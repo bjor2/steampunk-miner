@@ -7,7 +7,9 @@
  * cells stay where they are, and the cap stops the pocket at 32 density cells' worth of units.
  *
  * A pocket centred on a gated or core cell is blocked at no cost; one with nothing to open is
- * refused at no cost.
+ * refused at no cost. The ore it pushes out is banked on the trip ledger (`moverLedger.ts`,
+ * ticket 408): an ore cell the trip cap has no room for stays where it is, and a pocket that
+ * opened nothing for that reason is refused `trip_capped` at no cost.
  *
  * Mark milestones (#256, an income item's where and how): the Mark 3 second tap blows the same
  * pocket behind the miner, away from the drill, the Mark 6 hold on the side it steers toward
@@ -22,12 +24,16 @@ import {
 import type { TilePoint } from '../../../systems/world/tileGrid'
 import {
   ACTIVATION_UNIT_CAP,
+  bankedEditOf,
   canAfford,
+  canBankOreAt,
   draftMove,
   draftOpen,
+  holdBackOre,
+  isHeldByTripCap,
   MOVE_UNITS,
   OPEN_UNITS,
-  openDraft,
+  openMoverDraft,
   type EditDraft,
 } from './editDraft'
 import { sideVectorOf } from '../../../systems/vehicle/facedSide'
@@ -81,9 +87,18 @@ export function planPressurePocket(
   )
   const block = fixedBlockOf(view, centre)
   if (block !== null) return { kind: 'blocked', block }
-  const draft = openDraft(view, ACTIVATION_UNIT_CAP)
+  const draft = openMoverDraft(view, ACTIVATION_UNIT_CAP, key.origin)
   blowPocket(draft, { centre, radius, seed: editSeedOf(view.params, key) })
-  if (draft.cells.length > 0) return { kind: 'edit', cells: draft.cells }
+  return planOfPocket(draft)
+}
+
+/**
+ * The edit; with nothing opened, refused for the trip cap if it held ore back, else for want of
+ * ground to open.
+ */
+function planOfPocket(draft: EditDraft): TerrainPlan {
+  if (draft.cells.length > 0) return { kind: 'edit', ...bankedEditOf(draft) }
+  if (isHeldByTripCap(draft)) return { kind: 'refused', reason: TERRAIN_REFUSAL.tripCapped }
   return { kind: 'refused', reason: TERRAIN_REFUSAL.nothingToOpen }
 }
 
@@ -107,11 +122,18 @@ function openPocketTile(draft: EditDraft, pocket: Pocket, tile: TilePoint): void
   else if (isLooseOre(draft.view, tile)) pushOreOutward(draft, pocket, tile)
 }
 
-/** The ore moves to ground past the rim and its tile opens; with no ground near, it stays. */
+/**
+ * The ore moves to ground past the rim and its tile opens; with no ground near, or no room under
+ * the trip cap, it stays.
+ */
 function pushOreOutward(draft: EditDraft, pocket: Pocket, tile: TilePoint): void {
   if (!canAfford(draft, MOVE_UNITS + OPEN_UNITS)) return
   const rest = restPastRimOf(draft.view, pocket, tile)
   if (rest === null) return
+  if (!canBankOreAt(draft, tile)) {
+    holdBackOre(draft)
+    return
+  }
   draftMove(draft, tile, rest)
   draftOpen(draft, tile)
 }

@@ -15,6 +15,7 @@ import {
   press,
   replayedAtEveryRate,
   researchThrough,
+  roomyHoldCommand,
   standIntents,
   tilesOpenedBetween,
   type TimedIntent,
@@ -33,7 +34,8 @@ import { terrainToolsOf } from './terrainSection'
 // power-up path on the loaded slices: each tool pressed at tick 10 from a pocket underground,
 // facing right, then pressed again (a second tap) or held 20 ticks after it acted. A Mark N node
 // is researched from planet `unlockTier + 3 (N - 1)` (#161); every run is replayed jumped and in
-// render frames of 30 and 144 a second, and must come out the same.
+// render frames of 30 and 144 a second, and must come out the same. The hold is so large that the
+// movers' trip cap never binds (ticket 408): these runs say where a verb moves ore, not how much.
 
 const PRESS_TICK = 10
 const FOLLOW_GAP = 20
@@ -93,6 +95,7 @@ function playTool(
   const setup: TimedIntent[] = [
     [0, setVehicleLoadoutCommand({ 'powerup.1': itemId, ...slots })],
     [0, researchThrough(PLANET_OF_MARK[itemId][mark])],
+    [0, roomyHoldCommand()],
     [1, poseAbove(GROUND, facing)],
     ...standIntents(5, stand, facing),
     [PRESS_TICK, press()],

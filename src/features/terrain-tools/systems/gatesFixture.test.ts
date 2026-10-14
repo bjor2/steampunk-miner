@@ -114,7 +114,7 @@ describe('terrain-tools gates fixture', () => {
       const view = openGroundView(state, 'p1', editSourceOf(LODESTONE_BEACON_ID))
       if (view === null) throw new Error('no planet')
       const beacon = { tx: tile.tx - 2, ty: tile.ty, planetIndex: 1, plantedTick: 10, mark: 1 }
-      expect(planLodestoneGather(view, beacon)).toEqual([])
+      expect(planLodestoneGather(view, beacon).cells).toEqual([])
     })
   })
 })

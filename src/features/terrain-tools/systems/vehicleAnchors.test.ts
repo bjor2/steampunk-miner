@@ -89,7 +89,7 @@ function plannedCells(itemId: string, plan: Planner, miners: TwoMiners, mark: nu
 function gatherCells(miners: TwoMiners, mark: number) {
   const view = openGroundView(miners.state, 'p1', editSourceOf(LODESTONE_BEACON_ID))
   if (view === null) throw new Error('no planet')
-  return planLodestoneGather(view, { ...miners.stand, planetIndex: 1, plantedTick: 10, mark })
+  return planLodestoneGather(view, { ...miners.stand, planetIndex: 1, plantedTick: 10, mark }).cells
 }
 
 const CASES = SEEDS.flatMap((seed) => DEPTHS.map((depth) => [seed, depth] as const))

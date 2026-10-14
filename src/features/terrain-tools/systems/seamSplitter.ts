@@ -89,6 +89,6 @@ function splitAlong(view: GroundView, face: TilePoint, grain: GridStep, length: 
 }
 
 function planOfFissure(cells: readonly TerrainCellEdit[]): TerrainPlan {
-  if (cells.length > 0) return { kind: 'edit', cells }
+  if (cells.length > 0) return { kind: 'edit', cells, banked: null }
   return { kind: 'refused', reason: TERRAIN_REFUSAL.noGrain }
 }

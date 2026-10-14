@@ -17,6 +17,10 @@
  * the miner steers toward (Content's where-fix on #276); each re-plants the live beacon there, at
  * the same radius and cap. A beacon an ore-shifter's
  * sibling-link plants gathers at the link's half of its 256-swap cap (the lock's worked example).
+ *
+ * The ore a gather draws in is banked on the trip ledger (`moverLedger.ts`, ticket 408) under the
+ * cap of the beacon's band: the trip the dock starts, since the dock resets the counter first. A
+ * nodule the cap has no room for stays where it is.
  */
 import type { AuthorityState } from '../../../systems/authority/authorityState'
 import { unchanged, type RuleEffect } from '../../../systems/authority/commandRule'
@@ -33,14 +37,24 @@ import {
 } from '../../../systems/vehicle/vehiclePose'
 import type { TilePoint } from '../../../systems/world/tileGrid'
 import { atLinkStrength, type PowerUpOutcome, type PowerUpUse } from '../../power-up-core'
-import { canAfford, draftMove, MOVE_UNITS, openDraft, type EditDraft } from './editDraft'
+import {
+  bankedEditOf,
+  canAfford,
+  canBankOreAt,
+  draftMove,
+  holdBackOre,
+  MOVE_UNITS,
+  openMoverDraft,
+  type BankedEdit,
+  type EditDraft,
+} from './editDraft'
 import { distanceSqOf, tilesFarthestFirst, tilesNearestFirst } from './editGeometry'
 import { editSeedOf } from './editSeed'
 import { canHoldOre, isLooseOre, materialNow, openGroundView, type GroundView } from './groundView'
 import { magnitudeAt, terrainItemNamed } from './itemMagnitude'
 import { balanceOf } from './terrainItems'
 import { beaconPlantedOf, TERRAIN_REFUSAL } from './terrainEvents'
-import { editSourceOf, queueEditOf } from './terrainOutcome'
+import { editSourceOf, queueBankedEditOf } from './terrainOutcome'
 import { terrainToolsOf, withBeacon, type LodestoneBeacon } from './terrainSection'
 import { isHold, isSecondTap, toolVerbOf, type ToolVerb } from './toolVerb'
 
@@ -130,26 +144,32 @@ export function gatherAtDock(state: AuthorityState, playerId: string): RuleEffec
   const spent = withBeacon(state, playerId, null)
   const view = openGroundView(spent, playerId, editSourceOf(LODESTONE_BEACON_ID))
   if (view === null || view.params.planetIndex !== beacon.planetIndex) return unchanged(spent)
-  const cells = planLodestoneGather(view, beacon)
-  if (cells.length === 0) return unchanged(spent)
+  const gather = planLodestoneGather(view, beacon)
+  if (gather.cells.length === 0) return unchanged(spent)
   const author = { playerId, itemId: LODESTONE_BEACON_ID, mark: beacon.mark, origin: beacon }
-  return queueEditOf(spent, author, cells)
+  return queueBankedEditOf(spent, author, gather)
 }
 
-/** The gather's swaps: farthest nodules first, each onto the nearest free ground still closer. */
-export function planLodestoneGather(view: GroundView, beacon: LodestoneBeacon) {
+/**
+ * The gather's swaps: farthest nodules first, each onto the nearest free ground still closer; with
+ * the ore it banks on the trip.
+ */
+export function planLodestoneGather(view: GroundView, beacon: LodestoneBeacon): BankedEdit {
   const item = terrainItemNamed(LODESTONE_BEACON_ID)
   const centre = { tx: beacon.tx, ty: beacon.ty }
   const radius = gatherRadiusOf(beacon)
   const key = { origin: centre, tick: beacon.plantedTick, itemId: item.itemId, mark: beacon.mark }
   const seed = editSeedOf(view.params, key)
-  const draft = openDraft(view, beacon.swapCap ?? fullSwapCap())
+  const draft = openMoverDraft(view, beacon.swapCap ?? fullSwapCap(), centre)
   const nodules = tilesFarthestFirst(centre, radius, seed).filter((tile) => isLooseOre(view, tile))
   drawInward(draft, centre, nodules, tilesNearestFirst(centre, radius, seed))
-  return draft.cells
+  return bankedEditOf(draft)
 }
 
-/** Pairs each nodule, farthest first, with the nearest ground left; stops once none is closer. */
+/**
+ * Pairs each nodule, farthest first, with the nearest ground left; stops once none is closer. A
+ * nodule the trip cap has no room for stays and keeps its slot free.
+ */
 function drawInward(
   draft: EditDraft,
   centre: TilePoint,
@@ -162,6 +182,10 @@ function drawInward(
     const ore = materialNow(draft.view, nodule)
     while (next < slots.length && !canHoldOre(draft.view, slots[next], ore)) next += 1
     if (next === slots.length || !isCloser(centre, slots[next], nodule)) return
+    if (!canBankOreAt(draft, nodule)) {
+      holdBackOre(draft)
+      continue
+    }
     draftMove(draft, nodule, slots[next])
     next += 1
   }

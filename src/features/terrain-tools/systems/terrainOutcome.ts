@@ -4,7 +4,8 @@
  * a tick, and its `terrain_edit` line names the cells it changes, the chunks it touches and a hash
  * of the cells in order. A plan that a gate or core cell stopped before it changed anything is
  * `blocked` (the use costs nothing and logs `power_up_blocked_by_gate`); one that found nothing to
- * act on is `refused` and costs nothing either.
+ * act on is `refused` and costs nothing either. The ore a mover moved goes onto the trip ledger
+ * with the edit (`moverLedger.ts`, ticket 408).
  */
 import type { AuthorityState } from '../../../systems/authority/authorityState'
 import type { RuleEffect } from '../../../systems/authority/commandRule'
@@ -15,11 +16,13 @@ import {
 import { hashCell } from '../../../systems/cellRandom'
 import { chunkKey, chunkOfTile, type TilePoint } from '../../../systems/world/tileGrid'
 import type { GateBlock, PowerUpOutcome } from '../../power-up-core'
+import type { BankedEdit } from './editDraft'
+import { withOreBanked, type BankedOre } from './moverLedger'
 import { terrainEditedOf } from './terrainEvents'
 
 /** What a tool decided to do with one use. */
 export type TerrainPlan =
-  | { kind: 'edit'; cells: readonly TerrainCellEdit[] }
+  | ({ kind: 'edit' } & BankedEdit)
   | { kind: 'blocked'; block: GateBlock }
   | { kind: 'refused'; reason: string }
 
@@ -38,7 +41,25 @@ export function outcomeOfPlan(
 ): PowerUpOutcome {
   if (plan.kind === 'blocked') return plan
   if (plan.kind === 'refused') return plan
-  return { kind: 'acted', effect: queueEditOf(state, author, plan.cells) }
+  return { kind: 'acted', effect: queueBankedEditOf(state, author, plan) }
+}
+
+/** The edit joins the queue, and the ore a mover banked moves the trip on (ticket 408). */
+export function queueBankedEditOf(
+  state: AuthorityState,
+  author: EditAuthor,
+  edit: BankedEdit,
+): RuleEffect {
+  const queued = queueEditOf(state, author, edit.cells)
+  return { ...queued, state: withBankedOre(queued.state, author.playerId, edit.banked) }
+}
+
+function withBankedOre(
+  state: AuthorityState,
+  playerId: string,
+  banked: BankedOre | null,
+): AuthorityState {
+  return banked === null ? state : withOreBanked(state, playerId, banked)
 }
 
 /** The edit joins the queue, and its line says what it will change. */

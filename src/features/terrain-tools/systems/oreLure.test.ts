@@ -4,14 +4,22 @@ import { dockInBay, type ScriptedSession } from '../../../systems/authority/scri
 import { FACING } from '../../../systems/vehicle/vehiclePose'
 import type { TilePoint } from '../../../systems/world/tileGrid'
 import { chargesLeftOf } from '../../power-up-core'
-import { buriedTile, ofType, oreAround, press, sessionWith, standAt } from '../terrainTestSession'
+import {
+  buriedTile,
+  ofType,
+  oreAround,
+  press,
+  sessionWithRoomyHold,
+  standAt,
+} from '../terrainTestSession'
 import { ORE_SHIFTER_ID } from './oreShifter'
 import { terrainToolsOf } from './terrainSection'
 
 // The Ore Lure twist on the ore-shifter (spec #162 twist row, ticket 329): held, a use near no
 // plate leaves one on the tunnel wall at the miner's tile; a use farther than the shifter's reach
 // from it drags the ore round the hull toward the plate instead of the hull, with the same count,
-// cap and fixed cells. The owner's dock takes the plate back.
+// cap and fixed cells. The owner's dock takes the plate back. The hold is large enough that the
+// movers' trip cap never binds (ticket 408).
 
 const SHIFTER = { 'powerup.1': ORE_SHIFTER_ID }
 const ORE_LURE = 'artefact.salvage_magnet'
@@ -30,7 +38,7 @@ function distanceSq(a: TilePoint, b: TilePoint): number {
 
 /** A miner holding `artefactId`, standing at the plate's tile and pressing the shifter once. */
 function sessionAfterFirstPress(artefactId = ORE_LURE): ScriptedSession {
-  const session = sessionWith(SHIFTER)
+  const session = sessionWithRoomyHold(SHIFTER)
   session.submit(2, setArtefactCommand(artefactId))
   standAt(session, 5, PLATE_TILE, FACING.right)
   session.submit(10, press())

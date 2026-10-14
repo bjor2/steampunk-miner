@@ -231,8 +231,13 @@ import type { DriveSigns } from '../vehicle/driveSigns'
  *    `autoGuns` provider and the Flushing shell's `enemyFlushes` entry, so every pose report and
  *    cut now writes the vehicle's `stillSinceTick` (ticket 382's sentry fact) and owned turret
  *    modules shape the turret's shots. Only that field moves the digests; mined orders are unchanged.
+ * 70: the movers' trip ledger (ticket 408, Systems ruling 6167240683 on #385): the ore an
+ *    ore-shifter drags, a pocket lance pushes out or a lodestone beacon gathers is banked on the
+ *    `extraction` trip counter under `tripCapAt`, a nodule past the cap stays where it is, and a
+ *    use that moved nothing for the cap is refused `terrain-tools.trip_capped`. With no mover used
+ *    no digest or mined order changes.
  */
-export const AUTHORITY_PROTOCOL_VERSION = 69
+export const AUTHORITY_PROTOCOL_VERSION = 70
 
 /** The kernel's own commands: the closed set its rule tables are written against. */
 export interface KernelCommandPayloads {

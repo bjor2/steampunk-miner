@@ -19,6 +19,8 @@ import {
 import { planetParamsOf } from '../../systems/authority/planetOfState'
 import { queueTerrainEdit } from '../../systems/authority/terrain/terrainEdits'
 import { replayRun, type ReplayResult } from '../../systems/replay/replayRun'
+import { stepOfMajor } from '../../systems/economy/upgradeSteps'
+import { setUpgradeCommand } from '../../systems/vehicle/vehicleCommands'
 import { cellDensitySum } from '../../systems/world/cellYield'
 import { FACING, type Facing } from '../../systems/vehicle/vehiclePose'
 import type { PlanetParams } from '../../systems/world/planetParams'
@@ -57,6 +59,27 @@ export function sessionWith(
     session.submit(1, poseAbove(GROUND, FACING.right), playerId)
   }
   return session
+}
+
+/**
+ * The cargo-hold level a spec of where a mover moves ore stands on: a hold so large that the
+ * movers' trip cap (`tripCapAt`, ticket 408) never binds a planet-1 use, a lodestone's full gather
+ * of the richest band ore included. How much a trip banks is `moverLedger.test.ts`'s.
+ */
+const ROOMY_HOLD_MAJOR = 1000
+
+/** `sessionWith`, the hold so large the movers' trip cap never binds a use. */
+export function sessionWithRoomyHold(
+  slots: Readonly<Record<string, string>>,
+  playerIds: readonly string[] = ['p1'],
+): ScriptedSession {
+  const session = sessionWith(slots, playerIds)
+  for (const playerId of playerIds) session.submit(1, roomyHoldCommand(), playerId)
+  return session
+}
+
+export function roomyHoldCommand(): CommandIntent {
+  return setUpgradeCommand('cargo_hold', stepOfMajor(ROOMY_HOLD_MAJOR))
 }
 
 /** Carves a pocket round `tile` and reports the miner at rest at its centre, facing `facing`. */

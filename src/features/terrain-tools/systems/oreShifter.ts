@@ -6,7 +6,11 @@
  * edit lands whole on the activation tick and collects nothing: you still drill the ore.
  *
  * Gated and core cells are fixed and block paths. A use whose only ore in reach is fixed is
- * blocked by the nearest such cell and costs nothing; one with no ore in reach is refused. A combo
+ * blocked by the nearest such cell and costs nothing; one with no ore in reach is refused.
+ *
+ * The ore it drags is banked on the trip ledger (`moverLedger.ts`, ticket 408): a nodule the trip
+ * cap has no room for stays, and a use that dragged nothing for that reason is refused
+ * `trip_capped` at no cost. A combo
  * may choose which loose nodules go first through the `dragTarget` item hook (`dragHooks.ts`,
  * ticket 326), never how many.
  *
@@ -25,10 +29,14 @@ import type { TilePoint } from '../../../systems/world/tileGrid'
 import type { GateBlock } from '../../power-up-core'
 import {
   ACTIVATION_UNIT_CAP,
+  bankedEditOf,
   canAfford,
+  canBankOreAt,
   draftMove,
+  holdBackOre,
+  isHeldByTripCap,
   MOVE_UNITS,
-  openDraft,
+  openMoverDraft,
   type EditDraft,
 } from './editDraft'
 import { oreInDragOrder } from './dragHooks'
@@ -89,7 +97,7 @@ export function planOreDragTo(
   const pull = dragPullOf(view, key, pose, verb, target)
   const count = sizeOf(item, key, verb)
   const tiles = tilesInPull(pull)
-  const draft = openDraft(view, ACTIVATION_UNIT_CAP)
+  const draft = openMoverDraft(view, ACTIVATION_UNIT_CAP, key.origin)
   dragOre(draft, pull, oreInDragOrder(view, key, count, tiles), count)
   return planOfDrag(draft, tiles)
 }
@@ -137,11 +145,18 @@ function isAhead(hull: TilePoint, aim: GridStep, tile: TilePoint): boolean {
   return (tile.tx - hull.tx) * aim.x + (tile.ty - hull.ty) * aim.y > 0
 }
 
-/** Moves the nodule at `tile` as far along the pull as the ground lets it; false if it stays. */
+/**
+ * Moves the nodule at `tile` as far along the pull as the ground lets it; false if it stays, as it
+ * does when the trip cap has no room for it.
+ */
 function dragOne(draft: EditDraft, pull: DragPull, tile: TilePoint): boolean {
   if (!isLooseOre(draft.view, tile)) return false
   const rest = restingTileOf(draft.view, tile, pull)
   if (rest === null) return false
+  if (!canBankOreAt(draft, tile)) {
+    holdBackOre(draft)
+    return false
+  }
   draftMove(draft, tile, rest)
   return true
 }
@@ -174,9 +189,13 @@ function stepsOf(at: TilePoint, pull: DragPull): TilePoint[] {
   )
 }
 
-/** The edit; with nothing dragged, the nearest fixed cell in reach blocks it, if there is one. */
+/**
+ * The edit; with nothing dragged, the trip cap refuses it if it held a nodule back, else the
+ * nearest fixed cell in reach blocks it, if there is one.
+ */
 function planOfDrag(draft: EditDraft, tilesInReach: readonly TilePoint[]): TerrainPlan {
-  if (draft.cells.length > 0) return { kind: 'edit', cells: draft.cells }
+  if (draft.cells.length > 0) return { kind: 'edit', ...bankedEditOf(draft) }
+  if (isHeldByTripCap(draft)) return { kind: 'refused', reason: TERRAIN_REFUSAL.tripCapped }
   const block = nearestFixedBlockOf(draft.view, tilesInReach)
   if (block !== null) return { kind: 'blocked', block }
   return { kind: 'refused', reason: TERRAIN_REFUSAL.nothingToDrag }

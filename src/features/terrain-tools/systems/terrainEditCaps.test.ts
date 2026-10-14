@@ -96,7 +96,7 @@ describe('terrain edit caps', () => {
       for (const depth of DEPTHS) {
         const { view, stand } = standingView(LODESTONE_BEACON_ID, depth)
         const beacon = { ...stand, planetIndex: 1, plantedTick: 10, mark }
-        const cells = planLodestoneGather(view, beacon)
+        const { cells } = planLodestoneGather(view, beacon)
         expect(cells.every((cell) => cell.kind === 'swap')).toBe(true)
         expect(cells.length).toBeLessThanOrEqual(256)
       }

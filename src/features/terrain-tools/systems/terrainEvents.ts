@@ -82,6 +82,7 @@ export const TERRAIN_REFUSAL = {
   nothingToFoam: 'terrain-tools.nothing_to_foam',
   notOwned: 'terrain-tools.not_owned',
   outOfPlay: 'terrain-tools.out_of_play',
+  tripCapped: 'terrain-tools.trip_capped',
 } as const
 
 export type TerrainEditedBody = DomainEventBodies['terrain-tools.TerrainEdited']
