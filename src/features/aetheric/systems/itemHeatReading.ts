@@ -1,6 +1,7 @@
 /**
  * The item heat gauge on the HUD (the GD ruling on #263 Q1 a): it shows only while the player owns
- * an item that adds or burns item heat (the chronometric governor or the aether condenser), never
+ * an item that adds or burns item heat (the phase lantern or the arc coil of #261, the
+ * chronometric governor or the aether condenser), never
  * previews the Fire act's heat and has no throttle line. It reads in percent of the gauge's max,
  * with the exact heat units in `exact`, so its state is said in text, never by colour alone.
  */
@@ -9,12 +10,19 @@ import type { AuthorityState } from '../../../systems/authority/authorityState'
 import { fromSafeInteger, toCanonical } from '../../../systems/money'
 import { isItemOwned } from '../../../systems/vehicle/loadoutState'
 import type { GaugeReading } from '../../../systems/views/hudModel'
+import { ARC_COIL_ID } from './arcCoilItem'
 import { CONDENSER_ID } from './condenserItem'
 import { GOVERNOR_ID } from './governorItem'
 import { gaugeMaxUnits, itemHeatUnitsAt } from './itemHeat'
+import { LANTERN_ID } from './lanternItem'
 
 /** The items that add item heat or burn it: owning one shows the gauge. */
-const ITEM_HEAT_ITEM_IDS = [GOVERNOR_ID, CONDENSER_ID]
+export const ITEM_HEAT_ITEM_IDS: readonly string[] = [
+  LANTERN_ID,
+  ARC_COIL_ID,
+  GOVERNOR_ID,
+  CONDENSER_ID,
+]
 
 const PERCENT = 100
 const PERMILLE = 1000

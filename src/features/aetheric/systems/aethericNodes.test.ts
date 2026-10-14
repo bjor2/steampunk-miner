@@ -21,6 +21,8 @@ describe('aetheric lane nodes', () => {
     expect(registered.map((node) => [node.id, node.unlockTier, node.prereqs])).toEqual([
       ['tech.aetheric.aether_condenser', 29, ['tech.aetheric.resonance_whistle']],
       ['tech.aetheric.chronometric_governor', 24, ['tech.aetheric.resonance_whistle']],
+      ['tech.aetheric.fork.arc', 16, ['tech.aetheric.resonance_whistle']],
+      ['tech.aetheric.fork.phase', 16, ['tech.aetheric.resonance_whistle']],
       ['tech.aetheric.resonance_whistle', 15, []],
     ])
   })

@@ -4,7 +4,7 @@
  * nodes on P24 and P29 that need only the entry node, so a P16 fork re-choice (#255) strands
  * neither. Every item adds a verb and spends energy or heat, never yield; the items, their Mark
  * ladders and their numbers come with their own builds: the whistle's with #262, the governor's
- * and the condenser's with #263, the P16 fork pair with #261.
+ * and the condenser's with #263. The P16 fork pair is `aethericFork.ts` (#261).
  */
 import type { TechNode } from '../../tech-tree'
 import {
@@ -29,7 +29,7 @@ import {
   whistleMarkLadder,
 } from './whistleItem'
 
-const ENTRY_NODE_ID = 'tech.aetheric.resonance_whistle'
+export const ENTRY_NODE_ID = 'tech.aetheric.resonance_whistle'
 
 export const AETHERIC_TECH_NODES: readonly TechNode[] = [
   {

@@ -8,9 +8,12 @@ import { oreFamilies } from '../ores'
 import { lastMarkOf, type MarkLadder } from '../tech-tree'
 import { AETHERIC_PROJECTIONS, AETHERIC_RUN_EVENTS } from './logging'
 import { AETHERIC_REFUSALS } from './systems/aethericEvents'
+import { AETHERIC_FORK_NODES } from './systems/aethericFork'
 import { AETHERIC_TECH_NODES } from './systems/aethericNodes'
+import { ARC_COIL_ID, arcCoilMarkLadder } from './systems/arcCoilItem'
 import { CONDENSER_ID, condenserMarkLadder } from './systems/condenserItem'
 import { GOVERNOR_ID, governorMarkLadder } from './systems/governorItem'
+import { LANTERN_ID, lanternMarkLadder } from './systems/lanternItem'
 import { WHISTLE_ID, whistleMarkLadder } from './systems/whistleItem'
 
 // The GD lock on #245: an aetheric item names no frozen, magnetic or hollow feature and no ore
@@ -22,6 +25,8 @@ const VISION_FEATURE_WORDS = /\b(frozen|magnetic|hollow)\b/i
 
 const AETHERIC_LADDERS: Readonly<Record<string, MarkLadder>> = {
   [WHISTLE_ID]: whistleMarkLadder(),
+  [LANTERN_ID]: lanternMarkLadder(),
+  [ARC_COIL_ID]: arcCoilMarkLadder(),
   [GOVERNOR_ID]: governorMarkLadder(),
   [CONDENSER_ID]: condenserMarkLadder(),
 }
@@ -65,7 +70,7 @@ function cardTextsOf(itemId: string): string[] {
 /** All the text the lane shows or logs: nodes, cards, power-ups, events and refusals. */
 function aethericTexts(): string[] {
   return [
-    ...AETHERIC_TECH_NODES.map((node) => JSON.stringify(node)),
+    ...[...AETHERIC_TECH_NODES, ...AETHERIC_FORK_NODES].map((node) => JSON.stringify(node)),
     ...AETHERIC_ITEM_IDS.flatMap(cardTextsOf),
     ...contentOf('power-up')
       .filter((powerUp) => AETHERIC_ITEM_IDS.includes(powerUp.itemId))

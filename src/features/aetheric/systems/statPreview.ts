@@ -6,6 +6,10 @@
  * the tank, heat in percent of the item heat gauge.
  *
  * - The resonance whistle (#262): its lure's duration, its reach and the energy a blow costs.
+ * - The phase lantern (#261): the energy a phase adds to the bit's own and the heat it adds; the
+ *   ticks and the bit's energy are the cell's, so the card shows neither.
+ * - The galvanic arc coil (#261): the bolt's reach, how many enemies one bolt hits, and the energy
+ *   and heat a bolt costs.
  * - The chronometric governor (#263): its pocket's duration and range, the energy it draws a
  *   second and the heat a pocket adds.
  * - The aether condenser (#263): the energy a full item heat gauge condenses into.
@@ -15,6 +19,7 @@ import { TICKS_PER_SECOND } from '../../../constants/physics'
 import { CONDENSE_RATIO } from '../../../systems/aetheric/condense'
 import { div, fromSafeInteger, mul, type Money } from '../../../systems/money'
 import { markStepOf, type MarkLadder } from '../../tech-tree'
+import { ARC_COIL_ID, arcCoilBalance, arcCoilMarkLadder, arcCoilPrice } from './arcCoilItem'
 import {
   condenserBalance,
   condenserMarkLadder,
@@ -23,6 +28,7 @@ import {
 } from './condenserItem'
 import { governorBalance, governorMarkLadder, GOVERNOR_ID, governorPrice } from './governorItem'
 import { gaugeMaxUnits } from './itemHeat'
+import { LANTERN_ID, lanternBalance, lanternMarkLadder, lanternPrice } from './lanternItem'
 import { WHISTLE_ID, whistleBalance, whistleMarkLadder, whistlePrice } from './whistleItem'
 
 export interface StatPreviewLine {
@@ -36,6 +42,8 @@ const PERCENT = 100
 
 const PREVIEWS: Readonly<Record<string, (mark: number) => readonly StatPreviewLine[]>> = {
   [WHISTLE_ID]: whistleLinesOf,
+  [LANTERN_ID]: lanternLinesOf,
+  [ARC_COIL_ID]: arcCoilLinesOf,
   [GOVERNOR_ID]: governorLinesOf,
   [CONDENSER_ID]: condenserLinesOf,
 }
@@ -59,6 +67,32 @@ function whistleLinesOf(mark: number): StatPreviewLine[] {
     bought('Reach (tiles)', fromSafeInteger(balance.reachTiles)),
     bought('Energy a blow', unitsOf(balance.energyQuanta)),
     bought('Price', whistlePrice()),
+  ]
+}
+
+function lanternLinesOf(mark: number): StatPreviewLine[] {
+  const balance = lanternBalance()
+  const stats = statsAt(lanternMarkLadder(), mark)
+  return [
+    marked('Cooldown (s)', secondsOf(stats.cooldown ?? balance.cooldownTicks)),
+    marked('Charges', fromSafeInteger(stats.charges ?? balance.charges)),
+    bought('Extra energy a phase', unitsOf(balance.energyQuanta)),
+    bought('Heat a phase (%)', gaugePercentOf(balance.heatUnits)),
+    bought('Price', lanternPrice()),
+  ]
+}
+
+function arcCoilLinesOf(mark: number): StatPreviewLine[] {
+  const balance = arcCoilBalance()
+  const stats = statsAt(arcCoilMarkLadder(), mark)
+  return [
+    marked('Cooldown (s)', secondsOf(stats.cooldown ?? balance.cooldownTicks)),
+    marked('Reach (tiles)', fromSafeInteger(stats.magnitude ?? balance.rangeTiles)),
+    marked('Charges', fromSafeInteger(stats.charges ?? balance.charges)),
+    bought('Enemies a bolt', fromSafeInteger(balance.chainCount + 1)),
+    bought('Energy a bolt', unitsOf(balance.energyQuanta)),
+    bought('Heat a bolt (%)', gaugePercentOf(balance.heatUnits)),
+    bought('Price', arcCoilPrice()),
   ]
 }
 

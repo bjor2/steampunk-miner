@@ -1,9 +1,10 @@
 /**
  * The aetheric lane's numbers from `aetheric.economy.json`, under `tech.aetheric` (the GD lock on
  * #245: range, duration, chain count, condense ratio and cooldowns live there, never in code): the
- * one-off price every item pays (#162 4.1), the resonance whistle's row (#262), the chronometric
- * governor's and the aether condenser's rows and the off-act item heat gauge (#263). The file is
- * refused whole on any problem, like the kernel's economy file, so a stand-in never reaches a rule.
+ * one-off price every item pays (#162 4.1), the resonance whistle's row (#262), the P16 fork pair's
+ * rows, the phase lantern's and the galvanic arc coil's (#261), the chronometric governor's and the
+ * aether condenser's rows and the off-act item heat gauge (#263). The file is refused whole on any
+ * problem, like the kernel's economy file, so a stand-in never reaches a rule.
  */
 import {
   createFieldReader,
@@ -25,6 +26,39 @@ export interface WhistleBalance {
   durationTicks: number
   /** What one blow takes from the tank. */
   energyQuanta: number
+}
+
+/**
+ * The phase lantern's Mark 1 numbers (#261): the phase itself takes the ticks and the energy the
+ * bit would need on the cell; these are what the lantern adds on top.
+ */
+export interface LanternBalance {
+  /** Charges per dock. */
+  charges: number
+  cooldownTicks: number
+  windupTicks: number
+  /** What the lantern takes from the tank beyond the bit's energy for the cell's ticks. */
+  energyQuanta: number
+  /** What a phase adds to the item heat gauge. */
+  heatUnits: number
+}
+
+/** The arc coil's Mark 1 numbers (#261), in whole ticks, tiles, energy quanta and heat units. */
+export interface ArcCoilBalance {
+  /** Charges per dock. */
+  charges: number
+  cooldownTicks: number
+  windupTicks: number
+  /** How far from the vehicle, in whole tiles, the bolt finds its first enemy: the Mark magnitude. */
+  rangeTiles: number
+  /** How far from the last enemy hit, in whole tiles, the bolt chains to the next. */
+  chainTiles: number
+  /** How many more enemies the bolt chains to after the first. */
+  chainCount: number
+  /** What one bolt takes from the tank. */
+  energyQuanta: number
+  /** What one bolt adds to the item heat gauge. */
+  heatUnits: number
 }
 
 /** The governor's Mark 1 numbers, in whole ticks, tiles, energy quanta and heat units. */
@@ -61,6 +95,8 @@ export interface AethericEconomy {
   /** `k` band-5 ore units, paid at the item's unlock planet (#162 4.1). */
   price: BandOreCost
   resonanceWhistle: WhistleBalance
+  phaseLantern: LanternBalance
+  arcCoil: ArcCoilBalance
   chronometricGovernor: GovernorBalance
   aetherCondenser: CondenserBalance
   itemHeat: ItemHeatBalance
@@ -78,6 +114,8 @@ export function readAethericEconomy(
   const economy = {
     price: readBandOreCost(reader, 'tech.aetheric.price', lane.price),
     resonanceWhistle: readWhistle(reader, 'tech.aetheric.resonanceWhistle', lane.resonanceWhistle),
+    phaseLantern: readLantern(reader, 'tech.aetheric.phaseLantern', lane.phaseLantern),
+    arcCoil: readArcCoil(reader, 'tech.aetheric.arcCoil', lane.arcCoil),
     chronometricGovernor: readGovernor(
       reader,
       'tech.aetheric.chronometricGovernor',
@@ -106,6 +144,31 @@ function readWhistle(reader: FieldReader, path: string, raw: unknown): WhistleBa
     reachTiles: reader.safeInteger(`${path}.reachTiles`, row.reachTiles),
     durationTicks: reader.safeInteger(`${path}.durationTicks`, row.durationTicks),
     energyQuanta: reader.safeInteger(`${path}.energyQuanta`, row.energyQuanta),
+  }
+}
+
+function readLantern(reader: FieldReader, path: string, raw: unknown): LanternBalance {
+  const row = reader.object(path, raw)
+  return {
+    charges: reader.safeInteger(`${path}.charges`, row.charges),
+    cooldownTicks: reader.safeInteger(`${path}.cooldownTicks`, row.cooldownTicks),
+    windupTicks: reader.safeInteger(`${path}.windupTicks`, row.windupTicks),
+    energyQuanta: reader.safeInteger(`${path}.energyQuanta`, row.energyQuanta),
+    heatUnits: reader.safeInteger(`${path}.heatUnits`, row.heatUnits),
+  }
+}
+
+function readArcCoil(reader: FieldReader, path: string, raw: unknown): ArcCoilBalance {
+  const row = reader.object(path, raw)
+  return {
+    charges: reader.safeInteger(`${path}.charges`, row.charges),
+    cooldownTicks: reader.safeInteger(`${path}.cooldownTicks`, row.cooldownTicks),
+    windupTicks: reader.safeInteger(`${path}.windupTicks`, row.windupTicks),
+    rangeTiles: reader.safeInteger(`${path}.rangeTiles`, row.rangeTiles),
+    chainTiles: reader.safeInteger(`${path}.chainTiles`, row.chainTiles),
+    chainCount: reader.safeInteger(`${path}.chainCount`, row.chainCount),
+    energyQuanta: reader.safeInteger(`${path}.energyQuanta`, row.energyQuanta),
+    heatUnits: reader.safeInteger(`${path}.heatUnits`, row.heatUnits),
   }
 }
 

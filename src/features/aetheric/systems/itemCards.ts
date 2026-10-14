@@ -9,8 +9,10 @@ import type { ItemCtx, ItemRef } from '../../../systems/registries/itemDescriber
 import type { ItemDescriptionEntry } from '../../../systems/registries/itemDescriptionEntries'
 import { hasNoNextLevel, type DescribedStatLineSpec } from '../../descriptions'
 import { isMasteredAt, type MarkLadder } from '../../tech-tree'
+import { ARC_COIL_DESCRIPTION, ARC_COIL_ID, arcCoilMarkLadder } from './arcCoilItem'
 import { CONDENSER_DESCRIPTION, CONDENSER_ID, condenserMarkLadder } from './condenserItem'
 import { GOVERNOR_DESCRIPTION, GOVERNOR_ID, governorMarkLadder } from './governorItem'
+import { LANTERN_DESCRIPTION, LANTERN_ID, lanternMarkLadder } from './lanternItem'
 import { statPreview, type StatPreviewLine } from './statPreview'
 import { WHISTLE_DESCRIPTION, WHISTLE_ID, whistleMarkLadder } from './whistleItem'
 
@@ -23,6 +25,20 @@ export const WHISTLE_ITEM_CARD = itemCardOf(
   WHISTLE_ID,
   WHISTLE_DESCRIPTION,
   whistleMarkLadder(),
+)
+
+export const LANTERN_ITEM_CARD = itemCardOf(
+  'aetheric.phase_lantern',
+  LANTERN_ID,
+  LANTERN_DESCRIPTION,
+  lanternMarkLadder(),
+)
+
+export const ARC_COIL_ITEM_CARD = itemCardOf(
+  'aetheric.arc_coil',
+  ARC_COIL_ID,
+  ARC_COIL_DESCRIPTION,
+  arcCoilMarkLadder(),
 )
 
 export const GOVERNOR_ITEM_CARD = itemCardOf(

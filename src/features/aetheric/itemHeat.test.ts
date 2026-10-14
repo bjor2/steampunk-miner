@@ -6,15 +6,18 @@ import {
   type ScriptedSession,
 } from '../../systems/authority/scriptedSession'
 import { AETHERIC_ECONOMY } from './systems/aethericEconomy'
+import { ARC_COIL_ID } from './systems/arcCoilItem'
 import { CONDENSER_ID } from './systems/condenserItem'
 import { GOVERNOR_ID } from './systems/governorItem'
 import { itemHeatReadingOf } from './systems/itemHeatReading'
+import { LANTERN_ID } from './systems/lanternItem'
 import { itemHeatUnitsAt } from './systems/itemHeat'
 import { WHISTLE_ID } from './systems/whistleItem'
 
 // The off-act item heat gauge (the GD ruling on #263 Q1 a): it holds only the heat items add, cools
-// on its own, never passes its max, and shows on the HUD only while the player owns the governor
-// or the condenser. Set up through `debug.aetheric.setItemHeat` and the loadout's debug command.
+// on its own, never passes its max, and shows on the HUD only while the player owns an item that
+// adds or burns it: the lantern, the coil (#261), the governor or the condenser. Set up through
+// `debug.aetheric.setItemHeat` and the loadout's debug command.
 
 const ITEM_HEAT = AETHERIC_ECONOMY.itemHeat
 const SET_TICK = 10
@@ -43,14 +46,14 @@ describe('item heat gauge', () => {
     expect(session.state().players.p1.slices ?? {}).not.toHaveProperty('aetheric.heat')
   })
 
-  it('is hidden while the player owns neither the governor nor the condenser', () => {
+  it('is hidden while the player owns no item that adds or burns item heat', () => {
     expect(itemHeatReadingOf(sessionWithHeat(HEAT).state(), 'p1')).toBeNull()
     expect(itemHeatReadingOf(sessionWithHeat(HEAT, [WHISTLE_ID]).state(), 'p1')).toBeNull()
   })
 
-  it('reads in percent of its max once the governor or the condenser is owned', () => {
+  it('reads in percent of its max once the lantern, the coil, the governor or the condenser is owned', () => {
     const quarter = ITEM_HEAT.gaugeMaxUnits / 4
-    ;[GOVERNOR_ID, CONDENSER_ID].forEach((itemId) => {
+    ;[LANTERN_ID, ARC_COIL_ID, GOVERNOR_ID, CONDENSER_ID].forEach((itemId) => {
       const session = sessionWithHeat(quarter, [itemId])
       session.advanceTo(SET_TICK)
       expect(itemHeatReadingOf(session.state(), 'p1'), itemId).toMatchObject({

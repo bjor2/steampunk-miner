@@ -1,5 +1,5 @@
 {
-  "source": "The GD lock on #245 (Aetheric science lane): every aetheric item spends energy or heat, never yield, and its range, duration, chain count, condense ratio and cooldowns live here under tech.aetheric. Prices are spec #162 4.1's one-off (k 15 band-5 ore at the unlock planet), charges and cooldown 4.2's charged-item shape. The resonance whistle (#262) is a stand-in for Systems to set, not tuned: two charges a dock and the steam shield's 900-tick cooldown; a 3-tick wind-up (2.3 allows 6) so a hunter turns within the lock's 6 ticks of the press, the act landing after the enemies' step; an 8-tile reach from the whistle's cell, the grapple's range; 300 ticks (5 s) of lure, the smoke canister's window, which the Mark magnitude step grows; one energy unit (240 quanta) a blow, two auto-gun shots. The chronometric governor and the aether condenser (#263) are stand-ins for Systems too (the GD ruling on #263 Q3): the governor, two charges and the whistle's 900-tick cooldown, a 3-tick wind-up, a 6-tile pocket round the cell it was pressed on for 240 ticks (4 s, the Mark magnitude step grows it), 4 energy quanta a tick it holds (the drill's draw: 960 quanta, 4 units, a full pocket) and 2400 heat units on the item gauge a pocket, which the condenser's kernel ratio (#360, 4 units a quantum) gives back as 600 quanta, so the pair never makes energy; the condenser, two charges, a 600-tick cooldown and a 3-tick wind-up, burning the whole gauge at once. The off-act item heat gauge (GD ruling on #263 Q1 a) holds 9600 units, four pockets, and cools 1 unit a tick, so a full gauge is cold again in 160 s.",
+  "source": "The GD lock on #245 (Aetheric science lane): every aetheric item spends energy or heat, never yield, and its range, duration, chain count, condense ratio and cooldowns live here under tech.aetheric. Prices are spec #162 4.1's one-off (k 15 band-5 ore at the unlock planet), charges and cooldown 4.2's charged-item shape. The resonance whistle (#262) is a stand-in for Systems to set, not tuned: two charges a dock and the steam shield's 900-tick cooldown; a 3-tick wind-up (2.3 allows 6) so a hunter turns within the lock's 6 ticks of the press, the act landing after the enemies' step; an 8-tile reach from the whistle's cell, the grapple's range; 300 ticks (5 s) of lure, the smoke canister's window, which the Mark magnitude step grows; one energy unit (240 quanta) a blow, two auto-gun shots. The chronometric governor and the aether condenser (#263) are stand-ins for Systems too (the GD ruling on #263 Q3): the governor, two charges and the whistle's 900-tick cooldown, a 3-tick wind-up, a 6-tile pocket round the cell it was pressed on for 240 ticks (4 s, the Mark magnitude step grows it), 4 energy quanta a tick it holds (the drill's draw: 960 quanta, 4 units, a full pocket) and 2400 heat units on the item gauge a pocket, which the condenser's kernel ratio (#360, 4 units a quantum) gives back as 600 quanta, so the pair never makes energy; the condenser, two charges, a 600-tick cooldown and a 3-tick wind-up, burning the whole gauge at once. The off-act item heat gauge (GD ruling on #263 Q1 a) holds 9600 units, four pockets, and cools 1 unit a tick, so a full gauge is cold again in 160 s. The P16 fork pair (#261, the GD locks on #245 and #255) are stand-ins for Systems too: the phase lantern, two charges, a 600-tick cooldown and a 3-tick wind-up, whose phase takes exactly the ticks the bit would need on the cell and the bit's energy for them, plus a quarter unit (60 quanta) for the lantern and 1200 heat units on the item gauge (half a pocket); the galvanic arc coil, three charges, the whistle's 900-tick cooldown and a 3-tick wind-up, a bolt to the nearest enemy within 8 tiles (the whistle's reach, which the Mark magnitude step grows) chaining to at most two more within 4 tiles of the last, each hit one auto-gun shot at the current drill power, for one energy unit (240 quanta) and 1200 heat units a bolt (an eighth of the gauge).",
   "tech": {
     "aetheric": {
       "price": {
@@ -13,6 +13,23 @@
         "reachTiles": 8,
         "durationTicks": 300,
         "energyQuanta": 240
+      },
+      "phaseLantern": {
+        "charges": 2,
+        "cooldownTicks": 600,
+        "windupTicks": 3,
+        "energyQuanta": 60,
+        "heatUnits": 1200
+      },
+      "arcCoil": {
+        "charges": 3,
+        "cooldownTicks": 900,
+        "windupTicks": 3,
+        "rangeTiles": 8,
+        "chainTiles": 4,
+        "chainCount": 2,
+        "energyQuanta": 240,
+        "heatUnits": 1200
       },
       "chronometricGovernor": {
         "charges": 2,
