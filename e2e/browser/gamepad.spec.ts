@@ -16,7 +16,7 @@ declare global {
 }
 
 /** The standard mapping's indices for the buttons these cases press. */
-const BUTTON_INDEX = { PadA: 0, PadStart: 9, PadRS: 11, PadRT: 7 } as const
+const BUTTON_INDEX = { PadA: 0, PadX: 2, PadLB: 4, PadStart: 9, PadRS: 11 } as const
 type Button = keyof typeof BUTTON_INDEX
 
 interface PadFrame {
@@ -79,10 +79,13 @@ test('Start opens settings from the pad, and a pad press while one waits rebinds
   await feedFrames(page, padFrame(['PadStart']), 1)
   await expect(page.getByTestId(UI_IDS.settingsPanel)).toBeVisible()
   await feedFrames(page, padFrame([]), 1)
+  // Every plain vehicle button is bound (RT fires the bore gun, ticket 345), so the free one is a
+  // chord: LB is held before the capture starts, as a player holds it before pressing X.
+  await feedFrames(page, padFrame(['PadLB']), 1)
   await page.getByTestId(UI_ID_TEMPLATES.settingsRebind('use_slot_5')).click()
-  await feedFrames(page, padFrame(['PadRT']), 1)
+  await feedFrames(page, padFrame(['PadLB', 'PadX']), 1)
   const rebound = await page.evaluate(() => window.steampunkDebug!.input.getBindings())
-  expect(rebound.ok && rebound.overrides).toEqual({ use_slot_5: { gamepad: ['PadRT'] } })
+  expect(rebound.ok && rebound.overrides).toEqual({ use_slot_5: { gamepad: ['PadLB+PadX'] } })
   expect(errors).toEqual([])
 })
 

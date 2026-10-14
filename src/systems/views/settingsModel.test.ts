@@ -24,8 +24,8 @@ describe('settings model: bindings (ticket 346)', () => {
   })
 
   it('shows a rebound pad button', () => {
-    const row = rowOf(sourcesWith({ use_slot_5: { gamepad: ['PadRT'] } }, null), 'use_slot_5')
-    expect(row?.padText).toBe('RT')
+    const row = rowOf(sourcesWith({ use_slot_5: { gamepad: ['PadLB+PadX'] } }, null), 'use_slot_5')
+    expect(row?.padText).toBe('LB+X')
   })
 
   it('asks for a key or pad button while the action waits', () => {

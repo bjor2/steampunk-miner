@@ -187,10 +187,11 @@ describe('gamepad adapter: any-layer release (#332)', () => {
 })
 
 describe('gamepad adapter: rebinding', () => {
-  it('rebinds the waiting action to the next pad button and keeps its keys', () => {
+  it('rebinds the waiting action to the next pad chord and keeps its keys', () => {
+    routePadFrame(padHolding(['PadLB']))
     game().startRebinding('interact')
-    routePadFrame(padHolding(['PadRT']))
-    expect(game().padBindings.interact).toEqual(['PadRT'])
+    routePadFrame(padHolding(['PadLB', 'PadX']))
+    expect(game().padBindings.interact).toEqual(['PadLB+PadX'])
     expect(game().bindings).toEqual(defaultBindings(ACTION_MAP))
     expect(game().rebindingActionId).toBeNull()
   })
@@ -209,11 +210,12 @@ describe('gamepad adapter: rebinding', () => {
   })
 
   it('keeps a pad rebinding when the key of the same action is rebound after it', () => {
+    routePadFrame(padHolding(['PadLB']))
     game().startRebinding('interact')
-    routePadFrame(padHolding(['PadRT']))
+    routePadFrame(padHolding(['PadLB', 'PadX']))
     game().startRebinding('interact')
     expect(game().rebindToChord('KeyJ')).toEqual([])
-    expect(game().prefs.bindings.interact).toEqual({ gamepad: ['PadRT'], keyboard: ['KeyJ'] })
+    expect(game().prefs.bindings.interact).toEqual({ gamepad: ['PadLB+PadX'], keyboard: ['KeyJ'] })
   })
 
   it('round-trips a pad rebinding through the preferences file', async () => {
@@ -224,12 +226,15 @@ describe('gamepad adapter: rebinding', () => {
         file = json
       },
     })
+    routePadFrame(padHolding(['PadLB']))
     game().startRebinding('use_slot_5')
-    routePadFrame(padHolding(['PadRT']))
+    routePadFrame(padHolding(['PadLB', 'PadX']))
     await preferencesWrites()
-    expect(readPreferences(file).prefs.bindings).toEqual({ use_slot_5: { gamepad: ['PadRT'] } })
+    expect(readPreferences(file).prefs.bindings).toEqual({
+      use_slot_5: { gamepad: ['PadLB+PadX'] },
+    })
     resetGameStore(spyAuthority())
     game().adoptPreferences(await loadPreferences())
-    expect(game().padBindings.use_slot_5).toEqual(['PadRT'])
+    expect(game().padBindings.use_slot_5).toEqual(['PadLB+PadX'])
   })
 })
