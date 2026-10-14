@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-10-14T20:52:19+02:00",
+  "updated_at": "2026-10-14T21:10:39+02:00",
   "caps": {
     "grok": 12,
     "claude": 8,
@@ -28,18 +28,18 @@
         {
           "slot": "C2",
           "state": "busy",
-          "ticket": 407,
+          "ticket": 381,
           "grok_slot": 2,
           "kind": "dev",
-          "since": "2026-10-14T20:37:00+02:00"
+          "since": "2026-10-14T21:10:00+02:00"
         },
         {
           "slot": "C3",
           "state": "busy",
-          "ticket": 406,
+          "ticket": 407,
           "grok_slot": 3,
           "kind": "dev",
-          "since": "2026-10-14T20:52:00+02:00"
+          "since": "2026-10-14T21:10:00+02:00"
         },
         {
           "slot": "C4",
@@ -53,7 +53,7 @@
       "size": 4,
       "used": 4,
       "free": 0,
-      "claims_last_hour": 7,
+      "claims_last_hour": 6,
       "name": "Claude Max 1"
     },
     {
@@ -426,15 +426,15 @@
     {
       "slot": 2,
       "state": "dev",
-      "ticket": 407,
-      "since": "2026-10-14T20:37:00+02:00",
+      "ticket": 381,
+      "since": "2026-10-14T21:10:00+02:00",
       "claude_slot": 2
     },
     {
       "slot": 3,
       "state": "dev",
-      "ticket": 406,
-      "since": "2026-10-14T20:52:00+02:00",
+      "ticket": 407,
+      "since": "2026-10-14T21:10:00+02:00",
       "claude_slot": 3
     },
     {
@@ -505,17 +505,17 @@
     {
       "slot": 2,
       "state": "busy",
-      "ticket": 407,
+      "ticket": 381,
       "grok_slot": 2,
-      "since": "2026-10-14T20:37:00+02:00",
+      "since": "2026-10-14T21:10:00+02:00",
       "account": 1
     },
     {
       "slot": 3,
       "state": "busy",
-      "ticket": 406,
+      "ticket": 407,
       "grok_slot": 3,
-      "since": "2026-10-14T20:52:00+02:00",
+      "since": "2026-10-14T21:10:00+02:00",
       "account": 1
     },
     {
@@ -564,10 +564,10 @@
     }
   ],
   "last_refill": {
-    "at": "2026-10-14 20:52 CEST",
-    "mode": "refill-dev",
-    "triggers": "#403",
-    "started": "#406->C3/A1",
+    "at": "2026-10-14 21:10 CEST",
+    "mode": "recheck",
+    "triggers": "#407",
+    "started": "#407->C3/A1",
     "note": "spawned 1 worker(s)"
   },
   "totals": {
