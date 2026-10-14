@@ -6,6 +6,7 @@
 import type { DrillGearCaps } from './drillGearCaps'
 import type { ItemHookCaps } from './itemHookCaps'
 import type { ItemEffectCaps } from './itemEffectCaps'
+import type { CasingCementGrades } from './casingCementGrades'
 import type { MagnetCaps } from './magnetCaps'
 import type { MagneticHazardCaps } from './magneticHazardCaps'
 import type { BigStat, Money } from '../money'
@@ -316,8 +317,6 @@ export interface HazardArchetype {
   /** The lining type that seals the pockets and cools the tunnel, and its price on the #76 charge. */
   liningType: string
   liningMultiplier: BigStat
-  /** The type is unlocked once at the Upgrade bay for this many band ore units (#105 `bandOre`). */
-  liningUnlockCost: BandOreCost
 }
 
 export interface Economy {
@@ -392,6 +391,7 @@ export interface Economy {
    * `G` holds bands `1..G`; the core needs `casingGradeCoreMin`. `collapseCrush` is the hull
    * fraction a collapse takes off a vehicle caught in it (#43), for bands 1 to 5 and then the core.
    * `kCasing` is the fraction of `V(t(p, b))` one metre of first-placed lining costs (#76).
+   * `cementGrades` are the hazard linings as casing_cement grades (ticket 366).
    */
   casing: {
     costCurveId: string
@@ -399,6 +399,7 @@ export interface Economy {
     casingGradeCoreMin: number
     kCasing: BigStat
     collapseCrush: readonly BigStat[]
+    cementGrades: CasingCementGrades
   }
   /**
    * The Refinery bay (#105 numbers): from `unlockPlanet` the platform has it with `slotsStart`

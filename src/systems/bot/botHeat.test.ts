@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { createAuthorityState } from '../authority/authorityState'
-import { liningTypeUnlockPrice } from '../economy/heatEconomy'
+import { liningTypeUnlockPrice } from '../economy/casingPrices'
 import { stepOfMajor } from '../economy/upgradeSteps'
 import { onCurveLevel } from '../economy/vehicleStats'
 import { UPGRADE_IDS } from '../economy/economyDefinition'

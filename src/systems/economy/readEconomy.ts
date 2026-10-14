@@ -9,6 +9,7 @@ import {
   readRange,
   type FieldReader,
 } from './economyFieldReader'
+import { liningTypesWithoutGrade, readCasingCementGrades } from './casingCementGrades'
 import { readArchetypes } from './readArchetypeEconomy'
 import { readBlastingCharges } from './readBlastingEconomy'
 import { readEnemies } from './readEnemyEconomy'
@@ -40,6 +41,7 @@ export type EconomyReading = { economy: Economy; problems: [] } | { problems: st
 export function readEconomy(raw: unknown): EconomyReading {
   const reader = createFieldReader()
   const economy = readEconomyFields(reader, reader.object('economy', raw))
+  checkHazardLiningsAreGrades(reader, economy)
   return reader.problems.length > 0 ? { problems: reader.problems } : { economy, problems: [] }
 }
 
@@ -187,6 +189,15 @@ function readCasing(
     casingGradeCoreMin: reader.safeInteger('casing.casingGradeCoreMin', casing.casingGradeCoreMin),
     kCasing: reader.money('casing.kCasing', casing.kCasing),
     collapseCrush: readCollapseCrush(reader, casing.collapseCrush, coreTierBand),
+    cementGrades: readCasingCementGrades(reader, casing.cementGrades),
+  }
+}
+
+/** Every hazard act's lining is a casing_cement grade, so it has a place and a price (ticket 366). */
+function checkHazardLiningsAreGrades(reader: FieldReader, economy: Economy): void {
+  const archetypeTypes = economy.archetypes.map((archetype) => archetype.liningType)
+  for (const liningType of liningTypesWithoutGrade(economy.casing.cementGrades, archetypeTypes)) {
+    reader.record(`archetype lining type ${liningType} is no casing.cementGrades grade`)
   }
 }
 

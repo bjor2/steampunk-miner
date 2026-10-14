@@ -7,13 +7,12 @@
  *   throttle       drillPower * lerp(1, throttleFloor, (heat - throttleAt) / (gaugeMax - throttleAt))
  *   heat damage    damageAtMaxPerSecond * hullMax a second at the gauge's max
  *   lava contact   +hazardContact.heat and hazardContact.hullFraction * hullMax
- *   refractory     liningMultiplier times the #76 lining charge; unlocked once for
- *                  liningUnlockCost band ore units at the purchase planet (`bandOre`)
+ *   refractory     liningMultiplier times the #76 lining charge; unlocked as casing_cement
+ *                  grade 1 (ticket 366, priced in `casingPrices.ts`)
  * Band 6 (the core) heats like band 5, the deepest band the data lists. The standard lining is the
  * type every vehicle starts with and costs the plain #76 charge.
  */
-import { cmp, div, fromSafeInteger, mul, sub, ZERO_MONEY, type BigStat, type Money } from '../money'
-import { bandOrePrice } from './bandOreCost'
+import { cmp, div, fromSafeInteger, mul, sub, ZERO_MONEY, type BigStat } from '../money'
 import { compoundRatio } from './curveFamilies'
 import { ECONOMY } from './economy'
 import type { HazardArchetype } from './economyDefinition'
@@ -100,13 +99,6 @@ export function archetypeOfLiningType(liningType: string): HazardArchetype | nul
 /** What a metre of this type costs against the #76 charge: 1 for the standard lining. */
 export function liningTypePriceMultiplier(liningType: string): BigStat {
   return archetypeOfLiningType(liningType)?.liningMultiplier ?? ONE
-}
-
-/** Unlocking a lining type at the Upgrade bay of planet `planetIndex`; the standard one is free. */
-export function liningTypeUnlockPrice(liningType: string, planetIndex: number): Money {
-  const archetype = archetypeOfLiningType(liningType)
-  if (archetype === null) return ZERO_MONEY
-  return bandOrePrice(archetype.liningUnlockCost, planetIndex)
 }
 
 /** `min(cap, ratio^(p - first))`: the act's later planets run hotter (#113 vertical tail). */

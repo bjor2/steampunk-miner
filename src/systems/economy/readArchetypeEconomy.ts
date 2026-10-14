@@ -3,7 +3,7 @@
  * the heat block first. Each band list holds bands 1 to 5 (the core's band, `ore.coreTierBand`, has
  * none); the throttle line sits inside the gauge; an archetype's planets are a non-empty range.
  */
-import { readBandOreCost, type FieldReader } from './economyFieldReader'
+import type { FieldReader } from './economyFieldReader'
 import type { HazardArchetype } from './economyDefinition'
 import type { BigStat } from '../money'
 
@@ -52,11 +52,6 @@ function readArchetype(
     tail: readTail(reader, `${path}.tail`, archetype.tail),
     liningType: reader.text(`${path}.liningType`, archetype.liningType),
     liningMultiplier: reader.money(`${path}.liningMultiplier`, archetype.liningMultiplier),
-    liningUnlockCost: readBandOreCost(
-      reader,
-      `${path}.liningUnlockCost`,
-      archetype.liningUnlockCost,
-    ),
   }
   checkBandCounts(reader, path, read, coreTierBand - 1)
   checkGauge(reader, path, read)

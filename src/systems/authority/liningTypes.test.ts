@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { casingLiningPrice } from '../economy/casingPrices'
 import { ECONOMY } from '../economy/economy'
-import { liningTypeUnlockPrice } from '../economy/heatEconomy'
+import { liningTypeUnlockPrice } from '../economy/casingPrices'
 import { oreTier, oreValue } from '../economy/oreEconomy'
 import { add, ceilMilli, fromCanonical, mul, sub, toCanonical, ZERO_MONEY } from '../money'
 import { FACING } from '../vehicle/vehiclePose'

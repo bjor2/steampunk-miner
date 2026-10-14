@@ -1,6 +1,8 @@
 import { describe, expect, it } from 'vitest'
 import { ceilMilli, cmp, mul, toCanonical } from '../money'
 import { bandOrePrice, bandOrePriceAt, bandOreWorth, bandOreWorthAt } from './bandOreCost'
+import { cementGradeOreCostOf } from './casingCementGrades'
+import { cementGradeCount } from './casingPrices'
 import { chargeCostOf, chargeSizeCount, chargeSizesUpTo } from './chargeSizes'
 import { ECONOMY } from './economy'
 import type { BandOreCost } from './economyDefinition'
@@ -8,12 +10,14 @@ import { oreTier, oreValue } from './oreEconomy'
 import { paceScale } from './planetEconomy'
 
 // Every band-ore cost economy.json prices today: the gun mount and levels, each charge size (K8
-// #218), and each hazard act's lining unlock.
+// #218), and each casing_cement grade (ticket 366).
 const FIXTURE_COSTS: readonly BandOreCost[] = [
   ECONOMY.gun.mountCost,
   ECONOMY.gun.levelCost,
   ...chargeSizesUpTo(chargeSizeCount()).map(chargeCostOf),
-  ...ECONOMY.archetypes.map((archetype) => archetype.liningUnlockCost),
+  ...Array.from({ length: cementGradeCount() }, (_, index) =>
+    cementGradeOreCostOf(ECONOMY.casing.cementGrades, index + 1),
+  ),
 ]
 
 const PLANETS = [...Array.from({ length: 60 }, (_, index) => index + 1), 247, 607, 6007]

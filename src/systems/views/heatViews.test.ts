@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { createScriptedSession } from '../authority/scriptedSession'
-import { liningTypeUnlockPrice } from '../economy/heatEconomy'
+import { liningTypeUnlockPrice } from '../economy/casingPrices'
 import { toCanonical } from '../money'
 import { heatReadingOf, THROTTLED_TEXT } from './heatReading'
 import { liningRowOf } from './liningRow'

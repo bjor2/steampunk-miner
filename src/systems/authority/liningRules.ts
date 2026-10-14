@@ -3,15 +3,16 @@
  * top of the casing grade, never a second grade.
  *
  * - `BuyLiningType {liningType}`: at the Upgrade bay only, once the type's schedule row is open
- *   (`refractory_lining` from planet 8, #80). Unlocks the type for its `bandOre` price, logs
- *   `lining_type_unlocked`, and makes it the active type (`lining_type_selected`).
+ *   (`refractory_lining` from planet 8, #80). Unlocks the type for its casing_cement grade's price
+ *   (ticket 366), logs `lining_type_unlocked`, and makes it the active type (`lining_type_selected`).
  * - `SelectLiningType {liningType}`: at the Upgrade bay, any type the vehicle owns; rings laid
  *   from then on use it. Free: the price is in the lining laid (#76, #113).
  * - `debug.setLiningType`: a scenario's lining, owned and selected, with no unlock or price.
  *
  * A refused command changes nothing.
  */
-import { liningTypeUnlockPrice, STANDARD_LINING_TYPE } from '../economy/heatEconomy'
+import { liningTypeUnlockPrice } from '../economy/casingPrices'
+import { STANDARD_LINING_TYPE } from '../economy/heatEconomy'
 import { sub, toCanonical, type Money } from '../money'
 import {
   isLiningType,

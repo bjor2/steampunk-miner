@@ -66,7 +66,13 @@
     "casingGradeStart": 1,
     "casingGradeCoreMin": 5,
     "kCasing": "0.002",
-    "collapseCrush": ["0.080", "0.080", "0.080", "0.080", "0.080", "0.080"]
+    "collapseCrush": ["0.080", "0.080", "0.080", "0.080", "0.080", "0.080"],
+    "cementGrades": {
+      "liningTypes": ["refractory", "insulated", "grounded"],
+      "gradeCost": { "band": 5, "oreUnits": "40" },
+      "gradeRatio": "1.04",
+      "gradeDepthCap": 10
+    }
   },
   "refinery": {
     "unlockPlanet": 3,
@@ -184,8 +190,7 @@
       "hazardPocketVolume": ["0", "0.010", "0.020", "0.030", "0.040"],
       "tail": { "ratio": "1.040", "cap": "1.350" },
       "liningType": "refractory",
-      "liningMultiplier": "1.5",
-      "liningUnlockCost": { "band": 5, "oreUnits": "40" }
+      "liningMultiplier": "1.5"
     }
   ],
   "visualTiers": [

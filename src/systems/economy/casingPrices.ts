@@ -8,8 +8,14 @@
  * Lining is charged on first placement only (#76, #85): `ceilMilli(k_casing * V(t(p,b)) * lengthM)`
  * for `lengthM` metres of new lining against band `b`'s rock on planet `p`. The grade does not
  * multiply it (grade only gates collapse) and relining is free, so no grade enters the formula.
+ *
+ * A hazard lining type is a casing_cement grade (ticket 366, `casingCementGrades.ts`), unlocked
+ * once at the Upgrade bay for its grade's price on the non-drill Mark curve; the standard lining
+ * is free. These cement grades are not the #41 casing grade above.
  */
-import { ceil, ceilMilli, mul, type BigStat, type Money } from '../money'
+import { ceil, ceilMilli, mul, ZERO_MONEY, type BigStat, type Money } from '../money'
+import { bandOrePrice } from './bandOreCost'
+import { cementGradeCountOf, cementGradeOfType, cementGradeOreCostOf } from './casingCementGrades'
 import { geometricCurveOf } from './costCurveLookup'
 import { growGeometric } from './curveFamilies'
 import { ECONOMY } from './economy'
@@ -41,4 +47,25 @@ export function casingLiningPrice(
   const metrePrice = mul(ECONOMY.casing.kCasing, oreValue(oreTier(planetIndex, band)))
   const typedPrice = mul(metrePrice, liningTypePriceMultiplier(liningType))
   return ceilMilli(mul(typedPrice, lengthM))
+}
+
+/** How many casing_cement grades there are (ticket 366): a fixed count. */
+export function cementGradeCount(): number {
+  return cementGradeCountOf(ECONOMY.casing.cementGrades)
+}
+
+/** The casing_cement grade `liningType` is, 1 first; null for the standard lining. */
+export function cementGradeOf(liningType: string): number | null {
+  return cementGradeOfType(ECONOMY.casing.cementGrades, liningType)
+}
+
+/** What casing_cement grade `grade` costs at the Upgrade bay of planet `planetIndex`. */
+export function cementGradePrice(grade: number, planetIndex: number): Money {
+  return bandOrePrice(cementGradeOreCostOf(ECONOMY.casing.cementGrades, grade), planetIndex)
+}
+
+/** Unlocking a lining type on planet `planetIndex`: its grade's price, the standard one free. */
+export function liningTypeUnlockPrice(liningType: string, planetIndex: number): Money {
+  const grade = cementGradeOf(liningType)
+  return grade === null ? ZERO_MONEY : cementGradePrice(grade, planetIndex)
 }

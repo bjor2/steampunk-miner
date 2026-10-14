@@ -9,6 +9,7 @@ import {
   mul,
   toCanonical,
 } from '../money'
+import { liningTypeUnlockPrice } from './casingPrices'
 import { gunMountPrice } from './gunStats'
 import {
   bandHeatPerSecond,
@@ -22,7 +23,6 @@ import {
   isHeatPlanet,
   liningTypePriceMultiplier,
   liningTypes,
-  liningTypeUnlockPrice,
   throttleFactor,
 } from './heatEconomy'
 import { oreTier, oreValue } from './oreEconomy'

@@ -3,6 +3,9 @@
  * with the standard lining; an archetype's type (refractory for the Fire act) is unlocked once at
  * the Upgrade bay and then picked there as the active type, which every ring laid from then on
  * uses. The casing layer stores a type by its index in `liningTypes()`, the standard one first.
+ *
+ * Each archetype type is a casing_cement grade (ticket 366): refractory is grade 1 on its P8 row,
+ * insulated and grounded grades 2 and 3 on their P17 and P25 rows once their acts bring the type.
  */
 import { liningTypes, STANDARD_LINING_TYPE } from '../economy/heatEconomy'
 
@@ -44,7 +47,10 @@ export function withLiningTypeOwned(lining: VehicleLining, liningType: string): 
   return { ...lining, owned }
 }
 
-/** The schedule row that opens a lining type: `refractory_lining` for refractory (#80). */
+/**
+ * The schedule row that opens a lining type: `refractory_lining` for refractory (#80). The row is
+ * the casing_cement grade's row; the grade has no id of its own (ticket 366).
+ */
 export function liningRowIdOf(liningType: string): string {
   return `${liningType}_lining`
 }

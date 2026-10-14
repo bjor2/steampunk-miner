@@ -48,6 +48,14 @@ describe('economy data validation', () => {
     ])
   })
 
+  it('refuses a hazard lining that is no casing_cement grade (ticket 366)', () => {
+    const broken = economyFileCopy()
+    broken.casing.cementGrades.liningTypes = ['insulated', 'grounded']
+    expect(problemsOf(broken)).toEqual([
+      'archetype lining type refractory is no casing.cementGrades grade',
+    ])
+  })
+
   it('reads the two-tier share as a fraction in lowest terms (#180)', () => {
     const reading = readEconomy(economyFile)
     if (!('economy' in reading)) throw new Error(reading.problems.join('\n'))
