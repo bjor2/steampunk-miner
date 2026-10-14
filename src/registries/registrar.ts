@@ -54,6 +54,7 @@ import { GENERATION_HOOK_REGISTRY } from '../systems/registries/generationHooks'
 import { HEAT_PAUSE_REGISTRY } from '../systems/registries/heatPauses'
 import { HULL_DAMAGE_INTERCEPT_REGISTRY } from '../systems/registries/hullDamageIntercepts'
 import { MAGNETIC_GROUND_REGISTRY } from '../systems/registries/magneticGround'
+import { PLANET_CARD_LINE_REGISTRY } from '../systems/registries/planetCardLines'
 import { PLANET_SKY_BAND_REGISTRY } from '../systems/registries/planetSkyBand'
 import { ITEM_DESCRIBER_REGISTRY } from '../systems/registries/itemDescriber'
 import { ITEM_HOOK_REGISTRY } from '../systems/registries/itemHooks'
@@ -152,6 +153,7 @@ export function registrarFor(sliceId: string): SliceRegistrar {
     soundCue: (cue) => add(SOUND_CUE_REGISTRY, cue),
     chargeBlastCue: (provider) => add(CHARGE_BLAST_CUE_REGISTRY, provider),
     planetSkyBand: (provider) => add(PLANET_SKY_BAND_REGISTRY, provider),
+    planetCardLine: (source) => addPrefixed(PLANET_CARD_LINE_REGISTRY, sliceId, source),
     boreGun: (provider) => add(BORE_GUN_REGISTRY, provider),
     autoActor: (actor) => add(AUTO_ACTOR_REGISTRY, actor),
     slotHoldCue: (source) => add(SLOT_HOLD_CUE_REGISTRY, source),

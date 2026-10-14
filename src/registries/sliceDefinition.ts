@@ -43,6 +43,7 @@ import type { ItemDescriptionEntry } from '../systems/registries/itemDescription
 import type { OreLookProvider } from '../systems/registries/oreLook'
 import type { CellGateLookProvider } from '../systems/registries/cellGateLook'
 import type { MagneticGroundProvider } from '../systems/registries/magneticGround'
+import type { PlanetCardLineSource } from '../systems/registries/planetCardLines'
 import type { PlanetSkyBandProvider } from '../systems/registries/planetSkyBand'
 import type { ShockShield } from '../systems/registries/shockShields'
 import type { OreDrillClassProvider } from '../systems/registries/oreDrillClasses'
@@ -194,6 +195,11 @@ export interface SliceRegistrar {
   chargeBlastCue(provider: ChargeBlastCueProvider): void
   /** One provider across all slices: a band of light in a planet's sky, the aurora (#293). */
   planetSkyBand(provider: PlanetSkyBandProvider): void
+  /**
+   * A planet class's tag, arrival line and values on the kernel's planet card (ticket 343): shown
+   * once its `featureId` row is open, the hazard and gate kind only, never an unlock id.
+   */
+  planetCardLine(source: PlanetCardLineSource): void
   /** One provider across all slices: a player's bore gun numbers (ticket 313, #309). */
   boreGun(provider: BoreGunProvider): void
   /** An item that acts on its own while switched to auto, keyed by its item id (ticket 317). */

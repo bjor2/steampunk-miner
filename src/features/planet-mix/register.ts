@@ -8,8 +8,9 @@
  * The kernel's `hazard:magnetic` reads the magnetic planets' fields and electrified cells from here
  * (`magneticGround`, ticket 290). A magnetic planet shows itself (ticket 293): the aurora on the
  * kernel's planet sky band, the field lines as a scene layer and their Blender asset; the arcs on
- * electrified cells ride the kernel's terrain channel through `magneticGround`. P1 and P2 generate
- * as before.
+ * electrified cells ride the kernel's terrain channel through `magneticGround`, and its class tag
+ * and arrival line go on the kernel's planet card (`planetCardLine`, ticket 343). P1 and P2
+ * generate as before.
  */
 import type { SliceDefinition } from '../../registries/sliceDefinition'
 import { planetMixDebugActions } from './debug'
@@ -21,6 +22,7 @@ import { isPatchNearLava, planetMixHookOf } from './systems/mixRoll'
 import { MAGNETIC_SKY_BAND } from './systems/render/auroraBand'
 import { FIELD_ARC_LAYER_BUDGET } from './systems/render/fieldArcBudget'
 import { magneticArtAssets } from './systems/render/magneticArt'
+import { planetCardSources } from './systems/planetCardSources'
 import { planetMixSignatureTag } from './systems/signatureTag'
 
 export const slice: SliceDefinition = {
@@ -37,6 +39,8 @@ export const slice: SliceDefinition = {
     r.artAssets(magneticArtAssets())
     r.planetSkyBand(MAGNETIC_SKY_BAND)
     r.sceneLayer({ id: FIELD_ARC_LAYER_ID, Layer: FieldArcLayer, budget: FIELD_ARC_LAYER_BUDGET })
+    // The class tag and arrival line on the kernel's planet card, once the class is live (343).
+    planetCardSources().forEach((source) => r.planetCardLine(source))
     r.reportRows(planetMixReportRows)
     // steampunkDebug.features['planet-mix'].describe(), .mixOf(p, seed), .histogramOf(p, seeds),
     // .getMagneticLooks()
