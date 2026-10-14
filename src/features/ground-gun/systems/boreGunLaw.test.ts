@@ -105,6 +105,14 @@ describe('ground-gun: the bore never out-digs the drill (#309 Systems budget)', 
     },
   )
 
+  // The VS's P40 case (TD and GD on #314): P40's own bands 1, 5 and 9 with the rig at the bot's
+  // #307 arrival drill level, the gun at the bot's emergent levels and at the max levels a P40
+  // economy affords. On today's tiers it would only measure the 24-tick cap, so it waits for the
+  // drill.sweptCut flag flip and the #304/#330 re-baseline.
+  it.todo(
+    'bores at most 0.5x the drill on P40 bands 1, 5 and 9 at the #307 arrival drill (drill.sweptCut flip, #304/#330 re-baseline)',
+  )
+
   it('asks at least the drill dig energy for every cell at every energy level', () => {
     for (let level = 1; level <= wallLevelOf('energy'); level++) {
       expect(energyStatsAt(level).energyPerCellPct * 100).toBeGreaterThanOrEqual(WHOLE_BP)
