@@ -16,11 +16,19 @@ import { setUpgradeCommand } from '../../../systems/vehicle/vehicleCommands'
 import { planetParamsFor } from '../../../systems/world/planetParams'
 import { cellDensitySum } from '../../../systems/world/cellYield'
 import { surfaceRowOfColumn, type TilePoint } from '../../../systems/world/tileGrid'
+import { LOCKED_SCHEDULE } from '../../../systems/unlocks/unlockSchedule'
 import type { WorldState } from '../../../systems/world/worldState'
+import { oreFamilies } from '../../ores'
 import { CHOOSE_FORK_COMMAND, FORK_TIER, nodeCostOf } from '../../tech-tree'
 import { drillGearAskOf, REACH_BOOM_ID, SIDE_CUTTERS_ID } from './cuttersAndBoom'
-import { DEEP_BRANCH, DRILL_GEAR_FORK, WIDE_BRANCH, widenedFlanksOf } from './drillGearFork'
-import { gearValueOf } from './drillGearItems'
+import {
+  DEEP_BRANCH,
+  DRILL_GEAR_FORK,
+  WIDE_BRANCH,
+  WIDE_LEANED_ROW,
+  widenedFlanksOf,
+} from './drillGearFork'
+import { drillGearItemOf, gearValueOf } from './drillGearItems'
 import { TWIN_BIT_ID } from './twinBit'
 
 // The drill-gear lane's P16 fork (GD lock on #255, build 3, ticket 268): Wide cuts the flanks,
@@ -167,5 +175,22 @@ describe('drill-gear fork: Wide and Deep', () => {
     const wide = tilesCutBeyondBare(WIDE_BRANCH)
     expect(wide.map((tile) => tile.tx).sort()).toEqual([bit - 1, bit + 1])
     expect(tilesCutBeyondBare(DEEP_BRANCH)).toEqual([{ tx: bit, ty: TARGET_16.ty - 1 }])
+  })
+
+  it('names neither the leaned row nor its side cutters on a card, and no ore family 3-12', () => {
+    const row = LOCKED_SCHEDULE.rows.find((candidate) => candidate.id === WIDE_LEANED_ROW)!
+    const cutters = drillGearItemOf(SIDE_CUTTERS_ID)!
+    const forbidden = [
+      row.id,
+      row.name,
+      cutters.name,
+      cutters.iconId,
+      cutters.node.iconId,
+      ...oreFamilies()
+        .slice(2)
+        .map((family) => family.name),
+    ].map((word) => word.toLowerCase())
+    const cards = DRILL_GEAR_FORK.branches.map((node) => JSON.stringify(node).toLowerCase())
+    expect(cards.flatMap((card) => forbidden.filter((word) => card.includes(word)))).toEqual([])
   })
 })
