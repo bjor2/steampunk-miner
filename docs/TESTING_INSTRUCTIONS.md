@@ -160,7 +160,12 @@ programs }` from three's `renderer.info` of the game canvas), read only when cal
   tested on the pure `src/systems/save/`; store specs install an in-memory `SaveSlots` with
   `installSaveSlots(...)`, `await checkpointWrites()` before reading what was written, and simulate quit
   and resume as `resetGameStore()` plus the same slots, then `loadCheckpoint()` and `resumeCheckpoint`.
-  Uninstall with `installSaveSlots(null)` in `afterEach`.
+  Uninstall with `installSaveSlots(null)` in `afterEach`. The exact round-trip (ticket 405) saves
+  through JSON text and reads back with `readSaveSlot`: `saveExactRoundTrip.test.ts` holds money and
+  prices to decimal text, the cut cursor, a bore mid-shot, the cache's offer, the codex's firsts and
+  the opened rows; `saveDeterminism.test.ts` saves the planet-200 dive of `p200DiveFixture.ts` (a
+  crew of eight, so the steps are cut by the swept span, and a drill under the curve, so the cursor
+  holds part of a tick) and plays 600 ticks on from the save and from its load, compared byte for byte.
 - Hint specs (#16, #27): the hint and transmission boards are pure (`src/systems/hints/`) and are
   fed authority moments (a scripted session, or the pacing bot's `listener`); the store specs
   call `startPlaques()` as bootstrap does, install an in-memory `PreferencesStorage` for the

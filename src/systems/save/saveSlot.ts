@@ -4,7 +4,9 @@
  *   header   formatVersion, slot (name and wall time, #401), snapshotVersion, generatorVersion,
  *            saveEpoch, tick, digest, and the open unlock ids (`savedUnlocks.ts`, #401)
  *   world    the planet as seed + params + chunk deltas, the platform, the core, combat, the
- *            blocks warning or refilling (#43), loose lava (#113), live blasts and queued power-up terrain edits (K6 #189)
+ *            blocks warning or refilling (#43), loose lava (#113), live blasts and queued power-up terrain edits (K6 #189),
+ *            and the bore gun's pending shots, standing struts and grounded lines while there are any
+ *            (tickets 313, 379, 378; carried since ticket 405, so a save taken mid-bore restores)
  *   profile  per player the wallet, the last seq and the vehicle (integer levels, never stats)
  *
  * The slices' save sections ride inside these two parts (feature-slices.md 3.13): the session
@@ -76,6 +78,12 @@ export interface SaveWorldSection {
   lava: PortableState['lava']
   liveBlasts: PortableState['liveBlasts']
   terrainEdits: PortableState['terrainEdits']
+  /** The bore gun's pending shots (ticket 313); omitted while there are none. */
+  bores?: PortableState['bores']
+  /** The standing struts (ticket 379); omitted while there are none. */
+  struts?: PortableState['struts']
+  /** The grounded bore lines (ticket 378); omitted while there are none. */
+  groundedLines?: PortableState['groundedLines']
   debugApplied: boolean
   /** The session sections; omitted while none is registered. */
   slices?: PortableState['slices']
@@ -127,8 +135,20 @@ function worldSectionOf(state: PortableState, saveEpoch: number): SaveWorldSecti
     lava: state.lava,
     liveBlasts: state.liveBlasts,
     terrainEdits: state.terrainEdits,
+    ...boreFieldsOf(state),
     debugApplied: state.debugApplied,
     ...(state.slices === undefined ? {} : { slices: state.slices }),
+  }
+}
+
+/** The bore gun's optional state, each key only while it holds something, as the snapshot has it. */
+function boreFieldsOf(
+  from: Pick<PortableState, 'bores' | 'struts' | 'groundedLines'>,
+): Pick<PortableState, 'bores' | 'struts' | 'groundedLines'> {
+  return {
+    ...(from.bores === undefined ? {} : { bores: from.bores }),
+    ...(from.struts === undefined ? {} : { struts: from.struts }),
+    ...(from.groundedLines === undefined ? {} : { groundedLines: from.groundedLines }),
   }
 }
 
@@ -170,6 +190,7 @@ export function snapshotOfSaveSlot(file: SaveSections): SessionSnapshot {
       lava: world.lava,
       liveBlasts: world.liveBlasts,
       terrainEdits: world.terrainEdits,
+      ...boreFieldsOf(world),
       debugApplied: world.debugApplied,
       ...(world.slices === undefined ? {} : { slices: world.slices }),
     },
