@@ -21,7 +21,7 @@ import { setGunsForEnergy } from './botGuns'
 import { facingTowards, NO_TICKS, reportPoseIntent } from './botPose'
 import type { BotSession } from './botSession'
 import type { GateRouteBlock } from './gateRouteBlocks'
-import { botTravelSpeedOf, moveTicks } from './botWorld'
+import { botTravelSpeedOf, moveTicks, tileKindAt } from './botWorld'
 import type { MineLayout } from './mineLayout'
 
 /** A bore reports at least this often, like the client's 5 Hz pose reports. */
@@ -66,18 +66,26 @@ export interface BotPlanet {
  */
 export function boreTile(session: BotSession, pilot: BotPilot, tile: TilePoint, ticks: number) {
   const facing = facingTowards(pilot.position, tile)
-  for (let left = ticks; left > 0 && isVehicleActive(session.vehicle());) {
+  for (let left = ticks; left > 0 && isBoreOn(session, tile);) {
     faceThreats(session, pilot)
     setGunsForEnergy(session)
     const chunk = Math.min(left, BORE_REPORT_TICKS)
     session.submit(reportPoseIntent(pilot.position, facing, NO_TICKS))
     waitFiring(session, pilot, chunk)
-    // An enemy can destroy the vehicle while it waits; the drill then has nothing to drive.
-    if (!isVehicleActive(session.vehicle())) return
+    if (!isBoreOn(session, tile)) return
     session.submit({ type: 'drillTile', payload: { ...tile, ticks: chunk } })
     pilot.facing = facing
     left -= chunk
   }
+}
+
+/**
+ * An enemy can destroy the vehicle while it waits, and the drill then has nothing to drive. The
+ * tile can open before the ticks counted for a whole cell are spent: a cell keeps what earlier
+ * cuts took off it, and the authority refuses a drill on open ground.
+ */
+function isBoreOn(session: BotSession, tile: TilePoint): boolean {
+  return isVehicleActive(session.vehicle()) && tileKindAt(session.state(), tile) !== 'open'
 }
 
 /**
