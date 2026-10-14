@@ -1,0 +1,31 @@
+{
+  "schema": 1,
+  "ticket": 391,
+  "title": "Balance: pin the aetheric action mix in balance:forks",
+  "tier": "easy",
+  "model": "claude-opus-5-5",
+  "created": "2026-10-14T14:56:22Z",
+  "closed": "2026-10-14T21:23:09Z",
+  "segments": [
+    {"category":"idle","start":"2026-10-14T14:56:22.000Z","end":"2026-10-14T20:46:14.000Z","attempt":0,"tier":null,"model":null,"source":"derived"},
+    {"category":"other","start":"2026-10-14T20:46:14.000Z","end":"2026-10-14T20:46:59.496Z","attempt":1,"tier":"easy","model":"claude-opus-5-5","source":"loop-log"},
+    {"category":"context","start":"2026-10-14T20:46:59.496Z","end":"2026-10-14T20:49:16.934Z","attempt":1,"tier":"easy","model":"claude-opus-5-5","source":"transcript"},
+    {"category":"developing","start":"2026-10-14T20:49:16.934Z","end":"2026-10-14T20:50:03.697Z","attempt":1,"tier":"easy","model":"claude-opus-5-5","source":"transcript"},
+    {"category":"testing","start":"2026-10-14T20:50:03.697Z","end":"2026-10-14T20:52:12.851Z","attempt":1,"tier":"easy","model":"claude-opus-5-5","source":"transcript"},
+    {"category":"developing","start":"2026-10-14T20:52:12.851Z","end":"2026-10-14T20:52:18.709Z","attempt":1,"tier":"easy","model":"claude-opus-5-5","source":"transcript"},
+    {"category":"context","start":"2026-10-14T20:52:18.709Z","end":"2026-10-14T20:52:21.991Z","attempt":1,"tier":"easy","model":"claude-opus-5-5","source":"transcript"},
+    {"category":"testing","start":"2026-10-14T20:52:21.991Z","end":"2026-10-14T20:56:16.292Z","attempt":1,"tier":"easy","model":"claude-opus-5-5","source":"transcript"},
+    {"category":"context","start":"2026-10-14T20:56:16.292Z","end":"2026-10-14T20:57:04.583Z","attempt":1,"tier":"easy","model":"claude-opus-5-5","source":"transcript"},
+    {"category":"testing","start":"2026-10-14T20:57:04.583Z","end":"2026-10-14T21:10:46.694Z","attempt":1,"tier":"easy","model":"claude-opus-5-5","source":"transcript"},
+    {"category":"landing","start":"2026-10-14T21:10:46.694Z","end":"2026-10-14T21:11:25.458Z","attempt":1,"tier":"easy","model":"claude-opus-5-5","source":"transcript"},
+    {"category":"planning","start":"2026-10-14T21:11:25.458Z","end":"2026-10-14T21:11:33.420Z","attempt":1,"tier":"easy","model":"claude-opus-5-5","source":"transcript"},
+    {"category":"gates","start":"2026-10-14T21:11:33.420Z","end":"2026-10-14T21:22:55.904Z","attempt":1,"tier":"easy","model":"claude-opus-5-5","source":"loop-log"},
+    {"category":"landing","start":"2026-10-14T21:22:55.904Z","end":"2026-10-14T21:23:09.000Z","attempt":1,"tier":"easy","model":"claude-opus-5-5","source":"loop-log"}
+  ],
+  "totals": {"blocked":0,"planner_wait":0,"idle":20992,"context":189,"planning":8,"developing":53,"testing":1186,"gates":682,"landing":52,"other":45},
+  "lead_time_s": 23207,
+  "cycle_time_s": 2215,
+  "claimed": "2026-10-14T20:46:14.000Z",
+  "claimed_to_done_s": 2215,
+  "backfilled": false
+}
