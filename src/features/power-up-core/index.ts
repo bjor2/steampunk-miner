@@ -5,7 +5,8 @@
  * effect that outlasts its use, or a passive's, reads the item at the player's Mark through
  * `powerUpAtMarkOf` (#249). An item used by holding its slot declares `release` and restarts its
  * cooldown from its hold's end with `startCooldownAt` (ticket 332). A self-acting item's auto
- * actor presses through `pressItemOnAuto` and waits on `autoUseReadyTickOf` (ticket 328).
+ * actor presses through `pressItemOnAuto` and waits on `autoUseReadyTickOf` (ticket 328); its
+ * specs run the press path with this slice registered through `withPowerUpCore`.
  */
 export const POWER_UP_CORE_SLICE_ID = 'power-up-core'
 export {
@@ -43,3 +44,4 @@ export {
 export { intentToHoldSlot, intentToReleaseSlot, intentToUseSlot } from './systems/slotUse'
 export { startCooldownAt } from './systems/slotRelease'
 export { isToggleEngaged } from './systems/toggleRead'
+export { withPowerUpCore } from './withPowerUpCore'
