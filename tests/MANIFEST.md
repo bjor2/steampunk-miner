@@ -198,7 +198,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/extraction/systems/tripCap.test.ts` | 6 | 6 |
 | `src/features/extraction/systems/useResolution.test.ts` | 4 | 4 |
 
-### `ground-gun`: 36 files, 237 tests
+### `ground-gun`: 38 files, 249 tests
 
 | File | Tests | Sites |
 | --- | --- | --- |
@@ -233,6 +233,8 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/ground-gun/systems/render/armouryMounts.test.ts` | 12 | 12 |
 | `src/features/ground-gun/systems/render/boreGunLook.test.ts` | 7 | 7 |
 | `src/features/ground-gun/systems/render/boreSpray.test.ts` | 3 | 3 |
+| `src/features/ground-gun/systems/shoringShot.test.ts` | 7 | 7 |
+| `src/features/ground-gun/systems/shotCells.test.ts` | 5 | 5 |
 | `src/features/ground-gun/systems/sightAim.test.ts` | 3 | 3 |
 | `src/features/ground-gun/systems/signatureGround.test.ts` | 6 | 6 |
 | `src/features/ground-gun/systems/signatureShapes.test.ts` | 14 | 14 |
