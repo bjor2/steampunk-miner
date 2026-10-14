@@ -15,6 +15,7 @@ import { NO_LIVE_BLASTS, type LiveBlast } from './charges/liveBlast'
 import { NO_TERRAIN_EDITS, type QueuedTerrainEdit } from './terrain/terrainEdits'
 import type { PendingBore } from './bore/boreState'
 import type { StandingStruts } from './bore/strutState'
+import type { GroundedLine } from './magnetic/groundedLines'
 import type { AutoMode } from './autoMode/autoModeState'
 import { NO_COLLAPSE, type CollapseState } from './collapse/collapseState'
 import { NO_LOOSE_LAVA, type LavaState } from './lava/lavaState'
@@ -69,6 +70,11 @@ export interface AuthorityState {
    * none stands, so a session that never placed one digests as before.
    */
   struts?: StandingStruts
+  /**
+   * Bore lines grounded until a tick (ticket 378), which the shock check reads; absent while there
+   * are none, so a session that never grounds digests as before.
+   */
+  groundedLines?: readonly GroundedLine[]
   /** Set by the first accepted `debug.*` command and never reset (#11 section 4). */
   debugApplied: boolean
   /** The slices' session sections away from their initial value (feature-slices.md 3.13). */

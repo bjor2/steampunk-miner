@@ -569,6 +569,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/authority/bore/boreAim.test.ts` | 14 | 14 |
 | `src/systems/authority/bore/boreAuto.test.ts` | 30 | 21 |
 | `src/systems/authority/bore/boreAutoAim.test.ts` | 7 | 7 |
+| `src/systems/authority/bore/boreGrounding.test.ts` | 10 | 10 |
 | `src/systems/authority/bore/boreShape.test.ts` | 16 | 16 |
 | `src/systems/authority/bore/boreStrut.test.ts` | 12 | 12 |
 | `src/systems/authority/bore/boreWalk.test.ts` | 14 | 14 |

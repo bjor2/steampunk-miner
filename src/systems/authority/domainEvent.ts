@@ -266,9 +266,16 @@ export interface KernelDomainEventBodies {
    * A bore stopped: at its range, its budget or the tank (quietly), or with the clank at a cell
    * the drill cannot dig, the core or lava (`isClankStop`), or quietly at a hollow's edge where its
    * shot wedges a strut (ticket 379). `tx, ty` is the cell it stopped at, or its last cell;
-   * `cellsOpened` the cells it opened.
+   * `cellsOpened` the cells it opened. A grounding shot's line that opened cells grounds them until
+   * `groundedUntilTick` (ticket 378); absent for every other line.
    */
-  BoreEnded: { stop: BoreStop; tx: number; ty: number; cellsOpened: number }
+  BoreEnded: {
+    stop: BoreStop
+    tx: number
+    ty: number
+    cellsOpened: number
+    groundedUntilTick?: number
+  }
   /**
    * A strut-bore line wedged a strut in the mouth it broke into a hollow through (ticket 379):
    * `tx, ty` is that mouth cell, and the strut stands until `untilTick`.

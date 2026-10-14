@@ -30,6 +30,7 @@ import { nextTerrainEditTick } from './terrain/terrainEdits'
 import { applyQueuedTerrainEdits } from './terrain/terrainEditTick'
 import { nextBoreTick, runBoreTick } from './bore/boreTick'
 import { nextStrutTick, takeFallenStruts } from './bore/strutClock'
+import { expireGroundedLines, nextGroundedExpiryTick } from './magnetic/groundedLines'
 import { nextAutoModeTick, runAutoModeTick } from './autoMode/autoModeTick'
 import { detonateChargesDue, nextDetonationTick } from './charges/chargeDetonation'
 import { disarmExpiredCharges, nextDisarmTick } from './charges/chargeDisarm'
@@ -70,6 +71,7 @@ function runLiveTick(state: AuthorityState, tick: number): TickOutcome {
     (current) => applyQueuedTerrainEdits(current, tick),
     (current) => runBoreTick(current, tick),
     (current) => takeFallenStruts(current, tick),
+    (current) => expireGroundedLines(current, tick),
     (current) => runAutoModeTick(current, tick),
     (current) => runCollapseTick(current, tick),
     (current) => announceReadyBatches(current, tick),
@@ -79,7 +81,7 @@ function runLiveTick(state: AuthorityState, tick: number): TickOutcome {
   ])
 }
 
-/** Up to the next blast, bore, collapse, refinery, lava or slice step tick, if one comes before `toTick`; else to `toTick`. */
+/** Up to the next blast, bore, grounded line's expiry, collapse, refinery, lava or slice step tick, if one comes before `toTick`; else to `toTick`. */
 function skipQuietTicks(state: AuthorityState, toTick: number): TickOutcome {
   const stopTick = nextScheduledTick(state)
   if (stopTick === null || stopTick > toTick) {
@@ -93,6 +95,7 @@ function skipQuietTicks(state: AuthorityState, toTick: number): TickOutcome {
     (current) => applyQueuedTerrainEdits(current, stopTick),
     (current) => runBoreTick(current, stopTick),
     (current) => takeFallenStruts(current, stopTick),
+    (current) => expireGroundedLines(current, stopTick),
     (current) => runAutoModeTick(current, stopTick),
     (current) => runCollapseTick(current, stopTick),
     (current) => announceReadyBatches(current, stopTick),
@@ -110,6 +113,7 @@ function nextScheduledTick(state: AuthorityState): number | null {
     nextTerrainEditTick(state),
     nextBoreTick(state),
     nextStrutTick(state),
+    nextGroundedExpiryTick(state),
     nextAutoModeTick(state),
     nextCollapseTick(state, state.tick),
     nextRefineReadyTick(state.platform.refinerySlots, state.tick),

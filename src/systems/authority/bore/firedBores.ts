@@ -78,7 +78,8 @@ export function shotOf(stats: BoreGunStats): BoreShot {
 
 /**
  * The shot as its shape bores it: the shape's extra energy on every cell, the lining type its
- * grade lays and how long its struts stand; the shot itself with no shape.
+ * grade lays, how long its struts stand and the ticks it grounds its lines for; the shot itself
+ * with no shape.
  */
 export function shapedShotOf(shot: BoreShot, shape: ShotShape | null): BoreShot {
   if (shape === null) return shot
@@ -88,6 +89,7 @@ export function shapedShotOf(shot: BoreShot, shape: ShotShape | null): BoreShot 
     energyPerCellBp,
     ...liningTypeFieldOf(shape),
     ...strutTicksFieldOf(shape),
+    ...groundTicksFieldOf(shape),
   }
 }
 
@@ -100,4 +102,11 @@ function liningTypeFieldOf(shape: ShotShape): Pick<BoreShot, 'liningType'> {
 /** The strut's standing ticks under their key, or no key for a shape that wedges none. */
 function strutTicksFieldOf(shape: ShotShape): Pick<BoreShot, 'strutTicks'> {
   return shape.strutTicks === null ? {} : { strutTicks: shape.strutTicks }
+}
+
+/** A shape grounding for no ticks grounds nothing, so its shot carries no field. */
+function groundTicksFieldOf(shape: ShotShape): Pick<BoreShot, 'groundTicks'> {
+  return shape.groundTicks === null || shape.groundTicks === 0
+    ? {}
+    : { groundTicks: shape.groundTicks }
 }

@@ -34,6 +34,12 @@ export interface BoreShot {
    * digests as before.
    */
   strutTicks?: number
+  /**
+   * The ticks a grounding shot grounds each line's opened cells for (ticket 378, a shape's
+   * `groundTicks`); absent for every other shot, so a session with no shape saves and digests as
+   * before.
+   */
+  groundTicks?: number
 }
 
 export interface PendingBore {
@@ -130,15 +136,16 @@ function isPendingBore(bore: unknown): boolean {
   )
 }
 
-const SHOT_FIELDS: readonly Exclude<keyof BoreShot, 'liningType' | 'strutTicks'>[] = [
-  'gunFactorBp',
-  'energyPerCellBp',
-  'openIntervalTicks',
-  'collapseHoldTicks',
-  'boreBudgetTicks',
-  'cooldownTicks',
-  'kGunPct',
-]
+const SHOT_FIELDS: readonly Exclude<keyof BoreShot, 'liningType' | 'strutTicks' | 'groundTicks'>[] =
+  [
+    'gunFactorBp',
+    'energyPerCellBp',
+    'openIntervalTicks',
+    'collapseHoldTicks',
+    'boreBudgetTicks',
+    'cooldownTicks',
+    'kGunPct',
+  ]
 
 function isBoreShot(shot: unknown): boolean {
   return (
@@ -146,7 +153,8 @@ function isBoreShot(shot: unknown): boolean {
     SHOT_FIELDS.every((field) => isWholeNumber(shot[field])) &&
     shot.kGunPct !== 0 &&
     (shot.liningType === undefined || typeof shot.liningType === 'string') &&
-    (shot.strutTicks === undefined || isWholeNumber(shot.strutTicks))
+    (shot.strutTicks === undefined || isWholeNumber(shot.strutTicks)) &&
+    (shot.groundTicks === undefined || isWholeNumber(shot.groundTicks))
   )
 }
 

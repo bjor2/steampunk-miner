@@ -33,6 +33,11 @@ import {
   type StandingStruts,
 } from './bore/strutState'
 import {
+  portableGroundedLinesOf,
+  portableGroundedLinesProblems,
+  type GroundedLine,
+} from './magnetic/groundedLines'
+import {
   portableAutoModesOf,
   portableAutoModesProblems,
   type AutoMode,
@@ -113,6 +118,8 @@ export interface PortableState {
   bores?: PendingBore[]
   /** The standing struts by mouth cell (ticket 379); omitted while there are none. */
   struts?: Record<string, BoreStrut>
+  /** The grounded bore lines (ticket 378); omitted while there are none. */
+  groundedLines?: GroundedLine[]
   debugApplied: boolean
   /** The session sections; omitted while none is registered. */
   slices?: PortableSections
@@ -166,6 +173,7 @@ function portableStateOf(state: AuthorityState): PortableState {
     terrainEdits: portableTerrainEditsOf(state.terrainEdits),
     ...portableBoresField(state.bores),
     ...portableStrutsField(state.struts),
+    ...portableGroundedLinesField(state.groundedLines),
     debugApplied: state.debugApplied,
     ...portableSectionsOf(state.slices, 'session'),
   }
@@ -232,6 +240,7 @@ function authorityStateOf(portable: PortableState): AuthorityState {
     terrainEdits: portableTerrainEditsOf(portable.terrainEdits),
     ...portableBoresField(portable.bores),
     ...portableStrutsField(portable.struts),
+    ...portableGroundedLinesField(portable.groundedLines),
     debugApplied: portable.debugApplied,
     ...sectionsOfPortable(portable.slices, 'session'),
   }
@@ -281,6 +290,7 @@ function portableStateProblems(state: unknown, tick: unknown): string[] {
     ...portableTerrainEditsProblems(state.terrainEdits, 'snapshot.state.terrainEdits'),
     ...portableBoresProblems(state.bores, 'snapshot.state.bores'),
     ...portableStrutsProblems(state.struts, 'snapshot.state.struts'),
+    ...portableGroundedLinesProblems(state.groundedLines, 'snapshot.state.groundedLines'),
     ...(typeof state.debugApplied === 'boolean'
       ? []
       : ['snapshot.state.debugApplied must be a boolean']),
@@ -305,6 +315,13 @@ function portableStrutsField(struts: StandingStruts | undefined): {
   struts?: Record<string, BoreStrut>
 } {
   return struts === undefined ? {} : { struts: portableStrutsOf(struts) }
+}
+
+/** A copy of the grounded lines under their key, or no key at all while there are none. */
+function portableGroundedLinesField(lines: readonly GroundedLine[] | undefined): {
+  groundedLines?: GroundedLine[]
+} {
+  return lines === undefined ? {} : { groundedLines: portableGroundedLinesOf(lines) }
 }
 
 function planetProblems(planet: unknown): string[] {

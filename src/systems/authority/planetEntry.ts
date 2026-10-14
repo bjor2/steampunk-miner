@@ -1,6 +1,6 @@
 /**
  * Moving the session onto another planet (decisions #10 and #4): another planet is another world.
- * Its deltas start empty, its core progress, enemies, collapses, lava, bores and struts start fresh, and every vehicle stands on its dock
+ * Its deltas start empty, its core progress, enemies, collapses, lava, bores, struts and grounded lines start fresh, and every vehicle stands on its dock
  * site. An item on auto stays on, its preview dropped (ticket 317). The vehicles keep their levels, energy, hull and cargo; the platform keeps its bay and look.
  * A charge still on a wall stays on the old planet's wall: it is gone, and the rack keeps the rest.
  * `Travel` and `debug.setPlanet` both go through here.
@@ -19,6 +19,7 @@ import { NO_LIVE_BLASTS } from './charges/liveBlast'
 import { NO_TERRAIN_EDITS } from './terrain/terrainEdits'
 import { NO_BORES, withBores } from './bore/boreState'
 import { NO_STRUTS, withStruts } from './bore/strutState'
+import { NO_GROUNDED_LINES, withGroundedLines } from './magnetic/groundedLines'
 import { playerOnNewPlanet } from './autoMode/autoModeState'
 import { combatOnNewPlanet } from './combat/enemyRoster'
 import { NEW_CORE_PROGRESS } from './coreProgress'
@@ -38,7 +39,7 @@ export function withSessionOnPlanet(state: AuthorityState, planet: SessionPlanet
     ]),
   )
   return {
-    ...withStruts(withBores(state, NO_BORES), NO_STRUTS),
+    ...withGroundedLines(withStruts(withBores(state, NO_BORES), NO_STRUTS), NO_GROUNDED_LINES),
     planet,
     world: EMPTY_WORLD,
     core: NEW_CORE_PROGRESS,

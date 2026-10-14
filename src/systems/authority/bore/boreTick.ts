@@ -13,8 +13,10 @@
  * player. They share the shot's budget and recovery: each cell any line opens spends from all of
  * them, so the shot's dig ticks summed over every line and turn stay within `boreBudgetTicks`, and
  * `nextShotTick` stays the recovery of that sum. Each line stops on its own, and a line whose shot
- * names a lining type lines its opened cells as it ends (`boreLining.ts`). A line whose shot wedges
- * struts stops at a hollow's edge and leaves a strut in its mouth (`boreStrut.ts`, ticket 379).
+ * names a lining type lines its opened cells as it ends (`boreLining.ts`); one whose shot grounds
+ * grounds them until its `BoreEnded`'s `groundedUntilTick` (ticket 378, `groundedLines.ts`). A
+ * line whose shot wedges struts stops at a hollow's edge and leaves a strut in its mouth
+ * (`boreStrut.ts`, ticket 379).
  *
  * Cell events carry the bore's player in their stamp; collapse warnings, like every collapse
  * event, carry only the tick.
@@ -28,6 +30,7 @@ import type { BoreStop, DomainEvent, DomainEventBody } from '../domainEvent'
 import { gunRecoveryTicks } from '../../registries/boreGun'
 import { planetParamsOf } from '../planetOfState'
 import { openBoreCell, type CellOpening } from './boreCell'
+import { groundedUntilOf, groundEndedBore } from '../magnetic/groundedLines'
 import { checkBoreBlocks } from './boreCollapse'
 import { lineEndedBore } from './boreLining'
 import {
@@ -96,7 +99,7 @@ function openNextCell(
   const opening = strutStopOr(state, bore, tile, openBoreCell(state, params, ask))
   const moved = movedBore(bore, tile, rest, opening, tick)
   const effect = effectOf(state, opening)
-  const ended = endEventsOf(moved, tile, opening)
+  const ended = endEventsOf(moved, tile, opening, tick)
   const left = leftOnEnd(effect.state, params, { bore: moved, tile, opening, tick })
   return {
     state: withShotSpent(withBoreAt(left.state, index, moved), moved),
@@ -114,13 +117,15 @@ interface LineCell {
 
 /**
  * What an ended line leaves: its walls lined when its shot lines them, then its strut when it
- * stopped at a hollow's edge; unchanged while it still opens.
+ * stopped at a hollow's edge, then its opened cells grounded when its shot grounds them (ticket
+ * 378); unchanged while it still opens.
  */
 function leftOnEnd(state: AuthorityState, params: PlanetParams, cell: LineCell): RuleEffect {
   if (isBoreOpening(cell.bore)) return { state, events: [] }
   const lined = lineEndedBore(state, params, cell.bore)
   const strut = strutOnStop(lined.state, cell.bore, cell.tile, cell.opening, cell.tick)
-  return { state: strut.state, events: [...lined.events, ...strut.events] }
+  const grounded = groundEndedBore(strut.state, cell.bore, cell.tick)
+  return { state: grounded, events: [...lined.events, ...strut.events] }
 }
 
 /** Every line of `spent`'s shot takes its budget left and recovery: the shot spends as one. */
@@ -174,11 +179,21 @@ function endedBore(bore: PendingBore, tick: number): PendingBore {
   return { ...bore, cells: [], checkTick }
 }
 
-/** `BoreEnded` when this cell ended the line: a stop at it, or the last cell of the range. */
-function endEventsOf(moved: PendingBore, tile: TilePoint, opening: CellOpening): DomainEventBody[] {
+/**
+ * `BoreEnded` when this cell ended the line: a stop at it, or the last cell of the range; with
+ * the tick its cells are grounded until when the line grounds them.
+ */
+function endEventsOf(
+  moved: PendingBore,
+  tile: TilePoint,
+  opening: CellOpening,
+  tick: number,
+): DomainEventBody[] {
   if (isBoreOpening(moved)) return []
   const stop: BoreStop = opening.kind === 'stopped' ? opening.stop : 'range'
-  return [{ type: 'BoreEnded', stop, ...tile, cellsOpened: moved.bored.length }]
+  const ended = { type: 'BoreEnded' as const, stop, ...tile, cellsOpened: moved.bored.length }
+  const groundedUntilTick = groundedUntilOf(moved, tick)
+  return [groundedUntilTick === null ? ended : { ...ended, groundedUntilTick }]
 }
 
 /** What the cell changed: the opened cell's effect, or a stop's own events on the same state. */

@@ -5,7 +5,9 @@
  * `diveHullCapBp` (`magneticHazard.ts`). The shock is a hazard, never a gate: no gate is asked about
  * it, and it bills nothing, since the hull is mended at the existing repair price. A shielded cut
  * (`shockShields`, the dielectric bit) takes neither the ticks nor the hull, and says `withBit`.
- * Only the drill shocks: a blast or a terrain edit breaking the cell does not.
+ * Only the drill shocks: a blast or a terrain edit breaking the cell does not. A cell on a grounded
+ * bore line (`groundedLines.ts`, ticket 378) is quiet until its line expires: no ticks, no hull and
+ * no event, for every player's drill.
  */
 import { cmp, sub, ZERO_MONEY, type BigStat } from '../../money'
 import { onCurveHullShareOf, shockHullBpAfter, shockTicks } from '../../economy/magneticHazard'
@@ -18,6 +20,7 @@ import { vehicleOf, withVehicle, type AuthorityState } from '../authorityState'
 import { chainEffects, unchanged, type RuleEffect } from '../commandRule'
 import type { DomainEventBody } from '../domainEvent'
 import { destroyIfHullGone } from '../vehicleTransitions'
+import { hasGroundedLines, isCellGrounded } from './groundedLines'
 
 /** How a player's drill meets an electrified cell's shock: its ticks per cell. */
 export type ShockTicksAt = (params: PlanetParams, tile: TilePoint, cell: number) => number
@@ -28,9 +31,15 @@ export const unshieldedShockTicksAt: ShockTicksAt = (params, tile, cell) =>
 
 const NO_SHOCK_TICKS: ShockTicksAt = () => 0
 
-/** The shock ticks the player's drill pays now: none while a shield covers it. */
+/** The shock ticks the player's drill pays now: none while a shield covers it or on a grounded line. */
 export function shockTicksFor(state: AuthorityState, playerId: string): ShockTicksAt {
-  return isDrillShielded(state, playerId) ? NO_SHOCK_TICKS : unshieldedShockTicksAt
+  if (isDrillShielded(state, playerId)) return NO_SHOCK_TICKS
+  return hasGroundedLines(state) ? groundedShockTicksOf(state) : unshieldedShockTicksAt
+}
+
+function groundedShockTicksOf(state: AuthorityState): ShockTicksAt {
+  return (params, tile, cell) =>
+    isCellGrounded(state, tile) ? 0 : unshieldedShockTicksAt(params, tile, cell)
 }
 
 /** Every electrified cell the player's drill broke shocks it, then a hull at 0 wrecks it. */
@@ -40,13 +49,23 @@ export function shockElectrifiedCells(
   params: PlanetParams,
   broken: readonly YieldedCell[],
 ): RuleEffect {
-  const electrified = broken.filter(({ tile, cell }) => isElectrifiedCellAt(params, tile, cell))
+  const electrified = broken.filter(({ tile, cell }) => isLiveCellAt(state, params, tile, cell))
   if (electrified.length === 0) return unchanged(state)
   const shock = isDrillShielded(state, playerId) ? shieldedShockOf : hullShockOf(params)
   return chainEffects(state, [
     ...electrified.map(({ tile }) => shockStepAt(shock, playerId, tile)),
     (current) => destroyIfHullGone(current, playerId, current.tick, 'electrified'),
   ])
+}
+
+/** Whether the cell is electrified and on no grounded line. */
+function isLiveCellAt(
+  state: AuthorityState,
+  params: PlanetParams,
+  tile: TilePoint,
+  cell: number,
+): boolean {
+  return isElectrifiedCellAt(params, tile, cell) && !isCellGrounded(state, tile)
 }
 
 type CellShock = (state: AuthorityState, playerId: string, tile: TilePoint) => RuleEffect
