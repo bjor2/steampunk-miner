@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
+import { itemSnapshotViewOf } from '../../../systems/registries/itemSnapshotView'
 import { PLAYER, researchAll, sessionOnPlanet, withFixtureTree } from '../treeTestSession'
-import { markLadderOfItem, researchedMarkOf } from './itemMarks'
+import { markLadderOfItem, researchedMarkInViewOf, researchedMarkOf } from './itemMarks'
 
 const ECHO_SOUNDER = 'power.echo_sounder'
 
@@ -21,6 +22,18 @@ describe('tech tree: the Mark an item plays at', () => {
         [2, 3, 4].map((mark) => `tech.mark.${ECHO_SOUNDER}.${mark}`),
       )
       expect(researchedMarkOf(session.state(), PLAYER, ECHO_SOUNDER)).toBe(4)
+    })
+  })
+
+  it("reads the same Mark off an item card's snapshot view", () => {
+    withFixtureTree(() => {
+      const session = sessionOnPlanet(11)
+      const markIn = () =>
+        researchedMarkInViewOf(itemSnapshotViewOf(session.state(), PLAYER), ECHO_SOUNDER)
+      expect(markIn()).toBe(0)
+      researchAll(session, ['tech.sensing.echo_sounder', `tech.mark.${ECHO_SOUNDER}.2`])
+      expect(markIn()).toBe(researchedMarkOf(session.state(), PLAYER, ECHO_SOUNDER))
+      expect(markIn()).toBe(2)
     })
   })
 

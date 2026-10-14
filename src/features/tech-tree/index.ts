@@ -23,7 +23,7 @@ export type {
 } from './systems/techNode'
 export { TECH_LANES } from './systems/techNode'
 export { isMasteredAt, lastMarkOf, markStepOf } from './systems/markLadder'
-export { markLadderOfItem, researchedMarkOf } from './systems/itemMarks'
+export { markLadderOfItem, researchedMarkInViewOf, researchedMarkOf } from './systems/itemMarks'
 export {
   isYieldMilestone,
   MILESTONE_MARKS,

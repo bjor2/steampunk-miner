@@ -85,8 +85,13 @@ export function unlockedItems(
   playerId: string,
   tree: TechTree = registeredTechTree(),
 ): ItemUnlock[] {
+  return itemsUnlockedBy(unlockedNodeIdsOf(state, playerId), tree)
+}
+
+/** Each store item the researched `nodeIds` unlock, at its highest Mark or grade, by item id. */
+export function itemsUnlockedBy(nodeIds: readonly string[], tree: TechTree): ItemUnlock[] {
   const highest = new Map<string, number>()
-  unlockedNodeIdsOf(state, playerId)
+  nodeIds
     .flatMap((nodeId) => treeNodeOf(tree, nodeId)?.unlocks ?? [])
     .forEach(({ itemId, mark }) => highest.set(itemId, Math.max(mark, highest.get(itemId) ?? 0)))
   return [...highest.entries()]
