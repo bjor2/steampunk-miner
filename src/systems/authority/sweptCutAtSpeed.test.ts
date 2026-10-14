@@ -1,31 +1,15 @@
 import { describe, expect, it } from 'vitest'
-import {
-  DRILL_STAMP_AHEAD_MM,
-  DRILL_SUBSTEPS_PER_TICK,
-  STEP_BOUND_TOLERANCE_MM,
-} from '../../constants/balance'
-import { CLOSED_CUT_GATE } from '../vehicle/cutGate'
+import { DRILL_SUBSTEPS_PER_TICK, STEP_BOUND_TOLERANCE_MM } from '../../constants/balance'
 import { NO_DRIVE } from '../vehicle/driveSigns'
-import { sweptDrillStampOf } from '../vehicle/drillStamp'
-import { pointAtStep, sweepPathOf, sweptStampOf, type SweptCut } from '../vehicle/sweptCut'
 import { FACING, noseTileOf, type VehiclePose } from '../vehicle/vehiclePose'
-import { carveDisc, walkStampInRows } from '../world/groundEdit'
-import { stampCellsUpTo, walkStampPerChunk } from '../world/sweptSpan'
-import type { StampPoint } from '../world/stampShape'
 import type { PlanetParams } from '../world/planetParams'
 import { CHUNK_SIZE, chunkOfTile, surfaceRowOfColumn } from '../world/tileGrid'
-import {
-  EMPTY_WORLD,
-  isGeneratedChunkHeld,
-  materialCellAt,
-  type WorldState,
-} from '../world/worldState'
+import { EMPTY_WORLD, isGeneratedChunkHeld, materialCellAt } from '../world/worldState'
 import { vehicleOf, type AuthorityState } from './authorityState'
 import { cellDigEnergyOf } from './cellDigEnergy'
 import type { RuleEffect } from './commandRule'
 import type { DomainEventBody } from './domainEvent'
 import { drillAlongStep } from './drillStepCut'
-import { DRILL_CELLS_PER_TICK } from './cutShare'
 import { AWAY, onHeatPlanet } from './lava/lavaFixtures'
 import { planetParamsOf } from './planetOfState'
 import { drillSubStepsOfCells } from './groundDrill'
@@ -34,11 +18,11 @@ import { shockTicksFor } from './magnetic/electrifiedShock'
 import {
   createScriptedSession,
   FREEZE_ENEMIES,
-  PARAMS,
   poseAbove,
   type ScriptedSession,
 } from './scriptedSession'
 import { stepBoundsAt } from './stepBoundRead'
+import { sweptColumnAt } from './sweptColumnFixture'
 import { columnSweep, sweepWith } from './sweptSpanFixtures'
 
 // The cut budget at any speed (ticket 335, TD scope b on #316 and the TD lock on #374): the same
@@ -161,36 +145,7 @@ describe('heat from the steps summed dig time (ticket 335, TD lock on #374)', ()
 })
 
 /** Cells of the 1.9 m stamp swept straight down 30 m, `strideMm` a tick, by a #304-law drill. */
-function cellsOpenedWorldAt(strideMm: number): string[] {
-  const top = { x: 30_500, y: 261_500 }
-  // The stamp leads the pose by the fastest step's bound, so every stride sweeps the same path.
-  const aheadMm = DRILL_STAMP_AHEAD_MM + 16_000
-  const { payload } = poseAbove({ tx: 0, ty: 0 }, FACING.down)
-  let world: WorldState = EMPTY_WORLD
-  let cursor: SweptCut | undefined
-  const opened: string[] = []
-  const ticks = Math.ceil((PATH_METRES * 1000) / strideMm)
-  for (let tick = 1; tick <= ticks + 1; tick++) {
-    const y = top.y - Math.min((tick - 1) * strideMm, PATH_METRES * 1000)
-    const pose: VehiclePose = { ...payload, x: top.x, y, facing: FACING.down }
-    const stamp = sweptDrillStampOf(pose, false, aheadMm)
-    const path = sweepPathOf(cursor, pose, { stamp, aheadMm }, tick)
-    const disc = sweptStampOf(path, stamp, path.steps)
-    const isPerCell = stampCellsUpTo(disc, new Set(), DRILL_CELLS_PER_TICK) <= DRILL_CELLS_PER_TICK
-    const window = { firstTick: tick - 1, ticks: 1, subStepsPerTick: DRILL_SUBSTEPS_PER_TICK }
-    const walk = isPerCell ? walkStampInRows : walkStampPerChunk
-    const carve = carveDisc(world, PARAMS, disc, window, () => 1, walk)
-    world = carve.world
-    opened.push(...carve.yielded.map(({ tile }) => `${tile.tx},${tile.ty}`))
-    cursor = cursorAt(pointAtStep(path, path.steps), pose, tick)
-  }
-  return opened.sort()
-}
-
-function cursorAt(reached: StampPoint, pose: VehiclePose, tick: number): SweptCut {
-  const step = { poseXMm: pose.x, poseYMm: pose.y, facing: pose.facing, tick }
-  return { ...reached, ...step, ...CLOSED_CUT_GATE, cutSharePassed: 0, digSubSteps: 0 }
-}
+const cellsOpenedWorldAt = (strideMm: number) => sweptColumnAt(strideMm, PATH_METRES).opened
 
 describe('cells per metre along the same path at any speed (ticket 335)', () => {
   it('opens the same cells at 1, 4 and 16 m a tick when the drill clears each tick', () => {
