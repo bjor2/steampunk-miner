@@ -153,8 +153,12 @@ import type { DriveSigns } from '../vehicle/driveSigns'
  *    each player's sounding whistle, its `aetheric.lures` clock step, `aetheric.WhistleSounded`,
  *    and the hunters' step hearing its lure (`enemy.lureRetarget` on). With no whistle blown no
  *    digest or mined order changes.
+ * 54: casing_cement reinforcement (ticket 367, ruling B on #367): the `casing-cement` slice's
+ *    `groundReinforcement` provider cases every open tile with an intact cement-grade lining
+ *    sample (refractory, insulated, grounded) in it or on its one-sample border, so its blocks
+ *    never warn or refill. Standard lining cases nothing, so no P1-P7 digest or mined order changes.
  */
-export const AUTHORITY_PROTOCOL_VERSION = 53
+export const AUTHORITY_PROTOCOL_VERSION = 54
 
 /** The kernel's own commands: the closed set its rule tables are written against. */
 export interface KernelCommandPayloads {
