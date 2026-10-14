@@ -151,6 +151,18 @@ export const RUN_EVENT_REGISTRY = {
       bytes: { optional: 'integer' },
     },
   },
+  // Ticket 341 (TD scope g on #316): the hazard strip's sampler moved to another cost tier, 1 exact,
+  // 3 lattice or 4 band; the felt speed in whole metres a second and the window in whole metres.
+  hazard_strip_tier: {
+    group: 'run',
+    level: 'perf',
+    payload: {
+      fromTier: 'integer',
+      toTier: 'integer',
+      speedMetresPerSecond: 'integer',
+      windowMetres: 'integer',
+    },
+  },
 
   // Progression
   planet_entered: {

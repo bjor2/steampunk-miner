@@ -6,6 +6,7 @@ import { createRunLog, installRunLog, uninstallRunLog } from '../logging/runLog'
 import { runEventProblems } from '../logging/runEventSchema'
 import { resetGameStore } from './gameStore'
 import {
+  recordHazardStripTier,
   recordMemorySample,
   recordPerfSample,
   turnOffPerfLog,
@@ -94,6 +95,24 @@ describe('perf log', () => {
 
   it('records nothing on a played run, where perf lines are off', () => {
     recordPerfSample(perfSampleOf(SECOND_AT_4K, 1.774))
+    expect(sink.events).toEqual([])
+  })
+})
+
+describe('hazard strip tier log', () => {
+  const TO_LATTICE = { fromTier: 1, toTier: 3, speedMetresPerSecond: 9800, windowMetres: 19600 }
+
+  it('records one valid hazard_strip_tier when the sampler changes tier (ticket 341)', () => {
+    turnOnPerfLog(CHROMIUM_PAGE)
+    recordHazardStripTier(TO_LATTICE)
+    expect(sink.events).toHaveLength(1)
+    const [line] = sink.events
+    expect(runEventProblems(line)).toEqual([])
+    expect(line).toMatchObject({ event: 'hazard_strip_tier', data: TO_LATTICE })
+  })
+
+  it('records nothing on a played run, where perf lines are off', () => {
+    recordHazardStripTier(TO_LATTICE)
     expect(sink.events).toEqual([])
   })
 })
