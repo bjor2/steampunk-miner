@@ -1,6 +1,6 @@
 /**
  * The dock buildings slice (#175, spec #170): the Assay & Exchange and the Engineering Works on
- * the pad, the Workshop auto-roll, and the in-place add-ons of the #170 amendment (#197, #222) with
+ * the pad with the Works' idle life (ticket 395), the Workshop auto-roll, and the in-place add-ons of the #170 amendment (#197, #222) with
  * their facility rows and unlock pan. Presentation only: it reads the authority state and never
  * writes it. No side effects at import; the loader calls `register`.
  */
@@ -19,12 +19,15 @@ export const slice: SliceDefinition = {
     r.worldPiece({ id: 'dock-buildings.shop-buildings', layer: 'platform', Piece: ShopBuildings })
     r.worldPiece({ id: 'dock-buildings.add-ons', layer: 'platform', Piece: DockAddOns })
     WORKSHOP_ROLL_ATTACH_USES.forEach((use) => r.buildingAttachUse(use))
+    // The Works' idle steam leaves from its tallest stack (ticket 395).
+    r.buildingAttachUse({ id: 'dock-buildings.works-steam', attach: 'workshop.stack' })
     r.vehicleStaging(createDockStaging())
     // The add-ons' art under public/assets/platform/, shell and moving part each (#197, #214).
     r.artAssets(dockAddOnArtAssetsOf(DOCK_ADD_ONS))
     // The add-ons are their facility rows' buildings: scanner_station, research_lab, drone_bay.
     dockFacilitiesOf(DOCK_ADD_ONS).forEach((facility) => r.dockFacility(facility))
-    // steampunkDebug.features['dock-buildings'].getWorkshopRoll(), .getDockAddOns(), .getUnlockPan()
+    // steampunkDebug.features['dock-buildings'].getWorkshopRoll(), .getDockAddOns(), .getUnlockPan(),
+    // .getWorksIdle()
     r.debugActions(dockBuildingsDebugActions)
   },
 }

@@ -2,7 +2,8 @@
  * Read-only, so no command and no log line (docs/standards/feature-slices.md 3.14): where the local
  * car is drawn now and where the Works' turntable is, so a browser spec reads the auto-roll (#170
  * TD acceptance 5) through the debug API, never pixels; which add-ons stand on the pad and where
- * (#222); and the unlock pan, armed or started, with the camera weight it stages now.
+ * (#222); the unlock pan, armed or started, with the camera weight it stages now; and the Works'
+ * idle life (ticket 395): the turntable's turn and speed, the gantry's sway and the live steam.
  */
 import type { DebugAction } from '../../debug/debugActionRegistry'
 import { vehiclePresence } from '../../scene/vehiclePresence'
@@ -12,6 +13,7 @@ import { dockSiteOfPlanet } from '../../systems/authority/planetOfState'
 import type { DockSite } from '../../systems/world/dockSite'
 import { worksOriginOf } from './systems/render/workshopStaging'
 import { workshopRollPoints } from './dockStaging'
+import { worksIdleNow } from './scene/worksIdleNow'
 import { armedUnlockPanRowId, shownUnlockPan } from './store/unlockPanStore'
 import { dockAddOnAssetIdOf, standingDockAddOnsOf, type DockAddOn } from './systems/dockAddOns'
 import { dockAddOnOriginOf } from './systems/render/dockAddOnPlacement'
@@ -48,6 +50,14 @@ export const dockBuildingsDebugActions: Readonly<Record<string, DebugAction>> = 
       cameraWeight: dockUnlockPanStagingOf(state, shown)?.cameraWeight ?? 0,
     }
   },
+  getWorksIdle: () => ({
+    ok: true,
+    seconds: worksIdleNow.seconds,
+    turntableRadians: worksIdleNow.spin.angle,
+    turntableSpeed: worksIdleNow.spin.speed,
+    gantryRadians: worksIdleNow.gantryRadians,
+    steamParticles: worksIdleNow.steamParticles,
+  }),
 }
 
 function reportOf(site: DockSite) {

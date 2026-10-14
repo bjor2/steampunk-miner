@@ -1,0 +1,41 @@
+{
+  "turntable": {
+    "secondsPerTurn": 48,
+    "easeSeconds": 1.5,
+    "rimPeriodDegrees": 15,
+    "bandColumns": 96
+  },
+  "gantry": {
+    "swayRadians": 0.035,
+    "swaySeconds": 7
+  },
+  "steam": {
+    "capacity": 120,
+    "seed": 395,
+    "colour": "#d8d2c6",
+    "sizePixels": 9,
+    "opacity": 0.5,
+    "vents": [
+      {
+        "offsetM": [0, 0],
+        "dir": [0.12, 1],
+        "perSecond": 12,
+        "speed": 0.85,
+        "spreadRadians": 0.3,
+        "lifeSeconds": 2.8,
+        "puffSeconds": 0,
+        "puffShare": 1
+      },
+      {
+        "offsetM": [0.7, -0.9],
+        "dir": [0.12, 1],
+        "perSecond": 18,
+        "speed": 1.1,
+        "spreadRadians": 0.22,
+        "lifeSeconds": 2.2,
+        "puffSeconds": 2.6,
+        "puffShare": 0.35
+      }
+    ]
+  }
+}
