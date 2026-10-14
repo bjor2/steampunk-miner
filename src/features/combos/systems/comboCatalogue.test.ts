@@ -23,6 +23,15 @@ const ENDLESS_ONLY = [
   'combo.aether_reel',
 ]
 
+/** The five aetheric pair templates Content wrote on ticket 373 (14 Oct): endless only too. */
+const AETHERIC_PAIRS = [
+  'combo.lull_line',
+  'combo.still_foam',
+  'combo.warning_chime',
+  'combo.pendulum_anchor',
+  'combo.quench_cutters',
+]
+
 /** #162 4.5 and the GD on ticket 206 (7 Oct). */
 const INCOME_COMBOS = [
   'combo.assay_drain',
@@ -56,9 +65,21 @@ describe('combo catalogue', () => {
     authored.forEach((item) => expect(item.node?.id).toBe(`tech.${item.itemId}`))
   })
 
-  it('gives the four Content templates no authored node', () => {
+  it('gives the four Content templates and the five aetheric pairs no authored node', () => {
     const endless = COMBO_ITEMS.filter((item) => item.node === null)
-    expect(endless.map((item) => item.itemId)).toEqual(ENDLESS_ONLY)
+    expect(endless.map((item) => item.itemId)).toEqual([...ENDLESS_ONLY, ...AETHERIC_PAIRS])
+  })
+
+  it('pairs every aetheric template with one other lane, the aetheric parent first', () => {
+    const aetheric = COMBO_ITEMS.filter((item) => item.lanes.includes('aetheric'))
+    expect(aetheric.map((item) => item.itemId)).toEqual(AETHERIC_PAIRS)
+    expect(aetheric.map((item) => item.lanes[1])).toEqual([
+      'extraction',
+      'terrain',
+      'sensing',
+      'mobility',
+      'drill-gear',
+    ])
   })
 
   it('counts the drain combos, the lodestone drain and the lens corer under the 15% cap', () => {

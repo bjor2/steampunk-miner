@@ -9,6 +9,11 @@ export const COMBO_HOLDS: Readonly<Record<string, string>> = {
   'combo.foam_cutters': 'stabiliser foam is held back (#202), so the combo has no parent node',
   'combo.foam_grapple': 'stabiliser foam is held back (#202), so the combo has no parent node',
   'combo.aether_reel': 'the tow hook waits until Gameplay defines tow (GD lock on #206, 10)',
+  'combo.lull_line': 'its effect is not built yet (ticket 373)',
+  'combo.still_foam': 'its effect is not built yet (ticket 373)',
+  'combo.warning_chime': 'its effect is not built yet (ticket 373)',
+  'combo.pendulum_anchor': 'its effect is not built yet (ticket 373)',
+  'combo.quench_cutters': 'its effect is not built yet (ticket 373)',
 }
 
 /** Whether the combo store item ships now. */

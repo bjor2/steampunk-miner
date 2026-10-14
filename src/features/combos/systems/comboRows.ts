@@ -58,7 +58,10 @@ export function comboTemplateOf(
   }
 }
 
-/** The ten templates, one per lane pair (#161 section 2; ticket 206 "Combo templates"). */
+/**
+ * The fifteen templates, one per lane pair of the six lanes (#161 section 2; ticket 206 "Combo
+ * templates"; the GD lock on #245 and the aetheric pairs of ticket 373).
+ */
 export const COMBO_TEMPLATES: readonly TechComboTemplate[] = COMBO_ITEMS.map(comboTemplateOf)
 
 /**

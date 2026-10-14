@@ -13,7 +13,10 @@ import {
   vehicleItemOf,
 } from './comboRows'
 
-/** The ids `COMBO_TEMPLATES_FIXTURE` in tech-tree's spec fixtures has (ticket 206). */
+/**
+ * The ids `COMBO_TEMPLATES_FIXTURE` in tech-tree's spec fixtures has (ticket 206), and the five
+ * aetheric pairs Content wrote on ticket 373, which stand in the fixture as `aetheric_pair_1..5`.
+ */
 const TEMPLATE_IDS = [
   'tech.template.aether_reel',
   'tech.template.alarm_shield',
@@ -24,16 +27,19 @@ const TEMPLATE_IDS = [
   'tech.template.foam_grapple',
   'tech.template.lens_corer',
   'tech.template.lodestone_drain',
+  'tech.template.lull_line',
   'tech.template.magnetic_survey',
+  'tech.template.pendulum_anchor',
+  'tech.template.quench_cutters',
+  'tech.template.still_foam',
+  'tech.template.warning_chime',
 ]
 
 const pairKeyOf = (lanes: readonly string[]) => [...lanes].sort().join('×')
 
-/** The Aetheric science pairs' five templates are the lane's own (ticket 260), not this slice's. */
-function everyFirstFiveLanePair(): string[] {
-  const lanes = TECH_LANES.filter((lane) => lane !== 'aetheric')
-  return lanes.flatMap((lane, index) =>
-    lanes.slice(index + 1).map((other) => pairKeyOf([lane, other])),
+function everyLanePair(): string[] {
+  return TECH_LANES.flatMap((lane, index) =>
+    TECH_LANES.slice(index + 1).map((other) => pairKeyOf([lane, other])),
   )
 }
 
@@ -83,13 +89,13 @@ describe('combo rows', () => {
 })
 
 describe('combo templates', () => {
-  it('lists the ten templates with the ids of the tree fixture', () => {
+  it('lists the fifteen templates with the ids of the tree fixture and the aetheric pairs', () => {
     expect(COMBO_TEMPLATES.map((template) => template.id).sort()).toEqual(TEMPLATE_IDS)
   })
 
-  it('gives every pair of the first five lanes exactly one template', () => {
+  it('gives every pair of the six lanes exactly one template', () => {
     const pairs = COMBO_TEMPLATES.map((template) => pairKeyOf(template.lanes))
-    expect(pairs.sort()).toEqual(everyFirstFiveLanePair().sort())
+    expect(pairs.sort()).toEqual(everyLanePair().sort())
   })
 
   it('grades the combo item of its row, from the same two parents, both owned', () => {

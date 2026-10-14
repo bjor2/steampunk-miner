@@ -3,8 +3,9 @@
  * ticket 206 "Combo templates"): one row per combo store item and one `tech-combo-template` row
  * per lane pair. Six combos are authored nodes researched at the `research_lab` (P15 onward);
  * the four templates Content added on 7 Oct are endless only, first seen as a generated combo
- * from P41. The ceiling anchor (#288) is the last authored one, at P36, once the twin bit's
- * diagonal (#279) is in the game.
+ * from P41, and so are the five aetheric pairs Content wrote on ticket 373 (the GD ruling of 14
+ * Oct: one per other lane, the aetheric parent first). The ceiling anchor (#288) is the last
+ * authored one, at P36, once the twin bit's diagonal (#279) is in the game.
  *
  * Combos have no Marks and mount nothing new: they read their parents' current values (#162 4.6).
  * Parents are named by node id only, so this slice imports no lane slice.
@@ -157,6 +158,61 @@ export const COMBO_ITEMS: readonly ComboItem[] = [
     lanes: ['extraction', 'mobility'],
     parents: ['tech.extraction.aether_tether', 'tech.mobility.grapple_winch'],
     parentItemIds: ['rig.aether_tether', 'power.grapple_winch'],
+    isIncomeCombo: false,
+    node: null,
+  },
+  {
+    itemId: 'combo.lull_line',
+    name: 'Lull line',
+    iconId: 'item-combo-lull-line',
+    description: "The whistle's note runs down the line and calls the hunters to its end.",
+    lanes: ['aetheric', 'extraction'],
+    parents: ['tech.aetheric.resonance_whistle', 'tech.extraction.aether_tether'],
+    parentItemIds: ['power.resonance_whistle', 'rig.aether_tether'],
+    isIncomeCombo: false,
+    node: null,
+  },
+  {
+    itemId: 'combo.still_foam',
+    name: 'Still foam',
+    iconId: 'item-combo-still-foam',
+    description: "Foam laid in the governor's hush keeps its slow beat as it sets.",
+    lanes: ['aetheric', 'terrain'],
+    parents: ['tech.aetheric.chronometric_governor', 'tech.terrain.stabiliser_foam'],
+    parentItemIds: ['power.chronometric_governor', 'consumable.stabiliser_foam'],
+    isIncomeCombo: false,
+    node: null,
+  },
+  {
+    itemId: 'combo.warning_chime',
+    name: 'Warning chime',
+    iconId: 'item-combo-warning-chime',
+    description: 'A sighting trips the valve and the whistle cries a warning.',
+    lanes: ['aetheric', 'sensing'],
+    parents: ['tech.aetheric.resonance_whistle', 'tech.sensing.threat_periscope'],
+    parentItemIds: ['power.resonance_whistle', 'passive.threat_periscope'],
+    isIncomeCombo: false,
+    node: null,
+  },
+  {
+    itemId: 'combo.pendulum_anchor',
+    name: 'Pendulum anchor',
+    iconId: 'item-combo-pendulum-anchor',
+    description: 'Pinned in the air, the gyro swings and the hunters slow around it.',
+    lanes: ['aetheric', 'mobility'],
+    parents: ['tech.aetheric.chronometric_governor', 'tech.mobility.grav_anchor'],
+    parentItemIds: ['power.chronometric_governor', 'power.grav_anchor'],
+    isIncomeCombo: false,
+    node: null,
+  },
+  {
+    itemId: 'combo.quench_cutters',
+    name: 'Quench cutters',
+    iconId: 'item-combo-quench-cutters',
+    description: "The condenser drinks the flank cutters' heat and gives it back as charge.",
+    lanes: ['aetheric', 'drill-gear'],
+    parents: ['tech.aetheric.aether_condenser', 'tech.drill_gear.side_cutters'],
+    parentItemIds: ['power.aether_condenser', 'gear.side_cutters'],
     isIncomeCombo: false,
     node: null,
   },

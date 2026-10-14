@@ -76,11 +76,16 @@ describe('combos shipped and held', () => {
     )
   })
 
-  it('holds exactly the foam combos and the aether reel, each with a reason', () => {
+  it('holds exactly the foam combos, the aether reel and the unbuilt aetheric pairs', () => {
     expect(Object.keys(COMBO_HOLDS).sort()).toEqual([
       'combo.aether_reel',
       'combo.foam_cutters',
       'combo.foam_grapple',
+      'combo.lull_line',
+      'combo.pendulum_anchor',
+      'combo.quench_cutters',
+      'combo.still_foam',
+      'combo.warning_chime',
     ])
   })
 
