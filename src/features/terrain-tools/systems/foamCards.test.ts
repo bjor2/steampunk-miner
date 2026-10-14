@@ -6,7 +6,8 @@ import { isVehicleItemResearched } from '../../../systems/registries/vehicleItem
 import { createScriptedSession } from '../../../systems/authority/scriptedSession'
 import { vehicleItemRowsOf } from '../../../systems/views/vehicleItemRows'
 import { lastMarkOf } from '../../tech-tree'
-import { FOAM_CARD_LINES, foamLineTextAt } from './foamCards'
+import { fromSafeInteger } from '../../../systems/money'
+import { FOAM_CARD_LINES, foamLineTextAt, type FoamStock } from './foamCards'
 import { magnitudeAt, terrainItemNamed } from './itemMagnitude'
 import { STABILISER_FOAM_ID } from './stabiliserFoam'
 import { markLadderOf } from './terrainItems'
@@ -14,8 +15,9 @@ import { markLadderOf } from './terrainItems'
 // Stabiliser foam's card (Content on #381, matched to the GD default ruling): Content's flavour
 // and lines with their numbers read from the data, a cone Mark capped at +2 (radius 4), and no
 // line that says "brace", so foam never reads like the lode clamp. The Charges line (Content's
-// addendum) says where the stack comes from; its live count waits for the restock (#394). The
-// Cure line names the Mark foam sets for good at, the one that masters it (ticket 368).
+// addendum) reads the live charges left, then the restock price line (ticket 394): one charge at
+// foam's band on the card's planet. The Cure line names the Mark foam sets for good at, the one
+// that masters it (ticket 368).
 
 const FOAM = terrainItemNamed(STABILISER_FOAM_ID)
 const LAST_MARK = lastMarkOf(markLadderOf(FOAM))
@@ -27,7 +29,9 @@ function cardAt(mark: number) {
   return describeItem(ref, { playerId: 'p1', planetIndex: 3, level: mark, view })
 }
 
-const textsAt = (mark: number) => FOAM_CARD_LINES.map((line) => foamLineTextAt(line, mark))
+const STOCK: FoamStock = { chargesLeft: 3, unitPrice: fromSafeInteger(1250) }
+
+const textsAt = (mark: number) => FOAM_CARD_LINES.map((line) => foamLineTextAt(line, mark, STOCK))
 
 describe('stabiliser foam card', () => {
   it("reads Content's lines at Mark 1: a 2-cell cone lasting 10 s", () => {
@@ -38,7 +42,7 @@ describe('stabiliser foam card', () => {
       'foamed rock keeps its hardness and price',
       '+0 cells, up to +2',
       `from Mark ${LAST_MARK} foamed rock sets for good, billed as lining at its band`,
-      'research grants 4, restock comes later',
+      '3 left; restock 1,250 a charge at the Upgrade bay',
     ])
   })
 

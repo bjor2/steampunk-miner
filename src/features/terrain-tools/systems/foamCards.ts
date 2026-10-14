@@ -5,22 +5,32 @@
  * card's level names, the brace's length, the cone's Mark bonus against its cap, the Mark foam cures
  * at (ticket 368; no Content line yet, so the words are this ticket's) and the stack research grants.
  *
- * The Charges line (Content's addendum on #381) reads only where charges come from. Its live
- * `{charges} left` waits for the restock (#394), which rewrites the line into its price: a card
- * line gets no view of power-up-core's spent charges today. A player who does not own foam never
- * sees the line, as no surface draws foam's card for them: it has no seller, so no shop row.
+ * The Charges line (Content's addendum on #381) reads the live `{charges} left` and, since the
+ * restock (ticket 394), its second half is the restock price line: one charge's price on the
+ * card's planet, bought back at the Upgrade bay. A player who does not own foam never sees the
+ * line, as no surface draws foam's card for them: it has no seller, so no shop row, and the
+ * restock's bay entry lists owned foam only.
  */
 import { TICKS_PER_SECOND } from '../../../constants/physics'
+import { formatAmount } from '../../../systems/displayAmount'
+import type { Money } from '../../../systems/money'
 import type { ItemCtx, ItemRef } from '../../../systems/registries/itemDescriber'
 import { hasNoNextLevel, type DescribedStatLineSpec } from '../../descriptions'
+import { chargesLeftInViewOf } from '../../power-up-core'
 import { isMasteredAt, lastMarkOf } from '../../tech-tree'
-import { foamStartingCount } from './foamResearch'
+import { foamRestockPriceAt } from './foamRestock'
 import { magnitudeAt, terrainItemNamed } from './itemMagnitude'
 import { foamCureMark, STABILISER_FOAM_ID } from './stabiliserFoam'
 import { balanceOf, markLadderOf, type TerrainItem } from './terrainItems'
 
 /** What a line reads, or null for a line of words. */
 type FoamReading = 'coneRadius' | 'duration' | 'coneRadiusBonus'
+
+/** What the Charges line quotes from the card's snapshot: the charges left and one's restock. */
+export interface FoamStock {
+  chargesLeft: number
+  unitPrice: Money
+}
 
 export interface FoamCardLine {
   label: string
@@ -59,7 +69,7 @@ export const FOAM_CARD_LINES: readonly FoamCardLine[] = [
   },
   {
     label: 'Charges',
-    template: 'research grants {startingCount}, restock comes later',
+    template: '{charges} left; restock {unitPrice} a charge at the Upgrade bay',
     reading: null,
   },
 ]
@@ -69,15 +79,16 @@ export function foamLineSpecs(): DescribedStatLineSpec[] {
   return FOAM_CARD_LINES.map(lineSpecOf)
 }
 
-/** A line's words at `mark`, its numbers filled in. */
-export function foamLineTextAt(line: FoamCardLine, mark: number): string {
+/** A line's words at `mark` with `stock` left, its numbers filled in. */
+export function foamLineTextAt(line: FoamCardLine, mark: number, stock: FoamStock): string {
   const foam = terrainItemNamed(STABILISER_FOAM_ID)
   return line.template
     .replace('{coneRadius}', `${magnitudeAt(foam, mark)}`)
     .replace('{duration}', secondsTextOf(braceTicksOf(foam)))
     .replace('{coneRadiusBonus}', `${coneBonusAt(foam, mark)}`)
     .replace('{coneRadiusCap}', `${coneBonusAt(foam, lastMarkOf(markLadderOf(foam)))}`)
-    .replace('{startingCount}', `${foamStartingCount()}`)
+    .replace('{charges}', `${stock.chargesLeft}`)
+    .replace('{unitPrice}', formatAmount(stock.unitPrice))
     .replace('{cureMark}', `${foamCureMark()}`)
 }
 
@@ -86,8 +97,16 @@ function lineSpecOf(line: FoamCardLine): DescribedStatLineSpec {
     label: line.label,
     kind: 'linearInt',
     value: (_ref: ItemRef, ctx: ItemCtx) => readingAt(line.reading, markOfLevel(ctx.level)),
-    textOf: (level: number) => foamLineTextAt(line, markOfLevel(level)),
+    textIn: (ctx: ItemCtx) => foamLineTextAt(line, markOfLevel(ctx.level), stockOf(ctx)),
     nextLevel: isMarkStepped(line) ? nextMarkOf : hasNoNextLevel,
+  }
+}
+
+/** The player's charges left, read off the card's snapshot, and one charge's restock here. */
+function stockOf(ctx: ItemCtx): FoamStock {
+  return {
+    chargesLeft: chargesLeftInViewOf(ctx.view, STABILISER_FOAM_ID),
+    unitPrice: foamRestockPriceAt(ctx.planetIndex),
   }
 }
 

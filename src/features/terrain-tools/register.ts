@@ -19,7 +19,9 @@
  * Stabiliser foam (ticket 381) sets on a forward cone and holds the collapse blocks under it for
  * 600 ticks through a timed `collapseBraces` provider of its own; its clock step drops each cell as
  * it lapses; researching its node owns it with a full stack, its only charge source (a reaction to
- * `TechNodeUnlocked`). At the Mark that masters foam its cells cure for good (ticket 368): a session
+ * `TechNodeUnlocked`); its stack is bought back by the charge at the Upgrade bay through the
+ * power-up core's restock (ticket 394), foam the lane's one `consumable-restock`. At the Mark that
+ * masters foam its cells cure for good (ticket 368): a session
  * section of cured cells read by a `groundReinforcement` provider, billed at each cell's band, cut
  * cells and other planets dropped by a reaction. The cryo binder, shoring props and the strata press stay vision rows
  * (`systems/shippedTools.ts`). The lane's P16 fork (ticket 269), built on no magnet: the Bracer
@@ -36,6 +38,7 @@ import { BREAKER_FRACTURE } from './systems/breakerFracture'
 import { CURED_FOAM_REINFORCEMENT, CURED_FOAM_SECTION } from './systems/curedFoam'
 import { CURED_FOAM_GROUND_REACTION } from './systems/foamCure'
 import { FOAM_RESEARCH_REACTION } from './systems/foamResearch'
+import { TERRAIN_RESTOCKS } from './systems/foamRestock'
 import { LIVE_LODESTONE_PROVIDER, LODESTONE_DOCK_REACTION } from './systems/lodestoneBeacon'
 import { HOLD_LODE_CLAMPS_STEP, LODE_CLAMP_BRACES } from './systems/lodeClamp'
 import { TERRAIN_MAGNETS_SPEND_FAMILY } from './systems/magnetSpend'
@@ -58,6 +61,7 @@ export const slice: SliceDefinition = {
     r.content('vehicle-item', TERRAIN_VEHICLE_ITEMS)
     r.content('power-up', TERRAIN_POWER_UPS)
     r.content('tech-node', TERRAIN_TECH_NODES)
+    r.content('consumable-restock', TERRAIN_RESTOCKS)
     r.itemDescriptionEntries(TERRAIN_ITEM_CARDS)
     r.vehicleItemSeller(TERRAIN_SELLER)
     r.spendFamily(TERRAIN_MAGNETS_SPEND_FAMILY)
