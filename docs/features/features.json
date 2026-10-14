@@ -1867,12 +1867,12 @@
     {
       "group": true,
       "title": "Controls, Save & Settings",
-      "description": "Keyboard controls, the settings overlay and automatic saves.",
+      "description": "Keyboard, touch and gamepad controls, the settings overlay and automatic saves.",
       "children": [
         {
           "group": true,
           "title": "Controls",
-          "description": "A data-driven keyboard map.",
+          "description": "A data-driven key and pad map.",
           "children": [
             {
               "title": "Keyboard layout",
@@ -1893,8 +1893,14 @@
               "issues": [173, 179]
             },
             {
-              "title": "Gamepad & Steam Input",
-              "description": "Controller support, cut from the slice; the control map is ready for it.",
+              "title": "Gamepad",
+              "description": "Any standard controller reaches every action: left stick drives and moves menu focus, A docks and confirms, B backs out, Start opens settings, LB with the d-pad zooms, the right-stick click switches the bore gun's auto mode; pad buttons rebind in settings beside the keys. The right stick's bore-gun aim is read once the gun's fire input lands.",
+              "status": "partial",
+              "issues": [346, 314]
+            },
+            {
+              "title": "Steam Input",
+              "description": "Steam's controller layer and glyphs, deferred with the Steam work.",
               "status": "planned",
               "issues": [33, 12]
             }

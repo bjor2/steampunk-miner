@@ -193,6 +193,17 @@
       "specs": ["e2e/browser/smoke.spec.ts", "e2e/browser/miningPopup.spec.ts"]
     },
     {
+      "why": "The gamepad adapter (ticket 346): the shell's poll, pad codes and frames, the pad runtime.",
+      "paths": [
+        "src/shell/gamepadHooks.ts",
+        "src/store/padRuntime.ts",
+        "src/systems/input/padCodes.ts",
+        "src/systems/input/padFrame.ts",
+        "src/constants/gamepad.ts"
+      ],
+      "specs": ["e2e/browser/gamepad.spec.ts"]
+    },
+    {
       "why": "The touch controls, and the specs that drive the game by touch.",
       "paths": ["src/ui/touch/**"],
       "specs": [

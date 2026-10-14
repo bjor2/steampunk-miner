@@ -140,8 +140,10 @@ programs }` from three's `renderer.info` of the game canvas), read only when cal
   the drill voice (`drillVoice`: `casing` while the drill's nose is in lining, #41), and
   changes local presentation only: no command, no log line, no `debugApplied` (#11 amendment 2,
   #33). The `input` namespace (`input.press/release/tap(actionId)`, `input.getBindings()`,
-  `input.setBindings(overrides)`, and the unlogged read `input.getActionStream()`: every action
-  pressed and held one released, oldest first, from keys, touches and the API alike, #173) presses
+  `input.setBindings(overrides)`, the unlogged read `input.getActionStream()`: every action
+  pressed and held one released, oldest first, from keys, touches, the pad and the API alike, #173,
+  and `input.padFrame(frame | null)` / `input.getPadAim()`: a polled gamepad frame as the shell hands
+  it over, and the right stick's aim the bore gun reads, ticket 346) presses
   actions at the action layer, so a tap submits ordinary
   player commands that replay like real play; bindings are refused whole on any problem.
 - Screens (#33): the HUD, platform and settings view models are pure (`src/systems/views/`) and
