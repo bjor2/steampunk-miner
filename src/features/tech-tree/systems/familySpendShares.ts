@@ -8,7 +8,11 @@
 import type { ShopSpend } from '../../../systems/bot/shopSpend'
 import { cmp, div, ZERO_MONEY, type Money } from '../../../systems/money'
 import { formatPercent } from '../../../systems/displayAmount'
-import { familySpendRowsOf, type FamilySpendRow } from '../../../systems/registries/spendFamilies'
+import {
+  familySpendRowsOf,
+  spendFamiliesOf,
+  type FamilySpendRow,
+} from '../../../systems/registries/spendFamilies'
 import { medianShareOf, treeSpendRowsOf, type TreeSpendRow } from './treeSpendGuard'
 
 /** What the family rows read of one seed's run. */
@@ -25,17 +29,31 @@ export interface FamilyShareRow {
   medianShare: Money
 }
 
+interface FamilyKey {
+  planetIndex: number
+  familyId: string
+}
+
 interface SeedLedger {
   totals: readonly TreeSpendRow[]
   families: readonly FamilySpendRow[]
 }
 
-/** One row per planet per family any seed spent on, by planet then family id. */
-export function familyShareRowsOf(seeds: readonly SeedSpends[]): FamilyShareRow[] {
+/**
+ * One row per planet per family any seed spent on, by planet then family id. On each of
+ * `reportPlanets` every family live on any seed prints too, at zero when nothing was spent on it
+ * (Systems (c) on #310: the armoury row prints on P2/P10/P20/P40); a planet no seed bought on
+ * prints nothing.
+ */
+export function familyShareRowsOf(
+  seeds: readonly SeedSpends[],
+  reportPlanets: readonly number[] = [],
+): FamilyShareRow[] {
   const ledgers = seeds.map(ledgerOf)
-  return familyKeysOf(ledgers).map(({ planetIndex, familyId }) =>
-    familyShareRowOf(planetIndex, familyId, ledgers),
-  )
+  const keys = [...familyKeysOf(ledgers), ...reportKeysOf(seeds, reportPlanets)]
+  return uniqueSortedKeysOf(keys)
+    .filter((key) => isBoughtOnByAnySeed(ledgers, key.planetIndex))
+    .map(({ planetIndex, familyId }) => familyShareRowOf(planetIndex, familyId, ledgers))
 }
 
 /** The rows as a Markdown table, each seed's share beside the median. */
@@ -54,13 +72,26 @@ function ledgerOf(seed: SeedSpends): SeedLedger {
   }
 }
 
-/** Each planet and family any seed has a row for, by planet then family id. */
-function familyKeysOf(ledgers: readonly SeedLedger[]): { planetIndex: number; familyId: string }[] {
-  const keys = new Map<string, { planetIndex: number; familyId: string }>()
-  for (const row of ledgers.flatMap((ledger) => ledger.families)) {
-    keys.set(`${row.planetIndex} ${row.familyId}`, row)
-  }
-  return [...keys.values()].sort(compareKeys)
+/** Each planet and family any seed has a row for. */
+function familyKeysOf(ledgers: readonly SeedLedger[]): FamilyKey[] {
+  return ledgers.flatMap((ledger) => ledger.families)
+}
+
+/** Each report planet with each family whose anchor is live on any seed. */
+function reportKeysOf(seeds: readonly SeedSpends[], reportPlanets: readonly number[]): FamilyKey[] {
+  const liveFamilies = spendFamiliesOf().filter((family) =>
+    seeds.some((seed) => seed.isAnchorLive(family.anchorRowId)),
+  )
+  return reportPlanets.flatMap((planetIndex) =>
+    liveFamilies.map((family) => ({ planetIndex, familyId: family.id })),
+  )
+}
+
+/** The keys once each, by planet then family id. */
+function uniqueSortedKeysOf(keys: readonly FamilyKey[]): FamilyKey[] {
+  const unique = new Map<string, FamilyKey>()
+  for (const key of keys) unique.set(`${key.planetIndex} ${key.familyId}`, key)
+  return [...unique.values()].sort(compareKeys)
 }
 
 function familyShareRowOf(
@@ -72,11 +103,22 @@ function familyShareRowOf(
   return { planetIndex, familyId, seedShares, medianShare: medianShareOf(seedShares) }
 }
 
+/** Whether any seed paid for anything on the planet, so the row has a share to print. */
+function isBoughtOnByAnySeed(ledgers: readonly SeedLedger[], planetIndex: number): boolean {
+  return ledgers.some((ledger) => paidTotalOn(ledger, planetIndex) !== null)
+}
+
 /** The family's share of the seed's planet spend; none when the seed bought nothing there. */
 function seedShareOf(ledger: SeedLedger, planetIndex: number, familyId: string): Money[] {
-  const total = ledger.totals.find((row) => row.planetIndex === planetIndex)?.totalSpend
-  if (total === undefined || cmp(total, ZERO_MONEY) <= 0) return []
+  const total = paidTotalOn(ledger, planetIndex)
+  if (total === null) return []
   return [div(familySpendOn(ledger, planetIndex, familyId), total)]
+}
+
+/** The seed's spend on the planet, or null when it paid nothing there. */
+function paidTotalOn(ledger: SeedLedger, planetIndex: number): Money | null {
+  const total = ledger.totals.find((row) => row.planetIndex === planetIndex)?.totalSpend
+  return total !== undefined && cmp(total, ZERO_MONEY) > 0 ? total : null
 }
 
 function familySpendOn(ledger: SeedLedger, planetIndex: number, familyId: string): Money {
@@ -91,10 +133,7 @@ function familyShareLineOf(row: FamilyShareRow): string {
   return `| P${row.planetIndex} | ${row.familyId} | ${seeds} | ${formatPercent(row.medianShare)} |`
 }
 
-function compareKeys(
-  a: { planetIndex: number; familyId: string },
-  b: { planetIndex: number; familyId: string },
-): number {
+function compareKeys(a: FamilyKey, b: FamilyKey): number {
   if (a.planetIndex !== b.planetIndex) return a.planetIndex - b.planetIndex
   if (a.familyId === b.familyId) return 0
   return a.familyId < b.familyId ? -1 : 1

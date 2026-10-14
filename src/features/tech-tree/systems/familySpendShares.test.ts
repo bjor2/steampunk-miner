@@ -25,9 +25,9 @@ const live = (shopSpend: readonly ShopSpend[]): SeedSpends => ({
   isAnchorLive: () => true,
 })
 
-function rowsAsText(seeds: readonly SeedSpends[]) {
+function rowsAsText(seeds: readonly SeedSpends[], reportPlanets: readonly number[] = []) {
   return withRegistrations([], () =>
-    familyShareRowsOf(seeds).map((row) => ({
+    familyShareRowsOf(seeds, reportPlanets).map((row) => ({
       planetIndex: row.planetIndex,
       familyId: row.familyId,
       seedShares: row.seedShares.map(String),
@@ -67,6 +67,23 @@ describe('tech tree: spend family rows', () => {
       [4, 'kernel.buy_gun'],
       [5, 'kernel.buy_gun'],
     ])
+  })
+
+  it('prints every live family on a report planet, at zero when nothing was spent on it', () => {
+    const rows = rowsAsText(
+      [live([spend(2, 'kernel', 'buyUpgrade', '1000'), ...gunPlanet(4, 100)])],
+      [2, 4],
+    )
+    expect(rows.map((row) => [row.planetIndex, row.familyId, row.medianShare])).toEqual([
+      [2, 'kernel.buy_gun', '0'],
+      [4, 'kernel.buy_gun', '0.1'],
+    ])
+  })
+
+  it('prints nothing on a report planet no seed bought on, or for a family live on no seed', () => {
+    const held: SeedSpends = { shopSpend: gunPlanet(4, 100), isAnchorLive: () => false }
+    expect(rowsAsText([live(gunPlanet(4, 100))], [10])).toHaveLength(1)
+    expect(rowsAsText([held], [4])).toEqual([])
   })
 
   it('folds every terrain magnet buy on a planet into the one family row its slice registered', () => {

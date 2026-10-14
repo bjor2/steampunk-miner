@@ -19,13 +19,16 @@ import {
 // The #212 spend guard (spec #161 acceptance 6): the pacing bot plays the bot scenario to the core
 // of planet 60 on each pacing seed, so the guard sees P2-P20, P21-P40 and the P41-P60 endless
 // sample, and the tree's share of each planet's spend must sit inside its band on the median of
-// the seeds. Beside it, report-only, each spend family's share from the kernel registry (GD ruling
-// Q3, Q4 on #212), the kernel gun mount among them. Headless, with no run log kept: the guard
+// the seeds; the kernel turret mount counts in it (ticket 371). Beside it, report-only, each spend
+// family's share from the kernel registry (GD ruling Q3, Q4 on #212), the one armoury row among
+// them, printed on P2/P10/P20/P40 at zero too. Headless, with no run log kept: the guard
 // reads the bot's spend records and which family anchors the run opened. The runs
 // take hours, so this is a lane (vite.config.ts leaves it out unless it is named):
 //   npx vitest run src/features/tech-tree/treeSpendGuard.lane.test.ts   (or npm run balance:tree)
 // A miss is a balance finding; the levers are #161's, in order (tech-tree.economy.json).
 const LAST_PLANET = 60
+/** Every live family prints on these even at zero: the armoury row's planets (Systems (c), #310). */
+const REPORT_PLANETS: readonly number[] = [2, 10, 20, 40]
 /** Two hours a planet, as the P200 money lane allows: a slow planet shows as a number. */
 const BUDGET_TICKS = LAST_PLANET * 2 * 60 * 60 * TICKS_PER_SECOND
 const RUN_TIMEOUT_MS = 12 * 60 * 60 * 1000
@@ -91,7 +94,7 @@ function familyTableOf(seedRuns: readonly SeedRun[]): string {
     shopSpend,
     isAnchorLive: (rowId: string) => liveAnchorRowIds.has(rowId),
   }))
-  return familyShareTableOf(familyShareRowsOf(seeds))
+  return familyShareTableOf(familyShareRowsOf(seeds, REPORT_PLANETS))
 }
 
 function seedLinesOf(seedRuns: readonly SeedRun[]): string {
