@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest'
+import { withRegistrations } from '../../registries/registrar'
 import { SHIPPED_ART } from '../../scene/shippedArt'
 import { createScriptedSession, dockInBay } from '../authority/scriptedSession'
 import { stateDigest } from '../authority/stateDigest'
@@ -99,14 +100,17 @@ describe('upgrade bay model: the Guns row (#107)', () => {
   })
 
   it('puts the Guns buy in focus after the Casing row', () => {
-    const model = upgradeBayOf(atUpgradeBayOn(4))
-    expect([...new Set(model.focusStops.map((stop) => stop.panel))]).toEqual([
-      'tracks',
-      'casing',
-      'guns',
-      'repair',
-      'footer',
-    ])
+    // The kernel's own rows: a slice's bay entries (ticket 344) join before Repair.
+    withRegistrations([], () => {
+      const model = upgradeBayOf(atUpgradeBayOn(4))
+      expect([...new Set(model.focusStops.map((stop) => stop.panel))]).toEqual([
+        'tracks',
+        'casing',
+        'guns',
+        'repair',
+        'footer',
+      ])
+    })
   })
 
   it('draws its icon from a final vector icon in the art manifest', () => {
@@ -215,14 +219,17 @@ describe('upgrade bay model', () => {
   })
 
   it('orders focus tracks, casing, repair, footer and starts on the first track', () => {
-    const model = upgradeBayOf(atUpgradeBay())
-    expect([...new Set(model.focusStops.map((stop) => stop.panel))]).toEqual([
-      'tracks',
-      'casing',
-      'repair',
-      'footer',
-    ])
-    expect(upgradeBayStartFocus(model)).toBe(buyIdOf(UPGRADE_IDS[0]))
+    // The kernel's own rows: a slice's bay entries (ticket 344) join before Repair.
+    withRegistrations([], () => {
+      const model = upgradeBayOf(atUpgradeBay())
+      expect([...new Set(model.focusStops.map((stop) => stop.panel))]).toEqual([
+        'tracks',
+        'casing',
+        'repair',
+        'footer',
+      ])
+      expect(upgradeBayStartFocus(model)).toBe(buyIdOf(UPGRADE_IDS[0]))
+    })
   })
 
   it('previews the focused track and the visual tier its purchase crosses into', () => {
