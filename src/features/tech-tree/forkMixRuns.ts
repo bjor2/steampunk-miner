@@ -2,8 +2,11 @@
  * The runs behind `balance:forks` (GD lock on #255, build 2; ticket 267): the pacing bot plays the
  * bot scenario from planet 1 to planet 10's core on one pacing seed, forced onto one fork branch
  * from the start (`forkHand.ts`), all else as the pacing gate plays it. Each step is folded into
- * the action-mix and pace tallies as it happens, and only those are kept: the run is let go. Only
- * specs use it.
+ * the action-mix and pace tallies as it happens, and only those are kept: the run is let go.
+ *
+ * The same run forced onto a whole lane (ticket 266, the Aetheric pace re-run): the branch forced,
+ * every other capability of its lane owned from the start, and the open slots pressed in turn
+ * (`forkHand.ts`). Only specs use it.
  */
 import { TICKS_PER_SECOND } from '../../constants/physics'
 import type { AuthorityCommand, CommandIntent } from '../../systems/authority/authorityCommand'
@@ -16,7 +19,7 @@ import { startOfScenario, validateScenario, type Scenario } from '../../systems/
 import { startScenarioCommands } from '../../systems/startScenarioCommands'
 import { tileOfPose } from '../../systems/vehicle/vehiclePose'
 import type { TilePoint } from '../../systems/world/tileGrid'
-import { forcedForkStartOf, forkHandOf, withForkHand } from './forkHand'
+import { forcedForkStartOf, forkHandsOf, withForkHands, type ForkHand } from './forkHand'
 import { forkMixMetricOf, forkMixRolesOf, forkMixValuesOf } from './systems/forkMixMetrics'
 import { FORK_REPORT_PLANETS, type ForkSeedRun } from './systems/forkMixReport'
 import {
@@ -32,6 +35,7 @@ import {
   tallyForkPaceStep,
   type ForkPaceTally,
 } from './systems/forkPace'
+import { lanePaceOf, type LanePace } from './systems/lanePace'
 import type { TechLane } from './systems/techNode'
 import { registeredTechTree, type ForkBranchNode } from './systems/techTree'
 
@@ -54,16 +58,71 @@ export function forkSeedRunOf(
   worldSeed: number,
   maxTicks = FORK_RUN_BUDGET_TICKS,
 ): ForkSeedRun {
+  const hands = forkHandsOf([branch.node.unlocks.itemId])
+  const forcing = { branch, hands, owned: hands.map((hand) => hand.itemId) }
+  const recorder = playForcedRun(scenario, forcing, worldSeed, maxTicks)
+  return seedRunOf(branch, worldSeed, recorder)
+}
+
+/** A run forced onto the whole of a branch's lane, as the lane pace re-run keeps it. */
+export interface LaneSeedRun extends ForkSeedRun {
+  lanePace: LanePace
+}
+
+/**
+ * One run of `branch` with its whole lane forced on `worldSeed`: the lane's capabilities owned,
+ * earliest first, the other branches of its fork left out, each in an open slot while one is
+ * left. A spec may cut it short.
+ */
+export function laneSeedRunOf(
+  scenario: Scenario,
+  branch: ForkBranchNode,
+  worldSeed: number,
+  maxTicks = FORK_RUN_BUDGET_TICKS,
+): LaneSeedRun {
+  const owned = laneItemIdsOf(branch)
+  const forcing = { branch, hands: forkHandsOf(owned), owned }
+  const recorder = playForcedRun(scenario, forcing, worldSeed, maxTicks)
+  return { ...seedRunOf(branch, worldSeed, recorder), lanePace: lanePaceOf(recorder.pace) }
+}
+
+/** The items a run forced onto `branch`'s lane owns: its capabilities, the other branches left out. */
+export function laneItemIdsOf(branch: ForkBranchNode): string[] {
+  const otherBranchIds = new Set(otherBranchesOf(branch).map((other) => other.node.id))
+  return registeredTechTree()
+    .authored.filter((node) => node.lane === branch.lane && node.kind === 'capability')
+    .filter((node) => !otherBranchIds.has(node.id))
+    .map((node) => node.unlocks.itemId)
+}
+
+/** What a forced start grants: the branch, the items pressed and the items owned. */
+interface Forcing {
+  branch: ForkBranchNode
+  hands: readonly ForkHand[]
+  owned: readonly string[]
+}
+
+function playForcedRun(
+  scenario: Scenario,
+  forcing: Forcing,
+  worldSeed: number,
+  maxTicks: number,
+): ForkRunRecorder {
   const recorder = forkRunRecorderOf(forkMixRolesOf(registeredForkBranches()))
   const session = createBotSession(startingState(worldSeed), PLAYER_ID, recorder.listener)
-  const hand = forkHandOf(branch.node.unlocks.itemId)
-  startForcedRun(session, scenario, branch, hand)
-  const forced = withForkHand(session, hand)
+  startForcedRun(session, scenario, forcing)
+  const forced = withForkHands(session, forcing.hands)
   playSliceFrom(forced, botPlanetOf(forced, 'blast'), {
     lastPlanet: FORK_LAST_PLANET,
     maxTicks,
   })
-  return seedRunOf(branch, worldSeed, recorder)
+  return recorder
+}
+
+function otherBranchesOf(branch: ForkBranchNode): ForkBranchNode[] {
+  return registeredForkBranches().filter(
+    (other) => other.lane === branch.lane && other.branch !== branch.branch,
+  )
 }
 
 interface ForkRunRecorder {
@@ -88,15 +147,11 @@ function forkRunRecorderOf(roles: ForkMixRoles): ForkRunRecorder {
   return { listener: { onCommand, onEvents }, mix, pace }
 }
 
-/** The scenario's start, as the pacing gate sends it, then the forced branch. */
-function startForcedRun(
-  session: BotSession,
-  scenario: Scenario,
-  branch: ForkBranchNode,
-  hand: ReturnType<typeof forkHandOf>,
-): void {
-  const pick = { lane: branch.lane, branch: branch.branch }
-  const intents = [...scenarioStartOf(scenario), ...forcedForkStartOf(pick, hand)]
+/** The scenario's start, as the pacing gate sends it, then the forced branch and its items. */
+function startForcedRun(session: BotSession, scenario: Scenario, forcing: Forcing): void {
+  const pick = { lane: forcing.branch.lane, branch: forcing.branch.branch }
+  const forced = forcedForkStartOf(pick, forcing.hands, forcing.owned)
+  const intents = [...scenarioStartOf(scenario), ...forced]
   intents.forEach((intent) => session.submit(intent))
 }
 

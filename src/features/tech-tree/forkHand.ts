@@ -7,7 +7,11 @@
  * before each of the bot's waits out of the dock, once a second, it presses the branch item's slot
  * whenever a dry run says the press is accepted, and leaves a toggle that is already on alone.
  * Pressing at every chance is the strict end: the most the branch can change the run. A branch
- * whose item no slot takes, or a passive no press uses, plays on the grant alone. Only specs use
+ * whose item no slot takes, or a passive no press uses, plays on the grant alone.
+ *
+ * Forced onto a whole lane (ticket 266, the Aetheric pace re-run), the lane's items are owned and
+ * each bolted into the next open slot that takes it, earliest node first, and the hand presses
+ * one slot a try, in turn, so an item refused at every try never starves the next. Only specs use
  * it.
  */
 import { TICKS_PER_SECOND } from '../../constants/physics'
@@ -39,25 +43,48 @@ const PRESSABLE_SLOTS: readonly string[] = [...POWER_UP_SLOTS, ...DRILL_GEAR_SOC
 
 /** The item in the first slot that takes it, is open at the start and is pressed; null for none. */
 export function forkHandOf(itemId: string): ForkHand | null {
-  const slot = acceptedSlotsOf(itemId).find(isPressableOpenSlot)
-  return slot === undefined ? null : { itemId, slot: slot as PressableSlot }
+  return forkHandsOf([itemId])[0] ?? null
 }
 
-/** The forced start: the branch made active, then its item bolted into the hand's slot. */
-export function forcedForkStartOf(pick: ForkPick, hand: ForkHand | null): CommandIntent[] {
+/**
+ * Each item in the first slot that takes it, is open at the start and no earlier item holds; an
+ * item left with no such slot gets no hand.
+ */
+export function forkHandsOf(itemIds: readonly string[]): ForkHand[] {
+  const hands: ForkHand[] = []
+  for (const itemId of itemIds) {
+    const slot = acceptedSlotsOf(itemId).find((each) => isFreePressableSlot(each, hands))
+    if (slot !== undefined) hands.push({ itemId, slot: slot as PressableSlot })
+  }
+  return hands
+}
+
+/** The forced start: the branch made active, then the hands' items bolted in, `owned` owned. */
+export function forcedForkStartOf(
+  pick: ForkPick,
+  hands: readonly ForkHand[],
+  owned: readonly string[] = hands.map((hand) => hand.itemId),
+): CommandIntent[] {
   const force: CommandIntent = { type: 'debug.tech-tree.forceFork', payload: pick }
-  return hand === null ? [force] : [force, loadoutOf(hand)]
+  return owned.length === 0 ? [force] : [force, loadoutOf(hands, owned)]
 }
 
 /** `session`, pressing the hand's slot before each wait the bot makes out of the dock. */
 export function withForkHand(session: BotSession, hand: ForkHand | null): BotSession {
-  if (hand === null) return session
+  return withForkHands(session, hand === null ? [] : [hand])
+}
+
+/** `session`, pressing one hand's slot a try, in turn, before each wait out of the dock. */
+export function withForkHands(session: BotSession, hands: readonly ForkHand[]): BotSession {
+  if (hands.length === 0) return session
   let nextTryTick = session.tick()
+  let turn = 0
   return {
     ...session,
     wait(ticks) {
       if (isTimeToTry(session, nextTryTick)) {
-        pressWhenAccepted(session, hand)
+        pressWhenAccepted(session, hands[turn % hands.length])
+        turn += 1
         nextTryTick = session.tick() + FORK_TRY_INTERVAL_TICKS
       }
       session.wait(ticks)
@@ -65,12 +92,17 @@ export function withForkHand(session: BotSession, hand: ForkHand | null): BotSes
   }
 }
 
+function isFreePressableSlot(slot: string, hands: readonly ForkHand[]): boolean {
+  return isPressableOpenSlot(slot) && !hands.some((hand) => hand.slot === slot)
+}
+
 function isPressableOpenSlot(slot: string): boolean {
   return PRESSABLE_SLOTS.includes(slot) && isSlotOpenAtStart(slot as PressableSlot)
 }
 
-function loadoutOf({ itemId, slot }: ForkHand): CommandIntent {
-  return setVehicleLoadoutCommand({ [slot]: itemId }, [itemId])
+function loadoutOf(hands: readonly ForkHand[], owned: readonly string[]): CommandIntent {
+  const slots = Object.fromEntries(hands.map((hand) => [hand.slot, hand.itemId]))
+  return setVehicleLoadoutCommand(slots, owned)
 }
 
 function isTimeToTry(session: BotSession, nextTryTick: number): boolean {
