@@ -62,6 +62,7 @@ import { touchLavaAtPose } from './lava/lavaRules'
 import { enterMagneticField } from './magnetic/fieldEntry'
 import type { DomainEventBody } from './domainEvent'
 import { noPlanetRejection, planetParamsOf } from './planetOfState'
+import { noteReportedStillness, noteRigCut } from './rigStillness'
 import { stepBoundsAt } from './stepBoundRead'
 import { isCutBySteps } from './sweptDrill'
 import { followEnergyChange, rescueCauseOf, towVehicle } from './vehicleTransitions'
@@ -98,6 +99,10 @@ export const VEHICLE_COMMAND_RULES: {
       ]),
     apply: (state, command) =>
       chainEffects(state, [
+        (current) =>
+          unchanged(
+            noteReportedStillness(current, command.playerId, command.payload, command.tick),
+          ),
         (current) => recordPose(current, command),
         (current) =>
           enterMagneticField(
@@ -136,6 +141,7 @@ export const VEHICLE_COMMAND_RULES: {
     apply: (state, command) =>
       chainEffects(state, [
         (current) => drillScriptedTile(current, command),
+        (current) => unchanged(noteRigCut(current, command.playerId, command.tick)),
         (current) =>
           followHeat(current, command.playerId, command.tick, {
             drillTicks: command.payload.ticks,

@@ -31,6 +31,7 @@ import {
   type RuleEffect,
 } from './commandRule'
 import { noPlanetRejection, planetParamsOf } from './planetOfState'
+import { noteRigCut } from './rigStillness'
 import { cutGateLeftAt, stepBoundsAt, stepReachMmOf } from './stepBoundRead'
 import { drillAlongStep } from './drillStepCut'
 import { withBurrowersCut } from './vehicleCommandRules'
@@ -51,6 +52,7 @@ export const DRILL_STEP_RULES: { readonly drillStep: CommandRule<'drillStep'> } 
     apply: (state, command) =>
       chainEffects(state, [
         (current) => cutStep(current, command),
+        (current) => unchanged(noteRigCut(current, command.playerId, command.tick)),
         (current) => followEnergyChange(current, command.playerId, command.tick),
       ]),
   },

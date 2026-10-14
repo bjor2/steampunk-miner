@@ -8,6 +8,7 @@ import type { ItemHookCaps } from './itemHookCaps'
 import type { ItemEffectCaps } from './itemEffectCaps'
 import type { CasingCementGrades } from './casingCementGrades'
 import type { MagnetCaps } from './magnetCaps'
+import type { TurretCaps } from './turretCaps'
 import type { MagneticHazardCaps } from './magneticHazardCaps'
 import type { BigStat, Money } from '../money'
 import type { WholeFraction } from '../wholeFractions'
@@ -234,6 +235,8 @@ export interface GunRules {
   rangeTiles: number
   /** The forward cone, centred on the drill axis, the guns never fire into. */
   frontDeadConeDeg: number
+  /** What a turret shape may ask at most (ticket 382, `turretCaps.ts`). */
+  turretCaps: TurretCaps
   mountCost: BandOreCost
   levelCost: BandOreCost & { id: string; ratio: Money }
 }

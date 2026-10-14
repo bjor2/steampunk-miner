@@ -102,6 +102,12 @@ export interface VehicleState {
    * with the flag off the state and its digest are unchanged.
    */
   sweptCut?: SweptCut
+  /**
+   * The last tick the reported pose moved or the drill cut (ticket 382, the TD's Q3 on #319): the
+   * sentry cam opens the drill's cone once the rig has stood still and quiet long enough. Kept
+   * only while a slice provides turret shapes, so with none the state and its digest are unchanged.
+   */
+  stillSinceTick?: number
 }
 
 export const EMPTY_CARGO: Cargo = { ore: {}, coreFragments: 0 }

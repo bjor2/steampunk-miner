@@ -130,6 +130,9 @@ export function portableVehicleProblems(vehicle: unknown, path: string): string[
     ...(vehicle.shockHullBp === undefined || isWholeNumber(vehicle.shockHullBp)
       ? []
       : [`${path}.shockHullBp must be a whole number of basis points, or be left out`]),
+    ...(vehicle.stillSinceTick === undefined || isWholeNumber(vehicle.stillSinceTick)
+      ? []
+      : [`${path}.stillSinceTick must be a whole tick, or be left out`]),
     ...(vehicle.sweptCut === undefined || isPortableSweptCut(vehicle.sweptCut)
       ? []
       : [

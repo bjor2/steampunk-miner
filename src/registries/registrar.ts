@@ -20,6 +20,7 @@ import { BLAST_EFFECT_REGISTRY } from '../systems/registries/blastEffects'
 import { BUILDING_ATTACH_USE_REGISTRY } from '../systems/registries/buildingAttach'
 import { CELL_GATE_LOOK_REGISTRY } from '../systems/registries/cellGateLook'
 import { BOT_PURCHASE_REGISTRY } from '../systems/registries/botPurchases'
+import { AUTO_GUNS_REGISTRY } from '../systems/registries/autoGuns'
 import { BORE_GUN_REGISTRY } from '../systems/registries/boreGun'
 import { AUTO_ACTOR_REGISTRY } from '../systems/registries/autoActors'
 import { CHARGE_BLAST_CUE_REGISTRY } from '../systems/registries/chargeBlastCue'
@@ -178,6 +179,7 @@ export function registrarFor(sliceId: string): SliceRegistrar {
     planetSkyBand: (provider) => add(PLANET_SKY_BAND_REGISTRY, provider),
     planetCardLine: (source) => addPrefixed(PLANET_CARD_LINE_REGISTRY, sliceId, source),
     boreGun: (provider) => add(BORE_GUN_REGISTRY, provider),
+    autoGuns: (provider) => add(AUTO_GUNS_REGISTRY, provider),
     autoActor: (actor) => add(AUTO_ACTOR_REGISTRY, actor),
     slotHoldCue: (source) => add(SLOT_HOLD_CUE_REGISTRY, source),
     debugActions: (actions) =>

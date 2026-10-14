@@ -11,17 +11,19 @@ import { unchanged, type RuleEffect } from '../commandRule'
 import type { DomainEventBody } from '../domainEvent'
 import { combatVehicleOf, withCombatVehicle, type PendingGunHit } from './combatState'
 
-/** One more shot of `damage` on `enemyId` in this vehicle's tally. */
-export function tallyGunHit(
-  state: AuthorityState,
-  playerId: string,
-  enemyId: string,
-  damage: BigStat,
-): AuthorityState {
+/** One shot's hit on one enemy: what it dealt and the energy quanta it is charged with. */
+export interface GunShotHit {
+  enemyId: string
+  damage: BigStat
+  energy: number
+}
+
+/** One more shot on the enemy in this vehicle's tally. */
+export function tallyGunHit(state: AuthorityState, playerId: string, shot: GunShotHit) {
   const hits = combatVehicleOf(state.combat, playerId).pendingGunHits
-  const pendingGunHits = hits.some((hit) => hit.enemyId === enemyId)
-    ? hits.map((hit) => (hit.enemyId === enemyId ? withOneMoreShot(hit, damage) : hit))
-    : [...hits, { enemyId, damage, shots: 1 }]
+  const pendingGunHits = hits.some((hit) => hit.enemyId === shot.enemyId)
+    ? hits.map((hit) => (hit.enemyId === shot.enemyId ? withOneMoreShot(hit, shot) : hit))
+    : [...hits, firstShotOf(shot)]
   return withCombat(state, withCombatVehicle(state.combat, playerId, { pendingGunHits }))
 }
 
@@ -54,8 +56,20 @@ function flushGunHitsWhere(
   }
 }
 
-function withOneMoreShot(hit: PendingGunHit, damage: BigStat): PendingGunHit {
-  return { ...hit, damage: add(hit.damage, damage), shots: hit.shots + 1 }
+/** Energy is kept only once a shot cost other than a full one, so #107's tallies stay as they were. */
+function firstShotOf({ enemyId, damage, energy }: GunShotHit): PendingGunHit {
+  const first = { enemyId, damage, shots: 1 }
+  return energy === GUN_SHOT_QUANTA ? first : { ...first, energy }
+}
+
+function withOneMoreShot(hit: PendingGunHit, shot: GunShotHit): PendingGunHit {
+  const more = { ...hit, damage: add(hit.damage, shot.damage), shots: hit.shots + 1 }
+  if (hit.energy === undefined && shot.energy === GUN_SHOT_QUANTA) return more
+  return { ...more, energy: energyOf(hit) + shot.energy }
+}
+
+function energyOf(hit: PendingGunHit): number {
+  return hit.energy ?? hit.shots * GUN_SHOT_QUANTA
 }
 
 function gunHitEventOf(hit: PendingGunHit): DomainEventBody {
@@ -64,6 +78,6 @@ function gunHitEventOf(hit: PendingGunHit): DomainEventBody {
     enemyId: hit.enemyId,
     damage: toCanonical(hit.damage),
     shots: hit.shots,
-    energy: hit.shots * GUN_SHOT_QUANTA,
+    energy: energyOf(hit),
   }
 }

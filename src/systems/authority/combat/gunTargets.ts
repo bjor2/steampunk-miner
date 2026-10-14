@@ -1,20 +1,23 @@
 /**
- * Which enemy the `auto_guns` turret shoots (#107 design "Rules and edge cases"):
+ * Which enemies the `auto_guns` turret can shoot (#107 design "Rules and edge cases"):
  *
- * - within `rangeTiles` of the vehicle's position at the tick;
+ * - within the turret shape's `rangeTiles` of the vehicle's position at the tick (#107's 8 with no
+ *   turret module, ticket 382);
  * - outside the forward cone the drill owns (`frontDeadConeDeg`, centred on the drill axis), so
- *   the guns cover the sides and the rear, where enemy hits land 1x and 2x;
+ *   the guns cover the sides and the rear, where enemy hits land 1x and 2x, unless the sentry cam
+ *   has opened it (`rigStillness.ts`);
  * - with a clear line of fire: every cell the shot crosses, the enemy's own included, is open, so
  *   a burrower swimming in rock cannot be hit until it comes out;
  * - the nearest such enemy, equal distances going to the one spawned first, so a replay always
- *   picks the same one.
+ *   picks the same one. The fire director's order and the ricochet are `turretAim.ts`.
  *
  * Integer mm and exact integer tests only (#5): the cone is compared as
  * `dot^2 * den >= num * |d|^2 * |f|^2` with `num / den` the exact cos^2 of the cone's half-angle,
  * and the line of fire is sampled every quarter tile with truncating integer steps.
  */
 import { MM_PER_METRE } from '../../../constants/physics'
-import { gunFrontDeadConeDegrees, gunRangeTiles } from '../../economy/gunStats'
+import { gunFrontDeadConeDegrees } from '../../economy/gunStats'
+import type { TurretShape } from '../../registries/autoGuns'
 import { facingVectorOf, tileOfMillimetres } from '../../vehicle/vehiclePose'
 import { CELL_KIND, kindOfCell } from '../../world/worldCell'
 import { cellAt } from '../../world/worldState'
@@ -41,20 +44,53 @@ const HALF_CONE_COS_SQ: Readonly<Record<number, Fraction>> = {
 }
 
 const DEAD_CONE: Fraction = halfConeCosSqOf(gunFrontDeadConeDegrees())
-const RANGE_MM = gunRangeTiles() * MM_PER_METRE
 /** A quarter tile: no cell the shot crosses is skipped by more than a corner. */
 const LINE_STEP_MM = MM_PER_METRE / 4
 
-/** The enemy the guns of the vehicle at `target` would shoot now, or null. */
-export function gunTargetOf(
+/** What a due shot sees with: the rig as enemies see it, its reach and the drill's cone. */
+export interface TurretSight {
+  terrain: Terrain
+  target: VehicleTarget
+  rangeMm: number
+  isForwardConeOpen: boolean
+}
+
+export function turretSightOf(
   terrain: Terrain,
   target: VehicleTarget,
-  enemies: readonly Enemy[],
-): Enemy | null {
-  const inSight = enemies.filter((enemy) => isInLineOfFire(terrain, target, enemy))
-  return inSight.reduce<Enemy | null>(
-    (nearest, enemy) =>
-      nearest === null || isNearer(target.position, enemy, nearest) ? enemy : nearest,
+  shape: TurretShape,
+  isForwardConeOpen: boolean,
+): TurretSight {
+  return { terrain, target, rangeMm: shape.rangeTiles * MM_PER_METRE, isForwardConeOpen }
+}
+
+/** In reach and outside a closed forward cone, whatever lies between: a bounce may still find it. */
+export function enemiesInReach(sight: TurretSight, enemies: readonly Enemy[]): Enemy[] {
+  const { position } = sight.target
+  return enemies.filter(
+    (enemy) => isWithinMm(position, enemy, sight.rangeMm) && isAimable(sight, position, enemy),
+  )
+}
+
+/** A straight line from the rig to the enemy crosses only open cells. */
+export function isInLineOfFire(sight: TurretSight, enemy: Enemy): boolean {
+  return isLineOpen(sight.terrain, sight.target.position, enemy)
+}
+
+/** The guns may point from `from` at `toward`: the drill's cone is open or `toward` is outside it. */
+export function isAimable(
+  sight: TurretSight,
+  from: MillimetrePoint,
+  toward: MillimetrePoint,
+): boolean {
+  const { pose } = sight.target
+  return sight.isForwardConeOpen || !isInDeadCone(pose, toward.x - from.x, toward.y - from.y)
+}
+
+/** The nearest of `enemies` to `from`, equal distances going to the one spawned first. */
+export function nearestOf(from: MillimetrePoint, enemies: readonly Enemy[]): Enemy | null {
+  return enemies.reduce<Enemy | null>(
+    (nearest, enemy) => (nearest === null || isNearer(from, enemy, nearest) ? enemy : nearest),
     null,
   )
 }
@@ -69,17 +105,8 @@ export function isInDeadCone(frame: DrillFrame, dx: number, dy: number): boolean
   return dot * dot * DEAD_CONE.den >= DEAD_CONE.num * offsetSq * axisSq
 }
 
-function isInLineOfFire(terrain: Terrain, target: VehicleTarget, enemy: Enemy): boolean {
-  const { position, pose } = target
-  return (
-    isWithinMm(position, enemy, RANGE_MM) &&
-    !isInDeadCone(pose, enemy.x - position.x, enemy.y - position.y) &&
-    isLineOpen(terrain, position, enemy)
-  )
-}
-
-/** Every sampled cell from just past the vehicle to the enemy's own is open air. */
-function isLineOpen(terrain: Terrain, from: MillimetrePoint, to: MillimetrePoint): boolean {
+/** Every sampled cell from just past `from` to `to`'s own is open air. */
+export function isLineOpen(terrain: Terrain, from: MillimetrePoint, to: MillimetrePoint): boolean {
   const dx = to.x - from.x
   const dy = to.y - from.y
   const steps = Math.max(1, Math.ceil(Math.max(Math.abs(dx), Math.abs(dy)) / LINE_STEP_MM))
@@ -91,12 +118,13 @@ function isLineOpen(terrain: Terrain, from: MillimetrePoint, to: MillimetrePoint
   return true
 }
 
-function isOpenAt(terrain: Terrain, x: number, y: number): boolean {
+export function isOpenAt(terrain: Terrain, x: number, y: number): boolean {
   const cell = cellAt(terrain.world, terrain.params, tileOfMillimetres(x, y))
   return kindOfCell(cell) === CELL_KIND.air
 }
 
-function isNearer(from: MillimetrePoint, enemy: Enemy, nearest: Enemy): boolean {
+/** Closer to `from`, or as close and spawned first. */
+export function isNearer(from: MillimetrePoint, enemy: Enemy, nearest: Enemy): boolean {
   const order = distanceSq(from, enemy) - distanceSq(from, nearest)
   return order < 0 || (order === 0 && isSpawnedBefore(enemy, nearest))
 }

@@ -13,6 +13,7 @@ import type { AuthorityReaction } from '../systems/registries/authorityReactions
 import type { BlastEffect } from '../systems/registries/blastEffects'
 import type { BuildingAttachUse } from '../systems/registries/buildingAttach'
 import type { BotPurchase } from '../systems/registries/botPurchases'
+import type { AutoGunsProvider } from '../systems/registries/autoGuns'
 import type { BoreGunProvider } from '../systems/registries/boreGun'
 import type { AutoActor } from '../systems/registries/autoActors'
 import type { ChargeBlastCueProvider } from '../systems/registries/chargeBlastCue'
@@ -244,6 +245,8 @@ export interface SliceRegistrar {
   planetCardLine(source: PlanetCardLineSource): void
   /** One provider across all slices: a player's bore gun numbers (ticket 313, #309). */
   boreGun(provider: BoreGunProvider): void
+  /** One provider across all slices: a player's turret shape for the auto_guns (ticket 382). */
+  autoGuns(provider: AutoGunsProvider): void
   /** An item that acts on its own while switched to auto, keyed by its item id (ticket 317). */
   autoActor(actor: AutoActor): void
   /** Names the slice's events that end a slot hold: cancelled clanks, finished chimes (253). */

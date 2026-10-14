@@ -51,6 +51,11 @@ export interface Enemy {
   pendingDrill: PendingDrillDamage
   /** The casing ring a tunnel wrecker heads for or gnaws; null for every other kind. */
   ring: RingPoint | null
+  /**
+   * The tick a concussion shell last knocked it back (ticket 382): its knock cooldown counts from
+   * here. Absent until the first knock, so with no turret module the state and digest are unchanged.
+   */
+  knockedTick?: number
 }
 
 /** Gun hits on one enemy not yet logged: `gun_hit` sums them per pose report (#107). */
@@ -58,6 +63,17 @@ export interface PendingGunHit {
   enemyId: string
   damage: BigStat
   shots: number
+  /**
+   * The energy quanta those shots took, once one of them cost other than a full shot (ticket 382:
+   * Extended barrels' cheaper shot, grapeshot's free split). Absent, it is `shots` full shots.
+   */
+  energy?: number
+}
+
+/** The fire director's pick (ticket 382): kept until `retargetTicks` after it ranked the pack. */
+export interface DirectorPick {
+  enemyId: string
+  rankedTick: number
 }
 
 /** What combat remembers about each vehicle besides its pose. */
@@ -75,6 +91,8 @@ export interface CombatVehicle {
   gunReadyTick: number
   /** This vehicle's gun hits since its last pose report, by enemy in the order first hit. */
   pendingGunHits: readonly PendingGunHit[]
+  /** Absent until a fire director first ranks, so without one the digest is unchanged. */
+  directorPick?: DirectorPick
 }
 
 /**

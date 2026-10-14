@@ -36,6 +36,11 @@ export const ENERGY_QUANTA_PER_TICK: EnergyQuantaPerTick = {
 /** One `auto_guns` shot (#107 numbers: half a unit, the same per second as drilling at 2 shots/s). */
 export const GUN_SHOT_QUANTA: number = toSafeInteger(mul(ECONOMY.energy.perShot, QUANTA_PER_UNIT))
 
+/** The least a turret shot may take (ticket 382, `gun.turretCaps.energyPerShotFloor`), rounded up. */
+export const GUN_SHOT_FLOOR_QUANTA: number = toSafeInteger(
+  ceil(mul(ECONOMY.gun.turretCaps.energyPerShotFloor, QUANTA_PER_UNIT)),
+)
+
 function quantaPerTickOf(unitsPerSecond: BigStat): number {
   return toSafeInteger(div(mul(unitsPerSecond, QUANTA_PER_UNIT), fromSafeInteger(TICKS_PER_SECOND)))
 }

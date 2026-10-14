@@ -18,6 +18,7 @@ import { readItemHookCaps } from './itemHookCaps'
 import { readItemEffectCaps } from './itemEffectCaps'
 import { readMagnetCaps } from './magnetCaps'
 import { readMagneticHazardCaps } from './magneticHazardCaps'
+import { readTurretCaps } from './turretCaps'
 import { readPaceScale } from './readPaceScale'
 import { readUpgradeTiers } from './readUpgradeTiers'
 import { readCostCurve, readRefinery } from './readRefineryEconomy'
@@ -154,6 +155,7 @@ function readGun(reader: FieldReader, gun: Record<string, unknown>): Economy['gu
     maxLevel: reader.safeInteger('gun.maxLevel', gun.maxLevel),
     rangeTiles: reader.safeInteger('gun.rangeTiles', gun.rangeTiles),
     frontDeadConeDeg: reader.safeInteger('gun.frontDeadConeDeg', gun.frontDeadConeDeg),
+    turretCaps: readTurretCaps(reader, gun.turretCaps),
     mountCost: readBandOreCost(reader, 'gun.mountCost', gun.mountCost),
     levelCost: {
       ...readBandOreCost(reader, 'gun.levelCost', levelCost),

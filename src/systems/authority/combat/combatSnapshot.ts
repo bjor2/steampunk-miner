@@ -139,8 +139,13 @@ function isPortableCombatVehicle(vehicle: unknown): boolean {
     (vehicle.lastHitTick === null || isWholeNumber(vehicle.lastHitTick)) &&
     isWholeNumber(vehicle.gunReadyTick) &&
     Array.isArray(vehicle.pendingGunHits) &&
-    vehicle.pendingGunHits.every(isPortableGunHit)
+    vehicle.pendingGunHits.every(isPortableGunHit) &&
+    (vehicle.directorPick === undefined || isDirectorPick(vehicle.directorPick))
   )
+}
+
+function isDirectorPick(pick: unknown): boolean {
+  return isJsonObject(pick) && typeof pick.enemyId === 'string' && isWholeNumber(pick.rankedTick)
 }
 
 function isPortableGunHit(hit: unknown): boolean {
@@ -148,7 +153,8 @@ function isPortableGunHit(hit: unknown): boolean {
     isJsonObject(hit) &&
     typeof hit.enemyId === 'string' &&
     isNonNegativeMoneyText(hit.damage) &&
-    isWholeNumber(hit.shots)
+    isWholeNumber(hit.shots) &&
+    (hit.energy === undefined || isWholeNumber(hit.energy))
   )
 }
 
@@ -168,7 +174,8 @@ function enemyProblems(enemy: unknown, path: string): string[] {
     isNonNegativeMoneyText(enemy.health) &&
     isIntegerStep(enemy.step) &&
     isPortablePendingDrill(enemy.pendingDrill) &&
-    (enemy.ring === null || isRingPoint(enemy.ring))
+    (enemy.ring === null || isRingPoint(enemy.ring)) &&
+    (enemy.knockedTick === undefined || isWholeNumber(enemy.knockedTick))
   return isValid ? [] : [`${path} is malformed`]
 }
 
