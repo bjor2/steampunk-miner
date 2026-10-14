@@ -1,0 +1,5 @@
+{
+  "$comment": "Aetheric lane effect numbers (#263, kernel half #360). Placeholders for Systems to set, not tuned: heatUnitsPerEnergyQuantum is how many heat units (HEAT_UNITS_PER_POINT per gauge point) the aether condenser burns into one energy quantum (1/240 unit); enemySlowBp is the share of its step an enemy keeps inside the chronometric governor's pocket, in basis points (5000 = half speed, the #263 goal). Kept apart from economy.json so nothing is shared with #333.",
+  "heatUnitsPerEnergyQuantum": 4,
+  "enemySlowBp": 5000
+}
