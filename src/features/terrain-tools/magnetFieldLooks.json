@@ -1,0 +1,27 @@
+{
+  "source": "GD lock on #246 (build 5: brass arcs converging on the beacon, a brass ring with arcs flaring outward, a brass lattice over the pinned cells) and the GD and TD rulings on #286: the attract arcs faint from planting, below the hazard strip's contrast, then ramping up over about 6 ticks during the gather and gone once the beacon is spent; the coil's ring reaches its radius in the 6-tick response. Look numbers, tuned by eye in npm run dev (ticket 286); shares are of a field's radius, insets in metres. The hazard strip (#316 scope g) is not built yet, so the faint state is held to at most a third of the bright one.",
+  "colour": "#d4a24c",
+  "arcColour": "#bfe4ff",
+  "segmentsPerPiece": 16,
+  "faintOpacity": 0.24,
+  "brightOpacity": 0.9,
+  "rampTicks": 6,
+  "fadeTicks": 12,
+  "sweepPerSecond": 0.6,
+  "attract": {
+    "arcs": 8,
+    "bendShare": 0.35
+  },
+  "repel": {
+    "flares": 8,
+    "growTicks": 6,
+    "lingerTicks": 30,
+    "flareInnerShare": 0.85,
+    "flareOuterShare": 1.4,
+    "flareBendShare": 0.12
+  },
+  "anchor": {
+    "cellInsetM": 0.12,
+    "blockInsetM": 0.3
+  }
+}
