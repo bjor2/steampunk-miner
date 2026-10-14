@@ -220,8 +220,15 @@ import type { DriveSigns } from '../vehicle/driveSigns'
  *    section v1, read through the `groundReinforcement` registry, each billed onto the lining bill
  *    at its band and logged as `terrain-tools.FoamCured`. With no foam cured no digest or mined
  *    order changes.
+ * 68: four aetheric pair combos in play (ticket 373, the GD ruling on #373): still foam's blocks in
+ *    the `aetheric.pocket` section's optional `stilledBlocks`, slowed with the pocket; the warning
+ *    chime's whistle press from a clock step with its target in the `aetheric` section's optional
+ *    `chime`; the pendulum anchor's governor press on an anchor switched on in open air; quench
+ *    cutters' side-cutter heat on the `aetheric.heat` gauge per dig second; and
+ *    `aetheric.FoamStilled`, `WarningChimed`, `PendulumSwung` and `CuttersQuenched`. With no combo
+ *    owned no digest or mined order changes.
  */
-export const AUTHORITY_PROTOCOL_VERSION = 67
+export const AUTHORITY_PROTOCOL_VERSION = 68
 
 /** The kernel's own commands: the closed set its rule tables are written against. */
 export interface KernelCommandPayloads {
