@@ -7,10 +7,11 @@
  *
  * The gimbal sight, the steam sear and the long barrel act through seams the slice already has
  * (the fire input, the provider's auto-shoot answer and its range and hold). The five signature
- * modules need a shot to split, turn, line, ground or stop at a hollow inside the kernel's bore
- * walk, which no seam reaches yet, so they are held back: never registered, so no store, tree,
- * card or bot sees them (the #205 GD lock's held-back rule). The GD ruling on #318 moved them to
- * #380, behind #377's `shotShapeOf` seam, #378 (grounding) and #379 (the strut).
+ * modules (ticket 380, the GD ruling on #318) shape the shot itself through the provider's
+ * `shotShapeOf` (#377): the splay choke and the rifled bore on every shot, the cementing round,
+ * the earthing spike and the strut bore while their per-dock charges and cooldowns allow
+ * (`signatureShapes.ts`, `moduleUse.ts`). The earthing spike also waits on `grounded_lining`
+ * (P25), so nothing magnetic or electrified previews before that row (HS on #318).
  *
  * The flavour lines are Content's, except the sight's "nearest" glint, which the GD's value rule
  * replaced ("richest").
@@ -30,6 +31,14 @@ export const BORE_GUN_LANE = 'armoury.bore_gun'
 
 export const GIMBAL_SIGHT_ITEM_ID = 'weapon.gimbal_sight'
 export const LONG_BARREL_ITEM_ID = 'weapon.long_barrel'
+export const SPLAY_CHOKE_ITEM_ID = 'weapon.splay_choke'
+export const CEMENTING_ROUND_ITEM_ID = 'weapon.cementing_round'
+export const EARTHING_SPIKE_ITEM_ID = 'weapon.earthing_spike'
+export const RIFLED_BORE_ITEM_ID = 'weapon.rifled_bore'
+export const STRUT_BORE_ITEM_ID = 'weapon.strut_bore'
+
+/** The row the grounded lining opens on (P25): the earthing spike stays hidden until it. */
+const GROUNDED_LINING_ROW = 'grounded_lining'
 
 /** Where the module sits on the gun (the #315 mount's zones; the art wiring is #321's). */
 export type BoreMountZone = 'sight' | 'breech' | 'barrel' | 'muzzle' | 'magazine'
@@ -54,7 +63,7 @@ export interface BoreGunNode {
   /** The placed planet; the item's one-off price is read there too (#162 4.1). */
   unlockTier: number
   prereqs: readonly string[]
-  /** Rows besides the lane's own anchor (the cementing round's `casing_cement`). */
+  /** Rows besides the lane's own anchor (`casing_cement`, `grounded_lining`). */
   alsoRequiresFeature?: readonly string[]
   requiresDiscovery?: DiscoveryKey
 }
@@ -91,59 +100,60 @@ export const BORE_GUN_MODULES: readonly BoreGunModule[] = [
     node: nodeOf('long_barrel', 12, ['gimbal_sight']),
   },
   {
-    itemId: 'weapon.splay_choke',
+    itemId: SPLAY_CHOKE_ITEM_ID,
     name: 'Splay choke',
     iconId: 'item-weapon-splay-choke',
     description: 'A slotted brass choke splays one charge into twin lines that share its bite.',
     label: 'horizontal',
     mount: 'muzzle',
-    isHeldBack: true,
+    isHeldBack: false,
     node: nodeOf('splay_choke', 18, ['long_barrel']),
   },
   {
-    itemId: 'weapon.cementing_round',
+    itemId: CEMENTING_ROUND_ITEM_ID,
     name: 'Cementing round',
     iconId: 'item-weapon-cementing-round',
     description: 'A cored round weeps casing cement into every wall the bore opens behind it.',
     label: 'horizontal',
     mount: 'magazine',
-    isHeldBack: true,
+    isHeldBack: false,
     node: {
       ...nodeOf('cementing_round', 23, ['long_barrel']),
       alsoRequiresFeature: ['casing_cement'],
     },
   },
   {
-    itemId: 'weapon.earthing_spike',
+    itemId: EARTHING_SPIKE_ITEM_ID,
     name: 'Earthing spike',
     iconId: 'item-weapon-earthing-spike',
     description: 'A copper spike rides the bore and bleeds the charged rock quiet along its line.',
     label: 'horizontal',
     mount: 'muzzle',
-    isHeldBack: true,
+    isHeldBack: false,
     node: {
       ...nodeOf('earthing_spike', 28, ['long_barrel']),
+      alsoRequiresFeature: [GROUNDED_LINING_ROW],
       requiresDiscovery: 'hazard:magnetic',
     },
   },
   {
-    itemId: 'weapon.rifled_bore',
+    itemId: RIFLED_BORE_ITEM_ID,
     name: 'Rifled bore',
     iconId: 'item-weapon-rifled-bore',
     description: 'Rifling in the steel bore lets the charge lean and follow a seam as it runs.',
     label: 'horizontal',
     mount: 'barrel',
-    isHeldBack: true,
+    isHeldBack: false,
     node: nodeOf('rifled_bore', 33, ['long_barrel']),
   },
   {
-    itemId: 'weapon.strut_bore',
+    itemId: STRUT_BORE_ITEM_ID,
     name: 'Strut bore',
     iconId: 'item-weapon-strut-bore',
     description: 'The bore stops at the mouth of a hollow and wedges an iron strut across it.',
     label: 'horizontal',
     mount: 'magazine',
-    isHeldBack: true,
+    isHeldBack: false,
     node: { ...nodeOf('strut_bore', 37, ['cementing_round']), requiresDiscovery: 'hazard:hollow' },
   },
 ]

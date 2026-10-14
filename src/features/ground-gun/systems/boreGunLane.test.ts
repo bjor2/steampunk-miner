@@ -12,10 +12,14 @@ import { lastMarkOf } from '../../tech-tree'
 import {
   BORE_GUN_LANE,
   BORE_GUN_MODULES,
+  CEMENTING_ROUND_ITEM_ID,
+  EARTHING_SPIKE_ITEM_ID,
   GIMBAL_SIGHT_ITEM_ID,
   LONG_BARREL_ITEM_ID,
   markLadderOf,
   SHIPPED_BORE_GUN_MODULES,
+  SPLAY_CHOKE_ITEM_ID,
+  STRUT_BORE_ITEM_ID,
 } from './boreGunLane'
 import { longBarrelMasteredMark } from './boreLadders'
 
@@ -31,7 +35,7 @@ const CONTENT_TABLE = [
   ['tech.bore_gun.strut_bore', 37, ['tech.bore_gun.cementing_round']],
 ]
 
-const SHIPPED_IDS = [GIMBAL_SIGHT_ITEM_ID, STEAM_SEAR_ITEM_ID, LONG_BARREL_ITEM_ID]
+const ALL_EIGHT_IDS = BORE_GUN_MODULES.map((module) => module.itemId)
 
 function registeredLaneNodes() {
   return contentOf('tech-node').filter((node) => node.lane === BORE_GUN_LANE)
@@ -52,28 +56,36 @@ describe('ground-gun: the armoury.bore_gun lane (ticket 318, Content on #310)', 
     expect(BORE_GUN_MODULES.find((m) => m.itemId === 'weapon.cementing_round')?.node).toMatchObject(
       { alsoRequiresFeature: ['casing_cement'] },
     )
+    expect(BORE_GUN_MODULES.find((m) => m.itemId === EARTHING_SPIKE_ITEM_ID)?.node).toMatchObject({
+      alsoRequiresFeature: ['grounded_lining'],
+    })
     expect(BORE_GUN_MODULES.flatMap(({ node }) => node.requiresDiscovery ?? []).sort()).toEqual([
       'hazard:hollow',
       'hazard:magnetic',
     ])
   })
 
-  it('registers the sight, the sear and the long barrel, hidden until bore_gun unlocks, under armoury', () => {
+  it('registers all eight modules, hidden until bore_gun unlocks, under armoury (ticket 380)', () => {
     const nodes = registeredLaneNodes()
-    expect(nodes.map((node) => node.unlocks).sort()).toEqual([...SHIPPED_IDS].sort())
+    expect(nodes.map((node) => node.unlocks).sort()).toEqual([...ALL_EIGHT_IDS].sort())
     expect(nodes.every((node) => node.requiresFeature?.includes('bore_gun'))).toBe(true)
     expect(nodes.every((node) => node.familyId === 'armoury')).toBe(true)
     expect(nodes.every((node) => node.costKind === 'capability')).toBe(true)
+    expect(BORE_GUN_MODULES.filter((module) => module.isHeldBack)).toEqual([])
   })
 
-  it('holds back the five signature modules: no node, no item, no offer', () => {
-    const heldBack = BORE_GUN_MODULES.filter((module) => module.isHeldBack).map((m) => m.itemId)
+  it('anchors the cementing round on casing_cement and the earthing spike on grounded_lining', () => {
+    const anchorsOf = (itemId: string) =>
+      registeredLaneNodes().find((node) => node.unlocks === itemId)?.requiresFeature
+    expect(anchorsOf(CEMENTING_ROUND_ITEM_ID)).toEqual(['bore_gun', 'casing_cement'])
+    expect(anchorsOf(EARTHING_SPIKE_ITEM_ID)).toEqual(['bore_gun', 'grounded_lining'])
+  })
+
+  it('registers every module as a store item with an offer and a card', () => {
     const itemIds = contentOf('vehicle-item').map((item) => item.id)
-    expect(heldBack).toHaveLength(5)
-    expect(heldBack.filter((itemId) => itemIds.includes(itemId))).toEqual([])
-    expect(heldBack.map((itemId) => vehicleItemOfferOf(itemId, 40))).toEqual(
-      heldBack.map(() => null),
-    )
+    expect(ALL_EIGHT_IDS.filter((itemId) => !itemIds.includes(itemId))).toEqual([])
+    expect(ALL_EIGHT_IDS.filter((itemId) => vehicleItemOfferOf(itemId, 40) === null)).toEqual([])
+    expect(ALL_EIGHT_IDS.filter((itemId) => cardLines(itemId, 0).length < 2)).toEqual([])
   })
 
   it('writes every flavour line inside the #159 rules', () => {
@@ -110,5 +122,27 @@ describe('ground-gun: the armoury.bore_gun lane (ticket 318, Content on #310)', 
     const lines = cardLines(STEAM_SEAR_ITEM_ID, 1)
     expect(lines[0]).toEqual({ label: 'Waits after a manual shot (s)', now: '1', next: '0.916' })
     expect(lines.at(-1)?.label).toBe('Price')
+  })
+
+  it('cards the splay choke from the shape it bores: lines and the cadence it adds', () => {
+    expect(cardLines(SPLAY_CHOKE_ITEM_ID, 0).slice(0, 2)).toEqual([
+      { label: 'Lines a shot', now: '2', next: '2' },
+      { label: 'Added to the wait between shots (s)', now: '0.25', next: '0.233' },
+    ])
+  })
+
+  it("cards the cementing round's rounds a dock, its wait and its extra energy", () => {
+    expect(cardLines(CEMENTING_ROUND_ITEM_ID, 0).slice(0, 3)).toEqual([
+      { label: 'Rounds a dock', now: '3', next: '3' },
+      { label: 'Waits between rounds (s)', now: '2', next: '1.833' },
+      { label: "Extra energy a cell (the drill's)", now: '1', next: '1' },
+    ])
+  })
+
+  it("cards the strut bore's standing time and struts a dock", () => {
+    expect(cardLines(STRUT_BORE_ITEM_ID, 0).slice(0, 2)).toEqual([
+      { label: 'A strut stands for (s)', now: '10', next: '11.5' },
+      { label: 'Struts a dock', now: '2', next: '2' },
+    ])
   })
 })

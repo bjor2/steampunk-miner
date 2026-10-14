@@ -6,7 +6,9 @@
  * interval and shot budget are the bore's fixed numbers; the long barrel on the gun (ticket 318)
  * sets its reach and adds its Marks' hold to the bore's. A player who has not mounted the gun has
  * none, so every fire is refused. The steam sear on the gun answers auto mode (ticket 317's
- * `autoShootOf`); without it the mode holds unavailable.
+ * `autoShootOf`); without it the mode holds unavailable. The signature modules on the gun shape
+ * each shot (ticket 380, #377's `shotShapeOf`), and the splay choke and rifled bore add their
+ * cadence to the least wait between shots (`signatureShapes.ts`).
  *
  * The forced pacing bot (`balance:bore`, ticket 347) starts with the gun mounted at every track's
  * wall, through the free debug command the provider names, so the run never counts as play.
@@ -19,6 +21,7 @@ import { GROUND_GUN } from './groundGunEconomy'
 import { gunLevelsOf, isGunMounted, type GunLevels } from './gunLevels'
 import { SET_LEVELS_COMMAND } from './gunPurchase'
 import { energyStatsAt, penetrationStatsAt, rateStatsAt, wallLevelOf } from './gunTracks'
+import { signatureCadenceTicksOf, signatureShotShapeOf } from './signatureShapes'
 
 const BP_PER_PERCENT = 100
 
@@ -26,12 +29,16 @@ export const GROUND_GUN_PROVIDER: BoreGunProvider = {
   id: 'ground-gun.bore-gun',
   boreGunOf: playerBoreGunOf,
   autoShootOf: searAutoShootOf,
+  shotShapeOf: signatureShotShapeOf,
   wallsMountIntent: () => ({ type: SET_LEVELS_COMMAND, payload: wallLevels() }),
 }
 
-/** The gun this player fires now, with the long barrel it carries; null before the mount. */
+/** The gun this player fires now, with the modules it carries; null before the mount. */
 export function playerBoreGunOf(state: AuthorityState, playerId: string): BoreGunStats | null {
-  return boreGunStatsOf(gunLevelsOf(state, playerId), longBarrelOf(state, playerId))
+  const levels = gunLevelsOf(state, playerId)
+  if (!isGunMounted(levels)) return null
+  const gun = boreGunStatsOf(levels, longBarrelOf(state, playerId))
+  return withCadenceAdded(gun, signatureCadenceTicksOf(state, playerId))
 }
 
 /** Every track at its last level: the gun the forced bot fires. */
@@ -61,4 +68,9 @@ export function boreGunStatsOf(
     energyPerCellBp: energyStatsAt(levels.energy).energyPerCellPct * BP_PER_PERCENT,
     collapseHoldTicks: bore.collapseHoldTicks + (barrel?.holdTicks ?? 0),
   }
+}
+
+/** The gun waiting `ticks` longer between shots at least. */
+function withCadenceAdded(gun: BoreGunStats | null, ticks: number): BoreGunStats | null {
+  return gun === null ? null : { ...gun, cooldownTicks: gun.cooldownTicks + ticks }
 }
