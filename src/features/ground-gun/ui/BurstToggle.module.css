@@ -1,0 +1,25 @@
+/*
+ * Bottom right, above the bore gun's gauge (ticket 314) and the dynamite rack's panel, clear of the
+ * touch cluster's foot. Only the switch catches the pointer, so a click beside it still fires.
+ */
+.toggle {
+  position: absolute;
+  right: var(--space-3);
+  bottom: calc(var(--space-3) + 9rem);
+  padding: var(--space-1) var(--space-2);
+  border: 1px solid var(--color-brass);
+  border-radius: var(--radius-panel);
+  background: var(--color-panel);
+  color: var(--color-parchment);
+  font: inherit;
+  cursor: pointer;
+  pointer-events: auto;
+}
+
+.toggle[aria-pressed='true'] {
+  border-color: var(--color-ember);
+}
+
+.toggle[data-phase='vent'] {
+  border-color: var(--color-teal);
+}

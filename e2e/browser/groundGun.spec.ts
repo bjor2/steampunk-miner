@@ -3,7 +3,8 @@
  * gauge panel shows once the gun is mounted, a held fire key fires at each `nextShotTick` and stops
  * when it comes up, and a canvas click fires through the same press. The tracer asks the kernel's
  * spray pool. The bought gun hangs on the rig at `hull.front` (ticket 315), and each bought Armoury
- * module rides it, its gilded plate shown once Mastered (ticket 321). State through
+ * module rides it, its gilded plate shown once Mastered (ticket 321). The auto guns' modules hang
+ * on the turret once owned, and Overpressure's switch latches the kernel's burst (ticket 388). State through
  * `steampunkDebug`, the run log and the DOM's test ids, never pixels.
  */
 import { expect, test, type Page } from '@playwright/test'
@@ -21,6 +22,10 @@ const LONG_BARREL = 'weapon.long_barrel'
 const LONG_BARREL_ASSET = 'vehicle-item-weapon-long-barrel'
 /** The long barrel's Mastered Mark 11 is researched by planet 42 (ticket 318's ladder). */
 const LONG_BARREL_MASTERED_PLANET = 42
+const BURST_TOGGLE = 'ground-gun-burst-toggle'
+const OVERPRESSURE = 'weapon.overpressure_burst'
+/** The turret's first major level is ten minor steps (#180): `setGunLevel` takes steps. */
+const TURRET_FIRST_LEVEL_STEPS = 10
 /** Long enough for a shot at the 45-tick cadence floor or a recovery in surface rock, at 60 ticks/s. */
 const HOLD_MS = 2500
 
@@ -77,6 +82,39 @@ test.describe('the bore gun on a desktop (ticket 314)', () => {
     expect(errors).toEqual([])
   })
 
+  test('hangs an owned auto_guns module on the turret once the guns are mounted (ticket 388)', async ({
+    page,
+  }) => {
+    const errors = await openDrawnGame(page)
+    await ownModules(page, ['weapon.fire_director'])
+    expect(await modulesOnGun(page)).toEqual([])
+    await mountTurret(page)
+    await expect
+      .poll(() => modulesOnGun(page))
+      .toEqual([
+        {
+          assetId: 'vehicle-item-weapon-fire-director',
+          attachId: 'hull.turret',
+          partIds: ['director-box'],
+        },
+      ])
+    expect(errors).toEqual([])
+  })
+
+  test("shows Overpressure's switch once it rides the mounted turret, and a click latches the burst (ticket 388)", async ({
+    page,
+  }) => {
+    const errors = await openDrawnGame(page)
+    await ownModules(page, [OVERPRESSURE])
+    await expect(page.getByTestId(BURST_TOGGLE)).toHaveCount(0)
+    await mountTurret(page)
+    await expect(page.getByTestId(BURST_TOGGLE)).toHaveAttribute('aria-pressed', 'false')
+    await page.getByTestId(BURST_TOGGLE).click()
+    await expect(page.getByTestId(BURST_TOGGLE)).toHaveAttribute('aria-pressed', 'true')
+    await expect.poll(() => burstSwitchesLogged(page)).toBe(1)
+    expect(errors).toEqual([])
+  })
+
   test('fires while the key is held and stops once it comes up', async ({ page }) => {
     const errors = await openDrawnGame(page)
     await mountGun(page)
@@ -120,6 +158,13 @@ function mountGun(page: Page): Promise<void> {
   })
 }
 
+function mountTurret(page: Page): Promise<void> {
+  return page.evaluate((steps) => {
+    const result = window.steampunkDebug!.setGunLevel(steps)
+    if (!result.ok) throw new Error(result.problems.join('; '))
+  }, TURRET_FIRST_LEVEL_STEPS)
+}
+
 /** The bore gun's entry in what the vehicle's pieces hang at attach points now. */
 function boreGunOnRig(page: Page) {
   return page.evaluate(() => {
@@ -160,6 +205,12 @@ function modulesOnGun(page: Page) {
 function boreShotsLogged(page: Page): Promise<number> {
   return page.evaluate(
     () => (window.steampunkRunLog?.() ?? '').split('"event":"bore_fired"').length - 1,
+  )
+}
+
+function burstSwitchesLogged(page: Page): Promise<number> {
+  return page.evaluate(
+    () => (window.steampunkRunLog?.() ?? '').split('"event":"turret_burst_set"').length - 1,
   )
 }
 

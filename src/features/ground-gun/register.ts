@@ -21,8 +21,9 @@
  * buy through a slice files under the spend guard's one `armoury` family row, with its gun-track
  * pin (ticket 371). The `armoury.auto_guns` lane (ticket 388) adds the turret's eight modules as
  * store items with their nodes, cards and seller: while the guns are mounted and a module hangs at
- * its `turret.*` mount, it shapes the kernel turret's shot through the `autoGuns` provider, and the
- * Flushing shell drives burrowers out through the `enemyFlushes` registry.
+ * its `turret.*` mount, it shapes the kernel turret's shot through the `autoGuns` provider, the
+ * Flushing shell drives burrowers out through the `enemyFlushes` registry, and Overpressure's toggle
+ * switch sends the kernel's `turret.burst`.
  * No side effects at import; the loader calls `register`.
  */
 import type { SliceDefinition } from '../../registries/sliceDefinition'
@@ -58,6 +59,7 @@ import { FLUSHING_SHELL_FLUSH } from './systems/flushingShell'
 import { autoGunsModuleCards } from './systems/turretModuleCards'
 import { AUTO_GUNS_PROVIDER } from './systems/turretShapes'
 import { BORE_GUN_MODULE_SELLER } from './systems/moduleSales'
+import { BurstToggle } from './ui/BurstToggle'
 import { FireGauge } from './ui/FireGauge'
 import { FireReticle } from './ui/FireReticle'
 import { FireTile } from './ui/FireTile'
@@ -98,6 +100,7 @@ export const slice: SliceDefinition = {
     r.eventProjections(GROUND_GUN_PROJECTIONS)
     r.runEvents(GROUND_GUN_RUN_EVENTS)
     r.hudPanel({ id: 'ground-gun.fire-gauge', slot: 'gauges', Panel: FireGauge })
+    r.hudPanel({ id: 'ground-gun.burst-toggle', slot: 'gauges', Panel: BurstToggle })
     r.hudPanel({ id: 'ground-gun.fire-tile', slot: 'slots', Panel: FireTile })
     r.hudPanel({
       id: 'ground-gun.reticle',
