@@ -24,7 +24,7 @@ export function vehicleItemOf(item: ComboItem): VehicleItem {
   return { id: item.itemId, iconId: item.iconId, slots: [], attach: null }
 }
 
-/** The authored grade-1 node of a combo that has one. */
+/** The authored grade-1 node of a combo that has one: both parent items owned (GD lock on #206). */
 export function techNodeOf(item: ComboItem, node: ComboNode): TechNode {
   return {
     id: node.id,
@@ -33,6 +33,7 @@ export function techNodeOf(item: ComboItem, node: ComboNode): TechNode {
     name: item.name,
     unlockTier: node.unlockTier,
     prereqs: item.parents,
+    requiresOwned: item.parentItemIds,
     unlocks: item.itemId,
     description: item.description,
     label: 'horizontal',
@@ -47,7 +48,7 @@ export function authoredComboNodesOf(items: readonly ComboItem[]): TechNode[] {
 
 /** The lane pair's template: `tech.template.<name>`, ids as `COMBO_TEMPLATES_FIXTURE` has them. */
 export function comboTemplateOf(
-  row: Pick<ComboItem, 'itemId' | 'name' | 'description' | 'lanes' | 'parents'>,
+  row: Pick<ComboItem, 'itemId' | 'name' | 'description' | 'lanes' | 'parents' | 'parentItemIds'>,
 ): TechComboTemplate {
   const name = row.itemId.slice(COMBO_ID_PREFIX.length)
   return {
@@ -58,6 +59,7 @@ export function comboTemplateOf(
     unlocks: row.itemId,
     parents: row.parents,
     description: row.description,
+    requiresOwned: row.parentItemIds,
   }
 }
 

@@ -1,21 +1,18 @@
 /**
- * Why each combo is still a vision row (GD lock on #205 Q2 and Q3: an item whose mechanic is not
- * in the game, or whose prerequisite is held back, stays unregistered). Each combo changes how a
- * parent item of a closed lane slice plays, and that slice exposes no hook a combo can reach
- * without importing it (ticket 206 acceptance: combos never import a lane slice), so every row
- * waits for its seam. The templates wait with their combos: a generated grade of a template would
- * unlock a store item with no effect.
+ * The combos still held as vision rows, and why (GD lock on #206, decisions 3 and 10; the lock on
+ * #205 Q2 and Q3: an item whose mechanic or prerequisite is not in the game stays unregistered).
+ * A held combo registers no store item, node or template, so no generated grade of its pair ever
+ * offers a combo with no effect. Every other combo ships through the item hooks
+ * (`comboHooks.ts`).
  */
 export const COMBO_HOLDS: Readonly<Record<string, string>> = {
-  'combo.assay_drain': "the mineral drain's cell order is extraction's, with no hook",
-  'combo.magnetic_survey':
-    "the ore-shifter's drag target is terrain-tools'; echo pings are render-only",
-  'combo.foam_cutters': 'stabiliser foam is held back (#202), and side cutters have no hook',
-  'combo.alarm_shield': 'periscope warnings are render-only; the shield fires only from a slot',
-  'combo.cored_drain': "the corer keeps no sampled vein, and the drain's reach is extraction's",
-  'combo.lodestone_drain': "the drain's reach and the beacon's gather radius have no hook",
-  'combo.lens_corer': "the corer's aim is drill-gear's, with no hook",
-  'combo.foam_grapple': 'stabiliser foam is held back (#202), and the grapple has no hook',
-  'combo.aether_reel': "the tether's tow is mining-gates' and the winch is mobility's, no hook",
+  'combo.foam_cutters': 'stabiliser foam is held back (#202), so the combo has no parent node',
+  'combo.foam_grapple': 'stabiliser foam is held back (#202), so the combo has no parent node',
+  'combo.aether_reel': 'the tow hook waits until Gameplay defines tow (GD lock on #206, 10)',
   'combo.ceiling_anchor': 'item and node moved to #288, after the twin-bit diagonal',
+}
+
+/** Whether the combo store item ships now. */
+export function isShippedCombo(itemId: string): boolean {
+  return !Object.hasOwn(COMBO_HOLDS, itemId)
 }

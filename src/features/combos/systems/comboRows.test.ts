@@ -56,6 +56,7 @@ describe('combo rows', () => {
       name: 'Cored drain',
       unlockTier: 28,
       prereqs: ['tech.drill_gear.sampling_corer', 'tech.extraction.mineral_drain'],
+      requiresOwned: ['gear.sampling_corer', 'power.mineral_drain'],
       unlocks: 'combo.cored_drain',
       description: drain.description,
       label: 'horizontal',
@@ -89,11 +90,12 @@ describe('combo templates', () => {
     expect(pairs.sort()).toEqual(everyLanePair().sort())
   })
 
-  it('grades the combo item of its row, from the same two parents', () => {
+  it('grades the combo item of its row, from the same two parents, both owned', () => {
     COMBO_ITEMS.forEach((item) => {
       const template = COMBO_TEMPLATES.find((row) => row.unlocks === item.itemId)
       expect(template?.parents, item.itemId).toEqual(item.parents)
       expect(template?.lanes, item.itemId).toEqual(item.lanes)
+      expect(template?.requiresOwned, item.itemId).toEqual(item.parentItemIds)
     })
   })
 
