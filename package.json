@@ -24,6 +24,7 @@
     "bench:combat": "vite-node scripts/benchCombatTick.ts",
     "bench:blast": "vite-node scripts/benchBlast.ts",
     "bench:drill-step": "vite-node scripts/benchDrillStep.ts",
+    "bench:strip": "vite-node scripts/benchHazardStrip.ts",
     "bench:summary": "vite-node scripts/bench/summarizeBenchLogs.ts",
     "perf:record": "node scripts/perf/recordPerf.mjs",
     "perf:sessions": "vite-node scripts/perf/analyzeSessions.ts",
