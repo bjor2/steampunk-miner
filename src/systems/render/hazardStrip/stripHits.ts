@@ -72,6 +72,13 @@ export function isSameHit(a: StripHit, b: StripHit): boolean {
   )
 }
 
+/** A copy of `hit` placed at `step` (a hit already placed is moved). */
 export function stepHitOf(step: number, hit: StripHit): StepHit {
-  return { step, ...hit }
+  return {
+    step,
+    kinds: hit.kinds,
+    gateKind: hit.gateKind,
+    gateOpensAtTipMajor: hit.gateOpensAtTipMajor,
+    oreTierOffset: hit.oreTierOffset,
+  }
 }

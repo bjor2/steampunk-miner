@@ -35,13 +35,16 @@ export const STRIP_FRAME_BUDGET_MS = 0.5
  * - a tile read is `baseCellOfTile` plus the lava, cache and patch look-ups, 0.33 to 0.40 µs (M);
  * - a chunk's set-up is its ore patch list, `orePatchesNearChunk`, 0.03 to 0.06 ms (M);
  * - a lattice block (tier 3) is four cave corners and the lava blocks over it, about twenty hashes,
- *   held at five tile reads until the bench says otherwise;
- * - a band warning (tier 4) is one band look-up along the path, a tile read.
+ *   held at two and a half tile reads until the bench says otherwise; a 3-cell line crosses at
+ *   most two blocks side by side;
+ * - a band warning (tier 4) is one band look-up along the path, a tile read;
+ * - a metre of path is a cosine, a sine and a logarithm (D, not measured).
  */
 export const STRIP_TILE_READ_US = 0.4
 export const STRIP_CHUNK_SETUP_US = 60
-export const STRIP_BLOCK_READ_US = 2
+export const STRIP_BLOCK_READ_US = 1
 export const STRIP_BAND_READ_US = 0.4
+export const STRIP_PATH_STEP_US = 0.1
 
 /** Tier 4 walks the path in this many even steps, whatever its length (scope g 4, O(1)). */
 export const STRIP_BAND_STEPS = 64

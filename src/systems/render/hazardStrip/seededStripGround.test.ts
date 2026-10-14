@@ -1,4 +1,6 @@
 import { describe, expect, it } from 'vitest'
+import { withRegistrations } from '../../../registries/registrar'
+import type { SliceDefinition } from '../../../registries/sliceDefinition'
 import { artefactCacheTile } from '../../world/artefactCache'
 import { withCellsYielded, withLavaFlipped } from '../../world/chunkDelta'
 import { generateChunkCells } from '../../world/generateChunk'
@@ -12,7 +14,9 @@ import {
 } from '../../world/tileGrid'
 import { CELL_KIND, kindOfCell } from '../../world/worldCell'
 import { deltaOfChunk, EMPTY_WORLD, withChunkDelta, type WorldState } from '../../world/worldState'
+import { createHazardStrip, sampleHazardStrip } from './hazardStripSampler'
 import { createSeededStripGround } from './seededStripGround'
+import { digFrameAt, VIEWER_WITH_SCANNER } from './stripFixtures'
 import { createStripHit, HAZARD_KINDS, STRIP_KIND } from './stripHits'
 
 const SEED = 1
@@ -42,7 +46,50 @@ function hazardKindsOfCell(cell: number): number {
   return kind === CELL_KIND.air ? STRIP_KIND.void : 0
 }
 
+/** A slice that puts gate kind 5, which no tip opens, on every ore cell. */
+const GATE_EVERY_ORE: SliceDefinition = {
+  id: 'gate-probe',
+  register: (r) =>
+    r.cellGateLook({
+      id: 'gate-probe.look',
+      cellGateLookOf: (_params, cell) =>
+        kindOfCell(cell) === CELL_KIND.ore ? { kind: 5, state: 0 } : null,
+      markerTintOf: () => null,
+    }),
+}
+
+/** The first ore tile of the surface chunk over the centre line. */
+function firstSurfaceOre(params: PlanetParams): TilePoint {
+  const cy = chunkOfTile(params.radiusTiles - 1)
+  const cells = generateChunkCells(params, 0, cy)
+  const tile = tilesOfChunk(0, cy).find(
+    (candidate) => kindOfCell(cells[cellIndexOfTile(candidate.tx, candidate.ty)]) === CELL_KIND.ore,
+  )
+  if (tile === undefined) throw new Error('no ore in the surface chunk')
+  return tile
+}
+
 describe('seeded strip ground', () => {
+  it('shows ore under a gate as the gate kind alone, even with the scanner open', () => {
+    withRegistrations([GATE_EVERY_ORE], () => {
+      const params = planetParamsFor(SEED, 1)
+      const ore = firstSurfaceOre(params)
+      const above = { x: ore.tx + 0.5, y: ore.ty + 3.5 }
+      const length = Math.hypot(above.x, above.y)
+      const strip = createHazardStrip()
+      const ground = createSeededStripGround(params, EMPTY_WORLD)
+      sampleHazardStrip(strip, ground, {
+        ...digFrameAt(0, 8, VIEWER_WITH_SCANNER),
+        nose: above,
+        facing: { x: -above.x / length, y: -above.y / length },
+      })
+      const [first] = strip.pips.slice(0, strip.pipCount)
+      expect([first.kind, first.gateKind]).toEqual(['gate', 5])
+      expect(first.metres).toBeLessThanOrEqual(3)
+      expect(strip.pips.slice(0, strip.pipCount).some((pip) => pip.kind === 'ore')).toBe(false)
+    })
+  })
+
   it.each([1, 8, 28])(
     'reads every tile of planet %i as generateChunk paints it, without generating a chunk',
     (planetIndex) => {

@@ -93,7 +93,7 @@ export function createSeededStripGround(
     params,
     world,
     radiusMetres: params.radiusTiles,
-    chunkVersionOf: (cx, cy) => readingOf(reads, cx, cy).delta.version,
+    chunkVersionOf: (cx, cy) => deltaOfChunk(reads.ground.world, cx, cy).version,
     readTile: (tile, out) => readTileInto(reads, out, tile),
     blockKindsAt: (tile) => blockKindsOf(reads.lattice, tile) | readingAt(reads, tile).editKinds,
     bandKindsAt: (tile) => bandKindsAt(reads.lattice, tile),
