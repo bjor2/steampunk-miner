@@ -20,6 +20,8 @@ export const renderPresence = {
   terrainMs: 0,
   /** The chunk worker builds the terrain's meshes (ticket 337); false while they are built here. */
   isTerrainWorkerMeshing: false,
+  /** Chunks in view with no mesh yet this frame (ticket 337: none at the bot's top speed). */
+  unbuiltVisibleChunks: 0,
   groundColliders: 0,
   renderScale: 1,
   /** The lowest scale the adaptive rule may step to on this output (#173 tiers). */

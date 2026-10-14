@@ -368,6 +368,7 @@ export function loadFeatures(): readonly string[] {
 **Timing.** Registration happens once, synchronously, before the first tick, render or test. Each composition root calls `loadFeatures()` first:
 - the page: `startGame()` in `src/bootstrap.ts`
 - every Vitest spec: `src/testSetup.ts`, already `setupFiles` in `vite.config.ts`
+- the chunk worker (ticket 337): `src/chunkWorker.ts`, a second realm the renderer starts, whose generation hooks and ore, gate and field looks paint the chunks it meshes
 - the 11 vite-node entries:
   - `scripts/updateGoldenRuns.ts`
   - `balanceReport`, `balancePlanets`, `balanceGuns`, `balanceCharges`, `balanceRefinery`, `balanceHeat`

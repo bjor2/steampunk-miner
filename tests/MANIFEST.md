@@ -790,13 +790,16 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/render/chargePlacement.test.ts` | 2 | 2 |
 | `src/systems/render/chunkBuildBudget.test.ts` | 11 | 11 |
 | `src/systems/render/chunkFrameWork.test.ts` | 6 | 6 |
+| `src/systems/render/chunkJobBook.test.ts` | 7 | 7 |
+| `src/systems/render/chunkMeshJob.test.ts` | 2 | 2 |
 | `src/systems/render/chunkPrefetch.test.ts` | 7 | 7 |
 | `src/systems/render/chunkStreaming.test.ts` | 25 | 7 |
 | `src/systems/render/chunkTileBatch.test.ts` | 8 | 8 |
 | `src/systems/render/chunkTileBatchGates.test.ts` | 12 | 5 |
 | `src/systems/render/chunkTileBatchOreLook.test.ts` | 1 | 1 |
+| `src/systems/render/chunkWorkerStreaming.test.ts` | 8 | 2 |
 | `src/systems/render/collapseTelegraph.test.ts` | 5 | 5 |
-| `src/systems/render/densityHalo.test.ts` | 3 | 3 |
+| `src/systems/render/densityHalo.test.ts` | 5 | 5 |
 | `src/systems/render/drillHeadPose.test.ts` | 7 | 4 |
 | `src/systems/render/enemyArt.test.ts` | 3 | 3 |
 | `src/systems/render/enemyPlaceholder.test.ts` | 7 | 3 |
@@ -853,6 +856,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | --- | --- | --- |
 | `src/scene/SceneLayers.test.ts` | 5 | 5 |
 | `src/scene/VehiclePieces.test.ts` | 2 | 2 |
+| `src/scene/chunkJobStream.test.ts` | 3 | 3 |
 | `src/scene/mountedPartsPresence.test.ts` | 3 | 3 |
 | `src/scene/partMotionPresence.test.ts` | 4 | 4 |
 | `src/scene/registries/sceneLayerBudget.test.ts` | 7 | 7 |

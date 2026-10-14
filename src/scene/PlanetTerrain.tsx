@@ -90,13 +90,14 @@ function syncTimed(pool: ChunkMeshPool, view: TerrainView): void {
 
 /**
  * The #38 visible-block budget, read by the render stats and the perf log; built meshes (#121);
- * whether the chunk worker builds them (ticket 337).
+ * whether the chunk worker builds them and how many in view still lack one (ticket 337).
  */
 function recordGroundDrawn(pool: ChunkMeshPool): void {
   renderPresence.groundBlocks = pool.drawnBlockCount()
   renderPresence.drawnChunks = pool.drawnChunkCount()
   renderPresence.builtChunks = pool.builtChunkCount()
   renderPresence.isTerrainWorkerMeshing = pool.isWorkerMeshing()
+  renderPresence.unbuiltVisibleChunks = pool.unbuiltVisibleChunkCount()
 }
 
 /** Its planet and world are placeholders, replaced before the pool first reads them. */

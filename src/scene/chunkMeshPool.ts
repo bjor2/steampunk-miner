@@ -73,6 +73,8 @@ export interface ChunkMeshPool {
   gateBitsAt(tile: TilePoint): number | null
   /** The chunk worker builds the meshes now (ticket 337), not the main thread. */
   isWorkerMeshing(): boolean
+  /** Chunks in view with no mesh yet: a hole in the ground until one is built (ticket 337). */
+  unbuiltVisibleChunkCount(): number
   dispose(): void
 }
 
@@ -132,6 +134,7 @@ export function createChunkMeshPool(
     builtChunkCount: () => pool.meshes.size,
     gateBitsAt: (tile) => gateBitsOfTile(pool, tile),
     isWorkerMeshing: () => isWorkerMeshing(pool.jobs),
+    unbuiltVisibleChunkCount: () => countUnbuiltVisible(pool),
     dispose: () => dropAll(pool, parent),
   }
 }
@@ -140,6 +143,12 @@ function countDrawn(pool: PoolState): number {
   let drawn = 0
   for (const chunk of pool.meshes.values()) if (chunk.mesh.visible) drawn++
   return drawn
+}
+
+function countUnbuiltVisible(pool: PoolState): number {
+  let unbuilt = 0
+  for (const { cx, cy } of pool.visible) if (!pool.meshes.has(chunkKey(cx, cy))) unbuilt++
+  return unbuilt
 }
 
 function countDrawnBlocks(pool: PoolState): number {

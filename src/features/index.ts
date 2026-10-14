@@ -1,8 +1,8 @@
 /**
  * The slice loader (docs/standards/feature-slices.md 3.3), kernel-owned: finds every
  * `src/features/<slice>/register.ts`, registers the slices in id order and seals the registries.
- * Only the composition roots call it (`bootstrap.ts`, `testSetup.ts`, `scripts/*.ts`), first,
- * before any tick, render or test; a slice never imports it (lint).
+ * Only the composition roots call it (`bootstrap.ts`, `chunkWorker.ts`, `testSetup.ts`,
+ * `scripts/*.ts`), first, before any tick, render or test; a slice never imports it (lint).
  */
 import { loadSlices } from '../registries/registrar'
 import type { SliceDefinition } from '../registries/sliceDefinition'

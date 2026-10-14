@@ -151,8 +151,23 @@
         "e2e/browser/miningGates.spec.ts",
         "e2e/browser/screens/screenLayout.spec.ts",
         "e2e/browser/screens/reviewShots.spec.ts",
-        "e2e/browser/magneticPlanet.spec.ts"
+        "e2e/browser/magneticPlanet.spec.ts",
+        "e2e/browser/chunkWorker.spec.ts"
       ]
+    },
+    {
+      "why": "The chunk worker (ticket 337): its root and port, the job stream and the pool that meshes its results.",
+      "paths": [
+        "src/chunkWorker.ts",
+        "src/shell/chunkWorkerPort.ts",
+        "src/scene/chunkJobStream.ts",
+        "src/scene/chunkMeshPool.ts",
+        "src/scene/chunkMeshGeometry.ts",
+        "src/scene/chunkBuildNeeds.ts",
+        "src/scene/chunkStreamFrame.ts",
+        "src/scene/PlanetTerrain.tsx"
+      ],
+      "specs": ["e2e/browser/chunkWorker.spec.ts", "e2e/browser/render.spec.ts"]
     },
     {
       "why": "The memory reads of the debug API and the run log's samples.",
