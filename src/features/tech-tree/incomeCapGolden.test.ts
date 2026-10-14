@@ -5,6 +5,7 @@ import { entriesOf } from '../../systems/registries/seal'
 import {
   failingVerdictsOf,
   incomeCapVerdictsOf,
+  isFailing,
   milestoneIncomeCapVerdictsOf,
   type IncomeCapVerdict,
   type SeedIncome,
@@ -32,9 +33,12 @@ function onCurveSeedOf(planetIndex: number): SeedIncome {
   return { levelsOn: new Map([[planetIndex, visits]]), anchors: EVERY_ITEM_OWNED }
 }
 
+function judgedVerdictsOf(verdictsOf = incomeCapVerdictsOf) {
+  return verdictsOf(TREE_ECONOMY.incomeCap.planets.map(onCurveSeedOf))
+}
+
 function band5VerdictsOf(verdictsOf = incomeCapVerdictsOf) {
-  const seeds = TREE_ECONOMY.incomeCap.planets.map(onCurveSeedOf)
-  return verdictsOf(seeds).filter((v) => v.band === 5 && v.visit === 'arrival')
+  return judgedVerdictsOf(verdictsOf).filter((v) => v.band === 5 && v.visit === 'arrival')
 }
 
 function rowTextOf(v: IncomeCapVerdict): string {
@@ -79,8 +83,16 @@ describe('income cap golden', () => {
     expect(gearItemIds).toEqual([])
   })
 
-  it('fails no gate on the on-curve vehicle: the drain is held by the ledger, the movers are known-red', () => {
+  it('fails no gate on the on-curve vehicle: the drain and the movers are held by the ledger', () => {
     expect(failingVerdictsOf(band5VerdictsOf())).toEqual([])
+  })
+
+  it('gates every item strictly on P10, P20, P40 and P60, every band, with no item known-red', () => {
+    // The movers left `knownRed` when their ledger landed (ticket 408): nothing is exempt.
+    const verdicts = judgedVerdictsOf()
+    expect(TREE_ECONOMY.incomeCap.knownRed).toEqual({})
+    expect(new Set(verdicts.map((v) => v.band))).toEqual(new Set([1, 2, 3, 4, 5]))
+    expect(verdicts.filter(isFailing).map(rowTextOf)).toEqual([])
   })
 
   it('pins every item share at Mark 9 with its sibling-link, the shifter alone carrying a yield link', () => {
@@ -114,7 +126,7 @@ describe('income cap golden', () => {
     expect(mismatched.map((rate) => rate.itemId)).toEqual([])
   })
 
-  it('fails no gate at Mark 9 with the sibling-links: the drain is held by the ledger, the movers are known-red', () => {
+  it('fails no gate at Mark 9 with the sibling-links: the drain and the movers are held by the ledger', () => {
     expect(failingVerdictsOf(band5VerdictsOf(milestoneIncomeCapVerdictsOf))).toEqual([])
   })
 })

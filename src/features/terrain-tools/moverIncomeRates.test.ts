@@ -58,6 +58,11 @@ describe('mover income rates', () => {
     expect(rows.map((row) => row.itemId)).toEqual(MOVER_ITEM_IDS)
   })
 
+  it('reports every mover held by the trip ledger in play (ticket 408)', () => {
+    const rows = moverRowsOf(AT)
+    expect(rows.filter((row) => !row.isTripCappedInPlay).map((row) => row.itemId)).toEqual([])
+  })
+
   it('counts a mover zero while its item is not owned', () => {
     const anchors = {
       isRowLive: () => true,
