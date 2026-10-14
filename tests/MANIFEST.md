@@ -23,7 +23,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | Every buyable has a description | #159 | `src/systems/registries/buyableRefs.test.ts`, `src/features/descriptions/systems/descriptionCoverage.test.ts` | 9 |
 | Every ore family has a gateClass row | #141, #142 | `src/features/planet-mix/systems/themeRows.test.ts`, `src/features/mining-gates/systems/rigs.test.ts`, `src/features/mining-gates/systems/gateTable.test.ts` | 19 |
 | Endless signature coverage, planets 41-65 | #148 | `src/features/mining-gates/systems/rigs.test.ts` | 8 |
-| Locked unlock schedule and one home per stats.json row (stay in the kernel) | #184, #191 | `src/systems/unlocks/unlockSchedule.test.ts`, `src/systems/registries/scheduleRows.test.ts` | 38 |
+| Locked unlock schedule and one home per stats.json row (stay in the kernel) | #184, #191 | `src/systems/unlocks/unlockSchedule.test.ts`, `src/systems/registries/scheduleRows.test.ts` | 39 |
 
 ## Slices
 
@@ -44,6 +44,13 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/artefact/systems/twistHooks.test.ts` | 5 | 3 |
 | `src/features/artefact/twistNoFreeCell.test.ts` | 6 | 1 |
 | `src/features/artefact/twistPace.test.ts` | 6 | 3 |
+
+### `casing-cement`: 2 files, 12 tests
+
+| File | Tests | Sites |
+| --- | --- | --- |
+| `src/features/casing-cement/systems/casedTiles.test.ts` | 6 | 6 |
+| `src/features/casing-cement/systems/cementReinforcement.test.ts` | 6 | 6 |
 
 ### `codex`: 7 files, 36 tests
 
@@ -77,13 +84,14 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/combos/systems/combosEconomy.test.ts` | 4 | 4 |
 | `src/features/combos/systems/render/anchorTilt.test.ts` | 7 | 7 |
 
-### `descriptions`: 4 files, 49 tests
+### `descriptions`: 5 files, 52 tests
 
 | File | Tests | Sites |
 | --- | --- | --- |
 | `src/features/descriptions/systems/descriptionCoverage.test.ts` | 5 | 5 |
 | `src/features/descriptions/systems/flavourRules.test.ts` | 8 | 8 |
 | `src/features/descriptions/systems/kernelEntries.test.ts` | 32 | 19 |
+| `src/features/descriptions/systems/liningCards.test.ts` | 3 | 3 |
 | `src/features/descriptions/ui/upgradeBayCards.test.ts` | 4 | 4 |
 
 ### `dock-buildings`: 8 files, 34 tests
@@ -1122,7 +1130,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/unlocks/readUnlockSchedule.test.ts` | 10 | 10 |
 | `src/systems/unlocks/scheduleCadence.test.ts` | 5 | 5 |
 | `src/systems/unlocks/travelUnlocks.test.ts` | 7 | 7 |
-| `src/systems/unlocks/unlockSchedule.test.ts` | 34 | 31 |
+| `src/systems/unlocks/unlockSchedule.test.ts` | 35 | 32 |
 
 ### `vehicle`
 

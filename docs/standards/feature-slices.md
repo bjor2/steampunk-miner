@@ -1138,6 +1138,14 @@ The enemy-step seam of #263's chronometric governor (GD ruling and TD lock on #2
 - **Where it applies** (`combat/enemyMovement.ts` `slowedWalkStepMmOf` / `slowedLungeStepMmOf`): every walking step through `walkToward` (the hunters' approach and lure walk, the wrecker's seek) and the wrecker's flee step, each tick; the lunge step when the wind-up ends and the recoil step when the recoil starts (`enemyBehaviour.ts`). A lunge or recoil under way keeps its fixed step. The wind-up reach (`lungeReachMm`), the wrecker's at-ring tolerance and the magnetic tug read the base step.
 - **Not here.** Ownership and research are the provider's to check when it opens its pocket (#263), never on a step read.
 
+### 3.53 casing_cement reinforcement (ticket 367)
+
+Piece (ii-b) of the #157 seam (3.47), with the GD's ruling B on #367: only cement-grade lining reinforces. The `casing-cement` slice (`src/features/casing-cement/`) registers one provider and nothing else: no section, command, event or save field. Protocol 54.
+
+- **Provider** `casing-cement.cased-tiles` (`systems/cementReinforcement.ts`): a tile is cased when an intact sample of a cement-grade lining type (`casing.cementGrades.liningTypes`: refractory P8, insulated P17, grounded P25, each with a lining type) lies in it or on its one-sample border (`systems/casedTiles.ts`, a 6x6 window of the kernel casing layer, 36 samples at most). The grade never decides; breached lining and the standard lining case nothing, so the #43 under-grade hazard stays and P1-P7 play and goldens are unchanged. A tile at the middle of a 1.75 m bore borders a lined wall sample; a tunnel carved wider, like the collapse fixture's 1.9 m, leaves its middle row uncased.
+- **Ownership on apply.** A grade counts only once its own row is owned or `FeatureUnlocked`: `BuyLiningType` opens it on its row and `SelectLiningType` refuses an unowned type, so cement lining is never laid unowned. The read never checks, so a cased tile holds for every player.
+- **Not here.** The unlined ground behind the drill (#56, about 2 m) is never cased, so an under-grade block that still holds it warns and refills those cells as before. The lining charge (#76, `casingLiningCharge.ts`) already prices each newly lined wall in its own band, times the type's multiplier. The P1 `casing_cement` row keeps its bore-collapse role (#309, #313); its scopeNote says reinforcement starts at P8. The descriptions slice prints "Cased: the ground around this lining won't collapse" on exactly the cement grades' cards.
+
 ## 4. Cross-slice contracts
 
 ```mermaid
