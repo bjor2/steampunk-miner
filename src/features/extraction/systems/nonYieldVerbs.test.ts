@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { PACING_WORLD_SEEDS } from '../../../constants/pacingSeeds'
 import { createAuthorityState } from '../../../systems/authority/authorityState'
-import type { DomainEvent } from '../../../systems/authority/domainEvent'
+import type { DomainEventBody } from '../../../systems/authority/domainEvent'
 import { carveCircleCommand } from '../../../systems/authority/groundCommands'
 import { setVehicleLoadoutCommand } from '../../../systems/authority/loadoutCommands'
 import { continueScriptedSession } from '../../../systems/authority/scriptedSession'
@@ -79,7 +79,7 @@ function isGeneratedOre(params: PlanetParams, tile: TilePoint): boolean {
 function measureDrain(seed: number, verb: FollowUpPattern | null): DrainMeasure {
   const stand = standOf(seed)
   const [drain] = EXTRACTION_POWER_UPS
-  const outcome = drain.activate(stateBeforeUse(seed, stand), useOf(stand, verb))
+  const outcome = drain.activate(stateBeforeUse(seed, stand), powerUpUseOf(stand, verb))
   if (outcome.kind !== 'acted') throw new Error(`seed ${seed}: the drain did not act`)
   return yieldOf(outcome.effect.events)
 }
@@ -101,7 +101,7 @@ function stateBeforeUse(seed: number, stand: TilePoint) {
   return session.state()
 }
 
-function useOf(stand: TilePoint, verb: FollowUpPattern | null): PowerUpUse {
+function powerUpUseOf(stand: TilePoint, verb: FollowUpPattern | null): PowerUpUse {
   return {
     playerId: 'p1',
     itemId: DRAIN_ID,
@@ -114,7 +114,7 @@ function useOf(stand: TilePoint, verb: FollowUpPattern | null): PowerUpUse {
   }
 }
 
-function yieldOf(events: readonly DomainEvent[]): DrainMeasure {
+function yieldOf(events: readonly DomainEventBody[]): DrainMeasure {
   const drained = events.find((event) => event.type === 'extraction.DrainYielded')
   if (drained?.type !== 'extraction.DrainYielded') throw new Error('the drain logged no yield')
   return { cells: drained.cells, units: drained.units, value: drained.value }

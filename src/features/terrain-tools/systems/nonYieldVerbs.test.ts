@@ -110,14 +110,18 @@ function measureUse(
   if (powerUp === undefined) throw new Error(`${budget.itemId} is not a shipped terrain tool`)
   const outcome = powerUp.activate(
     stateBeforeUse(seed, budget.itemId, stand),
-    useOf(budget, stand, verb),
+    powerUpUseOf(budget, stand, verb),
   )
   if (outcome.kind !== 'acted') return null
   const cells = budget.queuedBy(outcome.effect.state).terrainEdits.flatMap((edit) => edit.cells)
   return { seed, verb, oreCells: cells.filter(isOreLanding).length, units: unitsOf(cells) }
 }
 
-function useOf(budget: UseBudget, stand: TilePoint, verb: FollowUpPattern | null): PowerUpUse {
+function powerUpUseOf(
+  budget: UseBudget,
+  stand: TilePoint,
+  verb: FollowUpPattern | null,
+): PowerUpUse {
   return {
     playerId: 'p1',
     itemId: budget.itemId,
