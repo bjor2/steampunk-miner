@@ -1,7 +1,12 @@
 import { describe, expect, it } from 'vitest'
 import { SOLID_DENSITY } from '../world/sampleGrid'
 import { CELL_KIND } from '../world/worldCell'
-import { drillContactOf, sweptDrillContactOf, type DrillableGround } from './drillContact'
+import {
+  drillContactOf,
+  inTheWayMmOf,
+  sweptDrillContactOf,
+  type DrillableGround,
+} from './drillContact'
 import { drillStampOf } from './drillStamp'
 import { FACING, facingVectorOf, type VehiclePose } from './vehiclePose'
 
@@ -38,5 +43,21 @@ describe('swept drill contact (ticket 330)', () => {
   it('never bites on ground behind the face', () => {
     expect(sweptDrillContactOf(groundWith([[1, -1]]), AIM)).toBe('none')
     expect(sweptDrillContactOf(groundWith([]), AIM)).toBe('none')
+  })
+})
+
+describe('in-the-way window (ticket 334)', () => {
+  // Facing left, the face is 450 mm left of the centre; sample -3 sits 750 mm out, 300 past it.
+  const past300 = groundWith([[-3, 0]])
+
+  it('holds the wheels for ground up to 250 mm past the face by default', () => {
+    expect(drillContactOf(past300, AIM)).not.toBe('inTheWay')
+    expect(drillContactOf(groundWith([[-2, 0]]), AIM)).toBe('inTheWay')
+  })
+
+  it('widens to the cutting step bound, never under 250 mm', () => {
+    expect(inTheWayMmOf(100)).toBe(250)
+    expect(inTheWayMmOf(1300)).toBe(1300)
+    expect(drillContactOf(past300, { ...AIM, inTheWayMm: inTheWayMmOf(300) })).toBe('inTheWay')
   })
 })

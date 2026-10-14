@@ -100,3 +100,15 @@ export const SUBSTEP_REACH_MM = 400
  * per tick does not grow with speed past it.
  */
 export const MAX_PHYSICS_SUBSTEPS = 4
+
+/**
+ * The kinematic grid sweep (TD scope a on #316, ticket 334) walks the body's leading face forward
+ * this far at a time, one density sample, so no solid sample's contour fits between two probes.
+ */
+export const KINEMATIC_SWEEP_PROBE_M = 0.25
+
+/**
+ * The sweep's probes sit this far inside the body's sides, so a body resting on a floor or rubbing
+ * a bore's wall slides along it instead of stopping on it.
+ */
+export const KINEMATIC_SWEEP_INSET_M = 0.05

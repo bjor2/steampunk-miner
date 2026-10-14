@@ -25,6 +25,7 @@ function runMotion(
   steps: number,
   multiplier = 1,
   isGrounded = true,
+  maxSpeed?: number,
 ): MotionStep {
   const up = localUpOf(position, { x: 0, y: 1 })
   let step: MotionStep = { velocity: { x: 0, y: 0 }, isDriving: false, isThrusting: false }
@@ -41,6 +42,7 @@ function runMotion(
       isCuttingLevel: false,
       isWaitingForCut: false,
       dt: PHYSICS_TIMESTEP,
+      maxSpeed,
     })
   }
   return step
@@ -144,6 +146,11 @@ describe('vehicle gravity', () => {
     expect(speedOf(runMotion(PLANET_ANGLES[0], lift, 600, 1, false).velocity)).toBeLessThanOrEqual(
       bound,
     )
+  })
+
+  it('holds a long fall to the stats-derived bound it is given (ticket 334)', () => {
+    const fall = runMotion(PLANET_ANGLES[2], IDLE_INTENT, 600, 1.4, false, 29.4)
+    expect(speedOf(fall.velocity)).toBeCloseTo(29.4, 9)
   })
 })
 

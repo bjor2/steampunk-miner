@@ -2,8 +2,9 @@
  * One fixed step of the vehicle's motion (decision #7 "Movement on the round world"), as a pure
  * rule the physics motor applies by velocity: wheels drive along the tangent toward the intent's
  * speed, the steam lift pushes along `localUp`, radial gravity pulls, and the speed never exceeds
- * 18 m/s (`MAX_STEP_MM_PER_TICK`, 0.3 m per tick, so the tile halo cannot be tunnelled). Rapier then resolves the
- * contacts. The engine stats are the bounded numbers from `computeVehicleStats` (#5 rule 5).
+ * the pose bound: 18 m/s (`MAX_STEP_MM_PER_TICK`) with the swept cut off, else the rig's
+ * stats-derived bound the authority checks its steps against (`maxSpeed`, ticket 334). Rapier then
+ * resolves the contacts. The engine stats are the bounded numbers from `computeVehicleStats` (#5 rule 5).
  *
  * A slice's motion effects (ticket 233, `motionEffects.ts`) boost the engine, hold the body against
  * gravity, or set its velocity outright for a burst or a reel. With none, or a vehicle that cannot
@@ -65,6 +66,8 @@ export interface MotionStepInput {
   tug?: Vector2
   /** The cut-follow while the rig actively cuts (ticket 333); absent otherwise. */
   cutFollow?: CutFollowMotion
+  /** m/s the body's speed is clamped to (`stepBound.ts`, ticket 334); 18 m/s when absent. */
+  maxSpeed?: number
 }
 
 export interface MotionEffectInput {
@@ -101,7 +104,7 @@ export function stepVehicleMotion(input: MotionStepInput): MotionStep {
 function effectStep(input: MotionStepInput, effect: MotionEffectInput): MotionStep {
   const engine = boostedEngineOf(input.engine, effect.motion)
   const steered = steeredVelocityOf(effect.motion, effect.position, engine, input.dt)
-  if (steered !== null) return steeredStep(steered)
+  if (steered !== null) return steeredStep(steered, input.maxSpeed)
   return drivenStep(input, effectFrameOf(input, effect, engine))
 }
 
@@ -111,7 +114,7 @@ function drivenStep(input: MotionStepInput, frame: DriveFrame): MotionStep {
   const upward = nextUpwardSpeed(input, frame, isThrusting)
   const local = fromLocalFrame(input.up, along, upward)
   return {
-    velocity: withinSpeedBound(pulledByGravity(input, frame, local)),
+    velocity: withinSpeedBound(pulledByGravity(input, frame, local), input.maxSpeed),
     isDriving: input.canAct && input.intent.moveX !== 0 && input.isGrounded,
     isThrusting,
   }
@@ -140,8 +143,8 @@ function isCutFollowAlong(cut: CutFollowMotion | undefined): cut is CutFollowMot
 }
 
 /** A burst or reel is the item's own motion: no wheels, no thrust billed. */
-function steeredStep(velocity: Vector2): MotionStep {
-  return { velocity: withinSpeedBound(velocity), isDriving: false, isThrusting: false }
+function steeredStep(velocity: Vector2, maxSpeed: number | undefined): MotionStep {
+  return { velocity: withinSpeedBound(velocity, maxSpeed), isDriving: false, isThrusting: false }
 }
 
 function plainFrameOf(input: MotionStepInput): DriveFrame {
@@ -211,10 +214,11 @@ export function offsetToTileCentre(position: Vector2, up: Vector2): number {
   return dot({ x: centre.x - position.x, y: centre.y - position.y }, tangentOf(up))
 }
 
-export function withinSpeedBound(velocity: Vector2): Vector2 {
+/** The velocity held to `maxSpeed` m/s (18 m/s when absent), its direction kept. */
+export function withinSpeedBound(velocity: Vector2, maxSpeed = MAX_SPEED): Vector2 {
   const speed = Math.sqrt(velocity.x * velocity.x + velocity.y * velocity.y)
-  if (speed <= MAX_SPEED) return velocity
-  return { x: (velocity.x / speed) * MAX_SPEED, y: (velocity.y / speed) * MAX_SPEED }
+  if (speed <= maxSpeed) return velocity
+  return { x: (velocity.x / speed) * maxSpeed, y: (velocity.y / speed) * maxSpeed }
 }
 
 /** The point just under the wheels, half a body plus the probe depth below the centre. */

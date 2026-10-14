@@ -24,7 +24,10 @@ import { CELL_KIND, kindOfCell } from '../world/worldCell'
 import type { IntegerVector } from './vehiclePose'
 
 const HALF_BODY_MM = (VEHICLE_COLLIDER_SIZE * 1000) / 2
-/** How far past the face ground counts as in the way, mm. Placeholder, tuned by hand. */
+/**
+ * How far past the face ground counts as in the way, mm. Placeholder, tuned by hand; with the
+ * swept cut it widens to the step the rig may take while it cuts (`inTheWayMmOf`, ticket 334).
+ */
 const IN_THE_WAY_MM = 250
 
 /** Nothing to cut, ground to cut ahead of the body, or ground in its way. */
@@ -43,6 +46,17 @@ export interface DrillAim {
   centreMm: IntegerVector
   facing: IntegerVector
   stamp: DiscStamp
+  /** How far past the face ground is in the way, mm; `IN_THE_WAY_MM` when absent. */
+  inTheWayMm?: number
+}
+
+/**
+ * The in-the-way window for a rig whose cutting step bound is `cuttingBoundMm` (TD scope a on #316,
+ * ticket 334): at least one tick's step, so the wheels wait on the cut instead of a contact
+ * absorbing a step that overshoots the window into rock.
+ */
+export function inTheWayMmOf(cuttingBoundMm: number): number {
+  return Math.max(IN_THE_WAY_MM, cuttingBoundMm)
 }
 
 export function drillContactOf(ground: DrillableGround, aim: DrillAim): DrillContact {
@@ -81,7 +95,8 @@ export function isCuttable(ground: DrillableGround, sample: WeightedSample): boo
 function placeOf(aim: DrillAim, sample: WeightedSample): DrillContact {
   const ahead = aheadOf(aim, sample)
   const across = acrossOf(aim, sample)
-  const isPastFace = ahead >= HALF_BODY_MM && ahead <= HALF_BODY_MM + IN_THE_WAY_MM
+  const isPastFace =
+    ahead >= HALF_BODY_MM && ahead <= HALF_BODY_MM + (aim.inTheWayMm ?? IN_THE_WAY_MM)
   if (isPastFace && Math.abs(across) <= HALF_BODY_MM) return 'inTheWay'
   return sample.weight === FULL_WEIGHT && ahead > 0 ? 'ahead' : 'none'
 }
