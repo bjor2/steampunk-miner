@@ -284,7 +284,7 @@ describe('slice boundary lint', () => {
 | --- | --- |
 | `src/registries/sliceDefinition.ts` **(new kernel dir)** | `SliceDefinition`, `SliceRegistrar`, `FeaturesNotLoadedError` |
 | `src/registries/registrar.ts` **(new)** | `registrarFor(sliceId)`, `sealRegistries()`, `withRegistrations(slices, run)`, the test seam that swaps in a fresh sealed set and restores it |
-| `src/systems/registries/*.ts` **(new)** | Pure registries: `content`, `oreTypes`, `oreSignatures` (#232, 3.26), `gateChecks`, `blastEffects`, `generationHooks`, `hookSeed`, `saveSections`, `discovery`, `vehicleLoadout`, `vehicleAttach`, `oreLook`, `botPurchases`, `authorityReactions` (#219, 3.21), `seal`; `vehicleMotionEffects`, `hullDamageIntercepts`, `enemyDetectionModifiers`, `heatPauses` (ticket 233, 3.27); `drillGear` (ticket 234, 3.28); `artefactOptions` (K2 #324, 3.35); `itemHooks` (ticket 323, 3.36), `liveBeacon` (ticket 326, 3.36); `slotHoldCues` (ticket 253, 3.30); `itemDescriber`, `itemDescriptionEntries`, `buyableRefs` (K7, 3.19); `magneticGround`, `shockShields` (ticket 290, 3.34); `collapseBraces` (ticket 331, 3.38); `autoActors` (ticket 317, 3.40); `planetSkyBand` (ticket 293, 3.41); `bayEntries` (ticket 344, 3.42) |
+| `src/systems/registries/*.ts` **(new)** | Pure registries: `content`, `oreTypes`, `oreSignatures` (#232, 3.26), `gateChecks`, `blastEffects`, `generationHooks`, `hookSeed`, `saveSections`, `discovery`, `vehicleLoadout`, `vehicleAttach`, `oreLook`, `botPurchases`, `authorityReactions` (#219, 3.21), `seal`; `vehicleMotionEffects`, `hullDamageIntercepts`, `enemyDetectionModifiers`, `heatPauses` (ticket 233, 3.27); `drillGear` (ticket 234, 3.28); `artefactOptions` (K2 #324, 3.35); `itemHooks` (ticket 323, 3.36), `liveBeacon` (ticket 326, 3.36); `slotHoldCues` (ticket 253, 3.30); `itemDescriber`, `itemDescriptionEntries`, `buyableRefs` (K7, 3.19); `magneticGround`, `shockShields` (ticket 290, 3.34); `collapseBraces` (ticket 331, 3.38); `autoActors` (ticket 317, 3.40); `planetSkyBand` (ticket 293, 3.41); `bayEntries` (ticket 344, 3.42); `planetCardLines` (ticket 343, 3.43) |
 | `src/ui/registries/hudPanels.ts` **(new)** | HUD panels |
 | `src/ui/registries/screens.ts` | Full slice screens (#211) |
 | `src/ui/registries/bayPanels.ts`, `moneyCounter.ts` | Bay header and above-bay panels; the one money-counter provider (ticket 220) |
@@ -341,6 +341,7 @@ export interface SliceRegistrar {
   sceneLayer(layer: SceneLayer): void                  // #213, section 3.14
   chargeBlastCue(provider: ChargeBlastCueProvider): void  // one provider, #213, section 3.14
   planetSkyBand(provider: PlanetSkyBandProvider): void  // one provider, ticket 293, section 3.41
+  planetCardLine(source: PlanetCardLineSource): void  // ticket 343, section 3.43
   boreGun(provider: BoreGunProvider): void             // one provider, ticket 313, section 3.37
   autoActor(actor: AutoActor): void                    // ticket 317, section 3.40
   slotHoldCue(source: SlotHoldCueSource): void             // ticket 253, section 3.30
@@ -1019,6 +1020,17 @@ Section 1 of the TD kernel lock on #314, ruled by the GD: what a slice sells at 
 - **The seal** refuses an `anchorFeatureId` that is no row of the locked schedule and a source id naming an unlock id (`unlockIdNamedIn`); only `entriesOf` knows its entry ids, so an entry id naming one throws the same `RegistrationRefusedError` when the bay reads it.
 - **The bay** (`src/systems/views/bayEntryRows.ts`): `entriesOf` is asked only once `isFeatureUnlocked(state, anchorFeatureId)` holds, so nothing shows and nothing is asked before the anchor's `FeatureUnlocked`, and never for a vision row. Entries sort by the anchor's index in `LOCKED_SCHEDULE.rows`, then by entry id. An entry whose card names a `vehicle-item` no slice registered is a held item and is dropped. `UpgradeBayModel.entries` follows `items`; the buys still on sale join the buttons and the focus stops as panel `entries`, before Repair. `BayEntryRowView` (`ui/platform/ShopRowViews.tsx`) draws them after the item rows in `TracksPanel` and the workshop's `ServiceRows` (`upgradebay-entry-<entryId>`, `-level`, `-cost`, `-effect`, `-buy`).
 - **Never** in `upgradePreviewOf` or the showcase preview, and never a hold-chain target (the chain is `TrackPlaque`-only). An entry whose anchor is locked is on no screen, so a press, a focus or a held confirm on its id sends nothing; the slice's `feature_locked` refusal is the backstop. `GunRowView` stays as it is until its own ticket moves the #33 ids.
+
+### 3.43 Planet card lines (ticket 343)
+
+The GD ruling on #293 Q2, the TD lock and its addendum, with the Horizontal Scaler's three pins. Client-side presentation: no protocol, snapshot, save, log or golden change.
+
+- **`planetCardLines`** (`src/systems/registries/planetCardLines.ts`, many sources, ids `<slice>.<name>`): `{ id, featureId, lineOf(params) → { tag, arrivalLine, gateKind?, values?: { label, amount: Money | number, unit }[] } | null }`. `planetCardOf(state)` lists the lines of every source whose `featureId` schedule row is open on the session's planet (`isFeatureUnlocked`, so a vision row's class never shows), in id order; null when there are none.
+- **The hazard and the gate kind only.** The card copies `tag`, `arrivalLine`, `gateKind` and the typed `values` field by field, so a vision row, a held item, an unbuilt rig, a dynamite size or a counter-item to buy has no field to show through. The values are the home of #306's σ_s, V_p and toughness; `src/systems/views/planetCardView.ts` prints each through `formatAmount` and its unit.
+- **Never an unlock.** The seal refuses a source whose id names a schedule row id, or whose `featureId` names none; a line whose text names a schedule row id throws at the read, never trimmed.
+- **The card** (`src/ui/planet/PlanetCard.tsx`, store slice `src/store/planetCardSlice.ts`): it opens where the client logs `planet_entered` (the run's starting planet in `startGame`, travel's `PlanetEntered`) and where the debug API or a scenario moves the session (`PlanetChanged`), after the travel card and over the bay screen; it closes when the local vehicle undocks (`DockLeft`), after `PLANET_CARD_SECONDS` or on Dismiss.
+- **planet-mix** registers one source per class with text in `planetCards.json` (`planet-mix.card-<class>`, waiting on `magnetic_planets`, `frozen_planets`, `hollow_planets` or `relic_planet`): today only magnetic, from P25.
+- **Debug:** `steampunkDebug.ui.getPlanetCard()` answers the card drawn now as `{ planetIndex, lines: [{ sourceId, tag, arrivalLine, gateKind, values: [{ label, text }] }] } | null`.
 
 ## 4. Cross-slice contracts
 

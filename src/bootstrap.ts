@@ -77,6 +77,7 @@ export async function startGame(): Promise<void> {
   shell.onPadFrame(routePadFrame)
   await resumeLastCheckpoint(shell)
   recordStartingPlanetEntered()
+  showStartingPlanetCard()
   keepRunFilesWritten(shell, run)
   exposeDebugHandles(shell, run.runId)
   applyLaunchScenario(shell)
@@ -98,6 +99,11 @@ function startRunLogging(shell: Shell, startedAt: Date): RunFiles {
     }),
   )
   return { ...run, sink, summary, progress }
+}
+
+/** The card of the planet the run starts on, opened with its `planet_entered` (ticket 343). */
+function showStartingPlanetCard(): void {
+  useGameStore.getState().openPlanetCard()
 }
 
 function recordGameStarted(shell: Shell): void {

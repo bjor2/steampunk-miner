@@ -86,6 +86,12 @@ import { announceDomainEvents } from './domainEventBroadcast'
 import { announceFeedback } from './feedbackBroadcast'
 import { hintActionsOf, STARTING_HINTS, type HintActions, type HintValues } from './hintSlice'
 import {
+  planetCardActionsOf,
+  STARTING_PLANET_CARD,
+  type PlanetCardActions,
+  type PlanetCardValues,
+} from './planetCardSlice'
+import {
   liveStepActionsOf,
   STARTING_LIVE_STEP,
   type LiveStepActions,
@@ -118,6 +124,8 @@ export interface GameState
     PresentationActions,
     HintValues,
     HintActions,
+    PlanetCardValues,
+    PlanetCardActions,
     LiveStepValues,
     LiveStepActions {
   playerId: string
@@ -200,6 +208,7 @@ type GameValues = Pick<
   | 'isCoreCompleted'
   | keyof PresentationValues
   | keyof HintValues
+  | keyof PlanetCardValues
   | keyof LiveStepValues
   | 'travelTransition'
 >
@@ -220,6 +229,7 @@ export const STARTING_VALUES: GameValues = {
   isCoreCompleted: false,
   ...STARTING_PRESENTATION,
   ...STARTING_HINTS,
+  ...STARTING_PLANET_CARD,
   ...STARTING_LIVE_STEP,
   travelTransition: null,
 }
@@ -236,6 +246,7 @@ export const useGameStore = create<GameState>()((set, get) => ({
   ...artefactActionsOf(() => get().playerId),
   ...presentationActionsOf(set, get),
   ...hintActionsOf(set, get),
+  ...planetCardActionsOf(set, get),
   ...liveStepActionsOf(set, get),
 
   setPlanet: (planetTier) => {
@@ -269,7 +280,7 @@ export const useGameStore = create<GameState>()((set, get) => ({
   applyScenario: (scenario) => {
     refuseProblems(validateScenario(scenario))
     get().allowPlaquesFor(scenario)
-    set({ depthTiles: 0, travelTransition: null })
+    set({ depthTiles: 0, travelTransition: null, planetCard: null })
     replaceSession(freshSessionAfter(readAuthorityState()))
     get().applyStartScenario(startOfScenario(scenario))
     runScenarioScript(scenario.script ?? [], get().fastForward)
@@ -293,7 +304,7 @@ export const useGameStore = create<GameState>()((set, get) => ({
   },
 
   resumeCheckpoint: (checkpoint) => {
-    set({ depthTiles: 0, travelTransition: null })
+    set({ depthTiles: 0, travelTransition: null, planetCard: null })
     replaceSession(checkpoint.state)
     recordCheckpointLoaded(runEventPlaceOf(get()), checkpoint)
   },
@@ -413,13 +424,14 @@ export function runEventPlaceOf(state: GameValues): RunEventPlace {
 
 /**
  * The one writer of planet and wallet: copies them from the authority, starts the travel
- * transition when the events travelled, shows the hints, feedback, part installs, stingers and
- * scorches they trigger, hands them to the slices' stores, logs the events, then writes the
- * checkpoint when due.
+ * transition when the events travelled, opens or closes the planet card, shows the hints,
+ * feedback, part installs, stingers and scorches they trigger, hands them to the slices' stores,
+ * logs the events, then writes the checkpoint when due.
  */
 function followAuthority(events: readonly DomainEvent[]): void {
   useGameStore.setState(replicaOf(readAuthorityState(), useGameStore.getState().playerId))
   startTravelTransition(travelTransitionOf(events))
+  useGameStore.getState().followPlanetCard(events)
   useGameStore.getState().observePlaques(events)
   useGameStore.getState().followArtefactChoice(events)
   announceFeedback(events, useGameStore.getState().playerId)

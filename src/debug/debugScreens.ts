@@ -12,6 +12,7 @@ import { lightPresence } from '../scene/lightPresence'
 import { previewPresence } from '../scene/previewPresence'
 import { renderPresence } from '../scene/renderPresence'
 import { useGameStore } from '../store/gameStore'
+import { shownPlanetCardOf } from '../store/planetCardSlice'
 import {
   pressAction,
   readActionStream,
@@ -43,6 +44,7 @@ import { renderScalePinProblems } from '../systems/render/renderScale'
 import { cameraViewOf, viewShortAxisProblems, type CameraView } from '../systems/render/viewZoom'
 import { shopTypeOf, type ShopType } from '../systems/views/bayPresentation'
 import type { HudModel } from '../systems/views/hudModel'
+import { planetCardViewOf, type PlanetCardView } from '../systems/views/planetCardView'
 import type { RefineryBayModel } from '../systems/views/refineryBayModel'
 import type { SellBayModel } from '../systems/views/sellBayModel'
 import type { UpgradeBayModel } from '../systems/views/upgradeBayModel'
@@ -92,6 +94,8 @@ export interface DebugUi {
   openScreen(screenId: unknown): DebugResult
   /** The slice screen drawn now, or null; `input.tap('ui_cancel')` dismisses it like Escape. */
   getOpenScreen(): DebugResult<{ screenId: string | null }>
+  /** The planet card drawn now (ticket 343), or null: none, dismissed, or behind the travel card. */
+  getPlanetCard(): DebugResult<{ card: PlanetCardView | null }>
 }
 
 export interface BayPresentation {
@@ -151,6 +155,7 @@ export function createDebugUi(): DebugUi {
     getOverlayStats: () => ({ ok: true, stats: readOverlayStats() }),
     openScreen: openScreenUnlessRefused,
     getOpenScreen: () => ({ ok: true, screenId: game().openScreenId }),
+    getPlanetCard: () => ({ ok: true, card: planetCardViewNow() }),
   }
 }
 
@@ -225,6 +230,11 @@ function bayPresentationNow(): BayPresentation {
     ),
     preview: { ...previewPresence },
   }
+}
+
+function planetCardViewNow(): PlanetCardView | null {
+  const card = shownPlanetCardOf(game())
+  return card === null ? null : planetCardViewOf(card)
 }
 
 function screenLayoutNow(): DebugResult<{ layout: ScreenLayout }> {

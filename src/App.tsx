@@ -3,6 +3,7 @@ import { ArtefactChoice } from './ui/artefact/ArtefactChoice'
 import { EndOfSliceCard } from './ui/EndOfSliceCard'
 import { Hud } from './ui/hud/Hud'
 import { AboveBayLayer } from './ui/platform/AboveBayLayer'
+import { PlanetCard } from './ui/planet/PlanetCard'
 import { PlatformScreen } from './ui/platform/PlatformScreen'
 import { Plaques } from './ui/plaques/Plaques'
 import { SettingsPanel } from './ui/settings/SettingsPanel'
@@ -21,6 +22,7 @@ export default function App() {
       <Plaques />
       <TouchControls />
       <TravelTransitionCard />
+      <PlanetCard />
       <EndOfSliceCard />
       <SliceScreen />
       <ArtefactChoice />

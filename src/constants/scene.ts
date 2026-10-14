@@ -282,6 +282,12 @@ export const SPARK_SEED = 0x5a7c
 export const TRAVEL_TRANSITION_SECONDS = 10
 
 /**
+ * The planet card closes on its own this long after it shows (TD lock on #293 Q2: "dismissed by
+ * undocking or a timeout"; the length is ticket 343's pick, two readings of the arrival line).
+ */
+export const PLANET_CARD_SECONDS = 8
+
+/**
  * How often the HUD and the menus re-read their view models besides store changes (#33): enemy
  * telegraphs and the compass move every tick, and a tenth of a second is quick enough to read
  * while keeping per-tick state out of React. Placeholder, tuned by eye.
