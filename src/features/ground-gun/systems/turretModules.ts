@@ -34,15 +34,15 @@ export function liveTurretModulesOf(
   })).filter(({ itemId, mark }) => mark > 0 && isAttached(itemId))
 }
 
-/** The live module's Mark on the player's turret: 0 when it does not act. */
+/** The live module's Mark on the player's turret: 0 when it does not act. One module's read. */
 export function liveTurretModuleMarkOf(
   state: AuthorityState,
   playerId: string,
   itemId: string,
   isAttached: TurretAttachRead = isOnTurretMount,
 ): number {
-  const live = liveTurretModulesOf(state, playerId, isAttached)
-  return live.find((module) => module.itemId === itemId)?.mark ?? 0
+  if (!isGunMounted(vehicleOf(state, playerId).gun) || !isAttached(itemId)) return 0
+  return ownedModuleMarkOf(state, playerId, itemId)
 }
 
 /** The module's mount row resolves to a point on the turret. */

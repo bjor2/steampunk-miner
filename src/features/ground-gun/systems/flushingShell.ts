@@ -22,9 +22,9 @@ import { vehicleTargetOf } from '../../../systems/authority/combat/vehicleTarget
 import type { EnemyFlush } from '../../../systems/registries/enemyFlushes'
 import { isGunOnAuto } from '../../../systems/vehicle/vehicleGun'
 import { moduleStatsAt, type ModuleStats } from './armouryModules'
-import { FLUSHING_SHELL_ITEM_ID } from './autoGunsLane'
+import { EXTENDED_BARRELS_ITEM_ID, FLUSHING_SHELL_ITEM_ID } from './autoGunsLane'
+import { extendedBarrelsAt } from './boreLadders'
 import { isOnTurretMount, liveTurretModuleMarkOf, type TurretAttachRead } from './turretModules'
-import { playerTurretShapeOf } from './turretShapes'
 
 /** The shipped flush: the mount table says whether the shell's cradle hangs on the turret. */
 export const FLUSHING_SHELL_FLUSH: EnemyFlush = flushingShellOf(isOnTurretMount)
@@ -79,9 +79,18 @@ function isInTurretRange(
 ): boolean {
   const target = vehicleTargetOf(state, playerId, tick)
   if (target === null) return false
-  const shape = playerTurretShapeOf(state, playerId, isAttached) ?? BASE_TURRET_SHAPE
-  const rangeMm = shape.rangeTiles * MM_PER_METRE
+  const rangeMm = turretRangeTilesOf(state, playerId, isAttached) * MM_PER_METRE
   return distanceSq(target.position, enemy) <= rangeMm * rangeMm
+}
+
+/** #107's range, or the extended barrels' at their Mark: the only module that moves it. */
+function turretRangeTilesOf(
+  state: AuthorityState,
+  playerId: string,
+  isAttached: TurretAttachRead,
+): number {
+  const mark = liveTurretModuleMarkOf(state, playerId, EXTENDED_BARRELS_ITEM_ID, isAttached)
+  return mark === 0 ? BASE_TURRET_SHAPE.rangeTiles : extendedBarrelsAt(mark).rangeTiles
 }
 
 /** The whole ticks the burrower walks `flushRange` tiles in. */

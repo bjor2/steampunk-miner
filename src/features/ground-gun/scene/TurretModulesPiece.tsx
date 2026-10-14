@@ -3,8 +3,8 @@
  * hangs every bought turret module at its mount once the guns are mounted, the cupola's on the
  * still head and the barrel's on a group that turns as the kernel's `VehicleGuns` turns its
  * barrel: the same rule, the same aim and the same rate, so both swing together. The turn lives on
- * a ref, never in React or the store. With no module bought (all eight are held back until #388
- * registers them) it draws nothing and steps nothing.
+ * a ref, never in React or the store. With no module bought it draws nothing and steps nothing; a
+ * module with no mount row never draws, the same table that keeps it from acting (ticket 388).
  */
 import { useFrame } from '@react-three/fiber'
 import { useMemo, useRef } from 'react'
