@@ -139,8 +139,13 @@ import type { DriveSigns } from '../vehicle/driveSigns'
  *    on every crossed cell and held to the terrain budget, and the vehicle may carry `sweptCut`;
  *    a report whose ticks the steps cut no longer cuts them. The pose bound is 300 mm a tick (18
  *    m/s). With no step sent no digest or mined order changes.
+ * 51: self-acting items on the auto core (ticket 328, the GD lock on #206): the steam shield's
+ *    auto actor presses its slot through `power-up-core`'s press path, `PowerUpAutoFired`, the
+ *    pending use's `autoPressTick`, a use by hand cooling down for auto's override gap while
+ *    the item is on auto, and a press by hand withdrawing a same-tick auto press. With auto off
+ *    no digest or mined order changes.
  */
-export const AUTHORITY_PROTOCOL_VERSION = 50
+export const AUTHORITY_PROTOCOL_VERSION = 51
 
 /** The kernel's own commands: the closed set its rule tables are written against. */
 export interface KernelCommandPayloads {
