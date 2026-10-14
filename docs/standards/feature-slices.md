@@ -1069,6 +1069,15 @@ Section 2 of the TD kernel lock on #314, as the GD ruled it: the ground gun's fi
 - **Mouse buttons** (`shell/mouseHooks.ts`): the shell reports the game canvas's mouse buttons through `onKeyChange` as the codes `MouseLeft`/`MouseRight` (`systems/input/keyCodes.ts`, labelled `Left Mouse`/`Right Mouse`), so binding, rebinding, preferences and any-layer release take them as keys. A press whose target is not the canvas (HUD buttons, menus) never comes down; a release anywhere comes up. Touch and pen pointers are not mice. The canvas keeps no context menu, so the right button can be bound. HUD panels drawn with `pointer-events: none` let a click through to the canvas.
 - **Cursor**: `Shell.readPointer(): {x, y} | null`, the mouse over the game canvas in its CSS pixels from the top-left; null before a mouse move, off the canvas, or after a touch. No screen-to-world helper: the slice aims with its own `rigOnScreen()` and `rigAimOfDrag()`.
 
+### 3.46 The ground-gun slice (ticket 314)
+
+Build 2 of the #309 GD decision on the four seams the TD locked on #314 (3.42, 3.44, 3.45 and ticket 347's bore policy): the bore gun the kernel fires (3.37), as a player buys, fires and sees it. Protocol 52.
+
+- **State and buying:** the `ground-gun` player section v1 `{rate, penetration, energy}`, absent until bought. `ground-gun.mount` costs one band-5 unit at P1 (`groundGun.json` `mount`) and sets every track to L1; `ground-gun.buy_level {track}` sells L2 up at #322's planet prices. Both are sold as bay entries anchored on `bore_gun`: the mount until mounted, then the three tracks, a track at its wall reading Mastered (`gunBayEntries.ts`). Every `bore-gun` content entry carries the family id `armoury` and nothing more.
+- **Provider:** `boreGun` from the track levels (`boreGunProvider.ts`), with `wallsMountIntent` naming `debug.ground-gun.setLevels` at every wall for `balance:bore`. The bored-ore pickup pays each unit as its cell opens inside `tripCapAt`, logging `ground-gun.bored_ore_capped` past it.
+- **Input:** one writer, `store/fireInput.ts`, on the pure `fireHold`. The `fire_ground_gun` reaction sends a shot the recovery allows at once, else buffers the tap 12 ticks; each frame `isActionDown` keeps or lets go of the hold, and the aim is the right stick (`readPadAim`), else the cursor (`readPointer`), read in the rig's screen axes and snapped into the arc, else the facing. No release intent, no queued shot in the authority. The touch tile (`slots`) taps, holds after 15 ticks and drags to aim; its 28 px lamp toggles auto-shoot on a 30-tick press and never fires (`lampInput.ts`). The desktop gauge (`gauges`) is mounted with the HUD on every device and runs the clock (`useFireClock`); its lamp toggles on a click.
+- **Look:** the tracer asks the kernel spray pool at `low` from `BoreFired` (sparks at the rig) and `TileDestroyed {cause: 'bore'}` (debris and dust per cell), so it needs no dynamite and no scene layer of its own; the reticle is DOM on the overlay. `sceneLayerBudget.test.ts` is unchanged.
+
 ## 4. Cross-slice contracts
 
 ```mermaid
