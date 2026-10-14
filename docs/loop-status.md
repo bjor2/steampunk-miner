@@ -247,4 +247,4 @@ re-sends a heartbeat every 10 minutes while a session runs, and publishes a full
 
 ## Priority list (14 Oct 2026)
 
-`PRIORITY_TICKETS` in `next-ticket.sh` now starts `396 402 405 406 403 404 407 399 400 397 395 398`: #396 (drill law), then the save/load set from spec #401 (#402 slots + v2 format, #405 round-trip test, #406 save size/load time, then #403 title menu, #404 pause-menu save, #407 co-op ownership), then the cut-follow chain (#399, #400, #397), then the art tickets #395 (workshop) and #398 (service station). #393 has closed. The next free dev slot claims them in that order, skipping blocked tickets.
+`PRIORITY_TICKETS` in `next-ticket.sh` now starts `396 399 400 397 409 411 410` (Bjor, 14 Oct 23:10: smooth drilling first): #396 (drill law), then the cut-follow chain #399 (K-carry), #400 (K-bound), #397 (cut-follow, smooth drilling) and #409 (drill ladder benchmark), then #411 (money-only tech tree) and #410 (item cards). Free slots are refilled as soon as a worker exits instead of waiting for the 30-minute pass. The next free dev slot claims them in that order, skipping blocked tickets.
