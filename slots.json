@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-10-15T00:34:30+02:00",
+  "updated_at": "2026-10-15T00:43:31+02:00",
   "caps": {
     "grok": 12,
     "claude": 10,
@@ -27,11 +27,11 @@
         },
         {
           "slot": "C2",
-          "state": "busy",
-          "ticket": 411,
-          "grok_slot": 2,
-          "kind": "dev",
-          "since": "2026-10-14T23:24:00+02:00"
+          "state": "free",
+          "ticket": null,
+          "grok_slot": null,
+          "kind": null,
+          "since": null
         },
         {
           "slot": "C3",
@@ -67,9 +67,9 @@
         }
       ],
       "size": 6,
-      "used": 6,
-      "free": 0,
-      "claims_last_hour": 7,
+      "used": 5,
+      "free": 1,
+      "claims_last_hour": 3,
       "name": "Claude Max 1"
     },
     {
@@ -407,10 +407,9 @@
     },
     {
       "slot": 2,
-      "state": "dev",
-      "ticket": 411,
-      "since": "2026-10-14T23:24:00+02:00",
-      "claude_slot": 2
+      "state": "free",
+      "ticket": null,
+      "since": null
     },
     {
       "slot": 3,
@@ -488,10 +487,10 @@
     },
     {
       "slot": 2,
-      "state": "busy",
-      "ticket": 411,
-      "grok_slot": 2,
-      "since": "2026-10-14T23:24:00+02:00",
+      "state": "free",
+      "ticket": null,
+      "grok_slot": null,
+      "since": null,
       "account": 1
     },
     {
@@ -564,17 +563,17 @@
     }
   ],
   "last_refill": {
-    "at": "2026-10-15 00:34 CEST",
+    "at": "2026-10-15 00:43 CEST",
     "mode": "refill-dev",
-    "triggers": "#396",
-    "started": "#396->C4/A1",
-    "note": "spawned 1 worker(s)"
+    "triggers": "#411",
+    "started": "",
+    "note": "no pickable build ticket"
   },
   "totals": {
     "grok": {
       "size": 12,
-      "used": 6,
-      "dev": 6,
+      "used": 5,
+      "dev": 5,
       "dev_cap": 8,
       "planner": 0,
       "planner_cap": 4
@@ -582,8 +581,8 @@
     "claude": {
       "size": 10,
       "enabled": 6,
-      "used": 6,
-      "free": 0,
+      "used": 5,
+      "free": 1,
       "external": 0
     }
   }
