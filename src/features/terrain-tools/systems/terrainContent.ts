@@ -6,7 +6,8 @@
  * `statPreview` line read at the Mark the card's level names, and the price last. A card at level 0 reads Mark 1, the item as bought; its next value is
  * the next Mark until it is Mastered. A shipped terrain magnet (ticket 284) registers its item and
  * Content's card (`magnetCards.ts`) the same way. Stabiliser foam's card (ticket 381) carries
- * Content's lines in place of the stat lines, then its stack and price as every tool's does.
+ * Content's lines in place of the stat lines, its Charges line standing for the stack, then its
+ * price per unit as every consumable's card does.
  */
 import { TICKS_PER_SECOND } from '../../../constants/physics'
 import { div, fromSafeInteger, type Money } from '../../../systems/money'
@@ -91,13 +92,12 @@ function cardOf(item: TerrainItem): ItemDescriptionEntry {
   }
 }
 
-/** One line per stat preview line; an authored card keeps only its stack from them. */
+/** One line per stat preview line, or Content's own lines where it wrote them. */
 function statLineSpecsOf(item: TerrainItem): DescribedStatLineSpec[] {
-  const lines = statPreview(item.itemId, FIRST_MARK, LABEL_PLANET)?.lines ?? []
-  const specs = lines.map(markLineSpecOf)
   const authored = AUTHORED_LINES[item.itemId]
-  if (authored === undefined) return specs
-  return [...authored(), ...specs.filter((_spec, at) => lines[at].stat === 'charges')]
+  if (authored !== undefined) return authored()
+  const lines = statPreview(item.itemId, FIRST_MARK, LABEL_PLANET)?.lines ?? []
+  return lines.map(markLineSpecOf)
 }
 
 /** A stat the Marks step, in player units: its next value is the next Mark's. */

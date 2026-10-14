@@ -2,12 +2,19 @@
  * Stabiliser foam's card lines (Content on #381, matched to the GD default ruling, ticket 381):
  * foam "sets" and "hardens", never "braces", so it never reads like the lode clamp. Each number is
  * read when the card is drawn, never written into the copy: the cone's radius at the Mark the
- * card's level names, the brace's length, and the cone's Mark bonus against its cap.
+ * card's level names, the brace's length, the cone's Mark bonus against its cap and the stack
+ * research grants.
+ *
+ * The Charges line (Content's addendum on #381) reads only where charges come from. Its live
+ * `{charges} left` waits for the restock (#394), which rewrites the line into its price: a card
+ * line gets no view of power-up-core's spent charges today. A player who does not own foam never
+ * sees the line, as no surface draws foam's card for them: it has no seller, so no shop row.
  */
 import { TICKS_PER_SECOND } from '../../../constants/physics'
 import type { ItemCtx, ItemRef } from '../../../systems/registries/itemDescriber'
 import { hasNoNextLevel, type DescribedStatLineSpec } from '../../descriptions'
 import { isMasteredAt, lastMarkOf } from '../../tech-tree'
+import { foamStartingCount } from './foamResearch'
 import { magnitudeAt, terrainItemNamed } from './itemMagnitude'
 import { STABILISER_FOAM_ID } from './stabiliserFoam'
 import { balanceOf, markLadderOf, type TerrainItem } from './terrainItems'
@@ -45,6 +52,11 @@ export const FOAM_CARD_LINES: readonly FoamCardLine[] = [
     template: '+{coneRadiusBonus} cells, up to +{coneRadiusCap}',
     reading: 'coneRadiusBonus',
   },
+  {
+    label: 'Charges',
+    template: 'research grants {startingCount}, restock comes later',
+    reading: null,
+  },
 ]
 
 /** Content's lines, in card order. */
@@ -60,6 +72,7 @@ export function foamLineTextAt(line: FoamCardLine, mark: number): string {
     .replace('{duration}', secondsTextOf(braceTicksOf(foam)))
     .replace('{coneRadiusBonus}', `${coneBonusAt(foam, mark)}`)
     .replace('{coneRadiusCap}', `${coneBonusAt(foam, lastMarkOf(markLadderOf(foam)))}`)
+    .replace('{startingCount}', `${foamStartingCount()}`)
 }
 
 function lineSpecOf(line: FoamCardLine): DescribedStatLineSpec {

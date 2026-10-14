@@ -2,6 +2,9 @@ import { describe, expect, it } from 'vitest'
 import { createAuthorityState } from '../../../systems/authority/authorityState'
 import { describeItem, type ItemRef } from '../../../systems/registries/itemDescriber'
 import { itemSnapshotViewOf } from '../../../systems/registries/itemSnapshotView'
+import { isVehicleItemResearched } from '../../../systems/registries/vehicleItemSales'
+import { createScriptedSession } from '../../../systems/authority/scriptedSession'
+import { vehicleItemRowsOf } from '../../../systems/views/vehicleItemRows'
 import { lastMarkOf } from '../../tech-tree'
 import { FOAM_CARD_LINES, foamLineTextAt } from './foamCards'
 import { magnitudeAt, terrainItemNamed } from './itemMagnitude'
@@ -10,7 +13,8 @@ import { markLadderOf } from './terrainItems'
 
 // Stabiliser foam's card (Content on #381, matched to the GD default ruling): Content's flavour
 // and lines with their numbers read from the data, a cone Mark capped at +2 (radius 4), and no
-// line that says "brace", so foam never reads like the lode clamp.
+// line that says "brace", so foam never reads like the lode clamp. The Charges line (Content's
+// addendum) says where the stack comes from; its live count waits for the restock (#394).
 
 const FOAM = terrainItemNamed(STABILISER_FOAM_ID)
 const LAST_MARK = lastMarkOf(markLadderOf(FOAM))
@@ -32,6 +36,7 @@ describe('stabiliser foam card', () => {
       'the roof warns again before it can fall',
       'foamed rock keeps its hardness and price',
       '+0 cells, up to +2',
+      'research grants 4, restock comes later',
     ])
   })
 
@@ -48,7 +53,7 @@ describe('stabiliser foam card', () => {
     expect(FOAM_CARD_LINES.map((line) => line.label)).toContain('When it crumbles')
   })
 
-  it("shows Content's flavour and lines, then the stack and the price per unit", () => {
+  it("shows Content's flavour and lines, the Charges line for the stack, then the price per unit", () => {
     const card = cardAt(1)
     expect(card?.flavour).toBe(
       'Sprays a quick-setting aether foam that hardens loose rock in place.',
@@ -59,8 +64,18 @@ describe('stabiliser foam card', () => {
       'When it crumbles',
       'Note',
       'Cone',
-      'Stack',
+      'Charges',
       'Price per unit',
     ])
+  })
+
+  it('shows a player who does not own foam no Charges line: no shop row offers its card', () => {
+    const session = createScriptedSession(['p1'])
+    session.submit(0, { type: 'debug.setPlanet', payload: { planetIndex: 3 } })
+    session.submit(0, { type: 'debug.tech-tree.unlockThrough', payload: { planetIndex: 3 } })
+    expect(isVehicleItemResearched(session.state(), 'p1', STABILISER_FOAM_ID)).toBe(true)
+    const rows = vehicleItemRowsOf(session.state(), 'p1')
+    expect(rows.length).toBeGreaterThan(0)
+    expect(rows.map((row) => row.itemId)).not.toContain(STABILISER_FOAM_ID)
   })
 })
