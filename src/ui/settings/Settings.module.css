@@ -32,7 +32,13 @@
   gap: var(--space-1);
 }
 
-.row[data-waiting] .key {
+/* A binding row adds the pad button's column beside the key's (ticket 346). */
+.bindingRow {
+  composes: row;
+  grid-template-columns: 1fr auto auto auto;
+}
+
+.bindingRow[data-waiting] .key {
   text-decoration: underline wavy;
 }
 

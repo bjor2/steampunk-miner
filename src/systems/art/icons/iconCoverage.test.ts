@@ -190,6 +190,7 @@ describe('icon coverage (#158 section 3)', () => {
     const settings = selectSettingsModel({
       prefs: DEFAULT_PREFERENCES,
       bindings: BINDINGS,
+      padBindings: BINDINGS,
       bindingProblems: [],
       rebindingActionId: null,
     })

@@ -2,11 +2,17 @@
  * `selectSettingsModel` (#33 sections 3 and 7): the settings overlay as data. The accessibility
  * baseline (fixed camera, screen shake, flashes), the hint switch, the music switch and volume
  * (#49), TV mode and the touch controls' hand and haptics (#173), and every action with the key
- * now bound to it, "press a key to rebind" while one is waiting, the problem lines of the last
+ * and the pad button (ticket 346) now bound to it, "press a key or pad button" while one is waiting, the problem lines of the last
  * refused rebinding and "Reset to defaults". Local presentation only: nothing here is a command.
  */
 import { settingIconIdOf } from '../art/icons/iconSet'
-import { ACTION_MAP, boundLabel, type ActionId, type Bindings } from '../input/actionMap'
+import {
+  ACTION_MAP,
+  boundLabel,
+  boundPadLabel,
+  type ActionId,
+  type Bindings,
+} from '../input/actionMap'
 import type { PreferenceName, Preferences } from '../input/preferences'
 import type { FocusStop } from './menuFocus'
 import { uiButton, type ScreenButton } from './viewParts'
@@ -15,6 +21,7 @@ import { UI_ID_TEMPLATES, UI_IDS } from './screenIds'
 export interface SettingsSources {
   prefs: Preferences
   bindings: Bindings
+  padBindings: Bindings
   /** The problems of the last refused rebinding; the defaults or the last good map rule. */
   bindingProblems: readonly string[]
   rebindingActionId: ActionId | null
@@ -32,6 +39,8 @@ export interface BindingRow {
   actionId: ActionId
   displayName: string
   keyText: string
+  /** The pad chord bound, blank while the action waits (the key text says what to press). */
+  padText: string
   isWaitingForKey: boolean
   button: ScreenButton
 }
@@ -62,6 +71,8 @@ const TOGGLE_LABELS: Readonly<Record<PreferenceName, string>> = {
 const CAMERA_MODE_TEXT = { rotating: 'Rotating with planet', fixed: 'Fixed, north up' } as const
 
 const PERCENT = 100
+
+const WAITING_TEXT = 'Press a key or pad button to rebind'
 
 const VALUE_TEXTS: Readonly<Record<PreferenceName, (prefs: Preferences) => string>> = {
   cameraMode: (prefs) => CAMERA_MODE_TEXT[prefs.cameraMode],
@@ -118,7 +129,8 @@ function bindingRowsOf(sources: SettingsSources): BindingRow[] {
     return {
       actionId: action.id,
       displayName: action.displayName,
-      keyText: isWaitingForKey ? 'Press a key to rebind' : boundLabel(sources.bindings, action.id),
+      keyText: isWaitingForKey ? WAITING_TEXT : boundLabel(sources.bindings, action.id),
+      padText: isWaitingForKey ? '' : boundPadLabel(sources.padBindings, action.id),
       isWaitingForKey,
       button: uiButton(UI_ID_TEMPLATES.settingsRebind(action.id), 'Rebind', {
         kind: 'rebind',

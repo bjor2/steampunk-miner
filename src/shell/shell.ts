@@ -10,6 +10,7 @@ import type {
   RunDocumentName,
   SaveFolderName,
 } from '../../electron/bridgeContract.cts'
+import type { PadReading } from '../systems/input/padFrame'
 import type { ScreenReading } from '../systems/views/screenLayout'
 import { createBrowserShell } from './browserShell'
 import { createElectronShell } from './electronShell'
@@ -70,6 +71,11 @@ export interface Shell {
   onKeyChange(listener: (key: KeyChange) => void): () => void
   /** Reports mouse-wheel notches; returns an unsubscribe. */
   onScrollNotch(listener: (notch: ScrollNotch) => void): () => void
+  /**
+   * Hands over the connected gamepad once per animation frame, then null once it disconnects
+   * (ticket 346); nothing while none is connected. Returns an unsubscribe.
+   */
+  onPadFrame(listener: (pad: PadReading | null) => void): () => void
   /** Runs when the page is hidden or closing: the last chance to flush the run log. */
   onPageHide(callback: () => void): void
   /** Starts counting the page's event listeners; test runs only, before the scene mounts (#121). */

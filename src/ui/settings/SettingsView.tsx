@@ -1,6 +1,6 @@
 /**
- * Settings drawn from their view model: the display switches, every action with its key and a
- * rebind button, the problem lines of a refused rebinding, reset, and close. Markup only.
+ * Settings drawn from their view model: the display switches, every action with its key, its pad
+ * button and a rebind button, the problem lines of a refused rebinding, reset, and close. Markup only.
  */
 import type { BindingRow, SettingToggle, SettingsModel } from '../../systems/views/settingsModel'
 import { panelIconIdOf } from '../../systems/art/icons/iconSet'
@@ -55,9 +55,10 @@ function ToggleRow({ toggle, focusedId }: { toggle: SettingToggle; focusedId: st
 
 function BindingLine({ row, focusedId }: { row: BindingRow; focusedId: string }) {
   return (
-    <div className={styles.row} data-waiting={row.isWaitingForKey || undefined}>
+    <div className={styles.bindingRow} data-waiting={row.isWaitingForKey || undefined}>
       <span>{row.displayName}</span>
       <span className={styles.key}>{row.keyText}</span>
+      <span className={styles.key}>{row.padText}</span>
       <ScreenButtonView button={row.button} focusedId={focusedId} />
     </div>
   )

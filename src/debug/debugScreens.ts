@@ -3,7 +3,7 @@
  * screens' view models and the audio model (#49) and sets local presentation settings: no
  * command, no log line, not in the digest, never `debugApplied`. `input` presses actions at the action layer, so a tap travels the
  * same path as a key and its commands land in `commands.ndjson` like real play; bindings are
- * read and set refused-whole. `ui.getBayPresentation` reads what the bay screen and its preview
+ * read and set refused-whole, and `input.padFrame` feeds a polled gamepad frame (ticket 346). `ui.getBayPresentation` reads what the bay screen and its preview
  * wrote while drawing (#45, #44). None of it is a `debug.*` command, and all of it exists only on
  * `window.steampunkDebug`, which the debug flag alone exposes.
  */
@@ -18,6 +18,7 @@ import {
   releaseAction,
   type ActionEdge,
 } from '../store/inputRuntime'
+import { readPadAim, routePadFrame } from '../store/padRuntime'
 import {
   readAudioModel,
   readHudModel,
@@ -32,6 +33,7 @@ import {
   type BindingOverrides,
   type Bindings,
 } from '../systems/input/actionMap'
+import { padReadingProblems, type PadAim, type PadReading } from '../systems/input/padFrame'
 import {
   preferenceProblems,
   type PreferenceName,
@@ -118,6 +120,13 @@ export interface DebugInput {
    * alike (#173: a touch run and its key run press the same stream). An unlogged read.
    */
   getActionStream(): DebugResult<{ stream: ActionEdge[] }>
+  /**
+   * One polled gamepad frame, as the shell hands it over (`{ buttons: [{ value }], axes }`), or
+   * null for a disconnect (ticket 346): it presses through the pad bindings like a real pad.
+   */
+  padFrame(pad: unknown): DebugResult
+  /** The right stick's aim the bore gun reads, or null while it rests (ticket 346). */
+  getPadAim(): DebugResult<{ aim: PadAim | null }>
 }
 
 const game = () => useGameStore.getState()
@@ -157,7 +166,20 @@ export function createDebugInput(): DebugInput {
     getBindings: () => ({ ok: true, bindings: game().bindings, overrides: game().prefs.bindings }),
     setBindings: (overrides) => resultOf(game().setBindings(overrides)),
     getActionStream: () => ({ ok: true, stream: [...readActionStream()] }),
+    padFrame: routePadFrameUnlessRefused,
+    getPadAim: () => ({ ok: true, aim: copyOfPadAim() }),
   }
+}
+
+function routePadFrameUnlessRefused(pad: unknown): DebugResult {
+  const problems = pad === null ? [] : padReadingProblems(pad)
+  if (problems.length === 0) routePadFrame(pad as PadReading | null)
+  return resultOf(problems)
+}
+
+function copyOfPadAim(): PadAim | null {
+  const aim = readPadAim()
+  return aim === null ? null : { ...aim }
 }
 
 function setPreferenceUnlessRefused(name: unknown, value: unknown): DebugResult {

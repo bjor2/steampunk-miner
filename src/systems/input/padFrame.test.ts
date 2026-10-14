@@ -1,5 +1,11 @@
 import { describe, expect, it } from 'vitest'
-import { isPadInputHeld, padInputValueOf, readPadAimInto, type PadReading } from './padFrame'
+import {
+  isPadInputHeld,
+  padInputValueOf,
+  padReadingProblems,
+  readPadAimInto,
+  type PadReading,
+} from './padFrame'
 
 function padWith(buttons: Record<number, number>, axes: readonly number[] = [0, 0, 0, 0]) {
   const values = Array.from({ length: 17 }, (_, index) => ({ value: buttons[index] ?? 0 }))
@@ -36,5 +42,19 @@ describe('pad frame', () => {
   it('leaves the stick idle inside the deadzone', () => {
     const aim = { x: 0, y: 0 }
     expect(readPadAimInto(padWith({}, [0, 0, 0.1, -0.15]), aim)).toBe(false)
+  })
+})
+
+describe('pad frame: the debug reading', () => {
+  it('takes a pad as the browser reports it', () => {
+    expect(padReadingProblems(padWith({ 0: 1 }, [0, 0, 0.5, -1]))).toEqual([])
+  })
+
+  it('lists every problem of a broken frame', () => {
+    expect(padReadingProblems({ buttons: [{ value: 2 }], axes: ['left'] })).toEqual([
+      'buttons must be a list of { value } from 0 to 1',
+      'axes must be numbers from -1 to 1',
+    ])
+    expect(padReadingProblems(null)).toEqual(['a pad frame is { buttons, axes }'])
   })
 })

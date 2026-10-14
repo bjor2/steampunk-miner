@@ -55,6 +55,7 @@ export interface ScreenSources {
   depthTiles: number
   prefs: Preferences
   bindings: Bindings
+  padBindings: Bindings
   bindingProblems: readonly string[]
   rebindingActionId: ActionId | null
   isTravelArmed: boolean

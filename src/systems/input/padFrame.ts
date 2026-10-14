@@ -40,3 +40,27 @@ export function readPadAimInto(pad: PadReading, aim: PadAim): boolean {
   aim.y = pad.axes[RIGHT_STICK_AXES.y] ?? 0
   return aim.x * aim.x + aim.y * aim.y >= PAD_AIM_DEADZONE * PAD_AIM_DEADZONE
 }
+
+/** Why a value cannot be a pad frame (the debug API's `input.padFrame`); empty when it can. */
+export function padReadingProblems(raw: unknown): string[] {
+  if (typeof raw !== 'object' || raw === null) return ['a pad frame is { buttons, axes }']
+  const { buttons, axes } = raw as Record<string, unknown>
+  return [
+    ...(Array.isArray(buttons) && buttons.every(isButtonReading)
+      ? []
+      : ['buttons must be a list of { value } from 0 to 1']),
+    ...(Array.isArray(axes) && axes.every(isAxisValue)
+      ? []
+      : ['axes must be numbers from -1 to 1']),
+  ]
+}
+
+function isButtonReading(button: unknown): boolean {
+  if (typeof button !== 'object' || button === null) return false
+  const { value } = button as Record<string, unknown>
+  return typeof value === 'number' && value >= 0 && value <= 1
+}
+
+function isAxisValue(axis: unknown): boolean {
+  return typeof axis === 'number' && axis >= -1 && axis <= 1
+}

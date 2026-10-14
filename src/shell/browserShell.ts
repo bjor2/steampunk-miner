@@ -9,6 +9,7 @@ import { createBrowserSnapshots } from './browserSnapshots'
 import { readBrowserLaunchParameters } from './launchParameters'
 import { watchPageListeners } from './listenerCount'
 import { readPageMemory } from './pageMemory'
+import { listenForGamepad } from './gamepadHooks'
 import {
   exposeOnWindow,
   listenForKeys,
@@ -67,6 +68,7 @@ export function createBrowserShell(): Shell {
     onPageHide: runOnPageHide,
     onKeyChange: listenForKeys,
     onScrollNotch: listenForScrollNotches,
+    onPadFrame: listenForGamepad,
     watchPageListeners,
     readPageMemory,
     readScreen,

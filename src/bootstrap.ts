@@ -31,6 +31,7 @@ import {
 import { runEventPlaceOf, useGameStore } from './store/gameStore'
 import { listenForDomainEvents } from './store/domainEventBroadcast'
 import { routeKeyChange, routeScrollNotch } from './store/inputRuntime'
+import { routePadFrame } from './store/padRuntime'
 import { turnOnPerfLog } from './store/perfLog'
 import { recordStartingPlanetEntered } from './store/planetArrivalLog'
 import { installPreferencesStorage, loadPreferences } from './store/preferencesFile'
@@ -73,6 +74,7 @@ export async function startGame(): Promise<void> {
   keepHapticsPlaying(shell)
   shell.onKeyChange(routeKeyChange)
   shell.onScrollNotch(routeScrollNotch)
+  shell.onPadFrame(routePadFrame)
   await resumeLastCheckpoint(shell)
   recordStartingPlanetEntered()
   keepRunFilesWritten(shell, run)
