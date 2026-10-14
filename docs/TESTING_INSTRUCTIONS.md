@@ -337,6 +337,15 @@ programs }` from three's `renderer.info` of the game canvas), read only when cal
   when a CLI filter names it (`vite.config.ts`): it takes hours, so neither `npm test` nor the
   nightly picks it up. Its rounding rule is unit-tested in `systems/money.test.ts` (charges never
   round down, income never up, at 1e36, 1e37 and 1e40).
+- **Combos pace** (pin 6 of the GD lock on #206, ticket 206): `features/combos/comboPace.test.ts`
+  plays the bot from on-curve arrival to the core of planets 7 and 10 on the three pacing seeds
+  bare, with the shipped combos' parents owned and the drain, ore-shifter and corer pressed by
+  `withComboHand` (the kernel bot presses no slot, so the hand wraps its waits as the magnet hand
+  does), and with every shipped combo owned too. Gated on the median of the per-seed ratios: all on
+  at least 0.98x the core time without the combos, and the combos with their parents at most +15%
+  income per minute over bare. The alarm shield's runs (on its own vs pressed by hand on every lunge
+  warning, at least 0.98x, and the auto run replaying to the same digest) skip until a tech node
+  researches the steam sear (#318), whose toggle is the one auto switch. Long: for the box Tester.
 - **No free cell from item hooks** (GD lock on #206, Vertical pin 1, ticket 323):
   `bot/noFreeCellRuns.ts` is #281's exact check as a harness: the bot arrives on planets 7 and 10
   on-curve and plays to the core on each pacing seed with a bare setup and with items owned, none

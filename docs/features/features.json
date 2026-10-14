@@ -846,7 +846,7 @@
             },
             {
               "title": "Research lab",
-              "description": "Research to unlock new technology. From planet 15 its annex stands behind the Works and the camera pans to it on first landing; the lab's research is not built.",
+              "description": "Research to unlock new technology. From planet 15 its annex stands behind the Works and the camera pans to it on first landing; the milestone combos are researched there once both their parent items are owned.",
               "status": "partial",
               "issues": [80, 197, 221, 222, 206],
               "planet": 15
@@ -1065,6 +1065,13 @@
               "description": "Vibratory bit (soft ground ahead crumbles), spoil auger (fills the tunnel behind you, C to switch), side cutters, thaw crown, sampling corer (C: draws a plug from the first ore ahead, refused at no cost by a gated or core cell), twin-bit head (drive down and to a side to cut diagonally), dielectric bit (no shock or tug from electrified ground while the drill cuts) and reach boom, each in its drill socket with its tech node, Marks and item card, sold at the Upgrade bay once researched. Their models on the miner come later.",
               "status": "partial",
               "issues": [205, 242, 248, 295]
+            },
+            {
+              "title": "Milestone combos",
+              "description": "Two-lane combos researched at the research lab and bought once at the Upgrade bay, each changing how its parent items play: the assay drain drains the richest cells first, the magnetic survey drags toward the densest ore cluster, the alarm shield vents the steam shield on a lunge warning, the cored drain reaches the vein the corer sampled, and from P41 the lodestone drain and lens corer join; each grade from P41 reaches further. The card shows the grade and both parents' lines. The foam combos, the aether reel and the ceiling anchor wait for their mechanics, and the shield goes on auto once the steam sear's node is in.",
+              "status": "partial",
+              "issues": [206, 288, 318, 329],
+              "planet": 15
             },
             {
               "title": "Gear on the rig and power-up effects",

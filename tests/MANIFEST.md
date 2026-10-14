@@ -39,14 +39,21 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/codex/systems/codexSection.test.ts` | 7 | 7 |
 | `src/features/codex/systems/codexSize.test.ts` | 1 | 1 |
 
-### `combos`: 4 files, 21 tests
+### `combos`: 11 files, 67 tests
 
 | File | Tests | Sites |
 | --- | --- | --- |
-| `src/features/combos/systems/comboCatalogue.test.ts` | 8 | 8 |
+| `src/features/combos/alarmShield.test.ts` | 2 | 2 |
+| `src/features/combos/comboHand.test.ts` | 2 | 2 |
+| `src/features/combos/comboPace.test.ts` | 6 | 5 |
+| `src/features/combos/combosInPlay.test.ts` | 9 | 9 |
+| `src/features/combos/gatesFixture.test.ts` | 3 | 3 |
+| `src/features/combos/shippedRows.test.ts` | 6 | 6 |
+| `src/features/combos/systems/comboCatalogue.test.ts` | 9 | 9 |
+| `src/features/combos/systems/comboGrades.test.ts` | 4 | 4 |
+| `src/features/combos/systems/comboHooks.test.ts` | 14 | 14 |
 | `src/features/combos/systems/comboRows.test.ts` | 8 | 8 |
-| `src/features/combos/systems/combosEconomy.test.ts` | 2 | 2 |
-| `src/features/combos/visionRows.test.ts` | 3 | 3 |
+| `src/features/combos/systems/combosEconomy.test.ts` | 4 | 4 |
 
 ### `descriptions`: 4 files, 49 tests
 
@@ -332,7 +339,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/sensing/systems/threatPeriscope.test.ts` | 6 | 6 |
 | `src/features/sensing/systems/useResolution.test.ts` | 16 | 16 |
 
-### `tech-tree`: 28 files, 209 tests
+### `tech-tree`: 28 files, 212 tests
 
 | File | Tests | Sites |
 | --- | --- | --- |
@@ -341,7 +348,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/tech-tree/scene/extractorDeploy.test.ts` | 3 | 3 |
 | `src/features/tech-tree/store/treeScreenStore.test.ts` | 4 | 4 |
 | `src/features/tech-tree/systems/itemDescriber.test.ts` | 3 | 3 |
-| `src/features/tech-tree/systems/itemMarks.test.ts` | 3 | 3 |
+| `src/features/tech-tree/systems/itemMarks.test.ts` | 4 | 4 |
 | `src/features/tech-tree/systems/itemShop.test.ts` | 7 | 7 |
 | `src/features/tech-tree/systems/markLadder.test.ts` | 19 | 19 |
 | `src/features/tech-tree/systems/nodeCost.test.ts` | 6 | 6 |
@@ -357,7 +364,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/tech-tree/systems/render/techGear.test.ts` | 12 | 12 |
 | `src/features/tech-tree/systems/render/techGearQuads.test.ts` | 9 | 9 |
 | `src/features/tech-tree/systems/researchBotPurchase.test.ts` | 5 | 5 |
-| `src/features/tech-tree/systems/techTree.test.ts` | 15 | 15 |
+| `src/features/tech-tree/systems/techTree.test.ts` | 17 | 17 |
 | `src/features/tech-tree/systems/techTreeCommands.test.ts` | 4 | 4 |
 | `src/features/tech-tree/systems/treeScreenModel.test.ts` | 10 | 10 |
 | `src/features/tech-tree/systems/treeShape.test.ts` | 14 | 14 |
