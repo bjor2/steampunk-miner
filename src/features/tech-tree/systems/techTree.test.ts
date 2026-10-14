@@ -1,10 +1,16 @@
 import { describe, expect, it } from 'vitest'
 import { withRegistrations } from '../../../registries/registrar'
 import { TREE_FIXTURE_SLICE } from '../treeFixtureSlice'
-import { LANE_PAIRS, PAIR_ORDER } from './generatedCombos'
+import { generatedComboAt, LANE_PAIRS, PAIR_ORDER, pairIndexAt } from './generatedCombos'
 import { markNodeIdOf } from './markNodes'
-import { registeredTechTree, treeNodeOf, treeNodesThrough, type TechTree } from './techTree'
-import type { TreeNode } from './techNode'
+import {
+  itemUnlockTierOf,
+  registeredTechTree,
+  treeNodeOf,
+  treeNodesThrough,
+  type TechTree,
+} from './techTree'
+import type { TechComboTemplate, TreeNode } from './techNode'
 
 function withFixtureTree<T>(run: (tree: TechTree) => T): T {
   return withRegistrations([TREE_FIXTURE_SLICE], () => run(registeredTechTree()))
@@ -147,6 +153,40 @@ describe('tech tree: generated combos', () => {
     const generatedOf = () =>
       withFixtureTree((tree) => treeNodesThrough(tree, 100).filter((node) => node.unlockTier > 40))
     expect(generatedOf()).toEqual(generatedOf())
+  })
+
+  it('unlocks an endless-only combo with its first generated grade, an authored one at its node', () => {
+    withFixtureTree((tree) => {
+      const firstGrade = treeNodesThrough(tree, 100).find(
+        (node) => node.unlocks.itemId === 'combo.lodestone_drain',
+      )
+      expect(firstGrade?.unlocks.mark).toBe(1)
+      expect(itemUnlockTierOf(tree, 'combo.lodestone_drain')).toBe(firstGrade?.unlockTier)
+      expect(itemUnlockTierOf(tree, 'combo.assay_drain')).toBe(
+        nodeOf(tree, 'tech.combo.assay_drain').unlockTier,
+      )
+      expect(itemUnlockTierOf(tree, 'combo.no_such_combo')).toBeNull()
+    })
+  })
+
+  it("needs every grade's template items owned, as an authored node's requiresOwned", () => {
+    const owning: TechComboTemplate = {
+      id: 'tech.template.owning',
+      iconId: 'node-combo-owning',
+      lanes: LANE_PAIRS[PAIR_ORDER[0]],
+      name: 'Owning',
+      unlocks: 'combo.owning',
+      parents: ['tech.a.first', 'tech.b.second'],
+      description: 'A combo that asks for both parents in the hold.',
+      requiresOwned: ['power.first', 'power.second'],
+    }
+    const grading = {
+      templateOfPair: (pairIndex: number) => (pairIndex === pairIndexAt(41) ? owning : null),
+      authoredComboOf: () => null,
+      slots: new Map<string, number>(),
+    }
+    const graded = [41, 71].map((planet) => generatedComboAt(planet, grading))
+    graded.forEach((node) => expect(node?.requiresOwned).toEqual(owning.requiresOwned))
   })
 
   it('generates nothing for a pair with no template registered', () => {

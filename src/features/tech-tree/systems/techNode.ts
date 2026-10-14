@@ -110,6 +110,11 @@ export interface TechComboTemplate extends ContentEntry {
   /** The two capability nodes it combines, one in each lane. */
   parents: readonly [string, string]
   description: string
+  /**
+   * What the player must own before any grade can be researched, as `TechNode.requiresOwned`:
+   * a combo's two parent items (GD lock on #206, decision 7).
+   */
+  requiresOwned?: readonly string[]
 }
 
 /** What researching a node gives: the store item, at this Mark or grade. */

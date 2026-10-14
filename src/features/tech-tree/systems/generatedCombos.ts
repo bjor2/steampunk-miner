@@ -3,7 +3,8 @@
  * `p = 41 + K j`. Its lane pair is `PAIRS[perm(j mod 10)]`, where `perm` is a fixed permutation
  * seeded by a constant, never the world seed, so every player in a world sees the same offers.
  * Each is the next grade of its pair's template: the template's first appearance is labelled
- * horizontal, each re-grade both. It needs its template's two parents and the grade before it.
+ * horizontal, each re-grade both. It needs its template's two parents and the grade before it,
+ * and the items the template requires owned (a combo's two parent items, GD lock on #206).
  * Generated, never registered; `tech.combo.gen.<p>` is stable because it is a formula of `p`.
  */
 import { hashCell } from '../../../systems/cellRandom'
@@ -65,6 +66,12 @@ export function generatedComboAt(planetIndex: number, grading: ComboGrading): Tr
   return comboNodeOf(planetIndex, template, grading)
 }
 
+/** The planet of the `step`-th generated combo, `41 + K j` with `j = step`. */
+export function generatedComboPlanetOfStep(step: number): number {
+  const { firstGeneratedCombo, comboEvery } = TREE_ECONOMY.cadence
+  return firstGeneratedCombo + comboEvery * step
+}
+
 /** Every planet up to `planetIndex` a combo is generated on, ascending. */
 export function generatedComboPlanetsThrough(planetIndex: number): number[] {
   const { firstGeneratedCombo, comboEvery } = TREE_ECONOMY.cadence
@@ -89,6 +96,7 @@ function comboNodeOf(
     name: template.name,
     unlockTier: planetIndex,
     prereqs: previous === null ? template.parents : [...template.parents, previous],
+    ...(template.requiresOwned !== undefined && { requiresOwned: template.requiresOwned }),
     unlocks: { itemId: template.unlocks, mark: grade },
     iconId: template.iconId,
     description: template.description,

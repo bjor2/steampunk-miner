@@ -8,7 +8,9 @@ import { contentOf } from '../../../systems/registries/content'
 import { authoredTreeNodeOf, compareByTier, laneSlotsOf } from './authoredNodes'
 import {
   generatedComboAt,
+  generatedComboPlanetOfStep,
   generatedComboPlanetsThrough,
+  LANE_PAIRS,
   pairIndexOf,
   planetOfGeneratedComboId,
   type ComboGrading,
@@ -84,13 +86,15 @@ export function unlockAllPlanetOf(tree: TechTree, planetIndex: number): number {
 
 /**
  * The planet the item unlocks on: the tier of the earliest authored node that unlocks it, the
- * planet a one-off's price is fixed at (#162 4.1); null when no node unlocks it.
+ * planet a one-off's price is fixed at (#162 4.1). An endless-only combo has no authored node, so
+ * it unlocks with its template's first generated grade (`41 + 3j`, GD lock on #206 decision 7).
+ * Null when no node unlocks it.
  */
 export function itemUnlockTierOf(tree: TechTree, itemId: string): number | null {
   const tiers = tree.authored
     .filter((node) => node.unlocks.itemId === itemId)
     .map((node) => node.unlockTier)
-  return tiers.length === 0 ? null : Math.min(...tiers)
+  return tiers.length === 0 ? firstGeneratedGradePlanetOf(tree, itemId) : Math.min(...tiers)
 }
 
 /** The Mark-bearing item a capability unlocked, by item id. */
@@ -140,6 +144,15 @@ function markNodeOfId(tree: TechTree, nodeId: string): TreeNode | null {
 function generatedComboOfId(tree: TechTree, nodeId: string): TreeNode | null {
   const planetIndex = planetOfGeneratedComboId(nodeId)
   return planetIndex === null ? null : generatedComboAt(planetIndex, tree.grading)
+}
+
+/** The planet of the item's first generated combo: every pair takes its first turn by then. */
+function firstGeneratedGradePlanetOf(tree: TechTree, itemId: string): number | null {
+  const firstTurnOfLastPair = generatedComboPlanetOfStep(LANE_PAIRS.length - 1)
+  const first = generatedCombosThrough(tree, firstTurnOfLastPair).find(
+    (node) => node.unlocks.itemId === itemId,
+  )
+  return first?.unlockTier ?? null
 }
 
 function generatedCombosThrough(tree: TechTree, planetIndex: number): TreeNode[] {
