@@ -16,7 +16,8 @@
  * dock takes the plate back.
  * Stabiliser foam (ticket 381) sets on a forward cone and holds the collapse blocks under it for
  * 600 ticks through a timed `collapseBraces` provider of its own; its clock step drops each cell as
- * it lapses. The cryo binder, shoring props and the strata press stay vision rows
+ * it lapses; researching its node owns it with a full stack, its only charge source (a reaction to
+ * `TechNodeUnlocked`). The cryo binder, shoring props and the strata press stay vision rows
  * (`systems/shippedTools.ts`). The lane's P16 fork (ticket 269), built on no magnet: the Bracer
  * props warning collapse blocks round its rig through the same `collapseBraces` seam, fed by a
  * reaction to `CollapseWarned`; the Breaker fractures the plain ground past each charge it blasts,
@@ -28,6 +29,7 @@ import { TERRAIN_PROJECTIONS, TERRAIN_RUN_EVENTS } from './logging'
 import { MAGNET_FIELD_LAYER_ID, MagnetFieldLayer } from './scene/MagnetFieldLayer'
 import { BRACER_PROP_BRACES, BRACER_PROPS_REACTION } from './systems/bracerProps'
 import { BREAKER_FRACTURE } from './systems/breakerFracture'
+import { FOAM_RESEARCH_REACTION } from './systems/foamResearch'
 import { LIVE_LODESTONE_PROVIDER, LODESTONE_DOCK_REACTION } from './systems/lodestoneBeacon'
 import { HOLD_LODE_CLAMPS_STEP, LODE_CLAMP_BRACES } from './systems/lodeClamp'
 import { TERRAIN_MAGNETS_SPEND_FAMILY } from './systems/magnetSpend'
@@ -56,6 +58,7 @@ export const slice: SliceDefinition = {
     r.authorityReaction(LODESTONE_DOCK_REACTION)
     r.authorityReaction(ORE_LURE_DOCK_REACTION)
     r.authorityReaction(BRACER_PROPS_REACTION)
+    r.authorityReaction(FOAM_RESEARCH_REACTION)
     r.liveBeacon(LIVE_LODESTONE_PROVIDER)
     r.clockStep(HOLD_LODE_CLAMPS_STEP)
     r.collapseBrace(LODE_CLAMP_BRACES)

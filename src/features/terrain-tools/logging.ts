@@ -4,7 +4,8 @@
  * `terrain_edit {itemId, mark, origin, cellsChanged, chunksTouched, editHash}` for each queued edit
  * (with the TD's `chunksTouched`, #162 section 3 rule 7), where a lodestone beacon was planted, and
  * `magnet_used {itemId, verb, cellsMoved, energy}` for each terrain magnet use (GD lock on #246),
- * and `foam_set {mark, origin, cellsSet, untilTick}` for each spray of stabiliser foam (ticket 381).
+ * `foam_set {mark, origin, cellsSet, untilTick}` for each spray of stabiliser foam (ticket 381), and
+ * `foam_stocked {charges}` when researching foam's node stocks its first stack.
  */
 import type { SliceEventProjections } from '../../logging/registries/eventProjections'
 import type { SliceRunEvents } from '../../logging/registries/runEvents'
@@ -33,6 +34,10 @@ export const TERRAIN_PROJECTIONS: SliceEventProjections = {
   'terrain-tools.FoamSet': ({ mark, originTx, originTy, cellsSet, untilTick }) => ({
     event: 'terrain-tools.foam_set',
     data: { mark, origin: { tx: originTx, ty: originTy }, cellsSet, untilTick },
+  }),
+  'terrain-tools.FoamStocked': ({ charges }) => ({
+    event: 'terrain-tools.foam_stocked',
+    data: { charges },
   }),
 }
 
@@ -68,5 +73,10 @@ export const TERRAIN_RUN_EVENTS: SliceRunEvents = {
       cellsSet: 'integer',
       untilTick: 'integer',
     },
+  },
+  'terrain-tools.foam_stocked': {
+    group: 'vehicle_and_combat',
+    level: 'core',
+    payload: { charges: 'integer' },
   },
 }

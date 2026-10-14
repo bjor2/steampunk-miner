@@ -2,8 +2,9 @@
  * The domain events the terrain lane adds (feature-slices.md 3.15), by augmentation, never by
  * editing the kernel's lists. `power-up-core` already logs every use; these say what the use did to
  * the ground: the edit it queued (#162 section 2.4 `terrain_edit`), where a lodestone beacon
- * was planted, what a terrain magnet's use moved (GD lock on #246, `magnet_used`), and the cells
- * a spray of stabiliser foam set (ticket 381, `foam_set`).
+ * was planted, what a terrain magnet's use moved (GD lock on #246, `magnet_used`), the cells a
+ * spray of stabiliser foam set (ticket 381, `foam_set`), and the stack its research stocked
+ * (`foam_stocked`).
  *
  * Every event names its player: a use acts on the authority clock, and the lodestone's gather on a
  * dock reaction, so neither carries a command stamp of its own.
@@ -57,6 +58,11 @@ declare module '../../../systems/authority/domainEvent' {
       cellsSet: number
       untilTick: number
     }
+    /**
+     * Researching foam's node made the player its owner, with a full stack of `charges` (GD ruling
+     * on #381, option c): before the consumable restock this is foam's only charge source.
+     */
+    'terrain-tools.FoamStocked': { playerId: string; charges: number }
   }
 }
 
@@ -93,4 +99,10 @@ export type FoamSetBody = DomainEventBodies['terrain-tools.FoamSet']
 
 export function foamSetOf(body: FoamSetBody) {
   return { type: 'terrain-tools.FoamSet' as const, ...body }
+}
+
+export type FoamStockedBody = DomainEventBodies['terrain-tools.FoamStocked']
+
+export function foamStockedOf(body: FoamStockedBody) {
+  return { type: 'terrain-tools.FoamStocked' as const, ...body }
 }
