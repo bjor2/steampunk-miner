@@ -316,14 +316,24 @@ programs }` from three's `renderer.info` of the game canvas), read only when cal
   down-right and a down-left bore of six cells from the surface east of the pad. The eye check in
   `npm run dev` plays it from the console: take `s` from `twinBitDiagonal()`, then call
   `steampunkDebug.fastForward(s.ticks, s.commands)`.
-- **Drill-gear fork, Deep** (GD lock on #255, ticket 268): `features/drill-gear/forkDeep.pace.test.ts`
-  plays the bot from on-curve arrival to the core of planets 16 and 20 on the three pacing seeds,
-  once with the drill-gear fork unchosen and once with Deep chosen (both pass through the same
-  rich wallet and back to the arrival money). Gated on the median of the per-seed speed-ups: at
-  most one drill step (x1.225) faster than unchosen. A quick case checks the plunge crown inside
-  the `aheadCells` = 1 clamp. Wide's flank cells are drill throughput, not income, so they register
-  no income rate and the 15% cap never judges them (GD ruling on #385); `incomeCapGolden.test.ts`
-  keeps every `gear.*` item out of `incomeRates`. Long: for the box Tester.
+- **Drill-gear fork, Deep** (GD lock on #255, ticket 268; GD ruling on #392, ticket 392):
+  `features/drill-gear/forkDeep.pace.test.ts` plays the bot from on-curve arrival to the core of
+  planets 16 and 20 on the three pacing seeds, once with Deep chosen and once unchosen with the
+  bot's own fork pick switched off (`withoutPacingBotForkPicks`, since the on-curve bot chooses Deep
+  once its wallet pays), both through the same rich wallet and back to the arrival money
+  (`forkDeepPaceRuns.ts`). The bot's scripted bore cuts with the drill gear (protocol 71), so the
+  cell Deep opens below the bored one is one the bot drives into. Gated on the median of the
+  per-seed speed-ups: above 1.02 (measurably faster) and at most one drill step (x1.225); a result
+  above the ceiling is a balance finding for Systems, never a reason to patch the bot. Beside it,
+  Deep keeps travel (reported drive and thrust ticks, `systems/travelShare.ts`) at or under a
+  quarter of the run on every seed, or no higher than the bare run already was. The lane
+  `forkDeepP40.lane.test.ts` runs the same gates on planet 40, the headless check of the
+  re-baseline. A quick case checks the plunge crown inside the `aheadCells` = 1 clamp, and
+  `systems/deepParity.test.ts` that the cell past the bit costs its own drill ticks from the bot's
+  bore and the player's cut alike on planets 1 to 20. Wide's flank cells are drill throughput, not
+  income, so they register no income rate and the 15% cap never judges them (GD ruling on #385);
+  `incomeCapGolden.test.ts` keeps every `gear.*` item out of `incomeRates`. Long: for the box
+  Tester.
 - **Magnetic planet** (GD lock on #258 Q7, ticket 294): `npm run balance:magnetic-planet` runs
   `features/planet-mix/magneticBandValue.test.ts` and `magneticPlanetPace.test.ts`. The class
   switches off at the same planet index with `withMagneticClassOff` (`magneticClassOff.ts`): the

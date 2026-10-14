@@ -125,7 +125,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/dock-buildings/systems/render/worksSteam.test.ts` | 4 | 4 |
 | `src/features/dock-buildings/systems/render/workshopStaging.test.ts` | 6 | 6 |
 
-### `drill-gear`: 24 files, 170 tests
+### `drill-gear`: 27 files, 194 tests
 
 | File | Tests | Sites |
 | --- | --- | --- |
@@ -133,11 +133,13 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/drill-gear/drillGearPace.test.ts` | 2 | 1 |
 | `src/features/drill-gear/drillGearTouch.test.ts` | 2 | 2 |
 | `src/features/drill-gear/forkDeep.pace.test.ts` | 4 | 3 |
+| `src/features/drill-gear/forkDeepP40.lane.test.ts` | 1 | 1 |
 | `src/features/drill-gear/logging.test.ts` | 2 | 2 |
 | `src/features/drill-gear/shippedRows.test.ts` | 10 | 10 |
 | `src/features/drill-gear/systems/backfillRow.test.ts` | 4 | 4 |
 | `src/features/drill-gear/systems/cardLines.test.ts` | 7 | 7 |
 | `src/features/drill-gear/systems/cuttersAndBoom.test.ts` | 7 | 6 |
+| `src/features/drill-gear/systems/deepParity.test.ts` | 20 | 1 |
 | `src/features/drill-gear/systems/dielectricBit.test.ts` | 5 | 5 |
 | `src/features/drill-gear/systems/drillGearEconomy.test.ts` | 6 | 6 |
 | `src/features/drill-gear/systems/drillGearFork.test.ts` | 10 | 10 |
@@ -148,6 +150,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/drill-gear/systems/samplingCorer.test.ts` | 11 | 10 |
 | `src/features/drill-gear/systems/softGroundLink.test.ts` | 6 | 6 |
 | `src/features/drill-gear/systems/statPreview.test.ts` | 12 | 12 |
+| `src/features/drill-gear/systems/travelShare.test.ts` | 3 | 3 |
 | `src/features/drill-gear/systems/twinBit.test.ts` | 5 | 5 |
 | `src/features/drill-gear/systems/twinBitDiagonal.test.ts` | 5 | 5 |
 | `src/features/drill-gear/systems/useResolution.test.ts` | 13 | 13 |
@@ -439,7 +442,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/sensing/systems/threatPeriscope.test.ts` | 6 | 6 |
 | `src/features/sensing/systems/useResolution.test.ts` | 16 | 16 |
 
-### `tech-tree`: 59 files, 409 tests
+### `tech-tree`: 60 files, 414 tests
 
 | File | Tests | Sites |
 | --- | --- | --- |
@@ -460,6 +463,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/tech-tree/systems/deliveredIncomeShares.test.ts` | 5 | 5 |
 | `src/features/tech-tree/systems/familySharePins.test.ts` | 5 | 5 |
 | `src/features/tech-tree/systems/familySpendShares.test.ts` | 8 | 8 |
+| `src/features/tech-tree/systems/forkBotPick.test.ts` | 5 | 5 |
 | `src/features/tech-tree/systems/forkBranchCards.vision.test.ts` | 1 | 1 |
 | `src/features/tech-tree/systems/forkChoice.test.ts` | 13 | 13 |
 | `src/features/tech-tree/systems/forkCost.test.ts` | 5 | 5 |
@@ -710,6 +714,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/authority/refinery/refineryFacility.test.ts` | 2 | 2 |
 | `src/systems/authority/refinery/refineryRules.test.ts` | 15 | 15 |
 | `src/systems/authority/refinery/refinerySlots.test.ts` | 4 | 4 |
+| `src/systems/authority/scriptedDrillGear.test.ts` | 7 | 7 |
 | `src/systems/authority/sellCoins.test.ts` | 8 | 8 |
 | `src/systems/authority/sensingQueries.test.ts` | 10 | 10 |
 | `src/systems/authority/serviceReserve.test.ts` | 4 | 4 |
