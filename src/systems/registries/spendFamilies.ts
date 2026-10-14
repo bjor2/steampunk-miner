@@ -4,8 +4,10 @@
  * tech-tree's #212 report reads every family here and never imports a slice. A family counts spend
  * only while its anchor row is owned or `FeatureUnlocked`; the caller answers that once, here, at
  * report time, and `isMember` never re-checks it. A held or unbuilt anchor counts zero and prints
- * no row. Report-only: nothing here fails a run, and it reads `ShopSpend` records, never authority
- * state, so there is no command, event, save section or protocol bump.
+ * no row. The rows are report-only; a family may also carry a share pin, a per-planet cap on part
+ * of its spend that the #212 lane gates beside the tree total (ticket 371). Nothing here fails a
+ * run, and it reads `ShopSpend` records, never authority state, so there is no command, event,
+ * save section or protocol bump.
  */
 import type { ShopSpend } from '../bot/shopSpend'
 import { add, ZERO_MONEY, type Money } from '../money'
@@ -18,6 +20,18 @@ export interface SpendFamily {
   /** The `docs/scaling/horizontal/stats.json` row whose ownership or unlock admits the family. */
   anchorRowId: string
   isMember(spend: ShopSpend): boolean
+  /** A cap on the share of a planet's spend the pinned buys may take, judged by the #212 lane. */
+  sharePin?: SpendSharePin
+}
+
+/**
+ * The gun-track pin's shape (Vertical Scaler on #322, GD ruling on #371): on each planet, the
+ * median over the seeds of the pinned buys' share of everything bought there stays at or below
+ * `maxShare`. `isPinned` picks the buys the pin counts, a subset of the family's members.
+ */
+export interface SpendSharePin {
+  maxShare: Money
+  isPinned(spend: ShopSpend): boolean
 }
 
 /** One family's spend on one planet. Report-only: only the tree total is gated (GD Q4 on #212). */
@@ -30,9 +44,10 @@ export interface FamilySpendRow {
 export const SPEND_FAMILY_REGISTRY = defineRegistry<SpendFamily>('spendFamilies')
 
 /**
- * The kernel's gun mount at the Upgrade bay (`buyGun`), anchored to its `auto_guns` row. Once the
- * ground-gun slice loads, its `armoury` family sorts first and files the buy there (ticket 371);
- * the buy also counts in the gated tree total (GD ruling Q2 on #212).
+ * The kernel's gun mount at the Upgrade bay (`buyGun`), anchored to its `auto_guns` row. The bot's
+ * only `buyGun` is the mount (`botShopping.ts`). A one-time feature unlock, so it is filed here and
+ * counts once in the gated tree total, never in the `armoury` row or its gun-track pin (GD ruling
+ * on #371).
  */
 export const BUY_GUN_SPEND_FAMILY: SpendFamily = {
   id: 'kernel.buy_gun',

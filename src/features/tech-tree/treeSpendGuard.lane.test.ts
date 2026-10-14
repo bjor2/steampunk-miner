@@ -8,7 +8,13 @@ import type { AuthorityState } from '../../systems/authority/authorityState'
 import type { ShopSpend } from '../../systems/bot/shopSpend'
 import { spendFamiliesOf } from '../../systems/registries/spendFamilies'
 import type { Scenario } from '../../systems/scenario'
-import { familyShareRowsOf, familyShareTableOf } from './systems/familySpendShares'
+import {
+  brokenPinsOf,
+  sharePinTableOf,
+  sharePinVerdictsOf,
+  type SharePinVerdict,
+} from './systems/familySharePins'
+import { familyShareRowsOf, familyShareTableOf, type SeedSpends } from './systems/familySpendShares'
 import {
   missedPlanetsOf,
   treeShareTableOf,
@@ -19,11 +25,13 @@ import {
 // The #212 spend guard (spec #161 acceptance 6): the pacing bot plays the bot scenario to the core
 // of planet 60 on each pacing seed, so the guard sees P2-P20, P21-P40 and the P41-P60 endless
 // sample, and the tree's share of each planet's spend must sit inside its band on the median of
-// the seeds; the kernel turret mount counts in it (ticket 371). Beside it, report-only, each spend
-// family's share from the kernel registry (GD ruling Q3, Q4 on #212), the one armoury row among
-// them, printed on P2/P10/P20/P40 at zero too. Headless, with no run log kept: the guard
-// reads the bot's spend records and which family anchors the run opened. The runs
-// take hours, so this is a lane (vite.config.ts leaves it out unless it is named):
+// the seeds; the kernel turret mount counts in it once (ticket 371). Each family's share pin is
+// gated beside it on every planet: the armoury's recurring gun-track spend stays at or under 5%
+// (GD ruling on #371). Report-only, each spend family's share from the kernel registry (GD ruling
+// Q3, Q4 on #212), the one armoury row among them, printed on P2/P10/P20/P40 at zero too.
+// Headless, with no run log kept: the guard reads the bot's spend records and which family
+// anchors the run opened. The runs take hours, so this is a lane (vite.config.ts leaves it out
+// unless it is named):
 //   npx vitest run src/features/tech-tree/treeSpendGuard.lane.test.ts   (or npm run balance:tree)
 // A miss is a balance finding; the levers are #161's, in order (tech-tree.economy.json).
 const LAST_PLANET = 60
@@ -47,13 +55,13 @@ interface SeedRun {
 describe('tech tree: spend guard of the pacing bot to planet 60', () => {
   let seedRuns: SeedRun[] = []
   let verdicts: TreeShareVerdict[] = []
+  let pinVerdicts: SharePinVerdict[] = []
 
   beforeAll(() => {
     seedRuns = PACING_WORLD_SEEDS['bot-slice'].map(playSeedToLastPlanet)
     verdicts = treeShareVerdictsOf(seedRuns.map((seedRun) => seedRun.shopSpend))
-    console.log(
-      `${seedLinesOf(seedRuns)}\n${treeShareTableOf(verdicts)}\n${familyTableOf(seedRuns)}`,
-    )
+    pinVerdicts = sharePinVerdictsOf(seedRuns.map(seedSpendsOf))
+    console.log(reportOf(seedRuns, verdicts, pinVerdicts))
   }, RUN_TIMEOUT_MS)
 
   it('plays every seed to the core of planet 60', () => {
@@ -62,6 +70,10 @@ describe('tech tree: spend guard of the pacing bot to planet 60', () => {
 
   it('holds the tree share of every planet inside its band on the median of the seeds', () => {
     expect(missedPlanetsOf(verdicts).map((verdict) => verdict.planetIndex)).toEqual([])
+  })
+
+  it('holds every family share pin, the gun-track 5% among them, on the median of the seeds', () => {
+    expect(brokenPinsOf(pinVerdicts).map(pinMissOf)).toEqual([])
   })
 })
 
@@ -88,13 +100,30 @@ function liveAnchorRowIdsOf(state: AuthorityState): ReadonlySet<string> {
   return new Set(anchorRowIds.filter((rowId) => isFeatureUnlocked(state, rowId)))
 }
 
+function seedSpendsOf({ shopSpend, liveAnchorRowIds }: SeedRun): SeedSpends {
+  return { shopSpend, isAnchorLive: (rowId) => liveAnchorRowIds.has(rowId) }
+}
+
+function reportOf(
+  seedRuns: readonly SeedRun[],
+  verdicts: readonly TreeShareVerdict[],
+  pinVerdicts: readonly SharePinVerdict[],
+): string {
+  return [
+    seedLinesOf(seedRuns),
+    treeShareTableOf(verdicts),
+    sharePinTableOf(pinVerdicts),
+    familyTableOf(seedRuns),
+  ].join('\n')
+}
+
 /** Report-only: no family row fails the lane (GD ruling Q4 on #212). */
 function familyTableOf(seedRuns: readonly SeedRun[]): string {
-  const seeds = seedRuns.map(({ shopSpend, liveAnchorRowIds }) => ({
-    shopSpend,
-    isAnchorLive: (rowId: string) => liveAnchorRowIds.has(rowId),
-  }))
-  return familyShareTableOf(familyShareRowsOf(seeds, REPORT_PLANETS))
+  return familyShareTableOf(familyShareRowsOf(seedRuns.map(seedSpendsOf), REPORT_PLANETS))
+}
+
+function pinMissOf({ planetIndex, familyId }: SharePinVerdict): string {
+  return `P${planetIndex} ${familyId}`
 }
 
 function seedLinesOf(seedRuns: readonly SeedRun[]): string {

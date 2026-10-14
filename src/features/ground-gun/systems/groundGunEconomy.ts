@@ -2,7 +2,7 @@
  * The armoury's numbers from `groundGun.json` (ticket 322, the Systems values under the GD
  * decisions on #309 and #310): the bore's fixed numbers, the three store tracks as a gap to a
  * wall with their planet-tied prices, the long barrel's hold absorber, the auto-shoot reserve, the
- * bot's shot floor, the turret's cap and Content's module placeholders. The file is refused whole
+ * bot's shot floor, the gun-track spend pin, the turret's cap and Content's module placeholders. The file is refused whole
  * on any problem, like the kernel's economy file, so a stand-in never reaches a formula.
  */
 import type { BandOreCost } from '../../../systems/economy/economyDefinition'
@@ -88,6 +88,11 @@ export interface AutoShootNumbers {
   manualWaitFloorTicks: number
 }
 
+/** The gun-track pin (ticket 371): recurring gun-track spend's cap on a planet's spend. */
+export interface SpendPinNumbers {
+  maxShare: Money
+}
+
 export interface BotNumbers {
   /** Shots the forced-gun run must fire per planet run per seed, a floor that proves it fires. */
   minShots: number
@@ -129,6 +134,7 @@ export interface GroundGunEconomy {
   longBarrel: LongBarrelNumbers
   autoShoot: AutoShootNumbers
   bot: BotNumbers
+  spendPin: SpendPinNumbers
   input: InputNumbers
   turret: TurretNumbers
   modules: Readonly<Record<string, ArmouryModule>>
@@ -161,6 +167,7 @@ export function readGroundGunEconomy(
     longBarrel: readLongBarrel(reader, file.longBarrel),
     autoShoot: readAutoShoot(reader, file.autoShoot),
     bot: { minShots: reader.safeInteger('bot.minShots', reader.object('bot', file.bot).minShots) },
+    spendPin: readSpendPin(reader, file.spendPin),
     input: readInput(reader, file.input),
     turret: readTurret(reader, file.turret),
     modules: readRows(reader, 'modules', file.modules, readModule),
@@ -195,6 +202,11 @@ function readMountPrice(reader: FieldReader, raw: unknown): MountPrice {
     oreUnits: reader.money('mount.oreUnits', mount.oreUnits),
     targetPlanet: reader.safeInteger('mount.targetPlanet', mount.targetPlanet),
   }
+}
+
+function readSpendPin(reader: FieldReader, raw: unknown): SpendPinNumbers {
+  const pin = reader.object('spendPin', raw)
+  return { maxShare: reader.money('spendPin.maxShare', pin.maxShare) }
 }
 
 function readInput(reader: FieldReader, raw: unknown): InputNumbers {

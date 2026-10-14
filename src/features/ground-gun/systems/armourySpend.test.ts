@@ -8,9 +8,12 @@ import { ARMOURY_SPEND_FAMILY } from './armourySpend'
 import { AUTO_GUNS_MODULES } from './autoGunsLane'
 import { MOUNT_PART_ID, trackPartIdOf } from './boreGunContent'
 import { SHIPPED_BORE_GUN_MODULES } from './boreGunLane'
+import { GROUND_GUN } from './groundGunEconomy'
 
-// The spend guard's one `armoury` row (#310 Systems point 2; ticket 371): every weapon buy, the
-// kernel turret's included, folds into one row a planet, read from the family tag.
+// The spend guard's one `armoury` row (#310 Systems point 2; ticket 371): every weapon buy through
+// a slice folds into one row a planet, read from the family tag. The kernel turret's mount is a
+// one-time unlock filed under kernel.buy_gun alone, and the gun-track pin counts recurring buys
+// only (GD ruling on #371).
 
 function sliceSpend(planetIndex: number, boughtId: string, cost: string): ShopSpend {
   return {
@@ -39,6 +42,8 @@ function rowsAsText(spends: readonly ShopSpend[]) {
   )
 }
 
+const isPinned = (spend: ShopSpend) => ARMOURY_SPEND_FAMILY.sharePin?.isPinned(spend) ?? false
+
 const SIGHT = SHIPPED_BORE_GUN_MODULES[0]
 const DIRECTOR = AUTO_GUNS_MODULES[0]
 
@@ -55,11 +60,34 @@ describe('armoury spend family', () => {
     ])
   })
 
-  it('files the turret mount here, not under kernel.buy_gun', () => {
-    const rows = rowsAsText([kernelSpend(4, 'buyGun', '250')])
-    expect(rows).toEqual([
-      { planetIndex: 4, familyId: 'ground-gun.armoury', spend: canonical('250') },
+  it('files the turret mount once, under kernel.buy_gun, never in the armoury row or its pin', () => {
+    const mount = kernelSpend(4, 'buyGun', '250')
+    expect(rowsAsText([mount])).toEqual([
+      { planetIndex: 4, familyId: 'kernel.buy_gun', spend: canonical('250') },
     ])
+    expect(ARMOURY_SPEND_FAMILY.sharePin?.isPinned(mount)).toBe(false)
+  })
+
+  it('pins the bore gun’s track levels, lane nodes, modules and Marks', () => {
+    const recurring = [
+      sliceSpend(1, trackPartIdOf('penetration'), '6'),
+      sliceSpend(2, SIGHT.node.id, '100'),
+      sliceSpend(2, SIGHT.itemId, '40'),
+      sliceSpend(5, `tech.mark.${DIRECTOR.itemId}.2`, '70'),
+    ]
+    expect(recurring.filter((spend) => isPinned(spend))).toEqual(recurring)
+  })
+
+  it('leaves the bore gun’s one-time mount out of the pin, though the armoury row counts it', () => {
+    const mount = sliceSpend(1, MOUNT_PART_ID, '5')
+    expect(isPinned(mount)).toBe(false)
+    expect(rowsAsText([mount])).toEqual([
+      { planetIndex: 1, familyId: 'ground-gun.armoury', spend: canonical('5') },
+    ])
+  })
+
+  it('caps the pinned share at the slice’s spend pin', () => {
+    expect(ARMOURY_SPEND_FAMILY.sharePin?.maxShare).toEqual(GROUND_GUN.spendPin.maxShare)
   })
 
   it('counts the bore gun mount, its tracks and the auto_guns lane modules', () => {

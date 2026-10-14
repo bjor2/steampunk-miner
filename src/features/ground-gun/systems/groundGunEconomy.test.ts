@@ -46,6 +46,10 @@ describe('ground gun economy', () => {
     expect(GROUND_GUN.bot).toEqual({ minShots: 60 })
   })
 
+  it('reads the gun-track pin as 5% of a planet’s spend', () => {
+    expect(GROUND_GUN.spendPin).toEqual({ maxShare: fromCanonical('0.05') })
+  })
+
   it('reads the turret cap of 10 tiles and energy per shot as the past-cap stat', () => {
     expect(GROUND_GUN.turret).toEqual({ gunRangeCap: 10, pastCapStat: 'energyPerShot' })
   })

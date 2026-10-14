@@ -2,8 +2,9 @@
  * The #212 report's family rows (GD ruling Q3 (a) and Q4 on #212, TD lock "K-sf"): per planet, each
  * spend family's share of what the pacing bot bought there, read from the kernel `spendFamilies`
  * registry so the tech tree imports no slice. A family counts only while its anchor row is live on
- * that seed's run. Report-only: only the tree total is gated. The weapon spend prints as the one
- * `armoury` row its slice registers, the kernel turret mount inside it (ticket 371).
+ * that seed's run. Report-only: the tree total and the families' share pins (`familySharePins.ts`)
+ * are gated. The slices' weapon spend prints as the one `armoury` row its slice registers; the
+ * kernel turret's one-time mount prints as `kernel.buy_gun` (GD ruling on #371).
  */
 import type { ShopSpend } from '../../../systems/bot/shopSpend'
 import { cmp, div, ZERO_MONEY, type Money } from '../../../systems/money'

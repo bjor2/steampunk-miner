@@ -5,9 +5,10 @@
  *
  * - Numerator: node research (capabilities, slots, combos and Marks) and the tree-unlocked items
  *   bought, the tree's two bot purchases (`tech-tree.research`, `tech-tree.buy-item`), and the
- *   kernel turret mount (`buyGun`): the armoury's share counts inside the tree's (#310 Systems
- *   point 2), and the turret is its only weapon buy outside the tree (TD, GD accepted 14 Oct;
- *   ticket 371). The bot buys no bore gun level (#347), so no other weapon brass reaches here.
+ *   kernel turret mount (`buyGun`, the `kernel.buy_gun` family): the armoury's share counts inside
+ *   the tree's (#310 Systems point 2), and the mount, a one-time unlock, counts here once (TD, GD
+ *   accepted 14 Oct; GD ruling on #371). The bot buys no bore gun level (#347), so no other weapon
+ *   brass reaches here.
  * - Denominator: everything the bot bought on the planet. The spend records hold no travel, so
  *   travel never counts; a restock (charges, consumables) is a purchase but not tree spend, so it
  *   counts in the denominator only (Vertical on the #157 gap review).

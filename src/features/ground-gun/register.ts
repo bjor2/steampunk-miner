@@ -10,8 +10,8 @@
  * `hull.front` as a vehicle piece, its barrel turned to the aim (ticket 315). The
  * `armoury.bore_gun` lane (ticket 318) adds the shipped modules as store items with their tech
  * nodes, cards and seller: the gimbal sight aims an unaimed shot, the steam sear answers auto mode
- * and the long barrel sets the reach and the hold. Every weapon buy, the kernel turret's too, files
- * under the spend guard's one `armoury` family row (ticket 371).
+ * and the long barrel sets the reach and the hold. Every weapon buy through a slice files under
+ * the spend guard's one `armoury` family row, with its gun-track pin (ticket 371).
  * No side effects at import; the loader calls `register`.
  */
 import type { SliceDefinition } from '../../registries/sliceDefinition'
