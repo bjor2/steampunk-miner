@@ -1,9 +1,12 @@
 /**
- * The local player's fire input (ticket 314): the one writer of the fire tile's press and hold.
- * The tile's handlers press, drag and release it; each rendered frame hands it the authority's
- * tick, and a due shot goes out as `ground_gun.fire` through the player's own intent path, so the
- * command log records it at the tick it was allowed. The authority's refusals come back through
- * the domain events: a `recovering` one is silent, any other clanks once.
+ * The local player's fire input (ticket 314): the one writer of the fire tile's press and hold, and
+ * of the fire key's (`fire_ground_gun`, the mouse button or key of ticket 345). The tile's handlers
+ * press, drag and release it; the key's press comes through the input reaction, which sends a shot
+ * the recovery allows at once, and each frame reads whether the key is still down (`isActionDown`)
+ * and where the cursor aims. Each rendered frame hands it the authority's tick, and a due shot goes
+ * out as `ground_gun.fire` through the player's own intent path, so the command log records it at
+ * the tick it was allowed. The authority's refusals come back through the domain events: a
+ * `recovering` one is silent, any other clanks once.
  *
  * Plain module state, not a store field: it changes on input and every frame, and only the
  * reticle reads the aim, on the frame (CLAUDE.md, frame loop rules).
@@ -14,9 +17,12 @@ import type { CommandIntent } from '../../../systems/authority/authorityCommand'
 import type { DomainEvent } from '../../../systems/authority/domainEvent'
 import { readAuthorityState } from '../../../store/authorityLink'
 import { useGameStore } from '../../../store/gameStore'
+import { isActionDown } from '../../../store/inputRuntime'
 import { requestSoundCue } from '../../../store/soundCueRequests'
 import { bearingOfAim, facingBearingOf, type RigAim } from '../systems/fireAim'
-import { isClankRefusal, refusedFire } from '../systems/fireHold'
+import { isClankRefusal, refusedFire, fireStepAt } from '../systems/fireHold'
+import { keyFrameInput, keyPressedInput, keyReleasedByRefusal } from '../systems/fireKey'
+import { gunLevelsOf, isGunMounted } from '../systems/gunLevels'
 import { FIRE_TILE_FEEL } from '../systems/render/fireTileFeel'
 import {
   cancelledTile,
@@ -29,8 +35,11 @@ import {
 } from '../systems/tilePress'
 
 const FIRE_COMMAND = 'ground_gun.fire'
+export const FIRE_ACTION = 'fire_ground_gun'
 
 let input: FireInput = IDLE_INPUT
+/** Where the mouse aimed on the last frame (`advanceFire`'s argument); null with no mouse. */
+let cursorAim: RigAim | null = null
 
 export function pressFireTile(): void {
   input = pressedTile(input, readAuthorityState().tick)
@@ -44,17 +53,35 @@ export function aimFireTile(aim: RigAim): void {
 export function releaseFireTile(): void {
   const state = readAuthorityState()
   input = releasedTile(input, state.tick, facingBearingOf(facingOf(state)))
-  advanceFire()
+  advanceFire(cursorAim)
 }
 
 export function cancelFireTile(): void {
   input = cancelledTile(input)
 }
 
-/** Each rendered frame: a long press starts the held gun, and a due shot goes out. */
-export function advanceFire(): void {
+/**
+ * The fire key goes down (the `fire_ground_gun` input reaction): with the gun mounted it holds
+ * along the cursor's aim, and the shot is the reaction's intent when the recovery allows it now.
+ * With no gun nothing changes and nothing is sent.
+ */
+export function pressFireKey(state: AuthorityState, playerId: string): CommandIntent | null {
+  if (!isGunMounted(gunLevelsOf(state, playerId))) return null
+  input = keyPressedInput(input, keyBearingOf(state), state.tick)
+  const step = fireStepAt(input.hold, state.tick, nextShotTickOf(state, playerId))
+  input = { ...input, hold: step.hold }
+  return step.shotBearing === null ? null : fireIntentOf(step.shotBearing)
+}
+
+/**
+ * Each rendered frame, with the cursor's aim this frame: the key follows the cursor, a long press
+ * starts the held gun, and a due shot goes out.
+ */
+export function advanceFire(aim: RigAim | null): void {
+  cursorAim = aim
   const state = readAuthorityState()
   const playerId = localPlayerId()
+  input = keyFrameInput(input, isActionDown(FIRE_ACTION), keyBearingOf(state))
   const frame = frameOfTile(
     input,
     state.tick,
@@ -70,7 +97,7 @@ export function advanceFire(): void {
 export function hearFireRefusals(events: readonly DomainEvent[], playerId: string): void {
   for (const reason of fireRefusalsOf(events, playerId)) {
     input = { ...input, hold: refusedFire(input.hold, reason) }
-    if (isClankRefusal(reason)) requestSoundCue(FIRE_TILE_FEEL.refusalClank.id)
+    if (isClankRefusal(reason)) clankRefusedShot()
   }
 }
 
@@ -82,11 +109,27 @@ export function readAimBearing(): number | null {
 /** Forget any press and hold, as a fresh session starts. */
 export function resetFireInput(): void {
   input = IDLE_INPUT
+  cursorAim = null
 }
 
 function sendShot(bearing: number): void {
-  const intent: CommandIntent = { type: FIRE_COMMAND, payload: { bearing } }
-  useGameStore.getState().submitPlayerIntent(intent)
+  useGameStore.getState().submitPlayerIntent(fireIntentOf(bearing))
+}
+
+function fireIntentOf(bearing: number): CommandIntent {
+  return { type: FIRE_COMMAND, payload: { bearing } }
+}
+
+/** A blocked shot clanks, and a held key holds nothing more until it is pressed again. */
+function clankRefusedShot(): void {
+  input = keyReleasedByRefusal(input)
+  requestSoundCue(FIRE_TILE_FEEL.refusalClank.id)
+}
+
+/** The cursor's aim snapped into the arc, or the facing with no mouse over the canvas. */
+function keyBearingOf(state: AuthorityState): number {
+  const facing = facingOf(state)
+  return cursorAim === null ? facingBearingOf(facing) : bearingOfAim(cursorAim, facing)
 }
 
 function fireRefusalsOf(events: readonly DomainEvent[], playerId: string): string[] {

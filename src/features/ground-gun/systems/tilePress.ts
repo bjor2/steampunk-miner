@@ -35,6 +35,8 @@ export interface TilePress {
 export interface FireInput {
   press: TilePress
   hold: FireHold
+  /** The fire key or mouse button holds the gun (`fireKey`), not a finger on the tile. */
+  isKeyHeld: boolean
 }
 
 export const UNTOUCHED_TILE: TilePress = {
@@ -44,7 +46,7 @@ export const UNTOUCHED_TILE: TilePress = {
   hasFired: false,
 }
 
-export const IDLE_INPUT: FireInput = { press: UNTOUCHED_TILE, hold: IDLE_FIRE }
+export const IDLE_INPUT: FireInput = { press: UNTOUCHED_TILE, hold: IDLE_FIRE, isKeyHeld: false }
 
 export interface TileFrame {
   input: FireInput
@@ -60,6 +62,7 @@ export function pressedTile(input: FireInput, tick: number): FireInput {
 export function draggedTile(input: FireInput, bearing: number): FireInput {
   if (input.press.phase === 'idle') return input
   return {
+    ...input,
     press: { ...input.press, phase: 'aiming', aimBearing: bearing },
     hold: releasedFire(aimedFire(input.hold, bearing)),
   }
@@ -76,17 +79,17 @@ export function frameOfTile(
   const held = withHoldStarted(input, tick, facingBearing, holdFireTicks)
   const step = fireStepAt(held.hold, tick, nextShotTick)
   const press = step.shotBearing === null ? held.press : { ...held.press, hasFired: true }
-  return { input: { press, hold: step.hold }, shotBearing: step.shotBearing }
+  return { input: { ...held, press, hold: step.hold }, shotBearing: step.shotBearing }
 }
 
 /** The finger lifts: a tap or an aim fires as a tap; a hold lets go. */
 export function releasedTile(input: FireInput, tick: number, facingBearing: number): FireInput {
-  return { press: UNTOUCHED_TILE, hold: holdOnRelease(input, tick, facingBearing) }
+  return { ...input, press: UNTOUCHED_TILE, hold: holdOnRelease(input, tick, facingBearing) }
 }
 
 /** The press is lost (the finger slid off, the system took it): nothing more fires. */
 export function cancelledTile(input: FireInput): FireInput {
-  return { press: UNTOUCHED_TILE, hold: releasedFire(input.hold) }
+  return { ...input, press: UNTOUCHED_TILE, hold: releasedFire(input.hold) }
 }
 
 function withHoldStarted(
@@ -97,7 +100,11 @@ function withHoldStarted(
 ): FireInput {
   const { press } = input
   if (press.phase !== 'pending' || tick - press.pressedTick < holdFireTicks) return input
-  return { press: { ...press, phase: 'held' }, hold: heldFire(input.hold, facingBearing) }
+  return {
+    ...input,
+    press: { ...press, phase: 'held' },
+    hold: heldFire(input.hold, facingBearing),
+  }
 }
 
 function holdOnRelease(input: FireInput, tick: number, facingBearing: number): FireHold {

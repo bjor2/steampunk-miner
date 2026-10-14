@@ -12,6 +12,7 @@
 import type { SliceDefinition } from '../../registries/sliceDefinition'
 import { groundGunDebugActions } from './debug'
 import { GROUND_GUN_PROJECTIONS, GROUND_GUN_RUN_EVENTS } from './logging'
+import { FIRE_KEY_REACTION } from './store/fireKeyReaction'
 import { boreGunCards } from './systems/boreGunCards'
 import { BORE_GUN_KIND, boreGunParts } from './systems/boreGunContent'
 import { BORE_PICKUP_REACTION } from './systems/borePickup'
@@ -36,6 +37,7 @@ export const slice: SliceDefinition = {
     r.bayEntry(GUN_BAY_ENTRIES)
     r.boreGun(GROUND_GUN_PROVIDER)
     r.authorityReaction(BORE_PICKUP_REACTION)
+    r.inputReaction(FIRE_KEY_REACTION)
     r.eventProjections(GROUND_GUN_PROJECTIONS)
     r.runEvents(GROUND_GUN_RUN_EVENTS)
     r.hudPanel({ id: 'ground-gun.fire-tile', slot: 'slots', Panel: FireTile })
