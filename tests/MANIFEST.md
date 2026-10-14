@@ -478,10 +478,11 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/tech-tree/ui/nodeCardHold.test.ts` | 4 | 4 |
 | `src/features/tech-tree/ui/techTreeScreen.test.ts` | 5 | 5 |
 
-### `terrain-tools`: 40 files, 321 tests
+### `terrain-tools`: 42 files, 346 tests
 
 | File | Tests | Sites |
 | --- | --- | --- |
+| `src/features/terrain-tools/foamCurePace.lane.test.ts` | 11 | 1 |
 | `src/features/terrain-tools/foamPace.test.ts` | 3 | 1 |
 | `src/features/terrain-tools/logging.test.ts` | 2 | 2 |
 | `src/features/terrain-tools/magnetFieldsBench.test.ts` | 2 | 2 |
@@ -495,6 +496,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/terrain-tools/systems/clampLattice.test.ts` | 4 | 4 |
 | `src/features/terrain-tools/systems/dragHooks.test.ts` | 35 | 8 |
 | `src/features/terrain-tools/systems/foamCards.test.ts` | 5 | 5 |
+| `src/features/terrain-tools/systems/foamCure.test.ts` | 14 | 14 |
 | `src/features/terrain-tools/systems/foamResearch.test.ts` | 5 | 5 |
 | `src/features/terrain-tools/systems/gatesFixture.test.ts` | 22 | 5 |
 | `src/features/terrain-tools/systems/lodeClamp.test.ts` | 16 | 12 |

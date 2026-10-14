@@ -215,8 +215,13 @@ import type { DriveSigns } from '../vehicle/driveSigns'
  *    ticks and the `terrain-tools.lapse-foam` clock step drops each cell as it lapses. Researching
  *    foam's node owns it with a full stack (`terrain-tools.FoamStocked`). With no foam owned no
  *    digest or mined order changes.
+ * 67: stabiliser foam's permanent cure (ticket 368, piece iv of the #157 seam): a spray at the
+ *    Mark that masters foam also cures its set cells into the `terrain-tools.cured-foam` session
+ *    section v1, read through the `groundReinforcement` registry, each billed onto the lining bill
+ *    at its band and logged as `terrain-tools.FoamCured`. With no foam cured no digest or mined
+ *    order changes.
  */
-export const AUTHORITY_PROTOCOL_VERSION = 66
+export const AUTHORITY_PROTOCOL_VERSION = 67
 
 /** The kernel's own commands: the closed set its rule tables are written against. */
 export interface KernelCommandPayloads {
