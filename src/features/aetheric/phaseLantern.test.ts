@@ -333,26 +333,22 @@ describe('phase lantern', () => {
     expect(chargesLeftOf(fight.session.state(), PLAYER, LANTERN_ID)).toBe(LANTERN.charges)
   })
 
-  it('phasing ends centred in the landing cell with zero velocity: steered there, held against gravity, until it lands', () => {
-    // The authority's half: the kernel motion seam steers the body to the landing cell's centre
-    // (a reel arrives exactly on the step that reaches it) with gravity paused, for the whole
-    // move and not a tick longer; the body's own pass through the cell is the physics layer's.
+  it('phasing ends centred in the landing cell with zero velocity: a glide through the cell, until it lands', () => {
+    // The authority's half: the kernel's glide (ticket 390) takes the body at one speed to the
+    // landing cell's centre, at rest there by the move's end, input locked, gravity paused and
+    // the phased cell's walls passed through, for the whole move and not a tick longer. The
+    // body's own pass is `src/physics/glidePassThrough.test.ts`.
     const fight = phaseFight({ ticks: LANTERN.windupTicks })
-    const held = {
-      reelTo: { x: fight.landing.tx + 0.5, y: fight.landing.ty + 0.5 },
-      isHovering: true,
-    }
     for (let tick = fight.actTick; tick < fight.actTick + fight.bitTicks; tick++) {
-      expect(vehicleMotionAt(fight.session.state(), PLAYER, tick), `tick ${tick}`).toMatchObject(
-        held,
-      )
+      expect(vehicleMotionAt(fight.session.state(), PLAYER, tick).glide, `tick ${tick}`).toEqual({
+        to: { x: fight.landing.tx + 0.5, y: fight.landing.ty + 0.5 },
+        stepsLeft: fight.actTick + fight.bitTicks - tick,
+        passThrough: fight.cell,
+      })
     }
     expect(
-      vehicleMotionAt(fight.session.state(), PLAYER, fight.actTick + fight.bitTicks),
-    ).toMatchObject({
-      reelTo: null,
-      isHovering: false,
-    })
+      vehicleMotionAt(fight.session.state(), PLAYER, fight.actTick + fight.bitTicks).glide,
+    ).toBeNull()
     expect(powerUpOfItem(LANTERN_ID)?.holdOf?.(fight.session.state(), PLAYER)).toEqual({
       startTick: fight.actTick,
       finishTick: fight.actTick + fight.bitTicks,
@@ -382,10 +378,11 @@ describe('phase lantern', () => {
     expect(eventsOfType(fight.session, 'aetheric.PhaseReversed')).toMatchObject([
       { tick: fight.actTick + spent + 1, tx: start.tx, ty: start.ty, ticks: spent + 1 },
     ])
-    expect(vehicleMotionAt(fight.session.state(), PLAYER, fight.actTick + spent + 1)).toMatchObject(
+    expect(vehicleMotionAt(fight.session.state(), PLAYER, fight.actTick + spent + 1).glide).toEqual(
       {
-        reelTo: { x: start.tx + 0.5, y: start.ty + 0.5 },
-        isHovering: true,
+        to: { x: start.tx + 0.5, y: start.ty + 0.5 },
+        stepsLeft: spent + 1,
+        passThrough: fight.cell,
       },
     )
     stepTicks(fight.session, fight.session.state().tick, spent + 1)

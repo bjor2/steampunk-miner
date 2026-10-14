@@ -1,8 +1,8 @@
 /**
- * The phase as it moves (#261, G&V's rules on #261): from the act, the vehicle is steered in a
- * straight line to the centre of its landing cell, held against gravity, with the drive and the
- * lift out of it, through the kernel's motion seam (`vehicleMotionEffects`, ticket 233: a reel
- * sets the velocity outright, so input is locked and gravity paused for the move). The phase clock
+ * The phase as it moves (#261, G&V's rules on #261): from the act, the vehicle glides through the
+ * kernel's motion seam (`vehicleMotionEffects`, the glide of ticket 390) in a straight line at a
+ * constant speed to the centre of its landing cell, arriving at rest on the move's last tick, with
+ * input locked, gravity paused and the body passing through the phased cell's walls. The phase clock
  * (`clockSteps`) runs each tick a phase is under way: at the move's last tick it lands the vehicle
  * (`PhaseLanded`, a chime) and clears the record, so a finished phase leaves the section, the save
  * and the digest. If the landing cell stops being open before then (rubble, an enemy) the move
@@ -14,13 +14,14 @@
  * The slot's ring fills over the move (`holdOf`); a refused phase clanks lightly like a cancelled
  * hold (`slotHoldCues`, ticket 253), the lock's `playClank('light')`.
  */
-import type { AuthorityState } from '../../../systems/authority/authorityState'
+import { vehicleOf, type AuthorityState } from '../../../systems/authority/authorityState'
 import { unchanged, type RuleEffect } from '../../../systems/authority/commandRule'
 import type { DomainEvent, DomainEventBody } from '../../../systems/authority/domainEvent'
 import { planetParamsOf } from '../../../systems/authority/planetOfState'
 import type { ClockStep } from '../../../systems/registries/clockSteps'
 import type { SlotHoldCueSource, SlotHoldEnd } from '../../../systems/registries/slotHoldCues'
 import type {
+  MotionGlide,
   VehicleMotionEffect,
   VehicleMotionEffectSource,
 } from '../../../systems/registries/vehicleMotionEffects'
@@ -33,7 +34,7 @@ import { NOT_PHASING, phaseOf, withPhase, type PhaseMove } from './phaseSection'
 
 export const PHASE_MOTION: VehicleMotionEffectSource = {
   id: 'aetheric.phase-lantern',
-  effectOf: (state, playerId, tick) => motionOf(phaseOf(state, playerId).phase, tick),
+  effectOf: (state, playerId, tick) => motionOf(state, playerId, tick),
 }
 
 export const PHASE_CLOCK: ClockStep = {
@@ -54,10 +55,27 @@ export function phaseHoldOf(state: AuthorityState, playerId: string): SlotHold |
   return phase === null ? null : { startTick: phase.startTick, finishTick: phase.endTick }
 }
 
-/** Steered to the landing cell's centre and held against gravity while the move runs. */
-function motionOf(phase: PhaseMove | null, tick: number): VehicleMotionEffect | null {
+/**
+ * A glide through the phased cell to the landing cell's centre, at rest by the move's end; none
+ * once the vehicle is towed to the dock, which the tow has already placed.
+ */
+function motionOf(
+  state: AuthorityState,
+  playerId: string,
+  tick: number,
+): VehicleMotionEffect | null {
+  const phase = phaseOf(state, playerId).phase
   if (phase === null || tick >= phase.endTick) return null
-  return { reelTo: { tx: phase.toTx, ty: phase.toTy }, hover: true }
+  if (vehicleOf(state, playerId).mode === 'docked') return null
+  return { glide: glideOf(phase) }
+}
+
+function glideOf(phase: PhaseMove): MotionGlide {
+  return {
+    to: { tx: phase.toTx, ty: phase.toTy },
+    untilTick: phase.endTick,
+    passThrough: { tx: phase.cellTx, ty: phase.cellTy },
+  }
 }
 
 function phaseHoldEndOf(event: DomainEvent): SlotHoldEnd | null {
