@@ -202,7 +202,7 @@ export function markLadderOf(itemId: string): MarkLadder {
 }
 
 /** The one-off price (#162 4.1): `modulePrice` band ore at the planet the module unlocks on. */
-export function modulePriceOf(module: BoreGunModule): Money {
+export function modulePriceOf(module: { node: { unlockTier: number } }): Money {
   const planet = module.node.unlockTier
   return bandOrePriceAt(GROUND_GUN.modulePrice, planet, planet)
 }

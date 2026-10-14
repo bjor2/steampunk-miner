@@ -137,14 +137,17 @@ describe('turret shape: no provider, no change (ticket 382, acceptance 1)', () =
   })
 
   it('writes no turret field into the state with no provider', () => {
-    const session = createScriptedSession()
-    const start = standoff(session, [['crawler', -3, 0]])
-    standUntil(session, start, start + 120)
-    expect(session.vehicle().stillSinceTick).toBeUndefined()
-    expect(session.state().combat.vehicles.p1.directorPick).toBeUndefined()
-    expect(
-      session.state().combat.vehicles.p1.pendingGunHits.every((hit) => hit.energy === undefined),
-    ).toBe(true)
+    // The ground-gun slice provides turret shapes (ticket 388), so "no provider" is a bare set.
+    withRegistrations([], () => {
+      const session = createScriptedSession()
+      const start = standoff(session, [['crawler', -3, 0]])
+      standUntil(session, start, start + 120)
+      expect(session.vehicle().stillSinceTick).toBeUndefined()
+      expect(session.state().combat.vehicles.p1.directorPick).toBeUndefined()
+      expect(
+        session.state().combat.vehicles.p1.pendingGunHits.every((hit) => hit.energy === undefined),
+      ).toBe(true)
+    })
   })
 
   it('reads the shape once per due shot, never while the guns wait out the interval', () => {

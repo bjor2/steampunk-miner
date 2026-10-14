@@ -19,7 +19,10 @@
  * is also the shoring shot (ticket 369, piece iii of the #157 seam): the cells it opens are held as
  * permanent ground from the `ground-gun.shot-cells` section, each billed at its band. Every weapon
  * buy through a slice files under the spend guard's one `armoury` family row, with its gun-track
- * pin (ticket 371).
+ * pin (ticket 371). The `armoury.auto_guns` lane (ticket 388) adds the turret's eight modules as
+ * store items with their nodes, cards and seller: while the guns are mounted and a module hangs at
+ * its `turret.*` mount, it shapes the kernel turret's shot through the `autoGuns` provider, and the
+ * Flushing shell drives burrowers out through the `enemyFlushes` registry.
  * No side effects at import; the loader calls `register`.
  */
 import type { SliceDefinition } from '../../registries/sliceDefinition'
@@ -32,6 +35,11 @@ import { TURRET_MODULES_PIECE_ID, TurretModulesPiece } from './scene/TurretModul
 import { FIRE_KEY_REACTION } from './store/fireKeyReaction'
 import { boreGunCards } from './systems/boreGunCards'
 import { BORE_GUN_KIND, boreGunParts } from './systems/boreGunContent'
+import {
+  autoGunsTechNodeOf,
+  autoGunsVehicleItemOf,
+  SHIPPED_AUTO_GUNS_MODULES,
+} from './systems/autoGunsLane'
 import { SHIPPED_BORE_GUN_MODULES, techNodeOf, vehicleItemOf } from './systems/boreGunLane'
 import { BORE_PICKUP_REACTION } from './systems/borePickup'
 import { GROUND_GUN_PROVIDER } from './systems/boreGunProvider'
@@ -46,6 +54,9 @@ import { SHORING_SHOT_REACTION } from './systems/shoringShot'
 import { SHOT_CELL_REINFORCEMENT, SHOT_CELLS_SECTION } from './systems/shotCells'
 import { GUN_PURCHASE_RULES } from './systems/gunPurchase'
 import { boreGunModuleCards } from './systems/moduleCards'
+import { FLUSHING_SHELL_FLUSH } from './systems/flushingShell'
+import { autoGunsModuleCards } from './systems/turretModuleCards'
+import { AUTO_GUNS_PROVIDER } from './systems/turretShapes'
 import { BORE_GUN_MODULE_SELLER } from './systems/moduleSales'
 import { FireGauge } from './ui/FireGauge'
 import { FireReticle } from './ui/FireReticle'
@@ -65,11 +76,16 @@ export const slice: SliceDefinition = {
     r.content('vehicle-item', SHIPPED_BORE_GUN_MODULES.map(vehicleItemOf))
     r.content('tech-node', SHIPPED_BORE_GUN_MODULES.map(techNodeOf))
     r.itemDescriptionEntries(boreGunModuleCards())
+    r.content('vehicle-item', SHIPPED_AUTO_GUNS_MODULES.map(autoGunsVehicleItemOf))
+    r.content('tech-node', SHIPPED_AUTO_GUNS_MODULES.map(autoGunsTechNodeOf))
+    r.itemDescriptionEntries(autoGunsModuleCards())
     r.vehicleItemSeller(BORE_GUN_MODULE_SELLER)
     r.commandRules(GUN_PURCHASE_RULES)
     r.bayEntry(GUN_BAY_ENTRIES)
     r.spendFamily(ARMOURY_SPEND_FAMILY)
     r.boreGun(GROUND_GUN_PROVIDER)
+    r.autoGuns(AUTO_GUNS_PROVIDER)
+    r.enemyFlush(FLUSHING_SHELL_FLUSH)
     r.authorityReaction(BORE_PICKUP_REACTION)
     r.authorityReaction(MODULE_USE_REACTION)
     r.authorityReaction(SHORING_SHOT_REACTION)

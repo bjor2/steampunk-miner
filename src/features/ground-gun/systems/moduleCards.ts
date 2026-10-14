@@ -10,14 +10,13 @@ import { TICKS_PER_SECOND } from '../../../constants/physics'
 import { STEAM_SEAR_ITEM_ID } from '../../../systems/authority/bore/boreFire'
 import { div, fromSafeInteger, type Money } from '../../../systems/money'
 import { WHOLE_BP } from '../../../systems/registries/boreGun'
-import type { ItemCtx, ItemRef } from '../../../systems/registries/itemDescriber'
+import type { ItemCtx } from '../../../systems/registries/itemDescriber'
 import type { ItemDescriptionEntry } from '../../../systems/registries/itemDescriptionEntries'
 import { hasNoNextLevel, type DescribedStatLineSpec } from '../../descriptions'
-import { isMasteredAt } from '../../tech-tree'
+import { isMasteredAt, type MarkLadder } from '../../tech-tree'
 import { moduleStatsAt } from './armouryModules'
 import { searWaitTicksAt, sightRetargetTicksAt } from './boreGunModules'
 import {
-  boreGunModuleOf,
   CEMENTING_ROUND_ITEM_ID,
   EARTHING_SPIKE_ITEM_ID,
   GIMBAL_SIGHT_ITEM_ID,
@@ -28,7 +27,6 @@ import {
   markLadderOf,
   modulePriceOf,
   SHIPPED_BORE_GUN_MODULES,
-  type BoreGunModule,
 } from './boreGunLane'
 import { longBarrelAt } from './boreLadders'
 import { GROUND_GUN } from './groundGunEconomy'
@@ -36,7 +34,7 @@ import { GROUND_GUN } from './groundGunEconomy'
 const BOUGHT_MARK = 1
 
 /** One stat a module's card prints at a Mark. */
-interface ModuleStatLine {
+export interface ModuleStatLine {
   label: string
   valueAt(mark: number): Money
 }
@@ -86,8 +84,17 @@ const MODULE_STAT_LINES: Readonly<Record<string, readonly ModuleStatLine[]>> = {
   ],
 }
 
+/** What a card reads of an armoury module of either lane. */
+export interface CardedModule {
+  itemId: string
+  description: string
+  node: { unlockTier: number }
+}
+
 export function boreGunModuleCards(): ItemDescriptionEntry[] {
-  return SHIPPED_BORE_GUN_MODULES.map(cardOf)
+  return SHIPPED_BORE_GUN_MODULES.map((module) =>
+    moduleCardOf(module, MODULE_STAT_LINES[module.itemId] ?? [], markLadderOf),
+  )
 }
 
 /** The Mark a card's level names: Mark 1 before any Mark is researched. */
@@ -95,25 +102,33 @@ export function moduleMarkOfLevel(level: number): number {
   return Math.max(BOUGHT_MARK, level)
 }
 
-function cardOf(module: BoreGunModule): ItemDescriptionEntry {
+/** The module's card: its flavour, each stat at the card's Mark, then its one-off price. */
+export function moduleCardOf(
+  module: CardedModule,
+  lines: readonly ModuleStatLine[],
+  ladderOf: (itemId: string) => MarkLadder,
+): ItemDescriptionEntry {
   return {
     id: `ground-gun.${module.itemId.slice('weapon.'.length)}`,
     matches: { kind: 'vehicle-item', id: module.itemId },
     flavour: module.description,
-    statLines: [...(MODULE_STAT_LINES[module.itemId] ?? []).map(markLineOf), priceLineOf(module)],
+    statLines: [...lines.map((line) => markLineOf(line, ladderOf)), priceLineOf(module)],
   }
 }
 
-function markLineOf(line: ModuleStatLine): DescribedStatLineSpec {
+function markLineOf(
+  line: ModuleStatLine,
+  ladderOf: (itemId: string) => MarkLadder,
+): DescribedStatLineSpec {
   return {
     label: line.label,
     kind: 'linearInt',
     value: (_ref, ctx) => line.valueAt(moduleMarkOfLevel(ctx.level)),
-    nextLevel: nextMarkOf,
+    nextLevel: (ref, ctx) => nextMarkOf(ladderOf(ref.id), ctx),
   }
 }
 
-function priceLineOf(module: BoreGunModule): DescribedStatLineSpec {
+function priceLineOf(module: CardedModule): DescribedStatLineSpec {
   return {
     label: 'Price',
     kind: 'geometric',
@@ -122,25 +137,24 @@ function priceLineOf(module: BoreGunModule): DescribedStatLineSpec {
   }
 }
 
-function nextMarkOf(ref: ItemRef, ctx: ItemCtx): number | null {
+function nextMarkOf(ladder: MarkLadder, ctx: ItemCtx): number | null {
   const mark = moduleMarkOfLevel(ctx.level)
-  if (boreGunModuleOf(ref.id) === null || isMasteredAt(markLadderOf(ref.id), mark)) return null
-  return mark + 1
+  return isMasteredAt(ladder, mark) ? null : mark + 1
 }
 
-function secondsOf(ticks: number): Money {
+export function secondsOf(ticks: number): Money {
   return div(fromSafeInteger(ticks), fromSafeInteger(TICKS_PER_SECOND))
 }
 
-function countLineOf(label: string, itemId: string, stat: string): ModuleStatLine {
+export function countLineOf(label: string, itemId: string, stat: string): ModuleStatLine {
   return { label, valueAt: (mark) => fromSafeInteger(statAt(itemId, mark, stat)) }
 }
 
-function secondsLineOf(label: string, itemId: string, stat: string): ModuleStatLine {
+export function secondsLineOf(label: string, itemId: string, stat: string): ModuleStatLine {
   return { label, valueAt: (mark) => secondsOf(statAt(itemId, mark, stat)) }
 }
 
-function statAt(itemId: string, mark: number, stat: string): number {
+export function statAt(itemId: string, mark: number, stat: string): number {
   return moduleStatsAt(itemId, mark).stats[stat]
 }
 

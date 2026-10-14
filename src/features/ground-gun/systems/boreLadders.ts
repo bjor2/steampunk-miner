@@ -12,12 +12,12 @@
 import { ECONOMY } from '../../../systems/economy/economy'
 import { gunRangeTiles } from '../../../systems/economy/gunStats'
 import { fromSafeInteger, mul, toSafeInteger } from '../../../systems/money'
-import { isMasteredAt, markStepOf, type MarkLadder } from '../../tech-tree'
+import { isMasteredAt, lastMarkOf, markStepOf, type MarkLadder } from '../../tech-tree'
 import { GROUND_GUN } from './groundGunEconomy'
 
 const FIRST_MARK = 1
 /** Energy per shot is stepped in thousandths of a unit, the money quantum, so it stays whole. */
-const MILLI_PER_UNIT = 1000
+export const MILLI_PER_UNIT = 1000
 
 export interface LongBarrelStep {
   mark: number
@@ -71,6 +71,11 @@ export function extendedBarrelsAt(mark: number): ExtendedBarrelsStep {
       rangeTiles === GROUND_GUN.turret.gunRangeCap &&
       isMasteredAt(energyPerShotLadder(), energyMark),
   }
+}
+
+/** The Mark at which the range is capped and energy per shot at its floor: the barrels' last. */
+export function extendedBarrelsMasteredMark(): number {
+  return extendedBarrelsRangeMarks() + lastMarkOf(energyPerShotLadder()) - FIRST_MARK
 }
 
 /** The past-cap stat as a tree ladder: a general-limits cooldown in thousandths of a unit. */
