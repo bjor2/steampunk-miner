@@ -66,13 +66,16 @@ function dielectricTracesThrough(lastPlanet: number): unknown[] {
 }
 
 describe('drill-gear shipped rows', () => {
-  it('registers all eight items as vehicle items and power-ups, and eight drill-gear nodes', () => {
+  it('registers all eight items as vehicle items and power-ups, and their eight nodes', () => {
     expect(SHIPPED_IDS).toEqual(DRILL_GEAR_ITEMS.map((item) => item.itemId))
     const vehicleItems = ofIds(contentOf('vehicle-item'))
     const powerUps = contentOf('power-up').map((powerUp) => powerUp.itemId)
     expect(SHIPPED_IDS.filter((id) => !vehicleItems.includes(id))).toEqual([])
     expect(SHIPPED_IDS.filter((id) => !powerUps.includes(id))).toEqual([])
-    const lane = contentOf('tech-node').filter((node) => node.lane === 'drill-gear')
+    // The P16 fork's two branches (ticket 268) are lane nodes too, with no store item.
+    const lane = contentOf('tech-node').filter(
+      (node) => node.lane === 'drill-gear' && !node.id.startsWith('tech.drill_gear.fork.'),
+    )
     expect(lane.map((node) => node.unlocks).sort()).toEqual([...SHIPPED_IDS].sort())
   })
 

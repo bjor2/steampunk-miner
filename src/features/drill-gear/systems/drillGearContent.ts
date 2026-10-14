@@ -2,11 +2,13 @@
  * The lane's rows as the kernel, `power-up-core` and `tech-tree` take them (#205): one
  * `vehicle-item` (its one socket and attach point, #162 acceptance 1), one `power-up` and one
  * `tech-node` per shipped item: all eight since the dielectric bit's effect landed (ticket 292).
+ * The lane's P16 fork adds its two branch nodes, which unlock no store item (ticket 268).
  */
 import type { VehicleItem } from '../../../systems/registries/vehicleLoadout'
 import type { PowerUp } from '../../power-up-core'
 import type { TechNode } from '../../tech-tree'
 import { SHIPPED_DRILL_GEAR, techNodeOf, vehicleItemOf } from './drillGearItems'
+import { DRILL_GEAR_FORK } from './drillGearFork'
 import { powerUpOf } from './drillGearPowerUps'
 
 export const DRILL_GEAR_VEHICLE_ITEMS: readonly VehicleItem[] =
@@ -14,4 +16,7 @@ export const DRILL_GEAR_VEHICLE_ITEMS: readonly VehicleItem[] =
 
 export const DRILL_GEAR_POWER_UPS: readonly PowerUp[] = SHIPPED_DRILL_GEAR.map(powerUpOf)
 
-export const DRILL_GEAR_TECH_NODES: readonly TechNode[] = SHIPPED_DRILL_GEAR.map(techNodeOf)
+export const DRILL_GEAR_TECH_NODES: readonly TechNode[] = [
+  ...SHIPPED_DRILL_GEAR.map(techNodeOf),
+  ...DRILL_GEAR_FORK.branches,
+]
