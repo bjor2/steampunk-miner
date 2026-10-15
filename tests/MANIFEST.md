@@ -729,6 +729,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/authority/signatureCells.test.ts` | 9 | 9 |
 | `src/systems/authority/sliceSectionSnapshot.test.ts` | 12 | 12 |
 | `src/systems/authority/spanBudget.test.ts` | 4 | 4 |
+| `src/systems/authority/startingRigCutSpeed.test.ts` | 2 | 2 |
 | `src/systems/authority/stateDigest.test.ts` | 17 | 12 |
 | `src/systems/authority/sweptCarry.test.ts` | 8 | 6 |
 | `src/systems/authority/sweptCutAtSpeed.test.ts` | 8 | 8 |

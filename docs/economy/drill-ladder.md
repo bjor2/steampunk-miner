@@ -52,3 +52,66 @@ stored level (`debug.setUpgrade`) is a step of ten pips, so major `L` is step `1
   would show it here until #397 removes the floor.
 - To compare a curve change, run `npx vitest run src/logging/drillLadder.test.ts` before and after
   and compare the two `balance-report/drill-ladder.ndjson` files line by line.
+
+## Starting rigs: cut-follow speed per stored step (ticket 431)
+
+The cut-follow's read of `cutSpeed` (`cutFollowAt`, `systems/authority/cutFollowRead.ts`) at stored
+drill_power steps 0 to 30. The rig rests on the planet 1 band-1 surface (hardness 1) with the tip at
+step 0 (tip 1), so `eff` is 1 and the drill law's speed is `D = 1.5 x 1.12^x` cells/s. Here `x` is
+the step's effective level from the #180 pip rule (`stepStats.ts`): `x = L + k/18`, so the nine pips
+of a major share half its gain (1.12^(1/18) = 1.0063 each) and the major step adds the other half
+(1.12^(1/2) = 1.0583). `src/systems/authority/startingRigCutSpeed.test.ts` holds the two lines under
+the table.
+
+| stored | major + pip |      x | law m/s (D) | sub-steps n | read mm/tick | read m/s | read x prev | law x prev | read / law |
+| -----: | ----------: | -----: | ----------: | ----------: | -----------: | -------: | ----------: | ---------: | ---------: |
+|      0 |       0 + 0 | 0.0000 |      1.5000 |        2400 |           25 |     1.50 |             |            |     1.0000 |
+|      1 |       0 + 1 | 0.0556 |      1.5095 |        2385 |           25 |     1.50 |      1.0000 |     1.0063 |     0.9937 |
+|      2 |       0 + 2 | 0.1111 |      1.5190 |        2370 |           25 |     1.50 |      1.0000 |     1.0063 |     0.9875 |
+|      3 |       0 + 3 | 0.1667 |      1.5286 |        2356 |           25 |     1.50 |      1.0000 |     1.0063 |     0.9813 |
+|      4 |       0 + 4 | 0.2222 |      1.5383 |        2341 |           25 |     1.50 |      1.0000 |     1.0063 |     0.9751 |
+|      5 |       0 + 5 | 0.2778 |      1.5480 |        2326 |           25 |     1.50 |      1.0000 |     1.0063 |     0.9690 |
+|      6 |       0 + 6 | 0.3333 |      1.5577 |        2312 |           25 |     1.50 |      1.0000 |     1.0063 |     0.9629 |
+|      7 |       0 + 7 | 0.3889 |      1.5676 |        2297 |           26 |     1.56 |      1.0400 |     1.0063 |     0.9952 |
+|      8 |       0 + 8 | 0.4444 |      1.5775 |        2283 |           26 |     1.56 |      1.0000 |     1.0063 |     0.9889 |
+|      9 |       0 + 9 | 0.5000 |      1.5875 |        2268 |           26 |     1.56 |      1.0000 |     1.0063 |     0.9827 |
+|     10 |       1 + 0 | 1.0000 |      1.6800 |        2143 |           27 |     1.62 |      1.0385 |     1.0583 |     0.9643 |
+|     11 |       1 + 1 | 1.0556 |      1.6906 |        2130 |           28 |     1.68 |      1.0370 |     1.0063 |     0.9937 |
+|     12 |       1 + 2 | 1.1111 |      1.7013 |        2117 |           28 |     1.68 |      1.0000 |     1.0063 |     0.9875 |
+|     13 |       1 + 3 | 1.1667 |      1.7120 |        2103 |           28 |     1.68 |      1.0000 |     1.0063 |     0.9813 |
+|     14 |       1 + 4 | 1.2222 |      1.7228 |        2090 |           28 |     1.68 |      1.0000 |     1.0063 |     0.9751 |
+|     15 |       1 + 5 | 1.2778 |      1.7337 |        2077 |           28 |     1.68 |      1.0000 |     1.0063 |     0.9690 |
+|     16 |       1 + 6 | 1.3333 |      1.7447 |        2064 |           29 |     1.74 |      1.0357 |     1.0063 |     0.9973 |
+|     17 |       1 + 7 | 1.3889 |      1.7557 |        2051 |           29 |     1.74 |      1.0000 |     1.0063 |     0.9911 |
+|     18 |       1 + 8 | 1.4444 |      1.7668 |        2038 |           29 |     1.74 |      1.0000 |     1.0063 |     0.9848 |
+|     19 |       1 + 9 | 1.5000 |      1.7779 |        2025 |           29 |     1.74 |      1.0000 |     1.0063 |     0.9787 |
+|     20 |       2 + 0 | 2.0000 |      1.8816 |        1914 |           31 |     1.86 |      1.0690 |     1.0583 |     0.9885 |
+|     21 |       2 + 1 | 2.0556 |      1.8935 |        1902 |           31 |     1.86 |      1.0000 |     1.0063 |     0.9823 |
+|     22 |       2 + 2 | 2.1111 |      1.9054 |        1890 |           31 |     1.86 |      1.0000 |     1.0063 |     0.9762 |
+|     23 |       2 + 3 | 2.1667 |      1.9175 |        1878 |           31 |     1.86 |      1.0000 |     1.0063 |     0.9700 |
+|     24 |       2 + 4 | 2.2222 |      1.9296 |        1866 |           32 |     1.92 |      1.0323 |     1.0063 |     0.9950 |
+|     25 |       2 + 5 | 2.2778 |      1.9418 |        1854 |           32 |     1.92 |      1.0000 |     1.0063 |     0.9888 |
+|     26 |       2 + 6 | 2.3333 |      1.9540 |        1843 |           32 |     1.92 |      1.0000 |     1.0063 |     0.9826 |
+|     27 |       2 + 7 | 2.3889 |      1.9664 |        1831 |           32 |     1.92 |      1.0000 |     1.0063 |     0.9764 |
+|     28 |       2 + 8 | 2.4444 |      1.9788 |        1820 |           32 |     1.92 |      1.0000 |     1.0063 |     0.9703 |
+|     29 |       2 + 9 | 2.5000 |      1.9913 |        1808 |           33 |     1.98 |      1.0313 |     1.0063 |     0.9943 |
+|     30 |       3 + 0 | 3.0000 |      2.1074 |        1709 |           35 |     2.10 |      1.0606 |     1.0583 |     0.9965 |
+
+- **law** is `D eff / H` exactly. **sub-steps n** is the cell's drill time in 1/60 ticks,
+  `ceil(3600 H / (D eff))` (`subStepsPerTile`). **read** is `floor(60000 / n)` mm a tick
+  (`cutStepMmOf`), times 60 / 1000 for m/s. 1 mm a tick is 0.06 m/s.
+- **Why it looks flat.** The drill law and the step mapping give exactly 1.12 per ten stored steps
+  (the first line the test holds). The read then rounds twice: `n` up to a whole sub-step, then the
+  step down to a whole mm a tick. At 1.5 m/s one mm a tick is 4.0% of the speed, six times a pip's
+  0.63%, so the read stays put for 3 to 6 pips at a time and loses up to 3.7% against the law (the
+  second line: never over the law, at most 1 mm under). Stored 10 is the worst case: the law is
+  exactly 28.000 mm a tick, `n` rounds up to 2143 and the read floors to 27, so 1.62 m/s for a law of
+  1.68. That is why stored 1 to 10 reads 1.08x (law 1.113x over 17/18 of a major) and stored 10 to 20
+  reads 1.148x (law 1.12x).
+- **Where it stops.** A pip moves the read by a whole mm once the step is 158 mm a tick (9.5 m/s),
+  about stored 163 on band 1. At the on-curve end of planet 1 (major 13, 6.5 m/s) a pip is 0.69 mm,
+  so about one pip in three still reads flat there.
+- **What else uses the same step.** The authority's cutting step bound (`stepBound.ts`,
+  `cutStepMmOf` plus one 250 mm sample of tolerance), travel parity (`travelParity.ts`) and the P200
+  dive fixture. The authority's cut itself counts sub-steps and never rounds to mm, so it runs at the
+  law; only the body's commanded follow speed and those bounds see the floor.

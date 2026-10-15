@@ -12,7 +12,8 @@ final balance. Nothing here is game code.
 - `pace-baseline.md`: the pacing bot's core minutes on planets 1 to 10 with ore leads (#146), the
   P3–P10 reference for later tickets.
 - `drill-ladder.md`: the drill-speed ladder (#409), the time a 50-cell planet 1 column takes at
-  drill_power 1, 5, 10, 15 and 20, measured by the authority's cut, to tune the drill curve against.
+  drill_power 1, 5, 10, 15 and 20, measured by the authority's cut, to tune the drill curve against. It also
+  holds the starting rigs' cut-follow speed per stored step 0 to 30 and why it reads flat (#431).
 
 The game reads its constants from `src/systems/economy/economy.json`; the pure formulas in
 `src/systems/economy/` render these four tables again, and `economyTables.test.ts` compares them cell
