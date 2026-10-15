@@ -1,8 +1,8 @@
 /**
  * What the drill does at a step's pose, for the vehicle's motor (`vehicleController.ts`): whether
  * it bites (#7, #36) and, with the swept cut on, whether the drill sets the speed along the
- * facing (ticket 333). With the swept cut on, the rig's step bounds (ticket 334) widen the wait-for-cut
- * window and pick the speed the body is clamped to. Pure reads of the ground and the authority, no
+ * facing (ticket 333) and whether the wheels wait for it (ticket 400). With the swept cut on, the rig's
+ * step bounds (ticket 334) widen the wait-for-cut window and pick the speed the body is clamped to. Pure reads of the ground and the authority, no
  * Rapier.
  */
 import type { CutFollow, CutFollowStep } from '../systems/authority/cutFollowRead'
@@ -77,13 +77,29 @@ export function cutFollowFor(
   input: DrillEngagementInput,
   pose: VehiclePose,
   read: CutFollow | undefined,
+  followedTicks: number,
 ): CutFollowMotion | undefined {
   if (read === undefined || !input.canAct || !isCutGateOpen(read.gate)) return undefined
   return {
     speed: read.cutSpeed,
     facing: pose.facing,
     isPushing: input.intent.facing === pose.facing,
+    followedTicks,
   }
+}
+
+/**
+ * Whether the wheels wait for the drill in a level cut. With the drill setting the speed only a
+ * real span stop holds them (ticket 400, TD lock on #397 point 3): a lead cell the drill may not
+ * cut, which the read gives as a `vCut` of 0. Otherwise ground in the body's way does.
+ */
+export function isWaitingForCutAt(
+  isCuttingLevel: boolean,
+  contact: DrillContact,
+  cutFollow: CutFollowMotion | undefined,
+): boolean {
+  if (!isCuttingLevel) return false
+  return cutFollow === undefined ? contact === 'inTheWay' : cutFollow.speed === 0
 }
 
 /**

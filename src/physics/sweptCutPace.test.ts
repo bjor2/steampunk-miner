@@ -1,6 +1,6 @@
 import RAPIER from '@dimforge/rapier3d-compat'
 import { beforeAll, describe, expect, it, vi } from 'vitest'
-import { CUT_FOLLOW_TICKS, MAX_SPEED_MM_PER_SECOND } from '../constants/balance'
+import { MAX_SPEED_MM_PER_SECOND } from '../constants/balance'
 import { MM_PER_METRE, PHYSICS_TIMESTEP, UP_VECTOR_SCALE } from '../constants/physics'
 import { createMemorySink } from '../logging/eventSink'
 import { ECONOMY } from '../systems/economy/economy'
@@ -28,13 +28,6 @@ const STEADY_FROM_SECONDS = 3
 const NEAR_BOUND = 0.98
 /** The longest the wheels may wait on the cut: the 5 Hz report interval (ticket 330). */
 const MAX_WAIT_TICKS = 12
-
-/**
- * Since ticket 399 a cell costs its whole drill time and the cut reaches only as far as its work
- * pays for, so at a boundary the wheels may wait out one cell at the floor and the cut-follow's
- * ramp; holding the body to the cut is K-bound's (#400).
- */
-const maxWaitTicksAt = (floor: number) => Math.max(MAX_WAIT_TICKS, floor + CUT_FOLLOW_TICKS)
 
 /**
  * What held the body back on a drilling tick (TD ruling on #330, VS pin 2): the sweep stopping short
@@ -222,8 +215,8 @@ describe('swept cut in the live loop (ticket 330)', () => {
       console.log(`swept cut, ${floor}-tick floor: ${JSON.stringify({ swept, reported })}`)
       expect(swept.down.rate).toBeGreaterThan(reported.down.rate)
       expect(swept.level.rate).toBeGreaterThan(reported.level.rate)
-      expect(swept.level.longestWaitTicks).toBeLessThanOrEqual(maxWaitTicksAt(floor))
-      expect(swept.down.longestWaitTicks).toBeLessThanOrEqual(maxWaitTicksAt(floor))
+      expect(swept.level.longestWaitTicks).toBeLessThanOrEqual(MAX_WAIT_TICKS)
+      expect(swept.down.longestWaitTicks).toBeLessThanOrEqual(MAX_WAIT_TICKS)
     },
     180_000,
   )

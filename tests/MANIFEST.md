@@ -814,7 +814,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/economy/magnetCaps.test.ts` | 5 | 5 |
 | `src/systems/economy/oreEconomy.test.ts` | 7 | 7 |
 | `src/systems/economy/planetCharges.test.ts` | 16 | 12 |
-| `src/systems/economy/readEconomy.test.ts` | 22 | 22 |
+| `src/systems/economy/readEconomy.test.ts` | 23 | 23 |
 | `src/systems/economy/refineryEconomy.test.ts` | 6 | 6 |
 | `src/systems/economy/trackKind.test.ts` | 1 | 1 |
 | `src/systems/economy/upgradePrices.test.ts` | 14 | 14 |
@@ -934,7 +934,8 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | File | Tests | Sites |
 | --- | --- | --- |
 | `src/physics/cutFollow.test.ts` | 5 | 3 |
-| `src/physics/drillEngagement.test.ts` | 2 | 2 |
+| `src/physics/cutSmoothness.test.ts` | 4 | 3 |
+| `src/physics/drillEngagement.test.ts` | 6 | 6 |
 | `src/physics/floatingOrigin.test.ts` | 3 | 3 |
 | `src/physics/glidePassThrough.test.ts` | 4 | 4 |
 | `src/physics/liveFixedStep.test.ts` | 4 | 4 |
@@ -1278,7 +1279,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/vehicle/casingTrail.test.ts` | 16 | 12 |
 | `src/systems/vehicle/chargeSelection.test.ts` | 4 | 4 |
 | `src/systems/vehicle/colliderHalo.test.ts` | 3 | 3 |
-| `src/systems/vehicle/cutFollowMotion.test.ts` | 6 | 6 |
+| `src/systems/vehicle/cutFollowMotion.test.ts` | 13 | 13 |
 | `src/systems/vehicle/cutGate.test.ts` | 8 | 8 |
 | `src/systems/vehicle/drillContact.test.ts` | 5 | 5 |
 | `src/systems/vehicle/drillGearCells.test.ts` | 12 | 12 |

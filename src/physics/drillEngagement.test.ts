@@ -11,10 +11,11 @@ import { stepBoundsAt, stepReachMmOf } from '../systems/authority/stepBoundRead'
 import { CLOSED_CUT_GATE, type CutGate } from '../systems/vehicle/cutGate'
 import { createSeededRandom, type SeededRandom } from '../systems/seededRandom'
 import { IDLE_INTENT } from '../systems/vehicle/vehicleIntent'
+import type { CutFollowMotion } from '../systems/vehicle/cutFollowMotion'
 import { FACING } from '../systems/vehicle/vehiclePose'
 import { planetParamsFor } from '../systems/world/planetParams'
 import { surfaceRowOfColumn } from '../systems/world/tileGrid'
-import { maxSpeedFor } from './drillEngagement'
+import { isWaitingForCutAt, maxSpeedFor } from './drillEngagement'
 
 // The client's clamp and the authority's bound are one function (TD scope a on #316, ticket 334):
 // the speed the motor holds the body to, over one tick, is the step the authority accepts.
@@ -60,5 +61,32 @@ describe('step bound parity (ticket 334)', () => {
 
   it('leaves the 18 m/s clamp to the motion rule with the swept cut off', () => {
     expect(maxSpeedFor({ intent: IDLE_INTENT, canAct: true }, undefined)).toBeUndefined()
+  })
+})
+
+describe('wait for the cut (ticket 400)', () => {
+  const following: CutFollowMotion = {
+    speed: 4,
+    facing: FACING.left,
+    isPushing: true,
+    followedTicks: 6,
+  }
+
+  it('never holds the wheels for ground in the way while the drill sets the speed', () => {
+    expect(isWaitingForCutAt(true, 'inTheWay', following)).toBe(false)
+  })
+
+  it('holds them on a span stop, a lead cell the drill may not cut', () => {
+    expect(isWaitingForCutAt(true, 'ahead', { ...following, speed: 0 })).toBe(true)
+  })
+
+  it('holds them for ground in the way with no cut-follow, as before', () => {
+    expect(isWaitingForCutAt(true, 'inTheWay', undefined)).toBe(true)
+    expect(isWaitingForCutAt(true, 'ahead', undefined)).toBe(false)
+  })
+
+  it('never holds them outside a level cut', () => {
+    expect(isWaitingForCutAt(false, 'inTheWay', undefined)).toBe(false)
+    expect(isWaitingForCutAt(false, 'inTheWay', { ...following, speed: 0 })).toBe(false)
   })
 })

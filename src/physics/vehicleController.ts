@@ -29,6 +29,7 @@ import { NO_STRUTS, type StandingStruts } from '../systems/authority/bore/strutS
 import type { CutFollow, CutFollowStep } from '../systems/authority/cutFollowRead'
 import type { RenderOrigin } from '../systems/render/renderOrigin'
 import { blockOfPoint } from '../systems/vehicle/colliderHalo'
+import { followedTicksAfter } from '../systems/vehicle/cutFollowMotion'
 import type { DrillContactRule } from '../systems/vehicle/drillContact'
 import type { StepBounds } from '../systems/vehicle/stepBound'
 import { plannedTickOf, tickPlanOf, type TickPlan } from '../systems/vehicle/tickPlan'
@@ -69,7 +70,13 @@ import {
   planetPositionOf,
   recentreWhenFar,
 } from './bodyFrame'
-import { cutFollowFor, cutFollowReadFor, drillContactFor, maxSpeedFor } from './drillEngagement'
+import {
+  cutFollowFor,
+  cutFollowReadFor,
+  drillContactFor,
+  isWaitingForCutAt,
+  maxSpeedFor,
+} from './drillEngagement'
 import { createGroundHalo, type GroundHalo, type HaloGround } from './groundHalo'
 import { createStrutColliders, type StrutColliders } from './strutColliders'
 import { stepWorldThroughTick, sweepGroundOf } from './tickStepping'
@@ -115,7 +122,10 @@ export interface VehicleStepInput {
 export interface VehicleStepResult {
   flags: ActionFlags
   pose: VehiclePose
-  /** The wheels held this step for ground in a level cut's way (the swept cut's limiter tag). */
+  /**
+   * The wheels held this step in a level cut (the swept cut's limiter tag): for ground in the way,
+   * or while the drill sets the speed only on a span stop (ticket 400).
+   */
   isWaitingForCut: boolean
   /** The cut gate was open: the drill set the speed along the facing (ticket 333). */
   isCutting: boolean
@@ -192,6 +202,8 @@ export function createVehicleController(
   let head = newDrillHead(FACING.right)
   let up: Vector2 = { x: 0, y: 1 }
   let plan: TickPlan = tickPlanOf(0)
+  // Ticks the cut has followed the drill with no stop: past the ramp it holds `vCut` (ticket 400).
+  let followedTicks = 0
   let lastPlanet: { view: PlanetView; ground: HaloGround } | null = null
   let passThrough: TilePoint | null = null
   const syncHaloAt = (position: Vector2) => {
@@ -225,9 +237,10 @@ export function createVehicleController(
         : 'none'
       const isDrilling = contact !== 'none'
       const isCuttingLevel = isDrilling && !isLifting && isSidewaysFacing(pose.facing)
-      const isWaitingForCut = isCuttingLevel && contact === 'inTheWay'
       const cutRead = cutFollowReadFor(input, { pose, isLifting }, isDrilling)
-      const cutFollow = cutFollowFor(input, pose, cutRead)
+      const cutFollow = cutFollowFor(input, pose, cutRead, followedTicks)
+      const isWaitingForCut = isWaitingForCutAt(isCuttingLevel, contact, cutFollow)
+      followedTicks = followedTicksAfter(cutFollow, isWaitingForCut)
       const motion = stepVehicleMotion({
         velocity,
         up,
@@ -261,6 +274,7 @@ export function createVehicleController(
       placeBodyAt(body, colliders, frame, pose)
       body.setLinvel({ x: 0, y: 0, z: 0 }, true)
       head = newDrillHead(pose.facing)
+      followedTicks = 0
     },
     planetPosition: () => planetPositionOf(body, frame.origin),
     renderOrigin: () => frame.origin,
