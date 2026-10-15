@@ -13,6 +13,7 @@ import {
   useGameStore,
 } from '../store/gameStore'
 import { effectiveTravelSpeedOf } from '../systems/authority/travelSpeed'
+import { ECONOMY } from '../systems/economy/economy'
 import { buildIntent } from '../systems/input/buildIntent'
 import { IDLE_INTENT, type VehicleIntent } from '../systems/vehicle/vehicleIntent'
 import type { VehiclePose } from '../systems/vehicle/vehiclePose'
@@ -33,6 +34,13 @@ const RIGS: readonly Record<string, number>[] = [
   { drill_power: 300, drill_tip: 200 },
   { drill_power: 2000, drill_tip: 600, engine: 5000 },
 ]
+
+/**
+ * The core's casing grade holds every band's lining (#41), so no collapse (#43) refills a tunnel
+ * the rig drives back through. Under the 4-tick floor (#396) the fastest rig lines some 30 m of
+ * tunnel in the level leg, and at grade 1 its blocks fall in behind it.
+ */
+const HOLDING_CASING_GRADE = ECONOMY.casing.casingGradeCoreMin
 
 /** A step's result with the authority's view after it. */
 interface TickRead {
@@ -66,10 +74,14 @@ beforeEach(() => {
 afterEach(() => uninstallRunLog())
 
 /** Off the pad, down a shaft, a level tunnel west, let go, then back east along it. */
-function playScript(levels: Record<string, number>): Run {
+function playScript(
+  levels: Record<string, number>,
+  casingGrade = ECONOMY.casing.casingGradeStart,
+): Run {
   for (const [track, level] of Object.entries(levels)) {
     useGameStore.getState().setUpgrade(track, level)
   }
+  useGameStore.getState().setCasingGrade(casingGrade)
   const world = new RAPIER.World({ x: 0, y: 0, z: 0 })
   world.timestep = PHYSICS_TIMESTEP
   const start = readLocalVehicle().pose
@@ -153,7 +165,7 @@ describe('cut-follow in the live loop (ticket 333)', () => {
   }, 120_000)
 
   it('never drives back through its own tunnel faster than travel parity allows', () => {
-    const run = playScript(RIGS[2])
+    const run = playScript(RIGS[2], HOLDING_CASING_GRADE)
     expect(run.back.every((read) => !read.result.isCutting)).toBe(true)
     for (const read of run.back) {
       expect(alongSpeedOf(read.result.pose)).toBeLessThanOrEqual(read.travelCap * 1.01)
