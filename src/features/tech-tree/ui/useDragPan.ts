@@ -14,10 +14,8 @@ interface Drag {
 }
 
 export function useDragPan() {
-  const ref = useRef<HTMLDivElement>(null)
   const drag = useRef<Drag | null>(null)
   return {
-    ref,
     onPointerDown: (event: PointerEvent<HTMLDivElement>) => {
       drag.current = dragStartOf(event)
     },

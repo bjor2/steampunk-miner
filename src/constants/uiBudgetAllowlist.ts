@@ -54,10 +54,10 @@ export const UI_BUDGET_PANELS: readonly UiBudgetPanel[] = [
 /**
  * Measured on the start scenario when #424 landed (`UI_BUDGET_REPORT=1`); each pass lowers or
  * deletes its own entry, and #429 empties the list. Pass #425 moved the Upgrade bay and the shared
- * bay header and footer onto the element (so the dock's count fell with it) and deleted its entry.
+ * bay header and footer onto the element (so the dock's count fell with it) and deleted its entry;
+ * pass #426 did the same for the tech tree.
  */
 export const UI_BUDGET_ALLOWLIST: readonly UiBudgetAllowance[] = [
-  { panel: 'tech-tree', counts: { unregistered: 246, scroll: 4 }, ticket: 426 },
   { panel: 'dock', counts: { unregistered: 25, scroll: 3 }, ticket: 427 },
   { panel: 'hud', counts: { unregistered: 23 }, ticket: 428 },
   { panel: 'other-panels', counts: { unregistered: 154, scroll: 3 }, ticket: 429 },

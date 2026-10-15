@@ -3,9 +3,13 @@ import { renderToString } from 'react-dom/server'
 import { beforeEach, describe, expect, it } from 'vitest'
 import { resetGameStore, useGameStore } from '../../../store/gameStore'
 import { SliceScreenView } from '../../../ui/screens/SliceScreen'
+import { forgetUiTexts, registeredUiTexts } from '../../../systems/views/uiText'
+import { uiTextProblemsOf } from '../../../systems/views/uiTextBudget'
+import { unregisteredTextsOf } from '../../../systems/views/unregisteredText'
 import { readAuthorityState } from '../../../store/authorityLink'
 import { resetTreeScreenStore, type TreeZoom } from '../store/treeScreenStore'
 import { registeredTechTree } from '../systems/techTree'
+import type { TechNodeLane } from '../systems/techNode'
 import { nodeCardModelOf, treeScreenModelOf } from '../systems/treeScreenModel'
 import { LAB_FIXTURE_SLICE } from '../treeFixtureSlice'
 import { withFixtureTree, withNoLanes } from '../treeTestSession'
@@ -128,6 +132,53 @@ describe('tech tree screen', () => {
     expect(lines.some((line) => /Price: /.test(line))).toBe(true)
   })
 })
+
+describe('tech tree text budget (spec #422, pass #426)', () => {
+  it('keeps every lane list and node card within budget, with no text outside an element', () => {
+    openTreeOnPlanet(1)
+    forgetUiTexts()
+    const markup = everyZoomMarkup()
+    expect(unregisteredTextsOf(markup)).toEqual([])
+    expect(registeredUiTexts().flatMap(uiTextProblemsOf)).toEqual([])
+    expect(registeredUiTexts().length).toBeGreaterThan(100)
+  })
+
+  it("keeps a locked node's reason and its price on the element, never in the tooltip", () => {
+    openTreeOnPlanet(1)
+    forgetUiTexts()
+    everyZoomMarkup()
+    const lines = registeredUiTexts().flatMap((text) => text.lines)
+    expect(lines.some((line) => line.holds === 'needs' && line.tag === 'visible')).toBe(true)
+    expect(lines.some((line) => line.holds === 'price' && line.tag === 'visible')).toBe(true)
+    expect(lines.filter((line) => line.holds !== undefined && line.tag === 'tooltip')).toEqual([])
+  })
+})
+
+/** The map, every lane's list and every node's card, as one markup. */
+function everyZoomMarkup(): string {
+  const playerId = game().playerId
+  const tree = registeredTechTree()
+  const model = treeScreenModelOf(readAuthorityState(), playerId, tree, EVERYTHING)
+  const viewOf = (zoom: TreeZoom, lane: TechNodeLane, cardId = '') =>
+    renderToString(
+      createElement(TechTreeScreenView, {
+        view: {
+          model,
+          card: nodeCardModelOf(readAuthorityState(), playerId, tree, cardId),
+          zoom,
+          lane,
+        },
+        onDismiss: () => undefined,
+      }),
+    )
+  const lanes = model.lanes.map((lane) => viewOf('lane', lane.lane))
+  const cards = model.lanes.flatMap((lane) =>
+    lane.nodes.map((node) => viewOf('card', lane.lane, node.id)),
+  )
+  return [viewOf('overview', 'extraction'), viewOf('card', 'extraction'), ...lanes, ...cards].join(
+    '',
+  )
+}
 
 const EVERYTHING = { search: '', filters: [] } as const
 

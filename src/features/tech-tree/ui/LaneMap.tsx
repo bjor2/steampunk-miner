@@ -2,51 +2,66 @@
  * The campaign overview (#161 section 4, zoom 1): every lane as a strip of icons on the planet
  * ruler, so a node's place says when and its lane what kind; dashed combos sit on their own row,
  * and the Armoury group's weapon lanes under its heading.
- * Drag or the arrow keys pan it. On a narrow screen it becomes the shown lane's list.
+ * Drag or the arrow keys pan it, inside the shared scroll area (spec #422, pass #426); the ruler,
+ * each lane and the group heading are shared Title+OneLine elements. On a narrow screen it becomes
+ * the shown lane's list.
  */
+import { TitleOneLine } from '../../../ui/kit/TitleOneLine'
+import { ScrollArea } from '../../../ui/kit/ScrollArea'
 import type { LaneModel, TreeScreenModel } from '../systems/treeScreenModel'
 import { useTreeScreenStore } from '../store/treeScreenStore'
 import { LaneTabs } from './LaneTabs'
 import { NodeButton } from './NodeButton'
+import { nodeChipElementOf } from './nodeElement'
 import { rulerStyleOf, tierStyleOf } from './tierStyle'
 import { useDragPan } from './useDragPan'
 import styles from './LaneMap.module.css'
 
+const RULER_TEXT = { id: 'tech-tree.ruler', title: 'Planets', oneLine: '', tooltipLines: [] }
+
+/** Only the touch's vertical pan is the browser's; the drag pans sideways. */
+const PAN_TOUCH = { touchAction: 'pan-y' } as const
+
 export function LaneMap({ model }: { model: TreeScreenModel }) {
-  const { ref, ...panHandlers } = useDragPan()
+  const panHandlers = useDragPan()
   return (
-    <div className={styles.map}>
+    <div className={styles.map} style={rulerStyleOf(model.lastPlanet)}>
       <LaneTabs lanes={model.lanes} />
-      <div
-        ref={ref}
+      <ScrollArea
         className={styles.viewport}
-        style={rulerStyleOf(model.lastPlanet)}
-        tabIndex={0}
-        aria-label="Tech tree map: drag or use the arrow keys to pan"
-        {...panHandlers}
+        viewport={{
+          tabIndex: 0,
+          'aria-label': 'Tech tree map: drag or use the arrow keys to pan',
+          style: PAN_TOUCH,
+          ...panHandlers,
+        }}
       >
         <PlanetRuler marks={model.rulerMarks} planetIndex={model.planetIndex} />
         {model.lanes.map((lane) => (
           <LaneStrip key={lane.lane} lane={lane} />
         ))}
-      </div>
+      </ScrollArea>
     </div>
   )
 }
 
 function PlanetRuler({ marks, planetIndex }: { marks: readonly number[]; planetIndex: number }) {
   return (
-    <div className={styles.ruler}>
-      {marks.map((planet) => (
-        <span key={planet} className={styles.mark} style={tierStyleOf(planet)}>
-          P{planet}
-        </span>
-      ))}
-      <span
-        className={styles.here}
-        style={tierStyleOf(planetIndex)}
-        aria-label={`You are on planet ${planetIndex}`}
-      />
+    <div className={styles.rulerRow}>
+      <TitleOneLine text={RULER_TEXT} level="span">
+        <div className={styles.ruler}>
+          {marks.map((planet) => (
+            <span key={planet} className={styles.mark} style={tierStyleOf(planet)}>
+              P{planet}
+            </span>
+          ))}
+          <span
+            className={styles.here}
+            style={tierStyleOf(planetIndex)}
+            aria-label={`You are on planet ${planetIndex}`}
+          />
+        </div>
+      </TitleOneLine>
     </div>
   )
 }
@@ -60,19 +75,37 @@ function LaneStrip({ lane }: { lane: LaneModel }) {
       data-testid={`tech-tree-lane-${lane.lane}`}
       data-shown-tab={isShownTab}
     >
-      {lane.groupHeading !== null && <h3 className={styles.groupHeading}>{lane.groupHeading}</h3>}
+      {lane.groupHeading !== null && <GroupHeading heading={lane.groupHeading} />}
       <button type="button" className={styles.laneTitle} onClick={() => focusLane(lane.lane)}>
-        {lane.title}
+        <TitleOneLine text={laneTextOf(lane)} level="span" />
       </button>
-      {lane.isComingSoon ? (
-        <p className={styles.comingSoon}>Coming soon</p>
-      ) : (
+      {!lane.isComingSoon && (
         <div className={styles.strip}>
           {lane.nodes.map((node) => (
-            <NodeButton key={node.id} card={node} stack={node.stack} />
+            <NodeButton
+              key={node.id}
+              card={node}
+              element={nodeChipElementOf(node, 'map')}
+              stack={node.stack}
+            />
           ))}
         </div>
       )}
     </section>
   )
+}
+
+function GroupHeading({ heading }: { heading: string }) {
+  const text = { id: `tech-tree.group.${heading}`, title: heading, oneLine: '', tooltipLines: [] }
+  return (
+    <div className={styles.groupHeading}>
+      <TitleOneLine text={text} level="h3" />
+    </div>
+  )
+}
+
+/** A lane no slice has filled yet says so as its one line. */
+function laneTextOf(lane: LaneModel) {
+  const oneLine = lane.isComingSoon ? 'Coming soon.' : ''
+  return { id: `tech-tree.lane-title.${lane.lane}`, title: lane.title, oneLine, tooltipLines: [] }
 }

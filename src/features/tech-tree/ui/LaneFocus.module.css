@@ -1,6 +1,10 @@
 .focus {
   display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+  align-self: stretch;
   gap: var(--space-2);
+  height: 100%;
+  min-height: 0;
 }
 
 .picker {
@@ -23,6 +27,11 @@
   background: rgb(201 162 75 / 0.25);
 }
 
+/* The shared scroll area's frame (pass #426): the rows fill the screen's last row. */
+.list {
+  height: 100%;
+}
+
 .cards {
   display: grid;
   gap: var(--space-2);
@@ -31,37 +40,7 @@
   list-style: none;
 }
 
-.card {
-  display: grid;
-  grid-template-columns: auto auto 1fr auto;
-  align-items: center;
-  gap: var(--space-2);
-}
-
-.tier {
-  color: var(--color-brass);
-  font-family: var(--font-mono);
-}
-
-.description {
-  margin: 0;
-}
-
-.chip {
-  padding: 0 var(--space-1);
-  border: 1px solid var(--color-copper);
-  border-radius: var(--radius-panel);
-  font-family: var(--font-mono);
-}
-
-.comingSoon {
-  margin: 0;
-  font-style: italic;
-  opacity: 0.7;
-}
-
-@media (max-width: 760px), (pointer: coarse) {
-  .card {
-    grid-template-columns: 1fr;
-  }
+/* Each row is a whole node: its button spans the list. */
+.card > * {
+  width: 100%;
 }

@@ -1,19 +1,12 @@
 .header {
+  min-width: 0;
+}
+
+.controls {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
   gap: var(--space-2);
-}
-
-.title {
-  margin: 0;
-  color: var(--color-brass);
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-}
-
-.where {
-  font-family: var(--font-mono);
 }
 
 .zoom,
@@ -47,18 +40,9 @@
   background: rgb(184 115 51 / 0.35);
 }
 
-/* #161 mobile: the controls on one row that scrolls sideways. */
+/* #161 mobile: the controls wrap onto more rows rather than scroll sideways (pass #426). */
 @media (max-width: 760px), (pointer: coarse) {
-  .header {
-    flex-wrap: nowrap;
-    overflow-x: auto;
-  }
-
   .search {
     min-width: 8rem;
-  }
-
-  .header > * {
-    flex: none;
   }
 }

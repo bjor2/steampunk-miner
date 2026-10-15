@@ -1,11 +1,16 @@
 /**
- * The tree screen's controls (#161 section 4): where you are and what you hold, the zoom, the
- * search by node name, item or effect word, the filters, and the way back.
+ * The tree screen's controls (#161 section 4), on the shared Title+OneLine element (spec #422,
+ * pass #426): the title, where you are and what you hold as glyph-and-value facts, then the zoom,
+ * the search by node name, item or effect word, the filters, and the way back.
  */
+import { hudLabelIconIdOf } from '../../../systems/art/icons/iconSet'
 import { Button } from '../../../ui/kit/Button'
+import { TitleOneLine, type IconValue } from '../../../ui/kit/TitleOneLine'
 import { TREE_FILTERS, type TreeFilter, type TreeScreenModel } from '../systems/treeScreenModel'
 import { useTreeScreenStore } from '../store/treeScreenStore'
 import styles from './TreeHeader.module.css'
+
+const HEADER_TEXT = { id: 'tech-tree.header', title: 'Tech tree', oneLine: '', tooltipLines: [] }
 
 const FILTER_LABELS: Readonly<Record<TreeFilter, string>> = {
   available: 'Available',
@@ -27,26 +32,34 @@ export function TreeHeader({
   const setSearch = useTreeScreenStore((state) => state.setSearch)
   return (
     <header className={styles.header}>
-      <h2 className={styles.title}>Tech tree</h2>
-      <span className={styles.where}>
-        Planet {model.planetIndex} · {model.walletText}
-      </span>
-      <div className={styles.zoom}>
-        <Button label="Zoom out" onPress={zoomOut} />
-        <Button label="Zoom in" onPress={zoomIn} />
-      </div>
-      <input
-        className={styles.search}
-        type="search"
-        value={search}
-        placeholder="Search nodes, items, effects"
-        aria-label="Search the tech tree"
-        onChange={(event) => setSearch(event.target.value)}
-      />
-      <FilterChips />
-      <Button label="Back" onPress={onDismiss} />
+      <TitleOneLine text={HEADER_TEXT} facts={headerFactsOf(model)} level="h2">
+        <div className={styles.controls}>
+          <div className={styles.zoom}>
+            <Button label="Zoom out" onPress={zoomOut} />
+            <Button label="Zoom in" onPress={zoomIn} />
+          </div>
+          <input
+            className={styles.search}
+            type="search"
+            value={search}
+            placeholder="Search nodes, items, effects"
+            aria-label="Search the tech tree"
+            onChange={(event) => setSearch(event.target.value)}
+          />
+          <FilterChips />
+          <Button label="Back" onPress={onDismiss} />
+        </div>
+      </TitleOneLine>
     </header>
   )
+}
+
+/** The planet and the wallet, each a glyph and its value. */
+function headerFactsOf(model: TreeScreenModel): IconValue[] {
+  return [
+    { iconId: hudLabelIconIdOf('planet'), text: `${model.planetIndex}` },
+    { iconId: hudLabelIconIdOf('money'), text: model.walletText },
+  ]
 }
 
 function FilterChips() {

@@ -1,20 +1,25 @@
 /* One planet's width on the ruler; a node sits at (tier - 1) of them, a shared planet stacks. */
 .map {
   --planet-width: calc(9rem * var(--ui-scale));
-  --row-height: calc(var(--control-min) + var(--space-1));
+  /* A chip is two lines now, its name over its price (pass #426). */
+  --row-height: calc(3.5rem + var(--space-1));
 
   display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+  align-self: stretch;
   gap: var(--space-2);
+  height: 100%;
   min-height: 0;
 }
 
+/* The shared scroll area's frame (pass #426): it fills the screen's last row and pans inside. */
 .viewport {
-  overflow: auto;
+  grid-row: 2;
+  height: 100%;
   cursor: grab;
-  touch-action: pan-y;
 }
 
-.viewport:focus-visible {
+.viewport:focus-within {
   outline: var(--focus-ring);
   outline-offset: var(--focus-ring-offset);
 }
@@ -93,19 +98,9 @@
   left: calc((var(--tier) - 1) * var(--planet-width));
 }
 
-.comingSoon {
-  position: sticky;
-  left: 0;
-  margin: 0;
-  padding: var(--space-2);
-  color: var(--color-parchment);
-  font-style: italic;
-  opacity: 0.7;
-}
-
 /* #161 mobile: the shown lane only, as a list in planet order with 44 px targets. */
 @media (max-width: 760px), (pointer: coarse) {
-  .ruler {
+  .rulerRow {
     display: none;
   }
 

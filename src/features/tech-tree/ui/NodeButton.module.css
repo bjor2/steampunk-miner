@@ -10,6 +10,7 @@
   background: var(--color-panel);
   color: var(--color-parchment);
   font: inherit;
+  text-align: left;
   cursor: pointer;
   /* A held node opens its card (#161 section 4), so no text selection or callout covers it. */
   user-select: none;
@@ -29,26 +30,8 @@
   border-style: dashed;
 }
 
-.name {
-  white-space: nowrap;
-}
-
-.cost {
-  color: var(--color-brass);
-  font-family: var(--font-mono);
-  font-size: 0.85em;
-}
-
-/* #158: a red price while the wallet is short. */
-.node[data-status='available'] .cost {
-  color: var(--color-ember);
-}
-
-/* #158: a rivet dot once researched; the price no longer applies. */
-.node[data-status='researched'] .cost {
-  visibility: hidden;
-}
-
+/* #158: a rivet dot once researched; the price no longer shows (`nodeElement`). A red price
+   while the wallet is short is the shared element's own (#158, `isMoneyShort`). */
 .node[data-status='researched']::after {
   content: '';
   width: 0.5em;
