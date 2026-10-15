@@ -9,6 +9,8 @@
  * a cut has followed the drill for `CUT_FOLLOW_TICKS` ticks it holds `vCut` outright, across cell
  * boundaries and a contact's nudge alike, so the body never stops and ramps back at every cell. A
  * level cut waits for the drill only on a real span stop (`isWaitingForCut`), which ends the hold.
+ * What carries it through the gate's shut dwell, and the stop through a lost contact, is
+ * `heldCut.ts` (ticket 430).
  */
 import { CUT_FOLLOW_TICKS } from '../../constants/balance'
 import { FACING, type Facing } from './vehiclePose'
@@ -22,6 +24,13 @@ export interface CutFollowMotion {
   isPushing: boolean
   /** Ticks this cut has followed the drill with no stop, up to `CUT_FOLLOW_TICKS` (ticket 400). */
   followedTicks: number
+  /** Let go with uncut ground in the body's way: the stop ends there at once (ticket 430). */
+  isAtFace?: true
+  /**
+   * Ticks since the drive let go of this cut (ticket 430): the stop lands on zero by the
+   * `CUT_FOLLOW_TICKS`-th from whatever speed contacts leave the body at. Absent while pushed.
+   */
+  releasedTicks?: number
 }
 
 /** Whether the cut-follow drives the speed along the ground, else along `localUp`. */
@@ -35,9 +44,10 @@ export function cutFollowSpeedOf(
   cut: CutFollowMotion,
   isWaitingForCut: boolean,
 ): number {
+  if (cut.isAtFace === true) return 0
   const target = isFollowingDrill(cut, isWaitingForCut) ? signOfFacing(cut.facing) * cut.speed : 0
   if (target !== 0 && cut.followedTicks >= CUT_FOLLOW_TICKS) return target
-  return rampedToward(current, target, cut.speed)
+  return rampedToward(current, target, rampStepOf(current, cut))
 }
 
 /** `followedTicks` for the next tick: one more while the drill sets a speed, else 0. */
@@ -50,13 +60,22 @@ export function followedTicksAfter(
 }
 
 /** The drive pushes into a cut that moves: no span stop, and a `vCut` above 0. */
-function isFollowingDrill(cut: CutFollowMotion, isWaitingForCut: boolean): boolean {
+export function isFollowingDrill(cut: CutFollowMotion, isWaitingForCut: boolean): boolean {
   return cut.isPushing && !isWaitingForCut && cut.speed > 0
 }
 
-/** One tick of the start and stop ramp: at least a sixth of `vCut` or the speed it has. */
-function rampedToward(current: number, target: number, cutSpeed: number): number {
-  const maxChange = Math.max(cutSpeed, Math.abs(current)) / CUT_FOLLOW_TICKS
+/**
+ * One tick of the start and stop ramp: at least a sixth of `vCut` or the speed it has, and for a
+ * let-go cut at least what still lands it on zero in the ticks its stop has left.
+ */
+function rampStepOf(current: number, cut: CutFollowMotion): number {
+  const step = Math.max(cut.speed, Math.abs(current)) / CUT_FOLLOW_TICKS
+  if (cut.releasedTicks === undefined) return step
+  const ticksLeft = Math.max(1, CUT_FOLLOW_TICKS - cut.releasedTicks)
+  return Math.max(step, Math.abs(current) / ticksLeft)
+}
+
+function rampedToward(current: number, target: number, maxChange: number): number {
   const gap = target - current
   if (Math.abs(gap) <= maxChange) return target
   return current + Math.sign(gap) * maxChange

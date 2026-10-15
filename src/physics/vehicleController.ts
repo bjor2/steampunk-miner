@@ -29,7 +29,6 @@ import { NO_STRUTS, type StandingStruts } from '../systems/authority/bore/strutS
 import type { CutFollow, CutFollowStep } from '../systems/authority/cutFollowRead'
 import type { RenderOrigin } from '../systems/render/renderOrigin'
 import { blockOfPoint } from '../systems/vehicle/colliderHalo'
-import { followedTicksAfter } from '../systems/vehicle/cutFollowMotion'
 import type { DrillContactRule } from '../systems/vehicle/drillContact'
 import type { StepBounds } from '../systems/vehicle/stepBound'
 import { plannedTickOf, tickPlanOf, type TickPlan } from '../systems/vehicle/tickPlan'
@@ -40,6 +39,7 @@ import {
   stepDrillHead,
   type DrillHead,
 } from '../systems/vehicle/drillHead'
+import { cutMemoryAfter, FRESH_CUT_MEMORY, type CutMemory } from '../systems/vehicle/heldCut'
 import { localUpOf, type Vector2 } from '../systems/vehicle/localFrame'
 import type { ActionFlags } from '../systems/vehicle/poseReport'
 import { quantisePose } from '../systems/vehicle/poseReport'
@@ -70,13 +70,7 @@ import {
   planetPositionOf,
   recentreWhenFar,
 } from './bodyFrame'
-import {
-  cutFollowFor,
-  cutFollowReadFor,
-  drillContactFor,
-  isWaitingForCutAt,
-  maxSpeedFor,
-} from './drillEngagement'
+import { cutFollowReadFor, cutTickFor, drillContactFor, maxSpeedFor } from './drillEngagement'
 import { createGroundHalo, type GroundHalo, type HaloGround } from './groundHalo'
 import { createStrutColliders, type StrutColliders } from './strutColliders'
 import { stepWorldThroughTick, sweepGroundOf } from './tickStepping'
@@ -202,8 +196,8 @@ export function createVehicleController(
   let head = newDrillHead(FACING.right)
   let up: Vector2 = { x: 0, y: 1 }
   let plan: TickPlan = tickPlanOf(0)
-  // Ticks the cut has followed the drill with no stop: past the ramp it holds `vCut` (ticket 400).
-  let followedTicks = 0
+  // The hold's count (ticket 400) and the last `vCut`, held through the gate's shut dwell (430).
+  let cutMemory: CutMemory = FRESH_CUT_MEMORY
   let lastPlanet: { view: PlanetView; ground: HaloGround } | null = null
   let passThrough: TilePoint | null = null
   const syncHaloAt = (position: Vector2) => {
@@ -238,9 +232,10 @@ export function createVehicleController(
       const isDrilling = contact !== 'none'
       const isCuttingLevel = isDrilling && !isLifting && isSidewaysFacing(pose.facing)
       const cutRead = cutFollowReadFor(input, { pose, isLifting }, isDrilling)
-      const cutFollow = cutFollowFor(input, pose, cutRead, followedTicks)
-      const isWaitingForCut = isWaitingForCutAt(isCuttingLevel, contact, cutFollow)
-      followedTicks = followedTicksAfter(cutFollow, isWaitingForCut)
+      const cutStart = { read: cutRead, memory: cutMemory, contact, isCuttingLevel }
+      const cutTick = cutTickFor(input, { pose, isLifting }, cutStart, planet.ground)
+      const { cut: cutFollow, isGateOpen, isWaitingForCut } = cutTick
+      cutMemory = cutMemoryAfter(cutMemory, cutTick)
       const motion = stepVehicleMotion({
         velocity,
         up,
@@ -258,7 +253,7 @@ export function createVehicleController(
         cutFollow,
         maxSpeed: maxSpeedFor(input, cutRead),
       })
-      const sweep = sweepGroundOf(planet.ground, position, cutFollow === undefined ? null : pose)
+      const sweep = sweepGroundOf(planet.ground, position, isGateOpen ? pose : null)
       const planned = plannedTickOf(motion.velocity, PHYSICS_TIMESTEP, sweep)
       plan = planned.plan
       driveBody(body, planned.velocity, up)
@@ -266,7 +261,7 @@ export function createVehicleController(
         flags: { isDriving: motion.isDriving, isThrusting: motion.isThrusting, isDrilling },
         pose,
         isWaitingForCut,
-        isCutting: cutFollow !== undefined,
+        isCutting: isGateOpen,
       }
     },
     stepWorld: () => stepWorldThroughTick(tick, plan),
@@ -274,7 +269,7 @@ export function createVehicleController(
       placeBodyAt(body, colliders, frame, pose)
       body.setLinvel({ x: 0, y: 0, z: 0 }, true)
       head = newDrillHead(pose.facing)
-      followedTicks = 0
+      cutMemory = FRESH_CUT_MEMORY
     },
     planetPosition: () => planetPositionOf(body, frame.origin),
     renderOrigin: () => frame.origin,

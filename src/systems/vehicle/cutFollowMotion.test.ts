@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest'
 import { CUT_FOLLOW_TICKS } from '../../constants/balance'
 import { PHYSICS_TIMESTEP } from '../../constants/physics'
 import { engineStats, type EngineStats } from '../economy/vehicleStats'
-import { followedTicksAfter, type CutFollowMotion } from './cutFollowMotion'
+import { cutFollowSpeedOf, followedTicksAfter, type CutFollowMotion } from './cutFollowMotion'
 import { dot, tangentOf, type Vector2 } from './localFrame'
 import { gravityAt } from './radialGravity'
 import { IDLE_INTENT, type VehicleIntent } from './vehicleIntent'
@@ -200,5 +200,32 @@ describe('cut-follow hold (ticket 400)', () => {
     expect(followedTicksAfter(fresh, false)).toBe(1)
     const held = { ...fresh, followedTicks: CUT_FOLLOW_TICKS }
     expect(followedTicksAfter(held, false)).toBe(CUT_FOLLOW_TICKS)
+  })
+})
+
+describe('stop at the face (ticket 430 addendum)', () => {
+  it("stops a let-go cut at once when uncut ground stands in the body's way", () => {
+    const atFace: CutFollowMotion = {
+      speed: 15,
+      facing: FACING.right,
+      isPushing: false,
+      followedTicks: 0,
+      isAtFace: true,
+    }
+    expect(cutFollowSpeedOf(12.5, atFace, false)).toBe(0)
+    expect(cutFollowSpeedOf(12.5, { ...atFace, isAtFace: undefined }, false)).toBeCloseTo(10, 9)
+  })
+
+  it('lands a let-go cut on zero by its sixth tick, whatever speed a contact left it at', () => {
+    const letGo: CutFollowMotion = {
+      speed: 1.5,
+      facing: FACING.right,
+      isPushing: false,
+      followedTicks: 0,
+      releasedTicks: 3,
+    }
+    expect(cutFollowSpeedOf(1.2, letGo, false)).toBeCloseTo(0.8, 9)
+    expect(cutFollowSpeedOf(0.4, { ...letGo, releasedTicks: CUT_FOLLOW_TICKS - 1 }, false)).toBe(0)
+    expect(cutFollowSpeedOf(1.5, { ...letGo, releasedTicks: 0 }, false)).toBeCloseTo(1.25, 9)
   })
 })

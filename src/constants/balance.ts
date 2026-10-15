@@ -114,6 +114,15 @@ export const CUT_GATE_OFF_BP = 2500
 export const CUT_GATE_HOLD_TICKS = 6
 
 /**
+ * How far a body may coast on the last `vCut` it followed once the cut gate shuts under it (ticket
+ * 430, TD shape on #430): one cell. The gate's dwell is counted in ticks but the gap from a broken
+ * cell to the next one entering the leading slab is a distance under a cell (0.3-0.55 m measured),
+ * so below some 5 m/s the gate shuts in every cell; at 1.5 m/s that gap takes 11 ticks, past the
+ * TD's first cap of `CUT_GATE_HOLD_TICKS` + 2, which left 3 ticks of travel's acceleration a cell.
+ */
+export const CUT_COAST_METRES = 1
+
+/**
  * Pose reports go out at most 5 times a second (#11 amendment), every 12 ticks; the authority
  * allows one interval of slack when it checks the action tick counts (#11 amendment 2).
  */
