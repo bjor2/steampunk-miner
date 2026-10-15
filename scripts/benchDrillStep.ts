@@ -15,12 +15,21 @@
  * budget, so the swept span), as the TD's #316 table has them; neither speed is reachable through
  * `drillStep` under the 4-tick tile floor (ticket 396), so these cut the same line through
  * `drillAlongStep`.
+ *
+ * Ticket 420: the W = 7 cut again with each step logged as the game logs it, the drill span writer
+ * on (`w7Logged`); its p50 must stay within noise of the bare `wide` row, since a span only adds to
+ * a fixed accumulator a tick.
  */
 import { loadFeatures } from '../src/features'
+import { recordDomainEventsTo } from '../src/logging/domainEventLog'
+import { createMemorySink } from '../src/logging/eventSink'
+import { createRunLog } from '../src/logging/runLog'
 import { DENSITY_CELL_UNITS, TERRAIN_EDIT_UNITS_PER_TICK } from '../src/constants/terrainBudget'
 import { withRegistrations } from '../src/registries/registrar'
 import type { SliceDefinition } from '../src/registries/sliceDefinition'
+import type { AuthorityCommand } from '../src/systems/authority/authorityCommand'
 import type { AuthorityState } from '../src/systems/authority/authorityState'
+import type { DomainEvent } from '../src/systems/authority/domainEvent'
 import { vehicleOf } from '../src/systems/authority/authorityState'
 import { drillAlongStep } from '../src/systems/authority/drillStepCut'
 import { createScriptedSession, PARAMS, poseAbove } from '../src/systems/authority/scriptedSession'
@@ -61,7 +70,30 @@ interface StepRun {
   stepMm: number
 }
 
-function cutLevel(): StepRun {
+/** What a timed step does besides the cut: nothing, or log itself as the game does. */
+type LogStep = (
+  command: AuthorityCommand,
+  events: readonly DomainEvent[],
+  after: AuthorityState,
+) => void
+
+const LOG_NOTHING: LogStep = () => undefined
+
+/** A run log with the drill span writer on, as the game's (ticket 420). */
+function logIntoRunLog(): LogStep {
+  const runLog = createRunLog({
+    runId: 'run_bench',
+    sink: createMemorySink(),
+    secondsSinceStart: () => 0,
+  })
+  const place = { playerId: 'p1', planet: 1, depthTiles: 20 }
+  return (command, events, after) => {
+    runLog.recordCommand(command)
+    recordDomainEventsTo(runLog, place, events, after)
+  }
+}
+
+function cutLevel(logStep: LogStep = LOG_NOTHING): StepRun {
   const session = createScriptedSession()
   for (const payload of FLOOR_BOUND) session.submit(0, { type: 'debug.setUpgrade', payload })
   const { payload } = poseAbove({ tx: 0, ty: 0 }, FACING.right)
@@ -72,8 +104,10 @@ function cutLevel(): StepRun {
     session.submit(tick, { type: 'debug.setEnergy', payload: { energy: '150' } })
     const x = START.x + stepMm * tick
     const before = session.state()
+    const intent = { type: 'drillStep', payload: { x, y: START.y, drive: NO_DRIVE } } as const
+    const command = { playerId: 'p1', tick, seq: before.players.p1.lastSeq + 1, ...intent }
     const started = performance.now()
-    session.submit(tick, { type: 'drillStep', payload: { x, y: START.y, drive: NO_DRIVE } })
+    logStep(command, session.submit(tick, intent), session.state())
     run.timesMs.push(performance.now() - started)
     run.cellsPerTick.push(cellsChanged(before, session.state(), x))
   }
@@ -96,10 +130,10 @@ function cellsChanged(before: AuthorityState, after: AuthorityState, xMm: number
   return changed
 }
 
-function benchAtWidth(sideCells: number): StepRun {
+function benchAtWidth(sideCells: number, logStepOf: () => LogStep = () => LOG_NOTHING): StepRun {
   return withRegistrations([sideCellsSlice(sideCells)], () => {
-    cutLevel()
-    const runs = Array.from({ length: REPS }, cutLevel)
+    cutLevel(logStepOf())
+    const runs = Array.from({ length: REPS }, () => cutLevel(logStepOf()))
     return {
       timesMs: runs.flatMap((run) => run.timesMs),
       cellsPerTick: runs.flatMap((run) => run.cellsPerTick),
@@ -151,6 +185,7 @@ function benchAtStride(strideMm: number): number[] {
 
 const bare = benchAtWidth(0)
 const wide = benchAtWidth(5)
+const wideLogged = benchAtWidth(5, logIntoRunLog)
 const atBudget = AT_BUDGET_STEPS_MM.map((strideMm) => ({
   strideMm,
   timesMs: benchAtStride(strideMm),
@@ -161,6 +196,7 @@ console.log(
     stepMm: bare.stepMm,
     bare: reportOf(2, bare),
     wide: reportOf(7, wide),
+    w7Logged: reportOf(7, wideLogged),
     atBudget: atBudget.map(({ strideMm, timesMs }) => ({
       strideMm,
       stepP50Ms: round(percentile(timesMs, 0.5)),
@@ -172,6 +208,7 @@ console.log(
 logBenchmarkSeriesWhenAsked('drill-step', [
   { name: 'drillStep.bare', planet: 1, timesMs: bare.timesMs },
   { name: 'drillStep.w7', planet: 1, timesMs: wide.timesMs },
+  { name: 'drillStep.w7Logged', planet: 1, timesMs: wideLogged.timesMs },
   ...atBudget.map(({ strideMm, timesMs }) => ({
     name: `drillStep.stride${strideMm}`,
     planet: 1,

@@ -206,13 +206,22 @@ programs }` from three's `renderer.info` of the game canvas), read only when cal
   authority commands with the #6 movement-time model, buying casing grades on-curve (grade `b`
   before it mines band `b`, grade 5 before the core, S11). Its scripted mining (`drillTile`) lays
   casing through the player's placement code, one ring per metre, and the lining bill is settled per
-  Sell bay visit (#115, #128); the pacing specs fail a drill dive with no `casing_placed` and a slice that
+  Sell bay visit (#115, #128); the pacing specs fail a drill dive that lays no ring (a span's
+  `casing_lined` rings or a `casing_placed`) and a slice that
   forgives more than a tenth of the lining it charged. `src/logging/pacingGate.test.ts` fails on a
   missed pacing target (`src/constants/pacingTargets.ts`), an unregistered event or field, a broken
-  #2 sequence or more than 8 MB of core events and commands in the first hour (#11 am. 2's 4 MB,
-  raised as an interim by ticket 396 until the TD's log compaction lands); it also fails a
+  #2 sequence or core events and commands in the first hour over 1.3x the bytes ticket 420
+  measured with drill spans folded (about 2.4 MB, never above #11 am. 2's 4 MB; it prints the bytes
+  a cell too); it also fails a
   seed-median planet 1 drill under 3x its start band-1 speed when it first breaks a band-3 tile, or
   under 10 band-1 cells/s on arriving at planet 2 (`planetOneDrillPace.ts`, ticket 396).
+  `src/logging/logCompactionBotHour.test.ts` (nightly only, ticket 420) plays the bot's first hour
+  twice, its drill spans folded and with one line per cell (`drillLines: 'cells'`), and fails unless
+  the domain events are identical, the logged commands expand back exactly, every unfolded line is
+  byte for byte the same apart from `seq`, and the pacing report, planet 1 drill pace, dive casing,
+  summary and money lane read the same off both. `src/logging/drillLogBytes.test.ts` drills a
+  synthetic hour of 60 Hz `drillStep` with 5 Hz poses through the NDJSON sink at 1x, 10x and 100x
+  the planet 1 band-1 speed: events plus commands within 5% of each other and at most 6 MB.
   `src/logging/assayPacingGate.test.ts` holds the bot holding `assay_beacon`
   (`bot-slice-assay.scenario.json`) to the same three gates: the #16 first ten minutes, the planet 1
   core in 15 to 30 minutes and the slice in 40 to 130 (ticket 396's windows, slice edge per #418; `pacingVerdicts` prints pass or fail for each). Trips per planet
@@ -493,7 +502,7 @@ programs }` from three's `renderer.info` of the game canvas), read only when cal
   drill ticks per metre of bands 1 to 5, time on the planet, docked and cutting ticks, the trip
   share in basis points, the largest Money and its significant digits). It fails on any logged
   event the schema refuses (every money field canonical text, #5), on a run that does not finish
-  and on a log over 1 MB, apart from the first-hour 8 MB gate. A `*.lane.test.ts` file runs only
+  and on a log over 1 MB, apart from the first-hour gate. A `*.lane.test.ts` file runs only
   when a CLI filter names it (`vite.config.ts`): it takes hours, so neither `npm test` nor the
   nightly picks it up. Its rounding rule is unit-tested in `systems/money.test.ts` (charges never
   round down, income never up, at 1e36, 1e37 and 1e40).

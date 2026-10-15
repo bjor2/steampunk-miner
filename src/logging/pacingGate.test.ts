@@ -39,13 +39,15 @@ const SCENARIO = JSON.parse(
 
 /**
  * #11 amendment 2: core events plus commands stay under the first-hour budget, the commands as
- * `commands.ndjson` writes them (a pose's `drive` only when it changed, ticket 342). The pose rate
- * stays 5 Hz: the #123 rulings retired #11's 4 Hz fallback. Ticket 396 (GD ruling 6190377494,
- * Systems' confirmation) raises the budget from 4 MB to 8 MB as an interim: uncapped drilling logs
- * more cells an hour, and a log budget must never act as a speed cap. The TD's log compaction
- * ticket replaces this raise.
+ * `commands.ndjson` writes them (changed pose fields only, drill runs as one line). The pose rate
+ * stays 5 Hz: the #123 rulings retired #11's 4 Hz fallback. Ticket 420 (GD ruling on #396 Q4)
+ * brings the budget back down from #396's interim 8 MB to 1.3x the first hour it measured with the
+ * drill spans folded, 1,953,622 bytes, never above 4 MB. The log drops nothing at any speed, so the
+ * budget is only this assert and can never act as a speed cap; real growth fails it.
  */
-const BYTES_PER_HOUR_BUDGET = 8 * 1024 * 1024
+const MEASURED_FIRST_HOUR_BYTES = 1_953_622
+const BYTES_PER_HOUR_BUDGET = Math.round(MEASURED_FIRST_HOUR_BYTES * 1.3)
+const BYTES_PER_HOUR_CEILING = 4 * 1024 * 1024
 const HOUR_TICKS = 60 * 60 * TICKS_PER_SECOND
 
 /** The #2 acceptance sequence, in order, other lines allowed between (#24). */
@@ -85,6 +87,16 @@ function isSubsequence(names: readonly string[], log: readonly string[]): boolea
 function isCoreLevel(event: RunEvent): boolean {
   const registered = registeredEventOf(event.event)
   return registered !== undefined && 'level' in registered && registered.level === 'core'
+}
+
+/** Cells the drill broke: each drill span's, and any other tile's own line (ticket 420). */
+function cellsBrokenIn(events: readonly RunEvent[]): number {
+  return events.reduce((cells, event) => cells + cellsOfLine(event), 0)
+}
+
+function cellsOfLine(event: RunEvent): number {
+  if (event.event === 'drill_cut') return (event as RunEvent<'drill_cut'>).data.cells
+  return event.event === 'tile_destroyed' ? 1 : 0
 }
 
 function bytesOf(lines: readonly object[]): number {
@@ -143,12 +155,19 @@ describe('balance regression: the pacing bot on the slice (#29, S11)', () => {
     expect(Object.values(report.finalLevels).every((level) => level > 0)).toBe(true)
   })
 
-  it('keeps the first hour of core events and commands under the 8 MB budget', () => {
+  it('keeps the first hour of core events and commands under 1.3x its measured bytes (ticket 420)', () => {
     const { events, commands } = botRun()
-    const coreEvents = events.filter((event) => event.tick <= HOUR_TICKS && isCoreLevel(event))
+    const hourEvents = events.filter((event) => event.tick <= HOUR_TICKS)
+    const coreEvents = hourEvents.filter(isCoreLevel)
     const loggedCommands = loggedCommandsOf(commands.filter((c) => c.tick <= HOUR_TICKS))
     const bytes = bytesOf(coreEvents) + bytesOf(loggedCommands)
-    console.log(`first hour: ${(bytes / 1024 / 1024).toFixed(2)} MB of core events and commands`)
+    const cells = cellsBrokenIn(hourEvents)
+    console.log(
+      `first hour: ${(bytes / 1024 / 1024).toFixed(2)} MB of core events and commands, ` +
+        `budget ${(BYTES_PER_HOUR_BUDGET / 1024 / 1024).toFixed(2)} MB; ` +
+        `${cells} cells, ${Math.round(bytes / Math.max(cells, 1))} bytes a cell`,
+    )
+    expect(BYTES_PER_HOUR_BUDGET).toBeLessThanOrEqual(BYTES_PER_HOUR_CEILING)
     expect(bytes).toBeLessThan(BYTES_PER_HOUR_BUDGET)
   })
 
