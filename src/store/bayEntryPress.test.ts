@@ -7,11 +7,13 @@ import { UI_ID_TEMPLATES } from '../systems/views/screenIds'
 import { resetGameStore, useGameStore } from './gameStore'
 import { readUpgradeBayModel } from './screenReads'
 
-// A press on a bay entry whose anchor is locked sends nothing (ticket 344): the entry is not on
-// the screen, so neither a press nor a held confirm reaches the authority. `blasting_charges`
-// opens on planet 7; the probe's buy is the kernel casing grade.
+// A press on a bay entry whose anchor is held sends nothing (ticket 344): the entry is not on
+// the screen, so neither a press nor a held confirm reaches the authority. Since #411 a planet
+// only prices a row, so `blasting_charges` (planet 7) is on sale from planet 1 and only a vision
+// row such as `magma_tick` holds an entry back. The probe's buy is the kernel casing grade.
 
 const RACK_BUY = UI_ID_TEMPLATES.upgradebayEntryBuy('entry-probe.rack')
+const TICK_BUY = UI_ID_TEMPLATES.upgradebayEntryBuy('entry-probe.tick')
 
 const game = () => useGameStore.getState()
 
@@ -41,20 +43,27 @@ function withChargesEntry(run: () => void): void {
   withRegistrations([entryProbeSlice([charges.source])], run)
 }
 
+function withVisionEntry(run: () => void): void {
+  const vision = probeSourceOf('entry-probe.magma', 'magma_tick', [
+    { entryId: 'entry-probe.tick' },
+  ])
+  withRegistrations([entryProbeSlice([vision.source])], run)
+}
+
 describe('pressing a bay entry (ticket 344)', () => {
-  it('sends nothing while the entry anchor is locked', () =>
-    withChargesEntry(() => {
-      dockOnPlanet(6)
+  it('sends nothing while the entry anchor is a held vision row', () =>
+    withVisionEntry(() => {
+      dockOnPlanet(12)
       const grade = casingGrade()
-      game().focusControl(RACK_BUY)
-      expect(game().focusedControlId).not.toBe(RACK_BUY)
-      expect(game().pressScreenButton(RACK_BUY)).toBe(false)
+      game().focusControl(TICK_BUY)
+      expect(game().focusedControlId).not.toBe(TICK_BUY)
+      expect(game().pressScreenButton(TICK_BUY)).toBe(false)
       expect(casingGrade()).toBe(grade)
     }))
 
-  it('submits the slice command once the anchor is open', () =>
+  it("submits the slice command before its anchor's planet: the planet only prices it (#411)", () =>
     withChargesEntry(() => {
-      dockOnPlanet(7)
+      dockOnPlanet(1)
       const grade = casingGrade()
       expect(game().pressScreenButton(RACK_BUY)).toBe(true)
       expect(casingGrade()).toBe(grade + 1)
