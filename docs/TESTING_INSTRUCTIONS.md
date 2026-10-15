@@ -255,6 +255,15 @@ programs }` from three's `renderer.info` of the game canvas), read only when cal
   slower. Its rows go to `balance-report/drill-ladder-steps.ndjson`, which the Tester's
   `pushTestMetrics.sh` appends to `drill-ladder.ndjson` on `test-metrics` for the status page's
   Drill speed panel ([loop-status.md](loop-status.md#drill-speed-panel-ticket-434)). About 2 s.
+- **Cut-follow at the starting drill** (ticket 430): `src/physics/cutFollowStartingRigs.test.ts`
+  plays 8 s legs down, level and up in the live loop with `drill.sweptCut` on, at stored
+  drill_power 1, 10 and 20 (tip 0) and #400's two rigs, and holds a down cut to the drill's speed
+  (95% of the ticks within 5%, none under 80% or backward) past its start from rest (#433's first
+  cell, held and second stall), up and level to main's shares (79%, 42%), the motor gate to the
+  authority's and 30 and 144 frames/s to one path (about 40 s). The commanded speed is the open
+  gate's `vCut`, carried through a shut gate and a cleared slab. `src/physics/cutFollowRelease.test.ts`
+  lets go of a followed cut at every tick of a cell's cycle (a fresh rig a phase) and wants the body
+  stopped within 6 ticks (about 5 minutes). Both share the rig of `src/physics/cutFollowFixtures.ts`.
 - **Known red** (ticket 419, the TD on #396 section 2): `CAMPAIGN_PACING_KNOWN_RED`
   (`src/constants/knownRed.ts`) is the one known-red marker in the repo: one gate
   (`campaignPacingGate`), one finding (#417), no registry. The gate still runs in full;
