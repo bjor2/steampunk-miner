@@ -42,6 +42,12 @@
   align-items: center;
 }
 
+/* The bay's panels scroll in the shared scroll area (spec #422 ruling 3, pass #427). */
+.panelsFrame,
+.tracksFrame {
+  height: 100%;
+}
+
 .sellPanels,
 .upgradePanels,
 .refineryPanels {
@@ -49,7 +55,6 @@
   gap: var(--space-2);
   align-content: start;
   min-height: 0;
-  overflow: auto;
 }
 
 .sellPanels {
@@ -70,10 +75,6 @@
   grid-template-columns: 45fr 55fr;
   grid-template-rows: 1fr auto;
   overflow: hidden;
-}
-
-.upgradePanels > :first-child {
-  overflow: auto;
 }
 
 .wideRow {
@@ -117,13 +118,17 @@
   border-bottom: 1px dotted rgb(201 162 75 / 0.4);
 }
 
-.tier {
-  min-width: 2.5rem;
-  font-weight: bold;
+.row > * {
+  flex: 1;
 }
 
-.assay {
-  color: var(--color-brass);
+/* A row's element (#427) reads across: its title, its facts, then its button. */
+.row [data-ui-text] {
+  flex: 1;
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: var(--space-2) var(--space-3);
+  align-items: center;
 }
 
 .action {
@@ -134,32 +139,20 @@
 }
 
 /*
- * #173 phones and small tablets: a short screen gives the bay its whole safe area and scrolls it
- * as one page, so every row and button stays reachable by touch at the 17.6 px text size.
+ * #173 phones and small tablets: a short screen gives the bay its whole safe area and one column,
+ * and the panels scroll in the shared scroll area between header and footer (pass #427), so every
+ * row and button stays reachable by touch at the 17.6 px text size.
  */
 @media (max-height: 600px) {
   .screen {
     inset: 0;
-    display: block;
-    overflow: auto;
-    overscroll-behavior: contain;
-    /* Room to scroll the last row clear of the touch cluster's 72 px Interact corner. */
+    /* Keeps the footer clear of the touch cluster's 72 px Interact corner. */
     padding-bottom: calc(72px + 2 * var(--space-3));
-  }
-
-  .screen > * + * {
-    margin-top: var(--space-2);
   }
 
   .sellPanels,
   .refineryPanels,
   .upgradePanels {
     grid-template-columns: 1fr;
-    grid-template-rows: none;
-    overflow: visible;
-  }
-
-  .upgradePanels > :first-child {
-    overflow: visible;
   }
 }

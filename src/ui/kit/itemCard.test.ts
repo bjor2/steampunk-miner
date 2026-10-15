@@ -74,6 +74,7 @@ const FULL_LINE: StatLine = {
   cap: { value: '92', headroomPct: formatPercent(fromCanonical('0.125')) },
 }
 
+/** The full card's own words for FULL_LINE (#159), which the compact element shortens. */
 const FULL_TEXTS = [
   'Drill power 57 → 70',
   '+13 (+22.8%)',
@@ -187,17 +188,34 @@ describe('item card: shop row', () => {
   })
 })
 
+// Pass #427 (spec #422): the dock draws its cards on the shared element, the name and the first
+// stat line on it and the rest of the card in its brass tooltip, in the compact caveat words.
 describe('item card: platform card', () => {
-  it('draws the next refinery slot as the full card with the describer’s lines', () => {
+  it('draws the next refinery slot on the shared element, the rest of its card in the tooltip', () => {
     game().setPlanet(3)
     game().teleportToDock('refinery')
     const html = renderDescribed(() =>
       createElement(RefineryBayView, { model: readRefineryBayModel(), focusedId: '' }),
     )
-    const card = rowOf(html, 'module:refinery_slot')
-    expect(card).toContain('data-variant="full"')
-    expect(textOf(card)).toContain('A fake ledger line for refinery_slot.')
-    FULL_TEXTS.forEach((part) => expect(textOf(card)).toContain(part))
+    expect(textOf(shownElementOf(html, 'dock.refinery.slot-buy'))).toContain(
+      'Drill power 57 → 70 +13 (+22.8%)',
+    )
+    const tooltip = textOf(tooltipPlateOf(html, 'dock.refinery.slot-buy'))
+    expect(tooltip).toContain('A fake ledger line for refinery_slot.')
+    expect(tooltip).toContain('Major in 3: 1.20e6, cap 92 (12.5% to go)')
+    expect(tooltip).toContain('Available from planet 8')
+    expect(tooltip).toContain('Lets the drill take crystal ore')
+  })
+
+  it('prints every stat line field in the #159 words on the full card', () => {
+    game().setPlanet(3)
+    game().teleportToDock('refinery')
+    const text = textOf(
+      renderDescribed(() =>
+        createElement(ItemCard, { variant: 'full', card: readRefineryBayModel().slotCard }),
+      ),
+    )
+    FULL_TEXTS.forEach((part) => expect(text).toContain(part))
   })
 
   it('shows an artefact’s flavour and lines in place of its kernel summary', () => {
@@ -208,23 +226,27 @@ describe('item card: platform card', () => {
 })
 
 describe('item card: tooltip', () => {
-  it('carries the service’s full card over its button, hidden until it opens', () => {
+  it('carries the service’s card in the brass tooltip over Recharge, hidden until it opens', () => {
     game().teleportToDock('sell')
     const html = renderDescribed(() =>
       createElement(SellBayView, { model: readSellBayModel(), focusedId: '' }),
     )
-    const tooltip = tooltipOf(html, 'service:recharge')
+    expect(textOf(shownElementOf(html, 'dock.recharge'))).toContain(
+      'Drill power 57 → 70 +13 (+22.8%)',
+    )
+    const tooltip = tooltipPlateOf(html, 'dock.recharge')
     expect(tooltip).toContain('hidden')
     expect(textOf(tooltip)).toContain('A fake ledger line for recharge.')
-    FULL_TEXTS.forEach((part) => expect(textOf(tooltip)).toContain(part))
+    expect(textOf(tooltip)).toContain('Major in 3: 1.20e6, cap 92 (12.5% to go)')
   })
 
-  it('adds no tooltip while no describer is registered', () => {
+  it('adds no card tooltip while no describer is registered', () => {
     game().teleportToDock('sell')
     const html = withRegistrations([], () =>
       renderToString(createElement(SellBayView, { model: readSellBayModel(), focusedId: '' })),
     )
-    expect(html).not.toContain('role="tooltip"')
+    expect(html).not.toContain('data-tooltip="dock.recharge"')
+    expect(html).not.toContain('data-tooltip="dock.quick-service"')
   })
 })
 
@@ -279,11 +301,19 @@ function rowOf(html: string, itemCardId: string): string {
   return html.slice(html.lastIndexOf('<', start), next < 0 ? undefined : next)
 }
 
-function tooltipOf(html: string, itemCardId: string): string {
-  const start = html.indexOf(`data-item-tooltip="${itemCardId}"`)
-  expect(start, `${itemCardId} has a tooltip`).toBeGreaterThanOrEqual(0)
-  const next = html.indexOf('data-item-tooltip=', start + 1)
-  return html.slice(html.lastIndexOf('<', start), next < 0 ? undefined : next)
+/** The shared element `textId` up to its tooltip plate: what shows before the tooltip opens. */
+function shownElementOf(html: string, textId: string): string {
+  const start = html.indexOf(`data-ui-text="${textId}"`)
+  expect(start, `${textId} is drawn on the shared element`).toBeGreaterThanOrEqual(0)
+  return html.slice(start, html.indexOf('role="tooltip"', start))
+}
+
+/** The brass tooltip plate of the shared element `textId`. */
+function tooltipPlateOf(html: string, textId: string): string {
+  const plate = new RegExp(`<div role="tooltip"[^>]*data-tooltip="${textId}"[^>]*>.*?</div>`, 's')
+  const found = plate.exec(html)?.[0]
+  expect(found, `${textId} has a tooltip`).toBeDefined()
+  return found ?? ''
 }
 
 /** A focused compact card: what a tapped shop row shows. */

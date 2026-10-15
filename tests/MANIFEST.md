@@ -1263,11 +1263,12 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | --- | --- | --- |
 | `src/ui/hud/hudPanels.test.ts` | 6 | 6 |
 | `src/ui/iconCoverage.test.ts` | 9 | 9 |
-| `src/ui/kit/itemCard.test.ts` | 12 | 12 |
+| `src/ui/kit/itemCard.test.ts` | 13 | 13 |
 | `src/ui/kit/uiParts.test.ts` | 16 | 16 |
 | `src/ui/platform/bayEntryRowView.test.ts` | 2 | 2 |
 | `src/ui/platform/bayPanels.test.ts` | 8 | 8 |
 | `src/ui/platform/bayScreens.test.ts` | 6 | 6 |
+| `src/ui/platform/dockText.test.ts` | 4 | 4 |
 | `src/ui/projection/worldToScreen.test.ts` | 7 | 5 |
 | `src/ui/screenIds.test.ts` | 4 | 4 |
 | `src/ui/screens/sliceScreen.test.ts` | 8 | 8 |

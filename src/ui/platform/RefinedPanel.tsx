@@ -1,4 +1,7 @@
-/** The Sell bay's ready Refinery batches and Collect (#105): refined ore is paid here only. */
+/**
+ * The Sell bay's ready Refinery batches and Collect (#105): refined ore is paid here only. Each
+ * batch, and the total with Collect, is one shared Title+OneLine element (spec #422, pass #427).
+ */
 import {
   refinedLineId,
   type RefinedLine,
@@ -6,24 +9,30 @@ import {
 } from '../../systems/views/refinedPanel'
 import { panelIconIdOf } from '../../systems/art/icons/iconSet'
 import { Panel } from '../kit/Panel'
+import { TitleOneLine } from '../kit/TitleOneLine'
 import { UI_IDS } from '../ids'
 import { ScreenButtonView } from '../ScreenButtonView'
-import { VectorIcon } from '../VectorIcon'
 import styles from './Platform.module.css'
+import {
+  REFINED_COLLECT_TEXT,
+  REFINED_HEADING,
+  refinedLineFactsOf,
+  refinedLineTextOf,
+  refinedTotalFactsOf,
+} from './sellBayElements'
 
 export function RefinedPanel({ refined, focusedId }: { refined: Refined; focusedId: string }) {
   return (
-    <Panel title="Refined" iconId={panelIconIdOf('refined')}>
+    <Panel title="Refined" iconId={panelIconIdOf('refined')} heading={REFINED_HEADING}>
       <div data-testid={UI_IDS.sellbayRefined}>
         {refined.lines.map((line) => (
           <RefinedLineView key={line.slot} line={line} />
         ))}
       </div>
-      <div className={styles.action}>
-        <ScreenButtonView button={refined.collect} focusedId={focusedId} />
-        <span data-testid={UI_IDS.sellbayRefinedTotal} data-exact={refined.total.exact}>
-          {refined.total.text}
-        </span>
+      <div className={styles.row}>
+        <TitleOneLine text={REFINED_COLLECT_TEXT} facts={refinedTotalFactsOf(refined)} level="span">
+          <ScreenButtonView button={refined.collect} focusedId={focusedId} />
+        </TitleOneLine>
       </div>
     </Panel>
   )
@@ -32,10 +41,12 @@ export function RefinedPanel({ refined, focusedId }: { refined: Refined; focused
 function RefinedLineView({ line }: { line: RefinedLine }) {
   return (
     <div className={styles.row} data-testid={refinedLineId(line)} data-tier={line.tier}>
-      <VectorIcon iconId={line.iconId} size="menu" />
-      <span className={styles.tier}>T{line.tier}</span>
-      <span>{line.units} x</span>
-      <span data-exact={line.value.exact}>{line.value.text}</span>
+      <TitleOneLine
+        text={refinedLineTextOf(line)}
+        iconId={line.iconId}
+        facts={refinedLineFactsOf(line)}
+        level="span"
+      />
     </div>
   )
 }
