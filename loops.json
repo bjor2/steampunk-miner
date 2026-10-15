@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "updated_at": "2026-10-15T01:44:19Z",
+  "updated_at": "2026-10-15T01:45:08Z",
   "entries": {
     "steampunk-loop/1": {
       "loop": "steampunk-loop",
@@ -413,9 +413,9 @@
       "slot": null,
       "state": "working",
       "issue": null,
-      "note": "testing spec #139 (Wayfinder: Materials expansion (ore variety, depth and planet distribution, gates, dynamite, visual progression)) on 9f249c8",
+      "note": "nightly run on 57ab156 (nightly)",
       "stale_after_min": 420,
-      "updated_at": "2026-10-14T22:11:59Z",
+      "updated_at": "2026-10-15T01:45:08Z",
       "host": "grok-bot-vm-452660841"
     },
     "steampunk-loop/10": {
