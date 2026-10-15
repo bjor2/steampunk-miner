@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-10-15T23:06:51+02:00",
+  "updated_at": "2026-10-15T23:09:56+02:00",
   "caps": {
     "grok": 12,
     "claude": 10,
@@ -23,7 +23,8 @@
           "ticket": 426,
           "grok_slot": 1,
           "kind": "dev",
-          "since": "2026-10-15T23:00:00+02:00"
+          "since": "2026-10-15T23:00:00+02:00",
+          "wave": "1B"
         },
         {
           "slot": "C2",
@@ -47,7 +48,8 @@
           "ticket": 430,
           "grok_slot": 4,
           "kind": "dev",
-          "since": "2026-10-15T21:55:00+02:00"
+          "since": "2026-10-15T21:55:00+02:00",
+          "wave": "1A"
         },
         {
           "slot": "C5",
@@ -624,7 +626,8 @@
       "state": "dev",
       "ticket": 426,
       "since": "2026-10-15T23:00:00+02:00",
-      "claude_slot": 1
+      "claude_slot": 1,
+      "wave": "1B"
     },
     {
       "slot": 2,
@@ -643,7 +646,8 @@
       "state": "dev",
       "ticket": 430,
       "since": "2026-10-15T21:55:00+02:00",
-      "claude_slot": 4
+      "claude_slot": 4,
+      "wave": "1A"
     },
     {
       "slot": 5,
@@ -701,7 +705,8 @@
       "ticket": 426,
       "grok_slot": 1,
       "since": "2026-10-15T23:00:00+02:00",
-      "account": 1
+      "account": 1,
+      "wave": "1B"
     },
     {
       "slot": 2,
@@ -725,7 +730,8 @@
       "ticket": 430,
       "grok_slot": 4,
       "since": "2026-10-15T21:55:00+02:00",
-      "account": 1
+      "account": 1,
+      "wave": "1A"
     },
     {
       "slot": 5,
@@ -803,5 +809,76 @@
       "free": 4,
       "external": 0
     }
+  },
+  "waves": {
+    "mode": "off",
+    "parallel": 1,
+    "list": [
+      {
+        "number": 438,
+        "key": "1D",
+        "map": 302,
+        "lane": "hitl",
+        "mode": "bench",
+        "state": "bench",
+        "tickets": [
+          304,
+          305,
+          306,
+          307,
+          308,
+          417,
+          422
+        ],
+        "done": [],
+        "live": 0
+      },
+      {
+        "number": 437,
+        "key": "1C",
+        "map": 302,
+        "lane": "remote",
+        "mode": "solo",
+        "state": "ready",
+        "tickets": [
+          434
+        ],
+        "done": [],
+        "live": 0
+      },
+      {
+        "number": 436,
+        "key": "1B",
+        "map": 302,
+        "lane": "remote",
+        "mode": "solo",
+        "state": "running",
+        "tickets": [
+          425,
+          426,
+          427,
+          428,
+          429
+        ],
+        "done": [],
+        "live": 1
+      },
+      {
+        "number": 435,
+        "key": "1A",
+        "map": 302,
+        "lane": "remote",
+        "mode": "solo",
+        "state": "running",
+        "tickets": [
+          430,
+          397,
+          421,
+          432
+        ],
+        "done": [],
+        "live": 1
+      }
+    ]
   }
 }
