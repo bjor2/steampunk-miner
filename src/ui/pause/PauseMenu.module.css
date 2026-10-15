@@ -9,6 +9,15 @@
   pointer-events: auto;
 }
 
+/* The kit panel's brass frame, around one title element instead of a bare heading (pass #429). */
+.plate {
+  min-width: min(28rem, 90vw);
+  padding: var(--space-2) var(--space-3);
+  border: 1px solid var(--color-brass);
+  border-radius: var(--radius-panel);
+  background: var(--color-panel);
+}
+
 .choices {
   display: flex;
   flex-direction: column;
@@ -38,32 +47,25 @@
   outline-offset: var(--focus-ring-offset);
 }
 
+/* The shared scroll area (build #423) bounds the slot list; it owns the overflow. */
+.slotsScroll {
+  max-height: 60vh;
+  margin-bottom: var(--space-2);
+}
+
 .slots {
-  margin: 0 0 var(--space-2);
+  margin: 0;
   padding: 0;
   list-style: none;
-  max-height: 60vh;
-  overflow: auto;
 }
 
 .slot {
-  display: grid;
-  grid-template-columns: 12rem 10rem 12rem auto;
-  gap: var(--space-2);
-  align-items: center;
   padding: 2px 0;
 }
 
-/* An empty slot reads dimmer and in italics, not by colour alone. */
-.slot[data-empty] .slotTitle {
+/* An empty slot reads in italics, by shape and never dimmer than the readable floor (#422). */
+.slot[data-empty] [data-ui-text] > span {
   font-style: italic;
-  opacity: 0.7;
-}
-
-.slotTitle {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
 }
 
 .notice {

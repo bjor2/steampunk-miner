@@ -33,7 +33,8 @@ export interface IconValue {
   flashKey?: number
 }
 
-export type TitleLevel = 'h2' | 'h3' | 'span'
+/** `h1` is the game's name on the title screen; panels use `h2`, cards `h3`, rows `span`. */
+export type TitleLevel = 'h1' | 'h2' | 'h3' | 'span'
 
 /** `stack` puts the lines under the title; `row` sets title and values on one line (a HUD row). */
 export type ElementLayout = 'stack' | 'row'

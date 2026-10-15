@@ -1,6 +1,8 @@
 /**
  * Settings drawn from their view model: the display switches, every action with its key, its pad
- * button and a rebind button, the problem lines of a refused rebinding, reset, and close. Markup only.
+ * button and a rebind button, the problem lines of a refused rebinding, reset, and close. Each
+ * group, row and the footer is one shared Title+OneLine element (spec #422, pass #429), the rows
+ * scrolling in the shared scroll area. Markup only.
  */
 import {
   SETTINGS_HEADING,
@@ -11,10 +13,18 @@ import {
 import { panelIconIdOf } from '../../systems/art/icons/iconSet'
 import { Panel } from '../kit/Panel'
 import { ScrollArea } from '../kit/ScrollArea'
+import { TitleOneLine } from '../kit/TitleOneLine'
 import { UI_IDS } from '../ids'
 import { ScreenButtonView } from '../ScreenButtonView'
-import { VectorIcon } from '../VectorIcon'
 import styles from './Settings.module.css'
+import {
+  bindingTextOf,
+  CONTROLS_GROUP_TEXT,
+  DISPLAY_GROUP_TEXT,
+  REBIND_REFUSED_TEXT,
+  SETTINGS_FOOTER_TEXT,
+  toggleTextOf,
+} from './settingsElements'
 
 export function SettingsView({ model, focusedId }: { model: SettingsModel; focusedId: string }) {
   return (
@@ -22,27 +32,23 @@ export function SettingsView({ model, focusedId }: { model: SettingsModel; focus
       <Panel title="Settings" iconId={panelIconIdOf('settings')} heading={SETTINGS_HEADING}>
         <ScrollArea className={styles.scroll}>
           <div className={styles.columns}>
-            <section>
+            <TitleOneLine text={DISPLAY_GROUP_TEXT} level="span">
               {model.toggles.map((toggle) => (
                 <ToggleRow key={toggle.name} toggle={toggle} focusedId={focusedId} />
               ))}
-            </section>
-            <section>
+            </TitleOneLine>
+            <TitleOneLine text={CONTROLS_GROUP_TEXT} level="span">
               {model.bindings.map((row) => (
                 <BindingLine key={row.actionId} row={row} focusedId={focusedId} />
               ))}
-              {model.bindingProblems.length > 0 && (
-                <ul className={styles.problems} data-testid={UI_IDS.settingsBindingProblems}>
-                  {model.bindingProblems.map((problem) => (
-                    <li key={problem}>{problem}</li>
-                  ))}
-                </ul>
-              )}
+              <RebindProblems problems={model.bindingProblems} />
               <ScreenButtonView button={model.reset} focusedId={focusedId} />
-            </section>
+            </TitleOneLine>
           </div>
         </ScrollArea>
-        <ScreenButtonView button={model.close} focusedId={focusedId} />
+        <TitleOneLine text={SETTINGS_FOOTER_TEXT} level="span" layout="row">
+          <ScreenButtonView button={model.close} focusedId={focusedId} />
+        </TitleOneLine>
       </Panel>
     </div>
   )
@@ -51,23 +57,44 @@ export function SettingsView({ model, focusedId }: { model: SettingsModel; focus
 function ToggleRow({ toggle, focusedId }: { toggle: SettingToggle; focusedId: string }) {
   return (
     <div className={styles.row}>
-      <span className={styles.setting}>
-        <VectorIcon iconId={toggle.iconId} size="menu" />
-        {toggle.label}
-      </span>
-      <span data-state={toggle.valueText}>{toggle.valueText}</span>
-      <ScreenButtonView button={toggle.button} focusedId={focusedId} />
+      <TitleOneLine
+        text={toggleTextOf(toggle.name, toggle.label)}
+        iconId={toggle.iconId}
+        level="span"
+        layout="row"
+      >
+        <span className={styles.controls}>
+          <span data-state={toggle.valueText}>{toggle.valueText}</span>
+          <ScreenButtonView button={toggle.button} focusedId={focusedId} />
+        </span>
+      </TitleOneLine>
     </div>
   )
 }
 
 function BindingLine({ row, focusedId }: { row: BindingRow; focusedId: string }) {
   return (
-    <div className={styles.bindingRow} data-waiting={row.isWaitingForKey || undefined}>
-      <span>{row.displayName}</span>
-      <span className={styles.key}>{row.keyText}</span>
-      <span className={styles.key}>{row.padText}</span>
-      <ScreenButtonView button={row.button} focusedId={focusedId} />
+    <div className={styles.row} data-waiting={row.isWaitingForKey || undefined}>
+      <TitleOneLine text={bindingTextOf(row.actionId, row.displayName)} level="span" layout="row">
+        <span className={styles.controls}>
+          <span className={styles.key}>{row.keyText}</span>
+          <span className={styles.key}>{row.padText}</span>
+          <ScreenButtonView button={row.button} focusedId={focusedId} />
+        </span>
+      </TitleOneLine>
     </div>
+  )
+}
+
+function RebindProblems({ problems }: { problems: readonly string[] }) {
+  if (problems.length === 0) return null
+  return (
+    <TitleOneLine text={REBIND_REFUSED_TEXT} level="span">
+      <ul className={styles.problems} data-testid={UI_IDS.settingsBindingProblems}>
+        {problems.map((problem) => (
+          <li key={problem}>{problem}</li>
+        ))}
+      </ul>
+    </TitleOneLine>
   )
 }

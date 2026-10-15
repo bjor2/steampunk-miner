@@ -21,27 +21,20 @@
   gap: var(--space-3);
 }
 
+/* Each row is one title element in its row layout: the name left, value or keys and button right. */
 .row {
-  display: grid;
-  grid-template-columns: 1fr auto auto;
-  gap: var(--space-2);
-  align-items: center;
   padding: 2px 0;
 }
 
-.setting {
+/* The value or the keys and the button, kept together at the row's right edge. */
+.controls {
   display: inline-flex;
   align-items: center;
-  gap: var(--space-1);
+  gap: var(--space-2);
+  margin-left: auto;
 }
 
-/* A binding row adds the pad button's column beside the key's (ticket 346). */
-.bindingRow {
-  composes: row;
-  grid-template-columns: 1fr auto auto auto;
-}
-
-.bindingRow[data-waiting] .key {
+.row[data-waiting] .key {
   text-decoration: underline wavy;
 }
 

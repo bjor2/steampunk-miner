@@ -49,7 +49,6 @@ export interface TitleMenuModel {
   load: ScreenButton
   slotRows: TitleSlotRow[]
   back: ScreenButton
-  confirmText: string
   confirmNewGame: ScreenButton
   cancelNewGame: ScreenButton
   problems: readonly string[]
@@ -77,10 +76,6 @@ export const TITLE_MENU_ID_TEMPLATES = {
   slotLoad: (slot: SaveSlotKey) => `title-slot-${slot}-load`,
 }
 
-const CONFIRM_TEXT =
-  'Start a new game from planet 1? Nothing carries over. The autosave is replaced at the first ' +
-  'checkpoint; named slots stay.'
-
 const SECONDS_PER_MINUTE = 60
 const MINUTES_PER_HOUR = 60
 const MS_PER_MINUTE = 60_000
@@ -98,7 +93,6 @@ export function selectTitleMenuModel(sources: TitleMenuSources): TitleMenuModel 
     ...pageParts,
     continueSummary: latest === null ? null : slotSummaryOf(latest),
     slotRows,
-    confirmText: CONFIRM_TEXT,
     problems,
     buttons,
     focusStops: buttons.map((button) => ({ id: button.id, panel: page })),

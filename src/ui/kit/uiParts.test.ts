@@ -174,11 +174,12 @@ describe('panel with a heading', () => {
 })
 
 describe('settings panel as the example element', () => {
-  it('registers its header within the text budget and holds its rows in the scroll area', () => {
+  it('registers its header and rows within the text budget and holds its rows in the scroll area', () => {
     const html = renderToString(settingsView())
     expect(html).toContain('data-ui-text="settings-panel"')
     expect(html).toContain('data-scroll-area')
-    expect(registeredUiTexts().map((text) => text.id)).toEqual(['settings-panel'])
+    expect(registeredUiTexts().map((text) => text.id)).toContain('settings-panel')
+    expect(registeredUiTexts().map((text) => text.id)).toContain('settings.toggle.shake')
     expect(registeredUiTexts().flatMap(uiTextProblemsOf)).toEqual([])
   })
 })
