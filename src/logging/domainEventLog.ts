@@ -116,12 +116,18 @@ const PROJECTIONS: { readonly [K in KernelDomainEventType]: Projection<K> } = {
     event: 'bore_fired',
     data: { aimed, bearing, rangeCells },
   }),
-  BoreEnded: ({ stop, tx, ty, cellsOpened, groundedUntilTick }) => ({
+  BoreEnded: ({ stop, tx, ty, cellsOpened, groundedUntilTick, lineCells }) => ({
     event: 'bore_ended',
-    data:
-      groundedUntilTick === undefined
-        ? { stop, tx, ty, cellsOpened }
-        : { stop, tx, ty, cellsOpened, groundedUntilTick },
+    data: {
+      stop,
+      tx,
+      ty,
+      cellsOpened,
+      ...(groundedUntilTick === undefined ? {} : { groundedUntilTick }),
+      ...(lineCells === undefined
+        ? {}
+        : { lineCells: lineCells.map(({ tx, ty }) => ({ tx, ty })) }),
+    },
   }),
   StrutPlaced: ({ tx, ty, untilTick }) => ({
     event: 'strut_placed',

@@ -618,7 +618,8 @@ export const RUN_EVENT_REGISTRY = {
   // clamp, its cells opening on the clock; then the bore stopped at its range, budget or tank, or
   // with the clank at a cell the drill cannot dig, the core or lava. Its cells log as
   // `tile_destroyed` like drilled ones; their ore never reaches the hold. A grounding shot's line
-  // (ticket 378) adds the tick its opened cells stay grounded until.
+  // (ticket 378) adds the tick its opened cells stay grounded until, and the line ending a shot a
+  // listener wants (ticket 412) the shot's opened cells, at most 50.
   bore_fired: {
     group: 'mining',
     level: 'core',
@@ -633,6 +634,7 @@ export const RUN_EVENT_REGISTRY = {
       ty: 'integer',
       cellsOpened: 'integer',
       groundedUntilTick: { optional: 'integer' },
+      lineCells: { optional: { listOf: { tx: 'integer', ty: 'integer' } } },
     },
   },
   // Ticket 379 (#318): a strut-bore line stopped at a hollow's edge (`bore_ended` stop `strut`)

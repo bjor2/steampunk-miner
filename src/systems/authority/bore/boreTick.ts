@@ -26,12 +26,13 @@ import type { TilePoint } from '../../world/tileGrid'
 import type { AuthorityState } from '../authorityState'
 import type { TickOutcome } from '../combat/combatTick'
 import type { RuleEffect } from '../commandRule'
-import type { BoreStop, DomainEvent, DomainEventBody } from '../domainEvent'
+import type { BoreStop, DomainEvent, DomainEventBodies, DomainEventBody } from '../domainEvent'
 import { gunRecoveryTicks } from '../../registries/boreGun'
 import { planetParamsOf } from '../planetOfState'
 import { openBoreCell, type CellOpening } from './boreCell'
 import { groundedUntilOf, groundEndedBore } from '../magnetic/groundedLines'
 import { checkBoreBlocks } from './boreCollapse'
+import { lineCellsOnEnd } from './boreLine'
 import { lineEndedBore } from './boreLining'
 import {
   boresOf,
@@ -44,6 +45,8 @@ import {
 import { strutOnStop, strutStopOr } from './boreStrut'
 
 type BoreStep = (state: AuthorityState) => TickOutcome
+
+type BoreEndedBody = { type: 'BoreEnded' } & DomainEventBodies['BoreEnded']
 
 /** The next tick a bore opens a cell, checks its blocks or leaves; null with none. */
 export function nextBoreTick(state: AuthorityState): number | null {
@@ -99,8 +102,9 @@ function openNextCell(
   const opening = strutStopOr(state, bore, tile, openBoreCell(state, params, ask))
   const moved = movedBore(bore, tile, rest, opening, tick)
   const effect = effectOf(state, opening)
-  const ended = endEventsOf(moved, tile, opening, tick)
-  const left = leftOnEnd(effect.state, params, { bore: moved, tile, opening, tick })
+  const cell = { bore: moved, tile, opening, tick }
+  const ended = endEventsOf(state, index, cell)
+  const left = leftOnEnd(effect.state, params, cell)
   return {
     state: withShotSpent(withBoreAt(left.state, index, moved), moved),
     events: stampedFor(bore.playerId, [...effect.events, ...ended, ...left.events], tick),
@@ -180,20 +184,26 @@ function endedBore(bore: PendingBore, tick: number): PendingBore {
 }
 
 /**
- * `BoreEnded` when this cell ended the line: a stop at it, or the last cell of the range; with
- * the tick its cells are grounded until when the line grounds them.
+ * `BoreEnded` when this cell ended the line at `index`: a stop at it, or the last cell of the
+ * range; with the tick its cells are grounded until when the line grounds them, and the shot's
+ * opened cells when it ends the shot and a listener wants them (ticket 412).
  */
-function endEventsOf(
-  moved: PendingBore,
-  tile: TilePoint,
-  opening: CellOpening,
-  tick: number,
-): DomainEventBody[] {
-  if (isBoreOpening(moved)) return []
+function endEventsOf(state: AuthorityState, index: number, cell: LineCell): DomainEventBody[] {
+  if (isBoreOpening(cell.bore)) return []
+  const groundedUntilTick = groundedUntilOf(cell.bore, cell.tick)
+  const lineCells = lineCellsOnEnd(state, index, cell.bore)
+  return [
+    {
+      ...endedBodyOf(cell),
+      ...(groundedUntilTick === null ? {} : { groundedUntilTick }),
+      ...(lineCells === null ? {} : { lineCells }),
+    },
+  ]
+}
+
+function endedBodyOf({ bore, tile, opening }: LineCell): BoreEndedBody {
   const stop: BoreStop = opening.kind === 'stopped' ? opening.stop : 'range'
-  const ended = { type: 'BoreEnded' as const, stop, ...tile, cellsOpened: moved.bored.length }
-  const groundedUntilTick = groundedUntilOf(moved, tick)
-  return [groundedUntilTick === null ? ended : { ...ended, groundedUntilTick }]
+  return { type: 'BoreEnded', stop, ...tile, cellsOpened: bore.bored.length }
 }
 
 /** What the cell changed: the opened cell's effect, or a stop's own events on the same state. */

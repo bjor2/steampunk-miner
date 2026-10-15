@@ -22,6 +22,7 @@ import { CELL_GATE_LOOK_REGISTRY } from '../systems/registries/cellGateLook'
 import { BOT_PURCHASE_REGISTRY } from '../systems/registries/botPurchases'
 import { AUTO_GUNS_REGISTRY } from '../systems/registries/autoGuns'
 import { BORE_GUN_REGISTRY } from '../systems/registries/boreGun'
+import { BORE_LINE_LISTENER_REGISTRY } from '../systems/registries/boreLineListeners'
 import { AUTO_ACTOR_REGISTRY } from '../systems/registries/autoActors'
 import { CHARGE_BLAST_CUE_REGISTRY } from '../systems/registries/chargeBlastCue'
 import { CLOCK_STEP_REGISTRY } from '../systems/registries/clockSteps'
@@ -182,6 +183,7 @@ export function registrarFor(sliceId: string): SliceRegistrar {
     planetSkyBand: (provider) => add(PLANET_SKY_BAND_REGISTRY, provider),
     planetCardLine: (source) => addPrefixed(PLANET_CARD_LINE_REGISTRY, sliceId, source),
     boreGun: (provider) => add(BORE_GUN_REGISTRY, provider),
+    boreLineListener: (listener) => add(BORE_LINE_LISTENER_REGISTRY, listener),
     autoGuns: (provider) => add(AUTO_GUNS_REGISTRY, provider),
     autoActor: (actor) => add(AUTO_ACTOR_REGISTRY, actor),
     slotHoldCue: (source) => add(SLOT_HOLD_CUE_REGISTRY, source),

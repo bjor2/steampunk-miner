@@ -30,6 +30,16 @@ const digested: DomainEvent = {
   scope: 'periodic',
 }
 
+const boreEnded: DomainEvent = {
+  tick: 40,
+  playerId: 'p1',
+  type: 'BoreEnded',
+  stop: 'range',
+  tx: -26,
+  ty: 280,
+  cellsOpened: 2,
+}
+
 describe('domain event projection', () => {
   it('logs an applied debug command with the tick and seq of its command', () => {
     expect(projectDomainEvent(debugApplied)).toEqual({
@@ -527,6 +537,27 @@ describe('domain event log', () => {
     ])
     expect(sink.events.map(({ data }) => data)).toEqual([
       { tx: 3, ty: -41, size: 4, by: 'plunger' },
+    ])
+    expect(sink.events.flatMap(runEventProblems)).toEqual([])
+  })
+
+  it('records a bore end with no line cells as the four fields it always logged (ticket 412)', () => {
+    recordDomainEvents({ playerId: 'p1', planet: 3, depthTiles: 20 }, [boreEnded])
+    expect(sink.events.map(({ data }) => JSON.stringify(data))).toEqual([
+      '{"stop":"range","tx":-26,"ty":280,"cellsOpened":2}',
+    ])
+  })
+
+  it("records a bore end's line cells in their order as a schema-valid line (ticket 412)", () => {
+    const lineCells = [
+      { tx: -29, ty: 280 },
+      { tx: -28, ty: 280 },
+    ]
+    recordDomainEvents({ playerId: 'p1', planet: 3, depthTiles: 20 }, [
+      { ...boreEnded, groundedUntilTick: 160, lineCells },
+    ])
+    expect(sink.events.map(({ data }) => data)).toEqual([
+      { stop: 'range', tx: -26, ty: 280, cellsOpened: 2, groundedUntilTick: 160, lineCells },
     ])
     expect(sink.events.flatMap(runEventProblems)).toEqual([])
   })

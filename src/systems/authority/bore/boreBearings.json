@@ -4,6 +4,8 @@
   "arcEdges": [85, 170],
   "shotShapeCapsSource": "Ticket 377 (TD lock on #318): the most lines a shot shape bores (the aimed line included) and the most same-ore seam turns per line. Systems on #322 section 5: the splay choke's lines run 2 to 5 by charges, the rifled bore's turns 1 to 4.",
   "shotShapeCaps": { "maxLines": 5, "maxSeamTurns": 4 },
+  "boreEventCapsSource": "Ticket 412 (K-line, the TD lock 6180863028 on #320): a BoreEnded carries at most rangeCap x shotShapeCaps.maxLines opened cells (50), derived, never set apart. rangeCap is the most cells a line reaches: the ground-gun slice's bore.rangeCap 10 (the GD amendment on #310), held here because the kernel never reads a slice's numbers.",
+  "boreEventCaps": { "rangeCap": 10 },
   "bearings": [
     [-1024, 0],
     [-1024, 13],

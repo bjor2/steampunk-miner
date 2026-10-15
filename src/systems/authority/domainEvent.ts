@@ -269,7 +269,10 @@ export interface KernelDomainEventBodies {
    * the drill cannot dig, the core or lava (`isClankStop`), or quietly at a hollow's edge where its
    * shot wedges a strut (ticket 379). `tx, ty` is the cell it stopped at, or its last cell;
    * `cellsOpened` the cells it opened. A grounding shot's line that opened cells grounds them until
-   * `groundedUntilTick` (ticket 378); absent for every other line.
+   * `groundedUntilTick` (ticket 378); absent for every other line. The line that ends its shot
+   * carries the cells every line of the shot opened, line by line in fire order and each in walk
+   * order, as `lineCells` (ticket 412): the first `boreEventCaps.maxLineCells` (50) of them, and
+   * only while a `boreLineListeners` listener wants them; absent otherwise.
    */
   BoreEnded: {
     stop: BoreStop
@@ -277,6 +280,7 @@ export interface KernelDomainEventBodies {
     ty: number
     cellsOpened: number
     groundedUntilTick?: number
+    lineCells?: readonly { tx: number; ty: number }[]
   }
   /**
    * A strut-bore line wedged a strut in the mouth it broke into a hollow through (ticket 379):
