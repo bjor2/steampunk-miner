@@ -1262,6 +1262,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | File | Tests | Sites |
 | --- | --- | --- |
 | `src/ui/hud/hudPanels.test.ts` | 6 | 6 |
+| `src/ui/hud/hudText.test.ts` | 4 | 4 |
 | `src/ui/iconCoverage.test.ts` | 9 | 9 |
 | `src/ui/kit/itemCard.test.ts` | 13 | 13 |
 | `src/ui/kit/uiParts.test.ts` | 16 | 16 |
@@ -1334,6 +1335,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/views/engineTrackMaxed.test.ts` | 7 | 7 |
 | `src/systems/views/hazardStripView.test.ts` | 3 | 3 |
 | `src/systems/views/heatViews.test.ts` | 5 | 5 |
+| `src/systems/views/hudCallouts.test.ts` | 6 | 6 |
 | `src/systems/views/hudModel.test.ts` | 27 | 27 |
 | `src/systems/views/itemCardElement.test.ts` | 7 | 7 |
 | `src/systems/views/itemCardText.test.ts` | 5 | 5 |

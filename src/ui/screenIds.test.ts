@@ -37,6 +37,7 @@ import {
   setGunLevelCommand,
   teleportToDockCommand,
 } from '../systems/vehicle/vehicleCommands'
+import { calloutTextOf } from '../systems/views/hudCallouts'
 import { selectHudModel, type HudModel } from '../systems/views/hudModel'
 import type { BayFooter, BayHeader } from '../systems/views/bayFrame'
 import { selectSellBayModel, type SellBayModel } from '../systems/views/sellBayModel'
@@ -107,6 +108,15 @@ function decode(inner: string): string {
     .replace(/&amp;/g, '&')
 }
 
+/**
+ * A HUD call-out as the element draws it (pass #428): its title, then its one line, every word of
+ * the model's sentence with only the separator between them dropped.
+ */
+function calloutShown(text: string): string {
+  const shown = calloutTextOf('', text)
+  return shown.title + shown.oneLine
+}
+
 /** What each id's text must be; null for a gauge dial, which shows a needle and no text. */
 function hudTexts(model: HudModel): Partial<Record<UiId, string | null>> {
   return {
@@ -116,17 +126,21 @@ function hudTexts(model: HudModel): Partial<Record<UiId, string | null>> {
     [UI_IDS.hudHullText]: model.hull.text,
     [UI_IDS.hudCargoGauge]: null,
     [UI_IDS.hudCargoText]: model.cargo.text,
-    [UI_IDS.hudCargoCore]: model.cargo.coreText,
+    ...(model.cargo.coreText === '' ? {} : { [UI_IDS.hudCargoCore]: model.cargo.coreText }),
     [UI_IDS.hudCargoValue]: model.cargoValue.text,
     ...(model.liningBill === null ? {} : { [UI_IDS.hudLiningBill]: model.liningBill.text }),
     [UI_IDS.hudDepth]: model.depth.text,
     [UI_IDS.hudBand]: String(model.depth.band),
     ...(model.casing === null ? {} : { [UI_IDS.hudCasing]: model.casing.text }),
     ...(model.guns === null ? {} : { [UI_IDS.hudGuns]: model.guns.text }),
-    ...(model.guns?.isIdle === true ? { [UI_IDS.hudGunsIdle]: model.guns.idleText } : {}),
+    ...(model.guns?.isIdle === true
+      ? { [UI_IDS.hudGunsIdle]: calloutShown(model.guns.idleText) }
+      : {}),
     ...(model.boreAuto === null ? {} : { [UI_IDS.hudBoreAuto]: model.boreAuto.text }),
     ...(model.charges === null ? {} : { [UI_IDS.hudCharges]: model.charges.text }),
-    ...(model.chargeFuse === null ? {} : { [UI_IDS.hudChargeFuse]: model.chargeFuse.text }),
+    ...(model.chargeFuse === null
+      ? {}
+      : { [UI_IDS.hudChargeFuse]: calloutShown(model.chargeFuse.text) }),
     ...(model.heat === null
       ? {}
       : { [UI_IDS.hudHeatGauge]: null, [UI_IDS.hudHeatText]: model.heat.text }),
@@ -146,12 +160,20 @@ function hudTexts(model: HudModel): Partial<Record<UiId, string | null>> {
       : { [UI_IDS.hudCoreDistance]: String(model.coreDistance) }),
     ...(model.vehicleState.rescueCountdownTicks === null
       ? {}
-      : { [UI_IDS.hudRescueCountdown]: model.vehicleState.rescueCountdownText }),
-    ...(model.dockPrompt.isShown ? { [UI_IDS.hudDockPrompt]: model.dockPrompt.text } : {}),
-    ...(model.cachePrompt.isShown ? { [UI_IDS.hudCachePrompt]: model.cachePrompt.text } : {}),
-    ...(model.readyPrompt.isShown ? { [UI_IDS.hudReadyPrompt]: model.readyPrompt.text } : {}),
+      : { [UI_IDS.hudRescueCountdown]: calloutShown(model.vehicleState.rescueCountdownText) }),
+    ...(model.dockPrompt.isShown
+      ? { [UI_IDS.hudDockPrompt]: calloutShown(model.dockPrompt.text) }
+      : {}),
+    ...(model.cachePrompt.isShown
+      ? { [UI_IDS.hudCachePrompt]: calloutShown(model.cachePrompt.text) }
+      : {}),
+    ...(model.readyPrompt.isShown
+      ? { [UI_IDS.hudReadyPrompt]: calloutShown(model.readyPrompt.text) }
+      : {}),
     ...(model.isDebugRun ? { [UI_IDS.hudDebugMark]: 'DEBUG RUN' } : {}),
-    ...(model.warning.level === 'ok' ? {} : { [UI_IDS.hudWarningEnergy]: model.warning.text }),
+    ...(model.warning.level === 'ok'
+      ? {}
+      : { [UI_IDS.hudWarningEnergy]: calloutShown(model.warning.text) }),
   }
 }
 
@@ -451,7 +473,22 @@ function renderFullHoldHud(): string[] {
     isAwaitingPlay: true,
   })
   expect(model.cargo.isFull).toBe(true)
-  return checkScreen(createElement(HudView, { model, isFlashing: false }), hudTexts(model))
+  return [
+    ...checkScreen(createElement(HudView, { model, isFlashing: false }), hudTexts(model)),
+    ...checkScreen(createElement(HudView, { model: withCoreInHold(model), isFlashing: false }), {
+      [UI_IDS.hudCargoCore]: CORE_TEXT,
+    }),
+  ]
+}
+
+const CORE_TEXT = '(3 core)'
+
+/**
+ * The hold's core readout draws only while it carries fragments (pass #428), which only a core
+ * extraction gives; the view is handed the reading the model gives then.
+ */
+function withCoreInHold(model: HudModel): HudModel {
+  return { ...model, cargo: { ...model.cargo, coreFragments: 3, coreText: CORE_TEXT } }
 }
 
 /** The HUD over the planet's artefact cache, and the cache's cards (#46). */

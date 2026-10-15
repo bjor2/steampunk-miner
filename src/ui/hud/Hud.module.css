@@ -24,16 +24,12 @@
   gap: var(--space-2);
 }
 
-.notes {
-  grid-column: 2;
-  display: flex;
-  gap: var(--space-2);
-  font-size: 0.8rem;
-}
-
-/* #115: the lining bill owed at the next sale, a cost like a fee, so in the brass of the labels. */
-.liningBill {
-  color: var(--color-brass);
+/* A dial beside its element: the gauge's name over its glyph-and-value facts (pass #428). */
+.gauge {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  column-gap: var(--space-2);
+  align-items: center;
 }
 
 .position {
@@ -44,18 +40,11 @@
   min-width: 10rem;
 }
 
-.line {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: var(--space-2);
-}
-
-.lineLabel {
+/* A row's value drawn as markup (a badge, a lamp, the arrow), its glyph first. */
+.value {
   display: inline-flex;
   align-items: center;
   gap: var(--space-1);
-  color: var(--color-brass);
 }
 
 /* #41 casing feel: the bay teal while the grade holds the band, flashing amber when it does not. */
@@ -178,17 +167,19 @@
   }
 }
 
-/* The "+N" pip: the statuses that did not fit the three. */
+/* The "+N more" pip: the statuses that did not fit the three. */
 .statusMore {
   padding: 0 var(--space-1);
   border: 1px solid var(--color-ember);
-  border-radius: 50%;
+  border-radius: 1em;
   color: var(--color-ember);
   font-weight: bold;
 }
 
 /* Text, an icon id and hatching carry the warning; the blink is only an extra. */
 .warning {
+  display: inline-flex;
+  align-items: center;
   padding: 0 var(--space-1);
   background-image: repeating-linear-gradient(
     45deg,
