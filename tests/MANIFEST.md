@@ -1330,8 +1330,8 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/views/hazardStripView.test.ts` | 3 | 3 |
 | `src/systems/views/heatViews.test.ts` | 5 | 5 |
 | `src/systems/views/hudModel.test.ts` | 27 | 27 |
-| `src/systems/views/itemCardElement.test.ts` | 5 | 5 |
-| `src/systems/views/itemCardText.test.ts` | 4 | 4 |
+| `src/systems/views/itemCardElement.test.ts` | 7 | 7 |
+| `src/systems/views/itemCardText.test.ts` | 5 | 5 |
 | `src/systems/views/menuFocus.test.ts` | 2 | 2 |
 | `src/systems/views/overlaySeats.test.ts` | 5 | 5 |
 | `src/systems/views/pauseMenuModel.test.ts` | 7 | 7 |
