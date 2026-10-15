@@ -1,8 +1,9 @@
 /**
  * The ore catalogue's rows in the balance and session reports (#223 `reportRows`, #140 acceptance
  * 2-5, #146 "the pacing bot and the run log report the first sighting depth per tier"). Derived from
- * a run's log, never written into it. Every row is per seed and planet; the counts are printed whole
- * so three seeds pool by adding them.
+ * a run's log and, for its units, the domain events a bot run keeps (ticket 420), never written
+ * into the log. Every row is per seed and planet; the counts are printed whole so three seeds pool
+ * by adding them.
  *
  * - first sighting: the depth of the first unit of each tier collected on the planet
  * - deep preview: whether tier `3(p-1)+6` (band 4's +2, next planet's band 3) was collected before
@@ -13,6 +14,7 @@
  */
 import type { ReportRow, ReportRowSource } from '../../logging/registries/reportRows'
 import type { RunEvent } from '../../logging/runEvent'
+import type { DomainEvent } from '../../systems/authority/domainEvent'
 import { oreSalePrice, oreTier } from '../../systems/economy/oreEconomy'
 import {
   add,
@@ -39,8 +41,13 @@ const PER_MILLE = 1000
 
 export const oreReportRows: ReportRowSource = { id: ORE_REPORT_ROWS_ID, rowsOf: oreRowsOf }
 
-function oreRowsOf(events: readonly RunEvent[], worldSeed: number, planet: number): ReportRow[] {
-  const units = minedOreUnitsOf(events, worldSeed, planet)
+function oreRowsOf(
+  events: readonly RunEvent[],
+  worldSeed: number,
+  planet: number,
+  planetEvents: readonly DomainEvent[] = [],
+): ReportRow[] {
+  const units = minedOreUnitsOf(planetEvents, worldSeed, planet)
   if (units.length === 0) return []
   return [
     firstSightingRow(units),

@@ -2,9 +2,11 @@
  * Slowdowns and long-task bursts, per session, lined up with the mined order (#125, logging
  * strategy sections 4 and 6): a slowdown is a run of back-to-back seconds whose p95 frame missed
  * the #38 budget, a burst a run of seconds with frames over 50 ms (#121 `longTasks`). Each names
- * the ore, its depth and chunk last collected before it started (#122 `resource_collected`), so a
- * slow build shows which mineral, depth or chunk preceded the slowdown, ready to replay to.
+ * the ore, its depth and chunk last collected before it started (#122 `resource_collected`, or a
+ * drill span's `drill_cut` and its last unit, ticket 420), so a slow build shows which mineral,
+ * depth or chunk preceded the slowdown, ready to replay to.
  */
+import type { RunEventData } from '../eventNames'
 import type { RunEvent } from '../runEvent'
 import { isOverFrameBudget } from './frameCost'
 import { eventsNamed, type SessionLog } from './sessionTable'
@@ -36,7 +38,15 @@ export interface FrameStretch {
 }
 
 type PerfSample = RunEvent<'perf_sample'>
-type Collected = RunEvent<'resource_collected'>
+
+/** A collected unit, where the run's own order put its line. */
+interface Collected {
+  seq: number
+  tick: number
+  oreId: string
+  oreDepthTiles: number
+  chunk: string
+}
 
 const IS_IN_STRETCH: Record<StretchKind, (sample: PerfSample) => boolean> = {
   slowdown: isOverFrameBudget,
@@ -49,8 +59,39 @@ export function frameStretchesOf(sessions: readonly SessionLog[], kind: StretchK
 
 function frameStretchesOfSession(session: SessionLog, kind: StretchKind): FrameStretch[] {
   const runs = runsWhere(eventsNamed(session, 'perf_sample'), IS_IN_STRETCH[kind])
-  const collected = eventsNamed(session, 'resource_collected')
+  const collected = collectedOf(session)
   return runs.map((samples) => frameStretchOf(session, kind, samples, collected))
+}
+
+function collectedOf(session: SessionLog): Collected[] {
+  return session.events.flatMap(collectedOfLine)
+}
+
+function collectedOfLine(event: RunEvent): Collected[] {
+  if (event.event === 'resource_collected')
+    return [unitOfLine(event as RunEvent<'resource_collected'>)]
+  if (event.event !== 'drill_cut') return []
+  return lastUnitOfSpan(event as RunEvent<'drill_cut'>)
+}
+
+function unitOfLine({ seq, tick, data }: RunEvent<'resource_collected'>): Collected {
+  return { seq, tick, oreId: data.oreId, oreDepthTiles: data.oreDepthTiles, chunk: data.chunk }
+}
+
+type SpanData = RunEventData<'drill_cut'>
+type SpanDataWithLastOre = SpanData & Required<Pick<SpanData, LastOreField>>
+type LastOreField = 'lastOreDepthTiles' | 'lastOreChunk' | 'lastOreTick'
+
+/** A span's last unit: the last of its ore runs, at the depth, chunk and tick it names. */
+function lastUnitOfSpan({ seq, data }: RunEvent<'drill_cut'>): Collected[] {
+  const lastRun = data.ores.at(-1)
+  if (lastRun === undefined || !hasLastOre(data)) return []
+  const { lastOreTick: tick, lastOreDepthTiles: oreDepthTiles, lastOreChunk: chunk } = data
+  return [{ seq, tick, oreId: lastRun[0], oreDepthTiles, chunk }]
+}
+
+function hasLastOre(data: SpanData): data is SpanDataWithLastOre {
+  return data.lastOreTick !== undefined
 }
 
 /** Back-to-back samples that pass `isIn`, each run in tick order. */
@@ -99,9 +140,9 @@ function mineralBefore(collected: readonly Collected[], first: PerfSample): Mine
   const last = collected.filter((line) => line.seq < first.seq).at(-1)
   if (last === undefined) return null
   return {
-    oreId: last.data.oreId,
-    oreDepthTiles: last.data.oreDepthTiles,
-    chunk: last.data.chunk,
+    oreId: last.oreId,
+    oreDepthTiles: last.oreDepthTiles,
+    chunk: last.chunk,
     ticksBefore: first.tick - last.tick,
   }
 }

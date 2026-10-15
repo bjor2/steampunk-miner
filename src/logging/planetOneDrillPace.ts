@@ -15,6 +15,7 @@ import { startLevels, vehicleStatsAt, type UpgradeLevels } from '../systems/econ
 import { subStepsPerTile } from '../systems/vehicle/drillRule'
 import { bandOfTile } from '../systems/world/planetGeometry'
 import { planetParamsFor } from '../systems/world/planetParams'
+import type { TilePoint } from '../systems/world/tileGrid'
 import type { RunEvent } from './runEvent'
 
 export interface PlanetOneDrillPace {
@@ -63,9 +64,20 @@ function raiseTrack(levels: Record<UpgradeId, number>, event: RunEvent<'upgrade_
 }
 
 function isBandThreeOfPlanetOne(event: RunEvent, worldSeed: number): boolean {
-  if (!isEventNamed(event, 'tile_destroyed') || event.planet !== FIRST_PLANET) return false
+  const cell = brokenCellOf(event)
+  if (cell === null || event.planet !== FIRST_PLANET) return false
   const params = planetParamsFor(worldSeed, event.planet)
-  return bandOfTile(params, event.data.tx, event.data.ty) >= BAND_THREE
+  return bandOfTile(params, cell.tx, cell.ty) >= BAND_THREE
+}
+
+/**
+ * The tile a line broke first: a `tile_destroyed`'s, or a drill span's first cell (ticket 420),
+ * whose cells share one band.
+ */
+function brokenCellOf(event: RunEvent): TilePoint | null {
+  if (isEventNamed(event, 'tile_destroyed')) return { tx: event.data.tx, ty: event.data.ty }
+  if (!isEventNamed(event, 'drill_cut') || event.data.first === undefined) return null
+  return { tx: event.data.first[0], ty: event.data.first[1] }
 }
 
 function isArrivalPastPlanetOne(event: RunEvent): boolean {

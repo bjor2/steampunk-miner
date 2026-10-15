@@ -1,6 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import type { RunEventData, RunEventName } from '../../logging/eventNames'
-import { LOG_SCHEMA_VERSION, type RunEvent } from '../../logging/runEvent'
+import type { DomainEvent } from '../../systems/authority/domainEvent'
 import { oreSalePrice } from '../../systems/economy/oreEconomy'
 import { toCanonical } from '../../systems/money'
 import { planetMixReportRows } from './mixReportRows'
@@ -11,37 +10,27 @@ const PLANET = 12
 
 let seq = 0
 
-function line<N extends RunEventName>(planet: number, event: N, data: RunEventData<N>): RunEvent {
+/** One unit drilled into the hold, as its domain event names it (ticket 420). */
+function collected(entry: Pick<OreMixEntry, 'typeId' | 'family' | 'tier'>, depth: number) {
   seq += 1
   return {
-    v: LOG_SCHEMA_VERSION,
-    seq,
-    tick: seq,
-    timestamp: 0,
-    runId: 'run_test',
     playerId: 'p1',
-    planet,
-    depthTiles: 0,
-    event,
-    data,
-  } as RunEvent
-}
-
-function collected(entry: Pick<OreMixEntry, 'typeId' | 'family' | 'tier'>, depth: number) {
-  return line(PLANET, 'resource_collected', {
+    tick: seq,
+    seq,
+    type: 'CargoAdded',
     resourceTier: entry.tier,
     amount: 1,
     value: toCanonical(oreSalePrice(entry.tier)),
     oreId: entry.typeId,
     family: entry.family,
     signature: 'signature' in entry && entry.signature === true,
-    oreDepthTiles: depth,
+    depthTiles: depth,
     chunk: '0,9',
-  })
+  } satisfies DomainEvent
 }
 
-function rowsOf(events: readonly RunEvent[], planet = PLANET): Record<string, string> {
-  const rows = planetMixReportRows.rowsOf(events, WORLD_SEED, planet)
+function rowsOf(planetEvents: readonly DomainEvent[], planet = PLANET): Record<string, string> {
+  const rows = planetMixReportRows.rowsOf([], WORLD_SEED, planet, planetEvents)
   return Object.fromEntries(rows.map((row) => [row.label, row.value]))
 }
 
@@ -95,8 +84,7 @@ describe('planet mix report rows', () => {
     expect(rows['families before their act']).toBe('exotic')
   })
 
-  it('reads only the lines of its own planet', () => {
-    const elsewhere = { ...collected(SIGNATURE, 100), planet: PLANET + 1 }
-    expect(Object.keys(rowsOf([elsewhere]))).toEqual(['ore theme'])
+  it('has only the theme row when the run kept no domain events', () => {
+    expect(Object.keys(rowsOf([]))).toEqual(['ore theme'])
   })
 })

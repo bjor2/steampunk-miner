@@ -11,6 +11,7 @@ import { TICKS_PER_SECOND } from '../constants/physics'
 import { UPGRADE_IDS } from '../systems/economy/economyDefinition'
 import { bandOfTile } from '../systems/world/planetGeometry'
 import { planetParamsFor } from '../systems/world/planetParams'
+import type { TilePoint } from '../systems/world/tileGrid'
 import type { RunEventName } from './eventNames'
 import { derivePurchaseChains, type PurchaseChain } from './purchaseChains'
 import type { RunEvent } from './runEvent'
@@ -105,11 +106,14 @@ const PACING_FOLDS: { readonly [N in RunEventName]?: PacingFold<N> } = {
     earlyTracks.add(event.data.upgradeId)
   },
   tile_destroyed: (report, event, { worldSeed }) => {
-    if (isEarly(event))
-      report.deepestBandByEarlyCheck = Math.max(
-        report.deepestBandByEarlyCheck,
-        bandOfDestroyedTile(event, worldSeed),
-      )
+    if (isEarly(event)) deepenEarlyBand(report, bandOfCell(event, event.data, worldSeed))
+  },
+  // A drill span's cells share one band and its line is stamped at the first (ticket 420).
+  drill_cut: (report, event, { worldSeed }) => {
+    const { first } = event.data
+    if (isEarly(event) && first !== undefined) {
+      deepenEarlyBand(report, bandOfCell(event, { tx: first[0], ty: first[1] }, worldSeed))
+    }
   },
   core_completed: (report, { planet, tick }, { arrivals }) => {
     const key = String(planet)
@@ -129,10 +133,13 @@ function isEarly(event: RunEvent): boolean {
   return event.tick <= EARLY_CHECK_TICK
 }
 
+function deepenEarlyBand(report: PacingReport, band: number): void {
+  report.deepestBandByEarlyCheck = Math.max(report.deepestBandByEarlyCheck, band)
+}
+
 /** The band of a destroyed tile: the bot has dug there (#4 band thresholds of the planet). */
-function bandOfDestroyedTile(event: RunEvent<'tile_destroyed'>, worldSeed: number): number {
-  const params = planetParamsFor(worldSeed, event.planet)
-  return bandOfTile(params, event.data.tx, event.data.ty)
+function bandOfCell({ planet }: RunEvent, { tx, ty }: TilePoint, worldSeed: number): number {
+  return bandOfTile(planetParamsFor(worldSeed, planet), tx, ty)
 }
 
 /** One of the three gates the bot is held to (#29, S11 #65), and what it misses there. */

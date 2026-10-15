@@ -34,6 +34,30 @@ describe('drill dives and casing', () => {
     expect(diveTicksWithoutCasing(events)).toEqual([100])
   })
 
+  it("counts a drill span's cells and the rings of its lining run (ticket 420)", () => {
+    const span = line(20, 'drill_cut', {
+      spans: 2,
+      cells: 4,
+      ticks: 8,
+      units: 0,
+      value: '0e+0',
+      ores: [],
+      energy: 0,
+      heat: 0,
+      stop: 'command',
+    })
+    const lining = line(21, 'casing_lined', {
+      lengthMm: 1000,
+      band: 1,
+      grade: 1,
+      type: 'iron',
+      price: '2e+0',
+      rings: 2,
+    })
+    expect(diveTicksWithoutCasing([leave(10), span, lining, leave(100), span])).toEqual([100])
+    expect(countDrillDives([leave(10), span, lining])).toBe(1)
+  })
+
   it('ignores a dive that destroyed nothing', () => {
     expect(diveTicksWithoutCasing([leave(10), leave(100), dig(110), ring(111)])).toEqual([])
   })

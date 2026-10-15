@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import type { RunEventData, RunEventName } from '../../logging/eventNames'
 import { LOG_SCHEMA_VERSION, type RunEvent } from '../../logging/runEvent'
+import type { DomainEvent, DomainEventBody } from '../../systems/authority/domainEvent'
 import { oreSalePrice, oreTier } from '../../systems/economy/oreEconomy'
 import { toCanonical } from '../../systems/money'
 import { bandOfTile } from '../../systems/world/planetGeometry'
@@ -37,27 +38,43 @@ function tilesOfBand(band: number): TilePoint[] {
     .reverse()
 }
 
-/** One ore tile drilled for `ticks` (none: blasted) and its unit at `band`'s tier plus `lead`. */
+function domainEvent(tick: number, body: DomainEventBody): DomainEvent {
+  seq += 1
+  return { ...body, playerId: 'p1', tick, seq } as DomainEvent
+}
+
+function drilled(tick: number, tile: TilePoint, ticks: number): DomainEvent {
+  return domainEvent(tick, { type: 'DrillDamageDealt', ...tile, ticks, damage: '1e+0' })
+}
+
+/**
+ * One ore tile drilled for `ticks` (none: blasted) and its unit at `band`'s tier plus `lead`, as
+ * the domain events a bot run keeps (ticket 420).
+ */
 function minedUnit(tick: number, tile: TilePoint, band: number, lead: number, ticks: number) {
   const tier = oreTier(PLANET, band) + lead
   return [
-    ...(ticks > 0 ? [line(tick, 'drill_damage_dealt', { ...tile, ticks, damage: '1e+0' })] : []),
-    line(tick, 'tile_destroyed', { ...tile, kind: 'ore' }),
-    line(tick, 'resource_collected', {
+    ...(ticks > 0 ? [drilled(tick, tile, ticks)] : []),
+    domainEvent(tick, { type: 'TileDestroyed', ...tile, kind: 'ore' }),
+    domainEvent(tick, {
+      type: 'CargoAdded',
       resourceTier: tier,
       amount: 1,
       value: toCanonical(oreSalePrice(tier)),
       oreId: `metal_t${tier}`,
       family: 'metal',
       signature: false,
-      oreDepthTiles: 300 - tile.ty,
+      depthTiles: 300 - tile.ty,
       chunk: '0,9',
     }),
   ]
 }
 
-function rowsOf(events: readonly RunEvent[]): Record<string, string> {
-  const rows = oreReportRows.rowsOf(events, WORLD_SEED, PLANET)
+function rowsOf(
+  planetEvents: readonly DomainEvent[],
+  lines: readonly RunEvent[] = [],
+): Record<string, string> {
+  const rows = oreReportRows.rowsOf(lines, WORLD_SEED, PLANET, planetEvents)
   return Object.fromEntries(rows.map((row) => [row.label, row.value]))
 }
 
@@ -81,8 +98,8 @@ describe('ore report rows', () => {
     const preview = minedUnit(50, B4_FIRST, 4, 2, 30)
     const coreAt = (tick: number) => line(tick, 'core_reached', {})
     const label = `tier ${PREVIEW_TIER} collected before the core`
-    expect(rowsOf([...preview, coreAt(60)])[label]).toBe('yes')
-    expect(rowsOf([coreAt(40), ...preview])[label]).toBe('no')
+    expect(rowsOf(preview, [coreAt(60)])[label]).toBe('yes')
+    expect(rowsOf(preview, [coreAt(40)])[label]).toBe('no')
   })
 
   it('counts the +1 and +2 units of each band, read from the tile and the tier', () => {
@@ -106,7 +123,7 @@ describe('ore report rows', () => {
   it("prints band 5's median drill ticks per tile by lead, blasted tiles left out", () => {
     const rows = rowsOf([
       ...minedUnit(10, B5_FIRST, 5, 0, 30),
-      line(15, 'drill_damage_dealt', { ...B5_SECOND, ticks: 20, damage: '1e+0' }),
+      drilled(15, B5_SECOND, 20),
       ...minedUnit(20, B5_SECOND, 5, 1, 18),
       ...minedUnit(30, B5_THIRD, 5, 2, 0),
       ...minedUnit(40, B5_FOURTH, 5, 0, 34),

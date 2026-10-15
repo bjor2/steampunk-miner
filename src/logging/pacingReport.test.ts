@@ -115,6 +115,25 @@ describe('pacing report', () => {
     })
   })
 
+  it("reads the deepest early band off a drill span's first cell (ticket 420)", () => {
+    const span = line(5 * MINUTE, 'drill_cut', {
+      spans: 4,
+      cells: 9,
+      first: [7, 270],
+      last: [7, 262],
+      ticks: 40,
+      units: 0,
+      value: '0e+0',
+      ores: [],
+      energy: 0,
+      heat: 0,
+      stop: 'command',
+    })
+    const run = onTimeRun().filter((event) => event.event !== 'tile_destroyed')
+    expect(derivePacingReport([...run, span], WORLD_SEED).deepestBandByEarlyCheck).toBe(2)
+    expect(derivePacingReport(run, WORLD_SEED).deepestBandByEarlyCheck).toBe(0)
+  })
+
   it('keeps the final level of every track and the rescues by cause', () => {
     const report = derivePacingReport(onTimeRun(), WORLD_SEED)
     expect(report.finalLevels).toMatchObject({ drill_tip: 2, hull: 1, engine: 0 })

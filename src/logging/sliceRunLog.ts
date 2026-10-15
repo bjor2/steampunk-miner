@@ -21,13 +21,20 @@ import { tileOfPose } from '../systems/vehicle/vehiclePose'
 import { recordDomainEventsTo } from './domainEventLog'
 import { createMemorySink, type RunEventSink } from './eventSink'
 import type { RunEvent, RunEventPlace } from './runEvent'
-import { createRunLog, type RunLog } from './runLog'
+import {
+  trackPlanetStarts,
+  type PlanetDomainEvents,
+  type PlanetStartTracker,
+} from './planetDomainEvents'
+import { createRunLog, type DrillLines, type RunLog } from './runLog'
 import { recordStartingPlanet } from './startingPlanetLines'
 
 export interface LoggedSliceRun {
   run: SliceRun
   events: readonly RunEvent[]
   commands: readonly AuthorityCommand[]
+  /** The run's domain events by planet, for the per-unit report rows (ticket 420). */
+  domainEvents: PlanetDomainEvents
 }
 
 const PLAYER_ID = 'p1'
@@ -49,6 +56,8 @@ export interface LoggedRunOptions {
   chainPolicy?: ChainPolicy
   /** Whether the bot fires the bore gun (ticket 347); default `never`, `forced` for `balance:bore`. */
   borePolicy?: BorePolicy
+  /** `spans` (the default), or `cells` for the pre-compaction lines a spec compares (ticket 420). */
+  drillLines?: DrillLines
 }
 
 /** One run of a scenario on one of its pacing world seeds (#84). */
@@ -76,8 +85,10 @@ export function playLoggedSlice(
   options: LoggedRunOptions = {},
 ): LoggedSliceRun {
   const sink = createMemorySink()
-  const run = playSliceIntoSink(scenario, sink, options)
-  return { run, events: sink.events, commands: sink.commands }
+  const planets = trackPlanetStarts()
+  const run = playSliceIntoSink(scenario, sink, options, planets)
+  const domainEvents = { events: run.events, planetStarts: planets.planetStarts() }
+  return { run, events: sink.events, commands: sink.commands, domainEvents }
 }
 
 /**
@@ -89,6 +100,7 @@ export function playSliceIntoSink(
   scenario: Scenario,
   sink: RunEventSink,
   options: LoggedRunOptions = {},
+  planets: PlanetStartTracker = trackPlanetStarts(),
 ): SliceRun {
   refuseBotScenario(scenario)
   const start = startingState(scenario)
@@ -97,6 +109,7 @@ export function playSliceIntoSink(
     runId: `run_bot_${scenario.name}`,
     sink,
     secondsSinceStart: () => tick / TICKS_PER_SECOND,
+    drillLines: options.drillLines,
   })
   recordRunStart(runLog, start)
   const run = playSlice(start, {
@@ -113,7 +126,9 @@ export function playSliceIntoSink(
       onCommand: (command) => runLog.recordCommand(command),
       onEvents: (state, events) => {
         tick = state.tick
-        recordDomainEventsTo(runLog, placeOf(state), events)
+        const place = placeOf(state)
+        planets.noteBatch(place.planet, events)
+        recordDomainEventsTo(runLog, place, events, state)
       },
     },
   })
@@ -161,6 +176,7 @@ function recordRunStart(runLog: RunLog, start: AuthorityState): void {
 }
 
 function recordRunEnd(runLog: RunLog, run: SliceRun): void {
+  runLog.flushDrillSpans()
   const reason = run.isFinished ? 'slice_completed' : 'bot_budget_spent'
   runLog.record({ ...placeOf(run.state), tick: run.state.tick }, 'game_ended', { reason })
 }

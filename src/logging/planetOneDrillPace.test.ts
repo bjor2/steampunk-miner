@@ -57,6 +57,24 @@ function tileInBand(tick: number, band: number): RunEvent {
   return line(tick, 'tile_destroyed', { tx: 0, ty, kind: 'ground' })
 }
 
+/** The same tile as the first broken cell of a drill span's line (ticket 420). */
+function spanFromTileInBand(tick: number, band: number): RunEvent {
+  const { data } = tileInBand(tick, band) as RunEvent<'tile_destroyed'>
+  return line(tick, 'drill_cut', {
+    spans: 1,
+    cells: 2,
+    first: [data.tx, data.ty],
+    last: [data.tx, data.ty - 1],
+    ticks: 8,
+    units: 0,
+    value: '0e+0',
+    ores: [],
+    energy: 0,
+    heat: 0,
+    stop: 'band',
+  })
+}
+
 const arriveOnPlanetTwo = (tick: number) =>
   line(tick, 'planet_entered', { planetSeed: 2, generatorVersion: 1, radius: 400 }, 2)
 
@@ -103,6 +121,14 @@ describe('planet 1 drill pace (ticket 396)', () => {
         bandOneCellsPerSecond(levelsWithDrillMajor(17)),
       ),
     )
+  })
+
+  it('takes the band-3 speed at the first drill span whose cells are in band 3 (ticket 420)', () => {
+    const pace = derivePlanetOneDrillPace(
+      [drillBuy(10, 4), spanFromTileInBand(20, 2), drillBuy(30, 10), spanFromTileInBand(40, 3)],
+      WORLD_SEED,
+    )
+    expect(pace.bandThreeCellsPerSecond).toBe(bandOneCellsPerSecond(levelsWithDrillMajor(10)))
   })
 
   it('leaves both speeds open for a run that never dug to band 3 or left planet 1', () => {

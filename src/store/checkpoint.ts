@@ -221,10 +221,14 @@ function checkpointOfReading(
   return { slot, state, saveEpoch, unlocked, migrations }
 }
 
-/** Logged by the store once the resumed session is connected: each migration step, then the load. */
+/**
+ * Logged by the store once the resumed session is connected: the old session's open drill spans
+ * (ticket 420), each migration step, then the load.
+ */
 export function recordCheckpointLoaded(place: RunEventPlace, checkpoint: Checkpoint): void {
   const state = readAuthorityState()
   const at = { ...place, tick: state.tick }
+  getRunLog().flushDrillSpans()
   checkpoint.migrations.forEach((step) => getRunLog().record(at, 'save_migrated', { ...step }))
   getRunLog().record(at, 'checkpoint_loaded', {
     slot: checkpoint.slot,

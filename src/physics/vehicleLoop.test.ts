@@ -30,7 +30,7 @@ beforeAll(async () => {
 beforeEach(() => {
   resetGameStore()
   sink = createMemorySink()
-  installRunLog(createRunLog({ runId: 'run_test', sink, secondsSinceStart: () => 0 }))
+  installRunLog(createPerCellRunLog())
 })
 
 afterEach(() => uninstallRunLog())
@@ -63,12 +63,20 @@ function restartRun(): void {
   uninstallRunLog()
   resetGameStore()
   sink = createMemorySink()
-  installRunLog(createRunLog({ runId: 'run_test', sink, secondsSinceStart: () => 0 }))
+  installRunLog(createPerCellRunLog())
 }
 
 const lastPose = () => {
   const poses = sink.commands.filter((command) => command.type === 'reportPose')
   return poses.at(-1)?.payload as { thrusting: boolean; facing: number }
+}
+
+/**
+ * The run log with one line per drilled cell (ticket 420's pre-compaction stream), so the specs
+ * read each tile the pose's drilling broke.
+ */
+function createPerCellRunLog() {
+  return createRunLog({ runId: 'run_test', sink, secondsSinceStart: () => 0, drillLines: 'cells' })
 }
 
 const destroyedTiles = () => sink.events.filter((event) => event.event === 'tile_destroyed')

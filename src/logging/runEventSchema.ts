@@ -103,6 +103,8 @@ function holdsFloat(kind: FieldKind): boolean {
   if (typeof kind === 'string') return kind === 'float'
   if ('listOf' in kind) return Object.values(kind.listOf).some(holdsFloat)
   if ('mapOf' in kind) return holdsFloat(kind.mapOf)
+  if ('tuple' in kind) return kind.tuple.some(holdsFloat)
+  if ('itemsOf' in kind) return holdsFloat(kind.itemsOf)
   if ('optional' in kind) return holdsFloat(kind.optional)
   return false
 }

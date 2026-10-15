@@ -1,8 +1,9 @@
 /**
  * The minerals of a run in the order they were mined (#122, `TEST-LOGGING-STRATEGY.md` section 4),
  * run-length encoded so a long session stays short: `[["kernel.metal.t1", 12], ["kernel.crystal.t2",
- * 3], ...]`, plus the units of each ore. `summary.json` folds it from `resource_collected` lines and
- * a golden run from the `CargoAdded` events its replay gives, so both read the same sequence.
+ * 3], ...]`, plus the units of each ore. `summary.json` folds it from the `drill_cut` lines' `ores`
+ * (ticket 420) and the `resource_collected` lines of ore that came some other way, and a golden
+ * run from the `CargoAdded` events its replay gives, so both read the same sequence.
  */
 
 /** Units of one ore mined back to back: `[oreId, units]`. */
@@ -31,12 +32,13 @@ export function minedOrderOf(ores: readonly MinedOre[]): MinedOrder {
 
 /** Appends `ore` to `order` in place, as the summary's tally folds, and returns it. */
 export function addMinedOre(order: MinedOrder, { oreId, amount }: MinedOre): MinedOrder {
-  extendLastRun(order.runs, oreId, amount)
+  extendMinedRuns(order.runs, oreId, amount)
   order.unitsByOre[oreId] = (order.unitsByOre[oreId] ?? 0) + amount
   return order
 }
 
-function extendLastRun(runs: MinedRun[], oreId: string, amount: number): void {
+/** Appends `amount` of `oreId` to the runs in place: the last run grows when it is that ore. */
+export function extendMinedRuns(runs: MinedRun[], oreId: string, amount: number): void {
   const last = runs.at(-1)
   if (last !== undefined && last[0] === oreId) last[1] += amount
   else runs.push([oreId, amount])

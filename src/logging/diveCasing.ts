@@ -1,7 +1,8 @@
 /**
  * Every drill dive lays casing (#115 acceptance 1): a dive runs from leaving the dock to the next
- * departure, and one that destroyed any tile must log at least one `casing_placed`, as a player's
- * drilling does (#41). Derived from the run's events only (#11 section 3).
+ * departure, and one that destroyed any tile must lay at least one ring, as a player's drilling
+ * does (#41). A drill span logs its new rings on its `casing_lined` line and other rings log
+ * `casing_placed` (ticket 420). Derived from the run's events only (#11 section 3).
  */
 import type { RunEvent } from './runEvent'
 
@@ -41,9 +42,14 @@ function emptyDive(leftTick: number): Dive {
   return { leftTick, tilesDestroyed: 0, ringsPlaced: 0 }
 }
 
-/** A drill step's `drill_cut` line counts its cells (ticket 335). */
+/** A drill span's `drill_cut` line counts its cells (ticket 420). */
 function cellsOfDrillCut(event: RunEvent): number {
   return (event as RunEvent<'drill_cut'>).data.cells
+}
+
+/** A drill span's lining run logs its rings on one `casing_lined` line (ticket 420). */
+function ringsOfCasingLined(event: RunEvent): number {
+  return (event as RunEvent<'casing_lined'>).data.rings ?? 1
 }
 
 function countIntoDive(dive: Dive | undefined, event: RunEvent): void {
@@ -51,4 +57,5 @@ function countIntoDive(dive: Dive | undefined, event: RunEvent): void {
   if (event.event === 'tile_destroyed') dive.tilesDestroyed += 1
   if (event.event === 'drill_cut') dive.tilesDestroyed += cellsOfDrillCut(event)
   if (event.event === 'casing_placed') dive.ringsPlaced += 1
+  if (event.event === 'casing_lined') dive.ringsPlaced += ringsOfCasingLined(event)
 }

@@ -1,11 +1,13 @@
 /**
- * The ore units a run collected on one planet, read back off its log for the report rows (#140
- * acceptance 2-5): each `resource_collected` line is paired with the `tile_destroyed` ore line the
- * same command wrote just before it (`groundDrill`, `blastOre`), which names the tile, so the band
- * comes from the planet's geometry and the lead from the tier. The drill ticks are the
- * `drill_damage_dealt` lines on that tile before it broke; a blasted tile has none.
+ * The ore units a run collected on one planet, read back off its domain events for the report rows
+ * (#140 acceptance 2-5; ticket 420 moved them off the run log, which folds a drill span's units
+ * into one line): each `CargoAdded` is paired with the ore `TileDestroyed` the same command
+ * answered just before it (`groundDrill`, `blastOre`), which names the tile, so the band comes from
+ * the planet's geometry and the lead from the tier. The drill ticks are the `DrillDamageDealt`
+ * events on that tile before it broke; a blasted tile has none, and its unit pairs with no tile,
+ * as its run-log line never did (K6 #189).
  */
-import type { RunEvent } from '../../logging/runEvent'
+import type { DomainEvent } from '../../systems/authority/domainEvent'
 import { fromCanonical, type Money } from '../../systems/money'
 import { bandOfTile } from '../../systems/world/planetGeometry'
 import { planetParamsFor, type PlanetParams } from '../../systems/world/planetParams'
@@ -25,70 +27,62 @@ export interface MinedOreUnit {
   tick: number
 }
 
-type Named<N extends RunEvent['event']> = RunEvent<N>
+type Named<K extends DomainEvent['type']> = Extract<DomainEvent, { type: K }>
 
 interface Walk {
   params: PlanetParams
   ticksAtTile: Map<string, number>
-  brokenByPlayer: Map<string, { tile: TilePoint; drillTicks: number }>
+  broken: { tile: TilePoint; drillTicks: number } | null
   units: MinedOreUnit[]
 }
 
-/** Every unit collected on `planet`, in log order. */
+/** Every unit collected in `planetEvents`, the domain events logged on `planet`, in order. */
 export function minedOreUnitsOf(
-  events: readonly RunEvent[],
+  planetEvents: readonly DomainEvent[],
   worldSeed: number,
   planet: number,
 ): MinedOreUnit[] {
   const walk: Walk = {
     params: planetParamsFor(worldSeed, planet),
     ticksAtTile: new Map(),
-    brokenByPlayer: new Map(),
+    broken: null,
     units: [],
   }
-  for (const event of events) if (event.planet === planet) readLine(walk, event)
+  for (const event of planetEvents) readEvent(walk, event)
   return walk.units
 }
 
-function readLine(walk: Walk, event: RunEvent): void {
-  if (isNamed(event, 'drill_damage_dealt')) addDrillTicks(walk, event)
-  else if (isNamed(event, 'tile_destroyed')) noteBrokenTile(walk, event)
-  else if (isNamed(event, 'resource_collected')) collectUnit(walk, event)
+function readEvent(walk: Walk, event: DomainEvent): void {
+  if (event.type === 'DrillDamageDealt') addDrillTicks(walk, event)
+  else if (event.type === 'TileDestroyed' && event.cause !== 'blast') noteBrokenTile(walk, event)
+  else if (event.type === 'CargoAdded') collectUnit(walk, event)
 }
 
-function isNamed<N extends RunEvent['event']>(event: RunEvent, name: N): event is Named<N> {
-  return event.event === name
+function addDrillTicks(walk: Walk, event: Named<'DrillDamageDealt'>): void {
+  const key = tileKey(event)
+  walk.ticksAtTile.set(key, (walk.ticksAtTile.get(key) ?? 0) + event.ticks)
 }
 
-function addDrillTicks(walk: Walk, { data }: Named<'drill_damage_dealt'>): void {
-  const key = tileKey(data)
-  walk.ticksAtTile.set(key, (walk.ticksAtTile.get(key) ?? 0) + data.ticks)
-}
-
-function noteBrokenTile(walk: Walk, { playerId, data }: Named<'tile_destroyed'>): void {
-  const key = tileKey(data)
+function noteBrokenTile(walk: Walk, event: Named<'TileDestroyed'>): void {
+  const key = tileKey(event)
   const drillTicks = walk.ticksAtTile.get(key) ?? 0
   walk.ticksAtTile.delete(key)
-  if (data.kind === 'ore') {
-    walk.brokenByPlayer.set(playerId, { tile: { tx: data.tx, ty: data.ty }, drillTicks })
-  } else {
-    walk.brokenByPlayer.delete(playerId)
-  }
+  walk.broken = event.kind === 'ore' ? { tile: { tx: event.tx, ty: event.ty }, drillTicks } : null
 }
 
-function collectUnit(walk: Walk, { playerId, tick, data }: Named<'resource_collected'>): void {
-  const broken = walk.brokenByPlayer.get(playerId)
-  if (broken === undefined) return
-  walk.brokenByPlayer.delete(playerId)
+function collectUnit(walk: Walk, event: Named<'CargoAdded'>): void {
+  const { broken } = walk
+  if (broken === null) return
+  walk.broken = null
   const band = bandOfTile(walk.params, broken.tile.tx, broken.tile.ty)
   walk.units.push({
-    tier: data.resourceTier,
+    tier: event.resourceTier,
     band,
-    lead: leadOfTier(walk.params.planetIndex, band, data.resourceTier),
-    value: fromCanonical(data.value),
-    depthTiles: data.oreDepthTiles,
+    lead: leadOfTier(walk.params.planetIndex, band, event.resourceTier),
+    value: fromCanonical(event.value),
+    depthTiles: event.depthTiles,
     drillTicks: broken.drillTicks,
-    tick,
+    tick: event.tick,
   })
 }
 

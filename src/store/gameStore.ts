@@ -472,7 +472,7 @@ function followAuthority(events: readonly DomainEvent[]): void {
   useGameStore.getState().startPartInstall(events)
   recordMusicStingers(events, useGameStore.getState().playerId)
   recordBlastScorches(events)
-  recordDomainEvents(runEventPlaceOf(useGameStore.getState()), events)
+  recordDomainEvents(runEventPlaceOf(useGameStore.getState()), events, readAuthorityState())
   writeCheckpointAfter(events, runEventPlaceOf(useGameStore.getState()))
 }
 
@@ -502,9 +502,13 @@ function placeAtScenarioDepth(scenario: StartScenario): void {
   if (scenario.depthTiles !== undefined) useGameStore.setState({ depthTiles: scenario.depthTiles })
 }
 
-/** At the new session's tick 0, so the lines after it read as a fresh run's. */
+/**
+ * At the new session's tick 0, so the lines after it read as a fresh run's; the old session's open
+ * drill spans are written first (ticket 420).
+ */
 function recordNewGameStarted(state: GameValues): void {
   const stamp = { ...runEventPlaceOf(state), tick: readAuthorityState().tick }
+  getRunLog().flushDrillSpans()
   getRunLog().record(stamp, 'new_game_started', {})
 }
 

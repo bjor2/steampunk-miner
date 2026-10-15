@@ -1,6 +1,7 @@
 /**
  * The planet mix's rows in the balance and session reports (#223 `reportRows`; #141 acceptance 8
- * and 9; GD lock on #147). Derived from a run's log, never written into it:
+ * and 9; GD lock on #147). Derived from a run's units, the domain events a bot run keeps on each
+ * planet (ticket 420: the log folds a drill span's units into one line), never written into it:
  *
  * - ore theme: the planet's act, `actOf(planet)`, which is #141's `oreThemeId` (the GD lock rules
  *   the derived row satisfies acceptance 8, so `planet_entered` gains no field)
@@ -11,12 +12,13 @@
  */
 import type { ReportRow, ReportRowSource } from '../../logging/registries/reportRows'
 import type { RunEvent } from '../../logging/runEvent'
+import type { DomainEvent } from '../../systems/authority/domainEvent'
 import { oreMixFor } from './systems/oreMix'
 import { actOf, firstPlanetOfFamily } from './systems/planetActs'
 
 export const PLANET_MIX_REPORT_ROWS_ID = 'planet-mix.themes'
 
-/** One collected unit as its `resource_collected` line names it. */
+/** One collected unit as its `CargoAdded` names it. */
 interface CollectedOre {
   oreId: string
   /** Absent when no catalogue names it (#223). */
@@ -30,8 +32,13 @@ export const planetMixReportRows: ReportRowSource = {
   rowsOf: mixRowsOf,
 }
 
-function mixRowsOf(events: readonly RunEvent[], worldSeed: number, planet: number): ReportRow[] {
-  const units = collectedOresOf(events, planet)
+function mixRowsOf(
+  _events: readonly RunEvent[],
+  worldSeed: number,
+  planet: number,
+  planetEvents: readonly DomainEvent[] = [],
+): ReportRow[] {
+  const units = planetEvents.flatMap(collectedOreOf)
   const themeRow = { label: 'ore theme', value: actOf(planet).id }
   if (units.length === 0) return [themeRow]
   return [
@@ -43,19 +50,14 @@ function mixRowsOf(events: readonly RunEvent[], worldSeed: number, planet: numbe
   ]
 }
 
-function collectedOresOf(events: readonly RunEvent[], planet: number): CollectedOre[] {
-  return events.filter((event) => event.planet === planet).flatMap(collectedOreOf)
-}
-
-function collectedOreOf(event: RunEvent): CollectedOre[] {
-  if (event.event !== 'resource_collected') return []
-  const { data } = event as RunEvent<'resource_collected'>
+function collectedOreOf(event: DomainEvent): CollectedOre[] {
+  if (event.type !== 'CargoAdded') return []
   return [
     {
-      oreId: data.oreId,
-      family: data.family,
-      isSignature: data.signature === true,
-      depthTiles: data.oreDepthTiles,
+      oreId: event.oreId,
+      family: event.family,
+      isSignature: event.signature === true,
+      depthTiles: event.depthTiles,
     },
   ]
 }

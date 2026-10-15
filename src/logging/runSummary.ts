@@ -85,8 +85,8 @@ export interface RunSummary {
    */
   planetLevels: PlanetLevels
   /**
-   * The ore of every `resource_collected` line in mined order, run-length encoded as
-   * `[oreId, units]` (#122); `resource_collected` is a `detail` event, so a release run has none.
+   * The ore of every `drill_cut` and `resource_collected` line in mined order, run-length encoded
+   * as `[oreId, units]` (#122, ticket 420); both are `detail` events, so a release run has none.
    */
   minedOrder: MinedRun[]
   /** Ore id to the units of it collected (#122). */
@@ -268,6 +268,10 @@ const EVENT_FOLDS: { readonly [N in RunEventName]?: EventFold<N> } = {
   },
   resource_collected: (tally, { data }) => {
     addMinedOre(tally.minedOrder, data)
+  },
+  // A drill span's units, in mined order (ticket 420); ore from anywhere else keeps its own line.
+  drill_cut: (tally, { data }) => {
+    for (const [oreId, amount] of data.ores) addMinedOre(tally.minedOrder, { oreId, amount })
   },
   mining_session_ended: (tally, { data }) => {
     tally.maxDepthTiles = Math.max(tally.maxDepthTiles, data.maxDepthTiles)

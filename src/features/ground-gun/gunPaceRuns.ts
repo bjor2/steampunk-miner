@@ -138,10 +138,11 @@ function playOwning(
       onCommand: (command) => runLog.recordCommand(command),
       onEvents: (state, events) => {
         tick = state.tick
-        recordDomainEventsTo(runLog, placeOf(state), events)
+        recordDomainEventsTo(runLog, placeOf(state), events, state)
       },
     },
   })
+  runLog.flushDrillSpans()
   const reason = run.isFinished ? 'slice_completed' : 'bot_budget_spent'
   runLog.record({ ...placeOf(run.state), tick: run.state.tick }, 'game_ended', { reason })
   return { events: sink.events, isFinished: run.isFinished }

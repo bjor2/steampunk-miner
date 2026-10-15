@@ -79,6 +79,24 @@ describe('money lane: one summary line per planet', () => {
     expect(second).toMatchObject({ planet: 2, ticksOnPlanet: 15 * MINUTE, tripShareBp: 10_000 })
   })
 
+  it("counts a drill span's summed dig ticks as cutting time (ticket 420)", () => {
+    const { fold, log } = laneRun()
+    log.record(at(1, 0), 'planet_entered', ENTERED)
+    log.record(at(1, MINUTE), 'drill_cut', {
+      spans: 30,
+      cells: 12,
+      ticks: 2 * MINUTE,
+      units: 0,
+      value: '0e+0',
+      ores: [],
+      energy: 0,
+      heat: 0,
+      stop: 'command',
+    })
+    log.record(at(1, 4 * MINUTE), 'game_ended', { reason: 'slice_completed' })
+    expect(fold.summarize().lines[0]).toMatchObject({ cuttingTicks: 2 * MINUTE })
+  })
+
   it('keeps the drill levels each planet was entered and left with', () => {
     const { fold, log } = laneRun()
     playTwoPlanets(log)

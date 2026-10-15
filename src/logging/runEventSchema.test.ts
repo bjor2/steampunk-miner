@@ -88,6 +88,33 @@ describe('run event schema', () => {
     ])
   })
 
+  it("checks a drill span's cells and ore runs place by place (ticket 420)", () => {
+    const span = {
+      spans: 2,
+      cells: 3,
+      first: [3, 270],
+      last: [4, 269],
+      ticks: 8,
+      units: 2,
+      value: '2.55e+1',
+      ores: [
+        ['copper', 1],
+        ['tin', 1],
+      ],
+      energy: -16,
+      heat: 9,
+      stop: 'gate',
+    }
+    const line = { ...resourceSold, event: 'drill_cut', data: span }
+    expect(runEventProblems(line)).toEqual([])
+    const broken = { ...span, first: [3], ores: [['copper', 1.5], 'tin'] }
+    expect(runEventProblems({ ...line, data: broken })).toEqual([
+      'drill_cut.first must be a list of 2, got [3]',
+      'drill_cut.ores[0][1] must be a safe integer, got 1.5',
+      'drill_cut.ores[1] must be a list of 2, got "tin"',
+    ])
+  })
+
   it('accepts a line that leaves an optional field out, and one that fills it', () => {
     const saved = { slot: 'slot-1', epoch: 3, bytes: 20811, digest: '0123456789abcdef' }
     const line = { ...resourceSold, event: 'checkpoint_saved', data: saved }

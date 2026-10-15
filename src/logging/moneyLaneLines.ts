@@ -140,7 +140,9 @@ function emptyPlanetTally(planet: number, arrivalTick: number): PlanetTally {
 function foldPlanetTime(planet: PlanetTally, event: RunEvent): void {
   planet.lastTick = Math.max(planet.lastTick, event.tick)
   if (event.event === 'dock_left') planet.dockedTicks += dockStayOf(event)
-  if (event.event === 'drill_damage_dealt') planet.cuttingTicks += cutTicksOf(event)
+  if (event.event === 'drill_cut' || event.event === 'drill_damage_dealt') {
+    planet.cuttingTicks += cutTicksOf(event)
+  }
 }
 
 /** `travel_started` names the planet left (`fromPlanet`), as the summary's levels read it. */
@@ -154,8 +156,9 @@ function dockStayOf(event: RunEvent): number {
   return (event as RunEvent<'dock_left'>).data.durationTicks
 }
 
+/** A drill span sums its dig time on its `drill_cut` line (ticket 420); other digs log their own. */
 function cutTicksOf(event: RunEvent): number {
-  return (event as RunEvent<'drill_damage_dealt'>).data.ticks
+  return (event as RunEvent<'drill_cut' | 'drill_damage_dealt'>).data.ticks
 }
 
 function foldPlanetMoney(planet: PlanetTally, eventName: string, fields: MoneyField[]): void {

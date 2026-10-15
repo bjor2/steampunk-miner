@@ -261,6 +261,31 @@ describe('run summary: mined order (#122)', () => {
     })
   })
 
+  it("folds a drill span's ore runs into the mined order, beside units that came another way", () => {
+    const span = line(9100, 'drill_cut', {
+      spans: 3,
+      cells: 6,
+      ticks: 12,
+      units: 5,
+      value: '7.5e+0',
+      ores: [
+        [METAL, 2],
+        [CRYSTAL, 3],
+      ],
+      energy: 0,
+      heat: 0,
+      stop: 'command',
+    })
+    const run = [...PLAYED_RUN, collected(9050, METAL), span, collected(9200, CRYSTAL)]
+    expect(deriveSummary(run)).toMatchObject({
+      minedOrder: [
+        [METAL, 3],
+        [CRYSTAL, 4],
+      ],
+      minedUnitsByOre: { [METAL]: 3, [CRYSTAL]: 4 },
+    })
+  })
+
   it('has an empty mined order for a run that collected nothing', () => {
     expect(deriveSummary(PLAYED_RUN)).toMatchObject({ minedOrder: [], minedUnitsByOre: {} })
   })

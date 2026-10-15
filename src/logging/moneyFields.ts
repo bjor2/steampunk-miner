@@ -32,6 +32,8 @@ function moneyInValue(value: unknown, kind: FieldKind, field: string): MoneyFiel
   if (typeof kind === 'string' || 'oneOf' in kind) return []
   if ('optional' in kind) return moneyInOptional(value, kind.optional, field)
   if ('listOf' in kind) return moneyInList(value, kind.listOf)
+  if ('tuple' in kind) return moneyInTuple(value, kind.tuple, field)
+  if ('itemsOf' in kind) return moneyInItems(value, kind.itemsOf, field)
   return moneyInMap(value, kind.mapOf, field)
 }
 
@@ -41,6 +43,19 @@ function moneyInOptional(value: unknown, kind: FieldKind, field: string): MoneyF
 
 function moneyInList(value: unknown, itemFields: PayloadFields): MoneyField[] {
   return Array.isArray(value) ? value.flatMap((item) => moneyInFields(item, itemFields)) : []
+}
+
+function moneyInTuple(
+  value: unknown,
+  placeKinds: readonly FieldKind[],
+  field: string,
+): MoneyField[] {
+  if (!Array.isArray(value)) return []
+  return placeKinds.flatMap((kind, index) => moneyInValue(value[index], kind, field))
+}
+
+function moneyInItems(value: unknown, itemKind: FieldKind, field: string): MoneyField[] {
+  return Array.isArray(value) ? value.flatMap((item) => moneyInValue(item, itemKind, field)) : []
 }
 
 function moneyInMap(value: unknown, valueKind: FieldKind, field: string): MoneyField[] {

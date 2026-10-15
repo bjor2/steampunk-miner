@@ -4,6 +4,11 @@
  * run, never trimmed: unlocks are reported by stats.json and `feature_unlocked` alone.
  */
 import { LOCKED_SCHEDULE, unlockIdNamedIn } from '../systems/unlocks/unlockSchedule'
+import {
+  domainEventsOnPlanet,
+  NO_DOMAIN_EVENTS,
+  type PlanetDomainEvents,
+} from './planetDomainEvents'
 import { reportRowSources, type ReportRow, type ReportRowSource } from './registries/reportRows'
 import type { RunEvent } from './runEvent'
 
@@ -12,17 +17,18 @@ export interface PlanetReportRow extends ReportRow {
   sourceId: string
 }
 
-/** A run log and the world seed it was played on. */
+/** A run log and the world seed it was played on, with its domain events if it kept them. */
 export interface SeededRunLog {
   worldSeed: number
   events: readonly RunEvent[]
+  domainEvents?: PlanetDomainEvents
 }
 
 export class ReportRowRefusedError extends Error {}
 
-export function reportRowsOfRun({ worldSeed, events }: SeededRunLog): PlanetReportRow[] {
-  return planetsOfRun(events).flatMap((planet) =>
-    reportRowSources().flatMap((source) => rowsOfSource(source, { worldSeed, events }, planet)),
+export function reportRowsOfRun(run: SeededRunLog): PlanetReportRow[] {
+  return planetsOfRun(run.events).flatMap((planet) =>
+    reportRowSources().flatMap((source) => rowsOfSource(source, run, planet)),
   )
 }
 
@@ -42,11 +48,12 @@ function planetsOfRun(events: readonly RunEvent[]): number[] {
 
 function rowsOfSource(
   source: ReportRowSource,
-  { worldSeed, events }: SeededRunLog,
+  { worldSeed, events, domainEvents = NO_DOMAIN_EVENTS }: SeededRunLog,
   planet: number,
 ): PlanetReportRow[] {
+  const planetEvents = domainEventsOnPlanet(domainEvents, planet)
   return source
-    .rowsOf(events, worldSeed, planet)
+    .rowsOf(events, worldSeed, planet, planetEvents)
     .map((row) => ({ planet, sourceId: source.id, ...checkedRow(source, row) }))
 }
 

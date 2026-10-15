@@ -34,6 +34,23 @@ const ENEMY_KIND = {
 const HIT_ARC = { oneOf: ['front', 'side', 'rear'] } as const satisfies FieldKind
 const BAY = { oneOf: ['sell', 'upgrade', 'refinery'] } as const satisfies FieldKind
 /**
+ * Why a drill span's `drill_cut` line closed (ticket 420): one of #399's carry stops (the gate,
+ * the core, lava or an electrified cell, a full hold, an empty tank), a change of band or of
+ * lining run, another command with events, a gap in drilling, the 5 s cap, or a flush.
+ */
+export const DRILL_SPAN_STOPS = [
+  'gate',
+  'core',
+  'hazard',
+  'hold_full',
+  'tank_empty',
+  'band',
+  'command',
+  'idle',
+  'cap',
+  'end',
+] as const
+/**
  * A held purchase step's hold and the wallet above the service reserve after it (ticket 226,
  * `purchaseStepLine.ts`). A click's line leaves both out, so it reads as before.
  */
@@ -459,13 +476,33 @@ export const RUN_EVENT_REGISTRY = {
     level: 'detail',
     payload: { tx: 'integer', ty: 'integer', kind: { oneOf: ['ground', 'ore', 'core'] } },
   },
-  // Ticket 335 (TD scope b on #316): one line per drill step (a tick, a player) for the cells the
-  // swept cut broke, the units that reached the hold and their value, in place of that step's
-  // `tile_destroyed` and `resource_collected` lines, so the log grows with ticks, not cells.
+  // Ticket 420 (TD spec on #396 with the GD ruling): one line per drill span, a run of one
+  // player's drill commands (`drillStep`, `drillTile`, a drilling `reportPose`), in place of their
+  // `tile_destroyed`, `drill_damage_dealt`, `casing_placed` and `resource_collected` lines, so the
+  // log grows with time, not with cells (ticket 335 wrote one per `drillStep` tick). Stamped at the
+  // span's first broken cell (its first event when none broke), with the deepest `depthTiles` it
+  // reached. `ticks` sums the dig time, `ores` is the mined order's `[oreId, units]` runs, and
+  // `energy` and `heat` are the vehicle's net change over the span: a summary, never a source for
+  // the economy or the goldens. `lastOre*` name the last unit that reached the hold.
   drill_cut: {
     group: 'mining',
     level: 'detail',
-    payload: { cells: 'integer', units: 'integer', value: 'money' },
+    payload: {
+      spans: 'integer',
+      cells: 'integer',
+      first: { optional: { tuple: ['integer', 'integer'] } },
+      last: { optional: { tuple: ['integer', 'integer'] } },
+      ticks: 'integer',
+      units: 'integer',
+      value: 'money',
+      ores: { itemsOf: { tuple: ['text', 'integer'] } },
+      energy: 'integer',
+      heat: 'integer',
+      stop: { oneOf: DRILL_SPAN_STOPS },
+      lastOreDepthTiles: { optional: 'integer' },
+      lastOreChunk: { optional: 'text' },
+      lastOreTick: { optional: 'integer' },
+    },
   },
   // K2 (#185, #142 acceptance 13): a slice's gate check stopped the drill at an ore cell, once per
   // drilling command that met it; `required` and `have` are the gate's own words. `blocked` is
@@ -500,6 +537,8 @@ export const RUN_EVENT_REGISTRY = {
   },
   // #76: the first-place lining charge of one ring; relining is free and logs none. `type` is the
   // lining type laid (#113), so the bill splits by type; a type change is charged like new lining.
+  // Ticket 420: a drill span writes one line per (band, grade, type) run, its `rings` merged with
+  // their lengths and prices summed exactly; absent `rings` is one ring.
   casing_lined: {
     group: 'mining',
     level: 'core',
@@ -509,6 +548,7 @@ export const RUN_EVENT_REGISTRY = {
       grade: 'integer',
       type: 'text',
       price: 'money',
+      rings: { optional: 'integer' },
     },
   },
   // #111: a tunnel wrecker (or `debug.gnawCasing`) breached one ring; `ring` is its axis point `x,y`

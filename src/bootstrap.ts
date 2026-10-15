@@ -128,9 +128,15 @@ function recordGameStarted(shell: Shell): void {
   })
 }
 
-/** Lines flush every second; the summary and metadata are rewritten when the page hides. */
+/**
+ * Lines flush every second, each open drill span's first (ticket 420); the summary and metadata
+ * are rewritten when the page hides.
+ */
 function keepRunFilesWritten(shell: Shell, run: RunFiles): void {
-  const flush = () => reportFailure(run.sink.flush())
+  const flush = () => {
+    getRunLog().flushDrillSpans()
+    reportFailure(run.sink.flush())
+  }
   setInterval(flush, LOG_FLUSH_INTERVAL_MS)
   shell.onPageHide(() => {
     flush()

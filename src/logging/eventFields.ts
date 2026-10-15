@@ -19,6 +19,10 @@ export type FieldKind =
   | { readonly oneOf: readonly string[] }
   | { readonly listOf: PayloadFields }
   | { readonly mapOf: FieldKind }
+  /** A fixed-length list, one kind per place: a cell's `[tx, ty]` (ticket 420). */
+  | { readonly tuple: readonly FieldKind[] }
+  /** A list whose every item has one kind, such as `[oreId, units]` tuples (ticket 420). */
+  | { readonly itemsOf: FieldKind }
   /**
    * A field a line may leave out (#11 section 1: adding an optional field keeps
    * `logSchemaVersion`); when present it is checked as `optional`.
@@ -41,9 +45,13 @@ export type ValueOfKind<K> = K extends 'integer' | 'float'
             ? readonly PayloadOf<F>[]
             : K extends { readonly mapOf: infer M }
               ? Readonly<Record<string, ValueOfKind<M>>>
-              : K extends { readonly optional: infer O }
-                ? ValueOfKind<O>
-                : never
+              : K extends { readonly tuple: infer T extends readonly unknown[] }
+                ? { readonly [I in keyof T]: ValueOfKind<T[I]> }
+                : K extends { readonly itemsOf: infer I }
+                  ? readonly ValueOfKind<I>[]
+                  : K extends { readonly optional: infer O }
+                    ? ValueOfKind<O>
+                    : never
 
 /** The fields of `F` declared `{ optional: ... }`. */
 type OptionalFieldNames<F> = {
@@ -89,6 +97,8 @@ function valueProblems(value: unknown, kind: FieldKind, path: string): string[] 
   if (typeof kind === 'string') return scalarProblems(value, kind, path)
   if ('oneOf' in kind) return oneOfProblems(value, kind.oneOf, path)
   if ('listOf' in kind) return listProblems(value, kind.listOf, path)
+  if ('tuple' in kind) return tupleProblems(value, kind.tuple, path)
+  if ('itemsOf' in kind) return itemsProblems(value, kind.itemsOf, path)
   if ('optional' in kind)
     return value === undefined ? [] : valueProblems(value, kind.optional, path)
   return mapProblems(value, kind.mapOf, path)
@@ -129,6 +139,17 @@ function oneOfProblems(value: unknown, allowed: readonly string[], path: string)
 function listProblems(value: unknown, itemFields: PayloadFields, path: string): string[] {
   if (!Array.isArray(value)) return [`${path} must be a list, got ${quote(value)}`]
   return value.flatMap((item, index) => payloadProblems(item, itemFields, `${path}[${index}]`))
+}
+
+function tupleProblems(value: unknown, placeKinds: readonly FieldKind[], path: string): string[] {
+  if (!Array.isArray(value) || value.length !== placeKinds.length)
+    return [`${path} must be a list of ${placeKinds.length}, got ${quote(value)}`]
+  return placeKinds.flatMap((kind, index) => valueProblems(value[index], kind, `${path}[${index}]`))
+}
+
+function itemsProblems(value: unknown, itemKind: FieldKind, path: string): string[] {
+  if (!Array.isArray(value)) return [`${path} must be a list, got ${quote(value)}`]
+  return value.flatMap((item, index) => valueProblems(item, itemKind, `${path}[${index}]`))
 }
 
 function mapProblems(value: unknown, valueKind: FieldKind, path: string): string[] {
