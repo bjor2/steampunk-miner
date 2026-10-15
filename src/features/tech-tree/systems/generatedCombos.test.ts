@@ -13,7 +13,13 @@ import {
   pairIndexOf,
   rotationLengthOf,
 } from './generatedCombos'
-import { itemUnlockTierOf, registeredTechTree, treeNodeOf, treeNodesThrough } from './techTree'
+import {
+  itemUnlockTierOf,
+  registeredTechTree,
+  researchFrontierOf,
+  treeNodeOf,
+  treeNodesThrough,
+} from './techTree'
 import type { TechTree } from './techTree'
 import { isArmouryLane, type TechComboTemplate, type TreeNode } from './techNode'
 
@@ -207,6 +213,17 @@ describe('tech tree: weapon x lane templates in the endless rotation', () => {
       expect(again.unlocks).toEqual({ itemId: first.unlocks.itemId, mark: first.unlocks.mark + 1 })
       expect(again.prereqs).toContain('tech.combo.gen.41')
       expect(pairIndexAt(95, 3)).toBe(pairIndexAt(41))
+    })
+  })
+
+  it("offers each weapon template's next grade on the frontier, a lap on once researched", () => {
+    withWeaponTemplates((tree) => {
+      const frontierOf = (researched: string[]) =>
+        researchFrontierOf(tree, new Set(researched))
+          .filter((node) => node.id.startsWith('tech.combo.gen.'))
+          .map((node) => node.unlockTier)
+      expect(frontierOf([])).toEqual([...FIRST_TURNS, 86, 89, 92])
+      expect(frontierOf(['tech.combo.gen.86'])).toEqual([...FIRST_TURNS, 89, 92, 140])
     })
   })
 

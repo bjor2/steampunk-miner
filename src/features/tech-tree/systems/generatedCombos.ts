@@ -113,32 +113,29 @@ export function generatedComboPlanetOfStep(step: number): number {
 }
 
 /**
- * Each pair's next grade to research, by the grades researched: its first turn whose node is not
- * among them, since every grade needs the one before. A pair with no template has none. Read off
- * the research alone, so the frontier is the same on every planet (#411).
+ * Each turn's next grade to research, by the grades researched: its first lap whose node is not
+ * among them, since every grade needs the one before. A turn is a lane pair's or a weapon
+ * template's (ticket 320); a pair with no template has none. Read off the research alone, so the
+ * frontier is the same on every planet (#411).
  */
 export function nextGeneratedCombosOf(
   grading: ComboGrading,
   researched: ReadonlySet<string>,
 ): TreeNode[] {
-  return LANE_PAIRS.flatMap((_, pairIndex) => {
-    const planet = firstOpenTurnPlanetOf(pairIndex, researched)
+  const lap = rotationLengthOf(grading)
+  return Array.from({ length: lap }, (_, slot) => {
+    const planet = firstOpenTurnPlanetOf(slot, lap, researched)
     return generatedComboAt(planet, grading) ?? []
-  })
+  }).flat()
 }
 
-/** The planet of the pair's first turn whose combo is not researched. */
-function firstOpenTurnPlanetOf(pairIndex: number, researched: ReadonlySet<string>): number {
-  let planet = pairTurnPlanetOf(pairIndex, 0)
+/** The planet of the slot's first turn whose combo is not researched. */
+function firstOpenTurnPlanetOf(slot: number, lap: number, researched: ReadonlySet<string>): number {
+  let planet = generatedComboPlanetOfStep(slot)
   for (let turn = 1; researched.has(generatedComboIdOf(planet)); turn += 1) {
-    planet = pairTurnPlanetOf(pairIndex, turn)
+    planet = generatedComboPlanetOfStep(turn * lap + slot)
   }
   return planet
-}
-
-/** The planet of the pair's `turn`-th combo: its place in `PAIR_ORDER`, once every fifteen. */
-function pairTurnPlanetOf(pairIndex: number, turn: number): number {
-  return generatedComboPlanetOfStep(turn * LANE_PAIRS.length + PAIR_ORDER.indexOf(pairIndex))
 }
 
 /** Every planet up to `planetIndex` a combo is generated on, ascending. */
