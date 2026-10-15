@@ -42,12 +42,12 @@ export function serviceEntries(): readonly DescribedEntry[] {
     ),
     kernelEntryOf(
       KERNEL_ITEMS.recharge,
-      'A steam line from the platform tops the boiler back to a full gauge.',
+      'A platform steam line tops the boiler back to a full gauge.',
       [RECHARGED_ENERGY],
     ),
     kernelEntryOf(
       KERNEL_ITEMS.quickService,
-      'Sell the hold, mend the hull and fill the boiler in one stop.',
+      'Sell the hold, mend the hull and fill the boiler at once.',
       [REPAIRED_HULL, RECHARGED_ENERGY],
     ),
     kernelEntryOf(

@@ -105,7 +105,7 @@ export function moduleEntries(): readonly DescribedEntry[] {
     ),
     kernelEntryOf(
       KERNEL_ITEMS.refinerySlot,
-      'One more crucible in the yard, so another batch can cook at once.',
+      'One more crucible in the yard: another batch cooks at once.',
       [
         levelledLine('Refinery slots', 'linearInt', (slots) => slots, refinerySlotsMax),
         fixedLine('Refine time in seconds', 'linearInt', refineSeconds),
