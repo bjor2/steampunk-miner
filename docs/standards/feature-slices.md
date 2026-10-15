@@ -1285,6 +1285,16 @@ K-line of the TD lock on #320 (6180863028), accepted in full by the GD ruling (6
 - **`boreLineListeners`** (`src/systems/registries/boreLineListeners.ts`, registrar `boreLineListener`, many listeners): `{ id, wantsLine(state, playerId) → boolean }`, asked once as the shot's last line ends, in id order until one answers true. With none registered or none answering true, the event, its row and every digest are as before (`boreLine.test.ts`). The seal refuses an id naming an unlock row, as item hooks are refused (3.36). The combos slice registers `combos.sounding_bore_line` in #320.
 - **`boreFarEndOf(state, playerId) → { tile, firedTick } | null`** (`boreLine.ts`): the last cell of `bored` on the player's most recently fired pending bore (for a shaped shot, its last line in fire order) and that bore's fire tick; null with no bore standing or when it opened nothing. Read-only over the saved `bores`, no new state; it grows as the line opens and is gone once the bore leaves the state.
 
+### 3.67 The armoury combos (ticket 320)
+
+The three `research_lab` combos of the GD decision on #310 (build 4), played on the seams of 3.61, 3.66 and tickets 414 and 415 as the GD ruled on #320 (6180873822). The rows are the combos slice's (`comboCatalogue.ts`): each node and every generated grade carries `requiresFeature: ['research_lab', <anchor row>]`, so it stays off the screen and refused until the lab and its armoury anchor are unlocked. Horizontal, no yield, no row and no re-pin; a combo resolves only while the player owns it and both parent items. No protocol, save or event change.
+
+- **Sounding bore** (long barrel x echo sounder, P20). The listener `combos.sounding_bore_line` (`armouryCombos.ts`) wants the line for an owner, so the shot's `BoreEnded` carries `lineCells` and sensing rings them (ticket 415). Reveal only.
+- **Winch bore** (long barrel x grapple winch, P25). The item hook `combos.winch_bore_reach` on `power.grapple_winch`'s `reach` answers the tiles from the use's origin to the owner's `boreFarEndOf`, past the grapple's own range, while the shot is at most `hookWindowTicks` (60, `groundGun.json` `combos`) old; mobility spends it on that one cell (ticket 414). Movement only.
+- **Spotter guns** (fire director x threat periscope, P27). The ground-gun turret provider adds `pretrainTicks` (`groundGun.json` `combos.combo.spotter_guns`, 8, the whole of `gun.turretCaps.maxPretrainTicks`) to its fold while the director is live on the turret and the combo and the periscope are owned (`turretShapes.ts`). Timing and ranking only (3.61).
+- **Endless rotation** (`tech-tree/systems/generatedCombos.ts`). A template with an armoury lane is a weapon x lane template and never stands for a lane pair. Each lap is the fifteen pair turns in the fixed permutation, then one turn per weapon template in id order, so with these three the weapon turns land on P86 (sounding), P89 (spotter) and P92 (winch), and the next lap starts on P95. A later weapon template may only append after the existing ids, or its own ticket re-pins on purpose.
+- With none of the three owned every digest and golden is unchanged.
+
 ## 4. Cross-slice contracts
 
 ```mermaid
