@@ -1,6 +1,7 @@
 /*
  * The kernel item card (K7 #199): one look on the shop row, the platform card and the tooltip.
- * The compact row keeps the shop list's rhythm; opened, it grows into the full card in place.
+ * The compact row keeps the shop list's rhythm on the shared Title+OneLine element (#425); opened,
+ * its brass tooltip shows the rest of the card in place.
  */
 .card {
   display: flex;
@@ -21,7 +22,8 @@
   outline-offset: 2px;
 }
 
-.card[data-focused] > .name::before {
+.card[data-focused] > .name::before,
+.card[data-focused] h3::before {
   content: '\25B8\00A0';
 }
 
@@ -38,7 +40,6 @@
   font-size: inherit;
 }
 
-.row,
 .lines,
 .costLine,
 .flavour,

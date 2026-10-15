@@ -4,9 +4,12 @@
  * the #33 buy id, open while the game's menu focus is on it. Until one answers, it keeps the #33
  * row id and the Buy keeps the buy id, as the kernel's empty fast path does.
  */
+import { panelIconIdOf } from '../../../systems/art/icons/iconSet'
+import { itemCardElementOf, type ItemCardElement } from '../../../systems/views/itemCardElement'
 import { itemCardIdOf } from '../../../systems/views/itemCardModel'
 import { UI_ID_TEMPLATES } from '../../../systems/views/screenIds'
 import type { WorkshopRow } from '../../../systems/views/workshopRows'
+import type { IconValue } from '../../../ui/kit/TitleOneLine'
 
 export interface PlaqueEntry {
   hasCard: boolean
@@ -32,4 +35,39 @@ function cardAttributesOf(row: WorkshopRow, isCardOpen: boolean): Record<string,
     'data-variant': 'compact',
     'aria-expanded': isCardOpen,
   }
+}
+
+/**
+ * The plaque on the shared Title+OneLine element (spec #422, pass #425): the track's card text,
+ * its one line the stat it buys ("now → next" while no describer answers), the rest in the tooltip.
+ */
+export function plaqueElementOf(row: WorkshopRow): ItemCardElement {
+  const element = itemCardElementOf(`workshop.plaque-${row.upgradeId}`, row.card)
+  if (element.text.oneLine !== '') return element
+  const oneLine = `${row.effectBefore.text} → ${row.effectAfter.text}`
+  return { ...element, text: { ...element.text, oneLine } }
+}
+
+/** The level and the price beside the name, each a glyph and a value, on the #33 ids. */
+export function plaqueFactsOf(
+  row: WorkshopRow,
+  moneyIconId: string,
+  priceFlashKey: number | null,
+): IconValue[] {
+  const id = row.upgradeId
+  const level: IconValue = {
+    iconId: panelIconIdOf('upgrades'),
+    text: row.levelText,
+    testId: UI_ID_TEMPLATES.workshopUpgradeLevel(id),
+  }
+  const price: IconValue = {
+    iconId: moneyIconId,
+    text: row.cost.text,
+    exact: row.cost.exact,
+    holds: 'price',
+    testId: UI_ID_TEMPLATES.workshopUpgradeCost(id),
+    isMoneyShort: row.buyState === 'money_short',
+    ...(priceFlashKey === null ? {} : { flashKey: priceFlashKey }),
+  }
+  return [level, price]
 }

@@ -3,10 +3,12 @@
  * the left (Progression on #164), the stat lines, the cost, the flavour, the unlock line and the
  * gate note. Markup only: the text comes from `itemCardTextOf`.
  */
+import { hudLabelIconIdOf } from '../../systems/art/icons/iconSet'
 import type { ItemCardModel } from '../../systems/views/itemCardModel'
 import type { ItemCardLineText, ItemCardText } from '../../systems/views/itemCardText'
 import { VectorIcon } from '../VectorIcon'
 import styles from './ItemCard.module.css'
+import type { IconValue } from './TitleOneLine'
 
 export function ItemCardName({ card }: { card: ItemCardModel }) {
   return (
@@ -34,18 +36,6 @@ export function ItemCardBody({ card, text }: { card: ItemCardModel; text: ItemCa
   )
 }
 
-/** The compact row's one line: the first stat with its change; nothing for a cosmetic. */
-export function FirstStatLine({ lines }: { lines: readonly ItemCardLineText[] }) {
-  const [first] = lines
-  if (first === undefined) return null
-  return (
-    <span className={styles.line} data-stat-kind={first.kind}>
-      <StatNowAndNext line={first} />
-      {first.change !== null && <span className={styles.change}> {first.change}</span>}
-    </span>
-  )
-}
-
 /** The full card's cost line; absent for what is picked, not bought. */
 export function CostLine({ card }: { card: ItemCardModel }) {
   if (card.cost === null) return null
@@ -56,15 +46,12 @@ export function CostLine({ card }: { card: ItemCardModel }) {
   )
 }
 
-/** The compact row's cost, appended as "· 1.2k" (#159 line 3). */
-export function AppendedCost({ card }: { card: ItemCardModel }) {
-  if (card.cost === null) return null
-  return (
-    <span className={styles.costLine}>
-      {' · '}
-      <Price card={card} />
-    </span>
-  )
+/** The compact card's price as the shared element's fact: the money glyph and the value. */
+export function priceFactsOf(card: ItemCardModel): IconValue[] {
+  if (card.cost === null) return []
+  const { text, exact } = card.cost
+  const isMoneyShort = card.isMoneyShort
+  return [{ iconId: hudLabelIconIdOf('money'), text, exact, holds: 'price', isMoneyShort }]
 }
 
 function Price({ card }: { card: ItemCardModel }) {

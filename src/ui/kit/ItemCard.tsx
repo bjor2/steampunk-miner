@@ -6,17 +6,20 @@
  *
  * - `full`, the platform card and the tooltip: name, stat lines, cost, flavour, then the unlock
  *   line and the gate note (#159 line order), and the screen's action below.
- * - `compact`, the shop row: the same icon, name and line order, cut to the first stat line with
- *   its change and the cost. Tapping or focusing it opens the full card in place; a second tap buys
- *   (`tapItemCard`), and `ui_confirm` buys the focused entry as before.
+ * - `compact`, the Upgrade bay's shop row, on the shared Title+OneLine element (spec #422, pass
+ *   #425): the name, the first stat line with its change, the price, and the rest of the card in
+ *   the brass tooltip (`itemCardElementOf`). Tapping or focusing it opens that tooltip in place; a
+ *   second tap buys (`tapItemCard`), and `ui_confirm` buys the focused entry as before.
  */
 import type { MouseEvent, ReactNode } from 'react'
 import { useGameStore } from '../../store/gameStore'
+import { itemCardElementOf } from '../../systems/views/itemCardElement'
 import { itemCardIdOf, type ItemCardModel } from '../../systems/views/itemCardModel'
 import { itemCardTextOf, type ItemCardText } from '../../systems/views/itemCardText'
 import type { ScreenButton } from '../../systems/views/viewParts'
 import styles from './ItemCard.module.css'
-import { AppendedCost, FirstStatLine, ItemCardBody, ItemCardName } from './ItemCardParts'
+import { ItemCardBody, ItemCardName, priceFactsOf } from './ItemCardParts'
+import { TitleOneLine } from './TitleOneLine'
 
 type ItemCardProps =
   | { variant: 'full'; card: ItemCardModel; action?: ReactNode; children?: ReactNode }
@@ -31,10 +34,11 @@ type ItemCardProps =
 export function ItemCard(props: ItemCardProps) {
   const { card } = props
   if (card.description === null) return <>{props.children}</>
-  const text = itemCardTextOf(card.description)
   if (props.variant === 'full')
-    return <FullItemCard card={card} text={text} action={props.action} />
-  return <CompactItemCard card={card} text={text} buy={props.buy} focusedId={props.focusedId} />
+    return (
+      <FullItemCard card={card} text={itemCardTextOf(card.description)} action={props.action} />
+    )
+  return <CompactItemCard card={card} buy={props.buy} focusedId={props.focusedId} />
 }
 
 function FullItemCard({
@@ -57,16 +61,15 @@ function FullItemCard({
 
 function CompactItemCard({
   card,
-  text,
   buy,
   focusedId,
 }: {
   card: ItemCardModel
-  text: ItemCardText
   buy: ScreenButton
   focusedId: string | null
 }) {
   const isOpen = focusedId === buy.id
+  const element = itemCardElementOf(`upgrade-bay.${buy.id}`, card)
   return (
     <div
       role="button"
@@ -82,19 +85,14 @@ function CompactItemCard({
       onFocus={() => useGameStore.getState().focusControl(buy.id)}
       onClick={() => useGameStore.getState().tapItemCard(buy.id)}
     >
-      <ItemCardName card={card} />
-      {isOpen ? <ItemCardBody card={card} text={text} /> : <ClosedRow card={card} text={text} />}
+      <TitleOneLine
+        text={element.text}
+        iconId={card.iconId}
+        facts={priceFactsOf(card)}
+        lockReason={element.lockReason}
+        isTooltipHeldOpen={isOpen}
+      />
     </div>
-  )
-}
-
-/** The closed shop row: the first stat line with its change, and the cost appended. */
-function ClosedRow({ card, text }: { card: ItemCardModel; text: ItemCardText }) {
-  return (
-    <p className={styles.row}>
-      <FirstStatLine lines={text.lines} />
-      <AppendedCost card={card} />
-    </p>
   )
 }
 

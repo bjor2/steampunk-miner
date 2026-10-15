@@ -1,12 +1,11 @@
 /**
  * The Upgrade bay's rows that are not a track (#41 casing, #113 lining, #107 guns, #109 charges,
- * the tech-unlocked vehicle items of ticket 248, the slices' bay entries of ticket 344), hull and
- * repair, the look tier and quick service, under the showcase. They are the kernel's own row
- * views, so their #33 ids and their click buys stay exactly as before. Markup only.
+ * the tech-unlocked vehicle items of ticket 248, the slices' bay entries of ticket 344), then
+ * Repair as one shared Title+OneLine element (#425) with the hull, its price and the look tier, and
+ * the quick service, under the showcase. The rows are the kernel's own row views, so their #33 ids
+ * and their click buys stay exactly as before. Markup only.
  */
-import { UI_IDS } from '../../../ui/ids'
-import { ItemTooltip } from '../../../ui/kit/ItemTooltip'
-import { Field } from '../../../ui/platform/BayHeader'
+import { TitleOneLine } from '../../../ui/kit/TitleOneLine'
 import { ChargeRowsView } from '../../../ui/platform/ChargeRowsView'
 import {
   BayEntryRowView,
@@ -17,9 +16,11 @@ import {
 } from '../../../ui/platform/ShopRowViews'
 import { ScreenButtonView } from '../../../ui/ScreenButtonView'
 import type { UpgradeBayModel } from '../../../systems/views/upgradeBayModel'
+import { serviceElementOf, serviceFactsOf } from './serviceElement'
 import styles from './ShowcaseScreen.module.css'
 
 export function ServiceRows({ model, focusedId }: { model: UpgradeBayModel; focusedId: string }) {
+  const service = serviceElementOf(model)
   return (
     <div className={styles.service}>
       <div className={styles.serviceRows}>
@@ -35,19 +36,17 @@ export function ServiceRows({ model, focusedId }: { model: UpgradeBayModel; focu
         ))}
       </div>
       <div className={styles.serviceActions}>
-        <Field label="Hull">
-          <span data-testid={UI_IDS.workshopHull}>{model.repair.hullText}</span>
-        </Field>
-        <ItemTooltip card={model.repair.card}>
-          <ScreenButtonView button={model.repair.button} focusedId={focusedId} />
-        </ItemTooltip>
-        <span data-testid={UI_IDS.workshopRepairCost} data-exact={model.repair.cost.exact}>
-          {model.repair.cost.text}
-        </span>
-        <Field label="Look">
-          <span data-testid={UI_IDS.workshopVisualTier}>{model.visualTier}</span>
-        </Field>
-        <ScreenButtonView button={model.quickService} focusedId={focusedId} />
+        <TitleOneLine
+          text={service.text}
+          iconId={model.repair.card.iconId}
+          facts={serviceFactsOf(model)}
+          lockReason={service.lockReason}
+        >
+          <span className={styles.serviceButtons}>
+            <ScreenButtonView button={model.repair.button} focusedId={focusedId} />
+            <ScreenButtonView button={model.quickService} focusedId={focusedId} />
+          </span>
+        </TitleOneLine>
       </div>
     </div>
   )

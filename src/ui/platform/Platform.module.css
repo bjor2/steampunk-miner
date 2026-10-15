@@ -80,10 +80,18 @@
   grid-column: 1 / -1;
 }
 
-.bayName {
-  display: inline-flex;
+/* The header and footer are each one shared Title+OneLine element (#425), laid out as a row. */
+.header > [data-ui-text],
+.footer > [data-ui-text] {
+  flex: 1;
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: var(--space-3);
   align-items: center;
-  gap: var(--space-1);
+}
+
+/* The bay's name in its accent, as before the pass. */
+.header > [data-ui-text] > :first-child {
   color: var(--bay-accent);
 }
 

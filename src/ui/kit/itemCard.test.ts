@@ -104,6 +104,9 @@ function upgradeBay(focusedId: string): ReactElement {
   return createElement(UpgradeBayView, { model: readUpgradeBayModel(), focusedId })
 }
 
+/** The shared element's brass tooltip plate (spec #422): the card's lines past its one line. */
+const TOOLTIP_PLATE = /<div role="tooltip"[^>]*>.*?<\/div>/s
+
 function textOf(html: string): string {
   return html
     .replace(/<[^>]*>/g, '')
@@ -139,13 +142,17 @@ describe('item card: shop row', () => {
     game().teleportToDock('upgrade')
   })
 
-  it('shows a closed compact row as the name, the first stat line with its change and the cost', () => {
+  // Pass #425 (spec #422): the closed row shows the name, the first stat line and the price; the
+  // rest of the card waits in its brass tooltip, hidden until the row opens.
+  it('shows a closed compact row as the name, the first stat line with its change and the price', () => {
     const html = renderDescribed(() => upgradeBay(UI_ID_TEMPLATES.workshopUpgradeBuy('engine')))
     const row = rowOf(html, 'track:drill_power')
+    const shown = textOf(row.replace(TOOLTIP_PLATE, ''))
     expect(row).toContain('data-variant="compact"')
-    expect(textOf(row)).toContain('Drill power 57 → 70 +13 (+22.8%)')
-    expect(textOf(row)).toMatch(/ · \d/)
-    expect(textOf(row)).not.toContain('A fake ledger line')
+    expect(shown).toContain('Drill power 57 → 70 +13 (+22.8%)')
+    expect(row).toMatch(/data-exact="[^"]+"[^>]*>(?:<[^>]*>)*[^<]*\d/)
+    expect(shown).not.toContain('A fake ledger line')
+    expect(TOOLTIP_PLATE.exec(row)?.[0]).toContain('hidden')
   })
 
   it('opens the full card in place on the focused row, with every stat line field', () => {
@@ -154,6 +161,7 @@ describe('item card: shop row', () => {
       'track:drill_power',
     )
     expect(row).toContain('aria-expanded="true"')
+    expect(TOOLTIP_PLATE.exec(row)?.[0]).not.toContain('hidden')
     const text = textOf(row)
     FULL_TEXTS.forEach((part) => expect(text).toContain(part))
     expect(text).toContain('A fake ledger line for drill_power.')

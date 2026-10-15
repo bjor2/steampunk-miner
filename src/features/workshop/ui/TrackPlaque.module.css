@@ -1,10 +1,13 @@
 /*
  * A brass plaque beside the car (#180 section 1): small enough that the car stays the hero, with
- * the pips, the line and the held Buy readable at projector distance in the shop's type size.
+ * the pips, the line and the held Buy readable at projector distance in the shop's type size. The
+ * track's glyph stands left of the shared Title+OneLine element that holds the rest (#425).
  */
 .plaque {
   display: grid;
-  gap: var(--space-1);
+  grid-template-columns: auto 1fr;
+  align-items: start;
+  gap: var(--space-1) var(--space-2);
   padding: var(--space-1) var(--space-2);
   border: 2px solid rgb(201 162 75 / 0.55);
   border-radius: var(--radius-panel);
@@ -17,35 +20,16 @@
   box-shadow: 0 0 0.6em rgb(201 162 75 / 0.45);
 }
 
-.title,
-.numbers,
 .footer {
   display: flex;
   flex-wrap: wrap;
   gap: var(--space-1) var(--space-2);
   align-items: center;
-}
-
-.name {
-  flex: 1;
-  color: var(--color-brass);
-}
-
-.footer {
   justify-content: space-between;
 }
 
-.cost {
-  font-variant-numeric: tabular-nums;
-}
-
-/* #158 "State badges": only the price turns red when the wallet is short. */
-.plaque[data-buy-state='money_short'] .cost {
-  color: var(--color-ember);
-}
-
-/* Can't afford flashes the price red once (#180 section 2). */
-.cost[data-flash] {
+/* Can't afford flashes the price red once (#180 section 2); the price is the element's fact. */
+.plaque [data-flash] {
   animation: price-flash 0.6s ease-out;
 }
 
@@ -54,10 +38,6 @@
     color: var(--color-ember);
     text-shadow: 0 0 0.4em var(--color-ember);
   }
-}
-
-.effect {
-  font-variant-numeric: tabular-nums;
 }
 
 .line {
@@ -94,10 +74,4 @@
 /* The last pip glows when the big level-up is one buy away (GD rule 3). */
 .pips[data-jump-next] .pip:last-child {
   box-shadow: 0 0 0.5em var(--color-amber);
-}
-
-/* The open item card (#164), between the plaque's title and its pips. */
-.card {
-  display: grid;
-  gap: var(--space-1);
 }

@@ -39,7 +39,7 @@ export function BayFrame({
     >
       <BayHeader header={header} />
       {children}
-      <BayFooter footer={footer} focusedId={focusedId} />
+      <BayFooter bay={header.bay} footer={footer} focusedId={focusedId} />
     </div>
   )
 }

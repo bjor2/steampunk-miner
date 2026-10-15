@@ -21,7 +21,8 @@ declare global {
 
 const DRILL_ENTRY = 'workshop-upgrade-drill_power-buy'
 const TIP_ENTRY = 'workshop-upgrade-drill_tip-buy'
-const REPAIR_TOOLTIP = '[data-item-tooltip="service:repair"]'
+/** Repair's brass tooltip on the bay's service element (spec #422, pass #425). */
+const REPAIR_TOOLTIP = '[data-tooltip="upgrade-bay.service"]'
 const LONG_PRESS_MS = 400
 /** One page read takes about 1.5 s under software WebGL on a busy box. */
 const SLOW_POLL = { timeout: 15_000 }
@@ -118,7 +119,7 @@ test.describe('item cards (#164)', () => {
     await expect(page.locator(REPAIR_TOOLTIP)).toBeHidden()
     await page.getByTestId('workshop-repair').hover()
     await expect(page.locator(REPAIR_TOOLTIP)).toBeVisible()
-    await expect(page.locator(REPAIR_TOOLTIP)).toContainText('Hull restored to')
+    await expect(page.locator(REPAIR_TOOLTIP)).toContainText('Platform fitters')
     expect(errors).toEqual([])
   })
 
