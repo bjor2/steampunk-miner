@@ -221,6 +221,16 @@ programs }` from three's `renderer.info` of the game canvas), read only when cal
   each metric (`medianPacingReport`, #84), so one run's combat deaths cannot flip a gate; the log
   checks, the baseline and `compareRuns` stay on the first seed. Do not retune the bot or a constant to make it pass: a
   miss is a balance finding for the Systems & Economy Designer (the lever is `paceScale`).
+- **Drill-speed ladder** (ticket 409): `src/logging/drillLadder.test.ts` cuts the same 50 cells
+  straight down from the planet 1 surface (seed 83921, column 20) at drill_power majors 1, 5, 10,
+  15 and 20 through the authority's swept cut (`systems/authority/drillLadder.ts`: the #396 drill
+  law with #399's exact carry, a full tank and a hold that never fills, enemies frozen). It prints
+  the table (ticks, seconds, cells/s, gain on the level below beside the law's gain), writes it to
+  `balance-report/drill-ladder.ndjson` (a setup line, then one line a level) for comparing runs
+  across commits, and fails a step that is not faster or keeps less than the law's 1.12 a level
+  compounded, less the GD's 5% (`drillLadderReport.ts`, compared in Money). The cut alone sets the
+  time; #397's cut-follow adds the vehicle's travel. About 4 s, so it runs in the change-relevant
+  tier. The table and how to read it are in [docs/economy/drill-ladder.md](economy/drill-ladder.md).
 - **Known red** (ticket 419, the TD on #396 section 2): `CAMPAIGN_PACING_KNOWN_RED`
   (`src/constants/knownRed.ts`) is the one known-red marker in the repo: one gate
   (`campaignPacingGate`), one finding (#417), no registry. The gate still runs in full;

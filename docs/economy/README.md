@@ -11,6 +11,8 @@ final balance. Nothing here is game code.
 - `tools/gen.py` regenerates the tables from the constants. `tools/sim.py` is the pacing simulation.
 - `pace-baseline.md`: the pacing bot's core minutes on planets 1 to 10 with ore leads (#146), the
   P3–P10 reference for later tickets.
+- `drill-ladder.md`: the drill-speed ladder (#409), the time a 50-cell planet 1 column takes at
+  drill_power 1, 5, 10, 15 and 20, measured by the authority's cut, to tune the drill curve against.
 
 The game reads its constants from `src/systems/economy/economy.json`; the pure formulas in
 `src/systems/economy/` render these four tables again, and `economyTables.test.ts` compares them cell
