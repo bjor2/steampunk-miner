@@ -729,6 +729,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/authority/sliceSectionSnapshot.test.ts` | 12 | 12 |
 | `src/systems/authority/spanBudget.test.ts` | 4 | 4 |
 | `src/systems/authority/stateDigest.test.ts` | 17 | 12 |
+| `src/systems/authority/sweptCarry.test.ts` | 8 | 6 |
 | `src/systems/authority/sweptCutAtSpeed.test.ts` | 8 | 8 |
 | `src/systems/authority/sweptGateSpeeds.test.ts` | 24 | 2 |
 | `src/systems/authority/sweptSpanDrill.test.ts` | 17 | 13 |
@@ -1065,6 +1066,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | File | Tests | Sites |
 | --- | --- | --- |
 | `src/systems/save/byteCodecs.test.ts` | 20 | 12 |
+| `src/systems/save/carriedCursors.test.ts` | 3 | 3 |
 | `src/systems/save/chunkDiffSave.test.ts` | 11 | 11 |
 | `src/systems/save/playerProfile.test.ts` | 4 | 4 |
 | `src/systems/save/saveDeterminism.test.ts` | 7 | 7 |
@@ -1266,6 +1268,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | --- | --- | --- |
 | `src/systems/vehicle/aheadBearingLatch.test.ts` | 11 | 11 |
 | `src/systems/vehicle/bandDig.test.ts` | 5 | 5 |
+| `src/systems/vehicle/carryWalk.test.ts` | 34 | 13 |
 | `src/systems/vehicle/casingTrail.test.ts` | 16 | 12 |
 | `src/systems/vehicle/chargeSelection.test.ts` | 4 | 4 |
 | `src/systems/vehicle/colliderHalo.test.ts` | 3 | 3 |
@@ -1287,7 +1290,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/vehicle/returnReserve.test.ts` | 4 | 4 |
 | `src/systems/vehicle/stepBound.test.ts` | 10 | 10 |
 | `src/systems/vehicle/strutPlank.test.ts` | 4 | 4 |
-| `src/systems/vehicle/sweptCut.test.ts` | 9 | 9 |
+| `src/systems/vehicle/sweptCut.test.ts` | 7 | 7 |
 | `src/systems/vehicle/tickPlan.test.ts` | 10 | 6 |
 | `src/systems/vehicle/travelParity.test.ts` | 8 | 8 |
 | `src/systems/vehicle/vehicleCharges.test.ts` | 4 | 4 |

@@ -174,6 +174,13 @@ programs }` from three's `renderer.info` of the game canvas), read only when cal
   the opened rows; `saveDeterminism.test.ts` saves the planet-200 dive of `p200DiveFixture.ts` (a
   crew of eight, so the steps are cut by the swept span, and a drill under the curve, so the cursor
   holds part of a tick) and plays 600 ticks on from the save and from its load, compared byte for byte.
+- Drill carry specs (ticket 399): the pure walk is `vehicle/carryWalk.test.ts` (exact sums over a
+  column, hard stops, the carry ends, runs equal to the per-cell walk, no gate asked past the stop);
+  `authority/sweptCarry.test.ts` drives `drillAlongStep` down a 100-cell column (each cell breaks on
+  tick `ceil(running total of prices / 60)`), compares the live, run-length and per-cell walks byte for
+  byte at 1x, 10x and 100x a P40 rig's stride, and checks the carry is 0 where core, a hazard, a full
+  hold or a dry tank ends a tick's walk. Since the work picks how far a tick cuts, a flag-on fixture
+  whose pose runs ahead of the cut rests at its end while the cut catches up (`sweptSpanFixtures.ts`).
 - Hint specs (#16, #27): the hint and transmission boards are pure (`src/systems/hints/`) and are
   fed authority moments (a scripted session, or the pacing bot's `listener`); the store specs
   call `startPlaques()` as bootstrap does, install an in-memory `PreferencesStorage` for the
