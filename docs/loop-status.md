@@ -154,6 +154,8 @@ only". The Tester keeps running `tester.sh --full` while the flag is set. A gree
 the flag, and the next refill goes back to normal picking. Before this change a red main also
 blocked the needs-fix tickets, so main could never get green again (Oct 8 to 13).
 
+**Main-red cleared by hand (15 Oct 2026, Bjor's ruling):** `tester/main-red` (set at 57ab1562b) was deleted by hand at 17:40 CEST after #418 closed (16:48) so the waiting tickets (#419, #420, #416, #400, #397, #320) can start. `campaignPacingGate` is a known red until #417 closes, so a later full run will still fail on it until #419 (the known-failure marker) lands; the other previously failing files (runSummary, cutFollow, pacingGate, botWallet, botChargeNeed) pass on the tip 538aacfc0.
+
 **Auto-filed fix tickets (since 2026-10-13):** when a `--full` or nightly full suite is red and no
 open `needs-fix` issue exists, `tester.sh` (`auto_file_needs_fix`) files one itself, labelled
 `build`, `needs-fix` and `tier:hard`, with the run tag, SHA, failed files and the exact FAIL and
