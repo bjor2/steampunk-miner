@@ -3,10 +3,10 @@
  * strategy sections 4 and 6): a slowdown is a run of back-to-back seconds whose p95 frame missed
  * the #38 budget, a burst a run of seconds with frames over 50 ms (#121 `longTasks`). Each names
  * the ore, its depth and chunk last collected before it started (#122 `resource_collected`, or a
- * drill span's `drill_cut` and its last unit, ticket 420), so a slow build shows which mineral,
- * depth or chunk preceded the slowdown, ready to replay to.
+ * drill span's last ore run on its `drill_cut` line, ticket 420), so a slow build shows which
+ * mineral, depth or chunk preceded the slowdown, ready to replay to.
  */
-import type { RunEventData } from '../eventNames'
+import { chunkKey, chunkOfTile } from '../../systems/world/tileGrid'
 import type { RunEvent } from '../runEvent'
 import { isOverFrameBudget } from './frameCost'
 import { eventsNamed, type SessionLog } from './sessionTable'
@@ -78,20 +78,16 @@ function unitOfLine({ seq, tick, data }: RunEvent<'resource_collected'>): Collec
   return { seq, tick, oreId: data.oreId, oreDepthTiles: data.oreDepthTiles, chunk: data.chunk }
 }
 
-type SpanData = RunEventData<'drill_cut'>
-type SpanDataWithLastOre = SpanData & Required<Pick<SpanData, LastOreField>>
-type LastOreField = 'lastOreDepthTiles' | 'lastOreChunk' | 'lastOreTick'
-
-/** A span's last unit: the last of its ore runs, at the depth, chunk and tick it names. */
-function lastUnitOfSpan({ seq, data }: RunEvent<'drill_cut'>): Collected[] {
+/**
+ * A drill span's last ore: the last of its ore runs, near the span's last broken cell (its chunk)
+ * and as deep as the span went, at the span's tick: within the second or so a span lasts.
+ */
+function lastUnitOfSpan({ seq, tick, depthTiles, data }: RunEvent<'drill_cut'>): Collected[] {
   const lastRun = data.ores.at(-1)
-  if (lastRun === undefined || !hasLastOre(data)) return []
-  const { lastOreTick: tick, lastOreDepthTiles: oreDepthTiles, lastOreChunk: chunk } = data
-  return [{ seq, tick, oreId: lastRun[0], oreDepthTiles, chunk }]
-}
-
-function hasLastOre(data: SpanData): data is SpanDataWithLastOre {
-  return data.lastOreTick !== undefined
+  if (lastRun === undefined || data.last === undefined) return []
+  const [tx, ty] = data.last
+  const chunk = chunkKey(chunkOfTile(tx), chunkOfTile(ty))
+  return [{ seq, tick, oreId: lastRun[0], oreDepthTiles: depthTiles, chunk }]
 }
 
 /** Back-to-back samples that pass `isIn`, each run in tick order. */

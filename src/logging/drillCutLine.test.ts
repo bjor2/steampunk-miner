@@ -125,9 +125,6 @@ describe('drill_cut span line (ticket 420)', () => {
           ['tin', 1],
         ],
         stop: 'end',
-        lastOreDepthTiles: 12,
-        lastOreChunk: '0,8',
-        lastOreTick: 40,
       },
     })
     expect(session.lines.flatMap(runEventProblems)).toEqual([])

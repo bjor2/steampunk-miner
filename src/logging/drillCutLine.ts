@@ -47,12 +47,6 @@ export interface SpanEvent<K extends SpanEventType = SpanEventType> {
 
 type Cell = readonly [tx: number, ty: number]
 
-interface LastOre {
-  depthTiles: number
-  chunk: string
-  tick: number
-}
-
 interface LiningRun {
   stamp: RunEventStamp
   band: number
@@ -79,7 +73,6 @@ export interface DrillSpan {
   units: number
   value: Money
   ores: MinedRun[]
-  lastOre: LastOre | null
   lining: LiningRun | null
   opening: SpanReading | null
   closing: SpanReading | null
@@ -106,7 +99,6 @@ export function openDrillSpan(first: SpanEvent, opening: SpanReading | null): Dr
     units: 0,
     value: ZERO_MONEY,
     ores: [],
-    lastOre: null,
     lining: null,
     opening,
     closing: opening,
@@ -156,7 +148,6 @@ const SPAN_FOLDS: { readonly [K in SpanEventType]: SpanFold<K> } = {
     span.units += event.amount
     span.value = add(span.value, fromCanonical(event.value))
     extendMinedRuns(span.ores, event.oreId, event.amount)
-    span.lastOre = { depthTiles: event.depthTiles, chunk: event.chunk, tick: event.tick }
   },
   DrillDamageDealt: (span, { event }) => {
     span.ticks += event.ticks
@@ -208,7 +199,6 @@ export function drillCutDataOf(span: DrillSpan, stop: DrillSpanStop): RunEventDa
     ores: span.ores,
     ...netChangeOf(span.opening, span.closing),
     stop,
-    ...lastOreFieldsOf(span.lastOre),
   }
 }
 
@@ -220,15 +210,6 @@ function cellFieldsOf({ first, last }: DrillSpan): { first?: Cell; last?: Cell }
 function netChangeOf(opening: SpanReading | null, closing: SpanReading | null): SpanReading {
   if (opening === null || closing === null) return { energy: 0, heat: 0 }
   return { energy: closing.energy - opening.energy, heat: closing.heat - opening.heat }
-}
-
-function lastOreFieldsOf(lastOre: LastOre | null) {
-  if (lastOre === null) return {}
-  return {
-    lastOreDepthTiles: lastOre.depthTiles,
-    lastOreChunk: lastOre.chunk,
-    lastOreTick: lastOre.tick,
-  }
 }
 
 /** The span's lining run as one `casing_lined` line, at its first ring's stamp. */

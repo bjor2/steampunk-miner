@@ -35,12 +35,14 @@ function collected(oreId: string, depthTiles: number, chunk: string) {
     )
 }
 
-/** A drill span whose last unit was `oreId` at that depth and chunk, `ticksAgo` before its line. */
-function drilledSpan(oreId: string, depthTiles: number, chunk: string, ticksAgo: number) {
+/** A drill span `depthTiles` deep whose last ore run was `oreId`, its last cell at `last`. */
+function drilledSpan(oreId: string, depthTiles: number, last: readonly [number, number]) {
   return (seq: number, tick: number) =>
     runEventLine(RUN, seq, { tick, depthTiles }, 'drill_cut', {
       spans: 6,
       cells: 9,
+      first: [last[0], last[1] + 8],
+      last,
       ticks: 30,
       units: 2,
       value: '8e+0',
@@ -51,9 +53,6 @@ function drilledSpan(oreId: string, depthTiles: number, chunk: string, ticksAgo:
       energy: -24,
       heat: 0,
       stop: 'end',
-      lastOreDepthTiles: depthTiles,
-      lastOreChunk: chunk,
-      lastOreTick: tick - ticksAgo,
     })
 }
 
@@ -126,14 +125,14 @@ describe('frame stretches', () => {
     })
   })
 
-  it("names a drill span's last unit as the ore collected before a slowdown (ticket 420)", () => {
-    const session = sessionOfLines([drilledSpan('kernel.crystal.t2', 14, '1,-3', 20), second(40)])
+  it("names a drill span's last ore, its depth and its last cell's chunk before a slowdown (ticket 420)", () => {
+    const session = sessionOfLines([drilledSpan('kernel.crystal.t2', 14, [40, -70]), second(40)])
     const [slowdown] = frameStretchesOf([session], 'slowdown')
     expect(slowdown.mineralBefore).toEqual({
       oreId: 'kernel.crystal.t2',
       oreDepthTiles: 14,
       chunk: '1,-3',
-      ticksBefore: 80,
+      ticksBefore: 60,
     })
   })
 

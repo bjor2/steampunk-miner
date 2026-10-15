@@ -483,7 +483,7 @@ export const RUN_EVENT_REGISTRY = {
   // span's first broken cell (its first event when none broke), with the deepest `depthTiles` it
   // reached. `ticks` sums the dig time, `ores` is the mined order's `[oreId, units]` runs, and
   // `energy` and `heat` are the vehicle's net change over the span: a summary, never a source for
-  // the economy or the goldens. `lastOre*` name the last unit that reached the hold.
+  // the economy or the goldens.
   drill_cut: {
     group: 'mining',
     level: 'detail',
@@ -499,9 +499,6 @@ export const RUN_EVENT_REGISTRY = {
       energy: 'integer',
       heat: 'integer',
       stop: { oneOf: DRILL_SPAN_STOPS },
-      lastOreDepthTiles: { optional: 'integer' },
-      lastOreChunk: { optional: 'text' },
-      lastOreTick: { optional: 'integer' },
     },
   },
   // K2 (#185, #142 acceptance 13): a slice's gate check stopped the drill at an ore cell, once per
