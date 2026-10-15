@@ -101,6 +101,16 @@
         "tx": 19,
         "ty": 947,
         "ticks": 40
+      },
+      "run": {
+        "count": 2,
+        "tick": 41,
+        "seq": 2,
+        "payload": {
+          "tx": 1,
+          "ty": 1
+        },
+        "poses": 2
       }
     },
     {
@@ -111,17 +121,6 @@
       "payload": {
         "x": 20500,
         "y": 949500
-      }
-    },
-    {
-      "playerId": "p1",
-      "tick": 82,
-      "seq": 8,
-      "type": "drillTile",
-      "payload": {
-        "tx": 20,
-        "ty": 948,
-        "ticks": 40
       }
     },
     {

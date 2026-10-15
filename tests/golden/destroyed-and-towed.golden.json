@@ -72,6 +72,16 @@
         "tx": 14,
         "ty": 297,
         "ticks": 30
+      },
+      "run": {
+        "count": 13,
+        "tick": 31,
+        "seq": 2,
+        "payload": {
+          "tx": 1,
+          "ty": 0
+        },
+        "poses": 12
       }
     },
     {
@@ -85,33 +95,11 @@
     },
     {
       "playerId": "p1",
-      "tick": 62,
-      "seq": 5,
-      "type": "drillTile",
-      "payload": {
-        "tx": 15,
-        "ty": 297,
-        "ticks": 30
-      }
-    },
-    {
-      "playerId": "p1",
       "tick": 63,
       "seq": 6,
       "type": "reportPose",
       "payload": {
         "x": 16500
-      }
-    },
-    {
-      "playerId": "p1",
-      "tick": 93,
-      "seq": 7,
-      "type": "drillTile",
-      "payload": {
-        "tx": 16,
-        "ty": 297,
-        "ticks": 30
       }
     },
     {
@@ -125,33 +113,11 @@
     },
     {
       "playerId": "p1",
-      "tick": 124,
-      "seq": 9,
-      "type": "drillTile",
-      "payload": {
-        "tx": 17,
-        "ty": 297,
-        "ticks": 30
-      }
-    },
-    {
-      "playerId": "p1",
       "tick": 125,
       "seq": 10,
       "type": "reportPose",
       "payload": {
         "x": 18500
-      }
-    },
-    {
-      "playerId": "p1",
-      "tick": 155,
-      "seq": 11,
-      "type": "drillTile",
-      "payload": {
-        "tx": 18,
-        "ty": 297,
-        "ticks": 30
       }
     },
     {
@@ -165,33 +131,11 @@
     },
     {
       "playerId": "p1",
-      "tick": 186,
-      "seq": 13,
-      "type": "drillTile",
-      "payload": {
-        "tx": 19,
-        "ty": 297,
-        "ticks": 30
-      }
-    },
-    {
-      "playerId": "p1",
       "tick": 187,
       "seq": 14,
       "type": "reportPose",
       "payload": {
         "x": 20500
-      }
-    },
-    {
-      "playerId": "p1",
-      "tick": 217,
-      "seq": 15,
-      "type": "drillTile",
-      "payload": {
-        "tx": 20,
-        "ty": 297,
-        "ticks": 30
       }
     },
     {
@@ -205,33 +149,11 @@
     },
     {
       "playerId": "p1",
-      "tick": 248,
-      "seq": 17,
-      "type": "drillTile",
-      "payload": {
-        "tx": 21,
-        "ty": 297,
-        "ticks": 30
-      }
-    },
-    {
-      "playerId": "p1",
       "tick": 249,
       "seq": 18,
       "type": "reportPose",
       "payload": {
         "x": 22500
-      }
-    },
-    {
-      "playerId": "p1",
-      "tick": 279,
-      "seq": 19,
-      "type": "drillTile",
-      "payload": {
-        "tx": 22,
-        "ty": 297,
-        "ticks": 30
       }
     },
     {
@@ -245,33 +167,11 @@
     },
     {
       "playerId": "p1",
-      "tick": 310,
-      "seq": 21,
-      "type": "drillTile",
-      "payload": {
-        "tx": 23,
-        "ty": 297,
-        "ticks": 30
-      }
-    },
-    {
-      "playerId": "p1",
       "tick": 311,
       "seq": 22,
       "type": "reportPose",
       "payload": {
         "x": 24500
-      }
-    },
-    {
-      "playerId": "p1",
-      "tick": 341,
-      "seq": 23,
-      "type": "drillTile",
-      "payload": {
-        "tx": 24,
-        "ty": 297,
-        "ticks": 30
       }
     },
     {
@@ -285,33 +185,11 @@
     },
     {
       "playerId": "p1",
-      "tick": 372,
-      "seq": 25,
-      "type": "drillTile",
-      "payload": {
-        "tx": 25,
-        "ty": 297,
-        "ticks": 30
-      }
-    },
-    {
-      "playerId": "p1",
       "tick": 373,
       "seq": 26,
       "type": "reportPose",
       "payload": {
         "x": 26500
-      }
-    },
-    {
-      "playerId": "p1",
-      "tick": 403,
-      "seq": 27,
-      "type": "drillTile",
-      "payload": {
-        "tx": 26,
-        "ty": 297,
-        "ticks": 30
       }
     },
     {

@@ -10,6 +10,8 @@
  * - Consecutive `drillTile` commands of one player with equal `ticks` and a constant tile step,
  *   or `drillStep` commands with a constant `x, y` step and equal `drive`, are written as their
  *   first command with a `run` of the count and the step of the tick, the seq and those fields.
+ *   The player's pose reports between them (the shell's 5 Hz, the bot's report before each bore)
+ *   do not end the run: their lines follow the run's, and the reader puts them back by seq.
  *
  * `expandCommandLog` restores every original command exactly: tick, seq and payload. This is the
  * log's encoding only: the authority and the wire still get every field of every command, so no
@@ -36,6 +38,8 @@ export interface CommandRunStep {
   seq: number
   /** The step of each stepped payload field (`tx, ty` or `x, y`). */
   payload: Readonly<Record<string, number>>
+  /** The player's pose lines sent between the run's commands, written right after its line. */
+  poses?: number
 }
 
 type LoggedRunCommand = RunCommand & { run: CommandRunStep }
@@ -70,12 +74,16 @@ const POSE_FIELDS = Object.keys({
 /** The last pose each player logged; a rescue forgets it so the next report is written in full. */
 type LastPoses = Map<string, PosePayload>
 
-/** A run being gathered: its first command, the last one added and its step once it has two. */
+/**
+ * A run being gathered: its first command, the last one added, its step once it has two, and the
+ * logged lines of the player's poses sent since it started.
+ */
 interface PendingRun {
   first: RunCommand
   last: RunCommand
   count: number
   step: CommandRunStep | null
+  poses: LoggedCommand[]
 }
 
 /**
@@ -94,20 +102,20 @@ export function createCommandLogWriter(): CommandLogWriter {
   let pending: PendingRun | null = null
 
   const flush = (): LoggedCommand[] => {
-    const lines = pending === null ? [] : [loggedRunOf(pending)]
+    const lines = pending === null ? [] : linesOfRun(pending)
     pending = null
     return lines
   }
 
   const startOrWrite = (command: AuthorityCommand): LoggedCommand[] => {
     if (!isRunType(command)) return [loggedCommandOf(command, lastPoses)]
-    pending = { first: command, last: command, count: 1, step: null }
+    pending = { first: command, last: command, count: 1, step: null, poses: [] }
     return []
   }
 
   return {
     writeCommand: (command) => {
-      if (pending !== null && extendRun(pending, command)) return []
+      if (pending !== null && gatherIntoRun(pending, command, lastPoses)) return []
       return [...flush(), ...startOrWrite(command)]
     },
     flush,
@@ -123,7 +131,11 @@ export function loggedCommandsOf(commands: readonly AuthorityCommand[]): LoggedC
 /** The commands a log holds, every field carried forward and every run unrolled: the replay input. */
 export function expandCommandLog(logged: readonly LoggedCommand[]): AuthorityCommand[] {
   const lastPoses: LastPoses = new Map()
-  return logged.flatMap((command) => expandedCommandsOf(command, lastPoses))
+  const expanded: AuthorityCommand[] = []
+  for (let at = 0; at < logged.length; at += 1 + heldPoseCountOf(logged[at])) {
+    for (const command of expandedLinesAt(logged, at, lastPoses)) expanded.push(command)
+  }
+  return expanded
 }
 
 function isRunType(command: AuthorityCommand): command is RunCommand {
@@ -151,6 +163,17 @@ function isSamePoseField(last: PosePayload[keyof PosePayload], value: typeof las
 
 function forgetPoseOnRescue(command: LoggedCommand, lastPoses: LastPoses): void {
   if (command.type === 'requestRescue') lastPoses.delete(command.playerId)
+}
+
+/** Holds the player's pose for after the run, or adds `command` to the run when it continues it. */
+function gatherIntoRun(run: PendingRun, command: AuthorityCommand, lastPoses: LastPoses): boolean {
+  if (!isPoseOfRunPlayer(run, command)) return extendRun(run, command)
+  run.poses.push(loggedCommandOf(command, lastPoses))
+  return true
+}
+
+function isPoseOfRunPlayer(run: PendingRun, command: AuthorityCommand): boolean {
+  return command.type === 'reportPose' && command.playerId === run.first.playerId
 }
 
 /**
@@ -200,8 +223,28 @@ function isSameStep(run: CommandRunStep, step: CommandRunStep): boolean {
   return run.tick === step.tick && run.seq === step.seq && isSameValue(run.payload, step.payload)
 }
 
-function loggedRunOf({ first, step }: PendingRun): LoggedCommand {
-  return step === null ? first : { ...first, run: step }
+/** A lone command and its poses as they came; a run as one line, then the poses it held. */
+function linesOfRun({ first, step, poses }: PendingRun): LoggedCommand[] {
+  if (step === null) return [first, ...poses]
+  const run = poses.length === 0 ? step : { ...step, poses: poses.length }
+  return [{ ...first, run }, ...poses]
+}
+
+function heldPoseCountOf(line: LoggedCommand): number {
+  return 'run' in line ? (line.run.poses ?? 0) : 0
+}
+
+/** The line at `at` expanded, with the pose lines its run held put back among its commands. */
+function expandedLinesAt(
+  logged: readonly LoggedCommand[],
+  at: number,
+  lastPoses: LastPoses,
+): AuthorityCommand[] {
+  const held = logged.slice(at + 1, at + 1 + heldPoseCountOf(logged[at]))
+  const commands = expandedCommandsOf(logged[at], lastPoses)
+  if (held.length === 0) return commands
+  const poses = held.flatMap((line) => expandedCommandsOf(line, lastPoses))
+  return [...commands, ...poses].sort((a, b) => a.seq - b.seq)
 }
 
 function expandedCommandsOf(command: LoggedCommand, lastPoses: LastPoses): AuthorityCommand[] {

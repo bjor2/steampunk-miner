@@ -172,12 +172,29 @@ describe('command log: compact lines (ticket 420)', () => {
     expect(expandCommandLog(lines)).toEqual([...steady, ...faster])
   })
 
-  it('ends a run at any other command, and keeps a lone drill command as it was', () => {
+  it("ends a run at any command but the player's pose, and keeps a lone drill command as it was", () => {
     const [first, second] = drillTilesDown(2, 100)
-    const pose = poseOf('p1', 130, DOWN)
-    const commands = [first, pose, second]
-    expect(loggedCommandsOf(commands)).toEqual([first, pose, second])
+    const rescue = rescueOf('p1', 130)
+    const commands = [first, rescue, second]
+    expect(loggedCommandsOf(commands)).toEqual([first, rescue, second])
     expect(expandCommandLog(loggedCommandsOf(commands))).toEqual(commands)
+  })
+
+  it("keeps a run going across the player's pose reports, which follow its line and expand back in order", () => {
+    const drills = drillTilesDown(4, 100)
+    const commands = drills
+      .flatMap((drill) => [poseOf('p1', drill.tick, DOWN), drill])
+      .map((command) => ({ ...command, seq: nextSeq++ }))
+    const lines = loggedCommandsOf(commands)
+    expect(lines.map((line) => line.type)).toEqual([
+      'reportPose',
+      'drillTile',
+      'reportPose',
+      'reportPose',
+      'reportPose',
+    ])
+    expect(lines[1]).toMatchObject({ run: { count: 4, seq: 2, poses: 3 } })
+    expect(expandCommandLog(lines)).toEqual(commands)
   })
 
   it('expands a mixed log of poses, runs and rescues back to exactly the submitted commands', () => {
