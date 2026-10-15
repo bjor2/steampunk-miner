@@ -13,7 +13,7 @@ import {
   type ElementText,
   type UiTextHolds,
 } from '../../systems/views/uiText'
-import { VectorIcon } from '../VectorIcon'
+import { VectorIcon, type IconSize } from '../VectorIcon'
 import styles from './TitleOneLine.module.css'
 import { Tooltip } from './Tooltip'
 
@@ -35,6 +35,12 @@ export interface IconValue {
 
 export type TitleLevel = 'h2' | 'h3' | 'span'
 
+/** `stack` puts the lines under the title; `row` sets title and values on one line (a HUD row). */
+export type ElementLayout = 'stack' | 'row'
+
+/** The glyphs' size: `menu` in menus and cards, `hud` on the in-run HUD (#158 sizes). */
+export type GlyphSize = Extract<IconSize, 'menu' | 'hud'>
+
 const NO_FACTS: readonly IconValue[] = []
 
 export function TitleOneLine({
@@ -43,6 +49,8 @@ export function TitleOneLine({
   facts = NO_FACTS,
   lockReason = null,
   level = 'h3',
+  layout = 'stack',
+  glyphSize = 'menu',
   isTooltipHeldOpen = false,
   children,
 }: {
@@ -52,6 +60,8 @@ export function TitleOneLine({
   /** Why the element is locked, kept on the element itself; null when it is open. */
   lockReason?: string | null
   level?: TitleLevel
+  layout?: ElementLayout
+  glyphSize?: GlyphSize
   /** The game's menu focus is on the element: its tooltip shows as keyboard focus would (#164). */
   isTooltipHeldOpen?: boolean
   /** The element's action, drawn under its lines. */
@@ -64,10 +74,11 @@ export function TitleOneLine({
         className={styles.element}
         data-ui-text={text.id}
         data-locked={lockReason !== null || undefined}
+        data-layout={layout}
       >
-        <TitleRow title={text.title} iconId={iconId} level={level} />
+        <TitleRow title={text.title} iconId={iconId} level={level} glyphSize={glyphSize} />
         {text.oneLine !== '' && <p className={styles.oneLine}>{text.oneLine}</p>}
-        {facts.length > 0 && <FactRow facts={facts} />}
+        {facts.length > 0 && <FactRow facts={facts} glyphSize={glyphSize} />}
         {lockReason !== null && (
           <p className={styles.lock} data-lock-reason>
             {lockReason}
@@ -83,20 +94,22 @@ function TitleRow({
   title,
   iconId,
   level: Heading,
+  glyphSize,
 }: {
   title: string
   iconId: string | null
   level: TitleLevel
+  glyphSize: GlyphSize
 }) {
   return (
     <Heading className={styles.title}>
-      {iconId !== null && <VectorIcon iconId={iconId} size="menu" />}
+      {iconId !== null && <VectorIcon iconId={iconId} size={glyphSize} />}
       {title}
     </Heading>
   )
 }
 
-function FactRow({ facts }: { facts: readonly IconValue[] }) {
+function FactRow({ facts, glyphSize }: { facts: readonly IconValue[]; glyphSize: GlyphSize }) {
   return (
     <p className={styles.facts}>
       {facts.map((fact) => (
@@ -108,7 +121,7 @@ function FactRow({ facts }: { facts: readonly IconValue[] }) {
           data-money-short={fact.isMoneyShort || undefined}
           data-flash={fact.flashKey !== undefined || undefined}
         >
-          <VectorIcon iconId={fact.iconId} size="menu" />
+          <VectorIcon iconId={fact.iconId} size={glyphSize} />
           {fact.text}
         </span>
       ))}

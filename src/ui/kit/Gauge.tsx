@@ -27,17 +27,9 @@ export function Gauge({
   isHatched?: boolean
   children?: ReactNode
 }) {
-  const needleStyle = needleStyleOf(reading.permille)
   return (
     <div className={styles.gauge}>
-      <div
-        className={styles.dial}
-        data-testid={gaugeId}
-        data-permille={reading.permille}
-        data-hatched={isHatched || undefined}
-      >
-        <span className={styles.needle} style={needleStyle} />
-      </div>
+      <GaugeDial reading={reading} gaugeId={gaugeId} isHatched={isHatched} />
       <span className={styles.label}>
         <VectorIcon iconId={reading.iconId} size="hud" />
         {label}
@@ -46,6 +38,28 @@ export function Gauge({
         {reading.text}
       </span>
       {children}
+    </div>
+  )
+}
+
+/** The dial alone: needle and ticks, no text, for a view that draws the label and value itself. */
+export function GaugeDial({
+  reading,
+  gaugeId,
+  isHatched = false,
+}: {
+  reading: GaugeReading
+  gaugeId: string
+  isHatched?: boolean
+}) {
+  return (
+    <div
+      className={styles.dial}
+      data-testid={gaugeId}
+      data-permille={reading.permille}
+      data-hatched={isHatched || undefined}
+    >
+      <span className={styles.needle} style={needleStyleOf(reading.permille)} />
     </div>
   )
 }
