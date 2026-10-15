@@ -52,12 +52,11 @@ export const UI_BUDGET_PANELS: readonly UiBudgetPanel[] = [
 ]
 
 /**
- * Measured on the start scenario when #424 landed (`UI_BUDGET_REPORT=1`); each pass lowers or
- * deletes its own entry, and #429 empties the list. Pass #425 moved the Upgrade bay and the shared
- * bay header and footer onto the element (so the dock's count fell with it) and deleted its entry;
- * pass #426 did the same for the tech tree, pass #427 for the dock's Sell and Refinery bays, and
- * pass #428 for the HUD.
+ * Measured on the start scenario when #424 landed (`UI_BUDGET_REPORT=1`); each pass lowered or
+ * deleted its own entry. Pass #425 moved the Upgrade bay and the shared bay header and footer onto
+ * the element and deleted its entry; pass #426 did the same for the tech tree, pass #427 for the
+ * dock's Sell and Refinery bays, pass #428 for the HUD, and pass #429 for the title, pause and
+ * settings menus and the slice screen's frame, which emptied the list. It only shrinks, so a new
+ * entry needs a ruling first.
  */
-export const UI_BUDGET_ALLOWLIST: readonly UiBudgetAllowance[] = [
-  { panel: 'other-panels', counts: { unregistered: 154, scroll: 3 }, ticket: 429 },
-]
+export const UI_BUDGET_ALLOWLIST: readonly UiBudgetAllowance[] = []

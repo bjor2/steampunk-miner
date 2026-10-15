@@ -1,7 +1,8 @@
 .frame {
   position: absolute;
   inset: 0;
-  overflow: auto;
+  /* A full screen fits the stage and scrolls itself in the shared scroll area (#422, pass #429). */
+  overflow: hidden;
   background: rgb(27 22 19 / 0.92);
   font-family: var(--font-body);
   pointer-events: auto;
