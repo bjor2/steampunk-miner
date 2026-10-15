@@ -414,6 +414,12 @@ export interface Economy {
      * tune it from 1 to 2.
      */
     travelParityK: BigStat
+    /**
+     * The least wait after a bore gun shot (GD ruling, 14 Oct, on the #397 TD lock): with no tile
+     * floor a shot's dig ticks can reach 1, so `ceil(digTicks × 100 / kGunPct)` alone could wait 3
+     * ticks or less. It bounds the recovery, never the drill's speed.
+     */
+    boreRecoveryMinTicks: number
   }
   costCurves: readonly CostCurve[]
   /**

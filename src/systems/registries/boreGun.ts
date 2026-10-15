@@ -26,6 +26,7 @@
  */
 import type { CommandIntent } from '../authority/authorityCommand'
 import type { AuthorityState } from '../authority/authorityState'
+import { ECONOMY } from '../economy/economy'
 import { defineOneProviderRegistry, entriesOf } from './seal'
 
 export interface BoreGunStats {
@@ -109,11 +110,14 @@ export type GunRate = Pick<BoreGunStats, 'cooldownTicks' | 'kGunPct'>
 
 /**
  * The ticks from a shot until the next is accepted (TD ruling on #313):
- * `max(cooldownTicks, ceil(spentDigTicks × 100 / kGunPct))`, where `spentDigTicks` is what the
- * shot's cells took through the drill's dig function, at the rate the shot fired with.
+ * `max(minimum, cooldownTicks, ceil(spentDigTicks × 100 / kGunPct))`, where `spentDigTicks` is
+ * what the shot's cells took through the drill's dig function, at the rate the shot fired with.
+ * The minimum is `drill.boreRecoveryMinTicks` (GD, 14 Oct, on the #397 TD lock): with no tile
+ * floor a cell can dig in one tick, and the wait still reads as a recovery.
  */
 export function gunRecoveryTicks(spentDigTicks: number, rate: GunRate): number {
-  return Math.max(rate.cooldownTicks, ceilDiv(spentDigTicks * PERCENT, rate.kGunPct))
+  const digRecovery = ceilDiv(spentDigTicks * PERCENT, rate.kGunPct)
+  return Math.max(ECONOMY.drill.boreRecoveryMinTicks, rate.cooldownTicks, digRecovery)
 }
 
 /** The provider's answer held to the drill law; null with no provider or no gun. */

@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { COLLAPSE_VEHICLE_CLEARANCE_MM } from '../../../constants/balance'
 import { withRegistrations } from '../../../registries/registrar'
+import { ECONOMY } from '../../economy/economy'
 import { div, fromSafeInteger, mul } from '../../money'
 import { boreGunOf, gunRecoveryTicks, WHOLE_BP, type BoreGunStats } from '../../registries/boreGun'
 import { feedbackCuesOf } from '../../feedback/feedbackCues'
@@ -293,6 +294,15 @@ describe('ground gun: the recovery timer (ticket 313, #309 test 6 and the TD rul
     expect(gunRecoveryTicks(12, rate)).toBe(48)
     expect(gunRecoveryTicks(90, { cooldownTicks: 15, kGunPct: 45 })).toBe(200)
     expect(gunRecoveryTicks(91, { cooldownTicks: 15, kGunPct: 45 })).toBe(203)
+  })
+
+  // GD ruling, 14 Oct, on the #397 TD lock: with no tile floor a shot can dig in one tick.
+  it('never waits under drill.boreRecoveryMinTicks, 3 ticks, however cheap the shot or short the cooldown', () => {
+    expect(ECONOMY.drill.boreRecoveryMinTicks).toBe(3)
+    const quick = { cooldownTicks: 1, kGunPct: 45 }
+    expect(gunRecoveryTicks(0, quick)).toBe(3)
+    expect(gunRecoveryTicks(1, quick)).toBe(3)
+    expect(gunRecoveryTicks(2, quick)).toBe(5)
   })
 
   it('sets nextShotTick from the dig ticks the shot really spent on hard rock', () =>

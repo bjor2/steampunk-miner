@@ -173,6 +173,10 @@ function readDrill(reader: FieldReader, drill: Record<string, unknown>): Economy
     gateScratchFloor: reader.money('drill.gateScratchFloor', drill.gateScratchFloor),
     minTicksPerTile: reader.safeInteger('drill.minTicksPerTile', drill.minTicksPerTile),
     travelParityK: readTravelParityK(reader, drill.travelParityK),
+    boreRecoveryMinTicks: reader.safeInteger(
+      'drill.boreRecoveryMinTicks',
+      drill.boreRecoveryMinTicks,
+    ),
   }
 }
 
