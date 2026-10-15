@@ -322,11 +322,11 @@ programs }` from three's `renderer.info` of the game canvas), read only when cal
   bot's own fork pick switched off (`withoutPacingBotForkPicks`, since the on-curve bot chooses Deep
   once its wallet pays), both through the same rich wallet and back to the arrival money
   (`forkDeepPaceRuns.ts`). The bot's scripted bore cuts with the drill gear (protocol 74), so the
-  cell Deep opens below the bored one is one the bot drives into. Gated on the median of the
-  per-seed speed-ups: above 1.02 (measurably faster) and at most one drill step (x1.225); a result
-  above the ceiling is a balance finding for Systems, never a reason to patch the bot. Beside it,
-  Deep keeps travel (reported drive and thrust ticks, `systems/travelShare.ts`) at or under a
-  quarter of the run on every seed, or no higher than the bare run already was. The lane
+  cell Deep opens below the bored one is one the bot drives into. Gated on the seed medians (#84):
+  the speed-up above 1.02 (measurably faster), and Deep's travel (reported drive and thrust ticks,
+  `systems/travelShare.ts`) at or under a quarter of the run, or no higher than the bare run's.
+  One drill step (x1.225) is never a cap (GD ruling on #392): a median past it is printed as a
+  balance finding for Systems, never failed, and never a reason to patch the bot. The lane
   `forkDeepP40.lane.test.ts` runs the same gates on planet 40, the headless check of the
   re-baseline. A quick case checks the plunge crown inside the `aheadCells` = 1 clamp, and
   `systems/deepParity.test.ts` that the cell past the bit costs its own drill ticks from the bot's

@@ -3,7 +3,10 @@
  * each pacing seed the bot arrives on a planet with the on-curve levels and plays to its core
  * twice, once with Deep chosen and once unchosen with its own fork pick switched off, so it never
  * buys Deep mid-run. Both runs pass through the same rich wallet and back to the arrival's money,
- * so only the branch differs. Only specs use it.
+ * so only the branch differs. Speed-up and travel are judged on the seed medians (#84), so one
+ * seed's stall cannot flip a gate. A median past one drill step is printed as a balance finding for
+ * Systems, never failed: the GD ruling on #392 says the assert never acts as a speed cap. Only
+ * specs use it.
  */
 import type { CommandIntent } from '../../systems/authority/authorityCommand'
 import { ARRIVAL_MONEY } from '../../systems/bot/paceArrival'
@@ -23,21 +26,42 @@ const CHOOSE_DEEP = {
 export const UNCHOSEN: readonly CommandIntent[] = [RICH, ARRIVED]
 export const DEEP_CHOSEN: readonly CommandIntent[] = [RICH, CHOOSE_DEEP, ARRIVED]
 
+/** "Measurably faster" (GD ruling on #392): the speed-up's floor. */
+export const MEASURABLY_FASTER = 1.02
+/** One drill step of dig speed, as the #255 lock writes it: past it is a balance finding. */
+export const ONE_DRILL_STEP = 1.225
+
 /** What the gates read of one planet's runs on every seed. */
 export interface DeepPace {
   /** The median of the per-seed speed-ups, bare ticks over Deep ticks (#84). */
   speedUp: number
-  /** Per seed: Deep kept travel inside a quarter of the run, or no higher than bare. */
-  isTravelKept: boolean[]
+  /** On the seed medians: Deep kept travel inside a quarter of the run, or no higher than bare. */
+  isTravelKept: boolean
 }
 
-/** The two runs on every pacing seed, printed per seed and folded for the gates. */
+/** The two runs on every pacing seed, printed per seed, folded for the gates and the finding. */
 export function deepPaceOn(planet: number): DeepPace {
   const seeds = PACE_SEEDS.map((seed) => seedPaceOn(planet, seed))
+  const pace = foldSeedPaces(seeds)
+  printPastOneDrillStep(planet, pace.speedUp)
+  return pace
+}
+
+function foldSeedPaces(seeds: readonly SeedPace[]): DeepPace {
+  const deepTravelBp = median(seeds.map((seed) => seed.deepTravelBp))
+  const bareTravelBp = median(seeds.map((seed) => seed.bareTravelBp))
   return {
     speedUp: median(seeds.map((seed) => seed.speedUp)),
-    isTravelKept: seeds.map((seed) => isTravelKeptByDeep(seed.deepTravelBp, seed.bareTravelBp)),
+    isTravelKept: isTravelKeptByDeep(deepTravelBp, bareTravelBp),
   }
+}
+
+/** The ceiling as the ruling words it: a balance finding for Systems, reported and never failed. */
+function printPastOneDrillStep(planet: number, speedUp: number): void {
+  if (speedUp <= ONE_DRILL_STEP) return
+  console.warn(
+    `P${planet}: balance finding for Systems: Deep's median speed-up ${speedUp} is past one drill step (x${ONE_DRILL_STEP})`,
+  )
 }
 
 interface SeedPace {
