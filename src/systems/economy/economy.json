@@ -186,7 +186,8 @@
       "energyPerShotFloor": "0.250",
       "maxGrapeTargets": 5,
       "maxKnockCells": 4,
-      "maxBounceLegCells": 6
+      "maxBounceLegCells": 6,
+      "maxPretrainTicks": 8
     },
     "mountCost": { "band": 5, "oreUnits": "1" },
     "levelCost": { "id": "cost.vehicle.gun", "band": 5, "oreUnits": "8", "ratio": "1.250" }

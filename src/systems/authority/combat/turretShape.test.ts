@@ -42,6 +42,7 @@ describe("turret shape: the caps (ticket 382, Systems' auto_guns table on #322)"
       maxGrapeTargets: 5,
       maxKnockCells: 4,
       maxBounceLegCells: 6,
+      maxPretrainTicks: 8,
     })
     expect(GUN_SHOT_FLOOR_QUANTA * 2).toBe(GUN_SHOT_QUANTA)
   })
@@ -56,6 +57,7 @@ describe("turret shape: the caps (ticket 382, Systems' auto_guns table on #322)"
       grape: null,
       burst: null,
       bounceLegCells: null,
+      pretrainTicks: null,
     })
     expect(gunRangeTiles()).toBe(8)
   })
@@ -71,8 +73,14 @@ describe("turret shape: the caps (ticket 382, Systems' auto_guns table on #322)"
       grape: { targets: 5, coneDeg: 30 },
       burst: { burstTicks: 240, ventTicks: 150, intervalNumerator: 2, intervalDenominator: 3 },
       bounceLegCells: 6,
+      pretrainTicks: 8,
     })
     expect(checkedTurretShape(full)).toBe(full)
+  })
+
+  it("throws for a spotter's pre-train past maxPretrainTicks, or under one tick (ticket 413)", () => {
+    expect(() => checkedTurretShape(shapeWith({ pretrainTicks: 9 }))).toThrow(/pretrainTicks is 9/)
+    expect(() => checkedTurretShape(shapeWith({ pretrainTicks: 0 }))).toThrow(/pretrainTicks is 0/)
   })
 
   it('throws for a range past 10 tiles', () => {
@@ -156,6 +164,16 @@ describe("turret shape: the fold of the turret's modules (ticket 382)", () => {
       shapeWith({ targetOrder: 'director' }),
     ])
     expect(folded).toMatchObject({ energyPerShotQuanta: 92, targetOrder: 'director' })
+  })
+
+  it("takes the longest spotter's pre-train, and none when no module asks (ticket 413)", () => {
+    const folded = foldTurretShapes([
+      shapeWith({ pretrainTicks: 3 }),
+      BASE_TURRET_SHAPE,
+      shapeWith({ pretrainTicks: 6 }),
+    ])
+    expect(folded?.pretrainTicks).toBe(6)
+    expect(foldTurretShapes([BASE_TURRET_SHAPE])?.pretrainTicks).toBeNull()
   })
 
   it('takes the director over the nearest order when any module asks for it', () => {

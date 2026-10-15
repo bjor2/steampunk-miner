@@ -85,6 +85,7 @@ describe('ground-gun: the auto_guns modules shape the turret (ticket 388)', () =
       grape: { targets: 2, coneDeg: 30 },
       burst: { burstTicks: 120, ventTicks: 300, intervalNumerator: 2, intervalDenominator: 3 },
       bounceLegCells: null,
+      pretrainTicks: null,
     })
   })
 

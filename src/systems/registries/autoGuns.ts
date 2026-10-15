@@ -54,6 +54,11 @@ export interface TurretShape {
   burst: TurretBurst | null
   /** Ricochet: the longest leg after one bounce off a wall, in cells. */
   bounceLegCells: number | null
+  /**
+   * Spotter's pre-train (K-pretrain, ticket 413): the most ticks a due shot waits for a burrower
+   * about to break the surface, at most `gun.turretCaps.maxPretrainTicks`; null for no wait.
+   */
+  pretrainTicks: number | null
 }
 
 export interface AutoGunsProvider {

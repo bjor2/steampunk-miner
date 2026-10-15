@@ -36,6 +36,7 @@ export const BASE_TURRET_SHAPE: TurretShape = {
   grape: null,
   burst: null,
   bounceLegCells: null,
+  pretrainTicks: null,
 }
 
 /** The shape this player's guns shoot with now, held to the caps; #107's with no provider. */
@@ -64,6 +65,7 @@ export function foldTurretShapes(shapes: readonly TurretShape[]): TurretShape | 
     grape: foldedGrapeOf(shapes.map((shape) => shape.grape)),
     burst: foldedBurstOf(shapes.map((shape) => shape.burst)),
     bounceLegCells: largestPresentOf(shapes.map((shape) => shape.bounceLegCells)),
+    pretrainTicks: largestPresentOf(shapes.map((shape) => shape.pretrainTicks)),
   }
 }
 
@@ -83,6 +85,7 @@ function turretShapeProblems(shape: TurretShape): string[] {
     ...grapeProblems(shape.grape),
     ...burstProblems(shape.burst),
     ...optionalWithinProblems('bounceLegCells', shape.bounceLegCells, 1, CAPS.maxBounceLegCells),
+    ...optionalWithinProblems('pretrainTicks', shape.pretrainTicks, 1, CAPS.maxPretrainTicks),
   ]
 }
 
