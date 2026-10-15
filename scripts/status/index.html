@@ -1703,6 +1703,54 @@
         fill: var(--red);
         stroke: var(--red);
       }
+      /* Drill speed panel (ticket 434): drillSpeedHtml.mjs, above every tab but Features */
+      #drill-speed {
+        margin-bottom: 16px;
+      }
+      main:has(#tab-features:not(.hidden)) #drill-speed {
+        display: none;
+      }
+      section.ds-panel {
+        border: 2px solid var(--accent);
+        background: linear-gradient(var(--accent-soft), var(--accent-soft)), var(--panel);
+      }
+      .ds-panel h2 small {
+        font-weight: 400;
+      }
+      .ds-table td {
+        vertical-align: top;
+      }
+      .ds-big {
+        font-size: 22px;
+        font-variant-numeric: tabular-nums;
+      }
+      .ds-none {
+        color: var(--dim);
+        font-style: italic;
+      }
+      .ds-trend {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        margin-top: 2px;
+      }
+      .ds-bar {
+        width: 160px;
+        height: 6px;
+        margin-top: 4px;
+        background: var(--line);
+        border-radius: 3px;
+      }
+      .ds-bar span {
+        display: block;
+        height: 100%;
+        background: var(--accent);
+        border-radius: 3px;
+      }
+      .ds-note {
+        font-size: 12px;
+        margin: 8px 0 4px;
+      }
       .sl-pool h3 {
         font-size: 14px;
         margin: 0 0 6px;
@@ -1783,6 +1831,7 @@
       </nav>
     </header>
     <main>
+      <div id="drill-speed" class="muted">loading the drill speed…</div>
       <section class="tab tab-grid" id="tab-loops" data-tab="loops">
         <section class="panel" id="loops-panel">
           <h2>Loops</h2>
@@ -2558,25 +2607,29 @@
       // Read when the tab is shown and on the live poll while it is, like the test list.
       let DRILL_DOWN_VIEW = null
       let DRILL_DOWN_TEXT = null
-      async function refreshDrillDownRuns() {
+      // A history file on test-metrics: raw first, then the copy build-status.mjs put beside the page.
+      async function fetchMetricsFile(name) {
         const branch = (DATA && DATA.tests && DATA.tests.metricsBranch) || 'test-metrics'
         const sources = [
-          `https://raw.githubusercontent.com/${DATA.repo}/${branch}/drill-down.ndjson`,
-          './drill-down.ndjson',
+          `https://raw.githubusercontent.com/${DATA.repo}/${branch}/${name}`,
+          `./${name}`,
         ]
         for (const url of sources) {
           try {
             const r = await fetch(url, { cache: 'no-store' })
-            if (!r.ok) continue
-            const text = await r.text()
-            const isNewer = text !== DRILL_DOWN_TEXT
-            DRILL_DOWN_TEXT = text
-            return isNewer
+            if (r.ok) return await r.text()
           } catch (_) {
             /* try the copy beside the page */
           }
         }
-        return false
+        return null
+      }
+      async function refreshDrillDownRuns() {
+        const text = await fetchMetricsFile('drill-down.ndjson')
+        if (text === null) return false
+        const isNewer = text !== DRILL_DOWN_TEXT
+        DRILL_DOWN_TEXT = text
+        return isNewer
       }
       function renderDrillDown() {
         if (!DRILL_DOWN_VIEW || !DATA) return
@@ -2590,6 +2643,37 @@
       function showDrillDown() {
         if (DRILL_DOWN_TEXT !== null) return renderDrillDown()
         refreshDrillDownRuns().then(renderDrillDown)
+      }
+
+      // ---------- Drill speed panel (ticket 434): drillSpeed.mjs + drillSpeedHtml.mjs, drill-ladder.ndjson + drill-down.ndjson ----------
+      // Above the tabs, so it is read on load and on the live poll whatever tab is shown.
+      let DRILL_SPEED_VIEW = null
+      let DRILL_LADDER_TEXT = null
+      async function refreshDrillLadderRuns() {
+        const text = await fetchMetricsFile('drill-ladder.ndjson')
+        if (text === null) return false
+        const isNewer = text !== DRILL_LADDER_TEXT
+        DRILL_LADDER_TEXT = text
+        return isNewer
+      }
+      function renderDrillSpeed() {
+        if (!DRILL_SPEED_VIEW || !DATA) return
+        const model = DRILL_SPEED_VIEW.model.readDrillSpeed({
+          ladderText: DRILL_LADDER_TEXT,
+          drillDownText: DRILL_DOWN_TEXT,
+        })
+        $('#drill-speed').className = ''
+        $('#drill-speed').innerHTML = DRILL_SPEED_VIEW.html.renderDrillSpeed(model, {
+          repo: DATA.repo,
+          nowMs: Date.now(),
+        })
+      }
+      async function refreshDrillSpeed() {
+        const changed = await Promise.all([refreshDrillLadderRuns(), refreshDrillDownRuns()])
+        return changed.some(Boolean)
+      }
+      function showDrillSpeed() {
+        refreshDrillSpeed().then(renderDrillSpeed)
       }
 
       function renderMeta() {
@@ -2717,6 +2801,7 @@
         if (TEST_LIST_VIEW && !TEST_QUERY && parseHash().tab === 'tests')
           showTestList(parseHash().params)
         if (DRILL_DOWN_VIEW && parseHash().tab === 'tests') showDrillDown()
+        if (DRILL_SPEED_VIEW) showDrillSpeed()
         loadFeatures().catch((e) => {
           $('#ft-error').innerHTML =
             `<div class="ft-error">Feature tree failed to load: ${esc(e)}</div>`
@@ -3231,6 +3316,15 @@
           $('#drill-down').innerHTML =
             `<div class="warn">Drill-down runs failed to load: ${esc(e)}</div>`
         })
+      Promise.all([import('./drillSpeed.mjs'), import('./drillSpeedHtml.mjs')])
+        .then(([model, html]) => {
+          DRILL_SPEED_VIEW = { model, html }
+          if (DATA) showDrillSpeed()
+        })
+        .catch((e) => {
+          $('#drill-speed').innerHTML =
+            `<div class="warn">Drill speed panel failed to load: ${esc(e)}</div>`
+        })
       async function pollLoops() {
         if (!DATA || document.hidden) return
         refreshTestsSummary().then(renderTests)
@@ -3238,6 +3332,7 @@
           refreshTestHistory().then((isNewer) => isNewer && renderTestList())
         if (DRILL_DOWN_TEXT !== null && parseHash().tab === 'tests')
           refreshDrillDownRuns().then((isNewer) => isNewer && renderDrillDown())
+        if (DRILL_SPEED_VIEW) refreshDrillSpeed().then((isNewer) => isNewer && renderDrillSpeed())
         if (await refreshLoops()) {
           renderMeta()
           renderLoops()

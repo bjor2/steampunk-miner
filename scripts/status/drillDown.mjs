@@ -6,7 +6,8 @@
 export const DRILL_DOWN_HISTORY_ROWS = 20
 export const DRILL_DOWN_TREND_RUNS = 20
 
-function rowsOfText(text) {
+/** The rows of an NDJSON history and how many torn lines were skipped. */
+export function parseHistoryRows(text) {
   const rows = []
   let skipped = 0
   for (const line of String(text ?? '').split('\n')) {
@@ -20,7 +21,7 @@ function rowsOfText(text) {
   return { rows, skipped }
 }
 
-const isRunRow = (row) =>
+export const isDrillDownRow = (row) =>
   typeof row?.measuredAt === 'string' && Number.isSafeInteger(row.drillLevel)
 const byMeasuredAt = (a, b) => a.measuredAt.localeCompare(b.measuredAt)
 
@@ -50,8 +51,8 @@ function levelsOf(rows) {
 
 /** The panel's model, or `{ error }` when the history holds no run yet. */
 export function readDrillDownRuns(text) {
-  const { rows: parsed, skipped } = rowsOfText(text)
-  const rows = parsed.filter(isRunRow).sort(byMeasuredAt)
+  const { rows: parsed, skipped } = parseHistoryRows(text)
+  const rows = parsed.filter(isDrillDownRow).sort(byMeasuredAt)
   if (rows.length === 0) return { error: 'no drill-down run recorded yet' }
   const newest = rows.at(-1)
   return {

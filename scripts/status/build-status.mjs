@@ -13,7 +13,9 @@
 // slots.json and each measured ticket's phase bar). The Tests tab (#192) renders in the page from
 // the four tests*.mjs modules, fed by the test-metrics branch: summary.json in status.json, and the
 // per-test tests.json read live, with a copy as test-history.json; its drill-down panel (ticket
-// 416) from drillDown*.mjs and drill-down.ndjson, read the same way. Static output, no server.
+// 416) from drillDown*.mjs and drill-down.ndjson, read the same way. The Drill speed panel above
+// the tabs (ticket 434) renders from drillSpeed*.mjs, drill-ladder.ndjson and drill-down.ndjson.
+// Static output, no server.
 //
 //   node scripts/status/build-status.mjs [--out dist/status]
 //
@@ -74,6 +76,8 @@ const PAGE_MODULES = [
   'testsOverviewHtml.mjs',
   'drillDown.mjs',
   'drillDownHtml.mjs',
+  'drillSpeed.mjs',
+  'drillSpeedHtml.mjs',
 ]
 const REPO = process.env.GITHUB_REPOSITORY || 'bjor2/steampunk-miner'
 const [OWNER, NAME] = REPO.split('/')
@@ -297,6 +301,18 @@ async function fetchDrillDownRuns() {
   )
 }
 
+// The Drill speed panel's ladder runs (drill-ladder.ndjson, ticket 434), copied the same way.
+// Missing is fine: the panel says "no run yet".
+async function fetchDrillLadderRuns() {
+  return rest(`repos/${REPO}/contents/drill-ladder.ndjson?ref=${METRICS_BRANCH}`, {
+    raw: true,
+    allow404: true,
+    isText: true,
+  }).catch(
+    (err) => (console.warn(`test-metrics drill-ladder.ndjson unavailable: ${err.message}`), null),
+  )
+}
+
 async function fetchWorkflows() {
   const out = []
   for (const wf of WORKFLOWS) {
@@ -517,17 +533,27 @@ const perf = buildPerfSection()
 const ticketTime = buildTicketTimeSection()
 const pageBeforeFeatures = pageWithSections(perf.html, ticketTime.html)
 
-const [issues, loops, slots, workflows, featuresCommit, tests, testHistory, drillDownRuns] =
-  await Promise.all([
-    fetchIssues(),
-    fetchLoops(),
-    fetchSlots(),
-    fetchWorkflows(),
-    fetchLastCommitOf(FEATURES_FILE),
-    fetchTests(),
-    fetchTestHistory(),
-    fetchDrillDownRuns(),
-  ])
+const [
+  issues,
+  loops,
+  slots,
+  workflows,
+  featuresCommit,
+  tests,
+  testHistory,
+  drillDownRuns,
+  drillLadderRuns,
+] = await Promise.all([
+  fetchIssues(),
+  fetchLoops(),
+  fetchSlots(),
+  fetchWorkflows(),
+  fetchLastCommitOf(FEATURES_FILE),
+  fetchTests(),
+  fetchTestHistory(),
+  fetchDrillDownRuns(),
+  fetchDrillLadderRuns(),
+])
 const featureTime = buildFeatureTimeSection(
   buildFeatures(issues, featuresCommit, ticketTime.model.tickets ?? []),
   ticketTime.model,
@@ -573,6 +599,7 @@ writeFileSync(join(OUT, 'ticket-time.json'), JSON.stringify(ticketTime.model))
 writeFileSync(join(OUT, 'features.json'), JSON.stringify(features))
 if (testHistory) writeFileSync(join(OUT, 'test-history.json'), JSON.stringify(testHistory))
 if (drillDownRuns) writeFileSync(join(OUT, 'drill-down.ndjson'), drillDownRuns)
+if (drillLadderRuns) writeFileSync(join(OUT, 'drill-ladder.ndjson'), drillLadderRuns)
 writeFileSync(join(OUT, 'index.html'), page)
 for (const name of PAGE_MODULES) copyFileSync(join(HERE, name), join(OUT, name))
 for (const [tab, title] of Object.entries(SHORT_LINKS)) {

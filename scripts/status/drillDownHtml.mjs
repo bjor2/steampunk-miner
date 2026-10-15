@@ -46,13 +46,21 @@ function sparkMarkOf(points) {
   return `<polyline points="${points.map((point) => point.join(',')).join(' ')}"/>`
 }
 
-/** Depth gained per run, oldest left; the title lists each run's commit and depth. */
-export function depthTrendSvg(trend) {
+/**
+ * A sparkline of `trend` (`{ commit, value }` points, oldest left) from 0 to its largest value; the
+ * title lists each point's commit and `valueText(value)`. Shared with the Drill speed panel.
+ */
+export function trendSvg(trend, valueText) {
   const max = Math.max(0, ...trend.map((point) => point.value))
   const points = trend.map((point, index) => sparkPointOf(point.value, index, trend.length, max))
-  const title = trend.map((point) => `${point.commit ?? '—'}: ${point.value} cells`).join('\n')
+  const title = trend.map((point) => `${point.commit ?? '—'}: ${valueText(point.value)}`).join('\n')
   const mark = sparkMarkOf(points)
   return `<svg class="te-spark" viewBox="0 0 ${SPARK.width} ${SPARK.height}" width="${SPARK.width}" height="${SPARK.height}" role="img"><title>${escapeHtml(title)}</title>${mark}</svg>`
+}
+
+/** Depth gained per run, oldest left; the title lists each run's commit and depth. */
+export function depthTrendSvg(trend) {
+  return trendSvg(trend, (value) => `${value} cells`)
 }
 
 function latestRow(level, view) {
