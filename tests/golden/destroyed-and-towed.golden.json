@@ -76,7 +76,6 @@
       "run": {
         "count": 13,
         "tick": 31,
-        "seq": 2,
         "payload": {
           "tx": 1,
           "ty": 0

@@ -159,7 +159,7 @@ describe('command log: compact lines (ticket 420)', () => {
     expect(rest).toEqual([])
     expect(line).toEqual({
       ...commands[0],
-      run: { count: 5, tick: 60, seq: 1, payload: { tx: 0, ty: -1 } },
+      run: { count: 5, tick: 60, payload: { tx: 0, ty: -1 } },
     })
     expect(expandCommandLog([line])).toEqual(commands)
   })
@@ -193,7 +193,7 @@ describe('command log: compact lines (ticket 420)', () => {
       'reportPose',
       'reportPose',
     ])
-    expect(lines[1]).toMatchObject({ run: { count: 4, seq: 2, poses: 3 } })
+    expect(lines[1]).toMatchObject({ run: { count: 4, poses: 3 } })
     expect(expandCommandLog(lines)).toEqual(commands)
   })
 

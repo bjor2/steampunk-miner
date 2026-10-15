@@ -105,7 +105,6 @@
       "run": {
         "count": 2,
         "tick": 41,
-        "seq": 2,
         "payload": {
           "tx": 1,
           "ty": 1
