@@ -13,6 +13,7 @@
 import { CAMPAIGN_LAST_PLANET, MAX_PLANETS_WITHOUT_HORIZONTAL } from '../constants/balance'
 import type { UnlockSchedule } from '../systems/unlocks/readUnlockSchedule'
 import { longestRunWithoutHorizontal } from '../systems/unlocks/scheduleCadence'
+import type { KnownRedProblems } from './knownRed'
 import { campaignPlanetAlerts, type PacingReport } from './pacingReport'
 import { medianSawtoothScores, sawtoothMisses, type SeededSawtooth } from './sawtoothMedian'
 
@@ -41,6 +42,22 @@ export function campaignScalingProblems(
     ...sawtoothMisses(runs),
     ...cadenceProblems(schedule),
   ]
+}
+
+/**
+ * The same problems split by the known-red marker's reach (TD on #396, section 2): only the bot
+ * run's stalled seeds and sawtooth misses can be held as known red; a sawtooth that judged nothing
+ * and the schedule's cadence always fail.
+ */
+export function campaignScalingProblemsByMarkerReach(
+  runs: readonly CampaignGateRun[],
+  schedule: UnlockSchedule,
+  lastPlanet: number,
+): KnownRedProblems {
+  return {
+    covered: [...stalledSeedProblems(runs, lastPlanet), ...sawtoothMisses(runs)],
+    uncovered: [...nothingJudgedProblems(runs), ...cadenceProblems(schedule)],
+  }
 }
 
 /** Reported, never gated: each planet outside the campaign's minutes, then the dial to turn. */

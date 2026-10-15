@@ -221,6 +221,16 @@ programs }` from three's `renderer.info` of the game canvas), read only when cal
   each metric (`medianPacingReport`, #84), so one run's combat deaths cannot flip a gate; the log
   checks, the baseline and `compareRuns` stay on the first seed. Do not retune the bot or a constant to make it pass: a
   miss is a balance finding for the Systems & Economy Designer (the lever is `paceScale`).
+- **Known red** (ticket 419, the TD on #396 section 2): `CAMPAIGN_PACING_KNOWN_RED`
+  (`src/constants/knownRed.ts`) is the one known-red marker in the repo: one gate
+  (`campaignPacingGate`), one finding (#417), no registry. The gate still runs in full;
+  `knownRedVerdict` (`src/logging/knownRed.ts`) prints its stalled-seed and sawtooth problems as
+  `known-red (#417): ...` instead of failing them. The schedule cadence and "judged nothing" always
+  fail, and the marker never covers `pacingGate`, `assayPacingGate`, the schedule, hash or growth
+  asserts. The marker itself fails when it names no finding ticket, when the finding's
+  `docs/metrics/tickets/<n>.json` shows `closed` (it expires with the finding), and when the gate
+  is green (delete the marker in the commit that turns it green). `knownRed.test.ts` fails on a
+  second exported marker: a new one needs a ruling and a code review, not a copy.
 - **Guns** (#107 acceptance 5): `npm run balance:guns` plays the bot to planet 7's core with
   `auto_guns` (mounted on planet 4) and without, and prints planets 4 to 7 side by side with each
   planet's gun energy and kills from the dive summaries (`deriveDiveSummaries`). Reported, never gated;

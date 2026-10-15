@@ -7,6 +7,7 @@ import type { BandDig } from './bandDigReport'
 import {
   campaignPacingFindings,
   campaignScalingProblems,
+  campaignScalingProblemsByMarkerReach,
   type CampaignGateRun,
 } from './campaignScalingGate'
 import { derivePacingReport } from './pacingReport'
@@ -128,6 +129,32 @@ describe('campaign scaling gate (R1 #89)', () => {
     const visionRows = heldBack.rows.filter((row) => CONTENT_MODULE_ROW_IDS.includes(row.id))
     expect(visionRows.map((row) => row.status)).toEqual(Array(6).fill('vision'))
     expect(campaignScalingProblems(healthyRuns(), heldBack, LAST_PLANET)).toEqual([])
+  })
+
+  it('lets the known-red marker reach only stalled seeds and sawtooth misses (ticket 419)', () => {
+    const runs = [
+      seedRun(1, digsAtRatio(0.6)),
+      seedRun(2, digsAtRatio(0.8), 6),
+      seedRun(3, digsAtRatio(0.75)),
+    ]
+    const schedule = withoutRowsOn(LOCKED_SCHEDULE, [15, 17])
+
+    const problems = campaignScalingProblemsByMarkerReach(runs, schedule, LAST_PLANET)
+
+    expect(problems.covered).toContain('seed 2 stalled on planet 6 before the core of planet 8')
+    expect(problems.covered).toContain('planet 1 band 5 median 0.75x, target at most 0.7x')
+    expect(problems.uncovered).toEqual([
+      'the schedule leaves 3 campaign planets in a row without a horizontal row, at most 2',
+    ])
+  })
+
+  it('never lets the known-red marker reach a sawtooth that judged nothing (ticket 419)', () => {
+    const problems = campaignScalingProblemsByMarkerReach([], LOCKED_SCHEDULE, LAST_PLANET)
+
+    expect(problems).toEqual({
+      covered: [],
+      uncovered: ['no seed left a planet, so the band 5 sawtooth judged nothing'],
+    })
   })
 
   it("loads the locked schedule only at the Horizontal Scaler's source_hash pin", () => {
