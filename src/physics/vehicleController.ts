@@ -227,7 +227,7 @@ export function createVehicleController(
       const pose = quantisePose(position, velocity, up, settledFacingOf(head))
       const isLifting = input.canAct && input.intent.lift
       const contact = input.canAct
-        ? drillContactFor(input, head, { pose, isLifting }, planet.ground)
+        ? drillContactFor(input, head, { pose, isLifting }, planet.ground, cutMemory.followedTicks)
         : 'none'
       const isDrilling = contact !== 'none'
       const isCuttingLevel = isDrilling && !isLifting && isSidewaysFacing(pose.facing)

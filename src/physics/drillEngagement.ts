@@ -5,6 +5,7 @@
  * step bounds (ticket 334) widen the wait-for-cut window and pick the speed the body is clamped to. Pure reads of the ground and the authority, no
  * Rapier.
  */
+import { DRILL_STAMP_AHEAD_MM } from '../constants/balance'
 import type { CutFollow, CutFollowStep } from '../systems/authority/cutFollowRead'
 import type { CutFollowMotion } from '../systems/vehicle/cutFollowMotion'
 import { isCutGateOpen } from '../systems/vehicle/cutGate'
@@ -21,11 +22,12 @@ import {
   type CutMemory,
   type CutTick,
 } from '../systems/vehicle/heldCut'
-import { drillStampOf } from '../systems/vehicle/drillStamp'
+import { drillStampOf, sweptDrillStampOf } from '../systems/vehicle/drillStamp'
 import { speedOfStepBound, stepBoundMmOf, type StepBounds } from '../systems/vehicle/stepBound'
 import type { VehicleIntent } from '../systems/vehicle/vehicleIntent'
 import { facingVectorOf, type VehiclePose } from '../systems/vehicle/vehiclePose'
 import type { GroundReader } from '../systems/world/groundReader'
+import type { DiscStamp } from '../systems/world/stampShape'
 
 /** The parts of a step's input the drill reads. */
 export interface DrillEngagementInput {
@@ -45,28 +47,58 @@ export interface DrillPose {
 /**
  * Drilling auto-engages when the player pushes into ground the settled head faces (#7): the held
  * aim matches the facing and the drill's stamp has ground to cut (#36, `drillContact`).
+ * `followedTicks` is the cut-follow's count (ticket 400): a cut under way bites on the stamp its
+ * `drillStep` cuts (`bitingStampOf`).
  */
 export function drillContactFor(
   input: DrillEngagementInput,
   head: DrillHead,
   { pose, isLifting }: DrillPose,
   ground: GroundReader,
+  followedTicks: number,
 ): DrillContact {
   if (input.intent.facing !== pose.facing || !isHeadSettled(head)) return 'none'
-  return facedContactOf(input, { pose, isLifting }, ground)
+  return contactOf(input, pose, ground, bitingStampOf(input, pose, isLifting, followedTicks))
 }
 
-/** What the stamp meets along the pose's facing, whatever the drive does. */
+/**
+ * The stamp the drill bites with. A swept cut under way (ticket 397) bites on the stamp its
+ * `drillStep` cuts, ahead by the step the rig may take while it cuts: a cut faster than a cell a
+ * tick has already cleared the report's short stamp, and a tick it stopped biting would send no
+ * step and lose that tick's work. A cut starts on the report's stamp, at the face, and with the
+ * swept cut off (no step bounds) the report's stamp is the only one.
+ */
+function bitingStampOf(
+  input: DrillEngagementInput,
+  pose: VehiclePose,
+  isLifting: boolean,
+  followedTicks: number,
+): DiscStamp {
+  if (input.stepBounds === undefined || followedTicks === 0) return drillStampOf(pose, isLifting)
+  return sweptDrillStampOf(pose, isLifting, DRILL_STAMP_AHEAD_MM + input.stepBounds.cuttingMm)
+}
+
+/** What the report's stamp meets along the pose's facing, whatever the drive does. */
 function facedContactOf(
   input: DrillEngagementInput,
   { pose, isLifting }: DrillPose,
   ground: GroundReader,
 ): DrillContact {
-  const contactOf = input.drillContactRule ?? drillContactOf
-  return contactOf(ground, {
+  return contactOf(input, pose, ground, drillStampOf(pose, isLifting))
+}
+
+/** What `stamp` meets along the pose's facing. */
+function contactOf(
+  input: DrillEngagementInput,
+  pose: VehiclePose,
+  ground: GroundReader,
+  stamp: DiscStamp,
+): DrillContact {
+  const contactRule = input.drillContactRule ?? drillContactOf
+  return contactRule(ground, {
     centreMm: pose,
     facing: facingVectorOf(pose.upx, pose.upy, pose.facing),
-    stamp: drillStampOf(pose, isLifting),
+    stamp,
     inTheWayMm: input.stepBounds && inTheWayMmOf(input.stepBounds.cuttingMm),
   })
 }
