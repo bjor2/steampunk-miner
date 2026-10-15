@@ -946,6 +946,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/physics/cutSmoothness.test.ts` | 4 | 3 |
 | `src/physics/cutStartLatency.lane.test.ts` | 3 | 3 |
 | `src/physics/drillEngagement.test.ts` | 6 | 6 |
+| `src/physics/fastRigBodySpeed.lane.test.ts` | 2 | 2 |
 | `src/physics/floatingOrigin.test.ts` | 3 | 3 |
 | `src/physics/glidePassThrough.test.ts` | 4 | 4 |
 | `src/physics/liveFixedStep.test.ts` | 4 | 4 |
@@ -1292,6 +1293,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | --- | --- | --- |
 | `src/systems/vehicle/aheadBearingLatch.test.ts` | 11 | 11 |
 | `src/systems/vehicle/bandDig.test.ts` | 5 | 5 |
+| `src/systems/vehicle/bodySpeedDips.test.ts` | 6 | 6 |
 | `src/systems/vehicle/carryWalk.test.ts` | 34 | 13 |
 | `src/systems/vehicle/casingTrail.test.ts` | 16 | 12 |
 | `src/systems/vehicle/chargeSelection.test.ts` | 4 | 4 |

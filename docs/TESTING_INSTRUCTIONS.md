@@ -248,6 +248,18 @@ programs }` from three's `renderer.info` of the game canvas), read only when cal
   and the stale facing for each pose report phase, and writes them to
   `balance-report/cut-start-latency.ndjson`. A lane (about 40 s), so it runs only when named; it
   fails only when a start opens no cell or the two frame rates differ.
+- **Fast-rig body speed** (ticket 440, measurement only): `src/physics/fastRigBodySpeed.lane.test.ts`
+  plays #400's down leg in the live loop with `drill.sweptCut` on, at stored drill_power/tip
+  250/600, 300/200 (#400's rig 1), 320/600, 330/600 and 350/600, at 30 and 144 frames/s, and traces
+  every tick: the read's `vCut`, the speed the motor commands, the body's speed over the tick and
+  after its contacts, the step bound, the substeps, the cut's reach past the body and the gate. It
+  names each steady cut tick that falls more than 5% short of the commanded speed by the ground in
+  the slab the commanded move sweeps (`systems/vehicle/bodySpeedDips.ts`): stale halo (ground the
+  tick's own cut opened), uncut ground (still standing after the cut) or unexplained. It writes the
+  trace to `balance-report/fast-rig-body-speed.ndjson`. Under #396's 4-tick floor every rig cuts at
+  15 m/s, and the rigs reach 25 to 78 m/s only once #397 takes the floor out. A lane (about 20 s),
+  so it runs only when named; it fails only when a rig has no steady cut tick or the two frame rates
+  differ.
 - **Drill-speed ladder in stored steps** (ticket 434): `src/logging/drillLadderSteps.test.ts` cuts
   the same column's first 20 cells (all band 1, the ground a 10 s hold reaches) at stored drill_power
   steps 1, 5, 10, 15 and 20, the levels of the browser drill-down run, with the law counted per step
