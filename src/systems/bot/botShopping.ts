@@ -309,7 +309,8 @@ function isMarginalTrackOpen(session: BotSession, track: UpgradeId): boolean {
 
 /**
  * The engine track is maxed while the drill sets travel speed in every band (ticket 333, #418),
- * which the 4-tick floor of ticket 396 reaches: offering the refused step again would never end the visit.
+ * which a strong drill reaches (no tile floor since ticket 397): offering the refused step again
+ * would never end the visit.
  * Asked of the rig, not the bay, so a Sell-bay `hasPurchase` still sees the other tracks (#352).
  */
 function isEngineMaxed(session: BotSession, track: UpgradeId): boolean {

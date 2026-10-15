@@ -1,10 +1,10 @@
 import { describe, expect, it } from 'vitest'
-import { DRILL_SUBSTEPS_PER_TICK, STEP_BOUND_TOLERANCE_MM } from '../../constants/balance'
-import { ECONOMY } from '../economy/economy'
+import { STEP_BOUND_TOLERANCE_MM } from '../../constants/balance'
 import { NO_DRIVE } from '../vehicle/driveSigns'
+import { SWEEP_STEP_MM } from '../vehicle/sweptCut'
 import { FACING, noseTileOf, type VehiclePose } from '../vehicle/vehiclePose'
 import type { PlanetParams } from '../world/planetParams'
-import { CHUNK_SIZE, chunkOfTile, surfaceRowOfColumn } from '../world/tileGrid'
+import { CHUNK_SIZE, chunkOfTile, surfaceRowOfColumn, type TilePoint } from '../world/tileGrid'
 import { EMPTY_WORLD, isGeneratedChunkHeld, materialCellAt } from '../world/worldState'
 import { vehicleOf, type AuthorityState } from './authorityState'
 import { cellDigEnergyOf } from './cellDigEnergy'
@@ -24,7 +24,7 @@ import {
 } from './scriptedSession'
 import { stepBoundsAt } from './stepBoundRead'
 import { sweptColumnAt } from './sweptColumnFixture'
-import { columnSweep, sweepWith } from './sweptSpanFixtures'
+import { columnSweep, sweepWith, WORK_BOUND_DRILL_POWER } from './sweptSpanFixtures'
 
 // The cut budget at any speed (ticket 335, TD scope b on #316 and the TD lock on #374): the same
 // path cut at 1, 4 and 16 m a tick (60, 240 and 960 m/s) opens the same cells per metre, charges
@@ -32,14 +32,16 @@ import { columnSweep, sweepWith } from './sweptSpanFixtures'
 // for their summed dig time. Since ticket 399 the work picks how far each tick cuts, so a pose
 // running ahead of it never makes the cut go further; the pose rests at the end while it catches up.
 //
-// Today's drill takes at least 4 ticks a cell (ticket 396's stopgap floor), so no drill moves 16 m a tick: the
-// authority runs here cut ground softened to just over its yield, where a sample's dwell under the
-// stamp still decides the rim cells. Cells per metre are compared where the #304 law takes the rig,
+// The authority runs here cut ground softened to just over its yield, where a sample's dwell under
+// the stamp still decides the rim cells. Cells per metre are compared where the #304 law takes the rig,
 // a drill that clears every swept sample in its tick, at the world seam through the step's own path
 // and the budget's walk.
 
-/** A cell's drill time at the tile floor, in sub-steps. */
-const FLOOR_SUB_STEPS = ECONOMY.drill.minTicksPerTile * DRILL_SUBSTEPS_PER_TICK
+/**
+ * A cell's drill time under the fixtures' strong drill, in sub-steps: the law's one-sub-step
+ * quantum, as there is no tile floor since ticket 397.
+ */
+const STRONG_SUB_STEPS = 1
 
 /** 1, 4 and 16 m a tick. */
 const SPEEDS_M_PER_S = [60, 240, 960]
@@ -50,8 +52,8 @@ interface SpeedRun {
   ticks: RuleEffect[]
 }
 
-function cutColumnAt(speed: number): SpeedRun {
-  const fixture = columnSweep(speed)
+function cutColumnAt(speed: number, drillPower?: number): SpeedRun {
+  const fixture = columnSweep(speed, drillPower)
   return { start: fixture.start(), ticks: sweepWith(fixture, drillAlongStep, (effect) => effect) }
 }
 
@@ -69,33 +71,53 @@ function energySpentBy(run: SpeedRun): number {
   return vehicleOf(run.start, 'p1').energy - vehicleOf(lastStateOf(run), 'p1').energy
 }
 
+interface Reach {
+  tick: number | undefined
+  yMm: number | undefined
+  carrySubSteps: number | undefined
+}
+
+function reachesOf(run: SpeedRun): Reach[] {
+  return run.ticks.map(({ state }) => {
+    const cursor = vehicleOf(state, 'p1').sweptCut
+    return { tick: cursor?.tick, yMm: cursor?.yMm, carrySubSteps: cursor?.carrySubSteps }
+  })
+}
+
+/** Whether two reaches spent the same work on the same tick, and how far apart they stop. */
+function gapOf(reach: Reach, other: Reach): { isSameWork: boolean; yMm: number } {
+  const isSameWork = reach.tick === other.tick && reach.carrySubSteps === other.carrySubSteps
+  return { isSameWork, yMm: Math.abs((reach.yMm ?? 0) - (other.yMm ?? 0)) }
+}
+
 const ringsOf = (run: SpeedRun) => eventsOf(run).filter(({ type }) => type === 'CasingPlaced')
 
 describe('swept cut at any speed (ticket 335)', () => {
-  const runs = SPEEDS_M_PER_S.map(cutColumnAt)
+  const runs = SPEEDS_M_PER_S.map((speed) => cutColumnAt(speed))
 
   it('charges each opened cell its own dig energy at 1, 4 and 16 m a tick', () => {
-    // The strong drill breaks every cell at the tile floor, so each costs the same.
-    const perCell = cellDigEnergyOf(FLOOR_SUB_STEPS)
+    // The strong drill breaks every cell in one sub-step, so each costs the same.
+    const perCell = cellDigEnergyOf(STRONG_SUB_STEPS)
     for (const run of runs) {
       expect(openedCellsOf(run).length).toBeGreaterThanOrEqual(PATH_METRES)
       expect(energySpentBy(run)).toBe(perCell * openedCellsOf(run).length)
     }
   })
 
+  // A drill held under 1 m a tick, so every pose here runs ahead of its cut. The walk stops on its
+  // path's sub-steps, which a longer step divides differently, so the cursor may sit up to one
+  // sub-step apart; the work and the carry it leaves are the same tick for tick.
   it('cuts every tick to where the work reaches, however long the step', () => {
-    const reachesOf = (run: SpeedRun) =>
-      run.ticks.map(({ state }) => {
-        const cursor = vehicleOf(state, 'p1').sweptCut
-        return { tick: cursor?.tick, yMm: cursor?.yMm, carrySubSteps: cursor?.carrySubSteps }
-      })
-    const [slow, ...faster] = runs.map(reachesOf)
-    expect(slow.every(({ tick }, index) => tick === runs[0].start.tick + 1 + index)).toBe(true)
-    // Every pose here runs ahead of the cut, so each tick's reach is the work's alone.
-    const common = Math.min(...runs.map(({ ticks }) => ticks.length))
-    for (const reaches of faster) expect(reaches.slice(0, common)).toEqual(slow.slice(0, common))
-    const lastCursor = vehicleOf(lastStateOf(runs[runs.length - 1]), 'p1').sweptCut
-    expect(lastCursor?.yMm).toBe(vehicleOf(lastStateOf(runs[0]), 'p1').sweptCut?.yMm)
+    const workBound = SPEEDS_M_PER_S.map((speed) => cutColumnAt(speed, WORK_BOUND_DRILL_POWER))
+    const [slow, ...faster] = workBound.map(reachesOf)
+    expect(slow.every(({ tick }, index) => tick === workBound[0].start.tick + 1 + index)).toBe(true)
+    const common = Math.min(...workBound.map(({ ticks }) => ticks.length))
+    for (const reaches of faster) {
+      const apart = reaches.slice(0, common).map((reach, index) => gapOf(reach, slow[index]))
+      expect(apart.filter((gap) => !gap.isSameWork || gap.yMm >= SWEEP_STEP_MM)).toEqual([])
+    }
+    const lastCursor = vehicleOf(lastStateOf(workBound[workBound.length - 1]), 'p1').sweptCut
+    expect(lastCursor?.yMm).toBe(vehicleOf(lastStateOf(workBound[0]), 'p1').sweptCut?.yMm)
   })
 
   it('lays the same rings along the same path at 1, 4 and 16 m a tick', () => {
@@ -105,8 +127,8 @@ describe('swept cut at any speed (ticket 335)', () => {
   })
 })
 
-/** A drill that breaks planet 8's rock at the tile floor. */
-const FLOOR_DRILL_STEP = 1000
+/** A drill that breaks planet 8's rock in one sub-step a cell. */
+const STRONG_DRILL_STEP = 1000
 
 /**
  * A drill that takes about 23 ticks a cell of planet 8's rock, so the cells under a resting stamp
@@ -122,7 +144,7 @@ function restAndReport(
   steps: number,
   reportedDrillTicks: number,
   reportTick = steps,
-  drillStep = FLOOR_DRILL_STEP,
+  drillStep = STRONG_DRILL_STEP,
 ): ScriptedSession {
   const session = onHeatPlanet()
   session.submit(0, { type: 'debug.setUpgrade', payload: { upgradeId: 'drill_tip', level: 400 } })
@@ -144,14 +166,28 @@ function reportDownAt(drillTicks: number) {
   return { type, payload: { ...payload, ...AWAY } }
 }
 
+/** The broken cells' own drill times in sub-steps, read on the ground as generated. */
+function digSubStepsOf(session: ScriptedSession, broken: readonly TilePoint[]): number {
+  const state = session.state()
+  const params = planetParamsOf(state.planet) as PlanetParams
+  const drill = heatThrottledDrill(params.planetIndex, vehicleOf(state, 'p1'))
+  const subStepsOf = drillSubStepsOfCells(params, drill, shockTicksFor(state, 'p1'))
+  return broken.reduce(
+    (sum, tile) => sum + (subStepsOf(tile, materialCellAt(EMPTY_WORLD, params, tile), 0) ?? 0),
+    0,
+  )
+}
+
 describe('heat from the steps summed dig time (ticket 335, TD lock on #374)', () => {
   const STEPS = 40
 
   it('sums the dig time of the cells the steps broke on the cursor', () => {
     const session = restAndReport(STEPS, 0)
-    const broken = session.events().filter(({ type }) => type === 'TileDestroyed').length
-    expect(broken).toBeGreaterThan(0)
-    expect(session.vehicle().sweptCut?.digSubSteps).toBe(broken * FLOOR_SUB_STEPS)
+    const broken = session
+      .events()
+      .flatMap((event) => (event.type === 'TileDestroyed' ? [{ tx: event.tx, ty: event.ty }] : []))
+    expect(broken.length).toBeGreaterThan(0)
+    expect(session.vehicle().sweptCut?.digSubSteps).toBe(digSubStepsOf(session, broken))
   })
 
   it('heats a report for the steps dig time, whatever drill ticks it reports', () => {

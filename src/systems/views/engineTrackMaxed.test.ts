@@ -1,20 +1,16 @@
-import { afterEach, describe, expect, it, vi } from 'vitest'
+import { describe, expect, it } from 'vitest'
 import { CLICK_CHAIN } from '../authority/purchaseChain'
-import { ECONOMY } from '../economy/economy'
 import { createScriptedSession, dockInBay, typesOf } from '../authority/scriptedSession'
 import { buyUpgradeCommand } from '../platform/platformCommands'
 import { grantMoneyCommand } from '../startScenarioCommands'
 import { setUpgradeCommand } from '../vehicle/vehicleCommands'
-import { workshopRowsOf } from './workshopRows'
+import { ENGINE_MAXED_TEXT, workshopRowsOf } from './workshopRows'
 
 // The engine track stays finite (GD lock on #316 scope 0, ticket 333): the card reads "maxed,
 // drill sets travel" exactly when k times the drill's cut speed reaches the engine's top speed,
-// and then offers no buy. Under ticket 396's 4-tick stopgap floor a floor-bound drill already
-// passes every engine; a one-tick floor, as the #304 law with no floor allows, is swapped into
-// `economy.json` on a fresh module graph with no slices registered (a kernel spec never imports
-// one), as `physics/sweptCutPace.test.ts` does.
+// and then offers no buy. With no tile floor (ticket 397) a strong drill passes every engine.
 
-/** Steps that cut band-1 rock at the tile floor. */
+/** Steps that cut band-1 rock in one sub-step a cell, the law's quantum. */
 const STRONG_DRILL = { drill_power: 2000, drill_tip: 600 }
 
 /** Steps whose k times cut passes the 6 m/s engine in planet 1's band 1 (6.9) but not band 5 (1.68). */
@@ -49,18 +45,7 @@ function engineRowOf(modules: RowModules, levels: Record<string, number>) {
   return row
 }
 
-async function modulesWithFloor(minTicksPerTile: number) {
-  vi.resetModules()
-  vi.doMock('../economy/economy', () => ({
-    ECONOMY: { ...ECONOMY, drill: { ...ECONOMY.drill, minTicksPerTile } },
-  }))
-  ;(await import('../../registries/registrar')).loadSlices([])
-  const { createScriptedSession, dockInBay } = await import('../authority/scriptedSession')
-  const rows = await import('./workshopRows')
-  return { createScriptedSession, dockInBay, workshopRowsOf: rows.workshopRowsOf, rows }
-}
-
-describe('engine track at the 4-tick floor (ticket 396)', () => {
+describe('engine track with no tile floor (tickets 333, 396, 397)', () => {
   const modules = { createScriptedSession, dockInBay, workshopRowsOf }
 
   it('offers its buy with a starting drill, whose k times cut stays under the top speed', () => {
@@ -83,36 +68,20 @@ describe('engine track at the 4-tick floor (ticket 396)', () => {
     expect(typesOf(events)).toContain('UpgradePurchased')
   })
 
-  it('reads maxed once a floor-bound drill sets travel, k times 15 m/s', () => {
+  it('reads maxed, drill sets travel, and offers no buy once the drill sets travel', () => {
     const row = engineRowOf(modules, STRONG_DRILL)
     expect(row.badge).toBe('maxed')
-    expect(row.buy.reason).toBe('max_level')
-  })
-})
-
-describe('engine track past the crossover (ticket 333, a one-tick floor)', () => {
-  afterEach(() => {
-    vi.doUnmock('../economy/economy')
-    vi.resetModules()
-  })
-
-  it('reads maxed, drill sets travel, and offers no buy once the drill sets travel', async () => {
-    const modules = await modulesWithFloor(1)
-    const row = engineRowOf(modules, STRONG_DRILL)
-    expect(row.badge).toBe('maxed')
-    expect(row.levelText).toContain(modules.rows.ENGINE_MAXED_TEXT)
+    expect(row.levelText).toContain(ENGINE_MAXED_TEXT)
     expect(row.buy.reason).toBe('max_level')
   })
 
-  it('offers the buy while the drill is still slower than the engine', async () => {
-    const modules = await modulesWithFloor(1)
+  it('offers the buy while the drill is still slower than the engine', () => {
     const row = engineRowOf(modules, { engine: 400 })
     expect(row.badge).toBeNull()
     expect(row.buy.reason).toBeNull()
   })
 
-  it('leaves every other track buyable', async () => {
-    const modules = await modulesWithFloor(1)
+  it('leaves every other track buyable', () => {
     const others = rowsOf(modules, STRONG_DRILL).filter((row) => row.upgradeId !== 'engine')
     expect(others.every((row) => row.buy.reason === null && row.badge === null)).toBe(true)
   })

@@ -1,5 +1,4 @@
-import { afterEach, describe, expect, it, vi } from 'vitest'
-import { DRILL_SUBSTEPS_PER_TICK } from '../../constants/balance'
+import { describe, expect, it } from 'vitest'
 import { ECONOMY } from '../economy/economy'
 import { blockHardness } from '../economy/oreEconomy'
 import { vehicleStatsAt } from '../economy/vehicleStats'
@@ -29,8 +28,8 @@ function rigWith(levels: Partial<VehicleState['levels']> = {}): VehicleState {
   return { ...fresh, pose, levels: { ...fresh.levels, ...levels } }
 }
 
-/** Steps that cut band-1 rock at the tile floor (ticket 396's 4-tick stopgap). */
-const FLOOR_BOUND = { drill_power: 2000, drill_tip: 600 }
+/** Steps that cut band-1 rock in one sub-step a cell, the law's quantum (no tile floor, #397). */
+const ONE_SUB_STEP = { drill_power: 2000, drill_tip: 600 }
 
 /** Steps whose k times cut passes the 6 m/s engine in planet 1's band 1 (6.9) but not band 5 (1.68). */
 const BAND_ONE_DRILL = { drill_power: 100, drill_tip: 30 }
@@ -47,9 +46,8 @@ describe('travel parity (ticket 333)', () => {
   })
 
   it('moves k times the cut step, rounded down, through the band rock', () => {
-    const drill = vehicleStatsAt(rigWith(FLOOR_BOUND).levels)
-    const floorStep = cutStepMmOf(ECONOMY.drill.minTicksPerTile * DRILL_SUBSTEPS_PER_TICK)
-    expect(travelStepThrough(drill, blockHardness(1, 1))).toBe(Math.floor(floorStep * 1.5))
+    const drill = vehicleStatsAt(rigWith(ONE_SUB_STEP).levels)
+    expect(travelStepThrough(drill, blockHardness(1, 1))).toBe(Math.floor(cutStepMmOf(1) * 1.5))
   })
 
   it('gives no drill travel where the tip cannot scratch the rock', () => {
@@ -66,57 +64,40 @@ describe('travel parity (ticket 333)', () => {
     }
   })
 
-  // Ticket 396: at the 4-tick floor the cut is 15 m/s, so k times it passes every engine.
-  it('lets a floor-bound drill set travel at k times its cut, past every engine top speed', () => {
-    const floorStep = cutStepMmOf(ECONOMY.drill.minTicksPerTile * DRILL_SUBSTEPS_PER_TICK)
-    const drillSpeed = (Math.floor(floorStep * 1.5) * 60) / 1000
+  // Ticket 397: with no tile floor a one-sub-step cut is 3600 m/s, so k times it passes every engine.
+  it('lets a one-sub-step drill set travel at k times its cut, past every engine top speed', () => {
+    const drillSpeed = (Math.floor(cutStepMmOf(1) * 1.5) * 60) / 1000
     for (const engine of [0, 50, 400]) {
-      const rig = rigWith({ ...FLOOR_BOUND, engine })
+      const rig = rigWith({ ...ONE_SUB_STEP, engine })
       expect(travelSpeedOf(rig, PARAMS)).toBe(drillSpeed)
       expect(doesDrillSetTravel(rig, PARAMS)).toBe(true)
     }
   })
 
   it('is the engine top speed off a planet or with no pose', () => {
-    const rig = rigWith(FLOOR_BOUND)
+    const rig = rigWith(ONE_SUB_STEP)
     const speedMax = vehicleStatsAt(rig.levels).engine.speedMax
     expect(travelSpeedOf(rig, null)).toBe(speedMax)
     expect(travelSpeedOf({ ...rig, pose: null }, PARAMS)).toBe(speedMax)
   })
 })
 
-describe('travel parity past the engine (ticket 333, a one-tick floor)', () => {
-  afterEach(() => {
-    vi.doUnmock('../economy/economy')
-    vi.resetModules()
+describe('travel parity past the engine (ticket 333, no tile floor since #397)', () => {
+  it('lets the drill set travel once k times its cut speed passes the engine', () => {
+    const rig = rigWith({ drill_power: 300, drill_tip: 200 })
+    const drill = vehicleStatsAt(rig.levels)
+    const drillSpeed = (travelStepThrough(drill, blockHardness(1, 1)) * 60) / 1000
+    expect(travelSpeedOf(rig, PARAMS)).toBe(drillSpeed)
+    expect(drillSpeed).toBeGreaterThan(drill.engine.speedMax)
+    expect(doesDrillSetTravel(rig, PARAMS)).toBe(true)
+    expect(travelEngineOf(rig, PARAMS).accel).toBe(drill.engine.accel)
   })
 
-  /** The parity module read with the tile floor at one tick, as a fast #304 law would allow. */
-  async function parityWithFastFloor() {
-    vi.resetModules()
-    vi.doMock('../economy/economy', () => ({
-      ECONOMY: { ...ECONOMY, drill: { ...ECONOMY.drill, minTicksPerTile: 1 } },
-    }))
-    return import('./travelParity')
-  }
-
-  it('lets the drill set travel once k times its cut speed passes the engine', async () => {
-    const parity = await parityWithFastFloor()
-    const rig = rigWith(FLOOR_BOUND)
-    const speedMax = vehicleStatsAt(rig.levels).engine.speedMax
-    const drillSpeed = (Math.floor(cutStepMmOf(DRILL_SUBSTEPS_PER_TICK) * 1.5) * 60) / 1000
-    expect(parity.travelSpeedOf(rig, PARAMS)).toBe(drillSpeed)
-    expect(drillSpeed).toBeGreaterThan(speedMax)
-    expect(parity.doesDrillSetTravel(rig, PARAMS)).toBe(true)
-    expect(parity.travelEngineOf(rig, PARAMS).accel).toBe(vehicleStatsAt(rig.levels).engine.accel)
-  })
-
-  it('never lets travel fall under the engine where the drill is slow', async () => {
-    const parity = await parityWithFastFloor()
+  it('never lets travel fall under the engine where the drill is slow', () => {
     const rig = rigWith({ engine: 400 })
     const speedMax = vehicleStatsAt(rig.levels).engine.speedMax
-    expect(parity.travelSpeedOf(rig, PARAMS)).toBe(speedMax)
-    expect(parity.doesDrillSetTravel(rig, PARAMS)).toBe(false)
+    expect(travelSpeedOf(rig, PARAMS)).toBe(speedMax)
+    expect(doesDrillSetTravel(rig, PARAMS)).toBe(false)
   })
 })
 
@@ -135,14 +116,14 @@ describe('engine card judged in the hardest band (#418, GD option a)', () => {
   })
 
   it('reads maxed once the drill passes the top speed in every band', () => {
-    const drill = vehicleStatsAt(rigWith(FLOOR_BOUND).levels)
+    const drill = vehicleStatsAt(rigWith(ONE_SUB_STEP).levels)
     const hardestSpeed = (travelStepThrough(drill, hardestBandRockHardnessOf(PARAMS)) * 60) / 1000
     expect(hardestSpeed).toBeGreaterThanOrEqual(drill.engine.speedMax)
-    expect(doesDrillSetTravel(rigWith(FLOOR_BOUND), PARAMS)).toBe(true)
+    expect(doesDrillSetTravel(rigWith(ONE_SUB_STEP), PARAMS)).toBe(true)
   })
 
   it('reads the same at the dock, mid-shaft and with no pose', () => {
-    for (const levels of [BAND_ONE_DRILL, FLOOR_BOUND]) {
+    for (const levels of [BAND_ONE_DRILL, ONE_SUB_STEP]) {
       const rig = rigWith(levels)
       const readings = [0, Math.floor(PARAMS.radiusTiles / 2), null].map((depth) =>
         doesDrillSetTravel(rigPosedAt(rig, depth), PARAMS),
@@ -152,6 +133,6 @@ describe('engine card judged in the hardest band (#418, GD option a)', () => {
   })
 
   it('never reads maxed off a planet', () => {
-    expect(doesDrillSetTravel(rigWith(FLOOR_BOUND), null)).toBe(false)
+    expect(doesDrillSetTravel(rigWith(ONE_SUB_STEP), null)).toBe(false)
   })
 })

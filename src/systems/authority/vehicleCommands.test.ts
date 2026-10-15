@@ -51,17 +51,30 @@ describe('vehicle drilling', () => {
     expect(FULL_TANK - session.vehicle().energy).toBe(40 * 4)
   })
 
-  it('clears the same cell in exactly the 4-tick floor with drill_power at level 40', () => {
+  it('clears the same cell in its law time of 5 ticks with drill_power at level 20', () => {
+    const session = createSession()
+    session.submit(0, {
+      type: 'debug.setUpgrade',
+      payload: { upgradeId: 'drill_power', level: 200 },
+    })
+    session.submit(0, poseAbove(GROUND, FACING.down))
+    expect(typesOf(session.submit(2, drill(GROUND, 2)))).not.toContain('TileDestroyed')
+    expect(typesOf(session.submit(3, drill(GROUND, 1)))).toContain('TileDestroyed')
+    session.submit(4, drill(GROUND, 1))
+    expect(cellDensitySum(session.state().world, PARAMS, GROUND)).toBeGreaterThan(0)
+    session.submit(5, drill(GROUND, 1))
+    expect(cellDensitySum(session.state().world, PARAMS, GROUND)).toBe(0)
+  })
+
+  // No tile floor since ticket 397: 40 ticks over 1.12^40 is under one, so the law's one tick.
+  it('clears the same cell in a single tick with drill_power at level 40', () => {
     const session = createSession()
     session.submit(0, {
       type: 'debug.setUpgrade',
       payload: { upgradeId: 'drill_power', level: 400 },
     })
     session.submit(0, poseAbove(GROUND, FACING.down))
-    expect(typesOf(session.submit(2, drill(GROUND, 2)))).not.toContain('TileDestroyed')
-    expect(typesOf(session.submit(3, drill(GROUND, 1)))).toContain('TileDestroyed')
-    expect(cellDensitySum(session.state().world, PARAMS, GROUND)).toBeGreaterThan(0)
-    session.submit(4, drill(GROUND, 1))
+    expect(typesOf(session.submit(1, drill(GROUND, 1)))).toContain('TileDestroyed')
     expect(cellDensitySum(session.state().world, PARAMS, GROUND)).toBe(0)
   })
 

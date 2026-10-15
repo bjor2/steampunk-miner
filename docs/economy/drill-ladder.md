@@ -47,9 +47,8 @@ stored level (`debug.setUpgrade`) is a step of ten pips, so major `L` is step `1
 ## Reading it when tuning
 
 - A step that falls short of its law gain means something other than drill power is setting the
-  time. In the past that was the tile floor (#396 lowered it from 24 to 4 ticks). Today the 4-tick
-  floor (15 cells/s) binds on band 1 from L21 (1.5 x 1.12^21 = 16.2 cells/s), so a rung above 20
-  would show it here until #397 removes the floor.
+  time. In the past that was the tile floor (#396 lowered it from 24 to 4 ticks, #397 removed it):
+  no rung is held by a floor now, so a rung above 20 keeps the law's gain too.
 - To compare a curve change, run `npx vitest run src/logging/drillLadder.test.ts` before and after
   and compare the two `balance-report/drill-ladder.ndjson` files line by line.
 

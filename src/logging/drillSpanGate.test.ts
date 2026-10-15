@@ -35,7 +35,11 @@ const REFUSING_GATE: SliceDefinition = {
     }),
 }
 
-/** A strong drill stepping down column 57 onto the gated cell, every step logged as the game does. */
+/**
+ * A strong drill stepping down column 57 onto the gated cell, every step logged as the game does:
+ * stored step 200 cuts band 1 in about 4 ticks a cell, the old tile floor's pace (no floor since
+ * ticket 397; a stronger fresh cut is #439's).
+ */
 function sweepOntoTheGate(drillLines: DrillLines) {
   return withRegistrations([REFUSING_GATE], () => {
     const session = createScriptedSession()
@@ -46,7 +50,7 @@ function sweepOntoTheGate(drillLines: DrillLines) {
       runLog.recordCommand({ playerId: 'p1', tick, seq, ...intent } as AuthorityCommand)
       recordDomainEventsTo(runLog, PLACE, session.submit(tick, intent), session.state())
     }
-    send(0, { type: 'debug.setUpgrade', payload: { upgradeId: 'drill_power', level: 1000 } })
+    send(0, { type: 'debug.setUpgrade', payload: { upgradeId: 'drill_power', level: 200 } })
     send(0, { type: 'debug.setEnergy', payload: { energy: '100000' } })
     const { payload } = poseAbove({ tx: 0, ty: 0 }, FACING.down)
     send(0, { type: 'reportPose', payload: { ...payload, ...ABOVE } })

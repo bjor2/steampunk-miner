@@ -42,7 +42,6 @@
     "scratchFloor": "0.25",
     "denseScratchFloor": "1.5",
     "gateScratchFloor": "1",
-    "minTicksPerTile": 4,
     "travelParityK": "1.5",
     "boreRecoveryMinTicks": 3
   },

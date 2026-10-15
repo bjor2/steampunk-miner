@@ -1,11 +1,9 @@
-import { afterEach, describe, expect, it, vi } from 'vitest'
+import { describe, expect, it } from 'vitest'
 import {
-  DRILL_SUBSTEPS_PER_TICK,
   MAX_STEP_MM_PER_TICK,
   POSE_REPORT_INTERVAL_TICKS,
   STEP_BOUND_TOLERANCE_MM,
 } from '../../constants/balance'
-import { ECONOMY } from '../economy/economy'
 import { blockHardness } from '../economy/oreEconomy'
 import { vehicleStatsAt } from '../economy/vehicleStats'
 import { createSeededRandom } from '../seededRandom'
@@ -29,12 +27,12 @@ function rigWith(levels: Partial<VehicleState['levels']> = {}): VehicleState {
   return { ...fresh, pose, levels: { ...fresh.levels, ...levels } }
 }
 
-/** Steps that cut band-1 rock at the tile floor (ticket 396's 4-tick stopgap). */
-const FLOOR_BOUND = { drill_power: 2000, drill_tip: 600 }
+/** Steps that cut band-1 rock in one sub-step a cell, the law's quantum (no tile floor, #397). */
+const ONE_SUB_STEP = { drill_power: 2000, drill_tip: 600 }
 
 describe('step bound (ticket 334)', () => {
   it('bounds a cutting step by the drill law through the band rock, plus one sample', () => {
-    const rig = rigWith(FLOOR_BOUND)
+    const rig = rigWith(ONE_SUB_STEP)
     const subSteps = subStepsPerTile(vehicleStatsAt(rig.levels), blockHardness(1, 1)) as number
     expect(stepBoundsOf(rig, PARAMS).cuttingMm).toBe(
       cutStepMmOf(subSteps) + STEP_BOUND_TOLERANCE_MM,
@@ -51,14 +49,17 @@ describe('step bound (ticket 334)', () => {
     }
   })
 
-  it('bounds a travelling step by k times a floor-bound cut once it passes the engine', () => {
-    const floorStep = cutStepMmOf(ECONOMY.drill.minTicksPerTile * DRILL_SUBSTEPS_PER_TICK)
-    const bounds = stepBoundsOf(rigWith({ ...FLOOR_BOUND, engine: 400 }), PARAMS)
-    expect(bounds.travellingMm).toBe(Math.floor(floorStep * 1.5) + STEP_BOUND_TOLERANCE_MM)
+  it('bounds a travelling step by k times the cut once it passes the engine', () => {
+    const rig = rigWith({ drill_power: 300, drill_tip: 200, engine: 400 })
+    const subSteps = subStepsPerTile(vehicleStatsAt(rig.levels), blockHardness(1, 1)) as number
+    const bounds = stepBoundsOf(rig, PARAMS)
+    expect(bounds.travellingMm).toBe(
+      Math.floor(cutStepMmOf(subSteps) * 1.5) + STEP_BOUND_TOLERANCE_MM,
+    )
   })
 
   it('picks the cutting bound with the cut gate open and the travelling one with it shut', () => {
-    const bounds = stepBoundsOf(rigWith(FLOOR_BOUND), PARAMS)
+    const bounds = stepBoundsOf(rigWith(ONE_SUB_STEP), PARAMS)
     expect(stepBoundMmOf(bounds, true)).toBe(bounds.cuttingMm)
     expect(stepBoundMmOf(bounds, false)).toBe(bounds.travellingMm)
   })
@@ -83,7 +84,7 @@ describe('step bound (ticket 334)', () => {
   })
 
   it('bounds by the engine alone off a planet or with no pose', () => {
-    const rig = rigWith(FLOOR_BOUND)
+    const rig = rigWith(ONE_SUB_STEP)
     const engineOnly = stepBoundsOf(rig, null)
     expect(engineOnly.cuttingMm).toBe(STEP_BOUND_TOLERANCE_MM)
     expect(stepBoundsOf({ ...rig, pose: null }, PARAMS)).toEqual(engineOnly)
@@ -99,20 +100,12 @@ describe('step bound (ticket 334)', () => {
   })
 })
 
-describe('step bound past the engine (ticket 334, a one-tick floor)', () => {
-  afterEach(() => {
-    vi.doUnmock('../economy/economy')
-    vi.resetModules()
-  })
-
-  it('grows with the drill once k times its cut speed passes the engine', async () => {
-    vi.resetModules()
-    vi.doMock('../economy/economy', () => ({
-      ECONOMY: { ...ECONOMY, drill: { ...ECONOMY.drill, minTicksPerTile: 1 } },
-    }))
-    const { stepBoundsOf: fastBoundsOf } = await import('./stepBound')
-    const bounds = fastBoundsOf(rigWith(FLOOR_BOUND), PARAMS)
-    const cutStep = cutStepMmOf(DRILL_SUBSTEPS_PER_TICK)
+// The TD lock on #397: with no tile floor the bound follows the drill as far as the law's
+// one-sub-step quantum, 60 m of cut a tick, and travel k times that.
+describe('step bound with no tile floor (ticket 397)', () => {
+  it('grows with the drill to one sub-step a cell, and travel to k times that', () => {
+    const bounds = stepBoundsOf(rigWith(ONE_SUB_STEP), PARAMS)
+    const cutStep = cutStepMmOf(1)
     expect(bounds.cuttingMm).toBe(cutStep + STEP_BOUND_TOLERANCE_MM)
     expect(bounds.travellingMm).toBe(Math.floor(cutStep * 1.5) + STEP_BOUND_TOLERANCE_MM)
   })

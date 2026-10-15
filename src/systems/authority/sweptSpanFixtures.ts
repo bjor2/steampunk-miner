@@ -1,8 +1,9 @@
 /**
  * The swept span's reference fixtures (ticket 374): sweeps a tick at a time through ground
  * softened to just over its yield, run through either carve from the same start. Only specs use
- * them. Since ticket 399 the cut reaches only as far as its work pays for, about half a softened
- * cell a tick at the tile dig floor, so a fixture's pose rests at its end while the cut catches up.
+ * them. Since ticket 399 the cut reaches only as far as its work pays for, so a fixture's pose
+ * rests at its end while a slower drill's cut catches up. With no tile floor (ticket 397) the
+ * fixtures' strong drill pays a softened cell in one sub-step, up to 60 cells a tick.
  */
 import { MM_PER_METRE, TICKS_PER_SECOND } from '../../constants/physics'
 import type { SliceDefinition } from '../../registries/sliceDefinition'
@@ -85,12 +86,23 @@ export function positionsAlong(from: Point, to: Point, speed: number, restTicks 
   return [...moving, ...Array.from({ length: restTicks }, () => to)]
 }
 
-const STRONG_DRILL = [
-  { type: 'debug.setUpgrade', payload: { upgradeId: 'drill_tip', level: 400 } },
-  { type: 'debug.setUpgrade', payload: { upgradeId: 'drill_power', level: 1000 } },
-  { type: 'debug.setEnergy', payload: { energy: '100000' } },
-  { type: 'debug.setHull', payload: { hull: '1000000' } },
-] as const
+/** The fixtures' drill_power step: every cell here in one sub-step, the law's quantum. */
+const STRONG_DRILL_POWER = 1000
+
+/**
+ * A drill_power step whose cut through the softened column stays under 1 m a tick (about 120
+ * sub-steps a softened cell, the pace ticket 396's 4-tick floor held every drill to).
+ */
+export const WORK_BOUND_DRILL_POWER = 200
+
+function armedDrill(drillPower: number) {
+  return [
+    { type: 'debug.setUpgrade', payload: { upgradeId: 'drill_tip', level: 400 } },
+    { type: 'debug.setUpgrade', payload: { upgradeId: 'drill_power', level: drillPower } },
+    { type: 'debug.setEnergy', payload: { energy: '100000' } },
+    { type: 'debug.setHull', payload: { hull: '1000000' } },
+  ] as const
+}
 
 /** What a debug carve leaves each sample of the softened ground: just over half solid. */
 const SOFTENED_BY = 125
@@ -100,10 +112,16 @@ const SOFTENED_RADIUS_MM = 16_000
  * Player `p1` on `session` reported at `at`, its enemies frozen, with a drill that scratches any
  * rock here and the ground within about 11 m of `softAt` carved to just over its yield.
  */
-function armed(session: ScriptedSession, at: Point, facing: Facing, softAt: Point): AuthorityState {
+function armed(
+  session: ScriptedSession,
+  at: Point,
+  facing: Facing,
+  softAt: Point,
+  drillPower = STRONG_DRILL_POWER,
+): AuthorityState {
   const tick = session.state().tick + 1
   session.submit(tick, FREEZE_ENEMIES)
-  STRONG_DRILL.forEach((intent) => session.submit(tick, intent))
+  armedDrill(drillPower).forEach((intent) => session.submit(tick, intent))
   session.submit(tick, {
     type: 'debug.carveCircle',
     payload: { ...softAt, radius: SOFTENED_RADIUS_MM, amount: SOFTENED_BY },
@@ -169,11 +187,12 @@ const CATCH_UP_TICKS = 90
  * Planet 1 straight down column 30, 30 m through softened ground about 40 tiles under the surface
  * (ticket 335: the same path at any speed), then resting while the cut catches up.
  */
-export function columnSweep(speed: number): SweepFixture {
+export function columnSweep(speed: number, drillPower = STRONG_DRILL_POWER): SweepFixture {
   const from = { x: 30_500, y: 261_500 }
   const to = { x: 30_500, y: 231_500 }
+  const softAt = { x: 30_500, y: 246_000 }
   return {
-    start: () => armed(createScriptedSession(), from, FACING.down, { x: 30_500, y: 246_000 }),
+    start: () => armed(createScriptedSession(), from, FACING.down, softAt, drillPower),
     params: PARAMS,
     slices: [],
     positions: positionsAlong(from, to, speed, CATCH_UP_TICKS),

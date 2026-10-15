@@ -47,15 +47,16 @@ function sessionFacingDownAt(start = START): ScriptedSession {
 }
 
 /**
- * `sessionFacingDownAt` with a drill that breaks band-1 ground at the 4-tick floor (ticket 396)
- * and a deep tank: the level-0 drill takes 40 ticks a cell, and since ticket 399 the cut reaches
- * only as far as its work pays for.
+ * `sessionFacingDownAt` with a drill that breaks band-1 ground in about 4 ticks (stored step 200,
+ * the old tile floor's pace; ticket 397 took the floor out of the law) and a deep tank: the level-0
+ * drill takes 40 ticks a cell, and since ticket 399 the cut reaches only as far as its work pays
+ * for.
  */
 function strongSessionFacingDownAt(start = START): ScriptedSession {
   const session = sessionFacingDownAt(start)
   session.submit(0, {
     type: 'debug.setUpgrade',
-    payload: { upgradeId: 'drill_power', level: 1000 },
+    payload: { upgradeId: 'drill_power', level: 200 },
   })
   session.submit(0, { type: 'debug.setEnergy', payload: { energy: '100000' } })
   return session

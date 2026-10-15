@@ -3,15 +3,16 @@
  *
  *   r   = min(1, P / H)                     P = drill tip, H = tile hardness
  *   eff = (r < 1/4) ? 0 : r * r
- *   ticksPerTile = max(m, ceil(60 * H / (D * eff)))     D = drill power, m = minTicksPerTile
+ *   ticksPerTile = ceil(60 * H / (D * eff))  D = drill power
  *
- * `m` is a stopgap floor of 4 ticks, 15 tiles/s (ticket 396, lifted from #7's 24-tick, 2.5 tiles/s
- * cap): Bjor ruled on 8 Oct that drill speed has no cap, and #397 removes the floor from this law.
+ * No constant floor (Bjor's 8 Oct no-cap ruling; the TD lock on #397 takes out the 4-tick
+ * stopgap ticket 396 lowered #7's 24-tick floor to): a tile takes at least one tick here and one
+ * sub-step on the swept cut, and the exact carry (ticket 399) lets one tick cut many cells.
  *
  * The authority accumulates drill work on a tile one tick at a time (#3, #4), so the rule is kept
- * exact by working in units scaled by `H^2 * minTicks`: one tick adds `min(D * min(P, H)^2 * m,
- * 60 * H^3)` and the tile breaks at `60 * m * H^3` (m = minTicksPerTile). That is the same tick
- * count as the formula above with no division at all, so it never drifts by a tick.
+ * exact by working in units scaled by `H^2`: one tick adds `D * min(P, H)^2` and the tile breaks
+ * at `60 * H^3`. That is the same tick count as the formula above with no division at all, so it
+ * never drifts by a tick.
  *
  * The scratch floor is a gate, so it compares the tip of the last completed major (#180 amendment
  * 2): a cell opens on a big level-up, never on a pip. The efficiency reads the live tip. A cell may
@@ -19,8 +20,7 @@
  * it last and falls back to the global `drill.scratchFloor`.
  *
  * The swept cut (ticket 330) reads the same rule in `DRILL_SUBSTEPS_PER_TICK` sub-steps instead of
- * whole ticks (`subStepsPerTile`): the floor still binds at `minTicksPerTile` ticks, but a cell is
- * no longer rounded up to the next whole tick.
+ * whole ticks (`subStepsPerTile`), so a cell is no longer rounded up to the next whole tick.
  */
 import { DRILL_SUBSTEPS_PER_TICK } from '../../constants/balance'
 import { TICKS_PER_SECOND } from '../../constants/physics'
@@ -44,7 +44,6 @@ export interface DrillStats {
 }
 
 const TICKS = fromSafeInteger(TICKS_PER_SECOND)
-const MIN_TICKS = fromSafeInteger(ECONOMY.drill.minTicksPerTile)
 const SCRATCH_FLOOR = ECONOMY.drill.scratchFloor
 
 /** `P >= H/4`: below that the tip only skids, with no damage and no energy drain (#7). */
@@ -75,13 +74,12 @@ export function drillWorkPerTick(
 ): BigStat {
   if (!canScratch(drill.gateTip, hardness, scratchFloor)) return ZERO_MONEY
   const tip = effectiveTip(drill.drillTip, hardness)
-  const uncapped = mul(mul(drill.drillPower, mul(tip, tip)), MIN_TICKS)
-  return smallerOf(uncapped, capPerTick(hardness))
+  return mul(drill.drillPower, mul(tip, tip))
 }
 
-/** The work at which a tile of this hardness breaks: `60 * m * H^3`. */
+/** The work at which a tile of this hardness breaks: `60 * H^3`. */
 export function tileWorkToBreak(hardness: BigStat): BigStat {
-  return mul(capPerTick(hardness), MIN_TICKS)
+  return mul(TICKS, mul(hardness, mul(hardness, hardness)))
 }
 
 /** Whole ticks to break an intact tile, or null when the tip cannot scratch it. */
@@ -105,11 +103,7 @@ export function subStepsPerTile(
   return tileTimeIn(DRILL_SUBSTEPS_PER_TICK, drill, hardness, scratchFloor)
 }
 
-/**
- * A tile's drill time in `unitsPerTick` units of a tick. A tick whose work is held to the cap
- * takes exactly the floor: `60 * m * H^3` over `60 * H^3` rounded to 40 digits can land a hair
- * over `m` and round up to a whole extra unit (ticket 396).
- */
+/** A tile's drill time in `unitsPerTick` units of a tick, rounded up once to a whole unit. */
 function tileTimeIn(
   unitsPerTick: number,
   drill: DrillStats,
@@ -118,14 +112,13 @@ function tileTimeIn(
 ): number | null {
   const work = drillWorkPerTick(drill, hardness, scratchFloor)
   if (cmp(work, ZERO_MONEY) === 0) return null
-  if (cmp(work, capPerTick(hardness)) === 0) return ECONOMY.drill.minTicksPerTile * unitsPerTick
   const units = mul(tileWorkToBreak(hardness), fromSafeInteger(unitsPerTick))
   return toSafeInteger(ceil(div(units, work)))
 }
 
 /**
  * The damage `ticks` of drilling deal in hardness units, for `drill_damage_dealt`:
- * `ticks * D * eff / 60`, with `D * eff` held to the tile speed cap.
+ * `ticks * D * eff / 60`.
  */
 export function drillDamage(
   drill: DrillStats,
@@ -133,20 +126,12 @@ export function drillDamage(
   ticks: number,
   scratchFloor: BigStat = SCRATCH_FLOOR,
 ): BigStat {
-  const perSecond = smallerOf(
-    mul(drill.drillPower, drillEfficiency(drill, hardness, scratchFloor)),
-    div(mul(hardness, TICKS), MIN_TICKS),
-  )
+  const perSecond = mul(drill.drillPower, drillEfficiency(drill, hardness, scratchFloor))
   return div(mul(perSecond, fromSafeInteger(ticks)), TICKS)
 }
 
 function effectiveTip(tip: BigStat, hardness: BigStat): BigStat {
   return smallerOf(tip, hardness)
-}
-
-/** `60 * H^3`: one tick never does more than a tile's worth over the minimum tick count. */
-function capPerTick(hardness: BigStat): BigStat {
-  return mul(TICKS, mul(hardness, mul(hardness, hardness)))
 }
 
 function smallerOf(a: BigStat, b: BigStat): BigStat {

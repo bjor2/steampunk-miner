@@ -403,12 +403,6 @@ export interface Economy {
      */
     gateScratchFloor: BigStat
     /**
-     * The tile speed floor, a stopgap only (GD ruling and VS amendment on ticket 396): 4 ticks, 15
-     * tiles/s at 60 ticks/s, under the 16 m/s pose bound. Not a design value: #397 removes it from
-     * the drill law (the multi-cell carry of #399 and the lifted `aheadCellsMax`).
-     */
-    minTicksPerTile: number
-    /**
      * Travel parity's k (GD lock on #316 scope 0, ticket 333): away from fresh ground the rig moves
      * at up to `max(speedMax, k * cutSpeed)` of its drill in the band's nominal rock. Systems may
      * tune it from 1 to 2.

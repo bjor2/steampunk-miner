@@ -273,8 +273,12 @@ import type { DriveSigns } from '../vehicle/driveSigns'
  *    step that still speeds deep travel is sold at the dock. Travel speed itself is unchanged. A
  *    command log that bought an engine step the old band-1 reading refused now answers
  *    differently; a run that never reached that reading moves no digest or mined order.
+ * 78: no tile floor (ticket 397, the TD lock on #397 and the GD ruling on #396): the drill law is
+ *    `ceil(60 H / (D eff))` with no `drill.minTicksPerTile`, so a drill past the old 4-tick floor
+ *    breaks a cell in its own time, down to one tick (one sub-step on the swept cut), its step
+ *    bound and travel parity following that cut speed. Goldens that dig past the old floor change.
  */
-export const AUTHORITY_PROTOCOL_VERSION = 77
+export const AUTHORITY_PROTOCOL_VERSION = 78
 
 /** The kernel's own commands: the closed set its rule tables are written against. */
 export interface KernelCommandPayloads {

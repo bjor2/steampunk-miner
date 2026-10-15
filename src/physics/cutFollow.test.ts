@@ -29,16 +29,18 @@ import {
 // step lands, the rig stops within 6 ticks of letting go of the drive, and back through the tunnel
 // it carved it never beats travel parity's cap. Three rigs, three replays of the same script.
 
+// The third rig cuts at about 15 m/s, the old 4-tick tile floor's pace: with no floor (ticket 397)
+// #400's rig 2 cuts at 3600 m/s and jams on planet 1 (#439).
 const RIGS: readonly Record<string, number>[] = [
   {},
   { drill_power: 300, drill_tip: 200 },
-  { drill_power: 2000, drill_tip: 600, engine: 5000 },
+  { drill_power: 200, drill_tip: 600, engine: 5000 },
 ]
 
 /**
  * The core's casing grade holds every band's lining (#41), so no collapse (#43) refills a tunnel
- * the rig drives back through. Under the 4-tick floor (#396) the fastest rig lines some 30 m of
- * tunnel in the level leg, and at grade 1 its blocks fall in behind it.
+ * the rig drives back through. At 15 m/s the third rig lines some 30 m of tunnel in the level leg,
+ * and at grade 1 its blocks fall in behind it.
  */
 const HOLDING_CASING_GRADE = ECONOMY.casing.casingGradeCoreMin
 

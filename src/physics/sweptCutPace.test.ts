@@ -3,7 +3,6 @@ import { beforeAll, describe, expect, it, vi } from 'vitest'
 import { MAX_SPEED_MM_PER_SECOND } from '../constants/balance'
 import { MM_PER_METRE, PHYSICS_TIMESTEP, UP_VECTOR_SCALE } from '../constants/physics'
 import { createMemorySink } from '../logging/eventSink'
-import { ECONOMY } from '../systems/economy/economy'
 import { sweptDrillStampOf } from '../systems/vehicle/drillStamp'
 import type { VehicleIntent } from '../systems/vehicle/vehicleIntent'
 import type { VehiclePose } from '../systems/vehicle/vehiclePose'
@@ -11,16 +10,24 @@ import type { SweptCut } from '../systems/vehicle/sweptCut'
 import type { VehicleController, VehicleStepResult } from './vehicleController'
 
 // The swept cut in the real fixed-step loop (ticket 330 acceptance, Vertical Scaler on #316): with
-// `drill.sweptCut` on and the drill held at its floor (drill and engine far past the curve, the
-// tank refilled), the vehicle digs down and level faster than the 5 Hz report's cut and its wheels
-// never wait on the cut past a report interval. The speeds are logged, not gated (TD and GD rulings
-// on #330, Q1 (a)), at the floors 24, 12, 8 and 4, each tick tagged with what held the body back so
-// the 8-tick floor's limiter is measured, not inferred. The floor is `economy.json`'s
-// `minTicksPerTile`, swapped in on a fresh module graph with no slices registered (a kernel spec
-// never imports one), as `store/authorityReads.test.ts` does.
+// `drill.sweptCut` on, an engine and tip far past the curve and the tank refilled, the vehicle digs
+// down and level faster than the 5 Hz report's cut and its wheels never wait on the cut past a
+// report interval. The speeds are logged, not gated (TD and GD rulings on #330, Q1 (a)), for drills
+// cutting band 1 in about 24, 12, 8 and 4 ticks a cell (the tile floors this spec swept before
+// ticket 397 took the floor out of the drill law), each tick tagged with what held the body back so
+// the limiter is measured, not inferred. It runs on a fresh module graph with no slices registered
+// (a kernel spec never imports one), as `store/authorityReads.test.ts` does.
 
-/** Steps past the curve, as the TD's #316 runs: the drill bound by the floor, speedMax ~14. */
-const FLOOR_BOUND_LEVELS = { drill_power: 2000, drill_tip: 600, engine: 5000 } as const
+/** Steps past the curve, as the TD's #316 runs: speedMax ~14, a tip that cuts at full efficiency. */
+const RIG_LEVELS = { drill_tip: 600, engine: 5000 } as const
+
+/** drill_power steps (majors 5, 11, 14 and 20) and the ticks each takes on a band-1 cell. */
+const DRILLS = [
+  { drillPower: 50, ticksPerCell: 23 },
+  { drillPower: 110, ticksPerCell: 12 },
+  { drillPower: 140, ticksPerCell: 9 },
+  { drillPower: 200, ticksPerCell: 5 },
+]
 const SECONDS = 6
 /** The steady rate is read over the last half of each run. */
 const STEADY_FROM_SECONDS = 3
@@ -66,11 +73,8 @@ interface Run {
   level: Leg
 }
 
-async function playFloorBound(minTicksPerTile: number, isSwept: boolean): Promise<Run> {
+async function playAtDrill(drillPower: number, isSwept: boolean): Promise<Run> {
   vi.resetModules()
-  vi.doMock('../systems/economy/economy', () => ({
-    ECONOMY: { ...ECONOMY, drill: { ...ECONOMY.drill, minTicksPerTile } },
-  }))
   ;(await import('../registries/registrar')).loadSlices([])
   const runLog = await import('../logging/runLog')
   const store = await import('../store/gameStore')
@@ -85,7 +89,8 @@ async function playFloorBound(minTicksPerTile: number, isSwept: boolean): Promis
   const log = { runId: 'run_test', sink: createMemorySink(), secondsSinceStart: () => 0 }
   runLog.installRunLog(runLog.createRunLog(log))
   const game = store.useGameStore.getState()
-  for (const [track, level] of Object.entries(FLOOR_BOUND_LEVELS)) game.setUpgrade(track, level)
+  const levels = { ...RIG_LEVELS, drill_power: drillPower }
+  for (const [track, level] of Object.entries(levels)) game.setUpgrade(track, level)
   const world = new RAPIER.World({ x: 0, y: 0, z: 0 })
   world.timestep = PHYSICS_TIMESTEP
   const start = store.readLocalVehicle().pose
@@ -94,7 +99,7 @@ async function playFloorBound(minTicksPerTile: number, isSwept: boolean): Promis
     createVehicleController(RAPIER, world, createVehicleBody(RAPIER, world, start)),
   )
   const loop = createVehicleLoop({ 'drill.sweptCut': isSwept })
-  const speedMaxMm = engineStatsAtStep(FLOOR_BOUND_LEVELS.engine).speedMax * MM_PER_METRE
+  const speedMaxMm = engineStatsAtStep(RIG_LEVELS.engine).speedMax * MM_PER_METRE
   const hold = (intent: VehicleIntent, seconds: number, each?: (read: TickRead) => void) => {
     for (let step = 0; step < Math.round(seconds / PHYSICS_TIMESTEP); step++) {
       if (step % 60 === 0) store.useGameStore.getState().setEnergy('150')
@@ -202,17 +207,30 @@ beforeAll(async () => {
 })
 
 describe('swept cut in the live loop (ticket 330)', () => {
+  it('names the ticks each drill takes on a band-1 cell of planet 1', async () => {
+    const { ticksPerTile } = await import('../systems/vehicle/drillRule')
+    const { vehicleStatsAt, startLevels } = await import('../systems/economy/vehicleStats')
+    const { blockHardness } = await import('../systems/economy/oreEconomy')
+    const ticksOf = (drillPower: number) =>
+      ticksPerTile(
+        vehicleStatsAt({ ...startLevels(), ...RIG_LEVELS, drill_power: drillPower }),
+        blockHardness(1, 1),
+      )
+    expect(DRILLS.map(({ drillPower }) => ticksOf(drillPower))).toEqual(
+      DRILLS.map(({ ticksPerCell }) => ticksPerCell),
+    )
+  })
+
   // The gate is that the cut keeps up: it digs faster than the 5 Hz per-report cut and never holds
-  // the wheels past a report interval or one cell at the floor. Since ticket 399 the work picks how
-  // far each tick cuts, so the sweep may stop short of the stamp (TD ruling on #399 amending 335).
-  // The rates and each leg's limiter counts are logged for #316's break order and the #304/#307
-  // re-baseline.
-  it.each([24, 12, 8, 4])(
-    'digs faster than the per-report cut and never stalls at the %i-tick floor',
-    async (floor) => {
-      const swept = await playFloorBound(floor, true)
-      const reported = await playFloorBound(floor, false)
-      console.log(`swept cut, ${floor}-tick floor: ${JSON.stringify({ swept, reported })}`)
+  // the wheels past a report interval. Since ticket 399 the work picks how far each tick cuts, so
+  // the sweep may stop short of the stamp (TD ruling on #399 amending 335). The rates and each
+  // leg's limiter counts are logged for #316's break order and the #304/#307 re-baseline.
+  it.each(DRILLS)(
+    'digs faster than the per-report cut and never stalls at $ticksPerCell ticks a cell',
+    async ({ drillPower, ticksPerCell }) => {
+      const swept = await playAtDrill(drillPower, true)
+      const reported = await playAtDrill(drillPower, false)
+      console.log(`swept cut, ${ticksPerCell} ticks a cell: ${JSON.stringify({ swept, reported })}`)
       expect(swept.down.rate).toBeGreaterThan(reported.down.rate)
       expect(swept.level.rate).toBeGreaterThan(reported.level.rate)
       expect(swept.level.longestWaitTicks).toBeLessThanOrEqual(MAX_WAIT_TICKS)

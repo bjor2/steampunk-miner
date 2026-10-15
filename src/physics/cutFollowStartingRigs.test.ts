@@ -14,8 +14,9 @@ import { commandedSpeedsOf, createRig, type TickRead } from './cutFollowFixtures
 // cell and travel sped the body to the face ahead of the drill. Now the body coasts on its last
 // vCut through the gate's shut dwell, and over a slab the cut has just cleared, so a down cut holds
 // the drill's speed past its start; up and level are no worse than before (their stalls are a cell
-// held out until the body's front arrives, #432). #400's two fast rigs ride along as a
-// regression. Letting go of the drive is `cutFollowRelease.test.ts`.
+// held out until the body's front arrives, #432). Two fast rigs ride along as a regression:
+// #400's rig 1, and a 15 m/s rig at the old 4-tick floor's pace #400's rig 2 had until ticket 397
+// took the floor out (rig 2 now jams, #439). Letting go of the drive is `cutFollowRelease.test.ts`.
 
 const STARTING_RIGS: Readonly<Record<string, Record<string, number>>> = {
   'stored 1': { drill_power: 1, drill_tip: 0 },
@@ -24,7 +25,7 @@ const STARTING_RIGS: Readonly<Record<string, Record<string, number>>> = {
 }
 const FAST_RIGS: Readonly<Record<string, Record<string, number>>> = {
   'rig 1 (#400)': { drill_power: 300, drill_tip: 200 },
-  'rig 2 (#400)': { drill_power: 2000, drill_tip: 600, engine: 5000 },
+  '15 m/s rig': { drill_power: 200, drill_tip: 600, engine: 5000 },
 }
 const ALL_RIGS = { ...STARTING_RIGS, ...FAST_RIGS }
 const FRAME_RATES = [30, 144]

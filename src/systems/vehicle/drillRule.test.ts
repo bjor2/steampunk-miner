@@ -1,7 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { DRILL_SUBSTEPS_PER_TICK } from '../../constants/balance'
 import { TICKS_PER_SECOND } from '../../constants/physics'
-import { ECONOMY } from '../economy/economy'
 import { blockHardness } from '../economy/oreEconomy'
 import { drillPower, drillTip, onCurveLevels, vehicleStatsAt } from '../economy/vehicleStats'
 import { add, cmp, fromCanonical, mul, ZERO_MONEY, type BigStat } from '../money'
@@ -55,8 +54,8 @@ describe('drill rule', () => {
     expect(blockHardness(1, 3)).toEqual(mul(m('1.2544'), m('1.2544')))
   })
 
-  it('holds the tile speed at the 4-tick floor with drill_power level 40 on hardness 1', () => {
-    expect(ticksPerTile(drillOf(drillPower(40), drillTip(0)), m('1'))).toBe(4)
+  it('breaks hardness 1 in one tick at drill_power major 40, with no tile floor (#397)', () => {
+    expect(ticksPerTile(drillOf(drillPower(40), drillTip(0)), m('1'))).toBe(1)
   })
 
   it('breaks a tile after exactly ticksPerTile ticks of accumulated work', () => {
@@ -100,8 +99,9 @@ describe('drill rule', () => {
 describe('fractional drill time (ticket 330)', () => {
   const Q = DRILL_SUBSTEPS_PER_TICK
 
-  it('keeps the floor at 4 whole ticks, counted in sub-steps', () => {
-    expect(subStepsPerTile(drillOf(drillPower(40), drillTip(0)), m('1'))).toBe(4 * Q)
+  it('cuts a cell in less than a tick once the drill outruns one cell a tick (#397)', () => {
+    // 60 * 60 / (1.5 * 1.12^40) = 25.7 sub-steps.
+    expect(subStepsPerTile(drillOf(drillPower(40), drillTip(0)), m('1'))).toBe(26)
   })
 
   it('rounds a cell up to its next sub-step, never to the next whole tick', () => {
@@ -129,33 +129,37 @@ describe('fractional drill time (ticket 330)', () => {
   })
 })
 
-// The VS amendment and the GD ruling on ticket 396: the 4-tick floor is a stopgap, never a design
-// value. #397 takes `minTicksPerTile` out of the drill law and deletes this block.
-describe('stopgap tile floor (ticket 396)', () => {
-  it('holds the floor at 4 ticks, 15 tiles/s (todo: removed by #397/#335)', () => {
-    expect(ECONOMY.drill.minTicksPerTile).toBe(4)
+// The TD lock on #397 (from the GD ruling and the VS amendment on ticket 396): no constant floor
+// in the drill law, so a strong enough drill cuts a cell in a single sub-step.
+describe('no tile floor (ticket 397)', () => {
+  // A sub-step is the law's quantum, so below 10 sub-steps a major may round to the same count.
+  it('cuts faster at every drill major down to 10 sub-steps a cell, then reaches one', () => {
+    const subSteps = Array.from({ length: 90 }, (_, level) => bandOneSubSteps(level))
+    const steps = subSteps.slice(1).map((after, level) => ({ before: subSteps[level], after }))
+    const slower = steps.filter(({ before, after }) => after > before)
+    const stalls = steps.filter(({ before, after }) => after === before && before >= 10)
+    expect(subSteps.at(-1)).toBe(1)
+    expect([...slower, ...stalls]).toEqual([])
   })
 
-  it.todo('cuts with no constant floor at any drill level (#397/#335 remove minTicksPerTile)')
-
-  // Planet 8 band rock under a capped drill: 60 * m * H^3 over 60 * H^3 at 40 digits landed a
-  // hair over m, so the cell read 5 ticks and 241 sub-steps.
-  it('breaks a capped cell in exactly the floor whatever its hardness', () => {
-    const strong = drillOf(m('1e10'), m('1e4'))
+  it("breaks a vast drill's cell in one tick and one sub-step whatever its hardness", () => {
+    const vast = drillOf(m('1e10'), m('1e4'))
     const hardnesses = [m('183.6661163355495043607009944010986059235'), m('1'), m('7.31')]
     for (const hardness of hardnesses) {
-      expect(ticksPerTile(strong, hardness)).toBe(ECONOMY.drill.minTicksPerTile)
-      expect(subStepsPerTile(strong, hardness)).toBe(
-        ECONOMY.drill.minTicksPerTile * DRILL_SUBSTEPS_PER_TICK,
-      )
+      expect(ticksPerTile(vast, hardness)).toBe(1)
+      expect(subStepsPerTile(vast, hardness)).toBe(1)
     }
   })
 })
 
+/** Sub-steps a band-1 cell of planet 1 (hardness 1) takes at a drill_power major. */
+function bandOneSubSteps(level: number): number {
+  return subStepsPerTile(drillOf(drillPower(level), drillTip(0)), m('1')) ?? 0
+}
+
 /** Band-1 cells a second on planet 1 (hardness 1, tip at least 1) at a drill_power major. */
 function bandOneCellsPerSecond(level: number): number {
-  const subSteps = subStepsPerTile(drillOf(drillPower(level), drillTip(0)), m('1')) ?? 0
-  return (DRILL_SUBSTEPS_PER_TICK * TICKS_PER_SECOND) / subSteps
+  return (DRILL_SUBSTEPS_PER_TICK * TICKS_PER_SECOND) / bandOneSubSteps(level)
 }
 
 // The GD ruling on ticket 396: "every level adds speed" is a ratio, each drill major worth 1.12x
@@ -177,6 +181,40 @@ describe('felt speed per drill level (ticket 396)', () => {
     expect(bandOneCellsPerSecond(0)).toBe(1.5)
     expect(bandOneCellsPerSecond(17)).toBeGreaterThanOrEqual(10)
   })
+})
+
+// The GD ruling on ticket 396 and the TD lock on #397: with the floor gone the ratio holds through
+// planet 10, judged on the law's sub-steps (ticket 431: the m/s read rounds to whole mm a tick).
+// Each planet is judged over the majors its player holds there, from the last planet's on-curve
+// drill to this one's plus the bot's lead, in every band at the planet's on-curve tip.
+describe('felt speed per drill level through planet 10 (ticket 397)', () => {
+  const PLANETS = Array.from({ length: 10 }, (_, index) => index + 1)
+  const BANDS = [1, 2, 3, 4, 5]
+  const BOT_LEAD_MAJORS = 5
+
+  it('makes each drill major 1.12x +-5% faster in every band of planets 1 to 10', () => {
+    const misses = PLANETS.flatMap((planet) =>
+      BANDS.flatMap((band) =>
+        majorsHeldOn(planet).filter((level) => !isWorth112On(planet, band, level)),
+      ),
+    )
+    expect(misses).toEqual([])
+  })
+
+  /** The majors from the last planet's on-curve drill to this planet's plus the bot's lead. */
+  function majorsHeldOn(planet: number): number[] {
+    const first = planet === 1 ? 0 : onCurveLevels(planet - 1).drill_power
+    const last = onCurveLevels(planet).drill_power + BOT_LEAD_MAJORS
+    return Array.from({ length: last - first }, (_, index) => first + index)
+  }
+
+  function isWorth112On(planet: number, band: number, level: number): boolean {
+    const tip = drillTip(onCurveLevels(planet).drill_tip)
+    const hardness = blockHardness(planet, band)
+    const before = subStepsPerTile(drillOf(drillPower(level), tip), hardness) ?? 0
+    const after = subStepsPerTile(drillOf(drillPower(level + 1), tip), hardness) ?? 0
+    return after > 0 && isWithinFivePercentOf112(before / after)
+  }
 })
 
 function isWithinFivePercentOf112(ratio: number): boolean {

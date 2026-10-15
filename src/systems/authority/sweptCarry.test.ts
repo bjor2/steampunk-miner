@@ -79,8 +79,12 @@ function cutDown(rig: Rig, cut: StepCut, { strideMm, ticks }: { strideMm: number
   return effects
 }
 
-/** A drill at the 4-tick floor on planet 1, a hold that never fills and a deep tank. */
-const FLOOR_RIG = { drill_power: 1000, drill_tip: 400, cargo_hold: 3000 }
+/**
+ * A drill at about the old 4-tick floor's speed on planet 1 (stored step 200, some 250 sub-steps a
+ * band-1 cell, since ticket 397 took the floor out of the law), a hold that never fills and a deep
+ * tank.
+ */
+const QUICK_RIG = { drill_power: 200, drill_tip: 400, cargo_hold: 3000 }
 
 /** The tick each of the column's cells broke, from the top cell down, relative to the first tick. */
 function brokenTicksOf(ticks: readonly RuleEffect[], cells: readonly TilePoint[]): number[] {
@@ -119,7 +123,7 @@ function pricesOf(state: AuthorityState, params: PlanetParams, cells: readonly T
 
 describe('drill carry through the authority (ticket 399)', () => {
   it('cuts a 100-cell column in exactly the sum of its cells drill times', () => {
-    const rig = rigInColumn(FLOOR_RIG, '100000000')
+    const rig = rigInColumn(QUICK_RIG, '100000000')
     const cells = columnCellsBelow(rig)
     const prices = pricesOf(rig.state, rig.params, cells)
     let total = 0
@@ -186,7 +190,7 @@ describe('drill carry through the authority (ticket 399)', () => {
   })
 
   it('drops the carry on the tick the tank empties, and cuts on that tick', () => {
-    const rig = rigInColumn(FLOOR_RIG, '10')
+    const rig = rigInColumn(QUICK_RIG, '10')
     const ticks = cutDown(rig, drillAlongStep, { strideMm: 40_000, ticks: 800 })
     const isDry = (state: AuthorityState) =>
       vehicleOf(state, 'p1').energy < ENERGY_QUANTA_PER_TICK.drill
