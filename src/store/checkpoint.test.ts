@@ -152,6 +152,7 @@ describe('checkpoint', () => {
     expect(linesNamed('save_migrated').map((line) => line.data)).toEqual([
       { version: 'snapshotVersion', from: 18, to: 19 },
       { version: 'snapshotVersion', from: 19, to: 20 },
+      { version: 'snapshotVersion', from: 20, to: 21 },
       { version: 'generatorVersion', from: 5, to: 6 },
       { version: 'generatorVersion', from: 6, to: 7 },
       { version: 'generatorVersion', from: 7, to: 8 },

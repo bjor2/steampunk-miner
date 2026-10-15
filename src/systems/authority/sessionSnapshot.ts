@@ -73,7 +73,8 @@ import {
 } from './vehicleSnapshot'
 
 /**
- * 20: the charge rack carries charges by size and a planted charge its size, planting tick and a
+ * 21: the swept cut's cursor carries its work toward the next cell, `carrySubSteps` (ticket 399;
+ * older saves reach it at 0 through `saveMigrations.ts`); 20: the charge rack carries charges by size and a planted charge its size, planting tick and a
  * fuse tick or null (K8 #218; older saves reach it through `saveMigrations.ts`); 19: each track's
  * level and the guns' level are steps `10L + k` (#180 section 3, #181), so an older save's levels
  * migrate x10 (`saveMigrations.ts`); 18: the live blasts, each with its front cursor and running
@@ -90,7 +91,7 @@ import {
  * vehicle's casing grade (#41, #58); 5: combat joined the state (#25); 4 the planet's core
  * progress (#24); 3 the platform (#23).
  */
-export const SNAPSHOT_VERSION = 20
+export const SNAPSHOT_VERSION = 21
 
 export interface SessionSnapshot {
   snapshotVersion: number
