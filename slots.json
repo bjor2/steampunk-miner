@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-10-15T12:15:55+02:00",
+  "updated_at": "2026-10-15T12:31:36+02:00",
   "caps": {
     "grok": 12,
     "claude": 10,
@@ -27,11 +27,11 @@
         },
         {
           "slot": "C2",
-          "state": "busy",
-          "ticket": 411,
-          "grok_slot": 2,
-          "kind": "dev",
-          "since": "2026-10-15T12:07:00+02:00"
+          "state": "free",
+          "ticket": null,
+          "grok_slot": null,
+          "kind": null,
+          "since": null
         },
         {
           "slot": "C3",
@@ -67,9 +67,9 @@
         }
       ],
       "size": 6,
-      "used": 2,
-      "free": 4,
-      "claims_last_hour": 5,
+      "used": 1,
+      "free": 5,
+      "claims_last_hour": 3,
       "name": "Claude Max 1"
     },
     {
@@ -428,24 +428,6 @@
         "since": "2026-10-15T01:01:21+02:00"
       },
       {
-        "feature": 161,
-        "kind": "spec",
-        "title": "Spec: Deep tech tree: structure, costs and endless depth",
-        "tickets": [
-          249,
-          251,
-          254,
-          295,
-          370,
-          371,
-          384,
-          385,
-          408,
-          411
-        ],
-        "since": "2026-10-15T01:19:17+02:00"
-      },
-      {
         "feature": 255,
         "kind": "spec",
         "title": "Grilling: Lane forks (two specialisations per lane at P16)",
@@ -462,6 +444,24 @@
           410
         ],
         "since": "2026-10-15T11:03:13+02:00"
+      },
+      {
+        "feature": 161,
+        "kind": "spec",
+        "title": "Spec: Deep tech tree: structure, costs and endless depth",
+        "tickets": [
+          249,
+          251,
+          254,
+          295,
+          370,
+          371,
+          384,
+          385,
+          408,
+          411
+        ],
+        "since": "2026-10-15T12:27:02+02:00"
       },
       {
         "feature": 157,
@@ -574,7 +574,7 @@
           410,
           411
         ],
-        "since": "2026-10-15T11:03:13+02:00"
+        "since": "2026-10-15T12:27:02+02:00"
       }
     ]
   },
@@ -588,19 +588,15 @@
     },
     {
       "slot": 2,
-      "state": "dev",
-      "ticket": 411,
-      "since": "2026-10-15T12:07:00+02:00",
-      "claude_slot": 2
+      "state": "free",
+      "ticket": null,
+      "since": null
     },
     {
       "slot": 3,
-      "state": "planner",
-      "ticket": 416,
-      "since": "2026-10-15T11:38:44+02:00",
-      "map": null,
-      "room": "9cc76e78-1e10-4130-8b0e-0865bac3f7a8",
-      "adopted": false
+      "state": "free",
+      "ticket": null,
+      "since": null
     },
     {
       "slot": 4,
@@ -668,10 +664,10 @@
     },
     {
       "slot": 2,
-      "state": "busy",
-      "ticket": 411,
-      "grok_slot": 2,
-      "since": "2026-10-15T12:07:00+02:00",
+      "state": "free",
+      "ticket": null,
+      "grok_slot": null,
+      "since": null,
       "account": 1
     },
     {
@@ -744,26 +740,26 @@
     }
   ],
   "last_refill": {
-    "at": "2026-10-15 12:07 CEST",
+    "at": "2026-10-15 12:31 CEST",
     "mode": "refill-dev",
-    "triggers": "claude-run:tester-triage",
-    "started": "#396->C1/A1 #411->C2/A1",
-    "note": "spawned 2 worker(s)"
+    "triggers": "#411",
+    "started": "",
+    "note": "no pickable build ticket"
   },
   "totals": {
     "grok": {
       "size": 12,
-      "used": 3,
-      "dev": 2,
+      "used": 1,
+      "dev": 1,
       "dev_cap": 8,
-      "planner": 1,
+      "planner": 0,
       "planner_cap": 4
     },
     "claude": {
       "size": 10,
       "enabled": 6,
-      "used": 2,
-      "free": 4,
+      "used": 1,
+      "free": 5,
       "external": 0
     }
   }
