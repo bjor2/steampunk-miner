@@ -111,15 +111,14 @@ describe('swept span per chunk against the per-cell carve (ticket 374)', () => {
     expect(events.some((event) => event.type === 'DrillGated')).toBe(true)
   })
 
-  // The cache sits in a 3x3 of plain ground (#46), so a 100 m/s tick never reaches from where the
-  // cache breaks to the nearest ore. At the 4-tick floor (ticket 396) the cache breaks a tick
-  // sooner: 270 m/s (4.5 m a tick) is the slowest that still reaches the ore in that tick here.
-  it('cuts the same bytes crossing the cache and a gate in one tick at 300 m/s', () => {
-    const reference = expectSpanMatchesPerCell(cacheSweep(300))
-    const isCacheAndGate = ({ events }: TickRecord) =>
-      events.some((event) => isDestroyedAt(event, CACHE)) &&
-      events.some((event) => event.type === 'DrillGated')
-    expect(reference.some(isCacheAndGate)).toBe(true)
+  // The cache sits in a 3x3 of plain ground (#46). Since ticket 399 a tick's work pays about half
+  // a softened cell at the 4-tick floor, so the cache and the gate fall in different ticks; one
+  // tick crossing both waits for the floor to leave the drill law (#397).
+  it('cuts the same bytes crossing the cache and up to a gate at 300 m/s', () => {
+    const events = eventsOf(expectSpanMatchesPerCell(cacheSweep(300)))
+    const brokenAt = events.findIndex((event) => isDestroyedAt(event, CACHE))
+    expect(brokenAt).toBeGreaterThan(-1)
+    expect(events.slice(brokenAt).some((event) => event.type === 'DrillGated')).toBe(true)
   })
 
   it('cuts the same bytes through a gate, a hazard and a full hold mid-span at 100 m/s', () => {

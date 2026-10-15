@@ -1,9 +1,9 @@
 /**
- * A `drillStep`'s cut at any speed (TD scope b on #316, ticket 335): the whole clear sweep every
- * tick, walked per cell while it fits the player's per-cell share (`cutShare.ts`) and as the swept
- * span per chunk once it goes over (`sweptSpanDrill.ts`, ticket 374). The two walks cut the same
- * bytes, so the budget never slows the cut or the motion that waits on it: motion stops only where
- * the sweep stops, at a gated or tip-locked cell.
+ * A `drillStep`'s cut at any speed (TD scope b on #316, ticket 335): the sweep as far as its work
+ * reaches (the exact carry, ticket 399), walked per cell while it fits the player's per-cell share
+ * (`cutShare.ts`) and in runs and as the swept span per chunk once it goes over
+ * (`sweptSpanDrill.ts`, ticket 374). The walks cut the same bytes, so the budget never slows the
+ * cut or the motion that waits on it: the work picks how far, the budget never does.
  *
  * It also generates the chunk one chunk ahead of the cut along the drive (TD scope b item 6), so
  * the tick the cut enters it does not pay its generation on top of the cut. Generation is pure and
@@ -19,8 +19,9 @@ import { walkStampPerChunk } from '../world/sweptSpan'
 import { generatedChunkOf } from '../world/worldState'
 import { vehicleOf, type AuthorityState } from './authorityState'
 import type { RuleEffect } from './commandRule'
+import { walkCarryInRuns, walkCarryPerCell } from '../vehicle/carryWalk'
 import { isWithinShare } from './cutShare'
-import { drillSweepBy, type ClearSweepWalk, type SweptStep } from './sweptDrill'
+import { drillSweepBy, type SweepWalks, type SweptStep } from './sweptDrill'
 
 /** One `drillStep` tick of the swept cut at `state.tick`; call with a planet that has params. */
 export function drillAlongStep(
@@ -30,14 +31,21 @@ export function drillAlongStep(
   target: TilePoint,
   step: SweptStep,
 ): RuleEffect {
-  const effect = drillSweepBy(state, params, playerId, { target, step }, walkWithinShare).effect
+  const effect = drillSweepBy(state, params, playerId, { target, step }, WITHIN_SHARE).effect
   prefetchChunkAhead(params, step.pose, vehicleOf(effect.state, playerId).sweptCut)
   return effect
 }
 
-/** The per-cell walk within the player's share, the span over it. */
-export const walkWithinShare: ClearSweepWalk = ({ sweep, cells }) =>
-  isWithinShare(cells, sweep.share) ? walkStampInRows : walkStampPerChunk
+/**
+ * The per-cell walks within the player's share, runs and the span over it: the carry by the path's
+ * sub-steps (an upper bound on the cells its centre crosses), the stamp by the cells it touches.
+ */
+export const WITHIN_SHARE: SweepWalks = {
+  carryOf: ({ path, share }) =>
+    isWithinShare(path.steps, share) ? walkCarryPerCell : walkCarryInRuns,
+  stampOf: ({ sweep, cells }) =>
+    isWithinShare(cells, sweep.share) ? walkStampInRows : walkStampPerChunk,
+}
 
 /** Generates the chunk a chunk's length ahead of where the cut reached, along the facing. */
 function prefetchChunkAhead(

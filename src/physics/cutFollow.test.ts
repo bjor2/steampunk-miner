@@ -140,11 +140,16 @@ describe('cut-follow in the live loop (ticket 333)', () => {
     120_000,
   )
 
+  // Since ticket 399 the cut reaches only as far as its work pays for, so the face stands nearer
+  // the body and the rig settles against it with a bump after it stops; the drive's own stop is
+  // the pin here, and holding the body to the cut is K-bound's (#400).
   it('stops within 6 ticks of the drive letting go in a level cut', () => {
     const run = playScript(RIGS[2])
     expect(run.level.at(-1)?.result.isCutting).toBe(true)
-    const stopped = run.release[CUT_FOLLOW_TICKS].result.pose
-    expect(alongSpeedOf(stopped)).toBeLessThan(0.05)
+    const ramp = run.release.slice(1, CUT_FOLLOW_TICKS + 1)
+    expect(Math.min(...ramp.map(({ result }) => alongSpeedOf(result.pose)))).toBeLessThan(0.05)
+    const after = run.release.slice(CUT_FOLLOW_TICKS)
+    expect(after.every(({ result }) => !result.isCutting)).toBe(true)
   }, 120_000)
 
   it('never drives back through its own tunnel faster than travel parity allows', () => {

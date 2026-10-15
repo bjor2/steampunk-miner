@@ -20,8 +20,14 @@ import { drillAlongSpan } from './sweptSpanDrill'
 // sweeps run at 18, 100 and 1,000 m/s, past what any stats bound allows today, so the spec drives
 // the sweep (`drillAlongSweep`) directly, one tick at a time, rather than through `drillStep`. The
 // swept span (ticket 374) checks every crossed cell the same way, so it runs the same sweeps.
+//
+// Since ticket 399 the work picks how far a tick cuts, so the pose runs ahead of the cut and then
+// rests while the cut catches up; a gated or tip-locked cell stops the carry dead, with nothing
+// carried, at 18, 60 and 300 m/s and far above.
 
-const SPEEDS_M_PER_S = [18, 100, 1000]
+const SPEEDS_M_PER_S = [18, 60, 100, 300, 1000]
+/** Ticks the pose rests at the sweep's end: time for a floor-speed drill to cut 30 m. */
+const REST_TICKS = 130
 
 type SweepCut = (
   state: AuthorityState,
@@ -69,14 +75,21 @@ const DESCENT_MM = 30_000
 /** The rig reported at `ABOVE` facing down, then swept down at `speed` m/s, a tick at a time. */
 function sweepDownAt(cut: SweepCut, speed: number): AuthorityState {
   const session = createScriptedSession()
-  session.submit(0, { type: 'debug.setEnergy', payload: { energy: '150' } })
+  // A drill at the 4-tick floor on band 1 (ticket 396), with a tank for the whole descent.
+  session.submit(0, {
+    type: 'debug.setUpgrade',
+    payload: { upgradeId: 'drill_power', level: 1000 },
+  })
+  session.submit(0, { type: 'debug.setEnergy', payload: { energy: '100000' } })
   const { payload } = poseAbove({ tx: 0, ty: 0 }, FACING.down)
   session.submit(0, { type: 'reportPose', payload: { ...payload, ...ABOVE } })
   const stepMm = Math.round((speed * MM_PER_METRE) / TICKS_PER_SECOND)
   // The first step rests at the start, so every later one continues its cursor's sweep.
   let state = sweepOneTick(cut, { ...session.state(), tick: 1 }, ABOVE.y)
-  for (let moved = 1; moved * stepMm <= DESCENT_MM; moved++) {
-    state = sweepOneTick(cut, { ...state, tick: 1 + moved }, ABOVE.y - stepMm * moved)
+  const moves = Math.floor(DESCENT_MM / stepMm)
+  for (let moved = 1; moved <= moves + REST_TICKS; moved++) {
+    const y = ABOVE.y - stepMm * Math.min(moved, moves)
+    state = sweepOneTick(cut, { ...state, tick: 1 + moved }, y)
   }
   return state
 }
@@ -96,6 +109,8 @@ describe.each(CUTS)('swept cut gates at any speed through %s (tickets 334, 374)'
       expect(cellDensitySum(state.world, PARAMS, BELOW)).toBe(untouched(BELOW))
       const cursor = vehicleOf(state, 'p1').sweptCut
       expect(cursor?.yMm).toBeGreaterThanOrEqual((GATED.ty + 1) * 1000)
+      expect(cursor?.yMm).toBeLessThan((GATED.ty + 1) * 1000 + 125)
+      expect(cursor?.carrySubSteps).toBe(0)
     })
   })
 

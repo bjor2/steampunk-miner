@@ -1,6 +1,6 @@
 import RAPIER from '@dimforge/rapier3d-compat'
 import { beforeAll, describe, expect, it, vi } from 'vitest'
-import { MAX_SPEED_MM_PER_SECOND } from '../constants/balance'
+import { CUT_FOLLOW_TICKS, MAX_SPEED_MM_PER_SECOND } from '../constants/balance'
 import { MM_PER_METRE, PHYSICS_TIMESTEP, UP_VECTOR_SCALE } from '../constants/physics'
 import { createMemorySink } from '../logging/eventSink'
 import { ECONOMY } from '../systems/economy/economy'
@@ -30,9 +30,16 @@ const NEAR_BOUND = 0.98
 const MAX_WAIT_TICKS = 12
 
 /**
+ * Since ticket 399 a cell costs its whole drill time and the cut reaches only as far as its work
+ * pays for, so at a boundary the wheels may wait out one cell at the floor and the cut-follow's
+ * ramp; holding the body to the cut is K-bound's (#400).
+ */
+const maxWaitTicksAt = (floor: number) => Math.max(MAX_WAIT_TICKS, floor + CUT_FOLLOW_TICKS)
+
+/**
  * What held the body back on a drilling tick (TD ruling on #330, VS pin 2): the sweep stopping short
- * of the stamp (since ticket 335 the per-cell budget never does, so only a gated or tip-locked cell
- * can, and nothing on P1 refuses this drill), the pose bound (the 18 m/s clamp, the stats-derived bound swept, or a refused step), the engine's top speed along the
+ * of the stamp (the per-cell budget never does, ticket 335, but since ticket 399 the work does: the
+ * cut reaches as far as its work pays for, so this counts the cut front), the pose bound (the 18 m/s clamp, the stats-derived bound swept, or a refused step), the engine's top speed along the
  * ground, the wheels waiting on ground in a level cut's way, else the cut front itself. A tick the
  * drill does not bite (the body falling or rolling through ground already cut) is `undrilled`.
  */
@@ -202,9 +209,11 @@ beforeAll(async () => {
 })
 
 describe('swept cut in the live loop (ticket 330)', () => {
-  // The gate is that the cut keeps up: it digs faster than the 5 Hz per-report cut, never holds
-  // the wheels past a report interval and reaches the stamp every tick (ticket 335). The rates and each leg's limiter counts are logged for #316's
-  // break order and the #304/#307 re-baseline.
+  // The gate is that the cut keeps up: it digs faster than the 5 Hz per-report cut and never holds
+  // the wheels past a report interval or one cell at the floor. Since ticket 399 the work picks how
+  // far each tick cuts, so the sweep may stop short of the stamp (TD ruling on #399 amending 335).
+  // The rates and each leg's limiter counts are logged for #316's break order and the #304/#307
+  // re-baseline.
   it.each([24, 12, 8, 4])(
     'digs faster than the per-report cut and never stalls at the %i-tick floor',
     async (floor) => {
@@ -213,11 +222,8 @@ describe('swept cut in the live loop (ticket 330)', () => {
       console.log(`swept cut, ${floor}-tick floor: ${JSON.stringify({ swept, reported })}`)
       expect(swept.down.rate).toBeGreaterThan(reported.down.rate)
       expect(swept.level.rate).toBeGreaterThan(reported.level.rate)
-      expect(swept.level.longestWaitTicks).toBeLessThanOrEqual(MAX_WAIT_TICKS)
-      expect(swept.down.longestWaitTicks).toBeLessThanOrEqual(MAX_WAIT_TICKS)
-      // Ticket 335: the authority's cut is complete every tick; the budget never stops a sweep.
-      expect(swept.level.limiters.short).toBe(0)
-      expect(swept.down.limiters.short).toBe(0)
+      expect(swept.level.longestWaitTicks).toBeLessThanOrEqual(maxWaitTicksAt(floor))
+      expect(swept.down.longestWaitTicks).toBeLessThanOrEqual(maxWaitTicksAt(floor))
     },
     180_000,
   )

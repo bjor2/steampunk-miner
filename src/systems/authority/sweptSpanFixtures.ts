@@ -1,7 +1,8 @@
 /**
  * The swept span's reference fixtures (ticket 374): sweeps a tick at a time through ground
- * softened to just over its yield, so cells at the tile dig floor break in the one tick a fast
- * stamp spends on them, run through either carve from the same start. Only specs use them.
+ * softened to just over its yield, run through either carve from the same start. Only specs use
+ * them. Since ticket 399 the cut reaches only as far as its work pays for, about half a softened
+ * cell a tick at the tile dig floor, so a fixture's pose rests at its end while the cut catches up.
  */
 import { MM_PER_METRE, TICKS_PER_SECOND } from '../../constants/physics'
 import type { SliceDefinition } from '../../registries/sliceDefinition'
@@ -161,9 +162,12 @@ export function chunkCornerSweep(speed: number): SweepFixture {
   }
 }
 
+/** Ticks a fixture's pose rests at its end: time for the cut to cross about 30 softened cells. */
+const CATCH_UP_TICKS = 90
+
 /**
  * Planet 1 straight down column 30, 30 m through softened ground about 40 tiles under the surface
- * (ticket 335: the same path at any speed).
+ * (ticket 335: the same path at any speed), then resting while the cut catches up.
  */
 export function columnSweep(speed: number): SweepFixture {
   const from = { x: 30_500, y: 261_500 }
@@ -172,7 +176,7 @@ export function columnSweep(speed: number): SweepFixture {
     start: () => armed(createScriptedSession(), from, FACING.down, { x: 30_500, y: 246_000 }),
     params: PARAMS,
     slices: [],
-    positions: positionsAlong(from, to, speed),
+    positions: positionsAlong(from, to, speed, CATCH_UP_TICKS),
   }
 }
 
@@ -195,7 +199,10 @@ export const CACHE = artefactCacheTile(CACHE_PARAMS)
 /** Every ore cell near the cache refuses the drill. */
 export const CACHE_GATES = oreTilesAround(CACHE_PARAMS, CACHE, 6)
 
-/** Left along the cache's row into the gated ore beyond it, starting 4.6 m right of it. */
+/**
+ * Left along the cache's row into the gated ore beyond it, starting 4.6 m right of it, then resting
+ * while the cut catches up.
+ */
 export function cacheSweep(speed: number): SweepFixture {
   const from = { x: centreOf(CACHE).x + 4_600, y: centreOf(CACHE).y }
   const to = { x: centreOf(CACHE).x - 6_000, y: centreOf(CACHE).y }
@@ -208,7 +215,7 @@ export function cacheSweep(speed: number): SweepFixture {
     start,
     params: CACHE_PARAMS,
     slices: [probeSliceOf(CACHE_GATES)],
-    positions: positionsAlong(from, to, speed),
+    positions: positionsAlong(from, to, speed, CATCH_UP_TICKS),
   }
 }
 
@@ -254,7 +261,7 @@ export function fullHoldSweep(speed: number): SweepFixture {
   return { start, params: PARAMS, slices: [slice], positions: positionsAlong(from, to, speed, 40) }
 }
 
-/** Up through planet 8's lava pocket floor and the cave beyond it. */
+/** Up through planet 8's lava pocket floor and the cave beyond it, then resting there. */
 export function lavaSweep(speed: number): SweepFixture {
   const from = { x: centreOf(FLOOR).x, y: 294_500 }
   const to = { x: centreOf(FLOOR).x, y: 306_000 }
@@ -262,7 +269,7 @@ export function lavaSweep(speed: number): SweepFixture {
     start: () => armed(onHeatPlanet(), from, FACING.up, centreOf(FLOOR)),
     params: HEAT_PARAMS,
     slices: [],
-    positions: positionsAlong(from, to, speed),
+    positions: positionsAlong(from, to, speed, CATCH_UP_TICKS),
   }
 }
 

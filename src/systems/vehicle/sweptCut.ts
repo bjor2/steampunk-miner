@@ -7,9 +7,10 @@
  *   same facing. Otherwise it is fresh: its path runs from the body (the stamp pulled back along
  *   the facing by as far as it sits ahead) to the stamp, and it cuts a bare disc where it stops:
  *   with nothing in the way, a report's disc one cutting step further ahead (tickets 333, 334).
- * - The stamp's centre is walked along the path, and the sweep stops at the last sub-step before
- *   the centre would enter a cell the drill cannot cut (a gate that refuses or blocks it, or one
- *   past its scratch floor). Cells are 1 m and the stamp's radius 0.95 m, so a centre that never
+ * - The stamp's centre is walked along the path (`carryWalk.ts`, ticket 399), and the sweep stops at
+ *   the last sub-step before the centre would enter a cell the drill cannot cut (a gate that
+ *   refuses or blocks it, or one past its scratch floor), or one its work cannot pay for yet.
+ *   Cells are 1 m and the stamp's radius 0.95 m, so a centre that never
  *   enters such a cell never reaches the cells behind it: a fast tick never cuts past one, while
  *   the stamp still cuts every other cell up to its face. A fresh path whose body point is already
  *   in such a cell cuts nothing.
@@ -28,8 +29,10 @@ export const SWEEP_STEP_MM = 125
  * The vehicle's cursor: where the last drill step's cut reached (the next step's start), the
  * position that step reported (the next step's bound is measured from it), its facing and tick,
  * the cut gate as that step left it (ticket 333), what it left of its per-cell share for the
- * next player that tick (ticket 335, `cutShare.ts`), and the dig time the steps since the last
- * charged report cut, in sub-steps, which that report heats from (ticket 335).
+ * next player that tick (ticket 335, `cutShare.ts`), the dig time the steps since the last
+ * charged report cut, in sub-steps, which that report heats from (ticket 335), and the work the
+ * step carries toward its next cell, in sub-steps (ticket 399, `carryWalk.ts`), which only a step
+ * continuing the cursor spends.
  */
 export interface SweptCut extends StampPoint, CutGate {
   poseXMm: number
@@ -38,6 +41,7 @@ export interface SweptCut extends StampPoint, CutGate {
   tick: number
   cutSharePassed: number
   digSubSteps: number
+  carrySubSteps: number
 }
 
 /**
@@ -121,18 +125,6 @@ export function pointAtStep(path: SweepPath, step: number): StampPoint {
 export function centreTileAtStep(path: SweepPath, step: number): TilePoint {
   const centre = pointAtStep(path, step)
   return tileOfMillimetres(centre.xMm, centre.yMm)
-}
-
-/**
- * The last sub-step the sweep may reach before its centre enters a stopping cell, or -1 when a
- * fresh path starts in one. A continuing path's own start was walked by the step before.
- */
-export function lastClearStep(path: SweepPath, isStopTile: (tile: TilePoint) => boolean): number {
-  if (path.isFresh && isStopTile(centreTileAtStep(path, 0))) return -1
-  for (let step = 1; step <= path.steps; step++) {
-    if (isStopTile(centreTileAtStep(path, step))) return step - 1
-  }
-  return path.steps
 }
 
 /** The stamp the step cuts reaching `step`: a capsule from the cursor, or a fresh bare disc. */

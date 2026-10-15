@@ -1,12 +1,13 @@
 /**
  * The per-cell cut budget at any speed (TD scope b on #316, as the Producer rewrote it on 8 Oct;
- * ticket 335). The budget picks how a tick is cut, never how far: it never slows motion.
+ * ticket 335). The budget picks how a tick is cut, never how far: it never slows motion. How far
+ * is the work's (the exact carry, ticket 399, the TD ruling on #399 amending this line).
  *
  * - **Per-cell path budget**: a drill step whose stamp and gear touch at most its share of
  *   `DRILL_CELLS_PER_TICK` density cells (about 2 ms, `terrainBudget.ts`) is cut by the per-cell
  *   walk; one over it switches to the swept span (`sweptSpanDrill.ts`, ticket 374) instead of
- *   carrying the rest. Either walk cuts the whole clear sweep, the same bytes, so the authority's
- *   result is complete every tick. Raise the budget past 32 only after re-measuring it on the
+ *   carrying the rest. Either walk cuts the sweep as far as its work reaches, the same bytes, so
+ *   the authority's result is complete every tick. Raise the budget past 32 only after re-measuring it on the
  *   reference machine.
  * - **Co-op share**, round-robin per player in player-id order: each is guaranteed
  *   `floor(budget / players)` (the first player also the remainder), and a player who stepped this

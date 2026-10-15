@@ -52,5 +52,12 @@ export function sweptColumnAt(strideMm: number, pathMetres: number): SweptColumn
 
 function cursorAt(reached: StampPoint, pose: VehiclePose, tick: number): SweptCut {
   const step = { poseXMm: pose.x, poseYMm: pose.y, facing: pose.facing, tick }
-  return { ...reached, ...step, ...CLOSED_CUT_GATE, cutSharePassed: 0, digSubSteps: 0 }
+  return {
+    ...reached,
+    ...step,
+    ...CLOSED_CUT_GATE,
+    cutSharePassed: 0,
+    digSubSteps: 0,
+    carrySubSteps: 0,
+  }
 }

@@ -156,23 +156,29 @@ describe('drill carry (ticket 399)', () => {
     })
 
     it('banks what is left at the pose toward the next cell, short of its price', () => {
-      const ground = columnGround((ty) => (ty === 97 ? rock(40) : rock(5)))
-      const beyond = { tx: 0, ty: 97 }
+      const ground = columnGround(() => rock(5))
+      const beyond = { tile: { tx: 0, ty: 97 }, price: 40 }
       const reach = walk({ path: pathDown(TOP_Y, 98_500), beyond }, plenty(Q), ground)
       expect(reach.paid).toHaveLength(2)
       expect(reach.carrySubSteps).toBe(39)
-      expect(reach.target).toEqual(beyond)
+      expect(reach.target).toEqual(beyond.tile)
     })
 
     it('banks nothing toward open ground past the pose', () => {
-      const ground = columnGround((ty) => (ty === 97 ? OPEN : rock(5)))
+      const ground = columnGround(() => rock(5))
       const reach = walk(
-        { path: pathDown(TOP_Y, 98_500), beyond: { tx: 0, ty: 97 } },
+        { path: pathDown(TOP_Y, 98_500), beyond: { tile: { tx: 0, ty: 97 }, price: 0 } },
         plenty(Q),
         ground,
       )
       expect(reach.carrySubSteps).toBe(0)
       expect(reach.target).toBeNull()
+    })
+
+    it('reaches nothing on a fresh path that starts in a hard stop, carrying nothing', () => {
+      const ground = columnGround(() => rock(5), [100])
+      const reach = walk({ path: pathDown(TOP_Y, 95_000, true), beyond: null }, plenty(Q), ground)
+      expect(reach).toEqual({ reachedStep: -1, carrySubSteps: 0, paid: [], target: null })
     })
 
     it('reaches nothing on a fresh path whose start it cannot pay, carrying its work', () => {
@@ -182,6 +188,20 @@ describe('drill carry (ticket 399)', () => {
       expect(reach.carrySubSteps).toBe(Q)
       expect(reach.target).toEqual({ tx: 0, ty: 100 })
     })
+  })
+
+  it('asks the ground about the same cells in runs as per cell, none past where it stops', () => {
+    const askedBy = (walk: CarryWalk) => {
+      const asked: number[] = []
+      const ground: CarryGround = {
+        isStop: ({ ty }) => (asked.push(ty), ty === 80),
+        cellAt: () => rock(9),
+      }
+      walk({ path: pathDown(TOP_Y, 70_500), beyond: null }, plenty(Q), ground)
+      return asked
+    }
+    expect(askedBy(walkCarryInRuns)).toEqual(askedBy(walkCarryPerCell))
+    expect(Math.min(...askedBy(walkCarryInRuns))).toBe(93)
   })
 
   it('pays in runs exactly what it pays per cell, over mixed ground and purses', () => {
@@ -201,7 +221,8 @@ describe('drill carry (ticket 399)', () => {
         [40 + (seed % 50)],
       )
       const purse = { subSteps: 20 + ((seed * 37) % 400), tank: 3 + (seed % 60), room: seed % 7 }
-      const sweep = { path: pathDown(TOP_Y, 40_500 + seed * 10), beyond: { tx: 0, ty: 39 } }
+      const beyond = { tile: { tx: 0, ty: 39 }, price: seed % 90 }
+      const sweep = { path: pathDown(TOP_Y, 40_500 + seed * 10), beyond }
       expect(walkCarryInRuns(sweep, purse, ground)).toEqual(walkCarryPerCell(sweep, purse, ground))
     }
   })

@@ -15,7 +15,9 @@
  *   carry drops to 0, so no burst follows. The hold and the tank are counted per cell as the walk
  *   pays, never once a tick.
  * - **A walk that reaches the stamp at the pose** banks its leftover toward the next cell along the
- *   facing, never as much as that cell's price, and nothing toward open ground or a stop.
+ *   facing, never as much as that cell's price, and nothing toward open ground or a stop. That
+ *   cell comes priced with the sweep, never asked of the ground: asking a gate reports it, and a
+ *   gated one discards the carry the tick the walk meets it.
  * - **Run-length batches**: a run of crossed cells alike in price, energy and kind, none ending the
  *   walk, is paid in one closed-form step (`k` cells cost `k * price`); the per-cell walk is the
  *   reference the batches must equal.
@@ -60,10 +62,16 @@ export interface CarryReach {
   target: TilePoint | null
 }
 
-/** The sweep a tick walks: its path, and the cell past the path's end along the facing. */
+/** The cell past the path's end along the facing, and its price; 0 for open ground or a stop. */
+export interface BeyondCell {
+  tile: TilePoint
+  price: number
+}
+
+/** The sweep a tick walks: its path, and the cell past the path's end. */
 export interface CarrySweep {
   path: SweepPath
-  beyond: TilePoint | null
+  beyond: BeyondCell | null
 }
 
 /** A walk of a tick's crossed cells. */
@@ -102,6 +110,8 @@ function walkCarry(
   for (let step = firstStepOf(path); step <= path.steps; step++) {
     const tile = centreTileAtStep(path, step)
     if (step > 0 && isSameTile(tile, centreTileAtStep(path, step - 1))) continue
+    const spent = endOfSpentRun(ledger, run)
+    if (spent !== null) return spent
     if (ground.isStop(tile)) return payRunThenStop(ledger, run, step)
     const crossing = { tile, step, cell: crossedCellOf(ledger, ground, tile) }
     if (isOpenCrossing(crossing)) continue
@@ -112,7 +122,7 @@ function walkCarry(
     }
     run.push(crossing)
   }
-  return payRun(ledger, run) ?? reachOfPathEnd(ledger, path, { tile: beyond, ground })
+  return payRun(ledger, run) ?? reachOfPathEnd(ledger, path, beyond)
 }
 
 /** Open ground the walk passes for free, never in a run. */
@@ -152,6 +162,18 @@ function isAlike(a: CarryCell, b: CarryCell): boolean {
     a.energy === b.energy &&
     a.isOre === b.isOre
   )
+}
+
+/**
+ * The walk's end inside a run the purse cannot pay in full, before the next cell is asked about:
+ * the ground is never asked about a cell past where the work stops, as the per-cell walk never is
+ * (asking a gate reports it).
+ */
+function endOfSpentRun(ledger: CarryLedger, run: readonly Crossing[]): CarryReach | null {
+  if (run.length === 0) return null
+  const [first] = run
+  const unended = first.cell.isCarryEnd ? 0 : unendedCellsOf(first.cell, ledger.purse, run.length)
+  return unended < run.length ? payRun(ledger, run) : null
 }
 
 /** The run so far is paid, then the walk stops before the hard stop at `step`, carrying nothing. */
@@ -214,25 +236,18 @@ function isWalkEndingAt(cell: CarryCell, purse: CarryPurse): boolean {
   return cell.isCarryEnd || cell.energy >= purse.tank || (cell.isOre && purse.room === 0)
 }
 
-/** The cell past the path's end, if any, read on the walk's ground. */
-interface BeyondCell {
-  tile: TilePoint | null
-  ground: CarryGround
-}
-
 /**
  * The walk reached the stamp at the pose: its leftover works toward the cell past it along the
- * facing, short of that cell's price; open ground or a stop takes nothing.
+ * facing, short of that cell's price; open ground, a stop or a cell this tick paid takes nothing.
  */
-function reachOfPathEnd(ledger: CarryLedger, path: SweepPath, beyond: BeyondCell): CarryReach {
-  const price = bankablePriceOf(ledger, beyond)
-  if (beyond.tile === null || price === 0) return reachOf(ledger, path.steps, 0, null)
+function reachOfPathEnd(
+  ledger: CarryLedger,
+  path: SweepPath,
+  beyond: BeyondCell | null,
+): CarryReach {
+  const price = beyond === null || ledger.paidKeys.has(keyOf(beyond.tile)) ? 0 : beyond.price
+  if (beyond === null || price === 0) return reachOf(ledger, path.steps, 0, null)
   return reachOf(ledger, path.steps, Math.min(ledger.purse.subSteps, price - 1), beyond.tile)
-}
-
-function bankablePriceOf(ledger: CarryLedger, { tile, ground }: BeyondCell): number {
-  if (tile === null || ground.isStop(tile)) return 0
-  return crossedCellOf(ledger, ground, tile).price
 }
 
 function reachOf(

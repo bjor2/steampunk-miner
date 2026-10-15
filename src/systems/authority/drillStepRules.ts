@@ -10,8 +10,8 @@
  *   step in one tick (`too_many_ticks`), or a step further from the last accepted position (the
  *   last step's, or else the report's) than the rig's stats allow in the ticks since it
  *   (`invalid_pose`, the stats-derived bound of ticket 334, `stepBoundRead.ts`).
- * - It cuts the whole clear sweep, by the per-cell walk or the span as the per-cell budget picks
- *   (`drillStepCut.ts`, ticket 335). Energy is the drill's for the tick it cut; burrowers in the
+ * - It cuts the sweep as far as its work reaches (the exact carry, ticket 399), by the per-cell
+ *   walks or by runs and the span as the per-cell budget picks (`drillStepCut.ts`, ticket 335). Energy is the drill's for the tick it cut; burrowers in the
  *   nose's tile are cut as by a report.
  * - The collapse watch does not run after it (`applyCommand.ts`): it stays on `reportPose`, so it
  *   lags a step by at most one report interval, well inside a block's 60-tick warning.

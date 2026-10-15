@@ -29,7 +29,8 @@ import { columnSweep, sweepWith } from './sweptSpanFixtures'
 // The cut budget at any speed (ticket 335, TD scope b on #316 and the TD lock on #374): the same
 // path cut at 1, 4 and 16 m a tick (60, 240 and 960 m/s) opens the same cells per metre, charges
 // the same energy per cell, and lays its rings half a metre apart; the report after the steps heats
-// for their summed dig time.
+// for their summed dig time. Since ticket 399 the work picks how far each tick cuts, so a pose
+// running ahead of it never makes the cut go further; the pose rests at the end while it catches up.
 //
 // Today's drill takes at least 4 ticks a cell (ticket 396's stopgap floor), so no drill moves 16 m a tick: the
 // authority runs here cut ground softened to just over its yield, where a sample's dwell under the
@@ -82,17 +83,19 @@ describe('swept cut at any speed (ticket 335)', () => {
     }
   })
 
-  it('cuts every tick to the stamp, however long the step', () => {
-    for (const run of runs) {
-      const cursors = run.ticks.map(({ state }) => vehicleOf(state, 'p1').sweptCut)
-      expect(cursors.every((cursor, index) => cursor?.tick === run.start.tick + 1 + index)).toBe(
-        true,
-      )
-    }
-    const fastest = runs[runs.length - 1]
-    const lastCursor = vehicleOf(lastStateOf(fastest), 'p1').sweptCut
-    const slowCursor = vehicleOf(lastStateOf(runs[0]), 'p1').sweptCut
-    expect(lastCursor?.yMm).toBe(slowCursor?.yMm)
+  it('cuts every tick to where the work reaches, however long the step', () => {
+    const reachesOf = (run: SpeedRun) =>
+      run.ticks.map(({ state }) => {
+        const cursor = vehicleOf(state, 'p1').sweptCut
+        return { tick: cursor?.tick, yMm: cursor?.yMm, carrySubSteps: cursor?.carrySubSteps }
+      })
+    const [slow, ...faster] = runs.map(reachesOf)
+    expect(slow.every(({ tick }, index) => tick === runs[0].start.tick + 1 + index)).toBe(true)
+    // Every pose here runs ahead of the cut, so each tick's reach is the work's alone.
+    const common = Math.min(...runs.map(({ ticks }) => ticks.length))
+    for (const reaches of faster) expect(reaches.slice(0, common)).toEqual(slow.slice(0, common))
+    const lastCursor = vehicleOf(lastStateOf(runs[runs.length - 1]), 'p1').sweptCut
+    expect(lastCursor?.yMm).toBe(vehicleOf(lastStateOf(runs[0]), 'p1').sweptCut?.yMm)
   })
 
   it('lays the same rings along the same path at 1, 4 and 16 m a tick', () => {

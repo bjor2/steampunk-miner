@@ -4,7 +4,6 @@ import { CLOSED_CUT_GATE } from './cutGate'
 import { sweptDrillStampOf } from './drillStamp'
 import {
   digSubStepsAfter,
-  lastClearStep,
   pointAtStep,
   sweepPathOf,
   sweptStampOf,
@@ -39,6 +38,7 @@ const CURSOR: SweptCut = {
   ...CLOSED_CUT_GATE,
   cutSharePassed: 0,
   digSubSteps: 0,
+  carrySubSteps: 0,
 }
 
 describe('swept cut path (ticket 330)', () => {
@@ -60,11 +60,7 @@ describe('swept cut path (ticket 330)', () => {
 
   it('cuts the bare stamp a report cuts when a fresh path is clear', () => {
     const path = sweepPathOf(undefined, POSE, STEP_STAMP, 10)
-    const stamp = sweptStampOf(
-      path,
-      STAMP,
-      lastClearStep(path, () => false),
-    )
+    const stamp = sweptStampOf(path, STAMP, path.steps)
     expect(discSamplesOf(stamp)).toEqual(discSamplesOf(STAMP))
   })
 
@@ -75,20 +71,6 @@ describe('swept cut path (ticket 330)', () => {
       const to = pointAtStep(path, step)
       expect(Math.hypot(to.xMm - from.xMm, to.yMm - from.yMm)).toBeLessThanOrEqual(SWEEP_STEP_MM)
     }
-  })
-
-  it('stops at the last sub-step before the centre enters a stopping cell', () => {
-    const path = sweepPathOf(CURSOR, POSE, STEP_STAMP, 10)
-    const stopRow = Math.floor(STAMP.yMm / 1000)
-    const clear = lastClearStep(path, (tile) => tile.ty === stopRow)
-    expect(clear).toBeLessThan(path.steps)
-    expect(Math.floor(pointAtStep(path, clear).yMm / 1000)).toBeGreaterThan(stopRow)
-    expect(Math.floor(pointAtStep(path, clear + 1).yMm / 1000)).toBe(stopRow)
-  })
-
-  it('cuts nothing on a fresh path whose body point stands in a stopping cell', () => {
-    const path = sweepPathOf(undefined, POSE, STEP_STAMP, 10)
-    expect(lastClearStep(path, () => true)).toBe(-1)
   })
 })
 

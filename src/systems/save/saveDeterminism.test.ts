@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest'
 import { DRILL_SUBSTEPS_PER_TICK } from '../../constants/balance'
 import { vehicleOf, type AuthorityState } from '../authority/authorityState'
 import { perCellShareAt } from '../authority/cutShare'
-import { walkWithinShare } from '../authority/drillStepCut'
+import { WITHIN_SHARE } from '../authority/drillStepCut'
 import { planetParamsOf } from '../authority/planetOfState'
 import { takeSnapshot } from '../authority/sessionSnapshot'
 import { drillSweepBy } from '../authority/sweptDrill'
@@ -54,7 +54,7 @@ function isCutBySpan(state: AuthorityState, path: DivePath, tick: number): boole
   const params = planetParamsOf(state.planet)
   if (params === null) throw new Error('the dive needs a generated planet')
   const sweep = { target: noseTileOf(pose), step: { pose, drive: NO_DRIVE, isLifting: false } }
-  const cells = drillSweepBy(ticked, params, 'p1', sweep, walkWithinShare).carved?.cells ?? 0
+  const cells = drillSweepBy(ticked, params, 'p1', sweep, WITHIN_SHARE).carved?.cells ?? 0
   return cells > perCellShareAt(ticked, 'p1')
 }
 

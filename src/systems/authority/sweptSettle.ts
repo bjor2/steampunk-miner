@@ -1,6 +1,7 @@
 /**
  * How a swept cut's tick settles (tickets 330 and 335, split from `sweptDrill.ts`): the cursor
- * moves to where the cut reached with what it left of its per-cell share (`cutShare.ts`), a
+ * moves to where the cut reached with what it left of its per-cell share (`cutShare.ts`) and the
+ * work it carries to the next tick (ticket 399, `vehicle/carryWalk.ts`), a
  * standing cell is reported once as the sweep meets it, and the casing rings the cut makes due are
  * laid in order along it, their cells taken off the share passed on. The cursor also sums the dig
  * time of the cells the steps broke since the last charged report, which that report heats from.
@@ -45,9 +46,10 @@ export function settleSweep(
   if (carved === null) return effect
   const reached = reachedPointOf(sweep.path, carved.reachedStep)
   const passed = sharePassedOf(sweep.share, carved.cells)
+  const reach = { reached, passed, digSubSteps, carrySubSteps: carved.carrySubSteps }
   return chainEffects(effect.state, [
     (current) => ({
-      state: withCursorAt(current, playerId, sweep, { reached, passed, digSubSteps }),
+      state: withCursorAt(current, playerId, sweep, reach),
       events: withoutStandingMetBefore(effect.events, sweep, carved.reachedStep),
     }),
     (current) => layRingsAlongCut(current, playerId, cutAxisOf(sweep.path, reached), carved),
@@ -86,18 +88,22 @@ function reachedPointOf(path: SweepPath, reachedStep: number): StampPoint {
   return pointAtStep(path, Math.max(0, reachedStep))
 }
 
-/** Where a step's cut reached, what it left of its share for the next player, and its dig time. */
+/**
+ * Where a step's cut reached, what it left of its share for the next player, its dig time and the
+ * work it carries.
+ */
 interface CursorReach {
   reached: StampPoint
   passed: number
   digSubSteps: number
+  carrySubSteps: number
 }
 
 function withCursorAt(
   state: AuthorityState,
   playerId: string,
   { step, gate }: Sweep,
-  { reached, passed, digSubSteps }: CursorReach,
+  { reached, passed, digSubSteps, carrySubSteps }: CursorReach,
 ): AuthorityState {
   const vehicle = vehicleOf(state, playerId)
   const dig = digSubStepsAfter(vehicle.sweptCut, vehicle.accountedTick, digSubSteps)
@@ -110,6 +116,7 @@ function withCursorAt(
     ...gate,
     cutSharePassed: passed,
     digSubSteps: dig,
+    carrySubSteps,
   }
   return withVehicle(state, playerId, { ...vehicle, sweptCut: cursor })
 }

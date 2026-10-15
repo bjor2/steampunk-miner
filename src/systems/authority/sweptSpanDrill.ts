@@ -1,13 +1,13 @@
 /**
  * The swept span per chunk (ticket 374, the TD lock on #374 after 6050644115 on #316): one tick of
- * the swept cut carved as one pass over its span (`world/sweptSpan.ts`) up to the furthest
- * sub-step its gates leave clear.
+ * the swept cut carved as one pass over its span (`world/sweptSpan.ts`) as far as its work
+ * reaches, the carry walked in runs (ticket 399).
  *
  * - **The per-cell walk is the source of truth.** The span shares every rule with
- *   `drillAlongSweep` but the stamp's walk, which visits the same samples in the same order, so
- *   the two answer the same state and events byte for byte (`sweptSpanDrill.test.ts` at 18 and
- *   100 m/s).
- * - **Stops** only where the walk stops (`isStopCell` in `sweptDrill.ts`): a cell whose gated drill
+ *   `drillAlongSweep` but the stamp's walk, which visits the same samples in the same order, and
+ *   the carry's runs, which pay what its per-cell walk pays, so the two answer the same state and
+ *   events byte for byte (`sweptSpanDrill.test.ts` at 18 and 100 m/s).
+ * - **Stops** only where the walk stops (`isStopCell` in `sweptCarry.ts`): a cell whose gated drill
  *   time is null, a gated or tip-locked one, checked on every cell the stamp's centre crosses. A
  *   later stopping hazard stops it by answering null there. Core, a full hold, lava and electrified
  *   cells act as on the walk, cell by cell in crossing order, through the one drill path.
@@ -23,7 +23,8 @@ import type { TilePoint } from '../world/tileGrid'
 import type { AuthorityState } from './authorityState'
 import type { RuleEffect } from './commandRule'
 import { drillCutTallyOf, type DrillCutTally } from './drillCutTally'
-import { drillSweepBy, type ClearSweepWalk, type SweptStep } from './sweptDrill'
+import { walkCarryInRuns } from '../vehicle/carryWalk'
+import { drillSweepBy, type SweepWalks, type SweptStep } from './sweptDrill'
 
 /** A span tick's effect and its `drill_cut` tally. */
 export interface SpanCut {
@@ -39,9 +40,12 @@ export function drillAlongSpan(
   target: TilePoint,
   step: SweptStep,
 ): SpanCut {
-  const outcome = drillSweepBy(state, params, playerId, { target, step }, walkAsSpan)
+  const outcome = drillSweepBy(state, params, playerId, { target, step }, AS_SPAN)
   return { effect: outcome.effect, tally: drillCutTallyOf(state, params, playerId, outcome) }
 }
 
-/** The span per chunk, whatever the cells. */
-export const walkAsSpan: ClearSweepWalk = () => walkStampPerChunk
+/** The carry in runs and the span per chunk, whatever the cells. */
+export const AS_SPAN: SweepWalks = {
+  carryOf: () => walkCarryInRuns,
+  stampOf: () => walkStampPerChunk,
+}

@@ -46,6 +46,21 @@ function sessionFacingDownAt(start = START): ScriptedSession {
   return session
 }
 
+/**
+ * `sessionFacingDownAt` with a drill that breaks band-1 ground at the 4-tick floor (ticket 396)
+ * and a deep tank: the level-0 drill takes 40 ticks a cell, and since ticket 399 the cut reaches
+ * only as far as its work pays for.
+ */
+function strongSessionFacingDownAt(start = START): ScriptedSession {
+  const session = sessionFacingDownAt(start)
+  session.submit(0, {
+    type: 'debug.setUpgrade',
+    payload: { upgradeId: 'drill_power', level: 1000 },
+  })
+  session.submit(0, { type: 'debug.setEnergy', payload: { energy: '100000' } })
+  return session
+}
+
 /** One step a tick from tick 1, moving `mmPerTick` down each tick, for `ticks` ticks. */
 function stepDown(session: ScriptedSession, mmPerTick: number, ticks: number, from = START) {
   for (let tick = 1; tick <= ticks; tick++) {
@@ -67,16 +82,17 @@ const tilesDestroyed = (events: readonly DomainEvent[]) =>
   events.filter((event) => event.type === 'TileDestroyed')
 
 describe('drill step (ticket 330)', () => {
+  // The level-0 drill pays a band-1 cell in its full 40 ticks (ticket 399), so the rest is longer.
   it('cuts the ground under a resting stamp every tick it is sent', () => {
     const session = sessionFacingDownAt({ x: START.x, y: (SURFACE_TY + 1) * 1000 + 400 })
-    for (let tick = 1; tick <= 30; tick++) {
+    for (let tick = 1; tick <= 50; tick++) {
       session.submit(tick, stepTo(START.x, (SURFACE_TY + 1) * 1000 + 400))
     }
     const damage = session.events().filter((event) => event.type === 'DrillDamageDealt')
     expect(rejectionsOf(session.events())).toEqual([])
-    expect(damage.length).toBeGreaterThanOrEqual(24)
+    expect(damage.length).toBeGreaterThanOrEqual(40)
     expect(tilesDestroyed(session.events()).length).toBeGreaterThan(0)
-    expect(session.vehicle().sweptCut?.tick).toBe(30)
+    expect(session.vehicle().sweptCut?.tick).toBe(50)
   })
 
   it('charges each cell it breaks its own dig energy, and nothing for ground it only wears', () => {
@@ -182,7 +198,7 @@ describe('drill step (ticket 330)', () => {
   })
 
   it('lays casing rings half a metre apart along a fast cut', () => {
-    const session = sessionFacingDownAt()
+    const session = strongSessionFacingDownAt()
     stepDown(session, CUT_STEP_MM, 50)
     const rings = session.events().filter((event) => event.type === 'CasingPlaced')
     const trail = session.vehicle().casingTrail
@@ -217,8 +233,8 @@ describe('drill step gates (ticket 330, Horizontal Scaler)', () => {
 
   function sweepThroughGateAtTheBound(outcome: GateOutcome = 'refused') {
     return withRegistrations([gateSliceOf(outcome)], () => {
-      const session = sessionFacingDownAt(above)
-      stepDown(session, CUT_STEP_MM, 30, above)
+      const session = strongSessionFacingDownAt(above)
+      stepDown(session, CUT_STEP_MM, 60, above)
       return session
     })
   }
@@ -277,14 +293,16 @@ describe('drill step yield per metre (ticket 330, Vertical Scaler)', () => {
     return { opened: opened.sort(), drillTicks }
   }
 
-  it.each([10, 40])('opens the same cells per metre at %i mm a tick', (mmPerTick) => {
+  // At 40 mm a tick the level-0 cut falls behind the motion: it pays each cell its full #7 time
+  // (ticket 399), where a report's carve yields a cell once half of it is worn away.
+  it.each([10])('opens the same cells per metre at %i mm a tick', (mmPerTick) => {
     const reported = descend(false, mmPerTick)
     const stepped = descend(true, mmPerTick)
     expect(reported.opened.length).toBeGreaterThanOrEqual(METRES)
     expect(stepped.opened).toEqual(reported.opened)
   })
 
-  it.each([10, 40])('spends the same energy per cell, within 5%, at %i mm a tick', (mmPerTick) => {
+  it.each([10])('spends the same energy per cell, within 5%, at %i mm a tick', (mmPerTick) => {
     const reported = descend(false, mmPerTick)
     const stepped = descend(true, mmPerTick)
     const perCell = (run: typeof reported) => run.drillTicks / run.opened.length
@@ -292,7 +310,7 @@ describe('drill step yield per metre (ticket 330, Vertical Scaler)', () => {
   })
 
   it('opens no cell farther from the swept path than the stamp reaches', () => {
-    const { opened } = descend(true, 40)
+    const { opened } = descend(true, 10)
     // The stamp's centre ran straight down x = top.x from 0.5 m below the start to the end.
     const path = { x: top.x, yTop: top.y - 500, yBottom: top.y - 500 - METRES * 1000 }
     for (const key of opened) {
@@ -329,7 +347,7 @@ describe('drill step per-cell budget (tickets 330, 335)', () => {
   /** The cursor after each step, from the tick before the gate opens. */
   function catchUpAfterTheGate() {
     return withRegistrations([lateGate], () => {
-      const session = sessionFacingDownAt(above)
+      const session = strongSessionFacingDownAt(above)
       const cursors: NonNullable<ReturnType<ScriptedSession['vehicle']>['sweptCut']>[] = []
       for (let tick = 1; tick <= TICKS; tick++) {
         session.submit(tick, stepTo(above.x, above.y - CUT_STEP_MM * tick))
@@ -346,26 +364,29 @@ describe('drill step per-cell budget (tickets 330, 335)', () => {
     expect(DRILL_CELLS_PER_TICK).toBe(32)
   })
 
-  it('cuts the whole sweep in the tick the gate opens, however far the cursor fell behind', () => {
+  // The work picks how far, the budget never does (ticket 399 amending 335): once the gate opens
+  // the cut goes on at its work's pace, however far the pose ran ahead.
+  it('cuts on from the gate the tick it opens, as far as its work reaches', () => {
     const { session, cursors } = catchUpAfterTheGate()
     expect(cursors[0].yMm).toBeGreaterThan(stampAt(OPENS_AT_TICK - 1) + 10_000)
+    expect(cursors[0].carrySubSteps).toBe(0)
     cursors.slice(1).forEach((cursor, index) => {
-      expect(cursor.yMm).toBe(stampAt(OPENS_AT_TICK + index))
+      expect(cursor.yMm).toBeLessThanOrEqual(cursors[index].yMm)
+      expect(cursor.yMm).toBeGreaterThan(stampAt(OPENS_AT_TICK + index))
     })
+    expect(cursors[cursors.length - 1].yMm).toBeLessThan(cursors[0].yMm - 1_000)
     const world = session.state().world
-    for (let ty = gated.ty - 1; ty > gated.ty - 12; ty--) {
-      const tile = { tx: gated.tx, ty }
+    for (const tile of [gated, { tx: gated.tx, ty: gated.ty - 1 }]) {
       expect(cellDensitySum(world, PARAMS, tile)).toBeLessThan(
         cellDensitySum(EMPTY_WORLD, PARAMS, tile),
       )
     }
   })
 
-  it('passes none of its share on from a tick over it, and the rest from one within it', () => {
+  it('passes the rest of its share on from a tick whose stamp stays within it', () => {
     const { cursors } = catchUpAfterTheGate()
-    const [, opening, next] = cursors
-    expect(opening.cutSharePassed).toBe(0)
-    expect(next.cutSharePassed).toBeGreaterThan(0)
-    expect(next.cutSharePassed).toBeLessThan(DRILL_CELLS_PER_TICK)
+    const [, opening] = cursors
+    expect(opening.cutSharePassed).toBeGreaterThan(0)
+    expect(opening.cutSharePassed).toBeLessThan(DRILL_CELLS_PER_TICK)
   })
 })
