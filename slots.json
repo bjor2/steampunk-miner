@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-10-16T00:45:49+02:00",
+  "updated_at": "2026-10-16T00:47:18+02:00",
   "caps": {
     "grok": 12,
     "claude": 10,
@@ -28,12 +28,11 @@
         },
         {
           "slot": "C2",
-          "state": "busy",
-          "ticket": 429,
-          "grok_slot": 2,
-          "kind": "dev",
-          "since": "2026-10-16T00:26:00+02:00",
-          "wave": "1B"
+          "state": "free",
+          "ticket": null,
+          "grok_slot": null,
+          "kind": null,
+          "since": null
         },
         {
           "slot": "C3",
@@ -71,8 +70,8 @@
         }
       ],
       "size": 6,
-      "used": 4,
-      "free": 2,
+      "used": 3,
+      "free": 3,
       "claims_last_hour": 7,
       "name": "Claude Max 1"
     },
@@ -124,7 +123,7 @@
     }
   ],
   "gate": {
-    "busy": 2,
+    "busy": 1,
     "max": 3
   },
   "tester": {
@@ -619,6 +618,21 @@
           434
         ],
         "since": "2026-10-15T22:51:07+02:00"
+      },
+      {
+        "feature": 422,
+        "kind": "spec",
+        "title": "Spec: UI text budget, readable text, steampunk scroll area and tooltip",
+        "tickets": [
+          423,
+          424,
+          425,
+          426,
+          427,
+          428,
+          429
+        ],
+        "since": "2026-10-16T00:46:43+02:00"
       }
     ]
   },
@@ -633,11 +647,9 @@
     },
     {
       "slot": 2,
-      "state": "dev",
-      "ticket": 429,
-      "since": "2026-10-16T00:26:00+02:00",
-      "claude_slot": 2,
-      "wave": "1B"
+      "state": "free",
+      "ticket": null,
+      "since": null
     },
     {
       "slot": 3,
@@ -716,12 +728,11 @@
     },
     {
       "slot": 2,
-      "state": "busy",
-      "ticket": 429,
-      "grok_slot": 2,
-      "since": "2026-10-16T00:26:00+02:00",
-      "account": 1,
-      "wave": "1B"
+      "state": "free",
+      "ticket": null,
+      "grok_slot": null,
+      "since": null,
+      "account": 1
     },
     {
       "slot": 3,
@@ -795,17 +806,17 @@
     }
   ],
   "last_refill": {
-    "at": "2026-10-16 00:35 CEST",
-    "mode": "recheck",
-    "triggers": "claude-run:wave-plan",
+    "at": "2026-10-16 00:47 CEST",
+    "mode": "refill-dev",
+    "triggers": "#429",
     "started": "",
-    "note": "no pickable build ticket"
+    "note": "load guard (1-min load 15.01 > 14)"
   },
   "totals": {
     "grok": {
       "size": 12,
-      "used": 4,
-      "dev": 4,
+      "used": 3,
+      "dev": 3,
       "dev_cap": 8,
       "planner": 0,
       "planner_cap": 4
@@ -813,8 +824,8 @@
     "claude": {
       "size": 10,
       "enabled": 6,
-      "used": 4,
-      "free": 2,
+      "used": 3,
+      "free": 3,
       "external": 0
     }
   },
@@ -894,12 +905,12 @@
         "map": 302,
         "lane": "remote",
         "mode": "solo",
-        "state": "running",
+        "state": "ready",
         "tickets": [
           429
         ],
         "done": [],
-        "live": 1
+        "live": 0
       },
       {
         "number": 435,
