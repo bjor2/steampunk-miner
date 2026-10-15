@@ -276,6 +276,16 @@ programs }` from three's `renderer.info` of the game canvas), read only when cal
   gate's `vCut`, carried through a shut gate and a cleared slab. `src/physics/cutFollowRelease.test.ts`
   lets go of a followed cut at every tick of a cell's cycle (a fresh rig a phase) and wants the body
   stopped within 6 ticks (about 5 minutes). Both share the rig of `src/physics/cutFollowFixtures.ts`.
+- **Body-wide bore at any cells a tick** (ticket 439): `src/systems/authority/sweptFreshCarve.test.ts`
+  cuts planet 1's column and its tilted radius with rigs named by their band-1 cut speed (25 to
+  3600 m/s, the drill found by `subStepsPerTile` in `sweptRigFixtures.ts`), a tick count to the
+  core. Each 125 mm station of a tick's cut must be open the body's 900 mm across once the reach is
+  a stamp radius past it, the span must equal the per-cell walk from the fresh tick, refused rim and
+  centre cells are reported once, and no faster rig opens fewer cells or less work a metre than the
+  44 m/s one. Rigs the drill law cannot reach skip, as every one past 15 m/s does until #397 removes
+  the 4-tick floor. `src/physics/sweptFreshCarveLoop.test.ts` plays stored rigs 370/600, 450/600
+  and 2000/600 off the pad and down at 30 and 144 frames/s: never more than 6 straight cutting ticks
+  at 0 m/s, at least 50 m down, one path for both rates (about 20 s).
 - **Known red** (ticket 419, the TD on #396 section 2): `CAMPAIGN_PACING_KNOWN_RED`
   (`src/constants/knownRed.ts`) is the one known-red marker in the repo: one gate
   (`campaignPacingGate`), one finding (#417), no registry. The gate still runs in full;
