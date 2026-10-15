@@ -37,6 +37,7 @@ check_out_branch_tip() {
 commit_record() {
   git -C "$METRICS_DIR" add -- summary.json tests.json runs &&
     { [ ! -f "$METRICS_DIR/README.md" ] || git -C "$METRICS_DIR" add -- README.md; } &&
+    { [ ! -f "$METRICS_DIR/drill-down.ndjson" ] || git -C "$METRICS_DIR" add -- drill-down.ndjson; } &&
     git -C "$METRICS_DIR" -c user.name='github-actions[bot]' \
       -c user.email='41898599+github-actions[bot]@users.noreply.github.com' \
       commit --quiet -m "Record test metrics of run ${GITHUB_RUN_ID:-local} (${TEST_MODE:-unknown}) [skip ci]"
@@ -45,6 +46,8 @@ commit_record() {
 for attempt in $(seq 1 "$ATTEMPTS"); do
   check_out_branch_tip || warn "could not check out $BRANCH"
   node "$REPO_ROOT/scripts/ci/recordTestRun.mjs" || warn "recordTestRun.mjs failed"
+  # The drill-down runs this checkout's e2e wrote (ticket 416); none, and nothing changes.
+  node "$REPO_ROOT/scripts/ci/recordDrillDown.mjs" || echo "::warning::drill-down rows not recorded"
   commit_record || warn "nothing to commit"
   if git -C "$METRICS_DIR" push --quiet origin "HEAD:refs/heads/$BRANCH"; then
     echo "Pushed to $BRANCH (attempt $attempt)."
