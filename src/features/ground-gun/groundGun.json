@@ -146,7 +146,6 @@
     }
   },
   "combos": {
-    "combo.sounding_bore": { "soundRadius": 2 },
     "combo.winch_bore": { "hookWindowTicks": 60 }
   }
 }

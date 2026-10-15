@@ -56,6 +56,11 @@
       }
     }
   },
+  "soundingBore": {
+    "source": "TD lock 6180863028 on #320 section 2, accepted by the GD ruling 6180873822 (ticket 415, S-echo): the sounding bore's echo along a bore shot's opened cells. Moved here from groundGun.json combos.combo.sounding_bore.soundRadius so sensing needs no combo import. The echo sounder's Mark scales both, capped and asymptotic: v(m) = base + floor((cap - base) x (1 - 2^-(m-1))). The radius base is 2 tiles (the old soundRadius) and its cap 6 (the GD's placeholder); the echo base is a bought echo's 600 reveal ticks (4.2) and its cap 1200, the echo sounder's own reveal at its top Mark (the GD's hard cap, also enforced in code). Placeholders for Systems to confirm before #320 unholds.",
+    "radiusTiles": { "base": 2, "cap": 6 },
+    "echoTicks": { "base": 600, "cap": 1200 }
+  },
   "forks": {
     "source": "GD lock on #255 (ticket 269): the sensing fork at P16, each branch a charged item of its own pressed from a power-up slot, like the echo sounder, so every ping or cone read is a use. Scout pings wide and vague round the rig, one mark per block of blockTiles square, kept until the dock so the map fills in; its Mark magnitude is the radius. Diviner reads a narrow exact cone ahead of the drill, kept revealTicks, and while it is the active branch warns of a collapse block or an enemy in its cone; its Mark magnitude is the cone's length. The cone's half-angle is 15 degrees (tangent 268 per mille), half the Deep Striker's. Charges, cooldown and wind-up as the echo sounder's row. Starting values for G&V to tune; both branches share one tier, slot and price, so they cost the same.",
     "scout": {

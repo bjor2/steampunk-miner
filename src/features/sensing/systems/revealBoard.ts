@@ -5,7 +5,8 @@
  * Derived from `PowerUpUsed` and pure reads of the authority state on each client, never kept by
  * the authority, so nothing reaches the digest. A reload or a late joiner starts with an empty board; a flare's map lasts until the dock. Inside a magnetic field
  * each reach is cut to the kernel's field share, read where the ping, map or ring is centred
- * (spec #258, ticket 290).
+ * (spec #258, ticket 290). The local player's bore shot that ends carrying its opened cells pings
+ * them too, the sounding bore's echo (ticket 415, `soundingPing.ts`).
  */
 import type { AuthorityState } from '../../../systems/authority/authorityState'
 import type { DomainEvent } from '../../../systems/authority/domainEvent'
@@ -15,6 +16,7 @@ import { droppedPinOf, pinAfterPasses, pinsWithBuoy, type BuoyPin } from './buoy
 import { echoConeTilesOf, twistedDownOf } from './deepStriker'
 import { divinerPingOf } from './divinerCone'
 import { scoutPingOf } from './scoutPing'
+import { soundingPingsOf } from './soundingPing'
 import { DIVINER_ROD, SCOUT_PINGER } from './sensingFork'
 import { echoMarksOf, echoMarksOn } from './echoPing'
 import { BUOY_PIN_CAP, REVEAL_MARK_CAP } from './revealBudget'
@@ -45,7 +47,10 @@ export interface RevealBoard {
 
 export const EMPTY_REVEAL_BOARD: RevealBoard = { marks: [], pins: [] }
 
-/** The board after a batch of events: its uses, then the trip's flare maps gone if it docked. */
+/**
+ * The board after a batch of events: its uses, its sounded bores, then the trip's flare maps gone
+ * if it docked.
+ */
 export function boardAfterHeard(
   board: RevealBoard,
   events: readonly DomainEvent[],
@@ -53,7 +58,8 @@ export function boardAfterHeard(
   localPlayerId: string,
 ): RevealBoard {
   const used = boardAfterUses(board, events, state, localPlayerId)
-  return hasDockedIn(events, localPlayerId) ? boardAfterDock(used) : used
+  const sounded = boardAfterBores(used, events, state, localPlayerId)
+  return hasDockedIn(events, localPlayerId) ? boardAfterDock(sounded) : sounded
 }
 
 /** The board after a batch's uses: the local player's pings, and anyone's buoy. */
@@ -67,6 +73,16 @@ export function boardAfterUses(
     (running, use) => boardAfterUse(running, use, state, localPlayerId),
     board,
   )
+}
+
+/** The board after a batch's bores: one echo per local shot that ended carrying its cells. */
+export function boardAfterBores(
+  board: RevealBoard,
+  events: readonly DomainEvent[],
+  state: AuthorityState,
+  localPlayerId: string,
+): RevealBoard {
+  return soundingPingsOf(events, state, localPlayerId).reduce(boardWithPing, board)
 }
 
 /** The board on `tick`: run-out pings gone, and a ring re-pinged where a vehicle came inside. */

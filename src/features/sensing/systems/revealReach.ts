@@ -4,7 +4,7 @@
  * magnitude; the echo's radius and the mortar's range are fixed. A buoy's re-ping lingers as long
  * as a bought echo's ping: #162 gives the buoy a ring radius and no reveal time of its own.
  */
-import { markStepOf } from '../../tech-tree'
+import { lastMarkOf, markStepOf } from '../../tech-tree'
 import { sensingItemOf, type SensingItem } from './sensingCatalogue'
 import { chargedBalanceOf, consumableBalanceOf, markLadderOf } from './sensingItems'
 import { ECHO_SOUNDER, FLARE_MORTAR, SIGNAL_BUOY } from './sensingUses'
@@ -18,6 +18,12 @@ export function echoRadiusTiles(): number {
 
 export function echoRevealTicksAt(mark: number): number {
   return magnitudeAt(itemNamed(ECHO_SOUNDER), mark)
+}
+
+/** The echo's reveal at the Mark that masters it: the sounding bore's hard cap (ticket 415). */
+export function echoRevealTicksAtTopMark(): number {
+  const echo = itemNamed(ECHO_SOUNDER)
+  return magnitudeAt(echo, lastMarkOf(markLadderOf(echo)))
 }
 
 export function flareRangeTiles(): number {

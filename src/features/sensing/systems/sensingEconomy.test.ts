@@ -50,6 +50,21 @@ describe('sensing economy', () => {
     })
   })
 
+  it('reads the sounding bore echo: radius 2 to 6 tiles, 600 to 1200 ticks (ticket 415)', () => {
+    expect(SENSING_ECONOMY.soundingBore).toEqual({
+      radiusTiles: { base: 2, cap: 6 },
+      echoTicks: { base: 600, cap: 1200 },
+    })
+  })
+
+  it('refuses a sounding bore cap below its base', () => {
+    const broken = structuredClone(economyFile)
+    broken.soundingBore.radiusTiles = { base: 6, cap: 2 }
+    expect(readSensingEconomy(broken)).toEqual({
+      problems: ['soundingBore.radiusTiles.cap must be at least its base'],
+    })
+  })
+
   it('refuses the whole file and lists every broken field', () => {
     const broken: { items: Record<string, Record<string, unknown>> } = structuredClone(economyFile)
     broken.items.unitPrice = { band: 5, oreUnits: -2 }

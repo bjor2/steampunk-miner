@@ -15,3 +15,22 @@ export function tilesWithin(centre: TilePoint, radiusTiles: number): TilePoint[]
   }
   return tiles
 }
+
+/**
+ * Every tile within the radius of any of `cells`, each once: the first cell's disc, then each next
+ * cell's tiles not yet listed, so every client lists the same tiles in the same order (ticket 415).
+ */
+export function tilesWithinOfCells(cells: readonly TilePoint[], radiusTiles: number): TilePoint[] {
+  const seen = new Set<string>()
+  return cells.flatMap((cell) =>
+    tilesWithin(cell, radiusTiles).filter((tile) => isFirstSighting(seen, tile)),
+  )
+}
+
+/** True the first time a tile is seen; it is noted as seen. */
+function isFirstSighting(seen: Set<string>, { tx, ty }: TilePoint): boolean {
+  const key = `${tx},${ty}`
+  if (seen.has(key)) return false
+  seen.add(key)
+  return true
+}

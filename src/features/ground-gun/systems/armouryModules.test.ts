@@ -41,7 +41,6 @@ const CONTENT_PLACEHOLDERS: Readonly<Record<string, number>> = {
   burstTicks: statOf('weapon.overpressure_burst', 'burstTicks'),
   ventTicks: statOf('weapon.overpressure_burst', 'ventTicks'),
   bounceLegCells: statOf('weapon.ricochet_shot', 'bounceLegCells'),
-  soundRadius: GROUND_GUN.combos['combo.sounding_bore'].soundRadius,
   hookWindowTicks: GROUND_GUN.combos['combo.winch_bore'].hookWindowTicks,
   minBotShots: GROUND_GUN.bot.minShots,
 }

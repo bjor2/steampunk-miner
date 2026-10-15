@@ -414,7 +414,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/sell-burst/systems/salesOfBatch.test.ts` | 3 | 3 |
 | `src/features/sell-burst/systems/sellBurst.test.ts` | 12 | 12 |
 
-### `sensing`: 24 files, 155 tests
+### `sensing`: 25 files, 164 tests
 
 | File | Tests | Sites |
 | --- | --- | --- |
@@ -434,11 +434,12 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/sensing/systems/render/revealLook.test.ts` | 3 | 3 |
 | `src/features/sensing/systems/revealBoard.test.ts` | 11 | 11 |
 | `src/features/sensing/systems/revealPing.test.ts` | 3 | 3 |
-| `src/features/sensing/systems/sensingEconomy.test.ts` | 5 | 5 |
+| `src/features/sensing/systems/sensingEconomy.test.ts` | 7 | 7 |
 | `src/features/sensing/systems/sensingFork.test.ts` | 7 | 7 |
 | `src/features/sensing/systems/sensingItems.test.ts` | 14 | 14 |
 | `src/features/sensing/systems/sensingSales.test.ts` | 2 | 2 |
 | `src/features/sensing/systems/sensingView.test.ts` | 2 | 2 |
+| `src/features/sensing/systems/soundingPing.test.ts` | 7 | 7 |
 | `src/features/sensing/systems/statPreview.test.ts` | 11 | 11 |
 | `src/features/sensing/systems/threatPeriscope.test.ts` | 6 | 6 |
 | `src/features/sensing/systems/useResolution.test.ts` | 16 | 16 |

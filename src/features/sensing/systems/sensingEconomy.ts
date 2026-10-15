@@ -2,7 +2,7 @@
  * The sensing lane's numbers from `sensing.economy.json` (spec #162 section 4, locked): the one-off
  * price of the charged items and passives and the consumables' unit price (4.1), each charged
  * item's row (4.2), each consumable's row (4.3) and each passive's base magnitude (4.4, set by
- * Content on 7 Oct for gap S3 of the #157 review). The file is refused whole on any problem, like
+ * Content on 7 Oct for gap S3 of the #157 review), and the sounding bore's echo (ticket 415). The file is refused whole on any problem, like
  * the kernel's economy file, so a stand-in never reaches a formula.
  */
 import {
@@ -46,6 +46,18 @@ export interface PassiveSensingBalance {
   magnitude: number
 }
 
+/** A number the echo sounder's Mark lifts from `base` toward `cap`, never past it (ticket 415). */
+export interface MarkScaledRange {
+  base: number
+  cap: number
+}
+
+/** The sounding bore's echo along a shot's opened cells (TD lock on #320, section 2). */
+export interface SoundingBoreBalance {
+  radiusTiles: MarkScaledRange
+  echoTicks: MarkScaledRange
+}
+
 export interface SensingEconomy {
   /** `k` band-5 ore units, paid at the item's unlock planet (#162 4.1). */
   price: BandOreCost
@@ -54,6 +66,7 @@ export interface SensingEconomy {
   charged: Readonly<Record<string, ChargedSensingBalance>>
   consumable: Readonly<Record<string, ConsumableSensingBalance>>
   passive: Readonly<Record<string, PassiveSensingBalance>>
+  soundingBore: SoundingBoreBalance
 }
 
 export const SENSING_ECONOMY: SensingEconomy = loadSensingEconomy(SENSING_ECONOMY_FILE)
@@ -63,13 +76,15 @@ export function readSensingEconomy(
   raw: unknown,
 ): { economy: SensingEconomy } | { problems: string[] } {
   const reader = createFieldReader()
-  const items = reader.object('items', reader.object('file', raw).items)
+  const file = reader.object('file', raw)
+  const items = reader.object('items', file.items)
   const economy = {
     price: readBandOreCost(reader, 'items.price', items.price),
     unitPrice: readBandOreCost(reader, 'items.unitPrice', items.unitPrice),
     charged: readRows(reader, 'items.charged', items.charged, readChargedRow),
     consumable: readRows(reader, 'items.consumable', items.consumable, readConsumableRow),
     passive: readRows(reader, 'items.passive', items.passive, readPassiveRow),
+    soundingBore: readSoundingBore(reader, 'soundingBore', file.soundingBore),
   }
   return reader.problems.length > 0 ? { problems: reader.problems } : { economy }
 }
@@ -133,6 +148,23 @@ function readPassiveRow(reader: FieldReader, path: string, raw: unknown): Passiv
   return radius !== null
     ? { reach: 'radius', magnitude: radius }
     : { reach: 'lookahead', magnitude: lookahead ?? 0 }
+}
+
+function readSoundingBore(reader: FieldReader, path: string, raw: unknown): SoundingBoreBalance {
+  const row = reader.object(path, raw)
+  return {
+    radiusTiles: readMarkScaledRange(reader, `${path}.radiusTiles`, row.radiusTiles),
+    echoTicks: readMarkScaledRange(reader, `${path}.echoTicks`, row.echoTicks),
+  }
+}
+
+/** A base and a cap no lower than it. */
+function readMarkScaledRange(reader: FieldReader, path: string, raw: unknown): MarkScaledRange {
+  const row = reader.object(path, raw)
+  const base = reader.safeInteger(`${path}.base`, row.base)
+  const cap = reader.safeInteger(`${path}.cap`, row.cap)
+  if (cap < base) reader.record(`${path}.cap must be at least its base`)
+  return { base, cap }
 }
 
 /** A field an item may leave out: null when absent, a safe integer when present. */
