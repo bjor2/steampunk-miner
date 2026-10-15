@@ -51,5 +51,14 @@ export const UI_BUDGET_PANELS: readonly UiBudgetPanel[] = [
   { id: 'other-panels', sourcePrefixes: ['src/ui/', 'src/features/'], textIdPrefixes: [''] },
 ]
 
-/** Measured on the start scenario when #424 landed; each pass lowers or deletes its own entry. */
-export const UI_BUDGET_ALLOWLIST: readonly UiBudgetAllowance[] = []
+/**
+ * Measured on the start scenario when #424 landed (`UI_BUDGET_REPORT=1`); each pass lowers or
+ * deletes its own entry, and #429 empties the list.
+ */
+export const UI_BUDGET_ALLOWLIST: readonly UiBudgetAllowance[] = [
+  { panel: 'upgrade-bay', counts: { unregistered: 93, scroll: 2 }, ticket: 425 },
+  { panel: 'tech-tree', counts: { unregistered: 246, scroll: 4 }, ticket: 426 },
+  { panel: 'dock', counts: { unregistered: 39, scroll: 3 }, ticket: 427 },
+  { panel: 'hud', counts: { unregistered: 23 }, ticket: 428 },
+  { panel: 'other-panels', counts: { unregistered: 154, scroll: 3 }, ticket: 429 },
+]
