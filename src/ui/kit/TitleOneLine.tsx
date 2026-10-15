@@ -25,6 +25,12 @@ export interface IconValue {
   exact?: string
   /** What the value is (a price, charges left), so the budget test keeps it off the tooltip. */
   holds?: UiTextHolds
+  /** The spec hook on the value, a screen's #33 id. */
+  testId?: string
+  /** A price the wallet cannot pay: only the price turns red (#158). */
+  isMoneyShort?: boolean
+  /** Changes once per event the value flashes for; a new key redraws it, replaying the flash. */
+  flashKey?: number
 }
 
 export type TitleLevel = 'h2' | 'h3' | 'span'
@@ -37,6 +43,7 @@ export function TitleOneLine({
   facts = NO_FACTS,
   lockReason = null,
   level = 'h3',
+  isTooltipHeldOpen = false,
   children,
 }: {
   text: ElementText
@@ -45,12 +52,14 @@ export function TitleOneLine({
   /** Why the element is locked, kept on the element itself; null when it is open. */
   lockReason?: string | null
   level?: TitleLevel
+  /** The game's menu focus is on the element: its tooltip shows as keyboard focus would (#164). */
+  isTooltipHeldOpen?: boolean
   /** The element's action, drawn under its lines. */
   children?: ReactNode
 }) {
   recordUiText({ ...text, lines: elementLinesOf(text, facts, lockReason) })
   return (
-    <Tooltip id={text.id} lines={text.tooltipLines}>
+    <Tooltip id={text.id} lines={text.tooltipLines} isHeldOpen={isTooltipHeldOpen}>
       <div
         className={styles.element}
         data-ui-text={text.id}
@@ -91,7 +100,14 @@ function FactRow({ facts }: { facts: readonly IconValue[] }) {
   return (
     <p className={styles.facts}>
       {facts.map((fact) => (
-        <span key={`${fact.iconId}:${fact.text}`} className={styles.fact} data-exact={fact.exact}>
+        <span
+          key={`${fact.iconId}:${fact.text}:${fact.flashKey ?? ''}`}
+          className={styles.fact}
+          data-testid={fact.testId}
+          data-exact={fact.exact}
+          data-money-short={fact.isMoneyShort || undefined}
+          data-flash={fact.flashKey !== undefined || undefined}
+        >
           <VectorIcon iconId={fact.iconId} size="menu" />
           {fact.text}
         </span>

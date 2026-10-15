@@ -99,6 +99,32 @@ describe('Title+OneLine element', () => {
     expect(textOf(html)).toContain('A grey slurry from the boiler.')
   })
 
+  it('shows its tooltip while the game’s menu focus holds it open (pass #425)', () => {
+    const html = renderToString(
+      createElement(TitleOneLine, { text: FOAM, isTooltipHeldOpen: true }),
+    )
+    expect(html).toMatch(/<div role="tooltip"[^>]*data-tooltip="demo.foam"/)
+    expect(html).not.toMatch(/<div role="tooltip"[^>]*hidden/)
+  })
+
+  it('carries a fact’s spec id and marks a price the wallet cannot pay (pass #425)', () => {
+    const html = renderToString(
+      createElement(TitleOneLine, {
+        text: FOAM,
+        facts: [
+          {
+            iconId: 'icon-hud-money',
+            text: '9',
+            holds: 'price',
+            testId: 'demo-price',
+            isMoneyShort: true,
+          },
+        ],
+      }),
+    )
+    expect(html).toMatch(/data-testid="demo-price"[^>]*data-money-short/)
+  })
+
   it('draws no tooltip and no lock line for an open element with no tooltip lines', () => {
     const html = renderToString(
       createElement(TitleOneLine, { text: { ...FOAM, tooltipLines: [] } }),

@@ -44,6 +44,11 @@
   gap: var(--space-1);
 }
 
+/* #158 "State badges": only the price turns red when the wallet is short. */
+.fact[data-money-short] {
+  color: var(--color-ember);
+}
+
 .lock {
   margin: 0;
   color: var(--color-amber);
