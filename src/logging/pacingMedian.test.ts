@@ -36,7 +36,7 @@ describe('pacing median over seeded runs', () => {
 
   it('passes the slice gate when one seed of three misses it', () => {
     const median = medianPacingReport([
-      reportOf({ sliceEndTick: 59 * MINUTE }),
+      reportOf({ sliceEndTick: 39 * MINUTE }),
       reportOf({ sliceEndTick: 96 * MINUTE }),
       reportOf({ sliceEndTick: 114 * MINUTE }),
     ])
@@ -45,11 +45,11 @@ describe('pacing median over seeded runs', () => {
 
   it('fails the slice gate when two seeds of three miss it', () => {
     const median = medianPacingReport([
-      reportOf({ sliceEndTick: 58 * MINUTE }),
-      reportOf({ sliceEndTick: 59 * MINUTE }),
+      reportOf({ sliceEndTick: 38 * MINUTE }),
+      reportOf({ sliceEndTick: 39 * MINUTE }),
       reportOf({ sliceEndTick: 114 * MINUTE }),
     ])
-    expect(pacingProblems(median)).toEqual(['slice at 59.0 min, target 60 to 130 min'])
+    expect(pacingProblems(median)).toEqual(['slice at 39.0 min, target 40 to 130 min'])
   })
 
   it('counts a first sale that never happened as later than any tick', () => {

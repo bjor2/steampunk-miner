@@ -215,7 +215,7 @@ programs }` from three's `renderer.info` of the game canvas), read only when cal
   under 10 band-1 cells/s on arriving at planet 2 (`planetOneDrillPace.ts`, ticket 396).
   `src/logging/assayPacingGate.test.ts` holds the bot holding `assay_beacon`
   (`bot-slice-assay.scenario.json`) to the same three gates: the #16 first ten minutes, the planet 1
-  core in 15 to 30 minutes and the slice in 60 to 130 (ticket 396's windows; `pacingVerdicts` prints pass or fail for each). Trips per planet
+  core in 15 to 30 minutes and the slice in 40 to 130 (ticket 396's windows, slice edge per #418; `pacingVerdicts` prints pass or fail for each). Trips per planet
   outside 3 to 12 are printed, never failed. Both play their scenario on three world seeds
   (`src/constants/pacingSeeds.ts`, the scenario's own `worldSeed` first) and gate on the median of
   each metric (`medianPacingReport`, #84), so one run's combat deaths cannot flip a gate; the log

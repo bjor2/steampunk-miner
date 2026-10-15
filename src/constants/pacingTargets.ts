@@ -24,11 +24,12 @@ export const PACING_TARGETS = {
    */
   planet1Drill: { bandThreeSpeedupMin: 3, departureCellsPerSecondMin: 10 },
   /**
-   * Ticket 396 (same ruling): the 130-minute upper edge stays so a slow slice still fails; the lower
-   * edge drops from 90 to 60 as an interim, since a faster slice is intended. Systems posts the final
-   * lower edge on #396 after the Tester's split run.
+   * Ticket 396 (same ruling): the 130-minute upper edge stays so a slow slice still fails. The lower
+   * edge is a sanity floor, an interim since a faster slice is intended: 90 to 60 on #396, then 40
+   * (GD ruling on #418 Q2, Systems' json `{ "sliceMinutes": { "min": 40, "max": 130 } }` on #418).
+   * Systems posts the final lower edge on #418 after the Tester's split run.
    */
-  sliceMinutes: { min: 60, max: 130 },
+  sliceMinutes: { min: 40, max: 130 },
   /** Report only (#29 Systems & Economy note 4): alert when a planet takes fewer or more trips. */
   tripsPerPlanet: { min: 3, max: 12 },
   /**

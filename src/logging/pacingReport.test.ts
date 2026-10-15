@@ -102,7 +102,7 @@ describe('pacing report', () => {
   it('names a slice that never ends', () => {
     const unfinished = onTimeRun().filter((event) => event.planet === 1)
     expect(pacingProblems(derivePacingReport(unfinished, WORLD_SEED))).toEqual([
-      'slice at 25.0 min, target 60 to 130 min',
+      'slice at 25.0 min, target 40 to 130 min',
     ])
   })
 
@@ -164,7 +164,7 @@ describe('pacing report', () => {
     expect(verdicts.map((verdict) => verdict.gate)).toEqual([
       'first ten minutes (#16)',
       'planet 1 core, 15 to 30 min',
-      'slice, 60 to 130 min',
+      'slice, 40 to 130 min',
     ])
     expect(formatPacingVerdicts(verdicts)).not.toContain('FAIL')
   })
@@ -172,12 +172,12 @@ describe('pacing report', () => {
   it('fails only the slice gate for a slice that ends too early, naming the miss', () => {
     const early = onTimeRun().map((event) =>
       event.planet === 2 && event.event === 'core_completed'
-        ? line(55 * MINUTE, 'core_completed', { durationTicks: 0 }, 2)
+        ? line(35 * MINUTE, 'core_completed', { durationTicks: 0 }, 2)
         : event,
     )
     const table = formatPacingVerdicts(pacingVerdicts(derivePacingReport(early, WORLD_SEED)))
     expect(table).toContain(
-      '| slice, 60 to 130 min | FAIL: slice at 55.0 min, target 60 to 130 min |',
+      '| slice, 40 to 130 min | FAIL: slice at 35.0 min, target 40 to 130 min |',
     )
     expect(table.match(/FAIL/g)).toHaveLength(1)
   })
