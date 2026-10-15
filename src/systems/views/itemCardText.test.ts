@@ -29,6 +29,16 @@ describe('item card text', () => {
     expect([line.major, line.cap]).toEqual(['Next major in 3: 1.20e6', 'Cap 14, 12.5% to go'])
   })
 
+  it('says the major and the cap again in a compact caveat, null on a line with neither', () => {
+    const line = lineOf({
+      ...DRILL,
+      major: { levelsTo: 3, value: '1.20e6' },
+      cap: { value: '14', headroomPct: '12.5%' },
+    })
+    expect(line.caveat).toBe('major in 3: 1.20e6, cap 14 (12.5% to go)')
+    expect(lineOf(DRILL).caveat).toBeNull()
+  })
+
   it('carries the flavour, unlock line and gate note, null where the description has none', () => {
     const text = itemCardTextOf({ flavour: 'A brass bit.', statLines: [], unlock: 'From planet 8' })
     expect([text.flavour, text.unlock, text.gateNote]).toEqual([

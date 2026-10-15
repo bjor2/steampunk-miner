@@ -3,15 +3,18 @@
  * its comment 6197594891; pass #425): the title is the buyable's name, the one line is its first
  * stat line with the change it buys, and the tooltip holds the rest in Content's order: the
  * flavour, then the caveats (the next major or the cap, then every other stat line), then the
- * source line. Nothing is dropped: past the tooltip's last line the rest joins that line, so the
- * budget test (#424) flags a card that needs Content's merge instead of hiding its text. The price
- * stays on the element as a fact, never here, and so does an unlock line that names a prereq
- * ("Needs: …"): it is the element's lock reason. Pure.
+ * source line. The caveats use the compact words of the GD ruling on #425 ("major in 10: 1.03, cap
+ * 14 (57.1% to go)"), one piece per line while lines last; a card with more pieces than lines
+ * packs them by words, and past the last line the rest joins it, so nothing is dropped and the
+ * budget test (#424) flags a card that still needs Content's merge. The price stays on the element
+ * as a fact, never here, and so does an unlock line that names a prereq ("Needs: …"): it is the
+ * element's lock reason. Pure.
  */
-import { TOOLTIP_LINES_MAX } from '../../constants/uiParts'
+import { TOOLTIP_LINE_WORDS_MAX, TOOLTIP_LINES_MAX } from '../../constants/uiParts'
 import type { ItemCardModel } from './itemCardModel'
 import { itemCardTextOf, type ItemCardLineText } from './itemCardText'
 import { isNeedsLine, type ElementText } from './uiText'
+import { wordCountOf } from './uiTextBudget'
 
 /** What the shared element draws for a card, besides the price fact the screen adds. */
 export interface ItemCardElement {
@@ -28,9 +31,8 @@ export function itemCardElementOf(id: string, card: ItemCardModel): ItemCardElem
   const text = itemCardTextOf(card.description)
   const needs = needsLineOf(text.unlock)
   const [first, ...rest] = text.lines
-  const tooltipLines = packedTooltipLinesOf([
-    text.flavour,
-    ...asidesOf(first),
+  const tooltipLines = tooltipLinesOf(text.flavour, [
+    firstCaveatOf(first),
     ...rest.map(fullLineTextOf),
     text.gateNote,
     needs === null ? text.unlock : null,
@@ -54,21 +56,39 @@ function needsLineOf(unlock: string | null): string | null {
   return unlock !== null && isNeedsLine(unlock) ? unlock : null
 }
 
+/** "Acceleration 1 → 1.001 +0.001 (+0.177%), major in 10: 1.03, cap 1.8 (44.4% to go)". */
 function fullLineTextOf(line: ItemCardLineText): string {
-  return [statLineTextOf(line), ...asidesOf(line)].join(JOIN)
+  return line.caveat === null ? statLineTextOf(line) : `${statLineTextOf(line)}, ${line.caveat}`
 }
 
-function asidesOf(line: ItemCardLineText | undefined): string[] {
-  if (line === undefined) return []
-  return [line.major, line.cap].filter(isShown)
+/** The one line's own caveat, opening its tooltip line: "Major in 10: 1.68". */
+function firstCaveatOf(line: ItemCardLineText | undefined): string | null {
+  const caveat = line?.caveat ?? null
+  return caveat === null ? null : `${caveat[0].toUpperCase()}${caveat.slice(1)}`
 }
 
-/** At most `TOOLTIP_LINES_MAX` lines, the overflow joined onto the last so no text is lost. */
-function packedTooltipLinesOf(candidates: readonly (string | null)[]): string[] {
-  const lines = candidates.filter(isShown)
-  if (lines.length <= TOOLTIP_LINES_MAX) return lines
-  const kept = lines.slice(0, TOOLTIP_LINES_MAX - 1)
-  return [...kept, lines.slice(TOOLTIP_LINES_MAX - 1).join(JOIN)]
+/** The flavour on its own line, then the pieces in the lines left. */
+function tooltipLinesOf(flavour: string, pieces: readonly (string | null)[]): string[] {
+  const head = [flavour].filter(isShown)
+  return [...head, ...packedPiecesOf(pieces.filter(isShown), TOOLTIP_LINES_MAX - head.length)]
+}
+
+/** One piece per line while lines last, else packed by words with the overflow on the last. */
+function packedPiecesOf(pieces: readonly string[], lineCount: number): string[] {
+  if (pieces.length <= lineCount) return [...pieces]
+  return pieces.reduce<string[]>((lines, piece) => appendPiece(lines, piece, lineCount), [])
+}
+
+function appendPiece(lines: readonly string[], piece: string, lineCount: number): string[] {
+  const last = lines.at(-1)
+  if (last === undefined) return [piece]
+  const joined = `${last}${JOIN}${piece}`
+  if (lines.length < lineCount && !fitsOneTooltipLine(joined)) return [...lines, piece]
+  return [...lines.slice(0, -1), joined]
+}
+
+function fitsOneTooltipLine(text: string): boolean {
+  return wordCountOf(text) <= TOOLTIP_LINE_WORDS_MAX
 }
 
 function isShown(text: string | null): text is string {

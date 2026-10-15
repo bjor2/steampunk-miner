@@ -36,7 +36,7 @@ import { energyStatsAt, isTrackMaxed, penetrationStatsAt } from './gunTracks'
 /** The planet's median ground (#322's rate test): band 3. */
 const MEDIAN_BAND = 3
 
-const MOUNT_FLAVOUR = 'A brass bore gun on the miner punches a line of rock open, cell by cell.'
+const MOUNT_FLAVOUR = 'A brass bore gun punches a line of rock open.'
 
 const TRACK_FLAVOURS: Readonly<Record<GunTrackId, string>> = {
   rate: 'A quicker breech and a hotter boiler let the bore gun fire again sooner.',

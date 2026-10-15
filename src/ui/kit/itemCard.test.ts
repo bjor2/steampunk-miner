@@ -155,6 +155,7 @@ describe('item card: shop row', () => {
     expect(TOOLTIP_PLATE.exec(row)?.[0]).toContain('hidden')
   })
 
+  // The open row says the major and the cap in the compact words of the GD ruling on #425.
   it('opens the full card in place on the focused row, with every stat line field', () => {
     const row = rowOf(
       renderDescribed(() => upgradeBay(DRILL_BUY)),
@@ -163,7 +164,8 @@ describe('item card: shop row', () => {
     expect(row).toContain('aria-expanded="true"')
     expect(TOOLTIP_PLATE.exec(row)?.[0]).not.toContain('hidden')
     const text = textOf(row)
-    FULL_TEXTS.forEach((part) => expect(text).toContain(part))
+    expect(text).toContain('Drill power 57 → 70 +13 (+22.8%)')
+    expect(text).toContain('Major in 3: 1.20e6, cap 92 (12.5% to go)')
     expect(text).toContain('A fake ledger line for drill_power.')
     expect(text).toContain('Available from planet 8')
     expect(text).toContain('Lets the drill take crystal ore')

@@ -18,6 +18,11 @@ export interface ItemCardLineText {
   major: string | null
   /** "Cap 14, 12.5% to go" on a saturating track. */
   cap: string | null
+  /**
+   * The major and the cap in a compact tooltip's words, "major in 3: 1.20e6, cap 14 (12.5% to
+   * go)" (GD ruling on #425): the same values, fewer words; null when the line has neither.
+   */
+  caveat: string | null
 }
 
 export interface ItemCardText {
@@ -46,7 +51,16 @@ function lineTextOf(line: StatLine): ItemCardLineText {
     major:
       line.major === undefined ? null : `Next major in ${line.major.levelsTo}: ${line.major.value}`,
     cap: line.cap === undefined ? null : `Cap ${line.cap.value}, ${line.cap.headroomPct} to go`,
+    caveat: caveatOf(line),
   }
+}
+
+function caveatOf({ major, cap }: StatLine): string | null {
+  const parts = [
+    major === undefined ? null : `major in ${major.levelsTo}: ${major.value}`,
+    cap === undefined ? null : `cap ${cap.value} (${cap.headroomPct} to go)`,
+  ].filter(isGiven)
+  return parts.length === 0 ? null : parts.join(', ')
 }
 
 function changeTextOf({ delta, deltaPct }: StatLine): string | null {
@@ -55,8 +69,8 @@ function changeTextOf({ delta, deltaPct }: StatLine): string | null {
   return first ?? null
 }
 
-function isGiven(text: string | undefined): text is string {
-  return text !== undefined
+function isGiven(text: string | null | undefined): text is string {
+  return text !== undefined && text !== null
 }
 
 /** A rise reads "+13", a fall keeps its own minus. */
