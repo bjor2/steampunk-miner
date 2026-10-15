@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { createAuthorityState } from '../authority/authorityState'
 import type { CommandIntent } from '../authority/authorityCommand'
+import { setVehicleLoadoutCommand } from '../authority/loadoutCommands'
 import { UPGRADE_IDS, type UpgradeId } from '../economy/economyDefinition'
 import { onCurveLevel } from '../economy/vehicleStats'
 import { digestsOf } from '../replay/replayRun'
@@ -9,6 +10,8 @@ import { setUpgradeCommand } from '../vehicle/vehicleCommands'
 import type { ChargePolicy } from './botCharges'
 import { playSlice, type SliceRun } from './playSlice'
 import { stepOfMajor } from '../economy/upgradeSteps'
+import { contentOf } from '../registries/content'
+import { vehicleItemOfferOf } from '../registries/vehicleItemSales'
 
 const WORLD_SEED = 83921
 /** Three minutes on planet 7: past the first dock visit, where the rack was once always bought. */
@@ -24,14 +27,25 @@ const DRILL_TRACKS: readonly UpgradeId[] = ['drill_power', 'drill_tip']
  */
 const MONEY = '980000'
 
-/** Arrived on planet 7 with no charges, money for the rack and the drill `drillBehind` levels back. */
+/**
+ * Arrived on planet 7 with no charges, money for the rack and the drill `drillBehind` levels back,
+ * owning what the bot buys ahead of its tracks by then (the planet 5 extractor, ticket 296): since
+ * #411 the store sells it on planet 7 too, and a bot that never passed planet 5 bought it first.
+ */
 function arrivedOnPlanet7(drillBehind: number): CommandIntent[] {
   return [
     setPlanetCommand(7),
     setPlanetSeedCommand(WORLD_SEED),
     { type: 'debug.setMoney', payload: { amount: MONEY } },
+    setVehicleLoadoutCommand({}, itemsBoughtBeforeTracksThrough(7)),
     ...UPGRADE_IDS.map((id) => setUpgradeCommand(id, arrivalLevel(id, drillBehind))),
   ]
+}
+
+function itemsBoughtBeforeTracksThrough(planetIndex: number): string[] {
+  return contentOf('vehicle-item')
+    .map((item) => item.id)
+    .filter((id) => (vehicleItemOfferOf(id)?.boughtBeforeTracksFrom ?? Infinity) <= planetIndex)
 }
 
 function arrivalLevel(upgradeId: UpgradeId, drillBehind: number): number {
