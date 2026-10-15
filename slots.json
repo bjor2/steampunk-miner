@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-10-15T15:48:51+02:00",
+  "updated_at": "2026-10-15T15:53:51+02:00",
   "caps": {
     "grok": 12,
     "claude": 10,
@@ -69,7 +69,7 @@
       "size": 6,
       "used": 0,
       "free": 6,
-      "claims_last_hour": 1,
+      "claims_last_hour": 0,
       "name": "Claude Max 1"
     },
     {
@@ -739,9 +739,9 @@
     }
   ],
   "last_refill": {
-    "at": "2026-10-15 13:55 CEST",
-    "mode": "recheck",
-    "triggers": "#396",
+    "at": "2026-10-15 15:53 CEST",
+    "mode": "refill-dev",
+    "triggers": "#418",
     "started": "",
     "note": "no pickable build ticket"
   },
