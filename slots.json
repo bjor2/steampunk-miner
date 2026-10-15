@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-10-15T10:40:49+02:00",
+  "updated_at": "2026-10-15T11:12:16+02:00",
   "caps": {
     "grok": 12,
     "claude": 10,
@@ -28,18 +28,18 @@
         {
           "slot": "C2",
           "state": "busy",
-          "ticket": 392,
+          "ticket": 412,
           "grok_slot": 2,
           "kind": "dev",
-          "since": "2026-10-15T10:39:00+02:00"
+          "since": "2026-10-15T11:12:00+02:00"
         },
         {
           "slot": "C3",
-          "state": "busy",
-          "ticket": 412,
-          "grok_slot": 3,
-          "kind": "dev",
-          "since": "2026-10-15T10:39:00+02:00"
+          "state": "free",
+          "ticket": null,
+          "grok_slot": null,
+          "kind": null,
+          "since": null
         },
         {
           "slot": "C4",
@@ -67,9 +67,9 @@
         }
       ],
       "size": 6,
-      "used": 4,
-      "free": 2,
-      "claims_last_hour": 4,
+      "used": 3,
+      "free": 3,
+      "claims_last_hour": 5,
       "name": "Claude Max 1"
     },
     {
@@ -444,6 +444,137 @@
           411
         ],
         "since": "2026-10-15T01:19:17+02:00"
+      },
+      {
+        "feature": 255,
+        "kind": "spec",
+        "title": "Grilling: Lane forks (two specialisations per lane at P16)",
+        "tickets": [
+          259,
+          267,
+          268,
+          269,
+          270,
+          271,
+          359,
+          391,
+          392,
+          410
+        ],
+        "since": "2026-10-15T11:03:13+02:00"
+      },
+      {
+        "feature": 157,
+        "kind": "spec",
+        "title": "Wayfinder: Tech tree and UI clarity (deep tech tree with visible vehicle changes, clear icons, item descriptions)",
+        "tickets": [
+          163,
+          164,
+          165,
+          166,
+          199,
+          200,
+          201,
+          202,
+          203,
+          204,
+          205,
+          206,
+          212,
+          224,
+          233,
+          234,
+          235,
+          239,
+          240,
+          241,
+          242,
+          243,
+          244,
+          248,
+          249,
+          250,
+          251,
+          252,
+          253,
+          254,
+          259,
+          260,
+          261,
+          262,
+          263,
+          264,
+          265,
+          266,
+          267,
+          268,
+          269,
+          270,
+          271,
+          272,
+          273,
+          274,
+          275,
+          276,
+          277,
+          278,
+          279,
+          280,
+          281,
+          282,
+          283,
+          284,
+          285,
+          286,
+          287,
+          288,
+          295,
+          300,
+          323,
+          324,
+          325,
+          326,
+          327,
+          328,
+          329,
+          331,
+          332,
+          351,
+          357,
+          359,
+          360,
+          361,
+          363,
+          365,
+          366,
+          367,
+          368,
+          369,
+          370,
+          371,
+          372,
+          373,
+          375,
+          376,
+          381,
+          384,
+          385,
+          389,
+          390,
+          391,
+          392,
+          394,
+          402,
+          403,
+          404,
+          405,
+          406,
+          407,
+          408,
+          410,
+          411
+        ],
+        "since": "2026-10-15T11:03:13+02:00"
       }
     ]
   },
@@ -458,16 +589,15 @@
     {
       "slot": 2,
       "state": "dev",
-      "ticket": 392,
-      "since": "2026-10-15T10:39:00+02:00",
+      "ticket": 412,
+      "since": "2026-10-15T11:12:00+02:00",
       "claude_slot": 2
     },
     {
       "slot": 3,
-      "state": "dev",
-      "ticket": 412,
-      "since": "2026-10-15T10:39:00+02:00",
-      "claude_slot": 3
+      "state": "free",
+      "ticket": null,
+      "since": null
     },
     {
       "slot": 4,
@@ -537,17 +667,17 @@
     {
       "slot": 2,
       "state": "busy",
-      "ticket": 392,
+      "ticket": 412,
       "grok_slot": 2,
-      "since": "2026-10-15T10:39:00+02:00",
+      "since": "2026-10-15T11:12:00+02:00",
       "account": 1
     },
     {
       "slot": 3,
-      "state": "busy",
-      "ticket": 412,
-      "grok_slot": 3,
-      "since": "2026-10-15T10:39:00+02:00",
+      "state": "free",
+      "ticket": null,
+      "grok_slot": null,
+      "since": null,
       "account": 1
     },
     {
@@ -612,17 +742,17 @@
     }
   ],
   "last_refill": {
-    "at": "2026-10-15 01:41 CEST",
-    "mode": "refill-dev",
-    "triggers": "#392 #394",
-    "started": "",
-    "note": "dev slots full"
+    "at": "2026-10-15 11:12 CEST",
+    "mode": "recheck",
+    "triggers": "#412",
+    "started": "#412->C2/A1",
+    "note": "spawned 1 worker(s)"
   },
   "totals": {
     "grok": {
       "size": 12,
-      "used": 4,
-      "dev": 4,
+      "used": 3,
+      "dev": 3,
       "dev_cap": 8,
       "planner": 0,
       "planner_cap": 4
@@ -630,8 +760,8 @@
     "claude": {
       "size": 10,
       "enabled": 6,
-      "used": 4,
-      "free": 2,
+      "used": 3,
+      "free": 3,
       "external": 0
     }
   }
