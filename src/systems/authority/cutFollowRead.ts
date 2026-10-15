@@ -7,7 +7,10 @@
  *   (read on idle ticks too, so a rig that lets go of the drive brakes from it),
  *   `floor(1000 * Q / nLead)` mm a tick with `nLead` its sub-step drill time as the swept cut
  *   counts it (heat, gates and shocks included). A slab with nothing left to cut leaves travel to
- *   set the speed; one whose uncut cells the drill may not cut gives 0, so the body waits.
+ *   set the speed, and says so (`isSlabClear`), so a motor mid-cut may keep its last `vCut`
+ *   instead (ticket 430); one whose uncut cells the drill may not cut gives 0, so the body waits;
+ * - while it is shut, whether the slab the drill bites holds such a cell (`isSpanStopped`), so a
+ *   body coasting on its last `vCut` stops at once there (ticket 430).
  *
  * The pose is the last reported one moved to the step's position, as `drillStep` cuts it. The
  * authority keeps `cutGateAt` on the cursor in each `drillStep`; the client reads `cutFollowAt`
@@ -53,6 +56,10 @@ export interface CutFollow {
   gate: CutGate
   /** m/s along the facing while the gate is open (0 while it is closed). */
   cutSpeed: number
+  /** Open, with nothing left to cut in the slab: `cutSpeed` is travel's (ticket 430). */
+  isSlabClear?: true
+  /** Shut, with a cell in the bitten slab the drill may not cut: a span stop (ticket 430). */
+  isSpanStopped?: true
 }
 
 /** The slab a step drives into, with what reading its cells needs. */
@@ -68,8 +75,9 @@ export function cutFollowAt(
 ): CutFollow {
   const read = slabReadOf(state, playerId, step)
   const gate = gateAfter(state, playerId, step.isDrilling ? read : null)
-  if (!isCutGateOpen(gate) || read === null) return { gate, cutSpeed: 0 }
-  return { gate, cutSpeed: cutSpeedOf(state, playerId, read) }
+  if (read === null) return { gate, cutSpeed: 0 }
+  if (!isCutGateOpen(gate)) return shutFollowOf(state, playerId, read, gate, step.isDrilling)
+  return openFollowOf(state, playerId, read, gate)
 }
 
 /** The gate a `drillStep` at `step` leaves on the cursor. */
@@ -102,9 +110,45 @@ function idleTicksBefore(cursor: SweptCut | undefined, tick: number): number {
   return cursor === undefined ? 0 : Math.max(0, tick - cursor.tick - 1)
 }
 
-/** `vCut` in m/s; travel's speed when the slab holds nothing to cut. */
+/** Open: `vCut`, or travel's speed over a slab with nothing left to cut, saying so. */
+function openFollowOf(
+  state: AuthorityState,
+  playerId: string,
+  read: SlabRead,
+  gate: CutGate,
+): CutFollow {
+  if (!isSlabClear(read.slab)) return { gate, cutSpeed: cutSpeedOf(state, playerId, read) }
+  return {
+    gate,
+    cutSpeed: travelSpeedOf(vehicleOf(state, playerId), read.params),
+    isSlabClear: true,
+  }
+}
+
+/** Shut: no speed, and whether a span stop stands in the slab the drill bites. */
+function shutFollowOf(
+  state: AuthorityState,
+  playerId: string,
+  read: SlabRead,
+  gate: CutGate,
+  isDrilling: boolean,
+): CutFollow {
+  if (!isDrilling || !isSpanStoppedAt(state, playerId, read)) return { gate, cutSpeed: 0 }
+  return { gate, cutSpeed: 0, isSpanStopped: true }
+}
+
+function isSlabClear(slab: LeadingSlab): boolean {
+  return slab.uncutTiles.length === 0
+}
+
+/** The slab holds an uncut cell the drill may not cut. */
+function isSpanStoppedAt(state: AuthorityState, playerId: string, read: SlabRead): boolean {
+  if (isSlabClear(read.slab)) return false
+  return slowestSubStepsOf(state, playerId, read.params, read.slab.uncutTiles) === null
+}
+
+/** `vCut` in m/s through the slab's uncut cells; 0 when one cannot be cut. */
 function cutSpeedOf(state: AuthorityState, playerId: string, { params, slab }: SlabRead): number {
-  if (slab.uncutTiles.length === 0) return travelSpeedOf(vehicleOf(state, playerId), params)
   const leadSubSteps = slowestSubStepsOf(state, playerId, params, slab.uncutTiles)
   return leadSubSteps === null ? 0 : metresPerSecondOfStep(cutStepMmOf(leadSubSteps))
 }
