@@ -262,6 +262,11 @@
       "specs": ["e2e/browser/smoke.spec.ts", "e2e/browser/miningPopup.spec.ts"]
     },
     {
+      "why": "The drill-down run's start save (ticket 416); the code it drives maps to no rule, so a change there runs every spec, this one too.",
+      "paths": ["scenarios/drill-down-start.scenario.json"],
+      "specs": ["e2e/browser/drillDown.spec.ts"]
+    },
+    {
       "why": "The pause menu's manual save (ticket 404): its slice, view, model, debug reads, the slot writer and the title menu's Continue that loads it back.",
       "paths": [
         "src/store/pauseMenuSlice.ts",

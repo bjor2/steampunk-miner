@@ -1,0 +1,7 @@
+{
+  "scenarioVersion": 1,
+  "name": "drill-down-start",
+  "worldSeed": 83921,
+  "start": { "planet": 1, "depthTiles": 0, "money": "0", "upgrades": { "drill_power": 1 } },
+  "expect": {}
+}

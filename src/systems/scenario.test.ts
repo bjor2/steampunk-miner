@@ -23,6 +23,16 @@ describe('scenario validation', () => {
     expect(parseScenario(readScenarioFile('planet1-start.scenario.json')).problems).toEqual([])
   })
 
+  it('accepts the committed drill-down start save at drill level 1 (ticket 416)', () => {
+    const parsed = parseScenario(readScenarioFile('drill-down-start.scenario.json'))
+    expect(parsed.problems).toEqual([])
+    expect(startOfScenario(parsed.scenario as Scenario)).toMatchObject({
+      planetTier: 1,
+      depthTiles: 0,
+      upgrades: { drill_power: 1 },
+    })
+  })
+
   it('lists every problem in the deliberately broken file', () => {
     expect(parseScenario(readScenarioFile('broken.scenario.json')).problems).toEqual([
       'scenario.start.fuel is not a scenario field',

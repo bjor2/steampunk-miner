@@ -1161,7 +1161,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/globalSheetGuard.test.ts` | 5 | 5 |
 | `src/systems/money.test.ts` | 61 | 43 |
 | `src/systems/moneyAsDoubleLint.test.ts` | 6 | 3 |
-| `src/systems/scenario.test.ts` | 18 | 18 |
+| `src/systems/scenario.test.ts` | 19 | 19 |
 | `src/systems/seededRandom.test.ts` | 6 | 6 |
 | `src/systems/sliceProgress.test.ts` | 3 | 3 |
 | `src/systems/startScenario.test.ts` | 7 | 7 |
@@ -1171,6 +1171,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 
 | File | Tests | Sites |
 | --- | --- | --- |
+| `scripts/ci/drillDownHistory.test.mjs` | 6 | 6 |
 | `scripts/ci/testHistory.test.mjs` | 9 | 9 |
 | `scripts/ci/testMetrics.test.mjs` | 12 | 12 |
 
