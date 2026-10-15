@@ -8,9 +8,11 @@
  * A held step (`chain` not 0) is also refused under the service reserve (`purchaseChain.ts`).
  *
  * The engine track stays finite (GD lock on #316 scope 0, ticket 333): once k times the drill's
- * cut speed in the rig's band reaches the engine's top speed, the drill sets travel and an engine
- * step would buy no travel speed, so it is refused `max_level`. Under ticket 396's 4-tick floor a
- * floor-bound drill cuts 15 m/s, so a strong drill reaches it.
+ * cut speed in the planet's hardest band reaches the engine's top speed, the drill sets travel in
+ * every band and an engine step would buy no travel speed, so it is refused `max_level` (#418:
+ * judged in the hardest band, not the rig's, so a step that still speeds deep travel stays
+ * buyable at the dock). Under ticket 396's 4-tick floor a floor-bound drill cuts 15 m/s, so a
+ * strong drill reaches it.
  */
 import { costCurveIdOf, stepPrice } from '../economy/upgradePrices'
 import { isMajorStep, majorOf } from '../economy/upgradeSteps'

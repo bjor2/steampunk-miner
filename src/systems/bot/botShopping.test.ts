@@ -25,6 +25,12 @@ function botAtUpgradeBayOn(planetIndex: number): BotSession {
   return session
 }
 
+/** Steps that cut every band at the tile floor, so k times the cut passes the engine everywhere. */
+function withDrillSettingTravelEverywhere(session: BotSession): void {
+  session.submit({ type: 'debug.setUpgrade', payload: { upgradeId: 'drill_power', level: 2000 } })
+  session.submit({ type: 'debug.setUpgrade', payload: { upgradeId: 'drill_tip', level: 600 } })
+}
+
 /** Shops with the core as the goal, so the forced core rule leads. */
 function shopForTheCore(session: BotSession): void {
   const site = dockSiteOfPlanet(session.state().planet)!
@@ -52,8 +58,18 @@ describe('bot: shopping at the Upgrade bay', () => {
 
   it('sends no track buy the Upgrade bay refuses, the engine maxed by a drill that sets travel (ticket 396)', () => {
     const session = botAtUpgradeBayOn(2)
+    withDrillSettingTravelEverywhere(session)
     shopForTheCore(session)
     expect(isTravelSetByDrill(session.state(), session.playerId)).toBe(true)
+    expect(session.events().filter((event) => event.type === 'CommandRejected')).toEqual([])
+  })
+
+  // #418: the lead-capped planet 2 drill passes the engine in band 1 but not in the hardest band.
+  it('buys the engine at the dock while a step still speeds travel in the deeper bands (#418)', () => {
+    const session = botAtUpgradeBayOn(2)
+    shopForTheCore(session)
+    expect(isTravelSetByDrill(session.state(), session.playerId)).toBe(false)
+    expect(session.vehicle().levels.engine).toBeGreaterThan(0)
     expect(session.events().filter((event) => event.type === 'CommandRejected')).toEqual([])
   })
 

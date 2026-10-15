@@ -760,7 +760,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/bot/botMoneyLint.test.ts` | 6 | 3 |
 | `src/systems/bot/botRefining.test.ts` | 4 | 4 |
 | `src/systems/bot/botRetreat.test.ts` | 9 | 9 |
-| `src/systems/bot/botShopping.test.ts` | 7 | 7 |
+| `src/systems/bot/botShopping.test.ts` | 8 | 8 |
 | `src/systems/bot/botSlicePurchases.test.ts` | 11 | 11 |
 | `src/systems/bot/botWallet.test.ts` | 3 | 3 |
 | `src/systems/bot/chargePayoff.test.ts` | 5 | 5 |
@@ -1292,7 +1292,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/vehicle/strutPlank.test.ts` | 4 | 4 |
 | `src/systems/vehicle/sweptCut.test.ts` | 7 | 7 |
 | `src/systems/vehicle/tickPlan.test.ts` | 10 | 6 |
-| `src/systems/vehicle/travelParity.test.ts` | 8 | 8 |
+| `src/systems/vehicle/travelParity.test.ts` | 13 | 13 |
 | `src/systems/vehicle/vehicleCharges.test.ts` | 4 | 4 |
 | `src/systems/vehicle/vehicleControls.test.ts` | 15 | 15 |
 | `src/systems/vehicle/vehicleReadout.test.ts` | 3 | 3 |
@@ -1307,7 +1307,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/views/bayPresentation.test.ts` | 6 | 6 |
 | `src/systems/views/chargeViews.test.ts` | 14 | 14 |
 | `src/systems/views/combatStatuses.test.ts` | 8 | 8 |
-| `src/systems/views/engineTrackMaxed.test.ts` | 5 | 5 |
+| `src/systems/views/engineTrackMaxed.test.ts` | 7 | 7 |
 | `src/systems/views/hazardStripView.test.ts` | 3 | 3 |
 | `src/systems/views/heatViews.test.ts` | 5 | 5 |
 | `src/systems/views/hudModel.test.ts` | 27 | 27 |

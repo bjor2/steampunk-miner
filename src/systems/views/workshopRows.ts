@@ -4,8 +4,9 @@
  * value `upgrade_purchased.cost` logs) and an effect preview "before -> after" from
  * `vehicleStatsAt` at this step and the next (the same function as `upgrade_purchased.statsAfter`). `drill_tip` also says to which band of this planet
  * it drills at full speed (`P >= H`, #7). The engine reads maxed, the drill setting travel, once
- * k times the drill's cut speed reaches its top speed (GD lock on #316 scope 0, ticket 333): the
- * authority then refuses its step, so the row offers no buy.
+ * k times the drill's cut speed in the planet's hardest band reaches its top speed (GD lock on
+ * #316 scope 0, ticket 333; hardest band per #418): the authority then refuses its step, so the
+ * row offers no buy.
  */
 import type { AuthorityState } from '../authority/authorityState'
 import { isTravelSetByDrill } from '../authority/travelSpeed'

@@ -267,8 +267,14 @@ import type { DriveSigns } from '../vehicle/driveSigns'
  *    times its uncut share; a paid cell clears in full, the rest carries exactly, and gated or
  *    tip-locked cells discard it. Saved at snapshot 21. With no drill step sent (`drill.sweptCut`
  *    off) no digest or mined order changes.
+ * 77: the engine card judges the planet's hardest band (GD ruling on #418, option a; TD shape on
+ *    #418): `buyUpgrade('engine')` is refused `max_level` only once k times the drill's cut speed
+ *    in the hardest of bands 1 to 5 reaches the engine's top speed, wherever the rig stands, so a
+ *    step that still speeds deep travel is sold at the dock. Travel speed itself is unchanged. A
+ *    command log that bought an engine step the old band-1 reading refused now answers
+ *    differently; a run that never reached that reading moves no digest or mined order.
  */
-export const AUTHORITY_PROTOCOL_VERSION = 76
+export const AUTHORITY_PROTOCOL_VERSION = 77
 
 /** The kernel's own commands: the closed set its rule tables are written against. */
 export interface KernelCommandPayloads {

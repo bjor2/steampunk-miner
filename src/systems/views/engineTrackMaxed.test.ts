@@ -1,6 +1,8 @@
 import { afterEach, describe, expect, it, vi } from 'vitest'
+import { CLICK_CHAIN } from '../authority/purchaseChain'
 import { ECONOMY } from '../economy/economy'
-import { createScriptedSession, dockInBay } from '../authority/scriptedSession'
+import { createScriptedSession, dockInBay, typesOf } from '../authority/scriptedSession'
+import { buyUpgradeCommand } from '../platform/platformCommands'
 import { grantMoneyCommand } from '../startScenarioCommands'
 import { setUpgradeCommand } from '../vehicle/vehicleCommands'
 import { workshopRowsOf } from './workshopRows'
@@ -15,22 +17,30 @@ import { workshopRowsOf } from './workshopRows'
 /** Steps that cut band-1 rock at the tile floor. */
 const STRONG_DRILL = { drill_power: 2000, drill_tip: 600 }
 
+/** Steps whose k times cut passes the 6 m/s engine in planet 1's band 1 (6.9) but not band 5 (1.68). */
+const BAND_ONE_DRILL = { drill_power: 100, drill_tip: 30 }
+
 interface RowModules {
   createScriptedSession: typeof createScriptedSession
   dockInBay: typeof dockInBay
   workshopRowsOf: typeof workshopRowsOf
 }
 
-/** The track rows for a rig with `levels`, docked at the Upgrade bay with money to spare: a level-200
- * drill step costs about 1e35 on ticket 396's rows. */
-function rowsOf(modules: RowModules, levels: Record<string, number>) {
+/** A rig with `levels`, docked at the Upgrade bay with money to spare: a level-200 drill step
+ * costs about 1e35 on ticket 396's rows. */
+function dockedSessionOf(modules: RowModules, levels: Record<string, number>) {
   const session = modules.createScriptedSession()
   session.submit(1, grantMoneyCommand('1e60'))
   for (const [track, level] of Object.entries(levels)) {
     session.submit(1, setUpgradeCommand(track, level))
   }
   modules.dockInBay(session, 2, 'upgrade')
-  return modules.workshopRowsOf(session.state(), 'p1')
+  return session
+}
+
+/** The track rows for a rig with `levels`, docked at the Upgrade bay with money to spare. */
+function rowsOf(modules: RowModules, levels: Record<string, number>) {
+  return modules.workshopRowsOf(dockedSessionOf(modules, levels).state(), 'p1')
 }
 
 function engineRowOf(modules: RowModules, levels: Record<string, number>) {
@@ -58,6 +68,19 @@ describe('engine track at the 4-tick floor (ticket 396)', () => {
     expect(row.badge).toBeNull()
     expect(row.buy.reason).toBeNull()
     expect(row.levelText).not.toContain('drill sets travel')
+  })
+
+  // #418 (GD option a): an engine step still speeds travel in the deeper bands, so it is offered.
+  it('offers its buy at the dock while the drill sets travel in band 1 but not the hardest band', () => {
+    const row = engineRowOf(modules, BAND_ONE_DRILL)
+    expect(row.badge).toBeNull()
+    expect(row.buy.reason).toBeNull()
+  })
+
+  it('sells that engine step at the dock rather than refusing it max_level', () => {
+    const session = dockedSessionOf(modules, BAND_ONE_DRILL)
+    const events = session.submit(3, buyUpgradeCommand('engine', CLICK_CHAIN))
+    expect(typesOf(events)).toContain('UpgradePurchased')
   })
 
   it('reads maxed once a floor-bound drill sets travel, k times 15 m/s', () => {

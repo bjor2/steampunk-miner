@@ -13,12 +13,17 @@
  *
  * Every effect that scales with the engine's top speed reads `travelSpeedOf` instead, so it keeps
  * growing once the drill sets travel (GD lock point 3).
+ *
+ * The engine card reads maxed only where `k * cutSpeed` passes the top speed in the planet's
+ * hardest band (GD ruling on #418, option a; TD shape on #418): an engine step that still speeds
+ * travel deeper down does something, so it stays buyable at the dock (#333 "never offer a buy that
+ * does nothing").
  */
 import { blockHardness } from '../economy/oreEconomy'
 import { ECONOMY } from '../economy/economy'
 import type { EngineStats } from '../economy/vehicleStats'
-import { floor, fromSafeInteger, mul, toSafeInteger, type BigStat } from '../money'
-import { bandOfTile } from '../world/planetGeometry'
+import { cmp, floor, fromSafeInteger, mul, toSafeInteger, type BigStat } from '../money'
+import { BAND_COUNT, bandOfTile } from '../world/planetGeometry'
 import type { PlanetParams } from '../world/planetParams'
 import { cutStepMmOf, metresPerSecondOfStep } from './cutSpeed'
 import { subStepsPerTile, type DrillStats } from './drillRule'
@@ -39,10 +44,15 @@ export function travelEngineOf(vehicle: VehicleState, params: PlanetParams | nul
     : stats.engine
 }
 
-/** The engine card's maxed check: k times the drill's cut speed has reached the top speed. */
+/**
+ * The engine card's maxed check: k times the drill's cut speed in the planet's hardest band has
+ * reached the top speed, wherever the rig stands; never maxed off a planet.
+ */
 export function doesDrillSetTravel(vehicle: VehicleState, params: PlanetParams | null): boolean {
+  if (params === null) return false
   const stats = statsOfVehicle(vehicle)
-  return metresPerSecondOfStep(drillTravelStepOf(stats, vehicle, params)) >= stats.engine.speedMax
+  const hardestStep = travelStepThrough(stats, hardestBandRockHardnessOf(params))
+  return metresPerSecondOfStep(hardestStep) >= stats.engine.speedMax
 }
 
 /** `k * cutSpeed` of the drill in the rock of the band the vehicle stands in; 0 with no pose. */
@@ -63,6 +73,16 @@ export function bandRockHardnessOf(
   if (params === null || vehicle.pose === null) return null
   const tile = tileOfMillimetres(vehicle.pose.x, vehicle.pose.y)
   return blockHardness(params.planetIndex, bandOfTile(params, tile.tx, tile.ty))
+}
+
+/** The hardest rock of bands 1 to 5 on the planet, read from the table (biome exceptions exist). */
+export function hardestBandRockHardnessOf(params: PlanetParams): BigStat {
+  let hardest = blockHardness(params.planetIndex, 1)
+  for (let band = 2; band <= BAND_COUNT; band++) {
+    const hardness = blockHardness(params.planetIndex, band)
+    if (cmp(hardness, hardest) > 0) hardest = hardness
+  }
+  return hardest
 }
 
 /** `floor(k * cutStep)` through ground of `hardness`; 0 where the tip cannot scratch it. */

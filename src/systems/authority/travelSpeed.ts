@@ -18,7 +18,7 @@ export function travelEngineAt(state: AuthorityState, playerId: string): EngineS
   return travelEngineOf(vehicleOf(state, playerId), planetParamsOf(state.planet))
 }
 
-/** Whether the drill sets the rig's travel speed: the engine track then reads maxed. */
+/** Whether the drill sets travel in every band of the planet: the engine track then reads maxed. */
 export function isTravelSetByDrill(state: AuthorityState, playerId: string): boolean {
   return doesDrillSetTravel(vehicleOf(state, playerId), planetParamsOf(state.planet))
 }

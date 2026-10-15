@@ -3,12 +3,13 @@ import { DRILL_SUBSTEPS_PER_TICK } from '../../constants/balance'
 import { ECONOMY } from '../economy/economy'
 import { blockHardness } from '../economy/oreEconomy'
 import { vehicleStatsAt } from '../economy/vehicleStats'
-import { fromCanonical } from '../money'
+import { cmp, fromCanonical } from '../money'
 import { planetParamsFor } from '../world/planetParams'
 import { surfaceRowOfColumn } from '../world/tileGrid'
 import { cutStepMmOf } from './cutSpeed'
 import {
   doesDrillSetTravel,
+  hardestBandRockHardnessOf,
   travelEngineOf,
   travelSpeedOf,
   travelStepThrough,
@@ -30,6 +31,15 @@ function rigWith(levels: Partial<VehicleState['levels']> = {}): VehicleState {
 
 /** Steps that cut band-1 rock at the tile floor (ticket 396's 4-tick stopgap). */
 const FLOOR_BOUND = { drill_power: 2000, drill_tip: 600 }
+
+/** Steps whose k times cut passes the 6 m/s engine in planet 1's band 1 (6.9) but not band 5 (1.68). */
+const BAND_ONE_DRILL = { drill_power: 100, drill_tip: 30 }
+
+/** The rig with its pose moved `depthTiles` straight down from the surface; null for no pose. */
+function rigPosedAt(rig: VehicleState, depthTiles: number | null): VehicleState {
+  if (depthTiles === null || rig.pose === null) return { ...rig, pose: null }
+  return { ...rig, pose: { ...rig.pose, y: rig.pose.y - depthTiles * 1000 } }
+}
 
 describe('travel parity (ticket 333)', () => {
   it('reads k from economy.json as 1.5', () => {
@@ -107,5 +117,41 @@ describe('travel parity past the engine (ticket 333, a one-tick floor)', () => {
     const speedMax = vehicleStatsAt(rig.levels).engine.speedMax
     expect(parity.travelSpeedOf(rig, PARAMS)).toBe(speedMax)
     expect(parity.doesDrillSetTravel(rig, PARAMS)).toBe(false)
+  })
+})
+
+describe('engine card judged in the hardest band (#418, GD option a)', () => {
+  it('takes the hardest rock of bands 1 to 5 from the table', () => {
+    const hardnesses = [1, 2, 3, 4, 5].map((band) => blockHardness(1, band))
+    const hardest = hardestBandRockHardnessOf(PARAMS)
+    expect(hardnesses.every((hardness) => cmp(hardness, hardest) <= 0)).toBe(true)
+    expect(hardnesses.some((hardness) => cmp(hardness, hardest) === 0)).toBe(true)
+  })
+
+  it('reads not maxed while k times the cut passes the top speed in band 1 but not the hardest band', () => {
+    const rig = rigWith(BAND_ONE_DRILL)
+    expect(travelSpeedOf(rig, PARAMS)).toBeGreaterThan(vehicleStatsAt(rig.levels).engine.speedMax)
+    expect(doesDrillSetTravel(rig, PARAMS)).toBe(false)
+  })
+
+  it('reads maxed once the drill passes the top speed in every band', () => {
+    const drill = vehicleStatsAt(rigWith(FLOOR_BOUND).levels)
+    const hardestSpeed = (travelStepThrough(drill, hardestBandRockHardnessOf(PARAMS)) * 60) / 1000
+    expect(hardestSpeed).toBeGreaterThanOrEqual(drill.engine.speedMax)
+    expect(doesDrillSetTravel(rigWith(FLOOR_BOUND), PARAMS)).toBe(true)
+  })
+
+  it('reads the same at the dock, mid-shaft and with no pose', () => {
+    for (const levels of [BAND_ONE_DRILL, FLOOR_BOUND]) {
+      const rig = rigWith(levels)
+      const readings = [0, Math.floor(PARAMS.radiusTiles / 2), null].map((depth) =>
+        doesDrillSetTravel(rigPosedAt(rig, depth), PARAMS),
+      )
+      expect(new Set(readings).size).toBe(1)
+    }
+  })
+
+  it('never reads maxed off a planet', () => {
+    expect(doesDrillSetTravel(rigWith(FLOOR_BOUND), null)).toBe(false)
   })
 })
