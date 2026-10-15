@@ -321,7 +321,7 @@ programs }` from three's `renderer.info` of the game canvas), read only when cal
   planets 16 and 20 on the three pacing seeds, once with Deep chosen and once unchosen with the
   bot's own fork pick switched off (`withoutPacingBotForkPicks`, since the on-curve bot chooses Deep
   once its wallet pays), both through the same rich wallet and back to the arrival money
-  (`forkDeepPaceRuns.ts`). The bot's scripted bore cuts with the drill gear (protocol 71), so the
+  (`forkDeepPaceRuns.ts`). The bot's scripted bore cuts with the drill gear (protocol 74), so the
   cell Deep opens below the bored one is one the bot drives into. Gated on the median of the
   per-seed speed-ups: above 1.02 (measurably faster) and at most one drill step (x1.225); a result
   above the ceiling is a balance finding for Systems, never a reason to patch the bot. Beside it,
