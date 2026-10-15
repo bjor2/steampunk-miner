@@ -193,8 +193,8 @@ describe('run summary', () => {
       ...PLAYED_RUN.slice(7),
     ]
     expect(deriveSummary(run).firstBandDigTicks).toEqual({
-      '1': { arrival: 40, departure: 24 },
-      '2': { arrival: 24, departure: 24 },
+      '1': { arrival: 40, departure: 10 },
+      '2': { arrival: 19, departure: 19 },
     })
   })
 
@@ -206,7 +206,7 @@ describe('run summary', () => {
       ...PLAYED_RUN.slice(7),
     ]
     expect(deriveSummary(run).sawtoothBandDigTicks).toEqual({
-      '1': { arrival: 608, departure: 24 },
+      '1': { arrival: 608, departure: 23 },
       '2': { arrival: 45, departure: 45 },
     })
   })
@@ -217,7 +217,7 @@ describe('run summary', () => {
       args: { upgradeId: 'drill_power', level: 130 },
     })
     const run = [...PLAYED_RUN.slice(0, 2), setDrill, ...PLAYED_RUN.slice(2)]
-    expect(deriveSummary(run).firstBandDigTicks['1']).toEqual({ arrival: 24, departure: 24 })
+    expect(deriveSummary(run).firstBandDigTicks['1']).toEqual({ arrival: 10, departure: 10 })
   })
 
   it('calls a run with no game_ended interrupted', () => {
