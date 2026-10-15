@@ -12,6 +12,7 @@ import { coreNeededOf } from '../authority/coreBay'
 import { isTravelSetByDrill } from '../authority/travelSpeed'
 import { WORLD_SEED } from '../authority/scriptedSession'
 import { FACING } from '../vehicle/vehiclePose'
+import { faceThreats } from './botCombat'
 import { moveStraight, type BotPlanet } from './botPilot'
 import { createBotSession, type BotSession } from './botSession'
 import { botPlanetOf, travelWhenReady } from './botTravel'
@@ -119,5 +120,27 @@ describe('bot: combat reflex on the move (#29 Gameplay note 3, #130)', () => {
     expect(session.state().planet.index).toBe(2)
     expect(planet.hasBeenDestroyedHere).toBe(true)
     expect(nextPlanet.hasBeenDestroyedHere).toBe(false)
+  })
+})
+
+/** Ticks one `faceThreats` call holds the bot where it stands. */
+function ticksHeldFacing(session: BotSession, planet: BotPlanet): number {
+  const from = session.tick()
+  faceThreats(session, planet.pilot)
+  return session.tick() - from
+}
+
+describe('bot: combat reflex between bores (ticket 418)', () => {
+  it('gives up on a crawler walled off in the rock after 600 ticks in all, not on every bore', () => {
+    // On planet 1 a crawler hunting from a cave behind solid rock held the bot 10 s on every tile
+    // it cut beside the cave: 10 of the 34 minutes to the core.
+    const { session, planet } = botInCorridor()
+    session.submit(spawnEnemy('crawler', 1, 0, -2))
+    session.wait(NOTICE_TICKS)
+    expect(ticksHeldFacing(session, planet)).toBe(600)
+    expect(session.state().combat.enemies).toContainEqual(
+      expect.objectContaining({ kind: 'crawler', phase: expect.not.stringMatching(/^idle$/) }),
+    )
+    expect(ticksHeldFacing(session, planet)).toBe(0)
   })
 })

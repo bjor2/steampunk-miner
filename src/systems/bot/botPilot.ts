@@ -33,6 +33,8 @@ export interface BotPilot {
   facing: Facing
   /** Whether it fires the bore gun while it bores or stands by (ticket 347); absent is `never`. */
   borePolicy?: BorePolicy
+  /** The ticks each enemy has held it facing (`faceThreats`, ticket 418); absent is none yet. */
+  heldTicksByEnemy?: Map<string, number>
 }
 
 /** The bot on one planet: its mine, where its vehicle is, and whether it blasts (#109). */

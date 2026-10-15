@@ -3,6 +3,10 @@
  * reach is met with the drill head. The bot turns to face it and holds, so the enemy pins itself on
  * the drill and takes the heavy front damage, instead of hitting a side or the rear while the bot
  * looks the other way. Facing is one of the four drill directions, along the larger offset.
+ *
+ * Each enemy holds the bot for `HOLD_LIMIT_TICKS` in all (ticket 418): a crawler hunting from a
+ * cave behind solid rock never reaches the drill, and with the limit counted per call it held the
+ * bot 10 s on every tile cut beside it, 10 of planet 1's 34 minutes.
  */
 import type { Enemy } from '../authority/combat/combatState'
 import { FACING, type Facing } from '../vehicle/vehiclePose'
@@ -15,24 +19,42 @@ import type { BotSession } from './botSession'
 const THREAT_RANGE_MM = 3500
 /** Holds the facing for one pose-report interval at a time. */
 const HOLD_TICKS = 12
-/** Gives up after this long, so a stuck enemy cannot hold the trip forever. */
+/** Gives up on an enemy after this long, so a stuck enemy cannot hold the trip forever. */
 const HOLD_LIMIT_TICKS = 600
 
 export function faceThreats(session: BotSession, pilot: BotPilot): void {
   for (let held = 0; held < HOLD_LIMIT_TICKS; held += HOLD_TICKS) {
     const threat = nearestThreat(session, pilot)
     if (threat === null || !isVehicleActive(session.vehicle())) return
-    pilot.facing = facingTowardsEnemy(pilot, threat)
-    session.submit(reportPoseIntent(pilot.position, pilot.facing))
-    session.wait(HOLD_TICKS)
+    holdFacing(session, pilot, threat)
   }
+}
+
+function holdFacing(session: BotSession, pilot: BotPilot, threat: Enemy): void {
+  pilot.facing = facingTowardsEnemy(pilot, threat)
+  session.submit(reportPoseIntent(pilot.position, pilot.facing))
+  session.wait(HOLD_TICKS)
+  countHeldTicks(pilot, threat)
+}
+
+function countHeldTicks(pilot: BotPilot, enemy: Enemy): void {
+  pilot.heldTicksByEnemy ??= new Map()
+  pilot.heldTicksByEnemy.set(enemy.id, heldTicksOf(pilot, enemy) + HOLD_TICKS)
+}
+
+function heldTicksOf(pilot: BotPilot, enemy: Enemy): number {
+  return pilot.heldTicksByEnemy?.get(enemy.id) ?? 0
+}
+
+function hasHoldLeft(pilot: BotPilot, enemy: Enemy): boolean {
+  return heldTicksOf(pilot, enemy) < HOLD_LIMIT_TICKS
 }
 
 function nearestThreat(session: BotSession, pilot: BotPilot): Enemy | null {
   const threats = session
     .state()
     .combat.enemies.filter((enemy) => enemy.ownerId === session.playerId && enemy.phase !== 'idle')
-    .filter((enemy) => isWithinRange(pilot, enemy))
+    .filter((enemy) => isWithinRange(pilot, enemy) && hasHoldLeft(pilot, enemy))
   return threats.reduce<Enemy | null>(
     (nearest, enemy) =>
       nearest === null || distanceOf(pilot, enemy) < distanceOf(pilot, nearest) ? enemy : nearest,

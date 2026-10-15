@@ -751,7 +751,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/bot/botChains.test.ts` | 4 | 4 |
 | `src/systems/bot/botChargeNeed.test.ts` | 2 | 2 |
 | `src/systems/bot/botCharges.test.ts` | 9 | 9 |
-| `src/systems/bot/botCombat.test.ts` | 3 | 3 |
+| `src/systems/bot/botCombat.test.ts` | 4 | 4 |
 | `src/systems/bot/botCoreGalleries.test.ts` | 3 | 2 |
 | `src/systems/bot/botCoreRule.test.ts` | 7 | 7 |
 | `src/systems/bot/botDeathReplay.test.ts` | 8 | 8 |
