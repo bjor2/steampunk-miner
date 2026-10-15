@@ -136,6 +136,25 @@ describe('ndjson sink: commands', () => {
     expect(expandCommandLog(lines)).toEqual(poses)
   })
 
+  it('writes the run of drill commands it is gathering at each flush, and the file expands back (ticket 420)', async () => {
+    const { transport, commandsSent } = recordingTransport()
+    const sink = createNdjsonSink(transport)
+    const drills = [0, 1, 2, 3].map((index): AuthorityCommand => ({
+      playerId: 'player_1',
+      tick: 60 * (index + 1),
+      seq: index + 1,
+      type: 'drillTile',
+      payload: { tx: 0, ty: 200 - index, ticks: 60 },
+    }))
+    drills.slice(0, 3).forEach((drill) => sink.appendCommand('run_a', drill))
+    await sink.flush()
+    sink.appendCommand('run_a', drills[3])
+    await sink.flush()
+    const lines = commandsSent.flatMap(({ text }) => linesOf(text))
+    expect(lines).toHaveLength(2)
+    expect(expandCommandLog(lines)).toEqual(drills)
+  })
+
   it("starts each run's file with the drive written", async () => {
     const { transport, commandsSent } = recordingTransport()
     const sink = createNdjsonSink(transport)

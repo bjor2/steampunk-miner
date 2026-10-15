@@ -3,7 +3,7 @@
   "description": "Planet 1, level 0: drill metal, crystal, crystal, metal, crystal, metal surface ore; the replay must mine the same ores in the same order (#122).",
   "generatorVersion": 8,
   "authorityProtocolVersion": 77,
-  "logSchemaVersion": 5,
+  "logSchemaVersion": 6,
   "numberFormatVersion": 1,
   "sliceSections": {
     "aetheric": 1,
@@ -71,18 +71,7 @@
       "type": "reportPose",
       "payload": {
         "x": 68500,
-        "y": 288500,
-        "vx": 0,
-        "vy": 0,
-        "upx": 0,
-        "upy": 1024,
-        "facing": 2,
-        "driving": false,
-        "thrusting": false,
-        "drilling": false,
-        "thrustTicks": 0,
-        "driveTicks": 0,
-        "drillTicks": 0
+        "y": 288500
       }
     },
     {
@@ -103,18 +92,7 @@
       "type": "reportPose",
       "payload": {
         "x": 69500,
-        "y": 289500,
-        "vx": 0,
-        "vy": 0,
-        "upx": 0,
-        "upy": 1024,
-        "facing": 2,
-        "driving": false,
-        "thrusting": false,
-        "drilling": false,
-        "thrustTicks": 0,
-        "driveTicks": 0,
-        "drillTicks": 0
+        "y": 289500
       }
     },
     {
@@ -135,18 +113,7 @@
       "type": "reportPose",
       "payload": {
         "x": 30500,
-        "y": 294500,
-        "vx": 0,
-        "vy": 0,
-        "upx": 0,
-        "upy": 1024,
-        "facing": 2,
-        "driving": false,
-        "thrusting": false,
-        "drilling": false,
-        "thrustTicks": 0,
-        "driveTicks": 0,
-        "drillTicks": 0
+        "y": 294500
       }
     },
     {
@@ -167,18 +134,7 @@
       "type": "reportPose",
       "payload": {
         "x": 69500,
-        "y": 288500,
-        "vx": 0,
-        "vy": 0,
-        "upx": 0,
-        "upy": 1024,
-        "facing": 2,
-        "driving": false,
-        "thrusting": false,
-        "drilling": false,
-        "thrustTicks": 0,
-        "driveTicks": 0,
-        "drillTicks": 0
+        "y": 288500
       }
     },
     {
@@ -199,18 +155,7 @@
       "type": "reportPose",
       "payload": {
         "x": 30500,
-        "y": 293500,
-        "vx": 0,
-        "vy": 0,
-        "upx": 0,
-        "upy": 1024,
-        "facing": 2,
-        "driving": false,
-        "thrusting": false,
-        "drilling": false,
-        "thrustTicks": 0,
-        "driveTicks": 0,
-        "drillTicks": 0
+        "y": 293500
       }
     },
     {

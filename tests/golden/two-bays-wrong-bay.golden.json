@@ -3,7 +3,7 @@
   "description": "Buying at the Sell bay and selling at the Upgrade bay are refused as wrong_bay; the same buys at the Upgrade bay apply (#37, #41).",
   "generatorVersion": 8,
   "authorityProtocolVersion": 77,
-  "logSchemaVersion": 5,
+  "logSchemaVersion": 6,
   "numberFormatVersion": 1,
   "sliceSections": {
     "aetheric": 1,
@@ -103,19 +103,7 @@
       "seq": 7,
       "type": "reportPose",
       "payload": {
-        "x": 7000,
-        "y": 300500,
-        "vx": 0,
-        "vy": 0,
-        "upx": 0,
-        "upy": 1024,
-        "facing": 1,
-        "driving": false,
-        "thrusting": false,
-        "drilling": false,
-        "thrustTicks": 0,
-        "driveTicks": 0,
-        "drillTicks": 0
+        "x": 7000
       }
     },
     {

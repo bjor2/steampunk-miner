@@ -93,9 +93,16 @@ describe('golden run gate', () => {
     },
   )
 
-  it('writes the committed command lists as the log does, a drive only when it changed (ticket 342)', () => {
+  it('writes the committed command lists as the log does: changed pose fields, drill runs (ticket 420)', () => {
     for (const golden of committedGoldenRuns()) {
       expect(loggedCommandsOf(expandCommandLog(golden.commands))).toEqual(golden.commands)
+    }
+  })
+
+  it("expands each golden's logged commands back to exactly the commands its script sends (ticket 420)", () => {
+    for (const script of GOLDEN_SCRIPTS) {
+      const commands = stampScript(script)
+      expect(expandCommandLog(loggedCommandsOf(commands))).toEqual(commands)
     }
   })
 

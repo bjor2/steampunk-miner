@@ -9,8 +9,8 @@
  * - A version differs: the file is stale. Fail with "regenerate the golden file", so a digest
  *   change always arrives as a version bump plus a visible diff of the file in the same commit.
  *
- * `commands` are written as `commands.ndjson` holds them (`commandLog.ts`, ticket 342), so the
- * file pins the log encoding too; the replay expands them first.
+ * `commands` are written as `commands.ndjson` holds them (`commandLog.ts`, tickets 342 and 420),
+ * so the file pins the log encoding too; the replay expands them first.
  *
  * `sliceSections` records each registered save section's version (feature-slices.md 5.4), written
  * only while one is registered, so a build without sections writes the files byte for byte as
@@ -51,7 +51,7 @@ export interface GoldenRun extends GoldenVersions {
   description: string
   worldSeed: number
   endTick: number
-  /** As logged: a pose report's `drive` only when it changed. */
+  /** As logged: a pose report's changed fields only, a run of drill commands as one line. */
   commands: LoggedCommand[]
   digests: DigestRecord[]
   /** The ore the run mined, in order, as `summary.json` keeps it (#122). */

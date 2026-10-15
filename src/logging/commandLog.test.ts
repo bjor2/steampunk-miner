@@ -1,9 +1,14 @@
 import { describe, expect, it } from 'vitest'
 import { POSE_REPORT_INTERVAL_TICKS } from '../constants/balance'
 import { TICKS_PER_SECOND } from '../constants/physics'
-import type { AuthorityCommand } from '../systems/authority/authorityCommand'
+import type { AuthorityCommand, CommandPayloads } from '../systems/authority/authorityCommand'
 import type { DriveSigns } from '../systems/vehicle/driveSigns'
-import { createCommandLogWriter, expandCommandLog, loggedCommandsOf } from './commandLog'
+import {
+  createCommandLogWriter,
+  expandCommandLog,
+  loggedCommandsOf,
+  type LoggedCommand,
+} from './commandLog'
 import { formatNdjsonLine } from './ndjson'
 
 let nextSeq = 0
@@ -36,7 +41,7 @@ function loggedDrivesOf(commands: readonly AuthorityCommand[]): (DriveSigns | un
   )
 }
 
-describe('command log (ticket 342)', () => {
+describe('command log: pose drive (ticket 342)', () => {
   it('writes drive on a pose line only when it changed since the player last logged one', () => {
     const commands = [poseOf('p1', 12, DOWN), poseOf('p1', 24, DOWN), poseOf('p1', 36, RIGHT)]
     expect(loggedDrivesOf(commands)).toEqual([DOWN, undefined, RIGHT])
@@ -76,13 +81,19 @@ describe('command log (ticket 342)', () => {
   })
 
   it('writes the same lines one command at a time as for the whole list', () => {
-    const commands = [poseOf('p1', 12, DOWN), poseOf('p1', 24, DOWN), rescueOf('p1', 30)]
+    const commands = [
+      poseOf('p1', 12, DOWN),
+      ...drillTilesDown(5, 20),
+      poseOf('p1', 24, DOWN),
+      rescueOf('p1', 30),
+    ]
     const writer = createCommandLogWriter()
-    expect(commands.map(writer.toLoggedCommand)).toEqual(loggedCommandsOf(commands))
+    const lines = [...commands.flatMap(writer.writeCommand), ...writer.flush()]
+    expect(lines).toEqual(loggedCommandsOf(commands))
   })
 
   it('leaves the submitted command untouched', () => {
-    const commands = [poseOf('p1', 12, DOWN), poseOf('p1', 24, DOWN)]
+    const commands = [poseOf('p1', 12, DOWN), poseOf('p1', 24, DOWN), ...drillTilesDown(3, 30)]
     const before = structuredClone(commands)
     loggedCommandsOf(commands)
     expect(commands).toEqual(before)
@@ -92,9 +103,99 @@ describe('command log (ticket 342)', () => {
     expect(TICKS_PER_SECOND / POSE_REPORT_INTERVAL_TICKS).toBe(5)
   })
 
-  it('refuses a pose line with no drive and nothing to carry forward', () => {
+  it('refuses a pose line with fields left out and nothing to carry forward', () => {
     const [first, second] = loggedCommandsOf([poseOf('p1', 12, DOWN), poseOf('p1', 24, DOWN)])
-    expect(() => expandCommandLog([second])).toThrow(/no drive/)
-    expect(() => expandCommandLog([first, rescueOf('p1', 20), second])).toThrow(/no drive/)
+    expect(() => expandCommandLog([second])).toThrow(/no earlier one to carry forward/)
+    expect(() => expandCommandLog([first, rescueOf('p1', 20), second])).toThrow(/has no x, y/)
+  })
+})
+
+/** `count` drill commands down one column, 60 ticks each, as the pacing bot bores. */
+function drillTilesDown(count: number, fromTick: number): AuthorityCommand[] {
+  return Array.from({ length: count }, (_, index) => ({
+    playerId: 'p1',
+    tick: fromTick + 60 * index,
+    seq: nextSeq++,
+    type: 'drillTile',
+    payload: { tx: 4, ty: 270 - index, ticks: 60 },
+  }))
+}
+
+/** A swept drill step a tick from `fromY`, `stepMm` further down each tick. */
+function drillStepsDown(
+  count: number,
+  fromTick: number,
+  stepMm: number,
+  fromY = 261_500,
+): AuthorityCommand[] {
+  return Array.from({ length: count }, (_, index) => ({
+    playerId: 'p1',
+    tick: fromTick + index,
+    seq: nextSeq++,
+    type: 'drillStep',
+    payload: { x: 30_500, y: fromY - stepMm * index, drive: DOWN },
+  }))
+}
+
+function poseWith(tick: number, changes: Partial<CommandPayloads['reportPose']>): AuthorityCommand {
+  const pose = poseOf('p1', tick, DOWN) as AuthorityCommand<'reportPose'>
+  return { ...pose, payload: { ...pose.payload, ...changes } }
+}
+
+describe('command log: compact lines (ticket 420)', () => {
+  it("leaves out every pose field equal to the player's previous report", () => {
+    const moved = poseWith(24, { y: -3500, driveTicks: 4 })
+    const lines = loggedCommandsOf([poseOf('p1', 12, DOWN), poseOf('p1', 18, DOWN), moved])
+    expect(lines.map((line) => line.payload)).toEqual([
+      poseOf('p1', 12, DOWN).payload,
+      {},
+      { y: -3500, driveTicks: 4 },
+    ])
+  })
+
+  it('writes a run of drill tiles down a column as one line with its count and step', () => {
+    const commands = drillTilesDown(5, 100)
+    const [line, ...rest] = loggedCommandsOf(commands)
+    expect(rest).toEqual([])
+    expect(line).toEqual({
+      ...commands[0],
+      run: { count: 5, tick: 60, seq: 1, payload: { tx: 0, ty: -1 } },
+    })
+    expect(expandCommandLog([line])).toEqual(commands)
+  })
+
+  it('writes swept drill steps of a constant step as one line, and starts a new run where it changes', () => {
+    const steady = drillStepsDown(120, 10, 400)
+    const faster = drillStepsDown(30, 130, 800, 261_500 - 400 * 119 - 800)
+    const lines = loggedCommandsOf([...steady, ...faster])
+    expect(lines.map((line) => ('run' in line ? line.run.count : 1))).toEqual([120, 30])
+    expect(expandCommandLog(lines)).toEqual([...steady, ...faster])
+  })
+
+  it('ends a run at any other command, and keeps a lone drill command as it was', () => {
+    const [first, second] = drillTilesDown(2, 100)
+    const pose = poseOf('p1', 130, DOWN)
+    const commands = [first, pose, second]
+    expect(loggedCommandsOf(commands)).toEqual([first, pose, second])
+    expect(expandCommandLog(loggedCommandsOf(commands))).toEqual(commands)
+  })
+
+  it('expands a mixed log of poses, runs and rescues back to exactly the submitted commands', () => {
+    const commands = [
+      poseOf('p1', 12, DOWN),
+      ...drillTilesDown(7, 20),
+      poseOf('p1', 440, RIGHT),
+      ...drillStepsDown(50, 441, 125),
+      rescueOf('p1', 500),
+      poseOf('p1', 512, RIGHT),
+      poseOf('p2', 512, DOWN),
+      ...drillTilesDown(1, 520),
+    ]
+    const text = loggedCommandsOf(commands).map(formatNdjsonLine).join('')
+    const read = text
+      .split('\n')
+      .filter((line) => line !== '')
+      .map((line) => JSON.parse(line) as LoggedCommand)
+    expect(expandCommandLog(read)).toEqual(commands)
   })
 })

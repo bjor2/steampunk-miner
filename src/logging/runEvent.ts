@@ -18,8 +18,11 @@ import type { RunEventData, RunEventName } from './eventNames'
  * 4: `resource_sold` gains the required `coinsShown`, the sell burst's coin count (ticket 220).
  * 5: `commands.ndjson` writes a `reportPose`'s `drive` only when it changed since that player's
  *    previous logged report; a reader carries the last one forward (`commandLog.ts`, ticket 342).
+ * 6: a drill span logs one `drill_cut` line (its fields retyped) and one `casing_lined` line per
+ *    lining run in place of its per-cell lines (`drillCutLine.ts`), and `commands.ndjson` leaves
+ *    out every unchanged pose field and writes a run of drill commands as one line (ticket 420).
  */
-export const LOG_SCHEMA_VERSION = 5
+export const LOG_SCHEMA_VERSION = 6
 
 /** Where the player is: the store supplies it, the log stamps it. */
 export interface RunEventPlace {

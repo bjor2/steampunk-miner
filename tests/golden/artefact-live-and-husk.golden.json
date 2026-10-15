@@ -3,7 +3,7 @@
   "description": "Take assay_beacon from the live planet 1 cache; on planet 2 the cache is a husk and opening it is refused (#46).",
   "generatorVersion": 8,
   "authorityProtocolVersion": 77,
-  "logSchemaVersion": 5,
+  "logSchemaVersion": 6,
   "numberFormatVersion": 1,
   "sliceSections": {
     "aetheric": 1,
@@ -103,18 +103,7 @@
       "type": "reportPose",
       "payload": {
         "x": 244500,
-        "y": 258500,
-        "vx": 0,
-        "vy": 0,
-        "upx": 0,
-        "upy": 1024,
-        "facing": 2,
-        "driving": false,
-        "thrusting": false,
-        "drilling": false,
-        "thrustTicks": 0,
-        "driveTicks": 0,
-        "drillTicks": 0
+        "y": 258500
       }
     },
     {

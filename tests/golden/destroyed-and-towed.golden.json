@@ -3,7 +3,7 @@
   "description": "Hull set to 1 in the band-1 corridor, a crawler hits the rear, destroyed, towed (#9).",
   "generatorVersion": 8,
   "authorityProtocolVersion": 77,
-  "logSchemaVersion": 5,
+  "logSchemaVersion": 6,
   "numberFormatVersion": 1,
   "sliceSections": {
     "aetheric": 1,
@@ -80,19 +80,7 @@
       "seq": 4,
       "type": "reportPose",
       "payload": {
-        "x": 15500,
-        "y": 297500,
-        "vx": 0,
-        "vy": 0,
-        "upx": 0,
-        "upy": 1024,
-        "facing": 1,
-        "driving": false,
-        "thrusting": false,
-        "drilling": false,
-        "thrustTicks": 0,
-        "driveTicks": 0,
-        "drillTicks": 0
+        "x": 15500
       }
     },
     {
@@ -112,19 +100,7 @@
       "seq": 6,
       "type": "reportPose",
       "payload": {
-        "x": 16500,
-        "y": 297500,
-        "vx": 0,
-        "vy": 0,
-        "upx": 0,
-        "upy": 1024,
-        "facing": 1,
-        "driving": false,
-        "thrusting": false,
-        "drilling": false,
-        "thrustTicks": 0,
-        "driveTicks": 0,
-        "drillTicks": 0
+        "x": 16500
       }
     },
     {
@@ -144,19 +120,7 @@
       "seq": 8,
       "type": "reportPose",
       "payload": {
-        "x": 17500,
-        "y": 297500,
-        "vx": 0,
-        "vy": 0,
-        "upx": 0,
-        "upy": 1024,
-        "facing": 1,
-        "driving": false,
-        "thrusting": false,
-        "drilling": false,
-        "thrustTicks": 0,
-        "driveTicks": 0,
-        "drillTicks": 0
+        "x": 17500
       }
     },
     {
@@ -176,19 +140,7 @@
       "seq": 10,
       "type": "reportPose",
       "payload": {
-        "x": 18500,
-        "y": 297500,
-        "vx": 0,
-        "vy": 0,
-        "upx": 0,
-        "upy": 1024,
-        "facing": 1,
-        "driving": false,
-        "thrusting": false,
-        "drilling": false,
-        "thrustTicks": 0,
-        "driveTicks": 0,
-        "drillTicks": 0
+        "x": 18500
       }
     },
     {
@@ -208,19 +160,7 @@
       "seq": 12,
       "type": "reportPose",
       "payload": {
-        "x": 19500,
-        "y": 297500,
-        "vx": 0,
-        "vy": 0,
-        "upx": 0,
-        "upy": 1024,
-        "facing": 1,
-        "driving": false,
-        "thrusting": false,
-        "drilling": false,
-        "thrustTicks": 0,
-        "driveTicks": 0,
-        "drillTicks": 0
+        "x": 19500
       }
     },
     {
@@ -240,19 +180,7 @@
       "seq": 14,
       "type": "reportPose",
       "payload": {
-        "x": 20500,
-        "y": 297500,
-        "vx": 0,
-        "vy": 0,
-        "upx": 0,
-        "upy": 1024,
-        "facing": 1,
-        "driving": false,
-        "thrusting": false,
-        "drilling": false,
-        "thrustTicks": 0,
-        "driveTicks": 0,
-        "drillTicks": 0
+        "x": 20500
       }
     },
     {
@@ -272,19 +200,7 @@
       "seq": 16,
       "type": "reportPose",
       "payload": {
-        "x": 21500,
-        "y": 297500,
-        "vx": 0,
-        "vy": 0,
-        "upx": 0,
-        "upy": 1024,
-        "facing": 1,
-        "driving": false,
-        "thrusting": false,
-        "drilling": false,
-        "thrustTicks": 0,
-        "driveTicks": 0,
-        "drillTicks": 0
+        "x": 21500
       }
     },
     {
@@ -304,19 +220,7 @@
       "seq": 18,
       "type": "reportPose",
       "payload": {
-        "x": 22500,
-        "y": 297500,
-        "vx": 0,
-        "vy": 0,
-        "upx": 0,
-        "upy": 1024,
-        "facing": 1,
-        "driving": false,
-        "thrusting": false,
-        "drilling": false,
-        "thrustTicks": 0,
-        "driveTicks": 0,
-        "drillTicks": 0
+        "x": 22500
       }
     },
     {
@@ -336,19 +240,7 @@
       "seq": 20,
       "type": "reportPose",
       "payload": {
-        "x": 23500,
-        "y": 297500,
-        "vx": 0,
-        "vy": 0,
-        "upx": 0,
-        "upy": 1024,
-        "facing": 1,
-        "driving": false,
-        "thrusting": false,
-        "drilling": false,
-        "thrustTicks": 0,
-        "driveTicks": 0,
-        "drillTicks": 0
+        "x": 23500
       }
     },
     {
@@ -368,19 +260,7 @@
       "seq": 22,
       "type": "reportPose",
       "payload": {
-        "x": 24500,
-        "y": 297500,
-        "vx": 0,
-        "vy": 0,
-        "upx": 0,
-        "upy": 1024,
-        "facing": 1,
-        "driving": false,
-        "thrusting": false,
-        "drilling": false,
-        "thrustTicks": 0,
-        "driveTicks": 0,
-        "drillTicks": 0
+        "x": 24500
       }
     },
     {
@@ -400,19 +280,7 @@
       "seq": 24,
       "type": "reportPose",
       "payload": {
-        "x": 25500,
-        "y": 297500,
-        "vx": 0,
-        "vy": 0,
-        "upx": 0,
-        "upy": 1024,
-        "facing": 1,
-        "driving": false,
-        "thrusting": false,
-        "drilling": false,
-        "thrustTicks": 0,
-        "driveTicks": 0,
-        "drillTicks": 0
+        "x": 25500
       }
     },
     {
@@ -432,19 +300,7 @@
       "seq": 26,
       "type": "reportPose",
       "payload": {
-        "x": 26500,
-        "y": 297500,
-        "vx": 0,
-        "vy": 0,
-        "upx": 0,
-        "upy": 1024,
-        "facing": 1,
-        "driving": false,
-        "thrusting": false,
-        "drilling": false,
-        "thrustTicks": 0,
-        "driveTicks": 0,
-        "drillTicks": 0
+        "x": 26500
       }
     },
     {
@@ -494,18 +350,7 @@
       "type": "reportPose",
       "payload": {
         "x": 20500,
-        "y": 297500,
-        "vx": 0,
-        "vy": 0,
-        "upx": 0,
-        "upy": 1024,
-        "facing": 0,
-        "driving": false,
-        "thrusting": false,
-        "drilling": false,
-        "thrustTicks": 0,
-        "driveTicks": 0,
-        "drillTicks": 0
+        "facing": 0
       }
     },
     {

@@ -76,7 +76,7 @@ describe('session table', () => {
     const table = sessionTableOf([sessionFilesOf('logs/old', [oldLine])])
     expect(table.sessions).toEqual([])
     expect(table.refused[0].problems).toEqual([
-      'logSchemaVersion 1, this analysis reads 5; no adapter exists between them',
+      'logSchemaVersion 1, this analysis reads 6; no adapter exists between them',
     ])
   })
 

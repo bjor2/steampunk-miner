@@ -125,7 +125,7 @@ describe('compareRuns', () => {
     const comparison = compareRunsIncludingDebug(summaryOf(), summaryOf({ logSchemaVersion: 1 }))
     expect(comparison).toEqual({
       ok: false,
-      problems: ['run_a has logSchemaVersion 5 and run_a has 1; no adapter exists between them'],
+      problems: ['run_a has logSchemaVersion 6 and run_a has 1; no adapter exists between them'],
     })
   })
 

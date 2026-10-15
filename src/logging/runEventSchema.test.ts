@@ -176,6 +176,6 @@ describe('run event schema', () => {
   })
 
   it('refuses a line from another log schema version', () => {
-    expect(runEventProblems({ ...resourceSold, v: 1 })).toEqual(['v must be 5'])
+    expect(runEventProblems({ ...resourceSold, v: 1 })).toEqual(['v must be 6'])
   })
 })
