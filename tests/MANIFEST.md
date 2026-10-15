@@ -884,7 +884,8 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/logging/domainEventLog.test.ts` | 21 | 21 |
 | `src/logging/drillCutLine.test.ts` | 12 | 12 |
 | `src/logging/drillLadder.test.ts` | 3 | 3 |
-| `src/logging/drillLadderReport.test.ts` | 7 | 7 |
+| `src/logging/drillLadderReport.test.ts` | 9 | 9 |
+| `src/logging/drillLadderSteps.test.ts` | 2 | 2 |
 | `src/logging/drillLogBytes.test.ts` | 2 | 2 |
 | `src/logging/drillSpanGate.test.ts` | 2 | 2 |
 | `src/logging/dynamiteDryRuns.test.ts` | 4 | 4 |
@@ -1182,6 +1183,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | File | Tests | Sites |
 | --- | --- | --- |
 | `scripts/ci/drillDownHistory.test.mjs` | 6 | 6 |
+| `scripts/ci/drillLadderHistory.test.mjs` | 4 | 4 |
 | `scripts/ci/testHistory.test.mjs` | 9 | 9 |
 | `scripts/ci/testMetrics.test.mjs` | 12 | 12 |
 
@@ -1225,6 +1227,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | File | Tests | Sites |
 | --- | --- | --- |
 | `scripts/status/drillDown.test.mjs` | 8 | 8 |
+| `scripts/status/drillSpeed.test.mjs` | 11 | 11 |
 | `scripts/status/featureTime.test.mjs` | 11 | 11 |
 | `scripts/status/featureTimeHtml.test.mjs` | 7 | 7 |
 | `scripts/status/features.test.mjs` | 13 | 13 |

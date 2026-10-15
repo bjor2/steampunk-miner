@@ -170,7 +170,7 @@ before the per-push split, which ran the whole suite including the pacing bot fi
 ## Drill-down runs (`drill-down.ndjson`, schema 1)
 
 The Tests tab's drill-down panel (ticket 416) reads this file. `e2e/browser/drillDown.spec.ts`
-writes one row per run (drill levels 1 and 10) to `test-results/drill-down/level-<n>.json`, and
+writes one row per run (stored drill_power steps 1, 5, 10, 15 and 20) to `test-results/drill-down/level-<n>.json`, and
 `scripts/ci/recordDrillDown.mjs` appends them here from `pushTestMetrics.sh`, so any Tester record
 made after a Playwright run carries them (slow phase `e2e`, probes, the nightly suites). It is one
 JSON line per run, oldest first and append-only, following `docs/perf/history.ndjson`. A row whose id
@@ -198,5 +198,39 @@ metres (1 cell = 1 m, centre at the origin) of the last reported pose, at most 0
   "recordedAt": "…", // this and the next two: stamped by the recorder
   "sha": "<tested sha>",
   "phase": "slow",
+}
+```
+
+## Drill ladder runs (`drill-ladder.ndjson`, schema 1)
+
+The status page's Drill speed panel (ticket 434) reads the cut from this file and the descent from
+`drill-down.ndjson`. `src/logging/drillLadderSteps.test.ts` cuts the #409 ladder column at stored
+drill_power steps 1, 5, 10, 15 and 20 and writes one row per level to
+`balance-report/drill-ladder-steps.ndjson`; `scripts/ci/recordDrillLadder.mjs` appends them here
+from `pushTestMetrics.sh`, so any Tester record made after a Vitest run of that spec carries them.
+Append-only and de-duplicated by row id like the drill-down rows; a malformed row is refused with
+its problems (`scripts/ci/drillLadderHistory.mjs`). Rates are the ladder report's fixed-point text
+(`src/logging/drillLadderReport.ts`).
+
+```jsonc
+{
+  "schema": 1,
+  "id": "2026-10-16T01:35:00.000Z-drill-ladder-steps-L5", // run time, ladder, level
+  "measuredAt": "2026-10-16T01:35:00.000Z", // when the spec cut the ladder
+  "ladder": "drill-ladder-steps",
+  "planet": 1,
+  "worldSeed": 83921,
+  "column": 20,
+  "previousLevel": 1, // the level cut before this one in the run; null on the first
+  "level": 5, // the stored drill_power step
+  "cells": 20,
+  "ticks": 776, // until the last cell broke
+  "seconds": "12.933",
+  "cellsPerSecond": "1.546", // 1 cell = 1 m, so also m/s
+  "gainOnPrevious": "1.024", // times faster than previousLevel; null on the first
+  "lawGainOnPrevious": "1.026", // drillPowerAtStep(level) / drillPowerAtStep(previousLevel)
+  "recordedAt": "…", // this and the next two: stamped by the recorder
+  "sha": "<tested sha>",
+  "phase": "fast",
 }
 ```

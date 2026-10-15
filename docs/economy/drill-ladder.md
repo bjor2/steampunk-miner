@@ -53,6 +53,23 @@ stored level (`debug.setUpgrade`) is a step of ten pips, so major `L` is step `1
 - To compare a curve change, run `npx vitest run src/logging/drillLadder.test.ts` before and after
   and compare the two `balance-report/drill-ladder.ndjson` files line by line.
 
+## Stored-step ladder for the status page (ticket 434)
+
+`src/logging/drillLadderSteps.test.ts` cuts the same column's first 20 cells (all band 1) at stored
+drill_power steps 1, 5, 10, 15 and 20, the levels the browser drill-down run holds Down at, with the
+law counted per step (`drillPowerAtStep`). It asserts nothing beyond the whole column and no slower
+step; its rows go to `drill-ladder.ndjson` on `test-metrics` and the status page's Drill speed panel
+sets them beside the browser descent ([loop-status.md](../loop-status.md#drill-speed-panel-ticket-434)).
+At its first run (base 404db5da):
+
+| stored step | ticks | seconds | cells/s | x previous | law x previous |
+| ----------: | ----: | ------: | ------: | ---------: | -------------: |
+|           1 |   795 |  13.250 |   1.509 |            |                |
+|           5 |   776 |  12.933 |   1.546 |      1.024 |          1.026 |
+|          10 |   715 |  11.917 |   1.678 |      1.085 |          1.085 |
+|          15 |   693 |  11.550 |   1.732 |      1.032 |          1.032 |
+|          20 |   638 |  10.633 |   1.881 |      1.086 |          1.085 |
+
 ## Starting rigs: cut-follow speed per stored step (ticket 431)
 
 The cut-follow's read of `cutSpeed` (`cutFollowAt`, `systems/authority/cutFollowRead.ts`) at stored

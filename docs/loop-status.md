@@ -5,7 +5,9 @@ linkable: **Issue trees** (`#issues`), **Loops** (`#loops`, the default), **Slot
 build loop's slot pools), **Tests** (`#tests`, the box Tester and every test's duration, feature
 and trend), **Features** (`#features`, the game feature tree) and **Performance** (`#performance`,
 short link `/status/performance/`). It shows the issue trees and what every automated loop is
-doing. A loop reports its state with one command:
+doing. Above the tabs (on every tab but Features) the highlighted **Drill speed** panel shows whether
+drilling got faster ([below](#drill-speed-panel-ticket-434)). A loop reports its state with one
+command:
 
 ```bash
 scripts/status/loop-status.sh <loop> <working|idle|paused|blocked> [--issue N] [--slot S] [--note "text"]
@@ -221,7 +223,8 @@ Between the Tester panel and **Every test**, the **Drill-down run** panel shows 
 gets when the real Down key is held for 10 s. `e2e/browser/drillDown.spec.ts` opens the committed
 start save `scenarios/drill-down-start.scenario.json` (seed 83921, planet 1, `drill_power` 1) in the
 preview build. It drives off the dock pad to column 16, stops, then holds ArrowDown for 10 s of wall
-time. A second run does the same at drill level 10, set through `debug.setUpgrade`. The panel shows
+time. Further runs do the same at stored drill_power steps 5, 10, 15 and 20 (ticket 434), set
+through `debug.setUpgrade`. The panel shows
 the latest run per level (start and end position in cells, HUD depth, depth reached in 10 s and its
 change against the run before, cells/s, m/s), a sparkline of depth gained over commits, and the
 newest 20 runs (commit, ticks in the hold, Tester phase).
@@ -238,6 +241,40 @@ Tester's worktree. `scripts/ci/pushTestMetrics.sh`, which the Tester calls after
 skipped. The schema is in [test-metrics.md](metrics/test-metrics.md#drill-down-runs-drill-downndjson).
 The page reads the file from raw like `tests.json`, and `build-status.mjs` copies it beside the page
 as `drill-down.ndjson`.
+
+### Drill speed panel (ticket 434)
+
+Bjor, 15 Oct: "drilling is still way too slow, level 20 feels like level 5". The **Drill speed**
+panel sits in its own highlighted card above the tabs, so every merge shows whether drilling got
+faster and smoother. One row per **level**, which is the stored `drill_power` step the tests set
+(stored 10 equals major 1; the panel's note says so), at levels 1, 5, 10, 15 and 20:
+
+- **Cut m/s (ladder):** what the drill can cut. `src/logging/drillLadderSteps.test.ts` runs the
+  #409 ladder's cut (`cutColumnAtDrillStep`) down the first 20 cells of the P1 surface column (seed
+  83921, column 20; all band 1, the ground a 10 s hold reaches) at each stored step, with the drill
+  law alone and no vehicle travel. 1 cell = 1 m, so its cells/s is its m/s.
+- **Descent m/s (browser):** what the body achieves going down: the drill-down run's
+  `descentMetres` (toward the planet's centre) over its 10 s hold, at the same stored step.
+- **Descent ÷ cut:** the "remove ground, then fall" gap, with a bar against the **100% target**.
+- **Gain on the level before:** the latest cut, the drill law's own gain for that step (the ladder
+  row's `lawGainOnPrevious`) and the latest descent, each divided by the level shown above it, so
+  "level 20 feels like level 5" reads as a number.
+- **Trend:** each speed's latest value, its change since the run before ("first run" for a lone
+  one), the run count and commit, and a sparkline over the newest 20 runs.
+
+A level with no run reads **"no run yet"**, never 0. It watches and does not judge: nothing is
+coloured pass or fail, #409 keeps the strict per-major ladder assertion, and the drill-down run
+keeps its loose ones.
+
+Where the data comes from: the descent is `drill-down.ndjson` (above). The cut is
+**`drill-ladder.ndjson` on `test-metrics`**: the ladder spec writes one row per level to
+`balance-report/drill-ladder-steps.ndjson` in the Tester's worktree, and `pushTestMetrics.sh`
+runs `scripts/ci/recordDrillLadder.mjs` after every phase, which appends them the same way
+(append-only, a row id already held skipped, stamped with `recordedAt`, `sha` and `phase`). The
+schema is in [test-metrics.md](metrics/test-metrics.md#drill-ladder-runs-drill-ladderndjson-schema-1).
+The page reads both files from raw on load and on the 60 s poll, and `build-status.mjs` copies them
+beside the page. Code: `scripts/status/drillSpeed.mjs` (model) and `drillSpeedHtml.mjs` (view),
+tested from the fixtures in `scripts/status/fixtures/drill-speed/`.
 
 ## Feature tree
 
