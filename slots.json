@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-10-15T22:48:33+02:00",
+  "updated_at": "2026-10-15T23:06:51+02:00",
   "caps": {
     "grok": 12,
     "claude": 10,
@@ -20,26 +20,26 @@
         {
           "slot": "C1",
           "state": "busy",
-          "ticket": 397,
+          "ticket": 426,
           "grok_slot": 1,
           "kind": "dev",
-          "since": "2026-10-15T21:50:00+02:00"
+          "since": "2026-10-15T23:00:00+02:00"
         },
         {
           "slot": "C2",
-          "state": "busy",
-          "ticket": 425,
-          "grok_slot": 2,
-          "kind": "dev",
-          "since": "2026-10-15T22:41:00+02:00"
+          "state": "free",
+          "ticket": null,
+          "grok_slot": null,
+          "kind": null,
+          "since": null
         },
         {
           "slot": "C3",
-          "state": "busy",
-          "ticket": 434,
-          "grok_slot": 3,
-          "kind": "dev",
-          "since": "2026-10-15T22:41:00+02:00"
+          "state": "free",
+          "ticket": null,
+          "grok_slot": null,
+          "kind": null,
+          "since": null
         },
         {
           "slot": "C4",
@@ -67,9 +67,9 @@
         }
       ],
       "size": 6,
-      "used": 4,
-      "free": 2,
-      "claims_last_hour": 5,
+      "used": 2,
+      "free": 4,
+      "claims_last_hour": 3,
       "name": "Claude Max 1"
     },
     {
@@ -120,7 +120,7 @@
     }
   ],
   "gate": {
-    "busy": 2,
+    "busy": 1,
     "max": 3
   },
   "tester": {
@@ -464,6 +464,44 @@
         "since": "2026-10-15T16:49:09+02:00"
       },
       {
+        "feature": 310,
+        "kind": "spec",
+        "title": "Spec: Per-weapon tech trees (auto-aim, auto-shoot, vertically scaling range)",
+        "tickets": [
+          317,
+          318,
+          319,
+          320,
+          321,
+          322,
+          358,
+          364,
+          377,
+          378,
+          379,
+          380,
+          382,
+          383,
+          386,
+          387,
+          388,
+          412,
+          413,
+          414,
+          415
+        ],
+        "since": "2026-10-15T18:31:21+02:00"
+      },
+      {
+        "feature": 409,
+        "kind": "ticket",
+        "title": "Test: drill-speed ladder benchmark (levels 1/5/10/15/20)",
+        "tickets": [
+          409
+        ],
+        "since": "2026-10-15T19:17:47+02:00"
+      },
+      {
         "feature": 157,
         "kind": "spec",
         "title": "Wayfinder: Tech tree and UI clarity (deep tech tree with visible vehicle changes, clear icons, item descriptions)",
@@ -573,47 +611,10 @@
           408,
           410,
           411,
-          416
+          416,
+          434
         ],
-        "since": "2026-10-15T18:11:45+02:00"
-      },
-      {
-        "feature": 310,
-        "kind": "spec",
-        "title": "Spec: Per-weapon tech trees (auto-aim, auto-shoot, vertically scaling range)",
-        "tickets": [
-          317,
-          318,
-          319,
-          320,
-          321,
-          322,
-          358,
-          364,
-          377,
-          378,
-          379,
-          380,
-          382,
-          383,
-          386,
-          387,
-          388,
-          412,
-          413,
-          414,
-          415
-        ],
-        "since": "2026-10-15T18:31:21+02:00"
-      },
-      {
-        "feature": 409,
-        "kind": "ticket",
-        "title": "Test: drill-speed ladder benchmark (levels 1/5/10/15/20)",
-        "tickets": [
-          409
-        ],
-        "since": "2026-10-15T19:17:47+02:00"
+        "since": "2026-10-15T22:51:07+02:00"
       }
     ]
   },
@@ -621,23 +622,21 @@
     {
       "slot": 1,
       "state": "dev",
-      "ticket": 397,
-      "since": "2026-10-15T21:50:00+02:00",
+      "ticket": 426,
+      "since": "2026-10-15T23:00:00+02:00",
       "claude_slot": 1
     },
     {
       "slot": 2,
-      "state": "dev",
-      "ticket": 425,
-      "since": "2026-10-15T22:41:00+02:00",
-      "claude_slot": 2
+      "state": "free",
+      "ticket": null,
+      "since": null
     },
     {
       "slot": 3,
-      "state": "dev",
-      "ticket": 434,
-      "since": "2026-10-15T22:41:00+02:00",
-      "claude_slot": 3
+      "state": "free",
+      "ticket": null,
+      "since": null
     },
     {
       "slot": 4,
@@ -648,12 +647,9 @@
     },
     {
       "slot": 5,
-      "state": "planner",
-      "ticket": 422,
-      "since": "2026-10-15T22:47:12+02:00",
-      "map": 302,
-      "room": "9cc76e78-1e10-4130-8b0e-0865bac3f7a8",
-      "adopted": false
+      "state": "free",
+      "ticket": null,
+      "since": null
     },
     {
       "slot": 6,
@@ -702,25 +698,25 @@
     {
       "slot": 1,
       "state": "busy",
-      "ticket": 397,
+      "ticket": 426,
       "grok_slot": 1,
-      "since": "2026-10-15T21:50:00+02:00",
+      "since": "2026-10-15T23:00:00+02:00",
       "account": 1
     },
     {
       "slot": 2,
-      "state": "busy",
-      "ticket": 425,
-      "grok_slot": 2,
-      "since": "2026-10-15T22:41:00+02:00",
+      "state": "free",
+      "ticket": null,
+      "grok_slot": null,
+      "since": null,
       "account": 1
     },
     {
       "slot": 3,
-      "state": "busy",
-      "ticket": 434,
-      "grok_slot": 3,
-      "since": "2026-10-15T22:41:00+02:00",
+      "state": "free",
+      "ticket": null,
+      "grok_slot": null,
+      "since": null,
       "account": 1
     },
     {
@@ -785,26 +781,26 @@
     }
   ],
   "last_refill": {
-    "at": "2026-10-15 22:41 CEST",
-    "mode": "refill-dev",
-    "triggers": "#434",
-    "started": "#425->C2/A1 #434->C3/A1",
-    "note": "spawned 2 worker(s)"
+    "at": "2026-10-15 23:06 CEST",
+    "mode": "recheck",
+    "triggers": "#425",
+    "started": "",
+    "note": "no pickable build ticket"
   },
   "totals": {
     "grok": {
       "size": 12,
-      "used": 5,
-      "dev": 4,
+      "used": 2,
+      "dev": 2,
       "dev_cap": 8,
-      "planner": 1,
+      "planner": 0,
       "planner_cap": 4
     },
     "claude": {
       "size": 10,
       "enabled": 6,
-      "used": 4,
-      "free": 2,
+      "used": 2,
+      "free": 4,
       "external": 0
     }
   }
