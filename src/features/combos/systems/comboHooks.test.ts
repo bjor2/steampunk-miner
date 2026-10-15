@@ -99,6 +99,7 @@ describe('combo hooks', () => {
       'power.ore_shifter:dragTarget',
       'gear.sampling_corer:aim',
       'power.steam_shield:autoFire',
+      'power.grapple_winch:reach',
     ])
   })
 })

@@ -23,6 +23,7 @@ import { lastMarkOf } from '../../tech-tree'
 import {
   autoGunsMarkLadderOf,
   EXTENDED_BARRELS_ITEM_ID,
+  FIRE_DIRECTOR_ITEM_ID,
   RICOCHET_SHOT_ITEM_ID,
   SHIPPED_AUTO_GUNS_MODULES,
 } from './autoGunsLane'
@@ -148,6 +149,40 @@ describe('ground-gun: the auto_guns modules shape the turret (ticket 388)', () =
       bounceLegCells: 3,
     })
     expect(playerTurretShapeOf(outside, PLAYER)).toBeNull()
+  })
+})
+
+describe('ground-gun: the spotter guns pre-train the turret (ticket 320)', () => {
+  const SPOTTER = 'combo.spotter_guns'
+  const PERISCOPE = 'passive.threat_periscope'
+  const directorShape = () =>
+    playerTurretShapeOf(rigWith([FIRE_DIRECTOR_ITEM_ID], true).state(), PLAYER)
+
+  it('holds a due shot up to the 8-tick cap with the combo, the director and the periscope', () => {
+    const spotted = rigWith([FIRE_DIRECTOR_ITEM_ID, PERISCOPE, SPOTTER], true).state()
+    expect(playerTurretShapeOf(spotted, PLAYER)).toEqual({
+      ...directorShape(),
+      pretrainTicks: ECONOMY.gun.turretCaps.maxPretrainTicks,
+    })
+    expect(turretShapeOf(spotted, PLAYER).pretrainTicks).toBe(8)
+  })
+
+  it('leaves the director as it was while the combo is not owned', () => {
+    const unowned = rigWith([FIRE_DIRECTOR_ITEM_ID, PERISCOPE], true).state()
+    expect(playerTurretShapeOf(unowned, PLAYER)).toEqual(directorShape())
+    expect(directorShape()?.pretrainTicks).toBeNull()
+  })
+
+  it('resolves only with both parents: no pre-train without the periscope or the director', () => {
+    const noPeriscope = rigWith([FIRE_DIRECTOR_ITEM_ID, SPOTTER], true).state()
+    const noDirector = rigWith([PERISCOPE, SPOTTER], true).state()
+    expect(playerTurretShapeOf(noPeriscope, PLAYER)).toEqual(directorShape())
+    expect(playerTurretShapeOf(noDirector, PLAYER)).toBeNull()
+  })
+
+  it('asks nothing before the guns are mounted', () => {
+    const unmounted = rigWith([FIRE_DIRECTOR_ITEM_ID, PERISCOPE, SPOTTER], false).state()
+    expect(playerTurretShapeOf(unmounted, PLAYER)).toBeNull()
   })
 })
 

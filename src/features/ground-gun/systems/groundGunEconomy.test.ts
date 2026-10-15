@@ -60,6 +60,7 @@ describe('ground gun economy', () => {
       stats: { splaySteps: 8, splayCooldownTicks: 15, splayLines: 2 },
     })
     expect(GROUND_GUN.combos).toEqual({
+      'combo.spotter_guns': { pretrainTicks: 8 },
       'combo.winch_bore': { hookWindowTicks: 60 },
     })
   })

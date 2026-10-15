@@ -45,7 +45,7 @@ const shipped = COMBO_ITEMS.filter((item) => !isHeld(item.itemId))
 const held = COMBO_ITEMS.filter((item) => isHeld(item.itemId))
 
 describe('combos shipped and held', () => {
-  it('ships the authored combos, two endless-only ones and four aetheric pairs', () => {
+  it('ships the authored combos, two endless-only ones, four aetheric pairs and three weapon combos', () => {
     expect(shipped.map((item) => item.itemId)).toEqual([
       'combo.assay_drain',
       'combo.magnetic_survey',
@@ -58,6 +58,9 @@ describe('combos shipped and held', () => {
       'combo.warning_chime',
       'combo.pendulum_anchor',
       'combo.quench_cutters',
+      'combo.sounding_bore',
+      'combo.winch_bore',
+      'combo.spotter_guns',
     ])
   })
 
@@ -84,15 +87,12 @@ describe('combos shipped and held', () => {
     )
   })
 
-  it('holds exactly the foam combos, the aether reel, the lull line and the weapon combos', () => {
+  it('holds exactly the foam combos, the aether reel and the lull line', () => {
     expect(Object.keys(COMBO_HOLDS).sort()).toEqual([
       'combo.aether_reel',
       'combo.foam_cutters',
       'combo.foam_grapple',
       'combo.lull_line',
-      'combo.sounding_bore',
-      'combo.spotter_guns',
-      'combo.winch_bore',
     ])
     Object.values(COMBO_HOLDS).forEach((reason) => expect(reason).not.toBe(''))
   })

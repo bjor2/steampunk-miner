@@ -40,6 +40,8 @@ const PRESS_TICK = 10
 /** The drain's 60-tick channel, and a few ticks for the terrain queue. */
 const SETTLED_TICK = 74
 const CORE_ORIGIN: TilePoint = { tx: 0, ty: 0 }
+/** The winch bore lifts the grapple only after a bore shot (`armouryCombos.test.ts`). */
+const AFTER_A_SHOT_REACH_IDS: ReadonlySet<string> = new Set(['combos.winch_bore_reach'])
 const SHIPPED_IDS = COMBO_ITEMS.map((item) => item.itemId).filter(
   (itemId) => !Object.hasOwn(COMBO_HOLDS, itemId),
 )
@@ -108,7 +110,7 @@ describe('combos gates fixture', () => {
     const state = session.state()
     const candidates = [...surfaceOreTiles(4), ...coreTiles(2)]
     const ctx: ItemHookContext = { tick: 5, mark: 1, magnitude: 6, origin: CORE_ORIGIN, candidates }
-    COMBO_HOOKS.forEach(({ hook, parentItemId }) => {
+    COMBO_HOOKS.forEach(({ id, hook, parentItemId }) => {
       if (hook === 'targetOrder' || hook === 'dragTarget' || hook === 'aim') {
         const ranked = rankedCandidatesOf(state, P1, { point: hook, parentItemId, ctx })
         expect(new Set(ranked), parentItemId).toEqual(new Set(candidates))
@@ -117,7 +119,7 @@ describe('combos gates fixture', () => {
       if (hook === 'reach') {
         const reach = scalarHookValueOf(state, P1, { point: hook, parentItemId, ctx, base: 3 })
         expect(reach).toBeLessThanOrEqual(12)
-        expect(reach).toBeGreaterThan(3)
+        if (!AFTER_A_SHOT_REACH_IDS.has(id)) expect(reach).toBeGreaterThan(3)
       }
     })
   })

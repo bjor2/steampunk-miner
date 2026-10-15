@@ -9,11 +9,14 @@
  * section the cored drain keeps the corer's last plug in, with the reaction that writes it. The
  * ceiling anchor (ticket 288) asks the drill gear read for the up-diagonal while its player clings,
  * tilts the drill head on the car and plays the kernel's light clank when the anchor lets go
- * mid up-cut. The held combos (`systems/comboHolds.ts`) stay vision rows. No lane slice is
- * imported.
+ * mid up-cut. The bore-gun combos (ticket 320) answer the grapple's reach and ask for the bore
+ * line's cells (`systems/armouryCombos.ts`); their weapon x lane templates take their own turns in
+ * the endless rotation. The held combos (`systems/comboHolds.ts`) stay vision rows. No lane slice
+ * is imported except the ground-gun numbers the winch bore's window is read from.
  */
 import type { SliceDefinition } from '../../registries/sliceDefinition'
 import { CEILING_ANCHOR_PARTS } from './scene/ceilingAnchorParts'
+import { SOUNDING_BORE_LINE } from './systems/armouryCombos'
 import { ANCHOR_DROP_CLANK, CEILING_ANCHOR_GEAR } from './systems/ceilingAnchor'
 import { comboCardOf } from './systems/comboCards'
 import {
@@ -35,6 +38,7 @@ export const slice: SliceDefinition = {
     r.itemDescriptionEntries(SHIPPED_COMBOS.map(comboCardOf))
     r.vehicleItemSeller(COMBO_SELLER)
     COMBO_HOOKS.forEach((hook) => r.itemHook(hook))
+    r.boreLineListener(SOUNDING_BORE_LINE)
     r.saveSection(COMBO_SECTION)
     r.authorityReaction(SAMPLED_VEIN_REACTION)
     r.drillGear(CEILING_ANCHOR_GEAR)

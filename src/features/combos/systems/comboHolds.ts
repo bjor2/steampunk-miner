@@ -11,12 +11,6 @@ export const COMBO_HOLDS: Readonly<Record<string, string>> = {
   'combo.aether_reel': 'the tow hook waits until Gameplay defines tow (GD lock on #206, 10)',
   'combo.lull_line':
     "the tether's tow is a counter with no cell, so its lump has no tile to lure to (ticket 373)",
-  'combo.sounding_bore':
-    "the sensing reveal board hears no bore line, so a shot can't ring its cells (ticket 320)",
-  'combo.winch_bore':
-    "the grapple's hook pick consults no hook, so it can't reach a bore's far end (ticket 320)",
-  'combo.spotter_guns':
-    'the turret has no pre-train seam and the authority no dust-trail warning (ticket 320)',
 }
 
 /** Whether the combo store item ships now. */

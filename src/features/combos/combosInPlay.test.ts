@@ -24,7 +24,8 @@ import { COMBO_HOLDS, COMBO_ITEMS, comboPriceAt } from '.'
 const PLAYER = 'p1'
 const SHIPPED = COMBO_ITEMS.filter((item) => !Object.hasOwn(COMBO_HOLDS, item.itemId))
 const ALL_PARENTS = [...new Set(SHIPPED.flatMap((item) => item.parentItemIds))]
-const LAST_GRADED_PLANET = 140
+/** Two laps of 18 turns (fifteen pairs, three weapon templates): the last turn is P146. */
+const LAST_GRADED_PLANET = 146
 /** Small enough that a P28 price comes off it exactly: Money keeps 40 digits (#340). */
 const WALLET_EXACT_AT_P28 = '1e30'
 

@@ -164,6 +164,21 @@ function withWeaponTemplates<T>(run: (tree: TechTree) => T): T {
 }
 
 describe('tech tree: weapon x lane templates in the endless rotation', () => {
+  it('pins the shipped weapon turns on P86, P89 and P92 and the next lap on P95', () => {
+    const tree = registeredTechTree()
+    const lapOne = nodeOf(tree, 'tech.combo.gen.41')
+    expect(rotationLengthOf(tree.grading)).toBe(18)
+    expect([86, 89, 92].map((p) => nodeOf(tree, `tech.combo.gen.${p}`).unlocks.itemId)).toEqual([
+      'combo.sounding_bore',
+      'combo.spotter_guns',
+      'combo.winch_bore',
+    ])
+    expect(nodeOf(tree, 'tech.combo.gen.95').unlocks).toEqual({
+      itemId: lapOne.unlocks.itemId,
+      mark: lapOne.unlocks.mark + 1,
+    })
+  })
+
   it('never makes a lane pair of an armoury lane, so a weapon template stands for no pair', () => {
     expect(LANE_PAIRS.some((pair) => pair.some(isArmouryLane))).toBe(false)
     COMBO_TEMPLATES.filter(isWeaponTemplate).forEach((template) =>

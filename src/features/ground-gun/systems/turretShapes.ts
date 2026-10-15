@@ -17,6 +17,11 @@
  *   hollow pocket (Content's "inside a hollow pocket", K-hollow's `isHollowPocketCell`, one cell
  *   read per due shot).
  * - Flushing shell asks nothing of the shot: it drives burrowers out (`flushingShell.ts`).
+ * - Spotter guns (the fire director x threat periscope combo, ticket 320; GD ruling 6180873822 on
+ *   #320): with the director live on the turret and the combo and the periscope owned, a due shot
+ *   waits up to `pretrainTicks` for a burrower about to surface, and ranks it first among the
+ *   targets already in line of fire. Timing and ranking only: the kernel's pre-train keeps the
+ *   schedule, so shots and damage per shot stay the same.
  *
  * The grapeshot's and the ricochet's cooldown stats step on their Mark ladders but no seam reaches
  * them: the locked shape carries no cooldown for either, and a turret shot raises no event a
@@ -24,6 +29,7 @@
  */
 import { ENERGY_QUANTA_PER_UNIT } from '../../../constants/balance'
 import { vehicleOf, type AuthorityState } from '../../../systems/authority/authorityState'
+import { ownsItem } from '../../../systems/authority/loadoutRules'
 import { BASE_TURRET_SHAPE, foldTurretShapes } from '../../../systems/authority/combat/turretShape'
 import { isHollowPocketCell } from '../../../systems/authority/hollowPocket'
 import { planetParamsOf } from '../../../systems/authority/planetOfState'
@@ -40,6 +46,7 @@ import {
   SENTRY_CAM_ITEM_ID,
 } from './autoGunsLane'
 import { extendedBarrelsAt, MILLI_PER_UNIT } from './boreLadders'
+import { GROUND_GUN } from './groundGunEconomy'
 import {
   isOnTurretMount,
   liveTurretModulesOf,
@@ -48,6 +55,9 @@ import {
 } from './turretModules'
 
 type ShapeAsk = Partial<TurretShape>
+
+const SPOTTER_GUNS_ID = 'combo.spotter_guns'
+const THREAT_PERISCOPE_ID = 'passive.threat_periscope'
 
 const SHAPE_ASKS: Readonly<Record<string, (mark: number) => ShapeAsk>> = {
   [FIRE_DIRECTOR_ITEM_ID]: (mark) => ({
@@ -100,21 +110,51 @@ export function autoGunsProviderOf(isAttached: TurretAttachRead): AutoGunsProvid
   }
 }
 
-/** The shape the player's live modules fold to; null with none asking. */
+/** The shape the player's live modules, and the spotter guns over them, fold to; null with none. */
 export function playerTurretShapeOf(
   state: AuthorityState,
   playerId: string,
   isAttached: TurretAttachRead = isOnTurretMount,
 ): TurretShape | null {
-  const asking = liveTurretModulesOf(state, playerId, isAttached).filter((module) =>
-    isAskingNow(state, playerId, module),
-  )
-  return foldTurretShapes(asking.map(moduleShapeOf))
+  const live = liveTurretModulesOf(state, playerId, isAttached)
+  return foldTurretShapes([
+    ...askingModuleShapesOf(state, playerId, live),
+    ...spotterShapesOf(state, playerId, live),
+  ])
 }
 
 /** #107's guns with the module's fields at its Mark. */
 export function moduleShapeOf({ itemId, mark }: LiveTurretModule): TurretShape {
   return { ...BASE_TURRET_SHAPE, ...shapeAskOf(itemId, mark) }
+}
+
+function askingModuleShapesOf(
+  state: AuthorityState,
+  playerId: string,
+  live: readonly LiveTurretModule[],
+): TurretShape[] {
+  return live.filter((module) => isAskingNow(state, playerId, module)).map(moduleShapeOf)
+}
+
+/** The spotter's pre-train, while the combo resolves on this turret; none otherwise. */
+function spotterShapesOf(
+  state: AuthorityState,
+  playerId: string,
+  live: readonly LiveTurretModule[],
+): TurretShape[] {
+  if (!isSpotterInPlay(state, playerId, live)) return []
+  const { pretrainTicks } = GROUND_GUN.combos[SPOTTER_GUNS_ID]
+  return [{ ...BASE_TURRET_SHAPE, pretrainTicks }]
+}
+
+/** Both parents in play (the director live on the turret, the periscope owned) and the combo. */
+function isSpotterInPlay(
+  state: AuthorityState,
+  playerId: string,
+  live: readonly LiveTurretModule[],
+): boolean {
+  if (!live.some(({ itemId }) => itemId === FIRE_DIRECTOR_ITEM_ID)) return false
+  return [SPOTTER_GUNS_ID, THREAT_PERISCOPE_ID].every((itemId) => ownsItem(state, playerId, itemId))
 }
 
 /** Every module with a shape ask asks; the ricochet only from inside a hollow pocket. */
