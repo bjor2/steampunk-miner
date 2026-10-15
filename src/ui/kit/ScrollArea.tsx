@@ -2,20 +2,32 @@
  * The one steampunk scroll area (spec #422 ruling 3, build #423): a viewport that scrolls by wheel,
  * touch and keyboard as any overflow does, with the browser's scrollbar hidden, a thin brass rail
  * and a riveted thumb laid over its right edge (so nothing shifts when they show), fading out when
- * idle, and edge fades where more content hides. The caller sizes it through `className`.
+ * idle, and edge fades where more content hides. The caller sizes it through `className`, and may
+ * hand the viewport its own attributes and handlers (a map panned by drag or keys, pass #426).
  */
-import type { ReactNode } from 'react'
+import type { HTMLAttributes, ReactNode } from 'react'
 import styles from './ScrollArea.module.css'
 import { useScrollRail } from './useScrollRail'
+
+/** What a caller may put on the viewport; the scroll area keeps its own class and scroll hook. */
+export type ScrollViewportProps = Omit<
+  HTMLAttributes<HTMLDivElement>,
+  'children' | 'className' | 'onScroll'
+>
+
+const NO_VIEWPORT_PROPS: ScrollViewportProps = {}
 
 export function ScrollArea({
   className,
   testId,
+  viewport = NO_VIEWPORT_PROPS,
   children,
 }: {
   /** The caller's size: a height or max-height from its own module. */
   className?: string
   testId?: string
+  /** Attributes and handlers for the scrolling element itself, whose scroll position they move. */
+  viewport?: ScrollViewportProps
   children: ReactNode
 }) {
   const rail = useScrollRail()
@@ -26,7 +38,12 @@ export function ScrollArea({
       data-testid={testId}
       data-scroll-area
     >
-      <div ref={rail.viewportRef} className={styles.viewport} onScroll={rail.markScrolled}>
+      <div
+        {...viewport}
+        ref={rail.viewportRef}
+        className={styles.viewport}
+        onScroll={rail.markScrolled}
+      >
         <div className={styles.content}>{children}</div>
       </div>
       <div className={styles.rail} aria-hidden>
