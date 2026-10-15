@@ -1,9 +1,9 @@
 /**
  * The drill-down run (ticket 416, the slow real-browser companion of the #409 ladder): on the
  * committed start save the vehicle drives off the dock pad onto the planet 1 surface and stops,
- * then the real Down key is held for 10 s of wall time. It watches and does not judge (GD on #416):
- * the only assertions are that the vehicle went down and did not stall at 0; #409 owns the strict
- * ladder. Each run writes one row under test-results/drill-down/ (start and end position in cells,
+ * then the real Down key is held for 10 s of wall time, at stored drill_power steps 1, 5, 10, 15
+ * and 20 (ticket 434). It watches and does not judge (GD on #416): the only assertions are that the
+ * vehicle went down and did not stall at 0; #409 owns the strict ladder. Each run writes one row under test-results/drill-down/ (start and end position in cells,
  * depth, depth gained, cells/s and m/s over the hold, drill level, seed, build commit, time), which
  * the box Tester appends to drill-down.ndjson on the test-metrics branch
  * (scripts/ci/recordDrillDown.mjs) for the status page's Tests tab. Box Tester slow tier and
@@ -31,8 +31,12 @@ const START_SAVE = JSON.parse(START_SAVE_TEXT) as {
 /** Read by scripts/ci/recordDrillDown.mjs, relative to the checkout. */
 const ROWS_DIR = new URL('../../test-results/drill-down/', import.meta.url)
 const ROW_SCHEMA = 1
-/** The start save's level, then the second run set through the debug API (GD on #416). */
-const DRILL_LEVELS = [START_SAVE.start.upgrades.drill_power, 10]
+/**
+ * Stored drill_power steps (stored 10 is major 1): the start save's level, then the others set
+ * through the debug API (GD on #416), the levels the status page's Drill speed panel sets beside
+ * the stored-step ladder's cut (ticket 434).
+ */
+const DRILL_LEVELS = [START_SAVE.start.upgrades.drill_power, 5, 10, 15, 20]
 const HOLD_MS = 10_000
 /** Seed 83921's dock pad ends at column 12 (`dockSiteOf`); four cells clear of it is open ground. */
 const OFF_PAD_COLUMN = 16

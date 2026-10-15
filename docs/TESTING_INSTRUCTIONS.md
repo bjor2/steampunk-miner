@@ -248,6 +248,13 @@ programs }` from three's `renderer.info` of the game canvas), read only when cal
   and the stale facing for each pose report phase, and writes them to
   `balance-report/cut-start-latency.ndjson`. A lane (about 40 s), so it runs only when named; it
   fails only when a start opens no cell or the two frame rates differ.
+- **Drill-speed ladder in stored steps** (ticket 434): `src/logging/drillLadderSteps.test.ts` cuts
+  the same column's first 20 cells (all band 1, the ground a 10 s hold reaches) at stored drill_power
+  steps 1, 5, 10, 15 and 20, the levels of the browser drill-down run, with the law counted per step
+  (`drillPowerAtStep`). It watches: it only checks that the whole column was cut and no step cut
+  slower. Its rows go to `balance-report/drill-ladder-steps.ndjson`, which the Tester's
+  `pushTestMetrics.sh` appends to `drill-ladder.ndjson` on `test-metrics` for the status page's
+  Drill speed panel ([loop-status.md](loop-status.md#drill-speed-panel-ticket-434)). About 2 s.
 - **Known red** (ticket 419, the TD on #396 section 2): `CAMPAIGN_PACING_KNOWN_RED`
   (`src/constants/knownRed.ts`) is the one known-red marker in the repo: one gate
   (`campaignPacingGate`), one finding (#417), no registry. The gate still runs in full;
@@ -631,10 +638,10 @@ programs }` from three's `renderer.info` of the game canvas), read only when cal
   ([docs/screens/README.md](screens/README.md)). Software WebGL at 4K is slow, so these projects
   allow 5 minutes a test and 30 s a wait.
 - **Drill-down run** (ticket 416): `e2e/browser/drillDown.spec.ts` holds the real Down key for 10 s
-  on the P1 surface from `scenarios/drill-down-start.scenario.json`, at drill level 1 and at 10
-  (`debug.setUpgrade`), and writes one row per run (start and end position, depth gained, cells/s,
+  on the P1 surface from `scenarios/drill-down-start.scenario.json`, at stored drill_power steps 1
+  (the save's), 5, 10, 15 and 20 (`debug.setUpgrade`, ticket 434), and writes one row per run (start and end position, depth gained, cells/s,
   m/s, level, seed, build commit, time) that the Tester appends to `drill-down.ndjson` on
-  `test-metrics` for the Tests tab ([loop-status.md](loop-status.md#drill-down-run-ticket-416)). It
+  `test-metrics` for the Tests tab and the Drill speed panel ([loop-status.md](loop-status.md#drill-down-run-ticket-416)). It
   watches and does not judge: it asserts only that the vehicle went down and did not stall at 0.
   The speed ladder assertion is #409's. Box Tester slow tier and nightly only.
 - **Memory soak** (#99): `npm run soak:memory` builds, starts `vite preview` and drives the vehicle
