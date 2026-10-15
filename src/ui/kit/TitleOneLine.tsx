@@ -3,10 +3,16 @@
  * panel header draws: a title of at most 4 words, ONE sentence of about 12 words, then the facts
  * the player acts on as an icon plus a value (price, cost) and why it is locked, all visible on
  * the element; anything longer sits in the brass tooltip. It records what it draws in the text
- * registry, so the budget test (#424) reads the screens as shown.
+ * registry, every fact and lock reason tagged visible and every tooltip line tagged tooltip, so
+ * the budget test (#424) reads the screens as shown.
  */
 import type { ReactNode } from 'react'
-import { recordUiText, type UiText } from '../../systems/views/uiText'
+import {
+  elementLinesOf,
+  recordUiText,
+  type ElementText,
+  type UiTextHolds,
+} from '../../systems/views/uiText'
 import { VectorIcon } from '../VectorIcon'
 import styles from './TitleOneLine.module.css'
 import { Tooltip } from './Tooltip'
@@ -17,6 +23,8 @@ export interface IconValue {
   text: string
   /** The exact canonical amount behind a shortened value, for `data-exact`. */
   exact?: string
+  /** What the value is (a price, charges left), so the budget test keeps it off the tooltip. */
+  holds?: UiTextHolds
 }
 
 export type TitleLevel = 'h2' | 'h3' | 'span'
@@ -31,7 +39,7 @@ export function TitleOneLine({
   level = 'h3',
   children,
 }: {
-  text: UiText
+  text: ElementText
   iconId?: string | null
   facts?: readonly IconValue[]
   /** Why the element is locked, kept on the element itself; null when it is open. */
@@ -40,7 +48,7 @@ export function TitleOneLine({
   /** The element's action, drawn under its lines. */
   children?: ReactNode
 }) {
-  recordUiText(text)
+  recordUiText({ ...text, lines: elementLinesOf(text, facts, lockReason) })
   return (
     <Tooltip id={text.id} lines={text.tooltipLines}>
       <div

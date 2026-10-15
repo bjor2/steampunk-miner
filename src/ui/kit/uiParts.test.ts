@@ -6,7 +6,7 @@ import { createMemorySink } from '../../logging/eventSink'
 import { createRunLog, installRunLog, uninstallRunLog } from '../../logging/runLog'
 import { resetGameStore } from '../../store/gameStore'
 import { readSettingsModel } from '../../store/screenReads'
-import { forgetUiTexts, registeredUiTexts, type UiText } from '../../systems/views/uiText'
+import { forgetUiTexts, registeredUiTexts, type ElementText } from '../../systems/views/uiText'
 import { uiTextProblemsOf } from '../../systems/views/uiTextBudget'
 import { SettingsView } from '../settings/SettingsView'
 import { Panel } from './Panel'
@@ -24,7 +24,7 @@ function sheetOf(name: string): string {
   return readFileSync(new URL(`./${name}`, import.meta.url), 'utf8')
 }
 
-const FOAM: UiText = {
+const FOAM: ElementText = {
   id: 'demo.foam',
   title: 'Stabiliser foam',
   oneLine: 'Sets foam in a forward cone; the rock hardens and holds.',
@@ -69,7 +69,26 @@ describe('Title+OneLine element', () => {
 
   it('records the text it draws, so the budget test reads the screen as shown', () => {
     renderToString(createElement(TitleOneLine, { text: FOAM }))
-    expect(registeredUiTexts()).toEqual([FOAM])
+    expect(registeredUiTexts()).toEqual([
+      {
+        ...FOAM,
+        lines: FOAM.tooltipLines.map((text) => ({ text, tag: 'tooltip' })),
+      },
+    ])
+  })
+
+  it('records its facts and lock reason as visible lines, with what each holds', () => {
+    renderToString(
+      createElement(TitleOneLine, {
+        text: { ...FOAM, tooltipLines: [] },
+        facts: [{ iconId: 'icon-hud-money', text: '1.2k', holds: 'price' }],
+        lockReason: 'Needs: Deep bore',
+      }),
+    )
+    expect(registeredUiTexts()[0].lines).toEqual([
+      { text: '1.2k', tag: 'visible', holds: 'price' },
+      { text: 'Needs: Deep bore', tag: 'visible', holds: 'needs' },
+    ])
   })
 
   it('keeps its tooltip in the markup, hidden, with the lines under the element’s id', () => {

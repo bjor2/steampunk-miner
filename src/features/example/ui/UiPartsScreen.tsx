@@ -11,7 +11,7 @@ import { ScrollArea } from '../../../ui/kit/ScrollArea'
 import { TitleOneLine, type IconValue } from '../../../ui/kit/TitleOneLine'
 import type { ScreenProps } from '../../../ui/registries/screens'
 import { hudLabelIconIdOf, panelIconIdOf, trackIconIdOf } from '../../../systems/art/icons/iconSet'
-import type { UiText, UiTextUnderTitle } from '../../../systems/views/uiText'
+import type { ElementText, UiTextUnderTitle } from '../../../systems/views/uiText'
 import styles from './UiPartsScreen.module.css'
 
 export const UI_PARTS_SCREEN_ID = 'example.ui-parts'
@@ -23,7 +23,7 @@ const PAGE_HEADING: UiTextUnderTitle = {
 }
 
 /** A card: the buyable's name, its effect sentence, the price as an icon plus a value. */
-const CARD: UiText = {
+const CARD: ElementText = {
   id: `${UI_PARTS_SCREEN_ID}.card`,
   title: 'Drill power',
   oneLine: 'Cuts harder rock and cuts every band a little faster.',
@@ -35,11 +35,11 @@ const CARD: UiText = {
 }
 
 const CARD_PRICE: readonly IconValue[] = [
-  { iconId: hudLabelIconIdOf('money'), text: '1.2k', exact: '1234' },
+  { iconId: hudLabelIconIdOf('money'), text: '1.2k', exact: '1234', holds: 'price' },
 ]
 
 /** A locked node: the price and why it is locked stay on the element; the tooltip adds the lore. */
-const LOCKED_NODE: UiText = {
+const LOCKED_NODE: ElementText = {
   id: `${UI_PARTS_SCREEN_ID}.locked`,
   title: 'Long barrel',
   oneLine: 'The bore gun reaches two tiles further.',
@@ -47,11 +47,11 @@ const LOCKED_NODE: UiText = {
 }
 
 const LOCKED_NODE_PRICE: readonly IconValue[] = [
-  { iconId: hudLabelIconIdOf('money'), text: '48k', exact: '48000' },
+  { iconId: hudLabelIconIdOf('money'), text: '48k', exact: '48000', holds: 'price' },
 ]
 
 /** A plain row with no tooltip: the title and the one line are the whole of it. */
-const ROW: UiText = {
+const ROW: ElementText = {
   id: `${UI_PARTS_SCREEN_ID}.row`,
   title: 'Casing grade 2',
   oneLine: 'Holds band 2 and band 3 walls open.',

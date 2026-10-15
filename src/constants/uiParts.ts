@@ -10,6 +10,14 @@ export const TITLE_WORDS_MAX = 4
 export const ONE_LINE_WORDS_MAX = 12
 /** A tooltip holds at most this many short lines; never the only copy of what the player acts on. */
 export const TOOLTIP_LINES_MAX = 3
+/** Each tooltip line is short: at most this many words (GD answer 1 on #424, 15 Oct). */
+export const TOOLTIP_LINE_WORDS_MAX = 12
+/**
+ * A visible fact line (price, Needs, charges, a warning, a lock reason) is at most this many words,
+ * with no cap on how many an element shows; longer detail is a separate tooltip line (GD answer 2
+ * on #424, 15 Oct).
+ */
+export const FACT_LINE_WORDS_MAX = 12
 
 /** A mouse resting on an element opens its tooltip after this long ("about 200 ms"). */
 export const TOOLTIP_HOVER_MS = 200
