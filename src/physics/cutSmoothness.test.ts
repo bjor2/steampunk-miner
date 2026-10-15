@@ -25,8 +25,9 @@ import {
 // Continuous cut-follow (K-bound, ticket 400, from the #397 TD lock): once a cut has ramped up the
 // body holds the drill's speed across cell boundaries, its speed varying by at most 5% there, and
 // it never ends a tick inside solid ground. The fixed step runs under render frames at 30 and at
-// 144 frames a second, which must step the rig the same. The level cut's boundaries are asked of
-// the planner on #400: its body still meets a one-sample lip of uncut ground at its lower front.
+// 144 frames a second, which must step the rig the same. The level cut's boundaries belong to #421
+// (GD/TD ruling on #400): the carry holds its target cell out of the stamp, leaving a one-sample lip
+// of uncut ground at the body's lower front.
 
 const RIGS: readonly Record<string, number>[] = [
   { drill_power: 300, drill_tip: 200 },
@@ -168,7 +169,9 @@ describe('continuous cut-follow (ticket 400)', () => {
     120_000,
   )
 
-  it.todo('varies its speed by at most 5% across cell boundaries in a level cut (asked on #400)')
+  it.todo(
+    'varies its speed by at most 5% across cell boundaries in a level cut (#421: the carry target-cell lip)',
+  )
 
   it.each(RIGS.map((levels, index) => [index + 1, levels] as const))(
     'rig %i: never ends a tick inside solid ground, and steps alike at 30 and 144 frames/s',
