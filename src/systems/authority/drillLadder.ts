@@ -47,18 +47,27 @@ interface Rig {
   top: VehiclePose
 }
 
-/** Cuts `cellCount` ground cells down the ladder column at `drill_power` `level`. */
+/** Cuts `cellCount` ground cells down the ladder column at `drill_power` major `level`. */
 export function cutColumnAtDrillLevel(level: number, cellCount: number): DrillLadderRung {
-  const rig = rigOnSurfaceAt(level)
+  return { ...cutColumnAtDrillStep(stepOfMajor(level), cellCount), level }
+}
+
+/**
+ * Cuts `cellCount` ground cells down the ladder column at stored `drill_power` `step`, the unit the
+ * browser drill-down run and the status page's Drill speed panel count in (ticket 434); the rung's
+ * `level` is that step.
+ */
+export function cutColumnAtDrillStep(step: number, cellCount: number): DrillLadderRung {
+  const rig = rigOnSurfaceAt(step)
   const cells = columnCellsBelow(rig, cellCount)
-  return { level, cells: cells.length, ticks: ticksToBreakAll(rig, cells) }
+  return { level: step, cells: cells.length, ticks: ticksToBreakAll(rig, cells) }
 }
 
 /** The rig resting on the column's surface cell, facing down, with enemies frozen. */
-function rigOnSurfaceAt(level: number): Rig {
+function rigOnSurfaceAt(drillStep: number): Rig {
   const session = createScriptedSession()
   session.submit(0, FREEZE_ENEMIES)
-  session.submit(0, setUpgrade('drill_power', stepOfMajor(level)))
+  session.submit(0, setUpgrade('drill_power', drillStep))
   session.submit(0, setUpgrade('cargo_hold', stepOfMajor(HOLD_MAJOR)))
   session.submit(0, setUpgrade('boiler', stepOfMajor(DEEP_TANK_MAJOR)))
   session.submit(0, {

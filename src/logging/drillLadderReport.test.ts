@@ -1,8 +1,10 @@
 import { describe, expect, it } from 'vitest'
 import type { DrillLadderRung } from '../systems/authority/drillLadder'
+import { drillPowerAtStep } from '../systems/economy/vehicleStats'
 import { toFixedText } from '../systems/money'
 import {
   formatLadderTable,
+  ladderHistoryRowsOf,
   ladderNdjsonOf,
   ladderRowsOf,
   ladderStepsOf,
@@ -62,6 +64,44 @@ describe('drill ladder report (ticket 409)', () => {
       SETUP,
       expect.objectContaining({ level: 1, ticks: 1574, gainOnPrevious: null }),
       expect.objectContaining({ level: 5, ticks: 1000, gainOnPrevious: '1.574' }),
+    ])
+  })
+})
+
+describe('drill ladder history rows (ticket 434)', () => {
+  const MEASURED_AT = '2026-10-16T01:35:00.000Z'
+
+  it("counts the law in stored steps when the rungs are steps: ten of them are one major's 1.12", () => {
+    const [step] = ladderStepsOf([rung(10, 1120), rung(20, 1000)], drillPowerAtStep)
+    expect(toFixedText(step.lawGain, 3)).toBe('1.120')
+  })
+
+  it('stamps every level of one run with the run, the ground and the level cut before it', () => {
+    const rows = ladderHistoryRowsOf(
+      SETUP,
+      [rung(1, 90), rung(5, 60)],
+      drillPowerAtStep,
+      MEASURED_AT,
+    )
+    expect(rows).toEqual([
+      expect.objectContaining({
+        schema: 1,
+        id: `${MEASURED_AT}-drill-ladder-L1`,
+        measuredAt: MEASURED_AT,
+        ladder: 'drill-ladder',
+        worldSeed: 1,
+        level: 1,
+        previousLevel: null,
+        cellsPerSecond: '40.000',
+        lawGainOnPrevious: null,
+      }),
+      expect.objectContaining({
+        id: `${MEASURED_AT}-drill-ladder-L5`,
+        level: 5,
+        previousLevel: 1,
+        cellsPerSecond: '60.000',
+        gainOnPrevious: '1.500',
+      }),
     ])
   })
 })

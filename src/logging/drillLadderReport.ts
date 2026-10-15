@@ -9,7 +9,15 @@
 import { TICKS_PER_SECOND } from '../constants/physics'
 import type { DrillLadderRung } from '../systems/authority/drillLadder'
 import { drillPower } from '../systems/economy/vehicleStats'
-import { cmp, div, fromSafeInteger, mul, toFixedText, type Money } from '../systems/money'
+import {
+  cmp,
+  div,
+  fromSafeInteger,
+  mul,
+  toFixedText,
+  type BigStat,
+  type Money,
+} from '../systems/money'
 import { formatNdjsonLine } from './ndjson'
 
 /** The GD's ±5% on a level's 1.12x (#396), applied to a step's compounded law gain. */
@@ -17,6 +25,12 @@ export const LADDER_TOLERANCE_BP = 500
 const BASIS_POINTS = 10_000
 const PLACES = 3
 const TICKS = fromSafeInteger(TICKS_PER_SECOND)
+
+/**
+ * The drill power a rung's `level` stands for: `drillPower` of a major by default, or
+ * `drillPowerAtStep` when the rungs count stored steps (ticket 434).
+ */
+export type DrillLaw = (level: number) => BigStat
 
 /** What the ladder cut and where: the first line of its NDJSON log. */
 export interface LadderSetup {
@@ -51,13 +65,16 @@ export interface LadderRow {
   lawGainOnPrevious: string | null
 }
 
-export function ladderStepsOf(rungs: readonly DrillLadderRung[]): LadderStep[] {
-  return rungs.slice(1).map((rung, index) => ladderStepOf(rungs[index], rung))
+export function ladderStepsOf(
+  rungs: readonly DrillLadderRung[],
+  law: DrillLaw = drillPower,
+): LadderStep[] {
+  return rungs.slice(1).map((rung, index) => ladderStepOf(rungs[index], rung, law))
 }
 
-function ladderStepOf(lower: DrillLadderRung, upper: DrillLadderRung): LadderStep {
+function ladderStepOf(lower: DrillLadderRung, upper: DrillLadderRung, law: DrillLaw): LadderStep {
   const gain = div(cellsPerSecondOf(upper), cellsPerSecondOf(lower))
-  const lawGain = div(drillPower(upper.level), drillPower(lower.level))
+  const lawGain = div(law(upper.level), law(lower.level))
   return {
     from: lower.level,
     to: upper.level,
@@ -81,8 +98,11 @@ function cellsPerSecondOf(rung: DrillLadderRung): Money {
   return div(mul(fromSafeInteger(rung.cells), TICKS), fromSafeInteger(rung.ticks))
 }
 
-export function ladderRowsOf(rungs: readonly DrillLadderRung[]): LadderRow[] {
-  const steps = ladderStepsOf(rungs)
+export function ladderRowsOf(
+  rungs: readonly DrillLadderRung[],
+  law: DrillLaw = drillPower,
+): LadderRow[] {
+  const steps = ladderStepsOf(rungs, law)
   return rungs.map((rung, index) => ladderRowOf(rung, index === 0 ? null : steps[index - 1]))
 }
 
@@ -99,12 +119,16 @@ function ladderRowOf(rung: DrillLadderRung, step: LadderStep | null): LadderRow 
 }
 
 /** The ladder as a Markdown table under a line saying what was cut, for the test output. */
-export function formatLadderTable(setup: LadderSetup, rungs: readonly DrillLadderRung[]): string {
+export function formatLadderTable(
+  setup: LadderSetup,
+  rungs: readonly DrillLadderRung[],
+  law: DrillLaw = drillPower,
+): string {
   return [
     `Drill-speed ladder: planet ${setup.planet}, seed ${setup.worldSeed}, column ${setup.column}, ${setup.cells} cells straight down`,
     '| drill level | ticks | seconds | cells/s | x previous | law x previous |',
     '| ---: | ---: | ---: | ---: | ---: | ---: |',
-    ...ladderRowsOf(rungs).map(formatLadderRow),
+    ...ladderRowsOf(rungs, law).map(formatLadderRow),
   ].join('\n')
 }
 
@@ -116,4 +140,44 @@ function formatLadderRow(row: LadderRow): string {
 /** The ladder's log: its setup line, then one line a level, for comparing runs across commits. */
 export function ladderNdjsonOf(setup: LadderSetup, rungs: readonly DrillLadderRung[]): string {
   return [setup, ...ladderRowsOf(rungs)].map(formatNdjsonLine).join('')
+}
+
+/** The schema of a ladder history row (scripts/ci/drillLadderHistory.mjs checks it). */
+export const LADDER_HISTORY_SCHEMA = 1
+
+/**
+ * One level of one ladder run as the status page's Drill speed panel keeps it (ticket 434): the
+ * row of the table with what was cut and when, so runs append to drill-ladder.ndjson on the
+ * test-metrics branch and trend over commits. The id is unique per run and level.
+ */
+export interface LadderHistoryRow extends LadderRow {
+  schema: number
+  id: string
+  measuredAt: string
+  ladder: string
+  planet: number
+  worldSeed: number
+  column: number
+  /** The level cut before this one in the same run; null on the first. */
+  previousLevel: number | null
+}
+
+/** The history rows of one ladder run measured at `measuredAt` (an ISO time). */
+export function ladderHistoryRowsOf(
+  setup: LadderSetup,
+  rungs: readonly DrillLadderRung[],
+  law: DrillLaw,
+  measuredAt: string,
+): LadderHistoryRow[] {
+  return ladderRowsOf(rungs, law).map((row, index) => ({
+    schema: LADDER_HISTORY_SCHEMA,
+    id: `${measuredAt}-${setup.ladder}-L${row.level}`,
+    measuredAt,
+    ladder: setup.ladder,
+    planet: setup.planet,
+    worldSeed: setup.worldSeed,
+    column: setup.column,
+    previousLevel: index === 0 ? null : rungs[index - 1].level,
+    ...row,
+  }))
 }
