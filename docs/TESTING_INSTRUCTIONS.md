@@ -603,6 +603,13 @@ programs }` from three's `renderer.info` of the game canvas), read only when cal
   `npm run screens:update` puts it in `docs/screens/` for review, never compared
   ([docs/screens/README.md](screens/README.md)). Software WebGL at 4K is slow, so these projects
   allow 5 minutes a test and 30 s a wait.
+- **Drill-down run** (ticket 416): `e2e/browser/drillDown.spec.ts` holds the real Down key for 10 s
+  on the P1 surface from `scenarios/drill-down-start.scenario.json`, at drill level 1 and at 10
+  (`debug.setUpgrade`), and writes one row per run (start and end position, depth gained, cells/s,
+  m/s, level, seed, build commit, time) that the Tester appends to `drill-down.ndjson` on
+  `test-metrics` for the Tests tab ([loop-status.md](loop-status.md#drill-down-run-ticket-416)). It
+  watches and does not judge: it asserts only that the vehicle went down and did not stall at 0.
+  The speed ladder assertion is #409's. Box Tester slow tier and nightly only.
 - **Memory soak** (#99): `npm run soak:memory` builds, starts `vite preview` and drives the vehicle
   for 10 minutes through chunk cycles (dock, undock, right 8 s, down 8 s, left 4 s, right 4 s) with
   Playwright, reading the counts only through `ui.getRendererMemory()` and `getPhysicsStats()` and

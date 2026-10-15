@@ -166,3 +166,37 @@ The runs of 2026-10-06 before this landed were backfilled once from their job lo
 (`run.source: "log-backfill"`): per-file duration and counts from the default reporter, slowest
 tests only where the log printed them (300 ms or more), and mode `full-legacy` for the runs from
 before the per-push split, which ran the whole suite including the pacing bot files.
+
+## Drill-down runs (`drill-down.ndjson`, schema 1)
+
+The Tests tab's drill-down panel (ticket 416) reads this file. `e2e/browser/drillDown.spec.ts`
+writes one row per run (drill levels 1 and 10) to `test-results/drill-down/level-<n>.json`, and
+`scripts/ci/recordDrillDown.mjs` appends them here from `pushTestMetrics.sh`, so any Tester record
+made after a Playwright run carries them (slow phase `e2e`, probes, the nightly suites). It is one
+JSON line per run, oldest first and append-only, following `docs/perf/history.ndjson`. A row whose id
+is already held is skipped, since several records in one Tester run see the same files, and a
+malformed row is refused with its problems (`scripts/ci/drillDownHistory.mjs`). Positions are planet
+metres (1 cell = 1 m, centre at the origin) of the last reported pose, at most 0.2 s old.
+
+```jsonc
+{
+  "schema": 1,
+  "id": "2026-10-16T01:35:00.000Z-L1",
+  "measuredAt": "2026-10-16T01:35:00.000Z", // when the Down key went down
+  "buildCommit": "e1b25a23", // game_started's buildCommit: what the preview was built from
+  "seed": 83921,
+  "planet": 1,
+  "drillLevel": 1,
+  "holdMs": 10004, // wall time of the hold
+  "ticks": 600, // game ticks in it
+  "start": { "x": 16.42, "y": 299.61, "depthTiles": 0 }, // cells; depth = the HUD's whole cells
+  "end": { "x": 16.4, "y": 287.1, "depthTiles": 12 },
+  "depthGainedTiles": 12,
+  "descentMetres": 12.51, // toward the planet's centre
+  "cellsPerSecond": 1.2, // depth gained / s
+  "speedMetresPerSecond": 1.251, // start-to-end distance / s
+  "recordedAt": "…", // this and the next two: stamped by the recorder
+  "sha": "<tested sha>",
+  "phase": "slow",
+}
+```

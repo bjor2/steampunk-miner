@@ -215,6 +215,30 @@ Only runs that keep every test's duration feed it, so the trend has one point pe
 The page reads it from raw when the tab opens and on the 60 s poll while the tab is shown;
 `build-status.mjs` copies it beside the page as `test-history.json` for when raw fails.
 
+### Drill-down run (ticket 416)
+
+Between the Tester panel and **Every test**, the **Drill-down run** panel shows how far the vehicle
+gets when the real Down key is held for 10 s. `e2e/browser/drillDown.spec.ts` opens the committed
+start save `scenarios/drill-down-start.scenario.json` (seed 83921, planet 1, `drill_power` 1) in the
+preview build. It drives off the dock pad to column 16, stops, then holds ArrowDown for 10 s of wall
+time. A second run does the same at drill level 10, set through `debug.setUpgrade`. The panel shows
+the latest run per level (start and end position in cells, HUD depth, depth reached in 10 s and its
+change against the run before, cells/s, m/s), a sparkline of depth gained over commits, and the
+newest 20 runs (commit, ticks in the hold, Tester phase).
+
+It watches and does not judge (GD on #416). The spec asserts only that the vehicle went down and did
+not stall at 0, and the page colours nothing pass or fail. #409 owns the strict ladder assertion.
+It runs where the Tester runs Playwright: the slow tier of a spec run (when the box has room) and the
+nightly `e2e` suite. Build workers never run it.
+
+Where the results live: each run writes one row to `test-results/drill-down/level-<n>.json` in the
+Tester's worktree. `scripts/ci/pushTestMetrics.sh`, which the Tester calls after every phase, runs
+`scripts/ci/recordDrillDown.mjs`, and that appends the rows to **`drill-down.ndjson` on the
+`test-metrics` branch**: one JSON line per run, append-only, kept across runs, a row id already held
+skipped. The schema is in [test-metrics.md](metrics/test-metrics.md#drill-down-runs-drill-downndjson).
+The page reads the file from raw like `tests.json`, and `build-status.mjs` copies it beside the page
+as `drill-down.ndjson`.
+
 ## Feature tree
 
 The **Features** tab (https://bjor2.github.io/steampunk-miner/status/#features) renders
