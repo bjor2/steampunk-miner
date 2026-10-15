@@ -741,7 +741,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/authority/terrain/terrainEditPlan.test.ts` | 5 | 5 |
 | `src/systems/authority/terrain/terrainEditQueue.test.ts` | 5 | 5 |
 | `src/systems/authority/travelRules.test.ts` | 12 | 12 |
-| `src/systems/authority/vehicleCommands.test.ts` | 24 | 24 |
+| `src/systems/authority/vehicleCommands.test.ts` | 25 | 25 |
 | `src/systems/authority/vehicleItemRules.test.ts` | 10 | 10 |
 
 ### `bot`
@@ -941,9 +941,10 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | File | Tests | Sites |
 | --- | --- | --- |
 | `src/physics/cutFollow.test.ts` | 5 | 3 |
+| `src/physics/cutFollowBite.test.ts` | 3 | 2 |
 | `src/physics/cutFollowRelease.test.ts` | 16 | 3 |
 | `src/physics/cutFollowStartingRigs.test.ts` | 16 | 5 |
-| `src/physics/cutSmoothness.test.ts` | 4 | 3 |
+| `src/physics/cutSmoothness.test.ts` | 3 | 5 |
 | `src/physics/cutStartLatency.lane.test.ts` | 3 | 3 |
 | `src/physics/drillEngagement.test.ts` | 6 | 6 |
 | `src/physics/fastRigBodySpeed.lane.test.ts` | 2 | 2 |
@@ -952,7 +953,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/physics/liveFixedStep.test.ts` | 4 | 4 |
 | `src/physics/physicsStats.test.ts` | 3 | 3 |
 | `src/physics/strutColliders.test.ts` | 4 | 4 |
-| `src/physics/sweptCutPace.test.ts` | 2 | 1 |
+| `src/physics/sweptCutPace.test.ts` | 5 | 2 |
 | `src/physics/tunnelling.test.ts` | 10 | 2 |
 | `src/physics/vehicleLoop.test.ts` | 6 | 6 |
 | `src/physics/vehiclePhysics.test.ts` | 8 | 2 |
@@ -1335,7 +1336,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/views/bayPresentation.test.ts` | 6 | 6 |
 | `src/systems/views/chargeViews.test.ts` | 14 | 14 |
 | `src/systems/views/combatStatuses.test.ts` | 8 | 8 |
-| `src/systems/views/engineTrackMaxed.test.ts` | 7 | 7 |
+| `src/systems/views/engineTrackMaxed.test.ts` | 6 | 6 |
 | `src/systems/views/hazardStripView.test.ts` | 3 | 3 |
 | `src/systems/views/heatViews.test.ts` | 5 | 5 |
 | `src/systems/views/hudCallouts.test.ts` | 6 | 6 |
