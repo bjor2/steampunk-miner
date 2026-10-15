@@ -36,7 +36,7 @@ import {
   type UpgradeId,
   type VisualTierThreshold,
 } from './economyDefinition'
-import type { BigStat } from '../money'
+import { cmp, fromSafeInteger, type BigStat } from '../money'
 
 export type EconomyReading = { economy: Economy; problems: [] } | { problems: string[] }
 
@@ -172,8 +172,19 @@ function readDrill(reader: FieldReader, drill: Record<string, unknown>): Economy
     denseScratchFloor: reader.money('drill.denseScratchFloor', drill.denseScratchFloor),
     gateScratchFloor: reader.money('drill.gateScratchFloor', drill.gateScratchFloor),
     minTicksPerTile: reader.safeInteger('drill.minTicksPerTile', drill.minTicksPerTile),
-    travelParityK: reader.money('drill.travelParityK', drill.travelParityK),
+    travelParityK: readTravelParityK(reader, drill.travelParityK),
   }
+}
+
+/** Travel parity's k, tunable only from 1 to 2 (VS on the #397 TD lock, ticket 400). */
+const TRAVEL_PARITY_K_LOWEST = fromSafeInteger(1)
+const TRAVEL_PARITY_K_HIGHEST = fromSafeInteger(2)
+
+function readTravelParityK(reader: FieldReader, value: unknown): BigStat {
+  const k = reader.money('drill.travelParityK', value)
+  const isInRange = cmp(k, TRAVEL_PARITY_K_LOWEST) >= 0 && cmp(k, TRAVEL_PARITY_K_HIGHEST) <= 0
+  if (!isInRange) reader.record('drill.travelParityK must be from 1 to 2')
+  return k
 }
 
 function readCasing(

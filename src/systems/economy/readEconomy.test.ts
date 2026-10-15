@@ -139,6 +139,19 @@ describe('economy data validation', () => {
     ])
   })
 
+  it('refuses a travel parity k outside 1 to 2 (TD lock on #397, ticket 400)', () => {
+    for (const travelParityK of ['0.99', '2.01']) {
+      const broken = economyFileCopy()
+      Object.assign(broken.drill, { travelParityK })
+      expect(problemsOf(broken)).toEqual(['drill.travelParityK must be from 1 to 2'])
+    }
+    for (const travelParityK of ['1', '2']) {
+      const edge = economyFileCopy()
+      Object.assign(edge.drill, { travelParityK })
+      expect(problemsOf(edge)).toEqual([])
+    }
+  })
+
   it('refuses curve pieces that do not start past level 0 and past the piece before (ticket 396)', () => {
     const broken = economyFileCopy()
     const pieces = [
