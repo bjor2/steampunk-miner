@@ -44,9 +44,7 @@ function withChargesEntry(run: () => void): void {
 }
 
 function withVisionEntry(run: () => void): void {
-  const vision = probeSourceOf('entry-probe.magma', 'magma_tick', [
-    { entryId: 'entry-probe.tick' },
-  ])
+  const vision = probeSourceOf('entry-probe.magma', 'magma_tick', [{ entryId: 'entry-probe.tick' }])
   withRegistrations([entryProbeSlice([vision.source])], run)
 }
 
