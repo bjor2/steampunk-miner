@@ -261,8 +261,14 @@ import type { DriveSigns } from '../vehicle/driveSigns'
  *    carries the shot's opened cells as optional `lineCells` (at most 50) while a slice's
  *    `boreLineListeners` entry wants them. An event field, not saved state: with no listener
  *    answering, no event, digest or mined order changes.
+ * 76: the exact drill carry (ticket 399, K-carry of the TD lock on #397 with the TD ruling on
+ *    #399): a `drillStep` reaches only as far as its tick's work and the cursor's carried
+ *    `carrySubSteps` pay for, cell by cell along the stamp's centre at each cell's drill time
+ *    times its uncut share; a paid cell clears in full, the rest carries exactly, and gated or
+ *    tip-locked cells discard it. Saved at snapshot 21. With no drill step sent (`drill.sweptCut`
+ *    off) no digest or mined order changes.
  */
-export const AUTHORITY_PROTOCOL_VERSION = 75
+export const AUTHORITY_PROTOCOL_VERSION = 76
 
 /** The kernel's own commands: the closed set its rule tables are written against. */
 export interface KernelCommandPayloads {
