@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { runEventProblems } from '../../../logging/runEventSchema'
-import { projectDomainEvent } from '../../../logging/domainEventLog'
+import { projectDomainEvent } from '../../../logging/domainEventProjection'
 import { LOG_SCHEMA_VERSION } from '../../../logging/runEvent'
 import { enemyTier } from '../../economy/enemyStats'
 import { gunShotDamage } from '../../economy/gunStats'

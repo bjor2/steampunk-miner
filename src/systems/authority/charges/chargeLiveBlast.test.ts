@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { MM_PER_METRE } from '../../../constants/physics'
-import { projectDomainEvent } from '../../../logging/domainEventLog'
+import { projectDomainEvent } from '../../../logging/domainEventProjection'
 import { withRegistrations } from '../../../registries/registrar'
 import type { SliceDefinition } from '../../../registries/sliceDefinition'
 import { hashCell } from '../../cellRandom'

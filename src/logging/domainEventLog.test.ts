@@ -1,6 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it } from 'vitest'
 import type { DomainEvent } from '../systems/authority/domainEvent'
-import { projectDomainEvent, recordDomainEvents } from './domainEventLog'
+import { recordDomainEvents } from './domainEventLog'
+import { projectDomainEvent } from './domainEventProjection'
 import { createMemorySink } from './eventSink'
 import { formatNdjsonLine, parseNdjson } from './ndjson'
 import { createRunLog, installRunLog, uninstallRunLog } from './runLog'

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { projectDomainEvent } from '../../../logging/domainEventLog'
+import { projectDomainEvent } from '../../../logging/domainEventProjection'
 import { registeredEventOf } from '../../../logging/eventNames'
 import { toCanonical } from '../../money'
 import { FACING, type Facing } from '../../vehicle/vehiclePose'
