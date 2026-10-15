@@ -20,7 +20,8 @@ const WORLD_SEEDS = PACING_WORLD_SEEDS['bot-slice-assay']
 
 // #46 acceptance 6 and S11 (#65 Systems & Economy note 3): assay_beacon lifts early-band income
 // toward mid-band, so the bot holding it from the start must pass the same three gates as the bot
-// without it: the #16 first ten minutes, planet 1's core in 30-60 min and the slice in 90-130 min.
+// without it: the #16 first ten minutes, planet 1's core in 15-30 min and the slice in 60-130 min
+// (ticket 396's windows).
 // A miss is a tuning ticket for Systems & Economy, never a reason to retune the bot or a constant.
 // #84: the gates judge the median of the scenario played on its three pacing world seeds.
 describe('balance regression: the pacing bot holding assay_beacon (#46, S11)', () => {

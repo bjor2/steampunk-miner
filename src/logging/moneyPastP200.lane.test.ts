@@ -11,7 +11,7 @@ import { playSliceIntoSink } from './sliceRunLog'
 // The P200 money lane (ticket 340, #316 TD scope f; TD pin on #123, GD): the pacing bot plays the
 // bot scenario to planet 200's core, where prices are near 1e104, headless and with no command
 // log, and writes a summary log of one line a planet (about 1 MB at most, apart from the
-// first-hour 4 MB gate). Its gate: every money field it logged is canonical text (#5), checked
+// first-hour 8 MB gate). Its gate: every money field it logged is canonical text (#5), checked
 // against the schema as each event arrives. Its largest price and income are printed. It also
 // holds the per-tick authority cost budget at P200 (ticket 334, replacing the P100 acceptance of
 // #316 scope b): the process's CPU time over game ticks, bot planning included, so an upper bound

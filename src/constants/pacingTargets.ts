@@ -12,14 +12,23 @@ export const PACING_TARGETS = {
   earlyUpgrades: 3,
   earlyTracks: 2,
   earlyBand: 2,
-  planet1CoreMinutes: { min: 30, max: 60 },
+  /**
+   * Ticket 396 (GD ruling 6190377494, Systems' confirmation): with the drill speed uncapped, planet 1's
+   * core takes the VS's 15 to 30 minutes (Systems' model: 25.0). It replaces #29's 30 to 60.
+   */
+  planet1CoreMinutes: { min: 15, max: 30 },
   /**
    * Ticket 396 (GD ruling and VS amendment 4, on Bjor's 8 Oct no-cap ruling): the bot's band-1 drill
    * speed on planet 1 is at least 3x its start by the time it reaches band 3, and at least 10 cells
    * a second when it leaves. Systems' front-loaded drill rows are priced to meet both.
    */
   planet1Drill: { bandThreeSpeedupMin: 3, departureCellsPerSecondMin: 10 },
-  sliceMinutes: { min: 90, max: 130 },
+  /**
+   * Ticket 396 (same ruling): the 130-minute upper edge stays so a slow slice still fails; the lower
+   * edge drops from 90 to 60 as an interim, since a faster slice is intended. Systems posts the final
+   * lower edge on #396 after the Tester's split run.
+   */
+  sliceMinutes: { min: 60, max: 130 },
   /** Report only (#29 Systems & Economy note 4): alert when a planet takes fewer or more trips. */
   tripsPerPlanet: { min: 3, max: 12 },
   /**

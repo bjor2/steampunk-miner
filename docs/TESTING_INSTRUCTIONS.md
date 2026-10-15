@@ -209,12 +209,13 @@ programs }` from three's `renderer.info` of the game canvas), read only when cal
   Sell bay visit (#115, #128); the pacing specs fail a drill dive with no `casing_placed` and a slice that
   forgives more than a tenth of the lining it charged. `src/logging/pacingGate.test.ts` fails on a
   missed pacing target (`src/constants/pacingTargets.ts`), an unregistered event or field, a broken
-  #2 sequence or more than 4 MB of core events and commands in the first hour; it also fails a
+  #2 sequence or more than 8 MB of core events and commands in the first hour (#11 am. 2's 4 MB,
+  raised as an interim by ticket 396 until the TD's log compaction lands); it also fails a
   seed-median planet 1 drill under 3x its start band-1 speed when it first breaks a band-3 tile, or
   under 10 band-1 cells/s on arriving at planet 2 (`planetOneDrillPace.ts`, ticket 396).
   `src/logging/assayPacingGate.test.ts` holds the bot holding `assay_beacon`
   (`bot-slice-assay.scenario.json`) to the same three gates: the #16 first ten minutes, the planet 1
-  core in 30 to 60 minutes and the slice in 90 to 130 (`pacingVerdicts` prints pass or fail for each). Trips per planet
+  core in 15 to 30 minutes and the slice in 60 to 130 (ticket 396's windows; `pacingVerdicts` prints pass or fail for each). Trips per planet
   outside 3 to 12 are printed, never failed. Both play their scenario on three world seeds
   (`src/constants/pacingSeeds.ts`, the scenario's own `worldSeed` first) and gate on the median of
   each metric (`medianPacingReport`, #84), so one run's combat deaths cannot flip a gate; the log
@@ -472,7 +473,7 @@ programs }` from three's `renderer.info` of the game canvas), read only when cal
   drill ticks per metre of bands 1 to 5, time on the planet, docked and cutting ticks, the trip
   share in basis points, the largest Money and its significant digits). It fails on any logged
   event the schema refuses (every money field canonical text, #5), on a run that does not finish
-  and on a log over 1 MB, apart from the first-hour 4 MB gate. A `*.lane.test.ts` file runs only
+  and on a log over 1 MB, apart from the first-hour 8 MB gate. A `*.lane.test.ts` file runs only
   when a CLI filter names it (`vite.config.ts`): it takes hours, so neither `npm test` nor the
   nightly picks it up. Its rounding rule is unit-tested in `systems/money.test.ts` (charges never
   round down, income never up, at 1e36, 1e37 and 1e40).

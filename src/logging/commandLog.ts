@@ -2,7 +2,7 @@
  * `commands.ndjson` as written (ticket 342, the TD call on #123): a `reportPose` line carries
  * `drive` only when it differs from the same player's previous logged `drive`, and reading the
  * log carries the last value forward. `drive` changes on key edges only, so most 5 Hz pose lines
- * drop it and the first hour stays under #11's 4 MB budget without a slower pose rate.
+ * drop it and the first hour stays under #11's first-hour budget without a slower pose rate.
  *
  * This is the log's encoding only: the authority and the wire still get every `drive`, so no
  * protocol bump and no sticky state. A player's first report, and the first after a rescue

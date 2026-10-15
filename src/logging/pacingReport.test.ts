@@ -69,7 +69,7 @@ const onTimeRun = (): RunEvent[] => [
   upgrade(200 * SECOND, 'hull', 1),
   upgrade(300 * SECOND, 'drill_tip', 2),
   band2Tile(400 * SECOND),
-  line(45 * MINUTE, 'core_completed', { durationTicks: 0 }),
+  line(25 * MINUTE, 'core_completed', { durationTicks: 0 }),
   line(50 * MINUTE, 'planet_entered', { planetSeed: 2, generatorVersion: 1, radius: 400 }, 2),
   line(100 * MINUTE, 'core_completed', { durationTicks: 0 }, 2),
   line(100 * MINUTE, 'rescue_triggered', {
@@ -86,7 +86,7 @@ describe('pacing report', () => {
 
   it('times each core from the arrival on its planet, and the slice from the start', () => {
     const report = derivePacingReport(onTimeRun(), WORLD_SEED)
-    expect(report.coreTicksOnPlanet).toEqual({ '1': 45 * MINUTE, '2': 50 * MINUTE })
+    expect(report.coreTicksOnPlanet).toEqual({ '1': 25 * MINUTE, '2': 50 * MINUTE })
     expect(report.sliceEndTick).toBe(100 * MINUTE)
   })
 
@@ -102,7 +102,7 @@ describe('pacing report', () => {
   it('names a slice that never ends', () => {
     const unfinished = onTimeRun().filter((event) => event.planet === 1)
     expect(pacingProblems(derivePacingReport(unfinished, WORLD_SEED))).toEqual([
-      'slice at 45.0 min, target 90 to 130 min',
+      'slice at 25.0 min, target 60 to 130 min',
     ])
   })
 
@@ -141,19 +141,15 @@ describe('pacing report', () => {
       line(240 * MINUTE, 'core_completed', { durationTicks: 0 }, 4),
     ]
     expect(campaignPlanetAlerts(derivePacingReport(run, WORLD_SEED))).toEqual([
+      'planet 1 core took 25.0 min, campaign target 45 to 60 min per planet',
       'planet 4 core took 80.0 min, campaign target 45 to 60 min per planet',
     ])
   })
 
   it('reports a slice planet off the campaign target without failing the slice gates', () => {
-    const fastCore = onTimeRun().map((event) =>
-      event.event === 'core_completed' && event.planet === 1
-        ? line(35 * MINUTE, 'core_completed', { durationTicks: 0 })
-        : event,
-    )
-    const report = derivePacingReport(fastCore, WORLD_SEED)
+    const report = derivePacingReport(onTimeRun(), WORLD_SEED)
     expect(campaignPlanetAlerts(report)).toEqual([
-      'planet 1 core took 35.0 min, campaign target 45 to 60 min per planet',
+      'planet 1 core took 25.0 min, campaign target 45 to 60 min per planet',
     ])
     expect(pacingProblems(report)).toEqual([])
   })
@@ -167,8 +163,8 @@ describe('pacing report', () => {
     const verdicts = pacingVerdicts(derivePacingReport(onTimeRun(), WORLD_SEED))
     expect(verdicts.map((verdict) => verdict.gate)).toEqual([
       'first ten minutes (#16)',
-      'planet 1 core, 30 to 60 min',
-      'slice, 90 to 130 min',
+      'planet 1 core, 15 to 30 min',
+      'slice, 60 to 130 min',
     ])
     expect(formatPacingVerdicts(verdicts)).not.toContain('FAIL')
   })
@@ -176,12 +172,12 @@ describe('pacing report', () => {
   it('fails only the slice gate for a slice that ends too early, naming the miss', () => {
     const early = onTimeRun().map((event) =>
       event.planet === 2 && event.event === 'core_completed'
-        ? line(85 * MINUTE, 'core_completed', { durationTicks: 0 }, 2)
+        ? line(55 * MINUTE, 'core_completed', { durationTicks: 0 }, 2)
         : event,
     )
     const table = formatPacingVerdicts(pacingVerdicts(derivePacingReport(early, WORLD_SEED)))
     expect(table).toContain(
-      '| slice, 90 to 130 min | FAIL: slice at 85.0 min, target 90 to 130 min |',
+      '| slice, 60 to 130 min | FAIL: slice at 55.0 min, target 60 to 130 min |',
     )
     expect(table.match(/FAIL/g)).toHaveLength(1)
   })

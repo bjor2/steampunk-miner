@@ -11,8 +11,8 @@ function reportOf(changes: Partial<PacingReport>): PacingReport {
     upgradesByEarlyCheck: 4,
     tracksByEarlyCheck: 3,
     deepestBandByEarlyCheck: 2,
-    coreCompletedTick: { '1': 50 * MINUTE, '2': 100 * MINUTE },
-    coreTicksOnPlanet: { '1': 50 * MINUTE, '2': 48 * MINUTE },
+    coreCompletedTick: { '1': 25 * MINUTE, '2': 100 * MINUTE },
+    coreTicksOnPlanet: { '1': 25 * MINUTE, '2': 48 * MINUTE },
     sliceEndTick: 100 * MINUTE,
     tripsByPlanet: { '1': 6, '2': 5 },
     finalLevels: { drill_power: 190, drill_tip: 104 },
@@ -36,7 +36,7 @@ describe('pacing median over seeded runs', () => {
 
   it('passes the slice gate when one seed of three misses it', () => {
     const median = medianPacingReport([
-      reportOf({ sliceEndTick: 89 * MINUTE }),
+      reportOf({ sliceEndTick: 59 * MINUTE }),
       reportOf({ sliceEndTick: 96 * MINUTE }),
       reportOf({ sliceEndTick: 114 * MINUTE }),
     ])
@@ -45,11 +45,11 @@ describe('pacing median over seeded runs', () => {
 
   it('fails the slice gate when two seeds of three miss it', () => {
     const median = medianPacingReport([
-      reportOf({ sliceEndTick: 88 * MINUTE }),
-      reportOf({ sliceEndTick: 89 * MINUTE }),
+      reportOf({ sliceEndTick: 58 * MINUTE }),
+      reportOf({ sliceEndTick: 59 * MINUTE }),
       reportOf({ sliceEndTick: 114 * MINUTE }),
     ])
-    expect(pacingProblems(median)).toEqual(['slice at 89.0 min, target 90 to 130 min'])
+    expect(pacingProblems(median)).toEqual(['slice at 59.0 min, target 60 to 130 min'])
   })
 
   it('counts a first sale that never happened as later than any tick', () => {
@@ -86,7 +86,7 @@ describe('pacing median over seeded runs', () => {
       { worldSeed: 31415, report: reportOf({ sliceEndTick: 100 * MINUTE }) },
       { worldSeed: 27182, report: reportOf({ sliceEndTick: 134 * MINUTE }) },
     ])
-    expect(table).toContain('| 83921 | 50.0 min | 48.0 min | 94.0 min | 0 | 19 / 10 · 4/9 |')
-    expect(table).toContain('| median | 50.0 min | 48.0 min | 100.0 min | 0 | 19 / 10 · 4/9 |')
+    expect(table).toContain('| 83921 | 25.0 min | 48.0 min | 94.0 min | 0 | 19 / 10 · 4/9 |')
+    expect(table).toContain('| median | 25.0 min | 48.0 min | 100.0 min | 0 | 19 / 10 · 4/9 |')
   })
 })

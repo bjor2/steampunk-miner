@@ -38,11 +38,14 @@ const SCENARIO = JSON.parse(
 ) as Scenario
 
 /**
- * #11 amendment 2: core events plus commands stay under 4 MB per player-hour, the commands as
+ * #11 amendment 2: core events plus commands stay under the first-hour budget, the commands as
  * `commands.ndjson` writes them (a pose's `drive` only when it changed, ticket 342). The pose rate
- * stays 5 Hz: the #123 rulings retired #11's 4 Hz fallback, and the budget does not grow with speed.
+ * stays 5 Hz: the #123 rulings retired #11's 4 Hz fallback. Ticket 396 (GD ruling 6190377494,
+ * Systems' confirmation) raises the budget from 4 MB to 8 MB as an interim: uncapped drilling logs
+ * more cells an hour, and a log budget must never act as a speed cap. The TD's log compaction
+ * ticket replaces this raise.
  */
-const BYTES_PER_HOUR_BUDGET = 4 * 1024 * 1024
+const BYTES_PER_HOUR_BUDGET = 8 * 1024 * 1024
 const HOUR_TICKS = 60 * 60 * TICKS_PER_SECOND
 
 /** The #2 acceptance sequence, in order, other lines allowed between (#24). */
@@ -140,7 +143,7 @@ describe('balance regression: the pacing bot on the slice (#29, S11)', () => {
     expect(Object.values(report.finalLevels).every((level) => level > 0)).toBe(true)
   })
 
-  it('keeps the first hour of core events and commands under the 4 MB budget', () => {
+  it('keeps the first hour of core events and commands under the 8 MB budget', () => {
     const { events, commands } = botRun()
     const coreEvents = events.filter((event) => event.tick <= HOUR_TICKS && isCoreLevel(event))
     const loggedCommands = loggedCommandsOf(commands.filter((c) => c.tick <= HOUR_TICKS))
