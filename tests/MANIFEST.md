@@ -940,6 +940,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | --- | --- | --- |
 | `src/physics/cutFollow.test.ts` | 5 | 3 |
 | `src/physics/cutSmoothness.test.ts` | 4 | 3 |
+| `src/physics/cutStartLatency.lane.test.ts` | 3 | 3 |
 | `src/physics/drillEngagement.test.ts` | 6 | 6 |
 | `src/physics/floatingOrigin.test.ts` | 3 | 3 |
 | `src/physics/glidePassThrough.test.ts` | 4 | 4 |
@@ -1288,6 +1289,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/vehicle/colliderHalo.test.ts` | 3 | 3 |
 | `src/systems/vehicle/cutFollowMotion.test.ts` | 13 | 13 |
 | `src/systems/vehicle/cutGate.test.ts` | 8 | 8 |
+| `src/systems/vehicle/cutStartBreakdown.test.ts` | 4 | 4 |
 | `src/systems/vehicle/drillContact.test.ts` | 5 | 5 |
 | `src/systems/vehicle/drillGearCells.test.ts` | 12 | 12 |
 | `src/systems/vehicle/drillRule.test.ts` | 22 | 23 |

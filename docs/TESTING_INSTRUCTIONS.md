@@ -240,6 +240,14 @@ programs }` from three's `renderer.info` of the game canvas), read only when cal
   compounded, less the GD's 5% (`drillLadderReport.ts`, compared in Money). The cut alone sets the
   time; #397's cut-follow adds the vehicle's travel. About 4 s, so it runs in the change-relevant
   tier. The table and how to read it are in [docs/economy/drill-ladder.md](economy/drill-ladder.md).
+- **Cut start latency** (ticket 433, measurement only): `src/physics/cutStartLatency.lane.test.ts`
+  starts a down cut from rest in the live loop with `drill.sweptCut` on (from the planet 1 surface,
+  turning the head from left, and again mid-shaft), at stored drill_power 1, 10 and 20 and #400's
+  two rigs, at 30 and 144 frames/s. It prints where the ticks go until the body follows the drill
+  (swivel, stale facing, first cell, held, second stall: `systems/vehicle/cutStartBreakdown.ts`)
+  and the stale facing for each pose report phase, and writes them to
+  `balance-report/cut-start-latency.ndjson`. A lane (about 40 s), so it runs only when named; it
+  fails only when a start opens no cell or the two frame rates differ.
 - **Known red** (ticket 419, the TD on #396 section 2): `CAMPAIGN_PACING_KNOWN_RED`
   (`src/constants/knownRed.ts`) is the one known-red marker in the repo: one gate
   (`campaignPacingGate`), one finding (#417), no registry. The gate still runs in full;
