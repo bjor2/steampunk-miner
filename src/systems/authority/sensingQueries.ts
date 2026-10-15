@@ -10,6 +10,9 @@
  *   `(ty, tx)`. The radius is held to `itemHookCaps.reachCellsMax`, so a call reads at most the
  *   441 tiles of a twelve-tile disc, each once. The magnetic survey drags toward it.
  *
+ * `dustTrailWarningsOf` (K-pretrain, ticket 413) lives with the turret that holds for it
+ * (`combat/dustTrail.ts`) and is re-exported here for the periscope's render.
+ *
  * "A drag may move" is the kernel's share of the ore-shifter's rule: an ore cell with ground left
  * in it, no casing, and no gate holding it against the tool (`canMine`'s tool column). A core cell
  * is never ore. The ore-shifter's own anchor rule (no cell within 1 m of a vehicle) stays with its
@@ -34,6 +37,8 @@ import type { AuthorityState } from './authorityState'
 import type { Enemy } from './combat/combatState'
 import { resourceTierOf } from './minedOre'
 import { planetParamsOf } from './planetOfState'
+
+export { dustTrailWarningsOf, type DustTrailWarning } from './combat/dustTrail'
 
 export interface LungeWarning {
   enemyId: string

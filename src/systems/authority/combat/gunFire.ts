@@ -15,7 +15,9 @@
  * concussion's knock (`turretKnock.ts`) and the ricochet (`ricochet.ts`). Overpressure's toggle
  * (K-burst, ticket 383, `turretBurst.ts`) keeps the shape's `burst` cycle on the vehicle: a shot
  * in a burst waits the faster interval, and the guns hold fire through a vent without reading the
- * shape. With no provider the shape is #107's guns and every shot is as before.
+ * shape. A spotter's pre-train (K-pretrain, ticket 413, `turretPretrain.ts`) may hold a due shot
+ * a few ticks for a burrower about to break the surface, keeping the schedule of the due tick.
+ * With no provider the shape is #107's guns and every shot is as before.
  */
 import { gunFireIntervalTicks, gunShotDamage } from '../../economy/gunStats'
 import { cmp, sub, ZERO_MONEY, type BigStat } from '../../money'
@@ -36,6 +38,7 @@ import { flushGunHitsOn, tallyGunHit } from './gunHits'
 import { isAnyEnemyWithinRangeCap, turretSightOf } from './gunTargets'
 import { turretAimOf, type TurretAim } from './turretAim'
 import { knockedEnemy } from './turretKnock'
+import { pretrainOf, type Pretrain } from './turretPretrain'
 import { turretShapeOf } from './turretShape'
 import { vehicleTargetOf, type VehicleTarget } from './vehicleTarget'
 
@@ -43,10 +46,19 @@ import { vehicleTargetOf, type VehicleTarget } from './vehicleTarget'
 interface TurretShot {
   playerId: string
   tick: number
+  /** The tick the next due tick counts from: this one, or the due tick a pre-train held from. */
+  scheduleTick: number
   terrain: Terrain
   from: MillimetrePoint
   shape: TurretShape
   aim: TurretAim
+}
+
+/** What a due shot that is not held aims with. */
+interface ShotPlan {
+  shape: TurretShape
+  pretrain: Pretrain
+  tick: number
 }
 
 /** One target's part of a shot: the damage it takes and the energy it is charged with. */
@@ -85,20 +97,36 @@ function dueShotOf(
   return aimedShotOf(state, terrain, target, tick)
 }
 
-/** The shape is read here, once per due shot with an enemy in reach, and nowhere else. */
+/**
+ * The shape is read here, once per due shot with an enemy in reach, and nowhere else; a spotter's
+ * pre-train may hold the shot a few ticks for a burrower about to surface (`turretPretrain.ts`).
+ */
 function aimedShotOf(
   state: AuthorityState,
   terrain: Terrain,
   target: VehicleTarget,
   tick: number,
 ): TurretShot | null {
+  const shape = turretShapeOf(state, target.playerId)
+  const pretrain = pretrainOf(state, terrain, target, shape, tick)
+  if (pretrain.isHolding) return null
+  return shotAimedWith(state, terrain, target, { shape, pretrain, tick })
+}
+
+function shotAimedWith(
+  state: AuthorityState,
+  terrain: Terrain,
+  target: VehicleTarget,
+  { shape, pretrain, tick }: ShotPlan,
+): TurretShot | null {
   const { playerId } = target
-  const shape = turretShapeOf(state, playerId)
   const isConeOpen = isForwardConeOpen(vehicleOf(state, playerId), shape, tick)
   const sight = turretSightOf(terrain, target, shape, isConeOpen)
   const heldPick = combatVehicleOf(state.combat, playerId).directorPick
-  const aim = turretAimOf(sight, state.combat.enemies, { shape, heldPick, tick })
-  return aim === null ? null : { playerId, tick, terrain, from: target.position, shape, aim }
+  const { surfacedIds, scheduleTick } = pretrain
+  const aim = turretAimOf(sight, state.combat.enemies, { shape, heldPick, tick, surfacedIds })
+  if (aim === null) return null
+  return { playerId, tick, scheduleTick, terrain, from: target.position, shape, aim }
 }
 
 function isGunDue(state: AuthorityState, playerId: string, tick: number): boolean {
@@ -112,14 +140,15 @@ function isGunDue(state: AuthorityState, playerId: string, tick: number): boolea
   )
 }
 
-function spendShot(state: AuthorityState, { playerId, tick, shape }: TurretShot): RuleEffect {
+function spendShot(state: AuthorityState, shot: TurretShot): RuleEffect {
+  const { playerId, tick, scheduleTick, shape } = shot
   const vehicle = vehicleOf(state, playerId)
   const fired = withVehicle(state, playerId, {
     ...vehicle,
     energy: vehicle.energy - shape.energyPerShotQuanta,
   })
   const interval = gunIntervalAt(vehicle.gunBurst, gunFireIntervalTicks(vehicle.gun.level), tick)
-  const gunReadyTick = tick + interval
+  const gunReadyTick = scheduleTick + interval
   return unchanged(withCombat(fired, withCombatVehicle(fired.combat, playerId, { gunReadyTick })))
 }
 

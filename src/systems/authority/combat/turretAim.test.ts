@@ -135,3 +135,39 @@ describe('turret aim: the fire director order (ticket 382)', () => {
     })
   })
 })
+
+describe('turret aim: a pre-train ranks the surfaced burrower first (ticket 413, GD ruling on #320)', () => {
+  /** A burrower `dx, dy` mm from the rig, hunting it. */
+  const burrower = (number: number, dx: number, dy: number): Enemy => ({
+    ...crawler(number, dx, dy, 'approach'),
+    kind: 'burrower',
+  })
+
+  it('shoots the burrower that broke the surface in line of fire, though a crawler is nearer', () => {
+    const sight = turretSightOf(corridorTerrain(), RIG, BASE_TURRET_SHAPE, false)
+    const enemies = [crawler(1, -2000, 0, 'approach'), burrower(2, -5000, 0)]
+    const context = { shape: BASE_TURRET_SHAPE, heldPick: undefined, tick: 100 }
+    expect(turretAimOf(sight, enemies, context)?.primary.id).toBe('e1')
+    const surfacedIds = new Set(['e2'])
+    expect(turretAimOf(sight, enemies, { ...context, surfacedIds })?.primary.id).toBe('e2')
+  })
+
+  it("puts it ahead of the fire director's rear attacker and its held pick", () => {
+    const sight = turretSightOf(corridorTerrain(), RIG, DIRECTOR, false)
+    const enemies = [crawler(1, -5000, 0, 'approach'), burrower(2, -3000, 0)]
+    const heldPick: DirectorPick = { enemyId: 'e1', rankedTick: 100 }
+    const context = { shape: DIRECTOR, heldPick, tick: 101, surfacedIds: new Set(['e2']) }
+    expect(turretAimOf(sight, enemies, context)).toMatchObject({
+      primary: { id: 'e2' },
+      pick: { enemyId: 'e2', rankedTick: 101 },
+    })
+  })
+
+  it('never turns toward a surfaced burrower it cannot see: the order of the rest stands', () => {
+    const sight = turretSightOf(corridorTerrain(), RIG, BASE_TURRET_SHAPE, false)
+    const enemies = [crawler(1, -2000, 0, 'approach'), burrower(2, -3000, -1000)]
+    const context = { shape: BASE_TURRET_SHAPE, heldPick: undefined, tick: 100 }
+    const surfacedIds = new Set(['e2'])
+    expect(turretAimOf(sight, enemies, { ...context, surfacedIds })?.primary.id).toBe('e1')
+  })
+})

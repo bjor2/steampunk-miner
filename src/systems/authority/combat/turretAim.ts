@@ -8,6 +8,8 @@
  *   in sight, so the pack is re-ranked at most that often, never per tick.
  * - With a ricochet in the shape and no enemy in straight sight, the first enemy in the same order
  *   that one bounce reaches (`ricochet.ts`).
+ * - A spotter's pre-train (ticket 413, `turretPretrain.ts`) puts the burrowers it watched break the
+ *   surface ahead of either order, among the enemies in straight sight only; the rest keep theirs.
  *
  * Grapeshot's extra targets need their own straight line (`grapeShot.ts`), so a bounced shot hits
  * its one target.
@@ -33,6 +35,8 @@ export interface AimContext {
   shape: TurretShape
   heldPick: DirectorPick | undefined
   tick: number
+  /** Burrowers a pre-train watched break the surface (ticket 413); none when left out. */
+  surfacedIds?: ReadonlySet<string>
 }
 
 /** Rear attackers rank 0, latched enemies 1, every other enemy 2. */
@@ -55,6 +59,25 @@ export function turretAimOf(
 }
 
 function straightPickOf(
+  sight: TurretSight,
+  inSight: readonly Enemy[],
+  context: AimContext,
+): Enemy | null {
+  return surfacedPickOf(sight, inSight, context) ?? orderedPickOf(sight, inSight, context)
+}
+
+/** A burrower that just broke the surface in line of fire, nearest first (GD ruling on #320). */
+function surfacedPickOf(
+  sight: TurretSight,
+  inSight: readonly Enemy[],
+  { surfacedIds }: AimContext,
+): Enemy | null {
+  if (surfacedIds === undefined || surfacedIds.size === 0) return null
+  const surfaced = inSight.filter((enemy) => surfacedIds.has(enemy.id))
+  return nearestOf(sight.target.position, surfaced)
+}
+
+function orderedPickOf(
   sight: TurretSight,
   inSight: readonly Enemy[],
   context: AimContext,
