@@ -647,6 +647,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/authority/bore/boreAuto.test.ts` | 30 | 21 |
 | `src/systems/authority/bore/boreAutoAim.test.ts` | 7 | 7 |
 | `src/systems/authority/bore/boreGrounding.test.ts` | 10 | 10 |
+| `src/systems/authority/bore/boreLine.test.ts` | 17 | 17 |
 | `src/systems/authority/bore/boreShape.test.ts` | 16 | 16 |
 | `src/systems/authority/bore/boreStrut.test.ts` | 12 | 12 |
 | `src/systems/authority/bore/boreWalk.test.ts` | 14 | 14 |
@@ -875,7 +876,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/logging/compareRuns.test.ts` | 11 | 11 |
 | `src/logging/diveCasing.test.ts` | 3 | 3 |
 | `src/logging/diveSummaries.test.ts` | 4 | 4 |
-| `src/logging/domainEventLog.test.ts` | 19 | 19 |
+| `src/logging/domainEventLog.test.ts` | 21 | 21 |
 | `src/logging/drillCutLine.test.ts` | 3 | 3 |
 | `src/logging/dynamiteDryRuns.test.ts` | 4 | 4 |
 | `src/logging/eventNames.test.ts` | 6 | 6 |
@@ -949,6 +950,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/registries/attachCoverage.test.ts` | 36 | 17 |
 | `src/systems/registries/bayEntries.test.ts` | 3 | 3 |
 | `src/systems/registries/blastEffects.test.ts` | 2 | 2 |
+| `src/systems/registries/boreLineListeners.test.ts` | 6 | 6 |
 | `src/systems/registries/buildingAttach.test.ts` | 3 | 3 |
 | `src/systems/registries/buyableRefs.test.ts` | 4 | 4 |
 | `src/systems/registries/catalogueIds.test.ts` | 6 | 6 |
