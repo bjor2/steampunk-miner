@@ -1,0 +1,35 @@
+.page {
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: var(--space-3);
+}
+
+.columns {
+  display: grid;
+  grid-template-columns: minmax(18rem, 24rem) minmax(16rem, 22rem);
+  gap: var(--space-3);
+  margin: var(--space-2) 0;
+}
+
+.elements {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+/* The scroll area's size is the caller's: a fixed height here, so the ledger must scroll. */
+.ledger {
+  height: 14rem;
+  border: 1px solid rgb(201 162 75 / 0.4);
+  border-radius: var(--radius-panel);
+}
+
+.lines {
+  margin: 0;
+  padding: var(--space-2) var(--space-3);
+  list-style: none;
+  color: var(--color-text);
+  font-size: max(var(--text-min), 1em);
+  line-height: 1.5;
+}

@@ -34,12 +34,13 @@
   ],
   "rules": [
     {
-      "why": "The example slice answers smoke's features read, opens the slice screen and hangs the test piece.",
+      "why": "The example slice answers smoke's features read, opens the slice screen, hangs the test piece and shows the shared UI parts (#423).",
       "paths": ["src/features/example/**"],
       "specs": [
         "e2e/browser/smoke.spec.ts",
         "e2e/browser/sliceScreen.spec.ts",
-        "e2e/browser/vehiclePieces.spec.ts"
+        "e2e/browser/vehiclePieces.spec.ts",
+        "e2e/browser/uiParts.spec.ts"
       ]
     },
     {
@@ -388,6 +389,24 @@
         "src/features/sensing/**"
       ],
       "specs": ["e2e/browser/markMilestones.spec.ts"]
+    },
+    {
+      "why": "The shared UI parts (ticket 423): the brass tooltip, the Title+OneLine element, the steampunk scroll area, their rules and the demo page.",
+      "paths": [
+        "src/ui/kit/Tooltip.tsx",
+        "src/ui/kit/Tooltip.module.css",
+        "src/ui/kit/useTooltipOpening.ts",
+        "src/ui/kit/TitleOneLine.tsx",
+        "src/ui/kit/TitleOneLine.module.css",
+        "src/ui/kit/ScrollArea.tsx",
+        "src/ui/kit/ScrollArea.module.css",
+        "src/ui/kit/useScrollRail.ts",
+        "src/systems/views/uiText.ts",
+        "src/systems/views/tooltipOpening.ts",
+        "src/systems/views/scrollRail.ts",
+        "src/constants/uiParts.ts"
+      ],
+      "specs": ["e2e/browser/uiParts.spec.ts"]
     }
   ]
 }

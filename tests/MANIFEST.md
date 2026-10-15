@@ -1256,6 +1256,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/ui/hud/hudPanels.test.ts` | 6 | 6 |
 | `src/ui/iconCoverage.test.ts` | 9 | 9 |
 | `src/ui/kit/itemCard.test.ts` | 12 | 12 |
+| `src/ui/kit/uiParts.test.ts` | 13 | 13 |
 | `src/ui/platform/bayEntryRowView.test.ts` | 2 | 2 |
 | `src/ui/platform/bayPanels.test.ts` | 8 | 8 |
 | `src/ui/platform/bayScreens.test.ts` | 6 | 6 |
@@ -1330,9 +1331,12 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/views/plaqueModel.test.ts` | 6 | 6 |
 | `src/systems/views/refineryBayModel.test.ts` | 4 | 4 |
 | `src/systems/views/screenLayout.test.ts` | 14 | 14 |
+| `src/systems/views/scrollRail.test.ts` | 5 | 5 |
 | `src/systems/views/sellBayModel.test.ts` | 13 | 13 |
 | `src/systems/views/settingsModel.test.ts` | 3 | 3 |
 | `src/systems/views/titleMenuModel.test.ts` | 7 | 7 |
+| `src/systems/views/tooltipOpening.test.ts` | 9 | 9 |
+| `src/systems/views/uiText.test.ts` | 9 | 9 |
 | `src/systems/views/upgradeBayModel.test.ts` | 19 | 19 |
 | `src/systems/views/upgradePreview.test.ts` | 15 | 15 |
 | `src/systems/views/vehicleItemRows.test.ts` | 5 | 5 |

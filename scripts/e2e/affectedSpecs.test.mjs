@@ -90,6 +90,7 @@ describe('e2e: affected-spec map', () => {
       'e2e/browser/sellBurst.spec.ts',
       'e2e/browser/sliceScreen.spec.ts',
       'e2e/browser/smoke.spec.ts',
+      'e2e/browser/uiParts.spec.ts',
       'e2e/browser/vehiclePieces.spec.ts',
     ])
   })
