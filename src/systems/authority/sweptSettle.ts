@@ -21,6 +21,7 @@ import { chainEffects, type RuleEffect } from './commandRule'
 import { sharePassedAfterRings, sharePassedOf } from './cutShare'
 import type { DomainEventBody } from './domainEvent'
 import type { DrillOutcome } from './groundDrill'
+import { carryLeftAfter } from './sweptCarry'
 import type { Sweep, SweptCarve } from './sweptDrill'
 
 function tileKeyOfSample(sx: number, sy: number): string {
@@ -46,7 +47,8 @@ export function settleSweep(
   if (carved === null) return effect
   const reached = reachedPointOf(sweep.path, carved.reachedStep)
   const passed = sharePassedOf(sweep.share, carved.cells)
-  const reach = { reached, passed, digSubSteps, carrySubSteps: carved.carrySubSteps }
+  const carrySubSteps = carryLeftAfter(effect.state, playerId, carved.carrySubSteps)
+  const reach = { reached, passed, digSubSteps, carrySubSteps }
   return chainEffects(effect.state, [
     (current) => ({
       state: withCursorAt(current, playerId, sweep, reach),

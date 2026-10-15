@@ -12,7 +12,8 @@
  *   the tank and the hold are counted per paid cell, at the dig energy the cut charges for it
  *   (`cellDigEnergy.ts`) and one place per ore cell.
  * - **The purse**: `DRILL_SUBSTEPS_PER_TICK` sub-steps a tick, plus the cursor's carry when the step
- *   continues it (a fresh step starts from 0), the tank and the free places in the hold.
+ *   continues it (a fresh step starts from 0), the tank and the free places in the hold. A tick
+ *   that leaves the tank unable to pay another carries nothing, whichever cells emptied it.
  * - **The cell past the pose**, which a walk that reaches the pose banks toward, is priced from the
  *   drill's ungated time: asking its gates would report a cell the cut has not met, and a gated
  *   one discards the carry the tick the walk meets it. A tip-locked one takes nothing.
@@ -32,6 +33,7 @@ import type {
 import { SWEEP_STEP_MM, type SweepPath } from '../vehicle/sweptCut'
 import { facingVectorOf, tileOfMillimetres, type VehiclePose } from '../vehicle/vehiclePose'
 import { cargoUnitsOf, statsOfVehicle } from '../vehicle/vehicleState'
+import { ENERGY_QUANTA_PER_TICK } from '../vehicle/energyQuanta'
 import { cellDensitySum, type YieldedCell } from '../world/cellYield'
 import type { PlanetParams } from '../world/planetParams'
 import { SAMPLES_PER_CELL, SOLID_DENSITY } from '../world/sampleGrid'
@@ -172,6 +174,14 @@ export function leavingCellToCarry(
     return isTarget(tile) ? null : ticks
   }
   return { ...request, gates: { ...gates, drillTicksOf } }
+}
+
+/**
+ * The carry a tick leaves: none once the tank cannot pay another tick (#7's empty tank), whatever
+ * emptied it, the walk's cells or the stamp's.
+ */
+export function carryLeftAfter(state: AuthorityState, playerId: string, carry: number): number {
+  return vehicleOf(state, playerId).energy < ENERGY_QUANTA_PER_TICK.drill ? 0 : carry
 }
 
 /** The yielded cells with the walk's paid cells first, in walk order, the rest as they were. */

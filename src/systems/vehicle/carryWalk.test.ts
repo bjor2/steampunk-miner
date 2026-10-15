@@ -27,12 +27,22 @@ const WALKS: readonly [string, CarryWalk][] = [
 const OPEN: CarryCell = { price: 0, energy: 0, isOre: false, isCarryEnd: false }
 const rock = (price: number): CarryCell => ({ price, energy: 1, isOre: false, isCarryEnd: false })
 
-/** Down column 0 from `TOP_Y`; `cellOf` prices tile row `ty`, `stops` lists hard stops. */
+/** The cursor's own row: open in the world once the step before paid it. */
+const START_ROW = 100
+
+/**
+ * Down column 0 from `TOP_Y`; `cellOf` prices tile row `ty` below the start row, `stops` lists
+ * hard stops, and the start row is `startCell`.
+ */
 function columnGround(
   cellOf: (ty: number) => CarryCell,
   stops: readonly number[] = [],
+  startCell: CarryCell = OPEN,
 ): CarryGround {
-  return { isStop: ({ ty }) => stops.includes(ty), cellAt: ({ ty }) => cellOf(ty) }
+  return {
+    isStop: ({ ty }) => stops.includes(ty),
+    cellAt: ({ ty }) => (ty === START_ROW ? startCell : cellOf(ty)),
+  }
 }
 
 function pathDown(fromY: number, toY: number, isFresh = false): SweepPath {
@@ -57,12 +67,19 @@ function walkColumn(
   { strideMm, toY, maxTicks }: { strideMm: number; toY: number; maxTicks: number },
 ): ColumnTick[] {
   const ticks: ColumnTick[] = []
+  const opened = new Set<number>()
+  // The world clears a paid cell, so the next tick crosses it for nothing.
+  const world: CarryGround = {
+    isStop: ground.isStop,
+    cellAt: (tile) => (opened.has(tile.ty) ? OPEN : ground.cellAt(tile)),
+  }
   let yMm = TOP_Y
   let carry = 0
   for (let tick = 1; tick <= maxTicks && yMm > toY; tick++) {
     const poseY = Math.max(toY, TOP_Y - strideMm * tick)
     const path = pathDown(yMm, poseY)
-    const reach = walk({ path, beyond: null }, plenty(Q + carry), ground)
+    const reach = walk({ path, beyond: null }, plenty(Q + carry), world)
+    reach.paid.forEach(({ ty }) => opened.add(ty))
     yMm = pointAtStep(path, Math.max(0, reach.reachedStep)).yMm
     carry = reach.carrySubSteps
     ticks.push({ reach, yMm })
@@ -175,18 +192,31 @@ describe('drill carry (ticket 399)', () => {
       expect(reach.target).toBeNull()
     })
 
+    it('walks on from a continuing start in a cell that ended the step before', () => {
+      const lava: CarryCell = { price: 0, energy: 0, isOre: false, isCarryEnd: true }
+      const ground = columnGround(() => rock(5), [], lava)
+      const reach = walk({ path: pathDown(TOP_Y, 98_500), beyond: null }, plenty(Q), ground)
+      expect(reach.paid.map(({ ty }) => ty)).toEqual([99, 98])
+    })
+
     it('reaches nothing on a fresh path that starts in a hard stop, carrying nothing', () => {
       const ground = columnGround(() => rock(5), [100])
       const reach = walk({ path: pathDown(TOP_Y, 95_000, true), beyond: null }, plenty(Q), ground)
       expect(reach).toEqual({ reachedStep: -1, carrySubSteps: 0, paid: [], target: null })
     })
 
-    it('reaches nothing on a fresh path whose start it cannot pay, carrying its work', () => {
-      const ground = columnGround(() => rock(200))
-      const reach = walk({ path: pathDown(TOP_Y, 99_000, true), beyond: null }, plenty(Q), ground)
-      expect(reach.reachedStep).toBe(-1)
-      expect(reach.carrySubSteps).toBe(Q)
-      expect(reach.target).toEqual({ tx: 0, ty: 100 })
+    it('never prices the start of a path: the body cell or the cursor cell', () => {
+      const ground = columnGround(() => rock(200), [], rock(200))
+      for (const isFresh of [true, false]) {
+        const reach = walk(
+          { path: pathDown(TOP_Y, 98_500, isFresh), beyond: null },
+          plenty(Q),
+          ground,
+        )
+        expect(reach.paid).toEqual([])
+        expect(reach.carrySubSteps).toBe(Q)
+        expect(reach.target).toEqual({ tx: 0, ty: 99 })
+      }
     })
   })
 
@@ -195,7 +225,7 @@ describe('drill carry (ticket 399)', () => {
       const asked: number[] = []
       const ground: CarryGround = {
         isStop: ({ ty }) => (asked.push(ty), ty === 80),
-        cellAt: () => rock(9),
+        cellAt: ({ ty }) => (ty === START_ROW ? OPEN : rock(9)),
       }
       walk({ path: pathDown(TOP_Y, 70_500), beyond: null }, plenty(Q), ground)
       return asked

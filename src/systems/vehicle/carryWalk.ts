@@ -9,7 +9,10 @@
  *   (0 <= carry < that cell's price). No floats, no rounding: over any column the sub-steps spent
  *   are the sum of the cells' prices, exactly.
  * - **Hard stops discard the carry**: a gated or tip-locked cell stops the walk before it with a
- *   carry of 0, so work is never banked past a gate (Horizontal Scaler).
+ *   carry of 0, so work is never banked past a gate (Horizontal Scaler); a fresh path that starts
+ *   in one reaches nothing.
+ * - **The start is never priced**: it is the body's own cell on a fresh path, the cursor's on a
+ *   continuing one, which the step before paid or ended in; the stamp cuts around it as ever.
  * - **Core, lava, a hazard, a full hold and an empty tank** keep #7's behaviour (GD ruling and TD
  *   addendum on #399): the cell is cut and charged as ever, the tick's walk ends at it and the
  *   carry drops to 0, so no burst follows. The hold and the tank are counted per cell as the walk
@@ -52,7 +55,7 @@ export interface CarryPurse {
 
 /** How far the work reached. */
 export interface CarryReach {
-  /** The sub-step the cut reaches, or -1 when a fresh path could reach nothing. */
+  /** The sub-step the cut reaches, or -1 when a fresh path starts in a hard stop. */
   reachedStep: number
   /** The work carried to the next tick, in sub-steps. */
   carrySubSteps: number
@@ -106,10 +109,11 @@ function walkCarry(
   maxRun: number,
 ): CarryReach {
   const ledger: CarryLedger = { purse: { ...purse }, paid: [], paidKeys: new Set() }
+  if (isFreshStartStopped(path, ground)) return reachOf(ledger, -1, 0, null)
   let run: Crossing[] = []
-  for (let step = firstStepOf(path); step <= path.steps; step++) {
+  for (let step = 1; step <= path.steps; step++) {
     const tile = centreTileAtStep(path, step)
-    if (step > 0 && isSameTile(tile, centreTileAtStep(path, step - 1))) continue
+    if (isSameTile(tile, centreTileAtStep(path, step - 1))) continue
     const spent = endOfSpentRun(ledger, run)
     if (spent !== null) return spent
     if (ground.isStop(tile)) return payRunThenStop(ledger, run, step)
@@ -130,9 +134,9 @@ function isOpenCrossing({ cell }: Crossing): boolean {
   return cell.price === 0 && !cell.isCarryEnd
 }
 
-/** A continuing path's start was walked by the step before; a fresh one's is crossed here. */
-function firstStepOf(path: SweepPath): number {
-  return path.isFresh ? 0 : 1
+/** A fresh path whose start, the body's own cell, is one the drill cannot cut. */
+function isFreshStartStopped(path: SweepPath, ground: CarryGround): boolean {
+  return path.isFresh && ground.isStop(centreTileAtStep(path, 0))
 }
 
 function isSameTile(a: TilePoint, b: TilePoint): boolean {

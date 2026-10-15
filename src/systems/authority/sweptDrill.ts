@@ -78,7 +78,7 @@ export interface Sweep {
 }
 
 /**
- * A sweep's carve, the sub-step it reached (-1 when a fresh path could cut nothing), the cells
+ * A sweep's carve, the sub-step it reached (-1 when a fresh path starts in a hard stop), the cells
  * its stamp and gear touched, counted no further than one past the share (`cutCellsWithin`), and
  * the work it carries to the next tick.
  */
