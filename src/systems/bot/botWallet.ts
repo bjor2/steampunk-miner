@@ -3,7 +3,8 @@
  * next service paid for, and the travel fee too once the core is done. From the attrition planets
  * on (#198) a brass step (a track level) must also leave #180's service reserve and one rescue
  * fee, so two deaths after a spree still leave the bot a tow and a service: on T9's 0.85 run it
- * bought boiler 47 to 54, died twice and had nothing left to play on.
+ * bought boiler 47 to 54, died twice and had nothing left to play on. A slice purchase that is not
+ * due keeps that reserve too (`botSlicePurchases.ts`, #411's anchor prices).
  */
 import { serviceReserveOf } from '../authority/serviceReserve'
 import { rechargePrice, repairPrice, rescueFee, travelFee } from '../economy/planetCharges'
@@ -17,7 +18,7 @@ export function canPay(session: BotSession, price: Money): boolean {
   return cmp(walletOf(session), add(price, moneyKeptBack(session))) >= 0
 }
 
-/** A track step: paid for as any purchase, and leaving the brass reserve where it applies. */
+/** A track step or a slice's optional buy: paid for as any purchase, leaving the brass reserve. */
 export function canPayForBrass(session: BotSession, price: Money): boolean {
   return canPay(session, price) && leavesBrassReserve(session, price)
 }

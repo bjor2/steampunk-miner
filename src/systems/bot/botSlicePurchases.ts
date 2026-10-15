@@ -7,6 +7,11 @@
  * A purchase's due payloads (ticket 296, an extractor on its planet) come first instead, before
  * the kernel's own, and while one is due the bot saves for it (`isSavingForDuePurchase`).
  *
+ * A purchase that is not due keeps #198's brass reserve as a track step does (`canPayForBrass`):
+ * since #411 a node costs its anchor's price on every planet, so a planet 9 wallet's leftover
+ * after the tracks once bought every earlier node and item and spent the rescue fee with them.
+ * Due payloads keep only the next service back, as before.
+ *
  * Whether a purchase makes the Upgrade bay worth the drive is asked at the Sell bay, where the
  * authority refuses the Upgrade bay's commands (`buyVehicleItem`: `wrong_bay`), so that question
  * skips the dry run and trusts the purchase's own `isAvailable` and the wallet; the buy at the bay
@@ -18,7 +23,7 @@ import type { Money } from '../money'
 import { botPurchases, type BotPurchase } from '../registries/botPurchases'
 import { wouldAccept } from './botDryRun'
 import type { BotSession } from './botSession'
-import { canPay } from './botWallet'
+import { canPay, canPayForBrass } from './botWallet'
 import type { ShopSpend } from './shopSpend'
 
 export interface SlicePurchasePick {
@@ -34,7 +39,7 @@ type PayloadsOf = (purchase: BotPurchase, session: BotSession) => readonly unkno
 type PickTest = (session: BotSession, pick: SlicePurchasePick) => boolean
 
 function nextSlicePurchase(session: BotSession): SlicePurchasePick | null {
-  return nextPickOf(session, payloadsToTryOf, isAcceptedHere)
+  return nextPickOf(session, payloadsToTryOf, isAcceptedLeavingBrass)
 }
 
 /** The first due payload the wallet pays, as `nextSlicePurchase` picks; null when none does. */
@@ -44,7 +49,7 @@ function nextDueSlicePurchase(session: BotSession): SlicePurchasePick | null {
 
 /** A slice purchase the wallet pays, wherever the bot is docked: worth a drive to the bay. */
 export function hasSlicePurchaseAtBay(session: BotSession): boolean {
-  return nextPickOf(session, payloadsToTryOf, isPaidFor) !== null
+  return nextPickOf(session, payloadsToTryOf, isPaidLeavingBrass) !== null
 }
 
 /** A due payload the wallet pays, wherever the bot is docked: worth a drive to the bay. */
@@ -130,6 +135,14 @@ function isPaidFor(session: BotSession, pick: SlicePurchasePick): boolean {
 
 function isAcceptedHere(session: BotSession, pick: SlicePurchasePick): boolean {
   return isPaidFor(session, pick) && wouldAccept(session, pick.intent)
+}
+
+function isPaidLeavingBrass(session: BotSession, pick: SlicePurchasePick): boolean {
+  return canPayForBrass(session, pick.estimatedCost)
+}
+
+function isAcceptedLeavingBrass(session: BotSession, pick: SlicePurchasePick): boolean {
+  return isPaidLeavingBrass(session, pick) && wouldAccept(session, pick.intent)
 }
 
 function spendOf(session: BotSession, pick: SlicePurchasePick): ShopSpend {
