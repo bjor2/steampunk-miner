@@ -126,6 +126,7 @@ starts no workflow. There is no separate publish command to call. The fields the
   claude:   [{ slot, state: 'free'|'busy'|'disabled', ticket, grok_slot, since }],
   accounts: [{ id, account, name, enabled, reason,
                slots: [{ slot: 'C1', state, kind: 'dev'|'aux'|'external'|null, label, ticket, grok_slot, since }] }],
+  waves:    { mode, parallel, list: [{ number, key, map, lane, state, tickets, done, live }] },  // since 15 Oct; not drawn yet
   gate:     { busy, max },          // gate-stage tokens: worker gates + box Tester heavy phases
   tester:   { state: 'idle'|'running', phase, sha, since, holds_gate, claude_slot,
               last_run, last_nightly, last_nightly_result, main_red_sha,
@@ -307,6 +308,60 @@ The build-loop driver (`/workspace/claude-sessions/steampunk-loop/next-ticket.sh
 slot (`working` on claim, `idle` when freed, `blocked` on needs-planner or exhausted attempts),
 re-sends a heartbeat every 10 minutes while a session runs, and publishes a full snapshot of its
 `--status` (all slots, push_pending) on every coordinator run.
+
+## Waves and the load guard (15 Oct 2026)
+
+Bjor's rule (15 Oct 22:26): after each planning session the Producer runs `/osilion-wave-plan`, and
+**waves, not single tickets, are what gets developed.** A wave is a `wayfinder:wave` issue (written by
+`osilion-wave-plan`, one per theme, tickets in dependency order, `Touches:` and `Size:` taken from the
+ticket bodies). Today, on map #302: **1A Drill kernel** (#430 then #397, #421, #432), **1B UI text
+budget** (#425 then #426 to #429), **1C Status page drill speed** (#434) and **1D Bench** (the
+grilling and spec tickets; the loop never dispatches it). Settings sit in the map's _Wave settings_
+block (`packing: theme`, `promote: none`, `browser: off`, `replan: wave`).
+
+**Design (layer over the per-ticket worker).** A wave only decides _which ticket the next free slot
+takes and in what order_. The worker (one Claude Code session per ticket, own worktree, gates, push
+lock, attempts, `needs-planner` refund, tier labels) and the 6 Claude slots of account 1 are unchanged.
+Waves in one round run in parallel (one slot each); inside a wave tickets run one after another
+(`parallel=1`).
+
+**Switch.** Wave mode is **off by default**: the driver picks tickets exactly as before. Turn it on
+with `mode=on` in `/workspace/claude-sessions/steampunk-loop/wave-mode` (or `WAVE_MODE=on`). When on:
+
+- the next ticket comes from the claimed waves first, then the ready waves (every blocking wave
+  closed), best `PRIORITY_TICKETS` rank first; the usual per-ticket filters still apply;
+- **a build ticket in no wave is not built** once the transition window is over (`legacy_hours`,
+  default 24 h from the first on-pass); until then it is built as before. `--wave-status` lists them;
+  every routine pass prints `NEEDS_WAVE_PLAN {"map":..,"tickets":[..],"room":..}` for build tickets
+  older than 30 min that sit in no wave, and the Producer runs the wave plan;
+- the first claim of a wave assigns the wave issue to the gh user and labels it `in-progress`
+  (assigned = frozen: a replan never touches it); a green close ticks the ticket in the wave body; a
+  wave whose tickets are all closed is closed by the driver;
+- a claimed wave with nothing runnable left (every open ticket `needs-planner`, `blocked`, `hitl`,
+  `on-hold`, out of attempts, or waiting only on those) is un-assigned and labelled `wave:paused`;
+  the next `/osilion-wave-plan <map> --replan` regroups what is left, and removing the label makes it
+  claimable again. Independent tickets of a wave keep running while one ticket is stuck;
+- the worker prompt gets a `WAVE:` line naming the other tickets of the wave.
+
+Running workers are never killed by any of it. Order and caps are the only thing that changes.
+
+**Replan.** `next-ticket.sh --wave-plan <map>` runs `/osilion-wave-plan <map> --replan` headless in a
+Claude slot (exit 75 if the pool is full). A first plan is never applied headless. The Producer
+runs it after each planning session and posts the wave table in the room; the Game Director does
+not lock a spec until that table is posted. `Touches:` and `Size:` go on every build ticket when it
+is filed (areas in use: `drill-kernel`, `ui-panels`, `status-page`).
+
+**Load guard (always on, `LOAD_GUARD=0` or `load_guard=off` turns it off).** Before every dev claim
+the driver checks the box: no new worker while the 1-minute load average is above 14 or
+`MemAvailable` is below 3 GB (Oct 15 21:5x the box ran out of memory while the Tester's browser tests
+and 4 workers ran together). The driver log says `load guard: ...`. A skipped refill is retried by the
+next refill trigger or the 30-minute pass.
+
+**`slots.json`** gets a top-level `waves: { mode, parallel, list: [{ number, key, map, lane, mode,
+state: 'running'|'ready'|'blocked'|'paused'|'bench', tickets, done, live }] }` and a `wave` key (the
+wave key) on every slot that holds a ticket. The sanitised public copy carries them too. The Slots
+tab does not draw them yet (the page copies only the fields listed above); the Waves panel is a
+follow-up ticket in wave 1C, after #434, because it edits the same `scripts/status/` files.
 
 ## Priority list (14 Oct 2026)
 
