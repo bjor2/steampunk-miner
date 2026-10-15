@@ -17,8 +17,7 @@ import {
   ITEM_CARD_HOVER_MS,
   ITEM_CARD_LONG_PRESS_MS,
 } from '../../constants/itemCard'
-import { getShell } from '../../shell/shell'
-import { useGameStore } from '../../store/gameStore'
+import { tickHapticsOnHold } from './holdHaptics'
 
 export interface ItemTooltipHandlers {
   onPointerEnter(event: PointerEvent): void
@@ -47,7 +46,7 @@ export function useItemTooltip(): { isOpen: boolean; handlers: ItemTooltipHandle
   const holdOpen = () => {
     isHeldOpen.current = true
     setIsOpen(true)
-    tickHapticsOnHold()
+    tickHapticsOnHold(ITEM_CARD_HAPTIC_MS)
   }
   return {
     isOpen,
@@ -70,10 +69,6 @@ export function useItemTooltip(): { isOpen: boolean; handlers: ItemTooltipHandle
       onClickCapture: (event) => swallowClickAfterHold(event, isHeldOpen),
     },
   }
-}
-
-function tickHapticsOnHold(): void {
-  if (useGameStore.getState().prefs.haptics) getShell().vibrate(ITEM_CARD_HAPTIC_MS)
 }
 
 function stopTimer(timer: { current: number | null }): void {

@@ -9,13 +9,16 @@
   pointer-events: auto;
 }
 
+/* The shared scroll area (build #423) bounds the columns; it owns the overflow and the rail. */
+.scroll {
+  max-height: 70vh;
+  margin-bottom: var(--space-2);
+}
+
 .columns {
   display: grid;
   grid-template-columns: 1fr 1.4fr;
   gap: var(--space-3);
-  max-height: 70vh;
-  overflow: auto;
-  margin-bottom: var(--space-2);
 }
 
 .row {

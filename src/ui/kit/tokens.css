@@ -30,6 +30,13 @@
   /* #173: every control's keyboard focus ring, the hook a focus-driven UI (#168) can use later. */
   --focus-ring: 3px solid var(--color-amber);
   --focus-ring-offset: 2px;
+  /*
+   * The readable floor (spec #422 ruling 2, build #423): nothing on a dark panel is smaller or
+   * dimmer than these. 15 px at the 800 px reference (a rem, so it grows with --ui-scale; 15 epx
+   * is the 10-foot guide's main text), and a parchment at about 14:1 on --color-bg.
+   */
+  --text-min: 0.9375rem;
+  --color-text: #f3ead8;
   --font-body: 'Georgia', 'Times New Roman', serif;
   --font-mono: ui-monospace, 'Cascadia Mono', Consolas, monospace;
 }

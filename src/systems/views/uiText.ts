@@ -16,6 +16,9 @@ export interface UiText {
   readonly tooltipLines: readonly string[]
 }
 
+/** What a panel header adds under the title it already has (`Panel`'s `heading`). */
+export type UiTextUnderTitle = Pick<UiText, 'id' | 'oneLine' | 'tooltipLines'>
+
 const recorded = new Map<string, UiText>()
 
 /** Records what an element draws; drawing the same text again changes nothing. */

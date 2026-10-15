@@ -17,6 +17,7 @@ import type { PreferenceName, Preferences } from '../input/preferences'
 import type { FocusStop } from './menuFocus'
 import { uiButton, type ScreenButton } from './viewParts'
 import { UI_ID_TEMPLATES, UI_IDS } from './screenIds'
+import type { UiTextUnderTitle } from './uiText'
 
 export interface SettingsSources {
   prefs: Preferences
@@ -55,6 +56,20 @@ export interface SettingsModel {
 }
 
 export const SETTINGS_START_FOCUS: string = UI_IDS.settingsClose
+
+/**
+ * The panel header under the #422 text budget (build #423, the kit's example element): one line
+ * on what the panel holds, and a tooltip on what Rebind and Reset do. Nothing a player needs to
+ * act is only here: the rows say it themselves.
+ */
+export const SETTINGS_HEADING: UiTextUnderTitle = {
+  id: UI_IDS.settingsPanel,
+  oneLine: 'Display switches and the keys and pad buttons of every action.',
+  tooltipLines: [
+    'Rebind waits for your next key or pad button.',
+    'Reset puts every binding back to its default.',
+  ],
+}
 
 const TOGGLE_LABELS: Readonly<Record<PreferenceName, string>> = {
   cameraMode: 'Camera',
