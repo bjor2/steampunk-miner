@@ -253,8 +253,12 @@ import type { DriveSigns } from '../vehicle/driveSigns'
  *    slice registered a `consumable-restock` for, at the Upgrade bay, each charge at its band-ore
  *    price on the current planet, and answers `power-up-core.ConsumableRestocked`. Foam is the
  *    first. With no restock sent no digest or mined order changes.
+ * 74: scripted mining reads the drill gear (GD ruling on #392, ticket 392): a `drillTile` carves
+ *    the owned gear's cells past and beside the bored cell, aimed by the last reported pose, as
+ *    the reported drill does, so the pacing bot cuts with Deep, Wide or a switched-on boom. With no
+ *    gear owned no digest or mined order changes.
  */
-export const AUTHORITY_PROTOCOL_VERSION = 73
+export const AUTHORITY_PROTOCOL_VERSION = 74
 
 /** The kernel's own commands: the closed set its rule tables are written against. */
 export interface KernelCommandPayloads {

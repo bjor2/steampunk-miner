@@ -29,8 +29,15 @@
  * up once. The cells cut only for the ticks the tank can pay after the
  * disc's whole window, so a drill command never charges more than the tank holds.
  *
- * With no gear registered the disc carves exactly as before (`carveDisc`) and nothing more is
- * charged.
+ * The scripted `drillTile` reads the same gear (GD ruling on #392), so the pacing bot and the player
+ * share one cut: the bit is the bored cell (`cellStampOf`), aimed by the last reported pose's facing
+ * and the push that facing stands for (`driveOfFacing`). The gear cells are the next tiles along the
+ * facing and the tiles beside the bored one, each carved whole at its own drill time and charged as
+ * the stamp's are. Ahead cells are read nearest first and stop at the first one `canMine` refuses,
+ * so a gated cell is never reached past.
+ *
+ * With no gear registered the disc carves exactly as before (`carveDisc`), the scripted cell too
+ * (`carveCell`), and nothing more is charged.
  */
 import { BASIS_POINTS } from '../../constants/balance'
 import {
@@ -47,15 +54,19 @@ import {
   type AheadLatchRules,
   type DrillBit,
 } from '../vehicle/aheadBearingLatch'
-import { drillGearCellsAt } from '../vehicle/drillGearCells'
+import { cellStampOf, drillGearCellsAt } from '../vehicle/drillGearCells'
+import { driveOfFacing } from '../vehicle/driveSigns'
 import { latchFacedSide, type SideLatch } from '../vehicle/facedSide'
 import { ENERGY_QUANTA_PER_TICK } from '../vehicle/energyQuanta'
 import {
+  carveCell,
+  carveCellWithCells,
   carveDisc,
   carveDiscWithCells,
   type Carve,
   type CarveBesideDisc,
   type CarveWindow,
+  type CarveWindows,
   type StampWalk,
   walkStampInRows,
 } from '../world/groundEdit'
@@ -119,6 +130,43 @@ export function carveStampWithGear(
 }
 
 /**
+ * Scripted mining of one cell with the player's drill gear (ticket 392): the bit is the cell, aimed
+ * by the last reported pose; with no gear, or no pose yet, the cell alone.
+ */
+export function carveCellWithGear(
+  state: AuthorityState,
+  params: PlanetParams,
+  playerId: string,
+  tile: TilePoint,
+  request: DrillCarveRequest,
+): DrillCarve {
+  const bit = cellBitOf(state, playerId, tile)
+  const read = bit === null ? null : drillGearReadAt(state, params, playerId, bit, request.gates)
+  if (read === null) return withoutGear(carveBareCell(params, tile, request))
+  return carveBitAndGear(read, request, cellWithCellsOf(params, tile, request))
+}
+
+/** The bored cell as the gear reads it, from the last reported pose; null before any report. */
+function cellBitOf(state: AuthorityState, playerId: string, tile: TilePoint): DrillBit | null {
+  const { pose } = vehicleOf(state, playerId)
+  if (pose === null) return null
+  return { pose, disc: cellStampOf(tile), drive: driveOfFacing(pose.facing) }
+}
+
+function carveBareCell(params: PlanetParams, tile: TilePoint, request: DrillCarveRequest): Carve {
+  return carveCell(request.world, params, tile, request.window, request.gates.drillTicksOf)
+}
+
+function cellWithCellsOf(
+  params: PlanetParams,
+  tile: TilePoint,
+  { world, gates }: DrillCarveRequest,
+): CarveWithCells {
+  return (cells, windows) =>
+    carveCellWithCells(world, params, tile, cells, windows, gates.drillTicksOf)
+}
+
+/**
  * The cut at the bit with its gear read already taken, walking the stamp by `walk`: the swept cut
  * counts its cells first, and the swept span walks it per chunk (ticket 374).
  */
@@ -129,11 +177,33 @@ export function carveStampWithRead(
   request: DrillCarveRequest,
   walk: StampWalk,
 ): DrillCarve {
-  if (read === null) {
-    const { world, window, gates } = request
-    return withoutGear(carveDisc(world, params, bit.disc, window, gates.drillTicksOf, walk))
-  }
-  return carveDiscAndGear(params, { disc: bit.disc, walk }, read, request)
+  const stamp = { disc: bit.disc, walk }
+  if (read === null) return withoutGear(carveBareDisc(params, stamp, request))
+  return carveBitAndGear(read, request, discWithCellsOf(params, stamp, request))
+}
+
+/** The bit's stamp and how the carve walks it. */
+interface WalkedDisc {
+  disc: DiscStamp
+  walk: StampWalk
+}
+
+function carveBareDisc(
+  params: PlanetParams,
+  { disc, walk }: WalkedDisc,
+  request: DrillCarveRequest,
+) {
+  const { world, window, gates } = request
+  return carveDisc(world, params, disc, window, gates.drillTicksOf, walk)
+}
+
+function discWithCellsOf(
+  params: PlanetParams,
+  { disc, walk }: WalkedDisc,
+  { world, gates }: DrillCarveRequest,
+): CarveWithCells {
+  return (cells, windows) =>
+    carveDiscWithCells(world, params, disc, cells, windows, gates.drillTicksOf, walk)
 }
 
 /** The player's drill gear at the bit, listing only the cells that pass `canMine`; else null. */
@@ -147,6 +217,7 @@ export function drillGearReadAt(
   const gear = drillGearOf(state, playerId)
   if (gear === null) return null
   const canMine = (tile: TilePoint) => isMineableCell(state.world, params, gates, tile)
+  const canCut = (tile: TilePoint) => isCuttableCell(state.world, params, gates, tile)
   const isUncut = (tile: TilePoint) => canMine(tile) && !isTileYielded(state.world, tile)
   const isStanding = (tile: TilePoint) => isStandingCell(state.world, params, tile)
   const crossing = { isMineable: canMine, isStanding }
@@ -158,13 +229,25 @@ export function drillGearReadAt(
   const reach = { ...gear, aheadCells, aheadBearing, facedSide }
   const cells = drillGearCellsAt(bit.pose, bit.disc, reach)
   return {
-    aheadCells: cells.ahead.filter(canMine),
+    aheadCells: cellsUpToFirstRefused(cells.ahead, (tile) => canMine(tile) && canCut(tile)),
     aheadEnergyShareBp: aheadEnergyShareOf(gear, aheadBearing),
     sideCells: cells.side.filter(canMine),
     sideEnergyShareBp: gear.sideEnergyShareBp,
     aheadLatch,
     sideLatch,
   }
+}
+
+/**
+ * The cells in order until the first one the drill may not cut: an ahead cut never reaches past a
+ * gated or tip-locked cell (GD ruling on #392).
+ */
+function cellsUpToFirstRefused(
+  cells: readonly TilePoint[],
+  canCut: (tile: TilePoint) => boolean,
+): TilePoint[] {
+  const refused = cells.findIndex((tile) => !canCut(tile))
+  return refused === -1 ? [...cells] : cells.slice(0, refused)
 }
 
 /** A drive-aimed ask cuts ahead only on a diagonal; along the facing only the others do (#280). */
@@ -234,6 +317,16 @@ function isStandingCell(world: WorldState, params: PlanetParams, tile: TilePoint
   return isSolidCell(materialCellAt(world, params, tile)) && !isTileYielded(world, tile)
 }
 
+/** A cell the drill's tip scratches: it has a drill time (#29's `P < H/4` skid has none). */
+function isCuttableCell(
+  world: WorldState,
+  params: PlanetParams,
+  gates: DrillGates,
+  tile: TilePoint,
+): boolean {
+  return gates.drillTicksOf(tile, materialCellAt(world, params, tile), 0) !== null
+}
+
 /** Solid ground a drill may remove that no gate holds. */
 function isMineableCell(
   world: WorldState,
@@ -245,30 +338,18 @@ function isMineableCell(
   return isRemovableCell(cell) && gates.canMine({ tile, cell })
 }
 
-/** The bit's stamp and how the carve walks it. */
-interface WalkedDisc {
-  disc: DiscStamp
-  walk: StampWalk
-}
+/** The bit's carve with the gear's cells beside it, in the same edit. */
+type CarveWithCells = (cells: readonly TilePoint[], windows: CarveWindows) => CarveBesideDisc
 
-function carveDiscAndGear(
-  params: PlanetParams,
-  { disc, walk }: WalkedDisc,
+function carveBitAndGear(
   read: DrillGearRead,
   request: DrillCarveRequest,
+  carveWithCells: CarveWithCells,
 ): DrillCarve {
   const shares = cellSharesOf(read)
   const windows = { disc: request.window, cells: cellsWindowOf(request, shares) }
   const cells = [...read.aheadCells, ...read.sideCells]
-  const carved = carveDiscWithCells(
-    request.world,
-    params,
-    disc,
-    cells,
-    windows,
-    request.gates.drillTicksOf,
-    walk,
-  )
+  const carved = carveWithCells(cells, windows)
   const latches = { aheadLatch: read.aheadLatch, sideLatch: read.sideLatch }
   const gearCells = cells.map((tile, index) => ({ ...tile, shareBp: shares[index] }))
   return { ...carved, gearQuanta: gearQuantaOf(carved, shares), gearCells, ...latches }

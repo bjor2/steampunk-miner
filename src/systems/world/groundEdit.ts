@@ -134,11 +134,48 @@ export function carveDiscWithCells(
 ): CarveBesideDisc {
   const session = openSession(world, params)
   const ticksUsed = walk(session, disc, windows.disc, drillTicksOf)
-  const cellTicksUsed = cells.map((tile) =>
-    ticksUsed === 0
-      ? 0
-      : carveEachSample(session, cellSamplesBesideDisc(tile, disc), windows.cells, drillTicksOf),
-  )
+  const besides = cells.map((tile) => cellSamplesBesideDisc(tile, disc))
+  const cellTicksUsed = carveCellsBeside(session, ticksUsed, besides, windows.cells, drillTicksOf)
+  return closeWithCells(session, ticksUsed, cellTicksUsed)
+}
+
+/**
+ * The scripted `drillTile` cell and, in the same edit, whole cells beside it (slice drill gear on
+ * the bot's bore, ticket 392), each at its own drill time. As with the disc, `ticksUsed` stays the
+ * cell's and the others are cut only when it removed something.
+ */
+export function carveCellWithCells(
+  world: WorldState,
+  params: PlanetParams,
+  tile: TilePoint,
+  cells: readonly TilePoint[],
+  windows: CarveWindows,
+  drillTicksOf: CellDrillTicks,
+): CarveBesideDisc {
+  const session = openSession(world, params)
+  const ticksUsed = carveEachSample(session, cellSamplesOf(tile), windows.disc, drillTicksOf)
+  const besides = cells.map((cell) => cellSamplesOf(cell))
+  const cellTicksUsed = carveCellsBeside(session, ticksUsed, besides, windows.cells, drillTicksOf)
+  return closeWithCells(session, ticksUsed, cellTicksUsed)
+}
+
+/** Each cell's samples in order, in the cells' window; none when the bit removed nothing. */
+function carveCellsBeside(
+  session: EditSession,
+  ticksUsed: number,
+  cells: readonly (readonly WeightedSample[])[],
+  window: CarveWindow,
+  drillTicksOf: CellDrillTicks,
+): number[] {
+  if (ticksUsed === 0) return cells.map(() => 0)
+  return cells.map((samples) => carveEachSample(session, samples, window, drillTicksOf))
+}
+
+function closeWithCells(
+  session: EditSession,
+  ticksUsed: number,
+  cellTicksUsed: number[],
+): CarveBesideDisc {
   return {
     ...closeSession(session),
     ticksUsed,

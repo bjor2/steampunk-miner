@@ -15,6 +15,10 @@
  * the other only `offSideCells`, so the hold alone cuts one flank. With no faced side both cut
  * `sideCells`, as before.
  *
+ * The scripted `drillTile` bores one cell, not the disc (ticket 392): its stamp here is half a cell
+ * round the tile's centre (`cellStampOf`), so the ahead cells are the next tiles along the facing
+ * past the bored one and the side cells the tiles beside it.
+ *
  * Order: the ahead cells nearest first, then the side cells nearest first, the facing's left side
  * before its right. A tile met twice is listed once.
  */
@@ -51,6 +55,17 @@ interface CellLine {
 }
 
 const NO_SHIFT: IntegerVector = { x: 0, y: 0 }
+
+/** The stamp the gear reads round one bored cell: half a cell about the tile's centre. */
+export function cellStampOf(tile: TilePoint): DiscStamp {
+  const half = MM_PER_METRE / 2
+  return {
+    xMm: tile.tx * MM_PER_METRE + half,
+    yMm: tile.ty * MM_PER_METRE + half,
+    radiusMm: half,
+    floorRadiusMm: null,
+  }
+}
 
 export function drillGearCellsAt(
   pose: VehiclePose,

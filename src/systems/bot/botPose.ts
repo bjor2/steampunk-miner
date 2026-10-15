@@ -7,7 +7,7 @@
  */
 import { MM_PER_METRE, UP_VECTOR_SCALE } from '../../constants/physics'
 import type { CommandIntent } from '../authority/authorityCommand'
-import type { DriveSigns } from '../vehicle/driveSigns'
+import { driveOfFacing } from '../vehicle/driveSigns'
 import { FACING, type Facing } from '../vehicle/vehiclePose'
 import type { TilePoint } from '../world/tileGrid'
 
@@ -18,13 +18,6 @@ export interface ActionTicks {
 }
 
 export const NO_TICKS: ActionTicks = { thrustTicks: 0, driveTicks: 0, drillTicks: 0 }
-
-const DRIVE_OF_FACING: Readonly<Record<Facing, DriveSigns>> = {
-  [FACING.left]: { x: -1, y: 0 },
-  [FACING.right]: { x: 1, y: 0 },
-  [FACING.down]: { x: 0, y: -1 },
-  [FACING.up]: { x: 0, y: 1 },
-}
 
 export function reportPoseIntent(
   tile: TilePoint,
@@ -45,7 +38,7 @@ export function reportPoseIntent(
       thrusting: false,
       drilling: ticks.drillTicks > 0,
       ...ticks,
-      drive: DRIVE_OF_FACING[facing],
+      drive: driveOfFacing(facing),
     },
   }
 }

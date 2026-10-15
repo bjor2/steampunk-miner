@@ -12,7 +12,8 @@
  * never refused. The slices' gate checks may refuse an ore cell or destroy it without cargo, and
  * the drill reports each as a `DrillGated` (`drillGates.ts`); with none registered the drill is
  * unchanged. A slice's drill gear adds cells past the bit and beside the bore to the reported
- * drill's cut (`drillGearCut.ts`); with none registered the cut is the disc alone. On a magnetic
+ * drill's cut, and past and beside the scripted cell too, so the bot cuts with the player's gear
+ * (`drillGearCut.ts`, ticket 392); with none registered the cut is the disc or the cell alone. On a magnetic
  * planet an electrified cell takes its shock's ticks longer, and shocks the vehicle as it breaks
  * (`magnetic/electrifiedShock.ts`, spec #258).
  *
@@ -32,7 +33,7 @@ import type { DriveSigns } from '../vehicle/driveSigns'
 import type { SideLatch } from '../vehicle/facedSide'
 import type { VehiclePose } from '../vehicle/vehiclePose'
 import { hasCargoRoom, withOreUnit, type VehicleState } from '../vehicle/vehicleState'
-import { carveCell, type Carve, type CarveWindow, type CellDrillTicks } from '../world/groundEdit'
+import type { Carve, CarveWindow, CellDrillTicks } from '../world/groundEdit'
 import type { YieldedCell } from '../world/cellYield'
 import { bandOfTile } from '../world/planetGeometry'
 import type { PlanetParams } from '../world/planetParams'
@@ -44,8 +45,8 @@ import { chainEffects, unchanged, type RuleEffect } from './commandRule'
 import { harvestCoreTile } from './coreHarvest'
 import type { DomainEventBody } from './domainEvent'
 import {
+  carveCellWithGear,
   carveStampWithGear,
-  withoutGear,
   type DrillCarve,
   type DrillCarveRequest,
 } from './drillGearCut'
@@ -99,7 +100,7 @@ function tickEnergyOf(carved: DrillCarve): number {
   return carved.ticksUsed * ENERGY_QUANTA_PER_TICK.drill + carved.gearQuanta
 }
 
-/** Scripted mining: one cell's samples; call with a planet that has params. */
+/** Scripted mining: one cell's samples and its drill gear's cells; call with a planet that has params. */
 export function drillCell(
   state: AuthorityState,
   params: PlanetParams,
@@ -107,8 +108,7 @@ export function drillCell(
   tile: TilePoint,
   requestedTicks: number,
 ): RuleEffect {
-  const carve: CarveIn = ({ world, window, gates }) =>
-    withoutGear(carveCell(world, params, tile, window, gates.drillTicksOf))
+  const carve: CarveIn = (request) => carveCellWithGear(state, params, playerId, tile, request)
   return drillGround(state, params, playerId, { tile, carve }, requestedTicks)
 }
 

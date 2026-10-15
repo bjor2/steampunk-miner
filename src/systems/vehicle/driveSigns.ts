@@ -9,7 +9,7 @@
  */
 import { DRIVE_PUSH_SHARE_MIN } from '../../constants/physics'
 import type { VehicleIntent } from './vehicleIntent'
-import { FACING } from './vehiclePose'
+import { FACING, type Facing } from './vehiclePose'
 
 export type DriveSign = -1 | 0 | 1
 
@@ -19,6 +19,22 @@ export interface DriveSigns {
 }
 
 export const NO_DRIVE: DriveSigns = { x: 0, y: 0 }
+
+/**
+ * The push a facing stands for, as a player holding that one key: to the side when facing it, down
+ * when drilling down, up when facing up. The pacing bot reports it (`botPose.ts`), and a scripted
+ * `drillTile`, which carries no drive, drills with it (ticket 392).
+ */
+const DRIVE_OF_FACING: Readonly<Record<Facing, DriveSigns>> = {
+  [FACING.left]: { x: -1, y: 0 },
+  [FACING.right]: { x: 1, y: 0 },
+  [FACING.down]: { x: 0, y: -1 },
+  [FACING.up]: { x: 0, y: 1 },
+}
+
+export function driveOfFacing(facing: Facing): DriveSigns {
+  return DRIVE_OF_FACING[facing]
+}
 
 const DRIVE_SIGNS: readonly unknown[] = [-1, 0, 1]
 
