@@ -257,8 +257,12 @@ import type { DriveSigns } from '../vehicle/driveSigns'
  *    the owned gear's cells past and beside the bored cell, aimed by the last reported pose, as
  *    the reported drill does, so the pacing bot cuts with Deep, Wide or a switched-on boom. With no
  *    gear owned no digest or mined order changes.
+ * 75: the bore line (ticket 412, K-line, the TD lock on #320): the `BoreEnded` that ends a shot
+ *    carries the shot's opened cells as optional `lineCells` (at most 50) while a slice's
+ *    `boreLineListeners` entry wants them. An event field, not saved state: with no listener
+ *    answering, no event, digest or mined order changes.
  */
-export const AUTHORITY_PROTOCOL_VERSION = 74
+export const AUTHORITY_PROTOCOL_VERSION = 75
 
 /** The kernel's own commands: the closed set its rule tables are written against. */
 export interface KernelCommandPayloads {
