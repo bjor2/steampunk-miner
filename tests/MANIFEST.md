@@ -303,7 +303,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/mining-popup/systems/render/chipPlacement.test.ts` | 8 | 8 |
 | `src/features/mining-popup/systems/render/plaqueFit.test.ts` | 11 | 4 |
 
-### `mobility`: 17 files, 162 tests
+### `mobility`: 18 files, 172 tests
 
 | File | Tests | Sites |
 | --- | --- | --- |
@@ -324,6 +324,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/mobility/systems/statPreview.test.ts` | 15 | 6 |
 | `src/features/mobility/systems/survivalEffects.test.ts` | 5 | 5 |
 | `src/features/mobility/systems/useResolution.test.ts` | 10 | 2 |
+| `src/features/mobility/systems/winchBore.test.ts` | 10 | 9 |
 
 ### `ore-visuals`: 5 files, 48 tests
 

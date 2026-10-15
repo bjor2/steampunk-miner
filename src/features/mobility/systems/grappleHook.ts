@@ -7,6 +7,9 @@
  * Gated and core cells are hooks like any other: the grapple bites them and never breaks one
  * (GD lock on #204 Q5). Lava is no hook. Integer millimetres throughout, so every machine picks
  * the same cell.
+ *
+ * The winch bore (ticket 414) adds one other target, `farEndHookOf`: the open far end of the
+ * miner's own bore line, outside the aim cone, which the reel ends on rather than beside.
  */
 import { MM_PER_METRE } from '../../../constants/physics'
 import type { AuthorityState } from '../../../systems/authority/authorityState'
@@ -75,6 +78,56 @@ export function grappleHookOf(
     isAimedAt(candidate, shot),
   )
   return firstHookOf({ world: state.world, params }, pose, aimed)
+}
+
+/**
+ * The open far end of a bore line as the reel's target (ticket 414): within `reachTiles` of the
+ * miner, farther off than `pastTile`, open and seen through open cells only. The aim cone does not
+ * apply. Null when any of that fails.
+ */
+export function farEndHookOf(
+  state: AuthorityState,
+  pose: VehiclePose,
+  farEnd: FarEndShot,
+): GrappleHook | null {
+  const params = planetParamsOf(state.planet)
+  if (params === null) return null
+  const candidate = candidateAt(pose, farEnd.tile)
+  if (!isFarEndInReach(pose, candidate, farEnd)) return null
+  return openFarEndAt({ world: state.world, params }, pose, candidate)
+}
+
+/** The far end the winch bore offers, how far the boosted reach goes, and the hook it skips. */
+export interface FarEndShot {
+  tile: TilePoint
+  reachTiles: number
+  pastTile: TilePoint | null
+}
+
+function candidateAt(pose: VehiclePose, tile: TilePoint): HookCandidate {
+  const offset = offsetToTileCentre(pose, tile)
+  return { tile, offset, distanceSq: distanceSqOf(offset) }
+}
+
+function isFarEndInReach(pose: VehiclePose, candidate: HookCandidate, farEnd: FarEndShot) {
+  const reachMm = farEnd.reachTiles * MM_PER_METRE
+  return candidate.distanceSq <= reachMm * reachMm && candidate.distanceSq > pastSqOf(pose, farEnd)
+}
+
+function pastSqOf(pose: VehiclePose, farEnd: FarEndShot): number {
+  return farEnd.pastTile === null ? -1 : distanceSqOf(offsetToTileCentre(pose, farEnd.pastTile))
+}
+
+/** The far end as a hook the reel ends on: an open cell (so no lava), every cell on the way open. */
+function openFarEndAt(
+  ground: Ground,
+  pose: VehiclePose,
+  candidate: HookCandidate,
+): GrappleHook | null {
+  if (!isAirCell(cellAt(ground.world, ground.params, candidate.tile))) return null
+  if (lastOpenTileBefore(ground, pose, candidate) === null) return null
+  const distanceMm = Math.floor(Math.sqrt(candidate.distanceSq))
+  return { hook: candidate.tile, to: candidate.tile, distanceMm }
 }
 
 /** In the aim cone, and farther off than the hook the shot skips past. */

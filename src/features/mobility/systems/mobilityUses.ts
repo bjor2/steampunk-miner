@@ -37,6 +37,7 @@ import {
   type ReelWindow,
   type RivetHold,
 } from './mobilitySection'
+import { boreFarEndHookOf } from './winchBore'
 
 /** Why a use with the miner out of play, or a second patch, is refused. */
 export const OUT_OF_PLAY = 'mobility.out_of_play'
@@ -70,12 +71,48 @@ export function fireGrappleShot(
 ): PowerUpOutcome {
   const pose = vehicleOf(state, use.playerId).pose
   if (pose === null) return { kind: 'refused', reason: OUT_OF_PLAY }
-  const reach = { ...NUMBERS.grapple, rangeTiles: magnitudeOf(use, NUMBERS.grapple.rangeTiles) }
+  const rangeTiles = magnitudeOf(use, NUMBERS.grapple.rangeTiles)
+  const farEnd = boreFarEndHookOf(state, use, pose, { rangeTiles, pastTile: shot.pastTile })
+  return farEnd === null
+    ? fireAtAimedHook(state, use, pose, { ...shot, rangeTiles })
+    : reelTo(state, use, farEnd, shot.reelDriveBp)
+}
+
+/** The plain shot: the nearest hook in the aim cone and the shot's own range. */
+function fireAtAimedHook(
+  state: AuthorityState,
+  use: PowerUpUse,
+  pose: VehiclePose,
+  shot: GrappleShot & { rangeTiles: number },
+): PowerUpOutcome {
+  const reach = { ...NUMBERS.grapple, rangeTiles: shot.rangeTiles }
   const hook = grappleHookOf(state, pose, reach, shot.pastTile)
   if (hook === null) return { kind: 'refused', reason: NO_HOOK }
-  const winch = isGrappleTwisted(state, use, reach.rangeTiles)
-    ? withBelayPlanted(state, use, hook, reach.rangeTiles)
-    : withReelRunning(state, use, hook, shot.reelDriveBp)
+  if (isGrappleTwisted(state, use, reach.rangeTiles)) {
+    return hookedWith(state, use, hook, withBelayPlanted(state, use, hook, reach.rangeTiles))
+  }
+  return reelTo(state, use, hook, shot.reelDriveBp)
+}
+
+/**
+ * The winch reels to `hook`. A bore's far end (ticket 414) always reels, even with the Belay Line
+ * held: an open cell holds no standing line.
+ */
+function reelTo(
+  state: AuthorityState,
+  use: PowerUpUse,
+  hook: GrappleHook,
+  driveBp: number | undefined,
+): PowerUpOutcome {
+  return hookedWith(state, use, hook, withReelRunning(state, use, hook, driveBp))
+}
+
+function hookedWith(
+  state: AuthorityState,
+  use: PowerUpUse,
+  hook: GrappleHook,
+  winch: (value: MobilityState) => MobilityState,
+): PowerUpOutcome {
   return actedWith(state, use, winch, [grappleHookedOf(use.playerId, hook.hook, hook.to)])
 }
 
