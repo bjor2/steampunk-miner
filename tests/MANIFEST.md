@@ -1214,6 +1214,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 
 | File | Tests | Sites |
 | --- | --- | --- |
+| `scripts/status/drillDown.test.mjs` | 8 | 8 |
 | `scripts/status/featureTime.test.mjs` | 11 | 11 |
 | `scripts/status/featureTimeHtml.test.mjs` | 7 | 7 |
 | `scripts/status/features.test.mjs` | 13 | 13 |

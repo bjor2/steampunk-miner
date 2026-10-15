@@ -12,7 +12,8 @@
 // next to index.html, fed by status.json (issues with their in-progress label time, the published
 // slots.json and each measured ticket's phase bar). The Tests tab (#192) renders in the page from
 // the four tests*.mjs modules, fed by the test-metrics branch: summary.json in status.json, and the
-// per-test tests.json read live, with a copy as test-history.json. Static output, no server.
+// per-test tests.json read live, with a copy as test-history.json; its drill-down panel (ticket
+// 416) from drillDown*.mjs and drill-down.ndjson, read the same way. Static output, no server.
 //
 //   node scripts/status/build-status.mjs [--out dist/status]
 //
@@ -71,6 +72,8 @@ const PAGE_MODULES = [
   'testsHtml.mjs',
   'testsOverview.mjs',
   'testsOverviewHtml.mjs',
+  'drillDown.mjs',
+  'drillDownHtml.mjs',
 ]
 const REPO = process.env.GITHUB_REPOSITORY || 'bjor2/steampunk-miner'
 const [OWNER, NAME] = REPO.split('/')
@@ -88,14 +91,14 @@ const OUT = outArg > 0 ? process.argv[outArg + 1] : 'dist/status'
 // the tests run on the box (Tests tab), so no test workflow is listed.
 const WORKFLOWS = [{ file: 'ci.yml' }, { file: 'pages.yml' }]
 
-async function rest(path, { raw = false, allow404 = false } = {}) {
+// `isText` keeps a raw file's body as text (an NDJSON history is not one JSON document).
+async function rest(path, { raw = false, allow404 = false, isText = false } = {}) {
   if (!TOKEN) {
     try {
       const args = ['api', path]
       if (raw) args.push('-H', 'Accept: application/vnd.github.raw')
-      return JSON.parse(
-        execFileSync('gh', args, { encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] }),
-      )
+      const body = execFileSync('gh', args, { encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] })
+      return isText ? body : JSON.parse(body)
     } catch (err) {
       if (allow404 && String(err.stderr).includes('404')) return null
       throw err
@@ -110,7 +113,7 @@ async function rest(path, { raw = false, allow404 = false } = {}) {
   })
   if (allow404 && res.status === 404) return null
   if (!res.ok) throw new Error(`GET ${path}: ${res.status} ${await res.text()}`)
-  return res.json()
+  return isText ? res.text() : res.json()
 }
 
 async function graphql(query, variables) {
@@ -280,6 +283,18 @@ async function fetchTestHistory() {
     raw: true,
     allow404: true,
   }).catch((err) => (console.warn(`test-metrics tests.json unavailable: ${err.message}`), null))
+}
+
+// The Tests tab's drill-down runs (drill-down.ndjson, ticket 416), copied next to the page the
+// same way. Missing is fine: the panel says no run is recorded yet.
+async function fetchDrillDownRuns() {
+  return rest(`repos/${REPO}/contents/drill-down.ndjson?ref=${METRICS_BRANCH}`, {
+    raw: true,
+    allow404: true,
+    isText: true,
+  }).catch(
+    (err) => (console.warn(`test-metrics drill-down.ndjson unavailable: ${err.message}`), null),
+  )
 }
 
 async function fetchWorkflows() {
@@ -502,15 +517,17 @@ const perf = buildPerfSection()
 const ticketTime = buildTicketTimeSection()
 const pageBeforeFeatures = pageWithSections(perf.html, ticketTime.html)
 
-const [issues, loops, slots, workflows, featuresCommit, tests, testHistory] = await Promise.all([
-  fetchIssues(),
-  fetchLoops(),
-  fetchSlots(),
-  fetchWorkflows(),
-  fetchLastCommitOf(FEATURES_FILE),
-  fetchTests(),
-  fetchTestHistory(),
-])
+const [issues, loops, slots, workflows, featuresCommit, tests, testHistory, drillDownRuns] =
+  await Promise.all([
+    fetchIssues(),
+    fetchLoops(),
+    fetchSlots(),
+    fetchWorkflows(),
+    fetchLastCommitOf(FEATURES_FILE),
+    fetchTests(),
+    fetchTestHistory(),
+    fetchDrillDownRuns(),
+  ])
 const featureTime = buildFeatureTimeSection(
   buildFeatures(issues, featuresCommit, ticketTime.model.tickets ?? []),
   ticketTime.model,
@@ -555,6 +572,7 @@ writeFileSync(join(OUT, 'perf.json'), JSON.stringify(perf.model))
 writeFileSync(join(OUT, 'ticket-time.json'), JSON.stringify(ticketTime.model))
 writeFileSync(join(OUT, 'features.json'), JSON.stringify(features))
 if (testHistory) writeFileSync(join(OUT, 'test-history.json'), JSON.stringify(testHistory))
+if (drillDownRuns) writeFileSync(join(OUT, 'drill-down.ndjson'), drillDownRuns)
 writeFileSync(join(OUT, 'index.html'), page)
 for (const name of PAGE_MODULES) copyFileSync(join(HERE, name), join(OUT, name))
 for (const [tab, title] of Object.entries(SHORT_LINKS)) {

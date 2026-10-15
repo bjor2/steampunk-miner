@@ -1846,6 +1846,7 @@
             >
           </h2>
           <div id="tests-body" class="muted">loading…</div>
+          <div id="drill-down" class="muted">loading the drill-down runs…</div>
           <div id="tests-overview" class="muted">loading the test list…</div>
         </section>
       </section>
@@ -2553,6 +2554,44 @@
         TEST_TYPING = setTimeout(() => applyTestFilterBar('q'), 250)
       })
 
+      // ---------- Tests tab drill-down runs (ticket 416): drillDown.mjs + drillDownHtml.mjs, drill-down.ndjson ----------
+      // Read when the tab is shown and on the live poll while it is, like the test list.
+      let DRILL_DOWN_VIEW = null
+      let DRILL_DOWN_TEXT = null
+      async function refreshDrillDownRuns() {
+        const branch = (DATA && DATA.tests && DATA.tests.metricsBranch) || 'test-metrics'
+        const sources = [
+          `https://raw.githubusercontent.com/${DATA.repo}/${branch}/drill-down.ndjson`,
+          './drill-down.ndjson',
+        ]
+        for (const url of sources) {
+          try {
+            const r = await fetch(url, { cache: 'no-store' })
+            if (!r.ok) continue
+            const text = await r.text()
+            const isNewer = text !== DRILL_DOWN_TEXT
+            DRILL_DOWN_TEXT = text
+            return isNewer
+          } catch (_) {
+            /* try the copy beside the page */
+          }
+        }
+        return false
+      }
+      function renderDrillDown() {
+        if (!DRILL_DOWN_VIEW || !DATA) return
+        const model = DRILL_DOWN_VIEW.model.readDrillDownRuns(DRILL_DOWN_TEXT)
+        const view = { repo: DATA.repo, nowMs: Date.now() }
+        $('#drill-down').className = ''
+        $('#drill-down').innerHTML = model.error
+          ? DRILL_DOWN_VIEW.html.renderDrillDownFailure(model.error, view)
+          : DRILL_DOWN_VIEW.html.renderDrillDown(model, view)
+      }
+      function showDrillDown() {
+        if (DRILL_DOWN_TEXT !== null) return renderDrillDown()
+        refreshDrillDownRuns().then(renderDrillDown)
+      }
+
       function renderMeta() {
         const run = DATA.run
         $('#meta').innerHTML =
@@ -2677,6 +2716,7 @@
         renderAll()
         if (TEST_LIST_VIEW && !TEST_QUERY && parseHash().tab === 'tests')
           showTestList(parseHash().params)
+        if (DRILL_DOWN_VIEW && parseHash().tab === 'tests') showDrillDown()
         loadFeatures().catch((e) => {
           $('#ft-error').innerHTML =
             `<div class="ft-error">Feature tree failed to load: ${esc(e)}</div>`
@@ -3105,6 +3145,7 @@
           showIssueView()
         }
         if (tab === 'tests' && TEST_LIST_VIEW && DATA) showTestList(params)
+        if (tab === 'tests' && DRILL_DOWN_VIEW && DATA) showDrillDown()
         if (target) document.getElementById(target)?.scrollIntoView({ block: 'center' })
       }
       window.addEventListener('hashchange', showTab)
@@ -3181,11 +3222,22 @@
           $('#tests-overview').innerHTML =
             `<div class="warn">Test list failed to load: ${esc(e)}</div>`
         })
+      Promise.all([import('./drillDown.mjs'), import('./drillDownHtml.mjs')])
+        .then(([model, html]) => {
+          DRILL_DOWN_VIEW = { model, html }
+          if (DATA && parseHash().tab === 'tests') showDrillDown()
+        })
+        .catch((e) => {
+          $('#drill-down').innerHTML =
+            `<div class="warn">Drill-down runs failed to load: ${esc(e)}</div>`
+        })
       async function pollLoops() {
         if (!DATA || document.hidden) return
         refreshTestsSummary().then(renderTests)
         if (TEST_HISTORY && parseHash().tab === 'tests')
           refreshTestHistory().then((isNewer) => isNewer && renderTestList())
+        if (DRILL_DOWN_TEXT !== null && parseHash().tab === 'tests')
+          refreshDrillDownRuns().then((isNewer) => isNewer && renderDrillDown())
         if (await refreshLoops()) {
           renderMeta()
           renderLoops()
