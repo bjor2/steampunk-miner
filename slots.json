@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-10-16T01:20:24+02:00",
+  "updated_at": "2026-10-16T01:35:24+02:00",
   "caps": {
     "grok": 12,
     "claude": 10,
@@ -69,7 +69,7 @@
       "size": 6,
       "used": 0,
       "free": 6,
-      "claims_last_hour": 1,
+      "claims_last_hour": 0,
       "name": "Claude Max 1"
     },
     {
@@ -120,15 +120,15 @@
     }
   ],
   "gate": {
-    "busy": 1,
+    "busy": 0,
     "max": 3
   },
   "tester": {
     "state": "running",
     "phase": "fast",
     "sha": "7ab6634a92f24acd75815f473084a56f47a34c01",
-    "since": "2026-10-15T20:48:13Z",
-    "holds_gate": true,
+    "since": "2026-10-15T23:35:16Z",
+    "holds_gate": false,
     "claude_slot": null,
     "last_run": "2026-10-15T00:16:52Z",
     "last_nightly": "2026-10-15T20:43:15Z",
