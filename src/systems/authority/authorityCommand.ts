@@ -277,8 +277,14 @@ import type { DriveSigns } from '../vehicle/driveSigns'
  *    `ceil(60 H / (D eff))` with no `drill.minTicksPerTile`, so a drill past the old 4-tick floor
  *    breaks a cell in its own time, down to one tick (one sub-step on the swept cut), its step
  *    bound and travel parity following that cut speed. Goldens that dig past the old floor change.
+ * 79: the swept carve clears a body-wide bore at any cells a tick (ticket 439, the TD shape on
+ *    #397): a fresh `drillStep` path whose reach lies more than the stamp's radius from the body
+ *    point cuts the capsule from the body to its reach, not the bare disc at the reach, so the
+ *    body's own cell and the rim along the path open as a continuing step's do. A fresh reach
+ *    within one radius cuts the same bare disc as before. With no drill step sent
+ *    (`drill.sweptCut` off) no digest or mined order changes.
  */
-export const AUTHORITY_PROTOCOL_VERSION = 78
+export const AUTHORITY_PROTOCOL_VERSION = 79
 
 /** The kernel's own commands: the closed set its rule tables are written against. */
 export interface KernelCommandPayloads {

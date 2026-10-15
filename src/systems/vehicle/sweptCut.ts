@@ -7,6 +7,11 @@
  *   same facing. Otherwise it is fresh: its path runs from the body (the stamp pulled back along
  *   the facing by as far as it sits ahead) to the stamp, and it cuts a bare disc where it stops:
  *   with nothing in the way, a report's disc one cutting step further ahead (tickets 333, 334).
+ * - A tick's cut clears at least the stamp's bore from the body to its reach, at any cells a tick
+ *   (ticket 439, the TD shape on #397): once the bare disc where a fresh path stops would leave the
+ *   body point uncovered, the path cuts the capsule from the body instead, as a continuing step
+ *   cuts from its cursor. Otherwise the body's own cell and the rim along the path stay standing,
+ *   and a rig past about a cell a tick rests on that lip at 0 m/s while its reach runs on.
  * - The stamp's centre is walked along the path (`carryWalk.ts`, ticket 399), and the sweep stops at
  *   the last sub-step before the centre would enter a cell the drill cannot cut (a gate that
  *   refuses or blocks it, or one past its scratch floor), or one its work cannot pay for yet.
@@ -127,11 +132,25 @@ export function centreTileAtStep(path: SweepPath, step: number): TilePoint {
   return tileOfMillimetres(centre.xMm, centre.yMm)
 }
 
-/** The stamp the step cuts reaching `step`: a capsule from the cursor, or a fresh bare disc. */
+/**
+ * The stamp the step cuts reaching `step`: a capsule from the path's start, or a fresh path's bare
+ * disc while that disc still covers the body.
+ */
 export function sweptStampOf(path: SweepPath, stamp: DiscStamp, step: number): DiscStamp {
   const reached = pointAtStep(path, step)
-  const tail = path.isFresh ? reached : path.from
+  const tail = isBareDiscReach(path, reached, stamp.radiusMm) ? reached : path.from
   return { ...stamp, ...reached, tail }
+}
+
+/**
+ * A fresh path whose reach is within one radius of the body point it starts from: the disc there
+ * covers the body, so the cut stays the bare disc it was before ticket 439, byte for byte. Squares
+ * of whole mm, so no float decides it.
+ */
+function isBareDiscReach(path: SweepPath, reached: StampPoint, radiusMm: number): boolean {
+  const dx = reached.xMm - path.from.xMm
+  const dy = reached.yMm - path.from.yMm
+  return path.isFresh && dx * dx + dy * dy <= radiusMm * radiusMm
 }
 
 function pointOf({ xMm, yMm }: StampPoint): StampPoint {
