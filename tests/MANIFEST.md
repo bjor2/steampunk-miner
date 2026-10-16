@@ -734,7 +734,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/authority/stateDigest.test.ts` | 17 | 12 |
 | `src/systems/authority/sweptCarry.test.ts` | 8 | 6 |
 | `src/systems/authority/sweptCutAtSpeed.test.ts` | 8 | 8 |
-| `src/systems/authority/sweptFreshCarve.test.ts` | 26 | 13 |
+| `src/systems/authority/sweptFreshCarve.test.ts` | 40 | 17 |
 | `src/systems/authority/sweptGateSpeeds.test.ts` | 24 | 2 |
 | `src/systems/authority/sweptSpanDrill.test.ts` | 17 | 13 |
 | `src/systems/authority/teleportDebugRules.test.ts` | 5 | 5 |
@@ -941,9 +941,9 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 
 | File | Tests | Sites |
 | --- | --- | --- |
-| `src/physics/cutFollow.test.ts` | 5 | 3 |
+| `src/physics/cutFollow.test.ts` | 5 | 4 |
 | `src/physics/cutFollowBite.test.ts` | 3 | 2 |
-| `src/physics/cutFollowRelease.test.ts` | 16 | 3 |
+| `src/physics/cutFollowRelease.test.ts` | 15 | 4 |
 | `src/physics/cutFollowStartingRigs.test.ts` | 16 | 5 |
 | `src/physics/cutSmoothness.test.ts` | 3 | 5 |
 | `src/physics/cutStartLatency.lane.test.ts` | 3 | 3 |
@@ -955,7 +955,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/physics/physicsStats.test.ts` | 3 | 3 |
 | `src/physics/strutColliders.test.ts` | 4 | 4 |
 | `src/physics/sweptCutPace.test.ts` | 5 | 2 |
-| `src/physics/sweptFreshCarveLoop.test.ts` | 3 | 2 |
+| `src/physics/sweptFreshCarveLoop.test.ts` | 3 | 3 |
 | `src/physics/tunnelling.test.ts` | 10 | 2 |
 | `src/physics/vehicleLoop.test.ts` | 6 | 6 |
 | `src/physics/vehiclePhysics.test.ts` | 8 | 2 |

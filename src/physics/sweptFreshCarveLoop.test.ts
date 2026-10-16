@@ -11,10 +11,9 @@ import { createRig, type TickRead } from './cutFollowFixtures'
 // straight down until the body nears planet 1's core. A rig whose fresh first tick left its own
 // cell standing rested on that lip at 0 m/s while its reach ran on, from about 97 m/s on planet 1.
 // Planet radii stay under 1000 tiles, so the down leg is a tick count, not a 3 s leg: 3600 m/s
-// crosses planet 1 in about 5 ticks. Ticket 396's 4-tick floor holds these rigs to 15 m/s until
-// #397 removes it, so today they judge the same rule at that speed.
+// crosses planet 1 in about 5 ticks.
 
-/** The TD's rigs by stored drill_power/drill_tip, and the cut speed each reaches with no floor. */
+/** The TD's rigs by stored drill_power/drill_tip, and the band-1 cut speed each reaches. */
 const RIGS = [
   { speed: 97, levels: { drill_power: 370, drill_tip: 600 } },
   { speed: 240, levels: { drill_power: 450, drill_tip: 600 } },
@@ -96,5 +95,12 @@ describe('body-wide bore in the live loop (ticket 439)', () => {
 
   it.todo(
     'the 3600 m/s rig never ends a tick inside solid ground on its way to the core (#421: the carry target-cell hold-out)',
+  )
+
+  // The bore bar of Oct 16 on #439, ticked in the live body: the halo steps against the ground from
+  // before the tick's cut (about 58 m/s, #440's finding), and the carry's held-out cell lips (#421)
+  // still dip single ticks. The authority spec judges the bore's own share of it.
+  it.todo(
+    'every rig moves on at 80% or more of its commanded cut speed on every tick its cut gate is open (#440: the stale halo; #421: the hold-out lip)',
   )
 })
