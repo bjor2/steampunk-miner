@@ -1853,6 +1853,12 @@
               "issues": [49, 64]
             }
           ]
+        },
+        {
+          "title": "Sound on any tap",
+          "description": "Sound starts on the first key, press, touch or click, comes back on the next one or on returning to the page after an interruption, and a Tap for sound chip shows while the browser keeps it silent. Not yet checked on a real iPhone.",
+          "status": "built",
+          "issues": [478, 470]
         }
       ]
     },
@@ -1890,6 +1896,12 @@
           "description": "Rendering resolution adjusts to keep the frame rate while the UI stays sharp.",
           "status": "built",
           "issues": [38, 60]
+        },
+        {
+          "title": "Lost picture recovery",
+          "description": "When the browser takes the graphics context away, as phones do under memory pressure, the game holds still behind a Reconnecting chip and carries on once the picture is back.",
+          "status": "built",
+          "issues": [478, 470]
         },
         {
           "title": "Fits every screen",

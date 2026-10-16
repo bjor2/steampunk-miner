@@ -634,6 +634,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/audio/musicScore.test.ts` | 3 | 3 |
 | `src/systems/audio/musicStingers.test.ts` | 5 | 5 |
 | `src/systems/audio/soundRules.test.ts` | 8 | 8 |
+| `src/systems/audio/soundUnlock.test.ts` | 8 | 8 |
 | `src/systems/audio/voicePool.test.ts` | 3 | 3 |
 
 ### `authority`
@@ -1168,7 +1169,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/store/gameStore.test.ts` | 26 | 26 |
 | `src/store/hintSlice.test.ts` | 9 | 9 |
 | `src/store/inputRuntime.test.ts` | 51 | 51 |
-| `src/store/liveStepSlice.test.ts` | 17 | 17 |
+| `src/store/liveStepSlice.test.ts` | 22 | 22 |
 | `src/store/padRuntime.test.ts` | 16 | 14 |
 | `src/store/partInstall.test.ts` | 5 | 5 |
 | `src/store/pauseMenuSlice.test.ts` | 11 | 11 |
@@ -1179,6 +1180,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/store/runSnapshots.test.ts` | 10 | 10 |
 | `src/store/sliceRun.test.ts` | 7 | 7 |
 | `src/store/slowDeviceChip.test.ts` | 2 | 2 |
+| `src/store/soundUnlockSlice.test.ts` | 4 | 4 |
 | `src/store/tapSheetSlice.test.ts` | 6 | 6 |
 | `src/store/titleMenu.test.ts` | 9 | 9 |
 | `src/store/touchReplay.test.ts` | 2 | 2 |
@@ -1362,6 +1364,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/views/bayPresentation.test.ts` | 6 | 6 |
 | `src/systems/views/chargeViews.test.ts` | 14 | 14 |
 | `src/systems/views/combatStatuses.test.ts` | 8 | 8 |
+| `src/systems/views/deviceNotices.test.ts` | 6 | 6 |
 | `src/systems/views/engineTrackMaxed.test.ts` | 6 | 6 |
 | `src/systems/views/hazardStripView.test.ts` | 3 | 3 |
 | `src/systems/views/heatViews.test.ts` | 5 | 5 |
