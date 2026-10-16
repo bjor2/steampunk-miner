@@ -51,6 +51,12 @@ const FRAME_RATES = [30, 144]
 const REPORT_PHASES = 12
 /** Pixels a metre at the default 12 m view height (#39): 1080p, and a 390x844 phone. */
 const PIXELS_PER_METRE = { '1080p': 90, '390x844': 70 }
+/**
+ * How long a turn into the shaft wall is held: its first cell on the line ahead opened at most 119
+ * ticks after the press on main, and 127 since ticket 506 starts the down cut sooner and so turns
+ * at another place in the shaft (the body follows the cut at `vCut` the whole time). 2 s held 120.
+ */
+const CUT_INTO_CUT_PRESS_SECONDS = 3
 const REPORT_FOLDER = new URL('../../balance-report/', import.meta.url)
 const RUN_TIMEOUT_MS = 900_000
 
@@ -209,7 +215,10 @@ function driveIntoCut(): PressRun[] {
   )
 }
 
-/** Set 4: off the pad, at rest, 4 s and `phase` ticks down from the surface, then left. */
+/**
+ * Set 4: off the pad, at rest, 4 s and `phase` ticks down from the surface, then left for
+ * `CUT_INTO_CUT_PRESS_SECONDS`.
+ */
 function cutIntoCut(): PressRun[] {
   return eachStoredRig((rig, levels) =>
     eachRate((fps) =>
@@ -218,7 +227,7 @@ function cutIntoCut(): PressRun[] {
         rigNow.hold(buildIntent(['aim_left']), 2 * fps)
         rigNow.hold(IDLE_INTENT, fps)
         rigNow.hold(buildIntent(['aim_down']), 4 * fps + framesForTicks(phase, fps))
-        const press = holdPress(rigNow, buildIntent(['aim_left']), 2 * fps)
+        const press = holdPress(rigNow, buildIntent(['aim_left']), CUT_INTO_CUT_PRESS_SECONDS * fps)
         return readPress('cut into cut', rig, fps, press)
       }),
     ),
@@ -362,10 +371,14 @@ describe('drill start and turn latency (ticket 504)', () => {
   })
 
   // Measured on main f0eac6c3 (ticket 504's table on #504). Owner: open, to be set by the GD.
-  it.todo(
-    'turns a drive into a cut with no stale facing (measured: 1-12 ticks, mean 6.5, on the 12 ' +
-      'report phases at stored 1/10/20; owner: open, to be set by the GD)',
-  )
+  // Measured 1-12 ticks, mean 6.5, on main f0eac6c3; ticket 506's drill step carries the facing.
+  it('turns a drive into a cut with no stale facing on any report phase (ticket 506)', () => {
+    const stale = FRAME_RATES.flatMap((framesPerSecond) =>
+      staleFacingByPhaseAt(runs, framesPerSecond),
+    )
+    expect(stale.length).toBeGreaterThan(0)
+    expect(stale.filter((row) => row.stale !== 0)).toEqual([])
+  })
   it.todo(
     'turns a cut into another cut direction with no stale facing (measured: 1-12 ticks, mean ' +
       '6.42 / 3.67 / 3.67 at stored 1/10/20, 144 frames/s; owner: open, to be set by the GD)',
