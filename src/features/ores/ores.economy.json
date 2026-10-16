@@ -6,6 +6,34 @@
     },
     "signatureValueLead": 1,
     "signatureShareCapBpByBand": { "4": 600, "5": 800 },
-    "catalogue": { "variantsPerFamily": 4 }
+    "catalogue": { "variantsPerFamily": 4 },
+    "rarity": {
+      "alpha": 2,
+      "tiers": [
+        { "id": "common", "tierOffset": 0, "mult": "1", "firstBand": 1, "firstPlanet": 1 },
+        { "id": "uncommon", "tierOffset": 1, "mult": "1.5", "firstBand": 1, "firstPlanet": 1 },
+        { "id": "rare", "tierOffset": 2, "mult": "2.25", "firstBand": 2, "firstPlanet": 1 },
+        { "id": "epic", "tierOffset": 3, "mult": "3.375", "firstBand": 3, "firstPlanet": 3 },
+        { "id": "mythic", "tierOffset": 4, "mult": "5.0625", "firstBand": 4, "firstPlanet": 3 }
+      ],
+      "meanPpmByBand": [1012500, 1015000, 1023750, 1055000, 1056250],
+      "weightsBpByBand": {
+        "legacy": {
+          "uncommon": [250, 300, 350, 400, 450],
+          "rare": [0, 0, 50, 100, 150],
+          "epic": [0, 0, 0, 0, 0],
+          "mythic": [0, 0, 0, 0, 0]
+        },
+        "mixed": {
+          "uncommon": [250, 142, 155, 97, 224],
+          "rare": [0, 63, 69, 41, 97],
+          "epic": [0, 0, 31, 18, 43],
+          "mythic": [0, 0, 0, 8, 19]
+        }
+      },
+      "meanToleranceBp": "0.5",
+      "tripClampShareBp": 1500,
+      "tripClampTierIds": ["epic", "mythic"]
+    }
   }
 }

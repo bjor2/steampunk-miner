@@ -7,6 +7,8 @@
  *   in basis points so the generation hook rolls them in integers and no fraction collides with
  *   the economy source scan. Both rows are #140's halved, its pace fallback (acceptance 6): at full
  *   weight the slice ran under 100 minutes on the seed median (#146 re-baseline).
+ * - `ores.economy.json` `rarity`: the five rarity tiers, their weights and the trip clamp
+ *   (`rarityRows.ts`, ticket 445). The lead rows above stay byte-identical beside it.
  * - `oreFamilies.json`: #141's 12 families in its table order. A family's place in the list is its
  *   code in the cell's 4-bit family field, plus one (`metal` 1 and `crystal` 2, as the kernel's
  *   `RESOURCE_FAMILY` already writes them), so the order is append-only.
@@ -14,6 +16,7 @@
 import { BAND_COUNT } from '../../../systems/world/planetGeometry'
 import economyFile from '../ores.economy.json'
 import familiesFile from '../oreFamilies.json'
+import { rarityRowProblems, rarityRowsOf, type RarityRows } from './rarityRows'
 
 export interface OreFamily {
   id: string
@@ -41,6 +44,7 @@ export interface OreRows {
   /** Bands 4 and 5 only; the world generator clamps a signature's share to it (#140, #141). */
   signatureShareCapBpByBand: Readonly<Record<string, number>>
   catalogue: CatalogueKnobs
+  rarity: RarityRows
 }
 
 /** The 4-bit field holds 15 families; 0 is `none`. */
@@ -63,6 +67,7 @@ export function oreRowProblems(economy: unknown, families: unknown): string[] {
     ...(isWhole(ore.signatureValueLead, 0) ? [] : ['ore.signatureValueLead must be whole, from 0']),
     ...signatureCapProblems(ore.signatureShareCapBpByBand as Raw | undefined),
     ...catalogueProblems(ore.catalogue as Raw | undefined),
+    ...rarityRowProblems(ore.rarity),
   ]
 }
 
@@ -80,6 +85,7 @@ function loadOreRows(economy: typeof economyFile, families: typeof familiesFile)
     signatureValueLead: ore.signatureValueLead,
     signatureShareCapBpByBand: ore.signatureShareCapBpByBand,
     catalogue: ore.catalogue,
+    rarity: rarityRowsOf(ore.rarity),
   }
 }
 
