@@ -313,6 +313,16 @@ programs }` from three's `renderer.info` of the game canvas), read only when cal
   writes `balance-report/stored-level-release-trace.ndjson`. A lane (about 2 min), so it runs only
   when named; it fails only when a sweep follows no release or the two frame rates trace a phase
   differently.
+- **Level-cut dips** (ticket 505, measurement only): `src/physics/levelCutDips.lane.test.ts` plays
+  `cutSmoothness.test.ts`'s script with a level leg of at least 100 m for the 15 m/s rig, rig-heavy
+  and the 25 and 44 m/s rigs (the two level lines that spec holds on `it.todo`) at 30 and 144
+  frames/s, the down leg held 0 to 3 ticks longer so the level cut starts at another cell phase. On
+  the ramped-up cut ticks it counts each run of ticks under 80% of the cut speed: depth (lowest
+  share), ticks, the largest change across a held boundary, dips per metre (over the leg and over
+  the judged ticks), mm and px lost at 12 m (90 and 70 px/m), and whether a dip tick crossed a
+  boundary, left the ground or went backwards. It prints the table and writes
+  `balance-report/level-cut-dips.ndjson`. A lane (about 70 s), so it runs only when named; it fails
+  only when a run drills under 100 m or judges no ramped-up tick.
 - **Drill-speed ladder in stored steps** (ticket 434): `src/logging/drillLadderSteps.test.ts` cuts
   the same column's first 20 cells (all band 1, the ground a 10 s hold reaches) at stored drill_power
   steps 1, 5, 10, 15 and 20, the levels of the browser drill-down run, with the law counted per step

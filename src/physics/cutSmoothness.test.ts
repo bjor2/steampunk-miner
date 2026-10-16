@@ -28,9 +28,10 @@ import { createRig, type TickRead } from './cutFollowFixtures'
 // capsule from the body, #440's classifier named the dips on the 15 m/s level leg (rig-heavy too),
 // the 25 m/s up leg and the 44 m/s down leg the collider halo stepping against ground the tick's
 // own cut had opened. Since ticket 459 the substeps collide with the world that cut left, and the
-// 25 m/s up and 44 m/s down legs hold; the 15 m/s level legs still dip under 80% (#465). The 25 and
-// 44 m/s level legs dip so with the hold-out ablated since #397, and they also bounce back off the
-// face (#458's trace, the fix is #491). The 78 m/s and
+// 25 m/s up and 44 m/s down legs hold; the 15 m/s level legs still dip under 80%, and the 25 and
+// 44 m/s level legs dip so with the hold-out ablated since #397. Ticket 505 measured those level
+// dips (depth, ticks, rate, mm and px lost) in `levelCutDips.lane.test.ts`; their owner is open,
+// for the GD to set. The 78 m/s and
 // 3600 m/s rigs meet a bore narrower than the body on a fresh path (#439), and a 3 s leg at
 // 300 m/s needs a planet larger than planet 1.
 
@@ -227,11 +228,11 @@ describe('continuous cut-follow (tickets 400, 397, 421, 432)', () => {
   )
 
   it.todo(
-    'the 15 m/s rig (and rig-heavy) in a level cut vary their speed by at most 5% across cell boundaries and hold the #421 interim bar (#465: under 80% with the post-cut halo, ticket 459)',
+    'the 15 m/s rig (and rig-heavy) in a level cut vary their speed by at most 5% across cell boundaries and hold the #421 interim bar (owner: open, to be set by the GD; measured by ticket 505 over 4 cell phases and at least 100 m a run: dips to 25.8% of the cut speed (rig-heavy 27.0%), 1-2 ticks under 80% each, 21 ticks at 30 frames/s and 23 at 144 (rig-heavy 12 and 14), largest boundary change 1.959 (rig-heavy 1.851), 2.9 and 3.3 dips per 100 m (rig-heavy 2.0 and 2.2), a dip losing up to 261 mm, 23.5 px at 12 m on 1080p, nearly every dip with a tick off the ground)',
   )
 
   it.todo(
-    'the 25 and 44 m/s rigs hold the #421 interim bar in a level cut (#491: the level cut bounces back off the face)',
+    'the 25 and 44 m/s rigs hold the #421 interim bar in a level cut (owner: open, to be set by the GD; measured by ticket 505 over 4 cell phases and at least 100 m a run: 25 m/s dips to 33.6% of the cut speed, 1-2 ticks under 80% each, 12 ticks at 30 frames/s and 19 at 144, largest boundary change 1.976, 2.6 and 3.9 dips per 100 m, a dip losing up to 385 mm, 34.7 px at 12 m on 1080p; 44 m/s dips to 37.8%, 9 ticks under 80% at both rates, largest boundary change 1.521, 1.4 dips per 100 m, up to 406 mm, 36.5 px; no tick backwards, every dip with a tick off the ground)',
   )
 
   it.todo(
