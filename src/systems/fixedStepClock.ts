@@ -52,6 +52,19 @@ export function carryPastFrameSteps(
 }
 
 /**
+ * The whole steps the frame was due but the cap cut (TD on #470, point 5): they are never run
+ * later, so the tick sequence stays the same and the game only falls behind the wall clock.
+ */
+export function stepsDroppedByCap(
+  carried: number,
+  frameSeconds: number,
+  stepSeconds: number,
+  steps: number,
+): number {
+  return Math.max(0, wholeStepsIn(carried + frameSeconds, stepSeconds) - steps)
+}
+
+/**
  * How far a frame that carries `carried` seconds sits from the last step (0) toward the next (1):
  * the share by which a body is drawn from its pose before the last step toward its pose after it.
  */

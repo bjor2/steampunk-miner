@@ -14,6 +14,14 @@ export const PHYSICS_TIMESTEP = 1 / TICKS_PER_SECOND
 export const MAX_STEPS_PER_FRAME = 30
 
 /**
+ * The "slow device" chip (TD on #470, point 5; VS ruling 2): it shows once the cap has dropped
+ * more than this share of the due ticks in each of `SLOW_DEVICE_SECONDS` seconds of frames running,
+ * and goes once that many seconds in a row stay at or under it.
+ */
+export const SLOW_DEVICE_DROPPED_SHARE = 0.05
+export const SLOW_DEVICE_SECONDS = 5
+
+/**
  * `useFrame` order. Negative runs before the scene's default 0 and never takes over rendering
  * (only a positive priority does). The fixed steps run first, then each body draws itself between
  * its last two steps, so the camera, terrain and lights read the position drawn this frame.
