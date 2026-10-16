@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-10-16T13:10:37+01:00",
+  "updated_at": "2026-10-16T13:24:36+01:00",
   "caps": {
     "grok": 12,
     "claude": 10,
@@ -743,11 +743,11 @@
     }
   ],
   "last_refill": {
-    "at": "2026-10-16 13:02 BST",
+    "at": "2026-10-16 13:24 BST",
     "mode": "refill-dev",
-    "triggers": "#492",
+    "triggers": "claude-run:wave-plan",
     "started": "",
-    "note": "load guard (1-min load 20.07 > 14)"
+    "note": "load guard (1-min load 19.83 > 14)"
   },
   "totals": {
     "grok": {
@@ -771,8 +771,21 @@
     "parallel": 1,
     "list": [
       {
+        "number": 502,
+        "key": "5D",
+        "map": 302,
+        "lane": "remote",
+        "mode": "solo",
+        "state": "ready",
+        "tickets": [
+          499
+        ],
+        "done": [],
+        "live": 0
+      },
+      {
         "number": 498,
-        "key": "4B",
+        "key": "5C",
         "map": 302,
         "lane": "remote",
         "mode": "solo",
@@ -833,24 +846,27 @@
       },
       {
         "number": 490,
-        "key": "3A",
+        "key": "5B",
         "map": 302,
         "lane": "remote",
         "mode": "solo",
-        "state": "ready",
+        "state": "blocked",
         "tickets": [
-          463
+          448,
+          463,
+          452,
+          453
         ],
         "done": [],
         "live": 0
       },
       {
         "number": 468,
-        "key": "3C",
+        "key": "6A",
         "map": 302,
         "lane": "remote",
         "mode": "solo",
-        "state": "ready",
+        "state": "blocked",
         "tickets": [
           471
         ],
@@ -858,58 +874,24 @@
         "live": 0
       },
       {
-        "number": 467,
-        "key": "3D",
-        "map": 302,
-        "lane": "remote",
-        "mode": "solo",
-        "state": "paused",
-        "tickets": [
-          491,
-          492
-        ],
-        "done": [
-          491
-        ],
-        "live": 0
-      },
-      {
         "number": 461,
-        "key": "4A",
+        "key": "5A",
         "map": 302,
         "lane": "remote",
         "mode": "solo",
-        "state": "blocked",
+        "state": "ready",
         "tickets": [
+          445,
           446,
-          448,
-          449,
-          453
+          447,
+          449
         ],
         "done": [],
         "live": 0
       },
       {
-        "number": 456,
-        "key": "3B",
-        "map": 302,
-        "lane": "remote",
-        "mode": "solo",
-        "state": "paused",
-        "tickets": [
-          444,
-          445,
-          447,
-          452
-        ],
-        "done": [
-          444
-        ],
-        "live": 0
-      },
-      {
         "number": 438,
-        "key": "3F",
+        "key": "5E",
         "map": 302,
         "lane": "hitl",
         "mode": "bench",
@@ -922,8 +904,8 @@
           308,
           417,
           441,
-          460,
-          470
+          470,
+          501
         ],
         "done": [],
         "live": 0
