@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-10-16T22:56:01+01:00",
+  "updated_at": "2026-10-16T22:57:44+01:00",
   "caps": {
     "grok": 12,
     "claude": 10,
@@ -722,19 +722,6 @@
     "mode": "on",
     "parallel": 1,
     "list": [
-      {
-        "number": 523,
-        "key": "2E",
-        "map": 316,
-        "lane": "remote",
-        "mode": "solo",
-        "state": "running",
-        "tickets": [
-          522
-        ],
-        "done": [],
-        "live": 0
-      },
       {
         "number": 521,
         "key": "2D",
