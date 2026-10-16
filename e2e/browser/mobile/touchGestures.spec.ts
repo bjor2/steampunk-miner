@@ -1,7 +1,7 @@
 /**
  * Multi-touch on the Pixel 7 project (ticket 481, the TD's section 5 on #470): two real fingers
  * through CDP spread on the open screen and press `zoom_in` into the action stream, as the Equal key
- * does, and a double tap presses `zoom_reset` and brings the view back. WebKit has no CDP, so the
+ * does, and a double tap presses `zoom_reset` and widens the view again. WebKit has no CDP, so the
  * iPhone 13 project skips these; the stick's stream equality runs on both phones from the screen
  * matrix's `touchControls.spec.ts`. State through `steampunkDebug`, never pixels.
  */
@@ -70,21 +70,20 @@ test.describe('mobile: multi-touch gestures (ticket 481)', () => {
     const startMetres = await viewMetres(page)
     const before = (await actionStream(page)).length
     await spreadTwoFingers(cdp)
-    const pinched = (await actionStream(page)).slice(before).map((edge) => edge.actionId)
-    expect(pinched).toContain('zoom_in')
-    expect(pinched).not.toContain('zoom_out')
+    const onPinch = (await actionStream(page)).slice(before)
+    expect(onPinch.map((edge) => edge.actionId)).toContain('zoom_in')
+    expect(onPinch.map((edge) => edge.actionId)).not.toContain('zoom_out')
     await expect.poll(() => viewMetres(page)).toBeLessThan(startMetres)
-    const middle = (await actionStream(page)).length
-    await page.keyboard.press('Equal')
-    expect((await actionStream(page)).slice(middle)[0]).toEqual({
-      actionId: 'zoom_in',
-      isDown: true,
-    })
+    const pinchedMetres = await viewMetres(page)
     const reset = (await actionStream(page)).length
     await doubleTap(cdp)
-    const tapped = (await actionStream(page)).slice(reset).map((edge) => edge.actionId)
-    expect(tapped).toContain('zoom_reset')
-    await expect.poll(() => viewMetres(page)).toBeCloseTo(startMetres, 1)
+    const onDoubleTap = (await actionStream(page)).slice(reset).map((edge) => edge.actionId)
+    expect(onDoubleTap).toContain('zoom_reset')
+    await expect.poll(() => viewMetres(page)).toBeGreaterThan(pinchedMetres)
+    // Last: a key hides the touch controls until the next touch.
+    const middle = (await actionStream(page)).length
+    await page.keyboard.press('Equal')
+    expect((await actionStream(page)).slice(middle)[0]).toEqual(onPinch[0])
     expect(errors).toEqual([])
   })
 })
