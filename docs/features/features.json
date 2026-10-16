@@ -2186,7 +2186,15 @@
           "description": "Plays in landscape on phones and tablets with every screen reachable by touch; portrait shows a turn-your-device card. A screenshot matrix keeps desktop, phone, tablet and TV sizes checked.",
           "status": "built",
           "issues": [173, 179],
-          "doc": "docs/screens/README.md"
+          "doc": "docs/screens/README.md",
+          "children": [
+            {
+              "title": "Compact phone HUD",
+              "description": "On a phone, upright or sideways, the HUD is a few rows of icons and numbers along the top edge with at most six words; a tap on a row shows its names, and the hint is a one-line chip with a dismiss that waits while the play view is crowded.",
+              "status": "built",
+              "issues": [500, 470]
+            }
+          ]
         },
         {
           "title": "Electron desktop build",
