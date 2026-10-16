@@ -83,7 +83,7 @@ function paintOrePatches(
 export function patchCellOf(params: PlanetParams, patch: OrePatch): number {
   const rolled = { family: patch.family, tierOffset: patch.band - 1 }
   const content = foldPatchContent(params, patch, rolled)
-  return oreCell(content.family, content.tierOffset)
+  return oreCell(content.family, content.tierOffset, content.kindSlot)
 }
 
 /** Plain ground of the patch's band; where two patches overlap, the earlier one keeps the tile. */

@@ -1,14 +1,19 @@
 /**
- * One packed world cell (decision #4, Generation): `kind (4 bits) | family (4 bits) |
- * tierOffset (24 bits)` in a uint32. Hardness is not stored; it is looked up from the planet and
- * depth when needed. Ore value comes from `tierOffset` at sell time (#4 consequences for #5).
+ * One packed world cell (decision #4, Generation): `kind (4 bits) | family (4 bits) | spare (8 bits)
+ * | kindSlot (8 bits) | tierOffset (8 bits)` in a uint32. Hardness is not stored; it is looked up
+ * from the planet and depth when needed. Ore value comes from `tierOffset` at sell time (#4
+ * consequences for #5).
  *
  * `tierOffset` is the ore tier above the planet's band-1 ore tier: ore in band `b` has offset
  * `b - 1` and core material has offset 5, because #6 sets tier `t = 3(p-1) + b` and core
  * material to `3(p-1) + 6`. #140's lead roll may lift an ore cell up to 2 tiers above its band, and
- * the mythic rarity tier (ticket 445) up to 4, so an ore offset runs from 0 to 8; the field is 24
- * bits, so the wider range is no new encoding. Storing the offset keeps every cell small for any
- * planet index.
+ * the mythic rarity tier (ticket 445) up to 4, so an ore offset runs from 0 to 8. Storing the offset
+ * keeps every cell small for any planet index.
+ *
+ * `kindSlot` (TD ruling on ticket 446, addendum 6226264758 amendment 1): the material kind a patch
+ * drew from its planet's roster, its roster index plus one, 0 for none. It is a look only: family,
+ * tier, price and gate never read it, so every reader of the tier offset masks it away. The field
+ * was the top of the old 24-bit tier offset, which never held more than 8; bits 16 to 23 stay spare.
  */
 
 export const CELL_KIND = {
@@ -56,10 +61,19 @@ export const CORE_TIER_OFFSET = 5
  */
 export const MAX_ORE_TIER_OFFSET = 8
 
+/** No material kind: a cell no roster fold drew on, or one generated before the roster. */
+export const NO_KIND_SLOT = 0
+
+/** The largest value the 8-bit kind slot holds: roster index 254. */
+export const MAX_KIND_SLOT = 0xff
+
 const KIND_SHIFT = 28
 const FAMILY_SHIFT = 24
+const KIND_SLOT_SHIFT = 8
 const NIBBLE = 0xf
-const TIER_OFFSET_MASK = 0xffffff
+const BYTE = 0xff
+const TIER_OFFSET_MASK = BYTE
+const KIND_SLOT_MASK = BYTE << KIND_SLOT_SHIFT
 
 export function packCell(kind: CellKind, family: ResourceFamily, tierOffset: number): number {
   return ((kind << KIND_SHIFT) | (family << FAMILY_SHIFT) | (tierOffset & TIER_OFFSET_MASK)) >>> 0
@@ -77,6 +91,21 @@ export function tierOffsetOfCell(cell: number): number {
   return cell & TIER_OFFSET_MASK
 }
 
+/** The cell's material kind: its roster index plus one, `NO_KIND_SLOT` for none (ticket 446). */
+export function kindSlotOfCell(cell: number): number {
+  return (cell >>> KIND_SLOT_SHIFT) & BYTE
+}
+
+/** The cell with its kind slot set; every other field is kept. */
+export function withKindSlot(cell: number, kindSlot: number): number {
+  return ((cell & ~KIND_SLOT_MASK) | ((kindSlot & BYTE) << KIND_SLOT_SHIFT)) >>> 0
+}
+
+/** The cell as a reader of family, tier and gate sees it: the look's kind slot cleared. */
+export function withoutKindSlot(cell: number): number {
+  return withKindSlot(cell, NO_KIND_SLOT)
+}
+
 export const SPACE_CELL = packCell(CELL_KIND.space, RESOURCE_FAMILY.none, 0)
 export const AIR_CELL = packCell(CELL_KIND.air, RESOURCE_FAMILY.none, 0)
 export const GROUND_CELL = packCell(CELL_KIND.ground, RESOURCE_FAMILY.none, 0)
@@ -85,8 +114,12 @@ export const INDESTRUCTIBLE_CELL = packCell(CELL_KIND.indestructible, RESOURCE_F
 export const ARTEFACT_CACHE_CELL = packCell(CELL_KIND.artefactCache, RESOURCE_FAMILY.none, 0)
 export const LAVA_CELL = packCell(CELL_KIND.lava, RESOURCE_FAMILY.none, 0)
 
-export function oreCell(family: ResourceFamily, tierOffset: number): number {
-  return packCell(CELL_KIND.ore, family, tierOffset)
+export function oreCell(
+  family: ResourceFamily,
+  tierOffset: number,
+  kindSlot: number = NO_KIND_SLOT,
+): number {
+  return withKindSlot(packCell(CELL_KIND.ore, family, tierOffset), kindSlot)
 }
 
 /** Nothing to collide with or stand on: space or air (#9 uses this for the enemy grid). */

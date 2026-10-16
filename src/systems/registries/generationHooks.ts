@@ -14,11 +14,16 @@ import { defineRegistry, entriesOf } from './seal'
 export interface PatchContent {
   family: ResourceFamily
   tierOffset: number
+  /** The material kind the patch wears (ticket 446), its roster index plus one; absent is none. */
+  kindSlot?: number
 }
 
 export interface GenerationHook {
   id: string
-  /** Fold over each patch's content, after the lattice rolls it (default: patch.family, band - 1). */
+  /**
+   * Fold over each patch's content, after the lattice rolls it (default: patch.family, band - 1, no
+   * kind slot).
+   */
   patchContent?(
     params: PlanetParams,
     patch: OrePatch,

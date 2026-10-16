@@ -7,10 +7,15 @@ import {
   CELL_KIND,
   familyOfCell,
   kindOfCell,
+  kindSlotOfCell,
+  MAX_KIND_SLOT,
   MAX_ORE_TIER_OFFSET,
   MAX_RESOURCE_FAMILY,
+  NO_KIND_SLOT,
   oreCell,
   tierOffsetOfCell,
+  withKindSlot,
+  withoutKindSlot,
   type ResourceFamily,
 } from './worldCell'
 
@@ -22,8 +27,9 @@ const EVERY_CODE = Array.from(
   (_, code) => code as ResourceFamily,
 )
 const FIRST_SPARE_CODE = 13
-/** The tier offset field is 24 bits wide (#4), so mythic's offset 8 needs no new encoding. */
-const TIER_OFFSET_FIELD_MAX = 0xffffff
+/** The tier offset field is 8 bits wide since the kind slot took bits 8 to 15 (ticket 446). */
+const TIER_OFFSET_FIELD_MAX = 0xff
+const KIND_SLOTS = [NO_KIND_SLOT, 1, 15, MAX_KIND_SLOT]
 const PLANETS = [1, 2, 3, 8, 17, 25, 33, 41]
 
 /** The family codes of every ore cell in the column of chunks through the planet's centre. */
@@ -47,7 +53,7 @@ describe('world cell family codes', () => {
     expect(cells.every((cell) => kindOfCell(cell) === CELL_KIND.ore)).toBe(true)
   })
 
-  it('keeps every family through the whole 24-bit tier offset, from 0 past 8 (ticket 445)', () => {
+  it('keeps every family through the whole 8-bit tier offset, from 0 past 8 (ticket 446)', () => {
     for (const offset of [0, MAX_ORE_TIER_OFFSET, TIER_OFFSET_FIELD_MAX]) {
       const cells = EVERY_CODE.map((code) => oreCell(code, offset))
       expect(cells.map(familyOfCell)).toEqual(EVERY_CODE)
@@ -67,5 +73,32 @@ describe('world cell family codes', () => {
     const placed = PLANETS.flatMap((planetIndex) => [...placedFamilyCodesOf(planetIndex)])
     expect(placed.filter((code) => !named.has(code))).toEqual([])
     expect(placed.filter((code) => code >= FIRST_SPARE_CODE)).toEqual([])
+  })
+})
+
+describe('world cell kind slot (ticket 446)', () => {
+  it('keeps the kind, family and tier offset whatever kind slot the cell carries', () => {
+    for (const kindSlot of KIND_SLOTS) {
+      const cells = EVERY_CODE.map((code) => oreCell(code, MAX_ORE_TIER_OFFSET, kindSlot))
+      expect(cells.map(familyOfCell)).toEqual(EVERY_CODE)
+      expect(cells.map(tierOffsetOfCell)).toEqual(EVERY_CODE.map(() => MAX_ORE_TIER_OFFSET))
+      expect(cells.map(kindSlotOfCell)).toEqual(EVERY_CODE.map(() => kindSlot))
+      expect(cells.every((cell) => kindOfCell(cell) === CELL_KIND.ore)).toBe(true)
+    }
+  })
+
+  it('reads no kind slot on a cell packed without one', () => {
+    expect(kindSlotOfCell(oreCell(1, TIER_OFFSET_FIELD_MAX))).toBe(NO_KIND_SLOT)
+  })
+
+  it('sets and clears the kind slot without touching another field', () => {
+    const bare = oreCell(12, 8)
+    const drawn = withKindSlot(bare, 15)
+    expect(kindSlotOfCell(withKindSlot(drawn, 3))).toBe(3)
+    expect(withoutKindSlot(drawn)).toBe(bare)
+  })
+
+  it('never lets a tier offset past 8 bits spill into the kind slot', () => {
+    expect(kindSlotOfCell(oreCell(1, TIER_OFFSET_FIELD_MAX + 1))).toBe(NO_KIND_SLOT)
   })
 })
