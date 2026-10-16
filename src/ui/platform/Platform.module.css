@@ -164,3 +164,19 @@
     grid-template-columns: 1fr;
   }
 }
+
+/*
+ * A phone held upright (#470 PT-5, ticket 487): the bay takes the safe area's width in one column,
+ * from under the compact HUD's top row, so the Tech tree button stays in reach, down to above the
+ * touch cluster's 72 px Interact row; the panels scroll between header and footer as above.
+ */
+:global([data-orientation='portrait'][data-hud-density='compact']) .screen {
+  inset: 10% 0 calc(72px + 2 * var(--space-3));
+  padding: var(--space-2);
+}
+
+:global([data-orientation='portrait'][data-hud-density='compact']) .sellPanels,
+:global([data-orientation='portrait'][data-hud-density='compact']) .refineryPanels,
+:global([data-orientation='portrait'][data-hud-density='compact']) .upgradePanels {
+  grid-template-columns: 1fr;
+}

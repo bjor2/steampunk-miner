@@ -44,6 +44,18 @@
   text-align: right;
 }
 
+/*
+ * A phone held upright (#470 PT-5, ticket 487): the display switches above the controls in one
+ * column, and the keys give up their fixed width so a row's name, keys and Rebind fit 390 px.
+ */
+:global([data-orientation='portrait'][data-hud-density='compact']) .columns {
+  grid-template-columns: 1fr;
+}
+
+:global([data-orientation='portrait'][data-hud-density='compact']) .key {
+  min-width: 0;
+}
+
 .problems {
   margin: var(--space-1) 0;
   padding-left: var(--space-3);

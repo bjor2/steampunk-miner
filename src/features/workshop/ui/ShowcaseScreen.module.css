@@ -120,3 +120,53 @@
     padding: var(--space-1) var(--space-2);
   }
 }
+
+/*
+ * A phone held upright (#173 section 3, #470 PT-5): one band on top holds the header and the bay's
+ * rows, capped at a third of the screen and scrolling; the car shows in the middle and the plaques
+ * lie in one row under it, each nearly the width so the next one shows at the edge, a swipe
+ * snapping from plaque to plaque. The showcase ends above the touch cluster's 72 px Interact row.
+ */
+.showcase[data-plaque-layout='carousel'] {
+  inset: 10% 0 calc(72px + 2 * var(--space-3));
+  /* The carousel's row is wider than the screen; the column must not grow to it. */
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-rows: auto minmax(0, 1fr);
+  gap: var(--space-1);
+}
+
+.showcase[data-plaque-layout='carousel'] .bandFrame {
+  max-height: 33vh;
+  max-height: 33dvh;
+}
+
+.showcase[data-plaque-layout='carousel'] .band {
+  padding: var(--space-1) var(--space-2);
+}
+
+.showcase[data-plaque-layout='carousel'] .stage {
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-rows: minmax(0, 1fr) auto;
+  gap: var(--space-1);
+}
+
+.carouselFrame {
+  z-index: 1;
+}
+
+/* The scroll area's viewport is the frame's first child: it snaps the row plaque by plaque. */
+.carouselFrame > :first-child {
+  scroll-snap-type: x mandatory;
+}
+
+.carousel {
+  display: flex;
+  gap: var(--space-2);
+  width: max-content;
+  padding: 0 var(--space-2);
+}
+
+.carousel > * {
+  width: 88vw;
+  scroll-snap-align: center;
+}

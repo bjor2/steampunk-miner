@@ -583,7 +583,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/terrain-tools/systems/vehicleAnchors.test.ts` | 20 | 2 |
 | `src/features/terrain-tools/terrainReplay.test.ts` | 2 | 1 |
 
-### `workshop`: 13 files, 91 tests
+### `workshop`: 13 files, 93 tests
 
 | File | Tests | Sites |
 | --- | --- | --- |
@@ -599,7 +599,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/workshop/systems/render/purchaseSound.test.ts` | 9 | 9 |
 | `src/features/workshop/systems/render/showcaseReactions.test.ts` | 8 | 8 |
 | `src/features/workshop/systems/render/turntableBeat.test.ts` | 2 | 2 |
-| `src/features/workshop/ui/showcaseCards.test.ts` | 2 | 2 |
+| `src/features/workshop/ui/showcaseCards.test.ts` | 4 | 3 |
 
 ## Kernel
 
