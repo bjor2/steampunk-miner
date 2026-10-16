@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-10-17T00:23:42+01:00",
+  "updated_at": "2026-10-17T00:32:03+01:00",
   "caps": {
     "grok": 12,
     "claude": 10,
@@ -20,11 +20,11 @@
         {
           "slot": "C1",
           "state": "busy",
-          "ticket": 526,
+          "ticket": 528,
           "grok_slot": 1,
           "kind": "dev",
-          "since": "2026-10-17T00:08:00+01:00",
-          "wave": "470-4A"
+          "since": "2026-10-17T00:28:00+01:00",
+          "wave": "316-2F"
         },
         {
           "slot": "C2",
@@ -47,11 +47,11 @@
         {
           "slot": "C4",
           "state": "busy",
-          "ticket": null,
-          "grok_slot": null,
-          "kind": "aux",
-          "since": "2026-10-17T00:22:00+01:00",
-          "label": "wave-plan 316"
+          "ticket": 529,
+          "grok_slot": 4,
+          "kind": "dev",
+          "since": "2026-10-17T00:28:00+01:00",
+          "wave": "316-2G"
         },
         {
           "slot": "C5",
@@ -73,7 +73,7 @@
       "size": 6,
       "used": 4,
       "free": 2,
-      "claims_last_hour": 8,
+      "claims_last_hour": 9,
       "name": "Claude Max 1"
     },
     {
@@ -124,15 +124,15 @@
     }
   ],
   "gate": {
-    "busy": 1,
+    "busy": 0,
     "max": 3
   },
   "tester": {
     "state": "running",
     "phase": "fast",
     "sha": "146ac486faeae77b3a49a4963150a542728f1d9b",
-    "since": "2026-10-16T20:56:29Z",
-    "holds_gate": true,
+    "since": "2026-10-16T23:31:55Z",
+    "holds_gate": false,
     "claude_slot": null,
     "last_run": "2026-10-16T19:07:40Z",
     "last_nightly": "2026-10-15T20:43:15Z",
@@ -534,10 +534,10 @@
     {
       "slot": 1,
       "state": "dev",
-      "ticket": 526,
-      "since": "2026-10-17T00:08:00+01:00",
+      "ticket": 528,
+      "since": "2026-10-17T00:28:00+01:00",
       "claude_slot": 1,
-      "wave": "470-4A"
+      "wave": "316-2F"
     },
     {
       "slot": 2,
@@ -557,9 +557,11 @@
     },
     {
       "slot": 4,
-      "state": "free",
-      "ticket": null,
-      "since": null
+      "state": "dev",
+      "ticket": 529,
+      "since": "2026-10-17T00:28:00+01:00",
+      "claude_slot": 4,
+      "wave": "316-2G"
     },
     {
       "slot": 5,
@@ -614,11 +616,11 @@
     {
       "slot": 1,
       "state": "busy",
-      "ticket": 526,
+      "ticket": 528,
       "grok_slot": 1,
-      "since": "2026-10-17T00:08:00+01:00",
+      "since": "2026-10-17T00:28:00+01:00",
       "account": 1,
-      "wave": "470-4A"
+      "wave": "316-2F"
     },
     {
       "slot": 2,
@@ -641,12 +643,11 @@
     {
       "slot": 4,
       "state": "busy",
-      "ticket": null,
-      "grok_slot": null,
-      "since": "2026-10-17T00:22:00+01:00",
-      "kind": "aux",
-      "label": "wave-plan 316",
-      "account": 1
+      "ticket": 529,
+      "grok_slot": 4,
+      "since": "2026-10-17T00:28:00+01:00",
+      "account": 1,
+      "wave": "316-2G"
     },
     {
       "slot": 5,
@@ -702,17 +703,17 @@
     }
   ],
   "last_refill": {
-    "at": "2026-10-17 00:21 BST",
-    "mode": "recheck",
-    "triggers": "claude-run:wave-plan",
-    "started": "#514->C3/A1",
-    "note": "spawned 1 worker(s)"
+    "at": "2026-10-17 00:28 BST",
+    "mode": "refill-dev",
+    "triggers": "#526",
+    "started": "#528->C1/A1 #529->C4/A1",
+    "note": "spawned 2 worker(s)"
   },
   "totals": {
     "grok": {
       "size": 12,
-      "used": 3,
-      "dev": 3,
+      "used": 4,
+      "dev": 4,
       "dev_cap": 8,
       "planner": 0,
       "planner_cap": 4
@@ -730,14 +731,28 @@
     "parallel": 1,
     "list": [
       {
-        "number": 527,
-        "key": "470-4A",
-        "map": 470,
+        "number": 532,
+        "key": "316-2G",
+        "map": 316,
         "lane": "remote",
         "mode": "solo",
         "state": "running",
         "tickets": [
-          526
+          529,
+          530
+        ],
+        "done": [],
+        "live": 1
+      },
+      {
+        "number": 531,
+        "key": "316-2F",
+        "map": 316,
+        "lane": "remote",
+        "mode": "solo",
+        "state": "running",
+        "tickets": [
+          528
         ],
         "done": [],
         "live": 1
