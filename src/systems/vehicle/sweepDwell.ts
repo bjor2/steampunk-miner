@@ -15,6 +15,11 @@
  *   Carried-in work a later tick drops at a gate, a release or open ground stays charged to the
  *   tick that spent it at its carry station (GD 6209400700 Q1 (c), counted by tick), so over a leg
  *   the stations sum to the paid prices, the final carry and `droppedCarryInOf`, exactly.
+ * - **The carry debt** (ticket 471's slice 1, ticket 503; the TD shape 6214473101 on #471): what a
+ *   tick drops of its carried-in work is owed, and the next ticks' stations pay it after their
+ *   carried-in work, so after every tick the stations sum to the paid prices, the kept carry and
+ *   the debt still owed. Paid cells are cleared in full first and never discounted; the debt only
+ *   lowers later rim dwell. It is dark: only the specs' recorder (`sweptChargeFixtures.ts`) holds it.
  */
 import { MM_PER_SAMPLE } from '../world/sampleGrid'
 import type { SampleDwell } from '../world/rimDwell'
@@ -34,14 +39,18 @@ export type WalkSpend = Pick<
   'reachedStep' | 'carrySubSteps' | 'paidPrices' | 'paidSteps'
 >
 
-/** The tick's stations in walk order, less the `carriedIn` sub-steps the tick before spent. */
+/**
+ * The tick's stations in walk order, less the `carriedIn` sub-steps the tick before spent, then
+ * less the `debt` earlier ticks over-charged (none by default: the ledger as fix A built it).
+ */
 export function dwellLedgerOf(
   path: SweepPath,
   spend: WalkSpend,
   carriedIn: number,
+  debt = 0,
 ): DwellStation[] {
   const stations = [...paidStationsOf(path, spend), ...carryStationOf(path, spend)]
-  return lessCarriedIn(stations, carriedIn)
+  return lessWork(lessWork(stations, carriedIn), debt)
 }
 
 function paidStationsOf(path: SweepPath, { paidSteps, paidPrices }: WalkSpend): DwellStation[] {
@@ -56,17 +65,43 @@ function carryStationOf(path: SweepPath, { reachedStep, carrySubSteps }: WalkSpe
  * The carried-in sub-steps a tick drops: what the cursor brought past the tick's paid prices and
  * the carry it keeps. The tick before charged them at its carry station (ticket 466).
  */
-export function droppedCarryInOf(
-  { paidPrices, carrySubSteps }: Pick<WalkSpend, 'paidPrices' | 'carrySubSteps'>,
-  carriedIn: number,
-): number {
-  const kept = paidPrices.reduce((sum, price) => sum + price, 0) + carrySubSteps
-  return Math.max(0, carriedIn - kept)
+export function droppedCarryInOf(spend: KeptSpend, carriedIn: number): number {
+  return Math.max(0, carriedIn - keptWorkOf(spend))
 }
 
-/** The stations with `carriedIn` taken from the first in order; those left with none dropped. */
-function lessCarriedIn(stations: readonly DwellStation[], carriedIn: number): DwellStation[] {
-  let left = carriedIn
+/** What the debt rules read of a tick's walk: its paid prices and the carry it keeps. */
+export type KeptSpend = Pick<WalkSpend, 'paidPrices' | 'carrySubSteps'>
+
+/** The paid prices and the kept carry: the work the tick's stations hold before any is taken. */
+function keptWorkOf({ paidPrices, carrySubSteps }: KeptSpend): number {
+  return paidPrices.reduce((sum, price) => sum + price, 0) + carrySubSteps
+}
+
+/**
+ * The debt a tick leaves (ticket 471's rule): what its stations, net of the carried-in work, could
+ * not pay of the `debt` it owed, plus the carried-in work it dropped. Never below 0.
+ */
+export function carryDebtAfter(spend: KeptSpend, carriedIn: number, debt: number): number {
+  const netStations = Math.max(0, keptWorkOf(spend) - carriedIn)
+  return Math.max(0, debt - netStations) + droppedCarryInOf(spend, carriedIn)
+}
+
+/** The debt a tick starts owing: none on a fresh path, which leaves the old debt as its carry. */
+export function carryDebtOwedOn(path: Pick<SweepPath, 'isFresh'>, debt: number): number {
+  return path.isFresh ? 0 : debt
+}
+
+/**
+ * The debt once the cursor stores less carry than the tick charged at its carry station (an emptied
+ * tank keeps none, `authority/sweptCarry.ts` `carryLeftAfter`): the carry it dropped is owed too.
+ */
+export function carryDebtAfterTank(debt: number, kept: number, stored: number): number {
+  return debt + Math.max(0, kept - stored)
+}
+
+/** The stations with `work` taken from the first in order; those left with none dropped. */
+function lessWork(stations: readonly DwellStation[], work: number): DwellStation[] {
+  let left = work
   const spent: DwellStation[] = []
   for (const { at, work } of stations) {
     const taken = Math.min(work, left)
