@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "updated_at": "2026-10-16T20:56:27Z",
+  "updated_at": "2026-10-16T20:56:31Z",
   "entries": {
     "steampunk-loop/1": {
       "loop": "steampunk-loop",
@@ -493,9 +493,9 @@
       "slot": null,
       "state": "working",
       "issue": null,
-      "note": "queue run on 146ac48 (pass)",
+      "note": "testing spec #246 (Grilling: Terrain magnets as a family beyond the lodestone beacon?) on 146ac48",
       "stale_after_min": 420,
-      "updated_at": "2026-10-16T20:56:27Z",
+      "updated_at": "2026-10-16T20:56:31Z",
       "host": "grok-bot-vm-452660841"
     },
     "steampunk-loop/10": {
