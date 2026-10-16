@@ -2,10 +2,14 @@
  * The client side of `reportPose` (decision #11 amendments): the shell quantises the pose to
  * integer mm, mm/s and a 1024-scaled up vector before the command is built, so the authority and
  * `commands.ndjson` hold integers only. Action tick counts add up every fixed step between
- * reports; a report goes out at most every 12 ticks (5 per second) and never repeats an identical
- * pose with all-zero counts. The drive pushed at the report rides along as signs (ticket 279).
+ * reports; a report goes out at most every 12 ticks (5 per second), or every tick while drill ticks
+ * wait to be reported (ticket 514), and never repeats an identical pose with all-zero counts. The
+ * drive pushed at the report rides along as signs (ticket 279).
  */
-import { POSE_REPORT_INTERVAL_TICKS } from '../../constants/balance'
+import {
+  DRILL_POSE_REPORT_INTERVAL_TICKS,
+  POSE_REPORT_INTERVAL_TICKS,
+} from '../../constants/balance'
 import { MM_PER_METRE, UP_VECTOR_SCALE } from '../../constants/physics'
 import type { CommandPayloads } from '../authority/authorityCommand'
 import type { Vector2 } from './localFrame'
@@ -99,11 +103,18 @@ export function takePoseReport(
 
 function isReportDue(reporter: PoseReporter, pose: VehiclePose, tick: number): boolean {
   const isIntervalOver =
-    reporter.lastSentTick === null || tick - reporter.lastSentTick >= POSE_REPORT_INTERVAL_TICKS
+    reporter.lastSentTick === null || tick - reporter.lastSentTick >= reportIntervalOf(reporter)
   return (
     isIntervalOver &&
     (hasCountedActions(reporter.counts) || !isSamePose(reporter.lastSentPose, pose))
   )
+}
+
+/** The fixed tick reads the cadence, never the frame clock, so render rate cannot move it. */
+function reportIntervalOf(reporter: PoseReporter): number {
+  return reporter.counts.drillTicks > 0
+    ? DRILL_POSE_REPORT_INTERVAL_TICKS
+    : POSE_REPORT_INTERVAL_TICKS
 }
 
 function hasCountedActions(counts: ActionTicks): boolean {

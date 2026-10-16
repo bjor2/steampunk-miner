@@ -138,10 +138,19 @@ export const CUT_GATE_HOLD_TICKS = 6
 export const CUT_COAST_METRES = 1
 
 /**
- * Pose reports go out at most 5 times a second (#11 amendment), every 12 ticks; the authority
- * allows one interval of slack when it checks the action tick counts (#11 amendment 2).
+ * Pose reports go out at most 5 times a second (#11 amendment), every 12 ticks, while the drill is
+ * not biting; the authority allows one such interval of slack when it checks the action tick
+ * counts (#11 amendment 2), and the step bound, field entry, bot and fixtures keep this cadence.
  */
 export const POSE_REPORT_INTERVAL_TICKS = 12
+
+/**
+ * While drill ticks wait to be reported (the drill bit since the last report) a report goes out
+ * every tick (ticket 514, the TD shape on #441 6223171858): at 12 the body followed a 5 Hz cut, a
+ * hidden ceiling of about 5 m/s that Bjor's no-cap rule forbids, and interval 2 missed interval 1's
+ * speed by 8-11% on the fast rig. The authority's slack stays `POSE_REPORT_INTERVAL_TICKS`.
+ */
+export const DRILL_POSE_REPORT_INTERVAL_TICKS = 1
 
 /** The drill head turns to a new facing over about 0.13 s (#7), while the body does not rotate. */
 export const SWIVEL_TICKS = 8
