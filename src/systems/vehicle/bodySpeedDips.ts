@@ -43,7 +43,7 @@ export interface BodySpeedSummary {
 }
 
 /** Within this share short of the commanded speed, the body holds it (#397's 5% line). */
-export const HELD_SHARE = 0.05
+export const HELD_SHARE = 1 / 20
 
 export function kindOfBodySpeedTick(tick: BodySpeedTick): BodySpeedTickKind {
   if (isHeld(tick)) return 'held'

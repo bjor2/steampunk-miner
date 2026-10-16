@@ -35,7 +35,7 @@ import {
 } from './vehicleController'
 
 /** Where along the line ahead, past the body's face in metres, a cell opening counts (#433). */
-const LINE_AHEAD_M = [0.05, 0.55, 1.05, 1.55, 2.05]
+const LINE_AHEAD_M = [1 / 20, 0.55, 1.05, 1.55, 2.05]
 
 /** One fixed tick of a script, read after it. */
 export interface TickRead {
