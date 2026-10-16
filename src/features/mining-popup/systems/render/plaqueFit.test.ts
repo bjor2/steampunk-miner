@@ -27,6 +27,11 @@ describe('plaque fit', () => {
     expect(plaqueFitOf(layoutOf(width, height, isTvMode))).toBe('line')
   })
 
+  it('measures the ring down the height, so a small phone held upright shows one line (ticket 484)', () => {
+    expect(plaqueFitOf(layoutOf(360, 640))).toBe('line')
+    expect(plaqueFitOf(layoutOf(390, 844))).toBe('full')
+  })
+
   it('shows the full plaque before the screen is first fitted', () => {
     expect(plaqueFitOf(null)).toBe('full')
   })

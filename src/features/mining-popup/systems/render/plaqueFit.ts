@@ -1,7 +1,8 @@
 /**
  * Whether the full plaque fits the top band of this screen (#172 §2 placement, §4 readability):
  * between the banner and whatever is nearer of the vehicle's 3-tile ring and the top of a column
- * of 3 chips rising above a downward drill, at the default 12 m zoom. The UI scales with the
+ * of 3 chips rising above a downward drill, at the default 12 m zoom down the screen's height
+ * (ticket 484: in either orientation). The UI scales with the
  * short axis (and 4x in TV mode) but the world does not, so a phone held sideways and TV mode
  * leave no room: there the plaque is one line in the bottom band, still outside the ring.
  *
@@ -9,6 +10,7 @@
  * sizes are the plaque's and chip's style sheets', measured at 1080p.
  */
 import { VIEW_SHORT_AXIS_DEFAULT_M } from '../../../../constants/scene'
+import { pixelsPerMetreOf } from '../../../../systems/render/viewZoom'
 import type { ScreenLayout } from '../../../../systems/views/screenLayout'
 import {
   CHIP_REACH_TILES,
@@ -50,7 +52,7 @@ function fullPlaqueBottomOf({ uiScale, tvSafeInset }: ScreenLayout): number {
 
 /** Pixels from the top: the nearer of the ring's top and the chip column's top. */
 function topBandFloorOf({ stage, uiScale }: ScreenLayout): number {
-  const pixelsPerMetre = Math.min(stage.width, stage.height) / VIEW_SHORT_AXIS_DEFAULT_M
+  const pixelsPerMetre = pixelsPerMetreOf(stage.height, VIEW_SHORT_AXIS_DEFAULT_M)
   const centre = stage.height / 2
   const ringTop = centre - CLEAR_RING_TILES * pixelsPerMetre
   const chipHeight = CHIP_HEIGHT_REM * ROOT_FONT_PX * uiScale
