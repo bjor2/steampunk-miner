@@ -78,6 +78,7 @@ import { ITEM_HOOK_REGISTRY } from '../systems/registries/itemHooks'
 import { LIVE_BEACON_REGISTRY } from '../systems/registries/liveBeacon'
 import { ITEM_DESCRIPTION_ENTRY_REGISTRY } from '../systems/registries/itemDescriptionEntries'
 import { ORE_LOOK_REGISTRY } from '../systems/registries/oreLook'
+import { ORE_PICKUP_REGISTRY } from '../systems/registries/orePickup'
 import { ORE_DRILL_CLASS_REGISTRY } from '../systems/registries/oreDrillClasses'
 import { ORE_SIGNATURE_REGISTRY, ORE_TYPE_REGISTRY } from '../systems/registries/oreTypes'
 import { PART_MOTION_REQUEST_REGISTRY } from '../systems/registries/partMotionRequests'
@@ -145,6 +146,7 @@ export function registrarFor(sliceId: string): SliceRegistrar {
     inputReaction: (reaction) => add(INPUT_REACTION_REGISTRY, reaction),
     generationHook: (hook) => add(GENERATION_HOOK_REGISTRY, hook),
     oreLook: (provider) => add(ORE_LOOK_REGISTRY, provider),
+    orePickup: (provider) => add(ORE_PICKUP_REGISTRY, provider),
     cellGateLook: (provider) => add(CELL_GATE_LOOK_REGISTRY, provider),
     magneticGround: (provider) => add(MAGNETIC_GROUND_REGISTRY, provider),
     shockShield: (shield) => add(SHOCK_SHIELD_REGISTRY, shield),

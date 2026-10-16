@@ -23,8 +23,9 @@
  */
 import { DRILL_SUBSTEPS_PER_TICK } from '../../constants/balance'
 import { casingHardness } from '../economy/casingGrades'
-import { coreHardness, blockHardness, oreSalePrice } from '../economy/oreEconomy'
+import { coreHardness, blockHardness, oreSalePrice, oreTier } from '../economy/oreEconomy'
 import { toCanonical, type BigStat } from '../money'
+import { pickedUpUnitOf, type PickedUp, type PickupFind } from '../registries/orePickup'
 import { drillDamage, subStepsPerTile, ticksPerTile, type DrillStats } from '../vehicle/drillRule'
 import { drillStampOf } from '../vehicle/drillStamp'
 import { ENERGY_QUANTA_PER_TICK } from '../vehicle/energyQuanta'
@@ -361,20 +362,42 @@ function collectTile(
 }
 
 /**
- * One ore unit into the hold at its sale tier (#232), named with its tier, ore id, depth and chunk
- * (#122); with a full hold it is lost, never refused (#7).
+ * One ore unit into the hold at the tier the ore pickup seam keeps it at (#232, ticket 509: its own
+ * sale tier, or its band's when the rarity trip clamp holds it), named with its tier, ore id, depth
+ * and chunk (#122); with a full hold it is lost, never refused (#7), and never asks the seam.
  */
 export function collectOreUnit(state: AuthorityState, playerId: string, ore: MinedOre): RuleEffect {
-  const vehicle = vehicleOf(state, playerId)
-  if (!hasCargoRoom(vehicle)) return { state, events: [{ type: 'StorageFull', lostUnits: 1 }] }
-  const { saleTier, ...named } = ore
+  if (!hasCargoRoom(vehicleOf(state, playerId))) {
+    return { state, events: [{ type: 'StorageFull', lostUnits: 1 }] }
+  }
+  const picked = pickedUpUnitOf(state, playerId, pickupFindOf(state, ore))
+  return storeOreUnit(picked, playerId, ore)
+}
+
+function pickupFindOf(
+  state: AuthorityState,
+  { band, resourceTier, saleTier }: MinedOre,
+): PickupFind {
+  const planetIndex = state.planet.index
+  return { planetIndex, band, tierAboveBand: resourceTier - oreTier(planetIndex, band), saleTier }
+}
+
+/** The unit into the hold at the picked tier; `band` and `saleTier` stay off `CargoAdded`. */
+function storeOreUnit(picked: PickedUp, playerId: string, ore: MinedOre): RuleEffect {
+  const vehicle = vehicleOf(picked.state, playerId)
+  const { saleTier: _ownSaleTier, band: _band, ...named } = ore
   return {
-    state: withVehicle(state, playerId, {
+    state: withVehicle(picked.state, playerId, {
       ...vehicle,
-      cargo: withOreUnit(vehicle.cargo, saleTier),
+      cargo: withOreUnit(vehicle.cargo, picked.saleTier),
     }),
     events: [
-      { type: 'CargoAdded', ...named, amount: 1, value: toCanonical(oreSalePrice(saleTier)) },
+      {
+        type: 'CargoAdded',
+        ...named,
+        amount: 1,
+        value: toCanonical(oreSalePrice(picked.saleTier)),
+      },
     ],
   }
 }

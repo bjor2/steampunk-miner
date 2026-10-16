@@ -49,6 +49,7 @@ import type { HullDamageIntercept } from '../systems/registries/hullDamageInterc
 import type { ItemDescriberProvider } from '../systems/registries/itemDescriber'
 import type { ItemDescriptionEntry } from '../systems/registries/itemDescriptionEntries'
 import type { OreLookProvider } from '../systems/registries/oreLook'
+import type { OrePickupProvider } from '../systems/registries/orePickup'
 import type { CellGateLookProvider } from '../systems/registries/cellGateLook'
 import type { MagneticGroundProvider } from '../systems/registries/magneticGround'
 import type { PlanetCardLineSource } from '../systems/registries/planetCardLines'
@@ -164,6 +165,8 @@ export interface SliceRegistrar {
   generationHook(hook: GenerationHook): void
   /** One provider across all slices. */
   oreLook(provider: OreLookProvider): void
+  /** One provider across all slices: the tier an ore unit is kept at in the hold (ticket 509). */
+  orePickup(provider: OrePickupProvider): void
   /** One provider across all slices: the gate each cell shows in the ground (ticket 298). */
   cellGateLook(provider: CellGateLookProvider): void
   /** One provider across all slices: a magnetic planet's fields and electrified cells (#290). */

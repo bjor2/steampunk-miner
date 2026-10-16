@@ -89,6 +89,7 @@ function richestCellsOf(planet: number, band: number, count: number) {
   const ore = {
     resourceTier: tier,
     saleTier: tier,
+    band,
     oreId: `kernel.metal.t${tier}`,
     depthTiles: 3,
     chunk: '0,0',

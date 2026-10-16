@@ -8,10 +8,11 @@
  * default `kernel.<family>.t<tier>` until the `ores` slice provides a catalogue.
  *
  * `saleTier` is the tier the unit is kept and sold at (#232): a signature's is one up. It stays off
- * `CargoAdded`, whose `resourceTier` is the cell's own.
+ * `CargoAdded`, whose `resourceTier` is the cell's own. So does `band`, the band of the cell's tile,
+ * which the ore pickup seam reads (ticket 509).
  */
 import { oreTier } from '../economy/oreEconomy'
-import { depthTilesAt } from '../world/planetGeometry'
+import { bandOfTile, depthTilesAt } from '../world/planetGeometry'
 import type { PlanetParams } from '../world/planetParams'
 import { oreCargoTagsOf, oreTypeOf, saleTierOf, type OreCargoTags } from '../registries/oreTypes'
 import { chunkKey, chunkOfTile, type TilePoint } from '../world/tileGrid'
@@ -22,6 +23,8 @@ const BAND_ONE = 1
 export interface MinedOre extends OreCargoTags {
   resourceTier: number
   saleTier: number
+  /** The band of the tile the cell lay in. */
+  band: number
   oreId: string
   /** Whole tiles below the surface of the cell's column, as the run log counts depth. */
   depthTiles: number
@@ -35,6 +38,7 @@ export function minedOreOf(params: PlanetParams, tile: TilePoint, cell: number):
   return {
     resourceTier,
     saleTier: saleTierOf(ore),
+    band: bandOfTile(params, tile.tx, tile.ty),
     oreId: ore.id,
     ...oreCargoTagsOf(ore),
     depthTiles: depthTilesAt(params, tile.tx, tile.ty),
