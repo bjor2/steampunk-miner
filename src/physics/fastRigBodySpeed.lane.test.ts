@@ -42,6 +42,11 @@ import {
 // levels; past #396's 4-tick floor (#397 removes it) they cut at 25, 44, 56, 62 and 78 m/s, under
 // it all of them cut at 15 m/s. A lane: it runs only when named, prints the table and writes the
 // trace to balance-report/fast-rig-body-speed.ndjson for comparing runs across commits.
+//
+// Since ticket 459 the substeps collide with the world the tick's own cut left, so no steady tick
+// dips at all, and no tick moves the body slower than commanded (GD ruling 6209399402 on #459). The
+// down leg's distance and its gate-shut ticks are logged; the body now reaches the cut's front and
+// waits there for the cut (#492), so the gate-shut count is held to the recorded rows.
 
 const RIGS: Readonly<Record<string, Record<string, number>>> = {
   'stored 250/600': { drill_power: 250, drill_tip: 600 },
@@ -54,6 +59,17 @@ const FRAME_RATES = [30, 144]
 const DOWN_LEG_SECONDS = 3
 const REPORT_FOLDER = new URL('../../balance-report/', import.meta.url)
 const RUN_TIMEOUT_MS = 600_000
+/**
+ * The down leg's gate-shut ticks with ticket 459's halo sync, at both frame rates (GD ruling
+ * 6209399402 on #459): may only shrink, as #492 keeps the cut ahead of the body.
+ */
+const GATE_SHUT_TICKS_MAX: Readonly<Record<string, number>> = {
+  'stored 250/600': 35,
+  'rig 1 (#400)': 42,
+  'stored 320/600': 75,
+  'stored 330/600': 41,
+  'stored 350/600': 76,
+}
 /** The body's half width, and the slab's sample spacing across and along it (half a sample). */
 const BODY_HALF_M = 0.45
 const SLAB_SPACING_M = 0.125
@@ -79,6 +95,10 @@ interface LegRun {
   framesPerSecond: number
   ticks: TraceTick[]
   summary: BodySpeedSummary
+  /** How far the body moved along its facing over the down leg, in m. */
+  distanceM: number
+  /** Ticks of the down leg the cut gate stood shut. */
+  gateShutTicks: number
 }
 
 /** What one tick of the live loop left, with the cut-follow read its step took. */
@@ -268,9 +288,24 @@ function runAllLegs(): LegRun[] {
     FRAME_RATES.map((framesPerSecond) => {
       resetGameStore()
       const ticks = playDownLeg(levels, framesPerSecond)
-      return { rig, framesPerSecond, ticks, summary: summariseBodySpeed(steadyTicksOf(ticks)) }
+      const summary = summariseBodySpeed(steadyTicksOf(ticks))
+      const distanceM = distanceCoveredM(ticks)
+      return { rig, framesPerSecond, ticks, summary, distanceM, gateShutTicks: gateShutOf(ticks) }
     }),
   )
+}
+
+function gateShutOf(ticks: readonly TraceTick[]): number {
+  return ticks.filter((tick) => tick.gate === 0).length
+}
+
+function distanceCoveredM(ticks: readonly TraceTick[]): number {
+  return ticks.reduce((metres, tick) => metres + tick.speed * PHYSICS_TIMESTEP, 0)
+}
+
+/** The lowest share under 1.00 at the table's two decimals; a held tick reads 0.99995 in float. */
+function isSlowerThanCommanded({ lowestShare }: BodySpeedSummary): boolean {
+  return Math.round(lowestShare * 100) < 100
 }
 
 function vCutsOf(ticks: readonly TraceTick[]): string {
@@ -280,8 +315,8 @@ function vCutsOf(ticks: readonly TraceTick[]): string {
 
 function formatLegTable(runs: readonly LegRun[]): string {
   const header =
-    'rig | fps | vCut m/s | steady ticks | dips | stale halo | uncut ground | unexplained | lowest share'
-  const rows = runs.map(({ rig, framesPerSecond, ticks, summary: s }) =>
+    'rig | fps | vCut m/s | steady ticks | dips | stale halo | uncut ground | unexplained | lowest share | down leg m | gate shut'
+  const rows = runs.map(({ rig, framesPerSecond, ticks, summary: s, distanceM, gateShutTicks }) =>
     [
       rig,
       framesPerSecond,
@@ -292,14 +327,16 @@ function formatLegTable(runs: readonly LegRun[]): string {
       s.uncutGround,
       s.unexplained,
       s.lowestShare.toFixed(2),
+      distanceM.toFixed(1),
+      gateShutTicks,
     ].join(' | '),
   )
   return [header, ...rows].join('\n')
 }
 
 function writeLegReport(runs: readonly LegRun[]): void {
-  const lines = runs.flatMap(({ rig, framesPerSecond, ticks, summary }) => [
-    { report: 'fast-rig-body-speed', ticket: 440, rig, framesPerSecond, summary },
+  const lines = runs.flatMap(({ rig, framesPerSecond, ticks, summary, ...leg }) => [
+    { report: 'fast-rig-body-speed', ticket: 440, rig, framesPerSecond, summary, ...leg },
     ...ticks.map((tick) => ({ rig, framesPerSecond, ...tick, kind: kindOf(tick) })),
   ])
   mkdirSync(REPORT_FOLDER, { recursive: true })
@@ -331,5 +368,22 @@ describe('fast-rig body speed while cutting (ticket 440)', () => {
       )
       expect(fast).toEqual(slow)
     }
+  })
+
+  it('dips on no steady tick of any rig, at 30 and 144 frames/s (ticket 459)', () => {
+    const dipping = runs.filter(({ summary }) => summary.dips > 0)
+    expect(dipping.map(({ rig, framesPerSecond }) => `${rig} ${framesPerSecond}`)).toEqual([])
+  })
+
+  it('moves the body no slower than commanded on any steady tick of any rig (ticket 459)', () => {
+    const slower = runs.filter(({ summary }) => isSlowerThanCommanded(summary))
+    expect(slower.map(({ rig, summary }) => `${rig}: ${summary.lowestShare}`)).toEqual([])
+  })
+
+  it('holds the cut gate shut no more ticks than recorded on any rig (ticket 459, #492)', () => {
+    const shutLonger = runs.filter(
+      ({ rig, gateShutTicks }) => gateShutTicks > GATE_SHUT_TICKS_MAX[rig],
+    )
+    expect(shutLonger.map(({ rig, gateShutTicks }) => `${rig}: ${gateShutTicks}`)).toEqual([])
   })
 })

@@ -259,8 +259,18 @@ programs }` from three's `renderer.info` of the game canvas), read only when cal
   tick's own cut opened), uncut ground (still standing after the cut) or unexplained. It writes the
   trace to `balance-report/fast-rig-body-speed.ndjson`. Under #396's 4-tick floor every rig cuts at
   15 m/s, and the rigs reach 25 to 78 m/s only once #397 takes the floor out. A lane (about 20 s),
-  so it runs only when named; it fails only when a rig has no steady cut tick or the two frame rates
-  differ.
+  so it runs only when named; it fails when a rig has no steady cut tick or the two frame rates
+  differ, and since ticket 459 (the halo synced to the tick's post-cut world) when any steady tick
+  dips, any moves slower than commanded (at the table's two decimals) or a rig holds the cut gate
+  shut more ticks than `GATE_SHUT_TICKS_MAX` records (it may only shrink, #492). It prints each
+  rig's down-leg distance and gate-shut ticks.
+- **Post-cut halo** (ticket 459): `src/physics/postCutHalo.test.ts` cuts a level bore along planet
+  1's arc with the real controller and halo, carving each tick past the face by the commanded step
+  the way a `drillStep` would, then handing the controller that world (`syncGround`) before the
+  substeps: at 25, 44 and 78 m/s every held step drives into ground the tick's cut opened, moves its
+  full step (±1 mm) and never ends inside ground (about 2 s). `vehicleLoop.test.ts` checks the live
+  loop hands the substeps the world its own drill step and report left with `drill.sweptCut` on, and
+  no other world with it off.
 - **Level release trace** (ticket 458, measurement only): `src/physics/levelReleaseTrace.lane.test.ts`
   plays `cutFollowRelease.test.ts`'s level release sweep (40 phases) for the 15 m/s rig and the
   rig-heavy one at 30 and 144 frames/s, and traces the 8 pressed ticks before letting go and the 12
@@ -312,7 +322,8 @@ programs }` from three's `renderer.info` of the game canvas), read only when cal
   the authority's gate stood open (the body then breaks out of the ground and travels). The commanded speed is the open
   gate's `vCut`, carried through a shut gate and a cleared slab. `src/physics/cutFollowRelease.test.ts`
   lets go of a followed cut at every tick of a cell's cycle (a fresh rig a phase) and wants the body
-  stopped within 6 ticks (about 5 minutes). Both share the rig of `src/physics/cutFollowFixtures.ts`.
+  stopped within 6 ticks (about 5 minutes); stored 20's level sweep is a todo on #465 since ticket
+  459 (the toe's gravity slide after letting go). Both share the rig of `src/physics/cutFollowFixtures.ts`.
 - **Body-wide bore at any cells a tick** (ticket 439): `src/systems/authority/sweptFreshCarve.test.ts`
   cuts planet 1's column and its tilted radius with rigs named by their band-1 cut speed (25 to
   3600 m/s, the drill found by `subStepsPerTile` in `sweptRigFixtures.ts`), a tick count to the
@@ -345,12 +356,14 @@ programs }` from three's `renderer.info` of the game canvas), read only when cal
   (about 2 s). `vehicle/carryWalk.test.ts` checks the release on the pure walk (one released cell a
   tick, never past a stop, runs equal to the per-cell walk). `src/physics/cutSmoothness.test.ts`
   judges down, level and up legs per rig against its own commanded speed at 30 and 144 frames/s:
-  no backward tick, none under 80% and at most 2% of ticks more than 5% off (the interim bar; the
-  stale-halo lines are todos on #459), and holds the up legs (15 m/s, rig-heavy and 44 m/s) to
+  no backward tick, none under 80% and at most 2% of ticks more than 5% off (the interim bar; since
+  ticket 459 the 25 m/s up and 44 m/s down legs hold it, the 15 m/s and rig-heavy level legs are
+  todos on #465), and holds the up legs (15 m/s, rig-heavy, 25 and 44 m/s) to
   #397's strict line on every ramped-up tick (ticket 432; the paid-not-free specs run an up leg
   too). `cutFollowRelease.test.ts` pairs the 15 m/s rig's level
   release phases main followed (`MAIN_FOLLOWED_LEVEL`) and wants their backward ticks no deeper and
-  no larger in sum than main's.
+  no larger in sum than main's; at 30 frames/s the sum is a todo on #491 and #460 since ticket 459,
+  held meanwhile by a ratchet on the sum and the backward ticks (`TOE_RATCHET`) that may only shrink.
 - **Known red** (ticket 419, the TD on #396 section 2): `CAMPAIGN_PACING_KNOWN_RED`
   (`src/constants/knownRed.ts`) is the one known-red marker in the repo: one gate
   (`campaignPacingGate`), one finding (#417), no registry. The gate still runs in full;
