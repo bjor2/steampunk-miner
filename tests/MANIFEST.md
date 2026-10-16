@@ -347,7 +347,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/ore-visuals/systems/oreGradeChannels.test.ts` | 7 | 7 |
 | `src/features/ore-visuals/systems/render/oreLookProvider.test.ts` | 21 | 10 |
 
-### `ores`: 15 files, 101 tests
+### `ores`: 16 files, 104 tests
 
 | File | Tests | Sites |
 | --- | --- | --- |
@@ -366,6 +366,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/ores/systems/raritySolve.test.ts` | 5 | 5 |
 | `src/features/ores/systems/rarityTiers.test.ts` | 11 | 11 |
 | `src/features/ores/systems/rarityTripClamp.test.ts` | 7 | 7 |
+| `src/features/ores/systems/rarityTripShare.test.ts` | 3 | 3 |
 
 ### `planet-mix`: 24 files, 144 tests
 
