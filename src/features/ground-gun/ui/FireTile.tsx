@@ -9,6 +9,7 @@
  */
 import type { CSSProperties, PointerEvent } from 'react'
 import { useGameStore } from '../../../store/gameStore'
+import { hudBoxOf } from '../../../ui/hud/hudBoxes'
 import { VectorIcon } from '../../../ui/VectorIcon'
 import { useScreenModel } from '../../../ui/useScreenModel'
 import type { BoreAutoReading } from '../../../systems/views/boreAutoReading'
@@ -44,6 +45,7 @@ function ArmedFireTile({
         className={styles.tile}
         style={ring}
         data-testid={FIRE_TILE_TEST_ID}
+        {...hudBoxOf('control')}
         data-recovering={recoveryFilledPercent < 100 || undefined}
         aria-label="Bore gun"
         tabIndex={-1}

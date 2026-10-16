@@ -5,6 +5,7 @@
 import { useRef, useState, type PointerEvent } from 'react'
 import { knobOffsetOf } from '../../systems/input/touchControls'
 import { landStick, liftStick, pushStick, stickPresence } from '../../store/touchRuntime'
+import { HUD_ZONE_ATTRIBUTE, STICK_ZONE_ID } from '../hud/hudBoxes'
 import { DEVICE_UI_IDS } from '../stage/deviceIds'
 import styles from './TouchControls.module.css'
 
@@ -20,6 +21,7 @@ export function StickZone() {
     <div
       className={styles.stickZone}
       data-testid={DEVICE_UI_IDS.touchStickZone}
+      {...{ [HUD_ZONE_ATTRIBUTE]: STICK_ZONE_ID }}
       onPointerDown={(event) => setSpot(landStickAt(event))}
       onPointerMove={(event) => pushStickTo(event, knobRef.current)}
       onPointerUp={(event) => setSpot(liftStickOf(event))}

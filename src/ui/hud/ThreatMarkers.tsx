@@ -7,6 +7,7 @@ import { readoutTextOf } from '../../systems/views/hudCallouts'
 import type { ThreatMarker } from '../../systems/views/threatMarkers'
 import { UI_ID_TEMPLATES } from '../ids'
 import { TitleOneLine } from '../kit/TitleOneLine'
+import { hudBoxOf } from './hudBoxes'
 import styles from './Hud.module.css'
 
 export function ThreatMarkers({ threats }: { threats: readonly ThreatMarker[] }) {
@@ -16,6 +17,7 @@ export function ThreatMarkers({ threats }: { threats: readonly ThreatMarker[] })
         <span
           key={index}
           className={styles.threat}
+          {...hudBoxOf('threat')}
           data-testid={UI_ID_TEMPLATES.hudThreat(index)}
           data-kind={threat.kind}
           data-octant={threat.octant}

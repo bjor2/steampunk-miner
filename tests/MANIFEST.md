@@ -1308,6 +1308,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 
 | File | Tests | Sites |
 | --- | --- | --- |
+| `src/ui/hud/hudBoxes.test.ts` | 4 | 4 |
 | `src/ui/hud/hudPanels.test.ts` | 6 | 6 |
 | `src/ui/hud/hudText.test.ts` | 6 | 6 |
 | `src/ui/iconCoverage.test.ts` | 9 | 9 |
@@ -1402,7 +1403,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/views/plaqueModel.test.ts` | 6 | 6 |
 | `src/systems/views/promptDevice.test.ts` | 8 | 8 |
 | `src/systems/views/refineryBayModel.test.ts` | 4 | 4 |
-| `src/systems/views/screenLayout.test.ts` | 20 | 20 |
+| `src/systems/views/screenLayout.test.ts` | 26 | 26 |
 | `src/systems/views/scrollRail.test.ts` | 5 | 5 |
 | `src/systems/views/sellBayModel.test.ts` | 13 | 13 |
 | `src/systems/views/settingsModel.test.ts` | 5 | 5 |

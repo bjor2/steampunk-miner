@@ -5,6 +5,7 @@
  */
 import { useGameStore } from '../../../store/gameStore'
 import type { ElementText } from '../../../systems/views/uiText'
+import { hudBoxOf } from '../../../ui/hud/hudBoxes'
 import { Button } from '../../../ui/kit/Button'
 import { TitleOneLine } from '../../../ui/kit/TitleOneLine'
 import { TECH_TREE_SCREEN_ID } from './TechTreeScreen'
@@ -20,7 +21,7 @@ const BUTTON_TEXT: ElementText = {
 export function TechTreeButton() {
   const openScreen = useGameStore((state) => state.openScreen)
   return (
-    <div className={styles.slot} data-testid="tech-tree-open">
+    <div className={styles.slot} data-testid="tech-tree-open" {...hudBoxOf('tech-tree')}>
       <TitleOneLine text={BUTTON_TEXT} level="span" layout="row" glyphSize="hud">
         <Button label="Open" onPress={() => openScreen(TECH_TREE_SCREEN_ID)} />
       </TitleOneLine>

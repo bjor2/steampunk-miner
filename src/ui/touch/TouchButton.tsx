@@ -6,6 +6,7 @@
 import { useState, type ReactNode } from 'react'
 import { ACTION_MAP, actionDefOf, type ActionId } from '../../systems/input/actionMap'
 import { pressTouchButton, releaseTouchButton } from '../../store/touchRuntime'
+import { hudBoxOf } from '../hud/hudBoxes'
 import { touchButtonIdOf } from '../stage/deviceIds'
 import styles from './TouchControls.module.css'
 
@@ -33,6 +34,7 @@ export function TouchButton({
       type="button"
       className={className}
       data-testid={touchButtonIdOf(action)}
+      {...hudBoxOf('control')}
       data-action={action}
       data-pressed={isPressed || undefined}
       aria-label={actionDefOf(ACTION_MAP, action).displayName}

@@ -14,12 +14,13 @@ import type { AmountReading } from '../../systems/views/viewParts'
 import { UI_IDS } from '../ids'
 import { GaugeDial } from '../kit/Gauge'
 import { TitleOneLine, type IconValue } from '../kit/TitleOneLine'
+import { hudBoxOf } from './hudBoxes'
 import styles from './Hud.module.css'
 
 export function GaugeCluster({ model }: { model: HudModel }) {
   const isEnergyWarned = model.warning.level !== 'ok'
   return (
-    <div className={styles.cluster}>
+    <div className={styles.cluster} {...hudBoxOf('gauges')}>
       <HudGauge
         textId="hud.energy"
         label="Energy"

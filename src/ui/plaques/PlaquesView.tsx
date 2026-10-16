@@ -5,13 +5,14 @@
 import type { PlaqueModel } from '../../systems/views/plaqueModel'
 import { UI_IDS } from '../ids'
 import { Plaque } from '../kit/Plaque'
+import { hudBoxOf } from '../hud/hudBoxes'
 import styles from './Plaques.module.css'
 
 export function PlaquesView({ model }: { model: PlaqueModel }) {
   return (
     <div className={styles.plaques}>
       {model.transmission !== null && (
-        <div className={styles.transmission}>
+        <div className={styles.transmission} {...hudBoxOf('transmission')}>
           <Plaque
             lines={model.transmission.lines}
             iconId={model.transmission.iconId}
@@ -20,7 +21,7 @@ export function PlaquesView({ model }: { model: PlaqueModel }) {
         </div>
       )}
       {model.hint !== null && (
-        <div className={styles.hint} data-hint={model.hint.id}>
+        <div className={styles.hint} data-hint={model.hint.id} {...hudBoxOf('hint')}>
           <Plaque
             lines={model.hint.lines}
             iconId={model.hint.iconId}

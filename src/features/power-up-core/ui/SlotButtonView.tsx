@@ -7,6 +7,7 @@
  * link fires this item, its tile flashes as its cooldown ring starts.
  */
 import type { CSSProperties } from 'react'
+import { hudBoxOf } from '../../../ui/hud/hudBoxes'
 import { ItemCard } from '../../../ui/kit/ItemCard'
 import { VectorIcon } from '../../../ui/VectorIcon'
 import { Button } from '../../../ui/kit/Button'
@@ -30,6 +31,7 @@ export function SlotButtonView({ button }: { button: SlotButton }) {
         className={styles.button}
         style={rings}
         data-testid={`power-up-slot-${button.slot}`}
+        {...hudBoxOf('control')}
         data-acting={button.isActing || undefined}
         data-on={button.isOn || undefined}
         data-cooling={button.cooldownPercent > 0 || undefined}

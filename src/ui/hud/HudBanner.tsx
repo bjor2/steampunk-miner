@@ -17,13 +17,14 @@ import type { HudModel } from '../../systems/views/hudModel'
 import { UI_ID_TEMPLATES, UI_IDS } from '../ids'
 import { TitleOneLine } from '../kit/TitleOneLine'
 import { VectorIcon } from '../VectorIcon'
+import { hudBoxOf } from './hudBoxes'
 import styles from './Hud.module.css'
 
 export function HudBanner({ model, isFlashing }: { model: HudModel; isFlashing: boolean }) {
   const { warning, chargeFuse, vehicleState } = model
   const hasCountdown = vehicleState.rescueCountdownTicks !== null
   return (
-    <div className={styles.banner}>
+    <div className={styles.banner} {...hudBoxOf('status')}>
       <StatusStack stack={model.statuses} isFlashing={isFlashing} />
       {warning.level !== 'ok' && (
         <div

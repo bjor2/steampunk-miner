@@ -9,12 +9,13 @@ import { calloutTextOf, readoutTextOf } from '../../systems/views/hudCallouts'
 import type { HudModel } from '../../systems/views/hudModel'
 import { UI_IDS } from '../ids'
 import { TitleOneLine } from '../kit/TitleOneLine'
+import { hudBoxOf } from './hudBoxes'
 import { SlowDeviceChip } from './SlowDeviceChip'
 import styles from './Hud.module.css'
 
 export function HudPrompts({ model }: { model: HudModel }) {
   return (
-    <div className={styles.prompts}>
+    <div className={styles.prompts} {...hudBoxOf('prompts')}>
       {model.dockPrompt.isShown && (
         <Prompt id="hud.prompt.dock" testId={UI_IDS.hudDockPrompt} text={model.dockPrompt.text} />
       )}

@@ -14,12 +14,13 @@ import { UI_IDS } from '../ids'
 import { TitleOneLine, type IconValue } from '../kit/TitleOneLine'
 import { VectorIcon } from '../VectorIcon'
 import { CompassArrow } from './CompassArrow'
+import { hudBoxOf } from './hudBoxes'
 import styles from './Hud.module.css'
 
 export function PositionPanel({ model }: { model: HudModel }) {
   const { depth, casing, guns, boreAuto, charges, dockArrow, coreDistance, tileTime } = model
   return (
-    <div className={styles.position}>
+    <div className={styles.position} {...hudBoxOf('readouts')}>
       <Line id="hud.depth" label="Depth" facts={[factOf('depth', depth.text, UI_IDS.hudDepth)]} />
       <Line
         id="hud.band"

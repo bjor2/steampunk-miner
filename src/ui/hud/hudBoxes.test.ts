@@ -1,0 +1,63 @@
+import { createElement } from 'react'
+import { renderToString } from 'react-dom/server'
+import { beforeEach, describe, expect, it } from 'vitest'
+import { resetGameStore } from '../../store/gameStore'
+import { readHudModel, readTouchSituation } from '../../store/screenReads'
+import { PlaquesView } from '../plaques/PlaquesView'
+import { TouchControlsView } from '../touch/TouchControls'
+import { everyReadoutOf } from './hudFixtures'
+import { HUD_BOX_IDS, HUD_ZONE_ATTRIBUTE, STICK_ZONE_ID } from './hudBoxes'
+import { HudView } from './HudView'
+
+// #500 TD shape 4.1: every HUD box carries `data-hud` on its root, so the layout specs can measure
+// it. A server render from props draws each box as the game would.
+
+const PLAQUES = {
+  hint: { id: 'hint_sell', iconId: 'icon-hint', lines: ['Ore fills your cargo hold.'] },
+  transmission: { id: 'tx_intro', iconId: 'icon-transmission', lines: ['Welcome, driller.'] },
+}
+
+const hudBoxesIn = (html: string) => [...html.matchAll(/data-hud="([^"]+)"/g)].map((m) => m[1])
+
+function drawEveryBox(): string {
+  const hud = createElement(HudView, { model: everyReadoutOf(readHudModel()), isFlashing: false })
+  const touch = createElement(TouchControlsView, {
+    situation: { ...readTouchSituation(), hasGuns: true, hasChargeRack: true },
+    isLeftHanded: false,
+  })
+  return [hud, createElement(PlaquesView, { model: PLAQUES }), touch]
+    .map((element) => renderToString(element))
+    .join('')
+}
+
+beforeEach(() => resetGameStore())
+
+describe('HUD boxes (#500)', () => {
+  it('lists each data-hud id once', () => {
+    const ids = Object.values(HUD_BOX_IDS)
+    expect(new Set(ids).size).toBe(ids.length)
+  })
+
+  it('sets data-hud on every HUD box root, the loaded tech tree button included', () => {
+    const boxes = new Set(hudBoxesIn(drawEveryBox()))
+    expect([...boxes].sort()).toEqual(Object.values(HUD_BOX_IDS).sort())
+  })
+
+  it('draws one data-hud box per threat marker, never one for the threats layer', () => {
+    const html = renderToString(
+      createElement(HudView, { model: everyReadoutOf(readHudModel()), isFlashing: false }),
+    )
+    const markers = everyReadoutOf(readHudModel()).threats.length
+    expect(hudBoxesIn(html).filter((id) => id === HUD_BOX_IDS.threat)).toHaveLength(markers)
+  })
+
+  it('sets data-hud on each touch control button and data-hud-zone on the stick zone', () => {
+    const html = renderToString(
+      createElement(TouchControlsView, { situation: readTouchSituation(), isLeftHanded: false }),
+    )
+    const buttons = html.match(/<button/g) ?? []
+    expect(buttons.length).toBeGreaterThan(0)
+    expect(hudBoxesIn(html)).toEqual(buttons.map(() => HUD_BOX_IDS.control))
+    expect(html).toContain(`${HUD_ZONE_ATTRIBUTE}="${STICK_ZONE_ID}"`)
+  })
+})
