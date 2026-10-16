@@ -1010,6 +1010,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/physics/cutFollowStartingRigs.test.ts` | 19 | 5 |
 | `src/physics/cutSmoothness.test.ts` | 13 | 7 |
 | `src/physics/cutStartLatency.lane.test.ts` | 5 | 5 |
+| `src/physics/digSpeedStop.lane.test.ts` | 7 | 4 |
 | `src/physics/drillEngagement.test.ts` | 6 | 6 |
 | `src/physics/drillFacingStep.test.ts` | 3 | 3 |
 | `src/physics/drillTurnLatency.lane.test.ts` | 3 | 7 |
@@ -1426,7 +1427,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/vehicle/leadingSlab.test.ts` | 5 | 5 |
 | `src/systems/vehicle/motionEffects.test.ts` | 13 | 13 |
 | `src/systems/vehicle/motionGlide.test.ts` | 8 | 7 |
-| `src/systems/vehicle/poseReport.test.ts` | 7 | 7 |
+| `src/systems/vehicle/poseReport.test.ts` | 16 | 16 |
 | `src/systems/vehicle/returnReserve.test.ts` | 4 | 4 |
 | `src/systems/vehicle/stepBound.test.ts` | 10 | 10 |
 | `src/systems/vehicle/strutPlank.test.ts` | 4 | 4 |

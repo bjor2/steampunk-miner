@@ -1,5 +1,6 @@
 import RAPIER from '@dimforge/rapier3d-compat'
 import { beforeAll, describe, expect, it, vi } from 'vitest'
+import { DEV_FLAGS, type DevFlags } from '../constants/devFlags'
 import { MAX_SPEED_MM_PER_SECOND } from '../constants/balance'
 import { MM_PER_METRE, PHYSICS_TIMESTEP, UP_VECTOR_SCALE } from '../constants/physics'
 import { createMemorySink } from '../logging/eventSink'
@@ -17,6 +18,10 @@ import type { VehicleController, VehicleStepResult } from './vehicleController'
 // ticket 397 took the floor out of the drill law), each tick tagged with what held the body back so
 // the limiter is measured, not inferred. It runs on a fresh module graph with no slices registered
 // (a kernel spec never imports one), as `store/authorityReads.test.ts` does.
+// The per-report cut it compares against is pinned at 12 ticks, #514's kill-switch off (GD and VS
+// Q5 on #514): the gate keeps its meaning, and the shipped flag-off cadence (a report every tick
+// while the drill bites) is logged beside it. Finding recorded on #514: at that cadence flag-off
+// digs faster down than the swept cut at slow drills; the swept kernel is frozen and dark.
 
 /** Steps past the curve, as the TD's #316 runs: speedMax ~14, a tip that cuts at full efficiency. */
 const RIG_LEVELS = { drill_tip: 600, engine: 5000 } as const
@@ -35,6 +40,12 @@ const STEADY_FROM_SECONDS = 3
 const NEAR_BOUND = 0.98
 /** The longest the wheels may wait on the cut: the 5 Hz report interval (ticket 330). */
 const MAX_WAIT_TICKS = 12
+
+const SWEPT: DevFlags = { ...DEV_FLAGS, 'drill.sweptCut': true }
+/** The 5 Hz per-report cut this gate was written against: flag off, #514's kill-switch off. */
+const PER_REPORT_AT_12: DevFlags = { 'drill.sweptCut': false, 'drill.reportEveryTick': false }
+/** The shipped flag-off loop: a report every tick while the drill bites (ticket 514). */
+const PER_REPORT_SHIPPED: DevFlags = { ...DEV_FLAGS, 'drill.sweptCut': false }
 
 /**
  * What held the body back on a drilling tick (TD ruling on #330, VS pin 2): the sweep stopping short
@@ -73,7 +84,8 @@ interface Run {
   level: Leg
 }
 
-async function playAtDrill(drillPower: number, isSwept: boolean): Promise<Run> {
+async function playAtDrill(drillPower: number, flags: DevFlags): Promise<Run> {
+  const isSwept = flags['drill.sweptCut']
   vi.resetModules()
   ;(await import('../registries/registrar')).loadSlices([])
   const runLog = await import('../logging/runLog')
@@ -98,7 +110,7 @@ async function playAtDrill(drillPower: number, isSwept: boolean): Promise<Run> {
   const watched = watchSteps(
     createVehicleController(RAPIER, world, createVehicleBody(RAPIER, world, start)),
   )
-  const loop = createVehicleLoop({ 'drill.sweptCut': isSwept })
+  const loop = createVehicleLoop(flags)
   const speedMaxMm = engineStatsAtStep(RIG_LEVELS.engine).speedMax * MM_PER_METRE
   const hold = (intent: VehicleIntent, seconds: number, each?: (read: TickRead) => void) => {
     for (let step = 0; step < Math.round(seconds / PHYSICS_TIMESTEP); step++) {
@@ -228,14 +240,17 @@ describe('swept cut in the live loop (ticket 330)', () => {
   it.each(DRILLS)(
     'digs faster than the per-report cut and never stalls at $ticksPerCell ticks a cell',
     async ({ drillPower, ticksPerCell }) => {
-      const swept = await playAtDrill(drillPower, true)
-      const reported = await playAtDrill(drillPower, false)
-      console.log(`swept cut, ${ticksPerCell} ticks a cell: ${JSON.stringify({ swept, reported })}`)
+      const swept = await playAtDrill(drillPower, SWEPT)
+      const reported = await playAtDrill(drillPower, PER_REPORT_AT_12)
+      const shipped = await playAtDrill(drillPower, PER_REPORT_SHIPPED)
+      const reportedEveryTick = { down: shipped.down.rate, level: shipped.level.rate }
+      const rates = JSON.stringify({ swept, reported, reportedEveryTick })
+      console.log(`swept cut, ${ticksPerCell} ticks a cell: ${rates}`)
       expect(swept.down.rate).toBeGreaterThan(reported.down.rate)
       expect(swept.level.rate).toBeGreaterThan(reported.level.rate)
       expect(swept.level.longestWaitTicks).toBeLessThanOrEqual(MAX_WAIT_TICKS)
       expect(swept.down.longestWaitTicks).toBeLessThanOrEqual(MAX_WAIT_TICKS)
     },
-    180_000,
+    270_000,
   )
 })
