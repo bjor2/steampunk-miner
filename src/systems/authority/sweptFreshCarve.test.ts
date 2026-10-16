@@ -1,9 +1,8 @@
 import { beforeAll, describe, expect, it } from 'vitest'
-import { DRILL_STAMP_RADIUS_MM, DRILL_SUBSTEPS_PER_TICK } from '../../constants/balance'
+import { DRILL_STAMP_RADIUS_MM } from '../../constants/balance'
 import { MM_PER_METRE, UP_VECTOR_SCALE, VEHICLE_COLLIDER_SIZE } from '../../constants/physics'
 import type { SliceDefinition } from '../../registries/sliceDefinition'
 import { withRegistrations } from '../../registries/registrar'
-import { minorsPerMajor } from '../economy/upgradeSteps'
 import type { GateVerdict } from '../registries/gateChecks'
 import { sweptDrillStampOf } from '../vehicle/drillStamp'
 import { sweepPathOf, sweptStampOf } from '../vehicle/sweptCut'
@@ -23,13 +22,13 @@ import {
   COLUMN_LEG,
   columnLeg,
   cutLeg,
-  drillStepOfRig,
   eventsOfLeg,
   facingOfLeg,
   reachAlongOf,
   reachOf,
   openRunAheadOf,
   rigAt,
+  subStepsSpentBy,
   TILTED_LEG,
   type Leg,
   type LegCut,
@@ -251,12 +250,6 @@ function isInWindow(leg: Leg, { tx, ty }: TilePoint): boolean {
   return along >= 0 && along < WINDOW_MM
 }
 
-/** Sub-steps the leg's ticks spent: a tick's work each, less what the last one carries on. */
-function subStepsSpentBy(run: LegRun): number {
-  const cursor = vehicleOf(run.ticks[run.ticks.length - 1].state, 'p1').sweptCut
-  return run.ticks.length * DRILL_SUBSTEPS_PER_TICK - (cursor?.carrySubSteps ?? 0)
-}
-
 function workPerMetreOf(cut: LegCut): WorkPerMetre {
   const run = cutLeg({ ...cut, reachMm: WINDOW_MM + 2 * DRILL_STAMP_RADIUS_MM })
   const opened = eventsOfLeg(run).flatMap((event) =>
@@ -310,41 +303,18 @@ describe('cells and work per metre at any speed (ticket 439, VS ruling)', () => 
   })
 
   it.todo(
-    "opens cells a metre within 5% of the 5 m/s rig and work a metre within 1% at 44, 240 and 3600 m/s, never under the 1x rig's work a metre (#441's band: exact per-sample rim dwell)",
+    "opens cells a metre within 5% of the 5 m/s rig and work a metre within 1% at 44 and 240 m/s, never under the 1x rig's work a metre (#441's band: exact per-sample rim dwell)",
+  )
+
+  // A 3600 m/s cell costs under one sub-step (c < 10 in the bands of ticket 463), so the law's
+  // whole-sub-step price and its one-tick legs alone put it outside the band (1.516 column, 1.665
+  // tilted on #441); the exact sub-step remainder carry is the fix (owner: Systems & Economy).
+  it.todo(
+    'opens work a metre within 1% of the 5 m/s rig at 3600 m/s, where a cell costs under 10 sub-steps (ticket 463: logged with c until the exact sub-step remainder carry)',
   )
 
   it.todo(
     'opens byte-identical cells, ore, energy, heat and dig time a metre at 1x, 10x, 100x and 3600 m/s (exact rim dwell, #441)',
-  )
-})
-
-/** A rig's pace down the column: metres its cut reached per sub-step of work it spent. */
-function paceOf(cut: LegCut): number {
-  const run = cutLeg({ ...cut, reachMm: WINDOW_MM })
-  return reachAlongOf(cut.leg, run.ticks[run.ticks.length - 1].state) / subStepsSpentBy(run)
-}
-
-const RATIO_RIGS = [44, 240].map(rigAt)
-/** Each drill major is 1.12x faster down to 10 sub-steps a cell (#397), +-5%. */
-const MAJOR_RATIO = 1.12
-const RATIO_TOLERANCE = 0.05
-
-describe('felt speed per drill major with the fresh capsule (ticket 439, VS ruling)', () => {
-  it('cuts each of the 44 and 240 m/s rigs 1.12x +-5% faster than the drill a major below it', () => {
-    const misses = RATIO_RIGS.flatMap((rig) => {
-      const drillStep = drillStepOfRig(rig)
-      const cut = { rig, leg: COLUMN_LEG, maxTicks: 400 }
-      const below = drillStep - minorsPerMajor()
-      const ratio = paceOf({ ...cut, drillStep }) / paceOf({ ...cut, drillStep: below })
-      return Math.abs(ratio / MAJOR_RATIO - 1) <= RATIO_TOLERANCE ? [] : [{ rig, ratio }]
-    })
-    expect(misses).toEqual([])
-  })
-
-  // At the one-sub-step quantum the major below takes 2 sub-steps a cell, so the law itself gives
-  // 2x, and either rig crosses its 30 m in its first tick (GD ruling Q2 on #439).
-  it.todo(
-    "cuts the 3600 m/s rig 1.12x +-5% faster than the drill a major below it (#397's law-level exemption under 10 sub-steps a cell; #441 judges it)",
   )
 })
 

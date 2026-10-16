@@ -8,12 +8,17 @@
  * a leg here is a tick count that ends where the body nears the planet's centre (3600 m/s crosses
  * planet 1 in about 5 ticks).
  */
-import { DRILL_STAMP_AHEAD_MM, STEP_BOUND_TOLERANCE_MM } from '../../constants/balance'
+import {
+  DRILL_STAMP_AHEAD_MM,
+  DRILL_SUBSTEPS_PER_TICK,
+  STEP_BOUND_TOLERANCE_MM,
+} from '../../constants/balance'
 import { MM_PER_METRE, UP_VECTOR_SCALE, VEHICLE_COLLIDER_SIZE } from '../../constants/physics'
 import { blockHardness } from '../economy/oreEconomy'
 import { startLevels, vehicleStatsAt } from '../economy/vehicleStats'
 import { NO_DRIVE } from '../vehicle/driveSigns'
-import { subStepsPerTile } from '../vehicle/drillRule'
+import { div, fromSafeInteger, mul, type BigStat } from '../money'
+import { drillWorkPerTick, subStepsPerTile, tileWorkToBreak } from '../vehicle/drillRule'
 import { FACING, facingVectorOf, noseTileOf, type VehiclePose } from '../vehicle/vehiclePose'
 import { groundReaderOf, type GroundReader } from '../world/groundReader'
 import { ISO_DENSITY } from '../world/sampleGrid'
@@ -55,10 +60,22 @@ const TIP_STEP = 400
 const MAX_DRILL_STEP = 4_000
 const BAND_ONE_ROCK = blockHardness(PARAMS.planetIndex, 1)
 
+function drillAtStep(drillStep: number) {
+  return vehicleStatsAt({ ...startLevels(), drill_power: drillStep, drill_tip: TIP_STEP })
+}
+
 /** A band-1 cell's drill time, in sub-steps, at a drill_power step with the fixtures' tip. */
-function subStepsAtDrillStep(drillStep: number): number {
-  const levels = { ...startLevels(), drill_power: drillStep, drill_tip: TIP_STEP }
-  return subStepsPerTile(vehicleStatsAt(levels), BAND_ONE_ROCK) ?? Number.MAX_SAFE_INTEGER
+export function subStepsAtDrillStep(drillStep: number): number {
+  return subStepsPerTile(drillAtStep(drillStep), BAND_ONE_ROCK) ?? Number.MAX_SAFE_INTEGER
+}
+
+/**
+ * A band-1 cell's real drill time at a drill_power step, in sub-steps before the law rounds it up
+ * to a whole one: the `c` of ticket 463's bands, read from the drill rule's own work terms.
+ */
+export function bandOneCellCostAt(drillStep: number): BigStat {
+  const subStepWork = mul(tileWorkToBreak(BAND_ONE_ROCK), fromSafeInteger(DRILL_SUBSTEPS_PER_TICK))
+  return div(subStepWork, drillWorkPerTick(drillAtStep(drillStep), BAND_ONE_ROCK))
 }
 
 /** The lowest drill_power step cutting a band-1 cell in at most the rig's sub-steps. */
@@ -285,6 +302,12 @@ export function alongOf(leg: Leg, point: StampPoint): number {
 export function poseAlong(leg: Leg, along: number): VehiclePose {
   const at = pointAlong(leg, along)
   return { x: at.xMm, y: at.yMm, vx: 0, vy: 0, upx: leg.upx, upy: leg.upy, facing: FACING.down }
+}
+
+/** Sub-steps the leg's ticks spent: a tick's work each, less what the last one carries on. */
+export function subStepsSpentBy(run: LegRun): number {
+  const cursor = vehicleOf(run.ticks[run.ticks.length - 1].state, 'p1').sweptCut
+  return run.ticks.length * DRILL_SUBSTEPS_PER_TICK - (cursor?.carrySubSteps ?? 0)
 }
 
 /** Every event the leg's ticks answered. */

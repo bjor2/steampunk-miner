@@ -297,7 +297,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/mining-gates/systems/rigs.test.ts` | 8 | 8 |
 | `src/features/mining-gates/systems/toolsAndGear.test.ts` | 3 | 3 |
 
-### `mining-popup`: 8 files, 47 tests
+### `mining-popup`: 8 files, 48 tests
 
 | File | Tests | Sites |
 | --- | --- | --- |
@@ -308,7 +308,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/mining-popup/systems/plaqueBoard.test.ts` | 5 | 5 |
 | `src/features/mining-popup/systems/popupText.test.ts` | 3 | 3 |
 | `src/features/mining-popup/systems/render/chipPlacement.test.ts` | 8 | 8 |
-| `src/features/mining-popup/systems/render/plaqueFit.test.ts` | 11 | 4 |
+| `src/features/mining-popup/systems/render/plaqueFit.test.ts` | 12 | 5 |
 
 ### `mobility`: 18 files, 172 tests
 
@@ -748,8 +748,9 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/authority/sweptChargeExact.lane.test.ts` | 168 | 1 |
 | `src/systems/authority/sweptChargeExact.test.ts` | 39 | 8 |
 | `src/systems/authority/sweptCutAtSpeed.test.ts` | 8 | 8 |
-| `src/systems/authority/sweptFreshCarve.test.ts` | 47 | 16 |
+| `src/systems/authority/sweptFreshCarve.test.ts` | 46 | 15 |
 | `src/systems/authority/sweptGateSpeeds.test.ts` | 24 | 2 |
+| `src/systems/authority/sweptQuantumLaw.test.ts` | 6 | 8 |
 | `src/systems/authority/sweptSpanDrill.test.ts` | 17 | 13 |
 | `src/systems/authority/teleportDebugRules.test.ts` | 5 | 5 |
 | `src/systems/authority/terrain/terrainEditGates.test.ts` | 6 | 4 |
