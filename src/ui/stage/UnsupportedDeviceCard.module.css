@@ -1,4 +1,4 @@
-/* Ticket 477: covers the stage like the portrait card, but only once the probe says so. */
+/* Ticket 477: covers the stage, but only once the probe says so. */
 .overlay {
   position: absolute;
   inset: 0;

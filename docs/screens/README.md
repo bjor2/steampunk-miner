@@ -40,4 +40,5 @@ nearest screen:
 | `workshop.jpg` | the Upgrade bay screen                                                              | the workshop mid-chain (#177) |
 | `settings.jpg` | the settings screen, stand-in for a big menu                                        | the tech tree (#165)          |
 
-The portrait cell writes only `portrait-card.jpg`.
+The portrait cell writes only `portrait-open.jpg`, the game as it opens held upright, until PT-6
+(ticket 488) brings the portrait set; ticket 483 retired the turn-your-device card.

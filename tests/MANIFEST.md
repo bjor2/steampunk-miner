@@ -1151,6 +1151,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/shell/listenerCount.test.ts` | 8 | 8 |
 | `src/shell/mirroredSaveFolder.test.ts` | 7 | 7 |
 | `src/shell/mouseHooks.test.ts` | 4 | 4 |
+| `src/shell/screenHooks.test.ts` | 3 | 3 |
 | `src/shell/storedSaveSlots.test.ts` | 4 | 4 |
 | `src/shell/storedZip.test.ts` | 4 | 4 |
 
@@ -1395,7 +1396,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/views/plaqueModel.test.ts` | 6 | 6 |
 | `src/systems/views/promptDevice.test.ts` | 8 | 8 |
 | `src/systems/views/refineryBayModel.test.ts` | 4 | 4 |
-| `src/systems/views/screenLayout.test.ts` | 14 | 14 |
+| `src/systems/views/screenLayout.test.ts` | 20 | 20 |
 | `src/systems/views/scrollRail.test.ts` | 5 | 5 |
 | `src/systems/views/sellBayModel.test.ts` | 13 | 13 |
 | `src/systems/views/settingsModel.test.ts` | 5 | 5 |

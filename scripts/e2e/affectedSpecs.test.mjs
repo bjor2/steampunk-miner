@@ -48,9 +48,9 @@ describe('e2e: affected-spec map', () => {
   })
 
   it('runs a changed spec by itself', () => {
-    expect(select('e2e/browser/screens/portrait.spec.ts')).toMatchObject({
+    expect(select('e2e/browser/screens/rotation.spec.ts')).toMatchObject({
       mode: 'affected',
-      specs: ['e2e/browser/screens/portrait.spec.ts'],
+      specs: ['e2e/browser/screens/rotation.spec.ts'],
     })
   })
 

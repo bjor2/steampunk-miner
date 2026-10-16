@@ -49,7 +49,7 @@ const SLACK_PX = 1
 const SIZE_SLACK_PX = 0.05
 
 test.beforeEach(() => {
-  test.skip(currentCell().isPortrait, 'portrait shows the turn-your-device card instead')
+  test.skip(currentCell().isPortrait, "portrait's matrix rows are PT-6's (ticket 488)")
 })
 
 test.describe('screen matrix: canvas (#173)', () => {

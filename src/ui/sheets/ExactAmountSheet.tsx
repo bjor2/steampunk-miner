@@ -1,7 +1,7 @@
 /**
  * The exact amount behind a tapped money readout (spec #470 section 3, ticket 476): a sheet along
  * the bottom of the screen with the canonical `exactAmount` text, over every layer but the
- * portrait card. Any tap on it, or on the dimmed screen around it, closes it.
+ * unsupported-device card. Any tap on it, or on the dimmed screen around it, closes it.
  */
 import { useGameStore } from '../../store/gameStore'
 import { hudLabelIconIdOf } from '../../systems/art/icons/iconSet'

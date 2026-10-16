@@ -10,7 +10,6 @@ import { PauseMenu } from './ui/pause/PauseMenu'
 import { SettingsPanel } from './ui/settings/SettingsPanel'
 import { DeviceNotices } from './ui/stage/DeviceNotices'
 import { GameStage } from './ui/stage/GameStage'
-import { PortraitCard } from './ui/stage/PortraitCard'
 import { UnsupportedDeviceCard } from './ui/stage/UnsupportedDeviceCard'
 import { SliceScreen } from './ui/screens/SliceScreen'
 import { UnsavedChip } from './ui/save/UnsavedChip'
@@ -38,7 +37,6 @@ export default function App() {
       <ExactAmountSheet />
       <DeviceNotices />
       <UnsavedChip />
-      <PortraitCard />
       <UnsupportedDeviceCard />
     </GameStage>
   )

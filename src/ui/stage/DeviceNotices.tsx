@@ -1,8 +1,8 @@
 /**
  * The device's notice chips (#470 P1-7, ticket 478): Reconnecting while the canvas has lost its
  * WebGL context, Tap for sound while a gesture left the audio context suspended. Over the HUD and
- * the menus, under the portrait card; they take no tap, so the tap that resumes the sound reaches
- * the page as any other gesture does.
+ * the menus, under the unsupported-device card; they take no tap, so the tap that resumes the
+ * sound reaches the page as any other gesture does.
  */
 import { useGameStore } from '../../store/gameStore'
 import { deviceNoticesOf } from '../../systems/views/deviceNotices'

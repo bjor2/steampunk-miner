@@ -25,8 +25,10 @@ test.describe('screen matrix: review shots (#173)', () => {
     test.setTimeout(600_000)
     const cell = currentCell()
     const errors = await openGame(page, cell)
+    // Ticket 483 retired the turn-your-device card; the portrait set is PT-6's (ticket 488).
     if (cell.isPortrait) {
-      await shoot(page, 'portrait-card')
+      await waitForGround(page)
+      await shoot(page, 'portrait-open')
       return expect(errors).toEqual([])
     }
     await page.evaluate(() => window.steampunkDebug!.ui.setRenderScale(1))
