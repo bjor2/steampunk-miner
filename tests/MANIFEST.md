@@ -192,12 +192,13 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/example/debug.test.ts` | 2 | 2 |
 | `src/features/example/systems/describeExample.test.ts` | 1 | 1 |
 
-### `extraction`: 18 files, 90 tests
+### `extraction`: 19 files, 92 tests
 
 | File | Tests | Sites |
 | --- | --- | --- |
 | `src/features/extraction/deliveredIncome.test.ts` | 3 | 3 |
 | `src/features/extraction/drainIncomeRate.test.ts` | 4 | 4 |
+| `src/features/extraction/drainRarity.test.ts` | 2 | 2 |
 | `src/features/extraction/gatesFixture.test.ts` | 3 | 2 |
 | `src/features/extraction/incomeLines.test.ts` | 4 | 4 |
 | `src/features/extraction/incomeRateClamp.test.ts` | 1 | 1 |
@@ -215,7 +216,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/extraction/systems/tripCap.test.ts` | 6 | 6 |
 | `src/features/extraction/systems/useResolution.test.ts` | 4 | 4 |
 
-### `ground-gun`: 43 files, 282 tests
+### `ground-gun`: 44 files, 284 tests
 
 | File | Tests | Sites |
 | --- | --- | --- |
@@ -235,6 +236,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/ground-gun/systems/boreGunProvider.test.ts` | 2 | 2 |
 | `src/features/ground-gun/systems/boreLadders.test.ts` | 8 | 8 |
 | `src/features/ground-gun/systems/borePickup.test.ts` | 4 | 4 |
+| `src/features/ground-gun/systems/borePickupRarity.test.ts` | 2 | 2 |
 | `src/features/ground-gun/systems/boughtModules.test.ts` | 3 | 3 |
 | `src/features/ground-gun/systems/burstToggle.test.ts` | 3 | 3 |
 | `src/features/ground-gun/systems/fireAim.test.ts` | 7 | 7 |
@@ -269,7 +271,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | --- | --- | --- |
 | `src/features/materials/systems/materialTable.test.ts` | 21 | 21 |
 
-### `mining-gates`: 24 files, 151 tests
+### `mining-gates`: 25 files, 153 tests
 
 | File | Tests | Sites |
 | --- | --- | --- |
@@ -290,6 +292,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/mining-gates/systems/gateTable.test.ts` | 6 | 6 |
 | `src/features/mining-gates/systems/gatesNearDock.test.ts` | 2 | 2 |
 | `src/features/mining-gates/systems/ledgerLines.test.ts` | 8 | 8 |
+| `src/features/mining-gates/systems/pullRarity.test.ts` | 2 | 2 |
 | `src/features/mining-gates/systems/render/cellGateLooks.test.ts` | 11 | 11 |
 | `src/features/mining-gates/systems/render/drawnMarkers.test.ts` | 6 | 6 |
 | `src/features/mining-gates/systems/render/gateSounds.test.ts` | 7 | 7 |
@@ -344,12 +347,15 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/ore-visuals/systems/oreGradeChannels.test.ts` | 7 | 7 |
 | `src/features/ore-visuals/systems/render/oreLookProvider.test.ts` | 21 | 10 |
 
-### `ores`: 12 files, 79 tests
+### `ores`: 15 files, 101 tests
 
 | File | Tests | Sites |
 | --- | --- | --- |
 | `src/features/ores/oreReportRows.test.ts` | 6 | 6 |
 | `src/features/ores/oresSourceHash.test.ts` | 1 | 1 |
+| `src/features/ores/rarityPickup.test.ts` | 11 | 11 |
+| `src/features/ores/rarityPickupRoutes.test.ts` | 4 | 2 |
+| `src/features/ores/rarityTripRun.test.ts` | 5 | 3 |
 | `src/features/ores/systems/kernelOreAliases.test.ts` | 2 | 2 |
 | `src/features/ores/systems/leadRoll.test.ts` | 20 | 12 |
 | `src/features/ores/systems/oreCatalogue.test.ts` | 9 | 9 |
@@ -359,7 +365,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/ores/systems/rarityRows.test.ts` | 7 | 7 |
 | `src/features/ores/systems/raritySolve.test.ts` | 5 | 5 |
 | `src/features/ores/systems/rarityTiers.test.ts` | 11 | 11 |
-| `src/features/ores/systems/rarityTripClamp.test.ts` | 5 | 5 |
+| `src/features/ores/systems/rarityTripClamp.test.ts` | 7 | 7 |
 
 ### `planet-mix`: 24 files, 144 tests
 
@@ -1035,6 +1041,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/registries/itemDescriptionEntries.test.ts` | 5 | 5 |
 | `src/systems/registries/itemHooks.test.ts` | 13 | 13 |
 | `src/systems/registries/oreLook.test.ts` | 2 | 2 |
+| `src/systems/registries/orePickup.test.ts` | 4 | 4 |
 | `src/systems/registries/oreTypes.test.ts` | 12 | 12 |
 | `src/systems/registries/planetCardLines.test.ts` | 9 | 9 |
 | `src/systems/registries/planetSkyBand.test.ts` | 5 | 5 |
