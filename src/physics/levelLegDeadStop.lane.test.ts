@@ -24,7 +24,8 @@ import { createRig, type Rig } from './cutFollowFixtures'
 // the 8 legs stuck (stored 200 at 12 ticks at 50 m here, 77.8 m in the TD's rig): the body rested
 // on a sliver of ground the stamp could still cut, outside its full-weight core and past the
 // face's reach, and the drill did not bite. `levelSliverDrillContactOf` bites there on a level
-// cut. A leg is stuck when the body moves under 1 m in 600 ticks. Each rig's 80 m down leg
+// cut; stored 200 at 12 ticks still stops, on another cause (the known limit, `isKnownLimit`).
+// A leg is stuck when the body moves under 1 m in 600 ticks. Each rig's 80 m down leg
 // (casing grade 5, so a cave-in never ends it) is played too and printed, its speed and the
 // density it removed per metre, so a run before and after the fix can be compared (#516 holds
 // them within 3%). A lane: it runs only when named, prints the table and writes
@@ -278,10 +279,23 @@ function expectCadence(leg: LegRun): void {
   }
 }
 
+/**
+ * The known limit (TD ruling 6225171313 on #516): stored 200 at the 12-tick interval still stops.
+ * The sawtooth carries the body past the last report's stamp at about 5.9 m/s, and it comes to
+ * rest on a floor contour where the stamp holds 1 solid and 0 cuttable samples, so no contact rule
+ * can bite. #514 reports every tick while the drill bites, which removes the cause; the limit
+ * applies only with its kill-switch off. The case stays, expected to fail, so it turns red if
+ * anyone fixes or worsens it.
+ */
+function isKnownLimit(rig: string, reportInterval: number): boolean {
+  return rig === 'stored 200' && reportInterval === 12
+}
+
 describe('flag-off level legs on the shipped contact rule (ticket 516)', () => {
   for (const rig of Object.keys(RIGS)) {
     for (const reportInterval of REPORT_INTERVALS) {
-      it(
+      const itLeg = isKnownLimit(rig, reportInterval) ? it.fails : it
+      itLeg(
         `drives the ${rig} rig level its full 250 m reporting every ${reportInterval} ticks`,
         () => {
           const leg = runLevelLeg(rig, reportInterval)
