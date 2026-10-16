@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "updated_at": "2026-10-16T20:55:58Z",
+  "updated_at": "2026-10-16T20:56:27Z",
   "entries": {
     "steampunk-loop/1": {
       "loop": "steampunk-loop",
@@ -493,9 +493,9 @@
       "slot": null,
       "state": "working",
       "issue": null,
-      "note": "testing spec #356 (Balance: restore magnetic electrifiedShareBp 2000 and pin full-hull start in pace harnesses) on 3f9512e",
+      "note": "queue run on 146ac48 (pass)",
       "stale_after_min": 420,
-      "updated_at": "2026-10-16T17:17:40Z",
+      "updated_at": "2026-10-16T20:56:27Z",
       "host": "grok-bot-vm-452660841"
     },
     "steampunk-loop/10": {
