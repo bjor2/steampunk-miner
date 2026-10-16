@@ -11,6 +11,7 @@ import { expect, test, type Page } from '@playwright/test'
 import type { ScriptedCommand } from '../../../src/systems/fastForward'
 // Brings the slice's `power-up-core.use_power_up` into `ScriptedCommand`'s command types.
 import type {} from '../../../src/features/power-up-core/systems/powerUpEvents'
+import { skipWhereEngineIsMissing } from '../mobile/mobileHelpers'
 import { currentCell } from './screenHelpers'
 
 const RIVET_PATCH = 'consumable.rivet_patch'
@@ -30,6 +31,9 @@ interface SlotRead {
   itemId: string
   holdPercent: number
 }
+
+// The mobile projects run this spec too (ticket 481); WebKit may not be installed.
+skipWhereEngineIsMissing()
 
 test.beforeEach(() => {
   const cell = currentCell()

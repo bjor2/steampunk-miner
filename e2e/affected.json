@@ -235,7 +235,7 @@
         "src/store/saveFolder.ts",
         "src/systems/save/**"
       ],
-      "specs": ["e2e/browser/titleMenu.spec.ts"]
+      "specs": ["e2e/browser/titleMenu.spec.ts", "e2e/browser/mobile/deviceSaveDigest.spec.ts"]
     },
     {
       "why": "Replay and snapshots give smoke's digests; the camera gives its framing checks.",
@@ -317,7 +317,9 @@
         "e2e/browser/screens/screenLayout.spec.ts",
         "e2e/browser/screens/reviewShots.spec.ts",
         "e2e/browser/itemCards.spec.ts",
-        "e2e/browser/workshop.spec.ts"
+        "e2e/browser/workshop.spec.ts",
+        "e2e/browser/mobile/touchGestures.spec.ts",
+        "e2e/browser/mobile/touchTaps.spec.ts"
       ]
     },
     {
@@ -425,6 +427,42 @@
         "e2e/browser/itemCards.spec.ts",
         "e2e/browser/uiParts.spec.ts"
       ]
+    },
+    {
+      "why": "The touch runtime and its gestures: pinch zoom and slot taps on the mobile projects (ticket 481).",
+      "paths": [
+        "src/store/touchRuntime.ts",
+        "src/systems/input/touchControls.ts",
+        "src/constants/touch.ts",
+        "src/features/power-up-core/ui/**",
+        "src/systems/views/titleOnlyText.ts"
+      ],
+      "specs": [
+        "e2e/browser/mobile/touchGestures.spec.ts",
+        "e2e/browser/mobile/touchTaps.spec.ts",
+        "e2e/browser/screens/touchControls.spec.ts"
+      ]
+    },
+    {
+      "why": "A save's digest across engines: the store's resume and the digest it logs (ticket 481).",
+      "paths": [
+        "src/store/checkpoint.ts",
+        "src/store/saveFolder.ts",
+        "src/shell/storedSaveSlots.ts",
+        "src/systems/authority/stateDigest.ts",
+        "src/systems/authority/canonicalJson.ts"
+      ],
+      "specs": ["e2e/browser/mobile/deviceSaveDigest.spec.ts"]
+    },
+    {
+      "why": "The perf:phone lane's reads: the live fixed step, the render stats and the debug step; it skips outside `npm run perf:phone` (ticket 481).",
+      "paths": [
+        "src/physics/liveFixedStep.ts",
+        "src/systems/fixedStepClock.ts",
+        "src/scene/renderPresence.ts",
+        "src/debug/debugLiveTime.ts"
+      ],
+      "specs": ["e2e/browser/mobile/perfPhone.spec.ts"]
     }
   ]
 }

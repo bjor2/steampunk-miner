@@ -8,6 +8,7 @@
  */
 import { expect, test, type Page } from '@playwright/test'
 import { EXACT_AMOUNT_IDS } from '../../../src/ui/sheets/exactAmountIds'
+import { skipWhereEngineIsMissing } from '../mobile/mobileHelpers'
 import { currentCell, openGame } from './screenHelpers'
 
 /** A planet-200 wallet whose short text, 1.23e149, hides most of its digits (TD on #470). */
@@ -15,6 +16,9 @@ const P200_WALLET = '1.234567890123e149'
 const P200_WALLET_EXACT = '1.234567890123e+149'
 /** The workshop's Repair element: its brass tooltip is Repair's card (pass #425). */
 const SERVICE_ID = 'upgrade-bay.service'
+
+// The mobile projects run this spec too (ticket 481); WebKit may not be installed.
+skipWhereEngineIsMissing()
 
 test.beforeEach(() => {
   const cell = currentCell()

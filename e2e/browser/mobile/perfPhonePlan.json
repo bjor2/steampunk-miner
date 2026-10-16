@@ -1,0 +1,25 @@
+{
+  "$comment": [
+    "The perf:phone lane's plan (#470 P1-10, ticket 481; the TD's section 5 on #470): the CPU throttle",
+    "rates and the speed cases, read by e2e/browser/mobile/perfPhone.spec.ts and scripts/perf/phoneLane.mjs.",
+    "Each case is a planet 1 rig by stored drill_power/drill_tip: parked on the pad, then the TD's",
+    "rigs of ticket 439 (physics/sweptFreshCarveLoop.test.ts), whose band-1 cut speeds are 97 and",
+    "3600 m/s; 96 m/s is bench:physics' body speed, which no whole sub-step count gives exactly.",
+    "Throttled SwiftShader gives tick cost (CPU) only; GPU numbers come from the device check (#482)."
+  ],
+  "cpuThrottleRates": [4, 6],
+  "cases": [
+    { "id": "at0", "speedMetresPerSecond": 0, "levels": null },
+    {
+      "id": "at96",
+      "speedMetresPerSecond": 96,
+      "levels": { "drill_power": 370, "drill_tip": 600 }
+    },
+    {
+      "id": "at3600",
+      "speedMetresPerSecond": 3600,
+      "levels": { "drill_power": 2000, "drill_tip": 600 }
+    }
+  ],
+  "tickMsP95Target": 6
+}

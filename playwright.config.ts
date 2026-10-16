@@ -7,8 +7,22 @@
  * The screen matrix (#173, #179): one project per reference screen runs `e2e/browser/screens/`,
  * asserting geometry and counts through the DOM and the debug API. Each cell also writes its
  * review screenshots (to `docs/screens/` under `npm run screens:update`), never compared.
+ *
+ * The mobile projects (#470 P1-10, ticket 481): a Pixel 7 on Chromium and an iPhone 13 on WebKit,
+ * in landscape, run `e2e/browser/mobile/` and the matrix's touch specs (`mobileDevices.ts`).
+ * Emulation only, never "verified on device" (#482). Without WebKit installed the iPhone project's
+ * tests skip with the install hint.
  */
 import { defineConfig, devices } from '@playwright/test'
+import {
+  cellOfDevice,
+  ENGINE_MISSING_MESSAGE,
+  isEngineInstalled,
+  landscapeUseOf,
+  MOBILE_DEVICES,
+  MOBILE_GLOB,
+  MOBILE_SPECS,
+} from './e2e/browser/mobile/mobileDevices'
 import { SCREEN_CELLS } from './e2e/browser/screens/screenCells'
 
 /** `E2E_PORT` moves the preview off the shared 4173 when another checkout serves its own build. */
@@ -21,6 +35,9 @@ const isCi = Boolean(process.env.CI)
 const CI_WORKERS = 4
 /** The matrix's specs, wherever the config is run from. */
 const SCREENS_GLOB = '**/browser/screens/**'
+
+// Said once per run as well as on each skipped test, so a run without WebKit reads why at the top.
+if (!isEngineInstalled('webkit')) console.warn(`mobile-webkit-iphone13: ${ENGINE_MISSING_MESSAGE}`)
 
 export default defineConfig({
   testDir: 'e2e/browser',
@@ -40,7 +57,7 @@ export default defineConfig({
   projects: [
     {
       name: 'chromium',
-      testIgnore: SCREENS_GLOB,
+      testIgnore: [SCREENS_GLOB, MOBILE_GLOB],
       use: { ...devices['Desktop Chrome'] },
     },
     ...SCREEN_CELLS.map((cell) => ({
@@ -57,6 +74,15 @@ export default defineConfig({
         isMobile: cell.isTouch,
         hasTouch: cell.isTouch,
       },
+    })),
+    ...MOBILE_DEVICES.map((device) => ({
+      name: device.project,
+      testMatch: MOBILE_SPECS,
+      // The matrix's waits: software GL on a 3x phone screen, and WebKit's is slower still.
+      timeout: 300_000,
+      expect: { timeout: 30_000 },
+      metadata: { cell: cellOfDevice(device) },
+      use: landscapeUseOf(device),
     })),
   ],
   webServer: {

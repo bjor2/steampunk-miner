@@ -8,6 +8,7 @@
  */
 import { expect, test, type Page } from '@playwright/test'
 import type { ActionEdge } from '../../../src/store/inputRuntime'
+import { skipWhereEngineIsMissing, skipWithoutCdp } from '../mobile/mobileHelpers'
 import { boxOf, currentCell, hudPanelBoxes, openGame, overlaps, type Box } from './screenHelpers'
 
 const INTERACT_PX = 72
@@ -20,6 +21,9 @@ const HELD_STEP_WAIT_MS = 1_000
 const LEFT_NOTCH_PX = 47
 /** The smallest touch target (#470), the charge size badge's (ticket 473). */
 const TOUCH_TARGET_PX = 48
+
+// The mobile projects run this spec too (ticket 481); WebKit may not be installed.
+skipWhereEngineIsMissing()
 
 test.beforeEach(() => {
   const cell = currentCell()
@@ -63,7 +67,11 @@ test.describe('screen matrix: touch controls (#173)', () => {
     expect(errors).toEqual([])
   })
 
-  test('presses the same action stream with the stick as with the keys', async ({ page }) => {
+  test('presses the same action stream with the stick as with the keys', async ({
+    page,
+    browserName,
+  }) => {
+    skipWithoutCdp(browserName)
     const errors = await openGame(page, currentCell())
     const zone = await boxOf(page, 'touch-stick-zone')
     const start = { x: zone.left + zone.width / 2, y: zone.top + zone.height / 2 }
