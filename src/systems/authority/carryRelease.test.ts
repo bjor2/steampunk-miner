@@ -261,37 +261,60 @@ const isPaidOnRelease = ({ price, left }: { price: number; left: number }) => pr
 /** The tick's walk paid a cell the stamp bit, on the tick it met it (rule (b)). */
 const hasReleasePay = (tick: LegTick) => paidCellsOf(tick).some(isPaidOnRelease)
 
-describe('a released cell is paid, not free (ticket 421)', () => {
-  it('pays the cell the stamp bit on the tick the walk meets it, on a level leg the body follows', () => {
-    expect(LEG.filter(hasReleasePay).length).toBeGreaterThan(10)
-  })
+/**
+ * An up leg through plain ground: the lifting stamp held the cell ahead out until the body's front
+ * met it (#432's stall, measured at a phase of 0.414 of a cell); the release pays it the same way.
+ */
+const UP_LEG = followCut({ facing: FACING.up, isSoftened: false }, 120)
 
-  it('never carries more than is left of the cell it works toward', () => {
-    const over = LEG.filter(({ carved, effect }) => {
-      const left = carved.carryTarget === null ? 0 : leftOf(effect.state, carved.carryTarget)
-      return carved.carrySubSteps > left
-    })
-    expect(over).toEqual([])
-  })
+const PAID_LEGS: readonly [string, LegTick[]][] = [
+  ['level', LEG],
+  ['up (ticket 432)', UP_LEG],
+]
 
-  it('pays each cell exactly what was left of it, and no tick more than its carry and work', () => {
-    let paidOverLeg = 0
-    for (const tick of LEG) {
-      const cells = paidCellsOf(tick)
-      const unbitten = cells.filter((cell) => !isPaidOnRelease(cell))
-      expect(unbitten.map(({ price }) => price)).toEqual(unbitten.map(({ left }) => left))
-      const paid = cells.reduce((sum, { price }) => sum + price, 0)
-      const available = Q + (vehicleOf(tick.before, 'p1').sweptCut?.carrySubSteps ?? 0)
-      expect(paid + tick.carved.carrySubSteps).toBeLessThanOrEqual(available)
-      paidOverLeg += paid
-    }
-    expect(paidOverLeg).toBeGreaterThan(20 * Q)
-  })
+describe('a released cell is paid, not free (tickets 421, 432)', () => {
+  it.each(PAID_LEGS)(
+    '%s leg: pays the cell the stamp bit on the tick the walk meets it, the body following',
+    (_, leg) => {
+      expect(leg.filter(hasReleasePay).length).toBeGreaterThan(10)
+    },
+  )
 
-  it('discards the surplus of a cell paid on release, never banking it forward', () => {
-    const released = LEG.filter(hasReleasePay)
-    expect(released.map(({ carved }) => carved.carrySubSteps)).toEqual(released.map(() => 0))
-  })
+  it.each(PAID_LEGS)(
+    '%s leg: never carries more than is left of the cell it works toward',
+    (_, leg) => {
+      const over = leg.filter(({ carved, effect }) => {
+        const left = carved.carryTarget === null ? 0 : leftOf(effect.state, carved.carryTarget)
+        return carved.carrySubSteps > left
+      })
+      expect(over).toEqual([])
+    },
+  )
+
+  it.each(PAID_LEGS)(
+    '%s leg: pays each cell exactly what was left of it, and no tick more than its carry and work',
+    (_, leg) => {
+      let paidOverLeg = 0
+      for (const tick of leg) {
+        const cells = paidCellsOf(tick)
+        const unbitten = cells.filter((cell) => !isPaidOnRelease(cell))
+        expect(unbitten.map(({ price }) => price)).toEqual(unbitten.map(({ left }) => left))
+        const paid = cells.reduce((sum, { price }) => sum + price, 0)
+        const available = Q + (vehicleOf(tick.before, 'p1').sweptCut?.carrySubSteps ?? 0)
+        expect(paid + tick.carved.carrySubSteps).toBeLessThanOrEqual(available)
+        paidOverLeg += paid
+      }
+      expect(paidOverLeg).toBeGreaterThan(20 * Q)
+    },
+  )
+
+  it.each(PAID_LEGS)(
+    '%s leg: discards the surplus of a cell paid on release, never banking it forward',
+    (_, leg) => {
+      const released = leg.filter(hasReleasePay)
+      expect(released.map(({ carved }) => carved.carrySubSteps)).toEqual(released.map(() => 0))
+    },
+  )
 })
 
 /** The tick's broken cells, in event order. */

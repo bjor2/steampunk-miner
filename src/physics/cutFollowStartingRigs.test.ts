@@ -13,10 +13,14 @@ import { commandedSpeedsOf, createRig, type TickRead } from './cutFollowFixtures
 // tip 0 (stored 10 is major 1): cutSpeed 1.50 / 1.62 / 1.86 m/s, where the cut gate shut in every
 // cell and travel sped the body to the face ahead of the drill. Now the body coasts on its last
 // vCut through the gate's shut dwell, and over a slab the cut has just cleared, so a down cut holds
-// the drill's speed past its start; up and level are no worse than before (their stalls are a cell
-// held out until the body's front arrives, #432). Two fast rigs ride along as a regression:
-// #400's rig 1, and a 15 m/s rig at the old 4-tick floor's pace #400's rig 2 had until ticket 397
-// took the floor out (rig 2 now jams, #439). Letting go of the drive is `cutFollowRelease.test.ts`.
+// the drill's speed past its start; level is no worse than before. An up cut holds the drill's
+// speed on every tick past its start until it breaks out of the ground (ticket 432): the lifting
+// stamp held the next cell out until the body's front arrived, a 4-7 tick stall a cell, and since
+// ticket 421 the carry releases that cell into the stamp once it lies in the body's next step,
+// while the coast carries the body through the gate's shut dwell. Two fast rigs ride along as a
+// regression: #400's rig 1, and a 15 m/s rig at the old 4-tick floor's pace #400's rig 2 had until
+// ticket 397 took the floor out (rig 2 now jams, #439). Letting go of the drive is
+// `cutFollowRelease.test.ts`.
 
 const STARTING_RIGS: Readonly<Record<string, Record<string, number>>> = {
   'stored 1': { drill_power: 1, drill_tip: 0 },
@@ -81,11 +85,20 @@ function pastStartOf(ticks: readonly TickRead[]): { speed: number; commanded: nu
     .slice(secondCell + CUT_FOLLOW_TICKS)
 }
 
+/**
+ * The leg up to the last tick the authority's gate stood open: past it the body has broken out of
+ * the ground and travels, with nothing left to cut.
+ */
+function untilBreakOutOf(ticks: readonly TickRead[]): readonly TickRead[] {
+  const cut = ticks.map((tick) => tick.authorityGate === 1)
+  return ticks.slice(0, cut.lastIndexOf(true) + 1)
+}
+
+const isOffHeldSpeed = ({ speed, commanded }: { speed: number; commanded: number }) =>
+  Math.abs(speed - commanded) > commanded * HELD_SHARE
+
 function heldShareOf(ticks: readonly { speed: number; commanded: number }[]): number {
-  const held = ticks.filter(
-    ({ speed, commanded }) => Math.abs(speed - commanded) <= commanded * HELD_SHARE,
-  )
-  return held.length / ticks.length
+  return (ticks.length - ticks.filter(isOffHeldSpeed).length) / ticks.length
 }
 
 /** Each frame rate's legs for a rig, played once and shared by the specs that read them. */
@@ -126,8 +139,17 @@ describe('cut-follow at the starting drill (ticket 430)', () => {
     120_000,
   )
 
-  it.todo(
-    'holds the drill speed within 5% on 95% of the up ticks (#432: the lifting stamp holds the next cell out until the body front arrives)',
+  it.each(rigsOf(STARTING_RIGS))(
+    '%s: holds the drill speed within 5% on every up tick past the start until it breaks out, none backward, at 30 and 144 frames/s (ticket 432)',
+    (rig) => {
+      for (const framesPerSecond of FRAME_RATES) {
+        const ticks = pastStartOf(untilBreakOutOf(legsOf(rig, framesPerSecond).up))
+        expect(ticks.length).toBeGreaterThan(300)
+        expect(ticks.filter(isOffHeldSpeed)).toEqual([])
+        expect(ticks.filter(({ speed }) => speed < BACKWARD_MPS)).toEqual([])
+      }
+    },
+    240_000,
   )
 
   it.each(rigsOf(ALL_RIGS))(

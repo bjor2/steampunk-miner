@@ -20,7 +20,9 @@ import { createRig, type TickRead } from './cutFollowFixtures'
 // the rigs hold the 5% line across cell boundaries, and the GD's interim bar for #421 (#397 keeps
 // the strict 5% on every tick): judged on every ramped-up cut tick against the rig's own commanded
 // cut speed, no tick goes backwards (below -0.02 m/s, as a stalled tick jitters at +-0.01) or under
-// 80% of it, and at most 2% of the leg's ticks are more than 5% off it.
+// 80% of it, and at most 2% of the leg's ticks are more than 5% off it. An up cut, where the lifting
+// stamp held the next cell out until the body's front arrived (ticket 432), now holds #397's strict
+// line: every ramped-up cut tick within 5% of the rig's cut speed.
 //
 // Each rig is held on the legs where the carry was the cause. Since ticket 439 cut each fresh step's
 // capsule from the body, the legs below dip under 80% with the hold-out ablated outright too, and
@@ -62,6 +64,10 @@ const BAR_RIGS: Readonly<Record<string, HeldRig>> = {
     legs: ['down', 'up'],
   },
 }
+/** The rigs held on an up cut; the 25 m/s rig's up leg is #459's (the todo below). */
+const UP_RIGS = Object.fromEntries(
+  Object.entries(BAR_RIGS).filter(([, { legs }]) => legs.includes('up')),
+)
 const MAX_OFF_SPEED = 0.05
 const MIN_SPEED_SHARE = 0.8
 const MAX_OFF_SPEED_TICK_SHARE = 0.02
@@ -168,6 +174,17 @@ function judgeLegAgainstBar(leg: string, ticks: readonly TickRead[]): void {
   )
 }
 
+/**
+ * An up leg's ramped-up cut ticks against #397's strict line (ticket 432): every one within 5% of
+ * the rig's own cut speed, none backwards.
+ */
+function judgeLegOnEveryTick(leg: string, ticks: readonly TickRead[]): void {
+  const cut = rampedCutTicksOf(ticks)
+  expect(cut.length, `${leg}: ramped-up cut ticks`).toBeGreaterThanOrEqual(MIN_JUDGED_TICKS)
+  expect(cut.filter(isBackwards), `${leg}: backwards`).toEqual([])
+  expect(cut.filter(isOffSpeed), `${leg}: more than 5% off`).toEqual([])
+}
+
 const rigsOf = (rigs: Readonly<Record<string, unknown>>) =>
   Object.keys(rigs).map((rig) => [rig] as const)
 
@@ -189,7 +206,7 @@ function judgeRig(
   }
 }
 
-describe('continuous cut-follow (tickets 400, 397, 421)', () => {
+describe('continuous cut-follow (tickets 400, 397, 421, 432)', () => {
   it.each(rigsOf(RIGS))(
     '%s rig: varies its speed by at most 5% across cell boundaries on its held legs, at 30 and 144 frames/s',
     (rig) => judgeRig(RIGS[rig], judgeLegAcrossBoundaries),
@@ -199,6 +216,12 @@ describe('continuous cut-follow (tickets 400, 397, 421)', () => {
   it.each(rigsOf(BAR_RIGS))(
     '%s rig: holds its own cut speed on its held legs, at 30 and 144 frames/s (#421 interim bar)',
     (rig) => judgeRig(BAR_RIGS[rig], judgeLegAgainstBar),
+    240_000,
+  )
+
+  it.each(rigsOf(UP_RIGS))(
+    '%s rig: holds its own cut speed within 5% on every ramped-up tick of an up cut, at 30 and 144 frames/s (ticket 432)',
+    (rig) => judgeRig({ ...UP_RIGS[rig], legs: ['up'] }, judgeLegOnEveryTick),
     240_000,
   )
 
