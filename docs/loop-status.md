@@ -481,3 +481,32 @@ priority list to keep the file the same size; the edit was one in-place `pwrite`
 
 Rollback: `gh issue edit 522 --remove-label build`; restore `next-ticket.sh.bak-20261016-2330-522` over `next-ticket.sh` in place
 (`cat`, not `mv`).
+
+## Idle-box bench for #514: quiet-bench.sh (16 Oct 2026, ~23:45 Oslo)
+
+The TD (comment 6225097284 on #514) ruled that A1 can only merge after the cost bench is re-run on an idle box: p50 <= 1.2 ms at W=7,
+p95 < 2 ms at W=27, P200 flatness (p50 within +-10% of the P1 rigs), a per-tick max, and `meetsBar` in `scripts/benchReportPose.ts` must
+read 1.2, not 0.7. Interval stays 1. The loop had no "bench on idle" concept: workers may not run benches, and the Tester only runs
+`npm run bench:<name>` probes after a whole spec closes, with workers alive (and its regex does not match `bench:report-pose`).
+
+What exists now:
+- `quiet-bench.sh <ticket>` in the loop dir. It writes `.quiet-hold` (expiry epoch + owner), waits until the 1-min load stays below 2.0 for
+  9 samples 20 s apart (max 60 min), checks out the tip of `ticket/<n>` in a throwaway `worktrees/wt-bench` (node_modules symlinked from the
+  main clone), runs `npm run bench:report-pose` three times, logs load and the top CPU consumers around each run to
+  `logs/quiet-bench-<n>-<ts>.log` (a run is marked NOT VALID if load1 after is 2.5 or more), then removes the worktree and the hold.
+  `--selftest` (5 s hold) and `--release` exist. Nothing is killed: running workers and the Tester finish, new dev claims wait.
+- `wave-lib.sh` `load_guard_reason` now also reports a live `.quiet-hold`, so `--refill-dev` and the pass claim nothing while it holds.
+  The hold expires by itself (wait + 30 min), so a crashed run cannot wedge the loop. `wave-lib.sh` is sourced once per process, so
+  running workers were not affected; `next-ticket.sh` was not edited.
+- #514 got a comment (merge gate, `meetsBar` 1.2, per-tick max, P200 flatness, "do not run the bench in the session; end with
+  `needs-planner: awaiting idle-box bench`; do not merge or close before the result is on the ticket and #519 and #522 have merged").
+
+How to use: when #514's worker has committed the final code and paused, run `quiet-bench.sh 514` (it may take up to an hour to get a quiet
+box; busy slots drain as sessions finish). Paste the benchmark lines on #514 for the TD and VS.
+
+Open decision (human or planner): the driver pushes a green ticket to main right after its session ends, so the only thing keeping #514
+from merging before the bench is the worker pausing with `needs-planner` and the native blockers (#519, #522). If a worker ignores the
+comment, put `on-hold` on #514 until the bench is posted.
+
+Rollback: `rm quiet-bench.sh .quiet-hold`; restore `wave-lib.sh.bak-20261016-2345-quiet` (the file before the 4-line hold check; copy it
+over `wave-lib.sh`).
