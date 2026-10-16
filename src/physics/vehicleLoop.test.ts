@@ -5,11 +5,14 @@ import { PHYSICS_TIMESTEP } from '../constants/physics'
 import { MAX_GROUND_COLLIDERS } from '../constants/scene'
 import { createMemorySink, type MemorySink } from '../logging/eventSink'
 import { createRunLog, installRunLog, uninstallRunLog } from '../logging/runLog'
+import type { DevFlags } from '../constants/devFlags'
 import {
   createVehicleBody,
   createVehicleController,
+  type VehicleController,
   type VehicleControllerOptions,
 } from './vehicleController'
+import { readAuthorityState } from '../store/authorityLink'
 import { readLocalVehicle, readPlanetWorld, resetGameStore } from '../store/gameStore'
 import { buildIntent } from '../systems/input/buildIntent'
 import { IDLE_INTENT, type VehicleIntent } from '../systems/vehicle/vehicleIntent'
@@ -77,6 +80,53 @@ const lastPose = () => {
  */
 function createPerCellRunLog() {
   return createRunLog({ runId: 'run_test', sink, secondsSinceStart: () => 0, drillLines: 'cells' })
+}
+
+/** The worlds one tick's step read, its substeps were handed (null for none) and it ended on. */
+interface GroundHandOver {
+  stepRead: unknown
+  substepsGot: unknown
+  tickLeft: unknown
+  isDrilling: boolean
+}
+
+/** Off the pad and down a shaft, noting which world each tick handed the controller (ticket 459). */
+function playGroundHandOvers(flags: DevFlags): GroundHandOver[] {
+  const world = new RAPIER.World({ x: 0, y: 0, z: 0 })
+  world.timestep = PHYSICS_TIMESTEP
+  const start = readLocalVehicle().pose
+  if (start === null) throw new Error('the starting planet has no dock')
+  const controller = createVehicleController(RAPIER, world, createVehicleBody(RAPIER, world, start))
+  const loop = createVehicleLoop(flags)
+  const handOvers: GroundHandOver[] = []
+  const hold = (intent: VehicleIntent, seconds: number) => {
+    for (let step = 0; step < seconds / PHYSICS_TIMESTEP; step++) {
+      const handOver = {
+        stepRead: null as unknown,
+        substepsGot: null as unknown,
+        isDrilling: false,
+      }
+      const watched: VehicleController = {
+        ...controller,
+        step(input, planet) {
+          handOver.stepRead = planet.worldVersion
+          const result = controller.step(input, planet)
+          handOver.isDrilling = result.flags.isDrilling
+          return result
+        },
+        syncGround(planet) {
+          handOver.substepsGot = planet.worldVersion
+          controller.syncGround(planet)
+        },
+      }
+      loop.step(watched, intent)
+      controller.stepWorld()
+      handOvers.push({ ...handOver, tickLeft: readAuthorityState().world })
+    }
+  }
+  hold(buildIntent(['aim_left']), 2)
+  hold(buildIntent(['aim_down']), 3)
+  return handOvers
 }
 
 const destroyedTiles = () => sink.events.filter((event) => event.event === 'tile_destroyed')
@@ -165,5 +215,20 @@ describe('vehicle loop', () => {
     expect(moving.tiles).toEqual(steady.tiles)
     expect(Math.abs(moving.at.x - steady.at.x)).toBeLessThanOrEqual(0.001)
     expect(Math.abs(moving.at.y - steady.at.y)).toBeLessThanOrEqual(0.001)
+  })
+})
+
+describe('vehicle loop, the ground the substeps meet (ticket 459)', () => {
+  it('hands the substeps the world its own drill step and report left, with the swept cut on', () => {
+    const cutting = playGroundHandOvers({ 'drill.sweptCut': true }).filter((t) => t.isDrilling)
+    expect(cutting.length).toBeGreaterThan(30)
+    expect(cutting.filter((tick) => tick.substepsGot !== tick.tickLeft)).toEqual([])
+    expect(cutting.some((tick) => tick.substepsGot !== tick.stepRead)).toBe(true)
+  })
+
+  it('hands the substeps no other world with the swept cut off', () => {
+    const handOvers = playGroundHandOvers({ 'drill.sweptCut': false })
+    expect(handOvers.some((tick) => tick.isDrilling)).toBe(true)
+    expect(handOvers.filter((tick) => tick.substepsGot !== null)).toEqual([])
   })
 })

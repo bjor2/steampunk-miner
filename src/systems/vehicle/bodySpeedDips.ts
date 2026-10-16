@@ -9,9 +9,9 @@
  * in the slab the commanded move sweeps, from the body's face to the face plus the commanded step:
  *
  * - **stale halo**: ground stood there in the world before the tick's `drillStep` cut and none
- *   stands after it. The halo the world steps against is synced from the planet view the motor's
- *   step took before the loop sent the cut (`vehicleLoop.ts`), so the body meets ground the
- *   authority has already opened that tick;
+ *   stands after it. Until ticket 459 the halo the world stepped against was synced from the planet
+ *   view the motor's step took before the loop sent the cut (`vehicleLoop.ts`), so the body met
+ *   ground the authority had already opened that tick; since, the substeps meet the post-cut world;
  * - **uncut ground**: ground still stands there after the cut: the carry's held-out target cell
  *   (#421), a cell harder than the read's `vCut`, a lip;
  * - **unexplained**: the slab is open before and after the cut (a corner or side contact).

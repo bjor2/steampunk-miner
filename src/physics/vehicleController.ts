@@ -21,7 +21,9 @@
  * The motor also steps the world through its tick (ticket 334, `tickStepping.ts`): `step` runs the
  * motion rule once and plans the tick from the speed it set, `stepWorld` then steps the world in
  * as many substeps as that speed needs, the halo synced round the body before each, or past the
- * substep budget sweeps the body against the ground with no contact solve.
+ * substep budget sweeps the body against the ground with no contact solve. With the swept cut the
+ * loop hands it the world the tick's own `drillStep` left before the substeps (ticket 459,
+ * `syncGround`), so the body never meets ground the authority opened that tick.
  */
 import type RAPIER from '@dimforge/rapier3d-compat'
 import { PHYSICS_TIMESTEP, VEHICLE_COLLIDER_SIZE } from '../constants/physics'
@@ -128,6 +130,11 @@ export interface VehicleStepResult {
 export interface VehicleController {
   /** Call once per fixed step: the motion rule, and the plan for stepping the world through it. */
   step(input: VehicleStepInput, planet: PlanetView): VehicleStepResult
+  /**
+   * Between `step` and `stepWorld`: the ground the tick's substeps collide with, the world after the
+   * tick's own cut (ticket 459); the halo syncs round the body from it before each substep.
+   */
+  syncGround(planet: PlanetView): void
   /** Then steps the world through the tick `step` planned (ticket 334); never call `world.step`. */
   stepWorld(): void
   /** A respawn on the dock after the tow or a planet change: the one time the body is placed. */
@@ -200,6 +207,9 @@ export function createVehicleController(
   let cutMemory: CutMemory = FRESH_CUT_MEMORY
   let lastPlanet: { view: PlanetView; ground: HaloGround } | null = null
   let passThrough: TilePoint | null = null
+  const holdPlanet = (planet: PlanetView) => {
+    lastPlanet = lastPlanet?.view === planet ? lastPlanet : haloPlanetOf(planet)
+  }
   const syncHaloAt = (position: Vector2) => {
     if (lastPlanet === null) return
     const { view, ground } = lastPlanet
@@ -218,7 +228,7 @@ export function createVehicleController(
       recentreWhenFar(body, colliders, frame, position)
       const velocity = vectorOf(body.linvel())
       up = localUpOf(position, up)
-      lastPlanet = lastPlanet?.view === planet ? lastPlanet : haloPlanetOf(planet)
+      holdPlanet(planet)
       passThrough = passThroughOf(input.motion)
       syncHaloAt(position)
       struts.sync(input.struts ?? NO_STRUTS)
@@ -264,6 +274,7 @@ export function createVehicleController(
         isCutting: isGateOpen,
       }
     },
+    syncGround: holdPlanet,
     stepWorld: () => stepWorldThroughTick(tick, plan),
     placeAt(pose) {
       placeBodyAt(body, colliders, frame, pose)

@@ -13,8 +13,9 @@
  * motor reads the cut gate and the drill's speed from the authority before the step's cut and
  * drives on an engine whose top speed is travel parity's, and (ticket 334) clamps the body to the
  * rig's stats-derived step bound and widens the wheels' wait-for-cut window to it; off, nothing
- * changes. The bore struts standing in the authority's state go to the motor, which lands the body
- * on their planks (ticket 379).
+ * changes. With it on, the motor's substeps then collide with the world that step's cut and report
+ * left, not the one the step read (ticket 459). The bore struts standing in the authority's state
+ * go to the motor, which lands the body on their planks (ticket 379).
  */
 import { DEV_FLAGS, type DevFlags } from '../constants/devFlags'
 import { MM_PER_METRE, UP_VECTOR_SCALE } from '../constants/physics'
@@ -128,6 +129,7 @@ export function createVehicleLoop(flags: DevFlags = DEV_FLAGS): VehicleLoop {
       noteBodyStep(loop, result)
       stepDrillWhenSwept(flags, result, stagedIntent)
       reportWhenDue(loop, result, stagedIntent)
+      syncGroundToTickWorld(flags, loop, controller)
       showDrill(result)
       showMotion(result)
       stepVehicleParts(result.pose, result.flags)
@@ -279,6 +281,17 @@ function readLocalCutFollow(step: CutFollowStep): CutFollow {
 function stepDrillWhenSwept(flags: DevFlags, result: VehicleStepResult, intent: VehicleIntent) {
   if (!flags['drill.sweptCut'] || !result.flags.isDrilling) return
   useGameStore.getState().stepDrill(drillStepCommand(result.pose, driveSignsOfIntent(intent)))
+}
+
+/**
+ * With the swept cut on, the ground the tick's substeps collide with is the world the tick's own
+ * cut and report left (ticket 459): the step read the world before them, and the cut has opened
+ * ground there since. A report can change the world too (a casing placed), so the sync comes last.
+ */
+function syncGroundToTickWorld(flags: DevFlags, loop: LoopState, controller: VehicleController) {
+  if (!flags['drill.sweptCut']) return
+  const { params, world } = readPlanetWorld()
+  if (params !== null) controller.syncGround(planetViewOf(loop, params, world))
 }
 
 function reportWhenDue(loop: LoopState, result: VehicleStepResult, intent: VehicleIntent): void {
