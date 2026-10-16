@@ -805,7 +805,7 @@ programs }` from three's `renderer.info` of the game canvas), read only when cal
   from `e2e-report/results.json`.
 - **Screen matrix** (#173, #179): `e2e/browser/screens/` runs once per reference screen, one
   Playwright project per cell of `screenCells.ts` (desktop, ultra-wide, 32:9, TV and TV at 1080p
-  with TV mode on, iPhone 13 and Pixel 7 class phones in landscape, a phone in portrait, a tablet).
+  with TV mode on, iPhone 13 and Pixel 7 class phones in landscape and upright, a tablet both ways).
   The cell's expectations are the decision's own tables (zoom cap, render-scale floor, stage), not
   the game's formulas. It asserts the zoom cap and pillarbox (`ui.getCameraView()`'s
   `maxViewShortAxisMetres`, the `game-stage` box), the render-scale floor and a pin at it
@@ -835,6 +835,16 @@ programs }` from three's `renderer.info` of the game canvas), read only when cal
   across devices (#11, #12). `perfPhone.spec.ts` is the `npm run perf:phone` lane
   ([docs/perf/README.md](perf/README.md#phone-lane)) and skips elsewhere. All of it is emulation;
   no spec claims "verified on device" until the real-device check (#482).
+- **Portrait framing** (ticket 484, spec #470): `e2e/browser/screens/portraitFraming.spec.ts` runs
+  in the matrix's portrait cells (390x844, 412x915, 820x1180) and skips elsewhere. It reads
+  `ui.getCameraView()`: 12 m down the height at the default with the collider at 7.5%, the width
+  `viewHorizontalMetres` at the vertical extent times width over height at 8, 12 and 20 m, and a
+  descent's screens a second (felt speed times pixels per metre over the height) against the same
+  run resized to a 16:9 window, within the camera's smoothing. It also holds the render scale at
+  the cell's floor and measures the hazard strip's track while digging down: along the long axis,
+  30 vmin long, at most 8 pips. The law is pinned in node (`viewZoom.test.ts` and
+  `speedFraming.test.ts`, which logs the horizontal cells ahead and warning seconds per speed row);
+  `debugScreens.test.ts` holds the digest to one value at both orientations. Box Tester only.
 - **Compact HUD** (#500, spec #470): `e2e/browser/hud/hudLayout.spec.ts` runs in the `chromium`
   project with each cell's viewport and touch set per `describe`: the four reference phones (390x844,
   412x915, 844x390, 915x412), the small-phone sweep (360x640, 320x568, 640x360) and the cells that

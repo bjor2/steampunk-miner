@@ -24,8 +24,10 @@ The command builds the preview, runs `reviewShots.spec.ts` in every cell and wri
 | `tv-1080p`        | 1920 x 1080     | 1     | TV mode on                 |
 | `phone-landscape` | 844 x 390       | 3     | iPhone 13 class, touch     |
 | `pixel-landscape` | 915 x 412       | 2.625 | Pixel 7 class, touch       |
-| `phone-portrait`  | 390 x 844       | 3     | the turn-your-device card  |
+| `phone-portrait`  | 390 x 844       | 3     | iPhone 13 class, upright   |
+| `pixel-portrait`  | 412 x 915       | 2.625 | Pixel 7 class, upright     |
 | `tablet`          | 1180 x 820      | 2     | touch                      |
+| `tablet-portrait` | 820 x 1180      | 2     | touch, upright             |
 
 ## The shots
 
@@ -40,5 +42,6 @@ nearest screen:
 | `workshop.jpg` | the Upgrade bay screen                                                              | the workshop mid-chain (#177) |
 | `settings.jpg` | the settings screen, stand-in for a big menu                                        | the tech tree (#165)          |
 
-The portrait cell writes only `portrait-open.jpg`, the game as it opens held upright, until PT-6
-(ticket 488) brings the portrait set; ticket 483 retired the turn-your-device card.
+The portrait cells (ticket 484 added `pixel-portrait` and `tablet-portrait`) write only
+`portrait-open.jpg`, the game as it opens held upright, until PT-6 (ticket 488) brings the
+portrait set; ticket 483 retired the turn-your-device card.

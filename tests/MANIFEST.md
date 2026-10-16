@@ -805,7 +805,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/debug/debugMemory.test.ts` | 4 | 4 |
 | `src/debug/debugOverlay.test.ts` | 2 | 2 |
 | `src/debug/debugSaves.test.ts` | 5 | 5 |
-| `src/debug/debugScreens.test.ts` | 32 | 31 |
+| `src/debug/debugScreens.test.ts` | 33 | 32 |
 | `src/debug/sliceDebugCommands.test.ts` | 3 | 3 |
 
 ### `economy`
@@ -1095,14 +1095,14 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/render/screenProjection.test.ts` | 5 | 5 |
 | `src/systems/render/skyBandLook.test.ts` | 3 | 3 |
 | `src/systems/render/skyBandRing.test.ts` | 6 | 6 |
-| `src/systems/render/speedFraming.test.ts` | 20 | 8 |
+| `src/systems/render/speedFraming.test.ts` | 25 | 13 |
 | `src/systems/render/sprayPool.test.ts` | 10 | 10 |
 | `src/systems/render/stagedTurn.test.ts` | 2 | 2 |
 | `src/systems/render/stationIdleMotion.test.ts` | 9 | 9 |
 | `src/systems/render/vehicleLook.test.ts` | 10 | 8 |
 | `src/systems/render/vehicleLookFold.test.ts` | 9 | 9 |
 | `src/systems/render/vehiclePreviewLook.test.ts` | 5 | 5 |
-| `src/systems/render/viewZoom.test.ts` | 20 | 14 |
+| `src/systems/render/viewZoom.test.ts` | 25 | 19 |
 | `src/systems/render/visibleChunks.test.ts` | 7 | 7 |
 
 ### `replay`

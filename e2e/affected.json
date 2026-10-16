@@ -269,7 +269,7 @@
         "src/scene/drillPresence.ts",
         "src/systems/render/speedFraming.ts"
       ],
-      "specs": ["e2e/browser/speedCamera.spec.ts"]
+      "specs": ["e2e/browser/speedCamera.spec.ts", "e2e/browser/screens/portraitFraming.spec.ts"]
     },
     {
       "why": "The committed scenarios the specs open with ?scenario=.",

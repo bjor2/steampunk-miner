@@ -11,7 +11,10 @@ export interface ScreenCell {
   isTouch: boolean
   isTvMode: boolean
   isPortrait: boolean
-  /** The widest view, metres across the short axis (TD's cap table). */
+  /**
+   * The widest view, metres down the screen's height (TD's cap table; ticket 484: 20 m on every
+   * portrait cell, as the zoom spans the height in either orientation).
+   */
   maxViewShortAxisMetres: number
   /** The render-scale floor (TD's tier table). */
   renderScaleFloor: number
@@ -104,9 +107,31 @@ export const SCREEN_CELLS: readonly ScreenCell[] = [
     isTouch: true,
     isTvMode: false,
     isPortrait: true,
-    maxViewShortAxisMetres: 17.11,
+    maxViewShortAxisMetres: 20,
     renderScaleFloor: 0.5,
     stage: { left: 0, width: 390 },
+  },
+  {
+    name: 'pixel-portrait',
+    viewport: { width: 412, height: 915 },
+    deviceScaleFactor: 2.625,
+    isTouch: true,
+    isTvMode: false,
+    isPortrait: true,
+    maxViewShortAxisMetres: 20,
+    renderScaleFloor: 0.5,
+    stage: { left: 0, width: 412 },
+  },
+  {
+    name: 'tablet-portrait',
+    viewport: { width: 820, height: 1180 },
+    deviceScaleFactor: 2,
+    isTouch: true,
+    isTvMode: false,
+    isPortrait: true,
+    maxViewShortAxisMetres: 20,
+    renderScaleFloor: 0.5,
+    stage: { left: 0, width: 820 },
   },
   {
     name: 'tablet',
