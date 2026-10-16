@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-10-16T07:40:35+02:00",
+  "updated_at": "2026-10-16T07:42:13+02:00",
   "caps": {
     "grok": 12,
     "claude": 10,
@@ -33,16 +33,15 @@
           "grok_slot": 2,
           "kind": "dev",
           "since": "2026-10-16T07:03:00+02:00",
-          "wave": "2F"
+          "wave": "3G"
         },
         {
           "slot": "C3",
-          "state": "busy",
-          "ticket": 392,
-          "grok_slot": 4,
-          "kind": "dev",
-          "since": "2026-10-16T07:28:00+02:00",
-          "wave": null
+          "state": "free",
+          "ticket": null,
+          "grok_slot": null,
+          "kind": null,
+          "since": null
         },
         {
           "slot": "C4",
@@ -51,7 +50,7 @@
           "grok_slot": 6,
           "kind": "dev",
           "since": "2026-10-16T07:28:00+02:00",
-          "wave": "2A"
+          "wave": "3A"
         },
         {
           "slot": "C5",
@@ -60,7 +59,7 @@
           "grok_slot": 1,
           "kind": "dev",
           "since": "2026-10-16T07:40:00+02:00",
-          "wave": "2F"
+          "wave": "3G"
         },
         {
           "slot": "C6",
@@ -69,12 +68,12 @@
           "grok_slot": 5,
           "kind": "dev",
           "since": "2026-10-16T07:40:00+02:00",
-          "wave": "2E"
+          "wave": "3E"
         }
       ],
       "size": 6,
-      "used": 6,
-      "free": 0,
+      "used": 5,
+      "free": 1,
       "claims_last_hour": 14,
       "name": "Claude Max 1"
     },
@@ -126,7 +125,7 @@
     }
   ],
   "gate": {
-    "busy": 2,
+    "busy": 1,
     "max": 3
   },
   "tester": {
@@ -493,7 +492,7 @@
           392,
           410
         ],
-        "since": "2026-10-16T03:19:05+02:00"
+        "since": "2026-10-16T07:41:39+02:00"
       },
       {
         "feature": 157,
@@ -608,7 +607,7 @@
           416,
           434
         ],
-        "since": "2026-10-16T03:19:05+02:00"
+        "since": "2026-10-16T07:41:39+02:00"
       }
     ]
   },
@@ -619,7 +618,7 @@
       "ticket": 440,
       "since": "2026-10-16T07:40:00+02:00",
       "claude_slot": 5,
-      "wave": "2F"
+      "wave": "3G"
     },
     {
       "slot": 2,
@@ -627,7 +626,7 @@
       "ticket": 465,
       "since": "2026-10-16T07:03:00+02:00",
       "claude_slot": 2,
-      "wave": "2F"
+      "wave": "3G"
     },
     {
       "slot": 3,
@@ -637,15 +636,13 @@
       "map": 302,
       "room": "9cc76e78-1e10-4130-8b0e-0865bac3f7a8",
       "adopted": false,
-      "wave": null
+      "wave": "3G"
     },
     {
       "slot": 4,
-      "state": "dev",
-      "ticket": 392,
-      "since": "2026-10-16T07:28:00+02:00",
-      "claude_slot": 3,
-      "wave": null
+      "state": "free",
+      "ticket": null,
+      "since": null
     },
     {
       "slot": 5,
@@ -653,7 +650,7 @@
       "ticket": 459,
       "since": "2026-10-16T07:40:00+02:00",
       "claude_slot": 6,
-      "wave": "2E"
+      "wave": "3E"
     },
     {
       "slot": 6,
@@ -661,7 +658,7 @@
       "ticket": 430,
       "since": "2026-10-16T07:28:00+02:00",
       "claude_slot": 4,
-      "wave": "2A"
+      "wave": "3A"
     },
     {
       "slot": 7,
@@ -718,16 +715,15 @@
       "grok_slot": 2,
       "since": "2026-10-16T07:03:00+02:00",
       "account": 1,
-      "wave": "2F"
+      "wave": "3G"
     },
     {
       "slot": 3,
-      "state": "busy",
-      "ticket": 392,
-      "grok_slot": 4,
-      "since": "2026-10-16T07:28:00+02:00",
-      "account": 1,
-      "wave": null
+      "state": "free",
+      "ticket": null,
+      "grok_slot": null,
+      "since": null,
+      "account": 1
     },
     {
       "slot": 4,
@@ -736,7 +732,7 @@
       "grok_slot": 6,
       "since": "2026-10-16T07:28:00+02:00",
       "account": 1,
-      "wave": "2A"
+      "wave": "3A"
     },
     {
       "slot": 5,
@@ -745,7 +741,7 @@
       "grok_slot": 1,
       "since": "2026-10-16T07:40:00+02:00",
       "account": 1,
-      "wave": "2F"
+      "wave": "3G"
     },
     {
       "slot": 6,
@@ -754,7 +750,7 @@
       "grok_slot": 5,
       "since": "2026-10-16T07:40:00+02:00",
       "account": 1,
-      "wave": "2E"
+      "wave": "3E"
     },
     {
       "slot": 7,
@@ -803,8 +799,8 @@
   "totals": {
     "grok": {
       "size": 12,
-      "used": 6,
-      "dev": 5,
+      "used": 5,
+      "dev": 4,
       "dev_cap": 8,
       "planner": 1,
       "planner_cap": 4
@@ -812,8 +808,8 @@
     "claude": {
       "size": 10,
       "enabled": 6,
-      "used": 6,
-      "free": 0,
+      "used": 5,
+      "free": 1,
       "external": 0
     }
   },
@@ -822,8 +818,21 @@
     "parallel": 1,
     "list": [
       {
+        "number": 490,
+        "key": "3F",
+        "map": 302,
+        "lane": "remote",
+        "mode": "solo",
+        "state": "ready",
+        "tickets": [
+          463
+        ],
+        "done": [],
+        "live": 0
+      },
+      {
         "number": 469,
-        "key": "3A",
+        "key": "4A",
         "map": 302,
         "lane": "hitl",
         "mode": "bench",
@@ -836,7 +845,7 @@
       },
       {
         "number": 468,
-        "key": "2C",
+        "key": "3C",
         "map": 302,
         "lane": "remote",
         "mode": "solo",
@@ -844,29 +853,29 @@
         "tickets": [
           446,
           448,
-          466
+          466,
+          471
         ],
         "done": [],
         "live": 0
       },
       {
         "number": 467,
-        "key": "2A",
+        "key": "3A",
         "map": 302,
         "lane": "remote",
         "mode": "solo",
         "state": "running",
         "tickets": [
           430,
-          397,
-          463
+          397
         ],
         "done": [],
         "live": 1
       },
       {
         "number": 462,
-        "key": "2E",
+        "key": "3E",
         "map": 302,
         "lane": "remote",
         "mode": "solo",
@@ -879,7 +888,7 @@
       },
       {
         "number": 461,
-        "key": "2D",
+        "key": "3D",
         "map": 302,
         "lane": "remote",
         "mode": "solo",
@@ -896,7 +905,7 @@
       },
       {
         "number": 456,
-        "key": "2B",
+        "key": "3B",
         "map": 302,
         "lane": "remote",
         "mode": "solo",
@@ -912,7 +921,7 @@
       },
       {
         "number": 438,
-        "key": "2F",
+        "key": "3G",
         "map": 302,
         "lane": "hitl",
         "mode": "bench",
@@ -927,8 +936,8 @@
           433,
           440,
           460,
-          464,
-          465
+          465,
+          470
         ],
         "done": [],
         "live": 2
