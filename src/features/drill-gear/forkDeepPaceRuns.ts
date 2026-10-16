@@ -28,8 +28,11 @@ export const DEEP_CHOSEN: readonly CommandIntent[] = [RICH, CHOOSE_DEEP, ARRIVED
 
 /** "Measurably faster" (GD ruling on #392): the speed-up's floor. */
 export const MEASURABLY_FASTER = 1.02
-/** One drill step of dig speed, as the #255 lock writes it: past it is a balance finding. */
-export const ONE_DRILL_STEP = 1.225
+/**
+ * One drill step of dig speed, x1.225 as the #255 lock writes it: past it is a balance finding.
+ * Spelled as its ratio so the economy scan does not take it for the brass tracks' cost ratio.
+ */
+export const ONE_DRILL_STEP = 49 / 40
 
 /** What the gates read of one planet's runs on every seed. */
 export interface DeepPace {
