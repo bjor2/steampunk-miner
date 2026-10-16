@@ -767,7 +767,8 @@ programs }` from three's `renderer.info` of the game canvas), read only when cal
   launches it with `--debug-api` and records under `soakElectron.*`. Its numbers back the decision
   to set no heap or stack flags ([docs/perf/runtime-flags.md](perf/runtime-flags.md)).
 - **Memory and frame samples in the run log** (#121): dev, scenario and debug runs log `perf_sample`
-  every second of frames (now with `frameMsP99` and `longTasks`, the frames over 50 ms) and
+  every second of frames (now with `frameMsP99` and `longTasks`, the frames over 50 ms, and
+  `ticksDroppedByCap`, the due ticks the 30-step frame cap cut since the last sample, ticket 480) and
   `memory_sample` every 10 s of frames: the JS heap, Rapier's WASM memory, the renderer and physics
   counts (the same seams as the two debug reads), cached and meshed chunks, DOM elements and live
   listeners, beside the progress so far (`maxDepthTiles`, `tilesDestroyed`, `mineralsCollected`,
