@@ -1,8 +1,8 @@
 /**
  * The kernel's own touch controls as binding rows (#474), read before the slices' rows: the
- * floating stick's four drive actions, the cluster's buttons (`touchControls.ts`, #173), the pause
- * button (ticket 472), the stage's double tap, and the actions the kernel leaves with no touch
- * control, each with its reason.
+ * floating stick's four drive actions, the cluster's buttons (`touchControls.ts`, #173), the charge
+ * size badge on Plant charge (ticket 473), the pause button (ticket 472), the stage's double tap,
+ * and the actions the kernel leaves with no touch control, each with its reason.
  */
 import type { ActionId } from './actionMap'
 import { CLUSTER_ACTION_IDS, PAUSE_ACTION_ID } from './touchControls'
@@ -16,6 +16,7 @@ const MENU_FOCUS_ACTION_IDS = ['ui_up', 'ui_down', 'ui_left', 'ui_right'] as con
 export const KERNEL_TOUCH_BINDINGS: readonly TouchBindingRule[] = [
   ...STICK_ACTION_IDS.map((action) => rowOf(`stick_${action}`, { gesture: 'drag', action })),
   ...CLUSTER_ACTION_IDS.map((action) => rowOf(`cluster_${action}`, { gesture: 'tap', action })),
+  rowOf('charge_size_badge', { gesture: 'tap', action: 'next_charge_size' }),
   rowOf('pause_button', { gesture: 'tap', action: PAUSE_ACTION_ID }),
   rowOf('double_tap_zoom_reset', { gesture: 'tap', action: 'zoom_reset' }),
   ...MENU_FOCUS_ACTION_IDS.map((action) =>
@@ -26,7 +27,6 @@ export const KERNEL_TOUCH_BINDINGS: readonly TouchBindingRule[] = [
     'ui_cancel',
     'every layer draws its own Back, Close, Leave, Resume or Undock button for a tap',
   ),
-  noControlRow('next_charge_size', 'P1-2 (#473) adds the plant-size badge'),
 ]
 
 function rowOf(control: string, touch: TouchBindingRule['touch']): TouchBindingRule {

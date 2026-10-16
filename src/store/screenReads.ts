@@ -19,6 +19,7 @@ import { dockedBayOf } from '../systems/authority/dockRules'
 import { chargesOf } from '../systems/authority/charges/chargeRules'
 import type { TouchSituation } from '../systems/input/touchControls'
 import { mountedGunModeOf } from '../systems/vehicle/vehicleGun'
+import { chargeSizeToPlantOf, nextChargeSizeOf } from '../systems/vehicle/chargeSelection'
 import type { BayId } from '../systems/world/dockBays'
 import { shownBayScreenIdOf } from '../ui/registries/bayScreens'
 import { readAuthorityState } from './authorityLink'
@@ -122,11 +123,14 @@ export function readArtefactChoiceModel(): ArtefactChoiceModel {
 export function readTouchSituation(): TouchSituation {
   const game = useGameStore.getState()
   const state = readAuthorityState()
+  const charges = chargesOf(state, game.playerId)
   return {
     layer: inputLayerOf(game),
     vehicleMode: game.vehicle.mode,
     dockedBay: dockedBayOf(state, game.playerId),
     hasGuns: mountedGunModeOf(state.players[game.playerId].vehicle.gun) !== null,
-    hasChargeRack: chargesOf(state, game.playerId).isRackMounted,
+    hasChargeRack: charges.isRackMounted,
+    plantingChargeSize: chargeSizeToPlantOf(charges, game.chosenChargeSize),
+    nextChargeSize: nextChargeSizeOf(charges, game.chosenChargeSize),
   }
 }

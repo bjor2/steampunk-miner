@@ -76,6 +76,10 @@ export interface TouchSituation {
   dockedBay: BayId | null
   hasGuns: boolean
   hasChargeRack: boolean
+  /** The size `plant_charge` plants now (`chargeSizeToPlantOf`), drawn on the size badge. */
+  plantingChargeSize: number
+  /** The size `next_charge_size` steps to; null while the rack holds fewer than two sizes. */
+  nextChargeSize: number | null
 }
 
 /** A finger's offset from where the stick landed, in CSS px, y growing down the screen. */
@@ -101,6 +105,15 @@ export function stickActionsOf(offset: StickOffset): ActionId[] {
 /** The cluster buttons to show now, in the cluster's order (#173: only valid and owned ones). */
 export function clusterActionsOf(situation: TouchSituation): ClusterActionId[] {
   return CLUSTER_ACTION_IDS.filter((action) => CLUSTER_RULES[action](situation))
+}
+
+/**
+ * The size the badge on Plant charge shows, or null for no badge (ticket 473): a tap on it presses
+ * `next_charge_size` as V does, so it is drawn only while Plant charge is and V would step a size.
+ */
+export function chargeSizeBadgeOf(situation: TouchSituation): number | null {
+  if (!isChargeSizeSteppable(situation)) return null
+  return situation.plantingChargeSize
 }
 
 /** Each cluster button's glyph, from the icon set the HUD already reads (#158; no text, #173). */
@@ -181,6 +194,10 @@ const CLUSTER_RULES: Readonly<Record<ClusterActionId, (situation: TouchSituation
   toggle_guns: ({ layer, hasGuns }) => layer === 'vehicle' && hasGuns,
   request_rescue: ({ layer, vehicleMode }) => layer === 'vehicle' && isWaitingForTow(vehicleMode),
   quick_service: ({ layer, dockedBay }) => layer === 'platform' && dockedBay === 'sell',
+}
+
+function isChargeSizeSteppable(situation: TouchSituation): boolean {
+  return CLUSTER_RULES.plant_charge(situation) && situation.nextChargeSize !== null
 }
 
 /** The tow is called only for a vehicle that cannot move on its own (#7), as `R` is. */

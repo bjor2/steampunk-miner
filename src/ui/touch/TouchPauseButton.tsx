@@ -5,13 +5,16 @@
  */
 import { PAUSE_ACTION_ID, PAUSE_ICON_ID } from '../../systems/input/touchControls'
 import { DEVICE_UI_IDS } from '../stage/deviceIds'
+import { VectorIcon } from '../VectorIcon'
 import { TouchButton } from './TouchButton'
 import styles from './TouchControls.module.css'
 
 export function TouchPauseButton() {
   return (
     <div className={styles.pause} data-testid={DEVICE_UI_IDS.touchPause}>
-      <TouchButton action={PAUSE_ACTION_ID} iconId={PAUSE_ICON_ID} />
+      <TouchButton action={PAUSE_ACTION_ID}>
+        <VectorIcon iconId={PAUSE_ICON_ID} size="menu" />
+      </TouchButton>
     </div>
   )
 }

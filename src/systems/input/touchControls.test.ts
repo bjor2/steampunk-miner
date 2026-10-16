@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest'
 import { iconEntryOf } from '../art/icons/iconSet'
 import {
   CLUSTER_ACTION_IDS,
+  chargeSizeBadgeOf,
   clusterActionsOf,
   clusterIconIdOf,
   knobOffsetOf,
@@ -21,6 +22,16 @@ const AT_REST_P1: TouchSituation = {
   dockedBay: null,
   hasGuns: false,
   hasChargeRack: false,
+  plantingChargeSize: 1,
+  nextChargeSize: null,
+}
+
+/** A rack holding sizes 1 and 4, planting 4 next press. */
+const RACKED_TWO_SIZES: TouchSituation = {
+  ...AT_REST_P1,
+  hasChargeRack: true,
+  plantingChargeSize: 4,
+  nextChargeSize: 1,
 }
 
 describe('touch stick (#173)', () => {
@@ -92,6 +103,18 @@ describe('touch cluster (#173)', () => {
 
   it('shows nothing over the settings overlay', () => {
     expect(clusterActionsOf({ ...AT_REST_P1, layer: 'settings' })).toEqual([])
+  })
+})
+
+describe('touch charge size badge (ticket 473)', () => {
+  it('shows the planting size on Plant charge while the rack holds two sizes', () => {
+    expect(chargeSizeBadgeOf(RACKED_TWO_SIZES)).toBe(4)
+  })
+
+  it('draws nothing with one size in the rack, no rack, or off the vehicle layer', () => {
+    expect(chargeSizeBadgeOf({ ...RACKED_TWO_SIZES, nextChargeSize: null })).toBeNull()
+    expect(chargeSizeBadgeOf({ ...RACKED_TWO_SIZES, hasChargeRack: false })).toBeNull()
+    expect(chargeSizeBadgeOf({ ...RACKED_TWO_SIZES, layer: 'platform' })).toBeNull()
   })
 })
 

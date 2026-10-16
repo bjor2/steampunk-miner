@@ -4,7 +4,7 @@
  * stream, the cluster following the situation, the left-handed mirror, and the keyboard hiding
  * them until the next touch. Every screen is reached by taps alone. Driven by real touch events.
  * Ticket 472 (#470 P1-1): the pause button while diving, the hold while the page is hidden, and
- * the controls inside a notched safe area.
+ * the controls inside a notched safe area. Ticket 473 (#470 P1-2): the charge size badge.
  */
 import { expect, test, type Page } from '@playwright/test'
 import type { ActionEdge } from '../../../src/store/inputRuntime'
@@ -18,6 +18,8 @@ const CLUSTER_GAP_PX = 8
 const HELD_STEP_WAIT_MS = 1_000
 /** A landscape phone's notch on the stick's side (the TD's 844x390 case on #470). */
 const LEFT_NOTCH_PX = 47
+/** The smallest touch target (#470), the charge size badge's (ticket 473). */
+const TOUCH_TARGET_PX = 48
 
 test.beforeEach(() => {
   const cell = currentCell()
@@ -188,6 +190,34 @@ test.describe('screen matrix: touch pause (ticket 472)', () => {
   })
 })
 
+test.describe('screen matrix: charge size badge (ticket 473)', () => {
+  test('steps the charge size on a tap of the badge with the same action stream as V', async ({
+    page,
+  }) => {
+    const errors = await openGame(page, currentCell())
+    await stockOneChargeSize(page)
+    await page.getByTestId('touch-plant_charge').waitFor()
+    await expect(page.getByTestId('touch-next_charge_size')).toHaveCount(0)
+    await stockSecondChargeSize(page)
+    const badge = page.getByTestId('touch-next_charge_size')
+    await expect(badge).toHaveText('1')
+    const box = await boxOf(page, 'touch-next_charge_size')
+    expect(Math.min(box.width, box.height)).toBeGreaterThanOrEqual(TOUCH_TARGET_PX)
+    const before = (await actionStream(page)).length
+    await badge.tap()
+    await expect(badge).toHaveText('4')
+    const middle = (await actionStream(page)).length
+    await page.keyboard.press('KeyV')
+    await page.touchscreen.tap(currentCell().viewport.width / 2, 40)
+    await expect(badge).toHaveText('1')
+    const stream = await actionStream(page)
+    const onTouch = stream.slice(before, middle)
+    expect(onTouch.map((edge) => edge.actionId)).toContain('next_charge_size')
+    expect(stream.slice(middle, middle + onTouch.length)).toEqual(onTouch)
+    expect(errors).toEqual([])
+  })
+})
+
 function tickNow(page: Page): Promise<number> {
   return page.evaluate(() => {
     const result = window.steampunkDebug!.snapshot()
@@ -207,6 +237,33 @@ function hidePageAndComeBack(page: Page): Promise<void> {
     reportVisibility('visible')
     Reflect.deleteProperty(document, 'visibilityState')
   })
+}
+
+/** A P16 rig with a rack of size 4 charges only: Plant charge shows, the badge does not. */
+async function stockOneChargeSize(page: Page): Promise<void> {
+  const problems = await page.evaluate(() => {
+    const debug = window.steampunkDebug!
+    return [debug.setPlanet(16), debug.setCharges(1, 5, 4), debug.giveMoney('1e30')].flatMap(
+      (result) => (result.ok ? [] : result.problems),
+    )
+  })
+  expect(problems).toEqual([])
+}
+
+/** Two size 1 charges bought at the Upgrade bay, then back on the vehicle layer. */
+async function stockSecondChargeSize(page: Page): Promise<void> {
+  const problems = await page.evaluate(() => {
+    const debug = window.steampunkDebug!
+    const docked = debug.teleportToDock('upgrade')
+    const at = debug.fastForward(1)
+    if (!docked.ok || !at.ok) return ['could not dock at the Upgrade bay']
+    const restocked = debug.fastForward(2, [
+      { tick: at.tick + 1, type: 'restockCharges', payload: { size: 1, count: 2 } },
+      { tick: at.tick + 2, type: 'undock', payload: {} },
+    ])
+    return restocked.ok ? [] : restocked.problems
+  })
+  expect(problems).toEqual([])
 }
 
 function clusterIds(page: Page): Promise<string[]> {

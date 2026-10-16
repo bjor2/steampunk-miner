@@ -1,15 +1,23 @@
 /**
  * One round touch button (#173): a glyph with no text, 35% at rest and 80% pressed. A press is the
- * action's key going down, a lift its key coming up, through the touch runtime.
+ * action's key going down, a lift its key coming up, through the touch runtime. The charge size
+ * badge (ticket 473) passes its own class and face.
  */
-import { useState } from 'react'
+import { useState, type ReactNode } from 'react'
 import { ACTION_MAP, actionDefOf, type ActionId } from '../../systems/input/actionMap'
 import { pressTouchButton, releaseTouchButton } from '../../store/touchRuntime'
 import { touchButtonIdOf } from '../stage/deviceIds'
-import { VectorIcon } from '../VectorIcon'
 import styles from './TouchControls.module.css'
 
-export function TouchButton({ action, iconId }: { action: ActionId; iconId: string }) {
+export function TouchButton({
+  action,
+  className = styles.button,
+  children,
+}: {
+  action: ActionId
+  className?: string
+  children: ReactNode
+}) {
   const [isPressed, setIsPressed] = useState(false)
   const press = () => {
     setIsPressed(true)
@@ -23,7 +31,7 @@ export function TouchButton({ action, iconId }: { action: ActionId; iconId: stri
     // Touch only: the keyboard has the keys themselves, so Tab never stops here.
     <button
       type="button"
-      className={styles.button}
+      className={className}
       data-testid={touchButtonIdOf(action)}
       data-action={action}
       data-pressed={isPressed || undefined}
@@ -34,7 +42,7 @@ export function TouchButton({ action, iconId }: { action: ActionId; iconId: stri
       onPointerCancel={release}
       onPointerLeave={() => isPressed && release()}
     >
-      <VectorIcon iconId={iconId} size="menu" />
+      {children}
     </button>
   )
 }

@@ -5,10 +5,11 @@ import type { SliceDefinition } from '../registries/sliceDefinition'
 import { createRunLog, installRunLog, uninstallRunLog } from '../logging/runLog'
 import type { AuthorityCommand } from '../systems/authority/authorityCommand'
 import type { Authority } from '../systems/authority/loopbackAuthority'
-import { PAUSE_ACTION_ID } from '../systems/input/touchControls'
+import { chargeSizeBadgeOf, PAUSE_ACTION_ID } from '../systems/input/touchControls'
 import { createStartingAuthority, resetGameStore, useGameStore } from './gameStore'
 import { readActionStream, readVehicleIntent, resetInput, routeKeyChange } from './inputRuntime'
 import { isLiveStepHeld } from './liveStepSlice'
+import { readTouchSituation } from './screenReads'
 import {
   cancelSlotButton,
   holdSlotButton,
@@ -28,8 +29,7 @@ import {
 
 let submitted: AuthorityCommand[]
 
-function spyAuthority(): Authority {
-  const real = createStartingAuthority()
+function spyAuthority(real: Authority): Authority {
   return {
     ...real,
     submit: (command) => {
@@ -68,12 +68,13 @@ function playOnTouch(): void {
   releaseTouchButton('interact')
 }
 
-/** What a run submitted and pressed, from a fresh store. */
-function runFresh(play: () => void) {
-  submitted = []
-  resetGameStore(spyAuthority())
+/** What a run submitted and pressed after its set-up, from a fresh store. */
+function runFresh(play: () => void, setUp: () => void = () => undefined) {
+  resetGameStore(spyAuthority(createStartingAuthority()))
   resetInput()
   resetTouch()
+  setUp()
+  submitted = []
   play()
   return {
     stream: [...readActionStream()],
@@ -205,6 +206,47 @@ describe('touch controls: pause button (ticket 472)', () => {
     runFresh(tapPause)
     game().closePauseMenu()
     expect(isLiveStepHeld(game())).toBe(false)
+  })
+})
+
+/** A P16 rig back from the Upgrade bay with a size 4 and two size 1 charges in its rack. */
+function stockTwoSizes(): void {
+  game().setPlanet(16)
+  game().setCharges(1, 5, 4)
+  game().giveMoney('1e30')
+  game().teleportToDock('upgrade')
+  game().fastForward(1, [{ tick: 1, type: 'restockCharges', payload: { size: 1, count: 2 } }])
+  game().undock()
+}
+
+/** The size the badge shows and the size plant_charge would plant, after a run. */
+function sizesAfter(play: () => void) {
+  const run = runFresh(play, stockTwoSizes)
+  return { ...run, badge: chargeSizeBadgeOf(readTouchSituation()), chosen: game().chosenChargeSize }
+}
+
+describe('touch controls: charge size badge (ticket 473)', () => {
+  it('show the planting size on Plant charge once the rack holds two sizes', () => {
+    expect(sizesAfter(() => undefined).badge).toBe(1)
+  })
+
+  it('step the size on a tap of the badge with the same action stream as V', () => {
+    const onKeys = sizesAfter(() => {
+      routeKeyChange(key('KeyV', true))
+      routeKeyChange(key('KeyV', false))
+    })
+    const onTouch = sizesAfter(() => {
+      pressTouchButton('next_charge_size')
+      releaseTouchButton('next_charge_size')
+    })
+    expect(onTouch).toEqual(onKeys)
+    expect(onTouch.stream.map((edge) => edge.actionId)).toContain('next_charge_size')
+    expect(onTouch).toMatchObject({ badge: 4, chosen: 4, commands: [] })
+  })
+
+  it('draw no badge for a fresh rig with no rack', () => {
+    runFresh(() => undefined)
+    expect(chargeSizeBadgeOf(readTouchSituation())).toBeNull()
   })
 })
 

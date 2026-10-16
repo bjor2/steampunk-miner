@@ -868,8 +868,8 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/input/padCodes.test.ts` | 4 | 4 |
 | `src/systems/input/padFrame.test.ts` | 7 | 7 |
 | `src/systems/input/preferences.test.ts` | 20 | 20 |
-| `src/systems/input/touchBindings.test.ts` | 15 | 15 |
-| `src/systems/input/touchControls.test.ts` | 23 | 16 |
+| `src/systems/input/touchBindings.test.ts` | 16 | 16 |
+| `src/systems/input/touchControls.test.ts` | 25 | 18 |
 
 ### `logging`
 
@@ -1173,7 +1173,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/store/tapSheetSlice.test.ts` | 6 | 6 |
 | `src/store/titleMenu.test.ts` | 9 | 9 |
 | `src/store/touchReplay.test.ts` | 2 | 2 |
-| `src/store/touchRuntime.test.ts` | 17 | 16 |
+| `src/store/touchRuntime.test.ts` | 20 | 19 |
 | `src/store/worldSaveOwnership.test.ts` | 7 | 7 |
 
 ### `systems-core`

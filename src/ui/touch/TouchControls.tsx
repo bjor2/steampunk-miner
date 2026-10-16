@@ -8,6 +8,7 @@
 import { useGameStore } from '../../store/gameStore'
 import { readTouchSituation } from '../../store/screenReads'
 import {
+  chargeSizeBadgeOf,
   clusterActionsOf,
   isPauseButtonShown,
   isStickShown,
@@ -48,7 +49,10 @@ export function TouchControlsView({
       {isDriving && <GestureSurface />}
       {isDriving && <StickZone />}
       {isPauseButtonShown(situation.layer) && <TouchPauseButton />}
-      <TouchCluster actions={clusterActionsOf(situation)} />
+      <TouchCluster
+        actions={clusterActionsOf(situation)}
+        chargeSizeBadge={chargeSizeBadgeOf(situation)}
+      />
       <TouchBindingTiles />
     </div>
   )
