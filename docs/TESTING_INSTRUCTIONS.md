@@ -858,7 +858,9 @@ programs }` from three's `renderer.info` of the game canvas), read only when cal
   included, the stick zone not) is asserted at 70% upright and 65% sideways on the reference
   phones, in the worst case and with every control the debug build can own and three status chips
   (GD rulings 2 and 3 on #500; #486 closed the stacked gap), and logged as a `clear-view`
-  annotation on the sweep. Box Tester only.
+  annotation on the sweep. With every control owned, held sideways, the pairs a slot or the fire
+  tile makes with a HUD box are logged as a `tile-lane` annotation, not asserted: #485 kept the
+  sideways tile lane where it meets the readouts and the east threat marker. Box Tester only.
 - **Touch controls held upright** (ticket 485, spec #470): `e2e/browser/screens/portraitTouch.spec.ts`
   runs in the matrix's portrait touch cells (390x844, 412x915, 820x1180) and skips elsewhere. It
   measures the stick zone (the lower 45% of the height from the thumb's lower corner, ending at a

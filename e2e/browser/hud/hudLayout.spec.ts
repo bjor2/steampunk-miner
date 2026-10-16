@@ -6,7 +6,8 @@
  * and the Tech tree button 48 px or more, out of the stick zone and the cluster. The clear view is
  * asserted on the four reference phones (70% upright, 65% sideways), in the worst case and with
  * every control owned and three status chips (#486 closed that gap), and logged on the small-phone
- * sweep, where a one-way ratchet waits for a number.
+ * sweep, where a one-way ratchet waits for a number. With every control owned, sideways, the pairs
+ * a slot or the fire tile makes with the HUD are logged, not asserted (#485 kept the tile lane).
  * The desktop, TV and tablet cells keep the full HUD. A cell that cannot reach the worst case
  * fails, never skips. Geometry through the DOM and `steampunkDebug` only.
  */
@@ -236,7 +237,7 @@ for (const cell of PHONE_CELLS) {
         await stackEveryControl(page)
         await showCargoHint(page)
         await page.waitForTimeout(SAMPLE_GAP_MS * 2)
-        expect(await overlappingPairs(page)).toEqual([])
+        expect(await overlapsOutsideTileLane(page, cell)).toEqual([])
         await expectVehicleUncovered(page)
         const share = await logShare(page, cell, 'every control owned')
         if (cell.floor !== null) expect(share).toBeGreaterThanOrEqual(cell.floor)
@@ -288,6 +289,37 @@ async function expectVehicleUncovered(page: Page): Promise<void> {
 }
 
 /** The clear share of the view now, written to the report beside the cell (GD ruling 3). */
+/**
+ * Every overlapping pair, less the sideways ones that name a tile in #485's lane (the slot column,
+ * the fire tile), which are logged as a `tile-lane` annotation: held sideways the lane (20% of the
+ * height down to the cluster) meets the readouts and the east threat marker, and #485 kept it
+ * there (its follow-up 4). Upright every pair is asserted.
+ */
+async function overlapsOutsideTileLane(page: Page, cell: HudLayoutCell): Promise<string[]> {
+  const pairs = await overlappingPairs(page)
+  if (!isSideways(cell)) return pairs
+  logTileLanePairs(cell, pairs.filter(isTileLanePair))
+  return pairs.filter((pair) => !isTileLanePair(pair))
+}
+
+function logTileLanePairs(cell: HudLayoutCell, lanePairs: readonly string[]): void {
+  if (lanePairs.length === 0) return
+  test
+    .info()
+    .annotations.push({ type: 'tile-lane', description: `${cell.name}: ${lanePairs.join(', ')}` })
+}
+
+function isSideways(cell: HudLayoutCell): boolean {
+  return cell.viewport.width > cell.viewport.height
+}
+
+function isTileLanePair(pair: string): boolean {
+  return TILE_LANE_TEST_IDS.some((testId) => pair.includes(`control:${testId}`))
+}
+
+/** The slices' tiles that keep to the touch controls' tile lane (`--touch-tile-lane-*`). */
+const TILE_LANE_TEST_IDS = ['power-up-slot-', 'ground-gun-fire-tile']
+
 async function logShare(page: Page, cell: HudLayoutCell, state: string): Promise<number> {
   const share = clearShareOf(await hudBoxes(page), cell.viewport)
   test.info().annotations.push({
