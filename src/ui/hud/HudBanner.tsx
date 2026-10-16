@@ -8,6 +8,7 @@
  * unless a call-out below says them already: no status text lives in a hover title (ticket 476).
  * On the compact HUD (#500) the banner is one row: the state's icon and at most three chips of at
  * most two words (`hudCompact.ts`), the rest as "+N"; a tap opens the full banner as its card.
+ * Each chip is its icon and its number alone (#486), its words in that card.
  */
 import type {
   CombatStatusReading,
@@ -16,6 +17,7 @@ import type {
 } from '../../systems/views/combatStatuses'
 import { calloutTextOf, readoutTextOf, statusLabelTextOf } from '../../systems/views/hudCallouts'
 import {
+  compactChipValueOf,
   compactStatusRowOf,
   type CompactChip,
   type CompactStatusRow,
@@ -191,7 +193,10 @@ function CompactRow({ row, isFlashing }: { row: CompactStatusRow; isFlashing: bo
   )
 }
 
-/** One chip: its icon and words; the last one carries the "+N" of the statuses that did not fit. */
+/**
+ * One chip: its icon and the number its title carries, the words in the card; the last one
+ * carries the "+N" of the statuses that did not fit.
+ */
 function Chip({
   chip,
   isFlashing,
@@ -201,6 +206,7 @@ function Chip({
   isFlashing: boolean
   moreCount: number
 }) {
+  const value = compactChipValueOf(chip.title)
   return (
     <span
       className={styles.status}
@@ -214,7 +220,9 @@ function Chip({
         level="span"
         layout="row"
         glyphSize="hud"
+        titlePlace="card"
       >
+        {value !== '' && <span className={styles.chipValue}>{value}</span>}
         {moreCount > 0 && <span className={styles.chipMore}>+{moreCount}</span>}
       </TitleOneLine>
     </span>

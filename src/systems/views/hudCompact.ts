@@ -7,10 +7,11 @@
  * after its colon, and every gauge and readout name, live in the box's tap card instead.
  * Display only: the same model the full banner draws, read the compact way.
  *
- * Held upright (#486) the row beside the pause button holds three glyphs, not three titles: each
- * chip is its icon and the number its title carries, its words in the status box's card, as every
- * gauge and readout already is; and the threats are chips in the rows instead of markers at the
- * screen's edge, which upright runs through the vehicle's lean. Sideways nothing changes.
+ * With every control owned the view keeps its clear floor only if each row stays one line (#486,
+ * the stacked case GD ruling 2 on #500 left to it): so a chip is its icon and the number its
+ * title carries, its words in the status box's card as every gauge and readout name already is,
+ * and a closed reading leaves the control it names in brackets to its card. Held upright the
+ * threats are chips in the rows, since a marker at the screen's edge sits where the vehicle leans.
  */
 import { MOST_STATUSES_SHOWN, type CombatStatusStack, type StatusUrgency } from './combatStatuses'
 import { calloutTextOf } from './hudCallouts'
@@ -92,28 +93,18 @@ export function isUprightCompactHud(density: HudDensity, orientation: StageOrien
   return density === 'compact' && orientation === 'portrait'
 }
 
-/** Where a status chip's title shows: in the box's card upright (#486), on the chip sideways. */
-export function compactChipTitlePlaceOf(orientation: StageOrientation): UiTextTitlePlace {
-  return orientation === 'portrait' ? 'card' : 'element'
-}
-
 /** The numbers a chip's title carries ("x2", "0.5s"), drawn by its icon when the words are not. */
 export function compactChipValueOf(title: string): string {
   return (title.match(NUMBER_WORD) ?? []).join(' ')
 }
 
 /**
- * A reading's text in its box: held upright the closed compact row leaves out the control the
- * reading names in brackets ("Auto (Guns button)" reads "Auto"), which its card still says, so
- * the readouts keep to two rows (#486); sideways and in the card the whole text.
+ * A reading's text in its box: the closed compact row leaves out the control the reading names in
+ * brackets ("Auto (Guns button)" reads "Auto"), which its card still says (#486); the full HUD
+ * and the open card show the whole text.
  */
-export function compactReadingTextOf(
-  text: string,
-  titlePlace: UiTextTitlePlace,
-  orientation: StageOrientation,
-): string {
-  if (titlePlace !== 'card' || orientation !== 'portrait') return text
-  return text.replace(BRACKETED_CONTROL, '')
+export function compactReadingTextOf(text: string, titlePlace: UiTextTitlePlace): string {
+  return titlePlace === 'card' ? text.replace(BRACKETED_CONTROL, '') : text
 }
 
 /** Label words an element shows on screen: its title unless the card holds it, and its line. */

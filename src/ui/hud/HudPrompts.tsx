@@ -3,8 +3,10 @@
  * the artefact cache prompt exactly when it would open the cache (#46), "Scenario ready" while a
  * scenario waits for play (ticket 301), the "DEBUG RUN" mark once a debug command was accepted
  * (#11), and the slow-device chip while the frame cap keeps dropping ticks (ticket 480). Each is one shared Title+OneLine element (spec #422, pass #428): the key before
- * the colon is the title, what it does the one line.
+ * the colon is the title, what it does the one line. Held upright (#486) the compact HUD's threat
+ * chips and the slices' threat and prompt panels lead the same row (`children`).
  */
+import type { ReactNode } from 'react'
 import { calloutTextOf, readoutTextOf } from '../../systems/views/hudCallouts'
 import type { HudModel } from '../../systems/views/hudModel'
 import { UI_IDS } from '../ids'
@@ -13,9 +15,10 @@ import { hudBoxOf } from './hudBoxes'
 import { SlowDeviceChip } from './SlowDeviceChip'
 import styles from './Hud.module.css'
 
-export function HudPrompts({ model }: { model: HudModel }) {
+export function HudPrompts({ model, children }: { model: HudModel; children?: ReactNode }) {
   return (
     <div className={styles.prompts} {...hudBoxOf('prompts')}>
+      {children}
       {model.dockPrompt.isShown && (
         <Prompt id="hud.prompt.dock" testId={UI_IDS.hudDockPrompt} text={model.dockPrompt.text} />
       )}

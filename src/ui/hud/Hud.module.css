@@ -393,6 +393,47 @@
   font-weight: bold;
 }
 
+/* Held upright (#486): the number a chip's title carries, beside its icon; the words are the card's. */
+.chipValue {
+  font-variant-numeric: tabular-nums;
+}
+
+/*
+ * Held upright (#486): a threat is a chip leading the prompts' row, the edge marker's rim and
+ * reading with the compass arrow pointing where it is, so nothing sits where the vehicle leans.
+ */
+.threatChip {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  padding: 0 var(--space-1);
+  border: 2px solid var(--color-copper);
+  border-radius: 1em;
+  white-space: nowrap;
+}
+
+.threatChip[data-tremor]::after {
+  content: ' ~';
+}
+
+/*
+ * The slices' threat and prompt panels join that row upright: placed by it, never over the view.
+ * A panel's wrapper of octant markers gives the row its markers.
+ */
+:global([data-orientation='portrait']) .hud[data-density='compact'] .prompts > * {
+  position: static;
+  max-width: 100%;
+  transform: none;
+}
+
+:global([data-orientation='portrait']) .hud[data-density='compact'] .prompts > :has([data-octant]) {
+  display: contents;
+}
+
+:global([data-orientation='portrait']) .hud[data-density='compact'] .prompts [data-octant] {
+  position: static;
+}
+
 .hud[data-density='compact'] .prompts {
   grid-area: prompts;
   justify-self: start;

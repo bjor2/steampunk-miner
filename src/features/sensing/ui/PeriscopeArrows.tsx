@@ -2,8 +2,10 @@
  * The threat periscope's arrows at the screen edge (#162 Sensing row, the GD ruling on #203):
  * one per enemy inside its radius, telegraphing or not, placed by its compass octant like the
  * kernel's `ThreatMarkers`, with the family icon, a distance band, and dust for a burrower. Draws
- * nothing while the periscope is not owned. Reads only the sensing store.
+ * nothing while the periscope is not owned. Reads only the sensing store. Each arrow is a threat
+ * box of the HUD (`data-hud`, #486), so the layout specs keep it clear of the rest.
  */
+import { hudBoxOf } from '../../../ui/hud/hudBoxes'
 import { VectorIcon } from '../../../ui/VectorIcon'
 import { useSensingStore } from '../store/sensingStore'
 import { SENSING_TEST_IDS } from './testIds'
@@ -18,6 +20,7 @@ export function PeriscopeArrows() {
         <span
           key={warning.enemyId}
           className={styles.arrow}
+          {...hudBoxOf('threat')}
           data-testid={SENSING_TEST_IDS.periscope}
           data-kind={warning.kind}
           data-octant={warning.octant}

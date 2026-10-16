@@ -6,10 +6,12 @@
  * line is one shared Title+OneLine row (spec #422, pass #428): its name as the title, then its
  * value beside the glyph of the icon set (#158). On the compact HUD (#500) a row is its glyph and
  * value; the names and the guns-idle line show in the box's tap card, the idle guns in amber.
+ * The closed compact row also leaves the guns' and the charges' control to the card (#486).
  */
 import type { ReactNode } from 'react'
 import { hudLabelIconIdOf, type HudLabelId } from '../../systems/art/icons/iconSet'
 import { calloutTextOf, readoutTextOf } from '../../systems/views/hudCallouts'
+import { compactReadingTextOf } from '../../systems/views/hudCompact'
 import type { HudModel } from '../../systems/views/hudModel'
 import type { HudDensity } from '../../systems/views/screenLayout'
 import type { UiTextTitlePlace } from '../../systems/views/uiText'
@@ -36,6 +38,7 @@ export function PositionPanel({
 
 function Readouts({ model, titlePlace }: { model: HudModel; titlePlace: UiTextTitlePlace }) {
   const { depth, casing, guns, boreAuto, charges, dockArrow, coreDistance, tileTime } = model
+  const readingOf = (text: string) => compactReadingTextOf(text, titlePlace)
   const isIdleLineShown = guns?.isIdle === true && titlePlace === 'element'
   const Line = titlePlace === 'card' ? CompactLine : FullLine
   return (
@@ -66,7 +69,7 @@ function Readouts({ model, titlePlace }: { model: HudModel; titlePlace: UiTextTi
             data-mode={guns.mode}
             data-idle={guns.isIdle || undefined}
           >
-            {guns.text}
+            {readingOf(guns.text)}
           </span>
         </Line>
       )}
@@ -92,7 +95,9 @@ function Readouts({ model, titlePlace }: { model: HudModel; titlePlace: UiTextTi
         <Line
           id="hud.charges"
           label="Charges"
-          facts={[{ ...factOf('charges', charges.text, UI_IDS.hudCharges), holds: 'charges' }]}
+          facts={[
+            { ...factOf('charges', readingOf(charges.text), UI_IDS.hudCharges), holds: 'charges' },
+          ]}
         />
       )}
       {dockArrow !== null && (
