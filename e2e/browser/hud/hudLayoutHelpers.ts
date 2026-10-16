@@ -96,6 +96,37 @@ function depthTilesOf(page: Page): Promise<number> {
   })
 }
 
+/**
+ * The stacked case the GD logged on #500 (ruling 2): every touch control the debug build can own
+ * at once (five slotted power-ups, the bore gun's fire tile, the guns, the charge rack) and three
+ * status chips (hull critical, critical energy, the staged threat) over the full hold.
+ */
+export async function stackEveryControl(page: Page): Promise<void> {
+  await page.evaluate((powerUps) => {
+    const debug = window.steampunkDebug!
+    const slots = Object.fromEntries(powerUps.map((id, index) => [`powerup.${index + 1}`, id]))
+    for (const result of [
+      debug.setVehicleLoadout(slots),
+      debug.features['ground-gun'].setLevels(1, 1, 1) as { ok: boolean; problems?: string[] },
+      debug.setGunLevel(10),
+      debug.setCharges(2, 1),
+      debug.setHull('1'),
+      debug.setEnergy('1'),
+    ]) {
+      if (!result.ok) throw new Error((result.problems ?? []).join('; '))
+    }
+  }, STACKED_POWER_UPS)
+}
+
+/** Five shipped power-ups, one a slot. */
+const STACKED_POWER_UPS = [
+  'power.steam_shield',
+  'power.grav_anchor',
+  'power.ore_shifter',
+  'power.resonance_whistle',
+  'power.phase_lantern',
+]
+
 /** Puts the cargo hint up; the compact HUD shows it once it has measured room. */
 export async function showCargoHint(page: Page): Promise<void> {
   await page.evaluate(() => {

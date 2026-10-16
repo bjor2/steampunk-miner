@@ -1,4 +1,8 @@
 import { describe, expect, it } from 'vitest'
+import { COARSE_TARGET_PX, HINT_CHIP_GAP_PX } from '../../constants/screen'
+import { CLUSTER_BUTTON_PX, INTERACT_BUTTON_PX } from '../../constants/touch'
+import { SLOT_ACTION_IDS, SOCKET_ACTION_IDS } from '../input/touchControls'
+import { hintChipHeightOf } from './hintRoom'
 import {
   clearShareOf,
   clearViewFloorOf,
@@ -7,6 +11,8 @@ import {
   isHintRoomFor,
   vehicleKeepClearOf,
   vehicleScreenBoxOf,
+  type ScreenBox,
+  type ScreenSize,
 } from './hudClearView'
 
 const PHONE = { width: 390, height: 844 }
@@ -119,12 +125,106 @@ describe('vehicle on screen (#500)', () => {
   })
 })
 
-// GD ruling 2 on #500: with every control owned, three status chips and the hint, the view misses
-// its floor by 1.0 to 5.4 points; #500 logs that share with a one-way ratchet, and #486 (threat
-// chips, prompts, the status row) owns closing the gap. Each todo flips when #486 closes.
-describe('clear view of the stacked worst case (owned by #486)', () => {
-  it.todo('keeps 70% of 390x844 clear with every control owned, three status chips and the hint')
-  it.todo('keeps 70% of 412x915 clear with every control owned, three status chips and the hint')
-  it.todo('keeps 65% of 844x390 clear with every control owned, three status chips and the hint')
-  it.todo('keeps 65% of 915x412 clear with every control owned, three status chips and the hint')
+// GD ruling 2 on #500: with every control owned, three status chips and the hint the view
+// missed its floor by 1.0 to 5.4 points, and #486 (threat chips, prompts, the status row) owned the
+// gap. These are the TD's arithmetic made exact: the compact HUD's boxes as Chromium lays them out
+// in that state on each cell (measured on the dev server at #486's layout, ui-scale 1, drilling with
+// a full hold, hull and energy critical, a staged threat and the debug mark), plus the most touch
+// controls the vehicle layer shows at once at their sizes, which never overlap a HUD box. The hint
+// shows only where it leaves the floor standing, as the hint queue rules (`isHintRoomFor`). The
+// browser spec measures the reachable loadout on the same cells (`hudLayout.spec.ts`).
+const STACKED_CELLS = [
+  {
+    name: '390x844',
+    screen: { width: 390, height: 844 },
+    floor: 0.7,
+    hud: [
+      box(8, 74, 382, 106.8),
+      box(8, 8, 155.1, 42.8),
+      box(8, 114.8, 382, 170.4),
+      box(326, 8, 382, 66),
+      box(8, 178.4, 216.3, 213.2),
+      box(17, 183.4, 83.1, 208.2),
+    ],
+  },
+  {
+    name: '412x915',
+    screen: { width: 412, height: 915 },
+    floor: 0.7,
+    hud: [
+      box(8, 74, 404, 106.8),
+      box(8, 8, 156.4, 42.8),
+      box(8, 114.8, 404, 170.4),
+      box(348, 8, 404, 66),
+      box(8, 178.4, 216.7, 213.2),
+      box(17, 183.4, 83.4, 208.2),
+    ],
+  },
+  {
+    name: '844x390',
+    screen: { width: 844, height: 390 },
+    floor: 0.65,
+    hud: [
+      box(8, 8, 519.6, 40.8),
+      box(8, 74, 155.1, 108.8),
+      box(599.6, 74, 836, 154.4),
+      box(780, 8, 836, 66),
+      box(8, 119.2, 134.2, 152),
+      box(784.9, 188.2, 836, 215),
+    ],
+  },
+  {
+    name: '915x412',
+    screen: { width: 915, height: 412 },
+    floor: 0.65,
+    hud: [
+      box(8, 8, 569.3, 40.8),
+      box(8, 74, 155.1, 108.8),
+      box(649.3, 74, 907, 154.4),
+      box(851, 8, 907, 66),
+      box(8, 119.2, 134.2, 152),
+      box(855.9, 199.2, 907, 226),
+    ],
+  },
+] as const
+
+/** The charge-size badge over Plant charge (TouchControls.module.css `.sizeBadge`). */
+const SIZE_BADGE_PX = 48
+
+/**
+ * Every touch control the vehicle layer can show at once while drilling: Interact, plant charge,
+ * the guns and the tow call (`clusterActionsOf`; quick service is the platform's), the size badge,
+ * the slot column's five power-up slots and two drill sockets and the fire tile at the cluster
+ * button's 56 px, and the pause button as measured on a finger (56 px).
+ */
+const MOST_CONTROLS_AREA =
+  INTERACT_BUTTON_PX ** 2 +
+  3 * CLUSTER_BUTTON_PX ** 2 +
+  SIZE_BADGE_PX ** 2 +
+  (SLOT_ACTION_IDS.length + SOCKET_ACTION_IDS.length + 1) * CLUSTER_BUTTON_PX ** 2 +
+  COARSE_TARGET_PX ** 2
+
+/** The clear share with the most controls, and with the hint chip when the queue lets it show. */
+function stackedShareOf(cell: (typeof STACKED_CELLS)[number]): number {
+  const { screen, floor, hud } = cell
+  const screenArea = screen.width * screen.height
+  const without = 1 - (coveredAreaOf(hud, screen) + MOST_CONTROLS_AREA) / screenArea
+  const chip = hintChipBoxUnder(hud, screen)
+  const chipShare = ((chip.right - chip.left) * (chip.bottom - chip.top)) / screenArea
+  const isShown = isHintRoomFor(hud, chip, screen, floor + MOST_CONTROLS_AREA / screenArea)
+  return isShown ? without - chipShare : without
+}
+
+/** The hint chip's box under the rows, across the safe width (`hintRoom.ts`). */
+function hintChipBoxUnder(hud: readonly ScreenBox[], screen: ScreenSize): ScreenBox {
+  const top = Math.max(...hud.map((each) => each.bottom)) + HINT_CHIP_GAP_PX
+  return box(16, top, screen.width - 16, top + hintChipHeightOf(screen))
+}
+
+describe('clear view of the stacked worst case (#486)', () => {
+  for (const cell of STACKED_CELLS) {
+    it(`keeps ${cell.floor * 100}% of ${cell.name} clear with every control owned, three status chips and the hint`, () => {
+      expect(stackedShareOf(cell)).toBeGreaterThanOrEqual(cell.floor)
+    })
+  }
 })

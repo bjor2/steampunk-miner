@@ -856,8 +856,9 @@ programs }` from three's `renderer.info` of the game canvas), read only when cal
   dismiss, the Tech tree button is 48 px or more and off the stick zone and the cluster, and every
   box sits in the safe area. The clear view (the union of the `data-hud` boxes, touch buttons
   included, the stick zone not) is asserted at 70% upright and 65% sideways on the reference
-  phones and logged as a `clear-view` annotation on the sweep and with a stacked loadout (GD
-  rulings 2 and 3 on #500; #486 owns the stacked gap's `it.todo` rows). Box Tester only.
+  phones, in the worst case and with every control the debug build can own and three status chips
+  (GD rulings 2 and 3 on #500; #486 closed the stacked gap), and logged as a `clear-view`
+  annotation on the sweep. Box Tester only.
 - **Touch controls held upright** (ticket 485, spec #470): `e2e/browser/screens/portraitTouch.spec.ts`
   runs in the matrix's portrait touch cells (390x844, 412x915, 820x1180) and skips elsewhere. It
   measures the stick zone (the lower 45% of the height from the thumb's lower corner, ending at a
@@ -869,6 +870,15 @@ programs }` from three's `renderer.info` of the game canvas), read only when cal
   bottom plaques, the boxes the zone meets are logged as a `stick-zone` annotation. The stick's
   and the keys' action streams, the pause button, the badge, the fire tile and the slot hold ring
   run upright too (`touchControls`, `fireTile`, `slotHoldRing`). Box Tester only.
+- **Upright HUD rows** (#486, spec #470): `e2e/browser/hud/portraitHud.spec.ts` runs the upright
+  cells (390x844, 412x915, 360x640, 320x568) in the worst case above with a threat at each of the
+  eight octants (`ui.stageHud({ threatOctants })`) and three status chips, and asserts no two
+  `data-hud` boxes overlap, every text sits inside its box, every threat chip sits in the prompts'
+  row and no row reaches the stick zone or a touch button, the vehicle stays uncovered, a clean
+  tap on the status row opens its card with the chips' words, and `ui.getOverlayStats()` holds at
+  most 16 seated cards. The stacked clear view is also pinned in node with the most controls the
+  vehicle layer can show (`hudClearView.test.ts`, over boxes measured on the phone cells). Box
+  Tester only.
 - **Drill-down run** (ticket 416): `e2e/browser/drillDown.spec.ts` holds the real Down key for 10 s
   on the P1 surface from `scenarios/drill-down-start.scenario.json`, at stored drill_power steps 1
   (the save's), 5, 10, 15 and 20 (`debug.setUpgrade`, ticket 434), and writes one row per run (start and end position, depth gained, cells/s,

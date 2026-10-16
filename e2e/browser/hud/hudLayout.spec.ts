@@ -4,8 +4,9 @@
  * marker, the Tech tree button) keeps every `data-hud` box apart, every text inside its box, the
  * vehicle's body uncovered, the hint chip one line within 8% of the height with a 48 px dismiss,
  * and the Tech tree button 48 px or more, out of the stick zone and the cluster. The clear view is
- * asserted on the four reference phones (70% upright, 65% sideways) and logged on the small-phone
- * sweep and with the controls of a stacked loadout, where a one-way ratchet waits for a number.
+ * asserted on the four reference phones (70% upright, 65% sideways), in the worst case and with
+ * every control owned and three status chips (#486 closed that gap), and logged on the small-phone
+ * sweep, where a one-way ratchet waits for a number.
  * The desktop, TV and tablet cells keep the full HUD. A cell that cannot reach the worst case
  * fails, never skips. Geometry through the DOM and `steampunkDebug` only.
  */
@@ -19,7 +20,9 @@ import {
   openGame,
   overlappingPairs,
   reachWorstCase,
+  showCargoHint,
   spilledTexts,
+  stackEveryControl,
   stickZone,
   vehicleBox,
   type HudLayoutCell,
@@ -221,28 +224,24 @@ for (const cell of PHONE_CELLS) {
       },
     )
 
-    test('logs the clear-view share with a stacked loadout and three status chips (#486 owns the gap)', async ({
-      page,
-    }) => {
-      test.setTimeout(TEST_TIMEOUT_MS)
-      await openGame(page, cell)
-      await reachWorstCase(page, cell)
-      await page.evaluate(() => {
-        const debug = window.steampunkDebug!
-        for (const result of [
-          debug.setGunLevel(10),
-          debug.setCharges(2, 1),
-          debug.setHull('1'),
-          debug.setEnergy('1'),
-        ]) {
-          if (!result.ok) throw new Error(result.problems.join('; '))
-        }
-      })
-      await page.waitForTimeout(SAMPLE_GAP_MS * 2)
-      expect(await overlappingPairs(page)).toEqual([])
-      await expectVehicleUncovered(page)
-      await logShare(page, cell, 'stacked loadout')
-    })
+    // GD ruling 2 on #500: the stacked case's gap is #486's, asserted once it closed (#486).
+    test(
+      cell.floor === null
+        ? 'logs the clear-view share with every control owned, three status chips and the hint'
+        : `keeps ${cell.floor * 100}% clear with every control owned, three status chips and the hint`,
+      async ({ page }) => {
+        test.setTimeout(TEST_TIMEOUT_MS)
+        await openGame(page, cell)
+        await reachWorstCase(page, cell)
+        await stackEveryControl(page)
+        await showCargoHint(page)
+        await page.waitForTimeout(SAMPLE_GAP_MS * 2)
+        expect(await overlappingPairs(page)).toEqual([])
+        await expectVehicleUncovered(page)
+        const share = await logShare(page, cell, 'every control owned')
+        if (cell.floor !== null) expect(share).toBeGreaterThanOrEqual(cell.floor)
+      },
+    )
   })
 }
 
