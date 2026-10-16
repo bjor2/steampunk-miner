@@ -143,7 +143,9 @@ describe('economy data validation', () => {
     for (const travelParityK of ['0.99', '2.01']) {
       const broken = economyFileCopy()
       Object.assign(broken.drill, { travelParityK })
-      expect(problemsOf(broken)).toEqual(['drill.travelParityK must be inside drill.travelParityKBounds'])
+      expect(problemsOf(broken)).toEqual([
+        'drill.travelParityK must be inside drill.travelParityKBounds',
+      ])
     }
     for (const travelParityK of ['1', '2']) {
       const edge = economyFileCopy()
