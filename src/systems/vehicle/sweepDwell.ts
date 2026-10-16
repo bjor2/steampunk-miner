@@ -10,6 +10,11 @@
  * - **Work the cursor carried in was spent the tick before**: it pays the first stations first.
  * - So the stations' work sums to the tick's `DRILL_SUBSTEPS_PER_TICK` when nothing is discarded,
  *   built only from the walk's own paid cells in walk order.
+ * - **The carry station charges the carry the cursor keeps** (ticket 466, fix A): the swept carve
+ *   builds the ledger from the carry the release clamp stores (`authority/clampedCharge.ts`).
+ *   Carried-in work a later tick drops at a gate, a release or open ground stays charged to the
+ *   tick that spent it at its carry station (GD 6209400700 Q1 (c), counted by tick), so over a leg
+ *   the stations sum to the paid prices, the final carry and `droppedCarryInOf`, exactly.
  */
 import { MM_PER_SAMPLE } from '../world/sampleGrid'
 import type { SampleDwell } from '../world/rimDwell'
@@ -45,6 +50,18 @@ function paidStationsOf(path: SweepPath, { paidSteps, paidPrices }: WalkSpend): 
 
 function carryStationOf(path: SweepPath, { reachedStep, carrySubSteps }: WalkSpend) {
   return carrySubSteps > 0 ? [{ at: pointAtStep(path, reachedStep), work: carrySubSteps }] : []
+}
+
+/**
+ * The carried-in sub-steps a tick drops: what the cursor brought past the tick's paid prices and
+ * the carry it keeps. The tick before charged them at its carry station (ticket 466).
+ */
+export function droppedCarryInOf(
+  { paidPrices, carrySubSteps }: Pick<WalkSpend, 'paidPrices' | 'carrySubSteps'>,
+  carriedIn: number,
+): number {
+  const kept = paidPrices.reduce((sum, price) => sum + price, 0) + carrySubSteps
+  return Math.max(0, carriedIn - kept)
 }
 
 /** The stations with `carriedIn` taken from the first in order; those left with none dropped. */

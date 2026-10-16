@@ -8,7 +8,7 @@ import {
   type CarryGround,
   type CarryReach,
 } from './carryWalk'
-import { dwellLedgerOf, sampleDwellOf, type DwellStation } from './sweepDwell'
+import { droppedCarryInOf, dwellLedgerOf, sampleDwellOf, type DwellStation } from './sweepDwell'
 import { pointAtStep, SWEEP_STEP_MM, type SweepPath } from './sweptCut'
 
 // The swept cut's dwell ledger (ticket 441): where the stamp's centre stood while the tick spent
@@ -104,6 +104,41 @@ describe('swept dwell ledger (ticket 441)', () => {
     const paidAt = ledger.slice(0, reach.paid.length).map(({ at }) => at)
     expect(paidAt).toEqual(reach.paidSteps.map((step) => pointAtStep(path, step - 1)))
     expect(paidAt.map(({ yMm }) => Math.floor(yMm / 1000))).toEqual([100, 99, 98, 97])
+  })
+})
+
+describe('swept dwell ledger charges the carry it keeps (ticket 466)', () => {
+  it('charges the carry station the clamped carry, not the walk’s', () => {
+    const path = pathDown(95_500)
+    const { reach } = tickOf({ path, ground: columnGround(() => rock(900)) })
+    const ledger = dwellLedgerOf(path, { ...reach, carrySubSteps: Q - 12 }, 0)
+    expect(ledger).toEqual([{ at: pointAtStep(path, reach.reachedStep), work: Q - 12 }])
+  })
+
+  it('drops no carried-in work the tick pays or carries on', () => {
+    expect(droppedCarryInOf({ paidPrices: [70], carrySubSteps: 40 }, 50)).toBe(0)
+    expect(droppedCarryInOf({ paidPrices: [], carrySubSteps: 112 }, 112)).toBe(0)
+  })
+
+  it('drops the carried-in work past what the tick pays and keeps', () => {
+    expect(droppedCarryInOf({ paidPrices: [], carrySubSteps: 0 }, 48)).toBe(48)
+    expect(droppedCarryInOf({ paidPrices: [0], carrySubSteps: 0 }, 30)).toBe(30)
+    expect(droppedCarryInOf({ paidPrices: [5], carrySubSteps: 104 }, 116)).toBe(7)
+  })
+
+  it('sums over two ticks to the paid prices, the final carry and the carried-in work dropped', () => {
+    const first = tickOf({ path: pathDown(95_500, true), ground: columnGround(() => rock(900)) })
+    // The next tick meets a gate first: the carried-in work is dropped with nothing paid.
+    const path = pathDown(95_500)
+    const carriedIn = first.reach.carrySubSteps
+    const second = tickOf({ path, ground: columnGround(() => rock(900), [99]) }, carriedIn)
+    const dropped = droppedCarryInOf(second.reach, carriedIn)
+    expect(dropped).toBe(carriedIn)
+    expect(workOf(first.ledger) + workOf(second.ledger)).toBe(
+      [...first.reach.paidPrices, ...second.reach.paidPrices].reduce((a, b) => a + b, 0) +
+        second.reach.carrySubSteps +
+        dropped,
+    )
   })
 })
 
