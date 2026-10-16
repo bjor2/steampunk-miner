@@ -510,3 +510,31 @@ comment, put `on-hold` on #514 until the bench is posted.
 
 Rollback: `rm quiet-bench.sh .quiet-hold`; restore `wave-lib.sh.bak-20261016-2345-quiet` (the file before the 4-line hold check; copy it
 over `wave-lib.sh`).
+
+## #516 first, #514 blocked by it; quiet-bench paired and balance stages (16 Oct 2026, ~00:00 Oslo, 17 Oct)
+
+TD ruling on #516 (comment 6225171313): **#516 merges before #514** and has no dependencies. `PRIORITY_TICKETS` is now
+`516 519 522 514 487 488 489` (a same-size reorder, one in-place `pwrite`, backup `next-ticket.sh.bak-20261016-2355-516first`), and
+**#516 is a native blocker of #514** next to #519 and #522 (`POST .../issues/514/dependencies/blocked_by`), so the picker keeps #514 out
+until all three are closed. #516 has no `needs-planner`, `on-hold` or `blocked`, 0 attempts used, and no blockers. Wave 2B (#517) still
+lists #514 then #516; the wave logic skips the blocked #514 and offers #516.
+Rollback: restore the backup in place (`cat`, not `mv`); `gh api -X DELETE repos/bjor2/steampunk-miner/issues/514/dependencies/blocked_by/<id of #516>`.
+
+`quiet-bench.sh` (see the section above) now also:
+- **Bench stage, PASS/FAIL per row** via `quiet-bench-eval.py` (VS 6225108027): W=7 p50 <= 1.2 ms; W=27 p95 <= 2 ms or <= 1.25 x the paired
+  swept-cut p95 (median of >= 3 runs); P200 rows (W=7 within +-10% of the P1 rig, W=27 the 1.25x rule); the per-tick max printed; the bench's
+  own bar constant must read 1.2. It detects the paired swept-cut mode at run time (a `pair|baseline|swept|compar` flag in
+  `scripts/benchReportPose.ts` or a matching `package.json` script) and never invents one. Tip `76f47f53` has none, so the log says
+  "paired mode not present yet, result INCOMPLETE" and falls back to plain `npm run bench:report-pose`. A gate with no matching field in the
+  bench JSON is INCOMPLETE, never PASS. The worker's bench must print, per row: `width`, `speedMps`, `interval`, a drill-level field (key
+  contains `level`), `tickP50Ms`, `tickP95Ms`, a per-tick max (key contains `tick` and `max`), and the swept-cut rows either as extra rows with
+  `mode`/`path`/`kind`/`variant`/`source` = `swept` or in a second array of rows, plus `bar.tickP50Ms` = 1.2.
+- **`--balance` stage** (`--only-balance` skips the bench): `npm run balance:baseline` (script `vite-node scripts/balanceReport.ts
+  --write-baseline`, output `balance-report/` with `summary.json`, `report.md`, `events.ndjson`, `commands.ndjson`) on the tip of `ticket/<n>`
+  **and on its merge-base with main** (`git merge-base origin/main ticket/<n>`; TD: not main's tip, not the stale 7 Oct baseline), one after the
+  other in throwaway worktrees (`wt-bench`, `wt-bench-base`), same seeds. The pacing-bot bands (summary.json minus `logSchemaVersion`, and the
+  pacing report minus its "Against the baseline" section) must be **zero diff**; any diff is FAIL: A leaked into the bot, goes back to Systems.
+  Events and commands hashes are reported as info. Drift from the other commits since 7 Oct is not in this comparison (both sides share the merge-base);
+  it belongs to the re-record, read against the #396 pacing bands. The hold is extended by 90 min for this stage.
+- `--selftest` now also checks the evaluator on synthetic paired rows, tip-style rows and the zero-diff and nonzero-diff balance cases (no benches run).
+Rollback: restore `quiet-bench.sh.bak-20261016-2355-paired`, remove `quiet-bench-eval.py`.
