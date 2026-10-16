@@ -992,6 +992,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/physics/floatingOrigin.test.ts` | 3 | 3 |
 | `src/physics/glidePassThrough.test.ts` | 4 | 4 |
 | `src/physics/levelCutDips.lane.test.ts` | 2 | 2 |
+| `src/physics/levelLegDeadStop.lane.test.ts` | 16 | 2 |
 | `src/physics/levelReleaseTrace.lane.test.ts` | 2 | 2 |
 | `src/physics/liveFixedStep.test.ts` | 7 | 7 |
 | `src/physics/physicsStats.test.ts` | 3 | 3 |
@@ -1379,7 +1380,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/vehicle/cutFollowMotion.test.ts` | 15 | 15 |
 | `src/systems/vehicle/cutGate.test.ts` | 8 | 8 |
 | `src/systems/vehicle/cutStartBreakdown.test.ts` | 4 | 4 |
-| `src/systems/vehicle/drillContact.test.ts` | 5 | 5 |
+| `src/systems/vehicle/drillContact.test.ts` | 8 | 8 |
 | `src/systems/vehicle/drillGearCells.test.ts` | 12 | 12 |
 | `src/systems/vehicle/drillRule.test.ts` | 22 | 23 |
 | `src/systems/vehicle/drillStamp.test.ts` | 1 | 1 |

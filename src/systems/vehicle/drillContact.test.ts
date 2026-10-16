@@ -4,6 +4,7 @@ import { CELL_KIND } from '../world/worldCell'
 import {
   drillContactOf,
   inTheWayMmOf,
+  levelSliverDrillContactOf,
   sweptDrillContactOf,
   type DrillableGround,
 } from './drillContact'
@@ -43,6 +44,38 @@ describe('swept drill contact (ticket 330)', () => {
   it('never bites on ground behind the face', () => {
     expect(sweptDrillContactOf(groundWith([[1, -1]]), AIM)).toBe('none')
     expect(sweptDrillContactOf(groundWith([]), AIM)).toBe('none')
+  })
+})
+
+describe('level sliver contact, the shipped rule with the swept cut off (ticket 516)', () => {
+  // On a planet's surface 100 m out, so the level cut's floor sits at the wheels.
+  const SURFACE = 100_000
+  const aimOf = (facing: VehiclePose['facing']) => {
+    const pose: VehiclePose = { x: 0, y: SURFACE, vx: 0, vy: 0, upx: 0, upy: 1024, facing }
+    return {
+      centreMm: { x: pose.x, y: pose.y },
+      facing: facingVectorOf(pose.upx, pose.upy, pose.facing),
+      stamp: drillStampOf(pose, false),
+    }
+  }
+  const SURFACE_ROW = SURFACE / 250
+
+  it('bites on a lip past the face of a level cut that the per-report rule does not see', () => {
+    // 1.25 m ahead at the centre's height: past the face's reach and outside the full-weight core.
+    const lip = groundWith([[-5, SURFACE_ROW]])
+    expect(drillContactOf(lip, aimOf(FACING.left))).toBe('none')
+    expect(levelSliverDrillContactOf(lip, aimOf(FACING.left))).toBe('ahead')
+  })
+
+  it('keeps the per-report rule on a cut down, where no level leg rests on a lip', () => {
+    const lip = groundWith([[0, SURFACE_ROW - 5]])
+    expect(sweptDrillContactOf(lip, aimOf(FACING.down))).toBe('ahead')
+    expect(levelSliverDrillContactOf(lip, aimOf(FACING.down))).toBe('none')
+  })
+
+  it('keeps the per-report answer wherever that rule bites', () => {
+    const inTheWay = groundWith([[-2, SURFACE_ROW]])
+    expect(levelSliverDrillContactOf(inTheWay, aimOf(FACING.left))).toBe('inTheWay')
   })
 })
 

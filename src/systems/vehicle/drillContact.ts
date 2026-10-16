@@ -10,6 +10,10 @@
  * can sit past the face's reach and outside the stamp's full-weight core: the drill would stop and
  * the body would stay on it. `sweptDrillContactOf` therefore also bites on any ground the stamp can
  * still cut past the body's face. The authority charges only the ticks that removed something.
+ *
+ * With the swept cut off the same lip dead-stops a level leg (ticket 516, the TD's #441 measure):
+ * the body rests on it and the drill does not bite. `levelSliverDrillContactOf` takes the swept
+ * rule's bite on a level cut only, so a cut down or up drills exactly as before.
  */
 import { VEHICLE_COLLIDER_SIZE } from '../../constants/physics'
 import { ISO_DENSITY, MM_PER_SAMPLE, SAMPLES_PER_TILE } from '../world/sampleGrid'
@@ -34,7 +38,7 @@ const IN_THE_WAY_MM = 250
 /** Nothing to cut, ground to cut ahead of the body, or ground in its way. */
 export type DrillContact = 'none' | 'ahead' | 'inTheWay'
 
-/** A rule for what the drill meets: `drillContactOf`, or the swept cut's wider bite. */
+/** A rule for what the drill meets: `drillContactOf`, or a wider bite (swept, level sliver). */
 export type DrillContactRule = (ground: DrillableGround, aim: DrillAim) => DrillContact
 
 export interface DrillableGround {
@@ -78,6 +82,16 @@ export function sweptDrillContactOf(ground: DrillableGround, aim: DrillAim): Dri
   const isBiting = (sample: WeightedSample) =>
     isCuttable(ground, sample) && aheadOf(aim, sample) >= HALF_BODY_MM
   return discSamplesOf(aim.stamp).some(isBiting) ? 'ahead' : 'none'
+}
+
+/** `drillContactOf`, with the swept cut's bite past the face on a level cut (ticket 516). */
+export function levelSliverDrillContactOf(ground: DrillableGround, aim: DrillAim): DrillContact {
+  return isLevelCut(aim.stamp) ? sweptDrillContactOf(ground, aim) : drillContactOf(ground, aim)
+}
+
+/** A level cut's stamp keeps a level floor at the wheels (`drillStamp.ts`). */
+function isLevelCut(stamp: DiscStamp): boolean {
+  return stamp.floorRadiusMm !== null
 }
 
 /** Ground the stamp can still lower at this sample: solid, above its floor, never a wall or lava. */

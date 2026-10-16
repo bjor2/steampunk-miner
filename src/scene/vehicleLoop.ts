@@ -47,7 +47,7 @@ import type { Vector2 } from '../systems/vehicle/localFrame'
 import { driveSignsOfIntent } from '../systems/vehicle/driveSigns'
 import { drillStepCommand } from '../systems/vehicle/vehicleCommands'
 import {
-  drillContactOf,
+  levelSliverDrillContactOf,
   sweptDrillContactOf,
   type DrillContactRule,
 } from '../systems/vehicle/drillContact'
@@ -252,9 +252,12 @@ function showMotion(result: VehicleStepResult): void {
   motionPresence.isLifting = result.flags.isThrusting
 }
 
-/** With the swept cut on, the drill also bites on part-cut ground past the face (ticket 330). */
+/**
+ * The drill also bites on part-cut ground past the face: with the swept cut on (ticket 330), and
+ * with it off on a level cut, where a lip there dead-stopped the body (ticket 516).
+ */
 function drillContactRuleOf(flags: DevFlags): DrillContactRule {
-  return flags['drill.sweptCut'] ? sweptDrillContactOf : drillContactOf
+  return flags['drill.sweptCut'] ? sweptDrillContactOf : levelSliverDrillContactOf
 }
 
 /** With the swept cut on, travel parity's top speed (ticket 333); else the engine's own. */
