@@ -408,6 +408,7 @@
       "paths": ["src/ui/stage/**"],
       "specs": [
         "e2e/browser/screens/rotation.spec.ts",
+        "e2e/browser/screens/portraitMatrix.spec.ts",
         "e2e/browser/screens/screenLayout.spec.ts",
         "e2e/browser/screens/touchControls.spec.ts",
         "e2e/browser/screens/reviewShots.spec.ts"
@@ -523,6 +524,7 @@
         "e2e/browser/hud/portraitHud.spec.ts",
         "e2e/browser/screens/screenLayout.spec.ts",
         "e2e/browser/screens/rotation.spec.ts",
+        "e2e/browser/screens/portraitMatrix.spec.ts",
         "e2e/browser/screens/tapAffordances.spec.ts"
       ]
     },

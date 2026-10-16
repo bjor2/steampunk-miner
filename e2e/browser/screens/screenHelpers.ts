@@ -7,6 +7,9 @@ import { expect, test, type Page } from '@playwright/test'
 import type { DebugApi } from '../../../src/debug/debugApi'
 import type { ScreenCell } from './screenCells'
 
+/** Long enough on software GL to drive off the pad before drilling down. */
+const DRIVE_OFF_PAD_MS = 6000
+
 declare global {
   interface Window {
     steampunkDebug?: DebugApi
@@ -215,4 +218,93 @@ export function textSizes(page: Page): Promise<Record<string, number>> {
 
 export function shortAxisOf(cell: ScreenCell): number {
   return Math.min(cell.viewport.width, cell.viewport.height)
+}
+
+/** On P1 with a drill that cuts at once and nothing to fight: off the pad, then down, held. */
+export async function startDiggingDown(page: Page): Promise<void> {
+  await page.evaluate(() => {
+    const debug = window.steampunkDebug!
+    debug.setPlanet(1)
+    for (const track of ['drill_power', 'drill_tip', 'engine']) debug.setUpgrade(track, 300)
+    debug.freezeEnemies(true)
+    debug.ui.setZoom(12)
+    debug.input.press('aim_right')
+  })
+  await page.waitForTimeout(DRIVE_OFF_PAD_MS)
+  await page.evaluate(() => {
+    window.steampunkDebug!.input.release('aim_right')
+    window.steampunkDebug!.input.press('aim_down')
+  })
+}
+
+/** What a screen shows out of place: findings by name, every list empty when the layout holds. */
+export interface LayoutFindings {
+  /** A turn-your-device card (#173's, retired by ticket 483) covering the game. */
+  cards: number
+  /** Two HUD boxes over each other. */
+  hudOverlaps: string[]
+  /** A touch control past the safe area's edge. */
+  controlsOutside: string[]
+  /** A touch control over another or over a HUD box. */
+  controlOverlaps: string[]
+}
+
+/** The layout rows of the matrix (#470 PT-6): no card, the HUD apart, the controls placed. */
+export async function layoutFindingsOf(page: Page): Promise<LayoutFindings> {
+  const safe = await boxOf(page, 'safe-area')
+  const boxes = await declaredHudBoxes(page)
+  const controls = boxes.filter((box) => box.id === 'control')
+  const hud = boxes.filter((box) => box.id !== 'control')
+  return {
+    cards: await page.getByTestId('portrait-card').count(),
+    hudOverlaps: overlappingPairsOf(hud),
+    controlsOutside: controls.filter((box) => !isBoxInside(box, safe)).map(nameOfHudBox),
+    controlOverlaps: [...overlappingPairsOf(controls), ...overlappingPairsAcross(controls, hud)],
+  }
+}
+
+export const NO_LAYOUT_FINDINGS: LayoutFindings = {
+  cards: 0,
+  hudOverlaps: [],
+  controlsOutside: [],
+  controlOverlaps: [],
+}
+
+/** Each pair of the list once. */
+function overlappingPairsOf(boxes: readonly HudBox[]): string[] {
+  return boxes.flatMap((box, index) => overlappingPairsAcross([box], boxes.slice(index + 1)))
+}
+
+/** Touching edges and sub-pixel layout are not overlap. */
+function overlappingPairsAcross(boxes: readonly HudBox[], others: readonly HudBox[]): string[] {
+  return boxes.flatMap((box) =>
+    others
+      .filter((other) => overlaps(shavedBox(box), other))
+      .map((other) => `${nameOfHudBox(box)} x ${nameOfHudBox(other)}`),
+  )
+}
+
+function shavedBox(box: HudBox): HudBox {
+  const shave = 0.5
+  return {
+    ...box,
+    left: box.left + shave,
+    top: box.top + shave,
+    right: box.right - shave,
+    bottom: box.bottom - shave,
+  }
+}
+
+function isBoxInside(inner: Box, outer: Box): boolean {
+  const slack = 1
+  return (
+    inner.left >= outer.left - slack &&
+    inner.top >= outer.top - slack &&
+    inner.right <= outer.right + slack &&
+    inner.bottom <= outer.bottom + slack
+  )
+}
+
+function nameOfHudBox(box: HudBox): string {
+  return `${box.id}:${box.testId}`
 }

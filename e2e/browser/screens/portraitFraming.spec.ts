@@ -10,12 +10,17 @@
 import { expect, test, type Page } from '@playwright/test'
 import { STRIP_LENGTH_VMIN, STRIP_MAX_PIPS } from '../../../src/constants/hazardStrip'
 import { VIEW_SHORT_AXIS_DEFAULT_M } from '../../../src/constants/scene'
-import { cameraView, currentCell, openGame, renderStats, shortAxisOf } from './screenHelpers'
+import {
+  cameraView,
+  currentCell,
+  startDiggingDown,
+  openGame,
+  renderStats,
+  shortAxisOf,
+} from './screenHelpers'
 
 /** The 0.9 m collider over 12 m down the screen (#39 acceptance 1). */
 const COLLIDER_SHARE_AT_DEFAULT = 0.075
-/** Long enough on software GL to drive off the pad before drilling down. */
-const DRIVE_OFF_PAD_MS = 6000
 const SAMPLE_SECONDS = 8
 /** Desktop's 16:9 shape at a size software GL draws quickly (cap 20 m, as 1920 x 1080). */
 const DESKTOP_SHAPE = { width: 1280, height: 720 }
@@ -53,7 +58,7 @@ test.describe('portrait framing (ticket 484)', () => {
     test.setTimeout(300_000)
     const cell = currentCell()
     const errors = await openGame(page, cell)
-    await digDown(page)
+    await startDiggingDown(page)
     const portrait = await sampleDescent(page, cell.viewport.height)
     await page.setViewportSize(DESKTOP_SHAPE)
     const desktop = await sampleDescent(page, DESKTOP_SHAPE.height)
@@ -104,7 +109,7 @@ test.describe('portrait framing (ticket 484)', () => {
     test.setTimeout(300_000)
     const cell = currentCell()
     const errors = await openGame(page, cell)
-    await digDown(page)
+    await startDiggingDown(page)
     const budget = (shortAxisOf(cell) * STRIP_LENGTH_VMIN) / 100
     for (let second = 0; second < SAMPLE_SECONDS; second++) {
       await page.waitForTimeout(1000)
@@ -119,23 +124,6 @@ test.describe('portrait framing (ticket 484)', () => {
     expect(errors).toEqual([])
   })
 })
-
-/** On P1 with a drill that cuts at once and nothing to fight: off the pad, then down. */
-async function digDown(page: Page): Promise<void> {
-  await page.evaluate(() => {
-    const debug = window.steampunkDebug!
-    debug.setPlanet(1)
-    for (const track of ['drill_power', 'drill_tip', 'engine']) debug.setUpgrade(track, 300)
-    debug.freezeEnemies(true)
-    debug.ui.setZoom(12)
-    debug.input.press('aim_right')
-  })
-  await page.waitForTimeout(DRIVE_OFF_PAD_MS)
-  await page.evaluate(() => {
-    window.steampunkDebug!.input.release('aim_right')
-    window.steampunkDebug!.input.press('aim_down')
-  })
-}
 
 /** Once a second: the felt speed, and how many screen heights a second that is on this canvas. */
 async function sampleDescent(page: Page, heightPixels: number): Promise<DescentSample[]> {

@@ -5,9 +5,12 @@
  * sizes, focus rings, and no art upscaled at the default zoom. Geometry and counts only, read
  * through the DOM and `steampunkDebug`. The ground row (ticket 315, Gameplay's test 8 on #309):
  * a lined cell carries the lined bit and its lining reads at the cell size the widest zoom shows
- * at the render-scale floor, about 24 px on a phone, by the shader's rule in TS.
+ * at the render-scale floor, about 24 px on a phone, by the shader's rule in TS. The portrait
+ * cells (ticket 488) run every row but the two sized against the landscape reference: held upright
+ * the panels keep #470's 48 px targets and their own fit (`portraitPanels.spec.ts`).
  */
 import { expect, test, type Page } from '@playwright/test'
+import type { ScreenCell } from './screenCells'
 import {
   boxOf,
   buttonBoxes,
@@ -47,10 +50,6 @@ const LINED_SEARCH_TILES = 2
 const SLACK_PX = 1
 /** Font sizes and boxes round to hundredths of a pixel. */
 const SIZE_SLACK_PX = 0.05
-
-test.beforeEach(() => {
-  test.skip(currentCell().isPortrait, "portrait's matrix rows are PT-6's (ticket 488)")
-})
 
 test.describe('screen matrix: canvas (#173)', () => {
   test('caps the zoom-out by the half diagonal and pillarboxes past 64:27', async ({ page }) => {
@@ -96,9 +95,10 @@ test.describe('screen matrix: canvas (#173)', () => {
   test('upscales no baked art at the 12 m default', async ({ page }) => {
     const cell = currentCell()
     const errors = await openGame(page, cell)
+    // The zoom spans the screen's height either way up (ticket 484).
     await expect
       .poll(async () => (await cameraView(page)).pixelsPerMetre, { timeout: 30_000 })
-      .toBeCloseTo(shortAxisOf(cell) / 12, 3)
+      .toBeCloseTo(cell.viewport.height / 12, 3)
     const devicePixelsPerMetre =
       (await cameraView(page)).pixelsPerMetre * Math.min(cell.deviceScaleFactor, CANVAS_MAX_DPR)
     expect(devicePixelsPerMetre).toBeLessThanOrEqual(LOWEST_TEXELS_PER_METRE)
@@ -112,6 +112,7 @@ test.describe('screen matrix: UI (#173)', () => {
   }) => {
     test.setTimeout(240_000)
     const cell = currentCell()
+    skipUprightPanelRow(cell)
     const errors = await openGame(page, cell)
     await dockAt(page, 'sell')
     const sizes = await textSizes(page)
@@ -143,6 +144,7 @@ test.describe('screen matrix: UI (#173)', () => {
   }) => {
     test.setTimeout(240_000)
     const cell = currentCell()
+    skipUprightPanelRow(cell)
     const errors = await openGame(page, cell)
     await dockAt(page, 'sell')
     const smallest = cell.isTouch ? 56 : 44
@@ -277,6 +279,11 @@ function expectTenFootText(sizes: Record<string, number>, shortAxis: number): vo
     .filter(([, size]) => size < smallest)
     .map(([key, size]) => `${key}: ${size} px`)
   expect(tooSmall).toEqual([])
+}
+
+/** Held upright the panels are judged by #470's own rules (ticket 487), not the landscape reference. */
+function skipUprightPanelRow(cell: ScreenCell): void {
+  test.skip(cell.isPortrait, "held upright, portraitPanels.spec.ts holds the panels' sizes")
 }
 
 /** A finger taps it on a touch screen; elsewhere the mouse clicks it. */
