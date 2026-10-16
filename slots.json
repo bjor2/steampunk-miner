@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-10-16T06:09:25+02:00",
+  "updated_at": "2026-10-16T06:12:09+02:00",
   "caps": {
     "grok": 12,
     "claude": 10,
@@ -793,11 +793,11 @@
     }
   ],
   "last_refill": {
-    "at": "2026-10-16 05:50 CEST",
-    "mode": "recheck",
-    "triggers": "#432",
+    "at": "2026-10-16 06:12 CEST",
+    "mode": "refill-dev",
+    "triggers": "#459",
     "started": "",
-    "note": "load guard (1-min load 20.04 > 14)"
+    "note": "no pickable build ticket"
   },
   "totals": {
     "grok": {
