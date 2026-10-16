@@ -29,6 +29,9 @@ export type ButtonAction =
   | { kind: 'togglePreference'; name: PreferenceName }
   | { kind: 'rebind'; actionId: ActionId }
   | { kind: 'resetBindings' }
+  /** Settings' save file (ticket 479): the session's last save out, or a picked file in. */
+  | { kind: 'exportSave' }
+  | { kind: 'importSave' }
   /** The pause menu (ticket 404): Resume, its save page, a slot's save or overwrite's first press. */
   | { kind: 'closePauseMenu' }
   | { kind: 'openSaveSlots' }

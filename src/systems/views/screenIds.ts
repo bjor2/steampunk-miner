@@ -116,6 +116,13 @@ export const UI_IDS = {
   settingsBindingProblems: 'settings-binding-problems',
   settingsResetBindings: 'settings-reset-bindings',
   settingsClose: 'settings-close',
+  // Save keeping (#470 P1-8, ticket 479): the settings' Export and Import, their refusal lines,
+  // and the "progress not saved" chip with its own Export.
+  settingsExportSave: 'settings-export-save',
+  settingsImportSave: 'settings-import-save',
+  settingsSaveProblems: 'settings-save-problems',
+  unsavedChip: 'unsaved-chip',
+  unsavedChipExport: 'unsaved-chip-export',
   // The pause menu (ticket 404): its first page, the save page's name field, Back and notice.
   pauseMenu: 'pause-menu',
   pauseResume: 'pause-resume',

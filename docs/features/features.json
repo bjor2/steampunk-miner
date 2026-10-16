@@ -2153,6 +2153,18 @@
               "description": "An autosave plus nine named slots: save into one from the pause menu (a filled slot asks before it is overwritten) and load any of them from the title menu.",
               "status": "built",
               "issues": [12, 402, 403, 404]
+            },
+            {
+              "title": "Saves that survive a phone",
+              "description": "Each save is kept in browser storage and in a second, larger store, and the browser is asked not to clear them. If neither can take a save, a \"Progress not saved\" chip stays up with Export until the next save lands.",
+              "status": "built",
+              "issues": [479]
+            },
+            {
+              "title": "Export and import a save",
+              "description": "Settings exports the last save as a file (the share sheet on a phone) and imports one, byte for byte, to carry a game to another device. A trip resumes at the dock: nothing is saved mid-trip.",
+              "status": "built",
+              "issues": [479]
             }
           ]
         }

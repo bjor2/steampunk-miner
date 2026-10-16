@@ -283,6 +283,25 @@
       "specs": ["e2e/browser/pauseSave.spec.ts"]
     },
     {
+      "why": "Save keeping (ticket 479): the checkpoint and its write queue, the save-keeping slice, the browser shell's mirrored save folder and file hooks, and the debug saves that export and import.",
+      "paths": [
+        "src/store/checkpoint.ts",
+        "src/store/checkpointLines.ts",
+        "src/store/slotWriteQueue.ts",
+        "src/store/saveKeepingSlice.ts",
+        "src/shell/browserShell.ts",
+        "src/shell/mirroredSaveFolder.ts",
+        "src/shell/indexedSaveFolder.ts",
+        "src/shell/storedSaveSlots.ts",
+        "src/shell/saveFileHooks.ts",
+        "src/shell/sharedBrowserHooks.ts",
+        "src/debug/debugSaves.ts",
+        "src/systems/save/**",
+        "src/ui/save/**"
+      ],
+      "specs": ["e2e/browser/saveKeeping.spec.ts"]
+    },
+    {
       "why": "The gamepad adapter (ticket 346): the shell's poll, pad codes and frames, the pad runtime.",
       "paths": [
         "src/shell/gamepadHooks.ts",

@@ -12,6 +12,7 @@ function sourcesWith(overrides: unknown, rebindingActionId: SettingsSources['reb
     inputDevice: 'keyboard' as const,
     bindingProblems: [],
     rebindingActionId,
+    saveTransferProblems: [],
   }
 }
 
@@ -36,5 +37,24 @@ describe('settings model: bindings (ticket 346)', () => {
       padText: '',
       isWaitingForKey: true,
     })
+  })
+})
+
+describe('settings model: saves (ticket 479)', () => {
+  it('offers Export and Import as focus stops between the controls and Close', () => {
+    const model = selectSettingsModel(sourcesWith({}, null))
+    const ids = model.focusStops.map((stop) => stop.id)
+    const exportAt = ids.indexOf(model.saves.exportSave.id)
+    expect(ids.slice(exportAt, exportAt + 3)).toEqual([
+      model.saves.exportSave.id,
+      model.saves.importSave.id,
+      model.close.id,
+    ])
+    expect([model.saves.exportSave.reason, model.saves.importSave.reason]).toEqual([null, null])
+  })
+
+  it('shows why the last export or import was refused', () => {
+    const sources = { ...sourcesWith({}, null), saveTransferProblems: ['save is not JSON'] }
+    expect(selectSettingsModel(sources).saves.problems).toEqual(['save is not JSON'])
   })
 })

@@ -12,6 +12,7 @@ import { DeviceNotices } from './ui/stage/DeviceNotices'
 import { GameStage } from './ui/stage/GameStage'
 import { PortraitCard } from './ui/stage/PortraitCard'
 import { SliceScreen } from './ui/screens/SliceScreen'
+import { UnsavedChip } from './ui/save/UnsavedChip'
 import { ExactAmountSheet } from './ui/sheets/ExactAmountSheet'
 import { TitleMenu } from './ui/title/TitleMenu'
 import { TouchControls } from './ui/touch/TouchControls'
@@ -35,6 +36,7 @@ export default function App() {
       <TitleMenu />
       <ExactAmountSheet />
       <DeviceNotices />
+      <UnsavedChip />
       <PortraitCard />
     </GameStage>
   )

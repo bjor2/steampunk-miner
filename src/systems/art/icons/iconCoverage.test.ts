@@ -200,6 +200,7 @@ describe('icon coverage (#158 section 3)', () => {
       inputDevice: 'keyboard',
       bindingProblems: [],
       rebindingActionId: null,
+      saveTransferProblems: [],
     })
     const ids = [
       cards.titleIconId,

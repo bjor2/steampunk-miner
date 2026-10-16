@@ -81,6 +81,17 @@ export interface Shell {
   deleteSaveSlot(slot: string): Promise<void>
   /** Moves a save this build refused out of the way, so the next write cannot overwrite it. */
   setAsideSaveSlot(slot: string): Promise<void>
+  /**
+   * Asks to keep the save folder from eviction (#470 P1-8): a browser's `storage.persist()`,
+   * answered true when granted; Electron's files are kept anyway.
+   */
+  askToKeepSaves(): Promise<boolean>
+  /** Runs once, at the first finger or button pressed on the page. */
+  onFirstTap(callback: () => void): void
+  /** Hands a save file to the player (a download, or a phone's share sheet), its exact text. */
+  handOverSaveFile(fileName: string, json: string): Promise<void>
+  /** Lets the player pick a save file; its text, or null when they picked none. */
+  pickSaveFile(): Promise<string | null>
   /** Puts a handle on `window` for bots and the dev console (Playwright, design doc section 20). */
   exposeGlobalHandle(name: string, handle: unknown): void
   /** The local preferences file's text (#33), or null when none was written yet. */

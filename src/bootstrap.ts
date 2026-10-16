@@ -27,9 +27,11 @@ import {
   loadCheckpoint,
   saveFileNow,
   type CheckpointLoad,
+  type SaveFolderInstall,
 } from './store/checkpoint'
 import { runEventPlaceOf, useGameStore } from './store/gameStore'
 import type { SaveFolder } from './store/saveFolder'
+import { installSaveTransfer } from './store/saveKeepingSlice'
 import { listenForDomainEvents } from './store/domainEventBroadcast'
 import { routeKeyChange, routeScrollNotch } from './store/inputRuntime'
 import { routePadFrame } from './store/padRuntime'
@@ -71,7 +73,8 @@ export async function startGame(): Promise<void> {
   logPerfOnTestRuns(shell, run)
   keepSnapshotsOnDebugRuns(shell, run.runId)
   recordGameStarted(shell)
-  installSaveFolder({ folder: saveFolderOf(shell), readWallClockMs: () => Date.now() })
+  installSaveFolder(saveFolderInstallOf(shell))
+  keepSavesOnThisDevice(shell)
   await adoptLocalPreferences(shell)
   keepScreenFitted(shell)
   showTouchControlsOnTouch(shell)
@@ -160,6 +163,28 @@ function holdPlayWhilePageHidden(shell: Shell): void {
 /** The sound output's unlock reports, for the stage's "tap for sound" chip (ticket 478). */
 function showWhetherSoundPlays(): void {
   onSoundUnlockChange((unlock) => useGameStore.getState().noteSoundUnlock(unlock))
+}
+
+function saveFolderInstallOf(shell: Shell): SaveFolderInstall {
+  return {
+    folder: saveFolderOf(shell),
+    readWallClockMs: () => Date.now(),
+    askToKeepSaves: () => void shell.askToKeepSaves(),
+  }
+}
+
+/**
+ * Saves on a phone (#470 P1-8, ticket 479): the browser is asked to keep them at the first tap as
+ * well as at the first save, Export and Import go through the shell's files, and a page hidden
+ * while docked writes the autosave once more.
+ */
+function keepSavesOnThisDevice(shell: Shell): void {
+  shell.onFirstTap(() => void shell.askToKeepSaves())
+  installSaveTransfer({
+    handOverSaveFile: (fileName, json) => shell.handOverSaveFile(fileName, json),
+    pickSaveFile: () => shell.pickSaveFile(),
+  })
+  shell.onPageHide(() => useGameStore.getState().writeCheckpointOnPageHide())
 }
 
 function saveFolderOf(shell: Shell): SaveFolder {

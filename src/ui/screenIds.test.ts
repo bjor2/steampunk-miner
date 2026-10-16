@@ -59,6 +59,7 @@ import { RefineryBayView } from './platform/RefineryBayView'
 import { SellBayView } from './platform/SellBayView'
 import { UpgradeBayView } from './platform/UpgradeBayView'
 import { PlaquesView } from './plaques/PlaquesView'
+import { UnsavedChipView } from './save/UnsavedChip'
 import { SettingsView } from './settings/SettingsView'
 import { PauseMenuView } from './pause/PauseMenuView'
 import {
@@ -301,10 +302,23 @@ function settingsTexts(model: SettingsModel): Partial<Record<UiId, string | null
     [UI_IDS.settingsPanel]: null,
     [UI_IDS.settingsResetBindings]: model.reset.label,
     [UI_IDS.settingsClose]: model.close.label,
+    [UI_IDS.settingsExportSave]: model.saves.exportSave.label,
+    [UI_IDS.settingsImportSave]: model.saves.importSave.label,
     ...(model.bindingProblems.length > 0
       ? { [UI_IDS.settingsBindingProblems]: model.bindingProblems.join('') }
       : {}),
+    ...(model.saves.problems.length > 0
+      ? { [UI_IDS.settingsSaveProblems]: model.saves.problems.join('') }
+      : {}),
   }
+}
+
+/** The chip a save no store took puts up (ticket 479), with its Export. */
+function renderUnsavedChip(): string[] {
+  return checkScreen(createElement(UnsavedChipView, { cause: 'quota' }), {
+    [UI_IDS.unsavedChip]: null,
+    [UI_IDS.unsavedChipExport]: 'Export',
+  })
 }
 
 function pauseMenuTexts(model: PauseMenuModel): Partial<Record<UiId, string | null>> {
@@ -680,6 +694,8 @@ function expectEveryIdRendered(): void {
   keep(renderSellBay())
   keep(renderUpgradeBay())
   game().setBindings({ lift: { keyboard: ['KeyE'] } })
+  // No file transfer is installed here, so the export is refused and its problem line shows.
+  game().exportSave()
   keep(renderSettings())
   game().pressScreenButton('platform-travel')
   tap('interact')
@@ -700,6 +716,7 @@ function expectEveryIdRendered(): void {
   keep(renderSliceScreen())
   keep(renderSlowDeviceChip())
   keep(renderPauseMenu())
+  keep(renderUnsavedChip())
   expect(Object.values(UI_IDS).filter((id) => !found.has(id))).toEqual([])
 }
 

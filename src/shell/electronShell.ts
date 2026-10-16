@@ -18,6 +18,7 @@ import {
   setRootStyle,
   vibrateDevice,
 } from './screenHooks'
+import { handOverSaveFile, pickSaveFile, runOnFirstTap } from './saveFileHooks'
 import { preferencesFileOf, saveFolderOf, type Shell } from './shell'
 
 export function createElectronShell(bridge: ShellBridge): Shell {
@@ -36,6 +37,10 @@ export function createElectronShell(bridge: ShellBridge): Shell {
     listSaveSlots: () => bridge.listSaveSlots(folder),
     deleteSaveSlot: (slot) => bridge.deleteSaveSlot(folder, slot),
     setAsideSaveSlot: (slot) => bridge.setAsideSaveSlot(folder, slot),
+    askToKeepSaves: async () => true,
+    onFirstTap: runOnFirstTap,
+    handOverSaveFile,
+    pickSaveFile,
     readPreferences: () => bridge.readPreferences(preferencesFile),
     writePreferences: (json) => bridge.writePreferences(preferencesFile, json),
     readBufferedRunEvents: () => '',

@@ -5,9 +5,24 @@
 import type { MouseEvent } from 'react'
 import styles from './Button.module.css'
 
-export function Button({ label, onPress }: { label: string; onPress: () => void }) {
+export function Button({
+  label,
+  onPress,
+  testId,
+}: {
+  label: string
+  onPress: () => void
+  /** The `data-testid` a spec finds it by. */
+  testId?: string
+}) {
   return (
-    <button type="button" className={styles.button} onMouseDown={keepFocusOnGame} onClick={onPress}>
+    <button
+      type="button"
+      className={styles.button}
+      data-testid={testId}
+      onMouseDown={keepFocusOnGame}
+      onClick={onPress}
+    >
       {label}
     </button>
   )

@@ -22,6 +22,27 @@ export const CONTROLS_GROUP_TEXT: ElementText = {
   tooltipLines: [],
 }
 
+/**
+ * Save keeping (#470 P1-8, ticket 479): out on a trip nothing is saved, so the line says a trip
+ * resumes at the dock until mid-trip saves are ruled on, and that Import replaces the game.
+ */
+export const SAVES_GROUP_TEXT: ElementText = {
+  id: 'settings.saves',
+  title: 'Saves',
+  oneLine: 'A trip resumes at the dock; Import replaces the game in play.',
+  tooltipLines: [
+    'The game saves at each dock, sale, repair, upgrade and travel.',
+    'Export hands the last save over as a file.',
+  ],
+}
+
+export const SAVE_FILE_REFUSED_TEXT: ElementText = {
+  id: 'settings.save-file-refused',
+  title: 'Save file refused',
+  oneLine: '',
+  tooltipLines: [],
+}
+
 export const REBIND_REFUSED_TEXT: ElementText = {
   id: 'settings.rebind-refused',
   title: 'Rebind refused',

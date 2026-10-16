@@ -23,6 +23,8 @@ export interface SettingsSources {
   /** The problems of the last refused rebinding; the defaults or the last good map rule. */
   bindingProblems: readonly string[]
   rebindingActionId: ActionId | null
+  /** Why the last save export or import was refused (ticket 479); [] after one that worked. */
+  saveTransferProblems: readonly string[]
 }
 
 export interface SettingToggle {
@@ -43,11 +45,19 @@ export interface BindingRow {
   button: ScreenButton
 }
 
+/** The save file's buttons and the refusal of the last export or import (ticket 479). */
+export interface SaveFileRow {
+  exportSave: ScreenButton
+  importSave: ScreenButton
+  problems: readonly string[]
+}
+
 export interface SettingsModel {
   toggles: SettingToggle[]
   bindings: BindingRow[]
   bindingProblems: readonly string[]
   reset: ScreenButton
+  saves: SaveFileRow
   close: ScreenButton
   focusStops: FocusStop[]
 }
@@ -104,12 +114,14 @@ export function selectSettingsModel(sources: SettingsSources): SettingsModel {
   const reset = uiButton(UI_IDS.settingsResetBindings, 'Reset to defaults', {
     kind: 'resetBindings',
   })
+  const saves = saveFileRowOf(sources.saveTransferProblems)
   const close = uiButton(UI_IDS.settingsClose, 'Close', { kind: 'closeSettings' })
   return {
     toggles,
     bindings,
     bindingProblems: sources.bindingProblems,
     reset,
+    saves,
     close,
     focusStops: [
       ...toggles.map((toggle) => ({ id: toggle.button.id, panel: 'display' })),
@@ -117,8 +129,18 @@ export function selectSettingsModel(sources: SettingsSources): SettingsModel {
         id: button.id,
         panel: 'controls',
       })),
+      ...[saves.exportSave, saves.importSave].map((button) => ({ id: button.id, panel: 'saves' })),
       { id: close.id, panel: 'footer' },
     ],
+  }
+}
+
+/** Always pressable: a refusal (nothing saved yet, a file this build cannot read) says why. */
+function saveFileRowOf(problems: readonly string[]): SaveFileRow {
+  return {
+    exportSave: uiButton(UI_IDS.settingsExportSave, 'Export save', { kind: 'exportSave' }),
+    importSave: uiButton(UI_IDS.settingsImportSave, 'Import save', { kind: 'importSave' }),
+    problems,
   }
 }
 

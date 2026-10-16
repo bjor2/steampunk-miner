@@ -52,6 +52,7 @@ import type { PauseMenuActions, PauseMenuValues } from './pauseMenuSlice'
 import { menuScreenOf, type ScreenSources } from './screenModels'
 import { screenIdProblems, winningScreenId } from '../ui/registries/screens'
 import type { TitleMenuActions } from './titleMenuSlice'
+import type { SaveKeepingActions } from './saveKeepingSlice'
 import type { VehicleReplica } from './vehicleReplica'
 
 export interface PresentationValues {
@@ -164,6 +165,7 @@ type SliceHost = PresentationValues &
   PauseMenuValues &
   PauseMenuActions &
   TitleMenuActions &
+  Pick<SaveKeepingActions, 'exportSave' | 'importSave'> &
   ScreenSources & { vehicle: VehicleReplica }
 
 type SetSlice = (partial: Partial<PresentationValues>) => void
@@ -323,6 +325,8 @@ function runButtonAction(state: SliceHost, action: ButtonAction): void {
   else if (action.kind === 'togglePreference') state.togglePreference(action.name)
   else if (action.kind === 'rebind') state.startRebinding(action.actionId)
   else if (action.kind === 'resetBindings') state.resetBindings()
+  else if (action.kind === 'exportSave') state.exportSave()
+  else if (action.kind === 'importSave') void state.importSave()
   else runMenuAction(state, action)
 }
 

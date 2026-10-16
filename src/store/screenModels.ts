@@ -72,6 +72,7 @@ export interface ScreenSources {
   isTouchControlsShown: boolean
   bindingProblems: readonly string[]
   rebindingActionId: ActionId | null
+  saveTransferProblems: readonly string[]
   isTravelArmed: boolean
   focusedControlId: string | null
   liveStepHold: LiveStepHold
@@ -206,6 +207,8 @@ function settingsMenu(model: SettingsModel): MenuScreen {
       ...model.toggles.map((toggle) => toggle.button),
       ...model.bindings.map((row) => row.button),
       model.reset,
+      model.saves.exportSave,
+      model.saves.importSave,
       model.close,
     ],
   }

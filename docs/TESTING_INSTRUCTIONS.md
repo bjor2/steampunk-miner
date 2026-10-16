@@ -174,6 +174,14 @@ programs }` from three's `renderer.info` of the game canvas), read only when cal
   the opened rows; `saveDeterminism.test.ts` saves the planet-200 dive of `p200DiveFixture.ts` (a
   crew of eight, so the steps are cut by the swept span, and a drill under the curve, so the cursor
   holds part of a tick) and plays 600 ticks on from the save and from its load, compared byte for byte.
+- Save keeping specs (#470 P1-8, ticket 479): `store/saveKeeping.test.ts` installs a memory folder whose
+  `write` throws a `QuotaExceededError` while a flag is set, and a fake `SaveTransfer`
+  (`installSaveTransfer`, null in `afterEach`) for Export's hand-over and Import's picked text;
+  failure, export, import on "another device" (a fresh folder) and the docked page-hide write are
+  asserted there. The localStorage + IndexedDB mirror is `shell/mirroredSaveFolder.test.ts`, two memory
+  stores standing in for both (IndexedDB itself is only reached by the browser e2e
+  `e2e/browser/saveKeeping.spec.ts`, which also exports and imports in a fresh context). A file picker
+  opens only from a real tap, so specs import through `steampunkDebug.saves.importText`.
 - Drill carry specs (ticket 399): the pure walk is `vehicle/carryWalk.test.ts` (exact sums over a
   column, hard stops, the carry ends, runs equal to the per-cell walk, no gate asked past the stop);
   `authority/sweptCarry.test.ts` drives `drillAlongStep` down a 100-cell column (each cell breaks on

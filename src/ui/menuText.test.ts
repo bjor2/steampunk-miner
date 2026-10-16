@@ -77,7 +77,7 @@ describe('menu text budget (spec #422, pass #429)', () => {
     expectEveryTextRegisteredWithinBudget(markup)
   })
 
-  it('draws settings with a key awaited and a refused rebinding on registered elements only', () => {
+  it('draws settings with a key awaited, a refused rebinding and a refused save file on registered elements only', () => {
     const model = selectSettingsModel({
       prefs: DEFAULT_PREFERENCES,
       bindings: defaultBindings(ACTION_MAP),
@@ -85,9 +85,11 @@ describe('menu text budget (spec #422, pass #429)', () => {
       padBindings: defaultPadBindings(ACTION_MAP),
       bindingProblems: ['KeyW is already bound to Lift'],
       rebindingActionId: ACTION_MAP.actions[0].id,
+      saveTransferProblems: ['save is not JSON'],
     })
     const markup = markupOf(createElement(SettingsView, { model, focusedId: model.close.id }))
     expect(markup).toContain('data-ui-text="settings.rebind-refused"')
+    expect(markup).toContain('data-ui-text="settings.save-file-refused"')
     expectEveryTextRegisteredWithinBudget(markup)
   })
 })
