@@ -398,3 +398,22 @@ Rollback: restore `next-ticket.sh.bak-20261016-drillfirst` (the file before this
 These three are children of #316, not #302, so the wave planner places them in no wave, and wave mode skips a ticket in no wave once the 24 h transition window ends (about 11:05 Oslo on 17 Oct). A new `WAVE_ORPHAN_ALLOW=" 504 505 503 "` list in `next-ticket.sh` exempts them: they are tried before wave order and keep running after the window. Every other pick rule still applies (`build`, none of `blocked`/`on-hold`/`hitl`/`needs-planner`, blockers closed, attempts left). Remove a number from the list once its ticket closes or joins a wave.
 
 Rollback: restore `next-ticket.sh.bak-20261016-1500-prio503-505` (the file before this edit), or delete `504 505 503` from line 130 and the `WAVE_ORPHAN_ALLOW` line and its two uses in `pick_tickets`.
+
+## Portrait go: #500 first, then the portrait slice (16 Oct 2026, 18:40 Oslo)
+
+Bjor, 16 Oct 18:18: "HUD fix, portrait slice then continue." `build` is on **#500** (mobile HUD declutter), **#484** to **#488**
+and **#489**; **#482** (real-device check) stays a human step and now carries `hitl`; the materials tickets (#444 to #454) stay
+without `build`. Native blockers make the order: **#500 blocks #484, #485 and #486**; #488 waits for #485 to #487; #489 waits
+for #483 to #488 (Producer). The map #470 waves, replanned with `/osilion-wave-plan`: **2A** (#496) `#500 → #484 → #485`,
+**2B** (#497, blocked by 2A) `#486 → #487`, then `#488`, then `#489`; **2C** (#495) is the HITL bench for #482. Waves 2A and 2B were
+unpaused. Map #302 was replanned too (now 7A to 7D; #441, #499 and #471's wave are out).
+
+`PRIORITY_TICKETS` now starts `500 506 484 485 486 487 488 489 463 504 505 503 396 ...` (closed tickets dropped, same file size,
+live workers read the script by offset); **#506** is also in `WAVE_ORPHAN_ALLOW` (a #316 child outside the wave planner, like
+503 to 505). Held: #471 (`blocked`), the materials waves, #482.
+
+Side effect to know about: removing `hitl` from the spec #470 makes the spec pool delegate it to a planner room (one pass did, at
+17:32 BST). `hitl` is back on #470 and the planner slot was freed; leave `hitl` on #470.
+
+Rollback: restore `next-ticket.sh.bak-20261016-1825-portrait-prio`; `gh issue edit <n> --remove-label build` for 500 and 484 to
+489; remove the blockers with `gh api -X DELETE repos/bjor2/steampunk-miner/issues/{484,485,486}/dependencies/blocked_by/<id of #500>`.
