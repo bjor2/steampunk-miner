@@ -1,12 +1,31 @@
 /*
  * The on-screen driving controls (#173, Gameplay & Vehicle's layout): a floating stick in the
- * thumb's 40% of the screen below the HUD strip, and a contextual cluster in the other bottom
- * corner. All inside the safe area; mirrored for the left hand.
+ * thumb's 40% of the screen's lower 45%, and a contextual cluster in the other bottom corner. All
+ * inside the safe area; mirrored for the left hand. Held upright (#470 PT-3, ticket 485) a phone's
+ * cluster lies in two rows and the slices' tiles keep to the free edge above it.
  */
 .controls {
+  /*
+   * The lane the slices' tiles (the slot column, the fire tile) keep to on the cluster's edge:
+   * from below the HUD down to the cluster's two lower rows (56 + 72 px and their gaps). The
+   * slices read these instead of their own copies of the cluster's size.
+   */
+  --touch-tile-lane-top: 20%;
+  --touch-tile-lane-bottom: calc(var(--space-3) + 56px + 8px + 72px + 8px);
+  /* The cluster's grid is always three tracks wide, shown buttons or not. */
+  --touch-cluster-width: calc(56px + 8px + 56px + 8px + 72px);
+
   position: absolute;
   inset: 0;
   pointer-events: none;
+}
+
+/*
+ * Held upright the tiles start at 40% of the height, under the compact HUD's rows and hint chip
+ * even on a 320 x 568 phone, so five slots still fit one column above the cluster on 390 x 844.
+ */
+:global([data-orientation='portrait']) .controls {
+  --touch-tile-lane-top: 40%;
 }
 
 /* Pinch and double tap anywhere the stick and the buttons are not; the browser never zooms. */
@@ -17,12 +36,19 @@
   touch-action: none;
 }
 
+/*
+ * The stick lands in the lower 45% of the screen's height (TD on #470, the keep-out #500's HUD
+ * lays its rows above), ending at the bottom inset: a thumb at the very bottom of an iPhone would
+ * swipe the home bar instead. This layer is the safe area, so 55% of the screen's height is 55% of
+ * the layer plus 0.55 of the bottom inset less 0.45 of the top one. 40% of the width, stopping a
+ * gap short of the cluster on the narrowest phones.
+ */
 .stickZone {
   position: absolute;
-  top: 20%;
+  top: calc(55% + 0.55 * var(--safe-bottom) - 0.45 * var(--safe-top));
   bottom: 0;
   left: 0;
-  width: 40%;
+  width: min(40%, calc(100% - var(--space-3) - var(--touch-cluster-width) - 8px));
   pointer-events: auto;
   touch-action: none;
 }
@@ -98,6 +124,27 @@
     'plant_charge toggle_guns .'
     'interact quick_service request_rescue';
   place-items: end start;
+}
+
+/*
+ * A phone held upright (ticket 485; the compact HUD's screens, #500) lays the cluster in two rows,
+ * 136 px tall instead of 192, so the view keeps the height: the size badge moves beside Plant
+ * charge, its face against that side. A tablet held upright keeps the full HUD and its three rows,
+ * clear of the full HUD's bottom-centre hint plaque.
+ */
+:global([data-orientation='portrait'][data-hud-density='compact']) .cluster {
+  grid-template-rows: 56px 72px;
+  grid-template-areas:
+    'toggle_guns charge_size plant_charge'
+    'request_rescue quick_service interact';
+}
+
+:global([data-orientation='portrait'][data-hud-density='compact'])
+  .controls[data-hand='left']
+  .cluster {
+  grid-template-areas:
+    'plant_charge charge_size toggle_guns'
+    'interact quick_service request_rescue';
 }
 
 /* 35% at rest and 80% pressed, a 2 px brass rim, glyphs only (#173). */
@@ -178,4 +225,17 @@
 
 .sizeBadge[data-pressed] .sizeBadgeFace {
   opacity: 1;
+}
+
+:global([data-orientation='portrait'][data-hud-density='compact']) .sizeBadge {
+  align-self: center;
+  justify-self: end;
+  place-items: center end;
+}
+
+:global([data-orientation='portrait'][data-hud-density='compact'])
+  .controls[data-hand='left']
+  .sizeBadge {
+  justify-self: start;
+  place-items: center start;
 }

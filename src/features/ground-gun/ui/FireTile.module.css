@@ -1,12 +1,13 @@
 /*
  * The fire tile sits one slot's width inside the power-up column (56 px and its 8 px gap), level
- * with the column's foot above the cluster, so the thumb finds it beside the slots. It matches
- * the cluster's look: 35% at rest, 80% pressed, a 2 px brass rim.
+ * with the column's foot at the bottom of the touch controls' tile lane (`--touch-tile-lane-bottom`,
+ * above the cluster either way up), so the thumb finds it beside the slots. It matches the
+ * cluster's look: 35% at rest, 80% pressed, a 2 px brass rim.
  */
 .dock {
   position: absolute;
   right: calc(var(--space-3) + 56px + 8px);
-  bottom: calc(var(--space-3) + 56px + 8px + 72px + 8px);
+  bottom: var(--touch-tile-lane-bottom);
   pointer-events: none;
 }
 

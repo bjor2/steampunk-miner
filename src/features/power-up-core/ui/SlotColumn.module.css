@@ -1,13 +1,14 @@
 /*
- * The power-up slot column (#162 section 2.3, #173): on the thumb's edge, above the cluster's two
- * rows (56 + 72 px and their gap) and below the HUD strip, wrapping inwards when five do not fit.
+ * The power-up slot column (#162 section 2.3, #173): on the thumb's edge, in the lane the touch
+ * controls keep for the tiles (`--touch-tile-lane-*`: above the cluster's two lower rows, below
+ * the HUD; ticket 485 moves it for a screen held upright), wrapping inwards when five do not fit.
  * The buttons match the cluster's look: 35% at rest, 80% pressed, a 2 px brass rim.
  */
 .column {
   position: absolute;
-  top: 20%;
+  top: var(--touch-tile-lane-top);
   right: var(--space-3);
-  bottom: calc(var(--space-3) + 56px + 8px + 72px + 8px);
+  bottom: var(--touch-tile-lane-bottom);
   display: flex;
   flex-flow: column wrap-reverse;
   justify-content: flex-end;

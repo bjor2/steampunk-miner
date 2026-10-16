@@ -5,8 +5,16 @@
 
 /** The floating stick lands anywhere in this share of the screen's width, from the thumb's side. */
 export const STICK_ZONE_WIDTH_PERCENT = 40
-/** Below the top HUD strip: the zone starts this far down the screen. */
-export const STICK_ZONE_TOP_PERCENT = 20
+/**
+ * The zone is the lower 45% of the screen's height, ending at the bottom inset so a thumb never
+ * swipes an iPhone's home bar (#470 PT-3, ticket 485; the HUD's rows keep above it, #500).
+ */
+export const STICK_ZONE_HEIGHT_PERCENT = 45
+/**
+ * Where the slices' tiles (the slot column, the fire tile) may start down the thumb's edge:
+ * under the HUD strip sideways, under the compact HUD's rows held upright (ticket 485).
+ */
+export const TOUCH_TILE_LANE_TOP_PERCENT = { landscape: 20, portrait: 40 } as const
 /** The stick's travel radius in CSS px. */
 export const STICK_RADIUS_PX = 56
 /** Inside this share of the travel the stick holds nothing. */
@@ -17,7 +25,10 @@ export const STICK_DEADZONE_SHARE = 0.2
  */
 export const STICK_OCTANT_SLOPE = Math.SQRT2 - 1
 
-/** The cluster's primary button (Interact) and the others, in CSS px (G&V layout). */
+/**
+ * The cluster's primary button (Interact) and the others, in CSS px (G&V layout): three rows
+ * sideways, two on a phone held upright (ticket 485).
+ */
 export const INTERACT_BUTTON_PX = 72
 export const CLUSTER_BUTTON_PX = 56
 /** At least this much between two hit boxes. */
