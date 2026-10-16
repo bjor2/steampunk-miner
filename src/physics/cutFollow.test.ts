@@ -1,5 +1,6 @@
 import RAPIER from '@dimforge/rapier3d-compat'
 import { afterEach, beforeAll, beforeEach, describe, expect, it } from 'vitest'
+import { DEV_FLAGS } from '../constants/devFlags'
 import { CUT_FOLLOW_TICKS } from '../constants/balance'
 import { MM_PER_METRE, PHYSICS_TIMESTEP, UP_VECTOR_SCALE } from '../constants/physics'
 import { createMemorySink } from '../logging/eventSink'
@@ -89,7 +90,7 @@ function playScript(
   const start = readLocalVehicle().pose
   if (start === null) throw new Error('the starting planet has no dock')
   const controller = createVehicleController(RAPIER, world, createVehicleBody(RAPIER, world, start))
-  const loop = createVehicleLoop({ 'drill.sweptCut': true })
+  const loop = createVehicleLoop({ ...DEV_FLAGS, 'drill.sweptCut': true })
   const hold = (intent: VehicleIntent, seconds: number) =>
     holdIntent(controller, intent, Math.round(seconds / PHYSICS_TIMESTEP), (stepped) => {
       loop.step(stepped, intent)

@@ -1,6 +1,7 @@
 import RAPIER from '@dimforge/rapier3d-compat'
 import { mkdirSync, writeFileSync } from 'node:fs'
 import { afterEach, beforeAll, beforeEach, describe, expect, it } from 'vitest'
+import { DEV_FLAGS } from '../constants/devFlags'
 import { CUT_FOLLOW_TICKS } from '../constants/balance'
 import { MM_PER_METRE, PHYSICS_TIMESTEP, UP_VECTOR_SCALE } from '../constants/physics'
 import { createMemorySink } from '../logging/eventSink'
@@ -133,7 +134,7 @@ function playDownLeg(levels: Record<string, number>, framesPerSecond: number): T
   if (start === null) throw new Error('the starting planet has no dock')
   const placed = createVehicleBody(RAPIER, world, start)
   const controller = createVehicleController(RAPIER, world, placed)
-  const loop = createVehicleLoop({ 'drill.sweptCut': true })
+  const loop = createVehicleLoop({ ...DEV_FLAGS, 'drill.sweptCut': true })
   const clock: FrameClock = { carried: 0 }
   const hold = (intent: VehicleIntent, seconds: number) => {
     const ticks: TraceTick[] = []

@@ -13,12 +13,18 @@
  *   stats-derived step bound and its wait-for-cut window widens to it (TD scope a, ticket 334);
  *   the authority checks steps and reports against that bound whatever the flag, and the world
  *   steps in substeps at any speed, which stays one a tick at the 18 m/s clamp it keeps off.
+ * - `drill.reportEveryTick` (ticket 514, TD shape on #441): with `drill.sweptCut` off, a pose report
+ *   goes out every tick while the drill bites instead of every 12, removing the 5 Hz cut's hidden
+ *   ceiling of about 5 m/s. Unlike the flags above it lands on: it is a kill-switch (HS on #514),
+ *   and off it brings back the 12-tick cadence and the old behaviour. With `drill.sweptCut` on it
+ *   reads nothing; the swept path keeps reports 12 ticks apart.
  */
 export interface DevFlags {
   readonly 'drill.sweptCut': boolean
+  readonly 'drill.reportEveryTick': boolean
 }
 
-export const DEV_FLAGS: DevFlags = { 'drill.sweptCut': false }
+export const DEV_FLAGS: DevFlags = { 'drill.sweptCut': false, 'drill.reportEveryTick': true }
 
 /**
  * Dev flags the authority's rules read, apart from the client loop's `DevFlags` above:

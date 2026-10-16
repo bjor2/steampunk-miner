@@ -8,7 +8,7 @@
  * store and install a run log around it.
  */
 import type RAPIER from '@dimforge/rapier3d-compat'
-import type { DevFlags } from '../constants/devFlags'
+import { DEV_FLAGS, type DevFlags } from '../constants/devFlags'
 import { PHYSICS_TIMESTEP, UP_VECTOR_SCALE, VEHICLE_COLLIDER_SIZE } from '../constants/physics'
 import { createVehicleLoop } from '../scene/vehicleLoop'
 import { readAuthorityState } from '../store/authorityLink'
@@ -38,7 +38,7 @@ import {
 
 /** Where along the line ahead, past the body's face in metres, a cell opening counts (#433). */
 const LINE_AHEAD_M = [1 / 20, 0.55, 1.05, 1.55, 2.05]
-const SWEPT_CUT_ON: DevFlags = { 'drill.sweptCut': true }
+const SWEPT_CUT_ON: DevFlags = { ...DEV_FLAGS, 'drill.sweptCut': true }
 
 /** One fixed tick of a script, read after it. */
 export interface TickRead {

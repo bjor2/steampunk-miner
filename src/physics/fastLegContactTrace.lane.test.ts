@@ -1,6 +1,7 @@
 import RAPIER from '@dimforge/rapier3d-compat'
 import { mkdirSync, writeFileSync } from 'node:fs'
 import { afterEach, beforeAll, beforeEach, describe, expect, it } from 'vitest'
+import { DEV_FLAGS } from '../constants/devFlags'
 import { CUT_FOLLOW_TICKS } from '../constants/balance'
 import { MM_PER_METRE, PHYSICS_TIMESTEP, UP_VECTOR_SCALE } from '../constants/physics'
 import { createMemorySink } from '../logging/eventSink'
@@ -246,7 +247,7 @@ function createLivePlay(): LivePlay {
     world,
     body,
     controller,
-    loop: createVehicleLoop({ 'drill.sweptCut': true }),
+    loop: createVehicleLoop({ ...DEV_FLAGS, 'drill.sweptCut': true }),
     substeps: [],
   }
   readEverySubstep(live)

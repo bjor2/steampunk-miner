@@ -1,6 +1,7 @@
 import RAPIER from '@dimforge/rapier3d-compat'
 import { mkdirSync, writeFileSync } from 'node:fs'
 import { afterEach, beforeAll, beforeEach, describe, expect, it } from 'vitest'
+import { DEV_FLAGS } from '../constants/devFlags'
 import { CUT_FOLLOW_TICKS } from '../constants/balance'
 import { MM_PER_METRE, PHYSICS_TIMESTEP, UP_VECTOR_SCALE } from '../constants/physics'
 import { createMemorySink } from '../logging/eventSink'
@@ -185,7 +186,12 @@ function createLivePlay(): LivePlay {
   if (start === null) throw new Error('the starting planet has no dock')
   const { body, origin } = createVehicleBody(RAPIER, world, start)
   const controller = createVehicleController(RAPIER, world, { body, origin })
-  return { world, body, controller, loop: createVehicleLoop({ 'drill.sweptCut': true }) }
+  return {
+    world,
+    body,
+    controller,
+    loop: createVehicleLoop({ ...DEV_FLAGS, 'drill.sweptCut': true }),
+  }
 }
 
 /** One fixed tick: the motor's step, the velocity it set, the world's step and its contacts. */

@@ -2,7 +2,8 @@
  * The live game's fixed step for the local vehicle (#3, #11): the authority's clock moves one
  * tick, the controller drives the body for that tick with the current intent, the step's actions
  * are counted, a pose report goes to the authority when one is due (with the drive the intent
- * pushes, ticket 279), the drill's facing and activity go to the scene for the headlamp and
+ * pushes, ticket 279; every tick while the drill bites with `drill.sweptCut` off and the
+ * `drill.reportEveryTick` kill-switch on, ticket 514), the drill's facing and activity go to the scene for the headlamp and
  * sparks, the speed and lift to the sounds, and the tick's motion to the part animation (#48). After the tow or a planet change the body
  * is placed on the dock the authority put the vehicle on. A dock building may stage the vehicle
  * first (#170 auto-roll, `vehicleStage.ts`): the drawn car and the camera move, the body does not.
@@ -37,7 +38,9 @@ import { engineStatsAtStep, type EngineStats } from '../systems/economy/vehicleS
 import { vehicleMotionAt, type VehicleMotion } from '../systems/registries/vehicleMotionEffects'
 import {
   countActionStep,
-  NEW_POSE_REPORTER,
+  createPoseReporter,
+  drillReportIntervalOf,
+  restartPoseReporter,
   takePoseReport,
   type PoseReporter,
 } from '../systems/vehicle/poseReport'
@@ -96,7 +99,7 @@ interface TugMemo {
 export function createVehicleLoop(flags: DevFlags = DEV_FLAGS): VehicleLoop {
   const loop: LoopState = {
     stage: createVehicleStage(),
-    reporter: NEW_POSE_REPORTER,
+    reporter: createPoseReporter(drillReportIntervalOf(flags)),
     placement: '',
     view: null,
     tile: { tx: 0, ty: 0 },
@@ -203,7 +206,7 @@ function placeAfterTowOrTravel(
   const placement = placementOf(vehicle, params)
   if (placement === loop.placement || vehicle.pose === null) return
   loop.placement = placement
-  loop.reporter = NEW_POSE_REPORTER
+  loop.reporter = restartPoseReporter(loop.reporter)
   controller.placeAt(vehicle.pose)
   motionPresence.placements += 1
 }

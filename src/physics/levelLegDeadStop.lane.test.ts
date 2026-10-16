@@ -1,6 +1,7 @@
 import RAPIER from '@dimforge/rapier3d-compat'
 import { mkdirSync, writeFileSync } from 'node:fs'
 import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest'
+import type { DevFlags } from '../constants/devFlags'
 import { MM_PER_METRE, PHYSICS_TIMESTEP } from '../constants/physics'
 import { createMemorySink } from '../logging/eventSink'
 import { createRunLog, installRunLog, uninstallRunLog } from '../logging/runLog'
@@ -11,7 +12,6 @@ import { planetParamsOf } from '../systems/authority/planetOfState'
 import { onCurveSteps } from '../systems/economy/vehicleStats'
 import { buildIntent } from '../systems/input/buildIntent'
 import type { Vector2 } from '../systems/vehicle/localFrame'
-import type { PoseReporter } from '../systems/vehicle/poseReport'
 import type { VehicleIntent } from '../systems/vehicle/vehicleIntent'
 import { cellDensitySum } from '../systems/world/cellYield'
 import type { WorldState } from '../systems/world/worldState'
@@ -19,8 +19,9 @@ import { createRig, type Rig } from './cutFollowFixtures'
 
 // Flag-off level legs on the shipped contact rule (ticket 516, the TD's #441 measure, section 1.5
 // of its evidence): with `drill.sweptCut` off, as the player plays, each stored rig leaves the pad,
-// dives 12 m and drives level west for 250 m through the real loop and Rapier body, at the shipped
-// report interval (12 ticks) and with the harness reporting every tick. On `drillContactOf` 7 of
+// dives 12 m and drives level west for 250 m through the real loop and Rapier body, reporting every
+// 12 ticks while drilling (#514's kill-switch `drill.reportEveryTick` off) and every tick (the
+// shipped scheduler, `DRILL_POSE_REPORT_INTERVAL_TICKS`; #514 Done-when 11b). On `drillContactOf` 7 of
 // the 8 legs stuck (stored 200 at 12 ticks at 50 m here, 77.8 m in the TD's rig): the body rested
 // on a sliver of ground the stamp could still cut, outside its full-weight core and past the
 // face's reach, and the drill did not bite. `levelSliverDrillContactOf` bites there on a level
@@ -31,19 +32,15 @@ import { createRig, type Rig } from './cutFollowFixtures'
 // them within 3%). A lane: it runs only when named, prints the table and writes
 // balance-report/level-leg-dead-stop.ndjson.
 
-/** The harness's report cadence: the shipped interval, or a report every tick (`takePoseReport`). */
-const reportCadence = vi.hoisted(() => ({ isEveryTick: false, reportsSent: 0 }))
+/** The reports the loop sent, counted as they leave the real scheduler (`takePoseReport`). */
+const reportCadence = vi.hoisted(() => ({ reportsSent: 0 }))
 
 vi.mock('../systems/vehicle/poseReport', async (importOriginal) => {
   const shipped = await importOriginal<typeof import('../systems/vehicle/poseReport')>()
-  const takePoseReport: typeof shipped.takePoseReport = (reporter, pose, moment, tick) => {
-    const report = shipped.takePoseReport(cadencedReporter(reporter), pose, moment, tick)
+  const takePoseReport: typeof shipped.takePoseReport = (...args) => {
+    const report = shipped.takePoseReport(...args)
     if (report.payload !== null) reportCadence.reportsSent++
     return report
-  }
-  /** Every tick, the last report is forgotten, so the interval is always over. */
-  function cadencedReporter(reporter: PoseReporter): PoseReporter {
-    return reportCadence.isEveryTick ? { ...reporter, lastSentTick: null } : reporter
   }
   return { ...shipped, takePoseReport }
 })
@@ -57,7 +54,11 @@ const RIGS: Readonly<Record<string, Record<string, number>>> = {
   'stored 200': { drill_power: P200.drill_power, drill_tip: P200.drill_tip, ...RIG_SAFETY },
 }
 const REPORT_INTERVALS = [12, 1] as const
-const FLAG_OFF = { 'drill.sweptCut': false }
+/** Flag off at each report interval: 1 is the shipped default, 12 the kill-switch off (#514). */
+const FLAG_OFF_AT: Readonly<Record<number, DevFlags>> = {
+  12: { 'drill.sweptCut': false, 'drill.reportEveryTick': false },
+  1: { 'drill.sweptCut': false, 'drill.reportEveryTick': true },
+}
 const FRAMES_PER_SECOND = 60
 const DIVE_M = 12
 const LEVEL_M = 250
@@ -69,7 +70,7 @@ const STUCK_UNDER_M = 1
 /** A move this long in one tick is a tow back to the dock, not driving. */
 const TOW_JUMP_M = 1.5
 const HOLD_CHUNK_TICKS = 6
-/** A report every tick while the drill bites is 60 a second; half of it proves the harness's. */
+/** A report every tick while the drill bites is 60 a second; half of it proves the scheduler's. */
 const EVERY_TICK_REPORTS_PER_SECOND = 30
 const REPORT_FOLDER = new URL('../../balance-report/', import.meta.url)
 const LEG_TIMEOUT_MS = 1_200_000
@@ -138,8 +139,7 @@ function runDownLeg(rig: string, reportInterval: number): LegRun {
 
 /** A flag-off rig at 60 frames/s, reporting at `reportInterval`, and the measure of one leg. */
 function createPlay(rig: string, reportInterval: number) {
-  reportCadence.isEveryTick = reportInterval === 1
-  const played = createRig(RAPIER, RIGS[rig], FRAMES_PER_SECOND, FLAG_OFF)
+  const played = createRig(RAPIER, RIGS[rig], FRAMES_PER_SECOND, FLAG_OFF_AT[reportInterval])
   let last = positionOfPose()
   const position = () => last
   const measure = (section: Section, intent: VehicleIntent, metres: number): LegRun => {
@@ -272,7 +272,7 @@ function expectFullLeg(leg: LegRun, metres: number): void {
   expect(leg.metres).toBeGreaterThanOrEqual(metres)
 }
 
-/** The harness's every-tick cadence took: a biting drill reported well past 5 a second. */
+/** The every-tick cadence took: a biting drill reported well past 5 a second. */
 function expectCadence(leg: LegRun): void {
   if (leg.reportInterval === 1) {
     expect(leg.reportsPerSecond).toBeGreaterThan(EVERY_TICK_REPORTS_PER_SECOND)

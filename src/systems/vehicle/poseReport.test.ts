@@ -1,10 +1,13 @@
 import { describe, expect, it } from 'vitest'
+import { DEV_FLAGS } from '../../constants/devFlags'
 import { NO_DRIVE, type DriveSigns } from './driveSigns'
 import { FACING, isWithinZoneTestRange } from './vehiclePose'
 import {
   countActionStep,
-  NEW_POSE_REPORTER,
+  createPoseReporter,
+  drillReportIntervalOf,
   quantisePose,
+  restartPoseReporter,
   takePoseReport,
   type ActionFlags,
   type PosePayload,
@@ -16,6 +19,9 @@ const THRUSTING: ActionFlags = { isDriving: false, isThrusting: true, isDrilling
 const DRILLING: ActionFlags = { isDriving: true, isThrusting: false, isDrilling: true }
 const IDLE: ActionFlags = { isDriving: false, isThrusting: false, isDrilling: false }
 
+/** The shipped loop's drill interval: a report every tick on the flag-off path (ticket 514). */
+const SHIPPED_DRILL_INTERVAL = drillReportIntervalOf(DEV_FLAGS)
+
 /** Drives along x at 3 m/s for `ticks` fixed steps, collecting every report sent. */
 function driveAndReport(ticks: number, flags: ActionFlags = DRIVING, drive: DriveSigns = NO_DRIVE) {
   return reportAlong(ticks, () => flags, drive)
@@ -26,8 +32,9 @@ function reportAlong(
   ticks: number,
   flagsAt: (tick: number) => ActionFlags,
   drive: DriveSigns = NO_DRIVE,
+  drillIntervalTicks = SHIPPED_DRILL_INTERVAL,
 ) {
-  let reporter: PoseReporter = NEW_POSE_REPORTER
+  let reporter: PoseReporter = createPoseReporter(drillIntervalTicks)
   const sent: { tick: number; payload: PosePayload }[] = []
   for (let tick = 1; tick <= ticks; tick++) {
     const flags = flagsAt(tick)
@@ -82,6 +89,28 @@ describe('pose reports', () => {
     const sent = reportAlong(150, (tick) => (tick <= 40 ? DRILLING : DRIVING))
     const after = sent.map(({ tick }) => tick).filter((tick) => tick > 40)
     expect(after).toEqual([52, 64, 76, 88, 100, 112, 124, 136, 148])
+  })
+
+  it('report every drill tick on the flag-off path only, by default', () => {
+    expect(drillReportIntervalOf(DEV_FLAGS)).toBe(1)
+    expect(drillReportIntervalOf({ ...DEV_FLAGS, 'drill.sweptCut': true })).toBe(12)
+  })
+
+  it('keep 12 ticks apart while drilling with the kill-switch off, as before ticket 514', () => {
+    const killed = drillReportIntervalOf({ ...DEV_FLAGS, 'drill.reportEveryTick': false })
+    const ticks = reportAlong(120, () => DRILLING, NO_DRIVE, killed).map(({ tick }) => tick)
+    expect(ticks).toEqual([1, 13, 25, 37, 49, 61, 73, 85, 97, 109])
+  })
+
+  it('keep 12 ticks apart while drilling with the swept cut on', () => {
+    const swept = drillReportIntervalOf({ ...DEV_FLAGS, 'drill.sweptCut': true })
+    const ticks = reportAlong(120, () => DRILLING, NO_DRIVE, swept).map(({ tick }) => tick)
+    expect(ticks).toEqual([1, 13, 25, 37, 49, 61, 73, 85, 97, 109])
+  })
+
+  it('keep the drill cadence across a tow, with nothing sent since', () => {
+    const towed = restartPoseReporter({ ...createPoseReporter(12), lastSentTick: 40 })
+    expect(towed).toEqual(createPoseReporter(12))
   })
 
   it('carry every drill tick across the switch between cadences, none lost or counted twice', () => {

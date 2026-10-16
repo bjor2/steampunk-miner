@@ -8,6 +8,7 @@
  * store and install a run log around it.
  */
 import type RAPIER from '@dimforge/rapier3d-compat'
+import { DEV_FLAGS } from '../constants/devFlags'
 import { PHYSICS_TIMESTEP, UP_VECTOR_SCALE, VEHICLE_COLLIDER_SIZE } from '../constants/physics'
 import { createVehicleLoop } from '../scene/vehicleLoop'
 import { readAuthorityState } from '../store/authorityLink'
@@ -66,7 +67,7 @@ export function createFrameRig(
   const start = readLocalVehicle().pose
   if (start === null) throw new Error('the starting planet has no dock')
   const controller = createVehicleController(rapier, world, createVehicleBody(rapier, world, start))
-  const loop = createVehicleLoop({ 'drill.sweptCut': true })
+  const loop = createVehicleLoop({ ...DEV_FLAGS, 'drill.sweptCut': true })
   const clock: FrameClock = { carried: 0 }
   let last: TickEdge = { position: controller.planetPosition(), world: readAuthorityState().world }
   const hold = (intent: VehicleIntent, frames: number) => {
