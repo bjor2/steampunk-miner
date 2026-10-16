@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-10-17T00:03:08+01:00",
+  "updated_at": "2026-10-17T00:10:34+01:00",
   "caps": {
     "grok": 12,
     "claude": 10,
@@ -19,20 +19,20 @@
       "slots": [
         {
           "slot": "C1",
+          "state": "busy",
+          "ticket": 526,
+          "grok_slot": 1,
+          "kind": "dev",
+          "since": "2026-10-17T00:08:00+01:00",
+          "wave": null
+        },
+        {
+          "slot": "C2",
           "state": "free",
           "ticket": null,
           "grok_slot": null,
           "kind": null,
           "since": null
-        },
-        {
-          "slot": "C2",
-          "state": "busy",
-          "ticket": 514,
-          "grok_slot": 2,
-          "kind": "dev",
-          "since": "2026-10-16T23:29:00+01:00",
-          "wave": "2B"
         },
         {
           "slot": "C3",
@@ -70,7 +70,7 @@
       "size": 6,
       "used": 1,
       "free": 5,
-      "claims_last_hour": 6,
+      "claims_last_hour": 7,
       "name": "Claude Max 1"
     },
     {
@@ -530,17 +530,17 @@
   "grok": [
     {
       "slot": 1,
-      "state": "free",
-      "ticket": null,
-      "since": null
+      "state": "dev",
+      "ticket": 526,
+      "since": "2026-10-17T00:08:00+01:00",
+      "claude_slot": 1,
+      "wave": null
     },
     {
       "slot": 2,
-      "state": "dev",
-      "ticket": 514,
-      "since": "2026-10-16T23:29:00+01:00",
-      "claude_slot": 2,
-      "wave": "2B"
+      "state": "free",
+      "ticket": null,
+      "since": null
     },
     {
       "slot": 3,
@@ -606,20 +606,20 @@
   "claude": [
     {
       "slot": 1,
+      "state": "busy",
+      "ticket": 526,
+      "grok_slot": 1,
+      "since": "2026-10-17T00:08:00+01:00",
+      "account": 1,
+      "wave": null
+    },
+    {
+      "slot": 2,
       "state": "free",
       "ticket": null,
       "grok_slot": null,
       "since": null,
       "account": 1
-    },
-    {
-      "slot": 2,
-      "state": "busy",
-      "ticket": 514,
-      "grok_slot": 2,
-      "since": "2026-10-16T23:29:00+01:00",
-      "account": 1,
-      "wave": "2B"
     },
     {
       "slot": 3,
@@ -691,11 +691,11 @@
     }
   ],
   "last_refill": {
-    "at": "2026-10-17 00:03 BST",
+    "at": "2026-10-17 00:08 BST",
     "mode": "refill-dev",
-    "triggers": "#489",
-    "started": "",
-    "note": "no pickable build ticket"
+    "triggers": "#514",
+    "started": "#526->C1/A1",
+    "note": "spawned 1 worker(s)"
   },
   "totals": {
     "grok": {
@@ -737,7 +737,7 @@
         "map": 316,
         "lane": "remote",
         "mode": "solo",
-        "state": "running",
+        "state": "paused",
         "tickets": [
           514,
           516
@@ -745,16 +745,18 @@
         "done": [
           516
         ],
-        "live": 1
+        "live": 0
       },
       {
         "number": 511,
-        "key": "8A",
+        "key": "302-8A",
         "map": 302,
         "lane": "remote",
         "mode": "solo",
-        "state": "blocked",
+        "state": "ready",
         "tickets": [
+          446,
+          447,
           448,
           453
         ],
@@ -763,12 +765,14 @@
       },
       {
         "number": 498,
-        "key": "8B",
+        "key": "302-8B",
         "map": 302,
         "lane": "remote",
         "mode": "solo",
         "state": "blocked",
         "tickets": [
+          449,
+          452,
           450,
           451,
           454
@@ -790,39 +794,8 @@
         "live": 0
       },
       {
-        "number": 490,
-        "key": "7B",
-        "map": 302,
-        "lane": "remote",
-        "mode": "solo",
-        "state": "ready",
-        "tickets": [
-          452
-        ],
-        "done": [],
-        "live": 0
-      },
-      {
-        "number": 461,
-        "key": "7A",
-        "map": 302,
-        "lane": "remote",
-        "mode": "solo",
-        "state": "paused",
-        "tickets": [
-          445,
-          446,
-          447,
-          449
-        ],
-        "done": [
-          445
-        ],
-        "live": 0
-      },
-      {
         "number": 438,
-        "key": "7D",
+        "key": "302-8C",
         "map": 302,
         "lane": "hitl",
         "mode": "bench",
