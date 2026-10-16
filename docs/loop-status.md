@@ -549,3 +549,17 @@ wave issue number (`$num`); `next-ticket.sh` only reads them through `WAVE_OF[$n
 (blocked by #516, #519 and #522 (closed 22:56 box time)). Not fixed, only noted: `blockedKeys` between waves still uses the bare keys, so two
 waves with the same key can block or unblock each other wrongly; the next `/osilion-wave-plan` should give map-unique keys.
 Rollback: restore the backup over `wave-lib.sh` (running processes keep the code they loaded).
+
+## Wave keys are map-unique (17 Oct 2026, ~00:35 Oslo); #524 orphan-allowed
+
+- `WAVE_ORPHAN_ALLOW` is now `" 514 516 519 522 524 "` (#524, the bot-slice baseline re-record; not in `PRIORITY_TICKETS`, its native blockers #514 and
+  #519 keep it out). Same size and inode (padding spaces), backup `next-ticket.sh.bak-20261017-0010-524`.
+- **Planner** (`osilion-wave-plan`, `scripts/waves.mjs`, doc `WAVES.md`; user-created workflow, edited in place with backups `*.bak-20261017-0030`):
+  new waves are keyed `<map>-<level><letter>` (`316-3A`) and sweeps `<map>-BT...`; the branch name keeps the bare part (`waves/316/3A`). Waves already
+  on GitHub keep their bare keys (`2B`); they are re-keyed only when a replan rewrites their issue. No existing wave issue body was touched.
+- **Loop** (`wave-lib.sh`, backup `wave-lib.sh.bak-20261017-0025-mapkeys`; `next-ticket.sh` not edited): the "Blocked by" parser accepts hyphenated keys, and a
+  blocker counts as open when an open wave **on the same map** has the same key with its `<map>-` prefix stripped, so bare and prefixed forms match each other
+  and two waves with the same bare key on different maps no longer block or unblock each other (this completes the `$num` indexing fix of 16 Oct).
+- Checked: `--wave-status` before and after is identical (10 waves, same states); a synthetic cache with bare and prefixed keys across maps 470, 316 and 302 resolved
+  each blocker within its own map; `waves.mjs propose 316` and `302` produce `316-3A`, `302-8A..8C` and blockers like `302-8A`, and `status 316` still reads the old keys.
+- Rollback: restore the three backups (`wave-lib.sh`, `waves.mjs`, `WAVES.md`); existing waves are unaffected either way.
