@@ -1,12 +1,14 @@
 /**
  * The live-loop rig the cut-follow specs drive (ticket 430): a Rapier world, the vehicle controller
- * and the fixed-step loop with `drill.sweptCut` on, stepped one render frame at a time at a given
+ * and the fixed-step loop with `drill.sweptCut` on (or the flags a spec passes, as the flag-off
+ * level legs of ticket 516 do), stepped one render frame at a time at a given
  * frame rate, each fixed tick read after it (the step's result, the cut-follow read it took, the
  * body's move along its facing, a cell opening on the line ahead, the authority's gate). Test
  * support for `cutFollowStartingRigs.test.ts` and `cutFollowRelease.test.ts`; the specs reset the
  * store and install a run log around it.
  */
 import type RAPIER from '@dimforge/rapier3d-compat'
+import type { DevFlags } from '../constants/devFlags'
 import { PHYSICS_TIMESTEP, UP_VECTOR_SCALE, VEHICLE_COLLIDER_SIZE } from '../constants/physics'
 import { createVehicleLoop } from '../scene/vehicleLoop'
 import { readAuthorityState } from '../store/authorityLink'
@@ -36,6 +38,7 @@ import {
 
 /** Where along the line ahead, past the body's face in metres, a cell opening counts (#433). */
 const LINE_AHEAD_M = [1 / 20, 0.55, 1.05, 1.55, 2.05]
+const SWEPT_CUT_ON: DevFlags = { 'drill.sweptCut': true }
 
 /** One fixed tick of a script, read after it. */
 export interface TickRead {
@@ -65,6 +68,7 @@ export function createRig(
   rapier: typeof RAPIER,
   levels: Record<string, number>,
   framesPerSecond: number,
+  flags: DevFlags = SWEPT_CUT_ON,
 ): Rig {
   resetGameStore()
   for (const [track, level] of Object.entries(levels)) {
@@ -75,7 +79,7 @@ export function createRig(
   const start = readLocalVehicle().pose
   if (start === null) throw new Error('the starting planet has no dock')
   const controller = createVehicleController(rapier, world, createVehicleBody(rapier, world, start))
-  const loop = createVehicleLoop({ 'drill.sweptCut': true })
+  const loop = createVehicleLoop(flags)
   const clock: FrameClock = { carried: 0 }
   let last = { position: controller.planetPosition(), world: readAuthorityState().world }
   let stepped = 0
