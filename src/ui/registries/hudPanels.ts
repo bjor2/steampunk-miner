@@ -7,13 +7,13 @@
  * its panels draw `OverlayCard`s at world points, and each declares the `priority` its cards hold
  * a seat with when more than the cap want to show.
  *
- * The `slots` slot (#217) is the power-up slot column inside the touch controls: drawn after the
- * cluster while the touch controls show, where #200 puts its 56 px slot buttons.
+ * The touch controls' tiles (the power-up slot column, the fire tile) are touch binding rows
+ * (`touchBindings.ts`, #474), drawn after the cluster while their anchor is exposed.
  */
 import type { ComponentType } from 'react'
 import { defineRegistry, entriesOf } from '../../systems/registries/seal'
 
-export type HudSlot = 'overlay' | 'gauges' | 'banner' | 'position' | 'prompts' | 'threats' | 'slots'
+export type HudSlot = 'overlay' | 'gauges' | 'banner' | 'position' | 'prompts' | 'threats'
 
 export interface SlotPanel {
   id: string

@@ -112,6 +112,7 @@ import { BAY_SCREEN_REGISTRY } from '../ui/registries/bayScreens'
 import { HUD_PANEL_REGISTRY } from '../ui/registries/hudPanels'
 import { MONEY_COUNTER_REGISTRY } from '../ui/registries/moneyCounter'
 import { SCREEN_REGISTRY } from '../ui/registries/screens'
+import { TOUCH_BINDING_REGISTRY } from '../ui/registries/touchBindings'
 import type { SliceDefinition, SliceRegistrar } from './sliceDefinition'
 
 export function registrarFor(sliceId: string): SliceRegistrar {
@@ -162,6 +163,7 @@ export function registrarFor(sliceId: string): SliceRegistrar {
     attachUse: (use) => add(ATTACH_USE_REGISTRY, use),
     buildingAttachUse: (use) => add(BUILDING_ATTACH_USE_REGISTRY, use),
     hudPanel: (panel) => add(HUD_PANEL_REGISTRY, panel),
+    touchBinding: (row) => add(TOUCH_BINDING_REGISTRY, row),
     bayPanel: (panel) => add(BAY_PANEL_REGISTRY, panel),
     bayScreen: (screen) => add(BAY_SCREEN_REGISTRY, screen),
     moneyCounter: (provider) => add(MONEY_COUNTER_REGISTRY, provider),

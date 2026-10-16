@@ -75,6 +75,7 @@ import type { SliceBayScreen } from '../ui/registries/bayScreens'
 import type { HudPanel } from '../ui/registries/hudPanels'
 import type { MoneyCounterProvider } from '../ui/registries/moneyCounter'
 import type { ScreenPanel } from '../ui/registries/screens'
+import type { TouchBindingRow } from '../ui/registries/touchBindings'
 
 export { FeaturesNotLoadedError } from '../systems/registries/seal'
 
@@ -195,6 +196,11 @@ export interface SliceRegistrar {
   /** A use of a shop building's attach point (#170 `building-attach`): render-only. */
   buildingAttachUse(use: BuildingAttachUse): void
   hudPanel(panel: HudPanel): void
+  /**
+   * A touch control for an item (#474, the HS decision on #470): the action it presses, its
+   * gesture, the anchor that exposes it and the tile it draws; refused at the seal on a rule.
+   */
+  touchBinding(row: TouchBindingRow): void
   /** A panel in the bay header, left of the money, or in the layer above the bay screen. */
   bayPanel(panel: BayPanel): void
   /** A bay's whole screen, one per bay, shown once its schedule row is open (#180). */

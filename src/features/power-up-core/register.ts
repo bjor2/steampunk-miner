@@ -22,7 +22,7 @@ import { RESTOCK_RULES } from './systems/restockRules'
 import { SLOT_USE_REACTIONS } from './systems/slotUse'
 import { DRAW_TOGGLES_STEP } from './systems/toggleDraw'
 import { RESOLVE_USES_STEP } from './systems/useClock'
-import { SlotColumn } from './ui/SlotColumn'
+import { SLOT_TOUCH_BINDINGS } from './ui/slotTouchBindings'
 
 export const slice: SliceDefinition = {
   id: 'power-up-core',
@@ -42,7 +42,8 @@ export const slice: SliceDefinition = {
     r.eventProjections(POWER_UP_PROJECTIONS)
     r.runEvents(POWER_UP_RUN_EVENTS)
     r.reportRows(MARK_REPORT_ROWS)
-    r.hudPanel({ id: 'power-up-core.slot-column', slot: 'slots', Panel: SlotColumn })
+    // The touch slot column, one tap row per tile it draws (#474).
+    SLOT_TOUCH_BINDINGS.forEach((row) => r.touchBinding(row))
     // steampunkDebug.features['power-up-core'].getSlots() / .getCharges(id) / .setCharges(id, n) /
     // .holdSlot(slot)
     r.debugActions(powerUpCoreDebugActions)

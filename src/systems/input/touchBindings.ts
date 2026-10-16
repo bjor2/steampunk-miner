@@ -70,6 +70,26 @@ export function touchBindingProblemsOf(rule: TouchBindingRule, map: ActionMap): 
   return problems.map((problem) => `touch binding "${rule.id}" ${problem}`)
 }
 
+/** Why a slice's row breaks what only the kernel may do: list a kernel control. */
+export function sliceRowProblemsOf(rule: TouchBindingRule): string[] {
+  if (rule.anchor !== 'kernel') return []
+  return [`touch binding "${rule.id}" anchors the kernel, whose controls only the kernel lists`]
+}
+
+/**
+ * Why a row that draws no control of its own breaks the rules: it must be `none`, or press an
+ * action a kernel control already presses (the plunger rides the cluster's plant button).
+ */
+export function undrawnRowProblemsOf(
+  rule: TouchBindingRule,
+  kernelRules: readonly TouchBindingRule[],
+): string[] {
+  const { gesture, action } = rule.touch
+  if (gesture === 'none' || action === undefined) return []
+  if (kernelRules.some((kernel) => isControlPressing(kernel, action))) return []
+  return [`touch binding "${rule.id}" draws no control, and no kernel control presses "${action}"`]
+}
+
 /**
  * Every action with a key, in every layer it has, that no row reaches: neither pressed nor marked
  * `none` with a reason there. Empty when touch reaches everything the keys do.
@@ -121,6 +141,10 @@ function isReachedOnTouch(
   return rules.some(
     (rule) => actionsOfRule(rule).includes(action) && contextsOfRule(rule, map).includes(context),
   )
+}
+
+function isControlPressing(rule: TouchBindingRule, action: ActionId): boolean {
+  return rule.touch.gesture !== 'none' && actionsOfRule(rule).includes(action)
 }
 
 function heldAnchorProblems(rule: TouchBindingRule): string[] {

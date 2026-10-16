@@ -2,8 +2,8 @@
  * The on-screen driving controls (#173): shown on a finger's touch and hidden by a key. While the
  * vehicle has the input, a pinch-and-double-tap surface, the floating stick and the pause button
  * (ticket 472); in any layer, the cluster of the buttons the situation allows, then the slices'
- * `slots` panels (#217: the power-up slot column). Markup only; every gesture goes to the touch runtime, which presses the actions
- * the keys would.
+ * touch binding tiles (#474: the power-up slot column, the fire tile). Markup only; every gesture
+ * goes to the touch runtime, which presses the actions the keys would.
  */
 import { useGameStore } from '../../store/gameStore'
 import { readTouchSituation } from '../../store/screenReads'
@@ -14,10 +14,10 @@ import {
   type TouchSituation,
 } from '../../systems/input/touchControls'
 import { DEVICE_UI_IDS } from '../stage/deviceIds'
-import { SlicePanels } from '../hud/SlicePanels'
 import { useScreenModel } from '../useScreenModel'
 import { GestureSurface } from './GestureSurface'
 import { StickZone } from './StickZone'
+import { TouchBindingTiles } from './TouchBindingTiles'
 import { TouchCluster } from './TouchCluster'
 import { TouchPauseButton } from './TouchPauseButton'
 import styles from './TouchControls.module.css'
@@ -49,7 +49,7 @@ export function TouchControlsView({
       {isDriving && <StickZone />}
       {isPauseButtonShown(situation.layer) && <TouchPauseButton />}
       <TouchCluster actions={clusterActionsOf(situation)} />
-      <SlicePanels slot="slots" />
+      <TouchBindingTiles />
     </div>
   )
 }

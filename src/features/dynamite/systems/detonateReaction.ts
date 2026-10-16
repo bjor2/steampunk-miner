@@ -7,8 +7,10 @@
  */
 import type { CommandIntent } from '../../../systems/authority/authorityCommand'
 import type { InputSituation } from '../../../systems/input/inputRouting'
+import type { TouchBindingRule } from '../../../systems/input/touchBindings'
 import type { InputReactionEntry } from '../../../systems/registries/inputReactions'
 import { DETONATE_INTENT } from './dynamiteCommands'
+import { REMOTE_DETONATOR_ROW_ID } from './dynamiteSizes'
 import { isDetonateOffered } from './plunger'
 
 export const DETONATE_REACTION: InputReactionEntry = {
@@ -16,6 +18,16 @@ export const DETONATE_REACTION: InputReactionEntry = {
   actionId: 'plant_charge',
   contexts: ['vehicle'],
   toIntent: detonateIntentOf,
+}
+
+/**
+ * On touch the plunger is the cluster's plant button (#474): a tap of `plant_charge`, as B is, so
+ * the row draws no tile of its own and rides the kernel's button.
+ */
+export const DETONATE_TOUCH_BINDING: TouchBindingRule = {
+  id: 'dynamite.remote_detonator',
+  anchor: { row: REMOTE_DETONATOR_ROW_ID },
+  touch: { gesture: 'tap', action: 'plant_charge' },
 }
 
 function detonateIntentOf({ state, playerId }: InputSituation): CommandIntent | null {

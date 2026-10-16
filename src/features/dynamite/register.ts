@@ -9,7 +9,7 @@
 import type { SliceDefinition } from '../../registries/sliceDefinition'
 import { dynamiteDebugActions } from './debug'
 import { DYNAMITE_PROJECTIONS, DYNAMITE_RUN_EVENTS } from './logging'
-import { DETONATE_REACTION } from './systems/detonateReaction'
+import { DETONATE_REACTION, DETONATE_TOUCH_BINDING } from './systems/detonateReaction'
 import { DYNAMITE_RULES } from './systems/dynamiteCommands'
 import { dynamiteSizes } from './systems/dynamiteSizes'
 import { RackPanel } from './ui/RackPanel'
@@ -20,6 +20,7 @@ export const slice: SliceDefinition = {
     r.content('dynamite-size', dynamiteSizes())
     r.commandRules(DYNAMITE_RULES)
     r.inputReaction(DETONATE_REACTION)
+    r.touchBinding(DETONATE_TOUCH_BINDING)
     r.eventProjections(DYNAMITE_PROJECTIONS)
     r.runEvents(DYNAMITE_RUN_EVENTS)
     r.hudPanel({ id: 'dynamite.rack', slot: 'gauges', Panel: RackPanel })
