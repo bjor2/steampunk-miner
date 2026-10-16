@@ -363,6 +363,24 @@ wave key) on every slot that holds a ticket. The sanitised public copy carries t
 tab does not draw them yet (the page copies only the fields listed above); the Waves panel is a
 follow-up ticket in wave 1C, after #434, because it edits the same `scripts/status/` files.
 
+## Wave mode is ON (16 Oct 2026)
+
+Bjor approved it on 16 Oct (about 11:23 Oslo): "test wave mode with a dry run and a real claim, put the mobile tickets in
+their own wave first, then turn it on". The switch is `mode=on` in
+`/workspace/claude-sessions/steampunk-loop/wave-mode` (backup `wave-mode.bak-20261016-off`). The transition window for
+tickets in no wave (`legacy_hours=24`) started at the first on-pass, 16 Oct 11:05 Oslo. **Rollback:**
+`sed -i 's/^mode=on/mode=off/' /workspace/claude-sessions/steampunk-loop/wave-mode` (or `WAVE_MODE=off`); nothing else changes
+and running workers are untouched either way.
+
+Mobile pass 1 has its own waves on map #470 (not #302, whose planner reads only its direct children): **1A** render quality
+(#477), **1B** save durability (#479), then the portrait slice **1D** (#483 to #487), **1E** (#489) and **1C**
+(#482, #488, blocked by 1D). They use #302's wave settings (`packing: theme`), written into the #470 body, and the
+`Touches:`/`Size:` lines the Producer put on the tickets. `PRIORITY_TICKETS` starts `473 475 476 477 478 479 480 481`, so
+mobile still wins ties. Only tickets with `build` run; `needs-planner`, `blocked` and no-`build` tickets are skipped, and a wave
+with nothing runnable left pauses itself. Tested: a dry run under `WAVE_MODE=on` (picked #477 only; held and `needs-planner`
+tickets skipped), a real pass (closed finished wave 1B, then claimed wave 3B for #444), `wave_on_claim` and the tick on
+wave 1A. Maps whose children are not #302's need their own `--wave-plan <map>` run.
+
 ## Priority list (14 Oct 2026)
 
 `PRIORITY_TICKETS` in `next-ticket.sh` now starts `396 399 400 397 409 411 410` (Bjor, 14 Oct 23:10: smooth drilling first): #396 (drill law), then the cut-follow chain #399 (K-carry), #400 (K-bound), #397 (cut-follow, smooth drilling) and #409 (drill ladder benchmark), then #411 (money-only tech tree) and #410 (item cards). Since 15 Oct 00:12 Claude account 1 has 6 slots (C1-C6; it was raised to 8 on 14 Oct and lowered after the box load reached 86 on 8 cores); account 2 is C7-C10 (4 slots, disabled until its weekly limit resets). Free slots are refilled as soon as a worker exits instead of waiting for the 30-minute pass. The next free dev slot claims them in that order, skipping blocked tickets.
