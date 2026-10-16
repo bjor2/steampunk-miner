@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "updated_at": "2026-10-16T11:15:23Z",
+  "updated_at": "2026-10-16T11:15:30Z",
   "entries": {
     "steampunk-loop/1": {
       "loop": "steampunk-loop",
@@ -481,9 +481,9 @@
       "slot": null,
       "state": "working",
       "issue": null,
-      "note": "testing spec #354 (Fix red main: magnetic planet pace still over GD bounds after #353 (P28/P32)) on ec5ce80",
+      "note": "queue run on f08434d (close-#491)",
       "stale_after_min": 420,
-      "updated_at": "2026-10-16T06:45:42Z",
+      "updated_at": "2026-10-16T11:15:30Z",
       "host": "grok-bot-vm-452660841"
     },
     "steampunk-loop/10": {
