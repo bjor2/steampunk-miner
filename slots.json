@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-10-16T06:26:09+02:00",
+  "updated_at": "2026-10-16T06:30:45+02:00",
   "caps": {
     "grok": 12,
     "claude": 10,
@@ -69,7 +69,7 @@
       "size": 6,
       "used": 0,
       "free": 6,
-      "claims_last_hour": 5,
+      "claims_last_hour": 3,
       "name": "Claude Max 1"
     },
     {
@@ -125,9 +125,9 @@
   },
   "tester": {
     "state": "running",
-    "phase": "fast",
+    "phase": "triage-fast",
     "sha": "d8448751522f42be6f7ced35aa0a7172a1cbf19f",
-    "since": "2026-10-16T04:26:02Z",
+    "since": "2026-10-16T04:30:37Z",
     "holds_gate": false,
     "claude_slot": null,
     "last_run": "2026-10-16T00:31:17Z",
@@ -785,9 +785,9 @@
     }
   ],
   "last_refill": {
-    "at": "2026-10-16 06:12 CEST",
-    "mode": "refill-dev",
-    "triggers": "#459",
+    "at": "2026-10-16 06:26 CEST",
+    "mode": "recheck",
+    "triggers": "#441",
     "started": "",
     "note": "no pickable build ticket"
   },
