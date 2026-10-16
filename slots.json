@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-10-16T08:14:45+02:00",
+  "updated_at": "2026-10-16T08:22:10+02:00",
   "caps": {
     "grok": 12,
     "claude": 10,
@@ -19,20 +19,21 @@
       "slots": [
         {
           "slot": "C1",
-          "state": "free",
-          "ticket": null,
-          "grok_slot": null,
-          "kind": null,
-          "since": null
+          "state": "busy",
+          "ticket": 477,
+          "grok_slot": 1,
+          "kind": "dev",
+          "since": "2026-10-16T08:18:00+02:00",
+          "wave": null
         },
         {
           "slot": "C2",
           "state": "busy",
-          "ticket": 473,
-          "grok_slot": 2,
-          "kind": "dev",
-          "since": "2026-10-16T07:59:00+02:00",
-          "wave": null
+          "ticket": null,
+          "grok_slot": null,
+          "kind": "aux",
+          "since": null,
+          "label": "wave-plan 302"
         },
         {
           "slot": "C3",
@@ -63,18 +64,17 @@
         },
         {
           "slot": "C6",
-          "state": "busy",
-          "ticket": 465,
-          "grok_slot": 7,
-          "kind": "dev",
-          "since": "2026-10-16T08:03:00+02:00",
-          "wave": "3G"
+          "state": "free",
+          "ticket": null,
+          "grok_slot": null,
+          "kind": null,
+          "since": null
         }
       ],
       "size": 6,
       "used": 5,
       "free": 1,
-      "claims_last_hour": 13,
+      "claims_last_hour": 14,
       "name": "Claude Max 1"
     },
     {
@@ -125,7 +125,7 @@
     }
   ],
   "gate": {
-    "busy": 3,
+    "busy": 1,
     "max": 3
   },
   "tester": {
@@ -614,17 +614,17 @@
   "grok": [
     {
       "slot": 1,
-      "state": "free",
-      "ticket": null,
-      "since": null
+      "state": "dev",
+      "ticket": 477,
+      "since": "2026-10-16T08:18:00+02:00",
+      "claude_slot": 1,
+      "wave": null
     },
     {
       "slot": 2,
-      "state": "dev",
-      "ticket": 473,
-      "since": "2026-10-16T07:59:00+02:00",
-      "claude_slot": 2,
-      "wave": null
+      "state": "free",
+      "ticket": null,
+      "since": null
     },
     {
       "slot": 3,
@@ -662,11 +662,9 @@
     },
     {
       "slot": 7,
-      "state": "dev",
-      "ticket": 465,
-      "since": "2026-10-16T08:03:00+02:00",
-      "claude_slot": 6,
-      "wave": "3G"
+      "state": "free",
+      "ticket": null,
+      "since": null
     },
     {
       "slot": 8,
@@ -702,20 +700,22 @@
   "claude": [
     {
       "slot": 1,
-      "state": "free",
-      "ticket": null,
-      "grok_slot": null,
-      "since": null,
-      "account": 1
+      "state": "busy",
+      "ticket": 477,
+      "grok_slot": 1,
+      "since": "2026-10-16T08:18:00+02:00",
+      "account": 1,
+      "wave": null
     },
     {
       "slot": 2,
       "state": "busy",
-      "ticket": 473,
-      "grok_slot": 2,
-      "since": "2026-10-16T07:59:00+02:00",
-      "account": 1,
-      "wave": null
+      "ticket": null,
+      "grok_slot": null,
+      "since": null,
+      "kind": "aux",
+      "label": "wave-plan 302",
+      "account": 1
     },
     {
       "slot": 3,
@@ -746,12 +746,11 @@
     },
     {
       "slot": 6,
-      "state": "busy",
-      "ticket": 465,
-      "grok_slot": 7,
-      "since": "2026-10-16T08:03:00+02:00",
-      "account": 1,
-      "wave": "3G"
+      "state": "free",
+      "ticket": null,
+      "grok_slot": null,
+      "since": null,
+      "account": 1
     },
     {
       "slot": 7,
@@ -791,17 +790,17 @@
     }
   ],
   "last_refill": {
-    "at": "2026-10-16 08:03 CEST",
-    "mode": "refill-dev",
-    "triggers": "#465",
-    "started": "#465->C6/A1",
-    "note": "spawned 1 worker(s)"
+    "at": "2026-10-16 08:22 CEST",
+    "mode": "recheck",
+    "triggers": "#465 #473",
+    "started": "",
+    "note": "spawned 0 worker(s)"
   },
   "totals": {
     "grok": {
       "size": 12,
-      "used": 6,
-      "dev": 5,
+      "used": 5,
+      "dev": 4,
       "dev_cap": 8,
       "planner": 1,
       "planner_cap": 4
@@ -941,7 +940,7 @@
           470
         ],
         "done": [],
-        "live": 1
+        "live": 0
       }
     ]
   }
