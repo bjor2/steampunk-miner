@@ -6,8 +6,7 @@
  * the rig's effective one (travel parity, ticket 333): the engine's top speed until k times the
  * drill's cut speed passes it.
  */
-import { MAX_SPEED_MM_PER_SECOND } from '../../constants/balance'
-import { MM_PER_METRE, TICKS_PER_SECOND } from '../../constants/physics'
+import { TICKS_PER_SECOND } from '../../constants/physics'
 import { planetParamsOf } from '../authority/planetOfState'
 import { scriptedGearCellsOf } from '../authority/scriptedGearCells'
 import { effectiveTravelSpeedOf } from '../authority/travelSpeed'
@@ -136,11 +135,13 @@ export function moveTicks(tiles: number, speedMax: number): number {
 }
 
 /**
- * m/s the bot moves at where its rig stands: the effective travel speed, held to the pose bound
- * its reports must keep (until #334 derives that bound from the rig's stats).
+ * m/s the bot moves at where its rig stands: the effective travel speed. No longer held to the
+ * fixed 18 m/s pose bound: #334 derives the bound from the rig's stats, and with no tile floor
+ * (ticket 397) the drill's cut, and so travel, has no cap (HS on #397: rows read effective travel
+ * speed, never speedMax or the floor).
  */
 export function botTravelSpeedOf(state: AuthorityState, playerId: string): number {
-  return Math.min(effectiveTravelSpeedOf(state, playerId), MAX_SPEED_MM_PER_SECOND / MM_PER_METRE)
+  return effectiveTravelSpeedOf(state, playerId)
 }
 
 /** The quanta a move costs: driving and falling at the drive rate, climbing at the thrust rate. */
