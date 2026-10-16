@@ -284,8 +284,11 @@ programs }` from three's `renderer.info` of the game canvas), read only when cal
   start's breakdown and each set's min / mean / max in ticks, seconds and pixels of lost travel at
   the 12 m view (90 px/m at 1080p, 70 at 390x844), and writes them to
   `balance-report/drill-turn-latency.ndjson`; the latency targets are `it.todo`s with an open
-  owner. A lane (about 2.5 min), so it runs only when named; it fails only when a start opens no
-  cell or the frame rates differ on a start from rest or on a drive turn's report phase.
+  owner, except a drive turn's stale facing, held at 0 on every report phase since ticket 506. A
+  turn into the shaft wall holds its press 3 s (its first cell on the line ahead can come after
+  2 s while the body already follows the cut). A lane (about 2.5 min), so it runs only when named;
+  it fails when a start opens no cell, the frame rates differ on a start from rest or on a drive
+  turn's report phase, or a drive turn reads a stale facing.
 - **Fast-rig body speed** (ticket 440, measurement only): `src/physics/fastRigBodySpeed.lane.test.ts`
   plays #400's down leg in the live loop with `drill.sweptCut` on, at stored drill_power/tip
   250/600, 300/200 (#400's rig 1), 320/600, 330/600 and 350/600, at 30 and 144 frames/s, and traces
