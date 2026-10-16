@@ -2,7 +2,9 @@
  * The open state of an item card tooltip (#164 G&V input rules, K7 #199): a mouse hover or the
  * browser's focus opens it after `ITEM_CARD_HOVER_MS`; a touch held for `ITEM_CARD_LONG_PRESS_MS`
  * opens it while held, with a short haptic tick when the haptics setting is on (#173), and the
- * click that ends that press is swallowed so no action fires. UI state only, never a command.
+ * click that ends that press is swallowed so no action fires. A finger's tap on the anchor's own
+ * text, not on its control, calls `onTapOnText`: the owner pins the card open (ticket 476). UI
+ * state only, never a command.
  */
 import {
   useEffect,
@@ -18,6 +20,7 @@ import {
   ITEM_CARD_LONG_PRESS_MS,
 } from '../../constants/itemCard'
 import { tickHapticsOnHold } from './holdHaptics'
+import { isTapOnOwnText, tapPointerOf } from './tapTarget'
 
 export interface ItemTooltipHandlers {
   onPointerEnter(event: PointerEvent): void
@@ -28,11 +31,16 @@ export interface ItemTooltipHandlers {
   onFocus(event: FocusEvent): void
   onBlur(event: FocusEvent): void
   onClickCapture(event: MouseEvent): void
+  onClick(event: MouseEvent): void
 }
 
-export function useItemTooltip(): { isOpen: boolean; handlers: ItemTooltipHandlers } {
+export function useItemTooltip(onTapOnText: () => void): {
+  isOpen: boolean
+  handlers: ItemTooltipHandlers
+} {
   const [isOpen, setIsOpen] = useState(false)
   const timer = useRef<number | null>(null)
+  const isTouchPress = useRef(false)
   const isHeldOpen = useRef(false)
   useEffect(() => () => stopTimer(timer), [])
   const openAfter = (ms: number) => {
@@ -56,7 +64,8 @@ export function useItemTooltip(): { isOpen: boolean; handlers: ItemTooltipHandle
       },
       onPointerLeave: close,
       onPointerDown: (event) => {
-        if (event.pointerType === 'mouse') return
+        isTouchPress.current = tapPointerOf(event.pointerType) !== 'mouse'
+        if (!isTouchPress.current) return
         stopTimer(timer)
         timer.current = window.setTimeout(holdOpen, ITEM_CARD_LONG_PRESS_MS)
       },
@@ -67,8 +76,19 @@ export function useItemTooltip(): { isOpen: boolean; handlers: ItemTooltipHandle
       onFocus: () => openAfter(ITEM_CARD_HOVER_MS),
       onBlur: close,
       onClickCapture: (event) => swallowClickAfterHold(event, isHeldOpen),
+      onClick: (event) => callOnTapOnText(event, isTouchPress, onTapOnText),
     },
   }
+}
+
+/** The press is read once per click, so a later key press never counts as a tap. */
+function callOnTapOnText(
+  event: MouseEvent,
+  isTouchPress: { current: boolean },
+  onTapOnText: () => void,
+): void {
+  if (isTapOnOwnText(event, isTouchPress.current ? 'touch' : null)) onTapOnText()
+  isTouchPress.current = false
 }
 
 function stopTimer(timer: { current: number | null }): void {

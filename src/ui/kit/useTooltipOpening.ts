@@ -2,7 +2,9 @@
  * The open state of a brass tooltip (spec #422 ruling 4, build #423): the pure opening rule in
  * `systems/views/tooltipOpening.ts` answers from the clock, and this hook keeps its state in a
  * ref, sets one timer for the next pending opening, ticks the haptics when a hold opens it and
- * swallows the click that ends that hold. UI state only, never a command.
+ * swallows the click that ends that hold. A finger's tap on the element's own text, not on a
+ * control in it, calls `onTapOnText`: the owner pins the plate open (ticket 476). UI state only,
+ * never a command.
  */
 import {
   useEffect,
@@ -28,6 +30,7 @@ import {
   type TooltipPointer,
 } from '../../systems/views/tooltipOpening'
 import { tickHapticsOnHold } from './holdHaptics'
+import { isTapOnOwnText, tapPointerOf } from './tapTarget'
 
 export interface TooltipHandlers {
   onPointerEnter(event: PointerEvent): void
@@ -38,14 +41,19 @@ export interface TooltipHandlers {
   onFocus(event: FocusEvent): void
   onBlur(event: FocusEvent): void
   onClickCapture(event: MouseEvent): void
+  onClick(event: MouseEvent): void
 }
 
 interface Timer {
   current: number | null
 }
 
-export function useTooltipOpening(): { isOpen: boolean; handlers: TooltipHandlers } {
+export function useTooltipOpening(onTapOnText: () => void): {
+  isOpen: boolean
+  handlers: TooltipHandlers
+} {
   const [isOpen, setIsOpen] = useState(false)
+  const lastPointer = useRef<TooltipPointer | null>(null)
   const opening = useRef<TooltipOpening>(TOOLTIP_CLOSED)
   const wasOpen = useRef(false)
   const timer = useRef<number | null>(null)
@@ -75,19 +83,28 @@ export function useTooltipOpening(): { isOpen: boolean; handlers: TooltipHandler
           settle(withHoverSince(opening.current, performance.now()))
       },
       onPointerLeave: () => settle(withoutHover(opening.current)),
-      onPointerDown: (event) =>
-        settle(withPressSince(opening.current, pointerOf(event), performance.now())),
+      onPointerDown: (event) => {
+        lastPointer.current = tapPointerOf(event.pointerType)
+        settle(withPressSince(opening.current, lastPointer.current, performance.now()))
+      },
       onPointerUp: endPress,
       onPointerCancel: endPress,
       onFocus: () => settle(withFocus(opening.current)),
       onBlur: () => settle(withoutFocus(opening.current)),
       onClickCapture: (event) => swallowClickAfterHold(event, swallowsClick),
+      onClick: (event) => callOnTapOnText(event, lastPointer, onTapOnText),
     },
   }
 }
 
-function pointerOf(event: PointerEvent): TooltipPointer {
-  return event.pointerType === 'mouse' ? 'mouse' : event.pointerType === 'pen' ? 'pen' : 'touch'
+/** The pointer is read once per click, so a later key press never counts as a tap. */
+function callOnTapOnText(
+  event: MouseEvent,
+  lastPointer: { current: TooltipPointer | null },
+  onTapOnText: () => void,
+): void {
+  if (isTapOnOwnText(event, lastPointer.current)) onTapOnText()
+  lastPointer.current = null
 }
 
 /** One timer for the next pending opening; none while nothing is pending. */

@@ -44,6 +44,23 @@
   display: none;
 }
 
+/*
+ * The short screen of a phone held sideways (#173's 600 px line): a plate a tap pinned is a sheet
+ * along the bottom, clear of the finger and of the scroll area that would clip it (ticket 476).
+ */
+@media (max-height: 600px) {
+  .plate[data-pinned] {
+    position: fixed;
+    top: auto;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    max-width: none;
+    border-bottom: none;
+    border-radius: var(--radius-panel) var(--radius-panel) 0 0;
+  }
+}
+
 .line {
   display: block;
 }

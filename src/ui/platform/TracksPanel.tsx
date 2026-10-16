@@ -49,10 +49,10 @@ export function TracksPanel({ model, focusedId }: { model: UpgradeBayModel; focu
       <div className={styles.action}>
         <ItemTooltip card={model.repair.card}>
           <ScreenButtonView button={model.repair.button} focusedId={focusedId} />
+          <span data-testid={UI_IDS.workshopRepairCost} data-exact={model.repair.cost.exact}>
+            <AmountText text={model.repair.cost.text} exact={model.repair.cost.exact} />
+          </span>
         </ItemTooltip>
-        <span data-testid={UI_IDS.workshopRepairCost} data-exact={model.repair.cost.exact}>
-          <AmountText text={model.repair.cost.text} exact={model.repair.cost.exact} />
-        </span>
       </div>
       <Field label="Look">
         <span data-testid={UI_IDS.workshopVisualTier}>{model.visualTier}</span>
