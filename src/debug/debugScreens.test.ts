@@ -310,6 +310,30 @@ describe('debug api: presentation never reaches the session (#33 acceptance 10)'
     expect(digests.size).toBe(1)
   })
 
+  it('portrait framing leaves the state digest of the same scripted run unchanged', () => {
+    const digests = new Set<string>()
+    const widths = new Set<number>()
+    for (const [widthPixels, heightPixels] of [
+      [1920, 1080],
+      [844, 390],
+      [390, 844],
+      [820, 1180],
+    ]) {
+      resetGameStore()
+      resetInput()
+      // The canvas the camera framed (ticket 484), as PlanetCamera writes it each frame.
+      Object.assign(cameraPresence, { widthPixels, heightPixels, viewShortAxisMetres: 12 })
+      const debug = createDebugApi()
+      const view = debug.ui.getCameraView()
+      if (!view.ok) throw new Error(view.problems.join('; '))
+      widths.add(view.view.viewHorizontalMetres)
+      playThroughTheScreens()
+      digests.add(takeSessionSnapshot().digest)
+    }
+    expect(widths.size).toBe(4)
+    expect(digests.size).toBe(1)
+  })
+
   it('keeps the render quality in the preferences, out of the log and the commands', () => {
     const debug = createDebugApi()
     debug.ui.setRenderQuality('low')
