@@ -48,7 +48,7 @@ export interface CutStartBreakdown {
 }
 
 /** Within this share of `vCut`, the body holds the drill's speed (#430's 5% line). */
-const HELD_SHARE = 0.05
+const HELD_SHARE = 1 / 20
 /** Below this share of `vCut`, the body stands (the TD's `S` ticks). */
 const STANDING_SHARE = 0.1
 
