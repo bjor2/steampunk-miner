@@ -6,7 +6,7 @@ import { FACING } from '../../vehicle/vehiclePose'
 import { NO_DRIVE } from '../../vehicle/driveSigns'
 import { isLavaAt } from '../../world/lavaFlow'
 import { bandOfTile } from '../../world/planetGeometry'
-import { planetParamsFor } from '../../world/planetParams'
+import { freshPlanetParamsFor } from '../../world/planetParams'
 import type { TilePoint } from '../../world/tileGrid'
 import { CELL_KIND, kindOfCell } from '../../world/worldCell'
 import { cellAt, EMPTY_WORLD } from '../../world/worldState'
@@ -21,7 +21,7 @@ import {
 /** The first heat planet (#113 Fire act). */
 export const HEAT_PLANET = 8
 
-export const HEAT_PARAMS = planetParamsFor(WORLD_SEED, HEAT_PLANET)
+export const HEAT_PARAMS = freshPlanetParamsFor(WORLD_SEED, HEAT_PLANET)
 
 /** A band-3 lava cell above plain ground: the floor of a pocket. */
 function pocketFloor(): TilePoint {

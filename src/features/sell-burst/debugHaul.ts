@@ -18,7 +18,7 @@ import type { ScriptedCommand } from '../../systems/fastForward'
 import { setPlanetCommand, setPlanetSeedCommand } from '../../systems/startScenarioCommands'
 import { bayPoseAt, FACING } from '../../systems/vehicle/vehiclePose'
 import { dockSiteOf } from '../../systems/world/dockSite'
-import { planetParamsFor } from '../../systems/world/planetParams'
+import { freshPlanetParamsFor } from '../../systems/world/planetParams'
 
 /** Each leg mines `tiles` surface ore tiles of its planet, in order; the last leg's pad docks. */
 export type HaulPlan = readonly { planet: number; tiles: number }[]
@@ -76,7 +76,7 @@ function legSetupAt(tick: number, planet: number): ScriptedCommand[] {
 
 function withLeg(script: HaulScript, planet: number, tiles: number): HaulScript {
   const start = script.endTick
-  const params = planetParamsFor(WORLD_SEED, planet)
+  const params = freshPlanetParamsFor(WORLD_SEED, planet)
   const mining = surfaceOreTiles(tiles, params).flatMap((tile, index) => {
     const tick = start + 1 + TICKS_PER_TILE * index
     return [
@@ -92,7 +92,7 @@ function withLeg(script: HaulScript, planet: number, tiles: number): HaulScript 
 
 function withDocking(script: HaulScript, planet: number): HaulScript {
   const tick = script.endTick
-  const site = dockSiteOf(planetParamsFor(WORLD_SEED, planet))
+  const site = dockSiteOf(freshPlanetParamsFor(WORLD_SEED, planet))
   const { payload } = poseAbove(site.dockPoint, FACING.right)
   const docking: ScriptedCommand[] = [
     { tick, type: 'reportPose', payload: { ...payload, ...bayPoseAt(site, 'sell') } },

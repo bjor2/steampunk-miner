@@ -3,7 +3,24 @@ import { oreTier } from '../economy/oreEconomy'
 import { ARCHETYPE_IDS } from '../registeredIds'
 import { dockSiteOf } from './dockSite'
 import { coreTileCount } from './planetGeometry'
-import { coreRadiusFor, planetParamsFor, radiusForPlanet } from './planetParams'
+import { fnv1a64Hex } from '../authority/stateDigest'
+import {
+  coreRadiusFor,
+  freshPlanetParamsFor,
+  ORE_RULES_FROM_PLANET,
+  ORE_RULES_VERSION,
+  planetParamsFor,
+  radiusForPlanet,
+} from './planetParams'
+
+/** Taken on main at b2e77198, before the ore rules existed. */
+const LEGACY_PARAMS_DIGEST = '52478ece7bf1087f'
+const PLANETS_1_TO_200 = Array.from({ length: 200 }, (_, at) => at + 1)
+
+/** The params JSON of planets 1 to 200 as main wrote it before ticket 445, as one digest. */
+function legacyParamsDigestOf(paramsOf: (planetIndex: number) => unknown): string {
+  return fnv1a64Hex(PLANETS_1_TO_200.map((index) => JSON.stringify(paramsOf(index))).join('\n'))
+}
 
 describe('planet params', () => {
   it('gives planet 1 a radius of 300, planet 2 400 and planet 40 906 (#6 section 2)', () => {
@@ -109,5 +126,32 @@ describe('planet 2', () => {
       heavy.gravityMultiplier,
       heavy.familyWeights,
     ])
+  })
+})
+
+describe('planet params ore rules (ticket 445)', () => {
+  it('keeps the params JSON of every unstamped planet, 1 to 200, byte-identical to before', () => {
+    expect(legacyParamsDigestOf((index) => planetParamsFor(83921, index))).toBe(
+      LEGACY_PARAMS_DIGEST,
+    )
+  })
+
+  it('differs from the legacy params only by the stamp, appended last', () => {
+    const legacy = planetParamsFor(83921, 7)
+    const stamped = planetParamsFor(83921, 7, ORE_RULES_VERSION)
+    expect(stamped).toEqual({ ...legacy, oreRulesVersion: ORE_RULES_VERSION })
+    expect(Object.keys(stamped).at(-1)).toBe('oreRulesVersion')
+  })
+
+  it('stamps a fresh planet only from the first planet whose rows differ', () => {
+    const stamps = [1, 2, 3, 4, 60].map((index) => freshPlanetParamsFor(1, index).oreRulesVersion)
+    expect(ORE_RULES_FROM_PLANET).toBe(3)
+    expect(stamps).toEqual([undefined, undefined, 1, 1, 1])
+    expect('oreRulesVersion' in freshPlanetParamsFor(1, 2)).toBe(false)
+  })
+
+  it('refuses ore rules this build does not know', () => {
+    expect(() => planetParamsFor(1, 3, ORE_RULES_VERSION + 1)).toThrow(RangeError)
+    expect(() => planetParamsFor(1, 3, 0)).toThrow(RangeError)
   })
 })

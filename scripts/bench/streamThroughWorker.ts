@@ -38,7 +38,7 @@ import {
 import { visibleChunksAround, type ChunkPoint } from '../../src/systems/render/visibleChunks'
 import type { ShownChunk } from '../../src/systems/render/groundBlocks'
 import type { Vector2 } from '../../src/systems/vehicle/localFrame'
-import { planetParamsFor, type PlanetParams } from '../../src/systems/world/planetParams'
+import { freshPlanetParamsFor, type PlanetParams } from '../../src/systems/world/planetParams'
 import { clearDisc } from '../../src/systems/world/groundEdit'
 import { chunkKey } from '../../src/systems/world/tileGrid'
 import { EMPTY_WORLD, type WorldState } from '../../src/systems/world/worldState'
@@ -85,7 +85,7 @@ interface StreamRun {
 }
 
 export function benchStreamThroughWorker(worldSeed: number): BenchmarkSeries[] {
-  const params = planetParamsFor(worldSeed, PLANET)
+  const params = freshPlanetParamsFor(worldSeed, PLANET)
   return DRIVES.map((drive) => benchDrive(params, drive))
 }
 

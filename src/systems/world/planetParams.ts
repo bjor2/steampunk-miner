@@ -3,6 +3,12 @@
  * needs for one planet, from one pure `planetParamsFor(worldSeed, planetIndex)`. Planet 1 and
  * planet 2 differ only through these values; the same generator code path makes both.
  * Plain integers, strings and one gravity number, so the params can go into a save header as JSON.
+ *
+ * `oreRulesVersion` (TD ruling on ticket 445, section 2): the ore rules a planet was entered under.
+ * It is an input, never derived: a planet a save holds without it keeps the legacy lead rows, so its
+ * unmined chunks never seam against the ones already dug, while a planet entered from this build is
+ * stamped. Only planets whose rows differ are stamped (`ORE_RULES_FROM_PLANET`), and the key is
+ * omitted when absent, so the params JSON of every legacy planet stays byte-identical.
  */
 import { hashCell } from '../cellRandom'
 import { isHeatPlanet } from '../economy/heatEconomy'
@@ -66,14 +72,36 @@ export interface PlanetParams {
   hasStarterVein: boolean
   /** The band the planet's one artefact cache sits in (#46). */
   artefactCacheBand: number
+  /** The ore rules the planet was entered under; absent means the legacy rows (ticket 445). */
+  oreRulesVersion?: number
 }
 
+/** The ore rules a planet entered from this build carries: the rarity rows (ticket 445). */
+export const ORE_RULES_VERSION = 1
+
+/**
+ * The first planet whose ore rows differ under `ORE_RULES_VERSION` (where epic and mythic start,
+ * the `ores` slice's `mixedRowsFromPlanet`); an earlier planet is entered unstamped, so P1 and P2
+ * sessions, goldens and saves stay byte-identical. A ticket that changes P1 or P2 generation lowers
+ * it in the commit that re-records their goldens.
+ */
+export const ORE_RULES_FROM_PLANET = 3
+
+const KNOWN_ORE_RULES_VERSIONS: readonly unknown[] = Array.from(
+  { length: ORE_RULES_VERSION },
+  (_, at) => at + 1,
+)
 const TWO_TO_32 = 0x100000000
 const FIRST_PLANET = 1
 
-export function planetParamsFor(worldSeed: number, planetIndex: number): PlanetParams {
+export function planetParamsFor(
+  worldSeed: number,
+  planetIndex: number,
+  oreRulesVersion?: number,
+): PlanetParams {
   assertValidWorldSeed(worldSeed)
   assertValidPlanetIndex(planetIndex)
+  assertValidOreRulesVersion(oreRulesVersion)
   const radiusTiles = radiusForPlanet(planetIndex)
   return {
     worldSeed,
@@ -93,7 +121,21 @@ export function planetParamsFor(worldSeed: number, planetIndex: number): PlanetP
     ...archetypeOf(planetIndex),
     hasStarterVein: planetIndex === FIRST_PLANET,
     artefactCacheBand: artefactCacheBandOf(planetIndex),
+    ...(oreRulesVersion === undefined ? {} : { oreRulesVersion }),
   }
+}
+
+/** The ore rules a planet entered now is stamped with: none before `ORE_RULES_FROM_PLANET`. */
+export function oreRulesVersionOnEntry(planetIndex: number): number | undefined {
+  return planetIndex >= ORE_RULES_FROM_PLANET ? ORE_RULES_VERSION : undefined
+}
+
+/**
+ * The params of a planet as this build enters it fresh (travel, a new game, a scenario): what a
+ * model of a new planet reads, so a report or the bot sees the cells the session generates.
+ */
+export function freshPlanetParamsFor(worldSeed: number, planetIndex: number): PlanetParams {
+  return planetParamsFor(worldSeed, planetIndex, oreRulesVersionOnEntry(planetIndex))
 }
 
 /** The platform travels forward only, so it has the Refinery bay on every planet from its unlock. */
@@ -158,6 +200,19 @@ function artefactCacheBandOf(planetIndex: number): number {
 function assertValidWorldSeed(worldSeed: number): void {
   if (!Number.isInteger(worldSeed) || worldSeed < 0 || worldSeed >= TWO_TO_32) {
     throw new RangeError(`worldSeed must be a uint32, got ${worldSeed}`)
+  }
+}
+
+/** Absent (legacy), or a version this build knows: a later one is another build's world. */
+export function isKnownOreRulesVersion(version: unknown): boolean {
+  return version === undefined || KNOWN_ORE_RULES_VERSIONS.includes(version)
+}
+
+function assertValidOreRulesVersion(oreRulesVersion: number | undefined): void {
+  if (!isKnownOreRulesVersion(oreRulesVersion)) {
+    throw new RangeError(
+      `oreRulesVersion must be 1 to ${ORE_RULES_VERSION}, got ${oreRulesVersion}`,
+    )
   }
 }
 

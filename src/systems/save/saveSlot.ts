@@ -37,6 +37,12 @@ import type { AuthorityState } from '../authority/authorityState'
 import { isJsonObject, isWholeNumber } from '../authority/payloadFields'
 import { planetParamsOf } from '../authority/planetOfState'
 import {
+  boreFieldsOf,
+  oreRulesFieldOf,
+  planetOfWorld,
+  type WorldSectionPlanet,
+} from './worldSectionFields'
+import {
   readSnapshot,
   SNAPSHOT_VERSION,
   type PortablePlayer,
@@ -81,10 +87,8 @@ export interface SavedWorldSection extends Omit<SaveWorldSection, 'chunks'> {
   chunks: PackedChunks
 }
 
-export interface SaveWorldSection {
+export interface SaveWorldSection extends WorldSectionPlanet {
   saveEpoch: number
-  worldSeed: number
-  planetIndex: number
   /** The params the planet was generated with; a build that would generate others refuses. */
   params: PlanetParams | null
   chunks: PortableState['world']['chunks']
@@ -156,6 +160,7 @@ function worldSectionOf(state: PortableState, saveEpoch: number): SaveWorldSecti
     saveEpoch,
     worldSeed: state.planet.seed,
     planetIndex: state.planet.index,
+    ...oreRulesFieldOf(state.planet),
     params: planetParamsOf(state.planet),
     chunks: state.world.chunks,
     platform: state.platform,
@@ -168,17 +173,6 @@ function worldSectionOf(state: PortableState, saveEpoch: number): SaveWorldSecti
     ...boreFieldsOf(state),
     debugApplied: state.debugApplied,
     ...(state.slices === undefined ? {} : { slices: state.slices }),
-  }
-}
-
-/** The bore gun's optional state, each key only while it holds something, as the snapshot has it. */
-function boreFieldsOf(
-  from: Pick<PortableState, 'bores' | 'struts' | 'groundedLines'>,
-): Pick<PortableState, 'bores' | 'struts' | 'groundedLines'> {
-  return {
-    ...(from.bores === undefined ? {} : { bores: from.bores }),
-    ...(from.struts === undefined ? {} : { struts: from.struts }),
-    ...(from.groundedLines === undefined ? {} : { groundedLines: from.groundedLines }),
   }
 }
 
@@ -237,7 +231,7 @@ export function snapshotOfSaveSlot(file: SaveSections): SessionSnapshot {
     digest: file.digest,
     state: {
       tick: file.tick,
-      planet: { index: world.planetIndex, seed: world.worldSeed },
+      planet: planetOfWorld(world),
       players: profile.players,
       world: { chunks: world.chunks },
       platform: world.platform,
@@ -293,7 +287,7 @@ function sectionProblems(name: string, section: unknown, saveEpoch: unknown): st
 
 /** Params are a pure function of seed and index, so a difference means another generator. */
 function paramsProblems(world: SaveWorldSection): string[] {
-  const generated = planetParamsOf({ index: world.planetIndex, seed: world.worldSeed })
+  const generated = planetParamsOf(planetOfWorld(world))
   if (JSON.stringify(world.params) === JSON.stringify(generated)) return []
   return ['save.world.params differ from the params this build generates for its seed and planet']
 }

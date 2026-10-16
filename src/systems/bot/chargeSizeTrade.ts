@@ -28,7 +28,7 @@ import {
 import { oreSalePrice, oreTier } from '../economy/oreEconomy'
 import { onCurveLevels, vehicleStatsAt } from '../economy/vehicleStats'
 import { cmp, div, fromSafeInteger, mul, sub, type Money } from '../money'
-import { planetParamsFor, type PlanetParams } from '../world/planetParams'
+import { freshPlanetParamsFor, type PlanetParams } from '../world/planetParams'
 import { moveTicks } from './botWorld'
 
 /** The drill speeds the guard compares at (#153 amendment point 4): the floor and a slow tile. */
@@ -60,7 +60,7 @@ export interface ChargeSizeTrade {
 export function chargeSizeTradesOf(worldSeed: number): ChargeSizeTrade[] {
   return chargeSizesUpTo(chargeSizeCount()).flatMap((size) =>
     guardPlanetsOf(size).flatMap((planetIndex) =>
-      tradesOnPlanet(planetParamsFor(worldSeed, planetIndex), size),
+      tradesOnPlanet(freshPlanetParamsFor(worldSeed, planetIndex), size),
     ),
   )
 }

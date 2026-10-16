@@ -18,7 +18,7 @@
  */
 import { isHeatPlanet } from '../../../systems/economy/heatEconomy'
 import { subSeedForHook } from '../../../systems/registries/hookSeed'
-import { planetParamsFor, type PlanetParams } from '../../../systems/world/planetParams'
+import { freshPlanetParamsFor, type PlanetParams } from '../../../systems/world/planetParams'
 import { BAND_COUNT } from '../../../systems/world/planetGeometry'
 import { leadWeights, ORE_ROWS, oreTierOf, oreTypeOf } from '../../ores'
 import { planetMixPlanOf, type PlanetMixPlan } from './planetActs'
@@ -54,7 +54,7 @@ const BANDS = [1, 2, 3, 4, 5]
 
 /** The mix of planet `p` in world `worldSeed` (#141's `oreMixFor(planetIndex, seed)`). */
 export function oreMixFor(planetIndex: number, worldSeed: number): OreMix {
-  return oreMixOf(planetParamsFor(worldSeed, planetIndex))
+  return oreMixOf(freshPlanetParamsFor(worldSeed, planetIndex))
 }
 
 /** The mix of the planet these params make, under the mix hook's seed. */

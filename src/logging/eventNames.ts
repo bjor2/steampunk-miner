@@ -208,10 +208,17 @@ export const RUN_EVENT_REGISTRY = {
   },
 
   // Progression
+  // `oreRulesVersion` only on a planet entered under the ore rules (ticket 445), so a report can
+  // rebuild the exact params; optional, so a line from before it still reads.
   planet_entered: {
     group: 'progression',
     level: 'core',
-    payload: { planetSeed: 'integer', generatorVersion: 'integer', radius: 'integer' },
+    payload: {
+      planetSeed: 'integer',
+      generatorVersion: 'integer',
+      radius: 'integer',
+      oreRulesVersion: { optional: 'integer' },
+    },
   },
   // The unlocked planet by index: the envelope's `planet` is whichever planet the line was on.
   planet_unlocked: { group: 'progression', level: 'core', payload: { planetIndex: 'integer' } },

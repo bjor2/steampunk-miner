@@ -5,7 +5,7 @@
  * the same way in solid rock on the later planet their size opens on.
  */
 import { FACING, type Facing } from '../../vehicle/vehiclePose'
-import { planetParamsFor } from '../../world/planetParams'
+import { freshPlanetParamsFor } from '../../world/planetParams'
 import { surfaceRowOfColumn, type TilePoint } from '../../world/tileGrid'
 import { CELL_KIND, isSolidCell, kindOfCell } from '../../world/worldCell'
 import { cellAt, EMPTY_WORLD } from '../../world/worldState'
@@ -96,7 +96,7 @@ export interface BlastSite {
  * `carried` charges of `size`, and the vehicle in band-1 rock facing a solid wall east of it.
  */
 export function sizedBlasterOn(planetIndex: number, size: number, carried = 1) {
-  const params = planetParamsFor(WORLD_SEED, planetIndex)
+  const params = freshPlanetParamsFor(WORLD_SEED, planetIndex)
   const session = continueScriptedSession(
     createAuthorityState({ planetIndex, planetSeed: WORLD_SEED, playerIds: ['p1'] }),
   )
@@ -124,7 +124,7 @@ const SITE_DEPTH_TILES = 40
 
 /** A solid stand tile with a solid wall east of it, in band-1 rock of planet `planetIndex`. */
 export function solidBlastSiteOn(planetIndex: number): BlastSite {
-  const params = planetParamsFor(WORLD_SEED, planetIndex)
+  const params = freshPlanetParamsFor(WORLD_SEED, planetIndex)
   const ty = surfaceRowOfColumn(0, params.radiusTiles) - SITE_DEPTH_TILES
   for (let tx = -60; tx <= 60; tx++) {
     const stand = { tx, ty }

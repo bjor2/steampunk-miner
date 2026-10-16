@@ -7,7 +7,7 @@ import { setPlanetCommand, setPlanetSeedCommand } from '../../startScenarioComma
 import { bayPoseAt, FACING } from '../../vehicle/vehiclePose'
 import type { BayId } from '../../world/dockBays'
 import { dockSiteOf, type DockSite } from '../../world/dockSite'
-import { planetParamsFor, type PlanetParams } from '../../world/planetParams'
+import { freshPlanetParamsFor, type PlanetParams } from '../../world/planetParams'
 import type { DomainEvent } from '../domainEvent'
 import { vehicleOf } from '../authorityState'
 import {
@@ -20,7 +20,7 @@ import {
 } from '../scriptedSession'
 
 export const REFINERY_PLANET = 3
-export const REFINERY_PARAMS = planetParamsFor(WORLD_SEED, REFINERY_PLANET)
+export const REFINERY_PARAMS = freshPlanetParamsFor(WORLD_SEED, REFINERY_PLANET)
 export const REFINERY_SITE = dockSiteOf(REFINERY_PARAMS)
 
 /** Ticks between two mined tiles: `mineTile` drills for 40 ticks after its pose. */

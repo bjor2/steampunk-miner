@@ -428,7 +428,13 @@ export interface KernelDomainEventBodies {
   PlanetUnlocked: { planetIndex: number }
   /** A locked-schedule row opened by arriving at its planet (#88), keyed by its #79 row id. */
   FeatureUnlocked: { featureId: string }
-  PlanetEntered: { planetSeed: number; generatorVersion: number; radius: number }
+  /** `oreRulesVersion` only on a planet entered under the ore rules (ticket 445). */
+  PlanetEntered: {
+    planetSeed: number
+    generatorVersion: number
+    radius: number
+    oreRulesVersion?: number
+  }
   /**
    * `value` is the gross sale, before any lining bill; `coinsShown` is the sell burst's coin count
    * for it (`sellCoins.ts`, ticket 220).

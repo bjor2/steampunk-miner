@@ -4,6 +4,9 @@
  * site. An item on auto stays on, its preview dropped (ticket 317). The vehicles keep their levels, energy, hull and cargo; the platform keeps its bay and look.
  * A charge still on a wall stays on the old planet's wall: it is gone, and the rack keeps the rest.
  * `Travel` and `debug.setPlanet` both go through here.
+ *
+ * `planet_entered` names the ore rules when the planet has them (ticket 445), so a report can
+ * rebuild the exact params.
  */
 import { GENERATOR_VERSION } from '../generatorVersion'
 import type { VehicleCharges } from '../vehicle/vehicleCharges'
@@ -62,6 +65,7 @@ export function planetEntryOf(params: PlanetParams): DomainEventBodies['PlanetEn
     planetSeed: params.planetSeed,
     generatorVersion: GENERATOR_VERSION,
     radius: params.radiusTiles,
+    ...(params.oreRulesVersion === undefined ? {} : { oreRulesVersion: params.oreRulesVersion }),
   }
 }
 

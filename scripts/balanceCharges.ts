@@ -124,7 +124,7 @@ import {
   type Money,
 } from '../src/systems/money'
 import type { Scenario } from '../src/systems/scenario'
-import { planetParamsFor } from '../src/systems/world/planetParams'
+import { freshPlanetParamsFor } from '../src/systems/world/planetParams'
 
 loadFeatures()
 
@@ -350,7 +350,7 @@ function gateTableOnScenarioSeed(planet: number): GatedMixBands {
 }
 
 function tradeRowsOf(planet: number): TradeRow[] {
-  const params = planetParamsFor(scenario.worldSeed, planet)
+  const params = freshPlanetParamsFor(scenario.worldSeed, planet)
   const onCurve = onCurveLevels(planet)
   const behind = {
     ...onCurve,

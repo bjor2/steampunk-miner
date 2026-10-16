@@ -10,7 +10,7 @@ import type { BenchmarkSeries } from '../../src/logging/benchmarkResult'
 import { withRegistrations } from '../../src/registries/registrar'
 import { buildChunkTileBatch } from '../../src/systems/render/chunkTileBatch'
 import { chunkDensityHaloOf } from '../../src/systems/render/densityHalo'
-import { planetParamsFor, type PlanetParams } from '../../src/systems/world/planetParams'
+import { freshPlanetParamsFor, type PlanetParams } from '../../src/systems/world/planetParams'
 import { chunkRangeOfDisc } from '../../src/systems/world/tileGrid'
 import {
   currentDensityOfChunk,
@@ -37,7 +37,7 @@ interface RebuildTimes {
 /** Both series per gated planet: `buildChunkTileBatch.gates` and `buildChunkTileBatch.noGates`. */
 export function benchGateChannelRebuild(worldSeed: number): BenchmarkSeries[] {
   return GATED_PLANETS.flatMap((planetIndex) =>
-    benchPlanet(planetParamsFor(worldSeed, planetIndex)),
+    benchPlanet(freshPlanetParamsFor(worldSeed, planetIndex)),
   )
 }
 

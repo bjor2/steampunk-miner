@@ -23,7 +23,7 @@ import { buildChunkTileBatch } from '../../src/systems/render/chunkTileBatch'
 import { chunkDensityHaloOf } from '../../src/systems/render/densityHalo'
 import { visibleChunksAround, type ChunkPoint } from '../../src/systems/render/visibleChunks'
 import type { Vector2 } from '../../src/systems/vehicle/localFrame'
-import { planetParamsFor, type PlanetParams } from '../../src/systems/world/planetParams'
+import { freshPlanetParamsFor, type PlanetParams } from '../../src/systems/world/planetParams'
 import { CHUNK_SIZE, chunkKey } from '../../src/systems/world/tileGrid'
 import {
   currentDensityOfChunk,
@@ -66,7 +66,7 @@ interface StreamRun {
 }
 
 export function benchStreamAtSpeed(worldSeed: number): BenchmarkSeries[] {
-  const params = planetParamsFor(worldSeed, PLANET)
+  const params = freshPlanetParamsFor(worldSeed, PLANET)
   return DRIVES.map((drive) => benchDrive(params, drive))
 }
 

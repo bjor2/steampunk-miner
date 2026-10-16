@@ -51,6 +51,8 @@ import {
 import { coreProgressProblems, type CoreProgress } from './coreProgress'
 import { heldArtefactProblems, type HeldArtefact } from './heldArtefact'
 import { isJsonObject, isWholeNumber } from './payloadFields'
+import { withOreRulesVersion, type SessionPlanet } from './planetOfState'
+import { isKnownOreRulesVersion } from '../world/planetParams'
 import { isPlatformVisualState, type PlatformState } from './platformState'
 import { copyRefinerySlots, refinerySlotsProblems } from './refinery/refineryBatch'
 import {
@@ -105,7 +107,8 @@ export interface SessionSnapshot {
 /** AuthorityState with each Money written as its canonical string. */
 export interface PortableState {
   tick: number
-  planet: { index: number; seed: number }
+  /** `oreRulesVersion` only on a planet entered under the ore rules (ticket 445). */
+  planet: SessionPlanet
   players: Record<string, PortablePlayer>
   world: PortableWorld
   platform: PlatformState
@@ -227,7 +230,7 @@ function verifiedRestore(snapshot: SessionSnapshot): SnapshotRestore {
 function authorityStateOf(portable: PortableState): AuthorityState {
   return {
     tick: portable.tick,
-    planet: { index: portable.planet.index, seed: portable.planet.seed },
+    planet: withOreRulesVersion(portable.planet, portable.planet.oreRulesVersion),
     players: Object.fromEntries(
       Object.entries(portable.players).map(([id, player]) => [id, playerStateOf(player)]),
     ),
@@ -328,7 +331,10 @@ function portableGroundedLinesField(lines: readonly GroundedLine[] | undefined):
 function planetProblems(planet: unknown): string[] {
   const isValid =
     isJsonObject(planet) && isWholeNumber(planet.index) && Number.isSafeInteger(planet.seed)
-  return isValid ? [] : ['snapshot.state.planet must hold a whole index and a safe-integer seed']
+  if (!isValid) return ['snapshot.state.planet must hold a whole index and a safe-integer seed']
+  return isKnownOreRulesVersion(planet.oreRulesVersion)
+    ? []
+    : ['snapshot.state.planet.oreRulesVersion is not ore rules this build knows']
 }
 
 function platformProblems(platform: unknown): string[] {

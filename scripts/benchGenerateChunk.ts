@@ -7,7 +7,7 @@
 import { loadFeatures } from '../src/features'
 import type { BenchmarkSeries } from '../src/logging/benchmarkResult'
 import { generateChunk } from '../src/systems/world/generateChunk'
-import { planetParamsFor, type PlanetParams } from '../src/systems/world/planetParams'
+import { freshPlanetParamsFor, type PlanetParams } from '../src/systems/world/planetParams'
 import { chunkRangeOfDisc } from '../src/systems/world/tileGrid'
 import { logBenchmarkSeriesWhenAsked } from './bench/benchRunLog'
 
@@ -38,7 +38,7 @@ function percentile(times: readonly number[], fraction: number): number {
 }
 
 function benchPlanet(planetIndex: number): BenchmarkSeries {
-  const params = planetParamsFor(WORLD_SEED, planetIndex)
+  const params = freshPlanetParamsFor(WORLD_SEED, planetIndex)
   chunkTimesMs(params)
   const times = chunkTimesMs(params)
   const p95Ms = percentile(times, 0.95)

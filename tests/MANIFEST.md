@@ -731,6 +731,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/authority/magnetic/metalTag.test.ts` | 12 | 12 |
 | `src/systems/authority/minedOre.test.ts` | 7 | 7 |
 | `src/systems/authority/moneyRounding.test.ts` | 3 | 3 |
+| `src/systems/authority/planetOfState.test.ts` | 4 | 4 |
 | `src/systems/authority/platformCommands.test.ts` | 43 | 43 |
 | `src/systems/authority/purchaseChain.test.ts` | 18 | 10 |
 | `src/systems/authority/refinery/refineryDock.test.ts` | 5 | 5 |
@@ -1461,10 +1462,10 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/world/lavaFlow.test.ts` | 6 | 6 |
 | `src/systems/world/lavaPockets.test.ts` | 7 | 7 |
 | `src/systems/world/orePatches.test.ts` | 31 | 8 |
-| `src/systems/world/planetParams.test.ts` | 21 | 16 |
+| `src/systems/world/planetParams.test.ts` | 25 | 20 |
 | `src/systems/world/rimDwell.test.ts` | 6 | 6 |
 | `src/systems/world/stampShape.test.ts` | 8 | 5 |
 | `src/systems/world/sweptSpan.test.ts` | 6 | 6 |
-| `src/systems/world/worldCell.test.ts` | 3 | 3 |
+| `src/systems/world/worldCell.test.ts` | 4 | 4 |
 | `src/systems/world/worldExactMathLint.test.ts` | 15 | 3 |
 | `src/systems/world/worldState.test.ts` | 1 | 1 |

@@ -21,7 +21,7 @@ import { inRadiusCount } from '../authority/charges/blastFront'
 import { chargePrice, chargeRadiusMm, minChargeFor } from '../economy/chargeSizes'
 import { oreSalePrice, oreTier } from '../economy/oreEconomy'
 import { cmp, div, fromSafeInteger, mul, type Money } from '../money'
-import { planetParamsFor, type PlanetParams } from '../world/planetParams'
+import { freshPlanetParamsFor, type PlanetParams } from '../world/planetParams'
 
 /** Planets 7 to 40, then one endless planet (the GD lock on K8 #218). */
 export const PAYOFF_PLANETS: readonly number[] = [...planetsFrom(7, 40), 50]
@@ -53,7 +53,7 @@ export interface ChargePayoff {
 /** Every planet, band and lead of the domain, on one world seed. */
 export function chargePayoffsOf(worldSeed: number): ChargePayoff[] {
   return PAYOFF_PLANETS.flatMap((planetIndex) => {
-    const params = planetParamsFor(worldSeed, planetIndex)
+    const params = freshPlanetParamsFor(worldSeed, planetIndex)
     return PAYOFF_BANDS.flatMap((band) =>
       PAYOFF_LEADS.map((lead) => chargePayoffOf(params, band, lead)),
     )

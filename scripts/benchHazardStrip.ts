@@ -26,7 +26,7 @@ import {
   VIEWER_WITH_SCANNER,
 } from '../src/systems/render/hazardStrip/stripFixtures'
 import type { StripGround } from '../src/systems/render/hazardStrip/stripGround'
-import { planetParamsFor } from '../src/systems/world/planetParams'
+import { freshPlanetParamsFor } from '../src/systems/world/planetParams'
 import { EMPTY_WORLD } from '../src/systems/world/worldState'
 import { logBenchmarkSeriesWhenAsked } from './bench/benchRunLog'
 
@@ -66,7 +66,7 @@ function fixtureDig(speed: number): FrameTimes {
 
 /** Straight down planet 30 from its surface, stopping short of the core. */
 function planetDig(speed: number): FrameTimes {
-  const params = planetParamsFor(SEED, PLANET)
+  const params = freshPlanetParamsFor(SEED, PLANET)
   const ground = createSeededStripGround(params, EMPTY_WORLD)
   const top = params.radiusTiles - 0.5
   return timeDig(ground, (seconds) => {

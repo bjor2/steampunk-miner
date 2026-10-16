@@ -10,7 +10,7 @@
 import type { DomainEvent } from '../../systems/authority/domainEvent'
 import { fromCanonical, type Money } from '../../systems/money'
 import { bandOfTile } from '../../systems/world/planetGeometry'
-import { planetParamsFor, type PlanetParams } from '../../systems/world/planetParams'
+import { freshPlanetParamsFor, type PlanetParams } from '../../systems/world/planetParams'
 import type { TilePoint } from '../../systems/world/tileGrid'
 import { leadOfTier } from './systems/leadPayoff'
 
@@ -43,7 +43,7 @@ export function minedOreUnitsOf(
   planet: number,
 ): MinedOreUnit[] {
   const walk: Walk = {
-    params: planetParamsFor(worldSeed, planet),
+    params: freshPlanetParamsFor(worldSeed, planet),
     ticksAtTile: new Map(),
     broken: null,
     units: [],

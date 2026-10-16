@@ -12,7 +12,7 @@ import { resourceTierOf } from '../../systems/authority/minedOre'
 import { generateChunkCells } from '../../systems/world/generateChunk'
 import { orePatchesNearChunk } from '../../systems/world/orePatches'
 import { bandOfTile, BAND_COUNT } from '../../systems/world/planetGeometry'
-import { planetParamsFor, type PlanetParams } from '../../systems/world/planetParams'
+import { freshPlanetParamsFor, type PlanetParams } from '../../systems/world/planetParams'
 import {
   CHUNK_CELLS,
   CHUNK_SIZE,
@@ -55,7 +55,7 @@ export const SIGNATURE_ROLE = 'signature'
 
 /** The planet's ore tiles per band, generated under the registrations in force. */
 export function planetHistogramOf(planetIndex: number, worldSeed: number): PlanetHistogram {
-  const params = planetParamsFor(worldSeed, planetIndex)
+  const params = freshPlanetParamsFor(worldSeed, planetIndex)
   const counts = Array.from({ length: BAND_COUNT }, () => new Map<string, ObservedType>())
   const patches = Array.from({ length: BAND_COUNT }, () => new Set<string>())
   for (const [cx, cy] of chunksOfDisc(params)) {

@@ -265,9 +265,14 @@ const PROJECTIONS: { readonly [K in KernelDomainEventType]: Projection<K> } = {
   }),
   PlanetUnlocked: ({ planetIndex }) => ({ event: 'planet_unlocked', data: { planetIndex } }),
   FeatureUnlocked: ({ featureId }) => ({ event: 'feature_unlocked', data: { featureId } }),
-  PlanetEntered: ({ planetSeed, generatorVersion, radius }) => ({
+  PlanetEntered: ({ planetSeed, generatorVersion, radius, oreRulesVersion }) => ({
     event: 'planet_entered',
-    data: { planetSeed, generatorVersion, radius },
+    data: {
+      planetSeed,
+      generatorVersion,
+      radius,
+      ...(oreRulesVersion === undefined ? {} : { oreRulesVersion }),
+    },
   }),
   ResourceSold: ({ items, value, mode, coinsShown }) => ({
     event: 'resource_sold',
