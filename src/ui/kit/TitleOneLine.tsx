@@ -14,6 +14,7 @@ import {
   type UiTextHolds,
 } from '../../systems/views/uiText'
 import { VectorIcon, type IconSize } from '../VectorIcon'
+import { AmountText } from './AmountText'
 import styles from './TitleOneLine.module.css'
 import { Tooltip } from './Tooltip'
 
@@ -123,7 +124,7 @@ function FactRow({ facts, glyphSize }: { facts: readonly IconValue[]; glyphSize:
           data-flash={fact.flashKey !== undefined || undefined}
         >
           <VectorIcon iconId={fact.iconId} size={glyphSize} />
-          {fact.text}
+          <AmountText text={fact.text} exact={fact.exact} />
         </span>
       ))}
     </p>

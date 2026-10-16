@@ -11,6 +11,7 @@ import type { CasingRow } from '../../systems/views/upgradeBayModel'
 import type { VehicleItemRow } from '../../systems/views/vehicleItemRows'
 import type { BayEntryRow } from '../../systems/views/bayEntryRows'
 import type { ScreenButton } from '../../systems/views/viewParts'
+import { AmountText } from '../kit/AmountText'
 import { ItemCard } from '../kit/ItemCard'
 import { UI_ID_TEMPLATES, UI_IDS } from '../ids'
 import { ScreenButtonView } from '../ScreenButtonView'
@@ -34,7 +35,7 @@ export function UpgradeRow({ row, focusedId }: { row: WorkshopRow; focusedId: st
           data-testid={UI_ID_TEMPLATES.workshopUpgradeCost(id)}
           data-exact={row.cost.exact}
         >
-          {row.cost.text}
+          <AmountText text={row.cost.text} exact={row.cost.exact} />
         </span>
         <span className={rowStyles.effect}>
           <Preview
@@ -67,7 +68,7 @@ export function CasingRowView({ casing, focusedId }: { casing: CasingRow; focuse
           data-testid={UI_IDS.upgradebayCasingCost}
           data-exact={casing.cost.exact}
         >
-          {casing.cost.text}
+          <AmountText text={casing.cost.text} exact={casing.cost.exact} />
         </span>
         <span
           className={rowStyles.effect}
@@ -98,7 +99,7 @@ export function LiningRowView({ lining, focusedId }: { lining: LiningRow; focuse
           data-testid={UI_IDS.upgradebayLiningCost}
           data-exact={lining.cost.exact}
         >
-          {lining.cost.text}
+          <AmountText text={lining.cost.text} exact={lining.cost.exact} />
         </span>
         <span className={rowStyles.effect} data-testid={UI_IDS.upgradebayLiningEffect}>
           {lining.effectText}
@@ -127,7 +128,7 @@ export function GunRowView({ guns, focusedId }: { guns: GunRow; focusedId: strin
           data-testid={UI_IDS.upgradebayGunsCost}
           data-exact={guns.cost.exact}
         >
-          {guns.cost.text}
+          <AmountText text={guns.cost.text} exact={guns.cost.exact} />
         </span>
         <span className={rowStyles.effect} data-testid={UI_IDS.upgradebayGunsEffect}>
           {guns.effectText}
@@ -155,7 +156,7 @@ export function VehicleItemRowView({ row, focusedId }: { row: VehicleItemRow; fo
           data-testid={UI_ID_TEMPLATES.upgradebayItemCost(row.itemId)}
           data-exact={row.cost.exact}
         >
-          {row.cost.text}
+          <AmountText text={row.cost.text} exact={row.cost.exact} />
         </span>
         <span />
         <ScreenButtonView button={row.buy} focusedId={focusedId} state={row.buyState} />
@@ -197,7 +198,7 @@ function BayEntryLine({
         data-testid={UI_ID_TEMPLATES.upgradebayEntryCost(row.entryId)}
         data-exact={row.cost.exact}
       >
-        {row.cost.text}
+        <AmountText text={row.cost.text} exact={row.cost.exact} />
       </span>
       <span
         className={rowStyles.effect}

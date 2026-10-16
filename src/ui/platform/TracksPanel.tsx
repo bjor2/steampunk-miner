@@ -9,6 +9,7 @@
 import type { UpgradeBayModel } from '../../systems/views/upgradeBayModel'
 import { panelIconIdOf } from '../../systems/art/icons/iconSet'
 import { Panel } from '../kit/Panel'
+import { AmountText } from '../kit/AmountText'
 import { ItemTooltip } from '../kit/ItemTooltip'
 import { UI_IDS } from '../ids'
 import { ScreenButtonView } from '../ScreenButtonView'
@@ -50,7 +51,7 @@ export function TracksPanel({ model, focusedId }: { model: UpgradeBayModel; focu
           <ScreenButtonView button={model.repair.button} focusedId={focusedId} />
         </ItemTooltip>
         <span data-testid={UI_IDS.workshopRepairCost} data-exact={model.repair.cost.exact}>
-          {model.repair.cost.text}
+          <AmountText text={model.repair.cost.text} exact={model.repair.cost.exact} />
         </span>
       </div>
       <Field label="Look">

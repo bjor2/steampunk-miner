@@ -7,6 +7,7 @@ import { hudLabelIconIdOf } from '../../systems/art/icons/iconSet'
 import type { ItemCardModel } from '../../systems/views/itemCardModel'
 import type { ItemCardLineText, ItemCardText } from '../../systems/views/itemCardText'
 import { VectorIcon } from '../VectorIcon'
+import { AmountText } from './AmountText'
 import styles from './ItemCard.module.css'
 import type { IconValue } from './TitleOneLine'
 
@@ -63,7 +64,7 @@ function Price({ card }: { card: ItemCardModel }) {
       data-exact={cost.exact}
       data-money-short={card.isMoneyShort || undefined}
     >
-      {cost.text}
+      <AmountText text={cost.text} exact={cost.exact} />
     </span>
   )
 }

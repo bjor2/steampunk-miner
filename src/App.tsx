@@ -11,6 +11,7 @@ import { SettingsPanel } from './ui/settings/SettingsPanel'
 import { GameStage } from './ui/stage/GameStage'
 import { PortraitCard } from './ui/stage/PortraitCard'
 import { SliceScreen } from './ui/screens/SliceScreen'
+import { ExactAmountSheet } from './ui/sheets/ExactAmountSheet'
 import { TitleMenu } from './ui/title/TitleMenu'
 import { TouchControls } from './ui/touch/TouchControls'
 import { TravelTransitionCard } from './ui/TravelTransitionCard'
@@ -31,6 +32,7 @@ export default function App() {
       <PauseMenu />
       <SettingsPanel />
       <TitleMenu />
+      <ExactAmountSheet />
       <PortraitCard />
     </GameStage>
   )

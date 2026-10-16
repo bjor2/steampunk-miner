@@ -1,0 +1,12 @@
+/*
+ * A shortened amount answers a tap with its exact value (ticket 476): a dotted underline says
+ * there is more, and it takes the tap even on the HUD, which lets every other touch through.
+ */
+.amount {
+  position: relative;
+  z-index: 1;
+  text-decoration: underline dotted;
+  text-underline-offset: 0.2em;
+  cursor: pointer;
+  pointer-events: auto;
+}

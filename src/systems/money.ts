@@ -200,6 +200,11 @@ export function toSafeInteger(amount: Money): number {
   return count
 }
 
+/** Whether `text` is a decimal amount `fromCanonical` reads, of any sign. */
+export function isMoneyText(text: unknown): text is string {
+  return typeof text === 'string' && DECIMAL_TEXT.test(text)
+}
+
 /** Whether `text` parses as money >= 0: the check for a grant or a scenario's starting money. */
 export function isNonNegativeMoneyText(text: unknown): boolean {
   if (typeof text !== 'string' || !DECIMAL_TEXT.test(text)) return false

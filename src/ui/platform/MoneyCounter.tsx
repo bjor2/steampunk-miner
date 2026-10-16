@@ -5,6 +5,7 @@
  */
 import { fromCanonical } from '../../systems/money'
 import { amountReading, type AmountReading } from '../../systems/views/viewParts'
+import { AmountText } from '../kit/AmountText'
 import { UI_IDS } from '../ids'
 import { moneyCounterProvider } from '../registries/moneyCounter'
 import { trackMoneyCounter } from './moneyCounterAnchor'
@@ -19,7 +20,7 @@ export function MoneyCounter({ wallet }: { wallet: AmountReading }) {
       data-exact={wallet.exact}
       data-shown={shownExact}
     >
-      {shown.text}
+      <AmountText text={shown.text} exact={wallet.exact} />
     </span>
   )
 }

@@ -1,6 +1,12 @@
 import { describe, expect, it } from 'vitest'
 import { MONEY_TEXT_CHARS_MAX } from '../constants/uiParts'
-import { exactAmount, formatAmount, formatPercent, isAmountShortened } from './displayAmount'
+import {
+  exactAmount,
+  formatAmount,
+  formatPercent,
+  isAmountShortened,
+  isExactTextShortened,
+} from './displayAmount'
 import { fromCanonical, toCanonical } from './money'
 
 const show = (text: string) => formatAmount(fromCanonical(text))
@@ -108,6 +114,12 @@ describe('shortened amount', () => {
     ['-1.2345e149', true],
   ])('says whether the short text of %s hides digits: %s', (amount, isShortened) => {
     expect(isAmountShortened(fromCanonical(amount))).toBe(isShortened)
+  })
+
+  it('reads a readout’s exact text, and finds nothing hidden behind a text that is no amount', () => {
+    expect(isExactTextShortened('1.2345e+149')).toBe(true)
+    expect(isExactTextShortened('1234')).toBe(false)
+    expect(isExactTextShortened('3/9')).toBe(false)
   })
 
   it('reads a safe-integer count the same way', () => {

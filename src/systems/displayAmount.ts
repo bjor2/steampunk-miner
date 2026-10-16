@@ -16,7 +16,7 @@
  *   0.01% to 99.9%               3 significant digits, truncated           0.41%, 22.8%
  *   from 100%                    as `formatAmount` prints the percent      100%, 1,234%, 1.00e7%
  */
-import { fromSafeInteger, mul, toCanonical, type Money } from './money'
+import { fromCanonical, fromSafeInteger, isMoneyText, mul, toCanonical, type Money } from './money'
 
 /** The single switch from grouped digits to scientific notation: 1,000,000 is 1e6. */
 const SCIENTIFIC_FROM_EXPONENT = 6
@@ -55,6 +55,11 @@ export function exactAmount(amount: Money | number): string {
 export function isAmountShortened(amount: Money | number): boolean {
   const parts = splitCanonical(exactAmount(amount))
   return parts.digits.length > shownDigitCountOf(parts)
+}
+
+/** `isAmountShortened` of a readout's exact text; a text that is no decimal amount hides nothing. */
+export function isExactTextShortened(exact: string): boolean {
+  return isMoneyText(exact) && isAmountShortened(fromCanonical(exact))
 }
 
 /** Short screen text for a share of a whole: 0.0041 is `0.41%`. */
