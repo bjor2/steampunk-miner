@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-10-16T07:59:07+02:00",
+  "updated_at": "2026-10-16T08:03:29+02:00",
   "caps": {
     "grok": 12,
     "claude": 10,
@@ -64,17 +64,18 @@
         },
         {
           "slot": "C6",
-          "state": "free",
-          "ticket": null,
-          "grok_slot": null,
-          "kind": null,
-          "since": null
+          "state": "busy",
+          "ticket": 465,
+          "grok_slot": 7,
+          "kind": "dev",
+          "since": "2026-10-16T08:03:00+02:00",
+          "wave": "3G"
         }
       ],
       "size": 6,
-      "used": 5,
-      "free": 1,
-      "claims_last_hour": 14,
+      "used": 6,
+      "free": 0,
+      "claims_last_hour": 15,
       "name": "Claude Max 1"
     },
     {
@@ -664,9 +665,11 @@
     },
     {
       "slot": 7,
-      "state": "free",
-      "ticket": null,
-      "since": null
+      "state": "dev",
+      "ticket": 465,
+      "since": "2026-10-16T08:03:00+02:00",
+      "claude_slot": 6,
+      "wave": "3G"
     },
     {
       "slot": 8,
@@ -747,11 +750,12 @@
     },
     {
       "slot": 6,
-      "state": "free",
-      "ticket": null,
-      "grok_slot": null,
-      "since": null,
-      "account": 1
+      "state": "busy",
+      "ticket": 465,
+      "grok_slot": 7,
+      "since": "2026-10-16T08:03:00+02:00",
+      "account": 1,
+      "wave": "3G"
     },
     {
       "slot": 7,
@@ -791,17 +795,17 @@
     }
   ],
   "last_refill": {
-    "at": "2026-10-16 07:59 CEST",
-    "mode": "recheck",
-    "triggers": "#459",
-    "started": "#472->C1/A1 #473->C2/A1 #474->C3/A1 #475->C4/A1 #476->C5/A1",
-    "note": "spawned 5 worker(s)"
+    "at": "2026-10-16 08:03 CEST",
+    "mode": "refill-dev",
+    "triggers": "#465",
+    "started": "#465->C6/A1",
+    "note": "spawned 1 worker(s)"
   },
   "totals": {
     "grok": {
       "size": 12,
-      "used": 6,
-      "dev": 5,
+      "used": 7,
+      "dev": 6,
       "dev_cap": 8,
       "planner": 1,
       "planner_cap": 4
@@ -809,8 +813,8 @@
     "claude": {
       "size": 10,
       "enabled": 6,
-      "used": 5,
-      "free": 1,
+      "used": 6,
+      "free": 0,
       "external": 0
     }
   },
@@ -941,7 +945,7 @@
           470
         ],
         "done": [],
-        "live": 0
+        "live": 1
       }
     ]
   }
