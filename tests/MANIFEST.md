@@ -361,7 +361,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/ores/systems/rarityTiers.test.ts` | 11 | 11 |
 | `src/features/ores/systems/rarityTripClamp.test.ts` | 5 | 5 |
 
-### `planet-mix`: 24 files, 143 tests
+### `planet-mix`: 24 files, 144 tests
 
 | File | Tests | Sites |
 | --- | --- | --- |
@@ -382,7 +382,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/planet-mix/systems/planetCard.test.ts` | 4 | 4 |
 | `src/features/planet-mix/systems/planetCardSources.test.ts` | 3 | 3 |
 | `src/features/planet-mix/systems/planetClass.test.ts` | 6 | 6 |
-| `src/features/planet-mix/systems/rarityMean.test.ts` | 4 | 4 |
+| `src/features/planet-mix/systems/rarityMean.test.ts` | 5 | 5 |
 | `src/features/planet-mix/systems/render/auroraBand.test.ts` | 3 | 3 |
 | `src/features/planet-mix/systems/render/fieldArcBuffer.test.ts` | 7 | 7 |
 | `src/features/planet-mix/systems/render/fieldArcs.test.ts` | 6 | 6 |

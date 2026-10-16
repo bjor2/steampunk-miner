@@ -1,6 +1,8 @@
 import { describe, expect, it } from 'vitest'
 import {
+  add,
   cmp,
+  div,
   fromSafeInteger,
   mul,
   sub,
@@ -14,6 +16,7 @@ import {
   mixedRowsFromPlanet,
   ORE_ROWS,
   ORE_RULES_VERSION,
+  rarityMultiplierOf,
   rarityRowSetOf,
   rarityTiers,
   rarityWeightBpOf,
@@ -103,6 +106,30 @@ describe('rarity mean value', () => {
         signatureOffset: signatureOffsetOf(band),
       })
       expect(solved).toEqual(weightsBpOf('mixed', band, signatureBp))
+    }
+  })
+
+  it('keeps every non-common tier within 650 bp of a band trip, and epic with mythic within 1500', () => {
+    // Vertical Scaler's share bounds (TD ruling on #445, section 6): nominal, a hold filled in one band.
+    for (const planetIndex of PLANETS) {
+      for (const band of BANDS) {
+        const signatureBp = signatureBpOf(planetIndex, band)
+        const set = rarityRowSetOf(planetIndex, ORE_RULES_VERSION)
+        const weights = weightsBpOf(set, band, signatureBp)
+        const total = bandMeanValueBpOf(weights, signatureBp, signatureOffsetOf(band))
+        const shareBpOf = (valueBp: Money) => div(mul(valueBp, fromSafeInteger(10000)), total)
+        const tierValues = RATED_OFFSETS.map((offset) =>
+          mul(fromSafeInteger(weights[offset]), rarityMultiplierOf(offset)),
+        )
+        const signature = mul(
+          fromSafeInteger(signatureBp),
+          rarityMultiplierOf(signatureOffsetOf(band)),
+        )
+        for (const value of [...tierValues, signature])
+          expect(cmp(shareBpOf(value), fromSafeInteger(650))).toBeLessThanOrEqual(0)
+        const epicAndMythic = add(tierValues[2], tierValues[3])
+        expect(cmp(shareBpOf(epicAndMythic), fromSafeInteger(1500))).toBeLessThanOrEqual(0)
+      }
     }
   })
 
