@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-10-16T08:36:44+02:00",
+  "updated_at": "2026-10-16T08:45:44+02:00",
   "caps": {
     "grok": 12,
     "claude": 10,
@@ -73,7 +73,7 @@
       "size": 6,
       "used": 4,
       "free": 2,
-      "claims_last_hour": 10,
+      "claims_last_hour": 8,
       "name": "Claude Max 1"
     },
     {
@@ -130,26 +130,17 @@
   "tester": {
     "state": "running",
     "phase": "fast",
-    "sha": "0335d65ee0c2ef14a3dd924f5f7f7f5187d30c7b",
-    "since": "2026-10-16T05:25:34Z",
+    "sha": "ec5ce8046734571d4f6173f24cfbf5c471169aa8",
+    "since": "2026-10-16T06:45:44Z",
     "holds_gate": true,
     "claude_slot": null,
-    "last_run": "2026-10-16T05:01:06Z",
+    "last_run": "2026-10-16T06:45:37Z",
     "last_nightly": "2026-10-15T20:43:15Z",
     "last_nightly_result": "full=FAIL balance-report=ok bench=FAIL balance-planets=ok balance-guns=ok balance-charges=ok balance-refinery=ok balance-heat=ok e2e=FAIL memory-soak=FAIL packaged-smoke=ok ",
     "main_red_sha": null,
-    "feature": 352,
-    "feature_title": "Fix red main: campaign pacing gate (planets 2 and 3 under 45 min)",
+    "feature": 354,
+    "feature_title": "Fix red main: magnetic planet pace still over GD bounds after #353 (P28/P32)",
     "queue": [
-      {
-        "feature": 354,
-        "kind": "ticket",
-        "title": "Fix red main: magnetic planet pace still over GD bounds after #353 (P28/P32)",
-        "tickets": [
-          354
-        ],
-        "since": "2026-10-13T23:59:37+02:00"
-      },
       {
         "feature": 258,
         "kind": "spec",
