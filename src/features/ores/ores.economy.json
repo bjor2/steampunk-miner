@@ -34,6 +34,24 @@
       "meanToleranceBp": "0.5",
       "tripClampShareBp": 1500,
       "tripClampTierIds": ["epic", "mythic"]
+    },
+    "kinds": {
+      "rosterMaxKinds": 15,
+      "legacy": [
+        { "slotId": "legacy.c1", "family": "metal", "rarity": "common", "window": [1, 5] },
+        { "slotId": "legacy.c2", "family": "metal", "rarity": "common", "window": [1, 2] },
+        { "slotId": "legacy.c3", "family": "metal", "rarity": "common", "window": [3, 5] },
+        { "slotId": "legacy.c4", "family": "crystal", "rarity": "common", "window": [1, 5] },
+        { "slotId": "legacy.c5", "family": "crystal", "rarity": "common", "window": [1, 5] },
+        { "slotId": "legacy.u1", "family": "metal", "rarity": "uncommon", "window": [1, 3] },
+        { "slotId": "legacy.u2", "family": "metal", "rarity": "uncommon", "window": [3, 5] },
+        { "slotId": "legacy.u3", "family": "crystal", "rarity": "uncommon", "window": [1, 2] },
+        { "slotId": "legacy.u4", "family": "crystal", "rarity": "uncommon", "window": [2, 5] },
+        { "slotId": "legacy.r1", "family": "metal", "rarity": "rare", "window": [3, 5] },
+        { "slotId": "legacy.r2", "family": "crystal", "rarity": "rare", "window": [3, 4] },
+        { "slotId": "legacy.r3", "family": "crystal", "rarity": "rare", "window": [4, 5] }
+      ],
+      "mixed": []
     }
   }
 }

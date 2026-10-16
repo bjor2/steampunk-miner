@@ -9,6 +9,8 @@
  *   weight the slice ran under 100 minutes on the seed median (#146 re-baseline).
  * - `ores.economy.json` `rarity`: the five rarity tiers, their weights and the trip clamp
  *   (`rarityRows.ts`, ticket 445). The lead rows above stay byte-identical beside it.
+ * - `ores.economy.json` `kinds`: the material kind slots per rarity row set and the roster cap
+ *   (`kindRows.ts`, ticket 446), checked against the families and the rarity weights.
  * - `oreFamilies.json`: #141's 12 families in its table order. A family's place in the list is its
  *   code in the cell's 4-bit family field, plus one (`metal` 1 and `crystal` 2, as the kernel's
  *   `RESOURCE_FAMILY` already writes them), so the order is append-only.
@@ -16,7 +18,8 @@
 import { BAND_COUNT } from '../../../systems/world/planetGeometry'
 import economyFile from '../ores.economy.json'
 import familiesFile from '../oreFamilies.json'
-import { rarityRowProblems, rarityRowsOf, type RarityRows } from './rarityRows'
+import { kindRowProblems, kindRowsOf, type KindRowContext, type KindRows } from './kindRows'
+import { rarityRowProblems, rarityRowsOf, type RarityRowSet, type RarityRows } from './rarityRows'
 
 export interface OreFamily {
   id: string
@@ -45,6 +48,7 @@ export interface OreRows {
   signatureShareCapBpByBand: Readonly<Record<string, number>>
   catalogue: CatalogueKnobs
   rarity: RarityRows
+  kinds: KindRows
 }
 
 /** The 4-bit field holds 15 families; 0 is `none`. */
@@ -68,6 +72,7 @@ export function oreRowProblems(economy: unknown, families: unknown): string[] {
     ...signatureCapProblems(ore.signatureShareCapBpByBand as Raw | undefined),
     ...catalogueProblems(ore.catalogue as Raw | undefined),
     ...rarityRowProblems(ore.rarity),
+    ...kindRowProblems(ore.kinds, kindRowContextOf(ore, families)),
   ]
 }
 
@@ -86,7 +91,35 @@ function loadOreRows(economy: typeof economyFile, families: typeof familiesFile)
     signatureShareCapBpByBand: ore.signatureShareCapBpByBand,
     catalogue: ore.catalogue,
     rarity: rarityRowsOf(ore.rarity),
+    kinds: kindRowsOf(ore.kinds),
   }
+}
+
+/** The family ids and each set's tier weights, as the kind slot guards read them. */
+function kindRowContextOf(ore: Raw, families: unknown): KindRowContext {
+  const listed = (families as Raw).families
+  const rows = Array.isArray(listed) ? (listed as Raw[]) : []
+  return {
+    familyIds: rows.map((family) => String(family.id)),
+    weightBpOf: (set, rarity, band) =>
+      tierWeightBpOf(ore.rarity as Raw | undefined, set, rarity, band),
+  }
+}
+
+/** A rated tier's weight as stored; common's is what the rated tiers leave of the band. */
+function tierWeightBpOf(rarity: Raw | undefined, set: RarityRowSet, id: string, band: number) {
+  const tiers = Array.isArray(rarity?.tiers) ? (rarity.tiers as Raw[]) : []
+  const weights = ((rarity?.weightsBpByBand ?? {}) as Raw)[set] as Raw | undefined
+  if (tiers[0]?.id === id) return BASIS_POINTS - ratedWeightBpOf(weights, band)
+  if (!tiers.some((tier) => tier.id === id)) return undefined
+  return (weights?.[id] as number[] | undefined)?.[band - 1]
+}
+
+function ratedWeightBpOf(weights: Raw | undefined, band: number): number {
+  return Object.values(weights ?? {}).reduce<number>(
+    (sum, row) => sum + ((row as number[] | undefined)?.[band - 1] ?? 0),
+    0,
+  )
 }
 
 function familyListProblems(families: unknown): string[] {

@@ -1,7 +1,8 @@
 /**
  * The ores slice's public API (feature-slices.md 2.1, #140 "Slice and contract"): the ore
  * catalogue, its tier formula, the rarity lead weights and roll, the rarity tiers with their solved
- * weights and trip clamp (ticket 445), and the families of the cell's family field. Types, pure
+ * weights and trip clamp (ticket 445), the material kind slots per rarity row set (ticket 446), and
+ * the families of the cell's family field. Types, pure
  * selectors and constants only; never React, zustand or a store. Value and hardness by tier stay
  * kernel (`oreEconomy`) and are passed through unchanged.
  */
@@ -20,6 +21,8 @@ export {
 } from './systems/oreCatalogue'
 export type { CatalogueKnobs, LeadWeights, OreFamily } from './systems/oreRows'
 export { ORE_ROWS } from './systems/oreRows'
+export type { KindRows, KindSlot } from './systems/kindRows'
+export { isSlotLiveInBand } from './systems/kindRows'
 export { leadOfCell, leadOfPatch, ORE_LEAD_HOOK_ID, oreLeadHook } from './systems/leadRoll'
 export type { RarityRowSet, RarityRows, RarityTier } from './systems/rarityRows'
 export {
