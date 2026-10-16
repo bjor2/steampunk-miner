@@ -9,6 +9,7 @@
 import { MAX_SPEED_MM_PER_SECOND } from '../../constants/balance'
 import { MM_PER_METRE, TICKS_PER_SECOND } from '../../constants/physics'
 import { planetParamsOf } from '../authority/planetOfState'
+import { scriptedGearCellsOf } from '../authority/scriptedGearCells'
 import { effectiveTravelSpeedOf } from '../authority/travelSpeed'
 import type { AuthorityState } from '../authority/authorityState'
 import { hardnessOfTile, ticksPerCell } from '../authority/groundDrill'
@@ -21,6 +22,7 @@ import type { PlanetParams } from '../world/planetParams'
 import type { TilePoint } from '../world/tileGrid'
 import { CELL_KIND, GROUND_CELL, isAirCell, isRemovableCell, kindOfCell } from '../world/worldCell'
 import { cellAt } from '../world/worldState'
+import { botPoseAt, facingTowards } from './botPose'
 
 export type BotTileKind = 'open' | 'ground' | 'ore' | 'core' | 'pad' | 'lava'
 
@@ -57,6 +59,31 @@ export function isLavaRisk(state: AuthorityState, tile: TilePoint): boolean {
   return LAVA_NEIGHBOURS.some(
     ([dx, dy]) => tileKindAt(state, { tx: tile.tx + dx, ty: tile.ty + dy }) === 'lava',
   )
+}
+
+/**
+ * #113 for a bore with drill gear (ticket 392): the bored tile, or a cell the gear cuts with it
+ * from `from`, would free lava. A side cutter's cell beside a pocket frees it as surely as the bit.
+ */
+export function isBoreLavaRisk(
+  state: AuthorityState,
+  playerId: string,
+  from: TilePoint,
+  tile: TilePoint,
+): boolean {
+  const cut = [tile, ...gearCellsOfBore(state, playerId, from, tile)]
+  return cut.some((cell) => isLavaRisk(state, cell))
+}
+
+/** The gear's cells of a bore of `tile` from `from`, as the authority will cut them. */
+function gearCellsOfBore(
+  state: AuthorityState,
+  playerId: string,
+  from: TilePoint,
+  tile: TilePoint,
+): TilePoint[] {
+  const pose = botPoseAt(from, facingTowards(from, tile))
+  return scriptedGearCellsOf(state, playerId, { tile, pose })
 }
 
 export function isInsideWorld(state: AuthorityState, tile: TilePoint): boolean {

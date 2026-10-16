@@ -723,7 +723,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/authority/refinery/refineryFacility.test.ts` | 2 | 2 |
 | `src/systems/authority/refinery/refineryRules.test.ts` | 15 | 15 |
 | `src/systems/authority/refinery/refinerySlots.test.ts` | 4 | 4 |
-| `src/systems/authority/scriptedDrillGear.test.ts` | 7 | 7 |
+| `src/systems/authority/scriptedDrillGear.test.ts` | 9 | 9 |
 | `src/systems/authority/sellCoins.test.ts` | 8 | 8 |
 | `src/systems/authority/sensingQueries.test.ts` | 10 | 10 |
 | `src/systems/authority/serviceReserve.test.ts` | 4 | 4 |
@@ -760,6 +760,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/bot/botCoreGalleries.test.ts` | 3 | 2 |
 | `src/systems/bot/botCoreRule.test.ts` | 7 | 7 |
 | `src/systems/bot/botDeathReplay.test.ts` | 8 | 8 |
+| `src/systems/bot/botGearLava.test.ts` | 3 | 3 |
 | `src/systems/bot/botGuns.test.ts` | 4 | 4 |
 | `src/systems/bot/botHeat.test.ts` | 9 | 9 |
 | `src/systems/bot/botMoneyLint.test.ts` | 6 | 3 |

@@ -8,7 +8,7 @@
 import { MM_PER_METRE, UP_VECTOR_SCALE } from '../../constants/physics'
 import type { CommandIntent } from '../authority/authorityCommand'
 import { driveOfFacing } from '../vehicle/driveSigns'
-import { FACING, type Facing } from '../vehicle/vehiclePose'
+import { FACING, type Facing, type VehiclePose } from '../vehicle/vehiclePose'
 import type { TilePoint } from '../world/tileGrid'
 
 export interface ActionTicks {
@@ -27,13 +27,7 @@ export function reportPoseIntent(
   return {
     type: 'reportPose',
     payload: {
-      x: tile.tx * MM_PER_METRE + MM_PER_METRE / 2,
-      y: tile.ty * MM_PER_METRE + MM_PER_METRE / 2,
-      vx: 0,
-      vy: 0,
-      upx: 0,
-      upy: UP_VECTOR_SCALE,
-      facing,
+      ...botPoseAt(tile, facing),
       driving: false,
       thrusting: false,
       drilling: ticks.drillTicks > 0,
@@ -47,4 +41,17 @@ export function facingTowards(from: TilePoint, to: TilePoint): Facing {
   if (to.tx > from.tx) return FACING.right
   if (to.tx < from.tx) return FACING.left
   return to.ty < from.ty ? FACING.down : FACING.up
+}
+
+/** The pose a report from `tile` facing `facing` gives the vehicle: the tile centre, upright, still. */
+export function botPoseAt(tile: TilePoint, facing: Facing): VehiclePose {
+  return {
+    x: tile.tx * MM_PER_METRE + MM_PER_METRE / 2,
+    y: tile.ty * MM_PER_METRE + MM_PER_METRE / 2,
+    vx: 0,
+    vy: 0,
+    upx: 0,
+    upy: UP_VECTOR_SCALE,
+    facing,
+  }
 }

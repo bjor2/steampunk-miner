@@ -3,8 +3,9 @@
  * stands for the ticks the #7 drill rule gives, at the drill power the heat gauge leaves (#113),
  * and bore on while the gauge's throttle left the tile standing; a tile worth a blasting charge
  * (#109, `botCharges.ts`) is blasted open instead, and one met with an empty rack makes the next
- * Upgrade bay visit buy charges (#129). A tile that would free lava, or
- * the bot's tip cannot scratch, is `blocked`; one the tank cannot afford with the way home, `short`.
+ * Upgrade bay visit buy charges (#129). A tile whose bore would free lava (its drill gear's cells
+ * counted, ticket 392), or the bot's tip cannot scratch, is `blocked`; one the tank cannot afford
+ * with the way home, `short`.
  * A cell a gate leaves standing is `blocked` before any bore (#142 acceptance 8), and a dynamite
  * shell is blasted open with a charge that frees it, or `blocked` until it carries one (#142
  * acceptance 9, `botCharges.ts`). A wall its own extractor opens is touched and waited out, then
@@ -25,7 +26,7 @@ import {
   type BotPlanet,
 } from './botPilot'
 import type { BotSession } from './botSession'
-import { boreTicks, cellOfTile, isLavaRisk, tileKindAt } from './botWorld'
+import { boreTicks, cellOfTile, isBoreLavaRisk, isLavaRisk, tileKindAt } from './botWorld'
 
 /** Opening a tile: done, impossible for this tip or for the lava, or too dear for the tank. */
 export type OpenOutcome = 'opened' | 'blocked' | 'short'
@@ -50,7 +51,9 @@ export function openTile(session: BotSession, planet: BotPlanet, tile: TilePoint
 
 /** Bores a neighbouring tile without moving; nothing happens unless it is `opened`. */
 export function boreInPlace(session: BotSession, planet: BotPlanet, tile: TilePoint): OpenOutcome {
-  if (isLavaRisk(session.state(), tile)) return 'blocked'
+  if (isBoreLavaRisk(session.state(), session.playerId, planet.pilot.position, tile)) {
+    return 'blocked'
+  }
   for (let attempt = 0; attempt <= MAX_REBORES; attempt++) {
     const bored = boreOnce(session, planet, tile)
     if (bored !== 'opened' || tileKindAt(session.state(), tile) === 'open') return bored

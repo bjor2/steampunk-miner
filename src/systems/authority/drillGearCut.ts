@@ -57,6 +57,7 @@ import {
 import { cellStampOf, drillGearCellsAt } from '../vehicle/drillGearCells'
 import { driveOfFacing } from '../vehicle/driveSigns'
 import { latchFacedSide, type SideLatch } from '../vehicle/facedSide'
+import type { VehiclePose } from '../vehicle/vehiclePose'
 import { ENERGY_QUANTA_PER_TICK } from '../vehicle/energyQuanta'
 import {
   carveCell,
@@ -149,7 +150,11 @@ export function carveCellWithGear(
 /** The bored cell as the gear reads it, from the last reported pose; null before any report. */
 function cellBitOf(state: AuthorityState, playerId: string, tile: TilePoint): DrillBit | null {
   const { pose } = vehicleOf(state, playerId)
-  if (pose === null) return null
+  return pose === null ? null : cellBitAt(pose, tile)
+}
+
+/** The bored cell as the gear reads it from `pose`: its facing aims it, with the push it stands for. */
+export function cellBitAt(pose: VehiclePose, tile: TilePoint): DrillBit {
   return { pose, disc: cellStampOf(tile), drive: driveOfFacing(pose.facing) }
 }
 

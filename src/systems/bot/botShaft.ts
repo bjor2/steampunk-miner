@@ -1,8 +1,9 @@
 /**
  * The bot's shaft (#29): travelling it, and boring it deeper. On a heat planet the next tile down
- * may free a lava pocket (#113), and from planet 5 it may be a gated wall nothing the bot carries
- * or buys opens, an extractor's cell or a drill-gated signature (ticket 237: #142 acceptance 8 has
- * the bot skip those, and the GD ruling keeps extractor cells optional until 148d). The shaft then
+ * may free a lava pocket (#113), or a cell its drill gear cuts with it may (ticket 392), and from
+ * planet 5 it may be a gated wall nothing the bot carries or buys opens, an extractor's cell or a
+ * drill-gated signature (ticket 237: #142 acceptance 8 has the bot skip those, and the GD ruling
+ * keeps extractor cells optional until 148d). The shaft then
  * steps sideways to the nearest clear column (east first) along its bottom row, or failing that
  * along one of the few open rows just above it, and carries on down there, the jog remembered in
  * the layout. A wall with no clear column beside it is noted as `gate_blocked_no_route`.
@@ -14,7 +15,7 @@ import { isTooHotToDig } from './botHeat'
 import { moveStraight, type BotPlanet } from './botPilot'
 import type { BotSession } from './botSession'
 import { openRouteTile } from './gateRouteBlocks'
-import { isLavaRisk } from './botWorld'
+import { isBoreLavaRisk } from './botWorld'
 import { shaftColumnAt, shaftTileAt, shaftWaypoints, type MineLayout } from './mineLayout'
 
 /** How far either side the shaft looks for a clear column. */
@@ -55,7 +56,12 @@ export function boreShaftDownTo(session: BotSession, planet: BotPlanet, row: num
 
 /** Jogs off a stop under the shaft; a failed jog leaves it there for the open to refuse and note. */
 function stepRoundStopBelow(session: BotSession, planet: BotPlanet): void {
-  if (isShaftStop(session, tileBelowShaft(planet.layout))) jogShaft(session, planet)
+  if (isShaftStop(session, boreBelowShaft(planet.layout))) jogShaft(session, planet)
+}
+
+/** The next bore down: the tile under the shaft, from its open bottom. */
+function boreBelowShaft(layout: MineLayout): ShaftBore {
+  return { from: shaftTileAt(layout, layout.shaftBottomRow), tile: tileBelowShaft(layout) }
 }
 
 function tileBelowShaft(layout: MineLayout): TilePoint {
@@ -114,19 +120,39 @@ function clearColumnNear(session: BotSession, layout: MineLayout, row: number): 
 
 /** The way along the row and the new column's tiles below its end hold no stop. */
 function isClearJog(session: BotSession, from: number, to: number, row: number): boolean {
-  return [...tilesAlong(from, to, row), ...columnBelow(to, row)].every(
-    (tile) => !isShaftStop(session, tile),
+  return [...boresAlong(from, to, row), ...boresBelow(to, row)].every(
+    (bore) => !isShaftStop(session, bore),
   )
 }
 
-/** A tile the shaft steps round: one that would free lava, or a wall no means of the bot opens. */
-function isShaftStop(session: BotSession, tile: TilePoint): boolean {
-  return isLavaRisk(session.state(), tile) || isWallNoMeansOpen(drillGateAt(session, tile))
+/** A tile the shaft bores, and the tile the bot bores it from. */
+interface ShaftBore {
+  from: TilePoint
+  tile: TilePoint
 }
 
-/** The `JOG_CLEAR_ROWS` tiles of `column` under `row`. */
-function columnBelow(column: number, row: number): TilePoint[] {
-  return Array.from({ length: JOG_CLEAR_ROWS }, (_, at) => ({ tx: column, ty: row - 1 - at }))
+/**
+ * A bore the shaft steps round: one that would free lava, its drill gear's cells counted (ticket
+ * 392), or a wall no means of the bot opens.
+ */
+function isShaftStop(session: BotSession, { from, tile }: ShaftBore): boolean {
+  const state = session.state()
+  if (isBoreLavaRisk(state, session.playerId, from, tile)) return true
+  return isWallNoMeansOpen(drillGateAt(session, tile))
+}
+
+/** The bores along `row` from `from` to `to`, each from the tile before it. */
+function boresAlong(from: number, to: number, row: number): ShaftBore[] {
+  const tiles = tilesAlong(from, to, row)
+  return tiles.map((tile, at) => ({ from: at === 0 ? { tx: from, ty: row } : tiles[at - 1], tile }))
+}
+
+/** The `JOG_CLEAR_ROWS` bores down `column` under `row`, each from the tile above it. */
+function boresBelow(column: number, row: number): ShaftBore[] {
+  return Array.from({ length: JOG_CLEAR_ROWS }, (_, at) => ({
+    from: { tx: column, ty: row - at },
+    tile: { tx: column, ty: row - 1 - at },
+  }))
 }
 
 /** The tiles after `from` up to and including `to` along `row`. */

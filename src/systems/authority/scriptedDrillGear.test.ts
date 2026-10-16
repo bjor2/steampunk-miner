@@ -12,6 +12,7 @@ import { CELL_KIND, kindOfCell } from '../world/worldCell'
 import { EMPTY_WORLD, materialCellAt, type WorldState } from '../world/worldState'
 import { ticksPerCell } from './groundDrill'
 import { heatThrottledDrill } from './heatRules'
+import { scriptedGearCellsOf } from './scriptedGearCells'
 import { createScriptedSession, drill, PARAMS, poseAbove, surfaceOreTiles } from './scriptedSession'
 import { stateDigest } from './stateDigest'
 
@@ -159,5 +160,34 @@ describe('scripted mining with drill gear (ticket 392)', () => {
     const twin = boreWith([gearSlice({ aheadCells: 1, aheadAim: 'drive' })])
     expect(twin.events).toEqual(bare.events)
     expect(twin.spent).toBe(bare.spent)
+  })
+})
+
+/** The gear's cells of the bot's bore, read before the `drillTile`, from the report facing it. */
+function gearCellsOfBoreWith(slices: readonly SliceDefinition[], bore: Bore = DOWN_INTO_TARGET) {
+  return withRegistrations(slices, () => {
+    const session = createScriptedSession()
+    const standing = standingTileOf(bore)
+    session.submit(1, poseAbove({ tx: standing.tx, ty: standing.ty - 1 }, bore.facing))
+    const { pose } = session.vehicle()
+    if (pose === null) throw new Error('the report left no pose')
+    return scriptedGearCellsOf(session.state(), 'p1', { tile: bore.target, pose })
+  })
+}
+
+const byPlace = (a: TilePoint, b: TilePoint) => a.tx - b.tx || a.ty - b.ty
+
+describe('scripted mining: the gear cells read before a bore (ticket 392)', () => {
+  it('lists the cells the bore then cuts beside its tile, ahead and side', () => {
+    const gear = [gearSlice({ aheadCells: 1, sideCells: 1, sideEnergyShareBp: 10_000 })]
+    const cells = gearCellsOfBoreWith(gear)
+    expect([...cells].sort(byPlace)).toEqual([LEFT, BELOW, RIGHT].sort(byPlace))
+    const bored = boreWith(gear)
+    expect(cells.map((tile) => densityOf(bored.world, tile))).toEqual([0, 0, 0])
+  })
+
+  it('lists no cell without drill gear', () => {
+    expect(gearCellsOfBoreWith([])).toEqual([])
+    expect(gearCellsOfBoreWith([gearSlice(null)])).toEqual([])
   })
 })
