@@ -38,14 +38,14 @@ beforeEach(() => {
 
 afterEach(() => uninstallRunLog())
 
-function createLiveVehicle(options: VehicleControllerOptions = {}) {
+function createLiveVehicle(options: VehicleControllerOptions = {}, flags?: DevFlags) {
   const world = new RAPIER.World({ x: 0, y: 0, z: 0 })
   world.timestep = PHYSICS_TIMESTEP
   const start = readLocalVehicle().pose
   if (start === null) throw new Error('the starting planet has no dock')
   const placed = createVehicleBody(RAPIER, world, start)
   const controller = createVehicleController(RAPIER, world, placed, options)
-  const loop = createVehicleLoop()
+  const loop = createVehicleLoop(flags)
   const origins = new Set<string>()
   return {
     controller,
@@ -130,6 +130,17 @@ function playGroundHandOvers(flags: DevFlags): GroundHandOver[] {
 }
 
 const destroyedTiles = () => sink.events.filter((event) => event.event === 'tile_destroyed')
+
+/** The facing each command of `type` carried, by the tick it was sent. */
+function facingsSent(type: 'drillStep' | 'reportPose'): Map<number, number> {
+  const sent = sink.commands.filter((command) => command.type === type)
+  return new Map(sent.map(({ tick, payload }) => [tick, (payload as { facing: number }).facing]))
+}
+
+/** The first tick a command of `type` carried `facing`, or undefined. */
+function firstTickFacing(facings: Map<number, number>, facing: number): number | undefined {
+  return [...facings].find(([, sent]) => sent === facing)?.[0]
+}
 
 describe('vehicle loop', () => {
   it('drives off the pad and digs straight down, charging energy through pose reports', () => {
@@ -230,5 +241,28 @@ describe('vehicle loop, the ground the substeps meet (ticket 459)', () => {
     const handOvers = playGroundHandOvers({ 'drill.sweptCut': false })
     expect(handOvers.some((tick) => tick.isDrilling)).toBe(true)
     expect(handOvers.filter((tick) => tick.substepsGot !== null)).toEqual([])
+  })
+})
+
+describe('vehicle loop, the drill step (ticket 506)', () => {
+  it('sends no drillStep with drill.sweptCut off', () => {
+    const vehicle = createLiveVehicle()
+    vehicle.hold(buildIntent(['aim_left']), 2)
+    vehicle.hold(buildIntent(['aim_down']), 3)
+    expect(destroyedTiles().length).toBeGreaterThan(0)
+    expect(facingsSent('drillStep').size).toBe(0)
+  })
+
+  it("sends each drill step with the head's facing, no later than the pose report carries it", () => {
+    const vehicle = createLiveVehicle({}, { 'drill.sweptCut': true })
+    vehicle.hold(buildIntent(['aim_left']), 2)
+    vehicle.hold(buildIntent(['aim_down']), 3)
+    const steps = facingsSent('drillStep')
+    const reports = facingsSent('reportPose')
+    const turnedDown = firstTickFacing(steps, FACING.down) ?? Infinity
+    expect(turnedDown).toBeLessThanOrEqual(firstTickFacing(reports, FACING.down) ?? Infinity)
+    const sameTick = [...steps].filter(([tick]) => reports.has(tick))
+    expect(sameTick.length).toBeGreaterThan(0)
+    expect(sameTick.filter(([tick, facing]) => reports.get(tick) !== facing)).toEqual([])
   })
 })
