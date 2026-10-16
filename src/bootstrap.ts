@@ -74,6 +74,7 @@ export async function startGame(): Promise<void> {
   await adoptLocalPreferences(shell)
   keepScreenFitted(shell)
   showTouchControlsOnTouch(shell)
+  holdPlayWhilePageHidden(shell)
   keepHapticsPlaying(shell)
   shell.onKeyChange(routeKeyChange)
   shell.onScrollNotch(routeScrollNotch)
@@ -143,6 +144,15 @@ function keepRunFilesWritten(shell: Shell, run: RunFiles): void {
     reportFailure(writeRunSummary(shell, run.runId, run.summary.summarize()))
     writeMetadata(shell, run)
   })
+}
+
+/**
+ * A phone's app switch or a background tab stands the step still until the player is back and
+ * taps or presses (#470 P1-1, ticket 472): rAF already stops while hidden, but the first frame
+ * back would otherwise run straight into a live enemy.
+ */
+function holdPlayWhilePageHidden(shell: Shell): void {
+  shell.onPageHide(() => useGameStore.getState().holdLiveStepWhilePageHidden())
 }
 
 function saveFolderOf(shell: Shell): SaveFolder {

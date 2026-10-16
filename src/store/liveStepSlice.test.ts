@@ -127,6 +127,38 @@ describe('live step: debug pause', () => {
   })
 })
 
+describe('live step: page hidden (ticket 472)', () => {
+  it('holds a running step while the page is hidden and resumes it on a tap', () => {
+    game().holdLiveStepWhilePageHidden()
+    expect(isHeld()).toBe(true)
+    game().resumeLiveStepOnTap()
+    expect(isHeld()).toBe(false)
+  })
+
+  it('resumes on a key or an action press, as play does', () => {
+    game().holdLiveStepWhilePageHidden()
+    pressKey('KeyQ')
+    expect(isHeld()).toBe(false)
+    game().holdLiveStepWhilePageHidden()
+    pressAction('lift')
+    expect(isHeld()).toBe(false)
+  })
+
+  it('leaves a debug pause paused, through the hide and the tap', () => {
+    game().pauseLiveStep()
+    game().holdLiveStepWhilePageHidden()
+    game().resumeLiveStepOnTap()
+    expect(game().liveStepHold).toBe('paused')
+  })
+
+  it('leaves a scenario waiting for play until play, not a tap', () => {
+    game().applyScenario(PLANET_1_START)
+    game().holdLiveStepWhilePageHidden()
+    game().resumeLiveStepOnTap()
+    expect(game().liveStepHold).toBe('awaitingPlay')
+  })
+})
+
 describe('live step: debug steps', () => {
   it('logs the steps as a debug command and starts a scenario waiting for play', () => {
     game().applyScenario(PLANET_1_START)
