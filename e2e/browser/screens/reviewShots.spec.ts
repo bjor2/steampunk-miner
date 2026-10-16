@@ -8,10 +8,12 @@
  * over both, the yard and the car left on the Works' turntable. The workshop redo (#177) holds a
  * drill power chain for its shot. The chips (#178) and tech tree (#165) are not built yet, so the
  * set shoots a dig and the settings screen in their places; each ticket swaps its shot in when it
- * lands.
+ * lands. The portrait cells shoot the same set held upright (ticket 488), and `rotated` turned
+ * sideways mid-dig with no reload.
  */
 import { expect, test, type Page } from '@playwright/test'
-import { currentCell, dockAt, openGame, renderStats } from './screenHelpers'
+import type { ScreenCell } from './screenCells'
+import { currentCell, dockAt, openGame, renderStats, startDiggingDown } from './screenHelpers'
 import { VIEW_SHORT_AXIS_DEFAULT_M, VIEW_SHORT_AXIS_MAX_M } from '../../../src/constants/scene'
 
 const JPEG_QUALITY = 80
@@ -19,18 +21,14 @@ const JPEG_QUALITY = 80
 const GROUND_SETTLE_MS = 3000
 /** The buildings' atlases are uploaded once the renderer's texture count holds for this long. */
 const ART_SETTLE_MS = 3000
+/** Held upright, the share of the height down to open ground, above the stick zone's 45%. */
+const UPRIGHT_TAP_HEIGHT_SHARE = 0.4
 
 test.describe('screen matrix: review shots (#173)', () => {
   test('writes the look set for this screen', async ({ page }) => {
     test.setTimeout(600_000)
     const cell = currentCell()
     const errors = await openGame(page, cell)
-    // Ticket 483 retired the turn-your-device card; the portrait set is PT-6's (ticket 488).
-    if (cell.isPortrait) {
-      await waitForGround(page)
-      await shoot(page, 'portrait-open')
-      return expect(errors).toEqual([])
-    }
     await page.evaluate(() => window.steampunkDebug!.ui.setRenderScale(1))
     await dismissTransmission(page)
     await waitForGround(page)
@@ -46,6 +44,7 @@ test.describe('screen matrix: review shots (#173)', () => {
     await page.getByTestId('platform-settings').click()
     await expect(page.getByTestId('settings-panel')).toBeVisible()
     await shoot(page, 'settings')
+    if (cell.isPortrait) await shootTurnedMidDig(page)
     expect(errors).toEqual([])
   })
 })
@@ -71,7 +70,30 @@ async function holdMidChain(page: Page): Promise<void> {
 /** Any key takes the opening transmission down; on touch, a tap brings the controls back. */
 async function dismissTransmission(page: Page): Promise<void> {
   await page.keyboard.press('KeyX')
-  if (currentCell().isTouch) await page.touchscreen.tap(currentCell().viewport.width / 2, 20)
+  if (currentCell().isTouch) await page.touchscreen.tap(...controlsTapPointOf(currentCell()))
+}
+
+/**
+ * The top edge's middle sideways. Held upright the top is the compact HUD's rows, whose boxes open
+ * a card on a tap, so the tap lands on the ground above the stick zone instead.
+ */
+function controlsTapPointOf(cell: ScreenCell): [number, number] {
+  const upright: [number, number] = [
+    cell.viewport.width / 2,
+    cell.viewport.height * UPRIGHT_TAP_HEIGHT_SHARE,
+  ]
+  return cell.isPortrait ? upright : [cell.viewport.width / 2, 20]
+}
+
+/** Upright, then turned sideways mid-dig with no reload (ticket 488): the game laid out again. */
+async function shootTurnedMidDig(page: Page): Promise<void> {
+  const { width, height } = currentCell().viewport
+  await page.evaluate(() => window.steampunkDebug!.input.tap('ui_cancel'))
+  await startDiggingDown(page)
+  await page.setViewportSize({ width: height, height: width })
+  await waitForGround(page)
+  await shoot(page, 'rotated')
+  await page.evaluate(() => window.steampunkDebug!.input.release('aim_down'))
 }
 
 /** Both buildings in view (#175): zoomed out, the car left on the Works' turntable. */

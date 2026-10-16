@@ -42,6 +42,6 @@ nearest screen:
 | `workshop.jpg` | the Upgrade bay screen                                                              | the workshop mid-chain (#177) |
 | `settings.jpg` | the settings screen, stand-in for a big menu                                        | the tech tree (#165)          |
 
-The portrait cells (ticket 484 added `pixel-portrait` and `tablet-portrait`) write only
-`portrait-open.jpg`, the game as it opens held upright, until PT-6 (ticket 488) brings the
-portrait set; ticket 483 retired the turn-your-device card.
+The portrait cells (`phone-portrait`, `pixel-portrait`, `tablet-portrait`) shoot the same four
+held upright (ticket 488), plus `rotated.jpg`: the game turned sideways mid-dig with no reload.
+They are Chromium emulation (`isMobile`, `hasTouch`), not shots from a device.

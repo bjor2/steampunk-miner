@@ -901,6 +901,18 @@ programs }` from three's `renderer.info` of the game canvas), read only when cal
   zooms it within 1 to 2 times, and a tapped node opens a bottom sheet that Close takes down
   (real touches through CDP). The ordering and pinch maths are pinned in node
   (`treeList.test.ts`, `mapGestures.test.ts`). Box Tester only.
+- **Portrait matrix and rotation** (ticket 488, spec #470): `e2e/browser/screens/portraitMatrix.spec.ts`
+  runs in the matrix's portrait cells (390x844, 412x915, 820x1180) and skips elsewhere: no
+  turn-your-device card, no two `data-hud` boxes over each other, and every touch control inside
+  the safe area, off the other controls and off the HUD, as the game opens, sampled through a dig
+  with the ticks advancing, and docked at each bay. `screenLayout.spec.ts` runs its canvas, focus
+  ring and ground rows upright too (pixels per metre are the height over the view either way up,
+  ticket 484); its text-size and 56 px rows stay sideways, as held upright `portraitPanels` judges
+  the panels. `rotation.spec.ts` turns every touch cell the other way up and back with no reload:
+  at rest, and mid-dig, where the rig keeps digging the same session and the same layout rows hold
+  each way up. The review set (`reviewShots.spec.ts`) shoots the portrait cells' dock, dig,
+  workshop and settings upright, and `rotated` turned sideways mid-dig. Emulation only (Chromium
+  with `isMobile`/`hasTouch`), no on-device claim. Box Tester only.
 - **Drill-down run** (ticket 416): `e2e/browser/drillDown.spec.ts` holds the real Down key for 10 s
   on the P1 surface from `scenarios/drill-down-start.scenario.json`, at stored drill_power steps 1
   (the save's), 5, 10, 15 and 20 (`debug.setUpgrade`, ticket 434), and writes one row per run (start and end position, depth gained, cells/s,

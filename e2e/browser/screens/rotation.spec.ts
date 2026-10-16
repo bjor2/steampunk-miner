@@ -3,14 +3,25 @@
  * screen the game plays either way up. Turning the device with the simulation running, with no
  * reload, lays the stage out again over the whole window, flips the root's `data-orientation`,
  * keeps the safe area inside the window, and the ticks keep advancing. No card covers portrait.
- * The portrait matrix rows (sizes, overlap, controls) are PT-6's (ticket 488).
+ * Turned mid-dig (#470 PT-6, ticket 488), the rig keeps digging down the same session each way up
+ * and the matrix's layout rows hold: no card, the HUD apart, every control in the safe area. The
+ * upright rows at rest are `portraitMatrix.spec.ts`.
  */
 import { expect, test, type Page } from '@playwright/test'
 import type { ScreenCell } from './screenCells'
-import { boxOf, currentCell, openGame } from './screenHelpers'
+import {
+  boxOf,
+  currentCell,
+  layoutFindingsOf,
+  NO_LAYOUT_FINDINGS,
+  openGame,
+  startDiggingDown,
+} from './screenHelpers'
 
 /** A rounding pixel in the browser's layout. */
 const SLACK_PX = 1
+/** Half a cell further down: the drill is still cutting, not resting on the face. */
+const DUG_MM = 500
 
 test.beforeEach(() => {
   test.skip(!currentCell().isTouch, 'only a phone or tablet is turned in the hand')
@@ -32,6 +43,28 @@ test.describe('screen matrix: rotation (ticket 483)', () => {
     await page.setViewportSize(cell.viewport)
     await expectFittedTo(page, cell.viewport, cell.isPortrait)
     await expectTicksAdvancing(page)
+    expect(await page.evaluate(() => 'rotationMarker' in window)).toBe(true)
+    expect(errors).toEqual([])
+  })
+
+  test('keeps the rig digging and the layout in place when turned mid-dig, with no reload (ticket 488)', async ({
+    page,
+  }) => {
+    test.setTimeout(300_000)
+    const cell = currentCell()
+    const errors = await openGame(page, cell)
+    await page.evaluate(() => Object.assign(window, { rotationMarker: true }))
+    await startDiggingDown(page)
+    for (const viewport of [turned(cell.viewport), cell.viewport]) {
+      const before = await rigCentreDistanceMm(page)
+      await page.setViewportSize(viewport)
+      await expectFittedTo(page, viewport, viewport.height > viewport.width)
+      await expect.poll(() => layoutFindingsOf(page)).toEqual(NO_LAYOUT_FINDINGS)
+      await expect
+        .poll(() => rigCentreDistanceMm(page), { timeout: 30_000 })
+        .toBeLessThan(before - DUG_MM)
+    }
+    await page.evaluate(() => window.steampunkDebug!.input.release('aim_down'))
     expect(await page.evaluate(() => 'rotationMarker' in window)).toBe(true)
     expect(errors).toEqual([])
   })
@@ -85,6 +118,18 @@ function tickNow(page: Page): Promise<number> {
   return page.evaluate(() => {
     const result = window.steampunkDebug!.snapshot()
     return result.ok ? result.snapshot.tick : -1
+  })
+}
+
+/** The rig's distance from the planet's centre (the origin), mm: falls as it digs down. */
+function rigCentreDistanceMm(page: Page): Promise<number> {
+  return page.evaluate(() => {
+    const result = window.steampunkDebug!.snapshot()
+    if (!result.ok) throw new Error(result.problems.join('; '))
+    const [player] = Object.values(result.snapshot.state.players)
+    const pose = player.vehicle.pose
+    if (pose === null) throw new Error('the vehicle has no pose')
+    return Math.hypot(pose.x, pose.y)
   })
 }
 
