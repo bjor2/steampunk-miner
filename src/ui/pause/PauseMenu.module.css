@@ -72,3 +72,8 @@
 .notice {
   margin: var(--space-1) 0;
 }
+
+/* A phone held upright (#470 PT-5): 90% of the width is the plate's whole width, padding included. */
+:global([data-orientation='portrait'][data-hud-density='compact']) .plate {
+  box-sizing: border-box;
+}

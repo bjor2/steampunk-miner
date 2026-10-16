@@ -1,6 +1,7 @@
 .anchor {
   position: absolute;
-  top: calc(var(--tv-safe-y) + var(--space-3));
+  /* Below the notch held upright as well as TV mode's overscan (ticket 483's mirror). */
+  top: calc(var(--safe-top) + var(--space-3));
   left: 50%;
   transform: translateX(-50%);
   max-width: 30rem;

@@ -9,6 +9,12 @@
   pointer-events: auto;
 }
 
+/* The shared scroll area (build #423) bounds the cards; it owns the overflow and the rail. */
+.scroll {
+  max-height: 70vh;
+  max-height: 70dvh;
+}
+
 .cards {
   display: grid;
   grid-template-columns: repeat(3, minmax(10rem, 16rem));
@@ -37,4 +43,9 @@
 .summary {
   flex: 1;
   margin: 0;
+}
+
+/* A phone held upright (#470 PT-5): three cards side by side need 480 px; they stand in a column. */
+:global([data-orientation='portrait'][data-hud-density='compact']) .cards {
+  grid-template-columns: 1fr;
 }

@@ -7,7 +7,9 @@
   align-items: center;
   justify-content: center;
   gap: var(--space-3);
-  padding: calc(var(--tv-safe-y) + var(--space-3)) calc(var(--tv-safe-x) + var(--space-3));
+  /* Inside the notch and home bar as well as TV mode's overscan (ticket 483's mirrors). */
+  padding: calc(var(--safe-top) + var(--space-3)) calc(var(--safe-right) + var(--space-3))
+    calc(var(--safe-bottom) + var(--space-3)) calc(var(--safe-left) + var(--space-3));
   background: rgb(27 22 19 / 0.82);
   font-family: var(--font-body);
   pointer-events: auto;
@@ -22,7 +24,8 @@
 .screen h1 {
   margin: 0;
   color: var(--color-brass);
-  font-size: calc(2.6rem * var(--ui-scale));
+  /* A phone held upright (#470 PT-5) is narrower than the name's longest word at full size. */
+  font-size: min(calc(2.6rem * var(--ui-scale)), 9vw);
   letter-spacing: 0.12em;
   text-transform: uppercase;
   text-shadow: 0 2px 0 var(--color-copper);
@@ -70,4 +73,9 @@
 
 .problems li::before {
   content: '! ';
+}
+
+/* A phone held upright (#470 PT-5): 90% of the width is the plate's whole width, padding included. */
+:global([data-orientation='portrait'][data-hud-density='compact']) .plate {
+  box-sizing: border-box;
 }

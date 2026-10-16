@@ -1,11 +1,13 @@
 /**
  * The artefact cache's three cards drawn from their view model (#46 Choice UI): name, one line and
  * Choose on each, then "Leave it". Each is the kernel item card once a describer answers, its
- * flavour and stat lines in place of the summary (K7 #199). Markup only.
+ * flavour and stat lines in place of the summary (K7 #199). On a phone held upright the cards
+ * stand in one column and scroll in the shared scroll area (#470 PT-5). Markup only.
  */
 import type { ArtefactCard, ArtefactChoiceModel } from '../../systems/views/artefactChoiceModel'
 import { ItemCard } from '../kit/ItemCard'
 import { Panel } from '../kit/Panel'
+import { ScrollArea } from '../kit/ScrollArea'
 import { UI_ID_TEMPLATES, UI_IDS } from '../ids'
 import { ScreenButtonView } from '../ScreenButtonView'
 import { VectorIcon } from '../VectorIcon'
@@ -21,11 +23,13 @@ export function ArtefactChoiceView({
   return (
     <div className={styles.overlay} data-testid={UI_IDS.artefactChoice}>
       <Panel title={model.title} iconId={model.titleIconId}>
-        <div className={styles.cards}>
-          {model.cards.map((card) => (
-            <CardView key={card.optionId} card={card} focusedId={focusedId} />
-          ))}
-        </div>
+        <ScrollArea className={styles.scroll}>
+          <div className={styles.cards}>
+            {model.cards.map((card) => (
+              <CardView key={card.optionId} card={card} focusedId={focusedId} />
+            ))}
+          </div>
+        </ScrollArea>
         <ScreenButtonView button={model.leave} focusedId={focusedId} />
       </Panel>
     </div>
