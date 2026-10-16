@@ -256,7 +256,18 @@ programs }` from three's `renderer.info` of the game canvas), read only when cal
   (swivel, stale facing, first cell, held, second stall: `systems/vehicle/cutStartBreakdown.ts`)
   and the stale facing for each pose report phase, and writes them to
   `balance-report/cut-start-latency.ndjson`. A lane (about 40 s), so it runs only when named; it
-  fails only when a start opens no cell or the two frame rates differ.
+  fails only when a start opens no cell or the two frame rates differ. Its rig and script are
+  `src/physics/cutStartFixtures.ts`.
+- **Drill start and turn latency** (ticket 504, measurement only):
+  `src/physics/drillTurnLatency.lane.test.ts` drives #433's rig and script at stored drill_power
+  1, 10 and 20 and 30 and 144 frames/s: rig 1 (#400)'s mid-shaft start with the press moved over
+  the 12 pose report phases (and the report the cut gate waited for), the starts from rest, a
+  drive turned into a cut and a cut turned into the shaft wall on each report phase. It prints each
+  start's breakdown and each set's min / mean / max in ticks, seconds and pixels of lost travel at
+  the 12 m view (90 px/m at 1080p, 70 at 390x844), and writes them to
+  `balance-report/drill-turn-latency.ndjson`; the latency targets are `it.todo`s with an open
+  owner. A lane (about 2.5 min), so it runs only when named; it fails only when a start opens no
+  cell or the frame rates differ on a start from rest or on a drive turn's report phase.
 - **Fast-rig body speed** (ticket 440, measurement only): `src/physics/fastRigBodySpeed.lane.test.ts`
   plays #400's down leg in the live loop with `drill.sweptCut` on, at stored drill_power/tip
   250/600, 300/200 (#400's rig 1), 320/600, 330/600 and 350/600, at 30 and 144 frames/s, and traces
