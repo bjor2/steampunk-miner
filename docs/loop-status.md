@@ -490,6 +490,7 @@ read 1.2, not 0.7. Interval stays 1. The loop had no "bench on idle" concept: wo
 `npm run bench:<name>` probes after a whole spec closes, with workers alive (and its regex does not match `bench:report-pose`).
 
 What exists now:
+
 - `quiet-bench.sh <ticket>` in the loop dir. It writes `.quiet-hold` (expiry epoch + owner), waits until the 1-min load stays below 2.0 for
   9 samples 20 s apart (max 60 min), checks out the tip of `ticket/<n>` in a throwaway `worktrees/wt-bench` (node_modules symlinked from the
   main clone), runs `npm run bench:report-pose` three times, logs load and the top CPU consumers around each run to
@@ -521,6 +522,7 @@ lists #514 then #516; the wave logic skips the blocked #514 and offers #516.
 Rollback: restore the backup in place (`cat`, not `mv`); `gh api -X DELETE repos/bjor2/steampunk-miner/issues/514/dependencies/blocked_by/<id of #516>`.
 
 `quiet-bench.sh` (see the section above) now also:
+
 - **Bench stage, PASS/FAIL per row** via `quiet-bench-eval.py` (VS 6225108027): W=7 p50 <= 1.2 ms; W=27 p95 <= 2 ms or <= 1.25 x the paired
   swept-cut p95 (median of >= 3 runs); P200 rows (W=7 within +-10% of the P1 rig, W=27 the 1.25x rule); the per-tick max printed; the bench's
   own bar constant must read 1.2. It detects the paired swept-cut mode at run time (a `pair|baseline|swept|compar` flag in
@@ -530,14 +532,14 @@ Rollback: restore the backup in place (`cat`, not `mv`); `gh api -X DELETE repos
   contains `level`), `tickP50Ms`, `tickP95Ms`, a per-tick max (key contains `tick` and `max`), and the swept-cut rows either as extra rows with
   `mode`/`path`/`kind`/`variant`/`source` = `swept` or in a second array of rows, plus `bar.tickP50Ms` = 1.2.
 - **`--balance` stage** (`--only-balance` skips the bench): `npm run balance:baseline` (script `vite-node scripts/balanceReport.ts
-  --write-baseline`, output `balance-report/` with `summary.json`, `report.md`, `events.ndjson`, `commands.ndjson`) on the tip of `ticket/<n>`
+--write-baseline`, output `balance-report/` with `summary.json`, `report.md`, `events.ndjson`, `commands.ndjson`) on the tip of `ticket/<n>`
   **and on its merge-base with main** (`git merge-base origin/main ticket/<n>`; TD: not main's tip, not the stale 7 Oct baseline), one after the
   other in throwaway worktrees (`wt-bench`, `wt-bench-base`), same seeds. The pacing-bot bands (summary.json minus `logSchemaVersion`, and the
   pacing report minus its "Against the baseline" section) must be **zero diff**; any diff is FAIL: A leaked into the bot, goes back to Systems.
   Events and commands hashes are reported as info. Drift from the other commits since 7 Oct is not in this comparison (both sides share the merge-base);
   it belongs to the re-record, read against the #396 pacing bands. The hold is extended by 90 min for this stage.
 - `--selftest` now also checks the evaluator on synthetic paired rows, tip-style rows and the zero-diff and nonzero-diff balance cases (no benches run).
-Rollback: restore `quiet-bench.sh.bak-20261016-2355-paired`, remove `quiet-bench-eval.py`.
+  Rollback: restore `quiet-bench.sh.bak-20261016-2355-paired`, remove `quiet-bench-eval.py`.
 
 ## Wave-key collision fixed in wave-lib.sh: #516 was never picked (16 Oct 2026, 23:05 box time)
 
