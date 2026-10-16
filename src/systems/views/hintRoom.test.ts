@@ -25,7 +25,12 @@ describe('hint room (#500)', () => {
   })
 
   it('shows the chip while the view keeps 70% clear and the vehicle stays uncovered', () => {
-    expect(hintRoomOf(UPRIGHT).hasRoom).toBe(true)
+    // One row of controls, so the chip ends above the rig at its furthest lean down the screen,
+    // 0.6 of the half height (ticket 484).
+    const rows = UPRIGHT.rows.slice(0, 2)
+    const room = hintRoomOf({ ...UPRIGHT, rows, covering: rows })
+    expect(room.chip.bottom).toBeLessThan(vehicleKeepClearOf(UPRIGHT.screen).top)
+    expect(room.hasRoom).toBe(true)
   })
 
   it('queues the chip when it would reach into the vehicle keep-clear square', () => {

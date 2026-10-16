@@ -23,9 +23,9 @@ const ZOOMS = [VIEW_SHORT_AXIS_MIN_M, VIEW_SHORT_AXIS_DEFAULT_M, VIEW_SHORT_AXIS
 describe('hazard strip place (#500, VS)', () => {
   it('keeps the hazard strip a separate box that the vehicle keep-clear rect never intersects at any zoom from 8 to 20 m and at the 12 m default', () => {
     for (const screen of CELLS) {
-      const shortAxis = Math.min(screen.width, screen.height)
       for (const zoom of ZOOMS) {
-        const bodyHalf = (BODY_HALF_SIZE_MM / 1000) * (shortAxis / zoom)
+        // The zoom spans the height in either orientation (ticket 484).
+        const bodyHalf = (BODY_HALF_SIZE_MM / 1000) * (screen.height / zoom)
         expect(hazardStripReachOf(screen).inner).toBeGreaterThan(bodyHalf)
       }
     }

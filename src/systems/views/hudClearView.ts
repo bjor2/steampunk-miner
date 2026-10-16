@@ -68,20 +68,23 @@ export function isHintRoomFor(
 
 /**
  * Where the vehicle's body can be on screen: the camera holds it at the middle and leans ahead
- * by at most `leadMaxShare` of the half short axis in any direction, and the body reaches its
- * half size further, drawn at the closest zoom. A square, so a lean either way stays inside it.
+ * by at most `leadMaxShare` of the half height down the screen and of the half short axis across
+ * it (ticket 484: the zoom spans the height, the lean is laid in the camera's frame), and the body
+ * reaches its half size further, drawn at the closest zoom. A square on a landscape screen, taller
+ * than wide on a portrait one, so a lean either way stays inside it.
  */
 export function vehicleKeepClearOf(screen: ScreenSize): ScreenBox {
   const shortAxis = Math.min(screen.width, screen.height)
-  const pixelsPerMetre = shortAxis / VIEW_SHORT_AXIS_MIN_M
+  const pixelsPerMetre = screen.height / VIEW_SHORT_AXIS_MIN_M
   const bodyHalf = (BODY_HALF_SIZE_MM / MM_PER_METRE) * pixelsPerMetre
-  const reach = (SPEED_FRAMING.leadMaxShare * shortAxis) / 2 + bodyHalf
+  const reachAcross = (SPEED_FRAMING.leadMaxShare * shortAxis) / 2 + bodyHalf
+  const reachUp = (SPEED_FRAMING.leadMaxShare * screen.height) / 2 + bodyHalf
   const [middleX, middleY] = [screen.width / 2, screen.height / 2]
   return {
-    left: middleX - reach,
-    top: middleY - reach,
-    right: middleX + reach,
-    bottom: middleY + reach,
+    left: middleX - reachAcross,
+    top: middleY - reachUp,
+    right: middleX + reachAcross,
+    bottom: middleY + reachUp,
   }
 }
 

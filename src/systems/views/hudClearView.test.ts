@@ -56,20 +56,22 @@ describe('HUD clear view (#500)', () => {
     expect(doBoxesOverlap(box(0, 0, 10, 10), box(9.6, 0, 20, 10), 0.5)).toBe(false)
   })
 
-  it('keeps the vehicle inside a square round the middle, wide as the furthest lean', () => {
+  it('keeps the vehicle inside a rect round the middle, wide and tall as the furthest lean', () => {
     const rect = vehicleKeepClearOf(PHONE)
     expect(rect.left).toBeGreaterThan(0)
     expect(rect.right).toBeLessThan(PHONE.width)
     expect((rect.left + rect.right) / 2).toBe(195)
     expect((rect.top + rect.bottom) / 2).toBe(422)
-    // 0.6 of the half short axis, plus the body's 0.45 m at the closest zoom (8 m across 390 px).
-    expect(rect.right - 195).toBeCloseTo(0.6 * 195 + 0.45 * (390 / 8), 6)
+    // 0.6 of the half width and of the half height, plus the body's 0.45 m at the closest zoom
+    // (8 m down 844 px, ticket 484).
+    expect(rect.right - 195).toBeCloseTo(0.6 * 195 + 0.45 * (844 / 8), 6)
+    expect(422 - rect.top).toBeCloseTo(0.6 * 422 + 0.45 * (844 / 8), 6)
   })
 
-  it('leans the same distance either way up, so a rotation keeps the rect square', () => {
-    const upright = vehicleKeepClearOf(PHONE)
+  it('keeps the rect square on a landscape screen', () => {
     const sideways = vehicleKeepClearOf({ width: 844, height: 390 })
-    expect(upright.right - upright.left).toBeCloseTo(sideways.bottom - sideways.top, 6)
+    expect(sideways.right - sideways.left).toBeCloseTo(sideways.bottom - sideways.top, 6)
+    expect(sideways.right - 422).toBeCloseTo(0.6 * 195 + 0.45 * (390 / 8), 6)
   })
 })
 
@@ -96,16 +98,17 @@ describe('vehicle on screen (#500)', () => {
     expect((box.top + box.bottom) / 2).toBeCloseTo(400, 6)
   })
 
-  it('stays inside the keep-clear square at the furthest lean and the closest zoom', () => {
+  it('stays inside the keep-clear rect at the furthest lean and the closest zoom', () => {
     const screen = { width: 390, height: 844 }
-    const pixelsPerMetre = 390 / 8
-    const lean = (0.6 * 390) / 2 / pixelsPerMetre
+    const pixelsPerMetre = 844 / 8
+    const leanAcross = (0.6 * 390) / 2 / pixelsPerMetre
+    const leanUp = (0.6 * 844) / 2 / pixelsPerMetre
     const rect = vehicleKeepClearOf(screen)
     for (const fromCentre of [
-      { x: lean, y: 0 },
-      { x: -lean, y: 0 },
-      { x: 0, y: lean },
-      { x: 0, y: -lean },
+      { x: leanAcross, y: 0 },
+      { x: -leanAcross, y: 0 },
+      { x: 0, y: leanUp },
+      { x: 0, y: -leanUp },
     ]) {
       const box = vehicleScreenBoxOf({ ...screen, pixelsPerMetre, turnRadians: 0, fromCentre })
       expect(box.left).toBeGreaterThanOrEqual(rect.left - 1e-9)
