@@ -1,0 +1,30 @@
+{
+  "schema": 1,
+  "ticket": 444,
+  "title": "Materials data: materials.json schema, loader and validation guards",
+  "tier": "easy",
+  "model": "claude-opus-5-5",
+  "created": "2026-10-15T22:15:16Z",
+  "closed": "2026-10-16T10:26:10Z",
+  "segments": [
+    {"category":"idle","start":"2026-10-15T22:15:16.000Z","end":"2026-10-16T10:10:39.000Z","attempt":0,"tier":null,"model":null,"source":"derived"},
+    {"category":"other","start":"2026-10-16T10:10:39.000Z","end":"2026-10-16T10:11:29.648Z","attempt":1,"tier":null,"model":"claude-opus-5-5","source":"loop-log"},
+    {"category":"context","start":"2026-10-16T10:11:29.648Z","end":"2026-10-16T10:13:30.948Z","attempt":1,"tier":null,"model":"claude-opus-5-5","source":"transcript"},
+    {"category":"testing","start":"2026-10-16T10:13:30.948Z","end":"2026-10-16T10:13:38.607Z","attempt":1,"tier":null,"model":"claude-opus-5-5","source":"transcript"},
+    {"category":"context","start":"2026-10-16T10:13:38.607Z","end":"2026-10-16T10:14:18.927Z","attempt":1,"tier":null,"model":"claude-opus-5-5","source":"transcript"},
+    {"category":"developing","start":"2026-10-16T10:14:18.927Z","end":"2026-10-16T10:15:53.005Z","attempt":1,"tier":null,"model":"claude-opus-5-5","source":"transcript"},
+    {"category":"testing","start":"2026-10-16T10:15:53.005Z","end":"2026-10-16T10:20:13.820Z","attempt":1,"tier":null,"model":"claude-opus-5-5","source":"transcript"},
+    {"category":"developing","start":"2026-10-16T10:20:13.820Z","end":"2026-10-16T10:20:18.663Z","attempt":1,"tier":null,"model":"claude-opus-5-5","source":"transcript"},
+    {"category":"landing","start":"2026-10-16T10:20:18.663Z","end":"2026-10-16T10:20:37.820Z","attempt":1,"tier":null,"model":"claude-opus-5-5","source":"transcript"},
+    {"category":"developing","start":"2026-10-16T10:20:37.820Z","end":"2026-10-16T10:20:45.107Z","attempt":1,"tier":null,"model":"claude-opus-5-5","source":"transcript"},
+    {"category":"planning","start":"2026-10-16T10:20:45.107Z","end":"2026-10-16T10:20:53.740Z","attempt":1,"tier":null,"model":"claude-opus-5-5","source":"transcript"},
+    {"category":"gates","start":"2026-10-16T10:20:53.740Z","end":"2026-10-16T10:25:57.538Z","attempt":1,"tier":null,"model":"claude-opus-5-5","source":"loop-log"},
+    {"category":"idle","start":"2026-10-16T10:25:57.538Z","end":"2026-10-16T10:26:10.000Z","attempt":1,"tier":null,"model":"claude-opus-5-5","source":"derived"}
+  ],
+  "totals": {"blocked":0,"planner_wait":0,"idle":42935,"context":162,"planning":9,"developing":106,"testing":268,"gates":304,"landing":19,"other":51},
+  "lead_time_s": 43854,
+  "cycle_time_s": 931,
+  "claimed": "2026-10-16T10:10:39.000Z",
+  "claimed_to_done_s": 931,
+  "backfilled": false
+}
