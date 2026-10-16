@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-10-16T07:29:56+02:00",
+  "updated_at": "2026-10-16T07:34:50+02:00",
   "caps": {
     "grok": 12,
     "claude": 10,
@@ -54,12 +54,11 @@
         },
         {
           "slot": "C5",
-          "state": "busy",
-          "ticket": 464,
-          "grok_slot": 5,
-          "kind": "dev",
-          "since": "2026-10-16T06:44:00+02:00",
-          "wave": "2F"
+          "state": "free",
+          "ticket": null,
+          "grok_slot": null,
+          "kind": null,
+          "since": null
         },
         {
           "slot": "C6",
@@ -72,9 +71,9 @@
         }
       ],
       "size": 6,
-      "used": 5,
-      "free": 1,
-      "claims_last_hour": 15,
+      "used": 4,
+      "free": 2,
+      "claims_last_hour": 12,
       "name": "Claude Max 1"
     },
     {
@@ -125,7 +124,7 @@
     }
   ],
   "gate": {
-    "busy": 2,
+    "busy": 1,
     "max": 3
   },
   "tester": {
@@ -646,11 +645,9 @@
     },
     {
       "slot": 5,
-      "state": "dev",
-      "ticket": 464,
-      "since": "2026-10-16T06:44:00+02:00",
-      "claude_slot": 5,
-      "wave": "2F"
+      "state": "free",
+      "ticket": null,
+      "since": null
     },
     {
       "slot": 6,
@@ -737,12 +734,11 @@
     },
     {
       "slot": 5,
-      "state": "busy",
-      "ticket": 464,
-      "grok_slot": 5,
-      "since": "2026-10-16T06:44:00+02:00",
-      "account": 1,
-      "wave": "2F"
+      "state": "free",
+      "ticket": null,
+      "grok_slot": null,
+      "since": null,
+      "account": 1
     },
     {
       "slot": 6,
@@ -791,17 +787,17 @@
     }
   ],
   "last_refill": {
-    "at": "2026-10-16 07:29 CEST",
+    "at": "2026-10-16 07:34 CEST",
     "mode": "refill-dev",
-    "triggers": "#466",
+    "triggers": "#464",
     "started": "",
-    "note": "dev slots full"
+    "note": "load guard (MemAvailable 2873 MB < 3072 MB)"
   },
   "totals": {
     "grok": {
       "size": 12,
-      "used": 6,
-      "dev": 5,
+      "used": 5,
+      "dev": 4,
       "dev_cap": 8,
       "planner": 1,
       "planner_cap": 4
@@ -809,8 +805,8 @@
     "claude": {
       "size": 10,
       "enabled": 6,
-      "used": 5,
-      "free": 1,
+      "used": 4,
+      "free": 2,
       "external": 0
     }
   },
@@ -928,7 +924,7 @@
           465
         ],
         "done": [],
-        "live": 3
+        "live": 2
       }
     ]
   }
