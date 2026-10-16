@@ -795,7 +795,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/debug/debugMemory.test.ts` | 4 | 4 |
 | `src/debug/debugOverlay.test.ts` | 2 | 2 |
 | `src/debug/debugSaves.test.ts` | 5 | 5 |
-| `src/debug/debugScreens.test.ts` | 30 | 29 |
+| `src/debug/debugScreens.test.ts` | 32 | 31 |
 | `src/debug/sliceDebugCommands.test.ts` | 3 | 3 |
 
 ### `economy`
@@ -872,7 +872,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/input/inputRouting.test.ts` | 29 | 29 |
 | `src/systems/input/padCodes.test.ts` | 4 | 4 |
 | `src/systems/input/padFrame.test.ts` | 7 | 7 |
-| `src/systems/input/preferences.test.ts` | 20 | 20 |
+| `src/systems/input/preferences.test.ts` | 22 | 22 |
 | `src/systems/input/promptLabel.test.ts` | 8 | 8 |
 | `src/systems/input/touchBindings.test.ts` | 16 | 16 |
 | `src/systems/input/touchControls.test.ts` | 25 | 18 |
@@ -1051,6 +1051,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/render/enemyTint.test.ts` | 5 | 5 |
 | `src/systems/render/frameWindow.test.ts` | 4 | 4 |
 | `src/systems/render/gatePatterns.test.ts` | 10 | 10 |
+| `src/systems/render/gpuTier.test.ts` | 11 | 2 |
 | `src/systems/render/groundBlocks.test.ts` | 7 | 7 |
 | `src/systems/render/groundStrata.test.ts` | 6 | 6 |
 | `src/systems/render/gunLook.test.ts` | 7 | 7 |
@@ -1066,11 +1067,14 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/render/oreGrade.test.ts` | 2 | 2 |
 | `src/systems/render/oreLook.test.ts` | 11 | 9 |
 | `src/systems/render/partMotion.test.ts` | 16 | 13 |
-| `src/systems/render/particles.test.ts` | 6 | 6 |
+| `src/systems/render/particles.test.ts` | 9 | 9 |
 | `src/systems/render/platformYard.test.ts` | 6 | 6 |
+| `src/systems/render/qualityLadder.test.ts` | 7 | 7 |
 | `src/systems/render/refineryBayLook.test.ts` | 3 | 3 |
 | `src/systems/render/renderOrigin.test.ts` | 3 | 3 |
-| `src/systems/render/renderScale.test.ts` | 13 | 13 |
+| `src/systems/render/renderQuality.test.ts` | 9 | 9 |
+| `src/systems/render/renderRate.test.ts` | 6 | 6 |
+| `src/systems/render/renderScale.test.ts` | 19 | 19 |
 | `src/systems/render/requestedParts.test.ts` | 3 | 3 |
 | `src/systems/render/sampleClock.test.ts` | 3 | 3 |
 | `src/systems/render/sceneLights.test.ts` | 6 | 6 |
@@ -1131,6 +1135,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/scene/sceneDisposal.test.ts` | 8 | 3 |
 | `src/scene/soundCuePlayer.test.ts` | 4 | 4 |
 | `src/scene/sprayIntake.test.ts` | 3 | 3 |
+| `src/scene/terrainSamplers.test.ts` | 7 | 7 |
 | `src/scene/vehicleStage.test.ts` | 7 | 7 |
 
 ### `shell`
@@ -1177,7 +1182,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/store/padRuntime.test.ts` | 16 | 14 |
 | `src/store/partInstall.test.ts` | 5 | 5 |
 | `src/store/pauseMenuSlice.test.ts` | 11 | 11 |
-| `src/store/perfLog.test.ts` | 8 | 8 |
+| `src/store/perfLog.test.ts` | 10 | 10 |
 | `src/store/planetCardSlice.test.ts` | 5 | 5 |
 | `src/store/platformLoop.test.ts` | 4 | 4 |
 | `src/store/promptDevice.test.ts` | 2 | 2 |
