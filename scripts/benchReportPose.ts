@@ -1,60 +1,61 @@
 /**
- * The authority's cost of a pose report every tick while the drill bites (ticket 514 scope 5, the
- * Vertical Scaler's bar in the TD shape on #441 6223171858): at the shipped
- * `DRILL_POSE_REPORT_INTERVAL_TICKS` the cost per tick is p50 0.7 ms or less at W = 7 and at
- * W = 27, and p95 under 2 ms at W = 27. Run on a quiet box with `npm run bench:report-pose`
- * (`-- --log` writes `benchmark_result` lines, #124). Logged, not gated here: if the shipped
- * interval misses the bar, the ticket goes back to the TD and the VS (a quiet choice of 2 is not
- * allowed), so `meetsBar` only names the reading.
+ * The authority's cost of a pose report every tick while the drill bites (ticket 514 scope 5, cost
+ * gate final in the TD addendum 6225108027 on #514, with the Vertical Scaler's ruling). At the
+ * shipped `DRILL_POSE_REPORT_INTERVAL_TICKS`:
+ * - W = 7: tick p50 1.2 ms or less, an absolute bar;
+ * - W = 27: tick p95 2 ms or less, or else no worse than 1.25x the flag-on swept cut's p95 timed
+ *   beside it (same rig, width and stride, interleaved in the same run);
+ * - P200 flatness: at W = 7 the P200 rig's p50 within 10% of the P1 rig's at the same speed, and
+ *   at W = 27 the same 1.25x rule, so the cost follows the window, not the cells carved (about 430
+ *   a tick at W = 7 and 3600 m/s).
+ * Run on an idle box (the loop paused) with `npm run bench:report-pose:paired` (the swept rows
+ * need `--paired`; `npm run bench:report-pose` times the reports alone); the quiet-bench runner
+ * takes the median of three runs. `-- --log` writes `benchmark_result` lines (#124). Logged, not
+ * gated here: `meetsBar` and `gates` (`bench/reportPoseBar.ts`) only name the reading. Interval 2
+ * is not an option.
  *
- * The TD's probe method (section 2.6 of the shape's write-up): a level cut on planet 1 at about
- * 279.5 m from the centre, as `benchDrillStep.ts`, with the drill far past the floor so every
- * sample the stamp reaches clears; W = 2 + the side cells of a bench-only drill-gear source. The
- * body moves at a steady 1.5 or 7 m/s and reports every `interval` ticks with that many drive and
- * drill ticks, as the live loop's reporter does. The clock is moved untimed before each report, so
- * the timed call is the report alone (its stamp, gear, charge and yield); a tick with no report
- * costs 0. Every report must be accepted: a `CommandRejected` stops the bench.
+ * The TD's probe method (section 2.6 of the shape's write-up): the rigs of `bench/reportPoseRigs.ts`
+ * on a level cut on planet 1, W = 2 + the side cells of a bench-only drill-gear source, a leg timed
+ * as `bench/reportPoseLegs.ts` drives it. The swept rows (`mode` `swept`) time `drillAlongStep` at
+ * the same stride a tick (25 mm at 1.5 m/s, 117 mm at 7 m/s), interleaved rep by rep with the
+ * report legs. At 3600 m/s the body crosses the cut in a tick, so only the every-tick cadences run.
  *
- * The command log's volume (Systems' ask on #441) is the reports' `commands.ndjson` lines a
- * second while drilling. A steady scripted speed steps x by the same mm each report, so the live
- * loop's lines, which also carry a jittering velocity, are somewhat larger.
+ * The command log's volume (Systems' ask on #441) is the reports' `commands.ndjson` bytes a second
+ * while drilling, as the run log writes them (run-coded since #522). The cells a tick changed are
+ * counted on a warm-up pass, never on a timed one.
  */
 import { loadFeatures } from '../src/features'
 import {
   DRILL_POSE_REPORT_INTERVAL_TICKS,
   POSE_REPORT_INTERVAL_TICKS,
 } from '../src/constants/balance'
-import { MM_PER_METRE, TICKS_PER_SECOND } from '../src/constants/physics'
+import { TICKS_PER_SECOND } from '../src/constants/physics'
 import { loggedCommandsOf } from '../src/logging/commandLog'
 import { withRegistrations } from '../src/registries/registrar'
 import type { SliceDefinition } from '../src/registries/sliceDefinition'
-import { advanceTicks } from '../src/systems/authority/advanceTicks'
-import { applyCommand } from '../src/systems/authority/applyCommand'
-import type { AuthorityCommand, CommandIntent } from '../src/systems/authority/authorityCommand'
-import type { AuthorityState } from '../src/systems/authority/authorityState'
-import {
-  createScriptedSession,
-  FREEZE_ENEMIES,
-  poseAbove,
-} from '../src/systems/authority/scriptedSession'
-import { FACING } from '../src/systems/vehicle/vehiclePose'
+import type { AuthorityCommand } from '../src/systems/authority/authorityCommand'
 import { logBenchmarkSeriesWhenAsked } from './bench/benchRunLog'
+import { p95OverSweptOf, REPORT_POSE_BAR, reportPoseGatesOf } from './bench/reportPoseBar'
+import { driveLeg, passTicksOf, type Leg, type LegRun } from './bench/reportPoseLegs'
+import {
+  PLANET_1_RIG,
+  PLANET_200_RIG,
+  stateAtCutStart,
+  type BenchRig,
+} from './bench/reportPoseRigs'
 
 loadFeatures()
 
 const REPS = 3
 const TICKS = 240
-const BAR = { tickP50Ms: 0.7, wideTickP95Ms: 2 }
-const START = { x: -10_000, y: 279_500 }
-const FLOOR_BOUND = [
-  { upgradeId: 'drill_power', level: 2000 },
-  { upgradeId: 'drill_tip', level: 600 },
-]
 const WIDTHS = [
   { width: 7, sideCells: 5 },
   { width: 27, sideCells: 25 },
 ]
-const SPEEDS_MPS = [1.5, 7]
+/** The probe's speeds, the stored-200 rig's 15 m/s body and the rigs' 60 m step bound. */
+const SPEEDS_MPS = [1.5, 7, 15, 3600]
+/** The paired mode: each cut also timed as the flag-on swept cut (TD addendum 6225108027). */
+const isPaired = process.argv.includes('--paired')
 /** Today's cadence, the shipped one and the steps between (the VS's fallback rule reads them). */
 const INTERVALS = [POSE_REPORT_INTERVAL_TICKS, 3, 2, DRILL_POSE_REPORT_INTERVAL_TICKS]
 
@@ -66,82 +67,52 @@ function sideCellsSlice(sideCells: number): SliceDefinition {
   }
 }
 
-interface Leg {
-  speedMps: number
-  interval: number
+/** Every leg of one rig, width and speed: the cadences a pass holds, and the swept baseline. */
+function legsAt(rig: BenchRig, width: number, sideCells: number, speedMps: number): Leg[] {
+  const at = { rig, width, sideCells, speedMps }
+  const passTicks = passTicksOf(speedMps, TICKS)
+  const reports = INTERVALS.filter((interval) => interval <= passTicks).map((interval): Leg => ({
+    ...at,
+    mode: 'report',
+    interval,
+  }))
+  return isPaired ? [...reports, { ...at, mode: 'swept', interval: 1 }] : reports
 }
 
-/** One run's timings: each report's, each tick's (0 with no report) and the reports sent. */
-interface LegRun {
-  reportMs: number[]
-  tickMs: number[]
-  reports: AuthorityCommand[]
+/** The legs timed in turn, rep by rep, so load on the box falls on every leg alike. */
+function benchInterleaved(legs: readonly Leg[]): LegRun[] {
+  const start = stateAtCutStart(legs[0].rig)
+  const warm = legs.map((leg) => driveLeg(leg, start, TICKS, true))
+  const reps = Array.from({ length: REPS }, () =>
+    legs.map((leg) => driveLeg(leg, start, TICKS, false)),
+  )
+  return legs.map((_, index) =>
+    mergeRuns(
+      warm[index],
+      reps.map((rep) => rep[index]),
+    ),
+  )
 }
 
-function stateAtCutStart(): AuthorityState {
-  const session = createScriptedSession()
-  session.submit(0, FREEZE_ENEMIES)
-  for (const payload of FLOOR_BOUND) session.submit(0, { type: 'debug.setUpgrade', payload })
-  session.submit(0, { type: 'debug.setEnergy', payload: { energy: '1000000' } })
-  const { payload } = poseAbove({ tx: 0, ty: 0 }, FACING.right)
-  session.submit(0, { type: 'reportPose', payload: { ...payload, ...START } })
-  return session.state()
-}
-
-function reportAt(leg: Leg, tick: number): CommandIntent<'reportPose'> {
-  const vx = Math.round(leg.speedMps * MM_PER_METRE)
-  const { payload } = poseAbove({ tx: 0, ty: 0 }, FACING.right, { drillTicks: leg.interval })
+function mergeRuns(warm: LegRun, timed: readonly LegRun[]): LegRun {
   return {
-    type: 'reportPose',
-    payload: {
-      ...payload,
-      ...{ x: START.x + Math.round((vx * tick) / TICKS_PER_SECOND), y: START.y, vx },
-      ...{ driving: true, drilling: true, driveTicks: leg.interval },
-      drive: { x: 1, y: 0 },
-    },
+    reportMs: timed.flatMap((run) => run.reportMs),
+    tickMs: timed.flatMap((run) => run.tickMs),
+    reports: warm.reports,
+    cellsPerTick: warm.cellsPerTick,
   }
 }
 
-function driveLeg(leg: Leg): LegRun {
-  let state = stateAtCutStart()
-  const run: LegRun = { reportMs: [], tickMs: [], reports: [] }
-  for (let tick = 1; tick <= TICKS; tick++) {
-    if (tick % leg.interval !== 0) {
-      run.tickMs.push(0)
-      continue
-    }
-    state = advanceTicks(state, tick).state
-    const seq = state.players.p1.lastSeq + 1
-    const command = { playerId: 'p1', tick, seq, ...reportAt(leg, tick) }
-    const started = performance.now()
-    const outcome = applyCommand(state, command)
-    const ms = performance.now() - started
-    refuseRejection(outcome.events, tick)
-    state = outcome.state
-    run.reportMs.push(ms)
-    run.tickMs.push(ms)
-    run.reports.push(command)
-  }
-  return run
+function benchGroup(rig: BenchRig, width: number, sideCells: number, speedMps: number) {
+  const legs = legsAt(rig, width, sideCells, speedMps)
+  const runs = withRegistrations([sideCellsSlice(sideCells)], () => benchInterleaved(legs))
+  return legs.map((leg, index) => ({ leg, run: runs[index] }))
 }
 
-function refuseRejection(events: readonly { type: string }[], tick: number): void {
-  const rejected = events.find((event) => event.type === 'CommandRejected')
-  if (rejected !== undefined) {
-    throw new Error(`reportPose at tick ${tick} rejected: ${JSON.stringify(rejected)}`)
-  }
-}
-
-function benchLeg(sideCells: number, leg: Leg): LegRun {
-  return withRegistrations([sideCellsSlice(sideCells)], () => {
-    driveLeg(leg)
-    const runs = Array.from({ length: REPS }, () => driveLeg(leg))
-    return {
-      reportMs: runs.flatMap((run) => run.reportMs),
-      tickMs: runs.flatMap((run) => run.tickMs),
-      reports: runs[0].reports,
-    }
-  })
+function groupsOf(rig: BenchRig) {
+  return WIDTHS.flatMap(({ width, sideCells }) =>
+    SPEEDS_MPS.flatMap((speedMps) => benchGroup(rig, width, sideCells, speedMps)),
+  )
 }
 
 function percentile(times: readonly number[], fraction: number): number {
@@ -150,67 +121,68 @@ function percentile(times: readonly number[], fraction: number): number {
 }
 
 function mean(times: readonly number[]): number {
-  return times.reduce((total, ms) => total + ms, 0) / times.length
+  return times.length === 0 ? 0 : times.reduce((total, ms) => total + ms, 0) / times.length
 }
 
 const round = (ms: number) => Number(ms.toFixed(3))
 
-/** `commands.ndjson` bytes a second of one run's reports, as the run log writes them. */
+/** `commands.ndjson` bytes a second of the warm pass's reports, as the run log writes them. */
 function logBytesPerSecond(reports: readonly AuthorityCommand[]): number {
   const lines = loggedCommandsOf(reports).map((line) => JSON.stringify(line) + '\n')
   const bytes = lines.reduce((total, line) => total + line.length, 0)
   return Math.round((bytes * TICKS_PER_SECOND) / TICKS)
 }
 
-function rowOf(width: number, leg: Leg, run: LegRun) {
+function rowOf(leg: Leg, run: LegRun) {
   return {
-    width,
-    ...leg,
+    mode: leg.mode,
+    planetLevel: leg.rig.planetLevel,
+    width: leg.width,
+    speedMps: leg.speedMps,
+    interval: leg.interval,
     reportP50Ms: round(percentile(run.reportMs, 0.5)),
     reportP95Ms: round(percentile(run.reportMs, 0.95)),
     tickMeanMs: round(mean(run.tickMs)),
     tickP50Ms: round(percentile(run.tickMs, 0.5)),
     tickP95Ms: round(percentile(run.tickMs, 0.95)),
+    tickMaxMs: round(Math.max(...run.tickMs)),
     reportsPerSecond: (run.reports.length * TICKS_PER_SECOND) / TICKS,
     logBytesPerSecond: logBytesPerSecond(run.reports),
+    maxCellsPerTick: Math.max(0, ...run.cellsPerTick),
+    meanCellsPerTick: round(mean(run.cellsPerTick)),
   }
 }
 
 type Row = ReturnType<typeof rowOf>
 
-/** The VS bar on the shipped interval's rows: p50 at every width, p95 at the widest. */
-function meetsBar(rows: readonly Row[]): boolean {
-  const shipped = rows.filter((row) => row.interval === DRILL_POSE_REPORT_INTERVAL_TICKS)
-  return shipped.every(isRowWithinBar)
+/** Each report row with its tail over the swept cut beside it (null unpaired). */
+function withSweptRatios(rows: readonly Row[]) {
+  return rows.map((row) => {
+    const ratio = row.mode === 'report' ? p95OverSweptOf(rows, row) : null
+    return { ...row, tickP95OverSwept: ratio === null ? null : round(ratio) }
+  })
 }
 
-function isRowWithinBar(row: Row): boolean {
-  const isWidest = row.width === Math.max(...WIDTHS.map(({ width }) => width))
-  const isTailWithin = !isWidest || row.tickP95Ms < BAR.wideTickP95Ms
-  return row.tickP50Ms <= BAR.tickP50Ms && isTailWithin
+function seriesNameOf(leg: Leg): string {
+  const cadence = leg.mode === 'swept' ? 'swept' : `every${leg.interval}`
+  return `reportPose.p${leg.rig.planetLevel}.w${leg.width}.${leg.speedMps}mps.${cadence}`
 }
 
-const legs = SPEEDS_MPS.flatMap((speedMps) =>
-  INTERVALS.map((interval): Leg => ({ speedMps, interval })),
-)
-const runs = WIDTHS.flatMap(({ width, sideCells }) =>
-  legs.map((leg) => ({ width, leg, run: benchLeg(sideCells, leg) })),
-)
-const rows = runs.map(({ width, leg, run }) => rowOf(width, leg, run))
+const runs = [...groupsOf(PLANET_1_RIG), ...groupsOf(PLANET_200_RIG)]
+const rows = withSweptRatios(runs.map(({ leg, run }) => rowOf(leg, run)))
+const gates = reportPoseGatesOf(rows, DRILL_POSE_REPORT_INTERVAL_TICKS)
 console.log(
   JSON.stringify({
     bench: 'reportPose',
     shippedInterval: DRILL_POSE_REPORT_INTERVAL_TICKS,
+    isPaired,
     rows,
-    bar: BAR,
-    meetsBar: meetsBar(rows),
+    bar: REPORT_POSE_BAR,
+    gates,
+    meetsBar: Object.values(gates).every(Boolean),
   }),
 )
 logBenchmarkSeriesWhenAsked(
   'report-pose',
-  runs.map(({ width, leg, run }) => ({
-    name: `reportPose.w${width}.${leg.speedMps}mps.every${leg.interval}`,
-    planet: 1,
-    timesMs: run.tickMs,
-  })),
+  runs.map(({ leg, run }) => ({ name: seriesNameOf(leg), planet: 1, timesMs: run.tickMs })),
 )
