@@ -6,6 +6,8 @@
     "Memory soak",
     "Memory soak (Electron)",
     "Frame time",
+    "Frame A/B (Electron, real GPU)",
+    "Frame A/B (Electron, SwiftShader dry run)",
     "Main-thread profile",
     "Stack",
     "Run log",
@@ -1001,6 +1003,64 @@
       "group": "Save size",
       "better": "lower",
       "source": "the P200 money lane (npx vitest run src/logging/moneyPastP200.lane.test.ts, npm run balance:money-p200) on its first pacing seed: the largest save file cut at a checkpoint moment on the planet, UTF-8 bytes as the shell stores it (ticket 479); deterministic, so one run gives the number. A phone browser keeps about 5 MB per origin in localStorage, mirrored to IndexedDB"
+    },
+    "frameAbElectron.frameP50OffMs": {
+      "label": "Frame p50, look off (real GPU)",
+      "unit": "ms",
+      "group": "Frame A/B (Electron, real GPU)",
+      "better": "lower",
+      "source": "packaged Electron frame A/B, look off (merge-base build) vs on (#450/#451 tip), P1 band 5, 20 m zoom, 1280x800, vsync off (soakMemory.mjs --electron <on> --frame-ab <off>, ticket 526); the GD merge bar on #450: delta at most +0.5 ms, no recompile"
+    },
+    "frameAbElectron.frameP50OnMs": {
+      "label": "Frame p50, look on (real GPU)",
+      "unit": "ms",
+      "group": "Frame A/B (Electron, real GPU)",
+      "better": "lower",
+      "source": "packaged Electron frame A/B, look off (merge-base build) vs on (#450/#451 tip), P1 band 5, 20 m zoom, 1280x800, vsync off (soakMemory.mjs --electron <on> --frame-ab <off>, ticket 526); the GD merge bar on #450: delta at most +0.5 ms, no recompile"
+    },
+    "frameAbElectron.frameP50DeltaMs": {
+      "label": "Frame p50 delta, look on minus off (real GPU)",
+      "unit": "ms",
+      "group": "Frame A/B (Electron, real GPU)",
+      "better": "lower",
+      "budget": 0.5,
+      "source": "packaged Electron frame A/B, look off (merge-base build) vs on (#450/#451 tip), P1 band 5, 20 m zoom, 1280x800, vsync off (soakMemory.mjs --electron <on> --frame-ab <off>, ticket 526); the GD merge bar on #450: delta at most +0.5 ms, no recompile"
+    },
+    "frameAbElectron.shaderRecompiles": {
+      "label": "Shader programs linked while the look-on view held (real GPU)",
+      "unit": "programs",
+      "group": "Frame A/B (Electron, real GPU)",
+      "better": "lower",
+      "budget": 0,
+      "source": "packaged Electron frame A/B, look off (merge-base build) vs on (#450/#451 tip), P1 band 5, 20 m zoom, 1280x800, vsync off (soakMemory.mjs --electron <on> --frame-ab <off>, ticket 526); the GD merge bar on #450: delta at most +0.5 ms, no recompile"
+    },
+    "frameAbElectronSwiftShader.frameP50OffMs": {
+      "label": "Frame p50, look off (SwiftShader)",
+      "unit": "ms",
+      "group": "Frame A/B (Electron, SwiftShader dry run)",
+      "better": "lower",
+      "source": "packaged Electron frame A/B, look off (merge-base build) vs on (#450/#451 tip), P1 band 5, 20 m zoom, 1280x800, vsync off (soakMemory.mjs --electron <on> --frame-ab <off>, ticket 526); software GL: not GPU numbers, never used for or against the bar"
+    },
+    "frameAbElectronSwiftShader.frameP50OnMs": {
+      "label": "Frame p50, look on (SwiftShader)",
+      "unit": "ms",
+      "group": "Frame A/B (Electron, SwiftShader dry run)",
+      "better": "lower",
+      "source": "packaged Electron frame A/B, look off (merge-base build) vs on (#450/#451 tip), P1 band 5, 20 m zoom, 1280x800, vsync off (soakMemory.mjs --electron <on> --frame-ab <off>, ticket 526); software GL: not GPU numbers, never used for or against the bar"
+    },
+    "frameAbElectronSwiftShader.frameP50DeltaMs": {
+      "label": "Frame p50 delta, look on minus off (SwiftShader)",
+      "unit": "ms",
+      "group": "Frame A/B (Electron, SwiftShader dry run)",
+      "better": "lower",
+      "source": "packaged Electron frame A/B, look off (merge-base build) vs on (#450/#451 tip), P1 band 5, 20 m zoom, 1280x800, vsync off (soakMemory.mjs --electron <on> --frame-ab <off>, ticket 526); software GL: not GPU numbers, never used for or against the bar"
+    },
+    "frameAbElectronSwiftShader.shaderRecompiles": {
+      "label": "Shader programs linked while the look-on view held (SwiftShader)",
+      "unit": "programs",
+      "group": "Frame A/B (Electron, SwiftShader dry run)",
+      "better": "lower",
+      "source": "packaged Electron frame A/B, look off (merge-base build) vs on (#450/#451 tip), P1 band 5, 20 m zoom, 1280x800, vsync off (soakMemory.mjs --electron <on> --frame-ab <off>, ticket 526); software GL: not GPU numbers, never used for or against the bar"
     }
   }
 }

@@ -1296,6 +1296,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 
 | File | Tests | Sites |
 | --- | --- | --- |
+| `scripts/soak/frameAb.test.mjs` | 9 | 9 |
 | `scripts/soak/soakChart.test.mjs` | 6 | 6 |
 | `scripts/soak/soakGate.test.mjs` | 7 | 7 |
 | `scripts/soak/soakJobSummary.test.mjs` | 3 | 3 |

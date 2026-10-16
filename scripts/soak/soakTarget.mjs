@@ -24,6 +24,11 @@ const MEASUREMENT_SWITCHES = [
   '--enable-unsafe-swiftshader',
   '--ignore-gpu-blocklist',
 ]
+// The frame A/B (ticket 526) times frames, so neither side may wait on vsync or a frame-rate
+// limit; a real-GPU run (`--gpu`) drops SwiftShader so the machine's own GPU draws.
+const UNCAPPED_FRAME_SWITCHES = ['--disable-gpu-vsync', '--disable-frame-rate-limit']
+export const FRAME_AB_SWIFTSHADER_SWITCHES = [...MEASUREMENT_SWITCHES, ...UNCAPPED_FRAME_SWITCHES]
+export const FRAME_AB_GPU_SWITCHES = ['--ignore-gpu-blocklist', ...UNCAPPED_FRAME_SWITCHES]
 /** The packaged game's launch flag for `window.steampunkDebug` (electron/launchOptions.cts). */
 const DEBUG_API_FLAG = '--debug-api'
 
@@ -80,13 +85,14 @@ export async function openBrowserTarget(options) {
 /**
  * The packaged game with a fresh user-data folder, as the packaged smoke test launches it. Its
  * window opens at 1280x720 (electron/main.cts) and loads the game by itself, so `startGame()` has
- * nothing left to do.
+ * nothing left to do; `resizeContent()` sets the drawn area (the frame A/B's 1280x800).
+ * `options.switches` replaces the soak's measurement switches.
  */
 export async function openElectronTarget(options) {
   const appData = mkdtempSync(join(tmpdir(), 'steampunk-miner-soak-'))
   const app = await electron.launch({
     executablePath: options.electronPath,
-    args: [DEBUG_API_FLAG, ...MEASUREMENT_SWITCHES],
+    args: [DEBUG_API_FLAG, ...(options.switches ?? MEASUREMENT_SWITCHES)],
     env: { ...process.env, APPDATA: appData, XDG_CONFIG_HOME: appData },
   })
   try {
@@ -94,10 +100,16 @@ export async function openElectronTarget(options) {
       kind: 'electron',
       page: await app.firstWindow(),
       startGame: async () => {},
+      resizeContent: (size) => app.evaluate(resizeFirstWindow, size),
       close: () => app.close(),
     }
   } catch (error) {
     await app.close()
     throw error
   }
+}
+
+/** Runs in Electron's main process: Playwright serialises it, so it reaches only its argument. */
+function resizeFirstWindow({ BrowserWindow }, { width, height }) {
+  BrowserWindow.getAllWindows()[0].setContentSize(width, height)
 }

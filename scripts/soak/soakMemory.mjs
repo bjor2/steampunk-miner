@@ -16,6 +16,8 @@
 //        [--browser /path/to/chrome] [--no-snapshots]
 //   xvfb-run -a node scripts/soak/soakMemory.mjs --electron release/linux-unpacked/steampunk-miner
 //        [--minutes 10] [--out DIR] [--no-snapshots]   (after `npm run electron:build`)
+//   xvfb-run -a node scripts/soak/soakMemory.mjs --electron <look-on build> --frame-ab <look-off build>
+//        [--gpu] [--rounds 2] [--hold 60] [--out DIR]   (frame-cost A/B for #450/#451, soakFrameAb.mjs)
 //   node scripts/soak/soakMemory.mjs --evaluate DIR/soak.json   (re-run the gate offline, print)
 //   node scripts/soak/soakMemory.mjs --job-summary DIR   (print DIR/summary.json as a CI job-summary row)
 //
@@ -25,6 +27,7 @@ import { createWriteStream, existsSync, mkdirSync, readFileSync, writeFileSync }
 import { join, resolve } from 'node:path'
 import { drawSoakChart } from './soakChart.mjs'
 import { formatSoakJobSummary } from './soakJobSummary.mjs'
+import { readFrameAbOptions, runFrameAb } from './soakFrameAb.mjs'
 import { isGameMemoryReadable, readGameMemory, refillOnDock } from './soakPage.mjs'
 import { summariseSoak } from './soakSummary.mjs'
 import { openBrowserTarget, openElectronTarget } from './soakTarget.mjs'
@@ -57,6 +60,8 @@ function readSoakOptions(argv) {
     isTakingSnapshots: !argv.includes('--no-snapshots'),
     evaluate: valueOf('evaluate', null),
     jobSummary: valueOf('job-summary', null),
+    frameAb: valueOf('frame-ab', null),
+    ...readFrameAbOptions(argv),
   }
 }
 
@@ -263,10 +268,18 @@ function printJobSummary(dir) {
   return 0
 }
 
+/** The A/B compares two packaged builds; `--electron` is the look-on one. */
+function runFrameAbOnElectron(options) {
+  if (!options.electronPath)
+    throw new Error('--frame-ab <look-off build> needs --electron <look-on build>')
+  return runFrameAb(options)
+}
+
 async function main(argv) {
   const options = readSoakOptions(argv)
   if (options.evaluate) return evaluateSavedRun(options.evaluate)
   if (options.jobSummary) return printJobSummary(options.jobSummary)
+  if (options.frameAb) return runFrameAbOnElectron(options)
   return runSoak(options)
 }
 

@@ -940,6 +940,16 @@ programs }` from three's `renderer.info` of the game canvas), read only when cal
   `xvfb-run -a node scripts/soak/soakMemory.mjs --electron release/linux-unpacked/steampunk-miner`
   launches it with `--debug-api` and records under `soakElectron.*`. Its numbers back the decision
   to set no heap or stack flags ([docs/perf/runtime-flags.md](perf/runtime-flags.md)).
+- **Frame-cost A/B on the packaged soak** (ticket 526, the merge gate for #450 and #451):
+  `soakMemory.mjs --electron <look-on build> --frame-ab <look-off build> [--gpu]` launches the two
+  packaged builds in turn (off, on, off, on), holds P1 band 5 at 20 m zoom in a 1280x800 window
+  with vsync off, samples the frame p50 once a second and counts shader programs linked during the
+  hold. It writes `frame-ab.json` for `perf:record` (ids `frameAbElectron.*` on a real GPU,
+  `frameAbElectronSwiftShader.*` on a dry run) and prints the bar (p50 at most +0.5 ms, no
+  recompile), the verdict and the phone line from #482. A SwiftShader run is a dry run, labelled
+  "not GPU numbers", and never counts for or against the bar. The bar is judged on a real GPU by
+  the Perf Tester or Bjor. The bar and the report are pure and tested in `scripts/soak/frameAb.test.mjs`.
+  How to build both sides, run and read it: [docs/perf/frame-ab.md](perf/frame-ab.md).
 - **Memory and frame samples in the run log** (#121): dev, scenario and debug runs log `perf_sample`
   every second of frames (now with `frameMsP99` and `longTasks`, the frames over 50 ms, and
   `ticksDroppedByCap`, the due ticks the 30-step frame cap cut since the last sample, ticket 480) and
