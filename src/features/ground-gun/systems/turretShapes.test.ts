@@ -18,7 +18,7 @@ import { stepOfMajor } from '../../../systems/economy/upgradeSteps'
 import { GUN_SHOT_FLOOR_QUANTA, GUN_SHOT_QUANTA } from '../../../systems/vehicle/energyQuanta'
 import { FACING } from '../../../systems/vehicle/vehiclePose'
 import type { TilePoint } from '../../../systems/world/tileGrid'
-import { maxViewShortAxisOf } from '../../../systems/render/viewZoom'
+import { maxViewVerticalOf } from '../../../systems/render/viewZoom'
 import { lastMarkOf } from '../../tech-tree'
 import {
   autoGunsMarkLadderOf,
@@ -112,7 +112,7 @@ describe('ground-gun: the auto_guns modules shape the turret (ticket 388)', () =
   })
 
   it('keeps every target the guns can reach on a 16:9 screen zoomed fully out (TD on #322)', () => {
-    const halfShortAxisMetres = maxViewShortAxisOf(1920, 1080) / 2
+    const halfShortAxisMetres = maxViewVerticalOf(1920, 1080) / 2
 
     expect(ECONOMY.gun.turretCaps.gunRangeCap * METRES_PER_TILE).toBeLessThanOrEqual(
       halfShortAxisMetres,

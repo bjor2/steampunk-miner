@@ -14,7 +14,7 @@ import { pixelsPerMetreOf } from './viewZoom'
 const radiusTiles = planetParamsFor(1, 1).radiusTiles
 
 function viewRadiusAt(width: number, height: number, viewShortAxisMetres: number): number {
-  return viewRadiusOf(width, height, pixelsPerMetreOf(width, height, viewShortAxisMetres))
+  return viewRadiusOf(width, height, pixelsPerMetreOf(height, viewShortAxisMetres))
 }
 
 const referenceRadius = viewRadiusAt(

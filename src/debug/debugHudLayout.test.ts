@@ -76,6 +76,7 @@ describe('debug api: compact HUD layout (#500)', () => {
     if (!result.ok) throw new Error(result.problems.join('; '))
     expect((result.box.left + result.box.right) / 2).toBeCloseTo(195, 6)
     expect((result.box.top + result.box.bottom) / 2).toBeCloseTo(422, 6)
-    expect(result.box.right - result.box.left).toBeCloseTo(0.9 * (390 / 12), 6)
+    // 12 m down the 844 px height in portrait too (ticket 484).
+    expect(result.box.right - result.box.left).toBeCloseTo(0.9 * (844 / 12), 6)
   })
 })

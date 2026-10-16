@@ -11,7 +11,7 @@ import { _electron as electron, expect, test, type ElectronApplication } from '@
 import type { DebugApi } from '../../src/debug/debugApi'
 import { CANVAS_DPR_RANGE } from '../../src/constants/scene'
 import { renderScaleFloorOf } from '../../src/systems/render/renderScale'
-import { maxViewShortAxisOf } from '../../src/systems/render/viewZoom'
+import { maxViewVerticalOf } from '../../src/systems/render/viewZoom'
 import { screenLayoutOf } from '../../src/systems/views/screenLayout'
 
 declare global {
@@ -243,7 +243,7 @@ test.describe('packaged build (#29 packaged-smoke)', () => {
         { widthPixels: screen.width, heightPixels: screen.height, isCoarsePointer: false },
         false,
       ),
-      maxViewShortAxisMetres: maxViewShortAxisOf(screen.width, screen.height),
+      maxViewShortAxisMetres: maxViewVerticalOf(screen.width, screen.height),
       renderScaleFloor: renderScaleFloorOf({
         cssPixels: shortAxis,
         devicePixels: shortAxis * devicePixelRatio,

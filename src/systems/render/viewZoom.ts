@@ -1,7 +1,11 @@
 /**
- * Zoom framing (#39): the player picks how many world metres fit across the screen's shorter
- * axis, and the camera's pixels-per-metre follows from the screen, so every resolution shows the
- * same world. A local presentation setting: it never enters the authority, a command or the digest.
+ * Zoom framing (#39): the player picks how many world metres fit down the screen's height (the
+ * vertical extent, ticket 484), and the camera's pixels-per-metre follows from the screen, so every
+ * resolution shows the same world. On a landscape screen the height is the short axis, as #39 said;
+ * a portrait screen shows desktop's vertical metres and narrows only across, so a drive crosses the
+ * same share of the screen a second on both (the GD's option (a) on #484). The setting keeps its
+ * name, `viewShortAxisMetres`, and its 8 to 20 m band. A local presentation setting: it never
+ * enters the authority, a command or the digest.
  *
  * The ease is exponential in `dt` (like the camera turn), so a zoom step lands in the same time at
  * any frame rate, and runs on the metres' logarithm so zooming in and out feel alike.
@@ -29,12 +33,18 @@ export type ZoomChange = 'in' | 'out' | 'reset'
 
 /** What the camera shows, as the debug API reads it (#39 acceptance 1). */
 export interface CameraView {
+  /** Metres down the screen's height: the vertical extent (ticket 484). */
   viewShortAxisMetres: number
-  /** The widest view this screen shape allows (#173): 20 m up to 16:9, less on wider screens. */
+  /**
+   * The widest vertical view this screen shape allows (#173): 20 m up to 16:9, less on wider
+   * screens, 20 m on every portrait one (ticket 484).
+   */
   maxViewShortAxisMetres: number
+  /** Metres across the screen's width: the vertical extent times width over height (ticket 484). */
+  viewHorizontalMetres: number
   /** Pixels per world metre: `camera.zoom` of the orthographic camera. */
   pixelsPerMetre: number
-  /** The 0.9 m vehicle collider's projected height as a share of the short axis. */
+  /** The 0.9 m vehicle collider's projected height as a share of the vertical extent. */
   vehicleColliderShare: number
 }
 
@@ -62,25 +72,37 @@ export function viewShortAxisProblems(value: unknown): string[] {
   ]
 }
 
-/** `camera.zoom` for a screen: its shorter side spans `viewShortAxisMetres`. */
-export function pixelsPerMetreOf(
-  widthPixels: number,
-  heightPixels: number,
-  viewShortAxisMetres: number,
-): number {
-  return Math.min(widthPixels, heightPixels) / viewShortAxisMetres
+/**
+ * `camera.zoom` for a screen: its height spans `viewShortAxisMetres` (ticket 484), in either
+ * orientation. Landscape is unchanged, as its height is its shorter side.
+ */
+export function pixelsPerMetreOf(heightPixels: number, viewShortAxisMetres: number): number {
+  return heightPixels / viewShortAxisMetres
 }
 
 /**
- * The widest view a screen of this shape shows (#173): the short axis whose half diagonal is
- * #38's 20.40 m, never over the 20 m zoom-out. Before the canvas has a size, the 20 m zoom-out.
+ * The widest vertical view a screen of this shape shows (#173, ticket 484): the height whose half
+ * diagonal is #38's 20.40 m, never over the 20 m zoom-out, so a portrait screen (whose diagonal
+ * at 20 m is at most 12.2 m half) always reaches 20 m. Before the canvas has a size, the 20 m.
  */
-export function maxViewShortAxisOf(widthPixels: number, heightPixels: number): number {
-  const shortSide = Math.min(widthPixels, heightPixels)
-  if (shortSide <= 0) return VIEW_SHORT_AXIS_MAX_M
-  const aspect = Math.max(widthPixels, heightPixels) / shortSide
+export function maxViewVerticalOf(widthPixels: number, heightPixels: number): number {
+  if (heightPixels <= 0) return VIEW_SHORT_AXIS_MAX_M
+  const aspect = widthPixels / heightPixels
   const diagonalCap = (2 * VIEW_HALF_DIAGONAL_MAX_M) / Math.sqrt(1 + aspect * aspect)
   return Math.min(VIEW_SHORT_AXIS_MAX_M, diagonalCap)
+}
+
+/**
+ * Metres across the screen's width: derived from the vertical extent, never set (ticket 484).
+ * Before the canvas has a size, a square view.
+ */
+export function viewHorizontalMetresOf(
+  widthPixels: number,
+  heightPixels: number,
+  viewVerticalMetres: number,
+): number {
+  if (heightPixels <= 0) return viewVerticalMetres
+  return (viewVerticalMetres * widthPixels) / heightPixels
 }
 
 /** The view the camera frames: the player's choice, held under the screen shape's cap. */
@@ -89,7 +111,7 @@ export function shownViewShortAxisOf(
   heightPixels: number,
   chosenMetres: number,
 ): number {
-  return Math.min(chosenMetres, maxViewShortAxisOf(widthPixels, heightPixels))
+  return Math.min(chosenMetres, maxViewVerticalOf(widthPixels, heightPixels))
 }
 
 /** One frame of the eased view toward the player's chosen one. */
@@ -106,8 +128,9 @@ export function cameraViewOf(
 ): CameraView {
   return {
     viewShortAxisMetres,
-    maxViewShortAxisMetres: maxViewShortAxisOf(widthPixels, heightPixels),
-    pixelsPerMetre: pixelsPerMetreOf(widthPixels, heightPixels, viewShortAxisMetres),
+    maxViewShortAxisMetres: maxViewVerticalOf(widthPixels, heightPixels),
+    viewHorizontalMetres: viewHorizontalMetresOf(widthPixels, heightPixels, viewShortAxisMetres),
+    pixelsPerMetre: pixelsPerMetreOf(heightPixels, viewShortAxisMetres),
     vehicleColliderShare: VEHICLE_COLLIDER_SIZE / viewShortAxisMetres,
   }
 }

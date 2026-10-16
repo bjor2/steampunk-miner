@@ -96,7 +96,7 @@ function gatherSources(rig: RigScratch, platformLights: readonly PointLightSourc
 
 function viewRadiusOnScreen(): number {
   const { widthPixels, heightPixels, viewShortAxisMetres } = cameraPresence
-  const zoom = pixelsPerMetreOf(widthPixels, heightPixels, viewShortAxisMetres)
+  const zoom = pixelsPerMetreOf(heightPixels, viewShortAxisMetres)
   return viewRadiusOf(widthPixels, heightPixels, zoom)
 }
 

@@ -7,7 +7,9 @@
  * along the drive and pulls back past the player's zoom, up to that cap, so 1 s of ground stays in
  * view ahead (the #316 camera lock, ticket 338). The turn, the lean and the zoom ease on the render
  * delta, which is presentation only. It sits relative to the render origin, like the world root
- * (ticket 339).
+ * (ticket 339). The zoom is metres down the screen's height in either orientation, so a portrait
+ * screen shows desktop's vertical metres and narrows across, and the lean across it is scaled by
+ * its half width (ticket 484).
  */
 import { useFrame, type Size } from '@react-three/fiber'
 import { useMemo } from 'react'
@@ -23,15 +25,18 @@ import {
 import {
   createSpeedFraming,
   framedShortAxisOf,
-  leadOffsetOf,
+  leadOffsetInto,
   stepSpeedFraming,
+  type FramedView,
   type SpeedFraming,
 } from '../systems/render/speedFraming'
+import type { Vector2 } from '../systems/vehicle/localFrame'
 import {
   easeViewShortAxis,
-  maxViewShortAxisOf,
+  maxViewVerticalOf,
   pixelsPerMetreOf,
   shownViewShortAxisOf,
+  viewHorizontalMetresOf,
 } from '../systems/render/viewZoom'
 import { cameraPresence } from './cameraPresence'
 import { drillPresence } from './drillPresence'
@@ -46,31 +51,47 @@ interface PlayerZoom {
   shownMetres: number
 }
 
+/** Per-frame scratch for the lean (CLAUDE.md frame rules: no allocation a frame). */
+interface LeanScratch {
+  view: FramedView
+  lead: Vector2
+}
+
+function createLeanScratch(): LeanScratch {
+  return {
+    view: { verticalMetres: 0, horizontalMetres: 0, turnRadians: 0 },
+    lead: { x: 0, y: 0 },
+  }
+}
+
 export function PlanetCamera() {
   const turn = useMemo(createCameraTurn, [])
   const framing = useMemo(createSpeedFraming, [])
   const zoom = useMemo<PlayerZoom>(() => ({ shownMetres: VIEW_SHORT_AXIS_DEFAULT_M }), [])
+  const lean = useMemo(createLeanScratch, [])
   useFrame(({ camera, size }, delta) => {
     const { prefs } = useGameStore.getState()
     stepCameraTurn(turn, vehiclePresence, prefs.cameraMode, delta)
     stepSpeedFraming(framing, motionPresence.velocity, drillPresence.ahead, delta)
     frameCamera(camera as OrthographicCamera, size, zoom, prefs.viewShortAxisMetres, framing, delta)
-    placeCamera(camera, turn, framing)
+    placeCamera(camera, turn, leanOffsetOf(lean, turn, framing))
   })
   return null
 }
 
+/** The lean on the view this frame framed, turned with the camera (ticket 484). */
+function leanOffsetOf(lean: LeanScratch, turn: CameraTurn, framing: SpeedFraming): Vector2 {
+  const { view } = lean
+  view.verticalMetres = cameraPresence.viewShortAxisMetres
+  view.horizontalMetres = cameraPresence.viewHorizontalMetres
+  view.turnRadians = turn.angle
+  return leadOffsetInto(lean.lead, framing, view)
+}
+
 /** Over the vehicle, moved ahead along the drive by the lean, so the rig sits toward the trailing edge. */
-function placeCamera(camera: Camera, turn: CameraTurn, framing: SpeedFraming): void {
-  const shortAxis = cameraPresence.viewShortAxisMetres
-  const lookAtX = lookAtOf(
-    vehiclePresence.x + leadOffsetOf(framing, shortAxis, 'x'),
-    vehicleStagePresence.cameraX,
-  )
-  const lookAtY = lookAtOf(
-    vehiclePresence.y + leadOffsetOf(framing, shortAxis, 'y'),
-    vehicleStagePresence.cameraY,
-  )
+function placeCamera(camera: Camera, turn: CameraTurn, lead: Vector2): void {
+  const lookAtX = lookAtOf(vehiclePresence.x + lead.x, vehicleStagePresence.cameraX)
+  const lookAtY = lookAtOf(vehiclePresence.y + lead.y, vehicleStagePresence.cameraY)
   camera.position.x = lookAtX - renderOriginPresence.x + screenEffects.offsetX
   camera.position.y = lookAtY - renderOriginPresence.y + screenEffects.offsetY
   camera.rotation.z = turn.angle
@@ -108,16 +129,19 @@ function easePlayerZoom(zoom: PlayerZoom, size: Size, chosen: number, dt: number
 }
 
 function showFraming(size: Size, zoom: PlayerZoom, framing: SpeedFraming): void {
-  const cap = maxViewShortAxisOf(size.width, size.height)
-  cameraPresence.viewShortAxisMetres = framedShortAxisOf(framing, zoom.shownMetres, cap)
+  const cap = maxViewVerticalOf(size.width, size.height)
+  const vertical = framedShortAxisOf(framing, zoom.shownMetres, cap)
+  cameraPresence.viewShortAxisMetres = vertical
+  cameraPresence.viewHorizontalMetres = viewHorizontalMetresOf(size.width, size.height, vertical)
   cameraPresence.feltSpeedCellsPerSecond = framing.feltSpeed
   cameraPresence.leadShare = framing.leadShare
+  cameraPresence.sideLeadShare = framing.sideLeadShare
   cameraPresence.widthPixels = size.width
   cameraPresence.heightPixels = size.height
 }
 
 function fitCameraZoom(camera: OrthographicCamera, size: Size): void {
-  const zoom = pixelsPerMetreOf(size.width, size.height, cameraPresence.viewShortAxisMetres)
+  const zoom = pixelsPerMetreOf(size.height, cameraPresence.viewShortAxisMetres)
   if (camera.zoom === zoom) return
   camera.zoom = zoom
   camera.updateProjectionMatrix()

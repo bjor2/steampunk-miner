@@ -21,7 +21,7 @@ export function vehicleScreenBoxNow(): DebugResult<{ box: ScreenBox }> {
   const box = vehicleScreenBoxOf({
     width: widthPixels,
     height: heightPixels,
-    pixelsPerMetre: pixelsPerMetreOf(widthPixels, heightPixels, viewShortAxisMetres),
+    pixelsPerMetre: pixelsPerMetreOf(heightPixels, viewShortAxisMetres),
     fromCentre: { x: cameraPresence.vehicleFromCentreX, y: cameraPresence.vehicleFromCentreY },
     turnRadians: cameraPresence.turnRadians,
   })

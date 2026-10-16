@@ -81,7 +81,8 @@ export interface DebugUi {
   setZoom(viewShortAxisMetres: unknown): DebugResult
   /**
    * The framing on screen now: the eased zoom, pixels per metre and the collider's share (#39),
-   * and at speed the felt speed, the lean and the ground visible ahead (ticket 338).
+   * and at speed the felt speed, the lean and the ground visible ahead (ticket 338); the width
+   * and the ground ahead across the screen too (ticket 484).
    */
   getCameraView(): DebugResult<{ view: CameraView & SpeedView }>
   /** What the last frame drew and cost (#38 acceptance 1-3): draw calls, blocks, lights, scale. */
@@ -327,14 +328,18 @@ function screenLayoutNow(): DebugResult<{ layout: ScreenLayout }> {
   return { ok: true, layout }
 }
 
-/** The framing the player sees, with the speed lean and the ground it shows ahead (ticket 338). */
+/**
+ * The framing the player sees, with the speed leans and the ground they show ahead (ticket 338),
+ * down and across the screen (ticket 484).
+ */
 function cameraViewOnScreen(): CameraView & SpeedView {
-  const { widthPixels, heightPixels, viewShortAxisMetres } = cameraPresence
-  const { feltSpeedCellsPerSecond, leadShare } = cameraPresence
-  return {
-    ...cameraViewOf(widthPixels, heightPixels, viewShortAxisMetres),
-    ...speedViewOf(viewShortAxisMetres, feltSpeedCellsPerSecond, leadShare),
+  const { widthPixels, heightPixels, viewShortAxisMetres, feltSpeedCellsPerSecond } = cameraPresence
+  const view = cameraViewOf(widthPixels, heightPixels, viewShortAxisMetres)
+  const extent = {
+    verticalMetres: viewShortAxisMetres,
+    horizontalMetres: view.viewHorizontalMetres,
   }
+  return { ...view, ...speedViewOf(extent, feltSpeedCellsPerSecond, cameraPresence) }
 }
 
 function runWithAction(actionId: unknown, run: (action: ActionId) => void): DebugResult {

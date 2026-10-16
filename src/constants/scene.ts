@@ -148,12 +148,18 @@ export const CAMERA_TURN_SECONDS = 0.3
  * `2 vCam T_warn / (1 + f)` with `T_warn` 1 s, never under the player's zoom nor over the screen
  * shape's cap: easing out over 0.5 s and in over 1 s, and only once the need has stayed lower for
  * 1 s, so stop-start digging does not make the camera breathe. Placeholders, tuned by eye.
+ *
+ * On a portrait screen (ticket 484, the GD's option (a) with Gameplay's conditions) the half short
+ * axis is the half height, and the lean across the narrow width runs its own ramp: from 0 at 3
+ * cells/s to the full 0.6 of the half width at Gameplay's 5.6 cells/s,
+ * `f_h = clamp((vCam - 3) / 2.6, 0, 1) x 0.6`.
  */
 export const SPEED_FRAMING = {
   feltSpeedSeconds: 0.5,
   leadStartCellsPerSecond: 3,
   leadSpanCellsPerSecond: 12,
   leadMaxShare: 0.6,
+  sideLeadFullCellsPerSecond: 5.6,
   leadEaseSeconds: 0.4,
   warnSeconds: 1,
   pullOutEaseSeconds: 0.5,

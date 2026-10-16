@@ -21,7 +21,7 @@ const params = planetParamsFor(1, 1)
 const radiusTiles = params.radiusTiles
 
 function viewRadiusAt(width: number, height: number, viewShortAxisMetres: number): number {
-  return viewRadiusOf(width, height, pixelsPerMetreOf(width, height, viewShortAxisMetres))
+  return viewRadiusOf(width, height, pixelsPerMetreOf(height, viewShortAxisMetres))
 }
 
 function mostBlocksAcrossPlanet(viewRadius: number): number {

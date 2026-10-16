@@ -11,7 +11,7 @@ describe('texel density against the screen (#173)', () => {
   it.each(ASSET_CATEGORIES)(
     'bakes %s art at no fewer pixels per metre than a 4K TV shows',
     (category) => {
-      const tvPixelsPerMetre = pixelsPerMetreOf(3840, 2160, VIEW_SHORT_AXIS_DEFAULT_M)
+      const tvPixelsPerMetre = pixelsPerMetreOf(2160, VIEW_SHORT_AXIS_DEFAULT_M)
       expect(tvPixelsPerMetre).toBe(180)
       expect(pxPerMetreOf(category)).toBeGreaterThanOrEqual(tvPixelsPerMetre)
     },
@@ -19,11 +19,7 @@ describe('texel density against the screen (#173)', () => {
 
   it('covers a 1440p screen at the canvas DPR cap of 2 as well', () => {
     const [, maxDpr] = CANVAS_DPR_RANGE
-    const shownPixelsPerMetre = pixelsPerMetreOf(
-      2560 * maxDpr,
-      1440 * maxDpr,
-      VIEW_SHORT_AXIS_DEFAULT_M,
-    )
+    const shownPixelsPerMetre = pixelsPerMetreOf(1440 * maxDpr, VIEW_SHORT_AXIS_DEFAULT_M)
     for (const category of ASSET_CATEGORIES) {
       expect(pxPerMetreOf(category)).toBeGreaterThanOrEqual(shownPixelsPerMetre)
     }
