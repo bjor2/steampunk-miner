@@ -52,8 +52,9 @@ it runs `e2e/browser/mobile/perfPhone.spec.ts` on the Pixel 7 Chromium project w
 4x and 6x (`Emulation.setCPUThrottlingRate` over CDP), on planet 1 parked, at 96 m/s and at
 3600 m/s (`e2e/browser/mobile/perfPhonePlan.json`), and records one `--source e2e` line per rate,
 `--env "Chromium CPU throttled Nx, SwiftShader"`, under the ids `phone.cpu<N>x.<case>.<field>`:
-`tickMsP95` (one fixed tick stepped alone, the sim's CPU cost), `frameMsP95` and
-`ticksDroppedByCap` (15 s of live play: the ticks the wall clock owed that the 30-step cap let go),
+`tickMsP95` (one fixed tick stepped alone, the sim's CPU cost), `ticksDroppedByCap` (15 s of live
+play: the due ticks the 30-step cap let go, summed from the `perf_sample` lines, ticket 480) and
+`frameMsP95`,
 the settled `renderScale`, `internalWidth` and `internalHeight`, `jsHeapMB` and `domNodes`. They
 chart in the group "Phone lane (CPU-throttled emulation)"; the tick cost carries the TD's 6 ms
 target, so a phone three times slower still fits a 16.7 ms frame at any speed.

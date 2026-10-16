@@ -6,9 +6,9 @@
  *
  * - `tickMsP95`: one fixed tick's cost, each of 60 ticks stepped alone through the debug `step(1)`
  *   with the live step held, the driving input held down; the sim's CPU cost, no frame around it;
- * - over 15 s of live play after that: `frameMsP95` (the render stats' last second), and
- *   `ticksDroppedByCap`, the ticks the wall clock owed (60 a second) that the 30-step cap of
- *   `MAX_STEPS_PER_FRAME` let go (time dilation, #480);
+ * - over 15 s of live play after that: `ticksDroppedByCap`, the due ticks the 30-step cap of
+ *   `MAX_STEPS_PER_FRAME` let go (time dilation), summed from the window's `perf_sample` lines,
+ *   which count them since ticket 480; then `frameMsP95`, the render stats' last second;
  * - once the adaptive scale settles (or a minute passes): `renderScale`, `internalWidth` and
  *   `internalHeight`, `jsHeapMB` (CDP `Runtime.getHeapUsage`) and `domNodes`
  *   (`Memory.getDOMCounters`).
@@ -42,7 +42,6 @@ const PAD_TICKS = 120
 const TIMED_TICKS = 60
 const LIVE_MS = 15_000
 const SETTLE_MS = 60_000
-const TICKS_PER_SECOND = 60
 const MIB = 1024 * 1024
 
 interface PhoneCaseReading {
@@ -112,23 +111,36 @@ function timeTicksP95(page: Page): Promise<number> {
   }, TIMED_TICKS)
 }
 
-/** Live play for `LIVE_MS`: the ticks the wall clock owed that the step did not run. */
+/** Live play for `LIVE_MS`: the ticks the frame cap dropped, as its `perf_sample` lines count them. */
 async function liveTicksDropped(page: Page): Promise<number> {
   await page.evaluate(() => window.steampunkDebug!.resume())
-  const startedAt = await readLivePoint(page)
+  const startSeq = await newestLoggedSeq(page)
   await page.waitForTimeout(LIVE_MS)
-  const endedAt = await readLivePoint(page)
-  const owed = Math.round(((endedAt.atMs - startedAt.atMs) * TICKS_PER_SECOND) / 1000)
-  return Math.max(0, owed - (endedAt.tick - startedAt.tick))
+  return ticksDroppedLoggedAfter(page, startSeq)
 }
 
-/** The authority's tick and the page's clock, read together. */
-function readLivePoint(page: Page): Promise<{ tick: number; atMs: number }> {
+function newestLoggedSeq(page: Page): Promise<number> {
   return page.evaluate(() => {
-    const result = window.steampunkDebug!.snapshot()
-    if (!result.ok) throw new Error(result.problems.join('; '))
-    return { tick: result.snapshot.tick, atMs: performance.now() }
+    const lines = window.steampunkRunLog!().trim().split('\n')
+    return (JSON.parse(lines[lines.length - 1]) as { seq: number }).seq
   })
+}
+
+/** The sum of `perf_sample.ticksDroppedByCap` (ticket 480) over the lines after `startSeq`. */
+function ticksDroppedLoggedAfter(page: Page, startSeq: number): Promise<number> {
+  return page.evaluate((after) => {
+    const samples = window.steampunkRunLog!()
+      .split('\n')
+      .filter((text) => text.includes('"event":"perf_sample"'))
+      .map((text) => JSON.parse(text) as { seq: number; data: { ticksDroppedByCap?: number } })
+      .filter((line) => line.seq > after)
+    if (samples.length === 0) throw new Error('no perf_sample line was logged in the live window')
+    const counts = samples.map((line) => line.data.ticksDroppedByCap)
+    if (counts.some((count) => count === undefined)) {
+      throw new Error('perf_sample carries no ticksDroppedByCap: this build predates ticket 480')
+    }
+    return counts.reduce((sum: number, count) => sum + (count ?? 0), 0)
+  }, startSeq)
 }
 
 /** The render stats once the adaptive scale settles, or after `SETTLE_MS` of live play. */
