@@ -14,7 +14,7 @@ import { nodeCardModelOf, treeScreenModelOf } from '../systems/treeScreenModel'
 import { LAB_FIXTURE_SLICE } from '../treeFixtureSlice'
 import { withFixtureTree, withNoLanes } from '../treeTestSession'
 import { NodeCardView } from './NodeCardView'
-import { TechTreeButton } from './TechTreeButton'
+import { TechTreeButton, TechTreeButtonView } from './TechTreeButton'
 import { TECH_TREE_SCREEN_ID, TechTreeScreenView } from './TechTreeScreen'
 
 const game = () => useGameStore.getState()
@@ -186,3 +186,20 @@ const EVERYTHING = { search: '', filters: [] } as const
 function textOf(html: string): string {
   return html.replace(/<[^>]*>/g, ' ')
 }
+
+describe('tech tree button on the compact HUD (#500)', () => {
+  const draw = (density: 'full' | 'compact') =>
+    renderToString(createElement(TechTreeButtonView, { density, onOpen: () => {} }))
+
+  it('draws one glyph button with the tree named for assistive tech, and no Open word', () => {
+    const html = draw('compact')
+    expect(html).toContain('data-hud="tech-tree"')
+    expect(html).toContain('aria-label="Tech tree"')
+    expect(html).not.toContain('>Open<')
+    expect(html.match(/<button/g)).toHaveLength(1)
+  })
+
+  it('keeps the full HUD button as it was, titled with its Open button', () => {
+    expect(draw('full')).toContain('>Open<')
+  })
+})

@@ -452,7 +452,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/sensing/systems/threatPeriscope.test.ts` | 6 | 6 |
 | `src/features/sensing/systems/useResolution.test.ts` | 16 | 16 |
 
-### `tech-tree`: 61 files, 429 tests
+### `tech-tree`: 61 files, 431 tests
 
 | File | Tests | Sites |
 | --- | --- | --- |
@@ -516,7 +516,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/tech-tree/treeSpendGuard.lane.test.ts` | 8 | 8 |
 | `src/features/tech-tree/ui/nodeCardHold.test.ts` | 4 | 4 |
 | `src/features/tech-tree/ui/nodeElement.test.ts` | 6 | 6 |
-| `src/features/tech-tree/ui/techTreeScreen.test.ts` | 8 | 8 |
+| `src/features/tech-tree/ui/techTreeScreen.test.ts` | 10 | 10 |
 
 ### `terrain-tools`: 47 files, 383 tests
 

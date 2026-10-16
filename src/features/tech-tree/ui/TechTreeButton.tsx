@@ -7,6 +7,7 @@
  */
 import { useGameStore } from '../../../store/gameStore'
 import { panelIconIdOf } from '../../../systems/art/icons/iconSet'
+import type { HudDensity } from '../../../systems/views/screenLayout'
 import type { ElementText } from '../../../systems/views/uiText'
 import { hudBoxOf } from '../../../ui/hud/hudBoxes'
 import { useHudDensity } from '../../../ui/hud/useHudDensity'
@@ -28,11 +29,21 @@ const TECH_TREE_ICON_ID = panelIconIdOf('upgrades')
 
 export function TechTreeButton() {
   const openScreen = useGameStore((state) => state.openScreen)
-  const isCompact = useHudDensity() === 'compact'
-  const openTree = () => openScreen(TECH_TREE_SCREEN_ID)
+  const density = useHudDensity()
+  return <TechTreeButtonView density={density} onOpen={() => openScreen(TECH_TREE_SCREEN_ID)} />
+}
+
+/** The button for one HUD density; a server render draws it from props alone. */
+export function TechTreeButtonView({
+  density,
+  onOpen,
+}: {
+  density: HudDensity
+  onOpen: () => void
+}) {
   return (
     <div className={styles.slot} data-testid="tech-tree-open" {...hudBoxOf('tech-tree')}>
-      {isCompact ? <CompactOpener onOpen={openTree} /> : <FullOpener onOpen={openTree} />}
+      {density === 'compact' ? <CompactOpener onOpen={onOpen} /> : <FullOpener onOpen={onOpen} />}
     </div>
   )
 }
