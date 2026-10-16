@@ -8,11 +8,17 @@
  * The boards watch from `startPlaques`, which the composition root calls once preferences, the
  * checkpoint and any launch scenario are settled. A scenario turns them off unless its file says
  * `hintsEnabled: true`, so scenario and bot runs never see a plaque.
+ *
+ * On a phone (#500) the compact HUD says whether the hint chip has room in the play view; while it
+ * has none the board only queues, and a tap on the chip's dismiss takes the hint down for good.
  */
 import type { DomainEvent } from '../systems/authority/domainEvent'
 import {
+  dismissHintByTap,
   EMPTY_HINT_BOARD,
   observeHints,
+  observeHintsQueuedOnly,
+  queueShownHintForRoom,
   type HintBoard,
   type HintStep,
 } from '../systems/hints/hintBoard'
@@ -35,6 +41,8 @@ export interface HintValues {
   /** False once a scenario that does not turn hints on is applied (#16). */
   arePlaquesAllowed: boolean
   isWatchingPlaques: boolean
+  /** The compact HUD has room for the hint chip (#500); always true on the full HUD. */
+  hasHintRoom: boolean
 }
 
 export interface HintActions {
@@ -44,6 +52,10 @@ export interface HintActions {
   observePlaques(events: readonly DomainEvent[]): void
   /** Any key takes the transmission down (#16); the key still does what it is bound to. */
   dismissTransmission(): void
+  /** A tap on the hint chip's dismiss (#500): the hint goes down and, already seen, stays down. */
+  dismissHint(): void
+  /** The compact HUD measured its room for the hint chip (#500); a lost room queues the hint. */
+  noteHintRoom(hasRoom: boolean): void
   allowPlaquesFor(scenario: Scenario): void
 }
 
@@ -63,6 +75,7 @@ export const STARTING_HINTS: HintValues = {
   transmissionBoard: EMPTY_TRANSMISSION_BOARD,
   arePlaquesAllowed: true,
   isWatchingPlaques: false,
+  hasHintRoom: true,
 }
 
 export function hintActionsOf(set: SetSlice, get: () => SliceHost): HintActions {
@@ -89,8 +102,20 @@ export function hintActionsOf(set: SetSlice, get: () => SliceHost): HintActions 
       const step = dismissTransmission(transmissionStepOf(host))
       keepBoards(set, host, { ...hintStepOf(host), seen: step.seen }, step.board)
     },
+    dismissHint: () => set({ hintBoard: dismissHintByTap(get().hintBoard) }),
+    noteHintRoom: (hasRoom) => {
+      const host = get()
+      if (hasRoom === host.hasHintRoom) return
+      set({ hasHintRoom: hasRoom, hintBoard: boardForRoom(host.hintBoard, hasRoom) })
+      host.observePlaques([])
+    },
     allowPlaquesFor: (scenario) => set({ arePlaquesAllowed: isHintsEnabled(scenario) }),
   }
+}
+
+/** A lost room sends the hint up back to the queue; a found one leaves the board to show it. */
+function boardForRoom(board: HintBoard, hasRoom: boolean): HintBoard {
+  return hasRoom ? board : queueShownHintForRoom(board)
 }
 
 /** From the run's start, and never in a scenario run that keeps hints off. */
@@ -106,9 +131,13 @@ function transmissionStepOf(host: SliceHost): TransmissionStep {
   return { board: host.transmissionBoard, seen: host.prefs.seenHints }
 }
 
-/** "Show hints" off: the hint board neither queues nor shows; transmissions still do. */
+/**
+ * "Show hints" off: the hint board neither queues nor shows; transmissions still do. With no room
+ * in the compact HUD (#500) it queues without showing.
+ */
 function observeShownHints(host: SliceHost, step: HintStep, moment: HintMoment): HintStep {
-  return host.prefs.hintsEnabled ? observeHints(step, moment) : step
+  if (!host.prefs.hintsEnabled) return step
+  return host.hasHintRoom ? observeHints(step, moment) : observeHintsQueuedOnly(step, moment)
 }
 
 /** The boards are kept only when they changed, so a quiet tick never touches the store. */

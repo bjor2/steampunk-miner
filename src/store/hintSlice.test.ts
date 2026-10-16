@@ -4,6 +4,7 @@ import { createRunLog, installRunLog, uninstallRunLog } from '../logging/runLog'
 import { surfaceOreTiles } from '../systems/authority/scriptedSession'
 import type { ScriptedCommand } from '../systems/fastForward'
 import { HINT_TABLE } from '../systems/hints/hintTable'
+import { DEFAULT_PREFERENCES } from '../systems/input/preferences'
 import { IDLE_INTENT } from '../systems/vehicle/vehicleIntent'
 import { FACING, dockedPoseAt } from '../systems/vehicle/vehiclePose'
 import { dockSiteOf } from '../systems/world/dockSite'
@@ -12,7 +13,7 @@ import type { TilePoint } from '../systems/world/tileGrid'
 import { readAuthorityTick, resetGameStore, takeSessionSnapshot, useGameStore } from './gameStore'
 import { readVehicleIntent, resetInput, routeKeyChange } from './inputRuntime'
 import { installPreferencesStorage, loadPreferences, preferencesWrites } from './preferencesFile'
-import { readPlaqueModel, readSellBayModel } from './screenReads'
+import { readPlaqueModel, readSellBayModel, readTouchSituation } from './screenReads'
 import { NO_DRIVE } from '../systems/vehicle/driveSigns'
 
 const PLANET_1 = planetParamsFor(1, 1)
@@ -178,5 +179,66 @@ describe('hint slice', () => {
     game().setPreference('hintsEnabled', false)
     playFirstTrip()
     expect(takeSessionSnapshot().digest).toBe(withHints)
+  })
+
+  it('takes the shown hint down on a tap of its dismiss, and it never returns (#500)', async () => {
+    game().startPlaques()
+    expect(readPlaqueModel().hint?.id).toBe('hint_move')
+    game().dismissHint()
+    expect(readPlaqueModel().hint).toBeNull()
+    game().observePlaques([])
+    expect(readPlaqueModel().hint).toBeNull()
+    await reload()
+    game().startPlaques()
+    expect(readPlaqueModel().hint?.id).not.toBe('hint_move')
+  })
+
+  it('remembers a dismissed hint in the seen-set it joined when shown: no new field (#500)', () => {
+    game().startPlaques()
+    const seenWhenShown = game().prefs.seenHints
+    game().dismissHint()
+    expect(game().prefs.seenHints).toEqual(seenWhenShown)
+    expect(Object.keys(game().prefs).sort()).toEqual(Object.keys(DEFAULT_PREFERENCES).sort())
+  })
+
+  it('dismisses only the hint, never a control the hint pointed at (#500, HS)', () => {
+    game().startPlaques()
+    playFirstTrip()
+    game().fastForward(GAP)
+    expect(readPlaqueModel().hint?.id).toBe('hint_dock')
+    const controls = readTouchSituation()
+    const service = readSellBayModel().quickService
+    game().dismissHint()
+    expect(readTouchSituation()).toEqual(controls)
+    expect(readSellBayModel().quickService).toEqual({ ...service, isHighlighted: false })
+  })
+
+  it('leaves the state digest the same whether a hint was dismissed or not (#500)', () => {
+    game().startPlaques()
+    game().dismissHint()
+    playFirstTrip()
+    const dismissed = takeSessionSnapshot().digest
+    resetGameStore()
+    game().startPlaques()
+    playFirstTrip()
+    expect(takeSessionSnapshot().digest).toBe(dismissed)
+  })
+
+  it('queues the hint while the compact HUD has no room and shows it once there is (#500)', () => {
+    game().noteHintRoom(false)
+    game().startPlaques()
+    expect(readPlaqueModel().hint).toBeNull()
+    expect(game().prefs.seenHints).not.toContain('hint_move')
+    game().noteHintRoom(true)
+    expect(readPlaqueModel().hint?.id).toBe('hint_move')
+  })
+
+  it('sends the hint up back to the queue when the room goes, and back up when it returns', () => {
+    game().startPlaques()
+    expect(readPlaqueModel().hint?.id).toBe('hint_move')
+    game().noteHintRoom(false)
+    expect(readPlaqueModel().hint).toBeNull()
+    game().noteHintRoom(true)
+    expect(readPlaqueModel().hint?.id).toBe('hint_move')
   })
 })

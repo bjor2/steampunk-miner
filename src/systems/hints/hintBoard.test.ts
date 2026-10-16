@@ -15,7 +15,14 @@ import { stepPrice } from '../economy/upgradePrices'
 import { cmp, fromCanonical, sub, toCanonical } from '../money'
 import { dockCommand, undockCommand } from '../platform/platformCommands'
 import { dockedPoseAt, FACING } from '../vehicle/vehiclePose'
-import { EMPTY_HINT_BOARD, observeHints, type HintStep } from './hintBoard'
+import {
+  dismissHintByTap,
+  EMPTY_HINT_BOARD,
+  observeHints,
+  observeHintsQueuedOnly,
+  queueShownHintForRoom,
+  type HintStep,
+} from './hintBoard'
 import { HINT_TABLE } from './hintTable'
 
 const GAP = HINT_TABLE.minTicksBetweenHints
@@ -240,5 +247,48 @@ describe('hint board: the Upgrade bay hint (#58)', () => {
     expect(watched.step().board.shown?.id).toBe('hint_upgrade_bay')
     watched.submit(21, dockCommand('upgrade'))
     expect(watched.step().board.shown).toBeNull()
+  })
+})
+
+describe('hint board on a crowded phone view (#500)', () => {
+  it('queues a triggered hint without showing it while there is no room', () => {
+    const session = createScriptedSession()
+    const moment = { state: session.state(), playerId: 'p1', events: [] }
+    const step = observeHintsQueuedOnly({ board: EMPTY_HINT_BOARD, seen: [] }, moment)
+    expect(step.board.shown).toBeNull()
+    expect(step.board.queued.map((hint) => hint.id)).toEqual(['hint_move'])
+    expect(step.seen).toEqual([])
+  })
+
+  it('shows the queued hint at once when there is room again', () => {
+    const session = createScriptedSession()
+    const moment = { state: session.state(), playerId: 'p1', events: [] }
+    const waiting = observeHintsQueuedOnly({ board: EMPTY_HINT_BOARD, seen: [] }, moment)
+    expect(observeHints(waiting, moment).board.shown?.id).toBe('hint_move')
+  })
+
+  it('puts the hint up back at the front of the queue when the room goes', () => {
+    const watched = watchedSession()
+    const board = queueShownHintForRoom(watched.step().board)
+    expect(board.shown).toBeNull()
+    expect(board.queued[0].id).toBe('hint_move')
+    expect(board.lastShownTick).toBeNull()
+  })
+
+  it('keeps a hint shown again after waiting for room in the seen-set once', () => {
+    const session = createScriptedSession()
+    const moment = { state: session.state(), playerId: 'p1', events: [] }
+    const shown = observeHints({ board: EMPTY_HINT_BOARD, seen: [] }, moment)
+    const again = observeHints({ ...shown, board: queueShownHintForRoom(shown.board) }, moment)
+    expect(again.board.shown?.id).toBe('hint_move')
+    expect(again.seen).toEqual(['hint_move'])
+  })
+
+  it('takes the hint down on a tap of its dismiss, and it stays seen', () => {
+    const watched = watchedSession()
+    const board = dismissHintByTap(watched.step().board)
+    expect(board.shown).toBeNull()
+    expect(watched.step().seen).toContain('hint_move')
+    expect(dismissHintByTap(board)).toBe(board)
   })
 })

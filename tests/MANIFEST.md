@@ -867,7 +867,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | File | Tests | Sites |
 | --- | --- | --- |
 | `src/systems/hints/hintAcceptance.test.ts` | 4 | 4 |
-| `src/systems/hints/hintBoard.test.ts` | 18 | 18 |
+| `src/systems/hints/hintBoard.test.ts` | 23 | 23 |
 | `src/systems/hints/hintTable.test.ts` | 5 | 5 |
 | `src/systems/hints/transmissionBoard.test.ts` | 6 | 6 |
 
@@ -877,6 +877,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | --- | --- | --- |
 | `src/systems/input/actionMap.test.ts` | 28 | 28 |
 | `src/systems/input/buildIntent.test.ts` | 11 | 11 |
+| `src/systems/input/cleanTap.test.ts` | 5 | 5 |
 | `src/systems/input/inputRouting.test.ts` | 29 | 29 |
 | `src/systems/input/padCodes.test.ts` | 4 | 4 |
 | `src/systems/input/padFrame.test.ts` | 7 | 7 |
@@ -1187,7 +1188,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/store/checkpoint.test.ts` | 22 | 22 |
 | `src/store/domainEventBroadcast.test.ts` | 3 | 3 |
 | `src/store/gameStore.test.ts` | 26 | 26 |
-| `src/store/hintSlice.test.ts` | 9 | 9 |
+| `src/store/hintSlice.test.ts` | 15 | 15 |
 | `src/store/inputRuntime.test.ts` | 51 | 51 |
 | `src/store/liveStepSlice.test.ts` | 22 | 22 |
 | `src/store/padRuntime.test.ts` | 16 | 14 |

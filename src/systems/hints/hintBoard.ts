@@ -7,7 +7,10 @@
  * so the board pauses with the game and never pauses it.
  *
  * Dismissal is judged only while a hint is up: a hint queued behind the 20 s gap still goes up
- * once, even if the player has already done the thing (the run's first moments come fast).
+ * once, even if the player has already done the thing (the run's first moments come fast). A tap
+ * on the compact hint chip's dismiss takes it down too (#500); it is already seen, so it never
+ * returns. On a phone a hint that would crowd the play view waits (#500, GD ruling 5): the board
+ * then only queues, and one already up goes back to the front of the queue until there is room.
  */
 import { HINT_CONDITIONS, rescueCostIn, type HintMoment, type RescueCost } from './hintConditions'
 import { HINT_TABLE, type HintDef, type HintTable } from './hintTable'
@@ -41,10 +44,34 @@ export function observeHints(
   moment: HintMoment,
   table: HintTable = HINT_TABLE,
 ): HintStep {
+  return showNextHint(observeHintsQueuedOnly(step, moment, table), moment.state.tick, table)
+}
+
+/** The same moment with no room to show a hint: dismissals and new triggers only. */
+export function observeHintsQueuedOnly(
+  step: HintStep,
+  moment: HintMoment,
+  table: HintTable = HINT_TABLE,
+): HintStep {
   const dismissed = dismissShownHint(step, moment, table)
   const queued = queueTriggeredHints(dismissed, moment, table)
-  const costed = noteRescueCost(queued, rescueCostIn(moment))
-  return showNextHint(costed, moment.state.tick, table)
+  return noteRescueCost(queued, rescueCostIn(moment))
+}
+
+/** The player tapped the hint's dismiss (#500): it goes down and, already seen, stays down. */
+export function dismissHintByTap(board: HintBoard): HintBoard {
+  return board.shown === null ? board : { ...board, shown: null }
+}
+
+/**
+ * The view lost its room (#500): the hint up goes back to the front of the queue and may show
+ * again as soon as there is room, with no 20 s gap, since the player barely saw it.
+ */
+export function queueShownHintForRoom(board: HintBoard): HintBoard {
+  const { shown } = board
+  if (shown === null) return board
+  const waiting: QueuedHint = { id: shown.id, rescueCost: shown.rescueCost }
+  return { queued: [waiting, ...board.queued], shown: null, lastShownTick: null }
 }
 
 export function isHintShown(board: HintBoard, id: string): boolean {
@@ -90,8 +117,13 @@ function showNextHint(step: HintStep, tick: number, table: HintTable): HintStep 
   if (next === undefined || !isHintSlotFree(step.board, tick, table)) return step
   return {
     board: { queued: rest, shown: { ...next, shownTick: tick }, lastShownTick: tick },
-    seen: [...step.seen, next.id],
+    seen: withSeen(step.seen, next.id),
   }
+}
+
+/** A hint queued again for room is already seen; it joins the set once. */
+function withSeen(seen: readonly string[], id: string): readonly string[] {
+  return seen.includes(id) ? seen : [...seen, id]
 }
 
 function isHintSlotFree(board: HintBoard, tick: number, table: HintTable): boolean {
