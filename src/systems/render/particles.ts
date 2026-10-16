@@ -2,6 +2,11 @@
  * The small particle set of #13 VFX (sparks now; dust and steam reuse it): a fixed pool in flat
  * arrays, so emitting and stepping never allocate. Particles fly in straight lines and die when
  * their life runs out; a dead particle's slot is filled by the last live one.
+ *
+ * A pool may emit a share of what it is asked for (ticket 477, #173 "particle counts are halved"
+ * on phones): it reads its `ParticleShare` live and carries the fractions, so half of a steady
+ * rate is exactly half over time and a share of 1 emits every particle. Pools made without one
+ * (the blast front, the spray layer's blast debris, the statuses #173 never simplifies) emit all.
  */
 import type { SeededRandom } from '../seededRandom'
 
@@ -14,7 +19,18 @@ export interface ParticlePool {
   vy: Float32Array
   age: Float32Array
   life: Float32Array
+  share: ParticleShare
+  /** The fraction of a particle the share left owing, so a share holds across sprays. */
+  shareOwed: number
 }
+
+/** The share of their particles the pools that read it emit, 0 to 1; read at every spray. */
+export interface ParticleShare {
+  readonly particleShare: number
+}
+
+/** Every particle asked for. */
+export const FULL_PARTICLE_SHARE: ParticleShare = { particleShare: 1 }
 
 /** A cone of particles from one point. `dirX, dirY` is a unit vector. */
 export interface Spray {
@@ -32,7 +48,10 @@ export interface EmissionCarry {
   owed: number
 }
 
-export function createParticlePool(capacity: number): ParticlePool {
+export function createParticlePool(
+  capacity: number,
+  share: ParticleShare = FULL_PARTICLE_SHARE,
+): ParticlePool {
   return {
     capacity,
     count: 0,
@@ -42,6 +61,8 @@ export function createParticlePool(capacity: number): ParticlePool {
     vy: new Float32Array(capacity),
     age: new Float32Array(capacity),
     life: new Float32Array(capacity),
+    share,
+    shareOwed: 0,
   }
 }
 
@@ -53,15 +74,23 @@ export function particlesDue(carry: EmissionCarry, perSecond: number, dt: number
   return due
 }
 
-/** Adds up to `count` particles; a full pool takes no more. */
+/** Adds up to the pool's share of `count` particles; a full pool takes no more. */
 export function sprayParticles(
   pool: ParticlePool,
   random: SeededRandom,
   spray: Spray,
   count: number,
 ): void {
-  const room = Math.min(count, pool.capacity - pool.count)
+  const room = Math.min(sharedCountOf(pool, count), pool.capacity - pool.count)
   for (let added = 0; added < room; added++) addParticle(pool, random, spray)
+}
+
+/** The whole particles the pool's share of `count` comes to, with the fraction carried. */
+function sharedCountOf(pool: ParticlePool, count: number): number {
+  const owed = pool.shareOwed + count * pool.share.particleShare
+  const due = Math.floor(owed)
+  pool.shareOwed = owed - due
+  return due
 }
 
 export function stepParticles(pool: ParticlePool, dt: number): void {

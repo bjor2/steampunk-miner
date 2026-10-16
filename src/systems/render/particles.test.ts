@@ -86,4 +86,27 @@ describe('particles', () => {
     }
     expect(shifted.count).toBe(still.count)
   })
+
+  it('emit half of what they are asked for while their share is a half (#173 phones, ticket 477)', () => {
+    const share = { particleShare: 0.5 }
+    const pool = createParticlePool(64, share)
+    const random = createSeededRandom(7)
+    for (let spray = 0; spray < 9; spray++) sprayParticles(pool, random, SPRAY, 1)
+    sprayParticles(pool, random, SPRAY, 10)
+    expect(pool.count).toBe(9)
+  })
+
+  it('read their share live, so a quality change reaches pools already made', () => {
+    const share = { particleShare: 1 }
+    const pool = createParticlePool(64, share)
+    const random = createSeededRandom(7)
+    sprayParticles(pool, random, SPRAY, 8)
+    share.particleShare = 0.5
+    sprayParticles(pool, random, SPRAY, 8)
+    expect(pool.count).toBe(12)
+  })
+
+  it('emit every particle asked for when made without a share', () => {
+    expect(sprayed(7).count).toBe(7)
+  })
 })

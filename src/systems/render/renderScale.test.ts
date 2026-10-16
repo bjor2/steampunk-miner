@@ -2,7 +2,10 @@ import { describe, expect, it } from 'vitest'
 import { addFrame, createFrameWindow, frameMsAt, type FrameWindow } from './frameWindow'
 import {
   adaptRenderScale,
+  capRenderScale,
   createRenderScale,
+  drawnRenderScaleOf,
+  isRenderScaleAtFloor,
   pinRenderScale,
   refloorRenderScale,
   renderScaleFloorOf,
@@ -119,6 +122,85 @@ describe('adaptive render scale', () => {
     runSeconds(state, createFrameWindow(), [33, 33, 33])
     refloorRenderScale(state, AT_1080P)
     expect(state.scale).toBe(1)
+  })
+})
+
+/** Settles a 4K output at 0.75 after three reversals (as the #38 settle test does). */
+function settledAt4k(window: FrameWindow): RenderScale {
+  const state = createRenderScale(AT_4K)
+  runSeconds(state, window, [16.6, 33, 16.6, 33])
+  return state
+}
+
+describe('render scale hysteresis (TD #470 section 2.4, ticket 477)', () => {
+  it('draws only the floor, the ceiling or halfway, so most steps reallocate no target', () => {
+    const state = createRenderScale(PHONE_LANDSCAPE)
+    const window = createFrameWindow()
+    const drawn = new Set<number>()
+    for (let second = 0; second < 6; second++) {
+      runSecond(state, window, 33)
+      drawn.add(drawnRenderScaleOf(state))
+    }
+    for (let second = 0; second < 6; second++) {
+      runSecond(state, window, 16.6)
+      drawn.add(drawnRenderScaleOf(state))
+    }
+    expect([...drawn].sort()).toEqual([0.5, 0.75, 1])
+  })
+
+  it('draws a pinned scale exactly', () => {
+    const state = createRenderScale(AT_4K)
+    pinRenderScale(state, 0.62)
+    expect(drawnRenderScaleOf(state)).toBe(0.62)
+  })
+
+  it('steps at most every 2 s once it has settled and adapts again a minute later', () => {
+    const window = createFrameWindow()
+    const state = settledAt4k(window)
+    runSeconds(
+      state,
+      window,
+      Array.from({ length: 59 }, () => 16.6),
+    )
+    expect(state.isSettled).toBe(true)
+    expect(state.scale).toBe(0.75)
+    runSecond(state, window, 16.6)
+    expect(state.isSettled).toBe(false)
+    expect(state.scale).toBe(0.85)
+    runSecond(state, window, 16.6)
+    expect(state.scale).toBe(0.85)
+    runSecond(state, window, 16.6)
+    expect(state.scale).toBe(0.95)
+  })
+
+  it('never climbs past the quality cap, and the cap never sinks under the floor', () => {
+    const state = createRenderScale(AT_4K)
+    capRenderScale(state, 0.75)
+    runSeconds(state, createFrameWindow(), [16.6, 16.6, 16.6])
+    expect(state.scale).toBe(0.75)
+    capRenderScale(state, 0.2)
+    expect(state.ceiling).toBe(0.5)
+    expect(state.scale).toBe(0.5)
+  })
+
+  it('judges a second against the budget it is given, as a 30 fps cap needs', () => {
+    const state = createRenderScale(AT_4K)
+    const window = createFrameWindow()
+    let verdict = null
+    // 31 frames: thirty float thirtieths can sum just short of a second.
+    for (let frame = 0; frame < 31; frame++) {
+      addFrame(window, 1 / 30)
+      verdict = adaptRenderScale(state, window, 1000 / 30) ?? verdict
+    }
+    expect(verdict).toBe('met')
+    expect(state.scale).toBe(0.85)
+  })
+
+  it('has nothing left to give once it sits at its floor', () => {
+    const state = createRenderScale(AT_4K)
+    expect(isRenderScaleAtFloor(state)).toBe(false)
+    runSeconds(state, createFrameWindow(), [33, 33, 33])
+    expect(isRenderScaleAtFloor(state)).toBe(true)
   })
 })
 

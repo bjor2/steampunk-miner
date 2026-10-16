@@ -76,11 +76,12 @@ export const CANVAS_DPR_RANGE: readonly [number, number] = [1, 2]
 export const FRAME_BUDGET_MS = 16.7
 /**
  * A second whose p95 frame is over 10% past the budget missed frames, so the scale steps down;
- * one within 5% of it (vsync jitter) met every frame, so it steps up. Between, it holds.
+ * one within 5% of it (vsync jitter) met every frame, so it steps up. Between, it holds. The
+ * budget is `FRAME_BUDGET_MS`, or a capped render rate's own frame (ticket 477: 33.3 ms at 30).
  * Placeholders until the #38 acceptance run on the reference machine.
  */
-export const RENDER_SCALE_DECLINE_FRAME_MS = FRAME_BUDGET_MS * 1.1
-export const RENDER_SCALE_INCLINE_FRAME_MS = FRAME_BUDGET_MS * 1.05
+export const RENDER_SCALE_DECLINE_BUDGET_RATIO = 1.1
+export const RENDER_SCALE_INCLINE_BUDGET_RATIO = 1.05
 /**
  * Flip-flop protection (drei PerformanceMonitor's `flipflops`, #38): after this many reversals
  * the scale settles at the lower of the two it swung between and stops adapting.
