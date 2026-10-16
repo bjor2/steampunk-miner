@@ -374,8 +374,9 @@ programs }` from three's `renderer.info` of the game canvas), read only when cal
   #397's strict line on every ramped-up tick (ticket 432; the paid-not-free specs run an up leg
   too). `cutFollowRelease.test.ts` pairs the 15 m/s rig's level
   release phases main followed (`MAIN_FOLLOWED_LEVEL`) and wants their backward ticks no deeper and
-  no larger in sum than main's; at 30 frames/s the sum is a todo on #491 and #460 since ticket 459,
-  held meanwhile by a ratchet on the sum and the backward ticks (`TOE_RATCHET`) that may only shrink.
+  no larger in sum than main's; at 30 frames/s the sum is a todo since ticket 459, on #499 and #460
+  since #491's toe stop, held meanwhile by a ratchet on the sum and the backward ticks (`TOE_RATCHET`)
+  that may only shrink.
 - **Known red** (ticket 419, the TD on #396 section 2): `CAMPAIGN_PACING_KNOWN_RED`
   (`src/constants/knownRed.ts`) is the one known-red marker in the repo: one gate
   (`campaignPacingGate`), one finding (#417), no registry. The gate still runs in full;

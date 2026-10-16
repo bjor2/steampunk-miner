@@ -25,7 +25,8 @@ import { stepAtToe, type ToeStep } from './toeStopFixtures'
 // Since the substeps collide with the world the tick's own cut left (ticket 459), stored 20 slides
 // back down the toe's tilted floor at one level release phase after the drive lets go (#465's trace),
 // and the 15 m/s rig backs off more in sum at 30 frames/s, held by a ratchet. Since ticket 491 the
-// let-go stop also sees the face's toe (`drillToe.ts`) on a body on the ground.
+// let-go stop also sees the face's toe (`drillToe.ts`) on a body on the ground; what is left at 30
+// frames/s is contact made while the drive still pushed (phase 6) and a landing bounce (phase 20), #499.
 
 const RIGS: Readonly<Record<string, Record<string, number>>> = {
   'stored 1': { drill_power: 1, drill_tip: 0 },
@@ -42,7 +43,7 @@ const HELD_SHARE = 0.05
 /** The body counts as stopped under this speed along the facing (#333's stop spec). */
 const STOPPED_MPS = 0.05
 /**
- * The 15 m/s rig's level releases that must stop in time until #491 lands. Rig 2 stopped at 3 in
+ * The 15 m/s rig's level releases that must stop in time until #499 and #460 land. Rig 2 stopped at 3 in
  * 4 under the old floor; the 15 m/s rig that took its place (ticket 397) stops at 2 in 3 (4 of 6
  * phases at 30 frames/s, 9 of 13 at 144), and since #421's release 10 of 11 and 21 of 25.
  */
@@ -312,7 +313,7 @@ describe('the stop ramp follows the drive (ticket 430 addendum)', () => {
   )
 
   it.todo(
-    '15 m/s rig: backs off main’s followed level release phases no deeper and no more in sum than main, at 30 frames/s (#491: the face’s toe; #460: the stop ramp on a cleared face)',
+    '15 m/s rig: backs off main’s followed level release phases no deeper and no more in sum than main, at 30 frames/s (#499: the pushed-tick contact at phase 6 and the landing bounce at phase 20; #460: the stop ramp on a cleared face)',
   )
 
   it.each(TOE_RATCHET_ROWS)(
@@ -322,11 +323,11 @@ describe('the stop ramp follows the drive (ticket 430 addendum)', () => {
   )
 
   it.todo(
-    '15 m/s rig: stops in time on at least as many of main’s followed level release phases as main (11 of 14 against 12 at 144 frames/s; #491 bounce-back off the face, #460 stop ramp on a cleared face)',
+    '15 m/s rig: stops in time on at least as many of main’s followed level release phases as main (11 of 14 against 12 at 144 frames/s; #499 pushed-tick contact and landing bounce, #460 stop ramp on a cleared face)',
   )
 
   it.todo(
-    '15 m/s rig: stops within 6 ticks at every release phase of a level cut (#491: the body bounces back off the face; #460: the stop ramp on a cleared face)',
+    '15 m/s rig: stops within 6 ticks at every release phase of a level cut (#499: the pushed-tick contact and the landing bounce; #460: the stop ramp on a cleared face)',
   )
 
   it('with the swept cut off the face stop never reads the toe', () => {
