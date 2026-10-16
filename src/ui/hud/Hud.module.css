@@ -286,8 +286,9 @@
  * The compact HUD (#500 TD shape 4.2; GD rulings 2, 4 and 7): on a phone the same boxes become
  * grid cells along the top edge instead of floating panels, so no two can overlap. Held upright:
  * the gauges and the Tech tree button on the first row, either side of the pause button's gap
- * (`right: 30%`, ticket 472), then the readouts, the status row and the prompts across the width.
- * Sideways: a left column (gauges, status, prompts) that stops at the vehicle's keep-clear square
+ * (`right: 30%`, ticket 472), then the gauges, the readouts and the prompts across the width.
+ * Sideways: the gauges along the top edge up to the pause button, above the vehicle's keep-clear
+ * square; under them a left column (status, prompts) that stops at that square
  * (`--vehicle-clear-left`) and a right column (Tech tree, readouts) past the pause button. The
  * threat markers keep the space under the rows. Each box takes a clean tap for its card.
  */
@@ -310,13 +311,14 @@
   grid-template-columns:
     minmax(0, calc(var(--vehicle-clear-left) - var(--safe-left) - 2 * var(--space-2)))
     minmax(0, 1fr)
+    calc(56px + var(--space-2))
     minmax(0, calc(30% - 12px));
   grid-template-rows: repeat(3, min-content) minmax(0, 1fr);
   grid-template-areas:
-    'gauges . tech'
-    'status . readouts'
-    'prompts . readouts'
-    'threats threats threats';
+    'gauges gauges . tech'
+    'status . . readouts'
+    'prompts . . readouts'
+    'threats threats threats threats';
 }
 
 .hud[data-density='compact'] .cluster,
