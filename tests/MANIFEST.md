@@ -916,7 +916,8 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/logging/chargeDetonationLine.test.ts` | 4 | 4 |
 | `src/logging/chargeSharePayoffReport.test.ts` | 3 | 3 |
 | `src/logging/commandLog.test.ts` | 15 | 15 |
-| `src/logging/compareRuns.test.ts` | 11 | 11 |
+| `src/logging/commandLogPoseRuns.test.ts` | 13 | 11 |
+| `src/logging/compareRuns.test.ts` | 12 | 12 |
 | `src/logging/diveCasing.test.ts` | 4 | 4 |
 | `src/logging/diveSummaries.test.ts` | 4 | 4 |
 | `src/logging/domainEventLog.test.ts` | 21 | 21 |
@@ -924,7 +925,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/logging/drillLadder.test.ts` | 3 | 3 |
 | `src/logging/drillLadderReport.test.ts` | 9 | 9 |
 | `src/logging/drillLadderSteps.test.ts` | 2 | 2 |
-| `src/logging/drillLogBytes.test.ts` | 2 | 2 |
+| `src/logging/drillLogBytes.test.ts` | 4 | 4 |
 | `src/logging/drillSpanGate.test.ts` | 2 | 2 |
 | `src/logging/dynamiteDryRuns.test.ts` | 4 | 4 |
 | `src/logging/eventNames.test.ts` | 6 | 6 |
@@ -960,7 +961,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/logging/sessionAnalysis/fixtureSessions.test.ts` | 8 | 8 |
 | `src/logging/sessionAnalysis/frameCost.test.ts` | 8 | 8 |
 | `src/logging/sessionAnalysis/memoryTrend.test.ts` | 7 | 7 |
-| `src/logging/sessionAnalysis/sessionTable.test.ts` | 10 | 10 |
+| `src/logging/sessionAnalysis/sessionTable.test.ts` | 11 | 11 |
 | `src/logging/sessionAnalysis/summaryComparison.test.ts` | 3 | 3 |
 | `src/logging/wreckerDiveReport.test.ts` | 6 | 6 |
 

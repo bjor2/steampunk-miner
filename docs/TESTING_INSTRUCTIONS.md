@@ -229,7 +229,12 @@ programs }` from three's `renderer.info` of the game canvas), read only when cal
   byte for byte the same apart from `seq`, and the pacing report, planet 1 drill pace, dive casing,
   summary and money lane read the same off both. `src/logging/drillLogBytes.test.ts` drills a
   synthetic hour of 60 Hz `drillStep` with 5 Hz poses through the NDJSON sink at 1x, 10x and 100x
-  the planet 1 band-1 speed: events plus commands within 5% of each other and at most 6 MB.
+  the planet 1 band-1 speed (events plus commands within 5% of each other), and an hour of a pose
+  report every tick (the recorded stored-1 drilling track, re-stamped), and holds the TD's three
+  log budget lines on #514 (ticket 522): at most 8 KB/s of commands while drilling, at most 6 MB
+  in a typical hour at the bot's P1-P2 duty (46% drilling, 46% travel, 8% rest) and at most 8 MB
+  in an hour of continuous drilling (MB = 10^6 bytes). `src/logging/commandLogPoseRuns.test.ts`
+  round-trips the recorded schema 6 tracks in `src/logging/fixtures/poseTracks/` through pose runs.
   `src/logging/assayPacingGate.test.ts` holds the bot holding `assay_beacon`
   (`bot-slice-assay.scenario.json`) to the same three gates: the #16 first ten minutes, the planet 1
   core in 15 to 30 minutes and the slice in 40 to 130 (ticket 396's windows, slice edge per #418; `pacingVerdicts` prints pass or fail for each). Trips per planet
