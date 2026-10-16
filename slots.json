@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-10-16T19:14:07+01:00",
+  "updated_at": "2026-10-16T19:23:35+01:00",
   "caps": {
     "grok": 12,
     "claude": 10,
@@ -20,11 +20,11 @@
         {
           "slot": "C1",
           "state": "busy",
-          "ticket": 508,
+          "ticket": 445,
           "grok_slot": 1,
           "kind": "dev",
-          "since": "2026-10-16T18:58:00+01:00",
-          "wave": null
+          "since": "2026-10-16T19:18:00+01:00",
+          "wave": "7A"
         },
         {
           "slot": "C2",
@@ -71,7 +71,7 @@
       "size": 6,
       "used": 2,
       "free": 4,
-      "claims_last_hour": 3,
+      "claims_last_hour": 4,
       "name": "Claude Max 1"
     },
     {
@@ -551,10 +551,10 @@
     {
       "slot": 1,
       "state": "dev",
-      "ticket": 508,
-      "since": "2026-10-16T18:58:00+01:00",
+      "ticket": 445,
+      "since": "2026-10-16T19:18:00+01:00",
       "claude_slot": 1,
-      "wave": null
+      "wave": "7A"
     },
     {
       "slot": 2,
@@ -629,11 +629,11 @@
     {
       "slot": 1,
       "state": "busy",
-      "ticket": 508,
+      "ticket": 445,
       "grok_slot": 1,
-      "since": "2026-10-16T18:58:00+01:00",
+      "since": "2026-10-16T19:18:00+01:00",
       "account": 1,
-      "wave": null
+      "wave": "7A"
     },
     {
       "slot": 2,
@@ -714,11 +714,11 @@
     }
   ],
   "last_refill": {
-    "at": "2026-10-16 19:03 BST",
+    "at": "2026-10-16 19:23 BST",
     "mode": "recheck",
-    "triggers": "#500 #506",
-    "started": "#484->C2/A1",
-    "note": "spawned 1 worker(s)"
+    "triggers": "#508",
+    "started": "",
+    "note": "no pickable build ticket"
   },
   "totals": {
     "grok": {
@@ -824,7 +824,7 @@
         "map": 302,
         "lane": "remote",
         "mode": "solo",
-        "state": "ready",
+        "state": "running",
         "tickets": [
           445,
           446,
@@ -832,7 +832,7 @@
           449
         ],
         "done": [],
-        "live": 0
+        "live": 1
       },
       {
         "number": 438,
