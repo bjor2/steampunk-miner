@@ -673,6 +673,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/authority/charges/chargeLiveBlast.test.ts` | 12 | 12 |
 | `src/systems/authority/charges/chargeShop.test.ts` | 10 | 10 |
 | `src/systems/authority/charges/chargeSizeRules.test.ts` | 14 | 14 |
+| `src/systems/authority/clampedCharge.test.ts` | 6 | 6 |
 | `src/systems/authority/collapse/collapseBraces.test.ts` | 23 | 22 |
 | `src/systems/authority/collapse/collapseReinforcement.test.ts` | 7 | 7 |
 | `src/systems/authority/collapse/collapseRun.test.ts` | 19 | 19 |
@@ -734,6 +735,8 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/authority/startingRigCutSpeed.test.ts` | 2 | 2 |
 | `src/systems/authority/stateDigest.test.ts` | 17 | 12 |
 | `src/systems/authority/sweptCarry.test.ts` | 8 | 6 |
+| `src/systems/authority/sweptChargeConservation.lane.test.ts` | 168 | 1 |
+| `src/systems/authority/sweptChargeConservation.test.ts` | 36 | 5 |
 | `src/systems/authority/sweptCutAtSpeed.test.ts` | 8 | 8 |
 | `src/systems/authority/sweptFreshCarve.test.ts` | 47 | 16 |
 | `src/systems/authority/sweptGateSpeeds.test.ts` | 24 | 2 |
@@ -1334,7 +1337,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/vehicle/returnReserve.test.ts` | 4 | 4 |
 | `src/systems/vehicle/stepBound.test.ts` | 10 | 10 |
 | `src/systems/vehicle/strutPlank.test.ts` | 4 | 4 |
-| `src/systems/vehicle/sweepDwell.test.ts` | 9 | 9 |
+| `src/systems/vehicle/sweepDwell.test.ts` | 13 | 13 |
 | `src/systems/vehicle/sweptCut.test.ts` | 7 | 7 |
 | `src/systems/vehicle/tickPlan.test.ts` | 10 | 6 |
 | `src/systems/vehicle/travelParity.test.ts` | 13 | 13 |

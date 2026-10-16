@@ -145,6 +145,10 @@ export interface LegCut {
   /** Ends the leg once its cut reaches this far along it, mm; by default it runs to the core. */
   reachMm?: number
   tick?: LegTick
+  /** The tick the rig is armed on, 1 by default: a later one starts the dither phase elsewhere. */
+  startTick?: number
+  /** Upgrade levels over the armed rig's, such as a small hold that fills on the leg. */
+  upgrades?: Readonly<Record<string, number>>
 }
 
 /** Ends a leg this far before the point nearest the planet's centre: past it lies the core. */
@@ -157,7 +161,7 @@ const CORE_MARGIN_MM = 20_000
  */
 export function cutLeg(cut: LegCut): LegRun {
   const { leg, maxTicks, reachMm, tick = AS_DRILL_STEP } = cut
-  const start = armedRigStart(cut.drillStep ?? drillStepOfRig(cut.rig), leg)
+  const start = armedRigStart(cut.drillStep ?? drillStepOfRig(cut.rig), cut)
   const endMm = reachMm ?? alongOf(leg, { xMm: 0, yMm: 0 }) - CORE_MARGIN_MM
   const ticks: RuleEffect[] = []
   const bodyAlongMm: number[] = []
@@ -174,11 +178,14 @@ export function cutLeg(cut: LegCut): LegRun {
 }
 
 /** Player `p1` reported at the leg's start with the rig's drill, a deep hold and a full tank. */
-function armedRigStart(drillStep: number, leg: Leg): AuthorityState {
+function armedRigStart(
+  drillStep: number,
+  { leg, startTick: tick = 1, upgrades: over }: LegCut,
+): AuthorityState {
   const session = createScriptedSession()
-  const tick = 1
   session.submit(tick, FREEZE_ENEMIES)
-  const upgrades = { drill_tip: TIP_STEP, drill_power: drillStep, cargo_hold: 2_000, hull: 2_000 }
+  const armed = { drill_tip: TIP_STEP, drill_power: drillStep, cargo_hold: 2_000, hull: 2_000 }
+  const upgrades = { ...armed, ...over }
   for (const [upgradeId, level] of Object.entries(upgrades)) {
     session.submit(tick, { type: 'debug.setUpgrade', payload: { upgradeId, level } })
   }

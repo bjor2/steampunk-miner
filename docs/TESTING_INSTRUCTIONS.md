@@ -325,6 +325,17 @@ programs }` from three's `renderer.info` of the game canvas), read only when cal
   regression ratchet that #441's band replaces. `src/physics/sweptFreshCarveLoop.test.ts` plays
   stored rigs 370/600, 450/600 and 2000/600 off the pad and down at 30 and 144 frames/s: never more
   than 6 straight cutting ticks at 0 m/s, at least 50 m down, one path for both rates (about 20 s).
+- **Swept ledger charges the work it spends** (ticket 466, dark until #441's ring re-run):
+  `src/systems/authority/clampedCharge.test.ts` checks fix A's driver with fakes (one carve when
+  the release clamp keeps the carry, a second charging exactly the clamped carry when it lowers it,
+  the stored carry the first clamp's). `src/systems/authority/sweptChargeConservation.test.ts` cuts
+  the 100 m column and tilted legs of `sweptRigFixtures.ts` at 5 to 3600 m/s through a recorder on
+  the swept carve's walks (`sweptChargeFixtures.ts`; the ledger is not in the loop yet) and wants
+  the ledgers to charge the paid prices, the carry kept and the carried-in work later ticks drop,
+  to the sub-step after every tick, no row over-charging by more than 8% and none from 78 m/s up at
+  all; a gate keeps no carry, a full hold and the legs' releases and caves conserve too. It prints
+  the residual per row (about 10 s). The lane `sweptChargeConservation.lane.test.ts` runs the same
+  rows at tick phases 1, 7, 19 and 31 and start offsets 0, 41 and 83 mm (about 1 min).
 - **Carry release** (ticket 421): `src/systems/authority/carryRelease.test.ts` holds the carry's
   cell out of the stamp until one of its samples lies in the body's next-step slab
   (`CARRY_RELEASE_MARGIN_SAMPLES`), then wants it carved, priced again after the stamp's bite and
