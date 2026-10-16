@@ -8,12 +8,16 @@
  * the tag that names it beside the bytes it wrote (#207 TD lock, #219). The kernel default orders by
  * `(tier, cellFamily, grade)`, so metal and crystal of one tier never share a bit.
  *
+ * The provider may also say the largest rarity lead a planet's ore rolls (`topLeadOf`, ticket 445):
+ * the hazard strip's top-tier ore follows the planet's rows. With none, #140's +2.
+ *
  * Signature tags fold over the provider's answer (#232, GD lock on #147): a planet's signature
  * (#141) is a pure function of an ore's family and tier that only the planet mix knows, so the one
  * provider never has to. A tagged ore is `signature` and sells `signatureValueLead` tiers up
  * (`saleTier`); its tier, and so its id, bit and look, stay the provider's.
  */
 import { signatureSaleTier } from '../economy/oreEconomy'
+import type { PlanetParams } from '../world/planetParams'
 import { RESOURCE_FAMILY, type ResourceFamily } from '../world/worldCell'
 import { defineOneProviderRegistry, defineRegistry, entriesOf } from './seal'
 
@@ -65,11 +69,16 @@ export interface OreTypeProvider {
   bitIndexOf(ore: OreType): number
   /** Every ore the provider can answer, for icon coverage and the codex. */
   catalogue(): readonly OreType[]
+  /** The largest lead an ore patch rolls above its band's tier on the planet these params make. */
+  topLeadOf?(params: PlanetParams): number
 }
 
 export const ORE_TYPE_REGISTRY = defineOneProviderRegistry<OreTypeProvider>('oreTypes')
 
 export const ORE_SIGNATURE_REGISTRY = defineRegistry<OreSignatureTag>('oreSignatures')
+
+/** #140's largest rarity lead, the kernel default's answer for the top lead of any planet. */
+export const KERNEL_TOP_LEAD = 2
 
 /** The kernel draws ore from its tile look, never an icon (`none`, as the HUD's ok marker). */
 const NO_ORE_ICON = 'none'
@@ -116,6 +125,12 @@ export function oreTypeCatalogue(): readonly OreType[] {
 export function oreBitIndexOf(ore: OreType): number {
   const [provider] = entriesOf(ORE_TYPE_REGISTRY)
   return provider === undefined ? kernelOreBitIndexOf(ore) : provider.bitIndexOf(ore)
+}
+
+/** The largest lead the planet's ore rolls: the provider's answer, else #140's +2. */
+export function topOreLeadOf(params: PlanetParams): number {
+  const [provider] = entriesOf(ORE_TYPE_REGISTRY)
+  return provider?.topLeadOf?.(params) ?? KERNEL_TOP_LEAD
 }
 
 /** The tag of the index `oreBitIndexOf` answers by. */

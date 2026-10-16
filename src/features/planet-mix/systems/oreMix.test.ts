@@ -1,7 +1,15 @@
 import { describe, expect, it } from 'vitest'
-import { toCanonical, type Money } from '../../../systems/money'
-import { planetParamsFor } from '../../../systems/world/planetParams'
-import { leadWeights } from '../../ores'
+import {
+  cmp,
+  div,
+  fromSafeInteger,
+  mul,
+  sub,
+  toCanonical,
+  type Money,
+} from '../../../systems/money'
+import { ORE_RULES_VERSION, planetParamsFor } from '../../../systems/world/planetParams'
+import { leadWeights, ORE_ROWS, oreTierOf, rarityLeadBucketsBpOf } from '../../ores'
 import { gateClassOf } from './planetActs'
 import { oreMixFor, oreMixNearLavaOf, oreMixOf, type OreMix, type OreMixEntry } from './oreMix'
 import { bandValueMultiplierOf, signatureValueShareOf } from './mixValue'
@@ -9,6 +17,14 @@ import { bandValueMultiplierOf, signatureValueShareOf } from './mixValue'
 const SEEDS = [83921, 31415, 27182]
 const BANDS = [1, 2, 3, 4, 5]
 const MIXED_PLANETS = Array.from({ length: 198 }, (_, at) => at + 3)
+
+/**
+ * The mix of a planet a save holds without the ore rules: the legacy rows #141 was written for, so
+ * these specs hold its distribution formula on them (ticket 445 keeps such planets byte-identical).
+ */
+function legacyMixFor(planetIndex: number, worldSeed: number): OreMix {
+  return oreMixOf(planetParamsFor(worldSeed, planetIndex))
+}
 
 function numberOf(amount: Money): number {
   return Number(toCanonical(amount))
@@ -37,17 +53,17 @@ function rolesOf(mix: OreMix) {
   }
 }
 
-describe('planet ore mix', () => {
+describe('planet ore mix on the legacy rows', () => {
   it('fills every band to 10000 basis points on every planet', () => {
     for (const planet of [1, 2, ...MIXED_PLANETS]) {
-      const mix = oreMixFor(planet, 83921)
+      const mix = legacyMixFor(planet, 83921)
       for (const entries of mix.bands) expect(totalBp(entries)).toBeCloseTo(10000, 6)
     }
   })
 
   it('shows 5 band types, at most 2 previews, 1 signature and at most 8 types from P3', () => {
     for (const planet of MIXED_PLANETS) {
-      const roles = rolesOf(oreMixFor(planet, 31415))
+      const roles = rolesOf(legacyMixFor(planet, 31415))
       expect(roles.bandTypes.every((ids) => ids.length === 1)).toBe(true)
       expect(new Set(roles.bandTypes.flat()).size).toBe(5)
       expect(roles.previews.length).toBeLessThanOrEqual(2)
@@ -58,7 +74,7 @@ describe('planet ore mix', () => {
 
   it("carries the last planet's bands 4 and 5 into bands 1 and 2 inside an act", () => {
     for (const planet of MIXED_PLANETS.filter((p) => p >= 4)) {
-      const [before, here] = [oreMixFor(planet - 1, 27182), oreMixFor(planet, 27182)]
+      const [before, here] = [legacyMixFor(planet - 1, 27182), legacyMixFor(planet, 27182)]
       if (before.themeId !== here.themeId) continue
       expect([idsOf(here, 1, 0), idsOf(here, 2, 0)]).toEqual([
         idsOf(before, 4, 0),
@@ -69,7 +85,7 @@ describe('planet ore mix', () => {
 
   it('puts the signature only in bands 4 and 5, from P3, at the tier of band 5', () => {
     for (const planet of [1, 2, ...MIXED_PLANETS]) {
-      const mix = oreMixFor(planet, 83921)
+      const mix = legacyMixFor(planet, 83921)
       const signatureBands = BANDS.filter((band) => mix.bands[band - 1].some((e) => e.signature))
       expect(signatureBands).toEqual(planet >= 3 ? [4, 5] : [])
       const tiers = mix.bands
@@ -83,7 +99,7 @@ describe('planet ore mix', () => {
   it('gives the +1 and +2 entries of every band different gate classes (P3 to P200)', () => {
     for (const planet of MIXED_PLANETS) {
       for (const seed of SEEDS) {
-        for (const entries of oreMixFor(planet, seed).bands) {
+        for (const entries of legacyMixFor(planet, seed).bands) {
           const leads = entries.filter((entry) => entry.lead > 0 && !entry.signature)
           const classes = leads.map((entry) => gateClassOf(entry.family))
           expect(new Set(classes).size).toBe(leads.length)
@@ -93,11 +109,11 @@ describe('planet ore mix', () => {
   })
 
   it('keeps P1 and P2 on the legacy families with no signature', () => {
-    const p1 = oreMixFor(1, 83921).bands[0]
+    const p1 = legacyMixFor(1, 83921).bands[0]
     const metal = p1.filter((entry) => entry.family === 'metal' && entry.lead === 0)[0]
     expect(metal.weightBp).toBeCloseTo((10000 - leadWeights(1).plus1Bp) * 0.75, 6)
     expect(
-      oreMixFor(2, 83921)
+      legacyMixFor(2, 83921)
         .bands.flat()
         .map((entry) => entry.family),
     ).not.toContain('fossil')
@@ -105,7 +121,7 @@ describe('planet ore mix', () => {
 
   it('takes 3% of bands 4 and 5 for the signature, doubled on P30 and P40', () => {
     const shareOf = (planet: number, band: number) =>
-      totalBp(oreMixFor(planet, 83921).bands[band - 1].filter((entry) => entry.signature))
+      totalBp(legacyMixFor(planet, 83921).bands[band - 1].filter((entry) => entry.signature))
     expect([shareOf(12, 4), shareOf(12, 5)]).toEqual([300, 300])
     expect(shareOf(30, 5)).toBe(600)
     expect(shareOf(40, 5)).toBe(600)
@@ -113,7 +129,7 @@ describe('planet ore mix', () => {
 
   it("clamps a doubled band-4 signature to the +1 entry it is carved from and #140's cap", () => {
     for (const planet of [30, 40]) {
-      const band4 = oreMixFor(planet, 83921).bands[3]
+      const band4 = legacyMixFor(planet, 83921).bands[3]
       const signature = totalBp(band4.filter((entry) => entry.signature))
       expect(signature).toBe(Math.min(600, leadWeights(4).plus1Bp))
       expect(band4.every((entry) => entry.weightBp >= 0)).toBe(true)
@@ -134,7 +150,7 @@ describe('planet ore mix', () => {
 
   it("prices each band at #140's lead multiplier plus the signature's one tier up", () => {
     for (const planet of [3, 9, 30, 77]) {
-      const mix = oreMixFor(planet, 31415)
+      const mix = legacyMixFor(planet, 31415)
       for (const band of BANDS) {
         const { plus1Bp, plus2Bp } = leadWeights(band)
         const signatureBp = totalBp(mix.bands[band - 1].filter((entry) => entry.signature))
@@ -150,7 +166,7 @@ describe('planet ore mix', () => {
   it("keeps the signature's value share inside #142's 15% guard (12.7% band 4, 10.9% band 5)", () => {
     for (const planet of MIXED_PLANETS) {
       for (const mix of [
-        oreMixFor(planet, 83921),
+        legacyMixFor(planet, 83921),
         oreMixNearLavaOf(planetParamsFor(83921, planet)),
       ]) {
         expect(numberOf(signatureValueShareOf(mix.bands[3]))).toBeLessThanOrEqual(0.127)
@@ -161,7 +177,7 @@ describe('planet ore mix', () => {
 
   // Value and hardness read the tier alone (#140), so equal tiers mean equal oreHardness too.
   it('prices a band the same whichever family its seed swaps in', () => {
-    const mixes = Array.from({ length: 12 }, (_, seed) => oreMixFor(12, seed))
+    const mixes = Array.from({ length: 12 }, (_, seed) => legacyMixFor(12, seed))
     const bandThree = mixes.map((mix) => mix.bands[2])
     const families = new Set(bandThree.map((entries) => entries[0].family))
     const prices = new Set(
@@ -179,5 +195,76 @@ describe('planet ore mix', () => {
       expect(mix).toEqual(oreMixOf(planetParamsFor(27182, planet)))
       expect(mix.bands.flat().every((entry) => Number.isSafeInteger(entry.tier))).toBe(true)
     }
+  })
+})
+
+describe('planet ore mix on the rarity rows (ticket 445)', () => {
+  it('fills every band of a fresh planet to 10000 basis points, P3 to P200', () => {
+    for (const planet of MIXED_PLANETS) {
+      for (const entries of oreMixFor(planet, 83921).bands) expect(totalBp(entries)).toBe(10000)
+    }
+  })
+
+  it("weighs a fresh planet's rarity leads at the mixed rows, the signature carved from common", () => {
+    for (const planet of [3, 12, 77]) {
+      const mix = oreMixFor(planet, 31415)
+      for (const band of BANDS) {
+        const entries = mix.bands[band - 1]
+        const signatureBp = totalBp(entries.filter((entry) => entry.signature))
+        const leadBp = (lead: number) =>
+          totalBp(entries.filter((entry) => entry.lead === lead && !entry.signature))
+        const rows = rarityLeadBucketsBpOf('mixed', band)
+        expect([0, 1, 2, 3, 4].map(leadBp)).toEqual([rows[0] - signatureBp, ...rows.slice(1)])
+      }
+    }
+  })
+
+  it('keeps the signature at 3% of bands 4 and 5 and at the tier of band 5', () => {
+    const mix = oreMixFor(12, 83921)
+    for (const band of [4, 5]) {
+      const signatures = mix.bands[band - 1].filter((entry) => entry.signature)
+      expect(totalBp(signatures)).toBe(300)
+      expect(signatures.map((entry) => entry.tier)).toEqual([oreTierOf(12, 5, 0)])
+    }
+  })
+
+  it("keeps each band's mean value per ore unit within half a basis point of today's", () => {
+    for (const planet of [3, 9, 12, 77, 200]) {
+      const mix = oreMixFor(planet, 27182)
+      for (const band of BANDS) {
+        const multiplier = bandValueMultiplierOf(mix.bands[band - 1], planet, band)
+        const meanBp = mul(multiplier, fromSafeInteger(10000))
+        const todayBp = div(
+          fromSafeInteger(ORE_ROWS.rarity.meanPpmByBand[band - 1]),
+          fromSafeInteger(100),
+        )
+        const errorBp = cmp(meanBp, todayBp) < 0 ? sub(todayBp, meanBp) : sub(meanBp, todayBp)
+        expect(cmp(errorBp, ORE_ROWS.rarity.meanToleranceBp)).toBeLessThanOrEqual(0)
+      }
+    }
+  })
+
+  it('shows one type per band, 5 band types and 1 signature from P3', () => {
+    for (const planet of MIXED_PLANETS) {
+      const roles = rolesOf(oreMixFor(planet, 31415))
+      expect(roles.bandTypes.every((ids) => ids.length === 1)).toBe(true)
+      expect(new Set(roles.bandTypes.flat()).size).toBe(5)
+      expect(roles.signatures).toHaveLength(1)
+    }
+  })
+
+  it("keeps the signature's value share inside #142's 15% guard", () => {
+    for (const planet of MIXED_PLANETS) {
+      const params = planetParamsFor(83921, planet, ORE_RULES_VERSION)
+      for (const mix of [oreMixOf(params), oreMixNearLavaOf(params)]) {
+        expect(numberOf(signatureValueShareOf(mix.bands[3]))).toBeLessThanOrEqual(0.15)
+        expect(numberOf(signatureValueShareOf(mix.bands[4]))).toBeLessThanOrEqual(0.15)
+      }
+    }
+  })
+
+  it('leaves P1 and P2 on the legacy rows even when fresh', () => {
+    for (const planet of [1, 2])
+      expect(oreMixFor(planet, 83921)).toEqual(legacyMixFor(planet, 83921))
   })
 })

@@ -1,14 +1,19 @@
 /**
  * The rarity lead (#140 "rarity lead", #141 "Rolls are per patch"): each ore patch of band `b`
- * rolls a lead of 0, +1 or +2 on `leadWeights(b)` and holds tier `t + lead`, so a rare patch is a
- * deeper ore turning up early, with that tier's value and hardness. One roll per patch, so a vein
- * reads as one ore. Vertical.
+ * rolls a lead on its planet's rarity rows and holds tier `t + lead`, so a rare patch is a deeper
+ * ore turning up early, with that tier's value and hardness. One roll per patch, so a vein reads as
+ * one ore. Vertical.
+ *
+ * The rows (ticket 445, `rarityLeads.ts`): a planet on the legacy rows rolls 0, +1 or +2 on
+ * `leadWeights(b)` exactly as before; a planet entered under the ore rules from P3 rolls 0 to +4
+ * (common to mythic) on Systems' mixed weights. The rarest lead takes the lowest rolls, so with
+ * epic and mythic at 0 the legacy rows roll what they always rolled.
  *
  * The roll is a `patchContent` fold (feature-slices.md 3.8): it adds the lead to whatever tier
  * offset the fold received (the lattice's `b - 1`), keyed on the hook's own sub-seed and the
  * patch's band and centre, so it is a pure function of the planet and the patch in any chunk order,
- * and the family stream underneath never moves. The offset goes from 0-4 to 0-6 (#140 "Cell
- * storage"). Integer only.
+ * and the family stream underneath never moves. The offset goes from 0-4 to 0-8 (#140 "Cell
+ * storage", ticket 445). Integer only.
  */
 import { hashCell } from '../../../systems/cellRandom'
 import type { GenerationHook, PatchContent } from '../../../systems/registries/generationHooks'
@@ -17,7 +22,8 @@ import type { PlanetParams } from '../../../systems/world/planetParams'
 import { bandOfTile } from '../../../systems/world/planetGeometry'
 import type { TilePoint } from '../../../systems/world/tileGrid'
 import { CELL_KIND, kindOfCell, tierOffsetOfCell } from '../../../systems/world/worldCell'
-import { leadWeights } from './oreCatalogue'
+import type { RarityRowSet } from './rarityRows'
+import { rarityLeadBucketsBpOf, rarityRowSetOfPlanet } from './rarityLeads'
 
 export const ORE_LEAD_HOOK_ID = 'ores.lead'
 
@@ -26,19 +32,27 @@ const BASIS_POINTS = 10000
 /** Adds each patch's rolled lead to its tier offset. */
 export const oreLeadHook: GenerationHook = {
   id: ORE_LEAD_HOOK_ID,
-  patchContent: (_params, patch, content, seed) => withLead(content, leadOfPatch(seed, patch)),
+  patchContent: (params, patch, content, seed) =>
+    withLead(content, leadOfPatch(seed, patch, rarityRowSetOfPlanet(params))),
 }
 
-/** The lead a patch rolls under the hook's sub-seed. */
-export function leadOfPatch(seed: number, patch: OrePatch): number {
-  return leadOfRoll(patch.band, rollOfPatch(seed, patch))
+/** The lead a patch rolls under the hook's sub-seed, on the planet's rows. */
+export function leadOfPatch(seed: number, patch: OrePatch, set: RarityRowSet): number {
+  return leadOfRoll(set, patch.band, rollOfPatch(seed, patch))
 }
 
-/** +2 below `plus2Bp`, +1 below `plus2Bp + plus1Bp`, else 0, for a roll in 0..9999. */
-export function leadOfRoll(band: number, rollBp: number): number {
-  const { plus1Bp, plus2Bp } = leadWeights(band)
-  if (rollBp < plus2Bp) return 2
-  return rollBp < plus2Bp + plus1Bp ? 1 : 0
+/**
+ * For a roll in 0..9999, the rarest lead first: each lead below the sum of its weight and every
+ * rarer one's, else 0. On the legacy rows: +2 below `plus2Bp`, +1 below `plus2Bp + plus1Bp`.
+ */
+export function leadOfRoll(set: RarityRowSet, band: number, rollBp: number): number {
+  const buckets = rarityLeadBucketsBpOf(set, band)
+  let below = 0
+  for (let lead = buckets.length - 1; lead > 0; lead--) {
+    below += buckets[lead]
+    if (rollBp < below) return lead
+  }
+  return 0
 }
 
 /**

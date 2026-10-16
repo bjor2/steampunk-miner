@@ -8,6 +8,8 @@
  * the pad from -8 to +12 under the two shop buildings, growing east from planet 10 (#170, #175);
  * version 7 rolls each ore patch's rarity lead, 0, +1 or +2 tiers, on every planet (#140, #146);
  * version 8 gives each ore patch from planet 3 its planet's family mix and signature (#141, #147),
- * planets 1 and 2 unchanged.
+ * planets 1 and 2 unchanged; version 9 rolls the rarity rows, common to mythic, on each ore patch of
+ * a planet entered under the ore rules from planet 3, the band-4 signature carved from common (ticket
+ * 445), while a planet a save holds without the rules and planets 1 and 2 keep the lead rows.
  */
-export const GENERATOR_VERSION = 8
+export const GENERATOR_VERSION = 9

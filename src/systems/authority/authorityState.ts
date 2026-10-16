@@ -23,7 +23,7 @@ import { NEW_COMBAT, type CombatState } from './combat/combatState'
 import { NEW_CORE_PROGRESS, type CoreProgress } from './coreProgress'
 import type { HeldArtefact } from './heldArtefact'
 import { NEW_PLATFORM, type PlatformState } from './platformState'
-import { dockSiteOfPlanet, type SessionPlanet } from './planetOfState'
+import { dockSiteOfPlanet, enteredPlanetOf, type SessionPlanet } from './planetOfState'
 
 export interface PlayerState {
   wallet: Money
@@ -88,7 +88,7 @@ export interface SessionStart {
 }
 
 export function createAuthorityState(start: SessionStart): AuthorityState {
-  const planet = { index: start.planetIndex, seed: start.planetSeed }
+  const planet = enteredPlanetOf(start.planetIndex, start.planetSeed)
   return {
     tick: 0,
     planet,

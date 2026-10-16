@@ -16,20 +16,21 @@ import { onCurveLevel } from '../../../systems/economy/vehicleStats'
 import { setPlanetCommand, setPlanetSeedCommand } from '../../../systems/startScenarioCommands'
 import { setUpgradeCommand } from '../../../systems/vehicle/vehicleCommands'
 import { dockSiteOf } from '../../../systems/world/dockSite'
-import { planetParamsFor } from '../../../systems/world/planetParams'
+import { freshPlanetParamsFor } from '../../../systems/world/planetParams'
 
 // The bot's shaft steps round a gated wall nothing it has opens (ticket 237, GD ruling: extractor
 // cells stay optional until 148d, and #142 acceptance 8 has the bot skip drill-gated signatures),
 // as it steps round lava, so the core trips still finish and no gate_blocked_no_route is noted.
-// Both walls sit in the straight shaft column -10 of a pacing seed, above the core.
+// Both walls sit in the straight shaft column -10 of a pacing seed, above the core, on the planet
+// as a run enters it (under the rarity rows of ticket 445, which moved the walls first pinned here).
 
 const CORE: { kind: 'core' } = { kind: 'core' }
 const MAX_CORE_TRIPS = 60
 
-/** Pacing seed 27182's planet 7: a `rig.resonance` wall at rows 34 to 36 of column -10. */
-const RESONANCE_WALL = { seed: 27182, planet: 7, tile: { tx: -10, ty: 36 } }
-/** Pacing seed 31415's planet 5: a drill-gated signature at rows 60 to 64, above the tip. */
-const SIGNATURE_WALL = { seed: 31415, planet: 5, tile: { tx: -10, ty: 64 } }
+/** Pacing seed 27182's planet 8: a `rig.resonance` wall at rows 51 to 56 of column -10. */
+const RESONANCE_WALL = { seed: 27182, planet: 8, tile: { tx: -10, ty: 56 } }
+/** Pacing seed 83921's planet 4: a drill-gated signature at rows 77 to 80, above the tip. */
+const SIGNATURE_WALL = { seed: 83921, planet: 4, tile: { tx: -10, ty: 80 } }
 
 function arrivedOn(planetIndex: number, seed: number): CommandIntent[] {
   return [
@@ -50,7 +51,7 @@ function botOnCurve(planetIndex: number, seed: number): { session: BotSession; p
     'p1',
   )
   for (const intent of arrivedOn(planetIndex, seed)) session.submit(intent)
-  const params = planetParamsFor(seed, planetIndex)
+  const params = freshPlanetParamsFor(seed, planetIndex)
   const layout = newMineLayout(params, dockSiteOf(params))
   return {
     session,

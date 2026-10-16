@@ -269,7 +269,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | --- | --- | --- |
 | `src/features/materials/systems/materialTable.test.ts` | 21 | 21 |
 
-### `mining-gates`: 23 files, 150 tests
+### `mining-gates`: 24 files, 151 tests
 
 | File | Tests | Sites |
 | --- | --- | --- |
@@ -281,6 +281,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/mining-gates/systems/botGates.test.ts` | 6 | 6 |
 | `src/features/mining-gates/systems/botShaftJog.test.ts` | 2 | 1 |
 | `src/features/mining-gates/systems/canMine.test.ts` | 18 | 18 |
+| `src/features/mining-gates/systems/cellGates.test.ts` | 1 | 1 |
 | `src/features/mining-gates/systems/dynamiteCells.test.ts` | 3 | 3 |
 | `src/features/mining-gates/systems/extractorRules.test.ts` | 8 | 8 |
 | `src/features/mining-gates/systems/extractorVerbs.test.ts` | 12 | 12 |
@@ -343,24 +344,24 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/ore-visuals/systems/oreGradeChannels.test.ts` | 7 | 7 |
 | `src/features/ore-visuals/systems/render/oreLookProvider.test.ts` | 21 | 10 |
 
-### `ores`: 12 files, 68 tests
+### `ores`: 12 files, 79 tests
 
 | File | Tests | Sites |
 | --- | --- | --- |
 | `src/features/ores/oreReportRows.test.ts` | 6 | 6 |
 | `src/features/ores/oresSourceHash.test.ts` | 1 | 1 |
 | `src/features/ores/systems/kernelOreAliases.test.ts` | 2 | 2 |
-| `src/features/ores/systems/leadRoll.test.ts` | 10 | 6 |
+| `src/features/ores/systems/leadRoll.test.ts` | 20 | 12 |
 | `src/features/ores/systems/oreCatalogue.test.ts` | 9 | 9 |
 | `src/features/ores/systems/oreCensus.test.ts` | 4 | 4 |
 | `src/features/ores/systems/oreRows.test.ts` | 3 | 3 |
 | `src/features/ores/systems/oreTypeProvider.test.ts` | 6 | 6 |
 | `src/features/ores/systems/rarityRows.test.ts` | 7 | 7 |
 | `src/features/ores/systems/raritySolve.test.ts` | 5 | 5 |
-| `src/features/ores/systems/rarityTiers.test.ts` | 10 | 10 |
+| `src/features/ores/systems/rarityTiers.test.ts` | 11 | 11 |
 | `src/features/ores/systems/rarityTripClamp.test.ts` | 5 | 5 |
 
-### `planet-mix`: 24 files, 128 tests
+### `planet-mix`: 24 files, 143 tests
 
 | File | Tests | Sites |
 | --- | --- | --- |
@@ -370,13 +371,13 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/planet-mix/magneticClassOff.test.ts` | 3 | 3 |
 | `src/features/planet-mix/magneticPlanetPace.test.ts` | 9 | 3 |
 | `src/features/planet-mix/magneticPlanetRuns.test.ts` | 3 | 1 |
-| `src/features/planet-mix/mixHistogram.test.ts` | 7 | 3 |
+| `src/features/planet-mix/mixHistogram.test.ts` | 11 | 5 |
 | `src/features/planet-mix/mixReportRows.test.ts` | 5 | 5 |
 | `src/features/planet-mix/sceneBudget.test.ts` | 4 | 4 |
 | `src/features/planet-mix/systems/electrifiedCells.test.ts` | 6 | 6 |
 | `src/features/planet-mix/systems/magneticFields.test.ts` | 4 | 4 |
-| `src/features/planet-mix/systems/mixRoll.test.ts` | 5 | 5 |
-| `src/features/planet-mix/systems/oreMix.test.ts` | 13 | 13 |
+| `src/features/planet-mix/systems/mixRoll.test.ts` | 9 | 9 |
+| `src/features/planet-mix/systems/oreMix.test.ts` | 20 | 20 |
 | `src/features/planet-mix/systems/planetActs.test.ts` | 13 | 13 |
 | `src/features/planet-mix/systems/planetCard.test.ts` | 4 | 4 |
 | `src/features/planet-mix/systems/planetCardSources.test.ts` | 3 | 3 |
@@ -731,6 +732,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/authority/magnetic/metalTag.test.ts` | 12 | 12 |
 | `src/systems/authority/minedOre.test.ts` | 7 | 7 |
 | `src/systems/authority/moneyRounding.test.ts` | 3 | 3 |
+| `src/systems/authority/oreRulesStamp.test.ts` | 6 | 6 |
 | `src/systems/authority/planetOfState.test.ts` | 4 | 4 |
 | `src/systems/authority/platformCommands.test.ts` | 43 | 43 |
 | `src/systems/authority/purchaseChain.test.ts` | 18 | 10 |
@@ -869,7 +871,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | --- | --- | --- |
 | `src/logging/goldenRun.test.ts` | 26 | 10 |
 | `src/logging/secondSliceGolden.test.ts` | 6 | 6 |
-| `src/systems/world/generatorGolden.test.ts` | 5 | 5 |
+| `src/systems/world/generatorGolden.test.ts` | 7 | 7 |
 
 ### `hints`
 
@@ -1077,10 +1079,10 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/render/groundStrata.test.ts` | 6 | 6 |
 | `src/systems/render/gunLook.test.ts` | 7 | 7 |
 | `src/systems/render/hazardStrip/hazardStripPlanet.test.ts` | 5 | 2 |
-| `src/systems/render/hazardStrip/hazardStripSampler.test.ts` | 18 | 11 |
+| `src/systems/render/hazardStrip/hazardStripSampler.test.ts` | 19 | 12 |
 | `src/systems/render/hazardStrip/seededStripGround.test.ts` | 10 | 6 |
 | `src/systems/render/hazardStrip/stripPath.test.ts` | 8 | 6 |
-| `src/systems/render/hazardStrip/stripViewer.test.ts` | 2 | 2 |
+| `src/systems/render/hazardStrip/stripViewer.test.ts` | 3 | 3 |
 | `src/systems/render/headlamp.test.ts` | 3 | 3 |
 | `src/systems/render/heatShimmer.test.ts` | 2 | 2 |
 | `src/systems/render/heatTiles.test.ts` | 3 | 3 |
@@ -1127,6 +1129,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/save/chunkDiffSave.test.ts` | 11 | 11 |
 | `src/systems/save/loadedSaveDigest.test.ts` | 4 | 4 |
 | `src/systems/save/newerSaveText.test.ts` | 5 | 5 |
+| `src/systems/save/oreRulesOldSaves.test.ts` | 9 | 3 |
 | `src/systems/save/playerProfile.test.ts` | 4 | 4 |
 | `src/systems/save/saveBytesWatch.test.ts` | 2 | 2 |
 | `src/systems/save/saveDeterminism.test.ts` | 7 | 7 |

@@ -19,6 +19,7 @@ import { BAND_COUNT } from '../../../systems/world/planetGeometry'
 import type { ResourceFamily } from '../../../systems/world/worldCell'
 import { familyOfCellCode, oreFamilies, oreFamilyNamed, oreTierOf, oreTypeOf } from './oreCatalogue'
 import { MAX_FAMILY_CODE, type OreFamily } from './oreRows'
+import { rarityRowSetOfPlanet, topLeadOf } from './rarityLeads'
 import { rarityTiers } from './rarityTiers'
 
 export const ORE_TYPE_PROVIDER_ID = 'ores.catalogue'
@@ -33,6 +34,7 @@ export const oreTypeProvider: OreTypeProvider = {
   oreTypeOf: kernelOreTypeOf,
   bitIndexOf: bitIndexOfOre,
   catalogue: campaignCatalogue,
+  topLeadOf: (params) => topLeadOf(rarityRowSetOfPlanet(params)),
 }
 
 /** The highest tier campaign ore reaches: P40 band 5 plus the largest rarity lead, mythic's +4. */

@@ -32,6 +32,11 @@
  * signature, which changes only the family of generated ore cells; as for 6 -> 7, every edit and
  * the whole state are kept.
  *
+ * Generator 8 -> 9 (ticket 445): a planet entered under the ore rules rolls the rarity rows. A save
+ * written before them holds its planet without `oreRulesVersion`, so that planet keeps the legacy
+ * rows and every cell no one has dug reads as it did; every edit and the whole state are kept, and
+ * the next planet the player enters is stamped.
+ *
  * Format 1 -> 2 (#401): the slot layout. A v1 file was the checkpoint of the single slot, so it
  * becomes the autosave with no wall time, and its header gains the ids of the rows its state opens
  * (`savedUnlocks.ts`). Its sections are kept byte for byte: money, levels and everything else.
@@ -125,6 +130,7 @@ const SAVE_MIGRATION_STEPS: readonly SaveMigrationStep[] = [
   { version: 'generatorVersion', from: 5, to: 6, migrate: regeneratePadArea },
   { version: 'generatorVersion', from: 6, to: 7, migrate: keepEditsUnderOreLeads },
   { version: 'generatorVersion', from: 7, to: 8, migrate: keepEditsUnderOreMix },
+  { version: 'generatorVersion', from: 8, to: 9, migrate: keepLegacyOreRows },
   { version: 'formatVersion', from: 1, to: 2, migrate: addSlotHeader },
   { version: 'formatVersion', from: 2, to: 3, migrate: packChunkTable },
 ]
@@ -241,6 +247,11 @@ function keepEditsUnderOreLeads(file: MigratingFile): MigratingFile | null {
 /** Generator 7 -> 8: as 6 -> 7, since the mix too moves only cells no one has dug. */
 function keepEditsUnderOreMix(file: MigratingFile): MigratingFile | null {
   return keptUnderGenerator(file, 8)
+}
+
+/** Generator 8 -> 9: as 7 -> 8, the saved planet unstamped and so on the rows it was generated on. */
+function keepLegacyOreRows(file: MigratingFile): MigratingFile | null {
+  return keptUnderGenerator(file, 9)
 }
 
 function keptUnderGenerator(file: MigratingFile, generatorVersion: number): MigratingFile | null {

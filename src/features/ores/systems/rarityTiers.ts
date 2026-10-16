@@ -14,11 +14,12 @@
  */
 import { ECONOMY } from '../../../systems/economy/economy'
 import { powInt, type Money } from '../../../systems/money'
+import { ORE_RULES_VERSION } from '../../../systems/world/planetParams'
 import { ORE_ROWS, type OreRows } from './oreRows'
 import type { RarityRowSet, RarityTier } from './rarityRows'
 
-/** The ore rules a planet entered from this build carries (ticket 445). */
-export const ORE_RULES_VERSION = 1
+/** The ore rules a planet entered from this build carries: the kernel's, so it can stamp them. */
+export { ORE_RULES_VERSION }
 
 /** Common, uncommon, rare, epic and mythic, by tier offset. */
 export function rarityTiers(rows: OreRows = ORE_ROWS): readonly RarityTier[] {

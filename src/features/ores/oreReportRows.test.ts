@@ -102,22 +102,25 @@ describe('ore report rows', () => {
     expect(rowsOf(preview, [coreAt(40)])[label]).toBe('no')
   })
 
-  it('counts the +1 and +2 units of each band, read from the tile and the tier', () => {
+  it("counts each lead's units per band on P3's rarity rows, read from the tile and the tier", () => {
     const rows = rowsOf([
       ...minedUnit(10, B4_FIRST, 4, 1, 30),
       ...minedUnit(20, B5_FIRST, 5, 0, 30),
       ...minedUnit(30, B5_SECOND, 5, 2, 30),
       ...minedUnit(40, B5_THIRD, 5, 1, 0),
     ])
-    expect(rows['lead units by band (+1 / +2 of all)']).toBe('b4 1 / 0 of 1, b5 1 / 1 of 3')
+    expect(rows['lead units by band (+1 / +2 / +3 / +4 of all)']).toBe(
+      'b4 1 / 0 / 0 / 0 of 1, b5 1 / 1 / 0 / 0 of 3',
+    )
   })
 
-  it("prints each band's mean value per unit over V(t_b) beside #140's multiplier", () => {
+  it("prints each band's mean value per unit over V(t_b) beside the rarity rows' multiplier", () => {
     const rows = rowsOf([
       ...minedUnit(10, B4_FIRST, 4, 0, 30),
       ...minedUnit(20, B4_SECOND, 4, 2, 30),
     ])
-    expect(rows['mean value per unit over V(t_b) by band (expected)']).toBe('b4 x1.625 (x1.032)')
+    // Band 4's mixed rows (ticket 445): 9836 + 97 x 1.5 + 41 x 2.25 + 18 x 3.375 + 8 x 5.0625 bp.
+    expect(rows['mean value per unit over V(t_b) by band (expected)']).toBe('b4 x1.625 (x1.018)')
   })
 
   it("prints band 5's median drill ticks per tile by lead, blasted tiles left out", () => {
@@ -129,7 +132,7 @@ describe('ore report rows', () => {
       ...minedUnit(40, B5_FOURTH, 5, 0, 34),
     ])
     expect(rows['band 5 median drill ticks per tile by lead (H ratio)']).toBe(
-      '+0 32 (x1.000), +1 38 (x1.254), +2 - (x1.574)',
+      '+0 32 (x1.000), +1 38 (x1.254), +2 - (x1.574), +3 - (x1.974), +4 - (x2.476)',
     )
   })
 

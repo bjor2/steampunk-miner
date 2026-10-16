@@ -470,11 +470,15 @@ export interface OreTypeProvider {
   oreTypeOf(query: OreQuery): OreType
   bitIndexOf(ore: OreType): number  // whole number >= 0, one bit per ore (#219)
   catalogue(): readonly OreType[]   // for icon coverage and the codex
+  topLeadOf?(params: PlanetParams): number  // largest rarity lead on the planet (ticket 445)
 }
 export function oreTypeOf(query: OreQuery): OreType   // provider, else the kernel default
+export function topOreLeadOf(params: PlanetParams): number  // provider, else #140's +2
 export function oreBitIndexOf(ore: OreType): number   // provider, else `tier * 2 + (crystal ? 1 : 0)`
 export function oreIndexTag(): string                 // provider, else 'kernel.tier-family-grade'
 ```
+
+`topLeadOf` (ticket 445) lets the hazard strip's top-tier ore follow the planet's rarity rows: `ores` answers +2 on the legacy rows and mythic's +4 on the rarity rows, and the strip viewer writes it into `StripViewer.topLead`, since the render layer cannot import a slice.
 
 The bit index is the codex's `ore` bitset position (#207 TD lock). The kernel default orders by `(tier, cellFamily, grade)`, so `kernel.metal.t5` and `kernel.crystal.t5` take bits 10 and 11; grade is 0 there and adds no bits. #146 swaps the provider's index and tag, and the codex re-encodes on load.
 
@@ -821,6 +825,7 @@ The sell burst's kernel seams (TD lock on #176). With nothing registered, the ba
 
 Kernel seams for the ore catalogue (#146), from the TD lock on #146. With nothing registered every tier, drill time, log line and golden digest is unchanged.
 
+- **Ore rules (ticket 445).** `PlanetParams.oreRulesVersion` and `SessionPlanet.oreRulesVersion` are optional and omitted when absent (the legacy rows): `withSessionOnPlanet` and `createAuthorityState` stamp a planet with `ORE_RULES_VERSION` from `ORE_RULES_FROM_PLANET` (3), so P1 and P2 sessions and every planet a save already holds stay byte-identical. Snapshots and the save's world section carry the stamp; a version this build does not know is refused. A generation hook reads it from `params` (the `ores` slice's `rarityRowSetOfPlanet`); a tool that models a fresh planet asks `freshPlanetParamsFor`. A cache of anything derived from the mix keys on the stamp too (`cellGates.ts`). A later ticket that changes P1 or P2 generation lowers `ORE_RULES_FROM_PLANET` in the commit that re-records their goldens.
 - **Tier offsets.** An ore cell's tier is `oreTier(p, 1) + tierOffset` (`resourceTierOf`, `systems/authority/minedOre.ts`). #140's lead roll may write offsets 0 to 6 on a planet on the legacy rows, and the rarity rows (ticket 445) 0 to 8 (`MAX_ORE_TIER_OFFSET`, band 5 plus mythic's +4 lead); an offset past 8 throws. The field is 24 bits, so the wider range is no new encoding.
 - **Hardness by the cell.** `hardnessOfTile` (`groundDrill.ts`) gives ore `oreHardness` of its own tier, core `coreHardness`, and everything else its band's `blockHardness`. The pacing bot bores through the same function (`botWorld.boreTicks(drill, params, tile, cell)`), so its estimate always matches the drill.
 - **Cargo tags.** `CargoAdded` and `resource_collected` carry optional `family` and `signature`. They are filled only when an `oreTypes` provider answers (`oreCargoTagsOf`): `family` is `OreType.family`, and `signature` is `OreType.signature === true`. The kernel default names neither, so older lines still read (protocol 25, `LOG_SCHEMA_VERSION` unchanged). Since ticket 420 a drill command's units fold into its span's `drill_cut` line (`ores`, run-length), so only ore from elsewhere (a blast, a bore pickup, a drain) still logs `resource_collected`; the tags stay on every `CargoAdded`.

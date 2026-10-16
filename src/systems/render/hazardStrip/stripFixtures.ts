@@ -63,7 +63,12 @@ export function digFrameAt(seconds: number, speed: number, viewer: StripViewer):
   }
 }
 
-export const VIEWER_BEFORE_SCANNER: StripViewer = { isScannerOpen: false, tipMajor: 0, rigBand: 1 }
+export const VIEWER_BEFORE_SCANNER: StripViewer = {
+  isScannerOpen: false,
+  tipMajor: 0,
+  rigBand: 1,
+  topLead: 2,
+}
 export const VIEWER_WITH_SCANNER: StripViewer = { ...VIEWER_BEFORE_SCANNER, isScannerOpen: true }
 
 /** A lava row across the line. */

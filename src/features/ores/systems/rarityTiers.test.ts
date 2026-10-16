@@ -8,6 +8,7 @@ import {
 import { cargoCapacity, onCurveLevel } from '../../../systems/economy/vehicleStats'
 import { cmp, fromSafeInteger, mul, toCanonical } from '../../../systems/money'
 import { BAND_COUNT } from '../../../systems/world/planetGeometry'
+import { ORE_RULES_FROM_PLANET } from '../../../systems/world/planetParams'
 import { oreTierOf } from './oreCatalogue'
 import { ORE_ROWS } from './oreRows'
 import { RARITY_ROW_SETS } from './rarityRows'
@@ -37,6 +38,10 @@ describe('rarity tiers', () => {
     expect(rarityRowSetOf(2, ORE_RULES_VERSION)).toBe('legacy')
     expect(rarityRowSetOf(5, undefined)).toBe('legacy')
     expect(rarityRowSetOf(40, undefined)).toBe('legacy')
+  })
+
+  it("stamps planets with the ore rules from the kernel's first planet, where the mixed rows start", () => {
+    expect(ORE_RULES_FROM_PLANET).toBe(mixedRowsFromPlanet())
   })
 
   it('draws the mixed weights on new planets from P3, where epic and mythic start', () => {

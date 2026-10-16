@@ -8,9 +8,12 @@
  * - first sighting: the depth of the first unit of each tier collected on the planet
  * - deep preview: whether tier `3(p-1)+6` (band 4's +2, next planet's band 3) was collected before
  *   the core was reached (#140 acceptance 3, from planet 2)
- * - lead shares: units per band with a +1 and a +2 lead, of all the band's units
- * - value per unit: the band's mean sale value over `V(t_b)`, beside #140's expected multiplier
+ * - lead shares: units per band with each lead from +1, of all the band's units
+ * - value per unit: the band's mean sale value over `V(t_b)`, beside the rows' expected multiplier
  * - lead drill ticks: band 5's median drill ticks per tile by lead, beside `H(t+lead)/H(t)`
+ *
+ * The leads are the planet's rarity rows as a fresh planet rolls them (ticket 445): +1 and +2 on the
+ * legacy rows of P1 and P2, +1 to +4 from P3.
  */
 import type { ReportRow, ReportRowSource } from '../../logging/registries/reportRows'
 import type { RunEvent } from '../../logging/runEvent'
@@ -27,7 +30,10 @@ import {
 } from '../../systems/money'
 import { BAND_COUNT } from '../../systems/world/planetGeometry'
 import { minedOreUnitsOf, type MinedOreUnit } from './minedOreUnits'
+import { freshPlanetParamsFor } from '../../systems/world/planetParams'
 import { expectedValueRatio, hardnessRatioOfLead } from './systems/leadPayoff'
+import { rarityRowSetOfPlanet, topLeadOf } from './systems/rarityLeads'
+import type { RarityRowSet } from './systems/rarityRows'
 
 export const ORE_REPORT_ROWS_ID = 'ores.sightings'
 
@@ -36,7 +42,6 @@ const DEEP_PREVIEW_BAND = 4
 const DEEP_PREVIEW_LEAD = 2
 /** #140 acceptance 5 times lead cells in band 5, where the tip's headroom is tightest. */
 const TICKS_BAND = 5
-const LEADS = [0, 1, 2]
 const PER_MILLE = 1000
 
 export const oreReportRows: ReportRowSource = { id: ORE_REPORT_ROWS_ID, rowsOf: oreRowsOf }
@@ -49,13 +54,19 @@ function oreRowsOf(
 ): ReportRow[] {
   const units = minedOreUnitsOf(planetEvents, worldSeed, planet)
   if (units.length === 0) return []
+  const set = rarityRowSetOfPlanet(freshPlanetParamsFor(worldSeed, planet))
   return [
     firstSightingRow(units),
     ...deepPreviewRows(units, coreTickOf(events, planet), planet),
-    leadShareRow(units),
-    valuePerUnitRow(units, planet),
-    leadTicksRow(units, planet),
+    leadShareRow(units, set),
+    valuePerUnitRow(units, planet, set),
+    leadTicksRow(units, planet, set),
   ]
+}
+
+/** Every lead the rows roll, 0 first. */
+function leadsOf(set: RarityRowSet): number[] {
+  return Array.from({ length: topLeadOf(set) + 1 }, (_, lead) => lead)
 }
 
 function firstSightingRow(units: readonly MinedOreUnit[]): ReportRow {
@@ -85,26 +96,36 @@ function deepPreviewRows(
   return [{ label: `tier ${tier} collected before the core`, value: isSighted ? 'yes' : 'no' }]
 }
 
-function leadShareRow(units: readonly MinedOreUnit[]): ReportRow {
+function leadShareRow(units: readonly MinedOreUnit[], set: RarityRowSet): ReportRow {
+  const rareLeads = leadsOf(set).slice(1)
   return {
-    label: 'lead units by band (+1 / +2 of all)',
+    label: `lead units by band (${rareLeads.map((lead) => `+${lead}`).join(' / ')} of all)`,
     value: bandsMined(units)
       .map((band) =>
         leadShareOfBand(
           units.filter((unit) => unit.band === band),
           band,
+          rareLeads,
         ),
       )
       .join(', '),
   }
 }
 
-function leadShareOfBand(units: readonly MinedOreUnit[], band: number): string {
-  const [plus1, plus2] = [1, 2].map((lead) => units.filter((unit) => unit.lead === lead).length)
-  return `b${band} ${plus1} / ${plus2} of ${units.length}`
+function leadShareOfBand(
+  units: readonly MinedOreUnit[],
+  band: number,
+  rareLeads: readonly number[],
+): string {
+  const counts = rareLeads.map((lead) => units.filter((unit) => unit.lead === lead).length)
+  return `b${band} ${counts.join(' / ')} of ${units.length}`
 }
 
-function valuePerUnitRow(units: readonly MinedOreUnit[], planet: number): ReportRow {
+function valuePerUnitRow(
+  units: readonly MinedOreUnit[],
+  planet: number,
+  set: RarityRowSet,
+): ReportRow {
   return {
     label: 'mean value per unit over V(t_b) by band (expected)',
     value: bandsMined(units)
@@ -113,24 +134,36 @@ function valuePerUnitRow(units: readonly MinedOreUnit[], planet: number): Report
           units.filter((unit) => unit.band === band),
           planet,
           band,
+          set,
         ),
       )
       .join(', '),
   }
 }
 
-function valueRatioOfBand(units: readonly MinedOreUnit[], planet: number, band: number): string {
+function valueRatioOfBand(
+  units: readonly MinedOreUnit[],
+  planet: number,
+  band: number,
+  set: RarityRowSet,
+): string {
   const total = units.map((unit) => unit.value).reduce(add)
   const base = mul(oreSalePrice(oreTier(planet, band)), fromSafeInteger(units.length))
-  const expected = expectedValueRatio(planet, band)
+  const expected = expectedValueRatio(planet, band, set)
   return `b${band} x${formatRatio(div(total, base))} (x${formatRatio(expected)})`
 }
 
-function leadTicksRow(units: readonly MinedOreUnit[], planet: number): ReportRow {
+function leadTicksRow(
+  units: readonly MinedOreUnit[],
+  planet: number,
+  set: RarityRowSet,
+): ReportRow {
   const drilled = units.filter((unit) => unit.band === TICKS_BAND && unit.drillTicks > 0)
   return {
     label: `band ${TICKS_BAND} median drill ticks per tile by lead (H ratio)`,
-    value: LEADS.map((lead) => leadTicksOf(drilled, planet, lead)).join(', '),
+    value: leadsOf(set)
+      .map((lead) => leadTicksOf(drilled, planet, lead))
+      .join(', '),
   }
 }
 

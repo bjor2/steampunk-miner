@@ -32,6 +32,8 @@ function pingedCavity() {
   return session.state()
 }
 
+const SAMPLED_COLUMNS = [-40, 0, 40]
+
 const tileKey = ({ tx, ty }: TilePoint) => `${tx},${ty}`
 
 describe('echo sounder ping', () => {
@@ -101,10 +103,16 @@ function heatPlanetEight() {
 }
 
 /** A ring every 20 tiles down column 0 from just under the surface to the core, through every band. */
+/**
+ * Pings every 20 tiles down three columns through the planet: under the rarity rows (ticket 445)
+ * the centre column of the pacing seed's planet 8 alone holds no dynamite-gated cell.
+ */
 function ringsDownColumnOf(params: PlanetParams): TilePoint[] {
   const rings: TilePoint[] = []
-  const top = surfaceRowOfColumn(0, params.radiusTiles)
-  for (let ty = top - 2; ty > params.coreRadiusTiles; ty -= 20) rings.push({ tx: 0, ty })
+  for (const tx of SAMPLED_COLUMNS) {
+    const top = surfaceRowOfColumn(tx, params.radiusTiles)
+    for (let ty = top - 2; ty > params.coreRadiusTiles; ty -= 20) rings.push({ tx, ty })
+  }
   return rings
 }
 

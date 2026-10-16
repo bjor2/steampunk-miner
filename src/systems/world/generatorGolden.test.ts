@@ -3,26 +3,31 @@ import { fnv1a64Hex } from '../authority/stateDigest'
 import { GENERATOR_VERSION } from '../generatorVersion'
 import { chunkDigest } from './chunkDigest'
 import { generateChunk } from './generateChunk'
-import { planetParamsFor, type PlanetParams } from './planetParams'
+import { ORE_RULES_VERSION, planetParamsFor, type PlanetParams } from './planetParams'
 import { chunkRangeOfDisc } from './tileGrid'
 
 /**
  * Decision #4 acceptance 1 (#36 acceptance 1, #42 acceptance 4 under generator 2, the #46 artefact cache under 3,
  * the Refinery bay's pad from planet 3 under 4, which leaves these digests as they were, and the
  * lava pockets of the heat planets under 5, pinned by the planet 8 chunks, and the -8..+12 pad
- * under the shop buildings under 6, #170, the ores slice's rarity lead under 7, #146, and the planet
- * mix from planet 3 under 8, #147, which leaves planets 1 and 2 as they were, with the features
- * loaded as the game loads them): a committed
+ * under the shop buildings under 6, #170, the ores slice's rarity lead under 7, #146, the planet
+ * mix from planet 3 under 8, #147, which leaves planets 1 and 2 as they were, and the rarity rows of
+ * a planet entered under the ore rules under 9, ticket 445, which leaves every unstamped planet as it
+ * was and is pinned by the stamped digests, with the features loaded as the game loads them): a committed
  * digest of the generator's cells and density. If this fails, the
  * generator changed what a seed makes: bump GENERATOR_VERSION (saves and replays of the old
  * world are then refused) and update the version and digests below in the same commit.
  */
 const GOLDEN = {
-  generatorVersion: 8,
+  generatorVersion: 9,
   wholePlanet1: '4219af3346401cb7',
   wholePlanet2: 'ff1572afae8b0e0f',
   farPlanetChunks: 'c602124184c77617',
   heatPlanetChunks: 'c231252e3b76c103',
+  stampedWholePlanet3: 'da330a0c87eec7ee',
+  stampedHeatPlanetChunks: '352c6c236ec45985',
+  stampedPlanet10Chunks: '2925a97b54878073',
+  stampedPlanet60Chunks: '8477f02580a64afd',
 }
 
 /** One digest over every chunk's digest in a fixed order. */
@@ -85,5 +90,17 @@ describe('generator golden digest', () => {
     expect(digestOfChunks(planetParamsFor(1, 2 ** 40), FAR_PLANET_CHUNKS)).toBe(
       GOLDEN.farPlanetChunks,
     )
+  })
+
+  it('makes the committed planet 3 entered under the ore rules for world seed 83921 (ticket 445)', () => {
+    const params = planetParamsFor(83921, 3, ORE_RULES_VERSION)
+    expect(digestOfChunks(params, everyChunkOf(params))).toBe(GOLDEN.stampedWholePlanet3)
+  })
+
+  it('makes the committed chunks of planets 8, 10 and 60 entered under the ore rules', () => {
+    const stamped = (planet: number) => planetParamsFor(83921, planet, ORE_RULES_VERSION)
+    expect(digestOfChunks(stamped(8), HEAT_PLANET_CHUNKS)).toBe(GOLDEN.stampedHeatPlanetChunks)
+    expect(digestOfChunks(stamped(10), HEAT_PLANET_CHUNKS)).toBe(GOLDEN.stampedPlanet10Chunks)
+    expect(digestOfChunks(stamped(60), HEAT_PLANET_CHUNKS)).toBe(GOLDEN.stampedPlanet60Chunks)
   })
 })

@@ -32,6 +32,12 @@ export {
   rarityTiers,
   rarityWeightBpOf,
 } from './systems/rarityTiers'
+export {
+  rarityLeadBucketsBpOf,
+  rarityLeads,
+  rarityRowSetOfPlanet,
+  topLeadOf,
+} from './systems/rarityLeads'
 export type { RaritySolveBand } from './systems/raritySolve'
 export { bandMeanValueBpOf, solvedRarityWeightsBp } from './systems/raritySolve'
 export type { PaidRarityFind, RarityFind, RarityTrip } from './systems/rarityTripClamp'

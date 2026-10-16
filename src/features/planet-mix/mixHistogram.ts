@@ -6,13 +6,18 @@
  * band's ore tiles, as #141 has them: patches weighted by tiles. `histogramCheck.ts` judges them.
  *
  * On a heat planet a patch near lava doubles its signature share, so a role's expected share is the
- * range between the plain mix and the near-lava mix.
+ * range between the plain mix and the near-lava mix. A histogram names the ore rules its planet was
+ * generated under (ticket 445), so the check rebuilds the same mix.
  */
 import { resourceTierOf } from '../../systems/authority/minedOre'
 import { generateChunkCells } from '../../systems/world/generateChunk'
 import { orePatchesNearChunk } from '../../systems/world/orePatches'
 import { bandOfTile, BAND_COUNT } from '../../systems/world/planetGeometry'
-import { freshPlanetParamsFor, type PlanetParams } from '../../systems/world/planetParams'
+import {
+  freshPlanetParamsFor,
+  planetParamsFor,
+  type PlanetParams,
+} from '../../systems/world/planetParams'
 import {
   CHUNK_CELLS,
   CHUNK_SIZE,
@@ -42,6 +47,8 @@ export interface BandHistogram {
 export interface PlanetHistogram {
   planetIndex: number
   worldSeed: number
+  /** The ore rules the planet was generated under; absent on the legacy rows. */
+  oreRulesVersion?: number
   bands: readonly BandHistogram[]
 }
 
@@ -53,9 +60,13 @@ export interface ExpectedShare {
 
 export const SIGNATURE_ROLE = 'signature'
 
-/** The planet's ore tiles per band, generated under the registrations in force. */
+/** The ore tiles per band of the planet as this build enters it fresh. */
 export function planetHistogramOf(planetIndex: number, worldSeed: number): PlanetHistogram {
-  const params = freshPlanetParamsFor(worldSeed, planetIndex)
+  return planetHistogramOfParams(freshPlanetParamsFor(worldSeed, planetIndex))
+}
+
+/** The planet's ore tiles per band, generated under the registrations in force. */
+export function planetHistogramOfParams(params: PlanetParams): PlanetHistogram {
   const counts = Array.from({ length: BAND_COUNT }, () => new Map<string, ObservedType>())
   const patches = Array.from({ length: BAND_COUNT }, () => new Set<string>())
   for (const [cx, cy] of chunksOfDisc(params)) {
@@ -63,10 +74,17 @@ export function planetHistogramOf(planetIndex: number, worldSeed: number): Plane
     notePatchesNearChunk(params, patches, cx, cy)
   }
   return {
-    planetIndex,
-    worldSeed,
+    planetIndex: params.planetIndex,
+    worldSeed: params.worldSeed,
+    ...(params.oreRulesVersion === undefined ? {} : { oreRulesVersion: params.oreRulesVersion }),
     bands: counts.map((count, at) => bandHistogramOf(count, patches[at].size, at)),
   }
+}
+
+/** The params a histogram's planet was generated with. */
+export function paramsOfHistogram(histogram: PlanetHistogram): PlanetParams {
+  const { worldSeed, planetIndex, oreRulesVersion } = histogram
+  return planetParamsFor(worldSeed, planetIndex, oreRulesVersion)
 }
 
 /** Each band's roles with the share the mix expects of them. */

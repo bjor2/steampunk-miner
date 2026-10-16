@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { planetParamsFor } from '../../systems/world/planetParams'
+import { ORE_RULES_VERSION, planetParamsFor } from '../../systems/world/planetParams'
 import { histogramLines, histogramProblems } from './histogramCheck'
 import { expectedSharesOf, type BandHistogram, type PlanetHistogram } from './mixHistogram'
 
@@ -13,7 +13,7 @@ function histogramWith(
   patches: number,
   shareOf: (role: string, band: number, lowBp: number) => number = (_, __, lowBp) => lowBp,
 ): PlanetHistogram {
-  const expected = expectedSharesOf(planetParamsFor(WORLD_SEED, PLANET))
+  const expected = expectedSharesOf(planetParamsFor(WORLD_SEED, PLANET, ORE_RULES_VERSION))
   const bands: BandHistogram[] = expected.map((shares, at) => {
     const types = [...shares].map(([role, { lowBp }]) => ({
       typeId: `type_${role}`,
@@ -23,7 +23,7 @@ function histogramWith(
     const oreTiles = types.reduce((sum, type) => sum + type.tiles, 0)
     return { band: at + 1, oreTiles, patches, types }
   })
-  return { planetIndex: PLANET, worldSeed: WORLD_SEED, bands }
+  return { planetIndex: PLANET, worldSeed: WORLD_SEED, oreRulesVersion: ORE_RULES_VERSION, bands }
 }
 
 describe('ore mix histogram check', () => {
@@ -45,8 +45,8 @@ describe('ore mix histogram check', () => {
     const problemsOf = (patches: number) =>
       histogramProblems([histogramWith(patches, shifted)]).filter((line) => line.includes('+2'))
     expect(problemsOf(40)).toEqual([])
-    // 200 bp more of +2 over 102% of the tiles: 3500 / 102000.
-    expect(problemsOf(5000)).toEqual(['P20 band 5: +2 343 bp, expected 150 bp'])
+    // 200 bp more of the mixed rows' +2 (97 bp, ticket 445) over 102% of the tiles: 2970 / 102000.
+    expect(problemsOf(5000)).toEqual(['P20 band 5: +2 291 bp, expected 97 bp'])
   })
 
   it('names a role the mix does not have', () => {

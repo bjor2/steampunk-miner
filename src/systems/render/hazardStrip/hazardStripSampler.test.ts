@@ -137,6 +137,16 @@ describe('hazard strip sampler', () => {
     expect(hazardsOf(after)).toEqual(hazardsOf(before))
   })
 
+  it("counts ore as top-tier from the planet's top lead: +2 on the legacy rows, +4 on the rarity rows", () => {
+    const fixtures = [oreAt(12, 2), oreAt(20, 3), oreAt(30, 4)]
+    const oreMetresOf = (topLead: number) =>
+      pipsAtRestOver(fixtures, { ...VIEWER_WITH_SCANNER, topLead })
+        .filter((pip) => pip.kind === 'ore')
+        .map((pip) => pip.metres)
+    expect(oreMetresOf(2)).toEqual([12, 20, 30])
+    expect(oreMetresOf(4)).toEqual([30])
+  })
+
   it('shows a gate by its kind alone, beside a cache, never what opens it or lies inside', () => {
     const fixtures = [gateAt(10, 3), cacheAt(20)]
     const pips = pipsAtRestOver(fixtures, VIEWER_WITH_SCANNER)

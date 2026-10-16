@@ -10,11 +10,10 @@
  *   hazard pips never change with the unlock.
  * A pip says its kind and, for a gate, the gate's kind: never a vision row, a held item, an unbuilt
  * rig or a dynamite size. Top-tier ore is ore at or above the best tier the rig's band can hold:
- * its own band's tier plus the largest lead (`MAX_ORE_TIER_OFFSET`, band 5's ore plus 2).
+ * its own band's tier plus the largest lead the planet's rows roll (`viewer.topLead`: +2 on the
+ * legacy rows, mythic's +4 on the rarity rows, ticket 445).
  */
 import { STRIP_MAX_PIPS } from '../../../constants/hazardStrip'
-import { BAND_COUNT } from '../../world/planetGeometry'
-import { MAX_ORE_TIER_OFFSET } from '../../world/worldCell'
 import {
   isSameHit,
   NEVER_BY_TIP,
@@ -48,6 +47,8 @@ export interface StripViewer {
   tipMajor: number
   /** The band the rig's nose is in. */
   rigBand: number
+  /** The largest lead the planet's ore rolls above its band's tier (`topOreLeadOf`). */
+  topLead: number
 }
 
 /** The look-ahead this frame: metres along the path. */
@@ -59,8 +60,6 @@ export interface StripWindow {
   speed: number
 }
 
-/** The largest lead an ore patch rolls above its band's tier (#140). */
-const TOP_LEAD = MAX_ORE_TIER_OFFSET - (BAND_COUNT - 1)
 /** Under this the rig is at rest and a pip has no arrival time. */
 const RESTING_SPEED = 0.01
 
@@ -164,7 +163,7 @@ function isGateShut(hit: StepHit, viewer: StripViewer): boolean {
 }
 
 function isTopTierOre(hit: StepHit, viewer: StripViewer): boolean {
-  const best = viewer.rigBand - 1 + TOP_LEAD
+  const best = viewer.rigBand - 1 + viewer.topLead
   return (hit.kinds & STRIP_KIND.ore) !== 0 && hit.oreTierOffset >= best
 }
 

@@ -44,7 +44,7 @@ describe('session snapshot', () => {
     const snapshot = takeSnapshot(richState())
     expect(snapshot).toMatchObject({
       snapshotVersion: 21,
-      generatorVersion: 8,
+      generatorVersion: 9,
       tick: 600,
       digest: stateDigest(richState()),
     })
@@ -54,7 +54,7 @@ describe('session snapshot', () => {
   it('refuses a snapshot from another generator version instead of migrating it', () => {
     const snapshot = { ...takeSnapshot(richState()), generatorVersion: 1 }
     expect(readSnapshot(snapshot).problems).toEqual([
-      'snapshot.generatorVersion is 1, this build reads 8',
+      'snapshot.generatorVersion is 1, this build reads 9',
     ])
   })
 

@@ -22,9 +22,12 @@ export function cellGateOf(params: PlanetParams, tile: TilePoint, ore: OreType):
   return entries.find((gated) => isEntryOfOre(gated, ore))?.gate ?? NO_GATE
 }
 
-/** The planet's gate table, kept for the next ask. */
+/**
+ * The planet's gate table, kept for the next ask. The key names the ore rules too (ticket 445): a
+ * planet a save holds on the legacy rows and the same planet entered fresh have different mixes.
+ */
 export function gateTableOfPlanet(params: PlanetParams): GateTable {
-  const key = `${params.planetIndex}:${params.planetSeed}`
+  const key = `${params.planetIndex}:${params.planetSeed}:${params.oreRulesVersion ?? 'legacy'}`
   const kept = keptTables.get(key)
   if (kept !== undefined) return kept
   const table = gateTableOf(oreMixOf(params))

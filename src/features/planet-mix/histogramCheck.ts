@@ -7,10 +7,10 @@
  * resolve one percentage point; the bigger bands are held to #141's tolerance itself. A role the
  * mix lacks is always a problem, and the expected signature share never passes #140's band cap.
  */
-import { freshPlanetParamsFor } from '../../systems/world/planetParams'
 import { ORE_ROWS } from '../ores'
 import {
   expectedSharesOf,
+  paramsOfHistogram,
   SIGNATURE_ROLE,
   type BandHistogram,
   type ExpectedShare,
@@ -36,17 +36,17 @@ interface PooledBand {
 /** Why the seeds' histograms of one planet miss its mix; empty when they match. */
 export function histogramProblems(histograms: readonly PlanetHistogram[]): string[] {
   if (histograms.length === 0) return []
-  const [{ planetIndex, worldSeed }] = histograms
-  const expected = expectedSharesOf(freshPlanetParamsFor(worldSeed, planetIndex))
+  const [first] = histograms
+  const expected = expectedSharesOf(paramsOfHistogram(first))
   return expected.flatMap((shares, at) =>
-    bandProblems(`P${planetIndex} band ${at + 1}`, shares, pooledBandOf(histograms, at)),
+    bandProblems(`P${first.planetIndex} band ${at + 1}`, shares, pooledBandOf(histograms, at)),
   )
 }
 
 /** One line per band: each type with its role, observed and expected share in basis points. */
 export function histogramLines(histogram: PlanetHistogram): string[] {
   const { planetIndex, worldSeed } = histogram
-  const expected = expectedSharesOf(freshPlanetParamsFor(worldSeed, planetIndex))
+  const expected = expectedSharesOf(paramsOfHistogram(histogram))
   return histogram.bands.map((band, at) =>
     bandLine(`P${planetIndex} seed ${worldSeed}`, band, expected[at]),
   )

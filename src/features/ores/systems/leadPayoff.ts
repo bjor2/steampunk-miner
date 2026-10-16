@@ -6,7 +6,8 @@
  */
 import { oreHardness, oreTier, oreValue } from '../../../systems/economy/oreEconomy'
 import { add, div, fromSafeInteger, mul, type BigStat, type Money } from '../../../systems/money'
-import { leadWeights } from './oreCatalogue'
+import { rarityLeadBucketsBpOf } from './rarityLeads'
+import type { RarityRowSet } from './rarityRows'
 
 const BASIS_POINTS = 10000
 
@@ -27,10 +28,12 @@ export function hardnessRatioOfLead(planetIndex: number, band: number, lead: num
   return div(oreHardness(tier + lead), oreHardness(tier))
 }
 
-/** #140's expected value per unit over `V(t_b)`: each lead's share times its value ratio. */
-export function expectedValueRatio(planetIndex: number, band: number): Money {
-  const { plus1Bp, plus2Bp } = leadWeights(band)
-  const shares = [BASIS_POINTS - plus1Bp - plus2Bp, plus1Bp, plus2Bp]
+/**
+ * The expected value per unit over `V(t_b)` on the planet's rarity rows (#140's leads on the legacy
+ * rows, common to mythic on the mixed, ticket 445): each lead's share times its value ratio.
+ */
+export function expectedValueRatio(planetIndex: number, band: number, set: RarityRowSet): Money {
+  const shares = rarityLeadBucketsBpOf(set, band)
   const weighted = shares.map((shareBp, lead) =>
     mul(fromSafeInteger(shareBp), valueRatioOfLead(planetIndex, band, lead)),
   )

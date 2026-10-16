@@ -5,7 +5,9 @@
  * A charge still on a wall stays on the old planet's wall: it is gone, and the rack keeps the rest.
  * `Travel` and `debug.setPlanet` both go through here.
  *
- * `planet_entered` names the ore rules when the planet has them (ticket 445), so a report can
+ * The planet is entered under this build's ore rules (ticket 445): the stamp is set here from the
+ * index, never carried over, so a legacy planet loaded from a save never passes its missing stamp on
+ * to the next planet. `planet_entered` names the rules when the planet has them, so a report can
  * rebuild the exact params.
  */
 import { GENERATOR_VERSION } from '../generatorVersion'
@@ -27,9 +29,10 @@ import { playerOnNewPlanet } from './autoMode/autoModeState'
 import { combatOnNewPlanet } from './combat/enemyRoster'
 import { NEW_CORE_PROGRESS } from './coreProgress'
 import type { DomainEventBodies } from './domainEvent'
-import { dockSiteOfPlanet, type SessionPlanet } from './planetOfState'
+import { dockSiteOfPlanet, enteredPlanetOf, type SessionPlanet } from './planetOfState'
 
-export function withSessionOnPlanet(state: AuthorityState, planet: SessionPlanet): AuthorityState {
+export function withSessionOnPlanet(state: AuthorityState, to: SessionPlanet): AuthorityState {
+  const planet = enteredPlanetOf(to.index, to.seed)
   const site = dockSiteOfPlanet(planet)
   const pose = site === null ? null : dockedPoseAt(site)
   const players = Object.fromEntries(
