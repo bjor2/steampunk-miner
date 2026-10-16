@@ -72,6 +72,7 @@ function walkColumn(
   const world: CarryGround = {
     isStop: ground.isStop,
     cellAt: (tile) => (opened.has(tile.ty) ? OPEN : ground.cellAt(tile)),
+    releasedPriceAt: ground.releasedPriceAt,
   }
   let yMm = TOP_Y
   let carry = 0
@@ -202,7 +203,13 @@ describe('drill carry (ticket 399)', () => {
     it('reaches nothing on a fresh path that starts in a hard stop, carrying nothing', () => {
       const ground = columnGround(() => rock(5), [100])
       const reach = walk({ path: pathDown(TOP_Y, 95_000, true), beyond: null }, plenty(Q), ground)
-      expect(reach).toEqual({ reachedStep: -1, carrySubSteps: 0, paid: [], target: null })
+      expect(reach).toEqual({
+        reachedStep: -1,
+        carrySubSteps: 0,
+        paid: [],
+        paidPrices: [],
+        target: null,
+      })
     })
 
     it('never prices the start of a path: the body cell or the cursor cell', () => {
@@ -234,7 +241,7 @@ describe('drill carry (ticket 399)', () => {
     expect(Math.min(...askedBy(walkCarryInRuns))).toBe(93)
   })
 
-  it('pays in runs exactly what it pays per cell, over mixed ground and purses', () => {
+  it('pays in runs exactly what it pays per cell, over mixed ground, purses and releases', () => {
     const kinds: CarryCell[] = [
       rock(9),
       rock(9),
@@ -246,10 +253,13 @@ describe('drill carry (ticket 399)', () => {
       { price: 0, energy: 0, isOre: false, isCarryEnd: true },
     ]
     for (let seed = 1; seed <= 200; seed++) {
-      const ground = columnGround(
-        (ty) => kinds[(ty * seed * 31 + (ty >> 2)) % kinds.length],
-        [40 + (seed % 50)],
-      )
+      const ground = {
+        ...columnGround(
+          (ty) => kinds[(ty * seed * 31 + (ty >> 2)) % kinds.length],
+          [40 + (seed % 50)],
+        ),
+        releasedPriceAt: ({ ty }: TilePoint) => (ty % 3 === seed % 3 ? (ty * seed) % 25 : null),
+      }
       const purse = { subSteps: 20 + ((seed * 37) % 400), tank: 3 + (seed % 60), room: seed % 7 }
       const beyond = { tile: { tx: 0, ty: 39 }, price: seed % 90 }
       const sweep = { path: pathDown(TOP_Y, 40_500 + seed * 10), beyond }
@@ -262,3 +272,106 @@ function tileAtReach(path: SweepPath, reach: CarryReach): TilePoint {
   const { yMm } = pointAtStep(path, reach.reachedStep)
   return { tx: 0, ty: Math.floor(yMm / 1000) }
 }
+
+// A released cell (ticket 421, rule (b)): once the stamp may carve the cell the work cannot pay in
+// full, the walk prices it again after the stamp's bite, pays that on the tick it meets it when the
+// work left covers it, discards the surplus and goes on with nothing left to spend.
+
+/** Down the column with every cell at `price`, row `releasedRow` released at `releasedPrice`. */
+function releasingGround(price: number, releasedRow: number, releasedPrice: number): CarryGround {
+  return {
+    ...columnGround(() => rock(price)),
+    releasedPriceAt: ({ ty }) => (ty === releasedRow ? releasedPrice : null),
+  }
+}
+
+describe('a released cell in the carry walk (ticket 421)', () => {
+  describe.each(WALKS)('walked %s', (_name, walk) => {
+    const sweep = { path: pathDown(TOP_Y, 95_500), beyond: null }
+
+    it('pays a released cell what the stamp left of it on the tick it meets it, the rest discarded', () => {
+      const reach = walk(sweep, plenty(100), releasingGround(200, 99, 40))
+      expect(reach.paid).toEqual([{ tx: 0, ty: 99 }])
+      expect(reach.paidPrices).toEqual([40])
+      expect(reach.carrySubSteps).toBe(0)
+      expect(reach.target).toEqual({ tx: 0, ty: 98 })
+    })
+
+    it('pays a released cell the stamp cleared for nothing, so it yields where the walk crossed it', () => {
+      const reach = walk(sweep, plenty(100), releasingGround(200, 99, 0))
+      expect(reach.paid).toEqual([{ tx: 0, ty: 99 }])
+      expect(reach.paidPrices).toEqual([0])
+    })
+
+    it('carries the work toward a released cell the stamp left dearer than the work', () => {
+      const reach = walk(sweep, plenty(100), releasingGround(200, 99, 101))
+      expect(reach.paid).toEqual([])
+      expect(reach.carrySubSteps).toBe(100)
+      expect(reach.target).toEqual({ tx: 0, ty: 99 })
+    })
+
+    it('ends the walk at a released core cell it pays, with nothing carried', () => {
+      const core = { price: 200, energy: 1, isOre: false, isCarryEnd: true }
+      const ground = { ...releasingGround(200, 99, 40), cellAt: () => core }
+      const reach = walk(sweep, plenty(100), ground)
+      expect(reach.paid).toEqual([{ tx: 0, ty: 99 }])
+      expect(reach.carrySubSteps).toBe(0)
+      expect(reach.target).toBeNull()
+    })
+
+    it('releases one cell a tick: the next the stamp emptied is carried toward, never chained free', () => {
+      const ground: CarryGround = {
+        ...columnGround(() => rock(200)),
+        releasedPriceAt: () => 0,
+      }
+      const reach = walk(sweep, plenty(100), ground)
+      expect(reach.paid).toEqual([{ tx: 0, ty: 99 }])
+      expect(reach.paidPrices).toEqual([0])
+      expect(reach.carrySubSteps).toBe(0)
+      expect(reach.target).toEqual({ tx: 0, ty: 98 })
+    })
+
+    it('never asks the release of a cell the work pays in full, nor walks past a hard stop', () => {
+      const asked: number[] = []
+      const ground: CarryGround = {
+        ...columnGround(() => rock(20), [97]),
+        releasedPriceAt: ({ ty }) => (asked.push(ty), 0),
+      }
+      const reach = walk(sweep, plenty(100), ground)
+      expect(asked).toEqual([])
+      expect(reach.paid).toEqual([
+        { tx: 0, ty: 99 },
+        { tx: 0, ty: 98 },
+      ])
+      expect(reach.carrySubSteps).toBe(0)
+    })
+
+    it('pays each cell exactly what was left of it, and no tick more than its carry and work', () => {
+      const releasedPriceOf = (ty: number) => (ty % 3 === 0 ? Math.floor(priceOfRow(ty) / 4) : null)
+      const ground = {
+        ...columnGround((ty) => rock(priceOfRow(ty))),
+        releasedPriceAt: ({ ty }: TilePoint) => releasedPriceOf(ty),
+      }
+      const ticks = walkColumn(walk, ground, { strideMm: 100_000, toY: 500, maxTicks: 5_000 })
+      expect(paidRowsOf(ticks)).toEqual(Array.from({ length: 100 }, (_, index) => 99 - index))
+      let carried = 0
+      let releasedPays = 0
+      for (const { reach } of ticks) {
+        const prices = reach.paid.map(({ ty }, at) => ({ ty, price: reach.paidPrices[at] }))
+        const onRelease = prices.filter(({ ty, price }) => price !== priceOfRow(ty))
+        expect(onRelease.map(({ ty }) => releasedPriceOf(ty))).toEqual(
+          onRelease.map(({ price }) => price),
+        )
+        const paid = prices.reduce((sum, { price }) => sum + price, 0)
+        // Work is spent exactly while the walk carries toward a cell and pays none on release; a
+        // release discards the rest, as the column's end does.
+        if (onRelease.length > 0)
+          expect([paid <= Q + carried, reach.carrySubSteps]).toEqual([true, 0])
+        else if (reach.target !== null) expect(paid + reach.carrySubSteps).toBe(Q + carried)
+        releasedPays += onRelease.length
+        carried = reach.carrySubSteps
+      }
+      expect(releasedPays).toBeGreaterThan(10)
+    })
+  })
+})
