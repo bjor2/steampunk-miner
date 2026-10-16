@@ -814,7 +814,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/debug/debugMemory.test.ts` | 4 | 4 |
 | `src/debug/debugOverlay.test.ts` | 2 | 2 |
 | `src/debug/debugSaves.test.ts` | 5 | 5 |
-| `src/debug/debugScreens.test.ts` | 33 | 32 |
+| `src/debug/debugScreens.test.ts` | 34 | 33 |
 | `src/debug/sliceDebugCommands.test.ts` | 3 | 3 |
 
 ### `economy`
@@ -1051,6 +1051,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | --- | --- | --- |
 | `src/systems/render/artefactLook.test.ts` | 2 | 2 |
 | `src/systems/render/bandPalette.test.ts` | 6 | 6 |
+| `src/systems/render/cameraFollow.test.ts` | 9 | 9 |
 | `src/systems/render/cameraTurn.test.ts` | 7 | 7 |
 | `src/systems/render/casingLiningLook.test.ts` | 7 | 7 |
 | `src/systems/render/cellGateBits.test.ts` | 12 | 12 |
