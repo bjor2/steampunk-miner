@@ -407,6 +407,24 @@
         "src/constants/uiParts.ts"
       ],
       "specs": ["e2e/browser/uiParts.spec.ts"]
+    },
+    {
+      "why": "Tap-only affordances (ticket 476): tooltips and item cards pinned by a tap, the exact-amount sheet, hover rules under (hover: hover), and the bay header and HUD lines that replaced hover titles.",
+      "paths": [
+        "src/ui/kit/**",
+        "src/ui/sheets/**",
+        "src/ui/hud/HudBanner.tsx",
+        "src/ui/platform/BayHeader.tsx",
+        "src/ui/platform/MoneyCounter.tsx",
+        "src/ui/ScreenButtonView.module.css",
+        "src/store/tapSheetSlice.ts",
+        "src/systems/displayAmount.ts"
+      ],
+      "specs": [
+        "e2e/browser/screens/tapAffordances.spec.ts",
+        "e2e/browser/itemCards.spec.ts",
+        "e2e/browser/uiParts.spec.ts"
+      ]
     }
   ]
 }
