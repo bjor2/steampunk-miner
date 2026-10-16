@@ -426,3 +426,12 @@ map #302, `remote ready`). Native blockers set the order inside the wave: #445 f
 #499 and #471. The portrait waves (2A and 2B) and #506 keep their place in `PRIORITY_TICKETS`; wave 7A only uses free slots.
 
 Rollback: `gh issue edit <n> --remove-label build` for 445, 446, 447 and 449 (a running worker finishes its ticket first).
+
+## #508 added to the priority and orphan lists (16 Oct 2026, ~19:30 Oslo)
+
+The Producer filed **#508** (E1b carry-smoothing prototype, drill kernel, `build`, `tier:hard`) under #316, outside map #302, and the
+Game Director wants it ahead of anything off the smooth-drilling path. `PRIORITY_TICKETS` now starts `500 506 508 484 ...` and
+**508** is in `WAVE_ORPHAN_ALLOW` next to 506 (no-wave #316 child). Same file size and inode (padding spaces trimmed on the same
+lines; live workers read the script by offset).
+
+Rollback: restore `next-ticket.sh.bak-20261016-1930-508` (the file before this edit, same size; copy it over in place with `cat`, not `mv`).
