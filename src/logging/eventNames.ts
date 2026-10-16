@@ -95,7 +95,8 @@ export const RUN_EVENT_REGISTRY = {
   hint_shown: { group: 'run', level: 'core', payload: { hintId: 'text' } },
   // One per second of frames (#38 Consequences: render scale, frame p50/p95, draw calls,
   // triangles and visible ground blocks join the #4 terrain and collider counts; #121: the p99
-  // frame and the frames over 50 ms).
+  // frame and the frames over 50 ms; ticket 480: the ticks the frame cap dropped that second,
+  // optional so lines from before it still read).
   perf_sample: {
     group: 'run',
     level: 'perf',
@@ -111,6 +112,7 @@ export const RUN_EVENT_REGISTRY = {
       triangles: 'integer',
       groundBlocks: 'integer',
       chunksLoaded: 'integer',
+      ticksDroppedByCap: { optional: 'integer' },
     },
   },
   // #124: one timed series of a bench script run with `--log`, in the bench's own run folder.

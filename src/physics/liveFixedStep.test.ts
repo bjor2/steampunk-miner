@@ -1,12 +1,16 @@
 import { readFileSync } from 'node:fs'
 import { beforeEach, describe, expect, it } from 'vitest'
+import { readAuthorityState } from '../store/authorityLink'
 import { readAuthorityTick, resetGameStore, useGameStore } from '../store/gameStore'
 import { resetInput, routeKeyChange } from '../store/inputRuntime'
 import { isLiveStepHeld } from '../store/liveStepSlice'
+import { stateDigest } from '../systems/authority/stateDigest'
 import { parseScenario, type Scenario } from '../systems/scenario'
 import {
   exposeLiveStepper,
   liveWorldProblems,
+  readTickDilation,
+  resetTickDilation,
   runFixedStepFrame,
   runLiveSteps,
   stepLiveWorld,
@@ -28,6 +32,7 @@ const LIVE_WORLD: LiveWorld = {
 beforeEach(() => {
   resetGameStore()
   resetInput()
+  resetTickDilation()
 })
 
 function planet1Start(): Scenario {
@@ -80,5 +85,46 @@ describe('live fixed step', () => {
     unmount()
     expect(readAuthorityTick()).toBe(12)
     expect(liveWorldProblems()).toEqual(['no physics world is running'])
+  })
+})
+
+/** The planet-1 start, playing from a held key. */
+function startPlaying(): void {
+  game().applyScenario(planet1Start())
+  routeKeyChange({ code: 'KeyQ', isDown: true, isRepeat: false, isShiftHeld: false })
+}
+
+describe('live tick dilation (ticket 480)', () => {
+  it('counts the ticks a frame past the cap drops, and none for frames within it', () => {
+    startPlaying()
+    const clock = { carried: 0 }
+    drawFrames(clock, 2, 60)
+    runFixedStepFrame(clock, 0.5, LIVE_WORLD)
+    expect(readTickDilation().ticksDroppedByCap).toBe(0)
+    runFixedStepFrame(clock, 0.75, LIVE_WORLD)
+    expect(readTickDilation().ticksDroppedByCap).toBe(15)
+  })
+
+  it('counts no drop for a held frame, however long', () => {
+    game().applyScenario(planet1Start())
+    runFixedStepFrame({ carried: 0 }, 3600, LIVE_WORLD)
+    expect(readTickDilation().ticksDroppedByCap).toBe(0)
+  })
+
+  it('reaches the same digest at the same tick as plain steps, the drops only slowing the clock', () => {
+    startPlaying()
+    const clock = { carried: 0 }
+    drawFrames(clock, 1, 60)
+    for (let hitch = 0; hitch < 8; hitch++) runFixedStepFrame(clock, 0.75, LIVE_WORLD)
+    drawFrames(clock, 1, 30)
+    const ticks = readAuthorityTick() - SCENARIO_END_TICK
+    const digest = stateDigest(readAuthorityState())
+    expect(readTickDilation().ticksDroppedByCap).toBe(8 * 15)
+
+    resetGameStore()
+    resetInput()
+    startPlaying()
+    runLiveSteps(ticks, LIVE_WORLD)
+    expect(stateDigest(readAuthorityState())).toBe(digest)
   })
 })

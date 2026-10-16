@@ -10,9 +10,23 @@
  * The mounted vehicle owns its whole tick (ticket 334): its motion rule, then the world stepped
  * through the tick in the substeps its speed needs (`vehicleController.stepWorld`). With none
  * mounted the world steps once, bare.
+ *
+ * Each running frame tells the tick dilation watch what it ran and what the cap dropped (ticket
+ * 480): the perf log and the slow-device chip read it. A held frame is not running, so it counts
+ * neither way.
  */
 import { MAX_STEPS_PER_FRAME, PHYSICS_TIMESTEP } from '../constants/physics'
-import { carryPastFrameSteps, countFrameSteps, stepBlendOf } from '../systems/fixedStepClock'
+import {
+  carryPastFrameSteps,
+  countFrameSteps,
+  stepBlendOf,
+  stepsDroppedByCap,
+} from '../systems/fixedStepClock'
+import {
+  createTickDilationWatch,
+  watchFrameSteps,
+  type TickDilationWatch,
+} from '../systems/tickDilation'
 import { stepBlend } from './stepBlend'
 
 export interface FrameClock {
@@ -30,6 +44,8 @@ const mounted: {
   runTick: (() => void) | null
 } = { stepTicks: null, runTick: null }
 
+let tickDilation = createTickDilationWatch()
+
 /** One render frame: the whole steps it completes, then the share bodies are drawn through. */
 export function runFixedStepFrame(clock: FrameClock, frameSeconds: number, world: LiveWorld): void {
   if (world.isHeld()) return
@@ -41,6 +57,16 @@ export function runFixedStepFrame(clock: FrameClock, frameSeconds: number, world
 export function runLiveSteps(ticks: number, world: LiveWorld): void {
   for (let done = 0; done < ticks; done++) world.stepWorld(PHYSICS_TIMESTEP)
   stepBlend.share = 1
+}
+
+/** The live frames' dropped ticks and slow-device judgement, read outside React. */
+export function readTickDilation(): Readonly<TickDilationWatch> {
+  return tickDilation
+}
+
+/** For tests and a fresh page: nothing dropped yet. */
+export function resetTickDilation(): void {
+  tickDilation = createTickDilationWatch()
 }
 
 /** Registers the mounted world's stepper; the returned call unregisters it when the world goes. */
@@ -78,6 +104,8 @@ export function stepLiveWorld(ticks: number): void {
 /** Each manual `step` of exactly one timestep advances the world exactly one fixed step. */
 function runDueSteps(clock: FrameClock, frameSeconds: number, world: LiveWorld): void {
   const steps = countFrameSteps(clock.carried, frameSeconds, PHYSICS_TIMESTEP, MAX_STEPS_PER_FRAME)
+  const dropped = stepsDroppedByCap(clock.carried, frameSeconds, PHYSICS_TIMESTEP, steps)
   clock.carried = carryPastFrameSteps(clock.carried, frameSeconds, PHYSICS_TIMESTEP, steps)
+  watchFrameSteps(tickDilation, frameSeconds, steps, dropped)
   for (let done = 0; done < steps; done++) world.stepWorld(PHYSICS_TIMESTEP)
 }

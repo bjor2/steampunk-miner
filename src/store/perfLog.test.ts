@@ -27,6 +27,9 @@ const SECOND_AT_4K: FrameCost = {
   groundColliders: 8,
 }
 
+/** The second's terrain p95 and the ticks the frame cap dropped in it (ticket 480). */
+const STEPS_AT_4K = { terrainMsP95: 1.774, ticksDroppedByCap: 6 }
+
 const MIB = 1024 * 1024
 
 const SCENE_AFTER_A_DIVE: SceneMemory = {
@@ -69,9 +72,9 @@ afterEach(() => {
 })
 
 describe('perf log', () => {
-  it('records one valid perf_sample with the render scale, frame times, long tasks, draws and blocks (#38, #121)', () => {
+  it('records one valid perf_sample with the render scale, frame times, long tasks, draws, blocks and dropped ticks (#38, #121, ticket 480)', () => {
     turnOnPerfLog(CHROMIUM_PAGE)
-    recordPerfSample(perfSampleOf(SECOND_AT_4K, 1.774))
+    recordPerfSample(perfSampleOf(SECOND_AT_4K, STEPS_AT_4K))
     expect(sink.events).toHaveLength(1)
     const [line] = sink.events
     expect(runEventProblems(line)).toEqual([])
@@ -89,12 +92,13 @@ describe('perf log', () => {
         groundBlocks: 37,
         chunksLoaded: 6,
         colliders: 8,
+        ticksDroppedByCap: 6,
       },
     })
   })
 
   it('records nothing on a played run, where perf lines are off', () => {
-    recordPerfSample(perfSampleOf(SECOND_AT_4K, 1.774))
+    recordPerfSample(perfSampleOf(SECOND_AT_4K, STEPS_AT_4K))
     expect(sink.events).toEqual([])
   })
 })

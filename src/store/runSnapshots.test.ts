@@ -132,7 +132,9 @@ function sampleHeapAt(...readingsMiB: number[]): void {
 }
 
 function sampleFramesAt(...frameMsP95PerSecond: number[]): void {
-  frameMsP95PerSecond.forEach((p95) => recordPerfSample(perfSampleOf(secondAt(p95), 1)))
+  frameMsP95PerSecond.forEach((p95) =>
+    recordPerfSample(perfSampleOf(secondAt(p95), { terrainMsP95: 1, ticksDroppedByCap: 0 })),
+  )
 }
 
 /** Every trigger a short run can meet: a dock, a planet change, a heap climb, a breach, the timer, a quit. */
