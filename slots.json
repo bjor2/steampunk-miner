@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-10-16T07:03:45+02:00",
+  "updated_at": "2026-10-16T07:06:23+02:00",
   "caps": {
     "grok": 12,
     "claude": 10,
@@ -37,11 +37,12 @@
         },
         {
           "slot": "C3",
-          "state": "free",
+          "state": "busy",
           "ticket": null,
           "grok_slot": null,
-          "kind": null,
-          "since": null
+          "kind": "aux",
+          "since": "2026-10-16T07:04:00+02:00",
+          "label": "wave-plan 302"
         },
         {
           "slot": "C4",
@@ -70,9 +71,9 @@
         }
       ],
       "size": 6,
-      "used": 3,
-      "free": 3,
-      "claims_last_hour": 10,
+      "used": 4,
+      "free": 2,
+      "claims_last_hour": 11,
       "name": "Claude Max 1"
     },
     {
@@ -128,9 +129,9 @@
   },
   "tester": {
     "state": "running",
-    "phase": "slow",
+    "phase": "probes",
     "sha": "0335d65ee0c2ef14a3dd924f5f7f7f5187d30c7b",
-    "since": "2026-10-16T05:01:08Z",
+    "since": "2026-10-16T05:05:59Z",
     "holds_gate": true,
     "claude_slot": null,
     "last_run": "2026-10-16T05:01:06Z",
@@ -719,10 +720,12 @@
     },
     {
       "slot": 3,
-      "state": "free",
+      "state": "busy",
       "ticket": null,
       "grok_slot": null,
-      "since": null,
+      "since": "2026-10-16T07:04:00+02:00",
+      "kind": "aux",
+      "label": "wave-plan 302",
       "account": 1
     },
     {
@@ -806,8 +809,8 @@
     "claude": {
       "size": 10,
       "enabled": 6,
-      "used": 3,
-      "free": 3,
+      "used": 4,
+      "free": 2,
       "external": 0
     }
   },
