@@ -19,6 +19,7 @@ import {
   UI_SCALE_REFERENCE_SHORT_AXIS_PX,
 } from '../../constants/screen'
 import { SHOP_TEXT_REFERENCE_PX, STAGE_MAX_ASPECT } from '../../constants/scene'
+import { vehicleKeepClearOf } from './hudClearView'
 
 /** The window in CSS pixels and whether its primary pointer is a finger, as the shell reads it. */
 export interface ScreenReading {
@@ -150,6 +151,19 @@ export function screenStyleOf(layout: ScreenLayout): Record<string, string> {
     // Hundredths of a pixel, so 17.6 x 1.35 does not reach the sheet as 23.760000000000005.
     '--shop-text': `${layout.shopTextPixels.toFixed(2)}px`,
     '--hint-chip-max-height': `${hintChipMaxHeightOf(layout.stage.height).toFixed(2)}px`,
+    ...vehicleClearStyleOf(layout.stage),
+  }
+}
+
+/**
+ * `--vehicle-clear-left` and `--vehicle-clear-top`: where the vehicle's keep-clear square starts
+ * (#500), so the compact HUD's side columns and top rows stop short of it.
+ */
+function vehicleClearStyleOf(stage: StageRect): Record<string, string> {
+  const rect = vehicleKeepClearOf({ width: stage.width, height: stage.height })
+  return {
+    '--vehicle-clear-left': `${rect.left.toFixed(2)}px`,
+    '--vehicle-clear-top': `${rect.top.toFixed(2)}px`,
   }
 }
 

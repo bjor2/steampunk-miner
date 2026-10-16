@@ -189,6 +189,8 @@ describe('screen layout: style', () => {
       '--control-min': '44px',
       '--shop-text': '23.76px',
       '--hint-chip-max-height': '86.40px',
+      '--vehicle-clear-left': '895.25px',
+      '--vehicle-clear-top': '155.25px',
     })
   })
 
