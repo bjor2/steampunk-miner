@@ -30,9 +30,15 @@ function reportedTravelTicksOf(command: AuthorityCommand, playerId: string): num
 }
 
 /**
- * Whether Deep left travel inside the cap: at or under it, or no higher than the run without Deep
- * already was, since a bare run over the cap is not Deep's doing.
+ * How Deep's travel reads against the cap (GD ruling on #392, option (a)): pushed over it only when
+ * the run without Deep was at or under it and Deep's goes over. A bare run already over the cap is
+ * not Deep's doing, so it leaves Deep ungated: a finding for #397's travel target instead. With no
+ * bare run that reached the core there is no bare share at all, so the comparison is unmeasured.
  */
-export function isTravelKeptByDeep(deepShareBp: number, bareShareBp: number): boolean {
-  return deepShareBp <= Math.max(TRAVEL_SHARE_CAP_BP, bareShareBp)
+export type DeepTravel = 'kept' | 'pushed_over_cap' | 'bare_over_cap' | 'unmeasured'
+
+export function deepTravelOf(deepShareBp: number, bareShareBp: number | null): DeepTravel {
+  if (bareShareBp === null) return 'unmeasured'
+  if (bareShareBp > TRAVEL_SHARE_CAP_BP) return 'bare_over_cap'
+  return deepShareBp > TRAVEL_SHARE_CAP_BP ? 'pushed_over_cap' : 'kept'
 }

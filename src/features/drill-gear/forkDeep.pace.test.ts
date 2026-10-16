@@ -13,8 +13,10 @@ import { DEEP_BRANCH, forkValueOf, PLUNGE_CROWN_ID } from './systems/drillGearFo
 // the drill gear (ticket 392), so the cell Deep opens below the bored one is one the bot then
 // drives into. On the fork's planet and four planets on, the bot plays to the core with Deep
 // chosen and unchosen on each pacing seed (`forkDeepPaceRuns.ts`). Gated on the seed medians (#84):
-// the speed-up above 1.02, and Deep's travel at or under a quarter of the run (or no higher than
-// bare). One drill step (x1.225) is never a cap: a median past it is printed as a balance finding
+// the speed-up above 1.02, and Deep never pushing travel over a quarter of the run. Travel is
+// compared only on seeds whose bare run reached the core, and a bare run already over the quarter
+// leaves Deep ungated with a finding printed for #397's travel target (GD ruling on #392, option
+// (a)). One drill step (x1.225) is never a cap: a median past it is printed as a balance finding
 // for Systems, and the bot is never patched to hide it. Planet 40 is the lane
 // `forkDeepP40.lane.test.ts`. Long: a dozen bot runs, for the box Tester
 // (`npx vitest run src/features/drill-gear/forkDeep.pace.test.ts`). The clamp is checked first,
@@ -47,12 +49,17 @@ describe('drill-gear fork: Deep pace (GD lock on #255, GD ruling on #392)', () =
   })
 
   it.each(FORK_PACE_PLANETS)(
-    'reaches planet %i core measurably faster with Deep, travel kept inside a quarter',
+    'reaches planet %i core measurably faster with Deep, never pushing travel past a quarter',
     (planet) => {
       const pace = deepPaceOn(planet)
       expect(pace.speedUp).toBeGreaterThan(MEASURABLY_FASTER)
-      expect(pace.isTravelKept).toBe(true)
+      expect(pace.travel).not.toBe('pushed_over_cap')
     },
     TIMEOUT_MS,
+  )
+
+  // The bare bot already travels past a quarter on planet 16 (GD ruling on #392, option (a)).
+  it.todo(
+    "gates Deep's travel on planet 16 once the bare bot travels under #397's quarter target there",
   )
 })

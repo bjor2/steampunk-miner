@@ -451,7 +451,11 @@ programs }` from three's `renderer.info` of the game canvas), read only when cal
   (`forkDeepPaceRuns.ts`). The bot's scripted bore cuts with the drill gear (protocol 74), so the
   cell Deep opens below the bored one is one the bot drives into. Gated on the seed medians (#84):
   the speed-up above 1.02 (measurably faster), and Deep's travel (reported drive and thrust ticks,
-  `systems/travelShare.ts`) at or under a quarter of the run, or no higher than the bare run's.
+  `systems/travelShare.ts`) never pushed past a quarter of the run: it fails only when the bare
+  run was at or under the quarter and Deep's goes over. A bare run that timed out is unmeasured
+  and left out of that comparison, and a bare run already over the quarter leaves Deep ungated
+  with a printed finding for #397's travel target (GD ruling on #392, option (a); the planet-16
+  `it.todo` names it).
   One drill step (x1.225) is never a cap (GD ruling on #392): a median past it is printed as a
   balance finding for Systems, never failed, and never a reason to patch the bot. The lane
   `forkDeepP40.lane.test.ts` runs the same gates on planet 40, the headless check of the
