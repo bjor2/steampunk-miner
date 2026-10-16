@@ -116,6 +116,7 @@ function settingsTexts(prompts: PromptSource): string[] {
     ...prompts,
     prefs: DEFAULT_PREFERENCES,
     bindingProblems: [],
+    saveTransferProblems: [],
     rebindingActionId: null,
   })
   return model.bindings.flatMap((row) => [row.keyText, row.padText])
@@ -172,6 +173,7 @@ describe('prompts on touch (P1-4 of #470)', () => {
       ...TOUCH_PROMPTS,
       prefs: DEFAULT_PREFERENCES,
       bindingProblems: [],
+      saveTransferProblems: [],
       rebindingActionId: null,
     }).bindings
     expect(rows.find((row) => row.actionId === 'interact')).toMatchObject({
