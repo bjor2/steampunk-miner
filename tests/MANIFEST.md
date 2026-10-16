@@ -1098,6 +1098,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/save/byteCodecs.test.ts` | 20 | 12 |
 | `src/systems/save/carriedCursors.test.ts` | 3 | 3 |
 | `src/systems/save/chunkDiffSave.test.ts` | 11 | 11 |
+| `src/systems/save/loadedSaveDigest.test.ts` | 4 | 4 |
 | `src/systems/save/playerProfile.test.ts` | 4 | 4 |
 | `src/systems/save/saveDeterminism.test.ts` | 7 | 7 |
 | `src/systems/save/saveExactRoundTrip.test.ts` | 9 | 9 |
@@ -1161,7 +1162,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/store/artefactChoice.test.ts` | 5 | 5 |
 | `src/store/authorityReads.test.ts` | 3 | 3 |
 | `src/store/bayEntryPress.test.ts` | 2 | 2 |
-| `src/store/checkpoint.test.ts` | 21 | 21 |
+| `src/store/checkpoint.test.ts` | 22 | 22 |
 | `src/store/domainEventBroadcast.test.ts` | 3 | 3 |
 | `src/store/gameStore.test.ts` | 26 | 26 |
 | `src/store/hintSlice.test.ts` | 9 | 9 |
@@ -1236,6 +1237,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | File | Tests | Sites |
 | --- | --- | --- |
 | `scripts/perf/perfMetrics.test.mjs` | 11 | 11 |
+| `scripts/perf/phoneLane.test.mjs` | 6 | 6 |
 
 ### `tooling-soak`
 

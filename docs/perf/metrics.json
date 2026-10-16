@@ -8,7 +8,8 @@
     "Frame time",
     "Main-thread profile",
     "Stack",
-    "Run log"
+    "Run log",
+    "Phone lane (CPU-throttled emulation)"
   ],
   "metrics": {
     "generateChunk.p1.p50Ms": {
@@ -636,6 +637,348 @@
       "group": "Run log",
       "better": "lower",
       "source": "loggedCommandsOf over the first hour's 14,630 commands in the same probe (ticket 342)"
+    },
+    "phone.cpu4x.at0.tickMsP95": {
+      "label": "Tick cost p95 · 4x CPU · 0 m/s",
+      "unit": "ms",
+      "group": "Phone lane (CPU-throttled emulation)",
+      "better": "lower",
+      "budget": 6,
+      "source": "npm run perf:phone (Pixel 7 Chromium, CDP CPU throttle, SwiftShader; emulation, not a device)"
+    },
+    "phone.cpu4x.at0.frameMsP95": {
+      "label": "Frame time p95 (SwiftShader) · 4x CPU · 0 m/s",
+      "unit": "ms",
+      "group": "Phone lane (CPU-throttled emulation)",
+      "better": "lower",
+      "source": "npm run perf:phone (Pixel 7 Chromium, CDP CPU throttle, SwiftShader; emulation, not a device)"
+    },
+    "phone.cpu4x.at0.ticksDroppedByCap": {
+      "label": "Ticks the 30-step cap dropped in 15 s · 4x CPU · 0 m/s",
+      "unit": "ticks",
+      "group": "Phone lane (CPU-throttled emulation)",
+      "better": "lower",
+      "source": "npm run perf:phone (Pixel 7 Chromium, CDP CPU throttle, SwiftShader; emulation, not a device)"
+    },
+    "phone.cpu4x.at0.renderScale": {
+      "label": "Settled render scale · 4x CPU · 0 m/s",
+      "unit": "x",
+      "group": "Phone lane (CPU-throttled emulation)",
+      "better": "higher",
+      "source": "npm run perf:phone (Pixel 7 Chromium, CDP CPU throttle, SwiftShader; emulation, not a device)"
+    },
+    "phone.cpu4x.at0.internalWidth": {
+      "label": "Internal width · 4x CPU · 0 m/s",
+      "unit": "px",
+      "group": "Phone lane (CPU-throttled emulation)",
+      "better": "higher",
+      "source": "npm run perf:phone (Pixel 7 Chromium, CDP CPU throttle, SwiftShader; emulation, not a device)"
+    },
+    "phone.cpu4x.at0.internalHeight": {
+      "label": "Internal height · 4x CPU · 0 m/s",
+      "unit": "px",
+      "group": "Phone lane (CPU-throttled emulation)",
+      "better": "higher",
+      "source": "npm run perf:phone (Pixel 7 Chromium, CDP CPU throttle, SwiftShader; emulation, not a device)"
+    },
+    "phone.cpu4x.at0.jsHeapMB": {
+      "label": "JS heap · 4x CPU · 0 m/s",
+      "unit": "MB",
+      "group": "Phone lane (CPU-throttled emulation)",
+      "better": "lower",
+      "source": "npm run perf:phone (Pixel 7 Chromium, CDP CPU throttle, SwiftShader; emulation, not a device)"
+    },
+    "phone.cpu4x.at0.domNodes": {
+      "label": "DOM nodes · 4x CPU · 0 m/s",
+      "unit": "nodes",
+      "group": "Phone lane (CPU-throttled emulation)",
+      "better": "lower",
+      "source": "npm run perf:phone (Pixel 7 Chromium, CDP CPU throttle, SwiftShader; emulation, not a device)"
+    },
+    "phone.cpu4x.at96.tickMsP95": {
+      "label": "Tick cost p95 · 4x CPU · 96 m/s",
+      "unit": "ms",
+      "group": "Phone lane (CPU-throttled emulation)",
+      "better": "lower",
+      "budget": 6,
+      "source": "npm run perf:phone (Pixel 7 Chromium, CDP CPU throttle, SwiftShader; emulation, not a device)"
+    },
+    "phone.cpu4x.at96.frameMsP95": {
+      "label": "Frame time p95 (SwiftShader) · 4x CPU · 96 m/s",
+      "unit": "ms",
+      "group": "Phone lane (CPU-throttled emulation)",
+      "better": "lower",
+      "source": "npm run perf:phone (Pixel 7 Chromium, CDP CPU throttle, SwiftShader; emulation, not a device)"
+    },
+    "phone.cpu4x.at96.ticksDroppedByCap": {
+      "label": "Ticks the 30-step cap dropped in 15 s · 4x CPU · 96 m/s",
+      "unit": "ticks",
+      "group": "Phone lane (CPU-throttled emulation)",
+      "better": "lower",
+      "source": "npm run perf:phone (Pixel 7 Chromium, CDP CPU throttle, SwiftShader; emulation, not a device)"
+    },
+    "phone.cpu4x.at96.renderScale": {
+      "label": "Settled render scale · 4x CPU · 96 m/s",
+      "unit": "x",
+      "group": "Phone lane (CPU-throttled emulation)",
+      "better": "higher",
+      "source": "npm run perf:phone (Pixel 7 Chromium, CDP CPU throttle, SwiftShader; emulation, not a device)"
+    },
+    "phone.cpu4x.at96.internalWidth": {
+      "label": "Internal width · 4x CPU · 96 m/s",
+      "unit": "px",
+      "group": "Phone lane (CPU-throttled emulation)",
+      "better": "higher",
+      "source": "npm run perf:phone (Pixel 7 Chromium, CDP CPU throttle, SwiftShader; emulation, not a device)"
+    },
+    "phone.cpu4x.at96.internalHeight": {
+      "label": "Internal height · 4x CPU · 96 m/s",
+      "unit": "px",
+      "group": "Phone lane (CPU-throttled emulation)",
+      "better": "higher",
+      "source": "npm run perf:phone (Pixel 7 Chromium, CDP CPU throttle, SwiftShader; emulation, not a device)"
+    },
+    "phone.cpu4x.at96.jsHeapMB": {
+      "label": "JS heap · 4x CPU · 96 m/s",
+      "unit": "MB",
+      "group": "Phone lane (CPU-throttled emulation)",
+      "better": "lower",
+      "source": "npm run perf:phone (Pixel 7 Chromium, CDP CPU throttle, SwiftShader; emulation, not a device)"
+    },
+    "phone.cpu4x.at96.domNodes": {
+      "label": "DOM nodes · 4x CPU · 96 m/s",
+      "unit": "nodes",
+      "group": "Phone lane (CPU-throttled emulation)",
+      "better": "lower",
+      "source": "npm run perf:phone (Pixel 7 Chromium, CDP CPU throttle, SwiftShader; emulation, not a device)"
+    },
+    "phone.cpu4x.at3600.tickMsP95": {
+      "label": "Tick cost p95 · 4x CPU · 3600 m/s",
+      "unit": "ms",
+      "group": "Phone lane (CPU-throttled emulation)",
+      "better": "lower",
+      "budget": 6,
+      "source": "npm run perf:phone (Pixel 7 Chromium, CDP CPU throttle, SwiftShader; emulation, not a device)"
+    },
+    "phone.cpu4x.at3600.frameMsP95": {
+      "label": "Frame time p95 (SwiftShader) · 4x CPU · 3600 m/s",
+      "unit": "ms",
+      "group": "Phone lane (CPU-throttled emulation)",
+      "better": "lower",
+      "source": "npm run perf:phone (Pixel 7 Chromium, CDP CPU throttle, SwiftShader; emulation, not a device)"
+    },
+    "phone.cpu4x.at3600.ticksDroppedByCap": {
+      "label": "Ticks the 30-step cap dropped in 15 s · 4x CPU · 3600 m/s",
+      "unit": "ticks",
+      "group": "Phone lane (CPU-throttled emulation)",
+      "better": "lower",
+      "source": "npm run perf:phone (Pixel 7 Chromium, CDP CPU throttle, SwiftShader; emulation, not a device)"
+    },
+    "phone.cpu4x.at3600.renderScale": {
+      "label": "Settled render scale · 4x CPU · 3600 m/s",
+      "unit": "x",
+      "group": "Phone lane (CPU-throttled emulation)",
+      "better": "higher",
+      "source": "npm run perf:phone (Pixel 7 Chromium, CDP CPU throttle, SwiftShader; emulation, not a device)"
+    },
+    "phone.cpu4x.at3600.internalWidth": {
+      "label": "Internal width · 4x CPU · 3600 m/s",
+      "unit": "px",
+      "group": "Phone lane (CPU-throttled emulation)",
+      "better": "higher",
+      "source": "npm run perf:phone (Pixel 7 Chromium, CDP CPU throttle, SwiftShader; emulation, not a device)"
+    },
+    "phone.cpu4x.at3600.internalHeight": {
+      "label": "Internal height · 4x CPU · 3600 m/s",
+      "unit": "px",
+      "group": "Phone lane (CPU-throttled emulation)",
+      "better": "higher",
+      "source": "npm run perf:phone (Pixel 7 Chromium, CDP CPU throttle, SwiftShader; emulation, not a device)"
+    },
+    "phone.cpu4x.at3600.jsHeapMB": {
+      "label": "JS heap · 4x CPU · 3600 m/s",
+      "unit": "MB",
+      "group": "Phone lane (CPU-throttled emulation)",
+      "better": "lower",
+      "source": "npm run perf:phone (Pixel 7 Chromium, CDP CPU throttle, SwiftShader; emulation, not a device)"
+    },
+    "phone.cpu4x.at3600.domNodes": {
+      "label": "DOM nodes · 4x CPU · 3600 m/s",
+      "unit": "nodes",
+      "group": "Phone lane (CPU-throttled emulation)",
+      "better": "lower",
+      "source": "npm run perf:phone (Pixel 7 Chromium, CDP CPU throttle, SwiftShader; emulation, not a device)"
+    },
+    "phone.cpu6x.at0.tickMsP95": {
+      "label": "Tick cost p95 · 6x CPU · 0 m/s",
+      "unit": "ms",
+      "group": "Phone lane (CPU-throttled emulation)",
+      "better": "lower",
+      "budget": 6,
+      "source": "npm run perf:phone (Pixel 7 Chromium, CDP CPU throttle, SwiftShader; emulation, not a device)"
+    },
+    "phone.cpu6x.at0.frameMsP95": {
+      "label": "Frame time p95 (SwiftShader) · 6x CPU · 0 m/s",
+      "unit": "ms",
+      "group": "Phone lane (CPU-throttled emulation)",
+      "better": "lower",
+      "source": "npm run perf:phone (Pixel 7 Chromium, CDP CPU throttle, SwiftShader; emulation, not a device)"
+    },
+    "phone.cpu6x.at0.ticksDroppedByCap": {
+      "label": "Ticks the 30-step cap dropped in 15 s · 6x CPU · 0 m/s",
+      "unit": "ticks",
+      "group": "Phone lane (CPU-throttled emulation)",
+      "better": "lower",
+      "source": "npm run perf:phone (Pixel 7 Chromium, CDP CPU throttle, SwiftShader; emulation, not a device)"
+    },
+    "phone.cpu6x.at0.renderScale": {
+      "label": "Settled render scale · 6x CPU · 0 m/s",
+      "unit": "x",
+      "group": "Phone lane (CPU-throttled emulation)",
+      "better": "higher",
+      "source": "npm run perf:phone (Pixel 7 Chromium, CDP CPU throttle, SwiftShader; emulation, not a device)"
+    },
+    "phone.cpu6x.at0.internalWidth": {
+      "label": "Internal width · 6x CPU · 0 m/s",
+      "unit": "px",
+      "group": "Phone lane (CPU-throttled emulation)",
+      "better": "higher",
+      "source": "npm run perf:phone (Pixel 7 Chromium, CDP CPU throttle, SwiftShader; emulation, not a device)"
+    },
+    "phone.cpu6x.at0.internalHeight": {
+      "label": "Internal height · 6x CPU · 0 m/s",
+      "unit": "px",
+      "group": "Phone lane (CPU-throttled emulation)",
+      "better": "higher",
+      "source": "npm run perf:phone (Pixel 7 Chromium, CDP CPU throttle, SwiftShader; emulation, not a device)"
+    },
+    "phone.cpu6x.at0.jsHeapMB": {
+      "label": "JS heap · 6x CPU · 0 m/s",
+      "unit": "MB",
+      "group": "Phone lane (CPU-throttled emulation)",
+      "better": "lower",
+      "source": "npm run perf:phone (Pixel 7 Chromium, CDP CPU throttle, SwiftShader; emulation, not a device)"
+    },
+    "phone.cpu6x.at0.domNodes": {
+      "label": "DOM nodes · 6x CPU · 0 m/s",
+      "unit": "nodes",
+      "group": "Phone lane (CPU-throttled emulation)",
+      "better": "lower",
+      "source": "npm run perf:phone (Pixel 7 Chromium, CDP CPU throttle, SwiftShader; emulation, not a device)"
+    },
+    "phone.cpu6x.at96.tickMsP95": {
+      "label": "Tick cost p95 · 6x CPU · 96 m/s",
+      "unit": "ms",
+      "group": "Phone lane (CPU-throttled emulation)",
+      "better": "lower",
+      "budget": 6,
+      "source": "npm run perf:phone (Pixel 7 Chromium, CDP CPU throttle, SwiftShader; emulation, not a device)"
+    },
+    "phone.cpu6x.at96.frameMsP95": {
+      "label": "Frame time p95 (SwiftShader) · 6x CPU · 96 m/s",
+      "unit": "ms",
+      "group": "Phone lane (CPU-throttled emulation)",
+      "better": "lower",
+      "source": "npm run perf:phone (Pixel 7 Chromium, CDP CPU throttle, SwiftShader; emulation, not a device)"
+    },
+    "phone.cpu6x.at96.ticksDroppedByCap": {
+      "label": "Ticks the 30-step cap dropped in 15 s · 6x CPU · 96 m/s",
+      "unit": "ticks",
+      "group": "Phone lane (CPU-throttled emulation)",
+      "better": "lower",
+      "source": "npm run perf:phone (Pixel 7 Chromium, CDP CPU throttle, SwiftShader; emulation, not a device)"
+    },
+    "phone.cpu6x.at96.renderScale": {
+      "label": "Settled render scale · 6x CPU · 96 m/s",
+      "unit": "x",
+      "group": "Phone lane (CPU-throttled emulation)",
+      "better": "higher",
+      "source": "npm run perf:phone (Pixel 7 Chromium, CDP CPU throttle, SwiftShader; emulation, not a device)"
+    },
+    "phone.cpu6x.at96.internalWidth": {
+      "label": "Internal width · 6x CPU · 96 m/s",
+      "unit": "px",
+      "group": "Phone lane (CPU-throttled emulation)",
+      "better": "higher",
+      "source": "npm run perf:phone (Pixel 7 Chromium, CDP CPU throttle, SwiftShader; emulation, not a device)"
+    },
+    "phone.cpu6x.at96.internalHeight": {
+      "label": "Internal height · 6x CPU · 96 m/s",
+      "unit": "px",
+      "group": "Phone lane (CPU-throttled emulation)",
+      "better": "higher",
+      "source": "npm run perf:phone (Pixel 7 Chromium, CDP CPU throttle, SwiftShader; emulation, not a device)"
+    },
+    "phone.cpu6x.at96.jsHeapMB": {
+      "label": "JS heap · 6x CPU · 96 m/s",
+      "unit": "MB",
+      "group": "Phone lane (CPU-throttled emulation)",
+      "better": "lower",
+      "source": "npm run perf:phone (Pixel 7 Chromium, CDP CPU throttle, SwiftShader; emulation, not a device)"
+    },
+    "phone.cpu6x.at96.domNodes": {
+      "label": "DOM nodes · 6x CPU · 96 m/s",
+      "unit": "nodes",
+      "group": "Phone lane (CPU-throttled emulation)",
+      "better": "lower",
+      "source": "npm run perf:phone (Pixel 7 Chromium, CDP CPU throttle, SwiftShader; emulation, not a device)"
+    },
+    "phone.cpu6x.at3600.tickMsP95": {
+      "label": "Tick cost p95 · 6x CPU · 3600 m/s",
+      "unit": "ms",
+      "group": "Phone lane (CPU-throttled emulation)",
+      "better": "lower",
+      "budget": 6,
+      "source": "npm run perf:phone (Pixel 7 Chromium, CDP CPU throttle, SwiftShader; emulation, not a device)"
+    },
+    "phone.cpu6x.at3600.frameMsP95": {
+      "label": "Frame time p95 (SwiftShader) · 6x CPU · 3600 m/s",
+      "unit": "ms",
+      "group": "Phone lane (CPU-throttled emulation)",
+      "better": "lower",
+      "source": "npm run perf:phone (Pixel 7 Chromium, CDP CPU throttle, SwiftShader; emulation, not a device)"
+    },
+    "phone.cpu6x.at3600.ticksDroppedByCap": {
+      "label": "Ticks the 30-step cap dropped in 15 s · 6x CPU · 3600 m/s",
+      "unit": "ticks",
+      "group": "Phone lane (CPU-throttled emulation)",
+      "better": "lower",
+      "source": "npm run perf:phone (Pixel 7 Chromium, CDP CPU throttle, SwiftShader; emulation, not a device)"
+    },
+    "phone.cpu6x.at3600.renderScale": {
+      "label": "Settled render scale · 6x CPU · 3600 m/s",
+      "unit": "x",
+      "group": "Phone lane (CPU-throttled emulation)",
+      "better": "higher",
+      "source": "npm run perf:phone (Pixel 7 Chromium, CDP CPU throttle, SwiftShader; emulation, not a device)"
+    },
+    "phone.cpu6x.at3600.internalWidth": {
+      "label": "Internal width · 6x CPU · 3600 m/s",
+      "unit": "px",
+      "group": "Phone lane (CPU-throttled emulation)",
+      "better": "higher",
+      "source": "npm run perf:phone (Pixel 7 Chromium, CDP CPU throttle, SwiftShader; emulation, not a device)"
+    },
+    "phone.cpu6x.at3600.internalHeight": {
+      "label": "Internal height · 6x CPU · 3600 m/s",
+      "unit": "px",
+      "group": "Phone lane (CPU-throttled emulation)",
+      "better": "higher",
+      "source": "npm run perf:phone (Pixel 7 Chromium, CDP CPU throttle, SwiftShader; emulation, not a device)"
+    },
+    "phone.cpu6x.at3600.jsHeapMB": {
+      "label": "JS heap · 6x CPU · 3600 m/s",
+      "unit": "MB",
+      "group": "Phone lane (CPU-throttled emulation)",
+      "better": "lower",
+      "source": "npm run perf:phone (Pixel 7 Chromium, CDP CPU throttle, SwiftShader; emulation, not a device)"
+    },
+    "phone.cpu6x.at3600.domNodes": {
+      "label": "DOM nodes · 6x CPU · 3600 m/s",
+      "unit": "nodes",
+      "group": "Phone lane (CPU-throttled emulation)",
+      "better": "lower",
+      "source": "npm run perf:phone (Pixel 7 Chromium, CDP CPU throttle, SwiftShader; emulation, not a device)"
     }
   }
 }

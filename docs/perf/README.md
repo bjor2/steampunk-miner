@@ -45,6 +45,23 @@ committed code — the recorder warns on uncommitted changes), `--measured-at <i
 `--note "<text>"`, `--dry-run` (print the line, write nothing). The file shapes `--from` knows are
 listed in `scripts/perf/perfMetrics.mjs`; anything else should be written as `{"metrics": {...}}`.
 
+## Phone lane
+
+`npm run perf:phone` (#470 P1-10, ticket 481) is the phone-class lane, report only and not gated:
+it runs `e2e/browser/mobile/perfPhone.spec.ts` on the Pixel 7 Chromium project with the CPU slowed
+4x and 6x (`Emulation.setCPUThrottlingRate` over CDP), on planet 1 parked, at 96 m/s and at
+3600 m/s (`e2e/browser/mobile/perfPhonePlan.json`), and records one `--source e2e` line per rate,
+`--env "Chromium CPU throttled Nx, SwiftShader"`, under the ids `phone.cpu<N>x.<case>.<field>`:
+`tickMsP95` (one fixed tick stepped alone, the sim's CPU cost), `frameMsP95` and
+`ticksDroppedByCap` (15 s of live play: the ticks the wall clock owed that the 30-step cap let go),
+the settled `renderScale`, `internalWidth` and `internalHeight`, `jsHeapMB` and `domNodes`. They
+chart in the group "Phone lane (CPU-throttled emulation)"; the tick cost carries the TD's 6 ms
+target, so a phone three times slower still fits a 16.7 ms frame at any speed.
+
+It is emulation: a throttled desktop CPU and SwiftShader software GL. It gives tick cost (CPU)
+numbers only; GPU numbers come from the real-device check (#482), and nothing here is "verified on
+device". `-- --dry-run` prints the lines and writes nothing.
+
 ## Bench run logs
 
 Any bench run with `-- --log` (`npm run bench:ground -- --log`) also writes its timed series as

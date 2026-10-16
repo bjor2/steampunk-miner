@@ -29,6 +29,7 @@
     "bench:summary": "vite-node scripts/bench/summarizeBenchLogs.ts",
     "perf:record": "node scripts/perf/recordPerf.mjs",
     "perf:sessions": "vite-node scripts/perf/analyzeSessions.ts",
+    "perf:phone": "node scripts/perf/perfPhone.mjs",
     "metrics:ticket": "node scripts/metrics/ticketPhases.mjs",
     "metrics:backfill": "node scripts/metrics/ticketPhases.mjs --backfill",
     "metrics:tests": "node scripts/ci/queryTestMetrics.mjs",

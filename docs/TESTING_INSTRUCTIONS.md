@@ -739,6 +739,20 @@ programs }` from three's `renderer.info` of the game canvas), read only when cal
   `npm run screens:update` puts it in `docs/screens/` for review, never compared
   ([docs/screens/README.md](screens/README.md)). Software WebGL at 4K is slow, so these projects
   allow 5 minutes a test and 30 s a wait.
+- **Mobile projects** (#470 P1-10, ticket 481): `mobile-chromium-pixel7` (Playwright's `Pixel 7`
+  on Chromium) and `mobile-webkit-iphone13` (`iPhone 13` on WebKit), both turned to the landscape
+  screen of their matrix cell (`e2e/browser/mobile/mobileDevices.ts`), run `e2e/browser/mobile/` and
+  the matrix's touch specs (`touchControls`, `tapAffordances`, `slotHoldRing`) with the cell's
+  expectations. WebKit has no CDP: its touches are `locator.tap()` and `page.touchscreen.tap`, and
+  the multi-touch specs (the stick's action stream, the pinch) skip there and run on the Pixel 7
+  duplicate. Install the engine once with `npx playwright install webkit`; without it the iPhone
+  project's tests skip with that hint before a browser launches, so `test:e2e:affected` stays green.
+  `deviceSaveDigest.spec.ts` loads the committed device fixture through Continue on each engine and
+  holds its `checkpoint_loaded` digest to `tests/golden/device-save.digest.json`, which node pins
+  too (`loadedSaveDigest.test.ts`, rewritten by `npm run golden:update`): saves are identical
+  across devices (#11, #12). `perfPhone.spec.ts` is the `npm run perf:phone` lane
+  ([docs/perf/README.md](perf/README.md#phone-lane)) and skips elsewhere. All of it is emulation;
+  no spec claims "verified on device" until the real-device check (#482).
 - **Drill-down run** (ticket 416): `e2e/browser/drillDown.spec.ts` holds the real Down key for 10 s
   on the P1 surface from `scenarios/drill-down-start.scenario.json`, at stored drill_power steps 1
   (the save's), 5, 10, 15 and 20 (`debug.setUpgrade`, ticket 434), and writes one row per run (start and end position, depth gained, cells/s,
