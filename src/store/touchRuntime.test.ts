@@ -82,6 +82,15 @@ function runFresh(play: () => void) {
   }
 }
 
+/** The intent the fixed step would drive with after each step, from a fresh store. */
+function intentsAfterEach(steps: readonly (() => void)[]) {
+  runFresh(() => undefined)
+  return steps.map((step) => {
+    step()
+    return readVehicleIntent()
+  })
+}
+
 beforeEach(() => {
   installRunLog(
     createRunLog({ runId: 'run_test', sink: createMemorySink(), secondsSinceStart: () => 0 }),
@@ -103,6 +112,31 @@ describe('touch controls (#173)', () => {
       'interact+',
     ])
     expect(onTouch.mode).toBe('docked')
+  })
+
+  it('give the vehicle the same intent after every step as the matching keys (#474)', () => {
+    const onKeys = intentsAfterEach([
+      () => routeKeyChange(key('KeyD', true)),
+      () => routeKeyChange(key('KeyW', true)),
+      () => routeKeyChange(key('KeyW', false)),
+      () => routeKeyChange(key('KeyD', false)),
+    ])
+    const onTouch = intentsAfterEach([
+      () => {
+        landStick(1, 100, 300)
+        pushStick(1, 140, 300)
+      },
+      () => pushStick(1, 130, 270),
+      () => pushStick(1, 140, 300),
+      () => liftStick(1),
+    ])
+    expect(onTouch).toEqual(onKeys)
+    expect(onTouch.map(({ moveX, lift }) => [moveX, lift])).toEqual([
+      [1, false],
+      [1, true],
+      [1, false],
+      [0, false],
+    ])
   })
 
   it('hold a diagonal as W then A would, and let go of everything when the thumb lifts', () => {
