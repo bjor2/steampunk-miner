@@ -9,6 +9,8 @@
  * by pixels per metre, so 1080p and 4K show the same world. 12 m puts the 0.9 m vehicle collider
  * at 7.5% of the short axis (13.3 body heights); the player zooms between 8 m and 20 m, a factor
  * of 1.25 per step, eased over 0.2 s. Presentation only: never in the authority or the digest.
+ * Ticket 484: the metres span the screen's height in either orientation (the short axis on a
+ * landscape screen), so a portrait screen shows desktop's vertical metres; the names stay.
  */
 export const VIEW_SHORT_AXIS_DEFAULT_M = 12
 export const VIEW_SHORT_AXIS_MIN_M = 8

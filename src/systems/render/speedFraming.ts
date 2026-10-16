@@ -25,13 +25,13 @@ const HOLD_BUCKET_SECONDS = SPEED_FRAMING.pullInHoldSeconds / 2
 export interface SpeedFraming {
   /** `vCam`: the rig's felt speed along the drive, cells (metres) a second. */
   feltSpeed: number
-  /** `f`: the eased share of the half short axis the rig sits behind the screen centre. */
+  /** `f`: the eased share of the half vertical extent the rig sits behind the screen centre. */
   leadShare: number
   /** `f_h`: the eased share of the half width the rig sits behind it across a portrait screen. */
   sideLeadShare: number
   /** The eased drive direction the lean points along; shorter than 1 mid-turn. */
   leadDirection: Vector2
-  /** The eased auto pull-back, metres across the short axis; 0 when standing still. */
+  /** The eased auto pull-back, metres down the screen's height; 0 when standing still. */
   pullBack: number
   /** The largest pull-back need seen in this hold bucket and the two before it. */
   holdBuckets: { current: number; previous: number; older: number; seconds: number }

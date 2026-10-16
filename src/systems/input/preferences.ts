@@ -7,7 +7,7 @@
  * `cameraMode` is the fixed-camera accessibility toggle (#13), `shake` and `flashes` the
  * screen-shake and flash switches, `hintsEnabled` the "Show hints" setting the hints (#27) read,
  * `bindings` the sparse override of the action map, `seenHints` the hints and transmissions already
- * shown (#16), so none repeats after a reload, `viewShortAxisMetres` the player's zoom (#39),
+ * shown (#16), so none repeats after a reload, `viewShortAxisMetres` the player's zoom (#39; metres down the screen's height since ticket 484),
  * `musicVolume` and `musicMuted` the music settings (#49), `tvMode` the 10-foot UI with its safe
  * area (#173), `leftHanded` the mirrored touch controls and `haptics` their vibration (#173), and
  * `renderQuality` the render quality knob (ticket 477), set through its own action like the zoom. A

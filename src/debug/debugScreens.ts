@@ -77,7 +77,7 @@ export interface DebugUi {
   /** Any setting the overlay lists (`PREFERENCE_NAMES`), such as `tvMode` (#173). */
   setPref(name: string, value: unknown): DebugResult
   getPrefs(): DebugResult<{ prefs: Preferences }>
-  /** The player's zoom, metres across the short axis from 8 to 20 (#39); refused outside it. */
+  /** The player's zoom, metres down the screen's height from 8 to 20 (#39, ticket 484); refused outside it. */
   setZoom(viewShortAxisMetres: unknown): DebugResult
   /**
    * The framing on screen now: the eased zoom, pixels per metre and the collider's share (#39),
