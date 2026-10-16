@@ -106,10 +106,11 @@ function ZoomView({ view, list }: { view: TreeScreenView; list: readonly NodeCar
 
 /** The map or the list fills the screen; a picked node's card is a sheet over it. */
 function CompactBody({ view, list }: { view: TreeScreenView; list: readonly NodeCardModel[] }) {
+  const sheetCard = view.zoom === 'card' ? view.card : null
   return (
     <>
       {view.treeView === 'list' ? <TreeList list={list} /> : <LaneMap model={view.model} />}
-      {view.zoom === 'card' && view.card !== null && <NodeSheet card={view.card} />}
+      {sheetCard !== null && <NodeSheet card={sheetCard} />}
     </>
   )
 }

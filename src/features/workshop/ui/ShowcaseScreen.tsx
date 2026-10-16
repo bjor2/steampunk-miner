@@ -108,7 +108,7 @@ function CarouselShowcase({ model, focusedId }: { model: UpgradeBayModel; focuse
         <div className={styles.car} data-testid={WORKSHOP_TEST_IDS.showcase} />
         <ScrollArea className={styles.carouselFrame} testId={WORKSHOP_TEST_IDS.carousel}>
           <div className={styles.carousel}>
-            {CAROUSEL_SIDES.flatMap((side) => rowsOnSide(model.tracks, side)).map((row) => (
+            {carouselRowsOf(model.tracks).map((row) => (
               <TrackPlaque
                 key={row.upgradeId}
                 row={row}
@@ -121,6 +121,10 @@ function CarouselShowcase({ model, focusedId }: { model: UpgradeBayModel; focuse
       </div>
     </>
   )
+}
+
+function carouselRowsOf(tracks: UpgradeBayModel['tracks']): UpgradeBayModel['tracks'] {
+  return CAROUSEL_SIDES.flatMap((side) => rowsOnSide(tracks, side))
 }
 
 /** The bay's other rows (Casing, lining, guns, repair) and the footer. */
