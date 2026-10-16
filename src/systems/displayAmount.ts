@@ -48,6 +48,15 @@ export function exactAmount(amount: Money | number): string {
   return toCanonical(typeof amount === 'number' ? fromSafeInteger(amount) : amount)
 }
 
+/**
+ * Whether `formatAmount` drops digits of the amount (a cut mantissa or fraction), so a tap on the
+ * readout has an exact value to show (ticket 476); grouping commas alone hide nothing.
+ */
+export function isAmountShortened(amount: Money | number): boolean {
+  const parts = splitCanonical(exactAmount(amount))
+  return parts.digits.length > shownDigitCountOf(parts)
+}
+
 /** Short screen text for a share of a whole: 0.0041 is `0.41%`. */
 export function formatPercent(ratio: Money): string {
   const ratioParts = splitCanonical(toCanonical(ratio))
@@ -67,6 +76,13 @@ function formatPercentMagnitude(ratio: DecimalParts, percent: DecimalParts): str
   if (percent.exponent < SMALLEST_SHOWN_PERCENT_EXPONENT) return '<0.01'
   if (percent.exponent < SIGNIFICANT_DIGITS - 1) return significantSmallText(percent)
   return formatMagnitude(percent)
+}
+
+/** How many significant digits the text keeps: 3 in exponent form, the whole number, 3 decimals. */
+function shownDigitCountOf(parts: DecimalParts): number {
+  if (parts.exponent >= SCIENTIFIC_FROM_EXPONENT) return SIGNIFICANT_DIGITS
+  if (parts.exponent >= EXACT_BELOW_EXPONENT) return parts.exponent + 1
+  return parts.exponent + 1 + MAX_SHOWN_DECIMALS
 }
 
 function isZeroParts(parts: DecimalParts): boolean {

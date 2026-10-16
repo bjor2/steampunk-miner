@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
-import { exactAmount, formatAmount, formatPercent } from './displayAmount'
+import { MONEY_TEXT_CHARS_MAX } from '../constants/uiParts'
+import { exactAmount, formatAmount, formatPercent, isAmountShortened } from './displayAmount'
 import { fromCanonical, toCanonical } from './money'
 
 const show = (text: string) => formatAmount(fromCanonical(text))
@@ -83,6 +84,35 @@ describe('display amount', () => {
   it('exposes the exact canonical money string for tooltips and logs', () => {
     expect(exactAmount(fromCanonical('1234.567'))).toBe(toCanonical(fromCanonical('1234.567')))
     expect(exactAmount(1000)).toBe('1e+3')
+  })
+
+  it('fits a negative planet-200 amount in the money slot, up to a three-digit exponent', () => {
+    const widest = ['-1.00e149', '-9.9999e149', '-9.9999999e999', '-999999.999', '-999.999']
+    expect(show('-1.2e149')).toBe('-1.20e149')
+    const tooLong = widest.map(show).filter((text) => text.length > MONEY_TEXT_CHARS_MAX)
+    expect(tooLong).toEqual([])
+  })
+})
+
+describe('shortened amount', () => {
+  it.each([
+    ['1.2e149', false],
+    ['1.2345e149', true],
+    ['1.23456e7', true],
+    ['1234.567', true],
+    ['1000000', false],
+    ['1.23e8', false],
+    ['999999', false],
+    ['75.937', false],
+    ['0', false],
+    ['-1.2345e149', true],
+  ])('says whether the short text of %s hides digits: %s', (amount, isShortened) => {
+    expect(isAmountShortened(fromCanonical(amount))).toBe(isShortened)
+  })
+
+  it('reads a safe-integer count the same way', () => {
+    expect(isAmountShortened(12_345_678)).toBe(true)
+    expect(isAmountShortened(12_345)).toBe(false)
   })
 })
 
