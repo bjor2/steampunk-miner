@@ -6,12 +6,18 @@
  * full, the tow) is a chip in priority order; the rest fold into a "+N" count. A call-out's line
  * after its colon, and every gauge and readout name, live in the box's tap card instead.
  * Display only: the same model the full banner draws, read the compact way.
+ *
+ * Held upright (#486) the row beside the pause button holds three glyphs, not three titles: each
+ * chip is its icon and the number its title carries, its words in the status box's card, as every
+ * gauge and readout already is; and the threats are chips in the rows instead of markers at the
+ * screen's edge, which upright runs through the vehicle's lean. Sideways nothing changes.
  */
 import { MOST_STATUSES_SHOWN, type CombatStatusStack, type StatusUrgency } from './combatStatuses'
 import { calloutTextOf } from './hudCallouts'
 import type { VehicleStateReading } from './hudReadings'
+import type { HudDensity, StageOrientation } from './screenLayout'
 import { wordCountOf } from './uiTextBudget'
-import type { UiText } from './uiText'
+import type { UiText, UiTextTitlePlace } from './uiText'
 
 /** One chip of the compact row: its icon, its words and how fast it pulses. */
 export interface CompactChip {
@@ -53,6 +59,12 @@ const STATE_CHIP_ID = 'state'
 /** A unit set apart from its number ("0.5 s", "10 s"): glued on, it reads as the number's. */
 const SPACED_UNIT = /(\d) (?=[a-z%]{1,3}\b)/g
 
+/** The control a reading names after its value, in brackets: " (Guns button)", " (C)". */
+const BRACKETED_CONTROL = / \([^()]*\)$/
+
+/** A word of a title that holds a number: "x2", "0.5s", "10s". */
+const NUMBER_WORD = /\S*\d\S*/g
+
 export function compactStatusRowOf(
   statuses: CombatStatusStack,
   vehicleState: VehicleStateReading,
@@ -73,6 +85,35 @@ export function compactStatusRowOf(
 export function compactChipTitleOf(status: { id: string; text: string }): string {
   if (status.id === 'cargo_full') return CARGO_FULL_CHIP_TEXT
   return calloutTextOf(status.id, status.text).title.replace(SPACED_UNIT, '$1')
+}
+
+/** Held upright, the compact HUD lays threats and prompts out as chips in its rows (#486). */
+export function isUprightCompactHud(density: HudDensity, orientation: StageOrientation): boolean {
+  return density === 'compact' && orientation === 'portrait'
+}
+
+/** Where a status chip's title shows: in the box's card upright (#486), on the chip sideways. */
+export function compactChipTitlePlaceOf(orientation: StageOrientation): UiTextTitlePlace {
+  return orientation === 'portrait' ? 'card' : 'element'
+}
+
+/** The numbers a chip's title carries ("x2", "0.5s"), drawn by its icon when the words are not. */
+export function compactChipValueOf(title: string): string {
+  return (title.match(NUMBER_WORD) ?? []).join(' ')
+}
+
+/**
+ * A reading's text in its box: held upright the closed compact row leaves out the control the
+ * reading names in brackets ("Auto (Guns button)" reads "Auto"), which its card still says, so
+ * the readouts keep to two rows (#486); sideways and in the card the whole text.
+ */
+export function compactReadingTextOf(
+  text: string,
+  titlePlace: UiTextTitlePlace,
+  orientation: StageOrientation,
+): string {
+  if (titlePlace !== 'card' || orientation !== 'portrait') return text
+  return text.replace(BRACKETED_CONTROL, '')
 }
 
 /** Label words an element shows on screen: its title unless the card holds it, and its line. */

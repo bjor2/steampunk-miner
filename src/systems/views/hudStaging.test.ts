@@ -44,6 +44,26 @@ describe('HUD debug staging (#500)', () => {
     expect(folded.statuses.hiddenCount).toBe(1)
   })
 
+  it('adds one marker at each staged octant and the threat status once (#486)', () => {
+    const staged = stagedHudModelOf(QUIET, {
+      isCargoFull: false,
+      threatOctant: 2,
+      threatOctants: [0, 5, 7],
+    })
+    expect(staged.threats.map((threat) => threat.octant)).toEqual([2, 0, 5, 7])
+    expect(staged.statuses.shown.map((status) => status.id)).toEqual(['threat'])
+  })
+
+  it('refuses staged octants that are not a list of wholes 0 to 7', () => {
+    for (const threatOctants of [3, [8], [null], ['1']])
+      expect(
+        hudStagingProblemsOf({ isCargoFull: false, threatOctant: null, threatOctants }),
+      ).toEqual(['threatOctants must be a list of wholes 0 to 7'])
+    expect(
+      hudStagingProblemsOf({ isCargoFull: false, threatOctant: null, threatOctants: [0, 7] }),
+    ).toEqual([])
+  })
+
   it('names every problem of a staging that is not one', () => {
     expect(hudStagingProblemsOf(null)).toEqual(['staging must be an object'])
     expect(hudStagingProblemsOf({ isCargoFull: true, threatOctant: 1.5 })).toEqual([

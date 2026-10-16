@@ -14,6 +14,8 @@ export interface HudStaging {
   isCargoFull: boolean
   /** A scripted threat marker at this screen-edge octant (0 top, clockwise), or none. */
   threatOctant: number | null
+  /** More scripted markers, one at each octant: the upright threat chips' row (#486). */
+  threatOctants?: readonly number[]
 }
 
 export const NO_HUD_STAGING: HudStaging = { isCargoFull: false, threatOctant: null }
@@ -23,16 +25,27 @@ const SCRIPTED_THREAT_KIND = 'crawler' as const
 
 export function stagedHudModelOf(model: HudModel, staging: HudStaging): HudModel {
   const withCargo = staging.isCargoFull ? withFullHold(model) : model
-  return staging.threatOctant === null ? withCargo : withThreat(withCargo, staging.threatOctant)
+  return stagedOctantsOf(staging).reduce(withThreat, withCargo)
 }
 
 export function hudStagingProblemsOf(value: unknown): string[] {
   if (typeof value !== 'object' || value === null) return ['staging must be an object']
-  const { isCargoFull, threatOctant } = value as Partial<HudStaging>
+  const { isCargoFull, threatOctant, threatOctants } = value as Partial<HudStaging>
   return [
     ...(typeof isCargoFull === 'boolean' ? [] : ['isCargoFull must be true or false']),
     ...(isOctantOrNone(threatOctant) ? [] : ['threatOctant must be null or a whole 0 to 7']),
+    ...(areOctantsOrAbsent(threatOctants) ? [] : ['threatOctants must be a list of wholes 0 to 7']),
   ]
+}
+
+function stagedOctantsOf(staging: HudStaging): number[] {
+  const first = staging.threatOctant === null ? [] : [staging.threatOctant]
+  return [...first, ...(staging.threatOctants ?? [])]
+}
+
+function areOctantsOrAbsent(value: unknown): boolean {
+  if (value === undefined) return true
+  return Array.isArray(value) && value.every((octant) => octant !== null && isOctantOrNone(octant))
 }
 
 function isOctantOrNone(value: unknown): boolean {
