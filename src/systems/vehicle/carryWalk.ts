@@ -75,6 +75,11 @@ export interface CarryReach {
   paid: TilePoint[]
   /** What each paid cell was paid, in sub-steps, in the order of `paid`. */
   paidPrices: number[]
+  /**
+   * The sub-step where the stamp's centre enters each paid cell, in the order of `paid`: the stamp
+   * stands at the sub-step before while it pays it (ticket 441's rim dwell, `sweepDwell.ts`).
+   */
+  paidSteps: number[]
   /** The cell the carry works toward, which only the carry cuts; null when nothing is carried. */
   target: TilePoint | null
 }
@@ -117,6 +122,7 @@ interface CarryLedger {
   purse: CarryPurse
   paid: TilePoint[]
   paidPrices: number[]
+  paidSteps: number[]
   paidKeys: Set<string>
   hasReleased: boolean
 }
@@ -131,6 +137,7 @@ function walkCarry(
     purse: { ...purse },
     paid: [],
     paidPrices: [],
+    paidSteps: [],
     paidKeys: new Set(),
     hasReleased: false,
   }
@@ -259,12 +266,13 @@ function payCells(ledger: CarryLedger, cells: readonly Crossing[], cell: CarryCe
   ledger.purse.subSteps -= count * cell.price
   ledger.purse.tank -= count * cell.energy
   if (cell.isOre) ledger.purse.room -= count
-  for (const { tile } of cells) markPaid(ledger, tile, cell.price)
+  for (const crossing of cells) markPaid(ledger, crossing, cell.price)
 }
 
-function markPaid(ledger: CarryLedger, tile: TilePoint, price: number): void {
+function markPaid(ledger: CarryLedger, { tile, step }: Crossing, price: number): void {
   ledger.paid.push(tile)
   ledger.paidPrices.push(price)
+  ledger.paidSteps.push(step)
   ledger.paidKeys.add(keyOf(tile))
 }
 
@@ -353,5 +361,6 @@ function reachOf(
   carrySubSteps: number,
   target: TilePoint | null,
 ): CarryReach {
-  return { reachedStep, carrySubSteps, paid: ledger.paid, paidPrices: ledger.paidPrices, target }
+  const { paid, paidPrices, paidSteps } = ledger
+  return { reachedStep, carrySubSteps, paid, paidPrices, paidSteps, target }
 }

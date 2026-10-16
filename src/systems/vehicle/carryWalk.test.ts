@@ -110,6 +110,24 @@ describe('drill carry (ticket 399)', () => {
       }
     })
 
+    it('records each paid cell with the sub-step where the centre enters it, in walk order', () => {
+      const path = pathDown(TOP_Y, 96_500)
+      const reach = walk(
+        { path, beyond: null },
+        plenty(Q),
+        columnGround(() => rock(7)),
+      )
+      const entered = reach.paidSteps.map((step) => ({
+        inside: pointAtStep(path, step).yMm,
+        before: pointAtStep(path, step - 1).yMm,
+      }))
+      expect(reach.paid.map(({ ty }) => ty)).toEqual([99, 98, 97, 96])
+      reach.paid.forEach(({ ty }, at) => {
+        expect(entered[at].inside).toBeLessThan((ty + 1) * 1000)
+        expect(entered[at].before).toBeGreaterThanOrEqual((ty + 1) * 1000)
+      })
+    })
+
     it('cuts several cells in one tick when they cost less than a tick, carrying the rest', () => {
       const ground = columnGround(() => rock(7))
       const reach = walk({ path: pathDown(TOP_Y, 80_500), beyond: null }, plenty(Q), ground)
@@ -208,6 +226,7 @@ describe('drill carry (ticket 399)', () => {
         carrySubSteps: 0,
         paid: [],
         paidPrices: [],
+        paidSteps: [],
         target: null,
       })
     })
@@ -301,6 +320,14 @@ describe('a released cell in the carry walk (ticket 421)', () => {
       const reach = walk(sweep, plenty(100), releasingGround(200, 99, 0))
       expect(reach.paid).toEqual([{ tx: 0, ty: 99 }])
       expect(reach.paidPrices).toEqual([0])
+    })
+
+    it('records the sub-step where the centre enters each paid cell, a released one too', () => {
+      const reach = walk(sweep, plenty(100), releasingGround(200, 99, 40))
+      const [step] = reach.paidSteps
+      expect(reach.paidSteps).toHaveLength(1)
+      expect(pointAtStep(sweep.path, step).yMm).toBeLessThan(START_ROW * 1000)
+      expect(pointAtStep(sweep.path, step - 1).yMm).toBeGreaterThanOrEqual(START_ROW * 1000)
     })
 
     it('carries the work toward a released cell the stamp left dearer than the work', () => {
