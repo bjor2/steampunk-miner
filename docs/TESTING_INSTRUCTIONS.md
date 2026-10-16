@@ -255,9 +255,27 @@ programs }` from three's `renderer.info` of the game canvas), read only when cal
   at 30 and 144 frames/s. It prints where the ticks go until the body follows the drill
   (swivel, stale facing, first cell, held, second stall: `systems/vehicle/cutStartBreakdown.ts`)
   and the stale facing for each pose report phase, and writes them to
-  `balance-report/cut-start-latency.ndjson`. A lane (about 40 s), so it runs only when named; it
-  fails only when a start opens no cell or the two frame rates differ. Its rig and script are
+  `balance-report/cut-start-latency.ndjson`. Since ticket 506 (`drillStep` carries the head's
+  facing) every start and report phase reads 0 stale facing; press to first motion (the swivel and
+  the ticks the engaged drill stood) is logged per rig and may not grow from stored 1 to 10 to 20
+  to the planet-200 on-curve drill (surface start only, after resting in the pit it digs off the
+  pad); and the mid-shaft start's standing ticks, over a full cell period of face positions, may
+  average no more than main's before ticket 506 (the Vertical Scaler's bars). A lane (about 2.5
+  min), so it runs only when named; it fails when a start opens no cell, the two frame rates
+  differ, a stale facing reads above 0 or one of those bars fails. Its rig and script are
   `src/physics/cutStartFixtures.ts`.
+- **Drill step facing** (ticket 506, #433 fix 1): `drillStep` carries the head's settled facing,
+  which replaces the last report's in the authority's pose, its cut gate and the motor's cut-follow
+  read. `src/systems/authority/drillStep.test.ts` refuses a facing outside 0 to 3 (`invalid_pose`)
+  or none, and cuts along the step's facing, not the report's; `cutFollowRead.test.ts` reads the
+  slab along it. `src/systems/authority/drillStepFacing.test.ts` (the Horizontal Scaler) wants a
+  fixed flag-on route's event stream (ore firsts, DrillGated, in walk order) the same whether the
+  last report faced the step's way, as on main, or not, and a gated cell never cut under a fresh
+  facing (about 1 s). `src/physics/drillFacingStep.test.ts` plays turns in the live loop: a drive
+  turned into a cut reads no stale facing at any of the 12 report phases at stored 1, 10 and 20 and
+  30 and 144 frames/s, a cut turned into another direction never holds a gate that was free to
+  open (the #333 hold after the old cut's gate closes mid-swivel is the gate's own rule), and the
+  motor gate equals the authority's on every tick of the turn (about 1 min).
 - **Drill start and turn latency** (ticket 504, measurement only):
   `src/physics/drillTurnLatency.lane.test.ts` drives #433's rig and script at stored drill_power
   1, 10 and 20 and 30 and 144 frames/s: rig 1 (#400)'s mid-shaft start with the press moved over
@@ -408,7 +426,10 @@ programs }` from three's `renderer.info` of the game canvas), read only when cal
   release phases main followed (`MAIN_FOLLOWED_LEVEL`) and wants their backward ticks no deeper and
   no larger in sum than main's; at 30 frames/s the sum is a todo since ticket 459, on #499 and #460
   since #491's toe stop, held meanwhile by a ratchet on the sum and the backward ticks (`TOE_RATCHET`)
-  that may only shrink.
+  that may only shrink. Since ticket 506 the cut after the turn starts sooner, so the pairs are the
+  phases this tree follows (`REPAIRED_FOLLOWED_LEVEL_PHASES`, re-paired once, main's bars kept) and
+  the deepest back-off on them is held to main's −0.4557 m/s at 30 frames/s (a todo owned by #506
+  at 144, which reads −0.4925); the airborne release is re-paired to phase 38.
 - **Known red** (ticket 419, the TD on #396 section 2): `CAMPAIGN_PACING_KNOWN_RED`
   (`src/constants/knownRed.ts`) is the one known-red marker in the repo: one gate
   (`campaignPacingGate`), one finding (#417), no registry. The gate still runs in full;
