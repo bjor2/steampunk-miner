@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-10-16T20:41:50+01:00",
+  "updated_at": "2026-10-16T20:42:14+01:00",
   "caps": {
     "grok": 12,
     "claude": 10,
@@ -714,11 +714,11 @@
     }
   ],
   "last_refill": {
-    "at": "2026-10-16 20:40 BST",
+    "at": "2026-10-16 20:42 BST",
     "mode": "refill-dev",
-    "triggers": "claude-run:wave-plan",
+    "triggers": "manual",
     "started": "",
-    "note": "load guard (1-min load 16.38 > 14)"
+    "note": "load guard (1-min load 14.89 > 14)"
   },
   "totals": {
     "grok": {
