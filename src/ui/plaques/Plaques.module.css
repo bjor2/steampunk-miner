@@ -19,3 +19,93 @@
   left: 50%;
   transform: translateX(-50%);
 }
+
+/*
+ * The compact hint chip (#500): placed by its measured box, one line cut with an ellipsis, the
+ * only plaque that takes a tap (the GD's narrow amendment of #16). Room on the right for the
+ * dismiss, whose hit area overhangs the chip's box.
+ */
+.chip {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  pointer-events: auto;
+  touch-action: manipulation;
+}
+
+.chip > p {
+  flex: 1;
+  min-width: 0;
+  height: 100%;
+  max-width: none;
+  padding: 0 calc(var(--control-min) + var(--space-1)) 0 var(--space-2);
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+.chip > p > span:last-child {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.chip > p span {
+  display: inline;
+}
+
+/*
+ * Open: the whole hint as a card, its foot on the chip's, growing upward over the rows, which
+ * leave it the height of every hint in the table.
+ */
+.chip[data-expanded] > p {
+  height: auto;
+  max-height: 100%;
+  padding-block: var(--space-2);
+  white-space: normal;
+}
+
+.chip[data-expanded] > p span {
+  display: block;
+}
+
+/* The control minimum square, transparent; only its cross is drawn (GD ruling 3 on #500). */
+.dismiss {
+  position: absolute;
+  top: 50%;
+  right: 0;
+  width: var(--control-min);
+  height: var(--control-min);
+  padding: 0;
+  border: none;
+  background: none;
+  transform: translateY(-50%);
+  cursor: pointer;
+}
+
+.dismiss::before,
+.dismiss::after {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 18px;
+  height: 2px;
+  background: var(--color-parchment);
+  content: '';
+}
+
+.dismiss::before {
+  transform: translate(-50%, -50%) rotate(45deg);
+}
+
+.dismiss::after {
+  transform: translate(-50%, -50%) rotate(-45deg);
+}
+
+.chip[data-expanded] .dismiss {
+  top: var(--space-1);
+  transform: none;
+}
+
+.dismiss:focus-visible {
+  outline: 2px solid var(--color-brass);
+  outline-offset: -4px;
+}
