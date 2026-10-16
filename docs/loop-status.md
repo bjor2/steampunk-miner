@@ -565,3 +565,29 @@ Rollback: restore the backup over `wave-lib.sh` (running processes keep the code
 - Checked: `--wave-status` before and after is identical (10 waves, same states); a synthetic cache with bare and prefixed keys across maps 470, 316 and 302 resolved
   each blocker within its own map; `waves.mjs propose 316` and `302` produce `316-3A`, `302-8A..8C` and blockers like `302-8A`, and `status 316` still reads the old keys.
 - Rollback: restore the three backups (`wave-lib.sh`, `waves.mjs`, `WAVES.md`); existing waves are unaffected either way.
+
+## Merge-after guard (17 Oct 2026, ~00:40 Oslo): #529 builds in parallel, merges only after #514
+
+TD ruling on #514/#529: no hard build block, but a fixed merge order. Mechanism (generic, config-driven):
+
+- **`merge-after.conf`** (loop dir): one `<ticket>:<prerequisite>` per line, `#` comments allowed. Currently `529:514`.
+- **`merge-hold-lib.sh`** (new, sourced at the end of `wave-lib.sh`) defines `merge_after_of` and `merge_hold <n> <wt>`. `verify_ticket` calls
+  `merge_hold "$n" "$wt" && return 0` right after the gates are green and before the push/close (one-line hook in `next-ticket.sh`; same size, same inode,
+  an equal number of bytes were taken from the comment above it; backup `next-ticket.sh.bak-20261017-0140-mergehold`; `bash -n` ok).
+- **Semantics.** No entry: nothing changes. Prerequisite CLOSED *before this session started* (`SESSION_SINCE`): go ahead and push as usual. Otherwise the ticket is
+  **held**: nothing is pushed or closed, the attempt is refunded, a reopened issue is reopened, `ticket/N` is kept at its tip (`ensure_worktree` only wipes on
+  re-claim and reuses a tip ahead of main), `state.merge_held[N] = {after, branch, sha, why, since}`, and a comment tells the next session what to do.
+  `why=open` (prereq still open, or unreadable: fail closed) adds the prerequisite as a **native blocker**, which the picker already honours, so the ticket is
+  not re-picked while #514 is open and is re-claimed automatically when #514 closes. `why=stale` (prereq closed *during* the session, so the session did not
+  build on it) is not blocked and is re-picked at once. If the blocker link cannot be added, the ticket gets `needs-planner` instead (remove it once the prereq closes).
+- **Why not `push_pending`.** It is one global slot that blocks every other landing and marks the coordinator blocked; a held ticket should not stall the loop.
+  **Why re-queue rather than auto-push.** The protocol-bump renumber and the lane re-run at both cadences is worker work, and a failed #514 bar changes which
+  cadence ships. The re-claim is one normal attempt on the kept branch; its prompt gets the hold comment (rebase on `origin/main`, renumber the protocol bump,
+  re-run the lane at every shipping cadence, gates). The ordinary push then rebases/hands conflicts back; never forced.
+- **Picker/lane.** #529 and #514 may run in parallel; the guard only controls landing order. No extra lane-use constraint was added.
+- **#529 relaunch.** Workers read issue comments only at session start, and the live #529 session (started 23:29 UTC) predated Producer comment 6226634455 (deletes stop-rule
+  item (f)). Used the #508-style relaunch: `needs-planner`, SIGTERM the session (attempt refunded 0/2), label removed, re-claimed on slot 4 at 00:37 Oslo.
+- Tested with stubs and a temp state: no entry, prereq open (blocker + refund + record), blocker add fails (needs-planner fallback), prereq unreadable, closed
+  after session start (stale), closed before session start (go ahead, record cleared). Not run against real issues.
+- Rollback: restore `next-ticket.sh.bak-20261017-0140-mergehold` and `wave-lib.sh.bak-20261017-0140-mergehold`, delete `merge-after.conf`, remove any blocker links
+  and `merge_held` entries from `state.json`.
