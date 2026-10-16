@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-10-16T17:17:55+01:00",
+  "updated_at": "2026-10-16T17:33:13+01:00",
   "caps": {
     "grok": 12,
     "claude": 10,
@@ -557,9 +557,13 @@
   "grok": [
     {
       "slot": 1,
-      "state": "free",
-      "ticket": null,
-      "since": null
+      "state": "planner",
+      "ticket": 470,
+      "since": "2026-10-16T17:32:16+01:00",
+      "map": 302,
+      "room": "9cc76e78-1e10-4130-8b0e-0865bac3f7a8",
+      "adopted": false,
+      "wave": "7D"
     },
     {
       "slot": 2,
@@ -724,10 +728,10 @@
   "totals": {
     "grok": {
       "size": 12,
-      "used": 0,
+      "used": 1,
       "dev": 0,
       "dev_cap": 8,
-      "planner": 0,
+      "planner": 1,
       "planner_cap": 4
     },
     "claude": {
@@ -743,21 +747,21 @@
     "parallel": 1,
     "list": [
       {
-        "number": 502,
-        "key": "5D",
-        "map": 302,
+        "number": 507,
+        "key": "1A",
+        "map": 316,
         "lane": "remote",
         "mode": "solo",
         "state": "ready",
         "tickets": [
-          499
+          506
         ],
         "done": [],
         "live": 0
       },
       {
         "number": 498,
-        "key": "5C",
+        "key": "7C",
         "map": 302,
         "lane": "remote",
         "mode": "solo",
@@ -772,12 +776,15 @@
       },
       {
         "number": 497,
-        "key": "1E",
+        "key": "2B",
         "map": 470,
         "lane": "remote",
         "mode": "solo",
-        "state": "paused",
+        "state": "blocked",
         "tickets": [
+          486,
+          487,
+          488,
           489
         ],
         "done": [],
@@ -785,40 +792,35 @@
       },
       {
         "number": 496,
-        "key": "1D",
+        "key": "2A",
         "map": 470,
         "lane": "remote",
         "mode": "solo",
-        "state": "paused",
+        "state": "ready",
         "tickets": [
-          483,
+          500,
           484,
-          485,
-          486,
-          487
+          485
         ],
-        "done": [
-          483
-        ],
+        "done": [],
         "live": 0
       },
       {
         "number": 495,
-        "key": "1C",
+        "key": "2C",
         "map": 470,
-        "lane": "remote",
-        "mode": "solo",
-        "state": "blocked",
+        "lane": "hitl",
+        "mode": "bench",
+        "state": "bench",
         "tickets": [
-          482,
-          488
+          482
         ],
         "done": [],
         "live": 0
       },
       {
         "number": 490,
-        "key": "5B",
+        "key": "7B",
         "map": 302,
         "lane": "remote",
         "mode": "solo",
@@ -833,21 +835,8 @@
         "live": 0
       },
       {
-        "number": 468,
-        "key": "6A",
-        "map": 302,
-        "lane": "remote",
-        "mode": "solo",
-        "state": "blocked",
-        "tickets": [
-          471
-        ],
-        "done": [],
-        "live": 0
-      },
-      {
         "number": 461,
-        "key": "5A",
+        "key": "7A",
         "map": 302,
         "lane": "remote",
         "mode": "solo",
@@ -863,7 +852,7 @@
       },
       {
         "number": 438,
-        "key": "5E",
+        "key": "7D",
         "map": 302,
         "lane": "hitl",
         "mode": "bench",
@@ -875,7 +864,6 @@
           307,
           308,
           417,
-          441,
           470,
           501
         ],
