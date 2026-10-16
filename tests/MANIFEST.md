@@ -868,7 +868,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/input/padCodes.test.ts` | 4 | 4 |
 | `src/systems/input/padFrame.test.ts` | 7 | 7 |
 | `src/systems/input/preferences.test.ts` | 20 | 20 |
-| `src/systems/input/touchControls.test.ts` | 22 | 15 |
+| `src/systems/input/touchControls.test.ts` | 23 | 16 |
 
 ### `logging`
 
@@ -1159,7 +1159,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/store/gameStore.test.ts` | 26 | 26 |
 | `src/store/hintSlice.test.ts` | 9 | 9 |
 | `src/store/inputRuntime.test.ts` | 51 | 51 |
-| `src/store/liveStepSlice.test.ts` | 13 | 13 |
+| `src/store/liveStepSlice.test.ts` | 17 | 17 |
 | `src/store/padRuntime.test.ts` | 16 | 14 |
 | `src/store/partInstall.test.ts` | 5 | 5 |
 | `src/store/pauseMenuSlice.test.ts` | 11 | 11 |
@@ -1169,7 +1169,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/store/runSnapshots.test.ts` | 10 | 10 |
 | `src/store/sliceRun.test.ts` | 7 | 7 |
 | `src/store/titleMenu.test.ts` | 9 | 9 |
-| `src/store/touchRuntime.test.ts` | 14 | 13 |
+| `src/store/touchRuntime.test.ts` | 16 | 15 |
 | `src/store/worldSaveOwnership.test.ts` | 7 | 7 |
 
 ### `systems-core`
