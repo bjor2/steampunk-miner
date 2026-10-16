@@ -1,9 +1,9 @@
 {
-  "updated_at": "2026-10-16T08:45:58+02:00",
+  "updated_at": "2026-10-16T08:47:34+02:00",
   "caps": {
     "grok": 12,
     "claude": 10,
-    "claude_enabled": 6,
+    "claude_enabled": 0,
     "dev": 8,
     "planner": 4,
     "gate": 3,
@@ -14,8 +14,8 @@
       "id": "A1",
       "account": 1,
       "label": "Claude Max 1",
-      "enabled": true,
-      "reason": "signed in",
+      "enabled": false,
+      "reason": "not signed in",
       "slots": [
         {
           "slot": "C1",
@@ -28,7 +28,7 @@
         },
         {
           "slot": "C2",
-          "state": "free",
+          "state": "disabled",
           "ticket": null,
           "grok_slot": null,
           "kind": null,
@@ -45,7 +45,7 @@
         },
         {
           "slot": "C4",
-          "state": "free",
+          "state": "disabled",
           "ticket": null,
           "grok_slot": null,
           "kind": null,
@@ -62,7 +62,7 @@
         },
         {
           "slot": "C6",
-          "state": "free",
+          "state": "disabled",
           "ticket": null,
           "grok_slot": null,
           "kind": null,
@@ -71,7 +71,7 @@
       ],
       "size": 6,
       "used": 3,
-      "free": 3,
+      "free": 0,
       "claims_last_hour": 8,
       "name": "Claude Max 1"
     },
@@ -696,10 +696,11 @@
     },
     {
       "slot": 2,
-      "state": "free",
+      "state": "disabled",
       "ticket": null,
       "grok_slot": null,
       "since": null,
+      "reason": "not signed in",
       "account": 1
     },
     {
@@ -713,10 +714,11 @@
     },
     {
       "slot": 4,
-      "state": "free",
+      "state": "disabled",
       "ticket": null,
       "grok_slot": null,
       "since": null,
+      "reason": "not signed in",
       "account": 1
     },
     {
@@ -730,10 +732,11 @@
     },
     {
       "slot": 6,
-      "state": "free",
+      "state": "disabled",
       "ticket": null,
       "grok_slot": null,
       "since": null,
+      "reason": "not signed in",
       "account": 1
     },
     {
@@ -774,11 +777,11 @@
     }
   ],
   "last_refill": {
-    "at": "2026-10-16 08:36 CEST",
-    "mode": "refill-dev",
-    "triggers": "claude-run:wave-plan",
+    "at": "2026-10-16 08:46 CEST",
+    "mode": "recheck",
+    "triggers": "#475",
     "started": "",
-    "note": "load guard (MemAvailable 3069 MB < 3072 MB)"
+    "note": "dev slots full"
   },
   "totals": {
     "grok": {
@@ -791,9 +794,9 @@
     },
     "claude": {
       "size": 10,
-      "enabled": 6,
+      "enabled": 0,
       "used": 3,
-      "free": 3,
+      "free": 0,
       "external": 0
     }
   },
