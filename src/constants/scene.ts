@@ -116,6 +116,19 @@ export const TONE_KNEE = 0.8
 export const VIGNETTE_STRENGTH = 0.35
 /** Full-screen draws after the scene: bright pass, two blur passes and the composite (cap 6). */
 export const POST_PASSES = 4
+/** With bloom off (ticket 477: a quality rung, or no float render targets) only the composite. */
+export const POST_PASSES_WITHOUT_BLOOM = 1
+
+/**
+ * GPU limits (TD #470 section 2, ticket 477). WebGL2 guarantees 16 fragment texture units; the
+ * terrain program binds at most 15, so one stays spare (16 only for #451 option (a), and only once
+ * the capability probe gates it). A GPU with fewer than 15 units, or no fragment `highp`, draws
+ * the `TERRAIN_LITE` program; one with fewer than 12 units or textures under 2048 px can't run the
+ * game and says so instead of showing a black canvas.
+ */
+export const TERRAIN_SAMPLER_CEILING = 15
+export const GPU_MIN_TEXTURE_UNITS = 12
+export const GPU_MIN_TEXTURE_SIZE = 2048
 
 /** Camera sits in front of the XY plane and looks down -Z. */
 export const CAMERA_POSITION: readonly [number, number, number] = [0, 0, 20]

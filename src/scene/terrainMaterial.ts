@@ -31,6 +31,7 @@ import { liningShaderDefines } from '../systems/render/casingLiningLook'
 import { rgbOfHex, type Rgb } from '../systems/render/colour'
 import { writeHeadlampDirection } from '../systems/render/headlamp'
 import type { ArtefactLook } from '../systems/render/artefactLook'
+import type { TerrainProgram } from '../systems/render/gpuTier'
 import type { PointLightSource } from '../systems/render/sceneLights'
 import type { Facing } from '../systems/vehicle/vehiclePose'
 import type { Vector2 } from '../systems/vehicle/localFrame'
@@ -54,9 +55,11 @@ export interface TerrainLight extends ArtefactLook {
   pointLights: readonly PointLightSource[]
 }
 
-export function createTerrainMaterial(): ShaderMaterial {
+/** `lite` compiles the `TERRAIN_LITE` program for a GPU short of the full one (ticket 477). */
+export function createTerrainMaterial(program: TerrainProgram = 'full'): ShaderMaterial {
   return new ShaderMaterial({
     defines: {
+      ...(program === 'full' ? {} : { TERRAIN_LITE: 1 }),
       MAX_POINT_LIGHTS,
       // The gate channel's layout (cellGateBits.ts), so the shader decodes what the mesher wrote.
       GATED_BIT,

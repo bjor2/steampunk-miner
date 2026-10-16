@@ -25,7 +25,9 @@
  * Rock and ore tiles draw their depth band's strata map once the five have loaded (S7d,
  * `uHasStrata`), wrapped around the planet in rings (`groundStrata.ts`): albedo for the colour,
  * tinted per planet, and the baked normal tilting the lamp and point lights toward the slopes that
- * face them. Until then, and on the pad, core and cache, the flat band colour shows.
+ * face them. Until then, and on the pad, core and cache, the flat band colour shows. A GPU short of
+ * the full program's needs (ticket 477, `gpuTier.ts`) compiles it with `TERRAIN_LITE`: no strata
+ * samplers, so the flat band colours always show and the program binds 5 units instead of 15.
  *
  * A gated cell (tickets 298, 299) carries the gate channel's bits (`cellGateBits.ts`) and draws its
  * marker as the cell's top layer, over the ore and its effects (#151 draw order: gate marker, grade
@@ -111,8 +113,10 @@ uniform float uCacheLive;
 // Ground strata (S7d), bands 1 to 5; band b starts where a tile's halfTileDistanceSq is at most
 // uBandStarts[b - 2], as in bandOfTile (planetGeometry).
 uniform float uHasStrata;
+#ifndef TERRAIN_LITE
 uniform sampler2D uStrataAlbedo[5];
 uniform sampler2D uStrataNormal[5];
+#endif
 uniform vec3 uStrataTint[5];
 uniform float uStrataTurns[5];
 uniform float uStrataTileM;
@@ -512,6 +516,7 @@ vec2 strataUvChange(vec2 world, vec2 change, float turns) {
   return vec2(-turn / TAU * turns, -dot(world, change) / radius / uStrataTileM);
 }
 
+#ifndef TERRAIN_LITE
 // Explicit gradients, because the band differs per tile and sampler arrays take constant indices.
 vec4 strataAlbedo(int band, vec2 uv, vec2 dx, vec2 dy) {
   if (band == 1) return textureGrad(uStrataAlbedo[0], uv, dx, dy);
@@ -528,6 +533,7 @@ vec4 strataNormal(int band, vec2 uv, vec2 dx, vec2 dy) {
   if (band == 4) return textureGrad(uStrataNormal[3], uv, dx, dy);
   return textureGrad(uStrataNormal[4], uv, dx, dy);
 }
+#endif
 
 // A tangent-space normal (OpenGL, +Y up) in world terms: its x along the band, its y outward.
 vec3 groundNormalOf(vec3 tangentNormal, vec2 world) {
@@ -574,6 +580,7 @@ void main() {
   vec2 worldDy = dFdy(vWorld);
   // A gate marker's edges, about a pixel soft at any zoom, in tiles.
   float gateSoft = clamp(fwidth(vLocal.x), 0.004, 0.05);
+#ifndef TERRAIN_LITE
   if (uHasStrata > 0.5 && style < 1.5) {
     int band = bandOfTile(vTile);
     float turns = uStrataTurns[band - 1];
@@ -583,6 +590,7 @@ void main() {
     colour = linearToDisplay(strataAlbedo(band, uv, dx, dy).rgb) * uStrataTint[band - 1];
     normal = groundNormalOf(strataNormal(band, uv, dx, dy).xyz * 2.0 - 1.0, planet);
   }
+#endif
   if (style < 0.5 && vStyle.y > 0.5) {
     // Refractory lining (#113): firebrick, its joints glowing.
     vec2 uv = vWorld / HEAT_TILE_M;
