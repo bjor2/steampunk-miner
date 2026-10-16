@@ -18,7 +18,7 @@ export const MAX_STEPS_PER_FRAME = 30
  * more than this share of the due ticks in each of `SLOW_DEVICE_SECONDS` seconds of frames running,
  * and goes once that many seconds in a row stay at or under it.
  */
-export const SLOW_DEVICE_DROPPED_SHARE = 0.05
+export const SLOW_DEVICE_DROPPED_SHARE = 1 / 20
 export const SLOW_DEVICE_SECONDS = 5
 
 /**
