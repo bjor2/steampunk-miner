@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-10-16T22:21:20+01:00",
+  "updated_at": "2026-10-16T22:21:54+01:00",
   "caps": {
     "grok": 12,
     "claude": 10,
@@ -50,7 +50,7 @@
           "ticket": null,
           "grok_slot": null,
           "kind": "aux",
-          "since": null,
+          "since": "2026-10-16T22:21:00+01:00",
           "label": "wave-plan 316"
         },
         {
@@ -646,7 +646,7 @@
       "state": "busy",
       "ticket": null,
       "grok_slot": null,
-      "since": null,
+      "since": "2026-10-16T22:21:00+01:00",
       "kind": "aux",
       "label": "wave-plan 316",
       "account": 1
