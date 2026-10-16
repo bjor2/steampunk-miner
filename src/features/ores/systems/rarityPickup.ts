@@ -14,7 +14,12 @@ import type { DomainEvent } from '../../../systems/authority/domainEvent'
 import type { AuthorityReaction } from '../../../systems/registries/authorityReactions'
 import type { OrePickupProvider, PickedUp, PickupFind } from '../../../systems/registries/orePickup'
 import { statsOfVehicle } from '../../../systems/vehicle/vehicleState'
-import { NEW_RARITY_TRIP, paidRarityFind, type PaidRarityFind } from './rarityTripClamp'
+import {
+  NEW_RARITY_TRIP,
+  paidRarityFind,
+  type PaidRarityFind,
+  type RarityTrip,
+} from './rarityTripClamp'
 import { rarityTripOf, withRarityTrip } from './rarityTripSection'
 
 export const RARITY_PICKUP_PROVIDER: OrePickupProvider = {
@@ -44,7 +49,7 @@ function withPaidTrip(
   state: AuthorityState,
   playerId: string,
   paid: PaidRarityFind,
-  before: PaidRarityFind['trip'],
+  before: RarityTrip,
 ): AuthorityState {
   return paid.trip === before ? state : withRarityTrip(state, playerId, paid.trip)
 }
