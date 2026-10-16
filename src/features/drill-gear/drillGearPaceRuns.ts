@@ -12,7 +12,7 @@ import type { SliceRun } from '../../systems/bot/playSlice'
 
 export const PACE_PLANETS = [7, 10] as const
 export const PACE_SEEDS = PACING_WORLD_SEEDS['bot-slice']
-/** The #205 assert: with the gear, at least 0.98x the bare time (median of the seeds, #84). */
+/** The #205 ratio, 0.98 on the median of the seeds (#84); each spec says which way it reads. */
 export const MIN_PACE_RATIO = 0.98
 /** Two hours on one planet: room for a slow core on either run. */
 const BUDGET_TICKS = 2 * 60 * 60 * TICKS_PER_SECOND

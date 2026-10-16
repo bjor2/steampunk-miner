@@ -434,8 +434,10 @@ programs }` from three's `renderer.info` of the game canvas), read only when cal
   `features/drill-gear/twinBitPace.test.ts`: the bot arrives on planets 7 and 10 on-curve and plays
   to the core on each pacing seed with the head in `drill.head` and with the same loadout command
   slotting nothing. Gated twice on the same runs: the median core-time ratio stays at or above 0.98
-  (the #205 assert, `drillGearPace.test.ts`), and with drive 0 the head mines exactly the bare
-  run's cells, ticks and ore value (no free cell, GD ruling on #280). The scenario
+  (the #205 ratio; `drillGearPace.test.ts` reads it as a pace floor since the GD ruling on #392,
+  bare ticks over geared ticks, so the boom and side cutters may speed the bot up but never slow
+  it), and with drive 0 the head mines exactly the bare run's cells, ticks and ore value (no free
+  cell, GD ruling on #280). The scenario
   `drill-gear.twin-bit-diagonal` (`drill-gear/systems/twinBitDiagonal.ts`) is a `fastForward` script
   from the debug action `features['drill-gear'].twinBitDiagonal()`: P19 on-curve with the head, a
   down-right and a down-left bore of six cells from the surface east of the pad. The eye check in
