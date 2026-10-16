@@ -458,3 +458,15 @@ others) were dropped from both lists to keep the file the same size; the edit wa
 
 Rollback: `gh issue edit <n> --remove-label build` for 514, 515 and 516; restore `next-ticket.sh.bak-20261016-2145-514` over
 `next-ticket.sh` in place (`cat`, not `mv`).
+
+## #519 released at top priority, #514 held behind it (16 Oct 2026, ~23:10 Oslo)
+
+The Producer filed **#519** (A2: DrillGated once per gated cell on the flag-off report path, protocol 82; `build`, `tier:hard`, size M,
+under spec #316, outside map #302, new wave 2D #521) and the TD cleared it for `build`. **#514** (A1) is natively blocked by #519
+(open blocker), so the picker skips it until #519 is closed; #514 had no live worker (its earlier session paused with `needs-planner`
+and was refunded). `PRIORITY_TICKETS` now starts `519 514 516 509 486 ...` and `WAVE_ORPHAN_ALLOW` is `" 509 514 516 519 "`. Closed
+tickets (515, 396, 399, 400, 397, 409 to 411, 391) were dropped to keep the file the same size; the edit was one in-place `pwrite`
+on the same inode.
+
+Rollback: `gh issue edit 519 --remove-label build`; restore `next-ticket.sh.bak-20261016-2310-519` over `next-ticket.sh` in place
+(`cat`, not `mv`).
