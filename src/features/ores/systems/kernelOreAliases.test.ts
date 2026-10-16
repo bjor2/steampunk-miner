@@ -18,10 +18,10 @@ describe('kernel ore aliases', () => {
   it('canonicalises a kernel ore id onto the catalogue type of its family and tier', () => {
     const keys = withRegistrations([aliasSlice], () => [
       canonicalDiscoveryKey('ore:kernel.metal.t3'),
-      canonicalDiscoveryKey('ore:kernel.crystal.t124'),
+      canonicalDiscoveryKey('ore:kernel.crystal.t126'),
       canonicalDiscoveryKey('ore:metal_t3'),
     ])
-    expect(keys).toEqual(['ore:metal_t3', 'ore:crystal_t124', 'ore:metal_t3'])
+    expect(keys).toEqual(['ore:metal_t3', 'ore:crystal_t126', 'ore:metal_t3'])
   })
 
   it('maps every campaign tier of both kernel families onto a type the catalogue lists', () => {
@@ -30,7 +30,7 @@ describe('kernel ore aliases', () => {
       withRegistrations([aliasSlice], () => oreTypeCatalogue()).map(keyOf),
     )
     const targets = Object.values(aliases)
-    expect(targets).toHaveLength(2 * 124)
+    expect(targets).toHaveLength(2 * 126)
     expect(targets.filter((key) => key === undefined || !listed.has(key))).toEqual([])
   })
 })

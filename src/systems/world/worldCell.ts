@@ -5,8 +5,10 @@
  *
  * `tierOffset` is the ore tier above the planet's band-1 ore tier: ore in band `b` has offset
  * `b - 1` and core material has offset 5, because #6 sets tier `t = 3(p-1) + b` and core
- * material to `3(p-1) + 6`. #140's lead roll may lift an ore cell up to 2 tiers above its band, so
- * an ore offset runs from 0 to 6. Storing the offset keeps every cell small for any planet index.
+ * material to `3(p-1) + 6`. #140's lead roll may lift an ore cell up to 2 tiers above its band, and
+ * the mythic rarity tier (ticket 445) up to 4, so an ore offset runs from 0 to 8; the field is 24
+ * bits, so the wider range is no new encoding. Storing the offset keeps every cell small for any
+ * planet index.
  */
 
 export const CELL_KIND = {
@@ -47,8 +49,12 @@ export const MAX_RESOURCE_FAMILY = 15
 /** Core material is tier 3(p-1)+6 (#6), five above band-1 ore. */
 export const CORE_TIER_OFFSET = 5
 
-/** Band-5 ore (offset 4) with #140's largest lead, +2: no ore cell lies higher (#223). */
-export const MAX_ORE_TIER_OFFSET = 6
+/**
+ * Band-5 ore (offset 4) with the largest rarity lead, mythic's +4 (ticket 445; #140's was +2): no
+ * ore cell lies higher (#223). A planet on the legacy rows never rolls above +2, so an old save
+ * holds no offset past 6.
+ */
+export const MAX_ORE_TIER_OFFSET = 8
 
 const KIND_SHIFT = 28
 const FAMILY_SHIFT = 24

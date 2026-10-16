@@ -44,7 +44,8 @@ export function minedOreOf(params: PlanetParams, tile: TilePoint, cell: number):
 
 /**
  * A cell stores its tier above the planet's band-1 ore (#4, #6): `oreTier(p, 1) + offset`, so a
- * lead cell (#140) may sit above its band's tier. An offset past 6 is a broken cell, never ore.
+ * lead cell (#140) may sit above its band's tier. An offset past 8 (band 5's ore plus mythic's
+ * +4, ticket 445) is a broken cell, never ore.
  */
 export function resourceTierOf(params: PlanetParams, cell: number): number {
   return oreTier(params.planetIndex, BAND_ONE) + checkedTierOffsetOf(cell)

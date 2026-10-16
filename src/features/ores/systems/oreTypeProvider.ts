@@ -1,8 +1,9 @@
 /**
  * The catalogue as the kernel's one `oreTypes` provider (feature-slices.md 3.5): a cell asks with
  * its tier and its 4-bit family code, and gets the catalogue type of that family at that tier.
- * `catalogue()` lists every type sold ore can be in the campaign, P1 band 1 to P40 band 5 with a
- * +2 lead (t 1 to 124), for icon coverage and the codex; endless tiers are answered, not listed.
+ * `catalogue()` lists every type sold ore can be in the campaign, P1 band 1 to P40 band 5 with
+ * mythic's +4 lead (t 1 to 126, ticket 445), for icon coverage and the codex; endless tiers are
+ * answered, not listed.
  *
  * Icons are generated per tier (`icon-ore-<family>-t<tier>`), and the generator draws metal and
  * crystal; the other ten families take its `mixed` nugget until ore-visuals ships their glyphs.
@@ -18,12 +19,11 @@ import { BAND_COUNT } from '../../../systems/world/planetGeometry'
 import type { ResourceFamily } from '../../../systems/world/worldCell'
 import { familyOfCellCode, oreFamilies, oreFamilyNamed, oreTierOf, oreTypeOf } from './oreCatalogue'
 import { MAX_FAMILY_CODE, type OreFamily } from './oreRows'
+import { rarityTiers } from './rarityTiers'
 
 export const ORE_TYPE_PROVIDER_ID = 'ores.catalogue'
 export const ORE_INDEX_TAG = 'ores.tier-family'
 
-/** #140: the largest lead the catalogue rolls. */
-const MAX_LEAD = 2
 const ICON_FAMILIES: readonly string[] = ['metal', 'crystal']
 const NO_REQUIREMENTS: readonly string[] = Object.freeze([])
 
@@ -35,9 +35,13 @@ export const oreTypeProvider: OreTypeProvider = {
   catalogue: campaignCatalogue,
 }
 
-/** The highest tier campaign ore reaches: P40 band 5 plus the +2 lead. */
+/** The highest tier campaign ore reaches: P40 band 5 plus the largest rarity lead, mythic's +4. */
 export function lastCampaignOreTier(): number {
-  return oreTierOf(CAMPAIGN_LAST_PLANET, BAND_COUNT, MAX_LEAD)
+  return oreTierOf(CAMPAIGN_LAST_PLANET, BAND_COUNT, largestRarityLead())
+}
+
+function largestRarityLead(): number {
+  return rarityTiers().length - 1
 }
 
 function kernelOreTypeOf({ tier, cellFamily }: OreQuery): OreType {

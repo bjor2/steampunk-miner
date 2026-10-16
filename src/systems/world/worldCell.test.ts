@@ -22,6 +22,8 @@ const EVERY_CODE = Array.from(
   (_, code) => code as ResourceFamily,
 )
 const FIRST_SPARE_CODE = 13
+/** The tier offset field is 24 bits wide (#4), so mythic's offset 8 needs no new encoding. */
+const TIER_OFFSET_FIELD_MAX = 0xffffff
 const PLANETS = [1, 2, 3, 8, 17, 25, 33, 41]
 
 /** The family codes of every ore cell in the column of chunks through the planet's centre. */
@@ -43,6 +45,15 @@ describe('world cell family codes', () => {
     expect(cells.map(familyOfCell)).toEqual(EVERY_CODE)
     expect(cells.every((cell) => tierOffsetOfCell(cell) === MAX_ORE_TIER_OFFSET)).toBe(true)
     expect(cells.every((cell) => kindOfCell(cell) === CELL_KIND.ore)).toBe(true)
+  })
+
+  it('keeps every family through the whole 24-bit tier offset, from 0 past 8 (ticket 445)', () => {
+    for (const offset of [0, MAX_ORE_TIER_OFFSET, TIER_OFFSET_FIELD_MAX]) {
+      const cells = EVERY_CODE.map((code) => oreCell(code, offset))
+      expect(cells.map(familyOfCell)).toEqual(EVERY_CODE)
+      expect(cells.map(tierOffsetOfCell)).toEqual(EVERY_CODE.map(() => offset))
+      expect(cells.every((cell) => kindOfCell(cell) === CELL_KIND.ore)).toBe(true)
+    }
   })
 
   it('names code 12 as the last catalogue family and leaves 13 to 15 without a row', () => {

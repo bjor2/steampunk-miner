@@ -46,10 +46,10 @@ describe('ore type provider', () => {
     expect(mined.oreId).toBe('metal_t11')
   })
 
-  it('lists every family at every campaign tier, t 1 to 124, once each', () => {
+  it("lists every family at every campaign tier, t 1 to 126 (P40 band 5's mythic), once each", () => {
     const catalogue = withCatalogue(() => oreTypeCatalogue())
-    expect(lastCampaignOreTier()).toBe(124)
-    expect(catalogue).toHaveLength(12 * 124)
+    expect(lastCampaignOreTier()).toBe(126)
+    expect(catalogue).toHaveLength(12 * 126)
     expect(new Set(catalogue.map((ore) => ore.id)).size).toBe(catalogue.length)
   })
 
