@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-10-16T19:23:35+01:00",
+  "updated_at": "2026-10-16T19:41:19+01:00",
   "caps": {
     "grok": 12,
     "claude": 10,
@@ -29,27 +29,29 @@
         {
           "slot": "C2",
           "state": "busy",
-          "ticket": 484,
+          "ticket": 463,
           "grok_slot": 2,
           "kind": "dev",
-          "since": "2026-10-16T19:03:00+01:00",
-          "wave": "2A"
+          "since": "2026-10-16T19:36:00+01:00",
+          "wave": "7C"
         },
         {
           "slot": "C3",
-          "state": "free",
-          "ticket": null,
-          "grok_slot": null,
-          "kind": null,
-          "since": null
+          "state": "busy",
+          "ticket": 485,
+          "grok_slot": 3,
+          "kind": "dev",
+          "since": "2026-10-16T19:41:00+01:00",
+          "wave": "2A"
         },
         {
           "slot": "C4",
-          "state": "free",
-          "ticket": null,
-          "grok_slot": null,
-          "kind": null,
-          "since": null
+          "state": "busy",
+          "ticket": 486,
+          "grok_slot": 4,
+          "kind": "dev",
+          "since": "2026-10-16T19:41:00+01:00",
+          "wave": "2B"
         },
         {
           "slot": "C5",
@@ -69,9 +71,9 @@
         }
       ],
       "size": 6,
-      "used": 2,
-      "free": 4,
-      "claims_last_hour": 4,
+      "used": 4,
+      "free": 2,
+      "claims_last_hour": 8,
       "name": "Claude Max 1"
     },
     {
@@ -559,22 +561,26 @@
     {
       "slot": 2,
       "state": "dev",
-      "ticket": 484,
-      "since": "2026-10-16T19:03:00+01:00",
+      "ticket": 463,
+      "since": "2026-10-16T19:36:00+01:00",
       "claude_slot": 2,
-      "wave": "2A"
+      "wave": "7C"
     },
     {
       "slot": 3,
-      "state": "free",
-      "ticket": null,
-      "since": null
+      "state": "dev",
+      "ticket": 485,
+      "since": "2026-10-16T19:41:00+01:00",
+      "claude_slot": 3,
+      "wave": "2A"
     },
     {
       "slot": 4,
-      "state": "free",
-      "ticket": null,
-      "since": null
+      "state": "dev",
+      "ticket": 486,
+      "since": "2026-10-16T19:41:00+01:00",
+      "claude_slot": 4,
+      "wave": "2B"
     },
     {
       "slot": 5,
@@ -638,27 +644,29 @@
     {
       "slot": 2,
       "state": "busy",
-      "ticket": 484,
+      "ticket": 463,
       "grok_slot": 2,
-      "since": "2026-10-16T19:03:00+01:00",
+      "since": "2026-10-16T19:36:00+01:00",
+      "account": 1,
+      "wave": "7C"
+    },
+    {
+      "slot": 3,
+      "state": "busy",
+      "ticket": 485,
+      "grok_slot": 3,
+      "since": "2026-10-16T19:41:00+01:00",
       "account": 1,
       "wave": "2A"
     },
     {
-      "slot": 3,
-      "state": "free",
-      "ticket": null,
-      "grok_slot": null,
-      "since": null,
-      "account": 1
-    },
-    {
       "slot": 4,
-      "state": "free",
-      "ticket": null,
-      "grok_slot": null,
-      "since": null,
-      "account": 1
+      "state": "busy",
+      "ticket": 486,
+      "grok_slot": 4,
+      "since": "2026-10-16T19:41:00+01:00",
+      "account": 1,
+      "wave": "2B"
     },
     {
       "slot": 5,
@@ -714,17 +722,17 @@
     }
   ],
   "last_refill": {
-    "at": "2026-10-16 19:23 BST",
+    "at": "2026-10-16 19:41 BST",
     "mode": "recheck",
-    "triggers": "#508",
-    "started": "",
-    "note": "no pickable build ticket"
+    "triggers": "#484 claude-run:wave-plan",
+    "started": "#485->C3/A1 #486->C4/A1",
+    "note": "spawned 2 worker(s)"
   },
   "totals": {
     "grok": {
       "size": 12,
-      "used": 2,
-      "dev": 2,
+      "used": 4,
+      "dev": 4,
       "dev_cap": 8,
       "planner": 0,
       "planner_cap": 4
@@ -732,8 +740,8 @@
     "claude": {
       "size": 10,
       "enabled": 6,
-      "used": 2,
-      "free": 4,
+      "used": 4,
+      "free": 2,
       "external": 0
     }
   },
@@ -742,8 +750,49 @@
     "parallel": 1,
     "list": [
       {
-        "number": 498,
+        "number": 512,
+        "key": "3A",
+        "map": 470,
+        "lane": "remote",
+        "mode": "solo",
+        "state": "blocked",
+        "tickets": [
+          488,
+          489
+        ],
+        "done": [],
+        "live": 0
+      },
+      {
+        "number": 511,
+        "key": "8A",
+        "map": 302,
+        "lane": "remote",
+        "mode": "solo",
+        "state": "blocked",
+        "tickets": [
+          448,
+          453
+        ],
+        "done": [],
+        "live": 0
+      },
+      {
+        "number": 510,
         "key": "7C",
+        "map": 302,
+        "lane": "remote",
+        "mode": "solo",
+        "state": "running",
+        "tickets": [
+          463
+        ],
+        "done": [],
+        "live": 1
+      },
+      {
+        "number": 498,
+        "key": "8B",
         "map": 302,
         "lane": "remote",
         "mode": "solo",
@@ -762,15 +811,13 @@
         "map": 470,
         "lane": "remote",
         "mode": "solo",
-        "state": "blocked",
+        "state": "running",
         "tickets": [
           486,
-          487,
-          488,
-          489
+          487
         ],
         "done": [],
-        "live": 0
+        "live": 1
       },
       {
         "number": 496,
@@ -785,7 +832,8 @@
           485
         ],
         "done": [
-          500
+          500,
+          484
         ],
         "live": 1
       },
@@ -808,12 +856,9 @@
         "map": 302,
         "lane": "remote",
         "mode": "solo",
-        "state": "blocked",
+        "state": "ready",
         "tickets": [
-          448,
-          463,
-          452,
-          453
+          452
         ],
         "done": [],
         "live": 0
