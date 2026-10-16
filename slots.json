@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-10-16T07:23:43+02:00",
+  "updated_at": "2026-10-16T07:25:29+02:00",
   "caps": {
     "grok": 12,
     "claude": 10,
@@ -637,9 +637,13 @@
     },
     {
       "slot": 3,
-      "state": "free",
-      "ticket": null,
-      "since": null
+      "state": "planner",
+      "ticket": 470,
+      "since": "2026-10-16T07:24:33+02:00",
+      "map": 302,
+      "room": "9cc76e78-1e10-4130-8b0e-0865bac3f7a8",
+      "adopted": false,
+      "wave": null
     },
     {
       "slot": 4,
@@ -797,10 +801,10 @@
   "totals": {
     "grok": {
       "size": 12,
-      "used": 3,
+      "used": 4,
       "dev": 3,
       "dev_cap": 8,
-      "planner": 0,
+      "planner": 1,
       "planner_cap": 4
     },
     "claude": {
