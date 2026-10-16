@@ -2190,9 +2190,9 @@
           "children": [
             {
               "title": "Compact phone HUD",
-              "description": "On a phone, upright or sideways, the HUD is a few rows of icons and numbers along the top edge with at most six words; a tap on a row shows its names, and the hint is a one-line chip with a dismiss that waits while the play view is crowded.",
+              "description": "On a phone, upright or sideways, the HUD is a few rows of icons and numbers along the top edge with at most six words, each warning chip an icon and its number; a tap on a row shows its names, and the hint is a one-line chip with a dismiss that waits while the play view is crowded. Held upright the threats are chips with a compass arrow in the prompts' row, clear of where the vehicle leans.",
               "status": "built",
-              "issues": [500, 470]
+              "issues": [500, 486, 470]
             }
           ]
         },
