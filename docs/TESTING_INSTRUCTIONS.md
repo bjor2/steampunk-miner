@@ -283,6 +283,18 @@ programs }` from three's `renderer.info` of the game canvas), read only when cal
   writes `balance-report/fast-leg-contact-trace.ndjson`. A lane (about 20 s), so it runs only when
   named; it fails only when a leg has no ramped-up cut tick or the two frame rates trace it
   differently.
+- **Stored-rig level release trace** (ticket 465, measurement only):
+  `src/physics/storedLevelReleaseTrace.lane.test.ts` plays the same level release sweep for the
+  stored 10 and stored 20 rigs at 30 and 144 frames/s and traces the 8 pressed ticks before letting go
+  and the 12 after: commanded speed, the motor's speed along the facing and along up, the body's
+  speed along both, gate, carry, and the deepest contact anywhere on the body (depth, the push it
+  gives the body in the body's frame, where on the body, and the wall: floor, face, corner). It names
+  each followed release stopped, backed off or ran on, counts the window ticks the motor held at 0
+  that still slid back past the stop line and how many of them the floor's tilt explains (a
+  frictionless contact keeps the tick's gravity along the floor's tangent), prints the table and
+  writes `balance-report/stored-level-release-trace.ndjson`. A lane (about 2 min), so it runs only
+  when named; it fails only when a sweep follows no release or the two frame rates trace a phase
+  differently.
 - **Drill-speed ladder in stored steps** (ticket 434): `src/logging/drillLadderSteps.test.ts` cuts
   the same column's first 20 cells (all band 1, the ground a 10 s hold reaches) at stored drill_power
   steps 1, 5, 10, 15 and 20, the levels of the browser drill-down run, with the law counted per step
