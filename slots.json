@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-10-16T23:40:46+01:00",
+  "updated_at": "2026-10-16T23:50:04+01:00",
   "caps": {
     "grok": 12,
     "claude": 10,
@@ -20,10 +20,10 @@
         {
           "slot": "C1",
           "state": "busy",
-          "ticket": 488,
+          "ticket": 489,
           "grok_slot": 1,
           "kind": "dev",
-          "since": "2026-10-16T23:22:00+01:00",
+          "since": "2026-10-16T23:49:00+01:00",
           "wave": "3A"
         },
         {
@@ -122,7 +122,7 @@
     }
   ],
   "gate": {
-    "busy": 2,
+    "busy": 1,
     "max": 3
   },
   "tester": {
@@ -532,8 +532,8 @@
     {
       "slot": 1,
       "state": "dev",
-      "ticket": 488,
-      "since": "2026-10-16T23:22:00+01:00",
+      "ticket": 489,
+      "since": "2026-10-16T23:49:00+01:00",
       "claude_slot": 1,
       "wave": "3A"
     },
@@ -610,9 +610,9 @@
     {
       "slot": 1,
       "state": "busy",
-      "ticket": 488,
+      "ticket": 489,
       "grok_slot": 1,
-      "since": "2026-10-16T23:22:00+01:00",
+      "since": "2026-10-16T23:49:00+01:00",
       "account": 1,
       "wave": "3A"
     },
@@ -695,10 +695,10 @@
     }
   ],
   "last_refill": {
-    "at": "2026-10-16 23:29 BST",
-    "mode": "refill-dev",
-    "triggers": "#519",
-    "started": "#514->C2/A1",
+    "at": "2026-10-16 23:49 BST",
+    "mode": "recheck",
+    "triggers": "#488",
+    "started": "#489->C1/A1",
     "note": "spawned 1 worker(s)"
   },
   "totals": {
@@ -762,7 +762,9 @@
           488,
           489
         ],
-        "done": [],
+        "done": [
+          488
+        ],
         "live": 1
       },
       {
