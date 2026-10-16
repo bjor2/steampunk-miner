@@ -43,6 +43,7 @@
     "denseScratchFloor": "1.5",
     "gateScratchFloor": "1",
     "travelParityK": "1.5",
+    "travelParityKBounds": { "lowest": "1", "highest": "2" },
     "boreRecoveryMinTicks": 3
   },
   "costCurves": [
