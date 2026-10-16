@@ -12,6 +12,7 @@
  * framing's felt speed and leans, read by the debug API to log the ground visible ahead. `vehicleFromCentreX/Y`
  * (world metres from the point the camera looks at to the vehicle) and `turnRadians` (the camera's
  * roll) let the debug API say where the vehicle is on screen (#500's layout specs).
+ * `followLagMetres` is how far the slow-speed ease trails the drawn body (ticket 515).
  */
 import { VIEW_SHORT_AXIS_DEFAULT_M } from '../constants/scene'
 
@@ -27,4 +28,5 @@ export const cameraPresence = {
   vehicleFromCentreX: 0,
   vehicleFromCentreY: 0,
   turnRadians: 0,
+  followLagMetres: 0,
 }

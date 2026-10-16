@@ -48,6 +48,7 @@ import {
 import type { GpuCapabilities } from '../systems/render/gpuTier'
 import { renderQualityChoiceProblems } from '../systems/render/renderQuality'
 import { renderScalePinProblems } from '../systems/render/renderScale'
+import type { FollowView } from '../systems/render/cameraFollow'
 import { speedViewOf, type SpeedView } from '../systems/render/speedFraming'
 import { cameraViewOf, viewShortAxisProblems, type CameraView } from '../systems/render/viewZoom'
 import { shopTypeOf, type ShopType } from '../systems/views/bayPresentation'
@@ -82,9 +83,10 @@ export interface DebugUi {
   /**
    * The framing on screen now: the eased zoom, pixels per metre and the collider's share (#39),
    * and at speed the felt speed, the lean and the ground visible ahead (ticket 338); the width
-   * and the ground ahead across the screen too (ticket 484).
+   * and the ground ahead across the screen too (ticket 484), and how far the slow-speed ease
+   * trails the body (ticket 515).
    */
-  getCameraView(): DebugResult<{ view: CameraView & SpeedView }>
+  getCameraView(): DebugResult<{ view: CameraView & SpeedView & FollowView }>
   /** What the last frame drew and cost (#38 acceptance 1-3): draw calls, blocks, lights, scale. */
   getRenderStats(): DebugResult<{ stats: RenderStats }>
   /**
@@ -330,16 +332,20 @@ function screenLayoutNow(): DebugResult<{ layout: ScreenLayout }> {
 
 /**
  * The framing the player sees, with the speed leans and the ground they show ahead (ticket 338),
- * down and across the screen (ticket 484).
+ * down and across the screen (ticket 484), and the slow-speed ease's lag (ticket 515).
  */
-function cameraViewOnScreen(): CameraView & SpeedView {
+function cameraViewOnScreen(): CameraView & SpeedView & FollowView {
   const { widthPixels, heightPixels, viewShortAxisMetres, feltSpeedCellsPerSecond } = cameraPresence
   const view = cameraViewOf(widthPixels, heightPixels, viewShortAxisMetres)
   const extent = {
     verticalMetres: viewShortAxisMetres,
     horizontalMetres: view.viewHorizontalMetres,
   }
-  return { ...view, ...speedViewOf(extent, feltSpeedCellsPerSecond, cameraPresence) }
+  return {
+    ...view,
+    ...speedViewOf(extent, feltSpeedCellsPerSecond, cameraPresence),
+    followLagMetres: cameraPresence.followLagMetres,
+  }
 }
 
 function runWithAction(actionId: unknown, run: (action: ActionId) => void): DebugResult {

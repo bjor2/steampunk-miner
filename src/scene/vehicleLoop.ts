@@ -205,6 +205,7 @@ function placeAfterTowOrTravel(
   loop.placement = placement
   loop.reporter = NEW_POSE_REPORTER
   controller.placeAt(vehicle.pose)
+  motionPresence.placements += 1
 }
 
 /** Changes when the vehicle is towed to the dock or the planet changes under it. */

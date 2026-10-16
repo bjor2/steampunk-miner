@@ -492,6 +492,14 @@ describe('debug api: zoom framing (#39)', () => {
     expect(result.view).toMatchObject({ feltSpeedCellsPerSecond: 16, leadShare: 0.6 })
     expect(result.view.groundAheadMetres).toBeCloseTo(16, 9)
   })
+
+  it('reports how far the slow-speed ease trails the drawn body (ticket 515)', () => {
+    // As `PlanetCamera` writes it each frame while the body creeps along under 2 m/s.
+    Object.assign(cameraPresence, { widthPixels: 1920, heightPixels: 1080, followLagMetres: 0.12 })
+    const result = createDebugApi().ui.getCameraView()
+    Object.assign(cameraPresence, { followLagMetres: 0 })
+    expect(result).toMatchObject({ ok: true, view: { followLagMetres: 0.12 } })
+  })
 })
 
 describe('debug api: render scale and stats (#38)', () => {

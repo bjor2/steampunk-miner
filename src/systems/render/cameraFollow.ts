@@ -60,6 +60,12 @@ export function followPointInto(
   return out
 }
 
+/** The ease as the debug API reads it (ticket 515 acceptance: max lag under 0.35 m). */
+export interface FollowView {
+  /** Metres the followed point trails the drawn body; 0 at rest and from 3 m/s. */
+  followLagMetres: number
+}
+
 /** Metres between the followed point and the body (the debug read, ticket 515). */
 export function followLagOf(point: Vector2, body: Vector2): number {
   return Math.hypot(point.x - body.x, point.y - body.y)
