@@ -134,6 +134,13 @@
  * screen draws it, not one lane's list; the lane tabs hide (`LaneTabs`).
  */
 :global([data-hud-density='compact']) .map {
+  /*
+   * A planet a little wider and a row taller than the wide screen's, so each chip keeps to its
+   * own planet, its name wrapping to a second line, and no two chips' targets meet.
+   */
+  --planet-width: calc(12rem * var(--ui-scale));
+  --row-height: calc(5rem + var(--space-1));
+
   /* The strips are far wider than the screen; the column must not grow to them. */
   grid-template-columns: minmax(0, 1fr);
 }
@@ -153,4 +160,5 @@
 
 :global([data-hud-density='compact']) .strip > * {
   position: absolute;
+  max-width: calc(var(--planet-width) - var(--space-1));
 }

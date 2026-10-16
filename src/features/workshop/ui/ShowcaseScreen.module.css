@@ -127,15 +127,20 @@
  * A screen held upright (#173 section 3, #470 PT-5): one band on top holds the header and the
  * bay's rows, capped at a third of the screen and scrolling; the car shows in the middle and the
  * plaques lie in one row under it, each nearly a phone's width so the next one shows at the edge,
- * a swipe snapping from plaque to plaque. The showcase ends above the touch cluster's 72 px
- * Interact row.
+ * a swipe snapping from plaque to plaque. It ends a gap above the touch cluster's 72 px Interact
+ * row in its 16 px corner inset, and on a phone, as the kernel's bays do (`Platform.module.css`),
+ * starts under the compact HUD's top row.
  */
 .showcase[data-plaque-layout='carousel'] {
-  inset: 10% 0 calc(72px + 2 * var(--space-3));
+  inset: 10% 0 calc(72px + var(--space-3) + var(--space-2));
   /* The carousel's row is wider than the screen; the column must not grow to it. */
   grid-template-columns: minmax(0, 1fr);
   grid-template-rows: auto minmax(0, 1fr);
   gap: var(--space-1);
+}
+
+:global([data-hud-density='compact']) .showcase[data-plaque-layout='carousel'] {
+  top: 72px;
 }
 
 .showcase[data-plaque-layout='carousel'] .bandFrame {

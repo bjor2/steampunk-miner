@@ -886,6 +886,21 @@ programs }` from three's `renderer.info` of the game canvas), read only when cal
   most 16 seated cards. The stacked clear view is also pinned in node with the most controls the
   vehicle layer can show (`hudClearView.test.ts`, over boxes measured on the phone cells). Box
   Tester only.
+- **Upright panels** (#487, spec #470): `e2e/browser/screens/portraitPanels.spec.ts` runs in the
+  matrix's portrait touch cells (390x844, 412x915, 820x1180) and skips elsewhere. On the Sell bay,
+  the Upgrade bay, the settings, the pause menu and its save page, the title menu, the planet card
+  and the tech tree (map, list and an open card) it asserts the panel sits in the safe area, no
+  text of its own runs out of it sideways (the workshop carousel and the tree map pan, so their
+  frames are judged instead), every button, field and tab is at least 48 px both ways, no two
+  targets a finger can reach overlap (a target scrolled away or under a sheet counts only where
+  a tap can land), and the bays and the planet card cover no touch button and not the compact
+  HUD's Tech tree button. The workshop's six plaques sit in one carousel, clear of the car, each
+  showing its level, price and any Needs line with no hover or hold. The tree's List orders nodes
+  researchable, then short of money, then locked, then researched, and Next affordable opens the
+  first researchable one's card. On the phones a one-finger drag pans the map, a two-finger pinch
+  zooms it within 1 to 2 times, and a tapped node opens a bottom sheet that Close takes down
+  (real touches through CDP). The ordering and pinch maths are pinned in node
+  (`treeList.test.ts`, `mapGestures.test.ts`). Box Tester only.
 - **Drill-down run** (ticket 416): `e2e/browser/drillDown.spec.ts` holds the real Down key for 10 s
   on the P1 surface from `scenarios/drill-down-start.scenario.json`, at stored drill_power steps 1
   (the save's), 5, 10, 15 and 20 (`debug.setUpgrade`, ticket 434), and writes one row per run (start and end position, depth gained, cells/s,

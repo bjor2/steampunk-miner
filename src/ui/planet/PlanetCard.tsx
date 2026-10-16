@@ -24,7 +24,7 @@ export function PlanetCard() {
 
   const view = planetCardViewOf(shownCard)
   return (
-    <div className={styles.anchor} role="status">
+    <div className={styles.anchor} role="status" data-testid="planet-card">
       <Panel title={`Planet ${view.planetIndex}`}>
         {view.lines.map((line) => (
           <PlanetCardLine key={line.sourceId} line={line} />

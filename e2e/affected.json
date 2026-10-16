@@ -543,6 +543,24 @@
         "e2e/browser/screens/slotHoldRing.spec.ts",
         "e2e/browser/hud/hudLayout.spec.ts"
       ]
+    },
+    {
+      "why": "The panels held upright (ticket 487): the bays, the workshop carousel, settings, pause and title menus, the artefact cache, the planet card and the tech tree's map, list, sheet and gestures.",
+      "paths": [
+        "src/ui/platform/**",
+        "src/ui/settings/**",
+        "src/ui/pause/**",
+        "src/ui/title/**",
+        "src/ui/planet/**",
+        "src/ui/artefact/**",
+        "src/features/workshop/ui/**",
+        "src/features/tech-tree/ui/**",
+        "src/features/tech-tree/store/treeScreenStore.ts",
+        "src/features/tech-tree/systems/treeList.ts",
+        "src/features/tech-tree/systems/mapGestures.ts",
+        "src/features/tech-tree/systems/nodeCardModel.ts"
+      ],
+      "specs": ["e2e/browser/screens/portraitPanels.spec.ts"]
     }
   ]
 }
