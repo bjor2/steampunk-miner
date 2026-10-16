@@ -242,7 +242,8 @@ export function createVehicleController(
       const isDrilling = contact !== 'none'
       const isCuttingLevel = isDrilling && !isLifting && isSidewaysFacing(pose.facing)
       const cutRead = cutFollowReadFor(input, { pose, isLifting }, isDrilling)
-      const cutStart = { read: cutRead, memory: cutMemory, contact, isCuttingLevel }
+      const isGrounded = isGroundedAt(planet.ground, struts, groundProbeOf(position, up))
+      const cutStart = { read: cutRead, memory: cutMemory, contact, isCuttingLevel, isGrounded }
       const cutTick = cutTickFor(input, { pose, isLifting }, cutStart, planet.ground)
       const { cut: cutFollow, isGateOpen, isWaitingForCut } = cutTick
       cutMemory = cutMemoryAfter(cutMemory, cutTick)
@@ -253,7 +254,7 @@ export function createVehicleController(
         intent: input.intent,
         engine: input.engine,
         canAct: input.canAct,
-        isGrounded: isGroundedAt(planet.ground, struts, groundProbeOf(position, up)),
+        isGrounded,
         boreOffset: isAimingAlongUp(input.intent) ? offsetToTileCentre(position, up) : null,
         isCuttingLevel: isCuttingLevel,
         isWaitingForCut,

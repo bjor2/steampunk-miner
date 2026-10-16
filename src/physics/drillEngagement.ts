@@ -16,6 +16,7 @@ import {
   type DrillContactRule,
 } from '../systems/vehicle/drillContact'
 import { isHeadSettled, type DrillHead } from '../systems/vehicle/drillHead'
+import { solidToeAheadOf } from '../systems/vehicle/drillToe'
 import {
   clearedSlabSpeedOf,
   heldCutOf,
@@ -106,17 +107,43 @@ function contactOf(
 /**
  * A let-go cut whose stop ramp has reached uncut ground in the body's way stops there at once
  * (ticket 430): with the drive let go the drill no longer cuts, and a fast rig's ramp would carry
- * the body past the paid face into rock, to bounce off it. Any other cut as it is.
+ * the body past the paid face into rock, to bounce off it. The face's toe counts too (ticket 491).
+ * Any other cut as it is.
  */
 function stoppedAtFaceFor(
   input: DrillEngagementInput,
   drillPose: DrillPose,
   ground: GroundReader,
   cut: CutFollowMotion | undefined,
+  isGrounded: boolean,
 ): CutFollowMotion | undefined {
   if (cut === undefined || cut.isPushing) return cut
-  if (facedContactOf(input, drillPose, ground) !== 'inTheWay') return cut
+  if (!isAtFaceFor(input, drillPose, ground, isGrounded)) return cut
   return { ...cut, isAtFace: true }
+}
+
+/** Uncut ground in the body's way, or the face's toe ahead of a body on the ground. */
+function isAtFaceFor(
+  input: DrillEngagementInput,
+  drillPose: DrillPose,
+  ground: GroundReader,
+  isGrounded: boolean,
+): boolean {
+  if (facedContactOf(input, drillPose, ground) === 'inTheWay') return true
+  return isGrounded && hasToeAheadOf(input, drillPose.pose, ground)
+}
+
+/**
+ * Collider-solid ground the contact rule misses at the body's lower front (ticket 491,
+ * `drillToe.ts`), within the in-the-way reach. Read only for a body on the ground: an airborne
+ * release (#458's rig-heavy phase 37) lands on a step below its wheel line, which is no toe.
+ */
+function hasToeAheadOf(
+  input: DrillEngagementInput,
+  pose: VehiclePose,
+  ground: GroundReader,
+): boolean {
+  return solidToeAheadOf(ground, pose, inTheWayMmOf(input.stepBounds?.cuttingMm ?? 0))
 }
 
 /**
@@ -131,12 +158,16 @@ export function cutFollowReadFor(
   return input.cutFollowOf?.({ x: pose.x, y: pose.y, isLifting, isDrilling })
 }
 
-/** What a step's cut-follow starts from: the read, the carried memory and what the drill meets. */
+/**
+ * What a step's cut-follow starts from: the read, the carried memory, what the drill meets and
+ * whether the wheels are on the ground.
+ */
 export interface CutFollowStart {
   read: CutFollow | undefined
   memory: CutMemory
   contact: DrillContact
   isCuttingLevel: boolean
+  isGrounded: boolean
 }
 
 /**
@@ -150,14 +181,14 @@ export function cutTickFor(
   start: CutFollowStart,
   ground: GroundReader,
 ): CutTick {
-  const { read, memory, contact, isCuttingLevel } = start
+  const { read, memory, contact, isCuttingLevel, isGrounded } = start
   const isDrilling = contact !== 'none'
   const openCut = cutFollowFor(input, drillPose.pose, read, memory, isDrilling)
   const isWaitingForCut = isWaitingForCutAt(isCuttingLevel, contact, openCut)
   const bite = { isDrilling, isWaitingForCut }
   const drillCut = openCut ?? heldCutFor(input, drillPose.pose, read, memory, bite)
   return {
-    cut: stoppedAtFaceFor(input, drillPose, ground, drillCut),
+    cut: stoppedAtFaceFor(input, drillPose, ground, drillCut, isGrounded),
     isGateOpen: openCut !== undefined,
     isWaitingForCut,
   }

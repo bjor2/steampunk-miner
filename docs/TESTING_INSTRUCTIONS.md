@@ -332,6 +332,10 @@ programs }` from three's `renderer.info` of the game canvas), read only when cal
   lets go of a followed cut at every tick of a cell's cycle (a fresh rig a phase) and wants the body
   stopped within 6 ticks (about 5 minutes); stored 20's level sweep is a todo on #465 since ticket
   459 (the toe's gravity slide after letting go). Both share the rig of `src/physics/cutFollowFixtures.ts`.
+  Since ticket 491 it also holds the let-go stop at the face's toe (`src/systems/vehicle/drillToe.ts`,
+  unit spec beside it): the 15 m/s rig's paired back-off ratchets at 30 and 144 frames/s, an airborne
+  rig-heavy release that keeps its ramp, and one-step checks through `cutTickFor` (swept cut off
+  reads no toe; a gated cell still stops the body) on the ground of `src/physics/toeStopFixtures.ts`.
 - **Body-wide bore at any cells a tick** (ticket 439): `src/systems/authority/sweptFreshCarve.test.ts`
   cuts planet 1's column and its tilted radius with rigs named by their band-1 cut speed (25 to
   3600 m/s, the drill found by `subStepsPerTile` in `sweptRigFixtures.ts`), a tick count to the

@@ -6,8 +6,12 @@ import { createMemorySink } from '../logging/eventSink'
 import { createRunLog, installRunLog, uninstallRunLog } from '../logging/runLog'
 import { resetGameStore } from '../store/gameStore'
 import { buildIntent } from '../systems/input/buildIntent'
+import type { CutFollow } from '../systems/authority/cutFollowRead'
+import { cutFollowSpeedOf } from '../systems/vehicle/cutFollowMotion'
+import type { CutTick } from '../systems/vehicle/heldCut'
 import { IDLE_INTENT } from '../systems/vehicle/vehicleIntent'
 import { commandedSpeedsOf, createRig, type TickRead } from './cutFollowFixtures'
+import { stepAtToe, type ToeStep } from './toeStopFixtures'
 
 // The stop ramp follows the drive, not the contact (ticket 430, TD addendum on #430): once the
 // drive lets go of a cut it follows, the body stops within 6 ticks, whether the gate shuts
@@ -20,7 +24,8 @@ import { commandedSpeedsOf, createRig, type TickRead } from './cutFollowFixtures
 // floor's pace #400's rig 2 had until ticket 397 took the floor out (rig 2 now jams, #439).
 // Since the substeps collide with the world the tick's own cut left (ticket 459), stored 20 slides
 // back down the toe's tilted floor at one level release phase after the drive lets go (#465's trace),
-// and the 15 m/s rig backs off more in sum at 30 frames/s, held by a ratchet until #491 lands.
+// and the 15 m/s rig backs off more in sum at 30 frames/s, held by a ratchet. Since ticket 491 the
+// let-go stop also sees the face's toe (`drillToe.ts`) on a body on the ground.
 
 const RIGS: Readonly<Record<string, Record<string, number>>> = {
   'stored 1': { drill_power: 1, drill_tip: 0 },
@@ -88,11 +93,32 @@ interface BackOffCeiling {
 }
 
 /**
- * The 15 m/s rig's back-off on main's followed level phases at 30 frames/s since ticket 459 (GD
- * ruling 6209399402): the sum −1.574275 m/s to 4 places as the paired figures above, over 10
- * backward ticks. Both may only shrink; #491 flips them back to main’s −1.3008 and 6 ticks.
+ * The 15 m/s rig's back-off on main's followed level phases since ticket 459 (GD ruling 6209399402;
+ * the ratchet on #491), as measured with #491's toe stop: −1.207318 m/s over 9 backward ticks at 30
+ * frames/s (from −1.574275 over 10) and −2.949057 over 18 at 144 (from −3.8226 over 23), to 4
+ * places as the paired figures above. Both may only shrink, toward main’s −1.3008 over 6 ticks.
  */
-const TOE_RATCHET: BackOffCeiling = { summedBackwardMps: -1.5743, backwardTicks: 10 }
+const TOE_RATCHET: Readonly<Record<number, BackOffCeiling>> = {
+  30: { summedBackwardMps: -1.2074, backwardTicks: 9 },
+  144: { summedBackwardMps: -2.9491, backwardTicks: 18 },
+}
+const TOE_RATCHET_ROWS = FRAME_RATES.map((framesPerSecond) => ({
+  framesPerSecond,
+  ...TOE_RATCHET[framesPerSecond],
+}))
+/** #458's rig-heavy 15 m/s rig: the 15 m/s rig with its hull and hold upgraded too. */
+const RIG_HEAVY = { drill_power: 200, drill_tip: 600, engine: 5000, hull: 5000, cargo_hold: 5000 }
+/** Its level release phase at 144 frames/s whose body is in the air as the drive lets go (#458). */
+const AIRBORNE_RELEASE_PHASE = 37
+/** How deep rig-heavy backs off main's followed phases at 144 frames/s on main (#458's table). */
+const RIG_HEAVY_DEEPEST_BACKWARD_MPS = -0.53
+/** The cut-follow reads a gated cell gives the motor: `vCut` 0 while open, a span stop while shut. */
+const GATED_READS: readonly CutFollow[] = [
+  { gate: { cutGate: 1, cutGateLowTicks: 0 }, cutSpeed: 0 },
+  { gate: { cutGate: 0, cutGateLowTicks: 1 }, cutSpeed: 0, isSpanStopped: true },
+]
+/** An open gate on a cut the drill follows at 10 m/s. */
+const FOLLOWED_READ: CutFollow = { gate: { cutGate: 1, cutGateLowTicks: 0 }, cutSpeed: 10 }
 /** Below this the body moved backwards; a stopped tick jitters at +-0.01 m/s. */
 const BACKWARDS_M_PER_S = -0.02
 /**
@@ -193,6 +219,39 @@ function judgePairedBackOff(framesPerSecond: number, ceiling: BackOffCeiling): v
   expect(backward.length).toBeLessThanOrEqual(ceiling.backwardTicks)
 }
 
+/** A let-go release whose drive pushed the body in the air: on its ramp while it stays there. */
+function judgeAirborneRelease(pressed: readonly TickRead[], release: readonly TickRead[]): void {
+  const commanded = commandedSpeedsOf(pressed).at(-1) ?? 0
+  const airborne = release.slice(
+    0,
+    release.findIndex(({ isOnGround }) => isOnGround),
+  )
+  expect(airborne.length).toBeGreaterThan(0)
+  airborne.forEach(({ speed }, released) => {
+    const ramp = (commanded * (CUT_FOLLOW_TICKS - 1 - released)) / CUT_FOLLOW_TICKS
+    expect(Math.abs(speed - ramp)).toBeLessThanOrEqual(commanded * HELD_SHARE)
+  })
+  expect(Math.min(0, ...release.map(({ speed }) => speed))).toBeGreaterThanOrEqual(
+    RIG_HEAVY_DEEPEST_BACKWARD_MPS,
+  )
+}
+
+/** The speed a step's cut commands from 10 m/s; travel's (`null`) with no cut. */
+function commandedSpeedOf(tick: CutTick): number | null {
+  return tick.cut === undefined ? null : cutFollowSpeedOf(10, tick.cut, tick.isWaitingForCut)
+}
+
+/** A step at a gated cell, pushed or let go, on open ground and on a toe. */
+function gatedStepsOf(read: CutFollow): [ToeStep, ToeStep][] {
+  return [true, false].map((isPushing) => {
+    const step = { isSweptCutOn: true, isPushing, isGrounded: true, read }
+    return [
+      { ...step, hasToe: false },
+      { ...step, hasToe: true },
+    ]
+  })
+}
+
 /** Main's sum, and the backward ticks recorded since ticket 421. */
 function mainBackOffCeilingAt(framesPerSecond: number): BackOffCeiling {
   return {
@@ -256,9 +315,9 @@ describe('the stop ramp follows the drive (ticket 430 addendum)', () => {
     '15 m/s rig: backs off main’s followed level release phases no deeper and no more in sum than main, at 30 frames/s (#491: the face’s toe; #460: the stop ramp on a cleared face)',
   )
 
-  it(
-    '15 m/s rig: backs off main’s followed level release phases no deeper than main and no more in sum than −1.5743 m/s over at most 10 backward ticks, at 30 frames/s (ratchet until #491 lands; it may only shrink)',
-    () => judgePairedBackOff(30, TOE_RATCHET),
+  it.each(TOE_RATCHET_ROWS)(
+    '15 m/s rig: backs off main’s followed level release phases no deeper than main and no more in sum than $summedBackwardMps m/s over at most $backwardTicks backward ticks, at $framesPerSecond frames/s (ratchet; it may only shrink)',
+    ({ framesPerSecond }) => judgePairedBackOff(framesPerSecond, TOE_RATCHET[framesPerSecond]),
     240_000,
   )
 
@@ -269,4 +328,34 @@ describe('the stop ramp follows the drive (ticket 430 addendum)', () => {
   it.todo(
     '15 m/s rig: stops within 6 ticks at every release phase of a level cut (#491: the body bounces back off the face; #460: the stop ramp on a cleared face)',
   )
+
+  it('with the swept cut off the face stop never reads the toe', () => {
+    const step = { isPushing: false, hasToe: true, isGrounded: true, read: FOLLOWED_READ }
+    const off = stepAtToe({ ...step, isSweptCutOn: false })
+    expect(off.tick.cut).toBeUndefined()
+    expect(off.groundReads).toBe(0)
+    expect(stepAtToe({ ...step, isSweptCutOn: true }).tick.cut?.isAtFace).toBe(true)
+  })
+
+  it('a release in the air is not stopped by a toe that is not there', () => {
+    const { pressed, release } = releaseAt(RIG_HEAVY, 144, 'level', AIRBORNE_RELEASE_PHASE)
+    judgeAirborneRelease(pressed, release)
+    const inTheAir = { isSweptCutOn: true, isPushing: false, hasToe: true, read: FOLLOWED_READ }
+    expect(stepAtToe({ ...inTheAir, isGrounded: false }).tick.cut?.isAtFace).toBeUndefined()
+  }, 240_000)
+
+  it('a gated cell still stops the body at that cell with the toe rule on', () => {
+    // Dynamite, the rig and the tip-lock all reach the motor as one read (`cutFollowRead.ts`, the
+    // drill gates): `vCut` 0 while the gate is open, a span stop while it is shut.
+    for (const [openGround, toe] of GATED_READS.flatMap(gatedStepsOf)) {
+      const without = stepAtToe(openGround).tick
+      const withToe = stepAtToe(toe).tick
+      expect(withToe.isGateOpen).toBe(without.isGateOpen)
+      expect(withToe.isWaitingForCut).toBe(without.isWaitingForCut)
+      expect(Math.abs(commandedSpeedOf(withToe) ?? 0)).toBeLessThanOrEqual(
+        Math.abs(commandedSpeedOf(without) ?? 0),
+      )
+      expect(commandedSpeedOf(withToe) === null).toBe(commandedSpeedOf(without) === null)
+    }
+  })
 })
