@@ -9,6 +9,9 @@
   pointer-events: auto;
 }
 
-.button:hover {
-  background: rgb(201 162 75 / 0.15);
+/* Only a pointer that can rest hovers; on touch a tapped control would keep the style (#476). */
+@media (hover: hover) {
+  .button:hover {
+    background: rgb(201 162 75 / 0.15);
+  }
 }

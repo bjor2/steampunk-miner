@@ -39,6 +39,7 @@
 /* The shared scroll area (build #423) bounds the plate's pages; it owns the overflow. */
 .plateScroll {
   max-height: 70vh;
+  max-height: 70dvh;
 }
 
 .choices {

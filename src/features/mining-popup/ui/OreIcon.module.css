@@ -31,3 +31,14 @@
 .tile {
   --ore-icon-size: max(32px, calc(48 / 1080 * 100vh));
 }
+
+/* The visible height on a phone (#476), behind @supports as in VectorIcon.module.css. */
+@supports (height: 1dvh) {
+  .chip {
+    --ore-icon-size: max(24px, calc(24 / 1080 * 100dvh));
+  }
+
+  .tile {
+    --ore-icon-size: max(32px, calc(48 / 1080 * 100dvh));
+  }
+}

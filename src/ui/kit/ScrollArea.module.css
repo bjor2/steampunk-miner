@@ -70,10 +70,17 @@
   pointer-events: none;
 }
 
-.frame[data-scrollable][data-awake] .rail,
-.frame[data-scrollable]:hover .rail {
+.frame[data-scrollable][data-awake] .rail {
   opacity: 1;
   transition-duration: 80ms;
+}
+
+/* A resting mouse wakes the rail too; on touch the scroll itself wakes it (#476). */
+@media (hover: hover) {
+  .frame[data-scrollable]:hover .rail {
+    opacity: 1;
+    transition-duration: 80ms;
+  }
 }
 
 /* The riveted thumb: a brass plate with two dark studs. */

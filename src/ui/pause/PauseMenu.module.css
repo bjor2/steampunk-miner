@@ -50,6 +50,7 @@
 /* The shared scroll area (build #423) bounds the slot list; it owns the overflow. */
 .slotsScroll {
   max-height: 60vh;
+  max-height: 60dvh;
   margin-bottom: var(--space-2);
 }
 

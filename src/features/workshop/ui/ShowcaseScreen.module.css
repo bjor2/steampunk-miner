@@ -113,6 +113,7 @@
 
   .bandFrame {
     max-height: 24vh;
+    max-height: 24dvh;
   }
 
   .band {

@@ -12,8 +12,11 @@
   pointer-events: auto;
 }
 
-.button:hover:not(:disabled) {
-  background: rgb(201 162 75 / 0.15);
+/* Only a pointer that can rest hovers; on touch a tapped control would keep the style (#476). */
+@media (hover: hover) {
+  .button:hover:not(:disabled) {
+    background: rgb(201 162 75 / 0.15);
+  }
 }
 
 /* Focus is marked by a double frame and a pointer glyph, never by colour alone (#33 section 7). */

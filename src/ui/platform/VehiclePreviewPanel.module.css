@@ -77,5 +77,6 @@
 @media (max-height: 600px) {
   .stage {
     min-height: 60vh;
+    min-height: 60dvh;
   }
 }

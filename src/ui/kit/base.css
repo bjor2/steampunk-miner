@@ -11,6 +11,27 @@ body,
   font-family: var(--font-body);
 }
 
+/*
+ * Touch (spec #470 section 3, ticket 476): no pull-to-refresh or rubber band, no double-tap zoom
+ * delay, no long-press callout, no tap flash and no text selection anywhere in the game.
+ */
+html,
+body {
+  overscroll-behavior: none;
+  touch-action: manipulation;
+  -webkit-touch-callout: none;
+  -webkit-tap-highlight-color: transparent;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+/* The one place a player types (the pause menu's save name) keeps its caret and selection. */
+input,
+textarea {
+  -webkit-user-select: text;
+  user-select: text;
+}
+
 /* #173: one root UI scale, so every rem grows with the screen and never shrinks below 16 px. */
 html {
   font-size: calc(100% * var(--ui-scale));

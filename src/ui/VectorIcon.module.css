@@ -48,6 +48,20 @@
   --icon-size: max(20px, calc(32 / 1080 * 100vh));
 }
 
+/*
+ * The visible height on a phone, not the height behind its URL bar (#476). A custom property takes
+ * any text, so the twin sits behind @supports: the vh above stays where dvh is unknown.
+ */
+@supports (height: 1dvh) {
+  .hud {
+    --icon-size: max(20px, calc(24 / 1080 * 100dvh));
+  }
+
+  .banner {
+    --icon-size: max(20px, calc(32 / 1080 * 100dvh));
+  }
+}
+
 /* The surrounding type's size; the bay screens set it at 2.2% of the short axis, over 16 px. */
 .menu {
   --icon-size: 1.25em;
