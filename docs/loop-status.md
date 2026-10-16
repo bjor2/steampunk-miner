@@ -470,3 +470,14 @@ on the same inode.
 
 Rollback: `gh issue edit 519 --remove-label build`; restore `next-ticket.sh.bak-20261016-2310-519` over `next-ticket.sh` in place
 (`cat`, not `mv`).
+
+## #522 released at top priority, #514 held behind #519 and #522 (16 Oct 2026, ~23:30 Oslo)
+
+The Producer filed **#522** (A3: run-coded reportPose log lines, log schema bump, lossless; `build`, `tier:hard`, size M; touches the
+command log and test harness; under spec #316, outside map #302; wave 2E #523). It is not blocked by #519. **#514** (A1) is natively
+blocked by both **#519** and **#522** (both open), so the picker keeps it out until both are closed. `PRIORITY_TICKETS` now starts
+`519 522 514 516 487 488 489` and `WAVE_ORPHAN_ALLOW` is `" 514 516 519 522 "`. All other closed tickets were dropped from the
+priority list to keep the file the same size; the edit was one in-place `pwrite` on the same inode.
+
+Rollback: `gh issue edit 522 --remove-label build`; restore `next-ticket.sh.bak-20261016-2330-522` over `next-ticket.sh` in place
+(`cat`, not `mv`).
