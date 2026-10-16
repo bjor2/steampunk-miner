@@ -15,6 +15,12 @@ The command builds the preview, runs `reviewShots.spec.ts` in every cell and wri
 `docs/screens/<cell>/<shot>.jpg`. The Game Director reviews them against the per-device bar in
 #173 section 1 before a build that changes them merges.
 
+**Portrait is supported.** #173 ruled portrait not supported: a phone held upright showed a
+turn-your-device card. Spec #470 superseded that ruling when its portrait slice (#483 to #489)
+landed. The card is gone, every screen fits upright, the game turns either way without a reload,
+and the matrix has a portrait cell for the phone, the Pixel and the tablet. The rest of #173 (the
+reference screens, zoom cap, render-scale floor, text and target sizes) still stands.
+
 | Cell              | Window (CSS px) | DPR   | Notes                      |
 | ----------------- | --------------- | ----- | -------------------------- |
 | `desktop`         | 1920 x 1080     | 1     | the primary target         |

@@ -2183,9 +2183,9 @@
         },
         {
           "title": "Phones, tablets and TVs",
-          "description": "Plays in landscape on phones and tablets with every screen reachable by touch; portrait shows a turn-your-device card. A screenshot matrix keeps desktop, phone, tablet and TV sizes checked.",
+          "description": "Plays on phones and tablets held sideways or upright, with every screen reachable by touch, and turns either way mid-dig without a reload. Portrait support comes from spec #470 and replaces #173's turn-your-device card. A screenshot matrix keeps desktop, phone, tablet and TV sizes checked, each phone and tablet both ways up.",
           "status": "built",
-          "issues": [173, 179],
+          "issues": [173, 179, 470],
           "doc": "docs/screens/README.md",
           "children": [
             {
