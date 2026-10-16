@@ -417,3 +417,12 @@ Side effect to know about: removing `hitl` from the spec #470 makes the spec poo
 
 Rollback: restore `next-ticket.sh.bak-20261016-1825-portrait-prio`; `gh issue edit <n> --remove-label build` for 500 and 484 to
 489; remove the blockers with `gh api -X DELETE repos/bjor2/steampunk-miner/issues/{484,485,486}/dependencies/blocked_by/<id of #500>`.
+
+## Materials rarity wave 7A released (16 Oct 2026, 19:01 Oslo)
+
+Bjor, 16 Oct 19:01: "Give it the build label then." `build` is now on **#445**, **#446**, **#447** and **#449** (wave 7A, #461,
+map #302, `remote ready`). Native blockers set the order inside the wave: #445 first, then #446 and #447 (both blocked by #445), then
+#449 (blocked by #445 and #446); the wave runs one worker at a time. #448, #450 to #454, #461 and #463 stay without `build`, as do
+#499 and #471. The portrait waves (2A and 2B) and #506 keep their place in `PRIORITY_TICKETS`; wave 7A only uses free slots.
+
+Rollback: `gh issue edit <n> --remove-label build` for 445, 446, 447 and 449 (a running worker finishes its ticket first).
