@@ -85,6 +85,34 @@ export function vehicleKeepClearOf(screen: ScreenSize): ScreenBox {
   }
 }
 
+/** Where the camera shows the vehicle: canvas size, scale, and its offset from the look point. */
+export interface VehicleOnScreen {
+  width: number
+  height: number
+  pixelsPerMetre: number
+  /** World metres from the point the camera looks at to the vehicle. */
+  fromCentre: { x: number; y: number }
+  /** The camera's roll, counter-clockwise. */
+  turnRadians: number
+}
+
+/** The vehicle body's box on screen: its world offset turned by the camera's roll, y down. */
+export function vehicleScreenBoxOf(view: VehicleOnScreen): ScreenBox {
+  const { fromCentre, turnRadians, pixelsPerMetre } = view
+  const [cos, sin] = [Math.cos(turnRadians), Math.sin(turnRadians)]
+  const across = fromCentre.x * cos + fromCentre.y * sin
+  const up = -fromCentre.x * sin + fromCentre.y * cos
+  const middleX = view.width / 2 + across * pixelsPerMetre
+  const middleY = view.height / 2 - up * pixelsPerMetre
+  const half = (BODY_HALF_SIZE_MM / MM_PER_METRE) * pixelsPerMetre
+  return {
+    left: middleX - half,
+    top: middleY - half,
+    right: middleX + half,
+    bottom: middleY + half,
+  }
+}
+
 /** Two boxes share area; touching edges do not (`slack` shaves each side for sub-pixel layout). */
 export function doBoxesOverlap(a: ScreenBox, b: ScreenBox, slack = 0): boolean {
   return (

@@ -74,6 +74,15 @@ export function queueShownHintForRoom(board: HintBoard): HintBoard {
   return { queued: [waiting, ...board.queued], shown: null, lastShownTick: null }
 }
 
+/**
+ * Debug (#500's layout specs): the hint goes to the front of the queue with no gap to wait, so
+ * the next moment shows it where there is room. Never in play: only the debug API calls it.
+ */
+export function queueHintFirstForDebug(board: HintBoard, id: string): HintBoard {
+  const others = board.queued.filter((hint) => hint.id !== id)
+  return { queued: [{ id, rescueCost: null }, ...others], shown: null, lastShownTick: null }
+}
+
 export function isHintShown(board: HintBoard, id: string): boolean {
   return board.shown?.id === id
 }

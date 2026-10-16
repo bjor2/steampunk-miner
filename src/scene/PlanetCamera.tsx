@@ -75,6 +75,9 @@ function placeCamera(camera: Camera, turn: CameraTurn, framing: SpeedFraming): v
   camera.position.y = lookAtY - renderOriginPresence.y + screenEffects.offsetY
   camera.rotation.z = turn.angle
   cameraPresence.localUpScreenAngle = angleOfUp(turn.up) - turn.angle
+  cameraPresence.vehicleFromCentreX = vehiclePresence.x - lookAtX
+  cameraPresence.vehicleFromCentreY = vehiclePresence.y - lookAtY
+  cameraPresence.turnRadians = turn.angle
 }
 
 /** The vehicle, or on the way to where a dock building stages the camera (#170 showcase). */

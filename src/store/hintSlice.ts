@@ -18,11 +18,14 @@ import {
   EMPTY_HINT_BOARD,
   observeHints,
   observeHintsQueuedOnly,
+  queueHintFirstForDebug,
   queueShownHintForRoom,
+  hintDefOf,
   type HintBoard,
   type HintStep,
 } from '../systems/hints/hintBoard'
 import type { HintMoment } from '../systems/hints/hintConditions'
+import { HINT_TABLE } from '../systems/hints/hintTable'
 import {
   dismissTransmission,
   EMPTY_TRANSMISSION_BOARD,
@@ -56,6 +59,11 @@ export interface HintActions {
   dismissHint(): void
   /** The compact HUD measured its room for the hint chip (#500); a lost room queues the hint. */
   noteHintRoom(hasRoom: boolean): void
+  /**
+   * Debug (the #500 layout specs): puts a hint of the table up next, with no gap to wait;
+   * throws for an id the table does not have. Presentation only: no command, no log line.
+   */
+  debugShowHint(hintId: string): void
   allowPlaquesFor(scenario: Scenario): void
 }
 
@@ -108,6 +116,11 @@ export function hintActionsOf(set: SetSlice, get: () => SliceHost): HintActions 
       if (hasRoom === host.hasHintRoom) return
       set({ hasHintRoom: hasRoom, hintBoard: boardForRoom(host.hintBoard, hasRoom) })
       host.observePlaques([])
+    },
+    debugShowHint: (hintId) => {
+      hintDefOf(HINT_TABLE, hintId)
+      set({ hintBoard: queueHintFirstForDebug(get().hintBoard, hintId) })
+      get().observePlaques([])
     },
     allowPlaquesFor: (scenario) => set({ arePlaquesAllowed: isHintsEnabled(scenario) }),
   }

@@ -63,6 +63,8 @@ import { bayScreenPresence } from '../ui/platform/bayScreenPresence'
 import { screenIdProblems } from '../ui/registries/screens'
 import { readFittedScreen } from '../ui/stage/screenFit'
 import type { ScreenLayout } from '../systems/views/screenLayout'
+import type { ScreenBox } from '../systems/views/hudClearView'
+import { showHintUnlessRefused, stageHudUnlessRefused, vehicleScreenBoxNow } from './debugHudLayout'
 import { drawnLiningAt, type DrawnLining } from './debugLining'
 import { readRendererMemory, type RendererMemory } from './debugMemory'
 
@@ -135,6 +137,15 @@ export interface DebugUi {
     ty: unknown,
     pixelsPerCell: unknown,
   ): DebugResult<{ lining: DrawnLining | null }>
+  /** The vehicle body's box on screen as the last frame drew it, CSS px (#500's layout specs). */
+  getVehicleScreenBox(): DebugResult<{ box: ScreenBox }>
+  /**
+   * Draws a staged worst case over the run (#500): `{ isCargoFull, threatOctant }`, a full hold
+   * and a threat marker at that octant (or null). The HUD only: no command, log line or digest.
+   */
+  stageHud(staging: unknown): DebugResult
+  /** Puts a hint of the table up next, with no gap to wait (#500); the compact HUD's room holds. */
+  showHint(hintId: unknown): DebugResult
 }
 
 export interface BayPresentation {
@@ -207,6 +218,9 @@ export function createDebugUi(): DebugUi {
     getPlanetCard: () => ({ ok: true, card: planetCardViewNow() }),
     getTitleMenuModel: () => ({ ok: true, model: readTitleMenuModel() }),
     getDrawnLiningAt: drawnLiningAt,
+    getVehicleScreenBox: vehicleScreenBoxNow,
+    stageHud: stageHudUnlessRefused,
+    showHint: showHintUnlessRefused,
   }
 }
 

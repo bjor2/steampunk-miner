@@ -3,6 +3,8 @@
  * the same functions on the same store, so a spec reads what the screen draws. The audio model
  * (#49) is read the same way by the sound stage, and the touch cluster's situation (#173) too.
  */
+import { stagedHudModelOf } from '../systems/views/hudStaging'
+import { readHudStaging } from './hudStaging'
 import { selectAudioModel, type AudioModel } from '../systems/audio/audioModel'
 import { drillVoiceOf, type DrillVoice } from '../systems/audio/drillVoice'
 import { musicMomentOf } from '../systems/audio/musicMoment'
@@ -41,8 +43,9 @@ import {
   type BayScreen,
 } from './screenModels'
 
+/** The HUD's model, with the debug API's staging over it in a debug run (#500). */
 export function readHudModel(): HudModel {
-  return hudModelOf(useGameStore.getState())
+  return stagedHudModelOf(hudModelOf(useGameStore.getState()), readHudStaging())
 }
 
 /** The screen of the bay the vehicle is docked at, or null (#37). */

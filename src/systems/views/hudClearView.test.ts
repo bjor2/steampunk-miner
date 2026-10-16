@@ -6,6 +6,7 @@ import {
   doBoxesOverlap,
   isHintRoomFor,
   vehicleKeepClearOf,
+  vehicleScreenBoxOf,
 } from './hudClearView'
 
 const PHONE = { width: 390, height: 844 }
@@ -69,5 +70,48 @@ describe('HUD clear view (#500)', () => {
     const upright = vehicleKeepClearOf(PHONE)
     const sideways = vehicleKeepClearOf({ width: 844, height: 390 })
     expect(upright.right - upright.left).toBeCloseTo(sideways.bottom - sideways.top, 6)
+  })
+})
+
+describe('vehicle on screen (#500)', () => {
+  const view = { width: 400, height: 800, pixelsPerMetre: 40, turnRadians: 0 }
+
+  it('draws the vehicle at the middle with no lean, its body 0.9 m across', () => {
+    const box = vehicleScreenBoxOf({ ...view, fromCentre: { x: 0, y: 0 } })
+    expect(box).toEqual({ left: 182, top: 382, right: 218, bottom: 418 })
+  })
+
+  it('moves the vehicle up the screen when the camera leans down ahead of it', () => {
+    const box = vehicleScreenBoxOf({ ...view, fromCentre: { x: 0, y: 2 } })
+    expect((box.top + box.bottom) / 2).toBe(320)
+  })
+
+  it('turns the offset with the camera roll', () => {
+    const box = vehicleScreenBoxOf({
+      ...view,
+      fromCentre: { x: 0, y: 2 },
+      turnRadians: Math.PI / 2,
+    })
+    expect((box.left + box.right) / 2).toBeCloseTo(280, 6)
+    expect((box.top + box.bottom) / 2).toBeCloseTo(400, 6)
+  })
+
+  it('stays inside the keep-clear square at the furthest lean and the closest zoom', () => {
+    const screen = { width: 390, height: 844 }
+    const pixelsPerMetre = 390 / 8
+    const lean = (0.6 * 390) / 2 / pixelsPerMetre
+    const rect = vehicleKeepClearOf(screen)
+    for (const fromCentre of [
+      { x: lean, y: 0 },
+      { x: -lean, y: 0 },
+      { x: 0, y: lean },
+      { x: 0, y: -lean },
+    ]) {
+      const box = vehicleScreenBoxOf({ ...screen, pixelsPerMetre, turnRadians: 0, fromCentre })
+      expect(box.left).toBeGreaterThanOrEqual(rect.left - 1e-9)
+      expect(box.right).toBeLessThanOrEqual(rect.right + 1e-9)
+      expect(box.top).toBeGreaterThanOrEqual(rect.top - 1e-9)
+      expect(box.bottom).toBeLessThanOrEqual(rect.bottom + 1e-9)
+    }
   })
 })

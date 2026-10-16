@@ -8,7 +8,9 @@
  * `viewShortAxisMetres` is the eased zoom (#39) and `widthPixels`/`heightPixels` the canvas, so
  * the debug API can report the framing the player actually sees: the player's zoom, pulled back
  * for speed (ticket 338). `feltSpeedCellsPerSecond` and `leadShare` are the speed framing's felt
- * speed and lean, read by the debug API to log the ground visible ahead.
+ * speed and lean, read by the debug API to log the ground visible ahead. `vehicleFromCentreX/Y`
+ * (world metres from the point the camera looks at to the vehicle) and `turnRadians` (the camera's
+ * roll) let the debug API say where the vehicle is on screen (#500's layout specs).
  */
 import { VIEW_SHORT_AXIS_DEFAULT_M } from '../constants/scene'
 
@@ -19,4 +21,7 @@ export const cameraPresence = {
   heightPixels: 0,
   feltSpeedCellsPerSecond: 0,
   leadShare: 0,
+  vehicleFromCentreX: 0,
+  vehicleFromCentreY: 0,
+  turnRadians: 0,
 }

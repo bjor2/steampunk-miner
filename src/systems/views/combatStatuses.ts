@@ -70,7 +70,7 @@ const PERMILLE_PER_PERCENT = 10
 const HULL_CRITICAL_TEXT = 'HULL CRITICAL'
 const COLLAPSE_TEXT = 'COLLAPSE: back off'
 const OVERHEAT_TEXT = 'OVERHEAT: drill throttled'
-const CARGO_FULL_TEXT = 'CARGO FULL'
+export const CARGO_FULL_TEXT = 'CARGO FULL'
 
 export function combatStatusStackOf(sources: CombatStatusSources): CombatStatusStack {
   const active = [
