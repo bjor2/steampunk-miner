@@ -7,17 +7,16 @@
  * Planet radii run 300 to just under 1000 tiles, so a 3 s leg fits only rigs up to about 300 m/s;
  * a leg here is a tick count that ends where the body nears the planet's centre (3600 m/s crosses
  * planet 1 in about 5 ticks).
- *
- * A rig the law cannot reach today has no drill step (`drillStepOfRig` answers null): ticket 396's
- * 4-tick floor holds every drill to 240 sub-steps a cell until #397 removes it.
  */
 import { DRILL_STAMP_AHEAD_MM, STEP_BOUND_TOLERANCE_MM } from '../../constants/balance'
-import { UP_VECTOR_SCALE } from '../../constants/physics'
+import { MM_PER_METRE, UP_VECTOR_SCALE, VEHICLE_COLLIDER_SIZE } from '../../constants/physics'
 import { blockHardness } from '../economy/oreEconomy'
 import { startLevels, vehicleStatsAt } from '../economy/vehicleStats'
 import { NO_DRIVE } from '../vehicle/driveSigns'
 import { subStepsPerTile } from '../vehicle/drillRule'
 import { FACING, facingVectorOf, noseTileOf, type VehiclePose } from '../vehicle/vehiclePose'
+import { groundReaderOf, type GroundReader } from '../world/groundReader'
+import { ISO_DENSITY } from '../world/sampleGrid'
 import type { StampPoint } from '../world/stampShape'
 import { surfaceRowOfColumn } from '../world/tileGrid'
 import { applyCommand } from './applyCommand'
@@ -62,9 +61,11 @@ function subStepsAtDrillStep(drillStep: number): number {
   return subStepsPerTile(vehicleStatsAt(levels), BAND_ONE_ROCK) ?? Number.MAX_SAFE_INTEGER
 }
 
-/** The lowest drill_power step cutting a band-1 cell in at most the rig's sub-steps; null past the law. */
-export function drillStepOfRig(rig: SpeedRig): number | null {
-  if (subStepsAtDrillStep(MAX_DRILL_STEP) > rig.subSteps) return null
+/** The lowest drill_power step cutting a band-1 cell in at most the rig's sub-steps. */
+export function drillStepOfRig(rig: SpeedRig): number {
+  if (subStepsAtDrillStep(MAX_DRILL_STEP) > rig.subSteps) {
+    throw new Error(`the drill law reaches no ${rig.speed} m/s rig`)
+  }
   let [low, high] = [0, MAX_DRILL_STEP]
   while (low < high) {
     const middle = Math.floor((low + high) / 2)
@@ -72,16 +73,6 @@ export function drillStepOfRig(rig: SpeedRig): number | null {
     else low = middle + 1
   }
   return low
-}
-
-function drillStepNeeded(rig: SpeedRig): number {
-  const drillStep = drillStepOfRig(rig)
-  if (drillStep === null) throw new Error(`the drill law reaches no ${rig.speed} m/s rig`)
-  return drillStep
-}
-
-export function isRigInLaw(rig: SpeedRig): boolean {
-  return drillStepOfRig(rig) !== null
 }
 
 /** Where a leg starts, in mm, and its up vector (1024-scaled); it cuts facing down. */
@@ -136,10 +127,12 @@ export function bySweptCut(cut: SweepCut<RuleEffect>): LegTick {
     })
 }
 
-/** A leg cut by a rig: the state before its first step, and each tick's effect. */
+/** A leg cut by a rig: the state before its first step, each tick's effect and where its body cut from. */
 export interface LegRun {
   start: AuthorityState
   ticks: RuleEffect[]
+  /** How far down the leg the body stood for each tick's cut. */
+  bodyAlongMm: number[]
 }
 
 /** What a leg is cut with and how long. */
@@ -164,18 +157,20 @@ const CORE_MARGIN_MM = 20_000
  */
 export function cutLeg(cut: LegCut): LegRun {
   const { leg, maxTicks, reachMm, tick = AS_DRILL_STEP } = cut
-  const start = armedRigStart(cut.drillStep ?? drillStepNeeded(cut.rig), leg)
+  const start = armedRigStart(cut.drillStep ?? drillStepOfRig(cut.rig), leg)
   const endMm = reachMm ?? alongOf(leg, { xMm: 0, yMm: 0 }) - CORE_MARGIN_MM
   const ticks: RuleEffect[] = []
+  const bodyAlongMm: number[] = []
   let state = start
   let along = 0
   for (let index = 0; index < maxTicks && reachAlongOf(leg, state) < endMm; index++) {
     along = bodyAlongAfter(state, leg, along, index === 0)
     const effect = tick(state, start.tick + 1 + index, poseAlong(leg, along))
     ticks.push(effect)
+    bodyAlongMm.push(along)
     state = effect.state
   }
-  return { start, ticks }
+  return { start, ticks, bodyAlongMm }
 }
 
 /** Player `p1` reported at the leg's start with the rig's drill, a deep hold and a full tank. */
@@ -197,9 +192,54 @@ function armedRigStart(drillStep: number, leg: Leg): AuthorityState {
 /** The body's distance along the leg on its next step: the cut step on, held behind the cut. */
 function bodyAlongAfter(state: AuthorityState, leg: Leg, along: number, isFirst: boolean): number {
   if (isFirst) return along
-  const cutStep = stepBoundsAt(state, 'p1').cuttingMm - STEP_BOUND_TOLERANCE_MM
+  const cutStep = cutStepMmAt(state)
   const cutLets = reachAlongOf(leg, state) - DRILL_STAMP_AHEAD_MM
   return Math.max(along, Math.min(along + cutStep, cutLets))
+}
+
+/** The law's cut step where the rig stands: the cutting bound less its tolerance. */
+export function cutStepMmAt(state: AuthorityState): number {
+  return stepBoundsAt(state, 'p1').cuttingMm - STEP_BOUND_TOLERANCE_MM
+}
+
+const FACE_SCAN_MM = 25
+
+/** The body's collider face: half its 0.9 m square ahead of its centre. */
+const BODY_HALF_MM = (VEHICLE_COLLIDER_SIZE * MM_PER_METRE) / 2
+
+/**
+ * How far the body's face, judged `faceWidthMm` across, can move on from `along` before it meets
+ * standing ground, in scan steps up to `limitMm`.
+ */
+export function openRunAheadOf(
+  state: AuthorityState,
+  leg: Leg,
+  along: number,
+  { limitMm, faceWidthMm }: { limitMm: number; faceWidthMm: number },
+): number {
+  const reader = groundReaderOf(state.world, PARAMS)
+  const offsets = [-faceWidthMm / 2, 0, faceWidthMm / 2]
+  let run = 0
+  while (run < limitMm && isFaceOpenAt(reader, leg, along + run + FACE_SCAN_MM, offsets)) {
+    run += FACE_SCAN_MM
+  }
+  return Math.min(run, limitMm)
+}
+
+/** The body's face, with its centre `along` mm down the leg, lies in open ground at each offset. */
+function isFaceOpenAt(
+  reader: GroundReader,
+  leg: Leg,
+  along: number,
+  offsetsMm: readonly number[],
+): boolean {
+  const facing = facingOfLeg(leg)
+  const centre = pointAlong(leg, along + BODY_HALF_MM)
+  return offsetsMm.every((acrossMm) => {
+    const xMm = centre.xMm - (facing.y * acrossMm) / UP_VECTOR_SCALE
+    const yMm = centre.yMm + (facing.x * acrossMm) / UP_VECTOR_SCALE
+    return reader.densityAtPoint(xMm / MM_PER_METRE, yMm / MM_PER_METRE) < ISO_DENSITY
+  })
 }
 
 /** Where the cut reached: the cursor, or the leg's start before any cut. */

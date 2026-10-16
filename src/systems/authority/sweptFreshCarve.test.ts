@@ -1,6 +1,6 @@
-import { describe, expect, it } from 'vitest'
+import { beforeAll, describe, expect, it } from 'vitest'
 import { DRILL_STAMP_RADIUS_MM, DRILL_SUBSTEPS_PER_TICK } from '../../constants/balance'
-import { MM_PER_METRE, UP_VECTOR_SCALE } from '../../constants/physics'
+import { MM_PER_METRE, UP_VECTOR_SCALE, VEHICLE_COLLIDER_SIZE } from '../../constants/physics'
 import type { SliceDefinition } from '../../registries/sliceDefinition'
 import { withRegistrations } from '../../registries/registrar'
 import { minorsPerMajor } from '../economy/upgradeSteps'
@@ -26,14 +26,15 @@ import {
   drillStepOfRig,
   eventsOfLeg,
   facingOfLeg,
-  isRigInLaw,
   reachAlongOf,
   reachOf,
+  openRunAheadOf,
   rigAt,
   TILTED_LEG,
   type Leg,
   type LegCut,
   type LegRun,
+  type SpeedRig,
 } from './sweptRigFixtures'
 import { drillAlongSpan } from './sweptSpanDrill'
 
@@ -41,10 +42,8 @@ import { drillAlongSpan } from './sweptSpanDrill'
 // with the VS ruling): a fresh path whose bare disc at its reach would leave the body point
 // uncovered cuts the capsule from the body instead. Before it, a rig past about a cell a tick left
 // its own cell and the rim along its first tick standing, and its body rested on that lip at 0 m/s
-// while the reach ran on. The fast rigs need the drill law past ticket 396's 4-tick floor, which
-// #397 removes: until then their specs skip, and the rule's own specs run.
-
-const BODY_WIDTH_MM = 900
+// while the reach ran on. The bars are the rulings of Oct 16 on #439: the bore is judged against
+// the 1x rig's own, the per-metre counts are a regression ratchet until #441's exact rim dwell.
 
 describe('fresh swept stamp (ticket 439)', () => {
   const POSE: VehiclePose = {
@@ -159,13 +158,38 @@ function judgedStationsOf(run: LegRun, leg: Leg): Station[] {
   })
 }
 
-const isNarrow = ({ widthMm }: Station) => widthMm < BODY_WIDTH_MM
-
 function rejectionsIn(run: LegRun): DomainEventBody[] {
   return eventsOfLeg(run).filter(({ type }) => type === 'CommandRejected')
 }
 
-const BORE_RIGS = [25, 44, 78, 300, 3600].map(rigAt)
+/**
+ * Below this share of its next step a body stalls (the bore bar of Oct 16 on #439): a bore may be
+ * narrower than the body only where the body still passes it.
+ */
+const STALL_SHARE = 0.8
+const BODY_WIDTH_MM = VEHICLE_COLLIDER_SIZE * MM_PER_METRE
+
+/**
+ * The ticks whose cut left ground standing across the body's 0.9 m face within less than
+ * `STALL_SHARE` of the step the body takes next. That step is the law's cut step, held behind the
+ * reach by the carry's own pace, so a stall here is ground the bore left, not a cell the carry has
+ * yet to pay.
+ */
+function stallsOf(run: LegRun, leg: Leg): { tick: number; openMm: number; stepMm: number }[] {
+  return run.ticks.slice(0, -1).flatMap(({ state }, tick) => {
+    const stepMm = run.bodyAlongMm[tick + 1] - run.bodyAlongMm[tick]
+    const along = run.bodyAlongMm[tick]
+    const face = { limitMm: stepMm, faceWidthMm: BODY_WIDTH_MM }
+    const openMm = openRunAheadOf(state, leg, along, face)
+    return openMm < stepMm * STALL_SHARE ? [{ tick, openMm, stepMm }] : []
+  })
+}
+
+const narrowestOf = (stations: readonly Station[]) =>
+  Math.min(...stations.map(({ widthMm }) => widthMm))
+
+const ONE_X_RIG = rigAt(25)
+const BORE_RIGS = [44, 78, 300, 3600].map(rigAt)
 const LEGS: readonly { name: string; leg: Leg }[] = [
   { name: 'down the column', leg: COLUMN_LEG },
   { name: 'down the tilted radius', leg: TILTED_LEG },
@@ -173,23 +197,46 @@ const LEGS: readonly { name: string; leg: Leg }[] = [
 /** A 3 s leg, or to the core for the rigs that cross planet 1 sooner. */
 const LEG_TICKS = 180
 
+function boreOf(rig: SpeedRig, leg: Leg) {
+  const run = cutLeg({ rig, leg, maxTicks: LEG_TICKS })
+  return { run, stations: judgedStationsOf(run, leg) }
+}
+
 describe('body-wide bore at any cells a tick (ticket 439)', () => {
   for (const { name, leg } of LEGS) {
     for (const rig of BORE_RIGS) {
-      it.skipIf(!isRigInLaw(rig))(
-        `leaves the bore at least the body wide at every station, ${name} at ${rig.speed} m/s`,
-        () => {
-          const run = cutLeg({ rig, leg, maxTicks: LEG_TICKS })
-          const stations = judgedStationsOf(run, leg)
-          expect(rejectionsIn(run)).toEqual([])
-          expect(stations.length).toBeGreaterThan(40)
-          // The first tick's own stations, where a fresh path's bare disc left the start lip.
-          expect(stations.filter(({ tick }) => tick === 0).length).toBeGreaterThan(0)
-          expect(stations.filter(isNarrow)).toEqual([])
-        },
-      )
+      it(`leaves no station narrower than the 1x rig's narrowest, ${name} at ${rig.speed} m/s`, () => {
+        const narrowestMm = narrowestOf(boreOf(ONE_X_RIG, leg).stations)
+        const { run, stations } = boreOf(rig, leg)
+        expect(rejectionsIn(run)).toEqual([])
+        expect(stations.length).toBeGreaterThan(40)
+        // The first tick's own stations, where a fresh path's bare disc left the start lip.
+        expect(stations.filter(({ tick }) => tick === 0).length).toBeGreaterThan(0)
+        expect(stations.filter(({ widthMm }) => widthMm < narrowestMm)).toEqual([])
+      })
+    }
+
+    for (const rig of [ONE_X_RIG, ...BORE_RIGS]) {
+      it(`passes its body off the start lip without a stall, ${name} at ${rig.speed} m/s`, () => {
+        const { run } = boreOf(rig, leg)
+        expect(stallsOf(run, leg).filter(({ tick }) => tick === 0)).toEqual([])
+      })
     }
   }
+
+  for (const rig of [ONE_X_RIG, ...BORE_RIGS]) {
+    it(`passes its body through the bore on every tick without a stall, down the column at ${rig.speed} m/s`, () => {
+      const { run } = boreOf(rig, COLUMN_LEG)
+      expect(run.ticks.length).toBeGreaterThan(5)
+      expect(stallsOf(run, COLUMN_LEG)).toEqual([])
+    })
+  }
+
+  // Down the tilted radius a few ticks of the 25 to 240 m/s rigs stall on the cell the carry holds
+  // out at its reach tip; with `leavingCellToCarry` ablated none does, at any rig.
+  it.todo(
+    'passes its body through the bore on every tick without a stall, down the tilted radius at every rig (#421: the carry target-cell hold-out)',
+  )
 })
 
 /** The path the cells and work per metre are counted over, from the leg's start. */
@@ -227,27 +274,46 @@ function workPerMetreOf(cut: LegCut): WorkPerMetre {
 const BASE_RIG = rigAt(44)
 const FASTER_RIGS = [78, 240, 300, 3600].map(rigAt)
 
+/** Each faster rig's cells and work a metre down the column over the 44 m/s rig's. */
+function ratiosToBaseRig(): { speed: number; cells: number; work: number }[] {
+  const base = workPerMetreOf({ rig: BASE_RIG, leg: COLUMN_LEG, maxTicks: 400 })
+  return FASTER_RIGS.map((rig) => {
+    const faster = workPerMetreOf({ rig, leg: COLUMN_LEG, maxTicks: 400 })
+    const cells = faster.cellsPerMetre / base.cellsPerMetre
+    return { speed: rig.speed, cells, work: faster.workShare / base.workShare }
+  })
+}
+
+/**
+ * A regression ratchet, not the gate (GD and TD rulings of Oct 16 on #439): measured with the fix,
+ * 1.14x cells and 1.18x work at 78 m/s, 1.18x cells and 1.24 to 1.26x work from 240 m/s, the
+ * continuing ticks' whole tick of dwell on every rim sample the capsule touches. #441's band is
+ * the gate, and #441 deletes this ratchet when it lands.
+ */
+const RATCHET_CELLS = 1.2
+const RATCHET_WORK = 1.3
+
 describe('cells and work per metre at any speed (ticket 439, VS ruling)', () => {
+  let ratios: ReturnType<typeof ratiosToBaseRig> = []
+  beforeAll(() => {
+    ratios = ratiosToBaseRig()
+  }, 120_000)
+
   // The lower side of the VS gate: each extra cell pays its own drill time, energy and heat, so a
   // faster rig may open more a metre than the 44 m/s one, never fewer.
-  it.skipIf(![BASE_RIG, ...FASTER_RIGS].every(isRigInLaw))(
-    'opens at least the 44 m/s rig cells and work a metre at every faster rig: no free cells',
-    () => {
-      const base = workPerMetreOf({ rig: BASE_RIG, leg: COLUMN_LEG, maxTicks: 400 })
-      const fewer = FASTER_RIGS.flatMap((rig) => {
-        const faster = workPerMetreOf({ rig, leg: COLUMN_LEG, maxTicks: 400 })
-        const cells = faster.cellsPerMetre / base.cellsPerMetre
-        const work = faster.workShare / base.workShare
-        return cells >= 1 && work >= 1 ? [] : [{ speed: rig.speed, cells, work }]
-      })
-      expect(fewer).toEqual([])
-    },
-  )
+  it('opens at least the 44 m/s rig cells and work a metre at every faster rig: no free cells', () => {
+    const fewer = ratios.filter(({ cells, work }) => cells < 1 || work < 1)
+    expect(fewer).toEqual([])
+  })
 
-  // Measured with the fix on planet 1's column 30 and its tilted radius, no tile floor: 1.70 cells
-  // a metre at 44 m/s, 2.00 from 240 m/s (1.18x; 1.14x at 78 m/s), the continuing ticks' full
-  // tick of dwell on the rim. Asked on #439 before it is pinned.
-  it.todo('opens at most 1.10x the 44 m/s rig cells and work a metre at every faster rig')
+  it('opens at most 1.20x the 44 m/s rig cells and 1.30x its work a metre at 78, 240, 300 and 3600 m/s (a regression ratchet until #441)', () => {
+    const over = ratios.filter(({ cells, work }) => cells > RATCHET_CELLS || work > RATCHET_WORK)
+    expect(over).toEqual([])
+  })
+
+  it.todo(
+    "opens cells a metre within 5% of the 5 m/s rig and work a metre within 1% at 44, 240 and 3600 m/s, never under the 1x rig's work a metre (#441's band: exact per-sample rim dwell)",
+  )
 
   it.todo(
     'opens byte-identical cells, ore, energy, heat and dig time a metre at 1x, 10x, 100x and 3600 m/s (exact rim dwell, #441)',
@@ -266,23 +332,22 @@ const MAJOR_RATIO = 1.12
 const RATIO_TOLERANCE = 0.05
 
 describe('felt speed per drill major with the fresh capsule (ticket 439, VS ruling)', () => {
-  it.skipIf(!RATIO_RIGS.every(isRigInLaw))(
-    'cuts each of the 44 and 240 m/s rigs 1.12x +-5% faster than the drill a major below it',
-    () => {
-      const misses = RATIO_RIGS.flatMap((rig) => {
-        const drillStep = drillStepOfRig(rig) as number
-        const cut = { rig, leg: COLUMN_LEG, maxTicks: 400 }
-        const below = drillStep - minorsPerMajor()
-        const ratio = paceOf({ ...cut, drillStep }) / paceOf({ ...cut, drillStep: below })
-        return Math.abs(ratio / MAJOR_RATIO - 1) <= RATIO_TOLERANCE ? [] : [{ rig, ratio }]
-      })
-      expect(misses).toEqual([])
-    },
-  )
+  it('cuts each of the 44 and 240 m/s rigs 1.12x +-5% faster than the drill a major below it', () => {
+    const misses = RATIO_RIGS.flatMap((rig) => {
+      const drillStep = drillStepOfRig(rig)
+      const cut = { rig, leg: COLUMN_LEG, maxTicks: 400 }
+      const below = drillStep - minorsPerMajor()
+      const ratio = paceOf({ ...cut, drillStep }) / paceOf({ ...cut, drillStep: below })
+      return Math.abs(ratio / MAJOR_RATIO - 1) <= RATIO_TOLERANCE ? [] : [{ rig, ratio }]
+    })
+    expect(misses).toEqual([])
+  })
 
-  // At the one-sub-step quantum the major below takes 2 sub-steps a cell, and either rig crosses
-  // its 30 m in its first tick, as far as its stamp's lead: asked on #439 how this is judged.
-  it.todo('cuts the 3600 m/s rig 1.12x +-5% faster than the drill a major below it')
+  // At the one-sub-step quantum the major below takes 2 sub-steps a cell, so the law itself gives
+  // 2x, and either rig crosses its 30 m in its first tick (GD ruling Q2 on #439).
+  it.todo(
+    "cuts the 3600 m/s rig 1.12x +-5% faster than the drill a major below it (#397's law-level exemption under 10 sub-steps a cell; #441 judges it)",
+  )
 })
 
 const isListed = (tiles: readonly TilePoint[], { tx, ty }: TilePoint) =>
@@ -344,34 +409,28 @@ const GATE_RIGS = [78, 300, 3600].map(rigAt)
 
 describe('gates on the capsule cells at any speed (ticket 439, Horizontal Scaler)', () => {
   for (const rig of GATE_RIGS) {
-    it.skipIf(!isRigInLaw(rig))(
-      `reports a refused rim cell once, on the tick the capsule meets it, at ${rig.speed} m/s`,
-      () => {
-        const run = withRegistrations([probeSliceOf(RIM_GATES)], () =>
-          cutLeg({ rig, leg: RIM_LEG, maxTicks: LEG_TICKS, reachMm: 24_000 }),
-        )
-        for (const gate of RIM_GATES) {
-          expect(ticksGatingAt(run, gate)).toEqual([firstTickNear(run, RIM_LEG, gate)])
-          expect(isCellDestroyed(run, gate)).toBe(false)
-        }
-      },
-    )
+    it(`reports a refused rim cell once, on the tick the capsule meets it, at ${rig.speed} m/s`, () => {
+      const run = withRegistrations([probeSliceOf(RIM_GATES)], () =>
+        cutLeg({ rig, leg: RIM_LEG, maxTicks: LEG_TICKS, reachMm: 24_000 }),
+      )
+      for (const gate of RIM_GATES) {
+        expect(ticksGatingAt(run, gate)).toEqual([firstTickNear(run, RIM_LEG, gate)])
+        expect(isCellDestroyed(run, gate)).toBe(false)
+      }
+    })
 
-    it.skipIf(!isRigInLaw(rig))(
-      `stops before a refused centre cell, banking no work past it, at ${rig.speed} m/s`,
-      () => {
-        const run = withRegistrations([probeSliceOf([STOP_GATE])], () =>
-          cutLeg({ rig, leg: STOP_LEG, maxTicks: 12 }),
-        )
-        const gating = ticksGatingAt(run, STOP_GATE)
-        expect(gating.length).toBe(1)
-        const after = run.ticks.slice(gating[0]).map(({ state }) => vehicleOf(state, 'p1').sweptCut)
-        const gateTopMm = (STOP_GATE.ty + 1) * MM_PER_METRE
-        expect(after.every((cursor) => cursor?.carrySubSteps === 0)).toBe(true)
-        expect(after.every((cursor) => (cursor?.yMm ?? 0) >= gateTopMm)).toBe(true)
-        expect(isCellDestroyed(run, STOP_GATE)).toBe(false)
-      },
-    )
+    it(`stops before a refused centre cell, banking no work past it, at ${rig.speed} m/s`, () => {
+      const run = withRegistrations([probeSliceOf([STOP_GATE])], () =>
+        cutLeg({ rig, leg: STOP_LEG, maxTicks: 12 }),
+      )
+      const gating = ticksGatingAt(run, STOP_GATE)
+      expect(gating.length).toBe(1)
+      const after = run.ticks.slice(gating[0]).map(({ state }) => vehicleOf(state, 'p1').sweptCut)
+      const gateTopMm = (STOP_GATE.ty + 1) * MM_PER_METRE
+      expect(after.every((cursor) => cursor?.carrySubSteps === 0)).toBe(true)
+      expect(after.every((cursor) => (cursor?.yMm ?? 0) >= gateTopMm)).toBe(true)
+      expect(isCellDestroyed(run, STOP_GATE)).toBe(false)
+    })
   }
 })
 
@@ -385,18 +444,15 @@ const SPAN_RIGS = [300, 3600].map(rigAt)
 describe('swept span against the per-cell carve on a fresh path (ticket 439)', () => {
   for (const { name, leg } of LEGS) {
     for (const rig of SPAN_RIGS) {
-      it.skipIf(!isRigInLaw(rig))(
-        `cuts the same bytes from the first tick, ${name} at ${rig.speed} m/s`,
-        () => {
-          const legCut = { rig, leg, maxTicks: 4 }
-          const [perCell, span] = withRegistrations([], () => [
-            cutLeg({ ...legCut, tick: bySweptCut(drillAlongSweep) }),
-            cutLeg({ ...legCut, tick: bySweptCut((...cut) => drillAlongSpan(...cut).effect) }),
-          ])
-          expect(perCell.ticks.length).toBeGreaterThan(0)
-          expect(canonicalTicksOf(span)).toEqual(canonicalTicksOf(perCell))
-        },
-      )
+      it(`cuts the same bytes from the first tick, ${name} at ${rig.speed} m/s`, () => {
+        const legCut = { rig, leg, maxTicks: 4 }
+        const [perCell, span] = withRegistrations([], () => [
+          cutLeg({ ...legCut, tick: bySweptCut(drillAlongSweep) }),
+          cutLeg({ ...legCut, tick: bySweptCut((...cut) => drillAlongSpan(...cut).effect) }),
+        ])
+        expect(perCell.ticks.length).toBeGreaterThan(0)
+        expect(canonicalTicksOf(span)).toEqual(canonicalTicksOf(perCell))
+      })
     }
   }
 })
