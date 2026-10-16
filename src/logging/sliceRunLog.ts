@@ -7,6 +7,7 @@
 import { TICKS_PER_SECOND } from '../constants/physics'
 import type { AuthorityCommand, CommandIntent } from '../systems/authority/authorityCommand'
 import { createAuthorityState, type AuthorityState } from '../systems/authority/authorityState'
+import type { DomainEvent } from '../systems/authority/domainEvent'
 import { planetParamsOf } from '../systems/authority/planetOfState'
 import type { BorePolicy } from '../systems/bot/botBore'
 import type { ChainPolicy } from '../systems/bot/botChains'
@@ -58,6 +59,8 @@ export interface LoggedRunOptions {
   borePolicy?: BorePolicy
   /** `spans` (the default), or `cells` for the pre-compaction lines a spec compares (ticket 420). */
   drillLines?: DrillLines
+  /** Told each command's events with the state they left, as the log is (the save bytes, #479). */
+  watchEvents?: (state: AuthorityState, events: readonly DomainEvent[]) => void
 }
 
 /** One run of a scenario on one of its pacing world seeds (#84). */
@@ -129,6 +132,7 @@ export function playSliceIntoSink(
         const place = placeOf(state)
         planets.noteBatch(place.planet, events)
         recordDomainEventsTo(runLog, place, events, state)
+        options.watchEvents?.(state, events)
       },
     },
   })

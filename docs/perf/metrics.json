@@ -9,7 +9,8 @@
     "Main-thread profile",
     "Stack",
     "Run log",
-    "Phone lane (CPU-throttled emulation)"
+    "Phone lane (CPU-throttled emulation)",
+    "Save size"
   ],
   "metrics": {
     "generateChunk.p1.p50Ms": {
@@ -979,6 +980,27 @@
       "group": "Phone lane (CPU-throttled emulation)",
       "better": "lower",
       "source": "npm run perf:phone (Pixel 7 Chromium, CDP CPU throttle, SwiftShader; emulation, not a device)"
+    },
+    "saveBytes.p1": {
+      "label": "Largest save file · planet 1 · bot lane",
+      "unit": "bytes",
+      "group": "Save size",
+      "better": "lower",
+      "source": "the P200 money lane (npx vitest run src/logging/moneyPastP200.lane.test.ts, npm run balance:money-p200) on its first pacing seed: the largest save file cut at a checkpoint moment on the planet, UTF-8 bytes as the shell stores it (ticket 479); deterministic, so one run gives the number. A phone browser keeps about 5 MB per origin in localStorage, mirrored to IndexedDB"
+    },
+    "saveBytes.p10": {
+      "label": "Largest save file · planet 10 · bot lane",
+      "unit": "bytes",
+      "group": "Save size",
+      "better": "lower",
+      "source": "the P200 money lane (npx vitest run src/logging/moneyPastP200.lane.test.ts, npm run balance:money-p200) on its first pacing seed: the largest save file cut at a checkpoint moment on the planet, UTF-8 bytes as the shell stores it (ticket 479); deterministic, so one run gives the number. A phone browser keeps about 5 MB per origin in localStorage, mirrored to IndexedDB"
+    },
+    "saveBytes.p200": {
+      "label": "Largest save file · planet 200 · bot lane",
+      "unit": "bytes",
+      "group": "Save size",
+      "better": "lower",
+      "source": "the P200 money lane (npx vitest run src/logging/moneyPastP200.lane.test.ts, npm run balance:money-p200) on its first pacing seed: the largest save file cut at a checkpoint moment on the planet, UTF-8 bytes as the shell stores it (ticket 479); deterministic, so one run gives the number. A phone browser keeps about 5 MB per origin in localStorage, mirrored to IndexedDB"
     }
   }
 }
