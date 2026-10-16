@@ -1,6 +1,8 @@
 import { describe, expect, it } from 'vitest'
 import {
   controlMinPixelsOf,
+  hintChipMaxHeightOf,
+  hudDensityOf,
   screenLayoutOf,
   screenStyleOf,
   orientationOf,
@@ -53,7 +55,51 @@ describe('screen layout: orientation', () => {
   it('marks the page root with the orientation the panels switch their layout on', () => {
     expect(screenAttributesOf(screenLayoutOf(phone(390, 844), false))).toEqual({
       'data-orientation': 'portrait',
+      'data-hud-density': 'compact',
     })
+  })
+})
+
+describe('screen layout: HUD density (#500)', () => {
+  it('marks the HUD compact on a finger below the 800 px short axis and full from it', () => {
+    expect(hudDensityOf(799, true)).toBe('compact')
+    expect(hudDensityOf(800, true)).toBe('full')
+    expect(hudDensityOf(820, true)).toBe('full')
+  })
+
+  it('marks the HUD compact on any pointer below a 500 px short axis', () => {
+    expect(hudDensityOf(499, false)).toBe('compact')
+    expect(hudDensityOf(500, false)).toBe('full')
+  })
+
+  it('keeps the full HUD on a 1280 x 720 desktop window with a mouse (GD ruling 5)', () => {
+    expect(screenLayoutOf(desktop(1280, 720), false).hudDensity).toBe('full')
+    expect(screenLayoutOf(desktop(1920, 1080), true).hudDensity).toBe('full')
+  })
+
+  it('lays every phone cell and the small-phone sweep out compact, either way up', () => {
+    const phones = [
+      [390, 844],
+      [412, 915],
+      [844, 390],
+      [915, 412],
+      [360, 640],
+      [320, 568],
+      [640, 360],
+    ]
+    for (const [width, height] of phones) {
+      expect(screenLayoutOf(phone(width, height), false).hudDensity).toBe('compact')
+    }
+  })
+
+  it('keeps the tablet cells full, held upright or sideways', () => {
+    expect(screenLayoutOf(phone(1180, 820), false).hudDensity).toBe('full')
+    expect(screenLayoutOf(phone(820, 1180), false).hudDensity).toBe('full')
+  })
+
+  it('caps the hint chip at 8% of the screen height', () => {
+    expect(hintChipMaxHeightOf(844)).toBeCloseTo(67.52, 2)
+    expect(hintChipMaxHeightOf(390)).toBeCloseTo(31.2, 2)
   })
 })
 
@@ -142,6 +188,7 @@ describe('screen layout: style', () => {
       '--safe-left': 'max(env(safe-area-inset-left), 0px)',
       '--control-min': '44px',
       '--shop-text': '23.76px',
+      '--hint-chip-max-height': '86.40px',
     })
   })
 

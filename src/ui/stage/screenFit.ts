@@ -1,8 +1,10 @@
 /**
  * Keeps the stage and the UI fitted to the screen (#173): lays the screen out again on every
  * resize, rotation, change of pointer and switch of TV mode, and hands the result to the shell as
- * the page root's custom properties and its `data-orientation` (ticket 483). The one writer of
- * both, so panels switch their portrait layout from this one source.
+ * the page root's custom properties, its `data-orientation` (ticket 483) and its
+ * `data-hud-density` (#500). The one writer of all three, so panels switch their portrait layout
+ * and the HUD its compact one from this one source; React reads the layout through
+ * `subscribeFittedScreen`, which a refit notifies.
  */
 import type { Shell } from '../../shell/shell'
 import { useGameStore, type GameState } from '../../store/gameStore'
@@ -14,6 +16,7 @@ import {
 } from '../../systems/views/screenLayout'
 
 let fitted: ScreenLayout | null = null
+const listeners = new Set<() => void>()
 
 export function keepScreenFitted(shell: Shell): void {
   const fit = () => fitScreen(shell)
@@ -27,10 +30,17 @@ export function readFittedScreen(): ScreenLayout | null {
   return fitted
 }
 
+/** Calls `listener` after every refit; returns the unsubscribe (`useSyncExternalStore`'s shape). */
+export function subscribeFittedScreen(listener: () => void): () => void {
+  listeners.add(listener)
+  return () => listeners.delete(listener)
+}
+
 function fitScreen(shell: Shell): void {
   fitted = screenLayoutOf(shell.readScreen(), useGameStore.getState().prefs.tvMode)
   shell.setScreenStyle(screenStyleOf(fitted))
   shell.setScreenAttributes(screenAttributesOf(fitted))
+  listeners.forEach((listener) => listener())
 }
 
 function refitOnTvModeSwitch(state: GameState, previous: GameState, fit: () => void): void {

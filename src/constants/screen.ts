@@ -41,3 +41,22 @@ export const COARSE_TARGET_PX = 56
  * 16 DOM cards and labels over the picture; many small pings go on a later batched marker layer.
  */
 export const OVERLAY_CARD_CAP = 16
+
+/**
+ * The compact HUD (GD ruling 5 on #500): on a finger, a short axis under the 800 px reference
+ * screen lays the HUD out as icon-and-number rows; on any pointer, one under 500 px does. A
+ * 1280 x 720 desktop window (short axis 720, a mouse) keeps the full HUD.
+ */
+export const HUD_COMPACT_COARSE_SHORT_AXIS_PX = UI_SCALE_REFERENCE_SHORT_AXIS_PX
+export const HUD_COMPACT_ANY_POINTER_SHORT_AXIS_PX = 500
+
+/**
+ * The compact HUD's clear-view floors (GD ruling 2 on #500): the share of the screen no HUD box
+ * and no touch button covers, 70% held upright and 65% sideways. A hint that would take the share
+ * under its floor waits in the queue.
+ */
+export const CLEAR_VIEW_FLOOR_PORTRAIT_PERCENT = 70
+export const CLEAR_VIEW_FLOOR_LANDSCAPE_PERCENT = 65
+
+/** The compact hint chip's visible box is at most 8% of the screen's height (GD ruling 4, #500). */
+export const HINT_CHIP_MAX_HEIGHT_PERCENT = 8

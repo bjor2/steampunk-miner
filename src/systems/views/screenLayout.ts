@@ -8,6 +8,9 @@
  */
 import {
   COARSE_TARGET_PX,
+  HINT_CHIP_MAX_HEIGHT_PERCENT,
+  HUD_COMPACT_ANY_POINTER_SHORT_AXIS_PX,
+  HUD_COMPACT_COARSE_SHORT_AXIS_PX,
   MIN_TARGET_PX,
   TV_MINOR_TEXT_EPX,
   TV_CONTROL_MIN_EPX,
@@ -34,10 +37,19 @@ export interface StageRect {
 /** Held upright (taller than wide) or sideways; a square window counts as sideways. */
 export type StageOrientation = 'portrait' | 'landscape'
 
+/**
+ * How the in-run HUD is laid out (GD ruling 5 on #500): `full` is the desktop HUD with its words,
+ * `compact` the phone's icon-and-number rows with each word in the box's tap card. One HUD either
+ * way; only its layout follows the screen.
+ */
+export type HudDensity = 'full' | 'compact'
+
 export interface ScreenLayout {
   stage: StageRect
   /** `data-orientation` on the root: the one source panels switch their layout on. */
   orientation: StageOrientation
+  /** `data-hud-density` on the root: the one source the HUD switches its layout on. */
+  hudDensity: HudDensity
   /** `--ui-scale`: every rem and spacing token is multiplied by it. */
   uiScale: number
   /** TV mode's overscan-safe inset of the stage, in CSS pixels; 0 with TV mode off. */
@@ -56,6 +68,7 @@ export function screenLayoutOf(screen: ScreenReading, isTvMode: boolean): Screen
   return {
     stage,
     orientation: orientationOf(screen.widthPixels, screen.heightPixels),
+    hudDensity: hudDensityOf(shortAxis, screen.isCoarsePointer),
     uiScale: uiScaleOf(shortAxis, isTvMode),
     tvSafeInset: tvSafeInsetOf(stage, isTvMode),
     controlMinPixels: controlMinPixelsOf(shortAxis, screen.isCoarsePointer, isTvMode),
@@ -74,6 +87,12 @@ export function stageRectOf(widthPixels: number, heightPixels: number): StageRec
 
 export function orientationOf(widthPixels: number, heightPixels: number): StageOrientation {
   return heightPixels > widthPixels ? 'portrait' : 'landscape'
+}
+
+/** Compact on a finger under the 800 px short axis, or on any pointer under 500 (#500). */
+export function hudDensityOf(shortAxisPixels: number, isCoarsePointer: boolean): HudDensity {
+  if (shortAxisPixels < HUD_COMPACT_ANY_POINTER_SHORT_AXIS_PX) return 'compact'
+  return isCoarsePointer && shortAxisPixels < HUD_COMPACT_COARSE_SHORT_AXIS_PX ? 'compact' : 'full'
 }
 
 /**
@@ -130,12 +149,18 @@ export function screenStyleOf(layout: ScreenLayout): Record<string, string> {
     '--control-min': `${layout.controlMinPixels}px`,
     // Hundredths of a pixel, so 17.6 x 1.35 does not reach the sheet as 23.760000000000005.
     '--shop-text': `${layout.shopTextPixels.toFixed(2)}px`,
+    '--hint-chip-max-height': `${hintChipMaxHeightOf(layout.stage.height).toFixed(2)}px`,
   }
 }
 
-/** The layout as the attributes on the page root: the orientation panels switch their layout on. */
+/** The compact hint chip's tallest visible box: 8% of the screen's height (GD ruling 4, #500). */
+export function hintChipMaxHeightOf(heightPixels: number): number {
+  return (heightPixels * HINT_CHIP_MAX_HEIGHT_PERCENT) / PERCENT
+}
+
+/** The layout as the attributes on the page root: what panels and the HUD switch layout on. */
 export function screenAttributesOf(layout: ScreenLayout): Record<string, string> {
-  return { 'data-orientation': layout.orientation }
+  return { 'data-orientation': layout.orientation, 'data-hud-density': layout.hudDensity }
 }
 
 /**
