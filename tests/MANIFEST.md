@@ -952,6 +952,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/physics/fastRigBodySpeed.lane.test.ts` | 2 | 2 |
 | `src/physics/floatingOrigin.test.ts` | 3 | 3 |
 | `src/physics/glidePassThrough.test.ts` | 4 | 4 |
+| `src/physics/levelReleaseTrace.lane.test.ts` | 2 | 2 |
 | `src/physics/liveFixedStep.test.ts` | 4 | 4 |
 | `src/physics/physicsStats.test.ts` | 3 | 3 |
 | `src/physics/strutColliders.test.ts` | 4 | 4 |

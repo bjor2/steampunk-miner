@@ -261,6 +261,16 @@ programs }` from three's `renderer.info` of the game canvas), read only when cal
   15 m/s, and the rigs reach 25 to 78 m/s only once #397 takes the floor out. A lane (about 20 s),
   so it runs only when named; it fails only when a rig has no steady cut tick or the two frame rates
   differ.
+- **Level release trace** (ticket 458, measurement only): `src/physics/levelReleaseTrace.lane.test.ts`
+  plays `cutFollowRelease.test.ts`'s level release sweep (40 phases) for the 15 m/s rig and the
+  rig-heavy one at 30 and 144 frames/s, and traces the 8 pressed ticks before letting go and the 12
+  after: commanded speed, the speed the motor set, the body's speed, gate, reach, carry, the deepest
+  contact at the body's lower front and the gap from its front to collider-solid ground just above
+  the wheel line (the face's toe). It names each followed release stopped, bounced off the toe or a
+  ramp that ran out, prints the table with the stop line on main's followed phases
+  (`MAIN_FOLLOWED_LEVEL`), and writes `balance-report/level-release-trace.ndjson`. A lane (about
+  3 min), so it runs only when named; it fails only when a sweep follows no release or the two frame
+  rates trace a phase differently.
 - **Drill-speed ladder in stored steps** (ticket 434): `src/logging/drillLadderSteps.test.ts` cuts
   the same column's first 20 cells (all band 1, the ground a 10 s hold reaches) at stored drill_power
   steps 1, 5, 10, 15 and 20, the levels of the browser drill-down run, with the law counted per step
