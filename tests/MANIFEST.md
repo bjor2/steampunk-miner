@@ -263,6 +263,12 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/ground-gun/turretPace.lane.test.ts` | 1 | 1 |
 | `src/features/ground-gun/ui/fireGauge.test.ts` | 3 | 3 |
 
+### `materials`: 1 file, 21 tests
+
+| File | Tests | Sites |
+| --- | --- | --- |
+| `src/features/materials/systems/materialTable.test.ts` | 21 | 21 |
+
 ### `mining-gates`: 23 files, 150 tests
 
 | File | Tests | Sites |

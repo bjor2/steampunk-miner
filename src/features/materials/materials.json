@@ -1,0 +1,5 @@
+{
+  "$comment": "The materials look layer of #139 (GD ruling 15 Oct 2026, ticket 444): species under the 12 ore families. A species names its family, never a gate class (#142); family ids, ore ids and prices stay. Hue slots: hue in degrees, saturation and luma in 0..1 (Rec. 601 display luma); a slot keeps out of the reserved hue bands of oreLooks.json and above the brightest host rock. gradeBand is the species' depth window, first and last band in 1..5. The rows land in later tickets (P1-P2 in 447, P3-P5 after), each passing the guards of materialTable.ts.",
+  "hueSlots": [],
+  "materials": []
+}
