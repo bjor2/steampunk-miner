@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-10-16T21:56:52+01:00",
+  "updated_at": "2026-10-16T22:05:22+01:00",
   "caps": {
     "grok": 12,
     "claude": 10,
@@ -72,7 +72,7 @@
       "size": 6,
       "used": 3,
       "free": 3,
-      "claims_last_hour": 9,
+      "claims_last_hour": 4,
       "name": "Claude Max 1"
     },
     {
@@ -699,11 +699,11 @@
     }
   ],
   "last_refill": {
-    "at": "2026-10-16 21:55 BST",
-    "mode": "pass",
-    "triggers": "#515",
-    "started": "#486->C1/A1",
-    "note": "spawned 1 worker(s)"
+    "at": "2026-10-16 22:05 BST",
+    "mode": "refill-dev",
+    "triggers": "claude-run:wave-plan",
+    "started": "",
+    "note": "load guard (MemAvailable 2478 MB < 3072 MB)"
   },
   "totals": {
     "grok": {
@@ -726,6 +726,19 @@
     "mode": "on",
     "parallel": 1,
     "list": [
+      {
+        "number": 521,
+        "key": "2D",
+        "map": 316,
+        "lane": "remote",
+        "mode": "solo",
+        "state": "ready",
+        "tickets": [
+          519
+        ],
+        "done": [],
+        "live": 0
+      },
       {
         "number": 517,
         "key": "2B",
