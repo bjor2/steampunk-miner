@@ -282,13 +282,26 @@ programs }` from three's `renderer.info` of the game canvas), read only when cal
   3600 m/s, the drill found by `subStepsPerTile` in `sweptRigFixtures.ts`), a tick count to the
   core. No 125 mm station of a faster rig's cut may be narrower than the 25 m/s rig's narrowest once
   the reach is a stamp radius past it, and the ground a tick's cut leaves must let the body's 0.9 m
-  face on at least 80% of its next step (off the start lip on both legs, every tick down the column;
-  every tick down the tilted radius is a todo on #421's hold-out). The span must equal the per-cell
+  face on at least 80% of its next step (off the start lip, every tick down the column and the
+  tilted radius since ticket 421 releases the carry's cell). The span must equal the per-cell
   walk from the fresh tick, refused rim and centre cells are reported once, no faster rig opens fewer
   cells or less work a metre than the 44 m/s one, and at most 1.20x the cells and 1.30x the work: a
   regression ratchet that #441's band replaces. `src/physics/sweptFreshCarveLoop.test.ts` plays
   stored rigs 370/600, 450/600 and 2000/600 off the pad and down at 30 and 144 frames/s: never more
   than 6 straight cutting ticks at 0 m/s, at least 50 m down, one path for both rates (about 20 s).
+- **Carry release** (ticket 421): `src/systems/authority/carryRelease.test.ts` holds the carry's
+  cell out of the stamp until one of its samples lies in the body's next-step slab
+  (`CARRY_RELEASE_MARGIN_SAMPLES`), then wants it carved, priced again after the stamp's bite and
+  paid on the tick the walk meets it, the surplus discarded: a table of gated cells (charge, rig,
+  tip lock, core) answers as when held, no tick pays more than its carry plus its work, a carry
+  toward a cell the carve reported gated is discarded, and the released cell yields in walk order
+  (about 2 s). `vehicle/carryWalk.test.ts` checks the release on the pure walk (one released cell a
+  tick, never past a stop, runs equal to the per-cell walk). `src/physics/cutSmoothness.test.ts`
+  judges down, level and up legs per rig against its own commanded speed at 30 and 144 frames/s:
+  no backward tick, none under 80% and at most 2% of ticks more than 5% off (the interim bar; the
+  stale-halo lines are todos on #459). `cutFollowRelease.test.ts` pairs the 15 m/s rig's level
+  release phases main followed (`MAIN_FOLLOWED_LEVEL`) and wants their backward ticks no deeper and
+  no larger in sum than main's.
 - **Known red** (ticket 419, the TD on #396 section 2): `CAMPAIGN_PACING_KNOWN_RED`
   (`src/constants/knownRed.ts`) is the one known-red marker in the repo: one gate
   (`campaignPacingGate`), one finding (#417), no registry. The gate still runs in full;

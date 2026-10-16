@@ -658,6 +658,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/authority/bore/groundGun.test.ts` | 33 | 33 |
 | `src/systems/authority/bore/shotShape.test.ts` | 14 | 14 |
 | `src/systems/authority/builtFacilities.test.ts` | 6 | 6 |
+| `src/systems/authority/carryRelease.test.ts` | 18 | 13 |
 | `src/systems/authority/casingDrill.test.ts` | 5 | 5 |
 | `src/systems/authority/casingGnaw.test.ts` | 4 | 4 |
 | `src/systems/authority/casingPlacement.test.ts` | 15 | 15 |
@@ -734,7 +735,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/authority/stateDigest.test.ts` | 17 | 12 |
 | `src/systems/authority/sweptCarry.test.ts` | 8 | 6 |
 | `src/systems/authority/sweptCutAtSpeed.test.ts` | 8 | 8 |
-| `src/systems/authority/sweptFreshCarve.test.ts` | 40 | 17 |
+| `src/systems/authority/sweptFreshCarve.test.ts` | 47 | 16 |
 | `src/systems/authority/sweptGateSpeeds.test.ts` | 24 | 2 |
 | `src/systems/authority/sweptSpanDrill.test.ts` | 17 | 13 |
 | `src/systems/authority/teleportDebugRules.test.ts` | 5 | 5 |
@@ -941,11 +942,11 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 
 | File | Tests | Sites |
 | --- | --- | --- |
-| `src/physics/cutFollow.test.ts` | 5 | 4 |
+| `src/physics/cutFollow.test.ts` | 5 | 3 |
 | `src/physics/cutFollowBite.test.ts` | 3 | 2 |
-| `src/physics/cutFollowRelease.test.ts` | 15 | 4 |
+| `src/physics/cutFollowRelease.test.ts` | 18 | 5 |
 | `src/physics/cutFollowStartingRigs.test.ts` | 16 | 5 |
-| `src/physics/cutSmoothness.test.ts` | 3 | 5 |
+| `src/physics/cutSmoothness.test.ts` | 10 | 6 |
 | `src/physics/cutStartLatency.lane.test.ts` | 3 | 3 |
 | `src/physics/drillEngagement.test.ts` | 6 | 6 |
 | `src/physics/fastRigBodySpeed.lane.test.ts` | 2 | 2 |
@@ -1297,7 +1298,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/vehicle/aheadBearingLatch.test.ts` | 11 | 11 |
 | `src/systems/vehicle/bandDig.test.ts` | 5 | 5 |
 | `src/systems/vehicle/bodySpeedDips.test.ts` | 6 | 6 |
-| `src/systems/vehicle/carryWalk.test.ts` | 34 | 13 |
+| `src/systems/vehicle/carryWalk.test.ts` | 48 | 20 |
 | `src/systems/vehicle/casingTrail.test.ts` | 16 | 12 |
 | `src/systems/vehicle/chargeSelection.test.ts` | 4 | 4 |
 | `src/systems/vehicle/colliderHalo.test.ts` | 3 | 3 |
