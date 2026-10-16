@@ -8,6 +8,7 @@ import {
   heldChangesOf,
   isDoubleTap,
   isSlotHeldForCard,
+  isPauseButtonShown,
   isStickShown,
   pinchZoomStepsOf,
   stickActionsOf,
@@ -50,6 +51,14 @@ describe('touch stick (#173)', () => {
     expect(isStickShown('vehicle')).toBe(true)
     expect(isStickShown('platform')).toBe(false)
     expect(isStickShown('settings')).toBe(false)
+  })
+})
+
+describe('touch pause button (ticket 472)', () => {
+  it('shows only while the vehicle has the input, where the docked screen has its own', () => {
+    expect(isPauseButtonShown('vehicle')).toBe(true)
+    expect(isPauseButtonShown('platform')).toBe(false)
+    expect(isPauseButtonShown('pause')).toBe(false)
   })
 })
 

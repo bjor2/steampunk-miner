@@ -17,6 +17,7 @@ import {
   buttonIconIdOf,
   combatStatusIconIdOf,
   hudLabelIconIdOf,
+  panelIconIdOf,
   vehicleStateIconIdOf,
 } from '../art/icons/iconSet'
 import type { VehicleMode } from '../vehicle/vehicleState'
@@ -33,6 +34,15 @@ export const CLUSTER_ACTION_IDS = [
 ] as const satisfies readonly ActionId[]
 
 export type ClusterActionId = (typeof CLUSTER_ACTION_IDS)[number]
+
+/**
+ * The pause button's action (#470 P1-1, ticket 472): the pause menu Escape and Start open
+ * (ticket 404, the action the plan called `open_settings`), which holds the step while open.
+ */
+export const PAUSE_ACTION_ID = 'open_pause_menu' satisfies ActionId
+
+/** The pause button's glyph: the settings gear the panels already draw (no text, #173). */
+export const PAUSE_ICON_ID = panelIconIdOf('settings')
 
 /** The power-up slots' actions, slot 1 first (#162 section 3, #217). */
 export const SLOT_ACTION_IDS = [
@@ -107,6 +117,11 @@ export function knobOffsetOf({ dx, dy }: StickOffset): StickOffset {
 
 /** The floating stick is there to drive, so it shows only while the vehicle has the input. */
 export function isStickShown(layer: InputContext): boolean {
+  return layer === 'vehicle'
+}
+
+/** The pause button is there to stop a dive, so it shows only while the vehicle has the input. */
+export function isPauseButtonShown(layer: InputContext): boolean {
   return layer === 'vehicle'
 }
 

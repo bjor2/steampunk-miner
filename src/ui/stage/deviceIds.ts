@@ -10,6 +10,7 @@ export const DEVICE_UI_IDS = {
   touchStickZone: 'touch-stick-zone',
   touchStick: 'touch-stick',
   touchCluster: 'touch-cluster',
+  touchPause: 'touch-pause',
 } as const
 
 /** One button of the touch cluster, named for the action it presses. */

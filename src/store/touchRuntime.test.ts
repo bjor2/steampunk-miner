@@ -5,8 +5,10 @@ import type { SliceDefinition } from '../registries/sliceDefinition'
 import { createRunLog, installRunLog, uninstallRunLog } from '../logging/runLog'
 import type { AuthorityCommand } from '../systems/authority/authorityCommand'
 import type { Authority } from '../systems/authority/loopbackAuthority'
+import { PAUSE_ACTION_ID } from '../systems/input/touchControls'
 import { createStartingAuthority, resetGameStore, useGameStore } from './gameStore'
 import { readActionStream, readVehicleIntent, resetInput, routeKeyChange } from './inputRuntime'
+import { isLiveStepHeld } from './liveStepSlice'
 import {
   cancelSlotButton,
   holdSlotButton,
@@ -143,6 +145,32 @@ describe('touch controls (#173)', () => {
       leaveScreen(1)
     })
     expect(game().prefs.viewShortAxisMetres).toBe(12)
+  })
+})
+
+describe('touch controls: pause button (ticket 472)', () => {
+  const tapPause = () => {
+    pressTouchButton(PAUSE_ACTION_ID)
+    releaseTouchButton(PAUSE_ACTION_ID)
+  }
+  const pressEscape = () => {
+    routeKeyChange(key('Escape', true))
+    routeKeyChange(key('Escape', false))
+  }
+
+  it('opens the pause menu and holds the step, as Escape does, on the same action stream', () => {
+    const onKeys = runFresh(pressEscape)
+    const onTouch = runFresh(tapPause)
+    expect(onTouch).toEqual(onKeys)
+    expect(onTouch.stream).toEqual([{ actionId: 'open_pause_menu', isDown: true }])
+    expect(game().pauseMenu).not.toBeNull()
+    expect(isLiveStepHeld(game())).toBe(true)
+  })
+
+  it('lets the step run again once the pause menu closes', () => {
+    runFresh(tapPause)
+    game().closePauseMenu()
+    expect(isLiveStepHeld(game())).toBe(false)
   })
 })
 

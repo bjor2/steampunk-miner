@@ -3,6 +3,8 @@
  * acceptance points): sizes and clearances, the stick and the keys pressing the same action
  * stream, the cluster following the situation, the left-handed mirror, and the keyboard hiding
  * them until the next touch. Every screen is reached by taps alone. Driven by real touch events.
+ * Ticket 472 (#470 P1-1): the pause button while diving, the hold while the page is hidden, and
+ * the controls inside a notched safe area.
  */
 import { expect, test, type Page } from '@playwright/test'
 import type { ActionEdge } from '../../../src/store/inputRuntime'
@@ -12,6 +14,10 @@ const INTERACT_PX = 72
 const CLUSTER_PX = 56
 /** At least this much between two hit boxes (G&V layout). */
 const CLUSTER_GAP_PX = 8
+/** Software GL draws a frame in a few hundred ms, so a held step gets several frames to slip. */
+const HELD_STEP_WAIT_MS = 1_000
+/** A landscape phone's notch on the stick's side (the TD's 844x390 case on #470). */
+const LEFT_NOTCH_PX = 47
 
 test.beforeEach(() => {
   const cell = currentCell()
@@ -119,6 +125,89 @@ test.describe('screen matrix: touch controls (#173)', () => {
     expect(errors).toEqual([])
   })
 })
+
+test.describe('screen matrix: touch pause (ticket 472)', () => {
+  test('shows a pause button on the top edge, inside the safe area and clear of the HUD', async ({
+    page,
+  }) => {
+    const errors = await openGame(page, currentCell())
+    const pause = await boxOf(page, 'touch-open_pause_menu')
+    expect(isInside(pause, await boxOf(page, 'safe-area'))).toBe(true)
+    expect(pause.top).toBeLessThan(currentCell().viewport.height / 4)
+    for (const panel of await hudPanelBoxes(page)) expect(overlaps(pause, panel)).toBe(false)
+    expect(overlaps(pause, await boxOf(page, 'touch-cluster'))).toBe(false)
+    expect(errors).toEqual([])
+  })
+
+  test('holds the step while the pause menu is open and resumes on closing it, as Escape does', async ({
+    page,
+  }) => {
+    const errors = await openGame(page, currentCell())
+    const before = (await actionStream(page)).length
+    await page.getByTestId('touch-open_pause_menu').tap()
+    await expect(page.getByTestId('pause-menu')).toBeVisible()
+    const held = await tickNow(page)
+    await page.waitForTimeout(HELD_STEP_WAIT_MS)
+    expect(await tickNow(page)).toBe(held)
+    await page.getByTestId('pause-resume').tap()
+    await expect(page.getByTestId('pause-menu')).toHaveCount(0)
+    await expect.poll(() => tickNow(page)).toBeGreaterThan(held)
+    const middle = (await actionStream(page)).length
+    await page.keyboard.press('Escape')
+    await expect(page.getByTestId('pause-menu')).toBeVisible()
+    const stream = await actionStream(page)
+    expect(stream.slice(before, middle)).toEqual([{ actionId: 'open_pause_menu', isDown: true }])
+    expect(stream.slice(middle)).toEqual(stream.slice(before, middle))
+    expect(errors).toEqual([])
+  })
+
+  test('holds the step while the page is hidden and resumes on the next tap', async ({ page }) => {
+    const errors = await openGame(page, currentCell())
+    await expect.poll(() => tickNow(page)).toBeGreaterThan(0)
+    await hidePageAndComeBack(page)
+    const held = await tickNow(page)
+    await page.waitForTimeout(HELD_STEP_WAIT_MS)
+    expect(await tickNow(page)).toBe(held)
+    await page.touchscreen.tap(currentCell().viewport.width / 2, 40)
+    await expect.poll(() => tickNow(page)).toBeGreaterThan(held)
+    expect(errors).toEqual([])
+  })
+
+  test('keeps the stick zone and Interact inside a left notch', async ({ page }) => {
+    const errors = await openGame(page, currentCell())
+    // Chromium has no notch to emulate, so the safe area is moved as env(safe-area-inset-left) would.
+    await page.addStyleTag({
+      content: `[data-testid="safe-area"] { left: ${LEFT_NOTCH_PX}px !important; }`,
+    })
+    const safeArea = await boxOf(page, 'safe-area')
+    expect(safeArea.left).toBeCloseTo(LEFT_NOTCH_PX, 0)
+    expect(isInside(await boxOf(page, 'touch-stick-zone'), safeArea)).toBe(true)
+    expect(isInside(await boxOf(page, 'touch-interact'), safeArea)).toBe(true)
+    expect(isInside(await boxOf(page, 'touch-open_pause_menu'), safeArea)).toBe(true)
+    expect(errors).toEqual([])
+  })
+})
+
+function tickNow(page: Page): Promise<number> {
+  return page.evaluate(() => {
+    const result = window.steampunkDebug!.snapshot()
+    if (!result.ok) throw new Error(result.problems.join('; '))
+    return result.snapshot.tick
+  })
+}
+
+/** The page reports hidden, as an app switch does, then visible again; nothing is tapped yet. */
+function hidePageAndComeBack(page: Page): Promise<void> {
+  return page.evaluate(() => {
+    const reportVisibility = (state: DocumentVisibilityState) => {
+      Object.defineProperty(document, 'visibilityState', { value: state, configurable: true })
+      document.dispatchEvent(new Event('visibilitychange'))
+    }
+    reportVisibility('hidden')
+    reportVisibility('visible')
+    Reflect.deleteProperty(document, 'visibilityState')
+  })
+}
 
 function clusterIds(page: Page): Promise<string[]> {
   return page

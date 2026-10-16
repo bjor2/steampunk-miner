@@ -56,6 +56,23 @@
   transform: translate(var(--knob-x, 0px), var(--knob-y, 0px));
 }
 
+/*
+ * The pause button (ticket 472): 44 px on the top edge, in the gap between the centred banner and
+ * the position panel, clear of both thumbs and of the HUD.
+ */
+.pause {
+  position: absolute;
+  top: var(--space-3);
+  right: 30%;
+  pointer-events: none;
+}
+
+.pause .button {
+  width: 44px;
+  height: 44px;
+  font-size: 1.2rem;
+}
+
 .cluster {
   position: absolute;
   right: var(--space-3);
