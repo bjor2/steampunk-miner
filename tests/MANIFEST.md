@@ -951,24 +951,25 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | --- | --- | --- |
 | `src/physics/cutFollow.test.ts` | 5 | 3 |
 | `src/physics/cutFollowBite.test.ts` | 3 | 2 |
-| `src/physics/cutFollowRelease.test.ts` | 18 | 5 |
+| `src/physics/cutFollowRelease.test.ts` | 16 | 9 |
 | `src/physics/cutFollowStartingRigs.test.ts` | 19 | 5 |
 | `src/physics/cutSmoothness.test.ts` | 13 | 7 |
 | `src/physics/cutStartLatency.lane.test.ts` | 3 | 3 |
 | `src/physics/drillEngagement.test.ts` | 6 | 6 |
 | `src/physics/fastLegContactTrace.lane.test.ts` | 2 | 2 |
-| `src/physics/fastRigBodySpeed.lane.test.ts` | 2 | 2 |
+| `src/physics/fastRigBodySpeed.lane.test.ts` | 5 | 5 |
 | `src/physics/floatingOrigin.test.ts` | 3 | 3 |
 | `src/physics/glidePassThrough.test.ts` | 4 | 4 |
 | `src/physics/levelReleaseTrace.lane.test.ts` | 2 | 2 |
 | `src/physics/liveFixedStep.test.ts` | 7 | 7 |
 | `src/physics/physicsStats.test.ts` | 3 | 3 |
+| `src/physics/postCutHalo.test.ts` | 9 | 3 |
 | `src/physics/storedLevelReleaseTrace.lane.test.ts` | 2 | 2 |
 | `src/physics/strutColliders.test.ts` | 4 | 4 |
 | `src/physics/sweptCutPace.test.ts` | 5 | 2 |
 | `src/physics/sweptFreshCarveLoop.test.ts` | 3 | 3 |
 | `src/physics/tunnelling.test.ts` | 10 | 2 |
-| `src/physics/vehicleLoop.test.ts` | 6 | 6 |
+| `src/physics/vehicleLoop.test.ts` | 8 | 8 |
 | `src/physics/vehiclePhysics.test.ts` | 8 | 2 |
 
 ### `registries`
