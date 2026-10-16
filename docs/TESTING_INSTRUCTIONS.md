@@ -242,8 +242,9 @@ programs }` from three's `renderer.info` of the game canvas), read only when cal
   tier. The table and how to read it are in [docs/economy/drill-ladder.md](economy/drill-ladder.md).
 - **Cut start latency** (ticket 433, measurement only): `src/physics/cutStartLatency.lane.test.ts`
   starts a down cut from rest in the live loop with `drill.sweptCut` on (from the planet 1 surface,
-  turning the head from left, and again mid-shaft), at stored drill_power 1, 10 and 20 and #400's
-  two rigs, at 30 and 144 frames/s. It prints where the ticks go until the body follows the drill
+  turning the head from left, and again mid-shaft), at stored drill_power 1, 10 and 20, #400's rig
+  1 and #397's 15 m/s rig (rig 2 cuts at 3600 m/s since #397 and leaves no rest start mid-shaft),
+  at 30 and 144 frames/s. It prints where the ticks go until the body follows the drill
   (swivel, stale facing, first cell, held, second stall: `systems/vehicle/cutStartBreakdown.ts`)
   and the stale facing for each pose report phase, and writes them to
   `balance-report/cut-start-latency.ndjson`. A lane (about 40 s), so it runs only when named; it

@@ -35,19 +35,24 @@ import {
 
 // Cut start latency from rest (ticket 433, measurement only, from the TD's shape on #430): where
 // the ticks go from pressing down into ground until the body follows the drill, at the starting
-// drill (stored drill_power 1, 10 and 20, tip 0) and #400's two fast rigs, at 30 and 144 frames/s,
+// drill (stored drill_power 1, 10 and 20, tip 0) and two fast rigs, at 30 and 144 frames/s,
 // in the live fixed-step loop with `drill.sweptCut` on. Two starts: from the planet 1 surface
 // beside the pad (the head turns from left to down), and again mid-shaft after a second's rest
 // (the head already faces down). A lane: it runs only when named, prints the table and writes it
 // to balance-report/cut-start-latency.ndjson for comparing runs across commits. The breakdown is
 // `systems/vehicle/cutStartBreakdown.ts`.
+//
+// The fast rigs are #400's rig 1 and the 15 m/s rig #397 put in the place of #400's rig 2 (the old
+// 4-tick floor's pace). Since #397 took the floor out, rig 2 cuts at 3600 m/s: its surface leg's
+// reach clears the bore through P1's centre ahead of the body, so its mid-shaft press starts in
+// open bore and there is no start from rest left to measure.
 
 const RIGS: Readonly<Record<string, Record<string, number>>> = {
   'stored 1': { drill_power: 1, drill_tip: 0 },
   'stored 10': { drill_power: 10, drill_tip: 0 },
   'stored 20': { drill_power: 20, drill_tip: 0 },
   'rig 1 (#400)': { drill_power: 300, drill_tip: 200 },
-  'rig 2 (#400)': { drill_power: 2000, drill_tip: 600, engine: 5000 },
+  '15 m/s rig': { drill_power: 200, drill_tip: 600, engine: 5000 },
 }
 const FRAME_RATES = [30, 144]
 const LEGS = ['surface', 'mid-shaft'] as const
