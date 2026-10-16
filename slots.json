@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-10-16T07:42:13+02:00",
+  "updated_at": "2026-10-16T07:59:07+02:00",
   "caps": {
     "grok": 12,
     "claude": 10,
@@ -20,55 +20,55 @@
         {
           "slot": "C1",
           "state": "busy",
-          "ticket": null,
-          "grok_slot": null,
-          "kind": "aux",
-          "since": "2026-10-16T07:35:00+02:00",
-          "label": "wave-plan 302"
+          "ticket": 472,
+          "grok_slot": 1,
+          "kind": "dev",
+          "since": "2026-10-16T07:59:00+02:00",
+          "wave": null
         },
         {
           "slot": "C2",
           "state": "busy",
-          "ticket": 465,
+          "ticket": 473,
           "grok_slot": 2,
           "kind": "dev",
-          "since": "2026-10-16T07:03:00+02:00",
-          "wave": "3G"
+          "since": "2026-10-16T07:59:00+02:00",
+          "wave": null
         },
         {
           "slot": "C3",
+          "state": "busy",
+          "ticket": 474,
+          "grok_slot": 4,
+          "kind": "dev",
+          "since": "2026-10-16T07:59:00+02:00",
+          "wave": null
+        },
+        {
+          "slot": "C4",
+          "state": "busy",
+          "ticket": 475,
+          "grok_slot": 5,
+          "kind": "dev",
+          "since": "2026-10-16T07:59:00+02:00",
+          "wave": null
+        },
+        {
+          "slot": "C5",
+          "state": "busy",
+          "ticket": 476,
+          "grok_slot": 6,
+          "kind": "dev",
+          "since": "2026-10-16T07:59:00+02:00",
+          "wave": null
+        },
+        {
+          "slot": "C6",
           "state": "free",
           "ticket": null,
           "grok_slot": null,
           "kind": null,
           "since": null
-        },
-        {
-          "slot": "C4",
-          "state": "busy",
-          "ticket": 430,
-          "grok_slot": 6,
-          "kind": "dev",
-          "since": "2026-10-16T07:28:00+02:00",
-          "wave": "3A"
-        },
-        {
-          "slot": "C5",
-          "state": "busy",
-          "ticket": 440,
-          "grok_slot": 1,
-          "kind": "dev",
-          "since": "2026-10-16T07:40:00+02:00",
-          "wave": "3G"
-        },
-        {
-          "slot": "C6",
-          "state": "busy",
-          "ticket": 459,
-          "grok_slot": 5,
-          "kind": "dev",
-          "since": "2026-10-16T07:40:00+02:00",
-          "wave": "3E"
         }
       ],
       "size": 6,
@@ -615,18 +615,18 @@
     {
       "slot": 1,
       "state": "dev",
-      "ticket": 440,
-      "since": "2026-10-16T07:40:00+02:00",
-      "claude_slot": 5,
-      "wave": "3G"
+      "ticket": 472,
+      "since": "2026-10-16T07:59:00+02:00",
+      "claude_slot": 1,
+      "wave": null
     },
     {
       "slot": 2,
       "state": "dev",
-      "ticket": 465,
-      "since": "2026-10-16T07:03:00+02:00",
+      "ticket": 473,
+      "since": "2026-10-16T07:59:00+02:00",
       "claude_slot": 2,
-      "wave": "3G"
+      "wave": null
     },
     {
       "slot": 3,
@@ -640,25 +640,27 @@
     },
     {
       "slot": 4,
-      "state": "free",
-      "ticket": null,
-      "since": null
+      "state": "dev",
+      "ticket": 474,
+      "since": "2026-10-16T07:59:00+02:00",
+      "claude_slot": 3,
+      "wave": null
     },
     {
       "slot": 5,
       "state": "dev",
-      "ticket": 459,
-      "since": "2026-10-16T07:40:00+02:00",
-      "claude_slot": 6,
-      "wave": "3E"
+      "ticket": 475,
+      "since": "2026-10-16T07:59:00+02:00",
+      "claude_slot": 4,
+      "wave": null
     },
     {
       "slot": 6,
       "state": "dev",
-      "ticket": 430,
-      "since": "2026-10-16T07:28:00+02:00",
-      "claude_slot": 4,
-      "wave": "3A"
+      "ticket": 476,
+      "since": "2026-10-16T07:59:00+02:00",
+      "claude_slot": 5,
+      "wave": null
     },
     {
       "slot": 7,
@@ -701,56 +703,55 @@
     {
       "slot": 1,
       "state": "busy",
-      "ticket": null,
-      "grok_slot": null,
-      "since": "2026-10-16T07:35:00+02:00",
-      "kind": "aux",
-      "label": "wave-plan 302",
-      "account": 1
+      "ticket": 472,
+      "grok_slot": 1,
+      "since": "2026-10-16T07:59:00+02:00",
+      "account": 1,
+      "wave": null
     },
     {
       "slot": 2,
       "state": "busy",
-      "ticket": 465,
+      "ticket": 473,
       "grok_slot": 2,
-      "since": "2026-10-16T07:03:00+02:00",
+      "since": "2026-10-16T07:59:00+02:00",
       "account": 1,
-      "wave": "3G"
+      "wave": null
     },
     {
       "slot": 3,
+      "state": "busy",
+      "ticket": 474,
+      "grok_slot": 4,
+      "since": "2026-10-16T07:59:00+02:00",
+      "account": 1,
+      "wave": null
+    },
+    {
+      "slot": 4,
+      "state": "busy",
+      "ticket": 475,
+      "grok_slot": 5,
+      "since": "2026-10-16T07:59:00+02:00",
+      "account": 1,
+      "wave": null
+    },
+    {
+      "slot": 5,
+      "state": "busy",
+      "ticket": 476,
+      "grok_slot": 6,
+      "since": "2026-10-16T07:59:00+02:00",
+      "account": 1,
+      "wave": null
+    },
+    {
+      "slot": 6,
       "state": "free",
       "ticket": null,
       "grok_slot": null,
       "since": null,
       "account": 1
-    },
-    {
-      "slot": 4,
-      "state": "busy",
-      "ticket": 430,
-      "grok_slot": 6,
-      "since": "2026-10-16T07:28:00+02:00",
-      "account": 1,
-      "wave": "3A"
-    },
-    {
-      "slot": 5,
-      "state": "busy",
-      "ticket": 440,
-      "grok_slot": 1,
-      "since": "2026-10-16T07:40:00+02:00",
-      "account": 1,
-      "wave": "3G"
-    },
-    {
-      "slot": 6,
-      "state": "busy",
-      "ticket": 459,
-      "grok_slot": 5,
-      "since": "2026-10-16T07:40:00+02:00",
-      "account": 1,
-      "wave": "3E"
     },
     {
       "slot": 7,
@@ -790,17 +791,17 @@
     }
   ],
   "last_refill": {
-    "at": "2026-10-16 07:40 CEST",
-    "mode": "refill-dev",
-    "triggers": "#433",
-    "started": "#440->C5/A1 #459->C6/A1",
-    "note": "spawned 2 worker(s)"
+    "at": "2026-10-16 07:59 CEST",
+    "mode": "recheck",
+    "triggers": "#459",
+    "started": "#472->C1/A1 #473->C2/A1 #474->C3/A1 #475->C4/A1 #476->C5/A1",
+    "note": "spawned 5 worker(s)"
   },
   "totals": {
     "grok": {
       "size": 12,
-      "used": 5,
-      "dev": 4,
+      "used": 6,
+      "dev": 5,
       "dev_cap": 8,
       "planner": 1,
       "planner_cap": 4
@@ -865,13 +866,13 @@
         "map": 302,
         "lane": "remote",
         "mode": "solo",
-        "state": "running",
+        "state": "ready",
         "tickets": [
           430,
           397
         ],
         "done": [],
-        "live": 1
+        "live": 0
       },
       {
         "number": 462,
@@ -879,12 +880,12 @@
         "map": 302,
         "lane": "remote",
         "mode": "solo",
-        "state": "running",
+        "state": "ready",
         "tickets": [
           459
         ],
         "done": [],
-        "live": 1
+        "live": 0
       },
       {
         "number": 461,
@@ -940,7 +941,7 @@
           470
         ],
         "done": [],
-        "live": 2
+        "live": 0
       }
     ]
   }
