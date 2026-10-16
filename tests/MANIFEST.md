@@ -658,7 +658,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/authority/bore/groundGun.test.ts` | 33 | 33 |
 | `src/systems/authority/bore/shotShape.test.ts` | 14 | 14 |
 | `src/systems/authority/builtFacilities.test.ts` | 6 | 6 |
-| `src/systems/authority/carryRelease.test.ts` | 18 | 13 |
+| `src/systems/authority/carryRelease.test.ts` | 22 | 13 |
 | `src/systems/authority/casingDrill.test.ts` | 5 | 5 |
 | `src/systems/authority/casingGnaw.test.ts` | 4 | 4 |
 | `src/systems/authority/casingPlacement.test.ts` | 15 | 15 |
@@ -945,8 +945,8 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/physics/cutFollow.test.ts` | 5 | 3 |
 | `src/physics/cutFollowBite.test.ts` | 3 | 2 |
 | `src/physics/cutFollowRelease.test.ts` | 18 | 5 |
-| `src/physics/cutFollowStartingRigs.test.ts` | 16 | 5 |
-| `src/physics/cutSmoothness.test.ts` | 10 | 6 |
+| `src/physics/cutFollowStartingRigs.test.ts` | 19 | 5 |
+| `src/physics/cutSmoothness.test.ts` | 13 | 7 |
 | `src/physics/cutStartLatency.lane.test.ts` | 3 | 3 |
 | `src/physics/drillEngagement.test.ts` | 6 | 6 |
 | `src/physics/fastRigBodySpeed.lane.test.ts` | 2 | 2 |

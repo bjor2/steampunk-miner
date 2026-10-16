@@ -273,7 +273,9 @@ programs }` from three's `renderer.info` of the game canvas), read only when cal
   drill_power 1, 10 and 20 (tip 0) and #400's two rigs, and holds a down cut to the drill's speed
   (95% of the ticks within 5%, none under 80% or backward) past its start from rest (#433's first
   cell, held and second stall), up and level to main's shares (79%, 42%), the motor gate to the
-  authority's and 30 and 144 frames/s to one path (about 40 s). The commanded speed is the open
+  authority's and 30 and 144 frames/s to one path (about 40 s). Since ticket 432 an up cut holds
+  every tick past its start within 5%, none backward, at 30 and 144 frames/s, up to the last tick
+  the authority's gate stood open (the body then breaks out of the ground and travels). The commanded speed is the open
   gate's `vCut`, carried through a shut gate and a cleared slab. `src/physics/cutFollowRelease.test.ts`
   lets go of a followed cut at every tick of a cell's cycle (a fresh rig a phase) and wants the body
   stopped within 6 ticks (about 5 minutes). Both share the rig of `src/physics/cutFollowFixtures.ts`.
@@ -299,7 +301,9 @@ programs }` from three's `renderer.info` of the game canvas), read only when cal
   tick, never past a stop, runs equal to the per-cell walk). `src/physics/cutSmoothness.test.ts`
   judges down, level and up legs per rig against its own commanded speed at 30 and 144 frames/s:
   no backward tick, none under 80% and at most 2% of ticks more than 5% off (the interim bar; the
-  stale-halo lines are todos on #459). `cutFollowRelease.test.ts` pairs the 15 m/s rig's level
+  stale-halo lines are todos on #459), and holds the up legs (15 m/s, rig-heavy and 44 m/s) to
+  #397's strict line on every ramped-up tick (ticket 432; the paid-not-free specs run an up leg
+  too). `cutFollowRelease.test.ts` pairs the 15 m/s rig's level
   release phases main followed (`MAIN_FOLLOWED_LEVEL`) and wants their backward ticks no deeper and
   no larger in sum than main's.
 - **Known red** (ticket 419, the TD on #396 section 2): `CAMPAIGN_PACING_KNOWN_RED`
