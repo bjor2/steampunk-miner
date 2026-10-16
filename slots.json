@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-10-16T12:13:43+01:00",
+  "updated_at": "2026-10-16T12:15:30+01:00",
   "caps": {
     "grok": 12,
     "claude": 10,
@@ -19,12 +19,11 @@
       "slots": [
         {
           "slot": "C1",
-          "state": "busy",
-          "ticket": 491,
-          "grok_slot": 1,
-          "kind": "dev",
-          "since": "2026-10-16T12:04:00+01:00",
-          "wave": "3D"
+          "state": "free",
+          "ticket": null,
+          "grok_slot": null,
+          "kind": null,
+          "since": null
         },
         {
           "slot": "C2",
@@ -68,8 +67,8 @@
         }
       ],
       "size": 6,
-      "used": 1,
-      "free": 5,
+      "used": 0,
+      "free": 6,
       "claims_last_hour": 4,
       "name": "Claude Max 1"
     },
@@ -126,33 +125,18 @@
   },
   "tester": {
     "state": "running",
-    "phase": "slow",
-    "sha": "ec5ce8046734571d4f6173f24cfbf5c471169aa8",
-    "since": "2026-10-16T10:10:42Z",
+    "phase": "fast",
+    "sha": "f08434d362200e809492969090f2b0ec4080b0d8",
+    "since": "2026-10-16T11:15:26Z",
     "holds_gate": true,
     "claude_slot": null,
     "last_run": "2026-10-16T10:10:40Z",
     "last_nightly": "2026-10-15T20:43:15Z",
     "last_nightly_result": "full=FAIL balance-report=ok bench=FAIL balance-planets=ok balance-guns=ok balance-charges=ok balance-refinery=ok balance-heat=ok e2e=FAIL memory-soak=FAIL packaged-smoke=ok ",
     "main_red_sha": null,
-    "feature": 354,
-    "feature_title": "Fix red main: magnetic planet pace still over GD bounds after #353 (P28/P32)",
+    "feature": 258,
+    "feature_title": "Spec: Magnetic planet",
     "queue": [
-      {
-        "feature": 258,
-        "kind": "spec",
-        "title": "Spec: Magnetic planet",
-        "tickets": [
-          289,
-          290,
-          291,
-          292,
-          293,
-          294,
-          343
-        ],
-        "since": "2026-10-14T04:07:09+02:00"
-      },
       {
         "feature": 71,
         "kind": "spec",
@@ -601,11 +585,9 @@
   "grok": [
     {
       "slot": 1,
-      "state": "dev",
-      "ticket": 491,
-      "since": "2026-10-16T12:04:00+01:00",
-      "claude_slot": 1,
-      "wave": "3D"
+      "state": "free",
+      "ticket": null,
+      "since": null
     },
     {
       "slot": 2,
@@ -681,12 +663,11 @@
   "claude": [
     {
       "slot": 1,
-      "state": "busy",
-      "ticket": 491,
-      "grok_slot": 1,
-      "since": "2026-10-16T12:04:00+01:00",
-      "account": 1,
-      "wave": "3D"
+      "state": "free",
+      "ticket": null,
+      "grok_slot": null,
+      "since": null,
+      "account": 1
     },
     {
       "slot": 2,
@@ -775,8 +756,8 @@
   "totals": {
     "grok": {
       "size": 12,
-      "used": 2,
-      "dev": 1,
+      "used": 1,
+      "dev": 0,
       "dev_cap": 8,
       "planner": 1,
       "planner_cap": 4
@@ -784,8 +765,8 @@
     "claude": {
       "size": 10,
       "enabled": 6,
-      "used": 1,
-      "free": 5,
+      "used": 0,
+      "free": 6,
       "external": 0
     }
   },
@@ -892,7 +873,7 @@
           492
         ],
         "done": [],
-        "live": 1
+        "live": 0
       },
       {
         "number": 461,
