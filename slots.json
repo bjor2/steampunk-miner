@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-10-16T21:56:24+01:00",
+  "updated_at": "2026-10-16T21:56:52+01:00",
   "caps": {
     "grok": 12,
     "claude": 10,
@@ -123,42 +123,23 @@
     }
   ],
   "gate": {
-    "busy": 0,
+    "busy": 1,
     "max": 3
   },
   "tester": {
     "state": "running",
-    "phase": "probes",
-    "sha": "3f9512e8683d97df819402d82000f08c9dde1da4",
-    "since": "2026-10-16T19:32:53Z",
+    "phase": "fast",
+    "sha": "146ac486faeae77b3a49a4963150a542728f1d9b",
+    "since": "2026-10-16T20:56:29Z",
     "holds_gate": true,
     "claude_slot": null,
     "last_run": "2026-10-16T19:07:40Z",
     "last_nightly": "2026-10-15T20:43:15Z",
     "last_nightly_result": "full=FAIL balance-report=ok bench=FAIL balance-planets=ok balance-guns=ok balance-charges=ok balance-refinery=ok balance-heat=ok e2e=FAIL memory-soak=FAIL packaged-smoke=ok ",
     "main_red_sha": null,
-    "feature": 356,
-    "feature_title": "Balance: restore magnetic electrifiedShareBp 2000 and pin full-hull start in pace harnesses",
+    "feature": 246,
+    "feature_title": "Grilling: Terrain magnets as a family beyond the lodestone beacon?",
     "queue": [
-      {
-        "feature": 246,
-        "kind": "spec",
-        "title": "Grilling: Terrain magnets as a family beyond the lodestone beacon?",
-        "tickets": [
-          282,
-          283,
-          284,
-          285,
-          286,
-          287,
-          300,
-          331,
-          332,
-          351,
-          357
-        ],
-        "since": "2026-10-14T06:58:09+02:00"
-      },
       {
         "feature": 162,
         "kind": "spec",
