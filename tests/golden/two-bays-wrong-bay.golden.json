@@ -2,7 +2,7 @@
   "name": "two-bays-wrong-bay",
   "description": "Buying at the Sell bay and selling at the Upgrade bay are refused as wrong_bay; the same buys at the Upgrade bay apply (#37, #41).",
   "generatorVersion": 9,
-  "authorityProtocolVersion": 81,
+  "authorityProtocolVersion": 82,
   "logSchemaVersion": 6,
   "numberFormatVersion": 1,
   "sliceSections": {
@@ -19,6 +19,7 @@
     "ground-gun.shot-cells": 1,
     "mining-gates": 1,
     "mobility": 1,
+    "ores.rarity-trip": 1,
     "power-up-core": 1,
     "tech-tree": 1,
     "tech-tree.forks": 1,

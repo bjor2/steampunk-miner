@@ -47,6 +47,14 @@ export {
   paidRarityFind,
   rarityTripCapAt,
 } from './systems/rarityTripClamp'
+export { RARITY_PICKUP_PROVIDER, RARITY_TRIP_RESET } from './systems/rarityPickup'
+export type { SavedRarityTrip } from './systems/rarityTripSection'
+export {
+  FRESH_RARITY_TRIP,
+  RARITY_TRIP_SECTION,
+  rarityTripOf,
+  withRarityTrip,
+} from './systems/rarityTripSection'
 export {
   lastCampaignOreTier,
   ORE_TYPE_PROVIDER_ID,

@@ -295,8 +295,14 @@ import type { DriveSigns } from '../vehicle/driveSigns'
  *    after a turn starts on the head's settle tick, not up to 12 ticks later on the next report.
  *    A protocol-80 `drillStep` line has no facing and is refused as malformed. With no drill step
  *    sent (`drill.sweptCut` off) no digest or mined order changes.
+ * 82: the epic and mythic trip clamp (ticket 509, seam A' of the TD ruling 6221725921 on #445):
+ *    every ore unit that reaches the hold, on every route, is priced by the one `orePickup`
+ *    provider. The `ores` slice pays an epic or mythic find in full only while the trip's clamped
+ *    value stays within 15% of a full hold of the find's band ore, else at the band's own tier, and
+ *    keeps that value in its `ores.rarity-trip` section until the dock or a rescue. A run that
+ *    never keeps an epic or mythic find (every legacy-row planet, P1 and P2) moves no digest.
  */
-export const AUTHORITY_PROTOCOL_VERSION = 81
+export const AUTHORITY_PROTOCOL_VERSION = 82
 
 /** The kernel's own commands: the closed set its rule tables are written against. */
 export interface KernelCommandPayloads {

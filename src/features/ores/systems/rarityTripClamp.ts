@@ -9,6 +9,11 @@
  * pays `V(t_b)`, the band's common price: every cell still pays at least a common one, and the
  * clamped tiers never hold more than 15% of a full hold of the band's ore. The answer is the tier
  * the unit is kept and sold at, so the cargo stays keyed by tier and one id keeps one price.
+ *
+ * The running value sums across bands within a trip; each find is held to its own band's cap
+ * (ticket 509). A tier the clamp does not hold keeps the sale tier it came with, so a signature
+ * still sells one up (#232). A cell an ore mover carried out of its band reads its lead against the
+ * band it was picked up in: below it, never clamped; past mythic, clamped as mythic.
  */
 import { oreSalePrice, oreTier, oreValue } from '../../../systems/economy/oreEconomy'
 import {
@@ -21,7 +26,6 @@ import {
   ZERO_MONEY,
   type Money,
 } from '../../../systems/money'
-import { oreTierOf } from './oreCatalogue'
 import { ORE_ROWS, type OreRows } from './oreRows'
 import { rarityTierOf } from './rarityTiers'
 
@@ -34,7 +38,9 @@ export interface RarityFind {
   planetIndex: number
   band: number
   /** The cell's tiers above its band's own. */
-  tierOffset: number
+  tierAboveBand: number
+  /** The tier the unit sells at in full. */
+  saleTier: number
   cargoCapacity: number
 }
 
@@ -66,24 +72,21 @@ export function paidRarityFind(
   find: RarityFind,
   rows: OreRows = ORE_ROWS,
 ): PaidRarityFind {
-  const fullTier = oreTierOf(find.planetIndex, find.band, find.tierOffset)
-  if (!isTripClamped(find.tierOffset, rows)) return { saleTier: fullTier, trip }
-  return paidClampedFind(trip, find, fullTier, rows)
+  if (!isTripClamped(find.tierAboveBand, rows)) return { saleTier: find.saleTier, trip }
+  return paidClampedFind(trip, find, rows)
 }
 
-/** Whether the tier at `tierOffset` counts against the trip clamp (epic and mythic). */
-export function isTripClamped(tierOffset: number, rows: OreRows = ORE_ROWS): boolean {
-  return rows.rarity.tripClampTierIds.includes(rarityTierOf(tierOffset, rows).id)
+/** Whether a find `tierAboveBand` tiers above its band counts against the trip clamp (epic, mythic). */
+export function isTripClamped(tierAboveBand: number, rows: OreRows = ORE_ROWS): boolean {
+  if (tierAboveBand < 0) return false
+  const topOffset = rows.rarity.tiers.length - 1
+  const tier = rarityTierOf(Math.min(tierAboveBand, topOffset), rows)
+  return rows.rarity.tripClampTierIds.includes(tier.id)
 }
 
-function paidClampedFind(
-  trip: RarityTrip,
-  find: RarityFind,
-  fullTier: number,
-  rows: OreRows,
-): PaidRarityFind {
-  const clampedValue = add(trip.clampedValue, oreSalePrice(fullTier))
+function paidClampedFind(trip: RarityTrip, find: RarityFind, rows: OreRows): PaidRarityFind {
+  const clampedValue = add(trip.clampedValue, oreSalePrice(find.saleTier))
   const cap = rarityTripCapAt(find.planetIndex, find.band, find.cargoCapacity, rows)
-  if (cmp(clampedValue, cap) <= 0) return { saleTier: fullTier, trip: { clampedValue } }
+  if (cmp(clampedValue, cap) <= 0) return { saleTier: find.saleTier, trip: { clampedValue } }
   return { saleTier: oreTier(find.planetIndex, find.band), trip }
 }

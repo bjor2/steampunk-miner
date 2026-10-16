@@ -14,8 +14,8 @@ import {
 const P3_BAND_5 = { planetIndex: 3, band: 5, cargoCapacity: 90 }
 const EPIC = 3
 
-function findOf(tierOffset: number): RarityFind {
-  return { ...P3_BAND_5, tierOffset }
+function findOf(tierAboveBand: number): RarityFind {
+  return { ...P3_BAND_5, tierAboveBand, saleTier: oreTier(3, 5) + tierAboveBand }
 }
 
 /** The sale tiers of `count` finds of one offset in one trip, and the trip after them. */
@@ -65,5 +65,16 @@ describe('rarity trip clamp', () => {
     const { saleTiers, trip } = tripOf(EPIC, 6)
     expect(saleTiers).toEqual([14, 14, 14, 14, 11, 11])
     expect(toCanonical(trip.clampedValue)).toBe('7.78478e+3')
+  })
+
+  it('keeps the sale tier a find came with when the clamp does not hold it, so a signature sells one up', () => {
+    const signature = { ...findOf(0), saleTier: oreTier(3, 5) + 1 }
+    const paid = paidRarityFind(NEW_RARITY_TRIP, signature)
+    expect(paid).toEqual({ saleTier: oreTier(3, 5) + 1, trip: NEW_RARITY_TRIP })
+  })
+
+  it('never clamps a lead below its band, and clamps one past mythic as mythic', () => {
+    expect(isTripClamped(-1)).toBe(false)
+    expect(isTripClamped(5)).toBe(true)
   })
 })
