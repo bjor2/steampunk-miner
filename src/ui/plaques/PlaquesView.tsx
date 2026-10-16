@@ -1,8 +1,9 @@
 /**
  * The hint plaque at the bottom centre and the transmission plaque below the top banner (#33
- * section 5, #16), drawn from the plaque model; markup only. Neither takes input or pauses play.
- * On the compact HUD (#500) the hint is a one-line chip under the HUD's rows instead, drawn only
- * once its place is measured and while it has room.
+ * section 5, #16), drawn from the plaque model; markup only. Neither pauses play, and neither
+ * takes input but the compact HUD's hint chip (#500, the GD's narrow amendment of #16): on a
+ * phone the hint is a one-line chip under the HUD's rows, drawn once its place is measured and
+ * while it has room.
  */
 import type { PlaqueModel, PlaqueReading } from '../../systems/views/plaqueModel'
 import { hudBoxOf } from '../hud/hudBoxes'
