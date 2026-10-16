@@ -37,7 +37,8 @@ skipWhereEngineIsMissing()
 
 test.beforeEach(() => {
   const cell = currentCell()
-  test.skip(!cell.isTouch || cell.isPortrait, 'the slot column shows in landscape on touch screens')
+  // Either way up since ticket 485: held upright the column keeps to the free edge above the cluster.
+  test.skip(!cell.isTouch, 'the slot column shows on touch screens')
 })
 
 async function openWithPatchSlotted(page: Page): Promise<string[]> {

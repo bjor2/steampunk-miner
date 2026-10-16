@@ -523,6 +523,24 @@
         "e2e/browser/screens/rotation.spec.ts",
         "e2e/browser/screens/tapAffordances.spec.ts"
       ]
+    },
+    {
+      "why": "The touch controls held upright (ticket 485): the lower-45% stick zone, a phone's two-row cluster, the tile lane the slot column and the fire tile keep to, and the left-hand mirror.",
+      "paths": [
+        "src/ui/touch/**",
+        "src/constants/touch.ts",
+        "src/features/power-up-core/ui/SlotColumn.module.css",
+        "src/features/ground-gun/ui/FireTile.module.css",
+        "src/ui/stage/screenFit.ts",
+        "src/systems/views/screenLayout.ts"
+      ],
+      "specs": [
+        "e2e/browser/screens/portraitTouch.spec.ts",
+        "e2e/browser/screens/touchControls.spec.ts",
+        "e2e/browser/screens/fireTile.spec.ts",
+        "e2e/browser/screens/slotHoldRing.spec.ts",
+        "e2e/browser/hud/hudLayout.spec.ts"
+      ]
     }
   ]
 }

@@ -26,7 +26,8 @@ interface GunRead {
 
 test.beforeEach(() => {
   const cell = currentCell()
-  test.skip(!cell.isTouch || cell.isPortrait, 'the fire tile shows in landscape on touch screens')
+  // Either way up since ticket 485: held upright the tile keeps to the free edge above the cluster.
+  test.skip(!cell.isTouch, 'the fire tile shows on touch screens')
 })
 
 function readGun(page: Page): Promise<GunRead> {

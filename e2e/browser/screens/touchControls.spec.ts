@@ -4,12 +4,20 @@
  * stream, the cluster following the situation, the left-handed mirror, and the keyboard hiding
  * them until the next touch. Every screen is reached by taps alone. Driven by real touch events.
  * Ticket 472 (#470 P1-1): the pause button while diving, the hold while the page is hidden, and
- * the controls inside a notched safe area. Ticket 473 (#470 P1-2): the charge size badge.
+ * the controls inside a notched safe area. Ticket 473 (#470 P1-2): the charge size badge. The HUD
+ * is the boxes it declares (`data-hud`, #500), so the compact HUD's grid cells count.
  */
 import { expect, test, type Page } from '@playwright/test'
 import type { ActionEdge } from '../../../src/store/inputRuntime'
 import { skipWhereEngineIsMissing, skipWithoutCdp } from '../mobile/mobileHelpers'
-import { boxOf, currentCell, hudPanelBoxes, openGame, overlaps, type Box } from './screenHelpers'
+import {
+  boxOf,
+  currentCell,
+  hudBoxesBesideControls,
+  openGame,
+  overlaps,
+  type Box,
+} from './screenHelpers'
 
 const INTERACT_PX = 72
 const CLUSTER_PX = 56
@@ -25,9 +33,11 @@ const TOUCH_TARGET_PX = 48
 // The mobile projects run this spec too (ticket 481); WebKit may not be installed.
 skipWhereEngineIsMissing()
 
+// Either way up since ticket 485 (#470 PT-3): the portrait cells run every test here too, so the
+// stick's and the keys' action streams are held equal upright; `portraitTouch.spec.ts` adds
+// the upright layout's own checks.
 test.beforeEach(() => {
-  const cell = currentCell()
-  test.skip(!cell.isTouch || cell.isPortrait, 'touch controls play in landscape on touch screens')
+  test.skip(!currentCell().isTouch, 'touch controls play on touch screens')
 })
 
 test.describe('screen matrix: touch controls (#173)', () => {
@@ -43,7 +53,9 @@ test.describe('screen matrix: touch controls (#173)', () => {
     expect(interact.height).toBeGreaterThanOrEqual(INTERACT_PX)
     const safeArea = await boxOf(page, 'safe-area')
     expect(isInside(interact, safeArea)).toBe(true)
-    for (const panel of await hudPanelBoxes(page)) expect(overlaps(interact, panel)).toBe(false)
+    for (const panel of await hudBoxesBesideControls(page)) {
+      expect(overlaps(interact, panel), panel.id).toBe(false)
+    }
     const zone = await boxOf(page, 'touch-stick-zone')
     expect(interact.left - zone.right).toBeGreaterThanOrEqual(CLUSTER_GAP_PX)
     expect(errors).toEqual([])
@@ -129,7 +141,10 @@ test.describe('screen matrix: touch controls (#173)', () => {
     const cluster = await boxOf(page, 'touch-cluster')
     expect(zone.left).toBeGreaterThanOrEqual(cell.viewport.width * 0.6 - 1)
     expect(zone.right).toBeCloseTo(cell.viewport.width, 0)
-    expect(cluster.right).toBeLessThan(cell.viewport.width / 2)
+    // Nearer the left edge; sideways it fits the left half, but a phone held upright is too
+    // narrow for the 200 px cluster to (ticket 485).
+    expect(cluster.left).toBeLessThan(cell.viewport.width - cluster.right)
+    if (!cell.isPortrait) expect(cluster.right).toBeLessThan(cell.viewport.width / 2)
     expect(cluster.bottom).toBeGreaterThan(cell.viewport.height / 2)
     expect(zone.left - cluster.right).toBeGreaterThanOrEqual(CLUSTER_GAP_PX)
     expect(errors).toEqual([])
@@ -144,7 +159,9 @@ test.describe('screen matrix: touch pause (ticket 472)', () => {
     const pause = await boxOf(page, 'touch-open_pause_menu')
     expect(isInside(pause, await boxOf(page, 'safe-area'))).toBe(true)
     expect(pause.top).toBeLessThan(currentCell().viewport.height / 4)
-    for (const panel of await hudPanelBoxes(page)) expect(overlaps(pause, panel)).toBe(false)
+    for (const panel of await hudBoxesBesideControls(page)) {
+      expect(overlaps(pause, panel), panel.id).toBe(false)
+    }
     expect(overlaps(pause, await boxOf(page, 'touch-cluster'))).toBe(false)
     expect(errors).toEqual([])
   })

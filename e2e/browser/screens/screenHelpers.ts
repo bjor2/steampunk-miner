@@ -151,6 +151,34 @@ export function hudPanelBoxes(page: Page): Promise<Box[]> {
   })
 }
 
+/** A box the HUD declares (`data-hud`, #500): its id, its test id and where it is. */
+export interface HudBox extends Box {
+  id: string
+  testId: string
+}
+
+/**
+ * Every box the HUD declares with `data-hud` (#500's one list), the touch buttons (`control`)
+ * included. Unlike `hudPanelBoxes` it holds on the compact HUD, whose boxes are grid cells.
+ */
+export function declaredHudBoxes(page: Page): Promise<HudBox[]> {
+  return page.evaluate(() =>
+    [...document.querySelectorAll('[data-hud]')]
+      .map((element) => {
+        const { left, top, right, bottom, width, height } = element.getBoundingClientRect()
+        const id = element.getAttribute('data-hud') ?? ''
+        const testId = element.getAttribute('data-testid') ?? ''
+        return { id, testId, left, top, right, bottom, width, height }
+      })
+      .filter((box) => box.width > 0 && box.height > 0),
+  )
+}
+
+/** The HUD's own boxes: every declared box but the touch buttons. */
+export async function hudBoxesBesideControls(page: Page): Promise<HudBox[]> {
+  return (await declaredHudBoxes(page)).filter((box) => box.id !== 'control')
+}
+
 export function overlaps(a: Box, b: Box): boolean {
   return a.left < b.right && b.left < a.right && a.top < b.bottom && b.top < a.bottom
 }

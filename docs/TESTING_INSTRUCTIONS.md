@@ -813,9 +813,9 @@ programs }` from three's `renderer.info` of the game canvas), read only when cal
   bay-screen text at least its 1280 x 800 size times the UI scale, TV mode's 2.22%/2.78% text,
   5.9% controls and 5% safe area, 44 px targets (56 on touch), a focus ring on each control Tab
   reaches, no art upscaled at the 12 m default, a lined casing cell reading at the widest zoom and
-  the render-scale floor (`ui.getDrawnLiningAt`, ticket 315: about 24 px a cell on a phone), the
-  portrait card, and the touch controls: their
-  sizes and clearances, taps alone reaching every screen, the cluster following the dock, the
+  the render-scale floor (`ui.getDrawnLiningAt`, ticket 315: about 24 px a cell on a phone), and
+  the touch controls either way up (ticket 485): their sizes and clearances against the HUD's
+  `data-hud` boxes, taps alone reaching every screen, the cluster following the dock, the
   left-handed mirror, and a stick run pressing the same action stream as its key run
   (`input.getActionStream()`, real touches through CDP). Each cell also writes the #173 look set;
   `npm run screens:update` puts it in `docs/screens/` for review, never compared
@@ -858,6 +858,17 @@ programs }` from three's `renderer.info` of the game canvas), read only when cal
   included, the stick zone not) is asserted at 70% upright and 65% sideways on the reference
   phones and logged as a `clear-view` annotation on the sweep and with a stacked loadout (GD
   rulings 2 and 3 on #500; #486 owns the stacked gap's `it.todo` rows). Box Tester only.
+- **Touch controls held upright** (ticket 485, spec #470): `e2e/browser/screens/portraitTouch.spec.ts`
+  runs in the matrix's portrait touch cells (390x844, 412x915, 820x1180) and skips elsewhere. It
+  measures the stick zone (the lower 45% of the height from the thumb's lower corner, ending at a
+  home bar set as `--safe-bottom`), the cluster (two rows on a phone, three on the tablet, a gap
+  clear of the zone), and the slot column and fire tile on the free edge above the cluster. With a
+  stacked loadout (guns, a charge rack, five slots, the bore gun) every `data-hud` control sits
+  inside the safe area, apart, off every other `data-hud` box and off the vehicle's body, for
+  either hand. On a phone no HUD box meets the zone; on the tablet, whose full HUD keeps its
+  bottom plaques, the boxes the zone meets are logged as a `stick-zone` annotation. The stick's
+  and the keys' action streams, the pause button, the badge, the fire tile and the slot hold ring
+  run upright too (`touchControls`, `fireTile`, `slotHoldRing`). Box Tester only.
 - **Drill-down run** (ticket 416): `e2e/browser/drillDown.spec.ts` holds the real Down key for 10 s
   on the P1 surface from `scenarios/drill-down-start.scenario.json`, at stored drill_power steps 1
   (the save's), 5, 10, 15 and 20 (`debug.setUpgrade`, ticket 434), and writes one row per run (start and end position, depth gained, cells/s,
