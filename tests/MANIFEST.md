@@ -961,7 +961,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/physics/floatingOrigin.test.ts` | 3 | 3 |
 | `src/physics/glidePassThrough.test.ts` | 4 | 4 |
 | `src/physics/levelReleaseTrace.lane.test.ts` | 2 | 2 |
-| `src/physics/liveFixedStep.test.ts` | 4 | 4 |
+| `src/physics/liveFixedStep.test.ts` | 7 | 7 |
 | `src/physics/physicsStats.test.ts` | 3 | 3 |
 | `src/physics/storedLevelReleaseTrace.lane.test.ts` | 2 | 2 |
 | `src/physics/strutColliders.test.ts` | 4 | 4 |
@@ -1176,6 +1176,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/store/promptDevice.test.ts` | 2 | 2 |
 | `src/store/runSnapshots.test.ts` | 10 | 10 |
 | `src/store/sliceRun.test.ts` | 7 | 7 |
+| `src/store/slowDeviceChip.test.ts` | 2 | 2 |
 | `src/store/tapSheetSlice.test.ts` | 6 | 6 |
 | `src/store/titleMenu.test.ts` | 9 | 9 |
 | `src/store/touchReplay.test.ts` | 2 | 2 |
@@ -1198,6 +1199,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/sliceProgress.test.ts` | 3 | 3 |
 | `src/systems/startScenario.test.ts` | 7 | 7 |
 | `src/systems/startScenarioCommands.test.ts` | 6 | 6 |
+| `src/systems/tickDilation.test.ts` | 7 | 7 |
 | `src/systems/touchSheetGuard.test.ts` | 13 | 13 |
 
 ### `tooling-ci`
@@ -1281,7 +1283,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | File | Tests | Sites |
 | --- | --- | --- |
 | `src/ui/hud/hudPanels.test.ts` | 6 | 6 |
-| `src/ui/hud/hudText.test.ts` | 5 | 5 |
+| `src/ui/hud/hudText.test.ts` | 6 | 6 |
 | `src/ui/iconCoverage.test.ts` | 9 | 9 |
 | `src/ui/kit/itemCard.test.ts` | 13 | 13 |
 | `src/ui/kit/uiParts.test.ts` | 16 | 16 |

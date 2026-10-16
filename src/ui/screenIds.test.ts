@@ -37,7 +37,7 @@ import {
   setGunLevelCommand,
   teleportToDockCommand,
 } from '../systems/vehicle/vehicleCommands'
-import { calloutTextOf } from '../systems/views/hudCallouts'
+import { calloutTextOf, SLOW_DEVICE_TEXT } from '../systems/views/hudCallouts'
 import { selectHudModel, type HudModel } from '../systems/views/hudModel'
 import type { BayFooter, BayHeader } from '../systems/views/bayFrame'
 import { selectSellBayModel, type SellBayModel } from '../systems/views/sellBayModel'
@@ -53,6 +53,7 @@ import type { PlaqueModel } from '../systems/views/plaqueModel'
 import type { SettingsModel } from '../systems/views/settingsModel'
 import { FACING } from '../systems/vehicle/vehiclePose'
 import { HudView } from './hud/HudView'
+import { SlowDeviceChipView } from './hud/SlowDeviceChip'
 import { UI_IDS, type UiId } from './ids'
 import { RefineryBayView } from './platform/RefineryBayView'
 import { SellBayView } from './platform/SellBayView'
@@ -355,6 +356,13 @@ function renderSliceScreen(): string[] {
     onDismiss: () => undefined,
   })
   return withRegistrations([probe], () => checkScreen(frame, { [UI_IDS.sliceScreen]: null }))
+}
+
+/** The slow-device chip, which the store shows only while the frame cap drops ticks (ticket 480). */
+function renderSlowDeviceChip(): string[] {
+  return checkScreen(createElement(SlowDeviceChipView), {
+    [UI_IDS.hudSlowDevice]: calloutShown(SLOW_DEVICE_TEXT),
+  })
 }
 
 function renderHud(): string[] {
@@ -690,6 +698,7 @@ function expectEveryIdRendered(): void {
   keep(renderRefineryScreens())
   keep(renderLiningVisit())
   keep(renderSliceScreen())
+  keep(renderSlowDeviceChip())
   keep(renderPauseMenu())
   expect(Object.values(UI_IDS).filter((id) => !found.has(id))).toEqual([])
 }

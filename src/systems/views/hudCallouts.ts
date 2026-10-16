@@ -14,6 +14,12 @@ const STATUSES_SAID_ELSEWHERE: ReadonlySet<string> = new Set(['fuse', 'low_energ
 /** Where a call-out's title ends and its one line starts: the model's own separators. */
 const CALLOUT_SEPARATOR = /: | — /
 
+/**
+ * The slow-device chip's call-out (ticket 480; VS ruling 2 on #470): the frame cap is dropping
+ * ticks, so the game runs slower than the wall clock instead of skipping ahead.
+ */
+export const SLOW_DEVICE_TEXT = 'SLOW DEVICE: the game runs in slow motion'
+
 /** A readout titled by its label, with no line under it and no tooltip. */
 export function readoutTextOf(id: string, label: string): ElementText {
   return { id, title: label, oneLine: '', tooltipLines: [] }

@@ -1,14 +1,15 @@
 /**
  * Bottom centre (#33 section 5): the dock prompt exactly when the authority would accept a dock,
  * the artefact cache prompt exactly when it would open the cache (#46), "Scenario ready" while a
- * scenario waits for play (ticket 301), and the "DEBUG RUN" mark once a debug command was
- * accepted (#11). Each is one shared Title+OneLine element (spec #422, pass #428): the key before
+ * scenario waits for play (ticket 301), the "DEBUG RUN" mark once a debug command was accepted
+ * (#11), and the slow-device chip while the frame cap keeps dropping ticks (ticket 480). Each is one shared Title+OneLine element (spec #422, pass #428): the key before
  * the colon is the title, what it does the one line.
  */
 import { calloutTextOf, readoutTextOf } from '../../systems/views/hudCallouts'
 import type { HudModel } from '../../systems/views/hudModel'
 import { UI_IDS } from '../ids'
 import { TitleOneLine } from '../kit/TitleOneLine'
+import { SlowDeviceChip } from './SlowDeviceChip'
 import styles from './Hud.module.css'
 
 export function HudPrompts({ model }: { model: HudModel }) {
@@ -36,6 +37,7 @@ export function HudPrompts({ model }: { model: HudModel }) {
           <TitleOneLine text={readoutTextOf('hud.debug-run', 'DEBUG RUN')} level="span" />
         </div>
       )}
+      <SlowDeviceChip />
     </div>
   )
 }

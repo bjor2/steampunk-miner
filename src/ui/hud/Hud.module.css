@@ -225,6 +225,11 @@
   letter-spacing: 0.1em;
 }
 
+/* Ticket 480: the frame cap keeps dropping ticks; amber like the other "the rig is held" lines. */
+.slowDevice {
+  color: var(--color-amber);
+}
+
 .threats {
   position: absolute;
   inset: var(--space-3);

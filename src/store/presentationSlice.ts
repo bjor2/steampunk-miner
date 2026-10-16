@@ -1,8 +1,9 @@
 /**
  * The game store's presentation slice (#33): local settings and rebinding, which layer is open
  * (the artefact cache's cards too, #46), menu focus, the travel confirmation, the Upgrade bay
- * preview's install animation (#44) and the charge size `plant_charge` plants (#153, K8 #218). None of it is authority state, a command, a log line or
- * part of the digest; buttons that change the world submit ordinary authority commands.
+ * preview's install animation (#44), the charge size `plant_charge` plants (#153, K8 #218) and the
+ * slow-device chip (ticket 480). None of it is authority state, a command, a log line or part of
+ * the digest; buttons that change the world submit ordinary authority commands.
  *
  * Kept beside the store so the store stays one reason to change; `gameStore` spreads it in, so
  * there is still one store that owns its actions.
@@ -41,6 +42,7 @@ import {
   type ZoomChange,
 } from '../systems/render/viewZoom'
 import { renderScalePinProblems } from '../systems/render/renderScale'
+import type { TickDilationWatch } from '../systems/tickDilation'
 import { partToInstallOf } from '../systems/views/bayPresentation'
 import { focusOnScreen, stepFocus } from '../systems/views/menuFocus'
 import type { ButtonAction, ScreenButton } from '../systems/views/viewParts'
@@ -84,6 +86,8 @@ export interface PresentationValues {
    * the plant command names its size, so this never reaches the authority.
    */
   chosenChargeSize: number
+  /** The cap has been dropping ticks long enough to say so on the HUD (`tickDilation`, ticket 480). */
+  isSlowDeviceChipShown: boolean
 }
 
 export interface PresentationActions {
@@ -148,6 +152,11 @@ export interface PresentationActions {
   /** A key went down: the keyboard has the game until the next touch (#173). */
   hideTouchControls(): void
   chooseChargeSize(size: number): void
+  /**
+   * The chip follows the live frames' judgement (ticket 480): shown while the device is too slow
+   * for its ticks; the store changes only when the judgement does.
+   */
+  followSlowDevice(watch: Readonly<TickDilationWatch>): void
 }
 
 type SliceHost = PresentationValues &
@@ -174,6 +183,7 @@ export const STARTING_PRESENTATION: PresentationValues = {
   installingUpgradeId: null,
   isTouchControlsShown: false,
   chosenChargeSize: 1,
+  isSlowDeviceChipShown: false,
 }
 
 /** The waiting action takes the chord on one device; its other device's binding stays. */
@@ -298,6 +308,10 @@ export function presentationActionsOf(set: SetSlice, get: () => SliceHost): Pres
       if (get().isTouchControlsShown) set({ isTouchControlsShown: false })
     },
     chooseChargeSize: (size) => set({ chosenChargeSize: size }),
+    followSlowDevice: (watch) => {
+      if (watch.isSlowDevice !== get().isSlowDeviceChipShown)
+        set({ isSlowDeviceChipShown: watch.isSlowDevice })
+    },
   }
 }
 

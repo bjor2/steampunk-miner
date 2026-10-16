@@ -12,6 +12,7 @@ import { uiTextProblemsOf } from '../../systems/views/uiTextBudget'
 import { titleOnlyTextsOf } from '../../systems/views/titleOnlyText'
 import { unregisteredTextsOf } from '../../systems/views/unregisteredText'
 import { HudView } from './HudView'
+import { SlowDeviceChipView } from './SlowDeviceChip'
 
 // Spec #422, pass #428: the start scenario draws only part of the HUD, so the budget test cannot
 // see a warning, the fuse or a prompt. Here the HUD is handed a model with every readout and
@@ -123,5 +124,13 @@ describe('HUD text budget (spec #422, pass #428)', () => {
     drawEveryReadout()
     const hudTexts = registeredUiTexts().filter((text) => text.id.startsWith('hud.'))
     expect(hudTexts.flatMap((text) => text.tooltipLines)).toEqual([])
+  })
+
+  it('says the slow-device chip on a shared element within the budget (ticket 480)', () => {
+    const markup = renderToString(createElement(SlowDeviceChipView))
+    expect(markup).toContain('data-testid="hud-slow-device"')
+    expect(unregisteredTextsOf(markup)).toEqual([])
+    expect(registeredUiTexts().map((text) => text.id)).toEqual(['hud.slow-device'])
+    expect(registeredUiTexts().flatMap(uiTextProblemsOf)).toEqual([])
   })
 })

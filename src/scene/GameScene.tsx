@@ -19,6 +19,7 @@ import { EnemyFigures } from './EnemyFigures'
 import { HazardStripSampler } from './HazardStripSampler'
 import { LightRig } from './LightRig'
 import { PerfSampler } from './PerfSampler'
+import { SlowDeviceWatch } from './SlowDeviceWatch'
 import { PlanetCamera } from './PlanetCamera'
 import { PlanetSkyBand } from './PlanetSkyBand'
 import { PlanetTerrain } from './PlanetTerrain'
@@ -77,6 +78,7 @@ export function GameScene() {
       <SoundStage />
       <HazardStripSampler />
       <PerfSampler />
+      <SlowDeviceWatch />
       <ScreenProjectorFeed />
       <RenderPipeline />
       <CanvasScreenshots />
