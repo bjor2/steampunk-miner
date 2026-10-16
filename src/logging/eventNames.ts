@@ -17,6 +17,7 @@
  * which `registeredEventOf` asks for any name this table does not hold.
  */
 import type { FieldKind, PayloadFields, PayloadOf } from './eventFields'
+import { SAVE_FAILURE_CAUSES } from '../systems/save/saveWriteFailure'
 import { sliceRunEventOf } from './registries/runEvents'
 
 export type RunEventLevel = 'core' | 'detail' | 'perf'
@@ -386,6 +387,31 @@ export const RUN_EVENT_REGISTRY = {
       digest: 'text',
       file: { optional: 'text' },
     },
+  },
+  // #470 P1-8 (ticket 479): a slot save no store took, so the player's progress since the last
+  // `checkpoint_saved` is only in memory; `cause` reads the shell's error, `digest` the save lost.
+  checkpoint_failed: {
+    group: 'platform',
+    level: 'core',
+    payload: {
+      slot: 'text',
+      epoch: 'integer',
+      bytes: 'integer',
+      digest: 'text',
+      cause: { oneOf: SAVE_FAILURE_CAUSES },
+    },
+  },
+  // Ticket 479: the player took the session's last save out as a file (export), or brought a save
+  // file in, which replaced the autosave and was resumed (import, before its checkpoint_loaded).
+  save_exported: {
+    group: 'platform',
+    level: 'core',
+    payload: { slot: 'text', epoch: 'integer', bytes: 'integer' },
+  },
+  save_imported: {
+    group: 'platform',
+    level: 'core',
+    payload: { epoch: 'integer', bytes: 'integer', digest: 'text' },
   },
   // #170: an older save was brought up to this build by one step of the migration chain, logged
   // per step just before checkpoint_loaded; #181 added the snapshot step (levels to steps). #224:

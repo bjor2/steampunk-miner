@@ -72,7 +72,12 @@ import {
   submitCommand,
   submitUnlessRefused,
 } from './authorityLink'
-import { recordCheckpointLoaded, writeCheckpointAfter, type Checkpoint } from './checkpoint'
+import {
+  followSaveWrites,
+  recordCheckpointLoaded,
+  writeCheckpointAfter,
+  type Checkpoint,
+} from './checkpoint'
 import { artefactActionsOf, type ArtefactActions } from './artefactActions'
 import { combatDebugActionsOf, type CombatDebugActions } from './combatDebugActions'
 import { casingDebugActionsOf, type CasingDebugActions } from './casingDebugActions'
@@ -111,6 +116,12 @@ import {
   type PresentationActions,
   type PresentationValues,
 } from './presentationSlice'
+import {
+  saveKeepingActionsOf,
+  STARTING_SAVE_KEEPING,
+  type SaveKeepingActions,
+  type SaveKeepingValues,
+} from './saveKeepingSlice'
 import { runFastForwardSteps, runScenarioScript, submitEach } from './scenarioSteps'
 import {
   soundUnlockActionsOf,
@@ -159,7 +170,9 @@ export interface GameState
     SoundUnlockValues,
     SoundUnlockActions,
     TitleMenuValues,
-    TitleMenuActions {
+    TitleMenuActions,
+    SaveKeepingValues,
+    SaveKeepingActions {
   playerId: string
   planetTier: number
   planetSeed: number
@@ -251,6 +264,7 @@ type GameValues = Pick<
   | keyof TapSheetValues
   | keyof SoundUnlockValues
   | keyof TitleMenuValues
+  | keyof SaveKeepingValues
   | 'travelTransition'
 >
 
@@ -276,6 +290,7 @@ export const STARTING_VALUES: GameValues = {
   ...STARTING_TAP_SHEET,
   ...STARTING_SOUND_UNLOCK,
   ...STARTING_TITLE_MENU,
+  ...STARTING_SAVE_KEEPING,
   travelTransition: null,
 }
 
@@ -297,6 +312,7 @@ export const useGameStore = create<GameState>()((set, get) => ({
   ...tapSheetActionsOf(set, get),
   ...soundUnlockActionsOf(set),
   ...titleMenuActionsOf(set, get),
+  ...saveKeepingActionsOf(set, get),
 
   setPlanet: (planetTier) => {
     refuseProblems(startScenarioProblems({ planetTier }))
@@ -468,6 +484,7 @@ export function resetGameStore(authority: Authority = createStartingAuthority())
   forgetMusicStingers()
   forgetBlastScorches()
   connectAuthority(authority, followAuthority)
+  followSaveWrites((outcome) => useGameStore.getState().noteSaveWrite(outcome))
 }
 
 resetGameStore()
