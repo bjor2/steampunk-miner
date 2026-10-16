@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-10-16T18:39:14+01:00",
+  "updated_at": "2026-10-16T18:42:08+01:00",
   "caps": {
     "grok": 12,
     "claude": 10,
@@ -72,7 +72,7 @@
       "size": 6,
       "used": 3,
       "free": 3,
-      "claims_last_hour": 4,
+      "claims_last_hour": 2,
       "name": "Claude Max 1"
     },
     {
