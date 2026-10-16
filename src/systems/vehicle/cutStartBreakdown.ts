@@ -4,9 +4,10 @@
  * holds it. Read off a rig's ticks in the live loop (`physics/cutStartLatency.lane.test.ts`).
  *
  * - **swivel**: the drill head turns to the new facing (`SWIVEL_TICKS`, #7) before the drill engages;
- * - **stale facing**: the drill is engaged but the cut gate stays shut, the authority still reading
- *   the facing of the last pose report (`drillStep` carries no facing; reports go out every
- *   `POSE_REPORT_INTERVAL_TICKS`, #11 amendment);
+ * - **stale facing**: the drill is engaged but the cut gate stays shut. Until ticket 506 the
+ *   authority read the facing of the last pose report here (reports go out every
+ *   `POSE_REPORT_INTERVAL_TICKS`, #11 amendment); `drillStep` now carries the head's facing, so
+ *   this reads 0 unless something else holds the gate;
  * - **first cell**: the gate is open and the drill pays the cell before the face, which opens only
  *   once its whole price is paid (#399's carry);
  * - **held**, then **second stall**: between the first and the second cell opening, the ticks the

@@ -289,8 +289,14 @@ import type { DriveSigns } from '../vehicle/driveSigns'
  *    left of it on the tick it meets it, discarding the surplus; a carry banked against it is
  *    clamped to that. Which cells a `drillStep` pays, and in what order, change. With no drill step
  *    sent (`drill.sweptCut` off) no digest or mined order changes.
+ * 81: `drillStep` carries the head's facing (ticket 506, the TD shape 6218234935 as the GD ruled
+ *    it): a required `facing` 0 to 3, refused `invalid_pose` outside that, replaces the last
+ *    report's facing in the step's pose, its cut gate and the client's cut-follow read, so a cut
+ *    after a turn starts on the head's settle tick, not up to 12 ticks later on the next report.
+ *    A protocol-80 `drillStep` line has no facing and is refused as malformed. With no drill step
+ *    sent (`drill.sweptCut` off) no digest or mined order changes.
  */
-export const AUTHORITY_PROTOCOL_VERSION = 80
+export const AUTHORITY_PROTOCOL_VERSION = 81
 
 /** The kernel's own commands: the closed set its rule tables are written against. */
 export interface KernelCommandPayloads {
@@ -320,9 +326,10 @@ export interface KernelCommandPayloads {
   drillTile: { tx: number; ty: number; ticks: number }
   /**
    * The swept cut (ticket 330, dev flag `drill.sweptCut`): the body's position in mm at a fixed
-   * step its drill is engaged, and the push as signs (`drive.y` 1 lifting), sent every such step.
+   * step its drill is engaged, the head's settled `facing` 0 to 3 (ticket 506), and the push as
+   * signs (`drive.y` 1 lifting), sent every such step.
    */
-  drillStep: { x: number; y: number; drive: DriveSigns }
+  drillStep: { x: number; y: number; facing: number; drive: DriveSigns }
   /** Calls the tow for a stranded or destroyed vehicle (#7, #8). */
   requestRescue: Record<string, never>
   /** The platform (#8, #23, #37): dock when stationary in that bay's pad zone, and leave again. */

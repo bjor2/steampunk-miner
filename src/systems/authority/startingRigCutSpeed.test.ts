@@ -37,7 +37,7 @@ function readStepMmAt(step: number): number {
   const { payload } = poseAbove({ tx: 0, ty: 0 }, FACING.down)
   session.submit(0, { type: 'reportPose', payload: { ...payload, x: REST.x, y: REST.y } })
   session.advanceTo(1)
-  const drillingStep = { ...REST, isLifting: false, isDrilling: true }
+  const drillingStep = { ...REST, facing: FACING.down, isLifting: false, isDrilling: true }
   const { cutSpeed } = cutFollowAt(session.state(), 'p1', drillingStep)
   // The read is whole mm a tick as m/s; rounding undoes the float of that conversion.
   return Math.round((cutSpeed * MM_PER_METRE) / TICKS_PER_SECOND)

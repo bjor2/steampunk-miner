@@ -59,7 +59,10 @@ function drillTile(tile: TilePoint, ticks: number): CommandIntent {
   return { type: 'drillTile', payload: { ...tile, ticks } }
 }
 
-const DRILL_STEP: CommandIntent = { type: 'drillStep', payload: { x: 0, y: 0, drive: NO_DRIVE } }
+const DRILL_STEP: CommandIntent = {
+  type: 'drillStep',
+  payload: { x: 0, y: 0, facing: 2, drive: NO_DRIVE },
+}
 const UNDOCK: CommandIntent = { type: 'undock', payload: {} }
 
 /** What one drilling command answered: three broken cells, two of them ore that reached the hold. */

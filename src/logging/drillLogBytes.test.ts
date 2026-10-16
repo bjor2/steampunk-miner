@@ -81,7 +81,8 @@ async function flushLikeTheGame(runLog: RunLog, sink: { flush(): Promise<void> }
 function stepDrill(runLog: RunLog, drill: Drill, metresPerTick: number): void {
   drill.yMm -= Math.round(metresPerTick * MM_PER_METRE)
   if (drill.tick % POSE_REPORT_INTERVAL_TICKS === 0) send(runLog, drill, poseOf(drill), [])
-  send(runLog, drill, { type: 'drillStep', payload: { x: START.x, y: drill.yMm, drive: DOWN } }, [
+  const payload = { x: START.x, y: drill.yMm, facing: 2, drive: DOWN }
+  send(runLog, drill, { type: 'drillStep', payload }, [
     ...brokenCells(drill, metresPerTick),
     ...linedRings(drill, metresPerTick),
   ])

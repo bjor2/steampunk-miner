@@ -6,7 +6,7 @@ import { blockHardness } from '../economy/oreEconomy'
 import { cutStepMmOf, metresPerSecondOfStep } from '../vehicle/cutSpeed'
 import { NO_DRIVE } from '../vehicle/driveSigns'
 import { subStepsPerTile } from '../vehicle/drillRule'
-import { FACING } from '../vehicle/vehiclePose'
+import { FACING, type Facing } from '../vehicle/vehiclePose'
 import { statsOfVehicle } from '../vehicle/vehicleState'
 import { surfaceRowOfColumn } from '../world/tileGrid'
 import { cutFollowAt, type CutFollowStep } from './cutFollowRead'
@@ -27,14 +27,23 @@ import { vehicleOf } from './authorityState'
 const COLUMN = 20
 const SURFACE_TY = surfaceRowOfColumn(COLUMN, PARAMS.radiusTiles)
 const REST = { x: COLUMN * 1000 + 500, y: (SURFACE_TY + 1) * 1000 + 400 }
+const DOWN_AT_REST = { ...REST, facing: FACING.down }
 
 function sessionFacingDown(upgrades: Record<string, number> = {}): ScriptedSession {
+  return sessionReportedFacing(FACING.down, upgrades)
+}
+
+/** The body reported at `REST` facing `facing` at tick 0. */
+function sessionReportedFacing(
+  facing: Facing,
+  upgrades: Record<string, number> = {},
+): ScriptedSession {
   const session = createScriptedSession()
   session.submit(0, { type: 'debug.setEnergy', payload: { energy: '150' } })
   for (const [upgradeId, level] of Object.entries(upgrades)) {
     session.submit(0, { type: 'debug.setUpgrade', payload: { upgradeId, level } })
   }
-  const { payload } = poseAbove({ tx: 0, ty: 0 }, FACING.down)
+  const { payload } = poseAbove({ tx: 0, ty: 0 }, facing)
   session.submit(0, { type: 'reportPose', payload: { ...payload, x: REST.x, y: REST.y } })
   return session
 }
@@ -42,6 +51,7 @@ function sessionFacingDown(upgrades: Record<string, number> = {}): ScriptedSessi
 const drillingAt = (y: number): CutFollowStep => ({
   x: REST.x,
   y,
+  facing: FACING.down,
   isLifting: false,
   isDrilling: true,
 })
@@ -53,7 +63,10 @@ function descendReadingTheGate(session: ScriptedSession, mmPerTick: number, tick
     const y = REST.y - mmPerTick * tick
     session.advanceTo(tick)
     const read = cutFollowAt(session.state(), 'p1', drillingAt(y))
-    session.submit(tick, { type: 'drillStep', payload: { x: REST.x, y, drive: NO_DRIVE } })
+    session.submit(tick, {
+      type: 'drillStep',
+      payload: { x: REST.x, y, facing: FACING.down, drive: NO_DRIVE },
+    })
     reads.push({ client: read.gate.cutGate, authority: session.vehicle().sweptCut?.cutGate })
   }
   return reads
@@ -62,7 +75,7 @@ function descendReadingTheGate(session: ScriptedSession, mmPerTick: number, tick
 describe('cut-follow reads (ticket 333)', () => {
   it('opens the gate on the cursor when a drill step meets fresh rock', () => {
     const session = sessionFacingDown()
-    session.submit(1, { type: 'drillStep', payload: { x: REST.x, y: REST.y, drive: NO_DRIVE } })
+    session.submit(1, { type: 'drillStep', payload: { ...DOWN_AT_REST, drive: NO_DRIVE } })
     expect(session.vehicle().sweptCut).toMatchObject({ cutGate: 1, cutGateLowTicks: 0 })
   })
 
@@ -70,6 +83,19 @@ describe('cut-follow reads (ticket 333)', () => {
     const reads = descendReadingTheGate(sessionFacingDown(), 40, 90)
     expect(reads.some((read) => read.client === 1)).toBe(true)
     for (const read of reads) expect(read.client).toBe(read.authority)
+  })
+
+  // Ticket 506: the step carries the head's facing, so a turn is read on its settle tick.
+  it("reads the slab along the step's facing, not the last report's", () => {
+    const readAfterTurn = (reported: Facing) => {
+      const session = sessionReportedFacing(reported)
+      session.advanceTo(1)
+      return cutFollowAt(session.state(), 'p1', drillingAt(REST.y))
+    }
+    const fresh = readAfterTurn(FACING.down)
+    expect(fresh.gate.cutGate).toBe(1)
+    expect(fresh.cutSpeed).toBeGreaterThan(0)
+    expect(readAfterTurn(FACING.left)).toEqual(fresh)
   })
 
   it('sets vCut from the slowest uncut cell of the slab, floor(1000 Q / n) mm a tick', () => {
@@ -102,7 +128,7 @@ describe('cut-follow reads (ticket 333)', () => {
 
   it('counts the ticks with no step, and the tick read, as ticks under the off line', () => {
     const session = sessionFacingDown()
-    session.submit(1, { type: 'drillStep', payload: { x: REST.x, y: REST.y, drive: NO_DRIVE } })
+    session.submit(1, { type: 'drillStep', payload: { ...DOWN_AT_REST, drive: NO_DRIVE } })
     const idleAt = (tick: number) => {
       session.advanceTo(tick)
       return cutFollowAt(session.state(), 'p1', { ...drillingAt(REST.y), isDrilling: false }).gate
@@ -138,7 +164,12 @@ const DENSE_ORE: SliceDefinition = {
 
 const [ORE] = surfaceOreTiles(1)
 const ABOVE_ORE = { x: ORE.tx * 1000 + 500, y: (ORE.ty + 1) * 1000 + 500 }
-const OVER_ORE: CutFollowStep = { ...ABOVE_ORE, isLifting: false, isDrilling: true }
+const OVER_ORE: CutFollowStep = {
+  ...ABOVE_ORE,
+  facing: FACING.down,
+  isLifting: false,
+  isDrilling: true,
+}
 
 /** A starting rig (tip 0) facing down over the ore cell; its gate opened on tick 1, then idled. */
 function shutOverOre(): ScriptedSession {
@@ -147,7 +178,10 @@ function shutOverOre(): ScriptedSession {
   session.submit(0, { type: 'debug.setUpgrade', payload: { upgradeId: 'drill_tip', level: 0 } })
   const { payload } = poseAbove(ORE, FACING.down)
   session.submit(0, { type: 'reportPose', payload: { ...payload, ...ABOVE_ORE } })
-  session.submit(1, { type: 'drillStep', payload: { ...ABOVE_ORE, drive: NO_DRIVE } })
+  session.submit(1, {
+    type: 'drillStep',
+    payload: { ...ABOVE_ORE, facing: FACING.down, drive: NO_DRIVE },
+  })
   session.advanceTo(2 + CUT_GATE_HOLD_TICKS)
   return session
 }
@@ -173,7 +207,7 @@ describe('held cut reads (ticket 430)', () => {
 
   it("says when the open gate has nothing left to cut, its speed then travel's", () => {
     const session = sessionFacingDown()
-    session.submit(1, { type: 'drillStep', payload: { x: REST.x, y: REST.y, drive: NO_DRIVE } })
+    session.submit(1, { type: 'drillStep', payload: { ...DOWN_AT_REST, drive: NO_DRIVE } })
     const carve = { x: REST.x, y: REST.y - 1500, radius: 1500, amount: 255 }
     session.submit(1, { type: 'debug.carveCircle', payload: carve })
     session.advanceTo(2)

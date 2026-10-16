@@ -130,7 +130,8 @@ export function playDive(state: AuthorityState, ticks: readonly DiveTick[]): Div
 
 function diveTickAt(path: DivePath, tick: number): DiveTick {
   const y = path.topY - path.stepMm * (tick - DIVE_START_TICK)
-  const step: CommandIntent = { type: 'drillStep', payload: { x: path.x, y, drive: NO_DRIVE } }
+  const payload = { x: path.x, y, facing: FACING.down, drive: NO_DRIVE }
+  const step: CommandIntent = { type: 'drillStep', payload }
   if (tick === DIVE_START_TICK) return { tick, intents: [reportAt(path.x, y, 0), step] }
   if (tick % POSE_REPORT_INTERVAL_TICKS !== 0) return { tick, intents: [step] }
   return { tick, intents: [reportAt(path.x, y, POSE_REPORT_INTERVAL_TICKS), step] }

@@ -58,7 +58,7 @@ function sweepOntoTheGate(drillLines: DrillLines) {
     for (let tick = 1; tick <= 60; tick++) {
       send(tick, {
         type: 'drillStep',
-        payload: { x: ABOVE.x, y: ABOVE.y - stepMm * tick, drive: NO_DRIVE },
+        payload: { x: ABOVE.x, y: ABOVE.y - stepMm * tick, facing: FACING.down, drive: NO_DRIVE },
       })
     }
     runLog.flushDrillSpans()

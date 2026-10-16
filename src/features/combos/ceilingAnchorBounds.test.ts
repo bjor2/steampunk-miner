@@ -133,7 +133,7 @@ describe('ceiling anchor: the pace bounds', () => {
     const owner = anchorSession()
     const bare = anchorSession({ owned: [] })
     const { x, y } = poseOver(TARGET, FACING.up)
-    const step = { x, y, isLifting: true, isDrilling: true }
+    const step = { x, y, facing: FACING.up, isLifting: true, isDrilling: true }
     expect(cutFollowAt(owner.state(), 'p1', step)).toEqual(cutFollowAt(bare.state(), 'p1', step))
     const motionOf = (session: ScriptedSession) => vehicleMotionAt(session.state(), 'p1', 2)
     expect(motionOf(owner)).toEqual(motionOf(bare))

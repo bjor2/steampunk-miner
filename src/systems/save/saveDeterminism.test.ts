@@ -49,7 +49,9 @@ function isCutBySpan(state: AuthorityState, path: DivePath, tick: number): boole
   const [{ intents }] = diveTicks(path, tick, tick)
   const step = intents.find((intent) => intent.type === 'drillStep')
   if (step?.type !== 'drillStep') throw new Error(`no drill step on tick ${tick}`)
-  const pose: VehiclePose = { ...(vehicleOf(state, 'p1').pose as VehiclePose), ...step.payload }
+  const { x, y } = step.payload
+  // The dive's steps face down, as its reports do.
+  const pose: VehiclePose = { ...(vehicleOf(state, 'p1').pose as VehiclePose), x, y }
   const ticked = { ...state, tick }
   const params = planetParamsOf(state.planet)
   if (params === null) throw new Error('the dive needs a generated planet')

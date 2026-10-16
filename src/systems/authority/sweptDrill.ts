@@ -167,7 +167,13 @@ function sweepOf(state: AuthorityState, playerId: string, step: SweptStep): Swee
     stamp,
     cuttingMm,
     path: sweepPathOf(cursor, step.pose, { stamp, aheadMm }, state.tick),
-    gate: cutGateAt(state, playerId, { x, y, isLifting: step.isLifting, isDrilling: true }),
+    gate: cutGateAt(state, playerId, {
+      x,
+      y,
+      facing: step.pose.facing,
+      isLifting: step.isLifting,
+      isDrilling: true,
+    }),
     share: perCellShareAt(state, playerId),
   }
 }

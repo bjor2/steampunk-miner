@@ -155,7 +155,7 @@ export function cutFollowReadFor(
   { pose, isLifting }: DrillPose,
   isDrilling: boolean,
 ): CutFollow | undefined {
-  return input.cutFollowOf?.({ x: pose.x, y: pose.y, isLifting, isDrilling })
+  return input.cutFollowOf?.({ x: pose.x, y: pose.y, facing: pose.facing, isLifting, isDrilling })
 }
 
 /**

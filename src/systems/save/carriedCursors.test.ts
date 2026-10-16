@@ -48,7 +48,10 @@ function snapshot20State(): AuthorityState {
   const { payload } = poseAbove({ tx: 0, ty: 0 }, FACING.down)
   session.submit(0, { type: 'reportPose', payload: { ...payload, ...at } })
   for (let tick = 1; tick <= 3; tick++) {
-    session.submit(tick, { type: 'drillStep', payload: { ...at, drive: NO_DRIVE } })
+    session.submit(tick, {
+      type: 'drillStep',
+      payload: { ...at, facing: FACING.down, drive: NO_DRIVE },
+    })
   }
   const state = session.state()
   const vehicle = vehicleOf(state, 'p1')

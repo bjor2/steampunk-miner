@@ -12,7 +12,8 @@
  * - while it is shut, whether the slab the drill bites holds such a cell (`isSpanStopped`), so a
  *   body coasting on its last `vCut` stops at once there (ticket 430).
  *
- * The pose is the last reported one moved to the step's position, as `drillStep` cuts it. The
+ * The pose is the last reported one moved to the step's position and turned to its facing, as
+ * `drillStep` cuts it (ticket 506). The
  * authority keeps `cutGateAt` on the cursor in each `drillStep`; the client reads `cutFollowAt`
  * from the same state, with the same position and drive, before it sends that step, so the
  * client's gate is the authority's on every tick. A tick with no step counts as one under the off
@@ -30,7 +31,7 @@ import { sweptDrillStampOf } from '../vehicle/drillStamp'
 import { leadingSlabOf, type LeadingSlab } from '../vehicle/leadingSlab'
 import type { SweptCut } from '../vehicle/sweptCut'
 import { travelSpeedOf } from '../vehicle/travelParity'
-import { facingVectorOf, type VehiclePose } from '../vehicle/vehiclePose'
+import { facingVectorOf, type Facing, type VehiclePose } from '../vehicle/vehiclePose'
 import { groundReaderOf } from '../world/groundReader'
 import type { PlanetParams } from '../world/planetParams'
 import type { TilePoint } from '../world/tileGrid'
@@ -43,10 +44,14 @@ import { shockTicksFor } from './magnetic/electrifiedShock'
 import { planetParamsOf } from './planetOfState'
 import { sweptStampAheadMmAt } from './stepBoundRead'
 
-/** A tick's step as the client sends it: its position in mm, its lift, whether the drill bit. */
+/**
+ * A tick's step as the client sends it: its position in mm, the head's settled facing, its lift,
+ * whether the drill bit.
+ */
 export interface CutFollowStep {
   x: number
   y: number
+  facing: Facing
   isLifting: boolean
   /** The drill is engaged, so a `drillStep` goes out this tick; otherwise the tick idles. */
   isDrilling: boolean
@@ -89,7 +94,7 @@ function slabReadOf(state: AuthorityState, playerId: string, step: CutFollowStep
   const params = planetParamsOf(state.planet)
   const reported = vehicleOf(state, playerId).pose
   if (params === null || reported === null) return null
-  const pose: VehiclePose = { ...reported, x: step.x, y: step.y }
+  const pose: VehiclePose = { ...reported, x: step.x, y: step.y, facing: step.facing }
   const aim = {
     centreMm: pose,
     facing: facingVectorOf(pose.upx, pose.upy, pose.facing),

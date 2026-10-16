@@ -36,7 +36,10 @@ describe('vehicle target (ticket 334)', () => {
   it('places the rig at a later drill step, carried on from the step’s tick', () => {
     const session = sessionReportedFalling()
     const stoppedAt = { x: START.x, y: START.y - 150 }
-    session.submit(4, { type: 'drillStep', payload: { ...stoppedAt, drive: NO_DRIVE } })
+    session.submit(4, {
+      type: 'drillStep',
+      payload: { ...stoppedAt, facing: FACING.down, drive: NO_DRIVE },
+    })
     const target = vehicleTargetOf(session.state(), 'p1', 6)
     expect(target?.position).toEqual({ x: stoppedAt.x, y: stoppedAt.y - 200 })
   })

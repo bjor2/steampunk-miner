@@ -165,7 +165,10 @@ function restAndReport(
   session.submit(0, { type: 'debug.setEnergy', payload: { energy: '100000' } })
   session.submit(0, reportDownAt(0))
   for (let tick = 1; tick <= steps; tick++) {
-    session.submit(tick, { type: 'drillStep', payload: { ...AWAY, drive: NO_DRIVE } })
+    session.submit(tick, {
+      type: 'drillStep',
+      payload: { ...AWAY, facing: FACING.down, drive: NO_DRIVE },
+    })
   }
   session.submit(reportTick, reportDownAt(reportedDrillTicks))
   return session
@@ -237,7 +240,10 @@ describe('authority prefetch along the drive (ticket 335)', () => {
     const below = chunkOfTile(Math.floor(start.y / 1000) - 2 * CHUNK_SIZE + 4)
     const cx = chunkOfTile(column)
     expect(isGeneratedChunkHeld(params, cx, below)).toBe(false)
-    session.submit(1, { type: 'drillStep', payload: { ...start, drive: NO_DRIVE } })
+    session.submit(1, {
+      type: 'drillStep',
+      payload: { ...start, facing: FACING.down, drive: NO_DRIVE },
+    })
     const reach = session.vehicle().sweptCut?.yMm ?? 0
     const ahead = chunkOfTile(Math.floor((reach - CHUNK_SIZE * 1000) / 1000))
     expect(isGeneratedChunkHeld(params, cx, ahead)).toBe(true)

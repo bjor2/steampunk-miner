@@ -113,7 +113,7 @@ export type LegTick = (state: AuthorityState, tick: number, pose: VehiclePose) =
 /** The live command: a `drillStep` at the pose, as the client sends it. */
 export const AS_DRILL_STEP: LegTick = (state, tick, pose) => {
   const seq = state.players.p1.lastSeq + 1
-  const payload = { x: pose.x, y: pose.y, drive: NO_DRIVE }
+  const payload = { x: pose.x, y: pose.y, facing: pose.facing, drive: NO_DRIVE }
   return applyCommand(state, { playerId: 'p1', tick, seq, type: 'drillStep', payload })
 }
 

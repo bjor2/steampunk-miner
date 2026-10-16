@@ -27,6 +27,9 @@ import { stepAtToe, type ToeStep } from './toeStopFixtures'
 // and the 15 m/s rig backs off more in sum at 30 frames/s, held by a ratchet. Since ticket 491 the
 // let-go stop also sees the face's toe (`drillToe.ts`) on a body on the ground; what is left at 30
 // frames/s is contact made while the drive still pushed (phase 6) and a landing bounce (phase 20), #499.
+// Since ticket 506 the drill step carries the head's facing, so the cut after the down-then-left
+// turn starts up to 12 ticks sooner and every pinned phase lands on another cell state: the paired
+// back-off is judged on the phases this tree follows, re-paired once, with main's bars unchanged.
 
 const RIGS: Readonly<Record<string, Record<string, number>>> = {
   'stored 1': { drill_power: 1, drill_tip: 0 },
@@ -87,6 +90,22 @@ const MAIN_FOLLOWED_LEVEL: Readonly<Record<number, PairedPhases>> = {
  * 6206876410, TD on #421) while depth and sum carry the no-worse-than-main assert.
  */
 const LIP_BACKWARD_TICKS_MAX: Readonly<Record<number, number>> = { 30: 6, 144: 24 }
+/**
+ * The 15 m/s rig's level release phases this sweep follows (`isFollowingCut`) since ticket 506,
+ * re-paired once on its tree (GD ruling 6218251033, item 3) and fixed here as main's were: the cut
+ * now starts on the head's settle tick, so main's phases above mostly fall on releases it no
+ * longer follows. Unpaired, on main's phases, it backs off −0.8165 m/s deepest over 10 ticks
+ * (sum −2.5417) at 30 frames/s and −0.8459 over 20 (sum −6.7023) at 144, logged and not judged.
+ */
+const REPAIRED_FOLLOWED_LEVEL_PHASES: Readonly<Record<number, readonly number[]>> = {
+  30: [2, 12, 14, 16, 18, 28, 30, 32, 34],
+  144: [1, 2, 9, 11, 12, 13, 14, 15, 16, 17, 18, 19, 28, 29, 30, 31, 32, 33, 34],
+}
+/**
+ * The Vertical Scaler's bar on the re-paired phases (ticket 506, ruled by the GD, item 4): main
+ * f0eac6c3's deepest back-off over every level release phase it followed, at 30 and 144 frames/s.
+ */
+const MAIN_DEEPEST_FOLLOWED_BACKWARD_MPS = -0.4557
 /** A ceiling on how far the 15 m/s rig backs off main's followed level phases. */
 interface BackOffCeiling {
   summedBackwardMps: number
@@ -109,8 +128,13 @@ const TOE_RATCHET_ROWS = FRAME_RATES.map((framesPerSecond) => ({
 }))
 /** #458's rig-heavy 15 m/s rig: the 15 m/s rig with its hull and hold upgraded too. */
 const RIG_HEAVY = { drill_power: 200, drill_tip: 600, engine: 5000, hull: 5000, cargo_hold: 5000 }
-/** Its level release phase at 144 frames/s whose body is in the air as the drive lets go (#458). */
-const AIRBORNE_RELEASE_PHASE = 37
+/**
+ * Its level release phase at 144 frames/s whose body is in the air as the drive lets go (#458),
+ * re-paired for ticket 506 from main's 37: there it now rides its ramp for all 6 ticks. At 36 and
+ * 37 the body meets the uncut face ahead in the air and stops there; at 39 it lands on the sixth
+ * tick and backs off −0.621 m/s (#499's landing bounce).
+ */
+const AIRBORNE_RELEASE_PHASE = 38
 /** How deep rig-heavy backs off main's followed phases at 144 frames/s on main (#458's table). */
 const RIG_HEAVY_DEEPEST_BACKWARD_MPS = -0.53
 /** The cut-follow reads a gated cell gives the motor: `vCut` 0 while open, a span stop while shut. */
@@ -192,11 +216,17 @@ function isStoppedInTime(release: readonly TickRead[]): boolean {
   return release.some(({ speed }) => Math.abs(speed) < STOPPED_MPS)
 }
 
-/** The 6 ticks after letting go on each of main's followed phases. */
-function pairedReleasesOf(paired: PairedPhases, framesPerSecond: number): TickRead[][] {
-  return paired.phases.map(
+const pairedReleasesByRate = new Map<number, TickRead[][]>()
+
+/** The 6 ticks after letting go on each re-paired phase; the same at a rate, so run once. */
+function pairedReleasesOf(framesPerSecond: number): TickRead[][] {
+  const known = pairedReleasesByRate.get(framesPerSecond)
+  if (known !== undefined) return known
+  const releases = REPAIRED_FOLLOWED_LEVEL_PHASES[framesPerSecond].map(
     (phase) => releaseAt(RIGS['15 m/s rig'], framesPerSecond, 'level', phase).release,
   )
+  pairedReleasesByRate.set(framesPerSecond, releases)
+  return releases
 }
 
 /** Every release tick that moved backwards, as its speed. */
@@ -211,10 +241,10 @@ function sumOf(values: readonly number[]): number {
   return values.reduce((sum, value) => sum + value, 0)
 }
 
-/** The 15 m/s rig backs off main's followed level phases no deeper than main, and within `ceiling`. */
+/** The 15 m/s rig backs off its paired level phases no deeper than main, and within `ceiling`. */
 function judgePairedBackOff(framesPerSecond: number, ceiling: BackOffCeiling): void {
   const paired = MAIN_FOLLOWED_LEVEL[framesPerSecond]
-  const backward = backwardSpeedsOf(pairedReleasesOf(paired, framesPerSecond))
+  const backward = backwardSpeedsOf(pairedReleasesOf(framesPerSecond))
   expect(Math.min(0, ...backward)).toBeGreaterThanOrEqual(paired.deepestBackwardMps)
   expect(sumOf(backward)).toBeGreaterThanOrEqual(ceiling.summedBackwardMps)
   expect(backward.length).toBeLessThanOrEqual(ceiling.backwardTicks)
@@ -320,6 +350,19 @@ describe('the stop ramp follows the drive (ticket 430 addendum)', () => {
     '15 m/s rig: backs off main’s followed level release phases no deeper than main and no more in sum than $summedBackwardMps m/s over at most $backwardTicks backward ticks, at $framesPerSecond frames/s (ratchet; it may only shrink)',
     ({ framesPerSecond }) => judgePairedBackOff(framesPerSecond, TOE_RATCHET[framesPerSecond]),
     240_000,
+  )
+
+  it.each([30])(
+    '15 m/s rig: backs off its re-paired followed level release phases no deeper than main’s −0.4557 m/s, at %i frames/s (ticket 506, Vertical Scaler)',
+    (framesPerSecond) => {
+      const backward = backwardSpeedsOf(pairedReleasesOf(framesPerSecond))
+      expect(Math.min(0, ...backward)).toBeGreaterThanOrEqual(MAIN_DEEPEST_FOLLOWED_BACKWARD_MPS)
+    },
+    240_000,
+  )
+
+  it.todo(
+    '15 m/s rig: backs off its re-paired followed level release phases no deeper than main’s −0.4557 m/s, at 144 frames/s (ticket 506, Vertical Scaler: reads −0.4925 paired, −0.8459 unpaired; owner #506)',
   )
 
   it.todo(

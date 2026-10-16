@@ -104,7 +104,10 @@ function cutLevel(logStep: LogStep = LOG_NOTHING): StepRun {
     session.submit(tick, { type: 'debug.setEnergy', payload: { energy: '150' } })
     const x = START.x + stepMm * tick
     const before = session.state()
-    const intent = { type: 'drillStep', payload: { x, y: START.y, drive: NO_DRIVE } } as const
+    const intent = {
+      type: 'drillStep',
+      payload: { x, y: START.y, facing: FACING.right, drive: NO_DRIVE },
+    } as const
     const command = { playerId: 'p1', tick, seq: before.players.p1.lastSeq + 1, ...intent }
     const started = performance.now()
     logStep(command, session.submit(tick, intent), session.state())

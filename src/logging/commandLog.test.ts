@@ -133,7 +133,7 @@ function drillStepsDown(
     tick: fromTick + index,
     seq: nextSeq++,
     type: 'drillStep',
-    payload: { x: 30_500, y: fromY - stepMm * index, drive: DOWN },
+    payload: { x: 30_500, y: fromY - stepMm * index, facing: 2, drive: DOWN },
   }))
 }
 

@@ -5,13 +5,14 @@ import type { SliceDefinition } from '../../registries/sliceDefinition'
 import type { GateOutcome } from '../registries/gateChecks'
 import { ENERGY_QUANTA_PER_TICK } from '../vehicle/energyQuanta'
 import { NO_DRIVE, type DriveSigns } from '../vehicle/driveSigns'
-import { FACING } from '../vehicle/vehiclePose'
+import { FACING, type Facing } from '../vehicle/vehiclePose'
 import { cellDensitySum } from '../world/cellYield'
 import { surfaceRowOfColumn, type TilePoint } from '../world/tileGrid'
 import { EMPTY_WORLD, materialCellAt } from '../world/worldState'
 import { statsOfVehicle } from '../vehicle/vehicleState'
 import { cellDigEnergyOf } from './cellDigEnergy'
 import { drillSubStepsOfCells } from './groundDrill'
+import type { CommandIntent } from './authorityCommand'
 import type { DomainEvent } from './domainEvent'
 import {
   createScriptedSession,
@@ -34,14 +35,19 @@ const COLUMN = 20
 const SURFACE_TY = surfaceRowOfColumn(COLUMN, PARAMS.radiusTiles)
 const START = { x: COLUMN * 1000 + 500, y: (SURFACE_TY + 3) * 1000 + 500 }
 
-const stepTo = (x: number, y: number, drive: DriveSigns = NO_DRIVE) =>
-  ({ type: 'drillStep', payload: { x, y, drive } }) as const
+const stepTo = (x: number, y: number, drive: DriveSigns = NO_DRIVE, facing: number = FACING.down) =>
+  ({ type: 'drillStep', payload: { x, y, facing, drive } }) as const
 
 /** A session with a full tank, the body reported at `start` facing down at tick 0. */
 function sessionFacingDownAt(start = START): ScriptedSession {
+  return sessionReportedAt(start, FACING.down)
+}
+
+/** A session with a full tank, the body reported at `start` facing `facing` at tick 0. */
+function sessionReportedAt(start: { x: number; y: number }, facing: Facing): ScriptedSession {
   const session = createScriptedSession()
   session.submit(0, { type: 'debug.setEnergy', payload: { energy: '150' } })
-  const { payload } = poseAbove({ tx: 0, ty: 0 }, FACING.down)
+  const { payload } = poseAbove({ tx: 0, ty: 0 }, facing)
   session.submit(0, { type: 'reportPose', payload: { ...payload, x: start.x, y: start.y } })
   return session
 }
@@ -153,6 +159,39 @@ describe('drill step (ticket 330)', () => {
         expect.objectContaining({ type: 'CommandRejected', reason: 'invalid_pose' }),
       )
     }
+  })
+
+  it('rejects a drillStep whose facing is not 0 to 3 as invalid_pose', () => {
+    for (const facing of [4, 7]) {
+      const [answer] = sessionFacingDownAt().submit(1, stepTo(START.x, START.y, NO_DRIVE, facing))
+      expect(answer).toMatchObject({ type: 'CommandRejected', reason: 'invalid_pose' })
+    }
+  })
+
+  it('refuses a drillStep with no facing field', () => {
+    const payload = { x: START.x, y: START.y, drive: NO_DRIVE }
+    const unfaced = { type: 'drillStep', payload } as unknown as CommandIntent
+    const [answer] = sessionFacingDownAt().submit(1, unfaced)
+    expect(answer).toMatchObject({ type: 'CommandRejected', reason: 'invalid_payload' })
+  })
+
+  // Ticket 506: a turn reaches the authority on the step, not up to 12 ticks later on a report.
+  it("cuts along the step's facing, not the last report's", () => {
+    const near = { x: START.x, y: (SURFACE_TY + 1) * 1000 + 400 }
+    const cutFor50Ticks = (reported: Facing, stepped: Facing) => {
+      const session = sessionReportedAt(near, reported)
+      for (let tick = 1; tick <= 50; tick++) {
+        session.submit(tick, stepTo(near.x, near.y, NO_DRIVE, stepped))
+      }
+      return session
+    }
+    const fresh = cutFor50Ticks(FACING.down, FACING.down)
+    const stale = cutFor50Ticks(FACING.left, FACING.down)
+    expect(tilesDestroyed(fresh.events()).length).toBeGreaterThan(0)
+    expect(stale.events()).toEqual(fresh.events())
+    expect(stale.state().world).toEqual(fresh.state().world)
+    const leftward = cutFor50Ticks(FACING.down, FACING.left)
+    expect(leftward.state().world).not.toEqual(fresh.state().world)
   })
 
   it('refuses a step from a docked vehicle', () => {

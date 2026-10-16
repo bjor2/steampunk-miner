@@ -1,13 +1,15 @@
 /**
- * `drillStep {x, y, drive}` (TD scope on #316 as the GD locked it, ticket 330, behind the dev flag
+ * `drillStep {x, y, facing, drive}` (TD scope on #316 as the GD locked it, ticket 330, behind the dev flag
  * `drill.sweptCut`): the client sends one every fixed step its drill is engaged, beside the 5 Hz
  * `reportPose`, and the authority cuts that tick along the path the stamp swept (`sweptDrill.ts`).
  *
- * - The step is the last reported pose (its up vector and facing) moved to `x, y`; `drive.y` 1 is
- *   the lift, as the report's drive says (ticket 279). It never changes the reported pose, so
- *   collapse, combat, heat and lava keep reading the reports.
- * - Refused, cutting nothing, with no planet, an inactive vehicle or no reported pose, a second
- *   step in one tick (`too_many_ticks`), or a step further from the last accepted position (the
+ * - The step is the last reported pose (its up vector) moved to `x, y` and turned to the step's
+ *   `facing`, the head's settled facing that tick (ticket 506: a report lags a turn by up to 12
+ *   ticks, so the cut along its facing stood the body after a turn); `drive.y` 1 is the lift, as
+ *   the report's drive says (ticket 279). It never changes the reported pose, so collapse, combat,
+ *   heat and lava keep reading the reports.
+ * - Refused, cutting nothing, with no planet, an inactive vehicle or no reported pose, a facing
+ *   outside 0 to 3 (`invalid_pose`, the range check is the whole audit), a second step in one tick (`too_many_ticks`), or a step further from the last accepted position (the
  *   last step's, or else the report's) than the rig's stats allow in the ticks since it
  *   (`invalid_pose`, the stats-derived bound of ticket 334, `stepBoundRead.ts`).
  * - It cuts the sweep as far as its work reaches (the exact carry, ticket 399), by the per-cell
@@ -17,7 +19,7 @@
  *   lags a step by at most one report interval, well inside a block's 60-tick warning.
  */
 import type { SweptCut } from '../vehicle/sweptCut'
-import { noseTileOf, type VehiclePose } from '../vehicle/vehiclePose'
+import { isFacing, noseTileOf, type Facing, type VehiclePose } from '../vehicle/vehiclePose'
 import { isVehicleActive, type VehicleState } from '../vehicle/vehicleState'
 import type { AuthorityCommand } from './authorityCommand'
 import { vehicleOf, type AuthorityState } from './authorityState'
@@ -41,11 +43,12 @@ type StepCommand = AuthorityCommand<'drillStep'>
 
 export const DRILL_STEP_RULES: { readonly drillStep: CommandRule<'drillStep'> } = {
   drillStep: {
-    fields: { x: 'safeInteger', y: 'safeInteger', drive: 'driveSigns' },
+    fields: { x: 'safeInteger', y: 'safeInteger', facing: 'wholeNumber', drive: 'driveSigns' },
     reject: (state, command) =>
       firstRejection([
         () => noPlanetRejection(state.planet),
         () => steppingVehicleRejection(vehicleOf(state, command.playerId)),
+        () => facingRejection(command),
         () => repeatedStepRejection(vehicleOf(state, command.playerId), command.tick),
         () => stepLengthRejection(state, command),
       ]),
@@ -61,6 +64,11 @@ export const DRILL_STEP_RULES: { readonly drillStep: CommandRule<'drillStep'> } 
 function steppingVehicleRejection(vehicle: VehicleState): Rejection | null {
   if (isVehicleActive(vehicle) && vehicle.pose !== null) return null
   return rejectionOf('vehicle_not_active', `the vehicle is ${vehicle.mode} or has no pose`)
+}
+
+function facingRejection(command: StepCommand): Rejection | null {
+  if (isFacing(command.payload.facing)) return null
+  return rejectionOf('invalid_pose', `facing must be 0 to 3, got ${command.payload.facing}`)
 }
 
 function repeatedStepRejection(vehicle: VehicleState, tick: number): Rejection | null {
@@ -98,7 +106,8 @@ function cutStep(state: AuthorityState, { playerId, payload }: StepCommand): Rul
   const params = planetParamsOf(state.planet)
   const reported = vehicleOf(state, playerId).pose
   if (params === null || reported === null) return unchanged(state)
-  const pose = { ...reported, x: payload.x, y: payload.y }
+  // `facingRejection` refused any facing outside 0 to 3.
+  const pose = { ...reported, x: payload.x, y: payload.y, facing: payload.facing as Facing }
   const nose = noseTileOf(pose)
   const step = { pose, drive: payload.drive, isLifting: payload.drive.y === 1 }
   const drilled = drillAlongStep(state, params, playerId, nose, step)
