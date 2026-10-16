@@ -36,7 +36,7 @@ import { noPlanetRejection, planetParamsOf } from './planetOfState'
 import { noteRigCut } from './rigStillness'
 import { cutGateLeftAt, stepBoundsAt, stepReachMmOf } from './stepBoundRead'
 import { drillAlongStep } from './drillStepCut'
-import { withBurrowersCut } from './vehicleCommandRules'
+import { withBurrowersCut } from './reportedDrill'
 import { followEnergyChange } from './vehicleTransitions'
 
 type StepCommand = AuthorityCommand<'drillStep'>

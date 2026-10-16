@@ -29,13 +29,11 @@ import { ENERGY_QUANTA_PER_TICK } from '../vehicle/energyQuanta'
 import {
   isFacing,
   isWithinDrillReach,
-  noseTileOf,
   poseProblems,
   type Facing,
   type VehiclePose,
 } from '../vehicle/vehiclePose'
 import { reportSpeedOfStepBound } from '../vehicle/stepBound'
-import { stepDigTicksOf } from '../vehicle/sweptCut'
 import { isVehicleActive, type VehicleState } from '../vehicle/vehicleState'
 import type { TilePoint } from '../world/tileGrid'
 import { isRemovableCell } from '../world/worldCell'
@@ -55,15 +53,19 @@ import {
 } from './commandRule'
 import { layCasingAfterScriptedDrill, layCasingAtPose, layDueCasingAtPose } from './casingPlacement'
 import { followCasingSupport } from './casingSupport'
-import { drillBurrowersOnTile } from './combat/enemyDamage'
 import { flushGunHits } from './combat/gunHits'
 import { noteReportForCombat } from './combat/poseReportCombat'
-import { drillAtPose, drillCell } from './groundDrill'
-import { followHeat, type HeatActivity } from './heatRules'
+import { drillCell } from './groundDrill'
+import { followHeat } from './heatRules'
 import { touchLavaAtPose } from './lava/lavaRules'
 import { enterMagneticField } from './magnetic/fieldEntry'
-import type { DomainEventBody } from './domainEvent'
 import { noPlanetRejection, planetParamsOf } from './planetOfState'
+import {
+  actionTicksOf,
+  drillReportedTicks,
+  followReportedHeat,
+  withBurrowersCut,
+} from './reportedDrill'
 import { followGatedBite } from './reportedGateBite'
 import { noteReportedStillness, noteRigCut } from './rigStillness'
 import { stepBoundsAt } from './stepBoundRead'
@@ -119,13 +121,7 @@ export const VEHICLE_COMMAND_RULES: {
         (current) => flushGunHits(current, command.playerId),
         (current) => chargeReportedActions(current, command),
         (current) => layReportedCasing(current, command),
-        (current) =>
-          followHeat(
-            current,
-            command.playerId,
-            command.tick,
-            reportedHeatActivity(command.payload, vehicleOf(state, command.playerId)),
-          ),
+        (current) => followReportedHeat(current, command, vehicleOf(state, command.playerId)),
         (current) =>
           touchLavaAtPose(current, command.playerId, command.tick, command.payload.drillTicks > 0),
         (current) => followEnergyChange(current, command.playerId, command.tick),
@@ -221,27 +217,6 @@ function tickBudgetRejection(
   return rejectionOf('too_many_ticks', `action ticks must be at most ${budget}`)
 }
 
-function actionTicksOf(payload: PosePayload): number[] {
-  return [payload.thrustTicks, payload.driveTicks, payload.drillTicks]
-}
-
-/**
- * A report with no action ticks at all is the vehicle stopped to cool down (#113 "idle"). The
- * drilling it heats for is its own drill ticks, or, when the swept cut's steps cut them, the steps'
- * summed dig time (ticket 335), as `vehicle` stood before the report.
- */
-function reportedHeatActivity(payload: PosePayload, vehicle: VehicleState): HeatActivity {
-  return {
-    drillTicks: reportedDrillTicksOf(payload, vehicle),
-    isIdle: actionTicksOf(payload).every((ticks) => ticks === 0),
-  }
-}
-
-function reportedDrillTicksOf(payload: PosePayload, vehicle: VehicleState): number {
-  const cursor = vehicle.sweptCut
-  return isCutBySteps(vehicle) && cursor !== undefined ? stepDigTicksOf(cursor) : payload.drillTicks
-}
-
 function poseOf(payload: PosePayload): VehiclePose {
   const { x, y, vx, vy, upx, upy, facing } = payload
   return { x, y, vx, vy, upx, upy, facing: (isFacing(facing) ? facing : -1) as Facing }
@@ -278,17 +253,6 @@ function chargeReportedActions(
   return { state: markChargedState(moved, playerId, tick), events: drilled.events }
 }
 
-/** The report's drill ticks at its pose, unless the swept cut's steps already cut them. */
-function drillReportedTicks(
-  state: AuthorityState,
-  playerId: string,
-  vehicle: VehicleState,
-  payload: PosePayload,
-): RuleEffect {
-  if (isCutBySteps(vehicle) || vehicle.pose === null) return unchanged(state)
-  return drillAtPoseAndBurrowers(state, playerId, vehicle.pose, payload)
-}
-
 /** Rings behind the drill: the report's own cut records its axis; the steps' cut recorded theirs. */
 function layReportedCasing(
   state: AuthorityState,
@@ -314,38 +278,6 @@ function drillScriptedTile(state: AuthorityState, command: AuthorityCommand<'dri
   if (params === null) return unchanged(state)
   const drilled = drillCell(state, params, command.playerId, tile, ticks)
   return withBurrowersCut(drilled, command.playerId, tile)
-}
-
-function drillAtPoseAndBurrowers(
-  state: AuthorityState,
-  playerId: string,
-  pose: VehiclePose,
-  payload: PosePayload,
-): RuleEffect {
-  const params = planetParamsOf(state.planet)
-  if (params === null) return unchanged(state)
-  const nose = noseTileOf(pose)
-  const reported = { pose, drive: payload.drive, isLifting: payload.thrusting }
-  const drilled = drillAtPose(state, params, playerId, reported, nose, payload.drillTicks)
-  return withBurrowersCut(drilled, playerId, nose)
-}
-
-/** A burrower swimming in the drilled tile is cut for the ticks the drill worked (#9). */
-export function withBurrowersCut(
-  drilled: RuleEffect,
-  playerId: string,
-  tile: TilePoint,
-): RuleEffect {
-  const ticks = drilledTicksOf(drilled.events)
-  const cut = drillBurrowersOnTile(drilled.state, playerId, tile, ticks, drilled.state.tick)
-  return { state: cut.state, events: [...drilled.events, ...cut.events] }
-}
-
-function drilledTicksOf(events: readonly DomainEventBody[]): number {
-  return events.reduce(
-    (ticks, event) => ticks + (event.type === 'DrillDamageDealt' ? event.ticks : 0),
-    0,
-  )
 }
 
 function markCharged(state: AuthorityState, playerId: string, tick: number): RuleEffect {
