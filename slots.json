@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-10-16T06:55:32+02:00",
+  "updated_at": "2026-10-16T07:01:12+02:00",
   "caps": {
     "grok": 12,
     "claude": 10,
@@ -61,17 +61,16 @@
         },
         {
           "slot": "C6",
-          "state": "busy",
-          "ticket": 430,
-          "grok_slot": 6,
-          "kind": "dev",
-          "since": "2026-10-16T06:49:00+02:00",
-          "wave": null
+          "state": "free",
+          "ticket": null,
+          "grok_slot": null,
+          "kind": null,
+          "since": null
         }
       ],
       "size": 6,
-      "used": 3,
-      "free": 3,
+      "used": 2,
+      "free": 4,
       "claims_last_hour": 9,
       "name": "Claude Max 1"
     },
@@ -128,12 +127,12 @@
   },
   "tester": {
     "state": "running",
-    "phase": "fast",
+    "phase": "slow",
     "sha": "0335d65ee0c2ef14a3dd924f5f7f7f5187d30c7b",
-    "since": "2026-10-16T04:32:11Z",
+    "since": "2026-10-16T05:01:08Z",
     "holds_gate": true,
     "claude_slot": null,
-    "last_run": "2026-10-16T04:32:05Z",
+    "last_run": "2026-10-16T05:01:06Z",
     "last_nightly": "2026-10-15T20:43:15Z",
     "last_nightly_result": "full=FAIL balance-report=ok bench=FAIL balance-planets=ok balance-guns=ok balance-charges=ok balance-refinery=ok balance-heat=ok e2e=FAIL memory-soak=FAIL packaged-smoke=ok ",
     "main_red_sha": null,
@@ -655,11 +654,9 @@
     },
     {
       "slot": 6,
-      "state": "dev",
-      "ticket": 430,
-      "since": "2026-10-16T06:49:00+02:00",
-      "claude_slot": 6,
-      "wave": null
+      "state": "free",
+      "ticket": null,
+      "since": null
     },
     {
       "slot": 7,
@@ -743,12 +740,11 @@
     },
     {
       "slot": 6,
-      "state": "busy",
-      "ticket": 430,
-      "grok_slot": 6,
-      "since": "2026-10-16T06:49:00+02:00",
-      "account": 1,
-      "wave": null
+      "state": "free",
+      "ticket": null,
+      "grok_slot": null,
+      "since": null,
+      "account": 1
     },
     {
       "slot": 7,
@@ -797,8 +793,8 @@
   "totals": {
     "grok": {
       "size": 12,
-      "used": 3,
-      "dev": 3,
+      "used": 2,
+      "dev": 2,
       "dev_cap": 8,
       "planner": 0,
       "planner_cap": 4
@@ -806,8 +802,8 @@
     "claude": {
       "size": 10,
       "enabled": 6,
-      "used": 3,
-      "free": 3,
+      "used": 2,
+      "free": 4,
       "external": 0
     }
   },
