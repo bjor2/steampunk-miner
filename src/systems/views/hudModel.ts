@@ -13,7 +13,7 @@ import { dockableBayOf } from '../authority/dockRules'
 import { BAY_NAMES } from './bayNames'
 import { serviceQuote } from '../authority/platformServices'
 import { formatAmount } from '../displayAmount'
-import { boundLabel, type Bindings } from '../input/actionMap'
+import { fillPromptLine, promptLabelOf, type PromptSource } from '../input/promptLabel'
 import {
   cmp,
   div,
@@ -64,7 +64,8 @@ export interface HudSources {
   playerId: string
   /** Client-owned whole tiles below the surface, the log envelope's `depthTiles`. */
   depthTiles: number
-  bindings: Bindings
+  /** The bindings and the device the prompts name controls for (P1-4 of #470). */
+  prompts: PromptSource
   /** A scenario or a restore stands at its tick until play starts it (ticket 301); absent: no. */
   isAwaitingPlay?: boolean
 }
@@ -130,7 +131,7 @@ export interface HudModel {
   /** "Space: Ancient cache" (interact's first key) exactly while `interact` would open a live cache (#46). */
   cachePrompt: DockPrompt
   isDebugRun: boolean
-  /** "Scenario ready — press any key" while the live step waits for play (ticket 301). */
+  /** "Scenario ready — press any key" (on touch "tap any control") while play waits (ticket 301). */
   readyPrompt: DockPrompt
   warning: EnergyWarning
 }
@@ -145,7 +146,7 @@ const WARNING_MARKERS: Readonly<Record<EnergyWarningLevel, { text: string; icon:
 
 const PERMILLE = 1000
 
-const READY_PROMPT_TEXT = 'Scenario ready — press any key'
+const READY_PROMPT_LINE = 'Scenario ready — {inputVerb} any {inputNoun}'
 
 export function selectHudModel(sources: HudSources): HudModel {
   const { state, playerId } = sources
@@ -165,9 +166,9 @@ export function selectHudModel(sources: HudSources): HudModel {
     liningBill: liningBillOf(vehicle),
     depth: depthReadingOf(state, playerId, sources.depthTiles),
     casing: casingBadgeOf(state, playerId),
-    guns: gunReadingOf(vehicle, sources.bindings),
-    boreAuto: boreAutoReadingOf(state, playerId, sources.bindings),
-    charges: chargeReadingOf(vehicle.charges, sources.bindings),
+    guns: gunReadingOf(vehicle, sources.prompts),
+    boreAuto: boreAutoReadingOf(state, playerId, sources.prompts),
+    charges: chargeReadingOf(vehicle.charges, sources.prompts),
     chargeFuse,
     heat,
     dockArrow: dockArrowOf(state, playerId),
@@ -185,10 +186,10 @@ export function selectHudModel(sources: HudSources): HudModel {
     }),
     tileTime: tileTimeAhead(state, playerId),
     vehicleState,
-    dockPrompt: dockPromptOf(state, playerId, sources.bindings),
-    cachePrompt: cachePromptOf(state, playerId, sources.bindings),
+    dockPrompt: dockPromptOf(state, playerId, sources.prompts),
+    cachePrompt: cachePromptOf(state, playerId, sources.prompts),
     isDebugRun: state.debugApplied,
-    readyPrompt: { isShown: sources.isAwaitingPlay === true, text: READY_PROMPT_TEXT },
+    readyPrompt: readyPromptOf(sources),
     warning,
   }
 }
@@ -258,19 +259,27 @@ function energyWarningOf(vehicle: VehicleState, depthTiles: number): EnergyWarni
 }
 
 /** The prompt names the bay the vehicle would dock at (#37). */
-function dockPromptOf(state: AuthorityState, playerId: string, bindings: Bindings): DockPrompt {
+function dockPromptOf(state: AuthorityState, playerId: string, prompts: PromptSource): DockPrompt {
   const bay = dockableBayOf(state, playerId)
-  const label = boundLabel(bindings, 'interact')
+  const label = promptLabelOf('interact', prompts, prompts.inputDevice)
   return {
     isShown: bay !== null,
     text: bay === null ? '' : `${label}: Dock at the ${BAY_NAMES[bay]}`,
   }
 }
 
-function cachePromptOf(state: AuthorityState, playerId: string, bindings: Bindings): DockPrompt {
+function cachePromptOf(state: AuthorityState, playerId: string, prompts: PromptSource): DockPrompt {
   return {
     isShown: canOpenArtefactCache(state, playerId),
-    text: `${boundLabel(bindings, 'interact')}: Ancient cache`,
+    text: `${promptLabelOf('interact', prompts, prompts.inputDevice)}: Ancient cache`,
+  }
+}
+
+/** The ready line in the words of the device in use. */
+function readyPromptOf(sources: HudSources): DockPrompt {
+  return {
+    isShown: sources.isAwaitingPlay === true,
+    text: fillPromptLine(READY_PROMPT_LINE, sources.prompts),
   }
 }
 

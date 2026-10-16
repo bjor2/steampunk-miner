@@ -7,7 +7,7 @@
  */
 import { vehicleOf, type AuthorityState } from '../../../systems/authority/authorityState'
 import { chargeRadiusMm } from '../../../systems/economy/chargeSizes'
-import { boundLabel, type Bindings } from '../../../systems/input/actionMap'
+import { promptLabelOf, type PromptSource } from '../../../systems/input/promptLabel'
 import { chargeSizeToPlantOf, nextChargeSizeOf } from '../../../systems/vehicle/chargeSelection'
 import { carriedOf, type VehicleCharges } from '../../../systems/vehicle/vehicleCharges'
 import { dynamiteSizeIconIdOf } from './dynamiteSizes'
@@ -26,12 +26,12 @@ export interface RackPanel {
   plungerText: string | null
 }
 
-/** What the panel reads: the local player's replica, the chosen size and the key bindings. */
+/** What the panel reads: the local player's replica, the chosen size and the prompts' device. */
 export interface RackPanelSource {
   state: AuthorityState
   playerId: string
   chosenSize: number
-  bindings: Bindings
+  prompts: PromptSource
 }
 
 const MM_PER_TENTH_METRE = 100
@@ -54,14 +54,14 @@ export function rackPanelOf(source: RackPanelSource): RackPanel | null {
 
 function nextSizeTextOf(charges: VehicleCharges, source: RackPanelSource): string | null {
   if (nextChargeSizeOf(charges, source.chosenSize) === null) return null
-  return `Next size (${boundLabel(source.bindings, 'next_charge_size')})`
+  return `Next size (${promptLabelOf('next_charge_size', source.prompts, source.prompts.inputDevice)})`
 }
 
-function plungerTextOf({ state, playerId, bindings }: RackPanelSource): string | null {
+function plungerTextOf({ state, playerId, prompts }: RackPanelSource): string | null {
   const charge = liveChargeOf(state, playerId)
   if (charge === null || !isDetonatorOpen(state)) return null
   if (isWithinInterlock(vehicleOf(state, playerId).pose, charge)) return 'Back off to detonate'
-  return `Detonate (${boundLabel(bindings, 'plant_charge')})`
+  return `Detonate (${promptLabelOf('plant_charge', prompts, prompts.inputDevice)})`
 }
 
 /** Whole millimetres as metres to a tenth, the tenth only when there is one: "2.5", "24". */

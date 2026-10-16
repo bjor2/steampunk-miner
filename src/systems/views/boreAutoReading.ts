@@ -8,7 +8,7 @@ import { isAutoModeOn } from '../authority/autoMode/autoModeState'
 import { autoToggleRefusal } from '../authority/autoMode/autoToggle'
 import type { AuthorityState } from '../authority/authorityState'
 import { STEAM_SEAR_ITEM_ID } from '../authority/bore/boreFire'
-import { boundLabel, type Bindings } from '../input/actionMap'
+import { promptLabelOf, type PromptSource } from '../input/promptLabel'
 import { autoLampOf, type AutoLamp } from './autoLamp'
 
 export interface BoreAutoReading extends AutoLamp {
@@ -19,10 +19,13 @@ export interface BoreAutoReading extends AutoLamp {
 export function boreAutoReadingOf(
   state: AuthorityState,
   playerId: string,
-  bindings: Bindings,
+  prompts: PromptSource,
 ): BoreAutoReading | null {
   const isOn = isAutoModeOn(state, playerId, STEAM_SEAR_ITEM_ID)
   if (!isOn && autoToggleRefusal(state, playerId, STEAM_SEAR_ITEM_ID) !== null) return null
   const lamp = autoLampOf(state, playerId, STEAM_SEAR_ITEM_ID)
-  return { ...lamp, text: `${lamp.label} (${boundLabel(bindings, 'toggle_auto_fire')})` }
+  return {
+    ...lamp,
+    text: `${lamp.label} (${promptLabelOf('toggle_auto_fire', prompts, prompts.inputDevice)})`,
+  }
 }

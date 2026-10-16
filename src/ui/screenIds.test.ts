@@ -66,6 +66,7 @@ import {
   type PauseMenuModel,
 } from '../systems/views/pauseMenuModel'
 import { NO_DRIVE } from '../systems/vehicle/driveSigns'
+import { promptSourceOf } from '../systems/input/promptLabel'
 
 // #33 acceptance 12: the screens rendered on the server (no browser, no DOM) carry an element for
 // every id in UI_IDS, and its text is the model's value. Ids, not markup shape, are the contract.
@@ -469,7 +470,7 @@ function renderFullHoldHud(): string[] {
     state: session.state(),
     playerId: 'p1',
     depthTiles: 0,
-    bindings: game().bindings,
+    prompts: promptSourceOf(game()),
     isAwaitingPlay: true,
   })
   expect(model.cargo.isFull).toBe(true)
@@ -501,7 +502,7 @@ function renderAtArtefactCache(): string[] {
     state: session.state(),
     playerId: 'p1',
     depthTiles: 0,
-    bindings: game().bindings,
+    prompts: promptSourceOf(game()),
   })
   expect(hud.cachePrompt.isShown).toBe(true)
   const cards = selectArtefactChoiceModel(session.state(), 'p1')
@@ -523,7 +524,7 @@ function renderWithGuns(): string[] {
     state: session.state(),
     playerId: 'p1',
     depthTiles: 0,
-    bindings: game().bindings,
+    prompts: promptSourceOf(game()),
   })
   expect(hud.guns?.isIdle).toBe(true)
   session.submit(2, { type: 'debug.setPlanet', payload: { planetIndex: 4 } })
@@ -556,7 +557,7 @@ function renderWithCharges(): string[] {
     state: session.state(),
     playerId: 'p1',
     depthTiles: 0,
-    bindings: game().bindings,
+    prompts: promptSourceOf(game()),
   })
   expect(hud.chargeFuse).not.toBeNull()
   const bay = upgradeBayOn(7)
@@ -579,7 +580,7 @@ function renderWithHeat(): string[] {
     state: session.state(),
     playerId: 'p1',
     depthTiles: 0,
-    bindings: game().bindings,
+    prompts: promptSourceOf(game()),
   })
   expect(hud.heat?.isThrottled).toBe(true)
   session.submit(2, teleportToDockCommand('upgrade'))
@@ -608,7 +609,7 @@ function renderWithBoreAuto(): string[] {
       state: session.state(),
       playerId: 'p1',
       depthTiles: 0,
-      bindings: game().bindings,
+      prompts: promptSourceOf(game()),
     })
     expect(hud.boreAuto?.colour).toBe('green')
     return checkScreen(createElement(HudView, { model: hud, isFlashing: false }), hudTexts(hud))

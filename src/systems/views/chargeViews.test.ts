@@ -10,7 +10,7 @@ import {
 import { createScriptedSession } from '../authority/scriptedSession'
 import { rackSlotPrice } from '../economy/blastingCharges'
 import { chargePrice } from '../economy/chargeSizes'
-import { ACTION_MAP, defaultBindings } from '../input/actionMap'
+import { KEYBOARD_PROMPTS } from '../input/promptFixtures'
 import { toCanonical } from '../money'
 import { buyChargeRackSlotCommand, restockChargesCommand } from '../platform/platformCommands'
 import { CLICK_CHAIN } from '../authority/purchaseChain'
@@ -22,7 +22,6 @@ import { selectUpgradeBayModel } from './upgradeBayModel'
 
 type Session = ReturnType<typeof createScriptedSession>
 
-const BINDINGS = defaultBindings(ACTION_MAP)
 const NO_UI = {
   isTravelArmed: false,
   isQuickServiceHighlighted: false,
@@ -31,7 +30,7 @@ const NO_UI = {
 }
 
 const hudOf = (session: Session, playerId = 'p1') =>
-  selectHudModel({ state: session.state(), playerId, depthTiles: 0, bindings: BINDINGS })
+  selectHudModel({ state: session.state(), playerId, depthTiles: 0, prompts: KEYBOARD_PROMPTS })
 
 const upgradeBayOf = (session: Session) => selectUpgradeBayModel(session.state(), 'p1', NO_UI)
 

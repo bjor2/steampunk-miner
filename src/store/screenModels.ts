@@ -57,6 +57,7 @@ import {
   type TitleMenu,
   type TitleMenuModel,
 } from '../systems/views/titleMenuModel'
+import { inputDeviceOf, promptSourceOf } from '../systems/input/promptLabel'
 import { readAuthorityState } from './authorityLink'
 import type { LiveStepHold } from './liveStepSlice'
 
@@ -67,6 +68,8 @@ export interface ScreenSources {
   prefs: Preferences
   bindings: Bindings
   padBindings: Bindings
+  /** The prompts follow the device in use: touch while the touch controls show (P1-4 of #470). */
+  isTouchControlsShown: boolean
   bindingProblems: readonly string[]
   rebindingActionId: ActionId | null
   isTravelArmed: boolean
@@ -91,7 +94,7 @@ export function hudModelOf(sources: ScreenSources): HudModel {
     state: readAuthorityState(),
     playerId: sources.playerId,
     depthTiles: sources.depthTiles,
-    bindings: sources.bindings,
+    prompts: promptSourceOf(sources),
     isAwaitingPlay: sources.liveStepHold === 'awaitingPlay',
   })
 }
@@ -141,14 +144,14 @@ function plaqueSourcesOf(sources: ScreenSources): PlaqueSources {
   return {
     hintBoard: sources.hintBoard,
     transmissionBoard: sources.transmissionBoard,
-    bindings: sources.bindings,
+    prompts: promptSourceOf(sources),
     isShowingHints: sources.prefs.hintsEnabled && sources.arePlaquesAllowed,
     isShowingTransmissions: sources.arePlaquesAllowed,
   }
 }
 
 export function settingsModelOf(sources: ScreenSources): SettingsModel {
-  return selectSettingsModel(sources)
+  return selectSettingsModel({ ...sources, inputDevice: inputDeviceOf(sources) })
 }
 
 /** The pause menu as it draws now (ticket 404); null while it is closed. */

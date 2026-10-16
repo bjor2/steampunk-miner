@@ -11,7 +11,7 @@ import type { AuthorityState } from '../authority/authorityState'
 import { liveChargesOf } from '../authority/charges/chargeRules'
 import { isInFuseWarning } from '../economy/blastingCharges'
 import { isInChargeRadius } from '../economy/chargeSizes'
-import { boundLabel, type Bindings } from '../input/actionMap'
+import { promptLabelOf, type PromptSource } from '../input/promptLabel'
 import {
   chargeCentreMm,
   rackCapacityOf,
@@ -40,13 +40,16 @@ export interface FuseWarning {
 }
 
 /** Null until the rack is bolted on. */
-export function chargeReadingOf(charges: VehicleCharges, bindings: Bindings): ChargeReading | null {
+export function chargeReadingOf(
+  charges: VehicleCharges,
+  prompts: PromptSource,
+): ChargeReading | null {
   if (!charges.isRackMounted) return null
   const capacity = rackCapacityOf(charges)
   return {
     carried: totalCarriedOf(charges),
     capacity,
-    text: `${rackSlotsUsedOf(charges)}/${capacity} (${boundLabel(bindings, 'plant_charge')})`,
+    text: `${rackSlotsUsedOf(charges)}/${capacity} (${promptLabelOf('plant_charge', prompts, prompts.inputDevice)})`,
   }
 }
 

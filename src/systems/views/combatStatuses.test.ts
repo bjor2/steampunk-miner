@@ -3,7 +3,7 @@ import { forceCollapseCommand } from '../authority/collapse/collapseCommands'
 import { BAND_1_Y, digAlong, prepareDigger } from '../authority/collapse/collapseFixtures'
 import { createScriptedSession } from '../authority/scriptedSession'
 import { setHullCommand } from '../vehicle/vehicleCommands'
-import { ACTION_MAP, defaultBindings } from '../input/actionMap'
+import { KEYBOARD_PROMPTS } from '../input/promptFixtures'
 import { blockContaining, blockIdOf } from '../world/collapseBlock'
 import {
   combatStatusStackOf,
@@ -13,8 +13,6 @@ import {
   type CombatStatusSources,
 } from './combatStatuses'
 import { selectHudModel } from './hudModel'
-
-const BINDINGS = defaultBindings(ACTION_MAP)
 
 /** Nothing wrong: full hull, no collapse, no fuse, no heat, energy fine, no threats. */
 const CALM: CombatStatusSources = {
@@ -140,7 +138,12 @@ describe('combat status stack (#158)', () => {
 
 describe('combat statuses on the HUD model', () => {
   const hudOf = (session: ReturnType<typeof createScriptedSession>) =>
-    selectHudModel({ state: session.state(), playerId: 'p1', depthTiles: 0, bindings: BINDINGS })
+    selectHudModel({
+      state: session.state(),
+      playerId: 'p1',
+      depthTiles: 0,
+      prompts: KEYBOARD_PROMPTS,
+    })
 
   it('warns of a collapse while a block near the vehicle is telegraphing, and not after', () => {
     const session = createScriptedSession()

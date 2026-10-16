@@ -4,6 +4,7 @@
  */
 import { readAuthorityState } from '../../../store/authorityLink'
 import { useGameStore } from '../../../store/gameStore'
+import { promptSourceOf } from '../../../systems/input/promptLabel'
 import { rackPanelOf, type RackPanel } from '../systems/rackPanel'
 
 export function readRackPanel(): RackPanel | null {
@@ -12,6 +13,6 @@ export function readRackPanel(): RackPanel | null {
     state: readAuthorityState(),
     playerId: game.playerId,
     chosenSize: game.chosenChargeSize,
-    bindings: game.bindings,
+    prompts: promptSourceOf(game),
   })
 }

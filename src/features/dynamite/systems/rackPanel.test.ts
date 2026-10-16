@@ -6,13 +6,11 @@ import {
   sizedBlasterOn,
 } from '../../../systems/authority/charges/chargeFixtures'
 import { createScriptedSession } from '../../../systems/authority/scriptedSession'
-import { ACTION_MAP, defaultBindings } from '../../../systems/input/actionMap'
+import { KEYBOARD_PROMPTS, TOUCH_PROMPTS } from '../../../systems/input/promptFixtures'
 import { rackPanelOf } from './rackPanel'
 
-const BINDINGS = defaultBindings(ACTION_MAP)
-
 const panelOn = (state: AuthorityState, chosenSize = 1) =>
-  rackPanelOf({ state, playerId: 'p1', chosenSize, bindings: BINDINGS })
+  rackPanelOf({ state, playerId: 'p1', chosenSize, prompts: KEYBOARD_PROMPTS })
 
 describe('dynamite rack panel', () => {
   it('shows nothing before the rack is bolted on', () => {
@@ -46,6 +44,16 @@ describe('dynamite rack panel', () => {
     expect(panelOn(blaster.session.state(), 7)?.plungerText).toBe('Back off to detonate')
     blaster.session.submit(2, poseOnTile({ tx: blaster.wall.tx - 15, ty: blaster.wall.ty }))
     expect(panelOn(blaster.session.state(), 7)?.plungerText).toBe('Detonate (B)')
+  })
+
+  it('names the touch controls, never a key, while the touch controls show (P1-4 of #470)', () => {
+    const blaster = sizedBlasterOn(25, 7)
+    blaster.session.submit(1, { type: 'debug.setMoney', payload: { amount: '1e30' } })
+    blaster.session.submit(1, { type: 'debug.teleportToDock', payload: { bay: 'upgrade' } })
+    blaster.session.submit(1, { type: 'restockCharges', payload: { size: 1, count: 2 } })
+    const touchPanel = (state: AuthorityState) =>
+      rackPanelOf({ state, playerId: 'p1', chosenSize: 7, prompts: TOUCH_PROMPTS })
+    expect(touchPanel(blaster.session.state())?.nextSizeText).toBe('Next size (size badge)')
   })
 
   it('offers no plunger before P22, where only the fuse fires a charge', () => {

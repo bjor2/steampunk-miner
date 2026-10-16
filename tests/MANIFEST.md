@@ -159,7 +159,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/drill-gear/systems/vibratoryCrumble.test.ts` | 4 | 4 |
 | `src/features/drill-gear/twinBitPace.test.ts` | 4 | 2 |
 
-### `dynamite`: 5 files, 20 tests
+### `dynamite`: 5 files, 21 tests
 
 | File | Tests | Sites |
 | --- | --- | --- |
@@ -167,7 +167,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/dynamite/systems/detonateReaction.test.ts` | 3 | 3 |
 | `src/features/dynamite/systems/dynamiteSizes.test.ts` | 4 | 4 |
 | `src/features/dynamite/systems/plunger.test.ts` | 6 | 6 |
-| `src/features/dynamite/systems/rackPanel.test.ts` | 5 | 5 |
+| `src/features/dynamite/systems/rackPanel.test.ts` | 6 | 6 |
 
 ### `dynamite-visuals`: 11 files, 57 tests
 
@@ -872,6 +872,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/input/padCodes.test.ts` | 4 | 4 |
 | `src/systems/input/padFrame.test.ts` | 7 | 7 |
 | `src/systems/input/preferences.test.ts` | 20 | 20 |
+| `src/systems/input/promptLabel.test.ts` | 8 | 8 |
 | `src/systems/input/touchBindings.test.ts` | 16 | 16 |
 | `src/systems/input/touchControls.test.ts` | 25 | 18 |
 
@@ -1172,6 +1173,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/store/perfLog.test.ts` | 8 | 8 |
 | `src/store/planetCardSlice.test.ts` | 5 | 5 |
 | `src/store/platformLoop.test.ts` | 4 | 4 |
+| `src/store/promptDevice.test.ts` | 2 | 2 |
 | `src/store/runSnapshots.test.ts` | 10 | 10 |
 | `src/store/sliceRun.test.ts` | 7 | 7 |
 | `src/store/tapSheetSlice.test.ts` | 6 | 6 |
@@ -1367,6 +1369,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/views/pauseMenuModel.test.ts` | 7 | 7 |
 | `src/systems/views/planetCardView.test.ts` | 1 | 1 |
 | `src/systems/views/plaqueModel.test.ts` | 6 | 6 |
+| `src/systems/views/promptDevice.test.ts` | 8 | 8 |
 | `src/systems/views/refineryBayModel.test.ts` | 4 | 4 |
 | `src/systems/views/screenLayout.test.ts` | 14 | 14 |
 | `src/systems/views/scrollRail.test.ts` | 5 | 5 |

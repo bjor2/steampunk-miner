@@ -6,13 +6,8 @@
  * refused rebinding and "Reset to defaults". Local presentation only: nothing here is a command.
  */
 import { settingIconIdOf } from '../art/icons/iconSet'
-import {
-  ACTION_MAP,
-  boundLabel,
-  boundPadLabel,
-  type ActionId,
-  type Bindings,
-} from '../input/actionMap'
+import { ACTION_MAP, boundPadLabel, type ActionId, type Bindings } from '../input/actionMap'
+import { promptLabelOf, type InputDevice } from '../input/promptLabel'
 import type { PreferenceName, Preferences } from '../input/preferences'
 import type { FocusStop } from './menuFocus'
 import { uiButton, type ScreenButton } from './viewParts'
@@ -23,6 +18,8 @@ export interface SettingsSources {
   prefs: Preferences
   bindings: Bindings
   padBindings: Bindings
+  /** On touch the key column names the touch control and the pad column is blank (P1-4 of #470). */
+  inputDevice: InputDevice
   /** The problems of the last refused rebinding; the defaults or the last good map rule. */
   bindingProblems: readonly string[]
   rebindingActionId: ActionId | null
@@ -144,8 +141,8 @@ function bindingRowsOf(sources: SettingsSources): BindingRow[] {
     return {
       actionId: action.id,
       displayName: action.displayName,
-      keyText: isWaitingForKey ? WAITING_TEXT : boundLabel(sources.bindings, action.id),
-      padText: isWaitingForKey ? '' : boundPadLabel(sources.padBindings, action.id),
+      keyText: isWaitingForKey ? WAITING_TEXT : keyColumnTextOf(sources, action.id),
+      padText: isWaitingForKey ? '' : padColumnTextOf(sources, action.id),
       isWaitingForKey,
       button: uiButton(UI_ID_TEMPLATES.settingsRebind(action.id), 'Rebind', {
         kind: 'rebind',
@@ -153,6 +150,15 @@ function bindingRowsOf(sources: SettingsSources): BindingRow[] {
       }),
     }
   })
+}
+
+function keyColumnTextOf(sources: SettingsSources, actionId: ActionId): string {
+  const device = sources.inputDevice === 'touch' ? 'touch' : 'keyboard'
+  return promptLabelOf(actionId, sources, device)
+}
+
+function padColumnTextOf(sources: SettingsSources, actionId: ActionId): string {
+  return sources.inputDevice === 'touch' ? '' : boundPadLabel(sources.padBindings, actionId)
 }
 
 function onOffText(isOn: boolean): string {

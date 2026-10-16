@@ -25,7 +25,7 @@ import {
   prepareCorridor,
   spawnEnemy,
 } from '../authority/combat/combatFixtures'
-import { ACTION_MAP, defaultBindings } from '../input/actionMap'
+import { KEYBOARD_PROMPTS } from '../input/promptFixtures'
 import { bandOfTile } from '../world/planetGeometry'
 import { surfaceRowOfColumn } from '../world/tileGrid'
 import { parkAt } from '../authority/collapse/collapseFixtures'
@@ -35,13 +35,17 @@ import { energyWarningLevel } from './energyWarning'
 import { energyWarningMarkers, selectHudModel } from './hudModel'
 import { vehicleModeMarkers } from './hudReadings'
 
-const BINDINGS = defaultBindings(ACTION_MAP)
 const canonical = (text: string) => toCanonical(fromCanonical(text))
 const QUANTA = 240
 const LEVEL_0 = { energyMaxQuanta: 150 * QUANTA, speedMax: 6 }
 
 function hudOf(session: ReturnType<typeof createScriptedSession>, depthTiles = 0) {
-  return selectHudModel({ state: session.state(), playerId: 'p1', depthTiles, bindings: BINDINGS })
+  return selectHudModel({
+    state: session.state(),
+    playerId: 'p1',
+    depthTiles,
+    prompts: KEYBOARD_PROMPTS,
+  })
 }
 
 const UPRIGHT: VehiclePose = { x: 0, y: 0, vx: 0, vy: 0, upx: 0, upy: 1024, facing: FACING.right }
@@ -308,7 +312,7 @@ describe('HUD model: casing badge (#41)', () => {
 describe('HUD model: scenario ready (ticket 301)', () => {
   it('asks for a key only while a scenario or a restore waits for play', () => {
     const state = createScriptedSession().state()
-    const sources = { state, playerId: 'p1', depthTiles: 0, bindings: BINDINGS }
+    const sources = { state, playerId: 'p1', depthTiles: 0, prompts: KEYBOARD_PROMPTS }
     expect(selectHudModel({ ...sources, isAwaitingPlay: true }).readyPrompt).toEqual({
       isShown: true,
       text: 'Scenario ready — press any key',

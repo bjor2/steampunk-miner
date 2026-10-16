@@ -10,6 +10,7 @@ import {
 import { createScriptedSession, mineTile, surfaceOreTiles } from '../../authority/scriptedSession'
 import { HINT_TABLE } from '../../hints/hintTable'
 import { ACTION_MAP, defaultBindings } from '../../input/actionMap'
+import { KEYBOARD_PROMPTS } from '../../input/promptFixtures'
 import { DEFAULT_PREFERENCES } from '../../input/preferences'
 import { ENEMY_IDS, PLATFORM_BAY_IDS } from '../../registeredIds'
 import { setHullCommand, teleportToDockCommand } from '../../vehicle/vehicleCommands'
@@ -44,7 +45,12 @@ const markerIcons = (markers: Readonly<Record<string, { icon: string }>>): strin
     .filter((icon) => icon !== '')
 
 const hudOf = (session: ReturnType<typeof createScriptedSession>): HudModel =>
-  selectHudModel({ state: session.state(), playerId: 'p1', depthTiles: 0, bindings: BINDINGS })
+  selectHudModel({
+    state: session.state(),
+    playerId: 'p1',
+    depthTiles: 0,
+    prompts: KEYBOARD_PROMPTS,
+  })
 
 const buttonIcons = (buttons: readonly { iconId?: string }[]): string[] =>
   buttons.flatMap((button) => (button.iconId === undefined ? [] : [button.iconId]))
@@ -191,6 +197,7 @@ describe('icon coverage (#158 section 3)', () => {
       prefs: DEFAULT_PREFERENCES,
       bindings: BINDINGS,
       padBindings: BINDINGS,
+      inputDevice: 'keyboard',
       bindingProblems: [],
       rebindingActionId: null,
     })

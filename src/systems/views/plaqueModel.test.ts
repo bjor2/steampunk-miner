@@ -1,7 +1,8 @@
 import { describe, expect, it } from 'vitest'
 import { EMPTY_HINT_BOARD, type HintBoard } from '../hints/hintBoard'
 import { EMPTY_TRANSMISSION_BOARD } from '../hints/transmissionBoard'
-import { ACTION_MAP, bindingsWithOverrides, defaultBindings } from '../input/actionMap'
+import { ACTION_MAP, bindingsWithOverrides } from '../input/actionMap'
+import { KEYBOARD_PROMPTS } from '../input/promptFixtures'
 import { isQuickServiceHighlighted, selectPlaqueModel, type PlaqueSources } from './plaqueModel'
 
 const boardShowing = (id: string, rescueCost: HintBoard['queued'][0]['rescueCost'] = null) => ({
@@ -12,7 +13,7 @@ const boardShowing = (id: string, rescueCost: HintBoard['queued'][0]['rescueCost
 const sources = (patch: Partial<PlaqueSources> = {}): PlaqueSources => ({
   hintBoard: EMPTY_HINT_BOARD,
   transmissionBoard: EMPTY_TRANSMISSION_BOARD,
-  bindings: defaultBindings(ACTION_MAP),
+  prompts: KEYBOARD_PROMPTS,
   isShowingHints: true,
   isShowingTransmissions: true,
   ...patch,
@@ -35,8 +36,9 @@ describe('plaque model', () => {
   })
 
   it('follows a rebinding at once', () => {
-    const bindings = bindingsWithOverrides(ACTION_MAP, { lift: { keyboard: ['KeyJ'] } }).bindings
-    const { hint } = selectPlaqueModel(sources({ hintBoard: boardShowing('hint_move'), bindings }))
+    const { bindings } = bindingsWithOverrides(ACTION_MAP, { lift: { keyboard: ['KeyJ'] } })
+    const prompts = { ...KEYBOARD_PROMPTS, bindings }
+    const { hint } = selectPlaqueModel(sources({ hintBoard: boardShowing('hint_move'), prompts }))
     expect(hint?.lines[1]).toBe(
       'Hold J to fire the thruster and climb; it also turns the drill up.',
     )

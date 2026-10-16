@@ -81,6 +81,7 @@ describe('menu text budget (spec #422, pass #429)', () => {
     const model = selectSettingsModel({
       prefs: DEFAULT_PREFERENCES,
       bindings: defaultBindings(ACTION_MAP),
+      inputDevice: 'keyboard',
       padBindings: defaultPadBindings(ACTION_MAP),
       bindingProblems: ['KeyW is already bound to Lift'],
       rebindingActionId: ACTION_MAP.actions[0].id,

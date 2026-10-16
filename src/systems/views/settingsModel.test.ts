@@ -9,6 +9,7 @@ function sourcesWith(overrides: unknown, rebindingActionId: SettingsSources['reb
     prefs: DEFAULT_PREFERENCES,
     bindings,
     padBindings,
+    inputDevice: 'keyboard' as const,
     bindingProblems: [],
     rebindingActionId,
   }
