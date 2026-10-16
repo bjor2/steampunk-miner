@@ -1,0 +1,48 @@
+{
+  "touchPromptsVersion": 1,
+  "labels": {
+    "aim_left": "stick left",
+    "aim_right": "stick right",
+    "aim_down": "stick down",
+    "lift": "stick up",
+    "interact": "Dock button",
+    "quick_service": "Service button",
+    "request_rescue": "Tow button",
+    "toggle_guns": "Guns button",
+    "toggle_auto_fire": "lamp",
+    "fire_ground_gun": "fire tile",
+    "plant_charge": "Charge button",
+    "next_charge_size": "size badge",
+    "ui_up": "tap",
+    "ui_down": "tap",
+    "ui_left": "tap",
+    "ui_right": "tap",
+    "ui_confirm": "tap",
+    "ui_cancel": "Back",
+    "zoom_in": "pinch out",
+    "zoom_out": "pinch in",
+    "zoom_reset": "double tap",
+    "open_pause_menu": "Settings button",
+    "use_slot_1": "slot 1",
+    "use_slot_2": "slot 2",
+    "use_slot_3": "slot 3",
+    "use_slot_4": "slot 4",
+    "use_slot_5": "slot 5",
+    "use_drill_flank": "flank tile",
+    "use_drill_collar": "collar tile"
+  },
+  "deviceWords": {
+    "keyboard": {
+      "inputVerb": "press",
+      "inputNoun": "key"
+    },
+    "pad": {
+      "inputVerb": "press",
+      "inputNoun": "button"
+    },
+    "touch": {
+      "inputVerb": "tap",
+      "inputNoun": "control"
+    }
+  }
+}
