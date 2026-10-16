@@ -1,6 +1,6 @@
 /**
- * `data-testid`s of the stage the canvas and UI share, the portrait card and the touch controls
- * (#173). Apart from `UI_IDS`, which names what the screens' view models draw.
+ * `data-testid`s of the stage the canvas and UI share, the portrait card, the touch controls
+ * (#173) and the device's notice chips (ticket 478). Apart from `UI_IDS`, which names what the screens' view models draw.
  */
 export const DEVICE_UI_IDS = {
   gameStage: 'game-stage',
@@ -11,6 +11,7 @@ export const DEVICE_UI_IDS = {
   touchStick: 'touch-stick',
   touchCluster: 'touch-cluster',
   touchPause: 'touch-pause',
+  deviceNotices: 'device-notices',
 } as const
 
 /** One button of the touch cluster, named for the action it presses. */

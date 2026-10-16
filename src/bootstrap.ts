@@ -21,6 +21,7 @@ import { createRunProgressSink, type RunProgressSink } from './logging/runProgre
 import { watchRapierWasmMemory } from './physics/rapierWasmMemory'
 import { requestCanvasScreenshot } from './scene/canvasScreenshots'
 import { getShell, type Shell } from './shell/shell'
+import { onSoundUnlockChange } from './shell/soundOut'
 import {
   installSaveFolder,
   loadCheckpoint,
@@ -75,6 +76,7 @@ export async function startGame(): Promise<void> {
   keepScreenFitted(shell)
   showTouchControlsOnTouch(shell)
   holdPlayWhilePageHidden(shell)
+  showWhetherSoundPlays()
   keepHapticsPlaying(shell)
   shell.onKeyChange(routeKeyChange)
   shell.onScrollNotch(routeScrollNotch)
@@ -153,6 +155,11 @@ function keepRunFilesWritten(shell: Shell, run: RunFiles): void {
  */
 function holdPlayWhilePageHidden(shell: Shell): void {
   shell.onPageHide(() => useGameStore.getState().holdLiveStepWhilePageHidden())
+}
+
+/** The sound output's unlock reports, for the stage's "tap for sound" chip (ticket 478). */
+function showWhetherSoundPlays(): void {
+  onSoundUnlockChange((unlock) => useGameStore.getState().noteSoundUnlock(unlock))
 }
 
 function saveFolderOf(shell: Shell): SaveFolder {

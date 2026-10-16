@@ -4,10 +4,19 @@
  * programmatic placeholder until the commissioned sounds and music land (#13 sourcing table).
  *
  * Browsers (and Electron's Chromium) start audio only after a user gesture, so the graph is built
- * on the first key or pointer press; until then every call is silently dropped, never queued.
+ * on the first gesture of the unlock list; until then every call is silently dropped, never
+ * queued. Every later gesture, and the page coming back into view, resumes a context that is not
+ * running, since iOS suspends it after an interruption (#470 P1-7, ticket 478); each try is
+ * reported, so the stage can ask for a tap while it stays suspended.
  */
 import type { StingerId } from '../systems/audio/musicBook'
 import type { MusicLayers } from '../systems/audio/musicLayers'
+import {
+  AUDIO_UNLOCK_EVENTS,
+  isResumeNeeded,
+  soundUnlockOf,
+  type SoundUnlock,
+} from '../systems/audio/soundUnlock'
 import type { CueTone, SoundCuePlay } from '../systems/registries/soundCues'
 import { createWebAudioGraph, type WebAudioGraph } from './webAudioGraph'
 
@@ -45,10 +54,9 @@ export interface SoundOut {
   playCueTone(tone: CueTone, play: SoundCuePlay): CueVoice | null
 }
 
-const UNLOCK_EVENTS = ['keydown', 'pointerdown'] as const
-
 let graph: WebAudioGraph | null = null
 let isWaitingForGesture = false
+const unlockFollowers = new Set<(unlock: SoundUnlock) => void>()
 
 /** The one sound output; silent until the first gesture builds the graph. */
 export function getSoundOut(): SoundOut {
@@ -74,15 +82,46 @@ const SOUND_OUT: SoundOut = {
   playCueTone: (tone, play) => graph?.playCueTone(tone, play) ?? null,
 }
 
+/** Each report of whether sound plays, from the first gesture on; the returned call stops them. */
+export function onSoundUnlockChange(follow: (unlock: SoundUnlock) => void): () => void {
+  unlockFollowers.add(follow)
+  return () => unlockFollowers.delete(follow)
+}
+
+/** A browser with no Web Audio stays silent and never asks for a tap. */
 function waitForGesture(): void {
   if (isWaitingForGesture || typeof window === 'undefined' || !('AudioContext' in window)) return
   isWaitingForGesture = true
-  UNLOCK_EVENTS.forEach((name) => window.addEventListener(name, unlockAudio, { once: true }))
+  // Kept for the page's life, not once: a gesture after an interruption resumes the context.
+  AUDIO_UNLOCK_EVENTS.forEach((name) =>
+    window.addEventListener(name, unlockAudio, { passive: true }),
+  )
+  document.addEventListener('visibilitychange', resumeOnPageShown)
 }
 
 function unlockAudio(): void {
-  UNLOCK_EVENTS.forEach((name) => window.removeEventListener(name, unlockAudio))
-  if (graph !== null) return
-  graph = createWebAudioGraph(new AudioContext())
-  void graph.context.resume().catch(() => {})
+  graph ??= createReportingGraph()
+  resumeAudio(graph)
+}
+
+function createReportingGraph(): WebAudioGraph {
+  const created = createWebAudioGraph(new AudioContext())
+  created.context.addEventListener('statechange', reportSoundUnlock)
+  return created
+}
+
+/** Outside a gesture iOS may refuse it; the report then asks for a tap. */
+function resumeOnPageShown(): void {
+  if (graph !== null && document.visibilityState === 'visible') resumeAudio(graph)
+}
+
+/** A refused resume is reported, not thrown: the context stays suspended until the next try. */
+function resumeAudio(audio: WebAudioGraph): void {
+  if (!isResumeNeeded(audio.context.state)) return
+  void audio.context.resume().then(reportSoundUnlock, reportSoundUnlock)
+}
+
+function reportSoundUnlock(): void {
+  const unlock = soundUnlockOf(graph?.context.state ?? null)
+  unlockFollowers.forEach((follow) => follow(unlock))
 }

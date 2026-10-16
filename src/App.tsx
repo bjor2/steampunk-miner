@@ -8,6 +8,7 @@ import { PlatformScreen } from './ui/platform/PlatformScreen'
 import { Plaques } from './ui/plaques/Plaques'
 import { PauseMenu } from './ui/pause/PauseMenu'
 import { SettingsPanel } from './ui/settings/SettingsPanel'
+import { DeviceNotices } from './ui/stage/DeviceNotices'
 import { GameStage } from './ui/stage/GameStage'
 import { PortraitCard } from './ui/stage/PortraitCard'
 import { SliceScreen } from './ui/screens/SliceScreen'
@@ -33,6 +34,7 @@ export default function App() {
       <SettingsPanel />
       <TitleMenu />
       <ExactAmountSheet />
+      <DeviceNotices />
       <PortraitCard />
     </GameStage>
   )

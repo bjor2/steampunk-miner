@@ -30,7 +30,10 @@ describe('device notices', () => {
 
   it('puts Reconnecting before Tap for sound when both are missing', () => {
     const notices = deviceNoticesOf({ isRenderContextLost: true, soundUnlock: 'suspended' })
-    expect(notices.map((notice) => notice.id)).toEqual([RECONNECTING_TEXT.id, TAP_FOR_SOUND_TEXT.id])
+    expect(notices.map((notice) => notice.id)).toEqual([
+      RECONNECTING_TEXT.id,
+      TAP_FOR_SOUND_TEXT.id,
+    ])
   })
 
   it('keeps both texts inside the Title+OneLine budget', () => {
