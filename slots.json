@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-10-16T18:56:50+01:00",
+  "updated_at": "2026-10-16T19:02:16+01:00",
   "caps": {
     "grok": 12,
     "claude": 10,
@@ -20,11 +20,11 @@
         {
           "slot": "C1",
           "state": "busy",
-          "ticket": 506,
+          "ticket": 508,
           "grok_slot": 1,
           "kind": "dev",
-          "since": "2026-10-16T17:39:00+01:00",
-          "wave": "1A"
+          "since": "2026-10-16T18:58:00+01:00",
+          "wave": null
         },
         {
           "slot": "C2",
@@ -70,7 +70,7 @@
       "size": 6,
       "used": 1,
       "free": 5,
-      "claims_last_hour": 2,
+      "claims_last_hour": 3,
       "name": "Claude Max 1"
     },
     {
@@ -121,7 +121,7 @@
     }
   ],
   "gate": {
-    "busy": 2,
+    "busy": 1,
     "max": 3
   },
   "tester": {
@@ -550,10 +550,10 @@
     {
       "slot": 1,
       "state": "dev",
-      "ticket": 506,
-      "since": "2026-10-16T17:39:00+01:00",
+      "ticket": 508,
+      "since": "2026-10-16T18:58:00+01:00",
       "claude_slot": 1,
-      "wave": "1A"
+      "wave": null
     },
     {
       "slot": 2,
@@ -626,11 +626,11 @@
     {
       "slot": 1,
       "state": "busy",
-      "ticket": 506,
+      "ticket": 508,
       "grok_slot": 1,
-      "since": "2026-10-16T17:39:00+01:00",
+      "since": "2026-10-16T18:58:00+01:00",
       "account": 1,
-      "wave": "1A"
+      "wave": null
     },
     {
       "slot": 2,
@@ -710,11 +710,11 @@
     }
   ],
   "last_refill": {
-    "at": "2026-10-16 18:39 BST",
+    "at": "2026-10-16 18:58 BST",
     "mode": "refill-dev",
-    "triggers": "#445",
-    "started": "",
-    "note": "no pickable build ticket"
+    "triggers": "#508",
+    "started": "#508->C1/A1",
+    "note": "spawned 1 worker(s)"
   },
   "totals": {
     "grok": {
@@ -747,8 +747,10 @@
         "tickets": [
           506
         ],
-        "done": [],
-        "live": 1
+        "done": [
+          506
+        ],
+        "live": 0
       },
       {
         "number": 498,
@@ -793,7 +795,9 @@
           484,
           485
         ],
-        "done": [],
+        "done": [
+          500
+        ],
         "live": 0
       },
       {
