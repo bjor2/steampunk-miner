@@ -222,8 +222,8 @@ describe('debug api: input acts like play (#33 acceptance 3 and 11)', () => {
     // `bore_ended`; ticket 331 `collapse_braced`; ticket 317 `auto_mode_set`, `auto_target_locked`,
     // `auto_acted` and `auto_act_overridden`; ticket 341 `hazard_strip_tier` (perf runs only);
     // ticket 379 `strut_placed`; ticket 335 `drill_cut`; ticket 383 `turret_burst_set`; ticket
-    // 403 `new_game_started`; ticket 477 `gpu_capabilities` (perf runs only); the controls and the
-    // HUD still add none.
+    // 403 `new_game_started`; ticket 479 `checkpoint_failed`, `save_exported` and `save_imported`;
+    // ticket 477 `gpu_capabilities` (perf runs only); the controls and the HUD still add none.
     expect(ALL_RUN_EVENT_NAMES).toHaveLength(
       62 +
         4 +
@@ -254,6 +254,7 @@ describe('debug api: input acts like play (#33 acceptance 3 and 11)', () => {
         1 +
         1 +
         1 +
+        3 +
         1,
     )
   })
