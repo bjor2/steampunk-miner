@@ -446,3 +446,15 @@ Wave 7A (#461: #445, #446, #447, #449) had been paused by the driver at 19:34 Os
 answered and removed it, so `wave:paused` was removed from #461 and the wave is `ready` again (the wave cache takes up to ~2 min to show it).
 
 Rollback: `gh issue edit 509 --remove-label build`; restore `next-ticket.sh.bak-20261016-2015-509` over `next-ticket.sh` in place (`cat`, not `mv`).
+
+## Smooth drilling released at top priority: #514, #515, #516 (16 Oct 2026, ~21:45 Oslo)
+
+Bjor's top priority is smooth drilling. The Producer filed **#514** (A, report the pose every tick while drilling; `tier:hard`),
+**#515** (B, camera ease below 3 m/s; `tier:easy`) and **#516** (C, shipped-contact dead stop; `tier:hard`) under spec #316, outside
+map #302. All three carry `build`, no `needs-planner`, `hitl` or `on-hold`, and have no native blockers; the order #514 then #516
+lives in wave 2B (#517) and #515 is alone in wave 2C (#518). `PRIORITY_TICKETS` now starts `514 515 516 509 486 ...` (515 is not
+behind 514) and `WAVE_ORPHAN_ALLOW` is `" 509 514 515 516 "` (no-wave #316 children). Closed tickets (508, 484, 485, 463, 503 to 505 and
+others) were dropped from both lists to keep the file the same size; the edit was one in-place `pwrite` on the same inode.
+
+Rollback: `gh issue edit <n> --remove-label build` for 514, 515 and 516; restore `next-ticket.sh.bak-20261016-2145-514` over
+`next-ticket.sh` in place (`cat`, not `mv`).
