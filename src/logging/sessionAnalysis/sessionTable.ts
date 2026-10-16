@@ -9,7 +9,7 @@
  * Any other bad line refuses the session too: refused, never trimmed.
  */
 import { parseNdjson } from '../ndjson'
-import { LOG_SCHEMA_VERSION, type RunEvent } from '../runEvent'
+import { hasTodaysEventLines, LOG_SCHEMA_VERSION, type RunEvent } from '../runEvent'
 
 /** One session folder as the collector found it on disk. */
 export interface SessionFiles {
@@ -110,7 +110,7 @@ function isJsonLine(line: string): boolean {
 function schemaVersionProblems(events: readonly RunEvent[]): string[] {
   const versions = [...new Set(events.map((event) => event.v as number))]
   return versions
-    .filter((version) => version !== LOG_SCHEMA_VERSION)
+    .filter((version) => !hasTodaysEventLines(version))
     .map(
       (version) =>
         `logSchemaVersion ${version}, this analysis reads ${LOG_SCHEMA_VERSION}; ` +

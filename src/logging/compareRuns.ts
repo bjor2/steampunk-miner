@@ -5,9 +5,10 @@
  * minute, spending by kind, deaths and the final level of every track. Differences are
  * reported, never judged: only the pacing targets fail a build (#29).
  *
- * Runs with different `logSchemaVersion`s are refused (no adapter exists yet), and so, unless the
- * caller asks for `compareRunsIncludingDebug`, is a run in which a `debug.*` command was applied:
- * its numbers were not played for.
+ * Runs with different `logSchemaVersion`s are refused (no adapter exists yet) unless both read
+ * their events as today's (`hasTodaysEventLines`: schema 7 changed only the command file), and so,
+ * unless the caller asks for `compareRunsIncludingDebug`, is a run in which a `debug.*` command was
+ * applied: its numbers were not played for.
  */
 import { TICKS_PER_SECOND } from '../constants/physics'
 import { formatAmount } from '../systems/displayAmount'
@@ -25,6 +26,7 @@ import {
 } from '../systems/money'
 import { SAWTOOTH_BAND } from '../systems/vehicle/bandDig'
 import { digText, type BandDig } from './bandDigReport'
+import { hasTodaysEventLines } from './runEvent'
 import type { RunSummary } from './runSummary'
 
 export interface ComparisonRow {
@@ -61,11 +63,15 @@ export function compareRunsIncludingDebug(a: RunSummary, b: RunSummary): RunComp
 }
 
 function schemaProblems(a: RunSummary, b: RunSummary): string[] {
-  if (a.logSchemaVersion === b.logSchemaVersion) return []
+  if (haveSameEventLines(a.logSchemaVersion, b.logSchemaVersion)) return []
   return [
     `${a.runId} has logSchemaVersion ${a.logSchemaVersion} and ${b.runId} has ` +
       `${b.logSchemaVersion}; no adapter exists between them`,
   ]
+}
+
+function haveSameEventLines(a: number, b: number): boolean {
+  return a === b || (hasTodaysEventLines(a) && hasTodaysEventLines(b))
 }
 
 function debugProblems(summary: RunSummary): string[] {

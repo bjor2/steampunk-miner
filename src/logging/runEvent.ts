@@ -21,8 +21,21 @@ import type { RunEventData, RunEventName } from './eventNames'
  * 6: a drill span logs one `drill_cut` line (its fields retyped) and one `casing_lined` line per
  *    lining run in place of its per-cell lines (`drillCutLine.ts`), and `commands.ndjson` leaves
  *    out every unchanged pose field and writes a run of drill commands as one line (ticket 420).
+ * 7: `commands.ndjson` writes a player's reports a tick and a seq apart that only move as one line
+ *    with a `poseRun` of integer residuals (`poseRunLine.ts`, ticket 522). Events are unchanged.
  */
-export const LOG_SCHEMA_VERSION = 6
+export const LOG_SCHEMA_VERSION = 7
+
+/**
+ * The oldest schema whose `events.ndjson` reads as this one's: 7 changed `commands.ndjson` only, so
+ * a schema 6 run's events and summary still compare with today's (ticket 522).
+ */
+const OLDEST_SAME_EVENTS_SCHEMA_VERSION = 6
+
+/** Whether a run logged under schema `version` has events, and a summary, that read as today's. */
+export function hasTodaysEventLines(version: number): boolean {
+  return version >= OLDEST_SAME_EVENTS_SCHEMA_VERSION && version <= LOG_SCHEMA_VERSION
+}
 
 /** Where the player is: the store supplies it, the log stamps it. */
 export interface RunEventPlace {

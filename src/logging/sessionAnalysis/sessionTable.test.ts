@@ -76,8 +76,15 @@ describe('session table', () => {
     const table = sessionTableOf([sessionFilesOf('logs/old', [oldLine])])
     expect(table.sessions).toEqual([])
     expect(table.refused[0].problems).toEqual([
-      'logSchemaVersion 1, this analysis reads 6; no adapter exists between them',
+      'logSchemaVersion 1, this analysis reads 7; no adapter exists between them',
     ])
+  })
+
+  it("reads a session written under schema 6, whose events read as today's (ticket 522)", () => {
+    const line = { ...memoryLine(GAME_RUN, 0, 600), v: 6 }
+    const table = sessionTableOf([sessionFilesOf('logs/six', [line])])
+    expect(table.refused).toEqual([])
+    expect(table.sessions[0].events).toHaveLength(1)
   })
 
   it('refuses an empty events file', () => {

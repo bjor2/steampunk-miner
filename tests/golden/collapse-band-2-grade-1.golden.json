@@ -3,7 +3,7 @@
   "description": "Grade 1 digs 8 m into band 2: the lined blocks behind warn for 60 ticks and refill (#43).",
   "generatorVersion": 9,
   "authorityProtocolVersion": 82,
-  "logSchemaVersion": 6,
+  "logSchemaVersion": 7,
   "numberFormatVersion": 1,
   "sliceSections": {
     "aetheric": 1,

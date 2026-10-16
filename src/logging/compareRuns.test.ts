@@ -125,8 +125,13 @@ describe('compareRuns', () => {
     const comparison = compareRunsIncludingDebug(summaryOf(), summaryOf({ logSchemaVersion: 1 }))
     expect(comparison).toEqual({
       ok: false,
-      problems: ['run_a has logSchemaVersion 6 and run_a has 1; no adapter exists between them'],
+      problems: ['run_a has logSchemaVersion 7 and run_a has 1; no adapter exists between them'],
     })
+  })
+
+  it('compares a schema 6 run with a schema 7 one, as 7 changed the command file only (ticket 522)', () => {
+    const comparison = compareRuns(summaryOf({ logSchemaVersion: 6 }), summaryOf())
+    expect(comparison.ok).toBe(true)
   })
 
   it('refuses a run that applied debug commands unless asked to include it', () => {

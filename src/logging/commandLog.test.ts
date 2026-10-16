@@ -1,6 +1,4 @@
 import { describe, expect, it } from 'vitest'
-import { POSE_REPORT_INTERVAL_TICKS } from '../constants/balance'
-import { TICKS_PER_SECOND } from '../constants/physics'
 import type { AuthorityCommand, CommandPayloads } from '../systems/authority/authorityCommand'
 import type { DriveSigns } from '../systems/vehicle/driveSigns'
 import {
@@ -9,6 +7,7 @@ import {
   loggedCommandsOf,
   type LoggedCommand,
 } from './commandLog'
+import { recordedTrackLines } from './fixtures/poseTracks/recordedPoseTracks'
 import { formatNdjsonLine } from './ndjson'
 
 let nextSeq = 0
@@ -99,8 +98,19 @@ describe('command log: pose drive (ticket 342)', () => {
     expect(commands).toEqual(before)
   })
 
-  it('meets the log budget with poses still reported 5 times a second (the #123 rulings)', () => {
-    expect(TICKS_PER_SECOND / POSE_REPORT_INTERVAL_TICKS).toBe(5)
+  it('writes the recorded per-tick drilling reports in under a fifth of their schema 6 bytes (ticket 522)', () => {
+    const schemaSix = recordedTrackLines('stored-1-interval-1-down')
+    const poseBytesOf = (lines: readonly LoggedCommand[]) =>
+      lines
+        .filter((line) => line.type === 'reportPose')
+        .map(formatNdjsonLine)
+        .join('').length
+    const before = poseBytesOf(schemaSix)
+    const after = poseBytesOf(loggedCommandsOf(expandCommandLog(schemaSix)))
+    console.log(
+      `stored-1 track: ${(before / 3097).toFixed(1)} -> ${(after / 3097).toFixed(1)} B a report`,
+    )
+    expect(after).toBeLessThan(before / 5)
   })
 
   it('refuses a pose line with fields left out and nothing to carry forward', () => {

@@ -3,7 +3,7 @@
   "description": "Grade 2 digs 8 m into band 2 and parks beside its lining: no collapse; then debug.forceCollapse refills a lined block anyway (#41, #43).",
   "generatorVersion": 9,
   "authorityProtocolVersion": 82,
-  "logSchemaVersion": 6,
+  "logSchemaVersion": 7,
   "numberFormatVersion": 1,
   "sliceSections": {
     "aetheric": 1,
