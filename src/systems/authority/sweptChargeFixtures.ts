@@ -7,13 +7,24 @@
  *
  * Counted by tick (GD 6209400700 Q1 (c)): over a leg, the ledgers charge the paid prices, the
  * final carry and the carried-in work later ticks drop, to the sub-step, at every tick.
+ *
+ * The debt recorder (ticket 471's slice 1, ticket 503) holds the carry debt from tick to tick, as
+ * #466's recorder held the carried-in work: each tick's ledger pays the debt the tick before left,
+ * so the ledgers charge the paid prices, the stored carry and the debt still owed.
  */
 import { DRILL_STAMP_RADIUS_MM, DRILL_SUBSTEPS_PER_TICK } from '../../constants/balance'
 import type { CarryReach, CarryWalk } from '../vehicle/carryWalk'
 import { NO_DRIVE } from '../vehicle/driveSigns'
-import { droppedCarryInOf, dwellLedgerOf } from '../vehicle/sweepDwell'
+import {
+  carryDebtAfter,
+  carryDebtAfterTank,
+  carryDebtOwedOn,
+  droppedCarryInOf,
+  dwellLedgerOf,
+} from '../vehicle/sweepDwell'
 import type { SweepPath } from '../vehicle/sweptCut'
 import { noseTileOf, type VehiclePose } from '../vehicle/vehiclePose'
+import { vehicleOf, type AuthorityState } from './authorityState'
 import { chargedCarveOf } from './clampedCharge'
 import { WITHIN_SHARE } from './drillStepCut'
 import { PARAMS } from './scriptedSession'
@@ -45,6 +56,12 @@ export interface TickCharge {
   carriedIn: number
   /** Carried-in work this tick dropped: the tick before charged it. */
   dropped: number
+  /** The carry debt the tick's ledger paid toward: 0 on fix A's recorder and on a fresh path. */
+  owed: number
+  /** The carry debt the tick leaves: what it could not pay, what it dropped, what the tank did. */
+  owes: number
+  /** The carry the cursor stores after the settle: the kept carry, none once the tank empties. */
+  stored: number
 }
 
 /** A tick's walk as the carve's walk seam saw it. */
@@ -54,8 +71,19 @@ interface WalkedTick {
   carriedIn: number
 }
 
+/** How a leg's ticks are cut and charged: by fix A's ledger, or one holding the carry debt. */
+export type ChargeRecorder = (charges: TickCharge[]) => LegTick
+
 /** The leg's swept tick, cut by the live `drillStep`'s walks, its walk's charge kept in `charges`. */
-export function recordingChargesTick(charges: TickCharge[]): LegTick {
+export const recordingChargesTick: ChargeRecorder = (charges) =>
+  recordingTickOwing(() => 0, charges)
+
+/** The same tick with its ledger paying the debt the last recorded tick left (ticket 471). */
+export const recordingDebtTick: ChargeRecorder = (charges) =>
+  recordingTickOwing((path) => carryDebtOwedOn(path, charges.at(-1)?.owes ?? 0), charges)
+
+/** The recorded tick, its ledger paying what `owedOn` says its path owes. */
+function recordingTickOwing(owedOn: (path: SweepPath) => number, charges: TickCharge[]): LegTick {
   return (state, tick, pose) => {
     const walked: WalkedTick[] = []
     const outcome = drillSweepBy(
@@ -65,9 +93,15 @@ export function recordingChargesTick(charges: TickCharge[]): LegTick {
       sweptTickAt(pose),
       recordingWalks(walked),
     )
-    charges.push(...walked.map((walk) => tickChargeOf(walk, outcome.carved)))
+    const stored = storedCarryOf(outcome.effect.state)
+    const debtOf = (walk: WalkedTick) => ({ owed: owedOn(walk.path), stored })
+    charges.push(...walked.map((walk) => tickChargeOf(walk, outcome.carved, debtOf(walk))))
     return outcome.effect
   }
+}
+
+function storedCarryOf(state: AuthorityState): number {
+  return vehicleOf(state, 'p1').sweptCut?.carrySubSteps ?? 0
 }
 
 function sweptTickAt(pose: VehiclePose) {
@@ -90,21 +124,33 @@ function recordingCarry(walk: CarryWalk, walked: WalkedTick[]): CarryWalk {
   }
 }
 
-/** The tick's ledger as fix A charges it, from the carry the carve's clamp kept. */
+/** The debt a tick's ledger pays toward and the carry its settle stored. */
+interface TickDebt {
+  owed: number
+  stored: number
+}
+
+/** The tick's ledger as fix A charges it, from the carry the carve's clamp kept, less `owed`. */
 function tickChargeOf(
   { path, reach, carriedIn }: WalkedTick,
   carved: SweptCarve | null,
+  { owed, stored }: TickDebt,
 ): TickCharge {
   const kept = carved?.carrySubSteps ?? reach.carrySubSteps
-  const carve = (charged: CarryReach) => dwellLedgerOf(path, charged, carriedIn)
-  const ledger = chargedCarveOf(carve, () => ({ ...reach, carrySubSteps: kept }), reach).carved
+  const clamped = { ...reach, carrySubSteps: kept }
+  const carve = (charged: CarryReach) => dwellLedgerOf(path, charged, carriedIn, owed)
+  const ledger = chargedCarveOf(carve, () => clamped, reach).carved
+  const owes = carryDebtAfter(clamped, carriedIn, owed)
   return {
     charged: ledger.reduce((sum, { work }) => sum + work, 0),
     paid: reach.paidPrices.reduce((sum, price) => sum + price, 0),
     walked: reach.carrySubSteps,
     kept,
     carriedIn,
-    dropped: droppedCarryInOf({ ...reach, carrySubSteps: kept }, carriedIn),
+    dropped: droppedCarryInOf(clamped, carriedIn),
+    owed,
+    owes: carryDebtAfterTank(owes, kept, stored),
+    stored,
   }
 }
 
@@ -178,21 +224,30 @@ export interface ChargedLeg {
   charges: TickCharge[]
 }
 
-export function chargedLegOf(cut: LegCut): ChargedLeg {
+export function chargedLegOf(
+  cut: LegCut,
+  recorder: ChargeRecorder = recordingChargesTick,
+): ChargedLeg {
   const charges: TickCharge[] = []
-  const run = cutLeg({ ...cut, tick: recordingChargesTick(charges) })
+  const run = cutLeg({ ...cut, tick: recorder(charges) })
   return { run, charges }
 }
 
 /** The rig down the window of `leg`, started at `phase`. */
-export function chargedWindowOf(rig: SpeedRig, leg: Leg, phase: ChargePhase): ChargedLeg {
-  return chargedLegOf({
+export function chargedWindowOf(
+  rig: SpeedRig,
+  leg: Leg,
+  phase: ChargePhase,
+  recorder: ChargeRecorder = recordingChargesTick,
+): ChargedLeg {
+  const cut = {
     rig,
     leg: { ...leg, start: pointAlong(leg, phase.offsetMm) },
     startTick: phase.startTick,
     maxTicks: WINDOW_MAX_TICKS,
     reachMm: WINDOW_MM,
-  })
+  }
+  return chargedLegOf(cut, recorder)
 }
 
 /** One printed row: the leg's ticks, charged and spent work, the residual and the over-charge. */

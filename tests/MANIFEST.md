@@ -744,6 +744,8 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/authority/sweptCarry.test.ts` | 8 | 6 |
 | `src/systems/authority/sweptChargeConservation.lane.test.ts` | 168 | 1 |
 | `src/systems/authority/sweptChargeConservation.test.ts` | 36 | 5 |
+| `src/systems/authority/sweptChargeExact.lane.test.ts` | 168 | 1 |
+| `src/systems/authority/sweptChargeExact.test.ts` | 39 | 8 |
 | `src/systems/authority/sweptCutAtSpeed.test.ts` | 8 | 8 |
 | `src/systems/authority/sweptFreshCarve.test.ts` | 47 | 16 |
 | `src/systems/authority/sweptGateSpeeds.test.ts` | 24 | 2 |
@@ -1339,6 +1341,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/vehicle/aheadBearingLatch.test.ts` | 11 | 11 |
 | `src/systems/vehicle/bandDig.test.ts` | 5 | 5 |
 | `src/systems/vehicle/bodySpeedDips.test.ts` | 6 | 6 |
+| `src/systems/vehicle/carryDebt.test.ts` | 8 | 8 |
 | `src/systems/vehicle/carryWalk.test.ts` | 52 | 22 |
 | `src/systems/vehicle/casingTrail.test.ts` | 16 | 12 |
 | `src/systems/vehicle/chargeSelection.test.ts` | 4 | 4 |

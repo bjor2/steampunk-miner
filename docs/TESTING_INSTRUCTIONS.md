@@ -359,6 +359,17 @@ programs }` from three's `renderer.info` of the game canvas), read only when cal
   all; a gate keeps no carry, a full hold and the legs' releases and caves conserve too. It prints
   the residual per row (about 10 s). The lane `sweptChargeConservation.lane.test.ts` runs the same
   rows at tick phases 1, 7, 19 and 31 and start offsets 0, 41 and 83 mm (about 1 min).
+- **Swept ledger's carry debt** (ticket 471's slice 1, ticket 503; dark, the debt held by the
+  recorder): `src/systems/vehicle/carryDebt.test.ts` checks the pure rule in `sweepDwell.ts` (a
+  dropped carried-in work owed, paid off the first stations after the carried-in work, a fresh path
+  and a gate owing none, an emptied tank's carry owed, no debt byte-identical to fix A).
+  `src/systems/authority/sweptChargeExact.test.ts` cuts the same legs and rigs through the debt
+  recorder (`recordingDebtTick`, measures in `sweptDebtFixtures.ts`) and wants the ledgers to charge
+  the paid prices, the stored carry and the debt owed, to the sub-step after every tick, the debt
+  never below 0 and 0 from 78 m/s up; a gate, a full hold and the 300 m/s rig's cells and charge
+  with and without the debt hold too. It prints each row's debt, not pinned (about 10 s); the
+  cells-band bars stay todos until #471's second slice wires the debt. The lane
+  `sweptChargeExact.lane.test.ts` runs the rows at the twelve phases (about 1 min).
 - **Carry release** (ticket 421): `src/systems/authority/carryRelease.test.ts` holds the carry's
   cell out of the stamp until one of its samples lies in the body's next-step slab
   (`CARRY_RELEASE_MARGIN_SAMPLES`), then wants it carved, priced again after the stamp's bite and
