@@ -435,3 +435,14 @@ Game Director wants it ahead of anything off the smooth-drilling path. `PRIORITY
 lines; live workers read the script by offset).
 
 Rollback: restore `next-ticket.sh.bak-20261016-1930-508` (the file before this edit, same size; copy it over in place with `cat`, not `mv`).
+
+## #509 released: build, priority and orphan lists (16 Oct 2026, ~20:15 Oslo)
+
+**#509** (materials: clamp seam with its protocol bump, split from #445 by the Producer; `tier:hard`, under #316, outside map #302)
+now has `build`. It is blocked by #445 (open) and #506 (closed), so it waits for #445. `PRIORITY_TICKETS` starts `508 509 484 ...`
+(closed 500 and 506 dropped) and **509** is in `WAVE_ORPHAN_ALLOW` next to 508. Same file size and inode, edited in one in-place write.
+
+Wave 7A (#461: #445, #446, #447, #449) had been paused by the driver at 19:34 Oslo because #445 carried `needs-planner`. The TD
+answered and removed it, so `wave:paused` was removed from #461 and the wave is `ready` again (the wave cache takes up to ~2 min to show it).
+
+Rollback: `gh issue edit 509 --remove-label build`; restore `next-ticket.sh.bak-20261016-2015-509` over `next-ticket.sh` in place (`cat`, not `mv`).
