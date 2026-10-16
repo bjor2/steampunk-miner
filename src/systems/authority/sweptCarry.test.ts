@@ -20,7 +20,7 @@ import { shockTicksFor } from './magnetic/electrifiedShock'
 import { planetParamsOf } from './planetOfState'
 import { coreTiles, createScriptedSession, FREEZE_ENEMIES, poseAbove } from './scriptedSession'
 import { drillAlongSweep, type SweptStep } from './sweptDrill'
-import { coreSweep, ELECTRIFIED, fullHoldSweep, sweepWith } from './sweptSpanFixtures'
+import { coreSweep, ELECTRIFIED, fullHoldSweep, PREFILLED, sweepWith } from './sweptSpanFixtures'
 import { drillAlongSpan } from './sweptSpanDrill'
 
 // The exact drill carry through the authority (ticket 399, the TD ruling on #399): a tick's work
@@ -125,11 +125,16 @@ describe('drill carry through the authority (ticket 399)', () => {
   it('cuts a 100-cell column in exactly the sum of its cells drill times', () => {
     const rig = rigInColumn(QUICK_RIG, '100000000')
     const cells = columnCellsBelow(rig)
-    const prices = pricesOf(rig.state, rig.params, cells)
+    const startPrices = pricesOf(rig.state, rig.params, cells)
+    const spare = Math.ceil(startPrices.reduce((sum, price) => sum + price, 0) / Q) + 1
+    // After the first tick the pose runs 40 m ahead of the cut, so every tick's reach is its work's
+    // alone. The first rests right behind the first cell, which then lies in the body's next step:
+    // the stamp bites it too (ticket 421), so each cell is priced as the walk meets it.
+    const ticks = cutDown(rig, drillAlongStep, { strideMm: 40_000, ticks: spare })
     let total = 0
+    const prices = pricesOf(ticks[0].state, rig.params, cells)
     const expected = prices.map((price) => Math.ceil((total += price) / Q) - 1)
-    // The pose runs 40 m ahead of the cut, so every tick's reach is its work's alone.
-    const ticks = cutDown(rig, drillAlongStep, { strideMm: 40_000, ticks: expected[CELLS - 1] + 1 })
+    expect(prices[0]).toBeLessThan(startPrices[0])
     expect(brokenTicksOf(ticks, cells)).toEqual(expected)
   })
 
@@ -175,16 +180,16 @@ describe('drill carry through the authority (ticket 399)', () => {
   })
 
   it('drops the carry on a tick a full hold loses an ore unit its walk cut, and cuts it', () => {
-    const fixture = fullHoldSweep(18)
+    // Two places fewer than the span specs leave: the walk now pays the cell the stamp bit on the
+    // tick it meets it (ticket 421), ahead of the stamp's rim cells, so the hold fills on it.
+    const fixture = fullHoldSweep(18, [...PREFILLED, { tx: 56, ty: 292 }, { tx: 58, ty: 292 }])
     const ticks = withRegistrations(fixture.slices, () =>
       sweepWith(fixture, drillAlongStep, (effect) => effect),
     )
-    // The walk's cells yield first, so a lost unit right after the tick's first broken cell on
-    // the column is the walk's.
-    const losing = ticks.filter(({ events }) => {
-      const first = events.findIndex((event) => event.type === 'TileDestroyed')
-      return first > -1 && events[first + 1]?.type === 'StorageFull' && isOnColumn57(events[first])
-    })
+    // The walk's cells yield first, down the column's centre, so a lost unit right after one of
+    // the tick's first broken cells, all on the column, is the walk's. Since ticket 421 the walk
+    // may pay the cell the stamp bit on the tick it meets it, after the cells above it.
+    const losing = ticks.filter(({ events }) => isLostInWalk(events))
     expect(losing.length).toBeGreaterThan(0)
     for (const { state } of losing) expect(vehicleOf(state, 'p1').sweptCut?.carrySubSteps).toBe(0)
   })
@@ -203,6 +208,15 @@ describe('drill carry through the authority (ticket 399)', () => {
 
 function isAt(event: { tx: number; ty: number }, tile: TilePoint): boolean {
   return event.tx === tile.tx && event.ty === tile.ty
+}
+
+/** A unit lost right after a broken cell on column 57, every broken cell before it on the column. */
+function isLostInWalk(events: readonly { type: string }[]): boolean {
+  const broken = events.flatMap((event, at) => (isDestroyed(event) ? [at] : []))
+  const walked = broken.filter((at, index) =>
+    broken.slice(0, index + 1).every((before) => isOnColumn57(events[before])),
+  )
+  return walked.some((at) => events[at + 1]?.type === 'StorageFull')
 }
 
 function isOnColumn57(event: { type: string }): boolean {

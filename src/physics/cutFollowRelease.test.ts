@@ -15,7 +15,8 @@ import { commandedSpeedsOf, createRig, type TickRead } from './cutFollowFixtures
 // a fresh rig cuts down (or down, then level west) for 2.5 s and lets go one tick later each run,
 // a cell's worth of ticks at the slowest starting drill (40 at 1.50 m/s). At 30 frames/s a release
 // lands on a frame, every second tick; at 144 on any tick. At a few phases the 15 m/s rig lets go
-// of a level cut pressed into #421's lip, and bounces off it. That rig cuts at the old 4-tick
+// of a level cut and bounces back off the face (#458) or ramps down slowly on a face #421's release
+// cleared (#460). That rig cuts at the old 4-tick
 // floor's pace #400's rig 2 had until ticket 397 took the floor out (rig 2 now jams, #439).
 
 const RIGS: Readonly<Record<string, Record<string, number>>> = {
@@ -33,11 +34,52 @@ const HELD_SHARE = 0.05
 /** The body counts as stopped under this speed along the facing (#333's stop spec). */
 const STOPPED_MPS = 0.05
 /**
- * The 15 m/s rig's level releases that must stop in time until #421 lifts the lip. Rig 2 stopped
- * at 3 in 4 under the old floor; the 15 m/s rig that took its place (ticket 397) stops at 2 in 3
- * (4 of 6 phases at 30 frames/s, 9 of 13 at 144), the rest bouncing back off the face.
+ * The 15 m/s rig's level releases that must stop in time until #458 closes. Rig 2 stopped at 3 in
+ * 4 under the old floor; the 15 m/s rig that took its place (ticket 397) stops at 2 in 3 (4 of 6
+ * phases at 30 frames/s, 9 of 13 at 144), and since #421's release 10 of 11 and 21 of 25.
  */
 const LIP_STOPPED_SHARE_MIN = 0.65
+/** The level release phases main followed, and how main stopped and backed off on them. */
+interface PairedPhases {
+  phases: readonly number[]
+  stopped: number
+  backwardTicks: number
+  /** The deepest backward speed over the 6 ticks after letting go, m/s (rounded toward 0). */
+  deepestBackwardMps: number
+  /** The backward speeds summed over every phase's 6 ticks, m/s (rounded toward 0). */
+  summedBackwardMps: number
+}
+
+/**
+ * The like-for-like lip ratchet (GD ruling 6205935803, VS 6205939203, TD 6205950943 on #421): the
+ * 15 m/s rig's level release phases main followed by this sweep's own rule (`isFollowingCut`), run
+ * on main 2e229b0b (protocol 79) before ticket 421 and fixed here so a rebase cannot move the
+ * denominator; each phase is the tick past 2.5 s the drive lets go.
+ */
+const MAIN_FOLLOWED_LEVEL: Readonly<Record<number, PairedPhases>> = {
+  30: {
+    phases: [6, 16, 20, 24, 26],
+    stopped: 4,
+    backwardTicks: 5,
+    deepestBackwardMps: -0.6171,
+    summedBackwardMps: -1.3008,
+  },
+  144: {
+    phases: [5, 6, 7, 16, 19, 20, 21, 23, 24, 25, 26, 27, 37, 39],
+    stopped: 12,
+    backwardTicks: 17,
+    deepestBackwardMps: -0.7622,
+    summedBackwardMps: -3.8512,
+  },
+}
+/**
+ * Backward ticks on those phases after ticket 421 (6 at 30 frames/s, 24 at 144): more than main's
+ * but shallower, so the count is recorded and may only shrink (third-pause ruling 6206873222, VS
+ * 6206876410, TD on #421) while depth and sum carry the no-worse-than-main assert.
+ */
+const LIP_BACKWARD_TICKS_MAX: Readonly<Record<number, number>> = { 30: 6, 144: 24 }
+/** Below this the body moved backwards; a stopped tick jitters at +-0.01 m/s. */
+const BACKWARDS_M_PER_S = -0.02
 /**
  * Releases a sweep must sample. A starting rig's level cut holds the drill's speed only some of
  * the time (#432's stall), so a sweep of 20 frame-aligned phases finds 4 to 8 followed releases.
@@ -108,25 +150,33 @@ function isStoppedInTime(release: readonly TickRead[]): boolean {
   return release.some(({ speed }) => Math.abs(speed) < STOPPED_MPS)
 }
 
+/** The 6 ticks after letting go on each of main's followed phases. */
+function pairedReleasesOf(paired: PairedPhases, framesPerSecond: number): TickRead[][] {
+  return paired.phases.map(
+    (phase) => releaseAt(RIGS['15 m/s rig'], framesPerSecond, 'level', phase).release,
+  )
+}
+
+/** Every release tick that moved backwards, as its speed. */
+function backwardSpeedsOf(releases: readonly (readonly TickRead[])[]): number[] {
+  return releases
+    .flat()
+    .map(({ speed }) => speed)
+    .filter((speed) => speed < BACKWARDS_M_PER_S)
+}
+
+function sumOf(values: readonly number[]): number {
+  return values.reduce((sum, value) => sum + value, 0)
+}
+
 const STRICT_SWEEPS = Object.keys(RIGS).flatMap((rig) =>
   LEGS.filter((leg) => !isLipSweep(rig, leg)).flatMap((leg) =>
-    FRAME_RATES.filter((framesPerSecond) => !isLipHeldDownSweep(rig, leg, framesPerSecond)).map(
-      (framesPerSecond) => [rig, leg, framesPerSecond] as const,
-    ),
+    FRAME_RATES.map((framesPerSecond) => [rig, leg, framesPerSecond] as const),
   ),
 )
 
 function isLipSweep(rig: string, leg: Leg): boolean {
   return rig === '15 m/s rig' && leg === 'level'
-}
-
-/**
- * Since ticket 439 the 15 m/s rig's fresh stamp (990 mm ahead, past the stamp's radius) opens its
- * start lip, so its down cut runs at a new phase, and at 144 frames/s one release lets go on #421's
- * lip and does not stop in 6 ticks. With `leavingCellToCarry` ablated every release stops.
- */
-function isLipHeldDownSweep(rig: string, leg: Leg, framesPerSecond: number): boolean {
-  return rig === '15 m/s rig' && leg === 'down' && framesPerSecond === 144
 }
 
 describe('the stop ramp follows the drive (ticket 430 addendum)', () => {
@@ -151,11 +201,23 @@ describe('the stop ramp follows the drive (ticket 430 addendum)', () => {
     240_000,
   )
 
-  it.todo(
-    '15 m/s rig: stops within 6 ticks at every release phase of a level cut (#421: the body rests pressed into the carry target-cell lip and bounces off it)',
+  it.each(FRAME_RATES)(
+    '15 m/s rig: backs off main’s followed level release phases no deeper and no more in sum than main, at %i frames/s',
+    (framesPerSecond) => {
+      const paired = MAIN_FOLLOWED_LEVEL[framesPerSecond]
+      const backward = backwardSpeedsOf(pairedReleasesOf(paired, framesPerSecond))
+      expect(Math.min(0, ...backward)).toBeGreaterThanOrEqual(paired.deepestBackwardMps)
+      expect(sumOf(backward)).toBeGreaterThanOrEqual(paired.summedBackwardMps)
+      expect(backward.length).toBeLessThanOrEqual(LIP_BACKWARD_TICKS_MAX[framesPerSecond])
+    },
+    240_000,
   )
 
   it.todo(
-    '15 m/s rig: stops within 6 ticks of the drive letting go at every phase of a down cut, at 144 frames/s (#421: a release lets go on the carry target-cell lip)',
+    '15 m/s rig: stops in time on at least as many of main’s followed level release phases as main (11 of 14 against 12 at 144 frames/s; #458 bounce-back off the face, #460 stop ramp on a cleared face)',
+  )
+
+  it.todo(
+    '15 m/s rig: stops within 6 ticks at every release phase of a level cut (#458: the body bounces back off the face; #460: the stop ramp on a cleared face)',
   )
 })

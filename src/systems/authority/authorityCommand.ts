@@ -283,8 +283,14 @@ import type { DriveSigns } from '../vehicle/driveSigns'
  *    body's own cell and the rim along the path open as a continuing step's do. A fresh reach
  *    within one radius cuts the same bare disc as before. With no drill step sent
  *    (`drill.sweptCut` off) no digest or mined order changes.
+ * 80: the carry releases its cell (ticket 421, rule (b) of the GD ruling 6204353563 in the TD's
+ *    shape 6204362873): once the cell the swept cut's carry works toward lies in the body's next
+ *    step the stamp carves it too, still asking its gates, and the walk pays what the stamp's bite
+ *    left of it on the tick it meets it, discarding the surplus; a carry banked against it is
+ *    clamped to that. Which cells a `drillStep` pays, and in what order, change. With no drill step
+ *    sent (`drill.sweptCut` off) no digest or mined order changes.
  */
-export const AUTHORITY_PROTOCOL_VERSION = 79
+export const AUTHORITY_PROTOCOL_VERSION = 80
 
 /** The kernel's own commands: the closed set its rule tables are written against. */
 export interface KernelCommandPayloads {

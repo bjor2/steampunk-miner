@@ -168,16 +168,11 @@ describe('cut-follow in the live loop (ticket 333)', () => {
 
   it('never drives back through its own tunnel faster than travel parity allows', () => {
     const run = playScript(RIGS[2], HOLDING_CASING_GRADE)
+    // The level leg's held-out carry cells left a floor lip the drill met on the way back until
+    // ticket 421 let the stamp carve them (#439 had made this a todo naming #421).
+    expect(run.back.every((read) => !read.result.isCutting)).toBe(true)
     for (const read of run.back) {
       expect(alongSpeedOf(read.result.pose)).toBeLessThanOrEqual(read.travelCap * 1.01)
     }
   }, 120_000)
-
-  // Since ticket 439 the third rig's fresh stamp (990 mm ahead, past the stamp's radius) opens its
-  // start lip, so it cuts 11 m deeper and its level leg ends at full cut speed; back east, the drill
-  // meets the floor lip that leg's held-out cells left, for about 14 ticks at 1 m/s. With
-  // `leavingCellToCarry` ablated it never cuts on the way back.
-  it.todo(
-    'never cuts on the way back through its own tunnel (#421: the level cut leaves a lip where the carry holds its target cell out)',
-  )
 })

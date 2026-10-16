@@ -45,11 +45,19 @@ afterEach(() => uninstallRunLog())
 
 const ticks = (seconds: number) => Math.round(seconds / PHYSICS_TIMESTEP)
 
-/** Off the pad, then down for `DOWN_SECONDS`; the down leg's ticks. */
-function cutDown(framesPerSecond: number): TickRead[] {
+/**
+ * Off the pad for long enough that the shaft's stamp meets the metal cluster round (-29, 288).
+ * The level drive off the pad cuts too, so where the shaft starts moves with the carve: since
+ * ticket 421 the stamp carves the carry's cell there, and a 2 s drive puts the shaft a column west
+ * of the cluster.
+ */
+const OFF_PAD_TO_CLUSTER_SECONDS = 1.9
+
+/** Off the pad for `offPadSeconds`, then down for `DOWN_SECONDS`; the down leg's ticks. */
+function cutDown(framesPerSecond: number, offPadSeconds = 2): TickRead[] {
   const rig = createRig(RAPIER, RIG_44, framesPerSecond)
   // The Sell bay is the pad's west end (#170), so off the pad is to the left.
-  rig.hold(buildIntent(['aim_left']), ticks(2))
+  rig.hold(buildIntent(['aim_left']), ticks(offPadSeconds))
   return rig.hold(buildIntent(['aim_down']), ticks(DOWN_SECONDS))
 }
 
@@ -98,7 +106,9 @@ describe('a followed cut bites on its swept stamp (ticket 397)', () => {
   )
 
   it('leaves a gated cell the swept stamp meets standing, and reports its gate hit', () => {
-    const followed = withRegistrations([REFUSE_EVERY_ORE], () => followedPartOf(cutDown(30)))
+    const followed = withRegistrations([REFUSE_EVERY_ORE], () =>
+      followedPartOf(cutDown(30, OFF_PAD_TO_CLUSTER_SECONDS)),
+    )
     expect(followed.length).toBeGreaterThan(0)
     const gated = gateHitTilesOf(sink)
     expect(gated.length).toBeGreaterThan(0)

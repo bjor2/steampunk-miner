@@ -251,7 +251,7 @@ function oreTilesAround(params: PlanetParams, tile: TilePoint, reach: number): T
 }
 
 /** Planet-1 surface ore the full-hold sweep mines first, away from its path: 5 of 10 units. */
-const PREFILLED: readonly TilePoint[] = [
+export const PREFILLED: readonly TilePoint[] = [
   { tx: 12, ty: 298 },
   { tx: 30, ty: 293 },
   { tx: 30, ty: 292 },
@@ -268,12 +268,12 @@ export const ELECTRIFIED: TilePoint = { tx: 57, ty: 290 }
  * Down column 57 through the cluster with the hold half full, so it fills mid-span; then it rests
  * against the stopping gate for 40 ticks.
  */
-export function fullHoldSweep(speed: number): SweepFixture {
+export function fullHoldSweep(speed: number, prefilled = PREFILLED): SweepFixture {
   const from = { x: 57_500, y: 297_500 }
   const to = { x: 57_500, y: 285_000 }
   const start = () => {
     const session = createScriptedSession()
-    PREFILLED.forEach((tile, index) => mineTile(session, 100 * (index + 1), tile))
+    prefilled.forEach((tile, index) => mineTile(session, 100 * (index + 1), tile))
     return armed(session, from, FACING.down, { x: 57_500, y: 291_000 })
   }
   const slice = probeSliceOf([RIM_GATE, STOP_GATE], [ELECTRIFIED])

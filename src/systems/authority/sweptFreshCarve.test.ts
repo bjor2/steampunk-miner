@@ -224,19 +224,17 @@ describe('body-wide bore at any cells a tick (ticket 439)', () => {
     }
   }
 
-  for (const rig of [ONE_X_RIG, ...BORE_RIGS]) {
-    it(`passes its body through the bore on every tick without a stall, down the column at ${rig.speed} m/s`, () => {
-      const { run } = boreOf(rig, COLUMN_LEG)
-      expect(run.ticks.length).toBeGreaterThan(5)
-      expect(stallsOf(run, COLUMN_LEG)).toEqual([])
-    })
+  // Down the tilted radius a few ticks of the 25 to 240 m/s rigs stalled on the cell the carry held
+  // out at its reach tip, a todo naming #421 until ticket 421 let the stamp carve it.
+  for (const { name, leg } of LEGS) {
+    for (const rig of [ONE_X_RIG, ...BORE_RIGS, rigAt(240)]) {
+      it(`passes its body through the bore on every tick without a stall, ${name} at ${rig.speed} m/s`, () => {
+        const { run } = boreOf(rig, leg)
+        expect(run.ticks.length).toBeGreaterThan(5)
+        expect(stallsOf(run, leg)).toEqual([])
+      })
+    }
   }
-
-  // Down the tilted radius a few ticks of the 25 to 240 m/s rigs stall on the cell the carry holds
-  // out at its reach tip; with `leavingCellToCarry` ablated none does, at any rig.
-  it.todo(
-    'passes its body through the bore on every tick without a stall, down the tilted radius at every rig (#421: the carry target-cell hold-out)',
-  )
 })
 
 /** The path the cells and work per metre are counted over, from the leg's start. */

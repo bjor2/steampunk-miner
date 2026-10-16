@@ -148,14 +148,32 @@ function beyondCellOf(
   state: AuthorityState,
   params: PlanetParams,
   playerId: string,
-  { tile, world }: { tile: TilePoint; world: WorldState },
+  cut: CellInWorld,
 ): BeyondCell {
+  return { tile: cut.tile, price: ungatedPriceOf(state, params, playerId, cut) }
+}
+
+/** A cell, and the world it stands in. */
+export interface CellInWorld {
+  tile: TilePoint
+  world: WorldState
+}
+
+/**
+ * What is left of a cell priced at the drill's own time, no gate asked (asking reports the cell);
+ * nothing for open ground.
+ */
+export function ungatedPriceOf(
+  state: AuthorityState,
+  params: PlanetParams,
+  playerId: string,
+  { tile, world }: CellInWorld,
+): number {
   const cell = materialCellAt(world, params, tile)
-  if (!isRemovableCell(cell) || isTileYielded(world, tile)) return { tile, price: 0 }
+  if (!isRemovableCell(cell) || isTileYielded(world, tile)) return 0
   const drill = heatThrottledDrill(params.planetIndex, vehicleOf(state, playerId))
   const subSteps = drillSubStepsOfCells(params, drill, shockTicksFor(state, playerId))
-  const price = uncutPriceOf(subSteps(tile, cell, 0) ?? 0, cellDensitySum(world, params, tile))
-  return { tile, price }
+  return uncutPriceOf(subSteps(tile, cell, 0) ?? 0, cellDensitySum(world, params, tile))
 }
 
 /**

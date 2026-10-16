@@ -66,6 +66,18 @@ export const DRILL_STAMP_RADIUS_MM = 950
 export const DRILL_STAMP_AHEAD_MM = 500
 export const DRILL_STAMP_LIFT_MM = 250
 
+/** Half the 0.9 m body's side (#7): its face sits this far ahead of its centre. */
+export const BODY_HALF_SIZE_MM = 450
+
+/**
+ * The swept cut's carry holds its cell out of the stamp until the cell lies in the body's next
+ * step (ticket 421, GD ruling on #421 Q2): one of its samples inside the slab from the body's face
+ * to the face plus the cutting bound, across the body's width, widened on every side by this many
+ * density samples. Three, per the TD ruling on #421 (comment 6200703398): the narrowest width
+ * measured on #421 that kept a level cut inside the interim bar.
+ */
+export const CARRY_RELEASE_MARGIN_SAMPLES = 3
+
 /**
  * Casing lining (#41 Placement rule as amended on 5 Oct, #56 Q1): a ring is centred on the tunnel
  * axis, where the drill stamp's centre passed, and lines the annulus `stampR - 0.25 m <= d <

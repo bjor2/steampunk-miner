@@ -93,14 +93,21 @@ describe('body-wide bore in the live loop (ticket 439)', () => {
     240_000,
   )
 
-  it.todo(
-    'the 3600 m/s rig never ends a tick inside solid ground on its way to the core (#421: the carry target-cell hold-out)',
+  // #439 held this as a todo naming #421: the carry's held-out cell stood in the body's way.
+  it.each(FRAME_RATES)(
+    'the 3600 m/s rig never ends a tick inside solid ground on its way to the core, at %i frames/s',
+    (framesPerSecond) => {
+      const down = downLegOf(RIGS[2].levels, framesPerSecond)
+      expect(down.filter(({ result }) => result.isCutting).length).toBeGreaterThan(10)
+      expect(down.filter((tick) => tick.isInsideGround)).toEqual([])
+    },
+    240_000,
   )
 
   // The bore bar of Oct 16 on #439, ticked in the live body: the halo steps against the ground from
-  // before the tick's cut (about 58 m/s, #440's finding), and the carry's held-out cell lips (#421)
-  // still dip single ticks. The authority spec judges the bore's own share of it.
+  // before the tick's cut (about 58 m/s, #440's finding). Ticket 421 lets the stamp carve the
+  // carry's held-out cell; the halo's dips stay. The authority spec judges the bore's own share.
   it.todo(
-    'every rig moves on at 80% or more of its commanded cut speed on every tick its cut gate is open (#440: the stale halo; #421: the hold-out lip)',
+    'every rig moves on at 80% or more of its commanded cut speed on every tick its cut gate is open (#459: the halo steps against ground the tick’s own cut opened)',
   )
 })

@@ -90,6 +90,11 @@ function gapOf(reach: Reach, other: Reach): { isSameWork: boolean; yMm: number }
   return { isSameWork, yMm: Math.abs((reach.yMm ?? 0) - (other.yMm ?? 0)) }
 }
 
+/** Whether a downward cut's cursor at `yMm` stops short of one at `otherYMm` by a sub-step or more. */
+function isShortOf(yMm: number | undefined, otherYMm: number | undefined): boolean {
+  return (yMm ?? 0) - (otherYMm ?? 0) >= SWEEP_STEP_MM
+}
+
 const ringsOf = (run: SpeedRun) => eventsOf(run).filter(({ type }) => type === 'CasingPlaced')
 
 describe('swept cut at any speed (ticket 335)', () => {
@@ -104,18 +109,23 @@ describe('swept cut at any speed (ticket 335)', () => {
     }
   })
 
-  // A drill held under 1 m a tick, so every pose here runs ahead of its cut. The walk stops on its
-  // path's sub-steps, which a longer step divides differently, so the cursor may sit up to one
-  // sub-step apart; the work and the carry it leaves are the same tick for tick.
+  // A drill held under 1 m a tick. The walk stops on its path's sub-steps, which a longer step
+  // divides differently, so the cursor may sit up to one sub-step apart; at 4 and 16 m a tick every
+  // pose runs ahead of its cut, and the work and the carry it leaves are the same tick for tick. At
+  // 1 m a tick the pose stands on the cut for its first ticks, where the cell the carry works toward
+  // lies in the body's next step and the stamp bites it too (ticket 421, TD comment 6200703398), so
+  // that run is never behind the others and ends where they do.
   it('cuts every tick to where the work reaches, however long the step', () => {
     const workBound = SPEEDS_M_PER_S.map((speed) => cutColumnAt(speed, WORK_BOUND_DRILL_POWER))
-    const [slow, ...faster] = workBound.map(reachesOf)
+    const [slow, workAlone, ...longer] = workBound.map(reachesOf)
     expect(slow.every(({ tick }, index) => tick === workBound[0].start.tick + 1 + index)).toBe(true)
     const common = Math.min(...workBound.map(({ ticks }) => ticks.length))
-    for (const reaches of faster) {
-      const apart = reaches.slice(0, common).map((reach, index) => gapOf(reach, slow[index]))
+    for (const reaches of longer) {
+      const apart = reaches.slice(0, common).map((reach, index) => gapOf(reach, workAlone[index]))
       expect(apart.filter((gap) => !gap.isSameWork || gap.yMm >= SWEEP_STEP_MM)).toEqual([])
     }
+    const behind = slow.slice(0, common).filter(({ yMm }, at) => isShortOf(yMm, workAlone[at].yMm))
+    expect(behind).toEqual([])
     const lastCursor = vehicleOf(lastStateOf(workBound[workBound.length - 1]), 'p1').sweptCut
     expect(lastCursor?.yMm).toBe(vehicleOf(lastStateOf(workBound[0]), 'p1').sweptCut?.yMm)
   })
