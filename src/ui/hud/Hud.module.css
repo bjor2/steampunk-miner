@@ -281,3 +281,133 @@
   top: 0;
   left: 0;
 }
+
+/*
+ * The compact HUD (#500 TD shape 4.2; GD rulings 2, 4 and 7): on a phone the same boxes become
+ * grid cells along the top edge instead of floating panels, so no two can overlap. Held upright:
+ * the gauges and the Tech tree button on the first row, either side of the pause button's gap
+ * (`right: 30%`, ticket 472), then the readouts, the status row and the prompts across the width.
+ * Sideways: a left column (gauges, status, prompts) that stops at the vehicle's keep-clear square
+ * (`--vehicle-clear-left`) and a right column (Tech tree, readouts) past the pause button. The
+ * threat markers keep the space under the rows. Each box takes a clean tap for its card.
+ */
+.hud[data-density='compact'] {
+  display: grid;
+  grid-template-columns: minmax(0, calc(70% - 61px)) minmax(0, 1fr) auto;
+  grid-template-rows: repeat(4, min-content) minmax(0, 1fr);
+  grid-template-areas:
+    'status . tech'
+    'gauges gauges gauges'
+    'readouts readouts readouts'
+    'prompts prompts prompts'
+    'threats threats threats';
+  align-items: start;
+  gap: var(--space-2);
+  padding: var(--space-2);
+}
+
+:global([data-orientation='landscape']) .hud[data-density='compact'] {
+  grid-template-columns:
+    minmax(0, calc(var(--vehicle-clear-left) - var(--safe-left) - 2 * var(--space-2)))
+    minmax(0, 1fr)
+    minmax(0, calc(30% - 12px));
+  grid-template-rows: repeat(3, min-content) minmax(0, 1fr);
+  grid-template-areas:
+    'gauges . tech'
+    'status . readouts'
+    'prompts . readouts'
+    'threats threats threats';
+}
+
+.hud[data-density='compact'] .cluster,
+.hud[data-density='compact'] .position,
+.hud[data-density='compact'] .banner,
+.hud[data-density='compact'] .prompts {
+  position: static;
+  min-width: 0;
+  padding: var(--space-1) var(--space-2);
+  transform: none;
+}
+
+.hud[data-density='compact'] .cluster,
+.hud[data-density='compact'] .position,
+.hud[data-density='compact'] .banner {
+  pointer-events: auto;
+  touch-action: manipulation;
+}
+
+.hud[data-density='compact'] .cluster {
+  grid-area: gauges;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1) var(--space-2);
+}
+
+.hud[data-density='compact'] .gauge {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+}
+
+/* The glyph names the gauge and the number reads it; the dial's sweep is the card's. */
+.hud[data-density='compact'] .gauge > :first-child {
+  display: none;
+}
+
+.hud[data-density='compact'] [data-card-open] .gauge > :first-child {
+  display: block;
+}
+
+.hud[data-density='compact'] .position {
+  grid-area: readouts;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1) var(--space-3);
+  min-width: 0;
+}
+
+.hud[data-density='compact'] .banner {
+  grid-area: status;
+  justify-self: start;
+  flex-wrap: wrap;
+  max-width: 100%;
+}
+
+.hud[data-density='compact'] .statuses {
+  flex-wrap: wrap;
+}
+
+.hud[data-density='compact'] .status {
+  white-space: nowrap;
+}
+
+/* The guns on Auto held by the rescue floor: the card says why, the row shows it in amber. */
+.hud[data-density='compact'] [data-idle] {
+  color: var(--color-amber);
+}
+
+.chipMore {
+  color: var(--color-ember);
+  font-weight: bold;
+}
+
+.hud[data-density='compact'] .prompts {
+  grid-area: prompts;
+  justify-self: start;
+  flex-wrap: wrap;
+  max-width: 100%;
+}
+
+.hud[data-density='compact'] .threats {
+  position: relative;
+  grid-area: threats;
+  align-self: stretch;
+  inset: auto;
+  margin-bottom: calc(var(--control-min) * 3);
+}
+
+/* An open card is the box drawn with its words, above the rows it may cover while open. */
+.hud[data-density='compact'] [data-card-open] {
+  position: relative;
+  z-index: 1;
+}

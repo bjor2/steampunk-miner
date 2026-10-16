@@ -12,6 +12,7 @@ import {
   recordUiText,
   type ElementText,
   type UiTextHolds,
+  type UiTextTitlePlace,
 } from '../../systems/views/uiText'
 import { VectorIcon, type IconSize } from '../VectorIcon'
 import { AmountText } from './AmountText'
@@ -53,6 +54,7 @@ export function TitleOneLine({
   level = 'h3',
   layout = 'stack',
   glyphSize = 'menu',
+  titlePlace = 'element',
   isTooltipHeldOpen = false,
   children,
 }: {
@@ -64,12 +66,17 @@ export function TitleOneLine({
   level?: TitleLevel
   layout?: ElementLayout
   glyphSize?: GlyphSize
+  /**
+   * `card`: the compact HUD (#500) draws the glyph and values only; the title stays in the markup
+   * for assistive tech, out of sight, and shows in the card a tap on the box opens.
+   */
+  titlePlace?: UiTextTitlePlace
   /** The game's menu focus is on the element: its tooltip shows as keyboard focus would (#164). */
   isTooltipHeldOpen?: boolean
   /** The element's action, drawn under its lines. */
   children?: ReactNode
 }) {
-  recordUiText({ ...text, lines: elementLinesOf(text, facts, lockReason) })
+  recordUiText({ ...text, lines: elementLinesOf(text, facts, lockReason), ...placeOf(titlePlace) })
   return (
     <Tooltip id={text.id} lines={text.tooltipLines} isHeldOpen={isTooltipHeldOpen}>
       <div
@@ -77,8 +84,15 @@ export function TitleOneLine({
         data-ui-text={text.id}
         data-locked={lockReason !== null || undefined}
         data-layout={layout}
+        data-title-place={titlePlace === 'card' ? 'card' : undefined}
       >
-        <TitleRow title={text.title} iconId={iconId} level={level} glyphSize={glyphSize} />
+        <TitleRow
+          title={text.title}
+          iconId={iconId}
+          level={level}
+          glyphSize={glyphSize}
+          isInCard={titlePlace === 'card'}
+        />
         {text.oneLine !== '' && <p className={styles.oneLine}>{text.oneLine}</p>}
         {facts.length > 0 && <FactRow facts={facts} glyphSize={glyphSize} />}
         {lockReason !== null && (
@@ -97,18 +111,25 @@ function TitleRow({
   iconId,
   level: Heading,
   glyphSize,
+  isInCard,
 }: {
   title: string
   iconId: string | null
   level: TitleLevel
   glyphSize: GlyphSize
+  isInCard: boolean
 }) {
   return (
     <Heading className={styles.title}>
       {iconId !== null && <VectorIcon iconId={iconId} size={glyphSize} />}
-      {title}
+      {isInCard ? <span className={styles.titleWords}>{title}</span> : title}
     </Heading>
   )
+}
+
+/** The registry keeps the default place implicit, so every other element records as before. */
+function placeOf(titlePlace: UiTextTitlePlace): { titlePlace?: UiTextTitlePlace } {
+  return titlePlace === 'element' ? {} : { titlePlace }
 }
 
 function FactRow({ facts, glyphSize }: { facts: readonly IconValue[]; glyphSize: GlyphSize }) {

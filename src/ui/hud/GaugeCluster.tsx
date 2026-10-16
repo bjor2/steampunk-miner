@@ -3,24 +3,42 @@
  * and, while there is one, the lining bill the next sale settles (#115); on a heat planet the heat
  * gauge with its icon, hatched and marked THROTTLED above its throttle line (#113). Each gauge is a
  * dial beside one shared Title+OneLine element (spec #422, pass #428): its name as the title, every
- * number a glyph and its value.
+ * number a glyph and its value. On the compact HUD (#500) each gauge is its dial, glyphs and
+ * numbers; its name and state word show in the box's tap card, and the status row says FULL.
  */
 import type { ReactNode } from 'react'
 import { hudLabelIconIdOf } from '../../systems/art/icons/iconSet'
 import { readoutTextOf } from '../../systems/views/hudCallouts'
 import type { HeatReading } from '../../systems/views/heatReading'
 import type { GaugeReading, HudModel } from '../../systems/views/hudModel'
+import type { HudDensity } from '../../systems/views/screenLayout'
+import type { UiTextTitlePlace } from '../../systems/views/uiText'
 import type { AmountReading } from '../../systems/views/viewParts'
 import { UI_IDS } from '../ids'
 import { GaugeDial } from '../kit/Gauge'
 import { TitleOneLine, type IconValue } from '../kit/TitleOneLine'
-import { hudBoxOf } from './hudBoxes'
+import { HudBox } from './HudBox'
 import styles from './Hud.module.css'
 
-export function GaugeCluster({ model }: { model: HudModel }) {
-  const isEnergyWarned = model.warning.level !== 'ok'
+export function GaugeCluster({
+  model,
+  density = 'full',
+}: {
+  model: HudModel
+  density?: HudDensity
+}) {
   return (
-    <div className={styles.cluster} {...hudBoxOf('gauges')}>
+    <HudBox id="gauges" className={styles.cluster} density={density}>
+      {(titlePlace) => <Gauges model={model} titlePlace={titlePlace} />}
+    </HudBox>
+  )
+}
+
+function Gauges({ model, titlePlace }: { model: HudModel; titlePlace: UiTextTitlePlace }) {
+  const isEnergyWarned = model.warning.level !== 'ok'
+  const isStateShown = titlePlace === 'element'
+  return (
+    <>
       <HudGauge
         textId="hud.energy"
         label="Energy"
@@ -28,6 +46,7 @@ export function GaugeCluster({ model }: { model: HudModel }) {
         gaugeId={UI_IDS.hudEnergyGauge}
         facts={[gaugeFactOf(model.energy, UI_IDS.hudEnergyText)]}
         isHatched={isEnergyWarned}
+        titlePlace={titlePlace}
       />
       <HudGauge
         textId="hud.hull"
@@ -35,6 +54,7 @@ export function GaugeCluster({ model }: { model: HudModel }) {
         reading={model.hull}
         gaugeId={UI_IDS.hudHullGauge}
         facts={[gaugeFactOf(model.hull, UI_IDS.hudHullText)]}
+        titlePlace={titlePlace}
       />
       <HudGauge
         textId="hud.cargo"
@@ -43,19 +63,31 @@ export function GaugeCluster({ model }: { model: HudModel }) {
         gaugeId={UI_IDS.hudCargoGauge}
         facts={cargoFactsOf(model)}
         isHatched={model.cargo.isFull}
+        titlePlace={titlePlace}
       >
-        {model.cargo.isFull && (
+        {model.cargo.isFull && isStateShown && (
           <strong data-testid={UI_IDS.hudCargoFull} data-state="full">
             FULL
           </strong>
         )}
       </HudGauge>
-      {model.heat !== null && <HeatGauge heat={model.heat} />}
-    </div>
+      {model.heat !== null && (
+        <HeatGauge heat={model.heat} titlePlace={titlePlace} isStateShown={isStateShown} />
+      )}
+    </>
   )
 }
 
-function HeatGauge({ heat }: { heat: HeatReading }) {
+/** The heat gauge; on the compact HUD the status row's OVERHEAT chip says THROTTLED. */
+function HeatGauge({
+  heat,
+  titlePlace,
+  isStateShown,
+}: {
+  heat: HeatReading
+  titlePlace: UiTextTitlePlace
+  isStateShown: boolean
+}) {
   return (
     <HudGauge
       textId="hud.heat"
@@ -64,8 +96,9 @@ function HeatGauge({ heat }: { heat: HeatReading }) {
       gaugeId={UI_IDS.hudHeatGauge}
       facts={[gaugeFactOf(heat, UI_IDS.hudHeatText)]}
       isHatched={heat.isThrottled}
+      titlePlace={titlePlace}
     >
-      {heat.isThrottled && (
+      {heat.isThrottled && isStateShown && (
         <strong data-testid={UI_IDS.hudHeatThrottled} data-state="throttled">
           {heat.throttledText}
         </strong>
@@ -82,6 +115,7 @@ function HudGauge({
   gaugeId,
   facts,
   isHatched = false,
+  titlePlace,
   children,
 }: {
   textId: string
@@ -90,12 +124,19 @@ function HudGauge({
   gaugeId: string
   facts: readonly IconValue[]
   isHatched?: boolean
+  titlePlace: UiTextTitlePlace
   children?: ReactNode
 }) {
   return (
     <div className={styles.gauge}>
       <GaugeDial reading={reading} gaugeId={gaugeId} isHatched={isHatched} />
-      <TitleOneLine text={readoutTextOf(textId, label)} facts={facts} level="span" glyphSize="hud">
+      <TitleOneLine
+        text={readoutTextOf(textId, label)}
+        facts={facts}
+        level="span"
+        glyphSize="hud"
+        titlePlace={titlePlace}
+      >
         {children}
       </TitleOneLine>
     </div>

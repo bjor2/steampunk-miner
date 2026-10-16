@@ -33,9 +33,17 @@ export interface ElementText {
   readonly tooltipLines: readonly string[]
 }
 
+/**
+ * Where an element's title shows: on the element, or only in the card a tap on its box opens
+ * (the compact HUD's icon-and-number readings, #500), never in a tooltip alone.
+ */
+export type UiTextTitlePlace = 'element' | 'card'
+
 /** What an element recorded: its text plus every other line it drew, each tagged (#424 Q2). */
 export interface UiText extends ElementText {
   readonly lines: readonly UiTextLine[]
+  /** Absent means on the element. */
+  readonly titlePlace?: UiTextTitlePlace
 }
 
 /** What a panel header adds under the title it already has (`Panel`'s `heading`). */

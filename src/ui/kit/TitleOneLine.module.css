@@ -72,3 +72,16 @@
 .element[data-layout='row'] .title {
   font-size: 1em;
 }
+
+/*
+ * The compact HUD (#500): the title moves to the box's tap card; here it stays in the markup for
+ * assistive tech, clipped out of sight, so the element reads as its glyph and values.
+ */
+.element[data-title-place='card'] .titleWords {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}

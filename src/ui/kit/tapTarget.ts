@@ -18,6 +18,7 @@ export function tapPointerOf(pointerType: string): TooltipPointer {
   return pointerType === 'mouse' ? 'mouse' : pointerType === 'pen' ? 'pen' : 'touch'
 }
 
-function isTapOwnedByControl(event: MouseEvent): boolean {
+/** The tap landed on a control or a tappable amount, which acts on it itself. */
+export function isTapOwnedByControl(event: MouseEvent): boolean {
   return event.target instanceof Element && event.target.closest(TAP_OWNER) !== null
 }

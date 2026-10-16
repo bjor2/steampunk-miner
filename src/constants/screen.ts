@@ -60,3 +60,17 @@ export const CLEAR_VIEW_FLOOR_LANDSCAPE_PERCENT = 65
 
 /** The compact hint chip's visible box is at most 8% of the screen's height (GD ruling 4, #500). */
 export const HINT_CHIP_MAX_HEIGHT_PERCENT = 8
+
+/**
+ * The compact hint chip's height where 8% of the screen allows more (#500): one `--text-min` line
+ * (15 px at 1.3) inside a 3 px double brass frame and 4 px of padding, rounded up to 40 px. The
+ * dismiss control's hit area is the control minimum around a smaller glyph, outside the chip's box
+ * (GD ruling 3).
+ */
+export const HINT_CHIP_LINE_PX = 40
+
+/** Space between the compact HUD's rows and the hint chip under them. */
+export const HINT_CHIP_GAP_PX = 8
+
+/** How often the compact HUD re-measures its room for the hint chip (#500): 4 times a second. */
+export const HINT_ROOM_POLL_MS = 250

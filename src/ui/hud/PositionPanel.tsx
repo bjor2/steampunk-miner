@@ -4,23 +4,42 @@
  * (ticket 317), the charges carried with the plant key (#109), the dock arrow
  * with its distance, tiles to the core's edge, and the time per tile in front of the drill. Each
  * line is one shared Title+OneLine row (spec #422, pass #428): its name as the title, then its
- * value beside the glyph of the icon set (#158).
+ * value beside the glyph of the icon set (#158). On the compact HUD (#500) a row is its glyph and
+ * value; the names and the guns-idle line show in the box's tap card, the idle guns in amber.
  */
 import type { ReactNode } from 'react'
 import { hudLabelIconIdOf, type HudLabelId } from '../../systems/art/icons/iconSet'
 import { calloutTextOf, readoutTextOf } from '../../systems/views/hudCallouts'
 import type { HudModel } from '../../systems/views/hudModel'
+import type { HudDensity } from '../../systems/views/screenLayout'
+import type { UiTextTitlePlace } from '../../systems/views/uiText'
 import { UI_IDS } from '../ids'
 import { TitleOneLine, type IconValue } from '../kit/TitleOneLine'
 import { VectorIcon } from '../VectorIcon'
 import { CompassArrow } from './CompassArrow'
-import { hudBoxOf } from './hudBoxes'
+import { HudBox } from './HudBox'
 import styles from './Hud.module.css'
 
-export function PositionPanel({ model }: { model: HudModel }) {
-  const { depth, casing, guns, boreAuto, charges, dockArrow, coreDistance, tileTime } = model
+export function PositionPanel({
+  model,
+  density = 'full',
+}: {
+  model: HudModel
+  density?: HudDensity
+}) {
   return (
-    <div className={styles.position} {...hudBoxOf('readouts')}>
+    <HudBox id="readouts" className={styles.position} density={density}>
+      {(titlePlace) => <Readouts model={model} titlePlace={titlePlace} />}
+    </HudBox>
+  )
+}
+
+function Readouts({ model, titlePlace }: { model: HudModel; titlePlace: UiTextTitlePlace }) {
+  const { depth, casing, guns, boreAuto, charges, dockArrow, coreDistance, tileTime } = model
+  const isIdleLineShown = guns?.isIdle === true && titlePlace === 'element'
+  const Line = titlePlace === 'card' ? CompactLine : FullLine
+  return (
+    <>
       <Line id="hud.depth" label="Depth" facts={[factOf('depth', depth.text, UI_IDS.hudDepth)]} />
       <Line
         id="hud.band"
@@ -42,12 +61,16 @@ export function PositionPanel({ model }: { model: HudModel }) {
       {guns !== null && (
         <Line id="hud.guns" label="Guns">
           <Glyph icon="guns" />
-          <span data-testid={UI_IDS.hudGuns} data-mode={guns.mode}>
+          <span
+            data-testid={UI_IDS.hudGuns}
+            data-mode={guns.mode}
+            data-idle={guns.isIdle || undefined}
+          >
             {guns.text}
           </span>
         </Line>
       )}
-      {guns?.isIdle === true && (
+      {isIdleLineShown && (
         <div className={styles.gunsIdle} data-testid={UI_IDS.hudGunsIdle}>
           <TitleOneLine text={calloutTextOf('hud.guns-idle', guns.idleText)} level="span" />
         </div>
@@ -98,24 +121,36 @@ export function PositionPanel({ model }: { model: HudModel }) {
           {tileTime.text}
         </span>
       </Line>
-    </div>
+    </>
   )
 }
 
 const NO_FACTS: readonly IconValue[] = []
 
-/** One readout row: its name, then its value as a fact or, when it carries a state, as markup. */
-function Line({
-  id,
-  label,
-  facts = NO_FACTS,
-  children,
-}: {
+interface LineProps {
   id: string
   label: string
   facts?: readonly IconValue[]
   children?: ReactNode
-}) {
+}
+
+/** One readout row: its name, then its value as a fact or, when it carries a state, as markup. */
+function FullLine(props: LineProps) {
+  return <ReadoutLine {...props} titlePlace="element" />
+}
+
+/** The compact row (#500): the glyph and value, its name kept for the tap card. */
+function CompactLine(props: LineProps) {
+  return <ReadoutLine {...props} titlePlace="card" />
+}
+
+function ReadoutLine({
+  id,
+  label,
+  facts = NO_FACTS,
+  titlePlace,
+  children,
+}: LineProps & { titlePlace: UiTextTitlePlace }) {
   return (
     <TitleOneLine
       text={readoutTextOf(id, label)}
@@ -123,6 +158,7 @@ function Line({
       level="span"
       layout="row"
       glyphSize="hud"
+      titlePlace={titlePlace}
     >
       {children !== undefined && <span className={styles.value}>{children}</span>}
     </TitleOneLine>

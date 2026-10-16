@@ -4,3 +4,33 @@
   bottom: var(--space-3);
   left: var(--space-3);
 }
+
+/*
+ * The compact HUD (#500): the last cell of the HUD's top row (its `tech` grid area), out of the
+ * stick zone and the cluster, which hold the bottom corners. The HUD's grid places it; it takes
+ * taps itself, as the HUD layer lets the rest through.
+ */
+:global([data-hud-density='compact']) .slot {
+  position: static;
+  grid-area: tech;
+  justify-self: end;
+  pointer-events: auto;
+}
+
+.glyphButton {
+  display: grid;
+  place-items: center;
+  width: var(--control-min);
+  height: var(--control-min);
+  padding: 0;
+  border: 2px solid var(--color-brass);
+  border-radius: var(--radius-panel);
+  background: var(--color-panel);
+  color: var(--color-brass);
+  font-size: 1.6rem;
+}
+
+.glyphButton:focus-visible {
+  outline: 2px solid var(--color-brass);
+  outline-offset: 2px;
+}

@@ -30,3 +30,9 @@ export const DOUBLE_TAP_SLOP_PX = 24
 /** A short tick on drill contact and a pulse when the hull takes damage (G&V haptics). */
 export const HAPTIC_DRILL_MS = 10
 export const HAPTIC_HIT_MS = 30
+
+/**
+ * A clean tap on a HUD box (VS rule on #500): one finger, released inside the box it pressed,
+ * having moved no further than this; a drag or a second finger is never a tap.
+ */
+export const CLEAN_TAP_SLOP_PX = 10
