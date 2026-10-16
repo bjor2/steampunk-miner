@@ -811,6 +811,19 @@ programs }` from three's `renderer.info` of the game canvas), read only when cal
   across devices (#11, #12). `perfPhone.spec.ts` is the `npm run perf:phone` lane
   ([docs/perf/README.md](perf/README.md#phone-lane)) and skips elsewhere. All of it is emulation;
   no spec claims "verified on device" until the real-device check (#482).
+- **Compact HUD** (#500, spec #470): `e2e/browser/hud/hudLayout.spec.ts` runs in the `chromium`
+  project with each cell's viewport and touch set per `describe`: the four reference phones (390x844,
+  412x915, 844x390, 915x412), the small-phone sweep (360x640, 320x568, 640x360) and the cells that
+  keep the full HUD (1280x720 with a mouse, desktop, ultra-wide, TV at 1080p, both tablets). On a
+  phone it reaches the worst case (drilling off the pad, `ui.stageHud` for a full hold and a threat
+  marker, `ui.showHint('hint_cargo')`) and asserts that no two `data-hud` boxes overlap (an
+  ancestor excepted), every text sits inside its box, the vehicle's body (`ui.getVehicleScreenBox`)
+  is never covered while drilling, the hint chip is one line within 8% of the height with a 48 px
+  dismiss, the Tech tree button is 48 px or more and off the stick zone and the cluster, and every
+  box sits in the safe area. The clear view (the union of the `data-hud` boxes, touch buttons
+  included, the stick zone not) is asserted at 70% upright and 65% sideways on the reference
+  phones and logged as a `clear-view` annotation on the sweep and with a stacked loadout (GD
+  rulings 2 and 3 on #500; #486 owns the stacked gap's `it.todo` rows). Box Tester only.
 - **Drill-down run** (ticket 416): `e2e/browser/drillDown.spec.ts` holds the real Down key for 10 s
   on the P1 surface from `scenarios/drill-down-start.scenario.json`, at stored drill_power steps 1
   (the save's), 5, 10, 15 and 20 (`debug.setUpgrade`, ticket 434), and writes one row per run (start and end position, depth gained, cells/s,

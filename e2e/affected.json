@@ -496,6 +496,33 @@
         "src/debug/debugLiveTime.ts"
       ],
       "specs": ["e2e/browser/mobile/perfPhone.spec.ts"]
+    },
+    {
+      "why": "The compact HUD on phones (#500): its boxes, density switch, hint chip and debug staging, and the matrix specs that read the HUD on the phone cells.",
+      "paths": [
+        "src/ui/hud/**",
+        "src/ui/plaques/**",
+        "src/ui/touch/**",
+        "src/ui/stage/screenFit.ts",
+        "src/systems/views/screenLayout.ts",
+        "src/systems/views/hudClearView.ts",
+        "src/systems/views/hintRoom.ts",
+        "src/systems/views/hudCompact.ts",
+        "src/systems/views/hudStaging.ts",
+        "src/store/hintSlice.ts",
+        "src/store/hudStaging.ts",
+        "src/debug/debugHudLayout.ts",
+        "src/features/tech-tree/ui/TechTreeButton.tsx",
+        "src/features/tech-tree/ui/TechTreeButton.module.css",
+        "src/scene/PlanetCamera.tsx",
+        "src/scene/cameraPresence.ts"
+      ],
+      "specs": [
+        "e2e/browser/hud/hudLayout.spec.ts",
+        "e2e/browser/screens/screenLayout.spec.ts",
+        "e2e/browser/screens/rotation.spec.ts",
+        "e2e/browser/screens/tapAffordances.spec.ts"
+      ]
     }
   ]
 }
