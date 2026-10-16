@@ -301,8 +301,16 @@ import type { DriveSigns } from '../vehicle/driveSigns'
  *    value stays within 15% of a full hold of the find's band ore, else at the band's own tier, and
  *    keeps that value in its `ores.rarity-trip` section until the dock or a rescue. A run that
  *    never keeps an epic or mythic find (every legacy-row planet, P1 and P2) moves no digest.
+ * 83: a pose report's drill raises `DrillGated` once per gated cell it holds (ticket 519, the TD
+ *    ruling 6225185887 on #519): the vehicle keeps the standing gated cells its last drilling
+ *    report met as `gatedBite`, and the next report leaves out the ones already in it while the
+ *    bite runs on unbroken (written at the last charged report, the drill on every tick since).
+ *    The first meeting of a cell always fires, and the cut, its charge and its dig time are
+ *    unchanged. A command log recorded under 82 or earlier names its protocol in `metadata.json`
+ *    (`runMetadata.ts`), so it is compared and replayed under that number, never re-read under 83.
+ *    A run that never holds a gated cell under a report moves no digest.
  */
-export const AUTHORITY_PROTOCOL_VERSION = 82
+export const AUTHORITY_PROTOCOL_VERSION = 83
 
 /** The kernel's own commands: the closed set its rule tables are written against. */
 export interface KernelCommandPayloads {

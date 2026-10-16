@@ -138,6 +138,9 @@ export function portableVehicleProblems(vehicle: unknown, path: string): string[
       : [
           `${path}.gunBurst must be Overpressure's toggle and cycle in whole ticks, or be left out`,
         ]),
+    ...(vehicle.gatedBite === undefined || isPortableGatedBite(vehicle.gatedBite)
+      ? []
+      : [`${path}.gatedBite must hold a whole tick and its cells, or be left out`]),
     ...(vehicle.sweptCut === undefined || isPortableSweptCut(vehicle.sweptCut)
       ? []
       : [
@@ -264,6 +267,16 @@ function isPortableSweptCut(cursor: unknown): boolean {
     isWholeNumber(cursor.cutSharePassed) &&
     isWholeNumber(cursor.digSubSteps) &&
     isWholeNumber(cursor.carrySubSteps)
+  )
+}
+
+/** The drill's gated bite (ticket 519): the report's tick and the standing cells it met. */
+function isPortableGatedBite(bite: unknown): boolean {
+  return (
+    isJsonObject(bite) &&
+    isWholeNumber(bite.tick) &&
+    Array.isArray(bite.cells) &&
+    bite.cells.every(isPortableTile)
   )
 }
 

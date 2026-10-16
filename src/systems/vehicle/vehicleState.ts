@@ -24,6 +24,7 @@ import { NO_GUN, type VehicleGun } from './vehicleGun'
 import { dockedPoseAt, type VehiclePose } from './vehiclePose'
 import type { AheadLatch } from './aheadBearingLatch'
 import type { SideLatch } from './facedSide'
+import type { GatedBite } from './gatedBite'
 import type { SweptCut } from './sweptCut'
 
 /** The #7 state machine; `docked` is entered by the rescue tow here and by docking in #23. */
@@ -114,6 +115,12 @@ export interface VehicleState {
    * switch, so with no Overpressure the state and its digest are unchanged.
    */
   gunBurst?: GunBurst
+  /**
+   * The standing gated cells the last drilling pose report met (ticket 519), so a bite held on a
+   * gate raises its `DrillGated` once. Absent unless a report meets a gated cell, so a world that
+   * never meets one digests as it always did.
+   */
+  gatedBite?: GatedBite
 }
 
 export const EMPTY_CARGO: Cargo = { ore: {}, coreFragments: 0 }

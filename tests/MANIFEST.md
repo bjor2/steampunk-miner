@@ -749,6 +749,8 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/authority/refinery/refineryFacility.test.ts` | 2 | 2 |
 | `src/systems/authority/refinery/refineryRules.test.ts` | 15 | 15 |
 | `src/systems/authority/refinery/refinerySlots.test.ts` | 4 | 4 |
+| `src/systems/authority/reportedGateBite.test.ts` | 15 | 15 |
+| `src/systems/authority/reportedGateBiteTracks.test.ts` | 7 | 3 |
 | `src/systems/authority/scriptedDrillGear.test.ts` | 9 | 9 |
 | `src/systems/authority/sellCoins.test.ts` | 8 | 8 |
 | `src/systems/authority/sensingQueries.test.ts` | 10 | 10 |

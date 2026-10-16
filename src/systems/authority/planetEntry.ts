@@ -1,7 +1,7 @@
 /**
  * Moving the session onto another planet (decisions #10 and #4): another planet is another world.
  * Its deltas start empty, its core progress, enemies, collapses, lava, bores, struts and grounded lines start fresh, and every vehicle stands on its dock
- * site. An item on auto stays on, its preview dropped (ticket 317). The vehicles keep their levels, energy, hull and cargo; the platform keeps its bay and look.
+ * site, its drill's gated bite over (ticket 519). An item on auto stays on, its preview dropped (ticket 317). The vehicles keep their levels, energy, hull and cargo; the platform keeps its bay and look.
  * A charge still on a wall stays on the old planet's wall: it is gone, and the rack keeps the rest.
  * `Travel` and `debug.setPlanet` both go through here.
  *
@@ -12,6 +12,7 @@
  */
 import { GENERATOR_VERSION } from '../generatorVersion'
 import type { VehicleCharges } from '../vehicle/vehicleCharges'
+import { withoutGatedBite } from '../vehicle/gatedBite'
 import { dockedPoseAt } from '../vehicle/vehiclePose'
 import type { VehicleState } from '../vehicle/vehicleState'
 import { artefactCacheTile } from '../world/artefactCache'
@@ -40,7 +41,11 @@ export function withSessionOnPlanet(state: AuthorityState, to: SessionPlanet): A
       id,
       {
         ...playerOnNewPlanet(player),
-        vehicle: { ...player.vehicle, pose, charges: withoutPlanted(player.vehicle) },
+        vehicle: {
+          ...withoutGatedBite(player.vehicle),
+          pose,
+          charges: withoutPlanted(player.vehicle),
+        },
       },
     ]),
   )

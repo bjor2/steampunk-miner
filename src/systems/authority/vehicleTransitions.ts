@@ -35,6 +35,7 @@ import { bankCoreFragments } from './coreBay'
 import type { Attacker, DomainEvent, DomainEventBody, RescueCause } from './domainEvent'
 import { endShockDiveOnDock } from './magnetic/shockDive'
 import { dockSiteOfPlanet } from './planetOfState'
+import { endGatedBite } from './reportedGateBite'
 
 /** What follows any change to a vehicle's energy: the low-energy lines, then a possible strand. */
 export function followEnergyChange(
@@ -161,7 +162,7 @@ function isAtThePad(state: AuthorityState, vehicle: VehicleState): boolean {
   return site !== null && vehicle.pose !== null && isInPadZone(site, vehicle.pose)
 }
 
-/** A dock or a wreck also loses a live remote charge (#153, K8 #218). */
+/** A dock or a wreck also loses a live remote charge (#153, K8 #218); any change ends a gated bite. */
 export function changeMode(
   state: AuthorityState,
   playerId: string,
@@ -173,6 +174,7 @@ export function changeMode(
     (current) => recordModeChange(current, playerId, to, reason, tick),
     (current) => disarmOnModeChange(current, playerId, to),
     (current) => endShockDiveOnDock(current, playerId, to),
+    (current) => endGatedBite(current, playerId),
   ])
 }
 

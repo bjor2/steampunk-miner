@@ -64,6 +64,7 @@ import { touchLavaAtPose } from './lava/lavaRules'
 import { enterMagneticField } from './magnetic/fieldEntry'
 import type { DomainEventBody } from './domainEvent'
 import { noPlanetRejection, planetParamsOf } from './planetOfState'
+import { followGatedBite } from './reportedGateBite'
 import { noteReportedStillness, noteRigCut } from './rigStillness'
 import { stepBoundsAt } from './stepBoundRead'
 import { isCutBySteps } from './sweptDrill'
@@ -253,7 +254,10 @@ function recordPose(state: AuthorityState, command: AuthorityCommand<'reportPose
   )
 }
 
-/** Drill at the nose first, then thrust, then drive, each only as far as the tank allows. */
+/**
+ * Drill at the nose first, then thrust, then drive, each only as far as the tank allows; a gated
+ * cell the drill's bite already reported is not reported again (ticket 519).
+ */
 function chargeReportedActions(
   state: AuthorityState,
   command: AuthorityCommand<'reportPose'>,
@@ -264,7 +268,12 @@ function chargeReportedActions(
   if (!isVehicleActive(vehicle) || params === null || vehicle.pose === null) {
     return unchanged(markChargedState(state, playerId, tick))
   }
-  const drilled = drillReportedTicks(state, playerId, vehicle, payload)
+  const drilled = followGatedBite(
+    drillReportedTicks(state, playerId, vehicle, payload),
+    playerId,
+    vehicle,
+    { tick, drillTicks: payload.drillTicks },
+  )
   const moved = chargeMovement(drilled.state, playerId, payload)
   return { state: markChargedState(moved, playerId, tick), events: drilled.events }
 }
