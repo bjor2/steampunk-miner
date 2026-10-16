@@ -538,3 +538,14 @@ Rollback: restore the backup in place (`cat`, not `mv`); `gh api -X DELETE repos
   it belongs to the re-record, read against the #396 pacing bands. The hold is extended by 90 min for this stage.
 - `--selftest` now also checks the evaluator on synthetic paired rows, tip-style rows and the zero-diff and nonzero-diff balance cases (no benches run).
 Rollback: restore `quiet-bench.sh.bak-20261016-2355-paired`, remove `quiet-bench-eval.py`.
+
+## Wave-key collision fixed in wave-lib.sh: #516 was never picked (16 Oct 2026, 23:05 box time)
+
+With `516` at the front of `PRIORITY_TICKETS`, no blockers, no labels and 0 attempts, the picker still answered "no pickable build ticket" four
+times. Cause: wave keys repeat across maps (**2B** is #497 on map #470 and #517 on map #316), and `wave_prepare_pick` indexed `WAVE_TAKEN` and
+`WAVE_OF` by that key, so the live worker of #497 (#487) filled the one-worker cap of #517 and starved #516. `wave-lib.sh` now indexes both by the
+wave issue number (`$num`); `next-ticket.sh` only reads them through `WAVE_OF[$n]`, so it was not edited. Backup
+`wave-lib.sh.bak-20261016-2358-wavekey`. After the fix a fresh pass claimed **#516** (slot G1, Claude C1, 23:05 box time); #514 stays out
+(blocked by #516, #519 and #522 (closed 22:56 box time)). Not fixed, only noted: `blockedKeys` between waves still uses the bare keys, so two
+waves with the same key can block or unblock each other wrongly; the next `/osilion-wave-plan` should give map-unique keys.
+Rollback: restore the backup over `wave-lib.sh` (running processes keep the code they loaded).
