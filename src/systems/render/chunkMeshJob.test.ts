@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { clearDisc } from '../world/groundEdit'
-import { planetParamsFor } from '../world/planetParams'
+import { ORE_RULES_VERSION, planetParamsFor } from '../world/planetParams'
 import { CHUNK_SIZE } from '../world/tileGrid'
 import { EMPTY_WORLD, type WorldState } from '../world/worldState'
 import { chunkMeshJobOf, runChunkMeshJob } from './chunkMeshJob'
@@ -27,6 +27,15 @@ describe('chunk mesh job (ticket 337)', () => {
     const result = structuredClone(runChunkMeshJob(job))
     expect(result.id).toBe(7)
     expect(result.parts).toEqual(buildChunkMeshParts(params, world, CHUNK.cx, CHUNK.cy))
+  })
+
+  it("carries a stamped planet's ore rules across the clone and builds what the main thread builds (ticket 445)", () => {
+    const stamped = planetParamsFor(83921, 12, ORE_RULES_VERSION)
+    const job = structuredClone(chunkMeshJobOf(3, stamped, EMPTY_WORLD, 0, 4))
+    expect(job.params).toEqual(stamped)
+    expect(structuredClone(runChunkMeshJob(job)).parts).toEqual(
+      buildChunkMeshParts(stamped, EMPTY_WORLD, 0, 4),
+    )
   })
 
   it('carries only the deltas of the chunks its halo reads', () => {

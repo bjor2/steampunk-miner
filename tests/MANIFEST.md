@@ -1058,7 +1058,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/render/chunkBuildBudget.test.ts` | 11 | 11 |
 | `src/systems/render/chunkFrameWork.test.ts` | 6 | 6 |
 | `src/systems/render/chunkJobBook.test.ts` | 7 | 7 |
-| `src/systems/render/chunkMeshJob.test.ts` | 2 | 2 |
+| `src/systems/render/chunkMeshJob.test.ts` | 3 | 3 |
 | `src/systems/render/chunkPrefetch.test.ts` | 7 | 7 |
 | `src/systems/render/chunkStreaming.test.ts` | 25 | 7 |
 | `src/systems/render/chunkTileBatch.test.ts` | 8 | 8 |
