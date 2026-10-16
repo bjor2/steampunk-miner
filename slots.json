@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-10-16T06:31:31+02:00",
+  "updated_at": "2026-10-16T06:32:14+02:00",
   "caps": {
     "grok": 12,
     "claude": 10,
@@ -122,32 +122,23 @@
     }
   ],
   "gate": {
-    "busy": 0,
+    "busy": 1,
     "max": 3
   },
   "tester": {
     "state": "running",
-    "phase": "triage-fast",
-    "sha": "d8448751522f42be6f7ced35aa0a7172a1cbf19f",
-    "since": "2026-10-16T04:30:37Z",
-    "holds_gate": false,
+    "phase": "fast",
+    "sha": "0335d65ee0c2ef14a3dd924f5f7f7f5187d30c7b",
+    "since": "2026-10-16T04:32:11Z",
+    "holds_gate": true,
     "claude_slot": null,
-    "last_run": "2026-10-16T00:31:17Z",
+    "last_run": "2026-10-16T04:32:05Z",
     "last_nightly": "2026-10-15T20:43:15Z",
     "last_nightly_result": "full=FAIL balance-report=ok bench=FAIL balance-planets=ok balance-guns=ok balance-charges=ok balance-refinery=ok balance-heat=ok e2e=FAIL memory-soak=FAIL packaged-smoke=ok ",
     "main_red_sha": null,
-    "feature": 123,
-    "feature_title": "Perf 14 (logging 3): Debug-flag snapshot writers (checkpoints, heap threshold, screenshots)",
+    "feature": 353,
+    "feature_title": "Fix red main: magnetic planet pace over the #258 bounds",
     "queue": [
-      {
-        "feature": 353,
-        "kind": "ticket",
-        "title": "Fix red main: magnetic planet pace over the #258 bounds",
-        "tickets": [
-          353
-        ],
-        "since": "2026-10-13T20:54:35+02:00"
-      },
       {
         "feature": 352,
         "kind": "ticket",
