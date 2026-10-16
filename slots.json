@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-10-16T20:02:34+01:00",
+  "updated_at": "2026-10-16T20:08:06+01:00",
   "caps": {
     "grok": 12,
     "claude": 10,
@@ -72,7 +72,7 @@
       "size": 6,
       "used": 3,
       "free": 3,
-      "claims_last_hour": 8,
+      "claims_last_hour": 7,
       "name": "Claude Max 1"
     },
     {
@@ -123,17 +123,17 @@
     }
   ],
   "gate": {
-    "busy": 1,
+    "busy": 2,
     "max": 3
   },
   "tester": {
     "state": "running",
-    "phase": "fast",
+    "phase": "slow",
     "sha": "3f9512e8683d97df819402d82000f08c9dde1da4",
-    "since": "2026-10-16T17:17:42Z",
+    "since": "2026-10-16T19:07:42Z",
     "holds_gate": true,
     "claude_slot": null,
-    "last_run": "2026-10-16T17:17:35Z",
+    "last_run": "2026-10-16T19:07:40Z",
     "last_nightly": "2026-10-15T20:43:15Z",
     "last_nightly_result": "full=FAIL balance-report=ok bench=FAIL balance-planets=ok balance-guns=ok balance-charges=ok balance-refinery=ok balance-heat=ok e2e=FAIL memory-soak=FAIL packaged-smoke=ok ",
     "main_red_sha": null,
