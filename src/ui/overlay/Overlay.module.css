@@ -4,10 +4,8 @@
  */
 .overlay {
   position: absolute;
-  inset: calc(-1 * max(env(safe-area-inset-top), var(--tv-safe-y)))
-    calc(-1 * max(env(safe-area-inset-right), var(--tv-safe-x)))
-    calc(-1 * max(env(safe-area-inset-bottom), var(--tv-safe-y)))
-    calc(-1 * max(env(safe-area-inset-left), var(--tv-safe-x)));
+  inset: calc(-1 * var(--safe-top)) calc(-1 * var(--safe-right)) calc(-1 * var(--safe-bottom))
+    calc(-1 * var(--safe-left));
   overflow: hidden;
   pointer-events: none;
 }

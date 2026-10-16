@@ -3,6 +3,8 @@ import {
   controlMinPixelsOf,
   screenLayoutOf,
   screenStyleOf,
+  orientationOf,
+  screenAttributesOf,
   shopTextPixelsOf,
   stageRectOf,
   uiScaleOf,
@@ -30,8 +32,28 @@ describe('screen layout: stage', () => {
     expect(stageRectOf(3840, 1080)).toEqual({ left: 640, width: 2560, height: 1080 })
   })
 
-  it('leaves a portrait window whole, since the turn-your-device card covers it', () => {
+  it('never pillarboxes a portrait window: the stage is the whole window held upright', () => {
     expect(stageRectOf(390, 844)).toEqual({ left: 0, width: 390, height: 844 })
+    expect(stageRectOf(820, 1180)).toEqual({ left: 0, width: 820, height: 1180 })
+  })
+})
+
+describe('screen layout: orientation', () => {
+  it('is portrait when the window is taller than wide, and landscape otherwise', () => {
+    expect(orientationOf(390, 844)).toBe('portrait')
+    expect(orientationOf(844, 390)).toBe('landscape')
+    expect(orientationOf(800, 800)).toBe('landscape')
+  })
+
+  it('turns with the phone, so a rotation lays the same screen out the other way up', () => {
+    expect(screenLayoutOf(phone(390, 844), false).orientation).toBe('portrait')
+    expect(screenLayoutOf(phone(844, 390), false).orientation).toBe('landscape')
+  })
+
+  it('marks the page root with the orientation the panels switch their layout on', () => {
+    expect(screenAttributesOf(screenLayoutOf(phone(390, 844), false))).toEqual({
+      'data-orientation': 'portrait',
+    })
   })
 })
 
@@ -45,6 +67,18 @@ describe('screen layout: UI scale', () => {
   it('never shrinks the UI on a phone', () => {
     expect(uiScaleOf(390, false)).toBe(1)
     expect(uiScaleOf(390, true)).toBe(1)
+  })
+
+  it('gives a 390 px short axis the same scale held upright or sideways', () => {
+    expect(screenLayoutOf(phone(390, 844), false).uiScale).toBe(1)
+    expect(screenLayoutOf(phone(844, 390), false).uiScale).toBe(1)
+    expect(screenLayoutOf(phone(412, 915), false).uiScale).toBe(1)
+  })
+
+  it('reads a portrait tablet by its width, the short axis, as the landscape one by its height', () => {
+    expect(screenLayoutOf(phone(820, 1180), false).uiScale).toBe(
+      screenLayoutOf(phone(1180, 820), false).uiScale,
+    )
   })
 
   it('sets TV mode at 540 design pixels, so main text and labels meet the 10-foot minimums', () => {
@@ -102,8 +136,18 @@ describe('screen layout: style', () => {
       '--stage-width': '2560px',
       '--tv-safe-x': '0px',
       '--tv-safe-y': '0px',
+      '--safe-top': 'max(env(safe-area-inset-top), 0px)',
+      '--safe-right': 'max(env(safe-area-inset-right), 0px)',
+      '--safe-bottom': 'max(env(safe-area-inset-bottom), 0px)',
+      '--safe-left': 'max(env(safe-area-inset-left), 0px)',
       '--control-min': '44px',
       '--shop-text': '23.76px',
     })
+  })
+
+  it("mirrors the safe area as the larger of the device's inset and TV mode's on each side", () => {
+    const style = screenStyleOf(screenLayoutOf(desktop(3840, 2160), true))
+    expect(style['--safe-top']).toBe('max(env(safe-area-inset-top), 108px)')
+    expect(style['--safe-left']).toBe('max(env(safe-area-inset-left), 192px)')
   })
 })

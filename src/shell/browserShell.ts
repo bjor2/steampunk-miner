@@ -31,6 +31,7 @@ import {
   listenForScreenChanges,
   listenForTouches,
   readScreen,
+  setRootAttributes,
   setRootStyle,
   vibrateDevice,
 } from './screenHooks'
@@ -96,6 +97,7 @@ export function createBrowserShell(): Shell {
     readScreen,
     onScreenChange: listenForScreenChanges,
     setScreenStyle: setRootStyle,
+    setScreenAttributes: setRootAttributes,
     onTouchInput: listenForTouches,
     vibrate: vibrateDevice,
     writeRunSnapshot: (runId, file, bytes) => snapshots.write(runId, file, bytes),

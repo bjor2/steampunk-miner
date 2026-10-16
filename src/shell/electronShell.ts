@@ -15,6 +15,7 @@ import {
   listenForScreenChanges,
   listenForTouches,
   readScreen,
+  setRootAttributes,
   setRootStyle,
   vibrateDevice,
 } from './screenHooks'
@@ -56,6 +57,7 @@ export function createElectronShell(bridge: ShellBridge): Shell {
     readScreen,
     onScreenChange: listenForScreenChanges,
     setScreenStyle: setRootStyle,
+    setScreenAttributes: setRootAttributes,
     onTouchInput: listenForTouches,
     vibrate: vibrateDevice,
     writeRunSnapshot: (runId, file, bytes) => bridge.writeRunSnapshot(runId, file, bytes),

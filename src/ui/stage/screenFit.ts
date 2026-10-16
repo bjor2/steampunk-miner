@@ -1,11 +1,17 @@
 /**
  * Keeps the stage and the UI fitted to the screen (#173): lays the screen out again on every
  * resize, rotation, change of pointer and switch of TV mode, and hands the result to the shell as
- * the page root's custom properties. The one writer of those properties.
+ * the page root's custom properties and its `data-orientation` (ticket 483). The one writer of
+ * both, so panels switch their portrait layout from this one source.
  */
 import type { Shell } from '../../shell/shell'
 import { useGameStore, type GameState } from '../../store/gameStore'
-import { screenLayoutOf, screenStyleOf, type ScreenLayout } from '../../systems/views/screenLayout'
+import {
+  screenAttributesOf,
+  screenLayoutOf,
+  screenStyleOf,
+  type ScreenLayout,
+} from '../../systems/views/screenLayout'
 
 let fitted: ScreenLayout | null = null
 
@@ -24,6 +30,7 @@ export function readFittedScreen(): ScreenLayout | null {
 function fitScreen(shell: Shell): void {
   fitted = screenLayoutOf(shell.readScreen(), useGameStore.getState().prefs.tvMode)
   shell.setScreenStyle(screenStyleOf(fitted))
+  shell.setScreenAttributes(screenAttributesOf(fitted))
 }
 
 function refitOnTvModeSwitch(state: GameState, previous: GameState, fit: () => void): void {

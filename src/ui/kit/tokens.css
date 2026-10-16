@@ -21,6 +21,11 @@
   --stage-width: 100%;
   --tv-safe-x: 0px;
   --tv-safe-y: 0px;
+  /* Ticket 483: each side's safe inset, the device's or TV mode's, whichever is larger. */
+  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-right: env(safe-area-inset-right, 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+  --safe-left: env(safe-area-inset-left, 0px);
   --control-min: 44px;
   --shop-text: 17.6px;
   --space-1: calc(4px * var(--ui-scale));

@@ -124,6 +124,8 @@ export interface Shell {
   onScreenChange(listener: () => void): () => void
   /** Sets custom properties on the page root, the one place the UI's scale is written (#173). */
   setScreenStyle(properties: Readonly<Record<string, string>>): void
+  /** Sets attributes on the page root: `data-orientation`, the panels' layout switch (ticket 483). */
+  setScreenAttributes(attributes: Readonly<Record<string, string>>): void
   /** Reports each finger touching the page, so the touch controls can show (#173). */
   onTouchInput(listener: () => void): () => void
   /** A short buzz on a device with a vibration motor; nothing elsewhere (#173 haptics). */

@@ -1,8 +1,10 @@
 /**
  * How the game fits the screen it is shown on (#173 "Scaling rules"): the stage the canvas and the
- * DOM UI share (pillarboxed past 64:27), one UI scale from the short axis, TV mode's 10-foot scale
- * and 5% safe area, and the smallest control. The shell writes the result as CSS custom properties
- * on the page root; every size in the UI's style sheets follows from them. Presentation only.
+ * DOM UI share (pillarboxed past 64:27), the orientation it is held in (#470 PT-1, ticket 483), one
+ * UI scale from the short axis, TV mode's 10-foot scale and 5% safe area, and the smallest control.
+ * The shell writes the result as CSS custom properties and a `data-orientation` attribute on the
+ * page root; every size and layout switch in the UI's style sheets follows from them. Presentation
+ * only.
  */
 import {
   COARSE_TARGET_PX,
@@ -29,8 +31,13 @@ export interface StageRect {
   height: number
 }
 
+/** Held upright (taller than wide) or sideways; a square window counts as sideways. */
+export type StageOrientation = 'portrait' | 'landscape'
+
 export interface ScreenLayout {
   stage: StageRect
+  /** `data-orientation` on the root: the one source panels switch their layout on. */
+  orientation: StageOrientation
   /** `--ui-scale`: every rem and spacing token is multiplied by it. */
   uiScale: number
   /** TV mode's overscan-safe inset of the stage, in CSS pixels; 0 with TV mode off. */
@@ -48,6 +55,7 @@ export function screenLayoutOf(screen: ScreenReading, isTvMode: boolean): Screen
   const shortAxis = Math.min(stage.width, stage.height)
   return {
     stage,
+    orientation: orientationOf(screen.widthPixels, screen.heightPixels),
     uiScale: uiScaleOf(shortAxis, isTvMode),
     tvSafeInset: tvSafeInsetOf(stage, isTvMode),
     controlMinPixels: controlMinPixelsOf(shortAxis, screen.isCoarsePointer, isTvMode),
@@ -55,13 +63,26 @@ export function screenLayoutOf(screen: ScreenReading, isTvMode: boolean): Screen
   }
 }
 
-/** The whole window, or a centred 64:27 band of it on a wider screen (#173 pillarbox). */
+/**
+ * The whole window, or a centred 64:27 band of it on a wider screen (#173 pillarbox). A portrait
+ * window is never wider than 64:27, so the stage is always the whole of it.
+ */
 export function stageRectOf(widthPixels: number, heightPixels: number): StageRect {
   const width = Math.min(widthPixels, heightPixels * STAGE_MAX_ASPECT)
   return { left: (widthPixels - width) / 2, width, height: heightPixels }
 }
 
-/** `max(1, shortAxis / 800)`, or the 10-foot `max(1, shortAxis / 540)` in TV mode. */
+export function orientationOf(widthPixels: number, heightPixels: number): StageOrientation {
+  return heightPixels > widthPixels ? 'portrait' : 'landscape'
+}
+
+/**
+ * `max(1, shortAxis / 800)`, or the 10-foot `max(1, shortAxis / 540)` in TV mode. The short axis
+ * is the width held upright and the height held sideways, so a phone keeps its scale through a
+ * rotation. A 390 px short axis stays at 1 either way up: shrinking would take text under #422's
+ * readable floor (`--text-min`, Bjor's "can't read the text") and break #173's "never shrinks on
+ * phones" text check in every cell, so portrait panels reflow to the 390 px width instead.
+ */
 export function uiScaleOf(shortAxisPixels: number, isTvMode: boolean): number {
   const designShortAxis = isTvMode ? TV_DESIGN_SHORT_AXIS_EPX : UI_SCALE_REFERENCE_SHORT_AXIS_PX
   return Math.max(1, shortAxisPixels / designShortAxis)
@@ -105,8 +126,27 @@ export function screenStyleOf(layout: ScreenLayout): Record<string, string> {
     '--stage-width': `${layout.stage.width}px`,
     '--tv-safe-x': `${layout.tvSafeInset.x}px`,
     '--tv-safe-y': `${layout.tvSafeInset.y}px`,
+    ...safeAreaStyleOf(layout.tvSafeInset),
     '--control-min': `${layout.controlMinPixels}px`,
     // Hundredths of a pixel, so 17.6 x 1.35 does not reach the sheet as 23.760000000000005.
     '--shop-text': `${layout.shopTextPixels.toFixed(2)}px`,
+  }
+}
+
+/** The layout as the attributes on the page root: the orientation panels switch their layout on. */
+export function screenAttributesOf(layout: ScreenLayout): Record<string, string> {
+  return { 'data-orientation': layout.orientation }
+}
+
+/**
+ * `--safe-*`: each side's inset the HUD and screens keep clear, the larger of the device's notch
+ * or home bar (`env(safe-area-inset-*)`) and TV mode's overscan, so every layer reads one source.
+ */
+function safeAreaStyleOf(tvSafeInset: { x: number; y: number }): Record<string, string> {
+  return {
+    '--safe-top': `max(env(safe-area-inset-top), ${tvSafeInset.y}px)`,
+    '--safe-right': `max(env(safe-area-inset-right), ${tvSafeInset.x}px)`,
+    '--safe-bottom': `max(env(safe-area-inset-bottom), ${tvSafeInset.y}px)`,
+    '--safe-left': `max(env(safe-area-inset-left), ${tvSafeInset.x}px)`,
   }
 }
