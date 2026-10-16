@@ -1310,7 +1310,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/vehicle/aheadBearingLatch.test.ts` | 11 | 11 |
 | `src/systems/vehicle/bandDig.test.ts` | 5 | 5 |
 | `src/systems/vehicle/bodySpeedDips.test.ts` | 6 | 6 |
-| `src/systems/vehicle/carryWalk.test.ts` | 48 | 20 |
+| `src/systems/vehicle/carryWalk.test.ts` | 52 | 22 |
 | `src/systems/vehicle/casingTrail.test.ts` | 16 | 12 |
 | `src/systems/vehicle/chargeSelection.test.ts` | 4 | 4 |
 | `src/systems/vehicle/colliderHalo.test.ts` | 3 | 3 |
@@ -1334,6 +1334,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/vehicle/returnReserve.test.ts` | 4 | 4 |
 | `src/systems/vehicle/stepBound.test.ts` | 10 | 10 |
 | `src/systems/vehicle/strutPlank.test.ts` | 4 | 4 |
+| `src/systems/vehicle/sweepDwell.test.ts` | 9 | 9 |
 | `src/systems/vehicle/sweptCut.test.ts` | 7 | 7 |
 | `src/systems/vehicle/tickPlan.test.ts` | 10 | 6 |
 | `src/systems/vehicle/travelParity.test.ts` | 13 | 13 |
@@ -1405,6 +1406,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/world/lavaPockets.test.ts` | 7 | 7 |
 | `src/systems/world/orePatches.test.ts` | 31 | 8 |
 | `src/systems/world/planetParams.test.ts` | 21 | 16 |
+| `src/systems/world/rimDwell.test.ts` | 6 | 6 |
 | `src/systems/world/stampShape.test.ts` | 8 | 5 |
 | `src/systems/world/sweptSpan.test.ts` | 6 | 6 |
 | `src/systems/world/worldCell.test.ts` | 3 | 3 |
