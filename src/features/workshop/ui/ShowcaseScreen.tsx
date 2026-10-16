@@ -3,7 +3,7 @@
  * header on top, the car in the middle with nothing over it, the six track plaques beside it on
  * the side its part sits, each with a leader line to its part, and the bay's other rows and the
  * footer below; the columns and, on a short screen, the bands scroll in the shared scroll area
- * (spec #422 ruling 3, pass #425). On a phone held upright the plaques collapse to one carousel
+ * (spec #422 ruling 3, pass #425). On a screen held upright the plaques collapse to one carousel
  * under the car, swiped sideways, the bay's rows join the header's band, and the leader lines
  * drop while the selected part stays lit (#173 section 3, #470 PT-5). Registered as the `upgrade` bay's screen, drawn over the scene in
  * place of the kernel's menu (`bayScreens`, K-b ticket 227). Markup only.
@@ -18,8 +18,6 @@ import { BayFooter } from '../../../ui/platform/BayFooter'
 import { ScrollArea } from '../../../ui/kit/ScrollArea'
 import { BayHeader } from '../../../ui/platform/BayHeader'
 import { useScreenModel } from '../../../ui/useScreenModel'
-import { isUprightCompactHud } from '../../../systems/views/hudCompact'
-import { useHudDensity } from '../../../ui/hud/useHudDensity'
 import { useHudOrientation } from '../../../ui/hud/useHudOrientation'
 import { rowsOnSide, type PlaqueSide } from '../systems/plaqueReading'
 import { LeaderLines } from './LeaderLines'
@@ -32,7 +30,7 @@ import styles from './ShowcaseScreen.module.css'
 /** The layout's `--shop-text`, as the kernel's bay frame sets it (`BayFrame`). */
 const SHOP_TYPE = { fontSize: 'var(--shop-text)', '--kit-label-size': '1em' } as CSSProperties
 
-/** Plaques beside the car on the side their part sits, or one carousel under it on an upright phone. */
+/** Plaques beside the car on the side their part sits, or one carousel under it held upright. */
 export type PlaqueLayout = 'beside' | 'carousel'
 
 /** Both sides' plaques in one row for the carousel, left to right as the columns stand. */
@@ -169,8 +167,9 @@ function Band({ children }: { children: ReactNode }) {
   )
 }
 
+/** Held upright even a tablet's side columns are too narrow for a plaque, so any portrait screen. */
 function usePlaqueLayout(): PlaqueLayout {
-  return isUprightCompactHud(useHudDensity(), useHudOrientation()) ? 'carousel' : 'beside'
+  return useHudOrientation() === 'portrait' ? 'carousel' : 'beside'
 }
 
 function useUpgradeBayFocus(model: UpgradeBayModel): string {

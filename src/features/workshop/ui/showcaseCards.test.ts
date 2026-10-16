@@ -63,8 +63,8 @@ describe('workshop: the plaques as item cards', () => {
     },
   )
 
-  // #173 section 3 on an upright phone (#470 PT-5): one carousel of every plaque, no leader lines.
-  it('lays every plaque in the one carousel and drops the leader lines on an upright phone', () => {
+  // #173 section 3 held upright (#470 PT-5): one carousel of every plaque, no leader lines.
+  it('lays every plaque in the one carousel and drops the leader lines held upright', () => {
     const html = showcaseMarkup('carousel')
     const carouselAt = html.indexOf(`data-testid="${WORKSHOP_TEST_IDS.carousel}"`)
     expect(carouselAt).toBeGreaterThanOrEqual(0)

@@ -13,6 +13,8 @@
   font-variant-numeric: tabular-nums;
   color: var(--color-parchment);
   pointer-events: none;
+  /* The plaques' raised layer stays inside the showcase, under any screen opened over the bay. */
+  isolation: isolate;
 }
 
 /* The band's frame is the shared scroll area; the brass is on the frame, the rows inside. */
@@ -122,10 +124,11 @@
 }
 
 /*
- * A phone held upright (#173 section 3, #470 PT-5): one band on top holds the header and the bay's
- * rows, capped at a third of the screen and scrolling; the car shows in the middle and the plaques
- * lie in one row under it, each nearly the width so the next one shows at the edge, a swipe
- * snapping from plaque to plaque. The showcase ends above the touch cluster's 72 px Interact row.
+ * A screen held upright (#173 section 3, #470 PT-5): one band on top holds the header and the
+ * bay's rows, capped at a third of the screen and scrolling; the car shows in the middle and the
+ * plaques lie in one row under it, each nearly a phone's width so the next one shows at the edge,
+ * a swipe snapping from plaque to plaque. The showcase ends above the touch cluster's 72 px
+ * Interact row.
  */
 .showcase[data-plaque-layout='carousel'] {
   inset: 10% 0 calc(72px + 2 * var(--space-3));
@@ -167,6 +170,6 @@
 }
 
 .carousel > * {
-  width: 88vw;
+  width: min(88vw, 24rem);
   scroll-snap-align: center;
 }
