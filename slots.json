@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-10-17T00:37:09+01:00",
+  "updated_at": "2026-10-17T00:38:16+01:00",
   "caps": {
     "grok": 12,
     "claude": 10,
@@ -55,12 +55,11 @@
         },
         {
           "slot": "C5",
-          "state": "busy",
+          "state": "free",
           "ticket": null,
           "grok_slot": null,
-          "kind": "aux",
-          "since": null,
-          "label": "tester-triage"
+          "kind": null,
+          "since": null
         },
         {
           "slot": "C6",
@@ -72,8 +71,8 @@
         }
       ],
       "size": 6,
-      "used": 5,
-      "free": 1,
+      "used": 4,
+      "free": 2,
       "claims_last_hour": 11,
       "name": "Claude Max 1"
     },
@@ -125,59 +124,23 @@
     }
   ],
   "gate": {
-    "busy": 0,
+    "busy": 1,
     "max": 3
   },
   "tester": {
     "state": "running",
-    "phase": "triage-fast",
-    "sha": "146ac486faeae77b3a49a4963150a542728f1d9b",
-    "since": "2026-10-16T23:32:19Z",
-    "holds_gate": false,
+    "phase": "fast",
+    "sha": "8c31e735e996cd2dd15a15acfefa40bd8496ccf5",
+    "since": "2026-10-16T23:37:54Z",
+    "holds_gate": true,
     "claude_slot": null,
-    "last_run": "2026-10-16T19:07:40Z",
+    "last_run": "2026-10-16T23:37:46Z",
     "last_nightly": "2026-10-15T20:43:15Z",
     "last_nightly_result": "full=FAIL balance-report=ok bench=FAIL balance-planets=ok balance-guns=ok balance-charges=ok balance-refinery=ok balance-heat=ok e2e=FAIL memory-soak=FAIL packaged-smoke=ok ",
     "main_red_sha": null,
-    "feature": 246,
-    "feature_title": "Grilling: Terrain magnets as a family beyond the lodestone beacon?",
+    "feature": 162,
+    "feature_title": "Spec: Tech-unlocked store items and power-ups (drill gear, extraction, magnets, sensing)",
     "queue": [
-      {
-        "feature": 162,
-        "kind": "spec",
-        "title": "Spec: Tech-unlocked store items and power-ups (drill gear, extraction, magnets, sensing)",
-        "tickets": [
-          200,
-          201,
-          202,
-          203,
-          204,
-          205,
-          206,
-          224,
-          233,
-          234,
-          235,
-          239,
-          240,
-          241,
-          242,
-          243,
-          244,
-          248,
-          250,
-          252,
-          253,
-          323,
-          324,
-          325,
-          326,
-          327,
-          328,
-          329
-        ],
-        "since": "2026-10-14T07:33:36+02:00"
-      },
       {
         "feature": 309,
         "kind": "spec",
@@ -652,12 +615,10 @@
     },
     {
       "slot": 5,
-      "state": "busy",
+      "state": "free",
       "ticket": null,
       "grok_slot": null,
       "since": null,
-      "kind": "aux",
-      "label": "tester-triage",
       "account": 1
     },
     {
@@ -724,8 +685,8 @@
     "claude": {
       "size": 10,
       "enabled": 6,
-      "used": 5,
-      "free": 1,
+      "used": 4,
+      "free": 2,
       "external": 0
     }
   },
