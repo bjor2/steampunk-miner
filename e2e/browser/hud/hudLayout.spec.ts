@@ -230,7 +230,7 @@ for (const cell of PHONE_CELLS) {
       await page.evaluate(() => {
         const debug = window.steampunkDebug!
         for (const result of [
-          debug.setGunLevel(1),
+          debug.setGunLevel(10),
           debug.setCharges(2, 1),
           debug.setHull('1'),
           debug.setEnergy('1'),
