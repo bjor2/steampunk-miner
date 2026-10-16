@@ -159,6 +159,49 @@ describe('live step: page hidden (ticket 472)', () => {
   })
 })
 
+describe('live step: lost render context (ticket 478)', () => {
+  it('holds while the canvas has lost its context and runs again once it is restored', () => {
+    game().holdLiveStepWhileContextLost()
+    expect(isHeld()).toBe(true)
+    game().resumeLiveStepOnRestoredContext()
+    expect(isHeld()).toBe(false)
+  })
+
+  it('keeps holding through a tap, a key and a debug resume until the context is back', () => {
+    game().holdLiveStepWhileContextLost()
+    game().resumeLiveStepOnTap()
+    pressKey('KeyQ')
+    game().resumeLiveStep()
+    expect(isHeld()).toBe(true)
+  })
+
+  it('leaves a debug pause paused when the context comes back', () => {
+    game().pauseLiveStep()
+    game().holdLiveStepWhileContextLost()
+    game().resumeLiveStepOnRestoredContext()
+    expect(game().liveStepHold).toBe('paused')
+    expect(isHeld()).toBe(true)
+  })
+
+  it('leaves a hidden page held for its tap when the context comes back', () => {
+    game().holdLiveStepWhilePageHidden()
+    game().holdLiveStepWhileContextLost()
+    game().resumeLiveStepOnRestoredContext()
+    expect(game().liveStepHold).toBe('pageHidden')
+    game().resumeLiveStepOnTap()
+    expect(isHeld()).toBe(false)
+  })
+
+  it('leaves the session, its digest and the log as they were', () => {
+    const before = takeSessionSnapshot()
+    const logged = sink.events.length
+    game().holdLiveStepWhileContextLost()
+    game().resumeLiveStepOnRestoredContext()
+    expect(takeSessionSnapshot()).toEqual(before)
+    expect(sink.events.length).toBe(logged)
+  })
+})
+
 describe('live step: debug steps', () => {
   it('logs the steps as a debug command and starts a scenario waiting for play', () => {
     game().applyScenario(PLANET_1_START)

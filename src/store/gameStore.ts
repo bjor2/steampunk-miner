@@ -113,6 +113,12 @@ import {
 } from './presentationSlice'
 import { runFastForwardSteps, runScenarioScript, submitEach } from './scenarioSteps'
 import {
+  soundUnlockActionsOf,
+  STARTING_SOUND_UNLOCK,
+  type SoundUnlockActions,
+  type SoundUnlockValues,
+} from './soundUnlockSlice'
+import {
   STARTING_TAP_SHEET,
   tapSheetActionsOf,
   type TapSheetActions,
@@ -150,6 +156,8 @@ export interface GameState
     PauseMenuActions,
     TapSheetValues,
     TapSheetActions,
+    SoundUnlockValues,
+    SoundUnlockActions,
     TitleMenuValues,
     TitleMenuActions {
   playerId: string
@@ -241,6 +249,7 @@ type GameValues = Pick<
   | keyof LiveStepValues
   | keyof PauseMenuValues
   | keyof TapSheetValues
+  | keyof SoundUnlockValues
   | keyof TitleMenuValues
   | 'travelTransition'
 >
@@ -265,6 +274,7 @@ export const STARTING_VALUES: GameValues = {
   ...STARTING_LIVE_STEP,
   ...STARTING_PAUSE_MENU,
   ...STARTING_TAP_SHEET,
+  ...STARTING_SOUND_UNLOCK,
   ...STARTING_TITLE_MENU,
   travelTransition: null,
 }
@@ -285,6 +295,7 @@ export const useGameStore = create<GameState>()((set, get) => ({
   ...liveStepActionsOf(set, get),
   ...pauseMenuActionsOf(set, get),
   ...tapSheetActionsOf(set, get),
+  ...soundUnlockActionsOf(set),
   ...titleMenuActionsOf(set, get),
 
   setPlanet: (planetTier) => {

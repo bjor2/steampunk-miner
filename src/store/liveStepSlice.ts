@@ -6,7 +6,9 @@
  * `?scenario=` and `applyScenario` paths would end on different ticks and digests. The debug
  * `pause()` holds it until `resume()`. A page sent to the background holds it until the player is
  * back and taps or presses (#470 P1-1, ticket 472), so they never return into a live enemy.
- * Rendering goes on while held; only the step stops.
+ * A canvas whose WebGL context the browser took (iOS reclaims them under memory pressure) holds it
+ * until the context is restored, apart from every other hold, which the restore leaves as it was
+ * (#470 P1-7, ticket 478). Rendering goes on while held; only the step stops.
  *
  * None of it is authority state, a command or part of the digest; only the debug `step(ticks)`
  * logs `debug_command_applied`, because it moves the authority's clock as no play did.
@@ -23,6 +25,8 @@ export type LiveStepHold = 'running' | 'awaitingPlay' | 'pageHidden' | 'paused'
 
 export interface LiveStepValues {
   liveStepHold: LiveStepHold
+  /** The canvas has lost its WebGL context: the step holds and Reconnecting shows (ticket 478). */
+  isRenderContextLost: boolean
 }
 
 export interface LiveStepActions {
@@ -34,6 +38,10 @@ export interface LiveStepActions {
   holdLiveStepWhilePageHidden(): void
   /** A finger on the page: a step held while the page was hidden runs again (ticket 472). */
   resumeLiveStepOnTap(): void
+  /** The canvas lost its WebGL context: no step until it is restored (ticket 478). */
+  holdLiveStepWhileContextLost(): void
+  /** The context is back: the step runs again unless another hold still holds it. */
+  resumeLiveStepOnRestoredContext(): void
   /** Debug `pause()`: no live step until `resume()`. */
   pauseLiveStep(): void
   /** Debug `resume()`: the live step runs again, whatever held it. */
@@ -51,7 +59,10 @@ type SliceHost = LiveStepValues &
 
 type SetSlice = (partial: Partial<LiveStepValues>) => void
 
-export const STARTING_LIVE_STEP: LiveStepValues = { liveStepHold: 'running' }
+export const STARTING_LIVE_STEP: LiveStepValues = {
+  liveStepHold: 'running',
+  isRenderContextLost: false,
+}
 
 export function liveStepActionsOf(set: SetSlice, get: () => SliceHost): LiveStepActions {
   return {
@@ -65,6 +76,8 @@ export function liveStepActionsOf(set: SetSlice, get: () => SliceHost): LiveStep
     resumeLiveStepOnTap: () => {
       if (get().liveStepHold === 'pageHidden') set({ liveStepHold: 'running' })
     },
+    holdLiveStepWhileContextLost: () => set({ isRenderContextLost: true }),
+    resumeLiveStepOnRestoredContext: () => set({ isRenderContextLost: false }),
     pauseLiveStep: () => set({ liveStepHold: 'paused' }),
     resumeLiveStep: () => set({ liveStepHold: 'running' }),
     prepareDebugSteps: (ticks) => {
@@ -75,11 +88,12 @@ export function liveStepActionsOf(set: SetSlice, get: () => SliceHost): LiveStep
 }
 
 /**
- * The fixed step stands still: held here, paused by the settings overlay (#33 section 1) or the
- * pause menu (ticket 404), or behind the title menu until the player picks a game (ticket 403).
+ * The fixed step stands still: held here or by a lost context, paused by the settings overlay
+ * (#33 section 1) or the pause menu (ticket 404), or behind the title menu until the player picks a
+ * game (ticket 403).
  */
 export function isLiveStepHeld(state: LiveStepValues & HoldingMenus): boolean {
-  return isMenuHoldingPlay(state) || state.liveStepHold !== 'running'
+  return isMenuHoldingPlay(state) || isHeldHere(state)
 }
 
 /** The overlays that stand the fixed step still while open. */
@@ -91,6 +105,10 @@ interface HoldingMenus {
 
 function isMenuHoldingPlay(state: HoldingMenus): boolean {
   return state.isSettingsOpen || state.pauseMenu !== null || state.titleMenu !== null
+}
+
+function isHeldHere(state: LiveStepValues): boolean {
+  return state.isRenderContextLost || state.liveStepHold !== 'running'
 }
 
 /** Holds the player's next input ends; a debug pause is not one of them. */
