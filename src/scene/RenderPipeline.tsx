@@ -4,6 +4,7 @@
  * `renderer.info`, and once per second of frames lets the pure render-scale rule move the canvas's
  * pixel ratio between its floor (#173) and a native render. The HTML UI is outside the canvas, so
  * it stays native at every scale. Its `renderer.info` also answers `ui.getRendererMemory()` (#119).
+ * While the canvas has lost its WebGL context it draws nothing and counts no calls (ticket 478).
  * Presentation only: it never writes the authority or submits.
  */
 import { useFrame, useThree, type RootState } from '@react-three/fiber'
@@ -26,34 +27,24 @@ import {
   type OutputShortAxis,
   type RenderScale,
 } from '../systems/render/renderScale'
-import { createPostPipeline } from './postPipeline'
+import type { PostPipeline } from './postPipeline'
+import { createPostDrawing, drawThroughContextLoss } from './renderContextLoss'
 import { renderPresence } from './renderPresence'
-import { watchRendererInfo } from './rendererMemory'
 
 export function RenderPipeline() {
   const gl = useThree((state) => state.gl)
   const readRoot = useThree((state) => state.get)
-  const pipeline = useMemo(createPostPipeline, [])
+  const drawing = useMemo(createPostDrawing, [])
   const frames = useMemo(createFrameWindow, [])
   const shortAxis = useMemo(() => ({ cssPixels: 0, devicePixels: 0 }), [])
   const scale = useMemo(
     () => createRenderScale(readOutputShortAxis(readRoot(), shortAxis)),
     [readRoot, shortAxis],
   )
-  useEffect(() => {
-    // Counted over the whole frame, scene and post passes, then reset by hand each frame.
-    gl.info.autoReset = false
-    const unwatchInfo = watchRendererInfo(gl.info)
-    return () => {
-      unwatchInfo()
-      gl.info.autoReset = true
-      pipeline.dispose()
-    }
-  }, [gl, pipeline])
+  useEffect(() => drawThroughContextLoss(gl, drawing), [gl, drawing])
   useFrame((state, delta) => {
-    state.gl.info.reset()
-    pipeline.render(state.gl, state.scene, state.camera)
-    recordFrameCost(state)
+    if (drawing.pipeline === null) return recordNothingDrawn()
+    drawFrame(state, drawing.pipeline)
     adaptToFrame(state, scale, readOutputShortAxis(state, shortAxis), frames, delta)
   }, RENDER_FRAME_PRIORITY)
   return null
@@ -67,6 +58,18 @@ function readOutputShortAxis(state: RootState, out: OutputShortAxis): OutputShor
   out.cssPixels = Math.min(state.size.width, state.size.height)
   out.devicePixels = out.cssPixels * state.viewport.initialDpr
   return out
+}
+
+function drawFrame(state: RootState, pipeline: PostPipeline): void {
+  state.gl.info.reset()
+  pipeline.render(state.gl, state.scene, state.camera)
+  recordFrameCost(state)
+}
+
+/** A lost context draws nothing; the last frame's counts would read as a live picture. */
+function recordNothingDrawn(): void {
+  renderPresence.drawCalls = 0
+  renderPresence.triangles = 0
 }
 
 function recordFrameCost(state: RootState): void {
