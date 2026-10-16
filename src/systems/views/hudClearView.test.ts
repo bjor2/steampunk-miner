@@ -115,3 +115,13 @@ describe('vehicle on screen (#500)', () => {
     }
   })
 })
+
+// GD ruling 2 on #500: with every control owned, three status chips and the hint, the view misses
+// its floor by 1.0 to 5.4 points; #500 logs that share with a one-way ratchet, and #486 (threat
+// chips, prompts, the status row) owns closing the gap. Each todo flips when #486 closes.
+describe('clear view of the stacked worst case (owned by #486)', () => {
+  it.todo('keeps 70% of 390x844 clear with every control owned, three status chips and the hint')
+  it.todo('keeps 70% of 412x915 clear with every control owned, three status chips and the hint')
+  it.todo('keeps 65% of 844x390 clear with every control owned, three status chips and the hint')
+  it.todo('keeps 65% of 915x412 clear with every control owned, three status chips and the hint')
+})

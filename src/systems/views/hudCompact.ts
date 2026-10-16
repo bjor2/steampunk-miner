@@ -37,6 +37,14 @@ export const COMPACT_CHIP_WORDS_MAX = 2
 /** The persistent top HUD shows at most this many label words (GD ruling 4 on #500). */
 export const COMPACT_LABEL_WORDS_MAX = MOST_STATUSES_SHOWN * COMPACT_CHIP_WORDS_MAX
 
+/**
+ * The widest number a compact HUD box holds (VS on #500): `formatAmount`'s widest form is a sign,
+ * three significant digits and a four-digit exponent, `-9.99e4000`; a planet's depth in tiles
+ * and a tile time in seconds stay shorter. The same formatter as the full card, so the exact
+ * value the card shows always matches.
+ */
+export const COMPACT_VALUE_CHARS_MAX = 10
+
 /** "CARGO FULL" is the cargo icon and one word (GD ruling 4). */
 export const CARGO_FULL_CHIP_TEXT = 'FULL'
 

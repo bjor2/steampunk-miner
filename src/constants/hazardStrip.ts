@@ -54,3 +54,12 @@ export const STRIP_CACHED_CHUNKS = 96
 
 /** Metre labels switch to compact numbers from here on ("1.2k m", amendment 1 and the GD lock). */
 export const STRIP_COMPACT_FROM = 1000
+
+/**
+ * The strip's place on screen, in hundredths of the short axis (`vmin`): it starts this far out
+ * from the screen's middle and runs this long, whatever the zoom, speed, depth or drill level, so
+ * its size is fixed per orientation (the GD lock's fixed pixel budget; VS on #500). Placeholders
+ * tuned by eye.
+ */
+export const STRIP_INNER_VMIN = 14
+export const STRIP_LENGTH_VMIN = 30

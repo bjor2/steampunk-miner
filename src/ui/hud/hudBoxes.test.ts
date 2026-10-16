@@ -3,6 +3,9 @@ import { renderToString } from 'react-dom/server'
 import { beforeEach, describe, expect, it } from 'vitest'
 import { resetGameStore } from '../../store/gameStore'
 import { readHudModel, readTouchSituation } from '../../store/screenReads'
+import { HINT_TABLE } from '../../systems/hints/hintTable'
+import { TOUCH_HELD_ANCHOR_IDS } from '../../systems/input/touchBindings'
+import { touchBindingRows } from '../registries/touchBindings'
 import { PlaquesView } from '../plaques/PlaquesView'
 import { TouchControlsView } from '../touch/TouchControls'
 import { everyReadoutOf } from './hudFixtures'
@@ -60,4 +63,16 @@ describe('HUD boxes (#500)', () => {
     expect(hudBoxesIn(html)).toEqual(buttons.map(() => HUD_BOX_IDS.control))
     expect(html).toContain(`${HUD_ZONE_ATTRIBUTE}="${STICK_ZONE_ID}"`)
   })
+})
+
+describe('HUD boxes of held items (#500, HS)', () => {
+  it.each(TOUCH_HELD_ANCHOR_IDS)(
+    'gives the held %s no HUD box, no touch control and no hint',
+    (id) => {
+      const anchors = touchBindingRows().map((row) => JSON.stringify(row.anchor))
+      expect(anchors.filter((anchor) => anchor.includes(id))).toEqual([])
+      expect(HINT_TABLE.hints.filter((hint) => JSON.stringify(hint).includes(id))).toEqual([])
+      expect(drawEveryBox()).not.toContain(id)
+    },
+  )
 })

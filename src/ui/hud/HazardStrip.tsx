@@ -4,13 +4,15 @@
  * 8 pips placed by time to arrival, 0 to 2 s. The sampler writes the pips each frame; this draws
  * them on its own animation frame.
  */
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, type CSSProperties } from 'react'
 import { STRIP_MAX_PIPS } from '../../constants/hazardStrip'
+import { hazardStripStyleOf } from '../../systems/views/hazardStripPlace'
 import { UI_ID_TEMPLATES, UI_IDS } from '../ids'
 import { drawHazardStrip, pipSlotsOf } from './hazardStripDraw'
 import styles from './HazardStrip.module.css'
 
 const PIP_SLOTS = Array.from({ length: STRIP_MAX_PIPS }, (_, index) => index)
+const STRIP_STYLE = hazardStripStyleOf() as CSSProperties
 
 export function HazardStrip() {
   const strip = useRef<HTMLDivElement>(null)
@@ -27,7 +29,13 @@ export function HazardStrip() {
     return () => window.cancelAnimationFrame(frame)
   }, [])
   return (
-    <div ref={strip} className={styles.strip} data-testid={UI_IDS.hudHazardStrip} hidden>
+    <div
+      ref={strip}
+      className={styles.strip}
+      style={STRIP_STYLE}
+      data-testid={UI_IDS.hudHazardStrip}
+      hidden
+    >
       <div className={styles.track}>
         {PIP_SLOTS.map((index) => (
           <span
