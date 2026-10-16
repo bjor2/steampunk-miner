@@ -169,6 +169,19 @@ export const SPEED_FRAMING = {
   pullInHoldSeconds: 1,
 } as const
 
+/**
+ * The slow-speed camera ease (#316, ticket 515, TD shape "Ticket B" on #441): below the lean's
+ * 3 cells/s start the camera follows an eased copy of the drawn body, closing `1 - exp(-dt / tau)`
+ * of the gap a frame with `tau` 0.1 s, so a body lurch or jitter no longer shows one to one. The
+ * ease is full at or under 2 cells/s and fades out by 3, where the lean takes over. A gap over 2 m
+ * is a jump, never eased across. Presentation only.
+ */
+export const CAMERA_FOLLOW = {
+  easeSeconds: 0.1,
+  fullEaseCellsPerSecond: 2,
+  snapGapMetres: 2,
+} as const
+
 /** The reference machine's screen (#4): budgets are stated at this size. */
 export const REFERENCE_VIEWPORT = { width: 1280, height: 800 } as const
 
