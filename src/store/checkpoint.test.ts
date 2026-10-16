@@ -5,6 +5,7 @@ import { runEventProblems } from '../logging/runEventSchema'
 import { toCanonical } from '../systems/money'
 import { saveSectionsOf } from '../systems/registries/saveSections'
 import PRE_175_SAVE from '../systems/save/fixtures/pre-175-planet-1.save.json'
+import { loadedSaveDigestOf } from '../systems/save/loadedSaveDigest'
 import { readSaveSlot, type SaveSlotFile } from '../systems/save/saveSlot'
 import { SAVE_FORMAT_VERSION } from '../systems/save/saveSlot'
 import {
@@ -278,6 +279,15 @@ describe('save slots (#401)', () => {
     disk.items.delete('saves/slot-6.entry.json')
     expect((await listSaveSlots()).map(({ slot, name }) => [slot, name])).toEqual([
       ['slot-6', 'Crashed'],
+    ])
+  })
+
+  it('resumes the device fixture to the digest its golden holds every browser engine to', async () => {
+    disk.items.set('saves/autosave.json', JSON.stringify(PRE_175_SAVE))
+    startProcess()
+    await resumeFromDisk()
+    expect(linesNamed('checkpoint_loaded').map((line) => line.data)).toEqual([
+      { slot: 'autosave', epoch: PRE_175_SAVE.saveEpoch, ...loadedSaveDigestOf(PRE_175_SAVE) },
     ])
   })
 

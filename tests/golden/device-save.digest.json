@@ -1,0 +1,5 @@
+{
+  "description": "The digest the device fixture loads to, in node and in every browser engine (ticket 481, #11/#12).",
+  "fixture": "src/systems/save/fixtures/pre-175-planet-1.save.json",
+  "digest": "e149079914da3f5c"
+}
