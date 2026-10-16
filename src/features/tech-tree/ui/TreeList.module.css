@@ -1,0 +1,18 @@
+/* The shared scroll area's frame: the list fills the screen's last row. */
+.list {
+  align-self: stretch;
+  height: 100%;
+}
+
+.rows {
+  display: grid;
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* Each row is a whole node: its button spans the list. */
+.row > * {
+  width: 100%;
+}

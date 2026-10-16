@@ -10,6 +10,7 @@
 }
 
 .zoom,
+.views,
 .filters {
   display: flex;
   gap: var(--space-1);
@@ -38,6 +39,11 @@
 
 .filter[aria-pressed='true'] {
   background: rgb(184 115 51 / 0.35);
+}
+
+/* A phone either way up pinches the map instead (#470 PT-5). */
+:global([data-hud-density='compact']) .zoom {
+  display: none;
 }
 
 /* #161 mobile: the controls wrap onto more rows rather than scroll sideways (pass #426). */

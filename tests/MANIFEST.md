@@ -465,7 +465,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/sensing/systems/threatPeriscope.test.ts` | 6 | 6 |
 | `src/features/sensing/systems/useResolution.test.ts` | 16 | 16 |
 
-### `tech-tree`: 61 files, 431 tests
+### `tech-tree`: 63 files, 450 tests
 
 | File | Tests | Sites |
 | --- | --- | --- |
@@ -479,7 +479,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/tech-tree/rushHand.test.ts` | 3 | 3 |
 | `src/features/tech-tree/rushPace.lane.test.ts` | 1 | 4 |
 | `src/features/tech-tree/scene/extractorDeploy.test.ts` | 3 | 3 |
-| `src/features/tech-tree/store/treeScreenStore.test.ts` | 4 | 4 |
+| `src/features/tech-tree/store/treeScreenStore.test.ts` | 6 | 6 |
 | `src/features/tech-tree/systems/aethericCards.vision.test.ts` | 2 | 2 |
 | `src/features/tech-tree/systems/aethericLane.test.ts` | 5 | 5 |
 | `src/features/tech-tree/systems/anchorAffordability.test.ts` | 3 | 3 |
@@ -503,6 +503,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/tech-tree/systems/itemShop.test.ts` | 7 | 7 |
 | `src/features/tech-tree/systems/lanePace.test.ts` | 4 | 4 |
 | `src/features/tech-tree/systems/loadoutYieldCap.test.ts` | 7 | 7 |
+| `src/features/tech-tree/systems/mapGestures.test.ts` | 6 | 6 |
 | `src/features/tech-tree/systems/markLadder.test.ts` | 21 | 21 |
 | `src/features/tech-tree/systems/nodeCost.test.ts` | 7 | 7 |
 | `src/features/tech-tree/systems/nodePress.test.ts` | 2 | 2 |
@@ -522,6 +523,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/tech-tree/systems/rushPace.test.ts` | 5 | 5 |
 | `src/features/tech-tree/systems/techTree.test.ts` | 9 | 9 |
 | `src/features/tech-tree/systems/techTreeCommands.test.ts` | 4 | 4 |
+| `src/features/tech-tree/systems/treeList.test.ts` | 5 | 5 |
 | `src/features/tech-tree/systems/treeScreenModel.test.ts` | 16 | 16 |
 | `src/features/tech-tree/systems/treeShape.test.ts` | 18 | 18 |
 | `src/features/tech-tree/systems/treeSpendGuard.test.ts` | 9 | 9 |
@@ -529,7 +531,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/tech-tree/treeSpendGuard.lane.test.ts` | 8 | 8 |
 | `src/features/tech-tree/ui/nodeCardHold.test.ts` | 4 | 4 |
 | `src/features/tech-tree/ui/nodeElement.test.ts` | 6 | 6 |
-| `src/features/tech-tree/ui/techTreeScreen.test.ts` | 10 | 10 |
+| `src/features/tech-tree/ui/techTreeScreen.test.ts` | 16 | 16 |
 
 ### `terrain-tools`: 47 files, 383 tests
 

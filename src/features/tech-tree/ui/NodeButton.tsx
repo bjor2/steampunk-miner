@@ -10,6 +10,7 @@ import type { NodeCardModel } from '../systems/nodeCardModel'
 import { useTreeScreenStore } from '../store/treeScreenStore'
 import type { NodeElement } from './nodeElement'
 import { NodeIcon } from './NodeIcon'
+import { nodeTestIdOf } from './nodeTestIds'
 import { tierStyleOf } from './tierStyle'
 import { useNodeHold } from './useNodeHold'
 import styles from './NodeButton.module.css'
@@ -30,7 +31,7 @@ export function NodeButton({
       type="button"
       className={styles.node}
       style={tierStyleOf(card.tier, stack)}
-      data-testid={`tech-tree-node-${card.id}`}
+      data-testid={nodeTestIdOf(card.id)}
       data-status={card.status}
       data-kind={card.kind}
       onClick={() => selectNode(card.id)}

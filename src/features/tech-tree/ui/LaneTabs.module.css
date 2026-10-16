@@ -29,3 +29,8 @@
     display: block;
   }
 }
+
+/* A phone either way up draws the whole map to pan and pinch, so no lane is a tab (#470 PT-5). */
+:global([data-hud-density='compact']) .frame {
+  display: none;
+}

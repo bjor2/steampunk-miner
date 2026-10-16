@@ -19,6 +19,16 @@
   cursor: grab;
 }
 
+/* The frame's first child scrolls; the map's own gestures pan and pinch it, never the browser's. */
+.viewport > :first-child {
+  touch-action: none;
+}
+
+/* A pinch scales the whole map, nodes and ruler alike, from its laid-out size (#470 PT-5). */
+.zoomed {
+  zoom: var(--map-zoom, 1);
+}
+
 .viewport:focus-within {
   outline: var(--focus-ring);
   outline-offset: var(--focus-ring-offset);
@@ -117,4 +127,30 @@
   .strip > * {
     position: static;
   }
+}
+
+/*
+ * A phone either way up (#470 PT-5): the whole map, panned both ways and pinched, as the wide
+ * screen draws it, not one lane's list; the lane tabs hide (`LaneTabs`).
+ */
+:global([data-hud-density='compact']) .map {
+  /* The strips are far wider than the screen; the column must not grow to them. */
+  grid-template-columns: minmax(0, 1fr);
+}
+
+:global([data-hud-density='compact']) .rulerRow {
+  display: block;
+}
+
+:global([data-hud-density='compact']) .lane:not([data-shown-tab='true']) {
+  display: grid;
+}
+
+:global([data-hud-density='compact']) .strip {
+  display: block;
+  width: calc(var(--planets) * var(--planet-width));
+}
+
+:global([data-hud-density='compact']) .strip > * {
+  position: absolute;
 }

@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest'
+import { fromCanonical } from '../../../systems/money'
 import type { NodeCardModel } from '../systems/nodeCardModel'
 import {
   nodeCardElementOf,
@@ -25,6 +26,7 @@ function cardOf(overrides: Partial<NodeCardModel>): NodeCardModel {
     status: 'locked',
     refusal: 'missing_prereq',
     refusalText: 'Needs: Echo sounder',
+    cost: fromCanonical('32696'),
     costText: '32,696',
     prereqNames: ['Echo sounder'],
     prereqText: 'Echo sounder',

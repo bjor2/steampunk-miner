@@ -7,7 +7,7 @@ import { forgetUiTexts, registeredUiTexts } from '../../../systems/views/uiText'
 import { uiTextProblemsOf } from '../../../systems/views/uiTextBudget'
 import { unregisteredTextsOf } from '../../../systems/views/unregisteredText'
 import { readAuthorityState } from '../../../store/authorityLink'
-import { resetTreeScreenStore, type TreeZoom } from '../store/treeScreenStore'
+import { resetTreeScreenStore, type TreeView, type TreeZoom } from '../store/treeScreenStore'
 import { registeredTechTree } from '../systems/techTree'
 import type { TechNodeLane } from '../systems/techNode'
 import { nodeCardModelOf, treeScreenModelOf } from '../systems/treeScreenModel'
@@ -16,6 +16,7 @@ import { withFixtureTree, withNoLanes } from '../treeTestSession'
 import { NodeCardView } from './NodeCardView'
 import { TechTreeButton, TechTreeButtonView } from './TechTreeButton'
 import { TECH_TREE_SCREEN_ID, TechTreeScreenView } from './TechTreeScreen'
+import { nodeTestIdOf, TREE_TEST_IDS } from './nodeTestIds'
 
 const game = () => useGameStore.getState()
 
@@ -186,6 +187,101 @@ const EVERYTHING = { search: '', filters: [] } as const
 function textOf(html: string): string {
   return html.replace(/<[^>]*>/g, ' ')
 }
+
+/** The screen as a phone (`compact`) or a wide screen (`full`) draws it, at a zoom and view. */
+function phoneViewOf(
+  density: 'full' | 'compact',
+  zoom: TreeZoom,
+  treeView: TreeView,
+  cardId = '',
+): string {
+  const playerId = game().playerId
+  const tree = registeredTechTree()
+  const model = treeScreenModelOf(readAuthorityState(), playerId, tree, EVERYTHING)
+  const card = nodeCardModelOf(readAuthorityState(), playerId, tree, cardId)
+  return renderToString(
+    createElement(TechTreeScreenView, {
+      view: { model, card, zoom, lane: 'sensing', treeView, density },
+      onDismiss: () => undefined,
+    }),
+  )
+}
+
+function testIdCount(html: string, testId: string): number {
+  return html.split(`data-testid="${testId}"`).length - 1
+}
+
+describe('tech tree on a phone (#470 PT-5)', () => {
+  it('draws the whole map with no "next up" strip, and the list in its place on a tap of List', () => {
+    openTreeOnPlanet(3)
+    const map = phoneViewOf('compact', 'overview', 'map')
+    expect(testIdCount(map, TREE_TEST_IDS.map)).toBe(1)
+    expect(testIdCount(map, 'tech-tree-next-up')).toBe(0)
+    expect(testIdCount(map, TREE_TEST_IDS.showList)).toBe(1)
+    const list = phoneViewOf('compact', 'overview', 'list')
+    expect(testIdCount(list, TREE_TEST_IDS.list)).toBe(1)
+    expect(testIdCount(list, TREE_TEST_IDS.map)).toBe(0)
+    expect(testIdCount(list, TREE_TEST_IDS.showMap)).toBe(1)
+  })
+
+  it("opens a picked node's card as a sheet over the map, with its Research and Close buttons", () => {
+    openTreeOnPlanet(3)
+    const html = phoneViewOf('compact', 'card', 'map', 'tech.sensing.echo_sounder')
+    expect(testIdCount(html, TREE_TEST_IDS.map)).toBe(1)
+    const sheet = html.slice(html.indexOf(`data-testid="${TREE_TEST_IDS.sheet}"`))
+    expect(sheet).toContain('data-node-id="tech.sensing.echo_sounder"')
+    expect(sheet).toContain('Research for')
+    expect(sheet).toContain(`data-testid="${TREE_TEST_IDS.sheetClose}"`)
+  })
+
+  it('lists every node in the order the wallet reaches them, each row showing its price or what it needs', () => {
+    openTreeOnPlanet(3)
+    const html = phoneViewOf('compact', 'overview', 'list')
+    const model = treeScreenModelOf(
+      readAuthorityState(),
+      game().playerId,
+      registeredTechTree(),
+      EVERYTHING,
+    )
+    const shown = model.lanes.flatMap((lane) => lane.nodes)
+    const at = shown.map((card) => html.indexOf(`data-testid="${nodeTestIdOf(card.id)}"`))
+    expect(at.every((index) => index >= 0)).toBe(true)
+    const firstLocked = shown.find((card) => card.status === 'locked')!
+    const firstAffordable = shown.find((card) => card.status === 'affordable')!
+    expect(html.indexOf(nodeTestIdOf(firstAffordable.id))).toBeLessThan(
+      html.indexOf(nodeTestIdOf(firstLocked.id)),
+    )
+    expect(textOf(html)).toMatch(/Needs: /)
+  })
+
+  it('offers "Next affordable" while the wallet reaches a node, on a phone and a wide screen alike', () => {
+    openTreeOnPlanet(3)
+    expect(
+      testIdCount(phoneViewOf('compact', 'overview', 'map'), TREE_TEST_IDS.nextAffordable),
+    ).toBe(1)
+    expect(testIdCount(phoneViewOf('full', 'overview', 'map'), TREE_TEST_IDS.nextAffordable)).toBe(
+      1,
+    )
+  })
+
+  it('hides "Next affordable" while the wallet reaches no node', () => {
+    game().setPlanet(3)
+    game().openScreen(TECH_TREE_SCREEN_ID)
+    expect(
+      testIdCount(phoneViewOf('compact', 'overview', 'map'), TREE_TEST_IDS.nextAffordable),
+    ).toBe(0)
+  })
+
+  it('draws no text outside an element on the phone layout', () => {
+    openTreeOnPlanet(3)
+    const html = [
+      phoneViewOf('compact', 'overview', 'map'),
+      phoneViewOf('compact', 'overview', 'list'),
+      phoneViewOf('compact', 'card', 'list', 'tech.sensing.echo_sounder'),
+    ].join('')
+    expect(unregisteredTextsOf(html)).toEqual([])
+  })
+})
 
 describe('tech tree button on the compact HUD (#500)', () => {
   const draw = (density: 'full' | 'compact') =>

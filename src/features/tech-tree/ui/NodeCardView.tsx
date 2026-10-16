@@ -6,6 +6,7 @@
  * No line names a planet: the price is the only gate (Content's copy on #411). Stat lines arrive
  * with each item's `statPreview` from its lane slice (#159).
  */
+import type { ReactNode } from 'react'
 import { Button } from '../../../ui/kit/Button'
 import { TitleOneLine } from '../../../ui/kit/TitleOneLine'
 import type { MarkChipModel, NodeCardModel } from '../systems/nodeCardModel'
@@ -21,7 +22,14 @@ const EMPTY_TEXT = {
   tooltipLines: [],
 }
 
-export function NodeCardView({ card }: { card: NodeCardModel | null }) {
+export function NodeCardView({
+  card,
+  children,
+}: {
+  card: NodeCardModel | null
+  /** The way back from the card where it opens over the map, as on a phone's sheet. */
+  children?: ReactNode
+}) {
   if (card === null) return <TitleOneLine text={EMPTY_TEXT} level="h3" />
   const element = nodeCardElementOf(card)
   return (
@@ -35,6 +43,7 @@ export function NodeCardView({ card }: { card: NodeCardModel | null }) {
       >
         <ResearchAction card={card} />
         {card.markChip !== null && <MarkLadder chip={card.markChip} />}
+        {children}
       </TitleOneLine>
     </article>
   )

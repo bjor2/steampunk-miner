@@ -1,4 +1,5 @@
 .screen {
+  position: relative;
   display: grid;
   grid-template-rows: auto auto minmax(0, 1fr);
   align-items: start;
@@ -7,4 +8,13 @@
   box-sizing: border-box;
   padding: var(--space-3);
   color: var(--color-parchment);
+}
+
+/* A phone either way up has no "next up" strip: the header, then the map or the list (#470 PT-5). */
+.screen[data-density='compact'] {
+  /* The map is far wider than the screen; the column must not grow to it. */
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-rows: auto minmax(0, 1fr);
+  gap: var(--space-2);
+  padding: var(--space-2);
 }

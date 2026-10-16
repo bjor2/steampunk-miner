@@ -31,6 +31,28 @@ describe('tech tree screen store', () => {
     expect({ lane: screen().lane, zoom: screen().zoom }).toEqual({ lane: 'mobility', zoom: 'lane' })
   })
 
+  it('shows the list or the map from the overview, leaving any open card', () => {
+    screen().selectNode('tech.sensing.echo_sounder')
+    screen().showTreeView('list')
+    expect({ view: screen().treeView, zoom: screen().zoom }).toEqual({
+      view: 'list',
+      zoom: 'overview',
+    })
+    screen().showTreeView('map')
+    expect(screen().treeView).toBe('map')
+  })
+
+  it("closes a node's card back to the view under it, keeping the node picked", () => {
+    screen().showTreeView('list')
+    screen().selectNode('tech.sensing.echo_sounder')
+    screen().closeNodeCard()
+    expect({
+      view: screen().treeView,
+      zoom: screen().zoom,
+      selected: screen().selectedNodeId,
+    }).toEqual({ view: 'list', zoom: 'overview', selected: 'tech.sensing.echo_sounder' })
+  })
+
   it('toggles filters on and off', () => {
     screen().toggleFilter('locked')
     screen().toggleFilter('marks')

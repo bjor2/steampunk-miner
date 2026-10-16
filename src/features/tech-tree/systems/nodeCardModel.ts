@@ -9,6 +9,7 @@
  */
 import type { AuthorityState } from '../../../systems/authority/authorityState'
 import { formatAmount } from '../../../systems/displayAmount'
+import type { Money } from '../../../systems/money'
 import { markNodeIdOf, markNodeOf, type MarkBearer } from './markNodes'
 import { nodeCost } from './nodeCost'
 import { markBearerOfItem, treeNodeOf, type TechTree } from './techTree'
@@ -54,6 +55,8 @@ export interface NodeCardModel {
   refusal: TechNodeRefusal | null
   /** The refusal in the player's words; null with no refusal. */
   refusalText: string | null
+  /** The price, for ordering by what the wallet reaches first (#470 PT-5's list). */
+  cost: Money
   costText: string
   prereqNames: readonly string[]
   /** The prerequisites as one line: "Nothing" for none. */
@@ -122,6 +125,7 @@ export function nodeCardOf(node: TreeNode, context: CardContext): NodeCardModel 
     status: statusOf(answer),
     refusal,
     refusalText: refusal === null ? null : REFUSAL_TEXT[refusal](node, context),
+    cost: nodeCost(node),
     costText: formatAmount(nodeCost(node)),
     prereqNames: prereqNamesOf(node, context),
     prereqText: prereqNamesOf(node, context).join(', ') || 'Nothing',
