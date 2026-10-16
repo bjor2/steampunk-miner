@@ -25,11 +25,12 @@ import { createRig, type TickRead } from './cutFollowFixtures'
 // line: every ramped-up cut tick within 5% of the rig's cut speed.
 //
 // Each rig is held on the legs where the carry was the cause. Since ticket 439 cut each fresh step's
-// capsule from the body, the legs below dip under 80% with the hold-out ablated outright too, and
-// #440's classifier names every such dip on them the collider halo stepping against ground the
-// tick's own cut had opened (#459), none uncut ground: the 15 m/s level leg (rig-heavy too), the
-// 25 m/s up leg and the 44 m/s down leg. The 25 and 44 m/s level legs dip so with the hold-out
-// ablated since #397, and the level ones also bounce back off the face (#458). The 78 m/s and
+// capsule from the body, #440's classifier named the dips on the 15 m/s level leg (rig-heavy too),
+// the 25 m/s up leg and the 44 m/s down leg the collider halo stepping against ground the tick's
+// own cut had opened. Since ticket 459 the substeps collide with the world that cut left, and the
+// 25 m/s up and 44 m/s down legs hold; the 15 m/s level legs still dip under 80% (#465). The 25 and
+// 44 m/s level legs dip so with the hold-out ablated since #397, and they also bounce back off the
+// face (#458's trace, the fix is #491). The 78 m/s and
 // 3600 m/s rigs meet a bore narrower than the body on a fresh path (#439), and a 3 s leg at
 // 300 m/s needs a planet larger than planet 1.
 
@@ -46,8 +47,8 @@ const RIGS: Readonly<Record<string, HeldRig>> = {
     levels: { drill_power: 200, drill_tip: 600, engine: 5000 },
     legs: ['down', 'up'],
   },
-  '25 m/s': { levels: { drill_power: 250, drill_tip: 600, engine: 5000 }, legs: ['down'] },
-  '44 m/s (rig 1, #400)': { levels: { drill_power: 300, drill_tip: 200 }, legs: ['up'] },
+  '25 m/s': { levels: { drill_power: 250, drill_tip: 600, engine: 5000 }, legs: ['down', 'up'] },
+  '44 m/s (rig 1, #400)': { levels: { drill_power: 300, drill_tip: 200 }, legs: ['down', 'up'] },
 }
 const FRAME_RATES = [30, 144]
 const MAX_BOUNDARY_CHANGE = 0.05
@@ -64,7 +65,7 @@ const BAR_RIGS: Readonly<Record<string, HeldRig>> = {
     legs: ['down', 'up'],
   },
 }
-/** The rigs held on an up cut; the 25 m/s rig's up leg is #459's (the todo below). */
+/** The rigs held on an up cut. */
 const UP_RIGS = Object.fromEntries(
   Object.entries(BAR_RIGS).filter(([, { legs }]) => legs.includes('up')),
 )
@@ -226,11 +227,11 @@ describe('continuous cut-follow (tickets 400, 397, 421, 432)', () => {
   )
 
   it.todo(
-    'the 15 m/s rig (and rig-heavy) in a level cut, the 25 m/s rig up and the 44 m/s rig down vary their speed by at most 5% across cell boundaries and hold the #421 interim bar (#459: since #439 their dips are the collider halo stepping against ground the tick’s own cut opened)',
+    'the 15 m/s rig (and rig-heavy) in a level cut vary their speed by at most 5% across cell boundaries and hold the #421 interim bar (#465: under 80% with the post-cut halo, ticket 459)',
   )
 
   it.todo(
-    'the 25 and 44 m/s rigs hold the #421 interim bar in a level cut (#459: the stale collider halo; #458: the level cut bounces back off the face)',
+    'the 25 and 44 m/s rigs hold the #421 interim bar in a level cut (#491: the level cut bounces back off the face)',
   )
 
   it.todo(
