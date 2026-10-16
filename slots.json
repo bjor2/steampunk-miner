@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-10-16T23:22:34+01:00",
+  "updated_at": "2026-10-16T23:29:16+01:00",
   "caps": {
     "grok": 12,
     "claude": 10,
@@ -29,11 +29,11 @@
         {
           "slot": "C2",
           "state": "busy",
-          "ticket": 519,
-          "grok_slot": 3,
+          "ticket": 514,
+          "grok_slot": 2,
           "kind": "dev",
-          "since": "2026-10-16T23:15:00+01:00",
-          "wave": "2D"
+          "since": "2026-10-16T23:29:00+01:00",
+          "wave": "2B"
         },
         {
           "slot": "C3",
@@ -122,7 +122,7 @@
     }
   ],
   "gate": {
-    "busy": 2,
+    "busy": 1,
     "max": 3
   },
   "tester": {
@@ -539,17 +539,17 @@
     },
     {
       "slot": 2,
-      "state": "free",
-      "ticket": null,
-      "since": null
+      "state": "dev",
+      "ticket": 514,
+      "since": "2026-10-16T23:29:00+01:00",
+      "claude_slot": 2,
+      "wave": "2B"
     },
     {
       "slot": 3,
-      "state": "dev",
-      "ticket": 519,
-      "since": "2026-10-16T23:15:00+01:00",
-      "claude_slot": 2,
-      "wave": "2D"
+      "state": "free",
+      "ticket": null,
+      "since": null
     },
     {
       "slot": 4,
@@ -619,11 +619,11 @@
     {
       "slot": 2,
       "state": "busy",
-      "ticket": 519,
-      "grok_slot": 3,
-      "since": "2026-10-16T23:15:00+01:00",
+      "ticket": 514,
+      "grok_slot": 2,
+      "since": "2026-10-16T23:29:00+01:00",
       "account": 1,
-      "wave": "2D"
+      "wave": "2B"
     },
     {
       "slot": 3,
@@ -695,10 +695,10 @@
     }
   ],
   "last_refill": {
-    "at": "2026-10-16 23:22 BST",
+    "at": "2026-10-16 23:29 BST",
     "mode": "refill-dev",
-    "triggers": "#487 #516 claude-run:wave-plan",
-    "started": "#488->C1/A1",
+    "triggers": "#519",
+    "started": "#514->C2/A1",
     "note": "spawned 1 worker(s)"
   },
   "totals": {
@@ -736,19 +736,6 @@
         "live": 0
       },
       {
-        "number": 521,
-        "key": "2D",
-        "map": 316,
-        "lane": "remote",
-        "mode": "solo",
-        "state": "running",
-        "tickets": [
-          519
-        ],
-        "done": [],
-        "live": 1
-      },
-      {
         "number": 517,
         "key": "2B",
         "map": 316,
@@ -762,7 +749,7 @@
         "done": [
           516
         ],
-        "live": 0
+        "live": 1
       },
       {
         "number": 512,
