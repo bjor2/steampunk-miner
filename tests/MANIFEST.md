@@ -794,7 +794,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/debug/debugLiveTime.test.ts` | 3 | 3 |
 | `src/debug/debugMemory.test.ts` | 4 | 4 |
 | `src/debug/debugOverlay.test.ts` | 2 | 2 |
-| `src/debug/debugSaves.test.ts` | 2 | 2 |
+| `src/debug/debugSaves.test.ts` | 5 | 5 |
 | `src/debug/debugScreens.test.ts` | 30 | 29 |
 | `src/debug/sliceDebugCommands.test.ts` | 3 | 3 |
 
@@ -1101,13 +1101,16 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/save/carriedCursors.test.ts` | 3 | 3 |
 | `src/systems/save/chunkDiffSave.test.ts` | 11 | 11 |
 | `src/systems/save/loadedSaveDigest.test.ts` | 4 | 4 |
+| `src/systems/save/newerSaveText.test.ts` | 5 | 5 |
 | `src/systems/save/playerProfile.test.ts` | 4 | 4 |
+| `src/systems/save/saveBytesWatch.test.ts` | 2 | 2 |
 | `src/systems/save/saveDeterminism.test.ts` | 7 | 7 |
 | `src/systems/save/saveExactRoundTrip.test.ts` | 9 | 9 |
 | `src/systems/save/saveMigrations.test.ts` | 21 | 20 |
 | `src/systems/save/saveSlot.test.ts` | 20 | 16 |
 | `src/systems/save/saveSlotIndex.test.ts` | 8 | 8 |
 | `src/systems/save/saveSlotSections.test.ts` | 3 | 3 |
+| `src/systems/save/saveWriteFailure.test.ts` | 3 | 3 |
 | `src/systems/save/savedUnlocks.test.ts` | 7 | 7 |
 | `src/systems/save/sizedChargeRacks.test.ts` | 3 | 3 |
 | `src/systems/save/slotFormatMigration.test.ts` | 8 | 8 |
@@ -1135,6 +1138,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | File | Tests | Sites |
 | --- | --- | --- |
 | `src/shell/listenerCount.test.ts` | 8 | 8 |
+| `src/shell/mirroredSaveFolder.test.ts` | 7 | 7 |
 | `src/shell/mouseHooks.test.ts` | 4 | 4 |
 | `src/shell/storedSaveSlots.test.ts` | 4 | 4 |
 | `src/shell/storedZip.test.ts` | 4 | 4 |
@@ -1178,6 +1182,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/store/platformLoop.test.ts` | 4 | 4 |
 | `src/store/promptDevice.test.ts` | 2 | 2 |
 | `src/store/runSnapshots.test.ts` | 10 | 10 |
+| `src/store/saveKeeping.test.ts` | 14 | 14 |
 | `src/store/sliceRun.test.ts` | 7 | 7 |
 | `src/store/slowDeviceChip.test.ts` | 2 | 2 |
 | `src/store/soundUnlockSlice.test.ts` | 4 | 4 |
@@ -1382,7 +1387,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/views/screenLayout.test.ts` | 14 | 14 |
 | `src/systems/views/scrollRail.test.ts` | 5 | 5 |
 | `src/systems/views/sellBayModel.test.ts` | 13 | 13 |
-| `src/systems/views/settingsModel.test.ts` | 3 | 3 |
+| `src/systems/views/settingsModel.test.ts` | 5 | 5 |
 | `src/systems/views/titleMenuModel.test.ts` | 7 | 7 |
 | `src/systems/views/titleOnlyText.test.ts` | 5 | 5 |
 | `src/systems/views/tooltipOpening.test.ts` | 9 | 9 |
@@ -1391,6 +1396,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/views/uiScrollGuard.test.ts` | 7 | 7 |
 | `src/systems/views/uiText.test.ts` | 19 | 19 |
 | `src/systems/views/unregisteredText.test.ts` | 5 | 5 |
+| `src/systems/views/unsavedChipText.test.ts` | 2 | 2 |
 | `src/systems/views/upgradeBayModel.test.ts` | 19 | 19 |
 | `src/systems/views/upgradePreview.test.ts` | 15 | 15 |
 | `src/systems/views/vehicleItemRows.test.ts` | 5 | 5 |
