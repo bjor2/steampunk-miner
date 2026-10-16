@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { calloutTextOf, readoutTextOf } from './hudCallouts'
+import { calloutTextOf, readoutTextOf, statusLabelTextOf } from './hudCallouts'
 import { uiTextProblemsOf } from './uiTextBudget'
 import { elementLinesOf, type ElementText } from './uiText'
 
@@ -30,6 +30,21 @@ describe('HUD call-outs', () => {
   it('keeps a short call-out with no separator as a title alone', () => {
     const text = calloutTextOf('hud.fuse', 'CHARGE LIT 1.5 s')
     expect([text.title, text.oneLine]).toEqual(['CHARGE LIT 1.5 s', ''])
+  })
+
+  it('draws a status icon’s words beside it, split like any call-out (ticket 476)', () => {
+    const label = statusLabelTextOf({ id: 'collapse', text: 'COLLAPSE: back off' })
+    expect(label).toEqual({
+      id: 'hud.status.collapse',
+      title: 'COLLAPSE',
+      oneLine: 'back off',
+      tooltipLines: [],
+    })
+  })
+
+  it('leaves the fuse, low energy and tow icons unlabelled: their call-outs already say it', () => {
+    const labels = ['fuse', 'low_energy', 'tow'].map((id) => statusLabelTextOf({ id, text: 'X' }))
+    expect(labels).toEqual([null, null, null])
   })
 
   it('gives no element a tooltip, since no click reaches the HUD to open one', () => {

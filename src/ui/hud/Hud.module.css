@@ -140,6 +140,8 @@
 /* Urgency is a pulse rate; with flashes off, a thicker rim says the same. */
 .status {
   display: inline-flex;
+  gap: var(--space-1);
+  align-items: center;
   border: 2px solid transparent;
   border-radius: 4px;
 }

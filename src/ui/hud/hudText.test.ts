@@ -9,6 +9,7 @@ import { THROTTLED_TEXT } from '../../systems/views/heatReading'
 import type { HudModel } from '../../systems/views/hudModel'
 import { forgetUiTexts, registeredUiTexts } from '../../systems/views/uiText'
 import { uiTextProblemsOf } from '../../systems/views/uiTextBudget'
+import { titleOnlyTextsOf } from '../../systems/views/titleOnlyText'
 import { unregisteredTextsOf } from '../../systems/views/unregisteredText'
 import { HudView } from './HudView'
 
@@ -95,6 +96,12 @@ describe('HUD text budget (spec #422, pass #428)', () => {
     const markup = drawEveryReadout()
     expect(markup).toContain('data-testid="hud-statuses"')
     expect(unregisteredTextsOf(markup)).toEqual([])
+  })
+
+  it('says every status in a drawn line, never in a hover title alone (ticket 476)', () => {
+    const markup = drawEveryReadout()
+    expect(markup).toContain('data-testid="hud-status-hull_critical"')
+    expect(titleOnlyTextsOf(markup)).toEqual([])
   })
 
   it('keeps every HUD element within the text budget and its tag rules', () => {

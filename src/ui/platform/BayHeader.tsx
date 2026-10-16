@@ -1,9 +1,10 @@
 /**
  * The bay's emblem and name, then money, planet, the core bay against the need, and the platform's
  * state (#33, #37), each a glyph of the icon set and its value (#158), on the shared
- * Title+OneLine element (spec #422, pass #425): numbers show as an icon plus a value, the field's
- * name stays on the glyph as its hover title. Slice `header` bay panels draw just left of the
- * money (ticket 220).
+ * Title+OneLine element (spec #422, pass #425): numbers show as an icon plus a value, and the
+ * header's tooltip names the glyphs in order, a line a tap opens on a phone (ticket 476: it was
+ * each glyph's hover title, which touch never shows). Slice `header` bay panels draw just left of
+ * the money (ticket 220).
  */
 import type { ReactNode } from 'react'
 import type { BayHeader as Header } from '../../systems/views/bayFrame'
@@ -16,20 +17,23 @@ import { bayFrameTextIdOf } from './bayTextIds'
 import { MoneyCounter } from './MoneyCounter'
 import styles from './Platform.module.css'
 
+/** What the header's glyphs stand for, left to right. */
+const GLYPH_NAMES_LINE = 'Glyphs: money, planet, core bay, platform state.'
+
 export function BayHeader({ header }: { header: Header }) {
   const text = { id: bayFrameTextIdOf(header.bay, 'header'), title: header.bayName }
   return (
     <header className={styles.header}>
       <TitleOneLine
-        text={{ ...text, oneLine: '', tooltipLines: [] }}
+        text={{ ...text, oneLine: '', tooltipLines: [GLYPH_NAMES_LINE] }}
         iconId={header.emblemId}
         level="span"
       >
         <HeaderPanels />
-        <GlyphField label="Money" iconId={header.moneyIconId}>
+        <GlyphField iconId={header.moneyIconId}>
           <MoneyCounter wallet={header.money} />
         </GlyphField>
-        <GlyphField label="Planet" iconId={header.planetIconId}>
+        <GlyphField iconId={header.planetIconId}>
           <span data-testid={UI_IDS.platformPlanet}>{header.planet}</span>
         </GlyphField>
         <Gauge
@@ -38,7 +42,7 @@ export function BayHeader({ header }: { header: Header }) {
           gaugeId={UI_IDS.platformCoreBayGauge}
           textId={UI_IDS.platformCoreBay}
         />
-        <GlyphField label="Platform" iconId={header.platformStateIconId}>
+        <GlyphField iconId={header.platformStateIconId}>
           <span data-testid={UI_IDS.platformState} data-state={header.platformState}>
             {header.platformStateText}
           </span>
@@ -58,18 +62,10 @@ function HeaderPanels() {
   )
 }
 
-/** A value beside its glyph; the field's name is the glyph's hover title, not a word on screen. */
-function GlyphField({
-  label,
-  iconId,
-  children,
-}: {
-  label: string
-  iconId: string
-  children: ReactNode
-}) {
+/** A value beside its glyph; the header's tooltip line names the glyph, not a word on screen. */
+function GlyphField({ iconId, children }: { iconId: string; children: ReactNode }) {
   return (
-    <span className={styles.field} title={label}>
+    <span className={styles.field}>
       <VectorIcon iconId={iconId} size="menu" />
       {children}
     </span>

@@ -4,14 +4,15 @@
  * flashes off); then the low-energy and fuse texts, the vehicle state with its icon and the tow
  * countdown. Each carries text; with flashes off a warning is steady. Every text is one shared
  * Title+OneLine element (spec #422, pass #428): a call-out's words before its colon are the title,
- * the rest its one line, so nothing the model says is cut.
+ * the rest its one line, so nothing the model says is cut. A status icon's words sit beside it,
+ * unless a call-out below says them already: no status text lives in a hover title (ticket 476).
  */
 import type {
   CombatStatusReading,
   CombatStatusStack,
   SecondaryStatusReading,
 } from '../../systems/views/combatStatuses'
-import { calloutTextOf, readoutTextOf } from '../../systems/views/hudCallouts'
+import { calloutTextOf, readoutTextOf, statusLabelTextOf } from '../../systems/views/hudCallouts'
 import type { HudModel } from '../../systems/views/hudModel'
 import { UI_ID_TEMPLATES, UI_IDS } from '../ids'
 import { TitleOneLine } from '../kit/TitleOneLine'
@@ -98,28 +99,30 @@ function StatusStack({ stack, isFlashing }: { stack: CombatStatusStack; isFlashi
 }
 
 function StatusIcon({ status, isFlashing }: { status: CombatStatusReading; isFlashing: boolean }) {
+  const label = statusLabelTextOf(status)
   return (
     <span
       className={styles.status}
-      title={status.text}
       data-testid={UI_ID_TEMPLATES.hudStatus(status.id)}
       data-urgency={status.urgency}
       data-pulsing={isFlashing || undefined}
     >
       <VectorIcon iconId={status.iconId} size="banner" />
+      {label !== null && <TitleOneLine text={label} level="span" />}
     </span>
   )
 }
 
 function SecondaryIcon({ status }: { status: SecondaryStatusReading }) {
+  const label = statusLabelTextOf(status)
   return (
     <span
       className={styles.status}
-      title={status.text}
       data-testid={UI_ID_TEMPLATES.hudStatus(status.id)}
       data-urgency="steady"
     >
       <VectorIcon iconId={status.iconId} size="hud" />
+      {label !== null && <TitleOneLine text={label} level="span" />}
     </span>
   )
 }

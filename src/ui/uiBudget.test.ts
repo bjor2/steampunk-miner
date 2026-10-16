@@ -15,6 +15,7 @@ import { ratchetProblemsOf } from '../systems/views/uiBudgetRatchet'
 import { readUiBudget, type UiBudgetReading } from '../systems/views/uiBudgetReading'
 import { scrollFindingsOf, type SourceText } from '../systems/views/uiScrollGuard'
 import { forgetUiTexts, registeredUiTexts, type UiText } from '../systems/views/uiText'
+import { titleOnlyTextsOf } from '../systems/views/titleOnlyText'
 import { unregisteredTextsOf } from '../systems/views/unregisteredText'
 import { Hud } from './hud/Hud'
 import { PauseMenuView } from './pause/PauseMenuView'
@@ -181,6 +182,16 @@ describe('ui budget', () => {
       UI_BUDGET_PANELS.map((panel) => panel.id),
     )
     for (const drawing of drawings) expect(drawing.markup, drawing.panel).not.toBe('')
+  })
+
+  // Ticket 476: a phone never shows a hover title, so none may hold words no drawn line repeats.
+  it('carries nothing in a hover title alone on any panel', async () => {
+    const drawings = await drawEveryFixture()
+    const found = drawings.map((drawing) => ({
+      panel: drawing.panel,
+      titleOnly: titleOnlyTextsOf(drawing.markup),
+    }))
+    expect(found.filter((panel) => panel.titleOnly.length > 0)).toEqual([])
   })
 
   it('keeps every panel within budget or exactly at its allowlist entry', async () => {
