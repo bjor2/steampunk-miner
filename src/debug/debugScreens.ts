@@ -11,6 +11,7 @@ import { cameraPresence } from '../scene/cameraPresence'
 import { lightPresence } from '../scene/lightPresence'
 import { previewPresence } from '../scene/previewPresence'
 import { renderPresence } from '../scene/renderPresence'
+import { gpuPresence, renderQualityPresence } from '../scene/renderQualityPresence'
 import { KERNEL_SCENE_LAYER_BUDGET, type SceneLayerBudget } from '../scene/registries/sceneLayers'
 import { sprayPresence } from '../scene/sprayPresence'
 import { useGameStore } from '../store/gameStore'
@@ -44,6 +45,8 @@ import {
   type PreferenceName,
   type Preferences,
 } from '../systems/input/preferences'
+import type { GpuCapabilities } from '../systems/render/gpuTier'
+import { renderQualityChoiceProblems } from '../systems/render/renderQuality'
 import { renderScalePinProblems } from '../systems/render/renderScale'
 import { speedViewOf, type SpeedView } from '../systems/render/speedFraming'
 import { cameraViewOf, viewShortAxisProblems, type CameraView } from '../systems/render/viewZoom'
@@ -90,6 +93,8 @@ export interface DebugUi {
   getRendererMemory(): DebugResult<RendererMemory>
   /** Holds the render scale (0 to 1, clamped to the 1080p floor), or `null` to adapt again (#38). */
   setRenderScale(scale: unknown): DebugResult
+  /** The render quality (ticket 477): `auto`, `low`, `mid` or `high`; drawn from the next frame. */
+  setRenderQuality(choice: unknown): DebugResult
   getHudModel(): DebugResult<{ model: HudModel }>
   /** The bay screens (#37, #105), as each would draw now; their buttons carry `wrong_bay` away. */
   getSellBayModel(): DebugResult<{ model: SellBayModel }>
@@ -142,6 +147,10 @@ export type RenderStats = typeof renderPresence & {
   headlamps: number
   pointLights: number
   pointLightIds: string[]
+  /** The startup capability probe's readings (ticket 477); null before the first frame. */
+  gpu: GpuCapabilities | null
+  /** The terrain program, scene target, quality choice, preset, ladder rung and their quality. */
+  quality: typeof renderQualityPresence
 }
 
 export type SprayStats = typeof sprayPresence & { budget: SceneLayerBudget }
@@ -182,6 +191,7 @@ export function createDebugUi(): DebugUi {
     getSprayStats: () => ({ ok: true, stats: sprayStatsNow() }),
     getRendererMemory: readRendererMemory,
     setRenderScale: pinRenderScaleUnlessRefused,
+    setRenderQuality: setRenderQualityUnlessRefused,
     getHudModel: () => ({ ok: true, model: readHudModel() }),
     getSellBayModel: () => ({ ok: true, model: readSellBayModel() }),
     getUpgradeBayModel: () => ({ ok: true, model: readUpgradeBayModel() }),
@@ -246,6 +256,12 @@ function pinRenderScaleUnlessRefused(scale: unknown): DebugResult {
   return resultOf(problems)
 }
 
+function setRenderQualityUnlessRefused(choice: unknown): DebugResult {
+  const problems = renderQualityChoiceProblems(choice)
+  if (problems.length === 0) game().setRenderQuality(choice)
+  return resultOf(problems)
+}
+
 function setPauseSaveNameUnlessRefused(name: unknown): DebugResult {
   const problems = pauseSaveNameProblems(name)
   if (problems.length === 0) game().setPauseSaveName(name as string)
@@ -269,6 +285,8 @@ function renderStatsNow(): RenderStats {
     headlamps: lightPresence.headlamps,
     pointLights: lightPresence.pointLights.length,
     pointLightIds: lightPresence.pointLights.map((light) => light.id),
+    gpu: gpuPresence.gpu,
+    quality: { ...renderQualityPresence },
   }
 }
 

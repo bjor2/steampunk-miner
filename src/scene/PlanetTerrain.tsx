@@ -3,9 +3,10 @@
  * work stays out of React: the pool and the material are created once and updated in `useFrame`.
  * The meshes sit at their chunk corners under the world root; the shader learns the render origin
  * (ticket 339), so a moved origin rebuilds none of them. The chunk worker (ticket 337) lives as long
- * as the pool and builds its meshes' parts off the main thread.
+ * as the pool and builds its meshes' parts off the main thread. A GPU short of the full terrain
+ * program (ticket 477) draws the lite one, which never loads the strata maps.
  */
-import { useFrame } from '@react-three/fiber'
+import { useFrame, useThree } from '@react-three/fiber'
 import { useEffect, useMemo, useRef } from 'react'
 import type { Group, OrthographicCamera } from 'three'
 import { writeArtefactLook } from '../store/artefactActions'
@@ -22,6 +23,8 @@ import { renderPresence } from './renderPresence'
 import { GroundStrata } from './GroundStrata'
 import { HeatTiles } from './HeatTiles'
 import { isHeatPlanet } from '../systems/economy/heatEconomy'
+import { terrainProgramOf } from '../systems/render/gpuTier'
+import { readGpuCapabilities } from './gpuCapabilities'
 import { createTerrainMaterial, lightTerrain, type TerrainLight } from './terrainMaterial'
 import { fitTerrainToOrigin } from './terrainOrigin'
 import { renderOriginPresence } from './renderOriginPresence'
@@ -34,7 +37,9 @@ import { vehiclePresence } from './vehiclePresence'
 export function PlanetTerrain() {
   const group = useRef<Group>(null)
   const pool = useRef<ChunkMeshPool | null>(null)
-  const material = useMemo(createTerrainMaterial, [])
+  const gl = useThree((state) => state.gl)
+  const program = useMemo(() => terrainProgramOf(readGpuCapabilities(gl)), [gl])
+  const material = useMemo(() => createTerrainMaterial(program), [program])
   // Reused every frame, so the frame loop allocates nothing.
   const view = useMemo(createTerrainViewScratch, [])
   const light = useMemo(createTerrainLightScratch, [])
@@ -75,7 +80,7 @@ export function PlanetTerrain() {
 
   return (
     <group ref={group}>
-      <GroundStrata material={material} />
+      {program === 'full' && <GroundStrata material={material} />}
       <HeatTiles material={material} isHeatPlanet={isHeatPlanetNow} />
     </group>
   )

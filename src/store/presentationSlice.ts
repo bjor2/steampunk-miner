@@ -42,6 +42,7 @@ import {
   type ZoomChange,
 } from '../systems/render/viewZoom'
 import { renderScalePinProblems } from '../systems/render/renderScale'
+import { renderQualityChoiceProblems } from '../systems/render/renderQuality'
 import type { TickDilationWatch } from '../systems/tickDilation'
 import { partToInstallOf } from '../systems/views/bayPresentation'
 import { focusOnScreen, stepFocus } from '../systems/views/menuFocus'
@@ -78,6 +79,11 @@ export interface PresentationValues {
   rebindingActionId: ActionId | null
   /** A render scale held by the debug API (#38 "a toggle can pin it"); null adapts to the GPU. */
   renderScalePin: number | null
+  /**
+   * The GPU is under the game's hard minimum (ticket 477, `gpuTier.ts`): a plain card says so
+   * instead of a black canvas. Set once by the render pipeline's probe; never reaches the sim.
+   */
+  isUnsupportedDeviceCardShown: boolean
   /** The track whose part the Upgrade bay preview bolts on after a purchase (#44); null when none. */
   installingUpgradeId: UpgradeId | null
   /** The on-screen driving controls (#173): shown on a finger's touch, hidden by a key. */
@@ -102,6 +108,9 @@ export interface PresentationActions {
   zoom(change: ZoomChange): void
   /** Holds the render scale (clamped to the 1080p floor), or `null` to adapt; refused (thrown). */
   pinRenderScale(scale: unknown): void
+  /** `auto` or a preset (ticket 477), kept in the preferences file; refused (thrown) otherwise. */
+  setRenderQuality(choice: unknown): void
+  showUnsupportedDeviceCard(): void
   /** The preferences file read at start; the file owner already wrote back any reset. */
   adoptPreferences(reading: PreferencesReading): void
   /** The hints and transmissions shown so far (#16), kept in the preferences file. */
@@ -182,6 +191,7 @@ export const STARTING_PRESENTATION: PresentationValues = {
   isTravelArmed: false,
   rebindingActionId: null,
   renderScalePin: null,
+  isUnsupportedDeviceCardShown: false,
   installingUpgradeId: null,
   isTouchControlsShown: false,
   chosenChargeSize: 1,
@@ -243,6 +253,11 @@ export function presentationActionsOf(set: SetSlice, get: () => SliceHost): Pres
       refuseProblems(renderScalePinProblems(scale))
       set({ renderScalePin: scale as number | null })
     },
+    setRenderQuality: (choice) => {
+      refuseProblems(renderQualityChoiceProblems(choice))
+      savePrefs({ ...get().prefs, renderQuality: choice as Preferences['renderQuality'] })
+    },
+    showUnsupportedDeviceCard: () => set({ isUnsupportedDeviceCardShown: true }),
     adoptPreferences: ({ prefs, bindingsReset }) =>
       set({
         prefs,

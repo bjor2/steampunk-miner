@@ -3,10 +3,12 @@
  * drawn as one ring mesh round the planet just above its surface, additive over the sky and behind
  * the ground, 1 draw call from #38's co-op headroom (outside the slices' `SCENE_LAYER_LINE`). With
  * no look the planet draws nothing. The ring is built once per planet; a frame only advances the
- * shader's clock, held still while reduce motion is on (the shake switch, #33, #48).
+ * shader's clock, held still while reduce motion is on (the shake switch, #33, #48). It is the
+ * background layer a reduced render quality drops (#173 "background parallax layers are reduced",
+ * ticket 477): hidden, not unmounted, so the quality can bring it back any frame.
  */
 import { useFrame } from '@react-three/fiber'
-import { Suspense, useEffect, useMemo } from 'react'
+import { Suspense, useEffect, useMemo, useRef } from 'react'
 import {
   AdditiveBlending,
   BufferAttribute,
@@ -14,8 +16,10 @@ import {
   Color,
   ShaderMaterial,
   Vector4,
+  type Mesh,
   type Texture,
 } from 'three'
+import { FULL_BACKGROUND_LAYERS } from '../constants/renderQuality'
 import { SKY_BAND_Z } from '../constants/scene'
 import { useGameStore } from '../store/gameStore'
 import { planetParamsOf, type SessionPlanet } from '../systems/authority/planetOfState'
@@ -29,6 +33,7 @@ import {
 import { skyBandRingOf } from '../systems/render/skyBandRing'
 import { useAtlasTextureSet } from './atlasTextures'
 import { useDisposeOnRelease } from './disposeOnRelease'
+import { renderQualityPresence } from './renderQualityPresence'
 import { SHIPPED_ART } from './shippedArt'
 import { showSkyBand } from './skyBandPresence'
 
@@ -114,8 +119,12 @@ function SkyBandMesh({ shown, ribbon }: { shown: ShownSkyBand; ribbon: Texture |
   useDisposeOnRelease(geometry)
   useDisposeOnRelease(material)
   useEffect(() => showSkyBand(shown.look, ribbon !== null), [shown, ribbon])
-  useFrame((_, delta) => advanceSkyBandClock(material, delta))
-  return <mesh geometry={geometry} material={material} position={[0, 0, SKY_BAND_Z]} />
+  const mesh = useRef<Mesh>(null)
+  useFrame((_, delta) => {
+    advanceSkyBandClock(material, delta)
+    showSkyBandAtQuality(mesh.current)
+  })
+  return <mesh ref={mesh} geometry={geometry} material={material} position={[0, 0, SKY_BAND_Z]} />
 }
 
 function shownSkyBandOf(planet: SessionPlanet): ShownSkyBand | null {
@@ -152,6 +161,10 @@ function createSkyBandMaterial(shown: ShownSkyBand, ribbon: Texture | null): Sha
     depthWrite: false,
     blending: AdditiveBlending,
   })
+}
+
+function showSkyBandAtQuality(mesh: Mesh | null): void {
+  if (mesh !== null) mesh.visible = renderQualityPresence.parallaxLayers >= FULL_BACKGROUND_LAYERS
 }
 
 function advanceSkyBandClock(material: ShaderMaterial, delta: number): void {

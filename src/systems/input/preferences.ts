@@ -9,9 +9,11 @@
  * `bindings` the sparse override of the action map, `seenHints` the hints and transmissions already
  * shown (#16), so none repeats after a reload, `viewShortAxisMetres` the player's zoom (#39),
  * `musicVolume` and `musicMuted` the music settings (#49), `tvMode` the 10-foot UI with its safe
- * area (#173), `leftHanded` the mirrored touch controls and `haptics` their vibration (#173). A file
- * written before the seen-set, the zoom, the music or the #173 settings existed reads as nothing
- * seen, the 12 m default, full music, TV mode and left-handed off and haptics on.
+ * area (#173), `leftHanded` the mirrored touch controls and `haptics` their vibration (#173), and
+ * `renderQuality` the render quality knob (ticket 477), set through its own action like the zoom. A
+ * file written before the seen-set, the zoom, the music, the #173 settings or the quality knob
+ * existed reads as nothing seen, the 12 m default, full music, TV mode and left-handed off, haptics
+ * on and the quality on `auto`.
  *
  * The file notes the `inputMapVersion` its bindings were made for. Bindings from an older map
  * (none noted is version 1) are discarded for the current defaults, never migrated (#40, the Game
@@ -21,6 +23,7 @@ import { CAMERA_MODES, isCameraMode, type CameraMode } from '../render/cameraTur
 import { VIEW_SHORT_AXIS_DEFAULT_M } from '../../constants/scene'
 import { MUSIC_VOLUME_STEPS } from '../../constants/audio'
 import { viewShortAxisProblems } from '../render/viewZoom'
+import { renderQualityChoiceProblems, type RenderQualityChoice } from '../render/renderQuality'
 import { HINT_TABLE, plaqueIdsOf } from '../hints/hintTable'
 import {
   ACTION_MAP,
@@ -50,6 +53,8 @@ export interface Preferences {
   leftHanded: boolean
   /** A short vibration on drill contact and hull damage, where the device has one (#173). */
   haptics: boolean
+  /** A render quality preset, or `auto` for the device's own lowered as frames drop (ticket 477). */
+  renderQuality: RenderQualityChoice
 }
 
 /** The settings a player toggles one by one (`ui.setPref`); bindings change through rebinding. */
@@ -84,6 +89,7 @@ export const DEFAULT_PREFERENCES: Preferences = {
   tvMode: false,
   leftHanded: false,
   haptics: true,
+  renderQuality: 'auto',
 }
 
 const TOGGLE_NAMES = ['shake', 'flashes', 'hintsEnabled', 'musicMuted'] as const
@@ -115,6 +121,7 @@ const FILE_FIELDS = [
   'bindings',
   'seenHints',
   'viewShortAxisMetres',
+  'renderQuality',
 ]
 
 /** Fields a file from an earlier build may lack; they read as their defaults. */
@@ -127,6 +134,7 @@ const LATER_FIELDS: Pick<
   | 'tvMode'
   | 'leftHanded'
   | 'haptics'
+  | 'renderQuality'
 > = {
   seenHints: [],
   viewShortAxisMetres: VIEW_SHORT_AXIS_DEFAULT_M,
@@ -135,6 +143,7 @@ const LATER_FIELDS: Pick<
   tvMode: DEFAULT_PREFERENCES.tvMode,
   leftHanded: DEFAULT_PREFERENCES.leftHanded,
   haptics: DEFAULT_PREFERENCES.haptics,
+  renderQuality: DEFAULT_PREFERENCES.renderQuality,
 }
 
 /** Only the input map before #40 existed when files did not note their version. */
@@ -239,6 +248,9 @@ function preferenceFileProblems(file: unknown): string[] {
     ...(fields.viewShortAxisMetres === undefined
       ? []
       : viewShortAxisProblems(fields.viewShortAxisMetres)),
+    ...(fields.renderQuality === undefined
+      ? []
+      : renderQualityChoiceProblems(fields.renderQuality)),
   ]
 }
 

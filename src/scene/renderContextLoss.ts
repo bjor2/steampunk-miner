@@ -9,17 +9,22 @@
  */
 import type { WebGLRenderer } from 'three'
 import { useGameStore } from '../store/gameStore'
+import type { SceneTarget } from '../systems/render/gpuTier'
 import { createPostPipeline, type PostPipeline } from './postPipeline'
 import { watchRendererInfo } from './rendererMemory'
 
-/** What `RenderPipeline` draws through: null while the context is lost or nothing is mounted. */
+/**
+ * What `RenderPipeline` draws through: null while the context is lost or nothing is mounted. The
+ * scene target is the probe's answer (ticket 477), kept so a restored context re-creates the same.
+ */
 export interface PostDrawing {
+  readonly sceneTarget: SceneTarget
   pipeline: PostPipeline | null
   unwatchInfo: () => void
 }
 
-export function createPostDrawing(): PostDrawing {
-  return { pipeline: null, unwatchInfo: () => {} }
+export function createPostDrawing(sceneTarget: SceneTarget): PostDrawing {
+  return { sceneTarget, pipeline: null, unwatchInfo: () => {} }
 }
 
 /** Starts drawing on the renderer and follows its context; the returned call stops both. */
@@ -63,7 +68,7 @@ function resumeOnRestoredContext(gl: WebGLRenderer, drawing: PostDrawing): void 
 function startDrawing(gl: WebGLRenderer, drawing: PostDrawing): void {
   gl.info.autoReset = false
   drawing.unwatchInfo = watchRendererInfo(gl.info)
-  drawing.pipeline = createPostPipeline()
+  drawing.pipeline = createPostPipeline(drawing.sceneTarget)
 }
 
 /** Disposed while the old `info` still counts the targets, so the new one never goes below 0. */

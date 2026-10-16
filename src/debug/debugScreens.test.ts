@@ -222,7 +222,8 @@ describe('debug api: input acts like play (#33 acceptance 3 and 11)', () => {
     // `bore_ended`; ticket 331 `collapse_braced`; ticket 317 `auto_mode_set`, `auto_target_locked`,
     // `auto_acted` and `auto_act_overridden`; ticket 341 `hazard_strip_tier` (perf runs only);
     // ticket 379 `strut_placed`; ticket 335 `drill_cut`; ticket 383 `turret_burst_set`; ticket
-    // 403 `new_game_started`; the controls and the HUD still add none.
+    // 403 `new_game_started`; ticket 477 `gpu_capabilities` (perf runs only); the controls and the
+    // HUD still add none.
     expect(ALL_RUN_EVENT_NAMES).toHaveLength(
       62 +
         4 +
@@ -248,6 +249,7 @@ describe('debug api: input acts like play (#33 acceptance 3 and 11)', () => {
         2 +
         1 +
         4 +
+        1 +
         1 +
         1 +
         1 +
@@ -291,6 +293,32 @@ describe('debug api: presentation never reaches the session (#33 acceptance 10)'
       digests.add(takeSessionSnapshot().digest)
     }
     expect(digests.size).toBe(1)
+  })
+
+  it('ends a scripted run on the same digest under every render quality (ticket 477)', () => {
+    const digests = new Set<string>()
+    for (const choice of ['auto', 'low', 'mid', 'high']) {
+      resetGameStore()
+      resetInput()
+      const debug = createDebugApi()
+      expect(debug.ui.setRenderQuality(choice)).toEqual({ ok: true })
+      expect(debug.ui.getRenderStats()).toMatchObject({ ok: true })
+      playThroughTheScreens()
+      digests.add(takeSessionSnapshot().digest)
+    }
+    expect(digests.size).toBe(1)
+  })
+
+  it('keeps the render quality in the preferences, out of the log and the commands', () => {
+    const debug = createDebugApi()
+    debug.ui.setRenderQuality('low')
+    expect(sink.events).toEqual([])
+    expect(sink.commands).toEqual([])
+    expect(debug.ui.getPrefs()).toMatchObject({ ok: true, prefs: { renderQuality: 'low' } })
+    expect(debug.ui.setRenderQuality('ultra')).toEqual({
+      ok: false,
+      problems: ['render quality must be one of auto, low, mid, high, got "ultra"'],
+    })
   })
 
   it('keeps settings out of the log and the commands', () => {

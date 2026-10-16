@@ -6,6 +6,7 @@ import { createRunLog, installRunLog, uninstallRunLog } from '../logging/runLog'
 import { runEventProblems } from '../logging/runEventSchema'
 import { resetGameStore } from './gameStore'
 import {
+  recordGpuCapabilities,
   recordHazardStripTier,
   recordMemorySample,
   recordPerfSample,
@@ -117,6 +118,37 @@ describe('hazard strip tier log', () => {
 
   it('records nothing on a played run, where perf lines are off', () => {
     recordHazardStripTier(TO_LATTICE)
+    expect(sink.events).toEqual([])
+  })
+})
+
+describe('gpu capabilities log (ticket 477)', () => {
+  const PHONE_GPU = {
+    textureUnits: 16,
+    vertexTextureUnits: 16,
+    combinedTextureUnits: 32,
+    maxTextureSize: 4096,
+    fragmentUniformVectors: 224,
+    varyingVectors: 15,
+    isFragmentHighp: true,
+    hasFloatTargets: false,
+    hasHalfFloatTargets: true,
+    textureFormats: ['astc', 'etc2'],
+    terrainProgram: 'full',
+    sceneTarget: 'half_float',
+  } as const
+
+  it('records one valid gpu_capabilities line with every reading and what they chose', () => {
+    turnOnPerfLog(CHROMIUM_PAGE)
+    recordGpuCapabilities(PHONE_GPU)
+    expect(sink.events).toHaveLength(1)
+    const [line] = sink.events
+    expect(runEventProblems(line)).toEqual([])
+    expect(line).toMatchObject({ event: 'gpu_capabilities', data: PHONE_GPU })
+  })
+
+  it('records nothing on a played run, where perf lines are off', () => {
+    recordGpuCapabilities(PHONE_GPU)
     expect(sink.events).toEqual([])
   })
 })

@@ -34,6 +34,7 @@ import { drillPresence } from './drillPresence'
 import { createPoolOrigin, followRenderOrigin } from './localParticles'
 import { renderOriginPresence } from './renderOriginPresence'
 import { vehiclePresence } from './vehiclePresence'
+import { renderQualityPresence } from './renderQualityPresence'
 
 /** The puff draws just behind the sparks, in front of the tiles and the vehicle. */
 const CEMENT_Z = 0.28
@@ -47,7 +48,7 @@ interface PuffQueue {
 }
 
 export function CementSpray() {
-  const pool = useMemo(() => createParticlePool(CEMENT_CAPACITY), [])
+  const pool = useMemo(() => createParticlePool(CEMENT_CAPACITY, renderQualityPresence), [])
   const poolOrigin = useMemo(createPoolOrigin, [])
   const random = useMemo(() => createSeededRandom(CEMENT_SEED), [])
   const spray = useMemo(createSprayScratch, [])

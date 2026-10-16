@@ -83,6 +83,25 @@ describe('preferences file', () => {
     expect(preferenceProblems('tvMode', 'on')).toEqual(['tvMode must be true or false, got "on"'])
   })
 
+  it('reads a file from before the quality knob on auto, and reads back the preset it wrote (ticket 477)', () => {
+    const { renderQuality: _quality, ...older } = DEFAULT_PREFERENCES
+    const text = JSON.stringify({ preferencesVersion: 1, ...older })
+    expect(readPreferences(text)).toMatchObject({ prefs: { renderQuality: 'auto' }, problems: [] })
+    const prefs = { ...DEFAULT_PREFERENCES, renderQuality: 'low' } as const
+    expect(readPreferences(preferencesText(prefs)).prefs).toEqual(prefs)
+  })
+
+  it('refuses a render quality that is not auto or a preset', () => {
+    const text = JSON.stringify({
+      ...DEFAULT_PREFERENCES,
+      preferencesVersion: 1,
+      renderQuality: 'ultra',
+    })
+    expect(readPreferences(text).problems).toEqual([
+      'render quality must be one of auto, low, mid, high, got "ultra"',
+    ])
+  })
+
   it('refuses a music volume outside 0 to 1', () => {
     expect(preferenceProblems('musicVolume', 0.5)).toEqual([])
     expect(preferenceProblems('musicVolume', 1.5)).toEqual([

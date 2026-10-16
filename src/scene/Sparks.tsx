@@ -38,6 +38,7 @@ import { useDisposeOnRelease } from './disposeOnRelease'
 import { drillPresence } from './drillPresence'
 import { createPoolOrigin, followRenderOrigin } from './localParticles'
 import { renderOriginPresence } from './renderOriginPresence'
+import { renderQualityPresence } from './renderQualityPresence'
 
 /** Sparks draw just in front of the tiles and the vehicle. */
 const SPARK_Z = 0.3
@@ -46,7 +47,7 @@ const SPARK_Z = 0.3
 const drillDirection = { x: 0, y: 0 }
 
 export function Sparks() {
-  const pool = useMemo(() => createParticlePool(SPARK_CAPACITY), [])
+  const pool = useMemo(() => createParticlePool(SPARK_CAPACITY, renderQualityPresence), [])
   const poolOrigin = useMemo(createPoolOrigin, [])
   const random = useMemo(() => createSeededRandom(SPARK_SEED), [])
   const carry = useMemo<EmissionCarry>(() => ({ owed: 0 }), [])

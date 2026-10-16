@@ -4,12 +4,17 @@
  * resolution, and one composite pass adds the bloom, applies the tone curve and the vignette and
  * writes the canvas. Four full-screen draws after the scene, within the 6 #38 allows. The ONLY
  * writer of these render targets; `RenderPipeline` drives it once per frame.
+ *
+ * Without bloom (ticket 477: the quality ladder's last rung, or a GPU with no float colour
+ * targets) only the composite runs, adding nothing; a GPU with no float targets also draws the
+ * scene into an RGBA8 target, losing the light over 1 that bloom would have spread.
  */
 import {
   BufferAttribute,
   BufferGeometry,
   HalfFloatType,
   LinearFilter,
+  UnsignedByteType,
   Mesh,
   OrthographicCamera,
   ShaderMaterial,
@@ -20,6 +25,7 @@ import {
   type WebGLRenderer,
 } from 'three'
 import { BLOOM_STRENGTH, BLOOM_THRESHOLD, TONE_KNEE, VIGNETTE_STRENGTH } from '../constants/scene'
+import type { SceneTarget } from '../systems/render/gpuTier'
 import {
   BLUR_SHADER,
   BRIGHT_PASS_SHADER,
@@ -29,6 +35,7 @@ import {
 
 export interface PostPipeline {
   render(renderer: WebGLRenderer, scene: Scene, camera: Camera): void
+  renderWithoutBloom(renderer: WebGLRenderer, scene: Scene, camera: Camera): void
   dispose(): void
 }
 
@@ -52,10 +59,14 @@ interface Passes {
  */
 const SCENE_SAMPLES = 0
 
-export function createPostPipeline(): PostPipeline {
-  const passes = createPasses()
+const TEXEL_TYPE_OF_TARGET = { half_float: HalfFloatType, rgba8: UnsignedByteType } as const
+
+export function createPostPipeline(sceneTarget: SceneTarget): PostPipeline {
+  const passes = createPasses(sceneTarget)
   return {
     render: (renderer, scene, camera) => renderFrame(passes, renderer, scene, camera),
+    renderWithoutBloom: (renderer, scene, camera) =>
+      renderFrameWithoutBloom(passes, renderer, scene, camera),
     dispose: () => disposePasses(passes),
   }
 }
@@ -65,13 +76,24 @@ function renderFrame(passes: Passes, renderer: WebGLRenderer, scene: Scene, came
   renderScene(passes, renderer, scene, camera)
   extractBrightLight(passes, renderer)
   blurBloom(passes, renderer)
-  composite(passes, renderer)
+  composite(passes, renderer, BLOOM_STRENGTH)
 }
 
-function createPasses(): Passes {
+function renderFrameWithoutBloom(
+  passes: Passes,
+  renderer: WebGLRenderer,
+  scene: Scene,
+  camera: Camera,
+) {
+  fitTargets(passes, renderer)
+  renderScene(passes, renderer, scene, camera)
+  composite(passes, renderer, 0)
+}
+
+function createPasses(target: SceneTarget): Passes {
   const bloomA = halfFloatTarget()
   const bloomB = halfFloatTarget()
-  const sceneTarget = sceneDepthTarget()
+  const sceneTarget = sceneDepthTarget(target)
   return {
     sceneTarget,
     bloomA,
@@ -108,9 +130,9 @@ function halfFloatTarget(): WebGLRenderTarget {
 }
 
 /** The scene's: the parts' draw order is their depth, so it keeps a depth buffer. */
-function sceneDepthTarget(): WebGLRenderTarget {
+function sceneDepthTarget(target: SceneTarget): WebGLRenderTarget {
   return new WebGLRenderTarget(1, 1, {
-    type: HalfFloatType,
+    type: TEXEL_TYPE_OF_TARGET[target],
     minFilter: LinearFilter,
     magFilter: LinearFilter,
     depthBuffer: true,
@@ -173,7 +195,9 @@ function blurBloom(passes: Passes, renderer: WebGLRenderer): void {
   drawFullScreen(passes, renderer, blur, bloomA)
 }
 
-function composite(passes: Passes, renderer: WebGLRenderer): void {
+/** Without bloom the composite adds none of the (stale, or never drawn) bloom target. */
+function composite(passes: Passes, renderer: WebGLRenderer, bloomStrength: number): void {
+  passes.composite.uniforms.uBloomStrength.value = bloomStrength
   drawFullScreen(passes, renderer, passes.composite, null)
 }
 

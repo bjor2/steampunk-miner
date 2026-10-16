@@ -39,6 +39,7 @@ import type { DockSite } from '../systems/world/dockSite'
 import { useDisposeOnRelease } from './disposeOnRelease'
 import { PartQuadMesh } from './PartQuadMesh'
 import { SHIPPED_ART } from './shippedArt'
+import { renderQualityPresence } from './renderQualityPresence'
 
 /** Behind the platform's placeholder shapes, which sit at 0.02; the smoke in front of the bay. */
 const BAY_Z = 0.015
@@ -58,7 +59,7 @@ export function RefineryBay({ site, look }: { site: DockSite; look: RefineryBayL
 }
 
 function StackSmoke({ isRising }: { isRising: boolean }) {
-  const pool = useMemo(() => createParticlePool(REFINERY_SMOKE_CAPACITY), [])
+  const pool = useMemo(() => createParticlePool(REFINERY_SMOKE_CAPACITY, renderQualityPresence), [])
   const random = useMemo(() => createSeededRandom(REFINERY_SMOKE_SEED), [])
   const spray = useMemo(createSmokeSpray, [])
   const carry = useMemo<EmissionCarry>(() => ({ owed: 0 }), [])

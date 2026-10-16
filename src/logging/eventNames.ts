@@ -176,6 +176,26 @@ export const RUN_EVENT_REGISTRY = {
   },
   // Ticket 341 (TD scope g on #316): the hazard strip's sampler moved to another cost tier, 1 exact,
   // 3 lattice or 4 band; the felt speed in whole metres a second and the window in whole metres.
+  // Ticket 477 (TD #470 section 2.2): the startup GPU capability probe, once per renderer, with
+  // the terrain program and the scene target it chose. Presentation only, never read by the sim.
+  gpu_capabilities: {
+    group: 'run',
+    level: 'perf',
+    payload: {
+      textureUnits: 'integer',
+      vertexTextureUnits: 'integer',
+      combinedTextureUnits: 'integer',
+      maxTextureSize: 'integer',
+      fragmentUniformVectors: 'integer',
+      varyingVectors: 'integer',
+      isFragmentHighp: 'flag',
+      hasFloatTargets: 'flag',
+      hasHalfFloatTargets: 'flag',
+      textureFormats: { itemsOf: 'text' },
+      terrainProgram: { oneOf: ['full', 'lite', 'unsupported'] },
+      sceneTarget: { oneOf: ['half_float', 'rgba8'] },
+    },
+  },
   hazard_strip_tier: {
     group: 'run',
     level: 'perf',

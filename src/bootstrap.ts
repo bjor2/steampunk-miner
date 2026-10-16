@@ -20,6 +20,7 @@ import { createRunMetadata } from './logging/runMetadata'
 import { createRunProgressSink, type RunProgressSink } from './logging/runProgress'
 import { watchRapierWasmMemory } from './physics/rapierWasmMemory'
 import { requestCanvasScreenshot } from './scene/canvasScreenshots'
+import { renderPointerPresence } from './scene/renderQualityPresence'
 import { getShell, type Shell } from './shell/shell'
 import { onSoundUnlockChange } from './shell/soundOut'
 import {
@@ -77,6 +78,7 @@ export async function startGame(): Promise<void> {
   keepSavesOnThisDevice(shell)
   await adoptLocalPreferences(shell)
   keepScreenFitted(shell)
+  noteRenderPointer(shell)
   showTouchControlsOnTouch(shell)
   holdPlayWhilePageHidden(shell)
   showWhetherSoundPlays()
@@ -90,6 +92,14 @@ export async function startGame(): Promise<void> {
   applyLaunchScenario(shell)
   startHintsUnlessOnTitle()
   writeMetadata(shell, run)
+}
+
+/**
+ * The render quality's device default (ticket 477: a coarse pointer draws #173's phone cuts) reads
+ * the primary pointer as the game starts, before the scene mounts.
+ */
+function noteRenderPointer(shell: Shell): void {
+  renderPointerPresence.isCoarsePointer = shell.readScreen().isCoarsePointer
 }
 
 function startRunLogging(shell: Shell, startedAt: Date): RunFiles {

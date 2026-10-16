@@ -5,8 +5,9 @@
  *
  * A pool may emit a share of what it is asked for (ticket 477, #173 "particle counts are halved"
  * on phones): it reads its `ParticleShare` live and carries the fractions, so half of a steady
- * rate is exactly half over time and a share of 1 emits every particle. Pools made without one
- * (the blast front, the spray layer's blast debris, the statuses #173 never simplifies) emit all.
+ * rate is exactly half over time and a share of 1 emits every particle. The sparks, the refinery
+ * smoke and the cement spray read the render quality's share; pools made without one (the blast
+ * front, the spray layer, the collapse telegraph's warning dust) emit all.
  */
 import type { SeededRandom } from '../seededRandom'
 

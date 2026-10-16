@@ -2,7 +2,8 @@
  * The perf log (#11: `perf` events only in dev, scenario and debug runs; #38: one sample per
  * second; #121: a memory sample every 10 s). The composition root turns it on for those runs and
  * hands it the page and progress readers; a played release run records none and reads nothing.
- * The hazard strip's tier switches (ticket 341) ride the same switch.
+ * The hazard strip's tier switches (ticket 341) and the GPU capability probe (ticket 477) ride the
+ * same switch.
  * Samples are stamped like every other line, at the authority's tick. Each sample also tells a
  * debug run's snapshots (#123) how the frames and the heap are doing.
  */
@@ -22,7 +23,7 @@ export interface PerfLogSources {
   readRunProgress(): RunProgress
 }
 
-type PerfEventName = 'perf_sample' | 'memory_sample' | 'hazard_strip_tier'
+type PerfEventName = 'perf_sample' | 'memory_sample' | 'hazard_strip_tier' | 'gpu_capabilities'
 
 let sources: PerfLogSources | null = null
 
@@ -45,6 +46,12 @@ export function recordPerfSample(sample: PerfSample): void {
 export function recordHazardStripTier(change: RunEventData<'hazard_strip_tier'>): void {
   if (sources === null) return
   recordStamped('hazard_strip_tier', change)
+}
+
+/** What the renderer's GPU can draw and what that chose, once per renderer (ticket 477). */
+export function recordGpuCapabilities(probe: RunEventData<'gpu_capabilities'>): void {
+  if (sources === null) return
+  recordStamped('gpu_capabilities', probe)
 }
 
 /** `readScene` answers null while the renderer or the physics world is not up. */

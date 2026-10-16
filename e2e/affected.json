@@ -183,7 +183,8 @@
         "e2e/browser/screens/screenLayout.spec.ts",
         "e2e/browser/screens/reviewShots.spec.ts",
         "e2e/browser/magneticPlanet.spec.ts",
-        "e2e/browser/chunkWorker.spec.ts"
+        "e2e/browser/chunkWorker.spec.ts",
+        "e2e/browser/renderQuality.spec.ts"
       ]
     },
     {
@@ -199,6 +200,19 @@
         "src/scene/PlanetTerrain.tsx"
       ],
       "specs": ["e2e/browser/chunkWorker.spec.ts", "e2e/browser/render.spec.ts"]
+    },
+    {
+      "why": "The render quality knob and the GPU capability probe (ticket 477): presets, the ladder, the rate cap, the lite terrain program and the unsupported-device card.",
+      "paths": [
+        "src/scene/RenderPipeline.tsx",
+        "src/scene/renderAdaptation.ts",
+        "src/scene/renderQualityPresence.ts",
+        "src/scene/gpuCapabilities.ts",
+        "src/scene/postPipeline.ts",
+        "src/scene/PlanetSkyBand.tsx",
+        "src/ui/stage/UnsupportedDeviceCard.tsx"
+      ],
+      "specs": ["e2e/browser/renderQuality.spec.ts", "e2e/browser/render.spec.ts"]
     },
     {
       "why": "The memory reads of the debug API and the run log's samples.",
