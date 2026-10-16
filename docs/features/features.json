@@ -2033,6 +2033,12 @@
               "issues": [173, 179]
             },
             {
+              "title": "Tap instead of hover",
+              "description": "Nothing needs a mouse hover or a long press: a tap on an element's text pins its tooltip or item card open (a sheet along the bottom on a short screen), a tap on a shortened amount such as 1.23e149 shows the exact value, HUD statuses say their words beside the icon, and the page never zooms, refreshes or selects text under a finger.",
+              "status": "built",
+              "issues": [476, 470]
+            },
+            {
               "title": "Gamepad",
               "description": "Any standard controller reaches every action: left stick drives and moves menu focus, A docks and confirms, B backs out, Start opens the pause menu, LB with the d-pad zooms, the right-stick click switches the bore gun's auto mode; pad buttons rebind in settings beside the keys, and the right stick aims the bore gun.",
               "status": "partial",
