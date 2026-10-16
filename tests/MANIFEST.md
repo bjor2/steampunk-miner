@@ -868,6 +868,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/input/padCodes.test.ts` | 4 | 4 |
 | `src/systems/input/padFrame.test.ts` | 7 | 7 |
 | `src/systems/input/preferences.test.ts` | 20 | 20 |
+| `src/systems/input/touchBindings.test.ts` | 15 | 15 |
 | `src/systems/input/touchControls.test.ts` | 23 | 16 |
 
 ### `logging`
@@ -1170,7 +1171,8 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/store/runSnapshots.test.ts` | 10 | 10 |
 | `src/store/sliceRun.test.ts` | 7 | 7 |
 | `src/store/titleMenu.test.ts` | 9 | 9 |
-| `src/store/touchRuntime.test.ts` | 16 | 15 |
+| `src/store/touchReplay.test.ts` | 2 | 2 |
+| `src/store/touchRuntime.test.ts` | 17 | 16 |
 | `src/store/worldSaveOwnership.test.ts` | 7 | 7 |
 
 ### `systems-core`
@@ -1283,7 +1285,9 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/ui/projection/worldToScreen.test.ts` | 7 | 5 |
 | `src/ui/screenIds.test.ts` | 4 | 4 |
 | `src/ui/screens/sliceScreen.test.ts` | 8 | 8 |
-| `src/ui/touch/touchSlots.test.ts` | 3 | 3 |
+| `src/ui/touch/touchBindingTiles.test.ts` | 11 | 11 |
+| `src/ui/touch/touchCoverage.test.ts` | 10 | 5 |
+| `src/ui/touch/touchFunnel.test.ts` | 1 | 1 |
 | `src/ui/uiBudget.test.ts` | 2 | 2 |
 
 ### `unlocks`
