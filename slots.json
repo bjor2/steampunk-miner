@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-10-16T11:19:14+01:00",
+  "updated_at": "2026-10-16T11:26:26+01:00",
   "caps": {
     "grok": 12,
     "claude": 10,
@@ -71,7 +71,7 @@
       "size": 6,
       "used": 2,
       "free": 4,
-      "claims_last_hour": 6,
+      "claims_last_hour": 5,
       "name": "Claude Max 1"
     },
     {
@@ -79,7 +79,7 @@
       "account": 2,
       "label": "Claude Max 2",
       "enabled": false,
-      "reason": "signed in, but the claude -p ping failed",
+      "reason": "not signed in",
       "slots": [
         {
           "slot": "C7",
@@ -738,7 +738,7 @@
       "ticket": null,
       "grok_slot": null,
       "since": null,
-      "reason": "signed in, but the claude -p ping failed",
+      "reason": "not signed in",
       "account": 2
     },
     {
@@ -747,7 +747,7 @@
       "ticket": null,
       "grok_slot": null,
       "since": null,
-      "reason": "signed in, but the claude -p ping failed",
+      "reason": "not signed in",
       "account": 2
     },
     {
@@ -756,7 +756,7 @@
       "ticket": null,
       "grok_slot": null,
       "since": null,
-      "reason": "signed in, but the claude -p ping failed",
+      "reason": "not signed in",
       "account": 2
     },
     {
@@ -765,16 +765,16 @@
       "ticket": null,
       "grok_slot": null,
       "since": null,
-      "reason": "signed in, but the claude -p ping failed",
+      "reason": "not signed in",
       "account": 2
     }
   ],
   "last_refill": {
-    "at": "2026-10-16 11:19 BST",
+    "at": "2026-10-16 11:26 BST",
     "mode": "refill-dev",
-    "triggers": "#489",
+    "triggers": "claude-run:wave-plan",
     "started": "",
-    "note": "load guard (1-min load 25.39 > 14)"
+    "note": "load guard (1-min load 67.26 > 14)"
   },
   "totals": {
     "grok": {
@@ -797,6 +797,21 @@
     "mode": "on",
     "parallel": 1,
     "list": [
+      {
+        "number": 498,
+        "key": "4B",
+        "map": 302,
+        "lane": "remote",
+        "mode": "solo",
+        "state": "blocked",
+        "tickets": [
+          450,
+          451,
+          454
+        ],
+        "done": [],
+        "live": 0
+      },
       {
         "number": 497,
         "key": "1E",
@@ -843,7 +858,7 @@
       },
       {
         "number": 490,
-        "key": "3E",
+        "key": "3A",
         "map": 302,
         "lane": "remote",
         "mode": "solo",
@@ -855,29 +870,13 @@
         "live": 0
       },
       {
-        "number": 469,
-        "key": "4A",
-        "map": 302,
-        "lane": "hitl",
-        "mode": "bench",
-        "state": "bench",
-        "tickets": [
-          441
-        ],
-        "done": [],
-        "live": 0
-      },
-      {
         "number": 468,
         "key": "3C",
         "map": 302,
         "lane": "remote",
         "mode": "solo",
-        "state": "blocked",
+        "state": "ready",
         "tickets": [
-          446,
-          448,
-          466,
           471
         ],
         "done": [],
@@ -885,14 +884,12 @@
       },
       {
         "number": 467,
-        "key": "3A",
+        "key": "3D",
         "map": 302,
         "lane": "remote",
         "mode": "solo",
         "state": "ready",
         "tickets": [
-          397,
-          459,
           491,
           492
         ],
@@ -901,17 +898,16 @@
       },
       {
         "number": 461,
-        "key": "3D",
+        "key": "4A",
         "map": 302,
         "lane": "remote",
         "mode": "solo",
         "state": "blocked",
         "tickets": [
+          446,
+          448,
           449,
-          453,
-          450,
-          451,
-          454
+          453
         ],
         "done": [],
         "live": 0
@@ -946,6 +942,7 @@
           307,
           308,
           417,
+          441,
           460,
           470
         ],
