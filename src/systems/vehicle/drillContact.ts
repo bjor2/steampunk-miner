@@ -23,7 +23,8 @@ import type { TilePoint } from '../world/tileGrid'
 import { CELL_KIND, kindOfCell } from '../world/worldCell'
 import type { IntegerVector } from './vehiclePose'
 
-const HALF_BODY_MM = (VEHICLE_COLLIDER_SIZE * 1000) / 2
+/** Half the body's box, mm: its face this far ahead of the centre, its wheel line as far below. */
+export const HALF_BODY_MM = (VEHICLE_COLLIDER_SIZE * 1000) / 2
 /**
  * How far past the face ground counts as in the way, mm. Placeholder, tuned by hand; with the
  * swept cut it widens to the step the rig may take while it cuts (`inTheWayMmOf`, ticket 334).
