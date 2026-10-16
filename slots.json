@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-10-16T20:33:21+01:00",
+  "updated_at": "2026-10-16T20:40:15+01:00",
   "caps": {
     "grok": 12,
     "claude": 10,
@@ -714,11 +714,11 @@
     }
   ],
   "last_refill": {
-    "at": "2026-10-16 20:14 BST",
+    "at": "2026-10-16 20:40 BST",
     "mode": "refill-dev",
-    "triggers": "#485",
+    "triggers": "claude-run:wave-plan",
     "started": "",
-    "note": "load guard (1-min load 27.47 > 14)"
+    "note": "load guard (1-min load 16.38 > 14)"
   },
   "totals": {
     "grok": {
@@ -741,6 +741,33 @@
     "mode": "on",
     "parallel": 1,
     "list": [
+      {
+        "number": 518,
+        "key": "2C",
+        "map": 316,
+        "lane": "remote",
+        "mode": "solo",
+        "state": "ready",
+        "tickets": [
+          515
+        ],
+        "done": [],
+        "live": 0
+      },
+      {
+        "number": 517,
+        "key": "2B",
+        "map": 316,
+        "lane": "remote",
+        "mode": "solo",
+        "state": "ready",
+        "tickets": [
+          514,
+          516
+        ],
+        "done": [],
+        "live": 0
+      },
       {
         "number": 513,
         "key": "2A",
