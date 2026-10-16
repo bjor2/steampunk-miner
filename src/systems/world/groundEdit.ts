@@ -44,6 +44,7 @@ import {
   type GroundEdit,
 } from './groundEditSession'
 import { effectiveCasingGrade } from './chunkDelta'
+import { dwellRemovalOf, type SampleDwell } from './rimDwell'
 import type { PlanetParams } from './planetParams'
 import { SOLID_DENSITY } from './sampleGrid'
 import type { TilePoint } from './tileGrid'
@@ -60,6 +61,12 @@ export interface CarveWindow {
    * `DRILL_SUBSTEPS_PER_TICK` for the swept cut (ticket 330).
    */
   subStepsPerTick?: number
+  /**
+   * The swept cut's rim dwell (ticket 441, `rimDwell.ts`): each sample is charged only the work
+   * spent while the stamp's centre stood within its radius. Absent, every sample the stamp touches
+   * is charged the whole window.
+   */
+  dwellAt?: SampleDwell
 }
 
 /**
@@ -264,6 +271,7 @@ function carveOneSample(
   if (!isCarvable(session, sample)) return 0
   const drillTicks = drillTicksOfSample(session, sample, drillTicksOf)
   if (drillTicks === null) return 0
+  if (window.dwellAt !== undefined) return carveByDwell(session, sample, window, drillTicks)
   const rate = {
     perTick: SOLID_DENSITY * sample.weight * (window.subStepsPerTick ?? 1),
     per: FULL_WEIGHT * drillTicks,
@@ -273,6 +281,20 @@ function carveOneSample(
   if (removal === 0) return 0
   lowerSample(session, sample, removal)
   return ticksToRemove(rate, window.firstTick, removal)
+}
+
+/** Carves one sample by its rim dwell; answers the window's ticks when it removed anything. */
+function carveByDwell(
+  session: EditSession,
+  sample: WeightedSample,
+  window: CarveWindow,
+  drillTicks: number,
+): number {
+  const left = Math.max(0, densityOf(session, sample) - sample.floor)
+  const removal = Math.min(left, dwellRemovalOf(sample, window, drillTicks))
+  if (removal === 0) return 0
+  lowerSample(session, sample, removal)
+  return window.ticks
 }
 
 /** Lowers a sample's density; a lined sample cut to density 0 loses its casing (#41). */

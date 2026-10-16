@@ -119,6 +119,17 @@ export function isWithinStampAt(disc: DiscStamp, sx: number, sy: number): boolea
   return falloffStepAt(disc, sx, sy) !== OUTSIDE
 }
 
+/**
+ * The falloff weight a bare disc of `radiusMm` centred at `centre` gives the sample at `(sx, sy)`,
+ * level floor aside: 0 past its radius (the swept cut's rim dwell, ticket 441).
+ */
+export function discWeightAt(centre: StampPoint, radiusMm: number, sx: number, sy: number): number {
+  const dx = sx * MM_PER_SAMPLE - centre.xMm
+  const dy = sy * MM_PER_SAMPLE - centre.yMm
+  const step = stepOfDistanceSq(dx, dy, radiusMm * radiusMm)
+  return step === OUTSIDE ? 0 : FALLOFF[step]
+}
+
 function falloffStepAt(disc: DiscStamp, sx: number, sy: number): number {
   if (isCapsule(disc)) return falloffStepFromSegment(disc, disc.tail, sx, sy)
   const radiusSq = disc.radiusMm * disc.radiusMm
