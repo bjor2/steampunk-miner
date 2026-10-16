@@ -1,9 +1,9 @@
 {
-  "updated_at": "2026-10-16T08:22:54+02:00",
+  "updated_at": "2026-10-16T08:33:17+02:00",
   "caps": {
     "grok": 12,
     "claude": 10,
-    "claude_enabled": 6,
+    "claude_enabled": 0,
     "dev": 8,
     "planner": 4,
     "gate": 3,
@@ -14,8 +14,8 @@
       "id": "A1",
       "account": 1,
       "label": "Claude Max 1",
-      "enabled": true,
-      "reason": "signed in",
+      "enabled": false,
+      "reason": "not signed in",
       "slots": [
         {
           "slot": "C1",
@@ -64,7 +64,7 @@
         },
         {
           "slot": "C6",
-          "state": "free",
+          "state": "disabled",
           "ticket": null,
           "grok_slot": null,
           "kind": null,
@@ -73,8 +73,8 @@
       ],
       "size": 6,
       "used": 5,
-      "free": 1,
-      "claims_last_hour": 14,
+      "free": 0,
+      "claims_last_hour": 11,
       "name": "Claude Max 1"
     },
     {
@@ -82,7 +82,7 @@
       "account": 2,
       "label": "Claude Max 2",
       "enabled": false,
-      "reason": "signed in, but the claude -p ping failed",
+      "reason": "not signed in",
       "slots": [
         {
           "slot": "C7",
@@ -746,10 +746,11 @@
     },
     {
       "slot": 6,
-      "state": "free",
+      "state": "disabled",
       "ticket": null,
       "grok_slot": null,
       "since": null,
+      "reason": "not signed in",
       "account": 1
     },
     {
@@ -758,7 +759,7 @@
       "ticket": null,
       "grok_slot": null,
       "since": null,
-      "reason": "signed in, but the claude -p ping failed",
+      "reason": "not signed in",
       "account": 2
     },
     {
@@ -767,7 +768,7 @@
       "ticket": null,
       "grok_slot": null,
       "since": null,
-      "reason": "signed in, but the claude -p ping failed",
+      "reason": "not signed in",
       "account": 2
     },
     {
@@ -776,7 +777,7 @@
       "ticket": null,
       "grok_slot": null,
       "since": null,
-      "reason": "signed in, but the claude -p ping failed",
+      "reason": "not signed in",
       "account": 2
     },
     {
@@ -785,7 +786,7 @@
       "ticket": null,
       "grok_slot": null,
       "since": null,
-      "reason": "signed in, but the claude -p ping failed",
+      "reason": "not signed in",
       "account": 2
     }
   ],
@@ -807,9 +808,9 @@
     },
     "claude": {
       "size": 10,
-      "enabled": 6,
+      "enabled": 0,
       "used": 5,
-      "free": 1,
+      "free": 0,
       "external": 0
     }
   },
