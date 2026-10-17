@@ -1017,6 +1017,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/physics/postCutHalo.test.ts` | 9 | 3 |
 | `src/physics/storedLevelReleaseTrace.lane.test.ts` | 2 | 2 |
 | `src/physics/strutColliders.test.ts` | 4 | 4 |
+| `src/physics/sweptCoreCrossing.lane.test.ts` | 7 | 4 |
 | `src/physics/sweptCutPace.test.ts` | 5 | 2 |
 | `src/physics/sweptCutPaceWindow.lane.test.ts` | 3 | 3 |
 | `src/physics/sweptFreshCarveLoop.test.ts` | 3 | 3 |
@@ -1398,7 +1399,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/vehicle/casingTrailReversal.test.ts` | 36 | 5 |
 | `src/systems/vehicle/chargeSelection.test.ts` | 4 | 4 |
 | `src/systems/vehicle/colliderHalo.test.ts` | 3 | 3 |
-| `src/systems/vehicle/cutFollowMotion.test.ts` | 15 | 15 |
+| `src/systems/vehicle/cutFollowMotion.test.ts` | 19 | 19 |
 | `src/systems/vehicle/cutGate.test.ts` | 8 | 8 |
 | `src/systems/vehicle/cutStartBreakdown.test.ts` | 4 | 4 |
 | `src/systems/vehicle/drillContact.test.ts` | 8 | 8 |
