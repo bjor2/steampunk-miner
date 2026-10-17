@@ -1502,4 +1502,4 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/world/sweptSpan.test.ts` | 6 | 6 |
 | `src/systems/world/worldCell.test.ts` | 8 | 8 |
 | `src/systems/world/worldExactMathLint.test.ts` | 15 | 3 |
-| `src/systems/world/worldState.test.ts` | 1 | 1 |
+| `src/systems/world/worldState.test.ts` | 2 | 2 |
