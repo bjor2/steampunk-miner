@@ -350,6 +350,25 @@ function lowerSample(
   if (densityOf(session, sample) === 0) clearCasingSample(session, sample)
 }
 
+/**
+ * Tallies the law work of clearing what is left of a sample, whatever its drill time, when the
+ * window names a law time (ticket 540): a swept tick's paid cell is cleared in full outside the
+ * stamp's walk (`paidCellClear.ts`), and its law work is what the swept cut is charged on. Read at
+ * the sample's casing grade as it stands, before the clear; the law time alone is read, so no
+ * drill time or gate is asked and nothing is tallied without one.
+ */
+export function tallyClearedLawWork(
+  session: EditSession,
+  sample: WeightedSample,
+  window: CarveWindow,
+): void {
+  if (window.lawTimeOf === undefined) return
+  const grade = effectiveCasingGrade(casingGradeOf(session, sample))
+  const material = materialOfSample(session, sample)
+  const lawTime = window.lawTimeOf(tileOfSample(sample), material, grade) ?? 0
+  session.lawWork += densityOf(session, sample) * lawTime
+}
+
 /** `floor(a (T0 + k) / b) - floor(a T0 / b)`: the rate's removal over the window. */
 function removalOver(rate: { perTick: number; per: number }, window: CarveWindow): number {
   const before = Math.floor((rate.perTick * window.firstTick) / rate.per)

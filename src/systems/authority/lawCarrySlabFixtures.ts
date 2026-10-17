@@ -10,7 +10,9 @@
  * - `swept`: a `drillStep` every tick and a pose report every 12 (the cut by steps, the reference);
  * - `exact @12` and `exact @1`: the report cut with the charge on, a report every 12 ticks or every
  *   tick carrying that many drill and drive ticks;
- * - `main @12` and `main @1`: the same reports with the charge off, protocol 84's player path.
+ * - `main @12` and `main @1`: the same reports with the charge off, protocol 84's player path;
+ * - `swept law` (ticket 540, never in `SLAB_PATHS`): `swept`'s commands with the authority's
+ *   `drill.sweptLawCharge` on, the swept cut charged on the law work it removed.
  *
  * Read per run: the law work from the ground (every cell's density removed times its law time at
  * the rig's drill, `cutCarryFixtures.ts`), the drill energy (the tank's fall less the reports'
@@ -33,13 +35,15 @@ import { statsOfVehicle, type VehicleState } from '../vehicle/vehicleState'
 import { CHUNK_SIZE, type TilePoint } from '../world/tileGrid'
 import type { WorldState } from '../world/worldState'
 import type { CommandIntent } from './authorityCommand'
-import type { AuthorityState } from './authorityState'
+import { vehicleOf, type AuthorityState } from './authorityState'
 import { setCasingGradeCommand } from './casingDebugCommands'
 import {
   brokenCellsOf,
   cutEnergyNumeratorOf,
+  lawWorkOfGroundChanges,
   lawWorkRemovedOf,
   withDrillExactCarry,
+  withSweptLawCharge,
 } from './cutCarryFixtures'
 import type { DomainEvent } from './domainEvent'
 import { settleableHeatTicksOf } from './heatCapReadings'
@@ -53,7 +57,7 @@ import {
 import { stepBoundsAt } from './stepBoundRead'
 import { isCutBySteps } from './sweptDrill'
 
-export type SlabPath = 'swept' | 'exact @12' | 'exact @1' | 'main @12' | 'main @1'
+export type SlabPath = 'swept' | 'swept law' | 'exact @12' | 'exact @1' | 'main @12' | 'main @1'
 export const SLAB_PATHS: readonly SlabPath[] = [
   'swept',
   'exact @12',
@@ -71,6 +75,10 @@ export interface SlabTrack {
   section: SlabSection
   /** The stride of the pose list, mm a tick: the rig's speed. */
   strideMm: number
+  /** How far the track runs, mm: the section's own length when absent (short unit rows, #540). */
+  lengthMm?: number
+  /** The lining grade laid behind the drill: `CASING_GRADE` when absent, 0 for an unlined row. */
+  casingGrade?: number
 }
 
 /** What one path read cutting one track with one rig. */
@@ -78,13 +86,23 @@ export interface SlabRun {
   ticks: number
   metres: number
   lawWork: number
+  /**
+   * The law work read command by command (`lawWorkOfGroundChanges`), each sample at its casing
+   * grade as it stood before the command: `lawWork` with lining the run laid and cut again priced
+   * at its grade (ticket 540), the reference of the swept law rows.
+   */
+  lawWorkCut: number
   /** The hardest cell the run cut, in law work: one cell, the bars' quantum. */
   oneCellLaw: number
   energy: number
+  /** The energy carry the vehicle ends on, in the carry's numerator (`vehicle/cutCarry.ts`). */
+  energyCarry: number
   heatTicks: number
   /** The drill ticks the #113 rule could settle of `heatTicks`: each report's, capped at its elapsed ticks. */
   settleableHeatTicks: number
   broken: TilePoint[]
+  /** The lining samples the cut cleared, from its `CasingDrilled` events (#540's lining rows). */
+  casingSamples: number
   rejections: number
   /** Each distinct refusal, `type: reason` with the command's tick, for the report. */
   refusals: string[]
@@ -133,7 +151,7 @@ function frameOf(track: SlabTrack): Frame {
 
 /** The ticks the track lasts at its stride: at least 1. */
 export function slabTicksOf(track: SlabTrack): number {
-  return Math.max(1, Math.floor(LENGTH_MM[track.section] / track.strideMm))
+  return Math.max(1, Math.floor((track.lengthMm ?? LENGTH_MM[track.section]) / track.strideMm))
 }
 
 /** The stride of a rig cutting band-1 rock at `subSteps` a cell: 60 / n cells a tick. */
@@ -220,24 +238,35 @@ function stepOf(frame: Frame, at: { x: number; y: number }): CommandIntent<'dril
 function commandsOf(path: SlabPath, frame: Frame, to: { x: number; y: number }, tick: number) {
   if (path === 'exact @1' || path === 'main @1') return [reportOf(frame, to, 1)]
   const report = tick % REPORT_EVERY === 0 ? [reportOf(frame, to, REPORT_EVERY)] : []
-  if (path === 'swept') return [stepOf(frame, to), ...report]
+  if (isSweptPath(path)) return [stepOf(frame, to), ...report]
   return report
+}
+
+function isSweptPath(path: SlabPath): boolean {
+  return path === 'swept' || path === 'swept law'
 }
 
 function isChargeOn(path: SlabPath): boolean {
   return path !== 'main @12' && path !== 'main @1'
 }
 
-/** Runs `play` with the authority's `drill.exactCarry` as `path` wants it, put back after. */
+/**
+ * Runs `play` with the authority's `drill.exactCarry` as `path` wants it, and its
+ * `drill.sweptLawCharge` on for `swept law` alone, both put back after.
+ */
 function withChargeOf<T>(path: SlabPath, play: () => T): T {
-  return withDrillExactCarry(isChargeOn(path), play)
+  return withDrillExactCarry(isChargeOn(path), () => withSweptLawCharge(path === 'swept law', play))
 }
 
 /** A fresh rig of `levels` on planet 1, enemies frozen, the tank bottomless, at the track's start. */
-function sessionAtStart(levels: Record<string, number>, frame: Frame): ScriptedSession {
+function sessionAtStart(
+  levels: Record<string, number>,
+  frame: Frame,
+  casingGrade = CASING_GRADE,
+): ScriptedSession {
   const session = rigSession(levels)
   session.submit(0, FREEZE_ENEMIES)
-  session.submit(0, setCasingGradeCommand(CASING_GRADE))
+  session.submit(0, setCasingGradeCommand(casingGrade))
   session.submit(0, refillOf(session.vehicle()))
   session.submit(0, reportOf(frame, frame.start, 0))
   return session
@@ -253,7 +282,9 @@ interface RunTally {
   energy: number
   heatTicks: number
   settleableHeatTicks: number
+  lawWorkCut: number
   broken: TilePoint[]
+  casingSamples: number
   rejections: number
   refusals: string[]
 }
@@ -262,13 +293,15 @@ interface RunTally {
 export function cutSlab(track: SlabTrack, path: SlabPath, levels: Record<string, number>): SlabRun {
   return withChargeOf(path, () => {
     const frame = frameOf(track)
-    const session = sessionAtStart(levels, frame)
+    const session = sessionAtStart(levels, frame, track.casingGrade)
     const start = session.state()
     const tally: RunTally = {
       energy: 0,
       heatTicks: 0,
       settleableHeatTicks: 0,
+      lawWorkCut: 0,
       broken: [],
+      casingSamples: 0,
       rejections: 0,
       refusals: [],
     }
@@ -292,16 +325,18 @@ function noteCommand(
   command: CommandIntent,
   path: SlabPath,
 ): void {
+  const was = session.state()
   const before = session.vehicle()
   const movement = command.type === 'reportPose' ? command.payload.driveTicks : 0
-  const heatBefore = command.type === 'reportPose' ? heatTicksBeforeOf(before, command, path) : 0
   const events = session.submit(tick, command)
   const after = session.vehicle()
-  const fed = heatBefore + carriedHeatTicksOf(before, after, movement, path)
+  const fed = fedHeatTicksOf(before, after, command, path)
   tally.energy += before.energy - after.energy - movement * ENERGY_QUANTA_PER_TICK.drive
   tally.heatTicks += fed
   tally.settleableHeatTicks += settleableHeatTicksOf(fed, elapsedTicksOf(before, after))
+  tally.lawWorkCut += lawWorkOfGroundChanges(was, session.state().world, events)
   tally.broken.push(...brokenCellsOf(events))
+  tally.casingSamples += casingSamplesOf(events)
   tally.rejections += events.filter(isRejection).length
   tally.refusals.push(...events.filter(isRejection).map((event) => refusalTextOf(event, command)))
 }
@@ -315,6 +350,25 @@ function refusalTextOf(event: DomainEvent, command: CommandIntent): string {
   const reason =
     event.type === 'CommandRejected' ? `${event.reason}: ${event.problems.join('; ')}` : ''
   return `${command.type} at tick ${event.tick}, ${reason}`
+}
+
+/**
+ * The drill ticks a command fed the gauge: a report's, read before and after its cut; a
+ * `drillStep` feeds none (its dig time waits on the cursor for the next report), so the charge a
+ * step pays is never read as heat (ticket 540: the swept rows once read a step after a report as
+ * a charged report's carry).
+ */
+function fedHeatTicksOf(
+  before: VehicleState,
+  after: VehicleState,
+  command: CommandIntent,
+  path: SlabPath,
+): number {
+  if (command.type !== 'reportPose') return 0
+  const movement = command.payload.driveTicks
+  return (
+    heatTicksBeforeOf(before, command, path) + carriedHeatTicksOf(before, after, movement, path)
+  )
 }
 
 /**
@@ -350,6 +404,13 @@ function carriedHeatTicksOf(
   return Math.round(heated / LAW_WORK_PER_DRILL_TICK)
 }
 
+function casingSamplesOf(events: readonly DomainEvent[]): number {
+  return events.reduce(
+    (samples, event) => samples + (event.type === 'CasingDrilled' ? event.samples : 0),
+    0,
+  )
+}
+
 function isRejection(event: DomainEvent): boolean {
   return event.type === 'CommandRejected'
 }
@@ -366,11 +427,14 @@ function runOf(start: AuthorityState, end: AuthorityState, tally: RunTally, trac
     ticks: slabTicksOf(track),
     metres: (track.strideMm * slabTicksOf(track)) / MM_PER_METRE,
     lawWork,
+    lawWorkCut: tally.lawWorkCut,
     oneCellLaw,
     energy: tally.energy,
+    energyCarry: vehicleOf(end, 'p1').cutEnergyCarry ?? 0,
     heatTicks: tally.heatTicks,
     settleableHeatTicks: tally.settleableHeatTicks,
     broken: tally.broken,
+    casingSamples: tally.casingSamples,
     rejections: tally.rejections,
     refusals: [...new Set(tally.refusals)].slice(0, 3),
     chunks: chunksTextOf(end.world),

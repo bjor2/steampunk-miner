@@ -1,6 +1,5 @@
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs'
 import { afterAll, describe, expect, it } from 'vitest'
-import { onCurveSteps } from '../economy/vehicleStats'
 import {
   droppedHeatShareOf,
   gaugeRatchetOf,
@@ -27,6 +26,7 @@ import {
   type SlabTilt,
   type SlabTrack,
 } from './lawCarrySlabFixtures'
+import { LADDER_RIGS, SPEED_RIGS } from './lawSlabRigs'
 
 // The reference rows of the report cut's charge on density removed (ticket 535, A6: the TD shape
 // 6228682000 as VS 6228674086 and the GD 6228674068 ruled the reference, the TD's geometry
@@ -58,27 +58,6 @@ import {
 // (#514's geometry bars). A lane: it runs only when named, prints the table and writes
 // balance-report/law-carry-slab.ndjson.
 
-const RIG_SAFETY = { hull: 5000, cargo_hold: 5000 }
-/** VS's rows (`physics/exactCarry.lane.test.ts`): rigs named by their band-1 cut speed. */
-const SPEED_RIGS: Readonly<Record<string, { levels: Record<string, number>; speedMps: number }>> = {
-  '25 m/s': {
-    levels: { drill_power: 250, drill_tip: 600, engine: 5000, ...RIG_SAFETY },
-    speedMps: 25,
-  },
-  '44 m/s': { levels: { drill_power: 300, drill_tip: 200, ...RIG_SAFETY }, speedMps: 44 },
-  '240 m/s': { levels: { drill_power: 450, drill_tip: 600, ...RIG_SAFETY }, speedMps: 240 },
-  '3600 m/s': { levels: { drill_power: 2000, drill_tip: 600, ...RIG_SAFETY }, speedMps: 3600 },
-}
-/** Systems' ladder, stored as the loop lane stores it; its pose list moves at the rig's law speed. */
-const P200 = onCurveSteps(200)
-const LADDER_RIGS: Readonly<Record<string, Record<string, number>>> = {
-  'stored 1': { drill_power: 1, drill_tip: 0, ...RIG_SAFETY },
-  'stored 10': { drill_power: 10, drill_tip: 0, ...RIG_SAFETY },
-  'stored 20': { drill_power: 20, drill_tip: 0, ...RIG_SAFETY },
-  'stored 50': { drill_power: 50, drill_tip: 0, ...RIG_SAFETY },
-  'stored 100': { drill_power: 100, drill_tip: 0, ...RIG_SAFETY },
-  'stored 200': { drill_power: P200.drill_power, drill_tip: P200.drill_tip, ...RIG_SAFETY },
-}
 const TILTS: readonly SlabTilt[] = ['flat', 'tilted']
 const SECTIONS: readonly SlabSection[] = ['level', 'down']
 const CHARGED_PATHS = ['exact @12', 'exact @1'] as const

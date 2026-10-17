@@ -3,9 +3,10 @@
  * a paid cell never stays standing, whatever its drill time against the tick. Its 16 samples are
  * lowered to nothing in the same edit as the stamp, ahead of it and in walk order, so the cells
  * the cut crosses yield in the order it crosses them; lining in them is cleared with them (#41).
- * The dock pad and lava never carve, as everywhere.
+ * The dock pad and lava never carve, as everywhere. With a law time in the window (ticket 540) the
+ * clear tallies its law work as the stamp's carve does, so the swept cut is charged on all it removed.
  */
-import type { StampWalk } from './groundEdit'
+import { tallyClearedLawWork, type CarveWindow, type StampWalk } from './groundEdit'
 import {
   clearCasingSample,
   densityOf,
@@ -19,16 +20,21 @@ import type { TilePoint } from './tileGrid'
 /** `walk` after the paid cells are cleared; the tick counts as used when either removed anything. */
 export function clearingPaidCellsFirst(paid: readonly TilePoint[], walk: StampWalk): StampWalk {
   return (session, disc, window, drillTicksOf) => {
-    const cleared = clearCellsInFull(session, paid) ? window.ticks : 0
+    const cleared = clearCellsInFull(session, paid, window) ? window.ticks : 0
     return Math.max(cleared, walk(session, disc, window, drillTicksOf))
   }
 }
 
 /** Whether clearing the cells removed anything. */
-function clearCellsInFull(session: EditSession, tiles: readonly TilePoint[]): boolean {
+function clearCellsInFull(
+  session: EditSession,
+  tiles: readonly TilePoint[],
+  window: CarveWindow,
+): boolean {
   let isAnyRemoved = false
   for (const sample of tiles.flatMap(cellSamplesOf)) {
     if (!isCarvable(session, sample) || densityOf(session, sample) === 0) continue
+    tallyClearedLawWork(session, sample, window)
     editSample(session, sample, () => 0)
     clearCasingSample(session, sample)
     isAnyRemoved = true

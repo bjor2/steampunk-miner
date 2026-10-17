@@ -24,6 +24,8 @@
  * as before, but is charged on the density it removed at each cell's law time, the swept price,
  * with the part under a quantum carried on the vehicle (`LAW_WORK_CLOCK`, `vehicle/cutCarry.ts`):
  * scripted and reported drills then cut the same for the same ticks but no longer charge the same.
+ * Behind the authority dev flag `drill.sweptLawCharge` (ticket 540) the swept cut is charged that
+ * way too, on the same sub-step carve (`LAW_SUB_STEP_CLOCK`), its energy alone.
  */
 import { DRILL_SUBSTEPS_PER_TICK } from '../../constants/balance'
 import { casingHardness } from '../economy/casingGrades'
@@ -33,7 +35,7 @@ import { pickedUpUnitOf, type PickedUp, type PickupFind } from '../registries/or
 import { drillDamage, subStepsPerTile, ticksPerTile, type DrillStats } from '../vehicle/drillRule'
 import { drillStampOf } from '../vehicle/drillStamp'
 import { ENERGY_QUANTA_PER_TICK } from '../vehicle/energyQuanta'
-import { payLawWork, type LawWorkTally } from '../vehicle/cutCarry'
+import { payLawWork, payLawWorkEnergy, type LawWorkTally } from '../vehicle/cutCarry'
 import type { AheadLatch } from '../vehicle/aheadBearingLatch'
 import type { DriveSigns } from '../vehicle/driveSigns'
 import type { SideLatch } from '../vehicle/facedSide'
@@ -128,6 +130,20 @@ export const LAW_WORK_CLOCK: DrillClock = {
   lawTimesOf: drillSubStepsOfCells,
   chargeOf: (carved, _cellTimes, vehicle) =>
     payLawWork(vehicle, lawWorkTallyOf(carved), vehicle.energy),
+}
+
+/**
+ * The swept cut charged on the law work it removed (ticket 540, the TD seam 6234992964 as VS
+ * 6234998337 confirmed it, Systems' ruling 6231144515): the carve, its sub-steps and cell times
+ * are `SUB_STEP_CLOCK`'s, so it cuts byte for byte as the shipped swept cut, but its window names
+ * the law time and the tally is paid as A6 pays the report's (`LAW_WORK_CLOCK`), its energy alone:
+ * the swept cut heats from its steps' summed dig time, so the heat carry is never written.
+ */
+export const LAW_SUB_STEP_CLOCK: DrillClock = {
+  ...SUB_STEP_CLOCK,
+  lawTimesOf: drillSubStepsOfCells,
+  chargeOf: (carved, _cellTimes, vehicle) =>
+    payLawWorkEnergy(vehicle, lawWorkTallyOf(carved), vehicle.energy),
 }
 
 /** The ticks the stamp still removed something in, at the drill's rate, and its gear's cells. */

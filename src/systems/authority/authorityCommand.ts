@@ -327,8 +327,15 @@ import type { DriveSigns } from '../vehicle/driveSigns'
  *    unchanged. With the flag off every digest is protocol 84's. A command log recorded under 84
  *    or earlier is compared and replayed under its own number. A run with no report that drills
  *    moves no digest.
+ * 86: the swept cut is charged on the law work it removed (ticket 540, Systems' ruling 6231144515,
+ *    the TD seam 6234992964 as VS 6234998337 and the GD confirmed it; behind the authority dev flag
+ *    `drill.sweptLawCharge`, off): a `drillStep`'s carve, the same sub-step carve byte for byte,
+ *    tallies each sample it removes and each paid cell it clears at its cell's law time, and is
+ *    charged as A6 charges a report (`payLawWorkEnergy`), on the vehicle's one energy carry, where
+ *    it charged each broken cell its own dig energy; its heat is unchanged. With the flag off, or
+ *    with no drill step sent (`drill.sweptCut` off), every digest is protocol 85's.
  */
-export const AUTHORITY_PROTOCOL_VERSION = 85
+export const AUTHORITY_PROTOCOL_VERSION = 86
 
 /** The kernel's own commands: the closed set its rule tables are written against. */
 export interface KernelCommandPayloads {

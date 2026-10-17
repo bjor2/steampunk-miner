@@ -107,7 +107,8 @@ describe('cut carry, energy only (ticket 540)', () => {
   })
 
   it('never writes the heat carry, which nothing on the swept path drains', () => {
-    const paid = payLawWorkEnergy({}, wholeShare(LAW_WORK_PER_DRILL_TICK * 3 + 17), FULL_TANK)
+    const fresh: { cutEnergyCarry?: number; cutHeatCarry?: number } = {}
+    const paid = payLawWorkEnergy(fresh, wholeShare(LAW_WORK_PER_DRILL_TICK * 3 + 17), FULL_TANK)
     expect(paid.vehicle.cutHeatCarry).toBeUndefined()
     const kept = payLawWorkEnergy({ cutHeatCarry: 9 }, wholeShare(5), FULL_TANK)
     expect(kept.vehicle.cutHeatCarry).toBe(9)

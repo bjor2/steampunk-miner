@@ -15,7 +15,7 @@ import type { WeightedSample } from '../world/stampShape'
 import { effectiveCasingGrade } from '../world/chunkDelta'
 import { casingGradeOf, densityOf, openSession } from '../world/groundEditSession'
 import { SAMPLES_PER_TILE } from '../world/sampleGrid'
-import type { TilePoint } from '../world/tileGrid'
+import { CHUNK_SIZE, type TilePoint } from '../world/tileGrid'
 import { materialCellAt, type WorldState } from '../world/worldState'
 import { vehicleOf, type AuthorityState } from './authorityState'
 import type { DomainEvent, DomainEventBody } from './domainEvent'
@@ -38,6 +38,21 @@ export function withDrillExactCarry<T>(isOn: boolean, play: () => T): T {
     return play()
   } finally {
     flags['drill.exactCarry'] = shipped
+  }
+}
+
+/**
+ * Runs `play` with the authority's `drill.sweptLawCharge` as `isOn` (ticket 540), put back after:
+ * the swept cut reads it at call time (`sweptDrill.ts`) and it ships off.
+ */
+export function withSweptLawCharge<T>(isOn: boolean, play: () => T): T {
+  const flags = AUTHORITY_DEV_FLAGS as { -readonly [K in keyof AuthorityDevFlags]: boolean }
+  const shipped = flags['drill.sweptLawCharge']
+  flags['drill.sweptLawCharge'] = isOn
+  try {
+    return play()
+  } finally {
+    flags['drill.sweptLawCharge'] = shipped
   }
 }
 
@@ -87,6 +102,47 @@ export function lawWorkRemovedOf(
       }, 0)
     )
   }, 0)
+}
+
+/**
+ * The law work one command removed, read from the ground on the cells its `GroundChanged` events
+ * name, each sample at its casing grade as it stood before the command (ticket 540): lining a rig
+ * lays behind it and then cuts again is priced at the grade it was cut at, which a reading of the
+ * whole run against its start (`lawWorkRemovedOf` on the run's first state) prices at rock.
+ */
+export function lawWorkOfGroundChanges(
+  before: AuthorityState,
+  after: WorldState,
+  events: readonly (DomainEvent | DomainEventBody)[],
+  playerId = 'p1',
+): number {
+  return lawWorkRemovedOf(before, after, tilesOfGroundChanges(events), playerId)
+}
+
+/** Every cell a `GroundChanged` dirty rectangle touches, once each. */
+function tilesOfGroundChanges(events: readonly (DomainEvent | DomainEventBody)[]): TilePoint[] {
+  const keys = new Set<string>()
+  for (const event of events) {
+    if (event.type !== 'GroundChanged') continue
+    const first = { tx: event.cx * CHUNK_SIZE, ty: event.cy * CHUNK_SIZE }
+    for (
+      let ty = Math.floor(event.y0 / SAMPLES_PER_TILE);
+      ty <= Math.floor(event.y1 / SAMPLES_PER_TILE);
+      ty++
+    ) {
+      for (
+        let tx = Math.floor(event.x0 / SAMPLES_PER_TILE);
+        tx <= Math.floor(event.x1 / SAMPLES_PER_TILE);
+        tx++
+      ) {
+        keys.add(`${first.tx + tx},${first.ty + ty}`)
+      }
+    }
+  }
+  return [...keys].map((key) => {
+    const [tx, ty] = key.split(',').map(Number)
+    return { tx, ty }
+  })
 }
 
 /** A tile's samples, in row order, at full weight. */

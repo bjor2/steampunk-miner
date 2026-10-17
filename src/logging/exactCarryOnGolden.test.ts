@@ -6,7 +6,7 @@ import { goldenRunProblems, type GoldenRun } from './goldenRun'
 
 // The `drill.exactCarry` kill-switch (ticket 535, A6, the TD shape 6228682000 item 4 and the
 // goldens gate). It ships off until #541's heat change has landed (the GD 6234312287 condition 1),
-// so the committed goldens are protocol 84's digests and mined order under protocol 85's header,
+// so the committed goldens are protocol 84's digests and mined order under the current header,
 // the cheapest proof that the charge on density removed changed nothing with the switch off. With
 // the switch on, only the two goldens whose pose reports drill move their end digest, to the
 // digests pinned below (recorded by `npm run golden:update` with the switch on at `f02d0774`);

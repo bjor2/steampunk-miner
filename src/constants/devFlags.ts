@@ -39,13 +39,23 @@ export const DEV_FLAGS: DevFlags = { 'drill.sweptCut': false }
  *   every golden replays to protocol 84's digests; on, only the two goldens whose reports drill
  *   move their digests (`logging/exactCarryOnGolden.test.ts`). The lanes and the charge's specs
  *   switch it on for their runs.
+ * - `drill.sweptLawCharge` (ticket 540, the TD seam 6234992964 as VS 6234998337 and the GD
+ *   confirmed it, Systems' ruling 6231144515): the swept cut's `drillStep` is charged on the law
+ *   work it removed with A6's rule and its energy carry (`LAW_SUB_STEP_CLOCK`), where it charged
+ *   each broken cell its own dig energy, 0.62 to 1.74 times the law by geometry; the carve, its
+ *   cells and its heat (the steps' summed dig time) are unchanged. A kill-switch for the
+ *   authority's arithmetic: off, as `drill.sweptCut` is, and the two flip together behind the
+ *   ticket's gates and #541's. Off, the swept cut is charged as shipped, the parity reference for
+ *   #537 until the flip; with `drill.sweptCut` off no `drillStep` is sent and no digest moves.
  */
 export interface AuthorityDevFlags {
   readonly 'enemy.lureRetarget': boolean
   readonly 'drill.exactCarry': boolean
+  readonly 'drill.sweptLawCharge': boolean
 }
 
 export const AUTHORITY_DEV_FLAGS: AuthorityDevFlags = {
   'enemy.lureRetarget': true,
   'drill.exactCarry': false,
+  'drill.sweptLawCharge': false,
 }
