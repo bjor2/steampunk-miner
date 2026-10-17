@@ -15,7 +15,7 @@
       "primitive": "disc",
       "count": 5,
       "size": 0.11,
-      "aspect": 0.3,
+      "aspect": 0.4,
       "turn": 1,
       "layout": "scatter"
     },
@@ -121,7 +121,7 @@
     {
       "id": "crusted",
       "primitive": "crust",
-      "scale": 0.035,
+      "scale": 0.015,
       "contrast": 0.45,
       "angle": 0
     },
