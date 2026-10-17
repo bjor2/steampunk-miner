@@ -479,6 +479,18 @@ They ship as one `parts` asset, `ground-ore-atlas` (registered by the slice thro
 `public/assets/ground/ground-ore-atlas/`, written by `assemble_atlas.py` rather than `export.sh`,
 since the source is twelve family files. Nothing draws it yet; the kernel ore renderer will.
 
+## Hero ore sprites
+
+The hero materials of [#452](https://github.com/bjor2/steampunk-miner/issues/452) (the `hero: true`
+rows of `src/features/materials/materials.json`, four for the P1 and P2 acts) are authored one
+species per file in `docs/art/ore-heroes/blend/hero-<species>.blend` on the same ore stage, and
+rendered lit with the rock held out into 256 px albedo cells (`docs/art/ore-heroes/cells/`, the
+mask in alpha) that the per-act hero atlas of
+[#451](https://github.com/bjor2/steampunk-miner/issues/451) packs on its 16th sampler. The cell
+table is `docs/art/ore-heroes/hero-cells.json`; the rarity tint, frame and glow are the shader's,
+never the sprite's. See [docs/art/ore-heroes/README.md](art/ore-heroes/README.md). Nothing draws
+them yet.
+
 ## Magnetic planets
 
 The art of the magnetic planet class ([#293](https://github.com/bjor2/steampunk-miner/issues/293),
