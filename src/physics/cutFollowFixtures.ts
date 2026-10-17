@@ -63,14 +63,16 @@ export interface Rig {
   hold: (intent: VehicleIntent, ticks: number) => TickRead[]
 }
 
-/** A fresh store and world with `levels` bought, the rig on the dock. */
+/** A fresh store and world with `levels` bought, the rig on the dock of `planetIndex` (planet 1). */
 export function createRig(
   rapier: typeof RAPIER,
   levels: Record<string, number>,
   framesPerSecond: number,
   flags: DevFlags = SWEPT_CUT_ON,
+  planetIndex = 1,
 ): Rig {
   resetGameStore()
+  if (planetIndex !== 1) useGameStore.getState().setPlanet(planetIndex)
   for (const [track, level] of Object.entries(levels)) {
     useGameStore.getState().setUpgrade(track, level)
   }

@@ -1007,6 +1007,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/physics/drillEngagement.test.ts` | 6 | 6 |
 | `src/physics/drillFacingStep.test.ts` | 3 | 3 |
 | `src/physics/drillTurnLatency.lane.test.ts` | 3 | 7 |
+| `src/physics/exactCarry.lane.test.ts` | 57 | 6 |
 | `src/physics/fastLegContactTrace.lane.test.ts` | 2 | 2 |
 | `src/physics/fastRigBodySpeed.lane.test.ts` | 5 | 5 |
 | `src/physics/floatingOrigin.test.ts` | 3 | 3 |
