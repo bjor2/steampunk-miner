@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest'
 import { onCurveSteps } from '../../systems/economy/vehicleStats'
 import { INCOME_RATE_REGISTRY, type IncomeAnchors } from '../../systems/registries/incomeRates'
 import { entriesOf } from '../../systems/registries/seal'
+import { isTripClamped } from '../ores'
 import {
   failingVerdictsOf,
   incomeCapVerdictsOf,
@@ -17,7 +18,9 @@ import { TREE_ECONOMY } from './systems/treeEconomy'
 
 // The golden of the #385 income cap (HS condition 1 on ruling 6167240683): the loaded slices'
 // rates, every item owned, on the on-curve vehicle of each judged planet, band 5, in whole basis
-// points of a full hold after and before the trip cap. A rate, the trip cap or the drill curve that
+// points of a full hold after and before the trip cap. Since ticket 449 the hold is priced at the
+// band's rarity-weighted mean (mu_5 = 1.05625), so the trip cap's 15% of the nominal hold reads
+// 1421 bp, with the nominal share (1500) beside it. A rate, the trip cap or the drill curve that
 // moves a share moves this table, on purpose: say why in the commit. Beside it, the same shares
 // with each item's sibling-link added (`balance:tree --milestones`, GD lock on #256, ticket 278).
 
@@ -41,8 +44,9 @@ function band5VerdictsOf(verdictsOf = incomeCapVerdictsOf) {
   return judgedVerdictsOf(verdictsOf).filter((v) => v.band === 5 && v.visit === 'arrival')
 }
 
+/** Planet, item, then the trip share after the clamp, over the nominal hold, and before the clamp. */
 function rowTextOf(v: IncomeCapVerdict): string {
-  return `P${v.planetIndex} ${v.itemId} ${v.medianShareBp} ${v.medianUnclampedBp}`
+  return `P${v.planetIndex} ${v.itemId} ${v.medianShareBp} ${v.medianNominalShareBp} ${v.medianUnclampedBp}`
 }
 
 /** Whether the item's ladder reaches a sibling-link by its last Mark. */
@@ -57,23 +61,45 @@ function reachesSiblingLink(itemId: string): boolean {
 describe('income cap golden', () => {
   it('pins every item share on the on-curve vehicle of P10, P20, P40 and P60, band 5', () => {
     expect(band5VerdictsOf().map(rowTextOf)).toEqual([
-      'P10 power.mineral_drain 1500 2444',
-      'P10 consumable.lodestone_beacon 1500 18400',
-      'P10 power.ore_shifter 1500 7907',
-      'P10 power.pressure_pocket 1500 11500',
-      'P20 power.mineral_drain 1500 2875',
-      'P20 consumable.lodestone_beacon 1500 18400',
-      'P20 power.ore_shifter 1500 7907',
-      'P20 power.pressure_pocket 1500 11500',
-      'P40 power.mineral_drain 1500 2875',
-      'P40 consumable.lodestone_beacon 1500 18400',
-      'P40 power.ore_shifter 1500 7907',
-      'P40 power.pressure_pocket 1500 11500',
-      'P60 power.mineral_drain 1500 2875',
-      'P60 consumable.lodestone_beacon 1500 18400',
-      'P60 power.ore_shifter 1500 7907',
-      'P60 power.pressure_pocket 1500 11500',
+      'P10 power.mineral_drain 1421 1500 2314',
+      'P10 consumable.lodestone_beacon 1421 1500 17421',
+      'P10 power.ore_shifter 1421 1500 7486',
+      'P10 power.pressure_pocket 1421 1500 10888',
+      'P20 power.mineral_drain 1421 1500 2722',
+      'P20 consumable.lodestone_beacon 1421 1500 17421',
+      'P20 power.ore_shifter 1421 1500 7486',
+      'P20 power.pressure_pocket 1421 1500 10888',
+      'P40 power.mineral_drain 1421 1500 2722',
+      'P40 consumable.lodestone_beacon 1421 1500 17421',
+      'P40 power.ore_shifter 1421 1500 7486',
+      'P40 power.pressure_pocket 1421 1500 10888',
+      'P60 power.mineral_drain 1421 1500 2722',
+      'P60 consumable.lodestone_beacon 1421 1500 17421',
+      'P60 power.ore_shifter 1421 1500 7486',
+      'P60 power.pressure_pocket 1421 1500 10888',
     ])
+  })
+
+  it('keeps the drain and movers pricing at the +2 lead off every verdict (RICHEST_LEAD, ticket 449)', () => {
+    // The drain and the movers price a cell at its band's ore +2 (RICHEST_LEAD, TD ruling on #445
+    // 6221725921 section 1), the richest lead the rarity clamp never holds: the mixed rows' epic
+    // (+3) and mythic (+4) are held by it at pickup (#509). The lead moves only the column before
+    // the clamp: every item is held to the trip cap by its ledger in play, and its trip after the
+    // clamp is at most the cap's 15% of the nominal hold, so a richer price cannot move a verdict.
+    expect([0, 1, 2, 3, 4].map((lead) => isTripClamped(lead))).toEqual([
+      false,
+      false,
+      false,
+      true,
+      true,
+    ])
+    const verdicts = judgedVerdictsOf()
+    expect(verdicts.filter((v) => !v.isTripCappedInPlay).map(rowTextOf)).toEqual([])
+    expect(
+      verdicts
+        .filter((v) => v.medianNominalShareBp > TREE_ECONOMY.incomeCap.maxShareBp)
+        .map(rowTextOf),
+    ).toEqual([])
   })
 
   it('registers no drill-throughput gear as an income rate', () => {
@@ -98,22 +124,22 @@ describe('income cap golden', () => {
   it('pins every item share at Mark 9 with its sibling-link, the shifter alone carrying a yield link', () => {
     // The shifter's linked beacon gathers half a beacon's ore: half the beacon's share on top.
     expect(band5VerdictsOf(milestoneIncomeCapVerdictsOf).map(rowTextOf)).toEqual([
-      'P10 power.mineral_drain 1500 2444',
-      'P10 consumable.lodestone_beacon 1500 18400',
-      'P10 power.ore_shifter 1500 17107',
-      'P10 power.pressure_pocket 1500 11500',
-      'P20 power.mineral_drain 1500 2875',
-      'P20 consumable.lodestone_beacon 1500 18400',
-      'P20 power.ore_shifter 1500 17107',
-      'P20 power.pressure_pocket 1500 11500',
-      'P40 power.mineral_drain 1500 2875',
-      'P40 consumable.lodestone_beacon 1500 18400',
-      'P40 power.ore_shifter 1500 17107',
-      'P40 power.pressure_pocket 1500 11500',
-      'P60 power.mineral_drain 1500 2875',
-      'P60 consumable.lodestone_beacon 1500 18400',
-      'P60 power.ore_shifter 1500 17107',
-      'P60 power.pressure_pocket 1500 11500',
+      'P10 power.mineral_drain 1421 1500 2314',
+      'P10 consumable.lodestone_beacon 1421 1500 17421',
+      'P10 power.ore_shifter 1421 1500 16196',
+      'P10 power.pressure_pocket 1421 1500 10888',
+      'P20 power.mineral_drain 1421 1500 2722',
+      'P20 consumable.lodestone_beacon 1421 1500 17421',
+      'P20 power.ore_shifter 1421 1500 16196',
+      'P20 power.pressure_pocket 1421 1500 10888',
+      'P40 power.mineral_drain 1421 1500 2722',
+      'P40 consumable.lodestone_beacon 1421 1500 17421',
+      'P40 power.ore_shifter 1421 1500 16196',
+      'P40 power.pressure_pocket 1421 1500 10888',
+      'P60 power.mineral_drain 1421 1500 2722',
+      'P60 consumable.lodestone_beacon 1421 1500 17421',
+      'P60 power.ore_shifter 1421 1500 16196',
+      'P60 power.pressure_pocket 1421 1500 10888',
     ])
   })
 

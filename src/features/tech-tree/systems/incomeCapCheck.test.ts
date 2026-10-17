@@ -5,9 +5,17 @@ import { oreTier, oreValue } from '../../../systems/economy/oreEconomy'
 import {
   onCurveSteps,
   startLevels,
+  vehicleStatsAt,
   type UpgradeLevels,
 } from '../../../systems/economy/vehicleStats'
-import { fromCanonical, fromSafeInteger, mul, type Money } from '../../../systems/money'
+import {
+  div,
+  fromCanonical,
+  fromSafeInteger,
+  mul,
+  ZERO_MONEY,
+  type Money,
+} from '../../../systems/money'
 import type {
   IncomeAnchors,
   IncomeAt,
@@ -15,6 +23,7 @@ import type {
   TripCapSource,
 } from '../../../systems/registries/incomeRates'
 import { bandDigTicks } from '../../../systems/vehicle/bandDig'
+import { ORE_ROWS } from '../../ores'
 import {
   basisPointsOf,
   drillTripOf,
@@ -30,8 +39,8 @@ import { incomeCapTableOf } from './incomeCapTable'
 import type { IncomeCap } from './treeEconomy'
 
 // The #385 income cap, per trip (ruling 6167240683): each income item's trip from the kernel
-// registry, after the trip cap, against a full hold of the band's ore, in whole basis points, on
-// the median of the seeds; an item over the cap before the clamp passes only when play holds it to
+// registry, after the trip cap, against a full hold of the band's ore at its rarity-weighted mean
+// (ticket 449), in whole basis points, on the median of the seeds; an item over the cap before the clamp passes only when play holds it to
 // the trip ledger. Fake slices register the rates, so no real slice is imported and the numbers
 // stay the test's.
 
@@ -51,14 +60,20 @@ function seedOf(levels: UpgradeLevels, anchors = EVERY_ANCHOR_LIVE, planetIndex 
   return { levelsOn: new Map([[planetIndex, visits]]), anchors }
 }
 
-/** A rate whose trip is `share` of a full hold of the band's ore wherever it is asked. */
+/** `mu_b`, the band's mean ore value over its own ore's: what the gate's full hold is priced at. */
+function meanOfBand(band: number): Money {
+  return div(fromSafeInteger(ORE_ROWS.rarity.meanPpmByBand[band - 1]), fromSafeInteger(1_000_000))
+}
+
+/** A rate whose trip is `share` of the rarity-weighted full hold wherever it is asked. */
 function rateAtShareOf(itemId: string, share: string, isTripCappedInPlay = true): IncomeRate {
   return {
     id: `fake.${itemId}`,
     itemId: `power.${itemId}`,
     anchorRowId: `power.${itemId}`,
     isTripCappedInPlay,
-    valuePerMinuteAtFullStack: (at: IncomeAt) => mul(at.drillOrePerMinute, fromCanonical(share)),
+    valuePerMinuteAtFullStack: (at: IncomeAt) =>
+      mul(mul(at.drillOrePerMinute, meanOfBand(at.band)), fromCanonical(share)),
   }
 }
 
@@ -67,11 +82,16 @@ function fixedRateOf(itemId: string, perMinute: Money): IncomeRate {
   return { ...rateAtShareOf(itemId, '0'), valuePerMinuteAtFullStack: () => perMinute }
 }
 
-/** The #162 4.5 cap's shape: 15% of a full hold of the band's ore. */
+/** 15% of the rarity-weighted full hold; #162 4.5's own cap is 15% of the nominal one. */
 const FIFTEEN_PERCENT_TRIP_CAP: TripCapSource = {
   id: 'fake.trip_cap',
   tripCapAt: (planet, band, hold) =>
-    mul(fromCanonical('0.15'), mul(fromSafeInteger(hold), oreValue(oreTier(planet, band)))),
+    mul(fromCanonical('0.15'), mul(nominalHoldOf(planet, band, hold), meanOfBand(band))),
+}
+
+/** `cargo x V(t(p, b))`: the full hold the cap was judged against before ticket 449. */
+function nominalHoldOf(planet: number, band: number, hold: number): Money {
+  return mul(fromSafeInteger(hold), oreValue(oreTier(planet, band)))
 }
 
 function sliceOf(rates: readonly IncomeRate[], tripCap: TripCapSource | null = null) {
@@ -122,14 +142,35 @@ describe('income cap check', () => {
   it('measures a trip as the minutes the drill takes to fill the hold with the band ore', () => {
     const trip = drillTripOf(10, 5, ON_CURVE)!
     const drilledInATrip = mul(trip.drillOrePerMinute, trip.tripMinutes)
-    expect(basisPointsOf(drilledInATrip, trip.holdValue)).toBe(10_000)
+    expect(basisPointsOf(drilledInATrip, trip.nominalHoldValue)).toBe(10_000)
+  })
+
+  it('judges a trip against the full hold at the rarity-weighted mean, mu_b in ppm of V(t)', () => {
+    // Ticket 449 (Systems 6203133480 section 5.2): 1056250 ppm on band 5, so the nominal hold
+    // brought in one trip is 9468 bp of the gate's whole.
+    const trip = drillTripOf(10, 5, ON_CURVE)!
+    expect(basisPointsOf(trip.nominalHoldValue, trip.holdValue)).toBe(9468)
+    const hold = vehicleStatsAt(ON_CURVE).cargoCapacity
+    expect(trip.holdValue).toEqual(mul(nominalHoldOf(10, 5, hold), meanOfBand(5)))
+  })
+
+  it('keeps the trip over the nominal full hold beside the gate share', () => {
+    const drain = fixedRateOf('drain', ZERO_MONEY)
+    const nominal = rateAtShareOf('shifter', '0.1')
+    const verdicts = verdictsOf([drain, nominal], [seedOf(ON_CURVE)])
+    const band5 = verdicts.filter((v) => v.band === 5 && v.itemId === 'power.shifter')
+    // 10% of the rarity-weighted hold is 10.5625% of the nominal one on band 5.
+    expect(band5.map((v) => [v.medianShareBp, v.medianNominalShareBp])).toEqual([
+      [1000, 1057],
+      [1000, 1057],
+    ])
   })
 
   it('judges an item on the median of the seeds that count it', () => {
     // A fixed rate over three drills: the slowest seed alone would put it over the cap.
     const drills = [drillOffBy(-2), drillOffBy(0), drillOffBy(2)]
     const middle = drillTripOf(10, 5, drills[1])!.drillOrePerMinute
-    const rate = fixedRateOf('drain', mul(middle, fromCanonical('0.149')))
+    const rate = fixedRateOf('drain', mul(mul(middle, meanOfBand(5)), fromCanonical('0.149')))
     const band5 = verdictsOf(
       [rate],
       drills.map((levels) => seedOf(levels)),
@@ -215,9 +256,10 @@ describe('income cap table', () => {
     )
   }
 
-  it('prints each item at its worst median, before and after the clamp', () => {
+  it('prints each item at its worst median, before and after the clamp, and over the nominal hold', () => {
+    // The worst band is band 1, whose mean is 1.0125 of its ore: 15% of it is 15.19% nominal.
     const table = tableOf([rateAtShareOf('drain', '0.2', true)], { ...CAP, planets: [10, 20] })
-    expect(table).toContain('| P10 | power.drain | 15.00% | 20.00% |')
+    expect(table).toContain('| P10 | power.drain | 15.00% | 15.19% | 20.00% |')
     expect(table).toContain('| P20 | no live income item |')
   })
 
@@ -232,7 +274,7 @@ describe('income cap table', () => {
 
   it('prints a share past a whole hold', () => {
     const table = tableOf([rateAtShareOf('lodestone', '1.23456789', false)], CAP)
-    expect(table).toContain('| P10 | power.lodestone | 15.00% | 123.46% |')
+    expect(table).toContain('| P10 | power.lodestone | 15.00% | 15.19% | 123.46% |')
   })
 })
 
@@ -241,7 +283,7 @@ function linkedRateOf(itemId: string, share: string, linkShare: string): IncomeR
   return {
     ...rateAtShareOf(itemId, share),
     linkValuePerMinuteAtFullStack: (at: IncomeAt) =>
-      mul(at.drillOrePerMinute, fromCanonical(linkShare)),
+      mul(mul(at.drillOrePerMinute, meanOfBand(at.band)), fromCanonical(linkShare)),
   }
 }
 

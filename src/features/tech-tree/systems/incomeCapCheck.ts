@@ -3,12 +3,19 @@
  * per trip by the Systems ruling 6167240683 and its Scaler amendment 6167249318): each income item
  * at full stack (last Mark, all charges, 100% uptime, the income Marks' 0.7x cooldown floor and
  * 1.4x duration cap already in its ladder) brings in one trip at most `tech.incomeCap.maxShareBp`
- * of a full hold of the band's ore, the unit the trip cap `tripCapAt` already holds play to
- * (#162 4.5). Judged on each of `tech.incomeCap.planets`, every band, at the track levels the
+ * of a full hold of the band's ore at its mean value (the trip cap `tripCapAt` holds play to 15% of
+ * the hold at the band's own price, #162 4.5). Judged on each of `tech.incomeCap.planets`, every band, at the track levels the
  * pacing bot arrived with and left with (GD ruling 6160885114 Q1 (i)), on the median of the seeds.
  *
- *   share = min(rate x tripMinutes, tripCapAt) / (cargo x V(t(p, b)))
+ *   share = min(rate x tripMinutes, tripCapAt) / (cargo x V(t(p, b)) x mu_b)
  *   tripMinutes = cargo / the drill's cells a minute on the band (1 m tiles, #6)
+ *
+ * - The denominator is the rarity-weighted full hold (ticket 449; the Horizontal Scaler's
+ *   condition 2 in Systems' comment 6203133480 on #139, recorded in 6203159815 and confirmed by the
+ *   VS and the TD on #445, 6221725921): a hold of the band's ore at its mean value per unit, `mu_b`
+ *   the rarity rows' `meanPpmByBand` (today's mean, lead rows and signature included). The nominal
+ *   `cargo x V(t(p, b))` it amends is kept beside it, so nothing is hidden. `tripCapAt` and the 15%
+ *   line are unchanged.
  *
  * - The items' trips come from the kernel `incomeRates` registry (movers count the relocated ore
  *   value reaching the hold, Q2 (a)); an item counts on a seed only while its anchor is live there.
@@ -45,10 +52,12 @@ import {
 } from '../../../systems/registries/incomeRates'
 import { bandDigTicks } from '../../../systems/vehicle/bandDig'
 import { BAND_COUNT } from '../../../systems/world/planetGeometry'
+import { ORE_ROWS } from '../../ores'
 import { TREE_ECONOMY, type IncomeCap } from './treeEconomy'
 
 const MINUTE_TICKS = fromSafeInteger(60 * TICKS_PER_SECOND)
 const BASIS_POINTS = fromSafeInteger(10_000)
+const PARTS_PER_MILLION = fromSafeInteger(1_000_000)
 const BANDS = Array.from({ length: BAND_COUNT }, (_, index) => index + 1)
 
 /** The two vehicles a planet is judged with. */
@@ -67,8 +76,10 @@ export interface DrillTrip {
   drillOrePerMinute: Money
   /** The minutes the drill takes to fill the hold. */
   tripMinutes: Money
-  /** A full hold of the band's ore. */
+  /** A full hold of the band's ore at its rarity-weighted mean value per unit: the cap's whole. */
   holdValue: Money
+  /** The same hold priced at the band's own ore, `cargo x V(t(p, b))`, printed beside it. */
+  nominalHoldValue: Money
 }
 
 export interface IncomeCapVerdict {
@@ -80,6 +91,9 @@ export interface IncomeCapVerdict {
   /** The item's trip share after the clamp on each seed that counts it, in seed order. */
   seedShareBps: readonly number[]
   medianShareBp: number
+  /** The trip shares after the clamp over the nominal full hold, printed beside the gate's. */
+  seedNominalShareBps: readonly number[]
+  medianNominalShareBp: number
   /** The same before the clamp. */
   seedUnclampedBps: readonly number[]
   medianUnclampedBp: number
@@ -114,6 +128,7 @@ interface SeedShare {
   band: number
   row: IncomeCapRow
   shareBp: number
+  nominalShareBp: number
   unclampedBp: number
 }
 
@@ -158,11 +173,19 @@ export function drillTripOf(
   const cellsPerMinute = div(MINUTE_TICKS, fromSafeInteger(ticksPerCell))
   const hold = fromSafeInteger(vehicleStatsAt(levels).cargoCapacity)
   const ore = oreValue(oreTier(planetIndex, band))
+  const nominalHoldValue = mul(hold, ore)
   return {
     drillOrePerMinute: mul(cellsPerMinute, ore),
     tripMinutes: div(hold, cellsPerMinute),
-    holdValue: mul(hold, ore),
+    holdValue: rarityWeighted(nominalHoldValue, band),
+    nominalHoldValue,
   }
+}
+
+/** `value x mu_b`: the band's mean ore value per unit over its own ore's, in parts per million. */
+function rarityWeighted(value: Money, band: number): Money {
+  const meanPpm = fromSafeInteger(ORE_ROWS.rarity.meanPpmByBand[band - 1])
+  return div(mul(value, meanPpm), PARTS_PER_MILLION)
 }
 
 /**
@@ -237,6 +260,7 @@ function seedShareOf(where: JudgedPatch, row: IncomeCapRow, trip: DrillTrip): Se
     key: `${where.planetIndex} ${where.visit} ${where.band} ${row.itemId}`,
     row,
     shareBp: basisPointsOf(row.valuePerTrip, trip.holdValue),
+    nominalShareBp: basisPointsOf(row.valuePerTrip, trip.nominalHoldValue),
     unclampedBp: basisPointsOf(row.unclampedValuePerTrip, trip.holdValue),
   }
 }
@@ -251,6 +275,7 @@ function groupByKey(shares: readonly SeedShare[]): SeedShare[][] {
 function verdictOf(group: readonly SeedShare[], cap: IncomeCap): IncomeCapVerdict {
   const [{ planetIndex, visit, band, row }] = group
   const seedShareBps = group.map((each) => each.shareBp)
+  const seedNominalShareBps = group.map((each) => each.nominalShareBp)
   const seedUnclampedBps = group.map((each) => each.unclampedBp)
   const medianShareBp = medianBasisPointsOf(seedShareBps)
   const medianUnclampedBp = medianBasisPointsOf(seedUnclampedBps)
@@ -262,6 +287,8 @@ function verdictOf(group: readonly SeedShare[], cap: IncomeCap): IncomeCapVerdic
     isTripCappedInPlay: row.isTripCappedInPlay,
     seedShareBps,
     medianShareBp,
+    seedNominalShareBps,
+    medianNominalShareBp: medianBasisPointsOf(seedNominalShareBps),
     seedUnclampedBps,
     medianUnclampedBp,
     isOverCap: medianShareBp > cap.maxShareBp,

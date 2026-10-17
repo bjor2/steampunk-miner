@@ -1,8 +1,9 @@
 /**
  * The #385 income cap as the `balance:tree` lane prints it: per planet and item, its worst median
  * over the visits and bands, after the trip cap and before it (ruling 6167240683 asks for both),
- * whether play holds it to the cap, and why it fails or is known to; a planet no seed counts any
- * item on reads so.
+ * the same trip over the nominal full hold `cargo x V(t)` beside the rarity-weighted one the gate
+ * reads (ticket 449, Systems 6203159815: so nothing is hidden), whether play holds it to the cap,
+ * and why it fails or is known to; a planet no seed counts any item on reads so.
  */
 import { isFailing, type IncomeCapVerdict } from './incomeCapCheck'
 import { TREE_ECONOMY, type IncomeCap } from './treeEconomy'
@@ -12,8 +13,8 @@ export function incomeCapTableOf(
   cap: IncomeCap = TREE_ECONOMY.incomeCap,
 ): string {
   return [
-    '| planet | income item | worst trip share | before the clamp | at | seed shares there | cap | trip ledger in play | |',
-    '|---|---|---|---|---|---|---|---|---|',
+    '| planet | income item | worst trip share | nominal denominator | before the clamp | at | seed shares there | cap | trip ledger in play | |',
+    '|---|---|---|---|---|---|---|---|---|---|',
     ...cap.planets.flatMap((planetIndex) => planetLinesOf(planetIndex, verdicts, cap)),
   ].join('\n')
 }
@@ -31,7 +32,7 @@ function planetLinesOf(
   cap: IncomeCap,
 ): string[] {
   const onPlanet = verdicts.filter((verdict) => verdict.planetIndex === planetIndex)
-  if (onPlanet.length === 0) return [`| P${planetIndex} | no live income item | | | | | | | |`]
+  if (onPlanet.length === 0) return [`| P${planetIndex} | no live income item | | | | | | | | |`]
   return itemIdsOf(onPlanet).map((itemId) =>
     worstLineOf(worstOf(onPlanet.filter((verdict) => verdict.itemId === itemId)), cap),
   )
@@ -58,7 +59,7 @@ function worstLineOf(verdict: IncomeCapVerdict, cap: IncomeCap): string {
   const ledger = verdict.isTripCappedInPlay ? 'yes' : 'no'
   return (
     `| P${verdict.planetIndex} | ${verdict.itemId} | ${basisPointsText(verdict.medianShareBp)} | ` +
-    `${basisPointsText(verdict.medianUnclampedBp)} | ${verdict.visit}, band ${verdict.band} | ` +
+    `${basisPointsText(verdict.medianNominalShareBp)} | ${basisPointsText(verdict.medianUnclampedBp)} | ${verdict.visit}, band ${verdict.band} | ` +
     `${seeds} | ${basisPointsText(cap.maxShareBp)} | ${ledger} | ${markOf(verdict)} |`
   )
 }
