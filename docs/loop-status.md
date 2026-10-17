@@ -602,7 +602,7 @@ TD ruling on #514/#529: no hard build block, but a fixed merge order. Mechanism 
   Nothing is added while the ticket builds: the entry is read only when a green session is about to push, so a release entry never blocks or pauses the build.
 - `merge_release_sweep` (new, called at the top of `wave_prepare_pick`, skipped on `--dry-run`) lifts the `on-hold` label it added once marker + closed prerequisite are both there
   (gh is only called when a marker exists); the next pick re-claims the ticket for its rebase and re-run attempt; that session passes `merge_hold` (marker present, prerequisite
-  closed before the session) and the ordinary push path lands it. A prerequisite that closed *during* the session is a re-queue at once (no label), as before. `state.merge_held[N]`
+  closed before the session) and the ordinary push path lands it. A prerequisite that closed _during_ the session is a re-queue at once (no label), as before. `state.merge_held[N]`
   records `release` and `label` (the sweep only removes an on-hold it added itself).
 - Release command: `touch /workspace/claude-sessions/steampunk-loop/merge-release.d/<ticket>`. Un-release: `rm` the marker (only matters before the sweep ran).
 - The stale `529:514` entry was removed (#529 closed). No `514:<A6>` entry yet: the A6 issue was not filed at the time of this change.
