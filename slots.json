@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-10-17T18:47:51+01:00",
+  "updated_at": "2026-10-17T19:18:41+01:00",
   "caps": {
     "grok": 12,
     "claude": 10,
@@ -72,7 +72,7 @@
       "size": 6,
       "used": 3,
       "free": 3,
-      "claims_last_hour": 1,
+      "claims_last_hour": 0,
       "name": "Claude Max 1"
     },
     {
@@ -84,11 +84,12 @@
       "slots": [
         {
           "slot": "C7",
-          "state": "free",
-          "ticket": null,
-          "grok_slot": null,
-          "kind": null,
-          "since": null
+          "state": "busy",
+          "ticket": 537,
+          "grok_slot": 3,
+          "kind": "dev",
+          "since": "2026-10-17T19:17:00+01:00",
+          "wave": "316-3A"
         },
         {
           "slot": "C8",
@@ -116,14 +117,14 @@
         }
       ],
       "size": 4,
-      "used": 0,
-      "free": 4,
+      "used": 1,
+      "free": 3,
       "claims_last_hour": 2,
       "name": "Claude Max 2"
     }
   ],
   "gate": {
-    "busy": 1,
+    "busy": 2,
     "max": 3
   },
   "tester": {
@@ -444,9 +445,11 @@
     },
     {
       "slot": 3,
-      "state": "free",
-      "ticket": null,
-      "since": null
+      "state": "dev",
+      "ticket": 537,
+      "since": "2026-10-17T19:17:00+01:00",
+      "claude_slot": 7,
+      "wave": "316-3A"
     },
     {
       "slot": 4,
@@ -559,11 +562,12 @@
     },
     {
       "slot": 7,
-      "state": "free",
-      "ticket": null,
-      "grok_slot": null,
-      "since": null,
-      "account": 2
+      "state": "busy",
+      "ticket": 537,
+      "grok_slot": 3,
+      "since": "2026-10-17T19:17:00+01:00",
+      "account": 2,
+      "wave": "316-3A"
     },
     {
       "slot": 8,
@@ -591,17 +595,17 @@
     }
   ],
   "last_refill": {
-    "at": "2026-10-17 18:45 BST",
-    "mode": "refill-dev",
-    "triggers": "#524",
-    "started": "",
-    "note": "load guard (MemAvailable 1531 MB < 3072 MB)"
+    "at": "2026-10-17 19:17 BST",
+    "mode": "pass",
+    "triggers": "claude-run:tester-triage",
+    "started": "#537->C7/A2",
+    "note": "spawned 1 worker(s)"
   },
   "totals": {
     "grok": {
       "size": 12,
-      "used": 3,
-      "dev": 3,
+      "used": 4,
+      "dev": 4,
       "dev_cap": 8,
       "planner": 0,
       "planner_cap": 4
@@ -609,8 +613,8 @@
     "claude": {
       "size": 10,
       "enabled": 10,
-      "used": 3,
-      "free": 7,
+      "used": 4,
+      "free": 6,
       "external": 0
     }
   },
@@ -665,7 +669,7 @@
           514,
           524
         ],
-        "live": 0
+        "live": 1
       },
       {
         "number": 511,
