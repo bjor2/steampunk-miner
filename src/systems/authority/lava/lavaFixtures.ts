@@ -1,7 +1,9 @@
 /**
  * The planet 8 lava pocket the lava specs touch and flood (#113): the first band-3 pocket floor of
- * the scripted seed, a hole carved under it, and pose reports beside it. Only specs use it.
+ * the scripted seed (six lava cells wide), a hole carved under it, pose reports beside it, and
+ * drilling passes under it at a set speed and report cadence (#514). Only specs use it.
  */
+import { MM_PER_METRE, TICKS_PER_SECOND } from '../../../constants/physics'
 import { FACING } from '../../vehicle/vehiclePose'
 import { NO_DRIVE } from '../../vehicle/driveSigns'
 import { isLavaAt } from '../../world/lavaFlow'
@@ -80,4 +82,74 @@ export function reportAt(at: { x: number; y: number }, drillTicks = 0): CommandI
 export const carveHole: CommandIntent = {
   type: 'debug.carveCircle',
   payload: { x: HOLE.x, y: HOLE.y, radius: 950, amount: 255 },
+}
+
+/** The rig the crossing passes drive: a drill far past the floor, so any speed is in its bound. */
+const CROSSING_RIG = { drill_power: 2000, drill_tip: 600 }
+/** A crossing starts this far west of the pocket's floor cell and drives this far east. */
+const CROSSING_START_X = (FLOOR.tx - 20) * MM_PER_METRE + MM_PER_METRE / 2
+const CROSSING_LENGTH_MM = 40_000
+
+/** A level pass east under the pocket's floor at `speedMps`, drilling, reported every `interval`. */
+export function crossPocket(speedMps: number, interval: number): { burnTicks: number[] } {
+  const session = crossingSession()
+  const burnTicks: number[] = []
+  for (let tick = interval; tick <= crossingTicksOf(speedMps); tick += interval) {
+    session.advanceTo(tick)
+    const events = session.submit(tick, crossingReportAt(speedMps, tick, interval))
+    if (events.some((event) => event.type === 'LavaTouched')) burnTicks.push(tick)
+  }
+  return { burnTicks }
+}
+
+/** Whether one report at the crossing's pose for `tick` touches the lava, from a fresh session. */
+export function touchesAtCrossingTick(speedMps: number, tick: number): boolean {
+  const session = crossingSession()
+  const events = session.submit(1, crossingReportAt(speedMps, tick, 1))
+  return events.some((event) => event.type === 'LavaTouched')
+}
+
+function crossingSession(): ScriptedSession {
+  const session = onHeatPlanet()
+  for (const [upgradeId, level] of Object.entries(CROSSING_RIG)) {
+    session.submit(0, { type: 'debug.setUpgrade', payload: { upgradeId, level } })
+  }
+  return session
+}
+
+function crossingTicksOf(speedMps: number): number {
+  return Math.ceil((CROSSING_LENGTH_MM * TICKS_PER_SECOND) / (speedMps * MM_PER_METRE))
+}
+
+function crossingReportAt(speedMps: number, tick: number, interval: number): CommandIntent {
+  const { payload } = reportAt(AGAINST_LAVA, interval) as CommandIntent<'reportPose'>
+  const x = Math.round(CROSSING_START_X + (speedMps * MM_PER_METRE * tick) / TICKS_PER_SECOND)
+  return {
+    type: 'reportPose',
+    payload: {
+      ...payload,
+      x,
+      vx: speedMps * MM_PER_METRE,
+      facing: FACING.right,
+      driving: true,
+      driveTicks: interval,
+      drive: { x: 1, y: 0 },
+    },
+  }
+}
+
+/** Reports drilling every `interval` ticks at `at`, for `ticks`; the ticks each burnt on. */
+export function drillAgainst(
+  session: ScriptedSession,
+  at: { x: number; y: number },
+  interval: number,
+  ticks: number,
+): number[] {
+  const burnTicks: number[] = []
+  for (let tick = interval; tick <= ticks; tick += interval) {
+    session.advanceTo(tick)
+    const events = session.submit(tick, reportAt(at, interval))
+    if (events.some((event) => event.type === 'LavaTouched')) burnTicks.push(tick)
+  }
+  return burnTicks
 }

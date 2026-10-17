@@ -745,6 +745,8 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/authority/heatCapReadings.test.ts` | 13 | 13 |
 | `src/systems/authority/heatRun.test.ts` | 13 | 13 |
 | `src/systems/authority/hollowPocket.test.ts` | 7 | 7 |
+| `src/systems/authority/lava/lavaCadence.lane.test.ts` | 2 | 2 |
+| `src/systems/authority/lava/lavaCadence.test.ts` | 6 | 5 |
 | `src/systems/authority/lava/lavaRun.test.ts` | 9 | 9 |
 | `src/systems/authority/lawCarrySlab.lane.test.ts` | 338 | 6 |
 | `src/systems/authority/liningBill.test.ts` | 10 | 10 |
