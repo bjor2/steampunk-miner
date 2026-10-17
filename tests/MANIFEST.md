@@ -1004,6 +1004,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/physics/storedLevelReleaseTrace.lane.test.ts` | 2 | 2 |
 | `src/physics/strutColliders.test.ts` | 4 | 4 |
 | `src/physics/sweptCutPace.test.ts` | 5 | 2 |
+| `src/physics/sweptCutPaceWindow.lane.test.ts` | 3 | 3 |
 | `src/physics/sweptFreshCarveLoop.test.ts` | 3 | 3 |
 | `src/physics/tunnelling.test.ts` | 10 | 2 |
 | `src/physics/vehicleLoop.test.ts` | 10 | 10 |
