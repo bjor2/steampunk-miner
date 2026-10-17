@@ -697,6 +697,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/authority/casingDrill.test.ts` | 5 | 5 |
 | `src/systems/authority/casingGnaw.test.ts` | 4 | 4 |
 | `src/systems/authority/casingPlacement.test.ts` | 15 | 15 |
+| `src/systems/authority/casingReversal.test.ts` | 5 | 5 |
 | `src/systems/authority/casingRules.test.ts` | 6 | 6 |
 | `src/systems/authority/casingSupport.test.ts` | 4 | 4 |
 | `src/systems/authority/cellDigEnergy.test.ts` | 4 | 4 |
@@ -1393,7 +1394,8 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/vehicle/bodySpeedDips.test.ts` | 6 | 6 |
 | `src/systems/vehicle/carryDebt.test.ts` | 8 | 8 |
 | `src/systems/vehicle/carryWalk.test.ts` | 52 | 22 |
-| `src/systems/vehicle/casingTrail.test.ts` | 16 | 12 |
+| `src/systems/vehicle/casingTrail.test.ts` | 18 | 14 |
+| `src/systems/vehicle/casingTrailReversal.test.ts` | 36 | 5 |
 | `src/systems/vehicle/chargeSelection.test.ts` | 4 | 4 |
 | `src/systems/vehicle/colliderHalo.test.ts` | 3 | 3 |
 | `src/systems/vehicle/cutFollowMotion.test.ts` | 15 | 15 |
