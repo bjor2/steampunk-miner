@@ -229,3 +229,46 @@ describe('stop at the face (ticket 430 addendum)', () => {
     expect(cutFollowSpeedOf(1.5, { ...letGo, releasedTicks: 0 }, false)).toBeCloseTo(1.25, 9)
   })
 })
+
+describe('cut down at the planet centre (ticket 539)', () => {
+  /**
+   * The step along `up`, metres, of a cut held at `speed` m/s along `facing` for a whole ramp,
+   * `depthToCentre` m above the centre, clamped to its own speed as the swept cut's bound does.
+   */
+  const upwardStep = (facing: Facing, speed: number, depthToCentre: number) =>
+    upward(
+      stepVehicleMotion({
+        velocity: { x: 0, y: 0 },
+        up: UP,
+        gravity: { x: 0, y: 0 },
+        intent: facing === FACING.down ? DOWN : { ...DOWN, facing },
+        engine: engineStats(0),
+        canAct: true,
+        isGrounded: false,
+        boreOffset: 0,
+        isCuttingLevel: false,
+        isWaitingForCut: false,
+        dt: PHYSICS_TIMESTEP,
+        cutFollow: { speed, facing, isPushing: true, followedTicks: CUT_FOLLOW_TICKS },
+        maxSpeed: speed,
+        depthToCentre,
+      }).velocity,
+    ) * PHYSICS_TIMESTEP
+
+  it('stops a cut down at the centre when its step would carry the body past it', () => {
+    expect(upwardStep(FACING.down, 3600, 1.5)).toBeCloseTo(-1.5, 9)
+  })
+
+  it('moves a cut down no further at the centre, nor once past it', () => {
+    expect(upwardStep(FACING.down, 3600, 0)).toBe(0)
+    expect(upwardStep(FACING.down, 3600, -0.4)).toBe(0)
+  })
+
+  it('leaves a cut down short of the centre at the speed the drill sets', () => {
+    expect(upwardStep(FACING.down, 3, 295)).toBeCloseTo(-3 * PHYSICS_TIMESTEP, 9)
+  })
+
+  it('never holds back a cut up at the centre', () => {
+    expect(upwardStep(FACING.up, 3600, 0)).toBeCloseTo(60, 9)
+  })
+})

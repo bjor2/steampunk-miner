@@ -412,6 +412,15 @@ programs }` from three's `renderer.info` of the game canvas), read only when cal
   regression ratchet that #441's band replaces. `src/physics/sweptFreshCarveLoop.test.ts` plays
   stored rigs 370/600, 450/600 and 2000/600 off the pad and down at 30 and 144 frames/s: never more
   than 6 straight cutting ticks at 0 m/s, at least 50 m down, one path for both rates (about 20 s).
+- **Swept cut through planet 1's centre** (ticket 539): `src/physics/sweptCoreCrossing.lane.test.ts`
+  plays the stored-200 rig (the planet-200 on-curve drill, 3600 m/s through band 1) off the pad and
+  holds it down for 300 ticks at 30 and 144 frames/s with `drill.sweptCut` on, lined at casing
+  grade 5 so a cave-in never crushes it. No tick may move the body further than its step bound for
+  the gate it moved under, no tick of the held cut may carry it more than one density sample away
+  from the centre (before ticket 539 it crossed the centre and jumped 60 m out and back every tick), it must
+  reach the centre and stay there, and both rates play the same ticks. Each run prints its largest
+  move with the body and cut cursor before and after it. A lane (about 5 s), so it runs only when
+  named. The motion rule's stop is unit-tested in `src/systems/vehicle/cutFollowMotion.test.ts`.
 - **Swept ledger charges the work it spends** (ticket 466, dark until #441's ring re-run):
   `src/systems/authority/clampedCharge.test.ts` checks fix A's driver with fakes (one carve when
   the release clamp keeps the carry, a second charging exactly the clamped carry when it lowers it,

@@ -42,7 +42,7 @@ import {
   type DrillHead,
 } from '../systems/vehicle/drillHead'
 import { cutMemoryAfter, FRESH_CUT_MEMORY, type CutMemory } from '../systems/vehicle/heldCut'
-import { localUpOf, type Vector2 } from '../systems/vehicle/localFrame'
+import { dot, localUpOf, type Vector2 } from '../systems/vehicle/localFrame'
 import type { ActionFlags } from '../systems/vehicle/poseReport'
 import { quantisePose } from '../systems/vehicle/poseReport'
 import { gravityAt } from '../systems/vehicle/radialGravity'
@@ -263,6 +263,7 @@ export function createVehicleController(
         tug: input.tug,
         cutFollow,
         maxSpeed: maxSpeedFor(input, cutRead),
+        depthToCentre: dot(position, up),
       })
       const sweep = sweepGroundOf(planet.ground, position, isGateOpen ? pose : null)
       const planned = plannedTickOf(motion.velocity, PHYSICS_TIMESTEP, sweep)

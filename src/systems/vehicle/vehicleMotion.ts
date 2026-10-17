@@ -14,8 +14,9 @@
  *
  * While the rig actively cuts (ticket 333, `cutFollowMotion.ts`) the drill sets the speed along its
  * facing instead: the wheels' target on a level cut, or the speed along `localUp` with no gravity
- * on a cut down or up. Otherwise the engine passed in drives as above; the live loop passes one
- * whose `speedMax` is travel parity's cap (`travelParity.ts`).
+ * on a cut down or up, which stops at the planet's centre (ticket 539). Otherwise the engine passed
+ * in drives as above; the live loop passes one whose `speedMax` is travel parity's cap
+ * (`travelParity.ts`).
  */
 import { MAX_SPEED_MM_PER_SECOND } from '../../constants/balance'
 import {
@@ -69,6 +70,13 @@ export interface MotionStepInput {
   cutFollow?: CutFollowMotion
   /** m/s the body's speed is clamped to (`stepBound.ts`, ticket 334); 18 m/s when absent. */
   maxSpeed?: number
+  /**
+   * Metres the planet's centre lies below the body along `up` (ticket 539): a cut down stops
+   * there. Past it `localUp` turns over, so the drill would push the body straight back, a whole
+   * step out and back every tick for a rig whose step is longer than the planet's radius. No stop
+   * when absent.
+   */
+  depthToCentre?: number
 }
 
 export interface MotionEffectInput {
@@ -131,9 +139,15 @@ function drivenStep(input: MotionStepInput, frame: DriveFrame): MotionStep {
 /** The lift pushes along `localUp`; a cut down or up follows the drill there instead. */
 function nextUpwardSpeed(input: MotionStepInput, frame: DriveFrame, isThrusting: boolean): number {
   if (isCutFollowUpward(input.cutFollow)) {
-    return cutFollowSpeedOf(frame.upward, input.cutFollow, false)
+    return stoppedAtCentre(cutFollowSpeedOf(frame.upward, input.cutFollow, false), input)
   }
   return frame.upward + (isThrusting ? liftAcceleration(frame.engine.thrustToWeight) : 0) * input.dt
+}
+
+/** A cut down moves the body no further in a tick than the planet's centre (ticket 539). */
+function stoppedAtCentre(upward: number, input: MotionStepInput): number {
+  if (input.depthToCentre === undefined) return upward
+  return Math.max(upward, -Math.max(0, input.depthToCentre) / input.dt)
 }
 
 /** Gravity pulls, except along a cut down or up, where the drill sets the speed. */
