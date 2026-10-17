@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-10-17T17:16:28+01:00",
+  "updated_at": "2026-10-17T17:24:58+01:00",
   "caps": {
     "grok": 12,
     "claude": 10,
@@ -71,7 +71,7 @@
       "size": 6,
       "used": 2,
       "free": 4,
-      "claims_last_hour": 3,
+      "claims_last_hour": 4,
       "name": "Claude Max 1"
     },
     {
@@ -600,11 +600,11 @@
     }
   ],
   "last_refill": {
-    "at": "2026-10-17 17:16 BST",
+    "at": "2026-10-17 17:24 BST",
     "mode": "refill-dev",
     "triggers": "claude-run:wave-plan",
-    "started": "#514->C7/A2",
-    "note": "spawned 1 worker(s)"
+    "started": "",
+    "note": "no pickable build ticket"
   },
   "totals": {
     "grok": {
@@ -628,6 +628,19 @@
     "parallel": 1,
     "list": [
       {
+        "number": 543,
+        "key": "302-10C",
+        "map": 302,
+        "lane": "remote",
+        "mode": "solo",
+        "state": "ready",
+        "tickets": [
+          542
+        ],
+        "done": [],
+        "live": 0
+      },
+      {
         "number": 534,
         "key": "302-10B",
         "map": 302,
@@ -650,7 +663,7 @@
         "map": 316,
         "lane": "remote",
         "mode": "solo",
-        "state": "paused",
+        "state": "running",
         "tickets": [
           514,
           524,
@@ -689,7 +702,7 @@
       },
       {
         "number": 438,
-        "key": "302-10C",
+        "key": "302-10D",
         "map": 302,
         "lane": "hitl",
         "mode": "bench",
