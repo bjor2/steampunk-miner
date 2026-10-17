@@ -83,7 +83,7 @@ export function gatedCellOn(
 }
 
 /** Columns the world scan walks, each from the surface to the centre. */
-const SCANNED_COLUMNS = 40
+const SCANNED_COLUMNS = 64
 
 /**
  * The first generated ore cell `pick` names by its gate and ore, walking columns down from the
@@ -100,19 +100,57 @@ export function worldCellOfGate(
   throw new Error(`planet ${params.planetIndex} shows no such gated cell in its first columns`)
 }
 
+/**
+ * The shallowest generated ore cell `pick` names in the scanned columns, walking down one depth
+ * at a time across them. The bot keeps the way home in its tank, so a spec of the bot at a wall
+ * wants the wall near the surface; the rarity rows (ticket 445) left fewer lead cells up there.
+ */
+export function shallowestWorldCellOfGate(
+  params: PlanetParams,
+  pick: (gate: CellGate, ore: OreType) => boolean,
+): { tile: TilePoint; ore: OreType; gate: CellGate } {
+  for (let depth = 0; depth < params.radiusTiles; depth++) {
+    const found = gatedCellAtDepth(params, depth, pick)
+    if (found !== null) return found
+  }
+  throw new Error(`planet ${params.planetIndex} shows no such gated cell in its first columns`)
+}
+
+function gatedCellAtDepth(
+  params: PlanetParams,
+  depth: number,
+  pick: (gate: CellGate, ore: OreType) => boolean,
+) {
+  for (let tx = 0; tx < SCANNED_COLUMNS; tx++) {
+    const tile = { tx, ty: surfaceRowOfColumn(tx, params.radiusTiles) - depth }
+    const found = gatedCellAt(params, tile, pick)
+    if (found !== null) return found
+  }
+  return null
+}
+
 function gatedCellInColumn(
   params: PlanetParams,
   tx: number,
   pick: (gate: CellGate, ore: OreType) => boolean,
 ) {
   for (let ty = surfaceRowOfColumn(tx, params.radiusTiles); ty > 0; ty--) {
-    const cell = cellAt(EMPTY_WORLD, params, { tx, ty })
-    if (kindOfCell(cell) !== CELL_KIND.ore) continue
-    const ore = oreTypeOf({ tier: resourceTierOf(params, cell), cellFamily: familyOfCell(cell) })
-    const gate = cellGateOf(params, { tx, ty }, ore)
-    if (pick(gate, ore)) return { tile: { tx, ty }, ore, gate }
+    const found = gatedCellAt(params, { tx, ty }, pick)
+    if (found !== null) return found
   }
   return null
+}
+
+function gatedCellAt(
+  params: PlanetParams,
+  tile: TilePoint,
+  pick: (gate: CellGate, ore: OreType) => boolean,
+) {
+  const cell = cellAt(EMPTY_WORLD, params, tile)
+  if (kindOfCell(cell) !== CELL_KIND.ore) return null
+  const ore = oreTypeOf({ tier: resourceTierOf(params, cell), cellFamily: familyOfCell(cell) })
+  const gate = cellGateOf(params, tile, ore)
+  return pick(gate, ore) ? { tile, ore, gate } : null
 }
 
 /** The drill asking; a blast of `size` asking; or a tool. */

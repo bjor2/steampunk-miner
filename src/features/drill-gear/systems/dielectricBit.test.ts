@@ -19,7 +19,9 @@ import { interceptedHullDamage } from '../../../systems/registries/hullDamageInt
 import { isElectrifiedCellAt } from '../../../systems/registries/magneticGround'
 import { vehicleItemOfferOf } from '../../../systems/registries/vehicleItemSales'
 import { FACING } from '../../../systems/vehicle/vehiclePose'
+import { cellDensitySum } from '../../../systems/world/cellYield'
 import { generateChunkCells } from '../../../systems/world/generateChunk'
+import { SAMPLES_PER_CELL, SOLID_DENSITY } from '../../../systems/world/sampleGrid'
 import type { PlanetParams } from '../../../systems/world/planetParams'
 import {
   CHUNK_SIZE,
@@ -28,6 +30,7 @@ import {
   type TilePoint,
 } from '../../../systems/world/tileGrid'
 import { CELL_KIND, kindOfCell } from '../../../systems/world/worldCell'
+import { EMPTY_WORLD } from '../../../systems/world/worldState'
 import { cardLinesOf } from './cardLines'
 import { DIELECTRIC_BIT_ID } from './dielectricBit'
 import { DRILL_GEAR_ECONOMY } from './drillGearEconomy'
@@ -84,11 +87,22 @@ function firstCellOf(
   throw new Error('no such cell on the planet')
 }
 
+/** The first electrified cell that is whole, so the twin it is compared with is whole too. */
 function electrifiedCellOf(params: PlanetParams): PlanetCell {
-  return firstCellOf(params, (tile, cell) => isElectrifiedCellAt(params, tile, cell))
+  return firstCellOf(
+    params,
+    (tile, cell) => isElectrifiedCellAt(params, tile, cell) && isFullCell(params, { tile, cell }),
+  )
 }
 
-/** The same ore, just as hard, in a cell no field electrifies: the planet with no hazard. */
+function isFullCell(params: PlanetParams, planetCell: PlanetCell): boolean {
+  return densityOf(params, planetCell) === SAMPLES_PER_CELL * SOLID_DENSITY
+}
+
+/**
+ * The same ore, just as hard and just as full, in a cell no field electrifies: the planet with no
+ * hazard. A cave rim leaves a cell part-filled, and a part-filled twin breaks sooner.
+ */
 function plainTwinOf(params: PlanetParams, electrified: PlanetCell): PlanetCell {
   return firstCellOf(params, (tile, cell) => isPlainTwin(params, electrified, { tile, cell }))
 }
@@ -97,7 +111,12 @@ function isPlainTwin(params: PlanetParams, electrified: PlanetCell, other: Plane
   const hardness = hardnessOfTile(params, electrified.tile, electrified.cell)
   const isAsHard = cmp(hardnessOfTile(params, other.tile, other.cell), hardness) === 0
   const isSameOre = other.cell === electrified.cell
-  return isSameOre && isAsHard && !isElectrifiedCellAt(params, other.tile, other.cell)
+  const isAsFull = densityOf(params, other) === densityOf(params, electrified)
+  return isSameOre && isAsHard && isAsFull && !isElectrifiedCellAt(params, other.tile, other.cell)
+}
+
+function densityOf(params: PlanetParams, { tile }: PlanetCell): number {
+  return cellDensitySum(EMPTY_WORLD, params, tile)
 }
 
 function plainGroundCellOf(params: PlanetParams): PlanetCell {

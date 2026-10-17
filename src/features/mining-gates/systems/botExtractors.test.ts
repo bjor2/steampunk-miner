@@ -11,7 +11,7 @@ import { paramsOfSession, tileKindAt } from '../../../systems/bot/botWorld'
 import { newMineLayout } from '../../../systems/bot/mineLayout'
 import { onCurveSteps } from '../../../systems/economy/vehicleStats'
 import type { TilePoint } from '../../../systems/world/tileGrid'
-import { FIXTURE_SEED, worldCellOfGate } from './gateFixtures'
+import { FIXTURE_SEED, shallowestWorldCellOfGate } from './gateFixtures'
 
 // The pacing bot with an extractor (#142 acceptance 10, ticket 237): a wall its own extractor
 // opens by standing by it is touched and waited out, then bored or entered, and the cell is logged
@@ -23,7 +23,10 @@ function botBeside(planetIndex: number, rigId: string, owned: string[]) {
     'p1',
   )
   const params = paramsOfSession(session.state())
-  const cell = worldCellOfGate(params, (gate) => gate.kind === 'rig' && gate.rig.id === rigId)
+  const cell = shallowestWorldCellOfGate(
+    params,
+    (gate) => gate.kind === 'rig' && gate.rig.id === rigId,
+  )
   const stand = { tx: cell.tile.tx - 1, ty: cell.tile.ty }
   session.submit(FREEZE_ENEMIES)
   setDrillOnCurve(session, planetIndex)
