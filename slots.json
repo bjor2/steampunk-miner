@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-10-17T16:17:49+01:00",
+  "updated_at": "2026-10-17T16:19:34+01:00",
   "caps": {
     "grok": 12,
     "claude": 10,
@@ -121,32 +121,23 @@
     }
   ],
   "gate": {
-    "busy": 0,
+    "busy": 1,
     "max": 3
   },
   "tester": {
     "state": "running",
     "phase": "fast",
-    "sha": "0a05199e7073d5d4c1baa4432eb2555cb7a13984",
-    "since": "2026-10-17T15:17:27Z",
-    "holds_gate": false,
+    "sha": "4136770c32f5c3b223121c0f3b6839e43192a027",
+    "since": "2026-10-17T15:19:27Z",
+    "holds_gate": true,
     "claude_slot": null,
-    "last_run": "2026-10-17T13:12:48Z",
+    "last_run": "2026-10-17T15:19:21Z",
     "last_nightly": "2026-10-15T20:43:15Z",
     "last_nightly_result": "full=FAIL balance-report=ok bench=FAIL balance-planets=ok balance-guns=ok balance-charges=ok balance-refinery=ok balance-heat=ok e2e=FAIL memory-soak=FAIL packaged-smoke=ok ",
     "main_red_sha": null,
-    "feature": 316,
-    "feature_title": "Research: engine speed headroom for the drill law (16 m/s check, cells per tick, streaming)",
+    "feature": 393,
+    "feature_title": "Art: new player vehicle — compact casing driller (Blender MCP), replaces current machine",
     "queue": [
-      {
-        "feature": 393,
-        "kind": "ticket",
-        "title": "Art: new player vehicle — compact casing driller (Blender MCP), replaces current machine",
-        "tickets": [
-          393
-        ],
-        "since": "2026-10-14T18:19:21+02:00"
-      },
       {
         "feature": 398,
         "kind": "ticket",
