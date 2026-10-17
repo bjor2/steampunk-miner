@@ -8,7 +8,9 @@ estimates, not measurements. The merge waits for a number this harness measured 
 ## The bar
 
 - **View:** P1 band 5 (9500 bp of the radius, mid-band above the core), 20 m zoom, a 1280x800
-  window, render quality `high` at render scale 1, enemies frozen, the vehicle parked.
+  window, render quality `high` at render scale 1, enemies frozen, the vehicle parked. The look-on
+  build draws every material kind as if met (`ui.showEveryKindLook()`, ticket 450), since a fresh
+  save has met none; the look-off build has no such switch.
 - **p50 frame time at most +0.5 ms**, look on minus look off.
 - **No shader recompile:** no shader program linked while the look-on view is held.
 - **Real GPU only** (a Steam Deck-class or iGPU machine). A SwiftShader run is a dry run of the
