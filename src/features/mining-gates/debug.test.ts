@@ -78,7 +78,7 @@ describe('mining gates: debug actions', () => {
   })
 
   it('lists the gated cells a docked vehicle sees, and refuses a planet that is not one', () => {
-    const near = actions.gatesNearDock(17, 10) as { ok: true; tiles: { gate: { kind: string } }[] }
+    const near = actions.gatesNearDock(17, 32) as { ok: true; tiles: { gate: { kind: string } }[] }
     expect(near.ok).toBe(true)
     expect(near.tiles).toContainEqual(expect.objectContaining({ gate: { kind: 'dense' } }))
     expect(actions.gatesNearDock(0, 10).ok).toBe(false)

@@ -24,7 +24,7 @@ import { FACING } from '../../../systems/vehicle/vehiclePose'
 import { oreTypeAtTile } from '../../../systems/authority/tileOre'
 import { hasDiscovered } from '../../../systems/registries/discovery'
 import { magneticFieldHolding } from '../../../systems/registries/magneticGround'
-import { planetParamsFor } from '../../../systems/world/planetParams'
+import { freshPlanetParamsFor } from '../../../systems/world/planetParams'
 import type { TilePoint } from '../../../systems/world/tileGrid'
 import { readAuthorityState } from '../../../store/authorityLink'
 import { resetGameStore, useGameStore } from '../../../store/gameStore'
@@ -213,9 +213,12 @@ describe('codex discovery reaction', () => {
 /** Planet 25 is the Lodestone act's first magnetic planet (#258); its fields come from planet-mix. */
 const MAGNETIC_PLANET = 25
 const FIELD_SEED = 83921
-/** Either side of the top edge of the band-1 field round the ferrous vein at -20,831. */
-const OUTSIDE_FIELD: TilePoint = { tx: -20, ty: 837 }
-const INSIDE_FIELD: TilePoint = { tx: -20, ty: 836 }
+/**
+ * Either side of the top edge of a band-1 field in column -28, on planet 25 as a session enters it
+ * (under the depth density curve since ticket 448, which thinned the shallower vein at -20,831).
+ */
+const OUTSIDE_FIELD: TilePoint = { tx: -28, ty: 793 }
+const INSIDE_FIELD: TilePoint = { tx: -28, ty: 792 }
 
 /** A pose report with the vehicle's centre on `tile`: standing on the tile under it. */
 const centredOn = (tile: TilePoint) => poseAbove({ tx: tile.tx, ty: tile.ty - 1 }, FACING.up)
@@ -240,7 +243,7 @@ describe('codex: hazard:magnetic (ticket 290)', () => {
   afterEach(() => uninstallRunLog())
 
   it('stands its fixture tiles either side of a field edge', () => {
-    const params = planetParamsFor(FIELD_SEED, MAGNETIC_PLANET)
+    const params = freshPlanetParamsFor(FIELD_SEED, MAGNETIC_PLANET)
     expect(magneticFieldHolding(params, OUTSIDE_FIELD)).toBeNull()
     expect(magneticFieldHolding(params, INSIDE_FIELD)).not.toBeNull()
   })

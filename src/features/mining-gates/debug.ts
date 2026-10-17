@@ -9,9 +9,10 @@
  * logs `debug_command_applied` like a scenario's grant. `.lockMarkerAt(tx, ty)` reads the lock
  * marker the local player sees on a tile, and `.hintChip()` the HUD chip showing (ticket 238).
  * `.drawnMarkerAt(tx, ty)` reads the marker the ground draws there now, from the chunk mesh's gate
- * bits and the uniforms they draw with, and `.gatesNearDock(17, 10)` lists the gated ore cells a
- * docked vehicle sees on that planet and seed, so e2e specs check the ground against the lock
- * marker without driving (ticket 299).
+ * bits and the uniforms they draw with, and `.gatesNearDock(17, 32)` lists the gated ore cells a
+ * docked vehicle sees on that planet and seed, entered as `setPlanet` enters it (stamped with this
+ * build's ore rules, so under the depth density curve from planet 3), so e2e specs check the ground
+ * against the lock marker without driving (ticket 299).
  */
 import type { DebugAction } from '../../debug/debugActionRegistry'
 import { submitSliceDebugCommand } from '../../debug/sliceDebugCommands'
@@ -20,7 +21,7 @@ import { toCanonical } from '../../systems/money'
 import type { VehicleLoadout } from '../../systems/vehicle/loadoutState'
 import { groundGatePresence } from '../../scene/groundGatePresence'
 import { readAuthorityState } from '../../store/authorityLink'
-import { planetParamsFor } from '../../systems/world/planetParams'
+import { freshPlanetParamsFor } from '../../systems/world/planetParams'
 import { useGameStore } from '../../store/gameStore'
 import { useGateHintStore } from './store/gateHintStore'
 import { chipShownAt } from './systems/gateChipBoard'
@@ -123,7 +124,7 @@ function gatesNearDock(planetIndex: unknown, worldSeed: unknown) {
   if (!isWholeAtLeast(planetIndex, 1) || !isWholeAtLeast(worldSeed, 0)) {
     return { ok: false as const, problems: [NOT_A_DOCK_PLANET] }
   }
-  const tiles = gatedTilesNearDock(planetParamsFor(worldSeed, planetIndex))
+  const tiles = gatedTilesNearDock(freshPlanetParamsFor(worldSeed, planetIndex))
   return {
     ok: true as const,
     planetIndex,

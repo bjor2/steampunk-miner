@@ -51,7 +51,11 @@ const FROST_PLANETS = [17, 18, 19, 20, 21, 22, 23, 24]
 /** Dynamite gates from P7 (#142); extractor cells from P5, theme rares from P8. */
 const DYNAMITE_PLANETS = [7, 9, 11, 13, 15]
 const EXTRACTOR_PLANETS = [7, 18, 19, 20, 23, 24]
-const SEEDS = Array.from({ length: 16 }, (_, at) => at + 1)
+/**
+ * Seeds searched per planet. The depth density curve (ticket 448) leaves the ground under the pad
+ * bare, so a Frost dense cell within 8 rows first shows on seed 32 (planet 17).
+ */
+const SEEDS = Array.from({ length: 32 }, (_, at) => at + 1)
 /** Far past any campaign tip, so the rim of the last major cuts every dense cell. */
 const TIP_PAST_EVERY_GATE = 20_000
 /** Well inside the view circle at the 20 m zoom-out (20 m on 1280 x 720), so its chunk draws. */

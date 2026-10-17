@@ -9,7 +9,11 @@ import { lockMarkerOf } from './render/lockMarkers'
 // Ticket 299: the gated cells a docked vehicle sees, for the e2e checks of the ground.
 
 const FROST = 17
-const SEED_WITH_A_DENSE_CELL = 10
+/**
+ * Planet 17's docked view holds 12 gated cells on this seed under the depth density curve (ticket
+ * 448), a dense one 4 rows down.
+ */
+const SEED_WITH_GATES_IN_VIEW = 32
 
 function stateOn(planetIndex: number, planetSeed: number) {
   return createAuthorityState({ planetIndex, planetSeed, playerIds: ['p1'] })
@@ -17,7 +21,7 @@ function stateOn(planetIndex: number, planetSeed: number) {
 
 describe('gated cells near the dock', () => {
   it('lists only cells inside the docked view, each under the pad', () => {
-    const state = stateOn(FROST, SEED_WITH_A_DENSE_CELL)
+    const state = stateOn(FROST, SEED_WITH_GATES_IN_VIEW)
     const params = planetParamsOf(state.planet) as PlanetParams
     const { dockPoint, padRow } = dockSiteOf(params)
     const tiles = gatedTilesNearDock(params)
@@ -31,7 +35,7 @@ describe('gated cells near the dock', () => {
   })
 
   it('lists cells that wear a lock marker, and no ungated one', () => {
-    const state = stateOn(FROST, SEED_WITH_A_DENSE_CELL)
+    const state = stateOn(FROST, SEED_WITH_GATES_IN_VIEW)
     const tiles = gatedTilesNearDock(planetParamsOf(state.planet) as PlanetParams)
     expect(tiles.map(({ gate }) => gate.kind)).not.toContain('none')
     for (const tile of tiles) expect(lockMarkerOf(state, 'p1', tile).kind).not.toBe('none')

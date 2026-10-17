@@ -9,7 +9,7 @@ import { reportAt } from '../../../systems/authority/lava/lavaFixtures'
 import { setVehicleLoadoutCommand } from '../../../systems/authority/loadoutCommands'
 import { createScriptedSession, FREEZE_ENEMIES } from '../../../systems/authority/scriptedSession'
 import { magneticFieldHolding } from '../../../systems/registries/magneticGround'
-import { planetParamsFor } from '../../../systems/world/planetParams'
+import { freshPlanetParamsFor } from '../../../systems/world/planetParams'
 import { FACING } from '../../../systems/vehicle/vehiclePose'
 import { NO_PASSIVE_READS, passiveReadsOf } from './passiveReads'
 
@@ -34,11 +34,14 @@ function minerOwning(owned: readonly string[], researchedThrough: number | null 
   return session.state()
 }
 
-/** Planet 25 of seed 83921: a tile inside the band-1 field round the vein at -20,831 (#258). */
+/**
+ * Planet 25 of seed 83921 as a session enters it, under the depth density curve (ticket 448): the
+ * top tile of a band-1 field in column -28 (#258).
+ */
 const MAGNETIC_PLANET = 25
-const IN_FIELD = { x: -20 * 1000 + 500, y: 836 * 1000 + 500 }
+const IN_FIELD = { x: -28 * 1000 + 500, y: 792 * 1000 + 500 }
 /** Nine tiles above that field, outside every field. */
-const OFF_FIELD = { x: -20 * 1000 + 500, y: 845 * 1000 + 500 }
+const OFF_FIELD = { x: -28 * 1000 + 500, y: 801 * 1000 + 500 }
 
 /**
  * A periscope owner on planet 25 at `at`, a frozen crawler 7 tiles to its right: inside the
@@ -56,9 +59,9 @@ function periscopeOnMagneticPlanet(at: { x: number; y: number }) {
 
 describe('sensing passive reads', () => {
   it('halves a passive’s reach inside a magnetic field (spec #258, ticket 290)', () => {
-    const params = planetParamsFor(83921, MAGNETIC_PLANET)
-    expect(magneticFieldHolding(params, { tx: -20, ty: 836 })).not.toBeNull()
-    expect(magneticFieldHolding(params, { tx: -20, ty: 845 })).toBeNull()
+    const params = freshPlanetParamsFor(83921, MAGNETIC_PLANET)
+    expect(magneticFieldHolding(params, { tx: -28, ty: 792 })).not.toBeNull()
+    expect(magneticFieldHolding(params, { tx: -28, ty: 801 })).toBeNull()
     const offField = passiveReadsOf(periscopeOnMagneticPlanet(OFF_FIELD), 'p1').periscope
     expect(offField?.map((warning) => warning.kind)).toEqual(['crawler'])
     expect(passiveReadsOf(periscopeOnMagneticPlanet(IN_FIELD), 'p1').periscope).toEqual([])
