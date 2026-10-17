@@ -161,7 +161,9 @@ float drawKindGrains(vec4 kind, vec2 local, vec2 tile, float soft, inout vec3 co
   if (lead < 1) return inside;
   vec4 rarity = uRarityLooks[lead - 1];
   vec3 tint = rgbOfPacked(rarity.x);
-  float frame = rarityFrame(grain.x, rarity.z, soft);
+  // A small grain gets a thinner frame, so the rarity rims it rather than hiding it.
+  float frameWidth = rarity.z * clamp(KIND_SHAPES[int(kind.x + 0.5)].z / 0.1, 0.5, 1.0);
+  float frame = rarityFrame(grain.x, frameWidth, soft);
   colour = mix(colour, tint, frame);
   float glow = rarity.y * rarityPulse(rarity.w, uGateStill, tile);
   emissive += tint * glow * (0.8 * frame + 0.25 * inside);
