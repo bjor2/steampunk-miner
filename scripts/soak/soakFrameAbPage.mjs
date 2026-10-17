@@ -15,10 +15,13 @@ export function enterPlanet(planetIndex) {
 /**
  * The ore-heavy view, held still: full quality at render scale 1 (so the adaptive scale never
  * hides the cost), the bar's zoom, and the vehicle parked at the band's depth with no enemies.
+ * A build with the material look (ticket 450) draws every kind as if met, since a fresh save has
+ * met none; the merge-base build has no such switch and draws the family look as it always did.
  */
 export function holdOreView(view) {
   const debug = globalThis.steampunkDebug
   return [
+    ...(typeof debug.ui.showEveryKindLook === 'function' ? [debug.ui.showEveryKindLook()] : []),
     debug.ui.setRenderQuality('high'),
     debug.ui.setRenderScale(1),
     debug.ui.setZoom(view.viewShortAxisMetres),
