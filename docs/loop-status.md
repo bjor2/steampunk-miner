@@ -609,3 +609,18 @@ TD ruling on #514/#529: no hard build block, but a fixed merge order. Mechanism 
 - Stub-tested: no marker + prerequisite open, no marker + closed, marker + closed (goes ahead), marker + open (held), closed during session, plain entry unchanged, sweep (no marker,
   marker + open, marker + closed, idempotent). Files: `merge-hold-lib.sh`, `wave-lib.sh` (one sweep line; `.bak-20261017-0350-release`), `merge-hold-lib.sh.bak-20261017-0350-release`,
   `merge-after.conf.bak-20261017-0350`; `next-ticket.sh` untouched. Rollback: restore those backups.
+
+## Tester honours the quiet-bench hold (17 Oct 2026, ~06:10 Oslo box+1)
+
+Problem: `tester.sh` ignored `.quiet-hold`, and the running tester process (pid started 00:20) drains `tester/queue.json` (16 queued features, each a multi-hour full suite) one entry after another,
+so `quiet-bench.sh 514` could never see an idle box.
+- **`tester.sh`** (`.bak-20261017-0610-hold`): new `quiet_wait` (defined and called before `RUN_TAG`, and in `queue_run`'s loop condition before every `queue_take`): while a live
+  `.quiet-hold` (`<expiry epoch> <owner>`, expiry in the future) exists it sleeps in 30 s steps and starts nothing; the hold expires on its own. It then calls `quiet-queue.sh auto`.
+  Edited in place, same size (30564 bytes) and inode, one `pwrite`; the bytes added were taken out of header comments, and the process's read offset (30063) is past the edit, so the
+  running tester is unaffected. A run already in progress is never touched.
+- **Running process**: its functions are already parsed, so the edit cannot stop it. `quiet-queue.sh hide|restore|auto` (new) parks `tester/queue.json` as `queue.json.benchhold` under the queue flock; the running tester then
+  finds the queue empty after its current run and exits cleanly. Entries the driver enqueues meanwhile land in a fresh `queue.json`; `restore` merges the parked ones back in front (same-feature entries replaced like
+  `feature_enqueue`). `quiet-bench.sh` (`.bak-20261017-0610-queue`) parks on setting the hold and restores in `release()` (its EXIT trap and `--release`); `auto` (from `quiet_wait`) restores when no live hold
+  remains, so a crashed bench cannot strand the queue.
+- After a restore the driver's next `tester_kick` starts a fresh tester when the queue is non-empty. Rollback: restore the two backups, delete `quiet-queue.sh`, `quiet-queue.sh restore`.
+- Stub-tested: `quiet_wait` with no hold, expired hold, garbage hold, live hold (waits until it expires); `quiet-queue.sh` hide / merge with new entries / auto with a live hold (no-op) / auto after the hold / repeated hide / restore without a parked file.
