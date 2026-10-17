@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "updated_at": "2026-10-17T23:54:28Z",
+  "updated_at": "2026-10-17T23:56:12Z",
   "entries": {
     "steampunk-loop/1": {
       "loop": "steampunk-loop",
@@ -8,16 +8,16 @@
       "state": "working",
       "issue": 452,
       "note": "started 2026-10-18 00:23 BST",
-      "updated_at": "2026-10-17T23:52:37Z",
+      "updated_at": "2026-10-17T23:56:12Z",
       "host": "grok-bot-vm-452660841"
     },
     "steampunk-loop/2": {
       "loop": "steampunk-loop",
       "slot": "2",
-      "state": "working",
+      "state": "idle",
       "issue": null,
-      "note": "started 2026-10-18 00:52 BST",
-      "updated_at": "2026-10-17T23:52:37Z",
+      "note": "free",
+      "updated_at": "2026-10-17T23:56:12Z",
       "host": "grok-bot-vm-452660841"
     },
     "steampunk-loop/3": {
@@ -26,7 +26,7 @@
       "state": "idle",
       "issue": null,
       "note": "free",
-      "updated_at": "2026-10-17T23:52:37Z",
+      "updated_at": "2026-10-17T23:56:12Z",
       "host": "grok-bot-vm-452660841"
     },
     "steampunk-loop/4": {
@@ -35,7 +35,7 @@
       "state": "idle",
       "issue": null,
       "note": "free",
-      "updated_at": "2026-10-17T23:52:37Z",
+      "updated_at": "2026-10-17T23:56:12Z",
       "host": "grok-bot-vm-452660841"
     },
     "steampunk-loop": {
@@ -43,9 +43,9 @@
       "slot": null,
       "state": "working",
       "issue": null,
-      "note": "3/10 Claude slots busy, 0/4 planner slots; status check",
+      "note": "2/10 Claude slots busy, 0/4 planner slots; status check",
       "extra": {
-        "active": 3,
+        "active": 2,
         "max": 10,
         "max_attempts": 2,
         "attempts": {
@@ -464,7 +464,7 @@
         "planner": [],
         "push_pending": null
       },
-      "updated_at": "2026-10-17T23:52:37Z",
+      "updated_at": "2026-10-17T23:56:12Z",
       "host": "grok-bot-vm-452660841"
     },
     "perf-loop": {
@@ -482,7 +482,7 @@
       "state": "idle",
       "issue": null,
       "note": "free",
-      "updated_at": "2026-10-17T23:52:37Z",
+      "updated_at": "2026-10-17T23:56:12Z",
       "host": "grok-bot-vm-452660841"
     },
     "steampunk-loop/6": {
@@ -491,7 +491,7 @@
       "state": "idle",
       "issue": null,
       "note": "free",
-      "updated_at": "2026-10-17T23:52:37Z",
+      "updated_at": "2026-10-17T23:56:12Z",
       "host": "grok-bot-vm-452660841"
     },
     "steampunk-loop/7": {
@@ -499,8 +499,8 @@
       "slot": "7",
       "state": "working",
       "issue": 537,
-      "note": "tier fable, attempt 1/2 (session running)",
-      "updated_at": "2026-10-17T23:54:28Z",
+      "note": "started 2026-10-17 23:17 BST",
+      "updated_at": "2026-10-17T23:56:12Z",
       "host": "grok-bot-vm-452660841"
     },
     "steampunk-loop/8": {
@@ -509,7 +509,7 @@
       "state": "idle",
       "issue": null,
       "note": "free",
-      "updated_at": "2026-10-17T23:52:37Z",
+      "updated_at": "2026-10-17T23:56:12Z",
       "host": "grok-bot-vm-452660841"
     },
     "tester": {
@@ -528,7 +528,7 @@
       "state": "idle",
       "issue": null,
       "note": "free",
-      "updated_at": "2026-10-17T23:52:37Z",
+      "updated_at": "2026-10-17T23:56:12Z",
       "host": "grok-bot-vm-452660841"
     },
     "steampunk-loop/11": {
@@ -555,11 +555,18 @@
       "state": "idle",
       "issue": null,
       "note": "free",
-      "updated_at": "2026-10-17T23:52:37Z",
+      "updated_at": "2026-10-17T23:56:12Z",
       "host": "grok-bot-vm-452660841"
     }
   },
   "events": [
+    {
+      "at": "2026-10-17T23:56:12Z",
+      "key": "steampunk-loop/2",
+      "state": "idle",
+      "issue": null,
+      "note": "free"
+    },
     {
       "at": "2026-10-17T23:52:25Z",
       "key": "steampunk-loop/2",
@@ -972,13 +979,6 @@
       "state": "idle",
       "issue": null,
       "note": "free; #538 landed on main and closed"
-    },
-    {
-      "at": "2026-10-17T09:56:11Z",
-      "key": "steampunk-loop",
-      "state": "working",
-      "issue": null,
-      "note": "1/10 Claude slots busy, 0/4 planner slots; no pickable build ticket; delegated 0 spec(s); planner slots 0/4"
     }
   ]
 }
