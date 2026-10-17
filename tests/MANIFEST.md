@@ -1414,7 +1414,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/vehicle/carryDebt.test.ts` | 8 | 8 |
 | `src/systems/vehicle/carryWalk.test.ts` | 52 | 22 |
 | `src/systems/vehicle/casingTrail.test.ts` | 25 | 17 |
-| `src/systems/vehicle/casingTrailCadence.lane.test.ts` | 9 | 3 |
+| `src/systems/vehicle/casingTrailCadence.lane.test.ts` | 8 | 2 |
 | `src/systems/vehicle/casingTrailReversal.test.ts` | 36 | 5 |
 | `src/systems/vehicle/chargeSelection.test.ts` | 4 | 4 |
 | `src/systems/vehicle/colliderHalo.test.ts` | 3 | 3 |
