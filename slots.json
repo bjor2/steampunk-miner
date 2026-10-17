@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-10-17T00:42:28+01:00",
+  "updated_at": "2026-10-17T01:15:56+01:00",
   "caps": {
     "grok": 12,
     "claude": 10,
@@ -73,7 +73,7 @@
       "size": 6,
       "used": 4,
       "free": 2,
-      "claims_last_hour": 11,
+      "claims_last_hour": 7,
       "name": "Claude Max 1"
     },
     {
@@ -695,6 +695,34 @@
     "parallel": 1,
     "list": [
       {
+        "number": 534,
+        "key": "302-9B",
+        "map": 302,
+        "lane": "remote",
+        "mode": "solo",
+        "state": "blocked",
+        "tickets": [
+          450,
+          451,
+          454
+        ],
+        "done": [],
+        "live": 0
+      },
+      {
+        "number": 533,
+        "key": "302-9A",
+        "map": 302,
+        "lane": "remote",
+        "mode": "solo",
+        "state": "blocked",
+        "tickets": [
+          449
+        ],
+        "done": [],
+        "live": 0
+      },
+      {
         "number": 532,
         "key": "316-2G",
         "map": 316,
@@ -772,13 +800,10 @@
         "map": 302,
         "lane": "remote",
         "mode": "solo",
-        "state": "blocked",
+        "state": "ready",
         "tickets": [
-          449,
-          452,
-          450,
-          451,
-          454
+          445,
+          452
         ],
         "done": [],
         "live": 0
