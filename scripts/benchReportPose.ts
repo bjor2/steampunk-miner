@@ -1,7 +1,7 @@
 /**
  * The authority's cost of a pose report every tick while the drill bites (ticket 514 scope 5, cost
  * gate final in the TD addendum 6225108027 on #514, with the Vertical Scaler's ruling). At the
- * shipped `DRILL_POSE_REPORT_INTERVAL_TICKS`:
+ * shipped `DRILL_POSE_REPORT_INTERVAL_TICKS`, with `drill.exactCarry` on as it ships with:
  * - W = 7: tick p50 1.2 ms or less, an absolute bar;
  * - W = 27: tick p95 2 ms or less, or else no worse than 1.25x the flag-on swept cut's p95 timed
  *   beside it (same rig, width and stride, interleaved in the same run);
@@ -34,6 +34,7 @@ import { loggedCommandsOf } from '../src/logging/commandLog'
 import { withRegistrations } from '../src/registries/registrar'
 import type { SliceDefinition } from '../src/registries/sliceDefinition'
 import type { AuthorityCommand } from '../src/systems/authority/authorityCommand'
+import { withDrillExactCarry } from '../src/systems/authority/cutCarryFixtures'
 import { logBenchmarkSeriesWhenAsked } from './bench/benchRunLog'
 import { p95OverSweptOf, REPORT_POSE_BAR, reportPoseGatesOf } from './bench/reportPoseBar'
 import { driveLeg, passTicksOf, type Leg, type LegRun } from './bench/reportPoseLegs'
@@ -168,7 +169,12 @@ function seriesNameOf(leg: Leg): string {
   return `reportPose.p${leg.rig.planetLevel}.w${leg.width}.${leg.speedMps}mps.${cadence}`
 }
 
-const runs = [...groupsOf(PLANET_1_RIG), ...groupsOf(PLANET_200_RIG)]
+// A report every tick ships only with the authority's exact carry on (TD 6236464931 on #514), so
+// the report legs are timed with the charge they ship with.
+const runs = withDrillExactCarry(true, () => [
+  ...groupsOf(PLANET_1_RIG),
+  ...groupsOf(PLANET_200_RIG),
+])
 const rows = withSweptRatios(runs.map(({ leg, run }) => rowOf(leg, run)))
 const gates = reportPoseGatesOf(rows, DRILL_POSE_REPORT_INTERVAL_TICKS)
 console.log(
