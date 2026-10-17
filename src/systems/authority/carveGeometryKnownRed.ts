@@ -16,7 +16,8 @@ import type { GeometryMisses } from './lawWorkFixtures'
 /** The finding ticket's metrics file (`docs/metrics/tickets/<n>.json`) as text, or null if none. */
 export type FindingTicketFileReader = (finding: number) => string | null
 
-export const CARVE_GEOMETRY_KNOWN_RED: KnownRedMarker = {
+/** Local to the lane, as `exactCarry.lane`'s is: the repo's one exported marker is ticket 419's. */
+const CARVE_GEOMETRY_MARKER: KnownRedMarker = {
   finding: 545,
   reason:
     'the report capsule removes by falloff weight where swept clears every crossed cell in full, so three fixed-track rows miss the carve-geometry bars until the paid-cell rule on the report path (#545)',
@@ -50,7 +51,7 @@ export function carveGeometryVerdictOf(
   misses: GeometryMisses,
   readFindingTicketFile: FindingTicketFileReader,
 ): CarveGeometryVerdict {
-  const closedOn = closedOnIn(readFindingTicketFile(CARVE_GEOMETRY_KNOWN_RED.finding))
+  const closedOn = closedOnIn(readFindingTicketFile(CARVE_GEOMETRY_MARKER.finding))
   const problems = problemsOf(track, misses)
   if (closedOn !== null) {
     return { failures: [expiredProblemOf(closedOn), ...problems.map(textOf)], knownRed: [] }
@@ -60,7 +61,7 @@ export function carveGeometryVerdictOf(
   return {
     failures: [...failures.map(textOf), ...greenDeviationProblemsOf(track, misses)],
     knownRed: held.map(
-      (problem) => `known-red (#${CARVE_GEOMETRY_KNOWN_RED.finding}): ${textOf(problem)}`,
+      (problem) => `known-red (#${CARVE_GEOMETRY_MARKER.finding}): ${textOf(problem)}`,
     ),
   }
 }
@@ -87,7 +88,7 @@ function greenDeviationProblemsOf(track: string, misses: GeometryMisses): string
     (named) => named.track === track && misses[named.bar] === 0,
   ).map(
     (named) =>
-      `${track} ${named.bar} is inside the band but still a named deviation under #${CARVE_GEOMETRY_KNOWN_RED.finding}: delete it`,
+      `${track} ${named.bar} is inside the band but still a named deviation under #${CARVE_GEOMETRY_MARKER.finding}: delete it`,
   )
 }
 
@@ -106,5 +107,5 @@ function closedOnIn(ticketFile: string | null): string | null {
 }
 
 function expiredProblemOf(closedOn: string): string {
-  return `known-red marker for #${CARVE_GEOMETRY_KNOWN_RED.finding} expired: the finding closed on ${closedOn}; delete the deviations (the bars must hold) or file a new finding`
+  return `known-red marker for #${CARVE_GEOMETRY_MARKER.finding} expired: the finding closed on ${closedOn}; delete the deviations (the bars must hold) or file a new finding`
 }

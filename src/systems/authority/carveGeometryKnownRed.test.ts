@@ -1,9 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import {
-  CARVE_GEOMETRY_DEVIATIONS,
-  CARVE_GEOMETRY_KNOWN_RED,
-  carveGeometryVerdictOf,
-} from './carveGeometryKnownRed'
+import { CARVE_GEOMETRY_DEVIATIONS, carveGeometryVerdictOf } from './carveGeometryKnownRed'
 
 // The three named deviations of ticket 537's landing bars, held under #545 (the GD 6241320435
 // item 2): only the named bar of a named row is held, printed with its number; any other red
@@ -15,8 +11,7 @@ const CLOSED = () => JSON.stringify({ closed: '2026-10-20' })
 const INSIDE = { lawWorkPerMetre: 0, cellsPerMetre: 0 }
 
 describe('carve-geometry known red (ticket 537, #545)', () => {
-  it('names the three rows the ruling named, under #545', () => {
-    expect(CARVE_GEOMETRY_KNOWN_RED.finding).toBe(545)
+  it('names the three rows the ruling named', () => {
     expect(CARVE_GEOMETRY_DEVIATIONS.map((named) => `${named.track} ${named.bar}`)).toEqual([
       '3 m/s flat level lawWorkPerMetre',
       '25 m/s tilted down cellsPerMetre',
