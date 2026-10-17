@@ -1343,6 +1343,17 @@ Systems' share asserts for the materials (#139: 6203159815, 650 bp per tier sinc
 - **The #385 denominator** is the rarity-weighted full hold `cargo x V(t(p,b)) x mu_b`, `mu_b` the rarity rows' `meanPpmByBand` (`incomeCapCheck.ts`); every verdict keeps the nominal share beside it. `tripCapAt` and the 15% line are unchanged.
 - **The table** `docs/economy/rarity-shares.json` is written by `npm run rarity:shares` through the roster's debug action `shareTable` and printed on the status page's Performance tab (`scripts/status/rarityShareHtml.mjs`).
 
+### 3.72 The material look in the ground (ticket 450)
+
+How a planet's material kinds draw in the terrain shader (TD shape on #450 6226270701, GD ruling 6226278574, the Scalers' conditions recorded on #450). Look only: horizontal, no price, gate, income, save, generation or protocol change.
+
+- **The registry.** `src/systems/registries/kindLook.ts`, one provider (`r.kindLook`), the `roster` slice's `roster.kind-look`. It answers `kindLooksOf(params)`, each roster slot's species look (catalogue silhouette and pattern ids, the hue slot's colour, the rarity's tier offset, the hero flag) or null, empty for a planet with no roster; `rarityLooks()`, the tint, frame, glow and pulse of rarity leads 1 to 4 (`materials/rarityLooks.json`); and `hasSeenKind(state, playerId, speciesId)`. With no provider no tile carries a kind slot and the table stays empty.
+- **Per tile** only the kind slot rides, in its own instance array (`kinds`, attribute `aKind`, one varying): 9 of the 15 guaranteed varyings. The arrays the shader read before are unchanged.
+- **The table** (`render/kindLookTable.ts`): 16 slot `vec4`s (silhouette code, pattern code, colour as 0xRRGGBB, rarity lead + 8 for a hero) and 4 rarity `vec4`s (tint, glow, frame, pulse), 20 uniform vectors. `scene/terrainKindLooks.ts` is its one writer and rewrites it only when the planet, the local player's slice sections or the debug show-all switch change. A slot the player has not seen stays zeros, today's family decal with no rarity tint or frame.
+- **The catalogue** of silhouettes and patterns the shader draws is kernel data (`render/kindLooks.json`), coded by position plus one and chosen per tile by the table, never by `#define`; the materials table refuses a row naming an id it lacks. A new silhouette or pattern is a kernel row.
+- **Seen** is asked through the discovery query (3.12) under `material:<species id>`, a kind the `roster` slice declares by augmentation only. Nothing records it yet, so play draws the family look until a sighting record lands; `ui.showEveryKindLook()` draws every kind for eye checks and the #526 A/B.
+- **Fallbacks.** The lite program (ticket 477) has no kind slot and always draws the family decal. Reduce motion holds the rarity glow at its mean.
+
 ## 4. Cross-slice contracts
 
 ```mermaid
