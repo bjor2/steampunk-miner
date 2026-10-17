@@ -121,6 +121,19 @@ export interface VehicleState {
    * never meets one digests as it always did.
    */
   gatedBite?: GatedBite
+  /**
+   * What a pose report's own cut still owes the tank, in the numerator of `cutCarry.ts` (ticket
+   * 535, A6): the part of its charge on density removed under one quantum, or the debt a tank that
+   * could not pay left, paid by the next cut. Absent at 0, so a world that never drills by report
+   * digests as before; dropped at planet entry, by the tow and by a new game.
+   */
+  cutEnergyCarry?: number
+  /**
+   * The law work a pose report's own cut removed and has not heated yet, in density sub-steps
+   * (`cutCarry.ts`, ticket 535): under one drill tick between commands, carried into the next
+   * report's heat. Absent at 0; dropped where `cutEnergyCarry` is.
+   */
+  cutHeatCarry?: number
 }
 
 export const EMPTY_CARGO: Cargo = { ore: {}, coreFragments: 0 }

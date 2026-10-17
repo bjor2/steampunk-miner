@@ -18,6 +18,7 @@ import {
 import { rescueFee } from '../economy/planetCharges'
 import { oreSalePrice } from '../economy/oreEconomy'
 import { add, cmp, fromSafeInteger, mul, sub, toCanonical, ZERO_MONEY, type Money } from '../money'
+import { withoutCutCarry } from '../vehicle/cutCarry'
 import { isAtOrBelowPercent, rescueFloorQuanta } from '../vehicle/energyQuanta'
 import { dockedPoseAt, isInPadZone } from '../vehicle/vehiclePose'
 import {
@@ -68,8 +69,8 @@ export function destroyIfHullGone(
 
 /**
  * The tow (#7, #8): fee paid, cargo ore lost, hull full, at least 25% energy, back on the dock,
- * the carried core fragments delivered to the bay (#8 Game Director's rule, #10), and the trip
- * over for combat (#9).
+ * the carried core fragments delivered to the bay (#8 Game Director's rule, #10), the report
+ * cut's carry dropped with the trip (ticket 535), and the trip over for combat (#9).
  */
 export function towVehicle(
   state: AuthorityState,
@@ -224,7 +225,7 @@ function bringVehicleToDock(state: AuthorityState, playerId: string): RuleEffect
 function towedVehicle(vehicle: VehicleState, pose: VehicleState['pose']): VehicleState {
   const stats = statsOfVehicle(vehicle)
   return {
-    ...vehicle,
+    ...withoutCutCarry(vehicle),
     hull: stats.hullMax,
     energy: Math.max(vehicle.energy, rescueFloorQuanta(vehicle.levels.boiler)),
     cargo: { ...vehicle.cargo, ore: {} },

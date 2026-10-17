@@ -23,6 +23,7 @@ import {
   poseAbove,
   surfaceOreTiles,
 } from './scriptedSession'
+import { cutEnergyNumeratorOf } from './cutCarryFixtures'
 import { stateDigest } from './stateDigest'
 
 // Slice drill gear on the reported drill (ticket 234, the GD lock on #205): fake slices register
@@ -98,7 +99,8 @@ function drillWith(
     const session = createScriptedSession()
     for (const intent of setup) session.submit(0, intent)
     session.submit(1, poseAbove(tile, facing))
-    const before = session.vehicle().energy
+    const beforeVehicle = session.vehicle()
+    const before = beforeVehicle.energy
     const events = session.submit(
       1 + DRILL_TICKS,
       poseAbove(tile, facing, { drillTicks: DRILL_TICKS, drive }),
@@ -107,6 +109,8 @@ function drillWith(
       events,
       world: session.state().world,
       spent: before - session.vehicle().energy,
+      /** What the cut charged in the carry's numerator (ticket 535), exact below a quantum. */
+      charged: cutEnergyNumeratorOf(beforeVehicle, session.vehicle()),
       digest: stateDigest(session.state()),
     }
   })
@@ -476,11 +480,17 @@ describe('drill gear cut', () => {
     expect(densityOf(steeringLeft, cellBesideBore(1))).toBe(densityOf(plain, cellBesideBore(1)))
   })
 
-  it('charges one flank half the side cells of both', () => {
-    const plain = drillWith([]).spent
-    const both = drillWith([gearSlice({ sideCells: 1 })]).spent
-    const oneFlank = drillWith([SIDE_HOLD], TARGET, FACING.down, [], pushingSide(1)).spent
-    expect(oneFlank - plain).toBe((both - plain) / 2)
+  it('charges each flank its own side cell, the two together what both side cells cost', () => {
+    // Since ticket 535 a cut is charged on the density it removed, so the two flanks' cells cost
+    // what each removed at its share, not half of a tick count: the right and the left flank
+    // beyond the plain cut sum exactly to both side cells beyond it, in the carry's numerator.
+    const plain = drillWith([]).charged
+    const both = drillWith([gearSlice({ sideCells: 1 })]).charged
+    const right = drillWith([SIDE_HOLD], TARGET, FACING.down, [], pushingSide(1)).charged
+    const left = drillWith([SIDE_HOLD], TARGET, FACING.down, [], pushingSide(-1)).charged
+    expect(right - plain).toBeGreaterThan(0)
+    expect(left - plain).toBeGreaterThan(0)
+    expect(right - plain + (left - plain)).toBe(both - plain)
   })
 
   it('cuts exactly one flank with no drive: the seed, else the facing right', () => {

@@ -7,13 +7,20 @@ import { fromCanonical, fromSafeInteger, mul, sub, toCanonical } from '../money'
 import type { CommandIntent } from './authorityCommand'
 import type { DomainEvent } from './domainEvent'
 import { heatLineEvents, heatLinesOf, heatThrottledDrill } from './heatRules'
-import { createScriptedSession, FREEZE_ENEMIES, type ScriptedSession } from './scriptedSession'
+import {
+  createScriptedSession,
+  drill,
+  FREEZE_ENEMIES,
+  type ScriptedSession,
+} from './scriptedSession'
 import { NO_DRIVE } from '../vehicle/driveSigns'
 
 /** Planet 8, the first heat planet: radius 676 tiles, band 5 from 67.6 tiles in, core 10. */
 const HEAT_PLANET = 8
 /** Band-5 rock straight above the core, 40 m from the centre. */
 const BAND_5 = { x: 500, y: 40500 }
+/** The cell under the nose of a vehicle at `BAND_5` facing down. */
+const BAND_5_NOSE = { tx: 0, ty: 39 }
 
 const setHeat = (heat: number): CommandIntent => ({ type: 'debug.setHeat', payload: { heat } })
 
@@ -66,6 +73,26 @@ function reportFor(
   return lastTick
 }
 
+/**
+ * Scripted drilling (`drillTile`) of the band-5 cell under the nose every `interval` ticks from
+ * `firstTick` for `seconds`, refilling the tank each time. The gauge's numbers are held on the
+ * scripted drill, which heats for every tick it drills: since ticket 535 a pose report's own cut
+ * heats for the density it removes, and planet 8's level-0 drill cannot scratch band 5.
+ */
+function drillFor(
+  session: ScriptedSession,
+  firstTick: number,
+  seconds: number,
+  interval: number,
+): number {
+  const lastTick = firstTick + seconds * TICKS_PER_SECOND
+  for (let tick = firstTick + interval; tick <= lastTick; tick += interval) {
+    session.submit(tick, { type: 'debug.setEnergy', payload: { energy: '150' } })
+    session.submit(tick, drill(BAND_5_NOSE, interval))
+  }
+  return lastTick
+}
+
 const drilling = (interval: number) => ({ drill: interval })
 const driving = (interval: number) => ({ drive: interval })
 
@@ -86,7 +113,7 @@ describe('heat gauge (#113 numbers acceptance 1)', () => {
   it('reaches 70 from cold after 108 +- 5 s of drilling band 5 on planet 8', () => {
     const session = onHeatPlanet()
     session.submit(0, reportAt(BAND_5, {}))
-    reportFor(session, 0, 120, 12, drilling)
+    drillFor(session, 0, 120, 12)
     const seconds = (firstTickOf(session.events(), isThreshold(70)) ?? 0) / TICKS_PER_SECOND
     expect(seconds).toBeGreaterThanOrEqual(103)
     expect(seconds).toBeLessThanOrEqual(113)
@@ -105,7 +132,7 @@ describe('heat gauge (#113 numbers acceptance 1)', () => {
   it('throttles the drill from 70, before the hull takes any heat damage at 100', () => {
     const session = onHeatPlanet()
     session.submit(0, reportAt(BAND_5, {}))
-    reportFor(session, 0, 200, 12, drilling)
+    drillFor(session, 0, 200, 12)
     const events = session.events()
     const throttled = firstTickOf(events, (event) => event.type === 'OverheatStarted')
     const damaged = firstTickOf(events, isHeatDamage)

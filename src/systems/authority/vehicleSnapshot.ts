@@ -5,6 +5,7 @@
  * anything is built from it; the digest check in `sessionSnapshot.ts` then catches any value that does not match.
  */
 import { isChargeSize } from '../economy/chargeSizes'
+import { LAW_WORK_PER_DRILL_TICK } from '../vehicle/cutCarry'
 import type { AheadBearing, BoreSide } from '../economy/drillGearCaps'
 import { STANDARD_LINING_TYPE } from '../economy/heatEconomy'
 import { fromCanonical, isNonNegativeMoneyText, toCanonical, type Money } from '../money'
@@ -141,6 +142,14 @@ export function portableVehicleProblems(vehicle: unknown, path: string): string[
     ...(vehicle.gatedBite === undefined || isPortableGatedBite(vehicle.gatedBite)
       ? []
       : [`${path}.gatedBite must hold a whole tick and its cells, or be left out`]),
+    ...(vehicle.cutEnergyCarry === undefined || isPortableCutEnergyCarry(vehicle.cutEnergyCarry)
+      ? []
+      : [`${path}.cutEnergyCarry must be a whole number above 0, or be left out`]),
+    ...(vehicle.cutHeatCarry === undefined || isPortableCutHeatCarry(vehicle.cutHeatCarry)
+      ? []
+      : [
+          `${path}.cutHeatCarry must be whole law work under one drill tick, above 0, or be left out`,
+        ]),
     ...(vehicle.sweptCut === undefined || isPortableSweptCut(vehicle.sweptCut)
       ? []
       : [
@@ -267,6 +276,18 @@ function isPortableSweptCut(cursor: unknown): boolean {
     isWholeNumber(cursor.cutSharePassed) &&
     isWholeNumber(cursor.digSubSteps) &&
     isWholeNumber(cursor.carrySubSteps)
+  )
+}
+
+/** The report cut's energy carry (ticket 535): above 0 (left out at 0); a clamped tank's debt may exceed a quantum. */
+function isPortableCutEnergyCarry(carry: unknown): boolean {
+  return isWholeNumber(carry) && (carry as number) > 0
+}
+
+/** The report cut's heat carry (ticket 535): above 0, under one drill tick between commands. */
+function isPortableCutHeatCarry(carry: unknown): boolean {
+  return (
+    isWholeNumber(carry) && (carry as number) > 0 && (carry as number) < LAW_WORK_PER_DRILL_TICK
   )
 }
 

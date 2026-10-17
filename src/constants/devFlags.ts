@@ -28,9 +28,20 @@ export const DEV_FLAGS: DevFlags = { 'drill.sweptCut': false }
  *   vehicle until the lure ends. On since the resonance whistle shipped (#262): with no lure
  *   sounding the step hunts the vehicle exactly as with the flag off, so every hunt and golden
  *   without a whistle blown is as before. Off, the registry is never read.
+ * - `drill.exactCarry` (ticket 535, A6 "Option L" on #529, the TD shape 6228682000): a pose
+ *   report's own cut (not one the swept cut's steps already cut) is charged on the density it
+ *   removed at each cell's law time, the swept price, with an integer carry on the vehicle
+ *   (`vehicle/cutCarry.ts`), and heats from the same tally; the carve itself is unchanged. On; the
+ *   kill-switch for one soak, and the proof that the switch off replays protocol 83's digests
+ *   byte for byte. Off, the report charges the ticks its stamp removed something in and heats
+ *   for its client-counted drill ticks, as protocol 83 did.
  */
 export interface AuthorityDevFlags {
   readonly 'enemy.lureRetarget': boolean
+  readonly 'drill.exactCarry': boolean
 }
 
-export const AUTHORITY_DEV_FLAGS: AuthorityDevFlags = { 'enemy.lureRetarget': true }
+export const AUTHORITY_DEV_FLAGS: AuthorityDevFlags = {
+  'enemy.lureRetarget': true,
+  'drill.exactCarry': true,
+}

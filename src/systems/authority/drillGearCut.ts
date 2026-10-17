@@ -27,7 +27,9 @@
  * drill's rate, an ahead cell at `aheadEnergyShareBp` (a whole share along the facing, the side
  * floor on a diagonal) and a side cell at `sideEnergyShareBp` (never under a whole share), rounded
  * up once. The cells cut only for the ticks the tank can pay after the
- * disc's whole window, so a drill command never charges more than the tank holds.
+ * disc's whole window, so a drill command never charges more than the tank holds. A carve that
+ * tallies law work (ticket 535) also answers it share-weighted, each listed cell at its share, for
+ * the report cut's charge on density removed.
  *
  * The scripted `drillTile` reads the same gear (GD ruling on #392), so the pacing bot and the player
  * share one cut: the bit is the bored cell (`cellStampOf`), aimed by the last reported pose's facing
@@ -91,6 +93,8 @@ export interface DrillCarveRequest {
 export interface DrillCarve extends Carve {
   /** The energy the drill gear's cells cost beyond the disc's ticks, in quanta. */
   gearQuanta: number
+  /** `lawWork` with each gear cell at its energy share, in basis points (ticket 535). */
+  lawWorkBp: number
   /** The drill gear's cells this cut reached, each with its energy share (ticket 335). */
   gearCells: readonly GearCellShare[]
   /** The ahead bearing this cut latched, or null when no gear is aimed by the drive. */
@@ -116,7 +120,14 @@ export interface DrillGearRead {
 
 /** A carve with no drill gear: nothing beyond the disc's ticks. */
 export function withoutGear(carve: Carve): DrillCarve {
-  return { ...carve, gearQuanta: 0, gearCells: [], aheadLatch: null, sideLatch: null }
+  return {
+    ...carve,
+    gearQuanta: 0,
+    lawWorkBp: carve.lawWork * BASIS_POINTS,
+    gearCells: [],
+    aheadLatch: null,
+    sideLatch: null,
+  }
 }
 
 export function carveStampWithGear(
@@ -357,7 +368,20 @@ function carveBitAndGear(
   const carved = carveWithCells(cells, windows)
   const latches = { aheadLatch: read.aheadLatch, sideLatch: read.sideLatch }
   const gearCells = cells.map((tile, index) => ({ ...tile, shareBp: shares[index] }))
-  return { ...carved, gearQuanta: gearQuantaOf(carved, shares), gearCells, ...latches }
+  return {
+    ...carved,
+    gearQuanta: gearQuantaOf(carved, shares),
+    lawWorkBp: lawWorkBpOf(carved, shares),
+    gearCells,
+    ...latches,
+  }
+}
+
+/** The disc's law work at the drill's whole share, and each listed cell's at its own (ticket 535). */
+function lawWorkBpOf(carved: CarveBesideDisc, shares: readonly number[]): number {
+  const cellsLaw = carved.cellLawWork.reduce((sum, law) => sum + law, 0)
+  const cellsLawBp = carved.cellLawWork.reduce((sum, law, index) => sum + law * shares[index], 0)
+  return (carved.lawWork - cellsLaw) * BASIS_POINTS + cellsLawBp
 }
 
 /** Each listed cell's energy share in basis points, in carve order: ahead cells, then side. */

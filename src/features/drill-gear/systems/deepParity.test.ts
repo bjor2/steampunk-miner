@@ -1,6 +1,12 @@
 import { describe, expect, it } from 'vitest'
 import type { CommandIntent } from '../../../systems/authority/authorityCommand'
 import { createAuthorityState } from '../../../systems/authority/authorityState'
+import {
+  cutEnergyNumeratorOf,
+  energyNumeratorOfLawWork,
+  lawWorkRemovedOf,
+  tilesAround,
+} from '../../../systems/authority/cutCarryFixtures'
 import type { DomainEvent } from '../../../systems/authority/domainEvent'
 import { ticksPerCell } from '../../../systems/authority/groundDrill'
 import { heatThrottledDrill } from '../../../systems/authority/heatRules'
@@ -19,16 +25,20 @@ import { drillStampOf } from '../../../systems/vehicle/drillStamp'
 import { ENERGY_QUANTA_PER_TICK } from '../../../systems/vehicle/energyQuanta'
 import { setUpgradeCommand } from '../../../systems/vehicle/vehicleCommands'
 import { FACING, type VehiclePose } from '../../../systems/vehicle/vehiclePose'
+import { cellDensitySum } from '../../../systems/world/cellYield'
 import { planetParamsFor } from '../../../systems/world/planetParams'
 import { surfaceRowOfColumn, type TilePoint } from '../../../systems/world/tileGrid'
 import { EMPTY_WORLD, materialCellAt } from '../../../systems/world/worldState'
 import { DEEP_BRANCH } from './drillGearFork'
 
 // The GD ruling on #392 (ticket 392): the bot's scripted bore and the player's reported cut share
-// one drill-gear path, so with Deep owned the cell past the bit costs the same ticks either way:
-// its own drill time, on every planet from 1 to 20. The bot reaches it as the tile past the bored
-// one, the player as the cell past the stamp's rim; each pays the drill's energy for exactly the
-// ticks its own hardness takes.
+// one drill-gear path, so with Deep owned the cell past the bit is cut either way at its own drill
+// time, on every planet from 1 to 20. The bot reaches it as the tile past the bored one and pays
+// the drill's energy for exactly the whole ticks its own hardness takes. The player reaches it as
+// the cell past the stamp's rim; since ticket 535 a report's own cut is charged on the density it
+// removed at each cell's law time (the cell past the bit at Deep's whole share along the facing),
+// exactly, in the carry's numerator (Systems on #514: scripted and reported drills no longer
+// charge the same).
 
 const PLAYER = 'p1'
 const SEED = 83921
@@ -91,18 +101,37 @@ function botBoreOn(planet: number): GearCut {
   return { gearTicks: gearTicksOf(before - session.vehicle().energy, events), aheadTile }
 }
 
+/** What a report's cut charged in the carry's numerator, the law work it removed, and the cell past the bit. */
+interface ReportedCut {
+  charged: number
+  lawWorkCharge: number
+  aheadRemoved: number
+  aheadTile: TilePoint
+}
+
 /** The player's cut: a report facing down with the drill running over the target. */
-function playerCutOn(planet: number): GearCut {
+function playerCutOn(planet: number): ReportedCut {
   const session = deepSessionOn(planet)
   const target = targetOn(planet)
   session.submit(1, poseAbove(target, FACING.down))
-  const before = session.vehicle().energy
+  const before = session.state()
   const report = poseAbove(target, FACING.down, { drillTicks: DRILL_TICKS })
-  const events = session.submit(1 + DRILL_TICKS, report)
+  session.submit(1 + DRILL_TICKS, report)
   const pose = session.vehicle().pose as VehiclePose
   const stamp = drillStampOf(pose, false)
   const [aheadTile] = drillGearCellsAt(pose, stamp, { aheadCells: 1, sideCells: 0 }).ahead
-  return { gearTicks: gearTicksOf(before - session.vehicle().energy, events), aheadTile }
+  const after = session.state()
+  const params = planetParamsFor(SEED, planet)
+  return {
+    charged: cutEnergyNumeratorOf(before.players[PLAYER].vehicle, session.vehicle()),
+    lawWorkCharge: energyNumeratorOfLawWork(
+      lawWorkRemovedOf(before, after.world, tilesAround(target, 3), PLAYER),
+    ),
+    aheadRemoved:
+      cellDensitySum(before.world, params, aheadTile) -
+      cellDensitySum(after.world, params, aheadTile),
+    aheadTile,
+  }
 }
 
 /** The ticks the on-curve drill of `planet` takes to break `tile`. */
@@ -114,13 +143,14 @@ function ownTicksOf(planet: number, tile: TilePoint): number | null {
 
 describe('drill-gear fork: Deep from the bot and the player (GD ruling on #392)', () => {
   it.each(PLANETS)(
-    'charges the cell past the bit its own drill ticks on planet %i, bored or cut',
+    'charges the cell past the bit its own drill time on planet %i, bored or cut',
     (planet) => {
       const bot = botBoreOn(planet)
       const player = playerCutOn(planet)
       expect(bot.gearTicks).toBe(ownTicksOf(planet, bot.aheadTile))
-      expect(player.gearTicks).toBe(ownTicksOf(planet, player.aheadTile))
       expect(bot.gearTicks).toBeGreaterThan(0)
+      expect(player.aheadRemoved).toBeGreaterThan(0)
+      expect(player.charged).toBe(player.lawWorkCharge)
     },
   )
 })

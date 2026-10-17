@@ -20,6 +20,10 @@
  * The swept cut (`drillStep`, ticket 330, `sweptDrill.ts`) goes through the same path one tick at a
  * time, counting drill time in sub-steps (`SUB_STEP_CLOCK`) and charging each cell it breaks its own
  * dig energy (ticket 335, `cellDigEnergy.ts`); every other drill counts and charges whole ticks.
+ * A pose report's own cut (ticket 535, A6 "Option L") counts whole ticks too, so it cuts exactly
+ * as before, but is charged on the density it removed at each cell's law time, the swept price,
+ * with the part under a quantum carried on the vehicle (`LAW_WORK_CLOCK`, `vehicle/cutCarry.ts`):
+ * scripted and reported drills then cut the same for the same ticks but no longer charge the same.
  */
 import { DRILL_SUBSTEPS_PER_TICK } from '../../constants/balance'
 import { casingHardness } from '../economy/casingGrades'
@@ -29,6 +33,7 @@ import { pickedUpUnitOf, type PickedUp, type PickupFind } from '../registries/or
 import { drillDamage, subStepsPerTile, ticksPerTile, type DrillStats } from '../vehicle/drillRule'
 import { drillStampOf } from '../vehicle/drillStamp'
 import { ENERGY_QUANTA_PER_TICK } from '../vehicle/energyQuanta'
+import { payLawWork, type LawWorkTally } from '../vehicle/cutCarry'
 import type { AheadLatch } from '../vehicle/aheadBearingLatch'
 import type { DriveSigns } from '../vehicle/driveSigns'
 import type { SideLatch } from '../vehicle/facedSide'
@@ -67,38 +72,72 @@ import {
 
 type CarveIn<C extends DrillCarve = DrillCarve> = (request: DrillCarveRequest) => C
 
+/** The cell times a clock reads for a drill: drill times, and law times for the tally. */
+type CellTimesOf = (
+  params: PlanetParams,
+  drill: DrillStats,
+  shockTicksAt: ShockTicksAt,
+) => CellDrillTicks
+
+/** What a carve cost, and the vehicle carrying what the cut left owed (ticket 535). */
+export interface DrillCharge {
+  quanta: number
+  vehicle: VehicleState
+}
+
 /**
  * How a drill command counts drill time: in whole ticks, or in the swept cut's sub-steps of a
- * tick (ticket 330), with the cell times read in the same unit; and what its carve costs: the ticks
- * the stamp still removed something in, or (the swept cut, ticket 335) each broken cell's own dig
- * energy (`cellDigEnergy.ts`).
+ * tick (ticket 330), with the cell times read in the same unit; whether its carve tallies law
+ * work (ticket 535); and what its carve costs: the ticks the stamp still removed something in,
+ * (the swept cut, ticket 335) each broken cell's own dig energy (`cellDigEnergy.ts`), or (the
+ * report's cut, ticket 535) the law work it removed with the carry (`cutCarry.ts`).
  */
 export interface DrillClock {
   subStepsPerTick: number
-  cellTimesOf: (
-    params: PlanetParams,
-    drill: DrillStats,
-    shockTicksAt: ShockTicksAt,
-  ) => CellDrillTicks
-  /** The quanta a carve costs from a tank of `tank`, its cells timed by `cellTimes`. */
-  energyOf: (carved: DrillCarve, cellTimes: CellDrillTicks, tank: number) => number
+  cellTimesOf: CellTimesOf
+  /** The law time of a cell for the carve's tally, or null when the clock tallies none. */
+  lawTimesOf: CellTimesOf | null
+  /** What a carve costs `vehicle`, its cells timed by `cellTimes`, never more than its tank. */
+  chargeOf: (carved: DrillCarve, cellTimes: CellDrillTicks, vehicle: VehicleState) => DrillCharge
 }
 
 export const WHOLE_TICK_CLOCK: DrillClock = {
   subStepsPerTick: 1,
   cellTimesOf: drillTicksOfCells,
-  energyOf: tickEnergyOf,
+  lawTimesOf: null,
+  chargeOf: (carved, _cellTimes, vehicle) => ({ quanta: tickEnergyOf(carved), vehicle }),
 }
 
 export const SUB_STEP_CLOCK: DrillClock = {
   subStepsPerTick: DRILL_SUBSTEPS_PER_TICK,
   cellTimesOf: drillSubStepsOfCells,
-  energyOf: sweptCutEnergyOf,
+  lawTimesOf: null,
+  chargeOf: (carved, cellTimes, vehicle) => ({
+    quanta: sweptCutEnergyOf(carved, cellTimes, vehicle.energy),
+    vehicle,
+  }),
+}
+
+/**
+ * The report's cut (ticket 535, A6): whole ticks, the carve as `WHOLE_TICK_CLOCK` cuts it, charged
+ * on the law work it removed at the swept price with the carry (`vehicle/cutCarry.ts`).
+ */
+export const LAW_WORK_CLOCK: DrillClock = {
+  subStepsPerTick: 1,
+  cellTimesOf: drillTicksOfCells,
+  lawTimesOf: drillSubStepsOfCells,
+  chargeOf: (carved, _cellTimes, vehicle) =>
+    payLawWork(vehicle, lawWorkTallyOf(carved), vehicle.energy),
 }
 
 /** The ticks the stamp still removed something in, at the drill's rate, and its gear's cells. */
 function tickEnergyOf(carved: DrillCarve): number {
   return carved.ticksUsed * ENERGY_QUANTA_PER_TICK.drill + carved.gearQuanta
+}
+
+/** What the carve removed: as tallied, and with its gear cells at their share. */
+function lawWorkTallyOf(carved: DrillCarve): LawWorkTally {
+  return { law: carved.lawWork, lawBp: carved.lawWorkBp }
 }
 
 /** Scripted mining: one cell's samples and its drill gear's cells; call with a planet that has params. */
@@ -122,7 +161,8 @@ export interface ReportedDrill {
 
 /**
  * The reported drill: the stamp at the pose, aimed by its facing (#40), and any drill gear, which
- * may read the reported drive (ticket 279).
+ * may read the reported drive (ticket 279), counted and charged on `clock`: whole ticks as every
+ * drill was, or the law work it removed (ticket 535).
  */
 export function drillAtPose(
   state: AuthorityState,
@@ -131,11 +171,13 @@ export function drillAtPose(
   reported: ReportedDrill,
   target: TilePoint,
   requestedTicks: number,
+  clock: DrillClock = WHOLE_TICK_CLOCK,
 ): RuleEffect {
   const { pose, drive, isLifting } = reported
   const bit = { pose, disc: drillStampOf(pose, isLifting), drive }
   const carve: CarveIn = (request) => carveStampWithGear(state, params, playerId, bit, request)
-  return drillGround(state, params, playerId, { tile: target, carve }, requestedTicks)
+  return drillGroundBy(state, params, playerId, { tile: target, carve }, requestedTicks, clock)
+    .effect
 }
 
 /**
@@ -210,17 +252,40 @@ export function drillGroundBy<C extends DrillCarve>(
   const drill = heatThrottledDrill(params.planetIndex, vehicle)
   const ticks = Math.min(requestedTicks, affordableTicksOf(vehicle))
   if (ticks === 0) return { effect: unchanged(state), carved: null }
-  const window = windowOf(state.tick, ticks, clock)
-  const cellTicks = clock.cellTimesOf(params, drill, shockTicksFor(state, playerId))
+  const shockTicksAt = shockTicksFor(state, playerId)
+  const window = windowOf(state.tick, ticks, clock, lawTimesOn(clock, params, drill, shockTicksAt))
+  const cellTicks = clock.cellTimesOf(params, drill, shockTicksAt)
   const gates = openDrillGates(state, playerId, params, cellTicks)
   const carved = target.carve({ world: state.world, window, gates, energy: vehicle.energy })
   const effect = chargeAndCollect(state, params, playerId, { target, drill, gates, carved, clock })
   return { effect, carved }
 }
 
-/** The last `ticks` fixed steps before `tick`, counted on the clock's sub-steps. */
-function windowOf(tick: number, ticks: number, clock: DrillClock): CarveWindow {
-  return { firstTick: Math.max(0, tick - ticks), ticks, subStepsPerTick: clock.subStepsPerTick }
+/**
+ * The last `ticks` fixed steps before `tick`, counted on the clock's sub-steps, tallying law work
+ * at `lawTimeOf` when the clock names one (ticket 535).
+ */
+function windowOf(
+  tick: number,
+  ticks: number,
+  clock: DrillClock,
+  lawTimeOf: CellDrillTicks | null,
+): CarveWindow {
+  const window = {
+    firstTick: Math.max(0, tick - ticks),
+    ticks,
+    subStepsPerTick: clock.subStepsPerTick,
+  }
+  return lawTimeOf === null ? window : { ...window, lawTimeOf }
+}
+
+function lawTimesOn(
+  clock: DrillClock,
+  params: PlanetParams,
+  drill: DrillStats,
+  shockTicksAt: ShockTicksAt,
+): CellDrillTicks | null {
+  return clock.lawTimesOf === null ? null : clock.lawTimesOf(params, drill, shockTicksAt)
 }
 
 /** What a carve did, ready to be charged and collected. */
@@ -240,9 +305,10 @@ function chargeAndCollect(
 ): RuleEffect {
   const vehicle = vehicleOf(state, playerId)
   if (carved.ticksUsed === 0) return { state, events: gates.refusedEvents() }
+  const charge = clock.chargeOf(carved, gates.drillTicksOf, vehicle)
   const charged = withVehicle({ ...state, world: carved.world }, playerId, {
-    ...withLatches(vehicle, carved),
-    energy: vehicle.energy - clock.energyOf(carved, gates.drillTicksOf, vehicle.energy),
+    ...withLatches(charge.vehicle, carved),
+    energy: vehicle.energy - charge.quanta,
   })
   const collected = chainEffects(charged, [
     (current) => collectYieldedCells(current, playerId, params, carved.yielded, gates),

@@ -316,8 +316,19 @@ import type { DriveSigns } from '../vehicle/driveSigns'
  *    `MAX_CASING_TRAIL_POINTS` (6 to 9) the newest are dropped instead of the oldest being laid at
  *    once, so a rig cutting back over its own trail lays no ring under its stamp. A run that never
  *    cuts back within the ring lag of its own trail moves no digest.
+ * 85: a pose report's own cut is charged on the density it removed (ticket 535, A6 "Option L", the
+ *    TD shape 6228682000 on #529 as VS and the GD ruled it; behind the authority dev flag
+ *    `drill.exactCarry`, on): the carve is the same whole-tick carve as before, byte for byte, but
+ *    every sample it removes is tallied at its cell's law time and charged at the swept price with
+ *    an integer carry on the vehicle (`cutEnergyCarry`), never more than the tank holds, the debt
+ *    carried; the report heats from the same tally in whole drill ticks, the rest carried
+ *    (`cutHeatCarry`), where it charged the ticks its stamp removed something in and heated for
+ *    its drill ticks. A cut the swept cut's steps made, `drillTile` and the pacing bot are
+ *    unchanged. With the flag off every digest is protocol 84's. A command log recorded under 84
+ *    or earlier is compared and replayed under its own number. A run with no report that drills
+ *    moves no digest.
  */
-export const AUTHORITY_PROTOCOL_VERSION = 84
+export const AUTHORITY_PROTOCOL_VERSION = 85
 
 /** The kernel's own commands: the closed set its rule tables are written against. */
 export interface KernelCommandPayloads {
