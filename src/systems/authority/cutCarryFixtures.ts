@@ -8,7 +8,7 @@
 import { BASIS_POINTS } from '../../constants/balance'
 import { AUTHORITY_DEV_FLAGS, type AuthorityDevFlags } from '../../constants/devFlags'
 import { cellDigEnergyOf } from './cellDigEnergy'
-import { CUT_ENERGY_DENOMINATOR } from '../vehicle/cutCarry'
+import { CUT_ENERGY_DENOMINATOR, LAW_WORK_PER_DRILL_TICK } from '../vehicle/cutCarry'
 import { ENERGY_QUANTA_PER_TICK } from '../vehicle/energyQuanta'
 import type { VehicleState } from '../vehicle/vehicleState'
 import type { WeightedSample } from '../world/stampShape'
@@ -194,6 +194,21 @@ export function cutEnergyNumeratorOf(
 ): number {
   const quanta = before.energy - after.energy - movementQuanta
   return quanta * CUT_ENERGY_DENOMINATOR + carryOf(after) - carryOf(before)
+}
+
+/**
+ * The whole drill ticks a charged report heated for, read from the vehicle: the law work its
+ * charge shows tallied (the energy numerator at the drill's whole share) plus the heat carry's
+ * fall, over a drill tick's law work. Exact: an integer by `cutCarry.ts`.
+ */
+export function chargedHeatTicksOf(
+  before: VehicleState,
+  after: VehicleState,
+  movementQuanta = 0,
+): number {
+  const law = cutEnergyNumeratorOf(before, after, movementQuanta) / energyNumeratorOfLawWork(1)
+  const heated = (before.cutHeatCarry ?? 0) + law - (after.cutHeatCarry ?? 0)
+  return Math.round(heated / LAW_WORK_PER_DRILL_TICK)
 }
 
 function carryOf(vehicle: VehicleState): number {

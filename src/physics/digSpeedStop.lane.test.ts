@@ -8,6 +8,7 @@ import { createRunLog, installRunLog, uninstallRunLog } from '../logging/runLog'
 import { submitCommand } from '../store/authorityLink'
 import { useGameStore } from '../store/gameStore'
 import { setCasingGradeCommand } from '../systems/authority/casingDebugCommands'
+import { lawChargeBarsOf, lawChargeTextOf } from '../systems/authority/lawChargeBars'
 import {
   barVerdictsOf,
   lawReadingOf,
@@ -15,6 +16,7 @@ import {
   type LawReading,
 } from '../systems/authority/lawWorkFixtures'
 import { buildIntent } from '../systems/input/buildIntent'
+import { LAW_WORK_PER_DRILL_TICK } from '../systems/vehicle/cutCarry'
 import type { VehicleIntent } from '../systems/vehicle/vehicleIntent'
 import { createRig, type Rig, type TickRead } from './cutFollowFixtures'
 import { openDigSpeedWindow, type DigSpeedSums } from './digSpeedWindow'
@@ -23,9 +25,12 @@ import { openDigSpeedWindow, type DigSpeedSums } from './digSpeedWindow'
 // 6226435006 and the TD's v2 ruling 6226459471; energy and heat per unit of law work, VS on A5
 // 6226528512) at a report every tick on the flag-off path against the swept law-exact path at the
 // same rig and ground, down and level, in the real loop and Rapier body:
-// - gated, bar 4 (1a, charged per unit of law work; A6 #535 makes it hold): drill energy per unit
-//   of law work within 1% of swept; heat (the drill ticks the reports heat for) per unit of law
-//   work at least 1.000 of swept, less one cell;
+// - logged, bar 4 (1a, charged per unit of law work): the shipped charge (`drill.exactCarry` off
+//   until #541) against the analytic law value (`lawChargeBars.ts`) and against swept. The gate
+//   is A6's: VS ruled the reference on #535 (6230602042, recorded by the GD 6230602177) the law,
+//   never swept's own charge, which pays 0.62 to 1.74 times the law by its geometry (#540), and
+//   `exactCarry.lane.test.ts` gates a report every tick in the loop with the charge on, as the
+//   fixed track does at 3 to 44 m/s (`systems/authority/digSpeedTrack.lane.test.ts`);
 // - logged, the carve geometry (bar 1b, law work per metre from the ground, `lawWorkFixtures.ts`,
 //   at least 1.000 of swept less one cell and at most 1.050; bar 3, cells per metre within 5%):
 //   the carve-geometry ticket #537 owns them, and until it lands #514's ratchet reads them on the
@@ -92,6 +97,10 @@ interface LegReading extends LawReading {
   metresPerSecond: number
   drilledTicksPerMetre: number
   drilledTicksPerCell: number
+  /** The leg's law work in drill ticks, drill energy in quanta and heat ticks fed, summed. */
+  lawTicks: number
+  drillEnergy: number
+  heatTicks: number
 }
 
 const readings: LegReading[] = []
@@ -167,6 +176,9 @@ function legColumnsOf(sums: DigSpeedSums) {
     ...lawReadingOf(sums),
     drilledTicksPerMetre: thousandthsOf(sums.drilledTicks / sums.metres),
     drilledTicksPerCell: thousandthsOf(sums.drilledTicks / sums.law.yieldedCells),
+    lawTicks: sums.law.ticks,
+    drillEnergy: sums.drillEnergy,
+    heatTicks: sums.heatTicks,
   }
 }
 
@@ -188,6 +200,15 @@ function legOf(rig: string, path: string, section: Section): LegReading {
   )
   if (found === undefined) throw new Error(`no ${rig} ${path} ${section} leg was played`)
   return found
+}
+
+/** What a leg removed, in density sub-steps, and what it charged, as A6's bars read them. */
+function chargeReadOf(leg: LegReading) {
+  return {
+    lawWork: leg.lawTicks * LAW_WORK_PER_DRILL_TICK,
+    energy: leg.drillEnergy,
+    heatTicks: leg.heatTicks,
+  }
 }
 
 /** The every-tick leg's bars against the swept leg, and the ratios they read, for the message. */
@@ -226,10 +247,13 @@ describe('dig speed at a report every tick against the swept law-exact path (#51
         expect(legOf(rig, 'every tick', section).metres).toBeGreaterThan(0)
       })
 
-      it(`charges the swept path's energy and heat for the law work, ${rig} ${section} (bar 4)`, () => {
-        const { verdicts, message } = verdictsOf(rig, section)
-        expect(verdicts.energyPerLawWork, message).toBe(true)
-        expect(verdicts.heatPerLawWork, message).toBe(true)
+      it(`logs the shipped charge against the law and swept, ${rig} ${section} (bar 4)`, () => {
+        const { message } = verdictsOf(rig, section)
+        const bars = lawChargeBarsOf(chargeReadOf(legOf(rig, 'every tick', section)))
+        console.log(
+          `${rig} ${section} charge (logged): law ${lawChargeTextOf(bars)}, swept ${message}`,
+        )
+        expect(bars.expectedQuanta).toBeGreaterThan(0)
       })
     }
   }

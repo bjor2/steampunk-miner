@@ -10,9 +10,10 @@
  * probe's) whose cell in the hardest band it crosses takes at most 60 / v ticks.
  *
  * Paths, as the live loop sends them: `every tick` and `every 12` are flag-off pose reports with
- * that many drive and drill ticks; `swept` is a `drillStep` every tick and a report every 12 ticks
- * (flag on). Each tick reads the drill energy (the tank's fall less the reports' drive charge) and,
- * at each report, the drill ticks it heats for (`reportedDrillTicksOf` in `vehicleCommandRules.ts`).
+ * that many drive and drill ticks, charged on the law work they removed (A6's `drill.exactCarry`);
+ * `swept` is a `drillStep` every tick and a report every 12 ticks (flag on), charged as shipped.
+ * Each tick reads the drill energy (the tank's fall less the reports' drive charge) and, at each
+ * report, the drill ticks it heats for (`reportedDrill.ts`).
  * The law work (`lawWorkFixtures.ts`) is read once the track is cut, from the ground before and
  * after: over every cell the track and the swept cut's lead reach, for the bars per unit of law
  * work, and over a fixed stretch of the track both paths have passed, for the bars per metre. A
@@ -27,9 +28,11 @@ import { subStepsPerTile } from '../vehicle/drillRule'
 import { ENERGY_QUANTA_PER_TICK } from '../vehicle/energyQuanta'
 import { stepDigTicksOf } from '../vehicle/sweptCut'
 import { FACING } from '../vehicle/vehiclePose'
+import type { VehicleState } from '../vehicle/vehicleState'
 import type { TilePoint } from '../world/tileGrid'
 import type { CommandIntent } from './authorityCommand'
 import { setCasingGradeCommand } from './casingDebugCommands'
+import { chargedHeatTicksOf, withDrillExactCarry } from './cutCarryFixtures'
 import {
   ACROSS_MM,
   frameOf,
@@ -82,6 +85,20 @@ const CASING_GRADE = 5
 
 /** Cuts the track on `path` from a fresh rig of `drillPower`, tick by tick. */
 export function cutTrack(track: Track, path: TrackPath, drillPower: number): TrackRun {
+  return withDrillExactCarry(isChargedAtLaw(path), () => cutTrackOnPath(track, path, drillPower))
+}
+
+/**
+ * The report paths are charged on the law work they removed, A6's charge (ticket 535), whose bars
+ * are the reference (`lawChargeBars.ts`); it ships off until #541, so it is switched on here as the
+ * charge's own lanes switch it on. The carve is the same with it on or off (A6's regression gate).
+ * The swept path is charged as shipped, the parity reference for #537.
+ */
+function isChargedAtLaw(path: TrackPath): boolean {
+  return path !== 'swept'
+}
+
+function cutTrackOnPath(track: Track, path: TrackPath, drillPower: number): TrackRun {
   const frame = frameOf(track)
   const session = sessionAtStart(frame, drillPower)
   const start = session.state()
@@ -161,11 +178,12 @@ function cutTick(session: ScriptedSession, at: TrackTick): TrackCharge {
   let heatTicks = 0
   let movement = 0
   for (const command of commandsOf(at, to)) {
-    if (command.type === 'reportPose') {
-      heatTicks += heatTicksOf(session, command as CommandIntent<'reportPose'>)
-      movement += movementQuantaOf(command as CommandIntent<'reportPose'>)
-    }
+    const before = session.vehicle()
     refuseRejection(session.submit(at.tick, command), at.tick)
+    if (command.type !== 'reportPose') continue
+    const report = command as CommandIntent<'reportPose'>
+    heatTicks += heatTicksOf(before, session.vehicle(), report, at.path)
+    movement += movementQuantaOf(report)
   }
   refuseDryTank(session, at.tick)
   return { drillEnergy: energyBefore - session.vehicle().energy - movement, heatTicks }
@@ -223,13 +241,21 @@ function driveOf(frame: TrackFrame) {
     : { x: 0 as const, y: -1 as const }
 }
 
-/** The drill ticks a report heats for, read as the `reportPose` rule reads them. */
-function heatTicksOf(session: ScriptedSession, report: CommandIntent<'reportPose'>): number {
-  const vehicle = session.vehicle()
-  const cursor = vehicle.sweptCut
-  return isCutBySteps(vehicle) && cursor !== undefined
-    ? stepDigTicksOf(cursor)
-    : report.payload.drillTicks
+/**
+ * The drill ticks a report heats for, read as `reportedDrill.ts` feeds them: the swept steps'
+ * summed dig time when they cut it, else the law work its charge tallied (`chargedHeatTicksOf`)
+ * on a path charged at the law, else the report's own drill ticks.
+ */
+function heatTicksOf(
+  before: VehicleState,
+  after: VehicleState,
+  report: CommandIntent<'reportPose'>,
+  path: TrackPath,
+): number {
+  const cursor = before.sweptCut
+  if (isCutBySteps(before) && cursor !== undefined) return stepDigTicksOf(cursor)
+  if (isChargedAtLaw(path)) return chargedHeatTicksOf(before, after, movementQuantaOf(report))
+  return report.payload.drillTicks
 }
 
 function movementQuantaOf({ payload }: CommandIntent<'reportPose'>): number {

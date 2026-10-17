@@ -23,11 +23,10 @@
  * path), the cells broken in order, the ground's chunks, and every `CommandRejected`. Test
  * support, never run in play.
  */
-import { BASIS_POINTS, DRILL_SUBSTEPS_PER_TICK } from '../../constants/balance'
+import { DRILL_SUBSTEPS_PER_TICK } from '../../constants/balance'
 import { blockHardness } from '../economy/oreEconomy'
 import { subStepsPerTile } from '../vehicle/drillRule'
 import { MM_PER_METRE, TICKS_PER_SECOND, UP_VECTOR_SCALE } from '../../constants/physics'
-import { LAW_WORK_PER_DRILL_TICK } from '../vehicle/cutCarry'
 import { ENERGY_QUANTA_PER_TICK } from '../vehicle/energyQuanta'
 import { stepDigTicksOf } from '../vehicle/sweptCut'
 import { FACING, facingVectorOf, type Facing } from '../vehicle/vehiclePose'
@@ -39,7 +38,7 @@ import { vehicleOf, type AuthorityState } from './authorityState'
 import { setCasingGradeCommand } from './casingDebugCommands'
 import {
   brokenCellsOf,
-  cutEnergyNumeratorOf,
+  chargedHeatTicksOf,
   lawWorkOfGroundChanges,
   lawWorkRemovedOf,
   withDrillExactCarry,
@@ -128,7 +127,6 @@ const CASING_GRADE = 5
 const ROUNDING_MM = 2
 /** The tank is refilled this often, as the loop lane refills it, so no path is ever clamped. */
 const REFILL_EVERY = 60
-const FULL_SHARE_QUANTA = BASIS_POINTS * ENERGY_QUANTA_PER_TICK.drill
 
 interface Frame {
   start: { x: number; y: number }
@@ -386,11 +384,7 @@ function heatTicksBeforeOf(
   return isChargeOn(path) ? 0 : report.payload.drillTicks
 }
 
-/**
- * The whole drill ticks the charged report heated for, read from the vehicle: the law work its
- * charge shows tallied (the energy numerator at the drill's whole share) plus the heat carry's
- * fall, over a drill tick's law work. Exact: an integer by `cutCarry.ts`.
- */
+/** The whole drill ticks the charged report heated for, read from the vehicle's carry. */
 function carriedHeatTicksOf(
   before: VehicleState,
   after: VehicleState,
@@ -398,10 +392,7 @@ function carriedHeatTicksOf(
   path: SlabPath,
 ): number {
   if (!isChargeOn(path) || isCutBySteps(before)) return 0
-  const law =
-    cutEnergyNumeratorOf(before, after, movement * ENERGY_QUANTA_PER_TICK.drive) / FULL_SHARE_QUANTA
-  const heated = (before.cutHeatCarry ?? 0) + law - (after.cutHeatCarry ?? 0)
-  return Math.round(heated / LAW_WORK_PER_DRILL_TICK)
+  return chargedHeatTicksOf(before, after, movement * ENERGY_QUANTA_PER_TICK.drive)
 }
 
 function casingSamplesOf(events: readonly DomainEvent[]): number {

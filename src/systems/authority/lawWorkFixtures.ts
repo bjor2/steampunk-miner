@@ -168,33 +168,26 @@ export function thousandthsOf(value: number): number {
 /**
  * The bars, VS 6226431087 and 6226528512 (A5) as the TD's v2 ruling quotes them. Bar 2 (law work
  * per yielded cell against D) is a logged ratio to swept now, not a bar (VS 6228841725 and
- * 6228847292, GD 6228851107): the swept reference itself does not land at D.
+ * 6228847292, GD 6228851107): the swept reference itself does not land at D. Bar 4 (energy and
+ * heat per unit of law work) reads against the analytic law value, never swept (`lawChargeBars.ts`).
  */
 export const DIG_SPEED_BARS = {
   lawWorkFloor: 1,
   lawWorkCeiling: 1.05,
   cellsPerMetreShare: 0.05,
-  energyShare: 0.01,
-  heatFloor: 1,
 }
 
 /** Each bar against the reference stretch: true where it holds. */
 export interface BarVerdicts {
   lawWorkPerMetre: boolean
   cellsPerMetre: boolean
-  energyPerLawWork: boolean
-  heatPerLawWork: boolean
 }
 
 export function barVerdictsOf(reading: LawReading, reference: LawReading): BarVerdicts {
   const misses = geometryMissesOf(reading, reference)
-  const bars = DIG_SPEED_BARS
-  const ratioOf = (column: keyof LawReading) => reading[column] / reference[column]
   return {
     lawWorkPerMetre: misses.lawWorkPerMetre === 0,
     cellsPerMetre: misses.cellsPerMetre === 0,
-    energyPerLawWork: Math.abs(ratioOf('energyPerLawTick') - 1) <= bars.energyShare,
-    heatPerLawWork: ratioOf('heatPerLawTick') >= bars.heatFloor - reference.oneCellShare,
   }
 }
 

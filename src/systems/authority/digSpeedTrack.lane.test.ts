@@ -1,6 +1,7 @@
 import { mkdirSync, writeFileSync } from 'node:fs'
 import { afterAll, describe, expect, it, vi } from 'vitest'
 import * as groundEdit from '../world/groundEdit'
+import { LAW_WORK_PER_DRILL_TICK } from '../vehicle/cutCarry'
 import type { TilePoint } from '../world/tileGrid'
 import {
   addCarveRemoval,
@@ -17,12 +18,16 @@ import {
   type TrackRun,
 } from './digSpeedTrackFixtures'
 import {
-  barVerdictsOf,
-  geometryMissesOf,
-  lawReadingOf,
-  thousandthsOf,
-  type LawReading,
-} from './lawWorkFixtures'
+  isHeatAtLaw,
+  isUnderRatchet,
+  isUnderTankFloor,
+  isWithinLawShare,
+  lawChargeBarsOf,
+  lawChargeTextOf,
+  sweptVerdictOf,
+  type LawChargeBars,
+} from './lawChargeBars'
+import { geometryMissesOf, lawReadingOf, thousandthsOf, type LawReading } from './lawWorkFixtures'
 
 // The dig-speed STOP of #514 (Done-when 3) on a fixed pose track at 3, 8, 25, 44, 240 and 3600
 // m/s, flat and tilted, level and down (VS 6226431087 and 6226528512, the TD's v2 ruling
@@ -34,8 +39,13 @@ import {
 // charge per unit of law work over all it cut. At 3600 m/s the body crosses the track in two
 // ticks and a flag-off report stamps its pose only, never the span between (the parked bore-bar
 // wiring, TD v2 Q5), so that row reads what the report path does there.
-// - Gated, bar 4 (1a; A6 #535 makes it hold): energy per unit of law work within 1% of swept, heat
-//   at least 1.000 of swept less one cell.
+// - Gated, bar 4 (1a), on A6's bars (#535, `lawChargeBars.ts`; the reference VS ruled on #535,
+//   6230602042, recorded by the GD 6230602177, as the TD's paired-run list 6230607050 reads it): a
+//   report every tick, charged on the law work it removed (`drill.exactCarry`, switched on for the
+//   report paths as A6's lanes switch it on), within 1% of the analytic law value and under the
+//   tank floor and the ratchet, heat at least the law's less one drill tick; a row under 100
+//   quanta is quantized and logged. Swept's own charge pays 0.62 to 1.74 times the law by its
+//   geometry (#540), so the ratio to swept is logged beside it, amber outside 5%, never gated.
 // - Gated, the ratchet until #537 lands: on law work per metre (1b) and cells per metre (3), a
 //   report every tick misses its band against swept by no more than 12-tick reports do.
 // - Logged: Step 0's reading, a report every tick over swept on law work per metre at 3, 8, 25 and
@@ -71,6 +81,8 @@ interface TrackReading extends LawReading, RemovalColumns {
 }
 
 const readings: TrackReading[] = []
+/** Each report path's charge against the analytic law value, by track and path. */
+const chargeBars = new Map<string, LawChargeBars>()
 
 afterAll(() => {
   console.log(formatTable(readings))
@@ -105,6 +117,7 @@ function readTrack(track: Track, path: TrackPath): TrackReading {
       ? { run: cutTrack(track, path, drillPower), removal: null }
       : cutRecordingRemoval(track, path, drillPower)
   const perMetre = lawReadingOf({ ...run, ...run.stretch })
+  chargeBars.set(`${nameOf(track)} ${path}`, lawChargeBarsOf(chargeReadOf(run)))
   return {
     ...track,
     path,
@@ -115,6 +128,15 @@ function readTrack(track: Track, path: TrackPath): TrackReading {
     cellsPerMetre: perMetre.cellsPerMetre,
     oneCellShare: perMetre.oneCellShare,
     ...removalColumnsOf(run, removal),
+  }
+}
+
+/** What the run removed, in density sub-steps, and what it charged, as A6's bars read them. */
+function chargeReadOf(run: TrackRun) {
+  return {
+    lawWork: run.law.ticks * LAW_WORK_PER_DRILL_TICK,
+    energy: run.drillEnergy,
+    heatTicks: run.heatTicks,
   }
 }
 
@@ -225,18 +247,31 @@ function readingOf(track: Track, path: TrackPath): TrackReading {
   return found
 }
 
-function verdictsOf(track: Track) {
+function chargeBarsOf(track: Track, path: TrackPath): LawChargeBars {
+  const found = chargeBars.get(`${nameOf(track)} ${path}`)
+  if (found === undefined) throw new Error(`no ${nameOf(track)} ${path} track was cut`)
+  return found
+}
+
+/** A report every tick over swept, per unit of law work and per metre: logged beside the bars. */
+function sweptRatiosOf(track: Track) {
   const everyTick = readingOf(track, 'every tick')
   const swept = readingOf(track, 'swept')
-  const ratios = {
-    lawWorkPerMetre: thousandthsOf(everyTick.lawWorkPerMetre / swept.lawWorkPerMetre),
-    lawTicksPerCellOverSwept: thousandthsOf(everyTick.lawTicksPerCell / swept.lawTicksPerCell),
-    cellsPerMetre: thousandthsOf(everyTick.cellsPerMetre / swept.cellsPerMetre),
-    energyPerLawTick: thousandthsOf(everyTick.energyPerLawTick / swept.energyPerLawTick),
-    heatPerLawTick: thousandthsOf(everyTick.heatPerLawTick / swept.heatPerLawTick),
+  const ratioOf = (column: keyof LawReading) => thousandthsOf(everyTick[column] / swept[column])
+  return {
+    lawWorkPerMetre: ratioOf('lawWorkPerMetre'),
+    lawTicksPerCellOverSwept: ratioOf('lawTicksPerCell'),
+    cellsPerMetre: ratioOf('cellsPerMetre'),
+    energyPerLawTick: ratioOf('energyPerLawTick'),
+    heatPerLawTick: ratioOf('heatPerLawTick'),
     quantization: swept.oneCellShare,
   }
-  return { verdicts: barVerdictsOf(everyTick, swept), message: JSON.stringify(ratios) }
+}
+
+function sweptRatioTextOf(track: Track): string {
+  const ratios = sweptRatiosOf(track)
+  const verdict = `energy ${sweptVerdictOf(ratios.energyPerLawTick)}, heat ${sweptVerdictOf(ratios.heatPerLawTick)}`
+  return `/ swept (logged, ${verdict}): ${JSON.stringify(ratios)}`
 }
 
 /** Each cadence's carve-geometry misses against the swept cut, to the thousandth every bar reads. */
@@ -262,11 +297,15 @@ describe('dig speed of a report every tick on a fixed track, 3 to 3600 m/s (#514
       expect(cut.every((reading) => reading.metres > 0)).toBe(true)
     })
 
-    it(`charges the swept cut's energy and heat for the law work, ${nameOf(track)} (bar 4)`, () => {
-      const { verdicts, message } = verdictsOf(track)
-      console.log(`${nameOf(track)}: ${message}`)
-      expect(verdicts.energyPerLawWork, message).toBe(true)
-      expect(verdicts.heatPerLawWork, message).toBe(true)
+    it(`charges and heats a report every tick at the analytic law value, ${nameOf(track)} (bar 4)`, () => {
+      const bars = chargeBarsOf(track, 'every tick')
+      const message = `${nameOf(track)} / law: ${lawChargeTextOf(bars)}`
+      console.log(`${message}\n${nameOf(track)} ${sweptRatioTextOf(track)}`)
+      if (!bars.isMeasurable) return
+      expect(isWithinLawShare(bars.energyRatio), message).toBe(true)
+      expect(isUnderTankFloor(bars.energyRatio), message).toBe(true)
+      expect(isUnderRatchet(bars.energyRatio), message).toBe(true)
+      expect(isHeatAtLaw(bars), message).toBe(true)
     })
 
     if (!hasTwelveTickReport(track)) continue
