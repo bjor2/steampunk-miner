@@ -253,6 +253,22 @@ programs }` from three's `renderer.info` of the game canvas), read only when cal
   `src/systems/world/depthDensityPaint.lane.test.ts` generates pooled seed sets at radius 150, 300
   and 1000 and on planet 200 and fails a band whose painted fraction is more than 2% off the
   curve's band mean (about 3 to 5 minutes).
+- **Material looks** (ticket 450, TD shape on #450 6226270701 and the Scalers' conditions):
+  `src/features/roster/kindLook.test.ts` holds the roster's look provider to its rules: a fresh
+  save shows no species (unseen kinds draw the family look), a species shows only once the
+  discovery query says the player met it, every two kinds of one family differ in at least two of
+  silhouette, pattern and hue, a species keeps one look on every band and planet, the rarity a
+  cell draws is its tier offset over its band, each rarity draws a wider frame, a brighter tint and
+  no less glow than the one below, and a planet with no roster hands the shader exactly main's
+  instance arrays (render-state digests recorded at `a157e171`, `renderStateFixtures.ts`).
+  `src/scene/terrainUniforms.test.ts` holds the look to at most 24 new fragment uniform vectors,
+  the full fragment stage to 96 of the 224 floor and either program to 11 of the 15 varyings;
+  `terrainSamplers.test.ts` keeps 15 samplers. `src/systems/render/kindLooks.test.ts` and
+  `kindLookTable.test.ts` cover the shader's catalogue and the table encoding,
+  `src/scene/terrainKindLooks.test.ts` the one writer, and
+  `src/features/materials/systems/render/rarityLooks.test.ts` the rarity data's guard. The browser
+  spec `e2e/browser/materialLooks.spec.ts` reads the table through `ui.getKindLooks()`. The look
+  itself (each species apart at phone size) is an eye check; real-GPU frame cost is #526's A/B.
 - **Pacing bot** (`src/systems/bot/`, #29): plays `scenarios/bot-slice.scenario.json` through
   authority commands with the #6 movement-time model, buying casing grades on-curve (grade `b`
   before it mines band `b`, grade 5 before the core, S11). Its scripted mining (`drillTile`) lays

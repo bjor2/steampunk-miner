@@ -265,11 +265,12 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/ground-gun/turretPace.lane.test.ts` | 1 | 1 |
 | `src/features/ground-gun/ui/fireGauge.test.ts` | 3 | 3 |
 
-### `materials`: 1 file, 29 tests
+### `materials`: 2 files, 35 tests
 
 | File | Tests | Sites |
 | --- | --- | --- |
-| `src/features/materials/systems/materialTable.test.ts` | 29 | 29 |
+| `src/features/materials/systems/materialTable.test.ts` | 30 | 30 |
+| `src/features/materials/systems/render/rarityLooks.test.ts` | 5 | 5 |
 
 ### `mining-gates`: 25 files, 153 tests
 
@@ -424,10 +425,11 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/power-up-core/systems/useRefusals.test.ts` | 3 | 3 |
 | `src/features/power-up-core/systems/useResolution.test.ts` | 12 | 12 |
 
-### `roster`: 12 files, 98 tests
+### `roster`: 13 files, 111 tests
 
 | File | Tests | Sites |
 | --- | --- | --- |
+| `src/features/roster/kindLook.test.ts` | 13 | 10 |
 | `src/features/roster/rarityShares.test.ts` | 18 | 18 |
 | `src/features/roster/roster.byteIdentity.lane.test.ts` | 5 | 1 |
 | `src/features/roster/roster.byteIdentity.test.ts` | 19 | 11 |
@@ -1142,6 +1144,8 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/render/headlamp.test.ts` | 3 | 3 |
 | `src/systems/render/heatShimmer.test.ts` | 2 | 2 |
 | `src/systems/render/heatTiles.test.ts` | 3 | 3 |
+| `src/systems/render/kindLookTable.test.ts` | 6 | 6 |
+| `src/systems/render/kindLooks.test.ts` | 4 | 4 |
 | `src/systems/render/mountedPartLook.test.ts` | 8 | 4 |
 | `src/systems/render/oreGrade.test.ts` | 2 | 2 |
 | `src/systems/render/oreLook.test.ts` | 11 | 9 |
@@ -1158,6 +1162,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/render/sampleClock.test.ts` | 3 | 3 |
 | `src/systems/render/sceneLights.test.ts` | 6 | 6 |
 | `src/systems/render/screenProjection.test.ts` | 5 | 5 |
+| `src/systems/render/shaderUniforms.test.ts` | 4 | 4 |
 | `src/systems/render/skyBandLook.test.ts` | 3 | 3 |
 | `src/systems/render/skyBandRing.test.ts` | 6 | 6 |
 | `src/systems/render/speedFraming.test.ts` | 25 | 13 |
@@ -1215,7 +1220,9 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/scene/sceneDisposal.test.ts` | 8 | 3 |
 | `src/scene/soundCuePlayer.test.ts` | 4 | 4 |
 | `src/scene/sprayIntake.test.ts` | 3 | 3 |
+| `src/scene/terrainKindLooks.test.ts` | 4 | 4 |
 | `src/scene/terrainSamplers.test.ts` | 7 | 7 |
+| `src/scene/terrainUniforms.test.ts` | 4 | 4 |
 | `src/scene/vehicleStage.test.ts` | 7 | 7 |
 
 ### `shell`
