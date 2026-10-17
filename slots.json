@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-10-17T14:24:54+01:00",
+  "updated_at": "2026-10-17T14:38:07+01:00",
   "caps": {
     "grok": 12,
     "claude": 10,
@@ -19,20 +19,20 @@
       "slots": [
         {
           "slot": "C1",
+          "state": "busy",
+          "ticket": 535,
+          "grok_slot": 1,
+          "kind": "dev",
+          "since": "2026-10-17T14:38:00+01:00",
+          "wave": "316-2H"
+        },
+        {
+          "slot": "C2",
           "state": "free",
           "ticket": null,
           "grok_slot": null,
           "kind": null,
           "since": null
-        },
-        {
-          "slot": "C2",
-          "state": "busy",
-          "ticket": 535,
-          "grok_slot": 2,
-          "kind": "dev",
-          "since": "2026-10-17T14:15:00+01:00",
-          "wave": "316-2H"
         },
         {
           "slot": "C3",
@@ -70,7 +70,7 @@
       "size": 6,
       "used": 1,
       "free": 5,
-      "claims_last_hour": 5,
+      "claims_last_hour": 6,
       "name": "Claude Max 1"
     },
     {
@@ -444,17 +444,17 @@
   "grok": [
     {
       "slot": 1,
-      "state": "free",
-      "ticket": null,
-      "since": null
+      "state": "dev",
+      "ticket": 535,
+      "since": "2026-10-17T14:38:00+01:00",
+      "claude_slot": 1,
+      "wave": "316-2H"
     },
     {
       "slot": 2,
-      "state": "dev",
-      "ticket": 535,
-      "since": "2026-10-17T14:15:00+01:00",
-      "claude_slot": 2,
-      "wave": "316-2H"
+      "state": "free",
+      "ticket": null,
+      "since": null
     },
     {
       "slot": 3,
@@ -520,20 +520,20 @@
   "claude": [
     {
       "slot": 1,
+      "state": "busy",
+      "ticket": 535,
+      "grok_slot": 1,
+      "since": "2026-10-17T14:38:00+01:00",
+      "account": 1,
+      "wave": "316-2H"
+    },
+    {
+      "slot": 2,
       "state": "free",
       "ticket": null,
       "grok_slot": null,
       "since": null,
       "account": 1
-    },
-    {
-      "slot": 2,
-      "state": "busy",
-      "ticket": 535,
-      "grok_slot": 2,
-      "since": "2026-10-17T14:15:00+01:00",
-      "account": 1,
-      "wave": "316-2H"
     },
     {
       "slot": 3,
@@ -601,11 +601,11 @@
     }
   ],
   "last_refill": {
-    "at": "2026-10-17 14:24 BST",
+    "at": "2026-10-17 14:38 BST",
     "mode": "refill-dev",
-    "triggers": "#446",
-    "started": "",
-    "note": "no pickable build ticket"
+    "triggers": "#535",
+    "started": "#535->C1/A1",
+    "note": "spawned 1 worker(s)"
   },
   "totals": {
     "grok": {
