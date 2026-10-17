@@ -574,11 +574,11 @@ TD ruling on #514/#529: no hard build block, but a fixed merge order. Mechanism 
 - **`merge-hold-lib.sh`** (new, sourced at the end of `wave-lib.sh`) defines `merge_after_of` and `merge_hold <n> <wt>`. `verify_ticket` calls
   `merge_hold "$n" "$wt" && return 0` right after the gates are green and before the push/close (one-line hook in `next-ticket.sh`; same size, same inode,
   an equal number of bytes were taken from the comment above it; backup `next-ticket.sh.bak-20261017-0140-mergehold`; `bash -n` ok).
-- **Semantics.** No entry: nothing changes. Prerequisite CLOSED *before this session started* (`SESSION_SINCE`): go ahead and push as usual. Otherwise the ticket is
+- **Semantics.** No entry: nothing changes. Prerequisite CLOSED _before this session started_ (`SESSION_SINCE`): go ahead and push as usual. Otherwise the ticket is
   **held**: nothing is pushed or closed, the attempt is refunded, a reopened issue is reopened, `ticket/N` is kept at its tip (`ensure_worktree` only wipes on
   re-claim and reuses a tip ahead of main), `state.merge_held[N] = {after, branch, sha, why, since}`, and a comment tells the next session what to do.
   `why=open` (prereq still open, or unreadable: fail closed) adds the prerequisite as a **native blocker**, which the picker already honours, so the ticket is
-  not re-picked while #514 is open and is re-claimed automatically when #514 closes. `why=stale` (prereq closed *during* the session, so the session did not
+  not re-picked while #514 is open and is re-claimed automatically when #514 closes. `why=stale` (prereq closed _during_ the session, so the session did not
   build on it) is not blocked and is re-picked at once. If the blocker link cannot be added, the ticket gets `needs-planner` instead (remove it once the prereq closes).
 - **Why not `push_pending`.** It is one global slot that blocks every other landing and marks the coordinator blocked; a held ticket should not stall the loop.
   **Why re-queue rather than auto-push.** The protocol-bump renumber and the lane re-run at both cadences is worker work, and a failed #514 bar changes which
