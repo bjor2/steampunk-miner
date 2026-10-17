@@ -143,11 +143,14 @@ describe('planet params ore rules (ticket 445)', () => {
     expect(Object.keys(stamped).at(-1)).toBe('oreRulesVersion')
   })
 
-  it('stamps a fresh planet only from the first planet whose rows differ', () => {
+  it('stamps every fresh planet from planet 1 with ore rules 2, the roster (ticket 446)', () => {
     const stamps = [1, 2, 3, 4, 60].map((index) => freshPlanetParamsFor(1, index).oreRulesVersion)
-    expect(ORE_RULES_FROM_PLANET).toBe(3)
-    expect(stamps).toEqual([undefined, undefined, 1, 1, 1])
-    expect('oreRulesVersion' in freshPlanetParamsFor(1, 2)).toBe(false)
+    expect(ORE_RULES_FROM_PLANET).toBe(1)
+    expect(stamps).toEqual([2, 2, 2, 2, 2])
+  })
+
+  it('still reads a planet stamped with ore rules 1 (ticket 445)', () => {
+    expect(planetParamsFor(1, 3, 1).oreRulesVersion).toBe(1)
   })
 
   it('refuses ore rules this build does not know', () => {

@@ -7,10 +7,11 @@
  * An id still maps to one price (`<family>_t<t_b + k>`), and there is no family multiplier: family
  * is look only (#140), so every price comes from `oreSalePrice(oreTierOf(p, b, k))`.
  *
- * Row sets (Horizontal Scaler, comment 6203133480 section 5): a planet entered under this build's
- * ore rules carries `oreRulesVersion` and draws the `mixed` weights once every tier is live there
- * (P3, where epic and mythic start); P1, P2 and any planet a save holds without the version keep
- * the `legacy` weights, today's lead rows, so a visited planet never seams against its own chunks.
+ * Row sets (Horizontal Scaler, comment 6203133480 section 5): a planet entered under the ore rules
+ * carries `oreRulesVersion` and draws the `mixed` weights once every tier is live there (P3, where
+ * epic and mythic start); P1, P2 and any planet a save holds without the version keep the `legacy`
+ * weights, today's lead rows, so a visited planet never seams against its own chunks. Every ore
+ * rules version draws the same rows: version 2 (ticket 446) adds the roster, not new weights.
  */
 import { ECONOMY } from '../../../systems/economy/economy'
 import { powInt, type Money } from '../../../systems/money'
@@ -47,14 +48,14 @@ export function mixedRowsFromPlanet(rows: OreRows = ORE_ROWS): number {
   return Math.max(...rows.rarity.tiers.map((tier) => tier.firstPlanet))
 }
 
-/** The weights a planet draws: `mixed` only under this build's ore rules and from P3. */
+/** The weights a planet draws: `mixed` only under the ore rules and from P3. */
 export function rarityRowSetOf(
   planetIndex: number,
   oreRulesVersion: number | undefined,
   rows: OreRows = ORE_ROWS,
 ): RarityRowSet {
-  const isCurrentRules = oreRulesVersion === ORE_RULES_VERSION
-  return isCurrentRules && planetIndex >= mixedRowsFromPlanet(rows) ? 'mixed' : 'legacy'
+  const isUnderOreRules = oreRulesVersion !== undefined
+  return isUnderOreRules && planetIndex >= mixedRowsFromPlanet(rows) ? 'mixed' : 'legacy'
 }
 
 /** Basis points of band `band`'s ore cells that hold tier offset `k`, for `k` from 1. */

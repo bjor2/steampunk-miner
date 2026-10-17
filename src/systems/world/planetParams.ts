@@ -8,7 +8,8 @@
  * It is an input, never derived: a planet a save holds without it keeps the legacy lead rows, so its
  * unmined chunks never seam against the ones already dug, while a planet entered from this build is
  * stamped. Only planets whose rows differ are stamped (`ORE_RULES_FROM_PLANET`), and the key is
- * omitted when absent, so the params JSON of every legacy planet stays byte-identical.
+ * omitted when absent, so the params JSON of every legacy planet stays byte-identical. A planet
+ * keeps the version it was stamped with: version 1 never gains what version 2 added.
  */
 import { hashCell } from '../cellRandom'
 import { isHeatPlanet } from '../economy/heatEconomy'
@@ -76,16 +77,19 @@ export interface PlanetParams {
   oreRulesVersion?: number
 }
 
-/** The ore rules a planet entered from this build carries: the rarity rows (ticket 445). */
-export const ORE_RULES_VERSION = 1
+/**
+ * The ore rules a planet entered from this build carries: 1 is the rarity rows (ticket 445), 2 adds
+ * the material roster, a kind slot per ore patch (ticket 446).
+ */
+export const ORE_RULES_VERSION = 2
 
 /**
- * The first planet whose ore rows differ under `ORE_RULES_VERSION` (where epic and mythic start,
- * the `ores` slice's `mixedRowsFromPlanet`); an earlier planet is entered unstamped, so P1 and P2
- * sessions, goldens and saves stay byte-identical. A ticket that changes P1 or P2 generation lowers
- * it in the commit that re-records their goldens.
+ * The first planet whose generation differs under `ORE_RULES_VERSION`: planet 1, since the roster
+ * draws kinds on P1 and P2 too (TD ruling on ticket 446, section 4). The rarity rows still differ
+ * only from P3 (the `ores` slice's `mixedRowsFromPlanet`), so on P1 and P2 the stamp changes the kind
+ * slot alone.
  */
-export const ORE_RULES_FROM_PLANET = 3
+export const ORE_RULES_FROM_PLANET = 1
 
 const KNOWN_ORE_RULES_VERSIONS: readonly unknown[] = Array.from(
   { length: ORE_RULES_VERSION },

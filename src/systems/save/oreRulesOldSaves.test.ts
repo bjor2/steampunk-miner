@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest'
 import type { AuthorityState } from '../authority/authorityState'
 import { resourceTierOf } from '../authority/minedOre'
 import { planetParamsOf } from '../authority/planetOfState'
+import { takeSnapshot } from '../authority/sessionSnapshot'
 import { fnv1a64Hex, stateDigest } from '../authority/stateDigest'
 import { oreSalePrice } from '../economy/oreEconomy'
 import { add, toCanonical, ZERO_MONEY } from '../money'
@@ -15,6 +16,7 @@ import PLANET_1_SAVE from './fixtures/pre-175-planet-1.save.json'
 import PLANET_10_SAVE from './fixtures/pre-175-planet-10.save.json'
 import PLANET_5_SAVE from './fixtures/pre-181-planet-5.save.json'
 import { migrateSaveSlot, readMigratedSaveSlot } from './saveMigrations'
+import { saveSlotOf } from './saveSlot'
 
 // Ticket 445 acceptance (Horizontal Scaler, #139 comment 6203133480 section 5.1; TD ruling on
 // #445): a save written before the ore rules loads its planet on the legacy rows, so every chunk
@@ -50,6 +52,17 @@ const MAIN_PINS: Record<number, ColumnPin> = {
   },
 }
 
+/**
+ * Ticket 446: a generator 9 save holding planet 5 under ore rules 1, the rarity rows without the
+ * roster, pinned on main at f49323ba (generator 9) over the same column.
+ */
+const RULES_ONE_PLANET_5_PIN: ColumnPin = {
+  chunks: '368e288725734121',
+  ores: '725c63742d4dd98b',
+  oreCells: 5678,
+  value: '2.0218044481e+7',
+}
+
 const FIXTURES = [
   ['pre-175 planet 1', PLANET_1_SAVE],
   ['pre-181 planet 5', PLANET_5_SAVE],
@@ -60,6 +73,17 @@ function loaded(file: unknown): AuthorityState {
   const reading = readMigratedSaveSlot(file)
   if (!('state' in reading)) throw new Error(reading.problems.join('; '))
   return reading.state
+}
+
+/** The pre-181 planet 5 state as if entered under ore rules 1, the rarity rows alone. */
+function rulesOnePlanet5(): AuthorityState {
+  const state = loaded(PLANET_5_SAVE)
+  return { ...state, planet: { ...state.planet, oreRulesVersion: 1 } }
+}
+
+/** That state saved as generator 9 wrote it. */
+function generator9SaveOf(state: AuthorityState): unknown {
+  return { ...saveSlotOf(takeSnapshot(state), 1), generatorVersion: 9 }
 }
 
 /** The column through the planet's centre as main pinned it. */
@@ -105,7 +129,21 @@ describe('saves written before the ore rules', () => {
     const reading = readMigratedSaveSlot(atGenerator8)
     expect(reading.migrations.filter((step) => 'version' in step)).toEqual([
       { version: 'generatorVersion', from: 8, to: 9 },
+      { version: 'generatorVersion', from: 9, to: 10 },
     ])
     expect('state' in reading && stateDigest(reading.state)).toBe(stateDigest(loaded(file)))
+  })
+
+  it('load a generator 9 save of a planet under ore rules 1 on those rules, drawing no kind (ticket 446)', () => {
+    const reading = readMigratedSaveSlot(generator9SaveOf(rulesOnePlanet5()))
+    if (!('state' in reading)) throw new Error(reading.problems.join('; '))
+    expect(reading.migrations.filter((step) => 'version' in step)).toEqual([
+      { version: 'generatorVersion', from: 9, to: 10 },
+    ])
+    expect(reading.state.planet.oreRulesVersion).toBe(1)
+    expect(stateDigest(reading.state)).toBe(stateDigest(rulesOnePlanet5()))
+    expect(columnPinOf(planetParamsOf(reading.state.planet) as PlanetParams)).toEqual(
+      RULES_ONE_PLANET_5_PIN,
+    )
   })
 })

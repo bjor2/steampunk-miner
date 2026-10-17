@@ -13,17 +13,21 @@ import { chunkRangeOfDisc } from './tileGrid'
  * under the shop buildings under 6, #170, the ores slice's rarity lead under 7, #146, the planet
  * mix from planet 3 under 8, #147, which leaves planets 1 and 2 as they were, and the rarity rows of
  * a planet entered under the ore rules under 9, ticket 445, which leaves every unstamped planet as it
- * was and is pinned by the stamped digests, with the features loaded as the game loads them): a committed
+ * was and is pinned by the stamped digests, and the material kind slot of a planet entered under ore
+ * rules 2 under 10, ticket 446, pinned by the stamped planets 1 and 2 and leaving the rest as they
+ * were while the P3+ kind table is empty, with the features loaded as the game loads them): a committed
  * digest of the generator's cells and density. If this fails, the
  * generator changed what a seed makes: bump GENERATOR_VERSION (saves and replays of the old
  * world are then refused) and update the version and digests below in the same commit.
  */
 const GOLDEN = {
-  generatorVersion: 9,
+  generatorVersion: 10,
   wholePlanet1: '4219af3346401cb7',
   wholePlanet2: 'ff1572afae8b0e0f',
   farPlanetChunks: 'c602124184c77617',
   heatPlanetChunks: 'c231252e3b76c103',
+  stampedWholePlanet1: '7e596f75431c827d',
+  stampedWholePlanet2: '73f6cedc7b7b1dd7',
   stampedWholePlanet3: 'da330a0c87eec7ee',
   stampedHeatPlanetChunks: '352c6c236ec45985',
   stampedPlanet10Chunks: '2925a97b54878073',
@@ -90,6 +94,13 @@ describe('generator golden digest', () => {
     expect(digestOfChunks(planetParamsFor(1, 2 ** 40), FAR_PLANET_CHUNKS)).toBe(
       GOLDEN.farPlanetChunks,
     )
+  })
+
+  it('makes the committed planets 1 and 2 entered under ore rules 2, the roster (ticket 446)', () => {
+    const planet1 = planetParamsFor(83921, 1, ORE_RULES_VERSION)
+    const planet2 = planetParamsFor(4_000_000_000, 2, ORE_RULES_VERSION)
+    expect(digestOfChunks(planet1, everyChunkOf(planet1))).toBe(GOLDEN.stampedWholePlanet1)
+    expect(digestOfChunks(planet2, everyChunkOf(planet2))).toBe(GOLDEN.stampedWholePlanet2)
   })
 
   it('makes the committed planet 3 entered under the ore rules for world seed 83921 (ticket 445)', () => {

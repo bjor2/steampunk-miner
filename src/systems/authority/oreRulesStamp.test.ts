@@ -9,8 +9,8 @@ import { continueScriptedSession, WORLD_SEED } from './scriptedSession'
 import { readSnapshot, takeSnapshot } from './sessionSnapshot'
 
 // TD ruling on ticket 445, section 2: a planet entered from this build carries the ore rules it was
-// entered under, from the first planet whose rows differ; one a save holds without them stays on
-// the legacy rows until the player leaves it.
+// entered under, from the first planet whose rows differ (planet 1 since the roster, ticket 446);
+// one a save holds without them stays on the legacy rows until the player leaves it.
 
 function sessionOn(planetIndex: number): AuthorityState {
   return createAuthorityState({ planetIndex, planetSeed: WORLD_SEED, playerIds: ['p1'] })
@@ -30,15 +30,10 @@ function onPlanet(state: AuthorityState, planetIndex: number): AuthorityState {
 }
 
 describe('ore rules stamp', () => {
-  it('stamps a session that starts on planet 3 or later, never one on planet 1 or 2', () => {
+  it('stamps a session that starts on any planet, planet 1 included (ticket 446)', () => {
     const planets = [1, 2, 3, 10].map((index) => sessionOn(index).planet)
-    expect(planets.map((planet) => planet.oreRulesVersion)).toEqual([
-      undefined,
-      undefined,
-      ORE_RULES_VERSION,
-      ORE_RULES_VERSION,
-    ])
-    expect('oreRulesVersion' in planets[1]).toBe(false)
+    expect(planets.map((planet) => planet.oreRulesVersion)).toEqual([2, 2, 2, 2])
+    expect(ORE_RULES_VERSION).toBe(2)
   })
 
   it('keeps a planet a save holds without the stamp on the legacy rows', () => {
@@ -47,10 +42,25 @@ describe('ore rules stamp', () => {
     expect(planetParamsOf(state.planet)).toEqual(planetParamsFor(WORLD_SEED, 5))
   })
 
-  it('stamps the next planet when a legacy one is left, and drops the stamp back on planet 2', () => {
+  it('stamps the next planet when a legacy one is left, planet 2 included', () => {
     const next = onPlanet(legacyPlanet5(), 6)
     expect(next.planet).toEqual({ index: 6, seed: WORLD_SEED, oreRulesVersion: ORE_RULES_VERSION })
-    expect(onPlanet(next, 2).planet).toEqual({ index: 2, seed: WORLD_SEED })
+    expect(onPlanet(next, 2).planet).toEqual({
+      index: 2,
+      seed: WORLD_SEED,
+      oreRulesVersion: ORE_RULES_VERSION,
+    })
+  })
+
+  it('keeps a planet a save holds under ore rules 1 on them, and stamps the next with this build', () => {
+    const atRulesOne = {
+      ...sessionOn(5),
+      planet: { index: 5, seed: WORLD_SEED, oreRulesVersion: 1 },
+    }
+    const file = saveSlotOf(takeSnapshot(atRulesOne), 1)
+    const fromSave = readSaveSlot(JSON.parse(JSON.stringify(file)))
+    expect('state' in fromSave && fromSave.state.planet.oreRulesVersion).toBe(1)
+    expect(onPlanet(atRulesOne, 6).planet.oreRulesVersion).toBe(ORE_RULES_VERSION)
   })
 
   it('carries a stamped planet through a snapshot and a save slot whole', () => {

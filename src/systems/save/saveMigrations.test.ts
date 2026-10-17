@@ -35,6 +35,8 @@ const ORE_LEAD_STEP = { version: 'generatorVersion', from: 6, to: 7 }
 const ORE_MIX_STEP = { version: 'generatorVersion', from: 7, to: 8 }
 /** Ticket 445: every fixture was written before the ore rules. */
 const ORE_RULES_STEP = { version: 'generatorVersion', from: 8, to: 9 }
+/** Ticket 446: every fixture was written before the material roster. */
+const ROSTER_STEP = { version: 'generatorVersion', from: 9, to: 10 }
 /** K8 #218: every fixture was written before the charge racks went by size. */
 const CHARGE_RACK_STEP = { version: 'snapshotVersion', from: 19, to: 20 }
 /** Ticket 399: every fixture was written before the swept cut's cursor carried work. */
@@ -84,7 +86,7 @@ describe('save migration chain', () => {
     ])
   })
 
-  it('loads a pre-#175 save through the snapshot 18 -> 19, 19 -> 20 and 20 -> 21 steps, then the generator 5 -> 6, 6 -> 7, 7 -> 8 and 8 -> 9 steps', () => {
+  it('loads a pre-#175 save through the snapshot 18 -> 19, 19 -> 20 and 20 -> 21 steps, then the generator 5 -> 6, 6 -> 7, 7 -> 8, 8 -> 9 and 9 -> 10 steps', () => {
     const reading = withRegistrations([], () => restored(PLANET_1_SAVE))
     expect(reading.migrations).toEqual([
       SNAPSHOT_STEP,
@@ -94,6 +96,7 @@ describe('save migration chain', () => {
       ORE_LEAD_STEP,
       ORE_MIX_STEP,
       ORE_RULES_STEP,
+      ROSTER_STEP,
       SLOT_FORMAT_STEP,
       PACKED_CHUNKS_STEP,
     ])
@@ -113,6 +116,7 @@ describe('save migration chain', () => {
       ORE_LEAD_STEP,
       ORE_MIX_STEP,
       ORE_RULES_STEP,
+      ROSTER_STEP,
       SLOT_FORMAT_STEP,
       PACKED_CHUNKS_STEP,
       { restoredSections: [{ section: 'save-probe.notes' }] },
@@ -161,18 +165,19 @@ describe('save migration chain', () => {
     )
   })
 
-  it('writes the params this build generates and generator version 9', () => {
+  it('writes the params this build generates and generator version 10', () => {
     const { migrated } = migrateSaveSlot(PLANET_10_SAVE)
     expect(migrated).toMatchObject({
-      generatorVersion: 9,
+      generatorVersion: 10,
       world: { params: planetParamsFor(83921, 10) },
     })
   })
 
   it.each([
-    [6, '#146', [ORE_LEAD_STEP, ORE_MIX_STEP, ORE_RULES_STEP]],
-    [7, '#147', [ORE_MIX_STEP, ORE_RULES_STEP]],
-    [8, 'ticket 445', [ORE_RULES_STEP]],
+    [6, '#146', [ORE_LEAD_STEP, ORE_MIX_STEP, ORE_RULES_STEP, ROSTER_STEP]],
+    [7, '#147', [ORE_MIX_STEP, ORE_RULES_STEP, ROSTER_STEP]],
+    [8, 'ticket 445', [ORE_RULES_STEP, ROSTER_STEP]],
+    [9, 'ticket 446', [ROSTER_STEP]],
   ])(
     'keeps every chunk edit, the wallet and the levels of a generator %i save (%s)',
     (generatorVersion, _, steps) => {
@@ -218,7 +223,7 @@ describe('save migration chain', () => {
 describe('save migration chain: levels to steps (#181)', () => {
   const saved = PLANET_5_SAVE.profile.players.p1
 
-  it('loads a pre-#181 save through the snapshot 18 -> 19, 19 -> 20 and 20 -> 21 steps, then the generator 6 -> 7, 7 -> 8 and 8 -> 9 steps', () => {
+  it('loads a pre-#181 save through the snapshot 18 -> 19, 19 -> 20 and 20 -> 21 steps, then the generator 6 -> 7, 7 -> 8, 8 -> 9 and 9 -> 10 steps', () => {
     expect(versionStepsOf(restored(PLANET_5_SAVE))).toEqual([
       SNAPSHOT_STEP,
       CHARGE_RACK_STEP,
@@ -226,6 +231,7 @@ describe('save migration chain: levels to steps (#181)', () => {
       ORE_LEAD_STEP,
       ORE_MIX_STEP,
       ORE_RULES_STEP,
+      ROSTER_STEP,
       SLOT_FORMAT_STEP,
       PACKED_CHUNKS_STEP,
     ])

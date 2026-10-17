@@ -6,7 +6,7 @@ import { takeSnapshot } from '../authority/sessionSnapshot'
 import { stateDigest } from '../authority/stateDigest'
 import { sweptColumnAt } from '../authority/sweptColumnFixture'
 import { clearDisc } from '../world/groundEdit'
-import { planetParamsFor, type PlanetParams } from '../world/planetParams'
+import { freshPlanetParamsFor, planetParamsFor, type PlanetParams } from '../world/planetParams'
 import { SOLID_DENSITY } from '../world/sampleGrid'
 import { currentCellsOfChunk, type WorldState } from '../world/worldState'
 import { packChunkDeltas, unpackChunkDeltas } from './packedChunks'
@@ -61,7 +61,7 @@ describe('chunk diff save', () => {
     session.submit(2, { type: 'debug.setPlanet', payload: { planetIndex: 2 } })
     const { world } = saveSlotOf(takeSnapshot(session.state()), 1)
     expect(world).toMatchObject({ worldSeed: WORLD_SEED, planetIndex: 2 })
-    expect(world.params).toEqual(planetParamsFor(WORLD_SEED, 2))
+    expect(world.params).toEqual(freshPlanetParamsFor(WORLD_SEED, 2))
     expect(world.chunks).toEqual(packChunkDeltas({}))
   })
 

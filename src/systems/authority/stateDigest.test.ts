@@ -70,10 +70,11 @@ describe('state digest', () => {
   })
 
   // Re-pinned for generator 6: the run starts on the Sell bay under the Exchange, 5 m left (#175),
-  // and for snapshot 20: the empty charge rack holds its charges by size (K8 #218).
+  // for snapshot 20: the empty charge rack holds its charges by size (K8 #218), and for generator
+  // 10: planet 1 is entered under ore rules 2, the roster (ticket 446).
   it('keeps the digest of a fresh authority state, as the golden runs do', () => {
     const state = createAuthorityState({ planetIndex: 1, planetSeed: 7, playerIds: ['p1'] })
-    expect(stateDigest(state)).toBe('58ce7e501fe07323')
+    expect(stateDigest(state)).toBe('0786d51f73354770')
   })
 
   it('changes when any value changes', () => {

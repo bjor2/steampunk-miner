@@ -10,6 +10,9 @@
  * version 8 gives each ore patch from planet 3 its planet's family mix and signature (#141, #147),
  * planets 1 and 2 unchanged; version 9 rolls the rarity rows, common to mythic, on each ore patch of
  * a planet entered under the ore rules from planet 3, the band-4 signature carved from common (ticket
- * 445), while a planet a save holds without the rules and planets 1 and 2 keep the lead rows.
+ * 445), while a planet a save holds without the rules and planets 1 and 2 keep the lead rows;
+ * version 10 draws a material kind per ore patch on every planet entered under ore rules 2, from
+ * planet 1 (ticket 446), written to the cell's kind slot alone, while a planet a save holds keeps its
+ * cells.
  */
-export const GENERATOR_VERSION = 9
+export const GENERATOR_VERSION = 10

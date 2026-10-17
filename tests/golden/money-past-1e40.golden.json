@@ -1,7 +1,7 @@
 {
   "name": "money-past-1e40",
   "description": "Planet 80 ore sold for more than 1e40, then a cargo_hold level bought for more than 1e40 (#5, #11).",
-  "generatorVersion": 9,
+  "generatorVersion": 10,
   "authorityProtocolVersion": 83,
   "logSchemaVersion": 7,
   "numberFormatVersion": 1,
@@ -213,17 +213,17 @@
     {
       "tick": 124,
       "scope": "dock",
-      "digest": "0cdb9f4cd8850730"
+      "digest": "38244cd8717ac399"
     },
     {
       "tick": 166,
       "scope": "dock",
-      "digest": "0083531f651e34f6"
+      "digest": "82e3ff8d639f3a33"
     },
     {
       "tick": 2000,
       "scope": "end",
-      "digest": "fa7d8763ede6c833"
+      "digest": "c1e5a46c7ff6db7c"
     }
   ],
   "minedOrder": [

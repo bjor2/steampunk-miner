@@ -40,8 +40,14 @@ describe('rarity tiers', () => {
     expect(rarityRowSetOf(40, undefined)).toBe('legacy')
   })
 
-  it("stamps planets with the ore rules from the kernel's first planet, where the mixed rows start", () => {
-    expect(ORE_RULES_FROM_PLANET).toBe(mixedRowsFromPlanet())
+  it('stamps planets from planet 1, before the mixed rows start, since the roster draws there (ticket 446)', () => {
+    expect(ORE_RULES_FROM_PLANET).toBeLessThan(mixedRowsFromPlanet())
+  })
+
+  it('draws the same rows under ore rules 1 as under this build, so an older stamp keeps its rows', () => {
+    expect([2, 3, 60].map((planetIndex) => rarityRowSetOf(planetIndex, 1))).toEqual(
+      [2, 3, 60].map((planetIndex) => rarityRowSetOf(planetIndex, ORE_RULES_VERSION)),
+    )
   })
 
   it('draws the mixed weights on new planets from P3, where epic and mythic start', () => {

@@ -1,7 +1,7 @@
 {
   "name": "collapse-band-2-grade-1",
   "description": "Grade 1 digs 8 m into band 2: the lined blocks behind warn for 60 ticks and refill (#43).",
-  "generatorVersion": 9,
+  "generatorVersion": 10,
   "authorityProtocolVersion": 83,
   "logSchemaVersion": 7,
   "numberFormatVersion": 1,
@@ -1260,7 +1260,7 @@
     {
       "tick": 2125,
       "scope": "end",
-      "digest": "090727c360079f1b"
+      "digest": "ea282a1cfc739ec2"
     }
   ],
   "minedOrder": [

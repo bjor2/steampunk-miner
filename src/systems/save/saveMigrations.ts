@@ -37,6 +37,11 @@
  * rows and every cell no one has dug reads as it did; every edit and the whole state are kept, and
  * the next planet the player enters is stamped.
  *
+ * Generator 9 -> 10 (ticket 446): a planet entered under ore rules 2 draws a material kind per ore
+ * patch into the cell's kind slot. A save written before them holds its planet unstamped or under
+ * rules 1, so that planet draws no kind and every cell no one has dug reads as it did; every edit
+ * and the whole state are kept, and the next planet the player enters is stamped with rules 2.
+ *
  * Format 1 -> 2 (#401): the slot layout. A v1 file was the checkpoint of the single slot, so it
  * becomes the autosave with no wall time, and its header gains the ids of the rows its state opens
  * (`savedUnlocks.ts`). Its sections are kept byte for byte: money, levels and everything else.
@@ -131,6 +136,7 @@ const SAVE_MIGRATION_STEPS: readonly SaveMigrationStep[] = [
   { version: 'generatorVersion', from: 6, to: 7, migrate: keepEditsUnderOreLeads },
   { version: 'generatorVersion', from: 7, to: 8, migrate: keepEditsUnderOreMix },
   { version: 'generatorVersion', from: 8, to: 9, migrate: keepLegacyOreRows },
+  { version: 'generatorVersion', from: 9, to: 10, migrate: keepCellsWithoutRoster },
   { version: 'formatVersion', from: 1, to: 2, migrate: addSlotHeader },
   { version: 'formatVersion', from: 2, to: 3, migrate: packChunkTable },
 ]
@@ -252,6 +258,11 @@ function keepEditsUnderOreMix(file: MigratingFile): MigratingFile | null {
 /** Generator 8 -> 9: as 7 -> 8, the saved planet unstamped and so on the rows it was generated on. */
 function keepLegacyOreRows(file: MigratingFile): MigratingFile | null {
   return keptUnderGenerator(file, 9)
+}
+
+/** Generator 9 -> 10: as 8 -> 9, the saved planet keeps its stamp and so draws no material kind. */
+function keepCellsWithoutRoster(file: MigratingFile): MigratingFile | null {
+  return keptUnderGenerator(file, 10)
 }
 
 function keptUnderGenerator(file: MigratingFile, generatorVersion: number): MigratingFile | null {
