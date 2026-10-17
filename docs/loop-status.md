@@ -614,6 +614,7 @@ TD ruling on #514/#529: no hard build block, but a fixed merge order. Mechanism 
 
 Problem: `tester.sh` ignored `.quiet-hold`, and the running tester process (pid started 00:20) drains `tester/queue.json` (16 queued features, each a multi-hour full suite) one entry after another,
 so `quiet-bench.sh 514` could never see an idle box.
+
 - **`tester.sh`** (`.bak-20261017-0610-hold`): new `quiet_wait` (defined and called before `RUN_TAG`, and in `queue_run`'s loop condition before every `queue_take`): while a live
   `.quiet-hold` (`<expiry epoch> <owner>`, expiry in the future) exists it sleeps in 30 s steps and starts nothing; the hold expires on its own. It then calls `quiet-queue.sh auto`.
   Edited in place, same size (30564 bytes) and inode, one `pwrite`; the bytes added were taken out of header comments, and the process's read offset (30063) is past the edit, so the
