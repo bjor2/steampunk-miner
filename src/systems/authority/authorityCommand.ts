@@ -309,8 +309,15 @@ import type { DriveSigns } from '../vehicle/driveSigns'
  *    unchanged. A command log recorded under 82 or earlier names its protocol in `metadata.json`
  *    (`runMetadata.ts`), so it is compared and replayed under that number, never re-read under 83.
  *    A run that never holds a gated cell under a report moves no digest.
+ * 84: the casing trail keeps its points apart and never lays inside the lag (ticket 538, the TD
+ *    ruling 6228998310 on #538): a recorded axis point is kept only at least one ring spacing from
+ *    every point still waiting for its ring, on the pose report's path and the swept cut's alike;
+ *    one the rule rejects is dropped, its stretch folded into no ring. Past
+ *    `MAX_CASING_TRAIL_POINTS` (6 to 9) the newest are dropped instead of the oldest being laid at
+ *    once, so a rig cutting back over its own trail lays no ring under its stamp. A run that never
+ *    cuts back within the ring lag of its own trail moves no digest.
  */
-export const AUTHORITY_PROTOCOL_VERSION = 83
+export const AUTHORITY_PROTOCOL_VERSION = 84
 
 /** The kernel's own commands: the closed set its rule tables are written against. */
 export interface KernelCommandPayloads {

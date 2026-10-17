@@ -53,10 +53,21 @@ describe('casing trail', () => {
     expect(backedOut.trail.unlined).toEqual([])
   })
 
-  it('lays the oldest points past six when the stamp dithers inside the lag', () => {
+  it('records nothing new and lays nothing while the stamp dithers inside the lag (#538)', () => {
     const { trail, due } = followAlongX([0, 600, 0, 600, 0, 600, 0, 600])
-    expect(trail.unlined).toHaveLength(6)
-    expect(due).toEqual([0, 600])
+    expect(trail.unlined.map((point) => point.xMm)).toEqual([0, 600])
+    expect(due).toEqual([])
+  })
+
+  it('drops a point within half a metre of one waiting, folding its stretch into no ring', () => {
+    const { trail } = followAlongX([0, 500, 1000, 1500, 1000, 500, 0, -500])
+    expect(trail.unlined.map((point) => [point.xMm, point.lengthMm])).toEqual([
+      [0, 500],
+      [500, 500],
+      [1000, 500],
+      [1500, 500],
+      [-500, 500],
+    ])
   })
 
   it('gives each ring the stretch of axis cut since the previous one', () => {
@@ -126,9 +137,33 @@ describe('casing trail along the swept cut (ticket 330)', () => {
     },
   )
 
+  it('drops no point of a straight diagonal cut to the millimetre its points round to (#538)', () => {
+    let trail: CasingTrail = EMPTY_CASING_TRAIL
+    const due: { xMm: number; yMm: number }[] = []
+    for (let step = 0; step <= 100; step++) {
+      const cut = { from: diagonalAt(step - 1), to: diagonalAt(step) }
+      const followed = followCasingTrailAlongCut(trail, cut, true)
+      trail = followed.trail
+      due.push(...followed.due)
+    }
+    const gaps = due.slice(1).map((point, index) => Math.round(distanceBetween(due[index], point)))
+    expect(due.length).toBeGreaterThan(50)
+    expect(gaps.every((gap) => gap >= 499 && gap <= 501)).toBe(true)
+  })
+
   it('starts a new cut where the sweep starts past the ring lag of the last point', () => {
     const start = followCasingTrailAlongCut(EMPTY_CASING_TRAIL, cutTo(0, 0), true).trail
     const far = followCasingTrailAlongCut(start, cutTo(9000, 0), true).trail
     expect(far.lastAxisPoint).toEqual({ xMm: 9000, yMm: 0 })
   })
 })
+
+/** 300 mm a step down a 7:13 diagonal from the origin, so every point rounds. */
+function diagonalAt(step: number) {
+  const along = Math.max(0, step) * 300
+  return { xMm: Math.floor((along * 13) / 14.765), yMm: -Math.floor((along * 7) / 14.765) }
+}
+
+function distanceBetween(a: { xMm: number; yMm: number }, b: { xMm: number; yMm: number }) {
+  return Math.sqrt((a.xMm - b.xMm) ** 2 + (a.yMm - b.yMm) ** 2)
+}

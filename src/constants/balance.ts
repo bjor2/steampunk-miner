@@ -95,10 +95,13 @@ export const CASING_RING_SPACING_MM = 500
 export const CASING_RING_LAG_MM =
   DRILL_STAMP_RADIUS_MM + DRILL_STAMP_RADIUS_MM + CASING_LINING_HALF_WIDTH_MM
 /**
- * Axis points waiting for their ring: a straight cut holds `CASING_RING_LAG_MM / 500` of them.
- * Dithering back and forth inside the lag lays the oldest past this many, so the save stays small.
+ * Axis points waiting for their ring, a safety net that keeps the save small (ticket 538, the TD
+ * ruling 6228998310 on #538: 6 to 9): waiting points lie at least `CASING_RING_SPACING_MM` apart
+ * and within the lag, so a straight cut holds at most `CASING_RING_LAG_MM / 500` of them and a
+ * line through the stamp `2 x 2150 / 500 + 1`. Only a tight loop fills it; the newest point past
+ * it is dropped, never the oldest laid inside the lag.
  */
-export const MAX_CASING_TRAIL_POINTS = 6
+export const MAX_CASING_TRAIL_POINTS = 9
 
 /**
  * Fractional drill time (TD scope on #316, ticket 330): the swept cut (`drillStep`) counts a cell's
