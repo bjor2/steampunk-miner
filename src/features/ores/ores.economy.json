@@ -37,6 +37,15 @@
     },
     "kinds": {
       "rosterMaxKinds": 15,
+      "pools": {
+        "1": "legacy",
+        "2": "legacy",
+        "3": "foothold-p3",
+        "4": "foothold-p4",
+        "5": "foothold-p5",
+        "6": "foothold-p6-p7",
+        "7": "foothold-p6-p7"
+      },
       "legacy": [
         { "slotId": "legacy.c1", "family": "metal", "rarity": "common", "window": [1, 5] },
         { "slotId": "legacy.c2", "family": "metal", "rarity": "common", "window": [1, 2] },

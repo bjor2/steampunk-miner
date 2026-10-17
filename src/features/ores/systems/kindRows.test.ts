@@ -15,6 +15,12 @@ function problemsWithLegacy(legacy: readonly unknown[], rosterMaxKinds = 15): st
   return oreRowProblems({ ore: { ...economyFile.ore, kinds } }, familiesFile)
 }
 
+/** The shipped files with the planet-to-pool table replaced. */
+function problemsWithPools(pools: unknown): string[] {
+  const kinds = { ...economyFile.ore.kinds, pools }
+  return oreRowProblems({ ore: { ...economyFile.ore, kinds } }, familiesFile)
+}
+
 const C1: Slot = economyFile.ore.kinds.legacy[0]
 
 describe('ore kind slots', () => {
@@ -69,6 +75,44 @@ describe('ore kind slots', () => {
       'ore.kinds.legacy[2].window must be [first, last] in 1..5',
       'ore.kinds.legacy[3].slotId must be "legacy.<name>"',
       'kind slot "legacy.c1" twice',
+    ])
+  })
+})
+
+// The planet-picks-pool seam (TD shape on ticket 542, #453 comment 6236465674): which species pool
+// a planet's shared kind slots resolve to, by planet index alone.
+describe('ore kind pools', () => {
+  const poolOf = (planet: number) => ORE_ROWS.kinds.poolByPlanet.get(planet)
+
+  it('keeps planets 1 and 2 on the legacy pool and gives P3, P4 and P5 a pool each', () => {
+    expect([1, 2, 3, 4, 5].map(poolOf)).toEqual([
+      'legacy',
+      'legacy',
+      'foothold-p3',
+      'foothold-p4',
+      'foothold-p5',
+    ])
+  })
+
+  it('maps planets 6 and 7 to one named pool and nothing past planet 7', () => {
+    expect(poolOf(6)).toBe('foothold-p6-p7')
+    expect(poolOf(7)).toBe('foothold-p6-p7')
+    expect([8, 9, 40, 200].map(poolOf)).toEqual([undefined, undefined, undefined, undefined])
+  })
+
+  it('refuses a table that skips a planet or does not start at planet 1', () => {
+    const gap = 'ore.kinds.pools must name planets 1 to n, with no gap'
+    expect(problemsWithPools({ 1: 'legacy', 3: 'foothold-p3' })).toEqual([gap])
+    expect(problemsWithPools({ 2: 'legacy' })).toEqual([gap])
+    expect(problemsWithPools({})).toEqual([gap])
+  })
+
+  it('refuses a pool id that is not kebab-case, and a table that is not a map', () => {
+    expect(problemsWithPools({ 1: 'legacy', 2: 'Foothold.P3' })).toEqual([
+      'ore.kinds.pools.2 must be a kebab-case pool id',
+    ])
+    expect(problemsWithPools(['legacy'])).toEqual([
+      'ore.kinds.pools must map planet indices to pool ids',
     ])
   })
 })
