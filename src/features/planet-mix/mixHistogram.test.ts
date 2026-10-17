@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest'
 import { PACING_WORLD_SEEDS } from '../../constants/pacingSeeds'
 import { withRegistrations } from '../../registries/registrar'
 import type { SliceDefinition } from '../../registries/sliceDefinition'
-import { planetParamsFor } from '../../systems/world/planetParams'
+import { ORE_RULES_VERSION, planetParamsFor } from '../../systems/world/planetParams'
 import { oreLeadHook, oreTypeProvider } from '../ores'
 import { histogramProblems } from './histogramCheck'
 import { planetHistogramOf, planetHistogramOfParams } from './mixHistogram'
@@ -49,7 +49,9 @@ describe('planet ore histogram', () => {
     'matches the mix on a fresh P%i, pooled over the pacing seeds',
     (planet) => {
       const histograms = SEEDS.map((seed) => planetHistogramOf(planet, seed))
-      expect(histograms.every((histogram) => histogram.oreRulesVersion === 1)).toBe(true)
+      expect(histograms.every((histogram) => histogram.oreRulesVersion === ORE_RULES_VERSION)).toBe(
+        true,
+      )
       expect(histogramProblems(histograms)).toEqual([])
     },
     5 * MINUTES,

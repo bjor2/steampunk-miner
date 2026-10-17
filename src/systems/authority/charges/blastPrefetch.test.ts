@@ -4,9 +4,11 @@ import { fuseTicksOf } from '../../economy/chargeSizes'
 import { chargeCentreMm } from '../../vehicle/vehicleCharges'
 import { blocksNear } from '../../world/collapseBlock'
 import { chunksReadByBlock } from '../../world/collapseBlockGround'
+import type { PlanetParams } from '../../world/planetParams'
 import { MM_PER_SAMPLE } from '../../world/sampleGrid'
 import { chunkKey, chunkOfTile } from '../../world/tileGrid'
-import { createScriptedSession, PARAMS } from '../scriptedSession'
+import { planetParamsOf } from '../planetOfState'
+import { createScriptedSession } from '../scriptedSession'
 import { blastFrontOf } from './blastFront'
 import { blastChunksOf, chunksAwaitingPrefetch } from './blastPrefetch'
 import { plantOnWall, prepareBlaster } from './chargeFixtures'
@@ -19,10 +21,12 @@ describe('blast prefetch', () => {
     const session = createScriptedSession()
     prepareBlaster(session, 0)
     plantOnWall(session, PLANT_TICK)
-    const waiting = [chunksAwaitingPrefetch(session.state(), PARAMS).length]
+    // The session's own planet: the stamped P1 of this build, whose chunks the prefetch warms.
+    const params = planetParamsOf(session.state().planet) as PlanetParams
+    const waiting = [chunksAwaitingPrefetch(session.state(), params).length]
     for (let tick = PLANT_TICK + 1; tick < PLANT_TICK + (fuseTicksOf(1) as number); tick++) {
       session.advanceTo(tick)
-      waiting.push(chunksAwaitingPrefetch(session.state(), PARAMS).length)
+      waiting.push(chunksAwaitingPrefetch(session.state(), params).length)
     }
     expect(waiting[0]).toBeGreaterThan(0)
     expect(waiting.every((count, at) => at === 0 || count >= waiting[at - 1] - 1)).toBe(true)
