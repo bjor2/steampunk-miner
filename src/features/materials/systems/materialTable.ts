@@ -7,6 +7,7 @@
  */
 import { oreFamilies } from '../../ores'
 import { ORE_LOOKS } from '../../ore-visuals'
+import { KIND_LOOKS } from '../../../systems/render/kindLooks'
 import { gateClassOf } from '../../planet-mix'
 import materialsFile from '../materials.json'
 import { materialCopyProblems, materialNameOf } from './materialCopyRules'
@@ -62,6 +63,9 @@ export interface MaterialGuardContext {
   familyNameById: Readonly<Record<string, string>>
   reservedHueBands: readonly HueBand[]
   hostRockLuma: number
+  /** The silhouettes and patterns the terrain shader draws (ticket 450). */
+  silhouetteIds: readonly string[]
+  patternIds: readonly string[]
 }
 
 type Raw = Record<string, unknown>
@@ -72,6 +76,8 @@ export function materialGuardContext(): MaterialGuardContext {
     familyNameById: Object.fromEntries(oreFamilies().map((family) => [family.id, family.name])),
     reservedHueBands: ORE_LOOKS.reservedHueBands,
     hostRockLuma: brightestHostRockLuma(),
+    silhouetteIds: KIND_LOOKS.silhouettes.map((silhouette) => silhouette.id),
+    patternIds: KIND_LOOKS.patterns.map((pattern) => pattern.id),
   }
 }
 
@@ -92,6 +98,7 @@ export function materialTableProblems(raw: unknown, context: MaterialGuardContex
     ...sharedSlotProblems(rows),
     ...unknownHueSlotProblems(rows, slots),
     ...sharedLookProblems(rows),
+    ...undrawnLookProblems(rows, context),
   ]
 }
 
@@ -128,6 +135,21 @@ function rowProblems(row: Raw, at: number, context: MaterialGuardContext): strin
     familyName,
     row.flavour as string,
   )
+}
+
+/** A well-shaped row must name a silhouette and a pattern the terrain shader draws (ticket 450). */
+function undrawnLookProblems(rows: readonly Raw[], context: MaterialGuardContext): string[] {
+  const wellShaped = rows.filter((row, at) => materialRowShapeProblems(row, `${at}`).length === 0)
+  return wellShaped.flatMap((row) => [
+    ...(context.silhouetteIds.includes(row.silhouette as string)
+      ? []
+      : [
+          `${String(row.id)} names the silhouette ${String(row.silhouette)} the shader cannot draw`,
+        ]),
+    ...(context.patternIds.includes(row.pattern as string)
+      ? []
+      : [`${String(row.id)} names the pattern ${String(row.pattern)} the shader cannot draw`]),
+  ])
 }
 
 function duplicateIdProblems(entries: readonly Raw[], list: string): string[] {

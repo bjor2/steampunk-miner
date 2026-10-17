@@ -25,3 +25,6 @@ export {
   MATERIAL_NAME_MAX_WORDS,
   materialNameOf,
 } from './systems/materialCopyRules'
+export type { MaterialRarityLook } from './systems/render/rarityLooks'
+export { FRAMED_RARITIES, RARITY_LOOKS, rarityLookProblems } from './systems/render/rarityLooks'
+export { hueSlotColourOf } from './systems/render/hueSlotColour'
