@@ -9,15 +9,16 @@ import { goldenRunProblems, type GoldenRun } from './goldenRun'
 // so the committed goldens are protocol 84's digests and mined order under the current header,
 // the cheapest proof that the charge on density removed changed nothing with the switch off. With
 // the switch on, only the two goldens whose pose reports drill move their end digest, to the
-// digests pinned below (recorded by `npm run golden:update` with the switch on at `f02d0774`);
-// every other golden replays to its committed digests and mined order byte for byte.
+// digests pinned below (recorded with the switch on at ticket 537's protocol 87, the report
+// capsule on as it ships); every other golden replays to its committed digests and mined order
+// byte for byte.
 
 const GOLDEN_FOLDER = new URL('../../tests/golden/', import.meta.url)
 
 /** The end digest of each golden the charge moves, with the switch on, by tick. */
 const CHARGED_DIGESTS: Readonly<Record<string, Readonly<Record<number, string>>>> = {
-  'casing-lined-band-2': { 2137: '4f2b5b5df597d375' },
-  'collapse-band-2-grade-1': { 2125: 'fd1d79ed2a080e24' },
+  'casing-lined-band-2': { 2137: 'f2def3c767fb08e1' },
+  'collapse-band-2-grade-1': { 2125: '1cd8a7cae47c33bd' },
 }
 
 function committedGoldenRuns(): GoldenRun[] {

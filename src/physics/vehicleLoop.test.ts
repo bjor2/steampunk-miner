@@ -34,9 +34,12 @@ import { createVehicleLoop } from '../scene/vehicleLoop'
 
 let sink: MemorySink
 
-/** The ticket-339 dig's end at every-tick reports, with the render origin still and moved each tick. */
-const STEADY_ORIGIN_RUN = { tiles: 19, xMm: -19808, yMm: 290614 }
-const MOVING_ORIGIN_RUN = { tiles: 20, xMm: -20105, yMm: 290825 }
+/**
+ * The ticket-339 dig's end at every-tick reports, with the render origin still and moved each tick,
+ * as the report capsule cuts it (ticket 537, protocol 87; the bare disc read 19 and 20 tiles).
+ */
+const STEADY_ORIGIN_RUN = { tiles: 16, xMm: -19860, yMm: 290841 }
+const MOVING_ORIGIN_RUN = { tiles: 16, xMm: -19838, yMm: 290834 }
 /** The known f32 noise between the two (TD v2 Q4 on #514): documentation, not the assertion. */
 const ORIGIN_NOISE = { mm: 500, tiles: 1 }
 

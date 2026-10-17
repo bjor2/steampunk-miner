@@ -33,7 +33,7 @@ import { coreHardness, blockHardness, oreSalePrice, oreTier } from '../economy/o
 import { toCanonical, type BigStat } from '../money'
 import { pickedUpUnitOf, type PickedUp, type PickupFind } from '../registries/orePickup'
 import { drillDamage, subStepsPerTile, ticksPerTile, type DrillStats } from '../vehicle/drillRule'
-import { drillStampOf } from '../vehicle/drillStamp'
+import { drillStampOf, stampSweptFrom } from '../vehicle/drillStamp'
 import { ENERGY_QUANTA_PER_TICK } from '../vehicle/energyQuanta'
 import { payLawWork, payLawWorkEnergy, type LawWorkTally } from '../vehicle/cutCarry'
 import type { AheadLatch } from '../vehicle/aheadBearingLatch'
@@ -42,6 +42,7 @@ import type { SideLatch } from '../vehicle/facedSide'
 import type { VehiclePose } from '../vehicle/vehiclePose'
 import { hasCargoRoom, withOreUnit, type VehicleState } from '../vehicle/vehicleState'
 import type { Carve, CarveWindow, CellDrillTicks } from '../world/groundEdit'
+import type { StampPoint } from '../world/stampShape'
 import type { YieldedCell } from '../world/cellYield'
 import { bandOfTile } from '../world/planetGeometry'
 import type { PlanetParams } from '../world/planetParams'
@@ -168,17 +169,22 @@ export function drillCell(
   return drillGround(state, params, playerId, { tile, carve }, requestedTicks)
 }
 
-/** What a pose report drills with: the pose, its reported drive, and whether it lifts. */
+/**
+ * What a pose report drills with: the pose, its reported drive, whether it lifts, and where its
+ * capsule starts (ticket 537, `reportedCapsule.ts`), or null for the bare disc at the pose.
+ */
 export interface ReportedDrill {
   pose: VehiclePose
   drive: DriveSigns
   isLifting: boolean
+  tail: StampPoint | null
 }
 
 /**
- * The reported drill: the stamp at the pose, aimed by its facing (#40), and any drill gear, which
- * may read the reported drive (ticket 279), counted and charged on `clock`: whole ticks as every
- * drill was, or the law work it removed (ticket 535).
+ * The reported drill: the stamp at the pose, aimed by its facing (#40), as the capsule from its
+ * tail when the bite runs on (ticket 537), and any drill gear, which may read the reported drive
+ * (ticket 279), counted and charged on `clock`: whole ticks as every drill was, or the law work it
+ * removed (ticket 535), on sub-steps for the capsule.
  */
 export function drillAtPose(
   state: AuthorityState,
@@ -189,8 +195,8 @@ export function drillAtPose(
   requestedTicks: number,
   clock: DrillClock = WHOLE_TICK_CLOCK,
 ): RuleEffect {
-  const { pose, drive, isLifting } = reported
-  const bit = { pose, disc: drillStampOf(pose, isLifting), drive }
+  const { pose, drive, isLifting, tail } = reported
+  const bit = { pose, disc: stampSweptFrom(drillStampOf(pose, isLifting), tail), drive }
   const carve: CarveIn = (request) => carveStampWithGear(state, params, playerId, bit, request)
   return drillGroundBy(state, params, playerId, { tile: target, carve }, requestedTicks, clock)
     .effect

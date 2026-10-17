@@ -57,15 +57,26 @@ export const DEV_FLAGS: DevFlags = { 'drill.sweptCut': false, 'drill.reportEvery
  *   authority's arithmetic: off, as `drill.sweptCut` is, and the two flip together behind the
  *   ticket's gates and #541's. Off, the swept cut is charged as shipped, the parity reference for
  *   #537 until the flip; with `drill.sweptCut` off no `drillStep` is sent and no digest moves.
+ * - `drill.reportCapsule` (ticket 537, A7, the TD shape 6228947744 section 4 with the HS additions):
+ *   a pose report whose drill ran every tick since the last charged report, on the same facing,
+ *   carves the capsule from the previous reported pose's stamp to this one's instead of the bare
+ *   disc at the pose, counted on the swept cut's sub-step clock (`authority/reportedCapsule.ts`),
+ *   so a report every tick no longer re-stamps a disc that leaves the rim between poses standing.
+ *   The step is capped at one stamp radius (950 mm): a longer step, a fresh bite, a turn and a
+ *   still rig cut today's bare disc on today's whole-tick clock, byte for byte. The charge is the
+ *   report's as before: whole ticks, or the law work removed with the carry (`drill.exactCarry`).
+ *   A kill-switch, on: off, every report cut and every digest is protocol 86's.
  */
 export interface AuthorityDevFlags {
   readonly 'enemy.lureRetarget': boolean
   readonly 'drill.exactCarry': boolean
   readonly 'drill.sweptLawCharge': boolean
+  readonly 'drill.reportCapsule': boolean
 }
 
 export const AUTHORITY_DEV_FLAGS: AuthorityDevFlags = {
   'enemy.lureRetarget': true,
   'drill.exactCarry': false,
   'drill.sweptLawCharge': false,
+  'drill.reportCapsule': true,
 }

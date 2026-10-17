@@ -31,14 +31,7 @@ import { planetParamsOf } from './planetOfState'
  * charge's specs and the lanes switch it on for their runs.
  */
 export function withDrillExactCarry<T>(isOn: boolean, play: () => T): T {
-  const flags = AUTHORITY_DEV_FLAGS as { -readonly [K in keyof AuthorityDevFlags]: boolean }
-  const shipped = flags['drill.exactCarry']
-  flags['drill.exactCarry'] = isOn
-  try {
-    return play()
-  } finally {
-    flags['drill.exactCarry'] = shipped
-  }
+  return withAuthorityFlag('drill.exactCarry', isOn, play)
 }
 
 /**
@@ -46,13 +39,26 @@ export function withDrillExactCarry<T>(isOn: boolean, play: () => T): T {
  * the swept cut reads it at call time (`sweptDrill.ts`) and it ships off.
  */
 export function withSweptLawCharge<T>(isOn: boolean, play: () => T): T {
+  return withAuthorityFlag('drill.sweptLawCharge', isOn, play)
+}
+
+/**
+ * Runs `play` with the authority's `drill.reportCapsule` as `isOn` (ticket 537), put back after:
+ * the report's cut reads it at call time (`reportedDrill.ts`) and it ships on, so a spec that
+ * reads protocol 86's bare disc switches it off for its run.
+ */
+export function withReportCapsule<T>(isOn: boolean, play: () => T): T {
+  return withAuthorityFlag('drill.reportCapsule', isOn, play)
+}
+
+function withAuthorityFlag<T>(name: keyof AuthorityDevFlags, isOn: boolean, play: () => T): T {
   const flags = AUTHORITY_DEV_FLAGS as { -readonly [K in keyof AuthorityDevFlags]: boolean }
-  const shipped = flags['drill.sweptLawCharge']
-  flags['drill.sweptLawCharge'] = isOn
+  const shipped = flags[name]
+  flags[name] = isOn
   try {
     return play()
   } finally {
-    flags['drill.sweptLawCharge'] = shipped
+    flags[name] = shipped
   }
 }
 
