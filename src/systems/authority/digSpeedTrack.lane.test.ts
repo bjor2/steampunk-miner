@@ -1,30 +1,67 @@
 import { mkdirSync, writeFileSync } from 'node:fs'
-import { afterAll, describe, expect, it } from 'vitest'
+import { afterAll, describe, expect, it, vi } from 'vitest'
+import * as groundEdit from '../world/groundEdit'
+import type { TilePoint } from '../world/tileGrid'
+import {
+  addCarveRemoval,
+  NO_CARVE_REMOVAL,
+  walkingWithRemoval,
+  type CarveRemoval,
+} from './carveRemovalFixtures'
 import { trackTicksOf, type Track, type TrackSection, type TrackTilt } from './digSpeedTrackFrame'
-import { cutTrack, drillPowerFor, type TrackPath } from './digSpeedTrackFixtures'
-import { barVerdictsOf, lawReadingOf, thousandthsOf, type LawReading } from './lawWorkFixtures'
+import {
+  cutTrack,
+  drillPowerFor,
+  stretchOf,
+  type TrackPath,
+  type TrackRun,
+} from './digSpeedTrackFixtures'
+import {
+  barVerdictsOf,
+  geometryMissesOf,
+  lawReadingOf,
+  thousandthsOf,
+  type LawReading,
+} from './lawWorkFixtures'
 
-// The dig-speed STOP of #514 (Done-when 3) at the Vertical Scaler's speeds, 25, 44, 240 and 3600
+// The dig-speed STOP of #514 (Done-when 3) on a fixed pose track at 3, 8, 25, 44, 240 and 3600
 // m/s, flat and tilted, level and down (VS 6226431087 and 6226528512, the TD's v2 ruling
-// 6226459471): the live loop holds the body to 18 m/s, so these rows replay a fixed pose track
-// through the authority (`digSpeedTrackFixtures.ts`), each path cutting the same track on the same
-// ground from a fresh rig whose law speed is the track's; law work per metre and cells per metre are read over a fixed
-// stretch of the track, past the swept cut's 60 m lead, the bars per unit of law work over all it
-// cut. The bars are the loop lane's (`physics/digSpeedStop.lane.test.ts`):
-// the flag-off report every tick against the swept cut, law work read from the ground. The 12-tick
-// cadence is logged where the track lasts a report. At 3600 m/s the body crosses the track in two
+// 6226459471; 3 and 8 m/s are Step 0 of the carve-geometry ticket, TD on #537 6228947744 section
+// 3, GD 6228937772): the live loop holds the body to 18 m/s, so these rows replay the same poses
+// through the authority (`digSpeedTrackFixtures.ts`) on the swept cut, a report every tick and
+// 12-tick reports, each from a fresh rig whose law speed is the track's on the same ground. Law
+// work and cells per metre are read over a fixed stretch past the swept cut's 60 m lead, the
+// charge per unit of law work over all it cut. At 3600 m/s the body crosses the track in two
 // ticks and a flag-off report stamps its pose only, never the span between (the parked bore-bar
-// wiring, TD v2 Q5), so that row reads what the report path does there. A lane: it runs only when
-// named, prints the table and writes balance-report/dig-speed-track.ndjson.
+// wiring, TD v2 Q5), so that row reads what the report path does there.
+// - Gated, bar 4 (1a; A6 #535 makes it hold): energy per unit of law work within 1% of swept, heat
+//   at least 1.000 of swept less one cell.
+// - Gated, the ratchet until #537 lands: on law work per metre (1b) and cells per metre (3), a
+//   report every tick misses its band against swept by no more than 12-tick reports do.
+// - Logged: Step 0's reading, a report every tick over swept on law work per metre at 3, 8, 25 and
+//   44 m/s (at least 0.99 on every row: the carve is not the cause and A7 is not built; any lower
+//   row: one capsule round of A7 after A6), with the report carve's removal per metre over the
+//   stretch: attempted before the clamp, applied, and the formula's unrounded continuum; bar 2,
+//   law work per yielded cell over swept's (VS 6228841725). A lane: it runs only when named, prints
+//   the table and writes balance-report/dig-speed-track.ndjson.
 
-const SPEEDS_MPS = [25, 44, 240, 3600]
+const SPEEDS_MPS = [3, 8, 25, 44, 240, 3600]
 const TILTS: readonly TrackTilt[] = ['flat', 'tilted']
 const SECTIONS: readonly TrackSection[] = ['level', 'down']
 const PATHS: readonly TrackPath[] = ['swept', 'every tick', 'every 12']
 const REPORT_EVERY = 12
+const STEP_ZERO = { speedsMps: [3, 8, 25, 44], floor: 0.99 }
 const REPORT_FOLDER = new URL('../../../balance-report/', import.meta.url)
+const discCarve = groundEdit.carveDisc
 
-interface TrackReading extends LawReading {
+/** The report carve's removal per metre of the stretch, full cells; null on the swept cut. */
+interface RemovalColumns {
+  attemptedCellsPerMetre: number | null
+  appliedCellsPerMetre: number
+  continuumCellsPerMetre: number | null
+}
+
+interface TrackReading extends LawReading, RemovalColumns {
   speedMps: number
   tilt: TrackTilt
   section: TrackSection
@@ -37,6 +74,7 @@ const readings: TrackReading[] = []
 
 afterAll(() => {
   console.log(formatTable(readings))
+  console.log(stepZeroLinesOf(readings).join('\n'))
   writeReadings(readings)
 })
 
@@ -52,13 +90,20 @@ function nameOf(track: Track): string {
 
 /** The paths the track lasts: the 12-tick cadence only where it sends a report. */
 function pathsOf(track: Track): TrackPath[] {
-  return PATHS.filter((path) => path !== 'every 12' || trackTicksOf(track) >= REPORT_EVERY)
+  return PATHS.filter((path) => path !== 'every 12' || hasTwelveTickReport(track))
+}
+
+function hasTwelveTickReport(track: Track): boolean {
+  return trackTicksOf(track) >= REPORT_EVERY
 }
 
 /** The bars per unit of law work read over all the track cut; per metre, over its stretch. */
 function readTrack(track: Track, path: TrackPath): TrackReading {
   const drillPower = drillPowerFor(track)
-  const run = cutTrack(track, path, drillPower)
+  const { run, removal } =
+    path === 'swept'
+      ? { run: cutTrack(track, path, drillPower), removal: null }
+      : cutRecordingRemoval(track, path, drillPower)
   const perMetre = lawReadingOf({ ...run, ...run.stretch })
   return {
     ...track,
@@ -69,7 +114,97 @@ function readTrack(track: Track, path: TrackPath): TrackReading {
     lawWorkPerMetre: perMetre.lawWorkPerMetre,
     cellsPerMetre: perMetre.cellsPerMetre,
     oneCellShare: perMetre.oneCellShare,
+    ...removalColumnsOf(run, removal),
   }
+}
+
+/** Cuts the track with every disc carve's removal on the stretch summed. */
+function cutRecordingRemoval(track: Track, path: TrackPath, drillPower: number) {
+  let removal = NO_CARVE_REMOVAL
+  const spy = spyOnDiscCarves(stretchCellsOf(track), (carved) => {
+    removal = addCarveRemoval(removal, carved)
+  })
+  try {
+    return { run: cutTrack(track, path, drillPower), removal }
+  } finally {
+    spy.mockRestore()
+  }
+}
+
+/** Every disc carve walks its stamp with its removal on `isCounted` cells handed to `record`. */
+function spyOnDiscCarves(
+  isCounted: (tile: TilePoint) => boolean,
+  record: (removal: CarveRemoval) => void,
+) {
+  return vi
+    .spyOn(groundEdit, 'carveDisc')
+    .mockImplementation((world, params, disc, window, drillTicksOf, walk) =>
+      discCarve(
+        world,
+        params,
+        disc,
+        window,
+        drillTicksOf,
+        walkingWithRemoval(walk ?? groundEdit.walkStampInRows, isCounted, record),
+      ),
+    )
+}
+
+function stretchCellsOf(track: Track): (tile: TilePoint) => boolean {
+  const keys = new Set(stretchOf(track).tiles.map(keyOf))
+  return (tile) => keys.has(keyOf(tile))
+}
+
+function keyOf(tile: TilePoint): string {
+  return `${tile.tx},${tile.ty}`
+}
+
+/**
+ * The removal columns over the stretch; the recorder must see what the ground lost there, or a
+ * carve went round the disc carve and the columns would not add up.
+ */
+function removalColumnsOf(run: TrackRun, removal: CarveRemoval | null): RemovalColumns {
+  const { metres, law } = run.stretch
+  const appliedCellsPerMetre = thousandthsOf(law.cellsRemoved / metres)
+  if (removal === null) {
+    return { attemptedCellsPerMetre: null, appliedCellsPerMetre, continuumCellsPerMetre: null }
+  }
+  if (thousandthsOf(removal.applied / metres) !== appliedCellsPerMetre) {
+    throw new Error(`the disc carves applied ${removal.applied} of ${law.cellsRemoved} cells`)
+  }
+  return {
+    attemptedCellsPerMetre: thousandthsOf(removal.attempted / metres),
+    appliedCellsPerMetre,
+    continuumCellsPerMetre: thousandthsOf(removal.continuum / metres),
+  }
+}
+
+/** Step 0: the lowest report-every-tick over swept law work per metre at each speed, and the verdict. */
+function stepZeroLinesOf(rows: readonly TrackReading[]): string[] {
+  const lowest = STEP_ZERO.speedsMps.map((speedMps) => lowestStepZeroRatioAt(rows, speedMps))
+  const isCarveCleared = lowest.every((ratio) => ratio >= STEP_ZERO.floor)
+  return [
+    ...lowest.map((ratio, i) => `Step 0, ${STEP_ZERO.speedsMps[i]} m/s: lowest ${ratio}`),
+    `Step 0 (#537): ${isCarveCleared ? 'every row at least 0.99' : 'a row below 0.99'}`,
+  ]
+}
+
+function lowestStepZeroRatioAt(rows: readonly TrackReading[], speedMps: number): number {
+  const ratios = tracksOf()
+    .filter((track) => track.speedMps === speedMps)
+    .map((track) => lawWorkRatioOf(rows, track))
+  return thousandthsOf(Math.min(...ratios))
+}
+
+function lawWorkRatioOf(rows: readonly TrackReading[], track: Track): number {
+  const reading = (path: TrackPath) => rows.find((row) => isReadingOf(row, track, path))
+  const [everyTick, swept] = [reading('every tick'), reading('swept')]
+  if (everyTick === undefined || swept === undefined) return NaN
+  return everyTick.lawWorkPerMetre / swept.lawWorkPerMetre
+}
+
+function isReadingOf(row: TrackReading, track: Track, path: TrackPath): boolean {
+  return nameOf(row) === nameOf(track) && row.path === path
 }
 
 function formatTable(rows: readonly TrackReading[]): string {
@@ -85,7 +220,7 @@ function writeReadings(rows: readonly TrackReading[]): void {
 }
 
 function readingOf(track: Track, path: TrackPath): TrackReading {
-  const found = readings.find((row) => nameOf(row) === nameOf(track) && row.path === path)
+  const found = readings.find((row) => isReadingOf(row, track, path))
   if (found === undefined) throw new Error(`no ${nameOf(track)} ${path} track was cut`)
   return found
 }
@@ -95,7 +230,7 @@ function verdictsOf(track: Track) {
   const swept = readingOf(track, 'swept')
   const ratios = {
     lawWorkPerMetre: thousandthsOf(everyTick.lawWorkPerMetre / swept.lawWorkPerMetre),
-    lawTicksPerCellOverD: thousandthsOf(everyTick.lawTicksPerCell / everyTick.ownLawTicksPerCell),
+    lawTicksPerCellOverSwept: thousandthsOf(everyTick.lawTicksPerCell / swept.lawTicksPerCell),
     cellsPerMetre: thousandthsOf(everyTick.cellsPerMetre / swept.cellsPerMetre),
     energyPerLawTick: thousandthsOf(everyTick.energyPerLawTick / swept.energyPerLawTick),
     heatPerLawTick: thousandthsOf(everyTick.heatPerLawTick / swept.heatPerLawTick),
@@ -104,7 +239,22 @@ function verdictsOf(track: Track) {
   return { verdicts: barVerdictsOf(everyTick, swept), message: JSON.stringify(ratios) }
 }
 
-describe('dig speed of a report every tick on a fixed track, 25 to 3600 m/s (#514 STOP)', () => {
+/** Each cadence's carve-geometry misses against the swept cut, to the thousandth every bar reads. */
+function geometryMissesAtBothCadences(track: Track) {
+  const swept = readingOf(track, 'swept')
+  const missesAt = (path: TrackPath) => {
+    const misses = geometryMissesOf(readingOf(track, path), swept)
+    return {
+      lawWorkPerMetre: thousandthsOf(misses.lawWorkPerMetre),
+      cellsPerMetre: thousandthsOf(misses.cellsPerMetre),
+    }
+  }
+  const misses = { everyTick: missesAt('every tick'), every12: missesAt('every 12') }
+  console.log(`${nameOf(track)} geometry misses: ${JSON.stringify(misses)}`)
+  return misses
+}
+
+describe('dig speed of a report every tick on a fixed track, 3 to 3600 m/s (#514 STOP)', () => {
   for (const track of tracksOf()) {
     it(`cuts the ${nameOf(track)} track on every path with no rejection`, () => {
       const cut = pathsOf(track).map((path) => readTrack(track, path))
@@ -112,15 +262,18 @@ describe('dig speed of a report every tick on a fixed track, 25 to 3600 m/s (#51
       expect(cut.every((reading) => reading.metres > 0)).toBe(true)
     })
 
-    it(`holds the four bars against the swept cut, ${nameOf(track)}`, () => {
+    it(`charges the swept cut's energy and heat for the law work, ${nameOf(track)} (bar 4)`, () => {
       const { verdicts, message } = verdictsOf(track)
-      expect(verdicts, message).toEqual({
-        lawWorkPerMetre: true,
-        digTimePerCell: true,
-        cellsPerMetre: true,
-        energyPerLawWork: true,
-        heatPerLawWork: true,
-      })
+      console.log(`${nameOf(track)}: ${message}`)
+      expect(verdicts.energyPerLawWork, message).toBe(true)
+      expect(verdicts.heatPerLawWork, message).toBe(true)
+    })
+
+    if (!hasTwelveTickReport(track)) continue
+    it(`misses the carve-geometry bars by no more than 12-tick reports, ${nameOf(track)}`, () => {
+      const { everyTick, every12 } = geometryMissesAtBothCadences(track)
+      expect(everyTick.lawWorkPerMetre).toBeLessThanOrEqual(every12.lawWorkPerMetre)
+      expect(everyTick.cellsPerMetre).toBeLessThanOrEqual(every12.cellsPerMetre)
     })
   }
 })

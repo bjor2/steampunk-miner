@@ -17,8 +17,8 @@
  * after: over every cell the track and the swept cut's lead reach, for the bars per unit of law
  * work, and over a fixed stretch of the track both paths have passed, for the bars per metre. A
  * fresh swept step cuts a whole step ahead of the body, as far as the rig's stats bound allows
- * (60 m on the strongest rig), so the stretch starts past that lead. A `CommandRejected` fails the
- * run.
+ * (60 m on the strongest rig), so the stretch starts past that lead. A `CommandRejected` or a
+ * tank run dry fails the run.
  */
 import { DRILL_SUBSTEPS_PER_TICK } from '../../constants/balance'
 import { MM_PER_METRE, TICKS_PER_SECOND, UP_VECTOR_SCALE } from '../../constants/physics'
@@ -27,7 +27,9 @@ import { subStepsPerTile } from '../vehicle/drillRule'
 import { ENERGY_QUANTA_PER_TICK } from '../vehicle/energyQuanta'
 import { stepDigTicksOf } from '../vehicle/sweptCut'
 import { FACING } from '../vehicle/vehiclePose'
+import type { TilePoint } from '../world/tileGrid'
 import type { CommandIntent } from './authorityCommand'
+import { setCasingGradeCommand } from './casingDebugCommands'
 import {
   ACROSS_MM,
   frameOf,
@@ -72,7 +74,11 @@ const STRETCH_MM = { from: 65_000, to: 110_000 }
 /** How far ahead of the body the swept cut may lead. */
 const LEAD_MM = 62_000
 const REPORT_EVERY = 12
-const FULL_TANK = { type: 'debug.setEnergy', payload: { energy: '1000000000' } } as const
+/**
+ * Lined at casing grade 5, as the loop lane is, so a cave-in never refills the bore (a slow track
+ * lasts long enough for one) or crushes the rig; the rings land behind the stamp, past its reach.
+ */
+const CASING_GRADE = 5
 
 /** Cuts the track on `path` from a fresh rig of `drillPower`, tick by tick. */
 export function cutTrack(track: Track, path: TrackPath, drillPower: number): TrackRun {
@@ -84,14 +90,20 @@ export function cutTrack(track: Track, path: TrackPath, drillPower: number): Tra
     charge = addCharges(charge, cutTick(session, { frame, track, path, tick }))
   }
   const metres = (strideMmOf(track) * trackTicksOf(track)) / MM_PER_METRE
-  const lawOver = (along: { from: number; to: number }) =>
-    lawWorkOfChange(start, session.state().world, PARAMS, 'p1', tilesAlongTrack(frame, along))
+  const lawOver = (tiles: readonly TilePoint[]) =>
+    lawWorkOfChange(start, session.state().world, PARAMS, 'p1', tiles)
   const reach = { from: -ACROSS_MM, to: metres * MM_PER_METRE + LEAD_MM }
-  const stretch = {
-    law: lawOver(STRETCH_MM),
+  const stretch = stretchOf(track)
+  const stretchLaw = { law: lawOver(stretch.tiles), metres: stretch.metres }
+  return { ...charge, law: lawOver(tilesAlongTrack(frame, reach)), metres, stretch: stretchLaw }
+}
+
+/** The cells of the stretch read per metre, and its length in metres. */
+export function stretchOf(track: Track): { tiles: TilePoint[]; metres: number } {
+  return {
+    tiles: tilesAlongTrack(frameOf(track), STRETCH_MM),
     metres: (STRETCH_MM.to - STRETCH_MM.from) / MM_PER_METRE,
   }
-  return { ...charge, law: lawOver(reach), metres, stretch }
 }
 
 /**
@@ -129,7 +141,7 @@ function rigSession(drillPower: number): ScriptedSession {
 function sessionAtStart(frame: TrackFrame, drillPower: number): ScriptedSession {
   const session = rigSession(drillPower)
   session.submit(0, FREEZE_ENEMIES)
-  session.submit(0, FULL_TANK)
+  session.submit(0, setCasingGradeCommand(CASING_GRADE))
   session.submit(0, reportOf(frame, frame.start, { speedMmPerS: 0, ticks: 0 }))
   return session
 }
@@ -155,6 +167,7 @@ function cutTick(session: ScriptedSession, at: TrackTick): TrackCharge {
     }
     refuseRejection(session.submit(at.tick, command), at.tick)
   }
+  refuseDryTank(session, at.tick)
   return { drillEnergy: energyBefore - session.vehicle().energy - movement, heatTicks }
 }
 
@@ -229,6 +242,11 @@ function movementQuantaOf({ payload }: CommandIntent<'reportPose'>): number {
 function refuseRejection(events: readonly { type: string }[], tick: number): void {
   const rejected = events.find((event) => event.type === 'CommandRejected')
   if (rejected !== undefined) throw new Error(`tick ${tick} rejected: ${JSON.stringify(rejected)}`)
+}
+
+/** A fresh rig starts with a full tank; one run dry would stop cutting and read nothing. */
+function refuseDryTank(session: ScriptedSession, tick: number): void {
+  if (session.vehicle().energy === 0) throw new Error(`tick ${tick}: the tank ran dry`)
 }
 
 function addCharges(a: TrackCharge, b: TrackCharge): TrackCharge {
