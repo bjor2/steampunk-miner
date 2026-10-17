@@ -247,7 +247,9 @@ programs }` from three's `renderer.info` of the game canvas), read only when cal
   column's value-weighted ore within 0.5% of today's step bands and the top 2% of depth at 6% ore
   or less. `src/systems/world/orePatches.test.ts` checks a planet under the curve fires its deep
   band-1 patches more often than its shallow ones, and `generatorGolden.test.ts` pins the curve's
-  P3, P8, P10 and P60 beside the unchanged rules-2 digests. The lane
+  P3, P8, P10 and P60 beside the unchanged rules-2 digests. `src/systems/authority/depthCurveTank.test.ts`
+  asserts the #396 tank rule on the on-curve rig for P3 to P40 and P200: band 1 is the worst band
+  and the rule's tank on today's step bands holds at least 1.10 times the new worst hold. The lane
   `src/systems/world/depthDensityPaint.lane.test.ts` generates pooled seed sets at radius 150, 300
   and 1000 and on planet 200 and fails a band whose painted fraction is more than 2% off the
   curve's band mean (about 3 to 5 minutes).

@@ -738,6 +738,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/authority/coreHarvest.test.ts` | 10 | 10 |
 | `src/systems/authority/cutFollowRead.test.ts` | 12 | 12 |
 | `src/systems/authority/cutShare.test.ts` | 3 | 3 |
+| `src/systems/authority/depthCurveTank.test.ts` | 78 | 2 |
 | `src/systems/authority/digSpeedTrack.lane.test.ts` | 69 | 4 |
 | `src/systems/authority/drillEventStream.lane.test.ts` | 8 | 1 |
 | `src/systems/authority/drillEventStream.test.ts` | 26 | 4 |
