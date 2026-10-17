@@ -2,6 +2,7 @@ import RAPIER from '@dimforge/rapier3d-compat'
 import { mkdirSync, writeFileSync } from 'node:fs'
 import { beforeAll, describe, expect, it, vi } from 'vitest'
 import { DRILL_SUBSTEPS_PER_TICK } from '../constants/balance'
+import { DEV_FLAGS } from '../constants/devFlags'
 import { PHYSICS_TIMESTEP, UP_VECTOR_SCALE } from '../constants/physics'
 import { createMemorySink } from '../logging/eventSink'
 import type { PlanetParams } from '../systems/world/planetParams'
@@ -250,7 +251,7 @@ function createRig(m: Modules) {
   if (start === null) throw new Error('the starting planet has no dock')
   const body = m.controller.createVehicleBody(RAPIER, world, start)
   const controller = m.controller.createVehicleController(RAPIER, world, body)
-  const loop = m.loop.createVehicleLoop({ 'drill.sweptCut': true })
+  const loop = m.loop.createVehicleLoop({ ...DEV_FLAGS, 'drill.sweptCut': true })
   const fullHull = m.money.toCanonical(m.stats.hullMaxAtStep(RIG_LEVELS.hull))
   const path = { steps: 0, travelledM: 0, at: controller.planetPosition() }
   const stepOnce = (intent: VehicleIntent) => {
