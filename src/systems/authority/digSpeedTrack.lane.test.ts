@@ -1,5 +1,7 @@
-import { mkdirSync, writeFileSync } from 'node:fs'
+import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs'
 import { afterAll, describe, expect, it, vi } from 'vitest'
+import type { KnownRedMarker } from '../../constants/knownRed'
+import { findingClosedOnIn } from '../../logging/knownRed'
 import * as groundEdit from '../world/groundEdit'
 import { LAW_WORK_PER_DRILL_TICK } from '../vehicle/cutCarry'
 import type { TilePoint } from '../world/tileGrid'
@@ -48,6 +50,11 @@ import { geometryMissesOf, lawReadingOf, thousandthsOf, type LawReading } from '
 //   geometry (#540), so the ratio to swept is logged beside it, amber outside 5%, never gated.
 // - Gated, the ratchet until #537 lands: on law work per metre (1b) and cells per metre (3), a
 //   report every tick misses its band against swept by no more than 12-tick reports do.
+// - Known red under #537, never a pass (VS 6236441275 condition 1, the GD 6236443694): a report
+//   every tick reads 0.77 to 0.95 of swept's law work per metre at 3 to 44 m/s (lower at 240 and
+//   3600 m/s, where a report stamps its pose only), under the 1.000 floor #537 lands; each row
+//   outside the geometry bands is printed as known red, and the marker fails as expired once #537
+//   closes and fails while every row is inside the bands, so it is deleted when A7 lands.
 // - Logged: Step 0's reading, a report every tick over swept on law work per metre at 3, 8, 25 and
 //   44 m/s (at least 0.99 on every row: the carve is not the cause and A7 is not built; any lower
 //   row: one capsule round of A7 after A6), with the report carve's removal per metre over the
@@ -62,6 +69,17 @@ const PATHS: readonly TrackPath[] = ['swept', 'every tick', 'every 12']
 const REPORT_EVERY = 12
 const STEP_ZERO = { speedsMps: [3, 8, 25, 44], floor: 0.99 }
 const REPORT_FOLDER = new URL('../../../balance-report/', import.meta.url)
+const TICKETS_FOLDER = new URL('../../../docs/metrics/tickets/', import.meta.url)
+/**
+ * The carve-geometry deviation #514 ships with (VS 6236441275 condition 1): local to this lane, as
+ * `physics/exactCarry.lane.test.ts` holds #541's; the repo's one exported marker is
+ * `CAMPAIGN_PACING_KNOWN_RED` (ticket 419).
+ */
+const CARVE_GEOMETRY_KNOWN_RED: KnownRedMarker = {
+  finding: 537,
+  reason:
+    'a report every tick cuts 0.77 to 0.95 of the swept cut law work per metre at 3 to 44 m/s (0.28 to 0.65 at 240 m/s, nothing past its pose at 3600 m/s), the same carve as 12-tick reports; the 1.000 floor and cells per metre within 5% are #537 landing bars',
+}
 const discCarve = groundEdit.carveDisc
 
 /** The report carve's removal per metre of the stretch, full cells; null on the swept cut. */
@@ -289,6 +307,48 @@ function geometryMissesAtBothCadences(track: Track) {
   return misses
 }
 
+/** Each track a report every tick cuts outside the carve-geometry bands against swept. */
+function geometryProblemsOf(): string[] {
+  return tracksOf()
+    .map((track) => ({
+      track,
+      misses: geometryMissesOf(readingOf(track, 'every tick'), readingOf(track, 'swept')),
+    }))
+    .filter(({ misses }) => misses.lawWorkPerMetre > 0 || misses.cellsPerMetre > 0)
+    .map(({ track }) => `${nameOf(track)}: ${JSON.stringify(sweptRatiosOf(track))}`)
+}
+
+/**
+ * The known-red verdict on the carve geometry (`logging/knownRed.ts`'s rule, local to this lane):
+ * every row outside the bands is held as known red under #537 and printed; every row inside them
+ * fails until the marker is deleted; a closed #537 fails as expired.
+ */
+function carveKnownRedVerdictOf(problems: readonly string[]): {
+  failures: string[]
+  knownRed: string[]
+} {
+  const { finding } = CARVE_GEOMETRY_KNOWN_RED
+  const closedOn = findingClosedOnIn(readTicketFile(finding))
+  if (closedOn !== null) {
+    const expired = `known-red marker for #${finding} expired: the finding closed on ${closedOn}; delete the marker (the carve must meet its bars) or file a new finding`
+    return { failures: [expired, ...problems], knownRed: [] }
+  }
+  if (problems.length === 0) {
+    const green = `a report every tick meets the carve-geometry bars on every track but is still marked known-red for #${finding}: delete the marker`
+    return { failures: [green], knownRed: [] }
+  }
+  return {
+    failures: [],
+    knownRed: problems.map((problem) => `known-red (#${finding}): ${problem}`),
+  }
+}
+
+/** The finding's metrics file as text (the loop writes it when it closes a ticket), or null if none. */
+function readTicketFile(finding: number): string | null {
+  const url = new URL(`${finding}.json`, TICKETS_FOLDER)
+  return existsSync(url) ? readFileSync(url, 'utf8') : null
+}
+
 describe('dig speed of a report every tick on a fixed track, 3 to 3600 m/s (#514 STOP)', () => {
   for (const track of tracksOf()) {
     it(`cuts the ${nameOf(track)} track on every path with no rejection`, () => {
@@ -315,4 +375,10 @@ describe('dig speed of a report every tick on a fixed track, 3 to 3600 m/s (#514
       expect(everyTick.cellsPerMetre).toBeLessThanOrEqual(every12.cellsPerMetre)
     })
   }
+
+  it('holds the carve geometry of a report every tick as known red under #537, never a pass', () => {
+    const verdict = carveKnownRedVerdictOf(geometryProblemsOf())
+    console.log(verdict.knownRed.join('\n'))
+    expect(verdict.failures).toEqual([])
+  })
 })
