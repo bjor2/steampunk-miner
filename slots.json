@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-10-17T18:45:12+01:00",
+  "updated_at": "2026-10-17T18:47:19+01:00",
   "caps": {
     "grok": 12,
     "claude": 10,
@@ -84,11 +84,12 @@
       "slots": [
         {
           "slot": "C7",
-          "state": "free",
+          "state": "busy",
           "ticket": null,
           "grok_slot": null,
-          "kind": null,
-          "since": null
+          "kind": "aux",
+          "since": "2026-10-17T18:47:00+01:00",
+          "label": "tester-triage"
         },
         {
           "slot": "C8",
@@ -116,23 +117,23 @@
         }
       ],
       "size": 4,
-      "used": 0,
-      "free": 4,
-      "claims_last_hour": 1,
+      "used": 1,
+      "free": 3,
+      "claims_last_hour": 2,
       "name": "Claude Max 2"
     }
   ],
   "gate": {
-    "busy": 1,
+    "busy": 0,
     "max": 3
   },
   "tester": {
     "state": "running",
-    "phase": "fast",
+    "phase": "triage-fast",
     "sha": "4136770c32f5c3b223121c0f3b6839e43192a027",
-    "since": "2026-10-17T15:19:27Z",
-    "holds_gate": true,
-    "claude_slot": null,
+    "since": "2026-10-17T17:47:11Z",
+    "holds_gate": false,
+    "claude_slot": 7,
     "last_run": "2026-10-17T15:19:21Z",
     "last_nightly": "2026-10-15T20:43:15Z",
     "last_nightly_result": "full=FAIL balance-report=ok bench=FAIL balance-planets=ok balance-guns=ok balance-charges=ok balance-refinery=ok balance-heat=ok e2e=FAIL memory-soak=FAIL packaged-smoke=ok ",
@@ -568,10 +569,12 @@
     },
     {
       "slot": 7,
-      "state": "free",
+      "state": "busy",
       "ticket": null,
       "grok_slot": null,
-      "since": null,
+      "since": "2026-10-17T18:47:00+01:00",
+      "kind": "aux",
+      "label": "tester-triage",
       "account": 2
     },
     {
@@ -618,8 +621,8 @@
     "claude": {
       "size": 10,
       "enabled": 10,
-      "used": 3,
-      "free": 7,
+      "used": 4,
+      "free": 6,
       "external": 0
     }
   },
@@ -671,7 +674,8 @@
           541
         ],
         "done": [
-          514
+          514,
+          524
         ],
         "live": 0
       },
