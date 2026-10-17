@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "updated_at": "2026-10-17T17:47:39Z",
+  "updated_at": "2026-10-17T17:47:43Z",
   "entries": {
     "steampunk-loop/1": {
       "loop": "steampunk-loop",
@@ -518,9 +518,9 @@
       "slot": null,
       "state": "working",
       "issue": null,
-      "note": "testing spec #393 (Art: new player vehicle — compact casing driller (Blender MCP), replaces current machine) on 4136770",
+      "note": "testing spec #398 (Art: service station — charge, repair & sell bays (Blender MCP), replaces Assay & Exchange) on d088aaa",
       "stale_after_min": 420,
-      "updated_at": "2026-10-17T15:19:25Z",
+      "updated_at": "2026-10-17T17:47:43Z",
       "host": "grok-bot-vm-452660841"
     },
     "steampunk-loop/10": {
