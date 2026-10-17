@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-10-17T22:22:52+01:00",
+  "updated_at": "2026-10-17T22:27:33+01:00",
   "caps": {
     "grok": 12,
     "claude": 10,
@@ -117,7 +117,7 @@
       "size": 4,
       "used": 0,
       "free": 4,
-      "claims_last_hour": 0,
+      "claims_last_hour": 1,
       "name": "Claude Max 2"
     }
   ],
@@ -587,9 +587,9 @@
     }
   ],
   "last_refill": {
-    "at": "2026-10-17 22:22 BST",
+    "at": "2026-10-17 22:27 BST",
     "mode": "refill-dev",
-    "triggers": "#537",
+    "triggers": "claude-run:wave-plan",
     "started": "",
     "note": "no pickable build ticket"
   },
