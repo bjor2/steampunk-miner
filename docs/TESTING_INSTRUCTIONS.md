@@ -476,8 +476,8 @@ programs }` from three's `renderer.info` of the game canvas), read only when cal
   pay and heat as one of sixty ticks; a tank that cannot pay keeps the debt and strands the rig
   till the tow drops it; the carries round-trip the snapshot, are refused malformed, and are
   dropped at planet entry. The switch ships off until #541's heat change has landed (the GD's
-  landing condition, G&V's line): the committed goldens are protocol 84's digests under the 85
-  header, and `src/logging/exactCarryOnGolden.test.ts` replays every golden with the switch on,
+  landing condition, G&V's line): the committed goldens are protocol 84's digests under the
+  current header, and `src/logging/exactCarryOnGolden.test.ts` replays every golden with the switch on,
   only `casing-lined-band-2` and `collapse-band-2-grade-1` moving their end digest, to the digests
   it pins. The charge's specs and the lanes switch it on through `withDrillExactCarry`
   (`cutCarryFixtures.ts`), which puts the shipped value back. The charge bars both lanes gate are one definition,
@@ -527,6 +527,26 @@ programs }` from three's `renderer.info` of the game canvas), read only when cal
   prices every trip per cell beside the bot's charge, the tank at least 1.138 times that figure
   (Systems' offline per-cell figure for the paired run; writes
   `balance-report/trip-cell-energy.ndjson`).
+- **Swept law charge** (ticket 540, Systems' ruling 6231144515, the TD seam 6234992964 as VS
+  6234998337 and the GD confirmed it): behind the authority dev flag `drill.sweptLawCharge` (off,
+  flipped with `drill.sweptCut` behind the ticket's bars and #541) a `drillStep` is charged on the
+  law work its carve removed, paid cells it clears in full included, with A6's rule on the one
+  energy carry, energy alone (`payLawWorkEnergy`; the heat carry is never written on the swept
+  path, which nothing there drains). `src/systems/authority/sweptLawCharge.test.ts` holds short
+  slab tracks to the law bars (fast level, fast and slow down), the carry's exactness, the carve,
+  its cells, chunks and heat byte-identical to the shipped swept cut, a lined row (lining the rig
+  laid and cut again) and an unlined one both within 1% of the law (lining neither charged twice
+  nor left out), the heat carry untouched and the carry shared with the report charge; it pins both
+  flags off. Its law work is read command by command from each command's `GroundChanged` cells at
+  the casing grade the sample was cut at (`lawWorkOfGroundChanges`, `lawWorkCut` on the slab run),
+  since a reading of the whole run against its start prices re-cut lining as rock. The lane
+  `src/systems/authority/sweptLawSlab.lane.test.ts` cuts every rig and track Systems listed (the
+  slab lane's rigs, `lawSlabRigs.ts`) as `swept` and `swept law` and gates, on every row of at
+  least 100 quanta, energy within 1% of the law, under the 1.25 floor and the 1.098 ratchet; on
+  every row the carry's exactness, the carve and heat as shipped, and no refusal. It prints, never
+  gates at landing, the heat fed against the law less one drill tick (the hard bar at the flip,
+  VS 6234998337), the share the #113 cap drops (#541) and the shipped price against the law and
+  the law charge (about 2 min, writes `balance-report/swept-law-slab.ndjson`).
 - **Known red** (ticket 419, the TD on #396 section 2): `CAMPAIGN_PACING_KNOWN_RED`
   (`src/constants/knownRed.ts`) is the one known-red marker in the repo: one gate
   (`campaignPacingGate`), one finding (#417), no registry. The gate still runs in full;

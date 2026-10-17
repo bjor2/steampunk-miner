@@ -786,6 +786,8 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/authority/sweptCutAtSpeed.test.ts` | 8 | 8 |
 | `src/systems/authority/sweptFreshCarve.test.ts` | 46 | 15 |
 | `src/systems/authority/sweptGateSpeeds.test.ts` | 24 | 2 |
+| `src/systems/authority/sweptLawCharge.test.ts` | 8 | 8 |
+| `src/systems/authority/sweptLawSlab.lane.test.ts` | 170 | 5 |
 | `src/systems/authority/sweptQuantumLaw.test.ts` | 6 | 8 |
 | `src/systems/authority/sweptSpanDrill.test.ts` | 17 | 13 |
 | `src/systems/authority/teleportDebugRules.test.ts` | 5 | 5 |
@@ -1406,7 +1408,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/vehicle/casingTrailReversal.test.ts` | 36 | 5 |
 | `src/systems/vehicle/chargeSelection.test.ts` | 4 | 4 |
 | `src/systems/vehicle/colliderHalo.test.ts` | 3 | 3 |
-| `src/systems/vehicle/cutCarry.test.ts` | 6 | 6 |
+| `src/systems/vehicle/cutCarry.test.ts` | 9 | 9 |
 | `src/systems/vehicle/cutFollowMotion.test.ts` | 19 | 19 |
 | `src/systems/vehicle/cutGate.test.ts` | 8 | 8 |
 | `src/systems/vehicle/cutStartBreakdown.test.ts` | 4 | 4 |
