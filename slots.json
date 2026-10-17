@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-10-17T03:51:54+01:00",
+  "updated_at": "2026-10-17T04:02:09+01:00",
   "caps": {
     "grok": 12,
     "claude": 10,
@@ -28,20 +28,20 @@
         },
         {
           "slot": "C2",
+          "state": "busy",
+          "ticket": null,
+          "grok_slot": null,
+          "kind": "aux",
+          "since": "2026-10-17T04:01:00+01:00",
+          "label": "wave-plan 316"
+        },
+        {
+          "slot": "C3",
           "state": "free",
           "ticket": null,
           "grok_slot": null,
           "kind": null,
           "since": null
-        },
-        {
-          "slot": "C3",
-          "state": "busy",
-          "ticket": 514,
-          "grok_slot": 3,
-          "kind": "dev",
-          "since": "2026-10-17T00:21:00+01:00",
-          "wave": "2B"
         },
         {
           "slot": "C4",
@@ -509,11 +509,9 @@
     },
     {
       "slot": 3,
-      "state": "dev",
-      "ticket": 514,
-      "since": "2026-10-17T00:21:00+01:00",
-      "claude_slot": 3,
-      "wave": "2B"
+      "state": "free",
+      "ticket": null,
+      "since": null
     },
     {
       "slot": 4,
@@ -582,20 +580,21 @@
     },
     {
       "slot": 2,
+      "state": "busy",
+      "ticket": null,
+      "grok_slot": null,
+      "since": "2026-10-17T04:01:00+01:00",
+      "kind": "aux",
+      "label": "wave-plan 316",
+      "account": 1
+    },
+    {
+      "slot": 3,
       "state": "free",
       "ticket": null,
       "grok_slot": null,
       "since": null,
       "account": 1
-    },
-    {
-      "slot": 3,
-      "state": "busy",
-      "ticket": 514,
-      "grok_slot": 3,
-      "since": "2026-10-17T00:21:00+01:00",
-      "account": 1,
-      "wave": "2B"
     },
     {
       "slot": 4,
@@ -659,17 +658,17 @@
     }
   ],
   "last_refill": {
-    "at": "2026-10-17 03:51 BST",
+    "at": "2026-10-17 04:01 BST",
     "mode": "recheck",
-    "triggers": "#445",
-    "started": "#447->C1/A1",
-    "note": "spawned 1 worker(s)"
+    "triggers": "#514",
+    "started": "",
+    "note": "no pickable build ticket"
   },
   "totals": {
     "grok": {
       "size": 12,
-      "used": 2,
-      "dev": 2,
+      "used": 1,
+      "dev": 1,
       "dev_cap": 8,
       "planner": 0,
       "planner_cap": 4
@@ -715,20 +714,6 @@
         "live": 0
       },
       {
-        "number": 532,
-        "key": "316-2G",
-        "map": 316,
-        "lane": "remote",
-        "mode": "solo",
-        "state": "paused",
-        "tickets": [
-          529,
-          530
-        ],
-        "done": [],
-        "live": 0
-      },
-      {
         "number": 525,
         "key": "316-3A",
         "map": 316,
@@ -755,7 +740,7 @@
         "done": [
           516
         ],
-        "live": 1
+        "live": 0
       },
       {
         "number": 511,
@@ -779,7 +764,7 @@
         "map": 302,
         "lane": "remote",
         "mode": "solo",
-        "state": "running",
+        "state": "paused",
         "tickets": [
           445,
           452
