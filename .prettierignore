@@ -24,3 +24,5 @@ playwright-report
 test-results
 # Written by `npm run metrics:ticket` / `metrics:backfill`; a rerun must rewrite the same bytes.
 docs/metrics/tickets
+# Written by `npm run rarity:shares` (ticket 449); a rerun must rewrite the same bytes.
+docs/economy/rarity-shares.json

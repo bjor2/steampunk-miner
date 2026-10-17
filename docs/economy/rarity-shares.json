@@ -1,0 +1,847 @@
+{
+  "schema": 1,
+  "ticket": 449,
+  "seeds": [
+    83921,
+    31415,
+    27182
+  ],
+  "bounds": {
+    "perNonCommonKindMax": 1500,
+    "perNonCommonTierMax": 650,
+    "epicPlusMythicTripClampBp": 1500,
+    "perCommonKindMaxOfBandTrip": 5000,
+    "perCommonKindMaxOfPlanet": 4000,
+    "meanShiftMaxBp": 0.5,
+    "cvMaxBp": 300,
+    "p999MaxOfNominalBp": 11200,
+    "clampLossMaxBp": 1,
+    "liveCommonsPerBandMin": 2
+  },
+  "planets": [
+    {
+      "planet": 1,
+      "hold": 42,
+      "hasRoster": true,
+      "isSignatureBoosted": false,
+      "bands": [
+        {
+          "band": 1,
+          "tiersBp": {
+            "uncommon": 371
+          },
+          "epicAndMythicBp": 0,
+          "worstCommonKindBp": 3612,
+          "worstOtherKindBp": 278,
+          "fewestLiveCommons": 4,
+          "meanShiftBp": "0.00",
+          "cvBp": 119,
+          "p999OfExpectedBp": 10465,
+          "worstEpicAndMythicTripBp": 0,
+          "clampLossBp": "0.00"
+        },
+        {
+          "band": 2,
+          "tiersBp": {
+            "uncommon": 444
+          },
+          "epicAndMythicBp": 0,
+          "worstCommonKindBp": 3584,
+          "worstOtherKindBp": 333,
+          "fewestLiveCommons": 4,
+          "meanShiftBp": "0.00",
+          "cvBp": 130,
+          "p999OfExpectedBp": 10556,
+          "worstEpicAndMythicTripBp": 0,
+          "clampLossBp": "0.00"
+        },
+        {
+          "band": 3,
+          "tiersBp": {
+            "uncommon": 513,
+            "rare": 110
+          },
+          "epicAndMythicBp": 0,
+          "worstCommonKindBp": 3517,
+          "worstOtherKindBp": 193,
+          "fewestLiveCommons": 4,
+          "meanShiftBp": "0.00",
+          "cvBp": 191,
+          "p999OfExpectedBp": 10815,
+          "worstEpicAndMythicTripBp": 0,
+          "clampLossBp": "0.00"
+        },
+        {
+          "band": 4,
+          "tiersBp": {
+            "uncommon": 582,
+            "rare": 218
+          },
+          "epicAndMythicBp": 0,
+          "worstCommonKindBp": 3451,
+          "worstOtherKindBp": 436,
+          "fewestLiveCommons": 4,
+          "meanShiftBp": "0.00",
+          "cvBp": 235,
+          "p999OfExpectedBp": 11012,
+          "worstEpicAndMythicTripBp": 0,
+          "clampLossBp": "0.00"
+        },
+        {
+          "band": 5,
+          "tiersBp": {
+            "uncommon": 649,
+            "rare": 325
+          },
+          "epicAndMythicBp": 0,
+          "worstCommonKindBp": 3386,
+          "worstOtherKindBp": 487,
+          "fewestLiveCommons": 4,
+          "meanShiftBp": "0.00",
+          "cvBp": 270,
+          "p999OfExpectedBp": 11091,
+          "worstEpicAndMythicTripBp": 0,
+          "clampLossBp": "0.00"
+        }
+      ],
+      "worstCommonKindOfPlanetBp": 3520,
+      "worstOtherKindOfPlanetBp": 199,
+      "violations": []
+    },
+    {
+      "planet": 2,
+      "hold": 66,
+      "hasRoster": true,
+      "isSignatureBoosted": false,
+      "bands": [
+        {
+          "band": 1,
+          "tiersBp": {
+            "uncommon": 371
+          },
+          "epicAndMythicBp": 0,
+          "worstCommonKindBp": 3210,
+          "worstOtherKindBp": 247,
+          "fewestLiveCommons": 4,
+          "meanShiftBp": "0.00",
+          "cvBp": 95,
+          "p999OfExpectedBp": 10401,
+          "worstEpicAndMythicTripBp": 0,
+          "clampLossBp": "0.00"
+        },
+        {
+          "band": 2,
+          "tiersBp": {
+            "uncommon": 444
+          },
+          "epicAndMythicBp": 0,
+          "worstCommonKindBp": 3186,
+          "worstOtherKindBp": 148,
+          "fewestLiveCommons": 4,
+          "meanShiftBp": "0.00",
+          "cvBp": 104,
+          "p999OfExpectedBp": 10375,
+          "worstEpicAndMythicTripBp": 0,
+          "clampLossBp": "0.00"
+        },
+        {
+          "band": 3,
+          "tiersBp": {
+            "uncommon": 513,
+            "rare": 110
+          },
+          "epicAndMythicBp": 0,
+          "worstCommonKindBp": 3126,
+          "worstOtherKindBp": 342,
+          "fewestLiveCommons": 4,
+          "meanShiftBp": "0.00",
+          "cvBp": 153,
+          "p999OfExpectedBp": 10657,
+          "worstEpicAndMythicTripBp": 0,
+          "clampLossBp": "0.00"
+        },
+        {
+          "band": 4,
+          "tiersBp": {
+            "uncommon": 582,
+            "rare": 218
+          },
+          "epicAndMythicBp": 0,
+          "worstCommonKindBp": 3067,
+          "worstOtherKindBp": 388,
+          "fewestLiveCommons": 4,
+          "meanShiftBp": "0.00",
+          "cvBp": 187,
+          "p999OfExpectedBp": 10750,
+          "worstEpicAndMythicTripBp": 0,
+          "clampLossBp": "0.00"
+        },
+        {
+          "band": 5,
+          "tiersBp": {
+            "uncommon": 649,
+            "rare": 325
+          },
+          "epicAndMythicBp": 0,
+          "worstCommonKindBp": 3010,
+          "worstOtherKindBp": 433,
+          "fewestLiveCommons": 4,
+          "meanShiftBp": "0.00",
+          "cvBp": 215,
+          "p999OfExpectedBp": 10878,
+          "worstEpicAndMythicTripBp": 0,
+          "clampLossBp": "0.00"
+        }
+      ],
+      "worstCommonKindOfPlanetBp": 3129,
+      "worstOtherKindOfPlanetBp": 285,
+      "violations": []
+    },
+    {
+      "planet": 3,
+      "hold": 90,
+      "hasRoster": false,
+      "isSignatureBoosted": false,
+      "bands": [
+        {
+          "band": 1,
+          "tiersBp": {
+            "uncommon": 371
+          },
+          "epicAndMythicBp": 0,
+          "worstCommonKindBp": null,
+          "worstOtherKindBp": null,
+          "fewestLiveCommons": null,
+          "meanShiftBp": "0.00",
+          "cvBp": 82,
+          "p999OfExpectedBp": 10316,
+          "worstEpicAndMythicTripBp": 0,
+          "clampLossBp": "0.00"
+        },
+        {
+          "band": 2,
+          "tiersBp": {
+            "uncommon": 210,
+            "rare": 140
+          },
+          "epicAndMythicBp": 0,
+          "worstCommonKindBp": null,
+          "worstOtherKindBp": null,
+          "fewestLiveCommons": null,
+          "meanShiftBp": "-0.25",
+          "cvBp": 120,
+          "p999OfExpectedBp": 10482,
+          "worstEpicAndMythicTripBp": 0,
+          "clampLossBp": "0.00"
+        },
+        {
+          "band": 3,
+          "tiersBp": {
+            "uncommon": 228,
+            "rare": 152,
+            "epic": 103
+          },
+          "epicAndMythicBp": 103,
+          "worstCommonKindBp": null,
+          "worstOtherKindBp": null,
+          "fewestLiveCommons": null,
+          "meanShiftBp": "-0.12",
+          "cvBp": 183,
+          "p999OfExpectedBp": 10854,
+          "worstEpicAndMythicTripBp": 1344,
+          "clampLossBp": "0.00"
+        },
+        {
+          "band": 4,
+          "tiersBp": {
+            "uncommon": 138,
+            "rare": 88,
+            "epic": 58,
+            "mythic": 39,
+            "signature": 640
+          },
+          "epicAndMythicBp": 96,
+          "worstCommonKindBp": null,
+          "worstOtherKindBp": null,
+          "fewestLiveCommons": null,
+          "meanShiftBp": "0.00",
+          "cvBp": 276,
+          "p999OfExpectedBp": 11145,
+          "worstEpicAndMythicTripBp": 1321,
+          "clampLossBp": "0.05"
+        },
+        {
+          "band": 5,
+          "tiersBp": {
+            "uncommon": 319,
+            "rare": 207,
+            "epic": 138,
+            "mythic": 92,
+            "signature": 427
+          },
+          "epicAndMythicBp": 229,
+          "worstCommonKindBp": null,
+          "worstOtherKindBp": null,
+          "fewestLiveCommons": null,
+          "meanShiftBp": "0.06",
+          "cvBp": 281,
+          "p999OfExpectedBp": 11171,
+          "worstEpicAndMythicTripBp": 1350,
+          "clampLossBp": "0.91"
+        }
+      ],
+      "worstCommonKindOfPlanetBp": null,
+      "worstOtherKindOfPlanetBp": null,
+      "violations": []
+    },
+    {
+      "planet": 10,
+      "hold": 258,
+      "hasRoster": false,
+      "isSignatureBoosted": false,
+      "bands": [
+        {
+          "band": 1,
+          "tiersBp": {
+            "uncommon": 371
+          },
+          "epicAndMythicBp": 0,
+          "worstCommonKindBp": null,
+          "worstOtherKindBp": null,
+          "fewestLiveCommons": null,
+          "meanShiftBp": "0.00",
+          "cvBp": 48,
+          "p999OfExpectedBp": 10202,
+          "worstEpicAndMythicTripBp": 0,
+          "clampLossBp": "0.00"
+        },
+        {
+          "band": 2,
+          "tiersBp": {
+            "uncommon": 210,
+            "rare": 140
+          },
+          "epicAndMythicBp": 0,
+          "worstCommonKindBp": null,
+          "worstOtherKindBp": null,
+          "fewestLiveCommons": null,
+          "meanShiftBp": "-0.25",
+          "cvBp": 71,
+          "p999OfExpectedBp": 10273,
+          "worstEpicAndMythicTripBp": 0,
+          "clampLossBp": "0.00"
+        },
+        {
+          "band": 3,
+          "tiersBp": {
+            "uncommon": 228,
+            "rare": 152,
+            "epic": 103
+          },
+          "epicAndMythicBp": 103,
+          "worstCommonKindBp": null,
+          "worstOtherKindBp": null,
+          "fewestLiveCommons": null,
+          "meanShiftBp": "-0.12",
+          "cvBp": 109,
+          "p999OfExpectedBp": 10469,
+          "worstEpicAndMythicTripBp": 732,
+          "clampLossBp": "0.00"
+        },
+        {
+          "band": 4,
+          "tiersBp": {
+            "uncommon": 138,
+            "rare": 88,
+            "epic": 58,
+            "mythic": 39,
+            "signature": 640
+          },
+          "epicAndMythicBp": 96,
+          "worstCommonKindBp": null,
+          "worstOtherKindBp": null,
+          "fewestLiveCommons": null,
+          "meanShiftBp": "0.00",
+          "cvBp": 163,
+          "p999OfExpectedBp": 10653,
+          "worstEpicAndMythicTripBp": 769,
+          "clampLossBp": "0.00"
+        },
+        {
+          "band": 5,
+          "tiersBp": {
+            "uncommon": 319,
+            "rare": 207,
+            "epic": 138,
+            "mythic": 92,
+            "signature": 427
+          },
+          "epicAndMythicBp": 229,
+          "worstCommonKindBp": null,
+          "worstOtherKindBp": null,
+          "fewestLiveCommons": null,
+          "meanShiftBp": "0.06",
+          "cvBp": 168,
+          "p999OfExpectedBp": 10665,
+          "worstEpicAndMythicTripBp": 1147,
+          "clampLossBp": "0.00"
+        }
+      ],
+      "worstCommonKindOfPlanetBp": null,
+      "worstOtherKindOfPlanetBp": null,
+      "violations": []
+    },
+    {
+      "planet": 20,
+      "hold": 498,
+      "hasRoster": false,
+      "isSignatureBoosted": false,
+      "bands": [
+        {
+          "band": 1,
+          "tiersBp": {
+            "uncommon": 371
+          },
+          "epicAndMythicBp": 0,
+          "worstCommonKindBp": null,
+          "worstOtherKindBp": null,
+          "fewestLiveCommons": null,
+          "meanShiftBp": "0.00",
+          "cvBp": 35,
+          "p999OfExpectedBp": 10145,
+          "worstEpicAndMythicTripBp": 0,
+          "clampLossBp": "0.00"
+        },
+        {
+          "band": 2,
+          "tiersBp": {
+            "uncommon": 210,
+            "rare": 140
+          },
+          "epicAndMythicBp": 0,
+          "worstCommonKindBp": null,
+          "worstOtherKindBp": null,
+          "fewestLiveCommons": null,
+          "meanShiftBp": "-0.25",
+          "cvBp": 51,
+          "p999OfExpectedBp": 10199,
+          "worstEpicAndMythicTripBp": 0,
+          "clampLossBp": "0.00"
+        },
+        {
+          "band": 3,
+          "tiersBp": {
+            "uncommon": 228,
+            "rare": 152,
+            "epic": 103
+          },
+          "epicAndMythicBp": 103,
+          "worstCommonKindBp": null,
+          "worstOtherKindBp": null,
+          "fewestLiveCommons": null,
+          "meanShiftBp": "-0.12",
+          "cvBp": 78,
+          "p999OfExpectedBp": 10286,
+          "worstEpicAndMythicTripBp": 454,
+          "clampLossBp": "0.00"
+        },
+        {
+          "band": 4,
+          "tiersBp": {
+            "uncommon": 138,
+            "rare": 88,
+            "epic": 58,
+            "mythic": 39,
+            "signature": 640
+          },
+          "epicAndMythicBp": 96,
+          "worstCommonKindBp": null,
+          "worstOtherKindBp": null,
+          "fewestLiveCommons": null,
+          "meanShiftBp": "0.00",
+          "cvBp": 118,
+          "p999OfExpectedBp": 10547,
+          "worstEpicAndMythicTripBp": 585,
+          "clampLossBp": "0.00"
+        },
+        {
+          "band": 5,
+          "tiersBp": {
+            "uncommon": 319,
+            "rare": 207,
+            "epic": 138,
+            "mythic": 92,
+            "signature": 427
+          },
+          "epicAndMythicBp": 229,
+          "worstCommonKindBp": null,
+          "worstOtherKindBp": null,
+          "fewestLiveCommons": null,
+          "meanShiftBp": "0.06",
+          "cvBp": 121,
+          "p999OfExpectedBp": 10523,
+          "worstEpicAndMythicTripBp": 805,
+          "clampLossBp": "0.00"
+        }
+      ],
+      "worstCommonKindOfPlanetBp": null,
+      "worstOtherKindOfPlanetBp": null,
+      "violations": []
+    },
+    {
+      "planet": 40,
+      "hold": 978,
+      "hasRoster": false,
+      "isSignatureBoosted": true,
+      "bands": [
+        {
+          "band": 1,
+          "tiersBp": {
+            "uncommon": 371
+          },
+          "epicAndMythicBp": 0,
+          "worstCommonKindBp": null,
+          "worstOtherKindBp": null,
+          "fewestLiveCommons": null,
+          "meanShiftBp": "0.00",
+          "cvBp": 25,
+          "p999OfExpectedBp": 10084,
+          "worstEpicAndMythicTripBp": 0,
+          "clampLossBp": "0.00",
+          "boostedTiersBp": {
+            "uncommon": 371
+          },
+          "boostedMeanShiftBp": "0.00"
+        },
+        {
+          "band": 2,
+          "tiersBp": {
+            "uncommon": 210,
+            "rare": 140
+          },
+          "epicAndMythicBp": 0,
+          "worstCommonKindBp": null,
+          "worstOtherKindBp": null,
+          "fewestLiveCommons": null,
+          "meanShiftBp": "-0.25",
+          "cvBp": 37,
+          "p999OfExpectedBp": 10153,
+          "worstEpicAndMythicTripBp": 0,
+          "clampLossBp": "0.00",
+          "boostedTiersBp": {
+            "uncommon": 210,
+            "rare": 140
+          },
+          "boostedMeanShiftBp": "-0.25"
+        },
+        {
+          "band": 3,
+          "tiersBp": {
+            "uncommon": 228,
+            "rare": 152,
+            "epic": 103
+          },
+          "epicAndMythicBp": 103,
+          "worstCommonKindBp": null,
+          "worstOtherKindBp": null,
+          "fewestLiveCommons": null,
+          "meanShiftBp": "-0.12",
+          "cvBp": 56,
+          "p999OfExpectedBp": 10187,
+          "worstEpicAndMythicTripBp": 301,
+          "clampLossBp": "0.00",
+          "boostedTiersBp": {
+            "uncommon": 228,
+            "rare": 152,
+            "epic": 103
+          },
+          "boostedMeanShiftBp": "-0.12"
+        },
+        {
+          "band": 4,
+          "tiersBp": {
+            "uncommon": 138,
+            "rare": 88,
+            "epic": 58,
+            "mythic": 39,
+            "signature": 640
+          },
+          "epicAndMythicBp": 93,
+          "worstCommonKindBp": null,
+          "worstOtherKindBp": null,
+          "fewestLiveCommons": null,
+          "meanShiftBp": "0.00",
+          "cvBp": 101,
+          "p999OfExpectedBp": 10399,
+          "worstEpicAndMythicTripBp": 355,
+          "clampLossBp": "0.00",
+          "boostedTiersBp": {
+            "uncommon": 134,
+            "rare": 85,
+            "epic": 56,
+            "mythic": 38,
+            "signature": 1236
+          },
+          "boostedMeanShiftBp": "355.45"
+        },
+        {
+          "band": 5,
+          "tiersBp": {
+            "uncommon": 319,
+            "rare": 207,
+            "epic": 138,
+            "mythic": 92,
+            "signature": 427
+          },
+          "epicAndMythicBp": 226,
+          "worstCommonKindBp": null,
+          "worstOtherKindBp": null,
+          "fewestLiveCommons": null,
+          "meanShiftBp": "0.06",
+          "cvBp": 88,
+          "p999OfExpectedBp": 10276,
+          "worstEpicAndMythicTripBp": 539,
+          "clampLossBp": "0.00",
+          "boostedTiersBp": {
+            "uncommon": 314,
+            "rare": 204,
+            "epic": 136,
+            "mythic": 90,
+            "signature": 841
+          },
+          "boostedMeanShiftBp": "142.07"
+        }
+      ],
+      "worstCommonKindOfPlanetBp": null,
+      "worstOtherKindOfPlanetBp": null,
+      "violations": []
+    },
+    {
+      "planet": 60,
+      "hold": 1458,
+      "hasRoster": false,
+      "isSignatureBoosted": false,
+      "bands": [
+        {
+          "band": 1,
+          "tiersBp": {
+            "uncommon": 371
+          },
+          "epicAndMythicBp": 0,
+          "worstCommonKindBp": null,
+          "worstOtherKindBp": null,
+          "fewestLiveCommons": null,
+          "meanShiftBp": "0.00",
+          "cvBp": 21,
+          "p999OfExpectedBp": 10080,
+          "worstEpicAndMythicTripBp": 0,
+          "clampLossBp": "0.00"
+        },
+        {
+          "band": 2,
+          "tiersBp": {
+            "uncommon": 210,
+            "rare": 140
+          },
+          "epicAndMythicBp": 0,
+          "worstCommonKindBp": null,
+          "worstOtherKindBp": null,
+          "fewestLiveCommons": null,
+          "meanShiftBp": "-0.25",
+          "cvBp": 30,
+          "p999OfExpectedBp": 10096,
+          "worstEpicAndMythicTripBp": 0,
+          "clampLossBp": "0.00"
+        },
+        {
+          "band": 3,
+          "tiersBp": {
+            "uncommon": 228,
+            "rare": 152,
+            "epic": 103
+          },
+          "epicAndMythicBp": 103,
+          "worstCommonKindBp": null,
+          "worstOtherKindBp": null,
+          "fewestLiveCommons": null,
+          "meanShiftBp": "-0.12",
+          "cvBp": 46,
+          "p999OfExpectedBp": 10150,
+          "worstEpicAndMythicTripBp": 290,
+          "clampLossBp": "0.00"
+        },
+        {
+          "band": 4,
+          "tiersBp": {
+            "uncommon": 138,
+            "rare": 88,
+            "epic": 58,
+            "mythic": 39,
+            "signature": 640
+          },
+          "epicAndMythicBp": 96,
+          "worstCommonKindBp": null,
+          "worstOtherKindBp": null,
+          "fewestLiveCommons": null,
+          "meanShiftBp": "0.00",
+          "cvBp": 69,
+          "p999OfExpectedBp": 10321,
+          "worstEpicAndMythicTripBp": 271,
+          "clampLossBp": "0.00"
+        },
+        {
+          "band": 5,
+          "tiersBp": {
+            "uncommon": 319,
+            "rare": 207,
+            "epic": 138,
+            "mythic": 92,
+            "signature": 427
+          },
+          "epicAndMythicBp": 229,
+          "worstCommonKindBp": null,
+          "worstOtherKindBp": null,
+          "fewestLiveCommons": null,
+          "meanShiftBp": "0.06",
+          "cvBp": 71,
+          "p999OfExpectedBp": 10241,
+          "worstEpicAndMythicTripBp": 465,
+          "clampLossBp": "0.00"
+        }
+      ],
+      "worstCommonKindOfPlanetBp": null,
+      "worstOtherKindOfPlanetBp": null,
+      "violations": []
+    }
+  ],
+  "incomeCap": [
+    {
+      "planet": 10,
+      "item": "power.mineral_drain",
+      "shareBp": 1421,
+      "nominalShareBp": 1500,
+      "unclampedBp": 2314,
+      "isFailing": false
+    },
+    {
+      "planet": 10,
+      "item": "consumable.lodestone_beacon",
+      "shareBp": 1421,
+      "nominalShareBp": 1500,
+      "unclampedBp": 17421,
+      "isFailing": false
+    },
+    {
+      "planet": 10,
+      "item": "power.ore_shifter",
+      "shareBp": 1421,
+      "nominalShareBp": 1500,
+      "unclampedBp": 7486,
+      "isFailing": false
+    },
+    {
+      "planet": 10,
+      "item": "power.pressure_pocket",
+      "shareBp": 1421,
+      "nominalShareBp": 1500,
+      "unclampedBp": 10888,
+      "isFailing": false
+    },
+    {
+      "planet": 20,
+      "item": "power.mineral_drain",
+      "shareBp": 1421,
+      "nominalShareBp": 1500,
+      "unclampedBp": 2722,
+      "isFailing": false
+    },
+    {
+      "planet": 20,
+      "item": "consumable.lodestone_beacon",
+      "shareBp": 1421,
+      "nominalShareBp": 1500,
+      "unclampedBp": 17421,
+      "isFailing": false
+    },
+    {
+      "planet": 20,
+      "item": "power.ore_shifter",
+      "shareBp": 1421,
+      "nominalShareBp": 1500,
+      "unclampedBp": 7486,
+      "isFailing": false
+    },
+    {
+      "planet": 20,
+      "item": "power.pressure_pocket",
+      "shareBp": 1421,
+      "nominalShareBp": 1500,
+      "unclampedBp": 10888,
+      "isFailing": false
+    },
+    {
+      "planet": 40,
+      "item": "power.mineral_drain",
+      "shareBp": 1421,
+      "nominalShareBp": 1500,
+      "unclampedBp": 2722,
+      "isFailing": false
+    },
+    {
+      "planet": 40,
+      "item": "consumable.lodestone_beacon",
+      "shareBp": 1421,
+      "nominalShareBp": 1500,
+      "unclampedBp": 17421,
+      "isFailing": false
+    },
+    {
+      "planet": 40,
+      "item": "power.ore_shifter",
+      "shareBp": 1421,
+      "nominalShareBp": 1500,
+      "unclampedBp": 7486,
+      "isFailing": false
+    },
+    {
+      "planet": 40,
+      "item": "power.pressure_pocket",
+      "shareBp": 1421,
+      "nominalShareBp": 1500,
+      "unclampedBp": 10888,
+      "isFailing": false
+    },
+    {
+      "planet": 60,
+      "item": "power.mineral_drain",
+      "shareBp": 1421,
+      "nominalShareBp": 1500,
+      "unclampedBp": 2722,
+      "isFailing": false
+    },
+    {
+      "planet": 60,
+      "item": "consumable.lodestone_beacon",
+      "shareBp": 1421,
+      "nominalShareBp": 1500,
+      "unclampedBp": 17421,
+      "isFailing": false
+    },
+    {
+      "planet": 60,
+      "item": "power.ore_shifter",
+      "shareBp": 1421,
+      "nominalShareBp": 1500,
+      "unclampedBp": 7486,
+      "isFailing": false
+    },
+    {
+      "planet": 60,
+      "item": "power.pressure_pocket",
+      "shareBp": 1421,
+      "nominalShareBp": 1500,
+      "unclampedBp": 10888,
+      "isFailing": false
+    }
+  ]
+}

@@ -1,0 +1,21 @@
+{
+  "shares": {
+    "source": "Systems' exact asserts for the materials on #139 (comment 6203159815; the per-tier bound is 650 bp on every planet since 6203640346) with the trip asserts of 6202970624 section 7.5 and the family-first share of ticket 446 (6226198316): ticket 449. Shares are whole basis points, rounded up, from the trip ledger over the pacing seeds. A missed bound is a balance finding; no bound moves to pass.",
+    "rarityShareBp": {
+      "perNonCommonKindMax": 1500,
+      "perNonCommonTierMax": 650,
+      "epicPlusMythicTripClampBp": 1500,
+      "perCommonKindMaxOfBandTrip": 5000,
+      "perCommonKindMaxOfPlanet": 4000
+    },
+    "liveCommonsPerBandMin": 2,
+    "trip": {
+      "meanShiftMaxBp": 0.5,
+      "cvMaxBp": 300,
+      "p999MaxOfNominalBp": 11200,
+      "clampLossMaxBp": 1
+    },
+    "judgedPlanets": [1, 2, 3, 10, 20, 40, 60],
+    "tripFindsPerSeed": 400000
+  }
+}

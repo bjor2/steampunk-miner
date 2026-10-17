@@ -43,6 +43,12 @@ export { milestoneLineSpecsOf, nextMilestoneLineOf } from './systems/milestoneCa
 export type { MarkStatName, MarkStats, MarkStep } from './systems/markLadder'
 export { nodeCostOf } from './systems/nodeCost'
 export { laneSpendRowsOf, type LaneSpendRow } from './systems/laneSpend'
+/** The #385 income cap at the on-curve vehicle, for ticket 449's share table on the status page. */
+export {
+  isFailing as isFailingIncomeCap,
+  onCurveIncomeCapVerdictsOf,
+  type IncomeCapVerdict,
+} from './systems/incomeCapCheck'
 export { unlockTierOfItem } from './systems/itemUnlockTier'
 export {
   availableNodes,

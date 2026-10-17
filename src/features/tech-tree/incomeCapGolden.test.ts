@@ -1,6 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { onCurveSteps } from '../../systems/economy/vehicleStats'
-import { INCOME_RATE_REGISTRY, type IncomeAnchors } from '../../systems/registries/incomeRates'
+import { INCOME_RATE_REGISTRY } from '../../systems/registries/incomeRates'
 import { entriesOf } from '../../systems/registries/seal'
 import { isTripClamped } from '../ores'
 import {
@@ -8,8 +7,8 @@ import {
   incomeCapVerdictsOf,
   isFailing,
   milestoneIncomeCapVerdictsOf,
+  onCurveIncomeCapVerdictsOf,
   type IncomeCapVerdict,
-  type SeedIncome,
 } from './systems/incomeCapCheck'
 import { markLadderOfItem } from './systems/itemMarks'
 import { lastMarkOf } from './systems/markLadder'
@@ -28,16 +27,8 @@ import { TREE_ECONOMY } from './systems/treeEconomy'
 // which the cap never limits (GD ruling on #385, HS condition 4), so it registers no income rate.
 const DRILL_THROUGHPUT_PREFIX = 'gear.'
 
-const EVERY_ITEM_OWNED: IncomeAnchors = { isRowLive: () => true, isItemOwned: () => true }
-
-function onCurveSeedOf(planetIndex: number): SeedIncome {
-  const levels = onCurveSteps(planetIndex)
-  const visits = { arrival: levels, departure: levels }
-  return { levelsOn: new Map([[planetIndex, visits]]), anchors: EVERY_ITEM_OWNED }
-}
-
 function judgedVerdictsOf(verdictsOf = incomeCapVerdictsOf) {
-  return verdictsOf(TREE_ECONOMY.incomeCap.planets.map(onCurveSeedOf))
+  return onCurveIncomeCapVerdictsOf(TREE_ECONOMY.incomeCap, verdictsOf)
 }
 
 function band5VerdictsOf(verdictsOf = incomeCapVerdictsOf) {

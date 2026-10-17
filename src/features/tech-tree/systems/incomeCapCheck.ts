@@ -31,7 +31,7 @@
 import { TICKS_PER_SECOND } from '../../../constants/physics'
 import { oreTier, oreValue } from '../../../systems/economy/oreEconomy'
 import type { UpgradeLevels } from '../../../systems/economy/vehicleStats'
-import { vehicleStatsAt } from '../../../systems/economy/vehicleStats'
+import { onCurveSteps, vehicleStatsAt } from '../../../systems/economy/vehicleStats'
 import {
   ceil,
   cmp,
@@ -56,6 +56,8 @@ import { ORE_ROWS } from '../../ores'
 import { TREE_ECONOMY, type IncomeCap } from './treeEconomy'
 
 const MINUTE_TICKS = fromSafeInteger(60 * TICKS_PER_SECOND)
+/** Every item owned: the full-stack loadout the golden and the status table judge. */
+const EVERY_ITEM_OWNED: IncomeAnchors = { isRowLive: () => true, isItemOwned: () => true }
 const BASIS_POINTS = fromSafeInteger(10_000)
 const PARTS_PER_MILLION = fromSafeInteger(1_000_000)
 const BANDS = Array.from({ length: BAND_COUNT }, (_, index) => index + 1)
@@ -138,6 +140,26 @@ export function incomeCapVerdictsOf(
   cap: IncomeCap = TREE_ECONOMY.incomeCap,
 ): IncomeCapVerdict[] {
   return verdictsOf(seeds, cap, incomeCapRowsOf)
+}
+
+/**
+ * The verdicts of the on-curve vehicle on each judged planet, every item owned: one seed standing
+ * there at the planet's on-curve steps on arrival and departure (the golden, ticket 449's table).
+ */
+export function onCurveIncomeCapVerdictsOf(
+  cap: IncomeCap = TREE_ECONOMY.incomeCap,
+  verdictsOfSeeds: (
+    seeds: readonly SeedIncome[],
+    cap: IncomeCap,
+  ) => IncomeCapVerdict[] = incomeCapVerdictsOf,
+): IncomeCapVerdict[] {
+  return verdictsOfSeeds(cap.planets.map(onCurveSeedOf), cap)
+}
+
+function onCurveSeedOf(planetIndex: number): SeedIncome {
+  const levels = onCurveSteps(planetIndex)
+  const visits = { arrival: levels, departure: levels }
+  return { levelsOn: new Map([[planetIndex, visits]]), anchors: EVERY_ITEM_OWNED }
 }
 
 /** The same verdicts with each item's sibling-link added to it (ticket 278). */
