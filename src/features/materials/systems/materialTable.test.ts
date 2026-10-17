@@ -60,9 +60,8 @@ function problemsOf(materials: unknown[], hueSlots: unknown[] = SLOTS): string[]
 }
 
 describe('materials table', () => {
-  it('loads the committed table cleanly while it holds no rows', () => {
+  it('loads the committed table cleanly', () => {
     expect(materialTableProblems(materialsFile, CONTEXT)).toEqual([])
-    expect(MATERIALS.materials).toEqual([])
   })
 
   it('loads a fixture table sorted by id, naming each species after its family', () => {
@@ -227,5 +226,35 @@ describe('host rock luma', () => {
   it('measures the brightest band of any palette, planet 1 band 1 at about 0.43 (#151)', () => {
     expect(brightestHostRockLuma()).toBeGreaterThan(0.43)
     expect(brightestHostRockLuma()).toBeLessThan(0.45)
+  })
+})
+
+// Ticket 447 (#139, Systems' split on #446): the 12 species P1 and P2 share, 5 common, 4 uncommon
+// and 3 rare, metal and crystal only, every one its own look and none in a reserved hue band.
+describe('legacy materials', () => {
+  const legacy = MATERIALS.materials.filter((material) => material.pool === 'legacy')
+
+  function countOf(rarity: string): number {
+    return legacy.filter((material) => material.rarity === rarity).length
+  }
+
+  it('holds 12 species split 5 common, 4 uncommon and 3 rare, with no epic or mythic', () => {
+    expect(legacy).toHaveLength(12)
+    expect(MATERIAL_RARITIES.map(countOf)).toEqual([5, 4, 3, 0, 0])
+  })
+
+  it('draws only on the metal and crystal families', () => {
+    expect(new Set(legacy.map((material) => material.family))).toEqual(
+      new Set(['metal', 'crystal']),
+    )
+  })
+
+  it('keeps every hue slot out of the 15-45 and 268-285 degree bands', () => {
+    const hues = MATERIALS.hueSlots.map((slot) => slot.hue)
+    expect(hues.filter((hue) => (hue >= 15 && hue <= 45) || (hue >= 268 && hue <= 285))).toEqual([])
+  })
+
+  it('gives every species its own hue slot', () => {
+    expect(new Set(legacy.map((material) => material.hueSlot)).size).toBe(legacy.length)
   })
 })

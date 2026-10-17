@@ -224,7 +224,9 @@ programs }` from three's `renderer.info` of the game canvas), read only when cal
   the roster, with the fold off and from an unstamped old-save planet 1, prints each run's first
   drill purchase and time to core, and fails a roster run whose first drill purchase is more than
   5% later than the fold-off one's. The guard and bounds are exact on the roster in
-  `roster/systems/rosterGuard.test.ts`.
+  `roster/systems/rosterGuard.test.ts`. `roster/systems/rosterSpecies.test.ts` (ticket 447) binds
+  each `materials.json` species to its kind slot by `(pool, slot)` with the slot's family, rarity
+  and window, and holds one legacy species in every legacy slot of planets 1 and 2.
 - **Pacing bot** (`src/systems/bot/`, #29): plays `scenarios/bot-slice.scenario.json` through
   authority commands with the #6 movement-time model, buying casing grades on-curve (grade `b`
   before it mines band `b`, grade 5 before the core, S11). Its scripted mining (`drillTile`) lays

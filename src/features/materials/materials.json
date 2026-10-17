@@ -1,5 +1,247 @@
 {
-  "$comment": "The materials look layer of #139 (GD ruling 15 Oct 2026, ticket 444): species under the 12 ore families. A species names its family, never a gate class (#142); family ids, ore ids and prices stay. Hue slots: hue in degrees, saturation and luma in 0..1 (Rec. 601 display luma); a slot keeps out of the reserved hue bands of oreLooks.json and above the brightest host rock. gradeBand is the species' depth window, first and last band in 1..5. The rows land in later tickets (P1-P2 in 447, P3-P5 after), each passing the guards of materialTable.ts.",
-  "hueSlots": [],
-  "materials": []
+  "$comment": "The materials look layer of #139 (GD ruling 15 Oct 2026, ticket 444): species under the 12 ore families. A species names its family, never a gate class (#142); family ids, ore ids and prices stay. pool is the species set a row belongs to (legacy = P1 and P2) and slot the kind slot of ores.economy.json it binds to (TD ruling on ticket 446); a row's family, rarity and gradeBand equal its slot's. Hue slots: hue in degrees, saturation and luma in 0..1 (Rec. 601 display luma); a slot keeps out of the reserved hue bands of oreLooks.json and above the brightest host rock. gradeBand is the species' depth window, first and last band in 1..5. The legacy rows are Content's roster for ticket 447 (names cut to an epithet before the family name, flavour to one ledger sentence); P3-P5 land after, each passing the guards of materialTable.ts.",
+  "hueSlots": [
+    {
+      "id": "ironstone-umber",
+      "hue": 52,
+      "saturation": 0.18,
+      "luma": 0.5
+    },
+    {
+      "id": "copper-verdigris",
+      "hue": 160,
+      "saturation": 0.45,
+      "luma": 0.58
+    },
+    {
+      "id": "tin-grey",
+      "hue": 210,
+      "saturation": 0.06,
+      "luma": 0.66
+    },
+    {
+      "id": "quartz-milk",
+      "hue": 200,
+      "saturation": 0.04,
+      "luma": 0.86
+    },
+    {
+      "id": "flint-glass",
+      "hue": 185,
+      "saturation": 0.22,
+      "luma": 0.76
+    },
+    {
+      "id": "lead-glance",
+      "hue": 228,
+      "saturation": 0.12,
+      "luma": 0.62
+    },
+    {
+      "id": "nickel-pale",
+      "hue": 75,
+      "saturation": 0.1,
+      "luma": 0.72
+    },
+    {
+      "id": "amber-honey",
+      "hue": 48,
+      "saturation": 0.75,
+      "luma": 0.6
+    },
+    {
+      "id": "fluorite-violet",
+      "hue": 258,
+      "saturation": 0.55,
+      "luma": 0.52
+    },
+    {
+      "id": "gold-vein",
+      "hue": 54,
+      "saturation": 0.85,
+      "luma": 0.74
+    },
+    {
+      "id": "corundum-blue",
+      "hue": 222,
+      "saturation": 0.75,
+      "luma": 0.5
+    },
+    {
+      "id": "beryl-red",
+      "hue": 352,
+      "saturation": 0.65,
+      "luma": 0.5
+    }
+  ],
+  "materials": [
+    {
+      "id": "ironstone-brassvein",
+      "pool": "legacy",
+      "slot": "legacy.c1",
+      "family": "metal",
+      "epithet": "Ironstone",
+      "silhouette": "nuggets",
+      "pattern": "mottled",
+      "hueSlot": "ironstone-umber",
+      "gradeBand": [1, 5],
+      "rarity": "common",
+      "hero": false,
+      "flavour": "Dull, heavy and honest, the backbone of every first manifest."
+    },
+    {
+      "id": "shallow-copper-brassvein",
+      "pool": "legacy",
+      "slot": "legacy.c2",
+      "family": "metal",
+      "epithet": "Shallow Copper",
+      "silhouette": "flakes",
+      "pattern": "crusted",
+      "hueSlot": "copper-verdigris",
+      "gradeBand": [1, 2],
+      "rarity": "common",
+      "hero": false,
+      "flavour": "Green-crusted flakes near the surface; the clerks count them by the sack."
+    },
+    {
+      "id": "deep-seam-tin-brassvein",
+      "pool": "legacy",
+      "slot": "legacy.c3",
+      "family": "metal",
+      "epithet": "Deep-Seam Tin",
+      "silhouette": "plates",
+      "pattern": "banded",
+      "hueSlot": "tin-grey",
+      "gradeBand": [3, 5],
+      "rarity": "common",
+      "hero": false,
+      "flavour": "Grey and brittle, it rings when struck and is entered under tin."
+    },
+    {
+      "id": "clouded-quartzine",
+      "pool": "legacy",
+      "slot": "legacy.c4",
+      "family": "crystal",
+      "epithet": "Clouded",
+      "silhouette": "nodules",
+      "pattern": "clouded",
+      "hueSlot": "quartz-milk",
+      "gradeBand": [1, 5],
+      "rarity": "common",
+      "hero": false,
+      "flavour": "Milky and cheap; every quartermaster keeps a drawer of it."
+    },
+    {
+      "id": "flint-glass-quartzine",
+      "pool": "legacy",
+      "slot": "legacy.c5",
+      "family": "crystal",
+      "epithet": "Flint-Glass",
+      "silhouette": "shards",
+      "pattern": "glassy",
+      "hueSlot": "flint-glass",
+      "gradeBand": [1, 5],
+      "rarity": "common",
+      "hero": false,
+      "flavour": "Sharp-edged and clear; the ledger does not cover cut fingers."
+    },
+    {
+      "id": "bright-lead-brassvein",
+      "pool": "legacy",
+      "slot": "legacy.u1",
+      "family": "metal",
+      "epithet": "Bright Lead",
+      "silhouette": "cubes",
+      "pattern": "sheen",
+      "hueSlot": "lead-glance",
+      "gradeBand": [1, 3],
+      "rarity": "uncommon",
+      "hero": false,
+      "flavour": "Heavy, soft and bright when freshly cut, it fogs within the hour."
+    },
+    {
+      "id": "deep-grade-nickel-brassvein",
+      "pool": "legacy",
+      "slot": "legacy.u2",
+      "family": "metal",
+      "epithet": "Deep-Grade Nickel",
+      "silhouette": "grains",
+      "pattern": "speckled",
+      "hueSlot": "nickel-pale",
+      "gradeBand": [3, 5],
+      "rarity": "uncommon",
+      "hero": false,
+      "flavour": "Pale and stubborn; clerks log it at a better rate than iron."
+    },
+    {
+      "id": "honey-amber-quartzine",
+      "pool": "legacy",
+      "slot": "legacy.u3",
+      "family": "crystal",
+      "epithet": "Honey Amber",
+      "silhouette": "beads",
+      "pattern": "translucent",
+      "hueSlot": "amber-honey",
+      "gradeBand": [1, 2],
+      "rarity": "uncommon",
+      "hero": false,
+      "flavour": "Warm to the touch, and faintly sweet when scraped."
+    },
+    {
+      "id": "violet-fluorite-quartzine",
+      "pool": "legacy",
+      "slot": "legacy.u4",
+      "family": "crystal",
+      "epithet": "Violet Fluorite",
+      "silhouette": "cubes",
+      "pattern": "zoned",
+      "hueSlot": "fluorite-violet",
+      "gradeBand": [2, 5],
+      "rarity": "uncommon",
+      "hero": true,
+      "flavour": "Glows faintly under the lamp and is entered with a small star."
+    },
+    {
+      "id": "vein-gold-brassvein",
+      "pool": "legacy",
+      "slot": "legacy.r1",
+      "family": "metal",
+      "epithet": "Vein Gold",
+      "silhouette": "wires",
+      "pattern": "veined",
+      "hueSlot": "gold-vein",
+      "gradeBand": [3, 5],
+      "rarity": "rare",
+      "hero": true,
+      "flavour": "Seldom seen below the second ledger; counted twice, weighed three times."
+    },
+    {
+      "id": "blue-corundum-quartzine",
+      "pool": "legacy",
+      "slot": "legacy.r2",
+      "family": "crystal",
+      "epithet": "Blue Corundum",
+      "silhouette": "barrels",
+      "pattern": "silky",
+      "hueSlot": "corundum-blue",
+      "gradeBand": [3, 4],
+      "rarity": "rare",
+      "hero": true,
+      "flavour": "A clear blue the Guild stamps and seals on sight."
+    },
+    {
+      "id": "red-beryl-quartzine",
+      "pool": "legacy",
+      "slot": "legacy.r3",
+      "family": "crystal",
+      "epithet": "Red Beryl",
+      "silhouette": "columns",
+      "pattern": "clear",
+      "hueSlot": "beryl-red",
+      "gradeBand": [4, 5],
+      "rarity": "rare",
+      "hero": true,
+      "flavour": "Rarer than the Guild admits; wrapped in felt, entered in red ink."
+    }
+  ]
 }
