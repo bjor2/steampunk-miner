@@ -227,6 +227,20 @@ programs }` from three's `renderer.info` of the game canvas), read only when cal
   `roster/systems/rosterGuard.test.ts`. `roster/systems/rosterSpecies.test.ts` (ticket 447) binds
   each `materials.json` species to its kind slot by `(pool, slot)` with the slot's family, rarity
   and window, and holds one legacy species in every legacy slot of planets 1 and 2.
+- **Rarity share bounds** (ticket 449, Systems on #139: 6203159815, 650 bp per tier since
+  6203640346, the trip asserts of 6202970624 section 7.5): `src/features/roster/rarityShares.test.ts`
+  reads P1, P2, P3, P10, P20, P40 and P60 on each pacing seed and fails any bound missed, in whole
+  basis points: non-common kind 1500, non-common tier 650, epic and mythic 1500 of a trip, common
+  kind 5000 of a band trip and 4000 of the planet, 2 live commons per band, no bare painted cell
+  (the family-first guard), band mean within 0.5 bp of today, trip CV 3%, the 99.9th percentile
+  trip 1.12 of the expected one and the clamp at most 1 bp of mean income. Kind bounds apply where
+  a planet has a roster (P1 and P2 until `kinds.mixed` lands); tiers and means read the base
+  signature share (Systems' model), a story planet's boost is printed, not judged. A fixture breaks
+  each bound. The trip ledger (`roster/systems/tripLedger.ts`, its spec beside it) prices units
+  through the real #509 clamp and reads mean, CV and clamp cost exactly over the clamp's states,
+  the 99.9th percentile and the worst epic and mythic trip from seeded trips. The same spec fails
+  while `docs/economy/rarity-shares.json`, the status page's table, is stale: rerun
+  `npm run rarity:shares`. About 15 seconds.
 - **Pacing bot** (`src/systems/bot/`, #29): plays `scenarios/bot-slice.scenario.json` through
   authority commands with the #6 movement-time model, buying casing grades on-curve (grade `b`
   before it mines band `b`, grade 5 before the core, S11). Its scripted mining (`drillTile`) lays
@@ -730,7 +744,10 @@ programs }` from three's `renderer.info` of the game canvas), read only when cal
   `systems/incomeCapCheck.ts`): every income item registered in the kernel `incomeRates` registry
   (the drain; the ore-shifter, pocket lance and lodestone as the ore value they relocate), at full
   stack, brings in one trip (the drill's minutes to fill the hold) at most
-  `tech.incomeCap.maxShareBp` of a full hold of the band's ore after `tripCapAt`, on P10, P20, P40
+  `tech.incomeCap.maxShareBp` of a full hold of the band's ore after `tripCapAt` (since ticket 449
+  the hold at its rarity-weighted mean, `cargo x V(t) x mu_b`, with the nominal share printed
+  beside it; the golden also states that the drain and movers' +2 price, `RICHEST_LEAD`, moves no
+  verdict), on P10, P20, P40
   and P60, every band, at the levels the bot arrived with and left with, on the median of the seeds
   that own the item when their run ends, in whole basis points. An item over the cap before the
   clamp fails unless play pays it through the trip ledger; `tech.incomeCap.knownRed` lists items

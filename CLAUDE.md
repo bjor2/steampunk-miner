@@ -35,6 +35,7 @@ Versions mirror `infernal-bistro` (same owner). The game is 2D: an orthographic 
 | `npm run balance:tree [-- --milestones]`  | lane: 3 seeds to P60, tree spend share, 15% income cap    |
 | `npm run balance:forks`                   | lane: each fork branch forced, 3 seeds to P10 (#255)      |
 | `npm run ore:mix -- --planets 1..60`      | each planet's ore histogram per band vs its mix (#141)    |
+| `npm run rarity:shares`                   | rewrite the status page's rarity share table (#449)       |
 | `npm run bench:world`                     | `generateChunk` p50/p95 per planet (logged, not gated)    |
 | `npm run bench:render`                    | chunk mesh batch p50/p95 per planet (logged, not gated)   |
 | `npm run bench:physics`                   | physics tick p50/p95 at 24-384 m/s (logged, not gated)    |

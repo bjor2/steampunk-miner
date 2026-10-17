@@ -369,7 +369,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/ores/systems/rarityTripClamp.test.ts` | 7 | 7 |
 | `src/features/ores/systems/rarityTripShare.test.ts` | 3 | 3 |
 
-### `planet-mix`: 24 files, 144 tests
+### `planet-mix`: 24 files, 145 tests
 
 | File | Tests | Sites |
 | --- | --- | --- |
@@ -385,7 +385,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/planet-mix/systems/electrifiedCells.test.ts` | 6 | 6 |
 | `src/features/planet-mix/systems/magneticFields.test.ts` | 4 | 4 |
 | `src/features/planet-mix/systems/mixRoll.test.ts` | 9 | 9 |
-| `src/features/planet-mix/systems/oreMix.test.ts` | 20 | 20 |
+| `src/features/planet-mix/systems/oreMix.test.ts` | 21 | 21 |
 | `src/features/planet-mix/systems/planetActs.test.ts` | 13 | 13 |
 | `src/features/planet-mix/systems/planetCard.test.ts` | 4 | 4 |
 | `src/features/planet-mix/systems/planetCardSources.test.ts` | 3 | 3 |
@@ -424,10 +424,11 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/power-up-core/systems/useRefusals.test.ts` | 3 | 3 |
 | `src/features/power-up-core/systems/useResolution.test.ts` | 12 | 12 |
 
-### `roster`: 9 files, 74 tests
+### `roster`: 12 files, 98 tests
 
 | File | Tests | Sites |
 | --- | --- | --- |
+| `src/features/roster/rarityShares.test.ts` | 18 | 18 |
 | `src/features/roster/roster.byteIdentity.lane.test.ts` | 5 | 1 |
 | `src/features/roster/roster.byteIdentity.test.ts` | 19 | 11 |
 | `src/features/roster/roster.pacing.lane.test.ts` | 1 | 1 |
@@ -437,6 +438,8 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/roster/systems/rosterFold.test.ts` | 6 | 6 |
 | `src/features/roster/systems/rosterGuard.test.ts` | 11 | 8 |
 | `src/features/roster/systems/rosterSpecies.test.ts` | 11 | 7 |
+| `src/features/roster/systems/shareRows.test.ts` | 2 | 2 |
+| `src/features/roster/systems/tripLedger.test.ts` | 4 | 4 |
 
 ### `sell-burst`: 7 files, 53 tests
 
@@ -480,7 +483,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/sensing/systems/threatPeriscope.test.ts` | 6 | 6 |
 | `src/features/sensing/systems/useResolution.test.ts` | 16 | 16 |
 
-### `tech-tree`: 63 files, 450 tests
+### `tech-tree`: 63 files, 453 tests
 
 | File | Tests | Sites |
 | --- | --- | --- |
@@ -489,7 +492,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/tech-tree/forkBranches.vision.test.ts` | 3 | 3 |
 | `src/features/tech-tree/forkMix.lane.test.ts` | 5 | 5 |
 | `src/features/tech-tree/forkMixRuns.test.ts` | 7 | 7 |
-| `src/features/tech-tree/incomeCapGolden.test.ts` | 7 | 7 |
+| `src/features/tech-tree/incomeCapGolden.test.ts` | 8 | 8 |
 | `src/features/tech-tree/rigPieces.test.ts` | 3 | 3 |
 | `src/features/tech-tree/rushHand.test.ts` | 3 | 3 |
 | `src/features/tech-tree/rushPace.lane.test.ts` | 1 | 4 |
@@ -512,7 +515,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/tech-tree/systems/forkPace.test.ts` | 6 | 6 |
 | `src/features/tech-tree/systems/forkRechoice.spend.test.ts` | 3 | 3 |
 | `src/features/tech-tree/systems/generatedCombos.test.ts` | 16 | 16 |
-| `src/features/tech-tree/systems/incomeCapCheck.test.ts` | 18 | 18 |
+| `src/features/tech-tree/systems/incomeCapCheck.test.ts` | 20 | 20 |
 | `src/features/tech-tree/systems/itemDescriber.test.ts` | 3 | 3 |
 | `src/features/tech-tree/systems/itemMarks.test.ts` | 4 | 4 |
 | `src/features/tech-tree/systems/itemShop.test.ts` | 7 | 7 |
@@ -1021,7 +1024,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/physics/digSpeedStop.lane.test.ts` | 10 | 3 |
 | `src/physics/drillEngagement.test.ts` | 6 | 6 |
 | `src/physics/drillFacingStep.test.ts` | 3 | 3 |
-| `src/physics/drillReportCadence.test.ts` | 3 | 3 |
+| `src/physics/drillReportCadence.test.ts` | 6 | 3 |
 | `src/physics/drillTurnLatency.lane.test.ts` | 3 | 7 |
 | `src/physics/exactCarry.lane.test.ts` | 184 | 16 |
 | `src/physics/fastLegContactTrace.lane.test.ts` | 2 | 2 |
@@ -1352,6 +1355,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `scripts/status/issueListHtml.test.mjs` | 18 | 18 |
 | `scripts/status/perfOverview.test.mjs` | 17 | 17 |
 | `scripts/status/perfOverviewHtml.test.mjs` | 12 | 12 |
+| `scripts/status/rarityShareHtml.test.mjs` | 5 | 5 |
 | `scripts/status/slots.test.mjs` | 17 | 13 |
 | `scripts/status/slotsHtml.test.mjs` | 12 | 12 |
 | `scripts/status/tests.test.mjs` | 5 | 5 |

@@ -243,6 +243,16 @@ skipped. The schema is in [test-metrics.md](metrics/test-metrics.md#drill-down-r
 The page reads the file from raw like `tests.json`, and `build-status.mjs` copies it beside the page
 as `drill-down.ndjson`.
 
+### Rarity shares panel (ticket 449)
+
+The **Performance** tab's Rarity shares panel prints Systems' share bounds for the materials (#139)
+from `docs/economy/rarity-shares.json`, read at build time like the perf charts: per judged planet
+(P1, P2, P3, P10, P20, P40, P60) and band, the worst over the pacing seeds of each share beside its
+bound, red where one is missed, a story planet's boosted signature under its judged tiers, and the
+#385 income cap at the on-curve vehicle over the rarity-weighted full hold beside the nominal one.
+The file is written by `npm run rarity:shares`; `src/features/roster/rarityShares.test.ts` fails
+while it is stale. Code: `scripts/status/rarityShareHtml.mjs`, tested beside it.
+
 ### Drill speed panel (ticket 434)
 
 Bjor, 15 Oct: "drilling is still way too slow, level 20 feels like level 5". The **Drill speed**

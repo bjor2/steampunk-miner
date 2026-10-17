@@ -1335,6 +1335,14 @@ The roster and look layer's worldgen side (TD ruling on #446, 6226236698 and add
 - **The planet picks its pool** (ticket 542, TD shape on #453 6236465674, GD ruling 6236449473 item 3). `kinds.pools` in `ores.economy.json` maps the planet index to a pool id, planets 1 to n with no gap (the loader refuses a gap or a pool id that is not kebab-case): P1 and P2 `legacy`, P3, P4 and P5 `foothold-p3`, `foothold-p4`, `foothold-p5`, P6 and P7 `foothold-p6-p7`. `poolOfPlanet(params)` reads the index only, never the seed, and is null past the table (P8+), so a slot there binds no species instead of borrowing a pool. `speciesOfKind(pool, slot)` finds the row of that pool with the slot's id, family, rarity and window as its `gradeBand`; `planetSpeciesOf(params, kindSlot)` chains the two. Look only: no stored cell, `ORE_RULES_VERSION`, `GENERATOR_VERSION` or protocol moves (`roster.poolSeam.test.ts` pins P1 to P7's whole cell words at main before the seam). The guard (`rosterSpecies.test.ts`): every pool holds exactly one species for every slot a planet of it can ask for, every planet from 1 to 7 has a pool, and no species row names an unmapped pool. A `kinds.mixed` slot therefore needs a row in each foothold pool.
 - **Raw cell words on the wire.** No command or event payload carries one. Snapshots and saves carry them in `ChunkDelta.overrides` (`[index, cell]`), so an override of an ore cell keeps its slot; a snapshot or save of another generator version is refused or migrated, never read with this build's cells.
 
+### 3.71 The rarity share bounds (ticket 449)
+
+Systems' share asserts for the materials (#139: 6203159815, 650 bp per tier since 6203640346; the trip asserts of 6202970624 section 7.5; the family-first guard of 6226198316) live in the `roster` slice, which reads `planet-mix` (`oreMixOf`, and `oreMixAtBaseSignatureOf`, the mix with every signature at its base share), `ores` (rarity tiers, `paidRarityFind`) and `tech-tree` (`onCurveIncomeCapVerdictsOf`) through their indexes. The bounds are data, `roster.economy.json`. Report and spec only: no command, event, save section, generation or protocol change.
+
+- **The trip ledger** (`tripLedger.ts`) prices each unit through the real clamp, asked once per clamp state, and reads the trip's mean, CV and clamp cost exactly over those states; seeded trips give the 99.9th percentile and the worst epic and mythic trip share.
+- **The #385 denominator** is the rarity-weighted full hold `cargo x V(t(p,b)) x mu_b`, `mu_b` the rarity rows' `meanPpmByBand` (`incomeCapCheck.ts`); every verdict keeps the nominal share beside it. `tripCapAt` and the 15% line are unchanged.
+- **The table** `docs/economy/rarity-shares.json` is written by `npm run rarity:shares` through the roster's debug action `shareTable` and printed on the status page's Performance tab (`scripts/status/rarityShareHtml.mjs`).
+
 ## 4. Cross-slice contracts
 
 ```mermaid
