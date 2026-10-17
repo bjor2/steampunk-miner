@@ -30,6 +30,10 @@ export interface HueSlot {
 
 export interface Material {
   id: string
+  /** The species set the row belongs to (`legacy` for P1 and P2); a data tag only. */
+  pool: string
+  /** The kind slot id the species binds to within its pool (`legacy.c1`), never renumbered. */
+  slot: string
   /** One of the 12 ore family ids; the species' gate class and price are the family's. */
   family: string
   epithet: string
@@ -85,6 +89,7 @@ export function materialTableProblems(raw: unknown, context: MaterialGuardContex
     ...slotsProblems(slots, context),
     ...rows.flatMap((row, at) => rowProblems(row, at, context)),
     ...duplicateIdProblems(rows, 'materials'),
+    ...sharedSlotProblems(rows),
     ...unknownHueSlotProblems(rows, slots),
     ...sharedLookProblems(rows),
   ]
@@ -130,6 +135,21 @@ function duplicateIdProblems(entries: readonly Raw[], list: string): string[] {
   return ids
     .filter((id, at) => ids.indexOf(id) !== at)
     .map((id) => `${list} share the id ${String(id)}; each needs its own`)
+}
+
+/** A kind slot holds one species, so the roster's `(pool, slot)` lookup is never ambiguous. */
+function sharedSlotProblems(rows: readonly Raw[]): string[] {
+  const keys = rows.map(slotKeyOf)
+  return rows
+    .filter((_, at) => keys.indexOf(keys[at]) !== at)
+    .map(
+      (row) =>
+        `${String(row.id)} binds the kind slot ${String(row.slot)} that ${String(rows[keys.indexOf(slotKeyOf(row))].id)} already holds`,
+    )
+}
+
+function slotKeyOf(row: Raw): string {
+  return `${String(row.pool)}|${String(row.slot)}`
 }
 
 function tableOf(file: Raw, context: MaterialGuardContext): MaterialTable {

@@ -1,8 +1,13 @@
 /**
- * The schema of one `materials.json` row (ticket 444): `id, family, epithet, silhouette, pattern,
- * hueSlot, gradeBand, rarity, hero, flavour` and nothing else. A row never carries a gate class:
- * the gate comes from the family only (#142), so rarity can never open or close one (#139 GD
- * ruling 2).
+ * The schema of one `materials.json` row (ticket 444): `id, pool, slot, family, epithet,
+ * silhouette, pattern, hueSlot, gradeBand, rarity, hero, flavour` and nothing else. A row never
+ * carries a gate class: the gate comes from the family only (#142), so rarity can never open or
+ * close one (#139 GD ruling 2).
+ *
+ * `pool` and `slot` are data tags only (TD ruling on ticket 446, 6226236698 and addendum
+ * 6226264758; landed in ticket 447): the species set a row belongs to (`legacy` for P1 and P2) and
+ * the stable kind slot id it binds to (`legacy.c1`), so a roster finds its species by `(pool, slot)`,
+ * never by position. The kinds table that owns the slots lives in the ores slice.
  */
 
 export const MATERIAL_RARITIES = ['common', 'uncommon', 'rare', 'epic', 'mythic'] as const
@@ -11,6 +16,8 @@ export type MaterialRarity = (typeof MATERIAL_RARITIES)[number]
 
 export const MATERIAL_ROW_FIELDS: readonly string[] = [
   'id',
+  'pool',
+  'slot',
   'family',
   'epithet',
   'silhouette',
@@ -25,6 +32,9 @@ export const MATERIAL_ROW_FIELDS: readonly string[] = [
 /** Kebab-case only, so a species id can never read as an ore id (`<family>_t<tier>`). */
 export const KEBAB_ID = /^[a-z][a-z0-9]*(-[a-z0-9]+)*$/
 
+/** A kind slot id is its pool's id, a dot and a kebab-case slot name, as `ores.economy.json` writes. */
+const KIND_SLOT_ID = /^[a-z][a-z0-9]*(-[a-z0-9]+)*\.[a-z0-9]+(-[a-z0-9]+)*$/
+
 const FIRST_BAND = 1
 const LAST_BAND = 5
 const GATE_FIELD = 'gateClass'
@@ -35,6 +45,10 @@ type Raw = Record<string, unknown>
 export function materialRowShapeProblems(row: Raw, where: string): string[] {
   return [
     ...(KEBAB_ID.test(String(row.id)) ? [] : [`${where}.id must be kebab-case`]),
+    ...(isPoolId(row.pool) ? [] : [`${where}.pool must be a kebab-case pool id`]),
+    ...(isSlotOfPool(row.slot, row.pool)
+      ? []
+      : [`${where}.slot must be a kind slot id of its pool (<pool>.<slot>)`]),
     ...['family', 'epithet', 'flavour']
       .filter((field) => !isText(row[field]))
       .map((field) => `${where}.${field} must be text`),
@@ -64,6 +78,14 @@ function unknownFieldProblems(row: Raw, where: string): string[] {
   return Object.keys(row)
     .filter((field) => field !== GATE_FIELD && !MATERIAL_ROW_FIELDS.includes(field))
     .map((field) => `${where}.${field} is not a material field`)
+}
+
+function isPoolId(pool: unknown): pool is string {
+  return typeof pool === 'string' && KEBAB_ID.test(pool)
+}
+
+function isSlotOfPool(slot: unknown, pool: unknown): boolean {
+  return typeof slot === 'string' && KIND_SLOT_ID.test(slot) && slot.startsWith(`${String(pool)}.`)
 }
 
 function isBandWindow(window: unknown): window is [number, number] {

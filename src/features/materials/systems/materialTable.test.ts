@@ -23,6 +23,8 @@ const SLOTS = [
 
 const GILDED = {
   id: 'gilded-brassvein',
+  pool: 'legacy',
+  slot: 'legacy.c1',
   family: 'metal',
   epithet: 'Gilded',
   silhouette: 'flecks',
@@ -36,6 +38,8 @@ const GILDED = {
 
 const CLEAR = {
   id: 'clear-quartzine',
+  pool: 'legacy',
+  slot: 'legacy.r2',
   family: 'crystal',
   epithet: 'Clear',
   silhouette: 'shards',
@@ -83,6 +87,32 @@ describe('materials table', () => {
   it('refuses a field the row shape does not name', () => {
     expect(problemsOf([{ ...GILDED, price: 12 }])).toEqual([
       'materials[0].price is not a material field',
+    ])
+  })
+
+  it('refuses a row without a pool or a slot', () => {
+    const bare = Object.fromEntries(
+      Object.entries(GILDED).filter(([field]) => field !== 'pool' && field !== 'slot'),
+    )
+    expect(problemsOf([bare])).toEqual([
+      'materials[0].pool must be a kebab-case pool id',
+      'materials[0].slot must be a kind slot id of its pool (<pool>.<slot>)',
+    ])
+  })
+
+  it('refuses a pool that is not a slug and a slot outside its pool', () => {
+    expect(problemsOf([{ ...GILDED, pool: 'Legacy Pool', slot: 'legacy.c1' }])).toEqual([
+      'materials[0].pool must be a kebab-case pool id',
+      'materials[0].slot must be a kind slot id of its pool (<pool>.<slot>)',
+    ])
+    expect(problemsOf([{ ...GILDED, slot: 'foothold.c1' }])).toEqual([
+      'materials[0].slot must be a kind slot id of its pool (<pool>.<slot>)',
+    ])
+  })
+
+  it('refuses two species bound to the same kind slot of a pool', () => {
+    expect(problemsOf([GILDED, { ...CLEAR, slot: GILDED.slot }])).toEqual([
+      'clear-quartzine binds the kind slot legacy.c1 that gilded-brassvein already holds',
     ])
   })
 
