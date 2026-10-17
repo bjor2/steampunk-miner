@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-10-17T01:45:11+01:00",
+  "updated_at": "2026-10-17T02:19:17+01:00",
   "caps": {
     "grok": 12,
     "claude": 10,
@@ -19,12 +19,11 @@
       "slots": [
         {
           "slot": "C1",
-          "state": "busy",
-          "ticket": 528,
-          "grok_slot": 1,
-          "kind": "dev",
-          "since": "2026-10-17T00:28:00+01:00",
-          "wave": "316-2F"
+          "state": "free",
+          "ticket": null,
+          "grok_slot": null,
+          "kind": null,
+          "since": null
         },
         {
           "slot": "C2",
@@ -71,8 +70,8 @@
         }
       ],
       "size": 6,
-      "used": 4,
-      "free": 2,
+      "used": 3,
+      "free": 3,
       "claims_last_hour": 0,
       "name": "Claude Max 1"
     },
@@ -497,11 +496,9 @@
   "grok": [
     {
       "slot": 1,
-      "state": "dev",
-      "ticket": 528,
-      "since": "2026-10-17T00:28:00+01:00",
-      "claude_slot": 1,
-      "wave": "316-2F"
+      "state": "free",
+      "ticket": null,
+      "since": null
     },
     {
       "slot": 2,
@@ -579,12 +576,11 @@
   "claude": [
     {
       "slot": 1,
-      "state": "busy",
-      "ticket": 528,
-      "grok_slot": 1,
-      "since": "2026-10-17T00:28:00+01:00",
-      "account": 1,
-      "wave": "316-2F"
+      "state": "free",
+      "ticket": null,
+      "grok_slot": null,
+      "since": null,
+      "account": 1
     },
     {
       "slot": 2,
@@ -676,8 +672,8 @@
   "totals": {
     "grok": {
       "size": 12,
-      "used": 4,
-      "dev": 4,
+      "used": 3,
+      "dev": 3,
       "dev_cap": 8,
       "planner": 0,
       "planner_cap": 4
@@ -685,8 +681,8 @@
     "claude": {
       "size": 10,
       "enabled": 6,
-      "used": 4,
-      "free": 2,
+      "used": 3,
+      "free": 3,
       "external": 0
     }
   },
@@ -732,19 +728,6 @@
         "tickets": [
           529,
           530
-        ],
-        "done": [],
-        "live": 1
-      },
-      {
-        "number": 531,
-        "key": "316-2F",
-        "map": 316,
-        "lane": "remote",
-        "mode": "solo",
-        "state": "running",
-        "tickets": [
-          528
         ],
         "done": [],
         "live": 1
