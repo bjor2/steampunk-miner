@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-10-17T17:13:25+01:00",
+  "updated_at": "2026-10-17T17:16:28+01:00",
   "caps": {
     "grok": 12,
     "claude": 10,
@@ -84,11 +84,11 @@
         {
           "slot": "C7",
           "state": "busy",
-          "ticket": null,
-          "grok_slot": null,
-          "kind": "aux",
-          "since": "2026-10-17T17:13:00+01:00",
-          "label": "wave-plan 316"
+          "ticket": 514,
+          "grok_slot": 3,
+          "kind": "dev",
+          "since": "2026-10-17T17:16:00+01:00",
+          "wave": "316-3A"
         },
         {
           "slot": "C8",
@@ -118,7 +118,7 @@
       "size": 4,
       "used": 1,
       "free": 3,
-      "claims_last_hour": 1,
+      "claims_last_hour": 2,
       "name": "Claude Max 2"
     }
   ],
@@ -453,9 +453,11 @@
     },
     {
       "slot": 3,
-      "state": "free",
-      "ticket": null,
-      "since": null
+      "state": "dev",
+      "ticket": 514,
+      "since": "2026-10-17T17:16:00+01:00",
+      "claude_slot": 7,
+      "wave": "316-3A"
     },
     {
       "slot": 4,
@@ -566,12 +568,11 @@
     {
       "slot": 7,
       "state": "busy",
-      "ticket": null,
-      "grok_slot": null,
-      "since": "2026-10-17T17:13:00+01:00",
-      "kind": "aux",
-      "label": "wave-plan 316",
-      "account": 2
+      "ticket": 514,
+      "grok_slot": 3,
+      "since": "2026-10-17T17:16:00+01:00",
+      "account": 2,
+      "wave": "316-3A"
     },
     {
       "slot": 8,
@@ -599,17 +600,17 @@
     }
   ],
   "last_refill": {
-    "at": "2026-10-17 17:09 BST",
+    "at": "2026-10-17 17:16 BST",
     "mode": "refill-dev",
     "triggers": "claude-run:wave-plan",
-    "started": "#448->C1/A1 #449->C2/A1",
-    "note": "spawned 2 worker(s)"
+    "started": "#514->C7/A2",
+    "note": "spawned 1 worker(s)"
   },
   "totals": {
     "grok": {
       "size": 12,
-      "used": 2,
-      "dev": 2,
+      "used": 3,
+      "dev": 3,
       "dev_cap": 8,
       "planner": 0,
       "planner_cap": 4
@@ -654,13 +655,10 @@
           514,
           524,
           537,
-          540,
           541
         ],
-        "done": [
-          540
-        ],
-        "live": 0
+        "done": [],
+        "live": 1
       },
       {
         "number": 511,
