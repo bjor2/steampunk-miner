@@ -224,17 +224,20 @@ programs }` from three's `renderer.info` of the game canvas), read only when cal
   the roster, with the fold off and from an unstamped old-save planet 1, prints each run's first
   drill purchase and time to core, and fails a roster run whose first drill purchase is more than
   5% later than the fold-off one's. The guard and bounds are exact on the roster in
-  `roster/systems/rosterGuard.test.ts`. `roster/systems/rosterSpecies.test.ts` (ticket 447) binds
+  `roster/systems/rosterGuard.test.ts`, on P1 to P7 over the pacing seeds (#453): it skips cells
+  only the relic signature paints, counts 15 kinds drawn on an unswapped P3+ planet and 17 on a
+  swapped band 3, and shows the guard short on exactly the swapped band-3 fossil commons without
+  Option B's two rows. Part C also reads P3 to P5 on the pacing seeds. `roster/systems/rosterSpecies.test.ts` (ticket 447) binds
   each `materials.json` species to its kind slot by `(pool, slot)` with the slot's family, rarity
-  and window, and holds one legacy species in every legacy slot of planets 1 and 2.
+  and window, and holds one species of each pool in every slot its planets can ask for.
 - **Rarity share bounds** (ticket 449, Systems on #139: 6203159815, 650 bp per tier since
   6203640346, the trip asserts of 6202970624 section 7.5): `src/features/roster/rarityShares.test.ts`
-  reads P1, P2, P3, P10, P20, P40 and P60 on each pacing seed and fails any bound missed, in whole
+  reads P1 to P7, P10, P20, P40 and P60 on each pacing seed and fails any bound missed, in whole
   basis points: non-common kind 1500, non-common tier 650, epic and mythic 1500 of a trip, common
   kind 5000 of a band trip and 4000 of the planet, 2 live commons per band, no bare painted cell
   (the family-first guard), band mean within 0.5 bp of today, trip CV 3%, the 99.9th percentile
   trip 1.12 of the expected one and the clamp at most 1 bp of mean income. Kind bounds apply where
-  a planet has a roster (P1 and P2 until `kinds.mixed` lands); tiers and means read the base
+  a planet has a roster (P1 to P7; P8+ has no species pool and no roster); tiers and means read the base
   signature share (Systems' model), a story planet's boost is printed, not judged. A fixture breaks
   each bound. The trip ledger (`roster/systems/tripLedger.ts`, its spec beside it) prices units
   through the real #509 clamp and reads mean, CV and clamp cost exactly over the clamp's states,
