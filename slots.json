@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-10-17T14:05:02+01:00",
+  "updated_at": "2026-10-17T14:10:17+01:00",
   "caps": {
     "grok": 12,
     "claude": 10,
@@ -122,15 +122,15 @@
     }
   ],
   "gate": {
-    "busy": 1,
+    "busy": 0,
     "max": 3
   },
   "tester": {
     "state": "running",
     "phase": "fast",
     "sha": "4387332e89bdfbc43eae6f18bdb16c3d179501bb",
-    "since": "2026-10-17T08:47:06Z",
-    "holds_gate": true,
+    "since": "2026-10-17T13:10:14Z",
+    "holds_gate": false,
     "claude_slot": null,
     "last_run": "2026-10-17T08:47:00Z",
     "last_nightly": "2026-10-15T20:43:15Z",
