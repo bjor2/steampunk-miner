@@ -85,6 +85,16 @@ export function planetCensusOf(params: PlanetParams): PlanetCensus {
   return { maskedDigest: fnv1a64Hex(digests.join('') + JSON.stringify(maskedCountsOf(rows))), rows }
 }
 
+/** Every chunk of the planet with its whole cell words, kind slot included, and its density. */
+export function planetCellDigestOf(params: PlanetParams): string {
+  const { min, max } = chunkRangeOfDisc(params.radiusTiles)
+  const digests: string[] = []
+  for (let cy = min; cy <= max; cy++) {
+    for (let cx = min; cx <= max; cx++) digests.push(chunkDigest(generateChunk(params, cx, cy)))
+  }
+  return fnv1a64Hex(digests.join(''))
+}
+
 /** One planet patch: its band, centre, family and lead, and the kind it drew. */
 export interface PatchDraw {
   band: number

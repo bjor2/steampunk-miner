@@ -6,7 +6,7 @@ import {
 } from '../../../systems/world/planetParams'
 import { MAX_KIND_SLOT, NO_KIND_SLOT } from '../../../systems/world/worldCell'
 import { ORE_ROWS } from '../../ores'
-import { planetRosterOf, ROSTER_ORE_RULES, rosterKindOf } from './planetRoster'
+import { planetRosterOf, poolOfPlanet, ROSTER_ORE_RULES, rosterKindOf } from './planetRoster'
 
 // A planet's roster (TD ruling on ticket 446, section 2 and addendum 6226264758): the kind slots of
 // its rarity row set, in table order, only on a planet entered under ore rules 2 or later.
@@ -49,5 +49,18 @@ describe('planet roster', () => {
     expect(rosterKindOf(params, 12)?.slotId).toBe('legacy.r3')
     expect(rosterKindOf(params, NO_KIND_SLOT)).toBeNull()
     expect(rosterKindOf(params, 13)).toBeNull()
+  })
+
+  it('picks the species pool from the planet index alone, whatever the seed', () => {
+    const poolsOf = (seed: number) =>
+      [1, 2, 3, 4, 5, 6, 7].map((index) => poolOfPlanet(freshPlanetParamsFor(seed, index)))
+    expect(poolsOf(SEED)).toEqual(poolsOf(7))
+    expect(new Set(poolsOf(SEED).slice(2, 5)).size).toBe(3)
+  })
+
+  it('gives no pool past planet 7, so a slot there binds no species', () => {
+    expect([8, 9, 41, 200].map((index) => poolOfPlanet(freshPlanetParamsFor(SEED, index)))).toEqual(
+      [null, null, null, null],
+    )
   })
 })

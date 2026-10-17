@@ -8,6 +8,10 @@
  * `mixed` from P3; Systems' table order, not seed dependent). Only a planet entered under ore rules
  * 2 or later has a roster: a planet a save holds without them, or under rules 1, keeps the cells it
  * was generated with (HS condition c). Look only: horizontal, no price, gate or income reads it.
+ *
+ * The slots are shared, but each planet picks the species pool they resolve to (ticket 542, TD
+ * shape on #453, 6236465674): `kinds.pools` maps the planet index to a pool, never the seed, so a
+ * pool changes which species a slot shows and never a stored cell.
  */
 import { ORE_ROWS, rarityRowSetOfPlanet, type KindSlot } from '../../ores'
 import type { PlanetParams } from '../../../systems/world/planetParams'
@@ -28,6 +32,14 @@ export function planetRosterOf(params: PlanetParams): readonly KindSlot[] {
 export function rosterKindOf(params: PlanetParams, kindSlot: number): KindSlot | null {
   if (kindSlot === NO_KIND_SLOT) return null
   return planetRosterOf(params)[kindSlot - 1] ?? null
+}
+
+/**
+ * The species pool the planet's kind slots resolve to, from its index alone. Null past the pools
+ * table (P8+, #453): there a slot binds no species instead of borrowing another planet's pool.
+ */
+export function poolOfPlanet(params: PlanetParams): string | null {
+  return ORE_ROWS.kinds.poolByPlanet.get(params.planetIndex) ?? null
 }
 
 function hasRoster(params: PlanetParams): boolean {
