@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "updated_at": "2026-10-17T13:12:25Z",
+  "updated_at": "2026-10-17T13:12:52Z",
   "entries": {
     "steampunk-loop/1": {
       "loop": "steampunk-loop",
@@ -513,9 +513,9 @@
       "slot": null,
       "state": "working",
       "issue": null,
-      "note": "testing spec #257 (Grilling: What positive effect justifies the twin-bit head?) on 4387332",
+      "note": "testing spec #316 (Research: engine speed headroom for the drill law (16 m/s check, cells per tick, streaming)) on 0a05199",
       "stale_after_min": 420,
-      "updated_at": "2026-10-17T08:47:04Z",
+      "updated_at": "2026-10-17T13:12:52Z",
       "host": "grok-bot-vm-452660841"
     },
     "steampunk-loop/10": {
