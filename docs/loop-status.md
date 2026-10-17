@@ -625,3 +625,23 @@ so `quiet-bench.sh 514` could never see an idle box.
   remains, so a crashed bench cannot strand the queue.
 - After a restore the driver's next `tester_kick` starts a fresh tester when the queue is non-empty. Rollback: restore the two backups, delete `quiet-queue.sh`, `quiet-queue.sh restore`.
 - Stub-tested: `quiet_wait` with no hold, expired hold, garbage hold, live hold (waits until it expires); `quiet-queue.sh` hide / merge with new entries / auto with a live hold (no-op) / auto after the hold / repeated hide / restore without a parked file.
+
+## Spurious dispatch from a log line, fixed (17 Oct 2026, ~15:45 Oslo)
+
+At 15:24 BST `merge_release_sweep` lifted `on-hold` on #514 and logged `merge-after: #514 released (marker + #535 closed); on-hold lifted` with `say()`. The sweep runs inside
+`wave_prepare_pick`, which `pick_tickets` calls, and the refill reads `pick_tickets` through `tickets=$(pick_tickets ...)`. `say()` tees to stdout, so the log line became part of the
+"picked tickets" and was split on spaces into ids (`#[2026-10-17`, `15:24`, `#BST]`, `#released`, `#(marker`, `#+`, `#535`, `#closed);`, `merge-after:` and `#514`). The driver started ten workers on them. The
+nine with non-numeric ids failed at once (jq quoting errors, branches `ticket/BST]` and similar). The `#535` worker found nothing to do and was counted as a failed attempt, which
+added `needs-fix` and reopened the closed ticket. The `#514` worker was real work started under a malformed id (`ticket/#514`, attempt key `#514`).
+
+Fix (`.bak-20261017-1540-pickstdout`):
+
+- **`merge-hold-lib.sh`**: the sweep's log line goes to `logs/driver.log` only (no stdout) and says `ticket 514 released (marker + prerequisite 535 closed)`, with no `#word`.
+- **`next-ticket.sh`**: both `tickets=$(pick_tickets ...)` call sites (refill and dry-run) now pass the output through `grep -E '^[0-9]+$'`, so only pure numeric ids from the candidate list can start a
+  worker. `worker_main` also refuses a non-numeric `--slot` or `--ticket` before it sets any trap, claims or labels.
+- **Rule for new code**: a function that `pick_tickets` (or anything under `$(...)`) can call must not use `say()`. Write to `$LOGS/driver.log` directly.
+- **Cleanup**: #535 closed again (A6 is on main, `714633ce`) with `needs-fix` removed. The `#514` worker was stopped before verify; its 20 commits were kept (`ticket/514` now at `408c1d57`,
+  old tip `backup/514-pre-slot8-d340742c`, malformed-name branch `backup/514-slot8-bogus-id-408c1d57`). The seven bogus `ticket/*` branches and worktree checkouts were removed, their logs moved to `logs/bogus-20261017/`,
+  and the bogus `attempts` keys and the dead slot 8 entry removed from `state.json`.
+- **Wave 316-3A order (parallel 1)**: `#514`, `#524` (blocked by #514), `#537` (no `build`), `#540` (in progress), `#541` (`needs-planner`). The picker takes `#514` once the live `#540` worker ends; `#537` and `#541` are skipped without stalling the others.
+- Rollback: restore the two `.bak-20261017-1540-pickstdout` files.
