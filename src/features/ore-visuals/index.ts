@@ -41,5 +41,5 @@ export {
   oreStrengthOf,
   visualEchoOf,
 } from './systems/oreGradeChannels'
-export { oreBodyColourOf, oreGlowColourOf, oreHueOf } from './systems/render/oreColour'
+export { oreBodyColourOf, oreGlowColourOf, oreHueOf, rgbOfHsl } from './systems/render/oreColour'
 export { oreLookOfCell, oreLookOfType, oreVariantOf } from './systems/render/oreLookProvider'

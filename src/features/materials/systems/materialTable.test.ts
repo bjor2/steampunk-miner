@@ -222,6 +222,16 @@ describe('materials table', () => {
   })
 })
 
+describe('materials table look ids (ticket 450)', () => {
+  it('refuses a silhouette or pattern the terrain shader cannot draw', () => {
+    const unknown = { ...GILDED, silhouette: 'tentacles', pattern: 'plaid' }
+    expect(problemsOf([unknown])).toEqual([
+      'gilded-brassvein names the silhouette tentacles the shader cannot draw',
+      'gilded-brassvein names the pattern plaid the shader cannot draw',
+    ])
+  })
+})
+
 describe('host rock luma', () => {
   it('measures the brightest band of any palette, planet 1 band 1 at about 0.43 (#151)', () => {
     expect(brightestHostRockLuma()).toBeGreaterThan(0.43)
