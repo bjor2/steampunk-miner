@@ -63,6 +63,18 @@ const RULES_ONE_PLANET_5_PIN: ColumnPin = {
   value: '2.0218044481e+7',
 }
 
+/**
+ * Ticket 448: a generator 10 save holding planet 5 under ore rules 2, the roster on the step bands,
+ * pinned on main at 87d22ac5 (generator 10) over the same column. It is the rules 1 pin: the P3+
+ * kind table is empty, so the roster draws no kind on planet 5 yet.
+ */
+const RULES_TWO_PLANET_5_PIN: ColumnPin = {
+  chunks: '368e288725734121',
+  ores: '725c63742d4dd98b',
+  oreCells: 5678,
+  value: '2.0218044481e+7',
+}
+
 const FIXTURES = [
   ['pre-175 planet 1', PLANET_1_SAVE],
   ['pre-181 planet 5', PLANET_5_SAVE],
@@ -81,9 +93,15 @@ function rulesOnePlanet5(): AuthorityState {
   return { ...state, planet: { ...state.planet, oreRulesVersion: 1 } }
 }
 
-/** That state saved as generator 9 wrote it. */
-function generator9SaveOf(state: AuthorityState): unknown {
-  return { ...saveSlotOf(takeSnapshot(state), 1), generatorVersion: 9 }
+/** The pre-181 planet 5 state as if entered under ore rules 2, the roster without the curve. */
+function rulesTwoPlanet5(): AuthorityState {
+  const state = loaded(PLANET_5_SAVE)
+  return { ...state, planet: { ...state.planet, oreRulesVersion: 2 } }
+}
+
+/** That state saved as generator `generatorVersion` wrote it. */
+function generatorSaveOf(state: AuthorityState, generatorVersion: number): unknown {
+  return { ...saveSlotOf(takeSnapshot(state), 1), generatorVersion }
 }
 
 /** The column through the planet's centre as main pinned it. */
@@ -130,20 +148,35 @@ describe('saves written before the ore rules', () => {
     expect(reading.migrations.filter((step) => 'version' in step)).toEqual([
       { version: 'generatorVersion', from: 8, to: 9 },
       { version: 'generatorVersion', from: 9, to: 10 },
+      { version: 'generatorVersion', from: 10, to: 11 },
     ])
     expect('state' in reading && stateDigest(reading.state)).toBe(stateDigest(loaded(file)))
   })
 
   it('load a generator 9 save of a planet under ore rules 1 on those rules, drawing no kind (ticket 446)', () => {
-    const reading = readMigratedSaveSlot(generator9SaveOf(rulesOnePlanet5()))
+    const reading = readMigratedSaveSlot(generatorSaveOf(rulesOnePlanet5(), 9))
     if (!('state' in reading)) throw new Error(reading.problems.join('; '))
     expect(reading.migrations.filter((step) => 'version' in step)).toEqual([
       { version: 'generatorVersion', from: 9, to: 10 },
+      { version: 'generatorVersion', from: 10, to: 11 },
     ])
     expect(reading.state.planet.oreRulesVersion).toBe(1)
     expect(stateDigest(reading.state)).toBe(stateDigest(rulesOnePlanet5()))
     expect(columnPinOf(planetParamsOf(reading.state.planet) as PlanetParams)).toEqual(
       RULES_ONE_PLANET_5_PIN,
+    )
+  })
+
+  it('load a generator 10 save of a planet under ore rules 2 on the step bands (ticket 448)', () => {
+    const reading = readMigratedSaveSlot(generatorSaveOf(rulesTwoPlanet5(), 10))
+    if (!('state' in reading)) throw new Error(reading.problems.join('; '))
+    expect(reading.migrations.filter((step) => 'version' in step)).toEqual([
+      { version: 'generatorVersion', from: 10, to: 11 },
+    ])
+    expect(reading.state.planet.oreRulesVersion).toBe(2)
+    expect(stateDigest(reading.state)).toBe(stateDigest(rulesTwoPlanet5()))
+    expect(columnPinOf(planetParamsOf(reading.state.planet) as PlanetParams)).toEqual(
+      RULES_TWO_PLANET_5_PIN,
     )
   })
 })

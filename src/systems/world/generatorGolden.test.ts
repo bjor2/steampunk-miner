@@ -3,7 +3,10 @@ import { fnv1a64Hex } from '../authority/stateDigest'
 import { GENERATOR_VERSION } from '../generatorVersion'
 import { chunkDigest } from './chunkDigest'
 import { generateChunk } from './generateChunk'
-import { ORE_RULES_VERSION, planetParamsFor, type PlanetParams } from './planetParams'
+import { DEPTH_CURVE_ORE_RULES, planetParamsFor, type PlanetParams } from './planetParams'
+
+/** The ore rules of the roster (ticket 446), the last before the depth density curve. */
+const ROSTER_ORE_RULES = 2
 import { chunkRangeOfDisc } from './tileGrid'
 
 /**
@@ -15,13 +18,15 @@ import { chunkRangeOfDisc } from './tileGrid'
  * a planet entered under the ore rules under 9, ticket 445, which leaves every unstamped planet as it
  * was and is pinned by the stamped digests, and the material kind slot of a planet entered under ore
  * rules 2 under 10, ticket 446, pinned by the stamped planets 1 and 2 and leaving the rest as they
- * were while the P3+ kind table is empty, with the features loaded as the game loads them): a committed
+ * were while the P3+ kind table is empty, and the depth density curve of a planet from 3 entered under
+ * ore rules 3 under 11, ticket 448, pinned by the curve digests and leaving every rules 2 digest as
+ * it was, with the features loaded as the game loads them): a committed
  * digest of the generator's cells and density. If this fails, the
  * generator changed what a seed makes: bump GENERATOR_VERSION (saves and replays of the old
  * world are then refused) and update the version and digests below in the same commit.
  */
 const GOLDEN = {
-  generatorVersion: 10,
+  generatorVersion: 11,
   wholePlanet1: '4219af3346401cb7',
   wholePlanet2: 'ff1572afae8b0e0f',
   farPlanetChunks: 'c602124184c77617',
@@ -32,6 +37,10 @@ const GOLDEN = {
   stampedHeatPlanetChunks: '352c6c236ec45985',
   stampedPlanet10Chunks: '2925a97b54878073',
   stampedPlanet60Chunks: '8477f02580a64afd',
+  curveWholePlanet3: 'e372b1b1861ce30f',
+  curveHeatPlanetChunks: 'c7bc93daae708f37',
+  curvePlanet10Chunks: '4f76a8c7f7cf0c68',
+  curvePlanet60Chunks: 'aec86f680144e408',
 }
 
 /** One digest over every chunk's digest in a fixed order. */
@@ -96,22 +105,36 @@ describe('generator golden digest', () => {
     )
   })
 
-  it('makes the committed planets 1 and 2 entered under ore rules 2, the roster (ticket 446)', () => {
-    const planet1 = planetParamsFor(83921, 1, ORE_RULES_VERSION)
-    const planet2 = planetParamsFor(4_000_000_000, 2, ORE_RULES_VERSION)
+  it('makes the committed planets 1 and 2 entered under ore rules 2 or 3, the roster (ticket 446)', () => {
+    const planet1 = planetParamsFor(83921, 1, ROSTER_ORE_RULES)
+    const planet2 = planetParamsFor(4_000_000_000, 2, ROSTER_ORE_RULES)
+    const curve1 = planetParamsFor(83921, 1, DEPTH_CURVE_ORE_RULES)
+    expect(digestOfChunks(curve1, everyChunkOf(curve1))).toBe(GOLDEN.stampedWholePlanet1)
     expect(digestOfChunks(planet1, everyChunkOf(planet1))).toBe(GOLDEN.stampedWholePlanet1)
     expect(digestOfChunks(planet2, everyChunkOf(planet2))).toBe(GOLDEN.stampedWholePlanet2)
   })
 
-  it('makes the committed planet 3 entered under the ore rules for world seed 83921 (ticket 445)', () => {
-    const params = planetParamsFor(83921, 3, ORE_RULES_VERSION)
+  it('makes the committed planet 3 entered under ore rules 2 for world seed 83921 (ticket 445)', () => {
+    const params = planetParamsFor(83921, 3, ROSTER_ORE_RULES)
     expect(digestOfChunks(params, everyChunkOf(params))).toBe(GOLDEN.stampedWholePlanet3)
   })
 
-  it('makes the committed chunks of planets 8, 10 and 60 entered under the ore rules', () => {
-    const stamped = (planet: number) => planetParamsFor(83921, planet, ORE_RULES_VERSION)
+  it('makes the committed chunks of planets 8, 10 and 60 entered under ore rules 2', () => {
+    const stamped = (planet: number) => planetParamsFor(83921, planet, ROSTER_ORE_RULES)
     expect(digestOfChunks(stamped(8), HEAT_PLANET_CHUNKS)).toBe(GOLDEN.stampedHeatPlanetChunks)
     expect(digestOfChunks(stamped(10), HEAT_PLANET_CHUNKS)).toBe(GOLDEN.stampedPlanet10Chunks)
     expect(digestOfChunks(stamped(60), HEAT_PLANET_CHUNKS)).toBe(GOLDEN.stampedPlanet60Chunks)
+  })
+
+  it('makes the committed planet 3 under the depth density curve, ore rules 3 (ticket 448)', () => {
+    const params = planetParamsFor(83921, 3, DEPTH_CURVE_ORE_RULES)
+    expect(digestOfChunks(params, everyChunkOf(params))).toBe(GOLDEN.curveWholePlanet3)
+  })
+
+  it('makes the committed chunks of planets 8, 10 and 60 under the depth density curve', () => {
+    const curve = (planet: number) => planetParamsFor(83921, planet, DEPTH_CURVE_ORE_RULES)
+    expect(digestOfChunks(curve(8), HEAT_PLANET_CHUNKS)).toBe(GOLDEN.curveHeatPlanetChunks)
+    expect(digestOfChunks(curve(10), HEAT_PLANET_CHUNKS)).toBe(GOLDEN.curvePlanet10Chunks)
+    expect(digestOfChunks(curve(60), HEAT_PLANET_CHUNKS)).toBe(GOLDEN.curvePlanet60Chunks)
   })
 })

@@ -42,6 +42,11 @@
  * rules 1, so that planet draws no kind and every cell no one has dug reads as it did; every edit
  * and the whole state are kept, and the next planet the player enters is stamped with rules 2.
  *
+ * Generator 10 -> 11 (ticket 448): a planet entered under ore rules 3 from planet 3 thins its ore
+ * patches to the depth density curve. A save written before them holds its planet under rules 2 or
+ * earlier, so that planet keeps the step bands and every cell no one has dug reads as it did; every
+ * edit and the whole state are kept, and the next planet from planet 3 is stamped with rules 3.
+ *
  * Format 1 -> 2 (#401): the slot layout. A v1 file was the checkpoint of the single slot, so it
  * becomes the autosave with no wall time, and its header gains the ids of the rows its state opens
  * (`savedUnlocks.ts`). Its sections are kept byte for byte: money, levels and everything else.
@@ -137,6 +142,7 @@ const SAVE_MIGRATION_STEPS: readonly SaveMigrationStep[] = [
   { version: 'generatorVersion', from: 7, to: 8, migrate: keepEditsUnderOreMix },
   { version: 'generatorVersion', from: 8, to: 9, migrate: keepLegacyOreRows },
   { version: 'generatorVersion', from: 9, to: 10, migrate: keepCellsWithoutRoster },
+  { version: 'generatorVersion', from: 10, to: 11, migrate: keepStepBandDensity },
   { version: 'formatVersion', from: 1, to: 2, migrate: addSlotHeader },
   { version: 'formatVersion', from: 2, to: 3, migrate: packChunkTable },
 ]
@@ -263,6 +269,10 @@ function keepLegacyOreRows(file: MigratingFile): MigratingFile | null {
 /** Generator 9 -> 10: as 8 -> 9, the saved planet keeps its stamp and so draws no material kind. */
 function keepCellsWithoutRoster(file: MigratingFile): MigratingFile | null {
   return keptUnderGenerator(file, 10)
+}
+
+function keepStepBandDensity(file: MigratingFile): MigratingFile | null {
+  return keptUnderGenerator(file, 11)
 }
 
 function keptUnderGenerator(file: MigratingFile, generatorVersion: number): MigratingFile | null {

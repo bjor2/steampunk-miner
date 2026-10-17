@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest'
+import { ECONOMY } from '../economy/economy'
 import { oreTier } from '../economy/oreEconomy'
 import { ARCHETYPE_IDS } from '../registeredIds'
 import { dockSiteOf } from './dockSite'
@@ -6,12 +7,19 @@ import { coreTileCount } from './planetGeometry'
 import { fnv1a64Hex } from '../authority/stateDigest'
 import {
   coreRadiusFor,
+  DEPTH_CURVE_ORE_RULES,
   freshPlanetParamsFor,
+  isDepthCurvePlanet,
   ORE_RULES_FROM_PLANET,
   ORE_RULES_VERSION,
   planetParamsFor,
   radiusForPlanet,
 } from './planetParams'
+import {
+  DEPTH_CURVE_PATCH_SEED_CHANCE_BP,
+  ORE_DENSITY_BP,
+  PATCH_SEED_CHANCE_BP,
+} from './planetTable'
 
 /** Taken on main at b2e77198, before the ore rules existed. */
 const LEGACY_PARAMS_DIGEST = '52478ece7bf1087f'
@@ -136,17 +144,18 @@ describe('planet params ore rules (ticket 445)', () => {
     )
   })
 
-  it('differs from the legacy params only by the stamp, appended last', () => {
+  it('differs from the legacy params only by the stamp, appended last, under rules 2', () => {
     const legacy = planetParamsFor(83921, 7)
-    const stamped = planetParamsFor(83921, 7, ORE_RULES_VERSION)
-    expect(stamped).toEqual({ ...legacy, oreRulesVersion: ORE_RULES_VERSION })
+    const stamped = planetParamsFor(83921, 7, 2)
+    expect(stamped).toEqual({ ...legacy, oreRulesVersion: 2 })
     expect(Object.keys(stamped).at(-1)).toBe('oreRulesVersion')
   })
 
-  it('stamps every fresh planet from planet 1 with ore rules 2, the roster (ticket 446)', () => {
+  it('stamps fresh planets 1 and 2 with ore rules 2 and planet 3 on with rules 3 (tickets 446, 448)', () => {
     const stamps = [1, 2, 3, 4, 60].map((index) => freshPlanetParamsFor(1, index).oreRulesVersion)
     expect(ORE_RULES_FROM_PLANET).toBe(1)
-    expect(stamps).toEqual([2, 2, 2, 2, 2])
+    expect(ORE_RULES_VERSION).toBe(3)
+    expect(stamps).toEqual([2, 2, 3, 3, 3])
   })
 
   it('still reads a planet stamped with ore rules 1 (ticket 445)', () => {
@@ -156,5 +165,29 @@ describe('planet params ore rules (ticket 445)', () => {
   it('refuses ore rules this build does not know', () => {
     expect(() => planetParamsFor(1, 3, ORE_RULES_VERSION + 1)).toThrow(RangeError)
     expect(() => planetParamsFor(1, 3, 0)).toThrow(RangeError)
+  })
+})
+
+describe('planet params under the depth density curve (ticket 448)', () => {
+  it("gives a planet from 3 under ore rules 3 the curve's band means on the step-band lattice", () => {
+    const params = planetParamsFor(83921, 3, DEPTH_CURVE_ORE_RULES)
+    expect(params.oreDensityBp).toEqual(ECONOMY.planets.depthDensity.bandMeanBp)
+    expect(params.patchSeedChanceBp).toEqual(DEPTH_CURVE_PATCH_SEED_CHANCE_BP)
+    expect(params.patchLatticeDensityBp).toEqual(ORE_DENSITY_BP)
+    expect(isDepthCurvePlanet(60, ORE_RULES_VERSION)).toBe(true)
+  })
+
+  it('keeps the step bands on planets 1 and 2 and on a planet a save holds under rules 2', () => {
+    const stepBands = [
+      planetParamsFor(83921, 1, ORE_RULES_VERSION),
+      planetParamsFor(83921, 2, ORE_RULES_VERSION),
+      planetParamsFor(83921, 3, 2),
+      planetParamsFor(83921, 3),
+    ]
+    for (const params of stepBands) {
+      expect(params.oreDensityBp).toEqual(ORE_DENSITY_BP)
+      expect(params.patchSeedChanceBp).toEqual(PATCH_SEED_CHANCE_BP)
+      expect('patchLatticeDensityBp' in params).toBe(false)
+    }
   })
 })

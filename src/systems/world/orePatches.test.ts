@@ -6,7 +6,7 @@ import { withFreshRegistrySet } from '../registries/seal'
 import { generateChunk } from './generateChunk'
 import { bandPatchesInBox } from './orePatches'
 import { bandOfTile } from './planetGeometry'
-import { planetParamsFor, type PlanetParams } from './planetParams'
+import { DEPTH_CURVE_ORE_RULES, planetParamsFor, type PlanetParams } from './planetParams'
 import { CHUNK_SIZE, cellIndexOfTile, chunkOfTile, chunkRangeOfDisc } from './tileGrid'
 import { CELL_KIND, kindOfCell, tierOffsetOfCell } from './worldCell'
 
@@ -148,6 +148,25 @@ describe('ore patches (#42)', () => {
         patch.tiles.length,
       ])
     }
+  })
+})
+
+/** Band-1 patches whose centre lies above and below the band's middle depth, 4% of the radius. */
+function bandOnePatchesByHalf(params: PlanetParams): { shallow: number; deep: number } {
+  const r = params.radiusTiles
+  const centreDepths = bandPatchesInBox(params, 1, { x0: -r, y0: -r, x1: r, y1: r }).map(
+    ({ centre }) => 1 - Math.sqrt(centre.tx * centre.tx + centre.ty * centre.ty) / r,
+  )
+  const shallow = centreDepths.filter((depth) => depth < 0.04).length
+  return { shallow, deep: centreDepths.length - shallow }
+}
+
+describe('ore patches under the depth density curve (ticket 448)', () => {
+  it('fires band-1 patches far more often in the deeper half of the band than near the surface', () => {
+    const curve = bandOnePatchesByHalf(planetParamsFor(83921, 3, DEPTH_CURVE_ORE_RULES))
+    const stepBands = bandOnePatchesByHalf(planetParamsFor(83921, 3, 2))
+    expect(curve.deep).toBeGreaterThan(1.3 * curve.shallow)
+    expect(stepBands.deep).toBeLessThan(1.1 * stepBands.shallow)
   })
 })
 

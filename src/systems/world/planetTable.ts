@@ -63,6 +63,15 @@ export const PATCH_MEAN_CELLS: readonly number[] = [12, 16, 20, 24, 28]
  */
 export const PATCH_SEED_CHANCE_BP: readonly number[] = [8420, 8870, 8980, 8220, 8800]
 
+/**
+ * The same chance on a planet under the depth density curve (ticket 448, from planet 3): the patch
+ * lattice stays the one `ORE_DENSITY_BP` lays, and each patch fires with this chance times
+ * `rho(d_centre) / ORE_DENSITY_BP[b]`, at most always. Re-solved once so the painted ore fraction
+ * of each band matches the curve's band means (Systems' table) on radii 150 to 1000. Locked by the
+ * golden digest and the painted-fraction lane (`depthDensityPaint.lane.test.ts`).
+ */
+export const DEPTH_CURVE_PATCH_SEED_CHANCE_BP: readonly number[] = [8460, 8870, 9160, 8475, 9630]
+
 /** The cone under the dock is this wide at mid-band-1 depth (#42 dock guarantee; cheap to retune). */
 export const DOCK_CONE_WIDTH_AT_MID_TILES = 16
 

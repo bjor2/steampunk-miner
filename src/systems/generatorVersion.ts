@@ -13,6 +13,8 @@
  * 445), while a planet a save holds without the rules and planets 1 and 2 keep the lead rows;
  * version 10 draws a material kind per ore patch on every planet entered under ore rules 2, from
  * planet 1 (ticket 446), written to the cell's kind slot alone, while a planet a save holds keeps its
- * cells.
+ * cells; version 11 thins each ore patch to the depth density curve on a planet entered under ore
+ * rules 3 from planet 3 (ticket 448), while planets 1 and 2 and every planet a save holds keep the
+ * step bands.
  */
-export const GENERATOR_VERSION = 10
+export const GENERATOR_VERSION = 11

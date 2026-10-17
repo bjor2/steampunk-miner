@@ -16,12 +16,18 @@
  *   A centre that is not plain ground of its band fires no patch.
  * - The family comes from the patch's hash and the planet's family weights; the tier offset is
  *   `b - 1` (#6 `t = 3(p-1) + b`).
+ * - Under the depth density curve (ticket 448, `patchLatticeDensityBp` in the params) the lattice
+ *   is the one the step-band rows lay, and a node fires with `chance_b * rho(d_centre) / DENS_b`,
+ *   at most always (Systems on #139, comment 6202970624 section 3): the same fire hash, compared
+ *   against the chance at the jittered centre's depth, so a deep patch fires more often than a
+ *   shallow one of its band.
  *
  * Patches are a pure function of the params and the node, and are painted in one fixed order
  * (band, then row, then column), so every chunk sees the same overlaps whatever order it is made in.
  */
 import { hashCell } from '../cellRandom'
 import { baseCellOfTile } from './baseTerrain'
+import { depthDensityBpOfTile } from './depthDensity'
 import { SEED_PURPOSE, subSeedFor } from './generatorSeeds'
 import type { PlanetParams } from './planetParams'
 import { BAND_COUNT, bandOfTile } from './planetGeometry'
@@ -44,6 +50,8 @@ interface BandLattice {
   reach: number
   mean: number
   chanceBp: number
+  /** The band's step-band density the lattice is laid on, which the curve thins against. */
+  latticeDensityBp: number
   seed: number
 }
 
@@ -98,10 +106,12 @@ function growthRadiusOf(meanCells: number): number {
 
 function bandLatticesOf(params: PlanetParams): BandLattice[] {
   const patchSeed = subSeedFor(params, SEED_PURPOSE.orePatch)
+  const latticeDensities = params.patchLatticeDensityBp ?? params.oreDensityBp
   const lattices: BandLattice[] = []
   for (let band = 1; band <= BAND_COUNT; band++) {
     const mean = params.patchMeanCells[band - 1]
-    const spacing = latticeSpacingOf(mean, params.oreDensityBp[band - 1])
+    const latticeDensityBp = latticeDensities[band - 1]
+    const spacing = latticeSpacingOf(mean, latticeDensityBp)
     const jitter = Math.floor(spacing / 3)
     lattices.push({
       band,
@@ -110,6 +120,7 @@ function bandLatticesOf(params: PlanetParams): BandLattice[] {
       reach: jitter + growthRadiusOf(mean),
       mean,
       chanceBp: params.patchSeedChanceBp[band - 1],
+      latticeDensityBp,
       seed: hashCell(patchSeed, band, 0),
     })
   }
@@ -170,13 +181,21 @@ function patchOfNode(
   i: number,
   j: number,
 ): OrePatch | null {
-  if (streamHash(lattice, STREAM.fire, i, j) % BASIS_POINTS >= lattice.chanceBp) return null
   const centre = {
     tx: i * lattice.spacing + jitterOf(lattice, STREAM.jitterX, i, j),
     ty: j * lattice.spacing + jitterOf(lattice, STREAM.jitterY, i, j),
   }
+  const fireRoll = streamHash(lattice, STREAM.fire, i, j) % BASIS_POINTS
+  if (fireRoll >= fireChanceBpAt(params, lattice, centre)) return null
   if (!isPatchGround(params, lattice.band, centre)) return null
   return patchOf(params, lattice, centre, i, j)
+}
+
+/** The band's chance, thinned to the depth curve at the centre where the planet follows it. */
+function fireChanceBpAt(params: PlanetParams, lattice: BandLattice, centre: TilePoint): number {
+  if (params.patchLatticeDensityBp === undefined) return lattice.chanceBp
+  const scaled = lattice.chanceBp * depthDensityBpOfTile(params, centre)
+  return Math.min(BASIS_POINTS, Math.floor(scaled / lattice.latticeDensityBp))
 }
 
 function patchOf(

@@ -30,10 +30,10 @@ function onPlanet(state: AuthorityState, planetIndex: number): AuthorityState {
 }
 
 describe('ore rules stamp', () => {
-  it('stamps a session that starts on any planet, planet 1 included (ticket 446)', () => {
+  it('stamps a session on any planet: rules 2 on planets 1 and 2, the curve, rules 3, from 3', () => {
     const planets = [1, 2, 3, 10].map((index) => sessionOn(index).planet)
-    expect(planets.map((planet) => planet.oreRulesVersion)).toEqual([2, 2, 2, 2])
-    expect(ORE_RULES_VERSION).toBe(2)
+    expect(planets.map((planet) => planet.oreRulesVersion)).toEqual([2, 2, 3, 3])
+    expect(ORE_RULES_VERSION).toBe(3)
   })
 
   it('keeps a planet a save holds without the stamp on the legacy rows', () => {
@@ -42,14 +42,23 @@ describe('ore rules stamp', () => {
     expect(planetParamsOf(state.planet)).toEqual(planetParamsFor(WORLD_SEED, 5))
   })
 
-  it('stamps the next planet when a legacy one is left, planet 2 included', () => {
+  it('stamps the next planet when a legacy one is left, planet 2 with the rules that change it', () => {
     const next = onPlanet(legacyPlanet5(), 6)
     expect(next.planet).toEqual({ index: 6, seed: WORLD_SEED, oreRulesVersion: ORE_RULES_VERSION })
-    expect(onPlanet(next, 2).planet).toEqual({
-      index: 2,
-      seed: WORLD_SEED,
-      oreRulesVersion: ORE_RULES_VERSION,
-    })
+    expect(onPlanet(next, 2).planet).toEqual({ index: 2, seed: WORLD_SEED, oreRulesVersion: 2 })
+  })
+
+  it('keeps a planet a save holds under ore rules 2 on the step bands (ticket 448)', () => {
+    const atRulesTwo = {
+      ...sessionOn(5),
+      planet: { index: 5, seed: WORLD_SEED, oreRulesVersion: 2 },
+    }
+    const fromSave = readSaveSlot(
+      JSON.parse(JSON.stringify(saveSlotOf(takeSnapshot(atRulesTwo), 1))),
+    )
+    expect('state' in fromSave && fromSave.state.planet.oreRulesVersion).toBe(2)
+    expect(planetParamsOf(atRulesTwo.planet)?.patchLatticeDensityBp).toBeUndefined()
+    expect(onPlanet(atRulesTwo, 6).planet.oreRulesVersion).toBe(ORE_RULES_VERSION)
   })
 
   it('keeps a planet a save holds under ore rules 1 on them, and stamps the next with this build', () => {

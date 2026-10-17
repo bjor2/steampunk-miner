@@ -10,8 +10,14 @@
  * stamped. Only planets whose rows differ are stamped (`ORE_RULES_FROM_PLANET`), and the key is
  * omitted when absent, so the params JSON of every legacy planet stays byte-identical. A planet
  * keeps the version it was stamped with: version 1 never gains what version 2 added.
+ *
+ * From ore rules 3 and planet 3 (ticket 448) a planet's ore follows the depth density curve: its
+ * `oreDensityBp` are the curve's band means, its patch lattice stays the one the step-band rows
+ * lay (`patchLatticeDensityBp`, present only there) and each patch is thinned to the curve at its
+ * centre (`orePatches.ts`).
  */
 import { hashCell } from '../cellRandom'
+import { ECONOMY } from '../economy/economy'
 import { isHeatPlanet } from '../economy/heatEconomy'
 import { refineryUnlockPlanet } from '../economy/refineryEconomy'
 import { BAY_IDS, SLICE_BAY_IDS, type BayId } from './dockBays'
@@ -23,6 +29,7 @@ import {
   CORE_RADIUS_MAX_TILES,
   CORE_RADIUS_MIN_TILES,
   DOCK_CLEARANCE_TILES,
+  DEPTH_CURVE_PATCH_SEED_CHANCE_BP,
   DOCK_COUNTER_BUILDING_PLANETS,
   HEAT_PLANET_ARCHETYPE,
   ORE_DENSITY_BP,
@@ -75,21 +82,32 @@ export interface PlanetParams {
   artefactCacheBand: number
   /** The ore rules the planet was entered under; absent means the legacy rows (ticket 445). */
   oreRulesVersion?: number
+  /**
+   * Under the depth density curve only (ticket 448): the step-band rows the patch lattice is laid
+   * on, each patch then thinned by `rho(d_centre)` over its band's entry. Absent elsewhere, where
+   * the lattice is laid on `oreDensityBp` and every patch fires at `patchSeedChanceBp`.
+   */
+  patchLatticeDensityBp?: readonly number[]
 }
 
 /**
- * The ore rules a planet entered from this build carries: 1 is the rarity rows (ticket 445), 2 adds
- * the material roster, a kind slot per ore patch (ticket 446).
+ * The newest ore rules: 1 is the rarity rows (ticket 445), 2 adds the material roster, a kind slot
+ * per ore patch (ticket 446), 3 the depth density curve from planet 3 (ticket 448).
  */
-export const ORE_RULES_VERSION = 2
+export const ORE_RULES_VERSION = 3
+
+/** The ore rules that add the depth density curve (ticket 448). */
+export const DEPTH_CURVE_ORE_RULES = 3
 
 /**
- * The first planet whose generation differs under `ORE_RULES_VERSION`: planet 1, since the roster
- * draws kinds on P1 and P2 too (TD ruling on ticket 446, section 4). The rarity rows still differ
- * only from P3 (the `ores` slice's `mixedRowsFromPlanet`), so on P1 and P2 the stamp changes the kind
- * slot alone.
+ * The first planet each ore rules version changes, version 1 first: the rarity rows from P3 (the
+ * `ores` slice's `mixedRowsFromPlanet`), the roster from P1 (TD ruling on ticket 446, section 4),
+ * the depth curve from its `fromPlanet` (GD on ticket 448: P1 and P2 keep the step bands).
  */
-export const ORE_RULES_FROM_PLANET = 1
+const ORE_RULES_FIRST_PLANETS: readonly number[] = [3, 1, ECONOMY.planets.depthDensity.fromPlanet]
+
+/** The first planet any ore rules change, so the first a fresh session stamps: planet 1. */
+export const ORE_RULES_FROM_PLANET = Math.min(...ORE_RULES_FIRST_PLANETS)
 
 const KNOWN_ORE_RULES_VERSIONS: readonly unknown[] = Array.from(
   { length: ORE_RULES_VERSION },
@@ -114,9 +132,9 @@ export function planetParamsFor(
     radiusTiles,
     coreRadiusTiles: coreRadiusFor(radiusTiles),
     bandStartsHalfTileSq: bandStartsFor(radiusTiles),
-    oreDensityBp: ORE_DENSITY_BP,
+    oreDensityBp: oreDensityBpOf(planetIndex, oreRulesVersion),
     patchMeanCells: PATCH_MEAN_CELLS,
-    patchSeedChanceBp: PATCH_SEED_CHANCE_BP,
+    patchSeedChanceBp: patchSeedChanceBpOf(planetIndex, oreRulesVersion),
     caveThresholdBp: CAVE_THRESHOLD_BP,
     padFirstColumn: PAD_FIRST_COLUMN,
     padLastColumn: padLastColumnOf(planetIndex),
@@ -126,12 +144,40 @@ export function planetParamsFor(
     hasStarterVein: planetIndex === FIRST_PLANET,
     artefactCacheBand: artefactCacheBandOf(planetIndex),
     ...(oreRulesVersion === undefined ? {} : { oreRulesVersion }),
+    ...(isDepthCurvePlanet(planetIndex, oreRulesVersion)
+      ? { patchLatticeDensityBp: ORE_DENSITY_BP }
+      : {}),
   }
 }
 
-/** The ore rules a planet entered now is stamped with: none before `ORE_RULES_FROM_PLANET`. */
+/**
+ * The ore rules a planet entered now is stamped with: the newest version that changes it, none
+ * before `ORE_RULES_FROM_PLANET`. Planets 1 and 2 stay on rules 2, which the curve leaves as they
+ * were, so their sessions and digests do not move with ticket 448.
+ */
 export function oreRulesVersionOnEntry(planetIndex: number): number | undefined {
-  return planetIndex >= ORE_RULES_FROM_PLANET ? ORE_RULES_VERSION : undefined
+  const changing = ORE_RULES_FIRST_PLANETS.map((first, at) => (planetIndex >= first ? at + 1 : 0))
+  const newest = Math.max(...changing)
+  return newest === 0 ? undefined : newest
+}
+
+/** Whether a planet's ore follows the depth density curve: rules 3 or later, from its first planet. */
+export function isDepthCurvePlanet(
+  planetIndex: number,
+  oreRulesVersion: number | undefined,
+): boolean {
+  const isUnderCurveRules = (oreRulesVersion ?? 0) >= DEPTH_CURVE_ORE_RULES
+  return isUnderCurveRules && planetIndex >= ECONOMY.planets.depthDensity.fromPlanet
+}
+
+function oreDensityBpOf(planetIndex: number, oreRulesVersion: number | undefined) {
+  const isCurve = isDepthCurvePlanet(planetIndex, oreRulesVersion)
+  return isCurve ? ECONOMY.planets.depthDensity.bandMeanBp : ORE_DENSITY_BP
+}
+
+function patchSeedChanceBpOf(planetIndex: number, oreRulesVersion: number | undefined) {
+  const isCurve = isDepthCurvePlanet(planetIndex, oreRulesVersion)
+  return isCurve ? DEPTH_CURVE_PATCH_SEED_CHANCE_BP : PATCH_SEED_CHANCE_BP
 }
 
 /**
@@ -193,7 +239,7 @@ export function planetSeedFor(worldSeed: number, planetIndex: number): number {
  * A band starting at `percent` of the depth has radius `R * (100 - percent) / 100`; as a squared
  * half-tile radius that is `(2R(100 - percent))^2 / 10000`, floored exactly in integers.
  */
-function bandStartsFor(radiusTiles: number): number[] {
+export function bandStartsFor(radiusTiles: number): number[] {
   return BAND_START_DEPTH_PERCENT.map((percent) => {
     const scaled = 2 * radiusTiles * (100 - percent)
     const squared = scaled * scaled

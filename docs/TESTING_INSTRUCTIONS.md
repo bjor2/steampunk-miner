@@ -241,6 +241,16 @@ programs }` from three's `renderer.info` of the game canvas), read only when cal
   the 99.9th percentile and the worst epic and mythic trip from seeded trips. The same spec fails
   while `docs/economy/rarity-shares.json`, the status page's table, is stale: rerun
   `npm run rarity:shares`. About 15 seconds.
+- **Depth density curve** (ticket 448, Systems on #139, comments 6202970624 section 7.4 and
+  6203133480 section 2): `src/systems/economy/depthDensityCurve.test.ts` holds the shipped 257-entry
+  table to the formula, the band means within 1% of Systems' table (band 5 at 2200 bp), the
+  column's value-weighted ore within 0.5% of today's step bands and the top 2% of depth at 6% ore
+  or less. `src/systems/world/orePatches.test.ts` checks a planet under the curve fires its deep
+  band-1 patches more often than its shallow ones, and `generatorGolden.test.ts` pins the curve's
+  P3, P8, P10 and P60 beside the unchanged rules-2 digests. The lane
+  `src/systems/world/depthDensityPaint.lane.test.ts` generates pooled seed sets at radius 150, 300
+  and 1000 and on planet 200 and fails a band whose painted fraction is more than 2% off the
+  curve's band mean (about 3 to 5 minutes).
 - **Pacing bot** (`src/systems/bot/`, #29): plays `scenarios/bot-slice.scenario.json` through
   authority commands with the #6 movement-time model, buying casing grades on-curve (grade `b`
   before it mines band `b`, grade 5 before the core, S11). Its scripted mining (`drillTile`) lays
