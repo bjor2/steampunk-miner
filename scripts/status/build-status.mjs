@@ -40,6 +40,7 @@ import {
 import { labelAppliedAt } from './issueClaims.mjs'
 import { buildPerfOverview } from './perfOverview.mjs'
 import { renderPerfOverview, renderPerfOverviewFailure } from './perfOverviewHtml.mjs'
+import { renderRarityShares, renderRaritySharesFailure } from './rarityShareHtml.mjs'
 import { SHOWN_CATEGORIES, buildTicketTimeOverview } from './ticketTimeOverview.mjs'
 import {
   renderTicketTimeFailure,
@@ -53,6 +54,9 @@ const HERE = dirname(fileURLToPath(import.meta.url))
 // The Pages job checks out with depth 1, so the perf files are read, never asked of git.
 const PERF_DIR = join(HERE, '..', '..', 'docs', 'perf')
 const PERF_PLACEHOLDER = '<!-- perf-overview -->'
+// Written by `npm run rarity:shares` (ticket 449); the Pages job only reads it.
+const RARITY_SHARES_FILE = join(HERE, '..', '..', 'docs', 'economy', 'rarity-shares.json')
+const RARITY_SHARES_PLACEHOLDER = '<!-- rarity-shares -->'
 // Written on the build box by `npm run metrics:ticket`; the Pages job only reads them.
 const TICKET_TIME_DIR = join(HERE, '..', '..', 'docs', 'metrics', 'tickets')
 const TICKET_TIME_PLACEHOLDER = '<!-- ticket-time -->'
@@ -400,6 +404,16 @@ function buildPerfSection() {
   }
 }
 
+// Like the perf section: a broken share table shows its error in its panel only.
+function buildRaritySharesSection() {
+  try {
+    return renderRarityShares(JSON.parse(readFileSync(RARITY_SHARES_FILE, 'utf8')))
+  } catch (err) {
+    console.warn(`rarity shares failed: ${err.message}`)
+    return renderRaritySharesFailure(err.message)
+  }
+}
+
 function readTicketTimeFiles() {
   if (!existsSync(TICKET_TIME_DIR)) return []
   return readdirSync(TICKET_TIME_DIR)
@@ -519,19 +533,23 @@ function withSection(page, placeholder, html) {
   return page.replace(placeholder, () => html)
 }
 
-function pageWithSections(perfHtml, ticketTimeHtml) {
+function pageWithSections(perfHtml, ticketTimeHtml, raritySharesHtml) {
   const page = readFileSync(join(HERE, 'index.html'), 'utf8')
   return withSection(
-    withSection(page, PERF_PLACEHOLDER, perfHtml),
-    TICKET_TIME_PLACEHOLDER,
-    ticketTimeHtml,
+    withSection(
+      withSection(page, PERF_PLACEHOLDER, perfHtml),
+      TICKET_TIME_PLACEHOLDER,
+      ticketTimeHtml,
+    ),
+    RARITY_SHARES_PLACEHOLDER,
+    raritySharesHtml,
   )
 }
 
 // The committed-file sections first, before any GitHub call, so their bugs top the log.
 const perf = buildPerfSection()
 const ticketTime = buildTicketTimeSection()
-const pageBeforeFeatures = pageWithSections(perf.html, ticketTime.html)
+const pageBeforeFeatures = pageWithSections(perf.html, ticketTime.html, buildRaritySharesSection())
 
 const [
   issues,

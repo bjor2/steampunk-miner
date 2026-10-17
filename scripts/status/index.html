@@ -716,6 +716,12 @@
         grid-column: 1 / -1;
         order: 2;
       }
+      /* Rarity shares (ticket 449): rarityShareHtml.mjs, full width under the charts */
+      #rarity-shares-panel {
+        grid-column: 1 / -1;
+        order: 3;
+        overflow-x: auto;
+      }
       .num-r {
         text-align: right;
         font-variant-numeric: tabular-nums;
@@ -1924,6 +1930,7 @@
       </section>
       <section class="tab tab-grid hidden" id="tab-performance" data-tab="performance">
         <!-- perf-overview -->
+        <!-- rarity-shares -->
         <section class="panel" id="perf-work-panel">
           <h2>Performance Tester bot</h2>
           <table id="perf-loop-table">
