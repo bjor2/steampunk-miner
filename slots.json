@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-10-17T05:20:59+01:00",
+  "updated_at": "2026-10-17T05:21:34+01:00",
   "caps": {
     "grok": 12,
     "claude": 10,
@@ -122,40 +122,23 @@
     }
   ],
   "gate": {
-    "busy": 0,
+    "busy": 1,
     "max": 3
   },
   "tester": {
     "state": "running",
     "phase": "fast",
-    "sha": "8c31e735e996cd2dd15a15acfefa40bd8496ccf5",
-    "since": "2026-10-17T04:20:55Z",
-    "holds_gate": false,
+    "sha": "e8f104f0fce750cc5affa3454598dac9c9eca8c2",
+    "since": "2026-10-17T04:21:23Z",
+    "holds_gate": true,
     "claude_slot": null,
-    "last_run": "2026-10-16T23:37:46Z",
+    "last_run": "2026-10-17T04:21:17Z",
     "last_nightly": "2026-10-15T20:43:15Z",
     "last_nightly_result": "full=FAIL balance-report=ok bench=FAIL balance-planets=ok balance-guns=ok balance-charges=ok balance-refinery=ok balance-heat=ok e2e=FAIL memory-soak=FAIL packaged-smoke=ok ",
     "main_red_sha": null,
-    "feature": 162,
-    "feature_title": "Spec: Tech-unlocked store items and power-ups (drill gear, extraction, magnets, sensing)",
+    "feature": 309,
+    "feature_title": "Spec: Planet-1 ground weapon (penetrating shot, collapse without casing, visible casing)",
     "queue": [
-      {
-        "feature": 309,
-        "kind": "spec",
-        "title": "Spec: Planet-1 ground weapon (penetrating shot, collapse without casing, visible casing)",
-        "tickets": [
-          313,
-          314,
-          315,
-          344,
-          345,
-          346,
-          347,
-          348,
-          362
-        ],
-        "since": "2026-10-14T08:32:18+02:00"
-      },
       {
         "feature": 257,
         "kind": "spec",
