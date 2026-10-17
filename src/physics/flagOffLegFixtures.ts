@@ -58,7 +58,7 @@ const TOW_JUMP_M = 1.5
 const LEG_TICKS_MAX = Math.round(300 / PHYSICS_TIMESTEP)
 const SETTLE_TICKS = 6
 const RELEASE_TICKS_MAX = 240
-const REST_MPS = 0.05
+const REST_MPS = 1 / 20
 const REST_TICKS = 6
 /** One tick reads backward when it moves against the facing faster than this. */
 const BACKWARD_MPS = -0.001

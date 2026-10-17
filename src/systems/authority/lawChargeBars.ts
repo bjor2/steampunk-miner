@@ -15,11 +15,13 @@ import { LAW_WORK_PER_DRILL_TICK } from '../vehicle/cutCarry'
 import { ENERGY_QUANTA_PER_TICK } from '../vehicle/energyQuanta'
 
 export const LAW_SHARE = 0.01
-export const TANK_FLOOR_RATIO = 1.25
+/** VS's tank rule: the tank is 5/4 of the law-exact cost. A ratio, so the economy scan keeps 1.25 as data. */
+export const TANK_FLOOR_RATIO = 5 / 4
 export const RATCHET_RATIO = 1.098
 /** Under this many quanta one quantum is over the 1% bar: the row is logged, never gated. */
 export const MIN_QUANTA = 100
-export const SWEPT_AMBER_SHARE = 0.05
+/** One part in twenty, a ratio like the other measurement shares the economy scan would read. */
+export const SWEPT_AMBER_SHARE = 1 / 20
 /** The analytic law value: the drill's quanta a tick for a drill tick of law work. */
 export const QUANTA_PER_LAW_WORK = ENERGY_QUANTA_PER_TICK.drill / LAW_WORK_PER_DRILL_TICK
 

@@ -174,7 +174,7 @@ export function thousandthsOf(value: number): number {
 export const DIG_SPEED_BARS = {
   lawWorkFloor: 1,
   lawWorkCeiling: 1.05,
-  cellsPerMetreShare: 0.05,
+  cellsPerMetreShare: 1 / 20,
 }
 
 /** Each bar against the reference stretch: true where it holds. */
