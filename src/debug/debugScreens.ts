@@ -66,6 +66,12 @@ import { readFittedScreen } from '../ui/stage/screenFit'
 import type { ScreenLayout } from '../systems/views/screenLayout'
 import type { ScreenBox } from '../systems/views/hudClearView'
 import { showHintUnlessRefused, stageHudUnlessRefused, vehicleScreenBoxNow } from './debugHudLayout'
+import {
+  readDrawnKindLooks,
+  showEveryKindLook,
+  showSeenKindLooksOnly,
+  type DrawnKindLooks,
+} from './debugKindLooks'
 import { drawnLiningAt, type DrawnLining } from './debugLining'
 import { readRendererMemory, type RendererMemory } from './debugMemory'
 
@@ -149,6 +155,12 @@ export interface DebugUi {
   stageHud(staging: unknown): DebugResult
   /** Puts a hint of the table up next, with no gap to wait (#500); the compact HUD's room holds. */
   showHint(hintId: unknown): DebugResult
+  /** The ground's material look table as the shader draws it now (ticket 450). */
+  getKindLooks(): DebugResult<{ looks: DrawnKindLooks }>
+  /** Shows every kind of the planet as if met, for eye checks and the frame A/B (ticket 450). */
+  showEveryKindLook(): DebugResult
+  /** Back to the kinds the local player has met. */
+  showSeenKindLooksOnly(): DebugResult
 }
 
 export interface BayPresentation {
@@ -224,6 +236,9 @@ export function createDebugUi(): DebugUi {
     getVehicleScreenBox: vehicleScreenBoxNow,
     stageHud: stageHudUnlessRefused,
     showHint: showHintUnlessRefused,
+    getKindLooks: readDrawnKindLooks,
+    showEveryKindLook,
+    showSeenKindLooksOnly,
   }
 }
 
