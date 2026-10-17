@@ -5,6 +5,7 @@ import {
   CUT_ENERGY_DENOMINATOR,
   LAW_WORK_PER_DRILL_TICK,
   payLawWork,
+  payLawWorkEnergy,
   splitCutHeatCarry,
   withoutCutCarry,
   type LawWorkTally,
@@ -86,6 +87,37 @@ describe('cut carry (ticket 535)', () => {
     expect(payLawWork({}, wholeShare(0), FULL_TANK)).toEqual({ quanta: 0, vehicle: {} })
     expect(withoutCutCarry({ cutEnergyCarry: 5, cutHeatCarry: 9, energy: 1 })).toEqual({
       energy: 1,
+    })
+  })
+})
+
+describe('cut carry, energy only (ticket 540)', () => {
+  it('pays the same quanta and energy carry as the report charge', () => {
+    const tallies = [123_456, 7, 999_999, LAW_WORK_PER_DRILL_TICK, 31].map(wholeShare)
+    let report: { cutEnergyCarry?: number; cutHeatCarry?: number } = {}
+    let swept: { cutEnergyCarry?: number; cutHeatCarry?: number } = {}
+    for (const tally of tallies) {
+      const reported = payLawWork(report, tally, FULL_TANK)
+      const sweptPaid = payLawWorkEnergy(swept, tally, FULL_TANK)
+      expect(sweptPaid.quanta).toBe(reported.quanta)
+      expect(sweptPaid.vehicle.cutEnergyCarry).toBe(reported.vehicle.cutEnergyCarry)
+      report = reported.vehicle
+      swept = sweptPaid.vehicle
+    }
+  })
+
+  it('never writes the heat carry, which nothing on the swept path drains', () => {
+    const paid = payLawWorkEnergy({}, wholeShare(LAW_WORK_PER_DRILL_TICK * 3 + 17), FULL_TANK)
+    expect(paid.vehicle.cutHeatCarry).toBeUndefined()
+    const kept = payLawWorkEnergy({ cutHeatCarry: 9 }, wholeShare(5), FULL_TANK)
+    expect(kept.vehicle.cutHeatCarry).toBe(9)
+  })
+
+  it('pays no more than the tank holds and carries the debt, as the report charge does', () => {
+    const tally = wholeShare(LAW_WORK_PER_DRILL_TICK * 3)
+    expect(payLawWorkEnergy({}, tally, 5)).toEqual({
+      quanta: 5,
+      vehicle: { cutEnergyCarry: (3 * DRILL_QUANTA - 5) * CUT_ENERGY_DENOMINATOR },
     })
   })
 })

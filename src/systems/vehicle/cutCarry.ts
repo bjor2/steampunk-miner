@@ -64,10 +64,25 @@ export function payLawWork<V extends CarriesCut>(
   tally: LawWorkTally,
   tank: number,
 ): CutEnergyPayment<V> {
+  const heated = withCutHeatCarry(vehicle, (vehicle.cutHeatCarry ?? 0) + tally.law)
+  return payLawWorkEnergy(heated, tally, tank)
+}
+
+/**
+ * `payLawWork`'s energy alone (ticket 540, the TD seam 6234992964 as VS confirmed it): the same
+ * quanta, clamp and carry, the heat carry left as it was. The swept cut heats from its steps'
+ * summed dig time (`sweptCut.ts`), and nothing on its path drains the heat carry, so a tally
+ * written there would grow until the tow. Both paths share the one energy carry in one unit, so a
+ * vehicle that switches path mid-trip pays no quantum twice and loses none.
+ */
+export function payLawWorkEnergy<V extends CarriesCut>(
+  vehicle: V,
+  tally: LawWorkTally,
+  tank: number,
+): CutEnergyPayment<V> {
   const owed = (vehicle.cutEnergyCarry ?? 0) + tally.lawBp * ENERGY_QUANTA_PER_TICK.drill
   const quanta = Math.min(tank, Math.floor(owed / CUT_ENERGY_DENOMINATOR))
-  const heated = withCutHeatCarry(vehicle, (vehicle.cutHeatCarry ?? 0) + tally.law)
-  return { quanta, vehicle: withCutEnergyCarry(heated, owed - quanta * CUT_ENERGY_DENOMINATOR) }
+  return { quanta, vehicle: withCutEnergyCarry(vehicle, owed - quanta * CUT_ENERGY_DENOMINATOR) }
 }
 
 /** The whole drill ticks the heat carry heats for, and the vehicle keeping the rest. */
