@@ -13,11 +13,18 @@ import {
   type VehicleControllerOptions,
 } from './vehicleController'
 import { readAuthorityState } from '../store/authorityLink'
-import { readLocalVehicle, readPlanetWorld, resetGameStore } from '../store/gameStore'
+import {
+  readLocalVehicle,
+  readPlanetWorld,
+  resetGameStore,
+  takeSessionSnapshot,
+  useGameStore,
+} from '../store/gameStore'
 import { buildIntent } from '../systems/input/buildIntent'
 import { IDLE_INTENT, type VehicleIntent } from '../systems/vehicle/vehicleIntent'
 import { FACING } from '../systems/vehicle/vehiclePose'
 import { ENERGY_QUANTA_PER_TICK } from '../systems/vehicle/energyQuanta'
+import { replayRun } from '../systems/replay/replayRun'
 import { surfaceRowOfColumn } from '../systems/world/tileGrid'
 import { createVehicleLoop } from '../scene/vehicleLoop'
 
@@ -25,6 +32,12 @@ import { createVehicleLoop } from '../scene/vehicleLoop'
 // the real store and authority, a plain Rapier world in node, no React and no canvas.
 
 let sink: MemorySink
+
+/** The ticket-339 dig's end at the live cadence, with the render origin still and moved each tick. */
+const STEADY_ORIGIN_RUN = { tiles: 19, xMm: -19808, yMm: 290614 }
+const MOVING_ORIGIN_RUN = { tiles: 20, xMm: -20105, yMm: 290825 }
+/** The known f32 noise between the two (TD v2 Q4 on #514): documentation, not the assertion. */
+const ORIGIN_NOISE = { mm: 500, tiles: 1 }
 
 beforeAll(async () => {
   await RAPIER.init()
@@ -208,29 +221,55 @@ describe('vehicle loop', () => {
     expect(spent).toBeLessThanOrEqual(SWIVEL_TICKS * ENERGY_QUANTA_PER_TICK.thrust)
   })
 
-  // Pinned at the 12-tick drill cadence, #514's kill-switch off: a rebase moves Rapier's f32 maths
-  // by up to 1 mm/s from the pad on, and a report every tick samples that noise into the cut until
-  // one tile differs (raised with the TD on #514). The authority replays the log either way.
-  it('drills on through a moved render origin as if it had never moved (ticket 339)', () => {
-    const digAndTunnel = (options: VehicleControllerOptions) => {
-      restartRun()
-      const vehicle = createLiveVehicle(options, { ...DEV_FLAGS, 'drill.reportEveryTick': false })
-      vehicle.hold(buildIntent(['aim_left']), 2)
-      vehicle.hold(buildIntent(['aim_down']), 5)
-      vehicle.hold(buildIntent(['aim_left']), 4)
-      const tiles = destroyedTiles().map((event) => JSON.stringify(event.data))
-      return { tiles, at: vehicle.controller.planetPosition(), origins: vehicle.origins }
-    }
+  // At the live cadence, a report every tick while the drill bites (#514). A rebase changes Rapier's
+  // f32 contact maths by about 1 mm/s from tick 55, on the pad before any drilling, and every-tick
+  // reports sample that into the cut, so the two runs part (TD v2 Q4 on #514): neither an intended
+  // faster body nor an origin bug. Each run asserts its own exact values, both deterministic, and
+  // the authority replays each run's command log to its live digest byte for byte.
+  it('drills on through a moved render origin, each run exact and replayed byte for byte (ticket 339)', () => {
     const steady = digAndTunnel({})
     const moving = digAndTunnel({ originReachMm: 0 })
-    expect(steady.origins.size).toBe(1)
-    expect(moving.origins.size).toBeGreaterThan(1)
-    expect(steady.tiles.length).toBeGreaterThan(10)
-    expect(moving.tiles).toEqual(steady.tiles)
-    expect(Math.abs(moving.at.x - steady.at.x)).toBeLessThanOrEqual(0.001)
-    expect(Math.abs(moving.at.y - steady.at.y)).toBeLessThanOrEqual(0.001)
+    expect(steady.origins).toBe(1)
+    expect(moving.origins).toBeGreaterThan(1)
+    expect(steady.reading).toEqual(STEADY_ORIGIN_RUN)
+    expect(moving.reading).toEqual(MOVING_ORIGIN_RUN)
+    expect(replayedDigestOf(steady)).toBe(steady.end.digest)
+    expect(replayedDigestOf(moving)).toBe(moving.end.digest)
+  })
+
+  it('keeps a moved render origin within the known f32 noise of a still one (ticket 339)', () => {
+    const steady = digAndTunnel({}).reading
+    const moving = digAndTunnel({ originReachMm: 0 }).reading
+    const apartMm = Math.hypot(moving.xMm - steady.xMm, moving.yMm - steady.yMm)
+    expect(apartMm).toBeLessThanOrEqual(ORIGIN_NOISE.mm)
+    expect(Math.abs(moving.tiles - steady.tiles)).toBeLessThanOrEqual(ORIGIN_NOISE.tiles)
   })
 })
+
+/** The ticket-339 dig at the live cadence: off the pad, 5 s down, 4 s level. */
+function digAndTunnel(options: VehicleControllerOptions) {
+  restartRun()
+  const vehicle = createLiveVehicle(options)
+  vehicle.hold(buildIntent(['aim_left']), 2)
+  vehicle.hold(buildIntent(['aim_down']), 5)
+  vehicle.hold(buildIntent(['aim_left']), 4)
+  const at = vehicle.controller.planetPosition()
+  const reading = {
+    tiles: destroyedTiles().length,
+    xMm: Math.round(at.x * 1000),
+    yMm: Math.round(at.y * 1000),
+  }
+  const commands = [...sink.commands]
+  return { reading, origins: vehicle.origins.size, commands, end: takeSessionSnapshot() }
+}
+
+function replayedDigestOf(run: ReturnType<typeof digAndTunnel>): string {
+  const replay = replayRun(useGameStore.getState().planetSeed, run.commands, {
+    playerIds: [useGameStore.getState().playerId],
+    endTick: run.end.tick,
+  })
+  return replay.digests.at(-1)?.digest ?? ''
+}
 
 describe('vehicle loop, the ground the substeps meet (ticket 459)', () => {
   it('hands the substeps the world its own drill step and report left, with the swept cut on', () => {
