@@ -13,6 +13,10 @@
  *   over through its densities. With `Q = 1` it is the whole-tick carve above, unchanged.
  * - A material cell yields once, at the moment the sum of its 16 samples falls to half or below
  *   (`cellYield`).
+ * - A carve whose window names a law time (`lawTimeOf`, ticket 535) tallies the law work it
+ *   removes, each sample's removal times its cell's law time in sub-steps, on the session: what
+ *   the report carve is charged on (`vehicle/cutCarry.ts`). The densities it leaves are the same
+ *   with or without the tally; one integer multiply-add per removed sample.
  *
  * - A lined sample (#41) carves in the drill time of its casing grade, not its cell's, and loses its
  *   casing when its density reaches 0. Its density still counts toward its cell's yield (#56).
@@ -40,6 +44,7 @@ import {
   casingGradeOf,
   tileOfSample,
   type CasingCleared,
+  type CellTimes,
   type EditSession,
   type GroundEdit,
 } from './groundEditSession'
@@ -67,6 +72,11 @@ export interface CarveWindow {
    * is charged the whole window.
    */
   dwellAt?: SampleDwell
+  /**
+   * The law time of a cell in sub-steps of a tick (`drillSubStepsOfCells`), for the law-work tally
+   * the report carve is charged on (ticket 535, `vehicle/cutCarry.ts`). Absent, nothing is tallied.
+   */
+  lawTimeOf?: CellDrillTicks
 }
 
 /**
@@ -83,6 +93,8 @@ export interface Carve extends GroundEdit {
   /** The ticks in which the stamp still removed something: the drill's charged ticks. */
   ticksUsed: number
   casingCleared: CasingCleared
+  /** The law work the whole carve removed, in density sub-steps (ticket 535); 0 untallied. */
+  lawWork: number
 }
 
 /**
@@ -110,13 +122,15 @@ export function carveDisc(
 ): Carve {
   const session = openSession(world, params)
   const ticksUsed = walk(session, disc, window, drillTicksOf)
-  return { ...closeSession(session), ticksUsed, casingCleared: session.casingCleared }
+  return closeCarve(session, ticksUsed)
 }
 
 /** A disc carve with cells beside it (slice drill gear, ticket 234). */
 export interface CarveBesideDisc extends Carve {
   /** Per cell, in the order given: the ticks in which it still lost something. */
   cellTicksUsed: number[]
+  /** Per cell, in the order given: the law work removed from it (ticket 535); 0 untallied. */
+  cellLawWork: number[]
 }
 
 /** The ticks each carve of the cells beside a disc may use. */
@@ -142,8 +156,8 @@ export function carveDiscWithCells(
   const session = openSession(world, params)
   const ticksUsed = walk(session, disc, windows.disc, drillTicksOf)
   const besides = cells.map((tile) => cellSamplesBesideDisc(tile, disc))
-  const cellTicksUsed = carveCellsBeside(session, ticksUsed, besides, windows.cells, drillTicksOf)
-  return closeWithCells(session, ticksUsed, cellTicksUsed)
+  const beside = carveCellsBeside(session, ticksUsed, besides, windows.cells, drillTicksOf)
+  return closeWithCells(session, ticksUsed, beside)
 }
 
 /**
@@ -162,8 +176,14 @@ export function carveCellWithCells(
   const session = openSession(world, params)
   const ticksUsed = carveEachSample(session, cellSamplesOf(tile), windows.disc, drillTicksOf)
   const besides = cells.map((cell) => cellSamplesOf(cell))
-  const cellTicksUsed = carveCellsBeside(session, ticksUsed, besides, windows.cells, drillTicksOf)
-  return closeWithCells(session, ticksUsed, cellTicksUsed)
+  const beside = carveCellsBeside(session, ticksUsed, besides, windows.cells, drillTicksOf)
+  return closeWithCells(session, ticksUsed, beside)
+}
+
+/** What the cells beside the bit took, per cell in order: ticks, and law work removed. */
+interface CellsBeside {
+  cellTicksUsed: number[]
+  cellLawWork: number[]
 }
 
 /** Each cell's samples in order, in the cells' window; none when the bit removed nothing. */
@@ -173,21 +193,32 @@ function carveCellsBeside(
   cells: readonly (readonly WeightedSample[])[],
   window: CarveWindow,
   drillTicksOf: CellDrillTicks,
-): number[] {
-  if (ticksUsed === 0) return cells.map(() => 0)
-  return cells.map((samples) => carveEachSample(session, samples, window, drillTicksOf))
+): CellsBeside {
+  if (ticksUsed === 0) return { cellTicksUsed: cells.map(() => 0), cellLawWork: cells.map(() => 0) }
+  const cellTicksUsed: number[] = []
+  const cellLawWork: number[] = []
+  for (const samples of cells) {
+    const before = session.lawWork
+    cellTicksUsed.push(carveEachSample(session, samples, window, drillTicksOf))
+    cellLawWork.push(session.lawWork - before)
+  }
+  return { cellTicksUsed, cellLawWork }
 }
 
 function closeWithCells(
   session: EditSession,
   ticksUsed: number,
-  cellTicksUsed: number[],
+  beside: CellsBeside,
 ): CarveBesideDisc {
+  return { ...closeCarve(session, ticksUsed), ...beside }
+}
+
+function closeCarve(session: EditSession, ticksUsed: number): Carve {
   return {
     ...closeSession(session),
     ticksUsed,
     casingCleared: session.casingCleared,
-    cellTicksUsed,
+    lawWork: session.lawWork,
   }
 }
 
@@ -229,7 +260,8 @@ export function clearDisc(
     if (!isCarvable(session, sample)) continue
     const cut = Math.floor((amount * sample.weight) / FULL_WEIGHT)
     const density = densityOf(session, sample)
-    lowerSample(session, sample, density - Math.max(Math.min(density, sample.floor), density - cut))
+    const removal = density - Math.max(Math.min(density, sample.floor), density - cut)
+    lowerSample(session, sample, removal, 0)
   }
   return closeSession(session)
 }
@@ -243,7 +275,7 @@ function carveSamples(
 ): Carve {
   const session = openSession(world, params)
   const ticksUsed = carveEachSample(session, samples, window, drillTicksOf)
-  return { ...closeSession(session), ticksUsed, casingCleared: session.casingCleared }
+  return closeCarve(session, ticksUsed)
 }
 
 /** Carves the samples in order; answers the most ticks any of them took. */
@@ -269,18 +301,24 @@ function carveOneSample(
   drillTicksOf: CellDrillTicks,
 ): number {
   if (!isCarvable(session, sample)) return 0
-  const drillTicks = drillTicksOfSample(session, sample, drillTicksOf)
-  if (drillTicks === null) return 0
-  if (window.dwellAt !== undefined) return carveByDwell(session, sample, window, drillTicks)
+  const { ticks, law } = cellTimesOfSample(session, sample, window, drillTicksOf)
+  if (ticks === null) return 0
+  if (window.dwellAt !== undefined) return carveByDwell(session, sample, window, { ticks, law })
   const rate = {
     perTick: SOLID_DENSITY * sample.weight * (window.subStepsPerTick ?? 1),
-    per: FULL_WEIGHT * drillTicks,
+    per: FULL_WEIGHT * ticks,
   }
   const density = densityOf(session, sample)
   const removal = Math.min(Math.max(0, density - sample.floor), removalOver(rate, window))
   if (removal === 0) return 0
-  lowerSample(session, sample, removal)
+  lowerSample(session, sample, removal, law)
   return ticksToRemove(rate, window.firstTick, removal)
+}
+
+/** A cuttable cell's times: its drill time for the window, and its law time (0 untallied). */
+interface CutTimes {
+  ticks: number
+  law: number
 }
 
 /** Carves one sample by its rim dwell; answers the window's ticks when it removed anything. */
@@ -288,18 +326,27 @@ function carveByDwell(
   session: EditSession,
   sample: WeightedSample,
   window: CarveWindow,
-  drillTicks: number,
+  times: CutTimes,
 ): number {
   const left = Math.max(0, densityOf(session, sample) - sample.floor)
-  const removal = Math.min(left, dwellRemovalOf(sample, window, drillTicks))
+  const removal = Math.min(left, dwellRemovalOf(sample, window, times.ticks))
   if (removal === 0) return 0
-  lowerSample(session, sample, removal)
+  lowerSample(session, sample, removal, times.law)
   return window.ticks
 }
 
-/** Lowers a sample's density; a lined sample cut to density 0 loses its casing (#41). */
-function lowerSample(session: EditSession, sample: WeightedSample, removal: number): void {
+/**
+ * Lowers a sample's density and tallies the law work removed (ticket 535); a lined sample cut to
+ * density 0 loses its casing (#41).
+ */
+function lowerSample(
+  session: EditSession,
+  sample: WeightedSample,
+  removal: number,
+  lawTime: number,
+): void {
   editSample(session, sample, (current) => current - removal)
+  session.lawWork += removal * lawTime
   if (densityOf(session, sample) === 0) clearCasingSample(session, sample)
 }
 
@@ -319,18 +366,26 @@ function ticksToRemove(
   return Math.ceil((target * rate.per) / rate.perTick) - firstTick
 }
 
-/** The sample's drill time: its cell's material, or its casing grade when it is lined (#41). */
-function drillTicksOfSample(
+/**
+ * The sample's times, once per cell and casing grade: its drill time from its cell's material, or
+ * its casing grade when it is lined (#41), and its law time when the window names one (ticket 535).
+ */
+function cellTimesOfSample(
   session: EditSession,
   sample: WeightedSample,
+  window: CarveWindow,
   drillTicksOf: CellDrillTicks,
-): number | null {
+): CellTimes {
   const tile = tileOfSample(sample)
   const grade = effectiveCasingGrade(casingGradeOf(session, sample))
   const key = `${tile.tx},${tile.ty}#${grade}`
-  const known = session.drillTicks.get(key)
+  const known = session.cellTimes.get(key)
   if (known !== undefined) return known
-  const ticks = drillTicksOf(tile, materialOfSample(session, sample), grade)
-  session.drillTicks.set(key, ticks)
-  return ticks
+  const material = materialOfSample(session, sample)
+  const times = {
+    ticks: drillTicksOf(tile, material, grade),
+    law: window.lawTimeOf?.(tile, material, grade) ?? 0,
+  }
+  session.cellTimes.set(key, times)
+  return times
 }

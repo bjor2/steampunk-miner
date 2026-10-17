@@ -23,6 +23,7 @@ function carveBreaking(cells: { tx: number; ty: number }[], lining = { samples: 
     })),
     ticksUsed: 1,
     casingCleared: lining,
+    lawWork: 0,
   })
 }
 

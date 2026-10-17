@@ -60,15 +60,30 @@ interface EditChunk {
   change: GroundChange
 }
 
+/**
+ * A cell's drill time for the edit's window, or null when the drill cannot cut it, and its law
+ * time in sub-steps of a tick for the law-work tally (ticket 535), 0 when the edit keeps none.
+ */
+export interface CellTimes {
+  ticks: number | null
+  law: number
+}
+
 export interface EditSession {
   world: WorldState
   params: PlanetParams
   chunks: Map<string, EditChunk>
   touchedTiles: Map<string, TilePoint>
-  /** Material per tile and drill time per tile and casing grade, worked out once per edit. */
+  /** Material per tile, and the times per tile and casing grade, worked out once per edit. */
   materials: Map<string, number>
-  drillTicks: Map<string, number | null>
+  cellTimes: Map<string, CellTimes>
   casingCleared: CasingCleared
+  /**
+   * The law work the edit removed, in density sub-steps: each carved sample's removal times its
+   * cell's law time (ticket 535, `vehicle/cutCarry.ts`). Stays 0 unless the carve's window names
+   * a law time.
+   */
+  lawWork: number
 }
 
 /** The drill and the ground rules never cut the dock pad or lava (#8, #113). */
@@ -95,8 +110,9 @@ export function openSession(world: WorldState, params: PlanetParams): EditSessio
     chunks: new Map(),
     touchedTiles: new Map(),
     materials: new Map(),
-    drillTicks: new Map(),
+    cellTimes: new Map(),
     casingCleared: { samples: 0, grade: 0 },
+    lawWork: 0,
   }
 }
 

@@ -4,7 +4,14 @@ import { cellDensitySum } from './cellYield'
 import { generateChunk } from './generateChunk'
 import { contourSegmentsOf } from './groundContour'
 import { FULL_WEIGHT } from './stampShape'
-import { carveCell, carveDisc, clearDisc, fillDisc, type CellDrillTicks } from './groundEdit'
+import {
+  carveCell,
+  carveDisc,
+  carveDiscWithCells,
+  clearDisc,
+  fillDisc,
+  type CellDrillTicks,
+} from './groundEdit'
 import { planetParamsFor } from './planetParams'
 import {
   CHUNK_SAMPLES,
@@ -256,5 +263,74 @@ describe('fractional drill time in the carve (ticket 330)', () => {
     const late = carveCell(EMPTY_WORLD, params, tile, window, () => 24 * Q)
     expect(cellDensitySum(late.world, params, tile)).toBe(0)
     expect(late.ticksUsed).toBe(24)
+  })
+})
+
+describe('the law-work tally of a carve (ticket 535)', () => {
+  const tile = { tx: 3, ty: 290 }
+  const disc = { xMm: 3500, yMm: 290_500, radiusMm: TUNNEL_RADIUS_MM, floorRadiusMm: null }
+  /** Law times in sub-steps by column, so cells of one disc tally at different prices. */
+  const lawByColumn: CellDrillTicks = (at) => 100 + at.tx
+
+  it('tallies each sample removed times its cell law time, read back from the densities', () => {
+    const carve = carveDisc(
+      EMPTY_WORLD,
+      params,
+      disc,
+      { firstTick: 0, ticks: 5, lawTimeOf: lawByColumn },
+      EVEN_GROUND,
+    )
+    let expected = 0
+    for (const tx of [1, 2, 3, 4, 5]) {
+      for (const ty of [288, 289, 290, 291, 292]) {
+        const cell = { tx, ty }
+        const removed =
+          cellDensitySum(EMPTY_WORLD, params, cell) - cellDensitySum(carve.world, params, cell)
+        expected += removed * (100 + tx)
+      }
+    }
+    expect(carve.lawWork).toBeGreaterThan(0)
+    expect(carve.lawWork).toBe(expected)
+  })
+
+  it('leaves the densities as a carve with no law time leaves them, which tallies 0', () => {
+    const plain = carveDisc(EMPTY_WORLD, params, disc, { firstTick: 3, ticks: 9 }, EVEN_GROUND)
+    const tallied = carveDisc(
+      EMPTY_WORLD,
+      params,
+      disc,
+      { firstTick: 3, ticks: 9, lawTimeOf: lawByColumn },
+      EVEN_GROUND,
+    )
+    expect(plain.lawWork).toBe(0)
+    expect(tallied.world).toEqual(plain.world)
+    expect(tallied.yielded).toEqual(plain.yielded)
+    expect(tallied.ticksUsed).toBe(plain.ticksUsed)
+  })
+
+  it('tallies the cells beside the disc each on their own, inside the carve total', () => {
+    const beside = [
+      { tx: 5, ty: 290 },
+      { tx: 1, ty: 290 },
+    ]
+    const windows = {
+      disc: { firstTick: 0, ticks: 6, lawTimeOf: lawByColumn },
+      cells: { firstTick: 0, ticks: 6, lawTimeOf: lawByColumn },
+    }
+    const carve = carveDiscWithCells(EMPTY_WORLD, params, disc, beside, windows, EVEN_GROUND)
+    const total = carve.cellLawWork.reduce((sum, law) => sum + law, 0)
+    expect(carve.cellLawWork).toHaveLength(2)
+    expect(carve.cellLawWork.every((law) => law > 0)).toBe(true)
+    expect(carve.lawWork).toBeGreaterThan(total)
+    const cellOnly = carveCell(
+      EMPTY_WORLD,
+      params,
+      tile,
+      { firstTick: 0, ticks: 4, lawTimeOf: lawByColumn },
+      EVEN_GROUND,
+    )
+    const removed =
+      cellDensitySum(EMPTY_WORLD, params, tile) - cellDensitySum(cellOnly.world, params, tile)
+    expect(cellOnly.lawWork).toBe(removed * (100 + tile.tx))
   })
 })
