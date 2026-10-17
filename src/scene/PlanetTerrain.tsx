@@ -30,6 +30,7 @@ import { fitTerrainToOrigin } from './terrainOrigin'
 import { renderOriginPresence } from './renderOriginPresence'
 import { fitGateTintToPlanet } from './terrainGateTint'
 import { fitGateToViewer } from './terrainGateViewer'
+import { fitKindLooksToViewer } from './terrainKindLooks'
 import { groundGatePresence, NO_DRAWN_GROUND } from './groundGatePresence'
 import { fitStrataToPlanet } from './terrainStrata'
 import { vehiclePresence } from './vehiclePresence'
@@ -76,6 +77,7 @@ export function PlanetTerrain() {
     fitTerrainToOrigin(material, params, renderOriginPresence)
     fitGateTintToPlanet(material, params)
     fitGateToViewer(material)
+    fitKindLooksToViewer(material, params)
   })
 
   return (

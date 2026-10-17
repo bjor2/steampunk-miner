@@ -38,6 +38,8 @@ import type { Vector2 } from '../systems/vehicle/localFrame'
 import { TERRAIN_FRAGMENT_SHADER, TERRAIN_VERTEX_SHADER } from './terrainShader'
 import { createGateTintUniforms } from './terrainGateTint'
 import { createGateViewerUniforms } from './terrainGateViewer'
+import { createKindLookUniforms } from './terrainKindLooks'
+import { kindLookDefines } from './terrainKindShader'
 import { createHeatTileUniforms } from './terrainHeatTiles'
 import { createTerrainOriginUniforms } from './terrainOrigin'
 import { createStrataUniforms } from './terrainStrata'
@@ -75,6 +77,8 @@ export function createTerrainMaterial(program: TerrainProgram = 'full'): ShaderM
       ...gatePatternDefines(),
       // The casing lining's look (casingLiningLook.ts), so the shader draws the rule the TS reads.
       ...liningShaderDefines(),
+      // The material look table's sizes (kindLookTable.ts), so the shader indexes what TS writes.
+      ...kindLookDefines(),
     },
     vertexShader: TERRAIN_VERTEX_SHADER,
     fragmentShader: TERRAIN_FRAGMENT_SHADER,
@@ -102,6 +106,7 @@ export function createTerrainMaterial(program: TerrainProgram = 'full'): ShaderM
       ...createHeatTileUniforms(),
       ...createGateTintUniforms(),
       ...createGateViewerUniforms(),
+      ...createKindLookUniforms(),
       ...createTerrainOriginUniforms(),
     },
   })
