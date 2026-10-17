@@ -1,7 +1,5 @@
-import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs'
+import { mkdirSync, writeFileSync } from 'node:fs'
 import { afterAll, describe, expect, it, vi } from 'vitest'
-import type { KnownRedMarker } from '../../constants/knownRed'
-import { findingClosedOnIn } from '../../logging/knownRed'
 import * as groundEdit from '../world/groundEdit'
 import { LAW_WORK_PER_DRILL_TICK } from '../vehicle/cutCarry'
 import type { TilePoint } from '../world/tileGrid'
@@ -15,6 +13,7 @@ import { trackTicksOf, type Track, type TrackSection, type TrackTilt } from './d
 import {
   cutTrack,
   drillPowerFor,
+  hardestCellTicksFor,
   stretchOf,
   type TrackPath,
   type TrackRun,
@@ -29,18 +28,37 @@ import {
   sweptVerdictOf,
   type LawChargeBars,
 } from './lawChargeBars'
-import { geometryMissesOf, lawReadingOf, thousandthsOf, type LawReading } from './lawWorkFixtures'
+import {
+  CARVE_GEOMETRY_BARS,
+  geometryMissesAgainst,
+  geometryMissesOf,
+  lawReadingOf,
+  inCellTimesOf,
+  thousandthsOf,
+  type GeometryMisses,
+  type LawReading,
+} from './lawWorkFixtures'
 
-// The dig-speed STOP of #514 (Done-when 3) on a fixed pose track at 3, 8, 25, 44, 240 and 3600
+// The dig-speed STOP of #514 (Done-when 3) on a fixed pose track at 3, 5, 8, 25, 44, 240 and 3600
 // m/s, flat and tilted, level and down (VS 6226431087 and 6226528512, the TD's v2 ruling
 // 6226459471; 3 and 8 m/s are Step 0 of the carve-geometry ticket, TD on #537 6228947744 section
-// 3, GD 6228937772): the live loop holds the body to 18 m/s, so these rows replay the same poses
-// through the authority (`digSpeedTrackFixtures.ts`) on the swept cut, a report every tick and
-// 12-tick reports, each from a fresh rig whose law speed is the track's on the same ground. Law
-// work and cells per metre are read over a fixed stretch past the swept cut's 60 m lead, the
-// charge per unit of law work over all it cut. At 3600 m/s the body crosses the track in two
-// ticks and a flag-off report stamps its pose only, never the span between (the parked bore-bar
-// wiring, TD v2 Q5), so that row reads what the report path does there.
+// 3, GD 6228937772; 5 m/s is #537's floor rig): the live loop holds the body to 18 m/s, so these
+// rows replay the same poses through the authority (`digSpeedTrackFixtures.ts`) on the swept cut,
+// a report every tick (the report capsule of ticket 537, as it ships), the same report every tick
+// with the capsule off (protocol 86's bare disc, logged beside it) and 12-tick reports, each from
+// a fresh rig whose law speed is the track's on the same ground. Law work and cells per metre are
+// read over a fixed stretch past the swept cut's 60 m lead, the charge per unit of law work over
+// all it cut. At 3600 m/s the body crosses the track in two ticks and a flag-off report stamps
+// its pose only, never the span between (the parked bore-bar wiring, TD v2 Q5), so that row reads
+// what the report path does there.
+// - Gated, #537's landing bars (the TD's Done-when 6236448069, VS 6228947744 item 2), on the rows
+//   at 3, 8, 25 and 44 m/s: against the 5 m/s rig on the same track, law work per metre at least
+//   1.000 (bar 1, the floor: work is never cheaper at speed; each rig's law work read in its own
+//   hardest-cell times, `inCellTimesOf`) and cells per metre within 5% (bar 3);
+//   against swept as shipped, law work per metre within 5%, below 0.95 fails (bar 2, parity), and
+//   at least 0.99 (bar 4, the Step 0 re-read). This lane's stretch is 45 m; the 250 m window of
+//   bar 2 is the loop lane's. The rows at 240 and 3600 m/s are logged: their steps exceed the
+//   capsule's cap, so they cut the bare disc as before and stay the parked #441 and #439 wiring.
 // - Gated, bar 4 (1a), on A6's bars (#535, `lawChargeBars.ts`; the reference VS ruled on #535,
 //   6230602042, recorded by the GD 6230602177, as the TD's paired-run list 6230607050 reads it): a
 //   report every tick, charged on the law work it removed (`drill.exactCarry`, switched on for the
@@ -48,38 +66,32 @@ import { geometryMissesOf, lawReadingOf, thousandthsOf, type LawReading } from '
 //   tank floor and the ratchet, heat at least the law's less one drill tick; a row under 100
 //   quanta is quantized and logged. Swept's own charge pays 0.62 to 1.74 times the law by its
 //   geometry (#540), so the ratio to swept is logged beside it, amber outside 5%, never gated.
-// - Gated, the ratchet until #537 lands: on law work per metre (1b) and cells per metre (3), a
-//   report every tick misses its band against swept by no more than 12-tick reports do.
-// - Known red under #537, never a pass (VS 6236441275 condition 1, the GD 6236443694): a report
-//   every tick reads 0.77 to 0.95 of swept's law work per metre at 3 to 44 m/s (lower at 240 and
-//   3600 m/s, where a report stamps its pose only), under the 1.000 floor #537 lands; each row
-//   outside the geometry bands is printed as known red, and the marker fails as expired once #537
-//   closes and fails while every row is inside the bands, so it is deleted when A7 lands.
-// - Logged: Step 0's reading, a report every tick over swept on law work per metre at 3, 8, 25 and
-//   44 m/s (at least 0.99 on every row: the carve is not the cause and A7 is not built; any lower
-//   row: one capsule round of A7 after A6), with the report carve's removal per metre over the
-//   stretch: attempted before the clamp, applied, and the formula's unrounded continuum; bar 2,
-//   law work per yielded cell over swept's (VS 6228841725). A lane: it runs only when named, prints
-//   the table and writes balance-report/dig-speed-track.ndjson.
+// - Gated, #514's ratchet (GD 6228851107 and 6228937772): on law work per metre and cells per
+//   metre, a report every tick misses the swept bands by no more than main's 12-tick reports do
+//   (`every 12, disc`; the 12-tick capsule is logged beside them).
+// - Logged: the Step 0 reading, a report every tick over swept on law work per metre at 3, 8, 25
+//   and 44 m/s, and the capsule's own move, every tick over every tick with the capsule off; the
+//   report carve's removal per metre over the stretch: attempted before the clamp, applied, and
+//   the formula's unrounded continuum; bar 2 of #514, law work per yielded cell over swept's (VS
+//   6228841725). A lane: it runs only when named, prints the table and writes
+//   balance-report/dig-speed-track.ndjson.
 
-const SPEEDS_MPS = [3, 8, 25, 44, 240, 3600]
+const SPEEDS_MPS = [3, 5, 8, 25, 44, 240, 3600]
 const TILTS: readonly TrackTilt[] = ['flat', 'tilted']
 const SECTIONS: readonly TrackSection[] = ['level', 'down']
-const PATHS: readonly TrackPath[] = ['swept', 'every tick', 'every 12']
+const PATHS: readonly TrackPath[] = [
+  'swept',
+  'every tick',
+  'every tick, disc',
+  'every 12',
+  'every 12, disc',
+]
 const REPORT_EVERY = 12
-const STEP_ZERO = { speedsMps: [3, 8, 25, 44], floor: 0.99 }
+/** The rows #537's landing bars gate, and the rig they read the floor against. */
+const LANDING_SPEEDS_MPS = [3, 8, 25, 44]
+const FLOOR_RIG_MPS = 5
+const STEP_ZERO = { speedsMps: LANDING_SPEEDS_MPS, floor: CARVE_GEOMETRY_BARS.parity.lawWorkFloor }
 const REPORT_FOLDER = new URL('../../../balance-report/', import.meta.url)
-const TICKETS_FOLDER = new URL('../../../docs/metrics/tickets/', import.meta.url)
-/**
- * The carve-geometry deviation #514 ships with (VS 6236441275 condition 1): local to this lane, as
- * `physics/exactCarry.lane.test.ts` holds #541's; the repo's one exported marker is
- * `CAMPAIGN_PACING_KNOWN_RED` (ticket 419).
- */
-const CARVE_GEOMETRY_KNOWN_RED: KnownRedMarker = {
-  finding: 537,
-  reason:
-    'a report every tick cuts 0.77 to 0.95 of the swept cut law work per metre at 3 to 44 m/s (0.28 to 0.65 at 240 m/s, nothing past its pose at 3600 m/s), the same carve as 12-tick reports; the 1.000 floor and cells per metre within 5% are #537 landing bars',
-}
 const discCarve = groundEdit.carveDisc
 
 /** The report carve's removal per metre of the stretch, full cells; null on the swept cut. */
@@ -95,6 +107,8 @@ interface TrackReading extends LawReading, RemovalColumns {
   section: TrackSection
   path: TrackPath
   drillPower: number
+  /** The rig's law time for a cell of the track's hardest band, ticks: the floor's unit. */
+  hardestCellTicks: number
   metres: number
 }
 
@@ -114,13 +128,21 @@ function tracksOf(): Track[] {
   )
 }
 
+function landingTracksOf(): Track[] {
+  return tracksOf().filter((track) => LANDING_SPEEDS_MPS.includes(track.speedMps))
+}
+
 function nameOf(track: Track): string {
   return `${track.speedMps} m/s ${track.tilt} ${track.section}`
 }
 
-/** The paths the track lasts: the 12-tick cadence only where it sends a report. */
+/** The paths the track lasts: the 12-tick cadences only where it sends a report. */
 function pathsOf(track: Track): TrackPath[] {
-  return PATHS.filter((path) => path !== 'every 12' || hasTwelveTickReport(track))
+  return PATHS.filter((path) => !isTwelveTickPath(path) || hasTwelveTickReport(track))
+}
+
+function isTwelveTickPath(path: TrackPath): boolean {
+  return path === 'every 12' || path === 'every 12, disc'
 }
 
 function hasTwelveTickReport(track: Track): boolean {
@@ -140,6 +162,7 @@ function readTrack(track: Track, path: TrackPath): TrackReading {
     ...track,
     path,
     drillPower,
+    hardestCellTicks: thousandthsOf(hardestCellTicksFor(track, drillPower)),
     metres: thousandthsOf(run.metres),
     ...lawReadingOf(run),
     lawWorkPerMetre: perMetre.lawWorkPerMetre,
@@ -225,7 +248,7 @@ function stepZeroLinesOf(rows: readonly TrackReading[]): string[] {
   const isCarveCleared = lowest.every((ratio) => ratio >= STEP_ZERO.floor)
   return [
     ...lowest.map((ratio, i) => `Step 0, ${STEP_ZERO.speedsMps[i]} m/s: lowest ${ratio}`),
-    `Step 0 (#537): ${isCarveCleared ? 'every row at least 0.99' : 'a row below 0.99'}`,
+    `Step 0 re-read (#537 bar 4): ${isCarveCleared ? 'every row at least 0.99' : 'a row below 0.99'}`,
   ]
 }
 
@@ -271,82 +294,91 @@ function chargeBarsOf(track: Track, path: TrackPath): LawChargeBars {
   return found
 }
 
-/** A report every tick over swept, per unit of law work and per metre: logged beside the bars. */
-function sweptRatiosOf(track: Track) {
-  const everyTick = readingOf(track, 'every tick')
-  const swept = readingOf(track, 'swept')
-  const ratioOf = (column: keyof LawReading) => thousandthsOf(everyTick[column] / swept[column])
+/**
+ * The 5 m/s rig's report every tick on the same track, its law work in its own cell times:
+ * #537's floor reference, read against the row in its cell times (`inCellTimes`).
+ */
+function floorReadingOf(track: Track): TrackReading {
+  return inCellTimes(readingOf({ ...track, speedMps: FLOOR_RIG_MPS }, 'every tick'))
+}
+
+function inCellTimes(reading: TrackReading): TrackReading {
+  return { ...reading, ...inCellTimesOf(reading, reading.hardestCellTicks) }
+}
+
+/** A report every tick over `reference`, per unit of law work and per metre. */
+function ratiosOf(track: Track, reference: TrackReading) {
+  return ratiosBetween(readingOf(track, 'every tick'), reference)
+}
+
+function ratiosBetween(reading: TrackReading, reference: TrackReading) {
+  const ratioOf = (column: keyof LawReading) => thousandthsOf(reading[column] / reference[column])
   return {
     lawWorkPerMetre: ratioOf('lawWorkPerMetre'),
-    lawTicksPerCellOverSwept: ratioOf('lawTicksPerCell'),
+    lawTicksPerCellOverReference: ratioOf('lawTicksPerCell'),
     cellsPerMetre: ratioOf('cellsPerMetre'),
     energyPerLawTick: ratioOf('energyPerLawTick'),
     heatPerLawTick: ratioOf('heatPerLawTick'),
-    quantization: swept.oneCellShare,
+    quantization: reference.oneCellShare,
   }
 }
 
 function sweptRatioTextOf(track: Track): string {
-  const ratios = sweptRatiosOf(track)
+  const ratios = ratiosOf(track, readingOf(track, 'swept'))
   const verdict = `energy ${sweptVerdictOf(ratios.energyPerLawTick)}, heat ${sweptVerdictOf(ratios.heatPerLawTick)}`
   return `/ swept (logged, ${verdict}): ${JSON.stringify(ratios)}`
 }
 
-/** Each cadence's carve-geometry misses against the swept cut, to the thousandth every bar reads. */
+/** The capsule's own move on the row: a report every tick over the same report with the capsule off. */
+function capsuleMoveTextOf(track: Track): string {
+  const ratios = ratiosOf(track, readingOf(track, 'every tick, disc'))
+  return `capsule / disc (logged): law work per metre ${ratios.lawWorkPerMetre}, cells per metre ${ratios.cellsPerMetre}`
+}
+
+/**
+ * The carve-geometry misses against the swept cut of a report every tick as it ships and of main's
+ * 12-tick disc (the ratchet's reference), with the 12-tick capsule logged beside, to the thousandth.
+ */
 function geometryMissesAtBothCadences(track: Track) {
   const swept = readingOf(track, 'swept')
-  const missesAt = (path: TrackPath) => {
-    const misses = geometryMissesOf(readingOf(track, path), swept)
-    return {
-      lawWorkPerMetre: thousandthsOf(misses.lawWorkPerMetre),
-      cellsPerMetre: thousandthsOf(misses.cellsPerMetre),
-    }
+  const missesAt = (path: TrackPath) =>
+    thousandthsMissesOf(geometryMissesOf(readingOf(track, path), swept))
+  const misses = {
+    everyTick: missesAt('every tick'),
+    every12: missesAt('every 12, disc'),
+    every12Capsule: missesAt('every 12'),
   }
-  const misses = { everyTick: missesAt('every tick'), every12: missesAt('every 12') }
   console.log(`${nameOf(track)} geometry misses: ${JSON.stringify(misses)}`)
   return misses
 }
 
-/** Each track a report every tick cuts outside the carve-geometry bands against swept. */
-function geometryProblemsOf(): string[] {
-  return tracksOf()
-    .map((track) => ({
-      track,
-      misses: geometryMissesOf(readingOf(track, 'every tick'), readingOf(track, 'swept')),
-    }))
-    .filter(({ misses }) => misses.lawWorkPerMetre > 0 || misses.cellsPerMetre > 0)
-    .map(({ track }) => `${nameOf(track)}: ${JSON.stringify(sweptRatiosOf(track))}`)
-}
-
-/**
- * The known-red verdict on the carve geometry (`logging/knownRed.ts`'s rule, local to this lane):
- * every row outside the bands is held as known red under #537 and printed; every row inside them
- * fails until the marker is deleted; a closed #537 fails as expired.
- */
-function carveKnownRedVerdictOf(problems: readonly string[]): {
-  failures: string[]
-  knownRed: string[]
-} {
-  const { finding } = CARVE_GEOMETRY_KNOWN_RED
-  const closedOn = findingClosedOnIn(readTicketFile(finding))
-  if (closedOn !== null) {
-    const expired = `known-red marker for #${finding} expired: the finding closed on ${closedOn}; delete the marker (the carve must meet its bars) or file a new finding`
-    return { failures: [expired, ...problems], knownRed: [] }
-  }
-  if (problems.length === 0) {
-    const green = `a report every tick meets the carve-geometry bars on every track but is still marked known-red for #${finding}: delete the marker`
-    return { failures: [green], knownRed: [] }
-  }
+function thousandthsMissesOf(misses: GeometryMisses): GeometryMisses {
   return {
-    failures: [],
-    knownRed: problems.map((problem) => `known-red (#${finding}): ${problem}`),
+    lawWorkPerMetre: thousandthsOf(misses.lawWorkPerMetre),
+    cellsPerMetre: thousandthsOf(misses.cellsPerMetre),
   }
 }
 
-/** The finding's metrics file as text (the loop writes it when it closes a ticket), or null if none. */
-function readTicketFile(finding: number): string | null {
-  const url = new URL(`${finding}.json`, TICKETS_FOLDER)
-  return existsSync(url) ? readFileSync(url, 'utf8') : null
+/** #537's landing bars on one row: the floor against the 5 m/s rig, parity against swept. */
+function landingBarMissesOf(track: Track) {
+  const everyTick = readingOf(track, 'every tick')
+  const floor = thousandthsMissesOf(
+    geometryMissesAgainst(inCellTimes(everyTick), floorReadingOf(track), CARVE_GEOMETRY_BARS.floor),
+  )
+  const parity = thousandthsMissesOf(
+    geometryMissesAgainst(everyTick, readingOf(track, 'swept'), CARVE_GEOMETRY_BARS.parity),
+  )
+  return { floor, parity }
+}
+
+function landingBarTextOf(track: Track): string {
+  const floor = ratiosBetween(inCellTimes(readingOf(track, 'every tick')), floorReadingOf(track))
+  const swept = ratiosOf(track, readingOf(track, 'swept'))
+  return (
+    `${nameOf(track)} / 5 m/s rig: law work per metre ${floor.lawWorkPerMetre}, cells per metre ${floor.cellsPerMetre}` +
+    `; / swept: law work per metre ${swept.lawWorkPerMetre}, cells per metre ${swept.cellsPerMetre}` +
+    `; misses ${JSON.stringify(landingBarMissesOf(track))}`
+  )
 }
 
 describe('dig speed of a report every tick on a fixed track, 3 to 3600 m/s (#514 STOP)', () => {
@@ -360,7 +392,9 @@ describe('dig speed of a report every tick on a fixed track, 3 to 3600 m/s (#514
     it(`charges and heats a report every tick at the analytic law value, ${nameOf(track)} (bar 4)`, () => {
       const bars = chargeBarsOf(track, 'every tick')
       const message = `${nameOf(track)} / law: ${lawChargeTextOf(bars)}`
-      console.log(`${message}\n${nameOf(track)} ${sweptRatioTextOf(track)}`)
+      console.log(
+        `${message}\n${nameOf(track)} ${sweptRatioTextOf(track)}\n${nameOf(track)} ${capsuleMoveTextOf(track)}`,
+      )
       if (!bars.isMeasurable) return
       expect(isWithinLawShare(bars.energyRatio), message).toBe(true)
       expect(isUnderTankFloor(bars.energyRatio), message).toBe(true)
@@ -369,16 +403,26 @@ describe('dig speed of a report every tick on a fixed track, 3 to 3600 m/s (#514
     })
 
     if (!hasTwelveTickReport(track)) continue
-    it(`misses the carve-geometry bars by no more than 12-tick reports, ${nameOf(track)}`, () => {
+    it(`misses the carve-geometry bars by no more than main's 12-tick reports, ${nameOf(track)}`, () => {
       const { everyTick, every12 } = geometryMissesAtBothCadences(track)
       expect(everyTick.lawWorkPerMetre).toBeLessThanOrEqual(every12.lawWorkPerMetre)
       expect(everyTick.cellsPerMetre).toBeLessThanOrEqual(every12.cellsPerMetre)
     })
   }
 
-  it('holds the carve geometry of a report every tick as known red under #537, never a pass', () => {
-    const verdict = carveKnownRedVerdictOf(geometryProblemsOf())
-    console.log(verdict.knownRed.join('\n'))
-    expect(verdict.failures).toEqual([])
-  })
+  for (const track of landingTracksOf()) {
+    it(`does at least the 5 m/s rig's law work per metre, within 5% of its cells per metre, ${nameOf(track)} (#537 bars 1 and 3)`, () => {
+      const message = landingBarTextOf(track)
+      console.log(message)
+      const { floor } = landingBarMissesOf(track)
+      expect(floor.lawWorkPerMetre, message).toBe(0)
+      expect(floor.cellsPerMetre, message).toBe(0)
+    })
+
+    it(`reads at least 0.99 and at most 1.05 of swept's law work per metre, ${nameOf(track)} (#537 bars 2 and 4)`, () => {
+      const message = landingBarTextOf(track)
+      const { parity } = landingBarMissesOf(track)
+      expect(parity.lawWorkPerMetre, message).toBe(0)
+    })
+  }
 })

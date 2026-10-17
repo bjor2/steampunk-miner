@@ -146,6 +146,16 @@ export interface LawReading {
   oneCellShare: number
 }
 
+/**
+ * A reading with its law work per metre in the rig's own cell times (`cellTicks`, the rig's law
+ * time for one reference cell), so two rigs' law work compares as geometry (ticket 537's floor
+ * against the 5 m/s rig, #441's "work per metre over the rig's cell time"): the #7 law time of
+ * every cell scales with the drill alike at the same tip, up to the law's whole-sub-step rounding.
+ */
+export function inCellTimesOf(reading: LawReading, cellTicks: number): LawReading {
+  return { ...reading, lawWorkPerMetre: reading.lawWorkPerMetre / cellTicks }
+}
+
 export function lawReadingOf({ law, metres, drillEnergy, heatTicks }: ChargedLawWork): LawReading {
   const ownLawTicksPerCell = law.yieldedCellTicks / law.yieldedCells
   return {
@@ -177,6 +187,25 @@ export const DIG_SPEED_BARS = {
   cellsPerMetreShare: 1 / 20,
 }
 
+/**
+ * The carve-geometry landing bars of ticket 537 (the TD's Done-when 6236448069 on #537, VS
+ * 6228947744 item 2): the floor, against the 5 m/s rig on the same track, law work per metre at
+ * least 1.000 (bar 1) and cells per metre within 5% (bar 3); parity, against swept as shipped,
+ * law work per metre within 5% (bar 2, below 0.95 fails) and, bar 4, the Step 0 re-read at least
+ * 0.99. A band's floor allows one cell of the reference's quantization, as `geometryMissesOf` does.
+ */
+export const CARVE_GEOMETRY_BARS = {
+  floor: { lawWorkFloor: 1, lawWorkCeiling: Infinity, cellsPerMetreShare: 0.05 },
+  parity: { lawWorkFloor: 0.99, lawWorkCeiling: 1.05, cellsPerMetreShare: 0.05 },
+}
+
+/** A band on the ratio to a reference: law work per metre between the two, cells within the share. */
+export interface GeometryBand {
+  lawWorkFloor: number
+  lawWorkCeiling: number
+  cellsPerMetreShare: number
+}
+
 /** Each bar against the reference stretch: true where it holds. */
 export interface BarVerdicts {
   lawWorkPerMetre: boolean
@@ -202,9 +231,17 @@ export interface GeometryMisses {
 }
 
 export function geometryMissesOf(reading: LawReading, reference: LawReading): GeometryMisses {
-  const bars = DIG_SPEED_BARS
-  const lawWork = { low: bars.lawWorkFloor - reference.oneCellShare, high: bars.lawWorkCeiling }
-  const cells = { low: 1 - bars.cellsPerMetreShare, high: 1 + bars.cellsPerMetreShare }
+  return geometryMissesAgainst(reading, reference, DIG_SPEED_BARS)
+}
+
+/** How far the reading misses `band` against the reference, as a ratio, 0 inside it. */
+export function geometryMissesAgainst(
+  reading: LawReading,
+  reference: LawReading,
+  band: GeometryBand,
+): GeometryMisses {
+  const lawWork = { low: band.lawWorkFloor - reference.oneCellShare, high: band.lawWorkCeiling }
+  const cells = { low: 1 - band.cellsPerMetreShare, high: 1 + band.cellsPerMetreShare }
   return {
     lawWorkPerMetre: missOf(reading.lawWorkPerMetre / reference.lawWorkPerMetre, lawWork),
     cellsPerMetre: missOf(reading.cellsPerMetre / reference.cellsPerMetre, cells),

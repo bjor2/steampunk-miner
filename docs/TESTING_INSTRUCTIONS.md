@@ -576,6 +576,32 @@ programs }` from three's `renderer.info` of the game canvas), read only when cal
   gates at landing, the heat fed against the law less one drill tick (the hard bar at the flip,
   VS 6234998337), the share the #113 cap drops (#541) and the shipped price against the law and
   the law charge (about 2 min, writes `balance-report/swept-law-slab.ndjson`).
+- **Report capsule** (ticket 537, A7 "carve geometry at interval 1", the TD shape 6228947744
+  section 4 with the HS additions, the GD 6234994053): behind the authority dev flag
+  `drill.reportCapsule` (on) a pose report whose drill ran every tick since the last charged report
+  on the same facing, and whose pose moved by at most one stamp radius, cuts the capsule from the
+  previous pose's stamp centre to this one's on the swept cut's sub-step clock, charged as the
+  report's bare disc is (`src/systems/authority/reportedCapsule.ts`); a fresh bite, a turn, a
+  standstill and a longer step cut protocol 86's bare disc byte for byte.
+  `src/systems/authority/reportedCapsule.test.ts` holds the continuity test, the 950 mm cap, the
+  clock (sub-steps, charged as the bare disc's whole ticks or A6's law work), the fallback byte for
+  byte, the capsule cutting every cell the disc cut on a 3 m/s track, and A6's regression gate on
+  it (the exact carry on or off cuts the same ground). `src/logging/reportCapsuleOffGolden.test.ts`
+  replays every golden with the switch off to its protocol-86 digests, pinning the two the capsule
+  moved (`casing-lined-band-2`, `collapse-band-2-grade-1`); `exactCarryOnGolden.test.ts` pins the
+  same two with the exact carry on at protocol 87. The landing bars are the fixed-track lane's
+  (`src/systems/authority/digSpeedTrack.lane.test.ts`, about 3 min, writes
+  `balance-report/dig-speed-track.ndjson`): on the rows at 3, 8, 25 and 44 m/s, flat and tilted,
+  level and down, a report every tick does at least the 5 m/s rig's law work per metre on the same
+  track with cells per metre within 5% of it (bars 1 and 3), and reads within 5% of swept as
+  shipped on law work per metre, below 0.95 failing, and at least 0.99 (bars 2 and 4, the Step 0
+  re-read); the same report with the capsule off (`every tick, disc`) is cut beside it so the
+  capsule's own move shows per row, and #514's ratchet and charge bars stay gated. The event
+  stream spec `src/systems/authority/drillEventStream.test.ts` is the HS bar (b) on the capsule
+  (every cell cut at 12 ticks cut once at every tick, walk order kept, `DrillGated` once per
+  gated cell); `src/physics/drillReportCadence.test.ts` holds 30, 60 and 144 frames a second
+  byte-identical, and `src/physics/vehicleLoop.test.ts` pins the ticket-339 dig's end at the
+  capsule's protocol-87 values.
 - **Known red** (ticket 419, the TD on #396 section 2): `CAMPAIGN_PACING_KNOWN_RED`
   (`src/constants/knownRed.ts`) is the one known-red marker in the repo: one gate
   (`campaignPacingGate`), one finding (#417), no registry. The gate still runs in full;

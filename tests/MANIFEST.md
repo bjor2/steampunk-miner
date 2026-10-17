@@ -699,6 +699,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/authority/bore/shotShape.test.ts` | 14 | 14 |
 | `src/systems/authority/builtFacilities.test.ts` | 6 | 6 |
 | `src/systems/authority/carryRelease.test.ts` | 22 | 13 |
+| `src/systems/authority/carveGeometryKnownRed.test.ts` | 5 | 5 |
 | `src/systems/authority/casingCadence.test.ts` | 7 | 3 |
 | `src/systems/authority/casingDrill.test.ts` | 5 | 5 |
 | `src/systems/authority/casingGnaw.test.ts` | 4 | 4 |
@@ -741,7 +742,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/authority/depthCurveTank.test.ts` | 78 | 2 |
 | `src/systems/authority/digSpeedTrack.lane.test.ts` | 69 | 4 |
 | `src/systems/authority/drillEventStream.lane.test.ts` | 8 | 1 |
-| `src/systems/authority/drillEventStream.test.ts` | 26 | 4 |
+| `src/systems/authority/drillEventStream.test.ts` | 27 | 5 |
 | `src/systems/authority/drillGates.test.ts` | 11 | 11 |
 | `src/systems/authority/drillGearCut.test.ts` | 27 | 25 |
 | `src/systems/authority/drillStep.test.ts` | 22 | 22 |
@@ -777,6 +778,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/authority/refinery/refineryFacility.test.ts` | 2 | 2 |
 | `src/systems/authority/refinery/refineryRules.test.ts` | 15 | 15 |
 | `src/systems/authority/refinery/refinerySlots.test.ts` | 4 | 4 |
+| `src/systems/authority/reportedCapsule.test.ts` | 16 | 16 |
 | `src/systems/authority/reportedCutCarry.test.ts` | 15 | 15 |
 | `src/systems/authority/reportedGateBite.test.ts` | 15 | 15 |
 | `src/systems/authority/reportedGateBiteTracks.test.ts` | 7 | 3 |
@@ -986,6 +988,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/logging/purchaseChains.test.ts` | 7 | 7 |
 | `src/logging/refineryReport.test.ts` | 5 | 5 |
 | `src/logging/registries/runEvents.test.ts` | 4 | 4 |
+| `src/logging/reportCapsuleOffGolden.test.ts` | 19 | 3 |
 | `src/logging/reportRows.test.ts` | 4 | 4 |
 | `src/logging/runEventSchema.test.ts` | 19 | 19 |
 | `src/logging/runLayout.test.ts` | 7 | 7 |
