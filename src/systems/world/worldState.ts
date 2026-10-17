@@ -18,7 +18,7 @@ import {
   type ChunkDelta,
 } from './chunkDelta'
 import type { GeneratedChunk } from './generateChunk'
-import type { PlanetParams } from './planetParams'
+import { isSameGeneratedPlanet, type PlanetParams } from './planetParams'
 import { cellIndexOfTile, chunkKey, chunkOfTile, type TilePoint } from './tileGrid'
 import { AIR_CELL, isLavaCell } from './worldCell'
 
@@ -182,12 +182,8 @@ export function cachedChunkCount(): number {
 }
 
 function cacheOf(params: PlanetParams): ChunkCache {
-  if (cacheOfPlanet === null || !isSamePlanet(cacheOfPlanet.params, params)) {
+  if (cacheOfPlanet === null || !isSameGeneratedPlanet(cacheOfPlanet.params, params)) {
     cacheOfPlanet = { params, cache: createChunkCache(params, CACHED_CHUNKS) }
   }
   return cacheOfPlanet.cache
-}
-
-function isSamePlanet(a: PlanetParams, b: PlanetParams): boolean {
-  return a.worldSeed === b.worldSeed && a.planetIndex === b.planetIndex
 }

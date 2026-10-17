@@ -184,7 +184,8 @@ function rememberWeakness(key: string, entry: CachedWeakness): void {
 }
 
 function cacheKeyOf(params: PlanetParams, block: CollapseBlock): string {
-  return `${params.worldSeed}:${params.planetIndex}:${blockIdOf(block)}`
+  const rules = params.oreRulesVersion ?? 'legacy'
+  return `${params.worldSeed}:${params.planetIndex}:${rules}:${blockIdOf(block)}`
 }
 
 function hasCasing(delta: ChunkDelta): boolean {

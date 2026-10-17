@@ -142,6 +142,18 @@ export function freshPlanetParamsFor(worldSeed: number, planetIndex: number): Pl
   return planetParamsFor(worldSeed, planetIndex, oreRulesVersionOnEntry(planetIndex))
 }
 
+/**
+ * Whether two params generate the same cells: one seed, one index and one set of ore rules. A cache
+ * keyed on the seed and index alone would hand a stamped planet the legacy planet's cells.
+ */
+export function isSameGeneratedPlanet(a: PlanetParams, b: PlanetParams): boolean {
+  return (
+    a.worldSeed === b.worldSeed &&
+    a.planetIndex === b.planetIndex &&
+    a.oreRulesVersion === b.oreRulesVersion
+  )
+}
+
 /** The platform travels forward only, so it has the Refinery bay on every planet from its unlock. */
 function dockBaysOf(planetIndex: number): readonly BayId[] {
   return planetIndex >= refineryUnlockPlanet() ? BAY_IDS : SLICE_BAY_IDS

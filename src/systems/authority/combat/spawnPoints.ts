@@ -21,7 +21,7 @@ import { enemyTier, spawnDensityScale } from '../../economy/enemyStats'
 import { floor, fromSafeInteger, mul, toSafeInteger } from '../../money'
 import { SEED_PURPOSE, subSeedFor } from '../../world/generatorSeeds'
 import { bandOfTile, isInsidePlanet } from '../../world/planetGeometry'
-import type { PlanetParams } from '../../world/planetParams'
+import { isSameGeneratedPlanet, type PlanetParams } from '../../world/planetParams'
 import {
   CHUNK_CELLS,
   CHUNK_SIZE,
@@ -97,7 +97,7 @@ export function spawnPositionOf(tile: TilePoint): { x: number; y: number } {
 }
 
 function spawnPlanetOf(params: PlanetParams): SpawnPlanet {
-  if (cacheOfPlanet === null || !isSamePlanet(cacheOfPlanet.params, params)) {
+  if (cacheOfPlanet === null || !isSameGeneratedPlanet(cacheOfPlanet.params, params)) {
     cacheOfPlanet = { params, densityKeepBelow: densityKeepBelowOf(params), byChunk: new Map() }
   }
   return cacheOfPlanet
@@ -106,10 +106,6 @@ function spawnPlanetOf(params: PlanetParams): SpawnPlanet {
 function densityKeepBelowOf(params: PlanetParams): number {
   const range = fromSafeInteger(DENSITY_ROLL_RANGE)
   return toSafeInteger(floor(mul(spawnDensityScale(params.planetIndex), range)))
-}
-
-function isSamePlanet(a: PlanetParams, b: PlanetParams): boolean {
-  return a.worldSeed === b.worldSeed && a.planetIndex === b.planetIndex
 }
 
 function generateSpawnPoints(planet: SpawnPlanet, cx: number, cy: number): SpawnPoint[] {
