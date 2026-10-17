@@ -591,3 +591,21 @@ TD ruling on #514/#529: no hard build block, but a fixed merge order. Mechanism 
   after session start (stale), closed before session start (go ahead, record cleared). Not run against real issues.
 - Rollback: restore `next-ticket.sh.bak-20261017-0140-mergehold` and `wave-lib.sh.bak-20261017-0140-mergehold`, delete `merge-after.conf`, remove any blocker links
   and `merge_held` entries from `state.json`.
+
+## Merge-after guard: `:release` entries (17 Oct 2026, ~04:00 Oslo)
+
+- `merge-after.conf` takes an optional third field: `<ticket>:<prereq>:release`. The prerequisite closing is then not enough: the hold is lifted only when the prerequisite is
+  CLOSED **and** the marker file `merge-release.d/<ticket>` exists (dir created in the loop dir). Plain `<ticket>:<prereq>` entries behave as before (native blocker).
+- A green ticket with a release entry that is not releasable (no marker, or prerequisite still open) is held: nothing pushed or closed, `ticket/N` kept, the attempt refunded,
+  and the issue labelled **`on-hold`** (no native blocker: that would clear when the prerequisite closes; on-hold is already honoured by the picker, so there is no cycle of
+  refunded attempts). The hold comment says what is needed ("waiting for recorded release: #prereq landed or the GD recording Bjor's decision") and gives the release command.
+  Nothing is added while the ticket builds: the entry is read only when a green session is about to push, so a release entry never blocks or pauses the build.
+- `merge_release_sweep` (new, called at the top of `wave_prepare_pick`, skipped on `--dry-run`) lifts the `on-hold` label it added once marker + closed prerequisite are both there
+  (gh is only called when a marker exists); the next pick re-claims the ticket for its rebase and re-run attempt; that session passes `merge_hold` (marker present, prerequisite
+  closed before the session) and the ordinary push path lands it. A prerequisite that closed *during* the session is a re-queue at once (no label), as before. `state.merge_held[N]`
+  records `release` and `label` (the sweep only removes an on-hold it added itself).
+- Release command: `touch /workspace/claude-sessions/steampunk-loop/merge-release.d/<ticket>`. Un-release: `rm` the marker (only matters before the sweep ran).
+- The stale `529:514` entry was removed (#529 closed). No `514:<A6>` entry yet: the A6 issue was not filed at the time of this change.
+- Stub-tested: no marker + prerequisite open, no marker + closed, marker + closed (goes ahead), marker + open (held), closed during session, plain entry unchanged, sweep (no marker,
+  marker + open, marker + closed, idempotent). Files: `merge-hold-lib.sh`, `wave-lib.sh` (one sweep line; `.bak-20261017-0350-release`), `merge-hold-lib.sh.bak-20261017-0350-release`,
+  `merge-after.conf.bak-20261017-0350`; `next-ticket.sh` untouched. Rollback: restore those backups.
