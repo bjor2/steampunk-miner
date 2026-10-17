@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-10-17T03:44:05+01:00",
+  "updated_at": "2026-10-17T03:51:54+01:00",
   "caps": {
     "grok": 12,
     "claude": 10,
@@ -20,11 +20,11 @@
         {
           "slot": "C1",
           "state": "busy",
-          "ticket": 445,
+          "ticket": 447,
           "grok_slot": 1,
           "kind": "dev",
-          "since": "2026-10-17T02:52:00+01:00",
-          "wave": "302-8B"
+          "since": "2026-10-17T03:51:00+01:00",
+          "wave": "302-8A"
         },
         {
           "slot": "C2",
@@ -71,7 +71,7 @@
       "size": 6,
       "used": 2,
       "free": 4,
-      "claims_last_hour": 1,
+      "claims_last_hour": 2,
       "name": "Claude Max 1"
     },
     {
@@ -122,7 +122,7 @@
     }
   ],
   "gate": {
-    "busy": 2,
+    "busy": 1,
     "max": 3
   },
   "tester": {
@@ -496,10 +496,10 @@
     {
       "slot": 1,
       "state": "dev",
-      "ticket": 445,
-      "since": "2026-10-17T02:52:00+01:00",
+      "ticket": 447,
+      "since": "2026-10-17T03:51:00+01:00",
       "claude_slot": 1,
-      "wave": "302-8B"
+      "wave": "302-8A"
     },
     {
       "slot": 2,
@@ -574,11 +574,11 @@
     {
       "slot": 1,
       "state": "busy",
-      "ticket": 445,
+      "ticket": 447,
       "grok_slot": 1,
-      "since": "2026-10-17T02:52:00+01:00",
+      "since": "2026-10-17T03:51:00+01:00",
       "account": 1,
-      "wave": "302-8B"
+      "wave": "302-8A"
     },
     {
       "slot": 2,
@@ -659,10 +659,10 @@
     }
   ],
   "last_refill": {
-    "at": "2026-10-17 02:52 BST",
-    "mode": "refill-dev",
-    "triggers": "#446 #528",
-    "started": "#445->C1/A1",
+    "at": "2026-10-17 03:51 BST",
+    "mode": "recheck",
+    "triggers": "#445",
+    "started": "#447->C1/A1",
     "note": "spawned 1 worker(s)"
   },
   "totals": {
@@ -771,7 +771,7 @@
           453
         ],
         "done": [],
-        "live": 0
+        "live": 1
       },
       {
         "number": 498,
@@ -784,8 +784,10 @@
           445,
           452
         ],
-        "done": [],
-        "live": 1
+        "done": [
+          445
+        ],
+        "live": 0
       },
       {
         "number": 495,
