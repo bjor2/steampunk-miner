@@ -14,6 +14,9 @@ import { playFlagOffLeg, type FlagOffLeg, type LegSection } from './flagOffLegFi
 // - A >= main: whole-leg mean speed at least the 12-tick leg's, every rung, down and level, and so
 //   the start-rig anchor (stored 1, 80 m down: the TD read 1.43 -> 1.52 m/s);
 // - backward ticks at most 1% of a down leg and 5% of a level leg (Done-when 1);
+// - VS's flag-off stand-in for `cutSmoothness` (VS 6228847292, item 5: flag-off has no commanded
+//   cut speed to hold): backward share, under-half share and press to first cut each no worse
+//   than the 12-tick leg's, every rung, down and level;
 // - press to first cut (from the head facing the leg's way) at most 1 tick, as the median over the
 //   rungs (Done-when 2);
 // - release: the median creep of the down legs no further than at 12 ticks, and the median rest
@@ -169,6 +172,18 @@ describe('the flag-off loop ladder at a report every tick against 12 ticks (#514
         expect(rowOf(rung, section, 1).backwardShare).toBeLessThanOrEqual(
           BARS.backwardShare[section],
         )
+      })
+
+      it(`moves backward and under half speed no more than 12-tick reports, ${rung} ${section}`, () => {
+        const [everyTick, every12] = [rowOf(rung, section, 1), rowOf(rung, section, 12)]
+        expect(everyTick.backwardShare).toBeLessThanOrEqual(every12.backwardShare)
+        expect(everyTick.underHalfShare).toBeLessThanOrEqual(every12.underHalfShare)
+      })
+
+      it(`cuts no later after the press than 12-tick reports, ${rung} ${section}`, () => {
+        const pressOf = (interval: number) =>
+          rowOf(rung, section, interval).pressToFirstCutTicks ?? Infinity
+        expect(pressOf(1)).toBeLessThanOrEqual(pressOf(12))
       })
     }
   }
