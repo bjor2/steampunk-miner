@@ -1,8 +1,15 @@
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs'
 import { afterAll, describe, expect, it } from 'vitest'
 import { onCurveSteps } from '../economy/vehicleStats'
-import { LAW_WORK_PER_DRILL_TICK } from '../vehicle/cutCarry'
-import { ENERGY_QUANTA_PER_TICK } from '../vehicle/energyQuanta'
+import {
+  isHeatAtLaw,
+  isUnderRatchet,
+  isUnderTankFloor,
+  isWithinLawShare,
+  lawChargeBarsOf,
+  lawChargeTextOf,
+  sweptVerdictOf,
+} from './lawChargeBars'
 import {
   cutSlab,
   SLAB_PATHS,
@@ -17,21 +24,23 @@ import {
 
 // The reference rows of the report cut's charge on density removed (ticket 535, A6: the TD shape
 // 6228682000 as VS 6228674086 and the GD 6228674068 ruled the reference, the TD's geometry
-// amendment 6228838042 as VS 6228848270 confirmed it). Every row, 25, 44, 240 and 3600 m/s and
-// the stored ladder with its 7 to 13 m/s rigs, is a pure authority replay of one prescribed pose
-// list on planet 1's fixed seed (`lawCarrySlabFixtures.ts`): flat and tilted 30 degrees, level
-// through band 1 and down from under the surface, the same poses fed to `drillStep` (swept, the
-// reference) and to the report carve with the charge on and off at 12 ticks and every tick, no
-// body, so nothing jams. Law work is read from the ground, energy from the tank, heat ticks as
-// the report rule feeds the gauge. Gated (VS, hard): energy per unit of law work within 1% of
-// swept at the same rig and ground, heat at least swept's less one cell; the regression gate:
-// with the charge on or off at the same cadence the carve is byte-identical (the same chunks,
-// cells in order and law work), and no `CommandRejected` on any path. Cross-checks: the charge
-// against the analytic law value (the drill's quanta a tick per drill tick of law work, within
-// 1%, red beyond), and, when the loop lane's `balance-report/exact-carry.ndjson` is present, the
-// 25 and 44 m/s ratios against the real loop's within 1%. Logged, never gated here: law work per
-// metre and cells per metre against swept (#514's geometry bars). A lane: it runs only when named,
-// prints the table and writes balance-report/law-carry-slab.ndjson.
+// amendment 6228838042 as VS 6228848270 confirmed it, and the reference VS ruled on the ticket,
+// 6230602042, recorded by the GD 6230602177). Every row, 25, 44, 240 and 3600 m/s and the stored
+// ladder with its 7 to 13 m/s rigs, is a pure authority replay of one prescribed pose list on
+// planet 1's fixed seed (`lawCarrySlabFixtures.ts`): flat and tilted 30 degrees, level through
+// band 1 and down from under the surface, the same poses fed to `drillStep` (swept) and to the
+// report carve with the charge on and off at 12 ticks and every tick, no body, so nothing jams.
+// Law work is read from the ground (density removed times law time), energy from the tank, heat
+// ticks as the report rule feeds the gauge. Gated (VS, hard, `lawChargeBars.ts`): on every row
+// of at least 100 quanta, energy per unit of law work within 1% of the analytic law value, under
+// the tank floor and the ratchet, and heat at least the law's less one drill tick; the regression
+// gate: with the charge on or off at the same cadence the carve is byte-identical (the same
+// chunks, cells in order and law work), and no `CommandRejected` on any path. Validation: when
+// the loop lane's `balance-report/exact-carry.ndjson` is present, the 25 and 44 m/s ratios to the
+// law agree with the real loop's within 1%. Logged, never gated: the ratio to swept (amber
+// outside 5%; swept's own charge is #540's), law work per metre and cells per metre against swept
+// (#514's geometry bars). A lane: it runs only when named, prints the table and writes
+// balance-report/law-carry-slab.ndjson.
 
 const RIG_SAFETY = { hull: 5000, cargo_hold: 5000 }
 /** VS's rows (`physics/exactCarry.lane.test.ts`): rigs named by their band-1 cut speed. */
@@ -58,13 +67,7 @@ const TILTS: readonly SlabTilt[] = ['flat', 'tilted']
 const SECTIONS: readonly SlabSection[] = ['level', 'down']
 const CHARGED_PATHS = ['exact @12', 'exact @1'] as const
 const CADENCES = ['@12', '@1'] as const
-const ENERGY_SHARE = 0.01
 const LOOP_SHARE = 0.01
-const ANALYTIC_SHARE = 0.01
-/** Under this many quanta a run is quantized past the 1% bar (one quantum is 1%): logged only. */
-const ANALYTIC_MIN_QUANTA = 100
-/** The analytic law value: the drill's quanta a tick for a drill tick of law work. */
-const QUANTA_PER_LAW_WORK = ENERGY_QUANTA_PER_TICK.drill / LAW_WORK_PER_DRILL_TICK
 /** The loop lane's rows this lane validates itself against, by rig and section. */
 const LOOP_REPORT = new URL('../../../balance-report/exact-carry.ndjson', import.meta.url)
 const REPORT_FOLDER = new URL('../../../balance-report/', import.meta.url)
@@ -132,38 +135,33 @@ function isComparable(run: SlabRun, swept: SlabRun): boolean {
   return [run, swept].every((row) => row.lawWork > 0 && row.energy > 0)
 }
 
-/** One cell of law work as a share of swept's: the bars' quantization slack. */
-function oneCellShareOf(run: SlabRun, swept: SlabRun): number {
-  return run.oneCellLaw / swept.lawWork
-}
-
-/** VS's hard charge bars for a charged run against swept; #514's geometry ratios printed beside. */
-function expectChargeBars(rig: string, tilt: SlabTilt, section: SlabSection, path: SlabPath) {
+/** The ratio to swept, printed beside the law bars: amber outside 5%, gating nothing (#540). */
+function logSweptRatios(rig: string, tilt: SlabTilt, section: SlabSection, path: SlabPath) {
   const run = runOf(rig, tilt, section, path)
   const swept = runOf(rig, tilt, section, 'swept')
-  const ratios = ratiosOf(run, swept)
-  console.log(`${keyOf(rig, tilt, section, path)} / swept: ${JSON.stringify(ratios)}`)
+  const name = keyOf(rig, tilt, section, path)
   if (!isComparable(run, swept)) {
-    console.log(`${keyOf(rig, tilt, section, path)}: unmeasured (nothing cut or charged)`)
+    console.log(`${name} / swept: unmeasured (nothing cut or charged on one of them)`)
     return
   }
-  expect(Math.abs(ratios.energyPerLaw - 1)).toBeLessThanOrEqual(ENERGY_SHARE)
-  expect(ratios.heatPerLaw).toBeGreaterThanOrEqual(1 - oneCellShareOf(run, swept))
+  const ratios = ratiosOf(run, swept)
+  const verdict = `energy ${sweptVerdictOf(ratios.energyPerLaw)}, heat ${sweptVerdictOf(ratios.heatPerLaw)}`
+  console.log(`${name} / swept (logged, ${verdict}): ${JSON.stringify(ratios)}`)
 }
 
-/** The charge against the analytic law value, read from the ground: red beyond 1%. */
-function expectAnalyticCharge(rig: string, tilt: SlabTilt, section: SlabSection, path: SlabPath) {
+/**
+ * VS's hard charge bars for a charged run against the analytic law value, read from the ground
+ * (`lawChargeBars.ts`); a row under 100 quanta is quantized and logged.
+ */
+function expectLawBars(rig: string, tilt: SlabTilt, section: SlabSection, path: SlabPath) {
   const run = runOf(rig, tilt, section, path)
-  if (run.lawWork === 0) return
-  const expected = run.lawWork * QUANTA_PER_LAW_WORK
-  const ratio = run.energy / expected
-  const name = keyOf(rig, tilt, section, path)
-  console.log(`${name} energy / analytic law value: ${thousandths(ratio)}`)
-  if (expected < ANALYTIC_MIN_QUANTA) {
-    console.log(`${name}: analytic value unmeasured (${expected.toFixed(2)} quanta, quantized)`)
-    return
-  }
-  expect(Math.abs(ratio - 1)).toBeLessThanOrEqual(ANALYTIC_SHARE)
+  const bars = lawChargeBarsOf(run)
+  console.log(`${keyOf(rig, tilt, section, path)} / law: ${lawChargeTextOf(bars)}`)
+  if (!bars.isMeasurable) return
+  expect(isWithinLawShare(bars.energyRatio)).toBe(true)
+  expect(isUnderTankFloor(bars.energyRatio)).toBe(true)
+  expect(isUnderRatchet(bars.energyRatio)).toBe(true)
+  expect(isHeatAtLaw(bars)).toBe(true)
 }
 
 /** The TD's regression gate: the charge on or off at one cadence cuts the same, byte for byte. */
@@ -180,7 +178,7 @@ function expectNoRejection(rig: string): void {
   expect(refused.map((row) => keyOf(row.rig, row.tilt, row.section, row.path))).toEqual([])
 }
 
-/** The loop lane's energy-per-law ratio to swept for a rig and section, or null without its rows. */
+/** The loop lane's energy ratio to the law for a rig, path and section, or null without the row. */
 function loopRatioOf(rig: string, path: SlabPath, section: SlabSection): number | null {
   if (!existsSync(LOOP_REPORT)) return null
   const rows = readFileSync(LOOP_REPORT, 'utf8')
@@ -194,41 +192,39 @@ function loopRatioOf(rig: string, path: SlabPath, section: SlabSection): number 
           section: string
           lawWork: number
           energy: number
+          heatTicks: number
           metres: number
         },
     )
-  const rowOf = (name: string) =>
-    rows.find((row) => row.rig === rig && row.path === name && row.section === section)
-  const run = rowOf(path)
-  const swept = rowOf('swept')
-  if (run === undefined || swept === undefined) return null
-  if ([run, swept].some((row) => row.metres < 10 || row.lawWork <= 0)) return null
-  return run.energy / run.lawWork / (swept.energy / swept.lawWork)
+  const row = rows.find(
+    (read) => read.rig === rig && read.path === path && read.section === section,
+  )
+  if (row === undefined || row.metres < 10) return null
+  const bars = lawChargeBarsOf(row)
+  return bars.isMeasurable ? bars.energyRatio : null
 }
 
-/** The slab method against the real loop: the same ratio within 1% where the loop has the row. */
+/** The slab method against the real loop: the same ratio to the law within 1% where the loop has the row. */
 function expectLoopAgreement(rig: string, path: SlabPath, section: SlabSection) {
   const loop = loopRatioOf(rig, path, section)
   const tilt: SlabTilt = section === 'down' ? 'flat' : 'tilted'
-  const run = runOf(rig, tilt, section, path)
-  const swept = runOf(rig, tilt, section, 'swept')
-  if (loop === null || !isComparable(run, swept)) {
+  const bars = lawChargeBarsOf(runOf(rig, tilt, section, path))
+  if (loop === null || !bars.isMeasurable) {
     console.log(`${rig} ${path} ${section}: no loop row to validate the slab against`)
     return
   }
-  const slab = ratiosOf(run, swept).energyPerLaw
-  console.log(
-    `${rig} ${path} ${section} energy/law over swept: slab ${slab}, loop ${thousandths(loop)}`,
-  )
+  const slab = thousandths(bars.energyRatio)
+  console.log(`${rig} ${path} ${section} energy / law: slab ${slab}, loop ${thousandths(loop)}`)
   expect(Math.abs(slab - loop)).toBeLessThanOrEqual(LOOP_SHARE)
 }
 
 function formatTable(rows: readonly SlabReading[]): string {
   const header =
     'rig | tilt | section | path | ticks | m | cells | law work | energy | heat ticks | ' +
-    'law/m | cells/m | energy/law | heat/law | rejected'
-  const lines = rows.map((row) =>
-    [
+    'law/m | cells/m | energy/law | heat/law | energy vs law | heat vs law | rejected'
+  const lines = rows.map((row) => {
+    const bars = lawChargeBarsOf(row)
+    return [
       row.rig,
       row.tilt,
       row.section,
@@ -243,9 +239,11 @@ function formatTable(rows: readonly SlabReading[]): string {
       (row.cells / row.metres).toFixed(3),
       row.lawWork === 0 ? '-' : (row.energy / row.lawWork).toExponential(3),
       row.lawWork === 0 ? '-' : (row.heatTicks / row.lawWork).toExponential(3),
+      row.lawWork === 0 ? '-' : thousandths(bars.energyRatio).toFixed(3),
+      row.lawWork === 0 ? '-' : thousandths(bars.heatRatio).toFixed(3),
       row.rejections,
-    ].join(' | '),
-  )
+    ].join(' | ')
+  })
   return [header, ...lines].join('\n')
 }
 
@@ -267,10 +265,10 @@ function describeRig(rig: string, levels: Record<string, number>, strideMm: numb
   for (const tilt of TILTS) {
     for (const section of SECTIONS) {
       for (const path of CHARGED_PATHS) {
-        it(`holds VS's charge bars, ${rig} ${tilt} ${section} ${path}`, () =>
-          expectChargeBars(rig, tilt, section, path))
-        it(`charges the analytic law value, ${rig} ${tilt} ${section} ${path}`, () =>
-          expectAnalyticCharge(rig, tilt, section, path))
+        it(`charges and heats at the analytic law value, ${rig} ${tilt} ${section} ${path}`, () =>
+          expectLawBars(rig, tilt, section, path))
+        it(`logs the ratio to swept, amber outside 5%, ${rig} ${tilt} ${section} ${path}`, () =>
+          logSweptRatios(rig, tilt, section, path))
       }
       for (const cadence of CADENCES) {
         it(`cuts the same with the charge on or off, ${rig} ${tilt} ${section} ${cadence}`, () =>

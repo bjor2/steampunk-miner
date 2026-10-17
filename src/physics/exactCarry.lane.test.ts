@@ -9,53 +9,69 @@ import { readAuthorityState, submitCommand } from '../store/authorityLink'
 import { readLocalVehicle, useGameStore } from '../store/gameStore'
 import { vehicleOf, type AuthorityState } from '../systems/authority/authorityState'
 import { setCasingGradeCommand } from '../systems/authority/casingDebugCommands'
+import { lawWorkRemovedOf } from '../systems/authority/cutCarryFixtures'
 import { digSubStepsOfCells } from '../systems/authority/drillCutTally'
-import { LAW_WORK_PER_DRILL_TICK } from '../systems/vehicle/cutCarry'
-import { hardnessOfTile } from '../systems/authority/groundDrill'
+import {
+  isHeatAtLaw,
+  isUnderRatchet,
+  isUnderTankFloor,
+  isWithinLawShare,
+  lawChargeBarsOf,
+  lawChargeTextOf,
+  QUANTA_PER_LAW_WORK,
+  sweptVerdictOf,
+  type LawChargeBars,
+} from '../systems/authority/lawChargeBars'
+import { CUT_ENERGY_DENOMINATOR, LAW_WORK_PER_DRILL_TICK } from '../systems/vehicle/cutCarry'
 import { planetParamsOf } from '../systems/authority/planetOfState'
 import { bandHeatPerSecond, drillHeatPerSecond } from '../systems/economy/heatEconomy'
 import { onCurveSteps } from '../systems/economy/vehicleStats'
 import { buildIntent } from '../systems/input/buildIntent'
-import { add, toCanonical } from '../systems/money'
+import { add } from '../systems/money'
 import type { Vector2 } from '../systems/vehicle/localFrame'
 import type { PoseReporter } from '../systems/vehicle/poseReport'
 import { heatUnitsPerTickOf } from '../systems/vehicle/vehicleHeat'
 import type { VehicleIntent } from '../systems/vehicle/vehicleIntent'
-import { cellDensitySum, type YieldedCell } from '../systems/world/cellYield'
+import type { VehicleState } from '../systems/vehicle/vehicleState'
+import type { YieldedCell } from '../systems/world/cellYield'
 import { bandOfTile } from '../systems/world/planetGeometry'
 import type { PlanetParams } from '../systems/world/planetParams'
-import { SAMPLES_PER_CELL, SOLID_DENSITY } from '../systems/world/sampleGrid'
+import type { TilePoint } from '../systems/world/tileGrid'
 import { isTileYielded, materialCellAt, type WorldState } from '../systems/world/worldState'
 import { createRig, type Rig } from './cutFollowFixtures'
 
-// The report cut charged on density removed, against the swept law-exact path in the real loop
+// The report cut charged on density removed, against the analytic law value in the real loop
 // (ticket 535, A6 "Option L": the TD shape 6228682000 with its geometry amendment 6228838042, VS
-// 6228674086 and 6228848270, Systems 6228669500). Each rig leaves the pad and plays, through the
+// 6228674086 and 6228848270, Systems 6228669500, and the reference VS ruled on the ticket,
+// 6230602042, recorded by the GD 6230602177). Each rig leaves the pad and plays, through the
 // real loop and Rapier body, an 80 m leg down (flat: the body upright down the dock's column,
 // casing grade 5 so a cave-in never ends it) and, from a fresh start, a 12 m dive and a 250 m leg
-// level west (tilted: the body rolls with the ground round the planet). Paths: the swept cut (the
-// reference, at its shipped report cadence), the report cut with the charge on (`drill.exactCarry`)
-// at the shipped 12 ticks and every tick (the harness below, as `levelLegDeadStop.lane.test.ts`
-// does), and the protocol-83 charge (the switch off) at both, which is main's player path. Read
-// per leg, from the ground and the tank:
-// - law work: each cell's density removed as a share of a solid cell, times its hardness;
+// level west (tilted: the body rolls with the ground round the planet). Paths: the swept cut (at
+// its shipped report cadence, logged beside), the report cut with the charge on
+// (`drill.exactCarry`) at the shipped 12 ticks and every tick (the harness below, as
+// `levelLegDeadStop.lane.test.ts` does), and the protocol-83 charge (the switch off) at both,
+// which is main's player path. Read per leg, from the ground and the tank:
+// - law work: each cell's density removed times its law time at the rig's drill, in density
+//   sub-steps (`cutCarryFixtures.ts`, the carry's own unit, as the slab replay reads it);
 // - energy: the quanta the tank lost each tick (the rig refills it every 60 ticks);
 // - heat ticks: what the report heats for before the gauge's clamp: the law work removed over a
 //   drill tick's on the charged paths (its carry read from the vehicle), the broken cells' summed
 //   dig time over 60 on the swept path, the drilled ticks on the protocol-83 one;
-// - cells yielded, metres, metres a second.
-// Gated (VS, hard): energy per unit of law work within 1% of swept at the same rig and ground, and
-// heat per unit of law work at least swept's, less one cell; and the regression gate of the TD's
-// amendment (VS confirmed): with the charge on or off at the same cadence the carve is
-// byte-identical (the same cells, law work, metres and ticks), only energy and heat moving. The
-// absolute geometry bars (law work per metre at least 1.000 and the 250 m window at most 1.050,
-// cells per metre within 5%) are #514's merge bars: logged here beside the charge bars, never
-// gated. Logged too: energy and heat per metre, energy per yielded cell, and the protocol-83 rows
-// (main). The ladder (stored 1 to 200) logs law work per metre at every rung. One heat-planet rig
-// (planet 8, on-curve) reads the gauge itself: drill heat per unit of law work at least swept's,
-// less one cell. A lane: it runs only when named, prints the table and writes
-// balance-report/exact-carry.ndjson; the slab replay (`authority/lawCarrySlab.lane.test.ts`) reads
-// its 25 and 44 m/s rows to validate itself against the loop.
+// - cells yielded, metres, metres a second, and the energy debt a tow dropped (VS: the maximum
+//   per run is logged; more than one cell's worth goes to the GD).
+// Gated (VS, hard, `lawChargeBars.ts`): on every leg of at least 100 quanta, energy per unit of
+// law work within 1% of the analytic law value, under the tank floor and the ratchet, and heat at
+// least the law's less one drill tick; and the regression gate of the TD's amendment (VS
+// confirmed): with the charge on or off at the same cadence the carve is byte-identical (the same
+// cells, law work, metres and ticks), only energy and heat moving. Logged, never gated: the ratio
+// to swept (amber outside 5%; swept's own charge is #540's), the absolute geometry bars (law work
+// per metre at least 1.000 and the 250 m window at most 1.050, cells per metre within 5%), which
+// are #514's merge bars, energy and heat per metre, energy per yielded cell, and the protocol-83
+// rows (main). The ladder (stored 1 to 200) logs law work per metre at every rung. One
+// heat-planet rig (planet 8, on-curve) reads the gauge itself: drill heat per unit of law work at
+// least the law's, less one drill tick. A lane: it runs only when named, prints the table and
+// writes balance-report/exact-carry.ndjson; the slab replay (`authority/lawCarrySlab.lane.test.ts`)
+// reads its 25 and 44 m/s rows to validate itself against the loop.
 
 /** The harness's report cadence: the shipped interval, or a report every tick (`takePoseReport`). */
 const reportCadence = vi.hoisted(() => ({ isEveryTick: false }))
@@ -125,14 +141,11 @@ const STUCK_UNDER_M = 1
 const TOW_JUMP_M = 1.5
 /** Cells this far round the body, each way, are watched for a yield each tick. */
 const WATCH_CELLS = 3
-const SOLID_CELL_SUM = SAMPLES_PER_CELL * SOLID_DENSITY
 const SUB_STEPS_PER_TICK = 60
 /** The tank the rig refills to every 60 ticks: 150 units of 240 quanta. */
 const REFILLED_QUANTA = 150 * 240
-const ENERGY_SHARE = 0.01
 const LEVEL_WINDOW_CEILING = 1.05
-/** The charge's numerator per quantum, and per density sub-step of law work (`cutCarry.ts`). */
-const CUT_ENERGY_DENOMINATOR_OF_LOOP = LAW_WORK_PER_DRILL_TICK * 10_000
+/** The charge's numerator per density sub-step of law work at the drill's whole share (`cutCarry.ts`). */
 const LAW_NUMERATOR_PER_SUB_STEP = 10_000 * 4
 /** Under this many metres a leg is no reading: the rig jammed or never left the pad. */
 const MIN_READ_M = 10
@@ -156,6 +169,8 @@ interface LegReading {
   heatTicks: number
   /** Drill heat ticks read off the gauge (heat planet only), else null. */
   gaugeHeatTicks: number | null
+  /** The energy carry a tow dropped on this leg, in quanta: a debt is free energy (VS). */
+  debtDroppedQuanta: number
   stuck: boolean
 }
 
@@ -175,6 +190,7 @@ afterEach(() => uninstallRunLog())
 
 afterAll(() => {
   console.log(formatTable(readings))
+  console.log(debtDroppedTextOf(readings))
   writeReadings(readings)
 })
 
@@ -254,6 +270,8 @@ interface LegTally {
   drilledTicks: number
   /** The band under the body each tick, for the gauge's band heat. */
   bands: number[]
+  /** The energy carry the tow dropped, in quanta (VS: logged, a debt over one cell goes to the GD). */
+  debtDroppedQuanta: number
   isTowed: boolean
 }
 
@@ -269,6 +287,7 @@ function measureLeg(rig: TrackedRig, intent: VehicleIntent, metres: number) {
     carriedHeatTicks: 0,
     drilledTicks: 0,
     bands: [],
+    debtDroppedQuanta: 0,
     isTowed: false,
   }
   let previous = rig.position()
@@ -295,6 +314,7 @@ function measureLeg(rig: TrackedRig, intent: VehicleIntent, metres: number) {
     carriedHeatTicks: tally.carriedHeatTicks,
     drilledTicks: tally.drilledTicks,
     bands: tally.bands,
+    debtDroppedQuanta: tally.debtDroppedQuanta,
     stuck: isStuck(tally.positions) || tally.isTowed,
   }
 }
@@ -313,7 +333,23 @@ function noteTick(tally: LegTally, before: AuthorityState, after: AuthorityState
   tally.digSubSteps += digSubStepsOfCells(before, params, playerIdOf(), yielded)
   tally.carriedHeatTicks += carriedHeatTicksOf(before, after)
   tally.energy += energyLostOf(before, after)
+  tally.debtDroppedQuanta += debtDroppedOf(before, after)
   tally.bands.push(bandOfTile(params, Math.floor(at.x), Math.floor(at.y)))
+}
+
+/**
+ * The energy carry a tow dropped this tick, in quanta: the stranded vehicle's carry when the
+ * rescue brings it to the dock (`vehicleTransitions.ts`); 0 on any other tick, a dock keeps it.
+ */
+function debtDroppedOf(before: AuthorityState, after: AuthorityState): number {
+  const was = vehicleOf(before, playerIdOf())
+  const now = vehicleOf(after, playerIdOf())
+  if (!isTowOf(was, now)) return 0
+  return (was.cutEnergyCarry ?? 0) / CUT_ENERGY_DENOMINATOR
+}
+
+function isTowOf(was: VehicleState, now: VehicleState): boolean {
+  return (was.mode === 'stranded' || was.mode === 'destroyed') && now.mode === 'docked'
 }
 
 /** The cells round the body that yielded this tick, as they stood before it. */
@@ -343,7 +379,7 @@ function carriedHeatTicksOf(before: AuthorityState, after: AuthorityState): numb
   const was = vehicleOf(before, playerIdOf())
   const now = vehicleOf(after, playerIdOf())
   const owed = (was.cutEnergyCarry ?? 0) - (now.cutEnergyCarry ?? 0)
-  const paid = Math.max(0, energyLostOf(before, after)) * CUT_ENERGY_DENOMINATOR_OF_LOOP + owed
+  const paid = Math.max(0, energyLostOf(before, after)) * CUT_ENERGY_DENOMINATOR + owed
   const law = Math.round(paid / LAW_NUMERATOR_PER_SUB_STEP)
   const heated = (was.cutHeatCarry ?? 0) + law - (now.cutHeatCarry ?? 0)
   return heated <= 0 ? 0 : Math.round(heated / LAW_WORK_PER_DRILL_TICK)
@@ -356,28 +392,34 @@ function energyLostOf(before: AuthorityState, after: AuthorityState): number {
   return now > was ? Math.max(0, REFILLED_QUANTA - now) : was - now
 }
 
-/** Every cell round the path: its density removed as a share of a solid cell, times its hardness. */
+/**
+ * The law work removed round the path, in density sub-steps: every cell's density removed times
+ * its law time at the drill the rig started the leg with (`cutCarryFixtures.ts`), and the most
+ * one cell lost, the bars' one-cell quantum.
+ */
 function lawWorkOf(start: AuthorityState, end: AuthorityState, positions: readonly Vector2[]) {
-  const params = planetParamsOf(end.planet)
-  if (params === null || positions.length === 0) return { lawWork: 0, hardest: 0 }
+  if (planetParamsOf(end.planet) === null || positions.length === 0)
+    return { lawWork: 0, hardest: 0 }
+  const tiles = tilesRoundPath(positions)
+  const player = playerIdOf()
+  const lawOfTile = (tile: TilePoint) => lawWorkRemovedOf(start, end.world, [tile], player)
+  return {
+    lawWork: lawWorkRemovedOf(start, end.world, tiles, player),
+    hardest: tiles.reduce((most, tile) => Math.max(most, lawOfTile(tile)), 0),
+  }
+}
+
+/** The cells within `WATCH_CELLS` of the path's bounding box, in column order. */
+function tilesRoundPath(positions: readonly Vector2[]): TilePoint[] {
   const xs = positions.map(({ x }) => Math.floor(x))
   const ys = positions.map(({ y }) => Math.floor(y))
-  let lawWork = 0
-  let hardest = 0
+  const tiles: TilePoint[] = []
   for (let tx = Math.min(...xs) - WATCH_CELLS; tx <= Math.max(...xs) + WATCH_CELLS; tx++) {
     for (let ty = Math.min(...ys) - WATCH_CELLS; ty <= Math.max(...ys) + WATCH_CELLS; ty++) {
-      const tile = { tx, ty }
-      const removed =
-        cellDensitySum(start.world, params, tile) - cellDensitySum(end.world, params, tile)
-      if (removed <= 0) continue
-      const hardness = numberOf(
-        hardnessOfTile(params, tile, materialCellAt(start.world, params, tile)),
-      )
-      lawWork += (removed / SOLID_CELL_SUM) * hardness
-      hardest = Math.max(hardest, hardness)
+      tiles.push({ tx, ty })
     }
   }
-  return { lawWork, hardest }
+  return tiles
 }
 
 /**
@@ -449,10 +491,6 @@ function distanceOf(a: Vector2, b: Vector2): number {
   return Math.hypot(a.x - b.x, a.y - b.y)
 }
 
-function numberOf(value: Parameters<typeof toCanonical>[0]): number {
-  return Number(toCanonical(value))
-}
-
 /**
  * A played leg as its reading: heat ticks from the carry on the charged report paths, from dig
  * time on the swept path, or drilled ticks on main's charge.
@@ -479,6 +517,7 @@ function readingOf(played: ReturnType<typeof playLeg> & { gaugeHeatTicks?: numbe
     energy: played.energy,
     heatTicks,
     gaugeHeatTicks: played.gaugeHeatTicks ?? null,
+    debtDroppedQuanta: played.debtDroppedQuanta,
     stuck: played.stuck,
   }
 }
@@ -520,10 +559,12 @@ function oneCellShareOf(leg: LegReading, swept: LegReading): number {
 function formatTable(rows: readonly LegReading[]): string {
   const header =
     'rig | path | section | m | m/s | cells | law work | energy | heat ticks | gauge heat ticks | ' +
-    'law/m | energy/law | heat/law | energy/m | heat/m | energy/cell | stuck'
+    'law/m | energy/law | heat/law | energy vs law | heat vs law | energy/m | heat/m | ' +
+    'energy/cell | debt dropped | stuck'
   const fixed = (value: number, digits = 3) => value.toFixed(digits)
-  const lines = rows.map((row) =>
-    [
+  const lines = rows.map((row) => {
+    const bars = lawChargeBarsOf(row)
+    return [
       row.rig,
       row.path,
       row.section,
@@ -535,15 +576,42 @@ function formatTable(rows: readonly LegReading[]): string {
       fixed(row.heatTicks, 1),
       row.gaugeHeatTicks === null ? '-' : fixed(row.gaugeHeatTicks, 1),
       fixed(perMetre(row.lawWork, row)),
-      fixed(perLaw(row.energy, row)),
-      fixed(perLaw(row.heatTicks, row), 4),
+      row.lawWork === 0 ? '-' : perLaw(row.energy, row).toExponential(3),
+      row.lawWork === 0 ? '-' : perLaw(row.heatTicks, row).toExponential(3),
+      row.lawWork === 0 ? '-' : fixed(bars.energyRatio),
+      row.lawWork === 0 ? '-' : fixed(bars.heatRatio),
       fixed(perMetre(row.energy, row), 1),
       fixed(perMetre(row.heatTicks, row), 2),
       row.cells === 0 ? '-' : fixed(row.energy / row.cells, 1),
+      fixed(row.debtDroppedQuanta, 2),
       row.stuck ? 'yes' : 'no',
-    ].join(' | '),
-  )
+    ].join(' | ')
+  })
   return [header, ...lines].join('\n')
+}
+
+/**
+ * VS's condition on the carry: the most energy debt a tow dropped over the run, against one
+ * cell's worth at the hardest cell any leg cut; more than that goes to the GD.
+ */
+function debtDroppedTextOf(rows: readonly LegReading[]): string {
+  const most = rows.reduce(
+    (top, row) => (row.debtDroppedQuanta > top.debtDroppedQuanta ? row : top),
+    {
+      debtDroppedQuanta: 0,
+      rig: 'none',
+      path: '-',
+      section: '-',
+    },
+  )
+  const oneCellQuanta =
+    rows.reduce((top, row) => Math.max(top, row.oneCellLaw), 0) * QUANTA_PER_LAW_WORK
+  const verdict =
+    most.debtDroppedQuanta <= oneCellQuanta ? 'within one cell' : 'over one cell: to the GD'
+  return (
+    `max energy debt dropped at the tow: ${most.debtDroppedQuanta.toFixed(2)} quanta ` +
+    `(${most.rig} ${most.path} ${most.section}; one cell is ${oneCellQuanta.toFixed(2)} quanta, ${verdict})`
+  )
 }
 
 function writeReadings(rows: readonly LegReading[]): void {
@@ -553,24 +621,47 @@ function writeReadings(rows: readonly LegReading[]): void {
 }
 
 /**
- * VS's hard charge bars for a charged leg against swept at the same rig and ground; the geometry
- * bars (#514's) are printed beside them, with their own verdict, and gate nothing here.
+ * VS's hard charge bars for a charged leg against the analytic law value (`lawChargeBars.ts`): a
+ * leg under 10 m or under 100 quanta is logged, not gated.
  */
-function expectBars(rig: string, path: string, section: Section): void {
+function expectLawBars(rig: string, path: string, section: Section): void {
   const leg = legOf(rig, path, section)
-  const swept = legOf(rig, 'swept', section)
-  const ratios = ratiosOf(leg, swept)
-  console.log(`${rig} ${path} ${section} / swept: ${JSON.stringify(ratios)}`)
-  if (!isComparable(leg, swept)) {
-    console.log(`${rig} ${path} ${section}: unmeasured (under ${MIN_READ_M} m or nothing cut)`)
+  const bars = lawChargeBarsOf(leg)
+  console.log(`${rig} ${path} ${section} / law: ${lawChargeTextOf(bars)}`)
+  if (leg.metres < MIN_READ_M || !bars.isMeasurable) {
+    console.log(`${rig} ${path} ${section}: unmeasured (under ${MIN_READ_M} m or quantized)`)
     return
   }
+  expectLawCharge(bars)
+}
+
+function expectLawCharge(bars: LawChargeBars): void {
+  expect(isWithinLawShare(bars.energyRatio)).toBe(true)
+  expect(isUnderTankFloor(bars.energyRatio)).toBe(true)
+  expect(isUnderRatchet(bars.energyRatio)).toBe(true)
+  expect(isHeatAtLaw(bars)).toBe(true)
+}
+
+/**
+ * The ratios to swept at the same rig and ground, printed and never gated: the charge ratios
+ * amber outside 5% (swept's own charge is #540's), the geometry bars (#514's) with their verdict.
+ */
+function logSweptRatios(rig: string, path: string, section: Section): void {
+  const leg = legOf(rig, path, section)
+  const swept = legOf(rig, 'swept', section)
+  if (!isComparable(leg, swept)) {
+    console.log(
+      `${rig} ${path} ${section} / swept: unmeasured (under ${MIN_READ_M} m or nothing cut)`,
+    )
+    return
+  }
+  const ratios = ratiosOf(leg, swept)
+  const verdict = `energy ${sweptVerdictOf(ratios.energyPerLaw)}, heat ${sweptVerdictOf(ratios.heatPerLaw)}`
+  console.log(`${rig} ${path} ${section} / swept (logged, ${verdict}): ${JSON.stringify(ratios)}`)
   const slack = oneCellShareOf(leg, swept)
   console.log(
     `${rig} ${path} ${section} geometry (#514's bars, reported): ${geometryVerdictOf(ratios, section, slack)}`,
   )
-  expect(Math.abs(ratios.energyPerLaw - 1)).toBeLessThanOrEqual(ENERGY_SHARE)
-  expect(ratios.heatPerLaw).toBeGreaterThanOrEqual(1 - slack)
 }
 
 /** The absolute geometry bars as #514 reads them, for the report beside the charge bars. */
@@ -612,8 +703,10 @@ describe('the charged report cut against the swept cut at VS rigs (ticket 535)',
         LEG_TIMEOUT_MS,
       )
       for (const path of EXACT_PATHS) {
-        it(`holds VS's charge bars for the ${rig} rig ${section}, ${path}`, () =>
-          expectBars(rig, path, section))
+        it(`charges and heats at the analytic law value, the ${rig} rig ${section}, ${path}`, () =>
+          expectLawBars(rig, path, section))
+        it(`logs the ratios to swept, amber outside 5%, the ${rig} rig ${section}, ${path}`, () =>
+          logSweptRatios(rig, path, section))
       }
       for (const cadence of ['@12', '@1'] as const) {
         it(`cuts the same with the charge on or off, the ${rig} rig ${section} ${cadence}`, () =>
@@ -639,8 +732,10 @@ describe('the ladder, stored 1 to 200, on every path (ticket 535, Systems)', () 
     )
     for (const path of EXACT_PATHS) {
       for (const section of ['down', 'level'] as const) {
-        it(`holds VS's charge bars for ${rig} ${section}, ${path}`, () =>
-          expectBars(rig, path, section))
+        it(`charges and heats at the analytic law value, ${rig} ${section}, ${path}`, () =>
+          expectLawBars(rig, path, section))
+        it(`logs the ratios to swept, amber outside 5%, ${rig} ${section}, ${path}`, () =>
+          logSweptRatios(rig, path, section))
       }
     }
     for (const cadence of ['@12', '@1'] as const) {
@@ -663,17 +758,18 @@ describe('the charged report cut on a heat planet (ticket 535, the heat bar off 
     LEG_TIMEOUT_MS,
   )
   for (const path of EXACT_PATHS) {
-    it(`heats at least as swept per unit of law work off the gauge, ${path}`, () => {
+    it(`heats at least the law per unit of law work off the gauge, ${path}`, () => {
       const leg = legOf(rig, path, 'down')
       const swept = legOf(rig, 'swept', 'down')
+      const gauge = lawChargeBarsOf({ ...leg, heatTicks: leg.gaugeHeatTicks ?? 0 })
       const perLawOfGauge = (row: LegReading) => (row.gaugeHeatTicks ?? 0) / row.lawWork
+      console.log(`${rig} ${path} gauge heat / law: ${lawChargeTextOf(gauge)}`)
       console.log(
-        `${rig} ${path} gauge heat/law over swept: ${perLawOfGauge(leg) / perLawOfGauge(swept)}`,
+        `${rig} ${path} gauge heat/law over swept (logged): ${perLawOfGauge(leg) / perLawOfGauge(swept)}`,
       )
       expect(isComparable(leg, swept)).toBe(true)
-      expect(perLawOfGauge(leg) / perLawOfGauge(swept)).toBeGreaterThanOrEqual(
-        1 - oneCellShareOf(leg, swept),
-      )
+      expect(gauge.isMeasurable).toBe(true)
+      expect(isHeatAtLaw(gauge)).toBe(true)
     })
   }
 })

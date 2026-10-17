@@ -476,20 +476,27 @@ programs }` from three's `renderer.info` of the game canvas), read only when cal
   pay and heat as one of sixty ticks; a tank that cannot pay keeps the debt and strands the rig
   till the tow drops it; the carries round-trip the snapshot, are refused malformed, and are
   dropped at planet entry. `src/logging/exactCarryOffGolden.test.ts` replays every golden to its
-  protocol-83 digests with the switch off. The lanes run only when named: the loop lane
-  `src/physics/exactCarry.lane.test.ts` plays the 25 to 3600 m/s rigs, the stored ladder and a
-  planet-8 rig through Rapier on the swept, charged (at 12 ticks and every tick) and protocol-83
-  paths, gates energy per unit of law work within 1% of swept and heat at least swept's less one
-  cell, gates the charge on and off to the same cells, law work, metres and ticks, and prints
-  #514's geometry bars beside them without gating them (about 10 min, writes
-  `balance-report/exact-carry.ndjson`); the slab lane `src/systems/authority/lawCarrySlab.lane.test.ts`
-  replays one prescribed pose list per speed on planet 1's fixed seed, flat and tilted 30 degrees,
-  level and down, through the pure authority with no body, feeding the same poses to
-  `drillStep` and to the report carve, so the 240 and 3600 m/s rows have a swept reference that
-  never jams; it gates the same charge bars and the same regression, cross-checks the charge
-  against the analytic law value (the drill's quanta a tick per drill tick of law work, within 1%)
-  and, when the loop lane's ndjson is present, holds its 25 and 44 m/s ratios to the loop's within
-  1% (about 1 min, writes `balance-report/law-carry-slab.ndjson`);
+  protocol-83 digests with the switch off. The charge bars both lanes gate are one definition,
+  `src/systems/authority/lawChargeBars.ts`, as VS ruled them on the ticket (6230602042): the
+  reference is the analytic law value (the drill's quanta a tick per drill tick of law work read
+  from the ground, density removed times law time), never swept's own charge; on every row of at
+  least 100 quanta, energy per unit of law work within 1% of the law (so at least 0.99, and under
+  the 1.25 tank floor and the 1.098 ratchet) and heat at least the law's less one drill tick; a row
+  under 100 quanta is quantized and logged; the ratio to swept is printed on every row, amber
+  outside 5%, and gates nothing (swept's own under- and over-charge is #540's). The lanes run only
+  when named: the loop lane `src/physics/exactCarry.lane.test.ts` plays the 25 to 3600 m/s rigs,
+  the stored ladder and a planet-8 rig through Rapier on the swept, charged (at 12 ticks and every
+  tick) and protocol-83 paths, gates the law bars, gates the charge on and off to the same cells,
+  law work, metres and ticks, prints #514's geometry bars and the swept ratios beside them without
+  gating them, and logs the most energy debt a tow dropped over the run against one cell's worth
+  (VS: more goes to the GD) (about 10 min, writes `balance-report/exact-carry.ndjson`); the slab
+  lane `src/systems/authority/lawCarrySlab.lane.test.ts` replays one prescribed pose list per speed
+  on planet 1's fixed seed, flat and tilted 30 degrees, level and down, through the pure authority
+  with no body, feeding the same poses to `drillStep` and to the report carve, so the 240 and
+  3600 m/s rows have a swept comparison that never jams; it gates the same law bars and the same
+  regression and, when the loop lane's ndjson is present, holds its 25 and 44 m/s ratios to the
+  law to the loop's within 1% (about 1 to 4 min on the loaded box, writes
+  `balance-report/law-carry-slab.ndjson`);
   `src/logging/tripCellEnergy.lane.test.ts` plays the bot slice on its three pacing seeds and
   prices every trip per cell beside the bot's charge, the tank at least 1.138 times that figure
   (Systems' offline per-cell figure for the paired run; writes
