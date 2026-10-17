@@ -334,16 +334,17 @@ import type { DriveSigns } from '../vehicle/driveSigns'
  *    charged as A6 charges a report (`payLawWorkEnergy`), on the vehicle's one energy carry, where
  *    it charged each broken cell its own dig energy; its heat is unchanged. With the flag off, or
  *    with no drill step sent (`drill.sweptCut` off), every digest is protocol 85's.
- * 87: a pose report's own cut carves the capsule from the previous reported pose (ticket 537, A7,
- *    the TD shape 6228947744 section 4 with the HS additions, the GD 6234994053; behind the
- *    authority dev flag `drill.reportCapsule`, on): where the drill ran every tick since the last
- *    charged report on the same facing and the pose moved by at most one stamp radius, the report
- *    cuts the capsule from the previous pose's stamp centre to this one's on the swept cut's
- *    sub-step clock, in place of the bare disc at the pose on whole ticks, charged as before
- *    (whole ticks, or the law work removed under `drill.exactCarry`). A fresh bite, a turn, a
- *    still rig and a longer step cut protocol 86's bare disc byte for byte. With the flag off every
- *    digest is protocol 86's. A run with no report that drills on from a previous report moves no
- *    digest.
+ * 87: a pose report at interval 1 carves the capsule from the previous reported pose (ticket 537,
+ *    A7, the TD shape 6228947744 section 4 with the HS additions, bounded by the GD 6241320435;
+ *    behind the authority dev flag `drill.reportCapsule`, on, and only with `drill.exactCarry`,
+ *    which interval 1 is tied to): where the drill ran the one tick since the last charged report
+ *    on the same facing and the pose moved by at most one stamp radius, the report cuts the capsule
+ *    from the previous pose's stamp centre to this one's on the swept cut's sub-step clock, in
+ *    place of the bare disc at the pose on whole ticks, charged as A6 charges it (the law work
+ *    removed with the carry), and its drill gear's cells are cut on every tick of the bite. A
+ *    12-tick report, a fresh bite, a turn, a still rig, a longer step and the exact carry off cut
+ *    protocol 86's bare disc byte for byte, so with the flags as shipped every digest is protocol
+ *    86's; with the exact carry on, every 12-tick golden replays to protocol 85's charged digests.
  */
 export const AUTHORITY_PROTOCOL_VERSION = 87
 

@@ -1,44 +1,17 @@
-import { readdirSync, readFileSync } from 'node:fs'
 import { describe, expect, it } from 'vitest'
 import { AUTHORITY_DEV_FLAGS } from '../constants/devFlags'
 import { withDrillExactCarry } from '../systems/authority/cutCarryFixtures'
-import { goldenRunProblems, type GoldenRun } from './goldenRun'
+import { asCharged, CHARGED_DIGESTS, committedGoldenRuns } from './chargedGoldenDigests'
+import { goldenRunProblems } from './goldenRun'
 
 // The `drill.exactCarry` kill-switch (ticket 535, A6, the TD shape 6228682000 item 4 and the
 // goldens gate). It ships off until #541's heat change has landed (the GD 6234312287 condition 1),
 // so the committed goldens are protocol 84's digests and mined order under the current header,
 // the cheapest proof that the charge on density removed changed nothing with the switch off. With
 // the switch on, only the two goldens whose pose reports drill move their end digest, to the
-// digests pinned below (recorded with the switch on at ticket 537's protocol 87, the report
-// capsule on as it ships); every other golden replays to its committed digests and mined order
-// byte for byte.
-
-const GOLDEN_FOLDER = new URL('../../tests/golden/', import.meta.url)
-
-/** The end digest of each golden the charge moves, with the switch on, by tick. */
-const CHARGED_DIGESTS: Readonly<Record<string, Readonly<Record<number, string>>>> = {
-  'casing-lined-band-2': { 2137: 'f2def3c767fb08e1' },
-  'collapse-band-2-grade-1': { 2125: '1cd8a7cae47c33bd' },
-}
-
-function committedGoldenRuns(): GoldenRun[] {
-  return readdirSync(GOLDEN_FOLDER)
-    .filter((name) => name.endsWith('.golden.json'))
-    .sort()
-    .map((name) => JSON.parse(readFileSync(new URL(name, GOLDEN_FOLDER), 'utf8')) as GoldenRun)
-}
-
-/** The golden as the charge records it: its moved digests swapped in. */
-function asCharged(golden: GoldenRun): GoldenRun {
-  const moved = CHARGED_DIGESTS[golden.name] ?? {}
-  return {
-    ...golden,
-    digests: golden.digests.map((record) => ({
-      ...record,
-      digest: moved[record.tick] ?? record.digest,
-    })),
-  }
-}
+// digests pinned in `chargedGoldenDigests.ts` (the goldens' reports are 12-tick, so ticket 537's
+// report capsule, cut at interval 1 only, leaves them as A6 recorded them); every other golden
+// replays to its committed digests and mined order byte for byte.
 
 describe('drill.exactCarry kill-switch (ticket 535)', () => {
   it('ships with the charge on density removed off until #541 lands', () => {

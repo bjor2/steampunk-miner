@@ -11,9 +11,10 @@
  * the cut from the vehicle's carry (`vehicle/cutCarry.ts`). Off, the report charges the ticks its
  * stamp removed something in and heats for its client-counted drill ticks, as protocol 84 did.
  *
- * A report whose bite runs on from the previous report cuts the capsule between the two poses on
- * the sub-step clock (ticket 537, `reportedCapsule.ts` picks the shape and the clock under
- * `drill.reportCapsule`); the charge rule above is the same for either shape.
+ * A report at interval 1 whose bite runs on from the previous report cuts the capsule between the
+ * two poses on the sub-step clock, its drill gear's cells cut on every tick (ticket 537,
+ * `reportedCapsule.ts` picks the shape, the clock and the gear's cut under `drill.reportCapsule`,
+ * only with the exact carry); the charge rule above is the same for either shape.
  */
 import { AUTHORITY_DEV_FLAGS, type AuthorityDevFlags } from '../../constants/devFlags'
 import { splitCutHeatCarry } from '../vehicle/cutCarry'
@@ -21,6 +22,7 @@ import { stepDigTicksOf } from '../vehicle/sweptCut'
 import type { VehiclePose } from '../vehicle/vehiclePose'
 import { noseTileOf } from '../vehicle/vehiclePose'
 import type { VehicleState } from '../vehicle/vehicleState'
+import type { CellsBesideCut } from '../world/groundEdit'
 import type { StampPoint } from '../world/stampShape'
 import type { TilePoint } from '../world/tileGrid'
 import type { AuthorityCommand, CommandPayloads } from './authorityCommand'
@@ -63,12 +65,16 @@ export function drillReportedTicks(
   return drillAtPoseAndBurrowers(state, playerId, reportedCutOf(vehicle.pose, report, flags))
 }
 
-/** A report's own cut: its pose and payload, where its capsule starts, and its clock. */
+/**
+ * A report's own cut: its pose and payload, where its capsule starts, its clock, and when its
+ * drill gear's cells are cut.
+ */
 interface PoseReportCut {
   pose: VehiclePose
   payload: PosePayload
   tail: StampPoint | null
   clock: DrillClock
+  cellsBeside: CellsBesideCut
 }
 
 /** The capsule from the previous pose where the bite runs on (ticket 537), else the bare disc. */
@@ -87,12 +93,12 @@ function reportedCutOf(
 function drillAtPoseAndBurrowers(
   state: AuthorityState,
   playerId: string,
-  { pose, payload, tail, clock }: PoseReportCut,
+  { pose, payload, tail, clock, cellsBeside }: PoseReportCut,
 ): RuleEffect {
   const params = planetParamsOf(state.planet)
   if (params === null) return unchanged(state)
   const nose = noseTileOf(pose)
-  const reported = { pose, drive: payload.drive, isLifting: payload.thrusting, tail }
+  const reported = { pose, drive: payload.drive, isLifting: payload.thrusting, tail, cellsBeside }
   const drilled = drillAtPose(state, params, playerId, reported, nose, payload.drillTicks, clock)
   return withBurrowersCut(drilled, playerId, nose)
 }
