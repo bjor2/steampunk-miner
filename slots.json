@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-10-17T07:04:45+01:00",
+  "updated_at": "2026-10-17T09:10:13+01:00",
   "caps": {
     "grok": 12,
     "claude": 10,
@@ -136,7 +136,342 @@
     "main_red_sha": null,
     "feature": 309,
     "feature_title": "Spec: Planet-1 ground weapon (penetrating shot, collapse without casing, visible casing)",
-    "queue": []
+    "queue": [
+      {
+        "feature": 257,
+        "kind": "spec",
+        "title": "Grilling: What positive effect justifies the twin-bit head?",
+        "tickets": [
+          279,
+          280,
+          281,
+          288,
+          372
+        ],
+        "since": "2026-10-14T10:27:45+02:00"
+      },
+      {
+        "feature": 316,
+        "kind": "spec",
+        "title": "Research: engine speed headroom for the drill law (16 m/s check, cells per tick, streaming)",
+        "tickets": [
+          330,
+          333,
+          334,
+          335,
+          336,
+          337,
+          338,
+          339,
+          340,
+          341,
+          349,
+          374
+        ],
+        "since": "2026-10-14T12:56:49+02:00"
+      },
+      {
+        "feature": 393,
+        "kind": "ticket",
+        "title": "Art: new player vehicle — compact casing driller (Blender MCP), replaces current machine",
+        "tickets": [
+          393
+        ],
+        "since": "2026-10-14T18:19:21+02:00"
+      },
+      {
+        "feature": 398,
+        "kind": "ticket",
+        "title": "Art: service station — charge, repair & sell bays (Blender MCP), replaces Assay & Exchange",
+        "tickets": [
+          398
+        ],
+        "since": "2026-10-14T20:01:14+02:00"
+      },
+      {
+        "feature": 395,
+        "kind": "ticket",
+        "title": "Art: upgrade workshop building — steampunk hangar (Blender MCP), replaces Engineering Works",
+        "tickets": [
+          395
+        ],
+        "since": "2026-10-14T20:06:14+02:00"
+      },
+      {
+        "feature": 401,
+        "kind": "spec",
+        "title": "Spec: New Game + save/load (slots, menus)",
+        "tickets": [
+          402,
+          403,
+          404,
+          405,
+          406,
+          407
+        ],
+        "since": "2026-10-14T21:25:29+02:00"
+      },
+      {
+        "feature": 256,
+        "kind": "spec",
+        "title": "Grilling: Mark milestone behaviours",
+        "tickets": [
+          272,
+          273,
+          274,
+          275,
+          276,
+          277,
+          278
+        ],
+        "since": "2026-10-14T23:40:41+02:00"
+      },
+      {
+        "feature": 304,
+        "kind": "spec",
+        "title": "Grilling: Exponential drill speed law (never capped, carries across planets)",
+        "tickets": [
+          396
+        ],
+        "since": "2026-10-15T00:44:07+02:00"
+      },
+      {
+        "feature": 245,
+        "kind": "spec",
+        "title": "Grilling: Sixth \"Aetheric science\" lane or fold steampunk-scientific power-ups into existing lanes?",
+        "tickets": [
+          260,
+          261,
+          262,
+          263,
+          264,
+          265,
+          266,
+          360,
+          361,
+          363,
+          373,
+          375,
+          376,
+          389,
+          390
+        ],
+        "since": "2026-10-15T01:01:21+02:00"
+      },
+      {
+        "feature": 161,
+        "kind": "spec",
+        "title": "Spec: Deep tech tree: structure, costs and endless depth",
+        "tickets": [
+          249,
+          251,
+          254,
+          295,
+          370,
+          371,
+          384,
+          385,
+          408,
+          411
+        ],
+        "since": "2026-10-15T12:27:02+02:00"
+      },
+      {
+        "feature": 418,
+        "kind": "ticket",
+        "title": "Fix red main: pacingGate planet 1 core at 33.8 min on 0ffdd7c5 (window 15-30)",
+        "tickets": [
+          418
+        ],
+        "since": "2026-10-15T16:49:09+02:00"
+      },
+      {
+        "feature": 310,
+        "kind": "spec",
+        "title": "Spec: Per-weapon tech trees (auto-aim, auto-shoot, vertically scaling range)",
+        "tickets": [
+          317,
+          318,
+          319,
+          320,
+          321,
+          322,
+          358,
+          364,
+          377,
+          378,
+          379,
+          380,
+          382,
+          383,
+          386,
+          387,
+          388,
+          412,
+          413,
+          414,
+          415
+        ],
+        "since": "2026-10-15T18:31:21+02:00"
+      },
+      {
+        "feature": 409,
+        "kind": "ticket",
+        "title": "Test: drill-speed ladder benchmark (levels 1/5/10/15/20)",
+        "tickets": [
+          409
+        ],
+        "since": "2026-10-15T19:17:47+02:00"
+      },
+      {
+        "feature": 422,
+        "kind": "spec",
+        "title": "Spec: UI text budget, readable text, steampunk scroll area and tooltip",
+        "tickets": [
+          423,
+          424,
+          425,
+          426,
+          427,
+          428,
+          429
+        ],
+        "since": "2026-10-16T00:46:43+02:00"
+      },
+      {
+        "feature": 255,
+        "kind": "spec",
+        "title": "Grilling: Lane forks (two specialisations per lane at P16)",
+        "tickets": [
+          259,
+          267,
+          268,
+          269,
+          270,
+          271,
+          359,
+          391,
+          392,
+          410
+        ],
+        "since": "2026-10-16T07:41:39+02:00"
+      },
+      {
+        "feature": 157,
+        "kind": "spec",
+        "title": "Wayfinder: Tech tree and UI clarity (deep tech tree with visible vehicle changes, clear icons, item descriptions)",
+        "tickets": [
+          163,
+          164,
+          165,
+          166,
+          199,
+          200,
+          201,
+          202,
+          203,
+          204,
+          205,
+          206,
+          212,
+          224,
+          233,
+          234,
+          235,
+          239,
+          240,
+          241,
+          242,
+          243,
+          244,
+          248,
+          249,
+          250,
+          251,
+          252,
+          253,
+          254,
+          259,
+          260,
+          261,
+          262,
+          263,
+          264,
+          265,
+          266,
+          267,
+          268,
+          269,
+          270,
+          271,
+          272,
+          273,
+          274,
+          275,
+          276,
+          277,
+          278,
+          279,
+          280,
+          281,
+          282,
+          283,
+          284,
+          285,
+          286,
+          287,
+          288,
+          295,
+          300,
+          323,
+          324,
+          325,
+          326,
+          327,
+          328,
+          329,
+          331,
+          332,
+          351,
+          357,
+          359,
+          360,
+          361,
+          363,
+          365,
+          366,
+          367,
+          368,
+          369,
+          370,
+          371,
+          372,
+          373,
+          375,
+          376,
+          381,
+          384,
+          385,
+          389,
+          390,
+          391,
+          392,
+          394,
+          402,
+          403,
+          404,
+          405,
+          406,
+          407,
+          408,
+          410,
+          411,
+          416,
+          434
+        ],
+        "since": "2026-10-16T07:41:39+02:00"
+      }
+    ]
   },
   "grok": [
     {
