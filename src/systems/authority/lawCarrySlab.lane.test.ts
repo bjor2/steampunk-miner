@@ -3,9 +3,9 @@ import { afterAll, describe, expect, it } from 'vitest'
 import { onCurveSteps } from '../economy/vehicleStats'
 import {
   droppedHeatShareOf,
-  gaugeRatchetRatioOf,
+  gaugeRatchetOf,
+  gaugeRatchetTextOf,
   heatCapTextOf,
-  isGaugeNoLowerThanMain,
 } from './heatCapReadings'
 import {
   isHeatAtLaw,
@@ -43,12 +43,15 @@ import {
 // rise). Gated (VS, hard, `lawChargeBars.ts`): on every row of at least 100 quanta, energy per
 // unit of law work within 1% of the analytic law value, under the tank floor and the ratchet, and
 // heat fed at least the law's less one drill tick (VS 6232473040: the bar reads the fed ticks, the
-// cap is #541's); VS's gauge ratchet: the charged branch settles no less heat per unit of law work
-// than main on the same rig and ground, which is main at the same cadence (the other cadence cuts
-// a different track of cells and is printed), and the share of the law heat the cap drops is
-// printed on every row; the regression gate: with the charge on or off at the same
-// cadence the carve is byte-identical (the same chunks, cells in order and law work), and no
-// `CommandRejected` on any path. Validation: when
+// cap is #541's); the regression gate: with the charge on or off at the same cadence the carve is
+// byte-identical (the same chunks, cells in order and law work), and no `CommandRejected` on any
+// path. Printed on every row, never gated (VS 6234304278, option iii, the GD 6234312287): the
+// share of the law heat the cap drops, and the gauge's settled heat against the law and against
+// main at both cadences, each red row with its reason (reason 1: main @12 heats one tick per
+// drilling tick, above the law; reason 2: the law-exact feed is bursty and the cap clips it,
+// #541's loss), amber below both main and the law. VS's exact settle gate (the gauge rises by what
+// the rule can settle of the fed ticks) reads on the loop lane's heat planet, the only gauge that
+// rises; here the settleable ticks are that rule's own arithmetic. Validation: when
 // the loop lane's `balance-report/exact-carry.ndjson` is present, the 25 and 44 m/s ratios to the
 // law agree with the real loop's within 1%. Logged, never gated: the ratio to swept (amber
 // outside 5%; swept's own charge is #540's), law work per metre and cells per metre against swept
@@ -179,32 +182,21 @@ function expectLawBars(rig: string, tilt: SlabTilt, section: SlabSection, path: 
 }
 
 /**
- * VS's gauge ratchet (6232473040): the charged branch settles no less heat per unit of law work
- * than main on the same rig and ground, which is main at the same cadence (the regression gate
- * makes that carve byte-identical; the other cadence is printed), and the share of the law heat
- * the #113 cap drops is printed; the gauge against the law is #541's, never a pass here.
+ * The gauge ratchet, printed and never gated (VS 6234304278, option iii): the share of the law
+ * heat the #113 cap drops, and the charged branch's settled heat per unit of law work against the
+ * law and against main at both cadences (the same cadence cuts the same track, the regression
+ * gate holds; the other cadence cuts a different one), each red row with its reason
+ * (`heatCapReadings.ts`). The gauge against the law is #541's, never a pass here.
  */
-function expectGaugeRatchet(rig: string, tilt: SlabTilt, section: SlabSection, path: SlabPath) {
+function logGaugeRatchet(rig: string, tilt: SlabTilt, section: SlabSection, path: SlabPath) {
   const run = runOf(rig, tilt, section, path)
   const bars = lawChargeBarsOf(run)
-  console.log(
-    `${keyOf(rig, tilt, section, path)} / heat cap: ${heatCapTextOf(run, bars.expectedHeatTicks)}`,
-  )
+  const name = keyOf(rig, tilt, section, path)
+  console.log(`${name} / heat cap: ${heatCapTextOf(run, bars.expectedHeatTicks)}`)
   for (const mainPath of MAIN_PATHS) {
-    const main = runOf(rig, tilt, section, mainPath)
-    const ratio = thousandths(gaugeRatchetRatioOf(run, main))
-    const verdict = isGaugeNoLowerThanMain(run, main) ? 'no lower' : 'lower: cooler than main'
-    console.log(
-      `${keyOf(rig, tilt, section, path)} settled per law work over ${mainPath}: ${ratio} (${verdict})`,
-    )
+    const ratchet = gaugeRatchetOf(run, runOf(rig, tilt, section, mainPath))
+    console.log(`${name} (printed, not gated): ${gaugeRatchetTextOf(ratchet, mainPath)}`)
   }
-  if (!bars.isMeasurable) return
-  expect(isGaugeNoLowerThanMain(run, runOf(rig, tilt, section, mainOfCadence(path)))).toBe(true)
-}
-
-/** The protocol-84 path cutting the same track as a charged one: the same cadence. */
-function mainOfCadence(path: SlabPath): SlabPath {
-  return path === 'exact @12' ? 'main @12' : 'main @1'
 }
 
 /** The TD's regression gate: the charge on or off at one cadence cuts the same, byte for byte. */
@@ -317,8 +309,8 @@ function describeRig(rig: string, levels: Record<string, number>, strideMm: numb
           expectLawBars(rig, tilt, section, path))
         it(`logs the ratio to swept, amber outside 5%, ${rig} ${tilt} ${section} ${path}`, () =>
           logSweptRatios(rig, tilt, section, path))
-        it(`settles no less heat than main and prints what the cap drops, ${rig} ${tilt} ${section} ${path}`, () =>
-          expectGaugeRatchet(rig, tilt, section, path))
+        it(`prints the gauge against the law and main, and what the cap drops, ${rig} ${tilt} ${section} ${path}`, () =>
+          logGaugeRatchet(rig, tilt, section, path))
       }
       for (const cadence of CADENCES) {
         it(`cuts the same with the charge on or off, ${rig} ${tilt} ${section} ${cadence}`, () =>
