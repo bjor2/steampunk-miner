@@ -475,26 +475,52 @@ programs }` from three's `renderer.info` of the game canvas), read only when cal
   carry equals the law work read from the ground (`cutCarryFixtures.ts`); sixty one-tick reports
   pay and heat as one of sixty ticks; a tank that cannot pay keeps the debt and strands the rig
   till the tow drops it; the carries round-trip the snapshot, are refused malformed, and are
-  dropped at planet entry. `src/logging/exactCarryOffGolden.test.ts` replays every golden to its
-  protocol-83 digests with the switch off. The charge bars both lanes gate are one definition,
+  dropped at planet entry. The switch ships off until #541's heat change has landed (the GD's
+  landing condition, G&V's line): the committed goldens are protocol 84's digests under the 85
+  header, and `src/logging/exactCarryOnGolden.test.ts` replays every golden with the switch on,
+  only `casing-lined-band-2` and `collapse-band-2-grade-1` moving their end digest, to the digests
+  it pins. The charge's specs and the lanes switch it on through `withDrillExactCarry`
+  (`cutCarryFixtures.ts`), which puts the shipped value back. The charge bars both lanes gate are one definition,
   `src/systems/authority/lawChargeBars.ts`, as VS ruled them on the ticket (6230602042): the
   reference is the analytic law value (the drill's quanta a tick per drill tick of law work read
   from the ground, density removed times law time), never swept's own charge; on every row of at
   least 100 quanta, energy per unit of law work within 1% of the law (so at least 0.99, and under
-  the 1.25 tank floor and the 1.098 ratchet) and heat at least the law's less one drill tick; a row
-  under 100 quanta is quantized and logged; the ratio to swept is printed on every row, amber
-  outside 5%, and gates nothing (swept's own under- and over-charge is #540's). The lanes run only
-  when named: the loop lane `src/physics/exactCarry.lane.test.ts` plays the 25 to 3600 m/s rigs,
-  the stored ladder and a planet-8 rig through Rapier on the swept, charged (at 12 ticks and every
-  tick) and protocol-83 paths, gates the law bars, gates the charge on and off to the same cells,
-  law work, metres and ticks, prints #514's geometry bars and the swept ratios beside them without
-  gating them, and logs the most energy debt a tow dropped over the run against one cell's worth
-  (VS: more goes to the GD) (about 10 min, writes `balance-report/exact-carry.ndjson`); the slab
+  the 1.25 tank floor and the 1.098 ratchet) and heat fed to the gauge at least the law's less one
+  drill tick (VS's amendment 6232473040: the heat bar reads the ticks the charge feeds the rule,
+  before the #113 cap); a row under 100 quanta is quantized and logged; the ratio to swept is
+  printed on every row, amber outside 5%, and gates nothing (swept's own under- and over-charge is
+  #540's). The heat cap (`src/systems/authority/heatCapReadings.ts`): `heatRules.ts` settles at
+  most one drill tick of heat per elapsed tick, so a bore wider than a cell's path feeds more law
+  heat than the gauge takes; both lanes print on every row the ticks the rule could settle (each
+  report's fed ticks capped at its elapsed ticks), the share of the law heat it drops, and the
+  gauge's settled heat against the law and against main at both cadences, each red row with its
+  reason (reason 1: main @12 heats one tick per drilling tick, above the law; reason 2: the
+  law-exact feed is bursty and the cap clips it, #541's loss), amber below both main and the law;
+  none of that gates (VS's ratchet against main is withdrawn as a gate, option iii, VS 6234304278,
+  the GD 6234312287: it fails by construction where main heats above the law). The gauge against
+  the law is #541's ("heat cap against the law at the gauge"): the loop lane's planet-8 rig reads
+  the gauge itself, only over the reports it was under its max for (a saturated report is
+  measurement), gates VS's exact settle (the gauge rises by what the rule can settle of the fed
+  heat, within one drill tick), and holds the gauge-against-the-
+  law reading as known red under #541 with a marker local to the lane (`HEAT_CAP_KNOWN_RED`,
+  never exported, so the repo's one exported marker stays `CAMPAIGN_PACING_KNOWN_RED`): red is
+  printed as `known-red (#541)` and passes, green fails until the marker is deleted, a closed #541
+  fails as expired, and no report may call it a pass; swept's identical loss is printed beside it.
+  The lanes run only when named: the loop lane `src/physics/exactCarry.lane.test.ts` plays the 25
+  to 3600 m/s rigs, the stored ladder and a planet-8 rig through Rapier, every leg lined at casing
+  grade 5 as the slab is (an unlined level leg buries the over-drilled rigs and reads their rescue
+  as energy), on the swept, charged (at 12 ticks and every tick) and protocol-84 paths, gates the
+  law bars, gates the charge on and off
+  to the same cells, law work, metres and ticks, prints #514's geometry bars and the swept ratios
+  beside them without gating them, and logs the most energy debt a tow dropped over the run
+  against one cell's worth (VS: more goes to the GD) (about 10 min, writes
+  `balance-report/exact-carry.ndjson`); the slab
   lane `src/systems/authority/lawCarrySlab.lane.test.ts` replays one prescribed pose list per speed
   on planet 1's fixed seed, flat and tilted 30 degrees, level and down, through the pure authority
   with no body, feeding the same poses to `drillStep` and to the report carve, so the 240 and
   3600 m/s rows have a swept comparison that never jams; it gates the same law bars and the same
-  regression and, when the loop lane's ndjson is present, holds its 25 and 44 m/s ratios to the
+  regression, prints the same ratchet readings (planet 1 is off the act, so the settleable ticks
+  stand for the gauge's rise) and, when the loop lane's ndjson is present, holds its 25 and 44 m/s ratios to the
   law to the loop's within 1% (about 1 to 4 min on the loaded box, writes
   `balance-report/law-carry-slab.ndjson`);
   `src/logging/tripCellEnergy.lane.test.ts` plays the bot slice on its three pacing seeds and
