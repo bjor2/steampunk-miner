@@ -126,7 +126,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/dock-buildings/systems/render/worksSteam.test.ts` | 4 | 4 |
 | `src/features/dock-buildings/systems/render/workshopStaging.test.ts` | 6 | 6 |
 
-### `drill-gear`: 28 files, 199 tests
+### `drill-gear`: 28 files, 219 tests
 
 | File | Tests | Sites |
 | --- | --- | --- |
@@ -141,7 +141,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/drill-gear/systems/backfillRow.test.ts` | 4 | 4 |
 | `src/features/drill-gear/systems/cardLines.test.ts` | 7 | 7 |
 | `src/features/drill-gear/systems/cuttersAndBoom.test.ts` | 7 | 6 |
-| `src/features/drill-gear/systems/deepParity.test.ts` | 20 | 1 |
+| `src/features/drill-gear/systems/deepParity.test.ts` | 40 | 2 |
 | `src/features/drill-gear/systems/dielectricBit.test.ts` | 5 | 5 |
 | `src/features/drill-gear/systems/drillGearEconomy.test.ts` | 6 | 6 |
 | `src/features/drill-gear/systems/drillGearFork.test.ts` | 10 | 10 |
@@ -741,9 +741,11 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/authority/featureUnlocks.test.ts` | 11 | 11 |
 | `src/systems/authority/groundDrill.test.ts` | 3 | 3 |
 | `src/systems/authority/gunRules.test.ts` | 12 | 12 |
+| `src/systems/authority/heatCapReadings.test.ts` | 13 | 13 |
 | `src/systems/authority/heatRun.test.ts` | 13 | 13 |
 | `src/systems/authority/hollowPocket.test.ts` | 7 | 7 |
 | `src/systems/authority/lava/lavaRun.test.ts` | 9 | 9 |
+| `src/systems/authority/lawCarrySlab.lane.test.ts` | 338 | 6 |
 | `src/systems/authority/liningBill.test.ts` | 10 | 10 |
 | `src/systems/authority/liningTypes.test.ts` | 9 | 9 |
 | `src/systems/authority/loadoutRules.test.ts` | 14 | 14 |
@@ -763,6 +765,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/authority/refinery/refineryFacility.test.ts` | 2 | 2 |
 | `src/systems/authority/refinery/refineryRules.test.ts` | 15 | 15 |
 | `src/systems/authority/refinery/refinerySlots.test.ts` | 4 | 4 |
+| `src/systems/authority/reportedCutCarry.test.ts` | 15 | 15 |
 | `src/systems/authority/reportedGateBite.test.ts` | 15 | 15 |
 | `src/systems/authority/reportedGateBiteTracks.test.ts` | 7 | 3 |
 | `src/systems/authority/scriptedDrillGear.test.ts` | 9 | 9 |
@@ -790,7 +793,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/authority/terrain/terrainEditPlan.test.ts` | 5 | 5 |
 | `src/systems/authority/terrain/terrainEditQueue.test.ts` | 5 | 5 |
 | `src/systems/authority/travelRules.test.ts` | 12 | 12 |
-| `src/systems/authority/vehicleCommands.test.ts` | 25 | 25 |
+| `src/systems/authority/vehicleCommands.test.ts` | 27 | 27 |
 | `src/systems/authority/vehicleItemRules.test.ts` | 10 | 10 |
 
 ### `bot`
@@ -948,6 +951,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/logging/dynamiteDryRuns.test.ts` | 4 | 4 |
 | `src/logging/eventNames.test.ts` | 6 | 6 |
 | `src/logging/eventSink.test.ts` | 10 | 10 |
+| `src/logging/exactCarryOnGolden.test.ts` | 11 | 3 |
 | `src/logging/extractorPurchaseTrips.test.ts` | 3 | 3 |
 | `src/logging/gateClearTables.test.ts` | 7 | 7 |
 | `src/logging/gateClearTally.test.ts` | 3 | 3 |
@@ -1007,7 +1011,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/physics/drillEngagement.test.ts` | 6 | 6 |
 | `src/physics/drillFacingStep.test.ts` | 3 | 3 |
 | `src/physics/drillTurnLatency.lane.test.ts` | 3 | 7 |
-| `src/physics/exactCarry.lane.test.ts` | 57 | 6 |
+| `src/physics/exactCarry.lane.test.ts` | 184 | 16 |
 | `src/physics/fastLegContactTrace.lane.test.ts` | 2 | 2 |
 | `src/physics/fastRigBodySpeed.lane.test.ts` | 5 | 5 |
 | `src/physics/floatingOrigin.test.ts` | 3 | 3 |
@@ -1402,6 +1406,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/vehicle/casingTrailReversal.test.ts` | 36 | 5 |
 | `src/systems/vehicle/chargeSelection.test.ts` | 4 | 4 |
 | `src/systems/vehicle/colliderHalo.test.ts` | 3 | 3 |
+| `src/systems/vehicle/cutCarry.test.ts` | 6 | 6 |
 | `src/systems/vehicle/cutFollowMotion.test.ts` | 19 | 19 |
 | `src/systems/vehicle/cutGate.test.ts` | 8 | 8 |
 | `src/systems/vehicle/cutStartBreakdown.test.ts` | 4 | 4 |
@@ -1499,7 +1504,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/world/generateChunk.test.ts` | 26 | 14 |
 | `src/systems/world/generateChunkHooks.test.ts` | 4 | 4 |
 | `src/systems/world/generateDensity.test.ts` | 7 | 5 |
-| `src/systems/world/groundEdit.test.ts` | 16 | 12 |
+| `src/systems/world/groundEdit.test.ts` | 19 | 15 |
 | `src/systems/world/lavaFlow.test.ts` | 6 | 6 |
 | `src/systems/world/lavaPockets.test.ts` | 7 | 7 |
 | `src/systems/world/orePatches.test.ts` | 31 | 8 |

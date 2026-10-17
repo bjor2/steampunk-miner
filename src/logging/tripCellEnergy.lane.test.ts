@@ -10,15 +10,16 @@ import {
   type TripCellEnergy,
 } from './tripCellEnergy'
 
-// The paired pacing run's per-cell energy (ticket 529, Systems 6226531099 on #514, Done-when 3):
-// the bot and scripted drills stay on the whole-tick clock, so the bot's own `tank_empty` and
-// tank margin are no evidence for the player path. The bot slice is played on its three pacing
-// seeds; every trip logs the energy the bot was charged beside the per-cell figure the player's
-// exact report carve charges for the same cells (`tripCellEnergy.ts`), and every trip that broke a
-// cell must keep the tank at least 1.138 times that figure. The bot's own bands and #524's baseline
-// do not move with ticket 529 (its digests are unchanged), so main and the tip play the same
-// trips and the pairing reads the same lines. A lane: it runs only when named, prints a line per
-// seed and planet and writes balance-report/trip-cell-energy.ndjson.
+// The paired pacing run's per-cell energy (ticket 535, Systems 6226531099 and 6228669500 on #514
+// and #529, "the offline per-cell energy figure per trip"): the bot and scripted drills stay on
+// the whole-tick clock, so the bot's own `tank_empty` and tank margin are no evidence for the
+// player path. The bot slice is played on its three pacing seeds; every trip logs the energy the
+// bot was charged beside the per-cell figure, the swept price the player's report cut is charged
+// at for the same law work (`tripCellEnergy.ts`), and every trip that broke a cell must keep the
+// tank at least 1.138 times that figure. The bot's own bands and #524's baseline do not move with
+// ticket 535 (its digests are unchanged), so main and the tip play the same trips and the pairing
+// reads the same lines. A lane: it runs only when named, prints a line per seed and planet and
+// writes balance-report/trip-cell-energy.ndjson.
 
 const SCENARIO = JSON.parse(
   readFileSync(new URL('../../scenarios/bot-slice.scenario.json', import.meta.url), 'utf8'),
@@ -60,11 +61,11 @@ function formatPlanetLines(trips: readonly SeededTrip[]): string {
 
 function writeTrips(trips: readonly SeededTrip[]): void {
   mkdirSync(REPORT_FOLDER, { recursive: true })
-  const lines = trips.map((trip) => JSON.stringify({ ticket: 529, ...trip }))
+  const lines = trips.map((trip) => JSON.stringify({ ticket: 535, ...trip }))
   writeFileSync(new URL('trip-cell-energy.ndjson', REPORT_FOLDER), `${lines.join('\n')}\n`)
 }
 
-describe('bot trips priced per cell on the player path (ticket 529, Systems on #514)', () => {
+describe('bot trips priced per cell on the player path (ticket 535, Systems on #514)', () => {
   it(
     'keeps the tank at least 1.138 times the per-cell energy of every trip on every pacing seed',
     () => {

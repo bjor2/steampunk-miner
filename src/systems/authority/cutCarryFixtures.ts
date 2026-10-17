@@ -6,6 +6,7 @@
  * removed at the swept price (`vehicle/cutCarry.ts`). Only specs use them.
  */
 import { BASIS_POINTS } from '../../constants/balance'
+import { cellDigEnergyOf } from './cellDigEnergy'
 import { CUT_ENERGY_DENOMINATOR } from '../vehicle/cutCarry'
 import { ENERGY_QUANTA_PER_TICK } from '../vehicle/energyQuanta'
 import type { VehicleState } from '../vehicle/vehicleState'
@@ -54,6 +55,23 @@ export function lawWorkRemovedOf(
     if (removed <= 0) return sum
     return sum + removed * (lawTimeOf(tile, materialCellAt(before.world, params, tile), 0) ?? 0)
   }, 0)
+}
+
+/** The quanta `broken` cost at the swept cut's per-cell price (`cellDigEnergy.ts`), each rounded up once. */
+export function brokenCellsEnergyOf(
+  before: AuthorityState,
+  broken: readonly TilePoint[],
+  playerId = 'p1',
+): number {
+  const params = planetParamsOf(before.planet)
+  if (params === null) throw new Error('the state has no planet')
+  const drill = heatThrottledDrill(params.planetIndex, vehicleOf(before, playerId))
+  const subStepsOf = drillSubStepsOfCells(params, drill, shockTicksFor(before, playerId))
+  return broken.reduce(
+    (sum, tile) =>
+      sum + cellDigEnergyOf(subStepsOf(tile, materialCellAt(before.world, params, tile), 0) ?? 0),
+    0,
+  )
 }
 
 /** `lawWork` at the drill's whole share, in the energy carry's numerator. */

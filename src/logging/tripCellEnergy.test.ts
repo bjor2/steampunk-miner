@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import type { CommandIntent } from '../systems/authority/authorityCommand'
-import { brokenCellsEnergyOf, brokenCellsOf } from '../systems/authority/exactCarryFixtures'
+import { brokenCellsEnergyOf, brokenCellsOf } from '../systems/authority/cutCarryFixtures'
 import {
   createScriptedSession,
   dockInBay,
@@ -25,8 +25,8 @@ function watchedSession() {
   return { session, fold, submit }
 }
 
-describe('trips priced per cell (ticket 529, Systems on #514)', () => {
-  it("prices a trip the player's reports cut at exactly what the reports were charged", () => {
+describe('trips priced per cell (ticket 535, Systems on #514)', () => {
+  it("prices a trip the player's reports cut per cell, beside what the reports were charged", () => {
     const { session, fold, submit } = watchedSession()
     submit(0, FREEZE_ENEMIES)
     submit(0, poseAbove(GROUND, FACING.down))
@@ -42,7 +42,8 @@ describe('trips priced per cell (ticket 529, Systems on #514)', () => {
       tankQuanta: tank,
     })
     expect(trip.perCellQuanta).toBe(brokenCellsEnergyOf(before, broken))
-    expect(trip.chargedQuanta).toBe(trip.perCellQuanta)
+    expect(trip.chargedQuanta).toBe(tank - session.vehicle().energy)
+    expect(trip.chargedQuanta).toBeGreaterThan(0)
     expect(tripTankMarginOf(trip)).toBe(tank / trip.perCellQuanta)
   })
 

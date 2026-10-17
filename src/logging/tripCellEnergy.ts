@@ -1,12 +1,13 @@
 /**
- * A bot run's trips priced per cell (ticket 529, Systems 6226531099 on #514, Done-when 3): the
- * pacing bot cuts with `drillTile` on the whole-tick clock, so its own energy and `tank_empty` are
- * no evidence for the player path, whose pose reports charge each broken cell its own dig energy
- * since ticket 529. Each trip (from the start or an undock to the next dock or tow) is logged with
- * the energy the bot was charged beside the per-cell figure the player path would charge for the
- * same cells: each broken cell's drill time in sub-steps at the drill the vehicle had, priced by
- * `cellDigEnergyOf`, at the drill's whole share. The margin is the tank over that figure; Systems
- * asks for at least 1.138 on every trip.
+ * A bot run's trips priced per cell (ticket 535, Systems 6226531099 and 6228669500 on #514 and
+ * #529, "the offline per-cell energy figure per trip"): the pacing bot cuts with `drillTile` on
+ * the whole-tick clock, so its own energy and `tank_empty` are no evidence for the player path,
+ * whose pose reports are charged on the density they remove at the swept price since ticket 535.
+ * Each trip (from the start or an undock to the next dock or tow) is logged with the energy the
+ * bot was charged beside the per-cell figure, the swept cut's price for the same cells: each
+ * broken cell's drill time in sub-steps at the drill the vehicle had, priced by `cellDigEnergyOf`,
+ * at the drill's whole share. The margin is the tank over that figure; Systems asks for at least
+ * 1.138 on every trip.
  *
  * A fold over the bot session's batches (`LoggedRunOptions.watchEvents`): each batch hands over the
  * state after it, so a batch's broken cells are priced on the state the batch before left, where
@@ -23,7 +24,7 @@ import { energyMaxQuantaOf } from '../systems/vehicle/vehicleState'
 import type { TilePoint } from '../systems/world/tileGrid'
 import { materialCellAt } from '../systems/world/worldState'
 
-/** Systems' line on the player path: the tank over a trip's per-cell energy (6226531099). */
+/** Systems' line on the player path: the tank over a trip's per-cell energy (6226531099, 6228669500). */
 export const TRIP_TANK_MARGIN_FLOOR = 1.138
 
 export interface TripCellEnergy {

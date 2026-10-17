@@ -464,6 +464,36 @@ programs }` from three's `renderer.info` of the game canvas), read only when cal
   phases this tree follows (`REPAIRED_FOLLOWED_LEVEL_PHASES`, re-paired once, main's bars kept) and
   the deepest back-off on them is held to main's −0.4557 m/s at 30 frames/s (a todo owned by #506
   at 144, which reads −0.4925); the airborne release is re-paired to phase 38.
+- **Charge on density removed** (ticket 535, A6 "Option L", the TD shape 6228682000 with its
+  geometry amendment, VS 6228848270): `src/systems/vehicle/cutCarry.test.ts` holds the pure carry
+  (many small tallies pay and heat as the one of their sum, a gear cell at its share, a clamped
+  tank's debt carried, never negative, absent at 0); `src/systems/world/groundEdit.test.ts` reads
+  the carve's tally back from the densities and wants the densities byte-identical with or without
+  it. `src/systems/authority/reportedCutCarry.test.ts` is the regression gate and the invariant on
+  the report path: with `drill.exactCarry` on or off the cut, its cells, their order and its events
+  are the same and only energy and the carries move; charged quanta times the denominator plus the
+  carry equals the law work read from the ground (`cutCarryFixtures.ts`); sixty one-tick reports
+  pay and heat as one of sixty ticks; a tank that cannot pay keeps the debt and strands the rig
+  till the tow drops it; the carries round-trip the snapshot, are refused malformed, and are
+  dropped at planet entry. `src/logging/exactCarryOffGolden.test.ts` replays every golden to its
+  protocol-83 digests with the switch off. The lanes run only when named: the loop lane
+  `src/physics/exactCarry.lane.test.ts` plays the 25 to 3600 m/s rigs, the stored ladder and a
+  planet-8 rig through Rapier on the swept, charged (at 12 ticks and every tick) and protocol-83
+  paths, gates energy per unit of law work within 1% of swept and heat at least swept's less one
+  cell, gates the charge on and off to the same cells, law work, metres and ticks, and prints
+  #514's geometry bars beside them without gating them (about 10 min, writes
+  `balance-report/exact-carry.ndjson`); the slab lane `src/systems/authority/lawCarrySlab.lane.test.ts`
+  replays one prescribed pose list per speed on planet 1's fixed seed, flat and tilted 30 degrees,
+  level and down, through the pure authority with no body, feeding the same poses to
+  `drillStep` and to the report carve, so the 240 and 3600 m/s rows have a swept reference that
+  never jams; it gates the same charge bars and the same regression, cross-checks the charge
+  against the analytic law value (the drill's quanta a tick per drill tick of law work, within 1%)
+  and, when the loop lane's ndjson is present, holds its 25 and 44 m/s ratios to the loop's within
+  1% (about 1 min, writes `balance-report/law-carry-slab.ndjson`);
+  `src/logging/tripCellEnergy.lane.test.ts` plays the bot slice on its three pacing seeds and
+  prices every trip per cell beside the bot's charge, the tank at least 1.138 times that figure
+  (Systems' offline per-cell figure for the paired run; writes
+  `balance-report/trip-cell-energy.ndjson`).
 - **Known red** (ticket 419, the TD on #396 section 2): `CAMPAIGN_PACING_KNOWN_RED`
   (`src/constants/knownRed.ts`) is the one known-red marker in the repo: one gate
   (`campaignPacingGate`), one finding (#417), no registry. The gate still runs in full;

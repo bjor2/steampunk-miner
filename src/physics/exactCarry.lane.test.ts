@@ -10,6 +10,7 @@ import { readLocalVehicle, useGameStore } from '../store/gameStore'
 import { vehicleOf, type AuthorityState } from '../systems/authority/authorityState'
 import { setCasingGradeCommand } from '../systems/authority/casingDebugCommands'
 import { digSubStepsOfCells } from '../systems/authority/drillCutTally'
+import { LAW_WORK_PER_DRILL_TICK } from '../systems/vehicle/cutCarry'
 import { hardnessOfTile } from '../systems/authority/groundDrill'
 import { planetParamsOf } from '../systems/authority/planetOfState'
 import { bandHeatPerSecond, drillHeatPerSecond } from '../systems/economy/heatEconomy'
@@ -27,28 +28,34 @@ import { SAMPLES_PER_CELL, SOLID_DENSITY } from '../systems/world/sampleGrid'
 import { isTileYielded, materialCellAt, type WorldState } from '../systems/world/worldState'
 import { createRig, type Rig } from './cutFollowFixtures'
 
-// The exact report carve against the swept law-exact path (ticket 529, A5 on #514: the TD shape
-// 6226525157, the VS bars 6226528512 with the TD amendment, Systems 6226531099). Each rig leaves the
-// pad and plays, through the real loop and Rapier body, an 80 m leg down (flat: the body upright
-// down the dock's column, casing grade 5 so a cave-in never ends it) and, from a fresh start, a
-// 12 m dive and a 250 m leg level west (tilted: the body rolls with the ground round the planet).
-// Paths: the swept cut (the reference, at its shipped report cadence), the exact report carve
-// (`drill.exactCarry` on) with a pose report at the shipped 12 ticks and every tick (the harness
-// below, as `levelLegDeadStop.lane.test.ts` does), and the protocol-83 carve (the switch off) at
-// both, which is main's player path. Read per leg, from the ground and the tank:
+// The report cut charged on density removed, against the swept law-exact path in the real loop
+// (ticket 535, A6 "Option L": the TD shape 6228682000 with its geometry amendment 6228838042, VS
+// 6228674086 and 6228848270, Systems 6228669500). Each rig leaves the pad and plays, through the
+// real loop and Rapier body, an 80 m leg down (flat: the body upright down the dock's column,
+// casing grade 5 so a cave-in never ends it) and, from a fresh start, a 12 m dive and a 250 m leg
+// level west (tilted: the body rolls with the ground round the planet). Paths: the swept cut (the
+// reference, at its shipped report cadence), the report cut with the charge on (`drill.exactCarry`)
+// at the shipped 12 ticks and every tick (the harness below, as `levelLegDeadStop.lane.test.ts`
+// does), and the protocol-83 charge (the switch off) at both, which is main's player path. Read
+// per leg, from the ground and the tank:
 // - law work: each cell's density removed as a share of a solid cell, times its hardness;
 // - energy: the quanta the tank lost each tick (the rig refills it every 60 ticks);
-// - heat ticks: what the report heats for before the gauge's clamp, the broken cells' summed dig
-//   time over 60 on the swept and exact paths, the drilled ticks on the protocol-83 one;
+// - heat ticks: what the report heats for before the gauge's clamp: the law work removed over a
+//   drill tick's on the charged paths (its carry read from the vehicle), the broken cells' summed
+//   dig time over 60 on the swept path, the drilled ticks on the protocol-83 one;
 // - cells yielded, metres, metres a second.
-// Gated (VS, hard): energy per unit of law work within 1% of swept at the same rig and ground;
-// heat per unit of law work at least swept's, less one cell; law work per metre at least swept's,
-// less one cell, and over the 250 m level window at most 1.050 of it. Logged beside them, never
-// gated: energy and heat per metre, cells per metre against swept, energy per yielded cell, and the
-// protocol-83 rows (main) for Systems' 1.5x and 2x estimates. The ladder (stored 1 to 200) logs
-// law work per metre at every rung. One heat-planet rig (planet 8, on-curve) reads the gauge itself:
-// drill heat per unit of law work at least swept's, less one cell. A lane: it runs only when
-// named, prints the table and writes balance-report/exact-carry.ndjson.
+// Gated (VS, hard): energy per unit of law work within 1% of swept at the same rig and ground, and
+// heat per unit of law work at least swept's, less one cell; and the regression gate of the TD's
+// amendment (VS confirmed): with the charge on or off at the same cadence the carve is
+// byte-identical (the same cells, law work, metres and ticks), only energy and heat moving. The
+// absolute geometry bars (law work per metre at least 1.000 and the 250 m window at most 1.050,
+// cells per metre within 5%) are #514's merge bars: logged here beside the charge bars, never
+// gated. Logged too: energy and heat per metre, energy per yielded cell, and the protocol-83 rows
+// (main). The ladder (stored 1 to 200) logs law work per metre at every rung. One heat-planet rig
+// (planet 8, on-curve) reads the gauge itself: drill heat per unit of law work at least swept's,
+// less one cell. A lane: it runs only when named, prints the table and writes
+// balance-report/exact-carry.ndjson; the slab replay (`authority/lawCarrySlab.lane.test.ts`) reads
+// its 25 and 44 m/s rows to validate itself against the loop.
 
 /** The harness's report cadence: the shipped interval, or a report every tick (`takePoseReport`). */
 const reportCadence = vi.hoisted(() => ({ isEveryTick: false }))
@@ -124,6 +131,9 @@ const SUB_STEPS_PER_TICK = 60
 const REFILLED_QUANTA = 150 * 240
 const ENERGY_SHARE = 0.01
 const LEVEL_WINDOW_CEILING = 1.05
+/** The charge's numerator per quantum, and per density sub-step of law work (`cutCarry.ts`). */
+const CUT_ENERGY_DENOMINATOR_OF_LOOP = LAW_WORK_PER_DRILL_TICK * 10_000
+const LAW_NUMERATOR_PER_SUB_STEP = 10_000 * 4
 /** Under this many metres a leg is no reading: the rig jammed or never left the pad. */
 const MIN_READ_M = 10
 const REPORT_FOLDER = new URL('../../balance-report/', import.meta.url)
@@ -239,6 +249,8 @@ interface LegTally {
   cells: number
   energy: number
   digSubSteps: number
+  /** The drill ticks the charged paths heated for: the heat carry's whole ticks per report. */
+  carriedHeatTicks: number
   drilledTicks: number
   /** The band under the body each tick, for the gauge's band heat. */
   bands: number[]
@@ -254,6 +266,7 @@ function measureLeg(rig: TrackedRig, intent: VehicleIntent, metres: number) {
     cells: 0,
     energy: 0,
     digSubSteps: 0,
+    carriedHeatTicks: 0,
     drilledTicks: 0,
     bands: [],
     isTowed: false,
@@ -279,6 +292,7 @@ function measureLeg(rig: TrackedRig, intent: VehicleIntent, metres: number) {
     oneCellLaw: law.hardest,
     energy: tally.energy,
     digSubSteps: tally.digSubSteps,
+    carriedHeatTicks: tally.carriedHeatTicks,
     drilledTicks: tally.drilledTicks,
     bands: tally.bands,
     stuck: isStuck(tally.positions) || tally.isTowed,
@@ -297,6 +311,7 @@ function noteTick(tally: LegTally, before: AuthorityState, after: AuthorityState
   const yielded = yieldedCellsOf(before.world, after.world, params, at)
   tally.cells += yielded.length
   tally.digSubSteps += digSubStepsOfCells(before, params, playerIdOf(), yielded)
+  tally.carriedHeatTicks += carriedHeatTicksOf(before, after)
   tally.energy += energyLostOf(before, after)
   tally.bands.push(bandOfTile(params, Math.floor(at.x), Math.floor(at.y)))
 }
@@ -317,6 +332,21 @@ function yieldedCellsOf(
     }
   }
   return yielded
+}
+
+/**
+ * The whole drill ticks the charged report heated for this tick (ticket 535): the heat carry's
+ * fall, read on the vehicle, plus the law work the tank's charge shows tallied, over a drill
+ * tick's law work. 0 on a tick with no report, or with the charge off.
+ */
+function carriedHeatTicksOf(before: AuthorityState, after: AuthorityState): number {
+  const was = vehicleOf(before, playerIdOf())
+  const now = vehicleOf(after, playerIdOf())
+  const owed = (was.cutEnergyCarry ?? 0) - (now.cutEnergyCarry ?? 0)
+  const paid = Math.max(0, energyLostOf(before, after)) * CUT_ENERGY_DENOMINATOR_OF_LOOP + owed
+  const law = Math.round(paid / LAW_NUMERATOR_PER_SUB_STEP)
+  const heated = (was.cutHeatCarry ?? 0) + law - (now.cutHeatCarry ?? 0)
+  return heated <= 0 ? 0 : Math.round(heated / LAW_WORK_PER_DRILL_TICK)
 }
 
 /** The quanta charged over a tick; a tick the rig refilled on started from the refilled tank. */
@@ -423,10 +453,17 @@ function numberOf(value: Parameters<typeof toCanonical>[0]): number {
   return Number(toCanonical(value))
 }
 
-/** A played leg as its reading: heat ticks from dig time, or drilled ticks on main's carve. */
+/**
+ * A played leg as its reading: heat ticks from the carry on the charged report paths, from dig
+ * time on the swept path, or drilled ticks on main's charge.
+ */
 function readingOf(played: ReturnType<typeof playLeg> & { gaugeHeatTicks?: number }): LegReading {
-  const isMain = !PATHS[played.pathName].isExactCarry
-  const heatTicks = isMain ? played.drilledTicks : played.digSubSteps / SUB_STEPS_PER_TICK
+  const path = PATHS[played.pathName]
+  const heatTicks = !path.isExactCarry
+    ? played.drilledTicks
+    : path.flags['drill.sweptCut']
+      ? played.digSubSteps / SUB_STEPS_PER_TICK
+      : played.carriedHeatTicks
   const seconds = played.ticks * PHYSICS_TIMESTEP
   return {
     rig: played.rigName,
@@ -511,11 +548,14 @@ function formatTable(rows: readonly LegReading[]): string {
 
 function writeReadings(rows: readonly LegReading[]): void {
   mkdirSync(REPORT_FOLDER, { recursive: true })
-  const lines = rows.map((row) => JSON.stringify({ ticket: 529, ...row }))
+  const lines = rows.map((row) => JSON.stringify({ ticket: 535, ...row }))
   writeFileSync(new URL('exact-carry.ndjson', REPORT_FOLDER), `${lines.join('\n')}\n`)
 }
 
-/** VS's hard bars for an exact leg against swept at the same rig and ground. */
+/**
+ * VS's hard charge bars for a charged leg against swept at the same rig and ground; the geometry
+ * bars (#514's) are printed beside them, with their own verdict, and gate nothing here.
+ */
 function expectBars(rig: string, path: string, section: Section): void {
   const leg = legOf(rig, path, section)
   const swept = legOf(rig, 'swept', section)
@@ -526,13 +566,40 @@ function expectBars(rig: string, path: string, section: Section): void {
     return
   }
   const slack = oneCellShareOf(leg, swept)
+  console.log(
+    `${rig} ${path} ${section} geometry (#514's bars, reported): ${geometryVerdictOf(ratios, section, slack)}`,
+  )
   expect(Math.abs(ratios.energyPerLaw - 1)).toBeLessThanOrEqual(ENERGY_SHARE)
   expect(ratios.heatPerLaw).toBeGreaterThanOrEqual(1 - slack)
-  expect(ratios.lawPerMetre).toBeGreaterThanOrEqual(1 - slack)
-  if (section === 'level') expect(ratios.lawPerMetre).toBeLessThanOrEqual(LEVEL_WINDOW_CEILING)
 }
 
-describe('the exact report carve against the swept cut at VS rigs (ticket 529)', () => {
+/** The absolute geometry bars as #514 reads them, for the report beside the charge bars. */
+function geometryVerdictOf(
+  ratios: ReturnType<typeof ratiosOf>,
+  section: Section,
+  slack: number,
+): string {
+  const lawPerMetre = ratios.lawPerMetre >= 1 - slack ? 'pass' : 'fail'
+  const window = section !== 'level' || ratios.lawPerMetre <= LEVEL_WINDOW_CEILING ? 'pass' : 'fail'
+  const cells = Math.abs(ratios.cellsPerMetre - 1) <= 0.05 ? 'pass' : 'fail'
+  return `law/m ${lawPerMetre}, window ${window}, cells/m ${cells}`
+}
+
+/** The TD's regression gate: with the charge on or off at the same cadence the carve is the same. */
+function expectSameCarve(rig: string, cadence: '@12' | '@1', section: Section): void {
+  const charged = legOf(rig, `exact ${cadence}`, section)
+  const main = legOf(rig, `main ${cadence}`, section)
+  console.log(
+    `${rig} ${cadence} ${section} charge on vs off: cells ${charged.cells}/${main.cells}, ` +
+      `law ${charged.lawWork.toFixed(3)}/${main.lawWork.toFixed(3)}, ticks ${charged.ticks}/${main.ticks}`,
+  )
+  expect(charged.cells).toBe(main.cells)
+  expect(charged.lawWork).toBe(main.lawWork)
+  expect(charged.metres).toBe(main.metres)
+  expect(charged.ticks).toBe(main.ticks)
+}
+
+describe('the charged report cut against the swept cut at VS rigs (ticket 535)', () => {
   for (const [rig, levels] of Object.entries(SPEED_RIGS)) {
     for (const section of ['down', 'level'] as const) {
       it(
@@ -545,14 +612,18 @@ describe('the exact report carve against the swept cut at VS rigs (ticket 529)',
         LEG_TIMEOUT_MS,
       )
       for (const path of EXACT_PATHS) {
-        it(`holds VS's bars for the ${rig} rig ${section}, ${path}`, () =>
+        it(`holds VS's charge bars for the ${rig} rig ${section}, ${path}`, () =>
           expectBars(rig, path, section))
+      }
+      for (const cadence of ['@12', '@1'] as const) {
+        it(`cuts the same with the charge on or off, the ${rig} rig ${section} ${cadence}`, () =>
+          expectSameCarve(rig, cadence, section))
       }
     }
   }
 })
 
-describe('the ladder, stored 1 to 200, on every path (ticket 529, Systems)', () => {
+describe('the ladder, stored 1 to 200, on every path (ticket 535, Systems)', () => {
   for (const [rig, levels] of Object.entries(LADDER_RIGS)) {
     it(
       `logs law work per metre, energy and heat for ${rig} level and down`,
@@ -568,13 +639,20 @@ describe('the ladder, stored 1 to 200, on every path (ticket 529, Systems)', () 
     )
     for (const path of EXACT_PATHS) {
       for (const section of ['down', 'level'] as const) {
-        it(`holds VS's bars for ${rig} ${section}, ${path}`, () => expectBars(rig, path, section))
+        it(`holds VS's charge bars for ${rig} ${section}, ${path}`, () =>
+          expectBars(rig, path, section))
+      }
+    }
+    for (const cadence of ['@12', '@1'] as const) {
+      for (const section of ['down', 'level'] as const) {
+        it(`cuts the same with the charge on or off, ${rig} ${section} ${cadence}`, () =>
+          expectSameCarve(rig, cadence, section))
       }
     }
   }
 })
 
-describe('the exact report carve on a heat planet (ticket 529, TD item 5)', () => {
+describe('the charged report cut on a heat planet (ticket 535, the heat bar off the gauge)', () => {
   const rig = `planet ${HEAT_PLANET} on-curve`
   it(
     'reads the gauge on every path down 30 m of planet 8',
