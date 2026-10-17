@@ -184,7 +184,8 @@
         "e2e/browser/screens/reviewShots.spec.ts",
         "e2e/browser/magneticPlanet.spec.ts",
         "e2e/browser/chunkWorker.spec.ts",
-        "e2e/browser/renderQuality.spec.ts"
+        "e2e/browser/renderQuality.spec.ts",
+        "e2e/browser/materialLooks.spec.ts"
       ]
     },
     {
@@ -563,6 +564,20 @@
         "src/features/tech-tree/systems/nodeCardModel.ts"
       ],
       "specs": ["e2e/browser/screens/portraitPanels.spec.ts"]
+    },
+    {
+      "why": "The ground's material looks (ticket 450): the roster's look provider, the materials' rarity looks, the look table's writer and shader, and its debug read and switch.",
+      "paths": [
+        "src/features/roster/systems/render/**",
+        "src/features/materials/**",
+        "src/systems/registries/kindLook.ts",
+        "src/scene/terrainKindLooks.ts",
+        "src/scene/terrainKindShader.ts",
+        "src/scene/terrainShader.ts",
+        "src/scene/kindLookPresence.ts",
+        "src/debug/debugKindLooks.ts"
+      ],
+      "specs": ["e2e/browser/materialLooks.spec.ts", "e2e/browser/render.spec.ts"]
     }
   ]
 }
