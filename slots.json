@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-10-17T04:09:29+01:00",
+  "updated_at": "2026-10-17T04:12:43+01:00",
   "caps": {
     "grok": 12,
     "claude": 10,
@@ -19,12 +19,11 @@
       "slots": [
         {
           "slot": "C1",
-          "state": "busy",
+          "state": "free",
           "ticket": null,
           "grok_slot": null,
-          "kind": "aux",
-          "since": null,
-          "label": "wave-plan 316"
+          "kind": null,
+          "since": null
         },
         {
           "slot": "C2",
@@ -68,8 +67,8 @@
         }
       ],
       "size": 6,
-      "used": 1,
-      "free": 5,
+      "used": 0,
+      "free": 6,
       "claims_last_hour": 3,
       "name": "Claude Max 1"
     },
@@ -568,12 +567,10 @@
   "claude": [
     {
       "slot": 1,
-      "state": "busy",
+      "state": "free",
       "ticket": null,
       "grok_slot": null,
       "since": null,
-      "kind": "aux",
-      "label": "wave-plan 316",
       "account": 1
     },
     {
@@ -654,9 +651,9 @@
     }
   ],
   "last_refill": {
-    "at": "2026-10-17 04:09 BST",
-    "mode": "recheck",
-    "triggers": "#447",
+    "at": "2026-10-17 04:12 BST",
+    "mode": "refill-dev",
+    "triggers": "claude-run:wave-plan",
     "started": "",
     "note": "load guard (quiet-bench hold (quiet-bench #514 (pid 2140280)))"
   },
@@ -672,8 +669,8 @@
     "claude": {
       "size": 10,
       "enabled": 6,
-      "used": 1,
-      "free": 5,
+      "used": 0,
+      "free": 6,
       "external": 0
     }
   },
@@ -689,7 +686,10 @@
         "mode": "solo",
         "state": "ready",
         "tickets": [
-          535
+          535,
+          537,
+          538,
+          539
         ],
         "done": [],
         "live": 0
@@ -757,14 +757,16 @@
         "map": 302,
         "lane": "remote",
         "mode": "solo",
-        "state": "running",
+        "state": "paused",
         "tickets": [
           446,
           447,
           448,
           453
         ],
-        "done": [],
+        "done": [
+          447
+        ],
         "live": 0
       },
       {
