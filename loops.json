@@ -1,14 +1,14 @@
 {
   "schema": 1,
-  "updated_at": "2026-10-17T13:47:30Z",
+  "updated_at": "2026-10-17T13:48:47Z",
   "entries": {
     "steampunk-loop/1": {
       "loop": "steampunk-loop",
       "slot": "1",
       "state": "working",
       "issue": 535,
-      "note": "started 2026-10-17 14:38 BST",
-      "updated_at": "2026-10-17T13:47:30Z",
+      "note": "tier fable, attempt 1/2 (session running)",
+      "updated_at": "2026-10-17T13:48:47Z",
       "host": "grok-bot-vm-452660841"
     },
     "steampunk-loop/2": {
