@@ -1,5 +1,5 @@
 {
-  "$comment": "The materials look layer of #139 (GD ruling 15 Oct 2026, ticket 444): species under the 12 ore families. A species names its family, never a gate class (#142); family ids, ore ids and prices stay. pool is the species set a row belongs to (legacy = P1 and P2; a planet's pool is ores.economy.json kinds.pools, ticket 542) and slot the kind slot of ores.economy.json it binds to (TD ruling on ticket 446); a row's family, rarity and gradeBand equal its slot's. Hue slots: hue in degrees, saturation and luma in 0..1 (Rec. 601 display luma); a slot keeps out of the reserved hue bands of oreLooks.json and above the brightest host rock. gradeBand is the species' depth window, first and last band in 1..5. The legacy rows are Content's roster for ticket 447 (names cut to an epithet before the family name, flavour to one ledger sentence); P3-P5 land after, each passing the guards of materialTable.ts.",
+  "$comment": "The materials look layer of #139 (GD ruling 15 Oct 2026, ticket 444): species under the 12 ore families. A species names its family, never a gate class (#142); family ids, ore ids and prices stay. pool is the species set a row belongs to (legacy = P1 and P2; a planet's pool is ores.economy.json kinds.pools, ticket 542) and slot the kind slot of ores.economy.json it binds to (TD ruling on ticket 446); a row's family, rarity and gradeBand equal its slot's. Hue slots: hue in degrees, saturation and luma in 0..1 (Rec. 601 display luma); a slot keeps out of the reserved hue bands of oreLooks.json and above the brightest host rock. gradeBand is the species' depth window, first and last band in 1..5. The legacy rows are Content's roster for ticket 447 (names cut to an epithet before the family name, flavour to one ledger sentence). The foothold rows (#453) fill every slot of kinds.mixed once per pool: foothold-p3, foothold-p4, foothold-p5 and foothold-p6-p7, 17 each, every species its own hue slot and silhouette + pattern pair; hero marks rare, epic and mythic for the follow-up hero art ticket.",
   "hueSlots": [
     {
       "id": "ironstone-umber",
@@ -72,6 +72,414 @@
       "hue": 352,
       "saturation": 0.65,
       "luma": 0.5
+    },
+    {
+      "id": "pig-iron",
+      "hue": 210,
+      "saturation": 0.08,
+      "luma": 0.55
+    },
+    {
+      "id": "soot-zinc",
+      "hue": 195,
+      "saturation": 0.1,
+      "luma": 0.62
+    },
+    {
+      "id": "rail-quartz",
+      "hue": 190,
+      "saturation": 0.08,
+      "luma": 0.8
+    },
+    {
+      "id": "smoke-calcite",
+      "hue": 232,
+      "saturation": 0.1,
+      "luma": 0.58
+    },
+    {
+      "id": "step-bismuth",
+      "hue": 300,
+      "saturation": 0.35,
+      "luma": 0.62
+    },
+    {
+      "id": "green-apatite",
+      "hue": 150,
+      "saturation": 0.45,
+      "luma": 0.6
+    },
+    {
+      "id": "ribbed-shell",
+      "hue": 58,
+      "saturation": 0.3,
+      "luma": 0.7
+    },
+    {
+      "id": "native-platinum",
+      "hue": 220,
+      "saturation": 0.05,
+      "luma": 0.78
+    },
+    {
+      "id": "blue-topaz",
+      "hue": 200,
+      "saturation": 0.55,
+      "luma": 0.7
+    },
+    {
+      "id": "coiled-ammonite",
+      "hue": 330,
+      "saturation": 0.25,
+      "luma": 0.68
+    },
+    {
+      "id": "meteoric-iron",
+      "hue": 236,
+      "saturation": 0.12,
+      "luma": 0.64
+    },
+    {
+      "id": "star-sapphire",
+      "hue": 246,
+      "saturation": 0.6,
+      "luma": 0.55
+    },
+    {
+      "id": "opal-jaw",
+      "hue": 175,
+      "saturation": 0.3,
+      "luma": 0.78
+    },
+    {
+      "id": "orichalcum",
+      "hue": 58,
+      "saturation": 0.72,
+      "luma": 0.66
+    },
+    {
+      "id": "heart-diamond",
+      "hue": 350,
+      "saturation": 0.2,
+      "luma": 0.9
+    },
+    {
+      "id": "chalk-bed",
+      "hue": 62,
+      "saturation": 0.12,
+      "luma": 0.82
+    },
+    {
+      "id": "fish-bed",
+      "hue": 82,
+      "saturation": 0.15,
+      "luma": 0.6
+    },
+    {
+      "id": "bog-iron",
+      "hue": 8,
+      "saturation": 0.3,
+      "luma": 0.5
+    },
+    {
+      "id": "cobalt-bloom",
+      "hue": 320,
+      "saturation": 0.4,
+      "luma": 0.6
+    },
+    {
+      "id": "rain-quartz",
+      "hue": 205,
+      "saturation": 0.12,
+      "luma": 0.82
+    },
+    {
+      "id": "canal-jasper",
+      "hue": 140,
+      "saturation": 0.25,
+      "luma": 0.5
+    },
+    {
+      "id": "antimony",
+      "hue": 215,
+      "saturation": 0.08,
+      "luma": 0.7
+    },
+    {
+      "id": "rose-quartz",
+      "hue": 345,
+      "saturation": 0.3,
+      "luma": 0.78
+    },
+    {
+      "id": "trilobite",
+      "hue": 70,
+      "saturation": 0.2,
+      "luma": 0.62
+    },
+    {
+      "id": "wire-silver",
+      "hue": 200,
+      "saturation": 0.05,
+      "luma": 0.8
+    },
+    {
+      "id": "watermelon-tourmaline",
+      "hue": 150,
+      "saturation": 0.5,
+      "luma": 0.6
+    },
+    {
+      "id": "belemnite",
+      "hue": 55,
+      "saturation": 0.45,
+      "luma": 0.62
+    },
+    {
+      "id": "clockspring-steel",
+      "hue": 225,
+      "saturation": 0.4,
+      "luma": 0.55
+    },
+    {
+      "id": "alexandrite",
+      "hue": 160,
+      "saturation": 0.45,
+      "luma": 0.55
+    },
+    {
+      "id": "ichthyosaur-eye",
+      "hue": 190,
+      "saturation": 0.2,
+      "luma": 0.7
+    },
+    {
+      "id": "starsteel",
+      "hue": 240,
+      "saturation": 0.25,
+      "luma": 0.72
+    },
+    {
+      "id": "painite",
+      "hue": 355,
+      "saturation": 0.7,
+      "luma": 0.48
+    },
+    {
+      "id": "grey-marl",
+      "hue": 65,
+      "saturation": 0.1,
+      "luma": 0.76
+    },
+    {
+      "id": "crinoid-stem",
+      "hue": 90,
+      "saturation": 0.12,
+      "luma": 0.66
+    },
+    {
+      "id": "furnace-iron",
+      "hue": 0,
+      "saturation": 0.25,
+      "luma": 0.48
+    },
+    {
+      "id": "magnetite",
+      "hue": 244,
+      "saturation": 0.06,
+      "luma": 0.5
+    },
+    {
+      "id": "selenite-blade",
+      "hue": 198,
+      "saturation": 0.06,
+      "luma": 0.88
+    },
+    {
+      "id": "ember-agate",
+      "hue": 356,
+      "saturation": 0.45,
+      "luma": 0.55
+    },
+    {
+      "id": "chromite",
+      "hue": 250,
+      "saturation": 0.1,
+      "luma": 0.58
+    },
+    {
+      "id": "peridot",
+      "hue": 80,
+      "saturation": 0.55,
+      "luma": 0.62
+    },
+    {
+      "id": "shark-tooth",
+      "hue": 222,
+      "saturation": 0.1,
+      "luma": 0.58
+    },
+    {
+      "id": "wolfram",
+      "hue": 212,
+      "saturation": 0.1,
+      "luma": 0.64
+    },
+    {
+      "id": "fire-garnet",
+      "hue": 345,
+      "saturation": 0.7,
+      "luma": 0.5
+    },
+    {
+      "id": "saurian-vertebra",
+      "hue": 60,
+      "saturation": 0.22,
+      "luma": 0.7
+    },
+    {
+      "id": "firebrass",
+      "hue": 50,
+      "saturation": 0.7,
+      "luma": 0.6
+    },
+    {
+      "id": "heat-spinel",
+      "hue": 330,
+      "saturation": 0.55,
+      "luma": 0.55
+    },
+    {
+      "id": "petrified-heartwood",
+      "hue": 72,
+      "saturation": 0.3,
+      "luma": 0.58
+    },
+    {
+      "id": "core-gold",
+      "hue": 56,
+      "saturation": 0.9,
+      "luma": 0.8
+    },
+    {
+      "id": "furnace-ruby",
+      "hue": 350,
+      "saturation": 0.85,
+      "luma": 0.5
+    },
+    {
+      "id": "coprolite",
+      "hue": 75,
+      "saturation": 0.18,
+      "luma": 0.55
+    },
+    {
+      "id": "ash-bed",
+      "hue": 5,
+      "saturation": 0.12,
+      "luma": 0.5
+    },
+    {
+      "id": "salt-iron",
+      "hue": 195,
+      "saturation": 0.06,
+      "luma": 0.7
+    },
+    {
+      "id": "wind-copper",
+      "hue": 165,
+      "saturation": 0.4,
+      "luma": 0.6
+    },
+    {
+      "id": "halite",
+      "hue": 210,
+      "saturation": 0.05,
+      "luma": 0.9
+    },
+    {
+      "id": "desert-rose",
+      "hue": 10,
+      "saturation": 0.25,
+      "luma": 0.66
+    },
+    {
+      "id": "mesa-manganese",
+      "hue": 252,
+      "saturation": 0.1,
+      "luma": 0.5
+    },
+    {
+      "id": "turquoise",
+      "hue": 178,
+      "saturation": 0.5,
+      "luma": 0.64
+    },
+    {
+      "id": "sand-dollar",
+      "hue": 50,
+      "saturation": 0.15,
+      "luma": 0.8
+    },
+    {
+      "id": "electrum",
+      "hue": 58,
+      "saturation": 0.5,
+      "luma": 0.78
+    },
+    {
+      "id": "moonstone",
+      "hue": 215,
+      "saturation": 0.2,
+      "luma": 0.85
+    },
+    {
+      "id": "sickle-claw",
+      "hue": 65,
+      "saturation": 0.25,
+      "luma": 0.64
+    },
+    {
+      "id": "thunder-iron",
+      "hue": 230,
+      "saturation": 0.3,
+      "luma": 0.66
+    },
+    {
+      "id": "mirage-glass",
+      "hue": 185,
+      "saturation": 0.35,
+      "luma": 0.8
+    },
+    {
+      "id": "leviathan-rib",
+      "hue": 55,
+      "saturation": 0.2,
+      "luma": 0.76
+    },
+    {
+      "id": "windsilver",
+      "hue": 205,
+      "saturation": 0.15,
+      "luma": 0.9
+    },
+    {
+      "id": "dawn-opal",
+      "hue": 300,
+      "saturation": 0.4,
+      "luma": 0.72
+    },
+    {
+      "id": "dune-scatter",
+      "hue": 48,
+      "saturation": 0.18,
+      "luma": 0.74
+    },
+    {
+      "id": "salt-shell",
+      "hue": 192,
+      "saturation": 0.1,
+      "luma": 0.78
     }
   ],
   "materials": [
@@ -242,6 +650,958 @@
       "rarity": "rare",
       "hero": true,
       "flavour": "Rarer than the Guild admits; wrapped in felt, entered in red ink."
+    },
+    {
+      "id": "pig-iron-brassvein",
+      "pool": "foothold-p3",
+      "slot": "mixed.c1",
+      "family": "metal",
+      "epithet": "Pig Iron",
+      "silhouette": "knots",
+      "pattern": "pitted",
+      "hueSlot": "pig-iron",
+      "gradeBand": [1, 5],
+      "rarity": "common",
+      "hero": false,
+      "flavour": "Lumpy and sooty; the smelter takes every sack and asks for more."
+    },
+    {
+      "id": "soot-zinc-brassvein",
+      "pool": "foothold-p3",
+      "slot": "mixed.c2",
+      "family": "metal",
+      "epithet": "Soot Zinc",
+      "silhouette": "scales",
+      "pattern": "dusted",
+      "hueSlot": "soot-zinc",
+      "gradeBand": [1, 5],
+      "rarity": "common",
+      "hero": false,
+      "flavour": "Grey scale that smudges the gloves and the ledger alike."
+    },
+    {
+      "id": "rail-quartz-quartzine",
+      "pool": "foothold-p3",
+      "slot": "mixed.c3",
+      "family": "crystal",
+      "epithet": "Rail Quartz",
+      "silhouette": "rods",
+      "pattern": "frosted",
+      "hueSlot": "rail-quartz",
+      "gradeBand": [1, 5],
+      "rarity": "common",
+      "hero": false,
+      "flavour": "Frosted rods the platelayers kick aside until the clerk pays."
+    },
+    {
+      "id": "smoke-calcite-quartzine",
+      "pool": "foothold-p3",
+      "slot": "mixed.c4",
+      "family": "crystal",
+      "epithet": "Smoke Calcite",
+      "silhouette": "lenses",
+      "pattern": "smoky",
+      "hueSlot": "smoke-calcite",
+      "gradeBand": [1, 5],
+      "rarity": "common",
+      "hero": false,
+      "flavour": "Grey lenses that smell of the furnace when broken open."
+    },
+    {
+      "id": "step-bismuth-brassvein",
+      "pool": "foothold-p3",
+      "slot": "mixed.u1",
+      "family": "metal",
+      "epithet": "Step Bismuth",
+      "silhouette": "terraces",
+      "pattern": "iridescent",
+      "hueSlot": "step-bismuth",
+      "gradeBand": [1, 4],
+      "rarity": "uncommon",
+      "hero": false,
+      "flavour": "Stepped and rainbowed; the clerk files it under curiosities that sell."
+    },
+    {
+      "id": "green-apatite-quartzine",
+      "pool": "foothold-p3",
+      "slot": "mixed.u2",
+      "family": "crystal",
+      "epithet": "Green Apatite",
+      "silhouette": "prisms",
+      "pattern": "glassy",
+      "hueSlot": "green-apatite",
+      "gradeBand": [1, 4],
+      "rarity": "uncommon",
+      "hero": false,
+      "flavour": "Green prisms the assayers mistake for emerald exactly once."
+    },
+    {
+      "id": "ribbed-shell-amberbone",
+      "pool": "foothold-p3",
+      "slot": "mixed.u3",
+      "family": "fossil",
+      "epithet": "Ribbed Shell",
+      "silhouette": "shells",
+      "pattern": "ringed",
+      "hueSlot": "ribbed-shell",
+      "gradeBand": [2, 5],
+      "rarity": "uncommon",
+      "hero": false,
+      "flavour": "Old shell turned to stone, paid by the crate at the dock."
+    },
+    {
+      "id": "native-platinum-brassvein",
+      "pool": "foothold-p3",
+      "slot": "mixed.r1",
+      "family": "metal",
+      "epithet": "Native Platinum",
+      "silhouette": "pebbles",
+      "pattern": "burnished",
+      "hueSlot": "native-platinum",
+      "gradeBand": [2, 5],
+      "rarity": "rare",
+      "hero": true,
+      "flavour": "Heavy pale pebbles, weighed before two witnesses and a guard."
+    },
+    {
+      "id": "blue-topaz-quartzine",
+      "pool": "foothold-p3",
+      "slot": "mixed.r2",
+      "family": "crystal",
+      "epithet": "Blue Topaz",
+      "silhouette": "blocks",
+      "pattern": "clear",
+      "hueSlot": "blue-topaz",
+      "gradeBand": [2, 5],
+      "rarity": "rare",
+      "hero": true,
+      "flavour": "Cool blue blocks, logged in the clean ledger, never the sooty one."
+    },
+    {
+      "id": "coiled-ammonite-amberbone",
+      "pool": "foothold-p3",
+      "slot": "mixed.r3",
+      "family": "fossil",
+      "epithet": "Coiled Ammonite",
+      "silhouette": "spirals",
+      "pattern": "nacreous",
+      "hueSlot": "coiled-ammonite",
+      "gradeBand": [4, 4],
+      "rarity": "rare",
+      "hero": true,
+      "flavour": "A stone coil with a pearl sheen; the Guild keeps the largest."
+    },
+    {
+      "id": "meteoric-iron-brassvein",
+      "pool": "foothold-p3",
+      "slot": "mixed.e1",
+      "family": "metal",
+      "epithet": "Meteoric Iron",
+      "silhouette": "slabs",
+      "pattern": "etched",
+      "hueSlot": "meteoric-iron",
+      "gradeBand": [4, 5],
+      "rarity": "epic",
+      "hero": true,
+      "flavour": "Fell from the sky long ago and still hums under the hammer."
+    },
+    {
+      "id": "star-sapphire-quartzine",
+      "pool": "foothold-p3",
+      "slot": "mixed.e2",
+      "family": "crystal",
+      "epithet": "Star Sapphire",
+      "silhouette": "domes",
+      "pattern": "starred",
+      "hueSlot": "star-sapphire",
+      "gradeBand": [4, 5],
+      "rarity": "epic",
+      "hero": true,
+      "flavour": "A pale star walks across it under the lamp; sealed on sight."
+    },
+    {
+      "id": "opal-jaw-amberbone",
+      "pool": "foothold-p3",
+      "slot": "mixed.e3",
+      "family": "fossil",
+      "epithet": "Opal Jaw",
+      "silhouette": "jaws",
+      "pattern": "opaline",
+      "hueSlot": "opal-jaw",
+      "gradeBand": [3, 3],
+      "rarity": "epic",
+      "hero": true,
+      "flavour": "A jawbone gone to opal; the ledger lists the teeth separately."
+    },
+    {
+      "id": "orichalcum-brassvein",
+      "pool": "foothold-p3",
+      "slot": "mixed.m1",
+      "family": "metal",
+      "epithet": "Orichalcum",
+      "silhouette": "lattices",
+      "pattern": "lustrous",
+      "hueSlot": "orichalcum",
+      "gradeBand": [4, 5],
+      "rarity": "mythic",
+      "hero": true,
+      "flavour": "Named in the old charters; the clerk checks the seal twice."
+    },
+    {
+      "id": "heart-diamond-quartzine",
+      "pool": "foothold-p3",
+      "slot": "mixed.m2",
+      "family": "crystal",
+      "epithet": "Heart Diamond",
+      "silhouette": "octahedra",
+      "pattern": "fiery",
+      "hueSlot": "heart-diamond",
+      "gradeBand": [4, 5],
+      "rarity": "mythic",
+      "hero": true,
+      "flavour": "The Guild vault opens for this and for very little else."
+    },
+    {
+      "id": "chalk-bed-amberbone",
+      "pool": "foothold-p3",
+      "slot": "mixed.c5",
+      "family": "fossil",
+      "epithet": "Chalk Bed",
+      "silhouette": "lumps",
+      "pattern": "chalky",
+      "hueSlot": "chalk-bed",
+      "gradeBand": [3, 3],
+      "rarity": "common",
+      "hero": false,
+      "flavour": "Soft white bone-stone that dusts the hold and the crew alike."
+    },
+    {
+      "id": "fish-bed-amberbone",
+      "pool": "foothold-p3",
+      "slot": "mixed.c6",
+      "family": "fossil",
+      "epithet": "Fish Bed",
+      "silhouette": "flags",
+      "pattern": "imprinted",
+      "hueSlot": "fish-bed",
+      "gradeBand": [3, 3],
+      "rarity": "common",
+      "hero": false,
+      "flavour": "Split a flag and a stone fish stares back at the clerk."
+    },
+    {
+      "id": "bog-iron-brassvein",
+      "pool": "foothold-p4",
+      "slot": "mixed.c1",
+      "family": "metal",
+      "epithet": "Bog Iron",
+      "silhouette": "clods",
+      "pattern": "peaty",
+      "hueSlot": "bog-iron",
+      "gradeBand": [1, 5],
+      "rarity": "common",
+      "hero": false,
+      "flavour": "Dug wet from the low ground and dried on the boiler casing."
+    },
+    {
+      "id": "cobalt-bloom-brassvein",
+      "pool": "foothold-p4",
+      "slot": "mixed.c2",
+      "family": "metal",
+      "epithet": "Cobalt Bloom",
+      "silhouette": "tufts",
+      "pattern": "bloomed",
+      "hueSlot": "cobalt-bloom",
+      "gradeBand": [1, 5],
+      "rarity": "common",
+      "hero": false,
+      "flavour": "Pink crust on grey rock; it stains the sacks and the shift."
+    },
+    {
+      "id": "rain-quartz-quartzine",
+      "pool": "foothold-p4",
+      "slot": "mixed.c3",
+      "family": "crystal",
+      "epithet": "Rain Quartz",
+      "silhouette": "needles",
+      "pattern": "dewed",
+      "hueSlot": "rain-quartz",
+      "gradeBand": [1, 5],
+      "rarity": "common",
+      "hero": false,
+      "flavour": "Fine needles that bead with water even in a dry hold."
+    },
+    {
+      "id": "canal-jasper-quartzine",
+      "pool": "foothold-p4",
+      "slot": "mixed.c4",
+      "family": "crystal",
+      "epithet": "Canal Jasper",
+      "silhouette": "cobbles",
+      "pattern": "striped",
+      "hueSlot": "canal-jasper",
+      "gradeBand": [1, 5],
+      "rarity": "common",
+      "hero": false,
+      "flavour": "Green-striped and plentiful; the bargemen use it for ballast."
+    },
+    {
+      "id": "antimony-brassvein",
+      "pool": "foothold-p4",
+      "slot": "mixed.u1",
+      "family": "metal",
+      "epithet": "Antimony",
+      "silhouette": "sprays",
+      "pattern": "metallic",
+      "hueSlot": "antimony",
+      "gradeBand": [1, 4],
+      "rarity": "uncommon",
+      "hero": false,
+      "flavour": "Bright silver sprays the clerk marks brittle and in demand."
+    },
+    {
+      "id": "rose-quartz-quartzine",
+      "pool": "foothold-p4",
+      "slot": "mixed.u2",
+      "family": "crystal",
+      "epithet": "Rose Quartz",
+      "silhouette": "masses",
+      "pattern": "rosy",
+      "hueSlot": "rose-quartz",
+      "gradeBand": [1, 4],
+      "rarity": "uncommon",
+      "hero": false,
+      "flavour": "Soft pink and common enough, yet the buyers always ask for it."
+    },
+    {
+      "id": "trilobite-amberbone",
+      "pool": "foothold-p4",
+      "slot": "mixed.u3",
+      "family": "fossil",
+      "epithet": "Trilobite",
+      "silhouette": "segments",
+      "pattern": "ridged",
+      "hueSlot": "trilobite",
+      "gradeBand": [2, 5],
+      "rarity": "uncommon",
+      "hero": false,
+      "flavour": "Three-lobed and stony; each one is logged and given a number."
+    },
+    {
+      "id": "wire-silver-brassvein",
+      "pool": "foothold-p4",
+      "slot": "mixed.r1",
+      "family": "metal",
+      "epithet": "Wire Silver",
+      "silhouette": "curls",
+      "pattern": "tarnished",
+      "hueSlot": "wire-silver",
+      "gradeBand": [2, 5],
+      "rarity": "rare",
+      "hero": true,
+      "flavour": "Curls of silver straight from the rock, kept in a locked box."
+    },
+    {
+      "id": "watermelon-tourmaline-quartzine",
+      "pool": "foothold-p4",
+      "slot": "mixed.r2",
+      "family": "crystal",
+      "epithet": "Watermelon Tourmaline",
+      "silhouette": "pencils",
+      "pattern": "two-tone",
+      "hueSlot": "watermelon-tourmaline",
+      "gradeBand": [2, 5],
+      "rarity": "rare",
+      "hero": true,
+      "flavour": "Pink at heart and green at the rind; entered with some delight."
+    },
+    {
+      "id": "belemnite-amberbone",
+      "pool": "foothold-p4",
+      "slot": "mixed.r3",
+      "family": "fossil",
+      "epithet": "Belemnite",
+      "silhouette": "darts",
+      "pattern": "polished",
+      "hueSlot": "belemnite",
+      "gradeBand": [4, 4],
+      "rarity": "rare",
+      "hero": true,
+      "flavour": "Stone darts from an old sea, sold to apothecaries by the dozen."
+    },
+    {
+      "id": "clockspring-steel-brassvein",
+      "pool": "foothold-p4",
+      "slot": "mixed.e1",
+      "family": "metal",
+      "epithet": "Clockspring Steel",
+      "silhouette": "springs",
+      "pattern": "blued",
+      "hueSlot": "clockspring-steel",
+      "gradeBand": [4, 5],
+      "rarity": "epic",
+      "hero": true,
+      "flavour": "Coils that keep their tension in the rock; the clockmakers bid high."
+    },
+    {
+      "id": "alexandrite-quartzine",
+      "pool": "foothold-p4",
+      "slot": "mixed.e2",
+      "family": "crystal",
+      "epithet": "Alexandrite",
+      "silhouette": "twins",
+      "pattern": "colour-change",
+      "hueSlot": "alexandrite",
+      "gradeBand": [4, 5],
+      "rarity": "epic",
+      "hero": true,
+      "flavour": "Green by lamplight and red by candle; the clerk logs both."
+    },
+    {
+      "id": "ichthyosaur-eye-amberbone",
+      "pool": "foothold-p4",
+      "slot": "mixed.e3",
+      "family": "fossil",
+      "epithet": "Ichthyosaur Eye",
+      "silhouette": "rings",
+      "pattern": "plated",
+      "hueSlot": "ichthyosaur-eye",
+      "gradeBand": [3, 3],
+      "rarity": "epic",
+      "hero": true,
+      "flavour": "A stone eye ring as wide as a palm, entered under wonders."
+    },
+    {
+      "id": "starsteel-brassvein",
+      "pool": "foothold-p4",
+      "slot": "mixed.m1",
+      "family": "metal",
+      "epithet": "Starsteel",
+      "silhouette": "stars",
+      "pattern": "watered",
+      "hueSlot": "starsteel",
+      "gradeBand": [4, 5],
+      "rarity": "mythic",
+      "hero": true,
+      "flavour": "No Guild smith has worked it; every chip is accounted for."
+    },
+    {
+      "id": "painite-quartzine",
+      "pool": "foothold-p4",
+      "slot": "mixed.m2",
+      "family": "crystal",
+      "epithet": "Painite",
+      "silhouette": "spindles",
+      "pattern": "deep-red",
+      "hueSlot": "painite",
+      "gradeBand": [4, 5],
+      "rarity": "mythic",
+      "hero": true,
+      "flavour": "Once called the rarest stone of all, and the Guild agrees."
+    },
+    {
+      "id": "grey-marl-amberbone",
+      "pool": "foothold-p4",
+      "slot": "mixed.c5",
+      "family": "fossil",
+      "epithet": "Grey Marl",
+      "silhouette": "clumps",
+      "pattern": "powdery",
+      "hueSlot": "grey-marl",
+      "gradeBand": [3, 3],
+      "rarity": "common",
+      "hero": false,
+      "flavour": "Crumbly grey marl full of small bones; shovelled, never picked."
+    },
+    {
+      "id": "crinoid-stem-amberbone",
+      "pool": "foothold-p4",
+      "slot": "mixed.c6",
+      "family": "fossil",
+      "epithet": "Crinoid Stem",
+      "silhouette": "stems",
+      "pattern": "beaded",
+      "hueSlot": "crinoid-stem",
+      "gradeBand": [3, 3],
+      "rarity": "common",
+      "hero": false,
+      "flavour": "Stacked stone discs the crews thread on string for luck."
+    },
+    {
+      "id": "furnace-iron-brassvein",
+      "pool": "foothold-p5",
+      "slot": "mixed.c1",
+      "family": "metal",
+      "epithet": "Furnace Iron",
+      "silhouette": "clinkers",
+      "pattern": "scorched",
+      "hueSlot": "furnace-iron",
+      "gradeBand": [1, 5],
+      "rarity": "common",
+      "hero": false,
+      "flavour": "Comes up warm and black; the furnace hands it straight back."
+    },
+    {
+      "id": "magnetite-brassvein",
+      "pool": "foothold-p5",
+      "slot": "mixed.c2",
+      "family": "metal",
+      "epithet": "Magnetite",
+      "silhouette": "grits",
+      "pattern": "glinting",
+      "hueSlot": "magnetite",
+      "gradeBand": [1, 5],
+      "rarity": "common",
+      "hero": false,
+      "flavour": "Black grit that tugs at the compass and the clerk's pen."
+    },
+    {
+      "id": "selenite-blade-quartzine",
+      "pool": "foothold-p5",
+      "slot": "mixed.c3",
+      "family": "crystal",
+      "epithet": "Selenite Blade",
+      "silhouette": "blades",
+      "pattern": "pearly",
+      "hueSlot": "selenite-blade",
+      "gradeBand": [1, 5],
+      "rarity": "common",
+      "hero": false,
+      "flavour": "Soft white blades the crew peel apart with a thumbnail."
+    },
+    {
+      "id": "ember-agate-quartzine",
+      "pool": "foothold-p5",
+      "slot": "mixed.c4",
+      "family": "crystal",
+      "epithet": "Ember Agate",
+      "silhouette": "geodes",
+      "pattern": "banded",
+      "hueSlot": "ember-agate",
+      "gradeBand": [1, 5],
+      "rarity": "common",
+      "hero": false,
+      "flavour": "Red-banded geodes that look hot to the eye and never are."
+    },
+    {
+      "id": "chromite-brassvein",
+      "pool": "foothold-p5",
+      "slot": "mixed.u1",
+      "family": "metal",
+      "epithet": "Chromite",
+      "silhouette": "seeds",
+      "pattern": "glossy",
+      "hueSlot": "chromite",
+      "gradeBand": [1, 4],
+      "rarity": "uncommon",
+      "hero": false,
+      "flavour": "Small black seeds of chrome; the plating shops pay well for them."
+    },
+    {
+      "id": "peridot-quartzine",
+      "pool": "foothold-p5",
+      "slot": "mixed.u2",
+      "family": "crystal",
+      "epithet": "Peridot",
+      "silhouette": "drops",
+      "pattern": "oily",
+      "hueSlot": "peridot",
+      "gradeBand": [1, 4],
+      "rarity": "uncommon",
+      "hero": false,
+      "flavour": "Olive drops from the hot depths, logged before they cool."
+    },
+    {
+      "id": "shark-tooth-amberbone",
+      "pool": "foothold-p5",
+      "slot": "mixed.u3",
+      "family": "fossil",
+      "epithet": "Shark Tooth",
+      "silhouette": "teeth",
+      "pattern": "glazed",
+      "hueSlot": "shark-tooth",
+      "gradeBand": [2, 5],
+      "rarity": "uncommon",
+      "hero": false,
+      "flavour": "Grey stone teeth by the bucket; the sharpest go to the clerk."
+    },
+    {
+      "id": "wolfram-brassvein",
+      "pool": "foothold-p5",
+      "slot": "mixed.r1",
+      "family": "metal",
+      "epithet": "Wolfram",
+      "silhouette": "bars",
+      "pattern": "satin",
+      "hueSlot": "wolfram",
+      "gradeBand": [2, 5],
+      "rarity": "rare",
+      "hero": true,
+      "flavour": "Dense and dour; no furnace on the planet will melt it."
+    },
+    {
+      "id": "fire-garnet-quartzine",
+      "pool": "foothold-p5",
+      "slot": "mixed.r2",
+      "family": "crystal",
+      "epithet": "Fire Garnet",
+      "silhouette": "spheres",
+      "pattern": "glowing",
+      "hueSlot": "fire-garnet",
+      "gradeBand": [2, 5],
+      "rarity": "rare",
+      "hero": true,
+      "flavour": "Deep red spheres the furnace crews carry as charms."
+    },
+    {
+      "id": "saurian-vertebra-amberbone",
+      "pool": "foothold-p5",
+      "slot": "mixed.r3",
+      "family": "fossil",
+      "epithet": "Saurian Vertebra",
+      "silhouette": "vertebrae",
+      "pattern": "porous",
+      "hueSlot": "saurian-vertebra",
+      "gradeBand": [4, 4],
+      "rarity": "rare",
+      "hero": true,
+      "flavour": "A spine bone the size of a boiler valve, crated in straw."
+    },
+    {
+      "id": "firebrass-brassvein",
+      "pool": "foothold-p5",
+      "slot": "mixed.e1",
+      "family": "metal",
+      "epithet": "Firebrass",
+      "silhouette": "ribbons",
+      "pattern": "flame-lit",
+      "hueSlot": "firebrass",
+      "gradeBand": [4, 5],
+      "rarity": "epic",
+      "hero": true,
+      "flavour": "Brass that grows in the rock and glows as the lamp nears."
+    },
+    {
+      "id": "heat-spinel-quartzine",
+      "pool": "foothold-p5",
+      "slot": "mixed.e2",
+      "family": "crystal",
+      "epithet": "Heat Spinel",
+      "silhouette": "octahedra",
+      "pattern": "glowing",
+      "hueSlot": "heat-spinel",
+      "gradeBand": [4, 5],
+      "rarity": "epic",
+      "hero": true,
+      "flavour": "Pink spinel that holds the deep heat for a full shift."
+    },
+    {
+      "id": "petrified-heartwood-amberbone",
+      "pool": "foothold-p5",
+      "slot": "mixed.e3",
+      "family": "fossil",
+      "epithet": "Petrified Heartwood",
+      "silhouette": "logs",
+      "pattern": "growth-ringed",
+      "hueSlot": "petrified-heartwood",
+      "gradeBand": [3, 3],
+      "rarity": "epic",
+      "hero": true,
+      "flavour": "A branch turned to stone, rings and all, sold by the inch."
+    },
+    {
+      "id": "core-gold-brassvein",
+      "pool": "foothold-p5",
+      "slot": "mixed.m1",
+      "family": "metal",
+      "epithet": "Core Gold",
+      "silhouette": "blooms",
+      "pattern": "molten",
+      "hueSlot": "core-gold",
+      "gradeBand": [4, 5],
+      "rarity": "mythic",
+      "hero": true,
+      "flavour": "Gold from beside the core, still bright and faintly soft."
+    },
+    {
+      "id": "furnace-ruby-quartzine",
+      "pool": "foothold-p5",
+      "slot": "mixed.m2",
+      "family": "crystal",
+      "epithet": "Furnace Ruby",
+      "silhouette": "hearts",
+      "pattern": "inner-fire",
+      "hueSlot": "furnace-ruby",
+      "gradeBand": [4, 5],
+      "rarity": "mythic",
+      "hero": true,
+      "flavour": "A ruby with a flame inside; the vault clerk sits well away."
+    },
+    {
+      "id": "coprolite-amberbone",
+      "pool": "foothold-p5",
+      "slot": "mixed.c5",
+      "family": "fossil",
+      "epithet": "Coprolite",
+      "silhouette": "pellets",
+      "pattern": "nodular",
+      "hueSlot": "coprolite",
+      "gradeBand": [3, 3],
+      "rarity": "common",
+      "hero": false,
+      "flavour": "The clerk records it plainly and the crew joke about it daily."
+    },
+    {
+      "id": "ash-bed-amberbone",
+      "pool": "foothold-p5",
+      "slot": "mixed.c6",
+      "family": "fossil",
+      "epithet": "Ash Bed",
+      "silhouette": "splinters",
+      "pattern": "charred",
+      "hueSlot": "ash-bed",
+      "gradeBand": [3, 3],
+      "rarity": "common",
+      "hero": false,
+      "flavour": "Bones caught in old ash, black-edged and brittle; ground for fertiliser."
+    },
+    {
+      "id": "salt-iron-brassvein",
+      "pool": "foothold-p6-p7",
+      "slot": "mixed.c1",
+      "family": "metal",
+      "epithet": "Salt Iron",
+      "silhouette": "rinds",
+      "pattern": "salted",
+      "hueSlot": "salt-iron",
+      "gradeBand": [1, 5],
+      "rarity": "common",
+      "hero": false,
+      "flavour": "Iron ore under a salt rind; rinse it or the hold corrodes."
+    },
+    {
+      "id": "wind-copper-brassvein",
+      "pool": "foothold-p6-p7",
+      "slot": "mixed.c2",
+      "family": "metal",
+      "epithet": "Wind Copper",
+      "silhouette": "sheets",
+      "pattern": "weathered",
+      "hueSlot": "wind-copper",
+      "gradeBand": [1, 5],
+      "rarity": "common",
+      "hero": false,
+      "flavour": "Thin green sheets scoured by grit; the frontier clerks stack them."
+    },
+    {
+      "id": "halite-quartzine",
+      "pool": "foothold-p6-p7",
+      "slot": "mixed.c3",
+      "family": "crystal",
+      "epithet": "Halite",
+      "silhouette": "hoppers",
+      "pattern": "stepped",
+      "hueSlot": "halite",
+      "gradeBand": [1, 5],
+      "rarity": "common",
+      "hero": false,
+      "flavour": "Salt crystals in hollow steps, tasted once by every new clerk."
+    },
+    {
+      "id": "desert-rose-quartzine",
+      "pool": "foothold-p6-p7",
+      "slot": "mixed.c4",
+      "family": "crystal",
+      "epithet": "Desert Rose",
+      "silhouette": "rosettes",
+      "pattern": "sandy",
+      "hueSlot": "desert-rose",
+      "gradeBand": [1, 5],
+      "rarity": "common",
+      "hero": false,
+      "flavour": "Petals of gypsum and sand, packed in sawdust for the long haul."
+    },
+    {
+      "id": "mesa-manganese-brassvein",
+      "pool": "foothold-p6-p7",
+      "slot": "mixed.u1",
+      "family": "metal",
+      "epithet": "Mesa Manganese",
+      "silhouette": "dendrites",
+      "pattern": "feathered",
+      "hueSlot": "mesa-manganese",
+      "gradeBand": [1, 4],
+      "rarity": "uncommon",
+      "hero": false,
+      "flavour": "Black ferns of manganese drawn across the rock; logged as found."
+    },
+    {
+      "id": "turquoise-quartzine",
+      "pool": "foothold-p6-p7",
+      "slot": "mixed.u2",
+      "family": "crystal",
+      "epithet": "Turquoise",
+      "silhouette": "pods",
+      "pattern": "webbed",
+      "hueSlot": "turquoise",
+      "gradeBand": [1, 4],
+      "rarity": "uncommon",
+      "hero": false,
+      "flavour": "Blue-green with dark webs; frontier traders swap it for water."
+    },
+    {
+      "id": "sand-dollar-amberbone",
+      "pool": "foothold-p6-p7",
+      "slot": "mixed.u3",
+      "family": "fossil",
+      "epithet": "Sand Dollar",
+      "silhouette": "discs",
+      "pattern": "petalled",
+      "hueSlot": "sand-dollar",
+      "gradeBand": [2, 5],
+      "rarity": "uncommon",
+      "hero": false,
+      "flavour": "Flat stone discs with a flower on top, paid per dozen."
+    },
+    {
+      "id": "electrum-brassvein",
+      "pool": "foothold-p6-p7",
+      "slot": "mixed.r1",
+      "family": "metal",
+      "epithet": "Electrum",
+      "silhouette": "leaves",
+      "pattern": "two-metal",
+      "hueSlot": "electrum",
+      "gradeBand": [2, 5],
+      "rarity": "rare",
+      "hero": true,
+      "flavour": "Gold and silver in one leaf; the assay takes all afternoon."
+    },
+    {
+      "id": "moonstone-quartzine",
+      "pool": "foothold-p6-p7",
+      "slot": "mixed.r2",
+      "family": "crystal",
+      "epithet": "Moonstone",
+      "silhouette": "ovals",
+      "pattern": "adularescent",
+      "hueSlot": "moonstone",
+      "gradeBand": [2, 5],
+      "rarity": "rare",
+      "hero": true,
+      "flavour": "A blue glow drifts beneath the skin; logged by lamplight at night."
+    },
+    {
+      "id": "sickle-claw-amberbone",
+      "pool": "foothold-p6-p7",
+      "slot": "mixed.r3",
+      "family": "fossil",
+      "epithet": "Sickle Claw",
+      "silhouette": "claws",
+      "pattern": "grooved",
+      "hueSlot": "sickle-claw",
+      "gradeBand": [4, 4],
+      "rarity": "rare",
+      "hero": true,
+      "flavour": "A curved stone claw, crated alone and marked to handle with care."
+    },
+    {
+      "id": "thunder-iron-brassvein",
+      "pool": "foothold-p6-p7",
+      "slot": "mixed.e1",
+      "family": "metal",
+      "epithet": "Thunder Iron",
+      "silhouette": "forks",
+      "pattern": "fulgurite",
+      "hueSlot": "thunder-iron",
+      "gradeBand": [4, 5],
+      "rarity": "epic",
+      "hero": true,
+      "flavour": "Struck by old lightning; every compass needle swings toward it."
+    },
+    {
+      "id": "mirage-glass-quartzine",
+      "pool": "foothold-p6-p7",
+      "slot": "mixed.e2",
+      "family": "crystal",
+      "epithet": "Mirage Glass",
+      "silhouette": "panes",
+      "pattern": "shimmering",
+      "hueSlot": "mirage-glass",
+      "gradeBand": [4, 5],
+      "rarity": "epic",
+      "hero": true,
+      "flavour": "Clear sheets that bend the horizon; the clerk logs it squinting."
+    },
+    {
+      "id": "leviathan-rib-amberbone",
+      "pool": "foothold-p6-p7",
+      "slot": "mixed.e3",
+      "family": "fossil",
+      "epithet": "Leviathan Rib",
+      "silhouette": "arches",
+      "pattern": "fluted",
+      "hueSlot": "leviathan-rib",
+      "gradeBand": [3, 3],
+      "rarity": "epic",
+      "hero": true,
+      "flavour": "One rib fills a wagon; the Guild sends a full crew."
+    },
+    {
+      "id": "windsilver-brassvein",
+      "pool": "foothold-p6-p7",
+      "slot": "mixed.m1",
+      "family": "metal",
+      "epithet": "Windsilver",
+      "silhouette": "filaments",
+      "pattern": "quicksilver",
+      "hueSlot": "windsilver",
+      "gradeBand": [4, 5],
+      "rarity": "mythic",
+      "hero": true,
+      "flavour": "So light it lifts off the scale; weighed under a glass bell."
+    },
+    {
+      "id": "dawn-opal-quartzine",
+      "pool": "foothold-p6-p7",
+      "slot": "mixed.m2",
+      "family": "crystal",
+      "epithet": "Dawn Opal",
+      "silhouette": "flames",
+      "pattern": "play-of-colour",
+      "hueSlot": "dawn-opal",
+      "gradeBand": [4, 5],
+      "rarity": "mythic",
+      "hero": true,
+      "flavour": "Every colour of a frontier dawn in a thumb of stone."
+    },
+    {
+      "id": "dune-scatter-amberbone",
+      "pool": "foothold-p6-p7",
+      "slot": "mixed.c5",
+      "family": "fossil",
+      "epithet": "Dune Scatter",
+      "silhouette": "fragments",
+      "pattern": "sandblasted",
+      "hueSlot": "dune-scatter",
+      "gradeBand": [3, 3],
+      "rarity": "common",
+      "hero": false,
+      "flavour": "Sun-bleached bone scoured by wind; the haulers shovel it by the ton."
+    },
+    {
+      "id": "salt-shell-amberbone",
+      "pool": "foothold-p6-p7",
+      "slot": "mixed.c6",
+      "family": "fossil",
+      "epithet": "Salt Shell",
+      "silhouette": "cockles",
+      "pattern": "rimed",
+      "hueSlot": "salt-shell",
+      "gradeBand": [3, 3],
+      "rarity": "common",
+      "hero": false,
+      "flavour": "Small shells under a salt crust, light in the hold."
     }
   ]
 }

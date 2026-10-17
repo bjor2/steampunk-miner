@@ -36,7 +36,7 @@
       "tripClampTierIds": ["epic", "mythic"]
     },
     "kinds": {
-      "rosterMaxKinds": 15,
+      "rosterMaxKinds": 17,
       "pools": {
         "1": "legacy",
         "2": "legacy",
@@ -60,7 +60,25 @@
         { "slotId": "legacy.r2", "family": "crystal", "rarity": "rare", "window": [3, 4] },
         { "slotId": "legacy.r3", "family": "crystal", "rarity": "rare", "window": [4, 5] }
       ],
-      "mixed": []
+      "mixed": [
+        { "slotId": "mixed.c1", "family": "metal", "rarity": "common", "window": [1, 5] },
+        { "slotId": "mixed.c2", "family": "metal", "rarity": "common", "window": [1, 5] },
+        { "slotId": "mixed.c3", "family": "crystal", "rarity": "common", "window": [1, 5] },
+        { "slotId": "mixed.c4", "family": "crystal", "rarity": "common", "window": [1, 5] },
+        { "slotId": "mixed.u1", "family": "metal", "rarity": "uncommon", "window": [1, 4] },
+        { "slotId": "mixed.u2", "family": "crystal", "rarity": "uncommon", "window": [1, 4] },
+        { "slotId": "mixed.u3", "family": "fossil", "rarity": "uncommon", "window": [2, 5] },
+        { "slotId": "mixed.r1", "family": "metal", "rarity": "rare", "window": [2, 5] },
+        { "slotId": "mixed.r2", "family": "crystal", "rarity": "rare", "window": [2, 5] },
+        { "slotId": "mixed.r3", "family": "fossil", "rarity": "rare", "window": [4, 4] },
+        { "slotId": "mixed.e1", "family": "metal", "rarity": "epic", "window": [4, 5] },
+        { "slotId": "mixed.e2", "family": "crystal", "rarity": "epic", "window": [4, 5] },
+        { "slotId": "mixed.e3", "family": "fossil", "rarity": "epic", "window": [3, 3] },
+        { "slotId": "mixed.m1", "family": "metal", "rarity": "mythic", "window": [4, 5] },
+        { "slotId": "mixed.m2", "family": "crystal", "rarity": "mythic", "window": [4, 5] },
+        { "slotId": "mixed.c5", "family": "fossil", "rarity": "common", "window": [3, 3] },
+        { "slotId": "mixed.c6", "family": "fossil", "rarity": "common", "window": [3, 3] }
+      ]
     }
   }
 }

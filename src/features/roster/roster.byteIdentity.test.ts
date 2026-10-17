@@ -38,7 +38,8 @@ import { liveRosterIndicesOf } from './systems/rosterFold'
 // amendment 4). A: the roster fold off against on changes no masked cell, density, band count or
 // family histogram (the pacing seeds here, all 64 in `roster.byteIdentity.lane.test.ts`). B: the
 // masked P1 and P2 cells and their per-band, per-family and per-tier counts are main's at f49323ba.
-// C: the properties of the drawn roster. D, the pacing line, is `roster.pacing.lane.test.ts`.
+// C: the properties of the drawn roster, on P1 and P2 and, since the mixed table (#453), on P3 to
+// P5 over the pacing seeds. D, the pacing line, is `roster.pacing.lane.test.ts`.
 
 /** Main's masked digests at f49323ba (generator 9), over the 8 named seeds, P1 then P2. */
 const MAIN_MASKED_DIGESTS: Readonly<Record<number, string>> = {
@@ -46,9 +47,12 @@ const MAIN_MASKED_DIGESTS: Readonly<Record<number, string>> = {
   2: 'c7b0db9f0903fa37',
 }
 
-/** The roster golden: every roster of P1 to P5, and the kinds P1 and P2 patches drew. */
+/**
+ * The roster golden: every roster of P1 to P5, and the kinds P1 and P2 patches drew. The rosters
+ * moved when the mixed table landed on P3 to P5 (#453); the P1 and P2 draws did not.
+ */
 const ROSTER_GOLDEN = {
-  rosters: '5700838e38882505',
+  rosters: '81835f3f737e5264',
   draws: { 1: '45eef63f1b02d27f', 2: '06187be540d8ba5c' } as Readonly<Record<number, string>>,
 }
 
@@ -85,6 +89,39 @@ function namedMaskedDigestOf(planetIndex: number): string {
 function drawsDigestOf(planetIndex: number): string {
   const draws = NAMED_SEEDS.flatMap((seed) => patchDrawsOf(freshPlanetParamsFor(seed, planetIndex)))
   return fnv1a64Hex(draws.map((draw) => draw.kindSlot).join(','))
+}
+
+/** The census rows of kinded cells whose kind's family, rarity or window is not the cell's. */
+function misplacedRowsOf(params: PlanetParams): PlanetCensus['rows'] {
+  const roster = planetRosterOf(params)
+  return censusOf(params).rows.filter((row) => {
+    if (row.kindSlot === 0) return false
+    const slot = roster[row.kindSlot - 1]
+    const family = oreFamilies().find((entry) => entry.cellCode === row.family)?.id
+    const rarity = rarityTiers()[row.tierOffset - (row.band - 1)]?.id
+    const isInWindow = row.band >= slot.window[0] && row.band <= slot.window[1]
+    return slot.family !== family || slot.rarity !== rarity || !isInWindow
+  })
+}
+
+/** The planet's kinds over their planet bound: 4000 bp of ore value for a common, 1500 for any other. */
+function kindsOverPlanetBoundOf(params: PlanetParams): KindShare[] {
+  return planetKindSharesBpOf(censusOf(params)).filter(
+    ({ isCommon, shareBp }) => shareBp > (isCommon ? COMMON_PLANET_BOUND_BP : RARE_BOUND_BP),
+  )
+}
+
+function familyIdOf(cellCode: number): string | undefined {
+  return oreFamilies().find((entry) => entry.cellCode === cellCode)?.id
+}
+
+/** The roster slot ids drawn on band-3 common fossil cells: a swapped band 3's (#453 Option B). */
+function swappedBand3SlotIdsOf(params: PlanetParams): string[] {
+  const roster = planetRosterOf(params)
+  const rows = censusOf(params).rows.filter(
+    (row) => row.band === 3 && row.tierOffset === 2 && familyIdOf(row.family) === 'fossil',
+  )
+  return [...new Set(rows.map((row) => roster[row.kindSlot - 1]?.slotId ?? 'none'))].sort()
 }
 
 interface PlacedOre {
@@ -194,17 +231,7 @@ describe('roster byte identity: C, the drawn roster', () => {
     'draws every kind of planet %i on a cell of its own family and rarity, inside its window',
     (planetIndex) => {
       for (const seed of NAMED_SEEDS) {
-        const params = freshPlanetParamsFor(seed, planetIndex)
-        const roster = planetRosterOf(params)
-        const misplaced = censusOf(params).rows.filter((row) => {
-          if (row.kindSlot === 0) return false
-          const slot = roster[row.kindSlot - 1]
-          const family = oreFamilies().find((entry) => entry.cellCode === row.family)?.id
-          const rarity = rarityTiers()[row.tierOffset - (row.band - 1)]?.id
-          const isInWindow = row.band >= slot.window[0] && row.band <= slot.window[1]
-          return slot.family !== family || slot.rarity !== rarity || !isInWindow
-        })
-        expect(misplaced).toEqual([])
+        expect(misplacedRowsOf(freshPlanetParamsFor(seed, planetIndex))).toEqual([])
       }
     },
     PLANET_TIMEOUT_MS,
@@ -253,11 +280,59 @@ describe('roster byte identity: C, the drawn roster', () => {
     'holds every kind of planet %i within its planet bound: 4000 bp of ore value for a common, 1500 for any other',
     (planetIndex) => {
       for (const seed of NAMED_SEEDS) {
-        const over = planetKindSharesBpOf(censusOf(freshPlanetParamsFor(seed, planetIndex))).filter(
-          ({ isCommon, shareBp }) => shareBp > (isCommon ? COMMON_PLANET_BOUND_BP : RARE_BOUND_BP),
-        )
-        expect(over).toEqual([])
+        expect(kindsOverPlanetBoundOf(freshPlanetParamsFor(seed, planetIndex))).toEqual([])
       }
+    },
+    PLANET_TIMEOUT_MS,
+  )
+
+  it.each([3, 4, 5])(
+    'draws every kind of planet %i on its own family and rarity, inside its window, on the pacing seeds',
+    (planetIndex) => {
+      for (const seed of PART_A_SEEDS) {
+        const params = freshPlanetParamsFor(seed, planetIndex)
+        expect(censusOf(params).rows.some((row) => row.kindSlot > 0)).toBe(true)
+        expect(misplacedRowsOf(params)).toEqual([])
+      }
+    },
+    PLANET_TIMEOUT_MS,
+  )
+
+  it.each([3, 4, 5])(
+    'leaves bare on planet %i only the cells the relic signature paints alone (E1, #453)',
+    (planetIndex) => {
+      for (const seed of PART_A_SEEDS) {
+        const bare = patchDrawsOf(freshPlanetParamsFor(seed, planetIndex)).filter(
+          (draw) => draw.kindSlot === 0,
+        )
+        expect(new Set(bare.map((draw) => familyIdOf(draw.family)))).toEqual(
+          new Set(bare.length > 0 ? ['relic'] : []),
+        )
+      }
+    },
+    PLANET_TIMEOUT_MS,
+  )
+
+  it.each([3, 4, 5])(
+    'holds every kind of planet %i within its planet bound on the pacing seeds',
+    (planetIndex) => {
+      for (const seed of PART_A_SEEDS) {
+        expect(kindsOverPlanetBoundOf(freshPlanetParamsFor(seed, planetIndex))).toEqual([])
+      }
+    },
+    PLANET_TIMEOUT_MS,
+  )
+
+  it(
+    'draws the two appended fossil commons on a swapped band 3, and nothing else there (Option B)',
+    () => {
+      const swapped = [4, 5]
+        .flatMap((index) => PART_A_SEEDS.map((seed) => freshPlanetParamsFor(seed, index)))
+        .map(swappedBand3SlotIdsOf)
+        .filter((slotIds) => slotIds.length > 0)
+      expect(swapped.length).toBeGreaterThan(0)
+      expect(new Set(swapped.flat())).toEqual(new Set(['mixed.c5', 'mixed.c6']))
+      expect(swappedBand3SlotIdsOf(freshPlanetParamsFor(FIRST_SEED, 3))).toEqual([])
     },
     PLANET_TIMEOUT_MS,
   )

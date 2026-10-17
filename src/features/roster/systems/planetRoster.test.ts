@@ -65,7 +65,7 @@ describe('planet roster', () => {
       ...PLANETS_1_TO_200.map((index) => planetRosterOf(freshPlanetParamsFor(SEED, index)).length),
     )
     expect(longest).toBeLessThanOrEqual(ORE_ROWS.kinds.rosterMaxKinds)
-    expect(ORE_ROWS.kinds.rosterMaxKinds).toBe(15)
+    expect(ORE_ROWS.kinds.rosterMaxKinds).toBe(17)
     expect(ORE_ROWS.kinds.rosterMaxKinds).toBeLessThanOrEqual(MAX_KIND_SLOT)
   })
 

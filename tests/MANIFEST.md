@@ -265,11 +265,11 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/ground-gun/turretPace.lane.test.ts` | 1 | 1 |
 | `src/features/ground-gun/ui/fireGauge.test.ts` | 3 | 3 |
 
-### `materials`: 1 file, 29 tests
+### `materials`: 1 file, 36 tests
 
 | File | Tests | Sites |
 | --- | --- | --- |
-| `src/features/materials/systems/materialTable.test.ts` | 29 | 29 |
+| `src/features/materials/systems/materialTable.test.ts` | 36 | 33 |
 
 ### `mining-gates`: 25 files, 153 tests
 
@@ -347,7 +347,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/ore-visuals/systems/oreGradeChannels.test.ts` | 7 | 7 |
 | `src/features/ore-visuals/systems/render/oreLookProvider.test.ts` | 21 | 10 |
 
-### `ores`: 17 files, 114 tests
+### `ores`: 17 files, 117 tests
 
 | File | Tests | Sites |
 | --- | --- | --- |
@@ -357,7 +357,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/ores/rarityPickupRoutes.test.ts` | 4 | 2 |
 | `src/features/ores/rarityTripRun.test.ts` | 5 | 3 |
 | `src/features/ores/systems/kernelOreAliases.test.ts` | 2 | 2 |
-| `src/features/ores/systems/kindRows.test.ts` | 9 | 9 |
+| `src/features/ores/systems/kindRows.test.ts` | 12 | 12 |
 | `src/features/ores/systems/leadRoll.test.ts` | 20 | 12 |
 | `src/features/ores/systems/oreCatalogue.test.ts` | 9 | 9 |
 | `src/features/ores/systems/oreCensus.test.ts` | 4 | 4 |
@@ -424,19 +424,19 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/power-up-core/systems/useRefusals.test.ts` | 3 | 3 |
 | `src/features/power-up-core/systems/useResolution.test.ts` | 12 | 12 |
 
-### `roster`: 12 files, 98 tests
+### `roster`: 12 files, 183 tests
 
 | File | Tests | Sites |
 | --- | --- | --- |
 | `src/features/roster/rarityShares.test.ts` | 18 | 18 |
 | `src/features/roster/roster.byteIdentity.lane.test.ts` | 5 | 1 |
-| `src/features/roster/roster.byteIdentity.test.ts` | 19 | 11 |
+| `src/features/roster/roster.byteIdentity.test.ts` | 29 | 15 |
 | `src/features/roster/roster.pacing.lane.test.ts` | 1 | 1 |
 | `src/features/roster/roster.poolSeam.test.ts` | 7 | 1 |
-| `src/features/roster/systems/planetRoster.test.ts` | 8 | 8 |
+| `src/features/roster/systems/planetRoster.test.ts` | 10 | 10 |
 | `src/features/roster/systems/planetSpecies.test.ts` | 6 | 6 |
 | `src/features/roster/systems/rosterFold.test.ts` | 6 | 6 |
-| `src/features/roster/systems/rosterGuard.test.ts` | 11 | 8 |
+| `src/features/roster/systems/rosterGuard.test.ts` | 84 | 10 |
 | `src/features/roster/systems/rosterSpecies.test.ts` | 11 | 7 |
 | `src/features/roster/systems/shareRows.test.ts` | 2 | 2 |
 | `src/features/roster/systems/tripLedger.test.ts` | 4 | 4 |

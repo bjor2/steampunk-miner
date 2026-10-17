@@ -258,3 +258,46 @@ describe('legacy materials', () => {
     expect(new Set(legacy.map((material) => material.hueSlot)).size).toBe(legacy.length)
   })
 })
+
+// #453 (Systems' kinds.mixed, 6235087481, with Option B; the per-planet pools of ticket 542): each
+// foothold pool holds a species for every mixed slot, 4/3/3/3/2 plus two fossil commons for a
+// swapped band 3, under the act's metal, crystal and fossil families, each with a look of its own.
+describe('foothold materials', () => {
+  const POOLS = ['foothold-p3', 'foothold-p4', 'foothold-p5', 'foothold-p6-p7']
+  const foothold = MATERIALS.materials.filter((material) => POOLS.includes(material.pool))
+
+  function speciesOf(pool: string) {
+    return foothold.filter((material) => material.pool === pool)
+  }
+
+  it.each(POOLS)('holds 17 %s species: 6 common, 3 uncommon, 3 rare, 3 epic, 2 mythic', (pool) => {
+    const count = (rarity: string) =>
+      speciesOf(pool).filter((material) => material.rarity === rarity).length
+    expect(MATERIAL_RARITIES.map(count)).toEqual([6, 3, 3, 3, 2])
+  })
+
+  it('draws only on the metal, crystal and fossil families', () => {
+    expect(new Set(foothold.map((material) => material.family))).toEqual(
+      new Set(['metal', 'crystal', 'fossil']),
+    )
+  })
+
+  it('gives every foothold species its own hue slot, apart from every other species', () => {
+    const hueSlots = MATERIALS.materials.map((material) => material.hueSlot)
+    const shared = foothold.filter(
+      (material) => hueSlots.indexOf(material.hueSlot) !== hueSlots.lastIndexOf(material.hueSlot),
+    )
+    expect(shared.map((material) => material.id)).toEqual([])
+  })
+
+  it('gives every foothold species a silhouette and pattern pair no other species wears', () => {
+    const pairs = MATERIALS.materials.map(
+      (material) => `${material.silhouette}|${material.pattern}`,
+    )
+    const shared = foothold.filter((material) => {
+      const pair = `${material.silhouette}|${material.pattern}`
+      return pairs.indexOf(pair) !== pairs.lastIndexOf(pair)
+    })
+    expect(shared.map((material) => material.id)).toEqual([])
+  })
+})

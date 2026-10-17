@@ -5,12 +5,16 @@ import { isSlotLiveInBand } from './kindRows'
 import { ORE_ROWS, oreRowProblems } from './oreRows'
 
 // The kind slot tables (TD ruling on ticket 446, addendum 6226264758; Systems' kinds.legacy,
-// 6226282340): the economy side of a material kind, refused whole when a slot breaks a rule.
+// 6226282340, and kinds.mixed on #453, 6235087481 with Option B): the economy side of a material
+// kind, refused whole when a slot breaks a rule.
 
 type Slot = (typeof economyFile.ore.kinds.legacy)[number]
 
 /** The shipped files with the legacy table and the cap replaced. */
-function problemsWithLegacy(legacy: readonly unknown[], rosterMaxKinds = 15): string[] {
+function problemsWithLegacy(
+  legacy: readonly unknown[],
+  rosterMaxKinds = economyFile.ore.kinds.rosterMaxKinds,
+): string[] {
   const kinds = { ...economyFile.ore.kinds, rosterMaxKinds, legacy }
   return oreRowProblems({ ore: { ...economyFile.ore, kinds } }, familiesFile)
 }
@@ -24,7 +28,7 @@ function problemsWithPools(pools: unknown): string[] {
 const C1: Slot = economyFile.ore.kinds.legacy[0]
 
 describe('ore kind slots', () => {
-  it('ships Systems twelve legacy slots, 5 common, 4 uncommon and 3 rare, under the cap of 15', () => {
+  it('ships Systems twelve legacy slots, 5 common, 4 uncommon and 3 rare', () => {
     const legacy = ORE_ROWS.kinds.slotsBySet.legacy
     const count = (rarity: string) => legacy.filter((slot) => slot.rarity === rarity).length
     expect(legacy.map((slot) => slot.slotId)).toEqual([
@@ -33,7 +37,35 @@ describe('ore kind slots', () => {
       ),
     ])
     expect([count('common'), count('uncommon'), count('rare')]).toEqual([5, 4, 3])
-    expect(ORE_ROWS.kinds.rosterMaxKinds).toBe(15)
+  })
+
+  it("ships Systems' mixed slots 4/3/3/3/2, then Option B's two fossil commons appended", () => {
+    const mixed = ORE_ROWS.kinds.slotsBySet.mixed
+    const names = ['c1', 'c2', 'c3', 'c4', 'u1', 'u2', 'u3', 'r1', 'r2', 'r3', 'e1', 'e2', 'e3']
+    expect(mixed.map((slot) => slot.slotId)).toEqual(
+      [...names, 'm1', 'm2', 'c5', 'c6'].map((name) => `mixed.${name}`),
+    )
+    const count = (rarity: string) => mixed.filter((slot) => slot.rarity === rarity).length
+    expect(['common', 'uncommon', 'rare', 'epic', 'mythic'].map(count)).toEqual([6, 3, 3, 3, 2])
+    expect(mixed.slice(-2).map(({ family, rarity, window }) => [family, rarity, window])).toEqual([
+      ['fossil', 'common', [3, 3]],
+      ['fossil', 'common', [3, 3]],
+    ])
+  })
+
+  it('caps a roster at the mixed table with its appended rows, 17, inside the 8-bit slot', () => {
+    expect(ORE_ROWS.kinds.rosterMaxKinds).toBe(17)
+    expect(ORE_ROWS.kinds.rosterMaxKinds).toBe(ORE_ROWS.kinds.slotsBySet.mixed.length)
+  })
+
+  it('keeps epic live from band 3 and mythic from band 4, the surface sparse (HS on #453)', () => {
+    const firstBandOf = (rarity: string) =>
+      Math.min(
+        ...ORE_ROWS.kinds.slotsBySet.mixed
+          .filter((slot) => slot.rarity === rarity)
+          .map((slot) => slot.window[0]),
+      )
+    expect(['rare', 'epic', 'mythic'].map(firstBandOf)).toEqual([2, 3, 4])
   })
 
   it('reads a slot live in the bands of its window only', () => {
@@ -50,6 +82,10 @@ describe('ore kind slots', () => {
   it('refuses a table with more kinds than rosterMaxKinds', () => {
     expect(problemsWithLegacy(economyFile.ore.kinds.legacy, 11)).toEqual([
       'ore.kinds.legacy holds 12 kinds, over rosterMaxKinds',
+      'ore.kinds.mixed holds 17 kinds, over rosterMaxKinds',
+    ])
+    expect(problemsWithLegacy(economyFile.ore.kinds.legacy, 15)).toEqual([
+      'ore.kinds.mixed holds 17 kinds, over rosterMaxKinds',
     ])
   })
 

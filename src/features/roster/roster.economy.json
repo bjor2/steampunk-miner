@@ -15,7 +15,7 @@
       "p999MaxOfNominalBp": 11200,
       "clampLossMaxBp": 1
     },
-    "judgedPlanets": [1, 2, 3, 10, 20, 40, 60],
+    "judgedPlanets": [1, 2, 3, 4, 5, 6, 7, 10, 20, 40, 60],
     "tripFindsPerSeed": 400000
   }
 }
