@@ -10,7 +10,10 @@ import { cellDigEnergyOf } from './cellDigEnergy'
 import { CUT_ENERGY_DENOMINATOR } from '../vehicle/cutCarry'
 import { ENERGY_QUANTA_PER_TICK } from '../vehicle/energyQuanta'
 import type { VehicleState } from '../vehicle/vehicleState'
-import { cellDensitySum } from '../world/cellYield'
+import type { WeightedSample } from '../world/stampShape'
+import { effectiveCasingGrade } from '../world/chunkDelta'
+import { casingGradeOf, densityOf, openSession } from '../world/groundEditSession'
+import { SAMPLES_PER_TILE } from '../world/sampleGrid'
 import type { TilePoint } from '../world/tileGrid'
 import { materialCellAt, type WorldState } from '../world/worldState'
 import { vehicleOf, type AuthorityState } from './authorityState'
@@ -37,8 +40,10 @@ export function tilesAround(tile: TilePoint, reach: number): TilePoint[] {
 }
 
 /**
- * The law work `after` shows removed over `before` on `tiles`, in density sub-steps: each cell's
- * density removed times its law time at the drill `playerId` had in `before`.
+ * The law work `after` shows removed over `before` on `tiles`, in density sub-steps: each
+ * sample's density removed times its law time at the drill `playerId` had in `before`, at the
+ * sample's own casing grade as it stood (a lined sample carves in its grade's time, #41, so a rig
+ * re-cutting its own trail pays the lining's law work; breached lining is grade 0).
  */
 export function lawWorkRemovedOf(
   before: AuthorityState,
@@ -50,11 +55,36 @@ export function lawWorkRemovedOf(
   if (params === null) throw new Error('the state has no planet')
   const drill = heatThrottledDrill(params.planetIndex, vehicleOf(before, playerId))
   const lawTimeOf = drillSubStepsOfCells(params, drill, shockTicksFor(before, playerId))
+  const was = openSession(before.world, params)
+  const now = openSession(after, params)
   return tiles.reduce((sum, tile) => {
-    const removed = cellDensitySum(before.world, params, tile) - cellDensitySum(after, params, tile)
-    if (removed <= 0) return sum
-    return sum + removed * (lawTimeOf(tile, materialCellAt(before.world, params, tile), 0) ?? 0)
+    const material = materialCellAt(before.world, params, tile)
+    return (
+      sum +
+      samplesOfTile(tile).reduce((cell, sample) => {
+        const removed = densityOf(was, sample) - densityOf(now, sample)
+        if (removed <= 0) return cell
+        const grade = effectiveCasingGrade(casingGradeOf(was, sample))
+        return cell + removed * (lawTimeOf(tile, material, grade) ?? 0)
+      }, 0)
+    )
   }, 0)
+}
+
+/** A tile's samples, in row order, at full weight. */
+function samplesOfTile(tile: TilePoint): WeightedSample[] {
+  const samples: WeightedSample[] = []
+  for (let j = 0; j < SAMPLES_PER_TILE; j++) {
+    for (let i = 0; i < SAMPLES_PER_TILE; i++) {
+      samples.push({
+        sx: tile.tx * SAMPLES_PER_TILE + i,
+        sy: tile.ty * SAMPLES_PER_TILE + j,
+        weight: 1,
+        floor: 0,
+      })
+    }
+  }
+  return samples
 }
 
 /** The quanta `broken` cost at the swept cut's per-cell price (`cellDigEnergy.ts`), each rounded up once. */

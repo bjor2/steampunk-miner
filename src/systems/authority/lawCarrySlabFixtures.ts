@@ -15,8 +15,11 @@
  * Read per run: the law work from the ground (every cell's density removed times its law time at
  * the rig's drill, `cutCarryFixtures.ts`), the drill energy (the tank's fall less the reports'
  * drive charge), the drill ticks the reports heated for (the carry's whole ticks on the charged
- * paths, the steps' summed dig time on the swept one, the drill ticks on main's), the cells
- * broken in order, the ground's chunks, and every `CommandRejected`. Test support, never run in play.
+ * paths, the steps' summed dig time on the swept one, the drill ticks on main's), the ticks the
+ * #113 rule could settle of them (each report's fed ticks capped at the ticks since the gauge
+ * settled, `heatCapReadings.ts`; planet 1 is off the act, so the gauge itself reads 0 on every
+ * path), the cells broken in order, the ground's chunks, and every `CommandRejected`. Test
+ * support, never run in play.
  */
 import { BASIS_POINTS, DRILL_SUBSTEPS_PER_TICK } from '../../constants/balance'
 import { blockHardness } from '../economy/oreEconomy'
@@ -35,6 +38,7 @@ import type { AuthorityState } from './authorityState'
 import { setCasingGradeCommand } from './casingDebugCommands'
 import { brokenCellsOf, cutEnergyNumeratorOf, lawWorkRemovedOf } from './cutCarryFixtures'
 import type { DomainEvent } from './domainEvent'
+import { settleableHeatTicksOf } from './heatCapReadings'
 import { heatThrottledDrill } from './heatRules'
 import {
   createScriptedSession,
@@ -74,6 +78,8 @@ export interface SlabRun {
   oneCellLaw: number
   energy: number
   heatTicks: number
+  /** The drill ticks the #113 rule could settle of `heatTicks`: each report's, capped at its elapsed ticks. */
+  settleableHeatTicks: number
   broken: TilePoint[]
   rejections: number
   /** Each distinct refusal, `type: reason` with the command's tick, for the report. */
@@ -248,6 +254,7 @@ function refillOf(vehicle: VehicleState): CommandIntent<'debug.setEnergy'> {
 interface RunTally {
   energy: number
   heatTicks: number
+  settleableHeatTicks: number
   broken: TilePoint[]
   rejections: number
   refusals: string[]
@@ -259,7 +266,14 @@ export function cutSlab(track: SlabTrack, path: SlabPath, levels: Record<string,
     const frame = frameOf(track)
     const session = sessionAtStart(levels, frame)
     const start = session.state()
-    const tally: RunTally = { energy: 0, heatTicks: 0, broken: [], rejections: 0, refusals: [] }
+    const tally: RunTally = {
+      energy: 0,
+      heatTicks: 0,
+      settleableHeatTicks: 0,
+      broken: [],
+      rejections: 0,
+      refusals: [],
+    }
     const ticks = slabTicksOf(track)
     for (let tick = 1; tick <= ticks; tick++) {
       session.advanceTo(tick)
@@ -272,7 +286,7 @@ export function cutSlab(track: SlabTrack, path: SlabPath, levels: Record<string,
   })
 }
 
-/** Submits one command and tallies its charge, heat, broken cells and refusal. */
+/** Submits one command and tallies its charge, heat (fed and settleable), broken cells and refusal. */
 function noteCommand(
   tally: RunTally,
   session: ScriptedSession,
@@ -285,11 +299,18 @@ function noteCommand(
   const heatBefore = command.type === 'reportPose' ? heatTicksBeforeOf(before, command, path) : 0
   const events = session.submit(tick, command)
   const after = session.vehicle()
+  const fed = heatBefore + carriedHeatTicksOf(before, after, movement, path)
   tally.energy += before.energy - after.energy - movement * ENERGY_QUANTA_PER_TICK.drive
-  tally.heatTicks += heatBefore + carriedHeatTicksOf(before, after, movement, path)
+  tally.heatTicks += fed
+  tally.settleableHeatTicks += settleableHeatTicksOf(fed, elapsedTicksOf(before, after))
   tally.broken.push(...brokenCellsOf(events))
   tally.rejections += events.filter(isRejection).length
   tally.refusals.push(...events.filter(isRejection).map((event) => refusalTextOf(event, command)))
+}
+
+/** The ticks a report settled the gauge over: what the #113 rule caps its drill ticks at. */
+function elapsedTicksOf(before: VehicleState, after: VehicleState): number {
+  return after.heat.settledTick - before.heat.settledTick
 }
 
 function refusalTextOf(event: DomainEvent, command: CommandIntent): string {
@@ -350,6 +371,7 @@ function runOf(start: AuthorityState, end: AuthorityState, tally: RunTally, trac
     oneCellLaw,
     energy: tally.energy,
     heatTicks: tally.heatTicks,
+    settleableHeatTicks: tally.settleableHeatTicks,
     broken: tally.broken,
     rejections: tally.rejections,
     refusals: [...new Set(tally.refusals)].slice(0, 3),
