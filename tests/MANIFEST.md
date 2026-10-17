@@ -732,6 +732,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/authority/coreHarvest.test.ts` | 10 | 10 |
 | `src/systems/authority/cutFollowRead.test.ts` | 12 | 12 |
 | `src/systems/authority/cutShare.test.ts` | 3 | 3 |
+| `src/systems/authority/digSpeedTrack.lane.test.ts` | 32 | 2 |
 | `src/systems/authority/drillGates.test.ts` | 11 | 11 |
 | `src/systems/authority/drillGearCut.test.ts` | 27 | 25 |
 | `src/systems/authority/drillStep.test.ts` | 22 | 22 |
@@ -1010,7 +1011,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/physics/cutFollowStartingRigs.test.ts` | 19 | 5 |
 | `src/physics/cutSmoothness.test.ts` | 13 | 7 |
 | `src/physics/cutStartLatency.lane.test.ts` | 5 | 5 |
-| `src/physics/digSpeedStop.lane.test.ts` | 7 | 4 |
+| `src/physics/digSpeedStop.lane.test.ts` | 18 | 5 |
 | `src/physics/drillEngagement.test.ts` | 6 | 6 |
 | `src/physics/drillFacingStep.test.ts` | 3 | 3 |
 | `src/physics/drillTurnLatency.lane.test.ts` | 3 | 7 |

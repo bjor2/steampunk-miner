@@ -3,87 +3,104 @@ import { mkdirSync, writeFileSync } from 'node:fs'
 import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it } from 'vitest'
 import { DEV_FLAGS, type DevFlags } from '../constants/devFlags'
 import { PHYSICS_TIMESTEP } from '../constants/physics'
-import { createMemorySink } from '../logging/eventSink'
+import { createMemorySink, type MemorySink } from '../logging/eventSink'
 import { createRunLog, installRunLog, uninstallRunLog } from '../logging/runLog'
-import { readAuthorityState } from '../store/authorityLink'
-import { planetParamsOf } from '../systems/authority/planetOfState'
+import { submitCommand } from '../store/authorityLink'
+import { useGameStore } from '../store/gameStore'
+import { setCasingGradeCommand } from '../systems/authority/casingDebugCommands'
+import {
+  barVerdictsOf,
+  lawReadingOf,
+  thousandthsOf,
+  type LawReading,
+} from '../systems/authority/lawWorkFixtures'
 import { buildIntent } from '../systems/input/buildIntent'
-import type { Vector2 } from '../systems/vehicle/localFrame'
 import type { VehicleIntent } from '../systems/vehicle/vehicleIntent'
-import { cellDensitySum } from '../systems/world/cellYield'
-import { SAMPLES_PER_CELL, SOLID_DENSITY } from '../systems/world/sampleGrid'
-import { isTileYielded, type WorldState } from '../systems/world/worldState'
 import { createRig, type Rig, type TickRead } from './cutFollowFixtures'
+import { openDigSpeedWindow, type DigSpeedSums } from './digSpeedWindow'
 
-// The dig-speed STOP of #514 (Done-when 3, the TD's 6224603228 as amended by 6224615876, the
-// Vertical Scaler's bars): with a pose report every tick while the drill bites, no cell may clear
-// in fewer ticks than the swept law-exact path gives it, at the same rig and ground, down and
-// level. The rig of `sweptCutPace.test.ts` cuts band 1 of planet 1 in 23 ticks a cell; each path
-// leaves the pad, plays a 14 s leg down and then one level west, and the last 10 s of each are read:
-// - dig ticks a cell: from the tick a fully solid cell first lost density to the tick it yielded,
-//   for cells that did both inside the read window (a part-cut or cave-rim cell needs less work);
-// - work per metre: drilled ticks (the ticks energy and heat are charged on, `groundDrill.ts`) a
-//   metre along the leg;
-// - cells per metre: cells yielded a metre.
-// Paths: the swept cut (the reference), flag off at the shipped every-tick cadence, and flag off at
-// 12 ticks (#514's kill-switch off). Asserted: no solid cell under the law's 23 ticks at a report
-// every tick, and cells a metre within 5% of the swept path. Logged, the STOP readings sent back to
-// the TD and the VS on #514 (the build stopped on them; their measure is this lane's reading of the
-// bars until the TD confirms it): dig ticks a cell against the swept path (bar: median within 1%)
-// and work a metre against it (bar: at least 1.000, no free work). Loop speed against the swept
-// path and against 60/23 is logged, not gated. A lane: it runs only when named, prints the table
-// and writes balance-report/dig-speed-stop.ndjson.
+// The dig-speed STOP of #514 (Done-when 3): the Vertical Scaler's four bars (6226431087, with
+// Systems 6226435006 and the TD's v2 ruling 6226459471; energy and heat per unit of law work, VS
+// on A5 6226528512), all hard, at a report every tick on the flag-off path against the swept
+// law-exact path at the same rig and ground, down and level, in the real loop and Rapier body:
+// 1. law work per metre (Σ density removed × hardness, read from the ground, `lawWorkFixtures.ts`)
+//    at least 1.000 of swept, less one cell's law work over the stretch, and at most 1.050;
+// 2. dig time per cell = law work per yielded cell: at least the cells' own law time D, at most
+//    1.01 D;
+// 3. cells per metre within 5% of swept;
+// 4. drill energy per unit of law work within 1% of swept; heat (the drill ticks the reports heat
+//    for) per unit of law work at least 1.000 of swept, less one cell.
+// Rigs: `sweptCutPace.test.ts`'s (23 ticks a band-1 cell on planet 1, about 3 m/s) and a strong rig
+// (drill power 200, tip 600: 8 to 13 m/s, the VS's 7 to 13 m/s rows; the stored-200 rig's swept
+// cut jumps the body tens of metres a tick on planet 1 in the loop, so it reads nothing). Each path
+// leaves the pad and plays a leg down, then one level west, each read over the same metres after
+// an 8 m lead-in so every path reads the same ground, lined at casing grade 5 so a cave-in never
+// crushes it; a tow back to the dock (a jump over 1.5 m in a tick) or a stall ends the read early
+// and is logged. Logged beside the bars: speed, energy and heat per metre, drilled ticks per metre
+// and per yielded cell (the withdrawn definitions, kept as diagnostics), and the 12-tick cadence
+// (#514's kill-switch off, today's game). The 25 to 3600 m/s and tilted rows are an authority
+// replay, `systems/authority/digSpeedTrack.lane.test.ts`. A lane: it runs only when named, prints
+// the table and writes balance-report/dig-speed-stop.ndjson.
 
-const RIG_LEVELS = { drill_tip: 600, engine: 5000, drill_power: 50 }
-const LAW_TICKS_PER_CELL = 23
-const LEG_SECONDS = 14
-const READ_FROM_SECONDS = 4
-const FRAMES_PER_SECOND = 60
-/** Cells this far round the body, each way, are watched for density each tick. */
-const WATCH_CELLS = 3
-const SOLID_CELL_SUM = SAMPLES_PER_CELL * SOLID_DENSITY
-const CELLS_PER_METRE_SHARE = 0.05
-const REPORT_FOLDER = new URL('../../balance-report/', import.meta.url)
-const LEG_TIMEOUT_MS = 600_000
+type Section = 'down' | 'level'
 
+interface LoopRig {
+  levels: Record<string, number>
+  /** Each leg's read length after its lead-in; the level leg is the VS's 250 m window or near. */
+  readMetres: Readonly<Record<Section, number>>
+}
+const RIGS: Readonly<Record<string, LoopRig>> = {
+  'law 23': {
+    levels: { drill_tip: 600, engine: 5000, drill_power: 50 },
+    readMetres: { down: 70, level: 150 },
+  },
+  'power 200': {
+    levels: { drill_power: 200, drill_tip: 600, hull: 5000 },
+    readMetres: { down: 70, level: 250 },
+  },
+}
 const PATHS: Readonly<Record<string, DevFlags>> = {
   swept: { ...DEV_FLAGS, 'drill.sweptCut': true },
   'every tick': { 'drill.sweptCut': false, 'drill.reportEveryTick': true },
   'every 12': { 'drill.sweptCut': false, 'drill.reportEveryTick': false },
 }
+const FRAMES_PER_SECOND = 60
+/** Each leg leaves this much behind it before its read starts: the turn and the first bite. */
+const LEAD_IN_M = 8
+/** A leg that has not gone its metres in this long has stalled; its read ends there. */
+const LEG_TICKS_MAX = Math.round(240 / PHYSICS_TIMESTEP)
+/** Lining strong enough that a cave-in never crushes a leg (the #516 lane's down legs). */
+const CASING_GRADE = 5
+/** A move this long in one tick is a tow back to the dock, not driving. */
+const TOW_JUMP_M = 1.5
+const REPORT_FOLDER = new URL('../../balance-report/', import.meta.url)
+const RIG_TIMEOUT_MS = 900_000
 
-type Section = 'down' | 'level'
+/** How a held stretch ended: its metres gone, a tow back to the dock, or a stall. */
+type StretchEnd = 'gone' | 'towed' | 'stalled'
 
-/** One read window of one leg. */
-interface LegReading {
+/** One read stretch of one leg. */
+interface LegReading extends LawReading {
+  rig: string
   path: string
   section: Section
+  end: StretchEnd
+  metres: number
   metresPerSecond: number
-  cellsPerSecond: number
-  workPerMetre: number
-  cellsPerMetre: number
-  digTicksMedian: number
-  digTicksMin: number
-  cellsTimed: number
+  drilledTicksPerMetre: number
+  drilledTicksPerCell: number
 }
 
-/** A watched cell: the tick it first lost density, and the tick it yielded. */
-interface CellDig {
-  firstBiteTick: number
-  yieldTick: number | null
-}
-
-const ticksOf = (seconds: number) => Math.round(seconds / PHYSICS_TIMESTEP)
 const readings: LegReading[] = []
+let sink: MemorySink
 
 beforeAll(async () => {
   await RAPIER.init()
 })
 
 beforeEach(() => {
-  installRunLog(
-    createRunLog({ runId: 'run_test', sink: createMemorySink(), secondsSinceStart: () => 0 }),
-  )
+  sink = createMemorySink()
+  installRunLog(createRunLog({ runId: 'run_test', sink, secondsSinceStart: () => 0 }))
 })
 
 afterEach(() => uninstallRunLog())
@@ -94,126 +111,66 @@ afterAll(() => {
 })
 
 /** A fresh rig on `path` leaves the pad, then plays and reads a leg down and a leg level. */
-function playPath(path: string): LegReading[] {
-  const rig = createRig(RAPIER, RIG_LEVELS, FRAMES_PER_SECOND, PATHS[path])
-  rig.hold(buildIntent(['aim_left']), ticksOf(2))
+function playPath(rigName: string, path: string): LegReading[] {
+  const loopRig = RIGS[rigName]
+  const rig = createRig(RAPIER, loopRig.levels, FRAMES_PER_SECOND, PATHS[path])
+  submitCommand(useGameStore.getState().playerId, setCasingGradeCommand(CASING_GRADE))
+  rig.hold(buildIntent(['aim_left']), Math.round(2 / PHYSICS_TIMESTEP))
+  const at = { rigName, path, loopRig }
   return [
-    playLeg(rig, path, 'down', buildIntent(['aim_down'])),
-    playLeg(rig, path, 'level', buildIntent(['aim_left'])),
+    playLeg(rig, at, 'down', buildIntent(['aim_down'])),
+    playLeg(rig, at, 'level', buildIntent(['aim_left'])),
   ]
 }
 
-/** Holds `intent` for a leg, reading the last half one tick at a time. */
-function playLeg(rig: Rig, path: string, section: Section, intent: VehicleIntent): LegReading {
-  rig.hold(intent, ticksOf(READ_FROM_SECONDS))
-  const window = createReadWindow()
-  for (let tick = 0; tick < ticksOf(LEG_SECONDS - READ_FROM_SECONDS); tick++) {
-    window.note(rig.hold(intent, 1)[0])
+/** Holds `intent` for the lead-in, then reads the leg's next metres one tick at a time. */
+function playLeg(
+  rig: Rig,
+  at: { rigName: string; path: string; loopRig: LoopRig },
+  section: Section,
+  intent: VehicleIntent,
+): LegReading {
+  holdAlong(rig, intent, LEAD_IN_M, () => undefined)
+  const window = openDigSpeedWindow(sink)
+  const end = holdAlong(rig, intent, at.loopRig.readMetres[section], window.note)
+  return { rig: at.rigName, path: at.path, section, end, ...legColumnsOf(window.sums()) }
+}
+
+/** Holds `intent` one tick at a time until the body has gone `metres`, passing each tick on. */
+function holdAlong(
+  rig: Rig,
+  intent: VehicleIntent,
+  metres: number,
+  each: (read: TickRead) => void,
+): StretchEnd {
+  let last = rig.hold(intent, 1)[0].position
+  let gone = 0
+  for (let tick = 1; tick < LEG_TICKS_MAX; tick++) {
+    const read = rig.hold(intent, 1)[0]
+    const step = Math.hypot(read.position.x - last.x, read.position.y - last.y)
+    if (step > TOW_JUMP_M) return 'towed'
+    each(read)
+    gone += step
+    if (gone >= metres) return 'gone'
+    last = read.position
   }
-  return window.readingOf(path, section)
+  return 'stalled'
 }
 
-function createReadWindow() {
-  const digs = new Map<string, CellDig>()
-  const positions: Vector2[] = []
-  let drilledTicks = 0
-  let yielded = 0
-  let world = readAuthorityState().world
-  const note = (read: TickRead) => {
-    const after = readAuthorityState().world
-    const tick = readAuthorityState().tick
-    yielded += noteCellDigs(digs, world, after, read.position, tick)
-    drilledTicks += read.result.flags.isDrilling ? 1 : 0
-    positions.push(read.position)
-    world = after
+function legColumnsOf(sums: DigSpeedSums) {
+  return {
+    metres: thousandthsOf(sums.metres),
+    metresPerSecond: thousandthsOf(sums.metres / sums.seconds),
+    ...lawReadingOf(sums),
+    drilledTicksPerMetre: thousandthsOf(sums.drilledTicks / sums.metres),
+    drilledTicksPerCell: thousandthsOf(sums.drilledTicks / sums.law.yieldedCells),
   }
-  const readingOf = (path: string, section: Section): LegReading => {
-    const metres = pathLengthOf(positions)
-    const seconds = positions.length * PHYSICS_TIMESTEP
-    const digTicks = timedDigTicksOf(digs)
-    return {
-      path,
-      section,
-      metresPerSecond: thousandthsOf(metres / seconds),
-      cellsPerSecond: thousandthsOf(yielded / seconds),
-      workPerMetre: thousandthsOf(drilledTicks / metres),
-      cellsPerMetre: thousandthsOf(yielded / metres),
-      digTicksMedian: medianOf(digTicks),
-      digTicksMin: Math.min(...digTicks),
-      cellsTimed: digTicks.length,
-    }
-  }
-  return { note, readingOf }
-}
-
-/** Notes each watched cell's first bite and yield this tick; returns the cells it yielded. */
-function noteCellDigs(
-  digs: Map<string, CellDig>,
-  before: WorldState,
-  after: WorldState,
-  at: Vector2,
-  tick: number,
-): number {
-  const params = planetParamsOf(readAuthorityState().planet)
-  if (params === null) return 0
-  let yielded = 0
-  for (let dy = -WATCH_CELLS; dy <= WATCH_CELLS; dy++) {
-    for (let dx = -WATCH_CELLS; dx <= WATCH_CELLS; dx++) {
-      const tile = { tx: Math.floor(at.x) + dx, ty: Math.floor(at.y) + dy }
-      const key = `${tile.tx},${tile.ty}`
-      const was = cellDensitySum(before, params, tile)
-      const isFirstBite = was === SOLID_CELL_SUM && cellDensitySum(after, params, tile) < was
-      if (isFirstBite && !digs.has(key)) digs.set(key, { firstBiteTick: tick, yieldTick: null })
-      const isYieldedNow = !isTileYielded(before, tile) && isTileYielded(after, tile)
-      const dig = digs.get(key)
-      if (isYieldedNow && dig !== undefined) dig.yieldTick = tick
-      if (isYieldedNow) yielded++
-    }
-  }
-  return yielded
-}
-
-/** Ticks from first bite to yield, both inside the window, the yielding tick counted. */
-function timedDigTicksOf(digs: ReadonlyMap<string, CellDig>): number[] {
-  const timed = [...digs.values()].filter((dig) => dig.yieldTick !== null)
-  return timed.map((dig) => (dig.yieldTick as number) - dig.firstBiteTick + 1)
-}
-
-function pathLengthOf(positions: readonly Vector2[]): number {
-  let metres = 0
-  for (let i = 1; i < positions.length; i++) {
-    metres += Math.hypot(positions[i].x - positions[i - 1].x, positions[i].y - positions[i - 1].y)
-  }
-  return metres
-}
-
-function medianOf(values: readonly number[]): number {
-  if (values.length === 0) return 0
-  const sorted = [...values].sort((a, b) => a - b)
-  return sorted[Math.floor(sorted.length / 2)]
-}
-
-function thousandthsOf(value: number): number {
-  return Math.round(value * 1000) / 1000
 }
 
 function formatTable(rows: readonly LegReading[]): string {
-  const header =
-    'path | section | m/s | cells/s | drilled ticks/m | cells/m | dig ticks median | min | cells timed'
-  const lines = rows.map((row) =>
-    [
-      row.path,
-      row.section,
-      row.metresPerSecond,
-      row.cellsPerSecond,
-      row.workPerMetre,
-      row.cellsPerMetre,
-      row.digTicksMedian,
-      row.digTicksMin,
-      row.cellsTimed,
-    ].join(' | '),
-  )
-  return [header, `60/23 = ${thousandthsOf(60 / LAW_TICKS_PER_CELL)} cells/s`, ...lines].join('\n')
+  const columns = Object.keys(rows[0] ?? {}) as (keyof LegReading)[]
+  const lines = rows.map((row) => columns.map((column) => row[column]).join(' | '))
+  return [columns.join(' | '), ...lines].join('\n')
 }
 
 function writeReadings(rows: readonly LegReading[]): void {
@@ -222,45 +179,63 @@ function writeReadings(rows: readonly LegReading[]): void {
   writeFileSync(new URL('dig-speed-stop.ndjson', REPORT_FOLDER), `${lines.join('\n')}\n`)
 }
 
-function readingOf(path: string, section: Section): LegReading {
-  const found = readings.find((row) => row.path === path && row.section === section)
-  if (found === undefined) throw new Error(`no ${path} ${section} leg was played`)
+function legOf(rig: string, path: string, section: Section): LegReading {
+  const found = readings.find(
+    (row) => row.rig === rig && row.path === path && row.section === section,
+  )
+  if (found === undefined) throw new Error(`no ${rig} ${path} ${section} leg was played`)
   return found
 }
 
+/** The every-tick leg's bars against the swept leg, and the ratios they read, for the message. */
+function verdictsOf(rig: string, section: Section) {
+  const everyTick = legOf(rig, 'every tick', section)
+  const swept = legOf(rig, 'swept', section)
+  const ratios = {
+    lawWorkPerMetre: thousandthsOf(everyTick.lawWorkPerMetre / swept.lawWorkPerMetre),
+    lawTicksPerCellOverD: thousandthsOf(everyTick.lawTicksPerCell / everyTick.ownLawTicksPerCell),
+    cellsPerMetre: thousandthsOf(everyTick.cellsPerMetre / swept.cellsPerMetre),
+    energyPerLawTick: thousandthsOf(everyTick.energyPerLawTick / swept.energyPerLawTick),
+    heatPerLawTick: thousandthsOf(everyTick.heatPerLawTick / swept.heatPerLawTick),
+    quantization: swept.oneCellShare,
+  }
+  return { verdicts: barVerdictsOf(everyTick, swept), message: JSON.stringify(ratios) }
+}
+
 describe('dig speed at a report every tick against the swept law-exact path (#514 STOP)', () => {
-  it(
-    'plays the swept cut and both flag-off cadences down and level',
-    () => {
-      for (const path of Object.keys(PATHS)) readings.push(...playPath(path))
-      expect(readings).toHaveLength(6)
-    },
-    LEG_TIMEOUT_MS,
-  )
+  for (const rig of Object.keys(RIGS)) {
+    it(
+      `plays the ${rig} rig on the swept cut and both flag-off cadences, down and level`,
+      () => {
+        const played = Object.keys(PATHS).flatMap((path) => playPath(rig, path))
+        readings.push(...played)
+        const compared = played.filter((leg) => leg.path !== 'every 12')
+        expect(compared.map((leg) => leg.end)).toEqual(['gone', 'gone', 'gone', 'gone'])
+      },
+      RIG_TIMEOUT_MS,
+    )
 
-  for (const section of ['down', 'level'] as const) {
-    it(`clears no solid cell ${section} in fewer ticks than the law at a report every tick`, () => {
-      expect(readingOf('every tick', section).digTicksMin).toBeGreaterThanOrEqual(
-        LAW_TICKS_PER_CELL,
-      )
-    })
+    for (const section of ['down', 'level'] as const) {
+      it(`pays the swept path's law work a metre, ${rig} ${section} (bar 1)`, () => {
+        const { verdicts, message } = verdictsOf(rig, section)
+        expect(verdicts.lawWorkPerMetre, message).toBe(true)
+      })
 
-    it(`cuts the swept path's cells a metre ${section}, within 5%`, () => {
-      const swept = readingOf('swept', section)
-      const drift = Math.abs(readingOf('every tick', section).cellsPerMetre - swept.cellsPerMetre)
-      expect(drift).toBeLessThanOrEqual(swept.cellsPerMetre * CELLS_PER_METRE_SHARE)
-    })
+      it(`pays each yielded cell its law time, at most 1% over, ${rig} ${section} (bar 2)`, () => {
+        const { verdicts, message } = verdictsOf(rig, section)
+        expect(verdicts.digTimePerCell, message).toBe(true)
+      })
 
-    it(`logs dig ticks a cell and work a metre ${section} against the swept path`, () => {
-      const swept = readingOf('swept', section)
-      const everyTick = readingOf('every tick', section)
-      const ratios = {
-        digTicksMedian: thousandthsOf(everyTick.digTicksMedian / swept.digTicksMedian),
-        workPerMetre: thousandthsOf(everyTick.workPerMetre / swept.workPerMetre),
-        speed: thousandthsOf(everyTick.metresPerSecond / swept.metresPerSecond),
-      }
-      console.log(`every tick / swept, ${section}: ${JSON.stringify(ratios)}`)
-      expect(ratios.workPerMetre).toBeGreaterThan(0)
-    })
+      it(`cuts the swept path's cells a metre within 5%, ${rig} ${section} (bar 3)`, () => {
+        const { verdicts, message } = verdictsOf(rig, section)
+        expect(verdicts.cellsPerMetre, message).toBe(true)
+      })
+
+      it(`charges the swept path's energy and heat for the law work, ${rig} ${section} (bar 4)`, () => {
+        const { verdicts, message } = verdictsOf(rig, section)
+        expect(verdicts.energyPerLawWork, message).toBe(true)
+        expect(verdicts.heatPerLawWork, message).toBe(true)
+      })
+    }
   }
 })

@@ -56,6 +56,8 @@ export interface TickRead {
   isInsideGround: boolean
   /** Solid ground lies just under the wheels after the tick. */
   isOnGround: boolean
+  /** Energy quanta the tick's commands took from the tank (the rig's refill before it excluded). */
+  energySpent: number
 }
 
 /** A rig's live loop, stepped one render frame at a time. */
@@ -110,6 +112,7 @@ function stepTick(
 ): TickRead {
   let result: VehicleStepResult | null = null
   let read: CutFollow | undefined
+  const energyBefore = readLocalVehicle().energy
   const watched: VehicleController = {
     ...controller,
     step: (input, planet) => {
@@ -134,6 +137,7 @@ function stepTick(
     authorityGate: gateLeftThisTick(),
     isInsideGround: isInsideGround(position),
     isOnGround: isInsideGround(groundProbeOf(position, upOf(stepResult.pose))),
+    energySpent: energyBefore - readLocalVehicle().energy,
   }
 }
 
