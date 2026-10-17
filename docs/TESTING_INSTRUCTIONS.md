@@ -210,6 +210,21 @@ programs }` from three's `renderer.info` of the game canvas), read only when cal
   2), the two bays (`wrong_bay` both ways) and the artefact cache (live on planet 1, a husk on
   planet 2). `src/logging/secondSliceGolden.test.ts` replays each committed file and checks it still
   shows what it is named for, and that the husk's chunk digest equals a player's who holds nothing.
+- **Roster byte identity** (ticket 446, TD ruling 6226236698 section 5):
+  `src/features/roster/roster.byteIdentity.test.ts` holds the material roster to a look layer. A:
+  generation with the `roster.materials` fold off (`withRosterOff`, `rosterFixtures.ts`) and on
+  gives the same cells with the kind slot masked, the same density and the same ore counts per
+  band, family and tier (whole planets 1 to 5 on the pacing seeds). B: the masked P1 and P2 cells
+  and counts over the 8 named seeds equal main's digest taken at f49323ba. C: every drawn kind sits
+  on its own family, rarity and window, no patch is bare, the draws split within 4 sigma, price and
+  gate ignore the slot, the `mined-order-mixed` golden raises the same events either way, a reload
+  draws the same roster, and the roster golden pins the rosters and the P1 and P2 draws. About a
+  minute. The lane `roster.byteIdentity.lane.test.ts` runs A over all 64 seeds (about 10 minutes),
+  and the lane `roster.pacing.lane.test.ts` (D) plays planet 1 to its core on each pacing seed with
+  the roster, with the fold off and from an unstamped old-save planet 1, prints each run's first
+  drill purchase and time to core, and fails a roster run whose first drill purchase is more than
+  5% later than the fold-off one's. The guard and bounds are exact on the roster in
+  `roster/systems/rosterGuard.test.ts`.
 - **Pacing bot** (`src/systems/bot/`, #29): plays `scenarios/bot-slice.scenario.json` through
   authority commands with the #6 movement-time model, buying casing grades on-curve (grade `b`
   before it mines band `b`, grade 5 before the core, S11). Its scripted mining (`drillTile`) lays
