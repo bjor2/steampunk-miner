@@ -11,10 +11,10 @@
  *
  * Paths, as the live loop sends them: `every tick` and `every 12` are flag-off pose reports with
  * that many drive and drill ticks, charged on the law work they removed (A6's `drill.exactCarry`)
- * and cut as they ship (the report capsule of ticket 537 where the bite runs on); `every tick,
- * disc` and `every 12, disc` are the same reports with `drill.reportCapsule` off, protocol 86's
- * bare disc (main's cut), read beside them so the capsule's own move shows per row and #514's
- * ratchet keeps main at 12 ticks as its reference; `swept` is a `drillStep` every tick and a report
+ * and cut as they ship (the report capsule of ticket 537 at interval 1; a 12-tick report cuts
+ * protocol 86's bare disc, main's cut, so `every 12` is #514's ratchet reference); `every tick,
+ * disc` is the same report with `drill.reportCapsule` off, the bare disc every tick, read beside
+ * it so the capsule's own move shows per row; `swept` is a `drillStep` every tick and a report
  * every 12 ticks (flag on), charged as shipped.
  * Each tick reads the drill energy (the tank's fall less the reports' drive charge) and, at each
  * report, the drill ticks it heats for (`reportedDrill.ts`).
@@ -58,7 +58,7 @@ import {
 import { heatThrottledDrill } from './heatRules'
 import { isCutBySteps } from './sweptDrill'
 
-export type TrackPath = 'every tick' | 'every tick, disc' | 'every 12' | 'every 12, disc' | 'swept'
+export type TrackPath = 'every tick' | 'every tick, disc' | 'every 12' | 'swept'
 
 /** What a track's cut charged, summed over its ticks. */
 interface TrackCharge {
@@ -104,9 +104,9 @@ function isChargedAtLaw(path: TrackPath): boolean {
   return path !== 'swept'
 }
 
-/** The report paths cut as they ship; the `disc` paths switch the capsule off for main's cut. */
+/** The report paths cut as they ship; the `disc` path switches the capsule off for the bare disc. */
 function isCapsulePath(path: TrackPath): boolean {
-  return path !== 'every tick, disc' && path !== 'every 12, disc'
+  return path !== 'every tick, disc'
 }
 
 function cutTrackOnPath(track: Track, path: TrackPath, drillPower: number): TrackRun {
@@ -217,7 +217,7 @@ function commandsOf(at: TrackTick, to: { x: number; y: number }): CommandIntent[
     at.tick % REPORT_EVERY === 0
       ? [reportOf(at.frame, to, { speedMmPerS, ticks: REPORT_EVERY })]
       : []
-  if (at.path === 'every 12' || at.path === 'every 12, disc') return report
+  if (at.path === 'every 12') return report
   return [stepOf(at.frame, to), ...report]
 }
 
