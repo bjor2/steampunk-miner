@@ -694,6 +694,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/authority/bore/shotShape.test.ts` | 14 | 14 |
 | `src/systems/authority/builtFacilities.test.ts` | 6 | 6 |
 | `src/systems/authority/carryRelease.test.ts` | 22 | 13 |
+| `src/systems/authority/casingCadence.test.ts` | 7 | 3 |
 | `src/systems/authority/casingDrill.test.ts` | 5 | 5 |
 | `src/systems/authority/casingGnaw.test.ts` | 4 | 4 |
 | `src/systems/authority/casingPlacement.test.ts` | 15 | 15 |
@@ -732,7 +733,9 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/authority/coreHarvest.test.ts` | 10 | 10 |
 | `src/systems/authority/cutFollowRead.test.ts` | 12 | 12 |
 | `src/systems/authority/cutShare.test.ts` | 3 | 3 |
-| `src/systems/authority/digSpeedTrack.lane.test.ts` | 32 | 2 |
+| `src/systems/authority/digSpeedTrack.lane.test.ts` | 68 | 3 |
+| `src/systems/authority/drillEventStream.lane.test.ts` | 8 | 1 |
+| `src/systems/authority/drillEventStream.test.ts` | 26 | 4 |
 | `src/systems/authority/drillGates.test.ts` | 11 | 11 |
 | `src/systems/authority/drillGearCut.test.ts` | 27 | 25 |
 | `src/systems/authority/drillStep.test.ts` | 22 | 22 |
@@ -745,8 +748,8 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/authority/heatCapReadings.test.ts` | 13 | 13 |
 | `src/systems/authority/heatRun.test.ts` | 13 | 13 |
 | `src/systems/authority/hollowPocket.test.ts` | 7 | 7 |
-| `src/systems/authority/lava/lavaCadence.lane.test.ts` | 2 | 2 |
-| `src/systems/authority/lava/lavaCadence.test.ts` | 6 | 5 |
+| `src/systems/authority/lava/lavaCadence.lane.test.ts` | 1 | 1 |
+| `src/systems/authority/lava/lavaCadence.test.ts` | 7 | 6 |
 | `src/systems/authority/lava/lavaRun.test.ts` | 9 | 9 |
 | `src/systems/authority/lawCarrySlab.lane.test.ts` | 338 | 6 |
 | `src/systems/authority/liningBill.test.ts` | 10 | 10 |
@@ -1013,13 +1016,15 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/physics/cutFollowStartingRigs.test.ts` | 19 | 5 |
 | `src/physics/cutSmoothness.test.ts` | 13 | 7 |
 | `src/physics/cutStartLatency.lane.test.ts` | 5 | 5 |
-| `src/physics/digSpeedStop.lane.test.ts` | 18 | 5 |
+| `src/physics/digSpeedStop.lane.test.ts` | 10 | 3 |
 | `src/physics/drillEngagement.test.ts` | 6 | 6 |
 | `src/physics/drillFacingStep.test.ts` | 3 | 3 |
+| `src/physics/drillReportCadence.test.ts` | 3 | 3 |
 | `src/physics/drillTurnLatency.lane.test.ts` | 3 | 7 |
 | `src/physics/exactCarry.lane.test.ts` | 184 | 16 |
 | `src/physics/fastLegContactTrace.lane.test.ts` | 2 | 2 |
 | `src/physics/fastRigBodySpeed.lane.test.ts` | 5 | 5 |
+| `src/physics/flagOffLadder.lane.test.ts` | 84 | 8 |
 | `src/physics/floatingOrigin.test.ts` | 3 | 3 |
 | `src/physics/glidePassThrough.test.ts` | 4 | 4 |
 | `src/physics/levelCutDips.lane.test.ts` | 2 | 2 |
@@ -1408,7 +1413,8 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/vehicle/bodySpeedDips.test.ts` | 6 | 6 |
 | `src/systems/vehicle/carryDebt.test.ts` | 8 | 8 |
 | `src/systems/vehicle/carryWalk.test.ts` | 52 | 22 |
-| `src/systems/vehicle/casingTrail.test.ts` | 18 | 14 |
+| `src/systems/vehicle/casingTrail.test.ts` | 25 | 17 |
+| `src/systems/vehicle/casingTrailCadence.lane.test.ts` | 9 | 3 |
 | `src/systems/vehicle/casingTrailReversal.test.ts` | 36 | 5 |
 | `src/systems/vehicle/chargeSelection.test.ts` | 4 | 4 |
 | `src/systems/vehicle/colliderHalo.test.ts` | 3 | 3 |

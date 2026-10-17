@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest'
+import { CASING_RING_LAG_MM, CASING_RING_SPACING_MM } from '../../constants/balance'
 import {
   EMPTY_CASING_TRAIL,
   followCasingTrail,
@@ -167,3 +168,58 @@ function diagonalAt(step: number) {
 function distanceBetween(a: { xMm: number; yMm: number }, b: { xMm: number; yMm: number }) {
   return Math.sqrt((a.xMm - b.xMm) ** 2 + (a.yMm - b.yMm) ** 2)
 }
+
+// Ticket 514: with a pose report every tick while the drill bites, a point is recorded at the first
+// report half a metre on, so the trail is denser than at 12-tick reports. Strides are 1.5, 7 and
+// 15 m/s at 60 ticks a second.
+describe('casing trail at a report every tick (ticket 514)', () => {
+  const STRIDES_MM = [25, 117, 250]
+
+  /** Every ring due cutting along x to `toMm`, with the stamp's x when each fell due. */
+  function laidAlong(xs: readonly number[], isCutting: boolean, start = EMPTY_CASING_TRAIL) {
+    let trail: CasingTrail = start
+    const laid: { xMm: number; stampMm: number }[] = []
+    let mostWaiting = 0
+    for (const x of xs) {
+      const step = followCasingTrail(trail, { xMm: x, yMm: 0 }, isCutting)
+      trail = step.trail
+      laid.push(...step.due.map((point) => ({ xMm: point.xMm, stampMm: x })))
+      mostWaiting = Math.max(mostWaiting, trail.unlined.length)
+    }
+    return { trail, laid, mostWaiting }
+  }
+
+  it.each(STRIDES_MM)(
+    'charges the axis it cut, and one spacing for the first ring, at %i mm a tick',
+    (strideMm) => {
+      let trail: CasingTrail = EMPTY_CASING_TRAIL
+      let charged = 0
+      for (const x of stepsTo(8000, strideMm)) {
+        const step = followCasingTrail(trail, { xMm: x, yMm: 0 }, true)
+        charged += step.trail.unlined
+          .filter((point) => !trail.unlined.includes(point))
+          .reduce((sum, point) => sum + point.lengthMm, 0)
+        trail = step.trail
+      }
+      const lastPoint = trail.lastAxisPoint?.xMm ?? 0
+      expect(charged).toBe(lastPoint + CASING_RING_SPACING_MM)
+    },
+  )
+
+  it.each(STRIDES_MM)(
+    'keeps a straight cut within six waiting points and lays no ring inside the lag at %i mm a tick',
+    (strideMm) => {
+      const { laid, mostWaiting } = laidAlong(stepsTo(20000, strideMm), true)
+      expect(mostWaiting).toBeLessThan(6)
+      expect(laid.every((ring) => ring.stampMm - ring.xMm >= CASING_RING_LAG_MM)).toBe(true)
+    },
+  )
+
+  it("lays a reversing rig's waiting rings once it has backed 2.15 m past each, never ahead of it", () => {
+    const cut = laidAlong(stepsTo(8000, 25), true)
+    const backing = stepsTo(8000, 25).reverse()
+    const backedOut = laidAlong(backing, false, cut.trail)
+    expect(backedOut.trail.unlined).toEqual([])
+    expect(backedOut.laid.every((ring) => ring.xMm - ring.stampMm >= CASING_RING_LAG_MM)).toBe(true)
+  })
+})
