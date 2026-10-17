@@ -25,19 +25,24 @@
  * With no provider the slot stays 0 and the provider is never asked. An electrified cell
  * (`magneticGround`, spec #258) sets its own bit in the same slot (ticket 293), so its arcs draw
  * over whatever gate the cell shows.
+ *
+ * Material kinds (ticket 450 under #139): with a `kindLook` provider each tile carries its cell's
+ * kind slot, and the shader draws the slot's species from the look table the provider fills, so
+ * neither a reveal nor a new roster rebuilds a chunk. With none the slot stays 0.
  */
 import { GROUND_BLOCK_SIZE, ORE_WHISPER_ROCK_TILES } from '../../constants/scene'
 import type { PlanetParams } from '../world/planetParams'
 import { bandOfTile } from '../world/planetGeometry'
 import { ISO_DENSITY, SAMPLES_PER_TILE } from '../world/sampleGrid'
 import { CHUNK_CELLS, CHUNK_SIZE, firstTileOfChunk } from '../world/tileGrid'
-import { CELL_KIND, kindOfCell } from '../world/worldCell'
+import { CELL_KIND, kindOfCell, kindSlotOfCell, NO_KIND_SLOT } from '../world/worldCell'
 import { DENSITY_HALO_SIDE } from './densityHalo'
 import { BLOCKS_PER_CHUNK, BLOCKS_PER_CHUNK_SIDE, type BlockedTileInstances } from './groundBlocks'
 import { ART_DIRECTION, type BandPalette } from './artDirection'
 import { bandColourOf, paletteOf, tileShadeOf } from './bandPalette'
 import type { Rgb } from './colour'
 import { cellGateLookProvider, type CellGateLookProvider } from '../registries/cellGateLook'
+import { kindLookProvider, type KindLookProvider } from '../registries/kindLook'
 import { magneticGroundProvider, type MagneticGroundProvider } from '../registries/magneticGround'
 import { oreLookProvider, type OreLookProvider } from '../registries/oreLook'
 import { cellMarkerBitsOf, LINED_BIT, NO_GATE_BITS } from './cellGateBits'
@@ -71,6 +76,8 @@ interface BatchContext {
   cellGateLook: CellGateLookProvider | null
   /** The `planet-mix` slice's fields and electrified cells (ticket 290), or null, read per chunk. */
   magneticGround: MagneticGroundProvider | null
+  /** The `roster` slice's kind looks (feature-slices.md 3.72), or null, read per chunk. */
+  kindLook: KindLookProvider | null
   /** Reused for every tile the providers are asked about, so a rebuild allocates no points. */
   gateTile: { tx: number; ty: number }
   /** The cells holding standard (ticket 315) and refractory (#113) lining, in cell order. */
@@ -166,6 +173,7 @@ function batchContextOf(
     oreLook: oreLookProvider(),
     cellGateLook: cellGateLookProvider(),
     magneticGround: magneticGroundProvider(),
+    kindLook: kindLookProvider(),
     gateTile: { tx: 0, ty: 0 },
   }
 }
@@ -179,6 +187,7 @@ function emptyBatch(): ChunkTileBatch {
     oreColours: new Float32Array(CHUNK_CELLS * 4),
     styles: new Float32Array(CHUNK_CELLS * 4),
     gates: new Float32Array(CHUNK_CELLS),
+    kinds: new Float32Array(CHUNK_CELLS),
   }
 }
 
@@ -209,6 +218,7 @@ function writeTile(
     ore?.sparkles ?? 0,
   )
   batch.gates[at] = gateBitsOfTile(context, cell, lx, ly)
+  batch.kinds[at] = context.kindLook === null ? NO_KIND_SLOT : kindSlotOfCell(cell)
   batch.count = at + 1
 }
 

@@ -26,6 +26,11 @@ export interface TileInstances {
   styles: Float32Array
   /** 1 per tile: the gate channel's bits (`cellGateBits.ts`, ticket 298), 0 on a cell with no gate. */
   gates: Float32Array
+  /**
+   * 1 per tile: the cell's material kind slot (its roster index plus one, ticket 446), which the
+   * shader looks up in the kind look table (ticket 450); 0 with no kind or no `kindLook` provider.
+   */
+  kinds: Float32Array
 }
 
 /** A chunk's tiles laid out block by block: block `b` is `blockStarts[b]` to `blockStarts[b + 1]`. */
@@ -114,5 +119,6 @@ function copyBlock(batch: BlockedTileInstances, block: number, drawn: TileInstan
   drawn.oreColours.set(batch.oreColours.subarray(start * 4, end * 4), drawn.count * 4)
   drawn.styles.set(batch.styles.subarray(start * 4, end * 4), drawn.count * 4)
   drawn.gates.set(batch.gates.subarray(start, end), drawn.count)
+  drawn.kinds.set(batch.kinds.subarray(start, end), drawn.count)
   drawn.count += end - start
 }

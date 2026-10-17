@@ -55,6 +55,7 @@ function emptyInstances(): TileInstances {
     oreColours: new Float32Array(1024 * 4),
     styles: new Float32Array(1024 * 4),
     gates: new Float32Array(1024),
+    kinds: new Float32Array(1024),
   }
 }
 

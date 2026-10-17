@@ -1,0 +1,199 @@
+{
+  "$comment": "The material silhouettes and patterns the terrain shader draws (ticket 450 under #139; TD shape 6226270701, GD ruling 6226278574: procedural, zero new samplers, chosen by uniform, never by #define). A species row of the materials slice names one silhouette and one pattern by id; the shader draws it by its position here plus one. Silhouette: `count` grains of `primitive` (box, diamond, disc, hexagon, rod) of half-size `size` tiles, `aspect` the height over the width (a rod's thickness over its half-length), turned up to `turn` of a half turn, laid out by `layout` (scatter, row along the tile's x, stack up its y). Pattern: the shade over the grain, `primitive` (flat, mottle, crust, bands, cloud, gloss, speckle, core, rings, veins, fibres) at `scale` (repeats per tile, or a crust's width in tiles), `contrast` the shade's swing either side of 1, `angle` in degrees for the directed ones. Append rows; a new id never renumbers an old one.",
+  "silhouettes": [
+    {
+      "id": "nuggets",
+      "primitive": "disc",
+      "count": 3,
+      "size": 0.12,
+      "aspect": 0.8,
+      "turn": 1,
+      "layout": "scatter"
+    },
+    {
+      "id": "flakes",
+      "primitive": "disc",
+      "count": 5,
+      "size": 0.11,
+      "aspect": 0.3,
+      "turn": 1,
+      "layout": "scatter"
+    },
+    {
+      "id": "plates",
+      "primitive": "box",
+      "count": 3,
+      "size": 0.24,
+      "aspect": 0.2,
+      "turn": 0.04,
+      "layout": "stack"
+    },
+    {
+      "id": "nodules",
+      "primitive": "disc",
+      "count": 2,
+      "size": 0.17,
+      "aspect": 1,
+      "turn": 0,
+      "layout": "scatter"
+    },
+    {
+      "id": "shards",
+      "primitive": "diamond",
+      "count": 2,
+      "size": 0.09,
+      "aspect": 3,
+      "turn": 1,
+      "layout": "scatter"
+    },
+    {
+      "id": "cubes",
+      "primitive": "box",
+      "count": 3,
+      "size": 0.1,
+      "aspect": 1,
+      "turn": 0,
+      "layout": "scatter"
+    },
+    {
+      "id": "grains",
+      "primitive": "disc",
+      "count": 6,
+      "size": 0.045,
+      "aspect": 1,
+      "turn": 0,
+      "layout": "scatter"
+    },
+    {
+      "id": "beads",
+      "primitive": "disc",
+      "count": 4,
+      "size": 0.075,
+      "aspect": 1,
+      "turn": 0,
+      "layout": "row"
+    },
+    {
+      "id": "wires",
+      "primitive": "rod",
+      "count": 2,
+      "size": 0.32,
+      "aspect": 0.12,
+      "turn": 1,
+      "layout": "scatter"
+    },
+    {
+      "id": "barrels",
+      "primitive": "hexagon",
+      "count": 2,
+      "size": 0.12,
+      "aspect": 1.6,
+      "turn": 0.25,
+      "layout": "scatter"
+    },
+    {
+      "id": "columns",
+      "primitive": "hexagon",
+      "count": 3,
+      "size": 0.07,
+      "aspect": 3.2,
+      "turn": 0.04,
+      "layout": "row"
+    },
+    {
+      "id": "flecks",
+      "primitive": "box",
+      "count": 3,
+      "size": 0.11,
+      "aspect": 1,
+      "turn": 0.5,
+      "layout": "scatter"
+    }
+  ],
+  "patterns": [
+    {
+      "id": "mottled",
+      "primitive": "mottle",
+      "scale": 9,
+      "contrast": 0.4,
+      "angle": 0
+    },
+    {
+      "id": "crusted",
+      "primitive": "crust",
+      "scale": 0.035,
+      "contrast": 0.45,
+      "angle": 0
+    },
+    {
+      "id": "banded",
+      "primitive": "bands",
+      "scale": 14,
+      "contrast": 0.35,
+      "angle": 0
+    },
+    {
+      "id": "clouded",
+      "primitive": "cloud",
+      "scale": 4,
+      "contrast": 0.35,
+      "angle": 0
+    },
+    {
+      "id": "glassy",
+      "primitive": "gloss",
+      "scale": 1.2,
+      "contrast": 0.5,
+      "angle": 45
+    },
+    {
+      "id": "sheen",
+      "primitive": "gloss",
+      "scale": 0.5,
+      "contrast": 0.3,
+      "angle": -30
+    },
+    {
+      "id": "speckled",
+      "primitive": "speckle",
+      "scale": 28,
+      "contrast": 0.45,
+      "angle": 0
+    },
+    {
+      "id": "translucent",
+      "primitive": "core",
+      "scale": 1,
+      "contrast": 0.5,
+      "angle": 0
+    },
+    {
+      "id": "zoned",
+      "primitive": "rings",
+      "scale": 18,
+      "contrast": 0.4,
+      "angle": 0
+    },
+    {
+      "id": "veined",
+      "primitive": "veins",
+      "scale": 6,
+      "contrast": 0.55,
+      "angle": 0
+    },
+    {
+      "id": "silky",
+      "primitive": "fibres",
+      "scale": 40,
+      "contrast": 0.25,
+      "angle": 20
+    },
+    {
+      "id": "clear",
+      "primitive": "gloss",
+      "scale": 3,
+      "contrast": 0.6,
+      "angle": 60
+    }
+  ]
+}

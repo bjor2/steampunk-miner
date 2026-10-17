@@ -19,6 +19,7 @@ import { AUTHORITY_REACTION_REGISTRY } from '../systems/registries/authorityReac
 import { BLAST_EFFECT_REGISTRY } from '../systems/registries/blastEffects'
 import { BUILDING_ATTACH_USE_REGISTRY } from '../systems/registries/buildingAttach'
 import { CELL_GATE_LOOK_REGISTRY } from '../systems/registries/cellGateLook'
+import { KIND_LOOK_REGISTRY } from '../systems/registries/kindLook'
 import { BOT_PURCHASE_REGISTRY } from '../systems/registries/botPurchases'
 import { AUTO_GUNS_REGISTRY } from '../systems/registries/autoGuns'
 import { BORE_GUN_REGISTRY } from '../systems/registries/boreGun'
@@ -148,6 +149,7 @@ export function registrarFor(sliceId: string): SliceRegistrar {
     oreLook: (provider) => add(ORE_LOOK_REGISTRY, provider),
     orePickup: (provider) => add(ORE_PICKUP_REGISTRY, provider),
     cellGateLook: (provider) => add(CELL_GATE_LOOK_REGISTRY, provider),
+    kindLook: (provider) => add(KIND_LOOK_REGISTRY, provider),
     magneticGround: (provider) => add(MAGNETIC_GROUND_REGISTRY, provider),
     shockShield: (shield) => add(SHOCK_SHIELD_REGISTRY, shield),
     saveSection: (section) => addSaveSection(sliceId, section),
