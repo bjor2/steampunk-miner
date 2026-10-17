@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-10-17T06:43:11+01:00",
+  "updated_at": "2026-10-17T07:04:45+01:00",
   "caps": {
     "grok": 12,
     "claude": 10,
@@ -27,12 +27,11 @@
         },
         {
           "slot": "C2",
-          "state": "busy",
-          "ticket": 535,
-          "grok_slot": 2,
-          "kind": "dev",
-          "since": "2026-10-17T05:19:00+01:00",
-          "wave": "316-2H"
+          "state": "free",
+          "ticket": null,
+          "grok_slot": null,
+          "kind": null,
+          "since": null
         },
         {
           "slot": "C3",
@@ -68,8 +67,8 @@
         }
       ],
       "size": 6,
-      "used": 1,
-      "free": 5,
+      "used": 0,
+      "free": 6,
       "claims_last_hour": 0,
       "name": "Claude Max 1"
     },
@@ -148,11 +147,9 @@
     },
     {
       "slot": 2,
-      "state": "dev",
-      "ticket": 535,
-      "since": "2026-10-17T05:19:00+01:00",
-      "claude_slot": 2,
-      "wave": "316-2H"
+      "state": "free",
+      "ticket": null,
+      "since": null
     },
     {
       "slot": 3,
@@ -226,12 +223,11 @@
     },
     {
       "slot": 2,
-      "state": "busy",
-      "ticket": 535,
-      "grok_slot": 2,
-      "since": "2026-10-17T05:19:00+01:00",
-      "account": 1,
-      "wave": "316-2H"
+      "state": "free",
+      "ticket": null,
+      "grok_slot": null,
+      "since": null,
+      "account": 1
     },
     {
       "slot": 3,
@@ -303,17 +299,17 @@
     }
   ],
   "last_refill": {
-    "at": "2026-10-17 06:08 BST",
+    "at": "2026-10-17 07:04 BST",
     "mode": "refill-dev",
-    "triggers": "#514",
+    "triggers": "#535",
     "started": "",
-    "note": "no pickable build ticket"
+    "note": "load guard (quiet-bench hold (quiet-bench #514 (pid 2264667)))"
   },
   "totals": {
     "grok": {
       "size": 12,
-      "used": 1,
-      "dev": 1,
+      "used": 0,
+      "dev": 0,
       "dev_cap": 8,
       "planner": 0,
       "planner_cap": 4
@@ -321,8 +317,8 @@
     "claude": {
       "size": 10,
       "enabled": 6,
-      "used": 1,
-      "free": 5,
+      "used": 0,
+      "free": 6,
       "external": 0
     }
   },
@@ -344,7 +340,7 @@
           539
         ],
         "done": [],
-        "live": 1
+        "live": 0
       },
       {
         "number": 534,
