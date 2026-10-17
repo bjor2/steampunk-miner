@@ -6,6 +6,7 @@
  * removed at the swept price (`vehicle/cutCarry.ts`). Only specs use them.
  */
 import { BASIS_POINTS } from '../../constants/balance'
+import { AUTHORITY_DEV_FLAGS, type AuthorityDevFlags } from '../../constants/devFlags'
 import { cellDigEnergyOf } from './cellDigEnergy'
 import { CUT_ENERGY_DENOMINATOR } from '../vehicle/cutCarry'
 import { ENERGY_QUANTA_PER_TICK } from '../vehicle/energyQuanta'
@@ -22,6 +23,23 @@ import { drillSubStepsOfCells } from './groundDrill'
 import { heatThrottledDrill } from './heatRules'
 import { shockTicksFor } from './magnetic/electrifiedShock'
 import { planetParamsOf } from './planetOfState'
+
+/**
+ * Runs `play` with the authority's `drill.exactCarry` as `isOn`, the flag put back after. The
+ * rule tables read it from `AUTHORITY_DEV_FLAGS` at call time (`reportedDrill.ts`), so a whole
+ * scripted session or replay takes the switch. It ships off (`constants/devFlags.ts`), so the
+ * charge's specs and the lanes switch it on for their runs.
+ */
+export function withDrillExactCarry<T>(isOn: boolean, play: () => T): T {
+  const flags = AUTHORITY_DEV_FLAGS as { -readonly [K in keyof AuthorityDevFlags]: boolean }
+  const shipped = flags['drill.exactCarry']
+  flags['drill.exactCarry'] = isOn
+  try {
+    return play()
+  } finally {
+    flags['drill.exactCarry'] = shipped
+  }
+}
 
 /** The cells `events` destroyed, in order. */
 export function brokenCellsOf(events: readonly (DomainEvent | DomainEventBody)[]): TilePoint[] {

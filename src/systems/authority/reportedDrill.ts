@@ -9,7 +9,7 @@
  * cut is counted on `LAW_WORK_CLOCK`: the same carve, charged on the density it removed at the
  * swept price with an integer carry, and its heat the same tally's whole drill ticks, read after
  * the cut from the vehicle's carry (`vehicle/cutCarry.ts`). Off, the report charges the ticks its
- * stamp removed something in and heats for its client-counted drill ticks, as protocol 83 did.
+ * stamp removed something in and heats for its client-counted drill ticks, as protocol 84 did.
  */
 import { AUTHORITY_DEV_FLAGS, type AuthorityDevFlags } from '../../constants/devFlags'
 import { splitCutHeatCarry } from '../vehicle/cutCarry'

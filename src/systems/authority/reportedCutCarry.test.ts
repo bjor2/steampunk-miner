@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'vitest'
+import { afterAll, beforeAll, describe, expect, it } from 'vitest'
 import { AUTHORITY_DEV_FLAGS, type AuthorityDevFlags } from '../../constants/devFlags'
 import { ENERGY_QUANTA_PER_TICK } from '../vehicle/energyQuanta'
 import {
@@ -38,6 +38,17 @@ import { stateDigest } from './stateDigest'
 
 const EXACT_OFF: AuthorityDevFlags = { ...AUTHORITY_DEV_FLAGS, 'drill.exactCarry': false }
 const EXACT_ON: AuthorityDevFlags = { ...AUTHORITY_DEV_FLAGS, 'drill.exactCarry': true }
+
+// The switch ships off until #541 lands (`constants/devFlags.ts`): every scripted session here
+// runs with it on, put back after, and the on-versus-off gate passes its flags explicitly.
+const switchable = AUTHORITY_DEV_FLAGS as { -readonly [K in keyof AuthorityDevFlags]: boolean }
+const SHIPPED_SWITCH = switchable['drill.exactCarry']
+beforeAll(() => {
+  switchable['drill.exactCarry'] = true
+})
+afterAll(() => {
+  switchable['drill.exactCarry'] = SHIPPED_SWITCH
+})
 
 /** Planet 8, the first heat planet, and band-5 rock straight above its core (`heatRun.test.ts`). */
 const HEAT_PLANET = 8
@@ -141,7 +152,7 @@ describe('the report cut with the charge on and off (ticket 535, the regression 
     expect(on.energy).not.toBe(off.energy)
   })
 
-  it('charges the ticks the stamp removed something in, as protocol 83 did, with the switch off', () => {
+  it('charges the ticks the stamp removed something in, as protocol 84 did, with the switch off', () => {
     const session = overGround()
     const vehicle = session.vehicle()
     const off = cutWith(EXACT_OFF, 60)

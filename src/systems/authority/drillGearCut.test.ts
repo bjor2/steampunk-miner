@@ -23,7 +23,7 @@ import {
   poseAbove,
   surfaceOreTiles,
 } from './scriptedSession'
-import { cutEnergyNumeratorOf } from './cutCarryFixtures'
+import { cutEnergyNumeratorOf, withDrillExactCarry } from './cutCarryFixtures'
 import { stateDigest } from './stateDigest'
 
 // Slice drill gear on the reported drill (ticket 234, the GD lock on #205): fake slices register
@@ -95,25 +95,29 @@ function drillWith(
   setup: readonly CommandIntent[] = [],
   drive: DriveSigns = NO_DRIVE,
 ) {
-  return withRegistrations(slices, () => {
-    const session = createScriptedSession()
-    for (const intent of setup) session.submit(0, intent)
-    session.submit(1, poseAbove(tile, facing))
-    const beforeVehicle = session.vehicle()
-    const before = beforeVehicle.energy
-    const events = session.submit(
-      1 + DRILL_TICKS,
-      poseAbove(tile, facing, { drillTicks: DRILL_TICKS, drive }),
-    )
-    return {
-      events,
-      world: session.state().world,
-      spent: before - session.vehicle().energy,
-      /** What the cut charged in the carry's numerator (ticket 535), exact below a quantum. */
-      charged: cutEnergyNumeratorOf(beforeVehicle, session.vehicle()),
-      digest: stateDigest(session.state()),
-    }
-  })
+  // The charge on density removed (ticket 535) prices each gear cell at its share exactly; the
+  // switch ships off, so these specs turn it on for their cut. The cut itself is the same either way.
+  return withRegistrations(slices, () =>
+    withDrillExactCarry(true, () => {
+      const session = createScriptedSession()
+      for (const intent of setup) session.submit(0, intent)
+      session.submit(1, poseAbove(tile, facing))
+      const beforeVehicle = session.vehicle()
+      const before = beforeVehicle.energy
+      const events = session.submit(
+        1 + DRILL_TICKS,
+        poseAbove(tile, facing, { drillTicks: DRILL_TICKS, drive }),
+      )
+      return {
+        events,
+        world: session.state().world,
+        spent: before - session.vehicle().energy,
+        /** What the cut charged in the carry's numerator (ticket 535), exact below a quantum. */
+        charged: cutEnergyNumeratorOf(beforeVehicle, session.vehicle()),
+        digest: stateDigest(session.state()),
+      }
+    }),
+  )
 }
 
 /** The bot's reports down the column from just above `TARGET`: a few short drills on each row. */

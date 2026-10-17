@@ -10,7 +10,7 @@
  * - `swept`: a `drillStep` every tick and a pose report every 12 (the cut by steps, the reference);
  * - `exact @12` and `exact @1`: the report cut with the charge on, a report every 12 ticks or every
  *   tick carrying that many drill and drive ticks;
- * - `main @12` and `main @1`: the same reports with the charge off, protocol 83's player path.
+ * - `main @12` and `main @1`: the same reports with the charge off, protocol 84's player path.
  *
  * Read per run: the law work from the ground (every cell's density removed times its law time at
  * the rig's drill, `cutCarryFixtures.ts`), the drill energy (the tank's fall less the reports'
@@ -25,7 +25,6 @@ import { BASIS_POINTS, DRILL_SUBSTEPS_PER_TICK } from '../../constants/balance'
 import { blockHardness } from '../economy/oreEconomy'
 import { subStepsPerTile } from '../vehicle/drillRule'
 import { MM_PER_METRE, TICKS_PER_SECOND, UP_VECTOR_SCALE } from '../../constants/physics'
-import { AUTHORITY_DEV_FLAGS, type AuthorityDevFlags } from '../../constants/devFlags'
 import { LAW_WORK_PER_DRILL_TICK } from '../vehicle/cutCarry'
 import { ENERGY_QUANTA_PER_TICK } from '../vehicle/energyQuanta'
 import { stepDigTicksOf } from '../vehicle/sweptCut'
@@ -36,7 +35,12 @@ import type { WorldState } from '../world/worldState'
 import type { CommandIntent } from './authorityCommand'
 import type { AuthorityState } from './authorityState'
 import { setCasingGradeCommand } from './casingDebugCommands'
-import { brokenCellsOf, cutEnergyNumeratorOf, lawWorkRemovedOf } from './cutCarryFixtures'
+import {
+  brokenCellsOf,
+  cutEnergyNumeratorOf,
+  lawWorkRemovedOf,
+  withDrillExactCarry,
+} from './cutCarryFixtures'
 import type { DomainEvent } from './domainEvent'
 import { settleableHeatTicksOf } from './heatCapReadings'
 import { heatThrottledDrill } from './heatRules'
@@ -224,15 +228,9 @@ function isChargeOn(path: SlabPath): boolean {
   return path !== 'main @12' && path !== 'main @1'
 }
 
-/** Runs `play` with the authority's `drill.exactCarry` as `path` wants it, restored after. */
+/** Runs `play` with the authority's `drill.exactCarry` as `path` wants it, put back after. */
 function withChargeOf<T>(path: SlabPath, play: () => T): T {
-  const flags = AUTHORITY_DEV_FLAGS as { -readonly [K in keyof AuthorityDevFlags]: boolean }
-  flags['drill.exactCarry'] = isChargeOn(path)
-  try {
-    return play()
-  } finally {
-    flags['drill.exactCarry'] = true
-  }
+  return withDrillExactCarry(isChargeOn(path), play)
 }
 
 /** A fresh rig of `levels` on planet 1, enemies frozen, the tank bottomless, at the track's start. */

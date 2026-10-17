@@ -14,6 +14,7 @@ import {
   energyNumeratorOfLawWork,
   lawWorkRemovedOf,
   tilesAround,
+  withDrillExactCarry,
 } from './cutCarryFixtures'
 import type { DomainEvent } from './domainEvent'
 import {
@@ -91,23 +92,36 @@ describe('vehicle drilling', () => {
     expect(FULL_TANK - session.vehicle().energy).toBe(40 * 4)
   })
 
-  it('carves the 1.9 m drill stamp under a reported pose, charging the law work it removed (ticket 535)', () => {
+  it('carves the 1.9 m drill stamp under a reported pose, charging only the ticks it cut', () => {
     const session = createSession()
     session.submit(10, poseAbove(GROUND, FACING.down))
-    const before = session.state()
     const events = session.submit(30, poseAbove(GROUND, FACING.down, { drillTicks: 20 }))
     expect(typesOf(events)).toContain('GroundChanged')
-    const lawWork = lawWorkRemovedOf(before, session.state().world, tilesAround(GROUND, 3))
-    expect(lawWork).toBeGreaterThan(0)
-    expect(cutEnergyNumeratorOf(before.players.p1.vehicle, session.vehicle())).toBe(
-      energyNumeratorOfLawWork(lawWork),
-    )
-    expect(FULL_TANK - session.vehicle().energy).toBeGreaterThan(0)
+    expect(FULL_TANK - session.vehicle().energy).toBe(20 * 4)
     for (const tx of [GROUND.tx - 1, GROUND.tx, GROUND.tx + 1]) {
       const tile = { tx, ty: GROUND.ty }
       expect(cellDensitySum(session.state().world, PARAMS, tile)).toBeLessThan(16 * 255)
     }
   })
+
+  it('carves the same stamp with drill.exactCarry on, charging the law work it removed (ticket 535)', () =>
+    withDrillExactCarry(true, () => {
+      const session = createSession()
+      session.submit(10, poseAbove(GROUND, FACING.down))
+      const before = session.state()
+      const events = session.submit(30, poseAbove(GROUND, FACING.down, { drillTicks: 20 }))
+      expect(typesOf(events)).toContain('GroundChanged')
+      const lawWork = lawWorkRemovedOf(before, session.state().world, tilesAround(GROUND, 3))
+      expect(lawWork).toBeGreaterThan(0)
+      expect(cutEnergyNumeratorOf(before.players.p1.vehicle, session.vehicle())).toBe(
+        energyNumeratorOfLawWork(lawWork),
+      )
+      expect(FULL_TANK - session.vehicle().energy).toBeGreaterThan(0)
+      for (const tx of [GROUND.tx - 1, GROUND.tx, GROUND.tx + 1]) {
+        const tile = { tx, ty: GROUND.ty }
+        expect(cellDensitySum(session.state().world, PARAMS, tile)).toBeLessThan(16 * 255)
+      }
+    }))
 
   it('charges nothing for a reported drill into open ground', () => {
     const session = createSession()
@@ -238,22 +252,33 @@ describe('vehicle core fragments', () => {
 })
 
 describe('vehicle energy', () => {
-  it('charges 6 and 1 quanta per reported thrust and drive tick, and the drill its law work (ticket 535)', () => {
+  it('charges 4, 6 and 1 quanta per reported drill, thrust and drive tick', () => {
     const session = createSession()
     session.submit(10, poseAbove(GROUND, FACING.down))
-    const before = session.state()
     session.submit(
       70,
       poseAbove(GROUND, FACING.down, { drillTicks: 30, thrustTicks: 60, driveTicks: 10 }),
     )
-    const lawWork = lawWorkRemovedOf(before, session.state().world, tilesAround(GROUND, 3))
-    const movement = 60 * 6 + 10
-    expect(lawWork).toBeGreaterThan(0)
-    expect(FULL_TANK - session.vehicle().energy).toBeGreaterThan(movement)
-    expect(cutEnergyNumeratorOf(before.players.p1.vehicle, session.vehicle(), movement)).toBe(
-      energyNumeratorOfLawWork(lawWork),
-    )
+    expect(FULL_TANK - session.vehicle().energy).toBe(30 * 4 + 60 * 6 + 10)
   })
+
+  it('charges 6 and 1 quanta per thrust and drive tick with drill.exactCarry on, and the drill its law work (ticket 535)', () =>
+    withDrillExactCarry(true, () => {
+      const session = createSession()
+      session.submit(10, poseAbove(GROUND, FACING.down))
+      const before = session.state()
+      session.submit(
+        70,
+        poseAbove(GROUND, FACING.down, { drillTicks: 30, thrustTicks: 60, driveTicks: 10 }),
+      )
+      const lawWork = lawWorkRemovedOf(before, session.state().world, tilesAround(GROUND, 3))
+      const movement = 60 * 6 + 10
+      expect(lawWork).toBeGreaterThan(0)
+      expect(FULL_TANK - session.vehicle().energy).toBeGreaterThan(movement)
+      expect(cutEnergyNumeratorOf(before.players.p1.vehicle, session.vehicle(), movement)).toBe(
+        energyNumeratorOfLawWork(lawWork),
+      )
+    }))
 
   it('is exactly one unit lower after 60 drilling ticks', () => {
     const session = createSession()

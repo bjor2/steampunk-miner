@@ -31,10 +31,14 @@ export const DEV_FLAGS: DevFlags = { 'drill.sweptCut': false }
  * - `drill.exactCarry` (ticket 535, A6 "Option L" on #529, the TD shape 6228682000): a pose
  *   report's own cut (not one the swept cut's steps already cut) is charged on the density it
  *   removed at each cell's law time, the swept price, with an integer carry on the vehicle
- *   (`vehicle/cutCarry.ts`), and heats from the same tally; the carve itself is unchanged. On; the
- *   kill-switch for one soak, and the proof that the switch off replays protocol 83's digests
- *   byte for byte. Off, the report charges the ticks its stamp removed something in and heats
- *   for its client-counted drill ticks, as protocol 83 did.
+ *   (`vehicle/cutCarry.ts`), and heats from the same tally; the carve itself is unchanged. Off in
+ *   the game Bjor plays until #541's heat change has landed (G&V's condition, the GD 6234312287
+ *   condition 1, Systems 6234342176): the #113 cap clips the law-exact feed at every tick on level
+ *   bores, so fast rigs would run cooler than today. Off, the report charges the ticks its stamp
+ *   removed something in and heats for its client-counted drill ticks, as protocol 84 did, and
+ *   every golden replays to protocol 84's digests; on, only the two goldens whose reports drill
+ *   move their digests (`logging/exactCarryOnGolden.test.ts`). The lanes and the charge's specs
+ *   switch it on for their runs.
  */
 export interface AuthorityDevFlags {
   readonly 'enemy.lureRetarget': boolean
@@ -43,5 +47,5 @@ export interface AuthorityDevFlags {
 
 export const AUTHORITY_DEV_FLAGS: AuthorityDevFlags = {
   'enemy.lureRetarget': true,
-  'drill.exactCarry': true,
+  'drill.exactCarry': false,
 }
