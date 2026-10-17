@@ -10,6 +10,7 @@ import type { CasingCementGrades } from './casingCementGrades'
 import type { MagnetCaps } from './magnetCaps'
 import type { TurretCaps } from './turretCaps'
 import type { MagneticHazardCaps } from './magneticHazardCaps'
+import type { DepthDensityCurve } from './depthDensityCurve'
 import type { BigStat, Money } from '../money'
 import type { WholeFraction } from '../wholeFractions'
 
@@ -366,6 +367,8 @@ export interface Economy {
     /** Core fragments one drilled core tile drops into the hold (#10: 1). */
     fragmentsPerTile: number
     paceScale: PaceScale
+    /** Ore per solid tile by depth from planet 3 (ticket 448, `depthDensityCurve.ts`). */
+    depthDensity: DepthDensityCurve
   }
   prices: {
     referenceBand: number

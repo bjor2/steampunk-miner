@@ -275,3 +275,10 @@ export const AUTO_PREVIEW_TICKS_FLOOR = 10
  * after the item's clock runs out is never held back.
  */
 export const AUTO_RETARGET_TICKS = 15
+
+/**
+ * The depth density curve (ticket 448) is read between its table entries in this many steps, so a
+ * tile's depth is taken in 1/65536 of the radius with 256 entries. A build choice, not a Systems
+ * number; changing it moves patch thinning, so it needs a GENERATOR_VERSION bump.
+ */
+export const DEPTH_SUBSTEPS_PER_TABLE_STEP = 256

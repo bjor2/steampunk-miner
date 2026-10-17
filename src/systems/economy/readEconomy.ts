@@ -20,6 +20,7 @@ import { readMagnetCaps } from './magnetCaps'
 import { readMagneticHazardCaps } from './magneticHazardCaps'
 import { readTurretCaps } from './turretCaps'
 import { readPaceScale } from './readPaceScale'
+import { readDepthDensity } from './depthDensityCurve'
 import { readUpgradeTiers } from './readUpgradeTiers'
 import { readCostCurve, readRefinery } from './readRefineryEconomy'
 import {
@@ -109,6 +110,7 @@ function readPlanets(reader: FieldReader, planets: Record<string, unknown>): Eco
     coreFraction: reader.money('planets.coreFraction', planets.coreFraction),
     fragmentsPerTile: reader.safeInteger('planets.fragmentsPerTile', planets.fragmentsPerTile),
     paceScale: readPaceScale(reader, planets.paceScale),
+    depthDensity: readDepthDensity(reader, planets.depthDensity),
   }
 }
 
