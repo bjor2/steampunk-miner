@@ -32,7 +32,10 @@ export const MATERIAL_ROW_FIELDS: readonly string[] = [
 /** Kebab-case only, so a species id can never read as an ore id (`<family>_t<tier>`). */
 export const KEBAB_ID = /^[a-z][a-z0-9]*(-[a-z0-9]+)*$/
 
-/** A kind slot id is its pool's id, a dot and a kebab-case slot name, as `ores.economy.json` writes. */
+/**
+ * A kind slot id is its kinds table's id, a dot and a slot name (`legacy.c1`), as `ores.economy.json`
+ * writes it. The table need not be named like the pool: an act pool (`foothold`) binds `mixed.*`.
+ */
 const KIND_SLOT_ID = /^[a-z][a-z0-9]*(-[a-z0-9]+)*\.[a-z0-9]+(-[a-z0-9]+)*$/
 
 const FIRST_BAND = 1
@@ -46,9 +49,7 @@ export function materialRowShapeProblems(row: Raw, where: string): string[] {
   return [
     ...(KEBAB_ID.test(String(row.id)) ? [] : [`${where}.id must be kebab-case`]),
     ...(isPoolId(row.pool) ? [] : [`${where}.pool must be a kebab-case pool id`]),
-    ...(isSlotOfPool(row.slot, row.pool)
-      ? []
-      : [`${where}.slot must be a kind slot id of its pool (<pool>.<slot>)`]),
+    ...(isKindSlotId(row.slot) ? [] : [`${where}.slot must be a kind slot id (<table>.<slot>)`]),
     ...['family', 'epithet', 'flavour']
       .filter((field) => !isText(row[field]))
       .map((field) => `${where}.${field} must be text`),
@@ -84,8 +85,8 @@ function isPoolId(pool: unknown): pool is string {
   return typeof pool === 'string' && KEBAB_ID.test(pool)
 }
 
-function isSlotOfPool(slot: unknown, pool: unknown): boolean {
-  return typeof slot === 'string' && KIND_SLOT_ID.test(slot) && slot.startsWith(`${String(pool)}.`)
+function isKindSlotId(slot: unknown): slot is string {
+  return typeof slot === 'string' && KIND_SLOT_ID.test(slot)
 }
 
 function isBandWindow(window: unknown): window is [number, number] {

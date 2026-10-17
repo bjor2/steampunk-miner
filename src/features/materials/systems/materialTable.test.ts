@@ -96,18 +96,19 @@ describe('materials table', () => {
     )
     expect(problemsOf([bare])).toEqual([
       'materials[0].pool must be a kebab-case pool id',
-      'materials[0].slot must be a kind slot id of its pool (<pool>.<slot>)',
+      'materials[0].slot must be a kind slot id (<table>.<slot>)',
     ])
   })
 
-  it('refuses a pool that is not a slug and a slot outside its pool', () => {
-    expect(problemsOf([{ ...GILDED, pool: 'Legacy Pool', slot: 'legacy.c1' }])).toEqual([
+  it('refuses a pool that is not a slug and a slot that is not a kind slot id', () => {
+    expect(problemsOf([{ ...GILDED, pool: 'Legacy Pool', slot: 'c1' }])).toEqual([
       'materials[0].pool must be a kebab-case pool id',
-      'materials[0].slot must be a kind slot id of its pool (<pool>.<slot>)',
+      'materials[0].slot must be a kind slot id (<table>.<slot>)',
     ])
-    expect(problemsOf([{ ...GILDED, slot: 'foothold.c1' }])).toEqual([
-      'materials[0].slot must be a kind slot id of its pool (<pool>.<slot>)',
-    ])
+  })
+
+  it('lets an act pool bind the slots of a kinds table named otherwise', () => {
+    expect(problemsOf([{ ...GILDED, pool: 'foothold', slot: 'mixed.c1' }])).toEqual([])
   })
 
   it('refuses two species bound to the same kind slot of a pool', () => {
