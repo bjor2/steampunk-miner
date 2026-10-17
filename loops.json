@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "updated_at": "2026-10-17T04:21:08Z",
+  "updated_at": "2026-10-17T04:21:21Z",
   "entries": {
     "steampunk-loop/1": {
       "loop": "steampunk-loop",
@@ -501,9 +501,9 @@
       "slot": null,
       "state": "working",
       "issue": null,
-      "note": "testing spec #162 (Spec: Tech-unlocked store items and power-ups (drill gear, extraction, magnets, sensing)) on 8c31e73",
+      "note": "testing spec #309 (Spec: Planet-1 ground weapon (penetrating shot, collapse without casing, visible casing)) on e8f104f",
       "stale_after_min": 420,
-      "updated_at": "2026-10-16T23:37:56Z",
+      "updated_at": "2026-10-17T04:21:21Z",
       "host": "grok-bot-vm-452660841"
     },
     "steampunk-loop/10": {
