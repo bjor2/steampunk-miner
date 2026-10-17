@@ -655,3 +655,12 @@ Fix (`.bak-20261017-1540-pickstdout`):
   and the bogus `attempts` keys and the dead slot 8 entry removed from `state.json`.
 - **Wave 316-3A order (parallel 1)**: `#514`, `#524` (blocked by #514), `#537` (no `build`), `#540` (in progress), `#541` (`needs-planner`). The picker takes `#514` once the live `#540` worker ends; `#537` and `#541` are skipped without stalling the others.
 - Rollback: restore the two `.bak-20261017-1540-pickstdout` files.
+
+## Merge-after entry `450:526:release` (18 Oct 2026, ~01:50 Oslo)
+
+- **Ruling (TD/GD on #450):** `ticket/450` may build, but nothing lands on main until the real-GPU A/B is done. #526 (closed) only built the A/B tooling. The A/B itself is a human step: two runs, p50 within +0.5 ms on the worse run.
+- **Entry:** `450:526:release` in `merge-after.conf` (backup `merge-after.conf.bak-1853`). A trailing `# comment` on the line is stripped by the parser, so it is safe.
+- **What happens:** #526 is closed, but the entry is a release entry and there is no marker, so a green #450 session is held at verify. Nothing is pushed or closed, `ticket/450` is kept in the loop clone (not on origin), the attempt is refunded, and the issue gets `on-hold`.
+  Stub-tested with the real `merge_hold`: no marker gives held (`on-hold` added, attempt 1 to 0, `state.merge_held["450"]` records `why: release`). With the marker it returns "goes ahead".
+- **Release:** once the GPU numbers are on #450, run `touch /workspace/claude-sessions/steampunk-loop/merge-release.d/450`. The next pick pass (`merge_release_sweep`) lifts `on-hold`, and the ticket is re-claimed once to rebase and re-run. That session then lands on main by the normal path.
+- **Real-GPU run:** the driver does not push a held branch. Push it by hand as a non-main branch, `git push origin ticket/450:refs/heads/ticket/450` (no force). CI only runs on pushes to `main`, so that push triggers nothing.
