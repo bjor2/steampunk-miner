@@ -51,6 +51,7 @@ import type { ItemDescriptionEntry } from '../systems/registries/itemDescription
 import type { OreLookProvider } from '../systems/registries/oreLook'
 import type { OrePickupProvider } from '../systems/registries/orePickup'
 import type { CellGateLookProvider } from '../systems/registries/cellGateLook'
+import type { KindLookProvider } from '../systems/registries/kindLook'
 import type { MagneticGroundProvider } from '../systems/registries/magneticGround'
 import type { PlanetCardLineSource } from '../systems/registries/planetCardLines'
 import type { PlanetSkyBandProvider } from '../systems/registries/planetSkyBand'
@@ -169,6 +170,8 @@ export interface SliceRegistrar {
   orePickup(provider: OrePickupProvider): void
   /** One provider across all slices: the gate each cell shows in the ground (ticket 298). */
   cellGateLook(provider: CellGateLookProvider): void
+  /** One provider across all slices: how a planet's material kinds look in the ground (ticket 450). */
+  kindLook(provider: KindLookProvider): void
   /** One provider across all slices: a magnetic planet's fields and electrified cells (#290). */
   magneticGround(provider: MagneticGroundProvider): void
   /** Whether a player's drill is shielded from an electrified cell's shock (#258 Q6, #290). */

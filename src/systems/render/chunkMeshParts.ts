@@ -50,6 +50,7 @@ export function buffersOfMeshParts({ batch, halo }: ChunkMeshParts): ArrayBuffer
     batch.oreColours.buffer,
     batch.styles.buffer,
     batch.gates.buffer,
+    batch.kinds.buffer,
     halo.buffer,
   ]
 }
