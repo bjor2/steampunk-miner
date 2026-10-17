@@ -57,7 +57,13 @@
  * its arc-flicker draws over whatever gate the cell shows, blue arcs striking across it a few times
  * a second, each at its own place, lighting the ore rather than covering it, in their own blue
  * rather than the act tint. With reduce motion one arc holds steady.
+ *
+ * An ore tile whose kind slot (`aKind`, ticket 450) the player has seen draws its species from the
+ * look table (`terrainKindShader.ts`): its own silhouette, pattern and hue, and its rarity's tint,
+ * frame and glow, in place of the family decal; its tier glow, sparkles and whisper rim stay. The
+ * lite program has no kind slot and always draws the family decal.
  */
+import { KIND_LOOK_UNIFORMS, kindLookFunctionsOf } from './terrainKindShader'
 
 export const TERRAIN_VERTEX_SHADER = /* glsl */ `
 attribute vec2 aTile;
@@ -65,6 +71,10 @@ attribute vec3 aBase;
 attribute vec4 aOre;
 attribute vec4 aStyle;
 attribute float aGate;
+#ifndef TERRAIN_LITE
+attribute float aKind;
+varying float vKind;
+#endif
 
 varying vec2 vLocal;
 varying vec2 vChunk;
@@ -87,6 +97,9 @@ void main() {
   vOre = aOre;
   vStyle = aStyle;
   vGate = aGate;
+#ifndef TERRAIN_LITE
+  vKind = aKind;
+#endif
   gl_Position = projectionMatrix * viewMatrix * world;
 }
 `
@@ -137,7 +150,7 @@ uniform float uGateStill;
 uniform vec2 uWorldOffset;
 uniform float uStrataOriginU[5];
 uniform float uStrataOriginV;
-
+${KIND_LOOK_UNIFORMS}
 varying vec2 vLocal;
 varying vec2 vChunk;
 varying vec2 vWorld;
@@ -146,6 +159,9 @@ varying vec3 vBase;
 varying vec4 vOre;
 varying vec4 vStyle;
 varying float vGate;
+#ifndef TERRAIN_LITE
+varying float vKind;
+#endif
 
 // sampleGrid: 4 samples per tile, a 129-sample halo, the contour at 128 of 255.
 const float SAMPLES_PER_TILE = 4.0;
@@ -243,6 +259,7 @@ float sparkles(vec2 local, vec2 tile, float count) {
   return light;
 }
 
+${kindLookFunctionsOf()}
 // The heat tiles cover 4 m; lava creeps along its tile slowly.
 const float HEAT_TILE_M = 4.0;
 const vec3 MOLTEN = vec3(1.0, 0.42, 0.08);
@@ -635,15 +652,30 @@ void main() {
     // The core: a slow emissive pulse rippling out from the centre.
     emissive += colour * 0.6 * (0.55 + 0.25 * sin(uTime * 1.7 - radius * 0.8));
   } else if (style > 0.5) {
-    float shape = vStyle.z < 1.5 ? flecks(vLocal, vTile) : shards(vLocal, vTile);
-    colour = mix(colour, vOre.rgb * max(shape, 0.65), step(0.01, shape));
+    // A seen species (ticket 450) draws its own look; anything else today's family decal.
+    vec4 kind = vec4(0.0);
+#ifndef TERRAIN_LITE
+    kind = kindLookOf(vKind);
+#endif
+    vec3 oreColour = vOre.rgb;
+    float shape = 0.0;
+    if (kind.x < 0.5) {
+      shape = vStyle.z < 1.5 ? flecks(vLocal, vTile) : shards(vLocal, vTile);
+      colour = mix(colour, vOre.rgb * max(shape, 0.65), step(0.01, shape));
+    }
+#ifndef TERRAIN_LITE
+    else {
+      oreColour = rgbOfPacked(kind.z);
+      shape = drawKindGrains(kind, vLocal, vTile, gateSoft, colour, emissive);
+    }
+#endif
     float halo = 1.0 - smoothstep(0.0, 0.7, length(vLocal - 0.5));
-    emissive += vOre.rgb * vOre.a * (0.35 * shape + 0.2 * halo);
+    emissive += oreColour * vOre.a * (0.35 * shape + 0.2 * halo);
     emissive += vec3(1.0, 0.97, 0.9) * sparkles(vLocal, vTile, vStyle.w);
     // ore_whisper: the tile's rim, within range of the vehicle and near the tunnel.
     float inRange = 1.0 - smoothstep(uWhisperRange - 2.0, uWhisperRange, distance(vWorld, uLampPosition));
     float rim = smoothstep(0.34, 0.5, max(abs(vLocal.x - 0.5), abs(vLocal.y - 0.5)));
-    emissive += vOre.rgb * uWhisper * vStyle.y * inRange * rim * (0.75 + 0.25 * sin(uTime * 3.0));
+    emissive += oreColour * uWhisper * vStyle.y * inRange * rim * (0.75 + 0.25 * sin(uTime * 3.0));
   }
 
   float gateBits = floor(vGate + 0.5);
