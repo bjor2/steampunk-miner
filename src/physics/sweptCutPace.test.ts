@@ -19,9 +19,10 @@ import type { VehicleController, VehicleStepResult } from './vehicleController'
 // the limiter is measured, not inferred. It runs on a fresh module graph with no slices registered
 // (a kernel spec never imports one), as `store/authorityReads.test.ts` does.
 // The per-report cut it compares against is pinned at 12 ticks, #514's kill-switch off (GD and VS
-// Q5 on #514): the gate keeps its meaning, and the shipped flag-off cadence (a report every tick
-// while the drill bites) is logged beside it. Finding recorded on #514: at that cadence flag-off
-// digs faster down than the swept cut at slow drills; the swept kernel is frozen and dark.
+// Q5 on #514): the gate keeps its meaning, and the flag-off cadence of a report every tick while the
+// drill bites (with the exact carry on, which it ships with, TD 6236464931) is logged beside it.
+// Finding recorded on #514: at that cadence flag-off digs faster down than the swept cut at slow
+// drills; the swept kernel is frozen and dark.
 
 /** Steps past the curve, as the TD's #316 runs: speedMax ~14, a tip that cuts at full efficiency. */
 const RIG_LEVELS = { drill_tip: 600, engine: 5000 } as const
@@ -41,11 +42,22 @@ const NEAR_BOUND = 0.98
 /** The longest the wheels may wait on the cut: the 5 Hz report interval (ticket 330). */
 const MAX_WAIT_TICKS = 12
 
-const SWEPT: DevFlags = { ...DEV_FLAGS, 'drill.sweptCut': true }
+/** A path: the client's flags and the authority's `drill.exactCarry`, which every tick needs. */
+interface Path {
+  flags: DevFlags
+  isExactCarry: boolean
+}
+const SWEPT: Path = { flags: { ...DEV_FLAGS, 'drill.sweptCut': true }, isExactCarry: false }
 /** The 5 Hz per-report cut this gate was written against: flag off, #514's kill-switch off. */
-const PER_REPORT_AT_12: DevFlags = { 'drill.sweptCut': false, 'drill.reportEveryTick': false }
-/** The shipped flag-off loop: a report every tick while the drill bites (ticket 514). */
-const PER_REPORT_SHIPPED: DevFlags = { ...DEV_FLAGS, 'drill.sweptCut': false }
+const PER_REPORT_AT_12: Path = {
+  flags: { 'drill.sweptCut': false, 'drill.reportEveryTick': false },
+  isExactCarry: false,
+}
+/** Flag off at a report every tick while the drill bites, as it ships with the exact carry (514). */
+const PER_REPORT_EVERY_TICK: Path = {
+  flags: { ...DEV_FLAGS, 'drill.sweptCut': false },
+  isExactCarry: true,
+}
 
 /**
  * What held the body back on a drilling tick (TD ruling on #330, VS pin 2): the sweep stopping short
@@ -84,7 +96,7 @@ interface Run {
   level: Leg
 }
 
-async function playAtDrill(drillPower: number, flags: DevFlags): Promise<Run> {
+async function playAtDrill(drillPower: number, { flags, isExactCarry }: Path): Promise<Run> {
   const isSwept = flags['drill.sweptCut']
   vi.resetModules()
   ;(await import('../registries/registrar')).loadSlices([])
@@ -97,60 +109,66 @@ async function playAtDrill(drillPower: number, flags: DevFlags): Promise<Run> {
   const { readAuthorityState } = await import('../store/authorityLink')
   const bounds = await import('../systems/authority/stepBoundRead')
   const { reportSpeedOfStepBound, stepBoundMmOf } = await import('../systems/vehicle/stepBound')
-  store.resetGameStore()
-  const log = { runId: 'run_test', sink: createMemorySink(), secondsSinceStart: () => 0 }
-  runLog.installRunLog(runLog.createRunLog(log))
-  const game = store.useGameStore.getState()
-  const levels = { ...RIG_LEVELS, drill_power: drillPower }
-  for (const [track, level] of Object.entries(levels)) game.setUpgrade(track, level)
-  const world = new RAPIER.World({ x: 0, y: 0, z: 0 })
-  world.timestep = PHYSICS_TIMESTEP
-  const start = store.readLocalVehicle().pose
-  if (start === null) throw new Error('the starting planet has no dock')
-  const watched = watchSteps(
-    createVehicleController(RAPIER, world, createVehicleBody(RAPIER, world, start)),
-  )
-  const loop = createVehicleLoop(flags)
-  const speedMaxMm = engineStatsAtStep(RIG_LEVELS.engine).speedMax * MM_PER_METRE
-  const hold = (intent: VehicleIntent, seconds: number, each?: (read: TickRead) => void) => {
-    for (let step = 0; step < Math.round(seconds / PHYSICS_TIMESTEP); step++) {
-      if (step % 60 === 0) store.useGameStore.getState().setEnergy('150')
-      const reportedPose = store.readLocalVehicle().pose
-      const playerId = store.useGameStore.getState().playerId
-      const stampAheadMm = bounds.sweptStampAheadMmAt(readAuthorityState(), playerId)
-      loop.step(watched.controller, intent)
-      watched.controller.stepWorld()
-      const cursor = store.readLocalVehicle().sweptCut
-      const tick = store.readAuthorityTick()
-      const isCutting = cursor?.tick === tick && cursor.cutGate === 1
-      const boundMm = stepBoundMmOf(bounds.stepBoundsAt(readAuthorityState(), playerId), isCutting)
-      const poseBoundMmPerSecond = isSwept
-        ? reportSpeedOfStepBound(boundMm)
-        : MAX_SPEED_MM_PER_SECOND
-      each?.({
-        result: watched.last(),
-        reportedPose,
-        cursor,
-        tick,
-        stampAheadMm,
-        poseBoundMmPerSecond,
-      })
+  const { withDrillExactCarry } = await import('../systems/authority/cutCarryFixtures')
+  return withDrillExactCarry(isExactCarry, () => {
+    store.resetGameStore()
+    const log = { runId: 'run_test', sink: createMemorySink(), secondsSinceStart: () => 0 }
+    runLog.installRunLog(runLog.createRunLog(log))
+    const game = store.useGameStore.getState()
+    const levels = { ...RIG_LEVELS, drill_power: drillPower }
+    for (const [track, level] of Object.entries(levels)) game.setUpgrade(track, level)
+    const world = new RAPIER.World({ x: 0, y: 0, z: 0 })
+    world.timestep = PHYSICS_TIMESTEP
+    const start = store.readLocalVehicle().pose
+    if (start === null) throw new Error('the starting planet has no dock')
+    const watched = watchSteps(
+      createVehicleController(RAPIER, world, createVehicleBody(RAPIER, world, start)),
+    )
+    const loop = createVehicleLoop(flags)
+    const speedMaxMm = engineStatsAtStep(RIG_LEVELS.engine).speedMax * MM_PER_METRE
+    const hold = (intent: VehicleIntent, seconds: number, each?: (read: TickRead) => void) => {
+      for (let step = 0; step < Math.round(seconds / PHYSICS_TIMESTEP); step++) {
+        if (step % 60 === 0) store.useGameStore.getState().setEnergy('150')
+        const reportedPose = store.readLocalVehicle().pose
+        const playerId = store.useGameStore.getState().playerId
+        const stampAheadMm = bounds.sweptStampAheadMmAt(readAuthorityState(), playerId)
+        loop.step(watched.controller, intent)
+        watched.controller.stepWorld()
+        const cursor = store.readLocalVehicle().sweptCut
+        const tick = store.readAuthorityTick()
+        const isCutting = cursor?.tick === tick && cursor.cutGate === 1
+        const boundMm = stepBoundMmOf(
+          bounds.stepBoundsAt(readAuthorityState(), playerId),
+          isCutting,
+        )
+        const poseBoundMmPerSecond = isSwept
+          ? reportSpeedOfStepBound(boundMm)
+          : MAX_SPEED_MM_PER_SECOND
+        each?.({
+          result: watched.last(),
+          reportedPose,
+          cursor,
+          tick,
+          stampAheadMm,
+          poseBoundMmPerSecond,
+        })
+      }
     }
-  }
-  const playLeg = (intent: VehicleIntent, along: () => number): Leg => {
-    hold(intent, STEADY_FROM_SECONDS)
-    const from = along()
-    const tally = createTally(isSwept, speedMaxMm)
-    hold(intent, SECONDS - STEADY_FROM_SECONDS, tally.note)
-    const rate = (along() - from) / (SECONDS - STEADY_FROM_SECONDS)
-    return { rate, limiters: tally.limiters, longestWaitTicks: tally.wait.longest }
-  }
-  // The Sell bay is the pad's west end (#170), so off the pad is to the left.
-  hold(buildIntent(['aim_left']), 2)
-  const down = playLeg(buildIntent(['aim_down']), () => -watched.controller.planetPosition().y)
-  const level = playLeg(buildIntent(['aim_left']), () => -watched.controller.planetPosition().x)
-  runLog.uninstallRunLog()
-  return { down, level }
+    const playLeg = (intent: VehicleIntent, along: () => number): Leg => {
+      hold(intent, STEADY_FROM_SECONDS)
+      const from = along()
+      const tally = createTally(isSwept, speedMaxMm)
+      hold(intent, SECONDS - STEADY_FROM_SECONDS, tally.note)
+      const rate = (along() - from) / (SECONDS - STEADY_FROM_SECONDS)
+      return { rate, limiters: tally.limiters, longestWaitTicks: tally.wait.longest }
+    }
+    // The Sell bay is the pad's west end (#170), so off the pad is to the left.
+    hold(buildIntent(['aim_left']), 2)
+    const down = playLeg(buildIntent(['aim_down']), () => -watched.controller.planetPosition().y)
+    const level = playLeg(buildIntent(['aim_left']), () => -watched.controller.planetPosition().x)
+    runLog.uninstallRunLog()
+    return { down, level }
+  })
 }
 
 /** The controller, with its last step's result kept for the spec to read. */
@@ -242,8 +260,8 @@ describe('swept cut in the live loop (ticket 330)', () => {
     async ({ drillPower, ticksPerCell }) => {
       const swept = await playAtDrill(drillPower, SWEPT)
       const reported = await playAtDrill(drillPower, PER_REPORT_AT_12)
-      const shipped = await playAtDrill(drillPower, PER_REPORT_SHIPPED)
-      const reportedEveryTick = { down: shipped.down.rate, level: shipped.level.rate }
+      const everyTick = await playAtDrill(drillPower, PER_REPORT_EVERY_TICK)
+      const reportedEveryTick = { down: everyTick.down.rate, level: everyTick.level.rate }
       const rates = JSON.stringify({ swept, reported, reportedEveryTick })
       console.log(`swept cut, ${ticksPerCell} ticks a cell: ${rates}`)
       expect(swept.down.rate).toBeGreaterThan(reported.down.rate)

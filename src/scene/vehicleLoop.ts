@@ -2,8 +2,9 @@
  * The live game's fixed step for the local vehicle (#3, #11): the authority's clock moves one
  * tick, the controller drives the body for that tick with the current intent, the step's actions
  * are counted, a pose report goes to the authority when one is due (with the drive the intent
- * pushes, ticket 279; every tick while the drill bites with `drill.sweptCut` off and the
- * `drill.reportEveryTick` kill-switch on, ticket 514), the drill's facing and activity go to the scene for the headlamp and
+ * pushes, ticket 279; every tick while the drill bites with `drill.sweptCut` off, the
+ * `drill.reportEveryTick` kill-switch on and the authority's `drill.exactCarry` on, ticket 514,
+ * read when the loop is made), the drill's facing and activity go to the scene for the headlamp and
  * sparks, the speed and lift to the sounds, and the tick's motion to the part animation (#48). After the tow or a planet change the body
  * is placed on the dock the authority put the vehicle on. A dock building may stage the vehicle
  * first (#170 auto-roll, `vehicleStage.ts`): the drawn car and the camera move, the body does not.

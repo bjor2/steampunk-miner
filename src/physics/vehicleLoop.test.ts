@@ -25,6 +25,7 @@ import { IDLE_INTENT, type VehicleIntent } from '../systems/vehicle/vehicleInten
 import { FACING } from '../systems/vehicle/vehiclePose'
 import { ENERGY_QUANTA_PER_TICK } from '../systems/vehicle/energyQuanta'
 import { replayRun } from '../systems/replay/replayRun'
+import { withDrillExactCarry } from '../systems/authority/cutCarryFixtures'
 import { surfaceRowOfColumn } from '../systems/world/tileGrid'
 import { createVehicleLoop } from '../scene/vehicleLoop'
 
@@ -33,7 +34,7 @@ import { createVehicleLoop } from '../scene/vehicleLoop'
 
 let sink: MemorySink
 
-/** The ticket-339 dig's end at the live cadence, with the render origin still and moved each tick. */
+/** The ticket-339 dig's end at every-tick reports, with the render origin still and moved each tick. */
 const STEADY_ORIGIN_RUN = { tiles: 19, xMm: -19808, yMm: 290614 }
 const MOVING_ORIGIN_RUN = { tiles: 20, xMm: -20105, yMm: 290825 }
 /** The known f32 noise between the two (TD v2 Q4 on #514): documentation, not the assertion. */
@@ -221,14 +222,26 @@ describe('vehicle loop', () => {
     expect(spent).toBeLessThanOrEqual(SWIVEL_TICKS * ENERGY_QUANTA_PER_TICK.thrust)
   })
 
-  // At the live cadence, a report every tick while the drill bites (#514). A rebase changes Rapier's
-  // f32 contact maths by about 1 mm/s from tick 55, on the pad before any drilling, and every-tick
-  // reports sample that into the cut, so the two runs part (TD v2 Q4 on #514): neither an intended
-  // faster body nor an origin bug. Each run asserts its own exact values, both deterministic, and
-  // the authority replays each run's command log to its live digest byte for byte.
-  it('drills on through a moved render origin, each run exact and replayed byte for byte (ticket 339)', () => {
-    const steady = digAndTunnel({})
-    const moving = digAndTunnel({ originReachMm: 0 })
+  it('drills on through a moved render origin as if it had never moved (ticket 339)', () => {
+    const steady = digAndTunnel({}, AS_SHIPPED)
+    const moving = digAndTunnel({ originReachMm: 0 }, AS_SHIPPED)
+    expect(steady.origins).toBe(1)
+    expect(moving.origins).toBeGreaterThan(1)
+    expect(steady.tiles.length).toBeGreaterThan(10)
+    expect(moving.tiles).toEqual(steady.tiles)
+    expect(Math.abs(moving.at.x - steady.at.x)).toBeLessThanOrEqual(0.001)
+    expect(Math.abs(moving.at.y - steady.at.y)).toBeLessThanOrEqual(0.001)
+  })
+
+  // At a report every tick while the drill bites (#514), which takes with the exact carry on (TD
+  // 6236464931). A rebase changes Rapier's f32 contact maths by about 1 mm/s from tick 55, on the
+  // pad before any drilling, and every-tick reports sample that into the cut, so the two runs part
+  // (TD v2 Q4 on #514): neither an intended faster body nor an origin bug. Each run asserts its own
+  // exact values, both deterministic, and the authority replays each run's command log to its live
+  // digest byte for byte.
+  it('drills on through a moved render origin at every-tick reports, each run exact and replayed byte for byte (ticket 339)', () => {
+    const steady = digAndTunnel({}, EVERY_TICK)
+    const moving = digAndTunnel({ originReachMm: 0 }, EVERY_TICK)
     expect(steady.origins).toBe(1)
     expect(moving.origins).toBeGreaterThan(1)
     expect(steady.reading).toEqual(STEADY_ORIGIN_RUN)
@@ -237,37 +250,54 @@ describe('vehicle loop', () => {
     expect(replayedDigestOf(moving)).toBe(moving.end.digest)
   })
 
-  it('keeps a moved render origin within the known f32 noise of a still one (ticket 339)', () => {
-    const steady = digAndTunnel({}).reading
-    const moving = digAndTunnel({ originReachMm: 0 }).reading
+  it('keeps a moved render origin within the known f32 noise of a still one at every-tick reports (ticket 339)', () => {
+    const steady = digAndTunnel({}, EVERY_TICK).reading
+    const moving = digAndTunnel({ originReachMm: 0 }, EVERY_TICK).reading
     const apartMm = Math.hypot(moving.xMm - steady.xMm, moving.yMm - steady.yMm)
     expect(apartMm).toBeLessThanOrEqual(ORIGIN_NOISE.mm)
     expect(Math.abs(moving.tiles - steady.tiles)).toBeLessThanOrEqual(ORIGIN_NOISE.tiles)
   })
 })
 
-/** The ticket-339 dig at the live cadence: off the pad, 5 s down, 4 s level. */
-function digAndTunnel(options: VehicleControllerOptions) {
+/** The authority's exact carry for a dig: off as the game ships, on for every-tick reports (#514). */
+interface DigSetting {
+  isExactCarry: boolean
+}
+const AS_SHIPPED: DigSetting = { isExactCarry: false }
+const EVERY_TICK: DigSetting = { isExactCarry: true }
+
+/** The ticket-339 dig: off the pad, 5 s down, 4 s level, with the exact carry as `setting` has it. */
+function digAndTunnel(options: VehicleControllerOptions, setting: DigSetting) {
+  return withDrillExactCarry(setting.isExactCarry, () => ({
+    setting,
+    ...playDigAndTunnel(options),
+  }))
+}
+
+function playDigAndTunnel(options: VehicleControllerOptions) {
   restartRun()
   const vehicle = createLiveVehicle(options)
   vehicle.hold(buildIntent(['aim_left']), 2)
   vehicle.hold(buildIntent(['aim_down']), 5)
   vehicle.hold(buildIntent(['aim_left']), 4)
   const at = vehicle.controller.planetPosition()
+  const tiles = destroyedTiles().map((event) => JSON.stringify(event.data))
   const reading = {
-    tiles: destroyedTiles().length,
+    tiles: tiles.length,
     xMm: Math.round(at.x * 1000),
     yMm: Math.round(at.y * 1000),
   }
   const commands = [...sink.commands]
-  return { reading, origins: vehicle.origins.size, commands, end: takeSessionSnapshot() }
+  return { reading, tiles, at, origins: vehicle.origins.size, commands, end: takeSessionSnapshot() }
 }
 
 function replayedDigestOf(run: ReturnType<typeof digAndTunnel>): string {
-  const replay = replayRun(useGameStore.getState().planetSeed, run.commands, {
-    playerIds: [useGameStore.getState().playerId],
-    endTick: run.end.tick,
-  })
+  const replay = withDrillExactCarry(run.setting.isExactCarry, () =>
+    replayRun(useGameStore.getState().planetSeed, run.commands, {
+      playerIds: [useGameStore.getState().playerId],
+      endTick: run.end.tick,
+    }),
+  )
   return replay.digests.at(-1)?.digest ?? ''
 }
 

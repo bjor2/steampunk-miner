@@ -6,8 +6,8 @@
  * - **swivel**: the drill head turns to the new facing (`SWIVEL_TICKS`, #7) before the drill engages;
  * - **stale facing**: the drill is engaged but the cut gate stays shut. Until ticket 506 the
  *   authority read the facing of the last pose report here (reports went out every
- *   `POSE_REPORT_INTERVAL_TICKS`, #11 amendment, and every tick while the drill bites since ticket
- *   514); `drillStep` now carries the head's facing, so this reads 0 unless something else holds
+ *   `POSE_REPORT_INTERVAL_TICKS`, #11 amendment, and every tick while the drill bites with the
+ *   exact carry on since ticket 514); `drillStep` now carries the head's facing, so this reads 0 unless something else holds
  *   the gate;
  * - **first cell**: the gate is open and the drill pays the cell before the face, which opens only
  *   once its whole price is paid (#399's carry);

@@ -148,7 +148,10 @@ interface Path {
 }
 
 // The @12 paths keep 12-tick reports with #514's kill-switch off; the @1 paths also forget the
-// last report each tick (above), so they report every tick as they did before #514.
+// last report each tick (above), so they report every tick as they did before #514. `main @1`, a
+// report every tick with the exact carry off, is unsafe and never ships: #514's scheduler reports
+// every tick only with `drill.exactCarry` on (VS 6236441275, TD 6236464931). Its rows are printed,
+// labelled so, and gate nothing of their own; A6's same-carve check reads them beside `exact @1`.
 const AT_12: DevFlags = { 'drill.sweptCut': false, 'drill.reportEveryTick': false }
 const AT_1: DevFlags = { 'drill.sweptCut': false, 'drill.reportEveryTick': true }
 const PATHS: Readonly<Record<string, Path>> = {
@@ -167,6 +170,10 @@ const EXACT_PATHS = ['exact @12', 'exact @1'] as const
 /** The path a leg is being played on: how its ticks feed the heat rule (`fedHeatTicksOf`). */
 let playedPath: Path = PATHS['exact @12']
 const MAIN_PATHS = ['main @12', 'main @1'] as const
+/** How a path's rows are printed: the never-shipped one says so (TD 6236464931 on #514). */
+const PATH_LABELS: Readonly<Record<string, string>> = {
+  'main @1': 'main @1 (unsafe, never shipped)',
+}
 
 /**
  * The planet-8 gauge against the law is red by design until the heat cap is decided (VS
@@ -746,7 +753,7 @@ function formatTable(rows: readonly LegReading[]): string {
     const bars = lawChargeBarsOf(row)
     return [
       row.rig,
-      row.path,
+      PATH_LABELS[row.path] ?? row.path,
       row.section,
       fixed(row.metres, 1),
       fixed(row.metresPerSecond, 2),
@@ -874,7 +881,7 @@ function logGaugeRatchet(rig: string, path: string, section: Section): void {
   for (const mainPath of MAIN_PATHS) {
     const ratchet = gaugeRatchetOf(leg, legOf(rig, mainPath, section))
     console.log(
-      `${rig} ${path} ${section} (printed, not gated): ${gaugeRatchetTextOf(ratchet, mainPath)}`,
+      `${rig} ${path} ${section} (printed, not gated): ${gaugeRatchetTextOf(ratchet, PATH_LABELS[mainPath] ?? mainPath)}`,
     )
   }
 }

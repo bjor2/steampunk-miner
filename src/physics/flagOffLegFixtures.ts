@@ -1,7 +1,8 @@
 /**
  * One flag-off leg of the live loop, read for #514's loop gates (Done-when 1, 2 and 9): a rig on
- * planet 1 at a chosen report cadence (`drill.reportEveryTick` on for a report every tick while the
- * drill bites, off for 12 ticks) leaves the pad, then drills down, or dives 12 m and drills level,
+ * planet 1 at a chosen report cadence (`drill.reportEveryTick` on, with the authority's
+ * `drill.exactCarry` that every tick needs and ships with, for a report every tick while the drill
+ * bites; both off for 12 ticks, as the game ships today) leaves the pad, then drills down, or dives 12 m and drills level,
  * for a set length, lined at casing grade 5 so a cave-in never ends it; then lets go. Per leg:
  * - the whole-leg mean speed and the cells it yielded a second, and its law work a metre
  *   (`digSpeedWindow.ts`);
@@ -18,6 +19,7 @@ import type { DevFlags } from '../constants/devFlags'
 import { PHYSICS_TIMESTEP } from '../constants/physics'
 import type { MemorySink } from '../logging/eventSink'
 import { submitCommand } from '../store/authorityLink'
+import { withDrillExactCarry } from '../systems/authority/cutCarryFixtures'
 import { readLocalVehicle, useGameStore } from '../store/gameStore'
 import { setCasingGradeCommand } from '../systems/authority/casingDebugCommands'
 import { heatThrottledDrill } from '../systems/authority/heatRules'
@@ -67,6 +69,14 @@ export function flagOffAt(interval: number): DevFlags {
 
 /** A fresh rig of `levels` plays one leg of `metres` at the cadence and lets go. */
 export function playFlagOffLeg(
+  rapier: typeof RAPIER,
+  sink: MemorySink,
+  leg: { levels: Record<string, number>; section: LegSection; interval: number; metres: number },
+): FlagOffLeg {
+  return withDrillExactCarry(leg.interval === 1, () => playLegAtCadence(rapier, sink, leg))
+}
+
+function playLegAtCadence(
   rapier: typeof RAPIER,
   sink: MemorySink,
   leg: { levels: Record<string, number>; section: LegSection; interval: number; metres: number },

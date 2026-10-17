@@ -1040,7 +1040,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/physics/sweptCutPaceWindow.lane.test.ts` | 3 | 3 |
 | `src/physics/sweptFreshCarveLoop.test.ts` | 3 | 3 |
 | `src/physics/tunnelling.test.ts` | 10 | 2 |
-| `src/physics/vehicleLoop.test.ts` | 11 | 11 |
+| `src/physics/vehicleLoop.test.ts` | 12 | 12 |
 | `src/physics/vehiclePhysics.test.ts` | 8 | 2 |
 
 ### `registries`
@@ -1436,7 +1436,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/vehicle/leadingSlab.test.ts` | 5 | 5 |
 | `src/systems/vehicle/motionEffects.test.ts` | 13 | 13 |
 | `src/systems/vehicle/motionGlide.test.ts` | 8 | 7 |
-| `src/systems/vehicle/poseReport.test.ts` | 16 | 16 |
+| `src/systems/vehicle/poseReport.test.ts` | 18 | 18 |
 | `src/systems/vehicle/returnReserve.test.ts` | 4 | 4 |
 | `src/systems/vehicle/stepBound.test.ts` | 10 | 10 |
 | `src/systems/vehicle/strutPlank.test.ts` | 4 | 4 |

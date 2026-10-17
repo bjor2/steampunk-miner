@@ -15,8 +15,11 @@
  *   steps in substeps at any speed, which stays one a tick at the 18 m/s clamp it keeps off.
  * - `drill.reportEveryTick` (ticket 514, TD shape on #441): with `drill.sweptCut` off, a pose report
  *   goes out every tick while the drill bites instead of every 12, removing the 5 Hz cut's hidden
- *   ceiling of about 5 m/s. Unlike the flags above it lands on: it is a kill-switch (HS on #514),
- *   and off it brings back the 12-tick cadence and the old behaviour. With `drill.sweptCut` on it
+ *   ceiling of about 5 m/s. Unlike the flags above it lands on: it is a kill-switch (HS on #514)
+ *   that can only turn the every-tick cadence off. It takes only with the authority's
+ *   `drill.exactCarry` on (below; VS 6236441275, TD 6236464931): a report every tick with the
+ *   exact carry off is the stopped #529 set-up, so flipping `drill.exactCarry` is the one switch
+ *   that turns it on, and until then the loop reports every 12 ticks. With `drill.sweptCut` on it
  *   reads nothing; the swept path keeps reports 12 ticks apart.
  */
 export interface DevFlags {
@@ -44,7 +47,8 @@ export const DEV_FLAGS: DevFlags = { 'drill.sweptCut': false, 'drill.reportEvery
  *   removed something in and heats for its client-counted drill ticks, as protocol 84 did, and
  *   every golden replays to protocol 84's digests; on, only the two goldens whose reports drill
  *   move their digests (`logging/exactCarryOnGolden.test.ts`). The lanes and the charge's specs
- *   switch it on for their runs.
+ *   switch it on for their runs. On, it also turns on the client's every-tick drill reports
+ *   (`drill.reportEveryTick` above, ticket 514).
  * - `drill.sweptLawCharge` (ticket 540, the TD seam 6234992964 as VS 6234998337 and the GD
  *   confirmed it, Systems' ruling 6231144515): the swept cut's `drillStep` is charged on the law
  *   work it removed with A6's rule and its energy carry (`LAW_SUB_STEP_CLOCK`), where it charged

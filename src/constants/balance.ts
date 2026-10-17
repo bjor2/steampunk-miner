@@ -148,7 +148,8 @@ export const POSE_REPORT_INTERVAL_TICKS = 12
  * While drill ticks wait to be reported (the drill bit since the last report) a report goes out
  * every tick (ticket 514, the TD shape on #441 6223171858): at 12 the body followed a 5 Hz cut, a
  * hidden ceiling of about 5 m/s that Bjor's no-cap rule forbids, and interval 2 missed interval 1's
- * speed by 8-11% on the fast rig. The authority's slack stays `POSE_REPORT_INTERVAL_TICKS`.
+ * speed by 8-11% on the fast rig. The authority's slack stays `POSE_REPORT_INTERVAL_TICKS`. It is
+ * used only while the authority charges the report cut exactly (`drill.exactCarry`, TD 6236464931).
  */
 export const DRILL_POSE_REPORT_INTERVAL_TICKS = 1
 

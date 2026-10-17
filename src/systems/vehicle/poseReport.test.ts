@@ -1,5 +1,10 @@
 import { describe, expect, it } from 'vitest'
-import { DEV_FLAGS } from '../../constants/devFlags'
+import {
+  AUTHORITY_DEV_FLAGS,
+  DEV_FLAGS,
+  type AuthorityDevFlags,
+  type DevFlags,
+} from '../../constants/devFlags'
 import { NO_DRIVE, type DriveSigns } from './driveSigns'
 import { FACING, isWithinZoneTestRange } from './vehiclePose'
 import {
@@ -19,8 +24,10 @@ const THRUSTING: ActionFlags = { isDriving: false, isThrusting: true, isDrilling
 const DRILLING: ActionFlags = { isDriving: true, isThrusting: false, isDrilling: true }
 const IDLE: ActionFlags = { isDriving: false, isThrusting: false, isDrilling: false }
 
-/** The shipped loop's drill interval: a report every tick on the flag-off path (ticket 514). */
-const SHIPPED_DRILL_INTERVAL = drillReportIntervalOf(DEV_FLAGS)
+/** The authority with the report cut charged exactly, which turns on every-tick reports (ticket 514). */
+const EXACT_CARRY_ON: AuthorityDevFlags = { ...AUTHORITY_DEV_FLAGS, 'drill.exactCarry': true }
+/** The loop's drill interval once `drill.exactCarry` flips: a report every tick on the flag-off path. */
+const EVERY_TICK_INTERVAL = drillReportIntervalOf(DEV_FLAGS, EXACT_CARRY_ON)
 
 /** Drives along x at 3 m/s for `ticks` fixed steps, collecting every report sent. */
 function driveAndReport(ticks: number, flags: ActionFlags = DRIVING, drive: DriveSigns = NO_DRIVE) {
@@ -32,7 +39,7 @@ function reportAlong(
   ticks: number,
   flagsAt: (tick: number) => ActionFlags,
   drive: DriveSigns = NO_DRIVE,
-  drillIntervalTicks = SHIPPED_DRILL_INTERVAL,
+  drillIntervalTicks = EVERY_TICK_INTERVAL,
 ) {
   let reporter: PoseReporter = createPoseReporter(drillIntervalTicks)
   const sent: { tick: number; payload: PosePayload }[] = []
@@ -46,6 +53,18 @@ function reportAlong(
     if (report.payload !== null) sent.push({ tick, payload: report.payload })
   }
   return Object.assign(sent, { pending: reporter.counts })
+}
+
+/** Every on/off combination of `flags`' switches, so a new flag is covered the day it lands. */
+function flagCombinationsOf<Flags extends DevFlags | AuthorityDevFlags>(flags: Flags): Flags[] {
+  return Object.keys(flags).reduce<Flags[]>(
+    (combinations, key) =>
+      combinations.flatMap((combination) => [
+        { ...combination, [key]: false },
+        { ...combination, [key]: true },
+      ]),
+    [flags],
+  )
 }
 
 describe('pose reports', () => {
@@ -91,19 +110,41 @@ describe('pose reports', () => {
     expect(after).toEqual([52, 64, 76, 88, 100, 112, 124, 136, 148])
   })
 
-  it('report every drill tick on the flag-off path only, by default', () => {
-    expect(drillReportIntervalOf(DEV_FLAGS)).toBe(1)
-    expect(drillReportIntervalOf({ ...DEV_FLAGS, 'drill.sweptCut': true })).toBe(12)
+  it('keep 12 ticks apart while drilling as the game ships, with the exact carry off', () => {
+    expect(AUTHORITY_DEV_FLAGS['drill.exactCarry']).toBe(false)
+    const shipped = drillReportIntervalOf(DEV_FLAGS)
+    expect(shipped).toBe(12)
+    const ticks = reportAlong(120, () => DRILLING, NO_DRIVE, shipped).map(({ tick }) => tick)
+    expect(ticks).toEqual([1, 13, 25, 37, 49, 61, 73, 85, 97, 109])
+  })
+
+  it('never report every drill tick with the exact carry off, whatever the other flags', () => {
+    const exactCarryOff = flagCombinationsOf(AUTHORITY_DEV_FLAGS).filter(
+      (authority) => !authority['drill.exactCarry'],
+    )
+    for (const flags of flagCombinationsOf(DEV_FLAGS)) {
+      for (const authority of exactCarryOff) {
+        expect(drillReportIntervalOf(flags, authority)).toBe(12)
+      }
+    }
+  })
+
+  it('report every drill tick on the flag-off path only, once the exact carry is on', () => {
+    expect(drillReportIntervalOf(DEV_FLAGS, EXACT_CARRY_ON)).toBe(1)
+    expect(drillReportIntervalOf({ ...DEV_FLAGS, 'drill.sweptCut': true }, EXACT_CARRY_ON)).toBe(12)
   })
 
   it('keep 12 ticks apart while drilling with the kill-switch off, as before ticket 514', () => {
-    const killed = drillReportIntervalOf({ ...DEV_FLAGS, 'drill.reportEveryTick': false })
+    const killed = drillReportIntervalOf(
+      { ...DEV_FLAGS, 'drill.reportEveryTick': false },
+      EXACT_CARRY_ON,
+    )
     const ticks = reportAlong(120, () => DRILLING, NO_DRIVE, killed).map(({ tick }) => tick)
     expect(ticks).toEqual([1, 13, 25, 37, 49, 61, 73, 85, 97, 109])
   })
 
   it('keep 12 ticks apart while drilling with the swept cut on', () => {
-    const swept = drillReportIntervalOf({ ...DEV_FLAGS, 'drill.sweptCut': true })
+    const swept = drillReportIntervalOf({ ...DEV_FLAGS, 'drill.sweptCut': true }, EXACT_CARRY_ON)
     const ticks = reportAlong(120, () => DRILLING, NO_DRIVE, swept).map(({ tick }) => tick)
     expect(ticks).toEqual([1, 13, 25, 37, 49, 61, 73, 85, 97, 109])
   })

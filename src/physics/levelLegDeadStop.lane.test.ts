@@ -8,6 +8,7 @@ import { createRunLog, installRunLog, uninstallRunLog } from '../logging/runLog'
 import { readAuthorityState, submitCommand } from '../store/authorityLink'
 import { readLocalVehicle, useGameStore } from '../store/gameStore'
 import { setCasingGradeCommand } from '../systems/authority/casingDebugCommands'
+import { withDrillExactCarry } from '../systems/authority/cutCarryFixtures'
 import { planetParamsOf } from '../systems/authority/planetOfState'
 import { onCurveSteps } from '../systems/economy/vehicleStats'
 import { buildIntent } from '../systems/input/buildIntent'
@@ -21,7 +22,8 @@ import { createRig, type Rig } from './cutFollowFixtures'
 // of its evidence): with `drill.sweptCut` off, as the player plays, each stored rig leaves the pad,
 // dives 12 m and drives level west for 250 m through the real loop and Rapier body, reporting every
 // 12 ticks while drilling (#514's kill-switch `drill.reportEveryTick` off) and every tick (the
-// shipped scheduler, `DRILL_POSE_REPORT_INTERVAL_TICKS`; #514 Done-when 11b). On `drillContactOf` 7 of
+// real scheduler, `DRILL_POSE_REPORT_INTERVAL_TICKS`, with the authority's `drill.exactCarry` on,
+// which every tick takes with, TD 6236464931; #514 Done-when 11b). On `drillContactOf` 7 of
 // the 8 legs stuck (stored 200 at 12 ticks at 50 m here, 77.8 m in the TD's rig): the body rested
 // on a sliver of ground the stamp could still cut, outside its full-weight core and past the
 // face's reach, and the drill did not bite. `levelSliverDrillContactOf` bites there on a level
@@ -54,7 +56,7 @@ const RIGS: Readonly<Record<string, Record<string, number>>> = {
   'stored 200': { drill_power: P200.drill_power, drill_tip: P200.drill_tip, ...RIG_SAFETY },
 }
 const REPORT_INTERVALS = [12, 1] as const
-/** Flag off at each report interval: 1 is the shipped default, 12 the kill-switch off (#514). */
+/** Flag off at each report interval: 1 once `drill.exactCarry` flips, 12 the kill-switch off (#514). */
 const FLAG_OFF_AT: Readonly<Record<number, DevFlags>> = {
   12: { 'drill.sweptCut': false, 'drill.reportEveryTick': false },
   1: { 'drill.sweptCut': false, 'drill.reportEveryTick': true },
@@ -122,6 +124,10 @@ afterAll(() => {
 
 /** A fresh rig leaves the pad, dives 12 m, then drives level west for up to 250 m. */
 function runLevelLeg(rig: string, reportInterval: number): LegRun {
+  return withCadenceCarry(reportInterval, () => playLevelLeg(rig, reportInterval))
+}
+
+function playLevelLeg(rig: string, reportInterval: number): LegRun {
   const play = createPlay(rig, reportInterval)
   play.rig.hold(buildIntent(['aim_left']), ticksOf(2))
   holdLeg(play.rig, buildIntent(['aim_down']), DIVE_M, ticksOf(120), play.position())
@@ -130,11 +136,20 @@ function runLevelLeg(rig: string, reportInterval: number): LegRun {
 
 /** A fresh rig leaves the pad and drills down for up to 80 m, its casing grade 5. */
 function runDownLeg(rig: string, reportInterval: number): LegRun {
+  return withCadenceCarry(reportInterval, () => playDownLeg(rig, reportInterval))
+}
+
+function playDownLeg(rig: string, reportInterval: number): LegRun {
   const play = createPlay(rig, reportInterval)
   submitCommand(useGameStore.getState().playerId, setCasingGradeCommand(DOWN_CASING_GRADE))
   play.rig.hold(buildIntent(['aim_left']), ticksOf(2))
   play.rig.hold(buildIntent([]), HOLD_CHUNK_TICKS)
   return play.measure('down', buildIntent(['aim_down']), DOWN_M)
+}
+
+/** Runs `play` with the authority's exact carry on at a report every tick, which needs it (#514). */
+function withCadenceCarry<T>(reportInterval: number, play: () => T): T {
+  return withDrillExactCarry(reportInterval === 1, play)
 }
 
 /** A flag-off rig at 60 frames/s, reporting at `reportInterval`, and the measure of one leg. */

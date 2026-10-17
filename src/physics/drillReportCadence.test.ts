@@ -7,6 +7,7 @@ import { createMemorySink, type MemorySink } from '../logging/eventSink'
 import { createRunLog, installRunLog, uninstallRunLog } from '../logging/runLog'
 import { takeSessionSnapshot } from '../store/gameStore'
 import type { AuthorityCommand } from '../systems/authority/authorityCommand'
+import { withDrillExactCarry } from '../systems/authority/cutCarryFixtures'
 import { buildIntent } from '../systems/input/buildIntent'
 import { createRig } from './cutFollowFixtures'
 
@@ -15,7 +16,9 @@ import { createRig } from './cutFollowFixtures'
 // frames at 30, 60 and 144 a second sends the same commands, ends on the same authority digest
 // and leaves the body in the same place; the authority refuses none of its reports; and its
 // `commands.ndjson`, run-coded as the run log writes it (#522), stays under the Vertical Scaler's
-// 8 KB a second while drilling (TD 6224892444 on #514).
+// 8 KB a second while drilling (TD 6224892444 on #514). Every tick only takes with the authority's
+// `drill.exactCarry` on (TD 6236464931), so both settings play: as the game ships (exact carry
+// off, a report every 12 ticks) and as it ships once the exact carry flips (every tick).
 
 const FRAME_RATES = [30, 60, 144]
 const DRILLING_SECONDS = 8
@@ -30,8 +33,18 @@ beforeAll(async () => {
 
 afterEach(() => uninstallRunLog())
 
-/** Off the pad, 4 s down and 4 s west, flag off at the shipped cadence, under `framesPerSecond`. */
-function digAt(framesPerSecond: number) {
+/** The two settings: the game as it ships, and with `drill.exactCarry` flipped on. */
+const SETTINGS = [
+  { setting: 'as shipped, every 12 ticks', isExactCarry: false, reportsAtLeast: 40 },
+  { setting: 'with the exact carry on, every tick', isExactCarry: true, reportsAtLeast: 300 },
+]
+
+/** Off the pad, 4 s down and 4 s west, flag off, under `framesPerSecond`, the exact carry as given. */
+function digAt(framesPerSecond: number, isExactCarry: boolean) {
+  return withDrillExactCarry(isExactCarry, () => digFlagOffAt(framesPerSecond))
+}
+
+function digFlagOffAt(framesPerSecond: number) {
   sink = createMemorySink()
   installRunLog(createRunLog({ runId: 'run_test', sink, secondsSinceStart: () => 0 }))
   const rig = createRig(RAPIER, RIG, framesPerSecond, DEV_FLAGS)
@@ -54,24 +67,27 @@ function commandLogBytesOf(commands: readonly AuthorityCommand[]): number {
   return loggedCommandsOf(commands).reduce((sum, line) => sum + JSON.stringify(line).length + 1, 0)
 }
 
-describe('the flag-off drill at a report every tick (#514)', () => {
-  it('sends the same commands, digest and position at 30, 60 and 144 frames a second', () => {
-    const [first, ...others] = FRAME_RATES.map(digAt)
-    expect(first.reports).toBeGreaterThan(300)
-    for (const other of others) {
-      expect(other.commands).toBe(first.commands)
-      expect(other.digest).toBe(first.digest)
-      expect(other.position).toEqual(first.position)
-    }
-  })
+describe.each(SETTINGS)(
+  'the flag-off drill $setting (#514)',
+  ({ isExactCarry, reportsAtLeast }) => {
+    it('sends the same commands, digest and position at 30, 60 and 144 frames a second', () => {
+      const [first, ...others] = FRAME_RATES.map((rate) => digAt(rate, isExactCarry))
+      expect(first.reports).toBeGreaterThan(reportsAtLeast)
+      for (const other of others) {
+        expect(other.commands).toBe(first.commands)
+        expect(other.digest).toBe(first.digest)
+        expect(other.position).toEqual(first.position)
+      }
+    })
 
-  it('has none of its reports refused', () => {
-    expect(digAt(60).rejected).toEqual([])
-  })
+    it('has none of its reports refused', () => {
+      expect(digAt(60, isExactCarry).rejected).toEqual([])
+    })
 
-  it('logs at most 8 KB of commands a second while drilling', () => {
-    const bytesPerSecond = digAt(60).drillingBytes / DRILLING_SECONDS
-    console.log(`commands.ndjson while drilling: ${(bytesPerSecond / 1024).toFixed(2)} KB/s`)
-    expect(bytesPerSecond).toBeLessThanOrEqual(COMMAND_BYTES_PER_SECOND_MAX)
-  })
-})
+    it('logs at most 8 KB of commands a second while drilling', () => {
+      const bytesPerSecond = digAt(60, isExactCarry).drillingBytes / DRILLING_SECONDS
+      console.log(`commands.ndjson while drilling: ${(bytesPerSecond / 1024).toFixed(2)} KB/s`)
+      expect(bytesPerSecond).toBeLessThanOrEqual(COMMAND_BYTES_PER_SECOND_MAX)
+    })
+  },
+)

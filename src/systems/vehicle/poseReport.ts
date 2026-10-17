@@ -3,15 +3,19 @@
  * integer mm, mm/s and a 1024-scaled up vector before the command is built, so the authority and
  * `commands.ndjson` hold integers only. Action tick counts add up every fixed step between
  * reports; a report goes out at most every 12 ticks (5 per second), or at the reporter's drill
- * interval while drill ticks wait to be reported (ticket 514: every tick on the flag-off path), and
- * never repeats an identical pose with all-zero counts. The drive pushed at the report rides along
+ * interval while drill ticks wait to be reported (ticket 514: every tick on the flag-off path once
+ * the authority charges the report cut exactly, `drill.exactCarry`), and never repeats an identical pose with all-zero counts. The drive pushed at the report rides along
  * as signs (ticket 279).
  */
 import {
   DRILL_POSE_REPORT_INTERVAL_TICKS,
   POSE_REPORT_INTERVAL_TICKS,
 } from '../../constants/balance'
-import type { DevFlags } from '../../constants/devFlags'
+import {
+  AUTHORITY_DEV_FLAGS,
+  type AuthorityDevFlags,
+  type DevFlags,
+} from '../../constants/devFlags'
 import { MM_PER_METRE, UP_VECTOR_SCALE } from '../../constants/physics'
 import type { CommandPayloads } from '../authority/authorityCommand'
 import type { Vector2 } from './localFrame'
@@ -53,17 +57,26 @@ export function restartPoseReporter(reporter: PoseReporter): PoseReporter {
 }
 
 /**
- * The drill interval the loop's flags give (ticket 514): every tick on the flag-off path, unless
- * the kill-switch `drill.reportEveryTick` is off; the swept path keeps 12, byte-identical (Q6).
+ * The drill interval the loop's flags give (ticket 514): every tick on the flag-off path, only
+ * while the authority's `drill.exactCarry` is on and the kill-switch `drill.reportEveryTick` is
+ * not off; else 12, and the swept path keeps 12, byte-identical (Q6). A report every tick with
+ * the exact carry off pays 0.853 of the law at 25 m/s and 1.300 at 44 m/s (VS 6236441275, the
+ * stopped #529 set-up), so the two go live together and flipping `drill.exactCarry` is the one
+ * switch (TD 6236464931). The authority's flags are read at call time, as `reportedDrill.ts`
+ * reads them.
  */
-export function drillReportIntervalOf(flags: DevFlags): number {
-  return isReportedEveryDrillTick(flags)
+export function drillReportIntervalOf(
+  flags: DevFlags,
+  authorityFlags: AuthorityDevFlags = AUTHORITY_DEV_FLAGS,
+): number {
+  return isReportedEveryDrillTick(flags, authorityFlags)
     ? DRILL_POSE_REPORT_INTERVAL_TICKS
     : POSE_REPORT_INTERVAL_TICKS
 }
 
-function isReportedEveryDrillTick(flags: DevFlags): boolean {
-  return flags['drill.reportEveryTick'] && !flags['drill.sweptCut']
+function isReportedEveryDrillTick(flags: DevFlags, authorityFlags: AuthorityDevFlags): boolean {
+  const isClientOn = flags['drill.reportEveryTick'] && !flags['drill.sweptCut']
+  return isClientOn && authorityFlags['drill.exactCarry']
 }
 
 export function quantisePose(

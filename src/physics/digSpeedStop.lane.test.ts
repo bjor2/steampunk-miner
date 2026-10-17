@@ -8,6 +8,7 @@ import { createRunLog, installRunLog, uninstallRunLog } from '../logging/runLog'
 import { submitCommand } from '../store/authorityLink'
 import { useGameStore } from '../store/gameStore'
 import { setCasingGradeCommand } from '../systems/authority/casingDebugCommands'
+import { withDrillExactCarry } from '../systems/authority/cutCarryFixtures'
 import { lawChargeBarsOf, lawChargeTextOf } from '../systems/authority/lawChargeBars'
 import {
   barVerdictsOf,
@@ -25,7 +26,8 @@ import { openDigSpeedWindow, type DigSpeedSums } from './digSpeedWindow'
 // 6226435006 and the TD's v2 ruling 6226459471; energy and heat per unit of law work, VS on A5
 // 6226528512) at a report every tick on the flag-off path against the swept law-exact path at the
 // same rig and ground, down and level, in the real loop and Rapier body:
-// - logged, bar 4 (1a, charged per unit of law work): the shipped charge (`drill.exactCarry` off
+// - logged, bar 4 (1a, charged per unit of law work): the charge a report every tick ships with
+//   (`drill.exactCarry` on: every tick takes only with it, TD 6236464931; both stay off for Bjor
 //   until #541) against the analytic law value (`lawChargeBars.ts`) and against swept. The gate
 //   is A6's: VS ruled the reference on #535 (6230602042, recorded by the GD 6230602177) the law,
 //   never swept's own charge, which pays 0.62 to 1.74 times the law by its geometry (#540), and
@@ -67,10 +69,23 @@ const RIGS: Readonly<Record<string, LoopRig>> = {
     readMetres: { down: 70, level: 250 },
   },
 }
-const PATHS: Readonly<Record<string, DevFlags>> = {
-  swept: { ...DEV_FLAGS, 'drill.sweptCut': true },
-  'every tick': { 'drill.sweptCut': false, 'drill.reportEveryTick': true },
-  'every 12': { 'drill.sweptCut': false, 'drill.reportEveryTick': false },
+/** A path: the client's flags and the authority's `drill.exactCarry`. */
+interface Path {
+  flags: DevFlags
+  isExactCarry: boolean
+}
+// Every tick takes only with the exact carry on and ships with it (TD 6236464931); every 12 is the
+// game as it ships today, the exact carry off.
+const PATHS: Readonly<Record<string, Path>> = {
+  swept: { flags: { ...DEV_FLAGS, 'drill.sweptCut': true }, isExactCarry: false },
+  'every tick': {
+    flags: { 'drill.sweptCut': false, 'drill.reportEveryTick': true },
+    isExactCarry: true,
+  },
+  'every 12': {
+    flags: { 'drill.sweptCut': false, 'drill.reportEveryTick': false },
+    isExactCarry: false,
+  },
 }
 const FRAMES_PER_SECOND = 60
 /** Each leg leaves this much behind it before its read starts: the turn and the first bite. */
@@ -124,8 +139,12 @@ afterAll(() => {
 
 /** A fresh rig on `path` leaves the pad, then plays and reads a leg down and a leg level. */
 function playPath(rigName: string, path: string): LegReading[] {
+  return withDrillExactCarry(PATHS[path].isExactCarry, () => playLegsOnPath(rigName, path))
+}
+
+function playLegsOnPath(rigName: string, path: string): LegReading[] {
   const loopRig = RIGS[rigName]
-  const rig = createRig(RAPIER, loopRig.levels, FRAMES_PER_SECOND, PATHS[path])
+  const rig = createRig(RAPIER, loopRig.levels, FRAMES_PER_SECOND, PATHS[path].flags)
   submitCommand(useGameStore.getState().playerId, setCasingGradeCommand(CASING_GRADE))
   rig.hold(buildIntent(['aim_left']), Math.round(2 / PHYSICS_TIMESTEP))
   const at = { rigName, path, loopRig }
@@ -247,7 +266,7 @@ describe('dig speed at a report every tick against the swept law-exact path (#51
         expect(legOf(rig, 'every tick', section).metres).toBeGreaterThan(0)
       })
 
-      it(`logs the shipped charge against the law and swept, ${rig} ${section} (bar 4)`, () => {
+      it(`logs the every-tick charge against the law and swept, ${rig} ${section} (bar 4)`, () => {
         const { message } = verdictsOf(rig, section)
         const bars = lawChargeBarsOf(chargeReadOf(legOf(rig, 'every tick', section)))
         console.log(
