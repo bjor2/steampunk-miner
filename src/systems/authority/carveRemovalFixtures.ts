@@ -7,7 +7,7 @@
  * applied against attempted the clamp (ground already gone or the level floor).
  *
  * Read inside the carve's walk once it has run (`walkingWithRemoval`), so each sample's drill
- * time is the one the carve worked out (its session's cache, keyed as `drillTicksOfSample` keys
+ * time is the one the carve worked out (its session's cache, keyed as `cellTimesOfSample` keys
  * it) and no gate is asked twice. A rim-dwell window (the swept cut's) charges by dwell, not this
  * formula, so it is refused. Test support; it reads, never writes.
  */
@@ -90,7 +90,7 @@ function walkedRemovalOf(
 function carvedDrillTicksOf(ground: WalkedGround, sample: WeightedSample): number | null {
   const tile = tileOfSample(sample)
   const grade = effectiveCasingGrade(casingGradeOf(ground.before, sample))
-  return ground.carved.drillTicks.get(`${tile.tx},${tile.ty}#${grade}`) ?? null
+  return ground.carved.cellTimes.get(`${tile.tx},${tile.ty}#${grade}`)?.ticks ?? null
 }
 
 function sampleRemovalOf(

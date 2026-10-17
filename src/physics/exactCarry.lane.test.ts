@@ -147,12 +147,20 @@ interface Path {
   isEveryTick: boolean
 }
 
+// The @12 paths keep 12-tick reports with #514's kill-switch off; the @1 paths also forget the
+// last report each tick (above), so they report every tick as they did before #514.
+const AT_12: DevFlags = { 'drill.sweptCut': false, 'drill.reportEveryTick': false }
+const AT_1: DevFlags = { 'drill.sweptCut': false, 'drill.reportEveryTick': true }
 const PATHS: Readonly<Record<string, Path>> = {
-  swept: { flags: { 'drill.sweptCut': true }, isExactCarry: true, isEveryTick: false },
-  'exact @12': { flags: { 'drill.sweptCut': false }, isExactCarry: true, isEveryTick: false },
-  'exact @1': { flags: { 'drill.sweptCut': false }, isExactCarry: true, isEveryTick: true },
-  'main @12': { flags: { 'drill.sweptCut': false }, isExactCarry: false, isEveryTick: false },
-  'main @1': { flags: { 'drill.sweptCut': false }, isExactCarry: false, isEveryTick: true },
+  swept: {
+    flags: { 'drill.sweptCut': true, 'drill.reportEveryTick': false },
+    isExactCarry: true,
+    isEveryTick: false,
+  },
+  'exact @12': { flags: AT_12, isExactCarry: true, isEveryTick: false },
+  'exact @1': { flags: AT_1, isExactCarry: true, isEveryTick: true },
+  'main @12': { flags: AT_12, isExactCarry: false, isEveryTick: false },
+  'main @1': { flags: AT_1, isExactCarry: false, isEveryTick: true },
 }
 const EXACT_PATHS = ['exact @12', 'exact @1'] as const
 

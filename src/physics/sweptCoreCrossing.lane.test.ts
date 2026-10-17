@@ -2,6 +2,7 @@ import RAPIER from '@dimforge/rapier3d-compat'
 import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it } from 'vitest'
 import { STEP_BOUND_TOLERANCE_MM } from '../constants/balance'
 import { MM_PER_METRE, PHYSICS_TIMESTEP, TICKS_PER_SECOND } from '../constants/physics'
+import { DEV_FLAGS, type DevFlags } from '../constants/devFlags'
 import { createMemorySink } from '../logging/eventSink'
 import { createRunLog, installRunLog, uninstallRunLog } from '../logging/runLog'
 import { readAuthorityState, submitCommand } from '../store/authorityLink'
@@ -44,7 +45,7 @@ const RIG = {
   hull: 5000,
   cargo_hold: 5000,
 }
-const SWEPT_CUT_ON = { 'drill.sweptCut': true } as const
+const SWEPT_CUT_ON: DevFlags = { ...DEV_FLAGS, 'drill.sweptCut': true }
 const FRAME_RATES = [30, 144]
 const LEAVE_PAD_TICKS = Math.round(2 / PHYSICS_TIMESTEP)
 /** Lining strong enough that a cave-in never crushes the rig (#514's loop lanes). */
