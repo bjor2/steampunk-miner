@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "updated_at": "2026-10-17T08:46:38Z",
+  "updated_at": "2026-10-17T08:47:04Z",
   "entries": {
     "steampunk-loop/1": {
       "loop": "steampunk-loop",
@@ -501,9 +501,9 @@
       "slot": null,
       "state": "working",
       "issue": null,
-      "note": "testing spec #309 (Spec: Planet-1 ground weapon (penetrating shot, collapse without casing, visible casing)) on e8f104f",
+      "note": "testing spec #257 (Grilling: What positive effect justifies the twin-bit head?) on 4387332",
       "stale_after_min": 420,
-      "updated_at": "2026-10-17T04:21:21Z",
+      "updated_at": "2026-10-17T08:47:04Z",
       "host": "grok-bot-vm-452660841"
     },
     "steampunk-loop/10": {
