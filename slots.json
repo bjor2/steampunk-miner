@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-10-17T22:31:47+01:00",
+  "updated_at": "2026-10-17T22:45:01+01:00",
   "caps": {
     "grok": 12,
     "claude": 10,
@@ -639,7 +639,7 @@
         "map": 316,
         "lane": "remote",
         "mode": "solo",
-        "state": "paused",
+        "state": "ready",
         "tickets": [
           537,
           541,
@@ -659,7 +659,9 @@
           448,
           453
         ],
-        "done": [],
+        "done": [
+          448
+        ],
         "live": 1
       },
       {
