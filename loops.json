@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "updated_at": "2026-10-17T18:16:45Z",
+  "updated_at": "2026-10-17T18:17:52Z",
   "entries": {
     "steampunk-loop/1": {
       "loop": "steampunk-loop",
@@ -8,7 +8,7 @@
       "state": "working",
       "issue": 448,
       "note": "started 2026-10-17 17:09 BST",
-      "updated_at": "2026-10-17T18:16:45Z",
+      "updated_at": "2026-10-17T18:17:52Z",
       "host": "grok-bot-vm-452660841"
     },
     "steampunk-loop/2": {
@@ -17,7 +17,7 @@
       "state": "working",
       "issue": 449,
       "note": "started 2026-10-17 17:09 BST",
-      "updated_at": "2026-10-17T18:16:45Z",
+      "updated_at": "2026-10-17T18:17:52Z",
       "host": "grok-bot-vm-452660841"
     },
     "steampunk-loop/3": {
@@ -26,7 +26,7 @@
       "state": "working",
       "issue": 542,
       "note": "started 2026-10-17 18:16 BST",
-      "updated_at": "2026-10-17T18:16:45Z",
+      "updated_at": "2026-10-17T18:17:52Z",
       "host": "grok-bot-vm-452660841"
     },
     "steampunk-loop/4": {
@@ -35,7 +35,7 @@
       "state": "idle",
       "issue": null,
       "note": "free",
-      "updated_at": "2026-10-17T18:16:45Z",
+      "updated_at": "2026-10-17T18:17:52Z",
       "host": "grok-bot-vm-452660841"
     },
     "steampunk-loop": {
@@ -43,9 +43,9 @@
       "slot": null,
       "state": "working",
       "issue": null,
-      "note": "3/10 Claude slots busy, 0/4 planner slots; status check",
+      "note": "4/10 Claude slots busy, 0/4 planner slots; spawned 1 worker(s); delegated 0 spec(s); planner slots 0/4",
       "extra": {
-        "active": 3,
+        "active": 4,
         "max": 10,
         "max_attempts": 2,
         "attempts": {
@@ -465,7 +465,7 @@
         "planner": [],
         "push_pending": null
       },
-      "updated_at": "2026-10-17T18:16:45Z",
+      "updated_at": "2026-10-17T18:17:52Z",
       "host": "grok-bot-vm-452660841"
     },
     "perf-loop": {
@@ -483,7 +483,7 @@
       "state": "idle",
       "issue": null,
       "note": "free",
-      "updated_at": "2026-10-17T18:16:45Z",
+      "updated_at": "2026-10-17T18:17:52Z",
       "host": "grok-bot-vm-452660841"
     },
     "steampunk-loop/6": {
@@ -492,16 +492,16 @@
       "state": "idle",
       "issue": null,
       "note": "free",
-      "updated_at": "2026-10-17T18:16:45Z",
+      "updated_at": "2026-10-17T18:17:52Z",
       "host": "grok-bot-vm-452660841"
     },
     "steampunk-loop/7": {
       "loop": "steampunk-loop",
       "slot": "7",
-      "state": "idle",
-      "issue": null,
-      "note": "free",
-      "updated_at": "2026-10-17T18:16:45Z",
+      "state": "working",
+      "issue": 537,
+      "note": "started 2026-10-17 19:17 BST",
+      "updated_at": "2026-10-17T18:17:52Z",
       "host": "grok-bot-vm-452660841"
     },
     "steampunk-loop/8": {
@@ -510,7 +510,7 @@
       "state": "idle",
       "issue": null,
       "note": "free",
-      "updated_at": "2026-10-17T18:16:45Z",
+      "updated_at": "2026-10-17T18:17:52Z",
       "host": "grok-bot-vm-452660841"
     },
     "tester": {
@@ -529,7 +529,7 @@
       "state": "idle",
       "issue": null,
       "note": "free",
-      "updated_at": "2026-10-17T18:16:45Z",
+      "updated_at": "2026-10-17T18:17:52Z",
       "host": "grok-bot-vm-452660841"
     },
     "steampunk-loop/11": {
@@ -556,11 +556,18 @@
       "state": "idle",
       "issue": null,
       "note": "free",
-      "updated_at": "2026-10-17T18:16:45Z",
+      "updated_at": "2026-10-17T18:17:52Z",
       "host": "grok-bot-vm-452660841"
     }
   },
   "events": [
+    {
+      "at": "2026-10-17T18:17:52Z",
+      "key": "steampunk-loop/7",
+      "state": "working",
+      "issue": 537,
+      "note": "started 2026-10-17 19:17 BST"
+    },
     {
       "at": "2026-10-17T17:47:39Z",
       "key": "steampunk-loop/7",
@@ -973,13 +980,6 @@
       "state": "blocked",
       "issue": 514,
       "note": "#514 needs-planner (slot free)"
-    },
-    {
-      "at": "2026-10-17T02:52:30Z",
-      "key": "steampunk-loop/1",
-      "state": "working",
-      "issue": 447,
-      "note": "tier easy, attempt 1/2"
     }
   ]
 }
