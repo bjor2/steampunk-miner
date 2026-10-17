@@ -424,12 +424,12 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/power-up-core/systems/useRefusals.test.ts` | 3 | 3 |
 | `src/features/power-up-core/systems/useResolution.test.ts` | 12 | 12 |
 
-### `roster`: 6 files, 46 tests
+### `roster`: 6 files, 48 tests
 
 | File | Tests | Sites |
 | --- | --- | --- |
 | `src/features/roster/roster.byteIdentity.lane.test.ts` | 5 | 1 |
-| `src/features/roster/roster.byteIdentity.test.ts` | 17 | 10 |
+| `src/features/roster/roster.byteIdentity.test.ts` | 19 | 11 |
 | `src/features/roster/roster.pacing.lane.test.ts` | 1 | 1 |
 | `src/features/roster/systems/planetRoster.test.ts` | 6 | 6 |
 | `src/features/roster/systems/rosterFold.test.ts` | 6 | 6 |

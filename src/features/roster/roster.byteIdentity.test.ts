@@ -60,6 +60,10 @@ const PART_A_SEEDS = NAMED_SEEDS.slice(0, 3)
 /** Binomial tolerance on the patch draws: 4 sigma (TD amendment 4). */
 const SIGMA_TOLERANCE = 4
 
+/** The Vertical Scaler's planet bounds: a common kind 4000 bp of the planet, any other 1500. */
+const COMMON_PLANET_BOUND_BP = 4000
+const RARE_BOUND_BP = 1500
+
 const censusCache = new Map<string, PlanetCensus>()
 
 /** The stamped planet's census, kept for the other checks of this file. */
@@ -100,6 +104,29 @@ function centreColumnOreOf(params: PlanetParams): PlacedOre[] {
     })
   }
   return ore
+}
+
+interface KindShare {
+  kindSlot: number
+  isCommon: boolean
+  shareBp: number
+}
+
+/**
+ * Each drawn kind's share of the planet's ore value, in whole basis points: a cell is worth
+ * `1.5^tierOffset` of the band-1 ore, so the shares are the census weighted by `3^k / 2^k`.
+ */
+function planetKindSharesBpOf(census: PlanetCensus): KindShare[] {
+  const valueOf = (row: (typeof census.rows)[number]) => row.cells * 1.5 ** row.tierOffset
+  const total = census.rows.reduce((sum, row) => sum + valueOf(row), 0)
+  const byKind = new Map<number, KindShare>()
+  for (const row of census.rows.filter((entry) => entry.kindSlot > 0)) {
+    const kept = byKind.get(row.kindSlot)
+    const isCommon = row.tierOffset === row.band - 1
+    const shareBp = (kept?.shareBp ?? 0) + (valueOf(row) * 10000) / total
+    byKind.set(row.kindSlot, { kindSlot: row.kindSlot, isCommon, shareBp })
+  }
+  return [...byKind.values()].map((share) => ({ ...share, shareBp: Math.round(share.shareBp) }))
 }
 
 /** The patch draws grouped by their (band, lead, family) cell. */
@@ -217,6 +244,19 @@ describe('roster byte identity: C, the drawn roster', () => {
             SIGMA_TOLERANCE * sigma,
           )
         }
+      }
+    },
+    PLANET_TIMEOUT_MS,
+  )
+
+  it.each([1, 2])(
+    'holds every kind of planet %i within its planet bound: 4000 bp of ore value for a common, 1500 for any other',
+    (planetIndex) => {
+      for (const seed of NAMED_SEEDS) {
+        const over = planetKindSharesBpOf(censusOf(freshPlanetParamsFor(seed, planetIndex))).filter(
+          ({ isCommon, shareBp }) => shareBp > (isCommon ? COMMON_PLANET_BOUND_BP : RARE_BOUND_BP),
+        )
+        expect(over).toEqual([])
       }
     },
     PLANET_TIMEOUT_MS,
