@@ -11,10 +11,12 @@ import {
 // cell). Red at a report every tick: a 12-tick report carves its 12 ticks of work at the one pose
 // it reports, ahead of where the body was for most of them, so it clears a cell or two the moving
 // stamp only part-cuts (on the 23-tick rig the cell at the track's end; on the starting rig at
-// 3 m/s, past its own law speed, side cells the moving stamp leaves part-cut). That is the flag-off carve the dig-speed STOP reads (exact carry, A5 on
-// #529), not the cadence code, so it is raised on #514 and nothing is retuned. The rig that clears
-// a cell inside a tick holds the bar (`drillEventStream.test.ts`). A lane: it runs only when named
-// and prints each run's cells cut at 12 and not at 1.
+// 3 m/s, past its own law speed, side cells the moving stamp leaves part-cut). That is the
+// flag-off carve's geometry, so it follows the carve-geometry decision (#537; HS 6228843611: bar
+// (b) is its target, with a last cell allowed to differ only where a multi-tick rig's track stops
+// mid-report), not the cadence code, and nothing is retuned. The rig that clears a cell inside a
+// tick holds the bar (`drillEventStream.test.ts`). A lane: it runs only when named and prints
+// each run's cells cut at 12 and not at 1.
 
 const RIGS: Readonly<Record<string, Readonly<Record<string, number>>>> = {
   starting: {},

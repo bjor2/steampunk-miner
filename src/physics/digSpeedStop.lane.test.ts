@@ -19,17 +19,20 @@ import type { VehicleIntent } from '../systems/vehicle/vehicleIntent'
 import { createRig, type Rig, type TickRead } from './cutFollowFixtures'
 import { openDigSpeedWindow, type DigSpeedSums } from './digSpeedWindow'
 
-// The dig-speed STOP of #514 (Done-when 3): the Vertical Scaler's four bars (6226431087, with
-// Systems 6226435006 and the TD's v2 ruling 6226459471; energy and heat per unit of law work, VS
-// on A5 6226528512), all hard, at a report every tick on the flag-off path against the swept
-// law-exact path at the same rig and ground, down and level, in the real loop and Rapier body:
-// 1. law work per metre (Σ density removed × hardness, read from the ground, `lawWorkFixtures.ts`)
-//    at least 1.000 of swept, less one cell's law work over the stretch, and at most 1.050;
-// 2. dig time per cell = law work per yielded cell: at least the cells' own law time D, at most
-//    1.01 D;
-// 3. cells per metre within 5% of swept;
-// 4. drill energy per unit of law work within 1% of swept; heat (the drill ticks the reports heat
-//    for) per unit of law work at least 1.000 of swept, less one cell.
+// The dig-speed STOP of #514 (Done-when 3): the Vertical Scaler's bars (6226431087, with Systems
+// 6226435006 and the TD's v2 ruling 6226459471; energy and heat per unit of law work, VS on A5
+// 6226528512) at a report every tick on the flag-off path against the swept law-exact path at the
+// same rig and ground, down and level, in the real loop and Rapier body:
+// - gated, bar 4 (1a, charged per unit of law work; A6 #535 makes it hold): drill energy per unit
+//   of law work within 1% of swept; heat (the drill ticks the reports heat for) per unit of law
+//   work at least 1.000 of swept, less one cell;
+// - logged, the carve geometry (bar 1b, law work per metre from the ground, `lawWorkFixtures.ts`,
+//   at least 1.000 of swept less one cell and at most 1.050; bar 3, cells per metre within 5%):
+//   the carve-geometry ticket #537 owns them, and until it lands #514's ratchet reads them on the
+//   fixed track (`systems/authority/digSpeedTrack.lane.test.ts`), loop rows logged beside it (VS
+//   6228847292 item 4 as the TD quotes it on #537, GD 6228851107 and 6228937772);
+// - logged, bar 2 as redefined (VS 6228841725, GD 6228851107): law work per yielded cell at a
+//   report every tick over swept's, amber outside 5%.
 // Rigs: `sweptCutPace.test.ts`'s (23 ticks a band-1 cell on planet 1, about 3 m/s) and a strong rig
 // (drill power 200, tip 600: 8 to 13 m/s, the VS's 7 to 13 m/s rows; the stored-200 rig's swept
 // cut jumps the body tens of metres a tick on planet 1 in the loop, so it reads nothing). Each path
@@ -193,7 +196,7 @@ function verdictsOf(rig: string, section: Section) {
   const swept = legOf(rig, 'swept', section)
   const ratios = {
     lawWorkPerMetre: thousandthsOf(everyTick.lawWorkPerMetre / swept.lawWorkPerMetre),
-    lawTicksPerCellOverD: thousandthsOf(everyTick.lawTicksPerCell / everyTick.ownLawTicksPerCell),
+    lawTicksPerCellOverSwept: thousandthsOf(everyTick.lawTicksPerCell / swept.lawTicksPerCell),
     cellsPerMetre: thousandthsOf(everyTick.cellsPerMetre / swept.cellsPerMetre),
     energyPerLawTick: thousandthsOf(everyTick.energyPerLawTick / swept.energyPerLawTick),
     heatPerLawTick: thousandthsOf(everyTick.heatPerLawTick / swept.heatPerLawTick),
@@ -216,19 +219,11 @@ describe('dig speed at a report every tick against the swept law-exact path (#51
     )
 
     for (const section of ['down', 'level'] as const) {
-      it(`pays the swept path's law work a metre, ${rig} ${section} (bar 1)`, () => {
+      it(`logs the carve geometry against the swept path, ${rig} ${section} (bars 1b, 2, 3)`, () => {
         const { verdicts, message } = verdictsOf(rig, section)
-        expect(verdicts.lawWorkPerMetre, message).toBe(true)
-      })
-
-      it(`pays each yielded cell its law time, at most 1% over, ${rig} ${section} (bar 2)`, () => {
-        const { verdicts, message } = verdictsOf(rig, section)
-        expect(verdicts.digTimePerCell, message).toBe(true)
-      })
-
-      it(`cuts the swept path's cells a metre within 5%, ${rig} ${section} (bar 3)`, () => {
-        const { verdicts, message } = verdictsOf(rig, section)
-        expect(verdicts.cellsPerMetre, message).toBe(true)
+        const held = { lawWorkPerMetre: verdicts.lawWorkPerMetre, cells: verdicts.cellsPerMetre }
+        console.log(`${rig} ${section} geometry (logged): ${message} ${JSON.stringify(held)}`)
+        expect(legOf(rig, 'every tick', section).metres).toBeGreaterThan(0)
       })
 
       it(`charges the swept path's energy and heat for the law work, ${rig} ${section} (bar 4)`, () => {
