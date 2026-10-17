@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-10-17T14:13:43+01:00",
+  "updated_at": "2026-10-17T14:16:17+01:00",
   "caps": {
     "grok": 12,
     "claude": 10,
@@ -20,20 +20,20 @@
         {
           "slot": "C1",
           "state": "busy",
-          "ticket": 539,
+          "ticket": 446,
           "grok_slot": 1,
           "kind": "dev",
-          "since": "2026-10-17T13:53:00+01:00",
-          "wave": "316-2H"
+          "since": "2026-10-17T14:15:00+01:00",
+          "wave": "302-8A"
         },
         {
           "slot": "C2",
           "state": "busy",
-          "ticket": 445,
+          "ticket": 535,
           "grok_slot": 2,
           "kind": "dev",
-          "since": "2026-10-17T14:04:00+01:00",
-          "wave": "302-8A"
+          "since": "2026-10-17T14:15:00+01:00",
+          "wave": "316-2H"
         },
         {
           "slot": "C3",
@@ -71,7 +71,7 @@
       "size": 6,
       "used": 2,
       "free": 4,
-      "claims_last_hour": 3,
+      "claims_last_hour": 5,
       "name": "Claude Max 1"
     },
     {
@@ -122,7 +122,7 @@
     }
   ],
   "gate": {
-    "busy": 3,
+    "busy": 1,
     "max": 3
   },
   "tester": {
@@ -446,18 +446,18 @@
     {
       "slot": 1,
       "state": "dev",
-      "ticket": 539,
-      "since": "2026-10-17T13:53:00+01:00",
+      "ticket": 446,
+      "since": "2026-10-17T14:15:00+01:00",
       "claude_slot": 1,
-      "wave": "316-2H"
+      "wave": "302-8A"
     },
     {
       "slot": 2,
       "state": "dev",
-      "ticket": 445,
-      "since": "2026-10-17T14:04:00+01:00",
+      "ticket": 535,
+      "since": "2026-10-17T14:15:00+01:00",
       "claude_slot": 2,
-      "wave": "302-8A"
+      "wave": "316-2H"
     },
     {
       "slot": 3,
@@ -524,20 +524,20 @@
     {
       "slot": 1,
       "state": "busy",
-      "ticket": 539,
+      "ticket": 446,
       "grok_slot": 1,
-      "since": "2026-10-17T13:53:00+01:00",
+      "since": "2026-10-17T14:15:00+01:00",
       "account": 1,
-      "wave": "316-2H"
+      "wave": "302-8A"
     },
     {
       "slot": 2,
       "state": "busy",
-      "ticket": 445,
+      "ticket": 535,
       "grok_slot": 2,
-      "since": "2026-10-17T14:04:00+01:00",
+      "since": "2026-10-17T14:15:00+01:00",
       "account": 1,
-      "wave": "302-8A"
+      "wave": "316-2H"
     },
     {
       "slot": 3,
@@ -605,9 +605,9 @@
     }
   ],
   "last_refill": {
-    "at": "2026-10-17 14:13 BST",
-    "mode": "refill-dev",
-    "triggers": "claude-run:tester-triage",
+    "at": "2026-10-17 14:16 BST",
+    "mode": "recheck",
+    "triggers": "#445",
     "started": "",
     "note": "no pickable build ticket"
   },
@@ -646,7 +646,8 @@
           539
         ],
         "done": [
-          538
+          538,
+          539
         ],
         "live": 1
       },
@@ -696,7 +697,9 @@
           448,
           453
         ],
-        "done": [],
+        "done": [
+          445
+        ],
         "live": 1
       },
       {
