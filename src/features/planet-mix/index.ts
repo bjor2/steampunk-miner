@@ -7,7 +7,13 @@
 export const PLANET_MIX_SLICE_ID = 'planet-mix'
 
 export type { OreMix, OreMixEntry } from './systems/oreMix'
-export { oreMixFor, oreMixNearLavaOf, oreMixOf, PLANET_MIX_HOOK_ID } from './systems/oreMix'
+export {
+  oreMixAtBaseSignatureOf,
+  oreMixFor,
+  oreMixNearLavaOf,
+  oreMixOf,
+  PLANET_MIX_HOOK_ID,
+} from './systems/oreMix'
 export { bandValueMultiplierOf, signatureValueShareOf } from './systems/mixValue'
 export type { OreAct } from './systems/themeRows'
 export { actOf, gateClassOf } from './systems/planetActs'

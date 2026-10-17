@@ -8,10 +8,21 @@ import {
   toCanonical,
   type Money,
 } from '../../../systems/money'
-import { ORE_RULES_VERSION, planetParamsFor } from '../../../systems/world/planetParams'
+import {
+  freshPlanetParamsFor,
+  ORE_RULES_VERSION,
+  planetParamsFor,
+} from '../../../systems/world/planetParams'
 import { leadWeights, ORE_ROWS, oreTierOf, rarityLeadBucketsBpOf } from '../../ores'
 import { gateClassOf } from './planetActs'
-import { oreMixFor, oreMixNearLavaOf, oreMixOf, type OreMix, type OreMixEntry } from './oreMix'
+import {
+  oreMixAtBaseSignatureOf,
+  oreMixFor,
+  oreMixNearLavaOf,
+  oreMixOf,
+  type OreMix,
+  type OreMixEntry,
+} from './oreMix'
 import { bandValueMultiplierOf, signatureValueShareOf } from './mixValue'
 
 const SEEDS = [83921, 31415, 27182]
@@ -199,6 +210,21 @@ describe('planet ore mix on the legacy rows', () => {
 })
 
 describe('planet ore mix on the rarity rows (ticket 445)', () => {
+  it('keeps a story planet at the base signature share in its base mix, and every other planet as it is', () => {
+    // Ticket 449: the share bounds read Systems' model, whose signature is never boosted.
+    const signatureBpOf = (mix: OreMix, band: number) =>
+      totalBp(mix.bands[band - 1].filter((entry) => entry.signature))
+    const story = freshPlanetParamsFor(83921, 40)
+    expect([4, 5].map((band) => signatureBpOf(oreMixOf(story), band))).toEqual([600, 600])
+    const base = oreMixAtBaseSignatureOf(story)
+    expect([4, 5].map((band) => signatureBpOf(base, band))).toEqual([300, 300])
+    for (const entries of base.bands) expect(totalBp(entries)).toBe(10000)
+    for (const planet of [3, 10, 41]) {
+      const params = freshPlanetParamsFor(31415, planet)
+      expect(oreMixAtBaseSignatureOf(params)).toEqual(oreMixOf(params))
+    }
+  })
+
   it('fills every band of a fresh planet to 10000 basis points, P3 to P200', () => {
     for (const planet of MIXED_PLANETS) {
       for (const entries of oreMixFor(planet, 83921).bands) expect(totalBp(entries)).toBe(10000)

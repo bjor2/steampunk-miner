@@ -75,6 +75,17 @@ export function oreMixNearLavaOf(params: PlanetParams): OreMix {
   return mixOf(params, isHeatPlanet(params.planetIndex))
 }
 
+/**
+ * The mix with every signature at the act's base share, as if no story planet or lava pocket
+ * boosted it: the mix Systems' rarity model is solved on (comment 6202970624 on #139, sections 2
+ * and 10, which leave the boosts outside mean preservation). The share bounds of ticket 449 judge
+ * the tiers and the band mean on it.
+ */
+export function oreMixAtBaseSignatureOf(params: PlanetParams): OreMix {
+  const plan = planetMixPlanOf(params.planetIndex, mixSeedOf(params))
+  return mixOfPlan(params, { ...plan, isStoryPlanet: false }, false)
+}
+
 /** The mix hook's sub-seed: every planet-wide and per-patch roll of the mix derives from it. */
 export function mixSeedOf(params: PlanetParams): number {
   return subSeedForHook(params, PLANET_MIX_HOOK_ID)
@@ -129,7 +140,10 @@ export function signatureCarveLeadOf(set: RarityRowSet, band: number): number {
 }
 
 function mixOf(params: PlanetParams, isNearLava: boolean): OreMix {
-  const plan = planetMixPlanOf(params.planetIndex, mixSeedOf(params))
+  return mixOfPlan(params, planetMixPlanOf(params.planetIndex, mixSeedOf(params)), isNearLava)
+}
+
+function mixOfPlan(params: PlanetParams, plan: PlanetMixPlan, isNearLava: boolean): OreMix {
   const set = rarityRowSetOfPlanet(params)
   return {
     planetIndex: params.planetIndex,
