@@ -49,6 +49,7 @@ import {
   type PortableState,
   type SessionSnapshot,
 } from '../authority/sessionSnapshot'
+import { devFlagFieldsOf } from '../authority/devFlagState'
 import { GENERATOR_VERSION } from '../generatorVersion'
 import type { PlanetParams } from '../world/planetParams'
 import { packChunkDeltas, unpackChunkDeltas, type PackedChunks } from './packedChunks'
@@ -106,6 +107,10 @@ export interface SaveWorldSection extends WorldSectionPlanet {
   /** The grounded bore lines (ticket 378); omitted while there are none. */
   groundedLines?: PortableState['groundedLines']
   debugApplied: boolean
+  /** The dev flags off their defaults, so the world runs as it ran (ticket 547); omitted while none is. */
+  devFlagDelta?: PortableState['devFlagDelta']
+  /** The sticky taint: a save made under `debug.setFlags` is marked (ticket 547); omitted before. */
+  devFlagsEverSet?: PortableState['devFlagsEverSet']
   /** The session sections; omitted while none is registered. */
   slices?: PortableState['slices']
 }
@@ -172,6 +177,7 @@ function worldSectionOf(state: PortableState, saveEpoch: number): SaveWorldSecti
     terrainEdits: state.terrainEdits,
     ...boreFieldsOf(state),
     debugApplied: state.debugApplied,
+    ...devFlagFieldsOf(state),
     ...(state.slices === undefined ? {} : { slices: state.slices }),
   }
 }
@@ -243,6 +249,7 @@ export function snapshotOfSaveSlot(file: SaveSections): SessionSnapshot {
       terrainEdits: world.terrainEdits,
       ...boreFieldsOf(world),
       debugApplied: world.debugApplied,
+      ...devFlagFieldsOf(world),
       ...(world.slices === undefined ? {} : { slices: world.slices }),
     },
   }

@@ -49,6 +49,7 @@ import {
   type PortableCombat,
 } from './combat/combatSnapshot'
 import { coreProgressProblems, type CoreProgress } from './coreProgress'
+import { devFlagFieldsOf, portableDevFlagProblems, type DevFlagDelta } from './devFlagState'
 import { heldArtefactProblems, type HeldArtefact } from './heldArtefact'
 import { isJsonObject, isWholeNumber } from './payloadFields'
 import { withOreRulesVersion, type SessionPlanet } from './planetOfState'
@@ -125,6 +126,10 @@ export interface PortableState {
   /** The grounded bore lines (ticket 378); omitted while there are none. */
   groundedLines?: GroundedLine[]
   debugApplied: boolean
+  /** The dev flags off their defaults (ticket 547); omitted while none is. */
+  devFlagDelta?: DevFlagDelta
+  /** The sticky taint of a `debug.setFlags` (ticket 547); omitted before the first. */
+  devFlagsEverSet?: true
   /** The session sections; omitted while none is registered. */
   slices?: PortableSections
 }
@@ -179,6 +184,7 @@ function portableStateOf(state: AuthorityState): PortableState {
     ...portableStrutsField(state.struts),
     ...portableGroundedLinesField(state.groundedLines),
     debugApplied: state.debugApplied,
+    ...devFlagFieldsOf(state),
     ...portableSectionsOf(state.slices, 'session'),
   }
 }
@@ -246,6 +252,7 @@ function authorityStateOf(portable: PortableState): AuthorityState {
     ...portableStrutsField(portable.struts),
     ...portableGroundedLinesField(portable.groundedLines),
     debugApplied: portable.debugApplied,
+    ...devFlagFieldsOf(portable),
     ...sectionsOfPortable(portable.slices, 'session'),
   }
 }
@@ -298,6 +305,7 @@ function portableStateProblems(state: unknown, tick: unknown): string[] {
     ...(typeof state.debugApplied === 'boolean'
       ? []
       : ['snapshot.state.debugApplied must be a boolean']),
+    ...portableDevFlagProblems(state, 'snapshot.state'),
     ...portableSectionsProblems(state.slices, 'session', 'snapshot.state'),
   ]
 }

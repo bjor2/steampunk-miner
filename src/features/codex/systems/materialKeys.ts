@@ -15,8 +15,8 @@
  * the planet's roster; a cell with no kind slot (a legacy planet, P8+) names none and old saves
  * get no backfill. Look only: gates, unlocks, ore firsts, artefact picks and prices never read it.
  */
-import { AUTHORITY_DEV_FLAGS } from '../../../constants/devFlags'
 import type { AuthorityState } from '../../../systems/authority/authorityState'
+import { flagsOf } from '../../../systems/authority/devFlagState'
 import type { DomainEvent } from '../../../systems/authority/domainEvent'
 import { planetParamsOf } from '../../../systems/authority/planetOfState'
 import type { DiscoveryKey } from '../../../systems/registries/discovery'
@@ -32,7 +32,7 @@ export function materialKeysOf(
   heard: readonly DomainEvent[],
 ): DiscoveryKey[] {
   const params = planetParamsOf(before.planet)
-  if (params === null || !AUTHORITY_DEV_FLAGS['codex.materialContact']) return []
+  if (params === null || !flagsOf(before)['codex.materialContact']) return []
   return touchedTilesOf(heard).flatMap((tile) => speciesKeysAt(before, params, tile))
 }
 

@@ -26,7 +26,8 @@
  * face instead, and once out hunts through open cells only while the flush lasts
  * (`burrowerFlush.ts`); a wind-up, lunge or recoil under way goes on.
  */
-import { AUTHORITY_DEV_FLAGS, type AuthorityDevFlags } from '../../../constants/devFlags'
+import type { AuthorityDevFlags } from '../../../constants/devFlags'
+import { flagsOf } from '../devFlagState'
 import { MM_PER_METRE } from '../../../constants/physics'
 import type { EnemyKind } from '../../economy/economyDefinition'
 import { enemyBoundedStats, type EnemyBoundedStats } from '../../economy/enemyStats'
@@ -121,7 +122,7 @@ export function stepEnemy(
   enemyId: string,
   terrain: Terrain,
   tick: number,
-  flags: AuthorityDevFlags = AUTHORITY_DEV_FLAGS,
+  flags: AuthorityDevFlags = flagsOf(state),
 ): RuleEffect {
   const enemy = enemyById(state.combat, enemyId)
   if (enemy === undefined) return unchanged(state)

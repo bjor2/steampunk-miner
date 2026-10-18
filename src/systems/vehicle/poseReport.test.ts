@@ -115,7 +115,7 @@ describe('pose reports', () => {
   it('keep 12 ticks apart while drilling as the game ships, with the swept cut on', () => {
     expect(AUTHORITY_DEV_FLAGS['drill.exactCarry']).toBe(true)
     expect(DEV_FLAGS['drill.sweptCut']).toBe(true)
-    const shipped = drillReportIntervalOf(DEV_FLAGS)
+    const shipped = drillReportIntervalOf(DEV_FLAGS, AUTHORITY_DEV_FLAGS)
     expect(shipped).toBe(12)
     const ticks = reportAlong(120, () => DRILLING, NO_DRIVE, shipped).map(({ tick }) => tick)
     expect(ticks).toEqual([1, 13, 25, 37, 49, 61, 73, 85, 97, 109])

@@ -25,6 +25,8 @@ export type FieldKind =
   | 'textList'
   /** `{ x, y }`, each -1, 0 or 1: the drive signs a pose report carries (ticket 279). */
   | 'driveSigns'
+  /** An object of booleans, as `debug.setFlags` names each flag it sets (ticket 547). */
+  | 'flagMap'
 
 export type PayloadFields = Readonly<Record<string, FieldKind>>
 
@@ -61,6 +63,7 @@ const FIELD_CHECKS: Record<FieldKind, { isValid: (value: unknown) => boolean; ex
     textMap: { isValid: isTextMap, expected: 'an object of strings' },
     textList: { isValid: isTextList, expected: 'a list of strings' },
     driveSigns: { isValid: isDriveSigns, expected: 'an x and a y, each -1, 0 or 1' },
+    flagMap: { isValid: isFlagMap, expected: 'an object of booleans' },
   }
 
 function fieldKindProblems(name: string, value: unknown, kind: FieldKind): string[] {
@@ -71,6 +74,10 @@ function fieldKindProblems(name: string, value: unknown, kind: FieldKind): strin
 
 function isTextMap(value: unknown): boolean {
   return isJsonObject(value) && Object.values(value).every((entry) => typeof entry === 'string')
+}
+
+function isFlagMap(value: unknown): boolean {
+  return isJsonObject(value) && Object.values(value).every((entry) => typeof entry === 'boolean')
 }
 
 function isTextList(value: unknown): boolean {

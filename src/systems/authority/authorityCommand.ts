@@ -360,8 +360,15 @@ import type { DriveSigns } from '../vehicle/driveSigns'
  *    into the player's codex section (v1) and says `codex.EntryAdded`, once per player per
  *    species. A run that never touches a roster-bound cell moves no digest; with the flag off
  *    every digest is protocol 88's.
+ * 90: the authority dev flags as logged state (ticket 547, the TD ruling on #547 and its
+ *    amendment): `debug.setFlags {delta}` (refused `unknown_flag`, or `not_session_host` from any
+ *    player but a shared session's lowest id) sets flags, answers `DevFlagsSet`, keeps the flags
+ *    off their shipped defaults as the state's optional `devFlagDelta` and marks it with
+ *    `devFlagsEverSet`, and drops the carries of a flag it turns on. The rules read `flagsOf`
+ *    (the defaults with the delta) in place of the module global. With no flag set no field is
+ *    written and no digest or mined order changes.
  */
-export const AUTHORITY_PROTOCOL_VERSION = 89
+export const AUTHORITY_PROTOCOL_VERSION = 90
 
 /** The kernel's own commands: the closed set its rule tables are written against. */
 export interface KernelCommandPayloads {
@@ -533,6 +540,11 @@ export interface KernelCommandPayloads {
    * `debug.forceCollapse`): it warns for the full 60 ticks and refills whatever its lining.
    */
   'debug.forceCollapse': { block: string }
+  /**
+   * Sets authority dev flags (ticket 547): each named flag takes its value, the rest keep theirs,
+   * and the session keeps only the ones off their shipped defaults. Flags, never numbers.
+   */
+  'debug.setFlags': { delta: Readonly<Record<string, boolean>> }
 }
 
 /**

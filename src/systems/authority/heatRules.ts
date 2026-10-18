@@ -20,7 +20,8 @@
  * the ticks being settled are no longer dropped: the drilling segment keeps its wall ticks and
  * heats for every drill tick of work over them (`drillSegmentHeat.ts`). Off, it is as above.
  */
-import { AUTHORITY_DEV_FLAGS, type AuthorityDevFlags } from '../../constants/devFlags'
+import type { AuthorityDevFlags } from '../../constants/devFlags'
+import { flagsOf } from './devFlagState'
 import { TICKS_PER_SECOND } from '../../constants/physics'
 import type { HazardArchetype } from '../economy/economyDefinition'
 import {
@@ -102,7 +103,7 @@ export function followHeat(
   playerId: string,
   tick: number,
   activity: HeatActivity,
-  flags: AuthorityDevFlags = AUTHORITY_DEV_FLAGS,
+  flags: AuthorityDevFlags = flagsOf(state),
 ): RuleEffect {
   const vehicle = vehicleOf(state, playerId)
   if (vehicle.mode === 'docked') return settleDockedHeat(state, playerId, tick)

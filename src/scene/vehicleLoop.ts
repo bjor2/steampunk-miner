@@ -32,6 +32,7 @@ import { readAuthorityState } from '../store/authorityLink'
 import type { AuthorityState } from '../systems/authority/authorityState'
 import { strutsOf } from '../systems/authority/bore/strutState'
 import { cutFollowAt, type CutFollow, type CutFollowStep } from '../systems/authority/cutFollowRead'
+import { flagsOf } from '../systems/authority/devFlagState'
 import { stepBoundsAt } from '../systems/authority/stepBoundRead'
 import { travelEngineAt } from '../systems/authority/travelSpeed'
 import { magneticTugAt, magneticTugOnCutAt } from '../systems/authority/magnetic/magneticTug'
@@ -43,6 +44,7 @@ import {
   drillReportIntervalOf,
   restartPoseReporter,
   takePoseReport,
+  withDrillIntervalTicks,
   type PoseReporter,
 } from '../systems/vehicle/poseReport'
 import type { StepBounds } from '../systems/vehicle/stepBound'
@@ -100,7 +102,7 @@ interface TugMemo {
 export function createVehicleLoop(flags: DevFlags = DEV_FLAGS): VehicleLoop {
   const loop: LoopState = {
     stage: createVehicleStage(),
-    reporter: createPoseReporter(drillReportIntervalOf(flags)),
+    reporter: createPoseReporter(drillReportIntervalOf(flags, flagsOf(readAuthorityState()))),
     placement: '',
     view: null,
     tile: { tx: 0, ty: 0 },
@@ -132,6 +134,7 @@ export function createVehicleLoop(flags: DevFlags = DEV_FLAGS): VehicleLoop {
       )
       noteBodyStep(loop, result)
       stepDrillWhenSwept(flags, result, stagedIntent)
+      followDrillInterval(loop, flags)
       reportWhenDue(loop, result, stagedIntent)
       syncGroundToTickWorld(flags, loop, controller)
       showDrill(result)
@@ -300,6 +303,16 @@ function syncGroundToTickWorld(flags: DevFlags, loop: LoopState, controller: Veh
   if (!flags['drill.sweptCut']) return
   const { params, world } = readPlanetWorld()
   if (params !== null) controller.syncGround(planetViewOf(loop, params, world))
+}
+
+/**
+ * The drill interval from the session's flags as they stand this step (ticket 547): the exact
+ * carry is the authority's, so a `debug.setFlags` turning it off drops every-tick reports on the
+ * tick it lands, never on the next loop.
+ */
+function followDrillInterval(loop: LoopState, flags: DevFlags): void {
+  const interval = drillReportIntervalOf(flags, flagsOf(readAuthorityState()))
+  loop.reporter = withDrillIntervalTicks(loop.reporter, interval)
 }
 
 function reportWhenDue(loop: LoopState, result: VehicleStepResult, intent: VehicleIntent): void {

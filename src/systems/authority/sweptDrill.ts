@@ -24,7 +24,7 @@
  * - With the authority dev flag `drill.sweptLawCharge` on (ticket 540) the tick is charged on the
  *   law work it removed (`LAW_SUB_STEP_CLOCK`), the same carve; off, each broken cell's dig energy.
  */
-import { AUTHORITY_DEV_FLAGS } from '../../constants/devFlags'
+import { flagsOf } from './devFlagState'
 import type { DrillBit } from '../vehicle/aheadBearingLatch'
 import type { CutGate } from '../vehicle/cutGate'
 import type { DriveSigns } from '../vehicle/driveSigns'
@@ -161,14 +161,21 @@ export function drillSweepBy(
   const sweep = sweepOf(state, playerId, step)
   const carve = (request: DrillCarveRequest) =>
     carveSweep(state, params, playerId, { sweep, request }, walks)
-  const outcome = drillGroundBy(state, params, playerId, { tile: target, carve }, 1, sweptClock())
+  const outcome = drillGroundBy(
+    state,
+    params,
+    playerId,
+    { tile: target, carve },
+    1,
+    sweptClockOf(state),
+  )
   const digSubSteps = digSubStepsOfCells(state, params, playerId, outcome.carved?.yielded ?? [])
   return { effect: settleSweep(outcome, playerId, { sweep, digSubSteps }), carved: outcome.carved }
 }
 
-/** The clock a swept tick is charged on, read at call time as the rule tables read the flags. */
-function sweptClock(): DrillClock {
-  return AUTHORITY_DEV_FLAGS['drill.sweptLawCharge'] ? LAW_SUB_STEP_CLOCK : SUB_STEP_CLOCK
+/** The clock a swept tick is charged on, by the session's flags (ticket 547). */
+function sweptClockOf(state: AuthorityState): DrillClock {
+  return flagsOf(state)['drill.sweptLawCharge'] ? LAW_SUB_STEP_CLOCK : SUB_STEP_CLOCK
 }
 
 function sweepOf(state: AuthorityState, playerId: string, step: SweptStep): Sweep {

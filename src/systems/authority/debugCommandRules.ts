@@ -7,7 +7,7 @@
  * `casingRules.ts`, `setGunLevel` in `gunRules.ts`, `setLiningType` in `liningRules.ts`, `setHeat`
  * in `heatRules.ts`, `setArtefact` in `artefactRules.ts`, `forceCollapse` in
  * `collapse/collapseDebugRules.ts`, `setCharges` in `charges/chargeRules.ts`, `setVehicleLoadout` in
- * `loadoutRules.ts`.
+ * `loadoutRules.ts`, `setFlags` in `devFlagRules.ts`.
  */
 import { add, fromCanonical, toCanonical, type Money } from '../money'
 import type { KernelCommandType } from './authorityCommand'
@@ -17,6 +17,7 @@ import { CASING_DEBUG_RULES } from './casingRules'
 import { CHARGE_DEBUG_RULES } from './charges/chargeRules'
 import { COLLAPSE_DEBUG_RULES } from './collapse/collapseDebugRules'
 import { COMBAT_DEBUG_RULES } from './combat/combatDebugRules'
+import { DEV_FLAG_DEBUG_RULES } from './devFlagRules'
 import type { CommandRule, RuleEffect } from './commandRule'
 import { followBayTotal } from './coreBay'
 import { GROUND_DEBUG_RULES } from './groundDebugRules'
@@ -72,6 +73,7 @@ export const DEBUG_COMMAND_RULES: {
   ...ARTEFACT_DEBUG_RULES,
   ...COLLAPSE_DEBUG_RULES,
   ...CHARGE_DEBUG_RULES,
+  ...DEV_FLAG_DEBUG_RULES,
 }
 
 function walletOf(state: AuthorityState, playerId: string): Money {

@@ -21,6 +21,7 @@ import { NO_COLLAPSE, type CollapseState } from './collapse/collapseState'
 import { NO_LOOSE_LAVA, type LavaState } from './lava/lavaState'
 import { NEW_COMBAT, type CombatState } from './combat/combatState'
 import { NEW_CORE_PROGRESS, type CoreProgress } from './coreProgress'
+import type { DevFlagDelta } from './devFlagState'
 import type { HeldArtefact } from './heldArtefact'
 import { NEW_PLATFORM, type PlatformState } from './platformState'
 import { dockSiteOfPlanet, enteredPlanetOf, type SessionPlanet } from './planetOfState'
@@ -77,6 +78,13 @@ export interface AuthorityState {
   groundedLines?: readonly GroundedLine[]
   /** Set by the first accepted `debug.*` command and never reset (#11 section 4). */
   debugApplied: boolean
+  /**
+   * The authority dev flags that differ from the shipped defaults (ticket 547, `devFlagState.ts`);
+   * absent while none does, so a session nobody flipped digests as before.
+   */
+  devFlagDelta?: DevFlagDelta
+  /** Written by the first `debug.setFlags` and kept on a flip back (ticket 547); absent before. */
+  devFlagsEverSet?: true
   /** The slices' session sections away from their initial value (feature-slices.md 3.13). */
   slices?: SliceSections
 }

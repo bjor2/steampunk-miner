@@ -20,7 +20,8 @@
  * carry, however few ticks elapsed (`heatRules.ts`), and a report at the tick the gauge settled
  * heats nothing and leaves the carry whole for the next report, so no work is dropped.
  */
-import { AUTHORITY_DEV_FLAGS, type AuthorityDevFlags } from '../../constants/devFlags'
+import type { AuthorityDevFlags } from '../../constants/devFlags'
+import { flagsOf } from './devFlagState'
 import { splitCutHeatCarry } from '../vehicle/cutCarry'
 import { stepDigTicksOf } from '../vehicle/sweptCut'
 import type { VehiclePose } from '../vehicle/vehiclePose'
@@ -63,7 +64,7 @@ export function drillReportedTicks(
   playerId: string,
   vehicle: VehicleState,
   report: PoseReport,
-  flags: AuthorityDevFlags = AUTHORITY_DEV_FLAGS,
+  flags: AuthorityDevFlags = flagsOf(state),
 ): RuleEffect {
   if (isCutBySteps(vehicle) || vehicle.pose === null) return unchanged(state)
   return drillAtPoseAndBurrowers(state, playerId, reportedCutOf(vehicle.pose, report, flags))
@@ -134,7 +135,7 @@ export function followReportedHeat(
   state: AuthorityState,
   { playerId, tick, payload }: AuthorityCommand<'reportPose'>,
   before: VehicleState,
-  flags: AuthorityDevFlags = AUTHORITY_DEV_FLAGS,
+  flags: AuthorityDevFlags = flagsOf(state),
 ): RuleEffect {
   if (isCarriedHeatReport(before, flags)) {
     return followCarriedHeat(state, playerId, tick, isIdleReport(payload), flags)

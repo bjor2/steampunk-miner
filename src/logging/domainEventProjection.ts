@@ -38,6 +38,7 @@ const PROJECTIONS: { readonly [K in KernelDomainEventType]: Projection<K> } = {
   PlanetChanged: () => null,
   PlanetSeedChanged: () => null,
   MoneyChanged: () => null,
+  DevFlagsSet: () => null,
   DebugCommandApplied: ({ command, args }) => ({
     event: 'debug_command_applied',
     data: { command, args },

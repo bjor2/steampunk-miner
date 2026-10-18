@@ -56,6 +56,10 @@ export interface RejectionReasons {
   // most enemies it may have.
   unknown_enemy: true
   enemy_cap: true
+  // Registered by `debug.setFlags` (ticket 547): a dev flag id the authority does not have, or a
+  // player of a shared session who is not its host.
+  unknown_flag: true
+  not_session_host: true
   // Registered by the artefact commands (#46): not one of the three option ids, or this cache is
   // not live for this player (they already hold an artefact).
   unknown_artefact: true
@@ -162,6 +166,8 @@ export interface KernelDomainEventBodies {
   PlanetSeedChanged: { planetSeed: number }
   MoneyChanged: { from: string; to: string }
   DebugCommandApplied: { command: CommandType; args: Readonly<Record<string, unknown>> }
+  /** `debug.setFlags` (ticket 547): the dev flags now off their shipped defaults, maybe none. */
+  DevFlagsSet: { delta: Readonly<Record<string, boolean>> }
   /** `chain` names the hold a refused held purchase step belonged to (ticket 226). */
   CommandRejected: {
     commandType: string

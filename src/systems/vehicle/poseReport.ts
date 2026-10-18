@@ -11,11 +11,7 @@ import {
   DRILL_POSE_REPORT_INTERVAL_TICKS,
   POSE_REPORT_INTERVAL_TICKS,
 } from '../../constants/balance'
-import {
-  AUTHORITY_DEV_FLAGS,
-  type AuthorityDevFlags,
-  type DevFlags,
-} from '../../constants/devFlags'
+import type { AuthorityDevFlags, DevFlags } from '../../constants/devFlags'
 import { MM_PER_METRE, UP_VECTOR_SCALE } from '../../constants/physics'
 import type { CommandPayloads } from '../authority/authorityCommand'
 import type { Vector2 } from './localFrame'
@@ -56,19 +52,26 @@ export function restartPoseReporter(reporter: PoseReporter): PoseReporter {
   return createPoseReporter(reporter.drillIntervalTicks)
 }
 
+/** The reporter at the drill interval the flags give now; the same reporter while it is unchanged. */
+export function withDrillIntervalTicks(
+  reporter: PoseReporter,
+  drillIntervalTicks: number,
+): PoseReporter {
+  if (reporter.drillIntervalTicks === drillIntervalTicks) return reporter
+  return { ...reporter, drillIntervalTicks }
+}
+
 /**
  * The drill interval the loop's flags give (ticket 514): every tick on the flag-off path, only
  * while the authority's `drill.exactCarry` is on and the kill-switch `drill.reportEveryTick` is
  * not off; else 12, and the swept path keeps 12, byte-identical (Q6). A report every tick with
  * the exact carry off pays 0.853 of the law at 25 m/s and 1.300 at 44 m/s (VS 6236441275, the
  * stopped #529 set-up), so the two go live together and flipping `drill.exactCarry` is the one
- * switch (TD 6236464931). The authority's flags are read at call time, as `reportedDrill.ts`
- * reads them.
+ * switch (TD 6236464931). The authority's flags are the session's (`flagsOf`, ticket 547), read
+ * every step, so a `debug.setFlags` that turns the exact carry off drops the interval to 12 on the
+ * tick it lands.
  */
-export function drillReportIntervalOf(
-  flags: DevFlags,
-  authorityFlags: AuthorityDevFlags = AUTHORITY_DEV_FLAGS,
-): number {
+export function drillReportIntervalOf(flags: DevFlags, authorityFlags: AuthorityDevFlags): number {
   return isReportedEveryDrillTick(flags, authorityFlags)
     ? DRILL_POSE_REPORT_INTERVAL_TICKS
     : POSE_REPORT_INTERVAL_TICKS
