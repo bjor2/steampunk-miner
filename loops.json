@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "updated_at": "2026-10-18T10:36:39Z",
+  "updated_at": "2026-10-18T10:36:47Z",
   "entries": {
     "steampunk-loop/1": {
       "loop": "steampunk-loop",
@@ -517,9 +517,9 @@
       "slot": null,
       "state": "working",
       "issue": null,
-      "note": "testing spec #256 (Grilling: Mark milestone behaviours) on 46fdb0d",
+      "note": "testing spec #304 (Grilling: Exponential drill speed law (never capped, carries across planets)) on 5a0866f",
       "stale_after_min": 420,
-      "updated_at": "2026-10-18T06:48:08Z",
+      "updated_at": "2026-10-18T10:36:47Z",
       "host": "grok-bot-vm-452660841"
     },
     "steampunk-loop/10": {
