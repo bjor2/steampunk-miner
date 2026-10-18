@@ -76,11 +76,6 @@ export function stepsToNextLevel(upgradeId: UpgradeId, step: number): number {
   return isPerPurchaseTrack(upgradeId) ? 1 : minorsPerMajor() - pipOf(step)
 }
 
-/** Per track, the stored step its level starts on (`stepOfLevel`). */
-export function stepsOfLevels(levels: TrackNumbers): TrackNumbers {
-  return mapTrackEntries(levels, stepOfLevel)
-}
-
 /** Whether buying from `step` lands a major: the big level-up. */
 export function isMajorStep(step: number): boolean {
   return pipOf(step) === minorsPerMajor() - 1
@@ -145,14 +140,7 @@ function sharesOfRoot(root: Money): Money[] {
 }
 
 function mapTracks(values: TrackNumbers, map: (value: number) => number): TrackNumbers {
-  return mapTrackEntries(values, (_, value) => map(value))
-}
-
-function mapTrackEntries(
-  values: TrackNumbers,
-  map: (upgradeId: UpgradeId, value: number) => number,
-): TrackNumbers {
-  const entries = UPGRADE_IDS.map((upgradeId) => [upgradeId, map(upgradeId, values[upgradeId])])
+  const entries = UPGRADE_IDS.map((upgradeId) => [upgradeId, map(values[upgradeId])] as const)
   return Object.fromEntries(entries) as Record<UpgradeId, number>
 }
 
