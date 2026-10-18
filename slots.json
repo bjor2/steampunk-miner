@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-10-18T07:47:41+01:00",
+  "updated_at": "2026-10-18T07:48:12+01:00",
   "caps": {
     "grok": 12,
     "claude": 10,
@@ -19,12 +19,11 @@
       "slots": [
         {
           "slot": "C1",
-          "state": "busy",
+          "state": "free",
           "ticket": null,
           "grok_slot": null,
-          "kind": "aux",
-          "since": "2026-10-18T07:47:00+01:00",
-          "label": "tester-triage"
+          "kind": null,
+          "since": null
         },
         {
           "slot": "C2",
@@ -68,8 +67,8 @@
         }
       ],
       "size": 6,
-      "used": 1,
-      "free": 5,
+      "used": 0,
+      "free": 6,
       "claims_last_hour": 1,
       "name": "Claude Max 1"
     },
@@ -121,38 +120,23 @@
     }
   ],
   "gate": {
-    "busy": 0,
+    "busy": 1,
     "max": 3
   },
   "tester": {
     "state": "running",
-    "phase": "triage-fast",
-    "sha": "ea1e2dcdc41dacaea1247dfe35a9590cbd2ead91",
-    "since": "2026-10-18T06:47:39Z",
-    "holds_gate": false,
-    "claude_slot": 1,
-    "last_run": "2026-10-17T23:56:03Z",
+    "phase": "fast",
+    "sha": "46fdb0d0611037d2f1b7a5a3d11a6d8d5717c9f2",
+    "since": "2026-10-18T06:48:10Z",
+    "holds_gate": true,
+    "claude_slot": null,
+    "last_run": "2026-10-18T06:48:04Z",
     "last_nightly": "2026-10-15T20:43:15Z",
     "last_nightly_result": "full=FAIL balance-report=ok bench=FAIL balance-planets=ok balance-guns=ok balance-charges=ok balance-refinery=ok balance-heat=ok e2e=FAIL memory-soak=FAIL packaged-smoke=ok ",
     "main_red_sha": null,
-    "feature": 401,
-    "feature_title": "Spec: New Game + save/load (slots, menus)",
+    "feature": 256,
+    "feature_title": "Grilling: Mark milestone behaviours",
     "queue": [
-      {
-        "feature": 256,
-        "kind": "spec",
-        "title": "Grilling: Mark milestone behaviours",
-        "tickets": [
-          272,
-          273,
-          274,
-          275,
-          276,
-          277,
-          278
-        ],
-        "since": "2026-10-14T23:40:41+02:00"
-      },
       {
         "feature": 304,
         "kind": "spec",
@@ -477,12 +461,10 @@
   "claude": [
     {
       "slot": 1,
-      "state": "busy",
+      "state": "free",
       "ticket": null,
       "grok_slot": null,
-      "since": "2026-10-18T07:47:00+01:00",
-      "kind": "aux",
-      "label": "tester-triage",
+      "since": null,
       "account": 1
     },
     {
@@ -577,8 +559,8 @@
     "claude": {
       "size": 10,
       "enabled": 10,
-      "used": 1,
-      "free": 9,
+      "used": 0,
+      "free": 10,
       "external": 0
     }
   },
