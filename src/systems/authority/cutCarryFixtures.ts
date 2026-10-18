@@ -26,9 +26,9 @@ import { planetParamsOf } from './planetOfState'
 
 /**
  * Runs `play` with the authority's `drill.exactCarry` as `isOn`, the flag put back after. The
- * rule tables read it from `AUTHORITY_DEV_FLAGS` at call time (`reportedDrill.ts`), so a whole
- * scripted session or replay takes the switch. It ships off (`constants/devFlags.ts`), so the
- * charge's specs and the lanes switch it on for their runs.
+ * rules read the shipped defaults through `flagsOf` at call time (`devFlagState.ts`, ticket 547),
+ * so a whole scripted session or replay with no `debug.setFlags` takes the switch. Spec support
+ * only: play switches flags through the logged command.
  */
 export function withDrillExactCarry<T>(isOn: boolean, play: () => T): T {
   return withAuthorityFlag('drill.exactCarry', isOn, play)

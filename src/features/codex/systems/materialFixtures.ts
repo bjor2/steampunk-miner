@@ -13,7 +13,8 @@ import { planetSpeciesOf } from '../../roster'
 
 /**
  * Runs `play` with the authority's `codex.materialContact` as `isOn`, put back after: the codex
- * reaction reads it at call time and it ships on.
+ * reaction reads the shipped defaults through `flagsOf` at call time (ticket 547) and it ships
+ * on. Spec support only: play switches flags through the logged `debug.setFlags`.
  */
 export function withMaterialContact<T>(isOn: boolean, play: () => T): T {
   const flags = AUTHORITY_DEV_FLAGS as { -readonly [K in keyof AuthorityDevFlags]: boolean }
