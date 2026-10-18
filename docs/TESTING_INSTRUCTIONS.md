@@ -643,6 +643,19 @@ programs }` from three's `renderer.info` of the game canvas), read only when cal
   cell the track's last report lists cut on that tick); `src/physics/drillReportCadence.test.ts`
   holds 30, 60 and 144 frames a second byte-identical, and `src/physics/vehicleLoop.test.ts` pins
   the ticket-339 dig's end with the exact carry on at the capsule's values.
+- **Species seen-record** (ticket 546, the TD's contact rule 6243331970 as the GD amended it
+  6243342631): behind the authority dev flag `codex.materialContact` (on) the codex writes
+  `material:<species id>` for a cell the drill damaged, a gate stopped on, whose unit reached the
+  hold, or the corer sampled. `src/features/codex/systems/materialContacts.test.ts` holds each
+  route, once per player per species, two species of one ore type told apart, every never-write
+  case (cells ahead, beside and behind a gate, a gate stop firing nothing but its one entry, the
+  held sounder, probe and siphon and the echo sounder, a blast's unit, a bore's cell, the assay
+  lens), a planet with no species, the `ore:` record unchanged, the snapshot round trip and the
+  kind look provider revealing only the touched species; `materialNewGame.test.ts` that New Game
+  clears it. `src/features/codex/materialContactOffGolden.test.ts` replays every golden with the
+  switch off to protocol 88's digests (the four planet 1 mining goldens' old digests pinned there),
+  and with the exact carry on to A6's charged digests; `chargedGoldenDigests.ts` holds the charged
+  digests with the record on.
 - **Known red** (ticket 419, the TD on #396 section 2): `CAMPAIGN_PACING_KNOWN_RED`
   (`src/constants/knownRed.ts`) is the one known-red marker in the repo: one gate
   (`campaignPacingGate`), one finding (#417), no registry. The gate still runs in full;
