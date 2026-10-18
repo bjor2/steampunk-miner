@@ -1,7 +1,8 @@
 /**
  * The debug flag panel's and the badge's models now (ticket 549), for the DOM components: the
  * authority's flags, its taint and who hosts read from the authority, the client loop's flags and
- * the browser's overrides from the store.
+ * the browser's overrides from the store. Outside a debug session nothing is stored, so no row
+ * reads as remembered there, whatever the session chose.
  */
 import { flagsOf } from '../systems/authority/devFlagState'
 import { isSessionHost } from '../systems/authority/sessionHost'
@@ -31,7 +32,7 @@ function readDevFlagPanelSources(): DevFlagPanelSources {
     client: game.clientDevFlags,
     isEverSet: state.devFlagsEverSet === true,
     isHost: isSessionHost(state, game.playerId),
-    overrides: game.devFlagOverrides,
+    overrides: game.isDevFlagSessionOn ? game.devFlagOverrides : {},
     changedDefaults: game.changedDevFlagDefaults,
     overriddenSaveFlags: game.overriddenSaveFlags,
   }

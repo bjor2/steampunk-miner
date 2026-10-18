@@ -1,0 +1,17 @@
+/*
+ * Ticket 549: the debug flag badge, low in the safe area's left corner, over every layer and
+ * never a target, so a thumb landing on the stick zone under it still drives.
+ */
+.badge {
+  position: absolute;
+  left: var(--space-2);
+  bottom: var(--space-2);
+  max-width: min(22rem, 60%);
+  padding: var(--space-1) var(--space-2);
+  border: 1px solid var(--color-ember);
+  border-radius: var(--radius-panel);
+  background: var(--color-panel);
+  color: var(--color-text);
+  font-family: var(--font-mono);
+  pointer-events: none;
+}

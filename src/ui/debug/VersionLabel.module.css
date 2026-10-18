@@ -1,0 +1,22 @@
+/*
+ * Ticket 549: the version number in the safe area's bottom-right corner, over the title and pause
+ * menus' dimmed stage and clear of their centred plates. Quiet, but at the readable floor (#422)
+ * and a whole target: a thumb has to find it to hold it (the 44 px floor, #173).
+ */
+.label {
+  position: absolute;
+  right: var(--space-2);
+  bottom: var(--space-2);
+  display: flex;
+  align-items: center;
+  min-height: var(--control-min);
+  padding: 0 var(--space-2);
+  color: var(--color-text);
+  font-family: var(--font-mono);
+  font-size: var(--text-min);
+  cursor: default;
+  pointer-events: auto;
+  touch-action: none;
+  user-select: none;
+  -webkit-touch-callout: none;
+}

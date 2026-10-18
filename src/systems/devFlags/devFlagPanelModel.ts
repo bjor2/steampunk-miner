@@ -49,6 +49,7 @@ export interface DevFlagPanelRow {
   name: string
   line: string
   isOn: boolean
+  isOnByDefault: boolean
   defaultText: string
   applyRule: string
   pairingRule: string
@@ -129,6 +130,7 @@ function panelRowOf(
     name: row.name,
     line: row.line,
     isOn: flags[row.id],
+    isOnByDefault: shipped[row.id],
     defaultText: `Default ${onOffOf(shipped[row.id])}`,
     applyRule: row.applyRule,
     pairingRule: row.pairingRule,

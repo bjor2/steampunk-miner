@@ -160,6 +160,11 @@ describe('dev flag panel: switches, reset and badge (ticket 549)', () => {
     expect(readDevFlagBadge()?.title).toBe('1 debug flag')
   })
 
+  it('marks nothing remembered in a session that stores nothing', () => {
+    game().chooseDevFlags({ 'drill.exactCarry': false })
+    expect(rowOf('drill.exactCarry')).toMatchObject({ isOn: false, isRemembered: false })
+  })
+
   it('shows a swept cut flip pending while the drill bites', () => {
     relaunchDebugSession(createMemoryTab())
     game().chooseDevFlags({ 'drill.sweptCut': false })

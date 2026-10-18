@@ -8,6 +8,9 @@ import { PlatformScreen } from './ui/platform/PlatformScreen'
 import { Plaques } from './ui/plaques/Plaques'
 import { PauseMenu } from './ui/pause/PauseMenu'
 import { SettingsPanel } from './ui/settings/SettingsPanel'
+import { DevFlagBadge } from './ui/debug/DevFlagBadge'
+import { DevFlagPanel } from './ui/debug/DevFlagPanel'
+import { VersionLabel } from './ui/debug/VersionLabel'
 import { DeviceNotices } from './ui/stage/DeviceNotices'
 import { GameStage } from './ui/stage/GameStage'
 import { UnsupportedDeviceCard } from './ui/stage/UnsupportedDeviceCard'
@@ -37,6 +40,9 @@ export default function App() {
       <ExactAmountSheet />
       <DeviceNotices />
       <UnsavedChip />
+      <VersionLabel />
+      <DevFlagBadge />
+      <DevFlagPanel />
       <UnsupportedDeviceCard />
     </GameStage>
   )
