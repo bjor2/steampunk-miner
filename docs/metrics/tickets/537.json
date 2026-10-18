@@ -5,7 +5,7 @@
   "tier": "fable",
   "model": "claude-fable-5-1",
   "created": "2026-10-17T03:08:08Z",
-  "closed": "2026-10-18T00:04:37Z",
+  "closed": "2026-10-18T07:47:03Z",
   "segments": [
     {"category":"idle","start":"2026-10-17T03:08:08.000Z","end":"2026-10-17T03:08:09.000Z","attempt":0,"tier":null,"model":null,"source":"derived"},
     {"category":"planner_wait","start":"2026-10-17T03:08:09.000Z","end":"2026-10-17T03:18:20.000Z","attempt":0,"tier":null,"model":null,"source":"github"},
@@ -108,12 +108,24 @@
     {"category":"developing","start":"2026-10-18T00:01:24.812Z","end":"2026-10-18T00:01:33.724Z","attempt":2,"tier":null,"model":"claude-fable-5-1","source":"transcript"},
     {"category":"planning","start":"2026-10-18T00:01:33.724Z","end":"2026-10-18T00:01:42.212Z","attempt":2,"tier":null,"model":"claude-fable-5-1","source":"transcript"},
     {"category":"gates","start":"2026-10-18T00:01:42.212Z","end":"2026-10-18T00:04:26.912Z","attempt":2,"tier":null,"model":"claude-fable-5-1","source":"loop-log"},
-    {"category":"idle","start":"2026-10-18T00:04:26.912Z","end":"2026-10-18T00:04:37.000Z","attempt":2,"tier":null,"model":"claude-fable-5-1","source":"derived"}
+    {"category":"idle","start":"2026-10-18T00:04:26.912Z","end":"2026-10-18T07:22:28.000Z","attempt":2,"tier":null,"model":"claude-fable-5-1","source":"derived"},
+    {"category":"other","start":"2026-10-18T07:22:28.000Z","end":"2026-10-18T07:23:16.591Z","attempt":3,"tier":null,"model":"claude-fable-5-1","source":"loop-log"},
+    {"category":"context","start":"2026-10-18T07:23:16.591Z","end":"2026-10-18T07:23:19.241Z","attempt":3,"tier":null,"model":"claude-fable-5-1","source":"transcript"},
+    {"category":"landing","start":"2026-10-18T07:23:19.241Z","end":"2026-10-18T07:23:23.710Z","attempt":3,"tier":null,"model":"claude-fable-5-1","source":"transcript"},
+    {"category":"context","start":"2026-10-18T07:23:23.710Z","end":"2026-10-18T07:24:00.108Z","attempt":3,"tier":null,"model":"claude-fable-5-1","source":"transcript"},
+    {"category":"testing","start":"2026-10-18T07:24:00.108Z","end":"2026-10-18T07:24:17.855Z","attempt":3,"tier":null,"model":"claude-fable-5-1","source":"transcript"},
+    {"category":"developing","start":"2026-10-18T07:24:17.855Z","end":"2026-10-18T07:24:22.125Z","attempt":3,"tier":null,"model":"claude-fable-5-1","source":"transcript"},
+    {"category":"testing","start":"2026-10-18T07:24:22.125Z","end":"2026-10-18T07:27:08.848Z","attempt":3,"tier":null,"model":"claude-fable-5-1","source":"transcript"},
+    {"category":"developing","start":"2026-10-18T07:27:08.848Z","end":"2026-10-18T07:27:14.682Z","attempt":3,"tier":null,"model":"claude-fable-5-1","source":"transcript"},
+    {"category":"landing","start":"2026-10-18T07:27:14.682Z","end":"2026-10-18T07:27:37.046Z","attempt":3,"tier":null,"model":"claude-fable-5-1","source":"transcript"},
+    {"category":"planning","start":"2026-10-18T07:27:37.046Z","end":"2026-10-18T07:27:44.039Z","attempt":3,"tier":null,"model":"claude-fable-5-1","source":"transcript"},
+    {"category":"gates","start":"2026-10-18T07:27:44.039Z","end":"2026-10-18T07:46:52.396Z","attempt":3,"tier":null,"model":"claude-fable-5-1","source":"loop-log"},
+    {"category":"idle","start":"2026-10-18T07:46:52.396Z","end":"2026-10-18T07:47:03.000Z","attempt":3,"tier":null,"model":"claude-fable-5-1","source":"derived"}
   ],
-  "totals": {"blocked":0,"planner_wait":771,"idle":57197,"context":4219,"planning":20,"developing":2875,"testing":8126,"gates":165,"landing":1934,"other":82},
-  "lead_time_s": 75389,
-  "cycle_time_s": 20812,
+  "totals": {"blocked":0,"planner_wait":771,"idle":83479,"context":4258,"planning":27,"developing":2885,"testing":8311,"gates":1313,"landing":1961,"other":130},
+  "lead_time_s": 103135,
+  "cycle_time_s": 48558,
   "claimed": "2026-10-17T18:17:45.000Z",
-  "claimed_to_done_s": 20812,
+  "claimed_to_done_s": 48558,
   "backfilled": false
 }
