@@ -488,8 +488,11 @@ rendered lit with the rock held out into 256 px albedo cells (`docs/art/ore-hero
 mask in alpha) that the per-act hero atlas of
 [#451](https://github.com/bjor2/steampunk-miner/issues/451) packs on its 16th sampler. The cell
 table is `docs/art/ore-heroes/hero-cells.json`; the rarity tint, frame and glow are the shader's,
-never the sprite's. See [docs/art/ore-heroes/README.md](art/ore-heroes/README.md). Nothing draws
-them yet.
+never the sprite's. See [docs/art/ore-heroes/README.md](art/ore-heroes/README.md).
+`python3 docs/art/ore-heroes/encode_hero_atlases.py` packs the cells into one `atlas` asset per
+act (`ground-hero-atlas-<act>`, an albedo map alone: ETC1S sRGB like every albedo map, but four
+mip levels it writes itself, since `toktx` 4.4.2 makes only full chains and a full chain would
+blur one cell into the next).
 
 ## Magnetic planets
 

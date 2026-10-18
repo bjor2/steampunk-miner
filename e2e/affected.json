@@ -578,6 +578,30 @@
         "src/debug/debugKindLooks.ts"
       ],
       "specs": ["e2e/browser/materialLooks.spec.ts", "e2e/browser/render.spec.ts"]
+    },
+    {
+      "why": "The per-act hero atlas (ticket 451): the materials' atlas rows and art, the roster's act lookup, the probe's 16th-unit gate, the terrain's swap and binder, and its debug read.",
+      "paths": [
+        "src/features/roster/systems/render/**",
+        "src/features/materials/**",
+        "src/systems/registries/kindLook.ts",
+        "src/systems/render/heroAtlas.ts",
+        "src/systems/render/gpuTier.ts",
+        "src/scene/HeroAtlas.tsx",
+        "src/scene/terrainHeroAtlas.ts",
+        "src/scene/heroAtlasPresence.ts",
+        "src/scene/terrainKindShader.ts",
+        "src/scene/terrainMaterial.ts",
+        "src/scene/PlanetTerrain.tsx",
+        "src/scene/atlasTextures.ts",
+        "src/debug/debugKindLooks.ts",
+        "public/assets/ground/ground-hero-atlas-*/**"
+      ],
+      "specs": [
+        "e2e/browser/heroAtlas.spec.ts",
+        "e2e/browser/materialLooks.spec.ts",
+        "e2e/browser/renderQuality.spec.ts"
+      ]
     }
   ]
 }

@@ -266,12 +266,23 @@ programs }` from three's `renderer.info` of the game canvas), read only when cal
   instance arrays (render-state digests recorded at `a157e171`, `renderStateFixtures.ts`).
   `src/scene/terrainUniforms.test.ts` holds the look to at most 24 new fragment uniform vectors,
   the full fragment stage to 96 of the 224 floor and either program to 11 of the 15 varyings;
-  `terrainSamplers.test.ts` keeps 15 samplers. `src/systems/render/kindLooks.test.ts` and
+  `terrainSamplers.test.ts` keeps the full program at 15 samplers, 16 with the hero atlas, and fails
+  a 17th. `src/systems/render/kindLooks.test.ts` and
   `kindLookTable.test.ts` cover the shader's catalogue and the table encoding,
   `src/scene/terrainKindLooks.test.ts` the one writer, and
   `src/features/materials/systems/render/rarityLooks.test.ts` the rarity data's guard. The browser
   spec `e2e/browser/materialLooks.spec.ts` reads the table through `ui.getKindLooks()`. The look
   itself (each species apart at phone size) is an eye check; real-GPU frame cost is #526's A/B.
+  The per-act hero atlas (ticket 451): `src/systems/render/gpuTier.test.ts` gives it the 16th unit
+  only with 16 units, the full program and an ETC1S alpha target;
+  `src/systems/render/heroAtlas.test.ts` the asset lookup, the 16-cell cap and the 2 MiB resident
+  budget; `src/features/materials/systems/render/heroAtlases.test.ts` the rows (hero species
+  only, in the #452 cell order) and each shipped KTX2 (1024 px, ETC1S sRGB, four levels);
+  `src/features/roster/kindLook.test.ts` one atlas object per act; `src/scene/terrainHeroAtlas.test.ts`
+  the binder (one resident, released and disposed before the next, RGBA8 refused) and the table
+  drawing a seen hero from its cell only while bound. The browser spec
+  `e2e/browser/heroAtlas.spec.ts` checks through `ui.getKindLooks()` that a change of act binds
+  once, a planet change inside an act binds none, and no bind links a program.
 - **Pacing bot** (`src/systems/bot/`, #29): plays `scenarios/bot-slice.scenario.json` through
   authority commands with the #6 movement-time model, buying casing grades on-curve (grade `b`
   before it mines band `b`, grade 5 before the core, S11). Its scripted mining (`drillTile`) lays

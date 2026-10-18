@@ -2,8 +2,11 @@
  * The debug API's read and switch of the ground's material looks (ticket 450): the look table the
  * terrain material was last given, as the shader reads it, and a presentation switch that shows
  * every kind as if the player had met it, for eye checks and the #526 frame A/B (a fresh save
- * shows none). State, never pixels; no command, no log line, not in the digest.
+ * shows none). State, never pixels; no command, no log line, not in the digest. It also reads the
+ * per-act hero atlas (ticket 451): whether the probe gave it the 16th unit, the act resident, its
+ * cells and how many binds there have been, so a spec sees a swap happen only at a change of act.
  */
+import { heroAtlasPresence } from '../scene/heroAtlasPresence'
 import { kindLookPresence } from '../scene/kindLookPresence'
 import {
   heroCellOfEntry,
@@ -30,6 +33,7 @@ export interface DrawnKindLooks {
   isEveryKindShown: boolean
   /** Slots drawing a species, slot 1 first. */
   shown: DrawnKindLook[]
+  heroAtlas: typeof heroAtlasPresence
 }
 
 export function readDrawnKindLooks(): DebugResult<{ looks: DrawnKindLooks }> {
@@ -37,7 +41,11 @@ export function readDrawnKindLooks(): DebugResult<{ looks: DrawnKindLooks }> {
   const slots = Array.from({ length: KIND_LOOK_SLOTS }, (_, at) => drawnLookOf(table.kinds, at))
   return {
     ok: true,
-    looks: { isEveryKindShown, shown: slots.filter((look) => look.silhouetteCode > 0) },
+    looks: {
+      isEveryKindShown,
+      shown: slots.filter((look) => look.silhouetteCode > 0),
+      heroAtlas: { ...heroAtlasPresence, cells: [...heroAtlasPresence.cells] },
+    },
   }
 }
 

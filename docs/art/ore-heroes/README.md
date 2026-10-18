@@ -12,8 +12,8 @@ The heroes are the `hero: true` rows of the `legacy` pool in
 [Materials rows for P1 and P2 (#447)](https://github.com/bjor2/steampunk-miner/issues/447): the
 three rares and Violet Fluorite, four for the act. P1 (`foothold.base`) and P2 (`foothold.heavy`,
 to P7) draw the same pool, so both acts get these four cells; the foothold pools of P3 to P7 add
-their own heroes in the follow-up art ticket. This folder holds sources and renders only: nothing
-in the game reads it yet, and `hero` is read by nothing at run time.
+their own heroes in the follow-up art ticket. This folder holds sources and renders; the game
+draws the cells from the per-act atlases `encode_hero_atlases.py` packs from them (#451).
 
 Authored in Blender 4.2.9 on the shared box, headless, on the ore stage of
 [docs/art/ores](../ores/README.md) (the same 1 m cell, lamp rig, orthographic camera and band
@@ -50,6 +50,7 @@ would double it. No glow layer, no compositor bloom, no animation.
 | `cells/<species>.png`                           | the atlas cell: the 248 px lit sprite (straight alpha, the mask) with its edge pixels extended into the 4 px gutter of a 256 px cell, ready to pack                                 |
 | `hero-cells.json`                               | the cell table for #451: pool, acts, atlas shape, and per cell the species, rarity, hue slot, body colour, window and content rect                                                  |
 | `sheets/atlas-preview.<act>.png`                | the 1024 px per-act atlas as #451's shape packs it (cell `i` at column `i mod 4`, row `i div 4`); a preview, #451 owns the shipped KTX2                                             |
+| `encode_hero_atlases.py`                        | packs `cells/` into each act's shipped atlas, `public/assets/ground/ground-hero-atlas-<act>/` (ETC1S sRGB, four mip levels, colour bled into transparent texels)                    |
 | `sheets/heroes-legacy.shallow.jpg`              | the four cells at 256 px/m on their band's rock under the headlamp and fill                                                                                                         |
 | `sheets/heroes-legacy.deep.jpg`                 | the same under the dim cool fill of band 5                                                                                                                                          |
 | `sheets/heroes-legacy.closeup.jpg`              | the four at 480 px/m                                                                                                                                                                |

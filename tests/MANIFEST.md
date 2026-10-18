@@ -265,11 +265,12 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/ground-gun/turretPace.lane.test.ts` | 1 | 1 |
 | `src/features/ground-gun/ui/fireGauge.test.ts` | 3 | 3 |
 
-### `materials`: 2 files, 42 tests
+### `materials`: 3 files, 48 tests
 
 | File | Tests | Sites |
 | --- | --- | --- |
 | `src/features/materials/systems/materialTable.test.ts` | 37 | 34 |
+| `src/features/materials/systems/render/heroAtlases.test.ts` | 6 | 6 |
 | `src/features/materials/systems/render/rarityLooks.test.ts` | 5 | 5 |
 
 ### `mining-gates`: 25 files, 153 tests
@@ -425,11 +426,11 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/power-up-core/systems/useRefusals.test.ts` | 3 | 3 |
 | `src/features/power-up-core/systems/useResolution.test.ts` | 12 | 12 |
 
-### `roster`: 13 files, 203 tests
+### `roster`: 13 files, 207 tests
 
 | File | Tests | Sites |
 | --- | --- | --- |
-| `src/features/roster/kindLook.test.ts` | 20 | 11 |
+| `src/features/roster/kindLook.test.ts` | 24 | 15 |
 | `src/features/roster/rarityShares.test.ts` | 18 | 18 |
 | `src/features/roster/roster.byteIdentity.lane.test.ts` | 5 | 1 |
 | `src/features/roster/roster.byteIdentity.test.ts` | 29 | 15 |
@@ -638,7 +639,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | --- | --- | --- |
 | `src/systems/art/assetLint.test.ts` | 16 | 16 |
 | `src/systems/art/assetLook.test.ts` | 7 | 7 |
-| `src/systems/art/assetManifest.test.ts` | 12 | 12 |
+| `src/systems/art/assetManifest.test.ts` | 13 | 13 |
 | `src/systems/art/autoGunsArt.test.ts` | 5 | 5 |
 | `src/systems/art/blastingChargesArt.test.ts` | 2 | 2 |
 | `src/systems/art/heatLavaArt.test.ts` | 6 | 6 |
@@ -648,7 +649,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/art/icons/iconStems.test.ts` | 3 | 3 |
 | `src/systems/art/icons/iconSvg.test.ts` | 6 | 6 |
 | `src/systems/art/icons/oreIcon.test.ts` | 3 | 3 |
-| `src/systems/art/ktx2Header.test.ts` | 8 | 8 |
+| `src/systems/art/ktx2Header.test.ts` | 9 | 9 |
 | `src/systems/art/partsSidecar.test.ts` | 22 | 18 |
 | `src/systems/art/placeholderLook.test.ts` | 10 | 9 |
 | `src/systems/art/refineryBayArt.test.ts` | 2 | 2 |
@@ -1137,7 +1138,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/render/enemyTint.test.ts` | 5 | 5 |
 | `src/systems/render/frameWindow.test.ts` | 4 | 4 |
 | `src/systems/render/gatePatterns.test.ts` | 10 | 10 |
-| `src/systems/render/gpuTier.test.ts` | 11 | 2 |
+| `src/systems/render/gpuTier.test.ts` | 19 | 3 |
 | `src/systems/render/groundBlocks.test.ts` | 7 | 7 |
 | `src/systems/render/groundStrata.test.ts` | 6 | 6 |
 | `src/systems/render/gunLook.test.ts` | 7 | 7 |
@@ -1149,7 +1150,8 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/render/headlamp.test.ts` | 3 | 3 |
 | `src/systems/render/heatShimmer.test.ts` | 2 | 2 |
 | `src/systems/render/heatTiles.test.ts` | 3 | 3 |
-| `src/systems/render/kindLookTable.test.ts` | 6 | 6 |
+| `src/systems/render/heroAtlas.test.ts` | 5 | 5 |
+| `src/systems/render/kindLookTable.test.ts` | 11 | 11 |
 | `src/systems/render/kindLooks.test.ts` | 6 | 6 |
 | `src/systems/render/mountedPartLook.test.ts` | 8 | 4 |
 | `src/systems/render/oreGrade.test.ts` | 2 | 2 |
@@ -1225,8 +1227,9 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/scene/sceneDisposal.test.ts` | 8 | 3 |
 | `src/scene/soundCuePlayer.test.ts` | 4 | 4 |
 | `src/scene/sprayIntake.test.ts` | 3 | 3 |
+| `src/scene/terrainHeroAtlas.test.ts` | 5 | 5 |
 | `src/scene/terrainKindLooks.test.ts` | 4 | 4 |
-| `src/scene/terrainSamplers.test.ts` | 7 | 7 |
+| `src/scene/terrainSamplers.test.ts` | 8 | 8 |
 | `src/scene/terrainUniforms.test.ts` | 4 | 4 |
 | `src/scene/vehicleStage.test.ts` | 7 | 7 |
 
