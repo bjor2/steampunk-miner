@@ -367,8 +367,14 @@ import type { DriveSigns } from '../vehicle/driveSigns'
  *    `devFlagsEverSet`, and drops the carries of a flag it turns on. The rules read `flagsOf`
  *    (the defaults with the delta) in place of the module global. With no flag set no field is
  *    written and no digest or mined order changes.
+ * 91: drill power grows and is priced per purchase (ticket 552, the GD ruling on #551 and its
+ *    amendment): a stored drill_power step is one purchase, `D(n) = 1.5 x 1.12^(1/18) x
+ *    1.243^(n-1)` with `D(0) = 1.5`, and purchase `n` costs `ceil(20 x 1.48^(n-1)) x paceScale`,
+ *    1 at `n = 0`, with no pip rule and no major split. Steps 0 and 1 keep their stat; every run
+ *    that holds a drill past stored step 1 or buys one past the first cuts, heats, charges and
+ *    pays differently, so its digests move.
  */
-export const AUTHORITY_PROTOCOL_VERSION = 90
+export const AUTHORITY_PROTOCOL_VERSION = 91
 
 /** The kernel's own commands: the closed set its rule tables are written against. */
 export interface KernelCommandPayloads {

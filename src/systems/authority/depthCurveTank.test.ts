@@ -10,11 +10,13 @@ import { cellDigEnergyOf } from './cellDigEnergy'
 
 // Ticket 448 (Systems on #139, comment 6203133480 section 2 and 6203159815 item 4): the tank rule
 // of #396, `tank = 1.25 x max over bands of (cells to fill the hold in band b x H_b)`, priced with
-// the game's own per-cell energy (the swept cut's charge, `cellDigEnergyOf`) for the on-curve rig
-// and hold. Under the depth density curve band 1 needs the most cells and becomes the worst band;
-// the tank the rule gives on today's step bands, which the tank rows are not retuned from, must
-// still hold at least 1.10 times the new worst need, so energy never ends a band-1 hold, P3 to P40
-// and headless at P200. The shipped boiler rows are not that tank: they grow linearly, and on the
+// the game's own energy for the on-curve rig and hold: the swept cut's law charge (ticket 540, on),
+// which carries the work across cells and rounds a whole hold's sub-steps to quanta once
+// (`cellDigEnergyOf` of the hold). A charge rounded up a cell at a time would overstate the fast
+// per-purchase drill of #552, whose band-1 cell costs a few quanta. Under the depth density curve
+// band 1 needs the most cells and becomes the worst band; the tank the rule gives on today's step
+// bands, which the tank rows are not retuned from, must still hold at least 1.10 times the new
+// worst need, so energy never ends a band-1 hold, P3 to P40 and headless at P200. The shipped boiler rows are not that tank: they grow linearly, and on the
 // on-curve rig they fall short of a full band-1 hold from about P10 under the curve (P20 on the step
 // bands). Whether the rule is applied to the rows is the Vertical Scaler's call, so nothing here
 // pins them.
@@ -24,22 +26,22 @@ const WORLD_SEED = 83921
 const PLANETS = [...Array.from({ length: 38 }, (_, at) => at + 3), 200]
 const BANDS = Array.from({ length: BAND_COUNT }, (_, at) => at + 1)
 
-/** Quanta the on-curve drill burns to break one plain cell of each band. */
-function cellEnergyByBand(planetIndex: number): number[] {
+/** Sub-steps the on-curve drill spends on one plain cell of each band. */
+function cellSubStepsByBand(planetIndex: number): number[] {
   const drill = vehicleStatsAt(onCurveSteps(planetIndex))
   return BANDS.map((band) => {
     const subSteps = subStepsPerTile(drill, blockHardness(planetIndex, band))
     if (subSteps === null) throw new Error(`the on-curve tip cannot scratch band ${band}`)
-    return cellDigEnergyOf(subSteps)
+    return subSteps
   })
 }
 
-/** Quanta to fill the on-curve hold in each band: the cells it takes times each cell's energy. */
+/** Quanta to fill the on-curve hold in each band: the cells it takes, charged as one law cut. */
 function holdFillQuantaByBand(planetIndex: number, densityBp: readonly number[]): number[] {
   const hold = vehicleStatsAt(onCurveSteps(planetIndex)).cargoCapacity
-  return cellEnergyByBand(planetIndex).map((quanta, at) => {
+  return cellSubStepsByBand(planetIndex).map((subSteps, at) => {
     const cells = Math.ceil((hold * BASIS_POINTS) / densityBp[at])
-    return cells * quanta
+    return cellDigEnergyOf(cells * subSteps)
   })
 }
 
