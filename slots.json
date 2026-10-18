@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-10-18T20:18:02+02:00",
+  "updated_at": "2026-10-18T20:18:08+02:00",
   "caps": {
     "grok": 12,
     "claude": 10,
@@ -121,41 +121,23 @@
     }
   ],
   "gate": {
-    "busy": 0,
+    "busy": 1,
     "max": 3
   },
   "tester": {
     "state": "running",
-    "phase": "slow",
-    "sha": "7b25481985191a0153c25cee55fc521929cf841c",
-    "since": "2026-10-18T17:57:38Z",
+    "phase": "fast",
+    "sha": "20ef31bc5eb28b2b93cd4e84e1b03914c67d76cc",
+    "since": "2026-10-18T18:18:05Z",
     "holds_gate": true,
     "claude_slot": null,
     "last_run": "2026-10-18T17:57:37Z",
     "last_nightly": "2026-10-15T20:43:15Z",
     "last_nightly_result": "full=FAIL balance-report=ok bench=FAIL balance-planets=ok balance-guns=ok balance-charges=ok balance-refinery=ok balance-heat=ok e2e=FAIL memory-soak=FAIL packaged-smoke=ok ",
     "main_red_sha": null,
-    "feature": 245,
-    "feature_title": "Grilling: Sixth \"Aetheric science\" lane or fold steampunk-scientific power-ups into existing lanes?",
+    "feature": 161,
+    "feature_title": "Spec: Deep tech tree: structure, costs and endless depth",
     "queue": [
-      {
-        "feature": 161,
-        "kind": "spec",
-        "title": "Spec: Deep tech tree: structure, costs and endless depth",
-        "tickets": [
-          249,
-          251,
-          254,
-          295,
-          370,
-          371,
-          384,
-          385,
-          408,
-          411
-        ],
-        "since": "2026-10-15T12:27:02+02:00"
-      },
       {
         "feature": 418,
         "kind": "ticket",
