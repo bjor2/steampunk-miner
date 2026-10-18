@@ -7,7 +7,6 @@ import {
   cellKey,
   CLEARING_RIG,
   cutAtBothCadences,
-  cutStream,
   positionAt,
   STREAM_GEARS,
   STREAM_TICKS,
@@ -156,10 +155,22 @@ describe('the drill event stream at a report every tick and every 12 ticks (#514
 
   it('credits the cut, the cargo and the ore-first lines to the cutting player in the same order', () => {
     const run = runOf('straight', SLOW_MPS)
-    const everyTick = creditedLinesOf(cutStream(run, 1).events)
-    const every12 = creditedLinesOf(cutStream(run, 12).events)
-    expect(everyTick.some((line) => line.startsWith('CargoAdded'))).toBe(true)
-    expect(everyTick).toEqual(every12)
-    expect(everyTick.every((line) => line.endsWith(' p1'))).toBe(true)
+    // Both cadences pinned the way cutAtBothCadences pins them: every tick on the exact carry,
+    // where interval 1 is live and the capsule cuts (the exact carry ships on, so a bare
+    // `cutStream(run, 1)` is the capsule too; it used to be the bare disc while the flag was off).
+    const { everyTick, every12 } = cutAtBothCadences(run)
+    const everyTickLines = creditedLinesOf(everyTick.events)
+    const every12Lines = creditedLinesOf(every12.events)
+    expect(everyTickLines.some((line) => line.startsWith('CargoAdded'))).toBe(true)
+    // The capsule's only extra credits are cut cells inside the paid reach (the rim cell under the
+    // bit's own stamp at the start, which the 12-tick disc leaves part-cut: bar (b)'s acceptable
+    // kind); with those lines set aside, every cut, cargo and ore-first line is the 12-tick
+    // stream's, in the same order.
+    const twelve = new Set(every12.cells)
+    const extraCells = everyTick.cells.filter((cell) => !twelve.has(cell))
+    expect(extraCells.filter((cell) => !isWithinPaidReach(run, cell))).toEqual([])
+    const extraLines = new Set(extraCells.map((cell) => `TileDestroyed ${cell} p1`))
+    expect(everyTickLines.filter((line) => !extraLines.has(line))).toEqual(every12Lines)
+    expect(everyTickLines.every((line) => line.endsWith(' p1'))).toBe(true)
   })
 })
