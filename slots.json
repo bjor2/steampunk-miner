@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-10-18T11:36:35+01:00",
+  "updated_at": "2026-10-18T11:36:49+01:00",
   "caps": {
     "grok": 12,
     "claude": 10,
@@ -120,32 +120,23 @@
     }
   ],
   "gate": {
-    "busy": 0,
+    "busy": 1,
     "max": 3
   },
   "tester": {
     "state": "running",
     "phase": "fast",
-    "sha": "46fdb0d0611037d2f1b7a5a3d11a6d8d5717c9f2",
-    "since": "2026-10-18T10:36:28Z",
-    "holds_gate": false,
+    "sha": "5a0866ff1ab86210615495b674bdc56372bc9f82",
+    "since": "2026-10-18T10:36:49Z",
+    "holds_gate": true,
     "claude_slot": null,
-    "last_run": "2026-10-18T06:48:04Z",
+    "last_run": "2026-10-18T10:36:42Z",
     "last_nightly": "2026-10-15T20:43:15Z",
     "last_nightly_result": "full=FAIL balance-report=ok bench=FAIL balance-planets=ok balance-guns=ok balance-charges=ok balance-refinery=ok balance-heat=ok e2e=FAIL memory-soak=FAIL packaged-smoke=ok ",
     "main_red_sha": null,
-    "feature": 256,
-    "feature_title": "Grilling: Mark milestone behaviours",
+    "feature": 304,
+    "feature_title": "Grilling: Exponential drill speed law (never capped, carries across planets)",
     "queue": [
-      {
-        "feature": 304,
-        "kind": "spec",
-        "title": "Grilling: Exponential drill speed law (never capped, carries across planets)",
-        "tickets": [
-          396
-        ],
-        "since": "2026-10-15T00:44:07+02:00"
-      },
       {
         "feature": 245,
         "kind": "spec",
