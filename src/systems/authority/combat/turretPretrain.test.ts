@@ -3,8 +3,8 @@ import { withRegistrations } from '../../../registries/registrar'
 import type { SliceDefinition } from '../../../registries/sliceDefinition'
 import { enemyHealth, enemyTier } from '../../economy/enemyStats'
 import { gunShotDamage } from '../../economy/gunStats'
-import { stepOfMajor } from '../../economy/upgradeSteps'
-import { hullMax, onCurveLevel, onCurveStep } from '../../economy/vehicleStats'
+import { stepOfLevel, stepOfMajor } from '../../economy/upgradeSteps'
+import { hullMax, onCurveLevel } from '../../economy/vehicleStats'
 import { cmp, fromSafeInteger, mul, sub, toCanonical } from '../../money'
 import type { TurretShape } from '../../registries/autoGuns'
 import { FACING, tileOfMillimetres } from '../../vehicle/vehiclePose'
@@ -17,6 +17,7 @@ import { createScriptedSession, type ScriptedSession } from '../scriptedSession'
 import {
   CORRIDOR_MIDDLE,
   CORRIDOR_ROW,
+  PLANET_4_FIGHT_DRILL_LEVEL,
   poseAt,
   prepareCorridor,
   setHull,
@@ -31,10 +32,14 @@ import { pretrainOf } from './turretPretrain'
 import { BASE_TURRET_SHAPE } from './turretShape'
 import { vehicleTargetOf } from './vehicleTarget'
 
-/** Planet 4's on-curve rig with level-1 guns, firing every 30 ticks (#107). */
+/**
+ * Planet 4's rig with level-1 guns, firing every 30 ticks (#107): the on-curve hull, and the drill
+ * whose quarter-power shot band-3 enemies outlive (#552, see the fixture).
+ */
 const PLANET = 4
 const BAND_3_TIER = enemyTier(PLANET, 3)
-const SHOT_DAMAGE = gunShotDamage(onCurveStep('drill_power', PLANET))
+const DRILL_LEVEL = PLANET_4_FIGHT_DRILL_LEVEL
+const SHOT_DAMAGE = gunShotDamage(stepOfLevel('drill_power', DRILL_LEVEL))
 const REPORT_TICKS = 12
 const SPOTTER: TurretShape = { ...BASE_TURRET_SHAPE, pretrainTicks: 8 }
 const RIG_X = CORRIDOR_MIDDLE.tx * 1000 + 500
@@ -162,7 +167,7 @@ describe('turret pre-train: in a fight (K-pretrain, ticket 413, acceptance 1-3)'
   function armedCorridor(session: ScriptedSession): number {
     const start = prepareCorridor(session, FACING.right)
     const hullLevel = onCurveLevel('hull', PLANET)
-    session.submit(start, setUpgrade('drill_power', onCurveLevel('drill_power', PLANET)))
+    session.submit(start, setUpgrade('drill_power', DRILL_LEVEL))
     session.submit(start, setUpgrade('hull', hullLevel))
     session.submit(start, setHull(toCanonical(hullMax(hullLevel))))
     session.submit(start, { type: 'debug.setGunLevel', payload: { level: stepOfMajor(1) } })

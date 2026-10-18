@@ -25,6 +25,7 @@ import {
   CORRIDOR_MIDDLE,
   CORRIDOR_ROW,
   freezeEnemies,
+  PLANET_4_FIGHT_DRILL_LEVEL,
   poseAt,
   prepareCorridor,
   setHull,
@@ -33,17 +34,20 @@ import {
 } from './combatFixtures'
 import type { Enemy } from './combatState'
 import { BASE_TURRET_SHAPE } from './turretShape'
-import { stepOfMajor } from '../../economy/upgradeSteps'
+import { stepOfLevel, stepOfMajor } from '../../economy/upgradeSteps'
 
-/** Planet 4's on-curve fight, as `gunFire.test.ts` stages it, in the planet 1 corridor. */
+/**
+ * Planet 4's fight, as `gunFire.test.ts` stages it, in the planet 1 corridor: the on-curve hull,
+ * and the drill whose quarter-power shot band-3 enemies outlive (#552, see the fixture).
+ */
 const PLANET = 4
-const DRILL_LEVEL = onCurveLevel('drill_power', PLANET)
+const DRILL_LEVEL = PLANET_4_FIGHT_DRILL_LEVEL
 const HULL_LEVEL = onCurveLevel('hull', PLANET)
 const BAND_3_TIER = enemyTier(PLANET, 3)
 const REPORT_TICKS = 12
 /** Gun level 1 fires every 30 ticks (#107). */
 const SHOT_TICKS = 30
-const SHOT_DAMAGE = gunShotDamage(stepOfMajor(DRILL_LEVEL))
+const SHOT_DAMAGE = gunShotDamage(stepOfLevel('drill_power', DRILL_LEVEL))
 
 const setGunLevel = (level: number): CommandIntent => ({
   type: 'debug.setGunLevel',
@@ -70,7 +74,7 @@ function turretProbe(shape: TurretShape | null, reads = { count: 0 }): SliceDefi
   }
 }
 
-/** The corridor with the planet 4 on-curve rig and level-1 guns; returns the start tick. */
+/** The corridor with the planet 4 rig and level-1 guns; returns the start tick. */
 function armedCorridor(session: ScriptedSession, facing: Facing = FACING.right): number {
   const start = prepareCorridor(session, facing)
   session.submit(start, setUpgrade('drill_power', DRILL_LEVEL))

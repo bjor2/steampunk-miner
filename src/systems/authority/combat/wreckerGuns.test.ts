@@ -26,10 +26,26 @@ import { stepOfMajor } from '../../economy/upgradeSteps'
  * wrecker; planet 80's tier walks 24 mm a tick (1.44 tiles/s), the fastest step any tier takes,
  * because 1.5 tiles/s (25 mm a tick) is the limit the saturating curve never reaches; planet 1's
  * walks 16 mm a tick (0.96 tiles/s), the slowest.
+ *
+ * Planet 80's drill is the one off its curve. Drill power grows x1.243 a purchase since #552,
+ * where enemy health grows 1.12 a tier, so the on-curve purchase 249 there is 0.29x the major 487
+ * the case was set against, and a level-1 gun needs 27 shots for the wrecker where it needed 8.
+ * Combat damage is its own design ticket (#555): until it lands, the case keeps purchase 255, the
+ * closest to that old on-curve drill (1.07x), so it still checks the flee window.
  */
-const SLOWEST = { name: 'slowest (16 mm/tick)', planet: 1, stepMm: 16 }
-const PLANET_6_BAND_2 = { name: 'planet 6 band 2 (19 mm/tick)', planet: 6, stepMm: 19 }
-const FASTEST = { name: 'fastest (24 mm/tick)', planet: 80, stepMm: 24 }
+const SLOWEST = {
+  name: 'slowest (16 mm/tick)',
+  planet: 1,
+  stepMm: 16,
+  drillStep: onCurveStep('drill_power', 1),
+}
+const PLANET_6_BAND_2 = {
+  name: 'planet 6 band 2 (19 mm/tick)',
+  planet: 6,
+  stepMm: 19,
+  drillStep: onCurveStep('drill_power', 6),
+}
+const FASTEST = { name: 'fastest (24 mm/tick)', planet: 80, stepMm: 24, drillStep: 255 }
 type WreckerCase = typeof FASTEST
 
 /** 22 tiles behind the parked vehicle: past `ignoreVehicleTiles`, 18 tiles of tunnel beyond. */
@@ -70,10 +86,7 @@ function armForTheChase(wrecker: WreckerCase): CommandIntent[] {
     },
     {
       type: 'debug.setUpgrade',
-      payload: {
-        upgradeId: 'drill_power',
-        level: onCurveStep('drill_power', wrecker.planet),
-      },
+      payload: { upgradeId: 'drill_power', level: wrecker.drillStep },
     },
     { type: 'debug.setUpgrade', payload: { upgradeId: 'hull', level: stepOfMajor(hullLevel) } },
     { type: 'debug.setHull', payload: { hull: toCanonical(hullMax(hullLevel)) } },

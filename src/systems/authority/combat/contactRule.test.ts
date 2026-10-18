@@ -67,7 +67,9 @@ describe('combat: hits on the vehicle (#9, #25 acceptance 2)', () => {
 })
 
 describe('combat: the pinned enemy (#9, #25 acceptance 3)', () => {
-  it('kills a tier 1 crawler on the nose of a level 13 drill in 72 ticks, at 4 quanta a tick', () => {
+  // The corridor fights with drill purchase 8 since #552 (6.92, where the old level 13 was 6.55):
+  // a tier 1 crawler's 7.84 health at 6.92 / 60 a tick is 67.98 ticks, so 68 where it was 72.
+  it('kills a tier 1 crawler on the nose of a purchase-8 drill in 68 ticks, at 4 quanta a tick', () => {
     const session = createScriptedSession()
     const start = prepareCorridor(session, FACING.right)
     session.submit(start, spawnEnemy('crawler', 1, 1))
@@ -78,7 +80,7 @@ describe('combat: the pinned enemy (#9, #25 acceptance 3)', () => {
     const [killed] = ofType(session.events(), 'EnemyKilled')
     const pinnedTicks = killed.tick - (start + 1)
     expect(killed).toMatchObject({ kind: 'crawler', tier: 1, by: 'drill' })
-    expect(Math.abs(pinnedTicks - 72)).toBeLessThanOrEqual(1)
+    expect(Math.abs(pinnedTicks - 68)).toBeLessThanOrEqual(1)
     expect(energyBefore - session.vehicle().energy).toBe(4 * pinnedTicks)
     expect(session.state().combat.enemies).toEqual([])
   })
@@ -89,7 +91,8 @@ describe('combat: the pinned enemy (#9, #25 acceptance 3)', () => {
     session.submit(start, spawnEnemy('crawler', 1, 1))
     session.advanceTo(start + 100)
     const damaged = ofType(session.events(), 'EnemyDamaged')
-    expect(damaged.map((event) => event.ticks)).toEqual([30, 30, 12])
+    // The 68-tick kill of the purchase-8 drill above (#552).
+    expect(damaged.map((event) => event.ticks)).toEqual([30, 30, 8])
     expect(damaged.every((event) => event.enemyId === 'e1')).toBe(true)
     expect(damaged.every((event) => event.source === 'drill' && event.arc === 'front')).toBe(true)
   })

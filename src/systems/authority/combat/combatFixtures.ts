@@ -12,13 +12,34 @@ import type { CommandIntent } from '../authorityCommand'
 import { drill, type ScriptedSession } from '../scriptedSession'
 import { freezeEnemiesCommand, spawnEnemyCommand } from './combatCommands'
 import { spawnPointsWithin } from './spawnPoints'
-import { stepOfMajor } from '../../economy/upgradeSteps'
+import type { UpgradeId } from '../../economy/economyDefinition'
+import { stepOfLevel } from '../../economy/upgradeSteps'
 
 export const CORRIDOR_ROW = 297
 export const CORRIDOR_MIDDLE: TilePoint = { tx: 20, ty: CORRIDOR_ROW }
 const CORRIDOR_HALF_LENGTH = 6
-/** More than the major-60 drill the corridor is bored with needs for a band 1 tile (#6). */
+/**
+ * The drill the corridor is bored with: purchase 33, the first as strong as the major-60 drill it
+ * was bored with before drill power grew per purchase (#552).
+ */
+const BORE_DRILL_LEVEL = 33
+/** More than the bore drill needs for a band 1 tile (#6). */
 const BORE_TICKS = 30
+/**
+ * The drill the corridor fights with: purchase 8, the first as strong as planet 1's on-curve
+ * major 13 before #552 (6.92 against 6.55). On-curve drill power is now about 2.5x that on planet
+ * 1, and combat damage still follows it until the combat damage design of #555, so the fights
+ * keep the old on-curve power rather than kill everything in a shot or two.
+ */
+const FIGHT_DRILL_LEVEL = 8
+
+/**
+ * The drill for planet 4's #107 fights: purchase 17, the closest to planet 4's on-curve major 31
+ * before #552 (49.0 against 50.3). On-curve drill power is now 21 purchases there, about 2.3x as
+ * strong, and a gun shot is still a quarter of it until the combat damage design of #555, so a
+ * band-3 enemy would die in three shots: the specs that count shots keep the old on-curve shot.
+ */
+export const PLANET_4_FIGHT_DRILL_LEVEL = 17
 
 export interface PoseOptions {
   facing: Facing
@@ -49,10 +70,13 @@ export function poseAt(tile: TilePoint, { facing, vx = 0, vy = 0 }: PoseOptions)
   }
 }
 
-/** A track at major level `level`, sent as its step (#180: `debug.setUpgrade` takes the step). */
-export const setUpgrade = (upgradeId: string, level: number): CommandIntent => ({
+/**
+ * A track at level `level`, sent as its step (#180: `debug.setUpgrade` takes the step): a major, or
+ * drill power's purchase count, which is its step (#552).
+ */
+export const setUpgrade = (upgradeId: UpgradeId, level: number): CommandIntent => ({
   type: 'debug.setUpgrade',
-  payload: { upgradeId, level: stepOfMajor(level) },
+  payload: { upgradeId, level: stepOfLevel(upgradeId, level) },
 })
 
 export const setHull = (hull: string): CommandIntent => ({
@@ -73,10 +97,12 @@ export interface TimedCommand {
 
 /**
  * The corridor set-up as commands: bore it, then stand the vehicle in its middle with the planet 1
- * on-curve hull (`hullMax "125.44"`, #25 acceptance 2) and drill power (level 13).
+ * on-curve hull (`hullMax "125.44"`, #25 acceptance 2) and the fight drill.
  */
 export function corridorCommands(facing: Facing = FACING.right): TimedCommand[] {
-  const commands: TimedCommand[] = [{ tick: 0, intent: setUpgrade('drill_power', 60) }]
+  const commands: TimedCommand[] = [
+    { tick: 0, intent: setUpgrade('drill_power', BORE_DRILL_LEVEL) },
+  ]
   let tick = 1
   for (let dx = -CORRIDOR_HALF_LENGTH; dx <= CORRIDOR_HALF_LENGTH; dx++) {
     const tile = { tx: CORRIDOR_MIDDLE.tx + dx, ty: CORRIDOR_ROW }
@@ -86,7 +112,7 @@ export function corridorCommands(facing: Facing = FACING.right): TimedCommand[] 
   }
   return [
     ...commands,
-    { tick, intent: setUpgrade('drill_power', 13) },
+    { tick, intent: setUpgrade('drill_power', FIGHT_DRILL_LEVEL) },
     { tick, intent: setUpgrade('hull', 2) },
     { tick, intent: setHull('125.44') },
     { tick, intent: poseAt(CORRIDOR_MIDDLE, { facing }) },

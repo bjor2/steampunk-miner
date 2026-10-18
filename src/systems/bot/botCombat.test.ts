@@ -28,11 +28,12 @@ const WRECK_HULL = '1'
 const BITE_WAIT_TICKS = 60
 const RICH = '1000000'
 /**
- * The highest drill major that leaves planet 1's travel to the engine (5.6 of its 6 m/s): from
- * ticket 396's 4-tick floor the corridor's on-curve drill (13) cuts band 1 at 6.6 cells/s and
- * drives the rig at 9.7 m/s, past what a crawler two tiles behind can catch in six tiles.
+ * The highest drill purchase that leaves planet 1's travel to the engine (its 6 m/s; drill power
+ * grows per purchase since #552, so this was major 8): purchase 6 drives the rig at 6.66 m/s, and
+ * the corridor's fight drill (purchase 8) at 10.3 m/s, past what a crawler two tiles behind can
+ * catch in six tiles.
  */
-const ENGINE_BOUND_DRILL_LEVEL = 8
+const ENGINE_BOUND_DRILL_LEVEL = 5
 
 /** The combat specs' planet 1 corridor (#25), the bot in its middle facing along it. */
 function botInCorridor(): { session: BotSession; planet: BotPlanet } {
