@@ -318,7 +318,7 @@ describe('debug api: vehicle', () => {
     expect(report.onCurveByPlanet.map((row) => row.planetIndex)).toEqual(
       Array.from({ length: 40 }, (_, index) => index + 1),
     )
-    expect(report.onCurveByPlanet[0].levels).toMatchObject({ drill_power: 13, drill_tip: 7 })
+    expect(report.onCurveByPlanet[0].levels).toMatchObject({ drill_power: 12, drill_tip: 7 })
     expect(sink.events).toEqual([])
     expect(sink.commands).toEqual([])
   })

@@ -10,14 +10,15 @@ import { withMaterialContact } from './systems/materialFixtures'
 // under protocol 89, and nothing else did (no mined order, no other golden, no device save). With
 // the switch off every golden replays to protocol 88's digests: those below, as committed before
 // the record, with the exact carry off (it ships on since 18 Oct 2026), and with it on, A6's
-// charged digests.
+// charged digests. The two digs that buy drill power past stored step 1 replay to protocol 91's
+// (the per-purchase drill of ticket 552) with the record off.
 
 type MovedDigests = Readonly<Record<string, Readonly<Record<number, string>>>>
 
-/** Protocol 88's digests of the goldens the record moves, by tick. */
+/** Protocol 88's digests of the goldens the record moves, by tick (91's for the two digs). */
 const PROTOCOL_88_DIGESTS: MovedDigests = {
-  'casing-lined-band-2': { 2137: 'b51f4e5a8a552c1e' },
-  'collapse-band-2-grade-1': { 2125: 'ea282a1cfc739ec2' },
+  'casing-lined-band-2': { 2137: '6a716de4327581ee' },
+  'collapse-band-2-grade-1': { 2125: '0f4f8cb9b015775c' },
   'dig-and-return': { 247: '1e33c58bae0ccc65', 3600: 'fe80393ecc5f6472', 4000: 'd7583f1a4c4bb62f' },
   'mined-order-mixed': { 307: '4ebff3e7eb9d8cde' },
 }
@@ -25,8 +26,8 @@ const PROTOCOL_88_DIGESTS: MovedDigests = {
 /** Protocol 88's charged digests (A6, `drill.exactCarry` on) of the same goldens. */
 const PROTOCOL_88_CHARGED_DIGESTS: MovedDigests = {
   ...PROTOCOL_88_DIGESTS,
-  'casing-lined-band-2': { 2137: '4f2b5b5df597d375' },
-  'collapse-band-2-grade-1': { 2125: 'fd1d79ed2a080e24' },
+  'casing-lined-band-2': { 2137: '30c3f2483846f7fa' },
+  'collapse-band-2-grade-1': { 2125: '210371f1101afbb9' },
 }
 
 const goldens = committedGoldenRuns().map((golden) => [golden.name, golden] as const)

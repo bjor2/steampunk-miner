@@ -17,10 +17,16 @@ import {
   createScriptedSession,
   type ScriptedSession,
 } from '../../../systems/authority/scriptedSession'
-import { onCurveSteps } from '../../../systems/economy/vehicleStats'
 import { setUpgradeCommand } from '../../../systems/vehicle/vehicleCommands'
 import { mountedLevels } from '../systems/gunLevels'
 import { hearFireRefusals } from './fireInput'
+
+/**
+ * The planet-4 drill the gun's bore is timed against: purchase 17, the power planet 4's on-curve
+ * major 31 had before drill power grew per purchase (#552); the on-curve purchase 21 is 2.3x it,
+ * and its bore through band-1 rock ends inside the gun's cooldown.
+ */
+const PLANET_4_DRILL = 17
 
 /** The store's local player, whose replica the fire input reads. */
 export const CLIENT_PLAYER = 'player_1'
@@ -76,7 +82,7 @@ function rigAuthority(isGunMounted: boolean): Authority {
     submit: (tick, intent) => session.submit(tick, intent, CLIENT_PLAYER),
   }
   if (isGunMounted) asPlayer.submit(0, setLevelsIntent())
-  asPlayer.submit(0, setUpgradeCommand('drill_power', onCurveSteps(4).drill_power))
+  asPlayer.submit(0, setUpgradeCommand('drill_power', PLANET_4_DRILL))
   standInPocket(asPlayer, PLAIN_RIG, 0)
   return createLoopbackAuthority(session.state())
 }

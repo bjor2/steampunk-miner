@@ -7,7 +7,6 @@ import {
   createScriptedSession,
   type ScriptedSession,
 } from '../../../systems/authority/scriptedSession'
-import { onCurveSteps } from '../../../systems/economy/vehicleStats'
 import { feedbackCuesOf } from '../../../systems/feedback/feedbackCues'
 import { setUpgradeCommand } from '../../../systems/vehicle/vehicleCommands'
 import { GROUND_GUN } from './groundGunEconomy'
@@ -23,6 +22,13 @@ import {
 } from './fireHold'
 import { mountedLevels } from './gunLevels'
 
+/**
+ * The planet-4 drill the gun's bore is timed against: purchase 17, the power planet 4's on-curve
+ * major 31 had before drill power grew per purchase (#552); the on-curve purchase 21 is 2.3x it,
+ * and its bore through band-1 rock ends inside the gun's cooldown.
+ */
+const PLANET_4_DRILL = 17
+
 const PRESS_TICK = 10
 const FIRE_EAST_BEARING = 255
 const TICKS_PER_SECOND = 60
@@ -33,7 +39,7 @@ function armedRig(): ScriptedSession {
   const session = createScriptedSession()
   const setLevels: CommandIntent = { type: 'debug.ground-gun.setLevels', payload: mountedLevels() }
   session.submit(0, setLevels)
-  session.submit(0, setUpgradeCommand('drill_power', onCurveSteps(4).drill_power))
+  session.submit(0, setUpgradeCommand('drill_power', PLANET_4_DRILL))
   standInPocket(session, PLAIN_RIG, 0)
   return session
 }

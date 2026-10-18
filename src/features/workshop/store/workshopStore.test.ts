@@ -255,8 +255,9 @@ describe('workshop hold-to-buy controller', () => {
     expect(ticks[29] - ticks[0]).toBeLessThanOrEqual(200)
   })
 
+  // Fifty drill power purchases cost about 9e9 since #552's x1.48 a purchase.
   it('keeps a 50-purchase spree within 4 ratchet voices and 1 flourish', () => {
-    atUpgradeBayWith()
+    atUpgradeBayWith('1e12')
     holdFor('drill_power', 50)
     const loudest = loudestVoicesOf(cues)
 

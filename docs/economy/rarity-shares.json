@@ -1106,9 +1106,9 @@
     {
       "planet": 10,
       "item": "power.mineral_drain",
-      "shareBp": 1421,
-      "nominalShareBp": 1500,
-      "unclampedBp": 2314,
+      "shareBp": 1208,
+      "nominalShareBp": 1275,
+      "unclampedBp": 1208,
       "isFailing": false
     },
     {
@@ -1116,7 +1116,7 @@
       "item": "consumable.lodestone_beacon",
       "shareBp": 1421,
       "nominalShareBp": 1500,
-      "unclampedBp": 17421,
+      "unclampedBp": 9089,
       "isFailing": false
     },
     {
@@ -1124,7 +1124,7 @@
       "item": "power.ore_shifter",
       "shareBp": 1421,
       "nominalShareBp": 1500,
-      "unclampedBp": 7486,
+      "unclampedBp": 3906,
       "isFailing": false
     },
     {
@@ -1132,7 +1132,7 @@
       "item": "power.pressure_pocket",
       "shareBp": 1421,
       "nominalShareBp": 1500,
-      "unclampedBp": 10888,
+      "unclampedBp": 5681,
       "isFailing": false
     },
     {
@@ -1140,7 +1140,7 @@
       "item": "power.mineral_drain",
       "shareBp": 1421,
       "nominalShareBp": 1500,
-      "unclampedBp": 2722,
+      "unclampedBp": 1894,
       "isFailing": false
     },
     {
@@ -1148,7 +1148,7 @@
       "item": "consumable.lodestone_beacon",
       "shareBp": 1421,
       "nominalShareBp": 1500,
-      "unclampedBp": 17421,
+      "unclampedBp": 12119,
       "isFailing": false
     },
     {
@@ -1156,7 +1156,7 @@
       "item": "power.ore_shifter",
       "shareBp": 1421,
       "nominalShareBp": 1500,
-      "unclampedBp": 7486,
+      "unclampedBp": 5208,
       "isFailing": false
     },
     {
@@ -1164,7 +1164,7 @@
       "item": "power.pressure_pocket",
       "shareBp": 1421,
       "nominalShareBp": 1500,
-      "unclampedBp": 10888,
+      "unclampedBp": 7574,
       "isFailing": false
     },
     {
@@ -1172,7 +1172,7 @@
       "item": "power.mineral_drain",
       "shareBp": 1421,
       "nominalShareBp": 1500,
-      "unclampedBp": 2722,
+      "unclampedBp": 3196,
       "isFailing": false
     },
     {
@@ -1180,7 +1180,7 @@
       "item": "consumable.lodestone_beacon",
       "shareBp": 1421,
       "nominalShareBp": 1500,
-      "unclampedBp": 17421,
+      "unclampedBp": 20450,
       "isFailing": false
     },
     {
@@ -1188,7 +1188,7 @@
       "item": "power.ore_shifter",
       "shareBp": 1421,
       "nominalShareBp": 1500,
-      "unclampedBp": 7486,
+      "unclampedBp": 8787,
       "isFailing": false
     },
     {
@@ -1196,7 +1196,7 @@
       "item": "power.pressure_pocket",
       "shareBp": 1421,
       "nominalShareBp": 1500,
-      "unclampedBp": 10888,
+      "unclampedBp": 12782,
       "isFailing": false
     },
     {
@@ -1204,7 +1204,7 @@
       "item": "power.mineral_drain",
       "shareBp": 1421,
       "nominalShareBp": 1500,
-      "unclampedBp": 2722,
+      "unclampedBp": 5444,
       "isFailing": false
     },
     {
@@ -1212,7 +1212,7 @@
       "item": "consumable.lodestone_beacon",
       "shareBp": 1421,
       "nominalShareBp": 1500,
-      "unclampedBp": 17421,
+      "unclampedBp": 34841,
       "isFailing": false
     },
     {
@@ -1220,7 +1220,7 @@
       "item": "power.ore_shifter",
       "shareBp": 1421,
       "nominalShareBp": 1500,
-      "unclampedBp": 7486,
+      "unclampedBp": 14971,
       "isFailing": false
     },
     {
@@ -1228,7 +1228,7 @@
       "item": "power.pressure_pocket",
       "shareBp": 1421,
       "nominalShareBp": 1500,
-      "unclampedBp": 10888,
+      "unclampedBp": 21776,
       "isFailing": false
     }
   ]
