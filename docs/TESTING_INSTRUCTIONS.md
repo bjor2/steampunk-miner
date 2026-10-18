@@ -147,7 +147,8 @@ programs }` from three's `renderer.info` of the game canvas), read only when cal
   screens' view models, the bay screen's shutter, text size and preview framing (#45, #44), the music's layer targets, settings and stinger sequence (#49) and
   the drill voice (`drillVoice`: `casing` while the drill's nose is in lining, #41), and
   changes local presentation only: no command, no log line, no `debugApplied` (#11 amendment 2,
-  #33). The `input` namespace (`input.press/release/tap(actionId)`, `input.getBindings()`,
+  #33). The exception is `ui.setDevFlags(flags)` (ticket 548), which sends a logged
+  `debug.setFlags` and marks the run; `ui.getDevFlags()` is its unlogged read. The `input` namespace (`input.press/release/tap(actionId)`, `input.getBindings()`,
   `input.setBindings(overrides)`, the unlogged read `input.getActionStream()`: every action
   pressed and held one released, oldest first, from keys, touches, the pad and the API alike, #173,
   and `input.padFrame(frame | null)` / `input.getPadAim()`: a polled gamepad frame as the shell hands
@@ -673,6 +674,22 @@ programs }` from three's `renderer.info` of the game canvas), read only when cal
   that a load keeps its world's flags and New Game drops them. With no flag set no field is written,
   so every golden and the device save keep their digests. A balance report refuses a marked run
   (`src/logging/devFlagReport.ts`) and `perf:sessions` refuses a marked session.
+- **Client dev flags and the browser's override** (ticket 548, the #548 ruling on #547): the
+  pure rules are `src/systems/devFlags/` (`devFlagOverrides.test.ts`: only differences kept,
+  unknown keys dropped, a flipped default reported and an opposing entry pinned, both with a
+  flipped `shipped` passed in; `devFlagChoice.test.ts`: flags never numbers, the split between
+  the client loop and one `debug.setFlags`, nothing sent for a choice that changes nothing;
+  `clientDevFlags.test.ts`: `drill.sweptCut` pending until the drill is idle).
+  `src/store/devFlagOverrides.test.ts` installs a memory `DevFlagStorage` (`installDevFlagStorage`,
+  null in `afterEach`) and simulates a reload as `resetGameStore()` plus the same storage: a
+  default boot and a set-then-reset boot play to main's digest, a session with no storage
+  installed ignores a stored override, a toggle survives a reload and goes out at tick 0, New
+  Game starts from the override and a load keeps its world's delta under it.
+  `src/physics/clientFlagFlip.test.ts` flips `drill.sweptCut` mid-drill through the real loop;
+  `src/shell/devFlagStorage.test.ts` holds which launches read the override (`?debug`, the tab
+  marker; never a player's launch or a scenario) and `?noflags`. Specs and Playwright set flags
+  with `ui.setDevFlags({...})` (a logged `debug.setFlags`, never `localStorage`) and read them with
+  `ui.getDevFlags()`; `e2e/browser/devFlags.spec.ts` plants an override, reloads and clears it.
 - **Known red** (ticket 419, the TD on #396 section 2): `CAMPAIGN_PACING_KNOWN_RED`
   (`src/constants/knownRed.ts`) is the one known-red marker in the repo: one gate
   (`campaignPacingGate`), one finding (#417), no registry. The gate still runs in full;

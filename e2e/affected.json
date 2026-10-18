@@ -283,6 +283,17 @@
       "specs": ["e2e/browser/drillDown.spec.ts"]
     },
     {
+      "why": "The client dev flag store and the browser's override (ticket 548): the slice, the pure override and choice rules, the shell's storage and ?noflags, and the debug API's flag calls.",
+      "paths": [
+        "src/store/devFlagSlice.ts",
+        "src/systems/devFlags/**",
+        "src/shell/devFlagStorage.ts",
+        "src/shell/launchParameters.ts",
+        "src/debug/debugDevFlags.ts"
+      ],
+      "specs": ["e2e/browser/devFlags.spec.ts"]
+    },
+    {
       "why": "The pause menu's manual save (ticket 404): its slice, view, model, debug reads, the slot writer and the title menu's Continue that loads it back.",
       "paths": [
         "src/store/pauseMenuSlice.ts",

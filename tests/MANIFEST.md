@@ -870,6 +870,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | --- | --- | --- |
 | `src/debug/debugApi.test.ts` | 52 | 51 |
 | `src/debug/debugArtefact.test.ts` | 5 | 5 |
+| `src/debug/debugDevFlags.test.ts` | 4 | 4 |
 | `src/debug/debugHudLayout.test.ts` | 5 | 5 |
 | `src/debug/debugLining.test.ts` | 4 | 4 |
 | `src/debug/debugLiveTime.test.ts` | 3 | 3 |
@@ -878,6 +879,14 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/debug/debugSaves.test.ts` | 5 | 5 |
 | `src/debug/debugScreens.test.ts` | 34 | 33 |
 | `src/debug/sliceDebugCommands.test.ts` | 3 | 3 |
+
+### `devFlags`
+
+| File | Tests | Sites |
+| --- | --- | --- |
+| `src/systems/devFlags/clientDevFlags.test.ts` | 5 | 5 |
+| `src/systems/devFlags/devFlagChoice.test.ts` | 8 | 8 |
+| `src/systems/devFlags/devFlagOverrides.test.ts` | 9 | 9 |
 
 ### `economy`
 
@@ -974,7 +983,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/logging/commandLog.test.ts` | 15 | 15 |
 | `src/logging/commandLogPoseRuns.test.ts` | 13 | 11 |
 | `src/logging/compareRuns.test.ts` | 12 | 12 |
-| `src/logging/devFlagReport.test.ts` | 6 | 6 |
+| `src/logging/devFlagReport.test.ts` | 8 | 8 |
 | `src/logging/diveCasing.test.ts` | 4 | 4 |
 | `src/logging/diveSummaries.test.ts` | 4 | 4 |
 | `src/logging/domainEventLog.test.ts` | 21 | 21 |
@@ -1040,6 +1049,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 
 | File | Tests | Sites |
 | --- | --- | --- |
+| `src/physics/clientFlagFlip.test.ts` | 1 | 1 |
 | `src/physics/cutFollow.test.ts` | 5 | 3 |
 | `src/physics/cutFollowBite.test.ts` | 3 | 2 |
 | `src/physics/cutFollowRelease.test.ts` | 21 | 14 |
@@ -1253,6 +1263,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 
 | File | Tests | Sites |
 | --- | --- | --- |
+| `src/shell/devFlagStorage.test.ts` | 5 | 5 |
 | `src/shell/listenerCount.test.ts` | 8 | 8 |
 | `src/shell/mirroredSaveFolder.test.ts` | 7 | 7 |
 | `src/shell/mouseHooks.test.ts` | 4 | 4 |
@@ -1286,6 +1297,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/store/authorityReads.test.ts` | 3 | 3 |
 | `src/store/bayEntryPress.test.ts` | 2 | 2 |
 | `src/store/checkpoint.test.ts` | 22 | 22 |
+| `src/store/devFlagOverrides.test.ts` | 15 | 15 |
 | `src/store/devFlagSessions.test.ts` | 2 | 2 |
 | `src/store/domainEventBroadcast.test.ts` | 3 | 3 |
 | `src/store/gameStore.test.ts` | 26 | 26 |
