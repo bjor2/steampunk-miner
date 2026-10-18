@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-10-18T15:48:39+01:00",
+  "updated_at": "2026-10-18T15:49:51+01:00",
   "caps": {
     "grok": 12,
     "claude": 10,
@@ -28,11 +28,12 @@
         },
         {
           "slot": "C2",
-          "state": "free",
-          "ticket": null,
-          "grok_slot": null,
-          "kind": null,
-          "since": null
+          "state": "busy",
+          "ticket": 545,
+          "grok_slot": 2,
+          "kind": "dev",
+          "since": "2026-10-18T15:49:00+01:00",
+          "wave": "316-4A"
         },
         {
           "slot": "C3",
@@ -68,9 +69,9 @@
         }
       ],
       "size": 6,
-      "used": 1,
-      "free": 5,
-      "claims_last_hour": 3,
+      "used": 2,
+      "free": 4,
+      "claims_last_hour": 4,
       "name": "Claude Max 1"
     },
     {
@@ -364,9 +365,11 @@
     },
     {
       "slot": 2,
-      "state": "free",
-      "ticket": null,
-      "since": null
+      "state": "dev",
+      "ticket": 545,
+      "since": "2026-10-18T15:49:00+01:00",
+      "claude_slot": 2,
+      "wave": "316-4A"
     },
     {
       "slot": 3,
@@ -441,11 +444,12 @@
     },
     {
       "slot": 2,
-      "state": "free",
-      "ticket": null,
-      "grok_slot": null,
-      "since": null,
-      "account": 1
+      "state": "busy",
+      "ticket": 545,
+      "grok_slot": 2,
+      "since": "2026-10-18T15:49:00+01:00",
+      "account": 1,
+      "wave": "316-4A"
     },
     {
       "slot": 3,
@@ -522,8 +526,8 @@
   "totals": {
     "grok": {
       "size": 12,
-      "used": 1,
-      "dev": 1,
+      "used": 2,
+      "dev": 2,
       "dev_cap": 8,
       "planner": 0,
       "planner_cap": 4
@@ -531,8 +535,8 @@
     "claude": {
       "size": 10,
       "enabled": 10,
-      "used": 1,
-      "free": 9,
+      "used": 2,
+      "free": 8,
       "external": 0
     }
   },
@@ -568,7 +572,7 @@
         "map": 316,
         "lane": "remote",
         "mode": "solo",
-        "state": "ready",
+        "state": "running",
         "tickets": [
           537,
           541,
@@ -578,7 +582,7 @@
           537,
           541
         ],
-        "live": 0
+        "live": 1
       },
       {
         "number": 495,
