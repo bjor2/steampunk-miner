@@ -1,14 +1,16 @@
 import { describe, expect, it } from 'vitest'
 import { createAuthorityState } from '../../authority/authorityState'
+import { emptyKindLookTable } from '../kindLookTable'
 import { ORE_RULES_VERSION, planetParamsFor, type PlanetParams } from '../../world/planetParams'
 import { createStripViewer, writeStripViewer } from './stripViewer'
 
 const PLAYER = 'p1'
+const NO_LOOKS = emptyKindLookTable()
 
 function viewerOnPlanet(planetIndex: number, nose: { x: number; y: number }) {
   const state = createAuthorityState({ planetIndex, planetSeed: 83921, playerIds: [PLAYER] })
   const params = planetParamsFor(83921, planetIndex)
-  return writeStripViewer(createStripViewer(), state, PLAYER, params, nose)
+  return writeStripViewer(createStripViewer(), state, PLAYER, params, nose, NO_LOOKS)
 }
 
 describe('strip viewer', () => {
@@ -20,7 +22,7 @@ describe('strip viewer', () => {
   it("reads the planet's top rarity lead: +2 on the legacy rows, +4 under the ore rules (ticket 445)", () => {
     const state = createAuthorityState({ planetIndex: 3, planetSeed: 83921, playerIds: [PLAYER] })
     const viewerOf = (params: PlanetParams) =>
-      writeStripViewer(createStripViewer(), state, PLAYER, params, { x: 0, y: 0 }).topLead
+      writeStripViewer(createStripViewer(), state, PLAYER, params, { x: 0, y: 0 }, NO_LOOKS).topLead
     expect(viewerOf(planetParamsFor(83921, 3))).toBe(2)
     expect(viewerOf(planetParamsFor(83921, 3, ORE_RULES_VERSION))).toBe(4)
   })

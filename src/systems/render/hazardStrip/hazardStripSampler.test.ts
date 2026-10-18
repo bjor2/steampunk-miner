@@ -16,6 +16,7 @@ import {
   type LineFixture,
 } from './stripFixtures'
 import type { StripPip, StripViewer } from './stripPips'
+import { NO_SEEN_LEAD } from '../kindLookTable'
 import { gapStepsWithin } from './stripSegments'
 import { STRIP_TIER } from './stripTiers'
 
@@ -147,6 +148,18 @@ describe('hazard strip sampler', () => {
     expect(oreMetresOf(4)).toEqual([30])
   })
 
+  it("names an ore pip's rarity only for a species the player has seen (ticket 454)", () => {
+    const seenLeads = new Int8Array([2, NO_SEEN_LEAD])
+    const fixtures = [lavaAt(8), oreAt(12, 2, 1), oreAt(20, 2, 2), oreAt(30, 2)]
+    const pips = pipsAtRestOver(fixtures, { ...VIEWER_WITH_SCANNER, seenLeads })
+    expect(pips.map((pip) => [pip.kind, pip.rarityLead])).toEqual([
+      ['lava', NO_SEEN_LEAD],
+      ['ore', 2],
+      ['ore', NO_SEEN_LEAD],
+      ['ore', NO_SEEN_LEAD],
+    ])
+  })
+
   it('shows a gate by its kind alone, beside a cache, never what opens it or lies inside', () => {
     const fixtures = [gateAt(10, 3), cacheAt(20)]
     const pips = pipsAtRestOver(fixtures, VIEWER_WITH_SCANNER)
@@ -155,9 +168,11 @@ describe('hazard strip sampler', () => {
       ['cache', -1],
     ])
     for (const pip of pips) {
+      // rarityLead (ticket 454) names only an ore pip's seen species, never a gate's contents.
       expect(Object.keys(pip).sort()).toEqual(
-        ['gateKind', 'isCoarse', 'kind', 'metres', 'place', 'seconds'].sort(),
+        ['gateKind', 'isCoarse', 'kind', 'metres', 'place', 'rarityLead', 'seconds'].sort(),
       )
+      expect(pip.rarityLead).toBe(NO_SEEN_LEAD)
     }
   })
 

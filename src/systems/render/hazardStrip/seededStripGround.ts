@@ -37,6 +37,7 @@ import {
   GROUND_CELL,
   LAVA_CELL,
   kindOfCell,
+  kindSlotOfCell,
   tierOffsetOfCell,
 } from '../../world/worldCell'
 import { deltaOfChunk, type WorldState } from '../../world/worldState'
@@ -136,6 +137,7 @@ function writeOreHit(out: StripHit, params: PlanetParams, cell: number, tile: Ti
   const look = cellGateLookProvider()?.cellGateLookOf(params, cell, tile) ?? null
   out.kinds = STRIP_KIND.ore
   out.oreTierOffset = tierOffsetOfCell(cell)
+  out.oreKindSlot = kindSlotOfCell(cell)
   if (look === null) return
   out.kinds |= STRIP_KIND.gate
   out.gateKind = look.kind

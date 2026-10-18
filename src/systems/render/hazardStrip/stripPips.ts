@@ -11,7 +11,9 @@
  * A pip says its kind and, for a gate, the gate's kind: never a vision row, a held item, an unbuilt
  * rig or a dynamite size. Top-tier ore is ore at or above the best tier the rig's band can hold:
  * its own band's tier plus the largest lead the planet's rows roll (`viewer.topLead`: +2 on the
- * legacy rows, mythic's +4 on the rarity rows, ticket 445).
+ * legacy rows, mythic's +4 on the rarity rows, ticket 445). An ore pip names its rarity only when
+ * the step's best ore is of a species the player has seen (ticket 454, `viewer.seenLeads` from the
+ * look table); a coarse read, a cell with no species and an unseen one stay unspecified.
  */
 import { STRIP_MAX_PIPS } from '../../../constants/hazardStrip'
 import {
@@ -22,6 +24,8 @@ import {
   type StepHit,
   type StripKindName,
 } from './stripHits'
+import { NO_KIND_SLOT } from '../../world/worldCell'
+import { NO_SEEN_LEAD } from '../kindLookTable'
 import type { StripSegment } from './stripScan'
 import { STRIP_TIER } from './stripTiers'
 
@@ -38,6 +42,8 @@ export interface StripPip {
   place: number
   /** Read from a lattice block or a band, so it may show a hazard that isn't quite there. */
   isCoarse: boolean
+  /** An ore pip's seen rarity lead, 0 common to 4 mythic; `NO_SEEN_LEAD` while unspecified. */
+  rarityLead: number
 }
 
 /** What the local player is allowed to see. */
@@ -49,6 +55,8 @@ export interface StripViewer {
   rigBand: number
   /** The largest lead the planet's ore rolls above its band's tier (`topOreLeadOf`). */
   topLead: number
+  /** By roster index, the rarity lead of each species the player has seen (`KindLookTable`). */
+  seenLeads: Int8Array
 }
 
 /** The look-ahead this frame: metres along the path. */
@@ -71,6 +79,7 @@ export function createStripPips(): StripPip[] {
     seconds: 0,
     place: 0,
     isCoarse: false,
+    rarityLead: NO_SEEN_LEAD,
   }))
 }
 
@@ -122,10 +131,18 @@ function writeOrePips(
 ): number {
   let count = written
   forEachHitAhead(segments, window, (hit, isCoarse) => {
-    if (isTopTierOre(hit, viewer) && hazardKindOf(hit, viewer) === null)
-      count = writePip(pips, count, 'ore', hit.step, window, isCoarse)
+    if (!isTopTierOre(hit, viewer) || hazardKindOf(hit, viewer) !== null) return
+    const written = writePip(pips, count, 'ore', hit.step, window, isCoarse)
+    if (written > count) pips[count].rarityLead = seenLeadOf(hit, viewer)
+    count = written
   })
   return count
+}
+
+/** The seen rarity of the step's best ore; unspecified with no kind slot or an unseen species. */
+function seenLeadOf(hit: StepHit, viewer: StripViewer): number {
+  if (hit.oreKindSlot === NO_KIND_SLOT) return NO_SEEN_LEAD
+  return viewer.seenLeads[hit.oreKindSlot - 1] ?? NO_SEEN_LEAD
 }
 
 /**
@@ -193,6 +210,7 @@ function writePip(
   pip.seconds = window.speed < RESTING_SPEED ? Infinity : pip.metres / window.speed
   pip.place = Math.min(1, pip.metres / window.reach)
   pip.isCoarse = isCoarse
+  pip.rarityLead = NO_SEEN_LEAD
   return count + 1
 }
 

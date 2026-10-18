@@ -1,10 +1,11 @@
 /**
  * What the hazard strip can find on its line (TD scope g on #316, ticket 341): a fixed set of
  * kinds, one bit each, so a chunk or lattice block sums up as one small number (scope g 3, "a byte
- * per chunk"). A hit carries its kinds, a gate's kind and opening major and an ore's tier offset,
- * and nothing else: no field can name a vision row, a held item, a rig or a dynamite size (the
+ * per chunk"). A hit carries its kinds, a gate's kind and opening major and an ore's tier offset
+ * and kind slot (ticket 454: the scanner names a seen species' rarity), and nothing else: no field can name a vision row, a held item, a rig or a dynamite size (the
  * Horizontal Scaler's guard on the strip).
  */
+import { NO_KIND_SLOT } from '../../world/worldCell'
 
 export const STRIP_KIND = {
   lava: 1,
@@ -35,6 +36,8 @@ export interface StripHit {
   gateOpensAtTipMajor: number
   /** The highest ore tier offset on the step, -1 with no ore. */
   oreTierOffset: number
+  /** That ore's kind slot (`kindSlotOfCell`), `NO_KIND_SLOT` with none or no ore. */
+  oreKindSlot: number
 }
 
 /** A hit at a step of the path, the first of a run of equal steps. */
@@ -43,7 +46,13 @@ export interface StepHit extends StripHit {
 }
 
 export function createStripHit(): StripHit {
-  return { kinds: 0, gateKind: NO_GATE, gateOpensAtTipMajor: NEVER_BY_TIP, oreTierOffset: -1 }
+  return {
+    kinds: 0,
+    gateKind: NO_GATE,
+    gateOpensAtTipMajor: NEVER_BY_TIP,
+    oreTierOffset: -1,
+    oreKindSlot: NO_KIND_SLOT,
+  }
 }
 
 export function clearStripHit(hit: StripHit): void {
@@ -51,16 +60,19 @@ export function clearStripHit(hit: StripHit): void {
   hit.gateKind = NO_GATE
   hit.gateOpensAtTipMajor = NEVER_BY_TIP
   hit.oreTierOffset = -1
+  hit.oreKindSlot = NO_KIND_SLOT
 }
 
-/** Adds a tile's hit to a step's: kinds join, the first gate stays, the best ore wins. */
+/** Adds a tile's hit to a step's: kinds join, the first gate stays, the best ore (and its kind) wins. */
 export function joinStripHit(into: StripHit, tile: StripHit): void {
   into.kinds |= tile.kinds
   if (into.gateKind === NO_GATE && tile.gateKind !== NO_GATE) {
     into.gateKind = tile.gateKind
     into.gateOpensAtTipMajor = tile.gateOpensAtTipMajor
   }
-  into.oreTierOffset = Math.max(into.oreTierOffset, tile.oreTierOffset)
+  if (tile.oreTierOffset <= into.oreTierOffset) return
+  into.oreTierOffset = tile.oreTierOffset
+  into.oreKindSlot = tile.oreKindSlot
 }
 
 export function isSameHit(a: StripHit, b: StripHit): boolean {
@@ -68,7 +80,8 @@ export function isSameHit(a: StripHit, b: StripHit): boolean {
     a.kinds === b.kinds &&
     a.gateKind === b.gateKind &&
     a.gateOpensAtTipMajor === b.gateOpensAtTipMajor &&
-    a.oreTierOffset === b.oreTierOffset
+    a.oreTierOffset === b.oreTierOffset &&
+    a.oreKindSlot === b.oreKindSlot
   )
 }
 
@@ -80,5 +93,6 @@ export function stepHitOf(step: number, hit: StripHit): StepHit {
     gateKind: hit.gateKind,
     gateOpensAtTipMajor: hit.gateOpensAtTipMajor,
     oreTierOffset: hit.oreTierOffset,
+    oreKindSlot: hit.oreKindSlot,
   }
 }

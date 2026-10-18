@@ -7,10 +7,12 @@
 import { NO_COLLAPSE } from '../../authority/collapse/collapseState'
 import { CAVE_LATTICE_TILES } from '../../world/baseTerrain'
 import { chunkOfTile, type TilePoint } from '../../world/tileGrid'
+import { NO_KIND_SLOT } from '../../world/worldCell'
 import type { StripFrame } from './hazardStripSampler'
 import type { StripGround } from './stripGround'
 import { clearStripHit, NEVER_BY_TIP, NO_GATE, STRIP_KIND, type StripHit } from './stripHits'
 import type { StripViewer } from './stripPips'
+import { emptyKindLookTable } from '../kindLookTable'
 
 /** The planet's radius: wide enough that a fixture at 10,000 m/s never reaches the core. */
 export const FIXTURE_RADIUS_M = 1_000_000
@@ -68,6 +70,7 @@ export const VIEWER_BEFORE_SCANNER: StripViewer = {
   tipMajor: 0,
   rigBand: 1,
   topLead: 2,
+  seenLeads: emptyKindLookTable().seenLeads,
 }
 export const VIEWER_WITH_SCANNER: StripViewer = { ...VIEWER_BEFORE_SCANNER, isScannerOpen: true }
 
@@ -76,9 +79,16 @@ export function lavaAt(metres: number): LineFixture {
   return { metres, hit: { kinds: STRIP_KIND.lava } }
 }
 
-/** Ore of `tierOffset`, gated or not. */
-export function oreAt(metres: number, tierOffset: number): LineFixture {
-  return { metres, hit: { kinds: STRIP_KIND.ore, oreTierOffset: tierOffset } }
+/** Ore of `tierOffset`, of the species a roster binds to `kindSlot` (ticket 454) or none. */
+export function oreAt(
+  metres: number,
+  tierOffset: number,
+  kindSlot: number = NO_KIND_SLOT,
+): LineFixture {
+  return {
+    metres,
+    hit: { kinds: STRIP_KIND.ore, oreTierOffset: tierOffset, oreKindSlot: kindSlot },
+  }
 }
 
 /** Ore behind a gate of `gateKind` that no tip opens. */
@@ -115,6 +125,7 @@ function readFixtureTile(
   out.gateKind = hit.gateKind ?? NO_GATE
   out.gateOpensAtTipMajor = hit.gateOpensAtTipMajor ?? NEVER_BY_TIP
   out.oreTierOffset = hit.oreTierOffset ?? -1
+  out.oreKindSlot = hit.oreKindSlot ?? NO_KIND_SLOT
 }
 
 /** A lattice block holds every hazard kind of the rows it spans; ore never shows at tier 3. */

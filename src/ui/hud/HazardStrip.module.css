@@ -85,3 +85,11 @@
 .pip[data-kind='ore'] {
   --pip-colour: var(--color-parchment);
 }
+
+/*
+ * An ore pip of a seen species (ticket 454): its rim in the rarity's tint, static, so reduce motion
+ * needs nothing more; common and unspecified keep the plain ore pip.
+ */
+.pip[data-kind='ore'][data-rarity-tinted]::before {
+  border-color: var(--pip-rarity-tint);
+}

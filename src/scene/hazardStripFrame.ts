@@ -20,6 +20,7 @@ import {
   createSeededStripGround,
   type SeededStripGround,
 } from '../systems/render/hazardStrip/seededStripGround'
+import { kindLookPresence } from './kindLookPresence'
 import { createStripViewer, writeStripViewer } from '../systems/render/hazardStrip/stripViewer'
 import type { PlanetParams } from '../systems/world/planetParams'
 import type { WorldState } from '../systems/world/worldState'
@@ -73,7 +74,8 @@ function readStripFrame(frame: StripFrame, params: PlanetParams, dt: number): vo
   frame.feltSpeed = feltSpeedAfter(frame.feltSpeed, speed, dt)
   frame.tick = state.tick
   frame.collapse = state.collapse
-  writeStripViewer(frame.viewer, state, useGameStore.getState().playerId, params, frame.nose)
+  const { playerId } = useGameStore.getState()
+  writeStripViewer(frame.viewer, state, playerId, params, frame.nose, kindLookPresence.table)
 }
 
 function recordTierSwitch(tierBefore: number, strip: HazardStrip): void {
