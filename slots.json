@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-10-18T15:26:55+01:00",
+  "updated_at": "2026-10-18T15:48:39+01:00",
   "caps": {
     "grok": 12,
     "claude": 10,
@@ -70,7 +70,7 @@
       "size": 6,
       "used": 1,
       "free": 5,
-      "claims_last_hour": 4,
+      "claims_last_hour": 3,
       "name": "Claude Max 1"
     },
     {
@@ -568,7 +568,7 @@
         "map": 316,
         "lane": "remote",
         "mode": "solo",
-        "state": "paused",
+        "state": "ready",
         "tickets": [
           537,
           541,
