@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { DEV_FLAG_ROWS, NO_PAIRING_RULE, CUT_OR_PACE_LABEL } from './devFlagRows'
+import { ONE_LINE_WORDS_MAX, TITLE_WORDS_MAX } from './uiParts'
 import { AUTHORITY_DEV_FLAGS, DEV_FLAGS } from './devFlags'
 
 // The debug flag panel's metadata table (ticket 547, the TD ruling on #547 and its amendment
@@ -52,4 +53,23 @@ describe('dev flag rows', () => {
     expect(rowOf('drill.sweptCut')?.pairingRule).toContain('#540 and #541')
     expect(rowOf('drill.sweptLawCharge')?.pairingRule).toContain('no effect without the swept path')
   })
+
+  it('names each flag in at most four words over one short game-like sentence (ticket 549)', () => {
+    DEV_FLAG_ROWS.forEach((row) => {
+      expect(wordsOf(row.name)).toBeLessThanOrEqual(TITLE_WORDS_MAX)
+      expect(wordsOf(row.line)).toBeLessThanOrEqual(ONE_LINE_WORDS_MAX)
+      expect(row.line).toMatch(/^[^.]+\.$/)
+    })
+  })
+
+  it('records the pairs the panel warns on, each naming a flag (VS 4)', () => {
+    const ids: string[] = [...CLIENT_IDS, ...AUTHORITY_IDS]
+    DEV_FLAG_ROWS.flatMap((row) => row.needsOn).forEach((id) => expect(ids).toContain(id))
+    expect(rowOf('drill.reportEveryTick')?.needsOn).toEqual(['drill.exactCarry'])
+    expect(rowOf('drill.sweptLawCharge')?.needsOn).toEqual(['drill.sweptCut'])
+  })
 })
+
+function wordsOf(text: string): number {
+  return text.split(/\s+/).length
+}
