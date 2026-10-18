@@ -9,7 +9,8 @@ import { withMaterialContact } from './systems/materialFixtures'
 // record ships on, so the four goldens that dig planet 1's roster-bound cells moved their digests
 // under protocol 89, and nothing else did (no mined order, no other golden, no device save). With
 // the switch off every golden replays to protocol 88's digests: those below, as committed before
-// the record, and with the exact carry on, A6's charged digests.
+// the record, with the exact carry off (it ships on since 18 Oct 2026), and with it on, A6's
+// charged digests.
 
 type MovedDigests = Readonly<Record<string, Readonly<Record<number, string>>>>
 
@@ -59,7 +60,10 @@ describe('codex.materialContact kill-switch (ticket 546)', () => {
 
   it.each(goldens)('replays %s with the switch off to protocol 88’s digests', (_name, golden) => {
     const before = withDigestsOf(golden, PROTOCOL_88_DIGESTS)
-    expect(withMaterialContact(false, () => goldenRunProblems(before))).toEqual([])
+    const problems = withMaterialContact(false, () =>
+      withDrillExactCarry(false, () => goldenRunProblems(before)),
+    )
+    expect(problems).toEqual([])
   })
 
   it.each(goldens)(
