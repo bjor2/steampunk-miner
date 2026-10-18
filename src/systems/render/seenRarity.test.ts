@@ -51,9 +51,7 @@ function probeSlice(met: readonly string[]): SliceDefinition {
 const STATE = createAuthorityState({ planetIndex: 3, planetSeed: SEED, playerIds: [PLAYER] })
 
 function rarityOfCell(cell: number, met: readonly string[]) {
-  return withRegistrations([probeSlice(met)], () =>
-    cellRarityReaderOf(STATE, PLAYER, PARAMS)(cell),
-  )
+  return withRegistrations([probeSlice(met)], () => cellRarityReaderOf(STATE, PLAYER, PARAMS)(cell))
 }
 
 describe('seen rarity', () => {

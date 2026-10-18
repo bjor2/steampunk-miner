@@ -20,10 +20,7 @@ export interface RarityName {
 
 const CHANNEL_MAX = 255
 
-export function rarityNameOf(
-  seen: SeenRarity | null,
-  isMotionReduced: boolean,
-): RarityName | null {
+export function rarityNameOf(seen: SeenRarity | null, isMotionReduced: boolean): RarityName | null {
   if (seen === null) return null
   return {
     rarity: seen.rarity,

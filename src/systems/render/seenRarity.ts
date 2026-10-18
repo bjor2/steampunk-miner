@@ -102,7 +102,9 @@ function hasPlayerSeen(
   provider: KindLookProvider,
   look: KindLook,
 ): boolean {
-  return Object.hasOwn(state.players, playerId) && provider.hasSeenKind(state, playerId, look.speciesId)
+  return (
+    Object.hasOwn(state.players, playerId) && provider.hasSeenKind(state, playerId, look.speciesId)
+  )
 }
 
 /** The species an ore cell's kind slot binds; null for any other cell or an unbound slot. */
