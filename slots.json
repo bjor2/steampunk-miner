@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-10-18T22:35:17+02:00",
+  "updated_at": "2026-10-18T22:35:44+02:00",
   "caps": {
     "grok": 12,
     "claude": 10,
@@ -121,32 +121,23 @@
     }
   ],
   "gate": {
-    "busy": 0,
+    "busy": 1,
     "max": 3
   },
   "tester": {
     "state": "running",
-    "phase": "triage-fast",
-    "sha": "20ef31bc5eb28b2b93cd4e84e1b03914c67d76cc",
-    "since": "2026-10-18T20:34:18Z",
-    "holds_gate": false,
+    "phase": "fast",
+    "sha": "9600b5e7f8e05746e1060e85ca49dab1143995c5",
+    "since": "2026-10-18T20:35:40Z",
+    "holds_gate": true,
     "claude_slot": null,
-    "last_run": "2026-10-18T17:57:37Z",
+    "last_run": "2026-10-18T20:35:36Z",
     "last_nightly": "2026-10-15T20:43:15Z",
     "last_nightly_result": "full=FAIL balance-report=ok bench=FAIL balance-planets=ok balance-guns=ok balance-charges=ok balance-refinery=ok balance-heat=ok e2e=FAIL memory-soak=FAIL packaged-smoke=ok ",
     "main_red_sha": null,
-    "feature": 161,
-    "feature_title": "Spec: Deep tech tree: structure, costs and endless depth",
+    "feature": 418,
+    "feature_title": "Fix red main: pacingGate planet 1 core at 33.8 min on 0ffdd7c5 (window 15-30)",
     "queue": [
-      {
-        "feature": 418,
-        "kind": "ticket",
-        "title": "Fix red main: pacingGate planet 1 core at 33.8 min on 0ffdd7c5 (window 15-30)",
-        "tickets": [
-          418
-        ],
-        "since": "2026-10-15T16:49:09+02:00"
-      },
       {
         "feature": 310,
         "kind": "spec",
