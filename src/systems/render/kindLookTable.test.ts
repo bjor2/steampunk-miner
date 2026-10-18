@@ -1,10 +1,12 @@
 import { describe, expect, it } from 'vitest'
 import {
   HERO_LOOK_FLAG,
+  heroCellOfEntry,
   KIND_LOOK_SLOTS,
   kindLookTableOf,
   LOOK_VECTOR,
   packedRgbOf,
+  rarityLeadOfEntry,
   rgbOfPacked,
   type KindLook,
   type RarityLook,
@@ -48,9 +50,41 @@ describe('material look table', () => {
       silhouetteCodeOf('wires'),
       patternCodeOf('veined'),
       packedRgbOf([0.2, 0.4, 0.6]),
-      2 + HERO_LOOK_FLAG,
+      2,
     ])
     expect(table.revealedSlots).toBe(2)
+  })
+
+  it('draws a hero from its cell of the resident atlas, carried with its rarity lead (ticket 451)', () => {
+    const cells = new Map([['probe-wires', 3]])
+    const [, , , rarity] = entryOf(kindLookTableOf([WIRES], [], () => true, cells).kinds, 1)
+    expect(rarity).toBe(2 + HERO_LOOK_FLAG * 4)
+    expect(rarityLeadOfEntry(rarity)).toBe(2)
+    expect(heroCellOfEntry(rarity)).toBe(3)
+  })
+
+  it('draws a hero with no sprite in the resident atlas with the shader look (ticket 451)', () => {
+    const [, , , rarity] = entryOf(kindLookTableOf([WIRES], [], () => true).kinds, 1)
+    expect(heroCellOfEntry(rarity)).toBe(null)
+    expect(rarityLeadOfEntry(rarity)).toBe(2)
+  })
+
+  it('draws a species that is not a hero with the shader look even where the atlas names it', () => {
+    const cells = new Map([['probe-nuggets', 0]])
+    const [, , , rarity] = entryOf(kindLookTableOf([NUGGETS], [], () => true, cells).kinds, 1)
+    expect(heroCellOfEntry(rarity)).toBe(null)
+  })
+
+  it('draws no sprite for a hero the player has not seen (Horizontal Scaler a, ticket 451)', () => {
+    const cells = new Map([['probe-wires', 0]])
+    const table = kindLookTableOf([WIRES], [], () => false, cells)
+    expect(entryOf(table.kinds, 1)).toEqual([0, 0, 0, 0])
+  })
+
+  it('keeps the last of the 16 atlas cells and every rarity lead exact in one float', () => {
+    const rarity = 4 + HERO_LOOK_FLAG * 16
+    expect(Math.fround(rarity)).toBe(rarity)
+    expect([rarityLeadOfEntry(rarity), heroCellOfEntry(rarity)]).toEqual([4, 15])
   })
 
   it('leaves a slot with no species and a species not yet seen at zeros, the family look', () => {

@@ -4,8 +4,10 @@
  * uniforms when the roster or what the player has seen changes, never per frame. A tile carries
  * only its kind slot; everything it draws comes from here, so a reveal rebuilds no chunk.
  *
- * A slot's entry is (silhouette code, pattern code, colour as 0xRRGGBB, rarity lead + 8 for a hero
- * sprite). A slot that binds no species, or one the player has not seen (Horizontal Scaler's
+ * A slot's entry is (silhouette code, pattern code, colour as 0xRRGGBB, rarity lead + 8 × (cell + 1)
+ * for a hero drawn from the resident act's atlas, ticket 451). A hero whose sprite is not in the
+ * resident atlas, or with no atlas at all, keeps the lead alone and draws the shader look. A slot
+ * that binds no species, or one the player has not seen (Horizontal Scaler's
  * condition a), stays all zeros, which the shader draws as today's family look with no rarity
  * tint or frame. Rarity changes only the tint, frame and glow (entry per lead 1 to 4: tint as
  * 0xRRGGBB, glow, frame width in tiles, pulse share of the glow); common draws none. Look only:
@@ -21,7 +23,10 @@ import { KIND_LOOKS, patternCodeOf, silhouetteCodeOf, type KindLookCatalogue } f
 export const KIND_LOOK_SLOTS = 17
 /** Rarity leads 1 to 4 (uncommon to mythic); common, lead 0, draws no tint, frame or glow. */
 export const RARITY_LOOK_LEADS = 4
-/** Added to a slot's rarity lead when the species is drawn from the act's hero atlas (#451). */
+/**
+ * A hero drawn from the act's atlas (ticket 451) adds this times its cell + 1 to its rarity lead,
+ * so the entry's fourth float carries both and the table needs no other vector.
+ */
 export const HERO_LOOK_FLAG = 8
 export const LOOK_VECTOR = 4
 
@@ -34,6 +39,7 @@ export interface KindLook {
   colour: Rgb
   /** Its rarity's tier offset over its band, 0 common to 4 mythic. */
   rarityLead: number
+  /** The species is a hero (`materials.json`): drawn from the act's atlas when its sprite is there. */
   isHero: boolean
 }
 
@@ -67,20 +73,26 @@ export function emptyKindLookTable(): KindLookTable {
   }
 }
 
+/** No atlas resident: every hero draws the shader look. */
+export const NO_HERO_CELLS: ReadonlyMap<string, number> = new Map()
+
 /**
  * `looks` by roster index (slot 1 first), null where a slot binds no species; `isRevealed` says
- * whether the player may see a species' look yet.
+ * whether the player may see a species' look yet; `heroCells` is the resident atlas's cell of
+ * each species it holds (`heroAtlas.ts`).
  */
 export function kindLookTableOf(
   looks: readonly (KindLook | null)[],
   rarityLooks: readonly RarityLook[],
   isRevealed: (look: KindLook) => boolean,
+  heroCells: ReadonlyMap<string, number> = NO_HERO_CELLS,
   catalogue: KindLookCatalogue = KIND_LOOKS,
 ): KindLookTable {
   const table = emptyKindLookTable()
   looks.slice(0, KIND_LOOK_SLOTS).forEach((look, at) => {
     if (look === null || !isRevealed(look)) return
-    table.kinds.set(kindEntryOf(look, catalogue), at * LOOK_VECTOR)
+    const entry = kindEntryOf(look, heroCells.get(look.speciesId) ?? null, catalogue)
+    table.kinds.set(entry, at * LOOK_VECTOR)
     table.revealedSlots++
   })
   rarityLooks.slice(0, RARITY_LOOK_LEADS).forEach((look, at) => {
@@ -89,8 +101,15 @@ export function kindLookTableOf(
   return table
 }
 
-/** One slot's vec4; throws on a look the shader cannot draw. */
-export function kindEntryOf(look: KindLook, catalogue: KindLookCatalogue = KIND_LOOKS): number[] {
+/**
+ * One slot's vec4, drawn from `heroCell` of the resident atlas when the species is a hero there;
+ * throws on a look the shader cannot draw.
+ */
+export function kindEntryOf(
+  look: KindLook,
+  heroCell: number | null = null,
+  catalogue: KindLookCatalogue = KIND_LOOKS,
+): number[] {
   if (!isRarityLead(look.rarityLead)) {
     throw new Error(`${look.speciesId} has the rarity lead ${look.rarityLead}, not 0 to 4`)
   }
@@ -98,8 +117,23 @@ export function kindEntryOf(look: KindLook, catalogue: KindLookCatalogue = KIND_
     silhouetteCodeOf(look.silhouette, catalogue),
     patternCodeOf(look.pattern, catalogue),
     packedRgbOf(look.colour),
-    look.rarityLead + (look.isHero ? HERO_LOOK_FLAG : 0),
+    look.rarityLead + heroShareOf(look, heroCell),
   ]
+}
+
+function heroShareOf(look: KindLook, heroCell: number | null): number {
+  return look.isHero && heroCell !== null ? HERO_LOOK_FLAG * (heroCell + 1) : 0
+}
+
+/** The rarity lead an entry's fourth float carries. */
+export function rarityLeadOfEntry(rarity: number): number {
+  return rarity % HERO_LOOK_FLAG
+}
+
+/** The atlas cell an entry's fourth float carries, or null for the shader look. */
+export function heroCellOfEntry(rarity: number): number | null {
+  const share = Math.floor(rarity / HERO_LOOK_FLAG)
+  return share > 0 ? share - 1 : null
 }
 
 function isRarityLead(lead: number): boolean {

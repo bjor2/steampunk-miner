@@ -1,12 +1,25 @@
 import { describe, expect, it } from 'vitest'
-import { GPU_MIN_TEXTURE_UNITS, TERRAIN_SAMPLER_CEILING } from '../constants/scene'
+import {
+  GPU_MIN_TEXTURE_UNITS,
+  TERRAIN_FULL_SAMPLERS,
+  TERRAIN_SAMPLER_CEILING,
+} from '../constants/scene'
+import type { HeroAtlasUnit, TerrainProgram } from '../systems/render/gpuTier'
 import { samplerCeilingProblems, samplerUnitsOf } from '../systems/render/shaderSamplers'
 import { createTerrainMaterial } from './terrainMaterial'
 import { TERRAIN_FRAGMENT_SHADER, TERRAIN_VERTEX_SHADER } from './terrainShader'
 
 /** The terrain program as the GPU compiles it: the material's own shader text and defines. */
-function fragmentProblemsOf(program: 'full' | 'lite', ceiling: number): string[] {
-  const material = createTerrainMaterial(program)
+function materialOf(program: TerrainProgram, heroAtlas: HeroAtlasUnit = 'absent') {
+  return createTerrainMaterial(program, heroAtlas)
+}
+
+function fragmentProblemsOf(
+  program: TerrainProgram,
+  ceiling: number,
+  heroAtlas: HeroAtlasUnit = 'absent',
+): string[] {
+  const material = materialOf(program, heroAtlas)
   return samplerCeilingProblems(
     `the ${program} terrain fragment stage`,
     material.fragmentShader,
@@ -15,22 +28,35 @@ function fragmentProblemsOf(program: 'full' | 'lite', ceiling: number): string[]
   )
 }
 
-const SIXTEENTH_SAMPLER = `${TERRAIN_FRAGMENT_SHADER}\nuniform sampler2D uHeroAtlas;\n`
+const WITH_HERO_ATLAS = materialOf('full', 'sampled').defines
+const SEVENTEENTH_SAMPLER = `${TERRAIN_FRAGMENT_SHADER}\nuniform sampler2D uSeventeenth;\n`
 
-describe('terrain program samplers (TD #470 section 2, ticket 477)', () => {
-  it('binds at most 15 samplers in the full fragment stage, one under WebGL2 guaranteed 16', () => {
-    expect(fragmentProblemsOf('full', TERRAIN_SAMPLER_CEILING)).toEqual([])
-    expect(samplerUnitsOf(TERRAIN_FRAGMENT_SHADER)).toBe(15)
+describe('terrain program samplers (TD #470 section 2, tickets 477 and 451)', () => {
+  it('binds 15 samplers in the full fragment stage without the hero atlas', () => {
+    expect(fragmentProblemsOf('full', TERRAIN_FULL_SAMPLERS)).toEqual([])
+    expect(samplerUnitsOf(TERRAIN_FRAGMENT_SHADER)).toBe(TERRAIN_FULL_SAMPLERS)
   })
 
-  it('fails the ceiling when a 16th sampler is added to the fragment stage', () => {
+  it('takes the 16th unit for the hero atlas and no more, the WebGL2 guaranteed 16', () => {
+    expect(fragmentProblemsOf('full', TERRAIN_SAMPLER_CEILING, 'sampled')).toEqual([])
+    expect(samplerUnitsOf(TERRAIN_FRAGMENT_SHADER, WITH_HERO_ATLAS)).toBe(16)
+    expect(TERRAIN_SAMPLER_CEILING).toBe(16)
+  })
+
+  it('fails the ceiling when a 17th sampler is added to the fragment stage', () => {
     expect(
-      samplerCeilingProblems('fixture', SIXTEENTH_SAMPLER, {}, TERRAIN_SAMPLER_CEILING),
-    ).toEqual(['fixture binds 16 samplers, over the ceiling of 15'])
+      samplerCeilingProblems(
+        'fixture',
+        SEVENTEENTH_SAMPLER,
+        WITH_HERO_ATLAS,
+        TERRAIN_SAMPLER_CEILING,
+      ),
+    ).toEqual(['fixture binds 17 samplers, over the ceiling of 16'])
   })
 
   it('fits the lite program within the 12 units of the weakest GPU the game still runs on', () => {
     expect(fragmentProblemsOf('lite', GPU_MIN_TEXTURE_UNITS)).toEqual([])
+    expect(fragmentProblemsOf('lite', GPU_MIN_TEXTURE_UNITS, 'sampled')).toEqual([])
     expect(samplerUnitsOf(TERRAIN_FRAGMENT_SHADER, { TERRAIN_LITE: 1 })).toBe(5)
   })
 

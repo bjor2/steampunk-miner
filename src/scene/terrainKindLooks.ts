@@ -3,13 +3,15 @@
  * provider's species looks for the planet's roster slots, with each slot the local player has not
  * seen left at the family look (Horizontal Scaler's condition a on #450), and the rarity tints.
  * The ONLY writer of `uKindLooks` and `uRarityLooks`. It rewrites them only when the planet, the
- * player's slice sections (where sightings are kept) or the debug show-all switch change, so a
- * frame allocates nothing and a reveal rebuilds no chunk.
+ * player's slice sections (where sightings are kept), the resident hero atlas (ticket 451: a seen
+ * hero with a cell there draws its sprite) or the debug show-all switch change, so a frame
+ * allocates nothing and a reveal rebuilds no chunk.
  */
 import { Vector4, type IUniform, type ShaderMaterial } from 'three'
 import { readAuthorityState } from '../store/authorityLink'
 import { useGameStore } from '../store/gameStore'
 import type { AuthorityState } from '../systems/authority/authorityState'
+import { heroCellsOf } from '../systems/render/heroAtlas'
 import { kindLookProvider, type KindLookProvider } from '../systems/registries/kindLook'
 import {
   emptyKindLookTable,
@@ -21,6 +23,7 @@ import {
   type KindLookTable,
 } from '../systems/render/kindLookTable'
 import type { PlanetParams } from '../systems/world/planetParams'
+import { heroAtlasPresence } from './heroAtlasPresence'
 import { kindLookPresence } from './kindLookPresence'
 
 export function createKindLookUniforms(): Record<string, IUniform> {
@@ -34,6 +37,7 @@ export function createKindLookUniforms(): Record<string, IUniform> {
 interface FittedLooks {
   params: PlanetParams
   sightings: unknown
+  heroCells: readonly string[]
   isEveryKindShown: boolean
 }
 
@@ -61,12 +65,18 @@ function isFittedTo(last: FittedLooks | undefined, params: PlanetParams, sightin
     last !== undefined &&
     last.params === params &&
     last.sightings === sightings &&
+    last.heroCells === heroAtlasPresence.cells &&
     last.isEveryKindShown === kindLookPresence.isEveryKindShown
   )
 }
 
 function fitOf(params: PlanetParams, sightings: unknown): FittedLooks {
-  return { params, sightings, isEveryKindShown: kindLookPresence.isEveryKindShown }
+  return {
+    params,
+    sightings,
+    heroCells: heroAtlasPresence.cells,
+    isEveryKindShown: kindLookPresence.isEveryKindShown,
+  }
 }
 
 function kindLookTableFor(
@@ -76,8 +86,11 @@ function kindLookTableFor(
 ): KindLookTable {
   const provider = kindLookProvider()
   if (provider === null) return emptyKindLookTable()
-  return kindLookTableOf(provider.kindLooksOf(params), provider.rarityLooks(), (look) =>
-    isShownTo(provider, state, playerId, look),
+  return kindLookTableOf(
+    provider.kindLooksOf(params),
+    provider.rarityLooks(),
+    (look) => isShownTo(provider, state, playerId, look),
+    heroCellsOf(heroAtlasPresence.cells),
   )
 }
 

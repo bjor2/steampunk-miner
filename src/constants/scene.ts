@@ -124,14 +124,32 @@ export const POST_PASSES_WITHOUT_BLOOM = 1
 
 /**
  * GPU limits (TD #470 section 2, ticket 477). WebGL2 guarantees 16 fragment texture units; the
- * terrain program binds at most 15, so one stays spare (16 only for #451 option (a), and only once
- * the capability probe gates it). A GPU with fewer than 15 units, or no fragment `highp`, draws
- * the `TERRAIN_LITE` program; one with fewer than 12 units or textures under 2048 px can't run the
- * game and says so instead of showing a black canvas.
+ * full terrain program binds 15, and the per-act hero atlas (ticket 451, GD ruling 6226278574
+ * item 2) takes the 16th only where the probe reports 16 units, the full program and a KTX2
+ * target with alpha, so the ceiling is 16 and a 17th never fits. A GPU with fewer than 15 units,
+ * or no fragment `highp`, draws the `TERRAIN_LITE` program; one with fewer than 12 units or
+ * textures under 2048 px can't run the game and says so instead of showing a black canvas.
  */
-export const TERRAIN_SAMPLER_CEILING = 15
+export const TERRAIN_SAMPLER_CEILING = 16
+/** The full program without the hero atlas: what `terrainProgramOf` asks of a GPU (ticket 477). */
+export const TERRAIN_FULL_SAMPLERS = 15
 export const GPU_MIN_TEXTURE_UNITS = 12
 export const GPU_MIN_TEXTURE_SIZE = 2048
+
+/**
+ * The per-act hero atlas (ticket 451, TD shape 6226270701 "#451 shape"): one albedo-only KTX2,
+ * 1024 px square, of 256 px cells (16, four to a row), each a 248 px sprite in a 4 px gutter
+ * (#452's `hero-cells.json`). Four mip levels keep a gutter of at least half a texel at the last
+ * one, so a cell never samples its neighbour. At most 2 MiB resident: one byte a texel on every
+ * alpha target Basis transcodes to (BC7, BC3, ASTC 4x4, ETC2 RGBA), which is why RGBA8 is refused.
+ */
+export const HERO_ATLAS_SIDE_PX = 1024
+export const HERO_ATLAS_CELL_PX = 256
+export const HERO_ATLAS_GUTTER_PX = 4
+export const HERO_ATLAS_CELLS_PER_ROW = 4
+export const HERO_ATLAS_CELLS = 16
+export const HERO_ATLAS_LEVELS = 4
+export const HERO_ATLAS_MAX_RESIDENT_BYTES = 2 * 1024 * 1024
 
 /** Camera sits in front of the XY plane and looks down -Z. */
 export const CAMERA_POSITION: readonly [number, number, number] = [0, 0, 20]

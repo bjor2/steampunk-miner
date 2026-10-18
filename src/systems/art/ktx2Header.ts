@@ -20,6 +20,7 @@ export interface Ktx2Header {
 const IDENTIFIER = [0xab, 0x4b, 0x54, 0x58, 0x20, 0x32, 0x30, 0xbb, 0x0d, 0x0a, 0x1a, 0x0a]
 const PIXEL_WIDTH_AT = 20
 const PIXEL_HEIGHT_AT = 24
+const LEVEL_COUNT_AT = 40
 const SUPERCOMPRESSION_AT = 44
 const DFD_OFFSET_AT = 48
 /** Within the data format descriptor: its total size, then the basic block's two header words. */
@@ -54,6 +55,18 @@ export function readKtx2Header(bytes: Uint8Array): Ktx2Header | null {
     ),
     transfer: transferOf(bytes[dfd + TRANSFER_IN_DFD]),
   }
+}
+
+/**
+ * How many mip levels the file holds (KTX 2.0 section 3.7: 0 asks the loader to make them), or
+ * null when the bytes are not KTX2; the hero atlas's resident budget reads it (ticket 451).
+ */
+export function readKtx2LevelCount(bytes: Uint8Array): number | null {
+  if (!hasKtx2Identifier(bytes)) return null
+  return new DataView(bytes.buffer, bytes.byteOffset, bytes.byteLength).getUint32(
+    LEVEL_COUNT_AT,
+    true,
+  )
 }
 
 /** Why a map file breaks #52 acceptance 2; empty when it passes. */

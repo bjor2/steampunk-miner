@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { sceneTargetOf, terrainProgramOf, type GpuCapabilities } from './gpuTier'
+import { heroAtlasUnitOf, sceneTargetOf, terrainProgramOf, type GpuCapabilities } from './gpuTier'
 
 /** WebGL2's guaranteed minimums with float targets: what current phones and desktops report. */
 const WEBGL2_FLOOR: GpuCapabilities = {
@@ -41,4 +41,20 @@ describe('gpu capability decision table (TD #470 section 2.3, ticket 477)', () =
   ] as const)('draws the scene into a %s target as %s', (_, readings, target) => {
     expect(sceneTargetOf(gpuWith(readings))).toBe(target)
   })
+
+  it.each([
+    ['16 units, the full program and ETC2', {}, 'sampled'],
+    ['BC7 alone', { textureFormats: ['bptc'] }, 'sampled'],
+    ['BC3 alone', { textureFormats: ['s3tc'] }, 'sampled'],
+    ['exactly the 15 units of the full program', { textureUnits: 15 }, 'absent'],
+    ['the lite program', { isFragmentHighp: false }, 'absent'],
+    ['no compressed format', { textureFormats: [] }, 'absent'],
+    ['only ASTC, which ETC1S cannot reach', { textureFormats: ['astc'] }, 'absent'],
+    ['only ETC1, which has no alpha', { textureFormats: ['etc1'] }, 'absent'],
+  ] as const)(
+    'gives the hero atlas the 16th unit with %s: %s (ticket 451)',
+    (_, readings, unit) => {
+      expect(heroAtlasUnitOf(gpuWith(readings))).toBe(unit)
+    },
+  )
 })

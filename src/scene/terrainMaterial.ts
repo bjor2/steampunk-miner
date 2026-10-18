@@ -31,7 +31,7 @@ import { liningShaderDefines } from '../systems/render/casingLiningLook'
 import { rgbOfHex, type Rgb } from '../systems/render/colour'
 import { writeHeadlampDirection } from '../systems/render/headlamp'
 import type { ArtefactLook } from '../systems/render/artefactLook'
-import type { TerrainProgram } from '../systems/render/gpuTier'
+import type { HeroAtlasUnit, TerrainProgram } from '../systems/render/gpuTier'
 import type { PointLightSource } from '../systems/render/sceneLights'
 import type { Facing } from '../systems/vehicle/vehiclePose'
 import type { Vector2 } from '../systems/vehicle/localFrame'
@@ -41,6 +41,7 @@ import { createGateViewerUniforms } from './terrainGateViewer'
 import { createKindLookUniforms } from './terrainKindLooks'
 import { kindLookDefines } from './terrainKindShader'
 import { createHeatTileUniforms } from './terrainHeatTiles'
+import { createHeroAtlasUniforms } from './terrainHeroAtlas'
 import { createTerrainOriginUniforms } from './terrainOrigin'
 import { createStrataUniforms } from './terrainStrata'
 
@@ -57,11 +58,18 @@ export interface TerrainLight extends ArtefactLook {
   pointLights: readonly PointLightSource[]
 }
 
-/** `lite` compiles the `TERRAIN_LITE` program for a GPU short of the full one (ticket 477). */
-export function createTerrainMaterial(program: TerrainProgram = 'full'): ShaderMaterial {
+/**
+ * `lite` compiles the `TERRAIN_LITE` program for a GPU short of the full one (ticket 477); a
+ * `sampled` hero atlas declares its sampler on the full program's 16th unit (ticket 451).
+ */
+export function createTerrainMaterial(
+  program: TerrainProgram = 'full',
+  heroAtlas: HeroAtlasUnit = 'absent',
+): ShaderMaterial {
   return new ShaderMaterial({
     defines: {
       ...(program === 'full' ? {} : { TERRAIN_LITE: 1 }),
+      ...(program === 'full' && heroAtlas === 'sampled' ? { TERRAIN_HERO_ATLAS: 1 } : {}),
       MAX_POINT_LIGHTS,
       // The gate channel's layout (cellGateBits.ts), so the shader decodes what the mesher wrote.
       GATED_BIT,
@@ -107,6 +115,7 @@ export function createTerrainMaterial(program: TerrainProgram = 'full'): ShaderM
       ...createGateTintUniforms(),
       ...createGateViewerUniforms(),
       ...createKindLookUniforms(),
+      ...createHeroAtlasUniforms(),
       ...createTerrainOriginUniforms(),
     },
   })

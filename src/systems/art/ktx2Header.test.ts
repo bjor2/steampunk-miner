@@ -1,6 +1,6 @@
 import { readFileSync } from 'node:fs'
 import { describe, expect, it } from 'vitest'
-import { ktx2MapProblems, ktx2TileProblems, readKtx2Header } from './ktx2Header'
+import { ktx2MapProblems, ktx2TileProblems, readKtx2Header, readKtx2LevelCount } from './ktx2Header'
 
 // Tiny files written by KTX-Software's `toktx` 4.4.2 (see docs/art-pipeline.md), so the reader is
 // checked against the encoder the pipeline uses, not against bytes the test made up.
@@ -21,6 +21,11 @@ describe('ktx2 header', () => {
       encoding: 'uastc',
       transfer: 'linear',
     })
+  })
+
+  it('reads how many mip levels toktx wrote: one for a map written without mipmaps', () => {
+    expect(readKtx2LevelCount(fixture('etc1s-srgb-8.ktx2'))).toBe(1)
+    expect(readKtx2LevelCount(new TextEncoder().encode('not a texture'))).toBe(null)
   })
 
   it('is no header for bytes that are not a KTX2 file', () => {

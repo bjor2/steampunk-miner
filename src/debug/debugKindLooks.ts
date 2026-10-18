@@ -6,9 +6,10 @@
  */
 import { kindLookPresence } from '../scene/kindLookPresence'
 import {
-  HERO_LOOK_FLAG,
+  heroCellOfEntry,
   KIND_LOOK_SLOTS,
   LOOK_VECTOR,
+  rarityLeadOfEntry,
   rgbOfPacked,
 } from '../systems/render/kindLookTable'
 import type { Rgb } from '../systems/render/colour'
@@ -21,7 +22,8 @@ export interface DrawnKindLook {
   patternCode: number
   colour: Rgb
   rarityLead: number
-  isHero: boolean
+  /** The resident hero atlas's cell it draws from (ticket 451); null draws the shader look. */
+  heroCell: number | null
 }
 
 export interface DrawnKindLooks {
@@ -59,7 +61,7 @@ function drawnLookOf(kinds: Float32Array, at: number): DrawnKindLook {
     silhouetteCode,
     patternCode,
     colour: rgbOfPacked(colour),
-    rarityLead: rarity % HERO_LOOK_FLAG,
-    isHero: rarity >= HERO_LOOK_FLAG,
+    rarityLead: rarityLeadOfEntry(rarity),
+    heroCell: heroCellOfEntry(rarity),
   }
 }

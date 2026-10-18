@@ -666,7 +666,7 @@ void main() {
 #ifndef TERRAIN_LITE
     else {
       oreColour = rgbOfPacked(kind.z);
-      shape = drawKindGrains(kind, vLocal, vTile, gateSoft, colour, emissive);
+      shape = drawKindTile(kind, vLocal, vTile, normalize(planet), worldDx, worldDy, gateSoft, colour, emissive);
     }
 #endif
     float halo = 1.0 - smoothstep(0.0, 0.7, length(vLocal - 0.5));

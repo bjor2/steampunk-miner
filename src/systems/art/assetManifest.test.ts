@@ -109,6 +109,19 @@ describe('asset manifest', () => {
     ])
   })
 
+  it('ships an atlas as its albedo map alone, with no sidecar (ticket 451)', () => {
+    const atlas: ManifestEntry = {
+      id: 'ground-hero-atlas-foothold-base',
+      source: 'blender',
+      form: 'atlas',
+      status: 'final',
+    }
+    const folder = 'public/assets/ground/ground-hero-atlas-foothold-base/'
+    expect(expectedFilesOf(atlas, [])).toEqual([
+      `${folder}ground-hero-atlas-foothold-base.albedo.ktx2`,
+    ])
+  })
+
   it('refuses an emissive flag on anything but a tile, whose sidecar would say it instead', () => {
     expect(manifestProblems(withEntries({ ...finalCrawler, emissive: true }))).toEqual([
       'asset "enemy-crawler": only a tile says emissive; a parts sidecar names its own maps',

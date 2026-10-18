@@ -46,3 +46,17 @@ export function useAtlasTextureSet(urls: readonly string[]): Texture[] {
   // R3F types an array load as possibly nested; one URL per entry loads one texture each.
   return textures as Texture[]
 }
+
+/**
+ * One map by URL, outside an asset (the per-act hero atlas, ticket 451). `clearKtx2Map` drops it
+ * from the loader's cache once its texture is disposed, so a released map is never handed out
+ * again and only the resident one stays held.
+ */
+export function useKtx2Map(url: string): Texture {
+  const gl = useThree((state) => state.gl)
+  return useLoader(KTX2Loader, url, (loader) => configureLoader(loader, gl))
+}
+
+export function clearKtx2Map(url: string): void {
+  useLoader.clear(KTX2Loader, url)
+}

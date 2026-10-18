@@ -14,10 +14,12 @@ export type AssetSource = (typeof ASSET_SOURCES)[number]
 
 /**
  * `parts`: KTX2 atlases plus a parts.json; `tile`: tileable albedo and normal maps (ground and
- * casing, #52); `backdrop`: a bay screen render (#51); `svg`: an icon under `src/ui/icons/`;
- * `css` and `code`: drawn by the UI kit or by shaders and particles, with no file of their own.
+ * casing, #52); `backdrop`: a bay screen render (#51); `atlas`: an albedo-only atlas of Blender
+ * renders a shader samples by cell (the per-act hero atlas, ticket 451); `svg`: an icon under
+ * `src/ui/icons/`; `css` and `code`: drawn by the UI kit or by shaders and particles, with no file
+ * of their own.
  */
-export type AssetForm = 'parts' | 'tile' | 'backdrop' | 'svg' | 'css' | 'code'
+export type AssetForm = 'parts' | 'tile' | 'backdrop' | 'atlas' | 'svg' | 'css' | 'code'
 
 export type AssetStatus = 'placeholder' | 'final'
 
@@ -44,7 +46,7 @@ export interface AssetManifest {
 export const SHIPPED_ART_FOLDERS = ['public/assets/', 'src/ui/icons/'] as const
 
 const FORMS_OF_SOURCE: Readonly<Record<AssetSource, readonly AssetForm[]>> = {
-  blender: ['parts', 'tile', 'backdrop'],
+  blender: ['parts', 'tile', 'backdrop', 'atlas'],
   vector: ['svg', 'css'],
   shader: ['code'],
   procedural: ['code'],
@@ -137,7 +139,7 @@ function namesOfForm(entry: ManifestEntry, sidecarMaps: readonly string[]): stri
   const { id } = entry
   if (entry.form === 'parts') return [`${id}.parts.json`, ...sidecarMaps]
   if (entry.form === 'tile') return tileMapNamesOf(entry)
-  if (entry.form === 'backdrop') return [`${id}.albedo.ktx2`]
+  if (entry.form === 'backdrop' || entry.form === 'atlas') return [`${id}.albedo.ktx2`]
   return entry.form === 'svg' ? [`${id}.svg`] : []
 }
 

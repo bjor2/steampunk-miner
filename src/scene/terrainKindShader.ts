@@ -10,7 +10,19 @@
  * the band just outside it. Rarity changes the tint, frame and glow only, never the silhouette;
  * with reduce motion (the shake switch, `uGateStill`) the glow holds at its mean and the frame
  * stays still. The lite program (ticket 477) leaves all of it out and draws the family look.
+ *
+ * A seen hero whose sprite is in the resident act's atlas (ticket 451) draws that sprite instead,
+ * upright on the planet, with the same rarity tint and glow and a frame just outside its mask.
+ * The atlas takes the 16th unit only where the startup probe allows it (`TERRAIN_HERO_ATLAS`,
+ * fixed when the material is made, so the program still compiles once); without it, or for a
+ * hero with no cell, the look table carries no cell and the hero draws its grains.
  */
+import {
+  HERO_ATLAS_CELL_PX,
+  HERO_ATLAS_CELLS_PER_ROW,
+  HERO_ATLAS_GUTTER_PX,
+  HERO_ATLAS_SIDE_PX,
+} from '../constants/scene'
 import { HERO_LOOK_FLAG, KIND_LOOK_SLOTS, RARITY_LOOK_LEADS } from '../systems/render/kindLookTable'
 import {
   KIND_LAYOUTS,
@@ -21,9 +33,18 @@ import {
   type KindLookCatalogue,
 } from '../systems/render/kindLooks'
 
-/** The table sizes and flag the GLSL below reads, as the material's defines. */
+/** The table sizes, flag and atlas layout the GLSL below reads, as the material's defines. */
 export function kindLookDefines(): Record<string, number> {
-  return { KIND_LOOK_SLOTS, RARITY_LOOK_LEADS, HERO_LOOK_FLAG, MAX_KIND_GRAINS }
+  return {
+    KIND_LOOK_SLOTS,
+    RARITY_LOOK_LEADS,
+    HERO_LOOK_FLAG,
+    MAX_KIND_GRAINS,
+    HERO_ATLAS_SIDE_PX,
+    HERO_ATLAS_CELL_PX,
+    HERO_ATLAS_GUTTER_PX,
+    HERO_ATLAS_CELLS_PER_ROW,
+  }
 }
 
 /** The look table's uniforms: the only fragment uniforms the material look adds. */
@@ -34,6 +55,10 @@ export const KIND_LOOK_UNIFORMS = /* glsl */ `
 uniform vec4 uKindLooks[KIND_LOOK_SLOTS];
 // Per rarity lead 1 to 4: tint as 0xRRGGBB, glow, frame width in tiles, pulse share of the glow.
 uniform vec4 uRarityLooks[RARITY_LOOK_LEADS];
+#ifdef TERRAIN_HERO_ATLAS
+// The resident act's hero sprites (ticket 451), albedo with the mask in alpha: the 16th unit.
+uniform sampler2D uHeroAtlas;
+#endif
 #endif
 `
 
@@ -166,6 +191,19 @@ float rarityPulse(float pulse, float still, vec2 tile) {
   return 1.0 - pulse * mix(wave, 0.5, still);
 }
 
+// The slot's rarity lead, 0 common to 4 mythic, under any hero cell the entry carries.
+int rarityLeadOf(vec4 kind) {
+  return int(mod(floor(kind.w + 0.5), float(HERO_LOOK_FLAG)));
+}
+
+// The rarity's tint over its frame and its glow over the frame and what it covers.
+void drawRarity(vec4 rarity, float frame, float inside, vec2 tile, inout vec3 colour, inout vec3 emissive) {
+  vec3 tint = rgbOfPacked(rarity.x);
+  colour = mix(colour, tint, frame);
+  float glow = rarity.y * rarityPulse(rarity.w, uGateStill, tile);
+  emissive += tint * glow * (0.8 * frame + 0.25 * inside);
+}
+
 // Draws the slot's species over the tile and its rarity's frame and glow; answers the share of
 // the tile its grains cover, which the ore's own tier glow lights as today's decal.
 float drawKindGrains(vec4 kind, vec2 local, vec2 tile, float soft, inout vec3 colour, inout vec3 emissive) {
@@ -173,17 +211,72 @@ float drawKindGrains(vec4 kind, vec2 local, vec2 tile, float soft, inout vec3 co
   float inside = 1.0 - smoothstep(-soft, soft, grain.x);
   float shade = kindPatternShade(int(kind.y + 0.5), local, tile, grain) * grain.y;
   colour = mix(colour, rgbOfPacked(kind.z) * shade, inside);
-  int lead = int(mod(floor(kind.w + 0.5), float(HERO_LOOK_FLAG)));
+  int lead = rarityLeadOf(kind);
   if (lead < 1) return inside;
   vec4 rarity = uRarityLooks[lead - 1];
-  vec3 tint = rgbOfPacked(rarity.x);
   // A small grain gets a thinner frame, so the rarity rims it rather than hiding it.
   float frameWidth = rarity.z * clamp(KIND_SHAPES[int(kind.x + 0.5)].z / 0.1, 0.5, 1.0);
   float frame = rarityFrame(grain.x, frameWidth, soft);
-  colour = mix(colour, tint, frame);
-  float glow = rarity.y * rarityPulse(rarity.w, uGateStill, tile);
-  emissive += tint * glow * (0.8 * frame + 0.25 * inside);
+  drawRarity(rarity, frame, inside, tile, colour, emissive);
   return inside;
+}
+
+#ifdef TERRAIN_HERO_ATLAS
+const float HERO_CONTENT_PX = float(HERO_ATLAS_CELL_PX - 2 * HERO_ATLAS_GUTTER_PX);
+
+// The atlas cell the entry carries (kindLookTable.ts), or -1 for the shader look.
+float heroCellOf(vec4 kind) {
+  return floor(floor(kind.w + 0.5) / float(HERO_LOOK_FLAG)) - 1.0;
+}
+
+// A point of the cell's sprite, 0 to 1 across its content with y down the image, to the atlas.
+vec2 heroAtlasUv(float cell, vec2 sprite) {
+  float perRow = float(HERO_ATLAS_CELLS_PER_ROW);
+  vec2 corner = vec2(mod(cell, perRow), floor(cell / perRow)) * float(HERO_ATLAS_CELL_PX);
+  return (corner + float(HERO_ATLAS_GUTTER_PX) + sprite * HERO_CONTENT_PX) / float(HERO_ATLAS_SIDE_PX);
+}
+
+// The sprite's mask a frame's width off the point, clamped into the cell so no neighbour shows.
+float heroMaskOff(float cell, vec2 sprite, vec2 off, vec2 dx, vec2 dy) {
+  return textureGrad(uHeroAtlas, heroAtlasUv(cell, clamp(sprite + off, 0.0, 1.0)), dx, dy).a;
+}
+
+// Draws the cell's sprite upright on the planet (its image top along up) and the rarity's tint
+// and glow, the frame on the band just outside its mask; answers the share of the tile it covers.
+// Gradients come from the world's, taken outside the ore branch, since the cell differs per tile.
+float drawHeroSprite(vec4 kind, float cell, vec2 local, vec2 up, vec2 worldDx, vec2 worldDy, vec2 tile, inout vec3 colour, inout vec3 emissive) {
+  vec2 right = vec2(up.y, -up.x);
+  vec2 fromCentre = local - 0.5;
+  vec2 sprite = vec2(dot(fromCentre, right), -dot(fromCentre, up)) + 0.5;
+  float toUv = HERO_CONTENT_PX / float(HERO_ATLAS_SIDE_PX);
+  vec2 dx = vec2(dot(worldDx, right), -dot(worldDx, up)) * toUv;
+  vec2 dy = vec2(dot(worldDy, right), -dot(worldDy, up)) * toUv;
+  vec4 texel = textureGrad(uHeroAtlas, heroAtlasUv(cell, sprite), dx, dy);
+  float isInCell = step(0.0, sprite.x) * step(sprite.x, 1.0) * step(0.0, sprite.y) * step(sprite.y, 1.0);
+  float inside = texel.a * isInCell;
+  colour = mix(colour, linearToDisplay(texel.rgb), inside);
+  int lead = rarityLeadOf(kind);
+  if (lead < 1) return inside;
+  vec4 rarity = uRarityLooks[lead - 1];
+  float spread = rarity.z;
+  float near = max(
+    max(heroMaskOff(cell, sprite, vec2(spread, 0.0), dx, dy), heroMaskOff(cell, sprite, vec2(-spread, 0.0), dx, dy)),
+    max(heroMaskOff(cell, sprite, vec2(0.0, spread), dx, dy), heroMaskOff(cell, sprite, vec2(0.0, -spread), dx, dy))
+  );
+  float frame = clamp(near - texel.a, 0.0, 1.0) * isInCell;
+  drawRarity(rarity, frame, inside, tile, colour, emissive);
+  return inside;
+}
+#endif
+
+// The species' look over the tile: its hero sprite where the entry carries an atlas cell, else
+// its grains. up is the planet's up at the tile; the world gradients serve the sprite's sampling.
+float drawKindTile(vec4 kind, vec2 local, vec2 tile, vec2 up, vec2 worldDx, vec2 worldDy, float soft, inout vec3 colour, inout vec3 emissive) {
+#ifdef TERRAIN_HERO_ATLAS
+  float cell = heroCellOf(kind);
+  if (cell >= 0.0) return drawHeroSprite(kind, cell, local, up, worldDx, worldDy, tile, colour, emissive);
+#endif
+  return drawKindGrains(kind, local, tile, soft, colour, emissive);
 }
 `
 
