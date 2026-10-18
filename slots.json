@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-10-18T14:52:42+01:00",
+  "updated_at": "2026-10-18T15:04:08+01:00",
   "caps": {
     "grok": 12,
     "claude": 10,
@@ -19,12 +19,11 @@
       "slots": [
         {
           "slot": "C1",
-          "state": "busy",
-          "ticket": 450,
-          "grok_slot": 1,
-          "kind": "dev",
-          "since": "2026-10-18T14:52:00+01:00",
-          "wave": "302-10B"
+          "state": "free",
+          "ticket": null,
+          "grok_slot": null,
+          "kind": null,
+          "since": null
         },
         {
           "slot": "C2",
@@ -69,8 +68,8 @@
         }
       ],
       "size": 6,
-      "used": 2,
-      "free": 4,
+      "used": 1,
+      "free": 5,
       "claims_last_hour": 3,
       "name": "Claude Max 1"
     },
@@ -380,11 +379,9 @@
   "grok": [
     {
       "slot": 1,
-      "state": "dev",
-      "ticket": 450,
-      "since": "2026-10-18T14:52:00+01:00",
-      "claude_slot": 1,
-      "wave": "302-10B"
+      "state": "free",
+      "ticket": null,
+      "since": null
     },
     {
       "slot": 2,
@@ -458,12 +455,11 @@
   "claude": [
     {
       "slot": 1,
-      "state": "busy",
-      "ticket": 450,
-      "grok_slot": 1,
-      "since": "2026-10-18T14:52:00+01:00",
-      "account": 1,
-      "wave": "302-10B"
+      "state": "free",
+      "ticket": null,
+      "grok_slot": null,
+      "since": null,
+      "account": 1
     },
     {
       "slot": 2,
@@ -540,17 +536,17 @@
     }
   ],
   "last_refill": {
-    "at": "2026-10-18 14:52 BST",
+    "at": "2026-10-18 15:04 BST",
     "mode": "refill-dev",
     "triggers": "#450",
-    "started": "#450->C1/A1 #541->C2/A1",
-    "note": "spawned 2 worker(s)"
+    "started": "",
+    "note": "no pickable build ticket"
   },
   "totals": {
     "grok": {
       "size": 12,
-      "used": 2,
-      "dev": 2,
+      "used": 1,
+      "dev": 1,
       "dev_cap": 8,
       "planner": 0,
       "planner_cap": 4
@@ -558,8 +554,8 @@
     "claude": {
       "size": 10,
       "enabled": 10,
-      "used": 2,
-      "free": 8,
+      "used": 1,
+      "free": 9,
       "external": 0
     }
   },
@@ -573,7 +569,7 @@
         "map": 302,
         "lane": "remote",
         "mode": "solo",
-        "state": "running",
+        "state": "paused",
         "tickets": [
           449,
           450,
@@ -586,7 +582,7 @@
           449,
           452
         ],
-        "live": 1
+        "live": 0
       },
       {
         "number": 525,
