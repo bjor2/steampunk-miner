@@ -52,10 +52,10 @@ describe('tech tree: the greedy rush bot against the plain pacing bot to planet 
     expect(rushPaceProblems(runs)).toEqual([])
   })
 
-  // The felt-speed growth asserts of #304 Revision 2 section 4 (a)-(c) have no measure on main.
-  it.todo('never dips in time-weighted felt drill speed from one planet to the next')
-  it.todo('grows arrival felt speed by at least r_min 1.30 a planet inside a system')
-  it.todo('adds at most 30% drill speed for a doubled stay on any planet from P2')
+  // #304 Revision 2 section 4's felt-speed growth asserts are superseded for drill power by the GD
+  // ruling on #551 (ticket 552): its per-planet bars (felt speed at least 0.9x the planet before
+  // and 5 cells/s through P10) run on the plain bot in src/logging/drillPace.lane.test.ts, and the
+  // grind todo moved there with them.
 })
 
 /** One run's arrival and core ticks, the session wrapped by `hand` before the bot plays it. */

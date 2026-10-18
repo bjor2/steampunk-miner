@@ -6,8 +6,8 @@
  * bot's time on the same seed. A skip that beats the curve is a pricing bug, never a reason to
  * slow the bot. A core never completed is "never": it fails the floors and the gate.
  *
- * Felt drill speed (no dips, `r_min` 1.30, the +30% grind limit from P2) has no measure on main
- * yet: those asserts land with the growth-assert work of #304 section 4 (a) to (c).
+ * Felt drill speed is judged per planet on the plain bot by #551's bars (ticket 552,
+ * `logging/drillPace.lane.test.ts`), which supersede #304 section 4 (a) to (c) for drill power.
  */
 import { TICKS_PER_SECOND } from '../../../constants/physics'
 import { medianTicks, minutesOfTicks, planetCoreTicksOf, type ForkPaceTally } from './forkPace'

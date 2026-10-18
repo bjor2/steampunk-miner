@@ -502,7 +502,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/tech-tree/incomeCapGolden.test.ts` | 8 | 8 |
 | `src/features/tech-tree/rigPieces.test.ts` | 3 | 3 |
 | `src/features/tech-tree/rushHand.test.ts` | 3 | 3 |
-| `src/features/tech-tree/rushPace.lane.test.ts` | 1 | 4 |
+| `src/features/tech-tree/rushPace.lane.test.ts` | 1 | 1 |
 | `src/features/tech-tree/scene/extractorDeploy.test.ts` | 3 | 3 |
 | `src/features/tech-tree/store/treeScreenStore.test.ts` | 6 | 6 |
 | `src/features/tech-tree/systems/aethericCards.vision.test.ts` | 2 | 2 |
@@ -994,6 +994,8 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/logging/drillLadderReport.test.ts` | 9 | 9 |
 | `src/logging/drillLadderSteps.test.ts` | 4 | 4 |
 | `src/logging/drillLogBytes.test.ts` | 4 | 4 |
+| `src/logging/drillPace.lane.test.ts` | 2 | 3 |
+| `src/logging/drillPace.test.ts` | 9 | 9 |
 | `src/logging/drillSpanGate.test.ts` | 2 | 2 |
 | `src/logging/dynamiteDryRuns.test.ts` | 4 | 4 |
 | `src/logging/eventNames.test.ts` | 6 | 6 |
@@ -1351,6 +1353,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | --- | --- | --- |
 | `scripts/ci/drillDownHistory.test.mjs` | 6 | 6 |
 | `scripts/ci/drillLadderHistory.test.mjs` | 4 | 4 |
+| `scripts/ci/drillPaceHistory.test.mjs` | 3 | 3 |
 | `scripts/ci/testHistory.test.mjs` | 9 | 9 |
 | `scripts/ci/testMetrics.test.mjs` | 12 | 12 |
 

@@ -51,6 +51,8 @@ for attempt in $(seq 1 "$ATTEMPTS"); do
   node "$REPO_ROOT/scripts/ci/recordDrillDown.mjs" || echo "::warning::drill-down rows not recorded"
   # The stored-step drill ladder's rows its Vitest run wrote (ticket 434); none, and nothing changes.
   node "$REPO_ROOT/scripts/ci/recordDrillLadder.mjs" || echo "::warning::drill-ladder rows not recorded"
+  # The drill pace lane's per-purchase rows (ticket 552); none, and nothing changes.
+  node "$REPO_ROOT/scripts/ci/recordDrillPace.mjs" || echo "::warning::drill-pace rows not recorded"
   commit_record || warn "nothing to commit"
   if git -C "$METRICS_DIR" push --quiet origin "HEAD:refs/heads/$BRANCH"; then
     echo "Pushed to $BRANCH (attempt $attempt)."

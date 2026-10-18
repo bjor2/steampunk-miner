@@ -318,15 +318,37 @@ programs }` from three's `renderer.info` of the game canvas), read only when cal
   checks, the baseline and `compareRuns` stay on the first seed. Do not retune the bot or a constant to make it pass: a
   miss is a balance finding for the Systems & Economy Designer (the lever is `paceScale`).
 - **Drill-speed ladder** (ticket 409): `src/logging/drillLadder.test.ts` cuts the same 50 cells
-  straight down from the planet 1 surface (seed 83921, column 20) at drill_power majors 1, 5, 10,
-  15 and 20 through the authority's swept cut (`systems/authority/drillLadder.ts`: the #396 drill
-  law with #399's exact carry, a full tank and a hold that never fills, enemies frozen). It prints
-  the table (ticks, seconds, cells/s, gain on the level below beside the law's gain), writes it to
-  `balance-report/drill-ladder.ndjson` (a setup line, then one line a level) for comparing runs
-  across commits, and fails a step that is not faster or keeps less than the law's 1.12 a level
-  compounded, less the GD's 5% (`drillLadderReport.ts`, compared in Money). The cut alone sets the
-  time; #397's cut-follow adds the vehicle's travel. About 4 s, so it runs in the change-relevant
-  tier. The table and how to read it are in [docs/economy/drill-ladder.md](economy/drill-ladder.md).
+  straight down from the planet 1 surface (seed 83921, column 20) at drill_power 1, 5, 10, 15 and
+  20 (purchases since ticket 552) through the authority's swept cut (`systems/authority/drillLadder.ts`:
+  the per-purchase drill law with #399's exact carry, a full tank and a hold that never fills,
+  enemies frozen). It prints the table (ticks, seconds, cells/s, gain on the level below beside the
+  law's gain), writes it to `balance-report/drill-ladder.ndjson` (a setup line, then one line a
+  level) for comparing runs across commits, and fails a step that is not faster or gains outside
+  1.181 to 1.305 a purchase compounded (the #463 bar of the GD ruling on #551, point 4, in place of
+  #396's 1.12 +-5% a major; `drillLadderReport.ts`, compared in Money). The cut alone sets the time.
+  About 4 s, so it runs in the change-relevant tier. The table and how to read it are in
+  [docs/economy/drill-ladder.md](economy/drill-ladder.md).
+- **Drill power per purchase** (ticket 552, the GD ruling on #551 and Systems' acceptance list,
+  section 7): `src/systems/economy/drillPowerRows.test.ts` holds the law (`D(0) = 1.5`, D(1) =
+  1.5095 within 0.1%, D(10), D(20) and D(50) within 1%, every purchase 1 to 200 gaining 1.181 to
+  1.305 with no dip, D(20) / D(1) in [60, 65], 50x today's stored 20), the price rows (`price(0) =
+  1`, `price(n) = ceil(20 x 1.48^(n - 1)) x paceScale` for n = 0 to 300 on planets 1, 3, 8 and 11,
+  no major split, p/s at least 1 on every purchase), and the numbers past purchase 100 (finite
+  canonical stats at 100, 1000 and 3000, whole climbing rows to 3000). `src/logging/subStepFloor.test.ts`
+  carries the one-sub-step floor as known red under #558 with a local marker: on soft ground the
+  delivered step stays in the band through purchase 23, leaves it at 24 and is dead from 33, and
+  no drill reaches 5000 cells/s; the marker expires when #558 closes and fails once its rows turn
+  green. The pacing half is the lane `src/logging/drillPace.lane.test.ts`: the plain bot plays the
+  bot scenario to planet 10's core on the three pacing seeds and `drillPaceBars.ts` judges the
+  seed medians as VS split them before #559: planet minutes at most 30 on P2-P10, drill-only gaps
+  at most 10 minutes, planet-average felt speed at least 5 cells/s, no dry tank and no stalled
+  planet are gated; planet minutes at least 22, 3 to 4 purchases a planet, the felt ratio to the
+  planet before (0.9), all-track majors 3.5 to 6.0, the income gain per purchase (amber under +5%
+  twice in a row), level 20 by P4 and 50 not before P5 and the felt speed at the core (at most 44)
+  are printed; the grind bar is a todo. Its per-purchase rows `{n, D, price, planet, minute,
+  incomePerHour}` go to `balance-report/drill-pace.ndjson`, which `pushTestMetrics.sh` appends to
+  `drill-pace.ndjson` on `test-metrics` (`scripts/ci/recordDrillPace.mjs`) to compare runs line by
+  line. Hours of play, so it runs only when named.
 - **Cut start latency** (ticket 433, measurement only): `src/physics/cutStartLatency.lane.test.ts`
   starts a down cut from rest in the live loop with `drill.sweptCut` on (from the planet 1 surface,
   turning the head from left, and again mid-shaft), at stored drill_power 1, 10 and 20, #400's rig
@@ -436,9 +458,12 @@ programs }` from three's `renderer.info` of the game canvas), read only when cal
   only when a run drills under 100 m or judges no ramped-up tick.
 - **Drill-speed ladder in stored steps** (ticket 434): `src/logging/drillLadderSteps.test.ts` cuts
   the same column's first 20 cells (all band 1, the ground a 10 s hold reaches) at stored drill_power
-  steps 1, 5, 10, 15 and 20, the levels of the browser drill-down run, with the law counted per step
-  (`drillPowerAtStep`). It watches: it only checks that the whole column was cut and no step cut
-  slower. Its rows go to `balance-report/drill-ladder-steps.ndjson`, which the Tester's
+  steps 1, 5, 10, 15 and 20, the levels of the browser drill-down run, one purchase each since
+  ticket 552. It checks the whole column was cut and no step cut slower, stored 20 against stored 1
+  within [55, 70], and the stored-20 cut on band 1 between -2.7% and +0.5% of D(20) (VS's bench bar
+  (ii) split by the TD on #551): it prints the band-1 hardness and tip it used and the expected
+  quantisation, `3600 / ceil(3600 H^3 / (D P^2))` cells/s, and the cut must read exactly that. Its
+  rows go to `balance-report/drill-ladder-steps.ndjson`, which the Tester's
   `pushTestMetrics.sh` appends to `drill-ladder.ndjson` on `test-metrics` for the status page's
   Drill speed panel ([loop-status.md](loop-status.md#drill-speed-panel-ticket-434)). About 2 s.
 - **Cut-follow at the starting drill** (ticket 430): `src/physics/cutFollowStartingRigs.test.ts`
@@ -705,7 +730,8 @@ programs }` from three's `renderer.info` of the game canvas), read only when cal
   hold), toggles, reloads, resets, checks a player's launch ignores a stored override, and opens
   the panel from `?debug&title` with a tap.
 - **Known red** (ticket 419, the TD on #396 section 2): `CAMPAIGN_PACING_KNOWN_RED`
-  (`src/constants/knownRed.ts`) is the one known-red marker in the repo: one gate
+  (`src/constants/knownRed.ts`) is the one exported known-red marker in the repo (lanes and specs
+  keep local ones with a ruling, as `subStepFloor.test.ts` keeps #558's): one gate
   (`campaignPacingGate`), one finding (#417), no registry. The gate still runs in full;
   `knownRedVerdict` (`src/logging/knownRed.ts`) prints its stalled-seed and sawtooth problems as
   `known-red (#417): ...` instead of failing them. The schedule cadence and "judged nothing" always
@@ -1027,8 +1053,9 @@ programs }` from three's `renderer.info` of the game canvas), read only when cal
   both per planet. `balance:planets` plays the bot scenario on each pacing seed and warns where the
   median band-5 departure is over 0.7x arrival on a planet the bot left (`sawtoothMedian.ts`);
   each seed's cell shows its drill_power and drill_tip leads past the curve on arrival and at
-  departure (`planetLeads.ts`). The bot holds drill_power to one level past the planet's on-curve
-  level (five on planet 1, json `onCurve.botLeadOnPlanet1`, ticket 396) and its forced core rule
+  departure (`planetLeads.ts`, purchases of drill power and majors of the tip). The bot holds
+  drill_power to one purchase past the planet's on-curve level on every planet (ticket 552; #396's
+  planet 1 lead of five majors went with its rows) and its forced core rule
   then buys drill_tip to two past (`bot/botCoreRule.ts`, #86), so a lead above those bounds is a
   bot bug, not a balance finding. Band 1 already digs at the
   24-tick cap on arrival, so it is printed, never judged. Reported in `balance:planets`; gated on
