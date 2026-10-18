@@ -1,10 +1,12 @@
 import { existsSync, readFileSync } from 'node:fs'
-import { describe, expect, it } from 'vitest'
+import { beforeAll, describe, expect, it } from 'vitest'
 import { DRILL_SUBSTEPS_PER_TICK } from '../constants/balance'
 import type { KnownRedMarker } from '../constants/knownRed'
 import { TICKS_PER_SECOND } from '../constants/physics'
+import { cutTrack } from '../systems/authority/digSpeedTrackFixtures'
 import { blockHardness } from '../systems/economy/oreEconomy'
-import { startLevels, vehicleStatsAt } from '../systems/economy/vehicleStats'
+import { drillPower, startLevels, vehicleStatsAt } from '../systems/economy/vehicleStats'
+import { div, toFixedText } from '../systems/money'
 import { subStepsPerTile } from '../systems/vehicle/drillRule'
 import { knownRedVerdict } from './knownRed'
 
@@ -32,6 +34,21 @@ const PAST_THE_FLOOR_CELLS_PER_SECOND = 5000
 /** A drill far past every rig: whatever the purchase, a cell still costs one sub-step. */
 const FAR_PAST_THE_FLOOR = 3000
 const SOFT_GROUND = blockHardness(1, 1)
+/**
+ * #551 acceptance 3: energy per metre new / today = D today / D new +-2% at L10, 20 and 30. Purchase
+ * 1 is today's stored 1, so the bar reads each purchase's energy per metre of the same bore against
+ * purchase 1's, beside D(1) / D(n); the band-1 level track of `digSpeedTrackFixtures.ts` at a speed
+ * under each rig's cut, energy as the law charge (exact on law work) over the cells it removed.
+ */
+const ENERGY_RIGS = [
+  { purchase: 1, speedMps: 1.4 },
+  { purchase: 10, speedMps: 10 },
+  { purchase: 20, speedMps: 85 },
+  { purchase: 30, speedMps: 600 },
+]
+const ENERGY_TOLERANCE = 0.02
+/** From purchase 30 a band-1 cell costs 5 sub-steps for a law of 4.3: the floor's own rows. */
+const FIRST_FLOORED_ENERGY_PURCHASE = 30
 const CELLS_PER_SECOND_AT_ONE_SUB_STEP = DRILL_SUBSTEPS_PER_TICK * TICKS_PER_SECOND
 
 function readFindingTicketFile(finding: number): string | null {
@@ -77,7 +94,64 @@ function pastTheFloorProblems(): string[] {
   ]
 }
 
+/** Law work a cell removed of the track's stretch, energy's measure on the law charge. */
+function lawTicksPerCellAt(purchase: number, speedMps: number): number {
+  const { stretch } = cutTrack({ speedMps, tilt: 'flat', section: 'level' }, 'swept', purchase)
+  return stretch.law.ticks / stretch.law.cellsRemoved
+}
+
+interface EnergyRow {
+  purchase: number
+  ratio: number
+  law: number
+}
+
+function energyRows(): EnergyRow[] {
+  const [first, ...rest] = ENERGY_RIGS.map(({ purchase, speedMps }) => ({
+    purchase,
+    perCell: lawTicksPerCellAt(purchase, speedMps),
+  }))
+  return rest.map(({ purchase, perCell }) => ({
+    purchase,
+    ratio: perCell / first.perCell,
+    law: Number(toFixedText(div(drillPower(first.purchase), drillPower(purchase)), 9)),
+  }))
+}
+
+function isWithinEnergyTolerance({ ratio, law }: EnergyRow): boolean {
+  return Math.abs(ratio / law - 1) <= ENERGY_TOLERANCE
+}
+
+function energyProblemOf(row: EnergyRow): string {
+  return `purchase ${row.purchase} spends ${row.ratio.toFixed(5)} of purchase 1's energy a metre, the law ${row.law.toFixed(5)}`
+}
+
 describe('the drill law at its one-sub-step floor (#551, ticket 552)', () => {
+  let energy: EnergyRow[] = []
+
+  beforeAll(() => {
+    energy = energyRows()
+    console.log(energy.map(energyProblemOf).join('\n'))
+  }, 120_000)
+
+  it('spends energy a metre at D today / D new within 2% at purchases 10 and 20', () => {
+    const unfloored = energy.filter((row) => row.purchase < FIRST_FLOORED_ENERGY_PURCHASE)
+    expect(unfloored.filter((row) => !isWithinEnergyTolerance(row)).map(energyProblemOf)).toEqual(
+      [],
+    )
+  })
+
+  it('carries purchase 30, whose band-1 cells round up a whole sub-step, as known red under #558', () => {
+    const floored = energy.filter((row) => row.purchase >= FIRST_FLOORED_ENERGY_PURCHASE)
+    const problems = {
+      covered: floored.filter((row) => !isWithinEnergyTolerance(row)).map(energyProblemOf),
+      uncovered: [],
+    }
+    const verdict = knownRedVerdict(SUB_STEP_FLOOR_KNOWN_RED, problems, readFindingTicketFile, GATE)
+    console.log(verdict.knownRed.join('\n'))
+    expect(verdict.failures).toEqual([])
+  })
+
   it('delivers 1.181 to 1.305 a purchase on soft ground through purchase 23', () => {
     const outside = purchasesBetween(2, LAST_BANDED_PURCHASE).filter(
       (purchase) => !isInBand(deliveredStepOf(purchase)),

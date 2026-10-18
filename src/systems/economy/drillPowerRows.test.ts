@@ -1,15 +1,6 @@
+import { readdirSync, readFileSync } from 'node:fs'
 import { describe, expect, it } from 'vitest'
-import {
-  ceil,
-  cmp,
-  div,
-  fromCanonical,
-  mul,
-  powInt,
-  sub,
-  toCanonical,
-  type Money,
-} from '../money'
+import { ceil, cmp, div, fromCanonical, mul, powInt, sub, toCanonical, type Money } from '../money'
 import { paceScale } from './planetEconomy'
 import { stepPrice, upgradePrice } from './upgradePrices'
 import { drillPower, startLevels, vehicleStatsAt } from './vehicleStats'
@@ -105,7 +96,10 @@ describe('drill power price rows (#551 price asserts, ticket 552)', () => {
   // than it adds in drill power.
   it('raises every price by at least the drill power its purchase adds, from purchase 1 to 300', () => {
     const cheap = PURCHASES_1_TO_300.filter((purchase) => {
-      const priceRatio = div(stepPrice('drill_power', purchase, 1), stepPrice('drill_power', purchase - 1, 1))
+      const priceRatio = div(
+        stepPrice('drill_power', purchase, 1),
+        stepPrice('drill_power', purchase - 1, 1),
+      )
       return cmp(priceRatio, gainAt(purchase)) < 0
     })
     expect(cheap).toEqual([])
@@ -135,5 +129,29 @@ describe('drill power past purchase 100 (#551 numbers, ticket 552)', () => {
       before = price
     }
     expect(misses).toEqual([])
+  })
+})
+
+const SRC = new URL('../../', import.meta.url)
+const STAT_NAMES = /drillPower|drillTip|gateTip|hullMax/
+/** `Number(` or `parseFloat(` wrapped round a stat: a double past 1e308 is Infinity (#340). */
+const NUMBER_OF_STAT = /(?:Number|parseFloat)\(([^()]*(?:\([^()]*\))?[^()]*)\)/g
+
+function gameSourceFiles(): string[] {
+  return readdirSync(SRC, { recursive: true, encoding: 'utf8' })
+    .map((path) => path.replaceAll('\\', '/'))
+    .filter((path) => /\.tsx?$/.test(path) && !/\.test\.tsx?$/.test(path))
+}
+
+function numbersOfStatsIn(path: string): string[] {
+  const code = readFileSync(new URL(path, SRC), 'utf8')
+  return [...code.matchAll(NUMBER_OF_STAT)]
+    .filter((match) => STAT_NAMES.test(match[1]))
+    .map((match) => `${path}: ${match[0]}`)
+}
+
+describe('drill power as a double (#551 numbers, ticket 552)', () => {
+  it('is never turned into a Number in game code, which D past purchase 3260 would overflow', () => {
+    expect(gameSourceFiles().flatMap(numbersOfStatsIn)).toEqual([])
   })
 })

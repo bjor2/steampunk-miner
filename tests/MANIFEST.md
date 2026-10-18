@@ -905,7 +905,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/economy/costCurveLookup.test.ts` | 3 | 3 |
 | `src/systems/economy/depthDensityCurve.test.ts` | 7 | 7 |
 | `src/systems/economy/drillGearCaps.test.ts` | 18 | 18 |
-| `src/systems/economy/drillPowerRows.test.ts` | 20 | 13 |
+| `src/systems/economy/drillPowerRows.test.ts` | 21 | 14 |
 | `src/systems/economy/economyGrowth.test.ts` | 5 | 5 |
 | `src/systems/economy/economySourceScan.test.ts` | 6 | 6 |
 | `src/systems/economy/economyTables.test.ts` | 10 | 5 |
@@ -1036,7 +1036,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/logging/sessionAnalysis/memoryTrend.test.ts` | 7 | 7 |
 | `src/logging/sessionAnalysis/sessionTable.test.ts` | 12 | 12 |
 | `src/logging/sessionAnalysis/summaryComparison.test.ts` | 3 | 3 |
-| `src/logging/subStepFloor.test.ts` | 4 | 4 |
+| `src/logging/subStepFloor.test.ts` | 6 | 6 |
 | `src/logging/tripCellEnergy.lane.test.ts` | 1 | 1 |
 | `src/logging/tripCellEnergy.test.ts` | 2 | 2 |
 | `src/logging/wreckerDiveReport.test.ts` | 6 | 6 |
