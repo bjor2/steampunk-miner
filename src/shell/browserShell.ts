@@ -7,6 +7,7 @@
  */
 import { keepNewestLines } from '../logging/ndjson'
 import { createBrowserSnapshots } from './browserSnapshots'
+import { createDevFlagStorage } from './devFlagStorage'
 import { readBrowserLaunchParameters } from './launchParameters'
 import { watchPageListeners } from './listenerCount'
 import { trackCanvasPointer } from './mouseHooks'
@@ -60,6 +61,7 @@ export function createBrowserShell(): Shell {
   return {
     kind: 'browser',
     launch,
+    devFlags: createDevFlagStorage(window.localStorage, window.sessionStorage),
     getAppInfo: async () => ({
       name: 'steampunk-miner',
       version: 'browser',

@@ -102,6 +102,12 @@ import {
   type LiveStepActions,
   type LiveStepValues,
 } from './liveStepSlice'
+import {
+  devFlagActionsOf,
+  STARTING_DEV_FLAGS,
+  type DevFlagActions,
+  type DevFlagValues,
+} from './devFlagSlice'
 import { forgetMusicStingers, recordMusicStingers } from './musicStingerRecord'
 import { platformReplicaOf, type PlatformReplica } from './platformReplica'
 import {
@@ -172,7 +178,9 @@ export interface GameState
     TitleMenuValues,
     TitleMenuActions,
     SaveKeepingValues,
-    SaveKeepingActions {
+    SaveKeepingActions,
+    DevFlagValues,
+    DevFlagActions {
   playerId: string
   planetTier: number
   planetSeed: number
@@ -198,18 +206,23 @@ export interface GameState
   applyStartScenario(scenario: StartScenario): void
   /**
    * A scenario file (#11 section 4) on a fresh session at tick 0: its start as `debug.*`
-   * commands, then its script; the live step then holds until play starts it.
+   * commands, then its script; the live step then holds until play starts it. The client loop's
+   * dev flags go back to the shipped ones, as the authority's do (ticket 548).
    */
   applyScenario(scenario: Scenario): void
   /** Advances the authority headlessly, submitting scripted commands at their ticks. */
   fastForward(ticks: number, commands?: readonly ScriptedCommand[]): void
   /** Replaces the session with a snapshot's state, held until play; refused whole on a problem. */
   restoreSnapshot(snapshot: unknown): void
-  /** Quit and resume (#26): play goes on from the checkpoint, docked; not a debug command. */
+  /**
+   * Quit and resume (#26): play goes on from the checkpoint, docked; not a debug command. The
+   * world keeps the dev flags it ran with; a debug session's overrides go on top (ticket 548).
+   */
   resumeCheckpoint(checkpoint: Checkpoint): void
   /**
    * New Game (ticket 403, HS1/VS4): the session replaced by the P1 baseline, so no unlock, owned
-   * item, artefact pick, first or planet carries over; logs `new_game_started`.
+   * item, artefact pick, first or planet carries over; logs `new_game_started`. Its dev flags are
+   * the shipped ones, or a debug session's overrides (ticket 548), never the old world's.
    */
   startNewGame(): void
   /** Debug: one upgrade track to an integer level (#7); the stats follow from the levels. */
@@ -265,6 +278,7 @@ type GameValues = Pick<
   | keyof SoundUnlockValues
   | keyof TitleMenuValues
   | keyof SaveKeepingValues
+  | keyof DevFlagValues
   | 'travelTransition'
 >
 
@@ -291,6 +305,7 @@ export const STARTING_VALUES: GameValues = {
   ...STARTING_SOUND_UNLOCK,
   ...STARTING_TITLE_MENU,
   ...STARTING_SAVE_KEEPING,
+  ...STARTING_DEV_FLAGS,
   travelTransition: null,
 }
 
@@ -313,6 +328,7 @@ export const useGameStore = create<GameState>()((set, get) => ({
   ...soundUnlockActionsOf(set),
   ...titleMenuActionsOf(set, get),
   ...saveKeepingActionsOf(set, get),
+  ...devFlagActionsOf(set, get),
 
   setPlanet: (planetTier) => {
     refuseProblems(startScenarioProblems({ planetTier }))
@@ -347,6 +363,7 @@ export const useGameStore = create<GameState>()((set, get) => ({
     get().allowPlaquesFor(scenario)
     set({ depthTiles: 0, travelTransition: null, planetCard: null })
     replaceSession(freshSessionAfter(readAuthorityState()))
+    get().restoreShippedClientFlags()
     get().applyStartScenario(startOfScenario(scenario))
     runScenarioScript(scenario.script ?? [], get().fastForward)
     get().holdLiveStepUntilPlay()
@@ -372,12 +389,14 @@ export const useGameStore = create<GameState>()((set, get) => ({
     set({ depthTiles: 0, travelTransition: null, planetCard: null })
     replaceSession(checkpoint.state)
     recordCheckpointLoaded(runEventPlaceOf(get()), checkpoint)
+    get().startSessionDevFlags()
   },
 
   startNewGame: () => {
     set({ depthTiles: 0, travelTransition: null, planetCard: null })
     replaceSession(freshSessionAfter(readAuthorityState()))
     recordNewGameStarted(get())
+    get().startSessionDevFlags()
   },
 
   setUpgrade: (upgradeId, level) =>

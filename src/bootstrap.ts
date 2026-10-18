@@ -21,6 +21,7 @@ import { createRunProgressSink, type RunProgressSink } from './logging/runProgre
 import { watchRapierWasmMemory } from './physics/rapierWasmMemory'
 import { requestCanvasScreenshot } from './scene/canvasScreenshots'
 import { renderPointerPresence } from './scene/renderQualityPresence'
+import { forgetDevFlagOverrides, isDevFlagSession } from './shell/devFlagStorage'
 import { getShell, type Shell } from './shell/shell'
 import { onSoundUnlockChange } from './shell/soundOut'
 import {
@@ -34,6 +35,7 @@ import { readAuthorityState } from './store/authorityLink'
 import { runEventPlaceOf, useGameStore } from './store/gameStore'
 import type { SaveFolder } from './store/saveFolder'
 import { installSaveTransfer } from './store/saveKeepingSlice'
+import { installDevFlagStorage } from './store/devFlagSlice'
 import { listenForDomainEvents } from './store/domainEventBroadcast'
 import { routeKeyChange, routeScrollNotch } from './store/inputRuntime'
 import { routePadFrame } from './store/padRuntime'
@@ -78,6 +80,8 @@ export async function startGame(): Promise<void> {
   installSaveFolder(saveFolderInstallOf(shell))
   keepSavesOnThisDevice(shell)
   await adoptLocalPreferences(shell)
+  forgetDevFlagsOnNoFlagsLaunch(shell)
+  readDevFlagOverridesInDebugSession(shell)
   keepScreenFitted(shell)
   noteRenderPointer(shell)
   showTouchControlsOnTouch(shell)
@@ -126,6 +130,7 @@ function startRunLogging(shell: Shell, startedAt: Date): RunFiles {
 async function openTitleOrResume(shell: Shell): Promise<void> {
   if (shell.launch.isTitleMenuShown) return useGameStore.getState().openTitleMenu()
   await resumeLastCheckpoint(shell)
+  startSessionDevFlags()
   recordStartingPlanetEntered()
   showStartingPlanetCard()
 }
@@ -220,6 +225,32 @@ async function adoptLocalPreferences(shell: Shell): Promise<void> {
   useGameStore.getState().adoptPreferences(reading)
 }
 
+/**
+ * `?noflags` (ticket 548): a bad override can never lock anyone out, so the launch forgets the
+ * browser's overrides and the tab's debug session marker before anything reads them.
+ */
+function forgetDevFlagsOnNoFlagsLaunch(shell: Shell): void {
+  if (shell.launch.isNoFlagsAsked) forgetDevFlagOverrides(shell.devFlags)
+}
+
+/**
+ * The overrides are read in a debug session only (the #548 ruling): a player's launch, a scenario
+ * and every headless run install no storage, so nothing stored ever reaches them.
+ */
+function readDevFlagOverridesInDebugSession(shell: Shell): void {
+  if (!isDevFlagSession(shell.launch, shell.devFlags)) return
+  installDevFlagStorage(shell.devFlags)
+  useGameStore.getState().loadDevFlagOverrides()
+}
+
+/**
+ * The session the launch plays: a resumed one already applied its overrides, so this sends
+ * nothing again; a fresh one gets them at its first tick.
+ */
+function startSessionDevFlags(): void {
+  useGameStore.getState().startSessionDevFlags()
+}
+
 /** Quit and resume (#26); a launch scenario sets its own start instead. */
 async function resumeLastCheckpoint(shell: Shell): Promise<void> {
   if (shell.launch.scenarioText !== null) return
@@ -306,7 +337,7 @@ function writeMetadata(shell: Shell, run: RunFiles): void {
     platform: shell.kind,
     debugEnabled: shell.launch.debugEnabled,
     debugApplied: game.debugApplied,
-    ...runFlagFieldsOf(readAuthorityState()),
+    ...runFlagFieldsOf(readAuthorityState(), game.clientDevFlags.flags),
     players: 1,
     startTime: run.startedAt.toISOString(),
     endTime: null,

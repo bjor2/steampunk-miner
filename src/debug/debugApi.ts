@@ -86,6 +86,7 @@ import {
   type DebugUi,
 } from './debugScreens'
 import { debugActionsBySlice, type SliceDebugActions } from './debugActionRegistry'
+import { createDebugDevFlags, type DebugDevFlags } from './debugDevFlags'
 import { createDebugSaves, type DebugSaves } from './debugSaves'
 import {
   pauseLiveGame,
@@ -253,8 +254,11 @@ export interface DebugApi {
    * the run folder under `logs/`.
    */
   exportSnapshots(): Promise<DebugResult<SnapshotExport>>
-  /** Screens and presentation settings (#33): no command, no log line, never `debugApplied`. */
-  ui: DebugUi
+  /**
+   * Screens and presentation settings (#33): no command, no log line, never `debugApplied`; and
+   * the dev flags (ticket 548), whose `setDevFlags` sends a logged `debug.setFlags`.
+   */
+  ui: DebugUi & DebugDevFlags
   /** The save slots (ticket 404): the index as the menus read it; an unlogged read. */
   saves: DebugSaves
   /** Actions pressed at the action layer (#33): their commands are ordinary play. */
@@ -458,7 +462,7 @@ export function createDebugApi(): DebugApi {
     collapseState: () => ({ ok: true, ...readCollapseReport() }),
     getPhysicsStats: readPhysicsStats,
     exportSnapshots: exportSnapshotZip,
-    ui: createDebugUi(),
+    ui: { ...createDebugUi(), ...createDebugDevFlags() },
     saves: createDebugSaves(),
     input: createDebugInput(),
     features: debugActionsBySlice(),

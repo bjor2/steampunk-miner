@@ -1,6 +1,7 @@
 /** The shell under Electron: forwards to the contextBridge object the preload exposed. */
 import type { ShellBridge } from '../../electron/bridgeContract.cts'
 import { readElectronLaunchParameters } from './launchParameters'
+import { createDevFlagStorage } from './devFlagStorage'
 import { watchPageListeners } from './listenerCount'
 import { trackCanvasPointer } from './mouseHooks'
 import { readPageMemory } from './pageMemory'
@@ -29,6 +30,7 @@ export function createElectronShell(bridge: ShellBridge): Shell {
   return {
     kind: 'electron',
     launch,
+    devFlags: createDevFlagStorage(window.localStorage, window.sessionStorage),
     getAppInfo: () => bridge.getAppInfo(),
     appendRunEvents: (runId, lines) => bridge.appendRunEvents(runId, lines),
     appendRunCommands: (runId, lines) => bridge.appendRunCommands(runId, lines),

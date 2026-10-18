@@ -14,6 +14,7 @@ import type {
 import type { PadReading } from '../systems/input/padFrame'
 import type { ScreenReading } from '../systems/views/screenLayout'
 import { createBrowserShell } from './browserShell'
+import type { ShellDevFlagStorage } from './devFlagStorage'
 import { createElectronShell } from './electronShell'
 import type { PageMemory } from './pageMemory'
 
@@ -30,6 +31,12 @@ export interface LaunchParameters {
    * which sets its own start.
    */
   isTitleMenuShown: boolean
+  /**
+   * `?noflags` (ticket 548): the browser's dev flag overrides and the tab's debug session marker
+   * are forgotten before anything reads them, so the game boots on the shipped flags. Electron
+   * reads no URL: false.
+   */
+  isNoFlagsAsked: boolean
 }
 
 /** One key going down or up (`KeyboardEvent.code`, e.g. "KeyA"), as the input layer reads it. */
@@ -60,6 +67,8 @@ export type ScrollNotch = 'up' | 'down'
 export interface Shell {
   readonly kind: 'electron' | 'browser'
   readonly launch: LaunchParameters
+  /** The browser's dev flag overrides and the tab's debug session marker (ticket 548). */
+  readonly devFlags: ShellDevFlagStorage
   getAppInfo(): Promise<AppInfo>
   appendRunEvents(runId: string, ndjsonLines: string): Promise<void>
   appendRunCommands(runId: string, ndjsonLines: string): Promise<void>

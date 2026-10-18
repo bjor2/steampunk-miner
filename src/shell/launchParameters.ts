@@ -2,7 +2,7 @@
  * How the game was launched (decision #11 section 6). Browser API, so it lives in the shell.
  *
  * - Dev server: the debug API is on (`import.meta.env.DEV`).
- * - Plain browser: `?debug`, `?scenario=` and `?title` on the URL, read once.
+ * - Plain browser: `?debug`, `?scenario=`, `?title` and `?noflags` (ticket 548) on the URL, read once.
  * - Electron: the URL is ignored; the main process says whether `--debug-api` was given and hands
  *   over a `--scenario=<path>` file's text.
  *
@@ -23,6 +23,7 @@ export function readBrowserLaunchParameters(): LaunchParameters {
       isTitleAsked: params.has('title'),
       scenarioText,
     }),
+    isNoFlagsAsked: params.has('noflags'),
   }
 }
 
@@ -35,6 +36,7 @@ export function readElectronLaunchParameters(launch: ShellLaunch): LaunchParamet
       isTitleAsked: false,
       scenarioText: launch.scenarioText,
     }),
+    isNoFlagsAsked: false,
   }
 }
 

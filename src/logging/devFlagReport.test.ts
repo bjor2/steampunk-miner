@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest'
+import { DEV_FLAGS } from '../constants/devFlags'
 import { createAuthorityState } from '../systems/authority/authorityState'
 import { devFlagSetLine, refuseTaintedRuns, taintedRunProblems } from './devFlagReport'
 import { devFlagsOfRun, runFlagFieldsOf } from './runMetadata'
@@ -56,16 +57,30 @@ describe('a paired or compared report', () => {
 
 describe("a run log header's dev flags", () => {
   it('writes no field for a session nobody flipped', () => {
-    expect(runFlagFieldsOf(DEFAULT)).toEqual({})
+    expect(runFlagFieldsOf(DEFAULT, DEV_FLAGS)).toEqual({})
   })
 
   it('writes the delta and the marker, and reads them back as the session had them', () => {
-    const fields = runFlagFieldsOf(FLIPPED)
+    const fields = runFlagFieldsOf(FLIPPED, DEV_FLAGS)
     expect(fields).toEqual({ flagsDelta: { 'drill.exactCarry': false }, devFlagsEverSet: true })
     expect(devFlagsOfRun(fields)).toEqual({
       devFlagDelta: { 'drill.exactCarry': false },
       devFlagsEverSet: true,
     })
-    expect(runFlagFieldsOf(FLIPPED_BACK)).toEqual({ devFlagsEverSet: true })
+    expect(runFlagFieldsOf(FLIPPED_BACK, DEV_FLAGS)).toEqual({ devFlagsEverSet: true })
+  })
+
+  it('names the client loop flags off their defaults beside the authority ones (ticket 548)', () => {
+    const client = { ...DEV_FLAGS, 'drill.sweptCut': false }
+    expect(runFlagFieldsOf(FLIPPED, client)).toEqual({
+      flagsDelta: { 'drill.exactCarry': false, 'drill.sweptCut': false },
+      devFlagsEverSet: true,
+    })
+  })
+
+  it('reads a header naming only a client flag back as a marked run', () => {
+    const flags = devFlagsOfRun({ flagsDelta: { 'drill.reportEveryTick': false } })
+    expect(flags).toEqual({ devFlagsEverSet: true })
+    expect(taintedRunProblems([{ label: 'the session', state: flags }])).toHaveLength(1)
   })
 })

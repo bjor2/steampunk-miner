@@ -3,8 +3,8 @@
  * tick, the controller drives the body for that tick with the current intent, the step's actions
  * are counted, a pose report goes to the authority when one is due (with the drive the intent
  * pushes, ticket 279; every tick while the drill bites with `drill.sweptCut` off, the
- * `drill.reportEveryTick` kill-switch on and the authority's `drill.exactCarry` on, ticket 514,
- * read when the loop is made), the drill's facing and activity go to the scene for the headlamp and
+ * `drill.reportEveryTick` kill-switch on and the authority's `drill.exactCarry` on, ticket 514),
+ * the drill's facing and activity go to the scene for the headlamp and
  * sparks, the speed and lift to the sounds, and the tick's motion to the part animation (#48). After the tow or a planet change the body
  * is placed on the dock the authority put the vehicle on. A dock building may stage the vehicle
  * first (#170 auto-roll, `vehicleStage.ts`): the drawn car and the camera move, the body does not.
@@ -18,8 +18,10 @@
  * changes. With it on, the motor's substeps then collide with the world that step's cut and report
  * left, not the one the step read (ticket 459). The bore struts standing in the authority's state
  * go to the motor, which lands the body on their planks (ticket 379).
+ * The client flags are read from the store at every step (ticket 548), so a debug flip takes on
+ * the next one; a `drill.sweptCut` flip lands only at a step whose last step did not drill.
  */
-import { DEV_FLAGS, type DevFlags } from '../constants/devFlags'
+import type { DevFlags } from '../constants/devFlags'
 import { MM_PER_METRE, UP_VECTOR_SCALE } from '../constants/physics'
 import type { PlanetView, VehicleController, VehicleStepResult } from '../physics/vehicleController'
 import {
@@ -99,10 +101,13 @@ interface TugMemo {
   tug: Vector2 | undefined
 }
 
-export function createVehicleLoop(flags: DevFlags = DEV_FLAGS): VehicleLoop {
+/** `fixedFlags` pins a spec's client flags; the game's loop reads the store's at every step. */
+export function createVehicleLoop(fixedFlags?: DevFlags): VehicleLoop {
+  const readFlags = fixedFlags === undefined ? readClientFlagsForStep : () => fixedFlags
+  const startFlags = fixedFlags ?? useGameStore.getState().clientDevFlags.flags
   const loop: LoopState = {
     stage: createVehicleStage(),
-    reporter: createPoseReporter(drillReportIntervalOf(flags, flagsOf(readAuthorityState()))),
+    reporter: createPoseReporter(drillReportIntervalOf(startFlags, flagsOf(readAuthorityState()))),
     placement: '',
     view: null,
     tile: { tx: 0, ty: 0 },
@@ -115,6 +120,7 @@ export function createVehicleLoop(flags: DevFlags = DEV_FLAGS): VehicleLoop {
       useGameStore.getState().advanceOneTick()
       const { params, world } = readPlanetWorld()
       if (params === null) return
+      const flags = readFlags(!loop.isCutting)
       const vehicle = readLocalVehicle()
       placeAfterTowOrTravel(loop, controller, vehicle, params)
       const stagedIntent = loop.stage.step(intent)
@@ -143,6 +149,12 @@ export function createVehicleLoop(flags: DevFlags = DEV_FLAGS): VehicleLoop {
       renderPresence.groundColliders = controller.colliderCount()
     },
   }
+}
+
+/** The store's client flags for this step, a pending flip landed once the last step was idle. */
+function readClientFlagsForStep(isDrillIdle: boolean): DevFlags {
+  useGameStore.getState().settleClientDevFlags(isDrillIdle)
+  return useGameStore.getState().clientDevFlags.flags
 }
 
 /** The slices' motion effects on the local vehicle at the authority's tick (ticket 233). */
