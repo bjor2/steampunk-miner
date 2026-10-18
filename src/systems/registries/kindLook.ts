@@ -19,6 +19,8 @@ export interface KindLookProvider {
   kindLooksOf(params: PlanetParams): readonly (KindLook | null)[]
   /** Rarity leads 1 to 4 (uncommon to mythic), each drawing at least the tint, frame and glow below it. */
   rarityLooks(): readonly RarityLook[]
+  /** The rarity tier a lead names (`common` at 0 to `mythic` at 4, ticket 454); null past them. */
+  rarityIdOfLead(lead: number): string | null
   /**
    * Whether the player has met the species, so its look and rarity may show (Horizontal Scaler's
    * condition a on #450): an unseen kind draws the family look with no rarity tint or frame.

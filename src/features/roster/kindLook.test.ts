@@ -25,7 +25,7 @@ import {
   tierOffsetOfCell,
 } from '../../systems/world/worldCell'
 import { generateChunk } from '../../systems/world/generateChunk'
-import { MATERIALS } from '../materials'
+import { MATERIAL_RARITIES, MATERIALS } from '../materials'
 import { ORE_ROWS, rarityTiers } from '../ores'
 import { NAMED_SEEDS } from './rosterFixtures'
 import { renderStateDigestOf } from './renderStateFixtures'
@@ -169,6 +169,14 @@ describe('roster kind looks', () => {
       })
     }
     expect(checked).toBeGreaterThan(0)
+  })
+
+  it('names the rarity tier of each lead from common to mythic, and none past them (ticket 454)', () => {
+    expect([0, 1, 2, 3, 4, 5, -1].map(ROSTER_KIND_LOOK.rarityIdOfLead)).toEqual([
+      ...MATERIAL_RARITIES,
+      null,
+      null,
+    ])
   })
 
   it('draws a wider frame, a brighter tint and no less glow for each rarity up', () => {

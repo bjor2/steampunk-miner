@@ -60,7 +60,15 @@ export interface KindLookTable {
   rarity: Float32Array
   /** How many slots draw a species. */
   revealedSlots: number
+  /**
+   * By roster index (slot 1 first), the rarity lead of the species the slot shows, or
+   * `NO_SEEN_LEAD` where it shows none: what the hazard strip's scanner may name (ticket 454).
+   */
+  seenLeads: Int8Array
 }
+
+/** A slot that shows no species, so its rarity stays unspecified. */
+export const NO_SEEN_LEAD = -1
 
 const CHANNEL_MAX = 255
 const BYTE = 256
@@ -70,6 +78,7 @@ export function emptyKindLookTable(): KindLookTable {
     kinds: new Float32Array(KIND_LOOK_SLOTS * LOOK_VECTOR),
     rarity: new Float32Array(RARITY_LOOK_LEADS * LOOK_VECTOR),
     revealedSlots: 0,
+    seenLeads: new Int8Array(KIND_LOOK_SLOTS).fill(NO_SEEN_LEAD),
   }
 }
 
@@ -93,6 +102,7 @@ export function kindLookTableOf(
     if (look === null || !isRevealed(look)) return
     const entry = kindEntryOf(look, heroCells.get(look.speciesId) ?? null, catalogue)
     table.kinds.set(entry, at * LOOK_VECTOR)
+    table.seenLeads[at] = look.rarityLead
     table.revealedSlots++
   })
   rarityLooks.slice(0, RARITY_LOOK_LEADS).forEach((look, at) => {

@@ -55,6 +55,7 @@ export const ROSTER_KIND_LOOK: KindLookProvider = {
   id: 'roster.kind-look',
   kindLooksOf: planetKindLooksOf,
   rarityLooks: rarityLooksByLead,
+  rarityIdOfLead,
   hasSeenKind: hasMetSpecies,
   heroAtlasOf: heroAtlasOfPlanet,
 }
@@ -86,6 +87,11 @@ export function kindLookOfSpecies(species: Material, table: MaterialTable = MATE
 /** Lead 1 (uncommon) first: lead k draws the look of the rarity whose tier offset is k. */
 export function rarityLooksByLead(): RarityLook[] {
   return FRAMED_RARITIES.map((_, at) => rarityLookAtLead(at + 1))
+}
+
+/** The rarity tier whose tier offset is the lead, as the ores rows name it. */
+export function rarityIdOfLead(lead: number): string | null {
+  return rarityTiers().find((tier) => tier.tierOffset === lead)?.id ?? null
 }
 
 function rarityLookAtLead(lead: number): RarityLook {

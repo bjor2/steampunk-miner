@@ -5,6 +5,7 @@ import {
   KIND_LOOK_SLOTS,
   kindLookTableOf,
   LOOK_VECTOR,
+  NO_SEEN_LEAD,
   packedRgbOf,
   rarityLeadOfEntry,
   rgbOfPacked,
@@ -92,6 +93,11 @@ describe('material look table', () => {
     expect(entryOf(table.kinds, 1)).toEqual([0, 0, 0, 0])
     expect(entryOf(table.kinds, 2)).toEqual([0, 0, 0, 0])
     expect(table.revealedSlots).toBe(1)
+  })
+
+  it('keeps the rarity lead of each slot it shows, and none for one it hides (ticket 454)', () => {
+    const table = kindLookTableOf([NUGGETS, null, WIRES], [RARE], (look) => look === WIRES)
+    expect(Array.from(table.seenLeads.subarray(0, 3))).toEqual([NO_SEEN_LEAD, NO_SEEN_LEAD, 2])
   })
 
   it('holds at most 17 slots, so a slot past them draws the family look', () => {
