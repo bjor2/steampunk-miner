@@ -6,10 +6,11 @@
  *
  * - Eight players' share of the per-cell budget is 4 cells (`cutShare.ts`), under what the stamp
  *   touches, so `p1`'s steps are cut by the swept span (ticket 374): a save between two is mid-span.
- * - The drill sits ten majors under the curve. On the curve every planet-200 cell takes the 24-tick
- *   floor, a whole number of ticks; here a cell takes a fractional number of ticks, so the cursor
- *   carries a sub-tick remainder of dig time (Q = `DRILL_SUBSTEPS_PER_TICK`) and the ground under
- *   the stamp stands part cut between two steps.
+ * - The drill sits twenty purchases over the curve. Since drill power grows per purchase (#552) the
+ *   on-curve planet-200 drill takes some 850 ticks a band-1 cell; twenty purchases more cut one in
+ *   about 11 ticks, a few cells a second, and a fractional number of ticks, so the cursor carries a
+ *   sub-tick remainder of dig time (Q = `DRILL_SUBSTEPS_PER_TICK`) and the ground under the stamp
+ *   stands part cut between two steps.
  *
  * Only specs use it.
  */
@@ -25,8 +26,7 @@ import { subStepsPerTile } from '../vehicle/drillRule'
 import { bandRockHardnessOf } from '../vehicle/travelParity'
 import { statsOfVehicle } from '../vehicle/vehicleState'
 import { paceArrivalOn } from '../bot/paceArrival'
-import { onCurveLevel } from '../economy/vehicleStats'
-import { stepOfMajor } from '../economy/upgradeSteps'
+import { onCurveStep } from '../economy/vehicleStats'
 import { NO_DRIVE } from '../vehicle/driveSigns'
 import { FACING } from '../vehicle/vehiclePose'
 import type { PlanetParams } from '../world/planetParams'
@@ -37,8 +37,11 @@ const DIVE_SEED = 83921
 /** About 1e149, every one of its 40 significant digits set. */
 export const DIVE_WALLET = '1.234567890123456789012345678901234567891e+149'
 export const DIVE_CREW = ['p1', 'p2', 'p3', 'p4', 'p5', 'p6', 'p7', 'p8'] as const
-/** Ten majors under the curve, where a cell is no longer a whole number of ticks. */
-const DRILL_MAJORS_UNDER_CURVE = 10
+/**
+ * Drill power purchases over planet 200's on-curve drill: a band-1 cell in about 11 ticks, not a
+ * whole number of them (`isFractionalTicks`).
+ */
+const DRILL_PURCHASES_OVER_CURVE = 20
 /** A band-1 column east of the pad; the body starts on its surface. */
 const DIVE_COLUMN = 20
 const ARRIVAL_TICK = 1
@@ -75,7 +78,7 @@ export function arrivedForDive(): AuthorityState {
 }
 
 function arrivalIntents(): CommandIntent[] {
-  const drillStep = stepOfMajor(onCurveLevel('drill_power', DIVE_PLANET) - DRILL_MAJORS_UNDER_CURVE)
+  const drillStep = onCurveStep('drill_power', DIVE_PLANET) + DRILL_PURCHASES_OVER_CURVE
   return [
     ...paceArrivalOn(DIVE_PLANET, DIVE_SEED),
     { type: 'debug.setMoney', payload: { amount: DIVE_WALLET } },

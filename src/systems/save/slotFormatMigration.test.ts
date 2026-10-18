@@ -110,7 +110,7 @@ describe('save format 2: purchases and constants', () => {
 
   /** A re-baseline (#397, #335) changes the drill law's numbers, never a save. */
   const rebaselined = ECONOMY.upgrades.map((upgrade) =>
-    upgrade.id === 'drill_power' && upgrade.effect.family === 'geometric'
+    upgrade.id === 'drill_power' && upgrade.effect.family === 'perPurchase'
       ? { ...upgrade, effect: { ...upgrade.effect, ratio: fromCanonical('2') } }
       : upgrade,
   )

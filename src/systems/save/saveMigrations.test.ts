@@ -8,7 +8,7 @@ import { UPGRADE_IDS } from '../economy/economyDefinition'
 import { gunFireIntervalTicks, gunShotDamage } from '../economy/gunStats'
 import { ECONOMY } from '../economy/economy'
 import { stepPrice, upgradePrice } from '../economy/upgradePrices'
-import { stepsOfMajors } from '../economy/upgradeSteps'
+import { levelOfStep, stepsOfMajors, stepsToNextLevel } from '../economy/upgradeSteps'
 import { drillPower, vehicleStatsAt } from '../economy/vehicleStats'
 import { readSection, type SaveSection } from '../registries/saveSections'
 import { GENERATOR_VERSION } from '../generatorVersion'
@@ -259,29 +259,32 @@ describe('save migration chain: levels to steps (#181)', () => {
     expect(vehicle.pose).toEqual(saved.vehicle.pose)
   })
 
-  it('keeps every stat as it was at the saved levels', () => {
+  // Drill power grows and is priced per purchase since #552, its level the stored step, and no
+  // save step rewrites a drill step: the saved major 37 loads as step 370, read as 370 purchases.
+  it('reads every stat at the migrated steps, drill power as that many purchases', () => {
     const { vehicle } = restored(PLANET_5_SAVE).state.players.p1
     const before = vehicleStatsAt(stepsOfMajors(saved.vehicle.levels))
     expect(statsOfVehicle(vehicle)).toEqual(before)
-    expect(statsOfVehicle(vehicle).drillPower).toEqual(drillPower(saved.vehicle.levels.drill_power))
+    expect(statsOfVehicle(vehicle).drillPower).toEqual(drillPower(vehicle.levels.drill_power))
   })
 
-  it('prices the next major, in ten steps, at what the next level cost before', () => {
+  it('prices the next major, in ten steps, at what the next level cost before, and the next drill purchase at its step', () => {
     const { state } = restored(PLANET_5_SAVE)
     for (const track of UPGRADE_IDS) {
       const step = state.players.p1.vehicle.levels[track]
-      const steps = Array.from({ length: 10 }, (_, pip) => stepPrice(track, step + pip, 5))
+      const toNext = stepsToNextLevel(track, step)
+      const steps = Array.from({ length: toNext }, (_, pip) => stepPrice(track, step + pip, 5))
       expect(nextUpgradePrice(state, 'p1', track)).toEqual(steps[0])
       expect(steps.reduce(add, ZERO_MONEY)).toEqual(
-        upgradePrice(track, saved.vehicle.levels[track], 5),
+        upgradePrice(track, levelOfStep(track, step), 5),
       )
     }
   })
 
-  it('keeps the barrel look and shot damage of gun level 7, its interval rounded half up', () => {
+  it('keeps the barrel look of gun level 7, its interval rounded half up, and shoots for the drill it loads with', () => {
     const { vehicle } = restored(PLANET_5_SAVE).state.players.p1
     const { damageFractionOfDrill } = ECONOMY.gun
-    const drill = drillPower(saved.vehicle.levels.drill_power)
+    const drill = drillPower(vehicle.levels.drill_power)
     expect(gunLookOf(vehicle.gun.level)).toBe(2)
     expect(gunShotDamage(vehicle.levels.drill_power)).toEqual(
       mul(mul(damageFractionOfDrill, drill), ECONOMY.enemies.combat.kDrillVsEnemy),

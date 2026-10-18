@@ -147,14 +147,20 @@ describe('save slot', () => {
     }
   })
 
+  // Drill power's level is its stored step since #552: 5 purchases, 1.5 * 2 * 2^4 once its first
+  // gain and its ratio are both retuned to 2.
   it('retunes a saved drill_power 5 when the coefficients in the definitions change', () => {
     const session = createScriptedSession()
-    session.submit(1, setUpgrade('drill_power', stepOfMajor(5)))
+    session.submit(1, setUpgrade('drill_power', 5))
     session.submit(5, dock)
     const levels = restoredFrom(savedText(session.state())).players.p1.vehicle.levels
+    const two = fromCanonical('2')
     const retuned = ECONOMY.upgrades.map((upgrade) =>
-      upgrade.id === 'drill_power' && upgrade.effect.family === 'geometric'
-        ? { ...upgrade, effect: { ...upgrade.effect, ratio: fromCanonical('2') } }
+      upgrade.id === 'drill_power' && upgrade.effect.family === 'perPurchase'
+        ? {
+            ...upgrade,
+            effect: { ...upgrade.effect, firstGain: { ratio: two, root: 1 }, ratio: two },
+          }
         : upgrade,
     )
     const reading = computeVehicleStats(levels, retuned)
