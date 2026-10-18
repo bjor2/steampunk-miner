@@ -113,10 +113,34 @@ describe('economy data validation', () => {
 
   it('lists a track whose effect has the wrong shape or stat', () => {
     const broken = economyFileCopy()
-    broken.upgrades[0].effect.stat = 'hullMax'
+    broken.upgrades[1].effect.stat = 'hullMax'
     expect(problemsOf(broken)).toContain(
-      'upgrades[0].effect must be geometric drillPower for drill_power',
+      'upgrades[1].effect must be geometric drillTip for drill_tip',
     )
+  })
+
+  it('lists drill power grown per major instead of per purchase (#552)', () => {
+    const broken = economyFileCopy()
+    Object.assign(broken.upgrades[0], {
+      effect: { family: 'geometric', stat: 'drillPower', start: '1.5', ratio: '1.12' },
+    })
+    expect(problemsOf(broken)).toEqual([
+      'upgrades[0].effect must be perPurchase drillPower for drill_power',
+      'upgrades[0].costCurveId cost.vehicle.drill_power must be a geometric curve',
+    ])
+  })
+
+  it('refuses a per-purchase effect whose first gain has no whole root (#552)', () => {
+    const broken = economyFileCopy()
+    Object.assign(broken.upgrades[0].effect, { firstGain: { ratio: '1.12', root: 1.5 } })
+    expect(problemsOf(broken)).toEqual(['upgrades[0].effect.firstGain.root must be a safe integer'])
+  })
+
+  it('refuses a per-purchase price curve with no first price (#552)', () => {
+    const broken = economyFileCopy()
+    const curve = broken.costCurves.find((candidate) => candidate.id === 'cost.vehicle.drill_power')
+    delete (curve as { firstPrice?: string }).firstPrice
+    expect(problemsOf(broken)).toEqual(['costCurves[4].firstPrice must be a decimal string >= 0'])
   })
 
   it('refuses a capped track', () => {
@@ -129,14 +153,6 @@ describe('economy data validation', () => {
     const broken = economyFileCopy()
     Object.assign(broken.costCurves[0], { ratio: 1.24 })
     expect(problemsOf(broken)).toContain('costCurves[0].ratio must be a decimal string >= 0')
-  })
-
-  it('refuses a planet 1 bot lead that is not a whole number of majors (ticket 396)', () => {
-    const broken = economyFileCopy()
-    Object.assign(broken.upgrades[0].onCurve, { botLeadOnPlanet1: 2.5 })
-    expect(problemsOf(broken)).toEqual([
-      'upgrades[0].onCurve.botLeadOnPlanet1 must be a safe integer',
-    ])
   })
 
   it('refuses a travel parity k outside 1 to 2 (TD lock on #397, ticket 400)', () => {
@@ -162,20 +178,6 @@ describe('economy data validation', () => {
       travelParityKBounds: { lowest: '1', highest: '3' },
     })
     expect(problemsOf(widened)).toEqual([])
-  })
-
-  it('refuses curve pieces that do not start past level 0 and past the piece before (ticket 396)', () => {
-    const broken = economyFileCopy()
-    const pieces = [
-      { fromLevel: 0, base: '1', ratio: '1.5' },
-      { fromLevel: 9, base: '1', ratio: '1.5' },
-      { fromLevel: 9, base: '1', ratio: '1.5' },
-    ]
-    Object.assign(broken.costCurves[0], { pieces })
-    expect(problemsOf(broken)).toEqual([
-      'costCurves[0].pieces[0].fromLevel must be above 0',
-      'costCurves[0].pieces[2].fromLevel must be above 9',
-    ])
   })
 
   it('refuses pace scale steps that do not climb by planet (#131)', () => {

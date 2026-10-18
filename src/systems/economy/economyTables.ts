@@ -19,12 +19,12 @@ import { blockHardness, coreHardness, coreMaterialTier, oreTier, oreValue } from
 import { energyUnitPrice, repairPrice, rescueFeeBounds, travelFee } from './planetCharges'
 import { coreFragmentsNeeded } from './planetEconomy'
 import { upgradePrice } from './upgradePrices'
-import { stepsOfMajors } from './upgradeSteps'
 import {
   vehicleStatsAt,
   hullMax,
   onCurveLevel,
   onCurveLevels,
+  onCurveSteps,
   type UpgradeLevels,
   type VehicleStats,
 } from './vehicleStats'
@@ -113,7 +113,7 @@ export function planetEconomyRow(planetIndex: number): PlanetEconomyRow {
 
 export function onCurveVehicleRow(planetIndex: number): OnCurveVehicleRow {
   const levels = onCurveLevels(planetIndex)
-  return { planetIndex, levels, stats: vehicleStatsAt(stepsOfMajors(levels)) }
+  return { planetIndex, levels, stats: vehicleStatsAt(onCurveSteps(planetIndex)) }
 }
 
 export function planetPriceRow(planetIndex: number): PlanetPriceRow {

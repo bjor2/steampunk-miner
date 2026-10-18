@@ -58,14 +58,20 @@ describe('economy growth past the slice', () => {
     })
   })
 
-  it("grows on-curve drill power and hull by 1.12^6 per planet, to Money's 40 digits", () => {
+  it("grows on-curve hull by 1.12^6 per planet, to Money's 40 digits", () => {
     for (const planet of PLANETS.slice(0, 40)) {
       const here = onCurveVehicleRow(planet).stats
       const next = onCurveVehicleRow(planet + 1).stats
-      expect(agreesTo35Digits(div(next.drillPower, here.drillPower), m('1.973822685184'))).toBe(
-        true,
-      )
       expect(agreesTo35Digits(div(next.hullMax, here.hullMax), m('1.973822685184'))).toBe(true)
+    }
+  })
+
+  // #552: three purchases of x1.243 a planet on curve, about 12 at planet 1 (#551 section 3).
+  it("grows on-curve drill power by 1.243^3 per planet, to Money's 40 digits", () => {
+    for (const planet of PLANETS.slice(0, 40)) {
+      const here = onCurveVehicleRow(planet).stats
+      const next = onCurveVehicleRow(planet + 1).stats
+      expect(agreesTo35Digits(div(next.drillPower, here.drillPower), m('1.920495907'))).toBe(true)
     }
   })
 })

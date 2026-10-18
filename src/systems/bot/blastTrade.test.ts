@@ -1,9 +1,9 @@
 import { describe, expect, it } from 'vitest'
-import { onCurveLevels, vehicleStatsAt, type UpgradeLevels } from '../economy/vehicleStats'
+import { vehicleStatsAt, type UpgradeLevels, onCurveSteps } from '../economy/vehicleStats'
 import { cmp } from '../money'
 import { planetParamsFor } from '../world/planetParams'
 import { blastTradeOf, type BlastTrade } from './blastTrade'
-import { stepOfMajor, stepsOfMajors } from '../economy/upgradeSteps'
+import { stepOfMajor } from '../economy/upgradeSteps'
 
 const WORLD_SEED = 83921
 const PLANETS = [7, 8, 9, 10]
@@ -15,7 +15,7 @@ const DRILL_LEVELS_BEHIND = 12
 function tradesOfCampaign(): BlastTrade[] {
   return PLANETS.flatMap((planetIndex) => {
     const params = planetParamsFor(WORLD_SEED, planetIndex)
-    return drillLevelsBehind(stepsOfMajors(onCurveLevels(planetIndex))).flatMap((levels) =>
+    return drillLevelsBehind(onCurveSteps(planetIndex)).flatMap((levels) =>
       BANDS.flatMap((band) => blastTradeOf(params, vehicleStatsAt(levels), band) ?? []),
     )
   })

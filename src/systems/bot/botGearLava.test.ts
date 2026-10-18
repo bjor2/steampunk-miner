@@ -4,8 +4,7 @@ import type { SliceDefinition } from '../../registries/sliceDefinition'
 import { createAuthorityState } from '../authority/authorityState'
 import type { DrillGearAsk } from '../economy/drillGearCaps'
 import { UPGRADE_IDS } from '../economy/economyDefinition'
-import { stepOfMajor } from '../economy/upgradeSteps'
-import { onCurveLevel } from '../economy/vehicleStats'
+import { onCurveStep } from '../economy/vehicleStats'
 import { dockSiteOf } from '../world/dockSite'
 import { planetParamsFor } from '../world/planetParams'
 import { noRouteDeaths } from './botDeathReplay'
@@ -43,7 +42,7 @@ function diggerBesidePocket(): { session: BotSession; planet: BotPlanet } {
   session.submit({ type: 'debug.setMoney', payload: { amount: '1e30' } })
   session.submit({ type: 'debug.teleportToDock', payload: { bay: 'upgrade' } })
   for (const upgradeId of UPGRADE_IDS) {
-    const level = stepOfMajor(onCurveLevel(upgradeId, 8))
+    const level = onCurveStep(upgradeId, 8)
     session.submit({ type: 'debug.setUpgrade', payload: { upgradeId, level } })
   }
   session.submit({ type: 'debug.setCasingGrade', payload: { grade: 5 } })

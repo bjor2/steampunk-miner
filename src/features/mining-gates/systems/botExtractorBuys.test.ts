@@ -9,8 +9,7 @@ import { createBotSession, type BotSession } from '../../../systems/bot/botSessi
 import { playSliceFrom } from '../../../systems/bot/playSlice'
 import { newMineLayout } from '../../../systems/bot/mineLayout'
 import { UPGRADE_IDS } from '../../../systems/economy/economyDefinition'
-import { stepOfMajor } from '../../../systems/economy/upgradeSteps'
-import { onCurveLevel } from '../../../systems/economy/vehicleStats'
+import { onCurveStep } from '../../../systems/economy/vehicleStats'
 import { setPlanetCommand, setPlanetSeedCommand } from '../../../systems/startScenarioCommands'
 import { setUpgradeCommand } from '../../../systems/vehicle/vehicleCommands'
 import { botPurchases } from '../../../systems/registries/botPurchases'
@@ -35,7 +34,7 @@ function arrivedBroke(planetIndex: number): CommandIntent[] {
     setPlanetCommand(planetIndex),
     setPlanetSeedCommand(FIXTURE_SEED),
     { type: 'debug.setMoney', payload: { amount: '0' } },
-    ...UPGRADE_IDS.map((id) => setUpgradeCommand(id, stepOfMajor(onCurveLevel(id, planetIndex)))),
+    ...UPGRADE_IDS.map((id) => setUpgradeCommand(id, onCurveStep(id, planetIndex))),
     { type: 'debug.setCasingGrade', payload: { grade: 5 } },
     { type: 'debug.setLiningType', payload: { liningType: 'refractory' } },
     { type: 'debug.freezeEnemies', payload: { frozen: true } },

@@ -18,8 +18,7 @@ import {
   poseAbove,
 } from '../../../systems/authority/scriptedSession'
 import { UPGRADE_IDS } from '../../../systems/economy/economyDefinition'
-import { stepOfMajor } from '../../../systems/economy/upgradeSteps'
-import { onCurveLevel } from '../../../systems/economy/vehicleStats'
+import { onCurveStep } from '../../../systems/economy/vehicleStats'
 import { setPlanetCommand } from '../../../systems/startScenarioCommands'
 import { cellStampOf, drillGearCellsAt } from '../../../systems/vehicle/drillGearCells'
 import { drillStampOf } from '../../../systems/vehicle/drillStamp'
@@ -60,7 +59,7 @@ function deepSessionOn(planet: number) {
   const setup: CommandIntent[] = [
     setPlanetCommand(planet),
     FREEZE_ENEMIES,
-    ...UPGRADE_IDS.map((id) => setUpgradeCommand(id, stepOfMajor(onCurveLevel(id, planet)))),
+    ...UPGRADE_IDS.map((id) => setUpgradeCommand(id, onCurveStep(id, planet))),
     FORCE_DEEP,
   ]
   setup.forEach((intent) => session.submit(0, intent))

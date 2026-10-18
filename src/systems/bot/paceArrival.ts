@@ -12,8 +12,7 @@
 import type { CommandIntent } from '../authority/authorityCommand'
 import { createAuthorityState, type AuthorityState } from '../authority/authorityState'
 import { UPGRADE_IDS } from '../economy/economyDefinition'
-import { stepOfMajor } from '../economy/upgradeSteps'
-import { onCurveLevel, onCurveSteps, vehicleStatsAt } from '../economy/vehicleStats'
+import { onCurveSteps, vehicleStatsAt, onCurveStep } from '../economy/vehicleStats'
 import { cmp, toCanonical, type Money } from '../money'
 import { setPlanetCommand, setPlanetSeedCommand } from '../startScenarioCommands'
 import { setHullCommand, setUpgradeCommand } from '../vehicle/vehicleCommands'
@@ -82,7 +81,7 @@ export function refuseOffHullArrival(vehicle: VehicleState, hull: ArrivalHull): 
 }
 
 function onCurveLevelCommandsOn(planet: number): CommandIntent[] {
-  return UPGRADE_IDS.map((id) => setUpgradeCommand(id, stepOfMajor(onCurveLevel(id, planet))))
+  return UPGRADE_IDS.map((id) => setUpgradeCommand(id, onCurveStep(id, planet)))
 }
 
 function arrivalHullOn(planet: number, hull: ArrivalHull): Money {

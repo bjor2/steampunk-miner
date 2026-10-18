@@ -20,7 +20,6 @@ import {
   enemyHitOnVehicle,
   enemyTier,
   pinnedDrillDamagePerTick,
-  pinnedKillSeconds,
   sideHitShareOfHull,
   spawnDensityScale,
 } from './enemyStats'
@@ -176,10 +175,10 @@ describe('enemy hits and the pinned drill (#9, #25 acceptance 2 and 3)', () => {
     ).toEqual(['4.9', '19.6', '39.2'].map(m))
   })
 
-  it('kills a tier 1 crawler pinned on a level 13 drill in 72 ticks', () => {
-    const perTick = pinnedDrillDamagePerTick(drillPower(13))
-    expect(toCanonical(mul(perTick, m('60')))).toBe(toCanonical(drillPower(13)))
-    expect(ceil(div(enemyHealth('crawler', 1), perTick))).toEqual(m('72'))
+  it('kills a tier 1 crawler pinned on the planet 1 on-curve drill, 12 purchases, in 29 ticks', () => {
+    const perTick = pinnedDrillDamagePerTick(drillPower(12))
+    expect(toCanonical(mul(perTick, m('60')))).toBe(toCanonical(drillPower(12)))
+    expect(ceil(div(enemyHealth('crawler', 1), perTick))).toEqual(m('29'))
   })
 
   it('never lets one rear hit destroy a full on-curve hull, and needs 4 side or 2 rear hits', () => {
@@ -197,29 +196,34 @@ describe('enemy hits and the pinned drill (#9, #25 acceptance 2 and 3)', () => {
 })
 
 describe('enemy parity with an on-curve player (#9, #20 acceptance 4)', () => {
-  it('kills a pinned crawler in 1.0 to 2.0 s and takes 15 to 25% of hull per side hit', () => {
+  it('takes 15 to 25% of hull per side hit', () => {
     for (const planet of PLANETS_1_TO_40) {
-      const drillLevel = onCurveLevel('drill_power', planet)
       const hullLevel = onCurveLevel('hull', planet)
       for (const band of BANDS) {
         const tier = enemyTier(planet, band)
-        expect(isWithin(pinnedKillSeconds('crawler', tier, drillLevel), '1.0', '2.0')).toBe(true)
         expect(isWithin(sideHitShareOfHull('crawler', tier, hullLevel), '0.15', '0.25')).toBe(true)
       }
     }
   })
 
-  // #6 acceptance 3 and table D state the one-planet-behind case for band 3 (2.97 s, 39%). The
-  // same constants give 2.37 s in band 1, so the 2.5 s floor holds from band 2 on, not in band 1.
-  it('takes 2.5 to 5 s and 30 to 50% of hull per side hit in band 3 one planet behind', () => {
+  // #6 acceptance 3 and table D state the one-planet-behind case for band 3 (39%).
+  it('takes 30 to 50% of hull per side hit in band 3 one planet behind', () => {
     for (const planet of PLANETS_1_TO_40.slice(1)) {
-      const drillLevel = onCurveLevel('drill_power', planet - 1)
       const hullLevel = onCurveLevel('hull', planet - 1)
       const tier = enemyTier(planet, 3)
-      expect(isWithin(pinnedKillSeconds('crawler', tier, drillLevel), '2.5', '5')).toBe(true)
       expect(isWithin(sideHitShareOfHull('crawler', tier, hullLevel), '0.30', '0.50')).toBe(true)
     }
   })
+
+  // Drill damage still follows drill power, which grows x1.243 a purchase since #552 against
+  // enemy health's 1.12 a tier: on curve a pinned crawler now dies in 0.48 s (band 1, planet 1) to
+  // 1.4 s (planet 40), table D. The GD ruled combat damage its own design ticket (#555, on #551).
+  it.todo(
+    'kills a pinned crawler in 1.0 to 2.0 s on curve (#20 acceptance 4; waits on the combat damage design of #555)',
+  )
+  it.todo(
+    'kills a pinned band-3 crawler in 2.5 to 5 s one planet behind (#6 acceptance 3; waits on the combat damage design of #555)',
+  )
 })
 
 /** `(R(6) / R(p))^2`, the landed density step of #131 written out. */

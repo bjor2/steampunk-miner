@@ -1,5 +1,5 @@
 {
-  "economyVersion": 1,
+  "economyVersion": 2,
   "ore": {
     "tiersPerPlanet": 3,
     "coreTierBand": 6,
@@ -80,13 +80,10 @@
     { "id": "cost.vehicle.hull", "family": "geometric", "base": "46", "ratio": "1.225" },
     {
       "id": "cost.vehicle.drill_power",
-      "family": "geometric",
-      "base": "10",
-      "ratio": "1.15",
-      "pieces": [
-        { "fromLevel": 1, "base": "9.2", "ratio": "1.15" },
-        { "fromLevel": 17, "base": "1300", "ratio": "1.5" }
-      ]
+      "family": "perPurchase",
+      "firstPrice": "1",
+      "base": "20",
+      "ratio": "1.48"
     },
     { "id": "cost.vehicle.drill_tip", "family": "geometric", "base": "83", "ratio": "1.500625" },
     { "id": "cost.casing.upgrade", "family": "geometric", "base": "48", "ratio": "1.225" },
@@ -151,8 +148,14 @@
       "id": "drill_power",
       "costCurveId": "cost.vehicle.drill_power",
       "maxLevel": null,
-      "effect": { "family": "geometric", "stat": "drillPower", "start": "1.5", "ratio": "1.12" },
-      "onCurve": { "levelAtPlanet1": 13, "levelsPerPlanet": 6, "botLeadOnPlanet1": 5 }
+      "effect": {
+        "family": "perPurchase",
+        "stat": "drillPower",
+        "start": "1.5",
+        "firstGain": { "ratio": "1.12", "root": 18 },
+        "ratio": "1.243"
+      },
+      "onCurve": { "levelAtPlanet1": 12, "levelsPerPlanet": 3 }
     },
     {
       "id": "drill_tip",

@@ -1,12 +1,12 @@
 /** Finds a named curve of `economy.json`'s `costCurves` and checks its family before pricing. */
-import type { Money } from '../money'
+import { ceil, type Money } from '../money'
 import { growGeometric } from './curveFamilies'
 import { ECONOMY } from './economy'
 import type {
   BandOreCostCurve,
   CostCurve,
   GeometricCostCurve,
-  GeometricCurvePiece,
+  PerPurchaseCostCurve,
 } from './economyDefinition'
 
 export function geometricCurveOf(curveId: string): GeometricCostCurve {
@@ -15,16 +15,23 @@ export function geometricCurveOf(curveId: string): GeometricCostCurve {
   return curve
 }
 
-/** The piece of a geometric curve that prices `level`: the curve's own start, or a later piece. */
-export function geometricPieceAt(curve: GeometricCostCurve, level: number): GeometricCurvePiece {
-  const later = (curve.pieces ?? []).filter((piece) => piece.fromLevel <= level)
-  return later.at(-1) ?? { fromLevel: 0, base: curve.base, ratio: curve.ratio }
+/** `base * ratio^level` before rounding. */
+export function geometricWorthAt(curve: GeometricCostCurve, level: number): Money {
+  return growGeometric(curve.base, curve.ratio, level)
 }
 
-/** `base * ratio^(level - fromLevel)` of the piece pricing `level`, before rounding. */
-export function geometricWorthAt(curve: GeometricCostCurve, level: number): Money {
-  const piece = geometricPieceAt(curve, level)
-  return growGeometric(piece.base, piece.ratio, level - piece.fromLevel)
+export function perPurchaseCurveOf(curveId: string): PerPurchaseCostCurve {
+  const curve = curveOf(curveId)
+  if (curve.family !== 'perPurchase') {
+    throw new RangeError(`cost curve ${curveId} is not perPurchase`)
+  }
+  return curve
+}
+
+/** `firstPrice` at purchase 0, else `ceil(base * ratio^(purchase - 1))` (#551, ticket 552). */
+export function perPurchaseRowAt(curve: PerPurchaseCostCurve, purchase: number): Money {
+  if (purchase === 0) return curve.firstPrice
+  return ceil(growGeometric(curve.base, curve.ratio, purchase - 1))
 }
 
 export function bandOreCurveOf(curveId: string): BandOreCostCurve {

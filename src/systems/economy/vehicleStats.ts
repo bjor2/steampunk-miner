@@ -1,24 +1,27 @@
 /**
  * The six upgrade tracks as stats of integer levels (decisions #6 sections 1 and 3, #7):
- *   drillPower  D(L) = 1.5 * 1.12^L       drillTip  P(L) = 1 * 1.2544^L      hullMax 100 * 1.12^L
+ *   drillPower  D(n) = 1.5 * 1.12^(1/18) * 1.243^(n-1), D(0) = 1.5, n purchases (#551, 552)
+ *   drillTip    P(L) = 1 * 1.2544^L       hullMax 100 * 1.12^L
  *   energyMax   150 + 6L                  cargo     10 + 4L
  *   engine      min + (max - min) * L / (L + 25) for speed 6..14, accel 1.0..1.8, twr 2.0..3.5
  * Level 0 is the 1.0x start of every track. Unbounded stats are BigStat; the bounded ones are
  * plain numbers the physics step may read (#5 rule 5).
  *
- * The per-track functions take a major level `L`, today's curve, which the design tables read. A
+ * The per-track functions take a track's level, which the design tables read: a major `L`, or the
+ * purchase count of drill power, whose level is its stored step (GD ruling on #551, ticket 552). A
  * vehicle stores steps (#180 section 3, `upgradeSteps.ts`): `vehicleStatsAt` and the `...AtStep`
  * functions evaluate each curve at the step's effective level (`stepStats.ts`).
  */
 import { fromSafeInteger, mul, type BigStat } from '../money'
 import { growGeometric, growLinear, saturate } from './curveFamilies'
 import { ECONOMY } from './economy'
-import { geometricAtStep, linearAtStep, saturatingAtStep } from './stepStats'
-import { majorOf, majorsOfSteps, stepOfMajor, type TrackNumbers } from './upgradeSteps'
+import { geometricAtStep, linearAtStep, perPurchaseAtStep, saturatingAtStep } from './stepStats'
+import { majorOf, majorsOfSteps, stepOfLevel, type TrackNumbers } from './upgradeSteps'
 import {
   UPGRADE_IDS,
   type GeometricEffect,
   type LinearEffect,
+  type PerPurchaseEffect,
   type SaturatingEffect,
   type UpgradeDef,
   type UpgradeId,
@@ -53,8 +56,9 @@ const FIRST_PLANET = 1
 /** The upgrade definitions a stat is read from; the game's own come from `economy.json`. */
 export type UpgradeDefs = readonly UpgradeDef[]
 
+/** Drill power after `level` purchases: drill power's level is its stored step (#552). */
 export function drillPower(level: number, defs: UpgradeDefs = ECONOMY.upgrades): BigStat {
-  return growGeometricStat(geometricEffectOf(defs, 'drill_power'), level)
+  return drillPowerAtStep(level, defs)
 }
 
 export function drillTip(level: number, defs: UpgradeDefs = ECONOMY.upgrades): BigStat {
@@ -102,7 +106,7 @@ export function vehicleStatsAt(
 }
 
 export function drillPowerAtStep(step: number, defs: UpgradeDefs = ECONOMY.upgrades): BigStat {
-  return geometricAtStep(geometricEffectOf(defs, 'drill_power'), step)
+  return perPurchaseAtStep(perPurchaseEffectOf(defs, 'drill_power'), step)
 }
 
 export function drillTipAtStep(step: number, defs: UpgradeDefs = ECONOMY.upgrades): BigStat {
@@ -135,24 +139,27 @@ export function rescueEnergyFloor(boilerStep: number): BigStat {
   return mul(ECONOMY.energy.rescueFloorFraction, fromSafeInteger(energyMaxAtStep(boilerStep)))
 }
 
-/** The level an on-curve player holds at the end of planet `p` (#6 section 3). */
+/**
+ * The level an on-curve player holds at the end of planet `p` (#6 section 3): a major, or drill
+ * power's purchase count (#552).
+ */
 export function onCurveLevel(upgradeId: UpgradeId, planetIndex: number): number {
   const { levelAtPlanet1, levelsPerPlanet } = upgradeDefOf(ECONOMY.upgrades, upgradeId).onCurve
   return levelAtPlanet1 + levelsPerPlanet * (planetIndex - FIRST_PLANET)
 }
 
-/** Majors past on-curve the pacing bot may buy on planet 1, if the track sets one (ticket 396). */
-export function botLeadOnPlanet1(upgradeId: UpgradeId): number | undefined {
-  return upgradeDefOf(ECONOMY.upgrades, upgradeId).onCurve.botLeadOnPlanet1
+/** The stored step of a track's on-curve level at the end of planet `p`: no pip. */
+export function onCurveStep(upgradeId: UpgradeId, planetIndex: number): number {
+  return stepOfLevel(upgradeId, onCurveLevel(upgradeId, planetIndex))
 }
 
 export function onCurveLevels(planetIndex: number): UpgradeLevels {
   return levelsOf((upgradeId) => onCurveLevel(upgradeId, planetIndex))
 }
 
-/** The steps an on-curve player holds at the end of planet `p`: its majors, no pip. */
+/** The steps an on-curve player holds at the end of planet `p`: its levels, no pip. */
 export function onCurveSteps(planetIndex: number): UpgradeLevels {
-  return levelsOf((upgradeId) => stepOfMajor(onCurveLevel(upgradeId, planetIndex)))
+  return levelsOf((upgradeId) => onCurveStep(upgradeId, planetIndex))
 }
 
 export function startLevels(): UpgradeLevels {
@@ -207,6 +214,12 @@ function upgradeDefOf(defs: UpgradeDefs, upgradeId: UpgradeId): UpgradeDef {
   const upgrade = defs.find((candidate) => candidate.id === upgradeId)
   if (upgrade === undefined) throw new RangeError(`no upgrade ${upgradeId} in the definitions`)
   return upgrade
+}
+
+function perPurchaseEffectOf(defs: UpgradeDefs, upgradeId: UpgradeId): PerPurchaseEffect {
+  const { effect } = upgradeDefOf(defs, upgradeId)
+  if (effect.family !== 'perPurchase') throw new RangeError(`${upgradeId} is not per purchase`)
+  return effect
 }
 
 function geometricEffectOf(defs: UpgradeDefs, upgradeId: UpgradeId): GeometricEffect {

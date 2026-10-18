@@ -8,23 +8,25 @@
  * band 5 started near the 24-tick cap and the #81 sawtooth (band 5 at departure at most 0.7x
  * arrival) could not show. The tip rises 3 levels a planet on curve, so +2 at departure is -1 on
  * the next arrival, and band 5 is already at full efficiency there: the tip lead does not speed
- * band 5 on arrival. At the caps the core digs at 135 ticks a tile on every planet. On planet 1
- * alone, ticket 396's GD ruling lets drill power lead 5 (json `onCurve.botLeadOnPlanet1`).
+ * band 5 on arrival. At the caps the core digs at 135 ticks a tile on every planet.
+ *
+ * Since the GD ruling on #551 (ticket 552) drill power's level is one purchase of x1.243, so its
+ * lead of 1 is one purchase past its on-curve purchase count (about 12 at planet 1 and 3 a
+ * planet), on planet 1 as well: #396's planet 1 lead of 5 majors was a stopgap for the old rows.
  */
 import { TICKS_PER_SECOND } from '../../constants/physics'
 import type { UpgradeId } from '../economy/economyDefinition'
-import { stepOfMajor } from '../economy/upgradeSteps'
-import { botLeadOnPlanet1, onCurveLevel, type UpgradeLevels } from '../economy/vehicleStats'
+import { stepOfLevel } from '../economy/upgradeSteps'
+import { onCurveLevel, type UpgradeLevels } from '../economy/vehicleStats'
 import { isCoreDugWithin } from './tripEstimate'
 
 /** #29 Systems & Economy note 3: the core is dug at 0.4 tiles a second (2.5 seconds a tile). */
 const FORCED_DRILL_TICKS_PER_TILE = (5 * TICKS_PER_SECOND) / 2
 
-const FIRST_PLANET = 1
-
 /**
- * Levels past the planet's on-curve level the bot buys, forced or marginal (#86). The tip's cap
- * starts at 2 and steps to 3 only if a seed stalls near the core at 2; never above 3.
+ * Levels past the planet's on-curve level the bot buys, forced or marginal (#86), in each track's
+ * own levels: purchases of drill power, majors of the tip. The tip's cap starts at 2 and steps to
+ * 3 only if a seed stalls near the core at 2; never above 3.
  */
 const LEAD_CAPS: Partial<Record<UpgradeId, number>> = { drill_power: 1, drill_tip: 2 }
 
@@ -52,20 +54,10 @@ export function isUnderLeadCap(
 }
 
 /**
- * The highest step the bot buys on this planet, or null for a track with no lead cap: the caps
- * count majors (#180 section 3), so the ceiling is the step of the capped major.
+ * The highest step the bot buys on this planet, or null for a track with no lead cap: the step
+ * of the capped level (a major's first step, #180 section 3, or drill power's purchase).
  */
 export function leadCeiling(track: UpgradeId, planetIndex: number): number | null {
-  const lead = leadOnPlanet(track, planetIndex)
-  return lead === undefined ? null : stepOfMajor(onCurveLevel(track, planetIndex) + lead)
-}
-
-/**
- * Planet 1 may set its own lead in the track's json (ticket 396: drill power leads 5 there, so
- * the bot buys its way to 10 band-1 cells a second on Systems' cheap early rows); the #86 cap
- * holds everywhere else.
- */
-function leadOnPlanet(track: UpgradeId, planetIndex: number): number | undefined {
-  const planetOneLead = planetIndex === FIRST_PLANET ? botLeadOnPlanet1(track) : undefined
-  return planetOneLead ?? LEAD_CAPS[track]
+  const lead = LEAD_CAPS[track]
+  return lead === undefined ? null : stepOfLevel(track, onCurveLevel(track, planetIndex) + lead)
 }

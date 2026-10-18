@@ -3,13 +3,13 @@ import { DRILL_SUBSTEPS_PER_TICK } from '../../constants/balance'
 import { PACING_TARGETS } from '../../constants/pacingTargets'
 import { TICKS_PER_SECOND } from '../../constants/physics'
 import { blockHardness } from '../economy/oreEconomy'
-import { stepOfMajor, stepsOfMajors } from '../economy/upgradeSteps'
+import { stepOfMajor } from '../economy/upgradeSteps'
 import {
   onCurveLevel,
-  onCurveLevels,
   startLevels,
   vehicleStatsAt,
   type UpgradeLevels,
+  onCurveSteps,
 } from '../economy/vehicleStats'
 import { subStepsPerTile } from '../vehicle/drillRule'
 import { forcedCoreTrack, leadCeiling } from './botCoreRule'
@@ -20,7 +20,7 @@ const MIN_TICKS_PER_TILE = 24
 
 /** The on-curve steps with the drill tracks `drillLead` and `tipLead` majors ahead. */
 function onCurveWithLeads(drillLead: number, tipLead: number): UpgradeLevels {
-  const levels = stepsOfMajors(onCurveLevels(PLANET))
+  const levels = onCurveSteps(PLANET)
   return {
     ...levels,
     drill_power: levels.drill_power + stepOfMajor(drillLead),
@@ -50,9 +50,9 @@ describe('bot: the forced core rule (#86)', () => {
     ).toBe('drill_power')
   })
 
-  it('lets drill power lead five majors on planet 1 and one from planet 2 (ticket 396)', () => {
-    expect(leadCeiling('drill_power', 1)).toBe(stepOfMajor(onCurveLevel('drill_power', 1) + 5))
-    expect(leadCeiling('drill_power', 2)).toBe(stepOfMajor(onCurveLevel('drill_power', 2) + 1))
+  it('lets drill power lead one purchase past on-curve on every planet, planet 1 too (#552)', () => {
+    expect(leadCeiling('drill_power', 1)).toBe(onCurveLevel('drill_power', 1) + 1)
+    expect(leadCeiling('drill_power', 2)).toBe(onCurveLevel('drill_power', 2) + 1)
   })
 
   it('lets the bot leave planet 1 cutting band 1 at 10 cells a second (ticket 396)', () => {

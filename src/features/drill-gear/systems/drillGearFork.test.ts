@@ -5,8 +5,7 @@ import { continueScriptedSession, poseAbove } from '../../../systems/authority/s
 import { UPGRADE_IDS } from '../../../systems/economy/economyDefinition'
 import { foldDrillGear } from '../../../systems/economy/drillGearCaps'
 import { ECONOMY } from '../../../systems/economy/economy'
-import { stepOfMajor } from '../../../systems/economy/upgradeSteps'
-import { onCurveLevel } from '../../../systems/economy/vehicleStats'
+import { onCurveStep } from '../../../systems/economy/vehicleStats'
 import { cmp } from '../../../systems/money'
 import { drillGearOf } from '../../../systems/registries/drillGear'
 import { contentOf } from '../../../systems/registries/content'
@@ -48,7 +47,7 @@ function sessionOnForkPlanet(branch: string | null) {
   const setup: CommandIntent[] = [
     setPlanetCommand(FORK_TIER),
     { type: 'debug.setMoney', payload: { amount: '1e30' } },
-    ...UPGRADE_IDS.map((id) => setUpgradeCommand(id, stepOfMajor(onCurveLevel(id, FORK_TIER)))),
+    ...UPGRADE_IDS.map((id) => setUpgradeCommand(id, onCurveStep(id, FORK_TIER))),
     ...(branch === null ? [] : [chooseDrillBranch(branch)]),
   ]
   setup.forEach((intent) => session.submit(0, intent))

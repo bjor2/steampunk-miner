@@ -11,6 +11,10 @@
  * to exactly today's level price at any size, also past 1e37 where a difference of 40-digit
  * running totals would lose low digits (TD, #181). `up` is `ceil` for the brass and drill tracks
  * and `ceilMilli` for the guns, whose prices are in the money quantum.
+ *
+ * A `perPurchase` track (drill power, the GD ruling on #551 for ticket 552) has no majors in its
+ * law or its price: its level is the stored step, one purchase each. Its step still splits into
+ * `L` and `k` for the pips the workshop draws, which drill looks may retune (#554).
  */
 import {
   add,
@@ -25,7 +29,7 @@ import {
 } from '../money'
 import { compoundRatio } from './curveFamilies'
 import { ECONOMY } from './economy'
-import { UPGRADE_IDS, type UpgradeId } from './economyDefinition'
+import { UPGRADE_IDS, type UpgradeEffect, type UpgradeId } from './economyDefinition'
 
 /** Per track, the stored step; or per track, a major level (`levelsOfSteps`). */
 export type TrackNumbers = Readonly<Record<UpgradeId, number>>
@@ -50,6 +54,31 @@ export function pipOf(step: number): number {
 /** The step a major level starts on: an old save's level `L` is step `n*L`. */
 export function stepOfMajor(level: number): number {
   return level * minorsPerMajor()
+}
+
+/** Whether a track grows and is priced per purchase, so its level is its stored step (#552). */
+export function isPerPurchaseTrack(upgradeId: UpgradeId): boolean {
+  return upgradeEffectFamilyOf(upgradeId) === 'perPurchase'
+}
+
+/** A track's level at stored step `step`: the purchases on a per-purchase track, else the major. */
+export function levelOfStep(upgradeId: UpgradeId, step: number): number {
+  return isPerPurchaseTrack(upgradeId) ? step : majorOf(step)
+}
+
+/** The stored step a track's level starts on: the level itself on a per-purchase track. */
+export function stepOfLevel(upgradeId: UpgradeId, level: number): number {
+  return isPerPurchaseTrack(upgradeId) ? level : stepOfMajor(level)
+}
+
+/** The steps from `step` to the track's next level: one purchase, or the pips left to a major. */
+export function stepsToNextLevel(upgradeId: UpgradeId, step: number): number {
+  return isPerPurchaseTrack(upgradeId) ? 1 : minorsPerMajor() - pipOf(step)
+}
+
+/** Per track, the stored step its level starts on (`stepOfLevel`). */
+export function stepsOfLevels(levels: TrackNumbers): TrackNumbers {
+  return mapTrackEntries(levels, stepOfLevel)
 }
 
 /** Whether buying from `step` lands a major: the big level-up. */
@@ -116,6 +145,20 @@ function sharesOfRoot(root: Money): Money[] {
 }
 
 function mapTracks(values: TrackNumbers, map: (value: number) => number): TrackNumbers {
-  const entries = UPGRADE_IDS.map((upgradeId) => [upgradeId, map(values[upgradeId])] as const)
+  return mapTrackEntries(values, (_, value) => map(value))
+}
+
+function mapTrackEntries(
+  values: TrackNumbers,
+  map: (upgradeId: UpgradeId, value: number) => number,
+): TrackNumbers {
+  const entries = UPGRADE_IDS.map((upgradeId) => [upgradeId, map(upgradeId, values[upgradeId])])
   return Object.fromEntries(entries) as Record<UpgradeId, number>
+}
+
+/** The curve family a track's stat grows by, as `economy.json` declares it. */
+export function upgradeEffectFamilyOf(upgradeId: UpgradeId): UpgradeEffect['family'] {
+  const upgrade = ECONOMY.upgrades.find((candidate) => candidate.id === upgradeId)
+  if (upgrade === undefined) throw new RangeError(`no upgrade ${upgradeId} in the definitions`)
+  return upgrade.effect.family
 }

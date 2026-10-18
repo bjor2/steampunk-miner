@@ -16,11 +16,12 @@
  * acceptance 7) is bought first, and while one is due and the wallet short, the bot saves for it:
  * the casing, lining, guns and charges still come, no track level or other slice purchase does.
  *
- * Every track buy is one step (#180): the on-curve rule buys toward its major once the steps left
- * to it are paid for whole, the forced rule a step at a time. A pip of cargo or boiler may leave
- * its whole-number stat where it is, and a drill pip may not win a whole tick, so a marginal track
- * is offered for the fewest next steps, up to its next major, that raise the planned money, priced
- * together and paid for whole; the bot buys their first step and weighs the offers again.
+ * Every track buy is one step (#180): the on-curve rule buys toward its next level once the steps
+ * left to it are paid for whole, the forced rule a step at a time. A pip of cargo or boiler may
+ * leave its whole-number stat where it is, so a marginal track is offered for the fewest next
+ * steps, up to its next level (a major, or one drill power purchase since #552), that raise the
+ * planned money, priced together and paid for whole; the bot buys their first step and weighs the
+ * offers again.
  *
  * From planet 8 on, every track buy also leaves #180's service reserve and one rescue fee (#198,
  * `botWallet.ts`); the casing, lining, guns and charges keep only the next service, as before.
@@ -36,8 +37,8 @@ import { nextCasingPrice } from '../authority/casingRules'
 import { isTravelSetByDrill } from '../authority/travelSpeed'
 import type { UpgradeId } from '../economy/economyDefinition'
 import { stepPrice } from '../economy/upgradePrices'
-import { minorsPerMajor, pipOf, stepOfMajor } from '../economy/upgradeSteps'
-import { onCurveLevel, type UpgradeLevels } from '../economy/vehicleStats'
+import { stepsToNextLevel } from '../economy/upgradeSteps'
+import { onCurveStep, type UpgradeLevels } from '../economy/vehicleStats'
 import { add, cmp, div, sub, ZERO_MONEY, type Money } from '../money'
 import { isCasingGradeShort } from './botCasing'
 import { startBotHold, stepOfHold, type ChainPolicy } from './botChains'
@@ -218,15 +219,14 @@ function chargeRestockDue(session: BotSession, situation: ShoppingSituation): Pu
 function belowCurveAffordable(session: BotSession): UpgradeId | null {
   return (
     ON_CURVE_FIRST.find(
-      (track) => isBelowCurve(session, track) && canAffordToNextMajor(session, track),
+      (track) => isBelowCurve(session, track) && canAffordToNextLevel(session, track),
     ) ?? null
   )
 }
 
 /** Short of the planet's on-curve major on this track. */
 function isBelowCurve(session: BotSession, track: UpgradeId): boolean {
-  const onCurveStep = stepOfMajor(onCurveLevel(track, session.state().planet.index))
-  return session.vehicle().levels[track] < onCurveStep
+  return session.vehicle().levels[track] < onCurveStep(track, session.state().planet.index)
 }
 
 function forcedTrack(session: BotSession, situation: ShoppingSituation): UpgradeId | null {
@@ -255,7 +255,7 @@ function marginalOffers(session: BotSession, layout: MineLayout): MarginalOffer[
   })
 }
 
-/** The fewest next steps, up to the next major, that raise the planned money; null if none pays. */
+/** The fewest next steps, up to the next level, that raise the planned money; null if none pays. */
 function marginalOfferOf(
   session: BotSession,
   layout: MineLayout,
@@ -265,7 +265,7 @@ function marginalOfferOf(
   const { levels } = session.vehicle()
   const planetIndex = session.state().planet.index
   let price = ZERO_MONEY
-  for (let steps = 1; steps <= stepsToNextMajor(levels[track]); steps++) {
+  for (let steps = 1; steps <= stepsToNextLevel(track, levels[track]); steps++) {
     price = add(price, stepPrice(track, levels[track] + steps - 1, planetIndex))
     const after = { ...levels, [track]: levels[track] + steps }
     const gain = sub(plannedMoneyPerTick(layout, after), now)
@@ -276,15 +276,11 @@ function marginalOfferOf(
   return null
 }
 
-function stepsToNextMajor(step: number): number {
-  return minorsPerMajor() - pipOf(step)
-}
-
-function canAffordToNextMajor(session: BotSession, track: UpgradeId): boolean {
+function canAffordToNextLevel(session: BotSession, track: UpgradeId): boolean {
   const step = session.vehicle().levels[track]
   const planetIndex = session.state().planet.index
   let price = ZERO_MONEY
-  for (let at = step; at < step + stepsToNextMajor(step); at++) {
+  for (let at = step; at < step + stepsToNextLevel(track, step); at++) {
     price = add(price, stepPrice(track, at, planetIndex))
   }
   return canPayForBrass(session, price)

@@ -3,8 +3,7 @@ import { PACING_WORLD_SEEDS } from '../../constants/pacingSeeds'
 import type { CommandIntent } from '../authority/authorityCommand'
 import { createAuthorityState } from '../authority/authorityState'
 import { UPGRADE_IDS } from '../economy/economyDefinition'
-import { stepOfMajor } from '../economy/upgradeSteps'
-import { onCurveLevel } from '../economy/vehicleStats'
+import { onCurveStep } from '../economy/vehicleStats'
 import { cmp, fromSafeInteger, toCanonical } from '../money'
 import { setPlanetCommand, setPlanetSeedCommand } from '../startScenarioCommands'
 import { setUpgradeCommand } from '../vehicle/vehicleCommands'
@@ -25,7 +24,7 @@ function levelsOnlyArrivalOn(planet: number): CommandIntent[] {
   return [
     setPlanetCommand(planet),
     setPlanetSeedCommand(SEED),
-    ...UPGRADE_IDS.map((id) => setUpgradeCommand(id, stepOfMajor(onCurveLevel(id, planet)))),
+    ...UPGRADE_IDS.map((id) => setUpgradeCommand(id, onCurveStep(id, planet))),
   ]
 }
 

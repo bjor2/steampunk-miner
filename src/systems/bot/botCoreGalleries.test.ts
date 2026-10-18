@@ -4,7 +4,7 @@ import type { CommandIntent } from '../authority/authorityCommand'
 import { coreNeededOf } from '../authority/coreBay'
 import { UPGRADE_IDS } from '../economy/economyDefinition'
 import { coreFragmentsNeeded } from '../economy/planetEconomy'
-import { onCurveLevel } from '../economy/vehicleStats'
+import { onCurveStep } from '../economy/vehicleStats'
 import { setPlanetCommand, setPlanetSeedCommand } from '../startScenarioCommands'
 import { setUpgradeCommand } from '../vehicle/vehicleCommands'
 import { dockSiteOf } from '../world/dockSite'
@@ -25,7 +25,6 @@ import {
   type MineLayout,
 } from './mineLayout'
 import { nextRow, sideFor } from './tripGoal'
-import { stepOfMajor } from '../economy/upgradeSteps'
 
 const CORE: { kind: 'core' } = { kind: 'core' }
 
@@ -44,9 +43,7 @@ const ARRIVED_ON_PLANET_9: CommandIntent[] = [
   setPlanetCommand(OFF_CENTRE_PLANET),
   setPlanetSeedCommand(OFF_CENTRE_SEED),
   { type: 'debug.setMoney', payload: { amount: '1e30' } },
-  ...UPGRADE_IDS.map((id) =>
-    setUpgradeCommand(id, stepOfMajor(onCurveLevel(id, OFF_CENTRE_PLANET))),
-  ),
+  ...UPGRADE_IDS.map((id) => setUpgradeCommand(id, onCurveStep(id, OFF_CENTRE_PLANET))),
   { type: 'debug.setCasingGrade', payload: { grade: 5 } },
   { type: 'debug.setLiningType', payload: { liningType: 'refractory' } },
   { type: 'debug.freezeEnemies', payload: { frozen: true } },

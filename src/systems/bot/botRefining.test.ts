@@ -2,13 +2,12 @@ import { describe, expect, it } from 'vitest'
 import { createAuthorityState } from '../authority/authorityState'
 import type { CommandIntent } from '../authority/authorityCommand'
 import { UPGRADE_IDS } from '../economy/economyDefinition'
-import { onCurveLevel } from '../economy/vehicleStats'
+import { onCurveStep } from '../economy/vehicleStats'
 import { digestsOf, replayRun } from '../replay/replayRun'
 import { setPlanetCommand, setPlanetSeedCommand } from '../startScenarioCommands'
 import { setUpgradeCommand } from '../vehicle/vehicleCommands'
 import { playSlice, type SliceRun } from './playSlice'
 import type { RefineryUse } from './botRefining'
-import { stepOfMajor } from '../economy/upgradeSteps'
 
 const WORLD_SEED = 83921
 /** Fifteen minutes on planet 3: several dock cycles, each past a 180 s batch. */
@@ -19,7 +18,7 @@ const ARRIVED_ON_PLANET_3: CommandIntent[] = [
   setPlanetCommand(3),
   setPlanetSeedCommand(WORLD_SEED),
   { type: 'debug.setMoney', payload: { amount: '2000' } },
-  ...UPGRADE_IDS.map((id) => setUpgradeCommand(id, stepOfMajor(onCurveLevel(id, 3)))),
+  ...UPGRADE_IDS.map((id) => setUpgradeCommand(id, onCurveStep(id, 3))),
 ]
 
 const runs = new Map<RefineryUse, SliceRun>()

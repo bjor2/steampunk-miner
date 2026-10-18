@@ -4,7 +4,7 @@ import { dockSiteOfPlanet } from '../authority/planetOfState'
 import { isTravelSetByDrill } from '../authority/travelSpeed'
 import { UPGRADE_IDS } from '../economy/economyDefinition'
 import { stepOfMajor } from '../economy/upgradeSteps'
-import { onCurveLevel } from '../economy/vehicleStats'
+import { onCurveLevel, onCurveStep } from '../economy/vehicleStats'
 import { leadCeiling } from './botCoreRule'
 import { buyUpgrades } from './botShopping'
 import { createBotSession, type BotSession } from './botSession'
@@ -73,9 +73,9 @@ describe('bot: shopping at the Upgrade bay', () => {
     expect(session.events().filter((event) => event.type === 'CommandRejected')).toEqual([])
   })
 
-  it('holds drill power to one major past the planet on-curve level from planet 2 (#86, caps count majors)', () => {
-    expect(leadCeiling('drill_power', 2)).toBe(stepOfMajor(onCurveLevel('drill_power', 2) + 1))
-    expect(leadCeiling('drill_power', 3)).toBe(stepOfMajor(onCurveLevel('drill_power', 3) + 1))
+  it('holds drill power to one purchase past the planet on-curve level (#86, a level is a purchase since #552)', () => {
+    expect(leadCeiling('drill_power', 2)).toBe(onCurveLevel('drill_power', 2) + 1)
+    expect(leadCeiling('drill_power', 3)).toBe(onCurveLevel('drill_power', 3) + 1)
   })
 
   it('stops buying drill power for the core at the ceiling, however much money is left', () => {
@@ -95,9 +95,7 @@ describe('bot: shopping at the Upgrade bay', () => {
   it('buys drill_tip past its on-curve level for the core once drill power is at its cap', () => {
     const session = botAtUpgradeBayOn(4)
     shopForTheCore(session)
-    expect(session.vehicle().levels.drill_tip).toBeGreaterThan(
-      stepOfMajor(onCurveLevel('drill_tip', 4)),
-    )
+    expect(session.vehicle().levels.drill_tip).toBeGreaterThan(onCurveStep('drill_tip', 4))
   })
 
   it('stops buying drill_tip for the core at its cap, two majors past on-curve', () => {

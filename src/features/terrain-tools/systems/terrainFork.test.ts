@@ -8,8 +8,7 @@ import {
   poseAbove,
 } from '../../../systems/authority/scriptedSession'
 import { SOLID_DENSITY } from '../../../systems/world/sampleGrid'
-import { stepOfMajor } from '../../../systems/economy/upgradeSteps'
-import { onCurveLevel } from '../../../systems/economy/vehicleStats'
+import { onCurveStep } from '../../../systems/economy/vehicleStats'
 import { contentOf } from '../../../systems/registries/content'
 import type { BlastEvent } from '../../../systems/registries/blastEffects'
 import { FACING } from '../../../systems/vehicle/vehiclePose'
@@ -58,7 +57,7 @@ function minerOnForkPlanet(branch: Branch | null) {
   session.submit(0, FREEZE_ENEMIES)
   session.submit(0, { type: 'debug.setMoney', payload: { amount: '1e30' } })
   for (const upgradeId of ['drill_power', 'drill_tip'] as const) {
-    const level = stepOfMajor(onCurveLevel(upgradeId, FORK_PLANET))
+    const level = onCurveStep(upgradeId, FORK_PLANET)
     session.submit(0, { type: 'debug.setUpgrade', payload: { upgradeId, level } } as CommandIntent)
   }
   if (branch !== null) session.submit(0, chooseFork(branch))

@@ -1,15 +1,29 @@
 import { describe, expect, it } from 'vitest'
-import { add, cmp, div, fromCanonical, sub, toCanonical, ZERO_MONEY, type Money } from '../money'
+import {
+  add,
+  cmp,
+  div,
+  fromCanonical,
+  sub,
+  toCanonical,
+  toFixedText,
+  ZERO_MONEY,
+  type Money,
+} from '../money'
 import { UPGRADE_IDS, type UpgradeId } from './economyDefinition'
 import { stepPrice, upgradePrice } from './upgradePrices'
 import {
   isMajorStep,
+  isPerPurchaseTrack,
+  levelOfStep,
   majorOf,
   majorsOfSteps,
   minorsPerMajor,
   pipOf,
+  stepOfLevel,
   stepOfMajor,
   stepsOfMajors,
+  stepsToNextLevel,
 } from './upgradeSteps'
 import {
   cargoCapacity,
@@ -26,6 +40,7 @@ import {
   hullMaxAtStep,
   onCurveLevels,
   vehicleStatsAt,
+  onCurveSteps,
 } from './vehicleStats'
 
 const m = fromCanonical
@@ -33,6 +48,8 @@ const LEVELS_0_TO_20 = Array.from({ length: 21 }, (_, level) => level)
 /** TD acceptance 3: 0..20, and 247, 607 and 6007 where prices pass 1e37, 1e55 and 1e531. */
 const PRICED_LEVELS = [...LEVELS_0_TO_20, 247, 607, 6007]
 const PIPS = Array.from({ length: 10 }, (_, pip) => pip)
+/** The tracks a major splits into pips: all but drill power, priced per purchase (#552). */
+const MAJOR_TRACKS = UPGRADE_IDS.filter((track) => !isPerPurchaseTrack(track))
 
 function stepPricesOfMajor(track: UpgradeId, level: number, planetIndex: number): Money[] {
   return PIPS.map((pip) => stepPrice(track, stepOfMajor(level) + pip, planetIndex))
@@ -57,13 +74,26 @@ describe('upgrade steps: the two-tier structure', () => {
 
   it("turns an old save's level L into step 10L and back", () => {
     const majors = onCurveLevels(10)
-    expect(stepsOfMajors(majors).drill_power).toBe(10 * majors.drill_power)
+    expect(stepsOfMajors(majors).drill_tip).toBe(10 * majors.drill_tip)
     expect(majorsOfSteps(stepsOfMajors(majors))).toEqual(majors)
+  })
+
+  it('counts drill power in purchases, its level its stored step, and every other track in majors (#552)', () => {
+    expect(UPGRADE_IDS.filter(isPerPurchaseTrack)).toEqual(['drill_power'])
+    expect([levelOfStep('drill_power', 137), stepOfLevel('drill_power', 13)]).toEqual([137, 13])
+    expect([levelOfStep('hull', 137), stepOfLevel('hull', 13)]).toEqual([13, 130])
+  })
+
+  it('puts the next drill power level one purchase away and a major track at its next major', () => {
+    expect([stepsToNextLevel('drill_power', 137), stepsToNextLevel('drill_power', 140)]).toEqual([
+      1, 1,
+    ])
+    expect([stepsToNextLevel('engine', 137), stepsToNextLevel('engine', 140)]).toEqual([3, 10])
   })
 })
 
 describe('upgrade steps: chain pricing', () => {
-  it.each(UPGRADE_IDS)(
+  it.each(MAJOR_TRACKS)(
     'sums the ten step prices of every %s major to exactly its level price',
     (track) => {
       for (const planetIndex of [1, 7]) {
@@ -78,7 +108,7 @@ describe('upgrade steps: chain pricing', () => {
     },
   )
 
-  it.each(UPGRADE_IDS)('prices the big level-up of every %s major above zero', (track) => {
+  it.each(MAJOR_TRACKS)('prices the big level-up of every %s major above zero', (track) => {
     for (const level of PRICED_LEVELS) {
       const bigLevelUp = stepPricesOfMajor(track, level, 1)[9]
       expect({ level, aboveZero: cmp(bigLevelUp, ZERO_MONEY) > 0 }).toEqual({
@@ -89,7 +119,7 @@ describe('upgrade steps: chain pricing', () => {
   })
 
   it('charges at least 1 a step, and never 1 less than the step before as the totals round', () => {
-    for (const track of UPGRADE_IDS) {
+    for (const track of MAJOR_TRACKS) {
       for (const level of LEVELS_0_TO_20) {
         const prices = stepPricesOfMajor(track, level, 1)
         expect(cmp(prices[0], m('1'))).toBeGreaterThanOrEqual(0)
@@ -107,7 +137,7 @@ describe('upgrade steps: chain pricing', () => {
   })
 
   it('makes the last steps of a dear major cost more than the first, as the curve climbs', () => {
-    for (const track of UPGRADE_IDS) {
+    for (const track of MAJOR_TRACKS) {
       const prices = stepPricesOfMajor(track, 40, 1)
       expect({ track, climbing: cmp(prices[9], prices[0]) > 0 }).toEqual({ track, climbing: true })
     }
@@ -125,7 +155,7 @@ describe('upgrade steps: chain pricing', () => {
       {
         "boiler": "3e+0 2e+0 2e+0 2e+0 2e+0 3e+0 2e+0 3e+0 2e+0 2e+0 3e+0 3e+0 2e+0 3e+0 3e+0 3e+0 3e+0 3e+0 3e+0 3e+0 4e+0 3e+0 3e+0 3e+0 4e+0 3e+0 4e+0 4e+0 3e+0 4e+0",
         "cargo_hold": "3e+0 2e+0 2e+0 3e+0 2e+0 2e+0 3e+0 2e+0 3e+0 2e+0 3e+0 3e+0 3e+0 3e+0 2e+0 3e+0 3e+0 4e+0 3e+0 3e+0 4e+0 3e+0 4e+0 3e+0 4e+0 3e+0 4e+0 4e+0 4e+0 4e+0",
-        "drill_power": "1e+0 1e+0 1e+0 1e+0 1e+0 1e+0 1e+0 1e+0 1e+0 1e+0 1e+0 1e+0 1e+0 1e+0 1e+0 1e+0 1e+0 1e+0 1e+0 1e+0 1e+0 1e+0 2e+0 1e+0 1e+0 1e+0 1e+0 1e+0 1e+0 1e+0",
+        "drill_power": "1e+0 2e+1 3e+1 4.4e+1 6.5e+1 9.6e+1 1.43e+2 2.11e+2 3.12e+2 4.61e+2 6.82e+2 1.009e+3 1.493e+3 2.209e+3 3.27e+3 4.839e+3 7.161e+3 1.0598e+4 1.5685e+4 2.3214e+4 3.4356e+4 5.0847e+4 7.5254e+4 1.11376e+5 1.64836e+5 2.43956e+5 3.61055e+5 5.34361e+5 7.90854e+5 1.170464e+6",
         "drill_tip": "7e+0 8e+0 7e+0 8e+0 8e+0 8e+0 9e+0 9e+0 1e+1 9e+0 1.1e+1 1.1e+1 1.1e+1 1.1e+1 1.2e+1 1.3e+1 1.3e+1 1.4e+1 1.4e+1 1.5e+1 1.6e+1 1.6e+1 1.7e+1 1.7e+1 1.9e+1 1.8e+1 2e+1 2.1e+1 2.1e+1 2.2e+1",
         "engine": "4e+0 3e+0 4e+0 3e+0 4e+0 3e+0 4e+0 4e+0 4e+0 3e+0 5e+0 4e+0 4e+0 4e+0 4e+0 5e+0 4e+0 5e+0 5e+0 5e+0 5e+0 5e+0 6e+0 5e+0 5e+0 6e+0 5e+0 6e+0 6e+0 6e+0",
         "hull": "5e+0 4e+0 4e+0 5e+0 4e+0 5e+0 5e+0 5e+0 4e+0 5e+0 6e+0 5e+0 5e+0 6e+0 5e+0 6e+0 6e+0 6e+0 6e+0 6e+0 7e+0 6e+0 7e+0 6e+0 7e+0 7e+0 7e+0 8e+0 7e+0 8e+0",
@@ -135,10 +165,10 @@ describe('upgrade steps: chain pricing', () => {
 })
 
 describe('upgrade steps: stats', () => {
-  it("lands every track on today's stat at each major", () => {
+  it("lands every track on today's stat at each level", () => {
     for (const level of PRICED_LEVELS) {
       const step = stepOfMajor(level)
-      expect(drillPowerAtStep(step)).toEqual(drillPower(level))
+      expect(drillPowerAtStep(level)).toEqual(drillPower(level))
       expect(drillTipAtStep(step)).toEqual(drillTip(level))
       expect(hullMaxAtStep(step)).toEqual(hullMax(level))
       expect(energyMaxAtStep(step)).toBe(energyMax(level))
@@ -147,11 +177,15 @@ describe('upgrade steps: stats', () => {
     }
   })
 
-  it('gives drill power about 0.63% a pip and 5.8% on the big level-up', () => {
-    const pip = riseOf(drillPowerAtStep(130), drillPowerAtStep(131))
-    const jump = riseOf(drillPowerAtStep(139), drillPowerAtStep(140))
-    expect(toCanonical(pip).slice(0, 6)).toBe('6.3158')
-    expect(toCanonical(jump).slice(0, 5)).toBe('5.830')
+  it('gives drill power 0.63% on its first purchase, its old first pip, and 24.3% on every one after (#552)', () => {
+    const first = riseOf(drillPowerAtStep(0), drillPowerAtStep(1))
+    const rises = [1, 9, 139].map((step) =>
+      riseOf(drillPowerAtStep(step), drillPowerAtStep(step + 1)),
+    )
+    expect(toCanonical(first).slice(0, 6)).toBe('6.3158')
+    expect(rises.map((rise) => toFixedText(rise, 30))).toEqual(
+      Array(3).fill(toFixedText(m('0.243'), 30)),
+    )
   })
 
   it('gives the drill tip about 1.27% a pip and 12.0% on the big level-up', () => {
@@ -183,7 +217,7 @@ describe('upgrade steps: stats', () => {
   })
 
   it('gates on the tip of the last completed major while the live tip climbs its pips', () => {
-    const stats = vehicleStatsAt({ ...stepsOfMajors(onCurveLevels(3)), drill_tip: 139 })
+    const stats = vehicleStatsAt({ ...onCurveSteps(3), drill_tip: 139 })
     expect(stats.gateTip).toEqual(drillTip(13))
     expect(cmp(stats.drillTip, stats.gateTip)).toBe(1)
     expect(cmp(stats.drillTip, drillTip(14))).toBe(-1)

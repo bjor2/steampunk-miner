@@ -4,7 +4,7 @@ import type { SliceDefinition } from '../../../registries/sliceDefinition'
 import { enemyHealth, enemyTier } from '../../economy/enemyStats'
 import { gunShotDamage } from '../../economy/gunStats'
 import { stepOfMajor } from '../../economy/upgradeSteps'
-import { hullMax, onCurveLevel } from '../../economy/vehicleStats'
+import { hullMax, onCurveLevel, onCurveStep } from '../../economy/vehicleStats'
 import { cmp, fromSafeInteger, mul, sub, toCanonical } from '../../money'
 import type { TurretShape } from '../../registries/autoGuns'
 import { FACING, tileOfMillimetres } from '../../vehicle/vehiclePose'
@@ -34,7 +34,7 @@ import { vehicleTargetOf } from './vehicleTarget'
 /** Planet 4's on-curve rig with level-1 guns, firing every 30 ticks (#107). */
 const PLANET = 4
 const BAND_3_TIER = enemyTier(PLANET, 3)
-const SHOT_DAMAGE = gunShotDamage(stepOfMajor(onCurveLevel('drill_power', PLANET)))
+const SHOT_DAMAGE = gunShotDamage(onCurveStep('drill_power', PLANET))
 const REPORT_TICKS = 12
 const SPOTTER: TurretShape = { ...BASE_TURRET_SHAPE, pretrainTicks: 8 }
 const RIG_X = CORRIDOR_MIDDLE.tx * 1000 + 500

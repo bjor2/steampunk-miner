@@ -30,7 +30,7 @@ import {
   type Economy,
   type GeometricEffect,
   type LinearEffect,
-  type OnCurve,
+  type PerPurchaseEffect,
   type SaturatingEffect,
   type UpgradeDef,
   type UpgradeEffect,
@@ -266,24 +266,15 @@ function readUpgrade(reader: FieldReader, path: string, value: unknown): Upgrade
         `${path}.onCurve.levelsPerPlanet`,
         onCurve.levelsPerPlanet,
       ),
-      ...readBotLeadOnPlanet1(reader, `${path}.onCurve`, onCurve.botLeadOnPlanet1),
     },
   }
 }
 
-function readBotLeadOnPlanet1(
-  reader: FieldReader,
-  path: string,
-  value: unknown,
-): Pick<OnCurve, 'botLeadOnPlanet1'> {
-  if (value === undefined) return {}
-  return { botLeadOnPlanet1: reader.safeInteger(`${path}.botLeadOnPlanet1`, value) }
-}
-
 function readUpgradeEffect(reader: FieldReader, path: string, value: unknown): UpgradeEffect {
   const effect = reader.object(path, value)
-  const families = ['geometric', 'linear', 'saturating'] as const
+  const families = ['geometric', 'perPurchase', 'linear', 'saturating'] as const
   const family = readLiteral(reader, `${path}.family`, effect.family, families)
+  if (family === 'perPurchase') return readPerPurchaseEffect(reader, path, effect)
   if (family === 'linear') return readLinearEffect(reader, path, effect)
   if (family === 'saturating') return readSaturatingEffect(reader, path, effect)
   return readGeometricEffect(reader, path, effect)
@@ -299,6 +290,24 @@ function readGeometricEffect(
     family: 'geometric',
     stat: readLiteral(reader, `${path}.stat`, effect.stat, stats),
     start: reader.money(`${path}.start`, effect.start),
+    ratio: reader.money(`${path}.ratio`, effect.ratio),
+  }
+}
+
+function readPerPurchaseEffect(
+  reader: FieldReader,
+  path: string,
+  effect: Record<string, unknown>,
+): PerPurchaseEffect {
+  const firstGain = reader.object(`${path}.firstGain`, effect.firstGain)
+  return {
+    family: 'perPurchase',
+    stat: readLiteral(reader, `${path}.stat`, effect.stat, ['drillPower'] as const),
+    start: reader.money(`${path}.start`, effect.start),
+    firstGain: {
+      ratio: reader.money(`${path}.firstGain.ratio`, firstGain.ratio),
+      root: reader.safeInteger(`${path}.firstGain.root`, firstGain.root),
+    },
     ratio: reader.money(`${path}.ratio`, effect.ratio),
   }
 }
@@ -351,23 +360,28 @@ function checkUpgradeSet(
   upgrades: readonly UpgradeDef[],
   costCurves: readonly CostCurve[],
 ): void {
-  const curveIds = new Set(costCurves.map((curve) => curve.id))
+  const curves = new Map(costCurves.map((curve) => [curve.id, curve]))
   UPGRADE_IDS.forEach((id) => checkTrackListedOnce(reader, id, upgrades))
   upgrades.forEach((upgrade, index) => checkTrackEffect(reader, index, upgrade))
-  upgrades.forEach((upgrade, index) => checkCostCurveLink(reader, index, upgrade, curveIds))
+  upgrades.forEach((upgrade, index) => checkCostCurveLink(reader, index, upgrade, curves))
 }
 
+/** A track bought per purchase is priced per purchase, and every other one per major (#552). */
 function checkCostCurveLink(
   reader: FieldReader,
   index: number,
   upgrade: UpgradeDef,
-  curveIds: ReadonlySet<string>,
+  curves: ReadonlyMap<string, CostCurve>,
 ): void {
   const expected = `cost.vehicle.${upgrade.id}`
+  const family = upgrade.effect.family === 'perPurchase' ? 'perPurchase' : 'geometric'
+  const curve = curves.get(expected)
   if (upgrade.costCurveId !== expected) {
     reader.record(`upgrades[${index}].costCurveId must be ${expected}`)
-  } else if (!curveIds.has(expected)) {
+  } else if (curve === undefined) {
     reader.record(`upgrades[${index}].costCurveId ${expected} has no curve in costCurves`)
+  } else if (curve.family !== family) {
+    reader.record(`upgrades[${index}].costCurveId ${expected} must be a ${family} curve`)
   }
 }
 

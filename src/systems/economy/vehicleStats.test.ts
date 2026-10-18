@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { cmp, fromCanonical, mul, powInt } from '../money'
+import { cmp, div, fromCanonical, mul, powInt, toFixedText } from '../money'
 import { UPGRADE_IDS, type UpgradeId } from './economyDefinition'
 import { ECONOMY } from './economy'
 import {
@@ -43,14 +43,17 @@ describe('vehicle stats', () => {
     })
   })
 
-  it('grows drill power and hull by "1.12" and the tip by "1.2544" per level', () => {
-    expect(drillPower(13)).toEqual(mul(m('1.5'), powInt(m('1.12'), 13)))
+  it('grows hull by "1.12" and the tip by "1.2544" per level', () => {
     expect(hullMax(2)).toEqual(m('125.44'))
     expect(drillTip(7)).toEqual(powInt(m('1.2544'), 7))
   })
 
-  it('grows drill power and hull by 1.12^6 over the six levels of one planet', () => {
-    expect(mul(drillPower(13), powInt(m('1.12'), 6))).toEqual(drillPower(19))
+  it('grows drill power by "1.243" a purchase after the first (#551, ticket 552)', () => {
+    const gain = div(drillPower(19), drillPower(13))
+    expect(toFixedText(gain, 30)).toBe(toFixedText(powInt(m('1.243'), 6), 30))
+  })
+
+  it('grows hull by 1.12^6 over the six levels of one planet', () => {
     expect(mul(hullMax(2), powInt(m('1.12'), 6))).toEqual(hullMax(8))
   })
 
@@ -81,11 +84,11 @@ describe('vehicle stats', () => {
     }
   })
 
-  it('declares drill, tip and hull geometric, boiler and cargo linear and the engine saturating', () => {
+  it('declares drill power per purchase, tip and hull geometric, boiler and cargo linear and the engine saturating', () => {
     const familyOf = (upgradeId: UpgradeId) =>
       ECONOMY.upgrades.find((upgrade) => upgrade.id === upgradeId)?.effect.family
     expect(UPGRADE_IDS.map(familyOf)).toEqual([
-      'geometric',
+      'perPurchase',
       'geometric',
       'saturating',
       'linear',
@@ -101,7 +104,7 @@ describe('on-curve levels', () => {
     ['boiler', 6, 4],
     ['engine', 6, 6],
     ['hull', 6, 2],
-    ['drill_power', 6, 13],
+    ['drill_power', 3, 12],
     ['drill_tip', 3, 7],
   ] as const)('puts %s at %i(p-1)+%i on planets 1 to 40', (upgradeId, perPlanet, atPlanet1) => {
     for (const planet of PLANETS_1_TO_40) {

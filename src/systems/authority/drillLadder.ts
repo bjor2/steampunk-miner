@@ -1,10 +1,10 @@
 /**
  * The drill-speed ladder's headless cut (ticket 409): a rig parked on the planet 1 surface of the
  * spec seed, facing down, cuts a fixed number of ground cells straight down its column through the
- * authority's swept cut, at one `drill_power` major (the level #396's 1.12x a level counts; a stored
- * level is a step of ten pips). It reports the ticks until the last of those
- * cells broke, so the ladder compares levels on the same ground with the #396 drill law and #399's
- * exact carry (no whole-tick rounding per cell).
+ * authority's swept cut, at one stored `drill_power` step (one purchase of the per-purchase law
+ * since the GD ruling on #551, ticket 552). It reports the ticks until the last of those cells
+ * broke, so the ladder compares levels on the same ground with the drill law and #399's exact
+ * carry (no whole-tick rounding per cell).
  *
  * Motion is left out: after its first, resting tick the pose sits past the column's foot, so every
  * tick's reach is its work's alone. #397's cut-follow adds the vehicle's travel time to the ladder.
@@ -47,15 +47,10 @@ interface Rig {
   top: VehiclePose
 }
 
-/** Cuts `cellCount` ground cells down the ladder column at `drill_power` major `level`. */
-export function cutColumnAtDrillLevel(level: number, cellCount: number): DrillLadderRung {
-  return { ...cutColumnAtDrillStep(stepOfMajor(level), cellCount), level }
-}
-
 /**
  * Cuts `cellCount` ground cells down the ladder column at stored `drill_power` `step`, the unit the
- * browser drill-down run and the status page's Drill speed panel count in (ticket 434); the rung's
- * `level` is that step.
+ * browser drill-down run and the status page's Drill speed panel count in (ticket 434) and the
+ * drill's level since #552; the rung's `level` is that step.
  */
 export function cutColumnAtDrillStep(step: number, cellCount: number): DrillLadderRung {
   const rig = rigOnSurfaceAt(step)

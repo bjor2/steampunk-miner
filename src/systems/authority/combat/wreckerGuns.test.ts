@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest'
 import { MM_PER_METRE, TICKS_PER_SECOND } from '../../../constants/physics'
 import { enemyTier } from '../../economy/enemyStats'
 import { gunRangeTiles } from '../../economy/gunStats'
-import { hullMax, onCurveLevel } from '../../economy/vehicleStats'
+import { hullMax, onCurveLevel, onCurveStep } from '../../economy/vehicleStats'
 import { toCanonical } from '../../money'
 import { FACING, type Facing } from '../../vehicle/vehiclePose'
 import { statsOfVehicle } from '../../vehicle/vehicleState'
@@ -66,13 +66,13 @@ function armForTheChase(wrecker: WreckerCase): CommandIntent[] {
     { type: 'debug.clearEnemies', payload: {} },
     {
       type: 'debug.setUpgrade',
-      payload: { upgradeId: 'engine', level: stepOfMajor(onCurveLevel('engine', 6)) },
+      payload: { upgradeId: 'engine', level: onCurveStep('engine', 6) },
     },
     {
       type: 'debug.setUpgrade',
       payload: {
         upgradeId: 'drill_power',
-        level: stepOfMajor(onCurveLevel('drill_power', wrecker.planet)),
+        level: onCurveStep('drill_power', wrecker.planet),
       },
     },
     { type: 'debug.setUpgrade', payload: { upgradeId: 'hull', level: stepOfMajor(hullLevel) } },

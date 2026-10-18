@@ -28,7 +28,7 @@ export type UpgradeId = (typeof UPGRADE_IDS)[number]
 
 /** The stat each track raises and its curve family (#7 effect shapes). */
 export const TRACK_EFFECTS: Readonly<Record<UpgradeId, string>> = {
-  drill_power: 'geometric drillPower',
+  drill_power: 'perPurchase drillPower',
   drill_tip: 'geometric drillTip',
   engine: 'saturating engine',
   boiler: 'linear energyMax',
@@ -77,7 +77,27 @@ export interface SaturatingEffect {
   stats: { speedMax: BoundedRange; accel: BoundedRange; thrustToWeight: BoundedRange }
 }
 
-export type UpgradeEffect = GeometricEffect | LinearEffect | SaturatingEffect
+/**
+ * A stat that grows by one ratio a purchase, with no pip rule and no majors (the GD ruling on #551
+ * for ticket 552, drill power only): `D(0) = start`, `D(1) = start * firstGain`, and every purchase
+ * after it multiplies by `ratio`, so `D(n) = start * firstGain * ratio^(n - 1)`.
+ */
+export interface PerPurchaseEffect {
+  family: 'perPurchase'
+  stat: 'drillPower'
+  start: BigStat
+  /** The first purchase's gain, the pip it was before: `firstGain.ratio^(1 / firstGain.root)`. */
+  firstGain: RatioRoot
+  ratio: BigStat
+}
+
+/** `ratio^(1 / root)`, kept as its parts so the root is worked out the one deterministic way. */
+export interface RatioRoot {
+  ratio: BigStat
+  root: number
+}
+
+export type UpgradeEffect = GeometricEffect | PerPurchaseEffect | LinearEffect | SaturatingEffect
 
 export interface UpgradeDef {
   id: UpgradeId
@@ -89,15 +109,13 @@ export interface UpgradeDef {
   onCurve: OnCurve
 }
 
+/**
+ * Where an on-curve player stands, in the track's own levels: majors, or purchases on a
+ * `perPurchase` track (drill power: about 12 at planet 1 and 3 a planet, #551 for ticket 552).
+ */
 export interface OnCurve {
   levelAtPlanet1: number
   levelsPerPlanet: number
-  /**
-   * Majors past on-curve the pacing bot buys on planet 1 only, in place of its #86 lead cap
-   * (ticket 396 GD ruling: drill power leads 5 so the bot leaves planet 1 at 10 band-1 cells a
-   * second on Systems' front-loaded rows). Absent, the #86 cap holds on planet 1 as well.
-   */
-  botLeadOnPlanet1?: number
 }
 
 /** A share as a fraction in lowest terms, so the pip rules stay in integers (#180 Systems). */
@@ -118,17 +136,17 @@ export interface GeometricCostCurve {
   family: 'geometric'
   base: Money
   ratio: Money
-  /**
-   * Later pieces of the curve, by rising `fromLevel`: from its level on, a piece prices level `L`
-   * at `base * ratio^(L - fromLevel)` (Systems' front-loaded drill rows on ticket 396). Absent, the
-   * whole curve is `base * ratio^L`.
-   */
-  pieces?: readonly GeometricCurvePiece[]
 }
 
-/** One piece of a geometric cost curve: its own base and ratio from `fromLevel` on. */
-export interface GeometricCurvePiece {
-  fromLevel: number
+/**
+ * Prices per purchase with no major split (the GD ruling on #551 for ticket 552, drill power):
+ * purchase 0 costs `firstPrice` and purchase `n >= 1` costs `ceil(base * ratio^(n - 1))`, each
+ * times `paceScale(p)`.
+ */
+export interface PerPurchaseCostCurve {
+  id: string
+  family: 'perPurchase'
+  firstPrice: Money
   base: Money
   ratio: Money
 }
@@ -146,7 +164,7 @@ export interface BandOreCostCurve {
   oreUnitsByLevel: readonly Money[]
 }
 
-export type CostCurve = GeometricCostCurve | BandOreCostCurve
+export type CostCurve = GeometricCostCurve | PerPurchaseCostCurve | BandOreCostCurve
 
 export interface VisualTierThreshold {
   tier: number

@@ -3,8 +3,7 @@ import { createAuthorityState } from '../authority/authorityState'
 import { withDrillExactCarry, withHeatWorkUncapped } from '../authority/cutCarryFixtures'
 import { stateDigest } from '../authority/stateDigest'
 import { liningTypeUnlockPrice } from '../economy/casingPrices'
-import { stepOfMajor } from '../economy/upgradeSteps'
-import { onCurveLevel } from '../economy/vehicleStats'
+import { onCurveStep } from '../economy/vehicleStats'
 import { UPGRADE_IDS } from '../economy/economyDefinition'
 import { dockSiteOf } from '../world/dockSite'
 import { planetParamsFor } from '../world/planetParams'
@@ -98,7 +97,7 @@ describe('bot: shaft round lava (#113)', () => {
   function diggerAbovePocket(): { session: BotSession; planet: BotPlanet } {
     const session = botOn(8)
     for (const upgradeId of UPGRADE_IDS) {
-      const level = stepOfMajor(onCurveLevel(upgradeId, 8))
+      const level = onCurveStep(upgradeId, 8)
       session.submit({ type: 'debug.setUpgrade', payload: { upgradeId, level } })
     }
     // The casing grade the bot buys before planet 8 too: scripted mining lays casing (#115), and a
@@ -193,7 +192,7 @@ describe('bot: heat with heat.workUncapped (ticket 541)', () => {
   function boreTwentyRows() {
     const session = botOn(8)
     for (const upgradeId of UPGRADE_IDS) {
-      const level = stepOfMajor(onCurveLevel(upgradeId, 8))
+      const level = onCurveStep(upgradeId, 8)
       session.submit({ type: 'debug.setUpgrade', payload: { upgradeId, level } })
     }
     session.submit({ type: 'debug.setCasingGrade', payload: { grade: 5 } })

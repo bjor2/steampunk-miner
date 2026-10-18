@@ -6,12 +6,12 @@ import { chargePrice, chargeReachTiles, fuseTicksOf, keptFractionOf } from '../e
 import type { UpgradeId } from '../economy/economyDefinition'
 import { oreSalePrice, oreTier } from '../economy/oreEconomy'
 import { stepPrice, upgradePrice } from '../economy/upgradePrices'
-import { majorOf, minorsPerMajor, pipOf, stepOfMajor, stepsOfMajors } from '../economy/upgradeSteps'
+import { majorOf, minorsPerMajor, pipOf, stepOfMajor } from '../economy/upgradeSteps'
 import {
-  onCurveLevels,
   vehicleStatsAt,
   type UpgradeLevels,
   type VehicleStats,
+  onCurveSteps,
 } from '../economy/vehicleStats'
 import {
   add,
@@ -67,7 +67,7 @@ function log10Difference(a: number, b: number): number {
  * here and the boiler leads all the others; with the tank ahead the hold limits instead.
  */
 function levelVariants(planetIndex: number): UpgradeLevels[] {
-  const onCurve = stepsOfMajors(onCurveLevels(planetIndex))
+  const onCurve = onCurveSteps(planetIndex)
   const behind = (track: UpgradeId) => ({ ...onCurve, [track]: onCurve[track] - stepOfMajor(4) })
   const tankAhead = { ...onCurve, boiler: onCurve.boiler * TANK_AHEAD_MULTIPLE }
   return [onCurve, ...MARGINAL_TRACKS.map(behind), tankAhead]
@@ -240,7 +240,7 @@ function paramsVariants(params: PlanetParams): PlanetParams[] {
 
 /** The on-curve drill and drills further behind it, down to where band 3 is out of reach. */
 function drillVariants(planetIndex: number): UpgradeLevels[] {
-  const onCurve = stepsOfMajors(onCurveLevels(planetIndex))
+  const onCurve = onCurveSteps(planetIndex)
   return DRILL_LEVELS_BEHIND.map((behind) => ({
     ...onCurve,
     drill_power: onCurve.drill_power - stepOfMajor(behind),
@@ -250,7 +250,7 @@ function drillVariants(planetIndex: number): UpgradeLevels[] {
 
 describe('bot: planning past planet 582 (#196)', () => {
   it.each(PLANETS)('picks the ore band log space picks on planet %i', (planetIndex) => {
-    const session = botShoppingOn(planetIndex, stepsOfMajors(onCurveLevels(planetIndex)))
+    const session = botShoppingOn(planetIndex, onCurveSteps(planetIndex))
     const layout = layoutOn(session)
     for (const levels of levelVariants(planetIndex)) {
       const stats = vehicleStatsAt(levels)
@@ -286,7 +286,7 @@ describe('bot: planning past planet 582 (#196)', () => {
   it.each(PLANETS)(
     'weighs blasting against drilling on planet %i as log space does',
     (planetIndex) => {
-      const session = botShoppingOn(planetIndex, stepsOfMajors(onCurveLevels(planetIndex)))
+      const session = botShoppingOn(planetIndex, onCurveSteps(planetIndex))
       const calls = paramsVariants(layoutOn(session).params).flatMap((params) =>
         drillVariants(planetIndex).flatMap((levels) => {
           const stats = vehicleStatsAt(levels)

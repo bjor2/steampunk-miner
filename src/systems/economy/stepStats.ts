@@ -8,11 +8,20 @@
  *   linear     start + step * L + round half up(step * k * p/q), in integers only, so cargo and
  *              boiler stay whole numbers that no pip rounding of a geometric value ever made
  *   saturating min + (max - min) * x / (x + halfLevel), x as a fraction in lowest terms
+ *
+ * A `perPurchase` track (drill power since the GD ruling on #551, ticket 552) skips the pip rule:
+ * every stored step is one purchase of its own ratio.
  */
 import { mul, nthRoot, toCanonical, type BigStat } from '../money'
 import { compoundRatio, growGeometric, growLinear, saturate } from './curveFamilies'
 import { ECONOMY } from './economy'
-import type { BoundedRange, GeometricEffect, LinearEffect } from './economyDefinition'
+import type {
+  BoundedRange,
+  GeometricEffect,
+  LinearEffect,
+  PerPurchaseEffect,
+  RatioRoot,
+} from './economyDefinition'
 import { majorOf, minorsPerMajor, pipOf } from './upgradeSteps'
 import { lowestTerms, roundHalfUp, type WholeFraction } from '../wholeFractions'
 
@@ -20,6 +29,13 @@ export function geometricAtStep(effect: GeometricEffect, step: number): BigStat 
   const { numerator } = pipExponent()
   const atMajor = growGeometric(effect.start, effect.ratio, majorOf(step))
   return mul(atMajor, compoundRatio(pipRootOf(effect.ratio), numerator * pipOf(step)))
+}
+
+/** `start` at step 0, then `start * firstGain * ratio^(n - 1)` at purchase `n` (#551, 552). */
+export function perPurchaseAtStep(effect: PerPurchaseEffect, step: number): BigStat {
+  if (step === 0) return effect.start
+  const afterFirst = growGeometric(effect.start, effect.ratio, step - 1)
+  return mul(afterFirst, rootOf(effect.firstGain))
 }
 
 export function linearAtStep(effect: LinearEffect, step: number): number {
@@ -51,14 +67,18 @@ function pipExponent(): WholeFraction {
   return lowestTerms(share.numerator, share.denominator * (minorsPerMajor() - 1))
 }
 
-/** `g^(1/q)`, worked out once per stat ratio. */
-const PIP_ROOTS = new Map<string, BigStat>()
-
 function pipRootOf(ratio: BigStat): BigStat {
-  const key = toCanonical(ratio)
-  const known = PIP_ROOTS.get(key)
+  return rootOf({ ratio, root: pipExponent().denominator })
+}
+
+/** `ratio^(1/root)`, worked out once per ratio and root: `g^(1/q)` of a pip, a first gain. */
+const ROOTS = new Map<string, BigStat>()
+
+function rootOf({ ratio, root }: RatioRoot): BigStat {
+  const key = `${toCanonical(ratio)}/${root}`
+  const known = ROOTS.get(key)
   if (known !== undefined) return known
-  const root = nthRoot(ratio, pipExponent().denominator)
-  PIP_ROOTS.set(key, root)
-  return root
+  const value = nthRoot(ratio, root)
+  ROOTS.set(key, value)
+  return value
 }
