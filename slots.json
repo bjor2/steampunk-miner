@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-10-18T18:18:09+01:00",
+  "updated_at": "2026-10-18T18:18:21+01:00",
   "caps": {
     "grok": 12,
     "claude": 10,
@@ -509,11 +509,11 @@
     }
   ],
   "last_refill": {
-    "at": "2026-10-18 16:43 BST",
+    "at": "2026-10-18 18:18 BST",
     "mode": "refill-dev",
-    "triggers": "#546",
-    "started": "#454->C1/A1",
-    "note": "spawned 1 worker(s)"
+    "triggers": "#454",
+    "started": "",
+    "note": "load guard (MemAvailable 2657 MB < 3072 MB)"
   },
   "totals": {
     "grok": {
