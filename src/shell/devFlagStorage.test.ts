@@ -47,6 +47,13 @@ describe('dev flag storage', () => {
     expect(isDevFlagSession(PLAYER_LAUNCH, storage)).toBe(true)
   })
 
+  it('marks the tab when the hidden gesture enters a debug session, so a reload reads them (ticket 549)', () => {
+    const { session, storage } = browserWithOverride()
+    storage.markDebugSession()
+    expect(session.getItem(DEBUG_SESSION_MARKER_KEY)).not.toBeNull()
+    expect(isDevFlagSession(PLAYER_LAUNCH, storage)).toBe(true)
+  })
+
   it('never reads them on a scenario launch', () => {
     const { storage } = browserWithOverride()
     const scenario = { ...PLAYER_LAUNCH, debugEnabled: true, scenarioText: '{}' }

@@ -11,7 +11,8 @@
  *   so they run on the shipped defaults whatever a browser remembers.
  * - Each session start (a resume, a load, New Game) runs the client loop on the shipped flags
  *   overlaid with the overrides, and sends the overrides as the session's first `debug.setFlags`.
- *   A loaded world keeps its own recorded delta for every flag the overrides do not name.
+ *   A loaded world keeps its own recorded delta for every flag the overrides do not name; the
+ *   flags an override changed on it are kept for the panel and the badge to say so (#549).
  */
 import { getRunLog } from '../logging/runLog'
 import type { RunEventPlace } from '../logging/runEvent'
@@ -73,6 +74,10 @@ export interface DevFlagValues {
   devFlagOverrides: DevFlagOverrides
   /** Flags whose shipped default flipped since an override was set; that override was dropped. */
   changedDevFlagDefaults: readonly DevFlagId[]
+  /** A debug session reads the overrides: `?debug`, the tab's marker, or the hidden gesture. */
+  isDevFlagSessionOn: boolean
+  /** Authority flags the overrides changed on the loaded save as it ran; empty on a new world. */
+  overriddenSaveFlags: readonly DevFlagId[]
 }
 
 export interface DevFlagActions {
@@ -84,8 +89,10 @@ export interface DevFlagActions {
   resetDevFlags(): void
   /** Reads the installed storage: entries dropped on read are written back cleaned. */
   loadDevFlagOverrides(): void
-  /** A session started (resume, load, New Game): the overrides applied at its first tick. */
+  /** A fresh session started (a launch with no save, New Game): the overrides at its first tick. */
   startSessionDevFlags(): void
+  /** A saved world resumed or loaded: the overrides on top of its own flags at its first tick. */
+  startLoadedSessionDevFlags(): void
   /** A scenario's fresh session: the client loop back on the shipped flags, no override read. */
   restoreShippedClientFlags(): void
   /** The fixed step's read: the pending flips land once the drill is idle. */
@@ -101,6 +108,8 @@ export const STARTING_DEV_FLAGS: DevFlagValues = {
   clientDevFlags: SHIPPED_CLIENT_DEV_FLAGS,
   devFlagOverrides: NO_DEV_FLAG_OVERRIDES.overrides,
   changedDevFlagDefaults: NO_DEV_FLAG_OVERRIDES.changedDefaults,
+  isDevFlagSessionOn: false,
+  overriddenSaveFlags: [],
 }
 
 export function devFlagActionsOf(set: SetSlice, get: () => SliceHost): DevFlagActions {
@@ -121,7 +130,14 @@ export function devFlagActionsOf(set: SetSlice, get: () => SliceHost): DevFlagAc
         get().setDevFlags(resetChoiceOf(readAuthorityState()))
     },
     loadDevFlagOverrides: () => loadOverrides(set),
-    startSessionDevFlags: () => startSessionWithOverrides(set, get),
+    startSessionDevFlags: () => {
+      startSessionWithOverrides(set, get)
+      set({ overriddenSaveFlags: STARTING_DEV_FLAGS.overriddenSaveFlags })
+    },
+    startLoadedSessionDevFlags: () => {
+      const sent = startSessionWithOverrides(set, get)
+      set({ overriddenSaveFlags: flagIdsOf(sent) })
+    },
     restoreShippedClientFlags: () =>
       set({ clientDevFlags: withChosenClientFlags(get().clientDevFlags, DEV_FLAGS) }),
     settleClientDevFlags: (isDrillIdle) => {
@@ -179,6 +195,7 @@ function forgetOverrides(set: SetSlice): void {
   set({
     devFlagOverrides: STARTING_DEV_FLAGS.devFlagOverrides,
     changedDevFlagDefaults: STARTING_DEV_FLAGS.changedDevFlagDefaults,
+    overriddenSaveFlags: STARTING_DEV_FLAGS.overriddenSaveFlags,
   })
 }
 
@@ -193,12 +210,23 @@ function loadOverrides(set: SetSlice): void {
   const reading = readDevFlagOverrides(text)
   const cleaned = devFlagOverridesText(reading.overrides)
   if (cleaned !== text) storage?.write(cleaned)
-  set({ devFlagOverrides: reading.overrides, changedDevFlagDefaults: reading.changedDefaults })
+  set({
+    devFlagOverrides: reading.overrides,
+    changedDevFlagDefaults: reading.changedDefaults,
+    isDevFlagSessionOn: storage !== null,
+  })
 }
 
-function startSessionWithOverrides(set: SetSlice, get: () => SliceHost): void {
+/** The authority flags it sent, changed from how the world ran; null when nothing was sent. */
+function startSessionWithOverrides(set: SetSlice, get: () => SliceHost): DevFlagDelta | null {
   const overrides = choiceOfOverrides(get().devFlagOverrides)
   const client = { ...DEV_FLAGS, ...clientPartOf(overrides) }
   set({ clientDevFlags: withChosenClientFlags(get().clientDevFlags, client) })
-  sendSetFlags(get().playerId, setFlagsDeltaOf(overrides, readAuthorityState(), DEV_FLAGS))
+  const delta = setFlagsDeltaOf(overrides, readAuthorityState(), DEV_FLAGS)
+  sendSetFlags(get().playerId, delta)
+  return delta
+}
+
+function flagIdsOf(delta: DevFlagDelta | null): DevFlagId[] {
+  return delta === null ? [] : (Object.keys(delta) as DevFlagId[])
 }

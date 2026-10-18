@@ -108,6 +108,12 @@ import {
   type DevFlagActions,
   type DevFlagValues,
 } from './devFlagSlice'
+import {
+  devFlagPanelActionsOf,
+  STARTING_DEV_FLAG_PANEL,
+  type DevFlagPanelActions,
+  type DevFlagPanelValues,
+} from './devFlagPanelSlice'
 import { forgetMusicStingers, recordMusicStingers } from './musicStingerRecord'
 import { platformReplicaOf, type PlatformReplica } from './platformReplica'
 import {
@@ -180,7 +186,9 @@ export interface GameState
     SaveKeepingValues,
     SaveKeepingActions,
     DevFlagValues,
-    DevFlagActions {
+    DevFlagActions,
+    DevFlagPanelValues,
+    DevFlagPanelActions {
   playerId: string
   planetTier: number
   planetSeed: number
@@ -279,6 +287,7 @@ type GameValues = Pick<
   | keyof TitleMenuValues
   | keyof SaveKeepingValues
   | keyof DevFlagValues
+  | keyof DevFlagPanelValues
   | 'travelTransition'
 >
 
@@ -306,6 +315,7 @@ export const STARTING_VALUES: GameValues = {
   ...STARTING_TITLE_MENU,
   ...STARTING_SAVE_KEEPING,
   ...STARTING_DEV_FLAGS,
+  ...STARTING_DEV_FLAG_PANEL,
   travelTransition: null,
 }
 
@@ -329,6 +339,7 @@ export const useGameStore = create<GameState>()((set, get) => ({
   ...titleMenuActionsOf(set, get),
   ...saveKeepingActionsOf(set, get),
   ...devFlagActionsOf(set, get),
+  ...devFlagPanelActionsOf(set, get),
 
   setPlanet: (planetTier) => {
     refuseProblems(startScenarioProblems({ planetTier }))
@@ -389,7 +400,7 @@ export const useGameStore = create<GameState>()((set, get) => ({
     set({ depthTiles: 0, travelTransition: null, planetCard: null })
     replaceSession(checkpoint.state)
     recordCheckpointLoaded(runEventPlaceOf(get()), checkpoint)
-    get().startSessionDevFlags()
+    get().startLoadedSessionDevFlags()
   },
 
   startNewGame: () => {

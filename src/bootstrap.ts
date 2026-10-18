@@ -28,6 +28,7 @@ import {
   installSaveFolder,
   loadCheckpoint,
   saveFileNow,
+  type Checkpoint,
   type CheckpointLoad,
   type SaveFolderInstall,
 } from './store/checkpoint'
@@ -36,6 +37,7 @@ import { runEventPlaceOf, useGameStore } from './store/gameStore'
 import type { SaveFolder } from './store/saveFolder'
 import { installSaveTransfer } from './store/saveKeepingSlice'
 import { installDevFlagStorage } from './store/devFlagSlice'
+import { installDebugSessionEntry } from './store/devFlagPanelSlice'
 import { listenForDomainEvents } from './store/domainEventBroadcast'
 import { routeKeyChange, routeScrollNotch } from './store/inputRuntime'
 import { routePadFrame } from './store/padRuntime'
@@ -82,6 +84,7 @@ export async function startGame(): Promise<void> {
   await adoptLocalPreferences(shell)
   forgetDevFlagsOnNoFlagsLaunch(shell)
   readDevFlagOverridesInDebugSession(shell)
+  offerDebugSessionByGesture(shell)
   keepScreenFitted(shell)
   noteRenderPointer(shell)
   showTouchControlsOnTouch(shell)
@@ -129,8 +132,7 @@ function startRunLogging(shell: Shell, startedAt: Date): RunFiles {
  */
 async function openTitleOrResume(shell: Shell): Promise<void> {
   if (shell.launch.isTitleMenuShown) return useGameStore.getState().openTitleMenu()
-  await resumeLastCheckpoint(shell)
-  startSessionDevFlags()
+  await resumeLastCheckpointOrStartFresh(shell)
   recordStartingPlanetEntered()
   showStartingPlanetCard()
 }
@@ -244,23 +246,40 @@ function readDevFlagOverridesInDebugSession(shell: Shell): void {
 }
 
 /**
- * The session the launch plays: a resumed one already applied its overrides, so this sends
- * nothing again; a fresh one gets them at its first tick.
+ * The hidden gesture (ticket 549) enters a debug session on a player's launch: it marks the tab
+ * and hands the store the overrides' storage. A scenario launch sets its own start and never
+ * reads an override, so it gets no entry.
  */
-function startSessionDevFlags(): void {
+function offerDebugSessionByGesture(shell: Shell): void {
+  if (shell.launch.scenarioText !== null) return
+  installDebugSessionEntry(() => {
+    shell.devFlags.markDebugSession()
+    return shell.devFlags
+  })
+}
+
+/**
+ * Quit and resume (#26), the resumed world's overrides applied over its own flags; else a fresh
+ * session, which gets them at its first tick. A launch scenario sets its own start instead.
+ */
+async function resumeLastCheckpointOrStartFresh(shell: Shell): Promise<void> {
+  const checkpoint = shell.launch.scenarioText === null ? await loadCheckpoint() : null
+  if (isResumable(checkpoint)) useGameStore.getState().resumeCheckpoint(checkpoint)
+  else startFreshSession(checkpoint)
+}
+
+function isResumable(checkpoint: CheckpointLoad): checkpoint is Checkpoint {
+  return checkpoint !== null && 'state' in checkpoint
+}
+
+function startFreshSession(checkpoint: CheckpointLoad): void {
+  reportRefusedCheckpoint(checkpoint)
   useGameStore.getState().startSessionDevFlags()
 }
 
-/** Quit and resume (#26); a launch scenario sets its own start instead. */
-async function resumeLastCheckpoint(shell: Shell): Promise<void> {
-  if (shell.launch.scenarioText !== null) return
-  resumeOrReport(await loadCheckpoint())
-}
-
-function resumeOrReport(checkpoint: CheckpointLoad): void {
-  if (checkpoint === null) return
-  if ('state' in checkpoint) useGameStore.getState().resumeCheckpoint(checkpoint)
-  else console.error(`checkpoint refused, starting fresh: ${checkpoint.problems.join('; ')}`)
+function reportRefusedCheckpoint(checkpoint: CheckpointLoad): void {
+  if (checkpoint !== null && 'problems' in checkpoint)
+    console.error(`checkpoint refused, starting fresh: ${checkpoint.problems.join('; ')}`)
 }
 
 /** Before the scene mounts, so `getPhysicsStats()` sees Rapier's WASM memory as it loads (#119). */

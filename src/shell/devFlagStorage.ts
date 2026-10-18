@@ -20,6 +20,8 @@ export interface ShellDevFlagStorage {
   /** Replaces the item; null removes it. */
   write(text: string | null): void
   isDebugSessionMarked(): boolean
+  /** The hidden gesture (#549): this tab is a debug session until it closes or is reset. */
+  markDebugSession(): void
   forgetDebugSession(): void
 }
 
@@ -32,6 +34,7 @@ export function createDevFlagStorage(
     read: () => local.getItem(DEV_FLAG_OVERRIDES_KEY),
     write: (text) => writeOrRemove(local, text),
     isDebugSessionMarked: () => session.getItem(DEBUG_SESSION_MARKER_KEY) !== null,
+    markDebugSession: () => session.setItem(DEBUG_SESSION_MARKER_KEY, '1'),
     forgetDebugSession: () => session.removeItem(DEBUG_SESSION_MARKER_KEY),
   }
 }
