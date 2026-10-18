@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-10-18T15:49:51+01:00",
+  "updated_at": "2026-10-18T16:13:56+01:00",
   "caps": {
     "grok": 12,
     "claude": 10,
@@ -20,10 +20,10 @@
         {
           "slot": "C1",
           "state": "busy",
-          "ticket": 451,
+          "ticket": 546,
           "grok_slot": 1,
           "kind": "dev",
-          "since": "2026-10-18T15:26:00+01:00",
+          "since": "2026-10-18T16:13:00+01:00",
           "wave": "302-10B"
         },
         {
@@ -71,7 +71,7 @@
       "size": 6,
       "used": 2,
       "free": 4,
-      "claims_last_hour": 4,
+      "claims_last_hour": 3,
       "name": "Claude Max 1"
     },
     {
@@ -358,8 +358,8 @@
     {
       "slot": 1,
       "state": "dev",
-      "ticket": 451,
-      "since": "2026-10-18T15:26:00+01:00",
+      "ticket": 546,
+      "since": "2026-10-18T16:13:00+01:00",
       "claude_slot": 1,
       "wave": "302-10B"
     },
@@ -436,9 +436,9 @@
     {
       "slot": 1,
       "state": "busy",
-      "ticket": 451,
+      "ticket": 546,
       "grok_slot": 1,
-      "since": "2026-10-18T15:26:00+01:00",
+      "since": "2026-10-18T16:13:00+01:00",
       "account": 1,
       "wave": "302-10B"
     },
@@ -517,11 +517,11 @@
     }
   ],
   "last_refill": {
-    "at": "2026-10-18 15:22 BST",
+    "at": "2026-10-18 16:13 BST",
     "mode": "refill-dev",
-    "triggers": "#541",
-    "started": "",
-    "note": "no pickable build ticket"
+    "triggers": "#451",
+    "started": "#546->C1/A1",
+    "note": "spawned 1 worker(s)"
   },
   "totals": {
     "grok": {
@@ -562,7 +562,8 @@
         "done": [
           449,
           450,
-          452
+          452,
+          451
         ],
         "live": 1
       },
