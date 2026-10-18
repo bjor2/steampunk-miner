@@ -9,7 +9,7 @@ import { setPlanetCommand, setPlanetSeedCommand } from '../startScenarioCommands
 import { setUpgradeCommand } from '../vehicle/vehicleCommands'
 import type { ChargePolicy } from './botCharges'
 import { playSlice, type SliceRun } from './playSlice'
-import { stepOfMajor } from '../economy/upgradeSteps'
+import { stepOfLevel } from '../economy/upgradeSteps'
 import { contentOf } from '../registries/content'
 import { vehicleItemOfferOf } from '../registries/vehicleItemSales'
 
@@ -18,7 +18,13 @@ const WORLD_SEED = 83921
 const ON_CURVE_BUDGET_TICKS = 3 * 60 * 60
 /** Fifteen minutes: the trip that meets a slow tile, the visit that buys the rack, the blasts. */
 const BEHIND_BUDGET_TICKS = 15 * 60 * 60
-/** A drill this far behind the curve meets tiles over the 96-tick threshold (#109 bot policy). */
+/**
+ * A drill this far behind the curve meets tiles over the 96-tick threshold (#109 bot policy): 12
+ * levels in each track's own levels, so 12 tip majors and, since #552, 12 drill power purchases
+ * (purchase 18 on planet 7). Purchase 21, the first at or past the old stored 370, no longer meets
+ * one after the first visit: the bot buys its way out of the lag there (tip majors, and drill
+ * purchases of 22k to 71k on planet 7).
+ */
 const DRILL_LEVELS_BEHIND = 12
 const DRILL_TRACKS: readonly UpgradeId[] = ['drill_power', 'drill_tip']
 /**
@@ -50,7 +56,7 @@ function itemsBoughtBeforeTracksThrough(planetIndex: number): string[] {
 
 function arrivalLevel(upgradeId: UpgradeId, drillBehind: number): number {
   const onCurve = onCurveLevel(upgradeId, 7)
-  return stepOfMajor(DRILL_TRACKS.includes(upgradeId) ? onCurve - drillBehind : onCurve)
+  return stepOfLevel(upgradeId, DRILL_TRACKS.includes(upgradeId) ? onCurve - drillBehind : onCurve)
 }
 
 function planet7Run(drillBehind: number, chargePolicy: ChargePolicy, maxTicks: number): SliceRun {

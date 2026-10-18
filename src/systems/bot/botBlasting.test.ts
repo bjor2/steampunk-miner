@@ -8,12 +8,16 @@ import { setPlanetCommand, setPlanetSeedCommand } from '../startScenarioCommands
 import { setUpgradeCommand } from '../vehicle/vehicleCommands'
 import type { ChargePolicy } from './botCharges'
 import { playSlice, type SliceRun } from './playSlice'
-import { stepOfMajor } from '../economy/upgradeSteps'
+import { stepOfLevel } from '../economy/upgradeSteps'
 
 const WORLD_SEED = 83921
 /** Fifteen minutes on planet 7: enough dock cycles to restock and blast. */
 const BUDGET_TICKS = 15 * 60 * 60
-/** A drill this far behind the curve meets tiles over the 96-tick threshold (#109 bot policy). */
+/**
+ * A drill this far behind the curve meets tiles over the 96-tick threshold (#109 bot policy): 12
+ * levels in each track's own levels, so 12 tip majors and, since #552, 12 drill power purchases
+ * (purchase 18 on planet 7), as `botChargeNeed.test.ts` lags it.
+ */
 const DRILL_LEVELS_BEHIND = 12
 const DRILL_TRACKS: readonly UpgradeId[] = ['drill_power', 'drill_tip']
 
@@ -31,7 +35,8 @@ const ARRIVED_ON_PLANET_7: CommandIntent[] = [
 
 function arrivalLevel(upgradeId: UpgradeId): number {
   const onCurve = onCurveLevel(upgradeId, 7)
-  return stepOfMajor(DRILL_TRACKS.includes(upgradeId) ? onCurve - DRILL_LEVELS_BEHIND : onCurve)
+  const level = DRILL_TRACKS.includes(upgradeId) ? onCurve - DRILL_LEVELS_BEHIND : onCurve
+  return stepOfLevel(upgradeId, level)
 }
 
 const runs = new Map<ChargePolicy, SliceRun>()

@@ -27,8 +27,13 @@ describe('ore hardness by the cell (#140 Numbers "Hardness", #223)', () => {
   })
 
   it('has the pacing bot bore a lead cell in the ticks the drill takes on it', () => {
-    const major12 = stepOfMajor(12)
-    const drill = vehicleStatsAt({ ...startLevels(), drill_power: major12, drill_tip: major12 })
+    /** Drill power's purchase 8 is the first at or past the old major 12 (stored 120) since #552. */
+    const drillPurchase = 8
+    const drill = vehicleStatsAt({
+      ...startLevels(),
+      drill_power: drillPurchase,
+      drill_tip: stepOfMajor(12),
+    })
     const drillTicks = ticksPerTile(drill, hardnessOfTile(PLANET_3, BAND_1_TILE, LEAD_CELL))
     expect(drillTicks).not.toBeNull()
     expect(boreTicks(drill, PLANET_3, BAND_1_TILE, LEAD_CELL)).toBe(drillTicks)

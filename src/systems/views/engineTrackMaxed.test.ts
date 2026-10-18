@@ -10,11 +10,17 @@ import { ENGINE_MAXED_TEXT, workshopRowsOf } from './workshopRows'
 // drill sets travel" exactly when k times the drill's cut speed reaches the engine's top speed,
 // and then offers no buy. With no tile floor (ticket 397) a strong drill passes every engine.
 
-/** Steps that cut band-1 rock in one sub-step a cell, the law's quantum. */
-const STRONG_DRILL = { drill_power: 2000, drill_tip: 600 }
+/**
+ * Steps that cut band-1 rock in one sub-step a cell, the law's quantum. Drill power's purchase 106
+ * is the first at or past the old stored 2000 since #552, and still costs only about 1.5e19.
+ */
+const STRONG_DRILL = { drill_power: 106, drill_tip: 600 }
 
-/** Steps whose k times cut passes the 6 m/s engine in planet 1's band 1 (6.9) but not band 5 (1.68). */
-const BAND_ONE_DRILL = { drill_power: 100, drill_tip: 30 }
+/**
+ * Steps whose k times cut passes the 6 m/s engine in planet 1's band 1 (8.28) but not band 5
+ * (2.04): drill power's purchase 7 is the first at or past the old stored 100 since #552.
+ */
+const BAND_ONE_DRILL = { drill_power: 7, drill_tip: 30 }
 
 interface RowModules {
   createScriptedSession: typeof createScriptedSession
@@ -22,8 +28,8 @@ interface RowModules {
   workshopRowsOf: typeof workshopRowsOf
 }
 
-/** A rig with `levels`, docked at the Upgrade bay with money to spare: a level-200 drill step
- * costs about 1e35 on ticket 396's rows. */
+/** A rig with `levels`, docked at the Upgrade bay with money to spare: drill power's purchase
+ * 106 costs about 1.5e19 on #552's per-purchase price. */
 function dockedSessionOf(modules: RowModules, levels: Record<string, number>) {
   const session = modules.createScriptedSession()
   session.submit(1, grantMoneyCommand('1e60'))

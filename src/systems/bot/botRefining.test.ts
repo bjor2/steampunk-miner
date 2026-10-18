@@ -10,8 +10,14 @@ import { playSlice, type SliceRun } from './playSlice'
 import type { RefineryUse } from './botRefining'
 
 const WORLD_SEED = 83921
-/** Fifteen minutes on planet 3: several dock cycles, each past a 180 s batch. */
+/** Fifteen minutes from arriving on planet 3: several dock cycles, each past a 180 s batch. */
 const BUDGET_TICKS = 15 * 60 * 60
+/**
+ * Since #552's per-purchase drill the bot arriving on curve completes planet 3's core in about 8.6
+ * minutes (tick 30,886) with one batch queued, so the run plays on into planet 4 to fill the
+ * fifteen minutes with dock cycles.
+ */
+const LAST_PLANET = 4
 
 /** On planet 3 with the on-curve levels and money a bot arriving there would have. */
 const ARRIVED_ON_PLANET_3: CommandIntent[] = [
@@ -29,7 +35,7 @@ function planet3Run(refinery: RefineryUse): SliceRun {
     runs.get(refinery) ??
     playSlice(start, {
       maxTicks: BUDGET_TICKS,
-      lastPlanet: 3,
+      lastPlanet: LAST_PLANET,
       startCommands: ARRIVED_ON_PLANET_3,
       refinery,
     })

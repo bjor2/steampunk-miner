@@ -8,11 +8,15 @@
  * band 5 started near the 24-tick cap and the #81 sawtooth (band 5 at departure at most 0.7x
  * arrival) could not show. The tip rises 3 levels a planet on curve, so +2 at departure is -1 on
  * the next arrival, and band 5 is already at full efficiency there: the tip lead does not speed
- * band 5 on arrival. At the caps the core digs at 135 ticks a tile on every planet.
+ * band 5 on arrival.
  *
  * Since the GD ruling on #551 (ticket 552) drill power's level is one purchase of x1.243, so its
  * lead of 1 is one purchase past its on-curve purchase count (about 12 at planet 1 and 3 a
  * planet), on planet 1 as well: #396's planet 1 lead of 5 majors was a stopgap for the old rows.
+ * That one purchase digs the core inside 2.5 s a tile through planet 9, so the tip is first forced
+ * on planet 10; three purchases a planet trail hardness's 1.974 a little, so at the caps the core
+ * takes about 62 ticks a tile on planet 10 and grows from there (the 135 on every planet of the
+ * old rows is gone).
  */
 import { TICKS_PER_SECOND } from '../../constants/physics'
 import type { UpgradeId } from '../economy/economyDefinition'

@@ -4,18 +4,21 @@ import { createAuthorityState } from '../authority/authorityState'
 import { dockSiteOfPlanet } from '../authority/planetOfState'
 import { chargePrice, chargeReachTiles, fuseTicksOf, keptFractionOf } from '../economy/chargeSizes'
 import type { UpgradeId } from '../economy/economyDefinition'
-import { oreSalePrice, oreTier } from '../economy/oreEconomy'
+import { blockHardness, oreSalePrice, oreTier } from '../economy/oreEconomy'
 import { stepPrice, upgradePrice } from '../economy/upgradePrices'
-import { majorOf, minorsPerMajor, pipOf, stepOfMajor } from '../economy/upgradeSteps'
+import { levelOfStep, stepOfMajor, stepsToNextLevel } from '../economy/upgradeSteps'
 import {
+  drillPowerAtStep,
+  onCurveStep,
+  onCurveSteps,
   vehicleStatsAt,
   type UpgradeLevels,
   type VehicleStats,
-  onCurveSteps,
 } from '../economy/vehicleStats'
 import {
   add,
   cmp,
+  div,
   fromSafeInteger,
   isMoney,
   mul,
@@ -45,7 +48,21 @@ const WALLET_PRICES = 1000
 const TOP_CASING_GRADE = 5
 const BANDS = [1, 2, 3, 4, 5]
 const TANK_SHARES = [1, 0.6, 0.3]
-const DRILL_LEVELS_BEHIND = [0, 6, 9, 12]
+/** Tip majors behind, and the drill power purchases about as far behind (a purchase ~1.92 majors). */
+const DRILL_LEVELS_BEHIND = [
+  { tipMajors: 0, drillPurchases: 0 },
+  { tipMajors: 6, drillPurchases: 3 },
+  { tipMajors: 9, drillPurchases: 5 },
+  { tipMajors: 12, drillPurchases: 6 },
+]
+/** Majors a marginal track is set behind so it can lead: 4, or 2 drill power purchases. */
+const MAJORS_BEHIND_TO_LEAD = 4
+const DRILL_PURCHASES_BEHIND_TO_LEAD = 2
+/**
+ * Drill power's purchase 8 is the first at or past the old on-curve major 13 of planet 1 (stored
+ * 130), whose band-1 pace the rig here keeps (`paceKeepingSteps`).
+ */
+const OLD_PLANET_1_PACE_PURCHASE = 8
 const BASIS_POINTS = 10000
 const TANK_AHEAD_MULTIPLE = 2
 const PICKS_DONE = new Error('the compared picks are bought')
@@ -62,13 +79,46 @@ function log10Difference(a: number, b: number): number {
 }
 
 /**
- * The on-curve steps with each marginal track in turn 4 majors behind, so each can lead, and a
- * tank twice the curve's: since ticket 396's 4-tick floor the on-curve tank ends every trip out
- * here and the boiler leads all the others; with the tank ahead the hold limits instead.
+ * The on-curve steps with the drill that keeps the old on-curve band-1 pace. Since #552 the
+ * on-curve drill grows 1.920 a planet (3 purchases of 1.243) against band-1 hardness's 1.974, so
+ * on planet 600 it takes 48,428,225 ticks a band-1 tile (4 on planet 1) and no ore trip pays; the
+ * old on-curve drill (6 majors of 1.12 a planet) kept band 1's pace on every planet. This rig
+ * holds the first purchase whose power over band-1 hardness is at least purchase 8's on planet 1
+ * (9 ticks a tile): 1881 on planet 600 against the on-curve 1809, 3131 on planet 1000 against
+ * 3009. That is past the bot's one-purchase lead cap, so the bot and the reference both leave
+ * drill power out of the marginal picks here.
+ */
+function paceKeepingSteps(planetIndex: number): UpgradeLevels {
+  return { ...onCurveSteps(planetIndex), drill_power: paceKeepingDrill(planetIndex) }
+}
+
+function paceKeepingDrill(planetIndex: number): number {
+  const hardnessGrowth = div(blockHardness(planetIndex, 1), blockHardness(1, 1))
+  const wanted = mul(drillPowerAtStep(OLD_PLANET_1_PACE_PURCHASE), hardnessGrowth)
+  let purchase = onCurveStep('drill_power', planetIndex)
+  while (cmp(drillPowerAtStep(purchase), wanted) < 0) purchase += 1
+  return purchase
+}
+
+/** How far behind a marginal track is set so it can lead, in its stored steps. */
+function stepsBehindToLead(track: UpgradeId): number {
+  return track === 'drill_power'
+    ? DRILL_PURCHASES_BEHIND_TO_LEAD
+    : stepOfMajor(MAJORS_BEHIND_TO_LEAD)
+}
+
+/**
+ * The pace-keeping steps with each marginal track in turn 4 majors (2 drill purchases) behind, so
+ * each can lead, and a tank twice the curve's: since ticket 396's 4-tick floor the on-curve tank
+ * ends every trip out here and the boiler leads all the others; with the tank ahead the hold
+ * limits instead.
  */
 function levelVariants(planetIndex: number): UpgradeLevels[] {
-  const onCurve = onCurveSteps(planetIndex)
-  const behind = (track: UpgradeId) => ({ ...onCurve, [track]: onCurve[track] - stepOfMajor(4) })
+  const onCurve = paceKeepingSteps(planetIndex)
+  const behind = (track: UpgradeId) => ({
+    ...onCurve,
+    [track]: onCurve[track] - stepsBehindToLead(track),
+  })
   const tankAhead = { ...onCurve, boiler: onCurve.boiler * TANK_AHEAD_MULTIPLE }
   return [onCurve, ...MARGINAL_TRACKS.map(behind), tankAhead]
 }
@@ -93,7 +143,7 @@ function botShoppingOn(planetIndex: number, levels: UpgradeLevels): BotSession {
 
 function walletFor(planetIndex: number, levels: UpgradeLevels): string {
   const prices = MARGINAL_TRACKS.map((track) =>
-    upgradePrice(track, majorOf(levels[track]), planetIndex),
+    upgradePrice(track, levelOfStep(track, levels[track]), planetIndex),
   )
   const dearest = prices.reduce((most, price) => (cmp(price, most) > 0 ? price : most))
   return toCanonical(mul(dearest, fromSafeInteger(WALLET_PRICES)))
@@ -145,7 +195,8 @@ function plannedLog(layout: MineLayout, levels: UpgradeLevels): number {
 
 /**
  * The reference: the best gain in planned money per tick per price, ranked by its log10, over the
- * fewest next steps up to the next major that raise the planned money (#180).
+ * fewest next steps up to the next level that raise the planned money (#180): the next major, or
+ * one drill power purchase since #552.
  */
 function referencePick(
   layout: MineLayout,
@@ -171,7 +222,7 @@ function referenceLogGainPerPrice(
   now: number,
 ): number | null {
   let price = ZERO_MONEY
-  for (let steps = 1; steps <= minorsPerMajor() - pipOf(levels[track]); steps++) {
+  for (let steps = 1; steps <= stepsToNextLevel(track, levels[track]); steps++) {
     price = add(price, stepPrice(track, levels[track] + steps - 1, planetIndex))
     const next = plannedLog(layout, { ...levels, [track]: levels[track] + steps })
     if (next > now) return log10Difference(next, now) - log10Of(price)
@@ -238,19 +289,19 @@ function paramsVariants(params: PlanetParams): PlanetParams[] {
   return [params, { ...params, oreDensityBp: BANDS.map(() => BASIS_POINTS) }]
 }
 
-/** The on-curve drill and drills further behind it, down to where band 3 is out of reach. */
+/** The pace-keeping drill and drills further behind it, down to where band 3 is out of reach. */
 function drillVariants(planetIndex: number): UpgradeLevels[] {
-  const onCurve = onCurveSteps(planetIndex)
-  return DRILL_LEVELS_BEHIND.map((behind) => ({
+  const onCurve = paceKeepingSteps(planetIndex)
+  return DRILL_LEVELS_BEHIND.map(({ tipMajors, drillPurchases }) => ({
     ...onCurve,
-    drill_power: onCurve.drill_power - stepOfMajor(behind),
-    drill_tip: onCurve.drill_tip - stepOfMajor(behind),
+    drill_power: onCurve.drill_power - drillPurchases,
+    drill_tip: onCurve.drill_tip - stepOfMajor(tipMajors),
   }))
 }
 
 describe('bot: planning past planet 582 (#196)', () => {
   it.each(PLANETS)('picks the ore band log space picks on planet %i', (planetIndex) => {
-    const session = botShoppingOn(planetIndex, onCurveSteps(planetIndex))
+    const session = botShoppingOn(planetIndex, paceKeepingSteps(planetIndex))
     const layout = layoutOn(session)
     for (const levels of levelVariants(planetIndex)) {
       const stats = vehicleStatsAt(levels)
@@ -286,7 +337,7 @@ describe('bot: planning past planet 582 (#196)', () => {
   it.each(PLANETS)(
     'weighs blasting against drilling on planet %i as log space does',
     (planetIndex) => {
-      const session = botShoppingOn(planetIndex, onCurveSteps(planetIndex))
+      const session = botShoppingOn(planetIndex, paceKeepingSteps(planetIndex))
       const calls = paramsVariants(layoutOn(session).params).flatMap((params) =>
         drillVariants(planetIndex).flatMap((levels) => {
           const stats = vehicleStatsAt(levels)
