@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "updated_at": "2026-10-18T20:34:27Z",
+  "updated_at": "2026-10-18T20:35:38Z",
   "entries": {
     "steampunk-loop/1": {
       "loop": "steampunk-loop",
@@ -526,9 +526,9 @@
       "slot": null,
       "state": "working",
       "issue": null,
-      "note": "testing spec #161 (Spec: Deep tech tree: structure, costs and endless depth) on 20ef31b",
+      "note": "testing spec #418 (Fix red main: pacingGate planet 1 core at 33.8 min on 0ffdd7c5 (window 15-30)) on 9600b5e",
       "stale_after_min": 420,
-      "updated_at": "2026-10-18T18:18:06Z",
+      "updated_at": "2026-10-18T20:35:38Z",
       "host": "grok-bot-vm-452660841"
     },
     "steampunk-loop/10": {
