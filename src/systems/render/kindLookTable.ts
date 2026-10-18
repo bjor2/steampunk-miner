@@ -14,8 +14,11 @@
 import type { Rgb } from './colour'
 import { KIND_LOOKS, patternCodeOf, silhouetteCodeOf, type KindLookCatalogue } from './kindLooks'
 
-/** Roster slots the table holds (#450: at most 16 entries); a slot past it draws the family look. */
-export const KIND_LOOK_SLOTS = 16
+/**
+ * Roster slots the table holds: `rosterMaxKinds`, 17 since ticket 453 (GD ruling on #450, item 4:
+ * 21 of the 24 vectors; a raise needs its own budget ruling). A slot past it draws the family look.
+ */
+export const KIND_LOOK_SLOTS = 17
 /** Rarity leads 1 to 4 (uncommon to mythic); common, lead 0, draws no tint, frame or glow. */
 export const RARITY_LOOK_LEADS = 4
 /** Added to a slot's rarity lead when the species is drawn from the act's hero atlas (#451). */
