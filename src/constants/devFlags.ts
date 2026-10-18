@@ -79,6 +79,11 @@ export const DEV_FLAGS: DevFlags = { 'drill.sweptCut': false, 'drill.reportEvery
  *   than elapsed, so its heat is the same either way. Off in the game Bjor plays until the paired
  *   run shows the per-trip heat budget as accepted (G&V condition 4): off, every heat settle is
  *   protocol 87's.
+ * - `codex.materialContact` (ticket 546, the TD's contact rule 6243331970 as the GD amended it
+ *   6243342631): the codex's reaction records `material:<species id>` the first time a player
+ *   really touches a cell of that species: the drill's damage on it, a gate stopping the drill
+ *   on it, its unit reaching the hold, or a tool sampling it. A kill-switch, on: off, no
+ *   `material:` key is written and every digest is protocol 88's.
  */
 export interface AuthorityDevFlags {
   readonly 'enemy.lureRetarget': boolean
@@ -86,6 +91,7 @@ export interface AuthorityDevFlags {
   readonly 'drill.sweptLawCharge': boolean
   readonly 'drill.reportCapsule': boolean
   readonly 'heat.workUncapped': boolean
+  readonly 'codex.materialContact': boolean
 }
 
 export const AUTHORITY_DEV_FLAGS: AuthorityDevFlags = {
@@ -94,4 +100,5 @@ export const AUTHORITY_DEV_FLAGS: AuthorityDevFlags = {
   'drill.sweptLawCharge': false,
   'drill.reportCapsule': true,
   'heat.workUncapped': false,
+  'codex.materialContact': true,
 }

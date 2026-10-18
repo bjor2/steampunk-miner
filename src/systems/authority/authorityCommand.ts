@@ -353,8 +353,15 @@ import type { DriveSigns } from '../vehicle/driveSigns'
  *    are unchanged, and a charged report at the tick the gauge settled leaves its whole drill
  *    ticks on the heat carry for the next. With the flag off every digest is protocol 87's, and the
  *    bot's whole-tick clock heats the same with it on.
+ * 89: the codex records the species a player touches (ticket 546, the TD's contact rule
+ *    6243331970 as the GD amended it 6243342631; behind the authority dev flag
+ *    `codex.materialContact`, on): the first drill damage on, gate stop at, unit in the hold from
+ *    or tool sample of a cell whose kind slot binds a species writes `material:<species id>`
+ *    into the player's codex section (v1) and says `codex.EntryAdded`, once per player per
+ *    species. A run that never touches a roster-bound cell moves no digest; with the flag off
+ *    every digest is protocol 88's.
  */
-export const AUTHORITY_PROTOCOL_VERSION = 88
+export const AUTHORITY_PROTOCOL_VERSION = 89
 
 /** The kernel's own commands: the closed set its rule tables are written against. */
 export interface KernelCommandPayloads {

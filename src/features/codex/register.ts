@@ -16,6 +16,8 @@ export const slice: SliceDefinition = {
   register(r) {
     r.saveSection(CODEX_SECTION)
     r.discovery(CODEX_DISCOVERY_PROVIDER)
+    // `material:<species id>` (ticket 546): the roster declares the kind, the codex writes it.
+    r.discoveryKind('material')
     r.authorityReaction(CODEX_DISCOVERY_REACTION)
     r.eventProjections(CODEX_PROJECTIONS)
     r.runEvents(CODEX_RUN_EVENTS)

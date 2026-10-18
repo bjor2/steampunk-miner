@@ -3,7 +3,9 @@
  * two goldens whose pose reports drill move their end digest, recorded with the switch on; every
  * other golden replays to its committed digests and mined order byte for byte. The goldens'
  * reports are 12-tick, so the report capsule of ticket 537 (interval 1 only) never moves them,
- * with its switch on or off. Spec support for the kill-switch pins; it reads, never writes.
+ * with its switch on or off. Both dig planet 1's roster-bound cells, so the codex's species record
+ * (ticket 546, protocol 89) moved them with the rest; its flag-off pin keeps A6's digests. Spec
+ * support for the kill-switch pins; it reads, never writes.
  */
 import { readdirSync, readFileSync } from 'node:fs'
 import type { GoldenRun } from './goldenRun'
@@ -12,8 +14,8 @@ const GOLDEN_FOLDER = new URL('../../tests/golden/', import.meta.url)
 
 /** The end digest of each golden the charge moves, with the switch on, by tick. */
 export const CHARGED_DIGESTS: Readonly<Record<string, Readonly<Record<number, string>>>> = {
-  'casing-lined-band-2': { 2137: '4f2b5b5df597d375' },
-  'collapse-band-2-grade-1': { 2125: 'fd1d79ed2a080e24' },
+  'casing-lined-band-2': { 2137: '1b0af955f030c2bc' },
+  'collapse-band-2-grade-1': { 2125: '197deff0f27f216d' },
 }
 
 export function committedGoldenRuns(): GoldenRun[] {

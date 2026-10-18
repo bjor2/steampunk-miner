@@ -67,17 +67,20 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/casing-cement/systems/casedTiles.test.ts` | 6 | 6 |
 | `src/features/casing-cement/systems/cementReinforcement.test.ts` | 6 | 6 |
 
-### `codex`: 7 files, 36 tests
+### `codex`: 10 files, 82 tests
 
 | File | Tests | Sites |
 | --- | --- | --- |
 | `src/features/codex/logging.test.ts` | 1 | 1 |
+| `src/features/codex/materialContactOffGolden.test.ts` | 20 | 4 |
+| `src/features/codex/materialNewGame.test.ts` | 1 | 1 |
 | `src/features/codex/systems/bitset.test.ts` | 6 | 6 |
 | `src/features/codex/systems/codexAliases.test.ts` | 4 | 4 |
 | `src/features/codex/systems/codexContacts.test.ts` | 6 | 6 |
 | `src/features/codex/systems/codexReaction.test.ts` | 11 | 11 |
 | `src/features/codex/systems/codexSection.test.ts` | 7 | 7 |
-| `src/features/codex/systems/codexSize.test.ts` | 1 | 1 |
+| `src/features/codex/systems/codexSize.test.ts` | 2 | 2 |
+| `src/features/codex/systems/materialContacts.test.ts` | 24 | 16 |
 
 ### `combos`: 17 files, 102 tests
 

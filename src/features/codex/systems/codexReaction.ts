@@ -8,7 +8,8 @@
  * `DrillDamageDealt` event names no ore), or a gate stopping the drill at one (`DrillGated`); a
  * unit reaching the hold (`CargoAdded`, drill or blast) is mined. A tool sampling a cell it leaves
  * standing (`OreSampled`, the corer, #243) is contact by that tool. Enemies and hazards are only
- * ever contacted (ticket 252, `contactKeys.ts`), recorded after the step's ore.
+ * ever contacted (ticket 252, `contactKeys.ts`), recorded after the step's ore, and the species of
+ * the cells those routes touched last (ticket 546, `materialKeys.ts`), contacted only too.
  */
 import type { AuthorityState } from '../../../systems/authority/authorityState'
 import { chainEffects, unchanged, type RuleEffect } from '../../../systems/authority/commandRule'
@@ -23,6 +24,7 @@ import type { ContactRoute } from './codexEvents'
 import { CODEX_SECTION, oreDiscoveriesOf, withOreDiscoveries } from './codexSection'
 import { contactKeysOf } from './contactKeys'
 import { recordIdContacts } from './idRecords'
+import { materialKeysOf } from './materialKeys'
 import { oreNamed } from './oreBits'
 import { recordOreTouches, type OreTouch } from './oreRecords'
 
@@ -41,6 +43,7 @@ function recordDiscoveriesHeard(
   return chainEffects(after, [
     (current) => recordOreTouchesFor(current, playerId, oreTouchesOf(before, heard)),
     (current) => recordContactsFor(current, playerId, contactKeysOf(before, after, heard)),
+    (current) => recordContactsFor(current, playerId, materialKeysOf(before, heard)),
   ])
 }
 

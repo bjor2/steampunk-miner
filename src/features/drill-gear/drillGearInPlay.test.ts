@@ -164,7 +164,8 @@ describe('drill-gear sampling corer', () => {
     expect(chargesLeftOf(session.state(), 'p1', CORER)).toBe(3)
   })
 
-  // #243: the plug is the kernel's OreSampled, which the codex hears as first contact.
+  // #243: the plug is the kernel's OreSampled, which the codex hears as first contact, of the ore
+  // and of the cell's species (ticket 546).
   it("records the plugged ore as codex contact via the corer, and the plug's ore stays unmined", () => {
     const session = sessionWith({ 'drill.collar': CORER }, ABOVE_ORE, FACING.down)
     session.submit(2, press('drill.collar'))
@@ -174,6 +175,7 @@ describe('drill-gear sampling corer', () => {
     expect(ofType(events, 'codex.OreContacted')).toMatchObject([{ tick: 8, oreId, via: 'corer' }])
     expect(ofType(events, 'codex.EntryAdded')).toMatchObject([
       { playerId: 'p1', key: `ore:${oreId}`, stage: 'contacted' },
+      { playerId: 'p1', key: expect.stringMatching(/^material:/), stage: 'contacted' },
     ])
     expect(ofType(events, 'codex.OreDiscovered')).toEqual([])
   })
