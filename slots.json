@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-10-18T18:18:21+01:00",
+  "updated_at": "2026-10-18T18:19:04+01:00",
   "caps": {
     "grok": 12,
     "claude": 10,
@@ -536,30 +536,6 @@
     "mode": "on",
     "parallel": 1,
     "list": [
-      {
-        "number": 534,
-        "key": "302-10B",
-        "map": 302,
-        "lane": "remote",
-        "mode": "solo",
-        "state": "running",
-        "tickets": [
-          449,
-          450,
-          452,
-          451,
-          546,
-          454
-        ],
-        "done": [
-          449,
-          450,
-          452,
-          451,
-          546
-        ],
-        "live": 0
-      },
       {
         "number": 525,
         "key": "316-4A",
