@@ -44,6 +44,7 @@ import {
   stateAtCutStart,
   type BenchRig,
 } from './bench/reportPoseRigs'
+import { devFlagSetLine, refuseTaintedRuns } from '../src/logging/devFlagReport'
 
 loadFeatures()
 
@@ -83,6 +84,7 @@ function legsAt(rig: BenchRig, width: number, sideCells: number, speedMps: numbe
 /** The legs timed in turn, rep by rep, so load on the box falls on every leg alike. */
 function benchInterleaved(legs: readonly Leg[]): LegRun[] {
   const start = stateAtCutStart(legs[0].rig)
+  refuseTaintedRuns('bench:report-pose', [{ label: 'the paired legs', state: start }])
   const warm = legs.map((leg) => driveLeg(leg, start, TICKS, true))
   const reps = Array.from({ length: REPS }, () =>
     legs.map((leg) => driveLeg(leg, start, TICKS, false)),
@@ -192,3 +194,6 @@ logBenchmarkSeriesWhenAsked(
   'report-pose',
   runs.map(({ leg, run }) => ({ name: seriesNameOf(leg), planet: 1, timesMs: run.tickMs })),
 )
+
+// The flag set the bench ran with (ticket 547): every bench report prints it.
+console.log(devFlagSetLine([]))

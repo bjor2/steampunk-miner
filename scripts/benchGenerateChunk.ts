@@ -10,6 +10,7 @@ import { generateChunk } from '../src/systems/world/generateChunk'
 import { freshPlanetParamsFor, type PlanetParams } from '../src/systems/world/planetParams'
 import { chunkRangeOfDisc } from '../src/systems/world/tileGrid'
 import { logBenchmarkSeriesWhenAsked } from './bench/benchRunLog'
+import { devFlagSetLine } from '../src/logging/devFlagReport'
 
 loadFeatures()
 
@@ -57,3 +58,6 @@ function benchPlanet(planetIndex: number): BenchmarkSeries {
 }
 
 logBenchmarkSeriesWhenAsked('world', PLANETS.map(benchPlanet))
+
+// The flag set the bench ran with (ticket 547): every bench report prints it.
+console.log(devFlagSetLine([]))

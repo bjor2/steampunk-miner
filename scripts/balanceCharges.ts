@@ -94,6 +94,8 @@ import {
   chargeSharePayoffTable,
   lowBandsWithDynamiteCells,
 } from '../src/logging/chargeSharePayoffReport'
+import { devFlagSectionOf, flaggedRunsOf } from '../src/logging/devFlagReport'
+import { devFlagFieldsOf, type CarriesDevFlags } from '../src/systems/authority/devFlagState'
 import { playLoggedSlice } from '../src/logging/sliceRunLog'
 import { blastTradeOf, type BlastTrade } from '../src/systems/bot/blastTrade'
 import type { ChargePolicy } from '../src/systems/bot/botCharges'
@@ -231,6 +233,10 @@ const text = [
   `Each seed's longest run of dynamite-act planets in a row with no dynamite cells (flagged past ${MAX_DRY_RUN} as data for Systems):`,
   dryRunTableOf(dryRuns),
   `### Warnings\n\n${warnings.length === 0 ? 'none' : warnings.map((line) => `- ${line}`).join('\n')}`,
+  devFlagSectionOf('balance:charges', [
+    ...flaggedRunsOf('blasting', blasting.runs),
+    ...flaggedRunsOf('drilling', drilling.runs),
+  ]),
 ].join('\n\n')
 
 mkdirSync(REPORT_FOLDER, { recursive: true })
@@ -278,6 +284,8 @@ interface PolicyRuns {
   routeBlocks: (readonly GateRouteBlock[])[]
   /** Per seed, in seed order: where and when each extractor was bought. */
   extractorPurchases: Map<string, ExtractorPurchase>[]
+  /** Per seed: the run's dev flag fields alone, for the taint check (ticket 547). */
+  runs: { worldSeed: number; run: { state: CarriesDevFlags } }[]
 }
 
 /** The extractors as the mining-gates debug action describes them. */
@@ -436,6 +444,7 @@ function playTo(chargePolicy: ChargePolicy): PolicyRuns {
       gateClears: gateClearsByPlanet(events),
       routeBlocks: run.gateRouteBlocks,
       extractorPurchases: extractorPurchasesOf(events, EXTRACTORS),
+      flags: { worldSeed, run: { state: devFlagFieldsOf(run.state) } },
     }
   })
   return {
@@ -444,6 +453,7 @@ function playTo(chargePolicy: ChargePolicy): PolicyRuns {
     gateClears: runs.map((run) => run.gateClears),
     routeBlocks: runs.map((run) => run.routeBlocks),
     extractorPurchases: runs.map((run) => run.extractorPurchases),
+    runs: runs.map((run) => run.flags),
   }
 }
 

@@ -1,12 +1,20 @@
 /**
  * `metadata.json` of a run (design doc section 24, decision #11 section 1): every version a
  * comparison or replay must match, the build, the seed and whether debug was enabled or used,
- * and whether the seed's planet 1 needed the dock-guaranteed ore patch (#42).
+ * and whether the seed's planet 1 needed the dock-guaranteed ore patch (#42). A run whose session
+ * had dev flags set says so (ticket 547): `flagsDelta` while any flag is off its default and
+ * `devFlagsEverSet` from the first `debug.setFlags`, both absent until then, so no gate reads a
+ * tainted run as evidence (`devFlagReport.ts`).
  */
 import { ENERGY_QUANTA_PER_UNIT } from '../constants/balance'
 import { AUTHORITY_PROTOCOL_VERSION } from '../systems/authority/authorityCommand'
 import { GENERATOR_VERSION } from '../systems/generatorVersion'
 import { NUMBER_FORMAT_VERSION } from '../systems/money'
+import {
+  devFlagFieldsOf,
+  type CarriesDevFlags,
+  type DevFlagDelta,
+} from '../systems/authority/devFlagState'
 import { planetParamsOf } from '../systems/authority/planetOfState'
 import { dockGuaranteeCount } from '../systems/world/dockGuarantee'
 import { LOG_SCHEMA_VERSION } from './runEvent'
@@ -27,6 +35,10 @@ export interface RunMetadata {
   /** At least one `debug.*` command was accepted (#11 section 4); never reset within a run. */
   debugApplied: boolean
   players: number
+  /** The authority dev flags off their shipped defaults (ticket 547); absent while none is. */
+  flagsDelta?: DevFlagDelta
+  /** A `debug.setFlags` was accepted in the session, even if flipped back (ticket 547). */
+  devFlagsEverSet?: true
   /** #42 `patch_dock_guaranteed`: 1 when planet 1 of this seed got the dock patch, else 0. */
   patchDockGuaranteed: number
   /** ISO 8601, UTC. */
@@ -62,4 +74,23 @@ export function createRunMetadata(facts: RunFacts): RunMetadata {
 function dockGuaranteeOfSeed(worldSeed: number): number {
   const params = planetParamsOf({ index: 1, seed: worldSeed })
   return params === null ? 0 : dockGuaranteeCount(params)
+}
+
+/** The header's dev flag fields from the session's state: each absent while unset (ticket 547). */
+export function runFlagFieldsOf(
+  state: CarriesDevFlags,
+): Pick<RunMetadata, 'flagsDelta' | 'devFlagsEverSet'> {
+  const { devFlagDelta, devFlagsEverSet } = devFlagFieldsOf(state)
+  return {
+    ...(devFlagDelta === undefined ? {} : { flagsDelta: devFlagDelta }),
+    ...(devFlagsEverSet === undefined ? {} : { devFlagsEverSet }),
+  }
+}
+
+/** The header's dev flag fields read back as a session carries them, for the taint checks. */
+export function devFlagsOfRun(metadata: Partial<RunMetadata>): CarriesDevFlags {
+  return devFlagFieldsOf({
+    devFlagDelta: metadata.flagsDelta,
+    devFlagsEverSet: metadata.devFlagsEverSet === true ? true : undefined,
+  })
 }

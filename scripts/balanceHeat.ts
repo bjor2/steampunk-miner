@@ -24,6 +24,7 @@ import {
 import { formatHeatPlanetLines, heatPlanetLines } from '../src/logging/heatReport'
 import { derivePacingReport } from '../src/logging/pacingReport'
 import { reportRowLines } from '../src/logging/reportRows'
+import { devFlagSectionOf, flaggedRunsOf } from '../src/logging/devFlagReport'
 import { playLoggedSliceOnSeeds } from '../src/logging/sliceRunLog'
 import type { Scenario } from '../src/systems/scenario'
 
@@ -78,6 +79,7 @@ const text = [
       .map((row) => `- ${row}`)
       .join('\n') || 'none'
   }`,
+  devFlagSectionOf('balance:heat', flaggedRunsOf('bot-slice', runs)),
 ].join('\n\n')
 
 mkdirSync(REPORT_FOLDER, { recursive: true })

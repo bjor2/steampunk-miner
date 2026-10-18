@@ -27,6 +27,7 @@ import { groundReaderOf } from '../src/systems/world/groundReader'
 import type { PlanetParams } from '../src/systems/world/planetParams'
 import { currentDensityOfChunk, materialCellsOfChunk } from '../src/systems/world/worldState'
 import { logBenchmarkSeriesWhenAsked } from './bench/benchRunLog'
+import { devFlagSetLine } from '../src/logging/devFlagReport'
 
 loadFeatures()
 
@@ -184,3 +185,6 @@ logBenchmarkSeriesWhenAsked('ground', [
   { name: 'groundDrilling.carveAndRemesh', planet: 1, timesMs: carveAndRemesh },
   { name: 'groundDrilling.terrainFrame', planet: 1, timesMs: timings.frameMs },
 ])
+
+// The flag set the bench ran with (ticket 547): every bench report prints it.
+console.log(devFlagSetLine([]))

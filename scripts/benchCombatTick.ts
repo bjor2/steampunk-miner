@@ -21,6 +21,7 @@ import { hullMax } from '../src/systems/economy/vehicleStats'
 import { toCanonical } from '../src/systems/money'
 import { FACING } from '../src/systems/vehicle/vehiclePose'
 import { logBenchmarkSeriesWhenAsked } from './bench/benchRunLog'
+import { devFlagSetLine } from '../src/logging/devFlagReport'
 
 loadFeatures()
 
@@ -77,3 +78,6 @@ function benchSixEnemies(): void {
 }
 
 benchSixEnemies()
+
+// The flag set the bench ran with (ticket 547): every bench report prints it.
+console.log(devFlagSetLine([]))

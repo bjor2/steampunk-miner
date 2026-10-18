@@ -15,6 +15,7 @@ import {
   refineGainByPlanet,
   refineryLeverFindings,
 } from '../src/logging/refineryReport'
+import { devFlagSectionOf, flaggedRunsOf } from '../src/logging/devFlagReport'
 import { playLoggedSlice } from '../src/logging/sliceRunLog'
 import type { RefineryUse } from '../src/systems/bot/botRefining'
 import type { Scenario } from '../src/systems/scenario'
@@ -71,6 +72,10 @@ const text = [
   ].join('\n'),
   `### Single-lever findings (#105)\n\n${[...unfinished, ...findings].length === 0 ? 'none' : [...unfinished, ...findings].map((line) => `- ${line}`).join('\n')}`,
   `### Realised refine gain per planet\n\n${formatRefineGain(refineGainByPlanet(refining.events))}`,
+  devFlagSectionOf('balance:refinery', [
+    ...flaggedRunsOf('refining', [refining]),
+    ...flaggedRunsOf('without', [without]),
+  ]),
 ].join('\n\n')
 
 mkdirSync(REPORT_FOLDER, { recursive: true })

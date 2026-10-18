@@ -12,6 +12,7 @@ import { TICKS_PER_SECOND } from '../src/constants/physics'
 import { loadFeatures } from '../src/features'
 import { deriveDiveSummaries, type DiveSummary } from '../src/logging/diveSummaries'
 import { derivePacingReport } from '../src/logging/pacingReport'
+import { devFlagSectionOf, flaggedRunsOf } from '../src/logging/devFlagReport'
 import { playLoggedSlice } from '../src/logging/sliceRunLog'
 import type { GunPolicy } from '../src/systems/bot/botGuns'
 import type { Scenario } from '../src/systems/scenario'
@@ -57,6 +58,10 @@ const text = [
           .map((row) => `- planet ${row.planet} moved ${percent(row.shiftPercent)} with the guns`)
           .join('\n')
   }`,
+  devFlagSectionOf('balance:guns', [
+    ...flaggedRunsOf('guns', [withGuns]),
+    ...flaggedRunsOf('no guns', [withoutGuns]),
+  ]),
 ].join('\n\n')
 
 mkdirSync(REPORT_FOLDER, { recursive: true })
@@ -65,8 +70,13 @@ console.log(text)
 if (process.env.GITHUB_STEP_SUMMARY) appendFileSync(process.env.GITHUB_STEP_SUMMARY, `${text}\n`)
 
 function playTo(lastPlanet: number, gunPolicy: GunPolicy) {
-  const { events } = playLoggedSlice(scenario, { lastPlanet, maxTicks: BUDGET_TICKS, gunPolicy })
+  const { events, run } = playLoggedSlice(scenario, {
+    lastPlanet,
+    maxTicks: BUDGET_TICKS,
+    gunPolicy,
+  })
   return {
+    run,
     pacing: derivePacingReport(events, scenario.worldSeed),
     dives: deriveDiveSummaries(events),
   }

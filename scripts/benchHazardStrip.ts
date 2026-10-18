@@ -29,6 +29,7 @@ import type { StripGround } from '../src/systems/render/hazardStrip/stripGround'
 import { freshPlanetParamsFor } from '../src/systems/world/planetParams'
 import { EMPTY_WORLD } from '../src/systems/world/worldState'
 import { logBenchmarkSeriesWhenAsked } from './bench/benchRunLog'
+import { devFlagSetLine } from '../src/logging/devFlagReport'
 
 loadFeatures()
 
@@ -117,3 +118,6 @@ logBenchmarkSeriesWhenAsked('strip', [
     timesMs: run.timesMs,
   })),
 ])
+
+// The flag set the bench ran with (ticket 547): every bench report prints it.
+console.log(devFlagSetLine([]))

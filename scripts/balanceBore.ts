@@ -14,6 +14,7 @@ import { appendFileSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs'
 import { PACING_WORLD_SEEDS } from '../src/constants/pacingSeeds'
 import { TICKS_PER_SECOND } from '../src/constants/physics'
 import { loadFeatures } from '../src/features'
+import { devFlagSectionOf, flaggedRunsOf } from '../src/logging/devFlagReport'
 import { deriveBoreReport, formatBoreReport, type BoreSeedRuns } from '../src/logging/boreReport'
 import { playLoggedSliceOnSeeds, type SeededSliceRun } from '../src/logging/sliceRunLog'
 import type { BorePolicy } from '../src/systems/bot/botBore'
@@ -40,6 +41,10 @@ const report = deriveBoreReport(pairedRuns(never, forced), LOCKED_SCHEDULE, last
 const text = [
   `## The bore gun against the pacing bot, planets 1 to ${lastPlanet}, never vs forced (gated)`,
   formatBoreReport(report),
+  devFlagSectionOf('balance:bore', [
+    ...flaggedRunsOf('never', never),
+    ...flaggedRunsOf('forced', forced),
+  ]),
 ].join('\n\n')
 
 mkdirSync(REPORT_FOLDER, { recursive: true })

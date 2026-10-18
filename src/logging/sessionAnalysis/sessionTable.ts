@@ -6,9 +6,12 @@
  * A session is read the way decision #11 tells a consumer to: one truncated final line is ignored
  * (crash safety), unknown events and fields are kept and never looked at, and a log written under
  * another `logSchemaVersion` is refused whole, as `compareRuns` refuses it, since no adapter exists.
- * Any other bad line refuses the session too: refused, never trimmed.
+ * Any other bad line refuses the session too: refused, never trimmed. So does a session whose
+ * `metadata.json` says dev flags were set in it (ticket 547): a tainted run is never perf evidence.
  */
+import { taintedRunProblems } from '../devFlagReport'
 import { parseNdjson } from '../ndjson'
+import { devFlagsOfRun, type RunMetadata } from '../runMetadata'
 import { hasTodaysEventLines, LOG_SCHEMA_VERSION, type RunEvent } from '../runEvent'
 
 /** One session folder as the collector found it on disk. */
@@ -76,7 +79,11 @@ export function sessionTableOf(files: readonly SessionFiles[]): SessionTable {
 
 function readSession(files: SessionFiles): SessionReading {
   const lines = readEventLines(files.eventsText)
-  const problems = [...lines.problems, ...schemaVersionProblems(lines.events)]
+  const problems = [
+    ...lines.problems,
+    ...schemaVersionProblems(lines.events),
+    ...devFlagProblemsOf(parseMetadata(files.metadataText)),
+  ]
   if (problems.length > 0) return { ok: false, refused: { folder: files.folder, problems } }
   return { ok: true, session: sessionLogOf(files, lines.events) }
 }
@@ -135,6 +142,22 @@ function sessionLogOf(files: SessionFiles, events: RunEvent[]): SessionLog {
 interface MetadataFields {
   buildCommit?: unknown
   worldSeed?: unknown
+  flagsDelta?: unknown
+  devFlagsEverSet?: unknown
+}
+
+function devFlagProblemsOf(metadata: MetadataFields): string[] {
+  const flags = devFlagsOfRun({
+    flagsDelta: isPlainObject(metadata.flagsDelta)
+      ? (metadata.flagsDelta as RunMetadata['flagsDelta'])
+      : undefined,
+    devFlagsEverSet: metadata.devFlagsEverSet === true ? true : undefined,
+  })
+  return taintedRunProblems([{ label: 'the session', state: flags }])
+}
+
+function isPlainObject(value: unknown): boolean {
+  return typeof value === 'object' && value !== null && !Array.isArray(value)
 }
 
 function parseMetadata(text: string | null): MetadataFields {

@@ -42,6 +42,7 @@ import { FACING } from '../src/systems/vehicle/vehiclePose'
 import { surfaceRowOfColumn, type TilePoint } from '../src/systems/world/tileGrid'
 import { generatedChunkOf } from '../src/systems/world/worldState'
 import { logBenchmarkSeriesWhenAsked } from './bench/benchRunLog'
+import { devFlagSetLine } from '../src/logging/devFlagReport'
 
 loadFeatures()
 
@@ -183,3 +184,6 @@ logBenchmarkSeriesWhenAsked('blast', [
   { name: 'liveBlast.tick', planet: 1, timesMs: alone },
   { name: 'liveBlast.sharedTick', planet: 1, timesMs: shared },
 ])
+
+// The flag set the bench ran with (ticket 547): every bench report prints it.
+console.log(devFlagSetLine([]))

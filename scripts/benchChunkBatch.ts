@@ -30,6 +30,7 @@ import { benchMagnetFieldsFrame } from './bench/magnetFieldsFrame'
 import { benchOverlayFrame } from './bench/overlayFrame'
 import { benchStreamAtSpeed } from './bench/streamAtSpeed'
 import { benchStreamThroughWorker } from './bench/streamThroughWorker'
+import { devFlagSetLine } from '../src/logging/devFlagReport'
 
 loadFeatures()
 
@@ -94,3 +95,6 @@ logBenchmarkSeriesWhenAsked('render', [
   ...benchStreamAtSpeed(WORLD_SEED),
   ...benchStreamThroughWorker(WORLD_SEED),
 ])
+
+// The flag set the bench ran with (ticket 547): every bench report prints it.
+console.log(devFlagSetLine([]))

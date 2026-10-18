@@ -49,6 +49,31 @@ describe('session table', () => {
     expect([second.commit, second.worldSeed]).toEqual(['abc1234', null])
   })
 
+  it('refuses a session whose metadata says dev flags were set, flipped back or not (ticket 547)', () => {
+    const lines = [gameStarted(GAME_RUN, 'abc1234')]
+    const flipped = sessionFilesOf('logs/f', lines, {
+      buildCommit: 'abc1234',
+      flagsDelta: { 'heat.workUncapped': false },
+      devFlagsEverSet: true,
+    })
+    const flippedBack = sessionFilesOf('logs/b', lines, { devFlagsEverSet: true })
+    const clean = sessionFilesOf('logs/c', lines, { buildCommit: 'abc1234' })
+    const table = sessionTableOf([flipped, flippedBack, clean])
+    expect(table.sessions.map((session) => session.folder)).toEqual(['logs/c'])
+    expect(table.refused).toEqual([
+      {
+        folder: 'logs/f',
+        problems: ['the session ran with dev flags set (heat.workUncapped off): not evidence'],
+      },
+      {
+        folder: 'logs/b',
+        problems: [
+          'the session ran with dev flags set (flipped back to the defaults): not evidence',
+        ],
+      },
+    ])
+  })
+
   it('names the commit unknown when neither the run nor its folder says it', () => {
     const files = sessionFilesOf('logs/x', [memoryLine(GAME_RUN, 0, 600)])
     expect(sessionTableOf([files]).sessions[0].commit).toBe('unknown')

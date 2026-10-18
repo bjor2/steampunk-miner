@@ -35,6 +35,7 @@ import {
   pacingVerdicts,
 } from '../src/logging/pacingReport'
 import { deriveSummary, formatRunSummary, type RunSummary } from '../src/logging/runSummary'
+import { devFlagSectionOf, flaggedRunsOf } from '../src/logging/devFlagReport'
 import { playLoggedSliceOnSeeds, type SeededSliceRun } from '../src/logging/sliceRunLog'
 import { deriveWreckerDives, wreckerDiveLines } from '../src/logging/wreckerDiveReport'
 import {
@@ -84,6 +85,7 @@ const report = [
   spreeSection(runs),
   comparisonSection(summary),
   assaySection(),
+  devFlagSectionOf('balance:report', flaggedRunsOf('bot-slice', runs)),
 ].join('\n\n')
 writeFileSync(new URL('report.md', REPORT_FOLDER), `${report}\n`)
 console.log(report)

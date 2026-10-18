@@ -38,6 +38,7 @@ import { NO_DRIVE } from '../src/systems/vehicle/driveSigns'
 import { FACING, noseTileOf, type VehiclePose } from '../src/systems/vehicle/vehiclePose'
 import { cellDensitySum } from '../src/systems/world/cellYield'
 import { logBenchmarkSeriesWhenAsked } from './bench/benchRunLog'
+import { devFlagSetLine } from '../src/logging/devFlagReport'
 
 loadFeatures()
 
@@ -218,3 +219,6 @@ logBenchmarkSeriesWhenAsked('drill-step', [
     timesMs,
   })),
 ])
+
+// The flag set the bench ran with (ticket 547): every bench report prints it.
+console.log(devFlagSetLine([]))

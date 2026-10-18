@@ -16,7 +16,7 @@ import {
 import { writeRunMetadata, writeRunSummary } from './logging/runDocuments'
 import { createRunId } from './logging/runLayout'
 import { createRunLog, getRunLog, installRunLog } from './logging/runLog'
-import { createRunMetadata } from './logging/runMetadata'
+import { createRunMetadata, runFlagFieldsOf } from './logging/runMetadata'
 import { createRunProgressSink, type RunProgressSink } from './logging/runProgress'
 import { watchRapierWasmMemory } from './physics/rapierWasmMemory'
 import { requestCanvasScreenshot } from './scene/canvasScreenshots'
@@ -30,6 +30,7 @@ import {
   type CheckpointLoad,
   type SaveFolderInstall,
 } from './store/checkpoint'
+import { readAuthorityState } from './store/authorityLink'
 import { runEventPlaceOf, useGameStore } from './store/gameStore'
 import type { SaveFolder } from './store/saveFolder'
 import { installSaveTransfer } from './store/saveKeepingSlice'
@@ -305,6 +306,7 @@ function writeMetadata(shell: Shell, run: RunFiles): void {
     platform: shell.kind,
     debugEnabled: shell.launch.debugEnabled,
     debugApplied: game.debugApplied,
+    ...runFlagFieldsOf(readAuthorityState()),
     players: 1,
     startTime: run.startedAt.toISOString(),
     endTime: null,

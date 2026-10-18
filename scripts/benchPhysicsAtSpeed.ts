@@ -25,6 +25,7 @@ import { planetParamsFor } from '../src/systems/world/planetParams'
 import { chunkKey } from '../src/systems/world/tileGrid'
 import { EMPTY_WORLD, type WorldState } from '../src/systems/world/worldState'
 import { logBenchmarkSeriesWhenAsked } from './bench/benchRunLog'
+import { devFlagSetLine } from '../src/logging/devFlagReport'
 
 loadFeatures()
 await RAPIER.init()
@@ -107,3 +108,6 @@ logBenchmarkSeriesWhenAsked(
   'physics-speed',
   runs.map(({ speed, timesMs }) => ({ name: `physicsTick.${speed}`, planet: 1, timesMs })),
 )
+
+// The flag set the bench ran with (ticket 547): every bench report prints it.
+console.log(devFlagSetLine([]))

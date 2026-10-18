@@ -19,6 +19,7 @@ import {
 } from '../src/logging/pacingReport'
 import { deriveSummary } from '../src/logging/runSummary'
 import { formatSawtoothSeedTable, sawtoothMisses } from '../src/logging/sawtoothMedian'
+import { devFlagSectionOf, flaggedRunsOf } from '../src/logging/devFlagReport'
 import { playLoggedSliceOnSeeds } from '../src/logging/sliceRunLog'
 import type { Scenario } from '../src/systems/scenario'
 import { SAWTOOTH_BAND } from '../src/systems/vehicle/bandDig'
@@ -65,6 +66,7 @@ const text = [
   `### Band ${SAWTOOTH_BAND} dig time, world seed ${scenario.worldSeed}\n\n${formatBandDigTable(summary.sawtoothBandDigTicks, SAWTOOTH_BAND)}`,
   `### Band ${FIRST_BAND} dig time, world seed ${scenario.worldSeed} (reported, not judged)\n\n${formatBandDigTable(summary.firstBandDigTicks, FIRST_BAND)}`,
   `### Warnings\n\n${alerts.length === 0 ? 'none' : alerts.map((line) => `- ${line}`).join('\n')}`,
+  devFlagSectionOf('balance:planets', flaggedRunsOf('bot-slice', runs)),
 ].join('\n\n')
 
 mkdirSync(REPORT_FOLDER, { recursive: true })
