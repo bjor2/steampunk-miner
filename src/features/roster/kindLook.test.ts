@@ -29,7 +29,9 @@ import { MATERIALS } from '../materials'
 import { ORE_ROWS, rarityTiers } from '../ores'
 import { NAMED_SEEDS } from './rosterFixtures'
 import { renderStateDigestOf } from './renderStateFixtures'
+import { actOf } from '../planet-mix'
 import {
+  heroAtlasOfPlanet,
   planetKindLooksOf,
   rarityLooksByLead,
   ROSTER_KIND_LOOK,
@@ -217,5 +219,32 @@ describe('roster kind looks', () => {
     const digest = renderStateDigestOf(freshPlanetParamsFor(SEED, 1))
     expect(digest.drawn).toBe(MAIN_DRAWN_DIGESTS[`${SEED} 1`])
     expect(digest.kindSlots.some((slot) => slot !== NO_KIND_SLOT)).toBe(true)
+  })
+})
+
+describe('roster hero atlases (ticket 451)', () => {
+  it("hands P1 its act's atlas, and P2 to P7 one shared atlas object", () => {
+    expect(heroAtlasOfPlanet(1)?.id).toBe('foothold.base')
+    const heavy = heroAtlasOfPlanet(2)
+    expect(heavy?.id).toBe('foothold.heavy')
+    expect([3, 4, 5, 6, 7].every((planet) => heroAtlasOfPlanet(planet) === heavy)).toBe(true)
+  })
+
+  it('hands an act with no hero art no atlas, so its heroes draw the shader look', () => {
+    expect(actOf(8).id).toBe('fire')
+    expect(heroAtlasOfPlanet(8)).toBe(null)
+  })
+
+  it("gives every hero of the P1 and P2 rosters a cell of its planet's atlas", () => {
+    for (const planet of [1, 2]) {
+      const cells = heroAtlasOfPlanet(planet)?.cells ?? []
+      const heroes = shownLooks(freshPlanetParamsFor(SEED, planet)).filter((look) => look.isHero)
+      expect(heroes.length, `planet ${planet}`).toBeGreaterThan(0)
+      expect(heroes.filter((look) => !cells.includes(look.speciesId))).toEqual([])
+    }
+  })
+
+  it('names the atlases through the registered look provider', () => {
+    expect(kindLookProvider()?.heroAtlasOf(1)).toBe(ROSTER_KIND_LOOK.heroAtlasOf(1))
   })
 })

@@ -1,0 +1,23 @@
+{
+  "$comment": "The per-act hero atlases (ticket 451; TD shape 6226270701 '#451 shape'): one albedo-only KTX2 of 16 cells per act, its cells in the order docs/art/ore-heroes/hero-cells.json packs them (#452). P1 (foothold.base) and P2 (foothold.heavy) draw the legacy pool, so both acts hold its four heroes. An act with no row, and a hero with no cell, draws the shader look.",
+  "atlases": [
+    {
+      "act": "foothold.base",
+      "cells": [
+        "violet-fluorite-quartzine",
+        "vein-gold-brassvein",
+        "blue-corundum-quartzine",
+        "red-beryl-quartzine"
+      ]
+    },
+    {
+      "act": "foothold.heavy",
+      "cells": [
+        "violet-fluorite-quartzine",
+        "vein-gold-brassvein",
+        "blue-corundum-quartzine",
+        "red-beryl-quartzine"
+      ]
+    }
+  ]
+}

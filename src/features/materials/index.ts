@@ -28,3 +28,11 @@ export {
 export type { MaterialRarityLook } from './systems/render/rarityLooks'
 export { FRAMED_RARITIES, RARITY_LOOKS, rarityLookProblems } from './systems/render/rarityLooks'
 export { hueSlotColourOf } from './systems/render/hueSlotColour'
+/** The per-act hero atlases (ticket 451): which hero species each act's atlas holds, by cell. */
+export {
+  HERO_ATLASES,
+  heroAtlasArtAssets,
+  heroAtlasAssetIdOf,
+  heroAtlasOfAct,
+  heroAtlasRowProblems,
+} from './systems/render/heroAtlases'

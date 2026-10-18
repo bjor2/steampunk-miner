@@ -4,8 +4,11 @@
  * the look table stays empty and the terrain draws as it did before materials. Render-only: the
  * looks are a pure read of the planet, so a chunk is rebuilt only when its cells change, and what
  * the player has seen is asked only when the table is rewritten, never per tile or per frame.
+ * The provider also names each act's hero atlas (ticket 451): its asset and the species of each
+ * cell; with none, every hero draws its procedural look.
  */
 import type { AuthorityState } from '../authority/authorityState'
+import type { HeroAtlasCells } from '../render/heroAtlas'
 import type { KindLook, RarityLook } from '../render/kindLookTable'
 import type { PlanetParams } from '../world/planetParams'
 import { defineOneProviderRegistry, entriesOf } from './seal'
@@ -21,6 +24,11 @@ export interface KindLookProvider {
    * condition a on #450): an unseen kind draws the family look with no rarity tint or frame.
    */
   hasSeenKind(state: AuthorityState, playerId: string, speciesId: string): boolean
+  /**
+   * The atlas of the act holding the planet, or null; the same object for every planet of one act,
+   * so a planet change inside an act swaps nothing (TD shape 6226270701, "#451 shape" item 4).
+   */
+  heroAtlasOf(planetIndex: number): HeroAtlasCells | null
 }
 
 export const KIND_LOOK_REGISTRY = defineOneProviderRegistry<KindLookProvider>('kindLook')

@@ -10,14 +10,19 @@
  * asked through the kernel's discovery query under the key `material:<species id>`. Nothing
  * records that key yet, so in play every kind draws the family look until a sighting record
  * lands; the debug API can show every kind for eye checks and the frame A/B.
+ *
+ * Heroes (ticket 451): the atlas of the planet's act, from the materials slice, one object per
+ * act, so the terrain swaps it only when a planet change crosses into another act.
  */
 import type { AuthorityState } from '../../../../systems/authority/authorityState'
 import { hasDiscovered, type DiscoveryFallback } from '../../../../systems/registries/discovery'
 import type { KindLookProvider } from '../../../../systems/registries/kindLook'
+import type { HeroAtlasCells } from '../../../../systems/render/heroAtlas'
 import type { KindLook, RarityLook } from '../../../../systems/render/kindLookTable'
 import type { PlanetParams } from '../../../../systems/world/planetParams'
 import {
   FRAMED_RARITIES,
+  heroAtlasOfAct,
   hueSlotColourOf,
   MATERIALS,
   RARITY_LOOKS,
@@ -25,6 +30,7 @@ import {
   type MaterialTable,
 } from '../../../materials'
 import { rarityTiers } from '../../../ores'
+import { actOf } from '../../../planet-mix'
 import { planetRosterOf } from '../planetRoster'
 import { planetSpeciesOf } from '../planetSpecies'
 
@@ -50,6 +56,12 @@ export const ROSTER_KIND_LOOK: KindLookProvider = {
   kindLooksOf: planetKindLooksOf,
   rarityLooks: rarityLooksByLead,
   hasSeenKind: hasMetSpecies,
+  heroAtlasOf: heroAtlasOfPlanet,
+}
+
+/** The atlas of the act holding the planet; null where the act has none. */
+export function heroAtlasOfPlanet(planetIndex: number): HeroAtlasCells | null {
+  return heroAtlasOfAct(actOf(planetIndex).id)
 }
 
 /** By roster index, slot 1 first; null where the planet's pool binds no species to the slot. */

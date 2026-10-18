@@ -4,7 +4,8 @@
  * The meshes sit at their chunk corners under the world root; the shader learns the render origin
  * (ticket 339), so a moved origin rebuilds none of them. The chunk worker (ticket 337) lives as long
  * as the pool and builds its meshes' parts off the main thread. A GPU short of the full terrain
- * program (ticket 477) draws the lite one, which never loads the strata maps.
+ * program (ticket 477) draws the lite one, which never loads the strata maps; only a GPU the probe
+ * gives the 16th unit loads the per-act hero atlas (ticket 451).
  */
 import { useFrame, useThree } from '@react-three/fiber'
 import { useEffect, useMemo, useRef } from 'react'
@@ -22,11 +23,13 @@ import { motionPresence } from './motionPresence'
 import { renderPresence } from './renderPresence'
 import { GroundStrata } from './GroundStrata'
 import { HeatTiles } from './HeatTiles'
+import { HeroAtlas } from './HeroAtlas'
 import { isHeatPlanet } from '../systems/economy/heatEconomy'
-import { terrainProgramOf } from '../systems/render/gpuTier'
+import { heroAtlasUnitOf, terrainProgramOf } from '../systems/render/gpuTier'
 import { readGpuCapabilities } from './gpuCapabilities'
 import { createTerrainMaterial, lightTerrain, type TerrainLight } from './terrainMaterial'
 import { fitTerrainToOrigin } from './terrainOrigin'
+import { noteHeroAtlasUnit } from './terrainHeroAtlas'
 import { renderOriginPresence } from './renderOriginPresence'
 import { fitGateTintToPlanet } from './terrainGateTint'
 import { fitGateToViewer } from './terrainGateViewer'
@@ -40,11 +43,14 @@ export function PlanetTerrain() {
   const pool = useRef<ChunkMeshPool | null>(null)
   const gl = useThree((state) => state.gl)
   const program = useMemo(() => terrainProgramOf(readGpuCapabilities(gl)), [gl])
-  const material = useMemo(() => createTerrainMaterial(program), [program])
+  const heroAtlas = useMemo(() => heroAtlasUnitOf(readGpuCapabilities(gl)), [gl])
+  const material = useMemo(() => createTerrainMaterial(program, heroAtlas), [program, heroAtlas])
   // Reused every frame, so the frame loop allocates nothing.
   const view = useMemo(createTerrainViewScratch, [])
   const light = useMemo(createTerrainLightScratch, [])
   const isHeatPlanetNow = useGameStore((state) => isHeatPlanet(state.planetTier))
+
+  useEffect(() => noteHeroAtlasUnit(heroAtlas), [heroAtlas])
 
   useEffect(() => {
     if (group.current === null) return
@@ -83,6 +89,7 @@ export function PlanetTerrain() {
   return (
     <group ref={group}>
       {program === 'full' && <GroundStrata material={material} />}
+      {heroAtlas === 'sampled' && <HeroAtlas material={material} />}
       <HeatTiles material={material} isHeatPlanet={isHeatPlanetNow} />
     </group>
   )
