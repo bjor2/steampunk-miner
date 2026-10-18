@@ -6,7 +6,7 @@
  * departure against the planet itself. Printed beside each seed's band-5 ratio; reported only.
  */
 import type { UpgradeId } from '../systems/economy/economyDefinition'
-import { majorOf } from '../systems/economy/upgradeSteps'
+import { levelOfStep } from '../systems/economy/upgradeSteps'
 import { onCurveLevel } from '../systems/economy/vehicleStats'
 import type { LoggedLevels, PlanetLevels } from './bandDigReport'
 
@@ -23,9 +23,12 @@ export function drillLeadsText(levels: PlanetLevels, planet: string): string {
   return `drill ${lead('drill_power')}, tip ${lead('drill_tip')}`
 }
 
-/** In major levels: the logged levels are steps (#180), the lead caps count majors. */
+/**
+ * In the track's levels: the logged levels are steps (#180), the lead caps count majors of the
+ * tip and purchases of drill power (#552).
+ */
 function leadOf(levels: LoggedLevels, track: UpgradeId, onCurvePlanet: number): number {
-  return majorOf(levels[track] ?? 0) - onCurveLevel(track, onCurvePlanet)
+  return levelOfStep(track, levels[track] ?? 0) - onCurveLevel(track, onCurvePlanet)
 }
 
 function signed(lead: number): string {

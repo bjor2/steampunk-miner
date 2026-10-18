@@ -74,17 +74,18 @@ describe('sawtooth on the median of the pacing seeds (#86)', () => {
         '| planet | seed 11 | seed 22 | median |',
         '| --- | --- | --- | --- |',
         '| 1 | 0.60x | 0.80x | 0.80x |',
-        '| 2 | 0.50x (drill -13/-19, tip -7/-10) | - | 0.50x |',
+        '| 2 | 0.50x (drill -12/-15, tip -7/-10) | - | 0.50x |',
       ].join('\n'),
     )
   })
 
   it('prints the drill and tip leads on arrival and at departure beside a seed ratio', () => {
-    // On curve, planet 3 is left with drill_power 25 and drill_tip 13; planet 4 with 31 and 16.
-    // The logged levels are steps (#180): major 26 is step 260, and a pip short of 13 is 129.
+    // On curve, planet 3 is left with drill_power 18 and drill_tip 13; planet 4 with 21 and 16.
+    // The logged levels are steps (#180): drill power counts purchases (#552), the tip majors, so
+    // a pip short of tip major 13 is 129.
     const planetLevels = {
-      arrival: { '4': { drill_power: 260, drill_tip: 129 } },
-      departure: { '4': { drill_power: 325, drill_tip: 180 } },
+      arrival: { '4': { drill_power: 19, drill_tip: 129 } },
+      departure: { '4': { drill_power: 22, drill_tip: 180 } },
     }
     const runs = [seedRun(5, { '4': { arrival: 41, departure: 24 } }, 5, planetLevels)]
     expect(formatSawtoothSeedTable(runs).split('\n')[2]).toBe(

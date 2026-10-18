@@ -14,8 +14,6 @@ import {
 import { LOG_SCHEMA_VERSION, type RunEvent } from './runEvent'
 
 const WORLD_SEED = 83921
-const MAJOR = 10
-
 function line<N extends RunEventName>(
   tick: number,
   event: N,
@@ -36,15 +34,16 @@ function line<N extends RunEventName>(
   } as RunEvent
 }
 
-const drillBuy = (tick: number, toMajor: number) =>
+/** A drill power purchase to `toLevel`, its stored step: one purchase each since #552. */
+const drillBuy = (tick: number, toLevel: number) =>
   line(tick, 'upgrade_purchased', {
     upgradeId: 'drill_power',
     kind: 'vertical',
-    fromLevel: toMajor * MAJOR - 1,
-    toLevel: toMajor * MAJOR,
+    fromLevel: toLevel - 1,
+    toLevel,
     cost: '1e+1',
     costCurveId: 'cost.vehicle.drill_power',
-    totalLevel: toMajor * MAJOR,
+    totalLevel: toLevel,
     visualTier: 1,
     statsAfter: {},
   })
@@ -91,9 +90,9 @@ function paceOf(
 }
 
 describe('planet 1 drill pace (ticket 396)', () => {
-  it('reads band 1 of planet 1 at the drill power of the major, 1.5 cells/s at the start', () => {
-    expect(bandOneCellsPerSecond(levelsWithDrillMajor(0))).toBe(1.5)
-    expect(bandOneCellsPerSecond(levelsWithDrillMajor(10))).toBeCloseTo(
+  it('reads band 1 of planet 1 at the drill power of the level, 1.5 cells/s at the start', () => {
+    expect(bandOneCellsPerSecond(levelsWithDrill(0))).toBe(1.5)
+    expect(bandOneCellsPerSecond(levelsWithDrill(10))).toBeCloseTo(
       Number(toFixedText(drillPower(10), 6)),
       1,
     )
@@ -117,8 +116,8 @@ describe('planet 1 drill pace (ticket 396)', () => {
     expect(pace).toEqual(
       paceOf(
         1.5,
-        bandOneCellsPerSecond(levelsWithDrillMajor(10)),
-        bandOneCellsPerSecond(levelsWithDrillMajor(17)),
+        bandOneCellsPerSecond(levelsWithDrill(10)),
+        bandOneCellsPerSecond(levelsWithDrill(17)),
       ),
     )
   })
@@ -128,7 +127,7 @@ describe('planet 1 drill pace (ticket 396)', () => {
       [drillBuy(10, 4), spanFromTileInBand(20, 2), drillBuy(30, 10), spanFromTileInBand(40, 3)],
       WORLD_SEED,
     )
-    expect(pace.bandThreeCellsPerSecond).toBe(bandOneCellsPerSecond(levelsWithDrillMajor(10)))
+    expect(pace.bandThreeCellsPerSecond).toBe(bandOneCellsPerSecond(levelsWithDrill(10)))
   })
 
   it('leaves both speeds open for a run that never dug to band 3 or left planet 1', () => {
@@ -162,9 +161,9 @@ describe('planet 1 drill pace (ticket 396)', () => {
   })
 })
 
-function levelsWithDrillMajor(major: number) {
+function levelsWithDrill(level: number) {
   return {
-    drill_power: major * MAJOR,
+    drill_power: level,
     drill_tip: 0,
     engine: 0,
     boiler: 0,

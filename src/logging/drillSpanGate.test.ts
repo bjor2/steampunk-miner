@@ -50,7 +50,7 @@ function sweepOntoTheGate(drillLines: DrillLines) {
       runLog.recordCommand({ playerId: 'p1', tick, seq, ...intent } as AuthorityCommand)
       recordDomainEventsTo(runLog, PLACE, session.submit(tick, intent), session.state())
     }
-    send(0, { type: 'debug.setUpgrade', payload: { upgradeId: 'drill_power', level: 200 } })
+    send(0, { type: 'debug.setUpgrade', payload: { upgradeId: 'drill_power', level: 12 } })
     send(0, { type: 'debug.setEnergy', payload: { energy: '100000' } })
     const { payload } = poseAbove({ tx: 0, ty: 0 }, FACING.down)
     send(0, { type: 'reportPose', payload: { ...payload, ...ABOVE } })
