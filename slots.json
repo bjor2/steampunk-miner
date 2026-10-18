@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-10-18T15:22:33+01:00",
+  "updated_at": "2026-10-18T15:26:55+01:00",
   "caps": {
     "grok": 12,
     "claude": 10,
@@ -19,11 +19,12 @@
       "slots": [
         {
           "slot": "C1",
-          "state": "free",
-          "ticket": null,
-          "grok_slot": null,
-          "kind": null,
-          "since": null
+          "state": "busy",
+          "ticket": 451,
+          "grok_slot": 1,
+          "kind": "dev",
+          "since": "2026-10-18T15:26:00+01:00",
+          "wave": "302-10B"
         },
         {
           "slot": "C2",
@@ -67,9 +68,9 @@
         }
       ],
       "size": 6,
-      "used": 0,
-      "free": 6,
-      "claims_last_hour": 3,
+      "used": 1,
+      "free": 5,
+      "claims_last_hour": 4,
       "name": "Claude Max 1"
     },
     {
@@ -355,9 +356,11 @@
   "grok": [
     {
       "slot": 1,
-      "state": "free",
-      "ticket": null,
-      "since": null
+      "state": "dev",
+      "ticket": 451,
+      "since": "2026-10-18T15:26:00+01:00",
+      "claude_slot": 1,
+      "wave": "302-10B"
     },
     {
       "slot": 2,
@@ -429,11 +432,12 @@
   "claude": [
     {
       "slot": 1,
-      "state": "free",
-      "ticket": null,
-      "grok_slot": null,
-      "since": null,
-      "account": 1
+      "state": "busy",
+      "ticket": 451,
+      "grok_slot": 1,
+      "since": "2026-10-18T15:26:00+01:00",
+      "account": 1,
+      "wave": "302-10B"
     },
     {
       "slot": 2,
@@ -518,8 +522,8 @@
   "totals": {
     "grok": {
       "size": 12,
-      "used": 0,
-      "dev": 0,
+      "used": 1,
+      "dev": 1,
       "dev_cap": 8,
       "planner": 0,
       "planner_cap": 4
@@ -527,8 +531,8 @@
     "claude": {
       "size": 10,
       "enabled": 10,
-      "used": 0,
-      "free": 10,
+      "used": 1,
+      "free": 9,
       "external": 0
     }
   },
@@ -542,7 +546,7 @@
         "map": 302,
         "lane": "remote",
         "mode": "solo",
-        "state": "paused",
+        "state": "running",
         "tickets": [
           449,
           450,
@@ -553,9 +557,10 @@
         ],
         "done": [
           449,
+          450,
           452
         ],
-        "live": 0
+        "live": 1
       },
       {
         "number": 525,
@@ -570,7 +575,8 @@
           545
         ],
         "done": [
-          537
+          537,
+          541
         ],
         "live": 0
       },
