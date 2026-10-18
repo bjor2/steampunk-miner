@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-10-18T20:18:08+02:00",
+  "updated_at": "2026-10-18T21:01:58+02:00",
   "caps": {
     "grok": 12,
     "claude": 10,
@@ -20,10 +20,10 @@
         {
           "slot": "C1",
           "state": "busy",
-          "ticket": 547,
+          "ticket": 548,
           "grok_slot": 1,
           "kind": "dev",
-          "since": "2026-10-18T20:17:00+02:00",
+          "since": "2026-10-18T21:01:00+02:00",
           "wave": "316-4A"
         },
         {
@@ -339,8 +339,8 @@
     {
       "slot": 1,
       "state": "dev",
-      "ticket": 547,
-      "since": "2026-10-18T20:17:00+02:00",
+      "ticket": 548,
+      "since": "2026-10-18T21:01:00+02:00",
       "claude_slot": 1,
       "wave": "316-4A"
     },
@@ -415,9 +415,9 @@
     {
       "slot": 1,
       "state": "busy",
-      "ticket": 547,
+      "ticket": 548,
       "grok_slot": 1,
-      "since": "2026-10-18T20:17:00+02:00",
+      "since": "2026-10-18T21:01:00+02:00",
       "account": 1,
       "wave": "316-4A"
     },
@@ -495,11 +495,11 @@
     }
   ],
   "last_refill": {
-    "at": "2026-10-18 19:59 CEST",
+    "at": "2026-10-18 21:01 CEST",
     "mode": "refill-dev",
-    "triggers": "claude-run:wave-plan",
-    "started": "",
-    "note": "no pickable build ticket"
+    "triggers": "#547",
+    "started": "#548->C1/A1",
+    "note": "spawned 1 worker(s)"
   },
   "totals": {
     "grok": {
@@ -534,7 +534,9 @@
           548,
           549
         ],
-        "done": [],
+        "done": [
+          547
+        ],
         "live": 1
       },
       {
