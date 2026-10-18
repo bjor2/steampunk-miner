@@ -7,6 +7,7 @@ import { kindLookProvider } from '../../systems/registries/kindLook'
 import { lumaOf } from '../../systems/render/colour'
 import {
   HERO_LOOK_FLAG,
+  KIND_LOOK_SLOTS,
   kindEntryOf,
   kindLookTableOf,
   LOOK_VECTOR,
@@ -25,7 +26,7 @@ import {
 } from '../../systems/world/worldCell'
 import { generateChunk } from '../../systems/world/generateChunk'
 import { MATERIALS } from '../materials'
-import { rarityTiers } from '../ores'
+import { ORE_ROWS, rarityTiers } from '../ores'
 import { NAMED_SEEDS } from './rosterFixtures'
 import { renderStateDigestOf } from './renderStateFixtures'
 import {
@@ -40,6 +41,9 @@ import {
 // a planet with no roster draws exactly what main drew.
 
 const [SEED, SECOND_SEED] = NAMED_SEEDS
+
+/** Every planet a species pool covers, P1 and P2 legacy, P3 to P7 the mixed pools (#453). */
+const POOLED_PLANETS = [...ORE_ROWS.kinds.poolByPlanet.keys()]
 
 /** Main's render-state digests at a157e171, before the kind look (renderStateFixtures.ts). */
 const MAIN_DRAWN_DIGESTS: Readonly<Record<string, string>> = {
@@ -79,6 +83,10 @@ function metSlice(speciesIds: readonly string[]): SliceDefinition {
 describe('roster kind looks', () => {
   beforeEach(() => resetGameStore())
 
+  it('holds a table slot for every kind a roster may hold', () => {
+    expect(KIND_LOOK_SLOTS).toBe(ORE_ROWS.kinds.rosterMaxKinds)
+  })
+
   it('registers as the kind look provider', () => {
     expect(kindLookProvider()?.id).toBe(ROSTER_KIND_LOOK.id)
   })
@@ -105,38 +113,39 @@ describe('roster kind looks', () => {
     })
   })
 
-  it('tells every two kinds of one family apart in at least two of silhouette, pattern and hue', () => {
-    const looks = [...shownLooks(), ...shownLooks(freshPlanetParamsFor(SEED, 2))]
-    const species = MATERIALS.materials
-    const familyOf = (look: KindLook) => species.find((row) => row.id === look.speciesId)?.family
-    const pairs = looks.flatMap((a, at) =>
-      looks
-        .slice(at + 1)
-        .filter((b) => b.speciesId !== a.speciesId && familyOf(a) === familyOf(b))
-        .map((b) => [a, b]),
-    )
-    expect(pairs.length).toBeGreaterThan(0)
-    for (const [a, b] of pairs)
-      expect(sharedKeysOf(a, b), `${a.speciesId} ${b.speciesId}`).toBeLessThanOrEqual(1)
-  })
+  it.each(POOLED_PLANETS)(
+    'tells every two kinds of one family apart in at least two of silhouette, pattern and hue (planet %i)',
+    (planetIndex) => {
+      const looks = shownLooks(freshPlanetParamsFor(SEED, planetIndex))
+      const species = MATERIALS.materials
+      const familyOf = (look: KindLook) => species.find((row) => row.id === look.speciesId)?.family
+      const pairs = looks.flatMap((a, at) =>
+        looks
+          .slice(at + 1)
+          .filter((b) => b.speciesId !== a.speciesId && familyOf(a) === familyOf(b))
+          .map((b) => [a, b]),
+      )
+      expect(pairs.length).toBeGreaterThan(0)
+      for (const [a, b] of pairs)
+        expect(sharedKeysOf(a, b), `${a.speciesId} ${b.speciesId}`).toBeLessThanOrEqual(1)
+    },
+  )
 
   it('keeps one look per species across bands and planets', () => {
-    const looksOn = (planetIndex: number, seed: number) =>
-      new Map(
-        shownLooks(freshPlanetParamsFor(seed, planetIndex)).map((look) => [
-          look.speciesId,
-          kindEntryOf(look),
-        ]),
-      )
-    const first = looksOn(1, SEED)
-    for (const [planetIndex, seed] of [
-      [1, SECOND_SEED],
-      [2, SEED],
-      [2, SECOND_SEED],
-    ]) {
-      for (const [id, entry] of looksOn(planetIndex, seed)) {
-        if (first.has(id)) expect(entry, id).toEqual(first.get(id))
+    const entriesById = new Map<string, number[][]>()
+    for (const seed of [SEED, SECOND_SEED]) {
+      for (const planetIndex of POOLED_PLANETS) {
+        for (const look of shownLooks(freshPlanetParamsFor(seed, planetIndex))) {
+          entriesById.set(look.speciesId, [
+            ...(entriesById.get(look.speciesId) ?? []),
+            kindEntryOf(look),
+          ])
+        }
       }
+    }
+    expect(entriesById.size).toBe(MATERIALS.materials.length)
+    for (const [id, [first, ...rest]] of entriesById) {
+      for (const entry of rest) expect(entry, id).toEqual(first)
     }
   })
 

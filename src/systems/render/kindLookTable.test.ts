@@ -60,7 +60,7 @@ describe('material look table', () => {
     expect(table.revealedSlots).toBe(1)
   })
 
-  it('holds at most 16 slots, so a slot past them draws the family look', () => {
+  it('holds at most 17 slots, so a slot past them draws the family look', () => {
     const looks = Array.from({ length: KIND_LOOK_SLOTS + 2 }, () => NUGGETS)
     const table = kindLookTableOf(looks, [], () => true)
     expect(table.kinds.length).toBe(KIND_LOOK_SLOTS * LOOK_VECTOR)
