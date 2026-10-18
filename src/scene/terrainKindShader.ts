@@ -6,7 +6,7 @@
  * uniform (`kindLookTable.ts`), never by a `#define`, so the program compiles once; the
  * catalogue they index (`kindLooks.json`) is written into the source as constant tables.
  *
- * A grain is one of five primitives with a signed edge distance in tiles, so the rarity frame is
+ * A grain is one of eight primitives with a signed edge distance in tiles, so the rarity frame is
  * the band just outside it. Rarity changes the tint, frame and glow only, never the silhouette;
  * with reduce motion (the shake switch, `uGateStill`) the glow holds at its mean and the frame
  * stays still. The lite program (ticket 477) leaves all of it out and draws the family look.
@@ -62,6 +62,19 @@ vec4 kindLookOf(float kindSlot) {
   return uKindLooks[at];
 }
 
+// A five-pointed star of outer radius size, its inner radius inner of it; near enough a distance
+// for a frame a pixel or two wide.
+float starDistance(vec2 q, float size, float inner) {
+  float spoke = abs(cos(atan(q.y, q.x) * 2.5));
+  return (length(q) - size * mix(inner, 1.0, spoke * spoke)) * 0.6;
+}
+
+// A triangle on its base, apex up the grain's y: extent.x half the base, extent.y half the height.
+float triangleDistance(vec2 q, vec2 extent, float shortSide) {
+  vec2 h = vec2(abs(q.x) / extent.x, q.y / extent.y);
+  return max((2.0 * h.x + h.y - 1.0) * 0.4472136, -h.y - 1.0) * shortSide;
+}
+
 // Signed distance in tiles from a grain's edge, below 0 inside, in the grain's own frame.
 float grainDistance(int primitive, vec2 q, float size, float aspect) {
   vec2 extent = vec2(size, size * aspect);
@@ -72,6 +85,9 @@ float grainDistance(int primitive, vec2 q, float size, float aspect) {
   if (primitive == KIND_DIAMOND) return (h.x + h.y - 1.0) * shortSide * 0.7;
   if (primitive == KIND_DISC) return (length(h) - 1.0) * shortSide;
   if (primitive == KIND_HEXAGON) return (max(h.x, h.y * 0.8660254 + h.x * 0.5) - 1.0) * shortSide;
+  if (primitive == KIND_RING) return abs(length(q) - size) - size * aspect * 0.5;
+  if (primitive == KIND_STAR) return starDistance(q, size, aspect);
+  if (primitive == KIND_TRIANGLE) return triangleDistance(q, extent, shortSide);
   return length(vec2(max(a.x - size, 0.0), a.y)) - size * aspect;
 }
 

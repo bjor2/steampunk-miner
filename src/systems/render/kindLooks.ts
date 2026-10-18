@@ -8,7 +8,17 @@
  */
 import lookFile from './kindLooks.json'
 
-export const KIND_PRIMITIVES = ['box', 'diamond', 'disc', 'hexagon', 'rod'] as const
+/** Appended only: the shader's primitive codes follow this order. */
+export const KIND_PRIMITIVES = [
+  'box',
+  'diamond',
+  'disc',
+  'hexagon',
+  'rod',
+  'ring',
+  'star',
+  'triangle',
+] as const
 export const KIND_LAYOUTS = ['scatter', 'row', 'stack'] as const
 export const PATTERN_PRIMITIVES = [
   'flat',
@@ -38,7 +48,10 @@ export interface KindSilhouette {
   count: number
   /** A grain's half-size, in tiles. */
   size: number
-  /** Height over width; a rod's thickness over its half-length. */
+  /**
+   * Height over width; a rod's thickness over its half-length, a ring's band over its radius, a
+   * star's inner radius over its outer one.
+   */
   aspect: number
   /** The largest turn a grain takes, as a share of a half turn. */
   turn: number
@@ -50,7 +63,7 @@ export interface KindPattern {
   primitive: PatternPrimitive
   /** Repeats a tile; a crust's width in tiles. */
   scale: number
-  /** The shade's swing either side of 1. */
+  /** The shade's swing either side of 1; below 0 it flips, so bright speckles become pits. */
   contrast: number
   /** Degrees, for the directed patterns (bands, gloss, fibres). */
   angle: number
@@ -64,6 +77,12 @@ export interface KindLookCatalogue {
 /** The code the shader reads for no species: the family look. */
 export const NO_KIND_LOOK_CODE = 0
 
+/**
+ * The thinnest stroke a grain may draw, in tiles: about 1.3 px at the 22 px a tile of a phone-size
+ * view, under which a ring or rod blurs into the ground (GD ruling 6226278574 item 3: every
+ * material stays clearly different at phone size; ticket 450's eye check at 40 and 22 px).
+ */
+export const MIN_STROKE_TILES = 0.06
 const SIZE_RANGE = [1 / 50, 2 / 5] as const
 const ASPECT_RANGE = [1 / 20, 4] as const
 const CONTRAST_MAX = 0.7
@@ -122,7 +141,26 @@ function silhouetteProblems(row: Raw, at: number): string[] {
     ...rangeProblems(row.size, SIZE_RANGE, `${where}.size`),
     ...rangeProblems(row.aspect, ASPECT_RANGE, `${where}.aspect`),
     ...rangeProblems(row.turn, [0, 1], `${where}.turn`),
+    ...strokeProblems(row, where),
   ]
+}
+
+function strokeProblems(row: Raw, where: string): string[] {
+  const isMeasurable = typeof row.size === 'number' && typeof row.aspect === 'number'
+  if (!isMeasurable || thinnestStrokeOf(row as unknown as KindSilhouette) >= MIN_STROKE_TILES) {
+    return []
+  }
+  return [`${where} draws a stroke under ${MIN_STROKE_TILES} tiles, lost at phone size`]
+}
+
+/**
+ * A grain's thinnest stroke in tiles, as the shader draws it: a rod's or a star's core is twice
+ * its aspect share of the size, a ring's band its aspect share, any other grain its short side.
+ */
+export function thinnestStrokeOf({ primitive, size, aspect }: KindSilhouette): number {
+  if (primitive === 'ring') return size * aspect
+  if (primitive === 'rod' || primitive === 'star') return 2 * size * aspect
+  return 2 * Math.min(size, size * aspect)
 }
 
 function patternProblems(row: Raw, at: number): string[] {
@@ -131,7 +169,7 @@ function patternProblems(row: Raw, at: number): string[] {
     ...idProblems(row, where),
     ...oneOfProblems(row.primitive, PATTERN_PRIMITIVES, `${where}.primitive`),
     ...(isPositive(row.scale) ? [] : [`${where}.scale must be above 0`]),
-    ...rangeProblems(row.contrast, [0, CONTRAST_MAX], `${where}.contrast`),
+    ...rangeProblems(row.contrast, [-CONTRAST_MAX, CONTRAST_MAX], `${where}.contrast`),
     ...rangeProblems(row.angle, [-ANGLE_MAX, ANGLE_MAX], `${where}.angle`),
   ]
 }

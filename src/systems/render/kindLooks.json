@@ -1,5 +1,5 @@
 {
-  "$comment": "The material silhouettes and patterns the terrain shader draws (ticket 450 under #139; TD shape 6226270701, GD ruling 6226278574: procedural, zero new samplers, chosen by uniform, never by #define). A species row of the materials slice names one silhouette and one pattern by id; the shader draws it by its position here plus one. Silhouette: `count` grains of `primitive` (box, diamond, disc, hexagon, rod) of half-size `size` tiles, `aspect` the height over the width (a rod's thickness over its half-length), turned up to `turn` of a half turn, laid out by `layout` (scatter, row along the tile's x, stack up its y). Pattern: the shade over the grain, `primitive` (flat, mottle, crust, bands, cloud, gloss, speckle, core, rings, veins, fibres) at `scale` (repeats per tile, or a crust's width in tiles), `contrast` the shade's swing either side of 1, `angle` in degrees for the directed ones. Append rows; a new id never renumbers an old one.",
+  "$comment": "The material silhouettes and patterns the terrain shader draws (ticket 450 under #139; TD shape 6226270701, GD ruling 6226278574: procedural, zero new samplers, chosen by uniform, never by #define). A species row of the materials slice names one silhouette and one pattern by id; the shader draws it by its position here plus one. Silhouette: `count` grains of `primitive` (box, diamond, disc, hexagon, rod, ring, star, triangle) of half-size `size` tiles, `aspect` the height over the width (a rod's thickness over its half-length, a ring's band over its radius, a star's inner radius over its outer), turned up to `turn` of a half turn, laid out by `layout` (scatter, row along the tile's x, stack up its y). Pattern: the shade over the grain, `primitive` (flat, mottle, crust, bands, cloud, gloss, speckle, core, rings, veins, fibres) at `scale` (repeats per tile, or a crust's width in tiles), `contrast` the shade's swing either side of 1 (below 0 it flips: pits for speckles, a bright rim for a crust), `angle` in degrees for the directed ones. Append rows; a new id never renumbers an old one. The rows after `flecks` and `clear` are the P3-P7 species' looks (ticket 453's materials rows).",
   "silhouettes": [
     {
       "id": "nuggets",
@@ -108,6 +108,609 @@
       "aspect": 1,
       "turn": 0.5,
       "layout": "scatter"
+    },
+    {
+      "id": "knots",
+      "primitive": "ring",
+      "count": 3,
+      "size": 0.08,
+      "aspect": 0.8,
+      "turn": 0,
+      "layout": "scatter"
+    },
+    {
+      "id": "scales",
+      "primitive": "diamond",
+      "count": 5,
+      "size": 0.1,
+      "aspect": 0.65,
+      "turn": 0.1,
+      "layout": "row"
+    },
+    {
+      "id": "rods",
+      "primitive": "rod",
+      "count": 3,
+      "size": 0.2,
+      "aspect": 0.18,
+      "turn": 0.06,
+      "layout": "stack"
+    },
+    {
+      "id": "lenses",
+      "primitive": "disc",
+      "count": 3,
+      "size": 0.14,
+      "aspect": 0.45,
+      "turn": 0.15,
+      "layout": "stack"
+    },
+    {
+      "id": "terraces",
+      "primitive": "box",
+      "count": 4,
+      "size": 0.28,
+      "aspect": 0.11,
+      "turn": 0,
+      "layout": "stack"
+    },
+    {
+      "id": "prisms",
+      "primitive": "hexagon",
+      "count": 3,
+      "size": 0.08,
+      "aspect": 2.4,
+      "turn": 1,
+      "layout": "scatter"
+    },
+    {
+      "id": "shells",
+      "primitive": "triangle",
+      "count": 2,
+      "size": 0.15,
+      "aspect": 0.9,
+      "turn": 0.4,
+      "layout": "scatter"
+    },
+    {
+      "id": "pebbles",
+      "primitive": "disc",
+      "count": 4,
+      "size": 0.09,
+      "aspect": 0.75,
+      "turn": 1,
+      "layout": "scatter"
+    },
+    {
+      "id": "blocks",
+      "primitive": "box",
+      "count": 2,
+      "size": 0.15,
+      "aspect": 0.8,
+      "turn": 0.12,
+      "layout": "scatter"
+    },
+    {
+      "id": "spirals",
+      "primitive": "ring",
+      "count": 1,
+      "size": 0.2,
+      "aspect": 0.3,
+      "turn": 0,
+      "layout": "scatter"
+    },
+    {
+      "id": "slabs",
+      "primitive": "box",
+      "count": 2,
+      "size": 0.3,
+      "aspect": 0.25,
+      "turn": 0.08,
+      "layout": "stack"
+    },
+    {
+      "id": "domes",
+      "primitive": "disc",
+      "count": 2,
+      "size": 0.16,
+      "aspect": 0.6,
+      "turn": 0,
+      "layout": "row"
+    },
+    {
+      "id": "jaws",
+      "primitive": "triangle",
+      "count": 5,
+      "size": 0.07,
+      "aspect": 1.4,
+      "turn": 0.05,
+      "layout": "row"
+    },
+    {
+      "id": "lattices",
+      "primitive": "rod",
+      "count": 4,
+      "size": 0.28,
+      "aspect": 0.11,
+      "turn": 1,
+      "layout": "scatter"
+    },
+    {
+      "id": "octahedra",
+      "primitive": "diamond",
+      "count": 3,
+      "size": 0.11,
+      "aspect": 1,
+      "turn": 0.1,
+      "layout": "scatter"
+    },
+    {
+      "id": "lumps",
+      "primitive": "disc",
+      "count": 2,
+      "size": 0.22,
+      "aspect": 0.85,
+      "turn": 0.5,
+      "layout": "scatter"
+    },
+    {
+      "id": "flags",
+      "primitive": "box",
+      "count": 3,
+      "size": 0.18,
+      "aspect": 0.35,
+      "turn": 0.5,
+      "layout": "scatter"
+    },
+    {
+      "id": "clods",
+      "primitive": "disc",
+      "count": 3,
+      "size": 0.15,
+      "aspect": 0.7,
+      "turn": 0.6,
+      "layout": "scatter"
+    },
+    {
+      "id": "tufts",
+      "primitive": "diamond",
+      "count": 6,
+      "size": 0.05,
+      "aspect": 2.2,
+      "turn": 1,
+      "layout": "scatter"
+    },
+    {
+      "id": "needles",
+      "primitive": "rod",
+      "count": 4,
+      "size": 0.3,
+      "aspect": 0.105,
+      "turn": 0.1,
+      "layout": "scatter"
+    },
+    {
+      "id": "cobbles",
+      "primitive": "box",
+      "count": 4,
+      "size": 0.1,
+      "aspect": 0.8,
+      "turn": 0.3,
+      "layout": "scatter"
+    },
+    {
+      "id": "sprays",
+      "primitive": "rod",
+      "count": 6,
+      "size": 0.18,
+      "aspect": 0.17,
+      "turn": 1,
+      "layout": "scatter"
+    },
+    {
+      "id": "masses",
+      "primitive": "disc",
+      "count": 1,
+      "size": 0.3,
+      "aspect": 0.8,
+      "turn": 0.3,
+      "layout": "scatter"
+    },
+    {
+      "id": "segments",
+      "primitive": "box",
+      "count": 5,
+      "size": 0.08,
+      "aspect": 0.6,
+      "turn": 0,
+      "layout": "row"
+    },
+    {
+      "id": "curls",
+      "primitive": "ring",
+      "count": 3,
+      "size": 0.09,
+      "aspect": 0.7,
+      "turn": 0,
+      "layout": "row"
+    },
+    {
+      "id": "pencils",
+      "primitive": "hexagon",
+      "count": 4,
+      "size": 0.05,
+      "aspect": 4,
+      "turn": 0.5,
+      "layout": "scatter"
+    },
+    {
+      "id": "darts",
+      "primitive": "triangle",
+      "count": 3,
+      "size": 0.06,
+      "aspect": 2.5,
+      "turn": 1,
+      "layout": "scatter"
+    },
+    {
+      "id": "springs",
+      "primitive": "ring",
+      "count": 4,
+      "size": 0.075,
+      "aspect": 0.85,
+      "turn": 0,
+      "layout": "stack"
+    },
+    {
+      "id": "twins",
+      "primitive": "diamond",
+      "count": 2,
+      "size": 0.13,
+      "aspect": 1.6,
+      "turn": 0.15,
+      "layout": "row"
+    },
+    {
+      "id": "rings",
+      "primitive": "ring",
+      "count": 2,
+      "size": 0.14,
+      "aspect": 0.45,
+      "turn": 0,
+      "layout": "scatter"
+    },
+    {
+      "id": "stars",
+      "primitive": "star",
+      "count": 1,
+      "size": 0.26,
+      "aspect": 0.4,
+      "turn": 0.2,
+      "layout": "scatter"
+    },
+    {
+      "id": "spindles",
+      "primitive": "diamond",
+      "count": 2,
+      "size": 0.07,
+      "aspect": 3.6,
+      "turn": 0.3,
+      "layout": "scatter"
+    },
+    {
+      "id": "clumps",
+      "primitive": "disc",
+      "count": 5,
+      "size": 0.07,
+      "aspect": 0.9,
+      "turn": 0.3,
+      "layout": "scatter"
+    },
+    {
+      "id": "stems",
+      "primitive": "rod",
+      "count": 2,
+      "size": 0.2,
+      "aspect": 0.22,
+      "turn": 0.1,
+      "layout": "scatter"
+    },
+    {
+      "id": "clinkers",
+      "primitive": "hexagon",
+      "count": 3,
+      "size": 0.1,
+      "aspect": 0.8,
+      "turn": 1,
+      "layout": "scatter"
+    },
+    {
+      "id": "grits",
+      "primitive": "box",
+      "count": 6,
+      "size": 0.045,
+      "aspect": 1,
+      "turn": 1,
+      "layout": "scatter"
+    },
+    {
+      "id": "blades",
+      "primitive": "diamond",
+      "count": 2,
+      "size": 0.3,
+      "aspect": 0.18,
+      "turn": 0.1,
+      "layout": "stack"
+    },
+    {
+      "id": "geodes",
+      "primitive": "ring",
+      "count": 2,
+      "size": 0.13,
+      "aspect": 0.55,
+      "turn": 0,
+      "layout": "scatter"
+    },
+    {
+      "id": "seeds",
+      "primitive": "disc",
+      "count": 6,
+      "size": 0.06,
+      "aspect": 0.55,
+      "turn": 1,
+      "layout": "scatter"
+    },
+    {
+      "id": "drops",
+      "primitive": "disc",
+      "count": 3,
+      "size": 0.08,
+      "aspect": 1.3,
+      "turn": 0,
+      "layout": "row"
+    },
+    {
+      "id": "teeth",
+      "primitive": "triangle",
+      "count": 3,
+      "size": 0.09,
+      "aspect": 1.8,
+      "turn": 0.4,
+      "layout": "scatter"
+    },
+    {
+      "id": "bars",
+      "primitive": "box",
+      "count": 2,
+      "size": 0.2,
+      "aspect": 0.35,
+      "turn": 0.6,
+      "layout": "scatter"
+    },
+    {
+      "id": "spheres",
+      "primitive": "disc",
+      "count": 3,
+      "size": 0.11,
+      "aspect": 1,
+      "turn": 0,
+      "layout": "scatter"
+    },
+    {
+      "id": "vertebrae",
+      "primitive": "hexagon",
+      "count": 4,
+      "size": 0.07,
+      "aspect": 0.5,
+      "turn": 0.1,
+      "layout": "stack"
+    },
+    {
+      "id": "ribbons",
+      "primitive": "rod",
+      "count": 3,
+      "size": 0.26,
+      "aspect": 0.12,
+      "turn": 0.8,
+      "layout": "scatter"
+    },
+    {
+      "id": "logs",
+      "primitive": "rod",
+      "count": 2,
+      "size": 0.24,
+      "aspect": 0.35,
+      "turn": 0.15,
+      "layout": "stack"
+    },
+    {
+      "id": "blooms",
+      "primitive": "star",
+      "count": 2,
+      "size": 0.13,
+      "aspect": 0.55,
+      "turn": 1,
+      "layout": "scatter"
+    },
+    {
+      "id": "hearts",
+      "primitive": "triangle",
+      "count": 1,
+      "size": 0.25,
+      "aspect": 0.9,
+      "turn": 0.1,
+      "layout": "scatter"
+    },
+    {
+      "id": "pellets",
+      "primitive": "disc",
+      "count": 4,
+      "size": 0.075,
+      "aspect": 0.65,
+      "turn": 1,
+      "layout": "row"
+    },
+    {
+      "id": "splinters",
+      "primitive": "rod",
+      "count": 5,
+      "size": 0.12,
+      "aspect": 0.26,
+      "turn": 1,
+      "layout": "scatter"
+    },
+    {
+      "id": "rinds",
+      "primitive": "ring",
+      "count": 2,
+      "size": 0.15,
+      "aspect": 0.42,
+      "turn": 0.2,
+      "layout": "stack"
+    },
+    {
+      "id": "sheets",
+      "primitive": "box",
+      "count": 2,
+      "size": 0.3,
+      "aspect": 0.16,
+      "turn": 0.05,
+      "layout": "stack"
+    },
+    {
+      "id": "hoppers",
+      "primitive": "box",
+      "count": 3,
+      "size": 0.12,
+      "aspect": 1,
+      "turn": 0.25,
+      "layout": "row"
+    },
+    {
+      "id": "rosettes",
+      "primitive": "star",
+      "count": 3,
+      "size": 0.1,
+      "aspect": 0.5,
+      "turn": 1,
+      "layout": "scatter"
+    },
+    {
+      "id": "dendrites",
+      "primitive": "star",
+      "count": 2,
+      "size": 0.14,
+      "aspect": 0.25,
+      "turn": 1,
+      "layout": "scatter"
+    },
+    {
+      "id": "pods",
+      "primitive": "disc",
+      "count": 2,
+      "size": 0.15,
+      "aspect": 0.55,
+      "turn": 0.5,
+      "layout": "row"
+    },
+    {
+      "id": "discs",
+      "primitive": "disc",
+      "count": 2,
+      "size": 0.15,
+      "aspect": 1,
+      "turn": 0,
+      "layout": "row"
+    },
+    {
+      "id": "leaves",
+      "primitive": "diamond",
+      "count": 3,
+      "size": 0.13,
+      "aspect": 0.5,
+      "turn": 1,
+      "layout": "scatter"
+    },
+    {
+      "id": "ovals",
+      "primitive": "disc",
+      "count": 3,
+      "size": 0.1,
+      "aspect": 0.65,
+      "turn": 0.3,
+      "layout": "scatter"
+    },
+    {
+      "id": "claws",
+      "primitive": "triangle",
+      "count": 3,
+      "size": 0.08,
+      "aspect": 2.2,
+      "turn": 0.6,
+      "layout": "row"
+    },
+    {
+      "id": "forks",
+      "primitive": "rod",
+      "count": 3,
+      "size": 0.24,
+      "aspect": 0.13,
+      "turn": 0.7,
+      "layout": "scatter"
+    },
+    {
+      "id": "panes",
+      "primitive": "box",
+      "count": 3,
+      "size": 0.13,
+      "aspect": 1.4,
+      "turn": 0.06,
+      "layout": "row"
+    },
+    {
+      "id": "arches",
+      "primitive": "ring",
+      "count": 1,
+      "size": 0.24,
+      "aspect": 0.26,
+      "turn": 0,
+      "layout": "scatter"
+    },
+    {
+      "id": "filaments",
+      "primitive": "rod",
+      "count": 4,
+      "size": 0.34,
+      "aspect": 0.09,
+      "turn": 1,
+      "layout": "scatter"
+    },
+    {
+      "id": "flames",
+      "primitive": "triangle",
+      "count": 3,
+      "size": 0.08,
+      "aspect": 2,
+      "turn": 0.1,
+      "layout": "row"
+    },
+    {
+      "id": "fragments",
+      "primitive": "triangle",
+      "count": 5,
+      "size": 0.06,
+      "aspect": 0.9,
+      "turn": 1,
+      "layout": "scatter"
+    },
+    {
+      "id": "cockles",
+      "primitive": "hexagon",
+      "count": 3,
+      "size": 0.09,
+      "aspect": 0.7,
+      "turn": 0.3,
+      "layout": "scatter"
     }
   ],
   "patterns": [
@@ -194,6 +797,454 @@
       "scale": 3,
       "contrast": 0.6,
       "angle": 60
+    },
+    {
+      "id": "pitted",
+      "primitive": "speckle",
+      "scale": 22,
+      "contrast": -0.35,
+      "angle": 0
+    },
+    {
+      "id": "dusted",
+      "primitive": "speckle",
+      "scale": 40,
+      "contrast": 0.3,
+      "angle": 0
+    },
+    {
+      "id": "frosted",
+      "primitive": "mottle",
+      "scale": 22,
+      "contrast": 0.25,
+      "angle": 0
+    },
+    {
+      "id": "smoky",
+      "primitive": "cloud",
+      "scale": 2.5,
+      "contrast": -0.45,
+      "angle": 0
+    },
+    {
+      "id": "iridescent",
+      "primitive": "bands",
+      "scale": 8,
+      "contrast": 0.3,
+      "angle": 30
+    },
+    {
+      "id": "ringed",
+      "primitive": "rings",
+      "scale": 10,
+      "contrast": 0.45,
+      "angle": 0
+    },
+    {
+      "id": "burnished",
+      "primitive": "gloss",
+      "scale": 0.8,
+      "contrast": 0.45,
+      "angle": 15
+    },
+    {
+      "id": "nacreous",
+      "primitive": "cloud",
+      "scale": 6,
+      "contrast": 0.3,
+      "angle": 0
+    },
+    {
+      "id": "etched",
+      "primitive": "veins",
+      "scale": 10,
+      "contrast": 0.6,
+      "angle": 0
+    },
+    {
+      "id": "starred",
+      "primitive": "gloss",
+      "scale": 2,
+      "contrast": 0.55,
+      "angle": 90
+    },
+    {
+      "id": "opaline",
+      "primitive": "cloud",
+      "scale": 8,
+      "contrast": 0.4,
+      "angle": 0
+    },
+    {
+      "id": "lustrous",
+      "primitive": "gloss",
+      "scale": 0.7,
+      "contrast": 0.55,
+      "angle": -45
+    },
+    {
+      "id": "fiery",
+      "primitive": "speckle",
+      "scale": 14,
+      "contrast": 0.6,
+      "angle": 0
+    },
+    {
+      "id": "chalky",
+      "primitive": "mottle",
+      "scale": 5,
+      "contrast": 0.15,
+      "angle": 0
+    },
+    {
+      "id": "imprinted",
+      "primitive": "veins",
+      "scale": 4,
+      "contrast": -0.45,
+      "angle": 0
+    },
+    {
+      "id": "peaty",
+      "primitive": "mottle",
+      "scale": 14,
+      "contrast": -0.35,
+      "angle": 0
+    },
+    {
+      "id": "bloomed",
+      "primitive": "cloud",
+      "scale": 10,
+      "contrast": 0.5,
+      "angle": 0
+    },
+    {
+      "id": "dewed",
+      "primitive": "speckle",
+      "scale": 12,
+      "contrast": 0.5,
+      "angle": 0
+    },
+    {
+      "id": "striped",
+      "primitive": "bands",
+      "scale": 10,
+      "contrast": 0.45,
+      "angle": 90
+    },
+    {
+      "id": "metallic",
+      "primitive": "gloss",
+      "scale": 0.6,
+      "contrast": 0.4,
+      "angle": 60
+    },
+    {
+      "id": "rosy",
+      "primitive": "cloud",
+      "scale": 3,
+      "contrast": 0.2,
+      "angle": 0
+    },
+    {
+      "id": "ridged",
+      "primitive": "bands",
+      "scale": 20,
+      "contrast": 0.4,
+      "angle": 90
+    },
+    {
+      "id": "tarnished",
+      "primitive": "mottle",
+      "scale": 7,
+      "contrast": -0.4,
+      "angle": 0
+    },
+    {
+      "id": "two-tone",
+      "primitive": "bands",
+      "scale": 2,
+      "contrast": 0.45,
+      "angle": 0
+    },
+    {
+      "id": "polished",
+      "primitive": "gloss",
+      "scale": 1.6,
+      "contrast": 0.6,
+      "angle": -60
+    },
+    {
+      "id": "blued",
+      "primitive": "gloss",
+      "scale": 2.5,
+      "contrast": 0.35,
+      "angle": 30
+    },
+    {
+      "id": "colour-change",
+      "primitive": "bands",
+      "scale": 3,
+      "contrast": 0.35,
+      "angle": 45
+    },
+    {
+      "id": "plated",
+      "primitive": "rings",
+      "scale": 6,
+      "contrast": 0.5,
+      "angle": 0
+    },
+    {
+      "id": "watered",
+      "primitive": "fibres",
+      "scale": 16,
+      "contrast": 0.4,
+      "angle": 45
+    },
+    {
+      "id": "deep-red",
+      "primitive": "core",
+      "scale": 1,
+      "contrast": -0.35,
+      "angle": 0
+    },
+    {
+      "id": "powdery",
+      "primitive": "speckle",
+      "scale": 50,
+      "contrast": 0.2,
+      "angle": 0
+    },
+    {
+      "id": "beaded",
+      "primitive": "rings",
+      "scale": 26,
+      "contrast": 0.35,
+      "angle": 0
+    },
+    {
+      "id": "scorched",
+      "primitive": "cloud",
+      "scale": 5,
+      "contrast": -0.35,
+      "angle": 0
+    },
+    {
+      "id": "glinting",
+      "primitive": "speckle",
+      "scale": 34,
+      "contrast": 0.65,
+      "angle": 0
+    },
+    {
+      "id": "pearly",
+      "primitive": "gloss",
+      "scale": 0.9,
+      "contrast": 0.3,
+      "angle": 75
+    },
+    {
+      "id": "glossy",
+      "primitive": "gloss",
+      "scale": 1.4,
+      "contrast": 0.45,
+      "angle": 20
+    },
+    {
+      "id": "oily",
+      "primitive": "cloud",
+      "scale": 7,
+      "contrast": 0.45,
+      "angle": 0
+    },
+    {
+      "id": "glazed",
+      "primitive": "gloss",
+      "scale": 2,
+      "contrast": 0.4,
+      "angle": -20
+    },
+    {
+      "id": "satin",
+      "primitive": "fibres",
+      "scale": 30,
+      "contrast": 0.2,
+      "angle": 0
+    },
+    {
+      "id": "glowing",
+      "primitive": "core",
+      "scale": 1,
+      "contrast": 0.65,
+      "angle": 0
+    },
+    {
+      "id": "porous",
+      "primitive": "speckle",
+      "scale": 26,
+      "contrast": -0.4,
+      "angle": 0
+    },
+    {
+      "id": "flame-lit",
+      "primitive": "veins",
+      "scale": 5,
+      "contrast": 0.5,
+      "angle": 0
+    },
+    {
+      "id": "growth-ringed",
+      "primitive": "rings",
+      "scale": 14,
+      "contrast": 0.3,
+      "angle": 0
+    },
+    {
+      "id": "molten",
+      "primitive": "cloud",
+      "scale": 3.5,
+      "contrast": 0.55,
+      "angle": 0
+    },
+    {
+      "id": "inner-fire",
+      "primitive": "speckle",
+      "scale": 10,
+      "contrast": 0.7,
+      "angle": 0
+    },
+    {
+      "id": "nodular",
+      "primitive": "mottle",
+      "scale": 4,
+      "contrast": 0.5,
+      "angle": 0
+    },
+    {
+      "id": "charred",
+      "primitive": "crust",
+      "scale": 0.02,
+      "contrast": 0.4,
+      "angle": 0
+    },
+    {
+      "id": "salted",
+      "primitive": "speckle",
+      "scale": 30,
+      "contrast": 0.4,
+      "angle": 0
+    },
+    {
+      "id": "weathered",
+      "primitive": "mottle",
+      "scale": 11,
+      "contrast": 0.35,
+      "angle": 0
+    },
+    {
+      "id": "stepped",
+      "primitive": "bands",
+      "scale": 6,
+      "contrast": 0.4,
+      "angle": 0
+    },
+    {
+      "id": "sandy",
+      "primitive": "speckle",
+      "scale": 45,
+      "contrast": -0.3,
+      "angle": 0
+    },
+    {
+      "id": "feathered",
+      "primitive": "fibres",
+      "scale": 10,
+      "contrast": 0.45,
+      "angle": 60
+    },
+    {
+      "id": "webbed",
+      "primitive": "veins",
+      "scale": 12,
+      "contrast": -0.4,
+      "angle": 0
+    },
+    {
+      "id": "petalled",
+      "primitive": "rings",
+      "scale": 4,
+      "contrast": 0.5,
+      "angle": 0
+    },
+    {
+      "id": "two-metal",
+      "primitive": "bands",
+      "scale": 2,
+      "contrast": 0.5,
+      "angle": 90
+    },
+    {
+      "id": "adularescent",
+      "primitive": "gloss",
+      "scale": 0.6,
+      "contrast": 0.5,
+      "angle": 0
+    },
+    {
+      "id": "grooved",
+      "primitive": "fibres",
+      "scale": 22,
+      "contrast": 0.35,
+      "angle": 90
+    },
+    {
+      "id": "fulgurite",
+      "primitive": "veins",
+      "scale": 7,
+      "contrast": 0.65,
+      "angle": 0
+    },
+    {
+      "id": "shimmering",
+      "primitive": "bands",
+      "scale": 24,
+      "contrast": 0.2,
+      "angle": 60
+    },
+    {
+      "id": "fluted",
+      "primitive": "fibres",
+      "scale": 8,
+      "contrast": 0.4,
+      "angle": 0
+    },
+    {
+      "id": "quicksilver",
+      "primitive": "gloss",
+      "scale": 0.4,
+      "contrast": 0.6,
+      "angle": 30
+    },
+    {
+      "id": "play-of-colour",
+      "primitive": "speckle",
+      "scale": 8,
+      "contrast": 0.5,
+      "angle": 0
+    },
+    {
+      "id": "sandblasted",
+      "primitive": "mottle",
+      "scale": 18,
+      "contrast": 0.3,
+      "angle": 0
+    },
+    {
+      "id": "rimed",
+      "primitive": "crust",
+      "scale": 0.025,
+      "contrast": -0.5,
+      "angle": 0
     }
   ]
 }
