@@ -4,6 +4,10 @@
  * Sell bay pays this player for a unit and the gate it needs (drill tier, extractor or dynamite).
  * It sees along open cells only, never through rock: that is the *Ore Whisper* artefact's trick,
  * not the lens's. Reveal only (Vertical Scaler on #157): nothing here changes the world or the hold.
+ *
+ * Rarity (ticket 454 under #139, GD ruling 2): a cell of a species names the species' rarity only
+ * once the player has seen the species (the codex's `material:<species id>` record); until then
+ * its rarity, lead included, stays unspecified. Reading a cell never records it as seen.
  */
 import { MM_PER_METRE } from '../../../constants/physics'
 import type { AuthorityState } from '../../../systems/authority/authorityState'
@@ -11,6 +15,11 @@ import { planetParamsOf } from '../../../systems/authority/planetOfState'
 import { sellBayUnitPrice } from '../../../systems/authority/platformServices'
 import { oreTypeAtTile } from '../../../systems/authority/tileOre'
 import type { Money } from '../../../systems/money'
+import {
+  cellRarityReaderOf,
+  type CellRarity,
+  type CellRarityOf,
+} from '../../../systems/render/seenRarity'
 import { saleTierOf, type OreType } from '../../../systems/registries/oreTypes'
 import {
   tileOfMillimetres,
@@ -37,11 +46,14 @@ export interface AssayReading {
   gate: CellGateKind
   /** The extractor id, `dynamite` or `drill-signature` the gate asks for; null for none or dense. */
   gateItem: string | null
+  /** Its species and that species' rarity once seen; no species on a legacy planet or P8+. */
+  rarity: CellRarity
 }
 
 interface Ground {
   world: WorldState
   params: PlanetParams
+  rarityOf: CellRarityOf
 }
 
 const HALF_TILE_MM = MM_PER_METRE / 2
@@ -57,7 +69,11 @@ export function assayReadingsOf(
   const pose = state.players[playerId].vehicle.pose
   const params = planetParamsOf(state.planet)
   if (pose === null || params === null) return []
-  const ground = { world: state.world, params }
+  const ground = {
+    world: state.world,
+    params,
+    rarityOf: cellRarityReaderOf(state, playerId, params),
+  }
   return tilesWithin(tileOfPose(pose), radiusTiles)
     .filter((tile) => isInSight(ground, pose, tile))
     .flatMap((tile) => readingAt(state, playerId, ground, tile))
@@ -82,6 +98,7 @@ function readingAt(
       unitPrice: unitPriceOf(state, playerId, ore),
       gate: gate.kind,
       gateItem: itemOfGate(gate),
+      rarity: ground.rarityOf(cellAt(ground.world, ground.params, tile)),
     },
   ]
 }

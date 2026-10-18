@@ -1,6 +1,7 @@
 /**
  * The words the passives' HUD panels print (#162 Sensing rows), built here so the markup does not
- * compute: an assay card's family and grade, its lead, unit price and gate; the barometer's hazard
+ * compute: an assay card's family and grade, its lead (none while its species is unseen, ticket
+ * 454), unit price and gate; the barometer's hazard
  * and distance; the Diviner's warning (ticket 269). Amounts go through the one display formatter
  * (#32).
  */
@@ -11,7 +12,8 @@ import type { BarometerWarning } from '../hazardBarometer'
 
 export interface AssayCardText {
   title: string
-  lead: string
+  /** Tiers over the band's ore; null while the cell's species is unseen, so its rarity is unspecified. */
+  lead: string | null
   price: string
   /** The gate's need, or null for a cell the drill takes as it is. */
   gate: string | null
@@ -32,7 +34,7 @@ const HAZARD_WORDS: Readonly<Record<BarometerWarning['hazard'], string>> = {
 export function assayCardTextOf(reading: AssayReading): AssayCardText {
   return {
     title: `${reading.family} G${reading.grade}`,
-    lead: leadTextOf(reading.lead),
+    lead: isRarityUnspecified(reading) ? null : leadTextOf(reading.lead),
     price: formatAmount(reading.unitPrice),
     gate: GATE_WORDS[reading.gate] ?? null,
   }
@@ -47,6 +49,11 @@ export function barometerTextOf(warning: BarometerWarning): string {
 export function divinerTextOf(warning: DivinerWarning): string {
   if (warning.kind === 'enemy') return 'Enemy ahead'
   return warning.ticksLeft === null ? 'Collapse held' : 'Collapse ahead'
+}
+
+/** A cell of a species the player has not seen: its lead would name the rarity. */
+function isRarityUnspecified({ rarity }: AssayReading): boolean {
+  return rarity.hasSpecies && rarity.seen === null
 }
 
 /** Tiers above its band's ore, signed; a patch spilled upward reads below zero. */

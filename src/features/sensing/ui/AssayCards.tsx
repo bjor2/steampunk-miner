@@ -1,10 +1,15 @@
 /**
  * The assay lens's cards (#162 Sensing row): over each ore cell it reads, nearest the miner first,
- * the family and grade, the rarity lead, the Sell bay's unit price and the gate it needs. Each is
- * an overlay card at the cell's centre (#208); a full overlay drops them first. Draws nothing
- * while the lens is not owned. Reads only the sensing store.
+ * the family and grade, the rarity lead, the Sell bay's unit price and the gate it needs. A cell
+ * of a seen species draws its title in the rarity's colour with the rarity's word (ticket 454);
+ * an unseen one leaves rarity and lead unspecified. Each is an overlay card at the cell's centre
+ * (#208); a full overlay drops them first. Draws nothing while the lens is not owned. Reads only
+ * the sensing store and the reduce-motion switch.
  */
 import { useMemo } from 'react'
+import { useGameStore } from '../../../store/gameStore'
+import { rarityNameOf } from '../../../systems/views/rarityName'
+import { RarityName } from '../../../ui/kit/RarityName'
 import { OverlayCard } from '../../../ui/overlay/OverlayCard'
 import type { AssayReading } from '../systems/assayLens'
 import { assayCardTextOf } from '../systems/render/passiveText'
@@ -28,6 +33,11 @@ export function AssayCards() {
 function AssayCard({ reading }: { reading: AssayReading }) {
   const anchor = useMemo(() => tileCentreOf(reading.tile), [reading.tile])
   const text = useMemo(() => assayCardTextOf(reading), [reading])
+  const isMotionReduced = useGameStore((state) => !state.prefs.shake)
+  const rarity = useMemo(
+    () => rarityNameOf(reading.rarity.seen, isMotionReduced),
+    [reading.rarity.seen, isMotionReduced],
+  )
   return (
     <OverlayCard anchor={anchor}>
       <span
@@ -35,9 +45,13 @@ function AssayCard({ reading }: { reading: AssayReading }) {
         data-testid={SENSING_TEST_IDS.assayCard}
         data-ore={reading.oreId}
         data-gate={reading.gate}
+        data-rarity={rarity?.rarity ?? ''}
       >
-        <span className={styles.title}>{text.title}</span>
-        <span>{text.lead}</span>
+        <span className={styles.title}>
+          <RarityName rarity={rarity}>{text.title}</RarityName>
+        </span>
+        {rarity !== null && <span>{rarity.word}</span>}
+        {text.lead !== null && <span>{text.lead}</span>}
         <span>{text.price}</span>
         {text.gate !== null && <span className={styles.gate}>{text.gate}</span>}
       </span>
