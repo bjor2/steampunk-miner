@@ -656,6 +656,23 @@ programs }` from three's `renderer.info` of the game canvas), read only when cal
   switch off to protocol 88's digests (the four planet 1 mining goldens' old digests pinned there),
   and with the exact carry on to A6's charged digests; `chargedGoldenDigests.ts` holds the charged
   digests with the record on.
+- **Dev flags as logged state** (ticket 547, the TD ruling on #547 and its amendment): the rules
+  read `flagsOf(state)` (`src/systems/authority/devFlagState.ts`), the shipped
+  `AUTHORITY_DEV_FLAGS` overlaid with the session's `devFlagDelta`, and `debug.setFlags` is the one
+  writer. A spec switches a flag for play through that command; the `with*` fixtures that set the
+  global stay for specs that replay a whole golden. `devFlagRules.test.ts` holds the command (only
+  flags off their defaults kept, the sticky `devFlagsEverSet`, `unknown_flag`, flags never numbers,
+  `not_session_host` for anyone but a shared session's lowest id, zero on flip to on per flag, the
+  snapshot and save round trips, and no unlock, codex or item write on any flip);
+  `devFlagFlips.test.ts` flips all six off, on and off mid-drill at the cadence the flags give (no
+  throw, no carry consumed after a turn-on, every stretch at or below the tank floor, the interval
+  12 from the tick the exact carry goes off, replay digest-equal jumping and at 60 fps);
+  `devFlagGates.test.ts` holds the gate under all 64 combinations (held, moving and swept: never
+  cut, a held bite's `DrillGated` once); `devFlagReads.test.ts` scans that no rule names the global;
+  `src/constants/devFlagRows.test.ts` that every flag has a panel row; `src/store/devFlagSessions.test.ts`
+  that a load keeps its world's flags and New Game drops them. With no flag set no field is written,
+  so every golden and the device save keep their digests. A balance report refuses a marked run
+  (`src/logging/devFlagReport.ts`) and `perf:sessions` refuses a marked session.
 - **Known red** (ticket 419, the TD on #396 section 2): `CAMPAIGN_PACING_KNOWN_RED`
   (`src/constants/knownRed.ts`) is the one known-red marker in the repo: one gate
   (`campaignPacingGate`), one finding (#417), no registry. The gate still runs in full;

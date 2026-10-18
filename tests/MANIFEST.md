@@ -747,6 +747,10 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/authority/cutFollowRead.test.ts` | 12 | 12 |
 | `src/systems/authority/cutShare.test.ts` | 3 | 3 |
 | `src/systems/authority/depthCurveTank.test.ts` | 78 | 2 |
+| `src/systems/authority/devFlagFlips.test.ts` | 7 | 7 |
+| `src/systems/authority/devFlagGates.test.ts` | 192 | 3 |
+| `src/systems/authority/devFlagReads.test.ts` | 1 | 1 |
+| `src/systems/authority/devFlagRules.test.ts` | 23 | 18 |
 | `src/systems/authority/digSpeedTrack.lane.test.ts` | 69 | 4 |
 | `src/systems/authority/drillEventStream.lane.test.ts` | 8 | 1 |
 | `src/systems/authority/drillEventStream.test.ts` | 27 | 5 |
@@ -853,6 +857,12 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/bot/noFreeCellRuns.test.ts` | 2 | 2 |
 | `src/systems/bot/paceArrival.test.ts` | 8 | 4 |
 | `src/systems/bot/spreeTargets.test.ts` | 10 | 10 |
+
+### `constants`
+
+| File | Tests | Sites |
+| --- | --- | --- |
+| `src/constants/devFlagRows.test.ts` | 6 | 6 |
 
 ### `debug`
 
@@ -964,6 +974,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/logging/commandLog.test.ts` | 15 | 15 |
 | `src/logging/commandLogPoseRuns.test.ts` | 13 | 11 |
 | `src/logging/compareRuns.test.ts` | 12 | 12 |
+| `src/logging/devFlagReport.test.ts` | 6 | 6 |
 | `src/logging/diveCasing.test.ts` | 4 | 4 |
 | `src/logging/diveSummaries.test.ts` | 4 | 4 |
 | `src/logging/domainEventLog.test.ts` | 21 | 21 |
@@ -976,14 +987,14 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/logging/dynamiteDryRuns.test.ts` | 4 | 4 |
 | `src/logging/eventNames.test.ts` | 6 | 6 |
 | `src/logging/eventSink.test.ts` | 10 | 10 |
-| `src/logging/exactCarryOnGolden.test.ts` | 11 | 3 |
+| `src/logging/exactCarryOnGolden.test.ts` | 20 | 4 |
 | `src/logging/extractorPurchaseTrips.test.ts` | 3 | 3 |
 | `src/logging/gateClearTables.test.ts` | 7 | 7 |
 | `src/logging/gateClearTally.test.ts` | 3 | 3 |
 | `src/logging/gateRouteStalls.test.ts` | 2 | 2 |
 | `src/logging/goldenSliceSections.test.ts` | 4 | 4 |
 | `src/logging/heatReport.test.ts` | 2 | 2 |
-| `src/logging/heatWorkUncappedGolden.test.ts` | 18 | 2 |
+| `src/logging/heatWorkUncappedGolden.test.ts` | 27 | 3 |
 | `src/logging/knownRed.test.ts` | 11 | 8 |
 | `src/logging/logCompactionBotHour.test.ts` | 5 | 5 |
 | `src/logging/memorySample.test.ts` | 2 | 2 |
@@ -1010,7 +1021,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/logging/sessionAnalysis/fixtureSessions.test.ts` | 8 | 8 |
 | `src/logging/sessionAnalysis/frameCost.test.ts` | 8 | 8 |
 | `src/logging/sessionAnalysis/memoryTrend.test.ts` | 7 | 7 |
-| `src/logging/sessionAnalysis/sessionTable.test.ts` | 11 | 11 |
+| `src/logging/sessionAnalysis/sessionTable.test.ts` | 12 | 12 |
 | `src/logging/sessionAnalysis/summaryComparison.test.ts` | 3 | 3 |
 | `src/logging/tripCellEnergy.lane.test.ts` | 1 | 1 |
 | `src/logging/tripCellEnergy.test.ts` | 2 | 2 |
@@ -1059,7 +1070,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/physics/sweptCutPaceWindow.lane.test.ts` | 3 | 3 |
 | `src/physics/sweptFreshCarveLoop.test.ts` | 3 | 3 |
 | `src/physics/tunnelling.test.ts` | 10 | 2 |
-| `src/physics/vehicleLoop.test.ts` | 12 | 12 |
+| `src/physics/vehicleLoop.test.ts` | 13 | 13 |
 | `src/physics/vehiclePhysics.test.ts` | 8 | 2 |
 
 ### `registries`
@@ -1173,7 +1184,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/render/sampleClock.test.ts` | 3 | 3 |
 | `src/systems/render/sceneLights.test.ts` | 6 | 6 |
 | `src/systems/render/screenProjection.test.ts` | 5 | 5 |
-| `src/systems/render/seenRarity.test.ts` | 7 | 7 |
+| `src/systems/render/seenRarity.test.ts` | 8 | 8 |
 | `src/systems/render/shaderUniforms.test.ts` | 4 | 4 |
 | `src/systems/render/skyBandLook.test.ts` | 3 | 3 |
 | `src/systems/render/skyBandRing.test.ts` | 6 | 6 |
@@ -1275,6 +1286,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/store/authorityReads.test.ts` | 3 | 3 |
 | `src/store/bayEntryPress.test.ts` | 2 | 2 |
 | `src/store/checkpoint.test.ts` | 22 | 22 |
+| `src/store/devFlagSessions.test.ts` | 2 | 2 |
 | `src/store/domainEventBroadcast.test.ts` | 3 | 3 |
 | `src/store/gameStore.test.ts` | 26 | 26 |
 | `src/store/hintSlice.test.ts` | 15 | 15 |

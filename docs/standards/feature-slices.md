@@ -1117,7 +1117,7 @@ The retarget seam of #262's resonance whistle (GD lock on #245, "lure"), split o
 
 - **`enemyLures`** (`src/systems/registries/enemyLures.ts`, registrar `enemyLure`, many sources): `{ id, luresAt(state, tick) → readonly Lure[] }`, each `Lure` `{ cell: TilePoint, reachMm, untilTick }`, oldest first; an ended lure may stay listed.
 - **The rule** (`src/systems/enemies/lureTarget.ts`): `lureTargetOf(enemy, lures, tick)` hears only the first `liveLureCap` lures still live (`tick < untilTick`, `src/data/aetheric.json`), in source id order, and answers the centre of the nearest lure cell whose reach takes in the enemy (the first listed wins a tie), else null for the vehicle. A tick is O(enemies x live lures).
-- **The step** (`combat/enemyBehaviour.ts`): with the flag on, a crawler or burrower in a hunting phase (idle, approach) walks to the lure goal in `approach`, and hunts the vehicle again from the tick the lure ends. A wind-up, lunge, recoil or pin under way goes on, and a tunnel wrecker never hears a lure. `stepEnemy` takes the flags as a last argument, defaulting to `AUTHORITY_DEV_FLAGS`, so a spec steps an enemy with the flag on.
+- **The step** (`combat/enemyBehaviour.ts`): with the flag on, a crawler or burrower in a hunting phase (idle, approach) walks to the lure goal in `approach`, and hunts the vehicle again from the tick the lure ends. A wind-up, lunge, recoil or pin under way goes on, and a tunnel wrecker never hears a lure. `stepEnemy` takes the flags as a last argument, defaulting to the session's (`flagsOf(state)`, ticket 547), so a spec steps an enemy with the flag on.
 
 ### 3.49 Spend families (ticket 370)
 
