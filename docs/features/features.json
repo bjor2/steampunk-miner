@@ -812,13 +812,13 @@
             },
             {
               "title": "Exponential upgrade prices",
-              "description": "Each upgrade level costs more by a fixed ratio; drill prices were flattened to match ore growth.",
+              "description": "Each upgrade level costs more by a fixed ratio; a drill power purchase costs 1.48 times the last, a little more than the speed it adds.",
               "status": "built",
-              "issues": [6, 84]
+              "issues": [6, 84, 552]
             },
             {
               "title": "Two-tier levels",
-              "description": "Every big level is ten steps: nine pips that each add a little, then the big level-up with the rest. The ten steps cost what the level did, so a good trip buys many in a row; the guns level the same way.",
+              "description": "Every big level is ten steps: nine pips that each add a little, then the big level-up with the rest. The ten steps cost what the level did, so a good trip buys many in a row; the guns level the same way. Drill power is the exception: each of its purchases is a whole level.",
               "status": "built",
               "issues": [180, 181]
             },
@@ -900,9 +900,9 @@
           "children": [
             {
               "title": "Drill power",
-              "description": "Digs faster through any rock.",
+              "description": "Digs faster through any rock: every purchase after the first is 24% faster, so level 20 drills about 50 times faster than it did before (no pips, no cap).",
               "status": "built",
-              "issues": [7, 84]
+              "issues": [7, 84, 551, 552]
             },
             {
               "title": "Drill tip",

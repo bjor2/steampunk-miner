@@ -51,7 +51,10 @@ describe('debug api: dev flags', () => {
 
   it('refuses a choice naming a number or an unknown flag whole, sending nothing', () => {
     const debug = createDebugApi()
-    const refused = debug.ui.setDevFlags({ 'drill.reportEveryTick': false, 'drill.perLevel': 1.12 })
+    const refused = debug.ui.setDevFlags({
+      'drill.reportEveryTick': false,
+      'drill.perLevel': 1.243,
+    })
     expect(refused).toEqual({ ok: false, problems: ['"drill.perLevel" is not a dev flag'] })
     expect(debug.ui.setDevFlags('on')).toMatchObject({ ok: false })
     expect(sink.commands).toEqual([])
