@@ -92,17 +92,18 @@ describe('vehicle drilling', () => {
     expect(FULL_TANK - session.vehicle().energy).toBe(40 * 4)
   })
 
-  it('carves the 1.9 m drill stamp under a reported pose, charging only the ticks it cut', () => {
-    const session = createSession()
-    session.submit(10, poseAbove(GROUND, FACING.down))
-    const events = session.submit(30, poseAbove(GROUND, FACING.down, { drillTicks: 20 }))
-    expect(typesOf(events)).toContain('GroundChanged')
-    expect(FULL_TANK - session.vehicle().energy).toBe(20 * 4)
-    for (const tx of [GROUND.tx - 1, GROUND.tx, GROUND.tx + 1]) {
-      const tile = { tx, ty: GROUND.ty }
-      expect(cellDensitySum(session.state().world, PARAMS, tile)).toBeLessThan(16 * 255)
-    }
-  })
+  it('carves the 1.9 m drill stamp under a reported pose, charging only the ticks it cut, with drill.exactCarry off', () =>
+    withDrillExactCarry(false, () => {
+      const session = createSession()
+      session.submit(10, poseAbove(GROUND, FACING.down))
+      const events = session.submit(30, poseAbove(GROUND, FACING.down, { drillTicks: 20 }))
+      expect(typesOf(events)).toContain('GroundChanged')
+      expect(FULL_TANK - session.vehicle().energy).toBe(20 * 4)
+      for (const tx of [GROUND.tx - 1, GROUND.tx, GROUND.tx + 1]) {
+        const tile = { tx, ty: GROUND.ty }
+        expect(cellDensitySum(session.state().world, PARAMS, tile)).toBeLessThan(16 * 255)
+      }
+    }))
 
   it('carves the same stamp with drill.exactCarry on, charging the law work it removed (ticket 535)', () =>
     withDrillExactCarry(true, () => {
@@ -252,15 +253,16 @@ describe('vehicle core fragments', () => {
 })
 
 describe('vehicle energy', () => {
-  it('charges 4, 6 and 1 quanta per reported drill, thrust and drive tick', () => {
-    const session = createSession()
-    session.submit(10, poseAbove(GROUND, FACING.down))
-    session.submit(
-      70,
-      poseAbove(GROUND, FACING.down, { drillTicks: 30, thrustTicks: 60, driveTicks: 10 }),
-    )
-    expect(FULL_TANK - session.vehicle().energy).toBe(30 * 4 + 60 * 6 + 10)
-  })
+  it('charges 4, 6 and 1 quanta per reported drill, thrust and drive tick, with drill.exactCarry off', () =>
+    withDrillExactCarry(false, () => {
+      const session = createSession()
+      session.submit(10, poseAbove(GROUND, FACING.down))
+      session.submit(
+        70,
+        poseAbove(GROUND, FACING.down, { drillTicks: 30, thrustTicks: 60, driveTicks: 10 }),
+      )
+      expect(FULL_TANK - session.vehicle().energy).toBe(30 * 4 + 60 * 6 + 10)
+    }))
 
   it('charges 6 and 1 quanta per thrust and drive tick with drill.exactCarry on, and the drill its law work (ticket 535)', () =>
     withDrillExactCarry(true, () => {

@@ -1,21 +1,22 @@
 /**
- * The end digests the exact carry moves (ticket 535, A6): with `drill.exactCarry` on, only the
- * two goldens whose pose reports drill move their end digest, recorded with the switch on; every
- * other golden replays to its committed digests and mined order byte for byte. The goldens'
- * reports are 12-tick, so the report capsule of ticket 537 (interval 1 only) never moves them,
- * with its switch on or off. Both dig planet 1's roster-bound cells, so the codex's species record
- * (ticket 546, protocol 89) moved them with the rest; its flag-off pin keeps A6's digests. Spec
- * support for the kill-switch pins; it reads, never writes.
+ * The end digests the exact carry moves (ticket 535, A6), pinned as they were before every dev flag
+ * shipped on (Bjor, 18 Oct 2026: "turn everything on"). With `drill.exactCarry` on, as it ships,
+ * only the two goldens whose pose reports drill move their end digest, and the committed goldens
+ * (`tests/golden`, regenerated with `npm run golden:update` that day) hold the moved ones; every
+ * other golden is the same either way. The pins below are protocol 89's digests with the exact carry off (the codex's
+ * species record, ticket 546, moved them with the rest), what those two goldens replay to with it off: the kill-switch's parity proof. The goldens' reports
+ * are 12-tick, so the report capsule of ticket 537 (interval 1 only) never moves them, switch on
+ * or off. Spec support for the kill-switch pins; it reads, never writes.
  */
 import { readdirSync, readFileSync } from 'node:fs'
 import type { GoldenRun } from './goldenRun'
 
 const GOLDEN_FOLDER = new URL('../../tests/golden/', import.meta.url)
 
-/** The end digest of each golden the charge moves, with the switch on, by tick. */
-export const CHARGED_DIGESTS: Readonly<Record<string, Readonly<Record<number, string>>>> = {
-  'casing-lined-band-2': { 2137: '1b0af955f030c2bc' },
-  'collapse-band-2-grade-1': { 2125: '197deff0f27f216d' },
+/** The end digest of each golden the charge moves, with the exact carry off, by tick. */
+export const UNCHARGED_DIGESTS: Readonly<Record<string, Readonly<Record<number, string>>>> = {
+  'casing-lined-band-2': { 2137: 'f094b0e39f1572d1' },
+  'collapse-band-2-grade-1': { 2125: 'c8cdb4146440c023' },
 }
 
 export function committedGoldenRuns(): GoldenRun[] {
@@ -25,9 +26,9 @@ export function committedGoldenRuns(): GoldenRun[] {
     .map((name) => JSON.parse(readFileSync(new URL(name, GOLDEN_FOLDER), 'utf8')) as GoldenRun)
 }
 
-/** The golden as the charge records it: its moved digests swapped in. */
-export function asCharged(golden: GoldenRun): GoldenRun {
-  const moved = CHARGED_DIGESTS[golden.name] ?? {}
+/** The golden as the game records it with the exact carry off: its moved digests swapped back. */
+export function asUncharged(golden: GoldenRun): GoldenRun {
+  const moved = UNCHARGED_DIGESTS[golden.name] ?? {}
   return {
     ...golden,
     digests: golden.digests.map((record) => ({

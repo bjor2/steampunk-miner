@@ -1,6 +1,6 @@
 import RAPIER from '@dimforge/rapier3d-compat'
 import { afterEach, beforeAll, describe, expect, it } from 'vitest'
-import { DEV_FLAGS } from '../constants/devFlags'
+import { DEV_FLAGS, type DevFlags } from '../constants/devFlags'
 import { PHYSICS_TIMESTEP } from '../constants/physics'
 import { loggedCommandsOf } from '../logging/commandLog'
 import { createMemorySink, type MemorySink } from '../logging/eventSink'
@@ -11,15 +11,17 @@ import { withDrillExactCarry } from '../systems/authority/cutCarryFixtures'
 import { buildIntent } from '../systems/input/buildIntent'
 import { createRig } from './cutFollowFixtures'
 
-// The flag-off drill at a pose report every tick while it bites (#514 scope 4 and Done-when 4):
+// The swept-cut-off drill at a pose report every tick while it bites (#514 scope 4 and Done-when 4):
 // the scheduler reads the fixed tick, never the frame clock, so the same dig played under render
 // frames at 30, 60 and 144 a second sends the same commands, ends on the same authority digest
 // and leaves the body in the same place; the authority refuses none of its reports; and its
 // `commands.ndjson`, run-coded as the run log writes it (#522), stays under the Vertical Scaler's
 // 8 KB a second while drilling (TD 6224892444 on #514). Every tick only takes with the authority's
-// `drill.exactCarry` on (TD 6236464931), so both settings play: as the game ships (exact carry
-// off, a report every 12 ticks) and as it ships once the exact carry flips (every tick).
+// `drill.exactCarry` on (TD 6236464931), so both settings play: with the exact carry
+// off (a report every 12 ticks) and as it ships once the exact carry flips (every tick).
 
+/** The swept-cut-off client, the path `drill.reportEveryTick` reads (every flag ships on since 18 Oct 2026). */
+const SWEPT_CUT_OFF: DevFlags = { ...DEV_FLAGS, 'drill.sweptCut': false }
 const FRAME_RATES = [30, 60, 144]
 const DRILLING_SECONDS = 8
 const COMMAND_BYTES_PER_SECOND_MAX = 8 * 1024
@@ -33,9 +35,9 @@ beforeAll(async () => {
 
 afterEach(() => uninstallRunLog())
 
-/** The two settings: the game as it ships, and with `drill.exactCarry` flipped on. */
+/** The two settings of the swept-cut-off path: `drill.exactCarry` off, and on (as it ships). */
 const SETTINGS = [
-  { setting: 'as shipped, every 12 ticks', isExactCarry: false, reportsAtLeast: 40 },
+  { setting: 'with the exact carry off, every 12 ticks', isExactCarry: false, reportsAtLeast: 40 },
   { setting: 'with the exact carry on, every tick', isExactCarry: true, reportsAtLeast: 300 },
 ]
 
@@ -47,7 +49,7 @@ function digAt(framesPerSecond: number, isExactCarry: boolean) {
 function digFlagOffAt(framesPerSecond: number) {
   sink = createMemorySink()
   installRunLog(createRunLog({ runId: 'run_test', sink, secondsSinceStart: () => 0 }))
-  const rig = createRig(RAPIER, RIG, framesPerSecond, DEV_FLAGS)
+  const rig = createRig(RAPIER, RIG, framesPerSecond, SWEPT_CUT_OFF)
   const ticksOf = (seconds: number) => Math.round(seconds / PHYSICS_TIMESTEP)
   rig.hold(buildIntent(['aim_left']), ticksOf(2))
   const offPad = sink.commands.length
@@ -68,7 +70,7 @@ function commandLogBytesOf(commands: readonly AuthorityCommand[]): number {
 }
 
 describe.each(SETTINGS)(
-  'the flag-off drill $setting (#514)',
+  'the swept-cut-off drill $setting (#514)',
   ({ isExactCarry, reportsAtLeast }) => {
     it('sends the same commands, digest and position at 30, 60 and 144 frames a second', () => {
       const [first, ...others] = FRAME_RATES.map((rate) => digAt(rate, isExactCarry))

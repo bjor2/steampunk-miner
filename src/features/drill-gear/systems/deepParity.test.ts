@@ -36,8 +36,8 @@ import { DEEP_BRANCH } from './drillGearFork'
 // one drill-gear path, so with Deep owned the cell past the bit is cut either way at its own drill
 // time, on every planet from 1 to 20. The bot reaches it as the tile past the bored one and pays
 // the drill's energy for exactly the whole ticks its own hardness takes; so does the player's
-// report on the shipped charge, as the cell past the stamp's rim. With `drill.exactCarry` on
-// (ticket 535, off until #541 lands) the report's own cut is charged on the density it removed at
+// report on the per-tick charge (`drill.exactCarry` off), as the cell past the stamp's rim. With `drill.exactCarry` on
+// (ticket 535, on since 18 Oct 2026) the report's own cut is charged on the density it removed at
 // each cell's law time (the cell past the bit at Deep's whole share along the facing), exactly,
 // in the carry's numerator (Systems on #514: scripted and reported drills then charge the same
 // work, not the same ticks).
@@ -111,8 +111,12 @@ interface ReportedCut {
   aheadTile: TilePoint
 }
 
-/** The player's cut on the shipped charge: a report facing down with the drill running over the target. */
+/** The player's cut on the per-tick charge (`drill.exactCarry` off, as before ticket 535): a report facing down with the drill running over the target. */
 function playerCutOn(planet: number): GearCut {
+  return withDrillExactCarry(false, () => playerCutOnTickCharge(planet))
+}
+
+function playerCutOnTickCharge(planet: number): GearCut {
   const session = deepSessionOn(planet)
   const target = targetOn(planet)
   session.submit(1, poseAbove(target, FACING.down))

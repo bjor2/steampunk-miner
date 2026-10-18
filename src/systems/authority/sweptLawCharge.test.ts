@@ -54,9 +54,9 @@ function carveOfLawWork(lawWork: number): DrillCarve {
 }
 
 describe('swept law charge (ticket 540)', () => {
-  it('ships off, with the swept cut itself off in the client', () => {
-    expect(AUTHORITY_DEV_FLAGS['drill.sweptLawCharge']).toBe(false)
-    expect(DEV_FLAGS['drill.sweptCut']).toBe(false)
+  it('ships on, with the swept cut itself on in the client', () => {
+    expect(AUTHORITY_DEV_FLAGS['drill.sweptLawCharge']).toBe(true)
+    expect(DEV_FLAGS['drill.sweptCut']).toBe(true)
   })
 
   it('charges a fast rig within 1% of the law on a level bore, where the per-cell price under-charged', () => {

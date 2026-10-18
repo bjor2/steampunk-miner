@@ -55,7 +55,16 @@ beforeEach(() => {
 
 afterEach(() => uninstallRunLog())
 
-function createLiveVehicle(options: VehicleControllerOptions = {}, flags?: DevFlags) {
+/**
+ * The client with the swept cut off: the pose-report path these specs were written on. Every flag
+ * ships on since 18 Oct 2026, so the swept path is the shipped one and is read below with it on.
+ */
+const SWEPT_CUT_OFF: DevFlags = { ...DEV_FLAGS, 'drill.sweptCut': false }
+
+function createLiveVehicle(
+  options: VehicleControllerOptions = {},
+  flags: DevFlags = SWEPT_CUT_OFF,
+) {
   const world = new RAPIER.World({ x: 0, y: 0, z: 0 })
   world.timestep = PHYSICS_TIMESTEP
   const start = readLocalVehicle().pose
@@ -322,6 +331,14 @@ describe('vehicle loop, the ground the substeps meet (ticket 459)', () => {
 })
 
 describe('vehicle loop, the drill step (ticket 506)', () => {
+  it('sends drill steps as the game ships, with drill.sweptCut on', () => {
+    const vehicle = createLiveVehicle({}, DEV_FLAGS)
+    vehicle.hold(buildIntent(['aim_left']), 2)
+    vehicle.hold(buildIntent(['aim_down']), 3)
+    expect(destroyedTiles().length).toBeGreaterThan(0)
+    expect(facingsSent('drillStep').size).toBeGreaterThan(0)
+  })
+
   it('sends no drillStep with drill.sweptCut off', () => {
     const vehicle = createLiveVehicle()
     vehicle.hold(buildIntent(['aim_left']), 2)

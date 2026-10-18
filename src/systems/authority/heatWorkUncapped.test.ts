@@ -84,8 +84,8 @@ function reportAt(tick: number, drillTicks: number) {
 }
 
 describe('heat per unit of law work (ticket 541, heat.workUncapped)', () => {
-  it('ships off', () => {
-    expect(AUTHORITY_DEV_FLAGS['heat.workUncapped']).toBe(false)
+  it('ships on', () => {
+    expect(AUTHORITY_DEV_FLAGS['heat.workUncapped']).toBe(true)
   })
 
   it('heats a report whose drill ticks fit the elapsed ticks the same with the flag on or off', () => {

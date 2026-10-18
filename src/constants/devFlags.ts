@@ -1,11 +1,15 @@
 /**
- * Dev flags: engine changes that land switched off and are turned on together in a planned
- * re-baseline, never by the player. They are not unlocks, so they stay out of
+ * Every flag in this file ships ON (Bjor, 18 Oct 2026: "Turn everything on then. No reason to keep
+ * feature toggles off in this game."). The flags stay as kill-switches and for the specs that read
+ * the off paths; a later cleanup may delete them. Read each "off" below as the path a spec can
+ * still switch to, not as what the game plays.
+ *
+ * Dev flags: engine changes that landed switched off and were turned on together, never by the player. They are not unlocks, so they stay out of
  * `docs/scaling/horizontal/stats.json` and `FeatureUnlocked`.
  *
  * - `drill.sweptCut` (TD scope on #316, ticket 330): the client sends `drillStep` every fixed step
- *   its drill is engaged, so the authority cuts every tick instead of once per pose report. Off
- *   until the combined #304/#307 re-baseline; with it off the cut and the goldens are as before.
+ *   its drill is engaged, so the authority cuts every tick instead of once per pose report. On since
+ *   18 Oct 2026 (it waited on the combined #304/#307 re-baseline); with it off the cut and the goldens are as before.
  *   With it on the motor also follows the drill (TD scope 0, ticket 333): while the cut gate is
  *   open the drill law's speed sets the speed along the facing, and otherwise the engine drives at
  *   travel parity's top speed. The cut gate rides on the swept cut's cursor, so it is saved and
@@ -27,7 +31,7 @@ export interface DevFlags {
   readonly 'drill.reportEveryTick': boolean
 }
 
-export const DEV_FLAGS: DevFlags = { 'drill.sweptCut': false, 'drill.reportEveryTick': true }
+export const DEV_FLAGS: DevFlags = { 'drill.sweptCut': true, 'drill.reportEveryTick': true }
 
 /**
  * Dev flags the authority's rules read, apart from the client loop's `DevFlags` above:
@@ -40,8 +44,8 @@ export const DEV_FLAGS: DevFlags = { 'drill.sweptCut': false, 'drill.reportEvery
  * - `drill.exactCarry` (ticket 535, A6 "Option L" on #529, the TD shape 6228682000): a pose
  *   report's own cut (not one the swept cut's steps already cut) is charged on the density it
  *   removed at each cell's law time, the swept price, with an integer carry on the vehicle
- *   (`vehicle/cutCarry.ts`), and heats from the same tally; the carve itself is unchanged. Off in
- *   the game Bjor plays until #541's heat change has landed (G&V's condition, the GD 6234312287
+ *   (`vehicle/cutCarry.ts`), and heats from the same tally; the carve itself is unchanged. On since 18 Oct 2026; it was off in
+ *   the game Bjor played until #541's heat change had landed (G&V's condition, the GD 6234312287
  *   condition 1, Systems 6234342176): the #113 cap clips the law-exact feed at every tick on level
  *   bores, so fast rigs would run cooler than today. Off, the report charges the ticks its stamp
  *   removed something in and heats for its client-counted drill ticks, as protocol 84 did, and
@@ -54,7 +58,7 @@ export const DEV_FLAGS: DevFlags = { 'drill.sweptCut': false, 'drill.reportEvery
  *   work it removed with A6's rule and its energy carry (`LAW_SUB_STEP_CLOCK`), where it charged
  *   each broken cell its own dig energy, 0.62 to 1.74 times the law by geometry; the carve, its
  *   cells and its heat (the steps' summed dig time) are unchanged. A kill-switch for the
- *   authority's arithmetic: off, as `drill.sweptCut` is, and the two flip together behind the
+ *   authority's arithmetic: on since 18 Oct 2026 with `drill.sweptCut`, which it flipped together behind the
  *   ticket's gates and #541's. Off, the swept cut is charged as shipped, the parity reference for
  *   #537 until the flip; with `drill.sweptCut` off no `drillStep` is sent and no digest moves.
  * - `drill.reportCapsule` (ticket 537, A7, the TD shape 6228947744 section 4 with the HS additions,
@@ -76,7 +80,7 @@ export const DEV_FLAGS: DevFlags = { 'drill.sweptCut': false, 'drill.reportEvery
  *   still run per elapsed tick, and the gauge at its max behaves as before. A report at the tick
  *   the gauge settled leaves the exact carry's work on the carry for the next one. On the report
  *   path, the charged branch and swept alike; the bot's whole-tick clock never drills more ticks
- *   than elapsed, so its heat is the same either way. Off in the game Bjor plays until the paired
+ *   than elapsed, so its heat is the same either way. On since 18 Oct 2026 (Bjor's go); it was off until the paired
  *   run shows the per-trip heat budget as accepted (G&V condition 4): off, every heat settle is
  *   protocol 87's.
  * - `codex.materialContact` (ticket 546, the TD's contact rule 6243331970 as the GD amended it
@@ -96,9 +100,9 @@ export interface AuthorityDevFlags {
 
 export const AUTHORITY_DEV_FLAGS: AuthorityDevFlags = {
   'enemy.lureRetarget': true,
-  'drill.exactCarry': false,
-  'drill.sweptLawCharge': false,
+  'drill.exactCarry': true,
+  'drill.sweptLawCharge': true,
   'drill.reportCapsule': true,
-  'heat.workUncapped': false,
+  'heat.workUncapped': true,
   'codex.materialContact': true,
 }

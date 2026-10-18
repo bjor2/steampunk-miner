@@ -11,6 +11,7 @@ import { surfaceRowOfColumn, type TilePoint } from '../world/tileGrid'
 import { EMPTY_WORLD, materialCellAt } from '../world/worldState'
 import { statsOfVehicle } from '../vehicle/vehicleState'
 import { cellDigEnergyOf } from './cellDigEnergy'
+import { withSweptLawCharge } from './cutCarryFixtures'
 import { drillSubStepsOfCells } from './groundDrill'
 import type { CommandIntent } from './authorityCommand'
 import type { DomainEvent } from './domainEvent'
@@ -102,7 +103,11 @@ describe('drill step (ticket 330)', () => {
     expect(session.vehicle().sweptCut?.tick).toBe(50)
   })
 
-  it('charges each cell it breaks its own dig energy, and nothing for ground it only wears', () => {
+  // The per-cell price is the kill-switch's off path (`drill.sweptLawCharge`, on since 18 Oct 2026).
+  it('charges each cell it breaks its own dig energy, and nothing for ground it only wears, law charge off', () =>
+    withSweptLawCharge(false, chargesEachCell))
+
+  function chargesEachCell() {
     const session = sessionFacingDownAt()
     const before = session.vehicle().energy
     stepDown(session, 0, 5)
@@ -125,7 +130,7 @@ describe('drill step (ticket 330)', () => {
     expect(charged - session.vehicle().energy).toBe(
       broken.reduce((sum, event) => sum + energyOf(event), 0),
     )
-  })
+  }
 
   it('refuses a second step in one tick', () => {
     const session = sessionFacingDownAt()

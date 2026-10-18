@@ -8,6 +8,7 @@ import { EMPTY_WORLD } from '../world/worldState'
 import { vehicleOf, type AuthorityState } from './authorityState'
 import { toCanonicalJson } from './canonicalJson'
 import { cellDigEnergyOf } from './cellDigEnergy'
+import { withSweptLawCharge } from './cutCarryFixtures'
 import type { RuleEffect } from './commandRule'
 import type { DomainEventBody } from './domainEvent'
 import { FLOOR, HEAT_PARAMS } from './lava/lavaFixtures'
@@ -151,7 +152,13 @@ describe('swept span per chunk against the per-cell carve (ticket 374)', () => {
   })
 
   // Ticket 335 (TD lock on #374): energy exact per cell, so a tick charges each cell it broke.
-  it.each(SPEEDS_M_PER_S)('charges each cell a swept tick breaks at %i m/s', (speed) => {
+  // The per-cell price is the kill-switch's off path (`drill.sweptLawCharge`, on since 18 Oct 2026).
+  it.each(SPEEDS_M_PER_S)(
+    'charges each cell a swept tick breaks at %i m/s, law charge off',
+    (speed) => withSweptLawCharge(false, () => chargesEachCell(speed)),
+  )
+
+  function chargesEachCell(speed: number) {
     const fixture = chunkCornerSweep(speed)
     const cuts = spanCutsOf(fixture)
     const states = [fixture.start(), ...cuts.map(({ effect }) => effect.state)]
@@ -161,7 +168,7 @@ describe('swept span per chunk against the per-cell carve (ticket 374)', () => {
     const perCell = cellDigEnergyOf(1)
     expect(charges).toEqual(cuts.map(({ tally }) => tally.cells * perCell))
     expect(Math.max(...charges)).toBeGreaterThan(ENERGY_QUANTA_PER_TICK.drill)
-  })
+  }
 })
 
 describe('swept span drill_cut tally (ticket 374)', () => {

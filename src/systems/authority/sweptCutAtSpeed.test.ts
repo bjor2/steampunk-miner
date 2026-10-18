@@ -8,6 +8,7 @@ import { CHUNK_SIZE, chunkOfTile, surfaceRowOfColumn, type TilePoint } from '../
 import { EMPTY_WORLD, isGeneratedChunkHeld, materialCellAt } from '../world/worldState'
 import { vehicleOf, type AuthorityState } from './authorityState'
 import { cellDigEnergyOf } from './cellDigEnergy'
+import { withSweptLawCharge } from './cutCarryFixtures'
 import type { RuleEffect } from './commandRule'
 import type { DomainEventBody } from './domainEvent'
 import { drillAlongStep } from './drillStepCut'
@@ -100,10 +101,14 @@ const ringsOf = (run: SpeedRun) => eventsOf(run).filter(({ type }) => type === '
 describe('swept cut at any speed (ticket 335)', () => {
   const runs = SPEEDS_M_PER_S.map((speed) => cutColumnAt(speed))
 
-  it('charges each opened cell its own dig energy at 1, 4 and 16 m a tick', () => {
+  // The per-cell price is the kill-switch's off path (`drill.sweptLawCharge`, on since 18 Oct 2026).
+  it('charges each opened cell its own dig energy at 1, 4 and 16 m a tick, law charge off', () => {
     // The strong drill breaks every cell in one sub-step, so each costs the same.
     const perCell = cellDigEnergyOf(STRONG_SUB_STEPS)
-    for (const run of runs) {
+    const perCellRuns = withSweptLawCharge(false, () =>
+      SPEEDS_M_PER_S.map((speed) => cutColumnAt(speed)),
+    )
+    for (const run of perCellRuns) {
       expect(openedCellsOf(run).length).toBeGreaterThanOrEqual(PATH_METRES)
       expect(energySpentBy(run)).toBe(perCell * openedCellsOf(run).length)
     }
@@ -271,7 +276,11 @@ function onPlanet40(): { state: AuthorityState; params: PlanetParams; top: Vehic
 }
 
 describe('energy per cell on planet 40 at the rig cut speed (ticket 335, Vertical Scaler)', () => {
-  it('charges within 1% of each broken cell at its own dig time', () => {
+  // The per-cell price is the kill-switch's off path (`drill.sweptLawCharge`, on since 18 Oct 2026).
+  it('charges within 1% of each broken cell at its own dig time, law charge off', () =>
+    withSweptLawCharge(false, chargesWithinOnePercent))
+
+  function chargesWithinOnePercent() {
     const start = onPlanet40()
     const stepMm = stepBoundsAt(start.state, 'p1').cuttingMm - STEP_BOUND_TOLERANCE_MM
     let state = start.state
@@ -292,5 +301,5 @@ describe('energy per cell on planet 40 at the rig cut speed (ticket 335, Vertica
     const spent = vehicleOf(start.state, 'p1').energy - vehicleOf(state, 'p1').energy
     expect(broken.length).toBeGreaterThanOrEqual(10)
     expect(Math.abs(spent / reference - 1)).toBeLessThanOrEqual(0.01)
-  })
+  }
 })

@@ -664,3 +664,22 @@ Fix (`.bak-20261017-1540-pickstdout`):
   Stub-tested with the real `merge_hold`: no marker gives held (`on-hold` added, attempt 1 to 0, `state.merge_held["450"]` records `why: release`). With the marker it returns "goes ahead".
 - **Release:** once the GPU numbers are on #450, run `touch /workspace/claude-sessions/steampunk-loop/merge-release.d/450`. The next pick pass (`merge_release_sweep`) lifts `on-hold`, and the ticket is re-claimed once to rebase and re-run. That session then lands on main by the normal path.
 - **Real-GPU run:** the driver does not push a held branch. Push it by hand as a non-main branch, `git push origin ticket/450:refs/heads/ticket/450` (no force). CI only runs on pushes to `main`, so that push triggers nothing.
+
+## All feature flags now default on (18 Oct 2026)
+
+Bjor, 18 Oct 2026: "Turn everything on then. No reason to keep feature toggles off in this game." Every flag in `src/constants/devFlags.ts` now ships **on**, so the game a player runs is
+the new drill, heat and charge rules. The flag code paths stay (kill-switches, and the specs that read the off paths); a later cleanup can delete them.
+
+| Flag                                                                 | Was | Now    | Ticket               |
+| -------------------------------------------------------------------- | --- | ------ | -------------------- |
+| `drill.sweptCut` (`DEV_FLAGS`)                                       | off | **on** | #330, #333, #334     |
+| `drill.exactCarry` (`AUTHORITY_DEV_FLAGS`)                           | off | **on** | #535 (A6), #537 (A7) |
+| `drill.sweptLawCharge`                                               | off | **on** | #540                 |
+| `heat.workUncapped`                                                  | off | **on** | #541                 |
+| `drill.reportEveryTick`, `drill.reportCapsule`, `enemy.lureRetarget` | on  | on     | #514, #537, #361     |
+
+- **Goldens:** `npm run golden:update` re-recorded the two goldens the exact carry moves (`casing-lined-band-2` end digest `b51f4e5a8a552c1e` to `4f2b5b5df597d375`, `collapse-band-2-grade-1`
+  `ea282a1cfc739ec2` to `fd1d79ed2a080e24`). The old digests stay pinned in `src/logging/chargedGoldenDigests.ts` (`UNCHARGED_DIGESTS`) and the kill-switch goldens replay them with the exact carry off.
+- **Specs that read an off path** now switch the flag off for their run (`withDrillExactCarry(false, ...)`, `withSweptLawCharge(false, ...)`, a swept-cut-off client in `vehicleLoop.test.ts`, `drillReportCadence.test.ts`, `poseReport.test.ts`).
+- **Known interaction:** with `drill.sweptCut` on, `drill.reportEveryTick` (#514) reads nothing: the swept path keeps pose reports 12 ticks apart and the `drillStep` carries the cut. The every-tick report cadence only runs with the swept cut switched off.
+- **Still red by name:** #545's three carve-geometry deviations (`carveGeometryKnownRed.ts`) and `CAMPAIGN_PACING_KNOWN_RED` (#417) are unchanged. The fixed-track lane switches the flags on itself, so flipping the default moves neither.

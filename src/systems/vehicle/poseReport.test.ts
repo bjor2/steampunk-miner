@@ -26,8 +26,10 @@ const IDLE: ActionFlags = { isDriving: false, isThrusting: false, isDrilling: fa
 
 /** The authority with the report cut charged exactly, which turns on every-tick reports (ticket 514). */
 const EXACT_CARRY_ON: AuthorityDevFlags = { ...AUTHORITY_DEV_FLAGS, 'drill.exactCarry': true }
-/** The loop's drill interval once `drill.exactCarry` flips: a report every tick on the flag-off path. */
-const EVERY_TICK_INTERVAL = drillReportIntervalOf(DEV_FLAGS, EXACT_CARRY_ON)
+/** The client with the swept cut off: the only path `drill.reportEveryTick` reads (every flag ships on since 18 Oct 2026). */
+const SWEPT_CUT_OFF: DevFlags = { ...DEV_FLAGS, 'drill.sweptCut': false }
+/** The loop's drill interval with the swept cut off and the exact carry on: a report every tick. */
+const EVERY_TICK_INTERVAL = drillReportIntervalOf(SWEPT_CUT_OFF, EXACT_CARRY_ON)
 
 /** Drives along x at 3 m/s for `ticks` fixed steps, collecting every report sent. */
 function driveAndReport(ticks: number, flags: ActionFlags = DRIVING, drive: DriveSigns = NO_DRIVE) {
@@ -110,8 +112,9 @@ describe('pose reports', () => {
     expect(after).toEqual([52, 64, 76, 88, 100, 112, 124, 136, 148])
   })
 
-  it('keep 12 ticks apart while drilling as the game ships, with the exact carry off', () => {
-    expect(AUTHORITY_DEV_FLAGS['drill.exactCarry']).toBe(false)
+  it('keep 12 ticks apart while drilling as the game ships, with the swept cut on', () => {
+    expect(AUTHORITY_DEV_FLAGS['drill.exactCarry']).toBe(true)
+    expect(DEV_FLAGS['drill.sweptCut']).toBe(true)
     const shipped = drillReportIntervalOf(DEV_FLAGS)
     expect(shipped).toBe(12)
     const ticks = reportAlong(120, () => DRILLING, NO_DRIVE, shipped).map(({ tick }) => tick)
@@ -129,14 +132,14 @@ describe('pose reports', () => {
     }
   })
 
-  it('report every drill tick on the flag-off path only, once the exact carry is on', () => {
-    expect(drillReportIntervalOf(DEV_FLAGS, EXACT_CARRY_ON)).toBe(1)
+  it('report every drill tick on the swept-cut-off path only, once the exact carry is on', () => {
+    expect(drillReportIntervalOf(SWEPT_CUT_OFF, EXACT_CARRY_ON)).toBe(1)
     expect(drillReportIntervalOf({ ...DEV_FLAGS, 'drill.sweptCut': true }, EXACT_CARRY_ON)).toBe(12)
   })
 
   it('keep 12 ticks apart while drilling with the kill-switch off, as before ticket 514', () => {
     const killed = drillReportIntervalOf(
-      { ...DEV_FLAGS, 'drill.reportEveryTick': false },
+      { ...SWEPT_CUT_OFF, 'drill.reportEveryTick': false },
       EXACT_CARRY_ON,
     )
     const ticks = reportAlong(120, () => DRILLING, NO_DRIVE, killed).map(({ tick }) => tick)
