@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "updated_at": "2026-10-18T00:05:04Z",
+  "updated_at": "2026-10-18T00:05:10Z",
   "entries": {
     "steampunk-loop/1": {
       "loop": "steampunk-loop",
@@ -517,9 +517,9 @@
       "slot": null,
       "state": "working",
       "issue": null,
-      "note": "testing spec #395 (Art: upgrade workshop building — steampunk hangar (Blender MCP), replaces Engineering Works) on 8179ab8",
+      "note": "queue run on ea1e2dc (close-#537)",
       "stale_after_min": 420,
-      "updated_at": "2026-10-17T23:52:14Z",
+      "updated_at": "2026-10-18T00:05:10Z",
       "host": "grok-bot-vm-452660841"
     },
     "steampunk-loop/10": {
