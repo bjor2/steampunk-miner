@@ -45,7 +45,7 @@ const STORED_RIGS: Readonly<Record<string, Record<string, number>>> = {
   'stored 10': { drill_power: 10, drill_tip: 0 },
   'stored 20': { drill_power: 20, drill_tip: 0 },
 }
-const RIG_1 = { drill_power: 300, drill_tip: 200 }
+const RIG_1 = { drill_power: 17, drill_tip: 200 }
 const FRAME_RATES = [30, 144]
 /** The pose report's interval in ticks (#11 amendment): the phases a press can land on. */
 const REPORT_PHASES = 12

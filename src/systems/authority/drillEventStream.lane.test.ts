@@ -20,7 +20,7 @@ import {
 
 const RIGS: Readonly<Record<string, Readonly<Record<string, number>>>> = {
   starting: {},
-  'law 23': { drill_power: 50, drill_tip: 600 },
+  'law 21': { drill_power: 4, drill_tip: 600 },
 }
 const TRACKS: readonly StreamTrack[] = ['straight', 'turn']
 const SPEEDS_MPS = [0.5, 3]

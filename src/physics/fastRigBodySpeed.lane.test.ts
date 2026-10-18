@@ -41,7 +41,9 @@ import {
 // body and the gate, for #400's down leg on planet 1 at 30 and 144 frames/s with `drill.sweptCut`
 // on. Each steady cut tick is named by `systems/vehicle/bodySpeedDips.ts`. The rigs are stored
 // levels; past #396's 4-tick floor (#397 removes it) they cut at 25, 44, 56, 62 and 78 m/s, under
-// it all of them cut at 15 m/s. A lane: it runs only when named, prints the table and writes the
+// it all of them cut at 15 m/s. Since the per-purchase drill of #552 they are the first purchases
+// at or past those speeds (25.5, 49, 61, 76 and 94 m/s), the gate-shut ceilings still the ones
+// measured at the old speeds until a run re-pins them. A lane: it runs only when named, prints the table and writes the
 // trace to balance-report/fast-rig-body-speed.ndjson for comparing runs across commits.
 //
 // Since ticket 459 the substeps collide with the world the tick's own cut left, so no steady tick
@@ -50,11 +52,11 @@ import {
 // waits there for the cut (#492), so the gate-shut count is held to the recorded rows.
 
 const RIGS: Readonly<Record<string, Record<string, number>>> = {
-  'stored 250/600': { drill_power: 250, drill_tip: 600 },
-  'rig 1 (#400)': { drill_power: 300, drill_tip: 200 },
-  'stored 320/600': { drill_power: 320, drill_tip: 600 },
-  'stored 330/600': { drill_power: 330, drill_tip: 600 },
-  'stored 350/600': { drill_power: 350, drill_tip: 600 },
+  'stored 14/600': { drill_power: 14, drill_tip: 600 },
+  'rig 1 (#400)': { drill_power: 17, drill_tip: 200 },
+  'stored 18/600': { drill_power: 18, drill_tip: 600 },
+  'stored 19/600': { drill_power: 19, drill_tip: 600 },
+  'stored 20/600': { drill_power: 20, drill_tip: 600 },
 }
 const FRAME_RATES = [30, 144]
 const DOWN_LEG_SECONDS = 3
@@ -65,11 +67,11 @@ const RUN_TIMEOUT_MS = 600_000
  * 6209399402 on #459): may only shrink, as #492 keeps the cut ahead of the body.
  */
 const GATE_SHUT_TICKS_MAX: Readonly<Record<string, number>> = {
-  'stored 250/600': 35,
+  'stored 14/600': 35,
   'rig 1 (#400)': 42,
-  'stored 320/600': 75,
-  'stored 330/600': 41,
-  'stored 350/600': 76,
+  'stored 18/600': 75,
+  'stored 19/600': 41,
+  'stored 20/600': 76,
 }
 /** The body's half width, and the slab's sample spacing across and along it (half a sample). */
 const BODY_HALF_M = 0.45

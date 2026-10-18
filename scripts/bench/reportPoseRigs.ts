@@ -31,7 +31,7 @@ const FULL_TANK = { type: 'debug.setEnergy', payload: { energy: '1000000000' } }
 
 export const PLANET_1_RIG: BenchRig = {
   planetLevel: 1,
-  levels: { drill_power: 2000, drill_tip: 600 },
+  levels: { drill_power: 106, drill_tip: 600 },
 }
 export const PLANET_200_RIG: BenchRig = { planetLevel: 200, levels: onCurveSteps(200) }
 

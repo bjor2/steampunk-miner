@@ -60,12 +60,12 @@ interface LoopRig {
   readMetres: Readonly<Record<Section, number>>
 }
 const RIGS: Readonly<Record<string, LoopRig>> = {
-  'law 23': {
-    levels: { drill_tip: 600, engine: 5000, drill_power: 50 },
+  'law 21': {
+    levels: { drill_tip: 600, engine: 5000, drill_power: 4 },
     readMetres: { down: 70, level: 150 },
   },
-  'power 200': {
-    levels: { drill_power: 200, drill_tip: 600, hull: 5000 },
+  'power 12': {
+    levels: { drill_power: 12, drill_tip: 600, hull: 5000 },
     readMetres: { down: 70, level: 250 },
   },
 }

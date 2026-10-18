@@ -132,7 +132,7 @@ async function waitForArt(page: Page): Promise<void> {
 async function digDown(page: Page): Promise<void> {
   await page.evaluate(() => {
     const debug = window.steampunkDebug!
-    debug.setUpgrade('drill_power', 120)
+    debug.setUpgrade('drill_power', 8)
     debug.setUpgrade('drill_tip', 120)
     debug.setUpgrade('engine', 80)
     debug.input.press('aim_left')

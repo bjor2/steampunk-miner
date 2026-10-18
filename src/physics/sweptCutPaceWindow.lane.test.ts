@@ -44,7 +44,7 @@ import type { Vector2 } from '../systems/vehicle/localFrame'
 const RIG_LEVELS = {
   drill_tip: 600,
   engine: 5000,
-  drill_power: 50,
+  drill_power: 4,
   cargo_hold: 10_000,
   hull: 0,
 } as const

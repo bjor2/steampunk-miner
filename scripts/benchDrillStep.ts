@@ -53,7 +53,7 @@ const BUDGET = {
 const AT_BUDGET_STEPS_MM = [8_000, 16_000]
 const START = { x: -10_000, y: 279_500 }
 const FLOOR_BOUND = [
-  { upgradeId: 'drill_power', level: 2000 },
+  { upgradeId: 'drill_power', level: 106 },
   { upgradeId: 'drill_tip', level: 600 },
 ]
 

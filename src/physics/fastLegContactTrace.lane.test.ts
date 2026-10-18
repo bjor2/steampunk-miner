@@ -71,8 +71,8 @@ interface TracedLeg {
 }
 
 const TRACED_LEGS: readonly TracedLeg[] = [
-  { rig: '25 m/s', levels: { drill_power: 250, drill_tip: 600, engine: 5000 }, leg: 'up' },
-  { rig: '44 m/s (rig 1, #400)', levels: { drill_power: 300, drill_tip: 200 }, leg: 'down' },
+  { rig: '25 m/s', levels: { drill_power: 14, drill_tip: 600, engine: 5000 }, leg: 'up' },
+  { rig: '44 m/s (rig 1, #400)', levels: { drill_power: 17, drill_tip: 200 }, leg: 'down' },
 ]
 const FRAME_RATES = [30, 144]
 /** `cutSmoothness.test.ts`'s #421 interim bar and its 5% line, 2% of a leg's ticks allowed off. */
