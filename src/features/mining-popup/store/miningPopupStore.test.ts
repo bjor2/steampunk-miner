@@ -2,7 +2,11 @@ import { afterEach, beforeEach, describe, expect, it } from 'vitest'
 import { listenForDomainEvents } from '../../../store/domainEventBroadcast'
 import { readAuthorityTick, resetGameStore, useGameStore } from '../../../store/gameStore'
 import { surfaceOreTiles } from '../../../systems/authority/scriptedSession'
+import { planetParamsOf } from '../../../systems/authority/planetOfState'
 import { oreTypeAtTile } from '../../../systems/authority/tileOre'
+import { kindLookProvider } from '../../../systems/registries/kindLook'
+import { kindSlotOfCell, NO_KIND_SLOT } from '../../../systems/world/worldCell'
+import { cellAt } from '../../../systems/world/worldState'
 import { readAuthorityState } from '../../../store/authorityLink'
 import type { ScriptedCommand } from '../../../systems/fastForward'
 import { FACING } from '../../../systems/vehicle/vehiclePose'
@@ -69,6 +73,15 @@ function mine(tiles: readonly TilePoint[], spacing = 50): void {
   game().fastForward(spacing * tiles.length, commands)
 }
 
+/** The rarity lead of the species the tile's cell wears on the store's planet, or null. */
+function speciesLeadAt(tile: TilePoint): number | null {
+  const state = readAuthorityState()
+  const params = planetParamsOf(state.planet)!
+  const slot = kindSlotOfCell(cellAt(state.world, params, tile))
+  if (slot === NO_KIND_SLOT) return null
+  return kindLookProvider()?.kindLooksOf(params)[slot - 1]?.rarityLead ?? null
+}
+
 function oreIdAt(tile: TilePoint): string | undefined {
   return oreTypeAtTile(readAuthorityState(), tile)?.id
 }
@@ -121,6 +134,49 @@ describe('mining popup store', () => {
     popup().showAt(readAuthorityTick())
     expect(chipsShownAt(popup().chipBoard, popup().tick)).toEqual([])
     expect(plaqueShownAt(popup().plaqueBoard, popup().tick)).toBeNull()
+  })
+
+  it("names a drilled unit's rarity on its chip and plaque once the drill has met its species (ticket 454)", () => {
+    const tile = surfaceOreTiles(20, PLANET_1).find(
+      (candidate) => speciesLeadAt(candidate) !== null,
+    )
+    expect(tile).toBeDefined()
+    const rarity = kindLookProvider()?.rarityIdOfLead(speciesLeadAt(tile!)!)
+    mine([tile!])
+    const [chip] = chipsShownAt(popup().chipBoard, popup().tick)
+    const [line] = plaqueShownAt(popup().plaqueBoard, popup().tick)!.materials
+    expect(chip.rarity?.rarity).toBe(rarity)
+    expect(line.rarity).toEqual(chip.rarity)
+  })
+
+  it("leaves a blast's unit unspecified: it names no cell to read the rarity from", () => {
+    const tile = surfaceOreTiles(20, PLANET_1).find(
+      (candidate) => speciesLeadAt(candidate) !== null,
+    )!
+    const oreId = oreIdAt(tile)!
+    mine([tile])
+    popup().showAt(readAuthorityTick() + 400)
+    const tick = readAuthorityTick() + 401
+    const stamp = { playerId: game().playerId, tick, seq: 1 }
+    popup().observePickups(
+      [
+        { ...stamp, type: 'TileDestroyed', ...tile, kind: 'ore', cause: 'blast' },
+        {
+          ...stamp,
+          type: 'CargoAdded',
+          resourceTier: 1,
+          amount: 1,
+          value: '1e+0',
+          oreId,
+          depthTiles: 0,
+          chunk: '0,0',
+        },
+      ],
+      game().playerId,
+    )
+    const [chip] = chipsShownAt(popup().chipBoard, tick)
+    expect(chip.face.oreId).toBe(oreId)
+    expect(chip.rarity).toBeNull()
   })
 
   it('shows nothing for another player', () => {

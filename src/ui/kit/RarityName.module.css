@@ -1,0 +1,36 @@
+/*
+ * A seen material's name (ticket 454): its rarity's tint on the text and a thin frame in the same
+ * tint; common keeps the panel's text colour and frame. Epic and mythic pulse a soft glow; with
+ * reduce motion (the shake switch drops `data-pulse`, and the media rule below) the glow holds
+ * still: static colour and frame only.
+ */
+.name {
+  padding: 0 2px;
+  border: 1px solid transparent;
+  border-radius: 3px;
+}
+
+.name[data-tinted] {
+  border-color: var(--rarity-tint);
+  color: var(--rarity-tint);
+}
+
+.name[data-pulse] {
+  animation: rarity-pulse 1.6s ease-in-out infinite alternate;
+}
+
+@keyframes rarity-pulse {
+  from {
+    text-shadow: 0 0 0 transparent;
+  }
+
+  to {
+    text-shadow: 0 0 6px var(--rarity-tint);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .name[data-pulse] {
+    animation: none;
+  }
+}

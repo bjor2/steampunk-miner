@@ -7,6 +7,7 @@ import {
   type ChipBoard,
   type OrePickup,
 } from './chipBoard'
+import type { SeenRarity } from '../../../systems/render/seenRarity'
 import type { OreFace } from './oreFace'
 
 const UP = { along: 0, upward: 1 }
@@ -16,7 +17,7 @@ function faceOf(oreId: string): OreFace {
 }
 
 function pickup(oreId: string, tick: number, planetIndex = 1): OrePickup {
-  return { face: faceOf(oreId), amount: 1, tick, planetIndex, away: UP }
+  return { face: faceOf(oreId), amount: 1, tick, planetIndex, away: UP, rarity: null }
 }
 
 function pickAll(pickups: readonly OrePickup[], board: ChipBoard = EMPTY_CHIP_BOARD): ChipBoard {
@@ -26,7 +27,20 @@ function pickAll(pickups: readonly OrePickup[], board: ChipBoard = EMPTY_CHIP_BO
 const shownIds = (board: ChipBoard, tick: number) =>
   chipsShownAt(board, tick).map((chip) => `${chip.face.oreId}x${chip.count}`)
 
+const RARE: SeenRarity = { lead: 2, rarity: 'rare', tint: [0, 0, 1], pulse: 0 }
+const EPIC: SeenRarity = { lead: 3, rarity: 'epic', tint: [1, 0, 1], pulse: 0.3 }
+
 describe('resource chips', () => {
+  it('keeps the rarest seen rarity a chip has merged (ticket 454)', () => {
+    const board = pickAll([
+      { ...pickup('iron', 0), rarity: RARE },
+      pickup('iron', 10),
+      { ...pickup('iron', 20), rarity: EPIC },
+      { ...pickup('iron', 30), rarity: RARE },
+    ])
+    expect(chipsShownAt(board, 30).map((chip) => chip.rarity)).toEqual([EPIC])
+  })
+
   it('merges pickups of one type within 1.2 s into one chip that counts them', () => {
     const board = pickAll([pickup('iron', 0), pickup('iron', 72), pickup('iron', 144)])
     expect(shownIds(board, 144)).toEqual(['ironx3'])

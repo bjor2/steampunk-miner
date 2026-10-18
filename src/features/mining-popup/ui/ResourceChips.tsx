@@ -1,9 +1,13 @@
 /**
  * The HUD overlay's resource chips (#172 §1): each chip is an overlay card riding beside the
- * vehicle, away from where it is going, rising as it shows and fading at the end of its life.
- * Reads only the popup store; the cards place themselves every frame (#208).
+ * vehicle, away from where it is going, rising as it shows and fading at the end of its life. A
+ * named chip draws its name in its seen rarity's colour (ticket 454). Reads only the popup store
+ * and the reduce-motion switch; the cards place themselves every frame (#208).
  */
 import { useMemo, type CSSProperties } from 'react'
+import { useGameStore } from '../../../store/gameStore'
+import { rarityNameOf } from '../../../systems/views/rarityName'
+import { RarityName } from '../../../ui/kit/RarityName'
 import { OverlayCard } from '../../../ui/overlay/OverlayCard'
 import { useMiningPopupStore } from '../store/miningPopupStore'
 import { chipPhaseAt, chipsShownAt, type ResourceChip } from '../systems/chipBoard'
@@ -34,6 +38,11 @@ export function ResourceChips() {
 function ChipCard({ chip, tick }: { chip: ResourceChip; tick: number }) {
   const { away, slot } = chip
   const anchor = useMemo(() => chipAnchorOf(away), [away])
+  const isMotionReduced = useGameStore((state) => !state.prefs.shake)
+  const rarity = useMemo(
+    () => rarityNameOf(chip.rarity, isMotionReduced),
+    [chip.rarity, isMotionReduced],
+  )
   const stack = { '--chip-stack': chipStackOf(away, slot) } as CSSProperties
   return (
     <OverlayCard anchor={anchor}>
@@ -46,7 +55,11 @@ function ChipCard({ chip, tick }: { chip: ResourceChip; tick: number }) {
         data-phase={chipPhaseAt(chip, tick)}
       >
         <OreIcon face={chip.face} size="chip" />
-        {chip.isNamed && <span className={styles.name}>{chip.face.name}</span>}
+        {chip.isNamed && (
+          <span className={styles.name}>
+            <RarityName rarity={rarity}>{chip.face.name}</RarityName>
+          </span>
+        )}
         <span key={chip.count} className={styles.count}>
           {chipCountTextOf(chip.count)}
         </span>

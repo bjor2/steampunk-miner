@@ -2,7 +2,9 @@
  * The tier-0 "NEW MATERIAL" plaque (#172 §2) in the HUD's banner slot: under the banner in the
  * top band, in the bottom band while the vehicle lifts at speed, and one line in the bottom band
  * on a screen whose top band has no room for it (`plaqueFitOf`). It comes in, holds and fades on
- * the authority's clock and never takes a click. Reads only the popup store and the local vehicle.
+ * the authority's clock and never takes a click. The first material's name shows in its seen
+ * rarity's colour (ticket 454). Reads only the popup store, the local vehicle and the
+ * reduce-motion switch.
  */
 import { useMemo } from 'react'
 import { readAuthorityState } from '../../../store/authorityLink'
@@ -14,6 +16,8 @@ import { plaqueTextOf } from '../systems/popupText'
 import type { PlaqueBand } from '../systems/render/chipPlacement'
 import { plaqueBandOn, plaqueFitOf, type PlaqueFit } from '../systems/render/plaqueFit'
 import { readFittedScreen } from '../../../ui/stage/screenFit'
+import { rarityNameOf } from '../../../systems/views/rarityName'
+import { RarityName } from '../../../ui/kit/RarityName'
 import { OreIcon } from './OreIcon'
 import { MINING_POPUP_TEST_IDS } from './testIds'
 import { usePopupClock } from './usePopupClock'
@@ -53,6 +57,8 @@ function NewMaterialPlaqueView({
   spot: PlaqueSpot
 }) {
   const text = plaqueTextOf(plaque)
+  const isMotionReduced = useGameStore((state) => !state.prefs.shake)
+  const rarity = rarityNameOf(plaque.materials[0].rarity, isMotionReduced)
   return (
     <div
       className={styles.plaque}
@@ -66,7 +72,9 @@ function NewMaterialPlaqueView({
       <OreIcon face={plaque.materials[0].face} size="tile" />
       <span className={styles.lines}>
         <span className={styles.title}>{text.title}</span>
-        <strong className={styles.name}>{text.name}</strong>
+        <strong className={styles.name}>
+          <RarityName rarity={rarity}>{text.name}</RarityName>
+        </strong>
         <span className={styles.detail}>{text.detail}</span>
         <span className={styles.price}>{text.price}</span>
         {text.joined.map(({ face }) => (

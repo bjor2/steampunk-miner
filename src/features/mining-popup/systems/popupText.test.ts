@@ -12,7 +12,7 @@ function material(oreId: string, name: string, unitPriceText: string): NewMateri
     iconId: 'none',
     swatch: 'red',
   }
-  return { face, unitPriceText }
+  return { face, unitPriceText, rarity: null }
 }
 
 function plaqueOf(materials: readonly NewMaterial[]): MaterialPlaque {

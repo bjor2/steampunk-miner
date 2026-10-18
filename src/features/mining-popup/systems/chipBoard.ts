@@ -12,6 +12,7 @@ import {
   MOST_CHIPS_SHOWN,
   NAMED_CHIPS_PER_PLANET,
 } from './popupTiming'
+import type { SeenRarity } from '../../../systems/render/seenRarity'
 import type { OreFace } from './oreFace'
 import type { LocalDirection } from './render/chipPlacement'
 
@@ -22,6 +23,8 @@ export interface OrePickup {
   planetIndex: number
   /** Where a chip spawned by this pickup sits; a merge keeps the chip where it is. */
   away: LocalDirection
+  /** The unit's rarity once its material is seen (ticket 454); null while unspecified. */
+  rarity: SeenRarity | null
 }
 
 export interface ResourceChip {
@@ -36,6 +39,8 @@ export interface ResourceChip {
   slot: number
   isNamed: boolean
   away: LocalDirection
+  /** The rarest seen rarity merged into the chip; null while every unit's is unspecified. */
+  rarity: SeenRarity | null
 }
 
 export type ChipPhase = 'rising' | 'fading'
@@ -97,6 +102,7 @@ function withMergedChip(board: ChipBoard, chip: ResourceChip, pickup: OrePickup)
     ...chip,
     count: chip.count + pickup.amount,
     lastTick: pickup.tick,
+    rarity: rarerOf(chip.rarity, pickup.rarity),
     endsTick: Math.min(lifeCapOf(chip), Math.max(chip.endsTick, pickup.tick + BASE_LIFE_TICKS)),
   }
   return { ...board, chips: board.chips.map((shown) => (shown === chip ? merged : shown)) }
@@ -137,7 +143,13 @@ function spawnedChipOf(
     slot: freeSlotOf(kept),
     isNamed: spawnsOf(board, pickup) <= NAMED_CHIPS_PER_PLANET,
     away: pickup.away,
+    rarity: pickup.rarity,
   }
+}
+
+function rarerOf(shown: SeenRarity | null, picked: SeenRarity | null): SeenRarity | null {
+  if (shown === null) return picked
+  return picked !== null && picked.lead > shown.lead ? picked : shown
 }
 
 function spawnsOf(board: ChipBoard, pickup: OrePickup): number {

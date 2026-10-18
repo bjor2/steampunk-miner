@@ -4,6 +4,7 @@
  * past 6 s from its first appearance; there is never a queue. Tiers 1 and 2 follow #146 (Game
  * Director on #178). Pure: time is the authority tick of the discovery.
  */
+import type { SeenRarity } from '../../../systems/render/seenRarity'
 import type { OreFace } from './oreFace'
 import {
   PLAQUE_FADE_TICKS,
@@ -17,6 +18,8 @@ export interface NewMaterial {
   face: OreFace
   /** "sells for ~X each": the gross Sell-bay unit price on this planet, `formatAmount`ed. */
   unitPriceText: string
+  /** The first unit's rarity once its material is seen (ticket 454); null while unspecified. */
+  rarity: SeenRarity | null
 }
 
 export interface MaterialPlaque {

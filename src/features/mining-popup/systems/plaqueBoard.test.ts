@@ -17,7 +17,7 @@ function material(oreId: string): NewMaterial {
     iconId: 'none',
     swatch: 'red',
   }
-  return { face, unitPriceText: '0.5' }
+  return { face, unitPriceText: '0.5', rarity: null }
 }
 
 const discover = (oreId: string, tick: number, board = EMPTY_PLAQUE_BOARD) =>
