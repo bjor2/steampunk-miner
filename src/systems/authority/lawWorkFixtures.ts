@@ -195,8 +195,8 @@ export const DIG_SPEED_BARS = {
  * 0.99. A band's floor allows one cell of the reference's quantization, as `geometryMissesOf` does.
  */
 export const CARVE_GEOMETRY_BARS = {
-  floor: { lawWorkFloor: 1, lawWorkCeiling: Infinity, cellsPerMetreShare: 0.05 },
-  parity: { lawWorkFloor: 0.99, lawWorkCeiling: 1.05, cellsPerMetreShare: 0.05 },
+  floor: { lawWorkFloor: 1, lawWorkCeiling: Infinity, cellsPerMetreShare: 1 / 20 },
+  parity: { lawWorkFloor: 0.99, lawWorkCeiling: 1.05, cellsPerMetreShare: 1 / 20 },
 }
 
 /** A band on the ratio to a reference: law work per metre between the two, cells within the share. */
