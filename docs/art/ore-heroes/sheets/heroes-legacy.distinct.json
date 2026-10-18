@@ -1,0 +1,85 @@
+{
+  "pool": "legacy",
+  "tilePx": 40,
+  "heroes": {
+    "violet-fluorite-quartzine": {
+      "coverage": 0.388,
+      "hueDeg": 260.3,
+      "luma": 0.517,
+      "rockLuma": 0.31,
+      "contrast": 1.58
+    },
+    "vein-gold-brassvein": {
+      "coverage": 0.188,
+      "hueDeg": 51.2,
+      "luma": 0.552,
+      "rockLuma": 0.245,
+      "contrast": 2.04
+    },
+    "blue-corundum-quartzine": {
+      "coverage": 0.216,
+      "hueDeg": 224.0,
+      "luma": 0.639,
+      "rockLuma": 0.31,
+      "contrast": 1.92
+    },
+    "red-beryl-quartzine": {
+      "coverage": 0.193,
+      "hueDeg": 354.4,
+      "luma": 0.549,
+      "rockLuma": 0.245,
+      "contrast": 2.03
+    }
+  },
+  "pairs": [
+    {
+      "a": "violet-fluorite-quartzine",
+      "b": "vein-gold-brassvein",
+      "silhouetteDifference": 0.748,
+      "hueDifferenceDeg": 150.9,
+      "lumaDifference": 0.035,
+      "deutanDistance": 0.545
+    },
+    {
+      "a": "violet-fluorite-quartzine",
+      "b": "blue-corundum-quartzine",
+      "silhouetteDifference": 0.599,
+      "hueDifferenceDeg": 36.3,
+      "lumaDifference": 0.122,
+      "deutanDistance": 0.227
+    },
+    {
+      "a": "violet-fluorite-quartzine",
+      "b": "red-beryl-quartzine",
+      "silhouetteDifference": 0.671,
+      "hueDifferenceDeg": 94.1,
+      "lumaDifference": 0.032,
+      "deutanDistance": 0.4
+    },
+    {
+      "a": "vein-gold-brassvein",
+      "b": "blue-corundum-quartzine",
+      "silhouetteDifference": 0.752,
+      "hueDifferenceDeg": 172.8,
+      "lumaDifference": 0.087,
+      "deutanDistance": 0.709
+    },
+    {
+      "a": "vein-gold-brassvein",
+      "b": "red-beryl-quartzine",
+      "silhouetteDifference": 0.673,
+      "hueDifferenceDeg": 56.8,
+      "lumaDifference": 0.003,
+      "deutanDistance": 0.179
+    },
+    {
+      "a": "blue-corundum-quartzine",
+      "b": "red-beryl-quartzine",
+      "silhouetteDifference": 0.643,
+      "hueDifferenceDeg": 130.4,
+      "lumaDifference": 0.09,
+      "deutanDistance": 0.54
+    }
+  ],
+  "leastDifferentPair": ["violet-fluorite-quartzine", "blue-corundum-quartzine"]
+}

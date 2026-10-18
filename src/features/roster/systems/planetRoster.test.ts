@@ -6,7 +6,13 @@ import {
 } from '../../../systems/world/planetParams'
 import { MAX_KIND_SLOT, NO_KIND_SLOT } from '../../../systems/world/worldCell'
 import { ORE_ROWS } from '../../ores'
-import { planetRosterOf, poolOfPlanet, ROSTER_ORE_RULES, rosterKindOf } from './planetRoster'
+import {
+  MIXED_ROSTER_ORE_RULES,
+  planetRosterOf,
+  poolOfPlanet,
+  ROSTER_ORE_RULES,
+  rosterKindOf,
+} from './planetRoster'
 
 // A planet's roster (TD ruling on ticket 446, section 2 and addendum 6226264758): the kind slots of
 // its rarity row set, in table order, only on a planet entered under ore rules 2 or later.
@@ -30,6 +36,26 @@ describe('planet roster', () => {
     expect(planetRosterOf(planetParamsFor(SEED, 5, 1))).toEqual([])
   })
 
+  it('keeps a planet from 3 a save holds under ore rules 2 or 3 kindless, the legacy planets rostered', () => {
+    expect(MIXED_ROSTER_ORE_RULES).toBe(4)
+    expect(planetRosterOf(planetParamsFor(SEED, 3, 2))).toEqual([])
+    expect(planetRosterOf(planetParamsFor(SEED, 5, 3))).toEqual([])
+    expect(planetRosterOf(planetParamsFor(SEED, 2, 2))).toEqual(ORE_ROWS.kinds.slotsBySet.legacy)
+  })
+
+  it('gives no roster to a planet without a species pool, from planet 8 (#453)', () => {
+    const rosters = [7, 8, 9, 60, 200].map((index) =>
+      planetRosterOf(freshPlanetParamsFor(SEED, index)),
+    )
+    expect(rosters.map((roster) => roster.length > 0)).toEqual([
+      ORE_ROWS.kinds.slotsBySet.mixed.length > 0,
+      false,
+      false,
+      false,
+      false,
+    ])
+  })
+
   it('is what this build stamps a fresh planet with', () => {
     expect(ORE_RULES_VERSION).toBeGreaterThanOrEqual(ROSTER_ORE_RULES)
   })
@@ -39,7 +65,7 @@ describe('planet roster', () => {
       ...PLANETS_1_TO_200.map((index) => planetRosterOf(freshPlanetParamsFor(SEED, index)).length),
     )
     expect(longest).toBeLessThanOrEqual(ORE_ROWS.kinds.rosterMaxKinds)
-    expect(ORE_ROWS.kinds.rosterMaxKinds).toBe(15)
+    expect(ORE_ROWS.kinds.rosterMaxKinds).toBe(17)
     expect(ORE_ROWS.kinds.rosterMaxKinds).toBeLessThanOrEqual(MAX_KIND_SLOT)
   })
 

@@ -9,7 +9,9 @@
  * and its constructive guard asks every painted cell for `max(1, ceil(weightBp / boundBp))` live
  * kinds, so no cell is bare and no kind can pass its bound. A signature shares its cell with the
  * lead entry of its family and tier, as the roster fold draws it, but is a tier of its own in the
- * tier shares (Systems 6203133480 section 1: "signature in b4 640"). Whole basis points, rounded up.
+ * tier shares (Systems 6203133480 section 1: "signature in b4 640"). A cell the signature paints
+ * alone (the relic signature from P3) is the slotless 16th material, so the guard asks it for no
+ * kind (E1, Systems and TD on #453). Whole basis points, rounded up.
  */
 import { isTripClamped, rarityTiers } from '../../ores'
 import { cellValueOf, type PaintedBand, type PaintedCell } from './paintedPlanet'
@@ -63,6 +65,8 @@ interface KindCell {
   weightBp: number
   value: number
   liveKinds: readonly string[]
+  /** Painted by signature entries only: the slotless signature material, never a kind (#453 E1). */
+  isSignatureOnly: boolean
 }
 
 export function bandSharesOf(band: PaintedBand, bounds: RarityShareBounds): BandShares {
@@ -121,6 +125,7 @@ function kindCellsOf(cells: readonly PaintedCell[]): KindCell[] {
       weightBp: (kept?.weightBp ?? 0) + cell.weightBp,
       value: (kept?.value ?? 0) + cellValueOf(cell),
       liveKinds: cell.liveKinds,
+      isSignatureOnly: (kept?.isSignatureOnly ?? true) && cell.isSignature,
     })
   }
   return [...merged.values()]
@@ -137,6 +142,7 @@ function kindSharesOf(cell: KindCell, bandValue: number): KindShare[] {
 }
 
 function shortCellsOf(cell: KindCell, bounds: RarityShareBounds): ShortCell[] {
+  if (cell.isSignatureOnly) return []
   const neededKinds = Math.max(1, Math.ceil(cell.weightBp / kindBoundBpOf(cell.lead, bounds)))
   if (cell.liveKinds.length >= neededKinds) return []
   const { family, lead, weightBp } = cell

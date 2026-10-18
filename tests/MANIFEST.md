@@ -265,12 +265,11 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/ground-gun/turretPace.lane.test.ts` | 1 | 1 |
 | `src/features/ground-gun/ui/fireGauge.test.ts` | 3 | 3 |
 
-### `materials`: 2 files, 35 tests
+### `materials`: 1 file, 36 tests
 
 | File | Tests | Sites |
 | --- | --- | --- |
-| `src/features/materials/systems/materialTable.test.ts` | 30 | 30 |
-| `src/features/materials/systems/render/rarityLooks.test.ts` | 5 | 5 |
+| `src/features/materials/systems/materialTable.test.ts` | 36 | 33 |
 
 ### `mining-gates`: 25 files, 153 tests
 
@@ -348,7 +347,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/ore-visuals/systems/oreGradeChannels.test.ts` | 7 | 7 |
 | `src/features/ore-visuals/systems/render/oreLookProvider.test.ts` | 21 | 10 |
 
-### `ores`: 17 files, 114 tests
+### `ores`: 17 files, 117 tests
 
 | File | Tests | Sites |
 | --- | --- | --- |
@@ -358,7 +357,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/ores/rarityPickupRoutes.test.ts` | 4 | 2 |
 | `src/features/ores/rarityTripRun.test.ts` | 5 | 3 |
 | `src/features/ores/systems/kernelOreAliases.test.ts` | 2 | 2 |
-| `src/features/ores/systems/kindRows.test.ts` | 9 | 9 |
+| `src/features/ores/systems/kindRows.test.ts` | 12 | 12 |
 | `src/features/ores/systems/leadRoll.test.ts` | 20 | 12 |
 | `src/features/ores/systems/oreCatalogue.test.ts` | 9 | 9 |
 | `src/features/ores/systems/oreCensus.test.ts` | 4 | 4 |
@@ -425,20 +424,19 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/power-up-core/systems/useRefusals.test.ts` | 3 | 3 |
 | `src/features/power-up-core/systems/useResolution.test.ts` | 12 | 12 |
 
-### `roster`: 13 files, 111 tests
+### `roster`: 12 files, 183 tests
 
 | File | Tests | Sites |
 | --- | --- | --- |
-| `src/features/roster/kindLook.test.ts` | 13 | 10 |
 | `src/features/roster/rarityShares.test.ts` | 18 | 18 |
 | `src/features/roster/roster.byteIdentity.lane.test.ts` | 5 | 1 |
-| `src/features/roster/roster.byteIdentity.test.ts` | 19 | 11 |
+| `src/features/roster/roster.byteIdentity.test.ts` | 29 | 15 |
 | `src/features/roster/roster.pacing.lane.test.ts` | 1 | 1 |
 | `src/features/roster/roster.poolSeam.test.ts` | 7 | 1 |
-| `src/features/roster/systems/planetRoster.test.ts` | 8 | 8 |
+| `src/features/roster/systems/planetRoster.test.ts` | 10 | 10 |
 | `src/features/roster/systems/planetSpecies.test.ts` | 6 | 6 |
 | `src/features/roster/systems/rosterFold.test.ts` | 6 | 6 |
-| `src/features/roster/systems/rosterGuard.test.ts` | 11 | 8 |
+| `src/features/roster/systems/rosterGuard.test.ts` | 84 | 10 |
 | `src/features/roster/systems/rosterSpecies.test.ts` | 11 | 7 |
 | `src/features/roster/systems/shareRows.test.ts` | 2 | 2 |
 | `src/features/roster/systems/tripLedger.test.ts` | 4 | 4 |
@@ -701,6 +699,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/authority/bore/shotShape.test.ts` | 14 | 14 |
 | `src/systems/authority/builtFacilities.test.ts` | 6 | 6 |
 | `src/systems/authority/carryRelease.test.ts` | 22 | 13 |
+| `src/systems/authority/carveGeometryKnownRed.test.ts` | 5 | 5 |
 | `src/systems/authority/casingCadence.test.ts` | 7 | 3 |
 | `src/systems/authority/casingDrill.test.ts` | 5 | 5 |
 | `src/systems/authority/casingGnaw.test.ts` | 4 | 4 |
@@ -743,7 +742,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/authority/depthCurveTank.test.ts` | 78 | 2 |
 | `src/systems/authority/digSpeedTrack.lane.test.ts` | 69 | 4 |
 | `src/systems/authority/drillEventStream.lane.test.ts` | 8 | 1 |
-| `src/systems/authority/drillEventStream.test.ts` | 26 | 4 |
+| `src/systems/authority/drillEventStream.test.ts` | 27 | 5 |
 | `src/systems/authority/drillGates.test.ts` | 11 | 11 |
 | `src/systems/authority/drillGearCut.test.ts` | 27 | 25 |
 | `src/systems/authority/drillStep.test.ts` | 22 | 22 |
@@ -779,6 +778,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/authority/refinery/refineryFacility.test.ts` | 2 | 2 |
 | `src/systems/authority/refinery/refineryRules.test.ts` | 15 | 15 |
 | `src/systems/authority/refinery/refinerySlots.test.ts` | 4 | 4 |
+| `src/systems/authority/reportedCapsule.test.ts` | 16 | 16 |
 | `src/systems/authority/reportedCutCarry.test.ts` | 15 | 15 |
 | `src/systems/authority/reportedGateBite.test.ts` | 15 | 15 |
 | `src/systems/authority/reportedGateBiteTracks.test.ts` | 7 | 3 |
@@ -988,6 +988,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/logging/purchaseChains.test.ts` | 7 | 7 |
 | `src/logging/refineryReport.test.ts` | 5 | 5 |
 | `src/logging/registries/runEvents.test.ts` | 4 | 4 |
+| `src/logging/reportCapsuleOffGolden.test.ts` | 19 | 3 |
 | `src/logging/reportRows.test.ts` | 4 | 4 |
 | `src/logging/runEventSchema.test.ts` | 19 | 19 |
 | `src/logging/runLayout.test.ts` | 7 | 7 |
@@ -1144,8 +1145,6 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/render/headlamp.test.ts` | 3 | 3 |
 | `src/systems/render/heatShimmer.test.ts` | 2 | 2 |
 | `src/systems/render/heatTiles.test.ts` | 3 | 3 |
-| `src/systems/render/kindLookTable.test.ts` | 6 | 6 |
-| `src/systems/render/kindLooks.test.ts` | 4 | 4 |
 | `src/systems/render/mountedPartLook.test.ts` | 8 | 4 |
 | `src/systems/render/oreGrade.test.ts` | 2 | 2 |
 | `src/systems/render/oreLook.test.ts` | 11 | 9 |
@@ -1162,7 +1161,6 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/render/sampleClock.test.ts` | 3 | 3 |
 | `src/systems/render/sceneLights.test.ts` | 6 | 6 |
 | `src/systems/render/screenProjection.test.ts` | 5 | 5 |
-| `src/systems/render/shaderUniforms.test.ts` | 4 | 4 |
 | `src/systems/render/skyBandLook.test.ts` | 3 | 3 |
 | `src/systems/render/skyBandRing.test.ts` | 6 | 6 |
 | `src/systems/render/speedFraming.test.ts` | 25 | 13 |
@@ -1220,9 +1218,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/scene/sceneDisposal.test.ts` | 8 | 3 |
 | `src/scene/soundCuePlayer.test.ts` | 4 | 4 |
 | `src/scene/sprayIntake.test.ts` | 3 | 3 |
-| `src/scene/terrainKindLooks.test.ts` | 4 | 4 |
 | `src/scene/terrainSamplers.test.ts` | 7 | 7 |
-| `src/scene/terrainUniforms.test.ts` | 4 | 4 |
 | `src/scene/vehicleStage.test.ts` | 7 | 7 |
 
 ### `shell`

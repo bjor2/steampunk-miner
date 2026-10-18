@@ -70,6 +70,7 @@ import {
   type CarveBesideDisc,
   type CarveWindow,
   type CarveWindows,
+  type CellsBesideCut,
   type StampWalk,
   walkStampInRows,
 } from '../world/groundEdit'
@@ -93,6 +94,8 @@ export interface DrillCarveRequest {
 export interface DrillCarve extends Carve {
   /** The energy the drill gear's cells cost beyond the disc's ticks, in quanta. */
   gearQuanta: number
+  /** The most ticks any of the drill gear's cells still removed something in; 0 with none cut. */
+  gearTicksUsed: number
   /** `lawWork` with each gear cell at its energy share, in basis points (ticket 535). */
   lawWorkBp: number
   /** The drill gear's cells this cut reached, each with its energy share (ticket 335). */
@@ -123,6 +126,7 @@ export function withoutGear(carve: Carve): DrillCarve {
   return {
     ...carve,
     gearQuanta: 0,
+    gearTicksUsed: 0,
     lawWorkBp: carve.lawWork * BASIS_POINTS,
     gearCells: [],
     aheadLatch: null,
@@ -130,15 +134,25 @@ export function withoutGear(carve: Carve): DrillCarve {
   }
 }
 
+/** Whether the bit or any of its gear's cells removed something: a carve to charge and collect. */
+export function hasCarveRemoved(carved: DrillCarve): boolean {
+  return carved.ticksUsed > 0 || carved.gearTicksUsed > 0
+}
+
+/**
+ * The cut at the bit with its gear, the gear's cells cut with the bit, or on every tick of the
+ * window (the report capsule's running bite, ticket 537).
+ */
 export function carveStampWithGear(
   state: AuthorityState,
   params: PlanetParams,
   playerId: string,
   bit: DrillBit,
   request: DrillCarveRequest,
+  cellsCut: CellsBesideCut = 'withBit',
 ): DrillCarve {
   const read = drillGearReadAt(state, params, playerId, bit, request.gates)
-  return carveStampWithRead(params, bit, read, request, walkStampInRows)
+  return carveStampWithRead(params, bit, read, request, { walk: walkStampInRows, cellsCut })
 }
 
 /**
@@ -182,26 +196,36 @@ function cellWithCellsOf(
     carveCellWithCells(world, params, tile, cells, windows, gates.drillTicksOf)
 }
 
+/** How a carve walks the bit's stamp, and when the cells beside it are cut. */
+export interface StampCut {
+  walk: StampWalk
+  cellsCut: CellsBesideCut
+}
+
+/** The stamp walked by `walk`, its cells beside cut with the bit. */
+export function walkedWithBit(walk: StampWalk): StampCut {
+  return { walk, cellsCut: 'withBit' }
+}
+
 /**
- * The cut at the bit with its gear read already taken, walking the stamp by `walk`: the swept cut
- * counts its cells first, and the swept span walks it per chunk (ticket 374).
+ * The cut at the bit with its gear read already taken, walking the stamp by `cut.walk`: the swept
+ * cut counts its cells first, and the swept span walks it per chunk (ticket 374).
  */
 export function carveStampWithRead(
   params: PlanetParams,
   bit: DrillBit,
   read: DrillGearRead | null,
   request: DrillCarveRequest,
-  walk: StampWalk,
+  cut: StampCut,
 ): DrillCarve {
-  const stamp = { disc: bit.disc, walk }
+  const stamp = { disc: bit.disc, ...cut }
   if (read === null) return withoutGear(carveBareDisc(params, stamp, request))
   return carveBitAndGear(read, request, discWithCellsOf(params, stamp, request))
 }
 
-/** The bit's stamp and how the carve walks it. */
-interface WalkedDisc {
+/** The bit's stamp, how the carve walks it, and when the cells beside it are cut. */
+interface WalkedDisc extends StampCut {
   disc: DiscStamp
-  walk: StampWalk
 }
 
 function carveBareDisc(
@@ -215,11 +239,11 @@ function carveBareDisc(
 
 function discWithCellsOf(
   params: PlanetParams,
-  { disc, walk }: WalkedDisc,
+  { disc, walk, cellsCut }: WalkedDisc,
   { world, gates }: DrillCarveRequest,
 ): CarveWithCells {
   return (cells, windows) =>
-    carveDiscWithCells(world, params, disc, cells, windows, gates.drillTicksOf, walk)
+    carveDiscWithCells(world, params, disc, cells, windows, gates.drillTicksOf, walk, cellsCut)
 }
 
 /** The player's drill gear at the bit, listing only the cells that pass `canMine`; else null. */
@@ -371,6 +395,7 @@ function carveBitAndGear(
   return {
     ...carved,
     gearQuanta: gearQuantaOf(carved, shares),
+    gearTicksUsed: Math.max(0, ...carved.cellTicksUsed),
     lawWorkBp: lawWorkBpOf(carved, shares),
     gearCells,
     ...latches,

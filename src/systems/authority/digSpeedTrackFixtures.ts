@@ -10,8 +10,12 @@
  * probe's) whose cell in the hardest band it crosses takes at most 60 / v ticks.
  *
  * Paths, as the live loop sends them: `every tick` and `every 12` are flag-off pose reports with
- * that many drive and drill ticks, charged on the law work they removed (A6's `drill.exactCarry`);
- * `swept` is a `drillStep` every tick and a report every 12 ticks (flag on), charged as shipped.
+ * that many drive and drill ticks, charged on the law work they removed (A6's `drill.exactCarry`)
+ * and cut as they ship (the report capsule of ticket 537 at interval 1; a 12-tick report cuts
+ * protocol 86's bare disc, main's cut, so `every 12` is #514's ratchet reference); `every tick,
+ * disc` is the same report with `drill.reportCapsule` off, the bare disc every tick, read beside
+ * it so the capsule's own move shows per row; `swept` is a `drillStep` every tick and a report
+ * every 12 ticks (flag on), charged as shipped.
  * Each tick reads the drill energy (the tank's fall less the reports' drive charge) and, at each
  * report, the drill ticks it heats for (`reportedDrill.ts`).
  * The law work (`lawWorkFixtures.ts`) is read once the track is cut, from the ground before and
@@ -32,7 +36,7 @@ import type { VehicleState } from '../vehicle/vehicleState'
 import type { TilePoint } from '../world/tileGrid'
 import type { CommandIntent } from './authorityCommand'
 import { setCasingGradeCommand } from './casingDebugCommands'
-import { chargedHeatTicksOf, withDrillExactCarry } from './cutCarryFixtures'
+import { chargedHeatTicksOf, withDrillExactCarry, withReportCapsule } from './cutCarryFixtures'
 import {
   ACROSS_MM,
   frameOf,
@@ -54,7 +58,7 @@ import {
 import { heatThrottledDrill } from './heatRules'
 import { isCutBySteps } from './sweptDrill'
 
-export type TrackPath = 'every tick' | 'every 12' | 'swept'
+export type TrackPath = 'every tick' | 'every tick, disc' | 'every 12' | 'swept'
 
 /** What a track's cut charged, summed over its ticks. */
 interface TrackCharge {
@@ -85,7 +89,9 @@ const CASING_GRADE = 5
 
 /** Cuts the track on `path` from a fresh rig of `drillPower`, tick by tick. */
 export function cutTrack(track: Track, path: TrackPath, drillPower: number): TrackRun {
-  return withDrillExactCarry(isChargedAtLaw(path), () => cutTrackOnPath(track, path, drillPower))
+  return withDrillExactCarry(isChargedAtLaw(path), () =>
+    withReportCapsule(isCapsulePath(path), () => cutTrackOnPath(track, path, drillPower)),
+  )
 }
 
 /**
@@ -96,6 +102,11 @@ export function cutTrack(track: Track, path: TrackPath, drillPower: number): Tra
  */
 function isChargedAtLaw(path: TrackPath): boolean {
   return path !== 'swept'
+}
+
+/** The report paths cut as they ship; the `disc` path switches the capsule off for the bare disc. */
+function isCapsulePath(path: TrackPath): boolean {
+  return path !== 'every tick, disc'
 }
 
 function cutTrackOnPath(track: Track, path: TrackPath, drillPower: number): TrackRun {
@@ -138,6 +149,16 @@ export function drillPowerFor(track: Track): number {
     else low = middle + 1
   }
   return low
+}
+
+/**
+ * The rig's law time for a cell of the hardest band the track crosses, in ticks: the cell time
+ * `drillPowerFor` picked the rig by, so two rigs' law work compares as geometry once each is read
+ * in its own hardest-cell times (ticket 537's floor, #441's "work per metre over the rig's cell
+ * time").
+ */
+export function hardestCellTicksFor(track: Track, drillPower: number): number {
+  return subStepsAt(drillPower, hardestBandOf(frameOf(track))) / DRILL_SUBSTEPS_PER_TICK
 }
 
 function subStepsAt(drillPower: number, band: number): number {
@@ -191,13 +212,17 @@ function cutTick(session: ScriptedSession, at: TrackTick): TrackCharge {
 
 function commandsOf(at: TrackTick, to: { x: number; y: number }): CommandIntent[] {
   const speedMmPerS = Math.round(at.track.speedMps * MM_PER_METRE)
-  if (at.path === 'every tick') return [reportOf(at.frame, to, { speedMmPerS, ticks: 1 })]
+  if (isReportEveryTick(at.path)) return [reportOf(at.frame, to, { speedMmPerS, ticks: 1 })]
   const report =
     at.tick % REPORT_EVERY === 0
       ? [reportOf(at.frame, to, { speedMmPerS, ticks: REPORT_EVERY })]
       : []
   if (at.path === 'every 12') return report
   return [stepOf(at.frame, to), ...report]
+}
+
+function isReportEveryTick(path: TrackPath): boolean {
+  return path === 'every tick' || path === 'every tick, disc'
 }
 
 function reportOf(

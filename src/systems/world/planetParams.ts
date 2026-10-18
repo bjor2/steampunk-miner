@@ -92,9 +92,10 @@ export interface PlanetParams {
 
 /**
  * The newest ore rules: 1 is the rarity rows (ticket 445), 2 adds the material roster, a kind slot
- * per ore patch (ticket 446), 3 the depth density curve from planet 3 (ticket 448).
+ * per ore patch (ticket 446), 3 the depth density curve from planet 3 (ticket 448), 4 the mixed
+ * kinds table's roster from planet 3 (#453).
  */
-export const ORE_RULES_VERSION = 3
+export const ORE_RULES_VERSION = 4
 
 /** The ore rules that add the depth density curve (ticket 448). */
 export const DEPTH_CURVE_ORE_RULES = 3
@@ -102,9 +103,15 @@ export const DEPTH_CURVE_ORE_RULES = 3
 /**
  * The first planet each ore rules version changes, version 1 first: the rarity rows from P3 (the
  * `ores` slice's `mixedRowsFromPlanet`), the roster from P1 (TD ruling on ticket 446, section 4),
- * the depth curve from its `fromPlanet` (GD on ticket 448: P1 and P2 keep the step bands).
+ * the depth curve from its `fromPlanet` (GD on ticket 448: P1 and P2 keep the step bands), the
+ * mixed roster where the mixed rows start (#453: P1 and P2 keep the legacy roster).
  */
-const ORE_RULES_FIRST_PLANETS: readonly number[] = [3, 1, ECONOMY.planets.depthDensity.fromPlanet]
+const ORE_RULES_FIRST_PLANETS: readonly number[] = [
+  3,
+  1,
+  ECONOMY.planets.depthDensity.fromPlanet,
+  3,
+]
 
 /** The first planet any ore rules change, so the first a fresh session stamps: planet 1. */
 export const ORE_RULES_FROM_PLANET = Math.min(...ORE_RULES_FIRST_PLANETS)

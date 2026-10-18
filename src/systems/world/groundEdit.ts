@@ -125,6 +125,14 @@ export function carveDisc(
   return closeCarve(session, ticksUsed)
 }
 
+/**
+ * When the cells beside the bit are cut: with the bit, only in a window the bit removed something
+ * in (slice drill gear, ticket 234), or on every tick of the window whether or not the bit did
+ * (the report capsule's running bite, ticket 537: a tick in which no new sample enters the
+ * capsule removes nothing under the disc, and the gear's cells are cut all the same, never lost).
+ */
+export type CellsBesideCut = 'withBit' | 'everyTick'
+
 /** A disc carve with cells beside it (slice drill gear, ticket 234). */
 export interface CarveBesideDisc extends Carve {
   /** Per cell, in the order given: the ticks in which it still lost something. */
@@ -142,7 +150,7 @@ export interface CarveWindows {
 /**
  * The disc and, in the same edit, the cells beside it (`cellSamplesBesideDisc`), so a widened bore
  * cuts in the same ticks as the bit. `ticksUsed` stays the disc's; cells are cut only when the disc
- * removed something.
+ * removed something, or on every tick where `cellsCut` says so (ticket 537).
  */
 export function carveDiscWithCells(
   world: WorldState,
@@ -152,11 +160,13 @@ export function carveDiscWithCells(
   windows: CarveWindows,
   drillTicksOf: CellDrillTicks,
   walk: StampWalk = walkStampInRows,
+  cellsCut: CellsBesideCut = 'withBit',
 ): CarveBesideDisc {
   const session = openSession(world, params)
   const ticksUsed = walk(session, disc, windows.disc, drillTicksOf)
   const besides = cells.map((tile) => cellSamplesBesideDisc(tile, disc))
-  const beside = carveCellsBeside(session, ticksUsed, besides, windows.cells, drillTicksOf)
+  const cut = { ticksUsed, cellsCut }
+  const beside = carveCellsBeside(session, cut, besides, windows.cells, drillTicksOf)
   return closeWithCells(session, ticksUsed, beside)
 }
 
@@ -176,7 +186,8 @@ export function carveCellWithCells(
   const session = openSession(world, params)
   const ticksUsed = carveEachSample(session, cellSamplesOf(tile), windows.disc, drillTicksOf)
   const besides = cells.map((cell) => cellSamplesOf(cell))
-  const beside = carveCellsBeside(session, ticksUsed, besides, windows.cells, drillTicksOf)
+  const cut = { ticksUsed, cellsCut: 'withBit' as const }
+  const beside = carveCellsBeside(session, cut, besides, windows.cells, drillTicksOf)
   return closeWithCells(session, ticksUsed, beside)
 }
 
@@ -186,15 +197,23 @@ interface CellsBeside {
   cellLawWork: number[]
 }
 
-/** Each cell's samples in order, in the cells' window; none when the bit removed nothing. */
+/** What the bit's cut leaves the cells beside it: its ticks, and when they are cut. */
+interface BitCut {
+  ticksUsed: number
+  cellsCut: CellsBesideCut
+}
+
+/** Each cell's samples in order, in the cells' window; none when the bit removed nothing, with it. */
 function carveCellsBeside(
   session: EditSession,
-  ticksUsed: number,
+  bit: BitCut,
   cells: readonly (readonly WeightedSample[])[],
   window: CarveWindow,
   drillTicksOf: CellDrillTicks,
 ): CellsBeside {
-  if (ticksUsed === 0) return { cellTicksUsed: cells.map(() => 0), cellLawWork: cells.map(() => 0) }
+  if (isSkippedWithBit(bit)) {
+    return { cellTicksUsed: cells.map(() => 0), cellLawWork: cells.map(() => 0) }
+  }
   const cellTicksUsed: number[] = []
   const cellLawWork: number[] = []
   for (const samples of cells) {
@@ -203,6 +222,10 @@ function carveCellsBeside(
     cellLawWork.push(session.lawWork - before)
   }
   return { cellTicksUsed, cellLawWork }
+}
+
+function isSkippedWithBit(bit: BitCut): boolean {
+  return bit.cellsCut === 'withBit' && bit.ticksUsed === 0
 }
 
 function closeWithCells(

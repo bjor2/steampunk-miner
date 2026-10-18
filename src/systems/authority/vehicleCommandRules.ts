@@ -119,7 +119,7 @@ export const VEHICLE_COMMAND_RULES: {
         (current) => followCasingSupport(current, command.playerId),
         (current) => noteReportForCombat(current, command.playerId, command.tick),
         (current) => flushGunHits(current, command.playerId),
-        (current) => chargeReportedActions(current, command),
+        (current) => chargeReportedActions(current, command, vehicleOf(state, command.playerId)),
         (current) => layReportedCasing(current, command),
         (current) => followReportedHeat(current, command, vehicleOf(state, command.playerId)),
         (current) =>
@@ -231,11 +231,14 @@ function recordPose(state: AuthorityState, command: AuthorityCommand<'reportPose
 
 /**
  * Drill at the nose first, then thrust, then drive, each only as far as the tank allows; a gated
- * cell the drill's bite already reported is not reported again (ticket 519).
+ * cell the drill's bite already reported is not reported again (ticket 519). `before` is the
+ * vehicle before the report: its pose is the previous reported pose the capsule starts from
+ * (ticket 537), and its bite the one the gates were last reported for.
  */
 function chargeReportedActions(
   state: AuthorityState,
   command: AuthorityCommand<'reportPose'>,
+  before: VehicleState,
 ): RuleEffect {
   const { playerId, payload, tick } = command
   const vehicle = vehicleOf(state, playerId)
@@ -244,7 +247,7 @@ function chargeReportedActions(
     return unchanged(markChargedState(state, playerId, tick))
   }
   const drilled = followGatedBite(
-    drillReportedTicks(state, playerId, vehicle, payload),
+    drillReportedTicks(state, playerId, vehicle, { before, tick, payload }),
     playerId,
     vehicle,
     { tick, drillTicks: payload.drillTicks },

@@ -16,7 +16,7 @@ describe('ore catalogue data', () => {
         signatureShareCapBpByBand: { '3': 600 },
         catalogue: { variantsPerFamily: 0 },
         rarity: economyFile.ore.rarity,
-        kinds: { ...economyFile.ore.kinds, legacy: [] },
+        kinds: { ...economyFile.ore.kinds, legacy: [], mixed: [] },
       },
     }
     const families = {

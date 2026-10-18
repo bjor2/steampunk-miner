@@ -33,7 +33,7 @@ import { coreHardness, blockHardness, oreSalePrice, oreTier } from '../economy/o
 import { toCanonical, type BigStat } from '../money'
 import { pickedUpUnitOf, type PickedUp, type PickupFind } from '../registries/orePickup'
 import { drillDamage, subStepsPerTile, ticksPerTile, type DrillStats } from '../vehicle/drillRule'
-import { drillStampOf } from '../vehicle/drillStamp'
+import { drillStampOf, stampSweptFrom } from '../vehicle/drillStamp'
 import { ENERGY_QUANTA_PER_TICK } from '../vehicle/energyQuanta'
 import { payLawWork, payLawWorkEnergy, type LawWorkTally } from '../vehicle/cutCarry'
 import type { AheadLatch } from '../vehicle/aheadBearingLatch'
@@ -41,7 +41,8 @@ import type { DriveSigns } from '../vehicle/driveSigns'
 import type { SideLatch } from '../vehicle/facedSide'
 import type { VehiclePose } from '../vehicle/vehiclePose'
 import { hasCargoRoom, withOreUnit, type VehicleState } from '../vehicle/vehicleState'
-import type { Carve, CarveWindow, CellDrillTicks } from '../world/groundEdit'
+import type { Carve, CarveWindow, CellDrillTicks, CellsBesideCut } from '../world/groundEdit'
+import type { StampPoint } from '../world/stampShape'
 import type { YieldedCell } from '../world/cellYield'
 import { bandOfTile } from '../world/planetGeometry'
 import type { PlanetParams } from '../world/planetParams'
@@ -55,6 +56,7 @@ import type { DomainEventBody } from './domainEvent'
 import {
   carveCellWithGear,
   carveStampWithGear,
+  hasCarveRemoved,
   type DrillCarve,
   type DrillCarveRequest,
 } from './drillGearCut'
@@ -168,17 +170,24 @@ export function drillCell(
   return drillGround(state, params, playerId, { tile, carve }, requestedTicks)
 }
 
-/** What a pose report drills with: the pose, its reported drive, and whether it lifts. */
+/**
+ * What a pose report drills with: the pose, its reported drive, whether it lifts, where its
+ * capsule starts (ticket 537, `reportedCapsule.ts`), or null for the bare disc at the pose, and
+ * when its drill gear's cells are cut (with the bit, or on every tick of the capsule's bite).
+ */
 export interface ReportedDrill {
   pose: VehiclePose
   drive: DriveSigns
   isLifting: boolean
+  tail: StampPoint | null
+  cellsBeside: CellsBesideCut
 }
 
 /**
- * The reported drill: the stamp at the pose, aimed by its facing (#40), and any drill gear, which
- * may read the reported drive (ticket 279), counted and charged on `clock`: whole ticks as every
- * drill was, or the law work it removed (ticket 535).
+ * The reported drill: the stamp at the pose, aimed by its facing (#40), as the capsule from its
+ * tail when the bite runs on (ticket 537), and any drill gear, which may read the reported drive
+ * (ticket 279), counted and charged on `clock`: whole ticks as every drill was, or the law work it
+ * removed (ticket 535), on sub-steps for the capsule.
  */
 export function drillAtPose(
   state: AuthorityState,
@@ -189,9 +198,10 @@ export function drillAtPose(
   requestedTicks: number,
   clock: DrillClock = WHOLE_TICK_CLOCK,
 ): RuleEffect {
-  const { pose, drive, isLifting } = reported
-  const bit = { pose, disc: drillStampOf(pose, isLifting), drive }
-  const carve: CarveIn = (request) => carveStampWithGear(state, params, playerId, bit, request)
+  const { pose, drive, isLifting, tail, cellsBeside } = reported
+  const bit = { pose, disc: stampSweptFrom(drillStampOf(pose, isLifting), tail), drive }
+  const carve: CarveIn = (request) =>
+    carveStampWithGear(state, params, playerId, bit, request, cellsBeside)
   return drillGroundBy(state, params, playerId, { tile: target, carve }, requestedTicks, clock)
     .effect
 }
@@ -320,7 +330,7 @@ function chargeAndCollect(
   { target, drill, gates, carved, clock }: CarvedDrill,
 ): RuleEffect {
   const vehicle = vehicleOf(state, playerId)
-  if (carved.ticksUsed === 0) return { state, events: gates.refusedEvents() }
+  if (!hasCarveRemoved(carved)) return { state, events: gates.refusedEvents() }
   const charge = clock.chargeOf(carved, gates.drillTicksOf, vehicle)
   const charged = withVehicle({ ...state, world: carved.world }, playerId, {
     ...withLatches(charge.vehicle, carved),
@@ -333,7 +343,7 @@ function chargeAndCollect(
   return {
     state: wakeLavaBeside(collected.state, params, carved.yielded, state.tick),
     events: [
-      damageEvent(params, state.world, target.tile, drill, carved.ticksUsed),
+      ...damageEventsOf(params, state.world, target.tile, drill, carved.ticksUsed),
       ...groundChangedEventsOf(carved),
       ...casingDrilledEvents(carved),
       ...collected.events,
@@ -492,7 +502,20 @@ export function kindNameOf(cell: number): 'ground' | 'ore' | 'core' {
   return 'ground'
 }
 
-/** The damage `ticks` of drilling deal in the target cell's hardness (#7 logging). */
+/**
+ * The damage `ticks` of drilling deal in the target cell's hardness (#7 logging); none when the
+ * bit removed nothing and only its gear's cells cut (the report capsule's running bite, ticket 537).
+ */
+function damageEventsOf(
+  params: PlanetParams,
+  world: WorldState,
+  tile: TilePoint,
+  drill: DrillStats,
+  ticks: number,
+): DomainEventBody[] {
+  return ticks === 0 ? [] : [damageEvent(params, world, tile, drill, ticks)]
+}
+
 function damageEvent(
   params: PlanetParams,
   world: WorldState,

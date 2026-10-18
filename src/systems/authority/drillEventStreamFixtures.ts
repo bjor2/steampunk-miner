@@ -1,7 +1,8 @@
 /**
  * The event-stream replay of ticket 514 (Done-when 6, the TD's "Event-stream test", the Horizontal
  * Scaler's bar (b)): one fixed per-tick pose track cut by pose reports every tick and every 12
- * ticks, the way the flag-off client sends them, and the cells each cut in the order it cut them.
+ * ticks, the way the flag-off client sends them (every tick with the exact carry on, as interval 1
+ * is live, ticket 537), and the cells each cut in the order it cut them.
  * Tracks run level east, level on a 30-degree tilt, or east then turning down, through rock 12 m
  * under planet 1's surface. Drill gear comes as fakes through `withRegistrations`, so no slice is
  * imported. Only specs use it.
@@ -14,6 +15,7 @@ import type { DriveSigns } from '../vehicle/driveSigns'
 import { FACING, facingVectorOf, type Facing } from '../vehicle/vehiclePose'
 import type { TilePoint } from '../world/tileGrid'
 import type { CommandIntent } from './authorityCommand'
+import { withDrillExactCarry } from './cutCarryFixtures'
 import type { DomainEvent } from './domainEvent'
 import { drillGearOf } from './gatedBiteFixtures'
 import { createScriptedSession, FREEZE_ENEMIES, poseAbove } from './scriptedSession'
@@ -36,10 +38,14 @@ export interface StreamRun {
   slices?: readonly SliceDefinition[]
 }
 
-/** What one cadence cut: the cells in the order they fell, and every event the reports answered. */
+/**
+ * What one cadence cut: the cells in the order they fell, every event the reports answered, and
+ * the cells the track's last report cut.
+ */
 export interface CutStream {
   cells: string[]
   events: DomainEvent[]
+  lastReportCells: string[]
 }
 
 /** A rig whose drill clears every sample its stamp reaches inside one tick. */
@@ -62,7 +68,11 @@ export const STREAM_GEARS: readonly StreamGear[] = [
   { name: 'twin bit', ask: { aheadCells: 1, aheadAim: 'drive' }, drive: { x: 1, y: -1 } },
 ]
 
-/** The track cut every tick and every 12 ticks, each from a fresh session. */
+/**
+ * The track cut every tick and every 12 ticks, each from a fresh session: every tick with the
+ * exact carry on, the one configuration interval 1 is live in (TD 6236464931) and the report
+ * capsule cuts in (ticket 537); every 12 ticks as the game ships, main's stream.
+ */
 export function cutAtBothCadences(run: StreamRun): { everyTick: CutStream; every12: CutStream } {
   const slices = [
     ...(run.gear.ask === null ? [] : [drillGearOf(run.gear.ask)]),
@@ -70,7 +80,7 @@ export function cutAtBothCadences(run: StreamRun): { everyTick: CutStream; every
   ]
   const cut = (interval: number) => () => cutStream(run, interval)
   return {
-    everyTick: withRegistrations(slices, cut(1)),
+    everyTick: withRegistrations(slices, () => withDrillExactCarry(true, cut(1))),
     every12: withRegistrations(slices, cut(REPORT_EVERY)),
   }
 }
@@ -84,11 +94,13 @@ export function cutStream(run: StreamRun, interval: number): CutStream {
   }
   session.submit(0, reportAt(run, 0, 0))
   const events: DomainEvent[] = []
+  let lastReport: DomainEvent[] = []
   for (let tick = interval; tick <= STREAM_TICKS; tick += interval) {
     session.submit(tick, { type: 'debug.setEnergy', payload: { energy: '150' } })
-    events.push(...session.submit(tick, reportAt(run, tick, interval)))
+    lastReport = session.submit(tick, reportAt(run, tick, interval))
+    events.push(...lastReport)
   }
-  return { cells: destroyedCellsOf(events), events }
+  return { cells: destroyedCellsOf(events), events, lastReportCells: destroyedCellsOf(lastReport) }
 }
 
 function destroyedCellsOf(events: readonly DomainEvent[]): string[] {

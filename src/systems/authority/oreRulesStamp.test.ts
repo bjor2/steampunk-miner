@@ -30,10 +30,10 @@ function onPlanet(state: AuthorityState, planetIndex: number): AuthorityState {
 }
 
 describe('ore rules stamp', () => {
-  it('stamps a session on any planet: rules 2 on planets 1 and 2, the curve, rules 3, from 3', () => {
+  it('stamps a session on any planet: rules 2 on planets 1 and 2, the mixed roster, 4, from 3', () => {
     const planets = [1, 2, 3, 10].map((index) => sessionOn(index).planet)
-    expect(planets.map((planet) => planet.oreRulesVersion)).toEqual([2, 2, 3, 3])
-    expect(ORE_RULES_VERSION).toBe(3)
+    expect(planets.map((planet) => planet.oreRulesVersion)).toEqual([2, 2, 4, 4])
+    expect(ORE_RULES_VERSION).toBe(4)
   })
 
   it('keeps a planet a save holds without the stamp on the legacy rows', () => {

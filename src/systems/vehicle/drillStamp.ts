@@ -15,6 +15,9 @@
  * The swept cut's stamp (ticket 333) is the same disc further ahead by the step the rig may take
  * while it cuts (`aheadMm`, from the stats-derived bound of ticket 334), so its nose reach grows
  * with the step.
+ *
+ * A report whose bite runs on from its previous pose (ticket 537) cuts its stamp as the capsule
+ * from that pose's stamp centre, the tail (`authority/reportedCapsule.ts` picks it).
  */
 import {
   DRILL_STAMP_AHEAD_MM,
@@ -23,7 +26,7 @@ import {
 } from '../../constants/balance'
 import { UP_VECTOR_SCALE, VEHICLE_COLLIDER_SIZE } from '../../constants/physics'
 import { centreDistanceFloorMmOf } from '../world/exactSquares'
-import type { DiscStamp } from '../world/stampShape'
+import type { DiscStamp, StampPoint } from '../world/stampShape'
 import { MM_PER_SAMPLE } from '../world/sampleGrid'
 import { FACING, facingVectorOf, type VehiclePose } from './vehiclePose'
 
@@ -42,6 +45,11 @@ export function sweptDrillStampOf(
   aheadMm: number,
 ): DiscStamp {
   return stampAheadBy(pose, isLifting, aheadMm)
+}
+
+/** The stamp as the capsule from `tail` to its centre (ticket 537), or the stamp alone with none. */
+export function stampSweptFrom(stamp: DiscStamp, tail: StampPoint | null): DiscStamp {
+  return tail === null ? stamp : { ...stamp, tail }
 }
 
 function stampAheadBy(pose: VehiclePose, isLifting: boolean, aheadMm: number): DiscStamp {

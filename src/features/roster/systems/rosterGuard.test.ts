@@ -11,11 +11,14 @@ import { liveRosterIndicesOf } from './rosterFold'
 // (6226208534) and the TD's test list (6226236698 section 5 C): a kind's share of a band trip is
 // `tierShare x familyShare / nLive`, every painted (band, tier, family) cell has
 // `nLive >= max(1, ceil(tierShareBp x familyShareBp / 10000 / boundBp))` live kinds, and the bounds
-// are asserts on the real roster. Checked on every planet whose roster holds kinds (P1 and P2 while
-// the mixed table is empty; P3 to P5 join when Systems attaches it).
+// are asserts on the real roster. Checked on every planet whose roster holds kinds: P1 and P2 on
+// the legacy table, P3 to P7 on the mixed one (#453), each on the three pacing seeds so a swapped
+// band 3 (fossil commons, from P4) is read too. A cell only the relic signature paints is the
+// slotless 16th material and asks for no kind (E1, Systems and TD on #453).
 
 const SEED = 83921
-const PLANETS = [1, 2, 3, 4, 5]
+const SEEDS = [83921, 31415, 27182]
+const PLANETS = [1, 2, 3, 4, 5, 6, 7]
 const BANDS = Array.from({ length: BAND_COUNT }, (_, at) => at + 1)
 const BASIS_POINTS = 10000
 /** Common kind: at most 5000 bp of a band trip; any other kind at most 1500 bp (VS bounds). */
@@ -31,19 +34,33 @@ interface PaintedCell {
   /** Its share of the band's ore patches, in basis points (fractional on P1 and P2). */
   weightBp: number
   nLive: number
+  isSignatureOnly: boolean
+}
+
+interface MixCell {
+  family: string
+  lead: number
+  weightBp: number
+  isSignatureOnly: boolean
 }
 
 function paintedCellsOf(params: PlanetParams): PaintedCell[] {
   return oreMixOf(params).bands.flatMap((entries, at) =>
-    mergedByFamilyAndLead(entries).map(({ family, lead, weightBp }) => ({
+    mergedByFamilyAndLead(entries).map(({ family, lead, weightBp, isSignatureOnly }) => ({
       band: at + 1,
       lead,
       family,
       weightBp,
       nLive: liveRosterIndicesOf(params, at + 1, { family: codeOf(family), tierOffset: at + lead })
         .length,
+      isSignatureOnly,
     })),
   )
+}
+
+/** The cells a kind is drawn on: every painted cell but those the signature paints alone. */
+function kindedCellsOf(params: PlanetParams): PaintedCell[] {
+  return paintedCellsOf(params).filter((cell) => !cell.isSignatureOnly)
 }
 
 function codeOf(family: string): ResourceFamily {
@@ -52,13 +69,18 @@ function codeOf(family: string): ResourceFamily {
 
 /** A signature entry shares its cell with a lead entry of its family and tier, if any. */
 function mergedByFamilyAndLead(
-  entries: readonly { family: string; lead: number; weightBp: number }[],
-): { family: string; lead: number; weightBp: number }[] {
-  const merged = new Map<string, { family: string; lead: number; weightBp: number }>()
-  for (const { family, lead, weightBp } of entries) {
+  entries: readonly { family: string; lead: number; weightBp: number; signature: boolean }[],
+): MixCell[] {
+  const merged = new Map<string, MixCell>()
+  for (const { family, lead, weightBp, signature } of entries) {
     const key = `${family}:${lead}`
     const kept = merged.get(key)
-    merged.set(key, { family, lead, weightBp: (kept?.weightBp ?? 0) + weightBp })
+    merged.set(key, {
+      family,
+      lead,
+      weightBp: (kept?.weightBp ?? 0) + weightBp,
+      isSignatureOnly: (kept?.isSignatureOnly ?? true) && signature,
+    })
   }
   return [...merged.values()]
 }
@@ -81,6 +103,13 @@ function kindTripShareBpOf(cells: readonly PaintedCell[], cell: PaintedCell): nu
   return (cell.weightBp * valueRatioOf(cell.lead)) / bandMeanOf(cells, cell.band) / cell.nLive
 }
 
+/** The cell's whole share of the band trip: its kinds' shares summed, or the signature's own. */
+function cellTripShareBpOf(cells: readonly PaintedCell[], cell: PaintedCell): number {
+  if (cell.isSignatureOnly)
+    return (cell.weightBp * valueRatioOf(cell.lead)) / bandMeanOf(cells, cell.band)
+  return kindTripShareBpOf(cells, cell) * cell.nLive
+}
+
 function guardOf(cell: PaintedCell): number {
   const bound = cell.lead === 0 ? COMMON_BOUND_BP : RARE_BOUND_BP
   return Math.max(1, Math.ceil(cell.weightBp / bound))
@@ -92,28 +121,66 @@ function liveCountOf(params: PlanetParams, family: string, rarity: string, band:
   return liveRosterIndicesOf(params, band, content).length
 }
 
-const ROSTERED = PLANETS.map((index) => freshPlanetParamsFor(SEED, index)).filter(
-  (params) => planetRosterOf(params).length > 0,
-)
+const ROSTERED = SEEDS.flatMap((seed) =>
+  PLANETS.map((index) => freshPlanetParamsFor(seed, index)),
+).filter((params) => planetRosterOf(params).length > 0)
+
+function labelOf(params: PlanetParams): string {
+  return `P${params.planetIndex} seed ${params.worldSeed}`
+}
+
+const MIXED = ROSTERED.filter((params) => params.planetIndex >= 3)
+/** Option B's rows (#453), appended after Systems' 15 slots for a swapped band 3's fossil commons. */
+const APPENDED_SLOT_IDS = ['mixed.c5', 'mixed.c6']
+
+/** The slot ids live on a painted cell, as the roster fold draws them. */
+function liveSlotIdsOf(params: PlanetParams, cell: PaintedCell): string[] {
+  const roster = planetRosterOf(params)
+  const content = { family: codeOf(cell.family), tierOffset: cell.band - 1 + cell.lead }
+  return liveRosterIndicesOf(params, cell.band, content).map((index) => roster[index].slotId)
+}
+
+/** Every kind the planet's painted cells can draw, the slotless signature apart. */
+function drawnSlotIdsOf(params: PlanetParams): Set<string> {
+  return new Set(kindedCellsOf(params).flatMap((cell) => liveSlotIdsOf(params, cell)))
+}
+
+/** The cells the guard finds short on a roster without Option B's appended rows. */
+function shortWithoutAppendedOf(params: PlanetParams): PaintedCell[] {
+  return kindedCellsOf(params).filter((cell) => {
+    const live = liveSlotIdsOf(params, cell).filter((id) => !APPENDED_SLOT_IDS.includes(id))
+    return live.length < guardOf(cell)
+  })
+}
+
+/** Whether the planet paints fossil, the act's rare family, as band 3's common (a swapped band 3). */
+function hasSwappedBand3(params: PlanetParams): boolean {
+  return paintedCellsOf(params).some(
+    (cell) => cell.band === 3 && cell.lead === 0 && cell.family === 'fossil',
+  )
+}
 
 describe('roster guard (Systems, ticket 446)', () => {
-  it('checks planets 1 and 2 at least', () => {
-    expect(ROSTERED.map((params) => params.planetIndex)).toEqual(expect.arrayContaining([1, 2]))
+  it('checks planets 1 to 7 on every seed, swapped band 3s included', () => {
+    expect(ROSTERED.map(labelOf)).toEqual(
+      SEEDS.flatMap((seed) => PLANETS.map((index) => `P${index} seed ${seed}`)),
+    )
+    expect(ROSTERED.filter(hasSwappedBand3).length).toBeGreaterThan(0)
   })
 
-  it.each(ROSTERED.map((params) => [params.planetIndex, params] as const))(
-    'gives every painted (band, tier, family) cell of planet %i the live kinds its bound needs',
+  it.each(ROSTERED.map((params) => [labelOf(params), params] as const))(
+    'gives every painted (band, tier, family) cell of %s the live kinds its bound needs',
     (_, params) => {
-      const short = paintedCellsOf(params).filter((cell) => cell.nLive < guardOf(cell))
+      const short = kindedCellsOf(params).filter((cell) => cell.nLive < guardOf(cell))
       expect(short).toEqual([])
     },
   )
 
-  it.each(ROSTERED.map((params) => [params.planetIndex, params] as const))(
-    'holds every kind of planet %i within its band-trip bound, in whole basis points',
+  it.each(ROSTERED.map((params) => [labelOf(params), params] as const))(
+    'holds every kind of %s within its band-trip bound, in whole basis points',
     (_, params) => {
       const cells = paintedCellsOf(params)
-      const over = cells.filter((cell) => {
+      const over = kindedCellsOf(params).filter((cell) => {
         const bound = cell.lead === 0 ? COMMON_BOUND_BP : RARE_BOUND_BP
         return Math.round(kindTripShareBpOf(cells, cell)) > bound
       })
@@ -121,14 +188,14 @@ describe('roster guard (Systems, ticket 446)', () => {
     },
   )
 
-  it.each(ROSTERED.map((params) => [params.planetIndex, params] as const))(
-    'keeps the band mean of planet %i: its kinds share out the whole band trip, within 0.5 bp',
+  it.each(ROSTERED.map((params) => [labelOf(params), params] as const))(
+    "keeps the band mean of %s: its kinds and the signature's own share make the whole band trip",
     (_, params) => {
       const cells = paintedCellsOf(params)
       for (const band of BANDS) {
         const shares = cells
           .filter((cell) => cell.band === band)
-          .reduce((sum, cell) => sum + kindTripShareBpOf(cells, cell) * cell.nLive, 0)
+          .reduce((sum, cell) => sum + cellTripShareBpOf(cells, cell), 0)
         expect(Math.abs(shares - BASIS_POINTS)).toBeLessThanOrEqual(MEAN_TOLERANCE_BP)
       }
     },
@@ -159,6 +226,28 @@ describe('roster guard (Systems, ticket 446)', () => {
       for (const band of [3, 4, 5])
         expect(liveCountOf(params, family, 'rare', band)).toBeGreaterThanOrEqual(1)
     }
+  })
+
+  it.each(MIXED.map((params) => [labelOf(params), params] as const))(
+    'draws on %s 15 kinds unswapped and all 17 on a swapped band 3, the signature apart (VS on #453)',
+    (_, params) => {
+      const drawn = drawnSlotIdsOf(params)
+      expect(drawn.size).toBe(hasSwappedBand3(params) ? 17 : 15)
+      expect(drawn.size).toBeLessThanOrEqual(ORE_ROWS.kinds.rosterMaxKinds)
+    },
+  )
+
+  it("needs Option B's two rows: without them only a swapped band 3's fossil commons fall short", () => {
+    const short = MIXED.flatMap((params) =>
+      shortWithoutAppendedOf(params).map((cell) => ({
+        isSwapped: hasSwappedBand3(params),
+        cell: `b${cell.band} ${cell.family} +${cell.lead}`,
+      })),
+    )
+    expect(short.length).toBeGreaterThan(0)
+    expect(new Set(short.map((entry) => `${String(entry.isSwapped)} ${entry.cell}`))).toEqual(
+      new Set(['true b3 fossil +0']),
+    )
   })
 
   it('never lets a kind sit on a family the planet does not paint', () => {

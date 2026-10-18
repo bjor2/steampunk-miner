@@ -52,6 +52,7 @@ import { cutCellsWithin, perCellShareAt } from './cutShare'
 import { digSubStepsOfCells } from './drillCutTally'
 import {
   carveStampWithRead,
+  walkedWithBit,
   drillGearReadAt,
   type DrillCarve,
   type DrillCarveRequest,
@@ -218,7 +219,7 @@ function carveSweep(
     bit,
     read,
     leavingCellToCarry(request, held),
-    clearingPaidCellsFirst(reach.paid, stampWalk),
+    walkedWithBit(clearingPaidCellsFirst(reach.paid, stampWalk)),
   )
   const clamped = carryClampedToRelease(state, params, playerId, {
     reach,
@@ -275,6 +276,7 @@ function emptyCarveOf(world: WorldState, carrySubSteps: number): SweptCarve {
     casingCleared: { samples: 0, grade: 0 },
     lawWork: 0,
     gearQuanta: 0,
+    gearTicksUsed: 0,
     lawWorkBp: 0,
     gearCells: [],
     aheadLatch: null,

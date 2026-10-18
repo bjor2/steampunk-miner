@@ -8,6 +8,7 @@
 export const ROSTER_SLICE_ID = 'roster'
 
 export {
+  MIXED_ROSTER_ORE_RULES,
   planetRosterOf,
   poolOfPlanet,
   ROSTER_ORE_RULES,

@@ -1,0 +1,90 @@
+{
+  "$comment": "The hero cells of the legacy pool (#452): one 256 px albedo cell per hero species, in the order the per-act hero atlas of #451 packs them (cell i at column i mod 4, row i div 4, 248 px of content inside a 4 px gutter). Rendered lit on the ore stage with the rock held out, so the alpha is the mask; the shader draws the rarity frame and glow, never the sprite.",
+  "pool": "legacy",
+  "acts": ["foothold.base", "foothold.heavy"],
+  "atlas": {
+    "sidePx": 1024,
+    "cellPx": 256,
+    "contentPx": 248,
+    "gutterPx": 4,
+    "cellsPerRow": 4
+  },
+  "cells": [
+    {
+      "index": 0,
+      "speciesId": "violet-fluorite-quartzine",
+      "family": "crystal",
+      "rarity": "uncommon",
+      "silhouette": "cubes",
+      "pattern": "zoned",
+      "hueSlot": "fluorite-violet",
+      "bodyHex": "#8e70d5",
+      "gradeBand": [2, 5],
+      "rect": {
+        "x": 4,
+        "y": 4,
+        "w": 248,
+        "h": 248
+      },
+      "cell": "cells/violet-fluorite-quartzine.png",
+      "blend": "blend/hero-violet-fluorite-quartzine.blend"
+    },
+    {
+      "index": 1,
+      "speciesId": "vein-gold-brassvein",
+      "family": "metal",
+      "rarity": "rare",
+      "silhouette": "wires",
+      "pattern": "veined",
+      "hueSlot": "gold-vein",
+      "bodyHex": "#e0cc12",
+      "gradeBand": [3, 5],
+      "rect": {
+        "x": 260,
+        "y": 4,
+        "w": 248,
+        "h": 248
+      },
+      "cell": "cells/vein-gold-brassvein.png",
+      "blend": "blend/hero-vein-gold-brassvein.blend"
+    },
+    {
+      "index": 2,
+      "speciesId": "blue-corundum-quartzine",
+      "family": "crystal",
+      "rarity": "rare",
+      "silhouette": "barrels",
+      "pattern": "silky",
+      "hueSlot": "corundum-blue",
+      "bodyHex": "#5581e7",
+      "gradeBand": [3, 4],
+      "rect": {
+        "x": 516,
+        "y": 4,
+        "w": 248,
+        "h": 248
+      },
+      "cell": "cells/blue-corundum-quartzine.png",
+      "blend": "blend/hero-blue-corundum-quartzine.blend"
+    },
+    {
+      "index": 3,
+      "speciesId": "red-beryl-quartzine",
+      "family": "crystal",
+      "rarity": "rare",
+      "silhouette": "columns",
+      "pattern": "clear",
+      "hueSlot": "beryl-red",
+      "bodyHex": "#db5667",
+      "gradeBand": [4, 5],
+      "rect": {
+        "x": 772,
+        "y": 4,
+        "w": 248,
+        "h": 248
+      },
+      "cell": "cells/red-beryl-quartzine.png",
+      "blend": "blend/hero-red-beryl-quartzine.blend"
+    }
+  ]
+}

@@ -224,17 +224,20 @@ programs }` from three's `renderer.info` of the game canvas), read only when cal
   the roster, with the fold off and from an unstamped old-save planet 1, prints each run's first
   drill purchase and time to core, and fails a roster run whose first drill purchase is more than
   5% later than the fold-off one's. The guard and bounds are exact on the roster in
-  `roster/systems/rosterGuard.test.ts`. `roster/systems/rosterSpecies.test.ts` (ticket 447) binds
+  `roster/systems/rosterGuard.test.ts`, on P1 to P7 over the pacing seeds (#453): it skips cells
+  only the relic signature paints, counts 15 kinds drawn on an unswapped P3+ planet and 17 on a
+  swapped band 3, and shows the guard short on exactly the swapped band-3 fossil commons without
+  Option B's two rows. Part C also reads P3 to P5 on the pacing seeds. `roster/systems/rosterSpecies.test.ts` (ticket 447) binds
   each `materials.json` species to its kind slot by `(pool, slot)` with the slot's family, rarity
-  and window, and holds one legacy species in every legacy slot of planets 1 and 2.
+  and window, and holds one species of each pool in every slot its planets can ask for.
 - **Rarity share bounds** (ticket 449, Systems on #139: 6203159815, 650 bp per tier since
   6203640346, the trip asserts of 6202970624 section 7.5): `src/features/roster/rarityShares.test.ts`
-  reads P1, P2, P3, P10, P20, P40 and P60 on each pacing seed and fails any bound missed, in whole
+  reads P1 to P7, P10, P20, P40 and P60 on each pacing seed and fails any bound missed, in whole
   basis points: non-common kind 1500, non-common tier 650, epic and mythic 1500 of a trip, common
   kind 5000 of a band trip and 4000 of the planet, 2 live commons per band, no bare painted cell
   (the family-first guard), band mean within 0.5 bp of today, trip CV 3%, the 99.9th percentile
   trip 1.12 of the expected one and the clamp at most 1 bp of mean income. Kind bounds apply where
-  a planet has a roster (P1 and P2 until `kinds.mixed` lands); tiers and means read the base
+  a planet has a roster (P1 to P7; P8+ has no species pool and no roster); tiers and means read the base
   signature share (Systems' model), a story planet's boost is printed, not judged. A fixture breaks
   each bound. The trip ledger (`roster/systems/tripLedger.ts`, its spec beside it) prices units
   through the real #509 clamp and reads mean, CV and clamp cost exactly over the clamp's states,
@@ -589,6 +592,40 @@ programs }` from three's `renderer.info` of the game canvas), read only when cal
   gates at landing, the heat fed against the law less one drill tick (the hard bar at the flip,
   VS 6234998337), the share the #113 cap drops (#541) and the shipped price against the law and
   the law charge (about 2 min, writes `balance-report/swept-law-slab.ndjson`).
+- **Report capsule** (ticket 537, A7 "carve geometry at interval 1", the TD shape 6228947744
+  section 4 with the HS additions, bounded to interval 1 by the GD's ruling after the prototype
+  round 6241320435): behind the authority dev flag `drill.reportCapsule` (on) a pose report at
+  interval 1, live only with `drill.exactCarry` on, whose drill ran the tick since the last charged
+  report on the same facing and whose pose moved by at most one stamp radius, cuts the capsule
+  from the previous pose's stamp centre to this one's on the swept cut's sub-step clock, charged
+  as A6 charges the report (`src/systems/authority/reportedCapsule.ts`), its drill gear's cells cut
+  on every tick of the bite (HS finding 1); a 12-tick report, any other interval, the exact carry
+  off, a fresh bite, a turn, a standstill and a longer step cut protocol 86's bare disc byte for
+  byte, so the flag-off game never carves a capsule.
+  `src/systems/authority/reportedCapsule.test.ts` holds the continuity test, the interval-1 bound
+  (a 12-tick report within the cap digests identically with the switch on and off), the 950 mm
+  cap, the clock, the fallback byte for byte, the capsule cutting every cell the disc cut on a 3
+  m/s track, and the exact carry off cutting the bare disc. `src/logging/reportCapsuleOffGolden.test.ts`
+  replays every golden byte for byte as it ships and with the switch off, and with the exact
+  carry on to A6's charged digests with the switch on or off (the goldens' reports are 12-tick;
+  the pins live in `src/logging/chargedGoldenDigests.ts`, shared with `exactCarryOnGolden.test.ts`).
+  The landing bars are the fixed-track lane's
+  (`src/systems/authority/digSpeedTrack.lane.test.ts`, about 3 min, writes
+  `balance-report/dig-speed-track.ndjson`): on the rows at 3, 8, 25 and 44 m/s, flat and tilted,
+  level and down, a report every tick does at least the 5 m/s rig's law work per metre on the same
+  track with cells per metre within 5% of it (bars 1 and 3, hard), with three named deviations held
+  as known red under #545 (`src/systems/authority/carveGeometryKnownRed.ts`: the floor at 3 m/s
+  flat level, cells per metre at 25 and 44 m/s tilted down; printed with the finding, never a
+  pass, failing as expired once #545 closes or a named row turns green); parity against swept as
+  shipped and the Step 0 re-read (bars 2 and 4) are printed amber, not gated; the same report with
+  the capsule off (`every tick, disc`) is cut beside it so the capsule's own move shows per row,
+  and #514's ratchet (against `every 12`, main's bare disc) and charge bars stay gated. The event
+  stream spec `src/systems/authority/drillEventStream.test.ts` is the HS bar (b) on the capsule,
+  every tick run with the exact carry on (every cell cut at 12 ticks cut once at every tick, the
+  slow rows in order, extras inside the paid reach, `DrillGated` once per gated cell, and the gear
+  cell the track's last report lists cut on that tick); `src/physics/drillReportCadence.test.ts`
+  holds 30, 60 and 144 frames a second byte-identical, and `src/physics/vehicleLoop.test.ts` pins
+  the ticket-339 dig's end with the exact carry on at the capsule's values.
 - **Known red** (ticket 419, the TD on #396 section 2): `CAMPAIGN_PACING_KNOWN_RED`
   (`src/constants/knownRed.ts`) is the one known-red marker in the repo: one gate
   (`campaignPacingGate`), one finding (#417), no registry. The gate still runs in full;

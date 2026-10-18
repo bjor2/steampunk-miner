@@ -87,7 +87,8 @@ function cutWith(flags: AuthorityDevFlags, ticks: number) {
   const state = session.state()
   const vehicle = vehicleOf(state, 'p1')
   const { payload } = poseAbove(GROUND, FACING.down, { drillTicks: ticks })
-  return drillReportedTicks({ ...state, tick: ticks }, 'p1', vehicle, payload, flags)
+  const report = { before: vehicle, tick: ticks, payload }
+  return drillReportedTicks({ ...state, tick: ticks }, 'p1', vehicle, report, flags)
 }
 
 /** A report at `at` facing down on the heat planet, drilling for `drillTicks`. */
