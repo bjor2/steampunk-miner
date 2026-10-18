@@ -13,8 +13,18 @@
  * law. The hard gate is the exact settle on the loop lane's heat planet: the gauge rises by what
  * the rule can settle of the fed ticks, within one drill tick. Only the lanes use this; it decides
  * no play.
+ *
+ * With the authority's `heat.workUncapped` on (ticket 541, shape (b)) the rule settles every tick
+ * a report fed, so the charged paths read `uncappedSettleableHeatTicksOf` and drop nothing. The
+ * lanes then gate VS's ratchet as restated on #535 (6234309451, option ii): the charged branch
+ * settles no less per unit of law work than the lesser of main and the law, less one drill tick;
+ * and the TD's cadence check (6232743242): the gauge per unit of law work at a report every tick
+ * and every 12 ticks agrees within `CADENCE_SHARE`.
  */
 import { LAW_WORK_PER_DRILL_TICK } from '../vehicle/cutCarry'
+
+/** How far the gauge per unit of law work may differ between the two cadences (TD 6232743242). */
+export const CADENCE_SHARE = 1 / 100
 
 /** A row's heat as the rule sees it: fed, settled and the law work it stands for. */
 export interface HeatCapRead {
@@ -45,6 +55,11 @@ export function settleableHeatTicksOf(fedTicks: number, elapsedTicks: number): n
   return Math.max(0, Math.min(fedTicks, elapsedTicks))
 }
 
+/** The drill ticks one report settles with `heat.workUncapped` on (ticket 541): all it fed. */
+export function uncappedSettleableHeatTicksOf(fedTicks: number): number {
+  return Math.max(0, fedTicks)
+}
+
 /** The share of the law's heat the rule drops on a row; negative where it settles above the law. */
 export function droppedHeatShareOf(read: HeatCapRead, expectedHeatTicks: number): number {
   return expectedHeatTicks === 0 ? 0 : 1 - read.settleableHeatTicks / expectedHeatTicks
@@ -69,6 +84,29 @@ export function isGaugeNoLowerThanMain(charged: HeatCapRead, main: HeatCapRead):
   if (charged.lawWork === 0 || main.lawWork === 0) return true
   const oneTickPerLawWork = 1 / charged.lawWork
   return settledPerLawWorkOf(charged) + oneTickPerLawWork >= settledPerLawWorkOf(main)
+}
+
+/**
+ * VS's ratchet as restated on #535 (6234309451, option ii), gated once #541's heat change runs:
+ * the charged branch settles no less per unit of law work than the lesser of `main`'s and the
+ * law's one drill tick per `LAW_WORK_PER_DRILL_TICK`, less one drill tick over its law work.
+ */
+export function isGaugeAtLesserOfMainAndLaw(charged: HeatCapRead, main: HeatCapRead): boolean {
+  if (charged.lawWork === 0) return true
+  const law = lawHeatTicksOf(charged)
+  const floor = main.lawWork === 0 ? law : Math.min(mainTicksOverLawWorkOf(main, charged), law)
+  return charged.settleableHeatTicks + 1 >= floor
+}
+
+/** What `main` settles per unit of law work, over `charged`'s law work, in drill ticks. */
+function mainTicksOverLawWorkOf(main: HeatCapRead, charged: HeatCapRead): number {
+  return (main.settleableHeatTicks * charged.lawWork) / main.lawWork
+}
+
+/** Whether two cadences' gauge readings per unit of law work agree within `CADENCE_SHARE`. */
+export function isCadenceInvariant(everyTick: number, everyTwelve: number): boolean {
+  if (everyTwelve === 0) return everyTick === 0
+  return Math.abs(everyTick / everyTwelve - 1) <= CADENCE_SHARE
 }
 
 /** Whether a row settles at least the law's heat, less one drill tick. */

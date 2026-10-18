@@ -6,9 +6,12 @@ import {
   gaugeRatchetRatioOf,
   gaugeRatchetTextOf,
   heatCapTextOf,
+  isCadenceInvariant,
+  isGaugeAtLesserOfMainAndLaw,
   isGaugeNoLowerThanMain,
   isSettledAtLaw,
   settleableHeatTicksOf,
+  uncappedSettleableHeatTicksOf,
   settledPerLawWorkOf,
   settledVsLawOf,
 } from './heatCapReadings'
@@ -135,5 +138,41 @@ describe('heat cap readings (ticket 535)', () => {
     expect(heatCapTextOf({ ...read, settleableHeatTicks: 120 }, 100)).toContain(
       "settles 0.200 above the law's heat",
     )
+  })
+})
+
+describe('heat cap readings with heat.workUncapped (ticket 541)', () => {
+  it('lets a report settle all it fed, however few ticks elapsed', () => {
+    expect(uncappedSettleableHeatTicksOf(16)).toBe(16)
+    expect(uncappedSettleableHeatTicksOf(-1)).toBe(0)
+  })
+
+  it('holds the restated ratchet at the lesser of main and the law, less one drill tick', () => {
+    const main = { lawWork: HUNDRED_TICKS_LAW, heatTicks: 230, settleableHeatTicks: 230 }
+    const atLaw = { lawWork: HUNDRED_TICKS_LAW, heatTicks: 100, settleableHeatTicks: 100 }
+    expect(isGaugeAtLesserOfMainAndLaw(atLaw, main)).toBe(true)
+    expect(isGaugeAtLesserOfMainAndLaw({ ...atLaw, settleableHeatTicks: 99 }, main)).toBe(true)
+    expect(isGaugeAtLesserOfMainAndLaw({ ...atLaw, settleableHeatTicks: 98 }, main)).toBe(false)
+  })
+
+  it('holds the restated ratchet at main where main settles under the law', () => {
+    const main = { lawWork: HUNDRED_TICKS_LAW, heatTicks: 75, settleableHeatTicks: 75 }
+    const charged = { lawWork: HUNDRED_TICKS_LAW, heatTicks: 80, settleableHeatTicks: 74 }
+    expect(isGaugeAtLesserOfMainAndLaw(charged, main)).toBe(true)
+    expect(isGaugeAtLesserOfMainAndLaw({ ...charged, settleableHeatTicks: 73 }, main)).toBe(false)
+  })
+
+  it('holds a row that removed nothing, and reads a bare main as the law alone', () => {
+    const bare = { lawWork: 0, heatTicks: 0, settleableHeatTicks: 0 }
+    const charged = { lawWork: HUNDRED_TICKS_LAW, heatTicks: 60, settleableHeatTicks: 60 }
+    expect(isGaugeAtLesserOfMainAndLaw(bare, charged)).toBe(true)
+    expect(isGaugeAtLesserOfMainAndLaw(charged, bare)).toBe(false)
+  })
+
+  it('reads two cadences as the same within 1%', () => {
+    expect(isCadenceInvariant(1.009, 1)).toBe(true)
+    expect(isCadenceInvariant(0.991, 1)).toBe(true)
+    expect(isCadenceInvariant(1.02, 1)).toBe(false)
+    expect(isCadenceInvariant(0, 0)).toBe(true)
   })
 })

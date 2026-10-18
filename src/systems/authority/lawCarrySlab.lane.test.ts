@@ -4,6 +4,7 @@ import {
   droppedHeatShareOf,
   gaugeRatchetOf,
   gaugeRatchetTextOf,
+  isGaugeAtLesserOfMainAndLaw,
   heatCapTextOf,
 } from './heatCapReadings'
 import {
@@ -42,11 +43,14 @@ import { LADDER_RIGS, SPEED_RIGS } from './lawSlabRigs'
 // off the act, so the gauge itself reads 0 on every path and the settleable ticks stand for its
 // rise). Gated (VS, hard, `lawChargeBars.ts`): on every row of at least 100 quanta, energy per
 // unit of law work within 1% of the analytic law value, under the tank floor and the ratchet, and
-// heat fed at least the law's less one drill tick (VS 6232473040: the bar reads the fed ticks, the
-// cap is #541's); the regression gate: with the charge on or off at the same cadence the carve is
+// heat fed at least the law's less one drill tick (VS 6232473040: the bar reads the fed ticks);
+// and VS's ratchet as restated on #535 (6234309451, option ii): the charged paths, run with the
+// authority's `heat.workUncapped` on (ticket 541, shape (b)) so the rule settles all they feed,
+// settle no less heat per unit of law work than the lesser of main's and the law's, less one drill
+// tick; the regression gate: with the charge on or off at the same cadence the carve is
 // byte-identical (the same chunks, cells in order and law work), and no `CommandRejected` on any
-// path. Printed on every row, never gated (VS 6234304278, option iii, the GD 6234312287): the
-// share of the law heat the cap drops, and the gauge's settled heat against the law and against
+// path. Printed on every row (VS 6234304278, option iii, the GD 6234312287): the share of the law
+// heat the rule drops (zero with the flag on), and the gauge's settled heat against the law and against
 // main at both cadences, each red row with its reason (reason 1: main @12 heats one tick per
 // drilling tick, above the law; reason 2: the law-exact feed is bursty and the cap clips it,
 // #541's loss), amber below both main and the law. VS's exact settle gate (the gauge rises by what
@@ -161,20 +165,22 @@ function expectLawBars(rig: string, tilt: SlabTilt, section: SlabSection, path: 
 }
 
 /**
- * The gauge ratchet, printed and never gated (VS 6234304278, option iii): the share of the law
- * heat the #113 cap drops, and the charged branch's settled heat per unit of law work against the
- * law and against main at both cadences (the same cadence cuts the same track, the regression
- * gate holds; the other cadence cuts a different one), each red row with its reason
- * (`heatCapReadings.ts`). The gauge against the law is #541's, never a pass here.
+ * The gauge ratchet (VS 6234304278, option iii, restated on #535 as option ii, 6234309451): the
+ * share of the law heat the rule drops, and the charged branch's settled heat per unit of law work
+ * against the law and against main at both cadences (the same cadence cuts the same track, the
+ * regression gate holds; the other cadence cuts a different one), each red row with its reason
+ * (`heatCapReadings.ts`), printed; and gated on a measurable row, the settled heat no lower than
+ * the lesser of main's and the law's, less one drill tick (ticket 541).
  */
-function logGaugeRatchet(rig: string, tilt: SlabTilt, section: SlabSection, path: SlabPath) {
+function expectGaugeRatchet(rig: string, tilt: SlabTilt, section: SlabSection, path: SlabPath) {
   const run = runOf(rig, tilt, section, path)
   const bars = lawChargeBarsOf(run)
   const name = keyOf(rig, tilt, section, path)
   console.log(`${name} / heat cap: ${heatCapTextOf(run, bars.expectedHeatTicks)}`)
   for (const mainPath of MAIN_PATHS) {
-    const ratchet = gaugeRatchetOf(run, runOf(rig, tilt, section, mainPath))
-    console.log(`${name} (printed, not gated): ${gaugeRatchetTextOf(ratchet, mainPath)}`)
+    const main = runOf(rig, tilt, section, mainPath)
+    console.log(`${name}: ${gaugeRatchetTextOf(gaugeRatchetOf(run, main), mainPath)}`)
+    if (bars.isMeasurable) expect(isGaugeAtLesserOfMainAndLaw(run, main)).toBe(true)
   }
 }
 
@@ -288,8 +294,8 @@ function describeRig(rig: string, levels: Record<string, number>, strideMm: numb
           expectLawBars(rig, tilt, section, path))
         it(`logs the ratio to swept, amber outside 5%, ${rig} ${tilt} ${section} ${path}`, () =>
           logSweptRatios(rig, tilt, section, path))
-        it(`prints the gauge against the law and main, and what the cap drops, ${rig} ${tilt} ${section} ${path}`, () =>
-          logGaugeRatchet(rig, tilt, section, path))
+        it(`settles no less heat than the lesser of main and the law, printing what the rule drops, ${rig} ${tilt} ${section} ${path}`, () =>
+          expectGaugeRatchet(rig, tilt, section, path))
       }
       for (const cadence of CADENCES) {
         it(`cuts the same with the charge on or off, ${rig} ${tilt} ${section} ${cadence}`, () =>

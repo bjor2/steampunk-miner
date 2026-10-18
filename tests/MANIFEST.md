@@ -754,7 +754,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/authority/featureUnlocks.test.ts` | 11 | 11 |
 | `src/systems/authority/groundDrill.test.ts` | 3 | 3 |
 | `src/systems/authority/gunRules.test.ts` | 12 | 12 |
-| `src/systems/authority/heatCapReadings.test.ts` | 13 | 13 |
+| `src/systems/authority/heatCapReadings.test.ts` | 18 | 18 |
 | `src/systems/authority/heatRun.test.ts` | 13 | 13 |
 | `src/systems/authority/heatWorkUncapped.test.ts` | 10 | 10 |
 | `src/systems/authority/hollowPocket.test.ts` | 7 | 7 |
@@ -1035,7 +1035,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/physics/drillFacingStep.test.ts` | 3 | 3 |
 | `src/physics/drillReportCadence.test.ts` | 6 | 3 |
 | `src/physics/drillTurnLatency.lane.test.ts` | 3 | 7 |
-| `src/physics/exactCarry.lane.test.ts` | 184 | 16 |
+| `src/physics/exactCarry.lane.test.ts` | 185 | 17 |
 | `src/physics/fastLegContactTrace.lane.test.ts` | 2 | 2 |
 | `src/physics/fastRigBodySpeed.lane.test.ts` | 5 | 5 |
 | `src/physics/flagOffLadder.lane.test.ts` | 84 | 8 |

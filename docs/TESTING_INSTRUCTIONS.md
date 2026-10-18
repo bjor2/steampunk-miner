@@ -536,21 +536,27 @@ programs }` from three's `renderer.info` of the game canvas), read only when cal
   printed on every row, amber outside 5%, and gates nothing (swept's own under- and over-charge is
   #540's). The heat cap (`src/systems/authority/heatCapReadings.ts`): `heatRules.ts` settles at
   most one drill tick of heat per elapsed tick, so a bore wider than a cell's path feeds more law
-  heat than the gauge takes; both lanes print on every row the ticks the rule could settle (each
-  report's fed ticks capped at its elapsed ticks), the share of the law heat it drops, and the
-  gauge's settled heat against the law and against main at both cadences, each red row with its
-  reason (reason 1: main @12 heats one tick per drilling tick, above the law; reason 2: the
-  law-exact feed is bursty and the cap clips it, #541's loss), amber below both main and the law;
-  none of that gates (VS's ratchet against main is withdrawn as a gate, option iii, VS 6234304278,
-  the GD 6234312287: it fails by construction where main heats above the law). The gauge against
-  the law is #541's ("heat cap against the law at the gauge"): the loop lane's planet-8 rig reads
-  the gauge itself, only over the reports it was under its max for (a saturated report is
-  measurement), gates VS's exact settle (the gauge rises by what the rule can settle of the fed
-  heat, within one drill tick), and holds the gauge-against-the-
-  law reading as known red under #541 with a marker local to the lane (`HEAT_CAP_KNOWN_RED`,
-  never exported, so the repo's one exported marker stays `CAMPAIGN_PACING_KNOWN_RED`): red is
-  printed as `known-red (#541)` and passes, green fails until the marker is deleted, a closed #541
-  fails as expired, and no report may call it a pass; swept's identical loss is printed beside it.
+  heat than the gauge takes, unless the authority's `heat.workUncapped` is on (ticket 541, shape
+  (b), ships off): then the drilling segment heats every drill tick of work over its wall ticks.
+  `src/systems/authority/heatWorkUncapped.test.ts` holds the rule (the same heat with the flag on
+  or off while the work fits the elapsed ticks, every tick of work paid past them, the same at
+  every cadence, the max and idle unchanged, a zero-elapsed charged report keeping its carry);
+  `src/systems/bot/botHeat.test.ts` holds the planet-8 bot to the same digest and gauge either
+  way, and `src/logging/heatWorkUncappedGolden.test.ts` every golden. Both lanes run the charged
+  paths and swept with the flag on and main's with it off, and print on every row the ticks the
+  rule could settle (all fed with the flag on, each report's fed ticks capped at its elapsed
+  ticks without), the share of the law heat it drops (zero with the flag on), and the settled
+  heat against the law and against main at both cadences, each red row with its reason (reason
+  1: main @12 heats one tick per drilling tick, above the law; reason 2: the law-exact feed is
+  bursty and the #113 cap clips it, the loss #541 lifts). They gate VS's ratchet as restated on
+  #535 (6234309451, option ii) on every measurable charged row: settled heat per unit of law work
+  no lower than the lesser of main's and the law's, less one drill tick. The loop lane's planet-8
+  rig reads the gauge itself, only over the reports it was under its max for (a saturated report
+  is measurement), and gates VS's exact settle (the gauge rises by what the rule can settle of
+  the fed heat, within one drill tick), the gauge against the law (at least the law per unit of
+  law work less one drill tick on each charged path; it was known red under #541 until the flag
+  landed) and the TD's cadence check (the gauge per unit of law work at a report every tick and
+  every 12 ticks within 1%); swept's gauge is printed beside them.
   The lanes run only when named: the loop lane `src/physics/exactCarry.lane.test.ts` plays the 25
   to 3600 m/s rigs, the stored ladder and a planet-8 rig through Rapier, every leg lined at casing
   grade 5 as the slab is (an unlined level leg buries the over-drilled rigs and reads their rescue

@@ -1,11 +1,9 @@
 import RAPIER from '@dimforge/rapier3d-compat'
-import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs'
+import { mkdirSync, writeFileSync } from 'node:fs'
 import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest'
 import type { DevFlags } from '../constants/devFlags'
-import type { KnownRedMarker } from '../constants/knownRed'
 import { MM_PER_METRE, PHYSICS_TIMESTEP } from '../constants/physics'
 import { createMemorySink } from '../logging/eventSink'
-import { findingClosedOnIn } from '../logging/knownRed'
 import { createRunLog, installRunLog, uninstallRunLog } from '../logging/runLog'
 import { readAuthorityState, submitCommand } from '../store/authorityLink'
 import { readLocalVehicle, useGameStore } from '../store/gameStore'
@@ -15,6 +13,7 @@ import {
   lawWorkRemovedOf,
   tilesAround,
   withDrillExactCarry,
+  withHeatWorkUncapped,
 } from '../systems/authority/cutCarryFixtures'
 import { digSubStepsOfCells } from '../systems/authority/drillCutTally'
 import {
@@ -22,7 +21,10 @@ import {
   gaugeRatchetOf,
   gaugeRatchetTextOf,
   heatCapTextOf,
+  isCadenceInvariant,
+  isGaugeAtLesserOfMainAndLaw,
   settleableHeatTicksOf,
+  uncappedSettleableHeatTicksOf,
 } from '../systems/authority/heatCapReadings'
 import {
   isHeatAtLaw,
@@ -85,23 +87,28 @@ import { createRig, type Rig } from './cutFollowFixtures'
 //   per run is logged; more than one cell's worth goes to the GD).
 // Gated (VS, hard, `lawChargeBars.ts`): on every leg of at least 100 quanta, energy per unit of
 // law work within 1% of the analytic law value, under the tank floor and the ratchet, and heat
-// fed at least the law's less one drill tick (VS 6232473040: the heat bar reads the fed ticks;
-// the cap is #541's); and the regression gate of the TD's amendment (VS confirmed): with the
+// fed at least the law's less one drill tick (VS 6232473040: the heat bar reads the fed ticks);
+// and the regression gate of the TD's amendment (VS confirmed): with the
 // charge on or off at the same cadence the carve is byte-identical (the same cells, law work,
-// metres and ticks), only energy and heat moving. Printed on every row, never gated (VS
-// 6234304278, option iii, the GD 6234312287): the share of the law heat the cap drops, and the
-// gauge's settled heat against the law and against main at both cadences, each red row with its
-// reason (reason 1: main @12 heats one tick per drilling tick, above the law; reason 2: the
-// law-exact feed is bursty and the cap clips it, #541's loss), amber below both main and the law.
+// metres and ticks), only energy and heat moving. The charged paths and swept run with the
+// authority's `heat.workUncapped` on (ticket 541, shape (b)), main's with it off, as shipped: the
+// heat rule settles every tick the charged reports feed it. Gated on every measurable charged row
+// (VS's ratchet as restated on #535, 6234309451, option ii): the settled heat per unit of law work
+// is no lower than the lesser of main's and the law's, less one drill tick. Printed on every row
+// (VS 6234304278, option iii, the GD 6234312287): the share of the law heat the rule drops, zero
+// with the flag on, and the settled heat against the law and against main at both cadences, each
+// red row with its reason (reason 1: main @12 heats one tick per drilling tick, above the law;
+// reason 2: the law-exact feed is bursty and the #113 cap clips it, the loss #541 lifts).
 // Logged, never gated: the ratio to swept (amber outside 5%; swept's own charge is #540's), the
 // absolute geometry bars (law work per metre at least 1.000 and the 250 m window at most 1.050,
 // cells per metre within 5%), which are #514's merge bars, energy and heat per metre, energy per
 // yielded cell, and the protocol-84 rows (main). The ladder (stored 1 to 200) logs law work per
 // metre at every rung. One heat-planet rig (planet 8, on-curve) reads the gauge itself, only while
 // it is under its max: VS's exact settle gate (hard), the gauge rises by what the rule can settle
-// of the fed heat within one drill tick, and the gauge against the law is held red as known red
-// under #541 ("heat cap against the law at the gauge"), never a pass, with swept's identical loss
-// printed beside it. A lane: it runs only when named, prints the table and writes
+// of the fed heat within one drill tick; the gauge against the law (hard since #541, VS and the
+// TD): at least the law per unit of law work less one drill tick on each charged path, swept's
+// printed beside it; and the TD's cadence check (hard): the gauge per unit of law work at a
+// report every tick and every 12 ticks agrees within 1%. A lane: it runs only when named, prints the table and writes
 // balance-report/exact-carry.ndjson; the slab replay (`authority/lawCarrySlab.lane.test.ts`) reads
 // its 25 and 44 m/s rows to validate itself against the loop.
 
@@ -140,10 +147,12 @@ const LADDER_RIGS: Readonly<Record<string, Record<string, number>>> = {
 const HEAT_PLANET = 8
 const HEAT_RIG = { ...onCurveSteps(HEAT_PLANET), ...RIG_SAFETY }
 
-/** A path: the client's flags, the authority's switch and the report cadence. */
+/** A path: the client's flags, the authority's switches and the report cadence. */
 interface Path {
   flags: DevFlags
   isExactCarry: boolean
+  /** The authority's `heat.workUncapped` (ticket 541): on for the charged paths and swept. */
+  isWorkUncapped: boolean
   isEveryTick: boolean
 }
 
@@ -158,12 +167,13 @@ const PATHS: Readonly<Record<string, Path>> = {
   swept: {
     flags: { 'drill.sweptCut': true, 'drill.reportEveryTick': false },
     isExactCarry: true,
+    isWorkUncapped: true,
     isEveryTick: false,
   },
-  'exact @12': { flags: AT_12, isExactCarry: true, isEveryTick: false },
-  'exact @1': { flags: AT_1, isExactCarry: true, isEveryTick: true },
-  'main @12': { flags: AT_12, isExactCarry: false, isEveryTick: false },
-  'main @1': { flags: AT_1, isExactCarry: false, isEveryTick: true },
+  'exact @12': { flags: AT_12, isExactCarry: true, isWorkUncapped: true, isEveryTick: false },
+  'exact @1': { flags: AT_1, isExactCarry: true, isWorkUncapped: true, isEveryTick: true },
+  'main @12': { flags: AT_12, isExactCarry: false, isWorkUncapped: false, isEveryTick: false },
+  'main @1': { flags: AT_1, isExactCarry: false, isWorkUncapped: false, isEveryTick: true },
 }
 const EXACT_PATHS = ['exact @12', 'exact @1'] as const
 
@@ -174,19 +184,6 @@ const MAIN_PATHS = ['main @12', 'main @1'] as const
 const PATH_LABELS: Readonly<Record<string, string>> = {
   'main @1': 'main @1 (unsafe, never shipped)',
 }
-
-/**
- * The planet-8 gauge against the law is red by design until the heat cap is decided (VS
- * 6232473040, the GD 6232473802): held as known red under #541, printed with its number, failed
- * the day it turns green or #541 closes. Local to this lane: the repo's one exported marker is
- * `CAMPAIGN_PACING_KNOWN_RED` (ticket 419).
- */
-const HEAT_CAP_KNOWN_RED: KnownRedMarker = {
-  finding: 541,
-  reason:
-    'the #113 cap settles at most one drill tick of heat per elapsed tick, so the gauge reads 0.59 to 0.86 of the law on fast and ladder rows',
-}
-const TICKETS_FOLDER = new URL('../../docs/metrics/tickets/', import.meta.url)
 
 type Section = 'down' | 'level'
 
@@ -231,7 +228,7 @@ interface LegReading {
   oneCellLaw: number
   energy: number
   heatTicks: number
-  /** The drill ticks the #113 rule could settle of `heatTicks`: each report's, capped at its elapsed ticks. */
+  /** The drill ticks the heat rule could settle of `heatTicks`: each report's, capped at its elapsed ticks with `heat.workUncapped` off. */
   settleableHeatTicks: number
   /** Drill heat ticks read off the gauge over the reports it was under its max for (heat planet only), else null. */
   gaugeHeatTicks: number | null
@@ -264,9 +261,11 @@ afterAll(() => {
   writeReadings(readings)
 })
 
-/** Runs `play` with the authority's `drill.exactCarry` as `path` has it, put back after. */
+/** Runs `play` with the authority's `drill.exactCarry` and `heat.workUncapped` as `path` has them, put back after. */
 function withExactCarry<T>(path: Path, play: () => T): T {
-  return withDrillExactCarry(path.isExactCarry, play)
+  return withDrillExactCarry(path.isExactCarry, () =>
+    withHeatWorkUncapped(path.isWorkUncapped, play),
+  )
 }
 
 /** A fresh rig on `path`: 2 s off the pad, then the leg of `section`. */
@@ -465,7 +464,11 @@ function settleReport(
   params: PlanetParams,
   at: Vector2,
 ) {
-  const settleable = settleableHeatTicksOf(tally.fedSinceSettled, elapsedTicksOf(before, after))
+  const settleable = settleableOnPath(
+    playedPath,
+    tally.fedSinceSettled,
+    elapsedTicksOf(before, after),
+  )
   tally.settleableHeatTicks += settleable
   if (isGaugeUnderMax(before, after)) {
     const report = { settleable, isIdle: !tally.actedSinceSettled, band: bandAt(params, at) }
@@ -475,6 +478,13 @@ function settleReport(
   }
   tally.fedSinceSettled = 0
   tally.actedSinceSettled = false
+}
+
+/** What the heat rule settles of a report's fed ticks on `path`: all of them with `heat.workUncapped` on. */
+function settleableOnPath(path: Path, fedTicks: number, elapsedTicks: number): number {
+  return path.isWorkUncapped
+    ? uncappedSettleableHeatTicksOf(fedTicks)
+    : settleableHeatTicksOf(fedTicks, elapsedTicks)
 }
 
 /** One report as the heat rule reads it: the ticks it can settle, whether it was idle, its band. */
@@ -868,21 +878,26 @@ function geometryVerdictOf(
 }
 
 /**
- * The gauge ratchet, printed and never gated (VS 6234304278, option iii): the share of the law
- * heat the #113 cap drops, and the charged branch's settled heat per unit of law work against the
- * law and against main at both cadences (the same cadence cuts the same ground, the regression
- * gate holds; the other cadence cuts a different trip), each red row with its reason
- * (`heatCapReadings.ts`). The gauge against the law is #541's, never a pass here.
+ * The gauge ratchet (VS 6234304278, option iii, restated on #535 as option ii, 6234309451): the
+ * share of the law heat the rule drops, and the charged branch's settled heat per unit of law work
+ * against the law and against main at both cadences (the same cadence cuts the same ground, the
+ * regression gate holds; the other cadence cuts a different trip), each red row with its reason
+ * (`heatCapReadings.ts`), printed; and gated on a measurable leg, the settled heat no lower than
+ * the lesser of main's and the law's, less one drill tick (ticket 541).
  */
-function logGaugeRatchet(rig: string, path: string, section: Section): void {
+function expectGaugeRatchet(rig: string, path: string, section: Section): void {
   const leg = legOf(rig, path, section)
   const bars = lawChargeBarsOf(leg)
   console.log(`${rig} ${path} ${section} / heat cap: ${heatCapTextOf(leg, bars.expectedHeatTicks)}`)
   for (const mainPath of MAIN_PATHS) {
-    const ratchet = gaugeRatchetOf(leg, legOf(rig, mainPath, section))
+    const main = legOf(rig, mainPath, section)
+    const ratchet = gaugeRatchetOf(leg, main)
     console.log(
-      `${rig} ${path} ${section} (printed, not gated): ${gaugeRatchetTextOf(ratchet, PATH_LABELS[mainPath] ?? mainPath)}`,
+      `${rig} ${path} ${section}: ${gaugeRatchetTextOf(ratchet, PATH_LABELS[mainPath] ?? mainPath)}`,
     )
+    if (leg.metres >= MIN_READ_M && bars.isMeasurable) {
+      expect(isGaugeAtLesserOfMainAndLaw(leg, main)).toBe(true)
+    }
   }
 }
 
@@ -917,8 +932,8 @@ describe('the charged report cut against the swept cut at VS rigs (ticket 535)',
           expectLawBars(rig, path, section))
         it(`logs the ratios to swept, amber outside 5%, the ${rig} rig ${section}, ${path}`, () =>
           logSweptRatios(rig, path, section))
-        it(`prints the gauge against the law and main, and what the cap drops, the ${rig} rig ${section}, ${path}`, () =>
-          logGaugeRatchet(rig, path, section))
+        it(`settles no less heat than the lesser of main and the law, printing what the rule drops, the ${rig} rig ${section}, ${path}`, () =>
+          expectGaugeRatchet(rig, path, section))
       }
       for (const cadence of ['@12', '@1'] as const) {
         it(`cuts the same with the charge on or off, the ${rig} rig ${section} ${cadence}`, () =>
@@ -948,8 +963,8 @@ describe('the ladder, stored 1 to 200, on every path (ticket 535, Systems)', () 
           expectLawBars(rig, path, section))
         it(`logs the ratios to swept, amber outside 5%, ${rig} ${section}, ${path}`, () =>
           logSweptRatios(rig, path, section))
-        it(`prints the gauge against the law and main, and what the cap drops, ${rig} ${section}, ${path}`, () =>
-          logGaugeRatchet(rig, path, section))
+        it(`settles no less heat than the lesser of main and the law, printing what the rule drops, ${rig} ${section}, ${path}`, () =>
+          expectGaugeRatchet(rig, path, section))
       }
     }
     for (const cadence of ['@12', '@1'] as const) {
@@ -961,7 +976,7 @@ describe('the ladder, stored 1 to 200, on every path (ticket 535, Systems)', () 
   }
 })
 
-describe('the charged report cut on a heat planet (ticket 535, the gauge under the #113 cap)', () => {
+describe('the charged report cut on a heat planet (tickets 535 and 541, the gauge)', () => {
   const rig = `planet ${HEAT_PLANET} on-curve`
   it(
     'reads the gauge on every path down 30 m of planet 8',
@@ -974,8 +989,8 @@ describe('the charged report cut on a heat planet (ticket 535, the gauge under t
   for (const path of EXACT_PATHS) {
     it(`charges and heats at the analytic law value, ${rig}, ${path}`, () =>
       expectLawBars(rig, path, 'down'))
-    it(`prints the gauge against the law and main, and what the cap drops, ${rig}, ${path}`, () =>
-      logGaugeRatchet(rig, path, 'down'))
+    it(`settles no less heat than the lesser of main and the law, printing what the rule drops, ${rig}, ${path}`, () =>
+      expectGaugeRatchet(rig, path, 'down'))
     it(`rises on the gauge by what the rule can settle of the fed heat, within one drill tick, read under its max (VS exact settle gate), ${rig}, ${path}`, () => {
       const leg = legOf(rig, path, 'down')
       expect(leg.metres).toBeGreaterThanOrEqual(MIN_READ_M)
@@ -983,7 +998,7 @@ describe('the charged report cut on a heat planet (ticket 535, the gauge under t
       expect(Math.abs(gaugeHeatTicksOf(leg) - gaugeSettleableTicksOf(leg))).toBeLessThanOrEqual(1)
     })
   }
-  it(`heats at least the law per unit of law work off the gauge on each charged path: known red under #541, ${rig}`, () => {
+  it(`heats at least the law per unit of law work less one drill tick off the gauge on each charged path (ticket 541), ${rig}`, () => {
     const swept = legOf(rig, 'swept', 'down')
     const problems = EXACT_PATHS.flatMap((path) => {
       const leg = legOf(rig, path, 'down')
@@ -991,12 +1006,19 @@ describe('the charged report cut on a heat planet (ticket 535, the gauge under t
       const problem = gaugeUnderLawProblemOf(leg, path)
       return problem === null ? [] : [problem]
     })
+    console.log(`${rig} swept gauge (logged): ${gaugeTextOf(swept)}`)
     console.log(
-      `${rig} swept / heat cap (the same loss, logged): ${heatCapTextOf(swept, lawChargeBarsOf(swept).expectedHeatTicks)}`,
+      `${rig} swept / heat cap (logged): ${heatCapTextOf(swept, lawChargeBarsOf(swept).expectedHeatTicks)}`,
     )
-    const verdict = heatCapKnownRedVerdictOf(problems)
-    for (const line of verdict.knownRed) console.log(line)
-    expect(verdict.failures).toEqual([])
+    expect(problems).toEqual([])
+  })
+  it(`rises on the gauge per unit of law work the same within 1% at a report every tick and every 12 (TD cadence check, ticket 541), ${rig}`, () => {
+    const everyTick = gaugeVsLawOf(legOf(rig, 'exact @1', 'down'))
+    const everyTwelve = gaugeVsLawOf(legOf(rig, 'exact @12', 'down'))
+    console.log(
+      `${rig} gauge per law work: @1 ${everyTick.toFixed(4)}, @12 ${everyTwelve.toFixed(4)}`,
+    )
+    expect(isCadenceInvariant(everyTick, everyTwelve)).toBe(true)
   })
   for (const cadence of ['@12', '@1'] as const) {
     it(`cuts the same with the charge on or off, ${rig} ${cadence}`, () =>
@@ -1031,44 +1053,4 @@ function gaugeUnderLawProblemOf(leg: LegReading, path: string): string | null {
   const ratio = gaugeVsLawOf(leg)
   if (ratio >= 1 - bars.oneTickShare) return null
   return `planet ${HEAT_PLANET} ${path}: the gauge rose ${ratio.toFixed(3)} of the law per unit of law work (bar at least ${(1 - bars.oneTickShare).toFixed(3)})`
-}
-
-/**
- * The known-red verdict on the gauge against the law (`logging/knownRed.ts`'s rule, local to this
- * lane): every red row is held as known red under #541 and printed (a row the cap never bites, a
- * crawl feeding under one tick a tick, reads the law and is no reason to delete the marker);
- * all rows green fails until the marker is deleted; a closed #541 fails as expired.
- */
-function heatCapKnownRedVerdictOf(problems: readonly string[]): {
-  failures: string[]
-  knownRed: string[]
-} {
-  const closedOn = findingClosedOnIn(readTicketFile(HEAT_CAP_KNOWN_RED.finding))
-  if (closedOn !== null) {
-    return {
-      failures: [
-        `known-red marker for #${HEAT_CAP_KNOWN_RED.finding} expired: the finding closed on ${closedOn}; delete the marker (the gauge must read the law) or file a new finding`,
-        ...problems,
-      ],
-      knownRed: [],
-    }
-  }
-  if (problems.length === 0) {
-    return {
-      failures: [
-        `the planet ${HEAT_PLANET} gauge reads the law on every charged path but is still marked known-red for #${HEAT_CAP_KNOWN_RED.finding}: delete the marker`,
-      ],
-      knownRed: [],
-    }
-  }
-  return {
-    failures: [],
-    knownRed: problems.map((problem) => `known-red (#${HEAT_CAP_KNOWN_RED.finding}): ${problem}`),
-  }
-}
-
-/** The finding's metrics file as text (the loop writes it when it closes a ticket), or null if none. */
-function readTicketFile(finding: number): string | null {
-  const url = new URL(`${finding}.json`, TICKETS_FOLDER)
-  return existsSync(url) ? readFileSync(url, 'utf8') : null
 }

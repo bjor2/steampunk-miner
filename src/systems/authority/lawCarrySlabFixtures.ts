@@ -18,8 +18,9 @@
  * the rig's drill, `cutCarryFixtures.ts`), the drill energy (the tank's fall less the reports'
  * drive charge), the drill ticks the reports heated for (the carry's whole ticks on the charged
  * paths, the steps' summed dig time on the swept one, the drill ticks on main's), the ticks the
- * #113 rule could settle of them (each report's fed ticks capped at the ticks since the gauge
- * settled, `heatCapReadings.ts`; planet 1 is off the act, so the gauge itself reads 0 on every
+ * heat rule could settle of them (each report's fed ticks capped at the ticks since the gauge
+ * settled, or all of them on the charged paths, which run with `heat.workUncapped` on, ticket 541,
+ * `heatCapReadings.ts`; planet 1 is off the act, so the gauge itself reads 0 on every
  * path), the cells broken in order, the ground's chunks, and every `CommandRejected`. Test
  * support, never run in play.
  */
@@ -42,10 +43,11 @@ import {
   lawWorkOfGroundChanges,
   lawWorkRemovedOf,
   withDrillExactCarry,
+  withHeatWorkUncapped,
   withSweptLawCharge,
 } from './cutCarryFixtures'
 import type { DomainEvent } from './domainEvent'
-import { settleableHeatTicksOf } from './heatCapReadings'
+import { settleableHeatTicksOf, uncappedSettleableHeatTicksOf } from './heatCapReadings'
 import { heatThrottledDrill } from './heatRules'
 import {
   createScriptedSession,
@@ -249,11 +251,21 @@ function isChargeOn(path: SlabPath): boolean {
 }
 
 /**
- * Runs `play` with the authority's `drill.exactCarry` as `path` wants it, and its
- * `drill.sweptLawCharge` on for `swept law` alone, both put back after.
+ * Runs `play` with the authority's `drill.exactCarry` and `heat.workUncapped` (ticket 541) as
+ * `path` wants them, and its `drill.sweptLawCharge` on for `swept law` alone, all put back after.
  */
 function withChargeOf<T>(path: SlabPath, play: () => T): T {
-  return withDrillExactCarry(isChargeOn(path), () => withSweptLawCharge(path === 'swept law', play))
+  const isOn = isChargeOn(path)
+  return withDrillExactCarry(isOn, () =>
+    withHeatWorkUncapped(isOn, () => withSweptLawCharge(path === 'swept law', play)),
+  )
+}
+
+/** What the heat rule settles of a report's fed ticks on `path`: all of them with `heat.workUncapped` on. */
+function settleableOnPath(path: SlabPath, fedTicks: number, elapsedTicks: number): number {
+  return isChargeOn(path)
+    ? uncappedSettleableHeatTicksOf(fedTicks)
+    : settleableHeatTicksOf(fedTicks, elapsedTicks)
 }
 
 /** A fresh rig of `levels` on planet 1, enemies frozen, the tank bottomless, at the track's start. */
@@ -331,7 +343,7 @@ function noteCommand(
   const fed = fedHeatTicksOf(before, after, command, path)
   tally.energy += before.energy - after.energy - movement * ENERGY_QUANTA_PER_TICK.drive
   tally.heatTicks += fed
-  tally.settleableHeatTicks += settleableHeatTicksOf(fed, elapsedTicksOf(before, after))
+  tally.settleableHeatTicks += settleableOnPath(path, fed, elapsedTicksOf(before, after))
   tally.lawWorkCut += lawWorkOfGroundChanges(was, session.state().world, events)
   tally.broken.push(...brokenCellsOf(events))
   tally.casingSamples += casingSamplesOf(events)
