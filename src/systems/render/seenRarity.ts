@@ -3,7 +3,8 @@
  * assay lens and scanner show a rarity only for materials already seen"). A cell's rarity is its
  * species' tier, asked of the `kindLook` provider, and shows only once the player has met that
  * species (the codex's `material:<species id>` record, ticket 546); an unseen species, a cell with
- * no species (a legacy planet, P8+) and a planet with no provider stay unspecified (null). Look
+ * no species (a legacy planet, P8+) and a planet with no provider stay unspecified (null), and so
+ * does every species while `codex.materialContact` is off (`speciesSighting.ts`, ticket 547). Look
  * only: no price, sale, gate or income reads it, and it never writes the record.
  */
 import type { AuthorityState } from '../authority/authorityState'
@@ -11,6 +12,7 @@ import { kindLookProvider, type KindLookProvider } from '../registries/kindLook'
 import type { PlanetParams } from '../world/planetParams'
 import { CELL_KIND, kindOfCell, kindSlotOfCell, NO_KIND_SLOT } from '../world/worldCell'
 import type { Rgb } from './colour'
+import { hasSeenSpecies } from './speciesSighting'
 import type { KindLook } from './kindLookTable'
 
 export interface SeenRarity {
@@ -102,9 +104,7 @@ function hasPlayerSeen(
   provider: KindLookProvider,
   look: KindLook,
 ): boolean {
-  return (
-    Object.hasOwn(state.players, playerId) && provider.hasSeenKind(state, playerId, look.speciesId)
-  )
+  return hasSeenSpecies(state, playerId, provider, look.speciesId)
 }
 
 /** The species an ore cell's kind slot binds; null for any other cell or an unbound slot. */

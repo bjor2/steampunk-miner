@@ -1,8 +1,10 @@
 import { describe, expect, it } from 'vitest'
 import { AUTHORITY_DEV_FLAGS } from '../../constants/devFlags'
 import { readSaveSlot, saveSlotOf } from '../save/saveSlot'
+import type { SweptCut } from '../vehicle/sweptCut'
 import { FACING } from '../vehicle/vehiclePose'
 import { vehicleOf, withVehicle } from './authorityState'
+import type { CommandIntent } from './authorityCommand'
 import type { DomainEvent } from './domainEvent'
 import { AUTHORITY_FLAG_IDS, flagsOf } from './devFlagState'
 import {
@@ -22,7 +24,7 @@ import { stateDigest } from './stateDigest'
 // shipped defaults and a sticky taint, a flag turned on drops its carries, and a shared session's
 // flags are its host's.
 
-const setFlags = (delta: Record<string, unknown>) =>
+const setFlags = (delta: Readonly<Record<string, boolean>>) =>
   ({ type: 'debug.setFlags', payload: { delta } }) as const
 
 const DRILL_POWER = {
@@ -117,7 +119,8 @@ describe('debug.setFlags (ticket 547)', () => {
   })
 
   it('refuses a flag set to anything but a boolean: flags, never numbers', () => {
-    const events = createScriptedSession().submit(0, setFlags({ 'drill.exactCarry': 1.12 }))
+    const numbered = { type: 'debug.setFlags', payload: { delta: { 'drill.exactCarry': 1.12 } } }
+    const events = createScriptedSession().submit(0, numbered as unknown as CommandIntent)
     expect(rejectionOf(events)).toMatchObject({ reason: 'invalid_payload' })
   })
 })
@@ -176,10 +179,10 @@ describe('a flag turned on drops its carries (ticket 547, the amendment decision
   it("drops the energy carry and the swept cursor's carried work when the swept law charge comes back on", () => {
     const drilled = drilledWithCarries()
     const vehicle = vehicleOf(drilled.state(), 'p1')
-    const sweptCut = {
+    const sweptCut: SweptCut = {
       ...{ xMm: 0, yMm: 0, poseXMm: 0, poseYMm: 0, facing: FACING.down, tick: 7 },
       ...{ cutGate: 0, cutGateLowTicks: 0, cutSharePassed: 0, digSubSteps: 0, carrySubSteps: 37 },
-    } as const
+    }
     const session = continueScriptedSession(
       withVehicle(drilled.state(), 'p1', { ...vehicle, sweptCut }),
     )

@@ -1,7 +1,9 @@
 import { describe, expect, it } from 'vitest'
 import { withRegistrations } from '../../registries/registrar'
 import type { SliceDefinition } from '../../registries/sliceDefinition'
-import { createAuthorityState } from '../authority/authorityState'
+import { applyCommand } from '../authority/applyCommand'
+import type { AuthorityCommand } from '../authority/authorityCommand'
+import { createAuthorityState, type AuthorityState } from '../authority/authorityState'
 import { planetParamsFor } from '../world/planetParams'
 import { AIR_CELL, oreCell, RESOURCE_FAMILY } from '../world/worldCell'
 import type { KindLook, RarityLook } from './kindLookTable'
@@ -50,8 +52,18 @@ function probeSlice(met: readonly string[]): SliceDefinition {
 
 const STATE = createAuthorityState({ planetIndex: 3, planetSeed: SEED, playerIds: [PLAYER] })
 
-function rarityOfCell(cell: number, met: readonly string[]) {
-  return withRegistrations([probeSlice(met)], () => cellRarityReaderOf(STATE, PLAYER, PARAMS)(cell))
+function rarityOfCell(cell: number, met: readonly string[], state: AuthorityState = STATE) {
+  return withRegistrations([probeSlice(met)], () => cellRarityReaderOf(state, PLAYER, PARAMS)(cell))
+}
+
+/** `state` after a `debug.setFlags` setting `codex.materialContact` (ticket 547). */
+function withMaterialContact(state: AuthorityState, isOn: boolean, seq: number): AuthorityState {
+  const delta = { 'codex.materialContact': isOn }
+  const command: AuthorityCommand<'debug.setFlags'> = {
+    ...{ playerId: PLAYER, tick: 0, seq },
+    ...{ type: 'debug.setFlags', payload: { delta } },
+  }
+  return applyCommand(state, command).state
 }
 
 describe('seen rarity', () => {
@@ -108,5 +120,13 @@ describe('seen rarity', () => {
     expect(findOf(['probe-lump'], 2)).toBeNull()
     expect(findOf(['probe-wire'], 2)?.rarity).toBe('rare')
     expect(findOf(['probe-wire'], -1)).toBeNull()
+  })
+
+  it('hides every seen rarity while codex.materialContact is off, and shows it again once it is back on (ticket 547)', () => {
+    const cell = oreCell(RESOURCE_FAMILY.metal, 2, 2)
+    const off = withMaterialContact(STATE, false, 1)
+    expect(rarityOfCell(cell, ['probe-wire'], off)).toEqual({ hasSpecies: true, seen: null })
+    const backOn = withMaterialContact(off, true, 2)
+    expect(rarityOfCell(cell, ['probe-wire'], backOn).seen?.rarity).toBe('rare')
   })
 })

@@ -3,7 +3,7 @@
  * provider's species looks for the planet's roster slots, with each slot the local player has not
  * seen left at the family look (Horizontal Scaler's condition a on #450), and the rarity tints.
  * The ONLY writer of `uKindLooks` and `uRarityLooks`. It rewrites them only when the planet, the
- * player's slice sections (where sightings are kept), the resident hero atlas (ticket 451: a seen
+ * player's slice sections (where sightings are kept), `codex.materialContact` (ticket 547), the resident hero atlas (ticket 451: a seen
  * hero with a cell there draws its sprite) or the debug show-all switch change, so a frame
  * allocates nothing and a reveal rebuilds no chunk.
  */
@@ -11,7 +11,9 @@ import { Vector4, type IUniform, type ShaderMaterial } from 'three'
 import { readAuthorityState } from '../store/authorityLink'
 import { useGameStore } from '../store/gameStore'
 import type { AuthorityState } from '../systems/authority/authorityState'
+import { flagsOf } from '../systems/authority/devFlagState'
 import { heroCellsOf } from '../systems/render/heroAtlas'
+import { hasSeenSpecies } from '../systems/render/speciesSighting'
 import { kindLookProvider, type KindLookProvider } from '../systems/registries/kindLook'
 import {
   emptyKindLookTable,
@@ -37,6 +39,8 @@ export function createKindLookUniforms(): Record<string, IUniform> {
 interface FittedLooks {
   params: PlanetParams
   sightings: unknown
+  /** `codex.materialContact` (ticket 547): off, every species shows its family look. */
+  isContactShown: boolean
   heroCells: readonly string[]
   isEveryKindShown: boolean
 }
@@ -47,8 +51,9 @@ export function fitKindLooksToViewer(material: ShaderMaterial, params: PlanetPar
   const state = readAuthorityState()
   const { playerId } = useGameStore.getState()
   const sightings = sightingsOf(state, playerId)
-  if (isFittedTo(FITTED.get(material), params, sightings)) return
-  FITTED.set(material, fitOf(params, sightings))
+  const isContactShown = flagsOf(state)['codex.materialContact']
+  if (isFittedTo(FITTED.get(material), params, sightings, isContactShown)) return
+  FITTED.set(material, fitOf(params, sightings, isContactShown))
   const table = kindLookTableFor(state, playerId, params)
   writeLookTable(material.uniforms, table)
   kindLookPresence.table = table
@@ -60,20 +65,27 @@ function sightingsOf(state: AuthorityState, playerId: string): unknown {
 }
 
 /** Compared field by field, so an unchanged frame allocates nothing. */
-function isFittedTo(last: FittedLooks | undefined, params: PlanetParams, sightings: unknown) {
+function isFittedTo(
+  last: FittedLooks | undefined,
+  params: PlanetParams,
+  sightings: unknown,
+  isContactShown: boolean,
+) {
   return (
     last !== undefined &&
     last.params === params &&
     last.sightings === sightings &&
+    last.isContactShown === isContactShown &&
     last.heroCells === heroAtlasPresence.cells &&
     last.isEveryKindShown === kindLookPresence.isEveryKindShown
   )
 }
 
-function fitOf(params: PlanetParams, sightings: unknown): FittedLooks {
+function fitOf(params: PlanetParams, sightings: unknown, isContactShown: boolean): FittedLooks {
   return {
     params,
     sightings,
+    isContactShown,
     heroCells: heroAtlasPresence.cells,
     isEveryKindShown: kindLookPresence.isEveryKindShown,
   }
@@ -101,9 +113,7 @@ function isShownTo(
   look: KindLook,
 ): boolean {
   if (kindLookPresence.isEveryKindShown) return true
-  return (
-    Object.hasOwn(state.players, playerId) && provider.hasSeenKind(state, playerId, look.speciesId)
-  )
+  return hasSeenSpecies(state, playerId, provider, look.speciesId)
 }
 
 function writeLookTable(uniforms: ShaderMaterial['uniforms'], table: KindLookTable): void {
