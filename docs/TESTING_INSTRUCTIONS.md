@@ -332,7 +332,7 @@ programs }` from three's `renderer.info` of the game canvas), read only when cal
   section 7): `src/systems/economy/drillPowerRows.test.ts` holds the law (`D(0) = 1.5`, D(1) =
   1.5095 within 0.1%, D(10), D(20) and D(50) within 1%, every purchase 1 to 200 gaining 1.181 to
   1.305 with no dip, D(20) / D(1) in [60, 65], 50x today's stored 20), the price rows (`price(0) =
-  1`, `price(n) = ceil(20 x 1.48^(n - 1)) x paceScale` for n = 0 to 300 on planets 1, 3, 8 and 11,
+1`, `price(n) = ceil(20 x 1.48^(n - 1)) x paceScale` for n = 0 to 300 on planets 1, 3, 8 and 11,
   no major split, p/s at least 1 on every purchase), and the numbers past purchase 100 (finite
   canonical stats at 100, 1000 and 3000, whole climbing rows to 3000). `src/logging/subStepFloor.test.ts`
   carries the one-sub-step floor as known red under #558 with a local marker: on soft ground the
@@ -346,7 +346,7 @@ programs }` from three's `renderer.info` of the game canvas), read only when cal
   planet before (0.9), all-track majors 3.5 to 6.0, the income gain per purchase (amber under +5%
   twice in a row), level 20 by P4 and 50 not before P5 and the felt speed at the core (at most 44)
   are printed; the grind bar is a todo. Its per-purchase rows `{n, D, price, planet, minute,
-  incomePerHour}` go to `balance-report/drill-pace.ndjson`, which `pushTestMetrics.sh` appends to
+incomePerHour}` go to `balance-report/drill-pace.ndjson`, which `pushTestMetrics.sh` appends to
   `drill-pace.ndjson` on `test-metrics` (`scripts/ci/recordDrillPace.mjs`) to compare runs line by
   line. Hours of play, so it runs only when named.
 - **Cut start latency** (ticket 433, measurement only): `src/physics/cutStartLatency.lane.test.ts`
