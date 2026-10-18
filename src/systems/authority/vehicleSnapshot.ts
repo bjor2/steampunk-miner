@@ -5,7 +5,6 @@
  * anything is built from it; the digest check in `sessionSnapshot.ts` then catches any value that does not match.
  */
 import { isChargeSize } from '../economy/chargeSizes'
-import { LAW_WORK_PER_DRILL_TICK } from '../vehicle/cutCarry'
 import type { AheadBearing, BoreSide } from '../economy/drillGearCaps'
 import { STANDARD_LINING_TYPE } from '../economy/heatEconomy'
 import { fromCanonical, isNonNegativeMoneyText, toCanonical, type Money } from '../money'
@@ -147,9 +146,7 @@ export function portableVehicleProblems(vehicle: unknown, path: string): string[
       : [`${path}.cutEnergyCarry must be a whole number above 0, or be left out`]),
     ...(vehicle.cutHeatCarry === undefined || isPortableCutHeatCarry(vehicle.cutHeatCarry)
       ? []
-      : [
-          `${path}.cutHeatCarry must be whole law work under one drill tick, above 0, or be left out`,
-        ]),
+      : [`${path}.cutHeatCarry must be whole law work above 0, or be left out`]),
     ...(vehicle.sweptCut === undefined || isPortableSweptCut(vehicle.sweptCut)
       ? []
       : [
@@ -284,11 +281,13 @@ function isPortableCutEnergyCarry(carry: unknown): boolean {
   return isWholeNumber(carry) && (carry as number) > 0
 }
 
-/** The report cut's heat carry (ticket 535): above 0, under one drill tick between commands. */
+/**
+ * The report cut's heat carry (ticket 535): above 0 (left out at 0). Under one drill tick after a
+ * report that heats, but a report at the tick the gauge settled leaves its whole drill ticks on it
+ * with `heat.workUncapped` on (ticket 541), so a save between the two may hold more.
+ */
 function isPortableCutHeatCarry(carry: unknown): boolean {
-  return (
-    isWholeNumber(carry) && (carry as number) > 0 && (carry as number) < LAW_WORK_PER_DRILL_TICK
-  )
+  return isWholeNumber(carry) && (carry as number) > 0
 }
 
 /** The drill's gated bite (ticket 519): the report's tick and the standing cells it met. */

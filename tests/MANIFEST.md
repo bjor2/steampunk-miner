@@ -756,6 +756,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/authority/gunRules.test.ts` | 12 | 12 |
 | `src/systems/authority/heatCapReadings.test.ts` | 13 | 13 |
 | `src/systems/authority/heatRun.test.ts` | 13 | 13 |
+| `src/systems/authority/heatWorkUncapped.test.ts` | 10 | 10 |
 | `src/systems/authority/hollowPocket.test.ts` | 7 | 7 |
 | `src/systems/authority/lava/lavaCadence.lane.test.ts` | 1 | 1 |
 | `src/systems/authority/lava/lavaCadence.test.ts` | 7 | 6 |
@@ -830,7 +831,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/bot/botDeathReplay.test.ts` | 8 | 8 |
 | `src/systems/bot/botGearLava.test.ts` | 3 | 3 |
 | `src/systems/bot/botGuns.test.ts` | 4 | 4 |
-| `src/systems/bot/botHeat.test.ts` | 9 | 9 |
+| `src/systems/bot/botHeat.test.ts` | 10 | 10 |
 | `src/systems/bot/botMoneyLint.test.ts` | 6 | 3 |
 | `src/systems/bot/botRefining.test.ts` | 4 | 4 |
 | `src/systems/bot/botRetreat.test.ts` | 9 | 9 |
@@ -977,6 +978,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/logging/gateRouteStalls.test.ts` | 2 | 2 |
 | `src/logging/goldenSliceSections.test.ts` | 4 | 4 |
 | `src/logging/heatReport.test.ts` | 2 | 2 |
+| `src/logging/heatWorkUncappedGolden.test.ts` | 18 | 2 |
 | `src/logging/knownRed.test.ts` | 11 | 8 |
 | `src/logging/logCompactionBotHour.test.ts` | 5 | 5 |
 | `src/logging/memorySample.test.ts` | 2 | 2 |

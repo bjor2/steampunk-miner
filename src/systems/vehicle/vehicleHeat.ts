@@ -55,6 +55,16 @@ export function heatUnitsPerTickOf(pointsPerSecond: BigStat): number {
   return toSafeInteger(ceil(div(mul(pointsPerSecond, UNITS_PER_POINT), TICKS)))
 }
 
+/**
+ * Gauge points a second summed over `overTicks` ticks, spread back over them as whole units per
+ * tick, rounded up (ticket 541): one division at the end, so a rate scaled by a ratio of ticks is
+ * exact and replays the same. With `overTicks` 1 it is `heatUnitsPerTickOf`.
+ */
+export function heatUnitsPerTickOver(pointsPerSecondTicks: BigStat, overTicks: number): number {
+  const ticks = mul(TICKS, fromSafeInteger(overTicks))
+  return toSafeInteger(ceil(div(mul(pointsPerSecondTicks, UNITS_PER_POINT), ticks)))
+}
+
 export function heatUnitsOfPoints(points: number): number {
   return points * HEAT_UNITS_PER_POINT
 }

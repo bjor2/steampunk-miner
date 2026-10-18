@@ -15,6 +15,10 @@
  * two poses on the sub-step clock, its drill gear's cells cut on every tick (ticket 537,
  * `reportedCapsule.ts` picks the shape, the clock and the gear's cut under `drill.reportCapsule`,
  * only with the exact carry); the charge rule above is the same for either shape.
+ *
+ * With `heat.workUncapped` on as well (ticket 541) the gauge heats every whole drill tick of the
+ * carry, however few ticks elapsed (`heatRules.ts`), and a report at the tick the gauge settled
+ * heats nothing and leaves the carry whole for the next report, so no work is dropped.
  */
 import { AUTHORITY_DEV_FLAGS, type AuthorityDevFlags } from '../../constants/devFlags'
 import { splitCutHeatCarry } from '../vehicle/cutCarry'
@@ -133,9 +137,9 @@ export function followReportedHeat(
   flags: AuthorityDevFlags = AUTHORITY_DEV_FLAGS,
 ): RuleEffect {
   if (isCarriedHeatReport(before, flags)) {
-    return followCarriedHeat(state, playerId, tick, isIdleReport(payload))
+    return followCarriedHeat(state, playerId, tick, isIdleReport(payload), flags)
   }
-  return followHeat(state, playerId, tick, reportedHeatActivity(payload, before))
+  return followHeat(state, playerId, tick, reportedHeatActivity(payload, before), flags)
 }
 
 function isCarriedHeatReport(before: VehicleState, flags: AuthorityDevFlags): boolean {
@@ -148,10 +152,22 @@ function followCarriedHeat(
   playerId: string,
   tick: number,
   isIdle: boolean,
+  flags: AuthorityDevFlags,
 ): RuleEffect {
+  if (isHeatHeldOnCarry(vehicleOf(state, playerId), tick, flags)) {
+    return followHeat(state, playerId, tick, { drillTicks: 0, isIdle }, flags)
+  }
   const { heatTicks, vehicle } = splitCutHeatCarry(vehicleOf(state, playerId))
   const carried = withVehicle(state, playerId, vehicle)
-  return followHeat(carried, playerId, tick, { drillTicks: heatTicks, isIdle })
+  return followHeat(carried, playerId, tick, { drillTicks: heatTicks, isIdle }, flags)
+}
+
+/**
+ * Whether the carry keeps its whole drill ticks for the next report: with `heat.workUncapped` on, a
+ * report at the tick the gauge settled has no tick to heat them over (the TD seam 6232743242).
+ */
+function isHeatHeldOnCarry(vehicle: VehicleState, tick: number, flags: AuthorityDevFlags): boolean {
+  return flags['heat.workUncapped'] && tick <= vehicle.heat.settledTick
 }
 
 /** A report with no action ticks at all is the vehicle stopped to cool down (#113 "idle"). */

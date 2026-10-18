@@ -15,12 +15,16 @@
  *   and down logs `overheat_started` and `overheat_ended`.
  *
  * Off the act the gauge reads 0 and nothing heats; a vehicle that arrives hot cools at once.
+ *
+ * With the authority's `heat.workUncapped` on (ticket 541, shape (b)) a report's drill ticks past
+ * the ticks being settled are no longer dropped: the drilling segment keeps its wall ticks and
+ * heats for every drill tick of work over them (`drillSegmentHeat.ts`). Off, it is as above.
  */
+import { AUTHORITY_DEV_FLAGS, type AuthorityDevFlags } from '../../constants/devFlags'
 import { TICKS_PER_SECOND } from '../../constants/physics'
 import type { HazardArchetype } from '../economy/economyDefinition'
 import {
   bandHeatPerSecond,
-  drillHeatPerSecond,
   hazardArchetypeOn,
   heatCoolingPerSecond,
   heatDamagePerSecond,
@@ -28,7 +32,6 @@ import {
   type HeatCooling,
 } from '../economy/heatEconomy'
 import {
-  add,
   cmp,
   div,
   fromSafeInteger,
@@ -45,7 +48,6 @@ import { tileOfPose } from '../vehicle/vehiclePose'
 import {
   heatPointsOf,
   heatUnitsOfPoints,
-  heatUnitsPerTickOf,
   runHeatSegments,
   type HeatRun,
   type HeatSegment,
@@ -65,6 +67,7 @@ import {
   type RuleEffect,
 } from './commandRule'
 import type { DomainEventBody } from './domainEvent'
+import { drillUnitsPerTickOf, netUnitsPerTick } from './drillSegmentHeat'
 import { planetParamsOf } from './planetOfState'
 import { destroyIfHullGone } from './vehicleTransitions'
 
@@ -82,7 +85,10 @@ export const HEAT_DEBUG_RULES: { readonly 'debug.setHeat': CommandRule<'debug.se
 
 /** What the vehicle did over the ticks being settled. */
 export interface HeatActivity {
-  /** Ticks the drill ran, at most the ticks being settled. */
+  /**
+   * Ticks the drill ran, or the drill ticks of law work it did: heated for at most the ticks being
+   * settled, or for all of them with `heat.workUncapped` on (ticket 541).
+   */
   drillTicks: number
   /** No drive, thrust or drill ticks at all: stopped to cool down (#113 "idle"). */
   isIdle: boolean
@@ -96,6 +102,7 @@ export function followHeat(
   playerId: string,
   tick: number,
   activity: HeatActivity,
+  flags: AuthorityDevFlags = AUTHORITY_DEV_FLAGS,
 ): RuleEffect {
   const vehicle = vehicleOf(state, playerId)
   if (vehicle.mode === 'docked') return settleDockedHeat(state, playerId, tick)
@@ -105,7 +112,8 @@ export function followHeat(
   if (params === null || archetype === null || !isVehicleActive(vehicle) || pose === null) {
     return unchanged(skipHeatTo(state, playerId, archetype, tick))
   }
-  const segments = activeSegmentsOf(state, params, archetype, { ...vehicle, pose }, tick, activity)
+  const posed = { ...vehicle, pose }
+  const segments = activeSegmentsOf(state, params, archetype, posed, tick, activity, flags)
   return settleHeat(state, playerId, archetype, segments, tick)
 }
 
@@ -190,6 +198,7 @@ function activeSegmentsOf(
   vehicle: VehicleState & { pose: NonNullable<VehicleState['pose']> },
   tick: number,
   activity: HeatActivity,
+  flags: AuthorityDevFlags,
 ): HeatSegment[] {
   const ticks = Math.max(0, tick - vehicle.heat.settledTick)
   const drillTicks = Math.min(activity.drillTicks, ticks)
@@ -197,13 +206,12 @@ function activeSegmentsOf(
   const tile = tileOfPose(vehicle.pose)
   const bandHeat = bandHeatPerSecond(params.planetIndex, bandOfTile(params, tile.tx, tile.ty))
   const restCoolings: HeatCooling[] = activity.isIdle ? [...place, 'idle'] : place
+  const drilling = { bandHeat, cooling: coolingOf(params.planetIndex, place) }
+  const work = { workTicks: activity.drillTicks, wallTicks: drillTicks }
   return [
     {
       ticks: drillTicks,
-      unitsPerTick: netUnitsPerTick(
-        add(bandHeat, drillHeatPerSecond(params.planetIndex)),
-        coolingOf(params.planetIndex, place),
-      ),
+      unitsPerTick: drillUnitsPerTickOf(params.planetIndex, drilling, work, flags),
     },
     {
       ticks: ticks - drillTicks,
@@ -232,10 +240,6 @@ function coolingOf(planetIndex: number, coolings: readonly HeatCooling[]): BigSt
   return coolings
     .map((cooling) => heatCoolingPerSecond(planetIndex, cooling))
     .reduce((strongest, rate) => (cmp(rate, strongest) > 0 ? rate : strongest), ZERO_MONEY)
-}
-
-function netUnitsPerTick(heating: BigStat, cooling: BigStat): number {
-  return heatUnitsPerTickOf(sub(heating, cooling))
 }
 
 /** `heat_threshold` for each line risen past, and the throttle's start and end edges. */

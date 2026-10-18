@@ -1,5 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { createAuthorityState } from '../authority/authorityState'
+import { withDrillExactCarry, withHeatWorkUncapped } from '../authority/cutCarryFixtures'
+import { stateDigest } from '../authority/stateDigest'
 import { liningTypeUnlockPrice } from '../economy/casingPrices'
 import { stepOfMajor } from '../economy/upgradeSteps'
 import { onCurveLevel } from '../economy/vehicleStats'
@@ -183,5 +185,43 @@ describe('bot: shaft round lava (#113)', () => {
     boreShaftDownTo(session, planet, BELOW_LAVA)
     expect(session.state().lava.loose).toEqual([])
     expect(session.events().filter((event) => event.type === 'LavaTouched')).toEqual([])
+  })
+})
+
+describe('bot: heat with heat.workUncapped (ticket 541)', () => {
+  /** The on-curve planet 8 digger boring its shaft 20 rows down from row 360 (seed 83921). */
+  function boreTwentyRows() {
+    const session = botOn(8)
+    for (const upgradeId of UPGRADE_IDS) {
+      const level = stepOfMajor(onCurveLevel(upgradeId, 8))
+      session.submit({ type: 'debug.setUpgrade', payload: { upgradeId, level } })
+    }
+    session.submit({ type: 'debug.setCasingGrade', payload: { grade: 5 } })
+    session.submit({ type: 'debug.freezeEnemies', payload: { frozen: true } })
+    session.submit({ type: 'undock', payload: {} })
+    const planet = planetAt(session, 'pad')
+    planet.layout.shaftBottomRow = 360
+    planet.pilot.position = shaftTileAt(planet.layout, 360)
+    const isBored = boreShaftDownTo(session, planet, 340)
+    return {
+      isBored,
+      digest: stateDigest(session.state()),
+      heat: session.vehicle().heat.level,
+      heatEvents: session
+        .events()
+        .flatMap((event) => (event.type.startsWith('Heat') ? [event.type] : [])),
+    }
+  }
+
+  it('bores and heats byte for byte the same with the flag on or off: its clock drills no tick past the elapsed ones', () => {
+    for (const isExactCarry of [false, true]) {
+      const off = withDrillExactCarry(isExactCarry, () =>
+        withHeatWorkUncapped(false, boreTwentyRows),
+      )
+      const on = withDrillExactCarry(isExactCarry, () => withHeatWorkUncapped(true, boreTwentyRows))
+      expect(off.isBored).toBe(true)
+      expect(off.heat).toBeGreaterThan(0)
+      expect(on).toEqual(off)
+    }
   })
 })

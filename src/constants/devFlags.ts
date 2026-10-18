@@ -68,12 +68,24 @@ export const DEV_FLAGS: DevFlags = { 'drill.sweptCut': false, 'drill.reportEvery
  *   a 12-tick report and the exact carry off cut today's bare disc on today's clock, byte for
  *   byte, so the flag-off game never carves a capsule. The charge is the report's: the law work
  *   removed with the carry. A kill-switch, on: off, every report cut is protocol 86's.
+ * - `heat.workUncapped` (ticket 541, shape (b): the TD seam 6232743242 priced by Systems 6232736622,
+ *   VS and G&V voting (b), the GD's acceptance and Bjor's go on the felt heat): a report's drill
+ *   ticks heat for all the law work they stand for, where the #113 rule clipped them at the ticks
+ *   since the gauge settled and dropped 14 to 41% of the law heat on fast and ladder rows. The
+ *   drill segment keeps its wall ticks and heats `drillHeat × work` over them; band heat and cooling
+ *   still run per elapsed tick, and the gauge at its max behaves as before. A report at the tick
+ *   the gauge settled leaves the exact carry's work on the carry for the next one. On the report
+ *   path, the charged branch and swept alike; the bot's whole-tick clock never drills more ticks
+ *   than elapsed, so its heat is the same either way. Off in the game Bjor plays until the paired
+ *   run shows the per-trip heat budget as accepted (G&V condition 4): off, every heat settle is
+ *   protocol 87's.
  */
 export interface AuthorityDevFlags {
   readonly 'enemy.lureRetarget': boolean
   readonly 'drill.exactCarry': boolean
   readonly 'drill.sweptLawCharge': boolean
   readonly 'drill.reportCapsule': boolean
+  readonly 'heat.workUncapped': boolean
 }
 
 export const AUTHORITY_DEV_FLAGS: AuthorityDevFlags = {
@@ -81,4 +93,5 @@ export const AUTHORITY_DEV_FLAGS: AuthorityDevFlags = {
   'drill.exactCarry': false,
   'drill.sweptLawCharge': false,
   'drill.reportCapsule': true,
+  'heat.workUncapped': false,
 }

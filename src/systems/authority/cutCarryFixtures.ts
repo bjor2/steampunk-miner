@@ -51,6 +51,14 @@ export function withReportCapsule<T>(isOn: boolean, play: () => T): T {
   return withAuthorityFlag('drill.reportCapsule', isOn, play)
 }
 
+/**
+ * Runs `play` with the authority's `heat.workUncapped` as `isOn` (ticket 541), put back after: the
+ * heat rule reads it at call time (`heatRules.ts`, `reportedDrill.ts`) and it ships off.
+ */
+export function withHeatWorkUncapped<T>(isOn: boolean, play: () => T): T {
+  return withAuthorityFlag('heat.workUncapped', isOn, play)
+}
+
 function withAuthorityFlag<T>(name: keyof AuthorityDevFlags, isOn: boolean, play: () => T): T {
   const flags = AUTHORITY_DEV_FLAGS as { -readonly [K in keyof AuthorityDevFlags]: boolean }
   const shipped = flags[name]

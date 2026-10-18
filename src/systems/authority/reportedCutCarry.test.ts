@@ -309,13 +309,13 @@ describe('the report cut carry in state (ticket 535)', () => {
     expect('state' in restored && stateDigest(restored.state)).toBe(stateDigest(session.state()))
   })
 
-  it('refuses a snapshot whose carry is not whole and above 0, or a heat carry of a drill tick', () => {
+  it('refuses a snapshot whose carry is not whole and above 0', () => {
     for (const [field, value] of [
       ['cutEnergyCarry', 0],
       ['cutEnergyCarry', 1.5],
       ['cutEnergyCarry', -1],
       ['cutHeatCarry', 0],
-      ['cutHeatCarry', LAW_WORK_PER_DRILL_TICK],
+      ['cutHeatCarry', -1],
       ['cutHeatCarry', 2.5],
     ] as const) {
       const snapshot = JSON.parse(JSON.stringify(takeSnapshot(overGround().state())))

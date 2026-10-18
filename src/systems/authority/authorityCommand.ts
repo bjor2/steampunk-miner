@@ -345,8 +345,16 @@ import type { DriveSigns } from '../vehicle/driveSigns'
  *    12-tick report, a fresh bite, a turn, a still rig, a longer step and the exact carry off cut
  *    protocol 86's bare disc byte for byte, so with the flags as shipped every digest is protocol
  *    86's; with the exact carry on, every 12-tick golden replays to protocol 85's charged digests.
+ * 88: a report's drill ticks heat for all the law work they stand for (ticket 541, shape (b), the
+ *    TD seam 6232743242 priced by Systems 6232736622; behind the authority dev flag
+ *    `heat.workUncapped`, off): where they outnumber the ticks since the gauge settled, the
+ *    drilling segment keeps its wall ticks and heats `drillHeat × work` over them, an exact ratio
+ *    of ticks, where the #113 rule dropped the rest; band heat, cooling and the gauge at its max
+ *    are unchanged, and a charged report at the tick the gauge settled leaves its whole drill
+ *    ticks on the heat carry for the next. With the flag off every digest is protocol 87's, and the
+ *    bot's whole-tick clock heats the same with it on.
  */
-export const AUTHORITY_PROTOCOL_VERSION = 87
+export const AUTHORITY_PROTOCOL_VERSION = 88
 
 /** The kernel's own commands: the closed set its rule tables are written against. */
 export interface KernelCommandPayloads {
