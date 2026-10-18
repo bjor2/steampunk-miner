@@ -306,13 +306,13 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/mining-gates/systems/rigs.test.ts` | 8 | 8 |
 | `src/features/mining-gates/systems/toolsAndGear.test.ts` | 3 | 3 |
 
-### `mining-popup`: 8 files, 48 tests
+### `mining-popup`: 8 files, 51 tests
 
 | File | Tests | Sites |
 | --- | --- | --- |
 | `src/features/mining-popup/noDoubleConversion.test.ts` | 1 | 1 |
-| `src/features/mining-popup/store/miningPopupStore.test.ts` | 6 | 6 |
-| `src/features/mining-popup/systems/chipBoard.test.ts` | 9 | 9 |
+| `src/features/mining-popup/store/miningPopupStore.test.ts` | 8 | 8 |
+| `src/features/mining-popup/systems/chipBoard.test.ts` | 10 | 10 |
 | `src/features/mining-popup/systems/oreFace.test.ts` | 4 | 4 |
 | `src/features/mining-popup/systems/plaqueBoard.test.ts` | 5 | 5 |
 | `src/features/mining-popup/systems/popupText.test.ts` | 3 | 3 |
@@ -429,11 +429,11 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/power-up-core/systems/useRefusals.test.ts` | 3 | 3 |
 | `src/features/power-up-core/systems/useResolution.test.ts` | 12 | 12 |
 
-### `roster`: 13 files, 207 tests
+### `roster`: 13 files, 208 tests
 
 | File | Tests | Sites |
 | --- | --- | --- |
-| `src/features/roster/kindLook.test.ts` | 24 | 15 |
+| `src/features/roster/kindLook.test.ts` | 25 | 16 |
 | `src/features/roster/rarityShares.test.ts` | 18 | 18 |
 | `src/features/roster/roster.byteIdentity.lane.test.ts` | 5 | 1 |
 | `src/features/roster/roster.byteIdentity.test.ts` | 29 | 15 |
@@ -459,7 +459,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/sell-burst/systems/salesOfBatch.test.ts` | 3 | 3 |
 | `src/features/sell-burst/systems/sellBurst.test.ts` | 12 | 12 |
 
-### `sensing`: 25 files, 164 tests
+### `sensing`: 26 files, 170 tests
 
 | File | Tests | Sites |
 | --- | --- | --- |
@@ -467,7 +467,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/sensing/renderOnly.test.ts` | 2 | 2 |
 | `src/features/sensing/sceneBudget.test.ts` | 4 | 4 |
 | `src/features/sensing/shippedRows.test.ts` | 9 | 9 |
-| `src/features/sensing/systems/assayLens.test.ts` | 6 | 6 |
+| `src/features/sensing/systems/assayLens.test.ts` | 8 | 8 |
 | `src/features/sensing/systems/deepStriker.test.ts` | 4 | 4 |
 | `src/features/sensing/systems/echoPing.test.ts` | 7 | 7 |
 | `src/features/sensing/systems/forkItemCards.test.ts` | 5 | 5 |
@@ -476,6 +476,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/sensing/systems/itemHookReach.test.ts` | 2 | 2 |
 | `src/features/sensing/systems/passiveReach.test.ts` | 3 | 3 |
 | `src/features/sensing/systems/passiveReads.test.ts` | 4 | 4 |
+| `src/features/sensing/systems/render/passiveText.test.ts` | 4 | 4 |
 | `src/features/sensing/systems/render/revealLook.test.ts` | 3 | 3 |
 | `src/features/sensing/systems/revealBoard.test.ts` | 11 | 11 |
 | `src/features/sensing/systems/revealPing.test.ts` | 3 | 3 |
@@ -1146,7 +1147,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/render/groundStrata.test.ts` | 6 | 6 |
 | `src/systems/render/gunLook.test.ts` | 7 | 7 |
 | `src/systems/render/hazardStrip/hazardStripPlanet.test.ts` | 5 | 2 |
-| `src/systems/render/hazardStrip/hazardStripSampler.test.ts` | 19 | 12 |
+| `src/systems/render/hazardStrip/hazardStripSampler.test.ts` | 20 | 13 |
 | `src/systems/render/hazardStrip/seededStripGround.test.ts` | 10 | 6 |
 | `src/systems/render/hazardStrip/stripPath.test.ts` | 8 | 6 |
 | `src/systems/render/hazardStrip/stripViewer.test.ts` | 3 | 3 |
@@ -1154,7 +1155,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/render/heatShimmer.test.ts` | 2 | 2 |
 | `src/systems/render/heatTiles.test.ts` | 3 | 3 |
 | `src/systems/render/heroAtlas.test.ts` | 5 | 5 |
-| `src/systems/render/kindLookTable.test.ts` | 11 | 11 |
+| `src/systems/render/kindLookTable.test.ts` | 12 | 12 |
 | `src/systems/render/kindLooks.test.ts` | 6 | 6 |
 | `src/systems/render/mountedPartLook.test.ts` | 8 | 4 |
 | `src/systems/render/oreGrade.test.ts` | 2 | 2 |
@@ -1172,6 +1173,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/render/sampleClock.test.ts` | 3 | 3 |
 | `src/systems/render/sceneLights.test.ts` | 6 | 6 |
 | `src/systems/render/screenProjection.test.ts` | 5 | 5 |
+| `src/systems/render/seenRarity.test.ts` | 7 | 7 |
 | `src/systems/render/shaderUniforms.test.ts` | 4 | 4 |
 | `src/systems/render/skyBandLook.test.ts` | 3 | 3 |
 | `src/systems/render/skyBandRing.test.ts` | 6 | 6 |
@@ -1405,6 +1407,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/ui/hud/hudText.test.ts` | 6 | 6 |
 | `src/ui/iconCoverage.test.ts` | 9 | 9 |
 | `src/ui/kit/itemCard.test.ts` | 13 | 13 |
+| `src/ui/kit/rarityName.test.ts` | 4 | 4 |
 | `src/ui/kit/uiParts.test.ts` | 16 | 16 |
 | `src/ui/menuText.test.ts` | 4 | 4 |
 | `src/ui/plaques/hintChip.test.ts` | 3 | 3 |
@@ -1504,6 +1507,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/views/planetCardView.test.ts` | 1 | 1 |
 | `src/systems/views/plaqueModel.test.ts` | 6 | 6 |
 | `src/systems/views/promptDevice.test.ts` | 8 | 8 |
+| `src/systems/views/rarityName.test.ts` | 5 | 5 |
 | `src/systems/views/refineryBayModel.test.ts` | 4 | 4 |
 | `src/systems/views/screenLayout.test.ts` | 26 | 26 |
 | `src/systems/views/scrollRail.test.ts` | 5 | 5 |
