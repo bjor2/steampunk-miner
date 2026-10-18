@@ -690,6 +690,20 @@ programs }` from three's `renderer.info` of the game canvas), read only when cal
   marker; never a player's launch or a scenario) and `?noflags`. Specs and Playwright set flags
   with `ui.setDevFlags({...})` (a logged `debug.setFlags`, never `localStorage`) and read them with
   `ui.getDevFlags()`; `e2e/browser/devFlags.spec.ts` plants an override, reloads and clears it.
+- **The debug flag panel, its gesture and badge** (ticket 549, the #548 ruling on #547): the
+  view models are pure (`src/systems/devFlags/devFlagPanelModel.test.ts`: every row of the flag
+  table listed, Client and Authority apart, a table row added later shown by itself, pending and
+  host-only states, the pair warnings from each row's `needsOn`, a stale default offered for
+  dropping; the badge counting flags off their defaults, running or remembered, and gone once all
+  are back). `src/store/devFlagPanel.test.ts` installs a memory tab through
+  `installDebugSessionEntry` (null in `afterEach`, with `installDevFlagStorage(null)`): the
+  gesture marks the tab and reads the overrides, sending them at once in play or leaving them to
+  the game the title starts; no entry means the panel opens and nothing is read; a switch is
+  remembered across a reload, the reset restores the shipped flags and drops the badge, and a
+  loaded save the override changed is named. `e2e/browser/mobile/devFlagPanel.spec.ts` holds the
+  version label 1.5 s on both phones (a `pointerdown`/`pointerup` pair, since `tap()` cannot
+  hold), toggles, reloads, resets, checks a player's launch ignores a stored override, and opens
+  the panel from `?debug&title` with a tap.
 - **Known red** (ticket 419, the TD on #396 section 2): `CAMPAIGN_PACING_KNOWN_RED`
   (`src/constants/knownRed.ts`) is the one known-red marker in the repo: one gate
   (`campaignPacingGate`), one finding (#417), no registry. The gate still runs in full;

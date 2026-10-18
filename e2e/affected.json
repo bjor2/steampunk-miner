@@ -291,7 +291,18 @@
         "src/shell/launchParameters.ts",
         "src/debug/debugDevFlags.ts"
       ],
-      "specs": ["e2e/browser/devFlags.spec.ts"]
+      "specs": ["e2e/browser/devFlags.spec.ts", "e2e/browser/mobile/devFlagPanel.spec.ts"]
+    },
+    {
+      "why": "The debug flag panel, its badge and the version label's hidden gesture (ticket 549): the panel and badge views, their store slice and reads, the flag table they list and the gesture's hold.",
+      "paths": [
+        "src/ui/debug/**",
+        "src/store/devFlagPanelSlice.ts",
+        "src/store/devFlagReads.ts",
+        "src/constants/devFlagRows.ts",
+        "src/constants/debugGesture.ts"
+      ],
+      "specs": ["e2e/browser/mobile/devFlagPanel.spec.ts", "e2e/browser/devFlags.spec.ts"]
     },
     {
       "why": "The pause menu's manual save (ticket 404): its slice, view, model, debug reads, the slot writer and the title menu's Continue that loads it back.",

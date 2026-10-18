@@ -13,8 +13,7 @@ import styles from './VersionLabel.module.css'
 
 export function VersionLabel() {
   const isMenuOpen = useGameStore((state) => state.titleMenu !== null || state.pauseMenu !== null)
-  const isPanelOpen = useGameStore((state) => state.isDevFlagPanelOpen)
-  return isMenuOpen && !isPanelOpen ? <HeldVersionLabel /> : null
+  return isMenuOpen ? <HeldVersionLabel /> : null
 }
 
 function HeldVersionLabel() {
