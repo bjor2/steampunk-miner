@@ -84,7 +84,7 @@ function cutDown(rig: Rig, cut: StepCut, { strideMm, ticks }: { strideMm: number
  * band-1 cell, since ticket 397 took the floor out of the law), a hold that never fills and a deep
  * tank.
  */
-const QUICK_RIG = { drill_power: 200, drill_tip: 400, cargo_hold: 3000 }
+const QUICK_RIG = { drill_power: 12, drill_tip: 400, cargo_hold: 3000 }
 
 /** The tick each of the column's cells broke, from the top cell down, relative to the first tick. */
 function brokenTicksOf(ticks: readonly RuleEffect[], cells: readonly TilePoint[]): number[] {
@@ -142,7 +142,7 @@ describe('drill carry through the authority (ticket 399)', () => {
   it.each([5_000, 50_000, 500_000])(
     'cuts the same bytes live, in runs and as the span, as per cell, %i mm a tick on planet 40',
     (strideMm) => {
-      const rig = rigInColumn({ drill_power: 3000, drill_tip: 3000 }, '100000000', 40)
+      const rig = rigInColumn({ drill_power: 158, drill_tip: 3000 }, '100000000', 40)
       const live = cutDown(rig, drillAlongStep, { strideMm, ticks: 40 })
       const perCell = cutDown(rig, drillAlongSweep, { strideMm, ticks: 40 })
       const span = cutDown(rig, (...cut) => drillAlongSpan(...cut).effect, {

@@ -49,7 +49,7 @@ export interface CutStream {
 }
 
 /** A rig whose drill clears every sample its stamp reaches inside one tick. */
-export const CLEARING_RIG = { drill_power: 2000, drill_tip: 600 }
+export const CLEARING_RIG = { drill_power: 106, drill_tip: 600 }
 export const STREAM_TICKS = 480
 const TURN_TICK = 240
 const REPORT_EVERY = 12

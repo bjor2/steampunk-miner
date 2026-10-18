@@ -7,6 +7,7 @@ import type { GateVerdict } from '../registries/gateChecks'
 import { sweptDrillStampOf } from '../vehicle/drillStamp'
 import { sweepPathOf, sweptStampOf } from '../vehicle/sweptCut'
 import { FACING, type VehiclePose } from '../vehicle/vehiclePose'
+import { cellDensitySum } from '../world/cellYield'
 import { groundReaderOf, type GroundReader } from '../world/groundReader'
 import { ISO_DENSITY } from '../world/sampleGrid'
 import type { StampPoint } from '../world/stampShape'
@@ -355,12 +356,14 @@ function isCellDestroyed(run: LegRun, tile: TilePoint): boolean {
   return eventsOfLeg(run).some((event) => event.type === 'TileDestroyed' && isAt(event, tile))
 }
 
-/** The first tick whose reach comes within a stamp radius of a cell's near edge, along the leg. */
-function firstTickNear(run: LegRun, leg: Leg, tile: TilePoint): number {
-  const nearEdge = alongOf(leg, { xMm: tile.tx * MM_PER_METRE, yMm: (tile.ty + 1) * MM_PER_METRE })
-  return run.ticks.findIndex(
-    ({ state }) => reachAlongOf(leg, state) + DRILL_STAMP_RADIUS_MM > nearEdge,
-  )
+/**
+ * The first tick the same leg with no gate takes ground from a cell: where its capsule meets it.
+ * A rim cell beside the centre line is met by the stamp's samples, not at a stamp radius from its
+ * near edge, so a rig's phase against the cells decides the tick (#552 moved the rigs to purchases).
+ */
+function firstTickCutting(run: LegRun, tile: TilePoint): number {
+  const before = cellDensitySum(run.start.world, PARAMS, tile)
+  return run.ticks.findIndex(({ state }) => cellDensitySum(state.world, PARAMS, tile) < before)
 }
 
 /** Planet 1's column 33, with ore beside its centre line in column 32, 4 and 18 m down. */
@@ -378,11 +381,11 @@ const GATE_RIGS = [78, 300, 3600].map(rigAt)
 describe('gates on the capsule cells at any speed (ticket 439, Horizontal Scaler)', () => {
   for (const rig of GATE_RIGS) {
     it(`reports a refused rim cell once, on the tick the capsule meets it, at ${rig.speed} m/s`, () => {
-      const run = withRegistrations([probeSliceOf(RIM_GATES)], () =>
-        cutLeg({ rig, leg: RIM_LEG, maxTicks: LEG_TICKS, reachMm: 24_000 }),
-      )
+      const leg = { rig, leg: RIM_LEG, maxTicks: LEG_TICKS, reachMm: 24_000 }
+      const run = withRegistrations([probeSliceOf(RIM_GATES)], () => cutLeg(leg))
+      const ungated = cutLeg(leg)
       for (const gate of RIM_GATES) {
-        expect(ticksGatingAt(run, gate)).toEqual([firstTickNear(run, RIM_LEG, gate)])
+        expect(ticksGatingAt(run, gate)).toEqual([firstTickCutting(ungated, gate)])
         expect(isCellDestroyed(run, gate)).toBe(false)
       }
     })

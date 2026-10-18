@@ -93,6 +93,14 @@ describe('known-red marker (ticket 419)', () => {
     ])
   })
 
+  it('names the gate it holds when that gate turns green (ticket 552)', () => {
+    const verdict = knownRedVerdict(markerFor(558), GREEN, readOpenTicketFile, 'the sub-step floor')
+
+    expect(verdict.failures).toEqual([
+      'the sub-step floor is green but still marked known-red for #558: delete the marker',
+    ])
+  })
+
   it('fails an uncovered cadence problem even with an active marker', () => {
     const problems = { covered: [STALL], uncovered: [CADENCE] }
 

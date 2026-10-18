@@ -25,12 +25,13 @@ import { stateDigest } from './stateDigest'
 /** The report path: no swept cut, the every-tick cadence on, as the client loop runs it. */
 const REPORT_PATH: DevFlags = { 'drill.sweptCut': false, 'drill.reportEveryTick': true }
 
+/** Purchase 2 since #552 (31 mm a tick in band 1), the cut stored step 10 gave before it (28). */
 const DRILL_POWER = {
   type: 'debug.setUpgrade',
-  payload: { upgradeId: 'drill_power', level: 10 },
+  payload: { upgradeId: 'drill_power', level: 2 },
 } as const
 
-/** The rig's descent, in mm a tick: under the cut speed of drill power 10 in band 1. */
+/** The rig's descent, in mm a tick: under the cut speed of drill power purchase 2 in band 1. */
 const DESCENT_MM_PER_TICK = 20
 const RUN_TICKS = 160
 

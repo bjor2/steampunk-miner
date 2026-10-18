@@ -143,13 +143,13 @@ describe('swept cut at any speed (ticket 335)', () => {
 })
 
 /** A drill that breaks planet 8's rock in one sub-step a cell. */
-const STRONG_DRILL_STEP = 1000
+const STRONG_DRILL_STEP = 54
 
 /**
  * A drill that takes about 23 ticks a cell of planet 8's rock, so the cells under a resting stamp
  * keep it digging through a 40-tick report interval: the report is never left idle time to cool.
  */
-const SLOW_DRILL_STEP = 510
+const SLOW_DRILL_STEP = 28
 
 /**
  * On planet 8 at `AWAY`, facing down with a drill at `drillStep`: the stamp rests for `steps` drill

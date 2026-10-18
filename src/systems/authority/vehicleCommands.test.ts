@@ -58,11 +58,12 @@ describe('vehicle drilling', () => {
     expect(FULL_TANK - session.vehicle().energy).toBe(40 * 4)
   })
 
-  it('clears the same cell in its law time of 5 ticks with drill_power at level 20', () => {
+  // 60 / D(11) = 60 / 13.29 = 4.5 ticks, rounded up (#552's per-purchase law).
+  it('clears the same cell in its law time of 5 ticks with drill_power at purchase 11', () => {
     const session = createSession()
     session.submit(0, {
       type: 'debug.setUpgrade',
-      payload: { upgradeId: 'drill_power', level: 200 },
+      payload: { upgradeId: 'drill_power', level: 11 },
     })
     session.submit(0, poseAbove(GROUND, FACING.down))
     expect(typesOf(session.submit(2, drill(GROUND, 2)))).not.toContain('TileDestroyed')
@@ -73,12 +74,12 @@ describe('vehicle drilling', () => {
     expect(cellDensitySum(session.state().world, PARAMS, GROUND)).toBe(0)
   })
 
-  // No tile floor since ticket 397: 40 ticks over 1.12^40 is under one, so the law's one tick.
-  it('clears the same cell in a single tick with drill_power at level 40', () => {
+  // No tile floor since ticket 397: 60 / D(18) = 60 / 60.9 is under one, so the law's one tick.
+  it('clears the same cell in a single tick with drill_power at purchase 18', () => {
     const session = createSession()
     session.submit(0, {
       type: 'debug.setUpgrade',
-      payload: { upgradeId: 'drill_power', level: 400 },
+      payload: { upgradeId: 'drill_power', level: 18 },
     })
     session.submit(0, poseAbove(GROUND, FACING.down))
     expect(typesOf(session.submit(1, drill(GROUND, 1)))).toContain('TileDestroyed')
@@ -234,7 +235,7 @@ describe('vehicle core fragments', () => {
     session.submit(0, { type: 'debug.setUpgrade', payload: { upgradeId: 'drill_tip', level: 70 } })
     session.submit(0, {
       type: 'debug.setUpgrade',
-      payload: { upgradeId: 'drill_power', level: 400 },
+      payload: { upgradeId: 'drill_power', level: 22 },
     })
     const core = { tx: 0, ty: 3 }
     session.submit(10, poseAbove(core, FACING.down))

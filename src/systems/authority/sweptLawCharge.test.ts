@@ -26,7 +26,7 @@ import { LADDER_RIGS, SPEED_RIGS } from './lawSlabRigs'
 // rig laid and cut again counts at its grade.
 
 const FAST = SPEED_RIGS['44 m/s'].levels
-const SLOW = LADDER_RIGS['stored 10']
+const SLOW = LADDER_RIGS['stored 1']
 const FAST_STRIDE = strideOfRig(FAST, strideOfSpeedMps(SPEED_RIGS['44 m/s'].speedMps))
 const SLOW_STRIDE = strideOfRig(SLOW)
 const SHORT_MM = 20_000

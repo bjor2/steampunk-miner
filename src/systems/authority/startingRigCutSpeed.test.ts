@@ -11,10 +11,15 @@ import { createScriptedSession, PARAMS, poseAbove } from './scriptedSession'
 
 // The starting rigs' cut-follow speed per stored drill_power step (ticket 431, the Vertical
 // Scaler's ratio question on #430): band-1 rock of planet 1 with the tip at step 0, so `eff` is 1
-// and the drill law's speed is `D` cells/s. The table and its cause are in
-// docs/economy/drill-ladder.md.
+// and the drill law's speed is `D` cells/s. A stored step is one purchase of x1.243 since the GD
+// ruling on #551 (ticket 552). The table and its cause are in docs/economy/drill-ladder.md.
 const STORED_STEPS = Array.from({ length: 31 }, (_, step) => step)
-const STEPS_PER_MAJOR = 10
+/** Purchases whose next one still lands in 1.181..1.305 on soft ground (VS on #551, via the TD). */
+const BANDED_PURCHASES = Array.from({ length: 22 }, (_, at) => at + 1)
+/** Up to here a cell costs enough sub-steps that the read loses under a mm a tick to them. */
+const FINE_READ_STEPS = STORED_STEPS.slice(0, 11)
+const PURCHASE_BAND = { lowest: 1.181, highest: 1.305 }
+const MM_A_TICK_OF_ONE_SUB_STEP_CELL = 60_000
 const BAND_1_ROCK = blockHardness(PARAMS.planetIndex, 1)
 const COLUMN = 20
 const REST = {
@@ -53,25 +58,39 @@ function lawStepMmAt(step: number): number {
   return Number(toFixedText(perTick, 6))
 }
 
-/** The cell's sub-step drill time over one major's ten stored steps: the law's gain, unrounded. */
-function majorGainOfSubSteps(fromStep: number): number {
-  const subStepsAt = (step: number) =>
-    subStepsPerTile(statsAtDrillStep(step), BAND_1_ROCK) as number
-  return subStepsAt(fromStep) / subStepsAt(fromStep + STEPS_PER_MAJOR)
+function subStepsAt(step: number): number {
+  return subStepsPerTile(statsAtDrillStep(step), BAND_1_ROCK) as number
+}
+
+/** The cell's sub-step drill time over the next purchase's: the gain the cut is paid at. */
+function purchaseGainOfSubSteps(fromStep: number): number {
+  return subStepsAt(fromStep) / subStepsAt(fromStep + 1)
 }
 
 describe('starting rigs cut speed (ticket 431)', () => {
-  it("keeps the drill law's 1.12 over every ten stored steps before the read rounds to mm", () => {
-    for (const fromStep of STORED_STEPS.slice(0, -STEPS_PER_MAJOR)) {
-      expect(majorGainOfSubSteps(fromStep)).toBeCloseTo(1.12, 3)
+  it("keeps the drill law's first purchase at its old pip, 1.0063, before the read rounds to mm", () => {
+    expect(purchaseGainOfSubSteps(0)).toBeCloseTo(1.0063, 3)
+  })
+
+  it('pays every purchase from 1 to 23 a gain of 1.181 to 1.305 in the sub-steps a cell costs', () => {
+    const outside = BANDED_PURCHASES.filter((step) => {
+      const gain = purchaseGainOfSubSteps(step)
+      return gain < PURCHASE_BAND.lowest || gain > PURCHASE_BAND.highest
+    })
+    expect(outside).toEqual([])
+  })
+
+  it('reads the cell its whole sub-steps allow, never over the law, at every stored step to 30', () => {
+    for (const step of STORED_STEPS) {
+      const read = readStepMmAt(step)
+      expect(read).toBe(Math.floor(MM_A_TICK_OF_ONE_SUB_STEP_CELL / subStepsAt(step)))
+      expect(lawStepMmAt(step) - read).toBeGreaterThanOrEqual(0)
     }
   })
 
-  it("reads the drill law's speed to within one mm a tick under it, never over it", () => {
-    for (const step of STORED_STEPS) {
-      const shortfall = lawStepMmAt(step) - readStepMmAt(step)
-      expect(shortfall).toBeGreaterThanOrEqual(0)
-      expect(shortfall).toBeLessThanOrEqual(1)
+  it("reads the drill law's speed to within one mm a tick under it on the rigs to stored 10", () => {
+    for (const step of FINE_READ_STEPS) {
+      expect(lawStepMmAt(step) - readStepMmAt(step)).toBeLessThanOrEqual(1)
     }
   })
 })

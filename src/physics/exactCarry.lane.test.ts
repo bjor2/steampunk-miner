@@ -129,10 +129,10 @@ vi.mock('../systems/vehicle/poseReport', async (importOriginal) => {
 const RIG_SAFETY = { hull: 5000, cargo_hold: 5000 }
 /** VS's rows (`sweptFreshCarveLoop.test.ts`, `cutSmoothness.test.ts`): band-1 cut speed by name. */
 const SPEED_RIGS: Readonly<Record<string, Record<string, number>>> = {
-  '25 m/s': { drill_power: 250, drill_tip: 600, engine: 5000, ...RIG_SAFETY },
-  '44 m/s': { drill_power: 300, drill_tip: 200, ...RIG_SAFETY },
-  '240 m/s': { drill_power: 450, drill_tip: 600, ...RIG_SAFETY },
-  '3600 m/s': { drill_power: 2000, drill_tip: 600, ...RIG_SAFETY },
+  '25 m/s': { drill_power: 14, drill_tip: 600, engine: 5000, ...RIG_SAFETY },
+  '44 m/s': { drill_power: 17, drill_tip: 200, ...RIG_SAFETY },
+  '240 m/s': { drill_power: 25, drill_tip: 600, ...RIG_SAFETY },
+  '3600 m/s': { drill_power: 106, drill_tip: 600, ...RIG_SAFETY },
 }
 /** Systems' ladder, stored as `levelLegDeadStop.lane.test.ts` stores it; the 7-13 m/s rows among them. */
 const P200 = onCurveSteps(200)

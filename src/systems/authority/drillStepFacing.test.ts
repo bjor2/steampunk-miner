@@ -45,7 +45,7 @@ function gateSliceOf(outcome: GateOutcome): SliceDefinition {
 /** A drill that breaks band-1 ground in about 4 ticks and a full tank, reported facing `facing`. */
 function strongSessionReported(facing: Facing): ScriptedSession {
   const session = createScriptedSession()
-  session.submit(0, { type: 'debug.setUpgrade', payload: { upgradeId: 'drill_power', level: 200 } })
+  session.submit(0, { type: 'debug.setUpgrade', payload: { upgradeId: 'drill_power', level: 12 } })
   session.submit(0, { type: 'debug.setEnergy', payload: { energy: '150' } })
   const { payload } = poseAbove({ tx: 0, ty: 0 }, facing)
   session.submit(0, { type: 'reportPose', payload: { ...payload, ...ABOVE } })

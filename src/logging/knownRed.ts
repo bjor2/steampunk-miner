@@ -23,13 +23,17 @@ export interface KnownRedVerdict {
 /** The finding ticket's metrics file (`docs/metrics/tickets/<n>.json`) as text, or null if none. */
 export type FindingTicketFileReader = (finding: number) => string | null
 
+/** The gate the repo's one exported marker holds (ticket 419). */
+const CAMPAIGN_PACING_GATE = 'campaignPacingGate'
+
 export function knownRedVerdict(
   marker: KnownRedMarker | null,
   problems: KnownRedProblems,
   readFindingTicketFile: FindingTicketFileReader,
+  gate: string = CAMPAIGN_PACING_GATE,
 ): KnownRedVerdict {
   if (marker === null) return failingEverything(null, problems)
-  const refusal = markerRefusalOf(marker, problems, readFindingTicketFile)
+  const refusal = markerRefusalOf(marker, problems, readFindingTicketFile, gate)
   return refusal === null
     ? holdingCoveredAsKnownRed(marker, problems)
     : failingEverything(refusal, problems)
@@ -40,11 +44,12 @@ function markerRefusalOf(
   marker: KnownRedMarker,
   problems: KnownRedProblems,
   readFindingTicketFile: FindingTicketFileReader,
+  gate: string,
 ): string | null {
   if (!isTicketed(marker)) return 'known-red marker has no finding ticket'
   const closedOn = findingClosedOnIn(readFindingTicketFile(marker.finding))
   if (closedOn !== null) return expiredMarkerProblem(marker.finding, closedOn)
-  if (problems.covered.length === 0) return greenGateProblem(marker.finding)
+  if (problems.covered.length === 0) return greenGateProblem(gate, marker.finding)
   return null
 }
 
@@ -64,8 +69,8 @@ function expiredMarkerProblem(finding: number, closedOn: string): string {
 }
 
 /** The ratchet: a marker cannot outlive the red it was filed for. */
-function greenGateProblem(finding: number): string {
-  return `campaignPacingGate is green but still marked known-red for #${finding}: delete the marker`
+function greenGateProblem(gate: string, finding: number): string {
+  return `${gate} is green but still marked known-red for #${finding}: delete the marker`
 }
 
 function failingEverything(refusal: string | null, problems: KnownRedProblems): KnownRedVerdict {

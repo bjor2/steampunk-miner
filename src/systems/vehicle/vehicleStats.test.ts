@@ -3,7 +3,7 @@ import { describe, expect, it } from 'vitest'
 import { ECONOMY } from '../economy/economy'
 import { UPGRADE_IDS, type UpgradeDef, type UpgradeId } from '../economy/economyDefinition'
 import { startLevels, type UpgradeLevels, type VehicleStats } from '../economy/vehicleStats'
-import { cmp, fromCanonical, toCanonical } from '../money'
+import { cmp, fromCanonical, toCanonical, toFixedText } from '../money'
 import { computeVehicleStats } from './vehicleStats'
 
 const LEVELS = [0, 1, 10, 1000, 1_000_000]
@@ -57,9 +57,10 @@ describe('vehicle stats from integer levels', () => {
     expect(stats.engine).toEqual({ speedMax: 6, accel: 1, thrustToWeight: 2 })
   })
 
-  it('gives "1.68", "1.2544", "112", 156 and 14 at level 1 (step 10)', () => {
+  // Drill power is grown per purchase since #552, so step 10 is its tenth purchase.
+  it('gives "10.69", "1.2544", "112", 156 and 14 at step 10', () => {
     const stats = statsOf(levelsWith(Object.fromEntries(UPGRADE_IDS.map((id) => [id, 10]))))
-    expect(stats.drillPower).toEqual(fromCanonical('1.68'))
+    expect(toFixedText(stats.drillPower, 2)).toBe('10.69')
     expect(stats.drillTip).toEqual(fromCanonical('1.2544'))
     expect(stats.hullMax).toEqual(fromCanonical('112'))
     expect([stats.energyMax, stats.cargoCapacity]).toEqual([156, 14])

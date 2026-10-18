@@ -7,8 +7,8 @@ describe('band dig time (#86)', () => {
     expect(bandDigTicks(1, startLevels(), 1)).toBe(40)
   })
 
-  it('reads the tip and power of the levels it is given: ceil(60 / (1.5 x 1.12^13)) = 10', () => {
-    expect(bandDigTicks(1, onCurveSteps(1), 1)).toBe(10)
+  it('reads the tip and power of the levels it is given: ceil(60 / (1.5 x 1.12^(1/18) x 1.243^11)) = 4', () => {
+    expect(bandDigTicks(1, onCurveSteps(1), 1)).toBe(4)
   })
 
   it('answers null when the tip only skids on the band', () => {
@@ -19,8 +19,9 @@ describe('band dig time (#86)', () => {
     expect(bandDigTicks(2, onCurveSteps(1))).toBe(bandDigTicks(2, onCurveSteps(1), 5))
   })
 
-  it('digs band 5 on curve in 45 ticks a metre on arrival and 23 by departure', () => {
-    expect(bandDigTicks(3, onCurveSteps(2))).toBe(45)
-    expect(bandDigTicks(3, onCurveSteps(3))).toBe(23)
+  // #552's on-curve drill: 15 purchases on arrival at planet 3, 18 by departure.
+  it('digs band 5 on curve in 19 ticks a metre on arrival and 10 by departure', () => {
+    expect(bandDigTicks(3, onCurveSteps(2))).toBe(19)
+    expect(bandDigTicks(3, onCurveSteps(3))).toBe(10)
   })
 })

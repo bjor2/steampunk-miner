@@ -29,10 +29,10 @@ function rigWith(levels: Partial<VehicleState['levels']> = {}): VehicleState {
 }
 
 /** Steps that cut band-1 rock in one sub-step a cell, the law's quantum (no tile floor, #397). */
-const ONE_SUB_STEP = { drill_power: 2000, drill_tip: 600 }
+const ONE_SUB_STEP = { drill_power: 106, drill_tip: 600 }
 
-/** Steps whose k times cut passes the 6 m/s engine in planet 1's band 1 (6.9) but not band 5 (1.68). */
-const BAND_ONE_DRILL = { drill_power: 100, drill_tip: 30 }
+/** Steps whose k times cut passes the 6 m/s engine in planet 1's band 1 but not band 5 (#552: purchase 7). */
+const BAND_ONE_DRILL = { drill_power: 7, drill_tip: 30 }
 
 /** The rig with its pose moved `depthTiles` straight down from the surface; null for no pose. */
 function rigPosedAt(rig: VehicleState, depthTiles: number | null): VehicleState {
@@ -84,7 +84,7 @@ describe('travel parity (ticket 333)', () => {
 
 describe('travel parity past the engine (ticket 333, no tile floor since #397)', () => {
   it('lets the drill set travel once k times its cut speed passes the engine', () => {
-    const rig = rigWith({ drill_power: 300, drill_tip: 200 })
+    const rig = rigWith({ drill_power: 17, drill_tip: 200 })
     const drill = vehicleStatsAt(rig.levels)
     const drillSpeed = (travelStepThrough(drill, blockHardness(1, 1)) * 60) / 1000
     expect(travelSpeedOf(rig, PARAMS)).toBe(drillSpeed)

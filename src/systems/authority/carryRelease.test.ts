@@ -134,8 +134,8 @@ describe('a released cell is still gate-checked (ticket 421, Horizontal Scaler)'
   })
 })
 
-/** #397's 15 m/s rig on planet 1, a hold that never fills and a deep tank. */
-const RIG_15 = { drill_power: 200, drill_tip: 600, engine: 5000, cargo_hold: 3000 }
+/** #397's 15 m/s rig on planet 1 (16.5 m/s at purchase 12 since #552), a hold that never fills and a deep tank. */
+const RIG_15 = { drill_power: 12, drill_tip: 600, engine: 5000, cargo_hold: 3000 }
 const COLUMN = 30
 
 const DEEP_START = {
@@ -356,8 +356,8 @@ function startAbove(tile: TilePoint) {
   return { x: tile.tx * 1000 + 500, y: (tile.ty + 4) * 1000 + 500 }
 }
 
-/** A drill at the 4-tick floor on band 1 with no tip, so a dense ore cell locks it (#334's spec). */
-const TIPLESS_RIG = { drill_power: 1000 }
+/** A drill far past the old 4-tick floor on band 1 with no tip, so a dense ore cell locks it (#334's spec). */
+const TIPLESS_RIG = { drill_power: 54 }
 
 /** A leg down onto `tile` with `levels`, the body following the cut. */
 function legDownOnto(tile: TilePoint, levels: Record<string, number>): LegTick[] {

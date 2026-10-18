@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest'
+import type { UpgradeId } from '../economy/economyDefinition'
 import { coreFragmentsNeeded } from '../economy/planetEconomy'
 import { FACING, dockedPoseAt } from '../vehicle/vehiclePose'
 import { coreTileCount } from '../world/planetGeometry'
@@ -20,12 +21,19 @@ import {
   typesOf,
   type ScriptedSession,
 } from './scriptedSession'
-import { stepOfMajor } from '../economy/upgradeSteps'
+import { stepOfLevel } from '../economy/upgradeSteps'
+import { onCurveLevel } from '../economy/vehicleStats'
 import { NO_DRIVE } from '../vehicle/driveSigns'
 
-/** A track at major `level`, sent as its step (#180). */
-const setUpgrade = (upgradeId: string, level: number) =>
-  ({ type: 'debug.setUpgrade', payload: { upgradeId, level: stepOfMajor(level) } }) as const
+/** A track at `level`, sent as its step: a major (#180), or drill power's purchases (#552). */
+const setUpgrade = (upgradeId: UpgradeId, level: number) =>
+  ({
+    type: 'debug.setUpgrade',
+    payload: { upgradeId, level: stepOfLevel(upgradeId, level) },
+  }) as const
+
+/** The planet-1 on-curve drill power: 12 purchases since #552 (major 13 before it). */
+const ON_CURVE_POWER = onCurveLevel('drill_power', 1)
 
 const dock = { type: 'dock', payload: { bay: 'sell' } } as const
 const undock = { type: 'undock', payload: {} } as const
@@ -47,13 +55,14 @@ const poseAtDock = {
 const CORE = { tx: 0, ty: 3 }
 
 /**
- * Tip 7 scratches the planet-1 core (#24 acceptance 3); power 60 breaks a tile in 40 ticks.
- * Crawlers live down there (#9): frozen, so the spec sees only the core's rules.
+ * Tip 7 scratches the planet-1 core (#24 acceptance 3); power 33 (major 60 before #552) breaks a
+ * tile in a few ticks. Crawlers live down there (#9): frozen, so the spec sees only the core's
+ * rules.
  */
 function equipForCore(session: ScriptedSession, cargoHold = 20): void {
   session.submit(0, FREEZE_ENEMIES)
   session.submit(0, setUpgrade('drill_tip', 7))
-  session.submit(0, setUpgrade('drill_power', 60))
+  session.submit(0, setUpgrade('drill_power', 33))
   session.submit(0, setUpgrade('cargo_hold', cargoHold))
 }
 
@@ -128,15 +137,15 @@ describe('core harvest', () => {
   })
 
   it('cannot scratch the planet-1 core with drill_tip at level 3', () => {
-    expect(ticksToBreakCore(3, 13)).toBe(Number.POSITIVE_INFINITY)
+    expect(ticksToBreakCore(3, ON_CURVE_POWER)).toBe(Number.POSITIVE_INFINITY)
   })
 
-  it('scratches it at tip level 4, where r is exactly 1/4, in 1453 ticks with power 13', () => {
-    expect(ticksToBreakCore(4, 13)).toBe(1453)
+  it('scratches it at tip level 4, where r is exactly 1/4, in 576 ticks with the on-curve power', () => {
+    expect(ticksToBreakCore(4, ON_CURVE_POWER)).toBe(576)
   })
 
-  it('breaks a core tile in 373 ticks at the planet-1 on-curve tip 7 and power 13', () => {
-    expect(ticksToBreakCore(7, 13)).toBe(373)
+  it('breaks a core tile in 148 ticks at the planet-1 on-curve tip 7 and power', () => {
+    expect(ticksToBreakCore(7, ON_CURVE_POWER)).toBe(148)
   })
 
   it('keeps harvested core tiles removed through a snapshot and restore', () => {

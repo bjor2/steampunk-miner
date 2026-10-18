@@ -194,8 +194,12 @@ export function overChargeOf({ charged, spent }: LegCharge): number {
 /** The VS bound on a leg's over-charge (TD decision record 6208695039, GD 6208709630). */
 export const OVER_CHARGE_BOUND = 0.08
 
-/** The TD's base rig, 3600 / 720 m/s, below `SPEED_RIGS`. */
-export const CRAWL_RIG: SpeedRig = { speed: 5, subSteps: 720 }
+/**
+ * The TD's base rig, 5 m/s (3600 / 720), below `SPEED_RIGS`. The per-purchase drill of #552 has no
+ * purchase at 720 sub-steps a band-1 cell, so it holds the nearer of the two either side: purchase
+ * 6 at 804 (4.48 m/s); purchase 7 cuts at 647 (5.56 m/s), where the tilted leg over-charges 8.02%.
+ */
+export const CRAWL_RIG: SpeedRig = { speed: 5, subSteps: 804 }
 
 /** The rigs the TD measured fix A on, 5 to 3600 m/s. */
 export const CHARGE_RIGS: readonly SpeedRig[] = [

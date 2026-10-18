@@ -63,7 +63,7 @@ function strongSessionFacingDownAt(start = START): ScriptedSession {
   const session = sessionFacingDownAt(start)
   session.submit(0, {
     type: 'debug.setUpgrade',
-    payload: { upgradeId: 'drill_power', level: 200 },
+    payload: { upgradeId: 'drill_power', level: 12 },
   })
   session.submit(0, { type: 'debug.setEnergy', payload: { energy: '100000' } })
   return session

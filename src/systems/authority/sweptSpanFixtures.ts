@@ -86,14 +86,14 @@ export function positionsAlong(from: Point, to: Point, speed: number, restTicks 
   return [...moving, ...Array.from({ length: restTicks }, () => to)]
 }
 
-/** The fixtures' drill_power step: every cell here in one sub-step, the law's quantum. */
-const STRONG_DRILL_POWER = 1000
+/** The fixtures' drill_power step (a purchase since #552): every cell here in one sub-step, the law's quantum. */
+const STRONG_DRILL_POWER = 54
 
 /**
  * A drill_power step whose cut through the softened column stays under 1 m a tick (about 120
  * sub-steps a softened cell, the pace ticket 396's 4-tick floor held every drill to).
  */
-export const WORK_BOUND_DRILL_POWER = 200
+export const WORK_BOUND_DRILL_POWER = 12
 
 function armedDrill(drillPower: number) {
   return [

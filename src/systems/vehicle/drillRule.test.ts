@@ -54,8 +54,8 @@ describe('drill rule', () => {
     expect(blockHardness(1, 3)).toEqual(mul(m('1.2544'), m('1.2544')))
   })
 
-  it('breaks hardness 1 in one tick at drill_power major 40, with no tile floor (#397)', () => {
-    expect(ticksPerTile(drillOf(drillPower(40), drillTip(0)), m('1'))).toBe(1)
+  it('breaks hardness 1 in one tick at drill_power purchase 18, with no tile floor (#397)', () => {
+    expect(ticksPerTile(drillOf(drillPower(18), drillTip(0)), m('1'))).toBe(1)
   })
 
   it('breaks a tile after exactly ticksPerTile ticks of accumulated work', () => {
@@ -100,8 +100,8 @@ describe('fractional drill time (ticket 330)', () => {
   const Q = DRILL_SUBSTEPS_PER_TICK
 
   it('cuts a cell in less than a tick once the drill outruns one cell a tick (#397)', () => {
-    // 60 * 60 / (1.5 * 1.12^40) = 25.7 sub-steps.
-    expect(subStepsPerTile(drillOf(drillPower(40), drillTip(0)), m('1'))).toBe(26)
+    // 60 * 60 / (1.5 * 1.12^(1/18) * 1.243^21) = 24.8 sub-steps (#552's per-purchase law).
+    expect(subStepsPerTile(drillOf(drillPower(22), drillTip(0)), m('1'))).toBe(25)
   })
 
   it('rounds a cell up to its next sub-step, never to the next whole tick', () => {
@@ -132,8 +132,8 @@ describe('fractional drill time (ticket 330)', () => {
 // The TD lock on #397 (from the GD ruling and the VS amendment on ticket 396): no constant floor
 // in the drill law, so a strong enough drill cuts a cell in a single sub-step.
 describe('no tile floor (ticket 397)', () => {
-  // A sub-step is the law's quantum, so below 10 sub-steps a major may round to the same count.
-  it('cuts faster at every drill major down to 10 sub-steps a cell, then reaches one', () => {
+  // A sub-step is the law's quantum, so below 10 sub-steps a purchase may round to the same count.
+  it('cuts faster at every drill purchase down to 10 sub-steps a cell, then reaches one', () => {
     const subSteps = Array.from({ length: 90 }, (_, level) => bandOneSubSteps(level))
     const steps = subSteps.slice(1).map((after, level) => ({ before: subSteps[level], after }))
     const slower = steps.filter(({ before, after }) => after > before)
@@ -152,73 +152,73 @@ describe('no tile floor (ticket 397)', () => {
   })
 })
 
-/** Sub-steps a band-1 cell of planet 1 (hardness 1) takes at a drill_power major. */
+/** Sub-steps a band-1 cell of planet 1 (hardness 1) takes at a drill_power purchase. */
 function bandOneSubSteps(level: number): number {
   return subStepsPerTile(drillOf(drillPower(level), drillTip(0)), m('1')) ?? 0
 }
 
-/** Band-1 cells a second on planet 1 (hardness 1, tip at least 1) at a drill_power major. */
+/** Band-1 cells a second on planet 1 (hardness 1, tip at least 1) at a drill_power purchase. */
 function bandOneCellsPerSecond(level: number): number {
   return (DRILL_SUBSTEPS_PER_TICK * TICKS_PER_SECOND) / bandOneSubSteps(level)
 }
 
-// The GD ruling on ticket 396: "every level adds speed" is a ratio, each drill major worth 1.12x
-// +-5% with no dips, asserted on planet 1 here (Systems' rows take the bot to L17.2 on P1).
-describe('felt speed per drill level (ticket 396)', () => {
-  const P1_LEVELS = Array.from({ length: 18 }, (_, level) => level)
+// The GD ruling on #551 (ticket 552): a drill level is one purchase, each worth 1.181 to 1.305
+// (1.243 +-5%, point 4) with no dips, in place of #396's 1.12 +-5% a major; the first purchase
+// keeps its old pip, 1.0063. Judged on the law's sub-steps (ticket 431: the m/s read rounds to
+// whole mm a tick).
+describe('felt speed per drill purchase (tickets 396 and 552)', () => {
+  const P1_PURCHASES = Array.from({ length: 13 }, (_, at) => at + 1)
 
-  it('makes each drill major from 0 to 18 cut band 1 of planet 1 1.12x +-5% faster', () => {
-    const ratios = P1_LEVELS.map((level) => ({
-      level,
-      isWorth112: isWithinFivePercentOf112(
-        bandOneCellsPerSecond(level + 1) / bandOneCellsPerSecond(level),
-      ),
-    }))
-    expect(ratios).toEqual(P1_LEVELS.map((level) => ({ level, isWorth112: true })))
+  it('makes each drill purchase from 1 to 14 cut band 1 of planet 1 1.181 to 1.305 times faster', () => {
+    const outside = P1_PURCHASES.filter(
+      (purchase) =>
+        !isInPurchaseBand(bandOneCellsPerSecond(purchase + 1) / bandOneCellsPerSecond(purchase)),
+    )
+    expect(outside).toEqual([])
   })
 
-  it('cuts band 1 at 1.5 cells/s at level 0 and past 10 cells/s at level 17', () => {
+  it('cuts band 1 at 1.5 cells/s at purchase 0 and past 10 cells/s on the planet 1 curve', () => {
     expect(bandOneCellsPerSecond(0)).toBe(1.5)
-    expect(bandOneCellsPerSecond(17)).toBeGreaterThanOrEqual(10)
+    expect(bandOneCellsPerSecond(onCurveLevels(1).drill_power)).toBeGreaterThanOrEqual(10)
   })
 })
 
-// The GD ruling on ticket 396 and the TD lock on #397: with the floor gone the ratio holds through
-// planet 10, judged on the law's sub-steps (ticket 431: the m/s read rounds to whole mm a tick).
-// Each planet is judged over the majors its player holds there, from the last planet's on-curve
-// drill to this one's plus the bot's lead, in every band at the planet's on-curve tip.
-describe('felt speed per drill level through planet 10 (ticket 397)', () => {
+// The TD lock on #397: with the floor gone the purchase band holds through planet 10, on the law's
+// sub-steps. Each planet is judged over the purchases its player holds there, from the last
+// planet's on-curve drill to this one's plus the bot's lead of one, in every band at the planet's
+// on-curve tip; planet 1 starts past the first purchase, which keeps its old pip.
+describe('felt speed per drill purchase through planet 10 (tickets 397 and 552)', () => {
   const PLANETS = Array.from({ length: 10 }, (_, index) => index + 1)
   const BANDS = [1, 2, 3, 4, 5]
-  const BOT_LEAD_MAJORS = 5
+  const BOT_LEAD_PURCHASES = 1
 
-  it('makes each drill major 1.12x +-5% faster in every band of planets 1 to 10', () => {
+  it('makes each drill purchase 1.181 to 1.305 times faster in every band of planets 1 to 10', () => {
     const misses = PLANETS.flatMap((planet) =>
       BANDS.flatMap((band) =>
-        majorsHeldOn(planet).filter((level) => !isWorth112On(planet, band, level)),
+        purchasesHeldOn(planet).filter((purchase) => !isInBandOn(planet, band, purchase)),
       ),
     )
     expect(misses).toEqual([])
   })
 
-  /** The majors from the last planet's on-curve drill to this planet's plus the bot's lead. */
-  function majorsHeldOn(planet: number): number[] {
-    const first = planet === 1 ? 0 : onCurveLevels(planet - 1).drill_power
-    const last = onCurveLevels(planet).drill_power + BOT_LEAD_MAJORS
+  /** The purchases from the last planet's on-curve drill to this planet's plus the bot's lead. */
+  function purchasesHeldOn(planet: number): number[] {
+    const first = planet === 1 ? 1 : onCurveLevels(planet - 1).drill_power
+    const last = onCurveLevels(planet).drill_power + BOT_LEAD_PURCHASES
     return Array.from({ length: last - first }, (_, index) => first + index)
   }
 
-  function isWorth112On(planet: number, band: number, level: number): boolean {
+  function isInBandOn(planet: number, band: number, purchase: number): boolean {
     const tip = drillTip(onCurveLevels(planet).drill_tip)
     const hardness = blockHardness(planet, band)
-    const before = subStepsPerTile(drillOf(drillPower(level), tip), hardness) ?? 0
-    const after = subStepsPerTile(drillOf(drillPower(level + 1), tip), hardness) ?? 0
-    return after > 0 && isWithinFivePercentOf112(before / after)
+    const before = subStepsPerTile(drillOf(drillPower(purchase), tip), hardness) ?? 0
+    const after = subStepsPerTile(drillOf(drillPower(purchase + 1), tip), hardness) ?? 0
+    return after > 0 && isInPurchaseBand(before / after)
   }
 })
 
-function isWithinFivePercentOf112(ratio: number): boolean {
-  return ratio >= 1.12 * 0.95 && ratio <= 1.12 * 1.05
+function isInPurchaseBand(ratio: number): boolean {
+  return ratio >= 1.181 && ratio <= 1.305
 }
 
 describe('energy quanta', () => {

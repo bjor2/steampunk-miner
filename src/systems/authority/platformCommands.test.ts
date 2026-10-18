@@ -566,7 +566,10 @@ describe('platform: workshop', () => {
       return changes.map(({ purchase, event }) => [purchase, event])
     }
     const majorsOf = (tracks: readonly string[]) => tracks.flatMap((id) => Array(10).fill(id))
-    const roundRobin = majorsOf(Array.from({ length: 20 }, (_, index) => SIX_TRACKS[index % 6]))
+    // Forty drill power purchases (#552) cut fast enough to set travel, so the engine card is
+    // maxed past them (#418) and the round robin leaves the engine out.
+    const fiveTracks = SIX_TRACKS.filter((id) => id !== 'engine')
+    const roundRobin = majorsOf(Array.from({ length: 20 }, (_, index) => fiveTracks[index % 5]))
     const oneTrackFirst = majorsOf([...Array(12).fill('boiler'), ...Array(8).fill('cargo_hold')])
     for (const order of [roundRobin, oneTrackFirst]) {
       expect(tiersOf(order)).toEqual([
