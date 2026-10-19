@@ -106,10 +106,29 @@ export const MAX_CASING_TRAIL_POINTS = 9
 /**
  * Fractional drill time (TD scope on #316, ticket 330): the swept cut (`drillStep`) counts a cell's
  * drill time in this many integer sub-steps of a fixed tick, so a cell may take 24.5 ticks, or less
- * than one, with no float and no carried state (the densities are the progress). The carve's
- * largest product is `255 * 256 * Q * T`, exact below 2^53 for T up to about 2.3e9 ticks (~440 days).
+ * than one, with no float and no carried state (the densities are the progress). The base quantum:
+ * a rig whose band-1 cells cost fewer than `DRILL_QUANTUM_MIN_SUBSTEPS_PER_CELL` of them counts in
+ * a doubled one (`vehicle/drillQuantum.ts`, ticket 558). The carve takes `255 * 256 * Q * T` modulo
+ * its period (`world/carvePhase.ts`), so it stays exact at any quantum and tick.
  */
 export const DRILL_SUBSTEPS_PER_TICK = 60
+
+/**
+ * The lifted sub-step floor (ticket 558, #551 B1, the TD's c-speed50 section 4 item 3): at a fixed
+ * 60 sub-steps a cell costs at least one, so no rig cut past 3600 cells/s (5400 m/s travel) and a
+ * cell of `n` sub-steps rounded its speed down by up to 1/n. A rig's quantum is the base doubled
+ * until a cell of its planet's softest rock (band 1) costs at least this many sub-steps, so the
+ * rounding stays under 1% at any speed: the acceptance's 1% at 1000 cells/s and above.
+ */
+export const DRILL_QUANTUM_MIN_SUBSTEPS_PER_CELL = 100
+
+/**
+ * At most this many doublings: 60 x 2^11 = 122,880 sub-steps a tick, still 100 or more a band-1 cell
+ * at the step bound's planet clamp (ticket 558: a tick never moves the rig further than the planet's
+ * radius), 1,000 m a tick on the largest planet (`RADIUS_BASE_TILES + RADIUS_GROWTH_TILES`). It keeps
+ * the carve's per-tick products far under 2^53 at any drill power.
+ */
+export const DRILL_QUANTUM_MAX_DOUBLINGS = 11
 
 /**
  * The cut-follow (TD scope 0 on #316, ticket 333): while the rig actively cuts, the drill sets its

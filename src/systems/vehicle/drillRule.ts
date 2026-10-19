@@ -20,7 +20,8 @@
  * it last and falls back to the global `drill.scratchFloor`.
  *
  * The swept cut (ticket 330) reads the same rule in `DRILL_SUBSTEPS_PER_TICK` sub-steps instead of
- * whole ticks (`subStepsPerTile`), so a cell is no longer rounded up to the next whole tick.
+ * whole ticks (`subStepsPerTile`), so a cell is no longer rounded up to the next whole tick; a fast
+ * rig reads it in its own doubled quantum (`subStepsPerTileAt`, `drillQuantum.ts`, ticket 558).
  */
 import { DRILL_SUBSTEPS_PER_TICK } from '../../constants/balance'
 import { TICKS_PER_SECOND } from '../../constants/physics'
@@ -101,6 +102,19 @@ export function subStepsPerTile(
   scratchFloor: BigStat = SCRATCH_FLOOR,
 ): number | null {
   return tileTimeIn(DRILL_SUBSTEPS_PER_TICK, drill, hardness, scratchFloor)
+}
+
+/**
+ * `ticksPerTile` in `quantum` sub-steps of a tick (the rig's drill quantum, ticket 558), rounded
+ * up once to a whole sub-step, or null when the tip cannot scratch the tile.
+ */
+export function subStepsPerTileAt(
+  quantum: number,
+  drill: DrillStats,
+  hardness: BigStat,
+  scratchFloor: BigStat = SCRATCH_FLOOR,
+): number | null {
+  return tileTimeIn(quantum, drill, hardness, scratchFloor)
 }
 
 /** A tile's drill time in `unitsPerTick` units of a tick, rounded up once to a whole unit. */
