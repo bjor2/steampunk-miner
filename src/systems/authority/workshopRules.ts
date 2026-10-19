@@ -7,12 +7,9 @@
  * six major levels crosses `T2` or `T3`. A refused purchase changes nothing and logs no purchase.
  * A held step (`chain` not 0) is also refused under the service reserve (`purchaseChain.ts`).
  *
- * The engine track stays finite (GD lock on #316 scope 0, ticket 333): once k times the drill's
- * cut speed in the planet's hardest band reaches the engine's top speed, the drill sets travel in
- * every band and an engine step would buy no travel speed, so it is refused `max_level` (#418:
- * judged in the hardest band, not the rig's, so a step that still speeds deep travel stays
- * buyable at the dock). With no tile floor (ticket 397) a strong drill's cut speed has no ceiling,
- * so a strong drill reaches it.
+ * No track has a max level (HS and VS on #551, ticket 553): the engine step is sold for money even
+ * while the drill sets travel in every band, where it buys no travel speed; the bay says so on its
+ * card (`engineParity.ts`) rather than refuse it.
  */
 import { costCurveIdOf, stepPrice } from '../economy/upgradePrices'
 import { isMajorStep, majorOf } from '../economy/upgradeSteps'
@@ -33,7 +30,6 @@ import {
 import { atBayRejection } from './dockRules'
 import type { DomainEventBody, PurchaseChainStamp } from './domainEvent'
 import { chainStampOf, CLICK_CHAIN, serviceReserveRejection } from './purchaseChain'
-import { isTravelSetByDrill } from './travelSpeed'
 import { visualTierEvents } from './vehicleDebugRules'
 
 export const WORKSHOP_RULES: { readonly buyUpgrade: CommandRule<'buyUpgrade'> } = {
@@ -58,7 +54,6 @@ export function upgradeRefusal(
   return firstRejection([
     () => atBayRejection(state, playerId, 'upgrade'),
     () => unknownUpgradeRejection(upgradeId),
-    () => travelSetByDrillRejection(state, playerId, upgradeId),
     () => upgradeMoneyRejection(state, playerId, upgradeId as UpgradeId),
     () => upgradeReserveRejection(state, playerId, upgradeId as UpgradeId, chain),
   ])
@@ -82,15 +77,6 @@ export function nextUpgradePrice(
 function unknownUpgradeRejection(upgradeId: string): Rejection | null {
   if (isUpgradeId(upgradeId)) return null
   return rejectionOf('unknown_upgrade', `${upgradeId} is not a registered upgrade id`)
-}
-
-function travelSetByDrillRejection(
-  state: AuthorityState,
-  playerId: string,
-  upgradeId: string,
-): Rejection | null {
-  if (upgradeId !== 'engine' || !isTravelSetByDrill(state, playerId)) return null
-  return rejectionOf('max_level', 'the drill sets travel speed: the engine track is maxed')
 }
 
 function upgradeMoneyRejection(

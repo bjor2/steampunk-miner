@@ -14,14 +14,14 @@
  * Every effect that scales with the engine's top speed reads `travelSpeedOf` instead, so it keeps
  * growing once the drill sets travel (GD lock point 3).
  *
- * The engine card reads maxed only where `k * cutSpeed` passes the top speed in the planet's
- * hardest band (GD ruling on #418, option a; TD shape on #418): an engine step that still speeds
- * travel deeper down does something, so it stays buyable at the dock (#333 "never offer a buy that
- * does nothing").
+ * The engine card says a purchase is worth zero only where `k * cutSpeed` in the planet's hardest
+ * band already reaches the top speed it would buy (the #418 reading, GD option a; ticket 553): a
+ * step that still speeds travel deeper down does something. With no max level (HS and VS on #551)
+ * the step is still sold, and the card shows the ratio `speedMax / (k * cutSpeed)` that says why.
  */
 import { blockHardness } from '../economy/oreEconomy'
 import { ECONOMY } from '../economy/economy'
-import type { EngineStats } from '../economy/vehicleStats'
+import { engineStatsAtStep, type EngineStats } from '../economy/vehicleStats'
 import { cmp, floor, fromSafeInteger, mul, toSafeInteger, type BigStat } from '../money'
 import { BAND_COUNT, bandOfTile } from '../world/planetGeometry'
 import type { PlanetParams } from '../world/planetParams'
@@ -45,14 +45,37 @@ export function travelEngineOf(vehicle: VehicleState, params: PlanetParams | nul
 }
 
 /**
- * The engine card's maxed check: k times the drill's cut speed in the planet's hardest band has
- * reached the top speed, wherever the rig stands; never maxed off a planet.
+ * Whether the next engine purchase buys no travel speed anywhere on the planet: k times the
+ * drill's cut speed in its hardest band already reaches the top speed that purchase would give,
+ * wherever the rig stands. Never off a planet.
  */
-export function doesDrillSetTravel(vehicle: VehicleState, params: PlanetParams | null): boolean {
+export function isNextEngineStepWorthZero(
+  vehicle: VehicleState,
+  params: PlanetParams | null,
+): boolean {
   if (params === null) return false
+  const nextSpeedMax = engineStatsAtStep(vehicle.levels.engine + 1).speedMax
+  return hardestBandDrillTravelOf(vehicle, params) >= nextSpeedMax
+}
+
+/**
+ * The engine card's ratio `speedMax / (k * cutSpeed)` in the planet's hardest band: below 1 the
+ * drill sets travel there too. Null off a planet or where the tip cannot cut that band.
+ */
+export function engineParityRatioOf(
+  vehicle: VehicleState,
+  params: PlanetParams | null,
+): number | null {
+  if (params === null) return null
+  const drillTravel = hardestBandDrillTravelOf(vehicle, params)
+  if (drillTravel === 0) return null
+  return statsOfVehicle(vehicle).engine.speedMax / drillTravel
+}
+
+/** `k * cutSpeed` in m/s through the rock of the planet's hardest band; 0 where it cannot cut. */
+function hardestBandDrillTravelOf(vehicle: VehicleState, params: PlanetParams): number {
   const stats = statsOfVehicle(vehicle)
-  const hardestStep = travelStepThrough(stats, hardestBandRockHardnessOf(params))
-  return metresPerSecondOfStep(hardestStep) >= stats.engine.speedMax
+  return metresPerSecondOfStep(travelStepThrough(stats, hardestBandRockHardnessOf(params)))
 }
 
 /** `k * cutSpeed` of the drill in the rock of the band the vehicle stands in; 0 with no pose. */

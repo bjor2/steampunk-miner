@@ -2,36 +2,43 @@
  * The six upgrade tracks as stats of integer levels (decisions #6 sections 1 and 3, #7):
  *   drillPower  D(n) = 1.5 * 1.12^(1/18) * 1.243^(n-1), D(0) = 1.5, n purchases (#551, 552)
  *   drillTip    P(L) = 1 * 1.2544^L       hullMax 100 * 1.12^L
- *   energyMax   150 + 6L                  cargo     10 + 4L
- *   engine      min + (max - min) * L / (L + 25) for speed 6..14, accel 1.0..1.8, twr 2.0..3.5
- * Level 0 is the 1.0x start of every track. Unbounded stats are BigStat; the bounded ones are
- * plain numbers the physics step may read (#5 rule 5).
+ *   energyMax   round(150 * 1.10^b)       cargo     round(10 * 1.10^c), b and c purchases (553)
+ *   engine      speedMax 6 * 1.05^e m/s, accel 1.0 * 1.05^e, twr 1 + 1.05^e, e purchases (553)
+ * Level 0 is the 1.0x start of every track. Unbounded stats are BigStat; the tank, the hold and
+ * the engine are plain numbers the physics step, the energy quanta and the cargo counts read (#5
+ * rule 5), so they throw past the safe integers rather than round (`stepStats.ts`).
  *
  * The per-track functions take a track's level, which the design tables read: a major `L`, or the
- * purchase count of drill power, whose level is its stored step (GD ruling on #551, ticket 552). A
- * vehicle stores steps (#180 section 3, `upgradeSteps.ts`): `vehicleStatsAt` and the `...AtStep`
- * functions evaluate each curve at the step's effective level (`stepStats.ts`).
+ * purchase count of a per-purchase track (drill power, GD ruling on #551, ticket 552; the boiler,
+ * the hold and the engine, Systems' rows on #553, ticket 553), whose level is its stored step. A vehicle
+ * stores steps (#180 section 3, `upgradeSteps.ts`): `vehicleStatsAt` and the `...AtStep` functions
+ * evaluate each curve at the step's effective level (`stepStats.ts`).
  */
 import { fromSafeInteger, mul, type BigStat } from '../money'
-import { growGeometric, growLinear, saturate } from './curveFamilies'
+import { growGeometric } from './curveFamilies'
 import { ECONOMY } from './economy'
-import { geometricAtStep, linearAtStep, perPurchaseAtStep, saturatingAtStep } from './stepStats'
+import {
+  enginePerPurchaseAtStep,
+  geometricAtStep,
+  perPurchaseAtStep,
+  wholePerPurchaseAtStep,
+} from './stepStats'
 import { majorOf, majorsOfSteps, stepOfLevel, type TrackNumbers } from './upgradeSteps'
 import {
   UPGRADE_IDS,
+  type EnginePerPurchaseEffect,
   type GeometricEffect,
-  type LinearEffect,
   type PerPurchaseEffect,
-  type SaturatingEffect,
   type UpgradeDef,
   type UpgradeId,
+  type WholePerPurchaseEffect,
 } from './economyDefinition'
 
 /** Per track, a level: the stored step on a vehicle, a major level in the design tables. */
 export type UpgradeLevels = TrackNumbers
 
 export interface EngineStats {
-  /** m/s; always under the 18 m/s pose bound (`MAX_SPEED_MM_PER_SECOND`, #7 and ticket 330). */
+  /** m/s; with no max level (ticket 553) the stats' step bound follows it (`stepBound.ts`). */
   speedMax: number
   accel: number
   thrustToWeight: number
@@ -69,21 +76,19 @@ export function hullMax(level: number, defs: UpgradeDefs = ECONOMY.upgrades): Bi
   return growGeometricStat(geometricEffectOf(defs, 'hull'), level)
 }
 
+/** The tank after `level` purchases: its level is its stored step (ticket 553). */
 export function energyMax(level: number, defs: UpgradeDefs = ECONOMY.upgrades): number {
-  return growLinearStat(linearEffectOf(defs, 'boiler'), level)
+  return energyMaxAtStep(level, defs)
 }
 
+/** The hold after `level` purchases: its level is its stored step (ticket 553). */
 export function cargoCapacity(level: number, defs: UpgradeDefs = ECONOMY.upgrades): number {
-  return growLinearStat(linearEffectOf(defs, 'cargo_hold'), level)
+  return cargoCapacityAtStep(level, defs)
 }
 
+/** The engine after `level` purchases: its level is its stored step (ticket 553). */
 export function engineStats(level: number, defs: UpgradeDefs = ECONOMY.upgrades): EngineStats {
-  const { stats, halfLevel } = saturatingEffectOf(defs, 'engine')
-  return {
-    speedMax: saturate(stats.speedMax, level, halfLevel),
-    accel: saturate(stats.accel, level, halfLevel),
-    thrustToWeight: saturate(stats.thrustToWeight, level, halfLevel),
-  }
+  return engineStatsAtStep(level, defs)
 }
 
 /**
@@ -118,20 +123,15 @@ export function hullMaxAtStep(step: number, defs: UpgradeDefs = ECONOMY.upgrades
 }
 
 export function energyMaxAtStep(step: number, defs: UpgradeDefs = ECONOMY.upgrades): number {
-  return linearAtStep(linearEffectOf(defs, 'boiler'), step)
+  return wholePerPurchaseAtStep(wholePerPurchaseEffectOf(defs, 'boiler'), step)
 }
 
 export function cargoCapacityAtStep(step: number, defs: UpgradeDefs = ECONOMY.upgrades): number {
-  return linearAtStep(linearEffectOf(defs, 'cargo_hold'), step)
+  return wholePerPurchaseAtStep(wholePerPurchaseEffectOf(defs, 'cargo_hold'), step)
 }
 
 export function engineStatsAtStep(step: number, defs: UpgradeDefs = ECONOMY.upgrades): EngineStats {
-  const { stats, halfLevel } = saturatingEffectOf(defs, 'engine')
-  return {
-    speedMax: saturatingAtStep(stats.speedMax, halfLevel, step),
-    accel: saturatingAtStep(stats.accel, halfLevel, step),
-    thrustToWeight: saturatingAtStep(stats.thrustToWeight, halfLevel, step),
-  }
+  return enginePerPurchaseAtStep(enginePerPurchaseEffectOf(defs, 'engine'), step)
 }
 
 /** Energy a rescue tow always leaves: 25% of `energyMax` (#9), so a broke player can still dig. */
@@ -144,8 +144,12 @@ export function rescueEnergyFloor(boilerStep: number): BigStat {
  * power's purchase count (#552).
  */
 export function onCurveLevel(upgradeId: UpgradeId, planetIndex: number): number {
-  const { levelAtPlanet1, levelsPerPlanet } = upgradeDefOf(ECONOMY.upgrades, upgradeId).onCurve
-  return levelAtPlanet1 + levelsPerPlanet * (planetIndex - FIRST_PLANET)
+  const { levelAtPlanet1, levelsPerPlanet, atMost } = upgradeDefOf(
+    ECONOMY.upgrades,
+    upgradeId,
+  ).onCurve
+  const level = levelAtPlanet1 + levelsPerPlanet * (planetIndex - FIRST_PLANET)
+  return atMost === null ? level : Math.min(level, atMost)
 }
 
 /** The stored step of a track's on-curve level at the end of planet `p`: no pip. */
@@ -206,10 +210,6 @@ function growGeometricStat(effect: GeometricEffect, level: number): BigStat {
   return growGeometric(effect.start, effect.ratio, level)
 }
 
-function growLinearStat(effect: LinearEffect, level: number): number {
-  return growLinear(effect.start, effect.step, level)
-}
-
 function upgradeDefOf(defs: UpgradeDefs, upgradeId: UpgradeId): UpgradeDef {
   const upgrade = defs.find((candidate) => candidate.id === upgradeId)
   if (upgrade === undefined) throw new RangeError(`no upgrade ${upgradeId} in the definitions`)
@@ -228,14 +228,21 @@ function geometricEffectOf(defs: UpgradeDefs, upgradeId: UpgradeId): GeometricEf
   return effect
 }
 
-function linearEffectOf(defs: UpgradeDefs, upgradeId: UpgradeId): LinearEffect {
+function wholePerPurchaseEffectOf(defs: UpgradeDefs, upgradeId: UpgradeId): WholePerPurchaseEffect {
   const { effect } = upgradeDefOf(defs, upgradeId)
-  if (effect.family !== 'linear') throw new RangeError(`${upgradeId} is not linear`)
+  if (effect.family !== 'wholePerPurchase') {
+    throw new RangeError(`${upgradeId} is not a whole stat per purchase`)
+  }
   return effect
 }
 
-function saturatingEffectOf(defs: UpgradeDefs, upgradeId: UpgradeId): SaturatingEffect {
+function enginePerPurchaseEffectOf(
+  defs: UpgradeDefs,
+  upgradeId: UpgradeId,
+): EnginePerPurchaseEffect {
   const { effect } = upgradeDefOf(defs, upgradeId)
-  if (effect.family !== 'saturating') throw new RangeError(`${upgradeId} is not saturating`)
+  if (effect.family !== 'enginePerPurchase') {
+    throw new RangeError(`${upgradeId} is not an engine per purchase`)
+  }
   return effect
 }

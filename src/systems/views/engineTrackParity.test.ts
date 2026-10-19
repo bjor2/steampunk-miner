@@ -4,11 +4,11 @@ import { createScriptedSession, dockInBay, typesOf } from '../authority/scripted
 import { buyUpgradeCommand } from '../platform/platformCommands'
 import { grantMoneyCommand } from '../startScenarioCommands'
 import { setUpgradeCommand } from '../vehicle/vehicleCommands'
-import { ENGINE_MAXED_TEXT, workshopRowsOf } from './workshopRows'
+import { engineWorthZeroText, workshopRowsOf } from './workshopRows'
 
-// The engine track stays finite (GD lock on #316 scope 0, ticket 333): the card reads "maxed,
-// drill sets travel" exactly when k times the drill's cut speed reaches the engine's top speed,
-// and then offers no buy. With no tile floor (ticket 397) a strong drill passes every engine.
+// No max level on the engine (HS and VS on #551, ticket 553): the card always sells the next
+// purchase for money, shows the ratio of the top speed to k times the drill's cut speed in the
+// planet's hardest band (#418's band), and says plainly when that purchase is worth zero.
 
 /**
  * Steps that cut band-1 rock in one sub-step a cell, the law's quantum. Drill power's purchase 106
@@ -51,40 +51,47 @@ function engineRowOf(modules: RowModules, levels: Record<string, number>) {
   return row
 }
 
-describe('engine track with no tile floor (tickets 333, 396, 397)', () => {
+describe('engine card parity with no max level (ticket 553)', () => {
   const modules = { createScriptedSession, dockInBay, workshopRowsOf }
 
   it('offers its buy with a starting drill, whose k times cut stays under the top speed', () => {
     const row = engineRowOf(modules, {})
     expect(row.badge).toBeNull()
     expect(row.buy.reason).toBeNull()
-    expect(row.levelText).not.toContain('drill sets travel')
+    expect(row.levelText).not.toContain(engineWorthZeroText())
   })
 
-  // #418 (GD option a): an engine step still speeds travel in the deeper bands, so it is offered.
-  it('offers its buy at the dock while the drill sets travel in band 1 but not the hardest band', () => {
+  it('shows the ratio of the top speed to 1.5 times the cut in the hardest band', () => {
+    expect(engineRowOf(modules, {}).levelText).toMatch(/top speed \d+\.\d\d× of 1\.5× cut/)
+  })
+
+  // #418 (GD option a): an engine step still speeds travel in the deeper bands, so it is no zero.
+  it('counts the step while the drill sets travel in band 1 but not the hardest band', () => {
     const row = engineRowOf(modules, BAND_ONE_DRILL)
+    expect(row.buy.reason).toBeNull()
+    expect(row.levelText).not.toContain(engineWorthZeroText())
+  })
+
+  it('says the next purchase is worth zero once the drill outruns the engine in every band', () => {
+    const row = engineRowOf(modules, STRONG_DRILL)
+    expect(row.levelText).toContain(engineWorthZeroText())
+    expect(row.levelText).toMatch(/top speed (<0\.01|0\.\d\d)× of 1\.5× cut/)
+  })
+
+  it('still sells that worth-zero purchase, with no maxed badge and no max_level refusal', () => {
+    const row = engineRowOf(modules, STRONG_DRILL)
     expect(row.badge).toBeNull()
     expect(row.buy.reason).toBeNull()
-  })
-
-  it('sells that engine step at the dock rather than refusing it max_level', () => {
-    const session = dockedSessionOf(modules, BAND_ONE_DRILL)
+    const session = dockedSessionOf(modules, STRONG_DRILL)
     const events = session.submit(3, buyUpgradeCommand('engine', CLICK_CHAIN))
     expect(typesOf(events)).toContain('UpgradePurchased')
   })
 
-  it('reads maxed, drill sets travel, and offers no buy once the drill sets travel', () => {
-    const row = engineRowOf(modules, STRONG_DRILL)
-    expect(row.badge).toBe('maxed')
-    expect(row.levelText).toContain(ENGINE_MAXED_TEXT)
-    expect(row.buy.reason).toBe('max_level')
-  })
-
-  it('offers the buy while the drill is still slower than the engine', () => {
-    const row = engineRowOf(modules, { engine: 400 })
-    expect(row.badge).toBeNull()
-    expect(row.buy.reason).toBeNull()
+  it('names the 1.5 times cut parity the purchase waits for in its worth-zero text', () => {
+    expect(engineWorthZeroText()).toBe(
+      "worth zero: No extra speed until your drill's cut speed is within reach of the engine's top " +
+        "speed (needs the engine above 1.5× the drill's cut speed). Raises your top speed once it is.",
+    )
   })
 
   it('leaves every other track buyable', () => {

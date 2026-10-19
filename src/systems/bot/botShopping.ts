@@ -4,8 +4,9 @@
  * casing grade the next trip needs comes first (`botCasing.ts`, S11); then a heat planet's lining
  * type, refractory, once it is offered (#113, `botHeat.ts`); then the guns' mount once they are
  * offered (#107, `botGuns.ts`); then a full charge rack once charges are and the bot has met a
- * tile it would blast (#109, #129, `botCharges.ts`); then `drill_tip` and `hull`
- * go to their on-curve level for the planet (#6 section 3);
+ * tile it would blast (#109, #129, `botCharges.ts`); then a boiler step while the tank cuts the
+ * average full-hold load by more than 20% and the step is affordable (ticket 553, `botBoiler.ts`);
+ * then `drill_tip` and `hull` go to their on-curve level for the planet (#6 section 3);
  * a drill level is forced while the core is the goal and digs slow (`botCoreRule.ts`: `drill_power`,
  * then `drill_tip` at the drill cap, #86); otherwise the bot buys the upgrade with the best gain in
  * planned money per tick per price, while one pays, never `drill_power` past its lead cap. The #6
@@ -17,11 +18,8 @@
  * the casing, lining, guns and charges still come, no track level or other slice purchase does.
  *
  * Every track buy is one step (#180): the on-curve rule buys toward its next level once the steps
- * left to it are paid for whole, the forced rule a step at a time. A pip of cargo or boiler may
- * leave its whole-number stat where it is, so a marginal track is offered for the fewest next
- * steps, up to its next level (a major, or one drill power purchase since #552), that raise the
- * planned money, priced together and paid for whole; the bot buys their first step and weighs the
- * offers again.
+ * left to it are paid for whole, the boiler and the forced rule a step at a time, and the marginal
+ * rule as `botMarginalOffers.ts` offers (the hold and the engine in bundles since ticket 553).
  *
  * From planet 8 on, every track buy also leaves #180's service reserve and one rescue fee (#198,
  * `botWallet.ts`); the casing, lining, guns and charges keep only the next service, as before.
@@ -34,15 +32,16 @@ import type { CommandIntent } from '../authority/authorityCommand'
 import { CLICK_CHAIN } from '../authority/purchaseChain'
 import { nextUpgradePrice } from '../authority/workshopRules'
 import { nextCasingPrice } from '../authority/casingRules'
-import { isTravelSetByDrill } from '../authority/travelSpeed'
 import type { UpgradeId } from '../economy/economyDefinition'
 import { stepPrice } from '../economy/upgradePrices'
 import { stepsToNextLevel } from '../economy/upgradeSteps'
 import { onCurveStep, type UpgradeLevels } from '../economy/vehicleStats'
-import { add, cmp, div, sub, ZERO_MONEY, type Money } from '../money'
+import { add, sub, ZERO_MONEY } from '../money'
 import { isCasingGradeShort } from './botCasing'
 import { startBotHold, stepOfHold, type ChainPolicy } from './botChains'
-import { forcedCoreTrack, isUnderLeadCap } from './botCoreRule'
+import { isBoilerStepDue } from './botBoiler'
+import { forcedCoreTrack } from './botCoreRule'
+import { bestMarginalPurchase } from './botMarginalOffers'
 import { chargeRestockOf } from './botCharges'
 import { gunMountPriceFor, type GunPolicy } from './botGuns'
 import { liningUnlockFor } from './botHeat'
@@ -61,7 +60,6 @@ import type { MineLayout } from './mineLayout'
 import { bestOrePlan, fullTankMeans } from './tripEstimate'
 
 const ON_CURVE_FIRST: readonly UpgradeId[] = ['drill_tip', 'hull']
-const MARGINAL_TRACKS: readonly UpgradeId[] = ['drill_power', 'engine', 'boiler', 'cargo_hold']
 
 /** One buy at the Upgrade bay: a track level, the next casing grade, a lining type or the guns. */
 type Purchase =
@@ -173,6 +171,7 @@ function nextPurchase(session: BotSession, situation: ShoppingSituation): Purcha
 }
 
 function nextTrackPurchase(session: BotSession, situation: ShoppingSituation): UpgradeId | null {
+  if (isBoilerStepAffordable(session, situation.layout)) return 'boiler'
   const onCurve = belowCurveAffordable(session)
   if (onCurve !== null) return onCurve
   const forced = forcedTrack(session, situation)
@@ -229,51 +228,14 @@ function isBelowCurve(session: BotSession, track: UpgradeId): boolean {
   return session.vehicle().levels[track] < onCurveStep(track, session.state().planet.index)
 }
 
+/** The boiler rule's step, when it is due and paid for; when it is not, the other rules go on. */
+function isBoilerStepAffordable(session: BotSession, layout: MineLayout): boolean {
+  return isBoilerStepDue(layout, session.vehicle().levels) && canAfford(session, 'boiler')
+}
+
 function forcedTrack(session: BotSession, situation: ShoppingSituation): UpgradeId | null {
   if (!situation.isCoreTheGoal) return null
   return forcedCoreTrack(session.vehicle().levels, session.state().planet.index)
-}
-
-/** An open track whose next steps raise the planned money per tick, and that gain per price. */
-interface MarginalOffer {
-  track: UpgradeId
-  gainPerPrice: Money
-}
-
-function bestMarginalPurchase(session: BotSession, layout: MineLayout): UpgradeId | null {
-  return (
-    marginalOffers(session, layout).reduce<MarginalOffer | null>(betterOffer, null)?.track ?? null
-  )
-}
-
-/** Gain and price stay Money: past planet 582 either one is Infinity as a double (#196). */
-function marginalOffers(session: BotSession, layout: MineLayout): MarginalOffer[] {
-  const now = plannedMoneyPerTick(layout, session.vehicle().levels)
-  return openMarginalTracks(session).flatMap((track) => {
-    const offer = marginalOfferOf(session, layout, now, track)
-    return offer === null ? [] : [offer]
-  })
-}
-
-/** The fewest next steps, up to the next level, that raise the planned money; null if none pays. */
-function marginalOfferOf(
-  session: BotSession,
-  layout: MineLayout,
-  now: Money,
-  track: UpgradeId,
-): MarginalOffer | null {
-  const { levels } = session.vehicle()
-  const planetIndex = session.state().planet.index
-  let price = ZERO_MONEY
-  for (let steps = 1; steps <= stepsToNextLevel(track, levels[track]); steps++) {
-    price = add(price, stepPrice(track, levels[track] + steps - 1, planetIndex))
-    const after = { ...levels, [track]: levels[track] + steps }
-    const gain = sub(plannedMoneyPerTick(layout, after), now)
-    if (cmp(gain, ZERO_MONEY) > 0) {
-      return canPayForBrass(session, price) ? { track, gainPerPrice: div(gain, price) } : null
-    }
-  }
-  return null
 }
 
 function canAffordToNextLevel(session: BotSession, track: UpgradeId): boolean {
@@ -284,37 +246,6 @@ function canAffordToNextLevel(session: BotSession, track: UpgradeId): boolean {
     price = add(price, stepPrice(track, at, planetIndex))
   }
   return canPayForBrass(session, price)
-}
-
-/** On a tie the earlier track keeps it, in `MARGINAL_TRACKS` order. */
-function betterOffer(best: MarginalOffer | null, offer: MarginalOffer): MarginalOffer {
-  return best === null || cmp(offer.gainPerPrice, best.gainPerPrice) > 0 ? offer : best
-}
-
-/** The marginal tracks the bot has not capped on this planet and the bay still sells. */
-function openMarginalTracks(session: BotSession): UpgradeId[] {
-  return MARGINAL_TRACKS.filter((track) => isMarginalTrackOpen(session, track))
-}
-
-function isMarginalTrackOpen(session: BotSession, track: UpgradeId): boolean {
-  const planetIndex = session.state().planet.index
-  return (
-    isUnderLeadCap(session.vehicle().levels, track, planetIndex) && !isEngineMaxed(session, track)
-  )
-}
-
-/**
- * The engine track is maxed while the drill sets travel speed in every band (ticket 333, #418),
- * which a strong drill reaches (no tile floor since ticket 397): offering the refused step again
- * would never end the visit.
- * Asked of the rig, not the bay, so a Sell-bay `hasPurchase` still sees the other tracks (#352).
- */
-function isEngineMaxed(session: BotSession, track: UpgradeId): boolean {
-  return track === 'engine' && isTravelSetByDrill(session.state(), session.playerId)
-}
-
-function plannedMoneyPerTick(layout: MineLayout, levels: UpgradeLevels): Money {
-  return bestOrePlan(layout, fullTankMeans(levels))?.moneyPerTick ?? ZERO_MONEY
 }
 
 function priceOf(session: BotSession, track: UpgradeId) {

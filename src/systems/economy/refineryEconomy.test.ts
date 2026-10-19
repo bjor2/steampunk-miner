@@ -32,9 +32,9 @@ describe('refinery economy', () => {
   })
 
   it('prices slot 2 at 20 and slot 3 at 40 band-5 ore units of the purchase planet, times its pace scale', () => {
-    expect(refinerySlotPrice(3, 1)).toEqual(m('16146.211'))
-    expect(refinerySlotPrice(3, 2)).toEqual(m('32292.422'))
-    expect(refinerySlotPrice(4, 1)).toEqual(m('54493.462'))
+    expect(refinerySlotPrice(3, 1)).toEqual(m('13839.61'))
+    expect(refinerySlotPrice(3, 2)).toEqual(m('27679.219'))
+    expect(refinerySlotPrice(4, 1)).toEqual(m('50601.072'))
   })
 
   it('has no price past the third slot', () => {

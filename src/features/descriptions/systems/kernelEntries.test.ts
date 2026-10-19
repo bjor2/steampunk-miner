@@ -6,11 +6,19 @@ import { formatPercent } from '../../../systems/displayAmount'
 import { casingHardness } from '../../../systems/economy/casingGrades'
 import { UPGRADE_IDS, type UpgradeId } from '../../../systems/economy/economyDefinition'
 import { gunMountStep, gunShotsPerSecond, gunTopStep } from '../../../systems/economy/gunStats'
-import { trackKindOf } from '../../../systems/economy/trackKind'
 import { refinerySlotsStart } from '../../../systems/economy/refineryEconomy'
-import { majorOf, stepOfMajor } from '../../../systems/economy/upgradeSteps'
+import { isPerPurchaseTrack, majorOf, stepOfMajor } from '../../../systems/economy/upgradeSteps'
 import { startLevels, vehicleStatsAt } from '../../../systems/economy/vehicleStats'
-import { div, fromCanonical, sub, toCanonical, type Money } from '../../../systems/money'
+import {
+  add,
+  div,
+  fromCanonical,
+  fromSafeInteger,
+  mul,
+  sub,
+  toCanonical,
+  type Money,
+} from '../../../systems/money'
 import type { ItemCtx, ItemRef, StatLine } from '../../../systems/registries/itemDescriber'
 import { itemSnapshotViewOf } from '../../../systems/registries/itemSnapshotView'
 import {
@@ -23,12 +31,19 @@ import { canonicalStatsOf } from '../../../systems/vehicle/vehicleStatsView'
 import { statReading } from '../../../systems/views/viewParts'
 import { statsOfTrack } from '../../../systems/views/workshopRows'
 import { describeItemCard } from './describeItemCard'
-import { TINY_CHANGE_TEXT } from './statLineOf'
+import { steppedLine } from './kernelEntry'
+import { statLineOf, TINY_CHANGE_TEXT } from './statLineOf'
 
 /** Majors pinned (VS on #164), each read at its major, mid-major and the buy landing the next. */
 const PINNED_MAJORS = [0, 1, 20, 247, 607, 6007]
 const HIGH_MAJORS = [607, 6007]
 const PINNED_PIPS = [0, 4, 9]
+/**
+ * The tank, the hold and the engine are plain numbers bought per purchase since ticket 553, safe
+ * to a few hundred purchases (Systems' range on #553), so they are pinned at purchases.
+ */
+const PINNED_PURCHASES = [0, 1, 4, 9, 10, 19, 20, 100, 190, 199, 200]
+const HIGH_PURCHASES = [190, 199, 200]
 const PLANET = 4
 
 const view = itemSnapshotViewOf(
@@ -51,6 +66,19 @@ function statLinesOf(upgradeId: UpgradeId, step: number): readonly StatLine[] {
 
 function stepsOf(majors: readonly number[]): number[] {
   return majors.flatMap((major) => PINNED_PIPS.map((pip) => stepOfMajor(major) + pip))
+}
+
+/** Whether a track's stat is a plain number bought per purchase (not drill power's BigStat). */
+function isPlainNumberTrack(upgradeId: UpgradeId): boolean {
+  return isPerPurchaseTrack(upgradeId) && upgradeId !== 'drill_power'
+}
+
+function pinnedStepsOf(upgradeId: UpgradeId): number[] {
+  return isPlainNumberTrack(upgradeId) ? PINNED_PURCHASES : stepsOf(PINNED_MAJORS)
+}
+
+function highStepsOf(upgradeId: UpgradeId): number[] {
+  return isPlainNumberTrack(upgradeId) ? HIGH_PURCHASES : stepsOf(HIGH_MAJORS)
 }
 
 /** The track's stats as the Upgrade bay's own preview reads them (`statsAfter` names). */
@@ -83,22 +111,19 @@ function isKernelStatMoving(upgradeId: UpgradeId, step: number, index: number): 
   return toCanonical(now) !== toCanonical(next)
 }
 
-/** Tracks whose every step moves the stat: the integer tracks gain a whole unit only on some pips. */
-const GROWING_TRACKS = UPGRADE_IDS.filter((id) => trackKindOf(id) !== 'linearInt')
-
 describe('descriptions side table: the six tracks', () => {
   it.each(UPGRADE_IDS)('pins every %s line to the kernel stat at the pinned steps', (id) => {
-    for (const step of stepsOf(PINNED_MAJORS)) {
+    for (const step of pinnedStepsOf(id)) {
       const lines = statLinesOf(id, step)
       expect(lines).toHaveLength(statsOfTrack(id).length)
       lines.forEach((line, index) => expect(line).toMatchObject(expectedLine(id, step, index)))
     }
   })
 
-  it.each(GROWING_TRACKS)(
-    'shows a change and its share on every %s line at majors 607 and 6007',
+  it.each(UPGRADE_IDS)(
+    'shows a change and its share on every %s line at majors 607 and 6007, or purchase 200',
     (id) => {
-      for (const step of stepsOf(HIGH_MAJORS)) {
+      for (const step of highStepsOf(id)) {
         for (const line of statLinesOf(id, step)) {
           expect([line.delta, line.deltaPct]).not.toContain(undefined)
           expect([line.delta, line.deltaPct]).not.toContain('0')
@@ -109,7 +134,7 @@ describe('descriptions side table: the six tracks', () => {
   )
 
   it.each(UPGRADE_IDS)('never shows a change of 0 where the %s stat moves', (id) => {
-    for (const step of stepsOf(PINNED_MAJORS)) {
+    for (const step of pinnedStepsOf(id)) {
       statLinesOf(id, step).forEach((line, index) => {
         if (!isKernelStatMoving(id, step, index)) return
         expect(line.delta).not.toBe('0')
@@ -118,11 +143,10 @@ describe('descriptions side table: the six tracks', () => {
     }
   })
 
-  it('shows the cargo line at major 607 rising by two on the buy that lands the next major', () => {
-    const [cargo] = statLinesOf('cargo_hold', stepOfMajor(607) + 9)
-    expect(cargo).toMatchObject({ now: '2,440', next: '2,442', delta: '2' })
-    expect(cargo.deltaPct).toBe(formatPercent(div(fromCanonical('2'), fromCanonical('2440'))))
-    expect(cargo.major).toEqual({ levelsTo: 1, value: '2,442' })
+  it('shows the cargo line at purchase 22 rising by about 10% on the next purchase (ticket 553)', () => {
+    const [cargo] = statLinesOf('cargo_hold', 22)
+    expect(cargo).toMatchObject({ now: '81', next: '90', delta: '9' })
+    expect(cargo.deltaPct).toBe(formatPercent(div(fromCanonical('9'), fromCanonical('81'))))
   })
 
   it('counts the steps to the next major on a track mid-level', () => {
@@ -130,16 +154,14 @@ describe('descriptions side table: the six tracks', () => {
     expect(power.major?.levelsTo).toBe(6)
   })
 
-  it('shows an engine line near its cap with the headroom left', () => {
-    const step = stepOfMajor(247)
-    const [speed] = statLinesOf('engine', step)
-    const now = kernelStatsOf('engine', step)[0]
-    const cap = fromCanonical('14')
-    expect(speed.cap).toEqual({ value: '14', headroomPct: formatPercent(div(sub(cap, now), cap)) })
+  it('shows no cap on an engine line: the engine has no max level (ticket 553)', () => {
+    for (const line of statLinesOf('engine', 100)) expect(line.cap).toBeUndefined()
   })
 
-  it('reads a sub-milli engine change as a tiny change, never as zero', () => {
-    const [speed] = statLinesOf('engine', stepOfMajor(6007))
+  it('reads a sub-milli change as a tiny change, never as zero', () => {
+    const creep = (step: number) => add(fromCanonical('6'), mul(fromSafeInteger(step), TENTH_MILLI))
+    const spec = steppedLine('Top speed', 'geometric', creep)
+    const speed = statLineOf(spec, trackItemOf('engine'), ctxAt(40))
     expect(speed.now).toBe(speed.next)
     expect(speed.delta).toBe(TINY_CHANGE_TEXT)
   })
@@ -156,11 +178,11 @@ describe('descriptions side table: the six tracks', () => {
 
   it('names each line’s kind from the track’s curve family', () => {
     expect(linesOf(trackItemOf('drill_power'), 1)[0].kind).toBe('geometric')
-    expect(linesOf(trackItemOf('boiler'), 1)[0].kind).toBe('linearInt')
+    expect(linesOf(trackItemOf('boiler'), 1)[0].kind).toBe('geometric')
     expect(statLinesOf('engine', 1).map((line) => line.kind)).toEqual([
-      'saturating',
-      'saturating',
-      'saturating',
+      'geometric',
+      'geometric',
+      'geometric',
     ])
   })
 })
@@ -236,6 +258,8 @@ describe('descriptions side table: gear, services, bays and artefacts', () => {
     expect(ARTEFACT_OPTIONS.map((option) => option.summary)).toEqual(KERNEL_SUMMARIES_ON_MAIN)
   })
 })
+
+const TENTH_MILLI = fromCanonical('0.0001')
 
 /** The kernel's artefact summaries as main has them: this slice writes no kernel field (Q1). */
 const KERNEL_SUMMARIES_ON_MAIN = [

@@ -25,7 +25,7 @@ const PLANETS = [...Array.from({ length: 60 }, (_, index) => index + 1), 247, 60
 /** The deep planets the Vertical Scaler pins (#165): far past any `paceScale` step. */
 const DEEP_PLANETS = [247, 607, 6007] as const
 
-/** P5 sits in the `paceScale` 1.4 step (#6 section 6), so a later planet's pace differs. */
+/** P5 sits in the `paceScale` 1.3 step (#6 section 6), so a later planet's pace differs. */
 const PACE_STEP_PLANET = 5
 
 describe('band ore cost at a pinned pace planet', () => {
@@ -54,10 +54,10 @@ describe('band ore cost at a pinned pace planet', () => {
     }
   })
 
-  it('never makes a P5 unlock cheaper by buying it on P8, where paceScale drops to 1', () => {
+  it("charges a P5 unlock bought on P8 at P5's pace of 1.3, under P8's 1.7", () => {
     const cost = ECONOMY.gun.mountCost
     const pinned = bandOrePriceAt(cost, 8, PACE_STEP_PLANET)
-    expect(cmp(pinned, bandOrePrice(cost, 8))).toBe(1)
+    expect(cmp(pinned, bandOrePrice(cost, 8))).toBe(-1)
   })
 
   it('pins the gun mount price at L 247, 607 and 6007', () => {
@@ -65,9 +65,9 @@ describe('band ore cost at a pinned pace planet', () => {
       toCanonical(bandOrePriceAt(ECONOMY.gun.mountCost, planet, planet)),
     )
     expect(prices).toEqual([
-      '4.567875088278464734944400568244834348837e+131',
-      '6.890869090200142041983802305493414256834e+321',
-      '3.286023776321706552737166757310471196788e+3174',
+      '7.765387650073390049405480966016218393023e+131',
+      '1.171447745334024147137246391933880423662e+322',
+      '5.58624041974690113965318348742780103454e+3174',
     ])
   })
 })

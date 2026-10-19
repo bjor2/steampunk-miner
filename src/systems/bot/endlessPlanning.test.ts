@@ -6,7 +6,12 @@ import { chargePrice, chargeReachTiles, fuseTicksOf, keptFractionOf } from '../e
 import type { UpgradeId } from '../economy/economyDefinition'
 import { blockHardness, oreSalePrice, oreTier } from '../economy/oreEconomy'
 import { stepPrice, upgradePrice } from '../economy/upgradePrices'
-import { levelOfStep, stepOfMajor, stepsToNextLevel } from '../economy/upgradeSteps'
+import {
+  isPerPurchaseTrack,
+  levelOfStep,
+  stepOfMajor,
+  stepsToNextLevel,
+} from '../economy/upgradeSteps'
 import {
   drillPowerAtStep,
   onCurveStep,
@@ -27,9 +32,9 @@ import {
   type Money,
 } from '../money'
 import { quantaOfUnits } from '../vehicle/energyQuanta'
-import { doesDrillSetTravel } from '../vehicle/travelParity'
 import type { PlanetParams } from '../world/planetParams'
 import { blastTradeOf, type BlastTrade } from './blastTrade'
+import { isBoilerStepDue } from './botBoiler'
 import { isUnderLeadCap } from './botCoreRule'
 import { buyUpgrades } from './botShopping'
 import { createBotSession, type BotSession } from './botSession'
@@ -41,7 +46,14 @@ import { bestOrePlan, fullTankMeans, orePlansOf } from './tripEstimate'
 // 600 and 1000 are checked against a reference that ranks the same quantities in log space.
 const WORLD_SEED = 83921
 const PLANETS = [600, 1000]
-const MARGINAL_TRACKS: readonly UpgradeId[] = ['drill_power', 'engine', 'boiler', 'cargo_hold']
+/** The tracks the marginal rule weighs; the boiler has its own rule since ticket 553. */
+const MARGINAL_TRACKS: readonly UpgradeId[] = ['drill_power', 'engine', 'cargo_hold']
+/** Every track the wallet must afford a pick of, the boiler's rule included. */
+const PICKED_TRACKS: readonly UpgradeId[] = [...MARGINAL_TRACKS, 'boiler']
+/** Systems' marginal rule on #553: hold and engine bundles of at most 10, raising 0.2% or more. */
+const BUNDLE_TRACKS: readonly UpgradeId[] = ['engine', 'cargo_hold']
+const BUNDLE_MAX_PURCHASES = 10
+const BUNDLE_GAIN_BP = 20
 const PICKS_COMPARED = 8
 /** Enough money for every compared pick of any track, with the service kept back. */
 const WALLET_PRICES = 1000
@@ -55,9 +67,13 @@ const DRILL_LEVELS_BEHIND = [
   { tipMajors: 9, drillPurchases: 5 },
   { tipMajors: 12, drillPurchases: 6 },
 ]
-/** Majors a marginal track is set behind so it can lead: 4, or 2 drill power purchases. */
+/**
+ * Purchases a marginal track is set behind so it can lead: 2 of drill power, 10 of the hold or the
+ * engine (per purchase since ticket 553); 4 majors of a track still split into majors.
+ */
 const MAJORS_BEHIND_TO_LEAD = 4
 const DRILL_PURCHASES_BEHIND_TO_LEAD = 2
+const PURCHASES_BEHIND_TO_LEAD = 10
 /**
  * Drill power's purchase 8 is the first at or past the old on-curve major 13 of planet 1 (stored
  * 130), whose band-1 pace the rig here keeps (`paceKeepingSteps`).
@@ -102,16 +118,14 @@ function paceKeepingDrill(planetIndex: number): number {
 
 /** How far behind a marginal track is set so it can lead, in its stored steps. */
 function stepsBehindToLead(track: UpgradeId): number {
-  return track === 'drill_power'
-    ? DRILL_PURCHASES_BEHIND_TO_LEAD
-    : stepOfMajor(MAJORS_BEHIND_TO_LEAD)
+  if (track === 'drill_power') return DRILL_PURCHASES_BEHIND_TO_LEAD
+  return isPerPurchaseTrack(track) ? PURCHASES_BEHIND_TO_LEAD : stepOfMajor(MAJORS_BEHIND_TO_LEAD)
 }
 
 /**
- * The pace-keeping steps with each marginal track in turn 4 majors (2 drill purchases) behind, so
- * each can lead, and a tank twice the curve's: since ticket 396's 4-tick floor the on-curve tank
- * ends every trip out here and the boiler leads all the others; with the tank ahead the hold
- * limits instead.
+ * The pace-keeping steps with each marginal track in turn behind so each can lead (2 drill
+ * purchases, 10 hold or engine purchases), and a tank twice the curve's, where the boiler's rule
+ * rests and the hold limits instead.
  */
 function levelVariants(planetIndex: number): UpgradeLevels[] {
   const onCurve = paceKeepingSteps(planetIndex)
@@ -142,7 +156,7 @@ function botShoppingOn(planetIndex: number, levels: UpgradeLevels): BotSession {
 }
 
 function walletFor(planetIndex: number, levels: UpgradeLevels): string {
-  const prices = MARGINAL_TRACKS.map((track) =>
+  const prices = PICKED_TRACKS.map((track) =>
     upgradePrice(track, levelOfStep(track, levels[track]), planetIndex),
   )
   const dearest = prices.reduce((most, price) => (cmp(price, most) > 0 ? price : most))
@@ -195,8 +209,8 @@ function plannedLog(layout: MineLayout, levels: UpgradeLevels): number {
 
 /**
  * The reference: the best gain in planned money per tick per price, ranked by its log10, over the
- * fewest next steps up to the next level that raise the planned money (#180): the next major, or
- * one drill power purchase since #552.
+ * fewest next steps that raise the planned money: one drill power purchase since #552, and a hold
+ * or engine bundle of at most 10 that raises it 0.2% or more since ticket 553.
  */
 function referencePick(
   layout: MineLayout,
@@ -221,26 +235,22 @@ function referenceLogGainPerPrice(
   track: UpgradeId,
   now: number,
 ): number | null {
+  const isBundle = BUNDLE_TRACKS.includes(track)
+  const most = isBundle ? BUNDLE_MAX_PURCHASES : stepsToNextLevel(track, levels[track])
+  const enough = isBundle ? now + Math.log10(1 + BUNDLE_GAIN_BP / BASIS_POINTS) : now
   let price = ZERO_MONEY
-  for (let steps = 1; steps <= stepsToNextLevel(track, levels[track]); steps++) {
+  for (let steps = 1; steps <= most; steps++) {
     price = add(price, stepPrice(track, levels[track] + steps - 1, planetIndex))
     const next = plannedLog(layout, { ...levels, [track]: levels[track] + steps })
-    if (next > now) return log10Difference(next, now) - log10Of(price)
+    if (next > now && next >= enough) return log10Difference(next, now) - log10Of(price)
   }
   return null
 }
 
-/**
- * The tracks under their lead cap the bay sells: the engine is maxed while the drill sets travel
- * speed (ticket 333), which the 4-tick floor of ticket 396 reaches on these planets.
- */
+/** The tracks under their lead cap: the bay sells every one, the engine too (ticket 553). */
 function referenceTracks(session: BotSession, levels: UpgradeLevels): UpgradeId[] {
   const planetIndex = session.state().planet.index
-  const rig = { ...session.vehicle(), levels }
-  const isEngineMaxed = doesDrillSetTravel(rig, paramsOfSession(session.state()))
-  return MARGINAL_TRACKS.filter(
-    (track) => isUnderLeadCap(levels, track, planetIndex) && !(track === 'engine' && isEngineMaxed),
-  )
+  return MARGINAL_TRACKS.filter((track) => isUnderLeadCap(levels, track, planetIndex))
 }
 
 function referencePicks(session: BotSession, layout: MineLayout, start: UpgradeLevels) {
@@ -248,7 +258,9 @@ function referencePicks(session: BotSession, layout: MineLayout, start: UpgradeL
   const picks: UpgradeId[] = []
   let levels = start
   for (let pick = 0; pick < PICKS_COMPARED; pick += 1) {
-    const track = referencePick(layout, levels, planetIndex, referenceTracks(session, levels))
+    const track = isBoilerStepDue(layout, levels)
+      ? 'boiler'
+      : referencePick(layout, levels, planetIndex, referenceTracks(session, levels))
     if (track === null) break
     picks.push(track)
     levels = { ...levels, [track]: levels[track] + 1 }

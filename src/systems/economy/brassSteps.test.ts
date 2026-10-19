@@ -7,7 +7,13 @@ import { upgradePrice } from './upgradePrices'
 import { cargoCapacity, energyMax, hullMax, onCurveLevel } from './vehicleStats'
 
 const m = fromCanonical
+/**
+ * The tracks a step of buys: the hold, the boiler and the engine left the brass curve for their
+ * per-purchase rows in ticket 553 (Systems' rows on #553), which the bot buys by gain, not on a
+ * curve, so only the hull's price still drifts against ore as a curve shape.
+ */
 const BRASS_TRACKS = ['cargo_hold', 'boiler', 'engine', 'hull'] as const
+const CURVE_TRACKS = ['hull'] as const
 const DEEPEST_BAND = 5
 const FIRST_PLANET = 1
 
@@ -60,7 +66,7 @@ describe('brass steps against ore income (#195)', () => {
   it.each([10, 20, 40])(
     'keeps the band-5 ore units per next brass step, before the pace row, within 1.2x of planet 1 on planet %i',
     (planetIndex) => {
-      for (const track of BRASS_TRACKS) {
+      for (const track of CURVE_TRACKS) {
         const drift = div(
           band5OreUnitsPerBrassStepBeforePace(track, planetIndex),
           band5OreUnitsPerBrassStepBeforePace(track, FIRST_PLANET),

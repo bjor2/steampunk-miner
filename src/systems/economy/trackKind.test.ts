@@ -8,9 +8,9 @@ describe('track kind', () => {
     expect(kinds).toEqual({
       drill_power: 'geometric',
       drill_tip: 'geometric',
-      engine: 'saturating',
-      boiler: 'linearInt',
-      cargo_hold: 'linearInt',
+      engine: 'geometric',
+      boiler: 'geometric',
+      cargo_hold: 'geometric',
       hull: 'geometric',
     })
   })

@@ -13,8 +13,8 @@ import { drillPower, startLevels, vehicleStatsAt } from './vehicleStats'
 const m = fromCanonical
 const PURCHASES_1_TO_200 = Array.from({ length: 200 }, (_, index) => index + 1)
 const PURCHASES_1_TO_300 = Array.from({ length: 300 }, (_, index) => index + 1)
-/** Planet 1 and 2 at pace 1, 3 at 1.4, 8 at 0.75, 11 back at 1 (`planets.paceScale`). */
-const PACE_PLANETS = [1, 3, 8, 11]
+/** Pace 1 on planet 1, 1.2 on 2 and 3, 1.3 from 4, 1.6 from 6, 1.7 from 8 (`paceScale`). */
+const PACE_PLANETS = [1, 2, 3, 4, 6, 8, 11]
 
 /** `|value / target - 1| <= tolerance`, in Money. */
 function isWithin(value: Money, target: Money, tolerance: Money): boolean {

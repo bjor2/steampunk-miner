@@ -5,7 +5,9 @@
  *
  * Drill power is priced per purchase with no major split (the GD ruling on #551, ticket 552):
  * `price(0) = 1`, `price(n) = ceil(20 * 1.48^(n - 1))`, each times `paceScale(p)`, so a price
- * on a planet whose scale is not whole carries the scale's decimals.
+ * on a planet whose scale is not whole carries the scale's decimals. The hold and the engine are
+ * too (Systems' Proposal 1 on #551, ticket 553): `ceil(2.4 * 1.20^c)` and `ceil(3.6 * 1.30^e)` for
+ * the purchase from `c` or `e`, times `paceScale(p)`.
  */
 import { ceil, mul, type Money } from '../money'
 import {

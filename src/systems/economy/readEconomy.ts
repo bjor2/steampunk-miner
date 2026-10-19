@@ -5,10 +5,10 @@
 import {
   createFieldReader,
   readBandOreCost,
-  readLiteral,
   readRange,
   type FieldReader,
 } from './economyFieldReader'
+import { checkUpgradeSet, readUpgrade } from './readUpgradeEconomy'
 import { liningTypesWithoutGrade, readCasingCementGrades } from './casingCementGrades'
 import { readArchetypes } from './readArchetypeEconomy'
 import { readBlastingCharges } from './readBlastingEconomy'
@@ -23,20 +23,7 @@ import { readPaceScale } from './readPaceScale'
 import { readDepthDensity } from './depthDensityCurve'
 import { readUpgradeTiers } from './readUpgradeTiers'
 import { readCostCurve, readRefinery } from './readRefineryEconomy'
-import {
-  TRACK_EFFECTS,
-  UPGRADE_IDS,
-  type CostCurve,
-  type Economy,
-  type GeometricEffect,
-  type LinearEffect,
-  type PerPurchaseEffect,
-  type SaturatingEffect,
-  type UpgradeDef,
-  type UpgradeEffect,
-  type UpgradeId,
-  type VisualTierThreshold,
-} from './economyDefinition'
+import type { CostCurve, Economy, VisualTierThreshold } from './economyDefinition'
 import { cmp, type BigStat } from '../money'
 
 export type EconomyReading = { economy: Economy; problems: [] } | { problems: string[] }
@@ -251,157 +238,10 @@ function readCollapseCrush(reader: FieldReader, value: unknown, coreTierBand: nu
   return fractions
 }
 
-function readUpgrade(reader: FieldReader, path: string, value: unknown): UpgradeDef {
-  const upgrade = reader.object(path, value)
-  const onCurve = reader.object(`${path}.onCurve`, upgrade.onCurve)
-  if (upgrade.maxLevel !== null) reader.record(`${path}.maxLevel must be null (uncapped, #7)`)
-  return {
-    id: readLiteral(reader, `${path}.id`, upgrade.id, UPGRADE_IDS),
-    costCurveId: reader.text(`${path}.costCurveId`, upgrade.costCurveId),
-    maxLevel: null,
-    effect: readUpgradeEffect(reader, `${path}.effect`, upgrade.effect),
-    onCurve: {
-      levelAtPlanet1: reader.safeInteger(`${path}.onCurve.levelAtPlanet1`, onCurve.levelAtPlanet1),
-      levelsPerPlanet: reader.safeInteger(
-        `${path}.onCurve.levelsPerPlanet`,
-        onCurve.levelsPerPlanet,
-      ),
-    },
-  }
-}
-
-function readUpgradeEffect(reader: FieldReader, path: string, value: unknown): UpgradeEffect {
-  const effect = reader.object(path, value)
-  const families = ['geometric', 'perPurchase', 'linear', 'saturating'] as const
-  const family = readLiteral(reader, `${path}.family`, effect.family, families)
-  if (family === 'perPurchase') return readPerPurchaseEffect(reader, path, effect)
-  if (family === 'linear') return readLinearEffect(reader, path, effect)
-  if (family === 'saturating') return readSaturatingEffect(reader, path, effect)
-  return readGeometricEffect(reader, path, effect)
-}
-
-function readGeometricEffect(
-  reader: FieldReader,
-  path: string,
-  effect: Record<string, unknown>,
-): GeometricEffect {
-  const stats = ['drillPower', 'drillTip', 'hullMax'] as const
-  return {
-    family: 'geometric',
-    stat: readLiteral(reader, `${path}.stat`, effect.stat, stats),
-    start: reader.money(`${path}.start`, effect.start),
-    ratio: reader.money(`${path}.ratio`, effect.ratio),
-  }
-}
-
-function readPerPurchaseEffect(
-  reader: FieldReader,
-  path: string,
-  effect: Record<string, unknown>,
-): PerPurchaseEffect {
-  const firstGain = reader.object(`${path}.firstGain`, effect.firstGain)
-  return {
-    family: 'perPurchase',
-    stat: readLiteral(reader, `${path}.stat`, effect.stat, ['drillPower'] as const),
-    start: reader.money(`${path}.start`, effect.start),
-    firstGain: {
-      ratio: reader.money(`${path}.firstGain.ratio`, firstGain.ratio),
-      root: reader.safeInteger(`${path}.firstGain.root`, firstGain.root),
-    },
-    ratio: reader.money(`${path}.ratio`, effect.ratio),
-  }
-}
-
-function readLinearEffect(
-  reader: FieldReader,
-  path: string,
-  effect: Record<string, unknown>,
-): LinearEffect {
-  const stats = ['energyMax', 'cargoCapacity'] as const
-  return {
-    family: 'linear',
-    stat: readLiteral(reader, `${path}.stat`, effect.stat, stats),
-    start: reader.safeInteger(`${path}.start`, effect.start),
-    step: reader.safeInteger(`${path}.step`, effect.step),
-  }
-}
-
-function readSaturatingEffect(
-  reader: FieldReader,
-  path: string,
-  effect: Record<string, unknown>,
-): SaturatingEffect {
-  const stats = reader.object(`${path}.stats`, effect.stats)
-  return {
-    family: 'saturating',
-    halfLevel: reader.safeInteger(`${path}.halfLevel`, effect.halfLevel),
-    stats: {
-      speedMax: readRange(reader, `${path}.stats.speedMax`, stats.speedMax),
-      accel: readRange(reader, `${path}.stats.accel`, stats.accel),
-      thrustToWeight: readRange(reader, `${path}.stats.thrustToWeight`, stats.thrustToWeight),
-    },
-  }
-}
-
 function readVisualTier(reader: FieldReader, path: string, value: unknown): VisualTierThreshold {
   const tier = reader.object(path, value)
   return {
     tier: reader.safeInteger(`${path}.tier`, tier.tier),
     minTotalLevel: reader.safeInteger(`${path}.minTotalLevel`, tier.minTotalLevel),
   }
-}
-
-/**
- * #20 Gameplay & Vehicle acceptance 1: exactly the six tracks, each pointing at its own
- * `cost.vehicle.<id>` curve, and that curve present in the file.
- */
-function checkUpgradeSet(
-  reader: FieldReader,
-  upgrades: readonly UpgradeDef[],
-  costCurves: readonly CostCurve[],
-): void {
-  const curves = new Map(costCurves.map((curve) => [curve.id, curve]))
-  UPGRADE_IDS.forEach((id) => checkTrackListedOnce(reader, id, upgrades))
-  upgrades.forEach((upgrade, index) => checkTrackEffect(reader, index, upgrade))
-  upgrades.forEach((upgrade, index) => checkCostCurveLink(reader, index, upgrade, curves))
-}
-
-/** A track bought per purchase is priced per purchase, and every other one per major (#552). */
-function checkCostCurveLink(
-  reader: FieldReader,
-  index: number,
-  upgrade: UpgradeDef,
-  curves: ReadonlyMap<string, CostCurve>,
-): void {
-  const expected = `cost.vehicle.${upgrade.id}`
-  const family = upgrade.effect.family === 'perPurchase' ? 'perPurchase' : 'geometric'
-  const curve = curves.get(expected)
-  if (upgrade.costCurveId !== expected) {
-    reader.record(`upgrades[${index}].costCurveId must be ${expected}`)
-  } else if (curve === undefined) {
-    reader.record(`upgrades[${index}].costCurveId ${expected} has no curve in costCurves`)
-  } else if (curve.family !== family) {
-    reader.record(`upgrades[${index}].costCurveId ${expected} must be a ${family} curve`)
-  }
-}
-
-function checkTrackListedOnce(
-  reader: FieldReader,
-  id: UpgradeId,
-  upgrades: readonly UpgradeDef[],
-): void {
-  const count = upgrades.filter((upgrade) => upgrade.id === id).length
-  if (count !== 1) reader.record(`upgrades must list the track ${id} once, found ${count}`)
-}
-
-function checkTrackEffect(reader: FieldReader, index: number, upgrade: UpgradeDef): void {
-  const declared = describeEffect(upgrade.effect)
-  const expected = TRACK_EFFECTS[upgrade.id]
-  if (declared !== expected) {
-    reader.record(`upgrades[${index}].effect must be ${expected} for ${upgrade.id}`)
-  }
-}
-
-function describeEffect(effect: UpgradeEffect): string {
-  return effect.family === 'saturating' ? 'saturating engine' : `${effect.family} ${effect.stat}`
 }

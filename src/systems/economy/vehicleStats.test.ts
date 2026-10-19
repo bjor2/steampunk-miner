@@ -20,6 +20,8 @@ import { stepsOfMajors } from './upgradeSteps'
 const m = fromCanonical
 const PLANETS_1_TO_40 = Array.from({ length: 40 }, (_, index) => index + 1)
 const LEVELS = [0, 1, 10, 1000, 1_000_000]
+/** The tank, the hold and the engine are plain numbers, tested to purchase 200 (ticket 553). */
+const PURCHASES = [0, 1, 10, 100, 200]
 
 function levelsWith(changes: Partial<Record<UpgradeId, number>>): UpgradeLevels {
   return { ...startLevels(), ...changes }
@@ -57,42 +59,39 @@ describe('vehicle stats', () => {
     expect(mul(hullMax(2), powInt(m('1.12'), 6))).toEqual(hullMax(8))
   })
 
-  it('adds 6 energy and 4 cargo units per level', () => {
-    expect([energyMax(0), energyMax(4), energyMax(10)]).toEqual([150, 174, 210])
-    expect([cargoCapacity(0), cargoCapacity(8), cargoCapacity(14)]).toEqual([10, 42, 66])
+  it('adds 10% to the tank and the hold a purchase, rounded to whole units (ticket 553)', () => {
+    expect([energyMax(0), energyMax(1), energyMax(16)]).toEqual([150, 165, 689])
+    expect([cargoCapacity(0), cargoCapacity(1), cargoCapacity(22)]).toEqual([10, 11, 81])
   })
 
-  it('saturates the engine below 14 m/s, accel 1.8 and thrust-to-weight 3.5', () => {
-    expect(engineStats(25)).toEqual({ speedMax: 10, accel: 1.4, thrustToWeight: 2.75 })
-    for (const level of LEVELS) {
-      const engine = engineStats(level)
-      expect(engine.speedMax).toBeGreaterThanOrEqual(6)
-      expect(engine.speedMax).toBeLessThan(14)
-      expect(engine.accel).toBeLessThan(1.8)
-      expect(engine.thrustToWeight).toBeLessThan(3.5)
-    }
+  it('runs the engine at 6 x 1.05^e m/s with no top, accel and lift scaled with it (ticket 553)', () => {
+    expect(engineStats(0)).toEqual({ speedMax: 6, accel: 1, thrustToWeight: 2 })
+    expect(engineStats(58).speedMax).toBeGreaterThan(100)
   })
 
-  it('is finite and non-decreasing in level for every track from 0 to a million', () => {
+  it('is finite and increasing in level for every track, to a million or to purchase 200', () => {
     for (const [lower, higher] of LEVELS.slice(1).map((level, index) => [LEVELS[index], level])) {
       expect(cmp(drillPower(lower), drillPower(higher))).toBe(-1)
       expect(cmp(drillTip(lower), drillTip(higher))).toBe(-1)
       expect(cmp(hullMax(lower), hullMax(higher))).toBe(-1)
+    }
+    const pairs = PURCHASES.slice(1).map((purchase, index) => [PURCHASES[index], purchase])
+    for (const [lower, higher] of pairs) {
       expect(energyMax(lower)).toBeLessThan(energyMax(higher))
       expect(cargoCapacity(lower)).toBeLessThan(cargoCapacity(higher))
       expect(engineStats(lower).speedMax).toBeLessThan(engineStats(higher).speedMax)
     }
   })
 
-  it('declares drill power per purchase, tip and hull geometric, boiler and cargo linear and the engine saturating', () => {
+  it('declares drill power, the engine, the boiler and the hold per purchase and the tip and hull geometric', () => {
     const familyOf = (upgradeId: UpgradeId) =>
       ECONOMY.upgrades.find((upgrade) => upgrade.id === upgradeId)?.effect.family
     expect(UPGRADE_IDS.map(familyOf)).toEqual([
       'perPurchase',
       'geometric',
-      'saturating',
-      'linear',
-      'linear',
+      'enginePerPurchase',
+      'wholePerPurchase',
+      'wholePerPurchase',
       'geometric',
     ])
   })
@@ -100,9 +99,8 @@ describe('vehicle stats', () => {
 
 describe('on-curve levels', () => {
   it.each([
-    ['cargo_hold', 6, 8],
-    ['boiler', 6, 4],
-    ['engine', 6, 6],
+    ['boiler', 0, 16],
+    ['engine', 1, 2],
     ['hull', 6, 2],
     ['drill_power', 3, 12],
     ['drill_tip', 3, 7],
@@ -112,7 +110,18 @@ describe('on-curve levels', () => {
     }
   })
 
-  it('stays a finite, increasing level on planets 1000 and a million', () => {
+  // Systems' rows on #553: the bot's hold stops at 255 units (34 purchases) from planet 12, past
+  // the largest band's ore, and the engine's last purchase under the 3600 m/s floor is 131.
+  it('stops the hold at 34 purchases and the engine at 131 on curve (ticket 553)', () => {
+    expect([1, 12, 13, 40, 1000].map((planet) => onCurveLevel('cargo_hold', planet))).toEqual([
+      22, 33, 34, 34, 34,
+    ])
+    expect([1, 40, 130, 131, 1_000_000].map((planet) => onCurveLevel('engine', planet))).toEqual([
+      2, 41, 131, 131, 131,
+    ])
+  })
+
+  it('stays a finite, never falling level on planets 1000 and a million (the boiler holds 16)', () => {
     for (const upgradeId of UPGRADE_IDS) {
       const levels = [40, 1000, 1_000_000].map((planet) => onCurveLevel(upgradeId, planet))
       expect(levels.every(Number.isSafeInteger)).toBe(true)

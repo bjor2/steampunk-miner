@@ -1,13 +1,14 @@
 /**
  * Reads the cost curves and the Refinery bay block of `economy.json` (#6 section 3 curves, #105
  * numbers). A curve is `geometric` (vehicle tracks, casing), `perPurchase` (drill power, #551 for
- * ticket 552) or `bandOre` (the refinery's slots); the refinery's slot curve must be a `bandOre` curve pricing
- * exactly the slots past the first.
+ * ticket 552), `geometricPerPurchase` (the hold and the engine, ticket 553) or `bandOre` (the
+ * refinery's slots); the refinery's slot curve must be a `bandOre` curve pricing exactly the slots
+ * past the first.
  */
 import { readLiteral, type FieldReader } from './economyFieldReader'
 import type { CostCurve, Economy } from './economyDefinition'
 
-const COST_CURVE_FAMILIES = ['geometric', 'perPurchase', 'bandOre'] as const
+const COST_CURVE_FAMILIES = ['geometric', 'perPurchase', 'geometricPerPurchase', 'bandOre'] as const
 
 export function readCostCurve(reader: FieldReader, path: string, value: unknown): CostCurve {
   const curve = reader.object(path, value)
@@ -25,7 +26,8 @@ export function readCostCurve(reader: FieldReader, path: string, value: unknown)
   }
   const base = reader.money(`${path}.base`, curve.base)
   const ratio = reader.money(`${path}.ratio`, curve.ratio)
-  if (family === 'geometric') return { id, family, base, ratio }
+  if (family === 'geometric' || family === 'geometricPerPurchase')
+    return { id, family, base, ratio }
   return {
     id,
     family,

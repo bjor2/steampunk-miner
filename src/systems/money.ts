@@ -200,6 +200,18 @@ export function toSafeInteger(amount: Money): number {
   return count
 }
 
+/**
+ * A bounded stat (the engine's speed, accel and lift, ticket 553) as a double through whole
+ * millionths, so every machine reads the same number for the physics step (#5 rule 5); past
+ * about 9e9 the millionths leave the safe integers and it throws rather than round.
+ */
+export function toMillionthsNumber(amount: Money): number {
+  const millionths = toSafeInteger(roundToWhole(mul(amount, fromSafeInteger(MILLIONTHS))))
+  return millionths / MILLIONTHS
+}
+
+const MILLIONTHS = 1_000_000
+
 /** Whether `text` is a decimal amount `fromCanonical` reads, of any sign. */
 export function isMoneyText(text: unknown): text is string {
   return typeof text === 'string' && DECIMAL_TEXT.test(text)

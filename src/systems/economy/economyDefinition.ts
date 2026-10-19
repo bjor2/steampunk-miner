@@ -30,9 +30,9 @@ export type UpgradeId = (typeof UPGRADE_IDS)[number]
 export const TRACK_EFFECTS: Readonly<Record<UpgradeId, string>> = {
   drill_power: 'perPurchase drillPower',
   drill_tip: 'geometric drillTip',
-  engine: 'saturating engine',
-  boiler: 'linear energyMax',
-  cargo_hold: 'linear cargoCapacity',
+  engine: 'enginePerPurchase engine',
+  boiler: 'wholePerPurchase energyMax',
+  cargo_hold: 'wholePerPurchase cargoCapacity',
   hull: 'geometric hullMax',
 }
 
@@ -63,20 +63,6 @@ export interface GeometricEffect {
   ratio: BigStat
 }
 
-export interface LinearEffect {
-  family: 'linear'
-  stat: 'energyMax' | 'cargoCapacity'
-  start: number
-  step: number
-}
-
-export interface SaturatingEffect {
-  family: 'saturating'
-  /** Level at which half of the range is gained (`Ke`). */
-  halfLevel: number
-  stats: { speedMax: BoundedRange; accel: BoundedRange; thrustToWeight: BoundedRange }
-}
-
 /**
  * A stat that grows by one ratio a purchase, with no pip rule and no majors (the GD ruling on #551
  * for ticket 552, drill power only): `D(0) = start`, `D(1) = start * firstGain`, and every purchase
@@ -91,13 +77,45 @@ export interface PerPurchaseEffect {
   ratio: BigStat
 }
 
+/**
+ * A whole-number stat that grows by one ratio a purchase, with no pip rule (ticket 553, Systems'
+ * rows on #553): the hold's units and the boiler's tank, `round(start * ratio^n)` after `n`
+ * purchases, ties to even.
+ */
+export interface WholePerPurchaseEffect {
+  family: 'wholePerPurchase'
+  stat: 'cargoCapacity' | 'energyMax'
+  start: BigStat
+  ratio: BigStat
+}
+
+/**
+ * The engine bought per purchase (Systems' Proposal 1 on #551, ticket 553): after `e` purchases
+ * `speedMax = speedMax0 * ratio^e`, `accel = accel0 * ratio^e` and
+ * `thrustToWeight = 1 + netLift0 * ratio^e`, so top speed, acceleration and net lift scale
+ * together and the ramp stays the same length. `e = 0` is the starting 6 m/s, 1.0 and 2.0.
+ */
+export interface EnginePerPurchaseEffect {
+  family: 'enginePerPurchase'
+  ratio: BigStat
+  start: { speedMax: BigStat; accel: BigStat; netLift: BigStat }
+}
+
 /** `ratio^(1 / root)`, kept as its parts so the root is worked out the one deterministic way. */
 export interface RatioRoot {
   ratio: BigStat
   root: number
 }
 
-export type UpgradeEffect = GeometricEffect | PerPurchaseEffect | LinearEffect | SaturatingEffect
+export type UpgradeEffect =
+  GeometricEffect | PerPurchaseEffect | WholePerPurchaseEffect | EnginePerPurchaseEffect
+
+/** The effect families bought per purchase: no pip rule and no majors (#552, ticket 553). */
+export const PER_PURCHASE_EFFECT_FAMILIES: readonly UpgradeEffect['family'][] = [
+  'perPurchase',
+  'wholePerPurchase',
+  'enginePerPurchase',
+]
 
 export interface UpgradeDef {
   id: UpgradeId
@@ -105,17 +123,24 @@ export interface UpgradeDef {
   /** Every track is uncapped in the slice (#7). */
   maxLevel: null
   effect: UpgradeEffect
-  /** `onCurveLevel(track, p) = levelAtPlanet1 + levelsPerPlanet * (p - 1)` (#6 section 3). */
+  /**
+   * `onCurveLevel(track, p) = levelAtPlanet1 + levelsPerPlanet * (p - 1)` (#6 section 3), no
+   * more than `atMost` where the track has one.
+   */
   onCurve: OnCurve
 }
 
 /**
  * Where an on-curve player stands, in the track's own levels: majors, or purchases on a
- * `perPurchase` track (drill power: about 12 at planet 1 and 3 a planet, #551 for ticket 552).
+ * per-purchase track (drill power: about 12 at planet 1 and 3 a planet, #551 for ticket 552).
+ * `atMost` is where an on-curve rig stops buying a track whose plain-number stat stops paying
+ * (ticket 553, Systems' rows on #553): the hold past the largest band's ore, the engine at the
+ * 3600 m/s sub-step floor. It bounds the reference rig only; the purchase itself has no max level.
  */
 export interface OnCurve {
   levelAtPlanet1: number
   levelsPerPlanet: number
+  atMost: number | null
 }
 
 /** A share as a fraction in lowest terms, so the pip rules stay in integers (#180 Systems). */
@@ -152,6 +177,18 @@ export interface PerPurchaseCostCurve {
 }
 
 /**
+ * Prices per purchase from the first one, with no major split (Systems' Proposal 1 on #551, ticket
+ * 553: the hold and the engine): purchase `n >= 0` costs `ceil(base * ratio^n)`, times
+ * `paceScale(p)`.
+ */
+export interface GeometricPerPurchaseCostCurve {
+  id: string
+  family: 'geometricPerPurchase'
+  base: Money
+  ratio: Money
+}
+
+/**
  * A price in ore units of one band at the buyer's planet (#105 `cost.refinery.slot`): the
  * travel-fee shape, so it keeps its weight on any planet with no geometric ratio to drift. Level
  * `L` (counted from the first priced level) costs `oreUnitsByLevel[L]` units; past the list there is
@@ -164,7 +201,11 @@ export interface BandOreCostCurve {
   oreUnitsByLevel: readonly Money[]
 }
 
-export type CostCurve = GeometricCostCurve | PerPurchaseCostCurve | BandOreCostCurve
+export type CostCurve =
+  GeometricCostCurve | PerPurchaseCostCurve | GeometricPerPurchaseCostCurve | BandOreCostCurve
+
+/** A curve that prices one purchase at a time: drill power's, or the hold's and the engine's. */
+export type PurchaseCostCurve = PerPurchaseCostCurve | GeometricPerPurchaseCostCurve
 
 export interface VisualTierThreshold {
   tier: number

@@ -2,11 +2,12 @@ from decimal import Decimal as D, getcontext, ROUND_FLOOR, ROUND_CEILING
 import json, math
 getcontext().prec=40
 C=dict(v0="10",rho="1.5",eta="1.2544",d0="1.5",dFirst=["1.12",18],gD="1.243",P0="1",gP="1.2544",H0="100",gH="1.12",
- E0=150,eStep=6,C0=10,cStep=4,sMin="6",sMax="14",aMin="1.0",aMax="1.8",tMin="2.0",tMax="3.5",Ke=25,
+ E0="150",eG="1.10",C0="10",cG="1.10",s0="6",gS="1.050",
  coreMult="4",coreFrac="0.4",travelK="0.12",chargeK="0.002",repairK="0.5",feeFrac="0.05",feeFloorK="3",feeCapK="30",
- c0=24,base=dict(drill_power="1",drill_tip="83",cargo_hold="24",boiler="23",engine="36",hull="46"),r="1.225",drillRow=dict(first="1",base="20",ratio="1.48"),rTip="1.500625",w=dict(drill_power=2,drill_tip=3,engine=1.5,boiler=1,cargo_hold=1,hull=2),
+ c0=24,base=dict(drill_power="1",drill_tip="83",hull="46"),r="1.225",drillRow=dict(first="1",base="20",ratio="1.48"),rTip="1.500625",w=dict(drill_power=2,drill_tip=3,engine=1.5,boiler=1,cargo_hold=1,hull=2),
+ purchaseRow=dict(cargo_hold=["2.4","1.20"],boiler=["2.4","1.20"],engine=["3.6","1.60"]),
  Hk="7",Dkc="17.5",Dkb="16.5",gE="1.12",ET0=1,etPlanet=6,etBand=1,KxE=60,tkill="1.5",
- paceFrom=[[3,"1.4"],[8,"0.75"],[11,"1"]])
+ paceFrom=[[2,"1.2"],[3,"1.2"],[4,"1.3"],[6,"1.6"],[8,"1.7"]])
 d=lambda s:D(str(s))
 def tier(p,b): return 3*(p-1)+b
 def V(t): return d(C['v0'])*d(C['rho'])**(t-1)
@@ -21,19 +22,24 @@ def coreTiles(Rr):
     c=coreR(Rr); return sum(1 for x in range(-c,c+1) for y in range(-c,c+1) if (2*x+1)**2+(2*y+1)**2<=(2*c)**2)
 def need(Rr): return -(-4*coreTiles(Rr)//10)
 def Lon(tr,p):
-    return dict(drill_power=3*(p-1)+12,drill_tip=3*(p-1)+7,hull=6*(p-1)+2,cargo_hold=6*(p-1)+8,boiler=6*(p-1)+4,engine=6*(p-1)+6)[tr]
+    return dict(drill_power=3*(p-1)+12,drill_tip=3*(p-1)+7,hull=6*(p-1)+2,cargo_hold=min((p-1)+22,34),boiler=16,engine=min((p-1)+2,131))[tr]
 # paceScale(p) (#131 fromPlanet): the last row at or below p, else 1; it multiplies every price.
 def pace(p): return d(([s for f_,s in C['paceFrom'] if f_<=p] or ["1"])[-1])
 # drill power's price rows per purchase (#551, ticket 552): price(0) = 1, price(n) = ceil(20 x 1.48^(n-1)), times pace(p).
 def drillRow(n):
     R_=C['drillRow']; return d(R_['first']) if n==0 else (d(R_['base'])*d(R_['ratio'])**(n-1)).to_integral_value(rounding=ROUND_CEILING)
+# the hold's, the boiler's and the engine's rows per purchase (ticket 553, Systems' rows on #553): ceil(base x ratio^n), times pace(p).
+def purchaseRow(tr,n):
+    b,r_=C['purchaseRow'][tr]; return (d(b)*d(r_)**n).to_integral_value(rounding=ROUND_CEILING)
 def cost(tr,L,p=1):
     if tr=='drill_power': return drillRow(L)*pace(p)
+    if tr in C['purchaseRow']: return purchaseRow(tr,L)*pace(p)
     base=d(C['base'][tr]) if tr in C['base'] else d(C['c0'])*d(C['w'][tr]); r=d(C[dict(drill_tip='rTip').get(tr,'r')])
     return (base*r**L*pace(p)).to_integral_value(rounding=ROUND_CEILING)
-def cargo(L): return C['C0']+C['cStep']*L
-def energy(L): return C['E0']+C['eStep']*L
-def speed(L): return d(C['sMin'])+(d(C['sMax'])-d(C['sMin']))*L/(L+C['Ke'])
+# the hold and the tank: round(start x 1.10^n), ties to even; the engine: 6 x 1.05^e m/s (ticket 553).
+def cargo(n): return int((d(C['C0'])*d(C['cG'])**n).to_integral_value())
+def energy(n): return int((d(C['E0'])*d(C['eG'])**n).to_integral_value())
+def speed(e): return d(C['s0'])*d(C['gS'])**e
 def ET(p,b): return C['ET0']+C['etPlanet']*(p-1)+C['etBand']*(b-1)
 def eh(T): return d(C['Hk'])*d(C['gE'])**T
 def ed(T,k='c'): return d(C['Dkc'] if k=='c' else C['Dkb'])*d(C['gE'])**T

@@ -7,6 +7,9 @@ import { cmp, fromCanonical, toCanonical, toFixedText } from '../money'
 import { computeVehicleStats } from './vehicleStats'
 
 const LEVELS = [0, 1, 10, 1000, 1_000_000]
+/** The tank, the hold and the engine are plain numbers per purchase, tested to 200 (ticket 553). */
+const PURCHASES = [0, 1, 10, 100, 200]
+const PLAIN_NUMBER_TRACKS: readonly UpgradeId[] = ['engine', 'boiler', 'cargo_hold']
 
 function levelsWith(changes: Partial<Record<UpgradeId, number>>): UpgradeLevels {
   return { ...startLevels(), ...changes }
@@ -57,37 +60,30 @@ describe('vehicle stats from integer levels', () => {
     expect(stats.engine).toEqual({ speedMax: 6, accel: 1, thrustToWeight: 2 })
   })
 
-  // Drill power is grown per purchase since #552, so step 10 is its tenth purchase.
-  it('gives "10.69", "1.2544", "112", 156 and 14 at step 10', () => {
+  // Drill power is grown per purchase since #552, the boiler and the hold since ticket 553, so step
+  // 10 is their tenth purchase.
+  it('gives "10.69", "1.2544", "112", 389 and 26 at step 10', () => {
     const stats = statsOf(levelsWith(Object.fromEntries(UPGRADE_IDS.map((id) => [id, 10]))))
     expect(toFixedText(stats.drillPower, 2)).toBe('10.69')
     expect(stats.drillTip).toEqual(fromCanonical('1.2544'))
     expect(stats.hullMax).toEqual(fromCanonical('112'))
-    expect([stats.energyMax, stats.cargoCapacity]).toEqual([156, 14])
+    expect([stats.energyMax, stats.cargoCapacity]).toEqual([389, 26])
   })
 
-  it('gives speed 10, accel 1.4 and twr 2.75 exactly at engine level 25 (step 250)', () => {
-    expect(statsOf(levelsWith({ engine: 250 })).engine).toEqual({
-      speedMax: 10,
-      accel: 1.4,
-      thrustToWeight: 2.75,
+  it('gives speed 6 x 1.05^10, accel 1.05^10 and twr 1 + 1.05^10 in millionths at engine step 10', () => {
+    expect(statsOf(levelsWith({ engine: 10 })).engine).toEqual({
+      speedMax: 9.773368,
+      accel: 1.628895,
+      thrustToWeight: 2.628895,
     })
   })
 
-  it('stays finite and never falls as any track rises through 0, 1, 10, 1000 and 10^6', () => {
+  it('stays finite and never falls as any track rises, to 10^6 or to purchase 200', () => {
     for (const upgradeId of UPGRADE_IDS) {
-      const series = LEVELS.map((level) => statsOf(levelsWith({ [upgradeId]: level })))
+      const levels = PLAIN_NUMBER_TRACKS.includes(upgradeId) ? PURCHASES : LEVELS
+      const series = levels.map((level) => statsOf(levelsWith({ [upgradeId]: level })))
       series.forEach((stats) => expect(statValues(stats).every(isFiniteValue)).toBe(true))
       series.slice(1).forEach((stats, index) => expect(isNotBelow(stats, series[index])).toBe(true))
-    }
-  })
-
-  it('keeps the engine under 14 m/s, 1.8x accel and twr 3.5 at any level', () => {
-    for (const level of LEVELS) {
-      const { engine } = statsOf(levelsWith({ engine: level }))
-      expect(engine.speedMax).toBeLessThan(14)
-      expect(engine.accel).toBeLessThan(1.8)
-      expect(engine.thrustToWeight).toBeLessThan(3.5)
     }
   })
 
@@ -109,12 +105,12 @@ describe('vehicle stats from integer levels', () => {
   it('retunes the same saved levels when a coefficient in the definitions changes', () => {
     const levels = levelsWith({ boiler: 30 })
     const retuned = ECONOMY.upgrades.map((upgrade) =>
-      upgrade.id === 'boiler' && upgrade.effect.family === 'linear'
-        ? { ...upgrade, effect: { ...upgrade.effect, step: 10 } }
+      upgrade.id === 'boiler' && upgrade.effect.family === 'wholePerPurchase'
+        ? { ...upgrade, effect: { ...upgrade.effect, ratio: fromCanonical('1.2') } }
         : upgrade,
     )
-    expect(statsOf(levels).energyMax).toBe(168)
-    expect(statsOf(levels, retuned).energyMax).toBe(180)
+    expect(statsOf(levels).energyMax).toBe(2617)
+    expect(statsOf(levels, retuned).energyMax).toBe(35606)
   })
 })
 

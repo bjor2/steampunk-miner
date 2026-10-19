@@ -7,8 +7,9 @@ import { planetParamsFor } from '../world/planetParams'
 import { surfaceRowOfColumn } from '../world/tileGrid'
 import { cutStepMmOf } from './cutSpeed'
 import {
-  doesDrillSetTravel,
+  engineParityRatioOf,
   hardestBandRockHardnessOf,
+  isNextEngineStepWorthZero,
   travelEngineOf,
   travelSpeedOf,
   travelStepThrough,
@@ -55,22 +56,25 @@ describe('travel parity (ticket 333)', () => {
     expect(travelStepThrough(drill, blockHardness(40, 5))).toBe(0)
   })
 
+  /** Engine purchases 5 and 13: the first at or past the old stored 50 and 400 (ticket 553). */
+  const ENGINES = [0, 5, 13]
+
   it('stays the engine top speed exactly while k times the cut is under it', () => {
-    for (const engine of [0, 50, 400]) {
+    for (const engine of ENGINES) {
       const rig = rigWith({ engine })
       expect(travelSpeedOf(rig, PARAMS)).toBe(vehicleStatsAt(rig.levels).engine.speedMax)
       expect(travelEngineOf(rig, PARAMS)).toEqual(vehicleStatsAt(rig.levels).engine)
-      expect(doesDrillSetTravel(rig, PARAMS)).toBe(false)
+      expect(isNextEngineStepWorthZero(rig, PARAMS)).toBe(false)
     }
   })
 
-  // Ticket 397: with no tile floor a one-sub-step cut is 3600 m/s, so k times it passes every engine.
-  it('lets a one-sub-step drill set travel at k times its cut, past every engine top speed', () => {
+  // Ticket 397: with no tile floor a one-sub-step cut is 3600 m/s, so k times it passes these engines.
+  it('lets a one-sub-step drill set travel at k times its cut, past these engines', () => {
     const drillSpeed = (Math.floor(cutStepMmOf(1) * 1.5) * 60) / 1000
-    for (const engine of [0, 50, 400]) {
+    for (const engine of ENGINES) {
       const rig = rigWith({ ...ONE_SUB_STEP, engine })
       expect(travelSpeedOf(rig, PARAMS)).toBe(drillSpeed)
-      expect(doesDrillSetTravel(rig, PARAMS)).toBe(true)
+      expect(isNextEngineStepWorthZero(rig, PARAMS)).toBe(true)
     }
   })
 
@@ -89,19 +93,19 @@ describe('travel parity past the engine (ticket 333, no tile floor since #397)',
     const drillSpeed = (travelStepThrough(drill, blockHardness(1, 1)) * 60) / 1000
     expect(travelSpeedOf(rig, PARAMS)).toBe(drillSpeed)
     expect(drillSpeed).toBeGreaterThan(drill.engine.speedMax)
-    expect(doesDrillSetTravel(rig, PARAMS)).toBe(true)
     expect(travelEngineOf(rig, PARAMS).accel).toBe(drill.engine.accel)
   })
 
+  // Engine purchase 13 (11.3 m/s) is the first at or past the old stored 400's 10.9 m/s (ticket 553).
   it('never lets travel fall under the engine where the drill is slow', () => {
-    const rig = rigWith({ engine: 400 })
+    const rig = rigWith({ engine: 13 })
     const speedMax = vehicleStatsAt(rig.levels).engine.speedMax
     expect(travelSpeedOf(rig, PARAMS)).toBe(speedMax)
-    expect(doesDrillSetTravel(rig, PARAMS)).toBe(false)
+    expect(isNextEngineStepWorthZero(rig, PARAMS)).toBe(false)
   })
 })
 
-describe('engine card judged in the hardest band (#418, GD option a)', () => {
+describe('engine card judged in the hardest band (#418, GD option a; ticket 553)', () => {
   it('takes the hardest rock of bands 1 to 5 from the table', () => {
     const hardnesses = [1, 2, 3, 4, 5].map((band) => blockHardness(1, band))
     const hardest = hardestBandRockHardnessOf(PARAMS)
@@ -109,30 +113,56 @@ describe('engine card judged in the hardest band (#418, GD option a)', () => {
     expect(hardnesses.some((hardness) => cmp(hardness, hardest) === 0)).toBe(true)
   })
 
-  it('reads not maxed while k times the cut passes the top speed in band 1 but not the hardest band', () => {
+  it('counts the next purchase while k times the cut passes the top speed in band 1 but not the hardest band', () => {
     const rig = rigWith(BAND_ONE_DRILL)
     expect(travelSpeedOf(rig, PARAMS)).toBeGreaterThan(vehicleStatsAt(rig.levels).engine.speedMax)
-    expect(doesDrillSetTravel(rig, PARAMS)).toBe(false)
+    expect(isNextEngineStepWorthZero(rig, PARAMS)).toBe(false)
   })
 
-  it('reads maxed once the drill passes the top speed in every band', () => {
-    const drill = vehicleStatsAt(rigWith(ONE_SUB_STEP).levels)
+  it('reads the next purchase worth zero once the drill outruns its top speed in every band', () => {
+    const rig = rigWith(ONE_SUB_STEP)
+    const drill = vehicleStatsAt(rig.levels)
     const hardestSpeed = (travelStepThrough(drill, hardestBandRockHardnessOf(PARAMS)) * 60) / 1000
-    expect(hardestSpeed).toBeGreaterThanOrEqual(drill.engine.speedMax)
-    expect(doesDrillSetTravel(rigWith(ONE_SUB_STEP), PARAMS)).toBe(true)
+    expect(hardestSpeed).toBeGreaterThanOrEqual(
+      vehicleStatsAt({ ...rig.levels, engine: 1 }).engine.speedMax,
+    )
+    expect(isNextEngineStepWorthZero(rig, PARAMS)).toBe(true)
+  })
+
+  it('counts the purchase that carries the top speed past the drill, as it buys travel', () => {
+    const rig = rigWith(ONE_SUB_STEP)
+    const drill = vehicleStatsAt(rig.levels)
+    const hardestSpeed = (travelStepThrough(drill, hardestBandRockHardnessOf(PARAMS)) * 60) / 1000
+    let engine = 0
+    while (vehicleStatsAt({ ...rig.levels, engine: engine + 1 }).engine.speedMax <= hardestSpeed) {
+      engine++
+    }
+    expect(
+      isNextEngineStepWorthZero(rigWith({ ...ONE_SUB_STEP, engine: engine - 1 }), PARAMS),
+    ).toBe(true)
+    expect(isNextEngineStepWorthZero(rigWith({ ...ONE_SUB_STEP, engine }), PARAMS)).toBe(false)
+  })
+
+  it('gives the ratio of the top speed to k times the cut in the hardest band', () => {
+    const rig = rigWith(ONE_SUB_STEP)
+    const drill = vehicleStatsAt(rig.levels)
+    const hardestSpeed = (travelStepThrough(drill, hardestBandRockHardnessOf(PARAMS)) * 60) / 1000
+    expect(engineParityRatioOf(rig, PARAMS)).toBe(drill.engine.speedMax / hardestSpeed)
+    expect(engineParityRatioOf(rig, PARAMS)).toBeLessThan(1)
   })
 
   it('reads the same at the dock, mid-shaft and with no pose', () => {
     for (const levels of [BAND_ONE_DRILL, ONE_SUB_STEP]) {
       const rig = rigWith(levels)
       const readings = [0, Math.floor(PARAMS.radiusTiles / 2), null].map((depth) =>
-        doesDrillSetTravel(rigPosedAt(rig, depth), PARAMS),
+        isNextEngineStepWorthZero(rigPosedAt(rig, depth), PARAMS),
       )
       expect(new Set(readings).size).toBe(1)
     }
   })
 
-  it('never reads maxed off a planet', () => {
-    expect(doesDrillSetTravel(rigWith(ONE_SUB_STEP), null)).toBe(false)
+  it('never reads worth zero, and gives no ratio, off a planet', () => {
+    expect(isNextEngineStepWorthZero(rigWith(ONE_SUB_STEP), null)).toBe(false)
+    expect(engineParityRatioOf(rigWith(ONE_SUB_STEP), null)).toBeNull()
   })
 })

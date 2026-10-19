@@ -78,17 +78,20 @@ describe('upgrade steps: the two-tier structure', () => {
     expect(majorsOfSteps(stepsOfMajors(majors))).toEqual(majors)
   })
 
-  it('counts drill power in purchases, its level its stored step, and every other track in majors (#552)', () => {
-    expect(UPGRADE_IDS.filter(isPerPurchaseTrack)).toEqual(['drill_power'])
+  it('counts drill power, the engine, the boiler and the hold in purchases and the tip and hull in majors (#552, 553)', () => {
+    expect(UPGRADE_IDS.filter(isPerPurchaseTrack)).toEqual([
+      'drill_power',
+      'engine',
+      'boiler',
+      'cargo_hold',
+    ])
     expect([levelOfStep('drill_power', 137), stepOfLevel('drill_power', 13)]).toEqual([137, 13])
     expect([levelOfStep('hull', 137), stepOfLevel('hull', 13)]).toEqual([13, 130])
   })
 
-  it('puts the next drill power level one purchase away and a major track at its next major', () => {
-    expect([stepsToNextLevel('drill_power', 137), stepsToNextLevel('drill_power', 140)]).toEqual([
-      1, 1,
-    ])
-    expect([stepsToNextLevel('engine', 137), stepsToNextLevel('engine', 140)]).toEqual([3, 10])
+  it('puts the next level of a per-purchase track one purchase away and a major track at its next major', () => {
+    expect([stepsToNextLevel('drill_power', 137), stepsToNextLevel('engine', 140)]).toEqual([1, 1])
+    expect([stepsToNextLevel('hull', 137), stepsToNextLevel('hull', 140)]).toEqual([3, 10])
   })
 })
 
@@ -153,11 +156,11 @@ describe('upgrade steps: chain pricing', () => {
     )
     expect(pinned).toMatchInlineSnapshot(`
       {
-        "boiler": "3e+0 2e+0 2e+0 2e+0 2e+0 3e+0 2e+0 3e+0 2e+0 2e+0 3e+0 3e+0 2e+0 3e+0 3e+0 3e+0 3e+0 3e+0 3e+0 3e+0 4e+0 3e+0 3e+0 3e+0 4e+0 3e+0 4e+0 4e+0 3e+0 4e+0",
-        "cargo_hold": "3e+0 2e+0 2e+0 3e+0 2e+0 2e+0 3e+0 2e+0 3e+0 2e+0 3e+0 3e+0 3e+0 3e+0 2e+0 3e+0 3e+0 4e+0 3e+0 3e+0 4e+0 3e+0 4e+0 3e+0 4e+0 3e+0 4e+0 4e+0 4e+0 4e+0",
+        "boiler": "3e+0 3e+0 4e+0 5e+0 5e+0 6e+0 8e+0 9e+0 1.1e+1 1.3e+1 1.5e+1 1.8e+1 2.2e+1 2.6e+1 3.1e+1 3.7e+1 4.5e+1 5.4e+1 6.4e+1 7.7e+1 9.3e+1 1.11e+2 1.33e+2 1.59e+2 1.91e+2 2.29e+2 2.75e+2 3.3e+2 3.96e+2 4.75e+2",
+        "cargo_hold": "3e+0 3e+0 4e+0 5e+0 5e+0 6e+0 8e+0 9e+0 1.1e+1 1.3e+1 1.5e+1 1.8e+1 2.2e+1 2.6e+1 3.1e+1 3.7e+1 4.5e+1 5.4e+1 6.4e+1 7.7e+1 9.3e+1 1.11e+2 1.33e+2 1.59e+2 1.91e+2 2.29e+2 2.75e+2 3.3e+2 3.96e+2 4.75e+2",
         "drill_power": "1e+0 2e+1 3e+1 4.4e+1 6.5e+1 9.6e+1 1.43e+2 2.11e+2 3.12e+2 4.61e+2 6.82e+2 1.009e+3 1.493e+3 2.209e+3 3.27e+3 4.839e+3 7.161e+3 1.0598e+4 1.5685e+4 2.3214e+4 3.4356e+4 5.0847e+4 7.5254e+4 1.11376e+5 1.64836e+5 2.43956e+5 3.61055e+5 5.34361e+5 7.90854e+5 1.170464e+6",
         "drill_tip": "7e+0 8e+0 7e+0 8e+0 8e+0 8e+0 9e+0 9e+0 1e+1 9e+0 1.1e+1 1.1e+1 1.1e+1 1.1e+1 1.2e+1 1.3e+1 1.3e+1 1.4e+1 1.4e+1 1.5e+1 1.6e+1 1.6e+1 1.7e+1 1.7e+1 1.9e+1 1.8e+1 2e+1 2.1e+1 2.1e+1 2.2e+1",
-        "engine": "4e+0 3e+0 4e+0 3e+0 4e+0 3e+0 4e+0 4e+0 4e+0 3e+0 5e+0 4e+0 4e+0 4e+0 4e+0 5e+0 4e+0 5e+0 5e+0 5e+0 5e+0 5e+0 6e+0 5e+0 5e+0 6e+0 5e+0 6e+0 6e+0 6e+0",
+        "engine": "4e+0 6e+0 1e+1 1.5e+1 2.4e+1 3.8e+1 6.1e+1 9.7e+1 1.55e+2 2.48e+2 3.96e+2 6.34e+2 1.014e+3 1.622e+3 2.595e+3 4.151e+3 6.641e+3 1.0626e+4 1.7001e+4 2.7201e+4 4.3522e+4 6.9635e+4 1.11415e+5 1.78264e+5 2.85222e+5 4.56355e+5 7.30167e+5 1.168267e+6 1.869227e+6 2.990763e+6",
         "hull": "5e+0 4e+0 4e+0 5e+0 4e+0 5e+0 5e+0 5e+0 4e+0 5e+0 6e+0 5e+0 5e+0 6e+0 5e+0 6e+0 6e+0 6e+0 6e+0 6e+0 7e+0 6e+0 7e+0 6e+0 7e+0 7e+0 7e+0 8e+0 7e+0 8e+0",
       }
     `)
@@ -171,9 +174,11 @@ describe('upgrade steps: stats', () => {
       expect(drillPowerAtStep(level)).toEqual(drillPower(level))
       expect(drillTipAtStep(step)).toEqual(drillTip(level))
       expect(hullMaxAtStep(step)).toEqual(hullMax(level))
-      expect(energyMaxAtStep(step)).toBe(energyMax(level))
-      expect(cargoCapacityAtStep(step)).toBe(cargoCapacity(level))
-      expect(engineStatsAtStep(step)).toEqual(engineStats(level))
+    }
+    for (const level of LEVELS_0_TO_20) {
+      expect(energyMaxAtStep(level)).toBe(energyMax(level))
+      expect(cargoCapacityAtStep(level)).toBe(cargoCapacity(level))
+      expect(engineStatsAtStep(level)).toEqual(engineStats(level))
     }
   })
 
@@ -195,24 +200,22 @@ describe('upgrade steps: stats', () => {
     expect(toCanonical(jump).slice(0, 5)).toBe('1.200')
   })
 
-  it('adds a cargo unit on pips 3 and 7 and two on the big level-up', () => {
-    const capacities = Array.from({ length: 11 }, (_, pip) => cargoCapacityAtStep(80 + pip))
-    expect(capacities).toEqual([42, 42, 42, 43, 43, 43, 43, 44, 44, 44, 46])
+  it('adds about 10% to the hold and the tank on every purchase (ticket 553)', () => {
+    const capacities = Array.from({ length: 6 }, (_, purchase) =>
+      cargoCapacityAtStep(20 + purchase),
+    )
+    const energies = Array.from({ length: 6 }, (_, purchase) => energyMaxAtStep(20 + purchase))
+    expect(capacities).toEqual([67, 74, 81, 90, 98, 108])
+    expect(energies).toEqual([1009, 1110, 1221, 1343, 1477, 1625])
   })
 
-  it('adds boiler energy on pips 2, 5 and 8 and three on the big level-up', () => {
-    const energies = Array.from({ length: 11 }, (_, pip) => energyMaxAtStep(40 + pip))
-    expect(energies).toEqual([174, 174, 175, 175, 175, 176, 176, 176, 177, 177, 180])
-  })
-
-  it('raises every engine stat a little on every pip, below its maximum', () => {
-    for (let step = 0; step < 400; step++) {
+  it('raises every engine stat on every purchase, with no maximum (ticket 553)', () => {
+    for (let step = 0; step < 200; step++) {
       const before = engineStatsAtStep(step)
       const after = engineStatsAtStep(step + 1)
       expect(after.speedMax).toBeGreaterThan(before.speedMax)
       expect(after.accel).toBeGreaterThan(before.accel)
       expect(after.thrustToWeight).toBeGreaterThan(before.thrustToWeight)
-      expect(after.speedMax).toBeLessThan(14)
     }
   })
 

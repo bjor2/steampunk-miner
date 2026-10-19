@@ -5,25 +5,36 @@
  * that is `x = L + k/18`. At a major (k = 0) each kind computes exactly today's level `L`.
  *
  *   geometric  start * g^x, as `start * g^L * (g^(1/q))^(p*k)` with `p/q = s / (n - 1)`
- *   linear     start + step * L + round half up(step * k * p/q), in integers only, so cargo and
- *              boiler stay whole numbers that no pip rounding of a geometric value ever made
- *   saturating min + (max - min) * x / (x + halfLevel), x as a fraction in lowest terms
+ *   saturating min + (max - min) * x / (x + halfLevel), x as a fraction in lowest terms (the guns)
  *
- * A `perPurchase` track (drill power since the GD ruling on #551, ticket 552) skips the pip rule:
- * every stored step is one purchase of its own ratio.
+ * A per-purchase track (drill power since the GD ruling on #551, ticket 552; the hold, the boiler
+ * and the engine since ticket 553, Systems' rows on #553) skips the pip rule: every stored step is
+ * one purchase of its own ratio.
  */
-import { mul, nthRoot, toCanonical, type BigStat } from '../money'
-import { compoundRatio, growGeometric, growLinear, saturate } from './curveFamilies'
+import {
+  add,
+  fromSafeInteger,
+  mul,
+  nthRoot,
+  roundToWhole,
+  toCanonical,
+  toMillionthsNumber,
+  toSafeInteger,
+  type BigStat,
+} from '../money'
+import { compoundRatio, growGeometric, saturate } from './curveFamilies'
 import { ECONOMY } from './economy'
 import type {
   BoundedRange,
+  EnginePerPurchaseEffect,
   GeometricEffect,
-  LinearEffect,
   PerPurchaseEffect,
   RatioRoot,
+  WholePerPurchaseEffect,
 } from './economyDefinition'
+import type { EngineStats } from './vehicleStats'
 import { majorOf, minorsPerMajor, pipOf } from './upgradeSteps'
-import { lowestTerms, roundHalfUp, type WholeFraction } from '../wholeFractions'
+import { lowestTerms, type WholeFraction } from '../wholeFractions'
 
 export function geometricAtStep(effect: GeometricEffect, step: number): BigStat {
   const { numerator } = pipExponent()
@@ -38,10 +49,30 @@ export function perPurchaseAtStep(effect: PerPurchaseEffect, step: number): BigS
   return mul(afterFirst, rootOf(effect.firstGain))
 }
 
-export function linearAtStep(effect: LinearEffect, step: number): number {
-  const { numerator, denominator } = pipExponent()
-  const pipGain = roundHalfUp(effect.step * numerator * pipOf(step), denominator)
-  return growLinear(effect.start, effect.step, majorOf(step)) + pipGain
+/**
+ * `round(start * ratio^n)` after `n` purchases, ties to even: the hold's units and the boiler's
+ * tank (ticket 553). A plain number past which it throws rather than round: the tank's quanta
+ * (240 a unit) stay safe integers to purchase 275 (Systems' range on #553).
+ */
+export function wholePerPurchaseAtStep(effect: WholePerPurchaseEffect, step: number): number {
+  return toSafeInteger(roundToWhole(growGeometric(effect.start, effect.ratio, step)))
+}
+
+/**
+ * The engine after `e` purchases (ticket 553): every stat times `ratio^e`, worked out in decimals
+ * and handed on as a bounded number for the physics step (#5 rule 5), with net lift on top of 1.
+ */
+export function enginePerPurchaseAtStep(
+  effect: EnginePerPurchaseEffect,
+  step: number,
+): EngineStats {
+  const growth = compoundRatio(effect.ratio, step)
+  const { speedMax, accel, netLift } = effect.start
+  return {
+    speedMax: toMillionthsNumber(mul(speedMax, growth)),
+    accel: toMillionthsNumber(mul(accel, growth)),
+    thrustToWeight: toMillionthsNumber(add(fromSafeInteger(1), mul(netLift, growth))),
+  }
 }
 
 /** `range` at the effective level of step `step`, `levelsBefore` majors not counted. */

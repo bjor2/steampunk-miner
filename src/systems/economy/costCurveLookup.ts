@@ -6,7 +6,7 @@ import type {
   BandOreCostCurve,
   CostCurve,
   GeometricCostCurve,
-  PerPurchaseCostCurve,
+  PurchaseCostCurve,
 } from './economyDefinition'
 
 export function geometricCurveOf(curveId: string): GeometricCostCurve {
@@ -20,16 +20,23 @@ export function geometricWorthAt(curve: GeometricCostCurve, level: number): Mone
   return growGeometric(curve.base, curve.ratio, level)
 }
 
-export function perPurchaseCurveOf(curveId: string): PerPurchaseCostCurve {
+export function perPurchaseCurveOf(curveId: string): PurchaseCostCurve {
   const curve = curveOf(curveId)
-  if (curve.family !== 'perPurchase') {
-    throw new RangeError(`cost curve ${curveId} is not perPurchase`)
+  if (curve.family !== 'perPurchase' && curve.family !== 'geometricPerPurchase') {
+    throw new RangeError(`cost curve ${curveId} is not priced per purchase`)
   }
   return curve
 }
 
-/** `firstPrice` at purchase 0, else `ceil(base * ratio^(purchase - 1))` (#551, ticket 552). */
-export function perPurchaseRowAt(curve: PerPurchaseCostCurve, purchase: number): Money {
+/**
+ * The price of purchase `purchase` before `paceScale`: drill power's `firstPrice` at 0, else
+ * `ceil(base * ratio^(purchase - 1))` (#551, ticket 552); the hold's and the engine's
+ * `ceil(base * ratio^purchase)` from the first one (Systems' Proposal 1, ticket 553).
+ */
+export function perPurchaseRowAt(curve: PurchaseCostCurve, purchase: number): Money {
+  if (curve.family === 'geometricPerPurchase') {
+    return ceil(growGeometric(curve.base, curve.ratio, purchase))
+  }
   if (purchase === 0) return curve.firstPrice
   return ceil(growGeometric(curve.base, curve.ratio, purchase - 1))
 }

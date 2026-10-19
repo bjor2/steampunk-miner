@@ -3,7 +3,15 @@ import { add, cmp, div, fromCanonical, isMoney, mul, sub, type Money } from '../
 import { BAND_START_DEPTH_PERCENT } from '../world/planetTable'
 import { ECONOMY } from './economy'
 import { enemyStatsRow, onCurveVehicleRow, planetEconomyRow, planetPriceRow } from './economyTables'
-import { drillPower, engineStats, rescueEnergyFloor } from './vehicleStats'
+import {
+  drillPower,
+  drillPowerAtStep,
+  drillTipAtStep,
+  engineStats,
+  hullMaxAtStep,
+  onCurveSteps,
+  rescueEnergyFloor,
+} from './vehicleStats'
 
 const m = fromCanonical
 const PLANETS = [...Array.from({ length: 40 }, (_, index) => index + 1), 1000, 1_000_000]
@@ -14,12 +22,26 @@ function agreesTo35Digits(actual: Money, expected: Money): boolean {
   return cmp(sub(actual, expected), tolerance) <= 0 && cmp(sub(expected, actual), tolerance) <= 0
 }
 
+/**
+ * The on-curve BigStats: the tank, the hold and the engine are plain numbers bought per purchase
+ * since ticket 553, safe only to a few hundred purchases (Systems' range on #553), so the
+ * vehicle row of planet 1000 is out of their range and only the BigStats are read there.
+ */
+function onCurveBigStatsOf(planetIndex: number): Record<string, Money> {
+  const steps = onCurveSteps(planetIndex)
+  return {
+    drillPower: drillPowerAtStep(steps.drill_power),
+    drillTip: drillTipAtStep(steps.drill_tip),
+    hullMax: hullMaxAtStep(steps.hull),
+  }
+}
+
 /** Every Money/BigStat a planet's rows hold that must grow with the planet, by name. */
 function growingAmountsOf(planetIndex: number): Map<string, Money> {
   const enemy = enemyStatsRow('crawler', planetIndex)
   const columns = {
     ...planetEconomyRow(planetIndex),
-    ...onCurveVehicleRow(planetIndex).stats,
+    ...onCurveBigStatsOf(planetIndex),
     ...planetPriceRow(planetIndex),
     healthByBand: enemy.healthByBand,
     baseHitByBand: enemy.baseHitByBand,

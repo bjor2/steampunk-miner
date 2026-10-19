@@ -3,19 +3,19 @@
  * stored step and its major and pip as text (#180), the next step's cost (`stepPrice`, the same
  * value `upgrade_purchased.cost` logs) and an effect preview "before -> after" from
  * `vehicleStatsAt` at this step and the next (the same function as `upgrade_purchased.statsAfter`). `drill_tip` also says to which band of this planet
- * it drills at full speed (`P >= H`, #7). The engine reads maxed, the drill setting travel, once
- * k times the drill's cut speed in the planet's hardest band reaches its top speed (GD lock on
- * #316 scope 0, ticket 333; hardest band per #418): the authority then refuses its step, so the
- * row offers no buy.
+ * it drills at full speed (`P >= H`, #7). The engine has no max level (ticket 553): its row shows
+ * the ratio of its top speed to k times the drill's cut speed in the planet's hardest band
+ * (#418's band), and says plainly when the next purchase is worth zero there, as it is still sold.
  */
 import type { AuthorityState } from '../authority/authorityState'
-import { isTravelSetByDrill } from '../authority/travelSpeed'
+import { engineParityRatioAt, isEngineStepWorthZero } from '../authority/travelSpeed'
 import { nextUpgradePrice } from '../authority/workshopRules'
 import { trackIconIdOf } from '../art/artIds'
 import { blockHardness } from '../economy/oreEconomy'
 import { UPGRADE_IDS, type UpgradeId } from '../economy/economyDefinition'
 import { vehicleStatsAt, type UpgradeLevels } from '../economy/vehicleStats'
-import { cmp } from '../money'
+import { cmp, toFixedText } from '../money'
+import { ECONOMY } from '../economy/economy'
 import { buyUpgradeCommand } from '../platform/platformCommands'
 import { CLICK_CHAIN } from '../authority/purchaseChain'
 import { canonicalStatsOf } from '../vehicle/vehicleStatsView'
@@ -62,7 +62,7 @@ export interface WorkshopRow {
   label: string
   /** The stored step, `10L + k`. */
   level: number
-  /** "13" at a major, "13 · 4/9" on its pips; the engine says when the drill sets travel. */
+  /** "13" at a major, "13 · 4/9" on its pips; the engine adds its parity ratio (ticket 553). */
   levelText: string
   cost: AmountReading
   effectBefore: StatPreview
@@ -86,8 +86,34 @@ const TRACK_LABELS: Readonly<Record<UpgradeId, string>> = {
   hull: 'Hull',
 }
 
-/** What the engine row says once the drill sets travel (GD lock on #316 scope 0). */
-export const ENGINE_MAXED_TEXT = 'maxed, drill sets travel'
+/**
+ * What the engine row says while its next purchase is worth zero (HS on #551, ticket 553): the
+ * step is sold, never hidden or refused, so the card says why it buys nothing yet.
+ */
+export function engineWorthZeroText(): string {
+  return (
+    "worth zero: No extra speed until your drill's cut speed is within reach of the engine's " +
+    `top speed (needs the engine above ${parityKText()}× the drill's cut speed). Raises your top ` +
+    'speed once it is.'
+  )
+}
+
+/** "top speed 0.62× of 1.5× cut": `speedMax / (k * cutSpeed)` in the hardest band. */
+export function engineParityText(ratio: number): string {
+  return `top speed ${ratioText(ratio)}× of ${parityKText()}× cut`
+}
+
+/** Two decimals, and "<0.01" under them, so a far-outrun engine never reads a flat 0. */
+function ratioText(ratio: number): string {
+  return ratio < SMALLEST_SHOWN_RATIO ? `<${SMALLEST_SHOWN_RATIO}` : ratio.toFixed(2)
+}
+
+const SMALLEST_SHOWN_RATIO = 0.01
+
+/** k as plain decimals, "1.5", with no trailing zeros. */
+function parityKText(): string {
+  return toFixedText(ECONOMY.drill.travelParityK, 2).replace(/\.?0+$/, '')
+}
 
 const STATS_OF_TRACK: Readonly<Record<UpgradeId, readonly string[]>> = {
   drill_power: ['drillPower'],
@@ -141,7 +167,7 @@ function workshopRowOf(
     effectAfter: previewOf(next, upgradeId),
     buy,
     buyState: buyStateOf(buy),
-    badge: isEngineMaxed(state, playerId, upgradeId) ? 'maxed' : null,
+    badge: null,
     isBuyOpen: isBuyOpen(buy),
     fullSpeedBand: upgradeId === 'drill_tip' ? fullSpeedBandOf(state.planet.index, levels) : null,
     card: itemCardOf(state, playerId, {
@@ -156,11 +182,6 @@ function workshopRowOf(
   }
 }
 
-/** The engine track is maxed while the drill sets travel speed (ticket 333). */
-function isEngineMaxed(state: AuthorityState, playerId: string, upgradeId: UpgradeId): boolean {
-  return upgradeId === 'engine' && isTravelSetByDrill(state, playerId)
-}
-
 function levelTextOf(
   state: AuthorityState,
   playerId: string,
@@ -168,7 +189,15 @@ function levelTextOf(
   upgradeId: UpgradeId,
 ): string {
   const text = stepLevelText(levels[upgradeId])
-  return isEngineMaxed(state, playerId, upgradeId) ? `${text} · ${ENGINE_MAXED_TEXT}` : text
+  return upgradeId === 'engine' ? withEngineParity(state, playerId, text) : text
+}
+
+/** The step text, the parity ratio where the drill cuts the hardest band, and a worth-zero step. */
+function withEngineParity(state: AuthorityState, playerId: string, text: string): string {
+  const ratio = engineParityRatioAt(state, playerId)
+  const parts = ratio === null ? [text] : [text, engineParityText(ratio)]
+  if (isEngineStepWorthZero(state, playerId)) parts.push(engineWorthZeroText())
+  return parts.join(' · ')
 }
 
 function previewOf(levels: UpgradeLevels, upgradeId: UpgradeId): StatPreview {

@@ -4,7 +4,12 @@
  * the drill sets travel (`vehicle/travelParity.ts`).
  */
 import type { EngineStats } from '../economy/vehicleStats'
-import { doesDrillSetTravel, travelEngineOf, travelSpeedOf } from '../vehicle/travelParity'
+import {
+  engineParityRatioOf,
+  isNextEngineStepWorthZero,
+  travelEngineOf,
+  travelSpeedOf,
+} from '../vehicle/travelParity'
 import { vehicleOf, type AuthorityState } from './authorityState'
 import { planetParamsOf } from './planetOfState'
 
@@ -18,7 +23,12 @@ export function travelEngineAt(state: AuthorityState, playerId: string): EngineS
   return travelEngineOf(vehicleOf(state, playerId), planetParamsOf(state.planet))
 }
 
-/** Whether the drill sets travel in every band of the planet: the engine track then reads maxed. */
-export function isTravelSetByDrill(state: AuthorityState, playerId: string): boolean {
-  return doesDrillSetTravel(vehicleOf(state, playerId), planetParamsOf(state.planet))
+/** Whether the player's next engine purchase buys no travel speed in any band (ticket 553). */
+export function isEngineStepWorthZero(state: AuthorityState, playerId: string): boolean {
+  return isNextEngineStepWorthZero(vehicleOf(state, playerId), planetParamsOf(state.planet))
+}
+
+/** `speedMax / (k * cutSpeed)` of the player's rig in the planet's hardest band, for the card. */
+export function engineParityRatioAt(state: AuthorityState, playerId: string): number | null {
+  return engineParityRatioOf(vehicleOf(state, playerId), planetParamsOf(state.planet))
 }

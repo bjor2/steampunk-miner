@@ -373,8 +373,17 @@ import type { DriveSigns } from '../vehicle/driveSigns'
  *    1 at `n = 0`, with no pip rule and no major split. Steps 0 and 1 keep their stat; every run
  *    that holds a drill past stored step 1 or buys one past the first cuts, heats, charges and
  *    pays differently, so its digests move.
+ * 92: the hold, the boiler and the engine grow and are priced per purchase, and no track has a
+ *    max level (ticket 553, Systems' rows on #553 with the HS and VS directions): the hold holds
+ *    `round(10 x 1.10^c)` units for `ceil(2.4 x 1.20^c) x paceScale`, the boiler's tank is
+ *    `round(150 x 1.10^b)` for `ceil(2.4 x 1.20^b) x paceScale`, the engine runs `6 x 1.05^e` m/s
+ *    with accel `1.05^e` and thrust to weight `1 + 1.05^e` for `ceil(3.6 x 1.60^e) x paceScale`,
+ *    and `buyUpgrade('engine')` is never refused `max_level`. `paceScale` is 1.2 from planet 2,
+ *    1.3 from 4, 1.6 from 6 and 1.7 from 8, with no planet 11 reset. Step 0 of every track keeps
+ *    its stat; a run that buys anything past planet 1, or holds a hold, boiler or engine past step
+ *    0, pays and moves differently, so its digests move.
  */
-export const AUTHORITY_PROTOCOL_VERSION = 91
+export const AUTHORITY_PROTOCOL_VERSION = 92
 
 /** The kernel's own commands: the closed set its rule tables are written against. */
 export interface KernelCommandPayloads {

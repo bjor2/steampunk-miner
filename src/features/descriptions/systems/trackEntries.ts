@@ -2,11 +2,10 @@
  * The six upgrade tracks' card entries (#164 side table; #159 example lines 1-3 for the tip,
  * boiler and cargo flavour). Each stat line reads the kernel's own stat function (#7,
  * `vehicleStats.ts`) at the stored step, the next step and the next major (#181), its kind from
- * `trackKindOf`. The engine's three lines saturate, so they show the cap from the engine's range in
- * `economy.json`. The last line is the step as the bay prints it, "13 · 4/9".
+ * `trackKindOf`. The engine's three lines grow per purchase with no cap since ticket 553 (Systems'
+ * Proposal 1 on #551), so they show none. The last line is the step as the bay prints it, "13 · 4/9".
  */
-import { ECONOMY } from '../../../systems/economy/economy'
-import type { BoundedRange, UpgradeId } from '../../../systems/economy/economyDefinition'
+import type { UpgradeId } from '../../../systems/economy/economyDefinition'
 import { trackKindOf } from '../../../systems/economy/trackKind'
 import {
   cargoCapacityAtStep,
@@ -66,14 +65,5 @@ function trackLine(
 }
 
 function engineLine(stat: EngineStat, label: string): DescribedStatLineSpec {
-  return {
-    ...trackLine('engine', label, (step) => engineStatsAtStep(step)[stat]),
-    cap: () => engineRangeOf(stat).max,
-  }
-}
-
-function engineRangeOf(stat: EngineStat): BoundedRange {
-  const effect = ECONOMY.upgrades.find((upgrade) => upgrade.id === 'engine')?.effect
-  if (effect?.family !== 'saturating') throw new RangeError('the engine track saturates (#7)')
-  return effect.stats[stat]
+  return trackLine('engine', label, (step) => engineStatsAtStep(step)[stat])
 }

@@ -12,8 +12,9 @@
  * running totals would lose low digits (TD, #181). `up` is `ceil` for the brass and drill tracks
  * and `ceilMilli` for the guns, whose prices are in the money quantum.
  *
- * A `perPurchase` track (drill power, the GD ruling on #551 for ticket 552) has no majors in its
- * law or its price: its level is the stored step, one purchase each. Its step still splits into
+ * A per-purchase track (drill power, the GD ruling on #551 for ticket 552; the hold and the engine,
+ * Systems' Proposal 1 for ticket 553) has no majors in its law or its price: its level is the
+ * stored step, one purchase each. Its step still splits into
  * `L` and `k` for the pips the workshop draws, which drill looks may retune (#554).
  */
 import {
@@ -29,7 +30,12 @@ import {
 } from '../money'
 import { compoundRatio } from './curveFamilies'
 import { ECONOMY } from './economy'
-import { UPGRADE_IDS, type UpgradeEffect, type UpgradeId } from './economyDefinition'
+import {
+  PER_PURCHASE_EFFECT_FAMILIES,
+  UPGRADE_IDS,
+  type UpgradeEffect,
+  type UpgradeId,
+} from './economyDefinition'
 
 /** Per track, the stored step; or per track, a major level (`levelsOfSteps`). */
 export type TrackNumbers = Readonly<Record<UpgradeId, number>>
@@ -56,9 +62,12 @@ export function stepOfMajor(level: number): number {
   return level * minorsPerMajor()
 }
 
-/** Whether a track grows and is priced per purchase, so its level is its stored step (#552). */
+/**
+ * Whether a track grows and is priced per purchase, so its level is its stored step: drill power
+ * (#552), the hold and the engine (ticket 553).
+ */
 export function isPerPurchaseTrack(upgradeId: UpgradeId): boolean {
-  return upgradeEffectFamilyOf(upgradeId) === 'perPurchase'
+  return PER_PURCHASE_EFFECT_FAMILIES.includes(upgradeEffectFamilyOf(upgradeId))
 }
 
 /** A track's level at stored step `step`: the purchases on a per-purchase track, else the major. */

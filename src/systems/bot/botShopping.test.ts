@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { createAuthorityState } from '../authority/authorityState'
 import { dockSiteOfPlanet } from '../authority/planetOfState'
-import { isTravelSetByDrill } from '../authority/travelSpeed'
+import { isEngineStepWorthZero } from '../authority/travelSpeed'
 import { UPGRADE_IDS } from '../economy/economyDefinition'
 import { stepOfMajor } from '../economy/upgradeSteps'
 import { onCurveLevel, onCurveStep, onCurveSteps } from '../economy/vehicleStats'
@@ -94,11 +94,12 @@ describe('bot: shopping at the Upgrade bay', () => {
     expect(stepsBought).toBeGreaterThan(stepOfMajor(1))
   })
 
-  it('sends no track buy the Upgrade bay refuses, the engine maxed by a drill that sets travel (ticket 396)', () => {
+  // Ticket 553: no max level, so a worth-zero engine purchase is sold; the bot plans no gain from it.
+  it('sends no track buy the Upgrade bay refuses with a drill that sets travel everywhere', () => {
     const session = botAtUpgradeBayOn(2)
     withDrillSettingTravelEverywhere(session)
     shopForTheCore(session)
-    expect(isTravelSetByDrill(session.state(), session.playerId)).toBe(true)
+    expect(isEngineStepWorthZero(session.state(), session.playerId)).toBe(true)
     expect(session.events().filter((event) => event.type === 'CommandRejected')).toEqual([])
   })
 
@@ -107,7 +108,7 @@ describe('bot: shopping at the Upgrade bay', () => {
   it('buys the engine at the dock while a step still speeds travel in the deeper bands (#418)', () => {
     const session = botArrivedOnCurveAt(ENGINE_STILL_SPEEDS_PLANET)
     shopForTheCore(session)
-    expect(isTravelSetByDrill(session.state(), session.playerId)).toBe(false)
+    expect(isEngineStepWorthZero(session.state(), session.playerId)).toBe(false)
     expect(session.vehicle().levels.engine).toBeGreaterThan(
       onCurveStep('engine', ENGINE_STILL_SPEEDS_PLANET),
     )
