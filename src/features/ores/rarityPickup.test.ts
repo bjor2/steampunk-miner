@@ -21,7 +21,6 @@ import {
   type SessionSnapshot,
 } from '../../systems/authority/sessionSnapshot'
 import { oreSalePrice, oreTier } from '../../systems/economy/oreEconomy'
-import { onCurveSteps } from '../../systems/economy/vehicleStats'
 import { add, cmp, fromCanonical, toCanonical, ZERO_MONEY } from '../../systems/money'
 import { setUpgradeCommand } from '../../systems/vehicle/vehicleCommands'
 import { FACING } from '../../systems/vehicle/vehiclePose'
@@ -33,6 +32,7 @@ import {
   CLAMPED_BANDS,
   clampedTilesOf,
   pickupFindAt,
+  RARITY_RUN_HOLD_STEP,
   RARITY_RUN_PLANET,
   stampedRunParamsOf,
 } from './rarityTripFixtures'
@@ -48,12 +48,12 @@ const SEED = 83921
 const PARAMS = stampedRunParamsOf(SEED)
 const [EPIC_TILE] = clampedTilesOf(PARAMS, 1, CLAMPED_BANDS)
 
-/** Planet 3 under the ore rules with the on-curve P3 hold (90 units). */
+/** Planet 3 under the ore rules with the 90-unit hold the trip-cap rows are pinned on. */
 function p3State(): AuthorityState {
   const session = continueScriptedSession(
     createAuthorityState({ planetIndex: RARITY_RUN_PLANET, planetSeed: SEED, playerIds: ['p1'] }),
   )
-  session.submit(0, setUpgradeCommand('cargo_hold', onCurveSteps(RARITY_RUN_PLANET).cargo_hold))
+  session.submit(0, setUpgradeCommand('cargo_hold', RARITY_RUN_HOLD_STEP))
   return session.state()
 }
 

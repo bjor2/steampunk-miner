@@ -31,6 +31,11 @@ import {
 } from './systems/rarityTripClamp'
 
 export const RARITY_RUN_PLANET = 3
+/**
+ * The run's hold: purchase 23 carries 90 units, the on-curve P3 hold the trip-cap rows were pinned
+ * on (`rarityTripClamp.test.ts`) before ticket 553 bought the hold per purchase (P3 on curve: 119).
+ */
+export const RARITY_RUN_HOLD_STEP = 23
 /** Band 5, Systems' binding case; of the pinned seeds only 27182's P3 band 5 holds an epic patch. */
 export const BAND_5_RUN = { seed: 27182, bands: [5] } as const
 /** Every band epic and mythic are live in on P3 (`firstBand` 3 and 4). */
@@ -100,7 +105,7 @@ function rarityRunSetUp(): ScriptedCommand[] {
     { tick: 0, ...FREEZE_ENEMIES },
     { tick: 0, ...setUpgradeCommand('drill_power', steps.drill_power) },
     { tick: 0, ...setUpgradeCommand('drill_tip', steps.drill_tip) },
-    { tick: 0, ...setUpgradeCommand('cargo_hold', onCurveSteps(RARITY_RUN_PLANET).cargo_hold) },
+    { tick: 0, ...setUpgradeCommand('cargo_hold', RARITY_RUN_HOLD_STEP) },
   ] as ScriptedCommand[]
 }
 

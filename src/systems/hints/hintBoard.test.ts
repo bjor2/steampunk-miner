@@ -223,17 +223,22 @@ describe('hint board: the Upgrade bay hint (#58)', () => {
   })
 
   it('counts the next casing grade: casing alone can fire it when every track costs more', () => {
-    const watched = watchedSession(EARLY_HINTS)
-    for (const upgradeId of [
-      'drill_power',
-      'drill_tip',
-      'engine',
-      'boiler',
-      'cargo_hold',
-      'hull',
-    ]) {
-      // Major 20: even one step of every track costs more than the casing grade's 48.
-      watched.submit(1, { type: 'debug.setUpgrade', payload: { upgradeId, level: 200 } })
+    // A boiler purchase dearer than 48 is a tank the starting energy fills under 25%, so setting
+    // it raises EnergyLow (ticket 553): the energy hint counts as seen, as the casing is the test.
+    const watched = watchedSession([...EARLY_HINTS, 'hint_energy'])
+    // Even one step of every track costs more than the casing grade's 48: major 20 of the tip and
+    // hull and drill purchase 200; per purchase since ticket 553, the hold and boiler's purchase
+    // 17 (54) and the engine's 6 (61).
+    const dearSteps = {
+      drill_power: 200,
+      drill_tip: 200,
+      hull: 200,
+      cargo_hold: 17,
+      boiler: 17,
+      engine: 6,
+    }
+    for (const [upgradeId, level] of Object.entries(dearSteps)) {
+      watched.submit(1, { type: 'debug.setUpgrade', payload: { upgradeId, level } })
     }
     watched.submit(5, grant('48'))
     watched.submit(10, dockCommand('sell'))

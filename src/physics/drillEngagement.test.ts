@@ -34,7 +34,8 @@ function randomRig(random: SeededRandom): AuthorityState {
     ...vehicle.levels,
     drill_power: random.nextInt(4000),
     drill_tip: random.nextInt(1200),
-    engine: random.nextInt(600),
+    // Per purchase since ticket 553: Systems tested the engine to purchase 200.
+    engine: random.nextInt(201),
   }
   const pose = { x: 500, y: ty * 1000 + 500, vx: 0, vy: 0, upx: 0, upy: 1024, facing: FACING.down }
   return withVehicle(state, 'p1', { ...vehicle, levels, pose })

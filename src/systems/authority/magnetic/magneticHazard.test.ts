@@ -304,7 +304,10 @@ describe('hazard:magnetic (spec #258, ticket 290)', () => {
       drives.forEach((drive) =>
         expect(drive.topSpeed).toBeLessThanOrEqual(engine.speedMax * 1.1 + SPEED_EPSILON),
       )
-      expect(drifts[0].distance).toBeCloseTo(drifts[1].distance, 1)
+      // Within 1% of the drift at both step rates: the 0.05 m this read before ticket 553 was 1.4%
+      // of the 3.5 m a 13 m/s engine drifted; the per-purchase on-curve engine drifts about 40 m.
+      const rateGap = Math.abs(drifts[0].distance - drifts[1].distance)
+      expect(rateGap).toBeLessThanOrEqual(Math.abs(drifts[1].distance) / 100)
     }
   })
 
