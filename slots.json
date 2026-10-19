@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-10-19T09:44:33+02:00",
+  "updated_at": "2026-10-19T09:45:54+02:00",
   "caps": {
     "grok": 12,
     "claude": 10,
@@ -460,19 +460,6 @@
     "mode": "on",
     "parallel": 1,
     "list": [
-      {
-        "number": 569,
-        "key": "316-5D",
-        "map": 316,
-        "lane": "remote",
-        "mode": "solo",
-        "state": "paused",
-        "tickets": [
-          548
-        ],
-        "done": [],
-        "live": 0
-      },
       {
         "number": 568,
         "key": "316-6B",
