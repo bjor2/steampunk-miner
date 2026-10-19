@@ -1,5 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { COLLAPSE_FILL_TICKS, COLLAPSE_WARN_TICKS } from '../../../constants/balance'
+import type { DomainEvent } from '../../authority/domainEvent'
+import { feedbackCuesOf } from '../../feedback/feedbackCues'
 import { blockContaining, blockIdOf } from '../../world/collapseBlock'
 import { createHazardStrip, sampleHazardStrip, type HazardStrip } from './hazardStripSampler'
 import {
@@ -21,6 +23,8 @@ import { gapStepsWithin } from './stripSegments'
 import { STRIP_TIER } from './stripTiers'
 
 const FRAME_SECONDS = 1 / 60
+/** Half a 4 m collapse block's diagonal, m: the line may meet the block this much sooner. */
+const BLOCK_HALF_DIAGONAL_M = 2.83
 /** A coarse pip sits at the start of its 8 m lattice block, a line's width before the hazard. */
 const COARSE_LEAD_M = 10
 
@@ -203,6 +207,32 @@ describe('hazard strip sampler', () => {
     // The block's centre is 20.5 m down the line; the line may meet its corner 2.8 m sooner.
     expect(kindsAt(0)).toEqual([['collapse', 17]])
     expect(kindsAt(COLLAPSE_WARN_TICKS + COLLAPSE_FILL_TICKS)).toEqual([])
+  })
+
+  // Ticket 560 (GD amendment 3 on #551): the warning is not scaled with speed, so at 84 m/s the
+  // authority warns a block 16 m ahead, under 0.2 s off; the strip shows it every frame until the
+  // nose reaches it, and its warning still sounds the rumble.
+  it('shows an authority-warned block every frame to the nose at 84 m/s, and rumbles once', () => {
+    const block = blockContaining({ xMm: 500, yMm: (FIXTURE_START.y - 16) * 1000 })
+    const collapse = { blocks: [{ block: blockIdOf(block), startTick: 0, isForced: false }] }
+    const ground = createFixtureGround([])
+    const strip = createHazardStrip()
+    const frames = Math.floor(((16 - 2 * BLOCK_HALF_DIAGONAL_M) / 84) * 60)
+    for (let frame = 0; frame <= frames; frame++) {
+      const seconds = frame * FRAME_SECONDS
+      const at = digFrameAt(seconds, 84, VIEWER_BEFORE_SCANNER)
+      sampleHazardStrip(strip, ground, { ...at, collapse, tick: frame })
+      expect(visiblePips(strip).map((pip) => pip.kind)).toEqual(['collapse'])
+    }
+    const warned: DomainEvent = {
+      tick: 0,
+      type: 'CollapseWarned',
+      block: blockIdOf(block),
+      band: 2,
+      weakestGrade: 1,
+      required: 2,
+    }
+    expect(feedbackCuesOf([warned], 'p1')).toEqual([{ kind: 'collapseRumble' }])
   })
 
   it('never shows more than 8 pips, nearest first', () => {
