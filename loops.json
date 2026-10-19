@@ -1,14 +1,14 @@
 {
   "schema": 1,
-  "updated_at": "2026-10-19T01:49:34Z",
+  "updated_at": "2026-10-19T01:50:43Z",
   "entries": {
     "steampunk-loop/1": {
       "loop": "steampunk-loop",
       "slot": "1",
-      "state": "idle",
-      "issue": null,
-      "note": "free; #552 landed on main and closed",
-      "updated_at": "2026-10-19T01:49:34Z",
+      "state": "working",
+      "issue": 553,
+      "note": "started 2026-10-19 03:50 CEST",
+      "updated_at": "2026-10-19T01:50:43Z",
       "host": "grok-bot-vm-452660841"
     },
     "steampunk-loop/2": {
@@ -17,7 +17,7 @@
       "state": "idle",
       "issue": null,
       "note": "free",
-      "updated_at": "2026-10-19T01:48:51Z",
+      "updated_at": "2026-10-19T01:50:43Z",
       "host": "grok-bot-vm-452660841"
     },
     "steampunk-loop/3": {
@@ -26,7 +26,7 @@
       "state": "idle",
       "issue": null,
       "note": "free",
-      "updated_at": "2026-10-19T01:48:51Z",
+      "updated_at": "2026-10-19T01:50:43Z",
       "host": "grok-bot-vm-452660841"
     },
     "steampunk-loop/4": {
@@ -35,7 +35,7 @@
       "state": "idle",
       "issue": null,
       "note": "free",
-      "updated_at": "2026-10-19T01:48:51Z",
+      "updated_at": "2026-10-19T01:50:43Z",
       "host": "grok-bot-vm-452660841"
     },
     "steampunk-loop": {
@@ -43,7 +43,7 @@
       "slot": null,
       "state": "working",
       "issue": null,
-      "note": "1/10 Claude slots busy, 0/4 planner slots; no pickable build ticket; delegated 0 spec(s); planner slots 0/4",
+      "note": "1/10 Claude slots busy, 0/4 planner slots; status check",
       "extra": {
         "active": 1,
         "max": 10,
@@ -426,7 +426,8 @@
           "547": 1,
           "548": 1,
           "549": 1,
-          "552": 1
+          "552": 1,
+          "553": 1
         },
         "tester_grants": {
           "123": {
@@ -523,7 +524,7 @@
         "planner": [],
         "push_pending": null
       },
-      "updated_at": "2026-10-19T01:48:51Z",
+      "updated_at": "2026-10-19T01:50:43Z",
       "host": "grok-bot-vm-452660841"
     },
     "perf-loop": {
@@ -541,7 +542,7 @@
       "state": "idle",
       "issue": null,
       "note": "free",
-      "updated_at": "2026-10-19T01:48:51Z",
+      "updated_at": "2026-10-19T01:50:43Z",
       "host": "grok-bot-vm-452660841"
     },
     "steampunk-loop/6": {
@@ -550,7 +551,7 @@
       "state": "idle",
       "issue": null,
       "note": "free",
-      "updated_at": "2026-10-19T01:48:51Z",
+      "updated_at": "2026-10-19T01:50:43Z",
       "host": "grok-bot-vm-452660841"
     },
     "steampunk-loop/7": {
@@ -559,7 +560,7 @@
       "state": "idle",
       "issue": null,
       "note": "free",
-      "updated_at": "2026-10-19T01:48:51Z",
+      "updated_at": "2026-10-19T01:50:43Z",
       "host": "grok-bot-vm-452660841"
     },
     "steampunk-loop/8": {
@@ -568,7 +569,7 @@
       "state": "idle",
       "issue": null,
       "note": "free",
-      "updated_at": "2026-10-19T01:48:51Z",
+      "updated_at": "2026-10-19T01:50:43Z",
       "host": "grok-bot-vm-452660841"
     },
     "tester": {
@@ -587,7 +588,7 @@
       "state": "idle",
       "issue": null,
       "note": "free",
-      "updated_at": "2026-10-19T01:48:51Z",
+      "updated_at": "2026-10-19T01:50:43Z",
       "host": "grok-bot-vm-452660841"
     },
     "steampunk-loop/11": {
@@ -614,11 +615,18 @@
       "state": "idle",
       "issue": null,
       "note": "free",
-      "updated_at": "2026-10-19T01:48:51Z",
+      "updated_at": "2026-10-19T01:50:43Z",
       "host": "grok-bot-vm-452660841"
     }
   },
   "events": [
+    {
+      "at": "2026-10-19T01:50:43Z",
+      "key": "steampunk-loop/1",
+      "state": "working",
+      "issue": 553,
+      "note": "started 2026-10-19 03:50 CEST"
+    },
     {
       "at": "2026-10-19T01:49:34Z",
       "key": "steampunk-loop/1",
@@ -1031,13 +1039,6 @@
       "state": "idle",
       "issue": null,
       "note": "free"
-    },
-    {
-      "at": "2026-10-17T21:32:20Z",
-      "key": "steampunk-loop/1",
-      "state": "working",
-      "issue": 453,
-      "note": "tier easy, attempt 1/2"
     }
   ]
 }
