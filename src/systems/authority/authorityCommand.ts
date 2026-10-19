@@ -401,8 +401,17 @@ import type { DriveSigns } from '../vehicle/driveSigns'
  *    its window that removed something. Several `drillTile`s at one tick each pay their own cell
  *    only, so the pacing bot bores past 60 cells/s at the player's price. A run with no scripted
  *    drill moves no digest.
+ * 96: the swept cut rides its face (ticket 570): an open-gate tick's stamp sits at the front of
+ *    the drill law's step (`sweptStampAheadMmOf`), and the stamp lowers each density sample once,
+ *    as the front crosses it, to a ramp half a sample behind the front (`world/cutFront.ts`), its
+ *    bore wall on the stamp's circle, never touching what lies behind its rear or a step ahead;
+ *    where the work runs out inside a cell the front bites into it as far as the work pays, a
+ *    point the cursor keeps (`sweptCut.front`, left out where it is the reach). Behind the last
+ *    front a sample falls at most 127 a tick, and such a cut's level floor allows 35 mm under the
+ *    wheels. A tilted line pays a cell for its chord. A shut-gate tick carves as at protocol 95,
+ *    and with `drill.sweptCut` off nothing moves.
  */
-export const AUTHORITY_PROTOCOL_VERSION = 95
+export const AUTHORITY_PROTOCOL_VERSION = 96
 
 /** The kernel's own commands: the closed set its rule tables are written against. */
 export interface KernelCommandPayloads {
