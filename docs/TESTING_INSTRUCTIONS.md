@@ -736,7 +736,7 @@ incomePerHour}` go to `balance-report/drill-pace.ndjson`, which `pushTestMetrics
   flags off their defaults kept, the sticky `devFlagsEverSet`, `unknown_flag`, flags never numbers,
   `not_session_host` for anyone but a shared session's lowest id, zero on flip to on per flag, the
   snapshot and save round trips, and no unlock, codex or item write on any flip);
-  `devFlagFlips.test.ts` flips all six off, on and off mid-drill at the cadence the flags give (no
+  `devFlagFlips.test.ts` flips all seven off, on and off mid-drill at the cadence the flags give (no
   throw, no carry consumed after a turn-on, every stretch at or below the tank floor, the interval
   12 from the tick the exact carry goes off, replay digest-equal jumping and at 60 fps);
   `devFlagGates.test.ts` holds the gate under all 64 combinations (held, moving and swept: never
@@ -745,6 +745,25 @@ incomePerHour}` go to `balance-report/drill-pace.ndjson`, which `pushTestMetrics
   that a load keeps its world's flags and New Game drops them. With no flag set no field is written,
   so every golden and the device save keep their digests. A balance report refuses a marked run
   (`src/logging/devFlagReport.ts`) and `perf:sessions` refuses a marked session.
+- **Nose contact at speed** (ticket 564, C2 of #551: the TD's shape 6254962969 with the VS's
+  amendment 6254978633 and the HS's conditions 6254968595): behind the authority dev flag
+  `drill.noseContact`, the one that ships off until the combat damage track (#565) flips it, a
+  `drillStep` engages the enemies its nose met on the body's walked path.
+  `src/systems/authority/combat/contactAtSpeed.test.ts` drives the combat corridor at 5, 84, 840
+  and 8400 m/s strides (`noseContactFixtures.ts`) and a column leg (`sweptRigFixtures.ts`'s
+  `cutLeg` with `prepare`): on the shipped flags the dwell at speed against 5 m/s (VS bar b) is
+  held known red under #565 (`noseContactKnownRed.ts`: printed with the finding, failing once the
+  row turns green or #565 closes); with the flag named, the dwell is `max(1, ceil(...))` at every
+  speed, an under-tier enemy dies on the tick it is met, the dwell grows with tier with no
+  threshold, a rider leaves every cursor as an enemy-free pass, nothing is damaged twice, the
+  flag off keeps the pose-only pin, an enemy-free pass is byte-identical either way, a snapshot
+  mid-ride kills the same way once, a rider strikes no more, a full roster of under-tier crawlers
+  dies on the ticks met, the wrecker and a crawler past the gate tip hold the cut (no
+  `DrillGated`, reach and carry kept), and a crossed burrower is hit once with the gated column's
+  cell events unchanged. The one damage seam is held there too (no contact module calls drill
+  power; `kDrillVsEnemy` the same at every level; a new tip moves no dwell).
+  `noseContactPath.test.ts` holds the path's geometry. The rows for families not built yet
+  (`ore_thief`, `swarm_nests`, `core_guardian`) are `it.todo`.
 - **Client dev flags and the browser's override** (ticket 548, the #548 ruling on #547): the
   pure rules are `src/systems/devFlags/` (`devFlagOverrides.test.ts`: only differences kept,
   unknown keys dropped, a flipped default reported and an opposing entry pinned, both with a
