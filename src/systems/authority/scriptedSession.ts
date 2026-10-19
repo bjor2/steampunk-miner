@@ -8,7 +8,7 @@ import { NO_DRIVE, type DriveSigns } from '../vehicle/driveSigns'
 import type { BayId } from '../world/dockBays'
 import { vehicleOf, createAuthorityState, type AuthorityState } from './authorityState'
 import { dockSiteOf } from '../world/dockSite'
-import { planetParamsFor, type PlanetParams } from '../world/planetParams'
+import { freshPlanetParamsFor, type PlanetParams } from '../world/planetParams'
 import { surfaceRowOfColumn, type TilePoint } from '../world/tileGrid'
 import { CELL_KIND, kindOfCell } from '../world/worldCell'
 import { cellAt, EMPTY_WORLD } from '../world/worldState'
@@ -18,7 +18,13 @@ import type { CommandIntent } from './authorityCommand'
 import type { DomainEvent } from './domainEvent'
 
 export const WORLD_SEED = 83921
-export const PARAMS = planetParamsFor(WORLD_SEED, 1)
+/**
+ * The params the session's planet generates from: planet 1 as entered, stamped with its ore rules,
+ * as `planetParamsOf(state.planet)` reads them. Legacy params (no stamp) generate other ore kinds
+ * and take the one planet chunk cache from the authority, so a spec or bench alternating the two
+ * regenerated its chunks every call (ticket 560).
+ */
+export const PARAMS = freshPlanetParamsFor(WORLD_SEED, 1)
 export const SITE = dockSiteOf(PARAMS)
 
 export type ScriptedSession = ReturnType<typeof continueScriptedSession>

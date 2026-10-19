@@ -16,6 +16,10 @@
  * `drillStep` under the 4-tick tile floor (ticket 396), so these cut the same line through
  * `drillAlongStep`.
  *
+ * Ticket 560: every read takes the session's own params (`planetParamsOf(state.planet)`); the
+ * legacy params of planet 1 (no ore rules stamp) took the one planet chunk cache from the
+ * authority, so each step regenerated its chunks and read about 2.5 to 3 ms high.
+ *
  * Ticket 420: the W = 7 cut again with each step logged as the game logs it, the drill span writer
  * on (`w7Logged`); its p50 must stay within noise of the bare `wide` row, since a span only adds to
  * a fixed accumulator a tick.
@@ -32,11 +36,13 @@ import type { AuthorityState } from '../src/systems/authority/authorityState'
 import type { DomainEvent } from '../src/systems/authority/domainEvent'
 import { vehicleOf } from '../src/systems/authority/authorityState'
 import { drillAlongStep } from '../src/systems/authority/drillStepCut'
-import { createScriptedSession, PARAMS, poseAbove } from '../src/systems/authority/scriptedSession'
+import { planetParamsOf } from '../src/systems/authority/planetOfState'
+import { createScriptedSession, poseAbove } from '../src/systems/authority/scriptedSession'
 import { stepBoundsAt } from '../src/systems/authority/stepBoundRead'
 import { NO_DRIVE } from '../src/systems/vehicle/driveSigns'
 import { FACING, noseTileOf, type VehiclePose } from '../src/systems/vehicle/vehiclePose'
 import { cellDensitySum } from '../src/systems/world/cellYield'
+import type { PlanetParams } from '../src/systems/world/planetParams'
 import { logBenchmarkSeriesWhenAsked } from './bench/benchRunLog'
 import { devFlagSetLine } from '../src/logging/devFlagReport'
 
@@ -118,8 +124,14 @@ function cutLevel(logStep: LogStep = LOG_NOTHING): StepRun {
   return run
 }
 
+/** The params the session's planet generates from: the authority's own, so the chunk cache holds. */
+function paramsOfSession(state: AuthorityState): PlanetParams {
+  return planetParamsOf(state.planet) as PlanetParams
+}
+
 /** Cells within 4 m of the body whose density the step changed. */
 function cellsChanged(before: AuthorityState, after: AuthorityState, xMm: number): number {
+  const params = paramsOfSession(before)
   let changed = 0
   const tx0 = Math.floor(xMm / 1000)
   const ty0 = Math.floor(START.y / 1000)
@@ -127,7 +139,7 @@ function cellsChanged(before: AuthorityState, after: AuthorityState, xMm: number
     for (let tx = tx0 - 4; tx <= tx0 + 4; tx++) {
       const tile = { tx, ty }
       const isChanged =
-        cellDensitySum(before.world, PARAMS, tile) !== cellDensitySum(after.world, PARAMS, tile)
+        cellDensitySum(before.world, params, tile) !== cellDensitySum(after.world, params, tile)
       if (isChanged) changed++
     }
   }
@@ -170,13 +182,14 @@ function cutAtStride(strideMm: number): number[] {
   const { payload } = poseAbove({ tx: 0, ty: 0 }, FACING.right)
   session.submit(0, { type: 'reportPose', payload: { ...payload, ...START } })
   let state = session.state()
+  const params = paramsOfSession(state)
   const timesMs: number[] = []
   for (let tick = 1; tick <= STEPS; tick++) {
     const reported = vehicleOf(state, 'p1').pose as VehiclePose
     const pose = { ...reported, x: START.x + strideMm * tick }
     const step = { pose, drive: NO_DRIVE, isLifting: false }
     const started = performance.now()
-    state = drillAlongStep({ ...state, tick }, PARAMS, 'p1', noseTileOf(pose), step).state
+    state = drillAlongStep({ ...state, tick }, params, 'p1', noseTileOf(pose), step).state
     timesMs.push(performance.now() - started)
   }
   return timesMs

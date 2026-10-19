@@ -22,7 +22,10 @@ import { CODEX_SECTION, type CodexSection } from './codexSection'
 // The codex section v1 (#207): written only by the reaction, carried in the snapshot and the
 // digest as it stands, and restored only in its one canonical form.
 
-const ORE_TILES = surfaceOreTiles(3)
+// Read under the codex alone, as the sessions below run: the planet's one chunk cache keeps what
+// it generated, so tiles read under the loaded slices would hand the session the roster's kind
+// slots (ticket 560 made the spec params the session's own, so they share that cache).
+const ORE_TILES = withRegistrations([CODEX], () => surfaceOreTiles(3))
 
 /** A session that mined three surface ore tiles with the codex loaded. */
 function minedState(): AuthorityState {

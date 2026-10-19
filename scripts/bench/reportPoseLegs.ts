@@ -14,10 +14,12 @@ import { applyCommand } from '../../src/systems/authority/applyCommand'
 import type { AuthorityCommand, CommandIntent } from '../../src/systems/authority/authorityCommand'
 import { vehicleOf, type AuthorityState } from '../../src/systems/authority/authorityState'
 import { drillAlongStep } from '../../src/systems/authority/drillStepCut'
-import { PARAMS, poseAbove } from '../../src/systems/authority/scriptedSession'
+import { planetParamsOf } from '../../src/systems/authority/planetOfState'
+import { poseAbove } from '../../src/systems/authority/scriptedSession'
 import { NO_DRIVE } from '../../src/systems/vehicle/driveSigns'
 import { FACING, noseTileOf, type VehiclePose } from '../../src/systems/vehicle/vehiclePose'
 import { cellDensitySum } from '../../src/systems/world/cellYield'
+import type { PlanetParams } from '../../src/systems/world/planetParams'
 import { CUT_LENGTH_MM, CUT_START, type BenchRig } from './reportPoseRigs'
 
 export type Mode = 'report' | 'swept'
@@ -124,8 +126,9 @@ function sweptTick(leg: Leg): TimedTick {
     const reported = vehicleOf(state, 'p1').pose as VehiclePose
     const pose = { ...reported, x: CUT_START.x + strideMm * tick }
     const step = { pose, drive: NO_DRIVE, isLifting: false }
+    const params = paramsOfSession(state)
     const started = performance.now()
-    const effect = drillAlongStep({ ...state, tick }, PARAMS, 'p1', noseTileOf(pose), step)
+    const effect = drillAlongStep({ ...state, tick }, params, 'p1', noseTileOf(pose), step)
     return { state: effect.state, ms: performance.now() - started }
   }
 }
@@ -142,8 +145,14 @@ function refuseRejection(events: readonly { type: string }[], tick: number): voi
   }
 }
 
+/** The session's own params (ticket 560): legacy ones would take the chunk cache from the authority. */
+function paramsOfSession(state: AuthorityState): PlanetParams {
+  return planetParamsOf(state.planet) as PlanetParams
+}
+
 /** Cells along the tick's stride, and round it, whose density the tick changed. */
 function cellsChanged(before: AuthorityState, after: AuthorityState, leg: Leg, tick: number) {
+  const params = paramsOfSession(before)
   const strideMm = strideMmOf(leg.speedMps)
   const tx0 = Math.floor((CUT_START.x + strideMm * (tick - 1)) / MM_PER_METRE) - COUNT_REACH_CELLS
   const tx1 = Math.floor((CUT_START.x + strideMm * tick) / MM_PER_METRE) + COUNT_REACH_CELLS
@@ -154,7 +163,7 @@ function cellsChanged(before: AuthorityState, after: AuthorityState, leg: Leg, t
     for (let tx = tx0; tx <= tx1; tx++) {
       const tile = { tx, ty }
       const isChanged =
-        cellDensitySum(before.world, PARAMS, tile) !== cellDensitySum(after.world, PARAMS, tile)
+        cellDensitySum(before.world, params, tile) !== cellDensitySum(after.world, params, tile)
       if (isChanged) changed++
     }
   }
