@@ -72,16 +72,34 @@ export function chunkDensityHaloOf(
   cy: number,
 ): Uint8Array<ArrayBuffer> {
   const halo = new Uint8Array(DENSITY_HALO_SIDE * DENSITY_HALO_SIDE)
-  const own = densityOf(cx, cy)
-  const right = densityOf(cx + 1, cy)
-  const above = densityOf(cx, cy + 1)
-  for (let lsy = 0; lsy < CHUNK_SAMPLE_SIDE; lsy++) {
-    const row = lsy * DENSITY_HALO_SIDE
-    halo.set(own.subarray(lsy * CHUNK_SAMPLE_SIDE, (lsy + 1) * CHUNK_SAMPLE_SIDE), row)
-    halo[row + CHUNK_SAMPLE_SIDE] = right[sampleIndexOf(0, lsy)]
-  }
-  const top = CHUNK_SAMPLE_SIDE * DENSITY_HALO_SIDE
-  halo.set(above.subarray(0, CHUNK_SAMPLE_SIDE), top)
-  halo[top + CHUNK_SAMPLE_SIDE] = densityOf(cx + 1, cy + 1)[0]
+  writeOwnSamples(halo, densityOf(cx, cy))
+  writeRightEdge(halo, densityOf(cx + 1, cy))
+  writeTopEdge(halo, densityOf(cx, cy + 1))
+  writeCorner(halo, densityOf(cx + 1, cy + 1))
   return halo
+}
+
+/** The chunk's own samples written into its halo, in place. */
+export function writeOwnSamples(halo: Uint8Array, own: Uint8Array): void {
+  for (let lsy = 0; lsy < CHUNK_SAMPLE_SIDE; lsy++) {
+    const from = lsy * CHUNK_SAMPLE_SIDE
+    halo.set(own.subarray(from, from + CHUNK_SAMPLE_SIDE), lsy * DENSITY_HALO_SIDE)
+  }
+}
+
+/** The right neighbour's first column written into the halo's last one, in place. */
+export function writeRightEdge(halo: Uint8Array, right: Uint8Array): void {
+  for (let lsy = 0; lsy < CHUNK_SAMPLE_SIDE; lsy++) {
+    halo[lsy * DENSITY_HALO_SIDE + CHUNK_SAMPLE_SIDE] = right[sampleIndexOf(0, lsy)]
+  }
+}
+
+/** The upper neighbour's first row written into the halo's top one, in place. */
+export function writeTopEdge(halo: Uint8Array, above: Uint8Array): void {
+  halo.set(above.subarray(0, CHUNK_SAMPLE_SIDE), CHUNK_SAMPLE_SIDE * DENSITY_HALO_SIDE)
+}
+
+/** The upper-right neighbour's first sample written into the halo's corner, in place. */
+export function writeCorner(halo: Uint8Array, corner: Uint8Array): void {
+  halo[CHUNK_SAMPLE_SIDE * DENSITY_HALO_SIDE + CHUNK_SAMPLE_SIDE] = corner[0]
 }

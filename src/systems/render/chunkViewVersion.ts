@@ -11,6 +11,10 @@ import {
   isCornerCurrent,
   isRightEdgeCurrent,
   isTopEdgeCurrent,
+  writeCorner,
+  writeOwnSamples,
+  writeRightEdge,
+  writeTopEdge,
   type ChunkDensity,
 } from './densityHalo'
 
@@ -57,4 +61,24 @@ export function isHaloEdgeCurrentSince(
     (isKept(2) || isTopEdgeCurrent(halo, densityOf(cx, cy + 1))) &&
     (isKept(3) || isCornerCurrent(halo, densityOf(cx + 1, cy + 1)))
   )
+}
+
+/**
+ * The halo brought up to the world's view `now` in place (ticket 570): the parts whose chunk's
+ * delta changed since `shown`, the view it holds, are read again, the rest left alone (reading an
+ * untouched neighbour would generate it on the main thread, ticket 337). The renderer does this
+ * every frame the world changes, so a cut's face shows the frame the authority carves it, while
+ * the chunk's tiles wait for their rebuild under the cap of ticket 330.
+ */
+export function writeHaloChangesSince(
+  halo: Uint8Array,
+  densityOf: ChunkDensity,
+  { cx, cy }: { cx: number; cy: number },
+  shown: ChunkViewVersion,
+  now: ChunkViewVersion,
+): void {
+  if (shown[0] !== now[0]) writeOwnSamples(halo, densityOf(cx, cy))
+  if (shown[1] !== now[1]) writeRightEdge(halo, densityOf(cx + 1, cy))
+  if (shown[2] !== now[2]) writeTopEdge(halo, densityOf(cx, cy + 1))
+  if (shown[3] !== now[3]) writeCorner(halo, densityOf(cx + 1, cy + 1))
 }

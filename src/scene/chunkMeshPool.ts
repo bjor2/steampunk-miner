@@ -12,8 +12,9 @@
  * `chunkBuildsPerFrame` builds, more the faster the rig goes, in `chunksToBuild`'s order: chunks
  * coming into view first, then stale ones, each rebuilt at most once in 4 frames, then the chunks
  * ahead along the velocity and the drill's facing (tickets 330 and 336). A chunk whose neighbours
- * changed only away from its halo's edge keeps its mesh. A frame where nothing changed allocates
- * nothing.
+ * changed only away from its halo's edge keeps its mesh. An edit shows in a built chunk's density
+ * halo the frame it lands, ahead of the rebuild (ticket 570). A frame where nothing changed
+ * allocates nothing.
  *
  * With the chunk worker up (TD scope c2 on #316, ticket 337) the same picks become worker jobs and
  * the frame only turns fresh results into meshes (`chunkJobStream.ts`); the generation and the tile
@@ -47,7 +48,13 @@ import {
 import type { Vector2 } from '../systems/vehicle/localFrame'
 import type { PlanetParams } from '../systems/world/planetParams'
 import { chunkKey, chunkOfTile, firstTileOfChunk, type TilePoint } from '../systems/world/tileGrid'
-import type { WorldState } from '../systems/world/worldState'
+import { currentDensityOfChunk, type WorldState } from '../systems/world/worldState'
+import {
+  chunkViewVersionOf,
+  isSameChunkView,
+  writeHaloChangesSince,
+} from '../systems/render/chunkViewVersion'
+import type { ChunkDensity } from '../systems/render/densityHalo'
 
 /** What the terrain should show this frame; the caller reuses one object across frames. */
 export interface TerrainView {
@@ -95,6 +102,8 @@ interface PoolState {
   tileY: number
   viewRadius: number
   world: WorldState | null
+  /** The world the meshes' halos were last brought up to (ticket 570). */
+  haloWorld: WorldState | null
   params: PlanetParams | null
   isUpToDate: boolean
 }
@@ -117,6 +126,7 @@ export function createChunkMeshPool(
     tileY: Number.NaN,
     viewRadius: Number.NaN,
     world: null,
+    haloWorld: null,
     params: null,
     isUpToDate: false,
   }
@@ -128,6 +138,7 @@ export function createChunkMeshPool(
       if (!isSameVisibleSet(pool, view)) chooseVisible(pool, parent, view)
       pool.world = view.world
       pool.isUpToDate = rebuildStale(pool, parent, material, view)
+      showEditsInHalos(pool, view)
     },
     drawnChunkCount: () => countDrawn(pool),
     drawnBlockCount: () => countDrawnBlocks(pool),
@@ -218,6 +229,27 @@ function dropAll(pool: PoolState, parent: Group): void {
   pool.meshes.clear()
   forgetChunkJobs(pool.jobs)
   pool.isUpToDate = false
+}
+
+/**
+ * Each mesh's density halo brought up to an edited world the frame the edit lands (ticket 570):
+ * only the halo, a texture upload, so a cut's face moves with its front every tick while the
+ * chunk's tiles are rebuilt at most once in 4 frames (ticket 330).
+ */
+function showEditsInHalos(pool: PoolState, view: TerrainView): void {
+  if (pool.haloWorld === view.world) return
+  pool.haloWorld = view.world
+  const densityOf = (cx: number, cy: number) =>
+    currentDensityOfChunk(view.world, view.params, cx, cy)
+  for (const chunk of pool.meshes.values()) showEditsInHalo(chunk, view.world, densityOf)
+}
+
+function showEditsInHalo(chunk: ChunkMesh, world: WorldState, densityOf: ChunkDensity): void {
+  const now = chunkViewVersionOf(world, chunk.cx, chunk.cy)
+  if (isSameChunkView(chunk.haloVersion, now)) return
+  writeHaloChangesSince(chunk.halo, densityOf, chunk, chunk.haloVersion, now)
+  chunk.haloVersion = now
+  chunk.density.needsUpdate = true
 }
 
 /** Runs the frame's chunk work under its budget; true when every visible and ahead chunk is current. */

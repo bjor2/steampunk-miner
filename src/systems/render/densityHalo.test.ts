@@ -8,6 +8,7 @@ import {
   isHaloEdgeCurrentSince,
   isOwnChunkSame,
   isSameChunkView,
+  writeHaloChangesSince,
 } from './chunkViewVersion'
 import { chunkDensityHaloOf, isHaloEdgeCurrent } from './densityHalo'
 
@@ -67,5 +68,30 @@ describe('edge-aware chunk view (ticket 330)', () => {
     const now = chunkViewVersionOf(world, CHUNK.cx, CHUNK.cy)
     const isCurrent = isHaloEdgeCurrentSince(halo, densityIn(world), CHUNK.cx, CHUNK.cy, built, now)
     expect(isCurrent).toBe(false)
+  })
+})
+
+describe('halo brought up to an edit (ticket 570)', () => {
+  const built = chunkViewVersionOf(EMPTY_WORLD, CHUNK.cx, CHUNK.cy)
+
+  it("writes the chunk's own cut and its neighbour's edge into the halo it holds", () => {
+    const world = cutAt(CHUNK_SIZE * 1000 - 300, CHUNK.cy * CHUNK_SIZE * 1000 + 16_000)
+    const halo = chunkDensityHaloOf(densityIn(EMPTY_WORLD), CHUNK.cx, CHUNK.cy)
+    const now = chunkViewVersionOf(world, CHUNK.cx, CHUNK.cy)
+    writeHaloChangesSince(halo, densityIn(world), CHUNK, built, now)
+    expect(halo).toEqual(chunkDensityHaloOf(densityIn(world), CHUNK.cx, CHUNK.cy))
+  })
+
+  it('reads only the chunks whose delta changed since the view it holds', () => {
+    const world = cutAt(16_000, CHUNK.cy * CHUNK_SIZE * 1000 + 16_000)
+    const halo = chunkDensityHaloOf(densityIn(EMPTY_WORLD), CHUNK.cx, CHUNK.cy)
+    const read: string[] = []
+    const densityOf = (cx: number, cy: number) => {
+      read.push(`${cx},${cy}`)
+      return densityIn(world)(cx, cy)
+    }
+    const now = chunkViewVersionOf(world, CHUNK.cx, CHUNK.cy)
+    writeHaloChangesSince(halo, densityOf, CHUNK, built, now)
+    expect(read).toEqual([`${CHUNK.cx},${CHUNK.cy}`])
   })
 })
