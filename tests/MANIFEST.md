@@ -738,11 +738,13 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/authority/collapse/collapseRun.test.ts` | 19 | 19 |
 | `src/systems/authority/combat/burrower.test.ts` | 5 | 5 |
 | `src/systems/authority/combat/combatRun.test.ts` | 8 | 7 |
+| `src/systems/authority/combat/contactAtSpeed.test.ts` | 18 | 21 |
 | `src/systems/authority/combat/contactRule.test.ts` | 10 | 8 |
 | `src/systems/authority/combat/dustTrail.test.ts` | 4 | 4 |
 | `src/systems/authority/combat/enemyRoster.test.ts` | 5 | 5 |
 | `src/systems/authority/combat/gunFire.test.ts` | 11 | 13 |
 | `src/systems/authority/combat/hitArc.test.ts` | 15 | 4 |
+| `src/systems/authority/combat/noseContactPath.test.ts` | 5 | 5 |
 | `src/systems/authority/combat/spawnPoints.test.ts` | 5 | 5 |
 | `src/systems/authority/combat/turretAim.test.ts` | 12 | 12 |
 | `src/systems/authority/combat/turretBurst.test.ts` | 7 | 7 |
@@ -883,7 +885,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 
 | File | Tests | Sites |
 | --- | --- | --- |
-| `src/constants/devFlagRows.test.ts` | 8 | 8 |
+| `src/constants/devFlagRows.test.ts` | 9 | 9 |
 
 ### `debug`
 
@@ -930,7 +932,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/economy/economyGrowth.test.ts` | 5 | 5 |
 | `src/systems/economy/economySourceScan.test.ts` | 6 | 6 |
 | `src/systems/economy/economyTables.test.ts` | 10 | 5 |
-| `src/systems/economy/enemyStats.test.ts` | 24 | 22 |
+| `src/systems/economy/enemyStats.test.ts` | 29 | 27 |
 | `src/systems/economy/gunStats.test.ts` | 9 | 9 |
 | `src/systems/economy/heatEconomy.test.ts` | 11 | 11 |
 | `src/systems/economy/itemEffectCaps.test.ts` | 6 | 6 |
