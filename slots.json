@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-10-19T07:41:49+02:00",
+  "updated_at": "2026-10-19T07:42:09+02:00",
   "caps": {
     "grok": 12,
     "claude": 10,
@@ -121,32 +121,23 @@
     }
   ],
   "gate": {
-    "busy": 0,
+    "busy": 1,
     "max": 3
   },
   "tester": {
     "state": "running",
-    "phase": "triage-fast",
-    "sha": "3c42a9188dc141fca748d0d254a7dca6217ddb49",
-    "since": "2026-10-19T05:41:32Z",
-    "holds_gate": false,
+    "phase": "fast",
+    "sha": "e54f5ed0cdc7d359631f994802c2f05fd794ff9a",
+    "since": "2026-10-19T05:42:04Z",
+    "holds_gate": true,
     "claude_slot": null,
-    "last_run": "2026-10-19T01:54:53Z",
+    "last_run": "2026-10-19T05:42:00Z",
     "last_nightly": "2026-10-15T20:43:15Z",
     "last_nightly_result": "full=FAIL balance-report=ok bench=FAIL balance-planets=ok balance-guns=ok balance-charges=ok balance-refinery=ok balance-heat=ok e2e=FAIL memory-soak=FAIL packaged-smoke=ok ",
     "main_red_sha": null,
-    "feature": 310,
-    "feature_title": "Spec: Per-weapon tech trees (auto-aim, auto-shoot, vertically scaling range)",
+    "feature": 409,
+    "feature_title": "Test: drill-speed ladder benchmark (levels 1/5/10/15/20)",
     "queue": [
-      {
-        "feature": 409,
-        "kind": "ticket",
-        "title": "Test: drill-speed ladder benchmark (levels 1/5/10/15/20)",
-        "tickets": [
-          409
-        ],
-        "since": "2026-10-15T19:17:47+02:00"
-      },
       {
         "feature": 422,
         "kind": "spec",
