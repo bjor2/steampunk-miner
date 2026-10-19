@@ -1,23 +1,23 @@
 {
   "schema": 1,
-  "updated_at": "2026-10-19T11:40:59Z",
+  "updated_at": "2026-10-19T11:46:18Z",
   "entries": {
     "steampunk-loop/1": {
       "loop": "steampunk-loop",
       "slot": "1",
       "state": "working",
       "issue": 558,
-      "note": "tier hard, attempt 1/2 (session running)",
-      "updated_at": "2026-10-19T11:40:59Z",
+      "note": "started 2026-10-19 11:41 CEST",
+      "updated_at": "2026-10-19T11:46:18Z",
       "host": "grok-bot-vm-452660841"
     },
     "steampunk-loop/2": {
       "loop": "steampunk-loop",
       "slot": "2",
-      "state": "idle",
+      "state": "working",
       "issue": null,
-      "note": "free",
-      "updated_at": "2026-10-19T11:12:18Z",
+      "note": "started 2026-10-19 13:45 CEST",
+      "updated_at": "2026-10-19T11:46:18Z",
       "host": "grok-bot-vm-452660841"
     },
     "steampunk-loop/3": {
@@ -26,7 +26,7 @@
       "state": "idle",
       "issue": null,
       "note": "free",
-      "updated_at": "2026-10-19T11:12:18Z",
+      "updated_at": "2026-10-19T11:46:18Z",
       "host": "grok-bot-vm-452660841"
     },
     "steampunk-loop/4": {
@@ -35,7 +35,7 @@
       "state": "idle",
       "issue": null,
       "note": "free",
-      "updated_at": "2026-10-19T11:12:18Z",
+      "updated_at": "2026-10-19T11:46:18Z",
       "host": "grok-bot-vm-452660841"
     },
     "steampunk-loop": {
@@ -43,9 +43,9 @@
       "slot": null,
       "state": "working",
       "issue": null,
-      "note": "1/10 Claude slots busy, 0/4 planner slots; no pickable build ticket; delegated 0 spec(s); planner slots 0/4",
+      "note": "2/10 Claude slots busy, 0/4 planner slots; status check",
       "extra": {
-        "active": 1,
+        "active": 2,
         "max": 10,
         "max_attempts": 2,
         "attempts": {
@@ -538,7 +538,7 @@
         "planner": [],
         "push_pending": null
       },
-      "updated_at": "2026-10-19T11:12:18Z",
+      "updated_at": "2026-10-19T11:46:18Z",
       "host": "grok-bot-vm-452660841"
     },
     "perf-loop": {
@@ -556,7 +556,7 @@
       "state": "idle",
       "issue": null,
       "note": "free",
-      "updated_at": "2026-10-19T11:12:18Z",
+      "updated_at": "2026-10-19T11:46:18Z",
       "host": "grok-bot-vm-452660841"
     },
     "steampunk-loop/6": {
@@ -565,7 +565,7 @@
       "state": "idle",
       "issue": null,
       "note": "free",
-      "updated_at": "2026-10-19T11:12:18Z",
+      "updated_at": "2026-10-19T11:46:18Z",
       "host": "grok-bot-vm-452660841"
     },
     "steampunk-loop/7": {
@@ -574,7 +574,7 @@
       "state": "idle",
       "issue": null,
       "note": "free",
-      "updated_at": "2026-10-19T11:12:18Z",
+      "updated_at": "2026-10-19T11:46:18Z",
       "host": "grok-bot-vm-452660841"
     },
     "steampunk-loop/8": {
@@ -583,7 +583,7 @@
       "state": "idle",
       "issue": null,
       "note": "free",
-      "updated_at": "2026-10-19T11:12:18Z",
+      "updated_at": "2026-10-19T11:46:18Z",
       "host": "grok-bot-vm-452660841"
     },
     "tester": {
@@ -602,7 +602,7 @@
       "state": "idle",
       "issue": null,
       "note": "free",
-      "updated_at": "2026-10-19T11:12:18Z",
+      "updated_at": "2026-10-19T11:46:18Z",
       "host": "grok-bot-vm-452660841"
     },
     "steampunk-loop/11": {
@@ -629,11 +629,18 @@
       "state": "idle",
       "issue": null,
       "note": "free",
-      "updated_at": "2026-10-19T11:12:18Z",
+      "updated_at": "2026-10-19T11:46:18Z",
       "host": "grok-bot-vm-452660841"
     }
   },
   "events": [
+    {
+      "at": "2026-10-19T11:46:18Z",
+      "key": "steampunk-loop/2",
+      "state": "working",
+      "issue": null,
+      "note": "started 2026-10-19 13:45 CEST"
+    },
     {
       "at": "2026-10-19T09:41:36Z",
       "key": "steampunk-loop",
@@ -1046,13 +1053,6 @@
       "state": "blocked",
       "issue": 450,
       "note": "push_pending: ticket/450 green but not on main (slot free)"
-    },
-    {
-      "at": "2026-10-18T13:53:21Z",
-      "key": "steampunk-loop/2",
-      "state": "working",
-      "issue": 541,
-      "note": "tier hard, attempt 1/2"
     }
   ]
 }
