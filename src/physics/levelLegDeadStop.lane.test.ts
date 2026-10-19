@@ -48,7 +48,7 @@ vi.mock('../systems/vehicle/poseReport', async (importOriginal) => {
 })
 
 const P200 = onCurveSteps(200)
-const RIG_SAFETY = { hull: 5000, cargo_hold: 5000 }
+const RIG_SAFETY = { hull: 5000, cargo_hold: 56 }
 const RIGS: Readonly<Record<string, Record<string, number>>> = {
   'stored 1': { drill_power: 1, drill_tip: 0, ...RIG_SAFETY },
   'stored 10': { drill_power: 10, drill_tip: 0, ...RIG_SAFETY },

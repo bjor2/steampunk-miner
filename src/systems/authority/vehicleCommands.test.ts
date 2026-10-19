@@ -296,7 +296,8 @@ describe('vehicle energy', () => {
     const session = createSession()
     session.submit(0, {
       type: 'debug.setUpgrade',
-      payload: { upgradeId: 'boiler', level: 10_000_000 },
+      // Boiler purchase 112 holds 6.5 million units: room for the 6,000,150 below (ticket 553).
+      payload: { upgradeId: 'boiler', level: 112 },
     })
     session.submit(0, { type: 'debug.setEnergy', payload: { energy: '6000150' } })
     const startEnergy = session.vehicle().energy

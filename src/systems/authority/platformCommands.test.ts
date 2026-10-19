@@ -479,9 +479,10 @@ describe('platform: workshop', () => {
           event.type === 'UpgradePurchased' ? fromCanonical(event.cost) : ZERO_MONEY,
         )
         .reduce(add, ZERO_MONEY)
-    costOfMajor('cargo_hold', 2)
+    // The hull: the hold is bought per purchase since ticket 553, with no major split.
+    costOfMajor('hull', 2)
     costOfMajor('drill_tip', 2)
-    expect(toCanonical(costOfMajor('cargo_hold', 3))).toBe('3e+1')
+    expect(toCanonical(costOfMajor('hull', 3))).toBe('5.7e+1')
     expect(toCanonical(costOfMajor('drill_tip', 3))).toBe('1.25e+2')
   })
 
@@ -570,7 +571,9 @@ describe('platform: workshop', () => {
     // maxed past them (#418) and the round robin leaves the engine out.
     const fiveTracks = SIX_TRACKS.filter((id) => id !== 'engine')
     const roundRobin = majorsOf(Array.from({ length: 20 }, (_, index) => fiveTracks[index % 5]))
-    const oneTrackFirst = majorsOf([...Array(12).fill('boiler'), ...Array(8).fill('cargo_hold')])
+    // Two tracks still split into majors: a boiler or hold purchase 120 costs past the wallet since
+    // their per-purchase rows (ticket 553).
+    const oneTrackFirst = majorsOf([...Array(12).fill('hull'), ...Array(8).fill('drill_tip')])
     for (const order of [roundRobin, oneTrackFirst]) {
       expect(tiersOf(order)).toEqual([
         [80, expect.objectContaining({ visualTier: 2 })],

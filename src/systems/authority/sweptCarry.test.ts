@@ -84,7 +84,7 @@ function cutDown(rig: Rig, cut: StepCut, { strideMm, ticks }: { strideMm: number
  * band-1 cell, since ticket 397 took the floor out of the law), a hold that never fills and a deep
  * tank.
  */
-const QUICK_RIG = { drill_power: 12, drill_tip: 400, cargo_hold: 3000 }
+const QUICK_RIG = { drill_power: 12, drill_tip: 400, cargo_hold: 51 }
 
 /** The tick each of the column's cells broke, from the top cell down, relative to the first tick. */
 function brokenTicksOf(ticks: readonly RuleEffect[], cells: readonly TilePoint[]): number[] {

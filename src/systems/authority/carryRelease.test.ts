@@ -135,7 +135,7 @@ describe('a released cell is still gate-checked (ticket 421, Horizontal Scaler)'
 })
 
 /** #397's 15 m/s rig on planet 1 (16.5 m/s at purchase 12 since #552), a hold that never fills and a deep tank. */
-const RIG_15 = { drill_power: 12, drill_tip: 600, engine: 5000, cargo_hold: 3000 }
+const RIG_15 = { drill_power: 12, drill_tip: 600, engine: 17, cargo_hold: 51 }
 const COLUMN = 30
 
 const DEEP_START = {

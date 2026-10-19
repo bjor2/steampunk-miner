@@ -30,7 +30,7 @@ const STARTING_RIGS: Readonly<Record<string, Record<string, number>>> = {
 }
 const FAST_RIGS: Readonly<Record<string, Record<string, number>>> = {
   'rig 1 (#400)': { drill_power: 17, drill_tip: 200 },
-  '15 m/s rig': { drill_power: 12, drill_tip: 600, engine: 5000 },
+  '15 m/s rig': { drill_power: 12, drill_tip: 600, engine: 17 },
 }
 const ALL_RIGS = { ...STARTING_RIGS, ...FAST_RIGS }
 const FRAME_RATES = [30, 144]

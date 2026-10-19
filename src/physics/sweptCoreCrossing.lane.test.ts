@@ -43,7 +43,7 @@ const RIG = {
   drill_power: P200.drill_power,
   drill_tip: P200.drill_tip,
   hull: 5000,
-  cargo_hold: 5000,
+  cargo_hold: 56,
 }
 const SWEPT_CUT_ON: DevFlags = { ...DEV_FLAGS, 'drill.sweptCut': true }
 const FRAME_RATES = [30, 144]

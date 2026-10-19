@@ -52,10 +52,10 @@ interface HeldRig {
  */
 const RIGS: Readonly<Record<string, HeldRig>> = {
   '15 m/s': {
-    levels: { drill_power: 11, drill_tip: 600, engine: 5000 },
+    levels: { drill_power: 11, drill_tip: 600, engine: 17 },
     legs: ['down', 'up'],
   },
-  '25 m/s': { levels: { drill_power: 14, drill_tip: 600, engine: 5000 }, legs: ['down', 'up'] },
+  '25 m/s': { levels: { drill_power: 14, drill_tip: 600, engine: 17 }, legs: ['down', 'up'] },
   '44 m/s (rig 1, #400)': { levels: { drill_power: 18, drill_tip: 200 }, legs: ['down', 'up'] },
 }
 const FRAME_RATES = [30, 144]
@@ -69,7 +69,7 @@ const MAX_BOUNDARY_CHANGE = 0.05
 const BAR_RIGS: Readonly<Record<string, HeldRig>> = {
   ...RIGS,
   'rig-heavy 15 m/s': {
-    levels: { ...RIGS['15 m/s'].levels, hull: 5000, cargo_hold: 5000 },
+    levels: { ...RIGS['15 m/s'].levels, hull: 5000, cargo_hold: 56 },
     legs: ['down', 'up'],
   },
 }

@@ -23,7 +23,7 @@ import {
 import { takeSnapshot } from '../authority/sessionSnapshot'
 import { stateDigest } from '../authority/stateDigest'
 import { oreTypeAtTile } from '../authority/tileOre'
-import { UPGRADE_IDS } from '../economy/economyDefinition'
+import { UPGRADE_IDS, type UpgradeId } from '../economy/economyDefinition'
 import { stepPrice } from '../economy/upgradePrices'
 import { toCanonical } from '../money'
 import { artefactOptionsOfferedTo } from '../registries/artefactOptions'
@@ -78,6 +78,9 @@ function diveMidCut(): AuthorityState {
   return playDive(arrived, diveTicks(divePathOf(arrived), DIVE_START_TICK, 160)).state
 }
 
+/** The tracks whose price grows with the planet (ticket 553: not the per-purchase brass). */
+const PLANET_GROWN: readonly UpgradeId[] = ['drill_power', 'drill_tip', 'hull']
+
 describe('save slot: money and prices as decimal text (ticket 405)', () => {
   const state = diveMidCut()
   const text = savedTextOf(state)
@@ -109,7 +112,10 @@ describe('save slot: money and prices as decimal text (ticket 405)', () => {
         return toCanonical(stepPrice(id, step, from.planet.index))
       })
     expect(nextPrices(loaded)).toEqual(nextPrices(state))
-    expect(nextPrices(state).every((price) => /e\+\d{3}$/.test(price))).toBe(true)
+    // The hold, boiler and engine are priced by their purchases alone since ticket 553, so only
+    // the drill, tip and hull prices carry the planet's growth past 1e100.
+    const grown = nextPrices(state).filter((_, index) => PLANET_GROWN.includes(UPGRADE_IDS[index]))
+    expect(grown.every((price) => /e\+\d{3}$/.test(price))).toBe(true)
   })
 })
 

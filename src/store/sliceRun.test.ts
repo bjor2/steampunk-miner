@@ -133,10 +133,14 @@ function earnAndBuyEveryTrack(): void {
  * The levels a core dig needs (#10: tip `3(p-1)+4` or more). Reaching them by play is the
  * pacing bot's job (#29); this scenario step sets them, logged as debug commands.
  */
+/** Hold purchases of 90 and 131 units, the old majors 20 and 30's 90 and 130 (ticket 553). */
+const HOLD_90_UNITS = 23
+const HOLD_131_UNITS = 27
+
 function equipForCore(tipLevel: number, cargoHold: number): void {
   game().setUpgrade('drill_tip', stepOfMajor(tipLevel))
   game().setUpgrade('drill_power', stepOfMajor(60))
-  game().setUpgrade('cargo_hold', stepOfMajor(cargoHold))
+  game().setUpgrade('cargo_hold', cargoHold)
 }
 
 function harvestCore(params: PlanetParams, count: number): void {
@@ -162,11 +166,11 @@ describe('slice run on both planets', () => {
   it('logs the #2 acceptance sequence and ends at the end-of-slice card', () => {
     startRun()
     earnAndBuyEveryTrack()
-    equipForCore(7, 20)
+    equipForCore(7, HOLD_90_UNITS)
     harvestCore(PLANET_1, 63)
     earnTravelFee()
     game().travel()
-    equipForCore(10, 30)
+    equipForCore(10, HOLD_131_UNITS)
     harvestCore(PLANET_2, 127)
 
     expect(isSubsequence(SLICE_SEQUENCE, loggedNames())).toBe(true)
@@ -181,11 +185,11 @@ describe('slice run on both planets', () => {
 
   it('logs core_completed once per planet, on planet 1 then on planet 2', () => {
     startRun()
-    equipForCore(7, 20)
+    equipForCore(7, HOLD_90_UNITS)
     harvestCore(PLANET_1, 63)
     game().giveMoney('100')
     game().travel()
-    equipForCore(10, 30)
+    equipForCore(10, HOLD_131_UNITS)
     harvestCore(PLANET_2, 127)
     const completions = sink.events.filter((event) => event.event === 'core_completed')
     expect(completions.map((event) => event.planet)).toEqual([1, 2])

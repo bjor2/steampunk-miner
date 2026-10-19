@@ -16,7 +16,14 @@ import { ECONOMY } from './economy'
 import { paceScale } from './planetEconomy'
 import { stepPrice, upgradePrice } from './upgradePrices'
 import { isPerPurchaseTrack } from './upgradeSteps'
-import { cargoCapacity, energyMax, engineStats, rescueEnergyFloor } from './vehicleStats'
+import {
+  cargoCapacity,
+  drillTip,
+  energyMax,
+  engineStats,
+  hullMax,
+  rescueEnergyFloor,
+} from './vehicleStats'
 import { quantaOfUnits } from '../vehicle/energyQuanta'
 
 // The hold, the boiler and the engine per purchase (ticket 553: Systems' rows on #553, comment
@@ -156,6 +163,19 @@ describe('boiler row per purchase (ticket 553)', () => {
     },
   )
 
+  // As the hold's: rounding makes a few early purchases cheaper than the units they add.
+  it('raises every price from purchase 4 to 200 by at least the energy its purchase adds', () => {
+    const cheap = PURCHASES_0_TO_200.slice(4).filter((purchase) => {
+      const priceRatio = div(stepPrice('boiler', purchase + 1, 1), stepPrice('boiler', purchase, 1))
+      const tankRatio = div(
+        fromSafeInteger(energyMax(purchase + 1)),
+        fromSafeInteger(energyMax(purchase)),
+      )
+      return cmp(priceRatio, tankRatio) < 0
+    })
+    expect(cheap).toEqual([])
+  })
+
   it('keeps p/s at or above 1 on the unrounded rows at every purchase from 0 to 200', () => {
     const cheap = PURCHASES_0_TO_200.filter((purchase) => {
       const priceRatio = div(powInt(m('1.20'), purchase + 1), powInt(m('1.20'), purchase))
@@ -226,5 +246,20 @@ describe('no max level on the hold, the boiler or the engine (ticket 553)', () =
       expect(isPerPurchaseTrack(upgradeId)).toBe(true)
       expect(upgradePrice(upgradeId, 37, 3)).toEqual(stepPrice(upgradeId, 37, 3))
     }
+  })
+})
+
+// The tip and the hull keep their major rows: price x1.500625 against tip x1.2544, price x1.225
+// against hull x1.12 a major, so p/s is 1.196 and 1.094 at every major.
+describe('p/s on the tip and hull majors (ticket 553 acceptance)', () => {
+  it.each([
+    ['drill_tip', drillTip],
+    ['hull', hullMax],
+  ] as const)('raises every %s major price from 0 to 200 by at least its stat', (track, statOf) => {
+    const cheap = PURCHASES_0_TO_200.filter((major) => {
+      const priceRatio = div(upgradePrice(track, major + 1, 1), upgradePrice(track, major, 1))
+      return cmp(priceRatio, div(statOf(major + 1), statOf(major))) < 0
+    })
+    expect(cheap).toEqual([])
   })
 })

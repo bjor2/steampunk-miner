@@ -17,7 +17,7 @@ import {
 // ruling on #547 section 2): a `drill.sweptCut` flip made mid-drill stays pending, the swept
 // steps going on, until a step finds the drill idle; from then the drill cuts on pose reports.
 
-const RIG = { drill_power: 4, drill_tip: 600, engine: 5000 }
+const RIG = { drill_power: 4, drill_tip: 600, engine: 17 }
 const ticksOf = (seconds: number) => Math.round(seconds / PHYSICS_TIMESTEP)
 
 let sink: MemorySink

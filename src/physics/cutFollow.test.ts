@@ -35,7 +35,7 @@ import {
 const RIGS: readonly Record<string, number>[] = [
   {},
   { drill_power: 17, drill_tip: 200 },
-  { drill_power: 12, drill_tip: 600, engine: 5000 },
+  { drill_power: 12, drill_tip: 600, engine: 17 },
 ]
 
 /**

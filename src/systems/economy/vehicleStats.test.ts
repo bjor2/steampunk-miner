@@ -100,7 +100,7 @@ describe('vehicle stats', () => {
 describe('on-curve levels', () => {
   it.each([
     ['boiler', 0, 16],
-    ['engine', 1, 2],
+    ['engine', 3, 2],
     ['hull', 6, 2],
     ['drill_power', 3, 12],
     ['drill_tip', 3, 7],
@@ -116,8 +116,8 @@ describe('on-curve levels', () => {
     expect([1, 12, 13, 40, 1000].map((planet) => onCurveLevel('cargo_hold', planet))).toEqual([
       22, 33, 34, 34, 34,
     ])
-    expect([1, 40, 130, 131, 1_000_000].map((planet) => onCurveLevel('engine', planet))).toEqual([
-      2, 41, 131, 131, 131,
+    expect([1, 40, 44, 45, 1_000_000].map((planet) => onCurveLevel('engine', planet))).toEqual([
+      2, 119, 131, 131, 131,
     ])
   })
 

@@ -35,7 +35,7 @@ import { stepAtToe, type ToeStep } from './toeStopFixtures'
 const RIGS: Readonly<Record<string, Record<string, number>>> = {
   'stored 1': { drill_power: 1, drill_tip: 0 },
   'stored 2': { drill_power: 2, drill_tip: 0 },
-  '15 m/s rig': { drill_power: 12, drill_tip: 600, engine: 5000 },
+  '15 m/s rig': { drill_power: 12, drill_tip: 600, engine: 17 },
 }
 const FRAME_RATES = [30, 144]
 const LEGS = ['down', 'level'] as const
@@ -127,7 +127,7 @@ const TOE_RATCHET_ROWS = FRAME_RATES.map((framesPerSecond) => ({
   ...TOE_RATCHET[framesPerSecond],
 }))
 /** #458's rig-heavy 15 m/s rig: the 15 m/s rig with its hull and hold upgraded too. */
-const RIG_HEAVY = { drill_power: 12, drill_tip: 600, engine: 5000, hull: 5000, cargo_hold: 5000 }
+const RIG_HEAVY = { drill_power: 12, drill_tip: 600, engine: 17, hull: 5000, cargo_hold: 56 }
 /**
  * Its level release phase at 144 frames/s whose body is in the air as the drive lets go (#458),
  * re-paired for ticket 506 from main's 37: there it now rides its ramp for all 6 ticks. At 36 and

@@ -201,7 +201,7 @@ function armedRigStart(
 ): AuthorityState {
   const session = createScriptedSession()
   session.submit(tick, FREEZE_ENEMIES)
-  const armed = { drill_tip: TIP_STEP, drill_power: drillStep, cargo_hold: 2_000, hull: 2_000 }
+  const armed = { drill_tip: TIP_STEP, drill_power: drillStep, cargo_hold: 47, hull: 2_000 }
   const upgrades = { ...armed, ...over }
   for (const [upgradeId, level] of Object.entries(upgrades)) {
     session.submit(tick, { type: 'debug.setUpgrade', payload: { upgradeId, level } })

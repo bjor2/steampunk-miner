@@ -40,7 +40,8 @@ describe('step bound (ticket 334)', () => {
   })
 
   it('bounds a travelling step by the engine top speed rounded up to whole mm, plus one sample', () => {
-    for (const engine of [0, 50, 400]) {
+    // The engine is bought per purchase since ticket 553: 200 purchases is Systems' tested range.
+    for (const engine of [0, 50, 200]) {
       const rig = rigWith({ engine })
       const speedMax = vehicleStatsAt(rig.levels).engine.speedMax
       const travelling = stepBoundsOf(rig, PARAMS).travellingMm - STEP_BOUND_TOLERANCE_MM
@@ -50,7 +51,8 @@ describe('step bound (ticket 334)', () => {
   })
 
   it('bounds a travelling step by k times the cut once it passes the engine', () => {
-    const rig = rigWith({ drill_power: 300, drill_tip: 200, engine: 400 })
+    // Engine purchase 13 (11.3 m/s) stands for the old saturating step 400 (10.9 m/s, ticket 553).
+    const rig = rigWith({ drill_power: 300, drill_tip: 200, engine: 13 })
     const subSteps = subStepsPerTile(vehicleStatsAt(rig.levels), blockHardness(1, 1)) as number
     const bounds = stepBoundsOf(rig, PARAMS)
     expect(bounds.travellingMm).toBe(
@@ -70,7 +72,7 @@ describe('step bound (ticket 334)', () => {
       const rig = rigWith({
         drill_power: random.nextInt(3000),
         drill_tip: random.nextInt(900),
-        engine: random.nextInt(500),
+        engine: random.nextInt(201),
       })
       const bounds = stepBoundsOf(rig, PARAMS)
       expect(bounds.travellingMm).toBeGreaterThanOrEqual(bounds.cuttingMm)

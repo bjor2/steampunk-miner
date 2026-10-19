@@ -44,13 +44,13 @@ import {
 // and writes the trace to balance-report/level-release-trace.ndjson for the fix tickets to re-run.
 
 const RIGS: Readonly<Record<string, Record<string, number>>> = {
-  '15 m/s rig': { drill_power: 12, drill_tip: 600, engine: 5000 },
+  '15 m/s rig': { drill_power: 12, drill_tip: 600, engine: 17 },
   'rig-heavy 15 m/s': {
     drill_power: 12,
     drill_tip: 600,
-    engine: 5000,
+    engine: 17,
     hull: 5000,
-    cargo_hold: 5000,
+    cargo_hold: 56,
   },
 }
 const FRAME_RATES = [30, 144]

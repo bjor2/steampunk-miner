@@ -134,7 +134,7 @@ async function digDown(page: Page): Promise<void> {
     const debug = window.steampunkDebug!
     debug.setUpgrade('drill_power', 8)
     debug.setUpgrade('drill_tip', 120)
-    debug.setUpgrade('engine', 80)
+    debug.setUpgrade('engine', 6)
     debug.input.press('aim_left')
   })
   await page.waitForTimeout(1500)

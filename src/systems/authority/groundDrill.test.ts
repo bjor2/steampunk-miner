@@ -25,7 +25,8 @@ function scriptedRegion(): TilePoint[] {
 /** Mines each cell clear from above, refilling the tank as a dock would. */
 function mineRegion(tiles: readonly TilePoint[]): DomainEvent[] {
   const session = createScriptedSession()
-  session.submit(0, { type: 'debug.setUpgrade', payload: { upgradeId: 'cargo_hold', level: 400 } })
+  // Hold purchase 30 carries 174 units, the old step 400's 170 (ticket 553).
+  session.submit(0, { type: 'debug.setUpgrade', payload: { upgradeId: 'cargo_hold', level: 30 } })
   let tick = 0
   for (const tile of tiles) {
     session.submit(tick, { type: 'debug.setEnergy', payload: { energy: '150' } })

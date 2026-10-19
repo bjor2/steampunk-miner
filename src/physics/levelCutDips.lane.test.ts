@@ -35,18 +35,18 @@ interface LevelRig {
   downSeconds: number
 }
 
-const FIFTEEN_LEVELS = { drill_power: 12, drill_tip: 600, engine: 5000 }
+const FIFTEEN_LEVELS = { drill_power: 12, drill_tip: 600, engine: 17 }
 const LEVEL_RIGS: readonly LevelRig[] = [
   { rig: '15 m/s', levels: FIFTEEN_LEVELS, levelSeconds: 10, downSeconds: 3 },
   {
     rig: 'rig-heavy 15 m/s',
-    levels: { ...FIFTEEN_LEVELS, hull: 5000, cargo_hold: 5000 },
+    levels: { ...FIFTEEN_LEVELS, hull: 5000, cargo_hold: 56 },
     levelSeconds: 10,
     downSeconds: 3,
   },
   {
     rig: '25 m/s',
-    levels: { drill_power: 14, drill_tip: 600, engine: 5000 },
+    levels: { drill_power: 14, drill_tip: 600, engine: 17 },
     levelSeconds: 6,
     downSeconds: 3,
   },

@@ -25,7 +25,7 @@ import type { VehicleController, VehicleStepResult } from './vehicleController'
 // drills; the swept kernel is frozen and dark.
 
 /** Steps past the curve, as the TD's #316 runs: speedMax ~14, a tip that cuts at full efficiency. */
-const RIG_LEVELS = { drill_tip: 600, engine: 5000 } as const
+const RIG_LEVELS = { drill_tip: 600, engine: 17 } as const
 
 /**
  * drill_power purchases (#552; the old majors 5, 11, 14 and 20 took 23, 12, 9 and 5) and the

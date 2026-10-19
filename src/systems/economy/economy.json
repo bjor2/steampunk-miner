@@ -191,7 +191,7 @@
         "ratio": "1.050",
         "start": { "speedMax": "6", "accel": "1.0", "netLift": "1" }
       },
-      "onCurve": { "levelAtPlanet1": 2, "levelsPerPlanet": 1, "atMost": 131 }
+      "onCurve": { "levelAtPlanet1": 2, "levelsPerPlanet": 3, "atMost": 131 }
     },
     {
       "id": "boiler",

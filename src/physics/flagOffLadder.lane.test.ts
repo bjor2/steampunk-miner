@@ -30,7 +30,7 @@ import { playFlagOffLeg, type FlagOffLeg, type LegSection } from './flagOffLegFi
 // balance-report/flag-off-ladder.ndjson.
 
 const P200 = onCurveSteps(200)
-const RIG_SAFETY = { hull: 5000, cargo_hold: 5000 }
+const RIG_SAFETY = { hull: 5000, cargo_hold: 56 }
 
 /** The on-curve drill of `planet` (#20 curve), for the ratio bands read from the ladder. */
 function onCurveRig(planet: number): Record<string, number> {

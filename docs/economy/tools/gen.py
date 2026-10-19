@@ -22,7 +22,7 @@ def coreTiles(Rr):
     c=coreR(Rr); return sum(1 for x in range(-c,c+1) for y in range(-c,c+1) if (2*x+1)**2+(2*y+1)**2<=(2*c)**2)
 def need(Rr): return -(-4*coreTiles(Rr)//10)
 def Lon(tr,p):
-    return dict(drill_power=3*(p-1)+12,drill_tip=3*(p-1)+7,hull=6*(p-1)+2,cargo_hold=min((p-1)+22,34),boiler=16,engine=min((p-1)+2,131))[tr]
+    return dict(drill_power=3*(p-1)+12,drill_tip=3*(p-1)+7,hull=6*(p-1)+2,cargo_hold=min((p-1)+22,34),boiler=16,engine=min(3*(p-1)+2,131))[tr]
 # paceScale(p) (#131 fromPlanet): the last row at or below p, else 1; it multiplies every price.
 def pace(p): return d(([s for f_,s in C['paceFrom'] if f_<=p] or ["1"])[-1])
 # drill power's price rows per purchase (#551, ticket 552): price(0) = 1, price(n) = ceil(20 x 1.48^(n-1)), times pace(p).

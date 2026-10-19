@@ -18,7 +18,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | Check | Decided in | Where | Tests |
 | --- | --- | --- | --- |
 | Pacing gates: slice band, planet 1 core and assay gate, median of the gate seeds | #84 | `src/logging/pacingGate.test.ts`, `src/logging/assayPacingGate.test.ts` | 10 |
-| Campaign scaling gate (R1): band 5 sawtooth on planets 1-7 and the schedule cadence, with the C1-C4 and H1-H2 probes | #81, #89 | `src/logging/campaignScalingGate.test.ts`, `src/logging/campaignPacingGate.test.ts`, `src/systems/economy/upgradePrices.test.ts`, `src/systems/economy/economyGrowth.test.ts`, `src/systems/economy/casingPrices.test.ts`, `src/systems/authority/casingPlacement.test.ts`, `src/systems/vehicle/bandDig.test.ts`, `src/logging/sawtoothMedian.test.ts`, `src/systems/bot/botCoreRule.test.ts`, `src/logging/pacingReport.test.ts`, `src/systems/unlocks/readUnlockSchedule.test.ts`, `src/systems/unlocks/travelUnlocks.test.ts`, `src/systems/unlocks/scheduleCadence.test.ts`, `src/systems/authority/featureUnlocks.test.ts`, `npm run balance:planets` | 115 |
+| Campaign scaling gate (R1): band 5 sawtooth on planets 1-7 and the schedule cadence, with the C1-C4 and H1-H2 probes | #81, #89 | `src/logging/campaignScalingGate.test.ts`, `src/logging/campaignPacingGate.test.ts`, `src/systems/economy/upgradePrices.test.ts`, `src/systems/economy/economyGrowth.test.ts`, `src/systems/economy/casingPrices.test.ts`, `src/systems/authority/casingPlacement.test.ts`, `src/systems/vehicle/bandDig.test.ts`, `src/logging/sawtoothMedian.test.ts`, `src/systems/bot/botCoreRule.test.ts`, `src/logging/pacingReport.test.ts`, `src/systems/unlocks/readUnlockSchedule.test.ts`, `src/systems/unlocks/travelUnlocks.test.ts`, `src/systems/unlocks/scheduleCadence.test.ts`, `src/systems/authority/featureUnlocks.test.ts`, `npm run balance:planets` | 114 |
 | Balance guards, reported against the committed baseline or a control run | #84, #105, #107, #109, #113, #198, #347 | `npm run balance:report`, `npm run balance:planets`, `npm run balance:guns`, `npm run balance:bore`, `npm run balance:charges`, `npm run balance:refinery`, `npm run balance:heat` | - |
 | Every buyable has a description | #159 | `src/systems/registries/buyableRefs.test.ts`, `src/features/descriptions/systems/descriptionCoverage.test.ts` | 10 |
 | Every ore family has a gateClass row | #141, #142 | `src/features/planet-mix/systems/themeRows.test.ts`, `src/features/mining-gates/systems/rigs.test.ts`, `src/features/mining-gates/systems/gateTable.test.ts` | 19 |
@@ -837,6 +837,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | --- | --- | --- |
 | `src/systems/bot/blastTrade.test.ts` | 2 | 2 |
 | `src/systems/bot/botBlasting.test.ts` | 4 | 4 |
+| `src/systems/bot/botBoiler.test.ts` | 4 | 4 |
 | `src/systems/bot/botBore.test.ts` | 10 | 10 |
 | `src/systems/bot/botChains.test.ts` | 4 | 4 |
 | `src/systems/bot/botChargeNeed.test.ts` | 2 | 2 |
@@ -923,13 +924,14 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/economy/itemHookCaps.test.ts` | 8 | 8 |
 | `src/systems/economy/magnetCaps.test.ts` | 5 | 5 |
 | `src/systems/economy/oreEconomy.test.ts` | 7 | 7 |
+| `src/systems/economy/perPurchaseRows.test.ts` | 37 | 19 |
 | `src/systems/economy/planetCharges.test.ts` | 16 | 12 |
 | `src/systems/economy/readEconomy.test.ts` | 25 | 25 |
 | `src/systems/economy/refineryEconomy.test.ts` | 6 | 6 |
 | `src/systems/economy/trackKind.test.ts` | 1 | 1 |
-| `src/systems/economy/upgradePrices.test.ts` | 10 | 10 |
-| `src/systems/economy/upgradeSteps.test.ts` | 24 | 16 |
-| `src/systems/economy/vehicleStats.test.ts` | 22 | 14 |
+| `src/systems/economy/upgradePrices.test.ts` | 9 | 9 |
+| `src/systems/economy/upgradeSteps.test.ts` | 17 | 15 |
+| `src/systems/economy/vehicleStats.test.ts` | 22 | 15 |
 
 ### `enemies`
 
@@ -1495,6 +1497,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/vehicle/drillStamp.test.ts` | 1 | 1 |
 | `src/systems/vehicle/drillToe.test.ts` | 6 | 6 |
 | `src/systems/vehicle/driveSigns.test.ts` | 5 | 5 |
+| `src/systems/vehicle/engineTravelBound.test.ts` | 7 | 3 |
 | `src/systems/vehicle/facedSide.test.ts` | 10 | 10 |
 | `src/systems/vehicle/gunBurst.test.ts` | 6 | 6 |
 | `src/systems/vehicle/heatPauseSteps.test.ts` | 7 | 7 |
@@ -1510,11 +1513,11 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/vehicle/sweepDwell.test.ts` | 13 | 13 |
 | `src/systems/vehicle/sweptCut.test.ts` | 7 | 7 |
 | `src/systems/vehicle/tickPlan.test.ts` | 10 | 6 |
-| `src/systems/vehicle/travelParity.test.ts` | 13 | 13 |
+| `src/systems/vehicle/travelParity.test.ts` | 15 | 15 |
 | `src/systems/vehicle/vehicleCharges.test.ts` | 4 | 4 |
 | `src/systems/vehicle/vehicleControls.test.ts` | 15 | 15 |
 | `src/systems/vehicle/vehicleReadout.test.ts` | 3 | 3 |
-| `src/systems/vehicle/vehicleStats.test.ts` | 9 | 9 |
+| `src/systems/vehicle/vehicleStats.test.ts` | 8 | 8 |
 | `src/systems/vehicle/workshopMilestones.test.ts` | 12 | 12 |
 
 ### `views`
@@ -1527,11 +1530,12 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/views/combatStatuses.test.ts` | 8 | 8 |
 | `src/systems/views/compactNumbers.test.ts` | 3 | 3 |
 | `src/systems/views/deviceNotices.test.ts` | 6 | 6 |
-| `src/systems/views/engineTrackMaxed.test.ts` | 6 | 6 |
+| `src/systems/views/engineTrackParity.test.ts` | 7 | 7 |
 | `src/systems/views/hazardStripPlace.test.ts` | 2 | 2 |
 | `src/systems/views/hazardStripView.test.ts` | 3 | 3 |
 | `src/systems/views/heatViews.test.ts` | 5 | 5 |
 | `src/systems/views/hintRoom.test.ts` | 7 | 7 |
+| `src/systems/views/holdTrackNote.test.ts` | 5 | 5 |
 | `src/systems/views/hudCallouts.test.ts` | 8 | 8 |
 | `src/systems/views/hudClearView.test.ts` | 18 | 15 |
 | `src/systems/views/hudCompact.test.ts` | 5 | 5 |

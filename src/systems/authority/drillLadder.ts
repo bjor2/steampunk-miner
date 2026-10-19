@@ -9,7 +9,6 @@
  * Motion is left out: after its first, resting tick the pose sits past the column's foot, so every
  * tick's reach is its work's alone. #397's cut-follow adds the vehicle's travel time to the ladder.
  */
-import { stepOfMajor } from '../economy/upgradeSteps'
 import { energyMax } from '../economy/vehicleStats'
 import { NO_DRIVE } from '../vehicle/driveSigns'
 import { FACING, noseTileOf, type VehiclePose } from '../vehicle/vehiclePose'
@@ -33,9 +32,12 @@ export interface DrillLadderRung {
 /** The ground the ladder cuts: the scripted sessions' planet 1 band-1 surface column. */
 export const LADDER_COLUMN = GROUND.tx
 
-/** A full tank and a hold (in majors) no column empties or fills, so only the drill sets the time. */
-const DEEP_TANK_MAJOR = 100
-const HOLD_MAJOR = 300
+/**
+ * A full tank and a hold no column empties or fills, so only the drill sets the time: boiler and
+ * hold purchases (ticket 553) of 758 and 1,291 units, the old majors 100 and 300's 750 and 1,210.
+ */
+const DEEP_TANK_PURCHASES = 17
+const HOLD_PURCHASES = 51
 /** Cells past the column's foot the pose waits at, so the stamp's centre crosses the last cell. */
 const FOOT_OVERSHOOT_CELLS = 3
 /** A cut that has not finished by now is stuck, never slow: about 28 minutes. */
@@ -63,11 +65,11 @@ function rigOnSurfaceAt(drillStep: number): Rig {
   const session = createScriptedSession()
   session.submit(0, FREEZE_ENEMIES)
   session.submit(0, setUpgrade('drill_power', drillStep))
-  session.submit(0, setUpgrade('cargo_hold', stepOfMajor(HOLD_MAJOR)))
-  session.submit(0, setUpgrade('boiler', stepOfMajor(DEEP_TANK_MAJOR)))
+  session.submit(0, setUpgrade('cargo_hold', HOLD_PURCHASES))
+  session.submit(0, setUpgrade('boiler', DEEP_TANK_PURCHASES))
   session.submit(0, {
     type: 'debug.setEnergy',
-    payload: { energy: `${energyMax(DEEP_TANK_MAJOR)}` },
+    payload: { energy: `${energyMax(DEEP_TANK_PURCHASES)}` },
   })
   session.submit(0, poseAbove(GROUND, FACING.down))
   const state = session.state()

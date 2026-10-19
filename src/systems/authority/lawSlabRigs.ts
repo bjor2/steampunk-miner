@@ -13,7 +13,11 @@
  */
 import { onCurveSteps } from '../economy/vehicleStats'
 
-const RIG_SAFETY = { hull: 5000, cargo_hold: 5000 }
+/**
+ * A hull and hold no slab breaks or fills: hold purchase 56 carries 2,080 units, the old step
+ * 5000's 2,010 (ticket 553); engine purchase 17 below (13.75 m/s) is the old top engine's 13.6.
+ */
+const RIG_SAFETY = { hull: 5000, cargo_hold: 56 }
 
 export interface SpeedRig {
   levels: Record<string, number>
@@ -22,7 +26,7 @@ export interface SpeedRig {
 
 export const SPEED_RIGS: Readonly<Record<string, SpeedRig>> = {
   '25 m/s': {
-    levels: { drill_power: 14, drill_tip: 600, engine: 5000, ...RIG_SAFETY },
+    levels: { drill_power: 14, drill_tip: 600, engine: 17, ...RIG_SAFETY },
     speedMps: 25,
   },
   '44 m/s': { levels: { drill_power: 17, drill_tip: 200, ...RIG_SAFETY }, speedMps: 44 },

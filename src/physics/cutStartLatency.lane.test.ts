@@ -50,7 +50,7 @@ const RIGS: Readonly<Record<string, Record<string, number>>> = {
   'stored 10': { drill_power: 10, drill_tip: 0 },
   'stored 20': { drill_power: 20, drill_tip: 0 },
   'rig 1 (#400)': { drill_power: 17, drill_tip: 200 },
-  '15 m/s rig': { drill_power: 12, drill_tip: 600, engine: 5000 },
+  '15 m/s rig': { drill_power: 12, drill_tip: 600, engine: 17 },
 }
 const FRAME_RATES = [30, 144]
 const P200_STEPS = onCurveSteps(200)

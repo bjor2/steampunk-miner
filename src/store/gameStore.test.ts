@@ -231,7 +231,7 @@ describe('game store: vehicle', () => {
   it('copies the vehicle from the authority after a debug command', () => {
     game().setEnergy('37.5')
     game().setUpgrade('cargo_hold', 20)
-    expect(game().vehicle).toMatchObject({ energy: 9000, cargoCapacity: 18, mode: 'active' })
+    expect(game().vehicle).toMatchObject({ energy: 9000, cargoCapacity: 67, mode: 'active' })
   })
 
   it('refuses a debug value the authority would refuse, without sending it', () => {

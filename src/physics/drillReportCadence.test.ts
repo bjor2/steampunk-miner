@@ -25,7 +25,7 @@ const SWEPT_CUT_OFF: DevFlags = { ...DEV_FLAGS, 'drill.sweptCut': false }
 const FRAME_RATES = [30, 60, 144]
 const DRILLING_SECONDS = 8
 const COMMAND_BYTES_PER_SECOND_MAX = 8 * 1024
-const RIG = { drill_power: 50, drill_tip: 600, engine: 5000 }
+const RIG = { drill_power: 50, drill_tip: 600, engine: 17 }
 
 let sink: MemorySink
 
