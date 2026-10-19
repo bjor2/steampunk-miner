@@ -468,7 +468,7 @@ incomePerHour}` go to `balance-report/drill-pace.ndjson`, which `pushTestMetrics
   Drill speed panel ([loop-status.md](loop-status.md#drill-speed-panel-ticket-434)). About 2 s.
 - **Cut-follow at the starting drill** (ticket 430): `src/physics/cutFollowStartingRigs.test.ts`
   plays 8 s legs down, level and up in the live loop with `drill.sweptCut` on, at stored
-  drill_power 1, 10 and 20 (tip 0) and #400's two rigs, and holds a down cut to the drill's speed
+  drill_power 1 and 2 (tip 0; purchases since ticket 552, 1.50 and 1.86 m/s, the old stored 1 and 20) and #400's two rigs, and holds a down cut to the drill's speed
   (95% of the ticks within 5%, none under 80% or backward) past its start from rest (#433's first
   cell, held and second stall), up and level to main's shares (79%, 42%), the motor gate to the
   authority's and 30 and 144 frames/s to one path (about 40 s). Since ticket 432 an up cut holds
@@ -476,11 +476,12 @@ incomePerHour}` go to `balance-report/drill-pace.ndjson`, which `pushTestMetrics
   the authority's gate stood open (the body then breaks out of the ground and travels). The commanded speed is the open
   gate's `vCut`, carried through a shut gate and a cleared slab. `src/physics/cutFollowRelease.test.ts`
   lets go of a followed cut at every tick of a cell's cycle (a fresh rig a phase) and wants the body
-  stopped within 6 ticks (about 5 minutes); stored 20's level sweep is a todo on #465 since ticket
+  stopped within 6 ticks (about 5 minutes); stored 2's level sweep is a todo on #465 since ticket
   459 (the toe's gravity slide after letting go). Both share the rig of `src/physics/cutFollowFixtures.ts`.
   Since ticket 491 it also holds the let-go stop at the face's toe (`src/systems/vehicle/drillToe.ts`,
-  unit spec beside it): the 15 m/s rig's paired back-off ratchets at 30 and 144 frames/s, an airborne
-  rig-heavy release that keeps its ramp, and one-step checks through `cutTickFor` (swept cut off
+  unit spec beside it): the 15 m/s rig's paired back-off ratchets at 30 and 144 frames/s and an
+  airborne rig-heavy release that keeps its ramp (skipped since ticket 552 until their phases are
+  re-paired at purchase 12, as no purchase cuts the 14.47 m/s they were read at), and one-step checks through `cutTickFor` (swept cut off
   reads no toe; a gated cell still stops the body) on the ground of `src/physics/toeStopFixtures.ts`.
 - **Body-wide bore at any cells a tick** (ticket 439): `src/systems/authority/sweptFreshCarve.test.ts`
   cuts planet 1's column and its tilted radius with rigs named by their band-1 cut speed (25 to
