@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import {
   CUT_FACE_MARGIN_MM,
-  DRILL_STAMP_AHEAD_MM,
+  DRILL_STAMP_OFFSET_MM,
   STEP_BOUND_TOLERANCE_MM,
 } from '../../constants/balance'
 import { sweptStampAheadMmOf } from '../vehicle/drillStamp'
@@ -88,7 +88,7 @@ const BOUNDS = stepBoundsAt(sessionFacingDownAt().state(), 'p1')
 /** The longest step a cutting rig may take: every scripted descent here keeps to it. */
 const CUT_STEP_MM = BOUNDS.cuttingMm
 /** The swept stamp's centre sat this far ahead of the pose before ticket 570: a report's, plus the cutting bound. */
-const SWEPT_AHEAD_MM = DRILL_STAMP_AHEAD_MM + CUT_STEP_MM
+const PRE_570_SWEPT_REACH_MM = DRILL_STAMP_OFFSET_MM + CUT_STEP_MM
 /** The furthest a resting body's front stands ahead of it (ticket 570): its step, margin and ramp, and the margin it may win back. */
 const SWEPT_REACH_MAX_MM = sweptStampAheadMmOf(CUT_STEP_MM) + CUT_FACE_MARGIN_MM + 125
 
@@ -362,7 +362,7 @@ describe('drill step yield per metre (ticket 330, Vertical Scaler)', () => {
   const top = { x: START.x, y: (SURFACE_TY + 1) * 1000 + 600 }
   const METRES = 8
   /** The swept stamp's front leads a report's by the cutting bound (tickets 333, 334). */
-  const REACH_GAIN_MM = SWEPT_AHEAD_MM - DRILL_STAMP_AHEAD_MM
+  const REACH_GAIN_MM = PRE_570_SWEPT_REACH_MM - DRILL_STAMP_OFFSET_MM
 
   /**
    * The same scripted descent of the stamp cut by 5 Hz reports alone, or by a step every tick

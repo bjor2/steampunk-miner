@@ -61,9 +61,11 @@ export const DRILL_STAMP_RADIUS_MM = 950
  * Driving sideways on the ground it is also raised along `localUp` by `DRILL_STAMP_LIFT_MM`, so
  * the tunnel is taller above the body than below and its floor (cut level, see `drillStamp.ts`)
  * lies inside the disc's strong middle. Placeholders, checked by the level-tunnel physics spec and
- * tuned by hand in the vehicle feel test.
+ * tuned by hand in the vehicle feel test. An offset, not a reach (ticket 570 renamed it from
+ * `DRILL_STAMP_AHEAD_MM`): a cut riding its face places its stamp by `sweptStampAheadMmOf`, and a
+ * travelling one this offset plus the cutting bound (`travelStampAheadMmAt`).
  */
-export const DRILL_STAMP_AHEAD_MM = 500
+export const DRILL_STAMP_OFFSET_MM = 500
 export const DRILL_STAMP_LIFT_MM = 250
 
 /** Half the 0.9 m body's side (#7): its face sits this far ahead of its centre. */

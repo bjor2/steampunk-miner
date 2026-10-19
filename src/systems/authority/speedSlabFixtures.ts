@@ -14,7 +14,7 @@
  * planet-1 rock), so the stride is what its stats allow. Every command's charge and the law work it
  * removed are tallied, as the law slab does (`lawCarrySlabFixtures.ts`). Only specs use this.
  */
-import { DRILL_STAMP_AHEAD_MM, STEP_BOUND_TOLERANCE_MM } from '../../constants/balance'
+import { DRILL_STAMP_OFFSET_MM, STEP_BOUND_TOLERANCE_MM } from '../../constants/balance'
 import { MM_PER_METRE, TICKS_PER_SECOND, UP_VECTOR_SCALE } from '../../constants/physics'
 import type { SliceDefinition } from '../../registries/sliceDefinition'
 import { ENERGY_QUANTA_PER_TICK } from '../vehicle/energyQuanta'
@@ -60,7 +60,7 @@ const ROCK_UNDER_FOOT = 160
 const SURFACE_ORE_SCANNED = 40
 const START = { x: COLUMN * 1000 + 500, y: (SURFACE_TY + 3) * 1000 + 500 }
 /** The body rests with its report stamp on the foot cell's floor. */
-const END_Y = SLAB_TILES.foot.ty * 1000 + DRILL_STAMP_AHEAD_MM
+const END_Y = SLAB_TILES.foot.ty * 1000 + DRILL_STAMP_OFFSET_MM
 export const GATE_OPENS_AT_TICK = 300
 /** Ten seconds of ticks: the run's whole length, rest included. */
 export const RUN_TICKS = 600

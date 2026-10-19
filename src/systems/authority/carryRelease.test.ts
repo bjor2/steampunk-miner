@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { DRILL_STAMP_AHEAD_MM, DRILL_SUBSTEPS_PER_TICK } from '../../constants/balance'
+import { DRILL_STAMP_OFFSET_MM, DRILL_SUBSTEPS_PER_TICK } from '../../constants/balance'
 import { withRegistrations } from '../../registries/registrar'
 import type { SliceDefinition } from '../../registries/sliceDefinition'
 import type { GateOutcome } from '../registries/gateChecks'
@@ -229,7 +229,7 @@ function followCut(shape: LegShape, ticks: number): LegTick[] {
 /** Where the body stands behind the cut's reach: the start before the first tick. */
 function poseBehindCut(start: VehiclePose, cursor: SweptCut | undefined) {
   if (cursor === undefined) return { x: start.x, y: start.y }
-  return pointAheadOf(start, -DRILL_STAMP_AHEAD_MM, { x: cursor.xMm, y: cursor.yMm })
+  return pointAheadOf(start, -DRILL_STAMP_OFFSET_MM, { x: cursor.xMm, y: cursor.yMm })
 }
 
 /** A level leg west through plain ground: the lip's case. */

@@ -61,7 +61,7 @@ const SCAN_REACH_M = 3
  * undercut, the front of a level cut's floor.
  */
 const CROSSING_BEHIND_MM = 2 * MM_PER_SAMPLE
-const CROSSING_AHEAD_MM = MM_PER_SAMPLE
+const CROSSING_PAST_FRONT_MM = MM_PER_SAMPLE
 
 export function faceReadOf(tick: TickRead, last: FaceRead | null): FaceRead {
   const reader = readerNow()
@@ -88,7 +88,9 @@ export function isPopIn({ sx, sy }: SampleDrop, read: FaceRead): boolean {
   const alongOf = (point: StampPoint) =>
     (sx * MM_PER_SAMPLE - point.xMm) * read.ahead.x +
     (sy * MM_PER_SAMPLE - point.yMm) * read.ahead.y
-  return alongOf(read.front) > CROSSING_AHEAD_MM || alongOf(read.lastFront) < -CROSSING_BEHIND_MM
+  return (
+    alongOf(read.front) > CROSSING_PAST_FRONT_MM || alongOf(read.lastFront) < -CROSSING_BEHIND_MM
+  )
 }
 
 /**

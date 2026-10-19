@@ -23,7 +23,7 @@
 import {
   BODY_HALF_SIZE_MM,
   CUT_FACE_MARGIN_MM,
-  DRILL_STAMP_AHEAD_MM,
+  DRILL_STAMP_OFFSET_MM,
   DRILL_STAMP_LIFT_MM,
   DRILL_STAMP_RADIUS_MM,
 } from '../../constants/balance'
@@ -47,7 +47,7 @@ const FLOOR_JITTER_MM = 20
 const CUTTING_FLOOR_JITTER_MM = 35
 
 export function drillStampOf(pose: VehiclePose, isLifting: boolean): DiscStamp {
-  return stampAheadBy(pose, isLifting, DRILL_STAMP_AHEAD_MM)
+  return stampAheadBy(pose, isLifting, DRILL_STAMP_OFFSET_MM)
 }
 
 /**

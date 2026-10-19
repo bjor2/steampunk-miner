@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest'
 import {
   COLLAPSE_ACTIVE_RADIUS_MM,
   COLLAPSE_WARN_TICKS,
-  DRILL_STAMP_AHEAD_MM,
+  DRILL_STAMP_OFFSET_MM,
   STEP_BOUND_TOLERANCE_MM,
 } from '../../../constants/balance'
 import { withRegistrations } from '../../../registries/registrar'
@@ -82,7 +82,7 @@ function cutEastAtSpeed(session: ScriptedSession): void {
 
 function bodyXAfter(session: ScriptedSession, bodyX: number): number {
   const cursor = session.vehicle().sweptCut
-  const cutLets = cursor === undefined ? bodyX : cursor.xMm - DRILL_STAMP_AHEAD_MM
+  const cutLets = cursor === undefined ? bodyX : cursor.xMm - DRILL_STAMP_OFFSET_MM
   return Math.max(bodyX, Math.min(bodyX + STRIDE_MM, cutLets))
 }
 

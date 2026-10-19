@@ -4,7 +4,7 @@
  * opens the same cells whatever the stride (ticket 335) and the world it leaves can be compared
  * across drill speeds (#401 VS2, the chunk diff size). Only specs use it.
  */
-import { DRILL_STAMP_AHEAD_MM, DRILL_SUBSTEPS_PER_TICK } from '../../constants/balance'
+import { DRILL_STAMP_OFFSET_MM, DRILL_SUBSTEPS_PER_TICK } from '../../constants/balance'
 import { CLOSED_CUT_GATE } from '../vehicle/cutGate'
 import { sweptDrillStampOf } from '../vehicle/drillStamp'
 import { pointAtStep, sweepPathOf, sweptStampOf, type SweptCut } from '../vehicle/sweptCut'
@@ -27,7 +27,7 @@ const TOP = { x: 30_500, y: 261_500 }
 /** The column swept `pathMetres` down from about 40 tiles under the surface, `strideMm` a tick. */
 export function sweptColumnAt(strideMm: number, pathMetres: number): SweptColumn {
   // The stamp leads the pose by the fastest step's bound, so every stride sweeps the same path.
-  const aheadMm = DRILL_STAMP_AHEAD_MM + 16_000
+  const aheadMm = DRILL_STAMP_OFFSET_MM + 16_000
   const { payload } = poseAbove({ tx: 0, ty: 0 }, FACING.down)
   let world: WorldState = EMPTY_WORLD
   let cursor: SweptCut | undefined
