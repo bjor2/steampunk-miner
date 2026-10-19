@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-10-19T07:43:35+02:00",
+  "updated_at": "2026-10-19T07:45:42+02:00",
   "caps": {
     "grok": 12,
     "claude": 10,
@@ -28,11 +28,12 @@
         },
         {
           "slot": "C2",
-          "state": "free",
+          "state": "busy",
           "ticket": null,
           "grok_slot": null,
-          "kind": null,
-          "since": null
+          "kind": "aux",
+          "since": "2026-10-19T07:43:00+02:00",
+          "label": "wave-plan 316"
         },
         {
           "slot": "C3",
@@ -68,9 +69,9 @@
         }
       ],
       "size": 6,
-      "used": 1,
-      "free": 5,
-      "claims_last_hour": 1,
+      "used": 2,
+      "free": 4,
+      "claims_last_hour": 2,
       "name": "Claude Max 1"
     },
     {
@@ -126,12 +127,12 @@
   },
   "tester": {
     "state": "running",
-    "phase": "fast",
+    "phase": "slow",
     "sha": "e54f5ed0cdc7d359631f994802c2f05fd794ff9a",
-    "since": "2026-10-19T05:42:04Z",
+    "since": "2026-10-19T05:45:24Z",
     "holds_gate": true,
     "claude_slot": null,
-    "last_run": "2026-10-19T05:42:00Z",
+    "last_run": "2026-10-19T05:45:23Z",
     "last_nightly": "2026-10-15T20:43:15Z",
     "last_nightly_result": "full=FAIL balance-report=ok bench=FAIL balance-planets=ok balance-guns=ok balance-charges=ok balance-refinery=ok balance-heat=ok e2e=FAIL memory-soak=FAIL packaged-smoke=ok ",
     "main_red_sha": null,
@@ -376,10 +377,12 @@
     },
     {
       "slot": 2,
-      "state": "free",
+      "state": "busy",
       "ticket": null,
       "grok_slot": null,
-      "since": null,
+      "since": "2026-10-19T07:43:00+02:00",
+      "kind": "aux",
+      "label": "wave-plan 316",
       "account": 1
     },
     {
@@ -466,8 +469,8 @@
     "claude": {
       "size": 10,
       "enabled": 10,
-      "used": 1,
-      "free": 9,
+      "used": 2,
+      "free": 8,
       "external": 0
     }
   },
@@ -475,6 +478,19 @@
     "mode": "on",
     "parallel": 1,
     "list": [
+      {
+        "number": 569,
+        "key": "316-5D",
+        "map": 316,
+        "lane": "remote",
+        "mode": "solo",
+        "state": "ready",
+        "tickets": [
+          548
+        ],
+        "done": [],
+        "live": 0
+      },
       {
         "number": 568,
         "key": "316-6B",
@@ -504,7 +520,7 @@
       },
       {
         "number": 566,
-        "key": "316-5D",
+        "key": "316-5E",
         "map": 316,
         "lane": "remote",
         "mode": "solo",
@@ -536,7 +552,7 @@
       },
       {
         "number": 525,
-        "key": "316-5E",
+        "key": "316-5F",
         "map": 316,
         "lane": "hitl",
         "mode": "bench",
