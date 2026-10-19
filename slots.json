@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-10-19T05:52:07+02:00",
+  "updated_at": "2026-10-19T06:11:36+02:00",
   "caps": {
     "grok": 12,
     "claude": 10,
@@ -70,7 +70,7 @@
       "size": 6,
       "used": 1,
       "free": 5,
-      "claims_last_hour": 2,
+      "claims_last_hour": 3,
       "name": "Claude Max 1"
     },
     {
@@ -457,11 +457,11 @@
     }
   ],
   "last_refill": {
-    "at": "2026-10-19 05:52 CEST",
+    "at": "2026-10-19 06:11 CEST",
     "mode": "refill-dev",
-    "triggers": "#554",
+    "triggers": "claude-run:wave-plan",
     "started": "",
-    "note": "load guard (1-min load 27.16 > 14)"
+    "note": "load guard (1-min load 25.53 > 14)"
   },
   "totals": {
     "grok": {
@@ -492,7 +492,9 @@
         "mode": "solo",
         "state": "blocked",
         "tickets": [
-          418
+          418,
+          564,
+          565
         ],
         "done": [],
         "live": 0
@@ -505,9 +507,7 @@
         "mode": "solo",
         "state": "ready",
         "tickets": [
-          555,
-          564,
-          565
+          555
         ],
         "done": [],
         "live": 0
