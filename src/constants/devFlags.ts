@@ -106,3 +106,13 @@ export const AUTHORITY_DEV_FLAGS: AuthorityDevFlags = {
   'heat.workUncapped': true,
   'codex.materialContact': true,
 }
+
+/** Every dev flag at one value: the shipped defaults, or a session's. */
+export type ShippedDevFlags = DevFlags & AuthorityDevFlags
+
+/**
+ * Every dev flag at its shipped default, the client loop's and the authority's. This module is the
+ * one place the two are joined, so the client flag store and the panel read the defaults from here
+ * and never name `AUTHORITY_DEV_FLAGS` themselves (ticket 548, TD ruling on #418).
+ */
+export const SHIPPED_DEV_FLAGS: ShippedDevFlags = { ...DEV_FLAGS, ...AUTHORITY_DEV_FLAGS }

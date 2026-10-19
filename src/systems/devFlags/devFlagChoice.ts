@@ -4,7 +4,7 @@
  * only, never numbers (VS 6): a choice naming anything else, or any value but a boolean, is
  * refused whole.
  */
-import { AUTHORITY_DEV_FLAGS, DEV_FLAGS, type DevFlags } from '../../constants/devFlags'
+import { DEV_FLAGS, SHIPPED_DEV_FLAGS, type DevFlags } from '../../constants/devFlags'
 import type { CommandIntent } from '../authority/authorityCommand'
 import {
   deltaOfFlags,
@@ -92,7 +92,7 @@ export function resetChoiceOf(state: CarriesDevFlags): DevFlagChoice {
   const offDefault = Object.keys(deltaOfFlags(flagsOf(state))) as AuthorityFlagId[]
   return {
     ...DEV_FLAGS,
-    ...Object.fromEntries(offDefault.map((id) => [id, AUTHORITY_DEV_FLAGS[id]])),
+    ...Object.fromEntries(offDefault.map((id) => [id, SHIPPED_DEV_FLAGS[id]])),
   }
 }
 

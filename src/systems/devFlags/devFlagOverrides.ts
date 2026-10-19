@@ -11,19 +11,16 @@
  * - Unknown ids and malformed entries are dropped on read, and named.
  */
 import {
-  AUTHORITY_DEV_FLAGS,
-  DEV_FLAGS,
+  SHIPPED_DEV_FLAGS,
   type AuthorityDevFlags,
   type DevFlags,
+  type ShippedDevFlags,
 } from '../../constants/devFlags'
+
+export { SHIPPED_DEV_FLAGS, type ShippedDevFlags }
 
 /** Every dev flag id, the client loop's and the authority's. */
 export type DevFlagId = keyof DevFlags | keyof AuthorityDevFlags
-
-/** Every dev flag at one value: the shipped defaults, or a session's. */
-export type ShippedDevFlags = DevFlags & AuthorityDevFlags
-
-export const SHIPPED_DEV_FLAGS: ShippedDevFlags = { ...DEV_FLAGS, ...AUTHORITY_DEV_FLAGS }
 
 /** The `localStorage` key, one per browser (the TD ruling on #547). */
 export const DEV_FLAG_OVERRIDES_KEY = 'sm.devFlagOverrides.v1'
