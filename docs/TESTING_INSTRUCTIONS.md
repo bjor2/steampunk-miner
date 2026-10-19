@@ -345,7 +345,10 @@ programs }` from three's `renderer.info` of the game canvas), read only when cal
   planet are gated; planet minutes at least 22, 3 to 4 purchases a planet, the felt ratio to the
   planet before (0.9), all-track majors 3.5 to 6.0, the income gain per purchase (amber under +5%
   twice in a row), level 20 by P4 and 50 not before P5 and the felt speed at the core (at most 44)
-  are printed; the grind bar is a todo. Its per-purchase rows `{n, D, price, planet, minute,
+  are printed; so are, since ticket 553, drill + tip majors 3.5 to 7.0 a planet (amber at 7), the
+  hold, boiler and engine share of track spend (at most 6% from P2, 15% on P1, printed with and
+  without the hull until VS rules) and at most 50 hold, boiler and engine purchases a planet. The
+  bot plays with ticket 553's boiler rule and hold/engine bundles; the grind bar is a todo. Its per-purchase rows `{n, D, price, planet, minute,
 incomePerHour}` go to `balance-report/drill-pace.ndjson`, which `pushTestMetrics.sh` appends to
   `drill-pace.ndjson` on `test-metrics` (`scripts/ci/recordDrillPace.mjs`) to compare runs line by
   line. Hours of play, so it runs only when named.

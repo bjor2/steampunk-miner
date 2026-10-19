@@ -3,7 +3,7 @@ import type { AuthorityState } from '../systems/authority/authorityState'
 import type { DomainEvent } from '../systems/authority/domainEvent'
 import { createScriptedSession } from '../systems/authority/scriptedSession'
 import { drillPower } from '../systems/economy/vehicleStats'
-import { toFixedText } from '../systems/money'
+import { fromCanonical, toFixedText } from '../systems/money'
 import {
   amberIncomeGainsOf,
   averageFeltOf,
@@ -19,6 +19,7 @@ import {
 import {
   gatedDrillPaceProblemsOf,
   printedDrillPaceFindingsOf,
+  spendShareBpOf,
   type DrillPaceRun,
 } from './drillPaceBars'
 
@@ -45,6 +46,16 @@ const drillBought = (toLevel: number, cost = '20'): DomainEvent =>
     cost,
   }) as DomainEvent
 
+const bought = (upgradeId: string, cost: string, isMajor = false): DomainEvent =>
+  ({
+    type: 'UpgradePurchased',
+    upgradeId,
+    toLevel: 1,
+    fromLevel: 0,
+    isMajor,
+    cost,
+  }) as DomainEvent
+
 const sold = (value: string): DomainEvent => ({ type: 'ResourceSold', value }) as DomainEvent
 const CORE: DomainEvent = { type: 'CoreCompleted', durationTicks: 0 } as DomainEvent
 const DRY: DomainEvent = { type: 'EnergyDepleted' } as DomainEvent
@@ -65,6 +76,9 @@ function paceOf(planet: number, over: Partial<PlanetDrillPace>): PlanetDrillPace
     coreFelt: 12,
     longestGapTicks: 8 * MINUTE,
     majors: 4,
+    drillTipMajors: 6,
+    catchUpPurchases: 3,
+    trackSpend: { drill_power: fromCanonical('970'), cargo_hold: fromCanonical('30') },
     tankEmpties: 0,
     ...over,
   }
@@ -152,6 +166,36 @@ describe('drill pace of a bot run (#551, ticket 552)', () => {
     ])
     expect(amberIncomeGainsOf(gains).map(({ n }) => n)).toEqual([4])
   })
+
+  // Ticket 553: the cadence basis is drill + tip (GD amendment 2 on #551), the burst counts hold,
+  // boiler and engine purchases (Systems' B4), and the spend share reads every track's spend.
+  it('counts drill purchases and tip majors for the cadence, and hold, boiler and engine purchases', () => {
+    const tally = emptyDrillPaceTally()
+    step(tally, stateWith(0, 1), [
+      drillBought(2),
+      bought('drill_tip', '5'),
+      bought('drill_tip', '50', true),
+      bought('cargo_hold', '3'),
+      bought('boiler', '3'),
+      bought('engine', '4'),
+      bought('hull', '46', true),
+    ])
+    const pace = tally.planets.get(1)!
+    expect([pace.drillTipMajors, pace.catchUpPurchases, pace.majors]).toEqual([2, 3, 3])
+  })
+
+  it('shares the track spend out in whole basis points, with and without the hull', () => {
+    const tally = emptyDrillPaceTally()
+    step(tally, stateWith(0, 1), [
+      drillBought(2, '800'),
+      bought('cargo_hold', '60'),
+      bought('engine', '40'),
+      bought('hull', '100'),
+    ])
+    const pace = tally.planets.get(1)!
+    expect(spendShareBpOf(pace, ['cargo_hold', 'boiler', 'engine'])).toBe(1000)
+    expect(spendShareBpOf(pace, ['cargo_hold', 'boiler', 'engine', 'hull'])).toBe(2000)
+  })
 })
 
 describe('drill pace bars on the seed median (#551 point 5, ticket 552)', () => {
@@ -199,6 +243,42 @@ describe('drill pace bars on the seed median (#551 point 5, ticket 552)', () => 
         'planet 5 takes 19.0 min, under 22 (printed until #559)',
         'planet 5 buys 6 drill purchases, outside 3 to 4',
       ]),
+    )
+  })
+})
+
+describe('drill pace bars of ticket 553, printed', () => {
+  const seeds = (paces: () => PlanetDrillPace[]) => [11, 22, 33].map((seed) => runOf(seed, paces()))
+
+  it('prints drill + tip majors outside 3.5 to 7.0, and amber at 7', () => {
+    const runs = seeds(() =>
+      TEN_PLANETS((planet) => ({ drillTipMajors: planet === 4 ? 7 : planet === 6 ? 8 : 6 })),
+    )
+    expect(printedDrillPaceFindingsOf(runs)).toEqual(
+      expect.arrayContaining([
+        'planet 4 amber: 7 drill + tip majors',
+        'planet 6 lands 8 drill + tip majors, outside 3.5 to 7.0',
+      ]),
+    )
+    expect(gatedDrillPaceProblemsOf(runs)).toEqual([])
+  })
+
+  it('prints hold, boiler and engine spend past 6% from P2 and 15% on P1, with the hull beside it', () => {
+    const heavy = { drill_power: fromCanonical('900'), engine: fromCanonical('100') }
+    const runs = seeds(() =>
+      TEN_PLANETS((planet) => (planet === 1 || planet === 5 ? { trackSpend: heavy } : {})),
+    )
+    const findings = printedDrillPaceFindingsOf(runs)
+    expect(findings).toContain(
+      'planet 5 spends 1000 bp on hold, boiler and engine (1000 bp with the hull), bar 600 bp',
+    )
+    expect(findings.filter((line) => line.startsWith('planet 1 spends'))).toEqual([])
+  })
+
+  it('prints a catch-up burst over 50 hold, boiler and engine purchases', () => {
+    const runs = seeds(() => TEN_PLANETS((planet) => ({ catchUpPurchases: planet === 1 ? 51 : 3 })))
+    expect(printedDrillPaceFindingsOf(runs)).toContain(
+      'planet 1 buys 51 hold, boiler and engine steps, over 50',
     )
   })
 })

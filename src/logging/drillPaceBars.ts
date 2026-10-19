@@ -9,14 +9,29 @@
  *   printed planet minutes at least 22, 3 to 4 drill purchases a planet, felt speed at least 0.9x
  *           the planet before, all-track majors 3.5 to 6.0 a planet, the income gain per purchase
  *           (amber under +5% twice in a row), level 20 by the end of P4 and 50 not before P5, the
- *           band-1 felt speed at the core at most 44 cells/s
+ *           band-1 felt speed at the core at most 44 cells/s; since ticket 553 (GD amendment 2
+ *           and VS on #551) drill + tip majors 3.5 to 7.0 a planet (amber at 7), the hold, boiler
+ *           and engine spend at most 6% of track spend on P2-P10 and 15% on P1 (printed with and
+ *           without the hull: VS has not ruled which), and at most 50 hold, boiler and engine
+ *           purchases a planet (the catch-up burst)
  *
  * A miss is a balance finding for Systems (retune order: paceScale rows, then ore sale prices,
  * never the law), never a reason to retune the bot or a bar.
  */
 import {
+  add,
+  cmp,
+  div,
+  floor,
+  fromSafeInteger,
+  mul,
+  toSafeInteger,
+  ZERO_MONEY,
+} from '../systems/money'
+import {
   amberIncomeGainsOf,
   averageFeltOf,
+  CATCH_UP_TRACKS,
   incomeGainsOf,
   longestGapMinutesOf,
   planetMinutesOf,
@@ -33,6 +48,9 @@ export const DRILL_PACE_BARS = {
   feltRatioToPreviousMin: 0.9,
   drillPurchasesPerPlanet: { min: 3, max: 4 },
   majorsPerPlanet: { min: 3.5, max: 6 },
+  drillTipMajorsPerPlanet: { min: 3.5, max: 7, amber: 7 },
+  otherSpendShareBpMax: { planet1: 1500, later: 600 },
+  catchUpPurchasesMax: 50,
   coreFeltCellsPerSecondMax: 44,
   level20ByEndOfPlanet: 4,
   level50NotBeforePlanet: 5,
@@ -53,7 +71,16 @@ export interface PlanetMedians {
   coreFelt: number | null
   longestGapMinutes: number | null
   majors: number | null
+  drillTipMajors: number | null
+  otherSpendShareBp: number | null
+  otherSpendShareWithHullBp: number | null
+  catchUpPurchases: number | null
 }
+
+const BASIS_POINTS = 10000
+/** The other tracks whose spend share VS bars (ticket 553); with the hull or without is open. */
+const OTHER_SPEND_TRACKS: readonly string[] = CATCH_UP_TRACKS
+const OTHER_SPEND_TRACKS_WITH_HULL: readonly string[] = [...CATCH_UP_TRACKS, 'hull']
 
 const PLANETS = Array.from({ length: DRILL_PACE_BARS.lastPlanet }, (_, at) => at + 1)
 
@@ -68,8 +95,32 @@ export function planetMediansOf(runs: readonly DrillPaceRun[]): PlanetMedians[] 
       coreFelt: medianOf(paces.map((pace) => pace?.coreFelt ?? null)),
       longestGapMinutes: medianOf(paces.map(gapOrNull)),
       majors: medianOf(paces.map((pace) => pace?.majors ?? null)),
+      drillTipMajors: medianOf(paces.map((pace) => pace?.drillTipMajors ?? null)),
+      otherSpendShareBp: medianOf(paces.map((pace) => shareOrNull(pace, OTHER_SPEND_TRACKS))),
+      otherSpendShareWithHullBp: medianOf(
+        paces.map((pace) => shareOrNull(pace, OTHER_SPEND_TRACKS_WITH_HULL)),
+      ),
+      catchUpPurchases: medianOf(paces.map((pace) => pace?.catchUpPurchases ?? null)),
     }
   })
+}
+
+function shareOrNull(pace: PlanetDrillPace | null, tracks: readonly string[]): number | null {
+  return pace === null ? null : spendShareBpOf(pace, tracks)
+}
+
+/**
+ * The share of the planet's track spend that went to `tracks`, in whole basis points; null with
+ * no spend. VS bars it at 600 bp on P2-P12 and 1500 bp on P1 (ticket 553 body).
+ */
+export function spendShareBpOf(pace: PlanetDrillPace, tracks: readonly string[]): number | null {
+  const spends = Object.entries(pace.trackSpend)
+  const total = spends.reduce((sum, [, spent]) => add(sum, spent), ZERO_MONEY)
+  if (cmp(total, ZERO_MONEY) === 0) return null
+  const share = spends
+    .filter(([track]) => tracks.includes(track))
+    .reduce((sum, [, spent]) => add(sum, spent), ZERO_MONEY)
+  return toSafeInteger(floor(div(mul(share, fromSafeInteger(BASIS_POINTS)), total)))
 }
 
 function gapOrNull(pace: PlanetDrillPace | null): number | null {
@@ -139,6 +190,9 @@ export function printedDrillPaceFindingsOf(runs: readonly DrillPaceRun[]): strin
     ...medians.flatMap(purchaseCountFindings),
     ...medians.flatMap((median, index) => feltRatioFindings(median, medians[index - 1])),
     ...medians.flatMap(majorsFindings),
+    ...medians.flatMap(drillTipCadenceFindings),
+    ...medians.flatMap(otherSpendFindings),
+    ...medians.flatMap(catchUpBurstFindings),
     ...medians.flatMap(coreFeltFindings),
     ...runs.flatMap(levelMilestoneFindings),
     ...runs.flatMap(amberIncomeFindings),
@@ -173,6 +227,40 @@ function majorsFindings({ planet, majors }: PlanetMedians): string[] {
   const { min, max } = DRILL_PACE_BARS.majorsPerPlanet
   if (!isTimedPlanet(planet) || majors === null || (majors >= min && majors <= max)) return []
   return [`planet ${planet} lands ${majors} majors of all tracks, outside 3.5 to 6.0`]
+}
+
+function drillTipCadenceFindings({ planet, drillTipMajors }: PlanetMedians): string[] {
+  const { min, max, amber } = DRILL_PACE_BARS.drillTipMajorsPerPlanet
+  if (!isTimedPlanet(planet) || drillTipMajors === null) return []
+  if (drillTipMajors < min || drillTipMajors > max) {
+    return [`planet ${planet} lands ${drillTipMajors} drill + tip majors, outside 3.5 to 7.0`]
+  }
+  return drillTipMajors >= amber
+    ? [`planet ${planet} amber: ${drillTipMajors} drill + tip majors`]
+    : []
+}
+
+function otherSpendFindings(median: PlanetMedians): string[] {
+  const { planet, otherSpendShareBp: share, otherSpendShareWithHullBp: withHull } = median
+  if (share === null || withHull === null) return []
+  const bar = otherSpendBarBpOf(planet)
+  if (share <= bar && withHull <= bar) return []
+  return [
+    `planet ${planet} spends ${share} bp on hold, boiler and engine (${withHull} bp with the ` +
+      `hull), bar ${bar} bp`,
+  ]
+}
+
+function otherSpendBarBpOf(planet: number): number {
+  const { planet1, later } = DRILL_PACE_BARS.otherSpendShareBpMax
+  return planet === 1 ? planet1 : later
+}
+
+function catchUpBurstFindings({ planet, catchUpPurchases }: PlanetMedians): string[] {
+  if (catchUpPurchases === null || catchUpPurchases <= DRILL_PACE_BARS.catchUpPurchasesMax) {
+    return []
+  }
+  return [`planet ${planet} buys ${catchUpPurchases} hold, boiler and engine steps, over 50`]
 }
 
 function coreFeltFindings({ planet, coreFelt }: PlanetMedians): string[] {

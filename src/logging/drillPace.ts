@@ -4,7 +4,9 @@
  * the drill power purchases bought, the planet-average felt speed (the band-1 law cut of the drill
  * held, cells/s, weighted by the ticks it was held), the felt speed at the core, the longest gap
  * between two drill purchases, the majors of every track (each drill purchase counts as one) and
- * the tank running dry; per drill purchase `{n, D, price, planet, minute, incomePerHour}`, the
+ * the tank running dry; since ticket 553 also the drill + tip majors (the cadence basis of GD
+ * amendment 2 on #551), each track's spend and the hold, boiler and engine purchases (Systems'
+ * catch-up burst, B4); per drill purchase `{n, D, price, planet, minute, incomePerHour}`, the
  * run-comparison row, with the sales a second earned at the level it replaced.
  *
  * Felt speed is the law's, `3600 / ceil(3600 H^3 / (D P^2))` on the planet's band-1 rock; the
@@ -38,6 +40,8 @@ const PLACES = 3
 const ONE = fromSafeInteger(1)
 /** Two gains in a row under it are amber, the trigger for the hold row (#551 VS, ticket 553). */
 const AMBER_INCOME_GAIN = fromCanonical('0.05')
+/** The tracks a catch-up burst counts (Systems' B4 on #553; combat waits on #555). */
+export const CATCH_UP_TRACKS: readonly string[] = ['cargo_hold', 'boiler', 'engine']
 
 /** One planet's pace in one run. */
 export interface PlanetDrillPace {
@@ -51,6 +55,12 @@ export interface PlanetDrillPace {
   coreFelt: number | null
   longestGapTicks: number
   majors: number
+  /** Drill power purchases and drill tip majors: the cadence basis (ticket 553). */
+  drillTipMajors: number
+  /** Hold, boiler and engine purchases on the planet (ticket 553). */
+  catchUpPurchases: number
+  /** Money spent on each track on the planet, by track id (ticket 553). */
+  trackSpend: Record<string, Money>
   tankEmpties: number
 }
 
@@ -111,6 +121,9 @@ function planetPaceOf(tally: DrillPaceTally, planet: number, tick: number): Plan
     coreFelt: null,
     longestGapTicks: 0,
     majors: 0,
+    drillTipMajors: 0,
+    catchUpPurchases: 0,
+    trackSpend: {},
     tankEmpties: 0,
   }
   tally.planets.set(planet, fresh)
@@ -157,13 +170,23 @@ function tallyPurchase(
   tick: number,
   event: PurchaseEvent,
 ): void {
-  if (event.upgradeId !== 'drill_power') {
-    if (event.isMajor) planet.majors++
-    return
-  }
+  addTrackSpend(planet, event)
+  if (event.upgradeId !== 'drill_power') return tallyOtherTrackPurchase(planet, event)
   planet.majors++
+  planet.drillTipMajors++
   planet.drillPurchases++
   recordDrillPurchase(tally, planet, tick, event)
+}
+
+function tallyOtherTrackPurchase(planet: PlanetDrillPace, event: PurchaseEvent): void {
+  if (event.isMajor) planet.majors++
+  if (event.isMajor && event.upgradeId === 'drill_tip') planet.drillTipMajors++
+  if (CATCH_UP_TRACKS.includes(event.upgradeId)) planet.catchUpPurchases++
+}
+
+function addTrackSpend(planet: PlanetDrillPace, event: PurchaseEvent): void {
+  const spent = planet.trackSpend[event.upgradeId] ?? ZERO_MONEY
+  planet.trackSpend[event.upgradeId] = add(spent, fromCanonical(event.cost))
 }
 
 function recordDrillPurchase(
