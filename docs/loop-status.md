@@ -346,7 +346,9 @@ with `mode=on` in `/workspace/claude-sessions/steampunk-loop/wave-mode` (or `WAV
   older than 30 min that sit in no wave, and the Producer runs the wave plan;
 - the first claim of a wave assigns the wave issue to the gh user and labels it `in-progress`
   (assigned = frozen: a replan never touches it); a green close ticks the ticket in the wave body; a
-  wave whose tickets are all closed is closed by the driver;
+  wave whose tickets are all closed is closed by the driver; if the Tester reopens a ticket
+  (`needs-fix`) while its box is still `[x]`, the driver unticks it and still treats the open
+  issue as not done (so it is not silently skipped);
 - a claimed wave with nothing runnable left (every open ticket `needs-planner`, `blocked`, `hitl`,
   `on-hold`, out of attempts, or waiting only on those) is un-assigned and labelled `wave:paused`;
   the next `/osilion-wave-plan <map> --replan` regroups what is left, and removing the label makes it
