@@ -9,7 +9,8 @@
  * `bench/fieldArcsFrame.ts`), then the terrain magnets' field outlines on the same descent (#286,
  * `bench/magnetFieldsFrame.ts`), then the terrain's streaming frame at 120 m/s on P10 (ticket 336,
  * `bench/streamAtSpeed.ts`), then its main-thread part at 480 m/s with the chunk worker (ticket
- * 337, `bench/streamThroughWorker.ts`).
+ * 337, `bench/streamThroughWorker.ts`), and the prefetch log: the rig's wait on a late chunk at 84,
+ * 840 and 8400 m/s (ticket 560, `bench/streamAtSpeed.ts`).
  * With `-- --log` it also writes `benchmark_result` lines to `logs/<runId>/events.ndjson` (#124).
  */
 import { loadFeatures } from '../src/features'
@@ -28,7 +29,7 @@ import { benchFieldArcsFrame } from './bench/fieldArcsFrame'
 import { benchGateChannelRebuild } from './bench/gateChannelRebuild'
 import { benchMagnetFieldsFrame } from './bench/magnetFieldsFrame'
 import { benchOverlayFrame } from './bench/overlayFrame'
-import { benchStreamAtSpeed } from './bench/streamAtSpeed'
+import { benchPrefetchWaits, benchStreamAtSpeed } from './bench/streamAtSpeed'
 import { benchStreamThroughWorker } from './bench/streamThroughWorker'
 import { devFlagSetLine } from '../src/logging/devFlagReport'
 
@@ -93,6 +94,7 @@ logBenchmarkSeriesWhenAsked('render', [
   ...benchFieldArcsFrame(WORLD_SEED),
   ...benchMagnetFieldsFrame(WORLD_SEED),
   ...benchStreamAtSpeed(WORLD_SEED),
+  ...benchPrefetchWaits(WORLD_SEED),
   ...benchStreamThroughWorker(WORLD_SEED),
 ])
 

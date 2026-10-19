@@ -7,6 +7,12 @@
  * runs the scene's own streaming (`streamChunkFrame`: prefetch along the velocity, generation, the
  * speed-scaled builds, the 2 ms budget) with real generation and real tile batches; the GPU upload
  * of a mesh is not in it. Measured and printed, not gated in CI.
+ *
+ * Ticket 560 (the Performance Tester's prefetch log on #551): the same drive down from the surface
+ * at 84, 840 and 8400 m/s, each 700 m long, logs how long the rig waits on a late chunk: the frames
+ * a newly visible chunk stayed unbuilt and the frames with any unbuilt chunk in view. Generation
+ * runs on the main thread here; the live client builds in the worker (ticket 337), so a wait here is
+ * an upper bound, not a live reading. 8400 m/s is past the drill's 3600 m/s floor until #558.
  */
 import { performance } from 'node:perf_hooks'
 import type { BenchmarkSeries } from '../../src/logging/benchmarkResult'
@@ -32,7 +38,6 @@ import {
 } from '../../src/systems/world/worldState'
 
 const PLANET = 10
-const SPEED_M_PER_S = 120
 const SETTLE_FRAMES_MAX = 600
 const FPS = CHUNK_STREAM_FRAMES_PER_SECOND
 const MAX_NEW_CHUNK_WAIT_FRAMES = 4
@@ -41,14 +46,37 @@ interface StreamDrive {
   name: string
   start: Vector2
   direction: Vector2
-  seconds: number
+  speedMPerS: number
+  metres: number
 }
 
 /** Planet 10's radius is 720 m: the chord at 300 m from the centre is 1,308 m long. */
 const DRIVES: readonly StreamDrive[] = [
-  { name: 'level', start: { x: -600.5, y: 300.5 }, direction: { x: 1, y: 0 }, seconds: 10 },
-  { name: 'down', start: { x: 0.5, y: 700.5 }, direction: { x: 0, y: -1 }, seconds: 5 },
+  {
+    name: 'level',
+    start: { x: -600.5, y: 300.5 },
+    direction: { x: 1, y: 0 },
+    speedMPerS: 120,
+    metres: 1200,
+  },
+  {
+    name: 'down',
+    start: { x: 0.5, y: 700.5 },
+    direction: { x: 0, y: -1 },
+    speedMPerS: 120,
+    metres: 600,
+  },
 ]
+
+/** The prefetch log's drives (ticket 560): down from the surface, 700 m, at each felt speed. */
+const WAIT_SPEEDS_M_PER_S = [84, 840, 8400]
+const WAIT_DRIVES: readonly StreamDrive[] = WAIT_SPEEDS_M_PER_S.map((speedMPerS) => ({
+  name: `downWait${speedMPerS}`,
+  start: { x: 0.5, y: 700.5 },
+  direction: { x: 0, y: -1 },
+  speedMPerS,
+  metres: 700,
+}))
 
 interface BuiltChunk {
   builtFrame: number
@@ -70,6 +98,17 @@ export function benchStreamAtSpeed(worldSeed: number): BenchmarkSeries[] {
   return DRIVES.map((drive) => benchDrive(params, drive))
 }
 
+/** The rig's wait on a late chunk at 84, 840 and 8400 m/s (ticket 560): logged, never gated. */
+export function benchPrefetchWaits(worldSeed: number): BenchmarkSeries[] {
+  const params = freshPlanetParamsFor(worldSeed, PLANET)
+  return WAIT_DRIVES.map((drive) => benchDrive(params, drive))
+}
+
+/** Whole frames the drive takes at its speed: at least one. */
+function framesOf(drive: StreamDrive): number {
+  return Math.max(1, Math.ceil((drive.metres / drive.speedMPerS) * FPS))
+}
+
 function benchDrive(params: PlanetParams, drive: StreamDrive): BenchmarkSeries {
   const run: StreamRun = {
     params,
@@ -80,7 +119,7 @@ function benchDrive(params: PlanetParams, drive: StreamDrive): BenchmarkSeries {
     queueLength: 0,
   }
   const settleFrames = settleAt(run, drive)
-  const timesMs = Array.from({ length: drive.seconds * FPS }, (_, index) =>
+  const timesMs = Array.from({ length: framesOf(drive) }, (_, index) =>
     driveFrame(run, drive, settleFrames + index + 1, (index + 1) / FPS),
   )
   printDrive(drive, settleFrames, timesMs, run)
@@ -96,14 +135,14 @@ function settleAt(run: StreamRun, drive: StreamDrive): number {
 }
 
 function driveFrame(run: StreamRun, drive: StreamDrive, frame: number, seconds: number): number {
-  const travelled = SPEED_M_PER_S * seconds
+  const travelled = Math.min(drive.speedMPerS * seconds, drive.metres)
   const centre = {
     x: drive.start.x + drive.direction.x * travelled,
     y: drive.start.y + drive.direction.y * travelled,
   }
   noteSeen(run, centre, frame)
   const started = performance.now()
-  streamFrame(run, drive, frame, centre, SPEED_M_PER_S)
+  streamFrame(run, drive, frame, centre, drive.speedMPerS)
   const elapsedMs = performance.now() - started
   noteUnbuiltVisible(run, centre)
   return elapsedMs
@@ -214,7 +253,7 @@ function printDrive(
       bench: 'chunkStreamFrame',
       planetIndex: PLANET,
       drive: drive.name,
-      speedMPerS: SPEED_M_PER_S,
+      speedMPerS: drive.speedMPerS,
       settleFrames,
       frames: timesMs.length,
       p50Ms: Number(percentile(timesMs, 0.5).toFixed(3)),
@@ -223,6 +262,7 @@ function printDrive(
       budgetP95Ms: TERRAIN_FRAME_BUDGET_MS,
       framesWithUnbuiltVisible: run.framesWithUnbuiltVisible,
       maxNewChunkWaitFrames: maxWaitFrames,
+      lateChunks: run.waits.filter((wait) => wait > 0).length,
       isWithinBudget:
         p95Ms <= TERRAIN_FRAME_BUDGET_MS &&
         run.framesWithUnbuiltVisible === 0 &&
