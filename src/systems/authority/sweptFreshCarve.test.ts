@@ -284,6 +284,8 @@ function ratiosToBaseRig(): { speed: number; cells: number; work: number }[] {
  * the gate, and #441 deletes this ratchet when it lands.
  */
 const RATCHET_CELLS = 1.2
+/** The share of a metre's work the bites' rounded-up price drops may shift (ticket 570). */
+const BITE_ROUNDING = 0.02
 const RATCHET_WORK = 1.3
 
 describe('cells and work per metre at any speed (ticket 439, VS ruling)', () => {
@@ -294,8 +296,11 @@ describe('cells and work per metre at any speed (ticket 439, VS ruling)', () => 
 
   // The lower side of the VS gate: each extra cell pays its own drill time, energy and heat, so a
   // faster rig may open more a metre than the 44 m/s one, never fewer.
+  // Since ticket 570 the bore is the stamp's 1.9 m at every speed and the front bites each cell
+  // as its work pays, each bite's price drop rounded up: a faster rig opens the same cells a metre
+  // and spends within the rounding of the same work on them.
   it('opens at least the 44 m/s rig cells and work a metre at every faster rig: no free cells', () => {
-    const fewer = ratios.filter(({ cells, work }) => cells < 1 || work < 1)
+    const fewer = ratios.filter(({ cells, work }) => cells < 1 || work < 1 - BITE_ROUNDING)
     expect(fewer).toEqual([])
   })
 

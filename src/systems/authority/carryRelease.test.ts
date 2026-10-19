@@ -308,11 +308,19 @@ describe('a released cell is paid, not free (tickets 421, 432)', () => {
     },
   )
 
+  // Since ticket 570 a cutting tick's front bites into the cell its work cannot pay in full
+  // (`sweptFront.ts`) instead of releasing it: the bite is paid what it removed and the rest of the
+  // work carries toward the same cell, never more than is left of it, never toward another.
   it.each(PAID_LEGS)(
-    '%s leg: discards the surplus of a cell paid on release, never banking it forward',
+    '%s leg: carries what a bite left only toward the cell it bit, never banking it forward',
     (_, leg) => {
-      const released = leg.filter(hasReleasePay)
-      expect(released.map(({ carved }) => carved.carrySubSteps)).toEqual(released.map(() => 0))
+      const bitten = leg.filter(hasReleasePay)
+      const forward = bitten.filter(({ carved }) => {
+        const last = carved.paid[carved.paid.length - 1]
+        return carved.carrySubSteps > 0 && !isSameTile(carved.carryTarget, last)
+      })
+      expect(bitten.length).toBeGreaterThan(0)
+      expect(forward).toEqual([])
     },
   )
 })
@@ -399,16 +407,25 @@ describe('a gated cell in the body’s next step stops the cut (ticket 421, Hori
     },
   )
 
-  it('pays a released core cell, then ends the walk at it with nothing carried', () => {
+  // Since ticket 570 the front opens the core cell as it bites through it, so the harvest lands as
+  // the cell yields; the walk ends where its centre enters the cell, paying the rest.
+  it('bites into the core cell, harvests it as it opens, and ends the walk at it with nothing carried', () => {
     const [top] = coreTiles(1)
     const leg = legDownOnto(top, RIG_15)
-    const harvest = leg.find(({ effect }) =>
+    const harvested = leg.findIndex(({ effect }) =>
       effect.events.some((event) => event.type === 'TileDestroyed' && isAtTile(event, top)),
     )
     const aimedAtCore = leg.filter((tick) => isSameTile(tick.carved.carryTarget, top))
-    expect(aimedAtCore.filter(isReleasedOn).length).toBeGreaterThan(0)
-    expect(harvest?.effect.events.some(({ type }) => type === 'CoreTileHarvested')).toBe(true)
-    expect(harvest?.carved.carrySubSteps).toBe(0)
+    expect(aimedAtCore.length).toBeGreaterThan(0)
+    expect(leg[harvested]?.effect.events.some(({ type }) => type === 'CoreTileHarvested')).toBe(
+      true,
+    )
+    const entered = leg.findIndex(
+      ({ carved }) =>
+        carved.paid.some((tile) => isSameTile(tile, top)) && carved.carryTarget === null,
+    )
+    expect(entered).toBeGreaterThanOrEqual(0)
+    expect(leg[entered].carved.carrySubSteps).toBe(0)
   })
 })
 

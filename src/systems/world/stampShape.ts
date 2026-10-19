@@ -57,6 +57,21 @@ const FALLOFF: readonly number[] = Array.from({ length: FALLOFF_STEPS + 1 }, (_,
     : Math.floor((FULL_WEIGHT * (FALLOFF_STEPS - step)) / (FALLOFF_STEPS - FULL_WEIGHT_UP_TO_STEP)),
 )
 
+/**
+ * The density a cut that clears its whole bore leaves a sample at, from the falloff weight the
+ * stamp gave it (ticket 570, `cutFront.ts`): a ramp of `128 + 255 (d - r) / 250` across the rim,
+ * as the level floor ramps, so the wall's contour lies on the stamp's circle and its diameter is
+ * the stamp's (decision #36's 1.9 m). `d` is read back from the weight's falloff step, the middle
+ * of its band; the full-weight core is cleared.
+ */
+export function boreWallTargetOf(weight: number, radiusMm: number): number {
+  if (weight >= FULL_WEIGHT) return 0
+  const step = FALLOFF_STEPS - weight / (FULL_WEIGHT / (FALLOFF_STEPS - FULL_WEIGHT_UP_TO_STEP))
+  const distanceMm = radiusMm * Math.sqrt((step + 0.5) / FALLOFF_STEPS)
+  const target = ISO_DENSITY + Math.floor((SOLID_DENSITY * (distanceMm - radiusMm)) / MM_PER_SAMPLE)
+  return Math.max(0, Math.min(SOLID_DENSITY, target))
+}
+
 /** A sample's step when it lies past the radius. */
 const OUTSIDE = FALLOFF_STEPS + 1
 

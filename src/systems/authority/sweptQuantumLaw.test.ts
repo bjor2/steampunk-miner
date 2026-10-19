@@ -118,6 +118,18 @@ function averagedRatioOf({ paces }: PurchaseWindow): number {
   return Math.pow(paces[0] / paces[WINDOW_PURCHASES], 1 / WINDOW_PURCHASES)
 }
 
+/** The window's own purchase ratio, or its averaged one for a window of a few strides only. */
+function judgedRatioOf(window: PurchaseWindow): number {
+  if (isFewStrides(window.rig)) return averagedRatioOf(window)
+  const [ratio] = purchaseRatiosOf(window)
+  return ratio
+}
+
+/** A rig whose window holds only its minimum strides, past the 30 m every other rig cuts. */
+function isFewStrides(rig: SpeedRig): boolean {
+  return windowMmOf(rig) > WINDOW_MM
+}
+
 const isInBand = (ratio: number) => ratio >= PURCHASE_BAND.lowest && ratio <= PURCHASE_BAND.highest
 
 function lawBandOf({ name, cost }: PurchaseWindow): LawBand {
@@ -160,10 +172,14 @@ describe('quantum bands of the drill law on the swept carve (tickets 439 and 463
     expect(coarse.map(({ name }) => name)).toEqual([])
   })
 
+  // A window of three strides (the 3600 m/s rig's) is judged on its averaged ratio: since ticket
+  // 570 a cutting tick pays its cells at the law's pace while a travelling one (the gate shut, its
+  // look-ahead 60 m away meeting a cave) carves as before, its stamp's parallel carve opening cells
+  // the walk then passes for less, and one such tick in a three-stride window skews one purchase.
   it('cuts each rig the bands assert 1.181 to 1.305 times faster than the drill a purchase below it', () => {
     const hard = windows.filter((window) => lawBandOf(window) === 'hard')
     const misses = hard.flatMap((window) => {
-      const [ratio] = purchaseRatiosOf(window)
+      const ratio = judgedRatioOf(window)
       return isInBand(ratio) ? [] : [{ name: window.name, ratio }]
     })
     hard.forEach(logLawWindow)

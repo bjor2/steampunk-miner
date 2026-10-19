@@ -52,13 +52,27 @@ interface HeldRig {
  * it to its own quantum's law speed (ticket 558). A finding for the speed bars of #560, named here
  * so the rig is not read as 44 m/s.
  */
+/**
+ * A hold these legs never fill. Since ticket 570 the cut rides the body's face, so the walk's end at
+ * an ore unit a full hold loses (#399's rule, each tick) holds the front at that cell and shows as
+ * a step in the body's speed, a finding reported on #570 for the planners; these rows judge the
+ * cut-follow, so the two fast rigs, which fill the base hold in their down leg, carry a larger one.
+ */
+const HOLD_NEVER_FULL = 60
+
 const RIGS: Readonly<Record<string, HeldRig>> = {
   '15 m/s': {
     levels: { drill_power: 11, drill_tip: 600, engine: 17 },
     legs: ['down', 'up'],
   },
-  '25 m/s': { levels: { drill_power: 14, drill_tip: 600, engine: 17 }, legs: ['down', 'up'] },
-  '44 m/s (rig 1, #400)': { levels: { drill_power: 19, drill_tip: 200 }, legs: ['down', 'up'] },
+  '25 m/s': {
+    levels: { drill_power: 14, drill_tip: 600, engine: 17, cargo_hold: HOLD_NEVER_FULL },
+    legs: ['down', 'up'],
+  },
+  '44 m/s (rig 1, #400)': {
+    levels: { drill_power: 19, drill_tip: 200, cargo_hold: HOLD_NEVER_FULL },
+    legs: ['down', 'up'],
+  },
 }
 const FRAME_RATES = [30, 144]
 const MAX_BOUNDARY_CHANGE = 0.05

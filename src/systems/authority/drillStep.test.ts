@@ -1,11 +1,17 @@
 import { describe, expect, it } from 'vitest'
-import { DRILL_STAMP_AHEAD_MM, STEP_BOUND_TOLERANCE_MM } from '../../constants/balance'
+import {
+  CUT_FACE_MARGIN_MM,
+  DRILL_STAMP_AHEAD_MM,
+  STEP_BOUND_TOLERANCE_MM,
+} from '../../constants/balance'
+import { sweptStampAheadMmOf } from '../vehicle/drillStamp'
 import { withRegistrations } from '../../registries/registrar'
 import type { SliceDefinition } from '../../registries/sliceDefinition'
 import type { GateOutcome } from '../registries/gateChecks'
 import { ENERGY_QUANTA_PER_TICK } from '../vehicle/energyQuanta'
 import { NO_DRIVE, type DriveSigns } from '../vehicle/driveSigns'
-import { FACING, type Facing } from '../vehicle/vehiclePose'
+import { frontOfCursor, type SweptCut } from '../vehicle/sweptCut'
+import { FACING, type Facing, type VehiclePose } from '../vehicle/vehiclePose'
 import { cellDensitySum } from '../world/cellYield'
 import { surfaceRowOfColumn, type TilePoint } from '../world/tileGrid'
 import { EMPTY_WORLD, materialCellAt } from '../world/worldState'
@@ -27,6 +33,7 @@ import { readSnapshot, takeSnapshot } from './sessionSnapshot'
 import { stateDigest } from './stateDigest'
 import { stepBoundsAt } from './stepBoundRead'
 import { DRILL_CELLS_PER_TICK } from './cutShare'
+import { poseRidingFront } from './faceHoldFixtures'
 
 // The swept cut (ticket 330): `drillStep` cuts every tick the drill is engaged, behind the dev
 // flag `drill.sweptCut`, which only decides whether a client sends it.
@@ -80,8 +87,15 @@ function stepDown(session: ScriptedSession, mmPerTick: number, ticks: number, fr
 const BOUNDS = stepBoundsAt(sessionFacingDownAt().state(), 'p1')
 /** The longest step a cutting rig may take: every scripted descent here keeps to it. */
 const CUT_STEP_MM = BOUNDS.cuttingMm
-/** The swept stamp's centre sits this far ahead of the pose: a report's, plus the cutting bound. */
+/** The swept stamp's centre sat this far ahead of the pose before ticket 570: a report's, plus the cutting bound. */
 const SWEPT_AHEAD_MM = DRILL_STAMP_AHEAD_MM + CUT_STEP_MM
+/** The furthest a resting body's front stands ahead of it (ticket 570): its step, margin and ramp, and the margin it may win back. */
+const SWEPT_REACH_MAX_MM = sweptStampAheadMmOf(CUT_STEP_MM) + CUT_FACE_MARGIN_MM + 125
+
+function frontOfCursorOf(cursor: SweptCut | undefined) {
+  if (cursor === undefined) throw new Error('no cut was made')
+  return frontOfCursor(cursor)
+}
 
 const rejectionsOf = (events: readonly DomainEvent[]) =>
   events.filter((event) => event.type === 'CommandRejected')
@@ -89,18 +103,55 @@ const rejectionsOf = (events: readonly DomainEvent[]) =>
 const tilesDestroyed = (events: readonly DomainEvent[]) =>
   events.filter((event) => event.type === 'TileDestroyed')
 
+/**
+ * One step a tick from `firstTick` for `ticks` ticks, the body riding its cut's front along
+ * `facing` (ticket 570: a live body moves into what its last step cut, never further).
+ */
+function rideCut(session: ScriptedSession, from: { x: number; y: number }, ride: RideFor) {
+  let body = from
+  for (let tick = ride.firstTick; tick < ride.firstTick + ride.ticks; tick++) {
+    session.submit(tick, stepTo(body.x, body.y, NO_DRIVE, ride.facing))
+    const pose = { ...(session.vehicle().pose as VehiclePose), ...body, facing: ride.facing }
+    body = poseRidingFront(pose, session.vehicle().sweptCut)
+  }
+}
+
+/** How long a ride lasts, from which tick, and along which facing. */
+interface RideFor {
+  firstTick: number
+  ticks: number
+  facing: Facing
+}
+
+const RIDE_DOWN_50: RideFor = { firstTick: 1, ticks: 50, facing: FACING.down }
+
 describe('drill step (ticket 330)', () => {
   // The level-0 drill pays a band-1 cell in its full 40 ticks (ticket 399), so the rest is longer.
-  it('cuts the ground under a resting stamp every tick it is sent', () => {
-    const session = sessionFacingDownAt({ x: START.x, y: (SURFACE_TY + 1) * 1000 + 400 })
-    for (let tick = 1; tick <= 50; tick++) {
-      session.submit(tick, stepTo(START.x, (SURFACE_TY + 1) * 1000 + 400))
-    }
+  it('cuts the ground ahead of a body riding its cut every tick it is sent', () => {
+    const near = { x: START.x, y: (SURFACE_TY + 1) * 1000 + 400 }
+    const session = sessionFacingDownAt(near)
+    rideCut(session, near, RIDE_DOWN_50)
     const damage = session.events().filter((event) => event.type === 'DrillDamageDealt')
     expect(rejectionsOf(session.events())).toEqual([])
     expect(damage.length).toBeGreaterThanOrEqual(40)
     expect(tilesDestroyed(session.events()).length).toBeGreaterThan(0)
     expect(session.vehicle().sweptCut?.tick).toBe(50)
+  })
+
+  // Ticket 570: the cut reaches where the body will be after its step, never a bound ahead, so a
+  // body that rests opens no more ground once its step is cut.
+  it('cuts no further than the step a resting body may take', () => {
+    const near = { x: START.x, y: (SURFACE_TY + 1) * 1000 + 400 }
+    const session = sessionFacingDownAt(near)
+    const changedAt: number[] = []
+    for (let tick = 1; tick <= 50; tick++) {
+      const events = session.submit(tick, stepTo(near.x, near.y))
+      if (events.some((event) => event.type === 'GroundChanged')) changedAt.push(tick)
+    }
+    expect(changedAt.length).toBeGreaterThan(0)
+    expect(Math.max(...changedAt)).toBeLessThan(15)
+    const cursor = session.vehicle().sweptCut
+    expect(near.y - frontOfCursorOf(cursor).yMm).toBeLessThanOrEqual(SWEPT_REACH_MAX_MM)
   })
 
   // The per-cell price is the kill-switch's off path (`drill.sweptLawCharge`, on since 18 Oct 2026).
@@ -119,7 +170,7 @@ describe('drill step (ticket 330)', () => {
     session.submit(8, stepTo(near.x, near.y))
     expect(tilesDestroyed(session.submit(9, stepTo(near.x, near.y)))).toEqual([])
     expect(charged - session.vehicle().energy).toBe(0)
-    for (let tick = 10; tick <= 80; tick++) session.submit(tick, stepTo(near.x, near.y))
+    rideCut(session, near, { firstTick: 10, ticks: 71, facing: FACING.down })
     const broken = tilesDestroyed(session.events())
     const subStepsOf = drillSubStepsOfCells(PARAMS, statsOfVehicle(session.vehicle()), () => 0)
     const energyOf = (event: (typeof broken)[number]) => {
@@ -185,9 +236,7 @@ describe('drill step (ticket 330)', () => {
     const near = { x: START.x, y: (SURFACE_TY + 1) * 1000 + 400 }
     const cutFor50Ticks = (reported: Facing, stepped: Facing) => {
       const session = sessionReportedAt(near, reported)
-      for (let tick = 1; tick <= 50; tick++) {
-        session.submit(tick, stepTo(near.x, near.y, NO_DRIVE, stepped))
-      }
+      rideCut(session, near, { ...RIDE_DOWN_50, facing: stepped })
       return session
     }
     const fresh = cutFor50Ticks(FACING.down, FACING.down)
@@ -370,11 +419,11 @@ describe('drill step yield per metre (ticket 330, Vertical Scaler)', () => {
 describe('drill step per-cell budget (tickets 330, 335)', () => {
   const [gated] = surfaceOreTiles(1)
   const above = { x: gated.tx * 1000 + 500, y: (gated.ty + 4) * 1000 + 500 }
-  /** Late enough that the cursor falls metres behind, far more than 32 cells of sweep. */
+  /** Late enough that the body, riding its cut, is held at the gated cell for many ticks. */
   const OPENS_AT_TICK = 60
   const TICKS = 70
 
-  /** A gate that holds every ore cell until `OPENS_AT_TICK`, so the cursor falls metres behind. */
+  /** A gate that holds every ore cell until `OPENS_AT_TICK`. */
   const lateGate: SliceDefinition = {
     id: 'gate-probe',
     register: (r) =>
@@ -389,37 +438,41 @@ describe('drill step per-cell budget (tickets 330, 335)', () => {
       }),
   }
 
-  /** The cursor after each step, from the tick before the gate opens. */
-  function catchUpAfterTheGate() {
+  /**
+   * The cursor after each step from the tick before the gate opens, the body riding its cut down
+   * (ticket 570: since the cut rides the body's face, the body waits at the gate with it).
+   */
+  function cutThroughTheGate() {
     return withRegistrations([lateGate], () => {
       const session = strongSessionFacingDownAt(above)
       const cursors: NonNullable<ReturnType<ScriptedSession['vehicle']>['sweptCut']>[] = []
+      let body = above
       for (let tick = 1; tick <= TICKS; tick++) {
-        session.submit(tick, stepTo(above.x, above.y - CUT_STEP_MM * tick))
+        session.submit(tick, stepTo(body.x, body.y))
         const cursor = session.vehicle().sweptCut
         if (tick >= OPENS_AT_TICK - 1 && cursor !== undefined) cursors.push(cursor)
+        const pose = { ...(session.vehicle().pose as VehiclePose), ...body, facing: FACING.down }
+        body = poseRidingFront(pose, cursor)
       }
       return { session, cursors }
     })
   }
 
-  const stampAt = (tick: number) => above.y - CUT_STEP_MM * tick - SWEPT_AHEAD_MM
-
   it('keeps the budget the terrain slice holds: 32 density cells a tick', () => {
     expect(DRILL_CELLS_PER_TICK).toBe(32)
   })
 
-  // The work picks how far, the budget never does (ticket 399 amending 335): once the gate opens
-  // the cut goes on at its work's pace, however far the pose ran ahead.
+  // The work picks how far, the budget never does (ticket 399 amending 335): held at the gate, the
+  // cut goes on through the gated cell from the tick it opens, at its work's pace.
   it('cuts on from the gate the tick it opens, as far as its work reaches', () => {
-    const { session, cursors } = catchUpAfterTheGate()
-    expect(cursors[0].yMm).toBeGreaterThan(stampAt(OPENS_AT_TICK - 1) + 10_000)
+    const { session, cursors } = cutThroughTheGate()
+    const gateTopMm = (gated.ty + 1) * 1000
+    expect(cursors[0].yMm).toBeGreaterThanOrEqual(gateTopMm)
     expect(cursors[0].carrySubSteps).toBe(0)
     cursors.slice(1).forEach((cursor, index) => {
       expect(cursor.yMm).toBeLessThanOrEqual(cursors[index].yMm)
-      expect(cursor.yMm).toBeGreaterThan(stampAt(OPENS_AT_TICK + index))
     })
-    expect(cursors[cursors.length - 1].yMm).toBeLessThan(cursors[0].yMm - 1_000)
+    expect(cursors[cursors.length - 1].yMm).toBeLessThan(gateTopMm - 1_000)
     const world = session.state().world
     for (const tile of [gated, { tx: gated.tx, ty: gated.ty - 1 }]) {
       expect(cellDensitySum(world, PARAMS, tile)).toBeLessThan(
@@ -429,7 +482,7 @@ describe('drill step per-cell budget (tickets 330, 335)', () => {
   })
 
   it('passes the rest of its share on from a tick whose stamp stays within it', () => {
-    const { cursors } = catchUpAfterTheGate()
+    const { cursors } = cutThroughTheGate()
     const [, opening] = cursors
     expect(opening.cutSharePassed).toBeGreaterThan(0)
     expect(opening.cutSharePassed).toBeLessThan(DRILL_CELLS_PER_TICK)

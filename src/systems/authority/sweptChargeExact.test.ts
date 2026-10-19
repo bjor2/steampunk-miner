@@ -115,7 +115,10 @@ describe('the swept ledger charges exactly what it spends at a stop (ticket 471)
       )
       expect(charges).toHaveLength(run.ticks.length)
       expect(gating).toHaveLength(1)
-      const fromGate = charges.slice(gating[0])
+      // Since ticket 570 the stamp meets the gate as it reaches the front's disc, a tick before the
+      // walk can: the work of that tick is still the cell before the gate's, and the walk discards
+      // the carry on the tick it meets the gate, the next.
+      const fromGate = charges.slice(gating[0] + 1)
       expect(fromGate.map(({ kept }) => kept)).toEqual(fromGate.map(() => 0))
       expect(fromGate.slice(1).map(({ owes }) => owes)).toEqual(fromGate.slice(1).map(() => 0))
       expect(inexactTicksOf(charges)).toEqual([])

@@ -99,10 +99,27 @@ function isSameTile(a: TilePoint, b: TilePoint): boolean {
   return a.tx === b.tx && a.ty === b.ty
 }
 
+/** A front's place: its pose, the point of the path it reached, its rear and its stamp. */
+export interface FrontPlace {
+  pose: VehiclePose
+  point: StampPoint
+  rear: StampPoint
+  stamp: DiscStamp
+}
+
 /** The front plane at a point of the path, square to the pose's facing, cutting from `rear`. */
-export function cutFrontAt(pose: VehiclePose, point: StampPoint, rear: StampPoint): CutFront {
+export function cutFrontAt({ pose, point, rear, stamp }: FrontPlace): CutFront {
   const ahead = facingVectorOf(pose.upx, pose.upy, pose.facing)
-  return { xMm: point.xMm, yMm: point.yMm, aheadX: ahead.x, aheadY: ahead.y, rear }
+  const { radiusMm, floorRadiusMm } = stamp
+  return {
+    xMm: point.xMm,
+    yMm: point.yMm,
+    aheadX: ahead.x,
+    aheadY: ahead.y,
+    rear,
+    radiusMm,
+    floorRadiusMm,
+  }
 }
 
 /** The window the carve takes at a front. */
@@ -147,7 +164,7 @@ function priceLeftAt(
   point: StampPoint,
 ): number {
   const disc = { ...stamp, ...point, tail: rear }
-  const window = windowAtFront(request.window, cutFrontAt(pose, point, rear))
+  const window = windowAtFront(request.window, cutFrontAt({ pose, point, rear, stamp }))
   const drillTicksOf = cellAloneOf(request.gates.drillTicksOf, cell)
   const world = carveDisc(request.world, params, disc, window, drillTicksOf).world
   return frontCarryGroundOf(params, { ...request, world }, path).cellAt(cell).price

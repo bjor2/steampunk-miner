@@ -89,12 +89,16 @@ describe('swept law charge (ticket 540)', () => {
     }
   })
 
+  // Since ticket 570 the cut never takes the lining it laid behind it (#41), so the lined row
+  // crosses a lined pocket laid ahead of it, and the lined run's own rings stay whole.
   it('prices cleared lining inside the law work, neither twice nor under, lined and unlined', () => {
-    const lined = { ...trackOf('level', SLOW_STRIDE), lengthMm: 12_000 }
+    const lined = { ...trackOf('level', SLOW_STRIDE), lengthMm: 12_000, linedPocketsAtMm: [6_000] }
+    const ownRings = { ...trackOf('level', SLOW_STRIDE), lengthMm: 12_000 }
     const unlined = { ...trackOf('level', SLOW_STRIDE), lengthMm: 5_000, casingGrade: 0 }
     const linedRun = cutSlab(lined, 'swept law', SLOW)
     const unlinedRun = cutSlab(unlined, 'swept law', SLOW)
     expect(linedRun.casingSamples).toBeGreaterThan(0)
+    expect(cutSlab(ownRings, 'swept law', SLOW).casingSamples).toBe(0)
     expect(unlinedRun.casingSamples).toBe(0)
     expectAtTheLaw(lawChargeBarsOf({ ...linedRun, lawWork: linedRun.lawWorkCut }))
     expectAtTheLaw(lawChargeBarsOf({ ...unlinedRun, lawWork: unlinedRun.lawWorkCut }))

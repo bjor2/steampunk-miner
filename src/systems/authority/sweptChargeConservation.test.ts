@@ -106,10 +106,14 @@ describe('swept ledger at a stop (ticket 466, Horizontal Scaler)', () => {
       )
       expect(charges).toHaveLength(run.ticks.length)
       expect(gating).toHaveLength(1)
-      expect(charges.slice(gating[0]).map(({ kept }) => kept)).toEqual(
-        charges.slice(gating[0]).map(() => 0),
+      // Since ticket 570 the stamp meets the gate as it reaches the front's disc, a tick before the
+      // walk can: the work of that tick is still the cell before the gate's, and the walk discards
+      // the carry on the tick it meets the gate, the next.
+      const metAt = gating[0] + 1
+      expect(charges.slice(metAt).map(({ kept }) => kept)).toEqual(
+        charges.slice(metAt).map(() => 0),
       )
-      expect(charges.slice(gating[0] + 1).every(({ carriedIn }) => carriedIn === 0)).toBe(true)
+      expect(charges.slice(metAt + 1).every(({ carriedIn }) => carriedIn === 0)).toBe(true)
       expect(unconservedTicksOf(charges)).toEqual([])
     })
   }

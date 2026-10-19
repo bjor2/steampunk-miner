@@ -1,15 +1,23 @@
 import RAPIER from '@dimforge/rapier3d-compat'
 import { afterEach, beforeAll, beforeEach, describe, expect, it } from 'vitest'
 import { CUT_FOLLOW_TICKS } from '../constants/balance'
-import { PHYSICS_TIMESTEP } from '../constants/physics'
+import {
+  MM_PER_METRE,
+  PHYSICS_TIMESTEP,
+  UP_VECTOR_SCALE,
+  VEHICLE_COLLIDER_SIZE,
+} from '../constants/physics'
 import { createMemorySink } from '../logging/eventSink'
 import { createRunLog, installRunLog, uninstallRunLog } from '../logging/runLog'
-import { resetGameStore } from '../store/gameStore'
+import { readPlanetWorld, resetGameStore } from '../store/gameStore'
 import { buildIntent } from '../systems/input/buildIntent'
 import type { CutFollow } from '../systems/authority/cutFollowRead'
 import { cutFollowSpeedOf } from '../systems/vehicle/cutFollowMotion'
 import type { CutTick } from '../systems/vehicle/heldCut'
 import { IDLE_INTENT } from '../systems/vehicle/vehicleIntent'
+import { facingVectorOf, tileOfMillimetres } from '../systems/vehicle/vehiclePose'
+import { isSolidCell } from '../systems/world/worldCell'
+import { cellAt, EMPTY_WORLD } from '../systems/world/worldState'
 import { commandedSpeedsOf, createRig, type TickRead } from './cutFollowFixtures'
 import { stepAtToe, type ToeStep } from './toeStopFixtures'
 
@@ -218,7 +226,25 @@ function isFollowingCut(pressed: readonly TickRead[], leg: Leg): boolean {
   const commanded = commandedSpeedsOf(pressed).at(-1) ?? 0
   if (last === undefined || !last.result.flags.isDrilling) return false
   if (leg === 'level' && !last.isOnGround) return false
+  if (isInNaturalCave(last)) return false
   return Math.abs(last.speed - commanded) <= commanded * HELD_SHARE
+}
+
+/**
+ * The body's face stands in a cave the planet was generated with, read from the generated world,
+ * not the cut: since ticket 570 the cut no longer runs a bound ahead, so a body crossing a cave at
+ * its last `vCut` meets the cave's floor as it lets go, the cave's own landing, not the stop's.
+ */
+function isInNaturalCave({ result, position }: TickRead): boolean {
+  const { pose } = result
+  const ahead = facingVectorOf(pose.upx, pose.upy, pose.facing)
+  const faceMm = (VEHICLE_COLLIDER_SIZE * MM_PER_METRE) / 2 + MM_PER_METRE / 2
+  const tile = tileOfMillimetres(
+    Math.round(position.x * MM_PER_METRE + (ahead.x * faceMm) / UP_VECTOR_SCALE),
+    Math.round(position.y * MM_PER_METRE + (ahead.y * faceMm) / UP_VECTOR_SCALE),
+  )
+  const { params } = readPlanetWorld()
+  return params !== null && !isSolidCell(cellAt(EMPTY_WORLD, params, tile))
 }
 
 /** The body moves under the stop line over one of the 6 ticks from the drive letting go. */

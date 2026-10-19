@@ -11,15 +11,16 @@
  * - **The face**: across the last density sample behind the front the target ramps from 255 down
  *   to 0, one sample's width, so the contour (`ISO_DENSITY`) lies half a sample behind the front
  *   whatever the sample grid. A level cut's floor ramp (`stampShape.ts`) is the same idea.
- * - **The floor**: a level cut's floor band is cut a sample further on than the face, so the corner
- *   between floor and face is square where the body's lower front meets it.
- * - **The bore**: behind it a sample keeps the stamp's soft rim, `255 (W - w) / W` at falloff
- *   weight `w`, so the full-weight core is cleared and the wall's contour stays smooth.
+ * - **The floor**: a level cut's lowest part is cut a sample further on than the face, so the
+ *   corner between floor and face is square where the body's lower front meets it.
+ * - **The bore**: behind it the whole stamp is cleared, its wall ramped so the contour lies on the
+ *   stamp's circle (`boreWallTargetOf`): the bore is the stamp's 1.9 m whatever the speed.
  *
  * Integer arithmetic only. The target never rises above a sample's density: the front only lowers.
  */
+import { circleExcessMm2Of } from './exactSquares'
 import { MM_PER_SAMPLE, SOLID_DENSITY } from './sampleGrid'
-import { FULL_WEIGHT, type StampPoint, type WeightedSample } from './stampShape'
+import { boreWallTargetOf, type StampPoint, type WeightedSample } from './stampShape'
 
 /**
  * The front plane: a point on it in mm, the facing it moves along (a 1024-scaled vector), and the
@@ -31,6 +32,10 @@ export interface CutFront extends StampPoint {
   aheadX: number
   aheadY: number
   rear: StampPoint
+  /** The stamp's radius, mm: the bore's wall lies on it. */
+  radiusMm: number
+  /** A level cut's floor, its radius from the planet's centre in mm; null for any other cut. */
+  floorRadiusMm: number | null
 }
 
 /** The facing vectors' scale (`UP_VECTOR_SCALE`). */
@@ -39,8 +44,9 @@ const AHEAD_SCALE = 1024
 /** The density the front leaves a sample at, whatever it holds now. */
 export function frontTargetOf(sample: WeightedSample, front: CutFront): number {
   if (behindPointMm(sample, front.rear, front) > 0) return SOLID_DENSITY
-  const behindFront = behindPointMm(sample, front, front) + floorUndercutMm(sample)
-  return Math.max(sample.floor, rimTargetOf(sample.weight), rampTargetOf(behindFront))
+  const behindFront = behindPointMm(sample, front, front) + floorUndercutMm(sample, front)
+  const wall = boreWallTargetOf(sample.weight, front.radiusMm)
+  return Math.max(sample.floor, wall, rampTargetOf(behindFront))
 }
 
 /** How far behind a plane through `point` the sample lies along the facing, in whole mm. */
@@ -51,21 +57,24 @@ function behindPointMm({ sx, sy }: WeightedSample, point: StampPoint, front: Cut
 }
 
 /**
- * A level cut's floor band (the samples its floor ramp holds up) is cut a sample further on than
- * the face: the face's ramp and the floor's would otherwise round the corner between them, a fillet
- * the body's lower front corner meets short of the face.
+ * A level cut's lowest part (within `FLOOR_UNDERCUT_HEIGHT_MM` above its floor's circle) is cut a
+ * sample further on than the face: the face's ramp, the floor's and the contour drawn between
+ * their samples would otherwise round the corner between floor and face, a fillet the body's lower
+ * front corner meets short of the face, and a body pressed down onto its floor that way sinks
+ * under it until the floor drops a sample.
  */
-function floorUndercutMm(sample: WeightedSample): number {
-  return sample.floor > 0 ? MM_PER_SAMPLE : 0
+function floorUndercutMm({ sx, sy }: WeightedSample, front: CutFront): number {
+  if (front.floorRadiusMm === null) return 0
+  const top = front.floorRadiusMm + FLOOR_UNDERCUT_HEIGHT_MM
+  const isLow = circleExcessMm2Of(top, sx * MM_PER_SAMPLE, sy * MM_PER_SAMPLE) > 0
+  return isLow ? MM_PER_SAMPLE : 0
 }
+
+/** One and a half samples: the floor's own ramp and the row above it. */
+const FLOOR_UNDERCUT_HEIGHT_MM = (3 * MM_PER_SAMPLE) / 2
 
 /** 255 at the front, falling one density step per 250/255 mm to 0 a sample's width behind it. */
 function rampTargetOf(behindMm: number): number {
   if (behindMm <= 0) return SOLID_DENSITY
   return Math.max(0, SOLID_DENSITY - Math.floor((SOLID_DENSITY * behindMm) / MM_PER_SAMPLE))
-}
-
-/** The stamp's soft rim: nothing at weight 0, cleared at full weight. */
-function rimTargetOf(weight: number): number {
-  return SOLID_DENSITY - Math.floor((SOLID_DENSITY * weight) / FULL_WEIGHT)
 }

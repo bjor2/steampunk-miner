@@ -23,6 +23,7 @@ import {
   poseAbove,
   type ScriptedSession,
 } from './scriptedSession'
+import { poseRidingFront } from './faceHoldFixtures'
 import { drillQuantumAt, stepBoundsAt } from './stepBoundRead'
 import { sweptColumnAt } from './sweptColumnFixture'
 import { columnSweep, sweepWith, WORK_BOUND_DRILL_POWER } from './sweptSpanFixtures'
@@ -152,8 +153,9 @@ const STRONG_DRILL_STEP = 54
 const SLOW_DRILL_STEP = 28
 
 /**
- * On planet 8 at `AWAY`, facing down with a drill at `drillStep`: the stamp rests for `steps` drill
- * steps, then a report at `reportTick` says it drilled `reportedDrillTicks`.
+ * On planet 8 at `AWAY`, facing down with a drill at `drillStep`: the body rides its cut down for
+ * `steps` drill steps (ticket 570: a resting body's cut stops once its step is cut), then a report
+ * at `reportTick` says it drilled `reportedDrillTicks`.
  */
 function restAndReport(
   steps: number,
@@ -169,11 +171,14 @@ function restAndReport(
   })
   session.submit(0, { type: 'debug.setEnergy', payload: { energy: '100000' } })
   session.submit(0, reportDownAt(0))
+  let body: { x: number; y: number } = AWAY
   for (let tick = 1; tick <= steps; tick++) {
     session.submit(tick, {
       type: 'drillStep',
-      payload: { ...AWAY, facing: FACING.down, drive: NO_DRIVE },
+      payload: { ...body, facing: FACING.down, drive: NO_DRIVE },
     })
+    const pose = { ...(session.vehicle().pose as VehiclePose), ...body, facing: FACING.down }
+    body = poseRidingFront(pose, session.vehicle().sweptCut)
   }
   session.submit(reportTick, reportDownAt(reportedDrillTicks))
   return session

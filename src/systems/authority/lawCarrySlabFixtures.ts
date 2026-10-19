@@ -25,7 +25,7 @@
  * path), the cells broken in order, the ground's chunks, and every `CommandRejected`. Test
  * support, never run in play.
  */
-import { DRILL_SUBSTEPS_PER_TICK } from '../../constants/balance'
+import { DRILL_STAMP_RADIUS_MM, DRILL_SUBSTEPS_PER_TICK } from '../../constants/balance'
 import { blockHardness } from '../economy/oreEconomy'
 import { subStepsPerTile } from '../vehicle/drillRule'
 import { MM_PER_METRE, TICKS_PER_SECOND, UP_VECTOR_SCALE } from '../../constants/physics'
@@ -34,10 +34,11 @@ import { stepDigTicksOf } from '../vehicle/sweptCut'
 import { FACING, facingVectorOf, type Facing } from '../vehicle/vehiclePose'
 import { statsOfVehicle, type VehicleState } from '../vehicle/vehicleState'
 import { CHUNK_SIZE, type TilePoint } from '../world/tileGrid'
+import { SOLID_DENSITY } from '../world/sampleGrid'
 import type { WorldState } from '../world/worldState'
 import type { CommandIntent } from './authorityCommand'
 import { vehicleOf, type AuthorityState } from './authorityState'
-import { setCasingGradeCommand } from './casingDebugCommands'
+import { lineCasingCommand, setCasingGradeCommand } from './casingDebugCommands'
 import {
   brokenCellsOf,
   chargedHeatTicksOf,
@@ -50,6 +51,7 @@ import {
   withSweptLawCharge,
 } from './cutCarryFixtures'
 import type { DomainEvent } from './domainEvent'
+import { carveCircleCommand } from './groundCommands'
 import { settleableHeatTicksOf, uncappedSettleableHeatTicksOf } from './heatCapReadings'
 import { heatThrottledDrill } from './heatRules'
 import {
@@ -83,6 +85,12 @@ export interface SlabTrack {
   lengthMm?: number
   /** The lining grade laid behind the drill: `CASING_GRADE` when absent, 0 for an unlined row. */
   casingGrade?: number
+  /**
+   * Lined pockets the track crosses, mm from its start: a hole of the stamp's radius carved there
+   * and lined at `CASING_GRADE` before the run. Since ticket 570 the cut never takes its own
+   * lining, so a row that prices cut lining crosses lining laid ahead of it.
+   */
+  linedPocketsAtMm?: readonly number[]
 }
 
 /** What one path read cutting one track with one rig. */
@@ -190,7 +198,11 @@ function rigSession(levels: Record<string, number>): ScriptedSession {
 }
 
 function positionAt(frame: Frame, track: SlabTrack, tick: number) {
-  const along = track.strideMm * tick
+  return pointOnTrack(frame, track.strideMm * tick)
+}
+
+/** The track's point `along` mm from its start. */
+function pointOnTrack(frame: Frame, along: number) {
   return {
     x: Math.round(frame.start.x + (frame.heading.x / UP_VECTOR_SCALE) * along),
     y: Math.round(frame.start.y + (frame.heading.y / UP_VECTOR_SCALE) * along),
@@ -285,6 +297,16 @@ function sessionAtStart(
   return session
 }
 
+/** Each lined pocket carved and lined at tick 0, before the run. */
+function lineThePockets(session: ScriptedSession, frame: Frame, alongMm: readonly number[]): void {
+  for (const along of alongMm) {
+    const at = pointOnTrack(frame, along)
+    const radius = DRILL_STAMP_RADIUS_MM
+    session.submit(0, carveCircleCommand({ ...at, radius, amount: SOLID_DENSITY }))
+    session.submit(0, lineCasingCommand({ ...at, grade: CASING_GRADE }))
+  }
+}
+
 /** The tank filled to the rig's own capacity (`debug.setEnergy` refuses more). */
 function refillOf(vehicle: VehicleState): CommandIntent<'debug.setEnergy'> {
   return { type: 'debug.setEnergy', payload: { energy: String(statsOfVehicle(vehicle).energyMax) } }
@@ -307,6 +329,7 @@ export function cutSlab(track: SlabTrack, path: SlabPath, levels: Record<string,
   return withChargeOf(path, () => {
     const frame = frameOf(track)
     const session = sessionAtStart(levels, frame, track.casingGrade)
+    lineThePockets(session, frame, track.linedPocketsAtMm ?? [])
     const start = session.state()
     const tally: RunTally = {
       energy: 0,

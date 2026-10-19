@@ -152,7 +152,8 @@ function frontOfReach(params: PlanetParams, cut: SweepRequest, reach: CarryReach
 }
 
 function frontWindowOf({ sweep, request }: SweepRequest, front: SweptFront) {
-  return windowAtFront(request.window, cutFrontAt(sweep.step.pose, front.point, sweep.rear))
+  const place = { pose: sweep.step.pose, point: front.point, rear: sweep.rear, stamp: sweep.stamp }
+  return windowAtFront(request.window, cutFrontAt(place))
 }
 
 /** The tick's stamp walk, the bit's gear cells cut with it. */
