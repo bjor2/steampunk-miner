@@ -9,10 +9,12 @@ import { hasGateChecks, isStandingVerdict } from '../registries/gateChecks'
 import type { YieldedCell } from '../world/cellYield'
 import type { CellDrillTicks } from '../world/groundEdit'
 import type { PlanetParams } from '../world/planetParams'
+import type { TilePoint } from '../world/tileGrid'
 import type { AuthorityState } from './authorityState'
 import {
   drillGatedEventOf,
   gateOfCell,
+  gateOfTile,
   type CellGates,
   type GateAsker,
   type GatedCell,
@@ -32,6 +34,11 @@ export interface DrillGates {
    * it. A standing cell is reported with the others; a standing or lost one is left in place.
    */
   canMine(cell: YieldedCell): boolean
+  /**
+   * `canMine` asked with no memo, so the cell is never reported: a check that a latched cell still
+   * stands is not the drill meeting it (the twin bit cuts as the bare drill, TD lock on #280).
+   */
+  canMineUnreported(tile: TilePoint): boolean
 }
 
 export function openDrillGates(
@@ -51,11 +58,18 @@ export function openDrillGates(
     refusedEvents: () => standingEventsOf(gates),
     lostEventOf: (yielded) => lostEventOf(gateOfCell(gates, asker, yielded)),
     canMine: (cell) => isCut(gateOfCell(gates, asker, cell)),
+    canMineUnreported: (tile) => isCut(gateOfTile(asker, tile)),
   }
 }
 
 function ungatedDrill(drillTicksOf: CellDrillTicks): DrillGates {
-  return { drillTicksOf, refusedEvents: () => [], lostEventOf: () => null, canMine: () => true }
+  return {
+    drillTicksOf,
+    refusedEvents: () => [],
+    lostEventOf: () => null,
+    canMine: () => true,
+    canMineUnreported: () => true,
+  }
 }
 
 function isCut(gated: GatedCell | null): boolean {

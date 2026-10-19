@@ -161,7 +161,33 @@ describe('scripted mining with drill gear (ticket 392)', () => {
     expect(twin.events).toEqual(bare.events)
     expect(twin.spent).toBe(bare.spent)
   })
+
+  // The no-free-cell identity (GD ruling on #280): the latch the first command left along the
+  // facing is checked again on the second, and that check must not report the gated cell past it.
+  it('reports no gate past the bit over two commands with the twin bit and no side pushed', () => {
+    const bore = groundOverOre()
+    const shell = { tx: bore.target.tx, ty: bore.target.ty - 1 }
+    const shellOnly = shellSlice(shell, 'refused')
+    const bare = boreInTwoWith([shellOnly], bore)
+    const twin = boreInTwoWith([gearSlice({ aheadCells: 1, aheadAim: 'drive' }), shellOnly], bore)
+    expect(bare.flat().filter((event) => event.type === 'DrillGated')).toEqual([])
+    expect(twin).toEqual(bare)
+  })
 })
+
+/** The bot's bore split over two `drillTile` commands, as it digs a slow cell: each one's events. */
+function boreInTwoWith(slices: readonly SliceDefinition[], bore: Bore) {
+  return withRegistrations(slices, () => {
+    const ticks = targetTicksOf(bore.target)
+    const firstTicks = Math.ceil(ticks / 2)
+    const session = createScriptedSession()
+    const standing = standingTileOf(bore)
+    session.submit(1, poseAbove({ tx: standing.tx, ty: standing.ty - 1 }, bore.facing))
+    const first = session.submit(1 + firstTicks, drill(bore.target, firstTicks))
+    const second = session.submit(1 + ticks, drill(bore.target, ticks - firstTicks))
+    return [first, second]
+  })
+}
 
 /** The gear's cells of the bot's bore, read before the `drillTile`, from the report facing it. */
 function gearCellsOfBoreWith(slices: readonly SliceDefinition[], bore: Bore = DOWN_INTO_TARGET) {

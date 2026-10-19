@@ -261,7 +261,8 @@ export function drillGearReadAt(
   const isUncut = (tile: TilePoint) => canMine(tile) && !isTileYielded(state.world, tile)
   const isStanding = (tile: TilePoint) => isStandingCell(state.world, params, tile)
   const crossing = { isMineable: canMine, isStanding }
-  const aheadLatch = aheadLatchOf(state, playerId, gear, bit, { isUncut, crossing })
+  const isLatchUncut = (tile: TilePoint) => isUncutUnreported(state.world, params, gates, tile)
+  const aheadLatch = aheadLatchOf(state, playerId, gear, bit, { isUncut: isLatchUncut, crossing })
   const aheadBearing = aheadLatch?.bearing ?? 'facing'
   const aheadCells = aheadCellsOn(gear, aheadBearing)
   const sideLatch = sideLatchOf(state, playerId, gear, bit, isUncut)
@@ -365,6 +366,21 @@ function isCuttableCell(
   tile: TilePoint,
 ): boolean {
   return gates.drillTicksOf(tile, materialCellAt(world, params, tile), 0) !== null
+}
+
+/**
+ * A latched cell still standing uncut, its gates asked without reporting them: the latch's check
+ * is not the drill meeting the cell, so a drive-aimed head cutting along the facing as the bare
+ * drill reports what the bare drill does (TD lock on #280). A cell it then cuts is reported there.
+ */
+function isUncutUnreported(
+  world: WorldState,
+  params: PlanetParams,
+  gates: DrillGates,
+  tile: TilePoint,
+): boolean {
+  const cell = materialCellAt(world, params, tile)
+  return isRemovableCell(cell) && gates.canMineUnreported(tile) && !isTileYielded(world, tile)
 }
 
 /** Solid ground a drill may remove that no gate holds. */

@@ -382,8 +382,13 @@ import type { DriveSigns } from '../vehicle/driveSigns'
  *    1.3 from 4, 1.6 from 6 and 1.7 from 8, with no planet 11 reset. Step 0 of every track keeps
  *    its stat; a run that buys anything past planet 1, or holds a hold, boiler or engine past step
  *    0, pays and moves differently, so its digests move.
+ * 93: a drive-aimed head's ahead latch checks that its cell still stands without reporting the
+ *    cell's gate (ticket 552, the no-free-cell identity of the GD ruling on #280): with no side
+ *    pushed the twin bit cuts along the facing as the bare drill, and no longer raises the
+ *    `DrillGated` (and the codex contact after it) of the gated cell past the bit that the bare
+ *    drill never met. A cell the head does cut is still reported where the cut meets it.
  */
-export const AUTHORITY_PROTOCOL_VERSION = 92
+export const AUTHORITY_PROTOCOL_VERSION = 93
 
 /** The kernel's own commands: the closed set its rule tables are written against. */
 export interface KernelCommandPayloads {
