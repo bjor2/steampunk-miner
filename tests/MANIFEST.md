@@ -765,7 +765,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/authority/drillEventStream.test.ts` | 27 | 5 |
 | `src/systems/authority/drillGates.test.ts` | 11 | 11 |
 | `src/systems/authority/drillGearCut.test.ts` | 27 | 25 |
-| `src/systems/authority/drillStep.test.ts` | 22 | 22 |
+| `src/systems/authority/drillStep.test.ts` | 23 | 23 |
 | `src/systems/authority/drillStepFacing.test.ts` | 3 | 2 |
 | `src/systems/authority/exactMathLint.test.ts` | 11 | 3 |
 | `src/systems/authority/featureSales.test.ts` | 6 | 6 |
@@ -1077,6 +1077,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | File | Tests | Sites |
 | --- | --- | --- |
 | `src/physics/clientFlagFlip.test.ts` | 1 | 1 |
+| `src/physics/cutFaceRide.test.ts` | 52 | 4 |
 | `src/physics/cutFollow.test.ts` | 5 | 3 |
 | `src/physics/cutFollowBite.test.ts` | 3 | 2 |
 | `src/physics/cutFollowRelease.test.ts` | 13 | 15 |
@@ -1183,7 +1184,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/render/chunkTileBatchOreLook.test.ts` | 1 | 1 |
 | `src/systems/render/chunkWorkerStreaming.test.ts` | 8 | 2 |
 | `src/systems/render/collapseTelegraph.test.ts` | 8 | 8 |
-| `src/systems/render/densityHalo.test.ts` | 5 | 5 |
+| `src/systems/render/densityHalo.test.ts` | 8 | 8 |
 | `src/systems/render/drillHeadPose.test.ts` | 7 | 4 |
 | `src/systems/render/enemyArt.test.ts` | 3 | 3 |
 | `src/systems/render/enemyPlaceholder.test.ts` | 7 | 3 |
@@ -1248,6 +1249,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/save/byteCodecs.test.ts` | 20 | 12 |
 | `src/systems/save/carriedCursors.test.ts` | 3 | 3 |
 | `src/systems/save/chunkDiffSave.test.ts` | 11 | 11 |
+| `src/systems/save/cutFrontSave.test.ts` | 2 | 2 |
 | `src/systems/save/loadedSaveDigest.test.ts` | 4 | 4 |
 | `src/systems/save/newerSaveText.test.ts` | 5 | 5 |
 | `src/systems/save/oreRulesOldSaves.test.ts` | 11 | 5 |
@@ -1271,6 +1273,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | --- | --- | --- |
 | `src/scene/SceneLayers.test.ts` | 5 | 5 |
 | `src/scene/VehiclePieces.test.ts` | 2 | 2 |
+| `src/scene/chunkHaloEdits.test.ts` | 1 | 1 |
 | `src/scene/chunkJobStream.test.ts` | 3 | 3 |
 | `src/scene/mountedPartsPresence.test.ts` | 3 | 3 |
 | `src/scene/oneShotPlayer.test.ts` | 5 | 5 |
