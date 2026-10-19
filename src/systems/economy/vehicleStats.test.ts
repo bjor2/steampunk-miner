@@ -99,7 +99,6 @@ describe('vehicle stats', () => {
 
 describe('on-curve levels', () => {
   it.each([
-    ['boiler', 0, 16],
     ['engine', 3, 2],
     ['hull', 6, 2],
     ['drill_power', 3, 12],
@@ -110,11 +109,15 @@ describe('on-curve levels', () => {
     }
   })
 
-  // Systems' rows on #553: the bot's hold stops at 255 units (34 purchases) from planet 12, past
-  // the largest band's ore, and the engine's last purchase under the 3600 m/s floor is 131.
-  it('stops the hold at 34 purchases and the engine at 131 on curve (ticket 553)', () => {
-    expect([1, 12, 13, 40, 1000].map((planet) => onCurveLevel('cargo_hold', planet))).toEqual([
-      22, 33, 34, 34, 34,
+  // Systems' rows on #553: the bot's hold climbs 81, 131, 192 and 211 units on P1, P4, P5 and P6
+  // and stops at 255 (34 purchases), past the largest band's ore; the tank at Systems' 16 purchases (689 units), the old on-curve tank's
+  // size from planet 13; and the engine's last purchase under the 3600 m/s floor is 131.
+  it('stops the hold at 34 purchases, the boiler at 16 and the engine at 131 on curve (ticket 553)', () => {
+    expect([1, 7, 10, 13, 40].map((planet) => onCurveLevel('boiler', planet))).toEqual([
+      4, 10, 13, 16, 16,
+    ])
+    expect([1, 3, 6, 7, 1000].map((planet) => onCurveLevel('cargo_hold', planet))).toEqual([
+      22, 26, 32, 34, 34,
     ])
     expect([1, 40, 44, 45, 1_000_000].map((planet) => onCurveLevel('engine', planet))).toEqual([
       2, 119, 131, 131, 131,

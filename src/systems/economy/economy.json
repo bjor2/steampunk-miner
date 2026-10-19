@@ -203,7 +203,7 @@
         "start": "150",
         "ratio": "1.10"
       },
-      "onCurve": { "levelAtPlanet1": 16, "levelsPerPlanet": 0 }
+      "onCurve": { "levelAtPlanet1": 4, "levelsPerPlanet": 1, "atMost": 16 }
     },
     {
       "id": "cargo_hold",
@@ -215,7 +215,7 @@
         "start": "10",
         "ratio": "1.10"
       },
-      "onCurve": { "levelAtPlanet1": 22, "levelsPerPlanet": 1, "atMost": 34 }
+      "onCurve": { "levelAtPlanet1": 22, "levelsPerPlanet": 2, "atMost": 34 }
     },
     {
       "id": "hull",

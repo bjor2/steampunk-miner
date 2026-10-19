@@ -41,11 +41,13 @@ The tables list **major levels** `L`, today's curves. A vehicle stores each trac
   `round(10 x 1.10^c)` and boiler `round(150 x 1.10^b)`, each for `ceil(2.4 x 1.20^n) x paceScale`
   (families `wholePerPurchase` and `geometricPerPurchase`); engine `6 x 1.05^e` m/s with accel
   `1.05^e` and thrust to weight `1 + 1.05^e`, for `ceil(3.6 x 1.60^e) x paceScale`
-  (`enginePerPurchase`). Their stats are plain numbers, safe to about 275 purchases, so the
-  on-curve reference rig stops the hold at 34 (Systems: the bot's hold stops at 255 units from
-  P12, past the largest band's ore) and the engine at 131 (the last purchase under the 3600 m/s
-  sub-step floor); the boiler is 16 on every planet (689 units, Systems' tank). `paceScale` rows:
-  1.2 from P2, 1.3 from P4, 1.6 from P6, 1.7 from P8.
+  (`enginePerPurchase`). Their stats are plain numbers, safe to about 275 purchases, so each
+  on-curve row (`onCurve.atMost`) stops where a purchase stops paying, following Systems' bot lane:
+  the hold 22 + 2 a planet, stopping at 34 (255 units, past the largest band's ore) from P7; the
+  boiler 4 + 1 a planet, stopping at Systems' 16-purchase tank (689 units) from P13, which keeps
+  the old on-curve tank (P7 389 units against 390); the engine 2 + 3 a planet, stopping at 131,
+  the last purchase under the 3600 m/s sub-step floor. `paceScale` rows: 1.2 from P2, 1.3 from P4,
+  1.6 from P6, 1.7 from P8.
 - The design tables of the tip and hull do not change, because they read majors. `npm run balance:report` prints the
   pacing bot's spree targets per track (GD lock on #181): the median steps per bought track a
   visit, 6 to 12, and the share of above-median trips that buy 10 or more steps on one track, 25 to

@@ -54,7 +54,7 @@ import {
   hasSlicePurchaseAtBay,
   isSavingForDuePurchase,
 } from './botSlicePurchases'
-import { canPay, canPayForBrass, walletOf } from './botWallet'
+import { canPay, canPayForBrass, trackStepsOutlayOf, walletOf } from './botWallet'
 import type { ShopSpend } from './shopSpend'
 import type { MineLayout } from './mineLayout'
 import { bestOrePlan, fullTankMeans } from './tripEstimate'
@@ -241,19 +241,22 @@ function forcedTrack(session: BotSession, situation: ShoppingSituation): Upgrade
 function canAffordToNextLevel(session: BotSession, track: UpgradeId): boolean {
   const step = session.vehicle().levels[track]
   const planetIndex = session.state().planet.index
+  const steps = stepsToNextLevel(track, step)
   let price = ZERO_MONEY
-  for (let at = step; at < step + stepsToNextLevel(track, step); at++) {
+  for (let at = step; at < step + steps; at++) {
     price = add(price, stepPrice(track, at, planetIndex))
   }
-  return canPayForBrass(session, price)
+  return canPayForBrass(session, trackStepsOutlayOf(session, { track, steps, price }))
 }
 
 function priceOf(session: BotSession, track: UpgradeId) {
   return nextUpgradePrice(session.state(), session.playerId, track)
 }
 
+/** One step paid for with what it adds to the service the bot keeps back (ticket 553). */
 function canAfford(session: BotSession, track: UpgradeId): boolean {
-  return canPayForBrass(session, priceOf(session, track))
+  const price = priceOf(session, track)
+  return canPayForBrass(session, trackStepsOutlayOf(session, { track, steps: 1, price }))
 }
 
 function canAffordCasing(session: BotSession): boolean {

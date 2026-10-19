@@ -112,13 +112,15 @@ describe('rarity share bounds (ticket 449)', () => {
     }
   })
 
-  it('costs P3 band 5 about 0.9 bp of mean income to the clamp, exactly, and P10 band 5 next to none', () => {
-    // Systems measured 0.87 bp, the TD 0.98 bp, both by sample (6202970624 section 4; #445).
+  it('costs P3 band 5 about 0.38 bp of mean income to the clamp, exactly, and P10 band 5 next to none', () => {
+    // Systems measured 0.87 bp, the TD 0.98 bp, both by sample (6202970624 section 4; #445), on
+    // the old on-curve hold of 90 units. Ticket 553's hold row puts the on-curve P3 hold at 119
+    // units, and a bigger trip spreads the clamp thinner: 0.378 bp, read exactly.
     const clampLossOf = (planet: number) =>
       (READINGS.find((reading) => reading.planetIndex === planet) as PlanetReading).bands[4].trip
         .clampLossBp
-    expect(clampLossOf(3)).toBeGreaterThan(0.85)
-    expect(clampLossOf(3)).toBeLessThan(0.95)
+    expect(clampLossOf(3)).toBeGreaterThan(0.37)
+    expect(clampLossOf(3)).toBeLessThan(0.39)
     expect(clampLossOf(10)).toBeLessThan(0.01)
   })
 

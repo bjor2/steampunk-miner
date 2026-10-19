@@ -20,7 +20,8 @@ import { TREE_ECONOMY } from './systems/treeEconomy'
 // points of a full hold after and before the trip cap. Since ticket 449 the hold is priced at the
 // band's rarity-weighted mean (mu_5 = 1.05625), so the trip cap's 15% of the nominal hold reads
 // 1421 bp, with the nominal share (1500) beside it. A rate, the trip cap or the drill curve that
-// moves a share moves this table, on purpose: say why in the commit. Beside it, the same shares
+// moves a share moves this table, on purpose: say why in the commit. Ticket 553's on-curve hold
+// (255 units from P7, past the largest band's ore) moved the drain's unclamped column on P20-P60. Beside it, the same shares
 // with each item's sibling-link added (`balance:tree --milestones`, GD lock on #256, ticket 278).
 
 // Drill-throughput gear (`gear.*`, a cut-shape item such as Wide's gallery reamers) is drill speed,
@@ -56,15 +57,15 @@ describe('income cap golden', () => {
       'P10 consumable.lodestone_beacon 1421 1500 9089',
       'P10 power.ore_shifter 1421 1500 3906',
       'P10 power.pressure_pocket 1421 1500 5681',
-      'P20 power.mineral_drain 1421 1500 1894',
+      'P20 power.mineral_drain 1421 1500 1610',
       'P20 consumable.lodestone_beacon 1421 1500 12119',
       'P20 power.ore_shifter 1421 1500 5208',
       'P20 power.pressure_pocket 1421 1500 7574',
-      'P40 power.mineral_drain 1421 1500 3196',
+      'P40 power.mineral_drain 1421 1500 2716',
       'P40 consumable.lodestone_beacon 1421 1500 20450',
       'P40 power.ore_shifter 1421 1500 8787',
       'P40 power.pressure_pocket 1421 1500 12782',
-      'P60 power.mineral_drain 1421 1500 5444',
+      'P60 power.mineral_drain 1421 1500 4628',
       'P60 consumable.lodestone_beacon 1421 1500 34841',
       'P60 power.ore_shifter 1421 1500 14971',
       'P60 power.pressure_pocket 1421 1500 21776',
@@ -119,15 +120,15 @@ describe('income cap golden', () => {
       'P10 consumable.lodestone_beacon 1421 1500 9089',
       'P10 power.ore_shifter 1421 1500 8450',
       'P10 power.pressure_pocket 1421 1500 5681',
-      'P20 power.mineral_drain 1421 1500 1894',
+      'P20 power.mineral_drain 1421 1500 1610',
       'P20 consumable.lodestone_beacon 1421 1500 12119',
       'P20 power.ore_shifter 1421 1500 11267',
       'P20 power.pressure_pocket 1421 1500 7574',
-      'P40 power.mineral_drain 1421 1500 3196',
+      'P40 power.mineral_drain 1421 1500 2716',
       'P40 consumable.lodestone_beacon 1421 1500 20450',
       'P40 power.ore_shifter 1421 1500 19012',
       'P40 power.pressure_pocket 1421 1500 12782',
-      'P60 power.mineral_drain 1421 1500 5444',
+      'P60 power.mineral_drain 1421 1500 4628',
       'P60 consumable.lodestone_beacon 1421 1500 34841',
       'P60 power.ore_shifter 1421 1500 32391',
       'P60 power.pressure_pocket 1421 1500 21776',
