@@ -67,7 +67,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/casing-cement/systems/casedTiles.test.ts` | 6 | 6 |
 | `src/features/casing-cement/systems/cementReinforcement.test.ts` | 6 | 6 |
 
-### `codex`: 10 files, 82 tests
+### `codex`: 11 files, 88 tests
 
 | File | Tests | Sites |
 | --- | --- | --- |
@@ -80,6 +80,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/codex/systems/codexReaction.test.ts` | 11 | 11 |
 | `src/features/codex/systems/codexSection.test.ts` | 7 | 7 |
 | `src/features/codex/systems/codexSize.test.ts` | 2 | 2 |
+| `src/features/codex/systems/contactsAtSpeed.test.ts` | 6 | 3 |
 | `src/features/codex/systems/materialContacts.test.ts` | 24 | 16 |
 
 ### `combos`: 17 files, 102 tests
@@ -731,6 +732,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/authority/charges/chargeShop.test.ts` | 10 | 10 |
 | `src/systems/authority/charges/chargeSizeRules.test.ts` | 14 | 14 |
 | `src/systems/authority/clampedCharge.test.ts` | 6 | 6 |
+| `src/systems/authority/collapse/collapseAtSpeed.test.ts` | 5 | 5 |
 | `src/systems/authority/collapse/collapseBraces.test.ts` | 23 | 22 |
 | `src/systems/authority/collapse/collapseReinforcement.test.ts` | 7 | 7 |
 | `src/systems/authority/collapse/collapseRun.test.ts` | 19 | 19 |
@@ -803,6 +805,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/authority/reportedGateBite.test.ts` | 15 | 15 |
 | `src/systems/authority/reportedGateBiteTracks.test.ts` | 7 | 3 |
 | `src/systems/authority/scriptedDrillGear.test.ts` | 9 | 9 |
+| `src/systems/authority/scriptedSession.test.ts` | 1 | 1 |
 | `src/systems/authority/sellCoins.test.ts` | 8 | 8 |
 | `src/systems/authority/sensingQueries.test.ts` | 10 | 10 |
 | `src/systems/authority/serviceReserve.test.ts` | 4 | 4 |
@@ -810,6 +813,8 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/authority/signatureCells.test.ts` | 9 | 9 |
 | `src/systems/authority/sliceSectionSnapshot.test.ts` | 12 | 12 |
 | `src/systems/authority/spanBudget.test.ts` | 4 | 4 |
+| `src/systems/authority/speedScaling.lane.test.ts` | 2 | 2 |
+| `src/systems/authority/speedScaling.test.ts` | 20 | 13 |
 | `src/systems/authority/startingRigCutSpeed.test.ts` | 4 | 4 |
 | `src/systems/authority/stateDigest.test.ts` | 17 | 12 |
 | `src/systems/authority/sweptCarry.test.ts` | 8 | 6 |
@@ -828,6 +833,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/authority/terrain/terrainEditGates.test.ts` | 6 | 4 |
 | `src/systems/authority/terrain/terrainEditPlan.test.ts` | 5 | 5 |
 | `src/systems/authority/terrain/terrainEditQueue.test.ts` | 5 | 5 |
+| `src/systems/authority/travelAtSpeed.test.ts` | 6 | 3 |
 | `src/systems/authority/travelRules.test.ts` | 12 | 12 |
 | `src/systems/authority/vehicleCommands.test.ts` | 27 | 27 |
 | `src/systems/authority/vehicleItemRules.test.ts` | 10 | 10 |
@@ -1183,7 +1189,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/render/groundStrata.test.ts` | 6 | 6 |
 | `src/systems/render/gunLook.test.ts` | 7 | 7 |
 | `src/systems/render/hazardStrip/hazardStripPlanet.test.ts` | 5 | 2 |
-| `src/systems/render/hazardStrip/hazardStripSampler.test.ts` | 20 | 13 |
+| `src/systems/render/hazardStrip/hazardStripSampler.test.ts` | 21 | 14 |
 | `src/systems/render/hazardStrip/seededStripGround.test.ts` | 10 | 6 |
 | `src/systems/render/hazardStrip/stripPath.test.ts` | 8 | 6 |
 | `src/systems/render/hazardStrip/stripViewer.test.ts` | 3 | 3 |
