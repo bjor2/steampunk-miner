@@ -790,6 +790,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/authority/minedOre.test.ts` | 7 | 7 |
 | `src/systems/authority/moneyRounding.test.ts` | 3 | 3 |
 | `src/systems/authority/oreRulesStamp.test.ts` | 8 | 8 |
+| `src/systems/authority/perPurchaseTrackEvents.test.ts` | 6 | 2 |
 | `src/systems/authority/planetOfState.test.ts` | 4 | 4 |
 | `src/systems/authority/platformCommands.test.ts` | 43 | 43 |
 | `src/systems/authority/purchaseChain.test.ts` | 18 | 10 |
@@ -924,7 +925,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/economy/itemHookCaps.test.ts` | 8 | 8 |
 | `src/systems/economy/magnetCaps.test.ts` | 5 | 5 |
 | `src/systems/economy/oreEconomy.test.ts` | 7 | 7 |
-| `src/systems/economy/perPurchaseRows.test.ts` | 37 | 19 |
+| `src/systems/economy/perPurchaseRows.test.ts` | 40 | 21 |
 | `src/systems/economy/planetCharges.test.ts` | 16 | 12 |
 | `src/systems/economy/readEconomy.test.ts` | 25 | 25 |
 | `src/systems/economy/refineryEconomy.test.ts` | 6 | 6 |
@@ -1004,7 +1005,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/logging/drillLadderSteps.test.ts` | 4 | 4 |
 | `src/logging/drillLogBytes.test.ts` | 4 | 4 |
 | `src/logging/drillPace.lane.test.ts` | 2 | 3 |
-| `src/logging/drillPace.test.ts` | 9 | 9 |
+| `src/logging/drillPace.test.ts` | 14 | 14 |
 | `src/logging/drillSpanGate.test.ts` | 2 | 2 |
 | `src/logging/dynamiteDryRuns.test.ts` | 4 | 4 |
 | `src/logging/eventNames.test.ts` | 6 | 6 |
