@@ -70,6 +70,14 @@ export const DRILL_STAMP_LIFT_MM = 250
 export const BODY_HALF_SIZE_MM = 450
 
 /**
+ * The swept cut's contact margin (ticket 570, TD shape on #570 point 1: no more than one density
+ * sample): the face the cut leaves sits this far past where the body's face will be after the
+ * tick's step, so the body rides the face with a little skin and never meets it mid-step. Under
+ * `GROUND_PROBE_DEPTH`, so a rig riding the face of a cut down stands on the ground.
+ */
+export const CUT_FACE_MARGIN_MM = 50
+
+/**
  * The swept cut's carry holds its cell out of the stamp until the cell lies in the body's next
  * step (ticket 421, GD ruling on #421 Q2): one of its samples inside the slab from the body's face
  * to the face plus the cutting bound, across the body's width, widened on every side by this many

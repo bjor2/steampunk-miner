@@ -53,6 +53,17 @@ export interface SweptCut extends StampPoint, CutGate {
    * absent at the base 60, so a cursor that never left it digests as before.
    */
   quantum?: number
+  /**
+   * Where a cutting step's front stood (ticket 570, `authority/sweptFront.ts`) when its bite left it
+   * past the reach: the cell it bit into stands part-cut, part-paid. Absent while the front stands
+   * at the reach, so a cursor with no bite saves and digests as before.
+   */
+  front?: StampPoint
+}
+
+/** Where the cursor's step left its front: its bite's, or its reach. */
+export function frontOfCursor(cursor: SweptCut): StampPoint {
+  return cursor.front ?? pointOf(cursor)
 }
 
 /** The sub-steps a tick the cursor's dig time and carry count in. */
@@ -115,7 +126,7 @@ export function sweepPathOf(
 ): SweepPath {
   const { stamp } = stepStamp
   const isFresh = !isContinuing(cursor, pose, tick)
-  const from = isFresh || cursor === undefined ? bodyPointOf(stepStamp, pose) : pointOf(cursor)
+  const from = isFresh || cursor === undefined ? stampBodyPointOf(stepStamp, pose) : pointOf(cursor)
   const to = pointOf(stamp)
   return { from, to, isFresh, steps: stepsBetween(from, to) }
 }
@@ -124,8 +135,11 @@ function isContinuing(cursor: SweptCut | undefined, pose: VehiclePose, tick: num
   return cursor !== undefined && cursor.tick === tick - 1 && cursor.facing === pose.facing
 }
 
-/** The stamp pulled back along the facing to the body: where a fresh step's walk starts. */
-function bodyPointOf({ stamp, aheadMm }: StepStamp, pose: VehiclePose): StampPoint {
+/**
+ * The stamp pulled back along the facing to the body: where a fresh step's walk starts, and where
+ * a cutting step's carve runs from (ticket 570).
+ */
+export function stampBodyPointOf({ stamp, aheadMm }: StepStamp, pose: VehiclePose): StampPoint {
   const ahead = facingVectorOf(pose.upx, pose.upy, pose.facing)
   return {
     xMm: stamp.xMm - scaled(ahead.x, aheadMm),
@@ -158,9 +172,16 @@ export function centreTileAtStep(path: SweepPath, step: number): TilePoint {
  * disc while that disc still covers the body.
  */
 export function sweptStampOf(path: SweepPath, stamp: DiscStamp, step: number): DiscStamp {
-  const reached = pointAtStep(path, step)
+  return sweptStampTo(path, stamp, pointAtStep(path, step))
+}
+
+/**
+ * The stamp the step cuts with its centre at `reached`, a point of the path (ticket 570: the
+ * front a tick's work bit to, which may lie between two sub-steps).
+ */
+export function sweptStampTo(path: SweepPath, stamp: DiscStamp, reached: StampPoint): DiscStamp {
   const tail = isBareDiscReach(path, reached, stamp.radiusMm) ? reached : path.from
-  return { ...stamp, ...reached, tail }
+  return { ...stamp, ...pointOf(reached), tail }
 }
 
 /**

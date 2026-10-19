@@ -268,7 +268,8 @@ function isPortableHeat(heat: unknown): boolean {
 
 /**
  * The swept cut's cursor (tickets 330, 333, 335, 399): reach, step, cut gate, share, dig time, carry,
- * and the drill quantum those count in when above the base (ticket 558).
+ * the drill quantum those count in when above the base (ticket 558), and the front a bite left
+ * past the reach (ticket 570).
  */
 function isPortableSweptCut(cursor: unknown): boolean {
   return (
@@ -283,7 +284,8 @@ function isPortableSweptCut(cursor: unknown): boolean {
     isWholeNumber(cursor.cutSharePassed) &&
     isWholeNumber(cursor.digSubSteps) &&
     isWholeNumber(cursor.carrySubSteps) &&
-    (cursor.quantum === undefined || isLiftedDrillQuantum(cursor.quantum))
+    (cursor.quantum === undefined || isLiftedDrillQuantum(cursor.quantum)) &&
+    (cursor.front === undefined || isRingPoint(cursor.front))
   )
 }
 

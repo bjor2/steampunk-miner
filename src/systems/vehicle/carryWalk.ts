@@ -28,11 +28,17 @@
  *   discards work, never banked forward; the walk then goes on past it with nothing left to spend,
  *   through open ground only: one cell is released a tick.
  *   It is one walk, so the purse, tank and hold are spent once.
+ * - **A front's bite** (ticket 570): where the ground bites, the walk stopping short of a cell it
+ *   cannot pay first spends its work on a front biting into that cell, as far as the work pays for
+ *   what the bite removes; the bite is paid as part of the cell's price, the cell stays the carry's
+ *   target and only the rest of the work is carried. Its price falls by what was paid, so over a
+ *   column the work spent still sums to the cells' prices.
  * - **Run-length batches**: a run of crossed cells alike in price, energy and kind, none ending the
  *   walk, is paid in one closed-form step (`k` cells cost `k * price`); the per-cell walk is the
  *   reference the batches must equal.
  */
 import { centreTileAtStep, type SweepPath } from './sweptCut'
+import type { StampPoint } from '../world/stampShape'
 import type { TilePoint } from '../world/tileGrid'
 
 /** What one crossed cell costs the walk. */
@@ -56,6 +62,23 @@ export interface CarryGround {
    * before carves it; null while the carry holds it out of the stamp. Absent: every cell is held.
    */
   releasedPriceAt?: (tile: TilePoint, step: number) => number | null
+  /**
+   * A cutting tick's front biting into a crossed cell the work cannot pay in full (ticket 570): the
+   * work the bite spends, at most `work`, and where it leaves the front. Absent: the work is banked.
+   */
+  biteInto?: (crossing: CellCrossing, work: number) => CellBite
+}
+
+/** A crossed cell, and the sub-step where the stamp's centre enters it. */
+export interface CellCrossing {
+  tile: TilePoint
+  step: number
+}
+
+/** What a front's bite into a cell spent, in sub-steps, and where it left the front. */
+export interface CellBite {
+  spent: number
+  front: StampPoint
 }
 
 /** What a tick's walk may spend: sub-steps of work, the tank in quanta, places in the hold. */
@@ -82,6 +105,8 @@ export interface CarryReach {
   paidSteps: number[]
   /** The cell the carry works toward, which only the carry cuts; null when nothing is carried. */
   target: TilePoint | null
+  /** Where a bite into `target` left the front (ticket 570); absent with no bite. */
+  front?: StampPoint
 }
 
 /** The cell past the path's end along the facing, and its price; 0 for open ground or a stop. */
@@ -108,9 +133,7 @@ export const walkCarryInRuns: CarryWalk = (sweep, purse, ground) =>
   walkCarry(sweep, purse, ground, Number.POSITIVE_INFINITY)
 
 /** A crossed cell: where the centre enters it, and what it costs. */
-interface Crossing {
-  tile: TilePoint
-  step: number
+interface Crossing extends CellCrossing {
   cell: CarryCell
 }
 
@@ -289,10 +312,29 @@ function payOrStopAt(
   const { purse } = ledger
   if (crossing.cell.price <= purse.subSteps) return payCellAt(ledger, crossing)
   const released = ledger.hasReleased ? null : releasedPriceOf(crossing, ground)
-  if (released === null || released > purse.subSteps) {
-    return reachOf(ledger, crossing.step - 1, purse.subSteps, crossing.tile)
-  }
+  if (released === null || released > purse.subSteps) return stopShortOf(ledger, crossing, ground)
   return payReleasedCellAt(ledger, crossing, released)
+}
+
+/**
+ * The walk stops short of a cell it cannot pay: its work carried toward it, or, where the ground
+ * bites (ticket 570), first spent on the bite, which is paid as part of the cell's price.
+ */
+function stopShortOf(ledger: CarryLedger, crossing: Crossing, ground: CarryGround): CarryReach {
+  const bite = ground.biteInto?.(crossing, ledger.purse.subSteps)
+  if (bite === undefined)
+    return reachOf(ledger, crossing.step - 1, ledger.purse.subSteps, crossing.tile)
+  if (bite.spent > 0) payBite(ledger, crossing, bite.spent)
+  const stopped = reachOf(ledger, crossing.step - 1, ledger.purse.subSteps, crossing.tile)
+  return { ...stopped, front: bite.front }
+}
+
+/** Part of a cell's price paid by a bite: it stays the carry's target, no cell paid whole. */
+function payBite(ledger: CarryLedger, { tile, step }: Crossing, spent: number): void {
+  ledger.purse.subSteps -= spent
+  ledger.paid.push(tile)
+  ledger.paidPrices.push(spent)
+  ledger.paidSteps.push(step)
 }
 
 /** What the stamp's bite leaves of the crossing's cell; null while the carry holds it. */
