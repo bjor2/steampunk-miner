@@ -176,7 +176,7 @@ export const LAW_SUB_STEP_CLOCK: DrillClock = lawSubStepClockOf(DRILL_SUBSTEPS_P
  * so a `drillTile` costs what the player's cut of the same cells costs and heats for its dig
  * time, never for the window it names.
  */
-export function scriptedClockOf(quantum: number): DrillClock {
+function scriptedClockOf(quantum: number): DrillClock {
   const clock = subStepClockOf(quantum)
   return {
     ...clock,
