@@ -129,6 +129,11 @@ export interface VehicleState {
    */
   cutEnergyCarry?: number
   /**
+   * The drill quantum `cutEnergyCarry` counts in when above the base 60 (ticket 558,
+   * `cutCarry.ts`): absent at the base, dropped with the carry.
+   */
+  cutEnergyCarryQuantum?: number
+  /**
    * The law work a pose report's own cut removed and has not heated yet, in density sub-steps
    * (`cutCarry.ts`, ticket 535): under one drill tick between commands, carried into the next
    * report's heat. Absent at 0; dropped where `cutEnergyCarry` is.

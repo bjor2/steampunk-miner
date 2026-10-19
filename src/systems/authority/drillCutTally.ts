@@ -6,7 +6,8 @@
  *
  * Dig time is each broken cell's own drill time at the drill's hardness and scratch floor, with an
  * electrified cell's shock unless a shield covers it, summed in sub-steps of a tick
- * (`DRILL_SUBSTEPS_PER_TICK`), so a change of band or depth inside a span is priced per cell. It
+ * (`DRILL_SUBSTEPS_PER_TICK`, doubled for a fast rig: its drill quantum, ticket 558), so a change
+ * of band or depth inside a span is priced per cell. It
  * prices heat once #335 flips the flag; it never prices energy or holds motion back.
  */
 import { add, fromCanonical, ZERO_MONEY, type Money } from '../money'
@@ -20,6 +21,7 @@ import { drillSubStepsOfCells, type DrillOutcome } from './groundDrill'
 import { heatThrottledDrill } from './heatRules'
 import { shockTicksFor } from './magnetic/electrifiedShock'
 import { minedOreOf } from './minedOre'
+import { drillQuantumAt } from './stepBoundRead'
 
 export interface DrillCutTally {
   /** Cells the tick's cut broke, of every kind. */
@@ -28,7 +30,7 @@ export interface DrillCutTally {
   value: Money
   /** Ore cells the cut broke per ore id, with the units a full hold or a gate lost. */
   ores: Record<string, number>
-  /** The broken cells' own drill times, summed in sub-steps of a tick. */
+  /** The broken cells' own drill times, summed in sub-steps of the rig's drill quantum. */
   digSubSteps: number
 }
 
@@ -44,7 +46,10 @@ export function drillCutTallyOf(
     cells: broken.length,
     value: cargoValueOf(effect.events),
     ores: oreCountsOf(params, broken),
-    digSubSteps: digSubStepsOfCells(before, params, playerId, broken),
+    digSubSteps: digSubStepsOfCells(before, params, playerId, {
+      yielded: broken,
+      quantum: drillQuantumAt(before, playerId),
+    }),
   }
 }
 
@@ -68,14 +73,20 @@ function isOreCell(cell: number): boolean {
   return kindOfCell(cell) === CELL_KIND.ore
 }
 
-/** The broken cells' own drill times from `before`, summed in sub-steps of a tick. */
+/** Cells a tick broke, and the drill quantum their times count in. */
+export interface BrokenCells {
+  yielded: readonly YieldedCell[]
+  quantum: number
+}
+
+/** The broken cells' own drill times from `before`, summed in sub-steps of their quantum. */
 export function digSubStepsOfCells(
   before: AuthorityState,
   params: PlanetParams,
   playerId: string,
-  broken: readonly YieldedCell[],
+  { yielded, quantum }: BrokenCells,
 ): number {
   const drill = heatThrottledDrill(params.planetIndex, vehicleOf(before, playerId))
-  const subStepsOf = drillSubStepsOfCells(params, drill, shockTicksFor(before, playerId))
-  return broken.reduce((sum, { tile, cell }) => sum + (subStepsOf(tile, cell, 0) ?? 0), 0)
+  const subStepsOf = drillSubStepsOfCells(params, drill, shockTicksFor(before, playerId), quantum)
+  return yielded.reduce((sum, { tile, cell }) => sum + (subStepsOf(tile, cell, 0) ?? 0), 0)
 }

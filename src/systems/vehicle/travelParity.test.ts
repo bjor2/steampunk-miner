@@ -5,8 +5,12 @@ import { vehicleStatsAt } from '../economy/vehicleStats'
 import { cmp, fromCanonical } from '../money'
 import { planetParamsFor } from '../world/planetParams'
 import { surfaceRowOfColumn } from '../world/tileGrid'
+import { DRILL_SUBSTEPS_PER_TICK } from '../../constants/balance'
 import { cutStepMmOf } from './cutSpeed'
+import { drillQuantumOnPlanet } from './drillQuantum'
+import { subStepsPerTileAt } from './drillRule'
 import {
+  drillTravelOnPlanet,
   engineParityRatioOf,
   hardestBandRockHardnessOf,
   isNextEngineStepWorthZero,
@@ -29,8 +33,14 @@ function rigWith(levels: Partial<VehicleState['levels']> = {}): VehicleState {
   return { ...fresh, pose, levels: { ...fresh.levels, ...levels } }
 }
 
-/** Steps that cut band-1 rock in one sub-step a cell, the law's quantum (no tile floor, #397). */
+/**
+ * Steps that cut band-1 rock in one sub-step a cell at the base quantum (no tile floor, #397), far
+ * past the old 3600 m/s floor: in its own quantum the drill's travel is the planet's radius a tick
+ * (ticket 558).
+ */
 const ONE_SUB_STEP = { drill_power: 106, drill_tip: 600 }
+/** Planet 1's radius a tick, in m/s: the most any step may move (ticket 558). */
+const PLANET_REACH_SPEED = (PARAMS.radiusTiles * 1000 * 60) / 1000
 
 /** Steps whose k times cut passes the 6 m/s engine in planet 1's band 1 but not band 5 (#552: purchase 7). */
 const BAND_ONE_DRILL = { drill_power: 7, drill_tip: 30 }
@@ -48,12 +58,25 @@ describe('travel parity (ticket 333)', () => {
 
   it('moves k times the cut step, rounded down, through the band rock', () => {
     const drill = vehicleStatsAt(rigWith(ONE_SUB_STEP).levels)
-    expect(travelStepThrough(drill, blockHardness(1, 1))).toBe(Math.floor(cutStepMmOf(1) * 1.5))
+    const base = DRILL_SUBSTEPS_PER_TICK
+    expect(travelStepThrough(drill, blockHardness(1, 1), base)).toBe(
+      Math.floor(cutStepMmOf(1) * 1.5),
+    )
+  })
+
+  it('moves k times the cut step in the drill quantum it is given (ticket 558)', () => {
+    const drill = vehicleStatsAt(rigWith({ drill_power: 25, drill_tip: 200 }).levels)
+    const quantum = drillQuantumOnPlanet(drill, 1)
+    const subSteps = subStepsPerTileAt(quantum, drill, blockHardness(1, 1)) as number
+    expect(quantum).toBeGreaterThan(DRILL_SUBSTEPS_PER_TICK)
+    expect(travelStepThrough(drill, blockHardness(1, 1), quantum)).toBe(
+      Math.floor(cutStepMmOf(subSteps, quantum) * 1.5),
+    )
   })
 
   it('gives no drill travel where the tip cannot scratch the rock', () => {
     const drill = vehicleStatsAt(rigWith().levels)
-    expect(travelStepThrough(drill, blockHardness(40, 5))).toBe(0)
+    expect(travelStepThrough(drill, blockHardness(40, 5), DRILL_SUBSTEPS_PER_TICK)).toBe(0)
   })
 
   /** Engine purchases 5 and 13: the first at or past the old stored 50 and 400 (ticket 553). */
@@ -68,12 +91,12 @@ describe('travel parity (ticket 333)', () => {
     }
   })
 
-  // Ticket 397: with no tile floor a one-sub-step cut is 3600 m/s, so k times it passes these engines.
-  it('lets a one-sub-step drill set travel at k times its cut, past these engines', () => {
-    const drillSpeed = (Math.floor(cutStepMmOf(1) * 1.5) * 60) / 1000
+  // Ticket 558: past the old 3600 m/s floor k times the cut runs on to the planet's radius a tick,
+  // which passes these engines.
+  it('lets a drill past the old floor set travel at the planet radius a tick, past these engines', () => {
     for (const engine of ENGINES) {
       const rig = rigWith({ ...ONE_SUB_STEP, engine })
-      expect(travelSpeedOf(rig, PARAMS)).toBe(drillSpeed)
+      expect(travelSpeedOf(rig, PARAMS)).toBe(PLANET_REACH_SPEED)
       expect(isNextEngineStepWorthZero(rig, PARAMS)).toBe(true)
     }
   })
@@ -90,7 +113,8 @@ describe('travel parity past the engine (ticket 333, no tile floor since #397)',
   it('lets the drill set travel once k times its cut speed passes the engine', () => {
     const rig = rigWith({ drill_power: 17, drill_tip: 200 })
     const drill = vehicleStatsAt(rig.levels)
-    const drillSpeed = (travelStepThrough(drill, blockHardness(1, 1)) * 60) / 1000
+    const quantum = drillQuantumOnPlanet(drill, 1)
+    const drillSpeed = (travelStepThrough(drill, blockHardness(1, 1), quantum) * 60) / 1000
     expect(travelSpeedOf(rig, PARAMS)).toBe(drillSpeed)
     expect(drillSpeed).toBeGreaterThan(drill.engine.speedMax)
     expect(travelEngineOf(rig, PARAMS).accel).toBe(drill.engine.accel)
@@ -122,7 +146,8 @@ describe('engine card judged in the hardest band (#418, GD option a; ticket 553)
   it('reads the next purchase worth zero once the drill outruns its top speed in every band', () => {
     const rig = rigWith(ONE_SUB_STEP)
     const drill = vehicleStatsAt(rig.levels)
-    const hardestSpeed = (travelStepThrough(drill, hardestBandRockHardnessOf(PARAMS)) * 60) / 1000
+    const hardestSpeed =
+      (drillTravelOnPlanet(drill, hardestBandRockHardnessOf(PARAMS), PARAMS) * 60) / 1000
     expect(hardestSpeed).toBeGreaterThanOrEqual(
       vehicleStatsAt({ ...rig.levels, engine: 1 }).engine.speedMax,
     )
@@ -132,7 +157,8 @@ describe('engine card judged in the hardest band (#418, GD option a; ticket 553)
   it('counts the purchase that carries the top speed past the drill, as it buys travel', () => {
     const rig = rigWith(ONE_SUB_STEP)
     const drill = vehicleStatsAt(rig.levels)
-    const hardestSpeed = (travelStepThrough(drill, hardestBandRockHardnessOf(PARAMS)) * 60) / 1000
+    const hardestSpeed =
+      (drillTravelOnPlanet(drill, hardestBandRockHardnessOf(PARAMS), PARAMS) * 60) / 1000
     let engine = 0
     while (vehicleStatsAt({ ...rig.levels, engine: engine + 1 }).engine.speedMax <= hardestSpeed) {
       engine++
@@ -146,7 +172,8 @@ describe('engine card judged in the hardest band (#418, GD option a; ticket 553)
   it('gives the ratio of the top speed to k times the cut in the hardest band', () => {
     const rig = rigWith(ONE_SUB_STEP)
     const drill = vehicleStatsAt(rig.levels)
-    const hardestSpeed = (travelStepThrough(drill, hardestBandRockHardnessOf(PARAMS)) * 60) / 1000
+    const hardestSpeed =
+      (drillTravelOnPlanet(drill, hardestBandRockHardnessOf(PARAMS), PARAMS) * 60) / 1000
     expect(engineParityRatioOf(rig, PARAMS)).toBe(drill.engine.speedMax / hardestSpeed)
     expect(engineParityRatioOf(rig, PARAMS)).toBeLessThan(1)
   })

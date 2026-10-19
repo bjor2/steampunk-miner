@@ -12,7 +12,7 @@ import { MM_PER_SAMPLE } from '../world/sampleGrid'
 import { chunkOfTile, type TilePoint } from '../world/tileGrid'
 import { generatedChunkOf, isGeneratedChunkHeld } from '../world/worldState'
 import { vehicleOf, type AuthorityState } from './authorityState'
-import { energyNumeratorOfLawWork } from './cutCarryFixtures'
+import { baseEnergyCarryOf, energyNumeratorOfLawWork } from './cutCarryFixtures'
 import type { DomainEvent } from './domainEvent'
 import { isUnderRatchet, isUnderTankFloor, lawChargeBarsOf } from './lawChargeBars'
 import { PARAMS, WORLD_SEED } from './scriptedSession'
@@ -37,10 +37,10 @@ import { stateDigest } from './stateDigest'
 // the gated ore and the cache cell each yield once; the cut breaks every cell its path crosses and
 // none off it; the tank pays the law work removed exactly, within the integer carry, under the
 // tank floor (1.25) and the ratchet (1.098); its events run in walk order, credited to the cutting
-// player; a second run leaves the same digest. 8400 m/s lies past the 3600 m/s sub-step floor
-// until #558 lifts it. The tick-time bar is the lane's (`speedScaling.lane.test.ts`).
+// player; a second run leaves the same digest. 8400 m/s lies past the old 3600 m/s sub-step floor,
+// which ticket 558 lifted. The tick-time bar is the lane's (`speedScaling.lane.test.ts`).
 
-const SPEEDS_M_PER_S = [84, 840]
+const SPEEDS_M_PER_S = [84, 840, 8400]
 /** The rock round the bore's cells, by distance from the axis: inside its stamp, or within reach. */
 const CROSSED_REACH_MM = DRILL_STAMP_RADIUS_MM - MM_PER_SAMPLE
 const TOUCHED_REACH_MM = DRILL_STAMP_RADIUS_MM + MM_PER_SAMPLE
@@ -106,7 +106,7 @@ function pathCellsOf(run: SlabRun): { crossed: string[]; touched: Set<string> } 
 
 /** What the rig charged over the run, in the carry's numerator, and the law work it removed. */
 function chargeOf(run: SlabRun): { charged: number; law: number } {
-  const carryOf = (state: AuthorityState) => vehicleOf(state, CUTTING_PLAYER).cutEnergyCarry ?? 0
+  const carryOf = (state: AuthorityState) => baseEnergyCarryOf(vehicleOf(state, CUTTING_PLAYER))
   const carried = carryOf(run.end) - carryOf(run.start)
   return {
     charged: run.energy * CUT_ENERGY_DENOMINATOR + carried,
@@ -204,10 +204,6 @@ describe.each(SPEEDS_M_PER_S)('the speed-scaling slab at %i m/s (ticket 560)', (
   it('leaves the same digest when cut again', () => {
     expect(stateDigest(cutGated(speed).end)).toBe(stateDigest(run.end))
   })
-})
-
-describe('the speed-scaling slab past the sub-step floor (ticket 560)', () => {
-  it.todo('holds every bar at 8400 m/s once #558 lifts the 3600 m/s sub-step floor')
 })
 
 /** Each tick's casing trail beside the cut's stamp centre, from an ungated run. */

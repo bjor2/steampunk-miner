@@ -13,7 +13,6 @@
  * pacing bot's whole-tick clock caps its own dig at 60 cells/s until #559, which is why the lane
  * gates only the bars VS let it gate before then.
  */
-import { DRILL_SUBSTEPS_PER_TICK } from '../constants/balance'
 import { TICKS_PER_SECOND } from '../constants/physics'
 import type { AuthorityState } from '../systems/authority/authorityState'
 import type { DomainEvent } from '../systems/authority/domainEvent'
@@ -31,11 +30,12 @@ import {
   ZERO_MONEY,
   type Money,
 } from '../systems/money'
-import { subStepsPerTile } from '../systems/vehicle/drillRule'
+import { cutCellsPerSecondOf } from '../systems/vehicle/cutSpeed'
+import { drillQuantumOnPlanet } from '../systems/vehicle/drillQuantum'
+import { subStepsPerTileAt } from '../systems/vehicle/drillRule'
 
 const TICKS_PER_MINUTE = 60 * TICKS_PER_SECOND
 const TICKS_PER_HOUR = 60 * TICKS_PER_MINUTE
-const LAW_CELLS_PER_SECOND_AT_ONE_SUB_STEP = DRILL_SUBSTEPS_PER_TICK * TICKS_PER_SECOND
 const PLACES = 3
 const ONE = fromSafeInteger(1)
 /** Two gains in a row under it are amber, the trigger for the hold row (#551 VS, ticket 553). */
@@ -241,8 +241,10 @@ function retakeFelt(tally: DrillPaceTally, state: AuthorityState, playerId: stri
 
 /** The law's band-1 cut of planet `planet` at these levels, in cells/s; 0 where it skids. */
 export function feltCellsPerSecond(levels: UpgradeLevels, planet: number): number {
-  const subSteps = subStepsPerTile(vehicleStatsAt(levels), blockHardness(planet, 1))
-  return subSteps === null ? 0 : LAW_CELLS_PER_SECOND_AT_ONE_SUB_STEP / subSteps
+  const drill = vehicleStatsAt(levels)
+  const quantum = drillQuantumOnPlanet(drill, planet)
+  const subSteps = subStepsPerTileAt(quantum, drill, blockHardness(planet, 1))
+  return subSteps === null ? 0 : cutCellsPerSecondOf(subSteps, quantum)
 }
 
 /** Arrival to core in minutes; null for a core never completed. */

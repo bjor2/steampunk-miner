@@ -50,6 +50,7 @@ import {
   type TrackFrame,
 } from './digSpeedTrackFrame'
 import { lawWorkOfChange, type LawWork } from './lawWorkFixtures'
+import { drillQuantumAt } from './stepBoundRead'
 import {
   createScriptedSession,
   FREEZE_ENEMIES,
@@ -119,8 +120,9 @@ function cutTrackOnPath(track: Track, path: TrackPath, drillPower: number): Trac
     charge = addCharges(charge, cutTick(session, { frame, track, path, tick }))
   }
   const metres = (strideMmOf(track) * trackTicksOf(track)) / MM_PER_METRE
+  const quantum = path === 'swept' ? drillQuantumAt(start, 'p1') : DRILL_SUBSTEPS_PER_TICK
   const lawOver = (tiles: readonly TilePoint[]) =>
-    lawWorkOfChange(start, session.state().world, PARAMS, 'p1', tiles)
+    lawWorkOfChange(start, session.state().world, PARAMS, 'p1', tiles, quantum)
   const reach = { from: -ACROSS_MM, to: metres * MM_PER_METRE + LEAD_MM }
   const stretch = stretchOf(track)
   const stretchLaw = { law: lawOver(stretch.tiles), metres: stretch.metres }

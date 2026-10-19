@@ -5,7 +5,8 @@
  * whose pose reports are charged on the density they remove at the swept price since ticket 535.
  * Each trip (from the start or an undock to the next dock or tow) is logged with the energy the
  * bot was charged beside the per-cell figure, the swept cut's price for the same cells: each
- * broken cell's drill time in sub-steps at the drill the vehicle had, priced by `cellDigEnergyOf`,
+ * broken cell's drill time in sub-steps of its drill quantum (ticket 558) at the drill the vehicle
+ * had, priced by `cellDigEnergyOf`,
  * at the drill's whole share. The margin is the tank over that figure; Systems asks for at least
  * 1.138 on every trip.
  *
@@ -13,6 +14,7 @@
  * state after it, so a batch's broken cells are priced on the state the batch before left, where
  * they still stood. Derived data only; nothing is written into the run log.
  */
+import { BASIS_POINTS } from '../constants/balance'
 import { vehicleOf, type AuthorityState } from '../systems/authority/authorityState'
 import { cellDigEnergyOf } from '../systems/authority/cellDigEnergy'
 import type { DomainEvent } from '../systems/authority/domainEvent'
@@ -20,6 +22,7 @@ import { drillSubStepsOfCells } from '../systems/authority/groundDrill'
 import { heatThrottledDrill } from '../systems/authority/heatRules'
 import { shockTicksFor } from '../systems/authority/magnetic/electrifiedShock'
 import { planetParamsOf } from '../systems/authority/planetOfState'
+import { drillQuantumAt } from '../systems/authority/stepBoundRead'
 import { energyMaxQuantaOf } from '../systems/vehicle/vehicleState'
 import type { TilePoint } from '../systems/world/tileGrid'
 import { materialCellAt } from '../systems/world/worldState'
@@ -130,10 +133,11 @@ function cellsEnergyOf(
   const params = planetParamsOf(before.planet)
   if (params === null || broken.length === 0) return 0
   const drill = heatThrottledDrill(params.planetIndex, vehicleOf(before, playerId))
-  const subStepsOf = drillSubStepsOfCells(params, drill, shockTicksFor(before, playerId))
+  const quantum = drillQuantumAt(before, playerId)
+  const subStepsOf = drillSubStepsOfCells(params, drill, shockTicksFor(before, playerId), quantum)
   return broken.reduce((sum, tile) => {
     const subSteps = subStepsOf(tile, materialCellAt(before.world, params, tile), 0) ?? 0
-    return sum + cellDigEnergyOf(subSteps)
+    return sum + cellDigEnergyOf(subSteps, BASIS_POINTS, quantum)
   }, 0)
 }
 

@@ -39,21 +39,25 @@ export const NO_LAW_WORK: LawWork = {
   cellsRemoved: 0,
 }
 
-/** The law work `after` shows over `before` on `tiles`, priced at `playerId`'s drill in `before`. */
+/**
+ * The law work `after` shows over `before` on `tiles`, priced at `playerId`'s drill in `before`,
+ * its law times in `quantum` sub-steps a tick: the base for a report's cut, the rig's drill
+ * quantum for the swept cut (ticket 558).
+ */
 export function lawWorkOfChange(
   before: AuthorityState,
   after: WorldState,
   params: PlanetParams,
   playerId: string,
   tiles: readonly TilePoint[],
+  quantum = DRILL_SUBSTEPS_PER_TICK,
 ): LawWork {
   const drill = heatThrottledDrill(params.planetIndex, vehicleOf(before, playerId))
-  const subStepsOf = drillSubStepsOfCells(params, drill, shockTicksFor(before, playerId))
+  const subStepsOf = drillSubStepsOfCells(params, drill, shockTicksFor(before, playerId), quantum)
   let work = NO_LAW_WORK
   for (const tile of tiles) {
     const lawTicks =
-      (subStepsOf(tile, materialCellAt(before.world, params, tile), 0) ?? 0) /
-      DRILL_SUBSTEPS_PER_TICK
+      (subStepsOf(tile, materialCellAt(before.world, params, tile), 0) ?? 0) / quantum
     work = addLawWork(work, cellLawWork(before.world, after, params, tile, lawTicks))
   }
   return work

@@ -22,7 +22,10 @@
  * - The swept span (`sweptSpanDrill.ts`, ticket 374) cuts the same tick through `drillSweepBy`
  *   with its stamp walked per chunk; everything else here is shared.
  * - With the authority dev flag `drill.sweptLawCharge` on (ticket 540) the tick is charged on the
- *   law work it removed (`LAW_SUB_STEP_CLOCK`), the same carve; off, each broken cell's dig energy.
+ *   law work it removed (`lawSubStepClockOf`), the same carve; off, each broken cell's dig energy.
+ * - The tick counts in the rig's drill quantum (ticket 558, `vehicle/drillQuantum.ts`): 60 sub-steps
+ *   a tick, doubled for a rig whose band-1 cells would cost fewer than 100, so no rig is held to
+ *   the old 3600 m/s one-sub-step floor; the cursor keeps the quantum its carry and dig time are in.
  */
 import { flagsOf } from './devFlagState'
 import type { DrillBit } from '../vehicle/aheadBearingLatch'
@@ -59,12 +62,12 @@ import {
 } from './drillGearCut'
 import {
   drillGroundBy,
-  LAW_SUB_STEP_CLOCK,
-  SUB_STEP_CLOCK,
+  lawSubStepClockOf,
+  subStepClockOf,
   type DrillClock,
   type DrillOutcome,
 } from './groundDrill'
-import { stepBoundsAt, sweptStampAheadMmAt } from './stepBoundRead'
+import { drillQuantumAt, stepBoundsAt, sweptStampAheadMmAt } from './stepBoundRead'
 import { carryPurseOf, carrySweepOf, leavingCellToCarry, yieldedInWalkOrder } from './sweptCarry'
 import { settleSweep } from './sweptSettle'
 
@@ -87,6 +90,8 @@ export interface Sweep {
   share: number
   /** The step the rig may take next while it cuts (ticket 334's cutting bound). */
   cuttingMm: number
+  /** The sub-steps a tick the rig's cut counts in (ticket 558, `vehicle/drillQuantum.ts`). */
+  quantum: number
 }
 
 /**
@@ -167,20 +172,30 @@ export function drillSweepBy(
     playerId,
     { tile: target, carve },
     1,
-    sweptClockOf(state),
+    sweptClockOf(state, sweep.quantum),
   )
-  const digSubSteps = digSubStepsOfCells(state, params, playerId, outcome.carved?.yielded ?? [])
+  const yielded = outcome.carved?.yielded ?? []
+  const digSubSteps = digSubStepsOfCells(state, params, playerId, {
+    yielded,
+    quantum: sweep.quantum,
+  })
   return { effect: settleSweep(outcome, playerId, { sweep, digSubSteps }), carved: outcome.carved }
 }
 
-/** The clock a swept tick is charged on, by the session's flags (ticket 547). */
-function sweptClockOf(state: AuthorityState): DrillClock {
-  return flagsOf(state)['drill.sweptLawCharge'] ? LAW_SUB_STEP_CLOCK : SUB_STEP_CLOCK
+/**
+ * The clock a swept tick is charged on, by the session's flags (ticket 547), in the rig's drill
+ * quantum (ticket 558).
+ */
+function sweptClockOf(state: AuthorityState, quantum: number): DrillClock {
+  return flagsOf(state)['drill.sweptLawCharge']
+    ? lawSubStepClockOf(quantum)
+    : subStepClockOf(quantum)
 }
 
 function sweepOf(state: AuthorityState, playerId: string, step: SweptStep): Sweep {
   const { cuttingMm } = stepBoundsAt(state, playerId)
   const aheadMm = sweptStampAheadMmAt(state, playerId)
+  const quantum = drillQuantumAt(state, playerId)
   const stamp = sweptDrillStampOf(step.pose, step.isLifting, aheadMm)
   const cursor = vehicleOf(state, playerId).sweptCut
   const { x, y } = step.pose
@@ -197,6 +212,7 @@ function sweepOf(state: AuthorityState, playerId: string, step: SweptStep): Swee
       isDrilling: true,
     }),
     share: perCellShareAt(state, playerId),
+    quantum,
   }
 }
 
@@ -245,7 +261,7 @@ function reachOfWork(
   { sweep, request }: SweepRequest,
   walk: CarryWalk,
 ): CarryReach {
-  const purse = carryPurseOf(state, playerId, sweep.path)
+  const purse = carryPurseOf(state, playerId, sweep)
   const path = { path: sweep.path, pose: sweep.step.pose, world: request.world }
   const carrySweep = carrySweepOf(state, params, playerId, path)
   return walk(carrySweep, purse, releasingCarryGround(params, request, sweep))

@@ -11,7 +11,7 @@ import { vehicleStatsAt, type UpgradeLevels, type VehicleStats } from '../econom
 import { cmp, fromFiniteNumber, mul, type Money } from '../money'
 import { metresPerSecondOfStep } from '../vehicle/cutSpeed'
 import { ticksPerTile } from '../vehicle/drillRule'
-import { travelStepThrough } from '../vehicle/travelParity'
+import { drillTravelOnPlanet } from '../vehicle/travelParity'
 import { quantaOfUnits } from '../vehicle/energyQuanta'
 import { statsOfVehicle, type VehicleState } from '../vehicle/vehicleState'
 import { coreHardness } from '../economy/oreEconomy'
@@ -176,7 +176,7 @@ interface TravelCost {
  */
 function travelSpeedThrough(stats: VehicleStats, layout: MineLayout, row: number): number {
   const ground = groundHardnessAt(layout.params, shaftTileAt(layout, row))
-  const drillTravel = metresPerSecondOfStep(travelStepThrough(stats, ground))
+  const drillTravel = metresPerSecondOfStep(drillTravelOnPlanet(stats, ground, layout.params))
   return Math.max(stats.engine.speedMax, drillTravel)
 }
 

@@ -1,10 +1,21 @@
 import { beforeAll, describe, expect, it } from 'vitest'
-import { ceil, cmp, fromSafeInteger, toFixedText, toSafeInteger, type BigStat } from '../money'
+import { DRILL_SUBSTEPS_PER_TICK } from '../../constants/balance'
+import {
+  ceil,
+  cmp,
+  div,
+  fromSafeInteger,
+  mul,
+  toFixedText,
+  toSafeInteger,
+  type BigStat,
+} from '../money'
 import {
   bandOneCellCostAt,
   COLUMN_LEG,
   cutLeg,
   drillStepOfRig,
+  quantumAtDrillStep,
   reachAlongOf,
   rigAt,
   subStepsAtDrillStep,
@@ -24,6 +35,8 @@ import {
 // c = 20. Between 10 and 20 the band holds only as measured, so a row there is a real assert once
 // its measured row passes; under 10 it is a todo. At every c, no purchase may be dead and five
 // purchases average inside the band, judged where the rig's own purchase costs a sub-step or more.
+// Since ticket 558 (#551 B1) `c` is counted in the rig's own drill quantum, which doubles until a
+// band-1 cell costs 100 sub-steps or more, so every rig here, 3600 m/s included, is judged hard.
 
 const WINDOW_MM = 30_000
 /** One purchase's gain, 1.243 +-5% (GD ruling on #551, point 4). */
@@ -51,7 +64,7 @@ const PROMOTED_ROWS: readonly string[] = []
 interface PurchaseWindow {
   name: string
   rig: SpeedRig
-  /** The rig's own band-1 cell cost in sub-steps, before the law rounds it up. */
+  /** The rig's own band-1 cell cost in sub-steps of its drill quantum, before the law rounds it up. */
   cost: BigStat
   /** Metres the cut reached per sub-step spent, `paces[k]` at k purchases below the rig's drill. */
   paces: number[]
@@ -60,9 +73,19 @@ interface PurchaseWindow {
 /** How ticket 463 judges a per-purchase ratio row: a real assert, a logged row, or a todo. */
 type LawBand = 'hard' | 'logged' | 'todo'
 
+/**
+ * A window holds at least this many of the rig's strides: since ticket 558 the 3600 m/s rig cuts in
+ * its own quantum, and 30 m is half of one of its ticks, too short to read a pace in.
+ */
+const WINDOW_MIN_STRIDES = 3
+
+function windowMmOf(rig: SpeedRig): number {
+  return Math.max(WINDOW_MM, (WINDOW_MIN_STRIDES * rig.speed * 1000) / 60)
+}
+
 /** A rig's pace down a leg: metres its cut reached per sub-step of work it spent. */
 function paceOf(cut: LegCut): number {
-  const run = cutLeg({ ...cut, reachMm: WINDOW_MM })
+  const run = cutLeg({ ...cut, reachMm: windowMmOf(cut.rig) })
   return reachAlongOf(cut.leg, run.ticks[run.ticks.length - 1].state) / subStepsSpentBy(run)
 }
 
@@ -74,8 +97,16 @@ function purchaseWindowOf(
   const paces = Array.from({ length: WINDOW_PURCHASES + 1 }, (_, below) =>
     paceOf({ rig, leg, maxTicks: 400, drillStep: drillStep - below }),
   )
-  return { name: `${rig.speed} m/s ${name}`, rig, cost: bandOneCellCostAt(drillStep), paces }
+  return { name: `${rig.speed} m/s ${name}`, rig, cost: quantumCellCostAt(drillStep), paces }
 }
+
+/** A band-1 cell's real cost at a drill step in sub-steps of its own quantum (ticket 558). */
+function quantumCellCostAt(drillStep: number): BigStat {
+  const scale = div(fromSafeInteger(quantumAtDrillStep(drillStep)), BASE_QUANTUM)
+  return mul(bandOneCellCostAt(drillStep), scale)
+}
+
+const BASE_QUANTUM = fromSafeInteger(DRILL_SUBSTEPS_PER_TICK)
 
 /** Each purchase's pace over the one below it, the rig's own first. */
 function purchaseRatiosOf({ paces }: PurchaseWindow): number[] {
@@ -124,36 +155,26 @@ describe('quantum bands of the drill law on the swept carve (tickets 439 and 463
     expect(misread).toEqual([])
   })
 
+  it('counts every rig in a quantum whose band-1 cell costs 100 sub-steps or more (ticket 558)', () => {
+    const coarse = windows.filter(({ cost }) => cmp(cost, fromSafeInteger(99)) <= 0)
+    expect(coarse.map(({ name }) => name)).toEqual([])
+  })
+
   it('cuts each rig the bands assert 1.181 to 1.305 times faster than the drill a purchase below it', () => {
     const hard = windows.filter((window) => lawBandOf(window) === 'hard')
     const misses = hard.flatMap((window) => {
       const [ratio] = purchaseRatiosOf(window)
       return isInBand(ratio) ? [] : [{ name: window.name, ratio }]
     })
-    expect(hard.map(({ name }) => name)).toEqual([
-      '44 m/s down the column',
-      '44 m/s down the tilted radius',
-    ])
+    hard.forEach(logLawWindow)
+    expect(hard.map(({ name }) => name)).toEqual(windows.map(({ name }) => name))
     expect(misses).toEqual([])
   })
 
-  it('logs every row the bands leave unasserted with its cost a cell', () => {
+  it('leaves no row the bands do not assert, 3600 m/s included, since ticket 558', () => {
     const unasserted = windows.filter((window) => lawBandOf(window) !== 'hard')
-    const lines = unasserted.map(logLawWindow)
-    expect(unasserted.map(({ name }) => name)).toEqual([
-      '240 m/s down the column',
-      '3600 m/s down the column',
-      '240 m/s down the tilted radius',
-      '3600 m/s down the tilted radius',
-    ])
-    expect(lines.filter((line) => !line.includes(' c '))).toEqual([])
+    expect(unasserted.map(logLawWindow)).toEqual([])
   })
-
-  // At 3600 m/s a cell costs under one sub-step, so the purchases below it pay whole sub-steps for
-  // a real fraction of one: the one-sub-step floor that #558 lifts.
-  it.todo(
-    'cuts the 3600 m/s rig 1.181 to 1.305 times faster than the drill a purchase below it (ticket 463: c < 10, logged with c until the sub-step floor lifts in #558)',
-  )
 
   it('cuts every purchase of each judged rig strictly faster than the purchase below it', () => {
     const dead = windows
@@ -166,32 +187,15 @@ describe('quantum bands of the drill law on the swept carve (tickets 439 and 463
     expect(dead).toEqual([])
   })
 
-  // Rounding averages out over a window, so this holds at 240 m/s (1.246 down the column, 1.238
-  // down the tilted radius) though its own purchases read 1.17 to 1.32. #463 judges it where the
-  // rig's own purchase costs a sub-step or more: at 3600 m/s the five purchases below average
-  // 1.172 and 1.177, held by the one-sub-step floor (logged below; #558 lifts it).
-  it('averages 1.181 to 1.305 a purchase over the five purchases below every judged rig', () => {
+  // Before ticket 558 the 3600 m/s rig's five purchases below averaged 1.172 and 1.177, held by
+  // the one-sub-step floor; in its own quantum every rig is judged.
+  it('averages 1.181 to 1.305 a purchase over the five purchases below every rig', () => {
     const judged = windows.filter(isJudgedAtAnyCost)
     const misses = judged.flatMap((window) => {
       const averaged = averagedRatioOf(window)
       return isInBand(averaged) ? [] : [{ name: window.name, averaged }]
     })
-    expect(judged.length).toBe(LEGS.length * (LAW_RIGS.length - 1))
+    expect(judged.length).toBe(LEGS.length * LAW_RIGS.length)
     expect(misses).toEqual([])
   })
-
-  // The faster purchase's real cost must be a sub-step a cell or more for it to cut faster: under
-  // it the whole-sub-step price saturates.
-  it("logs the windows whose rig's own purchase costs under one sub-step a cell, with that cost", () => {
-    const unjudged = windows.filter((window) => !isJudgedAtAnyCost(window))
-    unjudged.forEach(logLawWindow)
-    expect(unjudged.map(({ name }) => name)).toEqual([
-      '3600 m/s down the column',
-      '3600 m/s down the tilted radius',
-    ])
-  })
-
-  it.todo(
-    'cuts every purchase below the 3600 m/s rig strictly faster than the purchase below it (ticket 463: c < 1 sub-step, logged with c until the sub-step floor lifts in #558)',
-  )
 })

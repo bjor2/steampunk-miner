@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { STEP_BOUND_TOLERANCE_MM } from '../../constants/balance'
+import { BASIS_POINTS, STEP_BOUND_TOLERANCE_MM } from '../../constants/balance'
 import { NO_DRIVE } from '../vehicle/driveSigns'
 import { SWEEP_STEP_MM } from '../vehicle/sweptCut'
 import { FACING, noseTileOf, type VehiclePose } from '../vehicle/vehiclePose'
@@ -23,7 +23,7 @@ import {
   poseAbove,
   type ScriptedSession,
 } from './scriptedSession'
-import { stepBoundsAt } from './stepBoundRead'
+import { drillQuantumAt, stepBoundsAt } from './stepBoundRead'
 import { sweptColumnAt } from './sweptColumnFixture'
 import { columnSweep, sweepWith, WORK_BOUND_DRILL_POWER } from './sweptSpanFixtures'
 
@@ -189,7 +189,8 @@ function digSubStepsOf(session: ScriptedSession, broken: readonly TilePoint[]): 
   const state = session.state()
   const params = planetParamsOf(state.planet) as PlanetParams
   const drill = heatThrottledDrill(params.planetIndex, vehicleOf(state, 'p1'))
-  const subStepsOf = drillSubStepsOfCells(params, drill, shockTicksFor(state, 'p1'))
+  const quantum = drillQuantumAt(state, 'p1')
+  const subStepsOf = drillSubStepsOfCells(params, drill, shockTicksFor(state, 'p1'), quantum)
   return broken.reduce(
     (sum, tile) => sum + (subStepsOf(tile, materialCellAt(EMPTY_WORLD, params, tile), 0) ?? 0),
     0,
@@ -275,6 +276,16 @@ function onPlanet40(): { state: AuthorityState; params: PlanetParams; top: Vehic
   }
 }
 
+/**
+ * The ticks the rig's strides keep its pose above planet 40's core, at most 240. Past the old
+ * one-sub-step floor (ticket 558) a stride is the planet's radius, and a pose driven on past the
+ * cut's end lengthens the path every tick walks.
+ */
+function ticksAboveTheCoreOf(start: { params: PlanetParams; top: VehiclePose }, stepMm: number) {
+  const coreTopMm = start.params.coreRadiusTiles * 1000
+  return Math.max(1, Math.min(240, Math.floor((start.top.y - coreTopMm) / stepMm)))
+}
+
 describe('energy per cell on planet 40 at the rig cut speed (ticket 335, Vertical Scaler)', () => {
   // The per-cell price is the kill-switch's off path (`drill.sweptLawCharge`, on since 18 Oct 2026).
   it('charges within 1% of each broken cell at its own dig time, law charge off', () =>
@@ -285,7 +296,7 @@ describe('energy per cell on planet 40 at the rig cut speed (ticket 335, Vertica
     const stepMm = stepBoundsAt(start.state, 'p1').cuttingMm - STEP_BOUND_TOLERANCE_MM
     let state = start.state
     const broken: { tx: number; ty: number }[] = []
-    for (let tick = 1; tick <= 240; tick++) {
+    for (let tick = 1; tick <= ticksAboveTheCoreOf(start, stepMm); tick++) {
       const pose = { ...start.top, y: start.top.y - stepMm * tick }
       const step = { pose, drive: NO_DRIVE, isLifting: false }
       const effect = drillAlongStep({ ...state, tick }, start.params, 'p1', noseTileOf(pose), step)
@@ -293,10 +304,12 @@ describe('energy per cell on planet 40 at the rig cut speed (ticket 335, Vertica
       state = effect.state
     }
     const drill = heatThrottledDrill(start.params.planetIndex, vehicleOf(state, 'p1'))
-    const subStepsOf = drillSubStepsOfCells(start.params, drill, shockTicksFor(state, 'p1'))
+    const quantum = drillQuantumAt(state, 'p1')
+    const shock = shockTicksFor(state, 'p1')
+    const subStepsOf = drillSubStepsOfCells(start.params, drill, shock, quantum)
     const reference = broken.reduce((sum, tile) => {
       const cell = materialCellAt(EMPTY_WORLD, start.params, tile)
-      return sum + cellDigEnergyOf(subStepsOf(tile, cell, 0) ?? 0)
+      return sum + cellDigEnergyOf(subStepsOf(tile, cell, 0) ?? 0, BASIS_POINTS, quantum)
     }, 0)
     const spent = vehicleOf(start.state, 'p1').energy - vehicleOf(state, 'p1').energy
     expect(broken.length).toBeGreaterThanOrEqual(10)

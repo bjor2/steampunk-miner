@@ -12,7 +12,8 @@
  * #466's recorder held the carried-in work: each tick's ledger pays the debt the tick before left,
  * so the ledgers charge the paid prices, the stored carry and the debt still owed.
  */
-import { DRILL_STAMP_RADIUS_MM, DRILL_SUBSTEPS_PER_TICK } from '../../constants/balance'
+import { DRILL_STAMP_RADIUS_MM } from '../../constants/balance'
+import { MM_PER_METRE, TICKS_PER_SECOND } from '../../constants/physics'
 import type { CarryReach, CarryWalk } from '../vehicle/carryWalk'
 import { NO_DRIVE } from '../vehicle/driveSigns'
 import {
@@ -28,7 +29,7 @@ import { vehicleOf, type AuthorityState } from './authorityState'
 import { chargedCarveOf } from './clampedCharge'
 import { WITHIN_SHARE } from './drillStepCut'
 import { PARAMS } from './scriptedSession'
-import { drillSweepBy, type SweepWalks, type SweptCarve } from './sweptDrill'
+import { drillSweepBy, type Sweep, type SweepWalks, type SweptCarve } from './sweptDrill'
 import {
   COLUMN_LEG,
   cutLeg,
@@ -112,14 +113,20 @@ function sweptTickAt(pose: VehiclePose) {
 function recordingWalks(walked: WalkedTick[]): SweepWalks {
   return {
     stampOf: WITHIN_SHARE.stampOf,
-    carryOf: (sweep) => recordingCarry(WITHIN_SHARE.carryOf(sweep), walked),
+    carryOf: (sweep) => recordingCarry(WITHIN_SHARE.carryOf(sweep), { walked, sweep }),
   }
 }
 
-function recordingCarry(walk: CarryWalk, walked: WalkedTick[]): CarryWalk {
-  return (sweep, purse, ground) => {
-    const reach = walk(sweep, purse, ground)
-    walked.push({ path: sweep.path, reach, carriedIn: purse.subSteps - DRILL_SUBSTEPS_PER_TICK })
+/** Where the recorded walks go, and the tick's sweep, whose quantum is the tick's own work. */
+interface WalkRecord {
+  walked: WalkedTick[]
+  sweep: Sweep
+}
+
+function recordingCarry(walk: CarryWalk, { walked, sweep }: WalkRecord): CarryWalk {
+  return (carrySweep, purse, ground) => {
+    const reach = walk(carrySweep, purse, ground)
+    walked.push({ path: carrySweep.path, reach, carriedIn: purse.subSteps - sweep.quantum })
     return reach
   }
 }
@@ -221,6 +228,17 @@ export interface ChargePhase {
 /** The TD's 100 m window, with the stamp's reach either side. */
 const WINDOW_MM = 100_000 + 2 * DRILL_STAMP_RADIUS_MM
 const WINDOW_MAX_TICKS = 2_500
+/**
+ * A window holds at least this many of the rig's strides: the 3600 m/s rig no longer stops at the
+ * old one-sub-step floor (ticket 558), so it would cross the 100 m in two ticks.
+ */
+const WINDOW_MIN_STRIDES = 3
+
+/** The window a rig cuts: the TD's 100 m, or three of its strides where those are longer. */
+function windowMmOf(rig: SpeedRig): number {
+  const strideMm = (rig.speed * MM_PER_METRE) / TICKS_PER_SECOND
+  return Math.max(WINDOW_MM, WINDOW_MIN_STRIDES * strideMm + 2 * DRILL_STAMP_RADIUS_MM)
+}
 
 /** A leg cut through the recorder, and each tick's charge. */
 export interface ChargedLeg {
@@ -249,7 +267,7 @@ export function chargedWindowOf(
     leg: { ...leg, start: pointAlong(leg, phase.offsetMm) },
     startTick: phase.startTick,
     maxTicks: WINDOW_MAX_TICKS,
-    reachMm: WINDOW_MM,
+    reachMm: windowMmOf(rig),
   }
   return chargedLegOf(cut, recorder)
 }

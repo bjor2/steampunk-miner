@@ -10,7 +10,8 @@ import { createSeededRandom } from '../seededRandom'
 import { planetParamsFor } from '../world/planetParams'
 import { surfaceRowOfColumn } from '../world/tileGrid'
 import { cutStepMmOf } from './cutSpeed'
-import { subStepsPerTile } from './drillRule'
+import { drillQuantumOnPlanet } from './drillQuantum'
+import { subStepsPerTileAt } from './drillRule'
 import { guestPoseToleranceMm, speedOfStepBound, stepBoundMmOf, stepBoundsOf } from './stepBound'
 import { FACING } from './vehiclePose'
 import { newVehicleState, type VehicleState } from './vehicleState'
@@ -27,16 +28,27 @@ function rigWith(levels: Partial<VehicleState['levels']> = {}): VehicleState {
   return { ...fresh, pose, levels: { ...fresh.levels, ...levels } }
 }
 
-/** Steps that cut band-1 rock in one sub-step a cell, the law's quantum (no tile floor, #397). */
+/** Steps that cut band-1 rock in one sub-step a cell at the base quantum (no tile floor, #397). */
 const ONE_SUB_STEP = { drill_power: 2000, drill_tip: 600 }
+/** A drill whose band-1 cut, 278 cells/s, counts in a doubled quantum (ticket 558). */
+const FAST_DRILL = { drill_power: 25, drill_tip: 200 }
+/** Planet 1's radius, mm: the furthest a drill step may reach in a tick (ticket 558). */
+const PLANET_REACH_MM = PARAMS.radiusTiles * 1000
+
+/** The drill law's cut step through band-1 rock in the rig's own quantum. */
+function lawCutStepOf(rig: VehicleState): number {
+  const drill = vehicleStatsAt(rig.levels)
+  const quantum = drillQuantumOnPlanet(drill, 1)
+  const subSteps = subStepsPerTileAt(quantum, drill, blockHardness(1, 1)) as number
+  return cutStepMmOf(subSteps, quantum)
+}
 
 describe('step bound (ticket 334)', () => {
   it('bounds a cutting step by the drill law through the band rock, plus one sample', () => {
-    const rig = rigWith(ONE_SUB_STEP)
-    const subSteps = subStepsPerTile(vehicleStatsAt(rig.levels), blockHardness(1, 1)) as number
-    expect(stepBoundsOf(rig, PARAMS).cuttingMm).toBe(
-      cutStepMmOf(subSteps) + STEP_BOUND_TOLERANCE_MM,
-    )
+    for (const levels of [{ drill_power: 5 }, FAST_DRILL]) {
+      const rig = rigWith(levels)
+      expect(stepBoundsOf(rig, PARAMS).cuttingMm).toBe(lawCutStepOf(rig) + STEP_BOUND_TOLERANCE_MM)
+    }
   })
 
   it('bounds a travelling step by the engine top speed rounded up to whole mm, plus one sample', () => {
@@ -52,12 +64,9 @@ describe('step bound (ticket 334)', () => {
 
   it('bounds a travelling step by k times the cut once it passes the engine', () => {
     // Engine purchase 13 (11.3 m/s) stands for the old saturating step 400 (10.9 m/s, ticket 553).
-    const rig = rigWith({ drill_power: 300, drill_tip: 200, engine: 13 })
-    const subSteps = subStepsPerTile(vehicleStatsAt(rig.levels), blockHardness(1, 1)) as number
+    const rig = rigWith({ ...FAST_DRILL, engine: 13 })
     const bounds = stepBoundsOf(rig, PARAMS)
-    expect(bounds.travellingMm).toBe(
-      Math.floor(cutStepMmOf(subSteps) * 1.5) + STEP_BOUND_TOLERANCE_MM,
-    )
+    expect(bounds.travellingMm).toBe(Math.floor(lawCutStepOf(rig) * 1.5) + STEP_BOUND_TOLERANCE_MM)
   })
 
   it('picks the cutting bound with the cut gate open and the travelling one with it shut', () => {
@@ -102,13 +111,33 @@ describe('step bound (ticket 334)', () => {
   })
 })
 
-// The TD lock on #397: with no tile floor the bound follows the drill as far as the law's
-// one-sub-step quantum, 60 m of cut a tick, and travel k times that.
-describe('step bound with no tile floor (ticket 397)', () => {
-  it('grows with the drill to one sub-step a cell, and travel to k times that', () => {
+// The TD lock on #397: with no tile floor the bound follows the drill. Ticket 558 lifts the law's
+// one-sub-step floor, 60 m of cut a tick (3600 m/s, 5400 travelling): the drill counts in its own
+// quantum, so the bound grows on past it until a tick would carry the rig past the planet's radius.
+describe('step bound past the sub-step floor (ticket 558)', () => {
+  it('cuts past the old floor of 60 250 mm a tick once the drill is fast enough', () => {
+    for (const drill_power of [40, 45, 50]) {
+      const rig = rigWith({ drill_power, drill_tip: 600 })
+      const bounds = stepBoundsOf(rig, PARAMS)
+      expect(bounds.cuttingMm).toBeGreaterThan(60_250)
+      expect(bounds.cuttingMm).toBe(
+        Math.min(lawCutStepOf(rig), PLANET_REACH_MM) + STEP_BOUND_TOLERANCE_MM,
+      )
+    }
+  })
+
+  it('grows with the drill no further a tick than the planet radius, cutting or travelling', () => {
     const bounds = stepBoundsOf(rigWith(ONE_SUB_STEP), PARAMS)
-    const cutStep = cutStepMmOf(1)
-    expect(bounds.cuttingMm).toBe(cutStep + STEP_BOUND_TOLERANCE_MM)
-    expect(bounds.travellingMm).toBe(Math.floor(cutStep * 1.5) + STEP_BOUND_TOLERANCE_MM)
+    expect(bounds.cuttingMm).toBe(PLANET_REACH_MM + STEP_BOUND_TOLERANCE_MM)
+    expect(bounds.travellingMm).toBe(PLANET_REACH_MM + STEP_BOUND_TOLERANCE_MM)
+  })
+
+  it('keeps every bound and its square within safe integers at any drill on any planet', () => {
+    for (const planet of [1, 10, 200, 100_000]) {
+      const params = planetParamsFor(83921, planet)
+      const bounds = stepBoundsOf(rigWith({ drill_power: 5000, drill_tip: 5000 }), params)
+      expect(bounds.cuttingMm).toBeLessThanOrEqual(params.radiusTiles * 1000 + 250)
+      expect(Number.isSafeInteger(bounds.travellingMm * bounds.travellingMm)).toBe(true)
+    }
   })
 })

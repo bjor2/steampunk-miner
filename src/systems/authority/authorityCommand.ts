@@ -387,8 +387,15 @@ import type { DriveSigns } from '../vehicle/driveSigns'
  *    pushed the twin bit cuts along the facing as the bare drill, and no longer raises the
  *    `DrillGated` (and the codex contact after it) of the gated cell past the bit that the bare
  *    drill never met. A cell the head does cut is still reported where the cut meets it.
+ * 94: the swept cut counts in the rig's drill quantum (ticket 558, #551 B1): 60 sub-steps a tick,
+ *    doubled (at most 11 times) until a cell of the planet's band-1 rock costs the rig 100 or
+ *    more, so no rig is held to the old 3600 m/s one-sub-step floor and every cut stays within 1%
+ *    of the law; the cursor keeps its quantum (`sweptCut.quantum`) and the energy carry its own
+ *    (`cutEnergyCarryQuantum`), each left out at 60. A drill's cut and travel steps never pass the
+ *    planet's radius a tick. A rig whose band-1 cell already costs 100 sub-steps cuts, charges
+ *    and digests as at protocol 93.
  */
-export const AUTHORITY_PROTOCOL_VERSION = 93
+export const AUTHORITY_PROTOCOL_VERSION = 94
 
 /** The kernel's own commands: the closed set its rule tables are written against. */
 export interface KernelCommandPayloads {

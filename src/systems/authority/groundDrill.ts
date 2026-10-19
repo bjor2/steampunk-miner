@@ -32,7 +32,7 @@ import { casingHardness } from '../economy/casingGrades'
 import { coreHardness, blockHardness, oreSalePrice, oreTier } from '../economy/oreEconomy'
 import { toCanonical, type BigStat } from '../money'
 import { pickedUpUnitOf, type PickedUp, type PickupFind } from '../registries/orePickup'
-import { drillDamage, subStepsPerTile, ticksPerTile, type DrillStats } from '../vehicle/drillRule'
+import { drillDamage, subStepsPerTileAt, ticksPerTile, type DrillStats } from '../vehicle/drillRule'
 import { drillStampOf, stampSweptFrom } from '../vehicle/drillStamp'
 import { ENERGY_QUANTA_PER_TICK } from '../vehicle/energyQuanta'
 import { payLawWork, payLawWorkEnergy, type LawWorkTally } from '../vehicle/cutCarry'
@@ -112,15 +112,25 @@ export const WHOLE_TICK_CLOCK: DrillClock = {
   chargeOf: (carved, _cellTimes, vehicle) => ({ quanta: tickEnergyOf(carved), vehicle }),
 }
 
-export const SUB_STEP_CLOCK: DrillClock = {
-  subStepsPerTick: DRILL_SUBSTEPS_PER_TICK,
-  cellTimesOf: drillSubStepsOfCells,
-  lawTimesOf: null,
-  chargeOf: (carved, cellTimes, vehicle) => ({
-    quanta: sweptCutEnergyOf(carved, cellTimes, vehicle.energy),
-    vehicle,
-  }),
+/**
+ * The swept cut's clock in `quantum` sub-steps a tick (ticket 330; the rig's drill quantum, ticket
+ * 558): cell times in that quantum, each broken cell charged its own dig energy in it.
+ */
+export function subStepClockOf(quantum: number): DrillClock {
+  return {
+    subStepsPerTick: quantum,
+    cellTimesOf: (params, drill, shockTicksAt) =>
+      drillSubStepsOfCells(params, drill, shockTicksAt, quantum),
+    lawTimesOf: null,
+    chargeOf: (carved, cellTimes, vehicle) => ({
+      quanta: sweptCutEnergyOf(carved, cellTimes, vehicle.energy, quantum),
+      vehicle,
+    }),
+  }
 }
+
+/** The swept cut's clock at the base quantum: every rig's before ticket 558, and the capsule's. */
+export const SUB_STEP_CLOCK: DrillClock = subStepClockOf(DRILL_SUBSTEPS_PER_TICK)
 
 /**
  * The report's cut (ticket 535, A6): whole ticks, the carve as `WHOLE_TICK_CLOCK` cuts it, charged
@@ -131,7 +141,7 @@ export const LAW_WORK_CLOCK: DrillClock = {
   cellTimesOf: drillTicksOfCells,
   lawTimesOf: drillSubStepsOfCells,
   chargeOf: (carved, _cellTimes, vehicle) =>
-    payLawWork(vehicle, lawWorkTallyOf(carved), vehicle.energy),
+    payLawWork(vehicle, lawWorkTallyOf(carved, DRILL_SUBSTEPS_PER_TICK), vehicle.energy),
 }
 
 /**
@@ -139,23 +149,30 @@ export const LAW_WORK_CLOCK: DrillClock = {
  * 6234998337 confirmed it, Systems' ruling 6231144515): the carve, its sub-steps and cell times
  * are `SUB_STEP_CLOCK`'s, so it cuts byte for byte as the shipped swept cut, but its window names
  * the law time and the tally is paid as A6 pays the report's (`LAW_WORK_CLOCK`), its energy alone:
- * the swept cut heats from its steps' summed dig time, so the heat carry is never written.
+ * the swept cut heats from its steps' summed dig time, so the heat carry is never written. In the
+ * rig's quantum, its tally in the same one (ticket 558).
  */
-export const LAW_SUB_STEP_CLOCK: DrillClock = {
-  ...SUB_STEP_CLOCK,
-  lawTimesOf: drillSubStepsOfCells,
-  chargeOf: (carved, _cellTimes, vehicle) =>
-    payLawWorkEnergy(vehicle, lawWorkTallyOf(carved), vehicle.energy),
+export function lawSubStepClockOf(quantum: number): DrillClock {
+  const clock = subStepClockOf(quantum)
+  return {
+    ...clock,
+    lawTimesOf: clock.cellTimesOf,
+    chargeOf: (carved, _cellTimes, vehicle) =>
+      payLawWorkEnergy(vehicle, lawWorkTallyOf(carved, quantum), vehicle.energy),
+  }
 }
+
+/** The law-charged swept clock at the base quantum. */
+export const LAW_SUB_STEP_CLOCK: DrillClock = lawSubStepClockOf(DRILL_SUBSTEPS_PER_TICK)
 
 /** The ticks the stamp still removed something in, at the drill's rate, and its gear's cells. */
 function tickEnergyOf(carved: DrillCarve): number {
   return carved.ticksUsed * ENERGY_QUANTA_PER_TICK.drill + carved.gearQuanta
 }
 
-/** What the carve removed: as tallied, and with its gear cells at their share. */
-function lawWorkTallyOf(carved: DrillCarve): LawWorkTally {
-  return { law: carved.lawWork, lawBp: carved.lawWorkBp }
+/** What the carve removed, in density sub-steps of `quantum`: as tallied, and at gear shares. */
+function lawWorkTallyOf(carved: DrillCarve, quantum: number): LawWorkTally {
+  return { law: carved.lawWork, lawBp: carved.lawWorkBp, quantum }
 }
 
 /** Scripted mining: one cell's samples and its drill gear's cells; call with a planet that has params. */
@@ -369,28 +386,38 @@ function affordableTicksOf(vehicle: VehicleState): number {
   return Math.floor(vehicle.energy / ENERGY_QUANTA_PER_TICK.drill)
 }
 
-/** `drillTicksOfCells` in the swept cut's sub-steps (ticket 330): the same cells, never rounded to a tick. */
+/**
+ * `drillTicksOfCells` in the swept cut's sub-steps (ticket 330): the same cells, never rounded to a
+ * tick, in `quantum` sub-steps a tick (the base, or the rig's drill quantum, ticket 558).
+ */
 export function drillSubStepsOfCells(
   params: PlanetParams,
   drill: DrillStats,
   shockTicksAt: ShockTicksAt,
+  quantum: number = DRILL_SUBSTEPS_PER_TICK,
 ): CellDrillTicks {
   return (tile, material, casingGrade) =>
     casingGrade === 0
-      ? shockedSubStepsPerCell(drill, params, tile, material, shockTicksAt)
-      : subStepsPerTile(drill, casingHardness(params.planetIndex, casingGrade))
+      ? shockedSubStepsPerCell({ drill, quantum }, params, tile, material, shockTicksAt)
+      : subStepsPerTileAt(quantum, drill, casingHardness(params.planetIndex, casingGrade))
+}
+
+/** A drill timed in a quantum. */
+interface QuantumDrill {
+  drill: DrillStats
+  quantum: number
 }
 
 function shockedSubStepsPerCell(
-  drill: DrillStats,
+  { drill, quantum }: QuantumDrill,
   params: PlanetParams,
   tile: TilePoint,
   cell: number,
   shockTicksAt: ShockTicksAt,
 ): number | null {
   const floor = scratchFloorOfCell(params, tile, cell)
-  const cut = subStepsPerTile(drill, hardnessOfTile(params, tile, cell), floor)
-  return cut === null ? null : cut + shockTicksAt(params, tile, cell) * DRILL_SUBSTEPS_PER_TICK
+  const cut = subStepsPerTileAt(quantum, drill, hardnessOfTile(params, tile, cell), floor)
+  return cut === null ? null : cut + shockTicksAt(params, tile, cell) * quantum
 }
 
 /**

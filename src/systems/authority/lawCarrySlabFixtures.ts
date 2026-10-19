@@ -41,6 +41,8 @@ import { setCasingGradeCommand } from './casingDebugCommands'
 import {
   brokenCellsOf,
   chargedHeatTicksOf,
+  baseEnergyCarryOf,
+  lawQuantumOfCommand,
   lawWorkOfGroundChanges,
   lawWorkRemovedOf,
   withDrillExactCarry,
@@ -56,7 +58,7 @@ import {
   PARAMS,
   type ScriptedSession,
 } from './scriptedSession'
-import { stepBoundsAt } from './stepBoundRead'
+import { drillQuantumAt, stepBoundsAt } from './stepBoundRead'
 import { isCutBySteps } from './sweptDrill'
 
 export type SlabPath = 'swept' | 'swept law' | 'exact @12' | 'exact @1' | 'main @12' | 'main @1'
@@ -324,7 +326,8 @@ export function cutSlab(track: SlabTrack, path: SlabPath, levels: Record<string,
         noteCommand(tally, session, tick, command, path)
       }
     }
-    return runOf(start, session.state(), tally, track)
+    const lawQuantum = isSweptPath(path) ? drillQuantumAt(start, 'p1') : DRILL_SUBSTEPS_PER_TICK
+    return runOf({ start, end: session.state(), lawQuantum }, tally, track)
   })
 }
 
@@ -345,7 +348,8 @@ function noteCommand(
   tally.energy += before.energy - after.energy - movement * ENERGY_QUANTA_PER_TICK.drive
   tally.heatTicks += fed
   tally.settleableHeatTicks += settleableOnPath(path, fed, elapsedTicksOf(before, after))
-  tally.lawWorkCut += lawWorkOfGroundChanges(was, session.state().world, events)
+  const quantum = lawQuantumOfCommand(was, command)
+  tally.lawWorkCut += lawWorkOfGroundChanges(was, session.state().world, events, 'p1', quantum)
   tally.broken.push(...brokenCellsOf(events))
   tally.casingSamples += casingSamplesOf(events)
   tally.rejections += events.filter(isRejection).length
@@ -419,14 +423,23 @@ function isRejection(event: DomainEvent): boolean {
   return event.type === 'CommandRejected'
 }
 
+/**
+ * A run's first and last states, and the quantum its cut's law time counts in: the rig's drill
+ * quantum on a swept path (ticket 558), the base on a report's.
+ */
+interface RunEnds {
+  start: AuthorityState
+  end: AuthorityState
+  lawQuantum: number
+}
+
 /** The run's reading: law work over every chunk the cut touched, read from the ground. */
-function runOf(start: AuthorityState, end: AuthorityState, tally: RunTally, track: SlabTrack) {
+function runOf({ start, end, lawQuantum }: RunEnds, tally: RunTally, track: SlabTrack) {
   const tiles = tilesOfTouchedChunks(end.world)
-  const lawWork = lawWorkRemovedOf(start, end.world, tiles)
-  const oneCellLaw = tiles.reduce(
-    (most, tile) => Math.max(most, lawWorkRemovedOf(start, end.world, [tile])),
-    0,
-  )
+  const lawOf = (cut: readonly TilePoint[]) =>
+    lawWorkRemovedOf(start, end.world, cut, 'p1', lawQuantum)
+  const lawWork = lawOf(tiles)
+  const oneCellLaw = tiles.reduce((most, tile) => Math.max(most, lawOf([tile])), 0)
   return {
     ticks: slabTicksOf(track),
     metres: (track.strideMm * slabTicksOf(track)) / MM_PER_METRE,
@@ -434,7 +447,7 @@ function runOf(start: AuthorityState, end: AuthorityState, tally: RunTally, trac
     lawWorkCut: tally.lawWorkCut,
     oneCellLaw,
     energy: tally.energy,
-    energyCarry: vehicleOf(end, 'p1').cutEnergyCarry ?? 0,
+    energyCarry: baseEnergyCarryOf(vehicleOf(end, 'p1')),
     heatTicks: tally.heatTicks,
     settleableHeatTicks: tally.settleableHeatTicks,
     broken: tally.broken,

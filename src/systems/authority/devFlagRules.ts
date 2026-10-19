@@ -15,6 +15,7 @@
  *   gate check stays whatever the flags (HS c).
  */
 import type { AuthorityDevFlags } from '../../constants/devFlags'
+import { withoutCutEnergyCarry } from '../vehicle/cutCarry'
 import type { VehicleState } from '../vehicle/vehicleState'
 import type { AuthorityState, PlayerState } from './authorityState'
 import {
@@ -111,7 +112,7 @@ function playerWithCarriesDropped(player: PlayerState, carries: Set<FlagCarry>):
 
 /** Each carry left out (the report carries are absent at 0) or, on the swept cursor, at 0. */
 const DROP_CARRY: Readonly<Record<FlagCarry, (vehicle: VehicleState) => VehicleState>> = {
-  cutEnergyCarry: ({ cutEnergyCarry: _dropped, ...vehicle }) => vehicle,
+  cutEnergyCarry: (vehicle) => withoutCutEnergyCarry(vehicle),
   cutHeatCarry: ({ cutHeatCarry: _dropped, ...vehicle }) => vehicle,
   sweptCarrySubSteps: (vehicle) =>
     vehicle.sweptCut === undefined

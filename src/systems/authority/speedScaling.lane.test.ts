@@ -9,10 +9,10 @@ import { cutSpeedSlab, slabRigOf, strideOfSpeed, type SlabRun } from './speedSla
 // on a warm chunk cache: one run first, untimed, then the timed ones. Only the ticks the rig moves
 // on are timed (the descent to the column's foot, gate-free), so the rest at the foot does not
 // pull the median down. A lane: it reads the wall clock, so it runs only when named and prints
-// its table; 8400 m/s waits on #558's sub-step floor.
+// its table; 8400 m/s runs since ticket 558 lifted the sub-step floor.
 
 const BUDGET_P50_MS = 3
-const RUNS: Readonly<Record<number, number>> = { 84: 3, 840: 20 }
+const RUNS: Readonly<Record<number, number>> = { 84: 3, 840: 20, 8400: 20 }
 const rows: string[] = []
 
 afterAll(() => {
@@ -47,7 +47,7 @@ function timedStepsAt(speed: number): number[] {
 }
 
 describe('the speed-scaling slab tick time, width 7, warm cache (ticket 560)', () => {
-  it.each([84, 840])('steps p50 within 3 ms a tick at %i m/s', (speed) => {
+  it.each([84, 840, 8400])('steps p50 within 3 ms a tick at %i m/s', (speed) => {
     const times = timedStepsAt(speed)
     const p50 = percentile(times, 0.5)
     rows.push(
@@ -55,6 +55,4 @@ describe('the speed-scaling slab tick time, width 7, warm cache (ticket 560)', (
     )
     expect(p50).toBeLessThanOrEqual(BUDGET_P50_MS)
   })
-
-  it.todo('steps p50 within 3 ms a tick at 8400 m/s once #558 lifts the sub-step floor')
 })

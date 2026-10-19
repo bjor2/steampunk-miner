@@ -1,5 +1,7 @@
 import { describe, expect, it } from 'vitest'
+import { STEP_BOUND_TOLERANCE_MM } from '../../constants/balance'
 import { SWEPT_SPAN_CHUNKS_PER_TICK } from '../../constants/terrainBudget'
+import { RADIUS_BASE_TILES, RADIUS_GROWTH_TILES } from '../world/planetTable'
 import { FACING } from '../vehicle/vehiclePose'
 import { surfaceRowOfColumn } from '../world/tileGrid'
 import { createScriptedSession, PARAMS, poseAbove } from './scriptedSession'
@@ -20,6 +22,14 @@ describe('swept span chunk budget (ticket 335)', () => {
 
   it('keeps the TD figure for P200, about 430 m of bore a tick, inside the budget', () => {
     expect(worstSpanChunksAtStep(430_000)).toBeLessThanOrEqual(SWEPT_SPAN_CHUNKS_PER_TICK)
+  })
+
+  // Ticket 558: a drill step never passes the planet's radius, 1,000 m on the largest planet.
+  it("keeps a step of the largest planet's radius, the furthest any tick cuts, inside the budget", () => {
+    const largestRadiusMm = (RADIUS_BASE_TILES + RADIUS_GROWTH_TILES) * 1000
+    expect(worstSpanChunksAtStep(largestRadiusMm + STEP_BOUND_TOLERANCE_MM)).toBeLessThanOrEqual(
+      SWEPT_SPAN_CHUNKS_PER_TICK,
+    )
   })
 
   it('reads the rig top cutting step as its bound through band-1 rock', () => {

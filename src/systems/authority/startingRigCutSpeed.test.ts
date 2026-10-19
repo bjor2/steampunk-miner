@@ -3,7 +3,9 @@ import { MM_PER_METRE, TICKS_PER_SECOND } from '../../constants/physics'
 import { blockHardness } from '../economy/oreEconomy'
 import { startLevels, vehicleStatsAt } from '../economy/vehicleStats'
 import { div, fromSafeInteger, mul, toFixedText } from '../money'
-import { subStepsPerTile } from '../vehicle/drillRule'
+import { cutStepMmOf } from '../vehicle/cutSpeed'
+import { drillQuantumOnPlanet } from '../vehicle/drillQuantum'
+import { subStepsPerTileAt } from '../vehicle/drillRule'
 import { FACING } from '../vehicle/vehiclePose'
 import { surfaceRowOfColumn } from '../world/tileGrid'
 import { cutFollowAt } from './cutFollowRead'
@@ -14,12 +16,14 @@ import { createScriptedSession, PARAMS, poseAbove } from './scriptedSession'
 // and the drill law's speed is `D` cells/s. A stored step is one purchase of x1.243 since the GD
 // ruling on #551 (ticket 552). The table and its cause are in docs/economy/drill-ladder.md.
 const STORED_STEPS = Array.from({ length: 31 }, (_, step) => step)
-/** Purchases whose next one still lands in 1.181..1.305 on soft ground (VS on #551, via the TD). */
-const BANDED_PURCHASES = Array.from({ length: 22 }, (_, at) => at + 1)
+/**
+ * Purchases whose next one lands in 1.181..1.305 on soft ground (VS on #551, via the TD): every one
+ * since ticket 558 counts a fast rig's cell in its own drill quantum (the floor broke it at 24).
+ */
+const BANDED_PURCHASES = Array.from({ length: 29 }, (_, at) => at + 1)
 /** Up to here a cell costs enough sub-steps that the read loses under a mm a tick to them. */
 const FINE_READ_STEPS = STORED_STEPS.slice(0, 11)
 const PURCHASE_BAND = { lowest: 1.181, highest: 1.305 }
-const MM_A_TICK_OF_ONE_SUB_STEP_CELL = 60_000
 const BAND_1_ROCK = blockHardness(PARAMS.planetIndex, 1)
 const COLUMN = 20
 const REST = {
@@ -58,13 +62,21 @@ function lawStepMmAt(step: number): number {
   return Number(toFixedText(perTick, 6))
 }
 
-function subStepsAt(step: number): number {
-  return subStepsPerTile(statsAtDrillStep(step), BAND_1_ROCK) as number
+/** The drill quantum of a step on planet 1 (ticket 558), and a band-1 cell's sub-steps in it. */
+function cellTimeAt(step: number): { quantum: number; subSteps: number } {
+  const drill = statsAtDrillStep(step)
+  const quantum = drillQuantumOnPlanet(drill, PARAMS.planetIndex)
+  return { quantum, subSteps: subStepsPerTileAt(quantum, drill, BAND_1_ROCK) as number }
 }
 
-/** The cell's sub-step drill time over the next purchase's: the gain the cut is paid at. */
+function cellsPerTickAt(step: number): number {
+  const { quantum, subSteps } = cellTimeAt(step)
+  return quantum / subSteps
+}
+
+/** The next purchase's cut over this one's, from their cells' sub-steps: the gain the cut is paid at. */
 function purchaseGainOfSubSteps(fromStep: number): number {
-  return subStepsAt(fromStep) / subStepsAt(fromStep + 1)
+  return cellsPerTickAt(fromStep + 1) / cellsPerTickAt(fromStep)
 }
 
 describe('starting rigs cut speed (ticket 431)', () => {
@@ -72,7 +84,7 @@ describe('starting rigs cut speed (ticket 431)', () => {
     expect(purchaseGainOfSubSteps(0)).toBeCloseTo(1.0063, 3)
   })
 
-  it('pays every purchase from 1 to 23 a gain of 1.181 to 1.305 in the sub-steps a cell costs', () => {
+  it('pays every purchase from 1 to 30 a gain of 1.181 to 1.305 in the sub-steps a cell costs', () => {
     const outside = BANDED_PURCHASES.filter((step) => {
       const gain = purchaseGainOfSubSteps(step)
       return gain < PURCHASE_BAND.lowest || gain > PURCHASE_BAND.highest
@@ -83,7 +95,8 @@ describe('starting rigs cut speed (ticket 431)', () => {
   it('reads the cell its whole sub-steps allow, never over the law, at every stored step to 30', () => {
     for (const step of STORED_STEPS) {
       const read = readStepMmAt(step)
-      expect(read).toBe(Math.floor(MM_A_TICK_OF_ONE_SUB_STEP_CELL / subStepsAt(step)))
+      const { quantum, subSteps } = cellTimeAt(step)
+      expect(read).toBe(cutStepMmOf(subSteps, quantum))
       expect(lawStepMmAt(step) - read).toBeGreaterThanOrEqual(0)
     }
   })

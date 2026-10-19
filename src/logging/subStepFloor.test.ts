@@ -1,44 +1,36 @@
-import { existsSync, readFileSync } from 'node:fs'
 import { beforeAll, describe, expect, it } from 'vitest'
-import { DRILL_SUBSTEPS_PER_TICK } from '../constants/balance'
-import type { KnownRedMarker } from '../constants/knownRed'
-import { TICKS_PER_SECOND } from '../constants/physics'
 import { cutTrack } from '../systems/authority/digSpeedTrackFixtures'
 import { blockHardness } from '../systems/economy/oreEconomy'
 import { drillPower, startLevels, vehicleStatsAt } from '../systems/economy/vehicleStats'
 import { div, toFixedText } from '../systems/money'
-import { subStepsPerTile } from '../systems/vehicle/drillRule'
-import { knownRedVerdict } from './knownRed'
+import { cutCellsPerSecondOf } from '../systems/vehicle/cutSpeed'
+import { drillQuantumOnPlanet } from '../systems/vehicle/drillQuantum'
+import { subStepsPerTileAt } from '../systems/vehicle/drillRule'
 
-// The drill law's one-sub-step floor under the per-purchase drill (the GD ruling on #551 and its
-// amendment, VS and the TD 6254671302; ticket 552). A cell is paid in ceil(3600 H^3 / (D P^2))
-// sub-steps and never fewer than one, so on soft ground (planet 1 band 1, H = 1, the tip at step 0,
-// P = 1) the step each purchase delivers stays in 1.181..1.305 through purchase 23, leaves it at 24
-// (1.176), is dead (x1.00) from 33 and stops at one sub-step a cell, 3600 cells/s, from 37: no rig
-// cuts band 1 at 5000 cells/s. Both rows are carried known red under #558, which lifts the floor
-// and is their expiry; no economy cap hides them (Bjor's no-cap ruling). On frontier ground a cell
-// costs 115 to 240 sub-steps, so the rounding stays under about 0.9% there.
+// The drill law past its old one-sub-step floor (ticket 558, #551 B1; the GD ruling on #551 and
+// its amendment, VS and the TD 6254671302). At a fixed 60 sub-steps a tick a cell was paid in
+// ceil(3600 H^3 / (D P^2)) sub-steps and never fewer than one, so on soft ground (planet 1 band 1,
+// H = 1, the tip at step 0, P = 1) the step a purchase delivered left 1.181..1.305 at 24, was dead
+// (x1.00) from 33 and stopped at 3600 cells/s from 37: ticket 552 carried that as known red, with
+// this ticket as its expiry. The swept cut now counts in the rig's own drill quantum, the base
+// doubled until a band-1 cell costs 100 sub-steps or more, so every purchase delivers its x1.243,
+// within 1% of the law, and a drill cuts past 5000 cells/s.
 
-/** Local to this spec, as the lanes' markers are: the repo's one exported marker is ticket 419's. */
-const SUB_STEP_FLOOR_KNOWN_RED: KnownRedMarker = {
-  finding: 558,
-  reason:
-    'KNOWN_RED: delivered step per level breaks on soft ground from L24, dead levels from L33 (and no rig cuts past 3600 cells/s): the one-sub-step floor #558 lifts',
-}
-const GATE = 'the sub-step floor rows'
 const PURCHASE_BAND = { lowest: 1.181, highest: 1.305 }
-const LAST_BANDED_PURCHASE = 23
-const LAST_PURCHASE = 40
-/** The kernel row past the floor (#551 section 7, acceptance 6). */
+const LAST_PURCHASE = 50
+/** The kernel row past the old floor (#551 section 7, acceptance 6). */
 const PAST_THE_FLOOR_CELLS_PER_SECOND = 5000
-/** A drill far past every rig: whatever the purchase, a cell still costs one sub-step. */
-const FAR_PAST_THE_FLOOR = 3000
-const SOFT_GROUND = blockHardness(1, 1)
+/** From here a soft-ground cut must be within 1% of the law (ticket 558's precision cliff row). */
+const FAST_CELLS_PER_SECOND = 1000
+const LAW_SHARE = 0.01
+const PLANET = 1
+const SOFT_GROUND = blockHardness(PLANET, 1)
 /**
  * #551 acceptance 3: energy per metre new / today = D today / D new +-2% at L10, 20 and 30. Purchase
  * 1 is today's stored 1, so the bar reads each purchase's energy per metre of the same bore against
  * purchase 1's, beside D(1) / D(n); the band-1 level track of `digSpeedTrackFixtures.ts` at a speed
  * under each rig's cut, energy as the law charge (exact on law work) over the cells it removed.
+ * Purchase 30 was the floor's own row (5 sub-steps a cell for a law of 4.3, +15%) until ticket 558.
  */
 const ENERGY_RIGS = [
   { purchase: 1, speedMps: 1.4 },
@@ -47,24 +39,25 @@ const ENERGY_RIGS = [
   { purchase: 30, speedMps: 600 },
 ]
 const ENERGY_TOLERANCE = 0.02
-/** From purchase 30 a band-1 cell costs 5 sub-steps for a law of 4.3: the floor's own rows. */
-const FIRST_FLOORED_ENERGY_PURCHASE = 30
-const CELLS_PER_SECOND_AT_ONE_SUB_STEP = DRILL_SUBSTEPS_PER_TICK * TICKS_PER_SECOND
 
-function readFindingTicketFile(finding: number): string | null {
-  const url = new URL(`../../docs/metrics/tickets/${finding}.json`, import.meta.url)
-  return existsSync(url) ? readFileSync(url, 'utf8') : null
+function drillAt(purchase: number) {
+  return vehicleStatsAt({ ...startLevels(), drill_power: purchase })
 }
 
-/** Sub-steps a soft-ground cell costs at `purchase`, the tip at step 0. */
-function subStepsAt(purchase: number): number {
-  const stats = vehicleStatsAt({ ...startLevels(), drill_power: purchase })
-  return subStepsPerTile(stats, SOFT_GROUND) as number
+/** Soft-ground cells a second at `purchase`, in its own drill quantum, the tip at step 0. */
+function deliveredCellsPerSecondAt(purchase: number): number {
+  const drill = drillAt(purchase)
+  const quantum = drillQuantumOnPlanet(drill, PLANET)
+  return cutCellsPerSecondOf(subStepsPerTileAt(quantum, drill, SOFT_GROUND) as number, quantum)
+}
+
+function lawCellsPerSecondAt(purchase: number): number {
+  return Number(toFixedText(drillPower(purchase), 6))
 }
 
 /** The step purchase `purchase` delivers over the one before it, in cut speed. */
 function deliveredStepOf(purchase: number): number {
-  return subStepsAt(purchase - 1) / subStepsAt(purchase)
+  return deliveredCellsPerSecondAt(purchase) / deliveredCellsPerSecondAt(purchase - 1)
 }
 
 function purchasesBetween(first: number, last: number): number[] {
@@ -73,25 +66,6 @@ function purchasesBetween(first: number, last: number): number[] {
 
 function isInBand(step: number): boolean {
   return step >= PURCHASE_BAND.lowest && step <= PURCHASE_BAND.highest
-}
-
-/** The purchases from 2 to `LAST_PURCHASE` whose delivered step leaves the band, as problems. */
-function softGroundProblems(): string[] {
-  return purchasesBetween(2, LAST_PURCHASE)
-    .filter((purchase) => !isInBand(deliveredStepOf(purchase)))
-    .map(
-      (purchase) =>
-        `purchase ${purchase} delivers x${deliveredStepOf(purchase).toFixed(3)} on soft ground (${subStepsAt(purchase)} sub-steps a cell)`,
-    )
-}
-
-/** The fastest band-1 cut the law allows, against the row's 5000 cells/s. */
-function pastTheFloorProblems(): string[] {
-  const fastest = CELLS_PER_SECOND_AT_ONE_SUB_STEP / subStepsAt(FAR_PAST_THE_FLOOR)
-  if (fastest >= PAST_THE_FLOOR_CELLS_PER_SECOND) return []
-  return [
-    `no drill cuts soft ground at ${PAST_THE_FLOOR_CELLS_PER_SECOND} cells/s: one sub-step a cell is ${fastest} cells/s`,
-  ]
 }
 
 /** Law work a cell removed of the track's stretch, energy's measure on the law charge. */
@@ -126,7 +100,7 @@ function energyProblemOf(row: EnergyRow): string {
   return `purchase ${row.purchase} spends ${row.ratio.toFixed(5)} of purchase 1's energy a metre, the law ${row.law.toFixed(5)}`
 }
 
-describe('the drill law at its one-sub-step floor (#551, ticket 552)', () => {
+describe('the drill law past the lifted sub-step floor (#551, ticket 558)', () => {
   let energy: EnergyRow[] = []
 
   beforeAll(() => {
@@ -134,53 +108,38 @@ describe('the drill law at its one-sub-step floor (#551, ticket 552)', () => {
     console.log(energy.map(energyProblemOf).join('\n'))
   }, 120_000)
 
-  it('spends energy a metre at D today / D new within 2% at purchases 10 and 20', () => {
-    const unfloored = energy.filter((row) => row.purchase < FIRST_FLOORED_ENERGY_PURCHASE)
-    expect(unfloored.filter((row) => !isWithinEnergyTolerance(row)).map(energyProblemOf)).toEqual(
-      [],
-    )
+  it('spends energy a metre at D today / D new within 2% at purchases 10, 20 and 30', () => {
+    expect(energy.map(({ purchase }) => purchase)).toEqual([10, 20, 30])
+    expect(energy.filter((row) => !isWithinEnergyTolerance(row)).map(energyProblemOf)).toEqual([])
   })
 
-  it('carries purchase 30, whose band-1 cells round up a whole sub-step, as known red under #558', () => {
-    const floored = energy.filter((row) => row.purchase >= FIRST_FLOORED_ENERGY_PURCHASE)
-    const problems = {
-      covered: floored.filter((row) => !isWithinEnergyTolerance(row)).map(energyProblemOf),
-      uncovered: [],
-    }
-    const verdict = knownRedVerdict(SUB_STEP_FLOOR_KNOWN_RED, problems, readFindingTicketFile, GATE)
-    console.log(verdict.knownRed.join('\n'))
-    expect(verdict.failures).toEqual([])
-  })
-
-  it('delivers 1.181 to 1.305 a purchase on soft ground through purchase 23', () => {
-    const outside = purchasesBetween(2, LAST_BANDED_PURCHASE).filter(
+  it('delivers 1.181 to 1.305 a purchase on soft ground through purchase 50, none of them dead', () => {
+    const outside = purchasesBetween(2, LAST_PURCHASE).filter(
       (purchase) => !isInBand(deliveredStepOf(purchase)),
     )
     expect(outside).toEqual([])
   })
 
-  it('first leaves the band at purchase 24 and first delivers a dead purchase at 33, as VS measured', () => {
-    const left = purchasesBetween(2, LAST_PURCHASE).find(
-      (purchase) => !isInBand(deliveredStepOf(purchase)),
+  it('cuts soft ground within 1% of the law from 1000 cells/s to purchase 50', () => {
+    const fast = purchasesBetween(1, LAST_PURCHASE).filter(
+      (purchase) => lawCellsPerSecondAt(purchase) >= FAST_CELLS_PER_SECOND,
     )
-    const dead = purchasesBetween(2, LAST_PURCHASE).find(
-      (purchase) => deliveredStepOf(purchase) === 1,
+    const offLaw = fast.filter(
+      (purchase) =>
+        deliveredCellsPerSecondAt(purchase) < lawCellsPerSecondAt(purchase) * (1 - LAW_SHARE),
     )
-    expect([left, dead]).toEqual([24, 33])
+    expect(fast.length).toBeGreaterThan(15)
+    expect(offLaw).toEqual([])
   })
 
-  it('carries the soft-ground steps from purchase 24 as known red under #558', () => {
-    const problems = { covered: softGroundProblems(), uncovered: [] }
-    const verdict = knownRedVerdict(SUB_STEP_FLOOR_KNOWN_RED, problems, readFindingTicketFile, GATE)
-    console.log(verdict.knownRed.join('\n'))
-    expect(verdict.failures).toEqual([])
-  })
-
-  it('fails the 5000 cells/s row loudly at the floor, carried as known red under #558', () => {
-    const problems = { covered: pastTheFloorProblems(), uncovered: [] }
-    const verdict = knownRedVerdict(SUB_STEP_FLOOR_KNOWN_RED, problems, readFindingTicketFile, GATE)
-    console.log(verdict.knownRed.join('\n'))
-    expect(problems.covered).toHaveLength(1)
-    expect(verdict.failures).toEqual([])
+  it('cuts soft ground at 5000 cells/s and more, past the old 3600', () => {
+    const fastest = deliveredCellsPerSecondAt(LAST_PURCHASE)
+    expect(fastest).toBeGreaterThan(PAST_THE_FLOOR_CELLS_PER_SECOND)
+    const first = purchasesBetween(1, LAST_PURCHASE).find(
+      (purchase) => deliveredCellsPerSecondAt(purchase) >= PAST_THE_FLOOR_CELLS_PER_SECOND,
+    )
+    expect(lawCellsPerSecondAt(first as number)).toBeGreaterThanOrEqual(
+      PAST_THE_FLOOR_CELLS_PER_SECOND,
+    )
   })
 })

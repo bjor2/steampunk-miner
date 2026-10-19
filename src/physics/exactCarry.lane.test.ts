@@ -16,6 +16,7 @@ import {
   withHeatWorkUncapped,
 } from '../systems/authority/cutCarryFixtures'
 import { digSubStepsOfCells } from '../systems/authority/drillCutTally'
+import { drillQuantumAt } from '../systems/authority/stepBoundRead'
 import {
   droppedHeatShareOf,
   gaugeRatchetOf,
@@ -420,7 +421,8 @@ function noteTick(
   const params = planetParamsOf(after.planet)
   if (params === null) return
   const yielded = yieldedCellsOf(before.world, after.world, params, at)
-  const digSubSteps = digSubStepsOfCells(before, params, playerIdOf(), yielded)
+  const quantum = drillQuantumAt(before, playerIdOf())
+  const digSubSteps = digSubStepsOfCells(before, params, playerIdOf(), { yielded, quantum })
   const carried = carriedHeatTicksOf(before, after)
   const isDrilling = flags.isDrilling
   const law = lawWorkRemovedThisTickOf(before, after, at)

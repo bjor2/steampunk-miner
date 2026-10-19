@@ -38,11 +38,11 @@ import type { TilePoint } from '../world/tileGrid'
 import { materialCellAt } from '../world/worldState'
 import { vehicleOf, type AuthorityState } from './authorityState'
 import { openDrillGates } from './drillGates'
-import { SUB_STEP_CLOCK } from './groundDrill'
+import { subStepClockOf } from './groundDrill'
 import { heatThrottledDrill } from './heatRules'
 import { shockTicksFor } from './magnetic/electrifiedShock'
 import { planetParamsOf } from './planetOfState'
-import { sweptStampAheadMmAt } from './stepBoundRead'
+import { drillQuantumAt, sweptStampAheadMmAt } from './stepBoundRead'
 
 /**
  * A tick's step as the client sends it: its position in mm, the head's settled facing, its lift,
@@ -152,10 +152,11 @@ function isSpanStoppedAt(state: AuthorityState, playerId: string, read: SlabRead
   return slowestSubStepsOf(state, playerId, read.params, read.slab.uncutTiles) === null
 }
 
-/** `vCut` in m/s through the slab's uncut cells; 0 when one cannot be cut. */
+/** `vCut` in m/s through the slab's uncut cells, in the rig's quantum; 0 when one cannot be cut. */
 function cutSpeedOf(state: AuthorityState, playerId: string, { params, slab }: SlabRead): number {
   const leadSubSteps = slowestSubStepsOf(state, playerId, params, slab.uncutTiles)
-  return leadSubSteps === null ? 0 : metresPerSecondOfStep(cutStepMmOf(leadSubSteps))
+  if (leadSubSteps === null) return 0
+  return metresPerSecondOfStep(cutStepMmOf(leadSubSteps, drillQuantumAt(state, playerId)))
 }
 
 /** `nLead`: the largest sub-step drill time of the cells, or null when one cannot be cut. */
@@ -166,7 +167,8 @@ function slowestSubStepsOf(
   tiles: readonly TilePoint[],
 ): number | null {
   const drill = heatThrottledDrill(params.planetIndex, vehicleOf(state, playerId))
-  const cellTimes = SUB_STEP_CLOCK.cellTimesOf(params, drill, shockTicksFor(state, playerId))
+  const clock = subStepClockOf(drillQuantumAt(state, playerId))
+  const cellTimes = clock.cellTimesOf(params, drill, shockTicksFor(state, playerId))
   const gates = openDrillGates(state, playerId, params, cellTimes)
   let slowest = 0
   for (const tile of tiles) {

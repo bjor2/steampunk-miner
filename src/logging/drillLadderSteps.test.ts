@@ -6,12 +6,12 @@ import {
   type DrillLadderRung,
 } from '../systems/authority/drillLadder'
 import { WORLD_SEED } from '../systems/authority/scriptedSession'
-import { DRILL_SUBSTEPS_PER_TICK } from '../constants/balance'
 import { TICKS_PER_SECOND } from '../constants/physics'
 import { blockHardness } from '../systems/economy/oreEconomy'
 import { startLevels, vehicleStatsAt } from '../systems/economy/vehicleStats'
 import { cmp, div, fromCanonical, fromSafeInteger, mul, toFixedText } from '../systems/money'
-import { subStepsPerTile } from '../systems/vehicle/drillRule'
+import { drillQuantumOnPlanet } from '../systems/vehicle/drillQuantum'
+import { subStepsPerTileAt } from '../systems/vehicle/drillRule'
 import {
   formatLadderTable,
   ladderHistoryRowsOf,
@@ -31,9 +31,10 @@ import { formatNdjsonLine } from './ndjson'
 // Since the GD ruling on #551 (ticket 552) a stored step is one purchase, and two bars read this
 // cut: stored 20 against stored 1 within [55, 70] (Systems' acceptance 1), and the stored-20 cut on
 // band 1 between -2.7% and +0.5% of the law's D(20) (VS's bench bar (ii), split by the TD): a cell
-// is paid in ceil(3600 H^3 / (D P^2)) sub-steps, which can only slow the cut. The test prints the
-// band-1 hardness and the tip it used and works the expected quantisation out from them; the
-// browser's metres per second down at level 20 are #560's bench.
+// is paid in ceil(Q 60 H^3 / (D P^2)) sub-steps of the rig's drill quantum Q (60, doubled for a fast
+// rig since ticket 558), which can only slow the cut, and the column is read in whole ticks. The
+// test prints the band-1 hardness and the tip it used and works the expected reading out from them;
+// the browser's metres per second down at level 20 are #560's bench.
 const LAW_STEP = 20
 const STORED_STEPS = [1, 5, 10, 15, 20]
 const COLUMN_CELLS = 20
@@ -87,7 +88,7 @@ describe('drill-speed ladder in stored steps (ticket 434)', () => {
     const reading = quantisationAt(LAW_STEP)
     console.log(
       `stored ${LAW_STEP} on band 1: hardness ${reading.hardness}, tip ${reading.tip}, ` +
-        `law ${reading.law} cells/s, ${reading.subSteps} sub-steps a cell, ` +
+        `law ${reading.law} cells/s, ${reading.subSteps} sub-steps of ${reading.quantum} a cell, ` +
         `expected ${reading.expected} cells/s, cut ${toFixedText(cellsPerSecondOf(rung), 3)}`,
     )
     const offLaw = div(cellsPerSecondOf(rung), fromCanonical(reading.law))
@@ -99,18 +100,24 @@ describe('drill-speed ladder in stored steps (ticket 434)', () => {
   })
 })
 
-/** The band-1 law at a stored step with the ladder's tip 0, and the cut its sub-steps allow. */
+/**
+ * The band-1 law at a stored step with the ladder's tip 0, and the cut its sub-steps allow: a cell
+ * in sub-steps of the rig's drill quantum (ticket 558), the column read in whole ticks.
+ */
 function quantisationAt(step: number) {
   const stats = vehicleStatsAt({ ...startLevels(), drill_power: step })
   const hardness = blockHardness(SETUP.planet, 1)
-  const subSteps = subStepsPerTile(stats, hardness)!
-  const perSecond = fromSafeInteger(DRILL_SUBSTEPS_PER_TICK * TICKS_PER_SECOND)
+  const quantum = drillQuantumOnPlanet(stats, SETUP.planet)
+  const subSteps = subStepsPerTileAt(quantum, stats, hardness)!
+  const columnTicks = Math.ceil((COLUMN_CELLS * subSteps) / quantum)
+  const perSecond = fromSafeInteger(COLUMN_CELLS * TICKS_PER_SECOND)
   return {
     hardness: toFixedText(hardness, 4),
     tip: toFixedText(stats.drillTip, 4),
     law: toFixedText(div(stats.drillPower, hardness), 6),
+    quantum,
     subSteps,
-    expected: toFixedText(div(perSecond, fromSafeInteger(subSteps)), 3),
+    expected: toFixedText(div(perSecond, fromSafeInteger(columnTicks)), 3),
   }
 }
 

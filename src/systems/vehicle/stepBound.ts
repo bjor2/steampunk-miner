@@ -8,7 +8,10 @@
  *   stands in (`cutSpeed.ts`), with the drill as bought, while the cut gate is open;
  * - `travelStep`: travel parity's cap (`travelParity.ts`), `max(speedMax, k * cutSpeed)`, with the
  *   engine's top speed rounded up to whole mm a tick, otherwise;
- * - one 250 mm density sample of tolerance.
+ * - one 250 mm density sample of tolerance;
+ * - the drill counted in its own quantum (`drillQuantum.ts`), so its steps grow past the old
+ *   3600 m/s sub-step floor, each no longer than the planet's radius (ticket 558); the engine's
+ *   step is its own.
  *
  * The drill's part comes from its `BigStat` stats through `money.ts`, the engine's from its bounded
  * top speed, so no float reaches the bound. The authority refuses a step past it and the client
@@ -23,8 +26,9 @@ import { MM_PER_METRE, TICKS_PER_SECOND } from '../../constants/physics'
 import type { BigStat } from '../money'
 import type { PlanetParams } from '../world/planetParams'
 import { cutStepMmOf } from './cutSpeed'
-import { subStepsPerTile, type DrillStats } from './drillRule'
-import { bandRockHardnessOf, travelStepThrough } from './travelParity'
+import { drillQuantumOnPlanet } from './drillQuantum'
+import { subStepsPerTileAt, type DrillStats } from './drillRule'
+import { bandRockHardnessOf, drillTravelOnPlanet, stepWithinPlanetMm } from './travelParity'
 import { statsOfVehicle, type VehicleState } from './vehicleState'
 
 /** The rig's two bounds, mm a tick, tolerance included: while it cuts, and while it travels. */
@@ -35,13 +39,34 @@ export interface StepBounds {
 
 export function stepBoundsOf(vehicle: VehicleState, params: PlanetParams | null): StepBounds {
   const stats = statsOfVehicle(vehicle)
-  const hardness = bandRockHardnessOf(vehicle, params)
-  const cutStep = hardness === null ? 0 : cutStepThrough(stats, hardness)
-  const drillTravel = hardness === null ? 0 : travelStepThrough(stats, hardness)
-  const travelStep = Math.max(engineStepMmOf(stats.engine.speedMax), drillTravel)
+  const drill = drillStepsOf(stats, bandRockHardnessOf(vehicle, params), params)
+  const travelStep = Math.max(engineStepMmOf(stats.engine.speedMax), drill.travelMm)
   return {
-    cuttingMm: cutStep + STEP_BOUND_TOLERANCE_MM,
+    cuttingMm: drill.cutMm + STEP_BOUND_TOLERANCE_MM,
     travellingMm: travelStep + STEP_BOUND_TOLERANCE_MM,
+  }
+}
+
+/** The drill's two steps through the nominal ground, mm a tick: cutting, and `k` times that. */
+interface DrillSteps {
+  cutMm: number
+  travelMm: number
+}
+
+/**
+ * The drill's steps in its own quantum, each no further a tick than the planet's radius (ticket
+ * 558); none off a planet or posed nowhere.
+ */
+function drillStepsOf(
+  drill: DrillStats,
+  hardness: BigStat | null,
+  params: PlanetParams | null,
+): DrillSteps {
+  if (hardness === null || params === null) return { cutMm: 0, travelMm: 0 }
+  const quantum = drillQuantumOnPlanet(drill, params.planetIndex)
+  return {
+    cutMm: stepWithinPlanetMm(cutStepThrough(drill, hardness, quantum), params),
+    travelMm: drillTravelOnPlanet(drill, hardness, params),
   }
 }
 
@@ -65,10 +90,10 @@ export function guestPoseToleranceMm(boundMm: number): number {
   return boundMm * POSE_REPORT_INTERVAL_TICKS
 }
 
-/** The drill law's step through ground of `hardness`; 0 where the tip cannot scratch it. */
-function cutStepThrough(drill: DrillStats, hardness: BigStat): number {
-  const subSteps = subStepsPerTile(drill, hardness)
-  return subSteps === null ? 0 : cutStepMmOf(subSteps)
+/** The drill law's step through ground of `hardness` in `quantum`; 0 where the tip cannot scratch it. */
+function cutStepThrough(drill: DrillStats, hardness: BigStat, quantum: number): number {
+  const subSteps = subStepsPerTileAt(quantum, drill, hardness)
+  return subSteps === null ? 0 : cutStepMmOf(subSteps, quantum)
 }
 
 /** The engine's top speed in whole mm a tick, rounded up so the engine always fits its bound. */

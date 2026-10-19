@@ -3,6 +3,7 @@ import { discSamplesOf } from '../world/stampShape'
 import { CLOSED_CUT_GATE } from './cutGate'
 import { sweptDrillStampOf } from './drillStamp'
 import {
+  carrySubStepsIn,
   digSubStepsAfter,
   pointAtStep,
   sweepPathOf,
@@ -90,5 +91,33 @@ describe('swept cut dig time for heat (ticket 335)', () => {
   it('heats for the whole ticks of the summed dig time', () => {
     expect(stepDigTicksOf(at(9, 59))).toBe(0)
     expect(stepDigTicksOf(at(9, 150))).toBe(2)
+  })
+})
+
+describe('swept cut dig time and carry in a lifted drill quantum (ticket 558)', () => {
+  const lifted = (digSubSteps: number, carrySubSteps: number): SweptCut => ({
+    ...CURSOR,
+    tick: 9,
+    digSubSteps,
+    carrySubSteps,
+    quantum: 240,
+  })
+
+  it("heats for whole ticks of the cursor's own quantum", () => {
+    expect(stepDigTicksOf(lifted(239, 0))).toBe(0)
+    expect(stepDigTicksOf(lifted(600, 0))).toBe(2)
+  })
+
+  it('counts a base cursor exactly in a lifted quantum, and a lifted one down in whole sub-steps', () => {
+    expect(digSubStepsAfter({ ...CURSOR, tick: 9, digSubSteps: 150 }, 6, 10, 240)).toBe(610)
+    expect(digSubStepsAfter(lifted(601, 0), 6, 1, 60)).toBe(151)
+    expect(digSubStepsAfter(lifted(601, 0), 9, 0, 240)).toBe(121)
+  })
+
+  it('carries its work into the quantum the next tick counts in', () => {
+    expect(carrySubStepsIn(lifted(0, 37), 240)).toBe(37)
+    expect(carrySubStepsIn(lifted(0, 37), 480)).toBe(74)
+    expect(carrySubStepsIn({ ...CURSOR, carrySubSteps: 5 }, 240)).toBe(20)
+    expect(carrySubStepsIn(undefined, 240)).toBe(0)
   })
 })

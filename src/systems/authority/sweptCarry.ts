@@ -11,8 +11,9 @@
  * - **Carry ends**: a core cell, an electrified (hazard) cell or lava ends the tick's walk at it;
  *   the tank and the hold are counted per paid cell, at the dig energy the cut charges for it
  *   (`cellDigEnergy.ts`) and one place per ore cell.
- * - **The purse**: `DRILL_SUBSTEPS_PER_TICK` sub-steps a tick, plus the cursor's carry when the step
- *   continues it (a fresh step starts from 0), the tank and the free places in the hold. A tick
+ * - **The purse**: the rig's drill quantum of sub-steps a tick (`DRILL_SUBSTEPS_PER_TICK` doubled
+ *   for a fast rig, ticket 558), plus the cursor's carry counted in it when the step continues it
+ *   (a fresh step starts from 0), the tank and the free places in the hold. A tick
  *   that leaves the tank unable to pay another carries nothing, whichever cells emptied it.
  * - **The cell past the pose**, which a walk that reaches the pose banks toward, is priced from the
  *   drill's ungated time: asking its gates would report a cell the cut has not met, and a gated
@@ -20,7 +21,7 @@
  * - **The carry's cell**: the cell the carry works toward is cut by the carry alone, so the stamp
  *   leaves it standing until the walk pays for it; the paid cells yield first, in walk order.
  */
-import { DRILL_SUBSTEPS_PER_TICK } from '../../constants/balance'
+import { BASIS_POINTS, DRILL_SUBSTEPS_PER_TICK } from '../../constants/balance'
 import { UP_VECTOR_SCALE } from '../../constants/physics'
 import { isElectrifiedCellAt } from '../registries/magneticGround'
 import type {
@@ -30,7 +31,7 @@ import type {
   CarryPurse,
   CarrySweep,
 } from '../vehicle/carryWalk'
-import { SWEEP_STEP_MM, type SweepPath } from '../vehicle/sweptCut'
+import { carrySubStepsIn, SWEEP_STEP_MM, type SweepPath } from '../vehicle/sweptCut'
 import { facingVectorOf, tileOfMillimetres, type VehiclePose } from '../vehicle/vehiclePose'
 import { cargoUnitsOf, statsOfVehicle } from '../vehicle/vehicleState'
 import { ENERGY_QUANTA_PER_TICK } from '../vehicle/energyQuanta'
@@ -45,6 +46,7 @@ import { cellDigEnergyOf } from './cellDigEnergy'
 import { drillSubStepsOfCells } from './groundDrill'
 import { heatThrottledDrill } from './heatRules'
 import { shockTicksFor } from './magnetic/electrifiedShock'
+import { drillQuantumAt } from './stepBoundRead'
 import type { DrillCarveRequest } from './drillGearCut'
 import type { DrillGates } from './drillGates'
 
@@ -57,10 +59,17 @@ const MM_PER_CELL_DIAGONAL = 1_415
 /** The carve request's world and gates, read as the carry walk's ground. */
 export function carryGroundOf(params: PlanetParams, request: DrillCarveRequest): CarryGround {
   const { world, gates } = request
+  const timed = { gates, quantum: request.window.subStepsPerTick ?? DRILL_SUBSTEPS_PER_TICK }
   return {
     isStop: (tile) => isStopCell(world, params, gates, tile),
-    cellAt: (tile) => carryCellAt(world, params, gates, tile),
+    cellAt: (tile) => carryCellAt(world, params, timed, tile),
   }
+}
+
+/** The carve's gates, timed in the sub-steps a tick its window counts (the drill quantum). */
+interface TimedGates {
+  gates: DrillGates
+  quantum: number
 }
 
 /** A cell standing in the drill's way: solid, not yet opened, and one it cannot cut. */
@@ -78,7 +87,7 @@ function isStopCell(
 function carryCellAt(
   world: WorldState,
   params: PlanetParams,
-  gates: DrillGates,
+  { gates, quantum }: TimedGates,
   tile: TilePoint,
 ): CarryCell {
   const cell = materialCellAt(world, params, tile)
@@ -87,7 +96,7 @@ function carryCellAt(
   const subSteps = gates.drillTicksOf(tile, cell, 0) ?? 0
   return {
     price: uncutPriceOf(subSteps, cellDensitySum(world, params, tile)),
-    energy: cellDigEnergyOf(subSteps),
+    energy: cellDigEnergyOf(subSteps, BASIS_POINTS, quantum),
     isOre: kindOfCell(cell) === CELL_KIND.ore,
     isCarryEnd: kindOfCell(cell) === CELL_KIND.core || isElectrifiedCellAt(params, tile, cell),
   }
@@ -98,16 +107,29 @@ function uncutPriceOf(subSteps: number, densitySum: number): number {
   return Math.ceil((subSteps * densitySum) / (SAMPLES_PER_CELL * SOLID_DENSITY))
 }
 
-/** What the player's tick may spend: a tick's work and any carry it continues, tank and hold. */
-export function carryPurseOf(state: AuthorityState, playerId: string, path: SweepPath): CarryPurse {
+/**
+ * What the player's tick may spend: a tick's work in its drill quantum and any carry it continues,
+ * counted in that quantum (ticket 558), tank and hold.
+ */
+export function carryPurseOf(
+  state: AuthorityState,
+  playerId: string,
+  { path, quantum }: QuantumPath,
+): CarryPurse {
   const vehicle = vehicleOf(state, playerId)
-  const carried = path.isFresh ? 0 : (vehicle.sweptCut?.carrySubSteps ?? 0)
+  const carried = path.isFresh ? 0 : carrySubStepsIn(vehicle.sweptCut, quantum)
   const room = statsOfVehicle(vehicle).cargoCapacity - cargoUnitsOf(vehicle.cargo)
   return {
-    subSteps: DRILL_SUBSTEPS_PER_TICK + carried,
+    subSteps: quantum + carried,
     tank: vehicle.energy,
     room: Math.max(0, room),
   }
+}
+
+/** A tick's path, and the drill quantum its work counts in. */
+export interface QuantumPath {
+  path: SweepPath
+  quantum: number
 }
 
 /** A tick's path, its pose and the world it cuts. */
@@ -172,7 +194,9 @@ export function ungatedPriceOf(
   const cell = materialCellAt(world, params, tile)
   if (!isRemovableCell(cell) || isTileYielded(world, tile)) return 0
   const drill = heatThrottledDrill(params.planetIndex, vehicleOf(state, playerId))
-  const subSteps = drillSubStepsOfCells(params, drill, shockTicksFor(state, playerId))
+  const shockTicksAt = shockTicksFor(state, playerId)
+  const quantum = drillQuantumAt(state, playerId)
+  const subSteps = drillSubStepsOfCells(params, drill, shockTicksAt, quantum)
   return uncutPriceOf(subSteps(tile, cell, 0) ?? 0, cellDensitySum(world, params, tile))
 }
 

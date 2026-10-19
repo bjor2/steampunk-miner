@@ -10,13 +10,13 @@
  * supersede #396 for `drill_power`, and #551's per-planet bars (`drillPaceBars.ts`) replace its
  * drill bars. Under the per-purchase law a band-3 tile can come before the seventh purchase.
  */
-import { DRILL_SUBSTEPS_PER_TICK } from '../constants/balance'
 import { PACING_TARGETS } from '../constants/pacingTargets'
-import { TICKS_PER_SECOND } from '../constants/physics'
 import { UPGRADE_IDS, type UpgradeId } from '../systems/economy/economyDefinition'
 import { blockHardness } from '../systems/economy/oreEconomy'
 import { startLevels, vehicleStatsAt, type UpgradeLevels } from '../systems/economy/vehicleStats'
-import { subStepsPerTile } from '../systems/vehicle/drillRule'
+import { cutCellsPerSecondOf } from '../systems/vehicle/cutSpeed'
+import { drillQuantumOnPlanet } from '../systems/vehicle/drillQuantum'
+import { subStepsPerTileAt } from '../systems/vehicle/drillRule'
 import { bandOfTile } from '../systems/world/planetGeometry'
 import { planetParamsFor } from '../systems/world/planetParams'
 import type { TilePoint } from '../systems/world/tileGrid'
@@ -114,11 +114,12 @@ function bySlowestFirst(a: number | null, b: number | null): number {
   return a - b
 }
 
-/** Band-1 cells of planet 1 a second at `levels`, in the drill law's exact sub-step time. */
+/** Band-1 cells of planet 1 a second at `levels`, in the drill law's sub-step time and quantum. */
 export function bandOneCellsPerSecond(levels: UpgradeLevels): number {
-  const hardness = blockHardness(FIRST_PLANET, 1)
-  const subSteps = subStepsPerTile(vehicleStatsAt(levels), hardness)
-  return subSteps === null ? 0 : (DRILL_SUBSTEPS_PER_TICK * TICKS_PER_SECOND) / subSteps
+  const drill = vehicleStatsAt(levels)
+  const quantum = drillQuantumOnPlanet(drill, FIRST_PLANET)
+  const subSteps = subStepsPerTileAt(quantum, drill, blockHardness(FIRST_PLANET, 1))
+  return subSteps === null ? 0 : cutCellsPerSecondOf(subSteps, quantum)
 }
 
 /** What the run misses of #396's planet 1 drill speeds: 3x the start by band 3, 10 cells/s on leaving. */

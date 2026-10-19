@@ -9,8 +9,10 @@
  * A step that continues its cursor leaves out the gated cells its start's disc already reached, and
  * one that made no headway reports none, so holding the drill against a gate does not repeat it
  * every tick. The cursor keeps the step's own position, from which the next step's bound is
- * measured, and the cut gate read before the cut (`cutFollowRead.ts`, ticket 333).
+ * measured, and the cut gate read before the cut (`cutFollowRead.ts`, ticket 333). Its dig time
+ * and carry count in the tick's drill quantum, which it keeps when above the base (ticket 558).
  */
+import { DRILL_SUBSTEPS_PER_TICK } from '../../constants/balance'
 import type { CutAxis } from '../vehicle/casingTrail'
 import { digSubStepsAfter, pointAtStep, type SweepPath, type SweptCut } from '../vehicle/sweptCut'
 import { SAMPLES_PER_TILE } from '../world/sampleGrid'
@@ -104,11 +106,11 @@ interface CursorReach {
 function withCursorAt(
   state: AuthorityState,
   playerId: string,
-  { step, gate }: Sweep,
+  { step, gate, quantum }: Sweep,
   { reached, passed, digSubSteps, carrySubSteps }: CursorReach,
 ): AuthorityState {
   const vehicle = vehicleOf(state, playerId)
-  const dig = digSubStepsAfter(vehicle.sweptCut, vehicle.accountedTick, digSubSteps)
+  const dig = digSubStepsAfter(vehicle.sweptCut, vehicle.accountedTick, digSubSteps, quantum)
   const cursor: SweptCut = {
     ...reached,
     poseXMm: step.pose.x,
@@ -119,8 +121,14 @@ function withCursorAt(
     cutSharePassed: passed,
     digSubSteps: dig,
     carrySubSteps,
+    ...quantumKeyOf(quantum),
   }
   return withVehicle(state, playerId, { ...vehicle, sweptCut: cursor })
+}
+
+/** The cursor's quantum key: left out at the base, so a base cursor digests as before. */
+function quantumKeyOf(quantum: number): { quantum?: number } {
+  return quantum === DRILL_SUBSTEPS_PER_TICK ? {} : { quantum }
 }
 
 /**

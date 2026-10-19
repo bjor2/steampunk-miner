@@ -26,8 +26,11 @@ export const SWAP_CELL_UNITS = 1
  * about 430 m of bore a tick, which a bare stamp's span crosses in at most 31 chunks (a diagonal
  * through chunk corners, `authority/spanBudget.ts`); 40 leaves room for drill-gear cells beside the
  * bore. Re-set it from the figure the lane prints once the #304/#307 re-baseline has run it.
+ * Scaled with the lifted sub-step floor (ticket 558): a drill's step is no longer held to 60 m a
+ * tick but to the planet's radius, at most 1,000 m on the largest planet, whose bare-stamp span
+ * crosses at most 70 chunks; 80 keeps room for the drill-gear cells beside the bore.
  */
-export const SWEPT_SPAN_CHUNKS_PER_TICK = 40
+export const SWEPT_SPAN_CHUNKS_PER_TICK = 80
 
 /** At most 2 chunks touched per tick: at most 6 render rebuilds, final within 6 frames (#162). */
 export const TERRAIN_EDIT_CHUNKS_PER_TICK = 2

@@ -25,6 +25,7 @@ import {
   type ChargedLawWork,
 } from '../systems/authority/lawWorkFixtures'
 import { planetParamsOf } from '../systems/authority/planetOfState'
+import { drillQuantumAt } from '../systems/authority/stepBoundRead'
 import type { Vector2 } from '../systems/vehicle/localFrame'
 import { ENERGY_QUANTA_PER_TICK } from '../systems/vehicle/energyQuanta'
 import { stepDigTicksOf } from '../systems/vehicle/sweptCut'
@@ -59,7 +60,9 @@ export function openDigSpeedWindow(sink: MemorySink): DigSpeedWindow {
     const params = planetParamsOf(before.planet)
     if (params !== null) {
       const tiles = tilesAround(positions.at(-1) ?? read.position, WATCH_CELLS)
-      const change = lawWorkOfChange(before, readAuthorityState().world, params, playerId(), tiles)
+      const after = readAuthorityState().world
+      const quantum = drillQuantumAt(before, playerId())
+      const change = lawWorkOfChange(before, after, params, playerId(), tiles, quantum)
       law = addLawWork(law, change)
     }
     for (const report of reportsOf(sink.commands.slice(commandsSeen))) {

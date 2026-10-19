@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { BASIS_POINTS } from '../../constants/balance'
+import { BASIS_POINTS, DRILL_SUBSTEPS_PER_TICK } from '../../constants/balance'
 import { ENERGY_QUANTA_PER_TICK } from './energyQuanta'
 import {
   CUT_ENERGY_DENOMINATOR,
@@ -21,7 +21,7 @@ const FULL_TANK = 1_000_000
 
 /** A tally with every cell at the drill's whole share. */
 function wholeShare(law: number): LawWorkTally {
-  return { law, lawBp: law * BASIS_POINTS }
+  return { law, lawBp: law * BASIS_POINTS, quantum: DRILL_SUBSTEPS_PER_TICK }
 }
 
 /** Pays each tally in turn from a full tank; the quanta paid, heat ticks and the vehicle after. */
@@ -66,7 +66,7 @@ describe('cut carry (ticket 535)', () => {
 
   it('prices a gear cell at its share and heats it whole', () => {
     const law = LAW_WORK_PER_DRILL_TICK * 2
-    const half = { law, lawBp: law * (BASIS_POINTS / 2) }
+    const half = { law, lawBp: law * (BASIS_POINTS / 2), quantum: DRILL_SUBSTEPS_PER_TICK }
     const paid = payLawWork({}, half, FULL_TANK)
     expect(paid.quanta).toBe(DRILL_QUANTA)
     expect(splitCutHeatCarry(paid.vehicle).heatTicks).toBe(2)
@@ -120,5 +120,54 @@ describe('cut carry, energy only (ticket 540)', () => {
       quanta: 5,
       vehicle: { cutEnergyCarry: (3 * DRILL_QUANTA - 5) * CUT_ENERGY_DENOMINATOR },
     })
+  })
+})
+
+// Ticket 558: the swept cut tallies in the rig's drill quantum, the base doubled, and the carry
+// counts in the larger of its own quantum and the tally's, so it stays exact across both.
+describe('the energy carry in a lifted drill quantum (ticket 558)', () => {
+  const LIFTED = DRILL_SUBSTEPS_PER_TICK * 4
+
+  function liftedShare(law: number): LawWorkTally {
+    return { law, lawBp: law * BASIS_POINTS, quantum: LIFTED }
+  }
+
+  it('pays a lifted tally as the same law work at the base quantum would cost', () => {
+    const none: { cutEnergyCarry?: number; cutEnergyCarryQuantum?: number } = {}
+    const base = payLawWorkEnergy(none, wholeShare(LAW_WORK_PER_DRILL_TICK * 3 + 17), FULL_TANK)
+    const lifted = payLawWorkEnergy(
+      {},
+      liftedShare((LAW_WORK_PER_DRILL_TICK * 3 + 17) * 4),
+      FULL_TANK,
+    )
+    expect(lifted.quanta).toBe(base.quanta)
+    expect(lifted.vehicle).toEqual({
+      cutEnergyCarry: 4 * (base.vehicle.cutEnergyCarry ?? 0),
+      cutEnergyCarryQuantum: LIFTED,
+    })
+  })
+
+  it('keeps the charge exact over base and lifted tallies in any order', () => {
+    const tallies = [wholeShare(123_457), liftedShare(7), wholeShare(31), liftedShare(999_999)]
+    let vehicle: { cutEnergyCarry?: number; cutEnergyCarryQuantum?: number } = {}
+    let quanta = 0
+    for (const tally of tallies) {
+      const paid = payLawWorkEnergy(vehicle, tally, FULL_TANK)
+      quanta += paid.quanta
+      vehicle = paid.vehicle
+    }
+    const owedInLifted = (123_457 + 31) * 4 + 7 + 999_999
+    const denominator = CUT_ENERGY_DENOMINATOR * 4
+    expect(quanta * denominator + (vehicle.cutEnergyCarry ?? 0)).toBe(
+      owedInLifted * BASIS_POINTS * DRILL_QUANTA,
+    )
+    expect(vehicle.cutEnergyCarryQuantum).toBe(LIFTED)
+  })
+
+  it('leaves the quantum out with no carry, and drops it with the carry', () => {
+    const paidWhole = payLawWorkEnergy({}, liftedShare(LAW_WORK_PER_DRILL_TICK * 4), FULL_TANK)
+    expect(paidWhole).toEqual({ quanta: DRILL_QUANTA, vehicle: {} })
+    const carried = payLawWorkEnergy({}, liftedShare(5), FULL_TANK).vehicle
+    expect(withoutCutCarry(carried)).toEqual({})
   })
 })

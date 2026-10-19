@@ -27,7 +27,7 @@ import { cellAt, EMPTY_WORLD } from '../world/worldState'
 import type { CommandIntent } from './authorityCommand'
 import { createAuthorityState, vehicleOf, type AuthorityState } from './authorityState'
 import { setCasingGradeCommand } from './casingDebugCommands'
-import { lawWorkOfGroundChanges } from './cutCarryFixtures'
+import { lawQuantumOfCommand, lawWorkOfGroundChanges } from './cutCarryFixtures'
 import type { DomainEvent } from './domainEvent'
 import {
   continueScriptedSession,
@@ -50,9 +50,12 @@ export const SLAB_TILES = {
   cache: { tx: COLUMN, ty: SURFACE_TY - 13 },
   foot: { tx: COLUMN, ty: SURFACE_TY - 24 },
 } as const
-/** Rock round the bore, cells either side of the column and rows under the foot (the cut's lead). */
+/**
+ * Rock round the bore, cells either side of the column and rows under the foot (the cut's lead):
+ * the swept stamp sits the cutting bound ahead of the body, 140 m at 8400 m/s (ticket 558).
+ */
 const ROCK_HALF_WIDTH = 3
-const ROCK_UNDER_FOOT = 70
+const ROCK_UNDER_FOOT = 160
 const SURFACE_ORE_SCANNED = 40
 const START = { x: COLUMN * 1000 + 500, y: (SURFACE_TY + 3) * 1000 + 500 }
 /** The body rests with its report stamp on the foot cell's floor. */
@@ -104,7 +107,10 @@ export interface SlabRun {
   events: DomainEvent[]
   /** The tank's fall over the cut, less the reports' drive charge. */
   energy: number
-  /** The law work every command removed, read from the ground (`lawWorkOfGroundChanges`). */
+  /**
+   * The law work every command removed, read from the ground (`lawWorkOfGroundChanges`) in base
+   * sub-steps, each step's at the rig's drill quantum (ticket 558).
+   */
   lawWork: number
   /** The first tick the body stood at the column's foot; null if it never got there. */
   arrivedTick: number | null
@@ -289,7 +295,8 @@ function submitTallied(
   const after = session.vehicle(CUTTING_PLAYER)
   const movement = command.type === 'reportPose' ? command.payload.driveTicks : 0
   run.energy += before.energy - after.energy - movement * ENERGY_QUANTA_PER_TICK.drive
-  run.lawWork += lawWorkOfGroundChanges(was, session.state().world, events, CUTTING_PLAYER)
+  const quantum = lawQuantumOfCommand(was, command, CUTTING_PLAYER)
+  run.lawWork += lawWorkOfGroundChanges(was, session.state().world, events, CUTTING_PLAYER, quantum)
   run.events.push(...events)
   return elapsedMs
 }

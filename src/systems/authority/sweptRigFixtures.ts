@@ -19,6 +19,8 @@ import { startLevels, vehicleStatsAt } from '../economy/vehicleStats'
 import { NO_DRIVE } from '../vehicle/driveSigns'
 import { div, fromSafeInteger, mul, type BigStat } from '../money'
 import { drillWorkPerTick, subStepsPerTile, tileWorkToBreak } from '../vehicle/drillRule'
+import { drillQuantumOnPlanet } from '../vehicle/drillQuantum'
+import { quantumOfCursor, type SweptCut } from '../vehicle/sweptCut'
 import { FACING, facingVectorOf, noseTileOf, type VehiclePose } from '../vehicle/vehiclePose'
 import { groundReaderOf, type GroundReader } from '../world/groundReader'
 import { ISO_DENSITY } from '../world/sampleGrid'
@@ -76,6 +78,11 @@ export function subStepsAtDrillStep(drillStep: number): number {
 export function bandOneCellCostAt(drillStep: number): BigStat {
   const subStepWork = mul(tileWorkToBreak(BAND_ONE_ROCK), fromSafeInteger(DRILL_SUBSTEPS_PER_TICK))
   return div(subStepWork, drillWorkPerTick(drillAtStep(drillStep), BAND_ONE_ROCK))
+}
+
+/** The drill quantum a drill_power step cuts planet 1 in (ticket 558, `drillQuantum.ts`). */
+export function quantumAtDrillStep(drillStep: number): number {
+  return drillQuantumOnPlanet(drillAtStep(drillStep), PARAMS.planetIndex)
 }
 
 /** The lowest drill_power step cutting a band-1 cell in at most the rig's sub-steps. */
@@ -304,10 +311,19 @@ export function poseAlong(leg: Leg, along: number): VehiclePose {
   return { x: at.xMm, y: at.yMm, vx: 0, vy: 0, upx: leg.upx, upy: leg.upy, facing: FACING.down }
 }
 
-/** Sub-steps the leg's ticks spent: a tick's work each, less what the last one carries on. */
+/**
+ * Sub-steps the leg's ticks spent, in the base quantum (a lifted one read back exactly, ticket
+ * 558): a tick's work each, less what the last one carries on.
+ */
 export function subStepsSpentBy(run: LegRun): number {
   const cursor = vehicleOf(run.ticks[run.ticks.length - 1].state, 'p1').sweptCut
-  return run.ticks.length * DRILL_SUBSTEPS_PER_TICK - (cursor?.carrySubSteps ?? 0)
+  const carried = cursor === undefined ? 0 : cursor.carrySubSteps / quantumScaleOf(cursor)
+  return run.ticks.length * DRILL_SUBSTEPS_PER_TICK - carried
+}
+
+/** How many base sub-steps one of the cursor's makes up: its quantum over 60 (ticket 558). */
+function quantumScaleOf(cursor: SweptCut): number {
+  return quantumOfCursor(cursor) / DRILL_SUBSTEPS_PER_TICK
 }
 
 /** Every event the leg's ticks answered. */

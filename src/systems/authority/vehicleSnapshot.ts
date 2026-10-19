@@ -8,6 +8,7 @@ import { isChargeSize } from '../economy/chargeSizes'
 import type { AheadBearing, BoreSide } from '../economy/drillGearCaps'
 import { STANDARD_LINING_TYPE } from '../economy/heatEconomy'
 import { fromCanonical, isNonNegativeMoneyText, toCanonical, type Money } from '../money'
+import { isLiftedDrillQuantum } from '../vehicle/drillQuantum'
 import { BORE_SIDES } from '../vehicle/facedSide'
 import { isFacing, type VehiclePose } from '../vehicle/vehiclePose'
 import { isGunMode } from '../vehicle/vehicleGun'
@@ -144,6 +145,12 @@ export function portableVehicleProblems(vehicle: unknown, path: string): string[
     ...(vehicle.cutEnergyCarry === undefined || isPortableCutEnergyCarry(vehicle.cutEnergyCarry)
       ? []
       : [`${path}.cutEnergyCarry must be a whole number above 0, or be left out`]),
+    ...(vehicle.cutEnergyCarryQuantum === undefined ||
+    isPortableCarryQuantum(vehicle.cutEnergyCarryQuantum, vehicle.cutEnergyCarry)
+      ? []
+      : [
+          `${path}.cutEnergyCarryQuantum must be a drill quantum above 60 beside a carry, or be left out`,
+        ]),
     ...(vehicle.cutHeatCarry === undefined || isPortableCutHeatCarry(vehicle.cutHeatCarry)
       ? []
       : [`${path}.cutHeatCarry must be whole law work above 0, or be left out`]),
@@ -259,7 +266,10 @@ function isPortableHeat(heat: unknown): boolean {
   )
 }
 
-/** The swept cut's cursor (tickets 330, 333, 335, 399): reach, step, cut gate, share, dig time, carry. */
+/**
+ * The swept cut's cursor (tickets 330, 333, 335, 399): reach, step, cut gate, share, dig time, carry,
+ * and the drill quantum those count in when above the base (ticket 558).
+ */
 function isPortableSweptCut(cursor: unknown): boolean {
   return (
     isJsonObject(cursor) &&
@@ -272,8 +282,14 @@ function isPortableSweptCut(cursor: unknown): boolean {
     isWholeNumber(cursor.cutGateLowTicks) &&
     isWholeNumber(cursor.cutSharePassed) &&
     isWholeNumber(cursor.digSubSteps) &&
-    isWholeNumber(cursor.carrySubSteps)
+    isWholeNumber(cursor.carrySubSteps) &&
+    (cursor.quantum === undefined || isLiftedDrillQuantum(cursor.quantum))
   )
+}
+
+/** The energy carry's quantum (ticket 558): a lifted drill quantum, only beside a carry. */
+function isPortableCarryQuantum(quantum: unknown, carry: unknown): boolean {
+  return carry !== undefined && isLiftedDrillQuantum(quantum)
 }
 
 /** The report cut's energy carry (ticket 535): above 0 (left out at 0); a clamped tank's debt may exceed a quantum. */

@@ -18,15 +18,20 @@
  * band already reaches the top speed it would buy (the #418 reading, GD option a; ticket 553): a
  * step that still speeds travel deeper down does something. With no max level (HS and VS on #551)
  * the step is still sold, and the card shows the ratio `speedMax / (k * cutSpeed)` that says why.
+ *
+ * The drill's part counts in its own drill quantum and never passes the planet's radius a tick
+ * (ticket 558), as the step bound does.
  */
 import { blockHardness } from '../economy/oreEconomy'
 import { ECONOMY } from '../economy/economy'
 import { engineStatsAtStep, type EngineStats } from '../economy/vehicleStats'
 import { cmp, floor, fromSafeInteger, mul, toSafeInteger, type BigStat } from '../money'
+import { MM_PER_METRE } from '../../constants/physics'
 import { BAND_COUNT, bandOfTile } from '../world/planetGeometry'
 import type { PlanetParams } from '../world/planetParams'
 import { cutStepMmOf, metresPerSecondOfStep } from './cutSpeed'
-import { subStepsPerTile, type DrillStats } from './drillRule'
+import { drillQuantumOnPlanet } from './drillQuantum'
+import { subStepsPerTileAt, type DrillStats } from './drillRule'
 import { tileOfMillimetres } from './vehiclePose'
 import { statsOfVehicle, type VehicleState } from './vehicleState'
 
@@ -75,7 +80,9 @@ export function engineParityRatioOf(
 /** `k * cutSpeed` in m/s through the rock of the planet's hardest band; 0 where it cannot cut. */
 function hardestBandDrillTravelOf(vehicle: VehicleState, params: PlanetParams): number {
   const stats = statsOfVehicle(vehicle)
-  return metresPerSecondOfStep(travelStepThrough(stats, hardestBandRockHardnessOf(params)))
+  return metresPerSecondOfStep(
+    drillTravelOnPlanet(stats, hardestBandRockHardnessOf(params), params),
+  )
 }
 
 /** `k * cutSpeed` of the drill in the rock of the band the vehicle stands in; 0 with no pose. */
@@ -85,7 +92,30 @@ function drillTravelStepOf(
   params: PlanetParams | null,
 ): number {
   const hardness = bandRockHardnessOf(vehicle, params)
-  return hardness === null ? 0 : travelStepThrough(drill, hardness)
+  return hardness === null || params === null ? 0 : drillTravelOnPlanet(drill, hardness, params)
+}
+
+/**
+ * `k * cutSpeed` through `hardness` on the planet of `params`: in the drill's quantum, no further a
+ * tick than the planet's radius (ticket 558).
+ */
+export function drillTravelOnPlanet(
+  drill: DrillStats,
+  hardness: BigStat,
+  params: PlanetParams,
+): number {
+  const quantum = drillQuantumOnPlanet(drill, params.planetIndex)
+  return stepWithinPlanetMm(travelStepThrough(drill, hardness, quantum), params)
+}
+
+/**
+ * A step no longer than the planet's radius, the depth from its surface to its centre (ticket 558,
+ * the TD's c-speed50 section 3c): past the lifted sub-step floor a drill's step grows without
+ * bound, and a tick never needs to move the rig further than that, so the step bound, its squares
+ * and the f32 body stay small at any drill power.
+ */
+export function stepWithinPlanetMm(stepMm: number, params: PlanetParams): number {
+  return Math.min(stepMm, params.radiusTiles * MM_PER_METRE)
 }
 
 /** The nominal ground: the rock of the band the vehicle stands in; null off a planet or posed nowhere. */
@@ -108,10 +138,13 @@ export function hardestBandRockHardnessOf(params: PlanetParams): BigStat {
   return hardest
 }
 
-/** `floor(k * cutStep)` through ground of `hardness`; 0 where the tip cannot scratch it. */
-export function travelStepThrough(drill: DrillStats, hardness: BigStat): number {
-  const subSteps = subStepsPerTile(drill, hardness)
+/**
+ * `floor(k * cutStep)` through ground of `hardness`, the drill timed in `quantum` sub-steps a tick
+ * (its drill quantum, ticket 558); 0 where the tip cannot scratch it.
+ */
+export function travelStepThrough(drill: DrillStats, hardness: BigStat, quantum: number): number {
+  const subSteps = subStepsPerTileAt(quantum, drill, hardness)
   if (subSteps === null) return 0
-  const cutStep = fromSafeInteger(cutStepMmOf(subSteps))
+  const cutStep = fromSafeInteger(cutStepMmOf(subSteps, quantum))
   return toSafeInteger(floor(mul(ECONOMY.drill.travelParityK, cutStep)))
 }

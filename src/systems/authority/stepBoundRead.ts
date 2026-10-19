@@ -1,7 +1,8 @@
 /**
  * The stats-derived pose bound as the authority reads it (TD scope a on #316, ticket 334,
  * `vehicle/stepBound.ts`), from the rig's stats and the band of its reported pose, so the client
- * that reads the same state clamps its body to the same numbers.
+ * that reads the same state clamps its body to the same numbers; and the drill quantum the bound's
+ * cut step and the swept cut count in (ticket 558).
  *
  * - A `drillStep` may be no further from the last accepted position than the bound of the cut gate
  *   the rig moved off it under (the cursor's, idled to that tick), plus the travelling bound for
@@ -13,6 +14,7 @@
  */
 import { DRILL_STAMP_AHEAD_MM } from '../../constants/balance'
 import { CLOSED_CUT_GATE, idledCutGate, isCutGateOpen, type CutGate } from '../vehicle/cutGate'
+import { drillQuantumOfVehicle } from '../vehicle/drillQuantum'
 import { stepBoundMmOf, stepBoundsOf, type StepBounds } from '../vehicle/stepBound'
 import type { SweptCut } from '../vehicle/sweptCut'
 import { vehicleOf, type AuthorityState } from './authorityState'
@@ -20,6 +22,11 @@ import { planetParamsOf } from './planetOfState'
 
 export function stepBoundsAt(state: AuthorityState, playerId: string): StepBounds {
   return stepBoundsOf(vehicleOf(state, playerId), planetParamsOf(state.planet))
+}
+
+/** The sub-steps a tick the player's swept cut counts in (ticket 558, `drillQuantum.ts`). */
+export function drillQuantumAt(state: AuthorityState, playerId: string): number {
+  return drillQuantumOfVehicle(vehicleOf(state, playerId), planetParamsOf(state.planet))
 }
 
 /** How far a step may be from a position accepted `ticks` ticks before, left under `gate`. */

@@ -53,6 +53,16 @@ export function drillQuantumOnPlanet(drill: DrillStats, planetIndex: number): nu
   return drillQuantumOf(drill, blockHardness(planetIndex, SOFTEST_BAND))
 }
 
+/** A quantum above the base this rule can answer: 60 doubled 1 to 11 times (saves, ticket 558). */
+export function isLiftedDrillQuantum(value: unknown): boolean {
+  let quantum = DRILL_SUBSTEPS_PER_TICK
+  for (let doubling = 0; doubling < DRILL_QUANTUM_MAX_DOUBLINGS; doubling++) {
+    quantum *= 2
+    if (value === quantum) return true
+  }
+  return false
+}
+
 /**
  * Sub-steps of quantum `from` in quantum `to`: exact when `to` is the larger (a whole multiple),
  * rounded down when it is the smaller.

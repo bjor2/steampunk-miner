@@ -24,6 +24,7 @@ import { DRILL_SUBSTEPS_PER_TICK } from '../../constants/balance'
 import { UP_VECTOR_SCALE } from '../../constants/physics'
 import type { DiscStamp, StampPoint } from '../world/stampShape'
 import type { CutGate } from './cutGate'
+import { subStepsInQuantum } from './drillQuantum'
 import type { TilePoint } from '../world/tileGrid'
 import { facingVectorOf, tileOfMillimetres, type Facing, type VehiclePose } from './vehiclePose'
 
@@ -47,26 +48,46 @@ export interface SweptCut extends StampPoint, CutGate {
   cutSharePassed: number
   digSubSteps: number
   carrySubSteps: number
+  /**
+   * The drill quantum `digSubSteps` and `carrySubSteps` count in (ticket 558, `drillQuantum.ts`):
+   * absent at the base 60, so a cursor that never left it digests as before.
+   */
+  quantum?: number
+}
+
+/** The sub-steps a tick the cursor's dig time and carry count in. */
+export function quantumOfCursor(cursor: SweptCut): number {
+  return cursor.quantum ?? DRILL_SUBSTEPS_PER_TICK
+}
+
+/** The work the cursor carries toward its next cell, in sub-steps of `quantum`. */
+export function carrySubStepsIn(cursor: SweptCut | undefined, quantum: number): number {
+  if (cursor === undefined) return 0
+  return subStepsInQuantum(cursor.carrySubSteps, quantumOfCursor(cursor), quantum)
 }
 
 /**
- * The cursor's dig time after a step that cut `added` sub-steps: added to the steps' since the last
- * charged report (`accountedTick`), or to what that report left of a whole tick (TD lock on #374:
- * heat comes from summed dig time, so overheat never becomes a hidden speed cap).
+ * The cursor's dig time after a step that cut `added` sub-steps of `quantum`: added to the steps'
+ * since the last charged report (`accountedTick`), or to what that report left of a whole tick (TD
+ * lock on #374: heat comes from summed dig time, so overheat never becomes a hidden speed cap),
+ * either first counted in `quantum`.
  */
 export function digSubStepsAfter(
   cursor: SweptCut | undefined,
   accountedTick: number,
   added: number,
+  quantum: number = DRILL_SUBSTEPS_PER_TICK,
 ): number {
   if (cursor === undefined) return added
   const isSinceReport = cursor.tick > accountedTick
-  return (isSinceReport ? cursor.digSubSteps : cursor.digSubSteps % DRILL_SUBSTEPS_PER_TICK) + added
+  const own = quantumOfCursor(cursor)
+  const kept = isSinceReport ? cursor.digSubSteps : cursor.digSubSteps % own
+  return subStepsInQuantum(kept, own, quantum) + added
 }
 
 /** The whole ticks of drilling a report heats for: the steps' summed dig time since the last. */
 export function stepDigTicksOf(cursor: SweptCut): number {
-  return Math.floor(cursor.digSubSteps / DRILL_SUBSTEPS_PER_TICK)
+  return Math.floor(cursor.digSubSteps / quantumOfCursor(cursor))
 }
 
 /** One step's path for the stamp's centre. */
