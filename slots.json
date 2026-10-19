@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-10-19T09:49:10+02:00",
+  "updated_at": "2026-10-19T09:52:37+02:00",
   "caps": {
     "grok": 12,
     "claude": 10,
@@ -70,7 +70,7 @@
       "size": 6,
       "used": 1,
       "free": 5,
-      "claims_last_hour": 1,
+      "claims_last_hour": 0,
       "name": "Claude Max 1"
     },
     {
@@ -121,41 +121,23 @@
     }
   ],
   "gate": {
-    "busy": 0,
+    "busy": 1,
     "max": 3
   },
   "tester": {
     "state": "running",
     "phase": "fast",
-    "sha": "40f7723968bf215d9793d5d016db379ef02df8d6",
-    "since": "2026-10-19T07:48:54Z",
-    "holds_gate": false,
+    "sha": "a47edaf9872878eaf90da1a47553db53e3a7e078",
+    "since": "2026-10-19T07:52:23Z",
+    "holds_gate": true,
     "claude_slot": null,
-    "last_run": "2026-10-19T05:45:23Z",
+    "last_run": "2026-10-19T07:52:18Z",
     "last_nightly": "2026-10-15T20:43:15Z",
     "last_nightly_result": "full=FAIL balance-report=ok bench=FAIL balance-planets=ok balance-guns=ok balance-charges=ok balance-refinery=ok balance-heat=ok e2e=FAIL memory-soak=FAIL packaged-smoke=ok ",
     "main_red_sha": null,
-    "feature": 422,
-    "feature_title": "Spec: UI text budget, readable text, steampunk scroll area and tooltip",
+    "feature": 255,
+    "feature_title": "Grilling: Lane forks (two specialisations per lane at P16)",
     "queue": [
-      {
-        "feature": 255,
-        "kind": "spec",
-        "title": "Grilling: Lane forks (two specialisations per lane at P16)",
-        "tickets": [
-          259,
-          267,
-          268,
-          269,
-          270,
-          271,
-          359,
-          391,
-          392,
-          410
-        ],
-        "since": "2026-10-16T07:41:39+02:00"
-      },
       {
         "feature": 157,
         "kind": "spec",
