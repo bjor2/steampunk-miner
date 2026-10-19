@@ -639,6 +639,26 @@ incomePerHour}` go to `balance-report/drill-pace.ndjson`, which `pushTestMetrics
   gates at landing, the heat fed against the law less one drill tick (the hard bar at the flip,
   VS 6234998337), the share the #113 cap drops (#541) and the shipped price against the law and
   the law charge (about 2 min, writes `balance-report/swept-law-slab.ndjson`).
+- **Speed scaling at 84 and 840 m/s** (ticket 560, #551 ticket C): `src/systems/authority/speedSlabFixtures.ts`
+  scripts a planet-1 column (plain rock, a first ore cell, a probe-gated ore cell, a cache tile
+  under it) and cuts it by `drillStep` a tick and a report every 12, the body keeping pace with the
+  cut, with the weakest rig whose law step reaches the stride (purchase 20 at 84 m/s, 31 at 840),
+  so the authority's own bound clamps every step. `speedScaling.test.ts` holds, at each speed:
+  ten seconds with no refusal; the gate reported once with the carry stopped dead and nothing under
+  it carved; each scripted cell yielded once; every cell the stamp wholly crosses broken and none
+  beyond its reach; the tank paying the law work removed exactly within the integer carry, under
+  1.25 and 1.098; walk order and the cutting player's stamp; the same digest on a second run; the
+  84 m/s casing (points never under 500 mm apart, rings at the full lag, one per 500 mm, no own
+  lining cut); a cold slab and a prefetched one cutting the same ground. 8400 m/s is an `it.todo`
+  until #558 lifts the 3600 m/s sub-step floor. The codex half (first-ore and material records once
+  a cell, in walk order) is `src/features/codex/systems/contactsAtSpeed.test.ts`; the 84 m/s
+  collapse outrun (#341 stands: cancelled, nothing refilled or crushed, cut events as past a
+  tunnel that never warned, braced blocks never refilled) is
+  `src/systems/authority/collapse/collapseAtSpeed.test.ts`, with its strip and rumble row in
+  `hazardStripSampler.test.ts`; engine travel at 100 and 240 m/s on the authority path is
+  `travelAtSpeed.test.ts`. The lane `speedScaling.lane.test.ts` times the moving ticks at width 7
+  on a warm cache against p50 3 ms. The flag-off path above 18 m/s (`drill.sweptCut` off: the
+  18 m/s clamp and the 950 mm capsule) is unsupported, not a pass; nothing here covers it.
 - **Report capsule** (ticket 537, A7 "carve geometry at interval 1", the TD shape 6228947744
   section 4 with the HS additions, bounded to interval 1 by the GD's ruling after the prototype
   round 6241320435): behind the authority dev flag `drill.reportCapsule` (on) a pose report at
@@ -1220,6 +1240,11 @@ incomePerHour}` go to `balance-report/drill-pace.ndjson`, which `pushTestMetrics
   `test-metrics` for the Tests tab and the Drill speed panel ([loop-status.md](loop-status.md#drill-down-run-ticket-416)). It
   watches and does not judge: it asserts only that the vehicle went down and did not stall at 0.
   The speed ladder assertion is #409's. Box Tester slow tier and nightly only.
+- **L20 drill-speed anchor** (ticket 560): `e2e/browser/drillSpeedAnchor.spec.ts` holds the real
+  Down key from the same start save at drill purchases 1 and 20 and reads the felt speed between
+  the first and the last report inside band 1, by report ticks, not wall time. It asserts
+  D(20) / D(1) in [60, 65] and prints the L20 m/s against 83.9 m/s (VS's -2.7% to +0.5% band,
+  reported), with the band-1 hardness and tip. Box Tester only.
 - **Memory soak** (#99): `npm run soak:memory` builds, starts `vite preview` and drives the vehicle
   for 10 minutes through chunk cycles (dock, undock, right 8 s, down 8 s, left 4 s, right 4 s) with
   Playwright, reading the counts only through `ui.getRendererMemory()` and `getPhysicsStats()` and

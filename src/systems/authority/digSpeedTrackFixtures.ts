@@ -1,6 +1,7 @@
 /**
  * A fixed pose track through planet 1's ground, cut by the authority at a set speed, for the
- * dig-speed STOP of ticket 514 at speeds the live loop cannot reach (the body is held to 18 m/s):
+ * dig-speed STOP of ticket 514 with the same poses on every path, whatever the body would do (held
+ * to 18 m/s only on the flag-off path, unsupported above it; the swept body's bound is the rig's):
  * the Vertical Scaler's 25, 44, 240 and 3600 m/s rows, flat and tilted, level and down (VS
  * 6226431087 and the A5 ruling 6226528512, quoted by the TD's v2 6226459471). The track is the TD's
  * probe cut (`scripts/bench/reportPoseRigs.ts`): 279.5 m from the centre, 10 m west of the dock

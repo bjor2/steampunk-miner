@@ -1,11 +1,12 @@
 /**
  * The slab replay of the report cut's charge (ticket 535, A6: the reference rows of the TD shape
- * 6228682000 as VS 6228674086 and the GD 6228674068 ruled them). The real loop holds the body to
- * 18 m/s and the swept cut jams on planet 1 at 240 and 3600 m/s (#439), so every reference row is
- * read here instead: one prescribed pose list per speed on planet 1's fixed seed, a flat track
+ * 6228682000 as VS 6228674086 and the GD 6228674068 ruled them). Every reference row is read
+ * here, where a body cannot change it: one prescribed pose list per speed on planet 1's fixed seed
+ * (when written the live body was held to 18 m/s and the cut jammed at 240 and 3600 m/s; #439
+ * fixed the jam and the swept cut's body bound comes from the rig's stats), a flat track
  * (up along the dock column) and one tilted 30 degrees round the centre, level through band 1 or
  * down from just under the surface, fed tick by tick through the pure authority with no body, so
- * nothing jams and the same poses and ground go to every path:
+ * the same poses and ground go to every path:
  *
  * - `swept`: a `drillStep` every tick and a pose report every 12 (the cut by steps, the reference);
  * - `exact @12` and `exact @1`: the report cut with the charge on, a report every 12 ticks or every
