@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-10-19T05:21:34+02:00",
+  "updated_at": "2026-10-19T05:24:11+02:00",
   "caps": {
     "grok": 12,
     "claude": 10,
@@ -83,12 +83,11 @@
       "slots": [
         {
           "slot": "C7",
-          "state": "busy",
-          "ticket": 564,
-          "grok_slot": 3,
-          "kind": "dev",
-          "since": "2026-10-19T05:21:00+02:00",
-          "wave": "316-5D"
+          "state": "free",
+          "ticket": null,
+          "grok_slot": null,
+          "kind": null,
+          "since": null
         },
         {
           "slot": "C8",
@@ -116,8 +115,8 @@
         }
       ],
       "size": 4,
-      "used": 1,
-      "free": 3,
+      "used": 0,
+      "free": 4,
       "claims_last_hour": 1,
       "name": "Claude Max 2"
     }
@@ -318,11 +317,9 @@
     },
     {
       "slot": 3,
-      "state": "dev",
-      "ticket": 564,
-      "since": "2026-10-19T05:21:00+02:00",
-      "claude_slot": 7,
-      "wave": "316-5D"
+      "state": "free",
+      "ticket": null,
+      "since": null
     },
     {
       "slot": 4,
@@ -432,12 +429,11 @@
     },
     {
       "slot": 7,
-      "state": "busy",
-      "ticket": 564,
-      "grok_slot": 3,
-      "since": "2026-10-19T05:21:00+02:00",
-      "account": 2,
-      "wave": "316-5D"
+      "state": "free",
+      "ticket": null,
+      "grok_slot": null,
+      "since": null,
+      "account": 2
     },
     {
       "slot": 8,
@@ -465,17 +461,17 @@
     }
   ],
   "last_refill": {
-    "at": "2026-10-19 05:21 CEST",
+    "at": "2026-10-19 05:24 CEST",
     "mode": "refill-dev",
-    "triggers": "claude-run:wave-plan",
-    "started": "#554->C2/A1 #564->C7/A2",
-    "note": "spawned 2 worker(s)"
+    "triggers": "#564",
+    "started": "",
+    "note": "no pickable build ticket"
   },
   "totals": {
     "grok": {
       "size": 12,
-      "used": 3,
-      "dev": 3,
+      "used": 2,
+      "dev": 2,
       "dev_cap": 8,
       "planner": 0,
       "planner_cap": 4
@@ -483,8 +479,8 @@
     "claude": {
       "size": 10,
       "enabled": 10,
-      "used": 3,
-      "free": 7,
+      "used": 2,
+      "free": 8,
       "external": 0
     }
   },
@@ -518,7 +514,7 @@
           565
         ],
         "done": [],
-        "live": 1
+        "live": 0
       },
       {
         "number": 561,
