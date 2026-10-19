@@ -22,6 +22,9 @@
  * lure in reach instead (`enemyLures`), and hunts the vehicle again once it ends. A wind-up, lunge
  * or recoil under way goes on, and a wrecker never hears a lure.
  *
+ * An enemy riding a drill's nose (ticket 564, `noseRide.ts`) does nothing of its own: it is carried
+ * and drilled until its dwell ends, frozen or not.
+ *
  * A burrower a slice flushes (`enemyFlushes`, ticket 386) leaves the hunt for the nearest exposed
  * face instead, and once out hunts through open cells only while the flush lasts
  * (`burrowerFlush.ts`); a wind-up, lunge or recoil under way goes on.
@@ -57,6 +60,7 @@ import {
   type Terrain,
 } from './enemyMovement'
 import { flushMoveOf } from './burrowerFlush'
+import { rideTheNose } from './noseRide'
 import { ticksInPhase, updated, type EnemyTurn, type PhaseStep } from './enemyTurn'
 import { vehicleTargetOf, type VehicleTarget } from './vehicleTarget'
 import { fleeIntoRock, gnawRing, seekRing } from './wreckerBehaviour'
@@ -126,6 +130,7 @@ export function stepEnemy(
 ): RuleEffect {
   const enemy = enemyById(state.combat, enemyId)
   if (enemy === undefined) return unchanged(state)
+  if (enemy.ride !== undefined) return rideTheNose(state, enemy, tick)
   const target = vehicleTargetOf(state, enemy.ownerId, tick)
   if (target === null) return waitIdle(state, enemy, tick)
   const turn: EnemyTurn = { state, enemy, target, terrain, tick }

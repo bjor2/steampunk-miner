@@ -175,8 +175,14 @@ function enemyProblems(enemy: unknown, path: string): string[] {
     isIntegerStep(enemy.step) &&
     isPortablePendingDrill(enemy.pendingDrill) &&
     (enemy.ring === null || isRingPoint(enemy.ring)) &&
-    (enemy.knockedTick === undefined || isWholeNumber(enemy.knockedTick))
+    (enemy.knockedTick === undefined || isWholeNumber(enemy.knockedTick)) &&
+    (enemy.ride === undefined || isNoseRide(enemy.ride))
   return isValid ? [] : [`${path} is malformed`]
+}
+
+/** A nose ride (ticket 564): the player riding it and the tick it dies on. */
+function isNoseRide(ride: unknown): boolean {
+  return isJsonObject(ride) && typeof ride.by === 'string' && isWholeNumber(ride.untilTick)
 }
 
 /** Each vehicle's lined route (#111): its ring axis points and the next wrecker's tick. */

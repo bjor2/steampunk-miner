@@ -24,6 +24,7 @@ import type { StampPoint } from '../world/stampShape'
 import { surfaceRowOfColumn } from '../world/tileGrid'
 import { applyCommand } from './applyCommand'
 import { vehicleOf, type AuthorityState } from './authorityState'
+import type { CommandIntent } from './authorityCommand'
 import type { RuleEffect } from './commandRule'
 import type { DomainEventBody } from './domainEvent'
 import { createScriptedSession, FREEZE_ENEMIES, PARAMS, poseAbove } from './scriptedSession'
@@ -169,6 +170,8 @@ export interface LegCut {
   startTick?: number
   /** Upgrade levels over the armed rig's, such as a small hold that fills on the leg. */
   upgrades?: Readonly<Record<string, number>>
+  /** Commands sent once the rig is reported at the start, such as enemies to meet (ticket 564). */
+  prepare?: readonly CommandIntent[]
 }
 
 /** Ends a leg this far before the point nearest the planet's centre: past it lies the core. */
@@ -200,7 +203,7 @@ export function cutLeg(cut: LegCut): LegRun {
 /** Player `p1` reported at the leg's start with the rig's drill, a deep hold and a full tank. */
 function armedRigStart(
   drillStep: number,
-  { leg, startTick: tick = 1, upgrades: over }: LegCut,
+  { leg, startTick: tick = 1, upgrades: over, prepare = [] }: LegCut,
 ): AuthorityState {
   const session = createScriptedSession()
   session.submit(tick, FREEZE_ENEMIES)
@@ -213,6 +216,7 @@ function armedRigStart(
   const { payload } = poseAbove({ tx: 0, ty: 0 }, FACING.down)
   const pose = { ...payload, x: leg.start.xMm, y: leg.start.yMm, upx: leg.upx, upy: leg.upy }
   session.submit(tick, { type: 'reportPose', payload: pose })
+  for (const intent of prepare) session.submit(tick, intent)
   return session.state()
 }
 

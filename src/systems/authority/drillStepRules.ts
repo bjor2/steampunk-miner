@@ -15,6 +15,10 @@
  * - It cuts the sweep as far as its work reaches (the exact carry, ticket 399), by the per-cell
  *   walks or by runs and the span as the per-cell budget picks (`drillStepCut.ts`, ticket 335). Energy is the drill's for the tick it cut; burrowers in the
  *   nose's tile are cut as by a report.
+ * - With `drill.noseContact` on (ticket 564, `combat/noseRide.ts`), after the cut it engages every
+ *   enemy its nose met along the body's walked path, from the last accepted position to the step,
+ *   in walk order; while an enemy tougher than the rig rides the nose, the step cuts nothing
+ *   (`combat/noseHold.ts`).
  * - The collapse watch does not run after it (`applyCommand.ts`): it stays on `reportPose`, so it
  *   lags a step by at most one report interval, well inside a block's 60-tick warning.
  */
@@ -37,6 +41,11 @@ import { noteRigCut } from './rigStillness'
 import { cutGateLeftAt, stepBoundsAt, stepReachMmOf } from './stepBoundRead'
 import { drillAlongStep } from './drillStepCut'
 import { withBurrowersCut } from './reportedDrill'
+import { holdTheCut, isCutHeld } from './combat/noseHold'
+import { engageEnemiesOnPath } from './combat/noseRide'
+import type { SweptStep } from './sweptDrill'
+import type { PlanetParams } from '../world/planetParams'
+import type { TilePoint } from '../world/tileGrid'
 import { followEnergyChange } from './vehicleTransitions'
 
 type StepCommand = AuthorityCommand<'drillStep'>
@@ -110,6 +119,20 @@ function cutStep(state: AuthorityState, { playerId, payload }: StepCommand): Rul
   const pose = { ...reported, x: payload.x, y: payload.y, facing: payload.facing as Facing }
   const nose = noseTileOf(pose)
   const step = { pose, drive: payload.drive, isLifting: payload.drive.y === 1 }
-  const drilled = drillAlongStep(state, params, playerId, nose, step)
-  return withBurrowersCut(drilled, playerId, nose)
+  const walked = { from: lastAcceptedPositionOf(vehicleOf(state, playerId)), pose }
+  const drilled = cutUnlessHeld(state, params, playerId, nose, step)
+  const engaged = engageEnemiesOnPath(drilled, playerId, walked)
+  return withBurrowersCut(engaged, playerId, nose)
+}
+
+/** The step's cut, or nothing cut while a tougher enemy rides the nose (ticket 564). */
+function cutUnlessHeld(
+  state: AuthorityState,
+  params: PlanetParams,
+  playerId: string,
+  nose: TilePoint,
+  step: SweptStep,
+): RuleEffect {
+  if (isCutHeld(state, playerId)) return holdTheCut(state, playerId, step.pose)
+  return drillAlongStep(state, params, playerId, nose, step)
 }

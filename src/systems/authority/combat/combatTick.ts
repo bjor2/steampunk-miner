@@ -19,6 +19,7 @@ import { tugMetalEnemies } from '../magnetic/enemyTug'
 import { planetParamsOf } from '../planetOfState'
 import { combatVehicleOf } from './combatState'
 import { stepEnemy } from './enemyBehaviour'
+import { creditedPlayerOf } from './noseRide'
 import type { Terrain } from './enemyMovement'
 import { activateSpawnPoints, despawnEnemies } from './enemyRoster'
 import { fireGun } from './gunFire'
@@ -102,7 +103,7 @@ function stepEveryEnemy(state: AuthorityState, terrain: Terrain, tick: number): 
     state,
     state.combat.enemies.map(
       (enemy) => (current) =>
-        stampedFor(stepEnemy(current, enemy.id, terrain, tick), enemy.ownerId, tick),
+        stampedFor(stepEnemy(current, enemy.id, terrain, tick), creditedPlayerOf(enemy), tick),
     ),
   )
 }

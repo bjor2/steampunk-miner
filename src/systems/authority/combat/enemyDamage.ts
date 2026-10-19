@@ -5,6 +5,8 @@
  *   it, while the vehicle pays the drill's energy (`cDrill`, 4 quanta a tick). With an empty tank
  *   the drill does not cut.
  * - Drilling the tile a burrower swims in damages it by the same amount per drilled tick.
+ * - An enemy riding the nose (ticket 564, `noseRide.ts`) takes the same amount each tick it rides.
+ * - Every drill damage reads the one seam `enemyDamageRate` (ticket 564), never drill power.
  * - `enemy_damaged` sums continuous drill damage per 30 ticks and flushes before a kill.
  * - A killed enemy is gone for the trip: its spawn point stays used until the next dock. A killed
  *   tunnel wrecker came from no spawn point; the next may come `respawnTicks` later (#111).
@@ -57,6 +59,21 @@ export function drillPinnedEnemy(state: AuthorityState, enemy: Enemy, tick: numb
       }),
     (current) => followEnergyChange(current, enemy.ownerId, tick),
   ])
+}
+
+/**
+ * One tick of the drill on an enemy riding the nose (ticket 564): the riding player's damage rate
+ * for a tick, from the front, logged as the pinned drill's is; at 0 health it dies, killed by the
+ * drill. The cut already charges the rig, so the ride charges nothing of its own.
+ */
+export function drillRidingEnemy(
+  state: AuthorityState,
+  enemy: Enemy,
+  riderId: string,
+  tick: number,
+): RuleEffect {
+  const amount = drillDamagePerTickOf(state, riderId)
+  return damageEnemy(state, enemy, amount, { ticks: 1, arc: 'front', tick })
 }
 
 /** `ticks` of drilling on one tile, up to `tick`, also cut the burrowers swimming in it (not pinned ones). */
@@ -207,7 +224,7 @@ function chargeOneDrillTick(state: AuthorityState, playerId: string): RuleEffect
 }
 
 /** A sixtieth of the one damage seam's rate (ticket 564), never drill power read here. */
-export function drillDamagePerTickOf(state: AuthorityState, playerId: string): BigStat {
+function drillDamagePerTickOf(state: AuthorityState, playerId: string): BigStat {
   return enemyDamagePerTick(enemyDamageRate(state, playerId))
 }
 

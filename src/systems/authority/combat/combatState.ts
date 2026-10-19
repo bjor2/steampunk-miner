@@ -56,6 +56,21 @@ export interface Enemy {
    * here. Absent until the first knock, so with no turret module the state and digest are unchanged.
    */
   knockedTick?: number
+  /**
+   * The nose ride a drill step engaged it in (ticket 564, `noseRide.ts`). Absent until the nose
+   * contact first engages it, so with `drill.noseContact` off the state and digest are unchanged.
+   */
+  ride?: NoseRide
+}
+
+/**
+ * An enemy engaged on a drill's nose (ticket 564): the player whose drill met it, credited with
+ * its kill, and the tick it dies on, its dwell after the engagement. It takes no action of its own
+ * while it rides.
+ */
+export interface NoseRide {
+  by: string
+  untilTick: number
 }
 
 /** Gun hits on one enemy not yet logged: `gun_hit` sums them per pose report (#107). */
