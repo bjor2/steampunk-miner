@@ -43,6 +43,7 @@ const FLIP_TICKS: Readonly<Record<AuthorityFlagId, readonly number[]>> = {
   'drill.reportCapsule': [29, 52, 109],
   'heat.workUncapped': [34, 83, 132],
   'codex.materialContact': [46, 94, 141],
+  'drill.noseContact': [13, 57, 137],
 }
 
 interface FlipRun {
@@ -198,7 +199,8 @@ describe('authority dev flags flipped mid-drill (ticket 547)', () => {
     expect(stateDigest(framed.state)).toBe(end)
   })
 
-  it('ships every flag on, so the flips above start from the shipped defaults', () => {
-    expect(Object.values(AUTHORITY_DEV_FLAGS).every((isOn) => isOn)).toBe(true)
+  it('ships every flag on but the nose contact, which waits for the combat track (#565)', () => {
+    const off = AUTHORITY_FLAG_IDS.filter((id) => !AUTHORITY_DEV_FLAGS[id])
+    expect(off).toEqual(['drill.noseContact'])
   })
 })

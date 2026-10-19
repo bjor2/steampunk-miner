@@ -50,6 +50,7 @@ const CARRIES_OF_FLAG: Readonly<Record<AuthorityFlagId, readonly FlagCarry[]>> =
   'drill.reportCapsule': [],
   'heat.workUncapped': ['cutHeatCarry'],
   'codex.materialContact': [],
+  'drill.noseContact': [],
 }
 
 export const DEV_FLAG_DEBUG_RULES: { readonly 'debug.setFlags': CommandRule<'debug.setFlags'> } = {

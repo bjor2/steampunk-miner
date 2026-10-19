@@ -41,6 +41,9 @@ export const NO_PAIRING_RULE = 'No pairing rule recorded.'
 
 export const CUT_OR_PACE_LABEL = 'Changes cut cells or pace; run is tainted.'
 
+/** The nose contact's label (ticket 564, the TD's C2 shape on #551). */
+export const ENEMY_CONTACT_LABEL = 'Changes enemy contact; run is tainted.'
+
 const CLIENT_APPLY_RULE = 'Client loop only, never sent to the authority; local to this browser.'
 const AUTHORITY_APPLY_RULE =
   'Live, as a logged debug.setFlags at its tick; host only in a shared session.'
@@ -158,5 +161,20 @@ export const DEV_FLAG_ROWS: readonly DevFlagRow[] = [
     taintLabel: null,
     isExperimental: false,
     needsOn: [],
+  },
+  {
+    id: 'drill.noseContact',
+    name: 'Nose contact',
+    line: 'Enemies the drill crosses ride its nose.',
+    scope: 'authority',
+    meaning:
+      'Enemies the walked path crosses are engaged at any speed: they ride the nose for their dwell, or hold the cut if tougher.',
+    isOnByDefault: AUTHORITY_DEV_FLAGS['drill.noseContact'],
+    applyRule: `${AUTHORITY_APPLY_RULE} An enemy already riding rides out its dwell.`,
+    pairingRule:
+      'Off until the combat damage track (#565) flips it: with drill power as the damage it is a hidden combat power gain. Has no effect without the swept path.',
+    taintLabel: ENEMY_CONTACT_LABEL,
+    isExperimental: false,
+    needsOn: ['drill.sweptCut'],
   },
 ]

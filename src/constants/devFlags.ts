@@ -88,6 +88,16 @@ export const DEV_FLAGS: DevFlags = { 'drill.sweptCut': true, 'drill.reportEveryT
  *   really touches a cell of that species: the drill's damage on it, a gate stopping the drill
  *   on it, its unit reaching the hold, or a tool sampling it. A kill-switch, on: off, no
  *   `material:` key is written and every digest is protocol 88's.
+ * - `drill.noseContact` (ticket 564, C2 of #551: the TD's shape 6254962969 as the VS amended it
+ *   6254978633 and the HS conditioned it 6254968595): the authority tests enemy contact on the
+ *   body's walked path inside every `drillStep`, so an enemy the nose crosses is engaged at any
+ *   speed. One whose tier's rock the rig's gate tip scratches rides the nose and dies after its
+ *   dwell ticks, the rig keeping its speed; a tougher one, the wrecker and the core guardian
+ *   hold the cut for their dwell, then die (`combat/noseRide.ts`). **The one flag that ships
+ *   off**, against the line above (VS 6254978633, the TD's ruling 2): while the dwell reads drill
+ *   power it is a hidden combat power gain (62x at L20), so it waits for the combat damage track
+ *   (#565), which flips it on; `contactAtSpeed.test.ts` holds the 84 m/s dwell row as known red
+ *   under #565 until then. Off, contact is the pose-only pin of #9 and no digest moves.
  */
 export interface AuthorityDevFlags {
   readonly 'enemy.lureRetarget': boolean
@@ -96,6 +106,7 @@ export interface AuthorityDevFlags {
   readonly 'drill.reportCapsule': boolean
   readonly 'heat.workUncapped': boolean
   readonly 'codex.materialContact': boolean
+  readonly 'drill.noseContact': boolean
 }
 
 export const AUTHORITY_DEV_FLAGS: AuthorityDevFlags = {
@@ -105,6 +116,7 @@ export const AUTHORITY_DEV_FLAGS: AuthorityDevFlags = {
   'drill.reportCapsule': true,
   'heat.workUncapped': true,
   'codex.materialContact': true,
+  'drill.noseContact': false,
 }
 
 /** Every dev flag at one value: the shipped defaults, or a session's. */

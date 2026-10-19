@@ -1,5 +1,10 @@
 import { describe, expect, it } from 'vitest'
-import { DEV_FLAG_ROWS, NO_PAIRING_RULE, CUT_OR_PACE_LABEL } from './devFlagRows'
+import {
+  CUT_OR_PACE_LABEL,
+  DEV_FLAG_ROWS,
+  ENEMY_CONTACT_LABEL,
+  NO_PAIRING_RULE,
+} from './devFlagRows'
 import { ONE_LINE_WORDS_MAX, TITLE_WORDS_MAX } from './uiParts'
 import { AUTHORITY_DEV_FLAGS, DEV_FLAGS } from './devFlags'
 
@@ -67,6 +72,15 @@ describe('dev flag rows', () => {
     DEV_FLAG_ROWS.flatMap((row) => row.needsOn).forEach((id) => expect(ids).toContain(id))
     expect(rowOf('drill.reportEveryTick')?.needsOn).toEqual(['drill.exactCarry'])
     expect(rowOf('drill.sweptLawCharge')?.needsOn).toEqual(['drill.sweptCut'])
+  })
+
+  it('ships the nose contact off, labelled as changing enemy contact, until #565 (ticket 564)', () => {
+    const row = rowOf('drill.noseContact')
+    expect(row?.isOnByDefault).toBe(false)
+    expect(row?.taintLabel).toBe(ENEMY_CONTACT_LABEL)
+    expect(ENEMY_CONTACT_LABEL).toBe('Changes enemy contact; run is tainted.')
+    expect(row?.pairingRule).toContain('#565')
+    expect(row?.needsOn).toEqual(['drill.sweptCut'])
   })
 })
 
