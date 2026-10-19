@@ -5,7 +5,6 @@
  * step bounds (ticket 334) widen the wait-for-cut window and pick the speed the body is clamped to. Pure reads of the ground and the authority, no
  * Rapier.
  */
-import { DRILL_STAMP_AHEAD_MM } from '../constants/balance'
 import type { CutFollow, CutFollowStep } from '../systems/authority/cutFollowRead'
 import type { CutFollowMotion } from '../systems/vehicle/cutFollowMotion'
 import { isCutGateOpen } from '../systems/vehicle/cutGate'
@@ -23,7 +22,12 @@ import {
   type CutMemory,
   type CutTick,
 } from '../systems/vehicle/heldCut'
-import { drillStampOf, sweptDrillStampOf } from '../systems/vehicle/drillStamp'
+import {
+  cutFrontStepMmOf,
+  drillStampOf,
+  sweptDrillStampOf,
+  sweptStampAheadMmOf,
+} from '../systems/vehicle/drillStamp'
 import { speedOfStepBound, stepBoundMmOf, type StepBounds } from '../systems/vehicle/stepBound'
 import type { VehicleIntent } from '../systems/vehicle/vehicleIntent'
 import { facingVectorOf, type VehiclePose } from '../systems/vehicle/vehiclePose'
@@ -36,6 +40,8 @@ export interface DrillEngagementInput {
   canAct: boolean
   drillContactRule?: DrillContactRule
   cutFollowOf?: (step: CutFollowStep) => CutFollow
+  /** The step the swept cut's front takes at a step's pose (ticket 570, `frontStepMmAt`). */
+  frontStepOf?: (step: CutFollowStep) => number
   stepBounds?: StepBounds
 }
 
@@ -64,10 +70,11 @@ export function drillContactFor(
 
 /**
  * The stamp the drill bites with. A swept cut under way (ticket 397) bites on the stamp its
- * `drillStep` cuts, ahead by the step the rig may take while it cuts: a cut faster than a cell a
- * tick has already cleared the report's short stamp, and a tick it stopped biting would send no
- * step and lose that tick's work. A cut starts on the report's stamp, at the face, and with the
- * swept cut off (no step bounds) the report's stamp is the only one.
+ * `drillStep` cuts, at the front the tick's step takes it to (ticket 570, the same
+ * `sweptStampAheadMmOf` the authority cuts with): a cut faster than a cell a tick has already
+ * cleared the report's short stamp, and a tick it stopped biting would send no step and lose that
+ * tick's work. A cut starts on the report's stamp, at the face, and with the swept cut off (no
+ * step bounds) the report's stamp is the only one.
  */
 function bitingStampOf(
   input: DrillEngagementInput,
@@ -76,7 +83,19 @@ function bitingStampOf(
   followedTicks: number,
 ): DiscStamp {
   if (input.stepBounds === undefined || followedTicks === 0) return drillStampOf(pose, isLifting)
-  return sweptDrillStampOf(pose, isLifting, DRILL_STAMP_AHEAD_MM + input.stepBounds.cuttingMm)
+  const stepMm = frontStepAt(input, input.stepBounds, { pose, isLifting })
+  return sweptDrillStampOf(pose, isLifting, sweptStampAheadMmOf(stepMm))
+}
+
+/** The front's step at the pose as the authority reads it; the cutting bound with no read. */
+function frontStepAt(
+  input: DrillEngagementInput,
+  bounds: StepBounds,
+  { pose, isLifting }: DrillPose,
+): number {
+  const step = { x: pose.x, y: pose.y, facing: pose.facing, isLifting, isDrilling: true }
+  const lawStepMm = input.frontStepOf?.(step) ?? bounds.cuttingMm
+  return cutFrontStepMmOf(lawStepMm, bounds.cuttingMm)
 }
 
 /** What the report's stamp meets along the pose's facing, whatever the drive does. */

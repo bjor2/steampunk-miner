@@ -107,6 +107,11 @@ export interface VehicleStepInput {
    */
   cutFollowOf?: (step: CutFollowStep) => CutFollow
   /**
+   * The step the swept cut's front takes at this step's pose (ticket 570, `frontStepMmAt`): where
+   * the drill's stamp bites; absent with the swept cut off.
+   */
+  frontStepOf?: (step: CutFollowStep) => number
+  /**
    * The rig's stats-derived step bounds (ticket 334, `stepBound.ts`): the speed the body is clamped
    * to and the wheels' wait-for-cut window; absent with the swept cut off (18 m/s, 250 mm).
    */

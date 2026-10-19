@@ -33,7 +33,12 @@ import {
 import { readAuthorityState } from '../store/authorityLink'
 import type { AuthorityState } from '../systems/authority/authorityState'
 import { strutsOf } from '../systems/authority/bore/strutState'
-import { cutFollowAt, type CutFollow, type CutFollowStep } from '../systems/authority/cutFollowRead'
+import {
+  cutFollowAt,
+  frontStepMmAt,
+  type CutFollow,
+  type CutFollowStep,
+} from '../systems/authority/cutFollowRead'
 import { flagsOf } from '../systems/authority/devFlagState'
 import { stepBoundsAt } from '../systems/authority/stepBoundRead'
 import { travelEngineAt } from '../systems/authority/travelSpeed'
@@ -133,6 +138,7 @@ export function createVehicleLoop(fixedFlags?: DevFlags): VehicleLoop {
           tug: readLocalTug(loop),
           drillContactRule: drillContactRuleOf(flags),
           cutFollowOf: cutFollowRuleOf(flags),
+          frontStepOf: frontStepRuleOf(flags),
           stepBounds: stepBoundsOfFlag(flags),
           struts: strutsOf(readAuthorityState()),
         },
@@ -288,6 +294,15 @@ function engineOf(flags: DevFlags, vehicle: VehicleState): EngineStats {
 /** With the swept cut on, the motor reads the cut gate and `vCut` before the cut (ticket 333). */
 function cutFollowRuleOf(flags: DevFlags): ((step: CutFollowStep) => CutFollow) | undefined {
   return flags['drill.sweptCut'] ? readLocalCutFollow : undefined
+}
+
+/** With the swept cut on, the step the cut's front takes, as the authority reads it (ticket 570). */
+function frontStepRuleOf(flags: DevFlags): ((step: CutFollowStep) => number) | undefined {
+  return flags['drill.sweptCut'] ? readLocalFrontStep : undefined
+}
+
+function readLocalFrontStep(step: CutFollowStep): number {
+  return frontStepMmAt(readAuthorityState(), useGameStore.getState().playerId, step)
 }
 
 /** With the swept cut on, the rig's step bounds as the authority checks its steps (ticket 334). */
