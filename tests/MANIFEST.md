@@ -130,7 +130,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/dock-buildings/systems/render/worksSteam.test.ts` | 4 | 4 |
 | `src/features/dock-buildings/systems/render/workshopStaging.test.ts` | 6 | 6 |
 
-### `drill-gear`: 28 files, 219 tests
+### `drill-gear`: 28 files, 239 tests
 
 | File | Tests | Sites |
 | --- | --- | --- |
@@ -145,7 +145,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/drill-gear/systems/backfillRow.test.ts` | 4 | 4 |
 | `src/features/drill-gear/systems/cardLines.test.ts` | 7 | 7 |
 | `src/features/drill-gear/systems/cuttersAndBoom.test.ts` | 7 | 6 |
-| `src/features/drill-gear/systems/deepParity.test.ts` | 40 | 2 |
+| `src/features/drill-gear/systems/deepParity.test.ts` | 60 | 3 |
 | `src/features/drill-gear/systems/dielectricBit.test.ts` | 5 | 5 |
 | `src/features/drill-gear/systems/drillGearEconomy.test.ts` | 6 | 6 |
 | `src/features/drill-gear/systems/drillGearFork.test.ts` | 10 | 10 |
@@ -807,6 +807,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/authority/reportedGateBiteTracks.test.ts` | 7 | 3 |
 | `src/systems/authority/scriptedDrillGear.test.ts` | 10 | 10 |
 | `src/systems/authority/scriptedSession.test.ts` | 1 | 1 |
+| `src/systems/authority/scriptedSubStepClock.test.ts` | 3 | 3 |
 | `src/systems/authority/sellCoins.test.ts` | 8 | 8 |
 | `src/systems/authority/sensingQueries.test.ts` | 10 | 10 |
 | `src/systems/authority/serviceReserve.test.ts` | 4 | 4 |
@@ -844,9 +845,11 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | File | Tests | Sites |
 | --- | --- | --- |
 | `src/systems/bot/blastTrade.test.ts` | 2 | 2 |
+| `src/systems/bot/boreClock.test.ts` | 5 | 5 |
 | `src/systems/bot/botBlasting.test.ts` | 4 | 4 |
 | `src/systems/bot/botBoiler.test.ts` | 4 | 4 |
 | `src/systems/bot/botBore.test.ts` | 10 | 10 |
+| `src/systems/bot/botBoreSpeed.test.ts` | 2 | 2 |
 | `src/systems/bot/botChains.test.ts` | 4 | 4 |
 | `src/systems/bot/botChargeNeed.test.ts` | 2 | 2 |
 | `src/systems/bot/botCharges.test.ts` | 9 | 9 |
@@ -874,6 +877,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/bot/noFreeCellRuns.test.ts` | 2 | 2 |
 | `src/systems/bot/paceArrival.test.ts` | 8 | 4 |
 | `src/systems/bot/spreeTargets.test.ts` | 10 | 10 |
+| `src/systems/bot/tripEstimate.test.ts` | 1 | 1 |
 
 ### `constants`
 
