@@ -68,7 +68,9 @@ export function isHaloEdgeCurrentSince(
  * delta changed since `shown`, the view it holds, are read again, the rest left alone (reading an
  * untouched neighbour would generate it on the main thread, ticket 337). The renderer does this
  * every frame the world changes, so a cut's face shows the frame the authority carves it, while
- * the chunk's tiles wait for their rebuild under the cap of ticket 330.
+ * the chunk's tiles wait for their rebuild under the cap of ticket 330. Answers whether a
+ * neighbour's edge moved: the halo then no longer tells whether the tiles' view is current
+ * (`isHaloEdgeCurrentSince`), so the mesh is rebuilt.
  */
 export function writeHaloChangesSince(
   halo: Uint8Array,
@@ -76,9 +78,10 @@ export function writeHaloChangesSince(
   { cx, cy }: { cx: number; cy: number },
   shown: ChunkViewVersion,
   now: ChunkViewVersion,
-): void {
+): boolean {
   if (shown[0] !== now[0]) writeOwnSamples(halo, densityOf(cx, cy))
-  if (shown[1] !== now[1]) writeRightEdge(halo, densityOf(cx + 1, cy))
-  if (shown[2] !== now[2]) writeTopEdge(halo, densityOf(cx, cy + 1))
-  if (shown[3] !== now[3]) writeCorner(halo, densityOf(cx + 1, cy + 1))
+  const isRightMoved = shown[1] !== now[1] && writeRightEdge(halo, densityOf(cx + 1, cy))
+  const isTopMoved = shown[2] !== now[2] && writeTopEdge(halo, densityOf(cx, cy + 1))
+  const isCornerMoved = shown[3] !== now[3] && writeCorner(halo, densityOf(cx + 1, cy + 1))
+  return isRightMoved || isTopMoved || isCornerMoved
 }

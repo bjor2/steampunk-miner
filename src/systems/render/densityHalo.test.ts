@@ -94,4 +94,16 @@ describe('halo brought up to an edit (ticket 570)', () => {
     writeHaloChangesSince(halo, densityOf, CHUNK, built, now)
     expect(read).toEqual([`${CHUNK.cx},${CHUNK.cy}`])
   })
+
+  it("answers whether a neighbour's edge moved, so the mesh is rebuilt only then", () => {
+    const rowMm = CHUNK.cy * CHUNK_SIZE * 1000 + 16_000
+    const atEdge = cutAt(CHUNK_SIZE * 1000 + 300, rowMm)
+    const inside = cutAt(CHUNK_SIZE * 1000 + 16_000, rowMm)
+    const moved = [atEdge, inside].map((world) => {
+      const halo = chunkDensityHaloOf(densityIn(EMPTY_WORLD), CHUNK.cx, CHUNK.cy)
+      const now = chunkViewVersionOf(world, CHUNK.cx, CHUNK.cy)
+      return writeHaloChangesSince(halo, densityIn(world), CHUNK, built, now)
+    })
+    expect(moved).toEqual([true, false])
+  })
 })

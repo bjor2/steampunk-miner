@@ -247,7 +247,8 @@ function showEditsInHalos(pool: PoolState, view: TerrainView): void {
 function showEditsInHalo(chunk: ChunkMesh, world: WorldState, densityOf: ChunkDensity): void {
   const now = chunkViewVersionOf(world, chunk.cx, chunk.cy)
   if (isSameChunkView(chunk.haloVersion, now)) return
-  writeHaloChangesSince(chunk.halo, densityOf, chunk, chunk.haloVersion, now)
+  const isEdgeMoved = writeHaloChangesSince(chunk.halo, densityOf, chunk, chunk.haloVersion, now)
+  chunk.isHaloEdgeMoved ||= isEdgeMoved
   chunk.haloVersion = now
   chunk.density.needsUpdate = true
 }

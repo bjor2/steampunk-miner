@@ -87,19 +87,28 @@ export function writeOwnSamples(halo: Uint8Array, own: Uint8Array): void {
   }
 }
 
-/** The right neighbour's first column written into the halo's last one, in place. */
-export function writeRightEdge(halo: Uint8Array, right: Uint8Array): void {
+/**
+ * The right neighbour's first column written into the halo's last one, in place; whether any of
+ * it changed.
+ */
+export function writeRightEdge(halo: Uint8Array, right: Uint8Array): boolean {
+  const isCurrent = isRightEdgeCurrent(halo, right)
   for (let lsy = 0; lsy < CHUNK_SAMPLE_SIDE; lsy++) {
     halo[lsy * DENSITY_HALO_SIDE + CHUNK_SAMPLE_SIDE] = right[sampleIndexOf(0, lsy)]
   }
+  return !isCurrent
 }
 
-/** The upper neighbour's first row written into the halo's top one, in place. */
-export function writeTopEdge(halo: Uint8Array, above: Uint8Array): void {
+/** The upper neighbour's first row written into the halo's top one, in place; whether it changed. */
+export function writeTopEdge(halo: Uint8Array, above: Uint8Array): boolean {
+  const isCurrent = isTopEdgeCurrent(halo, above)
   halo.set(above.subarray(0, CHUNK_SAMPLE_SIDE), CHUNK_SAMPLE_SIDE * DENSITY_HALO_SIDE)
+  return !isCurrent
 }
 
-/** The upper-right neighbour's first sample written into the halo's corner, in place. */
-export function writeCorner(halo: Uint8Array, corner: Uint8Array): void {
+/** The upper-right neighbour's first sample written into the halo's corner; whether it changed. */
+export function writeCorner(halo: Uint8Array, corner: Uint8Array): boolean {
+  const isCurrent = isCornerCurrent(halo, corner)
   halo[CHUNK_SAMPLE_SIDE * DENSITY_HALO_SIDE + CHUNK_SAMPLE_SIDE] = corner[0]
+  return !isCurrent
 }

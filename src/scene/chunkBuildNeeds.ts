@@ -27,6 +27,11 @@ export interface BuiltChunk {
   halo: Uint8Array
   builtFrame: number
   version: ChunkViewVersion
+  /**
+   * A neighbour's edge moved in the halo since the build (ticket 570): the halo shows the world
+   * now, so it no longer tells whether the tiles' view is current, and the mesh is rebuilt.
+   */
+  isHaloEdgeMoved: boolean
 }
 
 /** The chunks the pool keeps, and their meshes by chunk key. */
@@ -108,7 +113,7 @@ function isCurrentAfterAdopting(
   view: NeedView,
 ): boolean {
   if (isSameChunkView(chunk.version, version)) return true
-  if (!isOwnChunkSame(chunk.version, version)) return false
+  if (!isOwnChunkSame(chunk.version, version) || chunk.isHaloEdgeMoved) return false
   const densityOf = (x: number, y: number) => currentDensityOfChunk(view.world, view.params, x, y)
   const { halo, cx, cy } = chunk
   if (!isHaloEdgeCurrentSince(halo, densityOf, cx, cy, chunk.version, version)) return false

@@ -88,6 +88,7 @@ export interface ChunkMesh {
   version: ChunkViewVersion
   /** The view the halo shows: ahead of `version` once an edit reached it before the rebuild. */
   haloVersion: ChunkViewVersion
+  isHaloEdgeMoved: boolean
   batch: ChunkTileBatch
   /** The instances the mesh draws: the tiles of the shown blocks, bound to its geometry. */
   drawn: TileInstances
@@ -121,6 +122,7 @@ export function chunkMeshOf(
     builtFrame: built.frame,
     version: built.version,
     haloVersion: built.version,
+    isHaloEdgeMoved: false,
     batch,
     drawn,
     blockMask: Number.NaN,
