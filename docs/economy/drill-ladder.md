@@ -18,8 +18,9 @@ Bjor's order of 18 Oct (level 20 about 50x today's) as the GD ruled it on #551: 
   `perPurchase`), so p/s = 1.19: 20, 30, 44, 96 at n = 1, 2, 3, 5, 682 at 10, 34.4k at 20.
 - **The bar (#463, replacing 1.12 +-5% a level):** every purchase from 2 on gains 1.181 to 1.305
   (1.243 +-5%), strictly climbing, and D(20) / D(1) is in [60, 65].
-- **Superseded for drill_power only:** #396's 1.12 +-5% a level, its front-loaded price rows
-  and planet 1 bot lead, #304's drill constants and #307's on-curve labels. On curve drill power
+- **Superseded for drill_power only:** #396's 1.12 +-5% a level, its front-loaded price rows,
+  planet 1 bot lead and planet 1 drill bars (3x the start by band 3, 10 cells/s on leaving; now
+  printed by `pacingGate.test.ts`, not gated), #304's drill constants and #307's on-curve labels. On curve drill power
   holds about 12 purchases at planet 1 and 3 a planet. Tip, hull and the other tracks keep their
   locks and their pips.
 - **The one-sub-step floor:** a cell costs `ceil(3600 H^3 / (D P^2))` sub-steps and never fewer

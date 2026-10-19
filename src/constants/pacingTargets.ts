@@ -20,7 +20,8 @@ export const PACING_TARGETS = {
   /**
    * Ticket 396 (GD ruling and VS amendment 4, on Bjor's 8 Oct no-cap ruling): the bot's band-1 drill
    * speed on planet 1 is at least 3x its start by the time it reaches band 3, and at least 10 cells
-   * a second when it leaves. Systems' front-loaded drill rows are priced to meet both.
+   * a second when it leaves. Printed, not gated, since ticket 552: #551 (VS 6254600977, GD ruling
+   * 6254611358) supersedes #396 for drill_power, front-loaded rows and all.
    */
   planet1Drill: { bandThreeSpeedupMin: 3, departureCellsPerSecondMin: 10 },
   /**

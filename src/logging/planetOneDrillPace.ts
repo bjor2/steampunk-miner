@@ -5,6 +5,10 @@
  * 2. Band 1 of planet 1 is the felt speed Systems' rows are priced on, so the speed is the drill
  * law's exact sub-step time for one such cell at the vehicle's levels then. Derived from the run
  * events only; the floats never enter the log.
+ *
+ * Printed, not gated, since ticket 552: VS (#551, 6254600977) and the GD ruling (6254611358)
+ * supersede #396 for `drill_power`, and #551's per-planet bars (`drillPaceBars.ts`) replace its
+ * drill bars. Under the per-purchase law a band-3 tile can come before the seventh purchase.
  */
 import { DRILL_SUBSTEPS_PER_TICK } from '../constants/balance'
 import { PACING_TARGETS } from '../constants/pacingTargets'
@@ -117,12 +121,12 @@ export function bandOneCellsPerSecond(levels: UpgradeLevels): number {
   return subSteps === null ? 0 : (DRILL_SUBSTEPS_PER_TICK * TICKS_PER_SECOND) / subSteps
 }
 
-/** What the run misses of the planet 1 drill targets: 3x the start by band 3, 10 cells/s on leaving. */
-export function planetOneDrillPaceProblems(pace: PlanetOneDrillPace): string[] {
-  return [...bandThreeProblems(pace), ...departureProblems(pace)]
+/** What the run misses of #396's planet 1 drill speeds: 3x the start by band 3, 10 cells/s on leaving. */
+export function planetOneDrillPaceAlerts(pace: PlanetOneDrillPace): string[] {
+  return [...bandThreeAlerts(pace), ...departureAlerts(pace)]
 }
 
-function bandThreeProblems(pace: PlanetOneDrillPace): string[] {
+function bandThreeAlerts(pace: PlanetOneDrillPace): string[] {
   const { bandThreeSpeedupMin } = PACING_TARGETS.planet1Drill
   const wanted = pace.startCellsPerSecond * bandThreeSpeedupMin
   if (pace.bandThreeCellsPerSecond === null) return ['planet 1 band 3 never reached']
@@ -133,7 +137,7 @@ function bandThreeProblems(pace: PlanetOneDrillPace): string[] {
   ]
 }
 
-function departureProblems(pace: PlanetOneDrillPace): string[] {
+function departureAlerts(pace: PlanetOneDrillPace): string[] {
   const { departureCellsPerSecondMin } = PACING_TARGETS.planet1Drill
   if (pace.departureCellsPerSecond === null) return ['planet 1 never left']
   if (pace.departureCellsPerSecond >= departureCellsPerSecondMin) return []

@@ -294,9 +294,10 @@ programs }` from three's `renderer.info` of the game canvas), read only when cal
   missed pacing target (`src/constants/pacingTargets.ts`), an unregistered event or field, a broken
   #2 sequence or core events and commands in the first hour over 1.3x the bytes ticket 420
   measured with drill spans folded (about 2.4 MB, never above #11 am. 2's 4 MB; it prints the bytes
-  a cell too); it also fails a
-  seed-median planet 1 drill under 3x its start band-1 speed when it first breaks a band-3 tile, or
-  under 10 band-1 cells/s on arriving at planet 2 (`planetOneDrillPace.ts`, ticket 396).
+  a cell too); it prints, without gating, the
+  seed-median planet 1 drill against 3x its start band-1 speed when it first breaks a band-3 tile and
+  10 band-1 cells/s on arriving at planet 2 (`planetOneDrillPace.ts`, ticket 396; superseded for
+  drill_power by #551 in ticket 552, whose per-planet bars gate in `drillPace.lane.test.ts`).
   `src/logging/logCompactionBotHour.test.ts` (nightly only, ticket 420) plays the bot's first hour
   twice, its drill spans folded and with one line per cell (`drillLines: 'cells'`), and fails unless
   the domain events are identical, the logged commands expand back exactly, every unfolded line is

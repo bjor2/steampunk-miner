@@ -8,7 +8,7 @@ import {
   bandOneCellsPerSecond,
   derivePlanetOneDrillPace,
   medianPlanetOneDrillPace,
-  planetOneDrillPaceProblems,
+  planetOneDrillPaceAlerts,
   type PlanetOneDrillPace,
 } from './planetOneDrillPace'
 import { LOG_SCHEMA_VERSION, type RunEvent } from './runEvent'
@@ -136,13 +136,13 @@ describe('planet 1 drill pace (ticket 396)', () => {
     )
   })
 
-  it('passes 3x the start by band 3 and 10 cells/s on leaving, and names each miss', () => {
-    expect(planetOneDrillPaceProblems(paceOf(1.5, 4.5, 10))).toEqual([])
-    expect(planetOneDrillPaceProblems(paceOf(1.5, 4.4, 9.9))).toEqual([
+  it('alerts on nothing at 3x the start by band 3 and 10 cells/s on leaving, and names each miss', () => {
+    expect(planetOneDrillPaceAlerts(paceOf(1.5, 4.5, 10))).toEqual([])
+    expect(planetOneDrillPaceAlerts(paceOf(1.5, 4.4, 9.9))).toEqual([
       'planet 1 band 3 reached at 4.40 band-1 cells/s, target at least 3x the start (4.50)',
       'planet 1 left at 9.90 band-1 cells/s, target at least 10',
     ])
-    expect(planetOneDrillPaceProblems(paceOf(1.5, null, null))).toEqual([
+    expect(planetOneDrillPaceAlerts(paceOf(1.5, null, null))).toEqual([
       'planet 1 band 3 never reached',
       'planet 1 never left',
     ])

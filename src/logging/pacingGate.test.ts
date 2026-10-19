@@ -20,7 +20,7 @@ import {
 import {
   derivePlanetOneDrillPace,
   medianPlanetOneDrillPace,
-  planetOneDrillPaceProblems,
+  planetOneDrillPaceAlerts,
 } from './planetOneDrillPace'
 import type { RunEvent } from './runEvent'
 import { runEventProblems } from './runEventSchema'
@@ -124,10 +124,15 @@ describe('balance regression: the pacing bot on the slice (#29, S11)', () => {
     expect(pacingProblems(median)).toEqual([])
   })
 
-  // Ticket 396 (GD ruling, VS amendment 4): planet 1 drilling must feel fast, on the seed median.
-  it('cuts band 1 at 3x its start speed by planet 1 band 3 and at 10 cells/s on leaving planet 1', () => {
+  // Ticket 396's planet 1 drill speeds (3x the start by band 3, 10 cells/s on leaving), on the seed
+  // median: printed only since ticket 552. VS (#551, 6254600977) and the GD ruling (6254611358)
+  // supersede #396 for drill_power; #551's per-planet bars gate drill pace in drillPace.lane.test.ts.
+  it('digs planet 1 to band 3 and leaves it, printing its band-1 drill speeds there', () => {
     const paces = seededRuns().map((run) => derivePlanetOneDrillPace(run.events, run.worldSeed))
-    expect(planetOneDrillPaceProblems(medianPlanetOneDrillPace(paces))).toEqual([])
+    const median = medianPlanetOneDrillPace(paces)
+    console.log('planet 1 drill pace (#396, printed):', median, planetOneDrillPaceAlerts(median))
+    expect(median.bandThreeCellsPerSecond).not.toBeNull()
+    expect(median.departureCellsPerSecond).not.toBeNull()
   })
 
   it('lays casing on every drill dive through the player placement code, and pays for it (#115)', () => {
