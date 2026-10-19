@@ -10,7 +10,9 @@
  * - The swept cut (ticket 330) counts drill times in `Q` sub-steps of a tick (`subStepsPerTick`):
  *   `n` is then in sub-steps and a tick removes `255 w Q / (W n)`, the same formula with `T0` and
  *   `ticks` scaled by `Q`, so a cell may clear in a fraction of a tick and a part-dug one carries
- *   over through its densities. With `Q = 1` it is the whole-tick carve above, unchanged.
+ *   over through its densities. With `Q = 1` it is the whole-tick carve above, unchanged. Only
+ *   `255 w Q T0` modulo `W n` decides it, so it is taken so (`carvePhase.ts`, ticket 558) and stays
+ *   exact at any quantum and tick.
  * - A material cell yields once, at the moment the sum of its 16 samples falls to half or below
  *   (`cellYield`).
  * - A carve whose window names a law time (`lawTimeOf`, ticket 535) tallies the law work it
@@ -48,6 +50,7 @@ import {
   type EditSession,
   type GroundEdit,
 } from './groundEditSession'
+import { removalOverTicks, ticksToRemoveFrom } from './carvePhase'
 import { effectiveCasingGrade } from './chunkDelta'
 import { dwellRemovalOf, type SampleDwell } from './rimDwell'
 import type { PlanetParams } from './planetParams'
@@ -332,10 +335,13 @@ function carveOneSample(
     per: FULL_WEIGHT * ticks,
   }
   const density = densityOf(session, sample)
-  const removal = Math.min(Math.max(0, density - sample.floor), removalOver(rate, window))
+  const removal = Math.min(
+    Math.max(0, density - sample.floor),
+    removalOverTicks(rate, window.firstTick, window.ticks),
+  )
   if (removal === 0) return 0
   lowerSample(session, sample, removal, law)
-  return ticksToRemove(rate, window.firstTick, removal)
+  return ticksToRemoveFrom(rate, window.firstTick, removal)
 }
 
 /** A cuttable cell's times: its drill time for the window, and its law time (0 untallied). */
@@ -390,22 +396,6 @@ export function tallyClearedLawWork(
   const material = materialOfSample(session, sample)
   const lawTime = window.lawTimeOf(tileOfSample(sample), material, grade) ?? 0
   session.lawWork += densityOf(session, sample) * lawTime
-}
-
-/** `floor(a (T0 + k) / b) - floor(a T0 / b)`: the rate's removal over the window. */
-function removalOver(rate: { perTick: number; per: number }, window: CarveWindow): number {
-  const before = Math.floor((rate.perTick * window.firstTick) / rate.per)
-  return Math.floor((rate.perTick * (window.firstTick + window.ticks)) / rate.per) - before
-}
-
-/** The fewest ticks from `firstTick` whose removal reaches `amount`. */
-function ticksToRemove(
-  rate: { perTick: number; per: number },
-  firstTick: number,
-  amount: number,
-): number {
-  const target = amount + Math.floor((rate.perTick * firstTick) / rate.per)
-  return Math.ceil((target * rate.per) / rate.perTick) - firstTick
 }
 
 /**

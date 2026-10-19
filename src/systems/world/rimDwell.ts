@@ -9,10 +9,12 @@
  * - The removal keeps `groundEdit.ts`'s tick clock: from the phase `P = Q T0` at the sample's own
  *   weight `w`, `floor(255 (w P + D) / (W n)) - floor(255 w P / (W n))`, never below the sample's
  *   floor. One station spending a whole tick (`Q` sub-steps) at the sample's weight is the
- *   whole-tick charge exactly; the phase carries fractions on average without per-sample state.
+ *   whole-tick charge exactly; the phase carries fractions on average without per-sample state,
+ *   taken modulo `W n` (`carvePhase.ts`) so it stays exact at any quantum and tick (ticket 558).
  * - A sample no station reaches, `D = 0`, is not cut, though its gates are still asked as the stamp
  *   meets it, so `DrillGated` stays per cell and in walk order.
  */
+import { productModuloOf } from './carvePhase'
 import type { CarveWindow, StampWalk } from './groundEdit'
 import { SOLID_DENSITY } from './sampleGrid'
 import { FULL_WEIGHT, type WeightedSample } from './stampShape'
@@ -29,10 +31,9 @@ export function dwellRemovalOf(
   const dwell = window.dwellAt?.(sample.sx, sample.sy) ?? 0
   if (dwell === 0) return 0
   const per = FULL_WEIGHT * drillTicks
-  const phase = sample.weight * window.firstTick * (window.subStepsPerTick ?? 1)
-  return (
-    Math.floor((SOLID_DENSITY * (phase + dwell)) / per) - Math.floor((SOLID_DENSITY * phase) / per)
-  )
+  const perTick = SOLID_DENSITY * sample.weight * (window.subStepsPerTick ?? 1)
+  const phase = productModuloOf(perTick, window.firstTick, per)
+  return Math.floor((phase + SOLID_DENSITY * dwell) / per)
 }
 
 /** `walk` with every sample of its stamp charged by `dwellAt`; cells carved beside it are not. */
