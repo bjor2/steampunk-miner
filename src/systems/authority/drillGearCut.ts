@@ -435,12 +435,23 @@ function cellSharesOf(read: DrillGearRead): number[] {
 
 /** The disc's window, cut short to what the tank pays for every cell after the disc's window. */
 function cellsWindowOf(request: DrillCarveRequest, shares: readonly number[]): CarveWindow {
-  const { window, energy } = request
+  const { energy } = request
+  const window = withoutFront(request.window)
   const perTick = ENERGY_QUANTA_PER_TICK.drill * shares.reduce((sum, share) => sum + share, 0)
   const left = energy - window.ticks * ENERGY_QUANTA_PER_TICK.drill
   if (perTick === 0 || left <= 0) return { ...window, ticks: 0 }
   const ticks = Math.min(window.ticks, Math.floor((left * BASIS_POINTS) / perTick))
   return { ...window, ticks }
+}
+
+/**
+ * The window without the swept cut's front (ticket 570): the gear's cells keep carving at their
+ * own drill time, as the gear's own reach, not the bit's front, says where they cut.
+ */
+function withoutFront(window: CarveWindow): CarveWindow {
+  if (window.front === undefined) return window
+  const { front: _front, ...plain } = window
+  return plain
 }
 
 /** Every cell's ticks at the drill's rate times its share, rounded up once. */

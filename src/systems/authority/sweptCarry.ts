@@ -5,7 +5,10 @@
  *
  * - **Price**: a cell's gated drill time in sub-steps (`subStepsPerTile` at its hardness, scratch
  *   floor and shock, #335) times its uncut density share, rounded up once: a part-dug or softened
- *   cell pays only for what is left. Open ground and yielded cells cost nothing.
+ *   cell pays only for what is left. Open ground and yielded cells cost nothing, except to the
+ *   front of a cutting tick (ticket 570, `frontCarryGroundOf`): it bites a cell past its yield
+ *   before it clears it, so there a yielded cell costs what is left of it, and takes no place in
+ *   the hold, its ore already counted.
  * - **Hard stops** are the walk's only stops: a cell whose gated drill time is null, a gated or
  *   tip-locked one (TD lock on #374, item 1).
  * - **Carry ends**: a core cell, an electrified (hazard) cell or lava ends the tick's walk at it;
@@ -22,7 +25,7 @@
  *   leaves it standing until the walk pays for it; the paid cells yield first, in walk order.
  */
 import { BASIS_POINTS, DRILL_SUBSTEPS_PER_TICK } from '../../constants/balance'
-import { UP_VECTOR_SCALE } from '../../constants/physics'
+import { MM_PER_METRE, UP_VECTOR_SCALE } from '../../constants/physics'
 import { isElectrifiedCellAt } from '../registries/magneticGround'
 import type {
   BeyondCell,
@@ -31,12 +34,14 @@ import type {
   CarryPurse,
   CarrySweep,
 } from '../vehicle/carryWalk'
+import { chordMmThroughCell } from '../vehicle/cellChord'
 import { carrySubStepsIn, SWEEP_STEP_MM, type SweepPath } from '../vehicle/sweptCut'
 import { facingVectorOf, tileOfMillimetres, type VehiclePose } from '../vehicle/vehiclePose'
 import { cargoUnitsOf, statsOfVehicle } from '../vehicle/vehicleState'
 import { ENERGY_QUANTA_PER_TICK } from '../vehicle/energyQuanta'
 import { cellDensitySum, type YieldedCell } from '../world/cellYield'
 import type { PlanetParams } from '../world/planetParams'
+import type { StampPoint } from '../world/stampShape'
 import { SAMPLES_PER_CELL, SOLID_DENSITY } from '../world/sampleGrid'
 import type { TilePoint } from '../world/tileGrid'
 import { CELL_KIND, isLavaCell, isRemovableCell, kindOfCell } from '../world/worldCell'
@@ -56,18 +61,62 @@ const LAVA_CELL: CarryCell = { ...OPEN_CELL, isCarryEnd: true }
 /** A cell's diagonal, in whole mm: past it the walk along the facing has left the cell. */
 const MM_PER_CELL_DIAGONAL = 1_415
 
-/** The carve request's world and gates, read as the carry walk's ground. */
+/** The carve request's world and gates, read as the carry walk's ground: yielded cells free. */
 export function carryGroundOf(params: PlanetParams, request: DrillCarveRequest): CarryGround {
+  return groundPricing(params, request, TRAVEL_PRICING)
+}
+
+/**
+ * The ground as a cutting tick's front walks it along `line` (ticket 570): a yielded cell costs
+ * what is left of it, so a cell the front has bitten past its yield is never free, and a cell is
+ * priced for the length of the line inside it (`vehicle/cellChord.ts`), so a tilted cut pays the
+ * drill law's metre a metre as a column does.
+ */
+export function frontCarryGroundOf(
+  params: PlanetParams,
+  request: DrillCarveRequest,
+  line: CutLine,
+): CarryGround {
+  const chordMmOf = (tile: TilePoint) => chordMmThroughCell(line.from, line.to, tile)
+  return groundPricing(params, request, { yielded: 'leftover', chordMmOf })
+}
+
+/** The straight line a front walks: two points of it. */
+export interface CutLine {
+  from: StampPoint
+  to: StampPoint
+}
+
+/** What a yielded cell still standing costs the walk: nothing, or what is left of it. */
+type YieldedPrice = 'free' | 'leftover'
+
+/** How the walk prices a cell: what a yielded one costs, and the mm of the cut through it. */
+interface Pricing {
+  yielded: YieldedPrice
+  chordMmOf: (tile: TilePoint) => number
+}
+
+/** A travelling tick's pricing: yielded cells free, every cell a whole metre. */
+const TRAVEL_PRICING: Pricing = { yielded: 'free', chordMmOf: () => MM_PER_METRE }
+
+function groundPricing(
+  params: PlanetParams,
+  request: DrillCarveRequest,
+  pricing: Pricing,
+): CarryGround {
   const { world, gates } = request
   const timed = { gates, quantum: request.window.subStepsPerTick ?? DRILL_SUBSTEPS_PER_TICK }
   return {
     isStop: (tile) => isStopCell(world, params, gates, tile),
-    cellAt: (tile) => carryCellAt(world, params, timed, tile),
+    cellAt: (tile) => carryCellAt(world, params, { ...timed, ...pricing }, tile),
   }
 }
 
-/** The carve's gates, timed in the sub-steps a tick its window counts (the drill quantum). */
-interface TimedGates {
+/**
+ * The carve's gates, timed in the sub-steps a tick its window counts (the drill quantum), and what
+ * a yielded cell costs.
+ */
+interface TimedGates extends Pricing {
   gates: DrillGates
   quantum: number
 }
@@ -87,19 +136,30 @@ function isStopCell(
 function carryCellAt(
   world: WorldState,
   params: PlanetParams,
-  { gates, quantum }: TimedGates,
+  { gates, quantum, yielded, chordMmOf }: TimedGates,
   tile: TilePoint,
 ): CarryCell {
   const cell = materialCellAt(world, params, tile)
   if (isLavaCell(cell)) return LAVA_CELL
-  if (!isRemovableCell(cell) || isTileYielded(world, tile)) return OPEN_CELL
+  const isYielded = isTileYielded(world, tile)
+  if (!isRemovableCell(cell) || (isYielded && yielded === 'free')) return OPEN_CELL
   const subSteps = gates.drillTicksOf(tile, cell, 0) ?? 0
   return {
-    price: uncutPriceOf(subSteps, cellDensitySum(world, params, tile)),
+    price: crossedPriceOf(subSteps, cellDensitySum(world, params, tile), chordMmOf(tile)),
     energy: cellDigEnergyOf(subSteps, BASIS_POINTS, quantum),
-    isOre: kindOfCell(cell) === CELL_KIND.ore,
+    isOre: kindOfCell(cell) === CELL_KIND.ore && !isYielded,
     isCarryEnd: kindOfCell(cell) === CELL_KIND.core || isElectrifiedCellAt(params, tile, cell),
   }
+}
+
+/**
+ * What is left of a cell crossed for `chordMm`: its full time times its uncut share and the share
+ * of a metre crossed, rounded up once; at a whole metre, `uncutPriceOf` exactly.
+ */
+function crossedPriceOf(subSteps: number, densitySum: number, chordMm: number): number {
+  return Math.ceil(
+    (subSteps * densitySum * chordMm) / (SAMPLES_PER_CELL * SOLID_DENSITY * MM_PER_METRE),
+  )
 }
 
 /** The drill time of what is left of a cell: its full time times its uncut share, rounded up. */

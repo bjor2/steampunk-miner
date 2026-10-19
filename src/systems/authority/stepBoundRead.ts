@@ -9,8 +9,10 @@
  *   every later tick with no step of its own: travelling is never below cutting.
  * - A report's speed is checked against the travelling bound: it carries the body's speed from the
  *   tick before, which either gate may have set.
- * - The swept stamp's front sits `DRILL_STAMP_AHEAD_MM` plus the cutting bound ahead of the pose
- *   (TD scope 0), so a tick's cut always clears the step the rig may take next while it cuts.
+ * - A travelling tick's stamp (the cut gate shut) sits `DRILL_STAMP_AHEAD_MM` plus the cutting bound
+ *   ahead of the pose (TD scope 0), so its cut clears the step the rig may take next, and the
+ *   cut-follow reads the ground ahead through the same stamp. A cutting tick's stamp sits at the
+ *   front of its own step instead (ticket 570, `vehicle/drillStamp.ts`).
  */
 import { DRILL_STAMP_AHEAD_MM } from '../../constants/balance'
 import { CLOSED_CUT_GATE, idledCutGate, isCutGateOpen, type CutGate } from '../vehicle/cutGate'
@@ -41,7 +43,11 @@ export function cutGateLeftAt(cursor: SweptCut | undefined, tick: number): CutGa
   return idledCutGate(cursor, Math.max(0, tick - cursor.tick))
 }
 
-/** How far ahead of the pose the swept stamp's centre sits: the report's, plus the cutting bound. */
-export function sweptStampAheadMmAt(state: AuthorityState, playerId: string): number {
+/**
+ * How far ahead of the pose the stamp a travelling tick cuts with sits (the cut gate shut), and
+ * the stamp the cut-follow reads: the report's, plus the cutting bound, so it covers the step the
+ * rig may take next. A cutting tick's stamp sits at its front instead (ticket 570).
+ */
+export function travelStampAheadMmAt(state: AuthorityState, playerId: string): number {
   return DRILL_STAMP_AHEAD_MM + stepBoundsAt(state, playerId).cuttingMm
 }

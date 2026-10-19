@@ -11,14 +11,17 @@
  * - **The work picks how far; the budget never does** (ticket 399, the TD ruling on #399 amending
  *   #335): the tick's work and the cursor's carry pay the crossed cells in order
  *   (`vehicle/carryWalk.ts`, `sweptCarry.ts`), the cut reaches the last one paid and the rest of
- *   the work carries exactly to the next tick. A paid cell is cleared in full. The per-cell budget
- *   (ticket 335, `cutShare.ts`) only picks the walks, the caller's `SweepWalks`: per cell within
- *   the player's share of `DRILL_CELLS_PER_TICK`, in runs and as the span per chunk over it.
- * - The tick settles in `sweptSettle.ts`: the cursor moves to where the cut reached, a standing
+ *   the work carries exactly to the next tick. The per-cell budget (ticket 335, `cutShare.ts`)
+ *   only picks the walks, the caller's `SweepWalks`: per cell within the player's share of
+ *   `DRILL_CELLS_PER_TICK`, in runs and as the span per chunk over it.
+ * - **The cut rides its front** (ticket 570, the TD shape on #570): the stamp's centre sits where
+ *   the body's face will be after this tick's step (`sweptStampAheadMmOf`, the step from
+ *   `frontStepMmAt`), and the stamp lowers each sample once, as the front crosses it
+ *   (`world/cutFront.ts`), so the face moves with the body and no cell vanishes in one frame. A
+ *   paid cell is cleared as the front passes it; where the work falls short of a cell, the front
+ *   bites into it as far as the work pays (`sweptFront.ts`).
+ * - The tick settles in `sweptSettle.ts`: the cursor moves to where the walk reached, a standing
  *   cell is reported once, and casing rings follow the cut at fixed spacing.
- * - The stamp's front sits further ahead than a report's by the step the rig may take while it
- *   cuts (`sweptStampAheadMmAt`, tickets 333 and 334), so this tick's cut always clears the step
- *   the body may take next tick.
  * - The swept span (`sweptSpanDrill.ts`, ticket 374) cuts the same tick through `drillSweepBy`
  *   with its stamp walked per chunk; everything else here is shared.
  * - With the authority dev flag `drill.sweptLawCharge` on (ticket 540) the tick is charged on the
@@ -28,38 +31,22 @@
  *   the old 3600 m/s one-sub-step floor; the cursor keeps the quantum its carry and dig time are in.
  */
 import { flagsOf } from './devFlagState'
-import type { DrillBit } from '../vehicle/aheadBearingLatch'
-import type { CutGate } from '../vehicle/cutGate'
+import { isCutGateOpen, type CutGate } from '../vehicle/cutGate'
 import type { DriveSigns } from '../vehicle/driveSigns'
-import { sweptDrillStampOf } from '../vehicle/drillStamp'
-import { walkCarryPerCell, type CarryReach, type CarryWalk } from '../vehicle/carryWalk'
-import { sweepPathOf, sweptStampOf, type SweepPath } from '../vehicle/sweptCut'
+import { walkCarryPerCell, type CarryWalk } from '../vehicle/carryWalk'
+import { sweepPathOf, type SweepPath } from '../vehicle/sweptCut'
 import type { VehiclePose } from '../vehicle/vehiclePose'
 import type { VehicleState } from '../vehicle/vehicleState'
 import type { PlanetParams } from '../world/planetParams'
-import type { DiscStamp } from '../world/stampShape'
+import type { DiscStamp, StampPoint } from '../world/stampShape'
 import { walkStampInRows, type StampWalk } from '../world/groundEdit'
-import { clearingPaidCellsFirst } from '../world/paidCellClear'
 import type { TilePoint } from '../world/tileGrid'
-import type { WorldState } from '../world/worldState'
 import { vehicleOf, type AuthorityState } from './authorityState'
 import type { RuleEffect } from './commandRule'
-import {
-  carryClampedToRelease,
-  crossedInWalkOrder,
-  heldCarryCellOf,
-  releasingCarryGround,
-} from './carryRelease'
-import { cutGateAt } from './cutFollowRead'
-import { cutCellsWithin, perCellShareAt } from './cutShare'
+import { cutGateAt, type CutFollowStep } from './cutFollowRead'
+import { perCellShareAt } from './cutShare'
 import { digSubStepsOfCells } from './drillCutTally'
-import {
-  carveStampWithRead,
-  walkedWithBit,
-  drillGearReadAt,
-  type DrillCarve,
-  type DrillCarveRequest,
-} from './drillGearCut'
+import type { DrillCarve, DrillCarveRequest } from './drillGearCut'
 import {
   drillGroundBy,
   lawSubStepClockOf,
@@ -67,9 +54,15 @@ import {
   type DrillClock,
   type DrillOutcome,
 } from './groundDrill'
-import { drillQuantumAt, stepBoundsAt, sweptStampAheadMmAt } from './stepBoundRead'
-import { carryPurseOf, carrySweepOf, leavingCellToCarry, yieldedInWalkOrder } from './sweptCarry'
+import { drillQuantumAt, stepBoundsAt } from './stepBoundRead'
+import {
+  carveSweepAheadOfTravel,
+  carveSweepToFront,
+  type CarveBy,
+  type SweepRequest,
+} from './sweptCarve'
 import { settleSweep } from './sweptSettle'
+import { cursorOnBodyLine, sweptStampAt } from './sweptStampAt'
 
 /** What a drill step cuts with: the last reported pose at the step's position, its drive and lift. */
 export interface SweptStep {
@@ -85,6 +78,11 @@ export interface SweptStep {
 export interface Sweep {
   step: SweptStep
   stamp: DiscStamp
+  /**
+   * Where a cutting step's carve runs from (ticket 570, `sweptStampAt.ts`): the stamp pulled back
+   * to the body, or the point the casing rings behind the last front leave free.
+   */
+  rear: StampPoint
   path: SweepPath
   gate: CutGate
   share: number
@@ -107,6 +105,8 @@ export interface SweptCarve extends DrillCarve {
   paid: readonly TilePoint[]
   paidPrices: readonly number[]
   carryTarget: TilePoint | null
+  /** Where a cutting tick's bite left its front past the reach (ticket 570); absent with none. */
+  front?: StampPoint
 }
 
 /**
@@ -164,8 +164,8 @@ export function drillSweepBy(
   walks: SweepWalks,
 ): DrillOutcome<SweptCarve> {
   const sweep = sweepOf(state, playerId, step)
-  const carve = (request: DrillCarveRequest) =>
-    carveSweep(state, params, playerId, { sweep, request }, walks)
+  const by = { state, params, playerId, walks }
+  const carve = (request: DrillCarveRequest) => carveSweep(by, { sweep, request })
   const outcome = drillGroundBy(
     state,
     params,
@@ -194,123 +194,36 @@ function sweptClockOf(state: AuthorityState, quantum: number): DrillClock {
 
 function sweepOf(state: AuthorityState, playerId: string, step: SweptStep): Sweep {
   const { cuttingMm } = stepBoundsAt(state, playerId)
-  const aheadMm = sweptStampAheadMmAt(state, playerId)
-  const quantum = drillQuantumAt(state, playerId)
-  const stamp = sweptDrillStampOf(step.pose, step.isLifting, aheadMm)
-  const cursor = vehicleOf(state, playerId).sweptCut
-  const { x, y } = step.pose
+  const read = cutFollowStepOf(step)
+  const gate = cutGateAt(state, playerId, read)
+  const { pose, isLifting } = step
+  const placed = sweptStampAt(state, playerId, { pose, isLifting, read, gate })
+  const { stamp, aheadMm, rear } = placed
+  const cursor = cursorOnBodyLine(vehicleOf(state, playerId).sweptCut, placed, gate)
   return {
     step,
     stamp,
+    rear,
     cuttingMm,
     path: sweepPathOf(cursor, step.pose, { stamp, aheadMm }, state.tick),
-    gate: cutGateAt(state, playerId, {
-      x,
-      y,
-      facing: step.pose.facing,
-      isLifting: step.isLifting,
-      isDrilling: true,
-    }),
+    gate,
     share: perCellShareAt(state, playerId),
-    quantum,
+    quantum: drillQuantumAt(state, playerId),
   }
 }
 
-/** A sweep and the drill command's carve request. */
-interface SweepRequest {
-  sweep: Sweep
-  request: DrillCarveRequest
-}
-
-/** The sweep as far as its work reaches, its paid cells cleared in full, walked as `walks` picks. */
-function carveSweep(
-  state: AuthorityState,
-  params: PlanetParams,
-  playerId: string,
-  { sweep, request }: SweepRequest,
-  walks: SweepWalks,
-): SweptCarve {
-  const reach = reachOfWork(state, params, playerId, { sweep, request }, walks.carryOf(sweep))
-  if (reach.reachedStep < 0) return emptyCarveOf(request.world, reach.carrySubSteps)
-  const bit = bitAt(sweep, reach.reachedStep)
-  const read = drillGearReadAt(state, params, playerId, bit, request.gates)
-  const cells = cutCellsWithin(bit.disc, read, sweep.share)
-  const stampWalk = walks.stampOf({ sweep, request, clear: reach.reachedStep, cells })
-  const held = heldCarryCellOf(reach.target, sweep.step.pose, sweep.cuttingMm)
-  const carved = carveStampWithRead(
-    params,
-    bit,
-    read,
-    leavingCellToCarry(request, held),
-    walkedWithBit(clearingPaidCellsFirst(reach.paid, stampWalk)),
-  )
-  const clamped = carryClampedToRelease(state, params, playerId, {
-    reach,
-    held,
-    world: carved.world,
-    gates: request.gates,
-  })
-  return withReach(carved, { reach: clamped, held }, cells)
-}
-
-/** How far the tick's work and carry reach along the sweep (`vehicle/carryWalk.ts`). */
-function reachOfWork(
-  state: AuthorityState,
-  params: PlanetParams,
-  playerId: string,
-  { sweep, request }: SweepRequest,
-  walk: CarryWalk,
-): CarryReach {
-  const purse = carryPurseOf(state, playerId, sweep)
-  const path = { path: sweep.path, pose: sweep.step.pose, world: request.world }
-  const carrySweep = carrySweepOf(state, params, playerId, path)
-  return walk(carrySweep, purse, releasingCarryGround(params, request, sweep))
-}
-
-/** The walk's reach, and the cell its carry kept out of the stamp (null once released). */
-interface HeldReach {
-  reach: CarryReach
-  held: TilePoint | null
+/** The step as the cut-follow reads it: at the step's position, drilling. */
+function cutFollowStepOf({ pose, isLifting }: SweptStep): CutFollowStep {
+  return { x: pose.x, y: pose.y, facing: pose.facing, isLifting, isDrilling: true }
 }
 
 /**
- * The carve with the walk's reach and carry, its paid cells and then a released cell yielding
- * first, in walk order.
+ * The tick's carve, by the gate its step read (`sweptCarve.ts`): to the front while it cuts, ahead
+ * of the body while it travels.
  */
-function withReach(carved: DrillCarve, { reach, held }: HeldReach, cells: number): SweptCarve {
-  return {
-    ...carved,
-    yielded: yieldedInWalkOrder(carved.yielded, crossedInWalkOrder(reach, held)),
-    reachedStep: reach.reachedStep,
-    cells,
-    carrySubSteps: reach.carrySubSteps,
-    paid: reach.paid,
-    paidPrices: reach.paidPrices,
-    carryTarget: reach.target,
-  }
-}
-
-function emptyCarveOf(world: WorldState, carrySubSteps: number): SweptCarve {
-  return {
-    world,
-    changes: [],
-    yielded: [],
-    ticksUsed: 0,
-    casingCleared: { samples: 0, grade: 0 },
-    lawWork: 0,
-    gearQuanta: 0,
-    gearTicksUsed: 0,
-    lawWorkBp: 0,
-    gearCells: [],
-    aheadLatch: null,
-    sideLatch: null,
-    reachedStep: -1,
-    cells: 0,
-    carrySubSteps,
-    paid: [],
-    paidPrices: [],
-    carryTarget: null,
-  }
+function carveSweep(by: CarveBy, cut: SweepRequest): SweptCarve {
+  if (isCutGateOpen(cut.sweep.gate)) return carveSweepToFront(by, cut)
+  return carveSweepAheadOfTravel(by, cut)
 }
 
 /** A sweep whose work reaches `clear`, and the cells that sweep touches. */
@@ -319,9 +232,4 @@ export interface ClearSweep extends SweepRequest {
   clear: number
   /** Its stamp's and gear's cells, counted no further than one past the share. */
   cells: number
-}
-
-/** The drill bit reaching sub-step `reached` of the sweep. */
-function bitAt({ step, path, stamp }: Sweep, reached: number): DrillBit {
-  return { pose: step.pose, disc: sweptStampOf(path, stamp, reached), drive: step.drive }
 }

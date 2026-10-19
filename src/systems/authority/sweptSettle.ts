@@ -14,7 +14,14 @@
  */
 import { DRILL_SUBSTEPS_PER_TICK } from '../../constants/balance'
 import type { CutAxis } from '../vehicle/casingTrail'
-import { digSubStepsAfter, pointAtStep, type SweepPath, type SweptCut } from '../vehicle/sweptCut'
+import { isCutGateOpen } from '../vehicle/cutGate'
+import {
+  digSubStepsAfter,
+  frontOfCursor,
+  pointAtStep,
+  type SweepPath,
+  type SweptCut,
+} from '../vehicle/sweptCut'
 import { SAMPLES_PER_TILE } from '../world/sampleGrid'
 import { discSamplesOf, type DiscStamp, type StampPoint } from '../world/stampShape'
 import { vehicleOf, withVehicle, type AuthorityState } from './authorityState'
@@ -50,11 +57,15 @@ export function settleSweep(
   const reached = reachedPointOf(sweep.path, carved.reachedStep)
   const passed = sharePassedOf(sweep.share, carved.cells)
   const carrySubSteps = carryLeftAfter(effect.state, playerId, carved.carrySubSteps)
-  const reach = { reached, passed, digSubSteps, carrySubSteps }
+  const reach = { reached, passed, digSubSteps, carrySubSteps, front: carved.front }
   return chainEffects(effect.state, [
     (current) => ({
       state: withCursorAt(current, playerId, sweep, reach),
-      events: withoutStandingMetBefore(effect.events, sweep, carved.reachedStep),
+      events: withoutStandingMetBefore(
+        effect.events,
+        { sweep, cursor: vehicleOf(effect.state, playerId).sweptCut },
+        carved.reachedStep,
+      ),
     }),
     (current) => layRingsAlongCut(current, playerId, cutAxisOf(sweep.path, reached), carved),
   ])
@@ -101,13 +112,15 @@ interface CursorReach {
   passed: number
   digSubSteps: number
   carrySubSteps: number
+  /** Where a bite left the front past the reach (ticket 570); absent with none. */
+  front?: StampPoint
 }
 
 function withCursorAt(
   state: AuthorityState,
   playerId: string,
   { step, gate, quantum }: Sweep,
-  { reached, passed, digSubSteps, carrySubSteps }: CursorReach,
+  { reached, passed, digSubSteps, carrySubSteps, front }: CursorReach,
 ): AuthorityState {
   const vehicle = vehicleOf(state, playerId)
   const dig = digSubStepsAfter(vehicle.sweptCut, vehicle.accountedTick, digSubSteps, quantum)
@@ -122,6 +135,7 @@ function withCursorAt(
     digSubSteps: dig,
     carrySubSteps,
     ...quantumKeyOf(quantum),
+    ...(front === undefined ? {} : { front }),
   }
   return withVehicle(state, playerId, { ...vehicle, sweptCut: cursor })
 }
@@ -133,18 +147,47 @@ function quantumKeyOf(quantum: number): { quantum?: number } {
 
 /**
  * `DrillGated` refused or blocked only where the sweep newly met the cell: a fresh step reports
- * all; a continuing one none when it made no headway, else none its start's disc already reached.
+ * all. A travelling step reports none when it made no headway, else none its start's disc already
+ * reached. A cutting step's stamp sits at its front (ticket 570), which may bite on while the walk's
+ * cursor stays put, so it reports any its stamp met that the stamps since the cursor did not.
  */
 function withoutStandingMetBefore(
   events: readonly DomainEventBody[],
-  sweep: Sweep,
+  { sweep, cursor }: SettledSweep,
   reachedStep: number,
 ): DomainEventBody[] {
   if (sweep.path.isFresh) return [...events]
-  const metBefore = cellsOfDisc({ ...sweep.stamp, ...sweep.path.from, tail: undefined })
+  const isCutting = isCutGateOpen(sweep.gate)
+  const metBefore = isCutting ? cellsMetSinceCursor(sweep, cursor) : cellsMetAtStart(sweep)
+  const hasHeadway = reachedStep > 0 || isCutting
   const isNewlyMet = (event: DomainEventBody) =>
-    !isStandingGate(event) || (reachedStep > 0 && !metBefore.has(`${event.tx},${event.ty}`))
+    !isStandingGate(event) || (hasHeadway && !metBefore.has(`${event.tx},${event.ty}`))
   return events.filter(isNewlyMet)
+}
+
+/** A tick's sweep, and the cursor it continues. */
+interface SettledSweep {
+  sweep: Sweep
+  cursor: SweptCut | undefined
+}
+
+/** The cells a travelling step's start already met: its stamp's disc there. */
+function cellsMetAtStart({ stamp, path }: Pick<Sweep, 'stamp' | 'path'>): Set<string> {
+  return cellsOfDisc({ ...stamp, ...path.from, tail: undefined })
+}
+
+/**
+ * The cells a cutting step's stamp met on the step before: its capsule from that step's rear (this
+ * step's, moved back by the body's step since) to where that step's front stood (a bite's, stored
+ * on the cursor, or the reach). This step's carve runs from its rear too (`sweptCarve.ts`).
+ */
+function cellsMetSinceCursor({ stamp, step, rear }: Sweep, cursor: SweptCut | undefined) {
+  if (cursor === undefined) return new Set<string>()
+  const lastRear = {
+    xMm: rear.xMm - (step.pose.x - cursor.poseXMm),
+    yMm: rear.yMm - (step.pose.y - cursor.poseYMm),
+  }
+  return cellsOfDisc({ ...stamp, ...frontOfCursor(cursor), tail: lastRear })
 }
 
 function cellsOfDisc(disc: DiscStamp): Set<string> {

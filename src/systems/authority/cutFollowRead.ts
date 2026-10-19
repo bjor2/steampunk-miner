@@ -6,9 +6,11 @@
  * - while it is open, `vCut`: the drill law's speed through the slowest uncut cell of that slab
  *   (read on idle ticks too, so a rig that lets go of the drive brakes from it),
  *   `floor(1000 * Q / nLead)` mm a tick with `nLead` its sub-step drill time as the swept cut
- *   counts it (heat, gates and shocks included). A slab with nothing left to cut leaves travel to
- *   set the speed, and says so (`isSlabClear`), so a motor mid-cut may keep its last `vCut`
- *   instead (ticket 430); one whose uncut cells the drill may not cut gives 0, so the body waits;
+ *   counts it (heat, gates and shocks included), cells it may not cut left out (ticket 570: the cut
+ *   rides its front up to such a cell, and the body with it). A slab with nothing left to cut
+ *   leaves travel to set the speed, and says so (`isSlabClear`), so a motor mid-cut may keep its
+ *   last `vCut` instead (ticket 430); one with no uncut cell the drill may cut gives 0, so the body
+ *   waits;
  * - while it is shut, whether the slab the drill bites holds such a cell (`isSpanStopped`), so a
  *   body coasting on its last `vCut` stops at once there (ticket 430).
  *
@@ -42,7 +44,7 @@ import { subStepClockOf } from './groundDrill'
 import { heatThrottledDrill } from './heatRules'
 import { shockTicksFor } from './magnetic/electrifiedShock'
 import { planetParamsOf } from './planetOfState'
-import { drillQuantumAt, sweptStampAheadMmAt } from './stepBoundRead'
+import { drillQuantumAt, travelStampAheadMmAt, stepBoundsAt } from './stepBoundRead'
 
 /**
  * A tick's step as the client sends it: its position in mm, the head's settled facing, its lift,
@@ -98,9 +100,31 @@ function slabReadOf(state: AuthorityState, playerId: string, step: CutFollowStep
   const aim = {
     centreMm: pose,
     facing: facingVectorOf(pose.upx, pose.upy, pose.facing),
-    stamp: sweptDrillStampOf(pose, step.isLifting, sweptStampAheadMmAt(state, playerId)),
+    stamp: sweptDrillStampOf(pose, step.isLifting, travelStampAheadMmAt(state, playerId)),
   }
   return { params, slab: leadingSlabOf(groundReaderOf(state.world, params), aim) }
+}
+
+/**
+ * The step the swept cut's front takes this tick, mm along the facing (ticket 570, TD shape on
+ * #570 point 1 and the Vertical Scaler's condition 1): the drill law's step through the slowest
+ * uncut cell of the leading slab it can cut, the `vCut` the body follows, never past the cutting
+ * bound; the bound itself over a slab with nothing left to cut; 0 when it can cut none there. A
+ * cell it cannot cut stops the walk where the front meets it. It reads the drill, never the body's
+ * speed, so physics jitter cannot shrink the front.
+ */
+export function frontStepMmAt(
+  state: AuthorityState,
+  playerId: string,
+  step: CutFollowStep,
+): number {
+  const read = slabReadOf(state, playerId, step)
+  if (read === null) return 0
+  const { cuttingMm } = stepBoundsAt(state, playerId)
+  if (isSlabClear(read.slab)) return cuttingMm
+  const leadSubSteps = slowestCuttableSubStepsOf(state, playerId, read.params, read.slab.uncutTiles)
+  if (leadSubSteps === null) return 0
+  return Math.min(cuttingMm, cutStepMmOf(leadSubSteps, drillQuantumAt(state, playerId)))
 }
 
 /** The cursor's gate idled to this tick, then this tick's slab, or one more idle tick. */
@@ -152,11 +176,29 @@ function isSpanStoppedAt(state: AuthorityState, playerId: string, read: SlabRead
   return slowestSubStepsOf(state, playerId, read.params, read.slab.uncutTiles) === null
 }
 
-/** `vCut` in m/s through the slab's uncut cells, in the rig's quantum; 0 when one cannot be cut. */
+/**
+ * `vCut` in m/s through the slab's uncut cells the drill can cut, in the rig's quantum; 0 when it
+ * can cut none. A cell it cannot cut stops the cut's walk where the front meets it (ticket 570),
+ * so the body drives on up to its face instead of waiting a slab short of it.
+ */
 function cutSpeedOf(state: AuthorityState, playerId: string, { params, slab }: SlabRead): number {
-  const leadSubSteps = slowestSubStepsOf(state, playerId, params, slab.uncutTiles)
+  const leadSubSteps = slowestCuttableSubStepsOf(state, playerId, params, slab.uncutTiles)
   if (leadSubSteps === null) return 0
   return metresPerSecondOfStep(cutStepMmOf(leadSubSteps, drillQuantumAt(state, playerId)))
+}
+
+/** The cells' sub-step drill times as the drill's gates answer them: null for one it cannot cut. */
+function cellSubStepsOf(
+  state: AuthorityState,
+  playerId: string,
+  params: PlanetParams,
+  tiles: readonly TilePoint[],
+): (number | null)[] {
+  const drill = heatThrottledDrill(params.planetIndex, vehicleOf(state, playerId))
+  const clock = subStepClockOf(drillQuantumAt(state, playerId))
+  const cellTimes = clock.cellTimesOf(params, drill, shockTicksFor(state, playerId))
+  const gates = openDrillGates(state, playerId, params, cellTimes)
+  return tiles.map((tile) => gates.drillTicksOf(tile, materialCellAt(state.world, params, tile), 0))
 }
 
 /** `nLead`: the largest sub-step drill time of the cells, or null when one cannot be cut. */
@@ -166,15 +208,17 @@ function slowestSubStepsOf(
   params: PlanetParams,
   tiles: readonly TilePoint[],
 ): number | null {
-  const drill = heatThrottledDrill(params.planetIndex, vehicleOf(state, playerId))
-  const clock = subStepClockOf(drillQuantumAt(state, playerId))
-  const cellTimes = clock.cellTimesOf(params, drill, shockTicksFor(state, playerId))
-  const gates = openDrillGates(state, playerId, params, cellTimes)
-  let slowest = 0
-  for (const tile of tiles) {
-    const subSteps = gates.drillTicksOf(tile, materialCellAt(state.world, params, tile), 0)
-    if (subSteps === null) return null
-    slowest = Math.max(slowest, subSteps)
-  }
-  return slowest
+  const times = cellSubStepsOf(state, playerId, params, tiles)
+  return times.includes(null) ? null : Math.max(0, ...(times as number[]))
+}
+
+/** The largest sub-step drill time of the cells the drill can cut, or null when it can cut none. */
+function slowestCuttableSubStepsOf(
+  state: AuthorityState,
+  playerId: string,
+  params: PlanetParams,
+  tiles: readonly TilePoint[],
+): number | null {
+  const times = cellSubStepsOf(state, playerId, params, tiles).filter((time) => time !== null)
+  return times.length === 0 ? null : Math.max(...times)
 }
