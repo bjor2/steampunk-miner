@@ -22,7 +22,7 @@ import { FACING } from '../vehicle/vehiclePose'
 import { statsOfVehicle } from '../vehicle/vehicleState'
 import { swapTileCells } from '../world/terrainCellEdits'
 import { surfaceRowOfColumn, type TilePoint } from '../world/tileGrid'
-import { ARTEFACT_CACHE_CELL, GROUND_CELL } from '../world/worldCell'
+import { ARTEFACT_CACHE_CELL, GROUND_CELL, kindSlotOfCell } from '../world/worldCell'
 import { cellAt, EMPTY_WORLD } from '../world/worldState'
 import type { CommandIntent } from './authorityCommand'
 import { createAuthorityState, vehicleOf, type AuthorityState } from './authorityState'
@@ -53,6 +53,7 @@ export const SLAB_TILES = {
 /** Rock round the bore, cells either side of the column and rows under the foot (the cut's lead). */
 const ROCK_HALF_WIDTH = 3
 const ROCK_UNDER_FOOT = 70
+const SURFACE_ORE_SCANNED = 40
 const START = { x: COLUMN * 1000 + 500, y: (SURFACE_TY + 3) * 1000 + 500 }
 /** The body rests with its report stamp on the foot cell's floor. */
 const END_Y = SLAB_TILES.foot.ty * 1000 + DRILL_STAMP_AHEAD_MM
@@ -185,9 +186,17 @@ function columnSwaps() {
   return [...rockRoundTheBore(), ...placed]
 }
 
-/** Two generated surface ore cells of planet 1, kind slots and all (the roster's, ticket 446). */
-function surfaceOreCells(): number[] {
-  return surfaceOreTiles(2).map((tile) => cellAt(EMPTY_WORLD, PARAMS, tile))
+/**
+ * Two generated surface ore cells of planet 1, kind slots and all (the roster's, ticket 446): the
+ * first, and the first after it with another kind slot (another species), so each cell's material
+ * is met on its own.
+ */
+function surfaceOreCells(): [number, number] {
+  const cells = surfaceOreTiles(SURFACE_ORE_SCANNED).map((tile) =>
+    cellAt(EMPTY_WORLD, PARAMS, tile),
+  )
+  const other = cells.find((cell) => kindSlotOfCell(cell) !== kindSlotOfCell(cells[0]))
+  return [cells[0], other ?? cells[1]]
 }
 
 function rockRoundTheBore() {
