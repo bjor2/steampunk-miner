@@ -62,7 +62,8 @@ export interface TickRead {
 
 /** A rig's live loop, stepped one render frame at a time. */
 export interface Rig {
-  hold: (intent: VehicleIntent, ticks: number) => TickRead[]
+  /** `observe` reads the world after each fixed tick, the frame's later ticks not yet run. */
+  hold: (intent: VehicleIntent, ticks: number, observe?: (read: TickRead) => void) => TickRead[]
 }
 
 /** A fresh store and world with `levels` bought, the rig on the dock of `planetIndex` (planet 1). */
@@ -87,12 +88,13 @@ export function createRig(
   const clock: FrameClock = { carried: 0 }
   let last = { position: controller.planetPosition(), world: readAuthorityState().world }
   let stepped = 0
-  const hold = (intent: VehicleIntent, ticks: number) => {
+  const hold = (intent: VehicleIntent, ticks: number, observe?: (read: TickRead) => void) => {
     const reads: TickRead[] = []
     const stepWorld = () => {
       if (stepped++ % 60 === 0) useGameStore.getState().setEnergy('150')
       const read = stepTick(controller, loop, intent, last)
       reads.push(read)
+      observe?.(read)
       last = { position: read.position, world: readAuthorityState().world }
     }
     while (reads.length < ticks) {

@@ -24,8 +24,8 @@ import {
 } from '../systems/vehicle/heldCut'
 import {
   cutFrontStepMmOf,
+  cuttingDrillStampOf,
   drillStampOf,
-  sweptDrillStampOf,
   sweptStampAheadMmOf,
 } from '../systems/vehicle/drillStamp'
 import { speedOfStepBound, stepBoundMmOf, type StepBounds } from '../systems/vehicle/stepBound'
@@ -84,7 +84,7 @@ function bitingStampOf(
 ): DiscStamp {
   if (input.stepBounds === undefined || followedTicks === 0) return drillStampOf(pose, isLifting)
   const stepMm = frontStepAt(input, input.stepBounds, { pose, isLifting })
-  return sweptDrillStampOf(pose, isLifting, sweptStampAheadMmOf(stepMm))
+  return cuttingDrillStampOf(pose, isLifting, sweptStampAheadMmOf(stepMm))
 }
 
 /** The front's step at the pose as the authority reads it; the cutting bound with no read. */

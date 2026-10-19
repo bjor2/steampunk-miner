@@ -59,8 +59,8 @@ export interface CarveBy {
 
 /** A tick cutting with the gate open: the walk pays, the front bites, the stamp carves to it. */
 export function carveSweepToFront(by: CarveBy, cut: SweepRequest): SweptCarve {
-  const { path, stamp, rear, step } = cut.sweep
-  const frontSweep = { path, stamp, rear, pose: step.pose, request: cut.request }
+  const { path, stamp, rear, crossed, step } = cut.sweep
+  const frontSweep = { path, stamp, rear, crossed, pose: step.pose, request: cut.request }
   const ground = frontGroundOf(by.params, frontSweep)
   const reach = reachOfWork(by, cut, ground)
   if (reach.reachedStep < 0) return emptyCarveOf(cut.request.world, reach.carrySubSteps)
@@ -146,13 +146,14 @@ function reachOfWork(
 
 /** Where the tick's front stands once the walk has paid what it can (`sweptFront.ts`). */
 function frontOfReach(params: PlanetParams, cut: SweepRequest, reach: CarryReach): SweptFront {
-  const { path, stamp, rear, step } = cut.sweep
-  const front = { path, stamp, rear, pose: step.pose, request: cut.request, reach }
+  const { path, stamp, rear, crossed, step } = cut.sweep
+  const front = { path, stamp, rear, crossed, pose: step.pose, request: cut.request, reach }
   return sweptFrontOf(params, front)
 }
 
 function frontWindowOf({ sweep, request }: SweepRequest, front: SweptFront) {
-  const place = { pose: sweep.step.pose, point: front.point, rear: sweep.rear, stamp: sweep.stamp }
+  const { rear, crossed, stamp } = sweep
+  const place = { pose: sweep.step.pose, point: front.point, rear, crossed, stamp }
   return windowAtFront(request.window, cutFrontAt(place))
 }
 

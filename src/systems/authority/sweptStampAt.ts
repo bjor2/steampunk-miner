@@ -15,6 +15,7 @@ import { UP_VECTOR_SCALE } from '../../constants/physics'
 import { isCutGateOpen, type CutGate } from '../vehicle/cutGate'
 import {
   cutFrontStepMmOf,
+  cuttingDrillStampOf,
   landingFrontStepMmOf,
   sweptDrillStampOf,
   sweptStampAheadMmOf,
@@ -28,14 +29,16 @@ import { frontStepMmAt, type CutFollowStep } from './cutFollowRead'
 import { cutGateLeftAt, stepBoundsAt, travelStampAheadMmAt } from './stepBoundRead'
 
 /**
- * A step's stamp, how far ahead of the pose it was placed, the body point it pulls back to, and
- * the point on the body's line a cutting step carves forward from (`rear`).
+ * A step's stamp, how far ahead of the pose it was placed, the body point it pulls back to, the
+ * point on the body's line a cutting step carves forward from (`rear`), and the front a
+ * continuing cut left the tick before (`crossed`, `cutFront.ts`), null on a fresh one.
  */
 export interface PlacedStamp {
   stamp: DiscStamp
   aheadMm: number
   bodyPoint: StampPoint
   rear: StampPoint
+  crossed: StampPoint | null
 }
 
 /** A step to place a stamp for: its pose and lift, as the cut-follow read it, and its gate. */
@@ -52,19 +55,29 @@ export function sweptStampAt(
   step: StampStep,
 ): PlacedStamp {
   const { pose, isLifting, gate } = step
-  if (!isCutGateOpen(gate)) return placedAt(pose, isLifting, travelStampAheadMmAt(state, playerId))
+  if (!isCutGateOpen(gate)) return placedTravellingAt(pose, isLifting, state, playerId)
   const stepMm = cutFrontStepMmAt(state, playerId, step)
-  const placed = placedAt(pose, isLifting, sweptStampAheadMmOf(stepMm))
+  const aheadMm = sweptStampAheadMmOf(stepMm)
+  const placed = placedAt(pose, cuttingDrillStampOf(pose, isLifting, aheadMm), aheadMm)
   const cursor = continuedCursorOf(state, playerId, pose)
   if (cursor === null) return placed
   const stamp = withinCursorReach(placed.stamp, { cursor, pose, stepMm })
-  return { ...placed, stamp, rear: rearOfCut(placed, cursor) }
+  return { ...placed, stamp, rear: rearOfCut(placed, cursor), crossed: frontOfCursor(cursor) }
 }
 
-function placedAt(pose: VehiclePose, isLifting: boolean, aheadMm: number): PlacedStamp {
-  const stamp = sweptDrillStampOf(pose, isLifting, aheadMm)
+function placedTravellingAt(
+  pose: VehiclePose,
+  isLifting: boolean,
+  state: AuthorityState,
+  playerId: string,
+): PlacedStamp {
+  const aheadMm = travelStampAheadMmAt(state, playerId)
+  return placedAt(pose, sweptDrillStampOf(pose, isLifting, aheadMm), aheadMm)
+}
+
+function placedAt(pose: VehiclePose, stamp: DiscStamp, aheadMm: number): PlacedStamp {
   const bodyPoint = stampBodyPointOf({ stamp, aheadMm }, pose)
-  return { stamp, aheadMm, bodyPoint, rear: bodyPoint }
+  return { stamp, aheadMm, bodyPoint, rear: bodyPoint, crossed: null }
 }
 
 /**

@@ -36,6 +36,15 @@ import { FACING, facingVectorOf, type VehiclePose } from './vehiclePose'
 const HALF_BODY_MM = (VEHICLE_COLLIDER_SIZE * 1000) / 2
 /** Contacts let a resting body sink a few mm into its floor; that must not drop the floor. */
 const FLOOR_JITTER_MM = 20
+/**
+ * The same allowance for a cut riding its face (ticket 570). The floor's ramp spans half a sample
+ * either side of its circle, so its contour, read between samples on a grid the circle crosses at
+ * a slant, lies up to 21 mm above or below the circle as the body moves along it; a body pressed
+ * along that floor by its cut sank past 20 mm every few metres and stepped the floor down a
+ * sample. 35 mm covers the 21 and the contact's few. Travel keeps 20 (its stamp runs ahead, and
+ * the specs that drive along the surface read its ground).
+ */
+const CUTTING_FLOOR_JITTER_MM = 35
 
 export function drillStampOf(pose: VehiclePose, isLifting: boolean): DiscStamp {
   return stampAheadBy(pose, isLifting, DRILL_STAMP_AHEAD_MM)
@@ -89,6 +98,20 @@ export function sweptDrillStampOf(
   return stampAheadBy(pose, isLifting, aheadMm)
 }
 
+/**
+ * The stamp of a cut riding its face (the gate open, ticket 570): `sweptDrillStampOf`, its level
+ * floor allowing `CUTTING_FLOOR_JITTER_MM`.
+ */
+export function cuttingDrillStampOf(
+  pose: VehiclePose,
+  isLifting: boolean,
+  aheadMm: number,
+): DiscStamp {
+  const stamp = stampAheadBy(pose, isLifting, aheadMm)
+  if (stamp.floorRadiusMm === null) return stamp
+  return { ...stamp, floorRadiusMm: wheelFloorRadiusOf(pose, CUTTING_FLOOR_JITTER_MM) }
+}
+
 /** The stamp as the capsule from `tail` to its centre (ticket 537), or the stamp alone with none. */
 export function stampSweptFrom(stamp: DiscStamp, tail: StampPoint | null): DiscStamp {
   return tail === null ? stamp : { ...stamp, tail }
@@ -102,7 +125,7 @@ function stampAheadBy(pose: VehiclePose, isLifting: boolean, aheadMm: number): D
     xMm: pose.x + scaled(ahead.x, aheadMm) + scaled(pose.upx, lift),
     yMm: pose.y + scaled(ahead.y, aheadMm) + scaled(pose.upy, lift),
     radiusMm: DRILL_STAMP_RADIUS_MM,
-    floorRadiusMm: isLevelCut ? wheelFloorRadiusOf(pose) : null,
+    floorRadiusMm: isLevelCut ? wheelFloorRadiusOf(pose, FLOOR_JITTER_MM) : null,
   }
 }
 
@@ -112,12 +135,12 @@ function isSideways(pose: VehiclePose): boolean {
 
 /**
  * The wheels' distance from the planet's centre rounded down to whole samples, in mm, after
- * allowing `FLOOR_JITTER_MM` for a body resting a hair into its floor: never meaningfully above
- * the wheels, so the floor never leaves a lip the drill may not cut.
+ * allowing `jitterMm` for a body resting a hair into its floor: never meaningfully above the
+ * wheels, so the floor never leaves a lip the drill may not cut.
  */
-function wheelFloorRadiusOf(pose: VehiclePose): number {
+function wheelFloorRadiusOf(pose: VehiclePose, jitterMm: number): number {
   const wheels = centreDistanceFloorMmOf(pose.x, pose.y) - HALF_BODY_MM
-  return Math.floor((wheels + FLOOR_JITTER_MM) / MM_PER_SAMPLE) * MM_PER_SAMPLE
+  return Math.floor((wheels + jitterMm) / MM_PER_SAMPLE) * MM_PER_SAMPLE
 }
 
 /** A component of a 1024-scaled unit vector, times a length in mm, in whole mm. */

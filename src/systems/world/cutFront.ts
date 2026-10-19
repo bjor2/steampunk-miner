@@ -15,11 +15,16 @@
  *   corner between floor and face is square where the body's lower front meets it.
  * - **The bore**: behind it the whole stamp is cleared, its wall ramped so the contour lies on the
  *   stamp's circle (`boreWallTargetOf`): the bore is the stamp's 1.9 m whatever the speed.
+ * - **What the last front crossed**: there a sample falls at most `CROSSED_DROP_MAX` a tick. The
+ *   last front's ramp had already lowered it as far as the front takes it, so what lowers it now
+ *   is the bore's wall following a body that slid aside: one sample's ramp across, it would drop
+ *   a wall sample by half its range for a slide of a few mm, a cell's edge in one frame (the GD's
+ *   pop on #570). Capped, the wall moves with the slide over the ticks after.
  *
  * Integer arithmetic only. The target never rises above a sample's density: the front only lowers.
  */
 import { circleExcessMm2Of } from './exactSquares'
-import { MM_PER_SAMPLE, SOLID_DENSITY } from './sampleGrid'
+import { ISO_DENSITY, MM_PER_SAMPLE, SOLID_DENSITY } from './sampleGrid'
 import { boreWallTargetOf, type StampPoint, type WeightedSample } from './stampShape'
 
 /**
@@ -36,17 +41,36 @@ export interface CutFront extends StampPoint {
   radiusMm: number
   /** A level cut's floor, its radius from the planet's centre in mm; null for any other cut. */
   floorRadiusMm: number | null
+  /** The front the tick before, on a continuing cut; null on a fresh one. */
+  crossed: StampPoint | null
 }
 
 /** The facing vectors' scale (`UP_VECTOR_SCALE`). */
 const AHEAD_SCALE = 1024
 
 /** The density the front leaves a sample at, whatever it holds now. */
-export function frontTargetOf(sample: WeightedSample, front: CutFront): number {
+function frontTargetOf(sample: WeightedSample, front: CutFront): number {
   if (behindPointMm(sample, front.rear, front) > 0) return SOLID_DENSITY
   const behindFront = behindPointMm(sample, front, front) + floorUndercutMm(sample, front)
   const wall = boreWallTargetOf(sample.weight, front.radiusMm)
   return Math.max(sample.floor, wall, rampTargetOf(behindFront))
+}
+
+/** The most a sample the last front crossed falls in a tick: it stays solid (`ISO_DENSITY`). */
+const CROSSED_DROP_MAX = ISO_DENSITY - 1
+
+/** The density the front lowers a sample holding `density` to this tick; never above it. */
+export function frontLoweredTo(sample: WeightedSample, front: CutFront, density: number): number {
+  const target = Math.min(density, frontTargetOf(sample, front))
+  if (!isPastCrossedRamp(sample, front)) return target
+  return Math.max(target, density - CROSSED_DROP_MAX)
+}
+
+/** The last front's ramp, its floor undercut counted, had reached the bottom of its fall here. */
+function isPastCrossedRamp(sample: WeightedSample, front: CutFront): boolean {
+  if (front.crossed === null) return false
+  const behind = behindPointMm(sample, front.crossed, front) + floorUndercutMm(sample, front)
+  return behind >= MM_PER_SAMPLE
 }
 
 /** How far behind a plane through `point` the sample lies along the facing, in whole mm. */

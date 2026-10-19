@@ -51,7 +51,7 @@ import {
   type GroundEdit,
 } from './groundEditSession'
 import { removalOverTicks, ticksToRemoveFrom } from './carvePhase'
-import { frontTargetOf, type CutFront } from './cutFront'
+import { frontLoweredTo, type CutFront } from './cutFront'
 import { effectiveCasingGrade } from './chunkDelta'
 import { dwellRemovalOf, type SampleDwell } from './rimDwell'
 import type { PlanetParams } from './planetParams'
@@ -385,7 +385,8 @@ function carveToFront(
   front: CutFront,
   times: CutTimes,
 ): number {
-  const removal = Math.max(0, densityOf(session, sample) - frontTargetOf(sample, front))
+  const density = densityOf(session, sample)
+  const removal = density - frontLoweredTo(sample, front, density)
   if (removal === 0) return 0
   lowerSample(session, sample, removal, times.law)
   return times.ticks

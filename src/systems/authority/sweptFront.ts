@@ -47,6 +47,7 @@ export interface FrontSweep {
   path: SweepPath
   stamp: DiscStamp
   rear: StampPoint
+  crossed: StampPoint | null
   pose: VehiclePose
   request: DrillCarveRequest
 }
@@ -104,11 +105,12 @@ export interface FrontPlace {
   pose: VehiclePose
   point: StampPoint
   rear: StampPoint
+  crossed: StampPoint | null
   stamp: DiscStamp
 }
 
 /** The front plane at a point of the path, square to the pose's facing, cutting from `rear`. */
-export function cutFrontAt({ pose, point, rear, stamp }: FrontPlace): CutFront {
+export function cutFrontAt({ pose, point, rear, crossed, stamp }: FrontPlace): CutFront {
   const ahead = facingVectorOf(pose.upx, pose.upy, pose.facing)
   const { radiusMm, floorRadiusMm } = stamp
   return {
@@ -119,6 +121,7 @@ export function cutFrontAt({ pose, point, rear, stamp }: FrontPlace): CutFront {
     rear,
     radiusMm,
     floorRadiusMm,
+    crossed,
   }
 }
 
@@ -159,12 +162,12 @@ function biteOf(
 /** What is left of the cell's price once the front at `point` has carved it alone, as the carve does. */
 function priceLeftAt(
   params: PlanetParams,
-  { request, stamp, rear, pose, path }: FrontSweep,
+  { request, stamp, rear, crossed, pose, path }: FrontSweep,
   cell: TilePoint,
   point: StampPoint,
 ): number {
   const disc = { ...stamp, ...point, tail: rear }
-  const window = windowAtFront(request.window, cutFrontAt({ pose, point, rear, stamp }))
+  const window = windowAtFront(request.window, cutFrontAt({ pose, point, rear, crossed, stamp }))
   const drillTicksOf = cellAloneOf(request.gates.drillTicksOf, cell)
   const world = carveDisc(request.world, params, disc, window, drillTicksOf).world
   return frontCarryGroundOf(params, { ...request, world }, path).cellAt(cell).price

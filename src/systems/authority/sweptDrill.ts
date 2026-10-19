@@ -83,6 +83,8 @@ export interface Sweep {
    * to the body, or the point the casing rings behind the last front leave free.
    */
   rear: StampPoint
+  /** The front the cut left the tick before, on a continuing cut (`sweptStampAt.ts`). */
+  crossed: StampPoint | null
   path: SweepPath
   gate: CutGate
   share: number
@@ -198,12 +200,13 @@ function sweepOf(state: AuthorityState, playerId: string, step: SweptStep): Swee
   const gate = cutGateAt(state, playerId, read)
   const { pose, isLifting } = step
   const placed = sweptStampAt(state, playerId, { pose, isLifting, read, gate })
-  const { stamp, aheadMm, rear } = placed
+  const { stamp, aheadMm, rear, crossed } = placed
   const cursor = cursorOnBodyLine(vehicleOf(state, playerId).sweptCut, placed, gate)
   return {
     step,
     stamp,
     rear,
+    crossed,
     cuttingMm,
     path: sweepPathOf(cursor, step.pose, { stamp, aheadMm }, state.tick),
     gate,
