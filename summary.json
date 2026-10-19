@@ -1,30 +1,8 @@
 {
  "schema": 1,
- "updatedAt": "2026-10-19T05:22:54.758Z",
+ "updatedAt": "2026-10-19T05:45:17.007Z",
  "lastRuns": 50,
  "runs": [
-  {
-   "id": 1791955172996,
-   "url": "https://github.com/bjor2/steampunk-miner/commit/6df895b28d6353eb27a9696b44518a73ac97c309",
-   "event": "nightly",
-   "mode": "nightly",
-   "sha": "6df895b28d6353eb27a9696b44518a73ac97c309",
-   "branch": "main",
-   "startedAt": "2026-10-14T05:04:39Z",
-   "jobConclusion": "success",
-   "timedOut": false,
-   "jobDurationSec": 893,
-   "source": "box",
-   "phase": "nightly",
-   "job": "balance-guns",
-   "feature": null,
-   "tickets": [],
-   "reportFound": false,
-   "files": 0,
-   "tests": 0,
-   "failed": 0,
-   "failedFiles": 0
-  },
   {
    "id": 1791963741723,
    "url": "https://github.com/bjor2/steampunk-miner/commit/6df895b28d6353eb27a9696b44518a73ac97c309",
@@ -1390,12 +1368,36 @@
    "tests": 10218,
    "failed": 4,
    "failedFiles": 4
+  },
+  {
+   "id": 1792388715095,
+   "url": "https://github.com/bjor2/steampunk-miner/commit/e54f5ed0cdc7d359631f994802c2f05fd794ff9a",
+   "event": "pass",
+   "mode": "scoped",
+   "sha": "e54f5ed0cdc7d359631f994802c2f05fd794ff9a",
+   "branch": "main",
+   "startedAt": "2026-10-19T05:42:04Z",
+   "jobConclusion": "success",
+   "timedOut": false,
+   "jobDurationSec": 191,
+   "source": "box",
+   "phase": "fast",
+   "job": "fast",
+   "feature": 409,
+   "tickets": [
+    409
+   ],
+   "reportFound": true,
+   "files": 13,
+   "tests": 161,
+   "failed": 0,
+   "failedFiles": 0
   }
  ],
  "pipeline": {
   "modes": {
-   "nightly": 15,
-   "scoped": 12,
+   "nightly": 14,
+   "scoped": 13,
    "full": 16,
    "nightly-only": 7
   },
@@ -1432,8 +1434,8 @@
   "tooling-tests": {
    "files": 3,
    "p50Ms": 259,
-   "p95Ms": 1202,
-   "fileRuns": 59,
+   "p95Ms": 1732,
+   "fileRuns": 60,
    "failedFileRuns": 1,
    "lastFailure": {
     "runId": 1792355624413,
@@ -1444,13 +1446,13 @@
     ],
     "file": "scripts/tests/manifestDrift.test.mjs"
    },
-   "passRate": 0.9830508474576272
+   "passRate": 0.9833333333333333
   },
   "debug": {
    "files": 11,
    "p50Ms": 1417,
-   "p95Ms": 2501,
-   "fileRuns": 219,
+   "p95Ms": 2625,
+   "fileRuns": 220,
    "failedFileRuns": 1,
    "lastFailure": {
     "runId": 1791997745710,
@@ -1461,7 +1463,7 @@
     ],
     "file": "src/debug/debugScreens.test.ts"
    },
-   "passRate": 0.9954337899543378
+   "passRate": 0.9954545454545455
   },
   "aetheric": {
    "files": 20,
@@ -1735,7 +1737,7 @@
    "files": 61,
    "p50Ms": 43051,
    "p95Ms": 115309,
-   "fileRuns": 950,
+   "fileRuns": 953,
    "failedFileRuns": 1,
    "lastFailure": {
     "runId": 1792056714640,
@@ -1748,13 +1750,13 @@
     ],
     "file": "src/logging/runSummary.test.ts"
    },
-   "passRate": 0.9989473684210526
+   "passRate": 0.9989506820566632
   },
   "golden-replay": {
    "files": 3,
-   "p50Ms": 11006,
-   "p95Ms": 20637,
-   "fileRuns": 60,
+   "p50Ms": 12410,
+   "p95Ms": 20902,
+   "fileRuns": 63,
    "failedFileRuns": 0,
    "lastFailure": null,
    "passRate": 1
@@ -1832,8 +1834,8 @@
   "authority": {
    "files": 129,
    "p50Ms": 329184,
-   "p95Ms": 518862,
-   "fileRuns": 2280,
+   "p95Ms": 518868,
+   "fileRuns": 2281,
    "failedFileRuns": 7,
    "lastFailure": {
     "runId": 1792387372406,
@@ -1844,7 +1846,7 @@
     ],
     "file": "src/systems/authority/devFlagReads.test.ts"
    },
-   "passRate": 0.9969298245614036
+   "passRate": 0.9969311705392372
   },
   "bot": {
    "files": 29,
@@ -1865,9 +1867,9 @@
   },
   "economy": {
    "files": 30,
-   "p50Ms": 1074,
+   "p50Ms": 1083,
    "p95Ms": 5882,
-   "fileRuns": 516,
+   "fileRuns": 518,
    "failedFileRuns": 10,
    "lastFailure": {
     "runId": 1792319779169,
@@ -1878,7 +1880,7 @@
     ],
     "file": "src/systems/economy/economySourceScan.test.ts"
    },
-   "passRate": 0.9806201550387597
+   "passRate": 0.9806949806949807
   },
   "feedback": {
    "files": 4,
@@ -1892,8 +1894,8 @@
   "systems-core": {
    "files": 14,
    "p50Ms": 1766,
-   "p95Ms": 5694,
-   "fileRuns": 229,
+   "p95Ms": 5882,
+   "fileRuns": 230,
    "failedFileRuns": 0,
    "lastFailure": null,
    "passRate": 1
@@ -1964,7 +1966,7 @@
    "files": 40,
    "p50Ms": 477,
    "p95Ms": 2510,
-   "fileRuns": 648,
+   "fileRuns": 649,
    "failedFileRuns": 0,
    "lastFailure": null,
    "passRate": 1
@@ -2176,13 +2178,13 @@
   },
   "scripts/tests/manifestDrift.test.mjs": {
    "feature": "tooling-tests",
-   "runs": 27,
-   "lastMs": 303,
+   "runs": 28,
+   "lastMs": 920,
    "p50Ms": 243,
-   "p95Ms": 390,
-   "passRate": 0.9629629629629629,
+   "p95Ms": 920,
+   "passRate": 0.9642857142857143,
    "lastStatus": "passed",
-   "lastRunId": 1792387372406,
+   "lastRunId": 1792388715095,
    "lastFailure": {
     "runId": 1792355624413,
     "sha": "20ef31bc5eb28b2b93cd4e84e1b03914c67d76cc",
@@ -2194,27 +2196,32 @@
    "flaky": false,
    "slowest": [
     [
-     "test manifest on main lists every test file on disk with its current test sites",
-     188
+     "test manifest on main points every cross-slice check at test files on disk",
+     499
     ],
     [
-     "test manifest on main points every cross-slice check at test files on disk",
-     101
+     "test manifest on main lists every test file on disk with its current test sites",
+     376
     ]
    ]
   },
   "src/debug/debugApi.test.ts": {
    "feature": "debug",
-   "runs": 23,
-   "lastMs": 281,
+   "runs": 24,
+   "lastMs": 776,
    "p50Ms": 308,
-   "p95Ms": 652,
+   "p95Ms": 776,
    "passRate": 1,
    "lastStatus": "passed",
-   "lastRunId": 1792387372406,
+   "lastRunId": 1792388715095,
    "lastFailure": null,
    "flaky": false,
-   "slowest": []
+   "slowest": [
+    [
+     "debug api: set state drives the game through the design doc command names",
+     217
+    ]
+   ]
   },
   "src/debug/debugArtefact.test.ts": {
    "feature": "debug",
@@ -7372,27 +7379,27 @@
   },
   "src/logging/goldenRun.test.ts": {
    "feature": "golden-replay",
-   "runs": 20,
-   "lastMs": 5133,
-   "p50Ms": 5170,
-   "p95Ms": 9088,
+   "runs": 21,
+   "lastMs": 20880,
+   "p50Ms": 5178,
+   "p95Ms": 9215,
    "passRate": 1,
    "lastStatus": "passed",
-   "lastRunId": 1792387372406,
+   "lastRunId": 1792388715095,
    "lastFailure": null,
    "flaky": false,
    "slowest": [
     [
-     "golden run gate replays collapse-band-2-grade-1 to its committed digests and mined order whatever drive its reports push (ticket 279)",
-     1110
+     "golden runs (committed in tests/golden) replays casing-lined-band-2 to every committed digest and its mined order at the fixed step, 30 and 144 fps",
+     7065
     ],
     [
      "golden runs (committed in tests/golden) replays collapse-band-2-grade-1 to every committed digest and its mined order at the fixed step, 30 and 144 fps",
-     966
+     3904
     ],
     [
-     "golden runs (committed in tests/golden) replays casing-lined-band-2 to every committed digest and its mined order at the fixed step, 30 and 144 fps",
-     878
+     "golden run gate replays collapse-band-2-grade-1 to its committed digests and mined order whatever drive its reports push (ticket 279)",
+     2279
     ]
    ]
   },
@@ -7568,23 +7575,27 @@
   },
   "src/logging/secondSliceGolden.test.ts": {
    "feature": "golden-replay",
-   "runs": 20,
-   "lastMs": 806,
-   "p50Ms": 817,
-   "p95Ms": 1385,
+   "runs": 21,
+   "lastMs": 2316,
+   "p50Ms": 829,
+   "p95Ms": 1505,
    "passRate": 1,
    "lastStatus": "passed",
-   "lastRunId": 1792387372406,
+   "lastRunId": 1792388715095,
    "lastFailure": null,
    "flaky": false,
    "slowest": [
     [
-     "second-slice golden runs (S11) lines a grade-2 bore in band 2 that only collapses where debug forces it",
-     432
+     "second-slice golden runs (S11) warns and refills the lined blocks behind a grade-1 dig into band 2",
+     1160
     ],
     [
-     "second-slice golden runs (S11) warns and refills the lined blocks behind a grade-1 dig into band 2",
-     329
+     "second-slice golden runs (S11) lines a grade-2 bore in band 2 that only collapses where debug forces it",
+     924
+    ],
+    [
+     "second-slice golden runs (S11) keeps the husk cache chunk digest player-independent",
+     129
     ]
    ]
   },
@@ -9700,13 +9711,13 @@
   },
   "src/systems/authority/moneyRounding.test.ts": {
    "feature": "authority",
-   "runs": 27,
-   "lastMs": 5,
+   "runs": 28,
+   "lastMs": 14,
    "p50Ms": 5,
-   "p95Ms": 8,
+   "p95Ms": 14,
    "passRate": 1,
    "lastStatus": "passed",
-   "lastRunId": 1792387372406,
+   "lastRunId": 1792388715095,
    "lastFailure": null,
    "flaky": false,
    "slowest": []
@@ -10779,13 +10790,13 @@
   },
   "src/systems/economy/economySourceScan.test.ts": {
    "feature": "economy",
-   "runs": 27,
-   "lastMs": 153,
+   "runs": 28,
+   "lastMs": 1021,
    "p50Ms": 218,
    "p95Ms": 1342,
-   "passRate": 0.6296296296296297,
+   "passRate": 0.6428571428571429,
    "lastStatus": "passed",
-   "lastRunId": 1792387372406,
+   "lastRunId": 1792388715095,
    "lastFailure": {
     "runId": 1792319779169,
     "sha": "46fdb0d0611037d2f1b7a5a3d11a6d8d5717c9f2",
@@ -10795,17 +10806,26 @@
     ]
    },
    "flaky": false,
-   "slowest": []
+   "slowest": [
+    [
+     "economy source scan finds no economy price, ratio or fee number in game code outside economy.json",
+     510
+    ],
+    [
+     "economy source scan searches every slice's code, its systems/ folder included",
+     309
+    ]
+   ]
   },
   "src/systems/economy/economyTables.test.ts": {
    "feature": "economy",
-   "runs": 18,
-   "lastMs": 127,
-   "p50Ms": 56,
+   "runs": 19,
+   "lastMs": 126,
+   "p50Ms": 65,
    "p95Ms": 552,
    "passRate": 1,
    "lastStatus": "passed",
-   "lastRunId": 1792387372406,
+   "lastRunId": 1792388715095,
    "lastFailure": null,
    "flaky": false,
    "slowest": []
@@ -12038,16 +12058,21 @@
   },
   "src/systems/scenario.test.ts": {
    "feature": "systems-core",
-   "runs": 18,
-   "lastMs": 14,
+   "runs": 19,
+   "lastMs": 261,
    "p50Ms": 12,
-   "p95Ms": 73,
+   "p95Ms": 261,
    "passRate": 1,
    "lastStatus": "passed",
-   "lastRunId": 1792387372406,
+   "lastRunId": 1792388715095,
    "lastFailure": null,
    "flaky": false,
-   "slowest": []
+   "slowest": [
+    [
+     "scenario validation accepts the committed drill-down start save at drill level 1 (ticket 416)",
+     182
+    ]
+   ]
   },
   "src/systems/startScenario.test.ts": {
    "feature": "systems-core",
@@ -12264,13 +12289,13 @@
   },
   "src/systems/vehicle/vehicleStats.test.ts": {
    "feature": "vehicle",
-   "runs": 27,
-   "lastMs": 11,
+   "runs": 28,
+   "lastMs": 12,
    "p50Ms": 13,
    "p95Ms": 91,
    "passRate": 1,
    "lastStatus": "passed",
-   "lastRunId": 1792387372406,
+   "lastRunId": 1792388715095,
    "lastFailure": null,
    "flaky": false,
    "slowest": []
@@ -12765,27 +12790,27 @@
   },
   "src/systems/world/generatorGolden.test.ts": {
    "feature": "golden-replay",
-   "runs": 20,
-   "lastMs": 9375,
-   "p50Ms": 5019,
-   "p95Ms": 10164,
+   "runs": 21,
+   "lastMs": 21215,
+   "p50Ms": 6403,
+   "p95Ms": 10182,
    "passRate": 1,
    "lastStatus": "passed",
-   "lastRunId": 1792387372406,
+   "lastRunId": 1792388715095,
    "lastFailure": null,
    "flaky": false,
    "slowest": [
     [
      "generator golden digest makes the committed planets 1 and 2 entered under ore rules 2 or 3, the roster (ticket 446)",
-     3047
+     6376
     ],
     [
      "generator golden digest makes the committed planet 3 entered under ore rules 2 for world seed 83921 (ticket 445)",
-     1875
+     5534
     ],
     [
      "generator golden digest makes the committed planet 3 under the depth density curve, ore rules 3 (ticket 448)",
-     1872
+     4677
     ]
    ]
   },
@@ -17844,13 +17869,13 @@
   },
   "src/logging/drillLadder.test.ts": {
    "feature": "logging",
-   "runs": 15,
+   "runs": 16,
    "lastMs": 3,
    "p50Ms": 3,
    "p95Ms": 4,
    "passRate": 1,
    "lastStatus": "passed",
-   "lastRunId": 1792387372406,
+   "lastRunId": 1792388715095,
    "lastFailure": null,
    "flaky": false,
    "slowest": []
@@ -18206,26 +18231,26 @@
   },
   "src/logging/drillLadderReport.test.ts": {
    "feature": "logging",
-   "runs": 13,
-   "lastMs": 7,
+   "runs": 14,
+   "lastMs": 11,
    "p50Ms": 8,
    "p95Ms": 11,
    "passRate": 1,
    "lastStatus": "passed",
-   "lastRunId": 1792387372406,
+   "lastRunId": 1792388715095,
    "lastFailure": null,
    "flaky": false,
    "slowest": []
   },
   "src/logging/drillLadderSteps.test.ts": {
    "feature": "logging",
-   "runs": 14,
+   "runs": 15,
    "lastMs": 3,
    "p50Ms": 3,
    "p95Ms": 3,
    "passRate": 1,
    "lastStatus": "passed",
-   "lastRunId": 1792387372406,
+   "lastRunId": 1792388715095,
    "lastFailure": null,
    "flaky": false,
    "slowest": []
