@@ -1,9 +1,9 @@
 {
-  "updated_at": "2026-10-19T10:15:20+02:00",
+  "updated_at": "2026-10-19T10:35:17+02:00",
   "caps": {
     "grok": 12,
     "claude": 10,
-    "claude_enabled": 6,
+    "claude_enabled": 10,
     "dev": 8,
     "planner": 4,
     "gate": 3,
@@ -19,12 +19,11 @@
       "slots": [
         {
           "slot": "C1",
-          "state": "busy",
-          "ticket": 560,
-          "grok_slot": 1,
-          "kind": "dev",
-          "since": "2026-10-19T08:47:00+02:00",
-          "wave": "316-5A"
+          "state": "free",
+          "ticket": null,
+          "grok_slot": null,
+          "kind": null,
+          "since": null
         },
         {
           "slot": "C2",
@@ -68,8 +67,8 @@
         }
       ],
       "size": 6,
-      "used": 1,
-      "free": 5,
+      "used": 0,
+      "free": 6,
       "claims_last_hour": 0,
       "name": "Claude Max 1"
     },
@@ -77,12 +76,12 @@
       "id": "A2",
       "account": 2,
       "label": "Claude Max 2",
-      "enabled": false,
-      "reason": "signed in, but the claude -p ping failed",
+      "enabled": true,
+      "reason": "signed in",
       "slots": [
         {
           "slot": "C7",
-          "state": "disabled",
+          "state": "free",
           "ticket": null,
           "grok_slot": null,
           "kind": null,
@@ -90,7 +89,7 @@
         },
         {
           "slot": "C8",
-          "state": "disabled",
+          "state": "free",
           "ticket": null,
           "grok_slot": null,
           "kind": null,
@@ -98,7 +97,7 @@
         },
         {
           "slot": "C9",
-          "state": "disabled",
+          "state": "free",
           "ticket": null,
           "grok_slot": null,
           "kind": null,
@@ -106,7 +105,7 @@
         },
         {
           "slot": "C10",
-          "state": "disabled",
+          "state": "free",
           "ticket": null,
           "grok_slot": null,
           "kind": null,
@@ -115,7 +114,7 @@
       ],
       "size": 4,
       "used": 0,
-      "free": 0,
+      "free": 4,
       "claims_last_hour": 0,
       "name": "Claude Max 2"
     }
@@ -258,11 +257,9 @@
   "grok": [
     {
       "slot": 1,
-      "state": "dev",
-      "ticket": 560,
-      "since": "2026-10-19T08:47:00+02:00",
-      "claude_slot": 1,
-      "wave": "316-5A"
+      "state": "free",
+      "ticket": null,
+      "since": null
     },
     {
       "slot": 2,
@@ -334,12 +331,11 @@
   "claude": [
     {
       "slot": 1,
-      "state": "busy",
-      "ticket": 560,
-      "grok_slot": 1,
-      "since": "2026-10-19T08:47:00+02:00",
-      "account": 1,
-      "wave": "316-5A"
+      "state": "free",
+      "ticket": null,
+      "grok_slot": null,
+      "since": null,
+      "account": 1
     },
     {
       "slot": 2,
@@ -383,62 +379,58 @@
     },
     {
       "slot": 7,
-      "state": "disabled",
+      "state": "free",
       "ticket": null,
       "grok_slot": null,
       "since": null,
-      "reason": "signed in, but the claude -p ping failed",
       "account": 2
     },
     {
       "slot": 8,
-      "state": "disabled",
+      "state": "free",
       "ticket": null,
       "grok_slot": null,
       "since": null,
-      "reason": "signed in, but the claude -p ping failed",
       "account": 2
     },
     {
       "slot": 9,
-      "state": "disabled",
+      "state": "free",
       "ticket": null,
       "grok_slot": null,
       "since": null,
-      "reason": "signed in, but the claude -p ping failed",
       "account": 2
     },
     {
       "slot": 10,
-      "state": "disabled",
+      "state": "free",
       "ticket": null,
       "grok_slot": null,
       "since": null,
-      "reason": "signed in, but the claude -p ping failed",
       "account": 2
     }
   ],
   "last_refill": {
-    "at": "2026-10-19 09:08 CEST",
+    "at": "2026-10-19 10:35 CEST",
     "mode": "refill-dev",
-    "triggers": "#548",
+    "triggers": "#560",
     "started": "",
-    "note": "load guard (1-min load 14.22 > 14)"
+    "note": "no pickable build ticket"
   },
   "totals": {
     "grok": {
       "size": 12,
-      "used": 1,
-      "dev": 1,
+      "used": 0,
+      "dev": 0,
       "dev_cap": 8,
       "planner": 0,
       "planner_cap": 4
     },
     "claude": {
       "size": 10,
-      "enabled": 6,
-      "used": 1,
-      "free": 5,
+      "enabled": 10,
+      "used": 0,
+      "free": 10,
       "external": 0
     }
   },
@@ -502,9 +494,10 @@
         ],
         "done": [
           552,
-          553
+          553,
+          560
         ],
-        "live": 1
+        "live": 0
       },
       {
         "number": 525,
