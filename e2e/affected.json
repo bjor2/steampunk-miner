@@ -283,9 +283,9 @@
       "specs": ["e2e/browser/smoke.spec.ts", "e2e/browser/miningPopup.spec.ts"]
     },
     {
-      "why": "The drill-down run's start save (ticket 416); the code it drives maps to no rule, so a change there runs every spec, this one too.",
+      "why": "The drill-down run's start save (ticket 416), which the L20 anchor (ticket 560) also drives; the code they drive maps to no rule, so a change there runs every spec, these too.",
       "paths": ["scenarios/drill-down-start.scenario.json"],
-      "specs": ["e2e/browser/drillDown.spec.ts"]
+      "specs": ["e2e/browser/drillDown.spec.ts", "e2e/browser/drillSpeedAnchor.spec.ts"]
     },
     {
       "why": "The client dev flag store and the browser's override (ticket 548): the slice, the pure override and choice rules, the shell's storage and ?noflags, and the debug API's flag calls.",
