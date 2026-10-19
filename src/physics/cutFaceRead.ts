@@ -52,7 +52,8 @@ const POP_DROP = 128
 const WINDOW_M = 3
 const HALF_BODY_M = VEHICLE_COLLIDER_SIZE / 2
 /** Across the face, metres from the centre line: the centre and a little inside each corner. */
-const ACROSS_M = [-(HALF_BODY_M - 0.05), 0, HALF_BODY_M - 0.05]
+const CORNER_INSET_M = 1 / 20
+const ACROSS_M = [-(HALF_BODY_M - CORNER_INSET_M), 0, HALF_BODY_M - CORNER_INSET_M]
 const SCAN_STEP_M = 0.005
 const SCAN_REACH_M = 3
 /**
@@ -110,7 +111,7 @@ function isFacingNaturalCave(tick: TickRead, ahead: Vector2): boolean {
 }
 
 /** The cave line's stride: a quarter cell, so no cell on it is stepped over. */
-const CAVE_STRIDE_M = 0.25
+const CAVE_STRIDE_M = MM_PER_SAMPLE / MM_PER_METRE
 
 function readerNow(): GroundReader {
   const state = readAuthorityState()
