@@ -61,7 +61,7 @@ export const GATE_OPENS_AT_TICK = 300
 export const RUN_TICKS = 600
 const REPORT_EVERY = 12
 const REFILL_EVERY = 60
-const RIG_TIP = 400
+export const RIG_TIP = 400
 const MAX_DRILL_POWER = 400
 export const CUTTING_PLAYER = 'p2'
 /** Lined at grade 5 behind the drill, as the law slab is, so no cave-in refills the bore. */
@@ -121,15 +121,20 @@ export interface SlabRig {
 
 /** The weakest drill whose law step on band-1 rock reaches `strideMm`, with the slab's tip. */
 export function slabRigOf(strideMm: number): SlabRig {
-  const reaches = (power: number) => lawStepOf(power) >= strideMm
-  if (!reaches(MAX_DRILL_POWER)) throw new Error(`no drill reaches ${strideMm} mm a tick`)
+  const power = weakestDrillPower((drillPower) => lawStepOf(drillPower) >= strideMm)
+  return { levels: rigLevelsOf(power), strideMm }
+}
+
+/** The lowest drill_power purchase from 1 that `reaches`, which holds for every one above it. */
+export function weakestDrillPower(reaches: (drillPower: number) => boolean): number {
+  if (!reaches(MAX_DRILL_POWER)) throw new Error(`no drill up to ${MAX_DRILL_POWER} reaches`)
   let [low, high] = [1, MAX_DRILL_POWER]
   while (low < high) {
     const middle = Math.floor((low + high) / 2)
     if (reaches(middle)) high = middle
     else low = middle + 1
   }
-  return { levels: rigLevelsOf(low), strideMm }
+  return low
 }
 
 function rigLevelsOf(drillPower: number): Record<string, number> {

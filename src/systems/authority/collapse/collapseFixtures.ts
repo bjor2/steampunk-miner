@@ -100,6 +100,11 @@ export function parkAt(
  * sits in its middle: its blocks warn as soon as the lining is laid.
  */
 export function weakTunnelIntents(): CommandIntent[] {
+  return tunnelIntents(1)
+}
+
+/** The same tunnel lined at `grade`: at 2 or more it holds band 2, so nothing warns. */
+export function tunnelIntents(grade: number): CommandIntent[] {
   return [
     FREEZE_ENEMIES,
     poseAt((TUNNEL_FROM_X + TUNNEL_TO_X) / 2, BAND_2_Y),
@@ -107,7 +112,7 @@ export function weakTunnelIntents(): CommandIntent[] {
       type: 'debug.carveCircle',
       payload: { x, y: BAND_2_Y, radius: 950, amount: 255 },
     })),
-    ...liningIntents(1),
+    ...liningIntents(grade),
   ]
 }
 
