@@ -34,8 +34,8 @@ import {
 // #400's rig 2 cuts at 3600 m/s and jams on planet 1 (#439).
 const RIGS: readonly Record<string, number>[] = [
   {},
-  { drill_power: 300, drill_tip: 200 },
-  { drill_power: 200, drill_tip: 600, engine: 5000 },
+  { drill_power: 17, drill_tip: 200 },
+  { drill_power: 12, drill_tip: 600, engine: 5000 },
 ]
 
 /**

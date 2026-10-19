@@ -27,12 +27,15 @@ import type { VehicleController, VehicleStepResult } from './vehicleController'
 /** Steps past the curve, as the TD's #316 runs: speedMax ~14, a tip that cuts at full efficiency. */
 const RIG_LEVELS = { drill_tip: 600, engine: 5000 } as const
 
-/** drill_power steps (majors 5, 11, 14 and 20) and the ticks each takes on a band-1 cell. */
+/**
+ * drill_power purchases (#552; the old majors 5, 11, 14 and 20 took 23, 12, 9 and 5) and the
+ * ticks each takes on a band-1 cell.
+ */
 const DRILLS = [
-  { drillPower: 50, ticksPerCell: 23 },
-  { drillPower: 110, ticksPerCell: 12 },
-  { drillPower: 140, ticksPerCell: 9 },
-  { drillPower: 200, ticksPerCell: 5 },
+  { drillPower: 4, ticksPerCell: 21 },
+  { drillPower: 7, ticksPerCell: 11 },
+  { drillPower: 9, ticksPerCell: 7 },
+  { drillPower: 12, ticksPerCell: 4 },
 ]
 const SECONDS = 6
 /** The steady rate is read over the last half of each run. */

@@ -21,7 +21,7 @@ import { createRig, type TickRead } from './cutFollowFixtures'
 // its gate hit (the Horizontal Scaler's gate rule, TD condition 2).
 
 /** The 44 m/s rig on planet 1 (#400's rig 1; no tile floor since ticket 397). */
-const RIG_44 = { drill_power: 300, drill_tip: 200 }
+const RIG_44 = { drill_power: 17, drill_tip: 200 }
 const FRAME_RATES = [30, 144]
 const DOWN_SECONDS = 2
 /**

@@ -9,8 +9,10 @@ import { buildIntent } from '../systems/input/buildIntent'
 import { commandedSpeedsOf, createRig, type TickRead } from './cutFollowFixtures'
 
 // The cut-follow at the starting drill (ticket 430, TD shape and addendum on #430), in the live
-// fixed-step loop with `drill.sweptCut` on. "Stored 1, 10 and 20" are stored drill_power steps with
-// tip 0 (stored 10 is major 1): cutSpeed 1.50 / 1.62 / 1.86 m/s, where the cut gate shut in every
+// fixed-step loop with `drill.sweptCut` on. "Stored 1 and 2" are the first drill_power purchases
+// with tip 0 (#552: stored 2 reads the old stored 20's 1.86 m/s; no purchase reads the old stored
+// 10's 1.62, and stored 3's 2.28 m/s climbs past these bars): cutSpeed 1.50 / 1.86 m/s, where the
+// cut gate shut in every
 // cell and travel sped the body to the face ahead of the drill. Now the body coasts on its last
 // vCut through the gate's shut dwell, and over a slab the cut has just cleared, so a down cut holds
 // the drill's speed past its start; level is no worse than before. An up cut holds the drill's
@@ -24,12 +26,11 @@ import { commandedSpeedsOf, createRig, type TickRead } from './cutFollowFixtures
 
 const STARTING_RIGS: Readonly<Record<string, Record<string, number>>> = {
   'stored 1': { drill_power: 1, drill_tip: 0 },
-  'stored 10': { drill_power: 10, drill_tip: 0 },
-  'stored 20': { drill_power: 20, drill_tip: 0 },
+  'stored 2': { drill_power: 2, drill_tip: 0 },
 }
 const FAST_RIGS: Readonly<Record<string, Record<string, number>>> = {
-  'rig 1 (#400)': { drill_power: 300, drill_tip: 200 },
-  '15 m/s rig': { drill_power: 200, drill_tip: 600, engine: 5000 },
+  'rig 1 (#400)': { drill_power: 17, drill_tip: 200 },
+  '15 m/s rig': { drill_power: 12, drill_tip: 600, engine: 5000 },
 }
 const ALL_RIGS = { ...STARTING_RIGS, ...FAST_RIGS }
 const FRAME_RATES = [30, 144]
