@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-10-19T17:39:07+02:00",
+  "updated_at": "2026-10-19T17:40:17+02:00",
   "caps": {
     "grok": 12,
     "claude": 10,
@@ -28,12 +28,11 @@
         },
         {
           "slot": "C2",
-          "state": "busy",
-          "ticket": 559,
-          "grok_slot": 2,
-          "kind": "dev",
-          "since": "2026-10-19T16:50:00+02:00",
-          "wave": "316-5A"
+          "state": "free",
+          "ticket": null,
+          "grok_slot": null,
+          "kind": null,
+          "since": null
         },
         {
           "slot": "C3",
@@ -69,8 +68,8 @@
         }
       ],
       "size": 6,
-      "used": 2,
-      "free": 4,
+      "used": 1,
+      "free": 5,
       "claims_last_hour": 1,
       "name": "Claude Max 1"
     },
@@ -122,7 +121,7 @@
     }
   ],
   "gate": {
-    "busy": 2,
+    "busy": 1,
     "max": 3
   },
   "tester": {
@@ -151,11 +150,9 @@
     },
     {
       "slot": 2,
-      "state": "dev",
-      "ticket": 559,
-      "since": "2026-10-19T16:50:00+02:00",
-      "claude_slot": 2,
-      "wave": "316-5A"
+      "state": "free",
+      "ticket": null,
+      "since": null
     },
     {
       "slot": 3,
@@ -230,12 +227,11 @@
     },
     {
       "slot": 2,
-      "state": "busy",
-      "ticket": 559,
-      "grok_slot": 2,
-      "since": "2026-10-19T16:50:00+02:00",
-      "account": 1,
-      "wave": "316-5A"
+      "state": "free",
+      "ticket": null,
+      "grok_slot": null,
+      "since": null,
+      "account": 1
     },
     {
       "slot": 3,
@@ -312,8 +308,8 @@
   "totals": {
     "grok": {
       "size": 12,
-      "used": 2,
-      "dev": 2,
+      "used": 1,
+      "dev": 1,
       "dev_cap": 8,
       "planner": 0,
       "planner_cap": 4
@@ -321,8 +317,8 @@
     "claude": {
       "size": 10,
       "enabled": 10,
-      "used": 2,
-      "free": 8,
+      "used": 1,
+      "free": 9,
       "external": 0
     }
   },
@@ -415,7 +411,7 @@
           558,
           560
         ],
-        "live": 1
+        "live": 0
       },
       {
         "number": 525,
