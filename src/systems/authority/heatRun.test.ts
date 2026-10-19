@@ -74,10 +74,24 @@ function reportFor(
 }
 
 /**
+ * A drill that cuts planet 8's band 5 so slowly that one cell outlasts every run below: tip
+ * purchase 190 scratches it and drill power 11 breaks a cell in about 330 s, longer still once
+ * the gauge throttles it. Since ticket 559 a scripted drill heats for the law work it removes, as
+ * a pose report's own cut has since ticket 535, so the gauge's numbers are held on a drill that
+ * cuts, never on one pressed against rock it cannot scratch.
+ */
+const SLOW_BAND_5_DRILL = { drill_tip: 190, drill_power: 11 }
+
+function withSlowBand5Drill(session: ScriptedSession): ScriptedSession {
+  for (const [upgradeId, level] of Object.entries(SLOW_BAND_5_DRILL)) {
+    session.submit(0, { type: 'debug.setUpgrade', payload: { upgradeId, level } })
+  }
+  return session
+}
+
+/**
  * Scripted drilling (`drillTile`) of the band-5 cell under the nose every `interval` ticks from
- * `firstTick` for `seconds`, refilling the tank each time. The gauge's numbers are held on the
- * scripted drill, which heats for every tick it drills: since ticket 535 a pose report's own cut
- * heats for the density it removes, and planet 8's level-0 drill cannot scratch band 5.
+ * `firstTick` for `seconds`, refilling the tank each time.
  */
 function drillFor(
   session: ScriptedSession,
@@ -111,7 +125,7 @@ function gaugePoints(session: ScriptedSession): number {
 
 describe('heat gauge (#113 numbers acceptance 1)', () => {
   it('reaches 70 from cold after 108 +- 5 s of drilling band 5 on planet 8', () => {
-    const session = onHeatPlanet()
+    const session = withSlowBand5Drill(onHeatPlanet())
     session.submit(0, reportAt(BAND_5, {}))
     drillFor(session, 0, 120, 12)
     const seconds = (firstTickOf(session.events(), isThreshold(70)) ?? 0) / TICKS_PER_SECOND
@@ -130,7 +144,7 @@ describe('heat gauge (#113 numbers acceptance 1)', () => {
   })
 
   it('throttles the drill from 70, before the hull takes any heat damage at 100', () => {
-    const session = onHeatPlanet()
+    const session = withSlowBand5Drill(onHeatPlanet())
     session.submit(0, reportAt(BAND_5, {}))
     drillFor(session, 0, 200, 12)
     const events = session.events()

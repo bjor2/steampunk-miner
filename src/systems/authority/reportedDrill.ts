@@ -147,13 +147,17 @@ function isCarriedHeatReport(before: VehicleState, flags: AuthorityDevFlags): bo
   return flags['drill.exactCarry'] && !isCutBySteps(before)
 }
 
-/** The carry's whole drill ticks heat; the part of a tick left over stays on the vehicle. */
-function followCarriedHeat(
+/**
+ * The carry's whole drill ticks heat; the part of a tick left over stays on the vehicle. A
+ * report's cut and a scripted drill (ticket 559) both heat this way, from the law work they
+ * removed.
+ */
+export function followCarriedHeat(
   state: AuthorityState,
   playerId: string,
   tick: number,
   isIdle: boolean,
-  flags: AuthorityDevFlags,
+  flags: AuthorityDevFlags = flagsOf(state),
 ): RuleEffect {
   if (isHeatHeldOnCarry(vehicleOf(state, playerId), tick, flags)) {
     return followHeat(state, playerId, tick, { drillTicks: 0, isIdle }, flags)

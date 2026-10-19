@@ -394,8 +394,15 @@ import type { DriveSigns } from '../vehicle/driveSigns'
  *    (`cutEnergyCarryQuantum`), each left out at 60. A drill's cut and travel steps never pass the
  *    planet's radius a tick. A rig whose band-1 cell already costs 100 sub-steps cuts, charges
  *    and digests as at protocol 93.
+ * 95: scripted mining counts on the swept cut's clock (ticket 559, #551 B2): a `drillTile` cuts
+ *    its window in sub-steps of the rig's drill quantum, so a cell can clear in part of a tick,
+ *    and is charged and heated on the law work it removed as a report's cut is (`payLawWork`,
+ *    the heat carry settled as the report settles it), where it charged and heated every tick of
+ *    its window that removed something. Several `drillTile`s at one tick each pay their own cell
+ *    only, so the pacing bot bores past 60 cells/s at the player's price. A run with no scripted
+ *    drill moves no digest.
  */
-export const AUTHORITY_PROTOCOL_VERSION = 94
+export const AUTHORITY_PROTOCOL_VERSION = 95
 
 /** The kernel's own commands: the closed set its rule tables are written against. */
 export interface KernelCommandPayloads {

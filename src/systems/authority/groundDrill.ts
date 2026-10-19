@@ -26,6 +26,10 @@
  * scripted and reported drills then cut the same for the same ticks but no longer charge the same.
  * Behind the authority dev flag `drill.sweptLawCharge` (ticket 540) the swept cut is charged that
  * way too, on the same sub-step carve (`LAW_SUB_STEP_CLOCK`), its energy alone.
+ * Scripted mining (`drillTile`, the pacing bot's bore) counts on the swept cut's sub-steps in the
+ * rig's drill quantum since ticket 559 (#551 B2), charged and heated on the law work it removed
+ * as a report's cut is (`scriptedDrillClockOf`), so a cell may clear in a fraction of a tick and a
+ * rig past 60 cells/s bores more than one cell a tick at the player's price.
  */
 import { DRILL_SUBSTEPS_PER_TICK } from '../../constants/balance'
 import { casingHardness } from '../economy/casingGrades'
@@ -36,6 +40,7 @@ import { drillDamage, subStepsPerTileAt, ticksPerTile, type DrillStats } from '.
 import { drillStampOf, stampSweptFrom } from '../vehicle/drillStamp'
 import { ENERGY_QUANTA_PER_TICK } from '../vehicle/energyQuanta'
 import { payLawWork, payLawWorkEnergy, type LawWorkTally } from '../vehicle/cutCarry'
+import { drillQuantumOfVehicle } from '../vehicle/drillQuantum'
 import type { AheadLatch } from '../vehicle/aheadBearingLatch'
 import type { DriveSigns } from '../vehicle/driveSigns'
 import type { SideLatch } from '../vehicle/facedSide'
@@ -165,6 +170,31 @@ export function lawSubStepClockOf(quantum: number): DrillClock {
 /** The law-charged swept clock at the base quantum. */
 export const LAW_SUB_STEP_CLOCK: DrillClock = lawSubStepClockOf(DRILL_SUBSTEPS_PER_TICK)
 
+/**
+ * Scripted mining's clock (ticket 559, #551 B2): the swept cut's sub-step carve in `quantum`, its
+ * law work tallied and paid as A6 pays a report's cut (`payLawWork`), energy and heat carry both,
+ * so a `drillTile` costs what the player's cut of the same cells costs and heats for its dig
+ * time, never for the window it names.
+ */
+export function scriptedClockOf(quantum: number): DrillClock {
+  const clock = subStepClockOf(quantum)
+  return {
+    ...clock,
+    lawTimesOf: clock.cellTimesOf,
+    chargeOf: (carved, _cellTimes, vehicle) =>
+      payLawWork(vehicle, lawWorkTallyOf(carved, quantum), vehicle.energy),
+  }
+}
+
+/** The clock a player's scripted drill counts on: the scripted clock in the rig's quantum. */
+export function scriptedDrillClockOf(
+  state: AuthorityState,
+  params: PlanetParams,
+  playerId: string,
+): DrillClock {
+  return scriptedClockOf(drillQuantumOfVehicle(vehicleOf(state, playerId), params))
+}
+
 /** The ticks the stamp still removed something in, at the drill's rate, and its gear's cells. */
 function tickEnergyOf(carved: DrillCarve): number {
   return carved.ticksUsed * ENERGY_QUANTA_PER_TICK.drill + carved.gearQuanta
@@ -175,7 +205,10 @@ function lawWorkTallyOf(carved: DrillCarve, quantum: number): LawWorkTally {
   return { law: carved.lawWork, lawBp: carved.lawWorkBp, quantum }
 }
 
-/** Scripted mining: one cell's samples and its drill gear's cells; call with a planet that has params. */
+/**
+ * Scripted mining: one cell's samples and its drill gear's cells for the last `requestedTicks`
+ * ticks, on the scripted clock (ticket 559); call with a planet that has params.
+ */
 export function drillCell(
   state: AuthorityState,
   params: PlanetParams,
@@ -184,7 +217,8 @@ export function drillCell(
   requestedTicks: number,
 ): RuleEffect {
   const carve: CarveIn = (request) => carveCellWithGear(state, params, playerId, tile, request)
-  return drillGround(state, params, playerId, { tile, carve }, requestedTicks)
+  const clock = scriptedDrillClockOf(state, params, playerId)
+  return drillGroundBy(state, params, playerId, { tile, carve }, requestedTicks, clock).effect
 }
 
 /**
@@ -248,6 +282,20 @@ export function ticksPerCell(
   return shockedTicksPerCell(drill, params, tile, cell, unshieldedShockTicksAt)
 }
 
+/**
+ * `ticksPerCell` in `quantum` sub-steps of a tick, as the scripted clock times the cell (ticket
+ * 559), so the bot waits what a `drillTile` really takes.
+ */
+export function subStepsPerCellAt(
+  quantum: number,
+  drill: DrillStats,
+  params: PlanetParams,
+  tile: TilePoint,
+  cell: number,
+): number | null {
+  return shockedSubStepsPerCell({ drill, quantum }, params, tile, cell, unshieldedShockTicksAt)
+}
+
 function shockedTicksPerCell(
   drill: DrillStats,
   params: PlanetParams,
@@ -270,16 +318,6 @@ export interface DrillTarget<C extends DrillCarve = DrillCarve> {
 export interface DrillOutcome<C extends DrillCarve> {
   effect: RuleEffect
   carved: C | null
-}
-
-function drillGround(
-  state: AuthorityState,
-  params: PlanetParams,
-  playerId: string,
-  target: DrillTarget,
-  requestedTicks: number,
-): RuleEffect {
-  return drillGroundBy(state, params, playerId, target, requestedTicks, WHOLE_TICK_CLOCK).effect
 }
 
 /** The one drill path, counting drill time on `clock`. */

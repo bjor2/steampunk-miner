@@ -92,12 +92,18 @@ describe('re-drilling casing', () => {
     expect(lined.session.vehicle().cargo).toEqual(unlined.session.vehicle().cargo)
   })
 
-  it('charges only the drill energy for the ticks it cut', () => {
-    const { session, ore } = oreWall(2)
-    const energy = session.vehicle().energy
-    const events = drillOre(session, ore)
-    expect(ticksOf(events)).toBeGreaterThan(0)
-    expect(energy - session.vehicle().energy).toBe(ticksOf(events) * 4)
+  it('charges the lining it cut on top of the rock, never every tick its slowest sample held', () => {
+    const chargeOf = (grade: number) => {
+      const { session, ore } = oreWall(grade)
+      const energy = session.vehicle().energy
+      const events = drillOre(session, ore)
+      return { charged: energy - session.vehicle().energy, ticks: ticksOf(events) }
+    }
+    const unlined = chargeOf(0)
+    const lined = chargeOf(2)
+    expect(lined.ticks).toBeGreaterThan(unlined.ticks)
+    expect(lined.charged).toBeGreaterThan(unlined.charged)
+    expect(lined.charged).toBeLessThan(lined.ticks * 4)
   })
 
   it('logs the lining it cleared and leaves the cell unlined', () => {

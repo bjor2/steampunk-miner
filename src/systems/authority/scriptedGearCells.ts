@@ -11,7 +11,7 @@ import type { TilePoint } from '../world/tileGrid'
 import { vehicleOf, type AuthorityState } from './authorityState'
 import { cellBitAt, drillGearReadAt } from './drillGearCut'
 import { openDrillGates, type DrillGates } from './drillGates'
-import { WHOLE_TICK_CLOCK } from './groundDrill'
+import { scriptedDrillClockOf } from './groundDrill'
 import { heatThrottledDrill } from './heatRules'
 import { shockTicksFor } from './magnetic/electrifiedShock'
 import { planetParamsOf } from './planetOfState'
@@ -35,13 +35,14 @@ export function scriptedGearCellsOf(
   return read === null ? [] : [...read.aheadCells, ...read.sideCells]
 }
 
-/** The gates a `drillTile` opens: whole-tick cell times at the heat-throttled drill. */
+/** The gates a `drillTile` opens: its clock's cell times at the heat-throttled drill (ticket 559). */
 function scriptedDrillGatesOf(
   state: AuthorityState,
   playerId: string,
   params: PlanetParams,
 ): DrillGates {
   const drill = heatThrottledDrill(params.planetIndex, vehicleOf(state, playerId))
-  const cellTicks = WHOLE_TICK_CLOCK.cellTimesOf(params, drill, shockTicksFor(state, playerId))
+  const clock = scriptedDrillClockOf(state, params, playerId)
+  const cellTicks = clock.cellTimesOf(params, drill, shockTicksFor(state, playerId))
   return openDrillGates(state, playerId, params, cellTicks)
 }

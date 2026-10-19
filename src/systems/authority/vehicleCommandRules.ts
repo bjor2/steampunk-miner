@@ -13,7 +13,10 @@
  *   ignored.
  * - `drillTile`: scripted mining of one tile within reach: the same drilling path, carving that
  *   cell's own samples, and the same casing rings behind the drill from the last reported pose
- *   (#115), so a scripted dig pays the lining a player's dig pays.
+ *   (#115), so a scripted dig pays the lining a player's dig pays. Its `ticks` name the window
+ *   it may cut in, counted on the swept cut's sub-steps in the rig's drill quantum, and it is
+ *   charged and heated on the law work it removed (ticket 559), so a cell can clear in part of a
+ *   tick and several `drillTile`s at one tick each pay only their own cell.
  * - `requestRescue`: calls the tow for a stranded or destroyed vehicle.
  *
  * With the dev flag `drill.sweptCut` on, `drillStep` (`drillStepRules.ts`, ticket 330) cuts every
@@ -56,13 +59,13 @@ import { followCasingSupport } from './casingSupport'
 import { flushGunHits } from './combat/gunHits'
 import { noteReportForCombat } from './combat/poseReportCombat'
 import { drillCell } from './groundDrill'
-import { followHeat } from './heatRules'
 import { touchLavaAtPose } from './lava/lavaRules'
 import { enterMagneticField } from './magnetic/fieldEntry'
 import { noPlanetRejection, planetParamsOf } from './planetOfState'
 import {
   actionTicksOf,
   drillReportedTicks,
+  followCarriedHeat,
   followReportedHeat,
   withBurrowersCut,
 } from './reportedDrill'
@@ -141,11 +144,7 @@ export const VEHICLE_COMMAND_RULES: {
       chainEffects(state, [
         (current) => drillScriptedTile(current, command),
         (current) => unchanged(noteRigCut(current, command.playerId, command.tick)),
-        (current) =>
-          followHeat(current, command.playerId, command.tick, {
-            drillTicks: command.payload.ticks,
-            isIdle: false,
-          }),
+        (current) => followCarriedHeat(current, command.playerId, command.tick, false),
         (current) => markCharged(current, command.playerId, command.tick),
         (current) => layCasingAfterScriptedDrill(current, command.playerId, command.payload.ticks),
         (current) => followEnergyChange(current, command.playerId, command.tick),

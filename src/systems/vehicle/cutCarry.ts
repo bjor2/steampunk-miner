@@ -20,7 +20,8 @@
  *   cut, never forgiven, so the carry is below `D` unless the tank clamped it.
  * - Heat: the same tally, unweighted, is heated in whole drill ticks, `floor(owed / D_heat)`, the
  *   rest carried, as the swept cut heats from its steps' summed dig time (`sweptCut.ts`); between
- *   commands the heat carry is below one tick.
+ *   commands the heat carry is below one tick. It counts at the base quantum; a scripted drill's
+ *   tally in a lifted one (ticket 559) is rounded down into it, under one sub-step a command.
  * - The swept cut pays its tally in the rig's drill quantum (ticket 558): the carry is counted in
  *   the larger of its own quantum and the tally's, both whole multiples of the smaller, so it stays
  *   exact; the carry's quantum is kept beside it (`cutEnergyCarryQuantum`) when above the base.
@@ -77,16 +78,22 @@ export interface CutEnergyPayment<V extends CarriesCut> {
 
 /**
  * Pays `tally` from a tank of `tank` quanta: the whole quanta it comes to with the carry, clamped
- * to the tank, the rest (and any debt the clamp left) carried; the heat carry takes the tally,
- * which the report's cut counts at the base quantum.
+ * to the tank, the rest (and any debt the clamp left) carried; the heat carry takes the tally at
+ * the base quantum, as the report's cut counts it, and a scripted drill's tally in a lifted
+ * quantum (ticket 559) rounded down into it.
  */
 export function payLawWork<V extends CarriesCut>(
   vehicle: V,
   tally: LawWorkTally,
   tank: number,
 ): CutEnergyPayment<V> {
-  const heated = withCutHeatCarry(vehicle, (vehicle.cutHeatCarry ?? 0) + tally.law)
+  const heated = withCutHeatCarry(vehicle, (vehicle.cutHeatCarry ?? 0) + baseLawOf(tally))
   return payLawWorkEnergy(heated, tally, tank)
+}
+
+/** The tally's unweighted work in the base quantum the heat carry counts in. */
+function baseLawOf(tally: LawWorkTally): number {
+  return subStepsInQuantum(tally.law, tally.quantum, DRILL_SUBSTEPS_PER_TICK)
 }
 
 /**
