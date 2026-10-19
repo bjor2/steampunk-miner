@@ -6,7 +6,6 @@ import {
   type DensityByRadius,
   type Economy,
   type EnemyDef,
-  type MetalEnemyTags,
   type TunnelWreckerRules,
   type WreckerCap,
 } from './economyDefinition'
@@ -27,7 +26,8 @@ export function readEnemies(
     kinds: reader
       .list('enemies.kinds', enemies.kinds)
       .map((kind, index) => readEnemyDef(reader, `enemies.kinds[${index}]`, kind)),
-    metal: readMetalTags(reader, reader.object('enemies.metal', enemies.metal)),
+    metal: readKindTags(reader, 'enemies.metal', enemies.metal),
+    holdsTheRig: readKindTags(reader, 'enemies.holdsTheRig', enemies.holdsTheRig),
     tunnelWrecker: readTunnelWrecker(
       reader,
       reader.object('enemies.tunnelWrecker', enemies.tunnelWrecker),
@@ -36,19 +36,27 @@ export function readEnemies(
   }
 }
 
-/** Each tag is true or false, and every built kind states one (#258 Q5). */
-function readMetalTags(reader: FieldReader, tags: Record<string, unknown>): MetalEnemyTags {
+/**
+ * A per-kind tag table (the metal tag, #258 Q5; the rig holders, ticket 564): each tag is true or
+ * false, and every built kind states one.
+ */
+function readKindTags(
+  reader: FieldReader,
+  path: string,
+  table: unknown,
+): Readonly<Record<string, boolean>> {
+  const tags = reader.object(path, table)
   ENEMY_KINDS.filter((kind) => !(kind in tags)).forEach((kind) =>
-    reader.record(`enemies.metal.${kind} must state true or false`),
+    reader.record(`${path}.${kind} must state true or false`),
   )
   return Object.fromEntries(
-    Object.entries(tags).map(([id, tag]) => [id, readMetalTag(reader, id, tag)]),
+    Object.entries(tags).map(([id, tag]) => [id, readKindTag(reader, `${path}.${id}`, tag)]),
   )
 }
 
-function readMetalTag(reader: FieldReader, id: string, tag: unknown): boolean {
+function readKindTag(reader: FieldReader, path: string, tag: unknown): boolean {
   if (typeof tag === 'boolean') return tag
-  reader.record(`enemies.metal.${id} must state true or false`)
+  reader.record(`${path} must state true or false`)
   return false
 }
 

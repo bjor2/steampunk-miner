@@ -324,6 +324,12 @@
       "tunnel_wrecker": false,
       "emp_mite": true
     },
+    "holdsTheRig": {
+      "crawler": false,
+      "burrower": false,
+      "tunnel_wrecker": true,
+      "core_guardian": true
+    },
     "tunnelWrecker": {
       "gnawTicksPerRing": 300,
       "fleeTiles": 12,

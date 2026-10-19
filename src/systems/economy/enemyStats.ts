@@ -7,11 +7,12 @@
  * on-curve player meets the same fight on every planet (the #9 parity rule).
  */
 import { TICKS_PER_SECOND } from '../../constants/physics'
-import { cmp, div, fromSafeInteger, mul, type BigStat } from '../money'
+import { ceil, cmp, div, fromSafeInteger, mul, toSafeInteger, type BigStat } from '../money'
 import { radiusForPlanet } from '../world/planetParams'
 import { compoundRatio, growGeometric, saturate } from './curveFamilies'
 import { ECONOMY } from './economy'
 import type { EnemyDef, EnemyKind, HitArc } from './economyDefinition'
+import { blockHardness } from './oreEconomy'
 import { drillPower, hullMax } from './vehicleStats'
 
 const { enemies } = ECONOMY
@@ -19,6 +20,7 @@ const FIRST_PLANET = 1
 const FIRST_BAND = 1
 const TICKS_PER_SECOND_STAT = fromSafeInteger(TICKS_PER_SECOND)
 const FULL_DENSITY = fromSafeInteger(1)
+const MOST_TICKS = fromSafeInteger(Number.MAX_SAFE_INTEGER)
 
 export interface EnemyBoundedStats {
   moveTilesPerSecond: number
@@ -64,15 +66,58 @@ export function enemyHitOnVehicle(kind: EnemyKind, tier: number, arc: HitArc): B
   return mul(enemyBaseHit(kind, tier), arcMultiplierOf(arc))
 }
 
+/**
+ * The drill's damage on an enemy per second: `drillPower * kDrillVsEnemy` (#9), where
+ * `kDrillVsEnemy` is one constant of economy.json, the same at every drill power and level.
+ */
+export function drillDamagePerSecond(drillPower: BigStat): BigStat {
+  return mul(drillPower, enemies.combat.kDrillVsEnemy)
+}
+
+/** What a damage rate per second takes off an enemy in one tick: a sixtieth of it. */
+export function enemyDamagePerTick(damagePerSecond: BigStat): BigStat {
+  return div(damagePerSecond, TICKS_PER_SECOND_STAT)
+}
+
 /** A pinned enemy loses `drillPower * kDrillVsEnemy` per second, a sixtieth of it per tick (#9). */
 export function pinnedDrillDamagePerTick(drillPower: BigStat): BigStat {
-  return div(mul(drillPower, enemies.combat.kDrillVsEnemy), TICKS_PER_SECOND_STAT)
+  return enemyDamagePerTick(drillDamagePerSecond(drillPower))
 }
 
 /** Seconds a pinned enemy survives on the drill: `health / (drillPower * kDrillVsEnemy)`. */
 export function pinnedKillSeconds(kind: EnemyKind, tier: number, drillLevel: number): BigStat {
-  const damagePerSecond = mul(drillPower(drillLevel), enemies.combat.kDrillVsEnemy)
-  return div(enemyHealth(kind, tier), damagePerSecond)
+  return div(enemyHealth(kind, tier), drillDamagePerSecond(drillPower(drillLevel)))
+}
+
+/**
+ * The ticks an enemy engaged on the drill's nose lives (ticket 564, the TD's dwell as the VS
+ * amended it on #551, 6254978633): `max(1, ceil(health * 60 / damagePerSecond))`, with no tier
+ * threshold and no speed input, so an under-tier enemy dies in one tick and time to kill is
+ * continuous in tier. Past a safe integer of ticks it is held at the largest one.
+ */
+export function noseDwellTicks(health: BigStat, damagePerSecond: BigStat): number {
+  const ticks = ceil(div(mul(health, TICKS_PER_SECOND_STAT), damagePerSecond))
+  if (cmp(ticks, MOST_TICKS) > 0) return Number.MAX_SAFE_INTEGER
+  return Math.max(1, toSafeInteger(ticks))
+}
+
+/** Whether `kind` always holds a rig its nose meets, by the `enemies.holdsTheRig` table (ticket 564). */
+export function isRigHolderKind(kind: string): boolean {
+  return enemies.holdsTheRig[kind] === true
+}
+
+/**
+ * The hardness of the rock an enemy tier belongs to (ticket 564, the TD's ruling 3 on #551): the
+ * planet and band `enemyTier` maps to that tier, read back (band 6 being the core material's), at
+ * `blockHardness`. The drill's gate tip against it is the ground gates' own comparison, so an
+ * enemy is tougher than the rig exactly where its band's rock would stop the drill.
+ */
+export function enemyRockHardness(tier: number): BigStat {
+  const { first, perPlanet, perBand } = enemies.tier
+  const steps = Math.max(0, tier - first)
+  const planetIndex = FIRST_PLANET + Math.floor(steps / perPlanet)
+  const band = FIRST_BAND + Math.floor((steps % perPlanet) / perBand)
+  return blockHardness(planetIndex, band)
 }
 
 /** The share of `hullMax` one side hit removes (#9: 15 to 25% on-curve). */

@@ -14,18 +14,24 @@ import { radiusForPlanet } from '../world/planetParams'
 import { ENEMY_KINDS } from './economyDefinition'
 import { ECONOMY } from './economy'
 import {
+  drillDamagePerSecond,
   enemyBaseHit,
   enemyBoundedStats,
   enemyHealth,
   enemyHitOnVehicle,
+  enemyRockHardness,
   enemyTier,
+  isRigHolderKind,
+  noseDwellTicks,
   pinnedDrillDamagePerTick,
   sideHitShareOfHull,
   spawnDensityScale,
 } from './enemyStats'
+import { blockHardness } from './oreEconomy'
 import { drillPower, engineStats, hullMax, onCurveLevel } from './vehicleStats'
 
 const m = fromCanonical
+const ZERO = fromSafeInteger(0)
 const PLANETS_1_TO_40 = Array.from({ length: 40 }, (_, index) => index + 1)
 const BANDS = [1, 2, 3, 4, 5]
 const TIERS = [1, 10, 100, 1000]
@@ -250,5 +256,52 @@ describe('spawn density by planet size (#131)', () => {
     expect(cmp(spawnDensityScale(15), m('0.6'))).toBeGreaterThan(0)
     expect(spawnDensityScale(16)).toEqual(m('0.6'))
     expect(spawnDensityScale(40)).toEqual(m('0.6'))
+  })
+})
+
+describe('nose contact inputs (ticket 564, the TD and VS rulings on #551)', () => {
+  const DRILL_LEVELS = [1, 8, 20, 60, 200]
+
+  it('scales drill damage by one kDrillVsEnemy that depends on neither drill power nor level', () => {
+    const k = ECONOMY.enemies.combat.kDrillVsEnemy
+    for (const level of DRILL_LEVELS) {
+      expect(div(drillDamagePerSecond(drillPower(level)), drillPower(level))).toEqual(k)
+    }
+  })
+
+  it('dwells max(1, ceil(health x 60 / damage per second)) ticks, as the pinned drill kills', () => {
+    const rate = drillDamagePerSecond(drillPower(12))
+    expect(noseDwellTicks(enemyHealth('crawler', 1), rate)).toBe(29)
+    expect(noseDwellTicks(m('0.001'), rate)).toBe(1)
+    expect(noseDwellTicks(ZERO, rate)).toBe(1)
+  })
+
+  it('kills an under-tier enemy in one tick and grows the dwell with tier, with no threshold', () => {
+    const rate = drillDamagePerSecond(drillPower(20))
+    const dwells = Array.from({ length: 60 }, (_, index) =>
+      noseDwellTicks(enemyHealth('crawler', index + 1), rate),
+    )
+    for (let index = 1; index < dwells.length; index++) {
+      expect(dwells[index]).toBeGreaterThanOrEqual(dwells[index - 1])
+      expect(dwells[index]).toBeLessThanOrEqual(Math.ceil(dwells[index - 1] * 1.12) + 1)
+    }
+    expect(noseDwellTicks(enemyHealth('crawler', 1), m('1000'))).toBe(1)
+  })
+
+  it('reads an enemy tier back to the rock of the planet and band it was made for', () => {
+    for (const planet of PLANETS_1_TO_40) {
+      for (const band of [...BANDS, 6]) {
+        expect(enemyRockHardness(enemyTier(planet, band))).toEqual(blockHardness(planet, band))
+      }
+    }
+    expect(enemyRockHardness(0)).toEqual(blockHardness(1, 1))
+  })
+
+  it('makes the wrecker and the core guardian hold the rig, and every built kind state it', () => {
+    for (const kind of ENEMY_KINDS) {
+      expect(typeof ECONOMY.enemies.holdsTheRig[kind]).toBe('boolean')
+    }
+    expect(['tunnel_wrecker', 'core_guardian'].every(isRigHolderKind)).toBe(true)
+    expect(['crawler', 'burrower', 'ore_thief'].some(isRigHolderKind)).toBe(false)
   })
 })

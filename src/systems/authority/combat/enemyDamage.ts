@@ -12,8 +12,7 @@
  *   damage still pending on a pinned one is logged first.
  */
 import { ENEMY_DAMAGE_LOG_TICKS } from '../../../constants/balance'
-import { pinnedDrillDamagePerTick } from '../../economy/enemyStats'
-import { drillPowerAtStep } from '../../economy/vehicleStats'
+import { enemyDamagePerTick } from '../../economy/enemyStats'
 import {
   add,
   cmp,
@@ -41,6 +40,7 @@ import {
   type Enemy,
   type HitArc,
 } from './combatState'
+import { enemyDamageRate } from './enemyDamageRate'
 import { hitArcOf } from './hitArc'
 import { withWreckerGone } from './wreckerRoute'
 
@@ -206,8 +206,9 @@ function chargeOneDrillTick(state: AuthorityState, playerId: string): RuleEffect
   return unchanged(withVehicle(state, playerId, { ...vehicle, energy }))
 }
 
-function drillDamagePerTickOf(state: AuthorityState, playerId: string): BigStat {
-  return pinnedDrillDamagePerTick(drillPowerAtStep(vehicleOf(state, playerId).levels.drill_power))
+/** A sixtieth of the one damage seam's rate (ticket 564), never drill power read here. */
+export function drillDamagePerTickOf(state: AuthorityState, playerId: string): BigStat {
+  return enemyDamagePerTick(enemyDamageRate(state, playerId))
 }
 
 function isSwimmingIn(enemy: Enemy, tile: TilePoint): boolean {

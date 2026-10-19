@@ -235,6 +235,15 @@ export interface EnemyDef {
  */
 export type MetalEnemyTags = Readonly<Record<string, boolean>>
 
+/**
+ * Whether each enemy always holds a rig whose drill meets it (ticket 564, HS on #551 6254968595):
+ * the single hunted targets, `tunnel_wrecker` and `core_guardian`, hold it as a gate-free obstacle
+ * whatever the tier comparison says; every other kind rides the nose unless its tier's rock is
+ * past the rig's gate tip. Every built kind states it, as with the metal tag; a row not built yet
+ * may state it ahead of its spec.
+ */
+export type RigHolderTags = Readonly<Record<string, boolean>>
+
 /** How many wreckers may hunt one vehicle's route from planet `from` on (#111 `maxAliveByPlanet`). */
 export interface WreckerCap {
   from: number
@@ -530,6 +539,7 @@ export interface Economy {
     saturationTier: number
     kinds: readonly EnemyDef[]
     metal: MetalEnemyTags
+    holdsTheRig: RigHolderTags
     tunnelWrecker: TunnelWreckerRules
     combat: CombatRules
   }
