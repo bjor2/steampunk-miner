@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-10-19T18:41:32+02:00",
+  "updated_at": "2026-10-19T19:33:49+02:00",
   "caps": {
     "grok": 12,
     "claude": 10,
@@ -20,11 +20,11 @@
         {
           "slot": "C1",
           "state": "busy",
-          "ticket": 570,
+          "ticket": 564,
           "grok_slot": 1,
           "kind": "dev",
-          "since": "2026-10-19T14:32:00+02:00",
-          "wave": "316-5G"
+          "since": "2026-10-19T19:33:00+02:00",
+          "wave": "316-6B"
         },
         {
           "slot": "C2",
@@ -70,7 +70,7 @@
       "size": 6,
       "used": 1,
       "free": 5,
-      "claims_last_hour": 0,
+      "claims_last_hour": 1,
       "name": "Claude Max 1"
     },
     {
@@ -143,10 +143,10 @@
     {
       "slot": 1,
       "state": "dev",
-      "ticket": 570,
-      "since": "2026-10-19T14:32:00+02:00",
+      "ticket": 564,
+      "since": "2026-10-19T19:33:00+02:00",
       "claude_slot": 1,
-      "wave": "316-5G"
+      "wave": "316-6B"
     },
     {
       "slot": 2,
@@ -219,11 +219,11 @@
     {
       "slot": 1,
       "state": "busy",
-      "ticket": 570,
+      "ticket": 564,
       "grok_slot": 1,
-      "since": "2026-10-19T14:32:00+02:00",
+      "since": "2026-10-19T19:33:00+02:00",
       "account": 1,
-      "wave": "316-5G"
+      "wave": "316-6B"
     },
     {
       "slot": 2,
@@ -299,11 +299,11 @@
     }
   ],
   "last_refill": {
-    "at": "2026-10-19 17:47 CEST",
+    "at": "2026-10-19 19:33 CEST",
     "mode": "refill-dev",
-    "triggers": "#418",
-    "started": "",
-    "note": "no pickable build ticket"
+    "triggers": "#570",
+    "started": "#564->C1/A1",
+    "note": "spawned 1 worker(s)"
   },
   "totals": {
     "grok": {
@@ -332,22 +332,9 @@
         "map": 316,
         "lane": "remote",
         "mode": "solo",
-        "state": "blocked",
-        "tickets": [
-          564
-        ],
-        "done": [],
-        "live": 0
-      },
-      {
-        "number": 572,
-        "key": "316-5G",
-        "map": 316,
-        "lane": "remote",
-        "mode": "solo",
         "state": "running",
         "tickets": [
-          570
+          564
         ],
         "done": [],
         "live": 1
