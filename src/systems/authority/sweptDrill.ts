@@ -19,7 +19,14 @@
  *   `frontStepMmAt`), and the stamp lowers each sample once, as the front crosses it
  *   (`world/cutFront.ts`), so the face moves with the body and no cell vanishes in one frame. A
  *   paid cell is cleared as the front passes it; where the work falls short of a cell, the front
- *   bites into it as far as the work pays (`sweptFront.ts`).
+ *   bites into it as far as the work pays (`sweptFront.ts`). The body follows on the cut-follow's
+ *   `vCut`, the face it meets read from this same density (the ground collider and the reader),
+ *   never a Rapier ray, so a replay meets the same face.
+ * - **Contact is the body's walked path, not the stamp** (TD shape on #570, point 3, for #564's
+ *   nose contact): since the stamp runs a step ahead of the body, what the body touches in a tick
+ *   is the segment from its pose at the last step (`SweptCut.poseXMm`/`poseYMm`) to its pose now
+ *   (`step.pose`), swept by its own 0.9 m box. A contact rule must read that segment; the stamp,
+ *   the front and the walk's reach say where the drill cut, not where the body went.
  * - The tick settles in `sweptSettle.ts`: the cursor moves to where the walk reached, a standing
  *   cell is reported once, and casing rings follow the cut at fixed spacing.
  * - The swept span (`sweptSpanDrill.ts`, ticket 374) cuts the same tick through `drillSweepBy`
