@@ -336,10 +336,13 @@ programs }` from three's `renderer.info` of the game canvas), read only when cal
 1`, `price(n) = ceil(20 x 1.48^(n - 1)) x paceScale` for n = 0 to 300 on planets 1, 3, 8 and 11,
   no major split, p/s at least 1 on every purchase), and the numbers past purchase 100 (finite
   canonical stats at 100, 1000 and 3000, whole climbing rows to 3000). `src/logging/subStepFloor.test.ts`
-  carries the one-sub-step floor as known red under #558 with a local marker: on soft ground the
-  delivered step stays in the band through purchase 23, leaves it at 24 and is dead from 33, and
-  no drill reaches 5000 cells/s; the marker expires when #558 closes and fails once its rows turn
-  green. The pacing half is the lane `src/logging/drillPace.lane.test.ts`: the plain bot plays the
+  holds the lifted sub-step floor (ticket 558; it carried the floor as known red under #552): on
+  soft ground every purchase to 50 delivers 1.181 to 1.305 with none dead, the cut is within 1% of
+  the law from 1000 cells/s, a drill cuts past 5000 cells/s, and energy a metre at purchases 10, 20
+  and 30 is D(1) / D(n) within 2%. `src/systems/vehicle/drillQuantum.test.ts` holds the rig's drill
+  quantum itself (60 kept while a band-1 cell costs 100 sub-steps, doubled to 100-199 past it, 11
+  doublings at most) and `src/systems/world/carvePhase.test.ts` the carve's tick phase, exact past
+  2^53. The pacing half is the lane `src/logging/drillPace.lane.test.ts`: the plain bot plays the
   bot scenario to planet 10's core on the three pacing seeds and `drillPaceBars.ts` judges the
   seed medians as VS split them before #559: planet minutes at most 30 on P2-P10, drill-only gaps
   at most 10 minutes, planet-average felt speed at least 5 cells/s, no dry tank and no stalled
@@ -466,7 +469,8 @@ incomePerHour}` go to `balance-report/drill-pace.ndjson`, which `pushTestMetrics
   ticket 552. It checks the whole column was cut and no step cut slower, stored 20 against stored 1
   within [55, 70], and the stored-20 cut on band 1 between -2.7% and +0.5% of D(20) (VS's bench bar
   (ii) split by the TD on #551): it prints the band-1 hardness and tip it used and the expected
-  quantisation, `3600 / ceil(3600 H^3 / (D P^2))` cells/s, and the cut must read exactly that. Its
+  reading, `20 x 60 / ceil(20 n / Q)` cells/s with `n` a cell's sub-steps in the rig's drill quantum
+  `Q` (ticket 558), and the cut must read exactly that. Its
   rows go to `balance-report/drill-ladder-steps.ndjson`, which the Tester's
   `pushTestMetrics.sh` appends to `drill-ladder.ndjson` on `test-metrics` for the status page's
   Drill speed panel ([loop-status.md](loop-status.md#drill-speed-panel-ticket-434)). About 2 s.
@@ -650,8 +654,9 @@ incomePerHour}` go to `balance-report/drill-pace.ndjson`, which `pushTestMetrics
   beyond its reach; the tank paying the law work removed exactly within the integer carry, under
   1.25 and 1.098; walk order and the cutting player's stamp; the same digest on a second run; the
   84 m/s casing (points never under 500 mm apart, rings at the full lag, one per 500 mm, no own
-  lining cut); a cold slab and a prefetched one cutting the same ground. 8400 m/s is an `it.todo`
-  until #558 lifts the 3600 m/s sub-step floor. The codex half (first-ore and material records once
+  lining cut); a cold slab and a prefetched one cutting the same ground. The bars run at 84, 840 and
+  8400 m/s: ticket 558 lifted the 3600 m/s sub-step floor, and the slab's rock runs 160 rows under
+  its foot, past the stamp's lead at 8400 m/s. The codex half (first-ore and material records once
   a cell, in walk order) is `src/features/codex/systems/contactsAtSpeed.test.ts`; the 84 m/s
   collapse outrun (#341 stands: cancelled, nothing refilled or crushed, cut events as past a
   tunnel that never warned, braced blocks never refilled) is
@@ -756,7 +761,7 @@ incomePerHour}` go to `balance-report/drill-pace.ndjson`, which `pushTestMetrics
   the panel from `?debug&title` with a tap.
 - **Known red** (ticket 419, the TD on #396 section 2): `CAMPAIGN_PACING_KNOWN_RED`
   (`src/constants/knownRed.ts`) is the one exported known-red marker in the repo (lanes and specs
-  keep local ones with a ruling, as `subStepFloor.test.ts` keeps #558's): one gate
+  keep local ones with a ruling, as `subStepFloor.test.ts` kept #558's until ticket 558): one gate
   (`campaignPacingGate`), one finding (#417), no registry. The gate still runs in full;
   `knownRedVerdict` (`src/logging/knownRed.ts`) prints its stalled-seed and sawtooth problems as
   `known-red (#417): ...` instead of failing them. The schedule cadence and "judged nothing" always

@@ -46,7 +46,7 @@ The tables list **major levels** `L`, today's curves. A vehicle stores each trac
   the hold 22 + 2 a planet, stopping at 34 (255 units, past the largest band's ore) from P7; the
   boiler 4 + 1 a planet, stopping at Systems' 16-purchase tank (689 units) from P13, which keeps
   the old on-curve tank (P7 389 units against 390); the engine 2 + 3 a planet, stopping at 131,
-  the last purchase under the 3600 m/s sub-step floor. `paceScale` rows: 1.2 from P2, 1.3 from P4,
+  the last purchase under the old 3600 m/s sub-step floor (lifted by ticket 558). `paceScale` rows: 1.2 from P2, 1.3 from P4,
   1.6 from P6, 1.7 from P8.
 - The design tables of the tip and hull do not change, because they read majors. `npm run balance:report` prints the
   pacing bot's spree targets per track (GD lock on #181): the median steps per bought track a

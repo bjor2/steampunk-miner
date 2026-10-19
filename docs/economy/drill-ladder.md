@@ -23,10 +23,16 @@ Bjor's order of 18 Oct (level 20 about 50x today's) as the GD ruled it on #551: 
   printed by `pacingGate.test.ts`, not gated), #304's drill constants and #307's on-curve labels. On curve drill power
   holds about 12 purchases at planet 1 and 3 a planet. Tip, hull and the other tracks keep their
   locks and their pips.
-- **The one-sub-step floor:** a cell costs `ceil(3600 H^3 / (D P^2))` sub-steps and never fewer
-  than one, so on soft ground the delivered step leaves the band at purchase 24 (1.176), is dead
-  from 33 and stops at 3600 cells/s from 37. `src/logging/subStepFloor.test.ts` carries this as
-  known red under #558, which lifts the floor. No economy cap hides it.
+- **The sub-step floor, lifted (ticket 558):** at a fixed 60 sub-steps a tick a cell cost
+  `ceil(3600 H^3 / (D P^2))` sub-steps and never fewer than one, so on soft ground the delivered
+  step left the band at purchase 24 (1.176), was dead from 33 and stopped at 3600 cells/s from 37.
+  The swept cut now counts in the rig's own drill quantum (`vehicle/drillQuantum.ts`): 60 doubled,
+  at most 11 times, until a cell of the planet's band-1 rock costs the rig 100 sub-steps or more,
+  so every cut is within 1% of the law and every purchase delivers 1.181 to 1.305 (checked through
+  purchase 50 in `src/logging/subStepFloor.test.ts`). A rig that already pays 100 keeps 60 (on
+  planet 1 purchases up to 15), so on-curve play cuts as before. A drill's cut and travel steps
+  stop at the planet's radius a tick, the one bound left, and the swept span budget
+  (`SWEPT_SPAN_CHUNKS_PER_TICK`, 80) covers that step on the largest planet. No economy cap.
 - **Flag-off path:** with `drill.sweptCut` off the body is held to 18 m/s and the report capsule to
   950 mm a tick; that fallback is unsupported above 18 m/s, a documented deviation, not a pass.
 
@@ -75,8 +81,9 @@ foot, so the cut alone sets the time.
 drill_power steps 1, 5, 10, 15 and 20, the levels the browser drill-down run holds Down at, one
 purchase each since #552. It holds the whole column, no slower step, stored 20 / stored 1 within
 [55, 70] and the stored-20 cut within -2.7% and +0.5% of D(20): it prints the band-1 hardness (1)
-and tip (1) it used and the expected cut, `3600 / ceil(3600 H^3 / (D P^2))` = 3600 / 39 = 92.308
-cells/s for a law of 94.14 (-1.9%, the 1/39 rounding). Its rows go to `drill-ladder.ndjson` on
+and tip (1) it used and the expected cut. Since ticket 558 stored 20 counts in a quantum of 240,
+153 sub-steps a cell (94.118 cells/s, 0.02% under the law of 94.14); the 20-cell column reads in
+whole ticks, 13 of them, so the row still reads 92.308 cells/s (-1.9%). Its rows go to `drill-ladder.ndjson` on
 `test-metrics` and the status page's Drill speed panel sets them beside the browser descent
 ([loop-status.md](../loop-status.md#drill-speed-panel-ticket-434)). At ticket 552:
 
@@ -133,13 +140,16 @@ step 0 (tip 1), so `eff` is 1 and the drill law's speed is `D` cells/s, one purc
   `ceil(3600 H / (D eff))` (`subStepsPerTile`). **read** is `floor(60000 / n)` mm a tick
   (`cutStepMmOf`), times 60 / 1000 for m/s. 1 mm a tick is 0.06 m/s.
 - **What the test holds.** The first purchase keeps its old pip (1.0063); every purchase from 1 to
-  23 pays 1.181 to 1.305 in sub-steps; the read is always the cell its whole sub-steps allow and
+  30 pays 1.181 to 1.305 in sub-steps (23 before ticket 558); the read is always the cell its whole sub-steps allow and
   never over the law; to stored 10 it is within one mm a tick under the law.
-- **Where the quantum shows.** While a cell costs hundreds of sub-steps the read stays within 1% of
-  the law. From about stored 20 (39 sub-steps) the whole sub-step rounds the read 2% under, and
-  from stored 24 a purchase can deliver outside its band (1.176 at 24, 1.167 at 29): the sub-step
-  floor that #558 lifts, carried as known red until it does.
+- **Where the quantum showed.** The table is ticket 552's, at the fixed 60 sub-steps a tick. While
+  a cell cost hundreds of sub-steps the read stayed within 1% of the law; from about stored 20 (39
+  sub-steps) the whole sub-step rounded it 2% under, and from stored 24 a purchase could deliver
+  outside its band (1.176 at 24, 1.167 at 29). Ticket 558 counts a rig past stored 15 in its own
+  doubled quantum (100 to 199 sub-steps a cell here), so from stored 16 the read is within 1% of
+  the law and every purchase to 30 is in its band; the test now reads `floor(1000 Q / n)`.
 - **What else uses the same step.** The authority's cutting step bound (`stepBound.ts`,
   `cutStepMmOf` plus one 250 mm sample of tolerance), travel parity (`travelParity.ts`) and the P200
-  dive fixture. The authority's cut itself counts sub-steps and never rounds to mm, so it runs at the
-  law; only the body's commanded follow speed and those bounds see the floor.
+  dive fixture, each in the rig's drill quantum since ticket 558. The authority's cut itself counts
+  sub-steps and never rounds to mm, so it runs at the law; only the body's commanded follow speed
+  and those bounds see the mm rounding, under 1% at any speed.
