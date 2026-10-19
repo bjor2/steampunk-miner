@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-10-19T08:16:44+02:00",
+  "updated_at": "2026-10-19T08:16:51+02:00",
   "caps": {
     "grok": 12,
     "claude": 10,
@@ -122,38 +122,23 @@
     }
   ],
   "gate": {
-    "busy": 0,
+    "busy": 1,
     "max": 3
   },
   "tester": {
     "state": "running",
-    "phase": "probes",
-    "sha": "e54f5ed0cdc7d359631f994802c2f05fd794ff9a",
-    "since": "2026-10-19T05:56:05Z",
+    "phase": "fast",
+    "sha": "40f7723968bf215d9793d5d016db379ef02df8d6",
+    "since": "2026-10-19T06:16:47Z",
     "holds_gate": true,
     "claude_slot": null,
     "last_run": "2026-10-19T05:45:23Z",
     "last_nightly": "2026-10-15T20:43:15Z",
     "last_nightly_result": "full=FAIL balance-report=ok bench=FAIL balance-planets=ok balance-guns=ok balance-charges=ok balance-refinery=ok balance-heat=ok e2e=FAIL memory-soak=FAIL packaged-smoke=ok ",
     "main_red_sha": null,
-    "feature": 409,
-    "feature_title": "Test: drill-speed ladder benchmark (levels 1/5/10/15/20)",
+    "feature": 422,
+    "feature_title": "Spec: UI text budget, readable text, steampunk scroll area and tooltip",
     "queue": [
-      {
-        "feature": 422,
-        "kind": "spec",
-        "title": "Spec: UI text budget, readable text, steampunk scroll area and tooltip",
-        "tickets": [
-          423,
-          424,
-          425,
-          426,
-          427,
-          428,
-          429
-        ],
-        "since": "2026-10-16T00:46:43+02:00"
-      },
       {
         "feature": 255,
         "kind": "spec",
