@@ -48,10 +48,11 @@ const TRIP_END_TICK = 4000
 /** Ore here sells for about 5e42 a unit (`V(t) = 10 * 1.5^(t-1)`, #6), so a sale earns past 1e40. */
 const RICH_PLANET = 80
 /**
- * A cargo_hold major whose first step costs about 4e40 (near a tenth of `24 * 1.225^L`, #6, #195,
- * #180), so a purchase spends past 1e40.
+ * A hull major whose first step costs about 1e41 (near a tenth of `46 * 1.225^L` times the pace,
+ * #6, #195, #180), so a purchase spends past 1e40. The hold bought this before ticket 553; bought
+ * per purchase, its units leave the safe integers long before its price passes 1e40.
  */
-const RICH_CARGO_LEVEL = 457
+const RICH_HULL_LEVEL = 457
 const RICH_TIP_LEVEL = 240
 const RICH_DRILL_LEVEL = 500
 const MIXED_ORE_COUNT = 6
@@ -82,7 +83,7 @@ export const GOLDEN_SCRIPTS: readonly GoldenScript[] = [
   {
     name: 'money-past-1e40',
     description:
-      'Planet 80 ore sold for more than 1e40, then a cargo_hold level bought for more than 1e40 (#5, #11).',
+      'Planet 80 ore sold for more than 1e40, then a hull step bought for more than 1e40 (#5, #11, 553).',
     worldSeed: WORLD_SEED,
     endTick: 2000,
     commands: moneyPast1e40Commands(planetParamsFor(WORLD_SEED, RICH_PLANET)),
@@ -167,7 +168,7 @@ function moneyPast1e40Commands(params: PlanetParams): ScriptedCommand[] {
   const levels = [
     setUpgrade('drill_tip', RICH_TIP_LEVEL),
     setUpgrade('drill_power', RICH_DRILL_LEVEL),
-    setUpgrade('cargo_hold', RICH_CARGO_LEVEL),
+    setUpgrade('hull', RICH_HULL_LEVEL),
   ]
   const tripEnd = 1 + 3 * (BAND_1_TICKS + 1)
   return [
@@ -176,7 +177,7 @@ function moneyPast1e40Commands(params: PlanetParams): ScriptedCommand[] {
     ...mineTilesFrom(1, surfaceOreTiles(3, params)),
     ...homeAndSellAt(tripEnd, params).slice(0, 3),
     ...dockInUpgradeBayAt(tripEnd + 40, params),
-    { tick: tripEnd + 45, type: 'buyUpgrade', payload: { upgradeId: 'cargo_hold', chain: 0 } },
+    { tick: tripEnd + 45, type: 'buyUpgrade', payload: { upgradeId: 'hull', chain: 0 } },
   ]
 }
 

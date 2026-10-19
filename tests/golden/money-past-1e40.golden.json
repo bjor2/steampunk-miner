@@ -1,8 +1,8 @@
 {
   "name": "money-past-1e40",
-  "description": "Planet 80 ore sold for more than 1e40, then a cargo_hold level bought for more than 1e40 (#5, #11).",
+  "description": "Planet 80 ore sold for more than 1e40, then a hull step bought for more than 1e40 (#5, #11, 553).",
   "generatorVersion": 11,
-  "authorityProtocolVersion": 91,
+  "authorityProtocolVersion": 92,
   "logSchemaVersion": 7,
   "numberFormatVersion": 1,
   "sliceSections": {
@@ -64,7 +64,7 @@
       "seq": 4,
       "type": "debug.setUpgrade",
       "payload": {
-        "upgradeId": "cargo_hold",
+        "upgradeId": "hull",
         "level": 4570
       }
     },
@@ -204,7 +204,7 @@
       "seq": 17,
       "type": "buyUpgrade",
       "payload": {
-        "upgradeId": "cargo_hold",
+        "upgradeId": "hull",
         "chain": 0
       }
     }
@@ -213,17 +213,17 @@
     {
       "tick": 124,
       "scope": "dock",
-      "digest": "147e61fc693ade13"
+      "digest": "e793b4e335efafdb"
     },
     {
       "tick": 166,
       "scope": "dock",
-      "digest": "7b4fffbc59f6ba95"
+      "digest": "09d6007e48adbac5"
     },
     {
       "tick": 2000,
       "scope": "end",
-      "digest": "94511acded33beca"
+      "digest": "14898144a1ae8bce"
     }
   ],
   "minedOrder": [

@@ -3,7 +3,8 @@
  * shipped on (Bjor, 18 Oct 2026: "turn everything on"). With `drill.exactCarry` on, as it ships,
  * only the two goldens whose pose reports drill move their end digest, and the committed goldens
  * (`tests/golden`, regenerated with `npm run golden:update` that day) hold the moved ones; every
- * other golden is the same either way. The pins below are protocol 91's digests with the exact
+ * other golden is the same either way. The pins below are protocol 91's digests (92's too: ticket
+ * 553 moved no digest of these two) with the exact
  * carry off (the codex's species record, ticket 546, and the per-purchase drill of ticket 552 moved
  * them with the rest), what those two goldens replay to with it off: the kill-switch's parity
  * proof. The goldens' reports
