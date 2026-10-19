@@ -495,6 +495,18 @@ incomePerHour}` go to `balance-report/drill-pace.ndjson`, which `pushTestMetrics
   airborne rig-heavy release that keeps its ramp (skipped since ticket 552 until their phases are
   re-paired at purchase 12, as no purchase cuts the 14.47 m/s they were read at), and one-step checks through `cutTickFor` (swept cut off
   reads no toe; a gated cell still stops the body) on the ground of `src/physics/toeStopFixtures.ts`.
+- **Riding the cut face** (ticket 570): `src/physics/cutFaceRide.test.ts` plays down legs at drill
+  purchases 1, 10 and 20 (1.5, 10.7 and 94 m/s on planet 1) on a column and a tilted column at 30
+  and 144 frames/s, and a level leg turned out of a down bore, in the live loop with
+  `drill.sweptCut` on, reading the world after every fixed tick (`Rig.hold`'s `observe`, the
+  reads in `src/physics/cutFaceRead.ts`). On every open-gate tick after a 6-tick settle, faces in
+  a generated cave left out: the gap from the body's face to the ground ahead is at most 0.10 m,
+  no density sample drops by 128 or more outside the stretch the cut's front crossed in the tick,
+  the body stands on ground, and no tick moves it further than the cut speed, a tick's fall and
+  0.25 m (about 15 s). Since ticket 570 the swept fixtures that script a body's pose hold it at
+  the cut's face (`authority/faceHoldFixtures.ts`), as a live body cannot move into ground its
+  cut has not opened. `src/scene/chunkHaloEdits.test.ts` checks a built chunk mesh shows an edit in
+  its density halo the frame the world changes, ahead of its capped rebuild.
 - **Body-wide bore at any cells a tick** (ticket 439): `src/systems/authority/sweptFreshCarve.test.ts`
   cuts planet 1's column and its tilted radius with rigs named by their band-1 cut speed (25 to
   3600 m/s, the drill found by `subStepsPerTile` in `sweptRigFixtures.ts`), a tick count to the
