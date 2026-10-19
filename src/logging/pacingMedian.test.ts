@@ -80,13 +80,13 @@ describe('pacing median over seeded runs', () => {
     expect(median.rescuesByCause).toEqual({ destroyed: 2 })
   })
 
-  it('prints one row per seed and the median', () => {
+  it('prints one row per seed and the median, drill power in purchases and the tip in majors', () => {
     const table = formatSeedPacingTable([
       { worldSeed: 83921, report: reportOf({ sliceEndTick: 94 * MINUTE }) },
       { worldSeed: 31415, report: reportOf({ sliceEndTick: 100 * MINUTE }) },
       { worldSeed: 27182, report: reportOf({ sliceEndTick: 134 * MINUTE }) },
     ])
-    expect(table).toContain('| 83921 | 25.0 min | 48.0 min | 94.0 min | 0 | 19 / 10 · 4/9 |')
-    expect(table).toContain('| median | 25.0 min | 48.0 min | 100.0 min | 0 | 19 / 10 · 4/9 |')
+    expect(table).toContain('| 83921 | 25.0 min | 48.0 min | 94.0 min | 0 | 190 / 10 · 4/9 |')
+    expect(table).toContain('| median | 25.0 min | 48.0 min | 100.0 min | 0 | 190 / 10 · 4/9 |')
   })
 })

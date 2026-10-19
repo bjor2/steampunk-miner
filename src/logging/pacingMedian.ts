@@ -7,7 +7,7 @@
  */
 import { derivePacingReport, minutesText, type PacingReport } from './pacingReport'
 import type { RunEvent } from './runEvent'
-import { stepLevelText } from '../systems/views/stepLevelText'
+import { trackStepText } from '../systems/views/stepLevelText'
 
 /** One seed's run, as the per-seed rows of the balance report print it. */
 export interface SeededPacingReport {
@@ -98,7 +98,7 @@ function seedRowOf(label: string, report: PacingReport): string {
     optionalMinutesText(report.coreTicksOnPlanet['2']),
     optionalMinutesText(report.sliceEndTick ?? undefined),
     String(rescueCountOf(report)),
-    `${stepLevelText(report.finalLevels.drill_power ?? 0)} / ${stepLevelText(report.finalLevels.drill_tip ?? 0)}`,
+    `${trackStepText('drill_power', report.finalLevels.drill_power ?? 0)} / ${trackStepText('drill_tip', report.finalLevels.drill_tip ?? 0)}`,
   ]
   return `| ${cells.join(' | ')} |`
 }
