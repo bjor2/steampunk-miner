@@ -14,6 +14,7 @@
   "planets": {
     "coreFraction": "0.4",
     "fragmentsPerTile": 1,
+    "largestBandOrePerRadius": "0.326",
     "paceScale": {
       "default": "1",
       "fromPlanet": [

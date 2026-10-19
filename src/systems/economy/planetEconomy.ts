@@ -1,8 +1,8 @@
 /**
  * Planet-level economy numbers (decisions #6 section 2 and 6, #10): the core fragments travel
- * needs and the `paceScale(p)` price lever.
+ * needs, the `paceScale(p)` price lever and the ore of the planet's largest band (ticket 553).
  */
-import { ceil, fromSafeInteger, mul, toSafeInteger, type Money } from '../money'
+import { ceil, floor, fromSafeInteger, mul, toSafeInteger, type Money } from '../money'
 import { ECONOMY } from './economy'
 
 const { planets } = ECONOMY
@@ -10,6 +10,16 @@ const { planets } = ECONOMY
 /** `coreNeeded = ceil(0.4 * coreTileCount)`: 63 on planet 1, 127 from planet 2 on (#10). */
 export function coreFragmentsNeeded(coreTileCount: number): number {
   return toSafeInteger(ceil(mul(planets.coreFraction, fromSafeInteger(coreTileCount))))
+}
+
+/**
+ * The ore units of a planet's largest band, `floor(0.326 R)` (Systems' rows on #553): 97 on
+ * planet 1 (Systems rounds it to 98), 189 on 5, 234 on 10. A trip serves one band, so a hold past
+ * it fills no fewer trips.
+ */
+export function largestBandOreUnits(radiusTiles: number): number {
+  const units = mul(planets.largestBandOrePerRadius, fromSafeInteger(radiusTiles))
+  return toSafeInteger(floor(units))
 }
 
 /** Fragments one core tile drops (#10 `fragmentsPerTile`, a data field). */

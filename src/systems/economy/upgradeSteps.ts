@@ -12,8 +12,8 @@
  * running totals would lose low digits (TD, #181). `up` is `ceil` for the brass and drill tracks
  * and `ceilMilli` for the guns, whose prices are in the money quantum.
  *
- * A per-purchase track (drill power, the GD ruling on #551 for ticket 552; the hold and the engine,
- * Systems' Proposal 1 for ticket 553) has no majors in its law or its price: its level is the
+ * A per-purchase track (drill power, the GD ruling on #551 for ticket 552; the hold, the boiler and
+ * the engine, Systems' rows on #553 for ticket 553) has no majors in its law or its price: its level is the
  * stored step, one purchase each. Its step still splits into
  * `L` and `k` for the pips the workshop draws, which drill looks may retune (#554).
  */
@@ -64,7 +64,7 @@ export function stepOfMajor(level: number): number {
 
 /**
  * Whether a track grows and is priced per purchase, so its level is its stored step: drill power
- * (#552), the hold and the engine (ticket 553).
+ * (#552), the hold, the boiler and the engine (ticket 553).
  */
 export function isPerPurchaseTrack(upgradeId: UpgradeId): boolean {
   return PER_PURCHASE_EFFECT_FAMILIES.includes(upgradeEffectFamilyOf(upgradeId))

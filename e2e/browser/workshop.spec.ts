@@ -2,7 +2,8 @@
  * The Workshop showcase (#177, spec #180): read through `steampunkDebug.features.workshop`, the
  * authority snapshot and the bay's #33 ids, never pixels. A click on a plaque's Buy buys exactly
  * one step; holding the pointer on it chains steps until let go; `holdBuy` runs a 10-step chain
- * across a big level-up; a hold stops on can't afford with its cue; and the showcase keeps the
+ * across a big level-up; a hold stops on can't afford with its cue; the hold plaque shows its units
+ * and, past the planet's largest band, a muted note (ticket 553); and the showcase keeps the
  * kernel rows' ids while the preview's second WebGL context stays unmounted. On touch (the GD's
  * input rules on #164), each plaque is its track's item card: the first tap opens it and buys
  * nothing, and a held touch on its Buy then chains.
@@ -85,6 +86,29 @@ test.describe('workshop showcase (#177)', () => {
     await expect(page.getByTestId(UI_ID_TEMPLATES.workshopUpgradeLevel('engine'))).toHaveText(
       '0 · 1/9',
     )
+    expect(errors).toEqual([])
+  })
+
+  // Ticket 553 (the Game Director's hold card): the real units always show, and past planet 1's
+  // largest band (97 ore) a muted note says so while the purchase stays on sale.
+  test('the hold plaque shows its units and the past-the-band note, and still sells', async ({
+    page,
+  }) => {
+    test.setTimeout(180_000)
+    const errors = await openAtTheShowcase(page)
+    await page.evaluate(() => {
+      const result = window.steampunkDebug!.setUpgrade('cargo_hold', 24)
+      if (!result.ok) throw new Error(result.problems.join('; '))
+    })
+    await expect(
+      page.getByTestId(UI_ID_TEMPLATES.workshopUpgradeLevel('cargo_hold')),
+    ).toContainText('Hold: 98 ore (+')
+    await expect(page.getByTestId(WORKSHOP_TEST_IDS.plaqueNote('cargo_hold'))).toHaveText(
+      'More than this planet holds. Pays off on deeper planets.',
+    )
+    await page.getByTestId(WORKSHOP_TEST_IDS.plaqueBuy('cargo_hold')).click()
+    await chainOnceEnded(page)
+    expect(await stepOf(page, 'cargo_hold')).toBe(25)
     expect(errors).toEqual([])
   })
 

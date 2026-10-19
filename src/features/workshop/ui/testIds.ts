@@ -5,6 +5,8 @@ export const WORKSHOP_TEST_IDS = {
   carousel: 'workshop-plaque-carousel',
   plaqueLine: (upgradeId: string) => `workshop-plaque-${upgradeId}-line`,
   plaquePips: (upgradeId: string) => `workshop-plaque-${upgradeId}-pips`,
+  /** The muted note under a plaque: a worth-zero engine, a hold past the largest band (553). */
+  plaqueNote: (upgradeId: string) => `workshop-plaque-${upgradeId}-note`,
   /** The held Buy once the plaque is drawn as a card, which carries the #33 buy id (#164). */
   plaqueBuy: (upgradeId: string) => `workshop-plaque-${upgradeId}-buy`,
 } as const

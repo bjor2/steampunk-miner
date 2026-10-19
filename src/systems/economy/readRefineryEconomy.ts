@@ -1,7 +1,7 @@
 /**
  * Reads the cost curves and the Refinery bay block of `economy.json` (#6 section 3 curves, #105
  * numbers). A curve is `geometric` (vehicle tracks, casing), `perPurchase` (drill power, #551 for
- * ticket 552), `geometricPerPurchase` (the hold and the engine, ticket 553) or `bandOre` (the
+ * ticket 552), `geometricPerPurchase` (the hold, the boiler and the engine, ticket 553) or `bandOre` (the
  * refinery's slots); the refinery's slot curve must be a `bandOre` curve pricing exactly the slots
  * past the first.
  */

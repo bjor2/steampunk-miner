@@ -177,8 +177,8 @@ export interface PerPurchaseCostCurve {
 }
 
 /**
- * Prices per purchase from the first one, with no major split (Systems' Proposal 1 on #551, ticket
- * 553: the hold and the engine): purchase `n >= 0` costs `ceil(base * ratio^n)`, times
+ * Prices per purchase from the first one, with no major split (Systems' rows on #553, ticket 553:
+ * the hold, the boiler and the engine): purchase `n >= 0` costs `ceil(base * ratio^n)`, times
  * `paceScale(p)`.
  */
 export interface GeometricPerPurchaseCostCurve {
@@ -425,6 +425,12 @@ export interface Economy {
     coreFraction: Money
     /** Core fragments one drilled core tile drops into the hold (#10: 1). */
     fragmentsPerTile: number
+    /**
+     * The ore of a planet's largest band per tile of radius (Systems' rows on #553, ticket 553:
+     * about 0.326 R units, 98 on planet 1 and 234 on planet 10): a hold past it carries more than
+     * one trip to a band brings back.
+     */
+    largestBandOrePerRadius: Money
     paceScale: PaceScale
     /** Ore per solid tile by depth from planet 3 (ticket 448, `depthDensityCurve.ts`). */
     depthDensity: DepthDensityCurve

@@ -29,14 +29,24 @@ The tables list **major levels** `L`, today's curves. A vehicle stores each trac
   by rounded running totals `ceil(X_L * F(k))`, `F(k) = (rho^k - 1) / (rho^10 - 1)`,
   `rho = ratio^(1/10)` (`nthRoot` in `money.ts`, no `Math.pow`). The tenth step is the remainder, so
   the ten always sum to exactly the level price in the price table.
-- **Stat** (`stepStats.ts`): each curve at `x = L + k/18`; cargo and boiler round their pips half up,
-  the engine saturates on `x`. At `k = 0` every stat is the vehicle table's value.
+- **Stat** (`stepStats.ts`): each curve at `x = L + k/18`. At `k = 0` every stat is the vehicle
+  table's value.
 - **Drill power is the exception since ticket 552** (the GD ruling on #551): it grows and is priced
   per purchase, its level is the stored step, with no pip rule and no major split:
   `D(n) = 1.5 x 1.12^(1/18) x 1.243^(n - 1)` and `price(n) = ceil(20 x 1.48^(n - 1)) x paceScale`,
   1 at n = 0 (economy.json families `perPurchase`). Its table columns count purchases, on curve
   12 at planet 1 and 3 a planet ([drill-ladder.md](drill-ladder.md)).
-- The design tables of the other tracks do not change, because they read majors. `npm run balance:report` prints the
+- **The hold, the boiler and the engine since ticket 553** (Systems' rows on #553, comment
+  6258422139, and the Producer's addendum): per purchase too, with no max level. Hold
+  `round(10 x 1.10^c)` and boiler `round(150 x 1.10^b)`, each for `ceil(2.4 x 1.20^n) x paceScale`
+  (families `wholePerPurchase` and `geometricPerPurchase`); engine `6 x 1.05^e` m/s with accel
+  `1.05^e` and thrust to weight `1 + 1.05^e`, for `ceil(3.6 x 1.60^e) x paceScale`
+  (`enginePerPurchase`). Their stats are plain numbers, safe to about 275 purchases, so the
+  on-curve reference rig stops the hold at 34 (Systems: the bot's hold stops at 255 units from
+  P12, past the largest band's ore) and the engine at 131 (the last purchase under the 3600 m/s
+  sub-step floor); the boiler is 16 on every planet (689 units, Systems' tank). `paceScale` rows:
+  1.2 from P2, 1.3 from P4, 1.6 from P6, 1.7 from P8.
+- The design tables of the tip and hull do not change, because they read majors. `npm run balance:report` prints the
   pacing bot's spree targets per track (GD lock on #181): the median steps per bought track a
   visit, 6 to 12, and the share of above-median trips that buy 10 or more steps on one track, 25 to
   45%. Steps a whole visit and the steps the wallet could chain print as information.

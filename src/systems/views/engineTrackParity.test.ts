@@ -4,7 +4,8 @@ import { createScriptedSession, dockInBay, typesOf } from '../authority/scripted
 import { buyUpgradeCommand } from '../platform/platformCommands'
 import { grantMoneyCommand } from '../startScenarioCommands'
 import { setUpgradeCommand } from '../vehicle/vehicleCommands'
-import { engineWorthZeroText, workshopRowsOf } from './workshopRows'
+import { ENGINE_WORTH_ZERO_TEXT, engineWorthZeroNote } from './trackNotes'
+import { workshopRowsOf } from './workshopRows'
 
 // No max level on the engine (HS and VS on #551, ticket 553): the card always sells the next
 // purchase for money, shows the ratio of the top speed to k times the drill's cut speed in the
@@ -58,7 +59,8 @@ describe('engine card parity with no max level (ticket 553)', () => {
     const row = engineRowOf(modules, {})
     expect(row.badge).toBeNull()
     expect(row.buy.reason).toBeNull()
-    expect(row.levelText).not.toContain(engineWorthZeroText())
+    expect(row.levelText).not.toContain(ENGINE_WORTH_ZERO_TEXT)
+    expect(row.note).toBeNull()
   })
 
   it('shows the ratio of the top speed to 1.5 times the cut in the hardest band', () => {
@@ -69,13 +71,15 @@ describe('engine card parity with no max level (ticket 553)', () => {
   it('counts the step while the drill sets travel in band 1 but not the hardest band', () => {
     const row = engineRowOf(modules, BAND_ONE_DRILL)
     expect(row.buy.reason).toBeNull()
-    expect(row.levelText).not.toContain(engineWorthZeroText())
+    expect(row.levelText).not.toContain(ENGINE_WORTH_ZERO_TEXT)
+    expect(row.note).toBeNull()
   })
 
   it('says the next purchase is worth zero once the drill outruns the engine in every band', () => {
     const row = engineRowOf(modules, STRONG_DRILL)
-    expect(row.levelText).toContain(engineWorthZeroText())
+    expect(row.levelText).toContain(ENGINE_WORTH_ZERO_TEXT)
     expect(row.levelText).toMatch(/top speed (<0\.01|0\.\d\d)× of 1\.5× cut/)
+    expect(row.note).toBe(engineWorthZeroNote())
   })
 
   it('still sells that worth-zero purchase, with no maxed badge and no max_level refusal', () => {
@@ -87,10 +91,10 @@ describe('engine card parity with no max level (ticket 553)', () => {
     expect(typesOf(events)).toContain('UpgradePurchased')
   })
 
-  it('names the 1.5 times cut parity the purchase waits for in its worth-zero text', () => {
-    expect(engineWorthZeroText()).toBe(
-      "worth zero: No extra speed until your drill's cut speed is within reach of the engine's top " +
-        "speed (needs the engine above 1.5× the drill's cut speed). Raises your top speed once it is.",
+  it('names the 1.5 times cut parity the purchase waits for in its worth-zero note', () => {
+    expect(engineWorthZeroNote()).toBe(
+      "No extra speed until your drill's cut speed is within reach of the engine's top speed " +
+        "(needs the engine above 1.5× the drill's cut speed). Raises your top speed once it is.",
     )
   })
 

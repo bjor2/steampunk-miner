@@ -44,6 +44,14 @@
   color: var(--color-amber);
 }
 
+/* What a purchase buys yet, muted under the footer (ticket 553): the purchase stays on sale. */
+.note {
+  margin: 0;
+  color: var(--color-text);
+  opacity: 0.7;
+  font-style: italic;
+}
+
 .line[data-kind='chain'] {
   font-weight: bold;
 }

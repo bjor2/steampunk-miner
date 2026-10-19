@@ -96,6 +96,10 @@ function readPlanets(reader: FieldReader, planets: Record<string, unknown>): Eco
   return {
     coreFraction: reader.money('planets.coreFraction', planets.coreFraction),
     fragmentsPerTile: reader.safeInteger('planets.fragmentsPerTile', planets.fragmentsPerTile),
+    largestBandOrePerRadius: reader.money(
+      'planets.largestBandOrePerRadius',
+      planets.largestBandOrePerRadius,
+    ),
     paceScale: readPaceScale(reader, planets.paceScale),
     depthDensity: readDepthDensity(reader, planets.depthDensity),
   }

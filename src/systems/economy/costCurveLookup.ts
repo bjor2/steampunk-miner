@@ -30,8 +30,8 @@ export function perPurchaseCurveOf(curveId: string): PurchaseCostCurve {
 
 /**
  * The price of purchase `purchase` before `paceScale`: drill power's `firstPrice` at 0, else
- * `ceil(base * ratio^(purchase - 1))` (#551, ticket 552); the hold's and the engine's
- * `ceil(base * ratio^purchase)` from the first one (Systems' Proposal 1, ticket 553).
+ * `ceil(base * ratio^(purchase - 1))` (#551, ticket 552); the hold's, the boiler's and the
+ * engine's `ceil(base * ratio^purchase)` from the first one (Systems' rows on #553, ticket 553).
  */
 export function perPurchaseRowAt(curve: PurchaseCostCurve, purchase: number): Money {
   if (curve.family === 'geometricPerPurchase') {

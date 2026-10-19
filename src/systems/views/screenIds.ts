@@ -149,6 +149,8 @@ export const UI_ID_TEMPLATES = {
   workshopUpgrade: (upgradeId: UpgradeId) => `workshop-upgrade-${upgradeId}`,
   workshopUpgradeLevel: (upgradeId: UpgradeId) => `workshop-upgrade-${upgradeId}-level`,
   workshopUpgradeCost: (upgradeId: UpgradeId) => `workshop-upgrade-${upgradeId}-cost`,
+  /** The row's muted note: a worth-zero engine, a hold past the largest band (ticket 553). */
+  workshopUpgradeNote: (upgradeId: UpgradeId) => `workshop-upgrade-${upgradeId}-note`,
   workshopUpgradeEffectBefore: (upgradeId: UpgradeId) =>
     `workshop-upgrade-${upgradeId}-effect-before`,
   workshopUpgradeEffectAfter: (upgradeId: UpgradeId) =>

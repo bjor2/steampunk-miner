@@ -2,7 +2,8 @@
  * One track's plaque around the showcase (#180 section 1; the GD's rules 1-5) on the shared
  * Title+OneLine element (spec #422, pass #425): its icon, name, the stat it buys as the one line,
  * level and price as glyph-and-value facts, the rivet pips toward the next big level, the line that
- * tempts, counts or says how a hold stopped, and the held Buy; the flavour and the other stat lines
+ * tempts, counts or says how a hold stopped, the held Buy, and the row's muted note (a worth-zero
+ * engine, a hold past the planet's largest band, ticket 553); the flavour and the other stat lines
  * sit in the brass tooltip. Hovering, focusing or pressing it selects the track, which lights its
  * part and turns it toward the camera. The kernel row's #33 ids stay on the level and the price.
  * Once a describer answers, the plaque is the track's item card (#164): a tap opens its tooltip in
@@ -73,6 +74,11 @@ export function TrackPlaque({
             hasCard={entry.hasCard}
           />
         </div>
+        {row.note !== null && (
+          <p className={styles.note} data-testid={WORKSHOP_TEST_IDS.plaqueNote(id)}>
+            {row.note}
+          </p>
+        )}
       </TitleOneLine>
     </div>
   )

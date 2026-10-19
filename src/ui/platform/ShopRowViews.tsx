@@ -47,6 +47,11 @@ export function UpgradeRow({ row, focusedId }: { row: WorkshopRow; focusedId: st
           {row.fullSpeedBand !== null && <span> full speed to band {row.fullSpeedBand}</span>}
         </span>
         <ScreenButtonView button={row.buy} focusedId={focusedId} state={row.buyState} />
+        {row.note !== null && (
+          <span className={rowStyles.note} data-testid={UI_ID_TEMPLATES.workshopUpgradeNote(id)}>
+            {row.note}
+          </span>
+        )}
       </div>
     </ItemCard>
   )
