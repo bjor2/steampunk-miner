@@ -3,7 +3,9 @@
  * ticks (5 per second, #11 amendments) with the action ticks since the last report, so energy is
  * charged by the authority exactly as in play. Moving is a run of reports along a straight tunnel.
  * Boring is a report facing the tile, then scripted mining of that one tile (`drillTile`, #3, #11
- * section 5) for the drill ticks it took: the #6 movement-time model the pacing gate measures bores one
+ * section 5) for the drill time it took, on the scripted sub-step clock since ticket 559
+ * (`boreClock.ts`): a tile's own sub-steps, the part of a tick it left over spent by the next bore,
+ * so a fast rig bores past 60 cells/s. The #6 movement-time model the pacing gate measures bores one
  * 1 m tile at a time, where the player's 1.9 m drill stamp (#36, #41) opens more ground per metre.
  * Scripted mining lays and charges casing through the player's placement code (#115), one ring per
  * metre the bot bores, charged per metre as a player's two rings are, onto the lining bill its
@@ -14,6 +16,13 @@ import { isVehicleActive } from '../vehicle/vehicleState'
 import type { Facing } from '../vehicle/vehiclePose'
 import type { TilePoint } from '../world/tileGrid'
 import { waitFiring, type BorePolicy } from './botBore'
+import {
+  borePlanOf,
+  carriedSubStepsOf,
+  type BoreCarry,
+  type BoreChunk,
+  type TileBore,
+} from './boreClock'
 import { faceThreats } from './botCombat'
 import type { ChargePolicy } from './botCharges'
 import type { RouteDeaths } from './botDeathReplay'
@@ -35,6 +44,8 @@ export interface BotPilot {
   borePolicy?: BorePolicy
   /** The ticks each enemy has held it facing (`faceThreats`, ticket 418); absent is none yet. */
   heldTicksByEnemy?: Map<string, number>
+  /** What its last bore left of the tick it ended on (ticket 559); absent is none. */
+  boreCarry?: BoreCarry
 }
 
 /** The bot on one planet: its mine, where its vehicle is, and whether it blasts (#109). */
@@ -61,24 +72,33 @@ export interface BotPlanet {
 }
 
 /**
- * Bores the neighbouring tile for `ticks`, reporting facing it every few ticks; between reports the
- * bot turns to meet any enemy closing in (`faceThreats`), so a long core bore is not a free hit,
- * and sets its guns for the tank it has (`setGunsForEnergy`). A forced pilot fires the bore gun at
- * its cadence through the wait (`waitFiring`).
+ * Bores the neighbouring tile for its drill time on the scripted clock, reporting facing it every
+ * few ticks; between reports the bot turns to meet any enemy closing in (`faceThreats`), so a long
+ * core bore is not a free hit, and sets its guns for the tank it has (`setGunsForEnergy`). A forced
+ * pilot fires the bore gun at its cadence through the wait (`waitFiring`). What it leaves of its
+ * last tick is carried to a bore that starts at that tick (ticket 559).
  */
-export function boreTile(session: BotSession, pilot: BotPilot, tile: TilePoint, ticks: number) {
+export function boreTile(session: BotSession, pilot: BotPilot, tile: TilePoint, bore: TileBore) {
+  const carried = carriedSubStepsOf(pilot.boreCarry, session.tick(), bore.quantum)
+  const plan = borePlanOf(bore, carried, BORE_REPORT_TICKS)
+  pilot.boreCarry = undefined
+  const isBored = plan.chunks.every((chunk) => boreChunk(session, pilot, tile, chunk))
+  if (!isBored) return
+  pilot.boreCarry = { tick: session.tick(), subSteps: plan.leftSubSteps, quantum: bore.quantum }
+}
+
+/** One report's stretch of a bore; false when the tile opened early or the vehicle was lost. */
+function boreChunk(session: BotSession, pilot: BotPilot, tile: TilePoint, chunk: BoreChunk) {
+  if (!isBoreOn(session, tile)) return false
   const facing = facingTowards(pilot.position, tile)
-  for (let left = ticks; left > 0 && isBoreOn(session, tile);) {
-    faceThreats(session, pilot)
-    setGunsForEnergy(session)
-    const chunk = Math.min(left, BORE_REPORT_TICKS)
-    session.submit(reportPoseIntent(pilot.position, facing, NO_TICKS))
-    waitFiring(session, pilot, chunk)
-    if (!isBoreOn(session, tile)) return
-    session.submit({ type: 'drillTile', payload: { ...tile, ticks: chunk } })
-    pilot.facing = facing
-    left -= chunk
-  }
+  faceThreats(session, pilot)
+  setGunsForEnergy(session)
+  session.submit(reportPoseIntent(pilot.position, facing, NO_TICKS))
+  waitFiring(session, pilot, chunk.waitTicks)
+  if (!isBoreOn(session, tile)) return false
+  session.submit({ type: 'drillTile', payload: { ...tile, ticks: chunk.windowTicks } })
+  pilot.facing = facing
+  return true
 }
 
 /**

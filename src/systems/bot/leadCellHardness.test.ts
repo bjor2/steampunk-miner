@@ -4,11 +4,14 @@ import { surfaceOreTiles, WORLD_SEED } from '../authority/scriptedSession'
 import { blockHardness, oreHardness, oreTier } from '../economy/oreEconomy'
 import { stepOfMajor } from '../economy/upgradeSteps'
 import { startLevels, vehicleStatsAt } from '../economy/vehicleStats'
-import { ticksPerTile } from '../vehicle/drillRule'
+import { subStepsPerTileAt } from '../vehicle/drillRule'
 import { bandOfTile } from '../world/planetGeometry'
 import { planetParamsFor } from '../world/planetParams'
 import { GROUND_CELL, oreCell, RESOURCE_FAMILY } from '../world/worldCell'
-import { boreTicks } from './botWorld'
+import { boreSubSteps } from './botWorld'
+
+/** The scripted clock's base quantum (ticket 559). */
+const QUANTUM = 60
 
 const PLANET_3 = planetParamsFor(WORLD_SEED, 3)
 const [BAND_1_TILE] = surfaceOreTiles(1, PLANET_3)
@@ -26,7 +29,7 @@ describe('ore hardness by the cell (#140 Numbers "Hardness", #223)', () => {
     expect(hardnessOfTile(PLANET_3, BAND_1_TILE, GROUND_CELL)).toEqual(blockHardness(3, 1))
   })
 
-  it('has the pacing bot bore a lead cell in the ticks the drill takes on it', () => {
+  it('has the pacing bot bore a lead cell in the time the drill takes on it', () => {
     /** Drill power's purchase 8 is the first at or past the old major 12 (stored 120) since #552. */
     const drillPurchase = 8
     const drill = vehicleStatsAt({
@@ -34,9 +37,10 @@ describe('ore hardness by the cell (#140 Numbers "Hardness", #223)', () => {
       drill_power: drillPurchase,
       drill_tip: stepOfMajor(12),
     })
-    const drillTicks = ticksPerTile(drill, hardnessOfTile(PLANET_3, BAND_1_TILE, LEAD_CELL))
-    expect(drillTicks).not.toBeNull()
-    expect(boreTicks(drill, PLANET_3, BAND_1_TILE, LEAD_CELL)).toBe(drillTicks)
-    expect(drillTicks).not.toBe(ticksPerTile(drill, blockHardness(3, 1)))
+    const leadHardness = hardnessOfTile(PLANET_3, BAND_1_TILE, LEAD_CELL)
+    const drillTime = subStepsPerTileAt(QUANTUM, drill, leadHardness)
+    expect(drillTime).not.toBeNull()
+    expect(boreSubSteps(drill, QUANTUM, PLANET_3, BAND_1_TILE, LEAD_CELL)).toBe(drillTime)
+    expect(drillTime).not.toBe(subStepsPerTileAt(QUANTUM, drill, blockHardness(3, 1)))
   })
 })

@@ -4,13 +4,16 @@
  * and the expected ore of a gallery (one unit per bored tile at the band's ore density). Used to pick the trip and to rank upgrades by marginal gain per price. A plan, not a
  * rule: the ore units a tick hauls are an approximate float, bounded by the vehicle, and nothing
  * it returns reaches the authority. The ore price grows without bound and stays Money: as a double
- * it is Infinity past planet 582 (#196).
+ * it is Infinity past planet 582 (#196). A bored tile takes its time on the scripted sub-step
+ * clock the bot bores on (ticket 559), a fraction of a tick past 60 cells/s, so a drill purchase
+ * that shortens a tile by less than a tick plans its gain.
  */
 import { oreSalePrice, oreTier } from '../economy/oreEconomy'
 import { vehicleStatsAt, type UpgradeLevels, type VehicleStats } from '../economy/vehicleStats'
-import { cmp, fromFiniteNumber, mul, type Money } from '../money'
+import { cmp, fromFiniteNumber, mul, type BigStat, type Money } from '../money'
 import { metresPerSecondOfStep } from '../vehicle/cutSpeed'
-import { ticksPerTile } from '../vehicle/drillRule'
+import { subStepsPerTileAt, ticksPerTile, type DrillStats } from '../vehicle/drillRule'
+import { drillQuantumOnPlanet } from '../vehicle/drillQuantum'
 import { drillTravelOnPlanet } from '../vehicle/travelParity'
 import { quantaOfUnits } from '../vehicle/energyQuanta'
 import { statsOfVehicle, type VehicleState } from '../vehicle/vehicleState'
@@ -93,7 +96,7 @@ export function canReachCore(layout: MineLayout, { stats, tankQuanta }: TripMean
   const row = nextRow(layout, { kind: 'core' })
   if (row === null) return false
   const deepest = groundHardnessAt(layout.params, shaftTileAt(layout, row + 1))
-  const boreTicksThere = ticksPerTile(stats, deepest)
+  const boreTicksThere = tileTicksOf(stats, deepest, layout.params.planetIndex)
   if (boreTicksThere === null) return false
   const travel = travelOf(layout, travelSpeedThrough(stats, layout, row), row, boreTicksThere)
   return travel.quanta * CORE_TRAVEL_SHARE_DENOMINATOR <= tankQuanta
@@ -148,9 +151,10 @@ function galleryTripOf(
 ): GalleryTrip | null {
   const row = nextRow(layout, { kind: 'ore', band })
   if (row === null) return null
-  const boreTicksHere = ticksPerTile(
+  const boreTicksHere = tileTicksOf(
     stats,
     groundHardnessAt(layout.params, shaftTileAt(layout, row)),
+    layout.params.planetIndex,
   )
   if (boreTicksHere === null) return null
   const travel = travelOf(layout, travelSpeedThrough(stats, layout, row), row, boreTicksHere)
@@ -162,6 +166,16 @@ function galleryTripOf(
     tilesByHold: stats.cargoCapacity / gallery.unitsPerTile,
     tilesByTank: tankLeft / gallery.quantaPerTile,
   }
+}
+
+/**
+ * A tile's drill time in ticks on the scripted clock (ticket 559): its sub-steps in the rig's
+ * drill quantum over the quantum, unrounded; null when the tip cannot scratch it.
+ */
+function tileTicksOf(drill: DrillStats, hardness: BigStat, planetIndex: number): number | null {
+  const quantum = drillQuantumOnPlanet(drill, planetIndex)
+  const subSteps = subStepsPerTileAt(quantum, drill, hardness)
+  return subSteps === null ? null : subSteps / quantum
 }
 
 interface TravelCost {

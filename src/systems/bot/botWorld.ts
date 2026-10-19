@@ -11,7 +11,7 @@ import { planetParamsOf } from '../authority/planetOfState'
 import { scriptedGearCellsOf } from '../authority/scriptedGearCells'
 import { effectiveTravelSpeedOf } from '../authority/travelSpeed'
 import type { AuthorityState } from '../authority/authorityState'
-import { hardnessOfTile, ticksPerCell } from '../authority/groundDrill'
+import { hardnessOfTile, subStepsPerCellAt } from '../authority/groundDrill'
 import { scratchFloorOfCell } from '../authority/signatureCells'
 import type { BigStat } from '../money'
 import { canScratch, type DrillStats } from '../vehicle/drillRule'
@@ -107,16 +107,20 @@ export function canBore(drill: DrillStats, params: PlanetParams, tile: TilePoint
   return isRemovableCell(cell) && isScratchableCell(drill, params, tile, cell)
 }
 
-/** Ticks to break an intact tile, or null when the tip cannot scratch it. */
-export function boreTicks(
+/**
+ * Sub-steps of `quantum` to break an intact tile on the scripted clock (ticket 559), or null when
+ * the tip cannot scratch it.
+ */
+export function boreSubSteps(
   drill: DrillStats,
+  quantum: number,
   params: PlanetParams,
   tile: TilePoint,
   cell: number,
 ): number | null {
   if (isAirCell(cell)) return 0
   if (!canBore(drill, params, tile, cell)) return null
-  return ticksPerCell(drill, params, tile, cell)
+  return subStepsPerCellAt(quantum, drill, params, tile, cell)
 }
 
 function isScratchableCell(

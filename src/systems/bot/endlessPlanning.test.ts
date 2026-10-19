@@ -68,11 +68,14 @@ const DRILL_LEVELS_BEHIND = [
   { tipMajors: 12, drillPurchases: 6 },
 ]
 /**
- * Purchases a marginal track is set behind so it can lead: 2 of drill power, 10 of the hold or the
- * engine (per purchase since ticket 553); 4 majors of a track still split into majors.
+ * Purchases a marginal track is set behind so it can lead: 3 of drill power, 10 of the hold or the
+ * engine (per purchase since ticket 553); 4 majors of a track still split into majors. Drill power
+ * was 2 behind until ticket 559: with a tile priced at its real drill time, planet 600's rig 2
+ * behind is tank-bound, so the hold plans no gain, yet its tank cuts the load by under the boiler
+ * rule's 20%, and the visit buys nothing to compare; 3 behind the boiler's rule is due.
  */
 const MAJORS_BEHIND_TO_LEAD = 4
-const DRILL_PURCHASES_BEHIND_TO_LEAD = 2
+const DRILL_PURCHASES_BEHIND_TO_LEAD = 3
 const PURCHASES_BEHIND_TO_LEAD = 10
 /**
  * Drill power's purchase 8 is the first at or past the old on-curve major 13 of planet 1 (stored
@@ -123,7 +126,7 @@ function stepsBehindToLead(track: UpgradeId): number {
 }
 
 /**
- * The pace-keeping steps with each marginal track in turn behind so each can lead (2 drill
+ * The pace-keeping steps with each marginal track in turn behind so each can lead (3 drill
  * purchases, 10 hold or engine purchases), and a tank twice the curve's, where the boiler's rule
  * rests and the hold limits instead.
  */
