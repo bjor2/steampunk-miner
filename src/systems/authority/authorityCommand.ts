@@ -410,8 +410,15 @@ import type { DriveSigns } from '../vehicle/driveSigns'
  *    front a sample falls at most 127 a tick, and such a cut's level floor allows 35 mm under the
  *    wheels. A tilted line pays a cell for its chord. A shut-gate tick carves as at protocol 95,
  *    and with `drill.sweptCut` off nothing moves.
+ * 97: nose contact (ticket 564, C2 of #551, behind the authority dev flag `drill.noseContact`,
+ *    off until the combat damage track #565): a `drillStep` engages every enemy its nose met on the
+ *    body's walked path, in walk order after its cut; an engaged enemy carries `ride` (its rider
+ *    and the tick it dies on), rides the nose taking the one damage seam's rate a tick, acts no
+ *    more and dies at the end of its dwell `max(1, ceil(health x 60 / rate))`; one tougher than
+ *    the rig's gate tip, a wrecker or a core guardian holds the rider's cut meanwhile. Its clock
+ *    events concern its rider. With the flag off no `ride` is written and no digest moves.
  */
-export const AUTHORITY_PROTOCOL_VERSION = 96
+export const AUTHORITY_PROTOCOL_VERSION = 97
 
 /** The kernel's own commands: the closed set its rule tables are written against. */
 export interface KernelCommandPayloads {
