@@ -51,6 +51,7 @@ import {
   type GroundEdit,
 } from './groundEditSession'
 import { removalOverTicks, ticksToRemoveFrom } from './carvePhase'
+import { frontTargetOf, type CutFront } from './cutFront'
 import { effectiveCasingGrade } from './chunkDelta'
 import { dwellRemovalOf, type SampleDwell } from './rimDwell'
 import type { PlanetParams } from './planetParams'
@@ -80,6 +81,13 @@ export interface CarveWindow {
    * the report carve is charged on (ticket 535, `vehicle/cutCarry.ts`). Absent, nothing is tallied.
    */
   lawTimeOf?: CellDrillTicks
+  /**
+   * The swept cut's front (ticket 570, `cutFront.ts`): each sample is lowered once to what the
+   * front leaves it at and nothing ahead of it is touched, though the stamp still asks a gate of
+   * every cell it meets; the drill time only says whether the drill may cut. Absent, samples
+   * carve over the window's ticks.
+   */
+  front?: CutFront
 }
 
 /**
@@ -329,6 +337,9 @@ function carveOneSample(
   if (!isCarvable(session, sample)) return 0
   const { ticks, law } = cellTimesOfSample(session, sample, window, drillTicksOf)
   if (ticks === null) return 0
+  if (window.front !== undefined) {
+    return carveToFront(session, sample, window.front, { ticks: window.ticks, law })
+  }
   if (window.dwellAt !== undefined) return carveByDwell(session, sample, window, { ticks, law })
   const rate = {
     perTick: SOLID_DENSITY * sample.weight * (window.subStepsPerTick ?? 1),
@@ -362,6 +373,22 @@ function carveByDwell(
   if (removal === 0) return 0
   lowerSample(session, sample, removal, times.law)
   return window.ticks
+}
+
+/**
+ * Lowers one sample to what the front leaves it at; answers the window's ticks (`times.ticks`)
+ * when it removed anything.
+ */
+function carveToFront(
+  session: EditSession,
+  sample: WeightedSample,
+  front: CutFront,
+  times: CutTimes,
+): number {
+  const removal = Math.max(0, densityOf(session, sample) - frontTargetOf(sample, front))
+  if (removal === 0) return 0
+  lowerSample(session, sample, removal, times.law)
+  return times.ticks
 }
 
 /**
