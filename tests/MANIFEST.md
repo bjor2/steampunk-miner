@@ -162,6 +162,13 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/drill-gear/systems/vibratoryCrumble.test.ts` | 4 | 4 |
 | `src/features/drill-gear/twinBitPace.test.ts` | 4 | 2 |
 
+### `drill-look`: 2 files, 14 tests
+
+| File | Tests | Sites |
+| --- | --- | --- |
+| `src/features/drill-look/drillLook.test.ts` | 6 | 6 |
+| `src/features/drill-look/systems/render/drillLookSteps.test.ts` | 8 | 8 |
+
 ### `dynamite`: 5 files, 21 tests
 
 | File | Tests | Sites |

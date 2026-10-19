@@ -451,7 +451,8 @@ describe('phase look', () => {
     stepTicks(fight.session, fight.actTick + 1, fight.bitTicks)
     expect(eventsOfType(fight.session, 'aetheric.PhaseLanded')).toHaveLength(1)
     const landed = lookAt(fight.session, fight.session.state().tick)
-    expect(landed).toEqual({ tint: null, opacity: 1, outline: null, glows: [] })
+    expect(landed).toMatchObject({ tint: null, opacity: 1, outline: null })
+    expect(lanternGlowsOf(landed)).toEqual([])
   })
 
   it('pulses the lantern over the move', () => {
@@ -467,7 +468,9 @@ describe('phase look', () => {
     const flicker = lookAt(refused.session, refused.actTick, flashes)
     expect(flicker).toMatchObject({ tint: null, opacity: 1 })
     expect(lanternGlowsOf(flicker).map((glow) => glow.colour)).toEqual([REFUSAL_RED])
-    expect(lookAt(refused.session, refused.actTick + FLICKER_TICKS, flashes).glows).toEqual([])
+    expect(
+      lanternGlowsOf(lookAt(refused.session, refused.actTick + FLICKER_TICKS, flashes)),
+    ).toEqual([])
   })
 
   it('draws one aether-blue outline and no translucency under reduced effects', () => {

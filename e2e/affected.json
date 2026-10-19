@@ -126,6 +126,11 @@
       ]
     },
     {
+      "why": "The drill look steps: a glow on the bit and head at drill_power purchase thresholds (ticket 554).",
+      "paths": ["src/features/drill-look/**"],
+      "specs": ["e2e/browser/drillLook.spec.ts", "e2e/browser/render.spec.ts"]
+    },
+    {
       "why": "The terrain lane's tools in the slots, the planted lodestone beacon and the card lines; the magnet fields' layer (ticket 286).",
       "paths": ["src/features/terrain-tools/**"],
       "specs": [

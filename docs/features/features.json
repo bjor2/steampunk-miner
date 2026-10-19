@@ -125,6 +125,12 @@
               "issues": [7, 66, 393]
             },
             {
+              "title": "Drill look steps",
+              "description": "The drill bit and head glow brighter and change colour at fixed drill power purchases (5, 10, 15, 20, 30, 40, 50, 75, 100). Cosmetic only.",
+              "status": "built",
+              "issues": [551, 554]
+            },
+            {
               "title": "Mounted modules on the rig",
               "description": "Bought modules show on the vehicle: the gun turret swings its barrel toward targets and the charge rack sits on the hull.",
               "status": "built",
