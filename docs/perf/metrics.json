@@ -1061,6 +1061,166 @@
       "group": "Frame A/B (Electron, SwiftShader dry run)",
       "better": "lower",
       "source": "packaged Electron frame A/B, look off (merge-base build) vs on (#450/#451 tip), P1 band 5, 20 m zoom, 1280x800, vsync off (soakMemory.mjs --electron <on> --frame-ab <off>, ticket 526); software GL: not GPU numbers, never used for or against the bar"
+    },
+    "buildChunkTileBatch.p8.p50Ms": {
+      "label": "Render buildChunkTileBatch p50 · planet 8 (gated)",
+      "unit": "ms",
+      "group": "CPU benches",
+      "better": "lower",
+      "source": "npm run bench:render"
+    },
+    "buildChunkTileBatch.p8.p95Ms": {
+      "label": "Render buildChunkTileBatch p95 · planet 8 (gated)",
+      "unit": "ms",
+      "group": "CPU benches",
+      "better": "lower",
+      "budget": 2,
+      "source": "npm run bench:render"
+    },
+    "buildChunkTileBatch.p17.p50Ms": {
+      "label": "Render buildChunkTileBatch p50 · planet 17 (gated)",
+      "unit": "ms",
+      "group": "CPU benches",
+      "better": "lower",
+      "source": "npm run bench:render"
+    },
+    "buildChunkTileBatch.p17.p95Ms": {
+      "label": "Render buildChunkTileBatch p95 · planet 17 (gated)",
+      "unit": "ms",
+      "group": "CPU benches",
+      "better": "lower",
+      "budget": 2,
+      "source": "npm run bench:render"
+    },
+    "fieldArcsFrame.p43.beforeP95Ms": {
+      "label": "Field arcs frame · P43 at 16 m/s, p95 before the layer",
+      "unit": "ms",
+      "group": "CPU benches",
+      "better": "lower",
+      "source": "npm run bench:render"
+    },
+    "fieldArcsFrame.p43.afterP50Ms": {
+      "label": "Field arcs frame · P43 at 16 m/s, p50 with the layer",
+      "unit": "ms",
+      "group": "CPU benches",
+      "better": "lower",
+      "source": "npm run bench:render"
+    },
+    "fieldArcsFrame.p43.afterP95Ms": {
+      "label": "Field arcs frame · P43 at 16 m/s, p95 with the layer",
+      "unit": "ms",
+      "group": "CPU benches",
+      "better": "lower",
+      "source": "npm run bench:render"
+    },
+    "fieldArcsFrame.p43.afterMaxMs": {
+      "label": "Field arcs frame · P43 at 16 m/s, max with the layer",
+      "unit": "ms",
+      "group": "CPU benches",
+      "better": "lower",
+      "source": "npm run bench:render"
+    },
+    "fieldArcsFrame.p43.pickP95Ms": {
+      "label": "Field arcs frame · P43 at 16 m/s, pick p95",
+      "unit": "ms",
+      "group": "CPU benches",
+      "better": "lower",
+      "source": "npm run bench:render"
+    },
+    "fieldArcsFrame.p43.changeP95Ms": {
+      "label": "Field arcs frame · P43 at 16 m/s, p95 the layer adds",
+      "unit": "ms",
+      "group": "CPU benches",
+      "better": "lower",
+      "budget": 0.1,
+      "source": "npm run bench:render"
+    },
+    "magnetFieldsFrame.p43.beforeP95Ms": {
+      "label": "Magnet field outlines frame · P43 at 16 m/s, p95 before the layer",
+      "unit": "ms",
+      "group": "CPU benches",
+      "better": "lower",
+      "source": "npm run bench:render"
+    },
+    "magnetFieldsFrame.p43.afterP50Ms": {
+      "label": "Magnet field outlines frame · P43 at 16 m/s, p50 with the layer",
+      "unit": "ms",
+      "group": "CPU benches",
+      "better": "lower",
+      "source": "npm run bench:render"
+    },
+    "magnetFieldsFrame.p43.afterP95Ms": {
+      "label": "Magnet field outlines frame · P43 at 16 m/s, p95 with the layer",
+      "unit": "ms",
+      "group": "CPU benches",
+      "better": "lower",
+      "source": "npm run bench:render"
+    },
+    "magnetFieldsFrame.p43.afterMaxMs": {
+      "label": "Magnet field outlines frame · P43 at 16 m/s, max with the layer",
+      "unit": "ms",
+      "group": "CPU benches",
+      "better": "lower",
+      "source": "npm run bench:render"
+    },
+    "magnetFieldsFrame.p43.rebuildP95Ms": {
+      "label": "Magnet field outlines frame · P43 at 16 m/s, rebuild p95",
+      "unit": "ms",
+      "group": "CPU benches",
+      "better": "lower",
+      "source": "npm run bench:render"
+    },
+    "magnetFieldsFrame.p43.changeP95Ms": {
+      "label": "Magnet field outlines frame · P43 at 16 m/s, p95 the layer adds",
+      "unit": "ms",
+      "group": "CPU benches",
+      "better": "lower",
+      "budget": 0.1,
+      "source": "npm run bench:render"
+    },
+    "chunkStreamFrame.p10.p50Ms": {
+      "label": "Chunk streaming frame (main thread, no worker) · P10 at 120 m/s p50",
+      "unit": "ms",
+      "group": "CPU benches",
+      "better": "lower",
+      "source": "npm run bench:render"
+    },
+    "chunkStreamFrame.p10.p95Ms": {
+      "label": "Chunk streaming frame (main thread, no worker) · P10 at 120 m/s p95",
+      "unit": "ms",
+      "group": "CPU benches",
+      "better": "lower",
+      "budget": 2,
+      "source": "npm run bench:render"
+    },
+    "chunkStreamFrame.p10.maxMs": {
+      "label": "Chunk streaming frame (main thread, no worker) · P10 at 120 m/s max",
+      "unit": "ms",
+      "group": "CPU benches",
+      "better": "lower",
+      "source": "npm run bench:render"
+    },
+    "chunkJobStream.p10.p50Ms": {
+      "label": "Chunk worker stream, main-thread part · P10 at 480 m/s p50",
+      "unit": "ms",
+      "group": "CPU benches",
+      "better": "lower",
+      "source": "npm run bench:render"
+    },
+    "chunkJobStream.p10.p95Ms": {
+      "label": "Chunk worker stream, main-thread part · P10 at 480 m/s p95",
+      "unit": "ms",
+      "group": "CPU benches",
+      "better": "lower",
+      "budget": 2,
+      "source": "npm run bench:render"
+    },
+    "chunkJobStream.p10.maxMs": {
+      "label": "Chunk worker stream, main-thread part · P10 at 480 m/s max",
+      "unit": "ms",
+      "group": "CPU benches",
+      "better": "lower",
+      "source": "npm run bench:render"
     }
   }
 }
