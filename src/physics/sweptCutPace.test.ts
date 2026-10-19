@@ -134,7 +134,7 @@ async function playAtDrill(drillPower: number, { flags, isExactCarry }: Path): P
         if (step % 60 === 0) store.useGameStore.getState().setEnergy('150')
         const reportedPose = store.readLocalVehicle().pose
         const playerId = store.useGameStore.getState().playerId
-        const stampAheadMm = bounds.sweptStampAheadMmAt(readAuthorityState(), playerId)
+        const stampAheadMm = bounds.travelStampAheadMmAt(readAuthorityState(), playerId)
         loop.step(watched.controller, intent)
         watched.controller.stepWorld()
         const cursor = store.readLocalVehicle().sweptCut

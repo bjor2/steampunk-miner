@@ -8,11 +8,7 @@
  * a leg here is a tick count that ends where the body nears the planet's centre (3600 m/s crosses
  * planet 1 in about 5 ticks).
  */
-import {
-  DRILL_STAMP_AHEAD_MM,
-  DRILL_SUBSTEPS_PER_TICK,
-  STEP_BOUND_TOLERANCE_MM,
-} from '../../constants/balance'
+import { DRILL_SUBSTEPS_PER_TICK, STEP_BOUND_TOLERANCE_MM } from '../../constants/balance'
 import { MM_PER_METRE, UP_VECTOR_SCALE, VEHICLE_COLLIDER_SIZE } from '../../constants/physics'
 import { blockHardness } from '../economy/oreEconomy'
 import { startLevels, vehicleStatsAt } from '../economy/vehicleStats'
@@ -220,13 +216,19 @@ function armedRigStart(
   return session.state()
 }
 
-/** The body's distance along the leg on its next step: the cut step on, held behind the cut. */
+/**
+ * The body's distance along the leg on its next step: the cut step on, into ground the cut has
+ * opened (ticket 570: the cut rides the body's face, so the body moves into what the last tick
+ * cut, as the live body does, never into standing ground).
+ */
 function bodyAlongAfter(state: AuthorityState, leg: Leg, along: number, isFirst: boolean): number {
   if (isFirst) return along
-  const cutStep = cutStepMmAt(state)
-  const cutLets = reachAlongOf(leg, state) - DRILL_STAMP_AHEAD_MM
-  return Math.max(along, Math.min(along + cutStep, cutLets))
+  const open = { limitMm: cutStepMmAt(state), faceWidthMm: BODY_FACE_WIDTH_MM, scanMm: 1 }
+  return along + openRunAheadOf(state, leg, along, open)
 }
+
+/** The body's face across, less a sample's play each side: the width it moves into ground by. */
+const BODY_FACE_WIDTH_MM = VEHICLE_COLLIDER_SIZE * MM_PER_METRE - 2 * 25
 
 /** The law's cut step where the rig stands: the cutting bound less its tolerance. */
 export function cutStepMmAt(state: AuthorityState): number {
@@ -246,15 +248,27 @@ export function openRunAheadOf(
   state: AuthorityState,
   leg: Leg,
   along: number,
-  { limitMm, faceWidthMm }: { limitMm: number; faceWidthMm: number },
+  { limitMm, faceWidthMm, scanMm = FACE_SCAN_MM }: OpenRun,
 ): number {
   const reader = groundReaderOf(state.world, PARAMS)
   const offsets = [-faceWidthMm / 2, 0, faceWidthMm / 2]
+  const isOpen = (run: number) => isFaceOpenAt(reader, leg, along + run, offsets)
+  const steps = scanMm < FACE_SCAN_MM ? [COARSE_SCAN_MM, FACE_SCAN_MM, scanMm] : [FACE_SCAN_MM]
   let run = 0
-  while (run < limitMm && isFaceOpenAt(reader, leg, along + run + FACE_SCAN_MM, offsets)) {
-    run += FACE_SCAN_MM
+  for (const step of steps) {
+    while (run < limitMm && isOpen(run + step)) run += step
   }
   return Math.min(run, limitMm)
+}
+
+/** A fine scan first strides half a sample at a time: thinner than any standing ground it meets. */
+const COARSE_SCAN_MM = 125
+
+/** How far to look for open ground, how wide the face is, and the finer steps that end the scan. */
+interface OpenRun {
+  limitMm: number
+  faceWidthMm: number
+  scanMm?: number
 }
 
 /** The body's face, with its centre `along` mm down the leg, lies in open ground at each offset. */

@@ -15,7 +15,7 @@
  * removed are tallied, as the law slab does (`lawCarrySlabFixtures.ts`). Only specs use this.
  */
 import { DRILL_STAMP_AHEAD_MM, STEP_BOUND_TOLERANCE_MM } from '../../constants/balance'
-import { MM_PER_METRE, TICKS_PER_SECOND } from '../../constants/physics'
+import { MM_PER_METRE, TICKS_PER_SECOND, UP_VECTOR_SCALE } from '../../constants/physics'
 import type { SliceDefinition } from '../../registries/sliceDefinition'
 import { ENERGY_QUANTA_PER_TICK } from '../vehicle/energyQuanta'
 import { FACING } from '../vehicle/vehiclePose'
@@ -39,6 +39,7 @@ import {
   type ScriptedSession,
 } from './scriptedSession'
 import { stepBoundsAt } from './stepBoundRead'
+import { openRunAheadOf, type Leg } from './sweptRigFixtures'
 
 /** A band-1 column east of the pad whose bore is solid rock from the surface to its foot. */
 export const COLUMN = 24
@@ -253,13 +254,20 @@ function startRun(start: AuthorityState, watch: SlabWatch): SlabRun {
   }
 }
 
-/** The body one stride down, held at the foot and behind where the cut reached (as the live body). */
+/**
+ * The body one stride down, held at the foot and in ground the cut has opened (as the live body:
+ * since ticket 570 the cut rides the body's face, so the body moves into what the last tick cut).
+ */
 function bodyYAfter(state: AuthorityState, bodyY: number, strideMm: number, isFirst: boolean) {
   if (isFirst) return bodyY
-  const cursor = vehicleOf(state, CUTTING_PLAYER).sweptCut
-  const cutLets = cursor === undefined ? bodyY : cursor.yMm + DRILL_STAMP_AHEAD_MM
-  return Math.min(bodyY, Math.max(bodyY - strideMm, END_Y, cutLets))
+  const open = { limitMm: strideMm, faceWidthMm: BODY_FACE_WIDTH_MM, scanMm: 1 }
+  return Math.max(END_Y, bodyY - openRunAheadOf(state, SLAB_LEG, START.y - bodyY, open))
 }
+
+/** The column straight down from the body's start. */
+const SLAB_LEG: Leg = { start: { xMm: START.x, yMm: START.y }, upx: 0, upy: UP_VECTOR_SCALE }
+/** The body's face across, less a little play each side. */
+const BODY_FACE_WIDTH_MM = 850
 
 function stepAndReport(run: SlabRun, session: ScriptedSession, tick: number, bodyY: number): void {
   run.stepMs.push(submitTallied(run, session, tick, stepAt(bodyY)))

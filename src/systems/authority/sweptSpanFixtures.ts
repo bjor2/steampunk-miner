@@ -8,6 +8,7 @@
 import { MM_PER_METRE, TICKS_PER_SECOND } from '../../constants/physics'
 import type { SliceDefinition } from '../../registries/sliceDefinition'
 import type { GateVerdict } from '../registries/gateChecks'
+import { stepIntoOpenGround } from './faceHoldFixtures'
 import { NO_DRIVE } from '../vehicle/driveSigns'
 import { FACING, noseTileOf, type Facing, type VehiclePose } from '../vehicle/vehiclePose'
 import { artefactCacheTile } from '../world/artefactCache'
@@ -59,15 +60,42 @@ export function sweepWith<T>(
   effectOf: (cutTick: T) => RuleEffect,
 ): T[] {
   let state = fixture.start()
+  let body: Point | null = null
   const firstTick = state.tick + 1
   return fixture.positions.map((at, index) => {
-    const pose: VehiclePose = { ...(vehicleOf(state, 'p1').pose as VehiclePose), ...at }
+    const reported = vehicleOf(state, 'p1').pose as VehiclePose
+    const pose: VehiclePose = {
+      ...reported,
+      ...bodyToward(state, fixture.params, reported, { body, at }),
+    }
+    body = { x: pose.x, y: pose.y }
     const step = { pose, drive: NO_DRIVE, isLifting: false }
     const ticked = { ...state, tick: firstTick + index }
     const cutTick = cut(ticked, fixture.params, 'p1', noseTileOf(pose), step)
     state = effectOf(cutTick).state
     return cutTick
   })
+}
+
+/** Where the body stood last tick (null before the first), and where the script wants it now. */
+interface ScriptedMove {
+  body: Point | null
+  at: Point
+}
+
+/**
+ * The body's position this tick: the script's on the first, then toward the script's no further
+ * than the ground the cut opened (ticket 570: the cut rides the body's face, so the body never
+ * moves into ground the cut has not reached).
+ */
+function bodyToward(
+  state: AuthorityState,
+  params: PlanetParams,
+  reported: VehiclePose,
+  { body, at }: ScriptedMove,
+): Point {
+  if (body === null) return at
+  return stepIntoOpenGround(state.world, params, { ...reported, ...body }, at)
 }
 
 /** Every tick's position from `from` toward `to` at `speed` m/s, then `restTicks` more at `to`. */
