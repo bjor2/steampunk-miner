@@ -380,8 +380,9 @@ incomePerHour}` go to `balance-report/drill-pace.ndjson`, which `pushTestMetrics
   fixed flag-on route's event stream (ore firsts, DrillGated, in walk order) the same whether the
   last report faced the step's way, as on main, or not, and a gated cell never cut under a fresh
   facing (about 1 s). `src/physics/drillFacingStep.test.ts` plays turns in the live loop: a drive
-  turned into a cut reads no stale facing at any of the 12 report phases at stored 1, 10 and 20 and
-  30 and 144 frames/s, a cut turned into another direction never holds a gate that was free to
+  turned into a cut reads no stale facing at any of the 12 report phases at stored 1, 10 and 21 (20's
+  drive off the pad lands too late on some phases since ticket 558; see the spec) and 30 and 144
+  frames/s, a cut turned into another direction never holds a gate that was free to
   open (the #333 hold after the old cut's gate closes mid-swivel is the gate's own rule), and the
   motor gate equals the authority's on every tick of the turn (about 1 min).
 - **Drill start and turn latency** (ticket 504, measurement only):

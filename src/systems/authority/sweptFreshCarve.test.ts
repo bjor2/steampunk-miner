@@ -29,6 +29,7 @@ import {
   reachOf,
   openRunAheadOf,
   rigAt,
+  baseDigSubStepsOf,
   subStepsSpentBy,
   TILTED_LEG,
   type Leg,
@@ -259,7 +260,7 @@ function workPerMetreOf(cut: LegCut): WorkPerMetre {
   const cursor = vehicleOf(run.ticks[run.ticks.length - 1].state, 'p1').sweptCut
   return {
     cellsPerMetre: opened.filter((tile) => isInWindow(cut.leg, tile)).length / (WINDOW_MM / 1000),
-    workShare: (cursor?.digSubSteps ?? 0) / subStepsSpentBy(run),
+    workShare: baseDigSubStepsOf(cursor) / subStepsSpentBy(run),
   }
 }
 

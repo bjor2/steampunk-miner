@@ -421,8 +421,12 @@ function noteTick(
   const params = planetParamsOf(after.planet)
   if (params === null) return
   const yielded = yieldedCellsOf(before.world, after.world, params, at)
+  // In the rig's drill quantum (ticket 558), counted back in base sub-steps: exact, the quantum
+  // being the base doubled.
   const quantum = drillQuantumAt(before, playerIdOf())
-  const digSubSteps = digSubStepsOfCells(before, params, playerIdOf(), { yielded, quantum })
+  const digSubSteps =
+    (digSubStepsOfCells(before, params, playerIdOf(), { yielded, quantum }) * SUB_STEPS_PER_TICK) /
+    quantum
   const carried = carriedHeatTicksOf(before, after)
   const isDrilling = flags.isDrilling
   const law = lawWorkRemovedThisTickOf(before, after, at)

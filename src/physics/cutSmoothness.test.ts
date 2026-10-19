@@ -46,9 +46,11 @@ interface HeldRig {
 /**
  * Since the per-purchase drill of #552 the rigs hold purchases: 11 (13.3 m/s, the nearest to the old
  * 14.5; purchase 12's 16.5 lifts the rig-heavy rig past what its thrust climbs) and 14 (25.5). Rig
- * 1 holds 18 (60.9 m/s for the old 44.9): at purchases 15 to 17 (31.7 to 49 m/s) its 30 frames/s
- * up leg rises through cut ground without one ramped-up tick, where the old law's 40 to 50 m/s
- * rigs held it. A finding for the speed bars of #560, named here so the rig is not read as 44 m/s.
+ * 1 holds 19 (75.7 m/s for the old 44.9): at purchases 15 to 18 (31.7 to 60.9 m/s) and 20 its 30
+ * frames/s up leg rises through cut ground without one ramped-up tick, where the old law's 40 to
+ * 50 m/s rigs held it. 18 held at the one-sub-step quantum (exactly 60 sub-steps a cell) and lost
+ * it to its own quantum's law speed (ticket 558). A finding for the speed bars of #560, named here
+ * so the rig is not read as 44 m/s.
  */
 const RIGS: Readonly<Record<string, HeldRig>> = {
   '15 m/s': {
@@ -56,7 +58,7 @@ const RIGS: Readonly<Record<string, HeldRig>> = {
     legs: ['down', 'up'],
   },
   '25 m/s': { levels: { drill_power: 14, drill_tip: 600, engine: 17 }, legs: ['down', 'up'] },
-  '44 m/s (rig 1, #400)': { levels: { drill_power: 18, drill_tip: 200 }, legs: ['down', 'up'] },
+  '44 m/s (rig 1, #400)': { levels: { drill_power: 19, drill_tip: 200 }, legs: ['down', 'up'] },
 }
 const FRAME_RATES = [30, 144]
 const MAX_BOUNDARY_CHANGE = 0.05

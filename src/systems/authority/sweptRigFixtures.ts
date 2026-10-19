@@ -321,6 +321,11 @@ export function subStepsSpentBy(run: LegRun): number {
   return run.ticks.length * DRILL_SUBSTEPS_PER_TICK - carried
 }
 
+/** The cursor's dig time in base sub-steps: exact, its quantum being the base doubled (ticket 558). */
+export function baseDigSubStepsOf(cursor: SweptCut | undefined): number {
+  return cursor === undefined ? 0 : cursor.digSubSteps / quantumScaleOf(cursor)
+}
+
 /** How many base sub-steps one of the cursor's makes up: its quantum over 60 (ticket 558). */
 function quantumScaleOf(cursor: SweptCut): number {
   return quantumOfCursor(cursor) / DRILL_SUBSTEPS_PER_TICK

@@ -91,11 +91,14 @@ describe('swept span per chunk against the per-cell carve (ticket 374)', () => {
     expect(eventsOf(reference).some(({ type }) => type === 'TileDestroyed')).toBe(true)
   })
 
+  // The gear's cells are seen charged on the per-cell price, where each costs a quantum or more:
+  // since ticket 558 the strong drill's law charge is exact in its own quantum, well under a
+  // quantum a tick here, where the one-sub-step floor charged each cell a whole sub-step.
   it.each(SPEEDS_M_PER_S)(
     'cuts the same bytes with drill gear beside the bore at %i m/s',
     (speed) => {
       const fixture = gearedCornerSweep(speed)
-      const reference = expectSpanMatchesPerCell(fixture)
+      const reference = withSweptLawCharge(false, () => expectSpanMatchesPerCell(fixture))
       const tanks = [fixture.start(), ...reference.map(({ state }) => state)].map(
         (state) => vehicleOf(state, 'p1').energy,
       )
