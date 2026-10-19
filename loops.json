@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "updated_at": "2026-10-19T10:23:01Z",
+  "updated_at": "2026-10-19T10:37:15Z",
   "entries": {
     "steampunk-loop/1": {
       "loop": "steampunk-loop",
@@ -591,9 +591,9 @@
       "slot": null,
       "state": "working",
       "issue": null,
-      "note": "testing spec #255 (Grilling: Lane forks (two specialisations per lane at P16)) on a47edaf",
+      "note": "testing spec #157 (Wayfinder: Tech tree and UI clarity (deep tech tree with visible vehicle changes, clear icons, item descriptions)) on 1648aa5",
       "stale_after_min": 420,
-      "updated_at": "2026-10-19T07:52:21Z",
+      "updated_at": "2026-10-19T10:37:15Z",
       "host": "grok-bot-vm-452660841"
     },
     "steampunk-loop/10": {
