@@ -1,8 +1,10 @@
 /**
  * A bot run's trips priced per cell (ticket 535, Systems 6226531099 and 6228669500 on #514 and
- * #529, "the offline per-cell energy figure per trip"): the pacing bot cuts with `drillTile` on
- * the whole-tick clock, so its own energy and `tank_empty` are no evidence for the player path,
- * whose pose reports are charged on the density they remove at the swept price since ticket 535.
+ * #529, "the offline per-cell energy figure per trip"): until ticket 559 the pacing bot cut with
+ * `drillTile` on the whole-tick clock, so its own energy and `tank_empty` were no evidence for the
+ * player path, whose pose reports are charged on the density they remove at the swept price since
+ * ticket 535. Since ticket 559 a `drillTile` is charged on that law work too, so the bot's charge
+ * and the per-cell figure differ only by what a cell's law time leaves of a whole quantum.
  * Each trip (from the start or an undock to the next dock or tow) is logged with the energy the
  * bot was charged beside the per-cell figure, the swept cut's price for the same cells: each
  * broken cell's drill time in sub-steps of its drill quantum (ticket 558) at the drill the vehicle

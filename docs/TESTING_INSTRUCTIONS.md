@@ -344,15 +344,18 @@ programs }` from three's `renderer.info` of the game canvas), read only when cal
   doublings at most) and `src/systems/world/carvePhase.test.ts` the carve's tick phase, exact past
   2^53. The pacing half is the lane `src/logging/drillPace.lane.test.ts`: the plain bot plays the
   bot scenario to planet 10's core on the three pacing seeds and `drillPaceBars.ts` judges the
-  seed medians as VS split them before #559: planet minutes at most 30 on P2-P10, drill-only gaps
-  at most 10 minutes, planet-average felt speed at least 5 cells/s, no dry tank and no stalled
-  planet are gated; planet minutes at least 22, 3 to 4 purchases a planet, the felt ratio to the
-  planet before (0.9), all-track majors 3.5 to 6.0, the income gain per purchase (amber under +5%
-  twice in a row), level 20 by P4 and 50 not before P5 and the felt speed at the core (at most 44)
-  are printed; so are, since ticket 553, drill + tip majors 3.5 to 7.0 a planet (amber at 7), the
-  hold, boiler and engine share of track spend (at most 6% from P2, 15% on P1, printed with and
-  without the hull until VS rules) and at most 50 hold, boiler and engine purchases a planet. The
-  bot plays with ticket 553's boiler rule and hold/engine bundles; the grind bar is a todo. Its per-purchase rows `{n, D, price, planet, minute,
+  seed medians. Since ticket 559 the bot bores on the scripted sub-step clock at real cells a
+  second (`src/systems/bot/boreClock.ts`, `drillTile` at protocol 95), so every bar of the #559
+  done-when gates: planet minutes 22 to 30 on P2-P10, drill-only gaps at most 10 minutes,
+  planet-average felt speed at least 5 cells/s and at least 0.9x the planet before, 3 to 4 drill
+  purchases a planet, no dry tank, no stalled planet, drill + tip majors 3.5 to 7.0 a planet, the
+  hold, boiler, engine and hull share of track spend (at most 6% from P2, 15% on P1) and at most
+  50 hold, boiler and engine purchases a planet. Printed only: all-track majors 3.5 to 6.0, the
+  income gain per purchase (amber under +5% twice in a row), level 20 by P4 and 50 not before P5,
+  the felt speed at the core (at most 44), drill + tip amber at 7 and the spend share without the
+  hull. The bot plays with ticket 553's boiler rule and hold/engine bundles; the grind bar is a
+  todo. The first drill purchase of each seed is printed for the paired bar (at most 5% later
+  than main), which the Tester reads beside main's run. Its per-purchase rows `{n, D, price, planet, minute,
 incomePerHour}` go to `balance-report/drill-pace.ndjson`, which `pushTestMetrics.sh` appends to
   `drill-pace.ndjson` on `test-metrics` (`scripts/ci/recordDrillPace.mjs`) to compare runs line by
   line. Hours of play, so it runs only when named.

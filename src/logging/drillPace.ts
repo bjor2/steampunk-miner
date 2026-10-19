@@ -9,9 +9,9 @@
  * catch-up burst, B4); per drill purchase `{n, D, price, planet, minute, incomePerHour}`, the
  * run-comparison row, with the sales a second earned at the level it replaced.
  *
- * Felt speed is the law's, `3600 / ceil(3600 H^3 / (D P^2))` on the planet's band-1 rock; the
- * pacing bot's whole-tick clock caps its own dig at 60 cells/s until #559, which is why the lane
- * gates only the bars VS let it gate before then.
+ * Felt speed is the law's, `3600 / ceil(3600 H^3 / (D P^2))` on the planet's band-1 rock; since
+ * ticket 559 the pacing bot bores on the scripted sub-step clock at that speed, with no cap at 60
+ * cells/s, so the lane gates every bar of the #559 done-when (`drillPaceBars.ts`).
  */
 import { TICKS_PER_SECOND } from '../constants/physics'
 import type { AuthorityState } from '../systems/authority/authorityState'

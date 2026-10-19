@@ -28,12 +28,14 @@ import { toFixedText } from '../systems/money'
 
 // The per-planet drill bars of the GD ruling on #551 (ticket 552), on the bot lane: each pacing
 // seed (83921, 31415, 27182) plays the bot scenario to planet 10's core with the per-purchase
-// drill, and the planets' medians are judged as VS split them for the lane before #559
-// (`drillPaceBars.ts`): planet minutes at most 30, drill-only gaps at most 10 minutes, felt speed
-// at least 5 cells/s, no dry tank and no stalled planet are gated; planet minutes at least 22, 3 to
-// 4 purchases a planet, the felt ratio, all-track cadence, the income gain per purchase, the level
-// milestones and the departure felt speed are printed. The tuning stays open until #559 lands and
-// this run reproduces Systems' planet minutes. Every drill purchase's {n, D, price, planet, minute,
+// drill, the bot boring on the scripted sub-step clock at real cells a second since ticket 559,
+// and the planets' medians are judged on every bar of the #559 done-when (`drillPaceBars.ts`):
+// planet minutes 22 to 30, drill-only gaps at most 10 minutes, felt speed at least 5 cells/s and
+// 0.9x the planet before, 3 to 4 purchases a planet, drill + tip majors 3.5 to 7.0, the other
+// tracks' spend share, the catch-up burst, no dry tank and no stalled planet are gated; all-track
+// cadence, the income gain per purchase, the level milestones and the departure felt speed are
+// printed. The tuning closes when this run, paired with main's, reproduces Systems' planet
+// minutes (GD amendment on #551). Every drill purchase's {n, D, price, planet, minute,
 // income/h} and every planet's row go to balance-report/drill-pace.ndjson, the run-comparison log
 // the Tester sets beside main's run line by line; the first purchase tick of each seed is printed
 // for the paired first-purchase bar (at most 5% later than main). Three runs of an hour or more
@@ -59,11 +61,11 @@ describe('drill speed per purchase: the per-planet bars on the bot lane to plane
     writeRows(runs)
   }, RUN_TIMEOUT_MS)
 
-  it('holds planets 2 to 10 to 30 minutes, drill gaps to 10, felt speed to 5 cells/s, no dry tank and no stall', () => {
+  it('holds planets 2 to 10 to 22-30 minutes with every drill, cadence and spend bar, no dry tank and no stall', () => {
     expect(gatedDrillPaceProblemsOf(runs)).toEqual([])
   })
 
-  it('prints the bars that wait on #559, and the first drill purchase of each seed', () => {
+  it('prints the bars it never gates, and the first drill purchase of each seed', () => {
     const gains = runs.flatMap(({ worldSeed, tally }) =>
       incomeGainsOf(tally.purchases).map(
         ({ n, planet, gain }) =>
@@ -71,9 +73,7 @@ describe('drill speed per purchase: the per-planet bars on the bot lane to plane
       ),
     )
     const findings = printedDrillPaceFindingsOf(runs)
-    console.log(
-      ['income gain per drill purchase:', ...gains, 'printed until #559:', ...findings].join('\n'),
-    )
+    console.log(['income gain per drill purchase:', ...gains, 'printed:', ...findings].join('\n'))
     expect(runs.every((run) => run.tally.purchases.length > 0)).toBe(true)
   })
 

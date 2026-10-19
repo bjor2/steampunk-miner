@@ -79,8 +79,8 @@ export const DEV_FLAGS: DevFlags = { 'drill.sweptCut': true, 'drill.reportEveryT
  *   drill segment keeps its wall ticks and heats `drillHeat × work` over them; band heat and cooling
  *   still run per elapsed tick, and the gauge at its max behaves as before. A report at the tick
  *   the gauge settled leaves the exact carry's work on the carry for the next one. On the report
- *   path, the charged branch and swept alike; the bot's whole-tick clock never drills more ticks
- *   than elapsed, so its heat is the same either way. On since 18 Oct 2026 (Bjor's go); it was off until the paired
+ *   path, the charged branch and swept alike; a scripted drill heats from its law work's carry
+ *   (ticket 559), held at the tick the gauge settled, so the bot's heat is the same either way. On since 18 Oct 2026 (Bjor's go); it was off until the paired
  *   run shows the per-trip heat budget as accepted (G&V condition 4): off, every heat settle is
  *   protocol 87's.
  * - `codex.materialContact` (ticket 546, the TD's contact rule 6243331970 as the GD amended it

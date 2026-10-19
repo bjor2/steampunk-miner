@@ -11,15 +11,15 @@ import {
 } from './tripCellEnergy'
 
 // The paired pacing run's per-cell energy (ticket 535, Systems 6226531099 and 6228669500 on #514
-// and #529, "the offline per-cell energy figure per trip"): the bot and scripted drills stay on
-// the whole-tick clock, so the bot's own `tank_empty` and tank margin are no evidence for the
-// player path. The bot slice is played on its three pacing seeds; every trip logs the energy the
-// bot was charged beside the per-cell figure, the swept price the player's report cut is charged
-// at for the same law work (`tripCellEnergy.ts`), and every trip that broke a cell must keep the
-// tank at least 1.138 times that figure. The bot's own bands and #524's baseline do not move with
-// ticket 535 (its digests are unchanged), so main and the tip play the same trips and the pairing
-// reads the same lines. A lane: it runs only when named, prints a line per seed and planet and
-// writes balance-report/trip-cell-energy.ndjson.
+// and #529, "the offline per-cell energy figure per trip"). Since ticket 559 the bot's drills are
+// charged on the law work they remove, the player's price, so its own charge now reads close to
+// the per-cell figure. The bot slice is played on its three pacing seeds; every trip logs the
+// energy the bot was charged beside the per-cell figure, the swept price the player's report cut
+// is charged at for the same law work (`tripCellEnergy.ts`), and every trip that broke a cell must
+// keep the tank at least 1.138 times that figure. Ticket 559 moves the bot's trips (it bores at
+// real cells a second), so a pairing with a run before it reads different trips. A lane: it runs
+// only when named, prints a line per seed and planet and writes
+// balance-report/trip-cell-energy.ndjson.
 
 const SCENARIO = JSON.parse(
   readFileSync(new URL('../../scenarios/bot-slice.scenario.json', import.meta.url), 'utf8'),

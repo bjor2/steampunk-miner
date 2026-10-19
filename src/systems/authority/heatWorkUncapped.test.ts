@@ -18,7 +18,7 @@ import { stateDigest } from './stateDigest'
 // Heat per unit of law work, uncapped (ticket 541, shape (b): the TD seam 6232743242, Systems'
 // price 6232736622, VS and G&V voting (b), the GD's acceptance and Bjor's go). Behind the
 // authority's `heat.workUncapped`, off: a report whose drill ticks fit the ticks since the gauge
-// settled heats the same either way (the bot's whole-tick clock); past them, the flag heats every
+// settled heats the same either way; past them, the flag heats every
 // drill tick of work over the elapsed ticks where the #113 rule dropped the rest, so the heat paid
 // no longer depends on the report cadence. The gauge at its max, idle cooling and the carry's
 // part of a tick are as before; a report at the tick the gauge settled keeps the exact carry's

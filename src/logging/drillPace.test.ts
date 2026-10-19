@@ -227,59 +227,62 @@ describe('drill pace bars on the seed median (#551 point 5, ticket 552)', () => 
       'planet 3 takes 31.0 min, over 30',
       'planet 3 waits 11.0 min between two drill purchases, over 10',
       'planet 3 averages 4.00 felt cells/s, under 5',
+      "planet 3 felt speed 0.40x planet 2's, under 0.9",
       'seed 11 ran the tank dry 1x on planet 3',
       'seed 22 ran the tank dry 1x on planet 3',
       'seed 33 ran the tank dry 1x on planet 3',
     ])
   })
 
-  it('prints a planet under 22 minutes and outside 3 to 4 purchases, never gating them', () => {
+  it('gates a planet under 22 minutes, outside 3 to 4 purchases and felt under 0.9x the planet before (ticket 559)', () => {
     const runs = seeds(() =>
-      TEN_PLANETS((planet) => (planet === 5 ? { coreTick: 19 * MINUTE, drillPurchases: 6 } : {})),
+      TEN_PLANETS((planet) =>
+        planet === 5
+          ? { coreTick: 19 * MINUTE, drillPurchases: 6 }
+          : planet === 7
+            ? { feltTicks: 8 * 25 * MINUTE }
+            : {},
+      ),
     )
-    expect(gatedDrillPaceProblemsOf(runs)).toEqual([])
-    expect(printedDrillPaceFindingsOf(runs)).toEqual(
-      expect.arrayContaining([
-        'planet 5 takes 19.0 min, under 22 (printed until #559)',
-        'planet 5 buys 6 drill purchases, outside 3 to 4',
-      ]),
-    )
+    expect(gatedDrillPaceProblemsOf(runs)).toEqual([
+      'planet 5 takes 19.0 min, under 22',
+      "planet 7 felt speed 0.80x planet 6's, under 0.9",
+      'planet 5 buys 6 drill purchases, outside 3 to 4',
+    ])
   })
 })
 
-describe('drill pace bars of ticket 553, printed', () => {
+describe('drill pace bars of ticket 553, gated since ticket 559', () => {
   const seeds = (paces: () => PlanetDrillPace[]) => [11, 22, 33].map((seed) => runOf(seed, paces()))
 
-  it('prints drill + tip majors outside 3.5 to 7.0, and amber at 7', () => {
+  it('gates drill + tip majors outside 3.5 to 7.0, and prints amber at 7', () => {
     const runs = seeds(() =>
       TEN_PLANETS((planet) => ({ drillTipMajors: planet === 4 ? 7 : planet === 6 ? 8 : 6 })),
     )
-    expect(printedDrillPaceFindingsOf(runs)).toEqual(
-      expect.arrayContaining([
-        'planet 4 amber: 7 drill + tip majors',
-        'planet 6 lands 8 drill + tip majors, outside 3.5 to 7.0',
-      ]),
-    )
-    expect(gatedDrillPaceProblemsOf(runs)).toEqual([])
+    expect(printedDrillPaceFindingsOf(runs)).toContain('planet 4 amber: 7 drill + tip majors')
+    expect(gatedDrillPaceProblemsOf(runs)).toEqual([
+      'planet 6 lands 8 drill + tip majors, outside 3.5 to 7.0',
+    ])
   })
 
-  it('prints hold, boiler and engine spend past 6% from P2 and 15% on P1, with the hull beside it', () => {
+  it('gates hold, boiler, engine and hull spend past 6% from P2 and 15% on P1, printing it without the hull', () => {
     const heavy = { drill_power: fromCanonical('900'), engine: fromCanonical('100') }
     const runs = seeds(() =>
       TEN_PLANETS((planet) => (planet === 1 || planet === 5 ? { trackSpend: heavy } : {})),
     )
-    const findings = printedDrillPaceFindingsOf(runs)
-    expect(findings).toContain(
-      'planet 5 spends 1000 bp on hold, boiler and engine (1000 bp with the hull), bar 600 bp',
+    expect(gatedDrillPaceProblemsOf(runs)).toEqual([
+      'planet 5 spends 1000 bp on hold, boiler, engine and hull, bar 600 bp',
+    ])
+    expect(printedDrillPaceFindingsOf(runs)).toContain(
+      'planet 5 spends 1000 bp on hold, boiler and engine alone, bar 600 bp',
     )
-    expect(findings.filter((line) => line.startsWith('planet 1 spends'))).toEqual([])
   })
 
-  it('prints a catch-up burst over 50 hold, boiler and engine purchases', () => {
+  it('gates a catch-up burst over 50 hold, boiler and engine purchases', () => {
     const runs = seeds(() => TEN_PLANETS((planet) => ({ catchUpPurchases: planet === 1 ? 51 : 3 })))
-    expect(printedDrillPaceFindingsOf(runs)).toContain(
+    expect(gatedDrillPaceProblemsOf(runs)).toEqual([
       'planet 1 buys 51 hold, boiler and engine steps, over 50',
-    )
+    ])
   })
 })
 

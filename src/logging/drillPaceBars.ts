@@ -1,19 +1,22 @@
 /**
  * The per-planet drill bars of the GD ruling on #551 (point 5, ticket 552) judged on the pacing
- * seeds, each on the median of the seeds (#84). VS split them for the bot lane before #559 (its
- * whole-tick clock prices time a cell too high, so the lane errs conservative, 6254671302):
+ * seeds, each on the median of the seeds (#84). Before #559 VS split them for the bot lane (its
+ * whole-tick clock priced time a cell too high, so only the conservative bars gated, 6254671302).
+ * Since ticket 559 the bot bores on the scripted sub-step clock at real cells a second, so the
+ * lower bounds on time and the cadence and spend bars gate too (#559 done-when, GD amendment 2 and
+ * VS on #551):
  *
- *   gated   planet minutes at most 30 on P2-P10, the longest drill-only gap at most 10 minutes,
- *           planet-average felt speed at least 5 cells/s through P10, the tank never empty, every
- *           planet's core reached (no stalled planet)
- *   printed planet minutes at least 22, 3 to 4 drill purchases a planet, felt speed at least 0.9x
- *           the planet before, all-track majors 3.5 to 6.0 a planet, the income gain per purchase
- *           (amber under +5% twice in a row), level 20 by the end of P4 and 50 not before P5, the
- *           band-1 felt speed at the core at most 44 cells/s; since ticket 553 (GD amendment 2
- *           and VS on #551) drill + tip majors 3.5 to 7.0 a planet (amber at 7), the hold, boiler
- *           and engine spend at most 6% of track spend on P2-P10 and 15% on P1 (printed with and
- *           without the hull: VS has not ruled which), and at most 50 hold, boiler and engine
- *           purchases a planet (the catch-up burst)
+ *   gated   planet minutes 22 to 30 on P2-P10, the longest drill-only gap at most 10 minutes,
+ *           planet-average felt speed at least 5 cells/s through P10 and at least 0.9x the planet
+ *           before, 3 to 4 drill purchases a planet, the tank never empty, every planet's core
+ *           reached (no stalled planet), drill + tip majors 3.5 to 7.0 a planet, the other tracks'
+ *           spend (hold, boiler, engine and hull, the #559 list) at most 6% of track spend from P2
+ *           and 15% on P1, and at most 50 hold, boiler and engine purchases a planet (the
+ *           catch-up burst)
+ *   printed all-track majors 3.5 to 6.0 a planet, the income gain per purchase (amber under +5%
+ *           twice in a row), level 20 by the end of P4 and 50 not before P5, the band-1 felt speed
+ *           at the core at most 44 cells/s, drill + tip majors amber at 7, and the spend share
+ *           without the hull beside the gated one
  *
  * A miss is a balance finding for Systems (retune order: paceScale rows, then ore sale prices,
  * never the law), never a reason to retune the bot or a bar.
@@ -133,14 +136,20 @@ function medianOf(values: readonly (number | null)[]): number | null {
   return sorted[Math.floor(sorted.length / 2)] ?? null
 }
 
-/** The bars the lane gates before #559, as problems; empty when they hold. */
+/** The bars the lane gates, as problems; empty when they hold. */
 export function gatedDrillPaceProblemsOf(runs: readonly DrillPaceRun[]): string[] {
   const medians = planetMediansOf(runs)
   return [
     ...stalledPlanetProblems(medians),
     ...medians.flatMap(slowPlanetProblems),
+    ...medians.flatMap(shortPlanetProblems),
     ...medians.flatMap(longGapProblems),
     ...medians.flatMap(slowFeltProblems),
+    ...medians.flatMap((median, index) => feltRatioProblems(median, medians[index - 1])),
+    ...medians.flatMap(purchaseCountProblems),
+    ...medians.flatMap(drillTipCadenceProblems),
+    ...medians.flatMap(otherSpendProblems),
+    ...medians.flatMap(catchUpBurstProblems),
     ...tankEmptyProblems(runs),
   ]
 }
@@ -182,37 +191,20 @@ function tankEmptyProblems(runs: readonly DrillPaceRun[]): string[] {
   )
 }
 
-/** The bars printed only until #559 or Systems' model confirms them, each as a finding line. */
-export function printedDrillPaceFindingsOf(runs: readonly DrillPaceRun[]): string[] {
-  const medians = planetMediansOf(runs)
-  return [
-    ...medians.flatMap(shortPlanetFindings),
-    ...medians.flatMap(purchaseCountFindings),
-    ...medians.flatMap((median, index) => feltRatioFindings(median, medians[index - 1])),
-    ...medians.flatMap(majorsFindings),
-    ...medians.flatMap(drillTipCadenceFindings),
-    ...medians.flatMap(otherSpendFindings),
-    ...medians.flatMap(catchUpBurstFindings),
-    ...medians.flatMap(coreFeltFindings),
-    ...runs.flatMap(levelMilestoneFindings),
-    ...runs.flatMap(amberIncomeFindings),
-  ]
-}
-
-function shortPlanetFindings({ planet, minutes }: PlanetMedians): string[] {
+function shortPlanetProblems({ planet, minutes }: PlanetMedians): string[] {
   if (!isTimedPlanet(planet) || minutes === null) return []
   if (minutes >= DRILL_PACE_BARS.planetMinutes.min) return []
-  return [`planet ${planet} takes ${minutes.toFixed(1)} min, under 22 (printed until #559)`]
+  return [`planet ${planet} takes ${minutes.toFixed(1)} min, under 22`]
 }
 
-function purchaseCountFindings({ planet, drillPurchases }: PlanetMedians): string[] {
+function purchaseCountProblems({ planet, drillPurchases }: PlanetMedians): string[] {
   const { min, max } = DRILL_PACE_BARS.drillPurchasesPerPlanet
   if (!isTimedPlanet(planet) || drillPurchases === null) return []
   if (drillPurchases >= min && drillPurchases <= max) return []
   return [`planet ${planet} buys ${drillPurchases} drill purchases, outside 3 to 4`]
 }
 
-function feltRatioFindings(median: PlanetMedians, before: PlanetMedians | undefined): string[] {
+function feltRatioProblems(median: PlanetMedians, before: PlanetMedians | undefined): string[] {
   if (before?.averageFelt == null || median.averageFelt === null || before.averageFelt === 0) {
     return []
   }
@@ -223,32 +215,17 @@ function feltRatioFindings(median: PlanetMedians, before: PlanetMedians | undefi
   ]
 }
 
-function majorsFindings({ planet, majors }: PlanetMedians): string[] {
-  const { min, max } = DRILL_PACE_BARS.majorsPerPlanet
-  if (!isTimedPlanet(planet) || majors === null || (majors >= min && majors <= max)) return []
-  return [`planet ${planet} lands ${majors} majors of all tracks, outside 3.5 to 6.0`]
-}
-
-function drillTipCadenceFindings({ planet, drillTipMajors }: PlanetMedians): string[] {
-  const { min, max, amber } = DRILL_PACE_BARS.drillTipMajorsPerPlanet
+function drillTipCadenceProblems({ planet, drillTipMajors }: PlanetMedians): string[] {
+  const { min, max } = DRILL_PACE_BARS.drillTipMajorsPerPlanet
   if (!isTimedPlanet(planet) || drillTipMajors === null) return []
-  if (drillTipMajors < min || drillTipMajors > max) {
-    return [`planet ${planet} lands ${drillTipMajors} drill + tip majors, outside 3.5 to 7.0`]
-  }
-  return drillTipMajors >= amber
-    ? [`planet ${planet} amber: ${drillTipMajors} drill + tip majors`]
-    : []
+  if (drillTipMajors >= min && drillTipMajors <= max) return []
+  return [`planet ${planet} lands ${drillTipMajors} drill + tip majors, outside 3.5 to 7.0`]
 }
 
-function otherSpendFindings(median: PlanetMedians): string[] {
-  const { planet, otherSpendShareBp: share, otherSpendShareWithHullBp: withHull } = median
-  if (share === null || withHull === null) return []
+function otherSpendProblems({ planet, otherSpendShareWithHullBp: share }: PlanetMedians): string[] {
   const bar = otherSpendBarBpOf(planet)
-  if (share <= bar && withHull <= bar) return []
-  return [
-    `planet ${planet} spends ${share} bp on hold, boiler and engine (${withHull} bp with the ` +
-      `hull), bar ${bar} bp`,
-  ]
+  if (share === null || share <= bar) return []
+  return [`planet ${planet} spends ${share} bp on hold, boiler, engine and hull, bar ${bar} bp`]
 }
 
 function otherSpendBarBpOf(planet: number): number {
@@ -256,11 +233,42 @@ function otherSpendBarBpOf(planet: number): number {
   return planet === 1 ? planet1 : later
 }
 
-function catchUpBurstFindings({ planet, catchUpPurchases }: PlanetMedians): string[] {
+function catchUpBurstProblems({ planet, catchUpPurchases }: PlanetMedians): string[] {
   if (catchUpPurchases === null || catchUpPurchases <= DRILL_PACE_BARS.catchUpPurchasesMax) {
     return []
   }
   return [`planet ${planet} buys ${catchUpPurchases} hold, boiler and engine steps, over 50`]
+}
+
+/** The bars the lane prints and never gates, each as a finding line. */
+export function printedDrillPaceFindingsOf(runs: readonly DrillPaceRun[]): string[] {
+  const medians = planetMediansOf(runs)
+  return [
+    ...medians.flatMap(majorsFindings),
+    ...medians.flatMap(drillTipAmberFindings),
+    ...medians.flatMap(otherSpendWithoutHullFindings),
+    ...medians.flatMap(coreFeltFindings),
+    ...runs.flatMap(levelMilestoneFindings),
+    ...runs.flatMap(amberIncomeFindings),
+  ]
+}
+
+function majorsFindings({ planet, majors }: PlanetMedians): string[] {
+  const { min, max } = DRILL_PACE_BARS.majorsPerPlanet
+  if (!isTimedPlanet(planet) || majors === null || (majors >= min && majors <= max)) return []
+  return [`planet ${planet} lands ${majors} majors of all tracks, outside 3.5 to 6.0`]
+}
+
+function drillTipAmberFindings({ planet, drillTipMajors }: PlanetMedians): string[] {
+  if (!isTimedPlanet(planet) || drillTipMajors === null) return []
+  if (drillTipMajors !== DRILL_PACE_BARS.drillTipMajorsPerPlanet.amber) return []
+  return [`planet ${planet} amber: ${drillTipMajors} drill + tip majors`]
+}
+
+function otherSpendWithoutHullFindings({ planet, otherSpendShareBp: share }: PlanetMedians) {
+  const bar = otherSpendBarBpOf(planet)
+  if (share === null || share <= bar) return []
+  return [`planet ${planet} spends ${share} bp on hold, boiler and engine alone, bar ${bar} bp`]
 }
 
 function coreFeltFindings({ planet, coreFelt }: PlanetMedians): string[] {
