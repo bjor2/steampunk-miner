@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-10-19T17:40:17+02:00",
+  "updated_at": "2026-10-19T17:40:47+02:00",
   "caps": {
     "grok": 12,
     "claude": 10,
@@ -28,11 +28,12 @@
         },
         {
           "slot": "C2",
-          "state": "free",
-          "ticket": null,
-          "grok_slot": null,
-          "kind": null,
-          "since": null
+          "state": "busy",
+          "ticket": 418,
+          "grok_slot": 2,
+          "kind": "dev",
+          "since": "2026-10-19T17:40:00+02:00",
+          "wave": "316-6A"
         },
         {
           "slot": "C3",
@@ -68,9 +69,9 @@
         }
       ],
       "size": 6,
-      "used": 1,
-      "free": 5,
-      "claims_last_hour": 1,
+      "used": 2,
+      "free": 4,
+      "claims_last_hour": 2,
       "name": "Claude Max 1"
     },
     {
@@ -150,9 +151,11 @@
     },
     {
       "slot": 2,
-      "state": "free",
-      "ticket": null,
-      "since": null
+      "state": "dev",
+      "ticket": 418,
+      "since": "2026-10-19T17:40:00+02:00",
+      "claude_slot": 2,
+      "wave": "316-6A"
     },
     {
       "slot": 3,
@@ -227,11 +230,12 @@
     },
     {
       "slot": 2,
-      "state": "free",
-      "ticket": null,
-      "grok_slot": null,
-      "since": null,
-      "account": 1
+      "state": "busy",
+      "ticket": 418,
+      "grok_slot": 2,
+      "since": "2026-10-19T17:40:00+02:00",
+      "account": 1,
+      "wave": "316-6A"
     },
     {
       "slot": 3,
@@ -299,17 +303,17 @@
     }
   ],
   "last_refill": {
-    "at": "2026-10-19 16:50 CEST",
+    "at": "2026-10-19 17:40 CEST",
     "mode": "refill-dev",
-    "triggers": "#552",
-    "started": "#559->C2/A1",
+    "triggers": "#559",
+    "started": "#418->C2/A1",
     "note": "spawned 1 worker(s)"
   },
   "totals": {
     "grok": {
       "size": 12,
-      "used": 1,
-      "dev": 1,
+      "used": 2,
+      "dev": 2,
       "dev_cap": 8,
       "planner": 0,
       "planner_cap": 4
@@ -317,8 +321,8 @@
     "claude": {
       "size": 10,
       "enabled": 10,
-      "used": 1,
-      "free": 9,
+      "used": 2,
+      "free": 8,
       "external": 0
     }
   },
@@ -358,12 +362,12 @@
         "map": 316,
         "lane": "remote",
         "mode": "solo",
-        "state": "blocked",
+        "state": "running",
         "tickets": [
           418
         ],
         "done": [],
-        "live": 0
+        "live": 1
       },
       {
         "number": 568,
@@ -389,28 +393,6 @@
           555
         ],
         "done": [],
-        "live": 0
-      },
-      {
-        "number": 556,
-        "key": "316-5A",
-        "map": 316,
-        "lane": "remote",
-        "mode": "solo",
-        "state": "running",
-        "tickets": [
-          552,
-          553,
-          558,
-          559,
-          560
-        ],
-        "done": [
-          552,
-          553,
-          558,
-          560
-        ],
         "live": 0
       },
       {
