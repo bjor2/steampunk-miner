@@ -3,8 +3,12 @@
  * one whose next steps add the most planned money per tick per price, while one pays, never
  * `drill_power` past its lead cap (`botCoreRule.ts`).
  *
- * Drill power is offered one purchase at a time, as since #552, once that purchase raises the
- * planned money. The hold and the engine are bought per purchase with no max level since ticket
+ * Drill power is offered for the fewest next purchases, up to its lead cap, that raise the planned
+ * money, priced together and paid for whole; the bot buys the first and weighs the offers again.
+ * Before #552 that look-ahead ran to the next major. Since a drill level is one purchase, the
+ * first purchase (x1.12^(1/18)) moves no whole-tick tile time on its own (40 ticks a band-1 tile
+ * either way), so a one-purchase look-ahead never offered the drill until the tip changed the
+ * plan. Behind ticket 553's boiler rule that took 18 minutes on planet 1. The hold and the engine are bought per purchase with no max level since ticket
  * 553, and an engine purchase below the drill's pace buys no travel speed, so each is offered for
  * the fewest next purchases, a bundle of at most 10, that raise the planned money by at least 0.2%
  * (Systems' marginal rule, section 3 of their rows on #553), priced together and paid for whole;
@@ -16,7 +20,7 @@ import { stepPrice } from '../economy/upgradePrices'
 import { stepsToNextLevel } from '../economy/upgradeSteps'
 import type { UpgradeLevels } from '../economy/vehicleStats'
 import { add, cmp, div, fromSafeInteger, mul, sub, ZERO_MONEY, type Money } from '../money'
-import { isUnderLeadCap } from './botCoreRule'
+import { isUnderLeadCap, leadCeiling } from './botCoreRule'
 import type { BotSession } from './botSession'
 import { canPayForBrass } from './botWallet'
 import type { MineLayout } from './mineLayout'
@@ -57,7 +61,7 @@ function marginalOffers(session: BotSession, layout: MineLayout): MarginalOffer[
   })
 }
 
-/** The best next buy on one track, or null: a hold or engine bundle, or the next level. */
+/** The best next buy on one track, or null: a hold or engine bundle, or drill power's purchases. */
 function marginalOfferOf(
   session: BotSession,
   layout: MineLayout,
@@ -65,19 +69,20 @@ function marginalOfferOf(
   track: UpgradeId,
 ): MarginalOffer | null {
   if (BUNDLE_TRACKS.includes(track)) return bundleOfferOf(session, layout, now, track)
-  return nextLevelOfferOf(session, layout, now, track)
+  return lookAheadOfferOf(session, layout, now, track)
 }
 
-/** The fewest next steps, up to the next level, that raise the planned money; null if none pays. */
-function nextLevelOfferOf(
+/**
+ * The fewest next steps, up to the lead cap, that raise the planned money; null if none pays.
+ */
+function lookAheadOfferOf(
   session: BotSession,
   layout: MineLayout,
   now: Money,
   track: UpgradeId,
 ): MarginalOffer | null {
-  const step = session.vehicle().levels[track]
   let price = ZERO_MONEY
-  for (let steps = 1; steps <= stepsToNextLevel(track, step); steps++) {
+  for (let steps = 1; steps <= stepsLookedAhead(session, track); steps++) {
     price = add(price, nextStepPrice(session, track, steps))
     const gain = gainOfSteps(session, layout, now, { track, steps })
     if (cmp(gain, ZERO_MONEY) > 0) return offerIfPaid(session, track, { price, gain })
@@ -105,6 +110,16 @@ function bundleOfferOf(
     if (isBundleWorthIt(gain, enough)) return { track, gainPerPrice: div(gain, price) }
   }
   return null
+}
+
+/**
+ * The steps left under the track's lead cap on this planet (#86); a track with no cap looks to
+ * its next level.
+ */
+function stepsLookedAhead(session: BotSession, track: UpgradeId): number {
+  const step = session.vehicle().levels[track]
+  const ceiling = leadCeiling(track, session.state().planet.index)
+  return ceiling === null ? stepsToNextLevel(track, step) : ceiling - step
 }
 
 /** 0.2% of the planned money per tick now. */
