@@ -27,8 +27,9 @@ import {
 import { quantaOfUnits } from '../vehicle/energyQuanta'
 
 // The hold, the boiler and the engine per purchase (ticket 553: Systems' rows on #553, comment
-// 6258422139, and the Producer's addendum 6258446174), with the GD's ruling of no max level:
-// holdUnits(c) = round(10 x 1.10^c) for ceil(2.4 x 1.20^c) x paceScale, energyMax(b) =
+// 6258422139, and the Producer's addendum 6258446174), with the GD's ruling of no max level, and the
+// hold's price ratio 1.15 from Systems' #418 retune (decision record 6282031970 and its final):
+// holdUnits(c) = round(10 x 1.10^c) for ceil(2.4 x 1.15^c) x paceScale, energyMax(b) =
 // round(150 x 1.10^b) for ceil(2.4 x 1.20^b) x paceScale, speedMax(e) = 6 x 1.05^e, accel(e) =
 // 1.0 x 1.05^e and thrustToWeight(e) = 1 + 1.05^e for ceil(3.6 x 1.60^e) x paceScale.
 
@@ -46,9 +47,17 @@ function boilerLawOf(purchase: number): Money {
   return mul(m('150'), powInt(m('1.10'), purchase))
 }
 
-/** The hold's and the boiler's price row: both are `ceil(2.4 x 1.20^n)` before the pace. */
+const HOLD_PRICE_RATIO = m('1.15')
+const BOILER_PRICE_RATIO = m('1.20')
+
+/** The hold's price row, `ceil(2.4 x 1.15^c)` before the pace. */
 function holdPriceRowOf(purchase: number): Money {
-  return ceil(mul(m('2.4'), powInt(m('1.20'), purchase)))
+  return ceil(mul(m('2.4'), powInt(HOLD_PRICE_RATIO, purchase)))
+}
+
+/** The boiler's price row, `ceil(2.4 x 1.20^b)` before the pace. */
+function boilerPriceRowOf(purchase: number): Money {
+  return ceil(mul(m('2.4'), powInt(BOILER_PRICE_RATIO, purchase)))
 }
 
 function enginePriceRowOf(purchase: number): Money {
@@ -88,7 +97,7 @@ describe('hold row per purchase (ticket 553)', () => {
   })
 
   it.each(PACE_PLANETS)(
-    'prices purchase c at ceil(2.4 x 1.20^c) x paceScale for c = 0 to 200 on planet %i',
+    'prices purchase c at ceil(2.4 x 1.15^c) x paceScale for c = 0 to 200 on planet %i',
     (planetIndex) => {
       const misses = PURCHASES_0_TO_200.filter((purchase) => {
         const law = mul(holdPriceRowOf(purchase), paceScale(planetIndex))
@@ -98,10 +107,11 @@ describe('hold row per purchase (ticket 553)', () => {
     },
   )
 
-  // p/s = 1.20 / 1.10 = 1.09 on the rows (Systems); rounding makes purchases 0 and 3 cheaper, each
-  // against the one before, than the units they add, and every purchase from 4 on keeps p/s >= 1.
-  it('raises every price from purchase 4 to 200 by at least the units its purchase adds', () => {
-    const cheap = PURCHASES_0_TO_200.slice(4).filter((purchase) => {
+  // p/s = 1.15 / 1.10 = 1.045 on the rows (Systems, VS on #418); rounding the small early prices up
+  // makes purchases 0, 2, 4 and 8 cheaper, each against the one before, than the units they add,
+  // and every purchase from 9 on keeps p/s >= 1.
+  it('raises every price from purchase 9 to 200 by at least the units its purchase adds', () => {
+    const cheap = PURCHASES_0_TO_200.slice(9).filter((purchase) => {
       const priceRatio = div(
         stepPrice('cargo_hold', purchase + 1, 1),
         stepPrice('cargo_hold', purchase, 1),
@@ -117,7 +127,10 @@ describe('hold row per purchase (ticket 553)', () => {
 
   it('keeps p/s at or above 1 on the unrounded rows at every purchase from 0 to 200', () => {
     const cheap = PURCHASES_0_TO_200.filter((purchase) => {
-      const priceRatio = div(powInt(m('1.20'), purchase + 1), powInt(m('1.20'), purchase))
+      const priceRatio = div(
+        powInt(HOLD_PRICE_RATIO, purchase + 1),
+        powInt(HOLD_PRICE_RATIO, purchase),
+      )
       const unitRatio = div(holdLawOf(purchase + 1), holdLawOf(purchase))
       return cmp(priceRatio, unitRatio) < 0
     })
@@ -156,7 +169,7 @@ describe('boiler row per purchase (ticket 553)', () => {
     'prices purchase b at ceil(2.4 x 1.20^b) x paceScale for b = 0 to 200 on planet %i',
     (planetIndex) => {
       const misses = PURCHASES_0_TO_200.filter((purchase) => {
-        const law = mul(holdPriceRowOf(purchase), paceScale(planetIndex))
+        const law = mul(boilerPriceRowOf(purchase), paceScale(planetIndex))
         return cmp(stepPrice('boiler', purchase, planetIndex), law) !== 0
       })
       expect(misses).toEqual([])
@@ -178,7 +191,10 @@ describe('boiler row per purchase (ticket 553)', () => {
 
   it('keeps p/s at or above 1 on the unrounded rows at every purchase from 0 to 200', () => {
     const cheap = PURCHASES_0_TO_200.filter((purchase) => {
-      const priceRatio = div(powInt(m('1.20'), purchase + 1), powInt(m('1.20'), purchase))
+      const priceRatio = div(
+        powInt(BOILER_PRICE_RATIO, purchase + 1),
+        powInt(BOILER_PRICE_RATIO, purchase),
+      )
       const tankRatio = div(boilerLawOf(purchase + 1), boilerLawOf(purchase))
       return cmp(priceRatio, tankRatio) < 0
     })

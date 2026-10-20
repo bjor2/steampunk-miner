@@ -45,7 +45,7 @@
     "hull": 2
   },
   "purchaseRow": {
-    "cargo_hold": ["2.4", "1.20"],
+    "cargo_hold": ["2.4", "1.15"],
     "boiler": ["2.4", "1.20"],
     "engine": ["3.6", "1.60"]
   },

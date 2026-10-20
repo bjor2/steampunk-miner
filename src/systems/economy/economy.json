@@ -81,7 +81,7 @@
       "id": "cost.vehicle.cargo_hold",
       "family": "geometricPerPurchase",
       "base": "2.4",
-      "ratio": "1.20"
+      "ratio": "1.15"
     },
     {
       "id": "cost.vehicle.boiler",

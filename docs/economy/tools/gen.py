@@ -5,7 +5,7 @@ C=dict(v0="10",rho="1.5",eta="1.2544",d0="1.5",dFirst=["1.12",18],gD="1.243",P0=
  E0="150",eG="1.10",C0="10",cG="1.10",s0="6",gS="1.050",
  coreMult="4",coreFrac="0.4",travelK="0.12",chargeK="0.002",repairK="0.5",feeFrac="0.05",feeFloorK="3",feeCapK="30",
  c0=24,base=dict(drill_power="1",drill_tip="83",hull="46"),r="1.225",drillRow=dict(first="1",base="20",ratio="1.48"),rTip="1.500625",w=dict(drill_power=2,drill_tip=3,engine=1.5,boiler=1,cargo_hold=1,hull=2),
- purchaseRow=dict(cargo_hold=["2.4","1.20"],boiler=["2.4","1.20"],engine=["3.6","1.60"]),
+ purchaseRow=dict(cargo_hold=["2.4","1.15"],boiler=["2.4","1.20"],engine=["3.6","1.60"]),
  Hk="7",Dkc="17.5",Dkb="16.5",gE="1.12",ET0=1,etPlanet=6,etBand=1,KxE=60,tkill="1.5",
  paceFrom=[[2,"1.2"],[3,"1.2"],[4,"1.3"],[6,"1.6"],[8,"1.7"]])
 d=lambda s:D(str(s))

@@ -417,8 +417,12 @@ import type { DriveSigns } from '../vehicle/driveSigns'
  *    more and dies at the end of its dwell `max(1, ceil(health x 60 / rate))`; one tougher than
  *    the rig's gate tip, a wrecker or a core guardian holds the rider's cut meanwhile. Its clock
  *    events concern its rider. With the flag off no `ride` is written and no digest moves.
+ * 98: the hold is priced `ceil(2.4 x 1.15^c) x paceScale` (ticket 418, Systems' retune with the HS
+ *    and VS decision record), where it was `ceil(2.4 x 1.20^c)`. Hold units, the boiler, the
+ *    engine and the drill are unchanged; purchases 0 to 2 keep their rows (3, 3 and 4), so a run
+ *    that buys no fourth hold step moves no digest.
  */
-export const AUTHORITY_PROTOCOL_VERSION = 97
+export const AUTHORITY_PROTOCOL_VERSION = 98
 
 /** The kernel's own commands: the closed set its rule tables are written against. */
 export interface KernelCommandPayloads {

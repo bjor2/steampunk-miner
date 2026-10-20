@@ -38,7 +38,8 @@ The tables list **major levels** `L`, today's curves. A vehicle stores each trac
   12 at planet 1 and 3 a planet ([drill-ladder.md](drill-ladder.md)).
 - **The hold, the boiler and the engine since ticket 553** (Systems' rows on #553, comment
   6258422139, and the Producer's addendum): per purchase too, with no max level. Hold
-  `round(10 x 1.10^c)` and boiler `round(150 x 1.10^b)`, each for `ceil(2.4 x 1.20^n) x paceScale`
+  `round(10 x 1.10^c)` for `ceil(2.4 x 1.15^c) x paceScale` (the ratio from Systems' #418 retune,
+  was 1.20) and boiler `round(150 x 1.10^b)` for `ceil(2.4 x 1.20^b) x paceScale`
   (families `wholePerPurchase` and `geometricPerPurchase`); engine `6 x 1.05^e` m/s with accel
   `1.05^e` and thrust to weight `1 + 1.05^e`, for `ceil(3.6 x 1.60^e) x paceScale`
   (`enginePerPurchase`). Their stats are plain numbers, safe to about 275 purchases, so each
