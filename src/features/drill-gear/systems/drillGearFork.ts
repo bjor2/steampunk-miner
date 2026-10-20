@@ -1,7 +1,8 @@
 /**
  * The drill-gear lane's fork, priced on P16 (GD lock on #255, build 3, ticket 268): two exclusive
- * branches, `tech.drill_gear.fork.wide` and `.deep`, picked with `tech-tree.choose_fork` and acting while
- * active, on the kernel's drill gear read. Both are tree-only capabilities: no store item, no slot.
+ * branches, `tech.drill_gear.fork.wide` and `.deep`, picked with `tech-tree.choose_fork` and
+ * acting while active, on the kernel's drill gear read. Both are tree-only capabilities: no store
+ * item, no slot.
  *
  * - **Wide** (gallery reamers): the flanks are the main cut. Every cut also takes the reamers' cells
  *   on each flank of the bore, and with the side cutters switched on, their cells plus the
