@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-10-20T06:17:07+02:00",
+  "updated_at": "2026-10-20T09:43:17+02:00",
   "caps": {
     "grok": 12,
     "claude": 10,
@@ -354,19 +354,6 @@
         "state": "ready",
         "tickets": [
           555
-        ],
-        "done": [],
-        "live": 0
-      },
-      {
-        "number": 525,
-        "key": "316-7D",
-        "map": 316,
-        "lane": "hitl",
-        "mode": "bench",
-        "state": "paused",
-        "tickets": [
-          545
         ],
         "done": [],
         "live": 0
