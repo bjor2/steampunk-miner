@@ -1,6 +1,6 @@
 /**
  * The game's sound (#13 audio direction): one-shots for each feedback cue (the pickup chime by
- * tier, the dock and upgrade clanks, a hit's thud, the core and travel stingers, casing's hiss and
+ * tier, at most 12 a second, ticket 615, the dock and upgrade clanks, a hit's thud, the core and travel stingers, casing's hiss and
  * pop, a charge's blast, its thump delayed by the blast cue with distance, #213, a slot hold's
  * cancel clank and finish chime, ticket 253), the music stingers (#49), the slices' sound cues
  * within their voice budgets (#180, `soundCuePlayer.ts`), the kernel one-shots slices ask for by
@@ -48,6 +48,7 @@ import {
 import { drillPresence } from './drillPresence'
 import { motionPresence } from './motionPresence'
 import { createOneShotPlayer } from './oneShotPlayer'
+import { createPickupChimePlayer, type PickupChimePlayer } from './pickupChimePlayer'
 import { createSoundCuePlayer } from './soundCuePlayer'
 
 /** The drill's load and the music's targets are re-read as often as the HUD re-reads. */
@@ -86,7 +87,11 @@ export function SoundStage() {
   const thumps = useMemo(createDelayedThumps, [])
   const cues = useMemo(() => createSoundCuePlayer(sound), [sound])
   const oneShots = useMemo(() => createOneShotPlayer(sound), [sound])
-  useEffect(() => listenForFeedback((cue) => playOrDelayCue(sound, thumps, cue)), [sound, thumps])
+  const chimes = useMemo(() => createPickupChimePlayer(sound), [sound])
+  useEffect(
+    () => listenForFeedback((cue) => playOrHoldCue(sound, thumps, chimes, cue)),
+    [sound, thumps, chimes],
+  )
   useEffect(() => listenForSoundCues(cues.play), [cues])
   useEffect(() => listenForOneShots(oneShots.play), [oneShots])
   useEffect(
@@ -96,6 +101,7 @@ export function SoundStage() {
   useFrame((_, delta) => {
     cues.advance(delta)
     oneShots.advance()
+    chimes.advance(delta)
     playDueThumps(sound, thumps, delta)
     refreshDrillLoad(drill, delta)
     playLoops(sound, drill)
@@ -139,10 +145,19 @@ function playBlastThump(sound: SoundOut): void {
   sound.playCollapseCrash()
 }
 
-/** A blast's thump may wait with the listener's distance (#213); every other cue sounds now. */
-function playOrDelayCue(sound: SoundOut, thumps: DelayedThumps, cue: FeedbackCue): void {
+/**
+ * A pickup chimes within its cap (ticket 615), a blast's thump may wait with the listener's
+ * distance (#213); every other cue sounds now.
+ */
+function playOrHoldCue(
+  sound: SoundOut,
+  thumps: DelayedThumps,
+  chimes: PickupChimePlayer,
+  cue: FeedbackCue,
+): void {
   const delayTicks = thumpDelayTicksOf(cue)
-  if (delayTicks > 0) delayThump(thumps, delayTicks)
+  if (cue.kind === 'pickup') chimes.play(cue.tier)
+  else if (delayTicks > 0) delayThump(thumps, delayTicks)
   else playCue(sound, cue)
 }
 

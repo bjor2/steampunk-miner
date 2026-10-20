@@ -324,12 +324,12 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/mining-gates/systems/rigs.test.ts` | 8 | 8 |
 | `src/features/mining-gates/systems/toolsAndGear.test.ts` | 3 | 3 |
 
-### `mining-popup`: 8 files, 51 tests
+### `mining-popup`: 8 files, 52 tests
 
 | File | Tests | Sites |
 | --- | --- | --- |
 | `src/features/mining-popup/noDoubleConversion.test.ts` | 1 | 1 |
-| `src/features/mining-popup/store/miningPopupStore.test.ts` | 8 | 8 |
+| `src/features/mining-popup/store/miningPopupStore.test.ts` | 9 | 9 |
 | `src/features/mining-popup/systems/chipBoard.test.ts` | 10 | 10 |
 | `src/features/mining-popup/systems/oreFace.test.ts` | 4 | 4 |
 | `src/features/mining-popup/systems/plaqueBoard.test.ts` | 5 | 5 |
@@ -707,6 +707,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/audio/musicLayers.test.ts` | 11 | 11 |
 | `src/systems/audio/musicScore.test.ts` | 3 | 3 |
 | `src/systems/audio/musicStingers.test.ts` | 5 | 5 |
+| `src/systems/audio/pickupChimeCap.test.ts` | 3 | 3 |
 | `src/systems/audio/soundRules.test.ts` | 8 | 8 |
 | `src/systems/audio/soundUnlock.test.ts` | 8 | 8 |
 | `src/systems/audio/voicePool.test.ts` | 3 | 3 |
@@ -1090,6 +1091,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 
 | File | Tests | Sites |
 | --- | --- | --- |
+| `src/systems/materialPop/carveWatch.test.ts` | 9 | 9 |
 | `src/systems/materialPop/materialPopMode.test.ts` | 3 | 3 |
 
 ### `pacing-bot`
@@ -1355,6 +1357,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/store/artefactChoice.test.ts` | 5 | 5 |
 | `src/store/authorityReads.test.ts` | 3 | 3 |
 | `src/store/bayEntryPress.test.ts` | 2 | 2 |
+| `src/store/carveCompleteBroadcast.test.ts` | 3 | 3 |
 | `src/store/checkpoint.test.ts` | 22 | 22 |
 | `src/store/devFlagOverrides.test.ts` | 15 | 15 |
 | `src/store/devFlagPanel.test.ts` | 12 | 12 |

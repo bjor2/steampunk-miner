@@ -16,12 +16,14 @@ import { chipStackOf } from '../systems/render/chipPlacement'
 import { chipAnchorOf } from './chipAnchor'
 import { MINING_POPUP_TEST_IDS } from './testIds'
 import { OreIcon } from './OreIcon'
+import { useCarveFeed } from './useCarveFeed'
 import { usePopupClock } from './usePopupClock'
 import { usePopupFeed } from './usePopupFeed'
 import styles from './ResourceChips.module.css'
 
 export function ResourceChips() {
   usePopupFeed(useMiningPopupStore((state) => state.observePickups))
+  useCarveFeed(useMiningPopupStore((state) => state.observeCarvedCells))
   const board = useMiningPopupStore((state) => state.chipBoard)
   const tick = useMiningPopupStore((state) => state.tick)
   const chips = useMemo(() => chipsShownAt(board, tick), [board, tick])

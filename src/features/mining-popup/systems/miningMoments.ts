@@ -1,6 +1,7 @@
 /**
  * What the popup hears (#178 TD settlement): a unit reaching the local player's hold
- * (`CargoAdded`, the drill's or a blast's) is a chip pickup, and the codex's first mine of a type
+ * (`CargoAdded`, the drill's or a blast's) is a chip pickup, the drill's once its cell is carved
+ * (ticket 615), and the codex's first mine of a type
  * (`codex.OreDiscovered`) is a plaque line. A teammate's events never show here (#172 §4). Each
  * carries its unit's rarity once the material is seen (ticket 454, `findRarity.ts`); the plaque's
  * is the first unit of its type in the batch. Reads the authority state the events answered;
@@ -9,6 +10,7 @@
 import type { AuthorityState } from '../../../systems/authority/authorityState'
 import { vehicleOf } from '../../../systems/authority/authorityState'
 import type { DomainEvent } from '../../../systems/authority/domainEvent'
+import { withoutCarvingPickups, type CarvedCell } from '../../../systems/materialPop/carveWatch'
 import { planetParamsOf } from '../../../systems/authority/planetOfState'
 import { statsOfVehicle } from '../../../systems/vehicle/vehicleState'
 import type { SeenRarity } from '../../../systems/render/seenRarity'
@@ -35,6 +37,29 @@ export function pickupsOf(
 ): OrePickup[] {
   return events.flatMap((event, at) =>
     isCargoAdded(event) ? localPickupsOf(events, at, event, state, playerId) : [],
+  )
+}
+
+/**
+ * The batch's pickups but the drill's: a drilled cell's unit shows once its cell is carved
+ * (ticket 615), so only a blast's or a bore's units show as they reach the hold.
+ */
+export function uncarvedPickupsOf(
+  events: readonly DomainEvent[],
+  state: AuthorityState,
+  playerId: string,
+): OrePickup[] {
+  return pickupsOf(withoutCarvingPickups(events, playerId), state, playerId)
+}
+
+/** The drilled cells' units, each at the tick its cell was carved (G&V on #442: within 1 tick). */
+export function carvedPickupsOf(
+  cells: readonly CarvedCell[],
+  state: AuthorityState,
+  playerId: string,
+): OrePickup[] {
+  return cells.flatMap((cell) =>
+    pickupsOf(cell.yieldEvents, state, playerId).map((pickup) => ({ ...pickup, tick: cell.tick })),
   )
 }
 

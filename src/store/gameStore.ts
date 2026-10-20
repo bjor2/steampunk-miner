@@ -87,8 +87,12 @@ import { forgetBlastScorches, recordBlastScorches } from './blastScorchRecord'
 import { heatDebugActionsOf, type HeatDebugActions } from './heatDebugActions'
 import { collapseDebugActionsOf, type CollapseDebugActions } from './collapseDebugActions'
 import { groundDebugActionsOf, type GroundDebugActions } from './groundDebugActions'
+import {
+  announceBatchFeedback,
+  followCarvedCells,
+  forgetCarveWatch,
+} from './carveCompleteBroadcast'
 import { announceDomainEvents } from './domainEventBroadcast'
-import { announceFeedback } from './feedbackBroadcast'
 import { hintActionsOf, STARTING_HINTS, type HintActions, type HintValues } from './hintSlice'
 import {
   planetCardActionsOf,
@@ -524,6 +528,7 @@ export function resetGameStore(authority: Authority = createStartingAuthority())
   useGameStore.setState({ ...STARTING_VALUES })
   forgetMusicStingers()
   forgetBlastScorches()
+  forgetCarveWatch()
   connectAuthority(authority, followAuthority)
   followSaveWrites((outcome) => useGameStore.getState().noteSaveWrite(outcome))
 }
@@ -538,8 +543,9 @@ export function runEventPlaceOf(state: GameValues): RunEventPlace {
 /**
  * The one writer of planet and wallet: copies them from the authority, starts the travel
  * transition when the events travelled, opens or closes the planet card, shows the hints,
- * feedback, part installs, stingers and scorches they trigger, hands them to the slices' stores,
- * logs the events, then writes the checkpoint when due.
+ * feedback, part installs, stingers and scorches they trigger, hands them to the slices' stores
+ * and the cells they finished carving to the carve listeners (ticket 615), logs the events, then
+ * writes the checkpoint when due.
  */
 function followAuthority(events: readonly DomainEvent[]): void {
   useGameStore.setState(replicaOf(readAuthorityState(), useGameStore.getState().playerId))
@@ -547,8 +553,9 @@ function followAuthority(events: readonly DomainEvent[]): void {
   useGameStore.getState().followPlanetCard(events)
   useGameStore.getState().observePlaques(events)
   useGameStore.getState().followArtefactChoice(events)
-  announceFeedback(events, useGameStore.getState().playerId)
+  announceBatchFeedback(events, useGameStore.getState().playerId)
   announceDomainEvents(events, useGameStore.getState().playerId)
+  followCarvedCells(events, useGameStore.getState().playerId)
   useGameStore.getState().startPartInstall(events)
   recordMusicStingers(events, useGameStore.getState().playerId)
   recordBlastScorches(events)
@@ -558,6 +565,7 @@ function followAuthority(events: readonly DomainEvent[]): void {
 
 /** A restored or resumed session on a fresh authority; its `seq`s continue (authorityLink). */
 function replaceSession(state: AuthorityState): void {
+  forgetCarveWatch()
   connectAuthority(createLoopbackAuthority(state), followAuthority)
   followAuthority([])
 }

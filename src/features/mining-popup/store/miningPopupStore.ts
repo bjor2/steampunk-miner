@@ -14,7 +14,13 @@ import {
   type ChipBoard,
   type OrePickup,
 } from '../systems/chipBoard'
-import { materialMomentsOf, pickupsOf, type MaterialMoment } from '../systems/miningMoments'
+import type { CarvedCell } from '../../../systems/materialPop/carveWatch'
+import {
+  carvedPickupsOf,
+  materialMomentsOf,
+  uncarvedPickupsOf,
+  type MaterialMoment,
+} from '../systems/miningMoments'
 import { addDiscoveryToPlaque, EMPTY_PLAQUE_BOARD, type PlaqueBoard } from '../systems/plaqueBoard'
 
 interface MiningPopupValues {
@@ -25,8 +31,10 @@ interface MiningPopupValues {
 }
 
 interface MiningPopupState extends MiningPopupValues {
-  /** One batch of authority events: the local player's units into the hold become chips. */
+  /** One batch of authority events: the local player's blasted and bored units become chips. */
   observePickups(events: readonly DomainEvent[], playerId: string): void
+  /** The cells the drill finished carving: their units become chips (ticket 615). */
+  observeCarvedCells(cells: readonly CarvedCell[], playerId: string): void
   /** One batch of authority events: the local player's first mines become plaque lines. */
   observeDiscoveries(events: readonly DomainEvent[], playerId: string): void
   /** Ages the boards to the authority's tick, so a chip or plaque clears with no new event. */
@@ -41,14 +49,10 @@ const STARTING_VALUES: MiningPopupValues = {
 
 export const useMiningPopupStore = create<MiningPopupState>()((set, get) => ({
   ...STARTING_VALUES,
-  observePickups: (events, playerId) => {
-    const pickups = pickupsOf(events, readAuthorityState(), playerId)
-    if (pickups.length === 0) return
-    set({
-      chipBoard: pickups.reduce(addPickupToChips, get().chipBoard),
-      tick: latestTickOf(get().tick, pickups),
-    })
-  },
+  observePickups: (events, playerId) =>
+    showPickups(uncarvedPickupsOf(events, readAuthorityState(), playerId)),
+  observeCarvedCells: (cells, playerId) =>
+    showPickups(carvedPickupsOf(cells, readAuthorityState(), playerId)),
   observeDiscoveries: (events, playerId) => {
     const moments = materialMomentsOf(events, readAuthorityState(), playerId)
     if (moments.length === 0) return
@@ -59,6 +63,15 @@ export const useMiningPopupStore = create<MiningPopupState>()((set, get) => ({
   },
   showAt: (tick) => set({ chipBoard: withoutEndedChips(get().chipBoard, tick), tick }),
 }))
+
+function showPickups(pickups: readonly OrePickup[]): void {
+  if (pickups.length === 0) return
+  const { chipBoard, tick } = useMiningPopupStore.getState()
+  useMiningPopupStore.setState({
+    chipBoard: pickups.reduce(addPickupToChips, chipBoard),
+    tick: latestTickOf(tick, pickups),
+  })
+}
 
 /** For specs' `beforeEach`. */
 export function resetMiningPopupStore(): void {

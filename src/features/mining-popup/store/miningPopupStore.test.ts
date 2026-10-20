@@ -1,4 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it } from 'vitest'
+import { listenForCarvedCells } from '../../../store/carveCompleteBroadcast'
 import { listenForDomainEvents } from '../../../store/domainEventBroadcast'
 import { readAuthorityTick, resetGameStore, useGameStore } from '../../../store/gameStore'
 import { surfaceOreTiles } from '../../../systems/authority/scriptedSession'
@@ -6,6 +7,7 @@ import { planetParamsOf } from '../../../systems/authority/planetOfState'
 import { oreTypeAtTile } from '../../../systems/authority/tileOre'
 import { kindLookProvider } from '../../../systems/registries/kindLook'
 import { kindSlotOfCell, NO_KIND_SLOT } from '../../../systems/world/worldCell'
+import { cellDensitySum } from '../../../systems/world/cellYield'
 import { cellAt } from '../../../systems/world/worldState'
 import { readAuthorityState } from '../../../store/authorityLink'
 import type { ScriptedCommand } from '../../../systems/fastForward'
@@ -18,7 +20,8 @@ import { resetMiningPopupStore, useMiningPopupStore } from './miningPopupStore'
 import { NO_DRIVE } from '../../../systems/vehicle/driveSigns'
 
 // The popup hears the game as the HUD does: every batch the game store follows, through
-// listenForDomainEvents, while the drill mines real surface ore on the store's starting planet.
+// listenForDomainEvents, and every cell the drill finished carving, through listenForCarvedCells,
+// while the drill mines real surface ore on the store's starting planet.
 
 const game = () => useGameStore.getState()
 const popup = () => useMiningPopupStore.getState()
@@ -26,6 +29,7 @@ const PLANET_1 = planetParamsFor(1, 1)
 const DRILL_TICKS = 40
 
 let stopListening: () => void
+let stopCarveListening: () => void
 
 beforeEach(() => {
   resetGameStore()
@@ -34,9 +38,15 @@ beforeEach(() => {
     popup().observePickups(events, playerId)
     popup().observeDiscoveries(events, playerId)
   })
+  stopCarveListening = listenForCarvedCells((cells, playerId) =>
+    popup().observeCarvedCells(cells, playerId),
+  )
 })
 
-afterEach(() => stopListening())
+afterEach(() => {
+  stopListening()
+  stopCarveListening()
+})
 
 function poseOver(tile: TilePoint, tick: number): ScriptedCommand {
   const payload = {
@@ -71,6 +81,12 @@ function mine(tiles: readonly TilePoint[], spacing = 50): void {
     },
   ])
   game().fastForward(spacing * tiles.length, commands)
+}
+
+/** One fixed step's drilling of `tile`, as the game's loop drills it. */
+function drillOneTick(tile: TilePoint): void {
+  const tick = readAuthorityTick() + 1
+  game().fastForward(1, [{ tick, type: 'drillTile', payload: { ...tile, ticks: 1 } }])
 }
 
 /** The rarity lead of the species the tile's cell wears on the store's planet, or null. */
@@ -179,10 +195,28 @@ describe('mining popup store', () => {
     expect(chip.rarity).toBeNull()
   })
 
+  it('shows the drill’s chip the tick its cell is carved, not the tick its unit is paid', () => {
+    const [tile] = tilesByType().same
+    if (game().vehicle.mode === 'docked') game().undock()
+    game().fastForward(1, [poseOver(tile, readAuthorityTick() + 1)])
+    const params = planetParamsOf(readAuthorityState().planet)!
+    const densityLeft = () => cellDensitySum(readAuthorityState().world, params, tile)
+    while (game().vehicle.cargoUnits === 0) drillOneTick(tile)
+    expect(densityLeft()).toBeGreaterThan(0)
+    expect(popup().chipBoard.chips).toEqual([])
+    while (densityLeft() > 0) drillOneTick(tile)
+    const chips = chipsShownAt(popup().chipBoard, readAuthorityTick())
+    expect(chips.map((chip) => [chip.count, chip.firstTick])).toEqual([[1, readAuthorityTick()]])
+  })
+
   it('shows nothing for another player', () => {
     const { same } = tilesByType()
     stopListening()
     stopListening = listenForDomainEvents((events) => popup().observePickups(events, 'p-other'))
+    stopCarveListening()
+    stopCarveListening = listenForCarvedCells((cells) =>
+      popup().observeCarvedCells(cells, 'p-other'),
+    )
     mine(same.slice(0, 1))
     expect(popup().chipBoard.chips).toEqual([])
   })
