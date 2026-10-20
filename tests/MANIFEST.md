@@ -992,7 +992,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | --- | --- | --- |
 | `src/logging/goldenRun.test.ts` | 26 | 10 |
 | `src/logging/secondSliceGolden.test.ts` | 6 | 6 |
-| `src/systems/world/generatorGolden.test.ts` | 10 | 10 |
+| `src/systems/world/generatorGolden.test.ts` | 11 | 11 |
 
 ### `hints`
 
@@ -1084,6 +1084,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/logging/sessionAnalysis/sessionTable.test.ts` | 12 | 12 |
 | `src/logging/sessionAnalysis/summaryComparison.test.ts` | 3 | 3 |
 | `src/logging/subStepFloor.test.ts` | 4 | 4 |
+| `src/logging/surfaceLayerReport.test.ts` | 3 | 3 |
 | `src/logging/tripCellEnergy.lane.test.ts` | 1 | 1 |
 | `src/logging/tripCellEnergy.test.ts` | 2 | 2 |
 | `src/logging/wreckerDiveReport.test.ts` | 6 | 6 |
@@ -1285,7 +1286,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/save/cutFrontSave.test.ts` | 2 | 2 |
 | `src/systems/save/loadedSaveDigest.test.ts` | 4 | 4 |
 | `src/systems/save/newerSaveText.test.ts` | 5 | 5 |
-| `src/systems/save/oreRulesOldSaves.test.ts` | 11 | 5 |
+| `src/systems/save/oreRulesOldSaves.test.ts` | 12 | 6 |
 | `src/systems/save/playerProfile.test.ts` | 4 | 4 |
 | `src/systems/save/saveBytesWatch.test.ts` | 2 | 2 |
 | `src/systems/save/saveDeterminism.test.ts` | 7 | 7 |
@@ -1649,6 +1650,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/world/planetParams.test.ts` | 28 | 23 |
 | `src/systems/world/rimDwell.test.ts` | 6 | 6 |
 | `src/systems/world/stampShape.test.ts` | 8 | 5 |
+| `src/systems/world/surfaceLayer.test.ts` | 11 | 11 |
 | `src/systems/world/sweptSpan.test.ts` | 6 | 6 |
 | `src/systems/world/worldCell.test.ts` | 8 | 8 |
 | `src/systems/world/worldExactMathLint.test.ts` | 15 | 3 |

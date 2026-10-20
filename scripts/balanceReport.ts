@@ -19,6 +19,7 @@ import { bandDigAlerts } from '../src/logging/bandDigReport'
 import { formatNdjsonLine } from '../src/logging/ndjson'
 import { loggedCommandsOf } from '../src/logging/commandLog'
 import { reportRowLines } from '../src/logging/reportRows'
+import { surfaceLayerCapLines } from '../src/logging/surfaceLayerReport'
 import {
   formatSeedPacingTable,
   medianPacingReport,
@@ -82,6 +83,7 @@ const report = [
   ]),
   listSection('Tunnel wrecker (reported only, #111)', wreckerDiveLines(deriveWreckerDives(events))),
   listSection('Slice report rows (reported only, #223)', reportRowLines(runs)),
+  listSection('Surface layer band-1 cap (reported only, ticket 625)', surfaceLayerCapLines()),
   spreeSection(runs),
   comparisonSection(summary),
   assaySection(),

@@ -253,6 +253,13 @@ export const COLLAPSE_VEHICLE_CLEARANCE_MM = 637 + 250
 export const CAMPAIGN_LAST_PLANET = 40
 
 /**
+ * The last planet the surface layer report reads (ticket 625): the tree lane's P60
+ * (`balance:tree`), past the campaign, so the first planet where the band-1 cap binds shows before
+ * endless play reaches it (VS on #625).
+ */
+export const SURFACE_REPORT_LAST_PLANET = 60
+
+/**
  * The locked schedule never leaves more than this many consecutive campaign planets without a
  * horizontal row, of any `bind` (#81 acceptance 2).
  */
