@@ -26,6 +26,13 @@
       ],
       "byPlanet": {}
     },
+    "surfaceLayer": {
+      "pinnedCells": 3,
+      "rampMinCells": 4,
+      "rampStepRatio": "1.5",
+      "systems": [{ "system": 1, "firstPlanet": 1, "surfaceTiers": 0 }],
+      "planetSurfaces": []
+    },
     "depthDensity": {
       "fromPlanet": 3,
       "floorBp": 1000,

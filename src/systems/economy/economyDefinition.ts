@@ -11,6 +11,7 @@ import type { MagnetCaps } from './magnetCaps'
 import type { TurretCaps } from './turretCaps'
 import type { MagneticHazardCaps } from './magneticHazardCaps'
 import type { DepthDensityCurve } from './depthDensityCurve'
+import type { SurfaceLayerRules } from './surfaceLayerRules'
 import type { BigStat, Money } from '../money'
 import type { WholeFraction } from '../wholeFractions'
 
@@ -441,6 +442,8 @@ export interface Economy {
      */
     largestBandOrePerRadius: Money
     paceScale: PaceScale
+    /** The pinned surface layer and its ramp to band 1 (ticket 625, `surfaceLayerRules.ts`). */
+    surfaceLayer: SurfaceLayerRules
     /** Ore per solid tile by depth from planet 3 (ticket 448, `depthDensityCurve.ts`). */
     depthDensity: DepthDensityCurve
   }

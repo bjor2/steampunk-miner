@@ -21,6 +21,7 @@ import { readMagneticHazardCaps } from './magneticHazardCaps'
 import { readTurretCaps } from './turretCaps'
 import { readPaceScale } from './readPaceScale'
 import { readDepthDensity } from './depthDensityCurve'
+import { readSurfaceLayer } from './surfaceLayerRules'
 import { readUpgradeTiers } from './readUpgradeTiers'
 import { readCostCurve, readRefinery } from './readRefineryEconomy'
 import type { CostCurve, Economy, VisualTierThreshold } from './economyDefinition'
@@ -101,6 +102,7 @@ function readPlanets(reader: FieldReader, planets: Record<string, unknown>): Eco
       planets.largestBandOrePerRadius,
     ),
     paceScale: readPaceScale(reader, planets.paceScale),
+    surfaceLayer: readSurfaceLayer(reader, planets.surfaceLayer),
     depthDensity: readDepthDensity(reader, planets.depthDensity),
   }
 }
