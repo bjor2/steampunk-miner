@@ -1,0 +1,41 @@
+{
+  "about": "The drill_tip track's rig-look parts (ticket 578, wave 576-1A of the rig look ladder #576): one asset at the track's attach slot, one part per look step. The thresholds are Systems' table (#157, comment 6300543785) and the names Progression's (comment 6300549964); the wiring (#579) reads them from the rig-look registry (#577), not from here.",
+  "assetId": "vehicle-look-drill-tip",
+  "track": "drill_tip",
+  "attach": "drill.head",
+  "z": 9,
+  "replaces": "t1-drill-bit",
+  "looks": [
+    {
+      "part": "cutter-crown",
+      "name": "Cutter crown",
+      "purchases": 0,
+      "unnamedDefault": true
+    },
+    {
+      "part": "steel-cone",
+      "name": "Steel cone",
+      "purchases": 70
+    },
+    {
+      "part": "fluted-bit",
+      "name": "Fluted bit",
+      "purchases": 100
+    },
+    {
+      "part": "toothed-crown",
+      "name": "Toothed crown",
+      "purchases": 130
+    },
+    {
+      "part": "gem-set-crown",
+      "name": "Gem-set crown",
+      "purchases": 190
+    },
+    {
+      "part": "aether-cut-crown",
+      "name": "Aether-cut crown",
+      "purchases": 280
+    }
+  ]
+}

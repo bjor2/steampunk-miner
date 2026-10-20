@@ -1,0 +1,59 @@
+{
+  "about": "Ticket 578: silhouette cells of each drill_tip look on drill.head, on a 4 mm grid, outside the rig at rest at tiers 1, 2, 3, and by which the tier-1 rig's silhouette changes with the look in place of its own t1-drill-bit; written by check_outline.py. `outsideRig` must be all zero; the base look's `changesRigOutline` must be zero.",
+  "looks": {
+    "cutter-crown": {
+      "cells": 462,
+      "outsideRig": {
+        "tier-1": 0,
+        "tier-2": 0,
+        "tier-3": 0
+      },
+      "changesRigOutline": 0
+    },
+    "steel-cone": {
+      "cells": 316,
+      "outsideRig": {
+        "tier-1": 0,
+        "tier-2": 0,
+        "tier-3": 0
+      },
+      "changesRigOutline": 220
+    },
+    "fluted-bit": {
+      "cells": 316,
+      "outsideRig": {
+        "tier-1": 0,
+        "tier-2": 0,
+        "tier-3": 0
+      },
+      "changesRigOutline": 220
+    },
+    "toothed-crown": {
+      "cells": 564,
+      "outsideRig": {
+        "tier-1": 0,
+        "tier-2": 0,
+        "tier-3": 0
+      },
+      "changesRigOutline": 0
+    },
+    "gem-set-crown": {
+      "cells": 494,
+      "outsideRig": {
+        "tier-1": 0,
+        "tier-2": 0,
+        "tier-3": 0
+      },
+      "changesRigOutline": 68
+    },
+    "aether-cut-crown": {
+      "cells": 494,
+      "outsideRig": {
+        "tier-1": 0,
+        "tier-2": 0,
+        "tier-3": 0
+      },
+      "changesRigOutline": 68
+    }
+  }
+}
