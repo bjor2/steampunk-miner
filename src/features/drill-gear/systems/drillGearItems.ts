@@ -60,7 +60,7 @@ export interface DrillGearItem {
 export interface DrillGearNode {
   id: string
   iconId: string
-  /** The unlock planet; the item's one-off price is read there too (#162 4.1). */
+  /** The price anchor: the planet the one-off price is read at (#162 4.1), never a gate (#624). */
   unlockTier: number
   prereqs: readonly string[]
   requiresDiscovery?: DiscoveryKey

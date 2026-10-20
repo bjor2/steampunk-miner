@@ -248,7 +248,7 @@ describe('drill-gear Mark milestones (#256): the vibratory bit links to the core
 })
 
 describe("drill-gear Mark milestones (#276): the side cutters' hold, a toggle", () => {
-  /** `side_drills` opens on planet 13; the cutters' Mark 3 is researched from planet 19. */
+  /** `side_drills` is anchored on planet 13; the cutters' Mark 3 is priced from planet 19. */
   const SIDE_DRILLS_PLANET = 13
   const MARK_3_PLANET = 19
   const MARK_2_PLANET = 16
@@ -318,13 +318,13 @@ describe("drill-gear Mark milestones (#276): the side cutters' hold, a toggle", 
     expect(askOf(held.state())).not.toHaveProperty('sideAim')
   })
 
-  it('cuts both sides as before until side_drills is open, even held at M3', () => {
+  it('held at M3 on a planet short of side_drills, cuts the faced side only (ticket 624)', () => {
     const early = cuttersFollowedUp(
       { researchedThrough: MARK_3_PLANET, onPlanet: SIDE_DRILLS_PLANET - 1 },
       intentToHoldSlot('drill.flank'),
     )
     expect(usedLinesOf(early.events()).slice(-1)).toEqual([{ milestone: 'hold', toggledOn: true }])
-    expect(askOf(early.state())).not.toHaveProperty('sideAim')
+    expect(askOf(early.state())).toMatchObject({ sideCells: 1, sideAim: 'drive' })
   })
 
   it('asks nothing for a hold without the cutters owned', () => {

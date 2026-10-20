@@ -8,12 +8,11 @@
  *
  * A plain press that switches them on again cuts both sides; a press that switches them off leaves
  * the hold remembered but unread, since the ask is made only while they are on. The hold answers
- * only at the hold's Mark and once `side_drills` (P13) is open (the Horizontal Scaler's pin), so
- * any other press asks both sides as before.
+ * only at the hold's Mark, so any other press asks both sides as before. No planet gates it: the
+ * `side_drills` row (P13) is the cutters' price anchor only (GD lock on #308, ticket 624).
  */
 import { vehicleOf, type AuthorityState } from '../../../systems/authority/authorityState'
 import { unchanged } from '../../../systems/authority/commandRule'
-import { isFeatureUnlocked } from '../../../systems/authority/featureUnlocks'
 import { isJsonObject } from '../../../systems/authority/payloadFields'
 import {
   readSection,
@@ -24,9 +23,6 @@ import { isDriveSigns, NO_DRIVE, type DriveSigns } from '../../../systems/vehicl
 import { sideSeedOf } from '../../../systems/vehicle/facedSide'
 import type { PowerUpOutcome, PowerUpUse } from '../../power-up-core'
 import { markLadderOfItem, researchedMarkOf } from '../../tech-tree'
-
-/** The Schedule C row the side cutters' node absorbs (#161). */
-const SIDE_DRILLS_ROW = 'side_drills'
 
 /** The hold, while it is on: the push the faced side starts from before any drive names one. */
 export interface FacedHold {
@@ -53,15 +49,14 @@ export function actSideCutters(state: AuthorityState, use: PowerUpUse): PowerUpO
   return { kind: 'acted', effect: unchanged(withDrillGearMemory(state, use.playerId, memory)) }
 }
 
-/** The hold the cutters ask with now: on, at its Mark, with `side_drills` open; else null. */
+/** The hold the cutters ask with now: on and at its Mark; else null. */
 export function facedHoldOf(
   state: AuthorityState,
   playerId: string,
   itemId: string,
 ): FacedHold | null {
   const hold = readSection(state, playerId, DRILL_GEAR_SECTION).facedHold
-  if (hold === undefined || !isHoldReached(state, playerId, itemId)) return null
-  return isFeatureUnlocked(state, SIDE_DRILLS_ROW) ? hold : null
+  return hold !== undefined && isHoldReached(state, playerId, itemId) ? hold : null
 }
 
 function heldFrom(state: AuthorityState, playerId: string): DrillGearMemory {

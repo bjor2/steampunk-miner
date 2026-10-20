@@ -3,6 +3,7 @@ import { createAuthorityState } from '../../../systems/authority/authorityState'
 import type { CommandIntent } from '../../../systems/authority/authorityCommand'
 import { continueScriptedSession, poseAbove } from '../../../systems/authority/scriptedSession'
 import { UPGRADE_IDS } from '../../../systems/economy/economyDefinition'
+import { featurePricePlanetOf } from '../../../systems/authority/featureSales'
 import { foldDrillGear } from '../../../systems/economy/drillGearCaps'
 import { ECONOMY } from '../../../systems/economy/economy'
 import { onCurveStep } from '../../../systems/economy/vehicleStats'
@@ -138,11 +139,11 @@ describe('drill-gear fork: Wide and Deep', () => {
     expect(widenedFlanksOf(held)).toMatchObject({ sideCells: 2, sideAim: 'drive' })
   })
 
-  it('Wide cuts nothing while its side_drills row is shut', () => {
+  it('Wide cuts its flanks on a planet short of its side_drills row, a price anchor only', () => {
     const session = sessionOnForkPlanet(WIDE_BRANCH)
-    session.submit(1, setPlanetCommand(12))
+    session.submit(1, setPlanetCommand(featurePricePlanetOf(WIDE_LEANED_ROW)! - 1))
     session.submit(2, poseAbove(TARGET_16, FACING.down))
-    expect(drillGearOf(session.state(), PLAYER)).toBeNull()
+    expect(drillGearOf(session.state(), PLAYER)).toMatchObject({ sideCells: 1, offSideCells: 1 })
   })
 
   it('Deep cuts the cell past the bit facing down, and nothing facing any other way', () => {

@@ -1,14 +1,14 @@
 /**
- * The drill-gear lane's P16 fork (GD lock on #255, build 3, ticket 268): two exclusive branches,
- * `tech.drill_gear.fork.wide` and `.deep`, picked with `tech-tree.choose_fork` and acting while
+ * The drill-gear lane's fork, priced on P16 (GD lock on #255, build 3, ticket 268): two exclusive
+ * branches, `tech.drill_gear.fork.wide` and `.deep`, picked with `tech-tree.choose_fork` and acting while
  * active, on the kernel's drill gear read. Both are tree-only capabilities: no store item, no slot.
  *
  * - **Wide** (gallery reamers): the flanks are the main cut. Every cut also takes the reamers' cells
  *   on each flank of the bore, and with the side cutters switched on, their cells plus the
  *   reamers', on the side their hold faces when held. Each flank cell pays the whole-share floor
- *   (`drillGearCaps`), so the width costs energy, never time. Wide leans on the `side_drills` row,
- *   so it cuts nothing until that row's `FeatureUnlocked` (P13, before the fork: only a scenario
- *   ever sees the gap).
+ *   (`drillGearCaps`), so the width costs energy, never time. No planet gates it: the fork
+ *   and the `side_drills` row it leans on are price anchors only, so a game short of P13 that
+ *   chose Wide cuts its flanks (GD lock on #308, ticket 624).
  * - **Deep** (plunge crown): the bit commits downward. Facing down, every cut also takes the cell
  *   past the bit along the facing, inside the kernel's `aheadCellsMax` of 1, which the slice's
  *   economy file is refused past. It never cuts a flank cell. It is the pacing bot's pick: the bot
@@ -17,7 +17,6 @@
  * The cards name neither the leaned row nor its item, and no ore family (the #255 guard).
  */
 import { vehicleOf, type AuthorityState } from '../../../systems/authority/authorityState'
-import { isFeatureUnlocked } from '../../../systems/authority/featureUnlocks'
 import type { DrillGearAsk } from '../../../systems/economy/drillGearCaps'
 import type { DrillGearSource } from '../../../systems/registries/drillGear'
 import { FACING } from '../../../systems/vehicle/vehiclePose'
@@ -79,8 +78,7 @@ function forkAskOf(state: AuthorityState, playerId: string): DrillGearAsk | null
   return branch === null ? null : (BRANCH_ASKS[branch]?.(state, playerId) ?? null)
 }
 
-function wideAskOf(state: AuthorityState, playerId: string): DrillGearAsk | null {
-  if (!isFeatureUnlocked(state, WIDE_LEANED_ROW)) return null
+function wideAskOf(state: AuthorityState, playerId: string): DrillGearAsk {
   return widenedFlanksOf(engagedCuttersAskOf(state, playerId))
 }
 
