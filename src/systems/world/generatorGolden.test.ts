@@ -3,10 +3,17 @@ import { fnv1a64Hex } from '../authority/stateDigest'
 import { GENERATOR_VERSION } from '../generatorVersion'
 import { chunkDigest } from './chunkDigest'
 import { generateChunk } from './generateChunk'
-import { DEPTH_CURVE_ORE_RULES, planetParamsFor, type PlanetParams } from './planetParams'
+import {
+  DEPTH_CURVE_ORE_RULES,
+  planetParamsFor,
+  SURFACE_LAYER_ORE_RULES,
+  type PlanetParams,
+} from './planetParams'
 
 /** The ore rules of the roster (ticket 446), the last before the depth density curve. */
 const ROSTER_ORE_RULES = 2
+/** The ore rules of the mixed roster (#453), the last before the surface layer (ticket 625). */
+const MIXED_ROSTER_ORE_RULES = 4
 import { chunkRangeOfDisc } from './tileGrid'
 
 /**
@@ -20,13 +27,15 @@ import { chunkRangeOfDisc } from './tileGrid'
  * rules 2 under 10, ticket 446, pinned by the stamped planets 1 and 2 and leaving the rest as they
  * were while the P3+ kind table is empty, and the depth density curve of a planet from 3 entered under
  * ore rules 3 under 11, ticket 448, pinned by the curve digests and leaving every rules 2 digest as
- * it was, with the features loaded as the game loads them): a committed
+ * it was, and the surface layer of a planet from 2 entered under ore rules 5 under 12, ticket 625,
+ * which changes rock hardness only and so no cell, with the features loaded as the game loads
+ * them): a committed
  * digest of the generator's cells and density. If this fails, the
  * generator changed what a seed makes: bump GENERATOR_VERSION (saves and replays of the old
  * world are then refused) and update the version and digests below in the same commit.
  */
 const GOLDEN = {
-  generatorVersion: 11,
+  generatorVersion: 12,
   wholePlanet1: '4219af3346401cb7',
   wholePlanet2: 'ff1572afae8b0e0f',
   farPlanetChunks: 'c602124184c77617',
@@ -136,5 +145,18 @@ describe('generator golden digest', () => {
     expect(digestOfChunks(curve(8), HEAT_PLANET_CHUNKS)).toBe(GOLDEN.curveHeatPlanetChunks)
     expect(digestOfChunks(curve(10), HEAT_PLANET_CHUNKS)).toBe(GOLDEN.curvePlanet10Chunks)
     expect(digestOfChunks(curve(60), HEAT_PLANET_CHUNKS)).toBe(GOLDEN.curvePlanet60Chunks)
+  })
+
+  it('makes the same cells under the surface layer, ore rules 5, as under rules 4 (ticket 625)', () => {
+    const layered = (seed: number, planet: number) =>
+      planetParamsFor(seed, planet, SURFACE_LAYER_ORE_RULES)
+    const planet2 = layered(4_000_000_000, 2)
+    expect(digestOfChunks(planet2, everyChunkOf(planet2))).toBe(GOLDEN.stampedWholePlanet2)
+    for (const planet of [3, 8, 10, 60]) {
+      const before = planetParamsFor(83921, planet, MIXED_ROSTER_ORE_RULES)
+      expect(digestOfChunks(layered(83921, planet), HEAT_PLANET_CHUNKS), `planet ${planet}`).toBe(
+        digestOfChunks(before, HEAT_PLANET_CHUNKS),
+      )
+    }
   })
 })

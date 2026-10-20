@@ -1,17 +1,18 @@
 import { describe, expect, it } from 'vitest'
 import type { AuthorityState } from '../authority/authorityState'
+import { hardnessOfTile } from '../authority/groundDrill'
 import { resourceTierOf } from '../authority/minedOre'
 import { planetParamsOf } from '../authority/planetOfState'
 import { takeSnapshot } from '../authority/sessionSnapshot'
 import { fnv1a64Hex, stateDigest } from '../authority/stateDigest'
-import { oreSalePrice } from '../economy/oreEconomy'
+import { blockHardness, oreSalePrice } from '../economy/oreEconomy'
 import { add, toCanonical, ZERO_MONEY } from '../money'
 import { oreTypeOf, saleTierOf } from '../registries/oreTypes'
 import { chunkDigest } from '../world/chunkDigest'
 import { generateChunk } from '../world/generateChunk'
 import type { PlanetParams } from '../world/planetParams'
 import { chunkRangeOfDisc } from '../world/tileGrid'
-import { CELL_KIND, familyOfCell, kindOfCell } from '../world/worldCell'
+import { CELL_KIND, familyOfCell, GROUND_CELL, kindOfCell } from '../world/worldCell'
 import PLANET_1_SAVE from './fixtures/pre-175-planet-1.save.json'
 import PLANET_10_SAVE from './fixtures/pre-175-planet-10.save.json'
 import PLANET_5_SAVE from './fixtures/pre-181-planet-5.save.json'
@@ -75,6 +76,17 @@ const RULES_TWO_PLANET_5_PIN: ColumnPin = {
   value: '2.0218044481e+7',
 }
 
+/**
+ * Ticket 625: a generator 11 save holding planet 5 under ore rules 4, the mixed roster on the depth
+ * curve before the surface layer, pinned on main at 6477758c7 (generator 11) over the same column.
+ */
+const RULES_FOUR_PLANET_5_PIN: ColumnPin = {
+  chunks: '920dd8e474b6422e',
+  ores: '6a6b69294f5d9cf0',
+  oreCells: 5734,
+  value: '2.0931487044e+7',
+}
+
 const FIXTURES = [
   ['pre-175 planet 1', PLANET_1_SAVE],
   ['pre-181 planet 5', PLANET_5_SAVE],
@@ -97,6 +109,12 @@ function rulesOnePlanet5(): AuthorityState {
 function rulesTwoPlanet5(): AuthorityState {
   const state = loaded(PLANET_5_SAVE)
   return { ...state, planet: { ...state.planet, oreRulesVersion: 2 } }
+}
+
+/** The pre-181 planet 5 state as if entered under ore rules 4, the last before the surface layer. */
+function rulesFourPlanet5(): AuthorityState {
+  const state = loaded(PLANET_5_SAVE)
+  return { ...state, planet: { ...state.planet, oreRulesVersion: 4 } }
 }
 
 /** That state saved as generator `generatorVersion` wrote it. */
@@ -149,6 +167,7 @@ describe('saves written before the ore rules', () => {
       { version: 'generatorVersion', from: 8, to: 9 },
       { version: 'generatorVersion', from: 9, to: 10 },
       { version: 'generatorVersion', from: 10, to: 11 },
+      { version: 'generatorVersion', from: 11, to: 12 },
     ])
     expect('state' in reading && stateDigest(reading.state)).toBe(stateDigest(loaded(file)))
   })
@@ -159,6 +178,7 @@ describe('saves written before the ore rules', () => {
     expect(reading.migrations.filter((step) => 'version' in step)).toEqual([
       { version: 'generatorVersion', from: 9, to: 10 },
       { version: 'generatorVersion', from: 10, to: 11 },
+      { version: 'generatorVersion', from: 11, to: 12 },
     ])
     expect(reading.state.planet.oreRulesVersion).toBe(1)
     expect(stateDigest(reading.state)).toBe(stateDigest(rulesOnePlanet5()))
@@ -172,11 +192,28 @@ describe('saves written before the ore rules', () => {
     if (!('state' in reading)) throw new Error(reading.problems.join('; '))
     expect(reading.migrations.filter((step) => 'version' in step)).toEqual([
       { version: 'generatorVersion', from: 10, to: 11 },
+      { version: 'generatorVersion', from: 11, to: 12 },
     ])
     expect(reading.state.planet.oreRulesVersion).toBe(2)
     expect(stateDigest(reading.state)).toBe(stateDigest(rulesTwoPlanet5()))
     expect(columnPinOf(planetParamsOf(reading.state.planet) as PlanetParams)).toEqual(
       RULES_TWO_PLANET_5_PIN,
+    )
+  })
+
+  it('load a generator 11 save of a planet under ore rules 4 with its terrain and shipped surface (ticket 625)', () => {
+    const reading = readMigratedSaveSlot(generatorSaveOf(rulesFourPlanet5(), 11))
+    if (!('state' in reading)) throw new Error(reading.problems.join('; '))
+    expect(reading.migrations.filter((step) => 'version' in step)).toEqual([
+      { version: 'generatorVersion', from: 11, to: 12 },
+    ])
+    expect(reading.state.planet.oreRulesVersion).toBe(4)
+    expect(stateDigest(reading.state)).toBe(stateDigest(rulesFourPlanet5()))
+    const params = planetParamsOf(reading.state.planet) as PlanetParams
+    expect(columnPinOf(params)).toEqual(RULES_FOUR_PLANET_5_PIN)
+    const surfaceTile = { tx: 0, ty: params.radiusTiles - 1 }
+    expect(toCanonical(hardnessOfTile(params, surfaceTile, GROUND_CELL))).toBe(
+      toCanonical(blockHardness(5, 1)),
     )
   })
 })

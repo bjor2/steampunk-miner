@@ -153,13 +153,17 @@ export function cavesOf(pairs: readonly WallAndCave[]): TilePoint[] {
 }
 
 /**
- * Band-1 ground walls the starting drill digs, a few tiles down, each with the plain ground tile
- * under it to hollow; three columns apart, so no wall touches another wall's cave.
+ * Band-1 ground walls `depth` tiles down (on planet 1, ones the starting drill digs), each with the
+ * plain ground tile under it to hollow; three columns apart, so no wall touches another wall's cave.
  */
-export function groundWalls(count: number, params: PlanetParams = PARAMS): WallAndCave[] {
+export function groundWalls(
+  count: number,
+  params: PlanetParams = PARAMS,
+  depth: number = 4,
+): WallAndCave[] {
   const pairs: WallAndCave[] = []
   for (let tx = 14; pairs.length < count; tx += 3) {
-    const wall = { tx, ty: surfaceRowOfColumn(tx, params.radiusTiles) - 4 }
+    const wall = { tx, ty: surfaceRowOfColumn(tx, params.radiusTiles) - depth }
     const cave = { tx, ty: wall.ty - 1 }
     if (isGroundPair(params, wall, cave)) pairs.push({ wall, cave })
   }

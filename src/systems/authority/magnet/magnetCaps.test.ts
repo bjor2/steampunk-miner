@@ -14,7 +14,8 @@ import { ticksPerTile } from '../../vehicle/drillRule'
 import { ENERGY_QUANTA_PER_TICK } from '../../vehicle/energyQuanta'
 import { statsOfVehicle } from '../../vehicle/vehicleState'
 import { bandOfTile } from '../../world/planetGeometry'
-import { planetParamsFor, type PlanetParams } from '../../world/planetParams'
+import { freshPlanetParamsFor, type PlanetParams } from '../../world/planetParams'
+import { surfaceLayerOf } from '../../world/surfaceLayer'
 import type { TilePoint } from '../../world/tileGrid'
 import { CELL_KIND, familyOfCell, kindOfCell } from '../../world/worldCell'
 import { cellAt, EMPTY_WORLD } from '../../world/worldState'
@@ -156,6 +157,12 @@ function secondsToStep(ticks: number, rate: number): number {
   return frames / rate
 }
 
+/** The first depth below the planet's surface layer (ticket 625), where band 1 is its own rock. */
+function belowSurfaceLayerOf(params: PlanetParams): number {
+  const layer = surfaceLayerOf(params)
+  return layer === null ? 4 : layer.pinnedCells + layer.rampCells
+}
+
 describe('magnet shift caps', () => {
   it.each(STEP_RATES)('a use moves at most 8 cells, at %i steps/s', (rate) => {
     const pairs = groundWalls(CAPS.maxCellsMoved + 4)
@@ -197,8 +204,8 @@ describe('magnet shift caps', () => {
   it.each(STEP_RATES)(
     'a cell the drill grade cannot dig, a core cell and a lava pocket never move, at %i steps/s',
     (rate) => {
-      const deepPlanet = planetParamsFor(WORLD_SEED, 25)
-      const [hard] = groundWalls(1, deepPlanet)
+      const deepPlanet = freshPlanetParamsFor(WORLD_SEED, 25)
+      const [hard] = groundWalls(1, deepPlanet, belowSurfaceLayerOf(deepPlanet))
       expect(isDiggableByStartingDrill(deepPlanet, hard.wall)).toBe(false)
       const [core] = coreTiles(1)
       const coreCave = { tx: core.tx, ty: core.ty - 1 }

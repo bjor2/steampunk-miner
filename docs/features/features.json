@@ -219,6 +219,12 @@
           "issues": [7, 6]
         },
         {
+          "title": "Same first layer on every planet",
+          "description": "The top 3 cells of rock are as soft on every planet of the first solar system as on planet 1, then harden a cell at a time (at most 1.5x a cell) to the planet's own band-1 rock; deeper bands keep their full hardness. Saved worlds keep the hardness they were made with.",
+          "status": "built",
+          "issues": [625, 306]
+        },
+        {
           "title": "'Needs a better tip'",
           "description": "If your drill tip is under a quarter of the rock's hardness the drill only skids: no progress, no energy spent, a clear sign to upgrade.",
           "status": "built",

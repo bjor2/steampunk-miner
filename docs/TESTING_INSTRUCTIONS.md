@@ -258,6 +258,17 @@ programs }` from three's `renderer.info` of the game canvas), read only when cal
   `src/systems/world/depthDensityPaint.lane.test.ts` generates pooled seed sets at radius 150, 300
   and 1000 and on planet 200 and fails a band whose painted fraction is more than 2% off the
   curve's band mean (about 3 to 5 minutes).
+- **Surface layer** (ticket 625; Systems on #306 6301879176, the ramp amendment 6301918833 and
+  the VS confirmation 6301930425 on #625): `src/systems/world/surfaceLayer.test.ts` holds a fresh
+  planet's rock to the rule: the top 3 cells at H = 1 on P2 to P40, the ramp over
+  K(p) = max(4, ceil(ln H_b1 / ln 1.5)) cells (4, 16 on P10, 66 on P40) reaching band 1's own value at
+  its last cell, every deeper cell absolute, felt cut speed for the arriving on-curve rig changing at
+  most 1.5x a cell from P2 to P42, P1 and every planet stamped before ore rules 5 on the shipped band
+  values, ore cells at their own tier, the band-1 cap first on P43 and a harder surface keyed on its
+  solar-system row with a planet row on top. `src/logging/surfaceLayerReport.test.ts` holds the
+  `balance:report` rows (first capped planet, each capped planet amber with its step);
+  `generatorGolden.test.ts` checks rules 5 make the cells rules 4 did, and `oreRulesOldSaves.test.ts`
+  loads a generator 11 save of P5 under rules 4 with main's column pin and its shipped surface.
 - **Material looks** (ticket 450, TD shape on #450 6226270701 and the Scalers' conditions):
   `src/features/roster/kindLook.test.ts` holds the roster's look provider to its rules: a fresh
   save shows no species (unseen kinds draw the family look), a species shows only once the

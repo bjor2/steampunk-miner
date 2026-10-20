@@ -30,10 +30,10 @@ function onPlanet(state: AuthorityState, planetIndex: number): AuthorityState {
 }
 
 describe('ore rules stamp', () => {
-  it('stamps a session on any planet: rules 2 on planets 1 and 2, the mixed roster, 4, from 3', () => {
+  it('stamps a session on any planet: rules 2 on planet 1, the surface layer, 5, from 2', () => {
     const planets = [1, 2, 3, 10].map((index) => sessionOn(index).planet)
-    expect(planets.map((planet) => planet.oreRulesVersion)).toEqual([2, 2, 4, 4])
-    expect(ORE_RULES_VERSION).toBe(4)
+    expect(planets.map((planet) => planet.oreRulesVersion)).toEqual([2, 5, 5, 5])
+    expect(ORE_RULES_VERSION).toBe(5)
   })
 
   it('keeps a planet a save holds without the stamp on the legacy rows', () => {
@@ -42,10 +42,10 @@ describe('ore rules stamp', () => {
     expect(planetParamsOf(state.planet)).toEqual(planetParamsFor(WORLD_SEED, 5))
   })
 
-  it('stamps the next planet when a legacy one is left, planet 2 with the rules that change it', () => {
+  it('stamps the next planet when a legacy one is left, planet 1 with the rules that change it', () => {
     const next = onPlanet(legacyPlanet5(), 6)
     expect(next.planet).toEqual({ index: 6, seed: WORLD_SEED, oreRulesVersion: ORE_RULES_VERSION })
-    expect(onPlanet(next, 2).planet).toEqual({ index: 2, seed: WORLD_SEED, oreRulesVersion: 2 })
+    expect(onPlanet(next, 1).planet).toEqual({ index: 1, seed: WORLD_SEED, oreRulesVersion: 2 })
   })
 
   it('keeps a planet a save holds under ore rules 2 on the step bands (ticket 448)', () => {

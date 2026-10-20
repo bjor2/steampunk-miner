@@ -51,6 +51,7 @@ import type { StampPoint } from '../world/stampShape'
 import type { YieldedCell } from '../world/cellYield'
 import { bandOfTile } from '../world/planetGeometry'
 import type { PlanetParams } from '../world/planetParams'
+import { surfaceRockHardnessAt } from '../world/surfaceLayer'
 import type { TilePoint } from '../world/tileGrid'
 import { CELL_KIND, kindOfCell } from '../world/worldCell'
 import { materialCellAt, type WorldState } from '../world/worldState'
@@ -260,13 +261,19 @@ export function drillAtPose(
 /**
  * Hardness is looked up, never stored in the cell (#4, #6): ore by its own tier, so a lead cell
  * (#140) is as hard as its tier (#223) and a signature as five tiers up (`signatureCells.ts`),
- * core by the planet, the rest by its band.
+ * core by the planet, the rest by its band, softened near the surface by the pinned surface
+ * layer and its ramp (ticket 625, `surfaceLayer.ts`).
  */
 export function hardnessOfTile(params: PlanetParams, tile: TilePoint, cell: number): BigStat {
   const kind = kindOfCell(cell)
   if (kind === CELL_KIND.core) return coreHardness(params.planetIndex)
   if (kind === CELL_KIND.ore) return oreCellHardness(params, tile, cell)
-  return blockHardness(params.planetIndex, bandOfTile(params, tile.tx, tile.ty))
+  return rockHardnessOf(params, tile)
+}
+
+function rockHardnessOf(params: PlanetParams, tile: TilePoint): BigStat {
+  const surface = surfaceRockHardnessAt(params, tile)
+  return surface ?? blockHardness(params.planetIndex, bandOfTile(params, tile.tx, tile.ty))
 }
 
 /**

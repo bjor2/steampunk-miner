@@ -15,6 +15,8 @@
  * planet 1 (ticket 446), written to the cell's kind slot alone, while a planet a save holds keeps its
  * cells; version 11 thins each ore patch to the depth density curve on a planet entered under ore
  * rules 3 from planet 3 (ticket 448), while planets 1 and 2 and every planet a save holds keep the
- * step bands.
+ * step bands; version 12 pins the rock of the top 3 cells at the surface hardness and ramps it to
+ * band 1's value on every planet entered under ore rules 5 from planet 2 (ticket 625), the cells
+ * themselves unchanged, while planet 1 and every planet a save holds keep the shipped band hardness.
  */
-export const GENERATOR_VERSION = 11
+export const GENERATOR_VERSION = 12
