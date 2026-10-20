@@ -421,8 +421,12 @@ import type { DriveSigns } from '../vehicle/driveSigns'
  *    and VS decision record), where it was `ceil(2.4 x 1.20^c)`. Hold units, the boiler, the
  *    engine and the drill are unchanged; purchases 0 to 2 keep their rows (3, 3 and 4), so a run
  *    that buys no fourth hold step moves no digest.
+ * 99: drill gear is money-only (ticket 624, GD lock on #308): the side cutters' Mark 3 hold and
+ *    the drill-gear fork's Wide branch no longer wait on the `side_drills` row (P13), a price
+ *    anchor only, so either cuts on any planet once owned and switched on. A run that holds no
+ *    cutters and chooses no Wide branch before P13 moves no digest.
  */
-export const AUTHORITY_PROTOCOL_VERSION = 98
+export const AUTHORITY_PROTOCOL_VERSION = 99
 
 /** The kernel's own commands: the closed set its rule tables are written against. */
 export interface KernelCommandPayloads {
