@@ -1,0 +1,93 @@
+{
+  "$comment": "The drill look #554 painted at drill_power purchases 0 to 100, snapshot from main at 7f78fb1 before its table moved into rigLook.json (ticket 577): `looks` is createDrillLooks(), `stageOf[n]` is drillLookStageOf(n). The rig-look registry must paint looks[stageOf[n]] for every n up to 100.",
+  "stageOf": [
+    0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 5, 5,
+    5, 5, 5, 5, 5, 5, 5, 5, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7,
+    7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8,
+    8, 8, 8, 8, 9
+  ],
+  "looks": [
+    null,
+    {
+      "tint": null,
+      "opacity": 1,
+      "outline": null,
+      "glows": [
+        { "slots": ["drill-bit"], "colour": "#c8873a", "glow": 0.3 },
+        { "slots": ["drill-head"], "colour": "#c8873a", "glow": 0 }
+      ]
+    },
+    {
+      "tint": null,
+      "opacity": 1,
+      "outline": null,
+      "glows": [
+        { "slots": ["drill-bit"], "colour": "#e8742a", "glow": 0.6 },
+        { "slots": ["drill-head"], "colour": "#e8742a", "glow": 0 }
+      ]
+    },
+    {
+      "tint": null,
+      "opacity": 1,
+      "outline": null,
+      "glows": [
+        { "slots": ["drill-bit"], "colour": "#ff5a1f", "glow": 0.9 },
+        { "slots": ["drill-head"], "colour": "#ff5a1f", "glow": 0.3 }
+      ]
+    },
+    {
+      "tint": null,
+      "opacity": 1,
+      "outline": null,
+      "glows": [
+        { "slots": ["drill-bit"], "colour": "#ffd27a", "glow": 1.2 },
+        { "slots": ["drill-head"], "colour": "#ffd27a", "glow": 0.5 }
+      ]
+    },
+    {
+      "tint": null,
+      "opacity": 1,
+      "outline": null,
+      "glows": [
+        { "slots": ["drill-bit"], "colour": "#5fd6c4", "glow": 1.4 },
+        { "slots": ["drill-head"], "colour": "#5fd6c4", "glow": 0.7 }
+      ]
+    },
+    {
+      "tint": null,
+      "opacity": 1,
+      "outline": null,
+      "glows": [
+        { "slots": ["drill-bit"], "colour": "#b07aff", "glow": 1.6 },
+        { "slots": ["drill-head"], "colour": "#b07aff", "glow": 0.9 }
+      ]
+    },
+    {
+      "tint": null,
+      "opacity": 1,
+      "outline": null,
+      "glows": [
+        { "slots": ["drill-bit"], "colour": "#ff7ae0", "glow": 1.8 },
+        { "slots": ["drill-head"], "colour": "#ff7ae0", "glow": 1.1 }
+      ]
+    },
+    {
+      "tint": null,
+      "opacity": 1,
+      "outline": null,
+      "glows": [
+        { "slots": ["drill-bit"], "colour": "#f4f4ff", "glow": 2 },
+        { "slots": ["drill-head"], "colour": "#f4f4ff", "glow": 1.3 }
+      ]
+    },
+    {
+      "tint": null,
+      "opacity": 1,
+      "outline": null,
+      "glows": [
+        { "slots": ["drill-bit"], "colour": "#ffe14a", "glow": 2.4 },
+        { "slots": ["drill-head"], "colour": "#ffe14a", "glow": 1.6 }
+      ]
+    }
+  ]
+}
