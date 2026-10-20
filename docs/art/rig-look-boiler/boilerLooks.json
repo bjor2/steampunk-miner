@@ -1,0 +1,21 @@
+{
+  "about": "The boiler track's rig-look parts (ticket 582, wave 576-1B of the rig look ladder #576): one asset at the track's attach slot, one part per look step. The thresholds are Systems' table (#157, comment 6300543785) and the names Progression's (comment 6300549964); the wiring (#583) reads them from the rig-look registry (#577), not from here.",
+  "assetId": "vehicle-look-boiler",
+  "track": "boiler",
+  "attach": "hull.boiler",
+  "z": 3,
+  "replaces": "t1-boiler",
+  "looks": [
+    {
+      "part": "kettle-boiler",
+      "name": "Kettle boiler",
+      "purchases": 0,
+      "unnamedDefault": true
+    },
+    {
+      "part": "twin-drum-boiler",
+      "name": "Twin-drum boiler",
+      "purchases": 16
+    }
+  ]
+}

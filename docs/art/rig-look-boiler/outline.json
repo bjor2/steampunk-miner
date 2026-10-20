@@ -1,0 +1,21 @@
+{
+  "about": "Ticket 582: silhouette cells of each boiler look on hull.boiler, on a 4 mm grid, outside the rig at rest at tiers 1 and 3, and by which it differs from the rig's own t1-boiler; written by check_outline.py. `outsideRig` must be all zero; the kettle's `differsFromSlotPart` must be zero.",
+  "looks": {
+    "kettle-boiler": {
+      "cells": 5915,
+      "outsideRig": {
+        "tier-1": 0,
+        "tier-3": 0
+      },
+      "differsFromSlotPart": 0
+    },
+    "twin-drum-boiler": {
+      "cells": 4855,
+      "outsideRig": {
+        "tier-1": 0,
+        "tier-3": 0
+      },
+      "differsFromSlotPart": 1060
+    }
+  }
+}
