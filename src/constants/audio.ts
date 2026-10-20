@@ -62,3 +62,10 @@ export const VALVE_CLICK_GAIN = 3 / 25
 export const VALVE_CLICK_HISS_HZ = 3200
 export const VALVE_CLICK_HISS_GAIN = 0.08
 export const VALVE_CLICK_SECONDS = 0.06
+
+/**
+ * The pickup sound's readability budget (G&V bar on #442, option A, ticket 615): at most 12 a
+ * second; pickups faster than that merge into the next one. Fixed, never scaled with drill speed
+ * (the Vertical Scaler on #442).
+ */
+export const PICKUP_CHIMES_PER_SECOND_MAX = 12
