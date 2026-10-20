@@ -1,0 +1,95 @@
+{
+  "about": "The drill-type rig-look parts (ticket 622, wave 308-1B of spec #308): one asset at the drill_tip track's attach slot (#578's slot and frame), one look per owned drill-gear item, so a fitted type wins the slot over the drill_tip look step (HS rule on #576). The wiring (#623) names the looks from owned state through the rig-look registry (#577), never from here; this is the table the author script, the reach check and the review renders share. A look is one or more parts: a moving part has its origin at its hinge or slide and carries a folded and a deployed pose (a turn in radians, counter-clockwise on screen, and a shift in metres), as techGear.json's rows do, so a toggled-off cutter can fold in and the boom can retract. Parts are authored at the deployed pose.",
+  "assetId": "vehicle-look-drill-type",
+  "attach": "drill.head",
+  "z": 9,
+  "replaces": "t1-drill-bit",
+  "looks": [
+    {
+      "look": "bare",
+      "name": "Bare drill",
+      "itemId": null,
+      "parts": []
+    },
+    {
+      "look": "side-cutters-mark-1",
+      "name": "Side cutters, Mark 1",
+      "itemId": "gear.side_cutters",
+      "mark": 1,
+      "reads": "cutters stick out to the sides",
+      "parts": [
+        { "id": "cutter-yoke-1" },
+        {
+          "id": "cutter-arm-up-1",
+          "pivotM": [0.06, 0.03],
+          "folded": { "turn": 1.5708, "shift": [0, 0] },
+          "deployed": { "turn": 0, "shift": [0, 0] }
+        },
+        {
+          "id": "cutter-arm-down-1",
+          "pivotM": [0.06, -0.03],
+          "folded": { "turn": -1.5708, "shift": [0, 0] },
+          "deployed": { "turn": 0, "shift": [0, 0] }
+        }
+      ]
+    },
+    {
+      "look": "side-cutters-mark-2",
+      "name": "Side cutters, Mark 2",
+      "itemId": "gear.side_cutters",
+      "mark": 2,
+      "reads": "cutters stick out further, two wheels a side",
+      "parts": [
+        { "id": "cutter-yoke-2" },
+        {
+          "id": "cutter-arm-up-2",
+          "pivotM": [0.06, 0.03],
+          "folded": { "turn": 1.5708, "shift": [0, 0] },
+          "deployed": { "turn": 0, "shift": [0, 0] }
+        },
+        {
+          "id": "cutter-arm-down-2",
+          "pivotM": [0.06, -0.03],
+          "folded": { "turn": -1.5708, "shift": [0, 0] },
+          "deployed": { "turn": 0, "shift": [0, 0] }
+        }
+      ]
+    },
+    {
+      "look": "gallery-reamers",
+      "name": "Gallery reamers",
+      "itemId": "gear.gallery_reamers",
+      "reads": "a wide ring round the bit",
+      "parts": [{ "id": "gallery-reamers" }]
+    },
+    {
+      "look": "plunge-crown",
+      "name": "Plunge crown",
+      "itemId": "gear.plunge_crown",
+      "reads": "a long spike ahead",
+      "parts": [{ "id": "plunge-crown" }]
+    },
+    {
+      "look": "twin-bit",
+      "name": "Twin-bit head",
+      "itemId": "gear.twin_bit",
+      "reads": "two bits side by side",
+      "parts": [{ "id": "twin-bit-head" }]
+    },
+    {
+      "look": "reach-boom",
+      "name": "Reach boom",
+      "itemId": "gear.reach_boom",
+      "reads": "the bit pushed ahead on a telescoping boom",
+      "parts": [
+        { "id": "boom-barrel" },
+        {
+          "id": "boom-ram",
+          "pivotM": [0.0, 0.0],
+          "folded": { "turn": 0, "shift": [-0.26, 0] },
+          "deployed": { "turn": 0, "shift": [0, 0] }
+        }
+      ]
+    }
+  ]
+}

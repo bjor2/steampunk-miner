@@ -1,0 +1,233 @@
+{
+  "about": "Ticket 622: silhouette cells of each drill-type look on drill.head, on a 4 mm grid, outside the rig at rest at tiers 1, 2, 3, and how far they reach up and down past the rig beside them and ahead of its tip (metres; a 360 px phone shows 30 px/m); `holeCells` is the open area inside the reamers' ring; `pairs` counts the phone pixels two swapped tier-1 rigs differ by, by silhouette alone (coverage moving more than 0.5); written by check_reach.py. Every look must leave the rig, differ from every other by 10 px, and keep its line of the table in the script.",
+  "phonePxPerM": 30.0,
+  "looks": {
+    "bare": {
+      "cells": 0,
+      "tiers": {
+        "tier-1": {
+          "outsideRig": 0,
+          "beyondRigM": {
+            "up": 0.0,
+            "down": 0.0,
+            "ahead": 0.0
+          }
+        },
+        "tier-2": {
+          "outsideRig": 0,
+          "beyondRigM": {
+            "up": 0.0,
+            "down": 0.0,
+            "ahead": 0.0
+          }
+        },
+        "tier-3": {
+          "outsideRig": 0,
+          "beyondRigM": {
+            "up": 0.0,
+            "down": 0.0,
+            "ahead": 0.0
+          }
+        }
+      }
+    },
+    "side-cutters-mark-1": {
+      "cells": 3340,
+      "tiers": {
+        "tier-1": {
+          "outsideRig": 2724,
+          "beyondRigM": {
+            "up": 0.34,
+            "down": 0.34,
+            "ahead": 0.0
+          }
+        },
+        "tier-2": {
+          "outsideRig": 2664,
+          "beyondRigM": {
+            "up": 0.336,
+            "down": 0.336,
+            "ahead": 0.0
+          }
+        },
+        "tier-3": {
+          "outsideRig": 2438,
+          "beyondRigM": {
+            "up": 0.3,
+            "down": 0.3,
+            "ahead": 0.0
+          }
+        }
+      }
+    },
+    "side-cutters-mark-2": {
+      "cells": 6346,
+      "tiers": {
+        "tier-1": {
+          "outsideRig": 5694,
+          "beyondRigM": {
+            "up": 0.5,
+            "down": 0.5,
+            "ahead": 0.0
+          }
+        },
+        "tier-2": {
+          "outsideRig": 5610,
+          "beyondRigM": {
+            "up": 0.492,
+            "down": 0.492,
+            "ahead": 0.0
+          }
+        },
+        "tier-3": {
+          "outsideRig": 5266,
+          "beyondRigM": {
+            "up": 0.46,
+            "down": 0.46,
+            "ahead": 0.0
+          }
+        }
+      }
+    },
+    "gallery-reamers": {
+      "cells": 8680,
+      "tiers": {
+        "tier-1": {
+          "outsideRig": 7208,
+          "beyondRigM": {
+            "up": 0.284,
+            "down": 0.284,
+            "ahead": 0.212
+          }
+        },
+        "tier-2": {
+          "outsideRig": 6841,
+          "beyondRigM": {
+            "up": 0.276,
+            "down": 0.276,
+            "ahead": 0.212
+          }
+        },
+        "tier-3": {
+          "outsideRig": 5412,
+          "beyondRigM": {
+            "up": 0.256,
+            "down": 0.256,
+            "ahead": 0.156
+          }
+        }
+      },
+      "holeCells": 6752
+    },
+    "plunge-crown": {
+      "cells": 1468,
+      "tiers": {
+        "tier-1": {
+          "outsideRig": 934,
+          "beyondRigM": {
+            "up": 0.036,
+            "down": 0.036,
+            "ahead": 0.324
+          }
+        },
+        "tier-2": {
+          "outsideRig": 926,
+          "beyondRigM": {
+            "up": 0.036,
+            "down": 0.036,
+            "ahead": 0.324
+          }
+        },
+        "tier-3": {
+          "outsideRig": 622,
+          "beyondRigM": {
+            "up": 0.012,
+            "down": 0.012,
+            "ahead": 0.268
+          }
+        }
+      }
+    },
+    "twin-bit": {
+      "cells": 2231,
+      "tiers": {
+        "tier-1": {
+          "outsideRig": 1739,
+          "beyondRigM": {
+            "up": 0.1,
+            "down": 0.1,
+            "ahead": 0.176
+          }
+        },
+        "tier-2": {
+          "outsideRig": 1725,
+          "beyondRigM": {
+            "up": 0.1,
+            "down": 0.1,
+            "ahead": 0.176
+          }
+        },
+        "tier-3": {
+          "outsideRig": 1409,
+          "beyondRigM": {
+            "up": 0.08,
+            "down": 0.08,
+            "ahead": 0.12
+          }
+        }
+      }
+    },
+    "reach-boom": {
+      "cells": 2644,
+      "tiers": {
+        "tier-1": {
+          "outsideRig": 1883,
+          "beyondRigM": {
+            "up": 0.052,
+            "down": 0.052,
+            "ahead": 0.296
+          }
+        },
+        "tier-2": {
+          "outsideRig": 1809,
+          "beyondRigM": {
+            "up": 0.052,
+            "down": 0.052,
+            "ahead": 0.296
+          }
+        },
+        "tier-3": {
+          "outsideRig": 1494,
+          "beyondRigM": {
+            "up": 0.044,
+            "down": 0.044,
+            "ahead": 0.24
+          }
+        }
+      }
+    }
+  },
+  "pairs": {
+    "bare vs side-cutters-mark-1": 42,
+    "bare vs side-cutters-mark-2": 82,
+    "bare vs gallery-reamers": 98,
+    "bare vs plunge-crown": 16,
+    "bare vs twin-bit": 22,
+    "bare vs reach-boom": 35,
+    "side-cutters-mark-1 vs side-cutters-mark-2": 40,
+    "side-cutters-mark-1 vs gallery-reamers": 108,
+    "side-cutters-mark-1 vs plunge-crown": 54,
+    "side-cutters-mark-1 vs twin-bit": 58,
+    "side-cutters-mark-1 vs reach-boom": 66,
+    "side-cutters-mark-2 vs gallery-reamers": 146,
+    "side-cutters-mark-2 vs plunge-crown": 94,
+    "side-cutters-mark-2 vs twin-bit": 98,
+    "side-cutters-mark-2 vs reach-boom": 106,
+    "gallery-reamers vs plunge-crown": 96,
+    "gallery-reamers vs twin-bit": 110,
+    "gallery-reamers vs reach-boom": 106,
+    "plunge-crown vs twin-bit": 36,
+    "plunge-crown vs reach-boom": 18,
+    "twin-bit vs reach-boom": 32
+  }
+}
