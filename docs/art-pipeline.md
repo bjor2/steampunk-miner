@@ -579,6 +579,21 @@ exported unchanged with `art:export`. `docs/art/aetheric/author_aetheric.py` wro
 from then on the `.blend` files are the sources. The part table and the review renders are in
 [docs/art/aetheric/](art/aetheric/README.md).
 
+## Rig-look parts: the boiler
+
+The art half of the boiler line of the rig look ladder
+([#576](https://github.com/bjor2/steampunk-miner/issues/576), built by
+[#582](https://github.com/bjor2/steampunk-miner/issues/582)): a Blender source for the one look
+step the Game Director locked for the `boiler` track, `art/blender/vehicle-look-boiler/`, with the
+base look beside it. Each part is authored with the track's attach slot, `hull.boiler`, at the
+origin, fills the footprint of the rig's own `t1-boiler` dome and is meant to stand in its place:
+`kettle-boiler` is that dome piece for piece, `twin-drum-boiler` the step at 16 purchases. Nothing
+registers or draws it yet: the per-track registry (#577) names the asset from the track id and the
+wiring (#583) swaps the part on the slot and runs the tail above the step.
+`docs/art/rig-look-boiler/author_boiler_looks.py` wrote the first version of the `.blend`; from
+then on it is the source. The part table, the outline check and the review renders, at desktop and
+at a 360 px phone's size, are in [docs/art/rig-look-boiler/](art/rig-look-boiler/README.md).
+
 ## The `parts.json` sidecar, schema 1
 
 ```json
