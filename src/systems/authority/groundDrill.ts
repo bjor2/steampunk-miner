@@ -70,6 +70,7 @@ import { openDrillGates, type DrillGates } from './drillGates'
 import { sweptCutEnergyOf } from './cellDigEnergy'
 import { groundChangedEventsOf } from './groundChangedEvents'
 import { heatThrottledDrill } from './heatRules'
+import { creditOreShare, oreSharesOf, type OreShareOf } from './sideOreCredit'
 import { minedOreOf, type MinedOre } from './minedOre'
 import { oreCellHardness, scratchFloorOfCell } from './signatureCells'
 import { wakeLavaBeside } from './lava/lavaRules'
@@ -399,7 +400,7 @@ function chargeAndCollect(
     energy: vehicle.energy - charge.quanta,
   })
   const collected = chainEffects(charged, [
-    (current) => collectYieldedCells(current, playerId, params, carved.yielded, gates),
+    (current) => collectYieldedCells(current, { playerId, params, gates, carved }),
     (current) => shockElectrifiedCells(current, playerId, params, carved.yielded),
   ])
   return {
@@ -482,18 +483,25 @@ export function drillTicksOfCells(
       : ticksPerTile(drill, casingHardness(params.planetIndex, casingGrade))
 }
 
-function collectYieldedCells(
-  state: AuthorityState,
-  playerId: string,
-  params: PlanetParams,
-  yielded: readonly YieldedCell[],
-  gates: DrillGates,
-): RuleEffect {
+/** Who collects a carve's opened cells, and the gates and gear shares they are read with. */
+interface CarveCollection {
+  playerId: string
+  params: PlanetParams
+  gates: DrillGates
+  carved: DrillCarve
+}
+
+function collectYieldedCells(state: AuthorityState, collection: CarveCollection): RuleEffect {
+  const shareOf = oreSharesOf(collection.carved.gearCells)
   return chainEffects(
     state,
-    yielded.map(({ tile, cell }) => (current: AuthorityState) => {
-      const collected = collectUngatedTile(current, playerId, params, { tile, cell }, gates)
-      const destroyed: DomainEventBody = { type: 'TileDestroyed', ...tile, kind: kindNameOf(cell) }
+    collection.carved.yielded.map((yielded) => (current: AuthorityState) => {
+      const collected = collectUngatedTile(current, collection, yielded, shareOf)
+      const destroyed: DomainEventBody = {
+        type: 'TileDestroyed',
+        ...yielded.tile,
+        kind: kindNameOf(yielded.cell),
+      }
       return { state: collected.state, events: [destroyed, ...collected.events] }
     }),
   )
@@ -502,27 +510,38 @@ function collectYieldedCells(
 /** A cell a gate says is lost is destroyed, pays nothing and says why; every other is collected. */
 function collectUngatedTile(
   state: AuthorityState,
-  playerId: string,
-  params: PlanetParams,
+  { playerId, params, gates }: CarveCollection,
   yielded: YieldedCell,
-  gates: DrillGates,
+  shareOf: OreShareOf,
 ): RuleEffect {
   const lost = gates.lostEventOf(yielded)
   if (lost !== null) return { state, events: [lost] }
-  return collectTile(state, playerId, params, yielded)
+  return collectTile(state, playerId, params, { yielded, shareBp: shareOf(yielded.tile) })
 }
 
-/** 1 unit per ore tile at any tier (#7), core fragments per core tile (#10); ground nothing. */
+/** An opened cell and the share of its ore it pays (ticket 620: a side cell's is the side share). */
+interface SharedCell {
+  yielded: YieldedCell
+  shareBp: number
+}
+
+/**
+ * 1 unit per ore tile at any tier (#7), a side cell's at its share (#308); core fragments per core
+ * tile (#10); ground nothing.
+ */
 function collectTile(
   state: AuthorityState,
   playerId: string,
   params: PlanetParams,
-  { tile, cell }: YieldedCell,
+  { yielded: { tile, cell }, shareBp }: SharedCell,
 ): RuleEffect {
   const kind = kindOfCell(cell)
   if (kind === CELL_KIND.core) return harvestCoreTile(state, playerId, params)
   if (kind !== CELL_KIND.ore) return unchanged(state)
-  return collectOreUnit(state, playerId, minedOreOf(params, tile, cell))
+  const credit = creditOreShare(vehicleOf(state, playerId), shareBp)
+  const credited = withVehicle(state, playerId, credit.vehicle)
+  if (!credit.isPaid) return unchanged(credited)
+  return collectOreUnit(credited, playerId, minedOreOf(params, tile, cell))
 }
 
 /**

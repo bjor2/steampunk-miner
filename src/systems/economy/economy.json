@@ -370,7 +370,8 @@
   },
   "drillGearCaps": {
     "aheadCellsMax": 1,
-    "sideEnergyShareFloorBp": 10000
+    "sideEnergyShareFloorBp": 10000,
+    "sideOreShareBp": 600
   },
   "itemHookCaps": {
     "reachCellsMax": 12

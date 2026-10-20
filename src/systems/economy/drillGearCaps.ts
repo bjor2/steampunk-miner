@@ -7,6 +7,10 @@
  * - `sideEnergyShareFloorBp` (10000, a whole share): a side cell costs at least the drill's own
  *   energy for that cell, so side drilling adds reach, not free throughput. The twin bit's
  *   diagonal ahead cell carries the same floor (GD lock on #257, ticket 279).
+ * - `sideOreShareBp` (600): the share of its ore a side cell pays (Systems' price rows on #308,
+ *   ticket 620), so width is yield and clearing at about +3% income a side cell, not the +50% a
+ *   flank paying whole would be. Fixed: no slice asks it and it never scales with depth (the VS on
+ *   #308), so width keeps one ratio to the planet's own income.
  *
  * A slice states the gear it wants; the kernel folds every answer through these caps, so no stack
  * of gear passes them.
@@ -18,7 +22,14 @@ import type { FieldReader } from './economyFieldReader'
 export interface DrillGearCaps {
   aheadCellsMax: number
   sideEnergyShareFloorBp: number
+  sideOreShareBp: number
 }
+
+/**
+ * What an opened cell was to the cut: under the bit's stamp, one of the gear's cells past the bit,
+ * or one of its side cells beside the bore (the side cutters' and the gallery reamers').
+ */
+export type CutCellKind = 'bit' | 'ahead' | 'side'
 
 /**
  * Where the ahead cells point (GD lock on #257): along the facing, or 45 degrees to the facing's
@@ -126,6 +137,15 @@ export function isAheadBearingAllowed(gear: DrillGear, bearing: ExtraBearing): b
   return gear.extraBearings.has(bearing)
 }
 
+/**
+ * The share of its ore an opened cell pays, in basis points (#308, ticket 620): a side cell the
+ * kernel's fixed side share, every other cell a whole one. The cut, its energy and its heat are
+ * the same for every kind; only the yield reads this.
+ */
+export function sideOreShareOf(kind: CutCellKind, caps: DrillGearCaps): number {
+  return kind === 'side' ? caps.sideOreShareBp : BASIS_POINTS
+}
+
 export function readDrillGearCaps(reader: FieldReader, value: unknown): DrillGearCaps {
   const caps = reader.object('drillGearCaps', value)
   const aheadCellsMax = reader.safeInteger('drillGearCaps.aheadCellsMax', caps.aheadCellsMax)
@@ -133,11 +153,19 @@ export function readDrillGearCaps(reader: FieldReader, value: unknown): DrillGea
     'drillGearCaps.sideEnergyShareFloorBp',
     caps.sideEnergyShareFloorBp,
   )
+  const sideOreShareBp = reader.safeInteger('drillGearCaps.sideOreShareBp', caps.sideOreShareBp)
   if (aheadCellsMax < 0) reader.record('drillGearCaps.aheadCellsMax must be 0 or more')
   if (sideEnergyShareFloorBp < BASIS_POINTS) {
     reader.record(`drillGearCaps.sideEnergyShareFloorBp must be ${BASIS_POINTS} or more`)
   }
-  return { aheadCellsMax, sideEnergyShareFloorBp }
+  if (!isWholeShareOrLess(sideOreShareBp)) {
+    reader.record(`drillGearCaps.sideOreShareBp must be 0 to ${BASIS_POINTS}`)
+  }
+  return { aheadCellsMax, sideEnergyShareFloorBp, sideOreShareBp }
+}
+
+function isWholeShareOrLess(shareBp: number): boolean {
+  return shareBp >= 0 && shareBp <= BASIS_POINTS
 }
 
 /**

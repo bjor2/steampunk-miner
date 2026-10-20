@@ -114,6 +114,8 @@ function drillWith(
         spent: before - session.vehicle().energy,
         /** What the cut charged in the carry's numerator (ticket 535), exact below a quantum. */
         charged: cutEnergyNumeratorOf(beforeVehicle, session.vehicle()),
+        /** The side ore share's carry the cut left on the vehicle (ticket 620). */
+        sideOreCarryBp: session.vehicle().sideOreCarryBp,
         digest: stateDigest(session.state()),
       }
     }),
@@ -152,6 +154,10 @@ function densityOf(world: WorldState, tile: TilePoint): number {
 
 function cargoAddedOf(events: readonly DomainEvent[]) {
   return events.filter((event) => event.type === 'CargoAdded')
+}
+
+function oreDestroyedOf(events: readonly DomainEvent[]) {
+  return events.filter((event) => event.type === 'TileDestroyed' && event.kind === 'ore')
 }
 
 function drillGatedOf(events: readonly DomainEvent[]) {
@@ -277,13 +283,38 @@ describe('drill gear cut', () => {
     expect(kindOfCell(cellAt(widened.world, PARAMS, floor))).toBe(CELL_KIND.ground)
   })
 
-  it('collects the ore of a side cell into the hold, as the bit would', () => {
+  it('credits a side ore cell its 600 bp share toward the next unit, never a whole one (#308)', () => {
     const { ore, target } = oreBesideBore(1)
+    const plain = drillWith([], target)
     const cut = drillWith([gearSlice({ sideCells: 2 })], target)
+    const sideOreCells = oreDestroyedOf(cut.events).length - oreDestroyedOf(plain.events).length
     expect(cut.events).toContainEqual(expect.objectContaining({ type: 'TileDestroyed', ...ore }))
-    expect(cargoAddedOf(cut.events).length).toBeGreaterThan(
-      cargoAddedOf(drillWith([], target).events).length,
-    )
+    expect(sideOreCells).toBeGreaterThan(0)
+    expect(cut.sideOreCarryBp).toBe(sideOreCells * 600)
+    expect(cargoAddedOf(cut.events)).toHaveLength(cargoAddedOf(plain.events).length)
+  })
+
+  it('credits the same side cells on every run of the same cut', () => {
+    const { target } = oreBesideBore(1)
+    const ask = gearSlice({ sideCells: 2 })
+    expect(drillWith([ask], target).digest).toBe(drillWith([ask], target).digest)
+  })
+
+  it('never credits a side ore cell a gate holds', () => {
+    const { target } = oreBesideBore(1)
+    const cut = drillWith([gearSlice({ sideCells: 2 }), REFUSE_ALL_ORE], target)
+    expect(oreDestroyedOf(cut.events)).toEqual([])
+    expect(cut.sideOreCarryBp).toBeUndefined()
+  })
+
+  it('pays an ore cell past the bit its whole unit: the share is the side cells alone', () => {
+    const { ore } = oreBesideBore(0)
+    const target = { tx: ore.tx, ty: ore.ty + 1 }
+    const plain = drillWith([], target)
+    const reach = drillWith([gearSlice({ aheadCells: 1 })], target)
+    expect(reach.sideOreCarryBp).toBeUndefined()
+    expect(cargoAddedOf(reach.events).length).toBe(oreDestroyedOf(reach.events).length)
+    expect(oreDestroyedOf(reach.events).length).toBeGreaterThan(oreDestroyedOf(plain.events).length)
   })
 
   it.each<GateOutcome>(['refused', 'lost'])(

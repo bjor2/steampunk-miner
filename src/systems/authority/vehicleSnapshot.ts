@@ -4,6 +4,7 @@
  * strings, and the loadout as its versioned `loadout` section (K4). Reading checks the shape so a malformed snapshot is refused with listed problems before
  * anything is built from it; the digest check in `sessionSnapshot.ts` then catches any value that does not match.
  */
+import { BASIS_POINTS } from '../../constants/balance'
 import { isChargeSize } from '../economy/chargeSizes'
 import type { AheadBearing, BoreSide } from '../economy/drillGearCaps'
 import { STANDARD_LINING_TYPE } from '../economy/heatEconomy'
@@ -128,6 +129,9 @@ export function portableVehicleProblems(vehicle: unknown, path: string): string[
     ...(vehicle.sideLatch === undefined || isPortableSideLatch(vehicle.sideLatch)
       ? []
       : [`${path}.sideLatch must hold a side and a tile, or be left out`]),
+    ...(vehicle.sideOreCarryBp === undefined || isPortableSideOreCarry(vehicle.sideOreCarryBp)
+      ? []
+      : [`${path}.sideOreCarryBp must be whole basis points under one unit, or be left out`]),
     ...(vehicle.shockHullBp === undefined || isWholeNumber(vehicle.shockHullBp)
       ? []
       : [`${path}.shockHullBp must be a whole number of basis points, or be left out`]),
@@ -295,6 +299,11 @@ function isPortableCarryQuantum(quantum: unknown, carry: unknown): boolean {
 }
 
 /** The report cut's energy carry (ticket 535): above 0 (left out at 0); a clamped tank's debt may exceed a quantum. */
+/** The side ore share's carry (ticket 620): above 0 (left out at 0) and under one whole unit. */
+function isPortableSideOreCarry(carry: unknown): boolean {
+  return isWholeNumber(carry) && (carry as number) > 0 && (carry as number) < BASIS_POINTS
+}
+
 function isPortableCutEnergyCarry(carry: unknown): boolean {
   return isWholeNumber(carry) && (carry as number) > 0
 }

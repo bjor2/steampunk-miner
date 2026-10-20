@@ -425,8 +425,14 @@ import type { DriveSigns } from '../vehicle/driveSigns'
  *    the drill-gear fork's Wide branch no longer wait on the `side_drills` row (P13), a price
  *    anchor only, so either cuts on any planet once owned and switched on. A run that holds no
  *    cutters and chooses no Wide branch before P13 moves no digest.
+ * 100: a side cell pays 600 bp of its ore (ticket 620, Systems' price rows on #308,
+ *    `drillGearCaps.sideOreShareBp`): an ore cell the drill gear listed beside the bore adds its
+ *    share to the vehicle's `sideOreCarryBp`, and the cell that brings it to a whole unit pays one,
+ *    in the cut's walk order; the bit's cells and the ahead cells pay whole, core cells harvest
+ *    whole and gated cells are never credited. The drill-gear slice sells the side cutters' Mark 2
+ *    (`sideCells` 2). A run that cuts no side ore cell moves no digest.
  */
-export const AUTHORITY_PROTOCOL_VERSION = 99
+export const AUTHORITY_PROTOCOL_VERSION = 100
 
 /** The kernel's own commands: the closed set its rule tables are written against. */
 export interface KernelCommandPayloads {

@@ -789,7 +789,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/authority/drillEventStream.lane.test.ts` | 8 | 1 |
 | `src/systems/authority/drillEventStream.test.ts` | 27 | 5 |
 | `src/systems/authority/drillGates.test.ts` | 11 | 11 |
-| `src/systems/authority/drillGearCut.test.ts` | 27 | 25 |
+| `src/systems/authority/drillGearCut.test.ts` | 30 | 28 |
 | `src/systems/authority/drillStep.test.ts` | 23 | 23 |
 | `src/systems/authority/drillStepFacing.test.ts` | 3 | 2 |
 | `src/systems/authority/exactMathLint.test.ts` | 11 | 3 |
@@ -837,6 +837,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/authority/sensingQueries.test.ts` | 10 | 10 |
 | `src/systems/authority/serviceReserve.test.ts` | 4 | 4 |
 | `src/systems/authority/sessionSnapshot.test.ts` | 21 | 21 |
+| `src/systems/authority/sideOreCredit.test.ts` | 6 | 6 |
 | `src/systems/authority/signatureCells.test.ts` | 9 | 9 |
 | `src/systems/authority/sliceSectionSnapshot.test.ts` | 12 | 12 |
 | `src/systems/authority/spanBudget.test.ts` | 5 | 5 |
@@ -951,7 +952,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/economy/collapseCrush.test.ts` | 2 | 2 |
 | `src/systems/economy/costCurveLookup.test.ts` | 3 | 3 |
 | `src/systems/economy/depthDensityCurve.test.ts` | 7 | 7 |
-| `src/systems/economy/drillGearCaps.test.ts` | 18 | 18 |
+| `src/systems/economy/drillGearCaps.test.ts` | 20 | 20 |
 | `src/systems/economy/drillPowerRows.test.ts` | 21 | 14 |
 | `src/systems/economy/economyGrowth.test.ts` | 5 | 5 |
 | `src/systems/economy/economySourceScan.test.ts` | 6 | 6 |

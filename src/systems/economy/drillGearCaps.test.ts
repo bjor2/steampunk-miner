@@ -6,6 +6,7 @@ import {
   foldDrillGear,
   isAheadBearingAllowed,
   readDrillGearCaps,
+  sideOreShareOf,
   type DrillGearAsk,
 } from './drillGearCaps'
 
@@ -14,8 +15,14 @@ import {
 const CAPS = ECONOMY.drillGearCaps
 
 describe('drill gear caps', () => {
-  it('reads one cell ahead and a whole energy share per side cell from economy.json', () => {
-    expect(CAPS).toEqual({ aheadCellsMax: 1, sideEnergyShareFloorBp: 10000 })
+  it('reads one cell ahead, a whole energy share and a 600 bp ore share per side cell', () => {
+    expect(CAPS).toEqual({ aheadCellsMax: 1, sideEnergyShareFloorBp: 10000, sideOreShareBp: 600 })
+  })
+
+  it('pays a side cell its fixed ore share and every other opened cell a whole one (#308)', () => {
+    expect(sideOreShareOf('side', CAPS)).toBe(600)
+    expect(sideOreShareOf('ahead', CAPS)).toBe(10000)
+    expect(sideOreShareOf('bit', CAPS)).toBe(10000)
   })
 
   it('cuts as before when no ask adds a cell', () => {
@@ -169,10 +176,22 @@ describe('drill gear caps', () => {
 
   it('refuses a side share floor under a whole share and a negative ahead cap', () => {
     const reader = createFieldReader()
-    readDrillGearCaps(reader, { aheadCellsMax: -1, sideEnergyShareFloorBp: 5000 })
+    readDrillGearCaps(reader, {
+      aheadCellsMax: -1,
+      sideEnergyShareFloorBp: 5000,
+      sideOreShareBp: 600,
+    })
     expect(reader.problems).toEqual([
       'drillGearCaps.aheadCellsMax must be 0 or more',
       'drillGearCaps.sideEnergyShareFloorBp must be 10000 or more',
     ])
+  })
+
+  it('refuses a side ore share under none or over a whole one', () => {
+    for (const sideOreShareBp of [-1, 10001]) {
+      const reader = createFieldReader()
+      readDrillGearCaps(reader, { aheadCellsMax: 1, sideEnergyShareFloorBp: 10000, sideOreShareBp })
+      expect(reader.problems).toEqual(['drillGearCaps.sideOreShareBp must be 0 to 10000'])
+    }
   })
 })

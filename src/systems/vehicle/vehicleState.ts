@@ -94,6 +94,12 @@ export interface VehicleState {
    */
   sideLatch?: SideLatch
   /**
+   * The side ore share's carry, in basis points of one ore unit (#308, ticket 620,
+   * `sideOreCredit.ts`): what the side cells cut so far paid toward the next whole unit. Absent at
+   * 0, so a world that never cuts a side ore cell digests as before.
+   */
+  sideOreCarryBp?: number
+  /**
    * The on-curve hull share, in basis points, that electrified cells' shocks took this dive (spec
    * #258, ticket 290), held to the dive cap. Absent until the first shock and again from the dock,
    * so off the magnetic planets the state and its digest are unchanged.

@@ -3,7 +3,8 @@
  * read lists the cells past the bit and beside the bore (`drillGearCellsAt`) that pass `canMine`:
  * rig-gated and dynamite-gated cells count as solid and stay standing, and a refused one is still
  * reported in the drill's `DrillGated`. The listed cells carve in the same edit and the same ticks
- * as the disc, at their own tier hardness and drill time, and collect like any drilled cell.
+ * as the disc, at their own tier hardness and drill time, and collect like any drilled cell, but
+ * a side cell's ore pays the kernel's side share (`sideOreCredit.ts`, ticket 620).
  *
  * The twin bit's diagonal (GD lock on #257, ticket 279) replaces the ahead cell with the one 45
  * degrees to a side; it runs the same `canMine`, takes its own full hardness and is never listed
@@ -46,6 +47,7 @@ import {
   aheadEnergyShareOf,
   isAheadBearingAllowed,
   type AheadBearing,
+  type CutCellKind,
   type DrillGear,
 } from '../economy/drillGearCaps'
 import { drillGearOf } from '../registries/drillGear'
@@ -106,9 +108,10 @@ export interface DrillCarve extends Carve {
   sideLatch: SideLatch | null
 }
 
-/** A drill-gear cell and its energy share, in basis points of the drill's. */
+/** A drill-gear cell, its energy share in basis points of the drill's, and which gear cell it is. */
 export interface GearCellShare extends TilePoint {
   shareBp: number
+  kind: Exclude<CutCellKind, 'bit'>
 }
 
 /** The drill gear's cells for one drill command, after `canMine`. */
@@ -407,7 +410,7 @@ function carveBitAndGear(
   const cells = [...read.aheadCells, ...read.sideCells]
   const carved = carveWithCells(cells, windows)
   const latches = { aheadLatch: read.aheadLatch, sideLatch: read.sideLatch }
-  const gearCells = cells.map((tile, index) => ({ ...tile, shareBp: shares[index] }))
+  const gearCells = gearCellSharesOf(read, cells, shares)
   return {
     ...carved,
     gearQuanta: gearQuantaOf(carved, shares),
@@ -430,6 +433,24 @@ function cellSharesOf(read: DrillGearRead): number[] {
   return [
     ...read.aheadCells.map(() => read.aheadEnergyShareBp),
     ...read.sideCells.map(() => read.sideEnergyShareBp),
+  ]
+}
+
+/** Each listed cell with its energy share and its kind, in carve order. */
+function gearCellSharesOf(
+  read: DrillGearRead,
+  cells: readonly TilePoint[],
+  shares: readonly number[],
+): GearCellShare[] {
+  const kinds = cellKindsOf(read)
+  return cells.map((tile, index) => ({ ...tile, shareBp: shares[index], kind: kinds[index] }))
+}
+
+/** Each listed cell's kind, in carve order: ahead cells, then side. */
+function cellKindsOf(read: DrillGearRead): GearCellShare['kind'][] {
+  return [
+    ...read.aheadCells.map(() => 'ahead' as const),
+    ...read.sideCells.map(() => 'side' as const),
   ]
 }
 
