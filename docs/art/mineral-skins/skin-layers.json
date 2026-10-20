@@ -1,0 +1,112 @@
+{
+  "$comment": "The drawn layer cells of the mineral skins (#576, tickets 592 to 606): one 256 px cell per base, vein and sheen layer of mineralSkins.json at 256 px/m, the 1 m ore cell. base: opaque, its luminance the ramp coordinate, seamless at its edges. vein: the shape, its luminance the ramp coordinate and its alpha the mask. sheen: the lustre highlight strength, seamless. Palettes are data in mineralSkins.json.",
+  "cellPx": 256,
+  "pxPerMetre": 256,
+  "layers": [
+    {
+      "kind": "base",
+      "id": "mottled-grain",
+      "cell": "cells/base/mottled-grain.png",
+      "blend": "blend/base-mottled-grain.blend",
+      "wornBy": ["ironstone-brassvein"]
+    },
+    {
+      "kind": "base",
+      "id": "crusted-scale",
+      "cell": "cells/base/crusted-scale.png",
+      "blend": "blend/base-crusted-scale.blend",
+      "wornBy": ["shallow-copper-brassvein"]
+    },
+    {
+      "kind": "base",
+      "id": "banded-seam",
+      "cell": "cells/base/banded-seam.png",
+      "blend": "blend/base-banded-seam.blend",
+      "wornBy": ["deep-seam-tin-brassvein"]
+    },
+    {
+      "kind": "base",
+      "id": "clouded-mass",
+      "cell": "cells/base/clouded-mass.png",
+      "blend": "blend/base-clouded-mass.blend",
+      "wornBy": ["clouded-quartzine"]
+    },
+    {
+      "kind": "base",
+      "id": "conchoidal-glass",
+      "cell": "cells/base/conchoidal-glass.png",
+      "blend": "blend/base-conchoidal-glass.blend",
+      "wornBy": ["flint-glass-quartzine"]
+    },
+    {
+      "kind": "vein",
+      "id": "nugget-cluster",
+      "cell": "cells/vein/nugget-cluster.png",
+      "blend": "blend/vein-nugget-cluster.blend",
+      "wornBy": ["ironstone-brassvein"]
+    },
+    {
+      "kind": "vein",
+      "id": "flake-scatter",
+      "cell": "cells/vein/flake-scatter.png",
+      "blend": "blend/vein-flake-scatter.blend",
+      "wornBy": ["shallow-copper-brassvein"]
+    },
+    {
+      "kind": "vein",
+      "id": "plate-stack",
+      "cell": "cells/vein/plate-stack.png",
+      "blend": "blend/vein-plate-stack.blend",
+      "wornBy": ["deep-seam-tin-brassvein"]
+    },
+    {
+      "kind": "vein",
+      "id": "nodule-bed",
+      "cell": "cells/vein/nodule-bed.png",
+      "blend": "blend/vein-nodule-bed.blend",
+      "wornBy": ["clouded-quartzine"]
+    },
+    {
+      "kind": "vein",
+      "id": "shard-spray",
+      "cell": "cells/vein/shard-spray.png",
+      "blend": "blend/vein-shard-spray.blend",
+      "wornBy": ["flint-glass-quartzine"]
+    },
+    {
+      "kind": "sheen",
+      "id": "earthy",
+      "cell": "cells/sheen/earthy.png",
+      "blend": "blend/sheen-earthy.blend",
+      "wornBy": ["ironstone-brassvein"]
+    },
+    {
+      "kind": "sheen",
+      "id": "submetallic",
+      "cell": "cells/sheen/submetallic.png",
+      "blend": "blend/sheen-submetallic.blend",
+      "wornBy": ["shallow-copper-brassvein"]
+    },
+    {
+      "kind": "sheen",
+      "id": "metallic",
+      "cell": "cells/sheen/metallic.png",
+      "blend": "blend/sheen-metallic.blend",
+      "wornBy": ["deep-seam-tin-brassvein"]
+    },
+    {
+      "kind": "sheen",
+      "id": "waxy",
+      "cell": "cells/sheen/waxy.png",
+      "blend": "blend/sheen-waxy.blend",
+      "wornBy": ["clouded-quartzine"]
+    },
+    {
+      "kind": "sheen",
+      "id": "vitreous",
+      "cell": "cells/sheen/vitreous.png",
+      "blend": "blend/sheen-vitreous.blend",
+      "wornBy": ["flint-glass-quartzine"]
+    }
+  ]
+}

@@ -494,6 +494,17 @@ act (`ground-hero-atlas-<act>`, an albedo map alone: ETC1S sRGB like every albed
 mip levels it writes itself, since `toktx` 4.4.2 makes only full chains and a full chain would
 blur one cell into the next).
 
+## Mineral skins
+
+The layer art of the mineral skins of [#576](https://github.com/bjor2/steampunk-miner/issues/576)
+(the `mineral-skins` slice's `mineralSkins.json`, feature-slices 3.73), built a batch at a time
+from ticket 592: one Blender source per base, vein and sheen layer under
+`docs/art/mineral-skins/blend/`, rendered on the ore stage into 256 px grey cells (a vein with its
+mask in alpha) under `cells/`, with the review sheets of each batch at desktop and phone tile
+sizes. A palette is three colours in the table. The compositing rule the renderer follows is in
+[docs/art/mineral-skins/README.md](art/mineral-skins/README.md). Nothing packs, registers or draws
+the cells yet; the kernel seam that draws a skin in the ground will.
+
 ## Magnetic planets
 
 The art of the magnetic planet class ([#293](https://github.com/bjor2/steampunk-miner/issues/293),
