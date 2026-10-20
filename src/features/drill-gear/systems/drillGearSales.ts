@@ -8,10 +8,17 @@ import type {
   VehicleItemSeller,
 } from '../../../systems/registries/vehicleItemSales'
 import { drillGearItemOf, itemPriceOf } from './drillGearItems'
+import { offerOfMark, sideCutterMarkOf } from './sideCutterMarks'
 
 export const DRILL_GEAR_SELLER: VehicleItemSeller = {
   id: 'drill-gear.seller',
-  offerOf: (itemId) => oneOffOfferOf(itemId),
+  offerOf: (itemId) => oneOffOfferOf(itemId) ?? widthMarkOfferOf(itemId),
+}
+
+/** The side cutters' width Marks are one-offs too, each at its own anchor (ticket 620). */
+function widthMarkOfferOf(itemId: string): VehicleItemOffer | null {
+  const mark = sideCutterMarkOf(itemId)
+  return mark === null ? null : offerOfMark(mark)
 }
 
 function oneOffOfferOf(itemId: string): VehicleItemOffer | null {

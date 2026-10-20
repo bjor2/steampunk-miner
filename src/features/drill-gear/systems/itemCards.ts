@@ -20,10 +20,14 @@ import {
   SHIPPED_DRILL_GEAR,
   type DrillGearItem,
 } from './drillGearItems'
+import { cardOfMark, SIDE_CUTTER_MARKS } from './sideCutterMarks'
 
 const FIRST_MARK = 1
 
-export const DRILL_GEAR_ITEM_CARDS: readonly ItemDescriptionEntry[] = SHIPPED_DRILL_GEAR.map(cardOf)
+export const DRILL_GEAR_ITEM_CARDS: readonly ItemDescriptionEntry[] = [
+  ...SHIPPED_DRILL_GEAR.map(cardOf),
+  ...SIDE_CUTTER_MARKS.map(cardOfMark),
+]
 
 /** The Mark a card's level names: Mark 1 before any Mark is researched. */
 export function markOfLevel(level: number): number {

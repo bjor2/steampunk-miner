@@ -24,8 +24,7 @@ import { FACING } from '../../../systems/vehicle/vehiclePose'
 import { isToggleEngaged } from '../../power-up-core'
 import { activeForkBranchOf, forkPairOf, type ForkPair, type TechLane } from '../../tech-tree'
 import { plungeCrownNotes } from './aheadCutNotes'
-import { drillGearAskOf, SIDE_CUTTERS_ID } from './cuttersAndBoom'
-import { facedHoldOf } from './cuttersHold'
+import { gearAskInPlayOf, SIDE_CUTTERS_ID } from './cuttersAndBoom'
 import { DRILL_GEAR_ECONOMY, type DrillGearStatName } from './drillGearEconomy'
 
 const LANE: TechLane = 'drill-gear'
@@ -103,11 +102,11 @@ function deepAskOf(state: AuthorityState, playerId: string): DrillGearAsk | null
   return { aheadCells: forkValueOf(PLUNGE_CROWN_ID, 'aheadCells') }
 }
 
-/** The side cutters' own ask while switched on, held aim included; null while off. */
+/** The side cutters' own ask while switched on, held aim and width Mark included; null while off. */
 function engagedCuttersAskOf(state: AuthorityState, playerId: string): DrillGearAsk | null {
   const isCutterEngaged = (itemId: string) =>
     itemId === SIDE_CUTTERS_ID && isToggleEngaged(state, playerId, itemId)
-  return drillGearAskOf(isCutterEngaged, facedHoldOf(state, playerId, SIDE_CUTTERS_ID))
+  return gearAskInPlayOf(state, playerId, isCutterEngaged)
 }
 
 /** One number of a branch's `items.balance` row; a missing one is a broken file. */

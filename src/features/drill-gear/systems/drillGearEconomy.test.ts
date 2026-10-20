@@ -16,11 +16,12 @@ describe('drill-gear economy', () => {
     expect(DRILL_GEAR_ECONOMY.price).toEqual({ band: 5, oreUnits: fromCanonical('15') })
   })
 
-  it('has a balance row for each of the eight drill-gear items and the two fork branches', () => {
+  it('has a balance row for each drill-gear item, the width Mark 2 and the two fork branches', () => {
     expect(Object.keys(DRILL_GEAR_ECONOMY.balance)).toEqual([
       'gear.vibratory_bit',
       'gear.spoil_auger',
       'gear.side_cutters',
+      'gear.side_cutters_mark_2',
       'gear.thaw_crown',
       'gear.twin_bit',
       'gear.sampling_corer',

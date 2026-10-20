@@ -12,6 +12,7 @@ import { flavourProblemsOf } from '../descriptions'
 import { lastMarkOf, type TechNode } from '../tech-tree'
 import { cardLinesOf } from './systems/cardLines'
 import { DRILL_GEAR_ITEMS, markLadderOf, SHIPPED_DRILL_GEAR } from './systems/drillGearItems'
+import { SIDE_CUTTER_MARKS } from './systems/sideCutterMarks'
 
 // #205 on the loaded slices: six drill-gear rows ship as vehicle items, power-ups, tree nodes and
 // item cards (#162 acceptance 1), the twin-bit head a seventh with its effect (ticket 280) and the
@@ -72,11 +73,14 @@ describe('drill-gear shipped rows', () => {
     const powerUps = contentOf('power-up').map((powerUp) => powerUp.itemId)
     expect(SHIPPED_IDS.filter((id) => !vehicleItems.includes(id))).toEqual([])
     expect(SHIPPED_IDS.filter((id) => !powerUps.includes(id))).toEqual([])
-    // The P16 fork's two branches (ticket 268) are lane nodes too, with no store item.
+    // The P16 fork's two branches (ticket 268) are lane nodes too, with no store item, and the
+    // side cutters' width Mark 2 (ticket 620) a node and an owned item with no power-up.
     const lane = contentOf('tech-node').filter(
       (node) => node.lane === 'drill-gear' && !node.id.startsWith('tech.drill_gear.fork.'),
     )
-    expect(lane.map((node) => node.unlocks).sort()).toEqual([...SHIPPED_IDS].sort())
+    const widthMarks = SIDE_CUTTER_MARKS.map((mark) => mark.itemId)
+    expect(lane.map((node) => node.unlocks).sort()).toEqual([...SHIPPED_IDS, ...widthMarks].sort())
+    expect(widthMarks.filter((id) => !vehicleItems.includes(id))).toEqual([])
   })
 
   it('registers the twin-bit node on P19 after the vibratory bit', () => {
