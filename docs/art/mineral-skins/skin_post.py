@@ -4,8 +4,10 @@ drawn layer's cell under cells/ (base and sheen as 8-bit grey, vein as grey with
 skin of a batch composited by the rule in README.md, and the batch's review sheets: the layer
 stacks, the skins at 256 px, the skins in a patch of ground at desktop (85 px a tile) and phone
 (22 px a tile, 360 px wide) sizes, the game-scale strip with its greyscale and deuteranopia
-copies, and the distinctness report between every pair of the batch's skins. Pillow and numpy;
-Blender's Python has neither.
+copies, and the distinctness report between every pair of the batch's skins and between each of
+them and the skins of the planet's earlier batches. A batch after a planet's first also writes the
+planet's game-scale strip, every skin of it so far, since no two species of a planet may look
+alike. Pillow and numpy; Blender's Python has neither.
 
   python3 docs/art/mineral-skins/skin_post.py [batch]       # p1-b1 by default
 """
@@ -62,7 +64,8 @@ def main():
     cells = write_cells()
     skins = layers.batch_skins(batch)
     ramps = {entry['id']: entry['ramp'] for entry in layers.load_skins()['layers']['palette']}
-    composites = {skin['species']: composite_of(skin, cells, ramps) for skin in skins}
+    mates = [skin for earlier in layers.earlier_batches(batch) for skin in layers.batch_skins(earlier)]
+    composites = {skin['species']: composite_of(skin, cells, ramps) for skin in skins + mates}
     write_layer_sheet(batch, skins, cells, ramps, composites)
     write_skin_sheet(batch, skins, composites)
     write_patch_sheet(batch, skins, composites, DESKTOP_TILE_PX, 'desktop')
@@ -70,7 +73,9 @@ def main():
     write_magnified(phone, STRIP_MAGNIFY)
     strip = write_scale_strip(batch, skins, composites)
     post.write_blind_copies(strip)
-    report = write_distinctness(batch, skins, composites)
+    report = write_distinctness(batch, skins, mates, composites)
+    if mates:
+        post.write_blind_copies(write_planet_strip(batch, mates + skins, composites))
     for name in ('layers', 'skins'):
         shrink_to_jpeg(sheet_path(batch, '%s.png' % name))
     print('post done: %d cells, %d skins, least different pair %s' % (len(cells), len(skins), report['leastDifferentPair']))
@@ -193,6 +198,13 @@ def write_scale_strip(batch, skins, composites):
     return write_magnified(sheet_path(batch, 'scale.png'), STRIP_MAGNIFY)
 
 
+def write_planet_strip(batch, skins, composites):
+    """The scale strip of every skin of the planet so far, in roster-slot order."""
+    path = os.path.join(SHEET_DIR, '%s.scale.png' % layers.planet_of(batch))
+    post.write_rgb(path, stacked([scale_row(skins, composites, px) for px in TILE_PX]))
+    return write_magnified(path, STRIP_MAGNIFY)
+
+
 def scale_row(skins, composites, tile_px):
     rock = rock_rgb()
     blocks = []
@@ -211,19 +223,21 @@ def write_magnified(path, factor):
 # --- distinctness -----------------------------------------------------------------------------------------
 
 
-def write_distinctness(batch, skins, composites):
+def write_distinctness(batch, skins, mates, composites):
     """
-    Per skin at the phone tile (22 px): mean colour, luma and hue, and its contrast against the rock.
-    Per pair: how far apart the mean colours are (display RGB, and seen with deuteranopia), the
+    Per skin of the batch at the phone tile (22 px): mean colour, luma and hue, and its contrast
+    against the rock. Per pair, the batch's own and each of its skins against the planet's earlier
+    ones (`mates`): how far apart the mean colours are (display RGB, and seen with deuteranopia), the
     lumas, and the textures (mean absolute difference of the two greyscale tiles, each about its
     own mean). The least different pair is named so the README can say it.
     """
     rock_luma = float(rec601_of(rock_rgb()[None, None, :])[0, 0])
-    measures = {skin['species']: skin_measures(composites[skin['species']], rock_luma) for skin in skins}
-    pairs = [pair_measures(a, b, measures) for a, b in itertools.combinations(measures, 2)]
+    measures = {skin['species']: skin_measures(composites[skin['species']], rock_luma) for skin in mates + skins}
+    ours = [skin['species'] for skin in skins]
+    pairs = [pair_measures(a, b, measures) for a, b in itertools.combinations(measures, 2) if a in ours or b in ours]
     least = min(pairs, key=lambda pair: pair['colourDistance'] + pair['textureDifference'])
     report = {'batch': batch, 'tilePx': PHONE_TILE_PX, 'rockLuma': round(rock_luma, 3),
-              'skins': {species: printable(measure) for species, measure in measures.items()},
+              'skins': {species: printable(measures[species]) for species in ours},
               'pairs': pairs, 'leastDifferentPair': [least['a'], least['b']]}
     with open(sheet_path(batch, 'distinct.json'), 'w', encoding='utf-8', newline='\n') as file:
         file.write(json_text_of(report))

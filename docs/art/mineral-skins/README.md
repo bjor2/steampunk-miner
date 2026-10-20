@@ -45,6 +45,42 @@ layer.
   metallic (bright streaks along the beds), waxy (a broad soft bloom), vitreous (sharp glints and
   slivers on curved fracture faces).
 
+## Batch p1-b2: P1's species 6 to 10 (ticket 593)
+
+The legacy pool's four uncommons and its first rare, kind slots 6 to 10 on P1 (and P2). The
+layers come from the species row, as for p1-b1. Bright lead and violet fluorite share the `cubes`
+silhouette, so each gets a cube vein of its own: galena cleaves into cubes square to each other,
+while fluorite grows twins turned through one another. No layer is shared with p1-b1 or within the
+batch.
+
+<!-- p1-b2 -->
+
+| slot | species                       | base            | vein             | palette (shadow, body, light)                   | sheen         |
+| ---- | ----------------------------- | --------------- | ---------------- | ----------------------------------------------- | ------------- |
+| 6    | `bright-lead-brassvein`       | `tarnish-steps` | `cleavage-cubes` | `lead-glance` `#4c4e58` `#999daf` `#ccced7`     | `splendent`   |
+| 7    | `deep-grade-nickel-brassvein` | `speckled-grit` | `grain-scatter`  | `nickel-pale` `#5c5d56` `#b7baab` `#dbdcd5`     | `glittering`  |
+| 8    | `honey-amber-quartzine`       | `resin-flow`    | `bead-drops`     | `amber-honey` `#604f0e` `#bf9e1b` `#dfce8d`     | `resinous`    |
+| 9    | `violet-fluorite-quartzine`   | `zoned-growth`  | `twinned-cubes`  | `fluorite-violet` `#47386a` `#8e70d5` `#c7b8ea` | `fluorescent` |
+| 10   | `vein-gold-brassvein`         | `quartz-veined` | `wire-dendrite`  | `gold-vein` `#706609` `#e0cc12` `#f0e689`       | `brilliant`   |
+
+<!-- /p1-b2 -->
+
+- **Bases:** staggered cleavage steps, each face its own tone, under a drifting tarnish fog; a pale
+  matrix peppered with coarse dark grit and a few bright specks; slow flow lines in resin with
+  trapped grit and bubble rings; growth zones as nested squares, two cubes by two to the cell;
+  smoky quartz crossed by pale branching veinlets.
+- **Veins:** a stair of sharp cubes square to the face; small hard grains alone and in twos and
+  threes; three trails of resin drops, each a fat bead under a small neck; cubes grown through
+  each other at an eighth of a turn; four kinked gold wires from one root, with twigs and a bead
+  on every tip.
+- **Sheens:** splendent (whole cleavage faces flash like mirrors, the fog dulls them), glittering
+  (pinpoint sparks on a share of the grains), resinous (soft round pools of gloss), fluorescent
+  (a faint glow in alternate growth zones, a few glints), brilliant (thin hard threads of light and
+  strong glints).
+- **The block lattice** (`lattice_of` in `layer_art.py`) cuts the cell into whole blocks and folds
+  a staggered row back into the cell, so the stepped and zoned bases repeat with no seam like the
+  noise ones.
+
 ## Compositing
 
 What a renderer draws for a skin, per pixel, in display values (0..1), from the row's layers:
@@ -75,7 +111,8 @@ cell, rimmed in the shadow end so it reads on a base of its own palette.
 | `sheets/<batch>.desktop.png`            | a 16 x 6 tile patch of band rock with each skin as a short run of ore tiles, at 85 px a tile (the default zoom on 1080p)     |
 | `sheets/<batch>.phone.png`, `-x4`       | the same patch at 22 px a tile in a 360 px wide strip (a phone), and magnified 4x for the eye                                |
 | `sheets/<batch>.scale.png`, `-x4`       | every skin as a 2 x 2 run on the rock at 85, 40 and 22 px a tile; `-x4-gray` and `-x4-deutan` are the blind copies           |
-| `sheets/<batch>.distinct.json`          | per skin at 22 px: mean colour, luma, hue and rock contrast; per pair: colour, deuteranopia, luma and texture distances      |
+| `sheets/<batch>.distinct.json`          | per skin at 22 px: mean colour, luma, hue and rock contrast; per pair (and against the planet's earlier batches): distances  |
+| `sheets/p<n>.scale.png`, `-x4`          | every skin of planet n so far, in slot order, as in `<batch>.scale`: written by each batch after the planet's first          |
 | `skin_layers.py`                        | plain Python: the table and species rows, the palette ramp rule, the batches and the cell table writer                       |
 | `layer_art.py`, `author_skin_layers.py` | Blender: one recipe per layer id (a layer with no recipe fails), and the authoring of sources and renders                    |
 | `skin_post.py`                          | python3 (Pillow, numpy): the cells, the vein rims, the composites, the sheets and the distinctness report                    |
@@ -85,7 +122,7 @@ cell, rimmed in the shadow end so it reads on a base of its own palette.
 ```
 BLENDER_USER_SCRIPTS=/tmp/empty blender -b --factory-startup --python-exit-code 1 \
   -P docs/art/mineral-skins/author_skin_layers.py -- [<kind>/<id> ...]   # sources, renders, skin-layers.json
-python3 docs/art/mineral-skins/skin_post.py p1-b1                         # cells, composites, sheets
+python3 docs/art/mineral-skins/skin_post.py p1-b2                         # cells, composites, sheets
 python3 docs/art/mineral-skins/skin_layers.py ramps p1-b1                 # the palette ramps of a batch's hue slots
 ```
 
@@ -124,6 +161,43 @@ patch and its 4x copy still show. Copper and tin come close only with deuteranop
 the copper's crust of scales and the tin's horizontal beds keep them apart (the largest texture
 distance of the batch). Checked by eye on `p1-b1.phone-x4.png`, `p1-b1.desktop.png` and the
 `p1-b1.scale-x4` copies.
+
+From `sheets/p1-b2.distinct.json`, at 22 px a tile. The first ten pairs are within the batch; the
+rest are the closest pairs against p1-b1's skins (the report holds all 25):
+
+<!-- p1-b2-readings -->
+
+| pair                        | colour apart | deuteranopia apart | luma apart | texture apart |
+| --------------------------- | ------------ | ------------------ | ---------- | ------------- |
+| lead vs nickel              | 0.088        | 0.095              | 0.018      | 0.100         |
+| lead vs amber               | 0.546        | 0.516              | 0.070      | 0.096         |
+| lead vs fluorite            | 0.222        | 0.291              | 0.135      | 0.093         |
+| lead vs gold                | 0.598        | 0.559              | 0.052      | 0.083         |
+| nickel vs amber             | 0.472        | 0.442              | 0.088      | 0.065         |
+| nickel vs fluorite          | 0.289        | 0.368              | 0.153      | 0.081         |
+| nickel vs gold              | 0.512        | 0.467              | 0.034      | 0.056         |
+| amber vs fluorite           | 0.634        | 0.651              | 0.065      | 0.074         |
+| amber vs gold               | 0.192        | 0.207              | 0.122      | 0.063         |
+| fluorite vs gold            | 0.737        | 0.765              | 0.187      | 0.066         |
+| tin vs nickel (least apart) | 0.084        | 0.092              | 0.050      | 0.092         |
+| tin vs lead                 | 0.078        | 0.074              | 0.032      | 0.110         |
+| flint vs lead               | 0.119        | 0.130              | 0.073      | 0.085         |
+| flint vs nickel             | 0.151        | 0.145              | 0.055      | 0.055         |
+| clouded vs nickel           | 0.215        | 0.209              | 0.110      | 0.073         |
+
+<!-- /p1-b2-readings -->
+
+The materials table gives P1 three pale, near-grey hue slots: tin, lead and nickel. Their palettes
+are pinned to those slots, so colour barely separates them, and texture has to. Tin is horizontal
+beds and a plate seam. Lead is staggered blocks with whole faces flashing, the largest texture
+distance of the batch. Nickel is a coarse pepper of dark grit and scattered grains. The nickel's
+grit was made coarser until it still showed at 22 px: at a fine pepper it read as plain pale
+stone beside flint glass. Honey amber and vein gold are the two warm yellows. Amber is darker
+(luma 0.62 against 0.74) and is crossed by dark flow lines and bead trails. Gold is the brightest
+skin on the planet, with pale veinlets and a wire star. Violet fluorite is the only violet. Every
+skin sits above its rock (contrast 1.66 for fluorite to 2.18 for gold). Checked by eye on
+`p1-b2.phone-x4.png`, `p1-b2.desktop.png`, the `p1-b2.scale-x4` copies and `p1.scale-x4.png`
+(P1's ten skins side by side at 85, 40 and 22 px a tile).
 
 Known limits: the cells are unlit tone, so a skin does not turn with the vehicle's lamp (the vein's
 own shading is baked from the stage's fixed headlamp, as the hero sprites are); the earthy sheen

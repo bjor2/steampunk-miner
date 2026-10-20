@@ -37,8 +37,12 @@ PX_PER_M = 256
 # The ramp around the hue slot's colour: the shadow at half its luma, the light halfway to white.
 SHADOW_LUMA_SHARE = 0.5
 LIGHT_LUMA_SHARE = 0.5
-# The batches of #576: a planet's species by roster slot, five a ticket (#592 is P1 slots 1 to 5).
-BATCHES = {'p1-b1': {'pool': 'legacy', 'slots': ('legacy.c1', 'legacy.c2', 'legacy.c3', 'legacy.c4', 'legacy.c5')}}
+# The batches of #576: a planet's species by roster slot, five a ticket (#592 is P1 slots 1 to 5,
+# #593 its slots 6 to 10), named `p<planet>-b<n>`.
+BATCHES = {
+    'p1-b1': {'pool': 'legacy', 'slots': ('legacy.c1', 'legacy.c2', 'legacy.c3', 'legacy.c4', 'legacy.c5')},
+    'p1-b2': {'pool': 'legacy', 'slots': ('legacy.u1', 'legacy.u2', 'legacy.u3', 'legacy.u4', 'legacy.r1')},
+}
 
 
 def load_skins():
@@ -61,6 +65,16 @@ def batch_skins(batch, skins=None, materials=None):
     if missing:
         raise SystemExit('batch %s has no skin row for slot(s) %s' % (batch, ', '.join(missing)))
     return [by_slot[slot] for slot in BATCHES[batch]['slots']]
+
+
+def planet_of(batch):
+    return batch.split('-')[0]
+
+
+def earlier_batches(batch):
+    """The batches of the same planet before this one: the skins it must stand apart from on screen."""
+    names = list(BATCHES)
+    return [name for name in names[:names.index(batch)] if planet_of(name) == planet_of(batch)]
 
 
 # --- the palette ramp ------------------------------------------------------------------------------
