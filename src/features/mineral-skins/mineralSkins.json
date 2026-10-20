@@ -1,0 +1,10 @@
+{
+  "$comment": "The mineral skins of #576 (GD ruling 20 Oct 2026, ticket 591): a species' skin is four layers drawn bottom first, a base texture, a vein or crystal shape, a palette and a sheen, each an id of its layer list below. A skin row names its species (a materials.json id) and one id per layer; no two species of one pool share all four, so no two species on one planet look alike. Look only: no price, gate, income, generation or save reads it. The batch tickets (#592 to #606) add the layers and rows, 15 species per planet on P1 to P5.",
+  "layers": {
+    "base": [],
+    "vein": [],
+    "palette": [],
+    "sheen": []
+  },
+  "skins": []
+}
