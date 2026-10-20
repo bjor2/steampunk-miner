@@ -3,11 +3,14 @@
  * `mineralSkins.json` and refused whole when broken, every problem listed. A skin row names a
  * species of the materials table and one id of each layer list; a species wears at most one skin,
  * and no two species of one pool share all four layers. A planet's species are its pool's
- * (ticket 542), so the pool guard keeps any two species of one planet apart. An empty table loads,
- * so the batch tickets land rows one planet at a time.
+ * (ticket 542), so the pool guard keeps any two species of one planet apart. A palette's body is
+ * the hue slot colour of every species wearing it (ticket 592). An empty table loads, so the batch
+ * tickets land rows one planet at a time.
  */
-import { MATERIALS, type MaterialTable } from '../../materials'
+import type { Rgb } from '../../../systems/render/colour'
+import { hueSlotColourOf, MATERIALS, type MaterialTable } from '../../materials'
 import mineralSkinsFile from '../mineralSkins.json'
+import { rampBodyProblems, type PaletteRamp } from './paletteRamps'
 import {
   SKIN_LAYER_KINDS,
   sharedSkinProblems,
@@ -22,11 +25,14 @@ export interface SkinTable {
   layers: Readonly<Record<SkinLayerKind, readonly string[]>>
   /** Sorted by species id. */
   skins: readonly SkinRow[]
+  /** Each palette id's ramp. */
+  ramps: ReadonlyMap<string, PaletteRamp>
 }
 
-/** What the guards measure skins against: the species and the pool each belongs to. */
+/** What the guards measure skins against: each species' pool and hue slot colour. */
 export interface SkinGuardContext {
   poolBySpecies: ReadonlyMap<string, string>
+  hueColourBySpecies: ReadonlyMap<string, Rgb>
 }
 
 type Raw = Record<string, unknown>
@@ -34,6 +40,7 @@ type Raw = Record<string, unknown>
 export function skinGuardContext(materials: MaterialTable = MATERIALS): SkinGuardContext {
   return {
     poolBySpecies: new Map(materials.materials.map((material) => [material.id, material.pool])),
+    hueColourBySpecies: hueColourBySpeciesOf(materials),
   }
 }
 
@@ -56,6 +63,17 @@ export function loadSkinTable(raw: unknown, context: SkinGuardContext): SkinTabl
   return tableOf(raw as Raw)
 }
 
+/** The materials loader refuses a row naming an unknown hue slot, so every species has its colour. */
+function hueColourBySpeciesOf(materials: MaterialTable): Map<string, Rgb> {
+  const slots = new Map(materials.hueSlots.map((slot) => [slot.id, slot]))
+  return new Map(
+    materials.materials.flatMap((material) => {
+      const slot = slots.get(material.hueSlot)
+      return slot === undefined ? [] : [[material.id, hueSlotColourOf(slot)] as const]
+    }),
+  )
+}
+
 function hasListsOfTable(file: Raw): boolean {
   const layers = (file.layers ?? {}) as Raw
   return Array.isArray(file.skins) && SKIN_LAYER_KINDS.every((kind) => Array.isArray(layers[kind]))
@@ -75,13 +93,16 @@ function crossRowProblems(table: SkinTable, context: SkinGuardContext): string[]
     ...twoSkinProblems(table.skins),
     ...unknownLayerProblems(table),
     ...poolsOf(context).flatMap((pool) => sharedSkinProblemsOfPool(table.skins, pool, context)),
+    ...rampBodyProblems(table.skins, table.ramps, context.hueColourBySpecies),
   ]
 }
 
 function layerListProblems(entries: readonly Raw[], kind: SkinLayerKind): string[] {
   const ids = entries.map((entry) => entry.id)
   return [
-    ...entries.flatMap((entry, at) => layerEntryShapeProblems(entry, `layers.${kind}[${at}]`)),
+    ...entries.flatMap((entry, at) =>
+      layerEntryShapeProblems(entry, kind, `layers.${kind}[${at}]`),
+    ),
     ...ids
       .filter((id, at) => ids.indexOf(id) !== at)
       .map((id) => `layers.${kind} lists ${String(id)} twice`),
@@ -125,11 +146,13 @@ function poolsOf(context: SkinGuardContext): string[] {
 
 function tableOf(file: Raw): SkinTable {
   const layers = file.layers as Record<SkinLayerKind, { id: string }[]>
+  const palettes = layers.palette as { id: string; ramp: PaletteRamp }[]
   return {
     layers: Object.fromEntries(
       SKIN_LAYER_KINDS.map((kind) => [kind, layers[kind].map((entry) => entry.id).sort()]),
     ) as Record<SkinLayerKind, string[]>,
     skins: (file.skins as SkinRow[]).map((row) => ({ ...row })).sort(bySpecies),
+    ramps: new Map(palettes.map((palette) => [palette.id, palette.ramp])),
   }
 }
 

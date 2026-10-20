@@ -1,10 +1,115 @@
 {
-  "$comment": "The mineral skins of #576 (GD ruling 20 Oct 2026, ticket 591): a species' skin is four layers drawn bottom first, a base texture, a vein or crystal shape, a palette and a sheen, each an id of its layer list below. A skin row names its species (a materials.json id) and one id per layer; no two species of one pool share all four, so no two species on one planet look alike. Look only: no price, gate, income, generation or save reads it. The batch tickets (#592 to #606) add the layers and rows, 15 species per planet on P1 to P5.",
+  "$comment": "The mineral skins of #576 (GD ruling 20 Oct 2026, ticket 591): a species' skin is four layers drawn bottom first, a base texture, a vein or crystal shape, a palette and a sheen, each an id of its layer list below. A skin row names its species (a materials.json id) and one id per layer; no two species of one pool share all four, so no two species on one planet look alike. A palette is a ramp of three display colours, shadow, body and light, darkest first; its body is the hue slot colour of the species wearing it (ticket 450), so the skin keeps the hue guards of materials.json. The base, vein and sheen layers are drawn in Blender, one cell each (docs/art/mineral-skins, skin-layers.json). Look only: no price, gate, income, generation or save reads it. The batch tickets (#592 to #606) add the layers and rows, 15 species per planet on P1 to P5; #592 skins P1's slots 1 to 5.",
   "layers": {
-    "base": [],
-    "vein": [],
-    "palette": [],
-    "sheen": []
+    "base": [
+      {
+        "id": "mottled-grain"
+      },
+      {
+        "id": "crusted-scale"
+      },
+      {
+        "id": "banded-seam"
+      },
+      {
+        "id": "clouded-mass"
+      },
+      {
+        "id": "conchoidal-glass"
+      }
+    ],
+    "vein": [
+      {
+        "id": "nugget-cluster"
+      },
+      {
+        "id": "flake-scatter"
+      },
+      {
+        "id": "plate-stack"
+      },
+      {
+        "id": "nodule-bed"
+      },
+      {
+        "id": "shard-spray"
+      }
+    ],
+    "palette": [
+      {
+        "id": "ironstone-umber",
+        "ramp": ["#44412f", "#87825e", "#c3c0ae"]
+      },
+      {
+        "id": "copper-verdigris",
+        "ramp": ["#245d4a", "#49ba94", "#a4dcca"]
+      },
+      {
+        "id": "tin-grey",
+        "ramp": ["#525457", "#a4a9ae", "#d2d4d6"]
+      },
+      {
+        "id": "quartz-milk",
+        "ramp": ["#6d6e6e", "#dadcdd", "#eceeee"]
+      },
+      {
+        "id": "flint-glass",
+        "ramp": ["#586466", "#afc9cc", "#d7e4e6"]
+      }
+    ],
+    "sheen": [
+      {
+        "id": "earthy"
+      },
+      {
+        "id": "submetallic"
+      },
+      {
+        "id": "metallic"
+      },
+      {
+        "id": "waxy"
+      },
+      {
+        "id": "vitreous"
+      }
+    ]
   },
-  "skins": []
+  "skins": [
+    {
+      "species": "ironstone-brassvein",
+      "base": "mottled-grain",
+      "vein": "nugget-cluster",
+      "palette": "ironstone-umber",
+      "sheen": "earthy"
+    },
+    {
+      "species": "shallow-copper-brassvein",
+      "base": "crusted-scale",
+      "vein": "flake-scatter",
+      "palette": "copper-verdigris",
+      "sheen": "submetallic"
+    },
+    {
+      "species": "deep-seam-tin-brassvein",
+      "base": "banded-seam",
+      "vein": "plate-stack",
+      "palette": "tin-grey",
+      "sheen": "metallic"
+    },
+    {
+      "species": "clouded-quartzine",
+      "base": "clouded-mass",
+      "vein": "nodule-bed",
+      "palette": "quartz-milk",
+      "sheen": "waxy"
+    },
+    {
+      "species": "flint-glass-quartzine",
+      "base": "conchoidal-glass",
+      "vein": "shard-spray",
+      "palette": "flint-glass",
+      "sheen": "vitreous"
+    }
+  ]
 }

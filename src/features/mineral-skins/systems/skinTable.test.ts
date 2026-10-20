@@ -1,9 +1,13 @@
 import { describe, expect, it } from 'vitest'
+import { rgbOfHex } from '../../../systems/render/colour'
 import { MATERIALS } from '../../materials'
 import { loadSkinTable, MINERAL_SKINS, skinTableProblems, type SkinGuardContext } from './skinTable'
 
 // The loader guards of ticket 591: a skin row names a species and one id of each layer list, a
-// species wears one skin, and no two species of one pool share all four layers (#576).
+// species wears one skin, and no two species of one pool share all four layers (#576). A palette
+// is a ramp, darkest first, whose body is its species' hue slot colour (ticket 592).
+
+const GREY = '#808080'
 
 const CONTEXT: SkinGuardContext = {
   poolBySpecies: new Map([
@@ -11,12 +15,17 @@ const CONTEXT: SkinGuardContext = {
     ['verdigris-copper', 'legacy'],
     ['far-copper', 'foothold-p3'],
   ]),
+  hueColourBySpecies: new Map(
+    ['ironstone-brassvein', 'verdigris-copper', 'far-copper'].map((id) => [id, rgbOfHex(GREY)]),
+  ),
 }
+
+const UMBER = { id: 'umber', ramp: ['#404040', GREY, '#c0c0c0'] }
 
 const LAYERS = {
   base: [{ id: 'granular' }, { id: 'glassy' }],
   vein: [{ id: 'brass-thread' }],
-  palette: [{ id: 'umber' }],
+  palette: [UMBER],
   sheen: [{ id: 'dull' }, { id: 'waxy' }],
 }
 
@@ -40,7 +49,10 @@ describe('mineral skins table', () => {
 
   it('skins only species of the materials table', () => {
     const species = MATERIALS.materials[0].id
-    const context = { poolBySpecies: new Map([[species, MATERIALS.materials[0].pool]]) }
+    const context = {
+      poolBySpecies: new Map([[species, MATERIALS.materials[0].pool]]),
+      hueColourBySpecies: new Map([[species, rgbOfHex(GREY)]]),
+    }
     expect(skinTableProblems(fileOf([skinRow(species)]), context)).toEqual([])
     expect(skinTableProblems(fileOf([skinRow('no-such-rock')]), CONTEXT)).toEqual([
       'a skin names no-such-rock, which is no species of the materials table',
@@ -90,6 +102,29 @@ describe('mineral skins table', () => {
       'layers.sheen lists dull twice',
       'skins[0].base must be a kebab-case id',
       'skins[0].tint is not a field',
+    ])
+  })
+
+  it('refuses a palette that is not three colours running darkest first', () => {
+    const palettes = [
+      { id: 'umber', ramp: ['#404040', GREY] },
+      { id: 'tin', ramp: ['#c0c0c0', GREY, '#404040'] },
+      { id: 'ash', ramp: ['#404040', GREY, '#c0c0c0'], gloss: 1 },
+      { id: 'rust' },
+    ]
+    expect(skinTableProblems(fileOf([], { ...LAYERS, palette: palettes }), CONTEXT)).toEqual([
+      'layers.palette[0].ramp must be three #rrggbb colours',
+      'layers.palette[1].ramp must run darkest first, shadow, body, light',
+      'layers.palette[2].gloss is not a field',
+      'layers.palette[3].ramp must be three #rrggbb colours',
+    ])
+  })
+
+  it('refuses a palette whose body is not the hue slot colour of the species wearing it', () => {
+    const umber = { id: 'umber', ramp: ['#404040', '#828080', '#c0c0c0'] }
+    const file = fileOf([skinRow('ironstone-brassvein')], { ...LAYERS, palette: [umber] })
+    expect(skinTableProblems(file, CONTEXT)).toEqual([
+      'ironstone-brassvein wears the palette umber, whose body is not its hue slot colour',
     ])
   })
 

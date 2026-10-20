@@ -1,20 +1,24 @@
 /**
- * The schema of `mineralSkins.json` (ticket 591): a layer entry is `{ id }`, a skin row is
- * `{ species, base, vein, palette, sheen }`, every id kebab-case and nothing else. Cross-row rules
- * (known species and layers, one skin per species, no two alike) live in the table.
+ * The schema of `mineralSkins.json` (ticket 591): a layer entry is `{ id }`, a palette's also
+ * carries its `ramp` (ticket 592), a skin row is `{ species, base, vein, palette, sheen }`, every
+ * id kebab-case and nothing else. Cross-row rules (known species and layers, one skin per species,
+ * no two alike, a palette's body on its species' hue slot) live in the table.
  */
-import { SKIN_LAYER_KINDS } from './skinLayers'
+import { rampShapeProblems } from './paletteRamps'
+import { SKIN_LAYER_KINDS, type SkinLayerKind } from './skinLayers'
 
 const KEBAB_ID = /^[a-z][a-z0-9]*(-[a-z0-9]+)*$/
 const LAYER_FIELDS: readonly string[] = ['id']
+const PALETTE_FIELDS: readonly string[] = ['id', 'ramp']
 const SKIN_FIELDS: readonly string[] = ['species', ...SKIN_LAYER_KINDS]
 
 type Raw = Record<string, unknown>
 
-export function layerEntryShapeProblems(entry: Raw, where: string): string[] {
+export function layerEntryShapeProblems(entry: Raw, kind: SkinLayerKind, where: string): string[] {
   return [
     ...(isKebab(entry.id) ? [] : [`${where}.id must be kebab-case`]),
-    ...unknownFieldProblems(entry, LAYER_FIELDS, where),
+    ...(kind === 'palette' ? rampShapeProblems(entry.ramp, `${where}.ramp`) : []),
+    ...unknownFieldProblems(entry, kind === 'palette' ? PALETTE_FIELDS : LAYER_FIELDS, where),
   ]
 }
 

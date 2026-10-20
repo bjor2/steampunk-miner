@@ -28,7 +28,7 @@ function skinRow(species: string, base = 'granular'): SkinRow {
 /** A table literal, past the loader's guards, so the planet check is tried on its own. */
 function tableOf(skins: readonly SkinRow[]): SkinTable {
   const layers = { base: ['glassy', 'granular'], vein: ['brass-thread'], palette: ['umber'] }
-  return { layers: { ...layers, sheen: ['dull'] }, skins }
+  return { layers: { ...layers, sheen: ['dull'] }, skins, ramps: new Map() }
 }
 
 /** A codex stand-in that has met exactly the listed species. */
