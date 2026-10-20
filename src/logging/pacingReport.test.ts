@@ -58,12 +58,23 @@ const upgrade = (tick: number, upgradeId: string, toLevel: number) =>
     statsAfter: {},
   })
 
+/** An event stamped below the surface: the vehicle is out on a dive. */
+const underground = (event: RunEvent): RunEvent => ({ ...event, depthTiles: 30 })
+
+const dockEntry = (tick: number, bay: 'sell' | 'upgrade') =>
+  line(tick, 'dock_entered', { bay, cargoUnits: 0, energy: 0, hull: '1e+2' })
+
+const dockExit = (tick: number, bay: 'sell' | 'upgrade') =>
+  line(tick, 'dock_left', { bay, durationTicks: 0 })
+
 /** A band-2 tile on planet 1 of the seed (#4 thresholds: band 2 starts 8% below the surface). */
 const band2Tile = (tick: number) => line(tick, 'tile_destroyed', { tx: 7, ty: 270, kind: 'ground' })
 
 const onTimeRun = (): RunEvent[] => [
   line(0, 'planet_entered', { planetSeed: 1, generatorVersion: 1, radius: 300 }),
-  line(10 * SECOND, 'dock_left', { bay: 'sell', durationTicks: 0 }),
+  dockExit(10 * SECOND, 'sell'),
+  underground(line(30 * SECOND, 'tile_destroyed', { tx: 7, ty: 290, kind: 'ground' })),
+  dockEntry(50 * SECOND, 'sell'),
   sale(60 * SECOND),
   upgrade(60 * SECOND, 'drill_tip', 1),
   upgrade(200 * SECOND, 'hull', 1),
@@ -176,6 +187,41 @@ describe('pacing report', () => {
   it('alerts, without failing, on a planet done in fewer than 3 trips', () => {
     const report = derivePacingReport(onTimeRun(), WORLD_SEED)
     expect(pacingAlerts(report)).toEqual(['planet 1 took 1 trips, expected 3 to 12'])
+  })
+
+  it('counts one trip for a surface visit that docks at the Sell bay and then the Works', () => {
+    const run = [
+      underground(band2Tile(30 * SECOND)),
+      dockEntry(60 * SECOND, 'sell'),
+      dockExit(70 * SECOND, 'sell'),
+      dockEntry(80 * SECOND, 'upgrade'),
+      dockExit(90 * SECOND, 'upgrade'),
+    ]
+    expect(derivePacingReport(run, WORLD_SEED).tripsByPlanet).toEqual({ '1': 1 })
+  })
+
+  it('counts a trip per dive below the surface, on the planet the vehicle docks at', () => {
+    const run = [
+      underground(band2Tile(30 * SECOND)),
+      dockEntry(60 * SECOND, 'sell'),
+      dockExit(70 * SECOND, 'sell'),
+      underground(band2Tile(100 * SECOND)),
+      dockEntry(130 * SECOND, 'upgrade'),
+      dockExit(140 * SECOND, 'upgrade'),
+      underground(line(200 * SECOND, 'tile_destroyed', { tx: 7, ty: 390, kind: 'ground' }, 2)),
+      line(
+        230 * SECOND,
+        'dock_entered',
+        { bay: 'sell', cargoUnits: 0, energy: 0, hull: '1e+2' },
+        2,
+      ),
+    ]
+    expect(derivePacingReport(run, WORLD_SEED).tripsByPlanet).toEqual({ '1': 2, '2': 1 })
+  })
+
+  it('counts no trip for docking that never left the surface', () => {
+    const run = [dockEntry(5 * SECOND, 'sell'), dockExit(10 * SECOND, 'sell')]
+    expect(derivePacingReport(run, WORLD_SEED).tripsByPlanet).toEqual({})
   })
 
   it('passes each of the three gates for a run that meets every target', () => {

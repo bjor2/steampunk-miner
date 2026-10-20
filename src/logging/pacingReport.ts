@@ -41,12 +41,11 @@ const EARLY_CHECK_TICK = PACING_TARGETS.earlyCheckSeconds * TICKS_PER_SECOND
 
 export function derivePacingReport(events: readonly RunEvent[], worldSeed: number): PacingReport {
   const report = emptyReport()
-  const arrivals: Record<string, number> = {}
-  const earlyTracks = new Set<string>()
+  const context = emptyFoldContext(worldSeed)
   for (const event of events) {
-    foldPacingEvent(report, event, { worldSeed, arrivals, earlyTracks })
+    foldPacingEvent(report, event, context)
   }
-  report.tracksByEarlyCheck = earlyTracks.size
+  report.tracksByEarlyCheck = context.earlyTracks.size
   countPurchaseChains(report, derivePurchaseChains(events))
   return report
 }
@@ -55,6 +54,12 @@ interface FoldContext {
   worldSeed: number
   arrivals: Record<string, number>
   earlyTracks: Set<string>
+  /** Whether an event since the last dock entry was stamped below the surface (ticket 574). */
+  hasLeftSurface: boolean
+}
+
+function emptyFoldContext(worldSeed: number): FoldContext {
+  return { worldSeed, arrivals: {}, earlyTracks: new Set(), hasLeftSurface: false }
 }
 
 function emptyReport(): PacingReport {
@@ -82,6 +87,11 @@ function countPurchaseChains(report: PacingReport, chains: readonly PurchaseChai
 
 function foldPacingEvent(report: PacingReport, event: RunEvent, context: FoldContext): void {
   PACING_FOLDS[event.event]?.(report, event as never, context)
+  noteSurfaceLeft(event, context)
+}
+
+function noteSurfaceLeft({ depthTiles }: RunEvent, context: FoldContext): void {
+  if (depthTiles > 0) context.hasLeftSurface = true
 }
 
 type PacingFold<N extends RunEventName> = (
@@ -121,7 +131,11 @@ const PACING_FOLDS: { readonly [N in RunEventName]?: PacingFold<N> } = {
     report.coreTicksOnPlanet[key] ??= tick - (arrivals[key] ?? 0)
     report.sliceEndTick = tick
   },
-  dock_left: (report, { planet }) => {
+  // One surface visit docks at the Sell bay and the Works, so a trip is the first dock entry
+  // after the vehicle went below the surface, never each dock (ticket 574).
+  dock_entered: (report, { planet }, context) => {
+    if (!context.hasLeftSurface) return
+    context.hasLeftSurface = false
     report.tripsByPlanet[String(planet)] = (report.tripsByPlanet[String(planet)] ?? 0) + 1
   },
   rescue_triggered: (report, { data }) => {

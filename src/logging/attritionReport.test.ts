@@ -40,15 +40,20 @@ interface PlanetPlay {
   deaths: number
 }
 
+/** A dive below the surface and the dock entry that ends it: one trip (ticket 574). */
+function tripOn(planet: number, tick: number): RunEvent[] {
+  const dug = line('tile_destroyed', { tx: 0, ty: 0, kind: 'ground' }, planet, tick)
+  const docked = { bay: 'sell', cargoUnits: 0, energy: 0, hull: '1e+2' } as const
+  return [{ ...dug, depthTiles: 30 }, line('dock_entered', docked, planet, tick)]
+}
+
 function playedOn({ planet, arrivedMinute, coreMinutes, trips, deaths }: PlanetPlay): RunEvent[] {
   const arrived = arrivedMinute * MINUTE
   const entered = { planetSeed: 1, generatorVersion: 5, radius: 700 }
   const destroyed = { cause: 'enemy', kind: 'crawler', tier: 9, arc: 'front' }
   return [
     line('planet_entered', entered, planet, arrived),
-    ...Array.from({ length: trips }, () =>
-      line('dock_left', { bay: 'sell', durationTicks: 1 }, planet, arrived),
-    ),
+    ...Array.from({ length: trips }, () => tripOn(planet, arrived)).flat(),
     ...Array.from({ length: deaths }, () => line('vehicle_destroyed', destroyed, planet, arrived)),
     ...(coreMinutes === null
       ? []
