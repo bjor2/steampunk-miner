@@ -1,9 +1,9 @@
 {
-  "updated_at": "2026-10-19T20:43:09+02:00",
+  "updated_at": "2026-10-20T02:43:49+02:00",
   "caps": {
     "grok": 12,
     "claude": 10,
-    "claude_enabled": 10,
+    "claude_enabled": 6,
     "dev": 8,
     "planner": 4,
     "gate": 3,
@@ -76,12 +76,12 @@
       "id": "A2",
       "account": 2,
       "label": "Claude Max 2",
-      "enabled": true,
-      "reason": "signed in",
+      "enabled": false,
+      "reason": "signed in, but the claude -p ping failed",
       "slots": [
         {
           "slot": "C7",
-          "state": "free",
+          "state": "disabled",
           "ticket": null,
           "grok_slot": null,
           "kind": null,
@@ -89,7 +89,7 @@
         },
         {
           "slot": "C8",
-          "state": "free",
+          "state": "disabled",
           "ticket": null,
           "grok_slot": null,
           "kind": null,
@@ -97,7 +97,7 @@
         },
         {
           "slot": "C9",
-          "state": "free",
+          "state": "disabled",
           "ticket": null,
           "grok_slot": null,
           "kind": null,
@@ -105,7 +105,7 @@
         },
         {
           "slot": "C10",
-          "state": "free",
+          "state": "disabled",
           "ticket": null,
           "grok_slot": null,
           "kind": null,
@@ -114,7 +114,7 @@
       ],
       "size": 4,
       "used": 0,
-      "free": 4,
+      "free": 0,
       "claims_last_hour": 0,
       "name": "Claude Max 2"
     }
@@ -263,34 +263,38 @@
     },
     {
       "slot": 7,
-      "state": "free",
+      "state": "disabled",
       "ticket": null,
       "grok_slot": null,
       "since": null,
+      "reason": "signed in, but the claude -p ping failed",
       "account": 2
     },
     {
       "slot": 8,
-      "state": "free",
+      "state": "disabled",
       "ticket": null,
       "grok_slot": null,
       "since": null,
+      "reason": "signed in, but the claude -p ping failed",
       "account": 2
     },
     {
       "slot": 9,
-      "state": "free",
+      "state": "disabled",
       "ticket": null,
       "grok_slot": null,
       "since": null,
+      "reason": "signed in, but the claude -p ping failed",
       "account": 2
     },
     {
       "slot": 10,
-      "state": "free",
+      "state": "disabled",
       "ticket": null,
       "grok_slot": null,
       "since": null,
+      "reason": "signed in, but the claude -p ping failed",
       "account": 2
     }
   ],
@@ -312,9 +316,9 @@
     },
     "claude": {
       "size": 10,
-      "enabled": 10,
+      "enabled": 6,
       "used": 0,
-      "free": 10,
+      "free": 6,
       "external": 0
     }
   },
