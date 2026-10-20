@@ -3,9 +3,9 @@ The outline check of the hull rig-look parts (ticket 584, #576 rules: a look sta
 rig outline and never changes collision or the hitbox). It rasterises the silhouette in the game's
 front view (X right, Z up) of the rig at rest, at tiers 1 and 3, on a 4 mm grid, and of each look
 standing on the `hull.plates` slot, and writes outline.json: the cells of each look outside the
-rig's silhouette (must be none) and, for the base look, the cells by which it differs from the
-pod fittings it reproduces, the rig's own bands and porthole (must be none: below the first step
-the rig is as it is). It exits 1 on either.
+rig's silhouette (must be none) and, for the base look, the cells it adds to the pod fitting it
+reproduces, the rig's own porthole (must be none: below the first step the rig is as it is). It
+exits 1 on either.
 
     blender -b --factory-startup --python-exit-code 1 -P docs/art/rig-look-hull/check_outline.py
 
@@ -80,8 +80,8 @@ def rig_silhouette(tier):
 
 
 def pod_fittings_silhouette():
-    """The tier-1 chassis's cells inside the base window: the bands and porthole are the pod's own
-    skin, so the base look can add no cell to them."""
+    """The tier-1 chassis's cells inside the base window: the porthole is the pod's own skin, so
+    the base look can add no cell to it."""
     driller.stage_vehicle(1)
     mask = grid.silhouette_of([bpy.data.objects['t1-chassis']])
     window = grid.np.zeros_like(mask)
@@ -102,7 +102,7 @@ def problems_in(table, report):
         problems += ['%s has %d cells outside the %s rig' % (part, cells, tier)
                      for tier, cells in entry['outsideRig'].items() if cells]
         if entry.get('addsToPod'):
-            problems.append('%s adds %d cells to the pod\'s own bands and porthole' % (part, entry['addsToPod']))
+            problems.append('%s adds %d cells to the pod\'s own porthole' % (part, entry['addsToPod']))
     return problems
 
 
@@ -110,7 +110,7 @@ def report_about(table, report):
     return {
         'about': 'Ticket 584: silhouette cells of each hull look on %s, on a %g mm grid, outside the rig at '
                  'rest at tiers %s, and, for the base look, the cells it adds to the tier-1 pod\'s own skin '
-                 'inside the window %s (its bands and porthole); written by check_outline.py. '
+                 'inside the window %s (its porthole); written by check_outline.py. '
                  '`outsideRig` must be all zero; the base look\'s `addsToPod` must be zero.'
                  % (table['attach'], grid.CELL_M * 1000, ' and '.join(str(tier) for tier in RIG_TIERS),
                     list(BASE_WINDOW_M)),

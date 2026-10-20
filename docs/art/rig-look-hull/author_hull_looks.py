@@ -23,7 +23,7 @@ opening round the driver's porthole, and two brass lifting eyes on the deck line
 
 | Part                   | Step (purchases) | Look                                                                 |
 | ---------------------- | ---------------- | -------------------------------------------------------------------- |
-| `bronze-pod`           | 0, the default   | the pod's own bands and porthole, piece for piece (the rig as it is) |
+| `bronze-pod`           | 0, the default   | the pod's own porthole, piece for piece (the rig as it is)           |
 | `riveted-plate`        | 20               | warm grey iron plates, brass rivets round every plate                |
 | `banded-iron`          | 80               | dark iron plates under polished iron straps, steel studs             |
 | `brass-trimmed-armour` | 140              | pale steel plates edged in brass, a brass boss on each, brass frame  |
@@ -31,8 +31,8 @@ opening round the driver's porthole, and two brass lifting eyes on the deck line
 | `filigree-armour`      | 440              | guild-green enamel under a brass bead-and-bar filigree, teal gems    |
 
 Every look stays inside the pod's silhouette (check_outline.py proves it against the whole rig),
-so the swap never grows the rig outline; the filigree's gems are the one glow, under half the
-drill nose's, so the nose stays the brightest part (#576 rules).
+so the swap never grows the rig outline; the filigree's gems are the one glow, under a fifth of
+the drill nose's, so the nose stays the brightest part (#576 rules).
 """
 
 import json
@@ -40,7 +40,6 @@ import math
 import os
 import sys
 
-import bmesh
 import bpy
 
 HERE = os.path.dirname(os.path.abspath(__file__))
@@ -59,7 +58,7 @@ LOOKS_TABLE = os.path.join(HERE, 'hullLooks.json')
 kit.PALETTE.update({
     'blued-steel': ((0.20, 0.24, 0.32), 0.45, 0.0),
     'guild-enamel': ((0.10, 0.22, 0.20), 0.35, 0.0),
-    'gem-glow': ((0.55, 0.95, 0.90), 0.15, 0.6),
+    'gem-glow': ((0.55, 0.95, 0.90), 0.15, 0.3),
 })
 
 # The pod's axis against the `hull.plates` slot (vehicle.parts.json: the chassis at (0, -0.07),
@@ -90,10 +89,6 @@ EYE_POST_DZ_ARMOUR = 0.1725
 EYE_POST_DZ_HIDDEN = 0.19
 EYE_Y_PROUD = -0.19
 EYE_Y_HIDDEN = -0.15
-# The base look's copies of the pod's bands keep their camera-side face between the keel's
-# rivets and the dome's base plate, where the pod's own bands show.
-BAND_XS = (-0.22, 0.0, 0.2)
-BAND_DZ = (-0.10, 0.17)
 # The platform's 15 mm bevel would round a 1 cm trim away; vehicle-scale parts take 4 mm.
 BEVEL_M = driller.BEVEL_M
 
@@ -227,38 +222,17 @@ def lifting_eyes(y, post_dz):
     return pieces
 
 
-def cut(piece, plane_co, plane_no):
-    """Keeps the side of the plane its normal points to (author_casing_driller.dome's cut)."""
-    mesh = bmesh.new()
-    mesh.from_mesh(piece.data)
-    geometry = mesh.verts[:] + mesh.edges[:] + mesh.faces[:]
-    bmesh.ops.bisect_plane(mesh, geom=geometry, plane_co=plane_co, plane_no=plane_no, clear_inner=True)
-    mesh.to_mesh(piece.data)
-    mesh.free()
-    return piece
-
-
 # --- the bronze pod (the default look) -----------------------------------------------------------
 
 
 def bronze_pod_pieces():
-    """The pod's own brass bands and porthole (author_casing_driller.chassis_pieces), half a
-    millimetre proud so the copy does not fight the pod's skin: below the first step the rig is
-    as it is. The bands keep the face that shows, between the keel and the dome plate."""
-    pieces = [band_face(x) for x in BAND_XS]
-    pieces += [driller.rivet(x, driller.hull_front_y(dz, 0.008) - 0.004, dz)
-               for x in BAND_XS for dz in stepped(-0.06, 0.12, 0.06)]
-    pieces += driller.porthole_pieces(0.08, 0.02)
+    """The pod's own porthole (author_casing_driller.porthole_pieces, the same at every tier),
+    half a millimetre proud so the copy does not fight the pod's skin: below the first step the
+    rig is as it is, and the part exists so the asset has one look per step of the table."""
+    pieces = driller.porthole_pieces(0.08, 0.02)
     for piece in pieces:
         piece.location.y -= 0.0005
     return pieces + lifting_eyes(EYE_Y_HIDDEN, EYE_POST_DZ_HIDDEN)
-
-
-def band_face(x):
-    band = driller.flat_cylinder_x('brass', HULL_RADIUS + 0.008, 0.03, (x, 0.0, 0.0), driller.HULL_DEPTH_SHARE)
-    cut(band, (0.0, 0.0, 0.0), (0.0, -1.0, 0.0))
-    cut(band, (0.0, 0.0, BAND_DZ[0]), (0.0, 0.0, 1.0))
-    return cut(band, (0.0, 0.0, BAND_DZ[1]), (0.0, 0.0, -1.0))
 
 
 # --- riveted plate (20) --------------------------------------------------------------------------

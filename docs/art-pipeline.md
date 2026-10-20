@@ -605,6 +605,24 @@ wiring (#583) swaps the part on the slot and runs the tail above the step.
 then on it is the source. The part table, the outline check and the review renders, at desktop and
 at a 360 px phone's size, are in [docs/art/rig-look-boiler/](art/rig-look-boiler/README.md).
 
+## Rig-look parts: the hull
+
+The art half of the hull line of the rig look ladder
+([#576](https://github.com/bjor2/steampunk-miner/issues/576), built by
+[#584](https://github.com/bjor2/steampunk-miner/issues/584)): a Blender source for the five look
+steps of the `hull` track, `art/blender/vehicle-look-hull/`, with the base look beside them. Each
+part is authored with the track's attach slot, `hull.plates`, at the origin, on the deck line
+0.21 m above the pod's axis, and is plating over the pod's camera-side skin: three rows of facets
+tangent to its cross-section, a hatch opening round the porthole, two brass lifting eyes at the
+slot. No rig part sits on the slot, so a look lies over the pod rather than replacing a part;
+`bronze-pod` is the pod's own bands and porthole piece for piece, the five armours the steps at
+20, 80, 140, 260 and 440 purchases. Nothing registers or draws it yet: the per-track registry
+(#577) names the asset from the track id and the wiring (#585) swaps the part on the slot and runs
+the tail above the top step. `docs/art/rig-look-hull/author_hull_looks.py` wrote the first version
+of the `.blend`; from then on it is the source. The part table, the outline check and the review
+renders, at desktop and at a 360 px phone's size, are in
+[docs/art/rig-look-hull/](art/rig-look-hull/README.md).
+
 ## The `parts.json` sidecar, schema 1
 
 ```json
