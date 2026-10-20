@@ -1,7 +1,8 @@
 /**
  * The debug flag panel drawn from its view model (ticket 549, the TD ruling on #547): every flag
- * of the metadata table, Client and Authority apart, in the shared scroll area; the run's mark;
- * Reset to the shipped defaults and Close. Flags only, never numbers (VS 6). Markup only.
+ * of the metadata table, Client and Authority apart, in the shared scroll area, then the material
+ * pop prototype's A/B switch (ticket 614); the run's mark; Reset to the shipped defaults and
+ * Close. Flags only, never numbers (VS 6). Markup only.
  */
 import type { DevFlagPanelGroup, DevFlagPanelModel } from '../../systems/devFlags/devFlagPanelModel'
 import { useGameStore } from '../../store/gameStore'
@@ -11,6 +12,7 @@ import { TitleOneLine } from '../kit/TitleOneLine'
 import { DEBUG_UI_IDS } from './debugUiIds'
 import styles from './DevFlagPanel.module.css'
 import { DevFlagRowView } from './DevFlagRowView'
+import { MaterialPopSwitch } from './MaterialPopSwitch'
 
 const PANEL_TEXT = {
   id: 'debug.flag-panel',
@@ -30,6 +32,7 @@ export function DevFlagPanelView({ model }: { model: DevFlagPanelModel }) {
           {model.groups.map((group) => (
             <FlagGroup key={group.scope} group={group} />
           ))}
+          <MaterialPopSwitch />
         </ScrollArea>
         <RunMark isRunMarked={model.isRunMarked} />
         <div className={styles.footer}>

@@ -79,6 +79,7 @@ export async function startGame(): Promise<void> {
   logPerfOnTestRuns(shell, run)
   keepSnapshotsOnDebugRuns(shell, run.runId)
   recordGameStarted(shell)
+  startMaterialPopMode(shell)
   installSaveFolder(saveFolderInstallOf(shell))
   keepSavesOnThisDevice(shell)
   await adoptLocalPreferences(shell)
@@ -150,6 +151,11 @@ function recordGameStarted(shell: Shell): void {
     platform: shell.kind,
     debug: shell.launch.debugEnabled,
   })
+}
+
+/** The session's material pop mode, from the URL or A (ticket 614), logged right after the start. */
+function startMaterialPopMode(shell: Shell): void {
+  useGameStore.getState().startMaterialPopMode(shell.launch.materialPopMode)
 }
 
 /**

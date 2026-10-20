@@ -114,6 +114,12 @@ import {
   type DevFlagPanelActions,
   type DevFlagPanelValues,
 } from './devFlagPanelSlice'
+import {
+  materialPopActionsOf,
+  STARTING_MATERIAL_POP,
+  type MaterialPopActions,
+  type MaterialPopValues,
+} from './materialPopSlice'
 import { forgetMusicStingers, recordMusicStingers } from './musicStingerRecord'
 import { platformReplicaOf, type PlatformReplica } from './platformReplica'
 import {
@@ -188,7 +194,9 @@ export interface GameState
     DevFlagValues,
     DevFlagActions,
     DevFlagPanelValues,
-    DevFlagPanelActions {
+    DevFlagPanelActions,
+    MaterialPopValues,
+    MaterialPopActions {
   playerId: string
   planetTier: number
   planetSeed: number
@@ -288,6 +296,7 @@ type GameValues = Pick<
   | keyof SaveKeepingValues
   | keyof DevFlagValues
   | keyof DevFlagPanelValues
+  | keyof MaterialPopValues
   | 'travelTransition'
 >
 
@@ -316,6 +325,7 @@ export const STARTING_VALUES: GameValues = {
   ...STARTING_SAVE_KEEPING,
   ...STARTING_DEV_FLAGS,
   ...STARTING_DEV_FLAG_PANEL,
+  ...STARTING_MATERIAL_POP,
   travelTransition: null,
 }
 
@@ -340,6 +350,7 @@ export const useGameStore = create<GameState>()((set, get) => ({
   ...saveKeepingActionsOf(set, get),
   ...devFlagActionsOf(set, get),
   ...devFlagPanelActionsOf(set, get),
+  ...materialPopActionsOf(set, get),
 
   setPlanet: (planetTier) => {
     refuseProblems(startScenarioProblems({ planetTier }))

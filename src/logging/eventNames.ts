@@ -17,6 +17,10 @@
  * which `registeredEventOf` asks for any name this table does not hold.
  */
 import type { FieldKind, PayloadFields, PayloadOf } from './eventFields'
+import {
+  MATERIAL_POP_MODES,
+  MATERIAL_POP_MODE_SOURCES,
+} from '../systems/materialPop/materialPopMode'
 import { SAVE_FAILURE_CAUSES } from '../systems/save/saveWriteFailure'
 import { sliceRunEventOf } from './registries/runEvents'
 
@@ -91,6 +95,16 @@ export const RUN_EVENT_REGISTRY = {
     group: 'run',
     level: 'detail',
     payload: { type: 'text', reason: 'text', chain: { optional: 'integer' } },
+  },
+  // Ticket 614: the material pop prototype's mode (#442), at the session's start and at every
+  // switch, so a run's lines say which pop the player saw. Presentation, never in the digest.
+  material_pop_mode_set: {
+    group: 'run',
+    level: 'core',
+    payload: {
+      mode: { oneOf: MATERIAL_POP_MODES },
+      source: { oneOf: MATERIAL_POP_MODE_SOURCES },
+    },
   },
   // #58: an onboarding hint went up, once per id; presentation, never part of the digest.
   hint_shown: { group: 'run', level: 'core', payload: { hintId: 'text' } },

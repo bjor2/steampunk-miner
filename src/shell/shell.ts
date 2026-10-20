@@ -11,6 +11,7 @@ import type {
   SaveFolderName,
   StoredSaveSlot,
 } from '../../electron/bridgeContract.cts'
+import type { MaterialPopMode } from '../systems/materialPop/materialPopMode'
 import type { PadReading } from '../systems/input/padFrame'
 import type { ScreenReading } from '../systems/views/screenLayout'
 import { createBrowserShell } from './browserShell'
@@ -37,6 +38,11 @@ export interface LaunchParameters {
    * reads no URL: false.
    */
   isNoFlagsAsked: boolean
+  /**
+   * `?pop=A` or `?pop=B` (ticket 614): the material pop prototype's mode for this session; null
+   * when the URL asks none (or Electron, which reads no URL), so the session starts on A.
+   */
+  materialPopMode: MaterialPopMode | null
 }
 
 /** One key going down or up (`KeyboardEvent.code`, e.g. "KeyA"), as the input layer reads it. */

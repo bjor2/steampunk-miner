@@ -148,7 +148,8 @@ programs }` from three's `renderer.info` of the game canvas), read only when cal
   the drill voice (`drillVoice`: `casing` while the drill's nose is in lining, #41), and
   changes local presentation only: no command, no log line, no `debugApplied` (#11 amendment 2,
   #33). The exception is `ui.setDevFlags(flags)` (ticket 548), which sends a logged
-  `debug.setFlags` and marks the run; `ui.getDevFlags()` is its unlogged read. The `input` namespace (`input.press/release/tap(actionId)`, `input.getBindings()`,
+  `debug.setFlags` and marks the run; `ui.getDevFlags()` is its unlogged read; and
+  `ui.setMaterialPopMode(mode)` (ticket 614), logged as `material_pop_mode_set`. The `input` namespace (`input.press/release/tap(actionId)`, `input.getBindings()`,
   `input.setBindings(overrides)`, the unlogged read `input.getActionStream()`: every action
   pressed and held one released, oldest first, from keys, touches, the pad and the API alike, #173,
   and `input.padFrame(frame | null)` / `input.getPadAim()`: a polled gamepad frame as the shell hands
@@ -794,6 +795,13 @@ incomePerHour}` go to `balance-report/drill-pace.ndjson`, which `pushTestMetrics
   version label 1.5 s on both phones (a `pointerdown`/`pointerup` pair, since `tap()` cannot
   hold), toggles, reloads, resets, checks a player's launch ignores a stored override, and opens
   the panel from `?debug&title` with a tap.
+- **The material pop A/B switch** (ticket 614, #442): `src/systems/materialPop/materialPopMode.test.ts`
+  reads `?pop=` (A by default); `src/store/materialPopSlice.test.ts` starts a session on A or the
+  URL's mode, switches it live, logs every start and switch as `material_pop_mode_set` and leaves
+  the session snapshot and `debugApplied` as they were. Specs switch it with
+  `ui.setMaterialPopMode('A' | 'B')` (logged, never a command, never marks the run) and read it with
+  `ui.getMaterialPopMode()`; `e2e/browser/materialPop.spec.ts` covers the URL, the panel switch,
+  the lines and a reload starting on A again.
 - **Known red** (ticket 419, the TD on #396 section 2): `CAMPAIGN_PACING_KNOWN_RED`
   (`src/constants/knownRed.ts`) is the one exported known-red marker in the repo (lanes and specs
   keep local ones with a ruling, as `subStepFloor.test.ts` kept #558's until ticket 558): one gate

@@ -310,6 +310,17 @@
       "specs": ["e2e/browser/mobile/devFlagPanel.spec.ts", "e2e/browser/devFlags.spec.ts"]
     },
     {
+      "why": "The material pop A/B switch (ticket 614): its mode rule, store slice, debug API, the panel's switch and the URL's ?pop=.",
+      "paths": [
+        "src/systems/materialPop/**",
+        "src/store/materialPopSlice.ts",
+        "src/debug/debugMaterialPop.ts",
+        "src/ui/debug/**",
+        "src/shell/launchParameters.ts"
+      ],
+      "specs": ["e2e/browser/materialPop.spec.ts"]
+    },
+    {
       "why": "The pause menu's manual save (ticket 404): its slice, view, model, debug reads, the slot writer and the title menu's Continue that loads it back.",
       "paths": [
         "src/store/pauseMenuSlice.ts",

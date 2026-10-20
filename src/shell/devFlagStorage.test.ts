@@ -18,6 +18,7 @@ const PLAYER_LAUNCH: LaunchParameters = {
   scenarioText: null,
   isTitleMenuShown: true,
   isNoFlagsAsked: false,
+  materialPopMode: null,
 }
 
 function browserWithOverride() {

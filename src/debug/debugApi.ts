@@ -87,6 +87,7 @@ import {
 } from './debugScreens'
 import { debugActionsBySlice, type SliceDebugActions } from './debugActionRegistry'
 import { createDebugDevFlags, type DebugDevFlags } from './debugDevFlags'
+import { createDebugMaterialPop, type DebugMaterialPop } from './debugMaterialPop'
 import { createDebugSaves, type DebugSaves } from './debugSaves'
 import {
   pauseLiveGame,
@@ -256,9 +257,10 @@ export interface DebugApi {
   exportSnapshots(): Promise<DebugResult<SnapshotExport>>
   /**
    * Screens and presentation settings (#33): no command, no log line, never `debugApplied`; and
-   * the dev flags (ticket 548), whose `setDevFlags` sends a logged `debug.setFlags`.
+   * the dev flags (ticket 548), whose `setDevFlags` sends a logged `debug.setFlags`; and the
+   * material pop switch (ticket 614), logged as `material_pop_mode_set`.
    */
-  ui: DebugUi & DebugDevFlags
+  ui: DebugUi & DebugDevFlags & DebugMaterialPop
   /** The save slots (ticket 404): the index as the menus read it; an unlogged read. */
   saves: DebugSaves
   /** Actions pressed at the action layer (#33): their commands are ordinary play. */
@@ -462,7 +464,7 @@ export function createDebugApi(): DebugApi {
     collapseState: () => ({ ok: true, ...readCollapseReport() }),
     getPhysicsStats: readPhysicsStats,
     exportSnapshots: exportSnapshotZip,
-    ui: { ...createDebugUi(), ...createDebugDevFlags() },
+    ui: { ...createDebugUi(), ...createDebugDevFlags(), ...createDebugMaterialPop() },
     saves: createDebugSaves(),
     input: createDebugInput(),
     features: debugActionsBySlice(),

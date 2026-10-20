@@ -2,7 +2,8 @@
  * How the game was launched (decision #11 section 6). Browser API, so it lives in the shell.
  *
  * - Dev server: the debug API is on (`import.meta.env.DEV`).
- * - Plain browser: `?debug`, `?scenario=`, `?title` and `?noflags` (ticket 548) on the URL, read once.
+ * - Plain browser: `?debug`, `?scenario=`, `?title`, `?noflags` (ticket 548) and
+ *   `?pop=` (ticket 614) on the URL, read once.
  * - Electron: the URL is ignored; the main process says whether `--debug-api` was given and hands
  *   over a `--scenario=<path>` file's text.
  *
@@ -10,6 +11,7 @@
  * dev server opens on it too, as nobody asked there. `?title` brings it back on a debug launch.
  */
 import type { ShellLaunch } from '../../electron/bridgeContract.cts'
+import { materialPopModeOfParam } from '../systems/materialPop/materialPopMode'
 import type { LaunchParameters } from './shell'
 
 export function readBrowserLaunchParameters(): LaunchParameters {
@@ -24,6 +26,7 @@ export function readBrowserLaunchParameters(): LaunchParameters {
       scenarioText,
     }),
     isNoFlagsAsked: params.has('noflags'),
+    materialPopMode: materialPopModeOfParam(params.get('pop')),
   }
 }
 
@@ -37,6 +40,7 @@ export function readElectronLaunchParameters(launch: ShellLaunch): LaunchParamet
       scenarioText: launch.scenarioText,
     }),
     isNoFlagsAsked: false,
+    materialPopMode: null,
   }
 }
 

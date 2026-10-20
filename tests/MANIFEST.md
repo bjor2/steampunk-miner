@@ -905,6 +905,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/debug/debugHudLayout.test.ts` | 5 | 5 |
 | `src/debug/debugLining.test.ts` | 4 | 4 |
 | `src/debug/debugLiveTime.test.ts` | 3 | 3 |
+| `src/debug/debugMaterialPop.test.ts` | 3 | 3 |
 | `src/debug/debugMemory.test.ts` | 4 | 4 |
 | `src/debug/debugOverlay.test.ts` | 2 | 2 |
 | `src/debug/debugSaves.test.ts` | 5 | 5 |
@@ -1072,6 +1073,12 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/logging/tripCellEnergy.lane.test.ts` | 1 | 1 |
 | `src/logging/tripCellEnergy.test.ts` | 2 | 2 |
 | `src/logging/wreckerDiveReport.test.ts` | 6 | 6 |
+
+### `materialPop`
+
+| File | Tests | Sites |
+| --- | --- | --- |
+| `src/systems/materialPop/materialPopMode.test.ts` | 3 | 3 |
 
 ### `pacing-bot`
 
@@ -1345,6 +1352,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/store/hintSlice.test.ts` | 15 | 15 |
 | `src/store/inputRuntime.test.ts` | 51 | 51 |
 | `src/store/liveStepSlice.test.ts` | 22 | 22 |
+| `src/store/materialPopSlice.test.ts` | 4 | 4 |
 | `src/store/padRuntime.test.ts` | 16 | 14 |
 | `src/store/partInstall.test.ts` | 5 | 5 |
 | `src/store/pauseMenuSlice.test.ts` | 11 | 11 |
