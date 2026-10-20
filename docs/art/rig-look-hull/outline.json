@@ -1,0 +1,48 @@
+{
+  "about": "Ticket 584: silhouette cells of each hull look on hull.plates, on a 4 mm grid, outside the rig at rest at tiers 1 and 3, and, for the base look, the cells it adds to the tier-1 pod's own skin inside the window [-0.25, -0.2, 0.25, 0.1] (its bands and porthole); written by check_outline.py. `outsideRig` must be all zero; the base look's `addsToPod` must be zero.",
+  "looks": {
+    "bronze-pod": {
+      "cells": 2376,
+      "outsideRig": {
+        "tier-1": 0,
+        "tier-3": 0
+      },
+      "addsToPod": 0
+    },
+    "riveted-plate": {
+      "cells": 5132,
+      "outsideRig": {
+        "tier-1": 0,
+        "tier-3": 0
+      }
+    },
+    "banded-iron": {
+      "cells": 5672,
+      "outsideRig": {
+        "tier-1": 0,
+        "tier-3": 0
+      }
+    },
+    "brass-trimmed-armour": {
+      "cells": 5713,
+      "outsideRig": {
+        "tier-1": 0,
+        "tier-3": 0
+      }
+    },
+    "layered-armour": {
+      "cells": 5599,
+      "outsideRig": {
+        "tier-1": 0,
+        "tier-3": 0
+      }
+    },
+    "filigree-armour": {
+      "cells": 5762,
+      "outsideRig": {
+        "tier-1": 0,
+        "tier-3": 0
+      }
+    }
+  }
+}

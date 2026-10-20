@@ -1,0 +1,43 @@
+{
+  "about": "The hull track's rig-look parts (ticket 584, wave 576-1B of the rig look ladder #576): one asset at the track's attach slot, one part per look step and the base look beside them. The thresholds are Systems' table (#157, comment 6300543785) in the model's hull counter, which the registry (#577) maps to `levels.hull` purchases, and the names Progression's (comment 6300549964); the wiring (#585) reads them from the rig-look registry, not from here.",
+  "assetId": "vehicle-look-hull",
+  "track": "hull",
+  "attach": "hull.plates",
+  "z": 5,
+  "replaces": null,
+  "footprintM": [-0.24, -0.13, 0.24, 0.15],
+  "looks": [
+    {
+      "part": "bronze-pod",
+      "name": "Bronze pod",
+      "purchases": 0,
+      "unnamedDefault": true,
+      "z": 2
+    },
+    {
+      "part": "riveted-plate",
+      "name": "Riveted plate",
+      "purchases": 20
+    },
+    {
+      "part": "banded-iron",
+      "name": "Banded iron",
+      "purchases": 80
+    },
+    {
+      "part": "brass-trimmed-armour",
+      "name": "Brass-trimmed armour",
+      "purchases": 140
+    },
+    {
+      "part": "layered-armour",
+      "name": "Layered armour",
+      "purchases": 260
+    },
+    {
+      "part": "filigree-armour",
+      "name": "Filigree armour",
+      "purchases": 440
+    }
+  ]
+}
