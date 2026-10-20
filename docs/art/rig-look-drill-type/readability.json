@@ -1,0 +1,153 @@
+{
+  "about": "Ticket 622: at a 360 px wide phone (30 px/m over the 12 m zoom), the pixels of the drill window ([0.45, -0.55, 1.15, 0.55] m in the vehicle frame) that change between the bare rig and each look and between each pair of looks (a channel moving more than 24 of 255), and the brightest pixel (Rec. 709 luminance, 0-255) inside the drill window against the brightest of the rest of the rig for each look, the nose lit as while drilling: under `lit` on the phone-size renders, under `glow` on the tier-1 emission-only render at 512 px/m; written by sheet_drill_type_looks.py. The nose must stay the brightest glow.",
+  "lit": {
+    "tier-1": {
+      "phonePxPerM": 30.0,
+      "drillWindowPx": 680,
+      "changedFromBare": {
+        "side-cutters-mark-1": 67,
+        "side-cutters-mark-2": 115,
+        "gallery-reamers": 142,
+        "plunge-crown": 22,
+        "twin-bit": 38,
+        "reach-boom": 59
+      },
+      "changedBetween": {
+        "side-cutters-mark-1 vs side-cutters-mark-2": 81,
+        "side-cutters-mark-1 vs gallery-reamers": 179,
+        "side-cutters-mark-1 vs plunge-crown": 91,
+        "side-cutters-mark-1 vs twin-bit": 102,
+        "side-cutters-mark-1 vs reach-boom": 111,
+        "side-cutters-mark-2 vs gallery-reamers": 225,
+        "side-cutters-mark-2 vs plunge-crown": 137,
+        "side-cutters-mark-2 vs twin-bit": 150,
+        "side-cutters-mark-2 vs reach-boom": 164,
+        "gallery-reamers vs plunge-crown": 159,
+        "gallery-reamers vs twin-bit": 165,
+        "gallery-reamers vs reach-boom": 179,
+        "plunge-crown vs twin-bit": 51,
+        "plunge-crown vs reach-boom": 59,
+        "twin-bit vs reach-boom": 63
+      },
+      "brightest": {
+        "bare": {
+          "nose": 203,
+          "restOfRig": 255
+        },
+        "side-cutters-mark-1": {
+          "nose": 203,
+          "restOfRig": 255
+        },
+        "side-cutters-mark-2": {
+          "nose": 203,
+          "restOfRig": 255
+        },
+        "gallery-reamers": {
+          "nose": 203,
+          "restOfRig": 255
+        },
+        "plunge-crown": {
+          "nose": 236,
+          "restOfRig": 255
+        },
+        "twin-bit": {
+          "nose": 226,
+          "restOfRig": 255
+        },
+        "reach-boom": {
+          "nose": 207,
+          "restOfRig": 255
+        }
+      }
+    },
+    "tier-3": {
+      "phonePxPerM": 30.0,
+      "drillWindowPx": 680,
+      "changedFromBare": {
+        "side-cutters-mark-1": 60,
+        "side-cutters-mark-2": 113,
+        "gallery-reamers": 119,
+        "plunge-crown": 23,
+        "twin-bit": 34,
+        "reach-boom": 39
+      },
+      "changedBetween": {
+        "side-cutters-mark-1 vs side-cutters-mark-2": 77,
+        "side-cutters-mark-1 vs gallery-reamers": 147,
+        "side-cutters-mark-1 vs plunge-crown": 76,
+        "side-cutters-mark-1 vs twin-bit": 90,
+        "side-cutters-mark-1 vs reach-boom": 99,
+        "side-cutters-mark-2 vs gallery-reamers": 193,
+        "side-cutters-mark-2 vs plunge-crown": 129,
+        "side-cutters-mark-2 vs twin-bit": 142,
+        "side-cutters-mark-2 vs reach-boom": 152,
+        "gallery-reamers vs plunge-crown": 129,
+        "gallery-reamers vs twin-bit": 132,
+        "gallery-reamers vs reach-boom": 142,
+        "plunge-crown vs twin-bit": 47,
+        "plunge-crown vs reach-boom": 45,
+        "twin-bit vs reach-boom": 55
+      },
+      "brightest": {
+        "bare": {
+          "nose": 253,
+          "restOfRig": 255
+        },
+        "side-cutters-mark-1": {
+          "nose": 253,
+          "restOfRig": 255
+        },
+        "side-cutters-mark-2": {
+          "nose": 253,
+          "restOfRig": 255
+        },
+        "gallery-reamers": {
+          "nose": 204,
+          "restOfRig": 255
+        },
+        "plunge-crown": {
+          "nose": 253,
+          "restOfRig": 255
+        },
+        "twin-bit": {
+          "nose": 253,
+          "restOfRig": 255
+        },
+        "reach-boom": {
+          "nose": 253,
+          "restOfRig": 255
+        }
+      }
+    }
+  },
+  "glow": {
+    "bare": {
+      "nose": 247,
+      "restOfRig": 253
+    },
+    "side-cutters-mark-1": {
+      "nose": 247,
+      "restOfRig": 253
+    },
+    "side-cutters-mark-2": {
+      "nose": 247,
+      "restOfRig": 253
+    },
+    "gallery-reamers": {
+      "nose": 247,
+      "restOfRig": 253
+    },
+    "plunge-crown": {
+      "nose": 247,
+      "restOfRig": 253
+    },
+    "twin-bit": {
+      "nose": 247,
+      "restOfRig": 253
+    },
+    "reach-boom": {
+      "nose": 247,
+      "restOfRig": 253
+    }
+  }
+}

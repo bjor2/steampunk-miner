@@ -642,6 +642,27 @@ step. `docs/art/rig-look-drill-tip/author_drill_tip_looks.py` wrote the first ve
 review renders, at desktop and at a 360 px phone's size, are in
 [docs/art/rig-look-drill-tip/](art/rig-look-drill-tip/README.md).
 
+## Rig-look parts: the drill types
+
+The art half of the drill-type looks of
+[Spec: Drill width and drill type store items (#308)](https://github.com/bjor2/steampunk-miner/issues/308),
+built by [#622](https://github.com/bjor2/steampunk-miner/issues/622): one Blender source,
+`art/blender/vehicle-look-drill-type/`, with a look for each owned drill-gear item that changes what
+the drill is (side cutters at Mark 1 and Mark 2, the Wide fork's gallery reamers, the Deep fork's
+plunge crown, the twin bit and the reach boom). Every look is authored in #578's frame, the
+`drill_tip` track's `drill.head` slot at the origin, stands in place of the rig's `t1-drill-bit` and
+sheathes the cone's last step, so a fitted type wins the slot over the drill_tip look step (the
+HS rule on #576) and never takes a module point. Unlike the drill_tip looks these leave the rig's
+silhouette on purpose: the cutters stick out to the sides (0.34 m at Mark 1, 0.5 m at Mark 2), the
+reamers are a 0.6 m ring round the bit, the crown is a 0.5 m spike ahead, which is what makes the
+type read at a 360 px phone's width. A look is one or more parts; the cutter arms and the boom's
+ram have their origin at their hinge or slide and carry a folded pose in the table, so a
+toggled-off cutter can fold in. Nothing registers, exports or draws it yet: the wiring (#623) names
+the looks from owned state through the rig-look registry (#577).
+`docs/art/rig-look-drill-type/author_drill_type_looks.py` wrote the first version of the `.blend`;
+from then on it is the source. The look table, the reach check and the review renders, at desktop
+and at a 360 px phone's size, are in [docs/art/rig-look-drill-type/](art/rig-look-drill-type/README.md).
+
 ## The `parts.json` sidecar, schema 1
 
 ```json
