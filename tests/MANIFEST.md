@@ -130,7 +130,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/dock-buildings/systems/render/worksSteam.test.ts` | 4 | 4 |
 | `src/features/dock-buildings/systems/render/workshopStaging.test.ts` | 6 | 6 |
 
-### `drill-gear`: 28 files, 239 tests
+### `drill-gear`: 29 files, 244 tests
 
 | File | Tests | Sites |
 | --- | --- | --- |
@@ -153,6 +153,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/drill-gear/systems/drillGearPowerUps.test.ts` | 4 | 4 |
 | `src/features/drill-gear/systems/drillGearSales.test.ts` | 2 | 2 |
 | `src/features/drill-gear/systems/gatesFixture.test.ts` | 22 | 3 |
+| `src/features/drill-gear/systems/moneyOnlyGates.test.ts` | 5 | 2 |
 | `src/features/drill-gear/systems/samplingCorer.test.ts` | 11 | 10 |
 | `src/features/drill-gear/systems/softGroundLink.test.ts` | 6 | 6 |
 | `src/features/drill-gear/systems/statPreview.test.ts` | 12 | 12 |
