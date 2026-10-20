@@ -8,14 +8,15 @@
  * It reads only what the carve already left: each cell the drill yielded for the local player is
  * watched, its 16 samples re-summed once per answered batch, until one of these:
  * - its density is gone (a cell on the cut's line, or a whole paid cell on a travelling tick);
- * - a tick later the carve edited its chunk again and left it as it was: the front has passed it,
- *   and what stays is the bore's wall (a cell beside the line);
+ * - a tick later the player's cut edited the ground again and left it as it was: the front has
+ *   passed it, and what stays is the bore's wall (a cell beside the line). Only a command's edit
+ *   counts: a tick-driven one (a collapse's refill) lands before the tick's cut;
  * - two ticks passed with no fall: the drill stopped inside it.
  * No new pass over the world's cells. Client-only presentation: nothing here reaches the authority,
  * so yield, energy, heat, the digest and the protocol are unchanged.
  */
 import type { DomainEvent } from '../authority/domainEvent'
-import { chunkOfTile, type TilePoint } from '../world/tileGrid'
+import type { TilePoint } from '../world/tileGrid'
 
 /** A cell the carve finished, with the events its yield raised: its `TileDestroyed`, its unit. */
 export interface CarvedCell {
@@ -100,14 +101,14 @@ function judgedCell(cell: CarvingCell, batch: CarveBatch): Judged {
 /** The carve moved past the cell, or stopped inside it. */
 function isPastCarving(cell: CarvingCell, batch: CarveBatch): boolean {
   if (batch.tick <= cell.fellAtTick) return false
-  return batch.tick >= cell.fellAtTick + STILL_TICKS || isChunkEdited(batch.events, cell.tile)
+  return batch.tick >= cell.fellAtTick + STILL_TICKS || isCutByPlayer(batch)
 }
 
-function isChunkEdited(events: readonly DomainEvent[], { tx, ty }: TilePoint): boolean {
-  const cx = chunkOfTile(tx)
-  const cy = chunkOfTile(ty)
+/** The batch answers one of the player's commands that edited the ground: its cut, this tick. */
+function isCutByPlayer({ events, playerId }: CarveBatch): boolean {
   return events.some(
-    (event) => event.type === 'GroundChanged' && event.cx === cx && event.cy === cy,
+    (event) =>
+      event.type === 'GroundChanged' && event.seq !== undefined && event.playerId === playerId,
   )
 }
 

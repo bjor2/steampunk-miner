@@ -33,8 +33,25 @@ function added(tick: number): DomainEvent {
   }
 }
 
+const EDIT = {
+  type: 'GroundChanged',
+  cx: 3,
+  cy: 0,
+  x0: 0,
+  y0: 0,
+  x1: 4,
+  y1: 4,
+  version: 1,
+} as const
+
+/** The player's cut edited the ground (any chunk) in this batch. */
 function groundChanged(tick: number): DomainEvent {
-  return { type: 'GroundChanged', cx: 0, cy: 0, x0: 0, y0: 0, x1: 4, y1: 4, version: 1, tick }
+  return { ...EDIT, tick, playerId: PLAYER, seq: 2 }
+}
+
+/** A tick-driven edit, a collapse's refill: no command caused it. */
+function refilled(tick: number): DomainEvent {
+  return { ...EDIT, tick }
 }
 
 function batchOf(tick: number, events: DomainEvent[], sum: number): CarveBatch {
@@ -71,12 +88,20 @@ describe('carve watch', () => {
     expect(carvedAt).toEqual([13])
   })
 
-  it('finishes a wall cell the tick the carve edits its chunk and leaves it standing', () => {
+  it('finishes a wall cell the tick the player’s cut edits the ground and leaves it standing', () => {
     const { carvedAt } = carveFrom(HALF, [
       [11, 900, [groundChanged(11)]],
       [12, 900, [groundChanged(12)]],
     ])
     expect(carvedAt).toEqual([12])
+  })
+
+  it('waits on a tick-driven edit, which lands before the tick’s cut', () => {
+    const { carvedAt } = carveFrom(HALF, [
+      [11, 900, [groundChanged(11)]],
+      [12, 900, [refilled(12)]],
+    ])
+    expect(carvedAt).toEqual([])
   })
 
   it('never judges a cell twice in the tick it last fell', () => {
