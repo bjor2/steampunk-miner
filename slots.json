@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-10-21T00:16:07+02:00",
+  "updated_at": "2026-10-21T00:40:22+02:00",
   "caps": {
     "grok": 12,
     "claude": 10,
@@ -74,7 +74,7 @@
       "size": 6,
       "used": 5,
       "free": 1,
-      "claims_last_hour": 5,
+      "claims_last_hour": 2,
       "name": "Claude Max 1"
     },
     {
@@ -123,7 +123,7 @@
       "size": 4,
       "used": 3,
       "free": 1,
-      "claims_last_hour": 4,
+      "claims_last_hour": 3,
       "name": "Claude Max 2"
     }
   ],
@@ -233,13 +233,9 @@
     },
     {
       "slot": 10,
-      "state": "planner",
-      "ticket": 308,
-      "since": "2026-10-21T00:14:56+02:00",
-      "map": 302,
-      "room": "9cc76e78-1e10-4130-8b0e-0865bac3f7a8",
-      "adopted": false,
-      "wave": "302-10D"
+      "state": "free",
+      "ticket": null,
+      "since": null
     },
     {
       "slot": 11,
@@ -354,10 +350,10 @@
   "totals": {
     "grok": {
       "size": 12,
-      "used": 10,
+      "used": 9,
       "dev": 8,
       "dev_cap": 8,
-      "planner": 2,
+      "planner": 1,
       "planner_cap": 4
     },
     "claude": {
