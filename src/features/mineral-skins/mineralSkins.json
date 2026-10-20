@@ -1,5 +1,5 @@
 {
-  "$comment": "The mineral skins of #576 (GD ruling 20 Oct 2026, ticket 591): a species' skin is four layers drawn bottom first, a base texture, a vein or crystal shape, a palette and a sheen, each an id of its layer list below. A skin row names its species (a materials.json id) and one id per layer; no two species of one pool share all four, so no two species on one planet look alike. A palette is a ramp of three display colours, shadow, body and light, darkest first; its body is the hue slot colour of the species wearing it (ticket 450), so the skin keeps the hue guards of materials.json. The base, vein and sheen layers are drawn in Blender, one cell each (docs/art/mineral-skins, skin-layers.json). Look only: no price, gate, income, generation or save reads it. The batch tickets (#592 to #606) add the layers and rows, 15 species per planet on P1 to P5; #592 skins P1's slots 1 to 5.",
+  "$comment": "The mineral skins of #576 (GD ruling 20 Oct 2026, ticket 591): a species' skin is four layers drawn bottom first, a base texture, a vein or crystal shape, a palette and a sheen, each an id of its layer list below. A skin row names its species (a materials.json id) and one id per layer; no two species of one pool share all four, so no two species on one planet look alike. A palette is a ramp of three display colours, shadow, body and light, darkest first; its body is the hue slot colour of the species wearing it (ticket 450), so the skin keeps the hue guards of materials.json. The base, vein and sheen layers are drawn in Blender, one cell each (docs/art/mineral-skins, skin-layers.json). Look only: no price, gate, income, generation or save reads it. The batch tickets (#592 to #606) add the layers and rows, 15 species per planet on P1 to P5; #592 skins P1's slots 1 to 5, #593 its slots 6 to 10.",
   "layers": {
     "base": [
       {
@@ -16,6 +16,21 @@
       },
       {
         "id": "conchoidal-glass"
+      },
+      {
+        "id": "tarnish-steps"
+      },
+      {
+        "id": "speckled-grit"
+      },
+      {
+        "id": "resin-flow"
+      },
+      {
+        "id": "zoned-growth"
+      },
+      {
+        "id": "quartz-veined"
       }
     ],
     "vein": [
@@ -33,6 +48,21 @@
       },
       {
         "id": "shard-spray"
+      },
+      {
+        "id": "cleavage-cubes"
+      },
+      {
+        "id": "grain-scatter"
+      },
+      {
+        "id": "bead-drops"
+      },
+      {
+        "id": "twinned-cubes"
+      },
+      {
+        "id": "wire-dendrite"
       }
     ],
     "palette": [
@@ -55,6 +85,26 @@
       {
         "id": "flint-glass",
         "ramp": ["#586466", "#afc9cc", "#d7e4e6"]
+      },
+      {
+        "id": "lead-glance",
+        "ramp": ["#4c4e58", "#999daf", "#ccced7"]
+      },
+      {
+        "id": "nickel-pale",
+        "ramp": ["#5c5d56", "#b7baab", "#dbdcd5"]
+      },
+      {
+        "id": "amber-honey",
+        "ramp": ["#604f0e", "#bf9e1b", "#dfce8d"]
+      },
+      {
+        "id": "fluorite-violet",
+        "ramp": ["#47386a", "#8e70d5", "#c7b8ea"]
+      },
+      {
+        "id": "gold-vein",
+        "ramp": ["#706609", "#e0cc12", "#f0e689"]
       }
     ],
     "sheen": [
@@ -72,6 +122,21 @@
       },
       {
         "id": "vitreous"
+      },
+      {
+        "id": "splendent"
+      },
+      {
+        "id": "glittering"
+      },
+      {
+        "id": "resinous"
+      },
+      {
+        "id": "fluorescent"
+      },
+      {
+        "id": "brilliant"
       }
     ]
   },
@@ -110,6 +175,41 @@
       "vein": "shard-spray",
       "palette": "flint-glass",
       "sheen": "vitreous"
+    },
+    {
+      "species": "bright-lead-brassvein",
+      "base": "tarnish-steps",
+      "vein": "cleavage-cubes",
+      "palette": "lead-glance",
+      "sheen": "splendent"
+    },
+    {
+      "species": "deep-grade-nickel-brassvein",
+      "base": "speckled-grit",
+      "vein": "grain-scatter",
+      "palette": "nickel-pale",
+      "sheen": "glittering"
+    },
+    {
+      "species": "honey-amber-quartzine",
+      "base": "resin-flow",
+      "vein": "bead-drops",
+      "palette": "amber-honey",
+      "sheen": "resinous"
+    },
+    {
+      "species": "violet-fluorite-quartzine",
+      "base": "zoned-growth",
+      "vein": "twinned-cubes",
+      "palette": "fluorite-violet",
+      "sheen": "fluorescent"
+    },
+    {
+      "species": "vein-gold-brassvein",
+      "base": "quartz-veined",
+      "vein": "wire-dendrite",
+      "palette": "gold-vein",
+      "sheen": "brilliant"
     }
   ]
 }

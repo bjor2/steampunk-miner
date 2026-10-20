@@ -1,6 +1,6 @@
 """
-The Blender recipes of the mineral skin layers (#576, ticket 592 for P1's slots 1 to 5): one per
-layer id of `mineralSkins.json`. A layer id with no recipe fails, never falls back.
+The Blender recipes of the mineral skin layers (#576, ticket 592 for P1's slots 1 to 5, ticket 593
+for its slots 6 to 10): one per layer id of `mineralSkins.json`. A layer id with no recipe fails, never falls back.
 
 - `base` and `sheen` are seamless textures on the 1 m cell: an emission material on a 1 m quad
   whose value is the ramp coordinate (base, mean about 0.5) or the highlight strength (sheen,
@@ -76,6 +76,49 @@ def around_half(graph, value, amplitude):
     return graph.mul_add(graph.minus(value, 0.5), amplitude, 0.5)
 
 
+def lattice_of(graph, per_u, per_v, stagger=0.0):
+    """
+    The cell cut into `per_u` by `per_v` blocks, odd rows shifted by `stagger` of a block: each
+    pixel's block (column, row) and its place in the block (0..1 across, 0..1 up). Whole blocks
+    across the cell, the column folded back into 0..per_u, so the lattice repeats at the cell edge.
+    """
+    row = graph.math('FLOOR', graph.mul(graph.v, per_v))
+    shift = graph.mul(graph.math('FLOORED_MODULO', row, 2.0), stagger)
+    across = graph.mul_add(graph.u, per_u, shift)
+    column = graph.math('FLOORED_MODULO', graph.math('FLOOR', across), per_u)
+    return {'column': column, 'row': row, 'x': graph.math('FRACT', across), 'y': graph.math('FRACT', graph.mul(graph.v, per_v))}
+
+
+def sprinkled(graph, per_cell, seed, radius, share):
+    """
+    Round dots on `share` of the cells of a Voronoi field with `per_cell` cells across: 1 at a dot's
+    middle, falling off to 0 at `radius` (of a Voronoi cell), 0 between dots.
+    """
+    cells = graph.voronoi(per_cell, per_cell, seed=seed)
+    dot = graph.smooth(cells['Distance'], radius, radius * 0.4)
+    picked = graph.add('ShaderNodeTexWhiteNoise', [('Vector', cells['Position'])], {'noise_dimensions': '3D'}).outputs['Value']
+    return graph.mul(dot, graph.smooth(picked, 1.0 - share, 1.0 - share + 0.02))
+
+
+def block_random(graph, lattice, seed):
+    """One random value in 0..1 per block of the lattice, the same everywhere inside it."""
+    point = graph.add('ShaderNodeCombineXYZ', [(0, lattice['column']), (1, lattice['row']), (2, float(seed))]).outputs[0]
+    return graph.add('ShaderNodeTexWhiteNoise', [('Vector', point)], {'noise_dimensions': '3D'}).outputs['Value']
+
+
+def block_edge(graph, lattice):
+    """How far a pixel sits from its block's nearest edge, 0 on the edge, 0.5 at the middle."""
+    x, y = lattice['x'], lattice['y']
+    return graph.math('MINIMUM', graph.math('MINIMUM', x, graph.minus(1.0, x)), graph.math('MINIMUM', y, graph.minus(1.0, y)))
+
+
+def block_ring(graph, lattice):
+    """The square distance from the block's middle, 0 there and 0.5 on its edge: nested squares."""
+    x = graph.math('ABSOLUTE', graph.minus(lattice['x'], 0.5))
+    y = graph.math('ABSOLUTE', graph.minus(lattice['y'], 0.5))
+    return graph.math('MAXIMUM', x, y)
+
+
 # --- base: the body texture, by the row's pattern ----------------------------------------------------
 
 
@@ -129,6 +172,73 @@ def base_conchoidal_glass(graph):
     return graph.plus(tone, graph.mul(graph.minus(drift, 0.5), 0.34))
 
 
+def base_tarnish_steps(graph):
+    """Bright lead: cleavage steps, each fresh face its own tone, fogged over by a drifting tarnish."""
+    steps = lattice_of(graph, 5, 5, stagger=0.5)
+    face = graph.mul_add(block_random(graph, steps, 151), 0.42, 0.42)
+    seam = graph.smooth(block_edge(graph, steps), 0.035, 0.0)
+    lip = graph.mul(graph.smooth(steps['y'], 0.9, 0.97), graph.minus(1.0, seam))
+    fog = graph.smooth(stretched(graph, graph.noise(3, 3, seed=152, detail=4, roughness=0.6)), 0.35, 0.8)
+    grain = stretched(graph, graph.noise(70, 70, seed=153, detail=5))
+    tone = graph.plus(face, graph.mul(lip, 0.16))
+    tone = graph.minus(tone, graph.mul(fog, 0.18))
+    tone = graph.plus(tone, graph.mul(graph.minus(grain, 0.5), 0.08))
+    return graph.minus(tone, graph.mul(seam, 0.3))
+
+
+def base_speckled_grit(graph):
+    """Deep-grade nickel: a pale matrix peppered with dark grit specks, fewer bright ones, a light mottle."""
+    mottle = stretched(graph, graph.noise(4, 4, seed=161, detail=3))
+    # Coarse enough that the pepper still shows at a phone's 22 px tile, where the hue slot's pale
+    # grey alone sits close to tin and flint glass.
+    dark = sprinkled(graph, 12, 162, 0.48, 0.85)
+    fine = sprinkled(graph, 26, 165, 0.36, 0.7)
+    bright = sprinkled(graph, 9, 163, 0.3, 0.35)
+    grain = stretched(graph, graph.noise(90, 90, seed=164, detail=4))
+    tone = around_half(graph, mottle, 0.4)
+    tone = graph.plus(tone, graph.mul(graph.minus(grain, 0.5), 0.12))
+    tone = graph.minus(tone, graph.plus(graph.mul(dark, 0.5), graph.mul(fine, 0.3)))
+    return graph.plus(graph.plus(tone, graph.mul(bright, 0.32)), 0.12)
+
+
+def base_resin_flow(graph):
+    """Honey amber: slow flow lines through clear resin, dark specks of trapped grit, a few bubbles."""
+    warp = graph.noise(2, 2, seed=171, detail=3, roughness=0.55)
+    flow = tiles.strata(graph, 3, warp, 2.2)
+    swirl = stretched(graph, graph.noise(5, 5, seed=172, detail=4))
+    grit = graph.smooth(graph.voronoi(7, 7, seed=173)['Distance'], 0.07, 0.035)
+    bubble = graph.voronoi(9, 9, seed=174)['Distance']
+    ring = graph.mul(graph.smooth(bubble, 0.035, 0.05), graph.smooth(bubble, 0.07, 0.055))
+    tone = around_half(graph, flow, 0.36)
+    tone = graph.plus(tone, graph.mul(graph.minus(swirl, 0.5), 0.3))
+    tone = graph.minus(tone, graph.mul(grit, 0.42))
+    return graph.plus(tone, graph.mul(ring, 0.3))
+
+
+def base_zoned_growth(graph):
+    """Violet fluorite: growth zones as nested squares parallel to the cube faces, deep and pale in turn."""
+    cubes = lattice_of(graph, 2, 2)
+    ring = graph.plus(block_ring(graph, cubes), graph.mul(graph.minus(graph.noise(3, 3, seed=181, detail=2), 0.5), 0.08))
+    zones = graph.math('SINE', graph.mul(ring, 38.0))
+    fine = graph.math('SINE', graph.mul(ring, 140.0))
+    rim = graph.smooth(block_edge(graph, cubes), 0.025, 0.0)
+    tone = graph.plus(graph.mul(zones, 0.22), 0.5)
+    tone = graph.plus(tone, graph.mul(fine, 0.04))
+    return graph.minus(tone, graph.mul(rim, 0.3))
+
+
+def base_quartz_veined(graph):
+    """Vein gold: a smoky quartz host crossed by pale veinlets, thin and branching, where the gold ran."""
+    host = stretched(graph, graph.noise(4, 4, seed=191, detail=4, roughness=0.55))
+    major = graph.voronoi(3, 3, seed=192, feature='DISTANCE_TO_EDGE')['Distance']
+    minor = graph.voronoi(8, 8, seed=193, feature='DISTANCE_TO_EDGE')['Distance']
+    veinlet = graph.math('MAXIMUM', graph.smooth(major, 0.03, 0.008), graph.mul(graph.smooth(minor, 0.018, 0.004), 0.6))
+    grain = stretched(graph, graph.noise(64, 64, seed=194, detail=5))
+    tone = graph.mul_add(host, 0.26, 0.3)
+    tone = graph.plus(tone, graph.mul(graph.minus(grain, 0.5), 0.1))
+    return graph.plus(tone, graph.mul(veinlet, 0.5))
+
+
 # --- sheen: the lustre's highlights -----------------------------------------------------------------
 
 
@@ -165,6 +275,44 @@ def sheen_vitreous(graph):
     lit = graph.smooth(stretched(graph, graph.noise(3, 3, seed=243, detail=2)), 0.55, 0.75)
     slivers = graph.mul(graph.smooth(arcs, 0.9, 0.99), lit)
     return graph.plus(graph.mul(glint, 0.9), graph.mul(slivers, 0.7))
+
+
+def sheen_splendent(graph):
+    """Splendent: whole cleavage faces flash like mirrors where they meet the lamp, the rest fogged dark."""
+    steps = lattice_of(graph, 5, 5, stagger=0.5)
+    flash = graph.smooth(block_random(graph, steps, 251), 0.72, 0.8)
+    inset = graph.smooth(block_edge(graph, steps), 0.03, 0.07)
+    fog = graph.smooth(stretched(graph, graph.noise(3, 3, seed=152, detail=4, roughness=0.6)), 0.35, 0.8)
+    return graph.mul(graph.mul(graph.mul(flash, inset), graph.mul_add(fog, -0.6, 1.0)), 0.85)
+
+
+def sheen_glittering(graph):
+    """Glittering: a dense dust of pinpoint sparks, as each metal grain throws back the lamp."""
+    return graph.mul(sprinkled(graph, 40, 261, 0.3, 0.4), 0.8)
+
+
+def sheen_resinous(graph):
+    """Resinous: a warm gloss in soft round pools with a broad sheen between, never a hard edge."""
+    pools = graph.smooth(graph.voronoi(5, 5, seed=271)['Distance'], 0.22, 0.04)
+    gloss = graph.smooth(stretched(graph, graph.noise(2, 2, seed=272, detail=2)), 0.5, 0.75)
+    return graph.plus(graph.mul(pools, 0.42), graph.mul(gloss, 0.16))
+
+
+def sheen_fluorescent(graph):
+    """Fluorescent: a faint glow in alternate growth zones, as fluorite answers the lamp, with a few glints."""
+    cubes = lattice_of(graph, 2, 2)
+    ring = graph.plus(block_ring(graph, cubes), graph.mul(graph.minus(graph.noise(3, 3, seed=181, detail=2), 0.5), 0.08))
+    glow = graph.smooth(graph.math('SINE', graph.mul(ring, 19.0)), 0.2, 0.9)
+    glint = graph.smooth(graph.voronoi(10, 10, seed=281)['Distance'], 0.05, 0.01)
+    return graph.plus(graph.mul(glow, 0.3), graph.mul(glint, 0.7))
+
+
+def sheen_brilliant(graph):
+    """Brilliant: thin hard threads of light wandering the face, and strong glints where they cross."""
+    ridge = graph.math('ABSOLUTE', graph.minus(graph.noise(5, 5, seed=291, detail=3, roughness=0.5), 0.5))
+    threads = graph.smooth(ridge, 0.018, 0.004)
+    glint = graph.smooth(graph.voronoi(14, 14, seed=292)['Distance'], 0.06, 0.012)
+    return graph.plus(graph.mul(threads, 0.7), graph.mul(glint, 0.85))
 
 
 # --- vein: the crystal or vein shape, by the row's silhouette ----------------------------------------
@@ -241,6 +389,96 @@ def vein_shard_spray(rng, body):
     return assign_all(marks, body)
 
 
+def vein_cleavage_cubes(rng, body):
+    """Bright lead: sharp cubes all square to the face, stepped up a stair the way galena cleaves."""
+    marks = []
+    x, z = -0.3, -0.24
+    for i in range(6):
+        size = rng.uniform(0.09, 0.13)
+        cube = shapes.add_cube('cube-%d' % i, size, (x, -size * 0.3, z), rotation=(0.0, 0.0, 0.0))
+        shapes.bevel(cube, size * 0.03, segments=1)
+        marks.append(cube)
+        x += size * rng.uniform(0.6, 0.7)
+        z += size * rng.uniform(0.45, 0.8) * (1 if i % 3 != 2 else -0.6)
+    return assign_all(marks, body)
+
+
+def vein_grain_scatter(rng, body):
+    """Deep-grade nickel: a sowing of small hard grains, some alone, some in twos and threes."""
+    marks = []
+    for i, (x, z) in enumerate(shapes.scatter_positions(rng, 22, VEIN_EXTENT_M, 0.07)):
+        for j in range(rng.choice((1, 1, 2, 3))):
+            radius = rng.uniform(0.016, 0.03)
+            at = (x + rng.uniform(-0.03, 0.03) * j, -radius * 0.2, z + rng.uniform(-0.03, 0.03) * j)
+            grain = shapes.add_icosphere('grain-%d-%d' % (i, j), radius, at, subdivisions=1,
+                                         scale=(1.0, 0.8, rng.uniform(0.75, 1.1)), rotation=(0.0, rng.uniform(0, math.tau), 0.0))
+            marks.append(grain)
+    return assign_all(marks, body)
+
+
+def vein_bead_drops(rng, body):
+    """Honey amber: drops of resin run down the face in short trails, each a fat bead under a small one."""
+    marks = []
+    for trail, x in enumerate((-0.22, 0.02, 0.24)):
+        z = rng.uniform(0.2, 0.28)
+        for i in range(rng.choice((2, 3))):
+            radius = rng.uniform(0.04, 0.06)
+            bead = shapes.add_icosphere('bead-%d-%d' % (trail, i), radius, (x + rng.uniform(-0.03, 0.03), -radius * 0.25, z),
+                                        subdivisions=3, scale=(0.9, 0.7, 1.25))
+            neck = shapes.add_icosphere('neck-%d-%d' % (trail, i), radius * 0.5, (x, -radius * 0.15, z + radius * 1.1),
+                                        subdivisions=2, scale=(0.8, 0.6, 1.3))
+            marks += [bead, neck]
+            z -= radius * 2.6 + rng.uniform(0.02, 0.05)
+    return assign_all(marks, body)
+
+
+def vein_twinned_cubes(rng, body):
+    """Violet fluorite: cubes grown through each other at a turn, the penetration twins fluorite makes."""
+    marks = []
+    for i, (x, z) in enumerate(((-0.13, 0.12), (0.15, -0.1), (-0.12, -0.2))):
+        size = rng.uniform(0.16, 0.22) if i < 2 else 0.11
+        spin = rng.uniform(0.0, 0.5)
+        for j, turn in enumerate((0.0, math.pi / 4)):
+            cube = shapes.add_cube('twin-%d-%d' % (i, j), size * (1.0 if j == 0 else 0.86), (x, -size * 0.2, z),
+                                   rotation=(rng.uniform(-0.25, 0.25) + turn * 0.6, spin + turn, rng.uniform(-0.2, 0.2)))
+            shapes.bevel(cube, size * 0.04, segments=1)
+            marks.append(cube)
+    return assign_all(marks, body)
+
+
+def vein_wire_dendrite(rng, body):
+    """Vein gold: wires of native gold branching from one root, kinked, a small nugget on each tip."""
+    marks = []
+    root = (0.0, -0.03, -0.04)
+    for i in range(4):
+        angle = i / 4 * math.tau + rng.uniform(-0.35, 0.35)
+        end = (math.cos(angle) * rng.uniform(0.25, 0.33), -0.05, -0.04 + math.sin(angle) * rng.uniform(0.25, 0.33))
+        path = kinked_path(root, end, rng, 5)
+        marks.append(shapes.add_tube('wire-%d' % i, path, 0.017, resolution=3))
+        for j, turn in enumerate((0.8, -0.85)):
+            fork = path[2 + j]
+            tip = (fork[0] + math.cos(angle + turn) * 0.11, -0.055, fork[2] + math.sin(angle + turn) * 0.11)
+            marks.append(shapes.add_tube('twig-%d-%d' % (i, j), kinked_path(fork, tip, rng, 3), 0.011, resolution=3))
+            marks.append(gold_bead('bead-%d-%d' % (i, j), tip, 0.02))
+        marks.append(gold_bead('tip-%d' % i, end, 0.03))
+    return assign_all(marks, body)
+
+
+def kinked_path(start, end, rng, segments):
+    """A wire from start to end, wobbling in the face at every inner point."""
+    points = []
+    for k in range(segments + 1):
+        t = k / segments
+        wobble = rng.uniform(-0.025, 0.025) if 0 < k < segments else 0.0
+        points.append((start[0] + (end[0] - start[0]) * t + wobble, start[1] + (end[1] - start[1]) * t,
+                       start[2] + (end[2] - start[2]) * t - wobble))
+    return points
+
+
+def gold_bead(name, at, radius):
+    return shapes.add_icosphere(name, radius, (at[0], at[1] - radius * 0.3, at[2]), subdivisions=2, scale=(1.0, 0.7, 1.0))
+
+
 def assign_all(marks, material):
     for mark in marks:
         shapes.assign(mark, material)
@@ -253,6 +491,11 @@ BASES = {
     'banded-seam': base_banded_seam,
     'clouded-mass': base_clouded_mass,
     'conchoidal-glass': base_conchoidal_glass,
+    'tarnish-steps': base_tarnish_steps,
+    'speckled-grit': base_speckled_grit,
+    'resin-flow': base_resin_flow,
+    'zoned-growth': base_zoned_growth,
+    'quartz-veined': base_quartz_veined,
 }
 SHEENS = {
     'earthy': sheen_earthy,
@@ -260,6 +503,11 @@ SHEENS = {
     'metallic': sheen_metallic,
     'waxy': sheen_waxy,
     'vitreous': sheen_vitreous,
+    'splendent': sheen_splendent,
+    'glittering': sheen_glittering,
+    'resinous': sheen_resinous,
+    'fluorescent': sheen_fluorescent,
+    'brilliant': sheen_brilliant,
 }
 VEINS = {
     'nugget-cluster': vein_nugget_cluster,
@@ -267,6 +515,11 @@ VEINS = {
     'plate-stack': vein_plate_stack,
     'nodule-bed': vein_nodule_bed,
     'shard-spray': vein_shard_spray,
+    'cleavage-cubes': vein_cleavage_cubes,
+    'grain-scatter': vein_grain_scatter,
+    'bead-drops': vein_bead_drops,
+    'twinned-cubes': vein_twinned_cubes,
+    'wire-dendrite': vein_wire_dendrite,
 }
 RECIPES = {'base': BASES, 'vein': VEINS, 'sheen': SHEENS}
 
