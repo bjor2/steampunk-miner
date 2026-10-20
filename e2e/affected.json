@@ -131,6 +131,15 @@
       "specs": ["e2e/browser/drillLook.spec.ts", "e2e/browser/render.spec.ts"]
     },
     {
+      "why": "The rig look ladder: every upgrade track's look steps and linear tail, painted as glows on the car's own parts; it paints drill-look's drill_power rows too (ticket 577).",
+      "paths": ["src/features/rig-look/**"],
+      "specs": [
+        "e2e/browser/rigLook.spec.ts",
+        "e2e/browser/drillLook.spec.ts",
+        "e2e/browser/render.spec.ts"
+      ]
+    },
+    {
       "why": "The terrain lane's tools in the slots, the planted lodestone beacon and the card lines; the magnet fields' layer (ticket 286).",
       "paths": ["src/features/terrain-tools/**"],
       "specs": [

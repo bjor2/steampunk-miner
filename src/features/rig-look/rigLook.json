@@ -1,0 +1,165 @@
+{
+  "$comment": "The rig look ladder (#577; G&V spec on #157, GD lock 6300553486; TD shape on #577), one row block per upgrade track, keyed by owned purchase count. `slot` is the track's own vehicle-attach point (the #180 showcase point), never a module or wagon point. Step thresholds are Systems' table (#157 comment 6300543785): the on-curve count on leaving P1, P2, P3, P5 and P8, duplicates dropped; hull's are levels.hull purchases (Systems on #577: 10 per tier, minorsPerMajor 10). drill_power keeps #554's nine rows unchanged (its old drillLook.json). `card` is Progression's step name (#157 comment 6300549964). `part` is the vehicle part a step swaps in; null until the Blender tickets (T2-T6) land it, so a step shows as the placeholder glow `colour`/`glows` on the track's `glowSlots`. Above the top step the tail moves one look per `delta` purchases (GD: 1) through the bounded ladders: tint every step, plating each palette lap, glow each palette x plating lap. glowCaps: every glow stays below its track's cap, summed per part slot across tracks; the drill nose (drill-bit) is the brightest part, the rest of the rig stays under rigBody. Starting values for G&V to tune; cosmetic only, never in state, a save or a digest.",
+  "glowCaps": { "drillNose": 3, "rigBody": 1 },
+  "tracks": [
+    {
+      "track": "drill_power",
+      "slot": "drill.housing",
+      "glowSlots": [["drill-bit"], ["drill-head"]],
+      "glowCap": "drillNose",
+      "steps": [
+        { "from": 5, "part": null, "card": null, "colour": "#c8873a", "glows": [0.3, 0] },
+        { "from": 10, "part": null, "card": null, "colour": "#e8742a", "glows": [0.6, 0] },
+        { "from": 15, "part": null, "card": null, "colour": "#ff5a1f", "glows": [0.9, 0.3] },
+        { "from": 20, "part": null, "card": null, "colour": "#ffd27a", "glows": [1.2, 0.5] },
+        { "from": 30, "part": null, "card": null, "colour": "#5fd6c4", "glows": [1.4, 0.7] },
+        { "from": 40, "part": null, "card": null, "colour": "#b07aff", "glows": [1.6, 0.9] },
+        { "from": 50, "part": null, "card": null, "colour": "#ff7ae0", "glows": [1.8, 1.1] },
+        { "from": 75, "part": null, "card": null, "colour": "#f4f4ff", "glows": [2, 1.3] },
+        { "from": 100, "part": null, "card": null, "colour": "#ffe14a", "glows": [2.4, 1.6] }
+      ],
+      "tail": {
+        "delta": 1,
+        "palette": [
+          "#ff9a3c",
+          "#7ae0ff",
+          "#ff6a9a",
+          "#c6ff7a",
+          "#ffb0f0",
+          "#7a9cff",
+          "#ffd0a0",
+          "#a0fff0"
+        ],
+        "plating": ["bright", "blued", "aged"],
+        "glow": [
+          [2.4, 1.6],
+          [2, 1.2],
+          [2.2, 1.4]
+        ]
+      }
+    },
+    {
+      "track": "drill_tip",
+      "slot": "drill.head",
+      "glowSlots": [["drill-bit"]],
+      "glowCap": "drillNose",
+      "steps": [
+        { "from": 70, "part": null, "card": "Steel cone", "colour": "#9fb4c8", "glows": [0.1] },
+        { "from": 100, "part": null, "card": "Fluted bit", "colour": "#7fd0ff", "glows": [0.2] },
+        { "from": 130, "part": null, "card": "Toothed crown", "colour": "#ffb347", "glows": [0.3] },
+        { "from": 190, "part": null, "card": "Gem-set crown", "colour": "#d47aff", "glows": [0.4] },
+        {
+          "from": 280,
+          "part": null,
+          "card": "Aether-cut crown",
+          "colour": "#7affd8",
+          "glows": [0.5]
+        }
+      ],
+      "tail": {
+        "delta": 1,
+        "palette": ["#c0f0ff", "#ffc0a0", "#a0c8ff", "#f0a0ff"],
+        "plating": ["bright", "blued"],
+        "glow": [[0.4], [0.5]]
+      }
+    },
+    {
+      "track": "engine",
+      "slot": "chassis.drive",
+      "glowSlots": [["piston"]],
+      "glowCap": "rigBody",
+      "steps": [
+        { "from": 2, "part": null, "card": "Single piston", "colour": "#d9a066", "glows": [0.3] },
+        {
+          "from": 18,
+          "part": null,
+          "card": "Triple flywheel",
+          "colour": "#ff8c42",
+          "glows": [0.5]
+        },
+        { "from": 26, "part": null, "card": "Guild turbine", "colour": "#6fd3ff", "glows": [0.7] }
+      ],
+      "tail": {
+        "delta": 1,
+        "palette": ["#ffd27a", "#8fffb0", "#ff9ad5", "#9ab8ff"],
+        "plating": ["bright", "blued", "aged"],
+        "glow": [[0.6], [0.8]]
+      }
+    },
+    {
+      "track": "boiler",
+      "slot": "hull.boiler",
+      "glowSlots": [["boiler", "boiler-2"]],
+      "glowCap": "rigBody",
+      "steps": [
+        {
+          "from": 16,
+          "part": null,
+          "card": "Twin-drum boiler",
+          "colour": "#ff7a3a",
+          "glows": [0.5]
+        }
+      ],
+      "tail": {
+        "delta": 1,
+        "palette": ["#ffb070", "#7ad0ff", "#ff7ab8", "#c8ff7a", "#b08aff", "#7affd0"],
+        "plating": ["bright", "blued", "aged"],
+        "glow": [[0.4], [0.6], [0.8]]
+      }
+    },
+    {
+      "track": "cargo_hold",
+      "slot": "hull.cargo",
+      "glowSlots": [["hopper"]],
+      "glowCap": "rigBody",
+      "steps": [
+        { "from": 23, "part": null, "card": "Plank crate", "colour": "#c89a5a", "glows": [0.3] },
+        { "from": 31, "part": null, "card": "Ore hopper", "colour": "#e0c070", "glows": [0.5] },
+        { "from": 33, "part": null, "card": "Riveted bin", "colour": "#9fd8ff", "glows": [0.7] }
+      ],
+      "tail": {
+        "delta": 1,
+        "palette": ["#ffe0a0", "#a0ffd0", "#ffa0c0", "#c0c0ff"],
+        "plating": ["bright", "blued"],
+        "glow": [[0.6], [0.8]]
+      }
+    },
+    {
+      "track": "hull",
+      "slot": "hull.plates",
+      "glowSlots": [["armour-plate", "armour-plate-2", "armour-plate-3", "chassis"]],
+      "glowCap": "rigBody",
+      "steps": [
+        { "from": 20, "part": null, "card": "Riveted plate", "colour": "#b8a088", "glows": [0.2] },
+        { "from": 80, "part": null, "card": "Banded iron", "colour": "#8fa8c0", "glows": [0.3] },
+        {
+          "from": 140,
+          "part": null,
+          "card": "Brass-trimmed armour",
+          "colour": "#e0b050",
+          "glows": [0.4]
+        },
+        {
+          "from": 260,
+          "part": null,
+          "card": "Layered armour",
+          "colour": "#a080d0",
+          "glows": [0.5]
+        },
+        {
+          "from": 440,
+          "part": null,
+          "card": "Filigree armour",
+          "colour": "#f0d8a0",
+          "glows": [0.6]
+        }
+      ],
+      "tail": {
+        "delta": 1,
+        "palette": ["#d0e8ff", "#ffc8a0", "#c0ffc8", "#ffb0d8"],
+        "plating": ["bright", "blued", "aged"],
+        "glow": [[0.5], [0.7]]
+      }
+    }
+  ]
+}

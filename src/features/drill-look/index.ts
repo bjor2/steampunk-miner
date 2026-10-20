@@ -1,6 +1,7 @@
 /**
  * The drill look slice's public API (docs/standards/feature-slices.md 2.1): the threshold table
- * and the pure stage rule. Never React, zustand or a store object.
+ * and the pure stage rule, read from the rig look table's `drill_power` rows (ticket 577). Never
+ * React, zustand or a store object.
  */
 export const DRILL_LOOK_SLICE_ID = 'drill-look'
 export type { DrillLookStep } from './systems/render/drillLookSteps'

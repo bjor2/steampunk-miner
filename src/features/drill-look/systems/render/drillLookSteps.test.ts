@@ -1,15 +1,17 @@
 import { describe, expect, it } from 'vitest'
-import { createDrillLooks, DRILL_LOOK_STEPS, drillLookStageOf } from './drillLookSteps'
+import { rigLookOf } from '../../../rig-look'
+import { DRILL_LOOK_STEPS, drillLookStageOf } from './drillLookSteps'
 
+// The colour the rig look paints for drill_power (ticket 577 moved the painting there).
 const coloursOf = (purchases: readonly number[]) =>
-  purchases.map((n) => createDrillLooks()[drillLookStageOf(n)]?.glows[0].colour ?? null)
+  purchases.map((n) => rigLookOf('drill_power', n)?.tint ?? null)
 
 describe('drill look steps', () => {
   it('shows no look at purchase 0 and 1, nor anywhere below the first threshold', () => {
     expect(drillLookStageOf(0)).toBe(0)
     expect(drillLookStageOf(1)).toBe(0)
     expect(drillLookStageOf(4)).toBe(0)
-    expect(createDrillLooks()[0]).toBeNull()
+    expect(coloursOf([0])).toEqual([null])
   })
 
   it('takes its first step at purchase 5', () => {
@@ -36,10 +38,11 @@ describe('drill look steps', () => {
     expect(new Set(coloursOf(range).filter((colour) => colour !== null)).size).toBeGreaterThan(2)
   })
 
-  it('still shows distinct looks at purchases 20, 50 and 100, and keeps the last past it', () => {
-    const [at20, at50, at100, at1000] = coloursOf([20, 50, 100, 1000])
+  it('still shows distinct looks at purchases 20, 50 and 100, and a new tail look past it', () => {
+    const [at20, at50, at100, at101, at1000] = coloursOf([20, 50, 100, 101, 1000])
     expect(new Set([at20, at50, at100]).size).toBe(3)
-    expect(at1000).toBe(at100)
+    expect(at101).not.toBe(at100)
+    expect(at1000).not.toBeNull()
   })
 
   it('glows the bit at least as bright as the step before, never pulsing', () => {

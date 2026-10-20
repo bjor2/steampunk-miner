@@ -2,13 +2,16 @@ import { describe, expect, it } from 'vitest'
 import { stateDigest } from '../../systems/authority/stateDigest'
 import { createScriptedSession } from '../../systems/authority/scriptedSession'
 import { vehicleLookSources } from '../../systems/registries/vehicleLooks'
-import { DRILL_LOOK_SOURCE_ID, drillLookStageOfPlayer } from './systems/drillLookSource'
+import { rigLookSourceIdOf } from '../rig-look'
+import { drillLookStageOfPlayer } from './systems/render/drillLookSteps'
 
 const setDrillPower = (level: number) => ({
   type: 'debug.setUpgrade' as const,
   payload: { upgradeId: 'drill_power', level },
 })
 
+// Painted by the rig look's drill_power source since ticket 577.
+const DRILL_LOOK_SOURCE_ID = rigLookSourceIdOf('drill_power')
 const drillLookSource = () => vehicleLookSources().find((s) => s.id === DRILL_LOOK_SOURCE_ID)!
 
 describe('drill look on the vehicle', () => {

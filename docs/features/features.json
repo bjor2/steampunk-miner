@@ -131,6 +131,12 @@
               "issues": [551, 554]
             },
             {
+              "title": "Rig look ladder",
+              "description": "Every upgrade track changes the rig's look: drill tip, engine, boiler, cargo hold and hull step up at Systems' purchase thresholds (one step per planet at most), and every purchase above a track's top step moves its look on through a bounded tint, plating and glow ladder, the drill nose staying the brightest part. Built: the per-track look table and rule, painted as glows on the rig's own parts, with drill power's steps moved into it. Missing: each step's own Blender part and its card line (wiring tickets), the combat row, and the plating finish, which shows once the parts land.",
+              "status": "partial",
+              "issues": [576, 577]
+            },
+            {
               "title": "Mounted modules on the rig",
               "description": "Bought modules show on the vehicle: the gun turret swings its barrel toward targets and the charge rack sits on the hull.",
               "status": "built",
