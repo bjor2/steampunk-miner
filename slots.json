@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-10-21T01:17:52+02:00",
+  "updated_at": "2026-10-21T01:20:24+02:00",
   "caps": {
     "grok": 12,
     "claude": 10,
@@ -36,12 +36,11 @@
         },
         {
           "slot": "C3",
-          "state": "busy",
-          "ticket": 584,
-          "grok_slot": 5,
-          "kind": "dev",
-          "since": "2026-10-20T23:25:00+02:00",
-          "wave": "576-1B"
+          "state": "free",
+          "ticket": null,
+          "grok_slot": null,
+          "kind": null,
+          "since": null
         },
         {
           "slot": "C4",
@@ -71,8 +70,8 @@
         }
       ],
       "size": 6,
-      "used": 4,
-      "free": 2,
+      "used": 3,
+      "free": 3,
       "claims_last_hour": 0,
       "name": "Claude Max 1"
     },
@@ -126,7 +125,7 @@
     }
   ],
   "gate": {
-    "busy": 3,
+    "busy": 2,
     "max": 3
   },
   "tester": {
@@ -187,11 +186,9 @@
     },
     {
       "slot": 5,
-      "state": "dev",
-      "ticket": 584,
-      "since": "2026-10-20T23:25:00+02:00",
-      "claude_slot": 3,
-      "wave": "576-1B"
+      "state": "free",
+      "ticket": null,
+      "since": null
     },
     {
       "slot": 6,
@@ -264,12 +261,11 @@
     },
     {
       "slot": 3,
-      "state": "busy",
-      "ticket": 584,
-      "grok_slot": 5,
-      "since": "2026-10-20T23:25:00+02:00",
-      "account": 1,
-      "wave": "576-1B"
+      "state": "free",
+      "ticket": null,
+      "grok_slot": null,
+      "since": null,
+      "account": 1
     },
     {
       "slot": 4,
@@ -342,8 +338,8 @@
   "totals": {
     "grok": {
       "size": 12,
-      "used": 7,
-      "dev": 6,
+      "used": 6,
+      "dev": 5,
       "dev_cap": 8,
       "planner": 1,
       "planner_cap": 4
@@ -351,8 +347,8 @@
     "claude": {
       "size": 10,
       "enabled": 10,
-      "used": 6,
-      "free": 4,
+      "used": 5,
+      "free": 5,
       "external": 0
     }
   },
@@ -516,22 +512,6 @@
         ],
         "done": [],
         "live": 0
-      },
-      {
-        "number": 608,
-        "key": "576-1B",
-        "map": 576,
-        "lane": "remote",
-        "mode": "solo",
-        "state": "running",
-        "tickets": [
-          582,
-          584
-        ],
-        "done": [
-          582
-        ],
-        "live": 1
       },
       {
         "number": 607,
