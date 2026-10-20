@@ -11,22 +11,22 @@
       "changesRigOutline": 0
     },
     "steel-cone": {
-      "cells": 316,
+      "cells": 328,
       "outsideRig": {
         "tier-1": 0,
         "tier-2": 0,
         "tier-3": 0
       },
-      "changesRigOutline": 220
+      "changesRigOutline": 224
     },
     "fluted-bit": {
-      "cells": 316,
+      "cells": 464,
       "outsideRig": {
         "tier-1": 0,
         "tier-2": 0,
         "tier-3": 0
       },
-      "changesRigOutline": 220
+      "changesRigOutline": 96
     },
     "toothed-crown": {
       "cells": 564,

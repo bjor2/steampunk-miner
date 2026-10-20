@@ -27,8 +27,8 @@ tooth positions they keep: the cones keep none, the crowns the eight.
 | Part               | Step (purchases) | Look                                                                  |
 | ------------------ | ---------------- | --------------------------------------------------------------------- |
 | `cutter-crown`     | 0, the default   | the rig's own crown, the same pieces as `t1-drill-bit`, re-based      |
-| `steel-cone`       | 70               | a polished steel cone on a brass collar, one hot seam near the point  |
-| `fluted-bit`       | 100              | the cone in blued steel, dark spiral flutes, a bright steel point     |
+| `steel-cone`       | 70               | a polished steel cone, all cool steel, one hot seam near the point    |
+| `fluted-bit`       | 100              | the cone in deep blued steel, a steel guide ring with four lands      |
 | `toothed-crown`    | 130              | sixteen cutters, brass on the rim, on a steel wheel round a hot core  |
 | `gem-set-crown`    | 190              | a dark iron wheel set with six violet gems round a bezelled centre    |
 | `aether-cut-crown` | 280              | a pale ceramic wheel with sixteen fins, aether glass on the rim       |
@@ -59,8 +59,8 @@ LOOKS_TABLE = os.path.join(HERE, 'drillTipLooks.json')
 # Base colour, roughness, emission strength (author_platform's PALETTE shape). The gem and aether
 # glows stay under the nose seams' 1.6 (author_casing_driller's `nose-glow`).
 kit.PALETTE.update({
-    'bright-steel': ((0.62, 0.65, 0.70), 0.25, 0.0),
-    'blued-steel': ((0.20, 0.28, 0.42), 0.3, 0.0),
+    'bright-steel': ((0.78, 0.80, 0.84), 0.25, 0.0),
+    'blued-steel': ((0.08, 0.11, 0.22), 0.3, 0.0),
     'gem-violet': ((0.60, 0.25, 0.95), 0.15, 0.8),
     'aether-ceramic': ((0.78, 0.86, 0.84), 0.3, 0.0),
     'aether-glass': ((0.55, 0.95, 0.85), 0.15, 0.5),
@@ -81,17 +81,21 @@ TOOTH_RING = CROWN_RADIUS * 0.84
 TOOTH_SIZE = (CROWN_RADIUS * 0.24, 0.028, CROWN_RADIUS * 0.36)
 # The head's depth, and how far proud of it a sheath stands so it reads over the cone.
 SHEATH_Y = -0.108
-# The sheath over the cone's last step: from 40 mm ahead of the slot to the cone's end, tapering
-# 1.5 mm under the step's own radius there (0.0325 down to 0.018).
-SHEATH_X = (0.04, 0.088)
-SHEATH_RADII = (0.029, 0.019)
+# The sheath over the cone's last step: from 40 mm ahead of the slot to 7 mm past the cone's end,
+# tapering 1.5 mm under the step's own radius (0.0325 down to 0.018) and under the wheel's chord.
+SHEATH_X = (0.04, 0.095)
+SHEATH_RADII = (0.029, 0.018)
 # The cone looks: the cone from the sheath's end to a point under the rig's tooth at the tip,
-# inside the wheel's chord all the way (0.032 at its back), a brass collar round its back and the
-# hot seam near the point.
+# inside the wheel's chord all the way (0.032 at its back), a brass collar round its back and a
+# hot seam near the point, as fine as the nose's own.
 CONE_X = (0.095, 0.166)
 CONE_RADII = (0.030, 0.002)
-COLLAR = (0.027, 0.004, 0.100)
+COLLAR = (0.026, 0.004, 0.097)
 HOT_SEAM_X = 0.125
+HOT_SEAM = (0.002, 0.0005, 0.006)
+# The fluted bit's lands and spokes sit on the cone's surface at the wheel's centre (radius 16 mm).
+LAND_Y = -0.125
+GUIDE_RING = (0.034, 0.005)
 # The crown looks: a short cone bridges the sheath to the wheel, under the wheel's chord (0.026 at
 # the cone's end).
 BRIDGE_X = (0.088, 0.118)
@@ -168,11 +172,16 @@ def shaft_pieces():
 
 
 def steel_cone_pieces():
-    return sheath_pieces('steel') + cone_pieces('bright-steel')
+    """All cool steel, so the step after it reads warm and dark against it at a phone's size."""
+    return sheath_pieces('steel') + cone_pieces('bright-steel', collar_material='bright-steel')
 
 
 def fluted_bit_pieces():
-    return sheath_pieces('blued-steel') + cone_pieces('blued-steel') + flute_pieces() + [bright_point()]
+    """Deep blued steel under steel flutes, a dark iron collar, and a steel guide ring round the
+    point carrying the flutes' four cutting lands where the rig's diagonal teeth stand: at a
+    phone's size the tip turns from a bright point to a dark one in a steel ring."""
+    return (sheath_pieces('blued-steel') + cone_pieces('blued-steel', collar_material='dark-iron') + flute_pieces()
+            + [bright_point(), guide_ring()] + land_pieces())
 
 
 def sheath_pieces(material):
@@ -182,14 +191,15 @@ def sheath_pieces(material):
     return [driller.cone_x(material, SHEATH_RADII[0], SHEATH_RADII[1], length, centre)]
 
 
-def cone_pieces(material):
+def cone_pieces(material, collar_material):
     """The collar, the cone to its point and the hot seam that glows with the load."""
     length = CONE_X[1] - CONE_X[0]
     seam_radius = cone_radius_at(HOT_SEAM_X)
     return [
-        collar('brass', COLLAR[0], COLLAR[1], (COLLAR[2], SHEATH_Y, 0.0)),
+        collar(collar_material, COLLAR[0], COLLAR[1], (COLLAR[2], SHEATH_Y, 0.0)),
         driller.cone_x(material, CONE_RADII[0], CONE_RADII[1], length, (CONE_X[0] + length / 2, SHEATH_Y, 0.0)),
-        driller.cone_x('nose-glow', seam_radius + 0.004, seam_radius + 0.001, 0.008, (HOT_SEAM_X, SHEATH_Y, 0.0)),
+        driller.cone_x('nose-glow', seam_radius + HOT_SEAM[0], seam_radius + HOT_SEAM[1], HOT_SEAM[2],
+                       (HOT_SEAM_X, SHEATH_Y, 0.0)),
     ]
 
 
@@ -199,14 +209,43 @@ def cone_radius_at(x):
 
 
 def flute_pieces():
-    """Three spiral flutes as dark slants down the camera side of the cone, each kept inside the
-    cone's profile where it ends."""
+    """Three spiral flutes as steel slants down the camera side of the cone, each kept inside the
+    cone's profile where it ends and leaning with the cone's taper so it lies on the surface."""
     start_x, end_x = 0.100, 0.128
     pieces = []
     for index in range(3):
         rise = (1 - index) * 0.022
-        start, end = (start_x, rise), (end_x, rise * 0.3 - 0.008)
-        pieces.append(driller.segment('dark-iron', start, end, 0.005, 0.02, SHEATH_Y - 0.034))
+        pieces.append(flute((start_x, rise), (end_x, rise * 0.3 - 0.008), 0.005, 0.008))
+    return pieces
+
+
+def flute(start, end, thickness, depth):
+    """A bar on the cone from `start` to `end` (x, z), its depth centred on the cone's surface at
+    its middle and tilted to the taper, so it neither buries nor stands off the cone."""
+    dx, dz = end[0] - start[0], end[1] - start[1]
+    mid_x, mid_z = (start[0] + end[0]) / 2, (start[1] + end[1]) / 2
+    surface_y = SHEATH_Y - math.sqrt(max(cone_radius_at(mid_x) ** 2 - mid_z ** 2, 0.0))
+    taper = math.atan2(cone_radius_at(start[0]) - cone_radius_at(end[0]), dx)
+    bpy.ops.mesh.primitive_cube_add(size=1.0, location=(mid_x, surface_y + 0.001, mid_z),
+                                    rotation=(0.0, math.atan2(-dz, dx), taper))
+    return kit.finish_piece('steel', scale=(math.hypot(dx, dz), depth, thickness), smooth=False)
+
+
+def guide_ring():
+    """The steel ring round the point, under the wheel's rim, the lands' spokes reach."""
+    return driller.ring('steel', GUIDE_RING[0], GUIDE_RING[1], (CROWN_AT[0], LAND_Y, 0.0))
+
+
+def land_pieces():
+    """The four lands the flutes end in, seen face-on round the point where the rig's diagonal teeth
+    stand, each on a steel spoke from the cone, at the cone's depth so they are part of it."""
+    x = CROWN_AT[0]
+    pieces = []
+    for angle, dx, dz in driller.around(4, TOOTH_RING, phase=math.pi / 4):
+        land = driller.tangent_box('steel', (0.010, 0.026, TOOTH_SIZE[2]), angle, TOOTH_RING, LAND_Y)
+        land.location.x += x
+        pieces.append(land)
+        pieces.append(driller.segment('steel', (x, 0.0), (x + dx, dz), 0.006, 0.012, LAND_Y))
     return pieces
 
 

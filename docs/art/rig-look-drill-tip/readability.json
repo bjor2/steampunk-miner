@@ -1,0 +1,184 @@
+{
+  "about": "Ticket 578: at a 360 px wide phone (30 px/m over the 12 m zoom), the pixels of the drill nose's footprint (its head and bit at the tier) that change between each look on drill.head and the next (a channel moving more than 24 of 255), and the brightest pixel (Rec. 709 luminance, 0-255) of the nose against the rest of the rig for each look, the nose lit as while drilling: under `lit` on the phone-size renders, under `glow` on the tier-1 emission-only render at 512 px/m; written by sheet_drill_tip_looks.py. The nose must stay the brightest glow.",
+  "lit": {
+    "tier-1": {
+      "phonePxPerM": 30.0,
+      "noseFootprintPx": {
+        "cutter-crown -> steel-cone": {
+          "changed": 7,
+          "of": 96
+        },
+        "steel-cone -> fluted-bit": {
+          "changed": 5,
+          "of": 96
+        },
+        "fluted-bit -> toothed-crown": {
+          "changed": 7,
+          "of": 96
+        },
+        "toothed-crown -> gem-set-crown": {
+          "changed": 7,
+          "of": 96
+        },
+        "gem-set-crown -> aether-cut-crown": {
+          "changed": 7,
+          "of": 96
+        }
+      },
+      "brightest": {
+        "cutter-crown": {
+          "nose": 203,
+          "restOfRig": 255
+        },
+        "steel-cone": {
+          "nose": 202,
+          "restOfRig": 255
+        },
+        "fluted-bit": {
+          "nose": 202,
+          "restOfRig": 255
+        },
+        "toothed-crown": {
+          "nose": 232,
+          "restOfRig": 255
+        },
+        "gem-set-crown": {
+          "nose": 202,
+          "restOfRig": 255
+        },
+        "aether-cut-crown": {
+          "nose": 249,
+          "restOfRig": 255
+        }
+      }
+    },
+    "tier-2": {
+      "phonePxPerM": 30.0,
+      "noseFootprintPx": {
+        "cutter-crown -> steel-cone": {
+          "changed": 7,
+          "of": 108
+        },
+        "steel-cone -> fluted-bit": {
+          "changed": 3,
+          "of": 108
+        },
+        "fluted-bit -> toothed-crown": {
+          "changed": 7,
+          "of": 108
+        },
+        "toothed-crown -> gem-set-crown": {
+          "changed": 7,
+          "of": 108
+        },
+        "gem-set-crown -> aether-cut-crown": {
+          "changed": 7,
+          "of": 108
+        }
+      },
+      "brightest": {
+        "cutter-crown": {
+          "nose": 252,
+          "restOfRig": 255
+        },
+        "steel-cone": {
+          "nose": 252,
+          "restOfRig": 255
+        },
+        "fluted-bit": {
+          "nose": 252,
+          "restOfRig": 255
+        },
+        "toothed-crown": {
+          "nose": 252,
+          "restOfRig": 255
+        },
+        "gem-set-crown": {
+          "nose": 252,
+          "restOfRig": 255
+        },
+        "aether-cut-crown": {
+          "nose": 252,
+          "restOfRig": 255
+        }
+      }
+    },
+    "tier-3": {
+      "phonePxPerM": 30.0,
+      "noseFootprintPx": {
+        "cutter-crown -> steel-cone": {
+          "changed": 5,
+          "of": 285
+        },
+        "steel-cone -> fluted-bit": {
+          "changed": 0,
+          "of": 285
+        },
+        "fluted-bit -> toothed-crown": {
+          "changed": 4,
+          "of": 285
+        },
+        "toothed-crown -> gem-set-crown": {
+          "changed": 2,
+          "of": 285
+        },
+        "gem-set-crown -> aether-cut-crown": {
+          "changed": 7,
+          "of": 285
+        }
+      },
+      "brightest": {
+        "cutter-crown": {
+          "nose": 255,
+          "restOfRig": 226
+        },
+        "steel-cone": {
+          "nose": 255,
+          "restOfRig": 226
+        },
+        "fluted-bit": {
+          "nose": 255,
+          "restOfRig": 226
+        },
+        "toothed-crown": {
+          "nose": 255,
+          "restOfRig": 226
+        },
+        "gem-set-crown": {
+          "nose": 255,
+          "restOfRig": 226
+        },
+        "aether-cut-crown": {
+          "nose": 255,
+          "restOfRig": 226
+        }
+      }
+    }
+  },
+  "glow": {
+    "cutter-crown": {
+      "nose": 247,
+      "restOfRig": 253
+    },
+    "steel-cone": {
+      "nose": 247,
+      "restOfRig": 253
+    },
+    "fluted-bit": {
+      "nose": 247,
+      "restOfRig": 253
+    },
+    "toothed-crown": {
+      "nose": 247,
+      "restOfRig": 253
+    },
+    "gem-set-crown": {
+      "nose": 247,
+      "restOfRig": 253
+    },
+    "aether-cut-crown": {
+      "nose": 247,
+      "restOfRig": 253
+    }
+  }
+}

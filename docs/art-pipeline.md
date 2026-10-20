@@ -623,6 +623,25 @@ of the `.blend`; from then on it is the source. The part table, the outline chec
 renders, at desktop and at a 360 px phone's size, are in
 [docs/art/rig-look-hull/](art/rig-look-hull/README.md).
 
+## Rig-look parts: the drill tip
+
+The art half of the `drill_tip` line of the rig look ladder
+([#576](https://github.com/bjor2/steampunk-miner/issues/576), built by
+[#578](https://github.com/bjor2/steampunk-miner/issues/578)): a Blender source for the five look
+steps Systems' table puts at 70, 100, 130, 190 and 280 purchases, `art/blender/vehicle-look-drill-tip/`,
+with the base look beside them. Each part is authored with the track's attach slot, `drill.head`, at
+the origin and is meant to stand in place of the rig's tier-1 cutter crown, `t1-drill-bit`, sheathing
+the last step of the stepped cone behind it: `cutter-crown` is that crown piece for piece, then
+Progression's `steel-cone`, `fluted-bit`, `toothed-crown`, `gem-set-crown` and `aether-cut-crown`.
+Every look keeps inside the crown's own silhouette (its disc and its eight tooth positions) and the
+cone's, so the rig's outline never grows, and the crowns carry the rig's hot core so the nose stays
+the brightest part. Nothing registers or draws it yet: the per-track registry (#577) names the asset
+from the track id and the wiring (#579) swaps the part on the slot and runs the tail above the top
+step. `docs/art/rig-look-drill-tip/author_drill_tip_looks.py` wrote the first version of the
+`.blend`; from then on it is the source. The part table, the outline check at tiers 1 to 3 and the
+review renders, at desktop and at a 360 px phone's size, are in
+[docs/art/rig-look-drill-tip/](art/rig-look-drill-tip/README.md).
+
 ## The `parts.json` sidecar, schema 1
 
 ```json
