@@ -10,6 +10,8 @@ import { itemCardIdOf } from '../../../systems/views/itemCardModel'
 import { UI_ID_TEMPLATES } from '../../../systems/views/screenIds'
 import type { WorkshopRow } from '../../../systems/views/workshopRows'
 import type { IconValue } from '../../../ui/kit/TitleOneLine'
+import { rigLookPlaqueFactOf } from '../../rig-look'
+import { WORKSHOP_TEST_IDS } from './testIds'
 
 export interface PlaqueEntry {
   hasCard: boolean
@@ -48,7 +50,11 @@ export function plaqueElementOf(row: WorkshopRow): ItemCardElement {
   return { ...element, text: { ...element.text, oneLine } }
 }
 
-/** The level and the price beside the name, each a glyph and a value, on the #33 ids. */
+/**
+ * The level and the price beside the name, each a glyph and a value, on the #33 ids; then, on a
+ * track whose rig look row carries a plaque template, the step the player owns (`Fitting: …`,
+ * ticket 585, TD ruling on #579). Every other plaque keeps its two facts.
+ */
 export function plaqueFactsOf(
   row: WorkshopRow,
   moneyIconId: string,
@@ -69,5 +75,12 @@ export function plaqueFactsOf(
     isMoneyShort: row.buyState === 'money_short',
     ...(priceFlashKey === null ? {} : { flashKey: priceFlashKey }),
   }
-  return [level, price]
+  return [level, price, ...fittingFactsOf(row)]
+}
+
+/** The owned rig look step on the track's own glyph; none below the first step or untemplated. */
+function fittingFactsOf(row: WorkshopRow): IconValue[] {
+  const text = rigLookPlaqueFactOf(row.upgradeId, row.level)
+  if (text === null) return []
+  return [{ iconId: row.iconId, text, testId: WORKSHOP_TEST_IDS.plaqueFitting(row.upgradeId) }]
 }
