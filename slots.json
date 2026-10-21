@@ -32,7 +32,7 @@
           "grok_slot": 6,
           "kind": "dev",
           "since": "2026-10-21T06:14:00+02:00",
-          "wave": "576-1C"
+          "wave": null
         },
         {
           "slot": "C3",
@@ -41,7 +41,7 @@
           "grok_slot": 2,
           "kind": "dev",
           "since": "2026-10-21T06:17:00+02:00",
-          "wave": "576-1E"
+          "wave": null
         },
         {
           "slot": "C4",
@@ -50,7 +50,7 @@
           "grok_slot": 5,
           "kind": "dev",
           "since": "2026-10-21T05:58:00+02:00",
-          "wave": "576-1G"
+          "wave": null
         },
         {
           "slot": "C5",
@@ -89,7 +89,7 @@
           "grok_slot": 3,
           "kind": "dev",
           "since": "2026-10-21T05:54:00+02:00",
-          "wave": "641-1A"
+          "wave": null
         },
         {
           "slot": "C8",
@@ -98,7 +98,7 @@
           "grok_slot": 7,
           "kind": "dev",
           "since": "2026-10-21T06:17:00+02:00",
-          "wave": "576-1F"
+          "wave": null
         },
         {
           "slot": "C9",
@@ -107,7 +107,7 @@
           "grok_slot": 8,
           "kind": "dev",
           "since": "2026-10-21T06:14:00+02:00",
-          "wave": "647-1A"
+          "wave": null
         },
         {
           "slot": "C10",
@@ -176,7 +176,7 @@
       "ticket": 595,
       "since": "2026-10-21T06:17:00+02:00",
       "claude_slot": 3,
-      "wave": "576-1E"
+      "wave": null
     },
     {
       "slot": 3,
@@ -184,7 +184,7 @@
       "ticket": 643,
       "since": "2026-10-21T05:54:00+02:00",
       "claude_slot": 7,
-      "wave": "641-1A"
+      "wave": null
     },
     {
       "slot": 4,
@@ -202,7 +202,7 @@
       "ticket": 605,
       "since": "2026-10-21T05:58:00+02:00",
       "claude_slot": 4,
-      "wave": "576-1G"
+      "wave": null
     },
     {
       "slot": 6,
@@ -210,7 +210,7 @@
       "ticket": 585,
       "since": "2026-10-21T06:14:00+02:00",
       "claude_slot": 2,
-      "wave": "576-1C"
+      "wave": null
     },
     {
       "slot": 7,
@@ -218,7 +218,7 @@
       "ticket": 601,
       "since": "2026-10-21T06:17:00+02:00",
       "claude_slot": 8,
-      "wave": "576-1F"
+      "wave": null
     },
     {
       "slot": 8,
@@ -226,7 +226,7 @@
       "ticket": 648,
       "since": "2026-10-21T06:14:00+02:00",
       "claude_slot": 9,
-      "wave": "647-1A"
+      "wave": null
     },
     {
       "slot": 9,
@@ -269,7 +269,7 @@
       "grok_slot": 6,
       "since": "2026-10-21T06:14:00+02:00",
       "account": 1,
-      "wave": "576-1C"
+      "wave": null
     },
     {
       "slot": 3,
@@ -278,7 +278,7 @@
       "grok_slot": 2,
       "since": "2026-10-21T06:17:00+02:00",
       "account": 1,
-      "wave": "576-1E"
+      "wave": null
     },
     {
       "slot": 4,
@@ -287,7 +287,7 @@
       "grok_slot": 5,
       "since": "2026-10-21T05:58:00+02:00",
       "account": 1,
-      "wave": "576-1G"
+      "wave": null
     },
     {
       "slot": 5,
@@ -312,7 +312,7 @@
       "grok_slot": 3,
       "since": "2026-10-21T05:54:00+02:00",
       "account": 2,
-      "wave": "641-1A"
+      "wave": null
     },
     {
       "slot": 8,
@@ -321,7 +321,7 @@
       "grok_slot": 7,
       "since": "2026-10-21T06:17:00+02:00",
       "account": 2,
-      "wave": "576-1F"
+      "wave": null
     },
     {
       "slot": 9,
@@ -330,7 +330,7 @@
       "grok_slot": 8,
       "since": "2026-10-21T06:14:00+02:00",
       "account": 2,
-      "wave": "647-1A"
+      "wave": null
     },
     {
       "slot": 10,
@@ -368,286 +368,6 @@
   "waves": {
     "mode": "on",
     "parallel": 1,
-    "list": [
-      {
-        "number": 660,
-        "key": "647-2A",
-        "map": 647,
-        "lane": "hitl",
-        "mode": "bench",
-        "state": "bench",
-        "tickets": [
-          650
-        ],
-        "done": [],
-        "live": 0
-      },
-      {
-        "number": 659,
-        "key": "647-1C",
-        "map": 647,
-        "lane": "remote",
-        "mode": "solo",
-        "state": "blocked",
-        "tickets": [
-          656
-        ],
-        "done": [],
-        "live": 0
-      },
-      {
-        "number": 658,
-        "key": "647-1B",
-        "map": 647,
-        "lane": "remote",
-        "mode": "solo",
-        "state": "ready",
-        "tickets": [
-          651,
-          652,
-          653,
-          654,
-          655
-        ],
-        "done": [],
-        "live": 0
-      },
-      {
-        "number": 657,
-        "key": "647-1A",
-        "map": 647,
-        "lane": "remote",
-        "mode": "solo",
-        "state": "running",
-        "tickets": [
-          648,
-          649
-        ],
-        "done": [],
-        "live": 1
-      },
-      {
-        "number": 646,
-        "key": "641-1A",
-        "map": 641,
-        "lane": "remote",
-        "mode": "solo",
-        "state": "running",
-        "tickets": [
-          642,
-          643,
-          644,
-          645
-        ],
-        "done": [
-          642
-        ],
-        "live": 1
-      },
-      {
-        "number": 639,
-        "key": "316-8D",
-        "map": 316,
-        "lane": "hitl",
-        "mode": "bench",
-        "state": "bench",
-        "tickets": [
-          630,
-          631,
-          633,
-          634,
-          635
-        ],
-        "done": [],
-        "live": 0
-      },
-      {
-        "number": 637,
-        "key": "576-2A",
-        "map": 576,
-        "lane": "remote",
-        "mode": "solo",
-        "state": "blocked",
-        "tickets": [
-          587,
-          590
-        ],
-        "done": [],
-        "live": 0
-      },
-      {
-        "number": 627,
-        "key": "308-1B",
-        "map": 308,
-        "lane": "remote",
-        "mode": "solo",
-        "state": "paused",
-        "tickets": [
-          622,
-          623
-        ],
-        "done": [
-          622
-        ],
-        "live": 0
-      },
-      {
-        "number": 613,
-        "key": "576-1G",
-        "map": 576,
-        "lane": "remote",
-        "mode": "solo",
-        "state": "running",
-        "tickets": [
-          603,
-          604,
-          605,
-          606
-        ],
-        "done": [
-          603,
-          604
-        ],
-        "live": 1
-      },
-      {
-        "number": 612,
-        "key": "576-1F",
-        "map": 576,
-        "lane": "remote",
-        "mode": "solo",
-        "state": "running",
-        "tickets": [
-          599,
-          600,
-          601,
-          602
-        ],
-        "done": [
-          599,
-          600
-        ],
-        "live": 1
-      },
-      {
-        "number": 611,
-        "key": "576-1E",
-        "map": 576,
-        "lane": "remote",
-        "mode": "solo",
-        "state": "running",
-        "tickets": [
-          595,
-          596,
-          597,
-          598
-        ],
-        "done": [
-          598
-        ],
-        "live": 1
-      },
-      {
-        "number": 609,
-        "key": "576-1C",
-        "map": 576,
-        "lane": "remote",
-        "mode": "solo",
-        "state": "running",
-        "tickets": [
-          640,
-          583,
-          585
-        ],
-        "done": [
-          640,
-          583
-        ],
-        "live": 1
-      },
-      {
-        "number": 607,
-        "key": "576-1A",
-        "map": 576,
-        "lane": "remote",
-        "mode": "solo",
-        "state": "running",
-        "tickets": [
-          577,
-          578,
-          579,
-          580,
-          581,
-          586,
-          589
-        ],
-        "done": [
-          577,
-          578,
-          586
-        ],
-        "live": 0
-      },
-      {
-        "number": 568,
-        "key": "316-9A",
-        "map": 316,
-        "lane": "hitl",
-        "mode": "bench",
-        "state": "bench",
-        "tickets": [
-          565,
-          618
-        ],
-        "done": [],
-        "live": 0
-      },
-      {
-        "number": 566,
-        "key": "316-8A",
-        "map": 316,
-        "lane": "remote",
-        "mode": "solo",
-        "state": "ready",
-        "tickets": [
-          555
-        ],
-        "done": [],
-        "live": 0
-      },
-      {
-        "number": 495,
-        "key": "470-4B",
-        "map": 470,
-        "lane": "hitl",
-        "mode": "bench",
-        "state": "bench",
-        "tickets": [
-          482
-        ],
-        "done": [],
-        "live": 0
-      },
-      {
-        "number": 438,
-        "key": "302-10D",
-        "map": 302,
-        "lane": "hitl",
-        "mode": "bench",
-        "state": "bench",
-        "tickets": [
-          304,
-          305,
-          306,
-          307,
-          308,
-          417,
-          470,
-          501
-        ],
-        "done": [],
-        "live": 0
-      }
-    ]
+    "list": []
   }
 }
