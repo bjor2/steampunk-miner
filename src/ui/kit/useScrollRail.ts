@@ -2,17 +2,21 @@
  * The scroll area's rail (spec #422 ruling 3, build #423): on every scroll and size change it
  * writes the thumb's place and the edge flags straight onto the elements, never through React
  * state (scrolling is per-frame work), and marks the frame awake until `SCROLL_RAIL_IDLE_MS`
- * passes with no scroll, when the sheet fades the rail out.
+ * passes with no scroll, when the sheet fades the rail out. Along `x` it reads the width, so a
+ * sideways row gets the same edge flags.
  */
 import { useCallback, useEffect, useRef, type RefObject } from 'react'
 import { SCROLL_RAIL_IDLE_MS } from '../../constants/uiParts'
-import { scrollRailOf, type ScrollThumb } from '../../systems/views/scrollRail'
+import { scrollRailOf, type ScrollMetrics, type ScrollThumb } from '../../systems/views/scrollRail'
+
+/** The axis a scroll area scrolls along: down a list, or sideways along a row. */
+export type ScrollAxis = 'x' | 'y'
 
 interface Timer {
   current: number | null
 }
 
-export function useScrollRail(): {
+export function useScrollRail(axis: ScrollAxis): {
   frameRef: RefObject<HTMLDivElement>
   viewportRef: RefObject<HTMLDivElement>
   thumbRef: RefObject<HTMLDivElement>
@@ -23,8 +27,8 @@ export function useScrollRail(): {
   const thumbRef = useRef<HTMLDivElement>(null)
   const idleTimer = useRef<number | null>(null)
   const drawRail = useCallback(
-    () => writeRail(frameRef.current, viewportRef.current, thumbRef.current),
-    [],
+    () => writeRail(frameRef.current, viewportRef.current, thumbRef.current, axis),
+    [axis],
   )
   const markScrolled = useCallback(() => {
     drawRail()
@@ -39,17 +43,29 @@ function writeRail(
   frame: HTMLDivElement | null,
   viewport: HTMLDivElement | null,
   thumb: HTMLDivElement | null,
+  axis: ScrollAxis,
 ): void {
   if (frame === null || viewport === null || thumb === null) return
-  const rail = scrollRailOf({
-    viewportPx: viewport.clientHeight,
-    contentPx: viewport.scrollHeight,
-    scrollPx: viewport.scrollTop,
-  })
+  const rail = scrollRailOf(metricsAlong(viewport, axis))
   frame.toggleAttribute('data-scrollable', rail.thumb !== null)
   frame.toggleAttribute('data-at-start', rail.isAtStart)
   frame.toggleAttribute('data-at-end', rail.isAtEnd)
   placeThumb(thumb, rail.thumb)
+}
+
+function metricsAlong(viewport: HTMLDivElement, axis: ScrollAxis): ScrollMetrics {
+  if (axis === 'x') {
+    return {
+      viewportPx: viewport.clientWidth,
+      contentPx: viewport.scrollWidth,
+      scrollPx: viewport.scrollLeft,
+    }
+  }
+  return {
+    viewportPx: viewport.clientHeight,
+    contentPx: viewport.scrollHeight,
+    scrollPx: viewport.scrollTop,
+  }
 }
 
 function placeThumb(thumb: HTMLDivElement, place: ScrollThumb | null): void {

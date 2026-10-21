@@ -55,6 +55,29 @@
   opacity: 1;
 }
 
+/* Sideways (ticket 686, the sheet's tab bar): the fades stand at the side edges, and no rail. */
+.frame[data-axis='x']::before,
+.frame[data-axis='x']::after {
+  top: 0;
+  bottom: 0;
+  width: var(--space-3);
+  height: auto;
+}
+
+.frame[data-axis='x']::before {
+  right: auto;
+  background: linear-gradient(90deg, var(--color-bg), transparent);
+}
+
+.frame[data-axis='x']::after {
+  left: auto;
+  background: linear-gradient(90deg, transparent, var(--color-bg));
+}
+
+.frame[data-axis='x'] .rail {
+  display: none;
+}
+
 /*
  * The thin brass rail, over the content's edge: hidden until a scroll wakes it, then it fades.
  * Ticket 683: the baked trough and thumb (design-system.md section 13) draw over the gradients,

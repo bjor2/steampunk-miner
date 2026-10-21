@@ -1,28 +1,12 @@
 /*
- * The sheet's tab bar (ticket 686): a row that scrolls sideways when the tabs outgrow it, the
- * native scrollbar hidden as the scroll area hides its own. Labels are `--type-label` (14 px).
+ * The sheet's tab bar (ticket 686): a row in the shared scroll area, sideways, which scrolls when
+ * the tabs outgrow it and fades the edge where more tabs hide. Labels are `--type-label` (14 px).
  */
 .bar {
   display: flex;
   gap: var(--space-1);
-  overflow-x: auto;
-  overscroll-behavior-x: contain;
-  scrollbar-width: none;
-}
-
-.bar::-webkit-scrollbar {
-  display: none;
-}
-
-/* Past the tab budget, a fade at each edge tells the bar scrolls. */
-.bar[data-scrolling] {
-  mask-image: linear-gradient(
-    90deg,
-    transparent,
-    black var(--space-3),
-    black calc(100% - var(--space-3)),
-    transparent
-  );
+  width: max-content;
+  padding-top: 2px;
 }
 
 .tab {

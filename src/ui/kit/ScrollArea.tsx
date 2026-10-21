@@ -4,10 +4,12 @@
  * and a riveted thumb laid over its right edge (so nothing shifts when they show), fading out when
  * idle, and edge fades where more content hides. The caller sizes it through `className`, and may
  * hand the viewport its own attributes and handlers (a map panned by drag or keys, pass #426).
+ * Sideways (`axis="x"`, the sheet's tab bar of ticket 686) it scrolls along its width with fades at
+ * the side edges and no rail: the baked thumb is upright, and a row of tabs shows its own end.
  */
 import type { HTMLAttributes, ReactNode } from 'react'
 import styles from './ScrollArea.module.css'
-import { useScrollRail } from './useScrollRail'
+import { useScrollRail, type ScrollAxis } from './useScrollRail'
 
 /** What a caller may put on the viewport; the scroll area keeps its own class and scroll hook. */
 export type ScrollViewportProps = Omit<
@@ -20,23 +22,27 @@ const NO_VIEWPORT_PROPS: ScrollViewportProps = {}
 export function ScrollArea({
   className,
   testId,
+  axis = 'y',
   viewport = NO_VIEWPORT_PROPS,
   children,
 }: {
   /** The caller's size: a height or max-height from its own module. */
   className?: string
   testId?: string
+  /** `y` scrolls down a list (the default); `x` scrolls a row sideways. */
+  axis?: ScrollAxis
   /** Attributes and handlers for the scrolling element itself, whose scroll position they move. */
   viewport?: ScrollViewportProps
   children: ReactNode
 }) {
-  const rail = useScrollRail()
+  const rail = useScrollRail(axis)
   return (
     <div
       ref={rail.frameRef}
       className={classNamesOf(styles.frame, className)}
       data-testid={testId}
       data-scroll-area
+      data-axis={axis}
     >
       <div
         {...viewport}

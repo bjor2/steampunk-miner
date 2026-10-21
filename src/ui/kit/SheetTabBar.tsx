@@ -1,8 +1,10 @@
 /**
  * The sheet's tab bar (spec #678, ticket 686; design-system.md section 10): one brass-edged label
- * per tab, the active one lifted, every tab a 44 px target. Past `layout.tabsMax` tabs the bar
- * scrolls sideways (`data-scrolling` adds the edge fades) rather than shrinking a label.
+ * per tab, the active one lifted, every tab a 44 px target. The row sits sideways in the shared
+ * scroll area, so past what fits (about `layout.tabsMax` tabs, `data-scrolling`) it scrolls with
+ * an edge fade rather than shrinking a label.
  */
+import { ScrollArea } from './ScrollArea'
 import styles from './SheetTabBar.module.css'
 
 export interface SheetTabLabel {
@@ -22,21 +24,23 @@ export function SheetTabBar({
   onSelectTab: (tabId: string) => void
 }) {
   return (
-    <div
-      className={styles.bar}
-      role="tablist"
-      data-sheet-tabs
-      data-scrolling={isScrolling || undefined}
-    >
-      {tabs.map((tab) => (
-        <SheetTabButton
-          key={tab.id}
-          tab={tab}
-          isActive={tab.id === activeTabId}
-          onSelectTab={onSelectTab}
-        />
-      ))}
-    </div>
+    <ScrollArea axis="x">
+      <div
+        className={styles.bar}
+        role="tablist"
+        data-sheet-tabs
+        data-scrolling={isScrolling || undefined}
+      >
+        {tabs.map((tab) => (
+          <SheetTabButton
+            key={tab.id}
+            tab={tab}
+            isActive={tab.id === activeTabId}
+            onSelectTab={onSelectTab}
+          />
+        ))}
+      </div>
+    </ScrollArea>
   )
 }
 

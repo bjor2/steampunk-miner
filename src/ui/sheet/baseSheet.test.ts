@@ -121,6 +121,12 @@ describe('base sheet', () => {
     expect(html).toContain('data-scroll-area')
   })
 
+  it('lays the tab bar in the shared scroll area sideways, the one place a row may scroll', () => {
+    const html = sheetHtml(PROBE, 'sheet-probe.ledger', PROBE_TABS)
+    expect(html).toMatch(/data-scroll-area="true" data-axis="x"[^]*data-sheet-tabs/)
+    expect(html).toContain('data-axis="y"')
+  })
+
   it('shows the first shown tab when the asked one is off the bar', () => {
     const html = sheetHtml(PROBE, 'sheet-probe.ledger', ['sheet-probe.outfitter'])
     expect(html).toContain('aria-label="Outfitter"')

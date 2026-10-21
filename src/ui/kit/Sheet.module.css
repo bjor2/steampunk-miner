@@ -52,7 +52,7 @@
   padding-top: var(--space-2);
 }
 
-.controls > [data-sheet-tabs] {
+.controls > [data-scroll-area] {
   flex: 1;
   min-width: 0;
 }
