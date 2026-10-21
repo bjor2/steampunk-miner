@@ -8,7 +8,7 @@
  * (#500) is the layout shell's. Held upright (#486) the threats are chips leading the prompts'
  * row, and the slices' threat and prompt panels join that row instead of floating over the view.
  */
-import { isUprightCompactHud } from '../../systems/views/hudCompact'
+import { isUprightCompactHud, statusIconsMaxOf } from '../../systems/views/hudCompact'
 import type { HudModel } from '../../systems/views/hudModel'
 import { hudStripOf } from '../../systems/views/hudStrip'
 import type { HudDensity, StageOrientation } from '../../systems/views/screenLayout'
@@ -50,7 +50,12 @@ export function HudView({
     <div className={styles.hud} data-density={density}>
       <OverlayLayer />
       <PopBadges />
-      <HudStrip strip={strip} model={model} isFlashing={isFlashing} />
+      <HudStrip
+        strip={strip}
+        model={model}
+        isFlashing={isFlashing}
+        statusIconsMax={statusIconsMaxOf(density)}
+      />
       <SlicePanels slot="gauges" />
       <SlicePanels slot="banner" />
       <SlicePanels slot="position" />

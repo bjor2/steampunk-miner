@@ -1,7 +1,7 @@
 /**
  * The strip's status row (#500, GD ruling 4; TD shape 4.2; on the strip since ticket 684): at
- * most `MOST_STATUSES_SHOWN` chips, each an icon and a title of at most two words, so the
- * always-on HUD never shows more than six label words. The vehicle state is its icon alone while
+ * most `MOST_STATUSES_SHOWN` chips on a phone and six on desktop (`layout.statusIcons`, ticket
+ * 685), each an icon and a title of at most two words. The vehicle state is its icon alone while
  * under way and a one-word chip otherwise; a combat status or a secondary one (cargo full, the
  * tow) is a chip in priority order; the rest fold into a "+N" count. A chip is its icon and the
  * number its title carries (#486), its words in the strip's detail behind the gear button.
@@ -9,6 +9,7 @@
  * are chips in the rows, since a marker at the screen's edge sits where the vehicle leans.
  */
 import { MOST_STATUSES_SHOWN, type CombatStatusStack, type StatusUrgency } from './combatStatuses'
+import { DESIGN_TOKENS, layoutKindOf, type DesignTokens } from './designSystem'
 import { calloutTextOf } from './hudCallouts'
 import type { VehicleStateReading } from './hudReadings'
 import type { HudDensity, StageOrientation } from './screenLayout'
@@ -58,17 +59,30 @@ const SPACED_UNIT = /(\d) (?=[a-z%]{1,3}\b)/g
 /** A word of a title that holds a number: "x2", "0.5s", "10s". */
 const NUMBER_WORD = /\S*\d\S*/g
 
+/**
+ * `chipsMax` is the row's room: `MOST_STATUSES_SHOWN` (3) on a phone, six on desktop
+ * (`layout.statusIcons`, ticket 685), filled in the same priority order past the stack's three.
+ */
 export function compactStatusRowOf(
   statuses: CombatStatusStack,
   vehicleState: VehicleStateReading,
+  chipsMax: number = MOST_STATUSES_SHOWN,
 ): CompactStatusRow {
   const candidates = [...stateChipsOf(vehicleState), ...statusChipsOf(statuses)]
   return {
     stateMode: vehicleState.mode,
     stateIconId: vehicleState.icon,
-    chips: candidates.slice(0, MOST_STATUSES_SHOWN),
-    hiddenCount: statuses.hiddenCount + Math.max(0, candidates.length - MOST_STATUSES_SHOWN),
+    chips: candidates.slice(0, chipsMax),
+    hiddenCount: Math.max(0, candidates.length - chipsMax),
   }
+}
+
+/** How many status icons the strip's row has room for in this layout (design section 10). */
+export function statusIconsMaxOf(
+  density: HudDensity,
+  tokens: DesignTokens = DESIGN_TOKENS,
+): number {
+  return tokens.layout.statusIcons.count[layoutKindOf(density)]
 }
 
 /**
@@ -105,7 +119,10 @@ function stateChipsOf(vehicleState: VehicleStateReading): CompactChip[] {
 
 function statusChipsOf(statuses: CombatStatusStack): CompactChip[] {
   return [
-    ...statuses.shown.map((status) => ({ ...status, title: compactChipTitleOf(status) })),
+    ...[...statuses.shown, ...statuses.folded].map((status) => ({
+      ...status,
+      title: compactChipTitleOf(status),
+    })),
     ...statuses.secondary.map((status) => ({
       id: status.id,
       iconId: status.iconId,

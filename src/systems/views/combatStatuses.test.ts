@@ -7,12 +7,16 @@ import { KEYBOARD_PROMPTS } from '../input/promptFixtures'
 import { blockContaining, blockIdOf } from '../world/collapseBlock'
 import {
   combatStatusStackOf,
-  HULL_CRITICAL_PERCENT,
   isCollapseWarnedFor,
   MOST_STATUSES_SHOWN,
   type CombatStatusSources,
 } from './combatStatuses'
+import { DESIGN_TOKENS } from './designSystem'
 import { selectHudModel } from './hudModel'
+
+/** The warning ladder's critical line in permille (design section 7, ticket 685). */
+const CRITICAL_PERMILLE =
+  (DESIGN_TOKENS.warningLadder.tiers.find((tier) => tier.name === 'critical')?.atPercent ?? 0) * 10
 
 /** Nothing wrong: full hull, no collapse, no fuse, no heat, energy fine, no threats. */
 const CALM: CombatStatusSources = {
@@ -53,7 +57,7 @@ const threat = (phase: 'windup' | 'lunge') => ({
 /** Every one of the six on at once. */
 const EVERYTHING: CombatStatusSources = {
   ...CALM,
-  hullPermille: HULL_CRITICAL_PERCENT * 10,
+  hullPermille: CRITICAL_PERMILLE,
   isCollapseWarned: true,
   chargeFuse: { ticksLeft: 60, isInsideBlast: true, text: 'CHARGE LIT 1.0 s: back off' },
   heat: {
@@ -75,7 +79,12 @@ const EVERYTHING: CombatStatusSources = {
 
 describe('combat status stack (#158)', () => {
   it('shows nothing while nothing is wrong', () => {
-    expect(combatStatusStackOf(CALM)).toEqual({ shown: [], hiddenCount: 0, secondary: [] })
+    expect(combatStatusStackOf(CALM)).toEqual({
+      shown: [],
+      hiddenCount: 0,
+      folded: [],
+      secondary: [],
+    })
   })
 
   it('orders the six by priority and folds the rest into a +N count', () => {
@@ -83,6 +92,7 @@ describe('combat status stack (#158)', () => {
     expect(stack.shown.map((status) => status.id)).toEqual(['hull_critical', 'collapse', 'fuse'])
     expect(stack.shown).toHaveLength(MOST_STATUSES_SHOWN)
     expect(stack.hiddenCount).toBe(3)
+    expect(stack.folded.map((status) => status.id)).toEqual(['overheat', 'low_energy', 'threat'])
   })
 
   it('gives every status its triangle icon and says its urgency as a pulse rate', () => {
@@ -111,9 +121,9 @@ describe('combat status stack (#158)', () => {
     expect(critical.shown[0]).toMatchObject({ id: 'low_energy', urgency: 'fast' })
   })
 
-  it('calls the hull critical at the hud.json percent and not one thousandth above it', () => {
-    const at = combatStatusStackOf({ ...CALM, hullPermille: HULL_CRITICAL_PERCENT * 10 })
-    const above = combatStatusStackOf({ ...CALM, hullPermille: HULL_CRITICAL_PERCENT * 10 + 1 })
+  it('calls the hull critical at the ladder critical tier and not one thousandth above it', () => {
+    const at = combatStatusStackOf({ ...CALM, hullPermille: CRITICAL_PERMILLE })
+    const above = combatStatusStackOf({ ...CALM, hullPermille: CRITICAL_PERMILLE + 1 })
     expect(at.shown.map((status) => status.id)).toEqual(['hull_critical'])
     expect(above.shown).toEqual([])
   })

@@ -42,10 +42,13 @@ export function HudStrip({
   strip,
   model,
   isFlashing,
+  statusIconsMax,
 }: {
   strip: Strip
   model: HudModel
   isFlashing: boolean
+  /** The status row's room; a phone's three when not given. */
+  statusIconsMax?: number
 }) {
   return (
     <div
@@ -61,7 +64,7 @@ export function HudStrip({
       </div>
       <StripNumberReadout number={strip.number} money={model.money} />
       {strip.nextUpgrade !== null && <UpgradeChip chip={strip.nextUpgrade} />}
-      <StripStatuses model={model} isFlashing={isFlashing} />
+      <StripStatuses model={model} isFlashing={isFlashing} chipsMax={statusIconsMax} />
       {strip.heat !== null && <HeatLine heat={strip.heat} />}
     </div>
   )

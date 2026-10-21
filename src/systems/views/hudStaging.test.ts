@@ -6,7 +6,7 @@ import { hudStagingProblemsOf, NO_HUD_STAGING, stagedHudModelOf } from './hudSta
 const QUIET = {
   cargo: { isFull: false },
   threats: [],
-  statuses: { shown: [], hiddenCount: 0, secondary: [] },
+  statuses: { shown: [], hiddenCount: 0, folded: [], secondary: [] },
 } as unknown as HudModel
 
 describe('HUD debug staging (#500)', () => {
@@ -42,6 +42,7 @@ describe('HUD debug staging (#500)', () => {
     )
     expect(folded.statuses.shown).toHaveLength(3)
     expect(folded.statuses.hiddenCount).toBe(1)
+    expect(folded.statuses.folded.map((status) => status.id)).toEqual(['threat'])
   })
 
   it('adds one marker at each staged octant and the threat status once (#486)', () => {

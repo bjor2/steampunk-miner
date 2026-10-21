@@ -88,15 +88,23 @@ function withThreat(model: HudModel, octant: number): HudModel {
 }
 
 /** The threat status in its priority place (last of the six), folded into "+N" past three. */
+function hasThreatStatus(statuses: CombatStatusStack): boolean {
+  return [...statuses.shown, ...statuses.folded].some((status) => status.id === 'threat')
+}
+
 function withThreatStatus(statuses: CombatStatusStack): CombatStatusStack {
-  if (statuses.shown.some((status) => status.id === 'threat')) return statuses
-  if (statuses.shown.length >= MOST_STATUSES_SHOWN)
-    return { ...statuses, hiddenCount: statuses.hiddenCount + 1 }
+  if (hasThreatStatus(statuses)) return statuses
   const threat = {
     id: 'threat' as const,
     iconId: combatStatusIconIdOf('threat'),
     text: 'THREAT',
     urgency: 'slow' as const,
   }
+  if (statuses.shown.length >= MOST_STATUSES_SHOWN)
+    return {
+      ...statuses,
+      hiddenCount: statuses.hiddenCount + 1,
+      folded: [...statuses.folded, threat],
+    }
   return { ...statuses, shown: [...statuses.shown, threat] }
 }

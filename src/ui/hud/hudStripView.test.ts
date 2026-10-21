@@ -147,7 +147,8 @@ describe('HUD detail behind the gear (ticket 684)', () => {
     expect(testIdIn(html, UI_IDS.hudDetail)).toBe(false)
     expect(testIdIn(html, UI_IDS.hudEnergyText)).toBe(false)
     expect(testIdIn(html, UI_IDS.hudDepth)).toBe(false)
-    expect(html).not.toContain('CRITICAL ENERGY')
+    // The banner's line; its title is the energy chip's out-of-sight name on desktop's six (685).
+    expect(html).not.toContain('climb home now')
   })
 
   it('shows every exact value and word in the detail once the gear opens it', () => {

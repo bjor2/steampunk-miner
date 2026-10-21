@@ -5,11 +5,11 @@
  * colour; with flashes off the screen draws a thicker rim instead. Cargo full and the tow
  * countdown are secondary, read between fights. Display only: nothing here is authority state.
  *
- * Hull critical is the hull at or under `hullCriticalPercent` of `src/data/hud/hud.json` (25, the
- * first energy warning line of #7 reused, to be checked in the feel test). Collapse is a block
+ * Hull critical is the hull standing in the warning ladder's critical tier (15% or under, design
+ * section 7, ticket 685), so the status and the strip's hatch and glow share one line; it was
+ * `hullCriticalPercent` 25 in `src/data/hud/hud.json` until then. Collapse is a block
  * warning within the collapse watch's radius of this vehicle (#43), the same rule that started it.
  */
-import HUD_TUNING from '../../data/hud/hud.json'
 import { COLLAPSE_ACTIVE_RADIUS_MM } from '../../constants/balance'
 import {
   combatStatusIconIdOf,
@@ -25,6 +25,7 @@ import type { HeatReading } from './heatReading'
 import type { CargoReading, EnergyWarning } from './hudModel'
 import type { VehicleStateReading } from './hudReadings'
 import type { ThreatMarker } from './threatMarkers'
+import { ladderTierOf } from './warningLadder'
 
 /** Steady, a slow pulse, a fast pulse: the only three rates, so the ear's cue matches the eye's. */
 export type StatusUrgency = 'steady' | 'slow' | 'fast'
@@ -47,6 +48,8 @@ export interface CombatStatusStack {
   shown: CombatStatusReading[]
   /** The rest, as the "+N" pip counts them. */
   hiddenCount: number
+  /** The rest in priority order: the desktop strip's row has room for some (ticket 685). */
+  folded: CombatStatusReading[]
   secondary: SecondaryStatusReading[]
 }
 
@@ -62,10 +65,6 @@ export interface CombatStatusSources {
 }
 
 export const MOST_STATUSES_SHOWN = 3
-
-export const HULL_CRITICAL_PERCENT: number = HUD_TUNING.hullCriticalPercent
-
-const PERMILLE_PER_PERCENT = 10
 
 const HULL_CRITICAL_TEXT = 'HULL CRITICAL'
 const COLLAPSE_TEXT = 'COLLAPSE: back off'
@@ -84,6 +83,7 @@ export function combatStatusStackOf(sources: CombatStatusSources): CombatStatusS
   return {
     shown: active.slice(0, MOST_STATUSES_SHOWN),
     hiddenCount: Math.max(0, active.length - MOST_STATUSES_SHOWN),
+    folded: active.slice(MOST_STATUSES_SHOWN),
     secondary: secondaryOf(sources),
   }
 }
@@ -100,8 +100,14 @@ export function isCollapseWarnedFor(state: AuthorityState, playerId: string): bo
 }
 
 function hullCriticalOf(sources: CombatStatusSources): CombatStatusReading | null {
-  if (sources.hullPermille > HULL_CRITICAL_PERCENT * PERMILLE_PER_PERCENT) return null
+  if (!isHullCritical(sources.hullPermille)) return null
   return statusOf('hull_critical', HULL_CRITICAL_TEXT, 'fast')
+}
+
+/** At or past the ladder's critical tier: critical, or empty while the rig still stands. */
+function isHullCritical(hullPermille: number): boolean {
+  const tier = ladderTierOf(hullPermille)
+  return tier === 'critical' || tier === 'empty'
 }
 
 function collapseOf(sources: CombatStatusSources): CombatStatusReading | null {

@@ -1,10 +1,11 @@
 /**
  * The strip's status icons (spec #678; docs/ui/design-system.md section 10): the vehicle state's
- * icon, then at most three combat or secondary statuses in priority order, each its icon and the
- * number its title carries, the last one saying how many more did not fit (#158, #486). Their
- * words sit in the detail behind the gear button; urgency pulses, or with flashes off a thicker
- * rim says the same. The warning layer (#685) builds its status plates on this row.
+ * icon, then at most three combat or secondary statuses on a phone and six on desktop (ticket
+ * 685) in priority order, each its icon and the number its title carries, the last one saying how
+ * many more did not fit (#158, #486). Their words sit in the detail behind the gear button;
+ * urgency pulses, or with flashes off a thicker rim says the same.
  */
+import { MOST_STATUSES_SHOWN } from '../../systems/views/combatStatuses'
 import { readoutTextOf } from '../../systems/views/hudCallouts'
 import {
   compactChipValueOf,
@@ -17,8 +18,17 @@ import { TitleOneLine } from '../kit/TitleOneLine'
 import { VectorIcon } from '../VectorIcon'
 import styles from './StripStatuses.module.css'
 
-export function StripStatuses({ model, isFlashing }: { model: HudModel; isFlashing: boolean }) {
-  const row = compactStatusRowOf(model.statuses, model.vehicleState)
+export function StripStatuses({
+  model,
+  isFlashing,
+  chipsMax = MOST_STATUSES_SHOWN,
+}: {
+  model: HudModel
+  isFlashing: boolean
+  /** 3 on a phone, 6 on desktop (`statusIconsMaxOf`, ticket 685). */
+  chipsMax?: number
+}) {
+  const row = compactStatusRowOf(model.statuses, model.vehicleState, chipsMax)
   const lastChipId = row.chips.at(-1)?.id
   return (
     <div
