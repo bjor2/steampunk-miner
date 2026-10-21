@@ -868,7 +868,6 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/authority/vehicleCommands.test.ts` | 27 | 27 |
 | `src/systems/authority/vehicleItemRules.test.ts` | 10 | 10 |
 | `src/systems/authority/widthDescentBars.test.ts` | 2 | 2 |
-| `src/systems/authority/zzdbg.test.ts` | 1 | 1 |
 
 ### `bot`
 
