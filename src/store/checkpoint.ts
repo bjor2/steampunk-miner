@@ -226,13 +226,13 @@ export function saveToExport(): SaveExport | null {
 /**
  * A save file the player brought in (ticket 479): read through the migration chain like a slot,
  * then its exact text written into the autosave and resumed, so exporting it again gives the same
- * bytes. A file this build refuses changes nothing.
+ * bytes. A file this build refuses, or one with no seat for the importing player, changes nothing.
  */
 export function importSaveText(
   text: string,
   place: RunEventPlace,
 ): Checkpoint | { problems: string[] } {
-  const imported = importedSaveOf(text)
+  const imported = importedSaveOf(text, place.playerId)
   if (installed === null) return { problems: ['this run has no save folder'] }
   if ('problems' in imported) return imported
   recordSaveImported(imported.save, place)
@@ -246,9 +246,11 @@ type ResumableReading = Extract<MigratedSaveSlotReading, { state: AuthorityState
 /** The file as the autosave's write, with the entry read off its own header. */
 function importedSaveOf(
   json: string,
+  playerId: string,
 ): { save: SlotSave; reading: ResumableReading } | { problems: string[] } {
   const reading = readSaveSlotText(json)
   if (!('state' in reading)) return { problems: reading.problems }
+  if (!(playerId in reading.state.players)) return { problems: [noSeatProblem(playerId)] }
   const entry = slotEntryOfFile(AUTOSAVE_SLOT, parsedJson(json))
   if (entry === null) return { problems: ['the save header names no slot'] }
   const { state, saveEpoch } = reading
@@ -258,6 +260,11 @@ function importedSaveOf(
     reading,
     save: { slot: AUTOSAVE_SLOT, json, entryJson, tick: state.tick, saveEpoch, digest },
   }
+}
+
+/** The store resumes as its own player, so a file without that player cannot be played (ticket 671). */
+function noSeatProblem(playerId: string): string {
+  return `the save holds no player ${playerId}`
 }
 
 /**

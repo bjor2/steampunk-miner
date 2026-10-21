@@ -3,6 +3,7 @@ import { createMemorySink } from '../logging/eventSink'
 import { runEventProblems } from '../logging/runEventSchema'
 import { createRunLog, installRunLog, uninstallRunLog } from '../logging/runLog'
 import { stateDigest } from '../systems/authority/stateDigest'
+import PLANET_10_SAVE from '../systems/save/fixtures/pre-175-planet-10.save.json'
 import type { SaveSlotFile } from '../systems/save/saveSlot'
 import { readAuthorityState } from './authorityLink'
 import { checkpointWrites, installSaveFolder } from './checkpoint'
@@ -189,6 +190,21 @@ describe('save keeping', () => {
     expect(sessionDigest()).toBe(digest)
     expect(autosaveText()).toBeUndefined()
     expect(game().saveTransferProblems).toEqual(['save is not JSON'])
+  })
+
+  // Ticket 671: the planet-10 fixture's only player is the scripted `p1`; resuming it threw in the
+  // store after the import was logged and had overwritten the autosave.
+  it('refuses a save with no seat for the player and keeps the autosave it would replace', async () => {
+    await dockAndWrite()
+    const autosave = autosaveText()
+    const digest = sessionDigest()
+    expect(game().importSaveFromText(JSON.stringify(PLANET_10_SAVE))).toEqual([
+      'the save holds no player player_1',
+    ])
+    await checkpointWrites()
+    expect(autosaveText()).toBe(autosave)
+    expect(sessionDigest()).toBe(digest)
+    expect(linesNamed('save_imported')).toEqual([])
   })
 
   it('does nothing when the player picks no file', async () => {
