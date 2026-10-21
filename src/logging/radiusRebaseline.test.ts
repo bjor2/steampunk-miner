@@ -159,6 +159,15 @@ describe('radius re-baseline bars (ticket 644)', () => {
     const lines = printedRadiusRebaselineLinesOf(threeSeeds(onBars))
     expect(lines).toContain('planet 5 row: radius 582, measured 26.0 min')
   })
+
+  it('names the paceScale a measured miss retunes first', () => {
+    const lines = printedRadiusRebaselineLinesOf(
+      threeSeeds((planet) => ({ ...onBars(planet), minutes: planet === 5 ? 34 : 26 })),
+    )
+    expect(lines).toContain(
+      'planet 5 misses 22-30 min at paceScale 1.44: retune its paceScale first, then the shared k (150-200), then a named exception to the GD',
+    )
+  })
 })
 
 function step(tally: RadiusRebaselineTally, state: AuthorityState, bodies: DomainEventBody[]) {

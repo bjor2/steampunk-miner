@@ -20,7 +20,7 @@
  */
 import { freshRadiusTilesOf } from '../systems/world/planetParams'
 import { paceScale } from '../systems/economy/planetEconomy'
-import { toCanonical, toFixedText } from '../systems/money'
+import { toFixedText } from '../systems/money'
 import { planetMediansOf, type PlanetMedians } from './drillPaceBars'
 import {
   equilibriumRateStepOf,
@@ -246,12 +246,12 @@ function measuredMinutesLine({ pace }: PlanetRow): string {
   return `planet ${pace.planet} row: radius ${freshRadiusTilesOf(pace.planet)}, measured ${minutes} min`
 }
 
-/** A planet outside 22-30 min names its first lever, its own paceScale (GD addendum). */
+/** A measured planet outside 22-30 min names its first lever, its own paceScale (GD addendum). */
 function retuneLines({ pace }: PlanetRow): string[] {
   const { min, max } = RADIUS_REBASELINE_BARS.planetMinutes
-  if (pace.minutes !== null && pace.minutes >= min && pace.minutes <= max) return []
+  if (pace.minutes === null || (pace.minutes >= min && pace.minutes <= max)) return []
   return [
-    `planet ${pace.planet} misses 22-30 min at paceScale ${toCanonical(paceScale(pace.planet))}: ` +
+    `planet ${pace.planet} misses 22-30 min at paceScale ${toFixedText(paceScale(pace.planet), 2)}: ` +
       'retune its paceScale first, then the shared k (150-200), then a named exception to the GD',
   ]
 }

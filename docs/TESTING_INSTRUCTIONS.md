@@ -360,6 +360,20 @@ programs }` from three's `renderer.info` of the game canvas), read only when cal
   replays to the same digest; `src/debug/debugBot.test.ts` holds the live replay to the bot's digest
   with `debugApplied` false; `src/features/ores/systems/hazardNearDock.test.ts` holds each of
   planets 2 to 5 on seed 1 to its own pocket kind within 20 columns of the dock.
+- **R3 re-baseline under the radius rule** (ticket 644, GD lock R3 on #302 6306854642, its addendum
+  6306861669, the VS guards on #305 6306854175 and the Campaign Scaling room's rows on #644): the
+  lane `src/logging/radiusRebaseline.lane.test.ts` plays `bot-slice` to planet 10's core on the three
+  pacing seeds at the registry radii and judges the medians (`radiusRebaselineBars.ts`): minutes 22
+  to 30 on P1-P10, felt speed at least 0.9x the planet before, drill + tip majors 3.5 to 7.0, p*
+  1.51 +/- 0.03 over the steps, money per minute within 5% of the #551 equilibrium step (the VS's
+  closed form solved for the rate), ore cells x1.15 a planet (whole fresh planets off generation),
+  the climb from a trip's deepest point at most 25% of the trip on P2-P10, the travel fee at most 15%
+  of the wallet at core harvest and paid in full (the #648 clamp not binding) on every P1->P5 hop, no
+  seed left behind after a core and every seed through P5's core. It prints each step's p*, the
+  planet rows' measured minutes and the paceScale a miss retunes first, and writes
+  `balance-report/radius-rebaseline.ndjson` for the paired bar (time to core within 10% of main),
+  which the Tester reads beside main's run. `radiusRebaseline.test.ts` holds the fold on real
+  authority states and every bar on synthetic seeds. Hours of play, so it runs only when named.
 - **Material looks** (ticket 450, TD shape on #450 6226270701 and the Scalers' conditions):
   `src/features/roster/kindLook.test.ts` holds the roster's look provider to its rules: a fresh
   save shows no species (unseen kinds draw the family look), a species shows only once the

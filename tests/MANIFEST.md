@@ -1107,6 +1107,8 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/logging/planetDomainEvents.test.ts` | 1 | 1 |
 | `src/logging/planetOneDrillPace.test.ts` | 6 | 6 |
 | `src/logging/purchaseChains.test.ts` | 7 | 7 |
+| `src/logging/radiusRebaseline.lane.test.ts` | 2 | 2 |
+| `src/logging/radiusRebaseline.test.ts` | 13 | 13 |
 | `src/logging/refineryReport.test.ts` | 5 | 5 |
 | `src/logging/registries/runEvents.test.ts` | 4 | 4 |
 | `src/logging/reportCapsuleOffGolden.test.ts` | 19 | 3 |
