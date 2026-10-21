@@ -1604,6 +1604,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/vehicle/cutFollowMotion.test.ts` | 19 | 19 |
 | `src/systems/vehicle/cutGate.test.ts` | 8 | 8 |
 | `src/systems/vehicle/cutStartBreakdown.test.ts` | 4 | 4 |
+| `src/systems/vehicle/drillBore.test.ts` | 6 | 6 |
 | `src/systems/vehicle/drillContact.test.ts` | 8 | 8 |
 | `src/systems/vehicle/drillGearCells.test.ts` | 12 | 12 |
 | `src/systems/vehicle/drillQuantum.test.ts` | 6 | 6 |
