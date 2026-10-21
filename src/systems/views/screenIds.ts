@@ -50,6 +50,7 @@ export const UI_IDS = {
   hudNextUpgrade: 'hud-next-upgrade',
   hudHeatLine: 'hud-heat-line',
   hudEdgeGauge: 'hud-edge-gauge',
+  hudEdgeGlow: 'hud-edge-glow',
   hudGear: 'hud-gear',
   hudDetail: 'hud-detail',
   hudDetailState: 'hud-detail-state',

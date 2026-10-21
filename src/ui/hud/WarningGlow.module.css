@@ -1,0 +1,45 @@
+/*
+ * The edge glow (ticket 685; design-system.md section 7): an inset shadow of
+ * `--warn-glow-thickness` (24 px on a phone, 32 on desktop) in the tier's colour at
+ * `--warn-glow-opacity`. Only its opacity animates, so a pulse costs the compositor and no layout.
+ */
+.glow {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0;
+  box-shadow: inset 0 0 var(--warn-glow-thickness) calc(var(--warn-glow-thickness) / 2)
+    var(--glow-colour, transparent);
+}
+
+.glow[data-tier='low'] {
+  --glow-colour: var(--warn-low);
+}
+
+.glow[data-tier='critical'] {
+  --glow-colour: var(--warn-critical);
+}
+
+.glow[data-tier='empty'] {
+  --glow-colour: var(--warn-empty);
+}
+
+.glow:not([data-tier='ok']) {
+  opacity: var(--warn-glow-opacity);
+}
+
+.glow[data-pulsing]:not([data-tier='ok']) {
+  animation: glow-pulse var(--glow-pulse) ease-in-out infinite;
+}
+
+@keyframes glow-pulse {
+  50% {
+    opacity: calc(var(--warn-glow-opacity) * 0.35);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .glow[data-pulsing]:not([data-tier='ok']) {
+    animation: none;
+  }
+}

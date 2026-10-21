@@ -72,8 +72,26 @@
   border-color: var(--warn-empty);
 }
 
+/*
+ * Ticket 685: the readout's glyph pulses while its tier holds, in step with the edge glow. The
+ * title row (the glyph; its words are out of sight) is the shared element's first child.
+ */
+.bar[data-pulsing]:not([data-tier='ok']) > * > :first-child {
+  animation: glyph-pulse var(--glow-pulse) ease-in-out infinite;
+}
+
+@keyframes glyph-pulse {
+  50% {
+    opacity: 0.35;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .fill {
     transition: none;
+  }
+
+  .bar[data-pulsing]:not([data-tier='ok']) > * > :first-child {
+    animation: none;
   }
 }

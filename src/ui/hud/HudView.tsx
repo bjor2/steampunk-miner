@@ -1,7 +1,8 @@
 /**
  * The in-run HUD drawn from its view model (#33 section 5; the strip of ticket 684); markup only.
  * The strip is the one always-on top box, the edge gauge sits in the right edge lane and the gear
- * button opens the strip's detail. Each kernel slot is followed by its slice panels
+ * button opens the strip's detail. The warning glow (ticket 685) lies along the screen's edges
+ * under every other part. Each kernel slot is followed by its slice panels
  * (feature-slices.md 3.14): `gauges`, `banner` and `position` keep their order after the strip,
  * so a slice's own panel still lays itself out. The overlay layer (#208) comes first, so every
  * other slot draws above it, and option B's pop badges (ticket 616) right after it. The density
@@ -12,6 +13,7 @@ import { isUprightCompactHud, statusIconsMaxOf } from '../../systems/views/hudCo
 import type { HudModel } from '../../systems/views/hudModel'
 import { hudStripOf } from '../../systems/views/hudStrip'
 import type { HudDensity, StageOrientation } from '../../systems/views/screenLayout'
+import { NO_EDGE_GLOW, type EdgeGlow } from '../../systems/views/warningWatch'
 import { DebugRunMark } from './DebugRunMark'
 import { EdgeGauge } from './EdgeGauge'
 import { HazardStrip } from './HazardStrip'
@@ -24,6 +26,7 @@ import { PopBadges } from './PopBadges'
 import { SlicePanels } from './SlicePanels'
 import { ThreatChips } from './ThreatChips'
 import { ThreatMarkers } from './ThreatMarkers'
+import { WarningGlow } from './WarningGlow'
 import styles from './Hud.module.css'
 
 export function HudView({
@@ -34,6 +37,7 @@ export function HudView({
   isDetailOpen = false,
   isLeftHanded = false,
   isOverTouchSurface = false,
+  glow = NO_EDGE_GLOW,
 }: {
   model: HudModel
   isFlashing: boolean
@@ -43,12 +47,15 @@ export function HudView({
   isLeftHanded?: boolean
   /** The gear and its detail rise over the touch gesture surface while it lies over the HUD. */
   isOverTouchSurface?: boolean
+  /** The warning layer's edge glow (ticket 685). */
+  glow?: EdgeGlow
 }) {
   const isUpright = isUprightCompactHud(density, orientation)
   const strip = hudStripOf(model)
   return (
     <div className={styles.hud} data-density={density}>
       <OverlayLayer />
+      <WarningGlow glow={glow} isFlashing={isFlashing} />
       <PopBadges />
       <HudStrip
         strip={strip}

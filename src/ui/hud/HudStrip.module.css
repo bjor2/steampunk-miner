@@ -147,9 +147,24 @@
   );
 }
 
+/* Ticket 685: it has no glyph on the strip, so the line itself pulses while a tier holds. */
+.heat[data-pulsing]:not([data-tier='ok']) .heatFill {
+  animation: heat-pulse var(--glow-pulse) ease-in-out infinite;
+}
+
+@keyframes heat-pulse {
+  50% {
+    opacity: 0.35;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .heatFill {
     transition: none;
+  }
+
+  .heat[data-pulsing]:not([data-tier='ok']) .heatFill {
+    animation: none;
   }
 
   .floatUp {

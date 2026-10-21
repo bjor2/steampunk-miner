@@ -59,18 +59,18 @@ export function HudStrip({
     >
       <div className={styles.bars}>
         {strip.bars.map((bar) => (
-          <StripGauge key={bar.id} bar={bar} />
+          <StripGauge key={bar.id} bar={bar} isFlashing={isFlashing} />
         ))}
       </div>
       <StripNumberReadout number={strip.number} money={model.money} />
       {strip.nextUpgrade !== null && <UpgradeChip chip={strip.nextUpgrade} />}
       <StripStatuses model={model} isFlashing={isFlashing} chipsMax={statusIconsMax} />
-      {strip.heat !== null && <HeatLine heat={strip.heat} />}
+      {strip.heat !== null && <HeatLine heat={strip.heat} isFlashing={isFlashing} />}
     </div>
   )
 }
 
-function StripGauge({ bar }: { bar: StripBar }) {
+function StripGauge({ bar, isFlashing }: { bar: StripBar; isFlashing: boolean }) {
   return (
     <GaugeBar
       text={BAR_TEXTS[bar.id]}
@@ -79,6 +79,7 @@ function StripGauge({ bar }: { bar: StripBar }) {
       fillPermille={bar.fillPermille}
       tier={bar.tier}
       testId={UI_ID_TEMPLATES.hudBar(bar.id)}
+      isPulsing={isFlashing}
     />
   )
 }
@@ -139,11 +140,11 @@ function UpgradeChip({ chip }: { chip: NextUpgradeChip }) {
 
 /**
  * Design section 9: heat is a 4 px ember line along the strip's foot, so it adds no box; hatched
- * under a ladder tier like a bar.
+ * under a ladder tier like a bar, and pulsing then as a bar's glyph does (ticket 685).
  */
-function HeatLine({ heat }: { heat: StripBar }) {
+function HeatLine({ heat, isFlashing }: { heat: StripBar; isFlashing: boolean }) {
   return (
-    <div className={styles.heat} data-tier={heat.tier}>
+    <div className={styles.heat} data-tier={heat.tier} data-pulsing={isFlashing || undefined}>
       <TitleOneLine text={BAR_TEXTS.heat} level="span" titlePlace="card">
         <span
           className={styles.heatFill}

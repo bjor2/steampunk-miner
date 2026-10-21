@@ -205,6 +205,7 @@ function stripTexts(model: HudModel): Partial<Record<UiId, string | null>> {
   return {
     [UI_IDS.hudStrip]: null,
     [UI_IDS.hudEdgeGauge]: null,
+    [UI_IDS.hudEdgeGlow]: null,
     [UI_IDS.hudGear]: null,
     [UI_IDS.hudDetail]: null,
     [UI_IDS.hudMoneyFloat]: '',
