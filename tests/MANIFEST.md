@@ -548,7 +548,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/sensing/systems/threatPeriscope.test.ts` | 6 | 6 |
 | `src/features/sensing/systems/useResolution.test.ts` | 16 | 16 |
 
-### `tech-tree`: 60 files, 422 tests
+### `tech-tree`: 60 files, 423 tests
 
 | File | Tests | Sites |
 | --- | --- | --- |
@@ -590,7 +590,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/tech-tree/systems/nodeCost.test.ts` | 7 | 7 |
 | `src/features/tech-tree/systems/nodeSpendShare.diagnostic.test.ts` | 0 | 1 |
 | `src/features/tech-tree/systems/nodeSpendShare.test.ts` | 7 | 7 |
-| `src/features/tech-tree/systems/patentCards.test.ts` | 5 | 5 |
+| `src/features/tech-tree/systems/patentCards.test.ts` | 6 | 6 |
 | `src/features/tech-tree/systems/priceOnly.test.ts` | 6 | 6 |
 | `src/features/tech-tree/systems/render/extractorPose.test.ts` | 6 | 6 |
 | `src/features/tech-tree/systems/render/forkPieces.test.ts` | 5 | 5 |
