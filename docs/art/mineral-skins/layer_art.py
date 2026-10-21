@@ -798,6 +798,7 @@ def base_graphite_smear(graph):
     tone = graph.plus(tone, graph.mul(graph.minus(fine, 0.5), 0.14))
     return graph.plus(graph.minus(tone, 0.05), graph.mul(lens, 0.18))
 
+
 def base_bloom_rosettes(graph):
     """Cobalt bloom: soft round blooms of colour on a dull dark matrix, brightest at the heart under a powdery fringe, fine flecks between."""
     bloom = cobalt_blooms_of(graph)
@@ -883,7 +884,6 @@ def galena_weave_of(graph):
     upright_fibre = stretched(graph, graph.noise(64, 4, seed=832, detail=3))
     fibre = graph.mul_add(graph.minus(upright_fibre, level_fibre), upright, level_fibre)
     return {'blocks': blocks, 'upright': upright, 'fibre': fibre}
-
 
 
 def base_peat_crumb(graph):
@@ -1477,6 +1477,7 @@ def sheen_slick(graph):
     broad = graph.smooth(stretched(graph, graph.noise(2, 2, seed=792, detail=2)), 0.4, 0.8)
     return graph.plus(graph.mul(smears, 0.7), graph.mul(broad, 0.16))
 
+
 def sheen_fleck_glints(graph):
     """Fleck glints (cobalt bloom): the blooms stay earthy, but sharp glints spark where their flecks meet the lamp, gathered in the blooms."""
     # Sprinkled, not a Voronoi distance: a 4D distance seldom gets small, so its glints barely show (ticket 595).
@@ -1507,7 +1508,6 @@ def sheen_satin_streaks(graph):
     flash = graph.mul(graph.smooth(block_random(graph, weave['blocks'], 835), 0.86, 0.9),
                       graph.smooth(block_edge(graph, weave['blocks']), 0.03, 0.06))
     return graph.plus(graph.mul(shimmer, 0.32), graph.mul(flash, 0.5))
-
 
 
 def sheen_damp_dull(graph):
@@ -1742,6 +1742,7 @@ def vein_wire_dendrite(rng, body):
         marks.append(gold_bead('tip-%d' % i, end, 0.03))
     return assign_all(marks, body)
 
+
 def vein_hex_barrels(rng, body):
     """Blue corundum: barrel-shaped hexagonal crystals, a six-sided body tapering to a point at each end."""
     marks = []
@@ -1868,7 +1869,6 @@ def ammonite_coil(name, centre, outer, phase):
         chambers.append(shapes.add_icosphere('%s-%d' % (name, k), radius, at, subdivisions=2, scale=(1.0, 0.55, 1.0),
                                              rotation=(0.0, -(angle + phase), 0.0)))
     return chambers
-
 
 
 def vein_slag_knots(rng, body):
@@ -2298,8 +2298,6 @@ def almond_seed(name, centre, length, angle):
                                 scale=(1.0, 0.36, 0.55), rotation=(0.0, -angle, 0.0))
 
 
-
-
 def vein_split_slabs(rng, body):
     """Slate shale: long thin slabs split off the seam, stacked level with gaps between, each end broken on a slant."""
     marks = []
@@ -2377,6 +2375,8 @@ def vein_flake_books(rng, body):
         loose = shapes.add_prism('loose-%d' % i, rng.uniform(0.035, 0.045), 0.007, (x, -0.01, z),
                                  rotation=(math.pi / 2 + rng.uniform(-0.3, 0.3), rng.uniform(0, math.pi / 3), 0.0), sides=6)
         marks.append(loose)
+    return assign_all(marks, body)
+
 
 def vein_fleck_drifts(rng, body):
     """Cobalt bloom: blue flecks in three drifts, each a trail of small flat chips tipped every way, thickest at its head."""
@@ -2443,7 +2443,6 @@ def vein_dice_cubes(rng, body):
         shapes.bevel(small, size * 0.04, segments=1)
         marks.append(small)
     return assign_all(marks, body)
-
 
 
 def vein_limonite_clods(rng, body):
