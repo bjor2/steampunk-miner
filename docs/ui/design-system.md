@@ -279,6 +279,23 @@ listed with the ticket that builds them. Every class lives in a CSS Module besid
 | gear button   | the one control that opens the strip's detail (exact values, words); in the thumb zone, never the top keep-out                                                             | layout.tapTargetMinPx                                  | #684    |
 | hint chip     | #500's chip, unchanged: one line, 8% of height at most, queued when the clear view would fall                                                                              | existing constants                                     | exists  |
 
+**The sheet as built (#686).** One base sheet (`ui/sheet/BaseSheet.tsx`) draws the store's open
+tab (`openSheet(tabId)`, `closeSheet()`, Escape) in the kit frame (`kit/Sheet.tsx`). Its tabs are
+data: a slice registers a `sheetTab` (`ui/registries/sheetTabs.ts`: id, a title of 3 words or
+fewer, refused at the seal past `copy.titleWordsMax`, an order, `isShownOn(state)` and its
+content), named from the vocabulary below where it has a place. On a phone (`sheetPlacementOf`) it
+fills the stage and rises from the foot, its tab bar and Close at the foot in the thumb zone, so
+nothing in the top keep-out takes a tap. On desktop it docks in a `layout.sheetDock.widthPx` (400)
+column at the right and the stage narrows by it, as long as the view keeps
+`layout.sheetDock.minViewPx` (640) beside it; a narrower desktop window takes the full sheet. A
+lone tab hides the bar; past what fits, the bar scrolls sideways in the shared scroll area
+(`axis="x"`). The card (`kit/SheetCard.tsx`) is one 44 px button: the title (`type.title`), an
+optional icon and figure, and the line (`type.body`) folded until a finger's first tap reveals it
+(`ui.reveal`, one card at a time), a resting mouse hovers it or the keyboard focuses it; the
+second tap, a click or Enter acts (`cardReveal.ts`). Under Reduce Motion the shutter fades and the
+fold snaps. The tab, card and sheet frames take the #683 art through `--art-tab-frame*`,
+`--art-card-frame` and `--art-sheet-frame`, with the CSS frames behind them.
+
 ## 11. Copy
 
 **Vocabulary** (Progression, GD lock): the places are the **Outfitter** (the upgrade bay's sheet,

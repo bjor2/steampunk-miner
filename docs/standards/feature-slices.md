@@ -342,6 +342,7 @@ export interface SliceRegistrar {
   artAssets(assets: readonly ArtAsset[]): void          // bare art ids, #214
   botPurchase(purchase: BotPurchase): void                  // #211, section 3.17
   screen(panel: ScreenPanel): void                          // #211, section 3.18
+  sheetTab(tab: SheetTab): void                             // ticket 686, section 3.80
   sceneLayer(layer: SceneLayer): void                  // #213, section 3.14
   chargeBlastCue(provider: ChargeBlastCueProvider): void  // one provider, #213, section 3.14
   planetSkyBand(provider: PlanetSkyBandProvider): void  // one provider, ticket 293, section 3.41
@@ -1760,3 +1761,11 @@ Spec #678 (Planet & Narrative's copy; the save header of #703 is the first reade
 - **The rows.** Planets 1 to 7 carry a `name` on their planet registry row (3.74, `planetNames.ts`): Hearthmoor, Gravelholm, Coalfen, Spinegarth, Kettlecrag, Salt Reach, Windmesa. From `planets.generatedNames.fromPlanet` (8) a planet takes a generated name, a `stems` word and an `endings` word walked stem first ("Ashholt", "Brassholt", ...), so the first 64 generated planets each have their own and every later lap adds its number ("Ashholt 2"). A planet past the last row is named the same way, however far.
 - **The seam.** `planetName` (`src/systems/registries/planetNames.ts`, one provider): `{ id, nameOf(planetIndex) → string }`. The `ores` slice registers `ores.planet-name`; `planetDisplayNameOf(p)` answers `Planet {n}` with no provider, so a menu never shows a blank. Nothing here reaches a command, a snapshot, a log line or a digest.
 - **What the guards hold.** A row before the generator's first planet without a name, a row from it with one, two rows sharing a name, a name with a digit, outer spaces, over `TITLE_WORDS_MAX` words or over `PLANET_NAME_CHARACTERS_MAX` (16) characters, and a generator whose longest stem and ending leave no room for a four-digit lap are refused. 16 characters fit the 24 px display role inside 360 px less its margins and at 1280x800 (`planetNames.test.ts` computes both through `uiScaleOf`).
+
+### 3.80 Base sheet tabs (ticket 686)
+
+Spec #678 (HS: one tabbed base panel, about 8 tabs from data). Presentation only, so neither vertical nor horizontal, and no stats.json row.
+
+- **The seam.** `sheetTab` (`src/ui/registries/sheetTabs.ts`): `{ id, title, order, isShownOn(state), Panel }`. The bar shows the tabs whose `isShownOn` answers true on the authority replica, by order then id; the title (3 words at most, `copy.titleWordsMax`, refused at the seal) names the tab and heads the sheet while it shows, from Progression's vocabulary where it has a place (Outfitter, Patent Office, Hold, Ledger, Gearbox). `Panel` takes no props, reads its own store and draws inside the sheet's one scroll area; cards are `kit/SheetCard` (title, one line, tap-to-reveal).
+- **The store.** `openSheet(tabId)` (refused for an unregistered id), `closeSheet()`, `pressSheetCard(cardId, presser)`. The sheet is its own input layer (`sheet`, under a slice screen and over the dock screen): `ui_cancel` closes it. `steampunkDebug.ui.openSheet / closeSheet / getSheet` do the same for specs. Opening a tab is no command, no log line and no digest change.
+- **The probe.** The example slice registers `example.cards` and `example.ledger`, off the bar until `features.example.showSheetTabs()`, so the kernel e2e and the screenshot suite have a sheet before #687 and #688 move content onto it.

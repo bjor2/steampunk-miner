@@ -1359,6 +1359,17 @@ incomePerHour}` go to `balance-report/drill-pace.ndjson`, which `pushTestMetrics
   shots, the measured share over 12% / 8% (`ui.getHudCoverage()`'s `isMeasuredWithinBudget`) or a
   `data-hud` box, touch controls included, in the middle band. The measured share is logged as a
   `hud-coverage` annotation either way. A new sheet joins the table as one row. Box Tester only.
+- **Shared sheet** (ticket 686, spec #678): the rules are pure (`systems/views/sheetLayout.ts`:
+  placement, shutter, tab bar; `cardReveal.ts`: reveal or act), the open tab and revealed card are
+  the store's sheet slice, and the frame, cards and tab bar are server-rendered as views
+  (`ui/sheet/baseSheet.test.ts`, which also reads their sheets for the 44 px targets and the 14 px
+  floor). Nothing in play opens the sheet before #687/#688, so the browser specs open it on the
+  example slice's probe tabs: `features.example.showSheetTabs()`, then `ui.openSheet('example.cards')`;
+  `ui.getSheet()` reads the tab, placement and revealed card and `features.example.getActedCard()`
+  the card whose act ran. `e2e/browser/ui/sheet.spec.ts` runs the four cells: a phone's first tap
+  reveals and the second acts with Close and the tabs out of the top 15%; desktop docks, narrowing
+  the stage by `layout.sheetDock.widthPx`, and widens it again on Close; Escape closes it
+  everywhere. The screenshot suite shoots it as `base-sheet`. Box Tester only.
 - **Touch controls held upright** (ticket 485, spec #470): `e2e/browser/screens/portraitTouch.spec.ts`
   runs in the matrix's portrait touch cells (390x844, 412x915, 820x1180) and skips elsewhere. It
   measures the stick zone (the lower 45% of the height from the thumb's lower corner, ending at a

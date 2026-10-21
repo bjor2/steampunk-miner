@@ -199,12 +199,13 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/dynamite-visuals/systems/render/plantedDynamiteLook.test.ts` | 4 | 4 |
 | `src/features/dynamite-visuals/systems/render/rackLook.test.ts` | 6 | 6 |
 
-### `example`: 2 files, 3 tests
+### `example`: 3 files, 5 tests
 
 | File | Tests | Sites |
 | --- | --- | --- |
 | `src/features/example/debug.test.ts` | 2 | 2 |
 | `src/features/example/systems/describeExample.test.ts` | 1 | 1 |
+| `src/features/example/ui/exampleSheetTabs.test.ts` | 2 | 2 |
 
 ### `extraction`: 19 files, 92 tests
 
@@ -960,6 +961,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/debug/debugOverlay.test.ts` | 2 | 2 |
 | `src/debug/debugSaves.test.ts` | 5 | 5 |
 | `src/debug/debugScreens.test.ts` | 34 | 33 |
+| `src/debug/debugSheet.test.ts` | 3 | 3 |
 | `src/debug/sliceDebugCommands.test.ts` | 3 | 3 |
 
 ### `devFlags`
@@ -1047,7 +1049,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/input/actionMap.test.ts` | 28 | 28 |
 | `src/systems/input/buildIntent.test.ts` | 11 | 11 |
 | `src/systems/input/cleanTap.test.ts` | 5 | 5 |
-| `src/systems/input/inputRouting.test.ts` | 29 | 29 |
+| `src/systems/input/inputRouting.test.ts` | 31 | 31 |
 | `src/systems/input/padCodes.test.ts` | 4 | 4 |
 | `src/systems/input/padFrame.test.ts` | 7 | 7 |
 | `src/systems/input/preferences.test.ts` | 24 | 24 |
@@ -1431,6 +1433,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/store/runSnapshots.test.ts` | 10 | 10 |
 | `src/store/saveKeeping.test.ts` | 15 | 15 |
 | `src/store/saveResumeLog.test.ts` | 2 | 2 |
+| `src/store/sheetSlice.test.ts` | 10 | 10 |
 | `src/store/sliceRun.test.ts` | 7 | 7 |
 | `src/store/slowDeviceChip.test.ts` | 2 | 2 |
 | `src/store/soundUnlockSlice.test.ts` | 4 | 4 |
@@ -1561,6 +1564,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/ui/projection/worldToScreen.test.ts` | 7 | 5 |
 | `src/ui/screenIds.test.ts` | 4 | 4 |
 | `src/ui/screens/sliceScreen.test.ts` | 8 | 8 |
+| `src/ui/sheet/baseSheet.test.ts` | 13 | 13 |
 | `src/ui/sheets/exactAmountSheet.test.ts` | 3 | 3 |
 | `src/ui/touch/touchBindingTiles.test.ts` | 11 | 11 |
 | `src/ui/touch/touchCoverage.test.ts` | 10 | 5 |
@@ -1630,6 +1634,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | --- | --- | --- |
 | `src/systems/views/bayEntryRows.test.ts` | 8 | 8 |
 | `src/systems/views/bayPresentation.test.ts` | 6 | 6 |
+| `src/systems/views/cardReveal.test.ts` | 6 | 6 |
 | `src/systems/views/chargeViews.test.ts` | 14 | 14 |
 | `src/systems/views/combatStatuses.test.ts` | 8 | 8 |
 | `src/systems/views/compactNumbers.test.ts` | 3 | 3 |
@@ -1666,6 +1671,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/views/scrollRail.test.ts` | 5 | 5 |
 | `src/systems/views/sellBayModel.test.ts` | 14 | 14 |
 | `src/systems/views/settingsModel.test.ts` | 5 | 5 |
+| `src/systems/views/sheetLayout.test.ts` | 11 | 11 |
 | `src/systems/views/titleMenuModel.test.ts` | 8 | 8 |
 | `src/systems/views/titleOnlyText.test.ts` | 5 | 5 |
 | `src/systems/views/tooltipOpening.test.ts` | 9 | 9 |

@@ -44,6 +44,7 @@ The phones are Chromium emulation (`isMobile`, `hasTouch`) at DPR 1, not shots f
 | `tech-tree`      | the tech tree's map                             |
 | `tech-tree-list` | the tech tree's list                            |
 | `planet-card`    | the planet card on arrival at planet 25         |
+| `base-sheet`     | the shared sheet on the example's probe tabs    |
 | `title-menu`     | the title menu                                  |
 
 The sheets are a table, `e2e/browser/ui/uiShotSheets.ts`: a sheet the shared sheet component (#686)
