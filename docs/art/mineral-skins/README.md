@@ -351,6 +351,59 @@ species rows as before; no layer is shared with another batch or within this one
 - **Seeds 701 to 792**, apart from p4-b3's 401 to 511, so no two P4 layers share a noise field
   (p2-b1 draws the same numbers on another planet, as the seed rule is per planet).
 
+## Batch p4-b2: P4's species 6 to 10 (ticket 602)
+
+The `foothold-p4` pool's crystal and fossil uncommons and its three rares, kind slots 6 to 10 on
+P4. P4's slots 1 to 5 (ticket 601, p4-b1) and 11 to 15 with its signature material (ticket 603,
+p4-b3) came first, so this batch's report measures it against them (`planet_mates`). Slots 16 and
+17 are #453's two appended fossil commons (grey marl, crinoid stem), whose skins are held. The
+layers come from the species rows as before; no layer is shared with another batch or within this
+one.
+
+<!-- p4-b2 -->
+
+| slot | species                           | base               | vein             | palette (shadow, body, light)                         | sheen               |
+| ---- | --------------------------------- | ------------------ | ---------------- | ----------------------------------------------------- | ------------------- |
+| 6    | `rose-quartz-quartzine`           | `rosy-haze`        | `quartz-masses`  | `rose-quartz-pink` `#6e5e62` `#dbbdc5` `#eddee2`      | `inner-glow`        |
+| 7    | `trilobite-amberbone`             | `ripple-shale`     | `lobed-segments` | `trilobite-olive` `#4f523c` `#9ea579` `#ced2bc`       | `crest-gleam`       |
+| 8    | `wire-silver-brassvein`           | `sulphide-tarnish` | `ramshorn-curls` | `wire-silver-bright` `#646668` `#c9cdcf` `#e4e6e7`    | `untarnished-gleam` |
+| 9    | `watermelon-tourmaline-quartzine` | `two-tone-pencils` | `pencil-prisms`  | `watermelon-pink-green` `#266244` `#4cc388` `#e9bec8` | `prism-lines`       |
+| 10   | `belemnite-amberbone`             | `radial-guards`    | `bullet-darts`   | `belemnite-amber` `#585422` `#b0a743` `#d8d3a1`       | `guard-crescents`   |
+
+<!-- /p4-b2 -->
+
+- **Bases:** massive milky quartz in a soft rosy haze, crossed by a wobbled net of pale healed
+  fractures, each with a faint dark side; dark shale with ripple marks on a gentle slant (lines of
+  2u + 6v, so six ripples cross the cell one way and two the other and it repeats), slow up one
+  side and steep down the other, over fine laminae; a pale silver-white host gone black in heavy
+  sulphide tarnish blotches with a brown fringe, bright silver threads through the clean stone;
+  seven upright pencils side by side, each pink down its heart (its own width) and green at its
+  rind, striated along its length and broken across here and there; a polished slab cut across the
+  guards, a staggered 3 by 3 lattice of amber calcite discs, fibres radiating from a dark apical
+  point through fine growth rings, in a smooth matrix.
+- **Veins:** three big broken masses of quartz, flat-shaded faces meeting at blunt edges, and a few
+  chips knocked off them; two whole trilobites, a head shield running out into genal spines with a
+  raised glabella and eyes, eight thorax segments each cut into a raised axial ring and two pleurae
+  swept back at their tips, and a small tail shield; four wires of native silver curled like a
+  ram's horn, each heading turning with the cube of the length, so nearly straight from the root
+  and curling tight at the tip; five thick three-sided pencils, edges rounded off and ends cut flat,
+  lying side by side, and one stood on end to show its rounded triangle; bullet-shaped guards lying
+  every way, a round body tapering to a long point, one snapped in two.
+- **Sheens:** inner glow (light pools softly in the middle of each piece between the cracks, the
+  healed cracks catch a thin line, a few glints); crest gleam (the crest of every ripple catches a
+  thin broken line, the rest dull); untarnished gleam (the clean silver shines in a slow sweep and
+  its threads flash, the tarnish takes no light); prism lines (each pencil throws back the lamp along
+  two facet edges, one bright and one faint, with sharp glints); guard crescents (each guard throws a
+  crescent of light from its rim on the lamp's side, the slab under a faint polish). Each sheen
+  shares its base's field (fractures, ripples, tarnish, pencils, guards), so the light sits where
+  the stone is shaped.
+- **Watermelon tourmaline's two tones.** It is pink at heart and green at the rind, so its ramp's
+  light end sits on a pink (345 degrees, `LIGHT_HUES` in `skin_layers.py`) at the usual luma, as
+  alexandrite's shadow sits on its second colour; the body is still its hue slot, as the loader asks.
+  The base's hearts run high on the ramp, so they read pink and the rinds green.
+- **Seeds 801 to 892**, apart from p4-b1's 701 to 792 and p4-b3's 401 to 511, so no two P4 layers
+  share a noise field.
+
 ## Batch p4-b3: P4's species 11 to 15 and its signature material (ticket 603)
 
 The `foothold-p4` pool's three epics and two mythics, kind slots 11 to 15 on P4, and the skin of
@@ -859,6 +912,51 @@ palest skin, dew-beaded, apart from the ichthyosaur eye's bone plates. Every ski
 rock (contrast 1.57 for bog iron to 2.47 for rain quartz). Checked by eye on `p4-b1.phone-x4.png`,
 `p4-b1.desktop.png`, the `p4-b1.layers.jpg` sheet and the planet strip `p4.scale-x4` with its
 `-deutan` and `-gray` copies.
+
+From `sheets/p4-b2.distinct.json`, at 22 px a tile over P4's band 3 rock (`palette.planet_2`, luma
+0.29). The first ten pairs are within the batch; the rest are the closest pairs against p4-b1's
+and p4-b3's skins and P4's signature (the report holds all 65):
+
+<!-- p4-b2-readings -->
+
+| pair                                                 | colour apart | deuteranopia apart | luma apart | texture apart |
+| ---------------------------------------------------- | ------------ | ------------------ | ---------- | ------------- |
+| rose quartz vs wire silver (batch least apart)       | 0.130        | 0.075              | 0.048      | 0.099         |
+| trilobite vs belemnite                               | 0.207        | 0.194              | 0.024      | 0.072         |
+| trilobite vs watermelon tourmaline                   | 0.226        | 0.064              | 0.011      | 0.073         |
+| trilobite vs wire silver                             | 0.235        | 0.223              | 0.084      | 0.115         |
+| rose quartz vs trilobite                             | 0.325        | 0.280              | 0.132      | 0.062         |
+| wire silver vs watermelon tourmaline                 | 0.320        | 0.160              | 0.095      | 0.107         |
+| watermelon tourmaline vs belemnite                   | 0.365        | 0.256              | 0.013      | 0.072         |
+| rose quartz vs watermelon tourmaline                 | 0.446        | 0.220              | 0.143      | 0.067         |
+| wire silver vs belemnite                             | 0.427        | 0.409              | 0.108      | 0.109         |
+| rose quartz vs belemnite                             | 0.487        | 0.454              | 0.156      | 0.060         |
+| rose quartz vs rain quartz (planet-wide least apart) | 0.105        | 0.069              | 0.028      | 0.054         |
+| wire silver vs starsteel                             | 0.061        | 0.072              | 0.026      | 0.118         |
+| wire silver vs ichthyosaur eye                       | 0.068        | 0.045              | 0.011      | 0.106         |
+| watermelon tourmaline vs signature                   | 0.127        | 0.086              | 0.003      | 0.071         |
+| rose quartz vs ichthyosaur eye                       | 0.170        | 0.059              | 0.037      | 0.053         |
+
+<!-- /p4-b2-readings -->
+
+Within the batch the closest pair, rose quartz against wire silver, still differs by 0.130 in
+colour, and soft cracked haze stands against black tarnish blotches. Under deuteranopia trilobite
+and watermelon tourmaline come closest (0.064): slanted ripples against upright pink-hearted
+pencils. The batch lands in P4's crowd of pale cool skins (rain quartz, ichthyosaur eye, starsteel,
+antimony, lumas 0.63 to 0.79). At first rose quartz and wire silver went the same grey under
+deuteranopia (0.023, silver at luma 0.74). Black tarnish is the wire silver's pattern, so its
+tarnish now runs heavy and its clean stone a shade low: the skin averages luma 0.71, under its slot
+(0.80), between the ichthyosaur eye (0.72) and the rose (0.76). Its nearest are then starsteel in
+colour (0.061) and the ichthyosaur eye under deuteranopia (0.045, the floor P4's first batch
+accepted for antimony), and texture parts both by the widest margins in the report (0.118 and
+0.106): tarnish blotches and ram's-horn curls against watered damask and plated bone. Planet-wide
+the least apart are rose quartz and rain quartz (0.105 in colour, 0.054 in texture), pink against
+blue-grey: a soft cracked haze with faceted masses against dew beads and crossed needle sheaves.
+Watermelon tourmaline sits on the signature's luma (0.003 apart), but its green-and-pink upright
+pencils stand 0.127 apart in colour from the teal riveted panels. Every skin sits above its rock
+(contrast 1.92 for belemnite to 2.38 for rose quartz). Checked by eye on `p4-b2.phone-x4.png`,
+`p4-b2.desktop.png`, the `p4-b2.layers.jpg` sheet and the planet strip `p4.scale-x4` with its
+`-deutan` and `-gray` copies, all 16 P4 skins so far.
 
 From `sheets/p4-b3.distinct.json`, at 22 px a tile over P4's band 3 rock (`palette.planet_2`, the
 slate P3 wears too, luma 0.29). P4 has no other batch yet, so these are the batch's own fifteen
