@@ -21,10 +21,12 @@ export function HudDetail({
   model,
   isFlashing,
   isLeftHanded,
+  isRaised,
 }: {
   model: HudModel
   isFlashing: boolean
   isLeftHanded: boolean
+  isRaised: boolean
 }) {
   return (
     <section
@@ -32,6 +34,7 @@ export function HudDetail({
       className={styles.detail}
       data-testid={UI_IDS.hudDetail}
       data-hand={isLeftHanded ? 'left' : 'right'}
+      data-raised={isRaised || undefined}
     >
       <TitleOneLine text={DETAIL_TEXT} level="h2" />
       <ScrollArea className={styles.scroll}>

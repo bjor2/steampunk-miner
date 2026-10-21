@@ -19,13 +19,19 @@ export const GEAR_TEXT = readoutTextOf('hud.gear', 'Gauges')
 export function HudGearButton({
   isOpen,
   isLeftHanded,
+  isRaised,
 }: {
   isOpen: boolean
   isLeftHanded: boolean
+  isRaised: boolean
 }) {
   const toggleHudDetail = useGameStore((state) => state.toggleHudDetail)
   return (
-    <div className={styles.gear} data-hand={isLeftHanded ? 'left' : 'right'}>
+    <div
+      className={styles.gear}
+      data-hand={isLeftHanded ? 'left' : 'right'}
+      data-raised={isRaised || undefined}
+    >
       <TitleOneLine text={GEAR_TEXT} level="span" titlePlace="card">
         <button
           type="button"

@@ -33,6 +33,7 @@ export function HudView({
   orientation = 'landscape',
   isDetailOpen = false,
   isLeftHanded = false,
+  isOverTouchSurface = false,
 }: {
   model: HudModel
   isFlashing: boolean
@@ -40,6 +41,8 @@ export function HudView({
   orientation?: StageOrientation
   isDetailOpen?: boolean
   isLeftHanded?: boolean
+  /** The gear and its detail rise over the touch gesture surface while it lies over the HUD. */
+  isOverTouchSurface?: boolean
 }) {
   const isUpright = isUprightCompactHud(density, orientation)
   const strip = hudStripOf(model)
@@ -55,9 +58,18 @@ export function HudView({
       {isUpright ? <UprightAlerts model={model} /> : <EdgeAlerts model={model} />}
       <HazardStrip />
       {model.isDebugRun && <DebugRunMark />}
-      <HudGearButton isOpen={isDetailOpen} isLeftHanded={isLeftHanded} />
+      <HudGearButton
+        isOpen={isDetailOpen}
+        isLeftHanded={isLeftHanded}
+        isRaised={isOverTouchSurface}
+      />
       {isDetailOpen && (
-        <HudDetail model={model} isFlashing={isFlashing} isLeftHanded={isLeftHanded} />
+        <HudDetail
+          model={model}
+          isFlashing={isFlashing}
+          isLeftHanded={isLeftHanded}
+          isRaised={isOverTouchSurface}
+        />
       )}
     </div>
   )

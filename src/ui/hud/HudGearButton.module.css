@@ -68,3 +68,12 @@
   outline: var(--focus-ring);
   outline-offset: var(--focus-ring-offset);
 }
+
+/*
+ * While the touch gesture surface lies over the HUD (the vehicle has the input on a touch
+ * screen), the button rises over it, as a tappable amount does (ticket 476); under a menu it sits
+ * back, so the menu covers it.
+ */
+.gear[data-raised] {
+  z-index: 1;
+}

@@ -9,6 +9,7 @@ import {
   heldChangesOf,
   isDoubleTap,
   isSlotHeldForCard,
+  isGestureSurfaceShown,
   isPauseButtonShown,
   isStickShown,
   pinchZoomStepsOf,
@@ -62,6 +63,14 @@ describe('touch stick (#173)', () => {
     expect(isStickShown('vehicle')).toBe(true)
     expect(isStickShown('platform')).toBe(false)
     expect(isStickShown('settings')).toBe(false)
+  })
+})
+
+describe('touch gesture surface (ticket 684)', () => {
+  it('lies over the HUD only while the touch controls show and the vehicle has the input', () => {
+    expect(isGestureSurfaceShown(true, 'vehicle')).toBe(true)
+    expect(isGestureSurfaceShown(false, 'vehicle')).toBe(false)
+    expect(isGestureSurfaceShown(true, 'settings')).toBe(false)
   })
 })
 

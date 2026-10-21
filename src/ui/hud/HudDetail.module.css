@@ -230,3 +230,12 @@
     visibility: hidden;
   }
 }
+
+/*
+ * While the touch gesture surface lies over the HUD (the vehicle has the input on a touch
+ * screen), the detail rises over it, as a tappable amount does (ticket 476); under a menu it sits
+ * back, so the menu covers it.
+ */
+.detail[data-raised] {
+  z-index: 1;
+}

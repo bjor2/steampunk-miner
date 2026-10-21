@@ -133,6 +133,15 @@ export function isStickShown(layer: InputContext): boolean {
   return layer === 'vehicle'
 }
 
+/**
+ * The pinch-and-double-tap surface lies over the whole HUD while the touch controls show and the
+ * vehicle has the input, so a HUD control that takes taps then (the strip's gear button and its
+ * detail, ticket 684) has to sit above it; under a menu it sits back.
+ */
+export function isGestureSurfaceShown(isTouchControlsShown: boolean, layer: InputContext): boolean {
+  return isTouchControlsShown && isStickShown(layer)
+}
+
 /** The pause button is there to stop a dive, so it shows only while the vehicle has the input. */
 export function isPauseButtonShown(layer: InputContext): boolean {
   return layer === 'vehicle'
