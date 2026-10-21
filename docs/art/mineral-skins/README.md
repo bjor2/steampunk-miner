@@ -534,6 +534,70 @@ the shared Blender (the procedure under Pipeline), and a second run wrote byte-i
   so the light sits where the stone is shaped.
 - **Seeds 701 to 791**, apart from P5's other batch.
 
+## Batch p5-b3: P5's species 11 to 15 and its signature material (ticket 606)
+
+The `foothold-p5` pool's three epics and two mythics, kind slots 11 to 15 on P5, and the skin of
+the planet's signature material: the relic (Cogwork) ore at its band-5 tier, `relic_t17`, the
+slotless 16th material of #453 E1, which wears the planet's `signatures` row (`p5-signature` in the
+cell table). P5's slots 16 and 17, #453's coprolite and ash bed, stay held. This batch closes the
+planet: slots 1 to 15 and the signature are skinned. The species' layers come from their rows as
+before, and the signature's from its family's look (Cogwork: clockwork). No layer is shared with
+another batch or within this one. Authored through the Blender MCP (the procedure under Pipeline);
+a headless run of the same recipes wrote byte-identical cells.
+
+<!-- p5-b3 -->
+
+| slot | wearer                          | base              | vein             | palette (shadow, body, light)                      | sheen              |
+| ---- | ------------------------------- | ----------------- | ---------------- | -------------------------------------------------- | ------------------ |
+| 11   | `firebrass-brassvein`           | `flame-tongues`   | `curled-ribbons` | `firebrass-flame` `#5c5010` `#b9a021` `#dcd090`    | `flame-flicker`    |
+| 12   | `heat-spinel-quartzine`         | `heat-shimmer`    | `spinel-macles`  | `heat-spinel-pink` `#69324e` `#d2659c` `#e8b2ce`   | `banked-glow`      |
+| 13   | `petrified-heartwood-amberbone` | `heartwood-grain` | `log-rounds`     | `heartwood-olive` `#49502c` `#92a157` `#c9d0ab`    | `chalcedony-gleam` |
+| 14   | `core-gold-brassvein`           | `molten-pour`     | `gold-blooms`    | `core-gold-bright` `#787006` `#efe00d` `#f7f086`   | `molten-sheen`     |
+| 15   | `furnace-ruby-quartzine`        | `hearth-zones`    | `heart-crystals` | `furnace-ruby-flame` `#782633` `#f04b66` `#edb288` | `ruby-fire`        |
+| sig. | P5's signature, `relic_t17`     | `enamel-dial`     | `escapement`     | `furnace-verdigris` `#1c5640` `#39ac80` `#9cd6c0`  | `dial-glaze`       |
+
+<!-- /p5-b3 -->
+
+- **Bases:** brass lit from below in three rows of flame tongues that rise from a dark seam and taper,
+  over a fine hammered grain; a clear pink body seen through rising heat, five upright shimmer columns
+  bent hard by a fine warp; side grain of stone wood, upright growth rings that bulge round the knots,
+  short dark drying checks across them; gold that set as it flowed, bright rivulets threading a cooled
+  skin wrinkled across the flow; a deep red body grown in hexagonal zones, two by two, a bright heart
+  in each and darker toward its rim, with crisp zone lines; enamelled clock dials, two by two, each a
+  chapter ring of twelve hour marks, its glaze crazed by the furnace, worn brass between.
+- **Veins:** three brass ribbons, each a wavering length that ends in a tight curl and narrows where
+  it twists; three spinel-law twins, flat triangular macles with a smaller triangle turned through
+  60 degrees on top, and two small octahedra; a stone branch lying along the face with a broken stub,
+  and two sawn rounds standing end on, each with bark and three growth rings; three blooms of gold,
+  rosettes of uneven rounded petals round a bead; three heart-shaped rubies with bevelled edges and a
+  raised table, two large and one small; an escapement, the escape wheel's fifteen hooked teeth, its
+  spokes and crossing, the anchor's two arms over it on their boss (P3's signature is an intact gear
+  train, P4's broken cogs; P5's clockwork is the part that keeps time).
+- **Sheens:** flame flicker (light at the tongues' tips, flickering in and out, a few hot glints);
+  banked glow (a soft glow along the shimmer crests and a warm bloom beneath, as the stone holds the
+  heat); chalcedony gleam (a waxy gleam along the late-wood lines where the wood turned to
+  chalcedony); molten sheen (the rivulets shine like liquid metal, a wet glare round them, hard
+  glints on the skin); ruby fire (a flame-bright glow in each zone's heart, sharp sparks); dial glaze
+  (a window of light swept across each glazed dial, the crazing catching it). Each sheen shares its
+  base's field (tongues, columns, rings, rivulets, zones, dials), so the light sits where the stone or
+  the plate is shaped.
+- **Furnace ruby's flame.** The materials table puts furnace ruby (350 degrees, saturation 0.85) five
+  degrees from fire garnet (345, 0.70) at one luma (0.50). Its row is the "inner-fire" pattern, "a
+  ruby with a flame inside", so its ramp puts the light end on a flame orange (25 degrees,
+  `LIGHT_HUES` in `skin_layers.py`), as alexandrite's shadow sits on its second colour; the body is
+  still its hue slot, as the loader asks. The bright hearts of its zones glow orange, and its mean
+  moves from 0.042 to 0.065 off the garnet's.
+- **Heat spinel stands upright.** At its slot's luma (0.55) the spinel goes the shark tooth's grey
+  under deuteranopia, and the shark tooth lies in level beds, so the spinel's heat shimmer rises in
+  upright columns.
+- **The signature's palette.** It has no hue slot, so its body is built as P3's and P4's are, on a
+  slot-shaped look inside the relic family's #151 bands (hue 155-168 degrees, luma 0.46-0.68): hue
+  157, the hue the ground draws `relic_t17` in today (`oreLookOfType`), at the family's saturation
+  (0.5) and luma 0.52 (`SIGNATURE_LOOKS`). That is below the ground's 0.64 and P5's three near-greys
+  at 0.56 to 0.65 (shark tooth, chromite, wolfram), which a teal joins under deuteranopia. It is the
+  planet's only blue-green.
+- **Seeds 801 to 852**, apart from P5's other batches (601 to 691, 701 to 791).
+
 ## Compositing
 
 What a renderer draws for a skin, per pixel, in display values (0..1), from the row's layers:
@@ -1064,6 +1128,56 @@ green. Every skin sits above its rock (contrast 1.57 for fire garnet to 2.22 for
 Checked by eye on `p5-b2.phone-x4.png`, `p5-b2.desktop.png`, the `p5-b2.layers.jpg` sheet, the
 `p5-b2.scale-x4` copies with `-deutan` and `-gray`, and `p5.scale-x4.png` (P5's ten skins side by
 side, with its blind copies).
+
+From `sheets/p5-b3.distinct.json`, at 22 px a tile over P5's band 3 rock (luma 0.29). The first
+fifteen pairs are within the batch; the rest are its closest pairs against p5-b1 and p5-b2 (the
+report holds all 75):
+
+<!-- p5-b3-readings -->
+
+| pair                                      | colour apart | deuteranopia apart | luma apart | texture apart |
+| ----------------------------------------- | ------------ | ------------------ | ---------- | ------------- |
+| firebrass vs heartwood                    | 0.201        | 0.159              | 0.013      | 0.082         |
+| heat spinel vs furnace ruby               | 0.263        | 0.234              | 0.072      | 0.117         |
+| firebrass vs core gold                    | 0.307        | 0.322              | 0.186      | 0.088         |
+| heartwood vs signature                    | 0.329        | 0.147              | 0.066      | 0.072         |
+| heat spinel vs heartwood                  | 0.343        | 0.231              | 0.035      | 0.094         |
+| firebrass vs furnace ruby                 | 0.360        | 0.199              | 0.120      | 0.120         |
+| heartwood vs furnace ruby                 | 0.394        | 0.110              | 0.107      | 0.095         |
+| firebrass vs heat spinel                  | 0.429        | 0.388              | 0.048      | 0.118         |
+| heartwood vs core gold                    | 0.444        | 0.407              | 0.199      | 0.055         |
+| firebrass vs signature                    | 0.512        | 0.304              | 0.079      | 0.100         |
+| heat spinel vs signature                  | 0.536        | 0.085              | 0.031      | 0.105         |
+| core gold vs furnace ruby                 | 0.573        | 0.498              | 0.306      | 0.093         |
+| heat spinel vs core gold                  | 0.620        | 0.604              | 0.234      | 0.093         |
+| furnace ruby vs signature                 | 0.655        | 0.158              | 0.041      | 0.086         |
+| core gold vs signature                    | 0.738        | 0.535              | 0.265      | 0.084         |
+| fire garnet vs furnace ruby (least apart) | 0.065        | 0.069              | 0.005      | 0.101         |
+| ember agate vs heat spinel                | 0.112        | 0.115              | 0.016      | 0.096         |
+| peridot vs heartwood                      | 0.136        | 0.135              | 0.044      | 0.055         |
+| peridot vs firebrass                      | 0.170        | 0.090              | 0.031      | 0.085         |
+| ember agate vs furnace ruby               | 0.210        | 0.142              | 0.088      | 0.097         |
+| shark tooth vs heat spinel                | 0.253        | 0.013              | 0.003      | 0.131         |
+| ember agate vs signature                  | 0.519        | 0.033              | 0.047      | 0.081         |
+
+<!-- /p5-b3-readings -->
+
+The materials table gives P5 five reds over its three batches: furnace iron (0 degrees, luma 0.48),
+ember agate (356, 0.55), fire garnet (345, 0.50), heat spinel (330, 0.55) and furnace ruby (350,
+0.50). Fire garnet and furnace ruby are P5's closest pair, 0.065 apart in colour
+with the ruby's flame light end (0.042 without it), so texture has to part them. The garnet is soft
+round glowing cores and faceted balls, the ruby a bold honeycomb, bright heart to dark rim, with
+hearts: 0.101 apart in texture. The heat spinel is the pink one: 0.11 from ember agate, with upright
+shimmer against nested rings and geodes. The yellows are four: saurian vertebra (60, 0.70) and the
+batch's firebrass (50, 0.60), heartwood (72, 0.58) and core gold (56, 0.80). Core gold stands apart by
+luma; firebrass and heartwood, 0.20 apart, are flame rows against upright wood grain. Under
+deuteranopia the spinel goes the shark tooth's grey (0.013 apart) and the signature the agate's
+khaki-grey (0.033). There the spinel's upright columns stand against the bone bed's level beds
+(0.131 apart in texture, among the report's largest), and the dials against the agate's nested bands.
+Every skin sits above its rock (contrast 1.59 for furnace ruby to 2.49 for core gold). Checked by eye
+on `p5-b3.phone-x4.png`, `p5-b3.desktop.png`, the `p5-b3.layers.jpg` sheet, the `p5-b3.scale-x4`
+copies with `-deutan` and `-gray`, and `p5.scale-x4.png` (all of P5's fifteen skins and its
+signature side by side, with its blind copies).
 
 Known limits: the cells are unlit tone, so a skin does not turn with the vehicle's lamp (the vein's
 own shading is baked from the stage's fixed headlamp, as the hero sprites are); the earthy sheen
