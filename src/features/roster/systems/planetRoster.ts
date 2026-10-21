@@ -14,8 +14,9 @@
  * reads it.
  *
  * The slots are shared, but each planet picks the species pool they resolve to (ticket 542, TD
- * shape on #453, 6236465674): `kinds.pools` maps the planet index to a pool, never the seed, so a
- * pool changes which species a slot shows and never a stored cell.
+ * shape on #453, 6236465674): the planet's registry row (`ores` `planets.rows`) names its pool by
+ * planet index, never the seed, so a pool changes which species a slot shows and never a stored
+ * cell.
  */
 import {
   ORE_ROWS,

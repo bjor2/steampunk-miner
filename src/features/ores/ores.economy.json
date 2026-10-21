@@ -37,15 +37,6 @@
     },
     "kinds": {
       "rosterMaxKinds": 17,
-      "pools": {
-        "1": "legacy",
-        "2": "foothold-p2",
-        "3": "foothold-p3",
-        "4": "foothold-p4",
-        "5": "foothold-p5",
-        "6": "foothold-p6-p7",
-        "7": "foothold-p6-p7"
-      },
       "poolsBeforeOreRules": { "6": { "2": "legacy" } },
       "legacy": [
         { "slotId": "legacy.c1", "family": "metal", "rarity": "common", "window": [1, 5] },
@@ -79,6 +70,21 @@
         { "slotId": "mixed.m2", "family": "crystal", "rarity": "mythic", "window": [4, 5] },
         { "slotId": "mixed.c5", "family": "fossil", "rarity": "common", "window": [3, 3] },
         { "slotId": "mixed.c6", "family": "fossil", "rarity": "common", "window": [3, 3] }
+      ]
+    },
+    "planets": {
+      "radiusRule": { "baseTiles": 300, "lnCoefficient": 175, "lnCoefficientBounds": [150, 200] },
+      "rows": [
+        { "planet": 1, "pool": "legacy", "radiusTiles": 300, "measuredMinutes": null },
+        { "planet": 2, "pool": "foothold-p2", "radiusTiles": 421, "measuredMinutes": null },
+        { "planet": 3, "pool": "foothold-p3", "radiusTiles": 492, "measuredMinutes": null },
+        { "planet": 4, "pool": "foothold-p4", "radiusTiles": 543, "measuredMinutes": null },
+        { "planet": 5, "pool": "foothold-p5", "radiusTiles": 582, "measuredMinutes": null },
+        { "planet": 6, "pool": "foothold-p6-p7", "radiusTiles": 614, "measuredMinutes": null },
+        { "planet": 7, "pool": "foothold-p6-p7", "radiusTiles": 641, "measuredMinutes": null },
+        { "planet": 8, "radiusTiles": 664, "measuredMinutes": null },
+        { "planet": 9, "radiusTiles": 685, "measuredMinutes": null },
+        { "planet": 10, "radiusTiles": 703, "measuredMinutes": null }
       ]
     }
   }

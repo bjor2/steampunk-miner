@@ -277,6 +277,15 @@ programs }` from three's `renderer.info` of the game canvas), read only when cal
   and a rules-5 P2 to one species of its pool, and `materialTable.test.ts` the 12 rows to their
   slot's family, rarity and window with looks no other species wears. Income, p* and P2's time do
   not move because the cells and kind slots do not: the Tester's `balance:report` confirms them.
+- **Planet registry** (ticket 642, GD lock R1 on #302 6306854642 and its addendum 6306861669):
+  `src/features/ores/systems/planetRows.test.ts` holds each planet's row (pool and radius on one
+  row, P1 to P10), the frozen radii to R(p) = round(300 + 175 ln p) with the shared k inside 150 to
+  200, P1 at today's 300, measured minutes null until ticket 644 writes them, and the loader refusing
+  a shrink inside a solar system without `radiusShrinkWhy`, a stray reason, a gap, a pool after a
+  pool-less planet and an unknown field. `src/features/ores/planetRadius.byteIdentity.test.ts`
+  changes each planet's radius (to 300, one tile more and twice it) and holds every band's hardness,
+  ore value and price, the surface rock by depth, core hardness, `paceScale` and upgrade prices
+  byte-identical.
 - **Material looks** (ticket 450, TD shape on #450 6226270701 and the Scalers' conditions):
   `src/features/roster/kindLook.test.ts` holds the roster's look provider to its rules: a fresh
   save shows no species (unseen kinds draw the family look), a species shows only once the

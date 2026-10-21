@@ -11,14 +11,25 @@
  *   (`rarityRows.ts`, ticket 445). The lead rows above stay byte-identical beside it.
  * - `ores.economy.json` `kinds`: the material kind slots per rarity row set and the roster cap
  *   (`kindRows.ts`, ticket 446), checked against the families and the rarity weights.
+ * - `ores.economy.json` `planets`: the planet registry, one row per planet with its species pool
+ *   and its frozen radius (`planetRows.ts`, ticket 642), checked against the solar systems.
  * - `oreFamilies.json`: #141's 12 families in its table order. A family's place in the list is its
  *   code in the cell's 4-bit family field, plus one (`metal` 1 and `crystal` 2, as the kernel's
  *   `RESOURCE_FAMILY` already writes them), so the order is append-only.
  */
+import { ECONOMY } from '../../../systems/economy/economy'
 import { BAND_COUNT } from '../../../systems/world/planetGeometry'
 import economyFile from '../ores.economy.json'
 import familiesFile from '../oreFamilies.json'
 import { kindRowProblems, kindRowsOf, type KindRowContext, type KindRows } from './kindRows'
+import {
+  planetRowProblems,
+  planetRowsOf,
+  poolByPlanetOf,
+  pooledPlanetKeysOf,
+  type PlanetRowContext,
+  type PlanetRows,
+} from './planetRows'
 import { rarityRowProblems, rarityRowsOf, type RarityRowSet, type RarityRows } from './rarityRows'
 
 export interface OreFamily {
@@ -49,6 +60,7 @@ export interface OreRows {
   catalogue: CatalogueKnobs
   rarity: RarityRows
   kinds: KindRows
+  planets: PlanetRows
 }
 
 /** The 4-bit field holds 15 families; 0 is `none`. */
@@ -59,6 +71,13 @@ const SIGNATURE_BANDS = ['4', '5']
 const FAMILY_ID = /^[a-z]+$/
 
 type Raw = Record<string, unknown>
+
+/** A planet's solar system: the last `planets.surfaceLayer.systems` row it has reached (#306). */
+const SOLAR_SYSTEMS: PlanetRowContext = {
+  solarSystemOf: (planetIndex) =>
+    ECONOMY.planets.surfaceLayer.systems.filter((row) => row.firstPlanet <= planetIndex).at(-1)
+      ?.system ?? 0,
+}
 
 export const ORE_ROWS: OreRows = loadOreRows(economyFile, familiesFile)
 
@@ -73,6 +92,7 @@ export function oreRowProblems(economy: unknown, families: unknown): string[] {
     ...catalogueProblems(ore.catalogue as Raw | undefined),
     ...rarityRowProblems(ore.rarity),
     ...kindRowProblems(ore.kinds, kindRowContextOf(ore, families)),
+    ...planetRowProblems(ore.planets, SOLAR_SYSTEMS),
   ]
 }
 
@@ -81,6 +101,7 @@ function loadOreRows(economy: typeof economyFile, families: typeof familiesFile)
   if (problems.length > 0)
     throw new Error(`The ores slice data is refused:\n${problems.join('\n')}`)
   const { leadWeightsBpByBand: weights, ...ore } = economy.ore
+  const planets = planetRowsOf(ore.planets)
   return {
     families: families.families.map((family, at) => ({ ...family, cellCode: at + 1 })),
     leadWeightsByBand: weights.plus1.map((plus1Bp, at) => ({
@@ -91,7 +112,8 @@ function loadOreRows(economy: typeof economyFile, families: typeof familiesFile)
     signatureShareCapBpByBand: ore.signatureShareCapBpByBand,
     catalogue: ore.catalogue,
     rarity: rarityRowsOf(ore.rarity),
-    kinds: kindRowsOf(ore.kinds),
+    kinds: kindRowsOf(ore.kinds, poolByPlanetOf(planets)),
+    planets,
   }
 }
 
@@ -101,6 +123,7 @@ function kindRowContextOf(ore: Raw, families: unknown): KindRowContext {
   const rows = Array.isArray(listed) ? (listed as Raw[]) : []
   return {
     familyIds: rows.map((family) => String(family.id)),
+    pooledPlanets: pooledPlanetKeysOf(ore.planets),
     weightBpOf: (set, rarity, band) =>
       tierWeightBpOf(ore.rarity as Raw | undefined, set, rarity, band),
   }

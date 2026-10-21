@@ -17,6 +17,7 @@ describe('ore catalogue data', () => {
         catalogue: { variantsPerFamily: 0 },
         rarity: economyFile.ore.rarity,
         kinds: { ...economyFile.ore.kinds, legacy: [], mixed: [] },
+        planets: economyFile.ore.planets,
       },
     }
     const families = {

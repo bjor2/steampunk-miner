@@ -26,12 +26,6 @@ function problemsWithEarlierPools(poolsBeforeOreRules: unknown): string[] {
   return oreRowProblems({ ore: { ...economyFile.ore, kinds } }, familiesFile)
 }
 
-/** The shipped files with the planet-to-pool table replaced, and no earlier pools to name it. */
-function problemsWithPools(pools: unknown): string[] {
-  const kinds = { ...economyFile.ore.kinds, pools, poolsBeforeOreRules: undefined }
-  return oreRowProblems({ ore: { ...economyFile.ore, kinds } }, familiesFile)
-}
-
 const C1: Slot = economyFile.ore.kinds.legacy[0]
 
 describe('ore kind slots', () => {
@@ -142,29 +136,16 @@ describe('ore kind pools', () => {
     expect(poolOf(7)).toBe('foothold-p6-p7')
     expect([8, 9, 40, 200].map(poolOf)).toEqual([undefined, undefined, undefined, undefined])
   })
-
-  it('refuses a table that skips a planet or does not start at planet 1', () => {
-    const gap = 'ore.kinds.pools must name planets 1 to n, with no gap'
-    expect(problemsWithPools({ 1: 'legacy', 3: 'foothold-p3' })).toEqual([gap])
-    expect(problemsWithPools({ 2: 'legacy' })).toEqual([gap])
-    expect(problemsWithPools({})).toEqual([gap])
-  })
-
-  it('refuses a pool id that is not kebab-case, and a table that is not a map', () => {
-    expect(problemsWithPools({ 1: 'legacy', 2: 'Foothold.P3' })).toEqual([
-      'ore.kinds.pools.2 must be a kebab-case pool id',
-    ])
-    expect(problemsWithPools(['legacy'])).toEqual([
-      'ore.kinds.pools must map planet indices to pool ids',
-    ])
-  })
 })
 
 // The pools a planet had under older ore rules (ticket 632, GD lock (b) on #595): a planet a save
 // holds under rules older than its pool's keeps the pool it was entered with.
 describe('ore kind pools before an ore rules version', () => {
   const EARLIER = { 3: { 2: 'older-p2' }, 5: { 2: 'legacy', 3: 'old-p3' } }
-  const kinds = kindRowsOf({ ...economyFile.ore.kinds, poolsBeforeOreRules: EARLIER })
+  const kinds = kindRowsOf(
+    { ...economyFile.ore.kinds, poolsBeforeOreRules: EARLIER },
+    ORE_ROWS.kinds.poolByPlanet,
+  )
   const today = (planet: number) => kinds.poolByPlanet.get(planet)
 
   it('resolves a stamp to the pool of the earliest rules it predates, and from them on to today', () => {
@@ -199,7 +180,7 @@ describe('ore kind pools before an ore rules version', () => {
     ])
     expect(problemsWithEarlierPools({ 3: { 9: 'legacy', 2: 'Old P2' } })).toEqual([
       'ore.kinds.poolsBeforeOreRules.3.2 must be a kebab-case pool id',
-      'ore.kinds.poolsBeforeOreRules.3.9 names a planet pools does not',
+      'ore.kinds.poolsBeforeOreRules.3.9 names a planet with no pool',
     ])
     expect(problemsWithEarlierPools(['legacy'])).toEqual([
       'ore.kinds.poolsBeforeOreRules must map ore rules versions to planet pools',

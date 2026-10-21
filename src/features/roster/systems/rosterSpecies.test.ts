@@ -7,7 +7,7 @@ import { planetRosterOf, poolOfPlanet } from './planetRoster'
 // The species-to-slot cross-check (TD ruling on ticket 446, 6226236698 section 1 and addendum
 // 6226264758, rows of ticket 447): a species binds to a kind slot by `(pool, slot)`, its family,
 // rarity and window equal the slot's, and every slot of the legacy table holds exactly one species.
-// The pool guard of ticket 542 (TD shape on #453, 6236465674): every pool of `kinds.pools` holds
+// The pool guard of ticket 542 (TD shape on #453, 6236465674): every pool of `planets.rows` holds
 // exactly one species for every slot a planet of it can ask for, and no species row's pool is
 // unmapped. P2's own pool (ticket 632, GD lock (b) on #595) binds the legacy slots, and a P2 a save
 // holds under ore rules 5 or earlier keeps the legacy species.

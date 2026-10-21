@@ -9,13 +9,13 @@
  *   Scaler). Raising it is a new `ORE_RULES_VERSION` that changes data only, never existing cells.
  * - One table per rarity row set: a planet draws the kinds of the set it draws its rarity from
  *   (`legacy` on P1 and P2, `mixed` from P3). A slot id is `<set>.<name>`, stable, never renumbered.
- * - `pools`: planet index to the species pool its slots resolve to (TD shape on ticket 542,
- *   #453 comment 6236465674), so P3, P4 and P5 show their own species on shared slots. It runs
- *   from planet 1 without a gap; a planet past its end has no pool and binds no species (#453).
+ * - The species pool each planet's slots resolve to (TD shape on ticket 542, #453 comment
+ *   6236465674) sits on the planet's row of the planet registry (`planetRows.ts`, ticket 642), so
+ *   P3, P4 and P5 show their own species on shared slots; a planet with no pool binds no species.
  * - `poolsBeforeOreRules`: an ore rules version to the pools planets had before it (ticket 632, GD
  *   lock (b) on #595), so a planet a save holds under earlier rules keeps the species it was
  *   entered with: P2 entered before rules 6 stays on `legacy`. Optional; a planet it names must be
- *   one `pools` names.
+ *   one the registry gives a pool.
  *
  * A slot is live only where its tier has weight in its set, so a kind never sits on a band its
  * rarity never paints. Look only: no slot field reaches a price, a hardness or a gate.
@@ -23,6 +23,7 @@
 import { BAND_COUNT } from '../../../systems/world/planetGeometry'
 import { ORE_RULES_VERSION } from '../../../systems/world/planetParams'
 import { MAX_KIND_SLOT } from '../../../systems/world/worldCell'
+import { isPlainMap, isPoolId } from './planetRows'
 import { RARITY_ROW_SETS, type RarityRowSet } from './rarityRows'
 
 export interface KindSlot {
@@ -57,6 +58,8 @@ export interface KindRows {
 /** What the guards check a slot against: the families and the set's tier weights per band. */
 export interface KindRowContext {
   familyIds: readonly string[]
+  /** The planets the registry gives a pool, as `poolsBeforeOreRules` keys name them. */
+  pooledPlanets: readonly string[]
   /** Per set, per tier id, bands 1 to 5 in basis points; common is never 0. */
   weightBpOf(set: RarityRowSet, rarity: string, band: number): number | undefined
 }
@@ -64,8 +67,6 @@ export interface KindRowContext {
 /** The roster index plus one fills the 8-bit kind slot, so 255 kinds at most. */
 const MOST_KINDS = MAX_KIND_SLOT
 const SLOT_NAME = /^[a-z][a-z0-9]*$/
-/** A pool id is kebab-case, as a `materials.json` row writes its `pool`. */
-const POOL_ID = /^[a-z][a-z0-9]*(-[a-z0-9]+)*$/
 const WHOLE_KEY = /^[1-9][0-9]*$/
 
 type Raw = Record<string, unknown>
@@ -78,19 +79,21 @@ export function kindRowProblems(kinds: unknown, context: KindRowContext): string
   return [
     ...(isCap ? [] : [`ore.kinds.rosterMaxKinds must be a whole number from 1 to ${MOST_KINDS}`]),
     ...RARITY_ROW_SETS.flatMap((set) => slotTableProblems(raw[set], set, cap, context)),
-    ...poolTableProblems(raw.pools),
-    ...earlierPoolTableProblems(raw.poolsBeforeOreRules, raw.pools),
+    ...earlierPoolTableProblems(raw.poolsBeforeOreRules, context.pooledPlanets),
     ...unknownTableProblems(raw),
   ]
 }
 
-/** The block as typed rows; call only on a block `kindRowProblems` accepts. */
-export function kindRowsOf(kinds: Raw): KindRows {
+/**
+ * The block as typed rows, with the registry's pools; call only on a block `kindRowProblems`
+ * accepts.
+ */
+export function kindRowsOf(kinds: Raw, poolByPlanet: ReadonlyMap<number, string>): KindRows {
   const tableOf = (set: RarityRowSet) => (kinds[set] as Raw[]).map(kindSlotOf)
   return {
     rosterMaxKinds: kinds.rosterMaxKinds as number,
     slotsBySet: { legacy: tableOf('legacy'), mixed: tableOf('mixed') },
-    poolByPlanet: poolByPlanetOf(kinds.pools as Record<string, string>),
+    poolByPlanet,
     earlierPools: earlierPoolsOf((kinds.poolsBeforeOreRules ?? {}) as EarlierPoolTable),
   }
 }
@@ -111,12 +114,6 @@ export function poolOfPlanetUnder(
 /** Whether band `band` is in the slot's window. */
 export function isSlotLiveInBand(slot: KindSlot, band: number): boolean {
   return band >= slot.window[0] && band <= slot.window[1]
-}
-
-/** The guard holds the keys to planets 1 to n, so planet `at + 1` is always a key. */
-function poolByPlanetOf(pools: Record<string, string>): ReadonlyMap<number, string> {
-  const planets = Object.keys(pools).map((_, at) => at + 1)
-  return new Map(planets.map((planet) => [planet, pools[String(planet)]]))
 }
 
 type EarlierPoolTable = Record<string, Record<string, string>>
@@ -204,55 +201,35 @@ function repeatedIdsOf(ids: readonly string[]): string[] {
   return [...new Set(ids.filter((id, at) => ids.indexOf(id) !== at))]
 }
 
-/** Planets 1 to n, each naming a pool, so only a planet past the table's end lacks one. */
-function poolTableProblems(pools: unknown): string[] {
-  if (typeof pools !== 'object' || pools === null || Array.isArray(pools)) {
-    return ['ore.kinds.pools must map planet indices to pool ids']
-  }
-  const entries = Object.entries(pools as Raw)
-  const isRunFromOne = entries.every((_, at) => Object.hasOwn(pools, String(at + 1)))
-  return [
-    ...(entries.length > 0 && isRunFromOne
-      ? []
-      : ['ore.kinds.pools must name planets 1 to n, with no gap']),
-    ...entries
-      .filter(([, pool]) => typeof pool !== 'string' || !POOL_ID.test(pool))
-      .map(([planet]) => `ore.kinds.pools.${planet} must be a kebab-case pool id`),
-  ]
-}
-
-/** Versions this build knows past the first, each naming planets of `pools` and a pool id. */
-function earlierPoolTableProblems(table: unknown, pools: unknown): string[] {
+/** Versions this build knows past the first, each naming pooled planets and a pool id. */
+function earlierPoolTableProblems(table: unknown, pooledPlanets: readonly string[]): string[] {
   if (table === undefined) return []
   if (!isPlainMap(table)) {
     return ['ore.kinds.poolsBeforeOreRules must map ore rules versions to planet pools']
   }
   return Object.entries(table).flatMap(([rules, planets]) =>
-    earlierPoolRowProblems(rules, planets, pools),
+    earlierPoolRowProblems(rules, planets, pooledPlanets),
   )
 }
 
-function earlierPoolRowProblems(rules: string, planets: unknown, pools: unknown): string[] {
+function earlierPoolRowProblems(
+  rules: string,
+  planets: unknown,
+  pooledPlanets: readonly string[],
+): string[] {
   const where = `ore.kinds.poolsBeforeOreRules.${rules}`
   const version = WHOLE_KEY.test(rules) ? Number.parseInt(rules, 10) : 0
   const isVersion = version > 1 && version <= ORE_RULES_VERSION
   if (!isVersion) return [`${where} must be an ore rules version from 2 to ${ORE_RULES_VERSION}`]
   if (!isPlainMap(planets)) return [`${where} must map planet indices to pool ids`]
-  const named = isPlainMap(pools) ? pools : {}
   return Object.entries(planets).flatMap(([planet, pool]) => [
-    ...(Object.hasOwn(named, planet) ? [] : [`${where}.${planet} names a planet pools does not`]),
-    ...(typeof pool === 'string' && POOL_ID.test(pool)
-      ? []
-      : [`${where}.${planet} must be a kebab-case pool id`]),
+    ...(pooledPlanets.includes(planet) ? [] : [`${where}.${planet} names a planet with no pool`]),
+    ...(isPoolId(pool) ? [] : [`${where}.${planet} must be a kebab-case pool id`]),
   ])
 }
 
-function isPlainMap(value: unknown): value is Raw {
-  return typeof value === 'object' && value !== null && !Array.isArray(value)
-}
-
 function unknownTableProblems(raw: Raw): string[] {
-  const known = ['rosterMaxKinds', 'pools', 'poolsBeforeOreRules', ...RARITY_ROW_SETS]
+  const known = ['rosterMaxKinds', 'poolsBeforeOreRules', ...RARITY_ROW_SETS]
   return Object.keys(raw)
     .filter((key) => !known.includes(key))
     .map((key) => `ore.kinds.${key} is not a rarity row set`)
