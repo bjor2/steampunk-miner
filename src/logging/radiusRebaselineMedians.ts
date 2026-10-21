@@ -1,9 +1,10 @@
 /**
  * The R3 re-baseline's numbers per planet and per hop (ticket 644), each on the median of the
- * pacing seeds (#84), from the runs' drill pace and radius tallies and each seed's ore census:
- * the money per minute from arrival to the core and its step against the #551 equilibrium, the
- * climb share of a trip, the ore cells on the planet, and for each hop the fee share of the wallet
- * at core harvest and whether the #648 clamp bound (the hop the player could not pay in full).
+ * pacing seeds (#84), from the runs' drill pace and radius tallies: the money per minute from
+ * arrival to the core and its step against the #551 equilibrium, the climb share of a trip, and
+ * for each hop the fee share of the wallet at core harvest and whether the #648 clamp bound (the
+ * hop the player could not pay in full). The ore pool's numbers come off generation instead
+ * (`oreValueCensus.ts`).
  */
 import { TICKS_PER_SECOND } from '../constants/physics'
 import { blockHardness } from '../systems/economy/oreEconomy'
@@ -22,12 +23,11 @@ import {
 import type { DrillPaceTally } from './drillPace'
 import type { PlanetRadiusPace, RadiusRebaselineTally, TravelHop } from './radiusRebaseline'
 
-/** One seed's run: both tallies and the ore cells of each planet it was played on. */
+/** One seed's run: both tallies. */
 export interface RadiusRebaselineRun {
   worldSeed: number
   drill: DrillPaceTally
   radius: RadiusRebaselineTally
-  oreCellsByPlanet: ReadonlyMap<number, number>
 }
 
 export interface PlanetRadiusMedians {
@@ -37,7 +37,6 @@ export interface PlanetRadiusMedians {
   /** Sales from arrival to the core. */
   salesToCore: Money | null
   climbShareBp: number | null
-  oreCells: number | null
 }
 
 export interface HopMedians {
@@ -67,7 +66,6 @@ export function planetRadiusMediansOf(
       moneyPerMinute: medianMoneyOf(rates),
       salesToCore: medianMoneyOf(paces.map(salesToCoreOrNull)),
       climbShareBp: medianOf(paces.map(climbShareBpOrNull)),
-      oreCells: medianOf(runs.map((run) => run.oreCellsByPlanet.get(planet) ?? null)),
     }
   })
 }

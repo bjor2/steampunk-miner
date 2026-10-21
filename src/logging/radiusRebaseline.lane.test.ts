@@ -10,10 +10,7 @@ import { playSliceFrom } from '../systems/bot/playSlice'
 import { toFixedText } from '../systems/money'
 import { startOfScenario, validateScenario, type Scenario } from '../systems/scenario'
 import { startScenarioCommands } from '../systems/startScenarioCommands'
-import { generateChunkCells } from '../systems/world/generateChunk'
 import { freshPlanetParamsFor } from '../systems/world/planetParams'
-import { CHUNK_CELLS, chunkRangeOfDisc } from '../systems/world/tileGrid'
-import { CELL_KIND, kindOfCell } from '../systems/world/worldCell'
 import {
   averageFeltOf,
   emptyDrillPaceTally,
@@ -35,12 +32,14 @@ import type { RadiusRebaselineRun } from './radiusRebaselineMedians'
 // registry radii (ticket 643), and the planets' medians are judged on `radiusRebaselineBars.ts`:
 // planet minutes 22 to 30 on P1-P10, felt speed at least 0.9x the planet before, drill + tip
 // majors 3.5 to 7.0, p* 1.51 +/- 0.03, money per minute within 5% of the #551 equilibrium step,
-// ore cells x1.15 a planet, the climb at most 25% of a trip, the travel fee at most 15% of the
-// core wallet and paid in full on every P1->P5 hop, travel never blocked and five planets open.
-// The rows `{planet, radius, minutes, soldToCore, oreCells}` of each seed go to
+// the climb at most 25% of a trip, the travel fee at most 15% of the core wallet and paid in full
+// on every P1->P5 hop, travel never blocked and five planets open. The sold ore step is printed
+// amber; the ore value bar is the generated pool's (`oreValueCensus.lane.test.ts`, GD lock of
+// option (a) on #644). The rows `{planet, radius, minutes, soldToCore}` of each seed go to
 // balance-report/radius-rebaseline.ndjson, which the Tester sets beside main's run for the paired
-// bar (time to core within 10% of main); the planet row's measured minutes and the paceScale a
-// miss retunes first are printed. Three runs of an hour or more each, so this is a lane:
+// bar (time to core within 10% of main; on P2-P10 the 22-30 min bar wins a conflict); the planet
+// row's measured minutes and the paceScale a miss retunes first are printed. Three runs of an hour
+// or more each, so this is a lane:
 //   npx vitest run src/logging/radiusRebaseline.lane.test.ts
 const RUN_TIMEOUT_MS = 6 * 60 * 60 * 1000
 /** Two hours a planet, as the drill pace lane allows: a slow planet shows as a number. */
@@ -61,7 +60,7 @@ describe('the R3 re-baseline: P1 to P10 on the registry radii, three seeds (tick
     writeRows(runs)
   }, RUN_TIMEOUT_MS)
 
-  it('holds every R3 bar on the median seed: time, felt speed, cadence, p*, rate, ore, climb and travel', () => {
+  it('holds every R3 bar on the median seed: time, felt speed, cadence, p*, rate, climb and travel', () => {
     expect(gatedRadiusRebaselineProblemsOf(runs)).toEqual([])
   })
 
@@ -71,7 +70,7 @@ describe('the R3 re-baseline: P1 to P10 on the registry radii, three seeds (tick
   })
 })
 
-/** One seed's run of the plain pacing bot, folded into both tallies, with its planets' ore. */
+/** One seed's run of the plain pacing bot, folded into both tallies. */
 function runOf(scenario: Scenario, worldSeed: number): RadiusRebaselineRun {
   const drill = emptyDrillPaceTally()
   const radius = emptyRadiusRebaselineTally()
@@ -92,7 +91,7 @@ function runOf(scenario: Scenario, worldSeed: number): RadiusRebaselineRun {
     lastPlanet: RADIUS_REBASELINE_BARS.lastPlanet,
     maxTicks: BUDGET_TICKS,
   })
-  return { worldSeed, drill, radius, oreCellsByPlanet: oreCellsByPlanetOf(worldSeed) }
+  return { worldSeed, drill, radius }
 }
 
 /** Refused, never trimmed: a broken scenario file. */
@@ -103,33 +102,9 @@ function scenarioStartOf(scenario: Scenario): CommandIntent[] {
   return startScenarioCommands(start)
 }
 
-/** Every ore cell of each fresh planet, off generation: the planet's total ore (Systems' pin). */
-function oreCellsByPlanetOf(worldSeed: number): Map<number, number> {
-  return new Map(PLANETS.map((planet) => [planet, oreCellsOfPlanet(worldSeed, planet)]))
-}
-
-function oreCellsOfPlanet(worldSeed: number, planet: number): number {
-  const params = freshPlanetParamsFor(worldSeed, planet)
-  const { min, max } = chunkRangeOfDisc(params.radiusTiles)
-  let oreCells = 0
-  for (let cy = min; cy <= max; cy++) {
-    for (let cx = min; cx <= max; cx++)
-      oreCells += oreCellsOfChunk(generateChunkCells(params, cx, cy))
-  }
-  return oreCells
-}
-
-function oreCellsOfChunk(cells: Uint32Array): number {
-  let oreCells = 0
-  for (let index = 0; index < CHUNK_CELLS; index++) {
-    if (kindOfCell(cells[index]) === CELL_KIND.ore) oreCells++
-  }
-  return oreCells
-}
-
 function reportOf(seedRuns: readonly RadiusRebaselineRun[]): string {
   const header =
-    '| seed | planet | radius | minutes | felt avg | drill + tip | sold to core | climb bp | ore cells |'
+    '| seed | planet | radius | minutes | felt avg | drill + tip | sold to core | climb bp |'
   const rows = seedRuns.flatMap((run) => PLANETS.flatMap((planet) => reportRowOf(run, planet)))
   return ['R3 re-baseline per planet (ticket 644)', header, ...rows].join('\n')
 }
@@ -149,7 +124,6 @@ function reportRowOf(run: RadiusRebaselineRun, planet: number): string[] {
     pace.drillTipMajors,
     toFixedText(money.salesToCore, 0),
     climbBp,
-    run.oreCellsByPlanet.get(planet) ?? '-',
   ]
   return [`| ${cells.join(' | ')} |`]
 }
@@ -179,7 +153,6 @@ function pairedRowOf(run: RadiusRebaselineRun, planet: number, measuredAt: strin
       radius: freshPlanetParamsFor(run.worldSeed, planet).radiusTiles,
       minutes: planetMinutesOf(pace)?.toFixed(1) ?? null,
       soldToCore: toFixedText(money.salesToCore, 0),
-      oreCells: run.oreCellsByPlanet.get(planet) ?? null,
     },
   ]
 }

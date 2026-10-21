@@ -1102,6 +1102,8 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/logging/moneyLaneLines.test.ts` | 8 | 8 |
 | `src/logging/moneyPastP200.lane.test.ts` | 1 | 1 |
 | `src/logging/ndjson.test.ts` | 6 | 6 |
+| `src/logging/oreValue.test.ts` | 8 | 8 |
+| `src/logging/oreValueCensus.lane.test.ts` | 1 | 1 |
 | `src/logging/pacingMedian.test.ts` | 7 | 7 |
 | `src/logging/pacingReport.test.ts` | 16 | 16 |
 | `src/logging/planetDomainEvents.test.ts` | 1 | 1 |

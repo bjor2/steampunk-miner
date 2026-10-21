@@ -1,18 +1,20 @@
 /**
- * The R3 bars under the radius rule (ticket 644), judged on the median of the pacing seeds (#84):
- * the GD lock R3 on #302 (6306854642), its addendum (6306861669), the VS guards on #305
- * (6306854175) and the Campaign Scaling room's rows on #644 (21 Oct):
+ * The R3 bars under the radius rule (ticket 644) a bot run judges, on the median of the pacing
+ * seeds (#84): the GD lock R3 on #302 (6306854642), its addendum (6306861669), the VS guards on
+ * #305 (6306854175), the Campaign Scaling room's rows on #644 (21 Oct) and the GD lock of option
+ * (a) on #644 (22 Oct), whose ore step is judged off generation in `oreValueBars.ts`:
  *
- *   gated   planet minutes 22 to 30 on P1-P10 (P1 by the room's P1-P5 row), felt speed at least
- *           0.9x the planet before at every step (no #306 exception is named yet), drill + tip
- *           majors 3.5 to 7.0 on P2-P10, p* 1.51 +/- 0.03 over the P1->P10 steps, money per
- *           minute within 5% of the #551 equilibrium step on each planet, total ore cells at least
- *           x1.15 a planet, the climb from a trip's deepest point at most 25% of the trip on
- *           P2-P10, the travel fee at most 15% of the wallet at core harvest on each P1->P5 hop,
- *           every P1->P5 hop paid in full (the next planet affordable, the next on-curve drill or
- *           tip still affordable after it), no seed left behind after a core (travel never
- *           blocks), and every seed through P5's core (five planets open)
- *   printed the p* and rate of each step, total money per planet, drill + tip amber at 7, the
+ *   gated   planet minutes 22 to 30 on P1-P10 (P1 by the room's P1-P5 row; on P2-P10 this wins
+ *           over the paired +/-10% of main), felt speed at least 0.9x the planet before at every
+ *           step (no #306 exception is named yet), drill + tip majors 3.5 to 7.0 on P2-P10, p*
+ *           1.51 +/- 0.03 over the P1->P10 steps, money per minute within 5% of the #551
+ *           equilibrium step on each planet, the climb from a trip's deepest point at most 25% of
+ *           the trip on P2-P10, the travel fee at most 15% of the wallet at core harvest on each
+ *           P1->P5 hop, every P1->P5 hop paid in full (the next planet affordable, the next
+ *           on-curve drill or tip still affordable after it), no seed left behind after a core
+ *           (travel never blocks), and every seed through P5's core (five planets open)
+ *   printed the p* and rate of each step, total money per planet, the sold ore step (amber, never
+ *           gated: the ore value bar is the generated pool's), drill + tip amber at 7, the
  *           measured minutes for the planet rows and the paceScale the miss asks to retune first
  *
  * A miss is a balance finding: that planet's paceScale first, then the shared k (150-200, one
@@ -41,7 +43,6 @@ export const RADIUS_REBASELINE_BARS = {
   drillTipMajorsPerPlanet: { min: 3.5, max: 7, amber: 7 },
   pStar: { target: 1.51, tolerance: 0.03 },
   moneyRateToEquilibrium: { min: 0.95, max: 1.05 },
-  oreGrowthPerPlanetMin: 1.15,
   firstClimbPlanet: 2,
   climbShareBpMax: 2500,
   openingHopLastFrom: 4,
@@ -77,7 +78,6 @@ export function gatedRadiusRebaselineProblemsOf(runs: readonly RadiusRebaselineR
     ...rows.flatMap(drillTipCadenceProblems),
     ...pStarProblems(rows),
     ...rows.flatMap((row, at) => moneyRateProblems(row, rows[at - 1])),
-    ...rows.flatMap((row, at) => oreGrowthProblems(row, rows[at - 1])),
     ...rows.flatMap(climbShareProblems),
     ...hops.flatMap(feeShareProblems),
     ...hops.flatMap(unaffordableHopProblems),
@@ -152,14 +152,6 @@ function moneyRateProblems(row: PlanetRow, before: PlanetRow | undefined): strin
   ]
 }
 
-function oreGrowthProblems({ radius }: PlanetRow, before: PlanetRow | undefined): string[] {
-  const growth = stepOf(radius.oreCells, before?.radius.oreCells ?? null)
-  if (growth === null || growth >= RADIUS_REBASELINE_BARS.oreGrowthPerPlanetMin) return []
-  return [
-    `planet ${radius.planet} holds x${growth.toFixed(3)} the ore cells before it, under x1.15`,
-  ]
-}
-
 function climbShareProblems({ radius }: PlanetRow): string[] {
   const share = radius.climbShareBp
   if (radius.planet < RADIUS_REBASELINE_BARS.firstClimbPlanet || share === null) return []
@@ -213,6 +205,7 @@ export function printedRadiusRebaselineLinesOf(runs: readonly RadiusRebaselineRu
   return [
     ...rows.flatMap((row, at) => rateStepLines(row, rows[at - 1])),
     ...rows.map(totalMoneyLine),
+    ...rows.flatMap((row, at) => soldOreStepLines(row, rows[at - 1])),
     ...rows.flatMap(drillTipAmberLines),
     ...rows.map(measuredMinutesLine),
     ...rows.flatMap(retuneLines),
@@ -230,7 +223,15 @@ function rateStepLines(row: PlanetRow, before: PlanetRow | undefined): string[] 
 
 function totalMoneyLine({ radius }: PlanetRow): string {
   const total = radius.salesToCore === null ? 'never' : toFixedText(radius.salesToCore, 0)
-  return `planet ${radius.planet}: ${total} sold to the core, ${radius.oreCells ?? '-'} ore cells`
+  return `planet ${radius.planet}: ${total} sold to the core`
+}
+
+/** The ore the bot sold to the core over the planet before's: reported amber only (GD lock). */
+function soldOreStepLines({ radius }: PlanetRow, before: PlanetRow | undefined): string[] {
+  const from = before?.radius.salesToCore ?? null
+  if (radius.salesToCore === null || from === null) return []
+  const step = ratioOf(radius.salesToCore, from)
+  return [`planet ${radius.planet} amber: sold ore x${step.toFixed(3)} the planet before`]
 }
 
 function drillTipAmberLines({ pace }: PlanetRow): string[] {

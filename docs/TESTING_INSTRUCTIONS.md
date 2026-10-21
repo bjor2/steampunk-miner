@@ -366,14 +366,23 @@ programs }` from three's `renderer.info` of the game canvas), read only when cal
   pacing seeds at the registry radii and judges the medians (`radiusRebaselineBars.ts`): minutes 22
   to 30 on P1-P10, felt speed at least 0.9x the planet before, drill + tip majors 3.5 to 7.0, p*
   1.51 +/- 0.03 over the steps, money per minute within 5% of the #551 equilibrium step (the VS's
-  closed form solved for the rate), ore cells x1.15 a planet (whole fresh planets off generation),
-  the climb from a trip's deepest point at most 25% of the trip on P2-P10, the travel fee at most 15%
-  of the wallet at core harvest and paid in full (the #648 clamp not binding) on every P1->P5 hop, no
-  seed left behind after a core and every seed through P5's core. It prints each step's p*, the
-  planet rows' measured minutes and the paceScale a miss retunes first, and writes
-  `balance-report/radius-rebaseline.ndjson` for the paired bar (time to core within 10% of main),
-  which the Tester reads beside main's run. `radiusRebaseline.test.ts` holds the fold on real
-  authority states and every bar on synthetic seeds. Hours of play, so it runs only when named.
+  closed form solved for the rate), the climb from a trip's deepest point at most 25% of the trip on
+  P2-P10, the travel fee at most 15% of the wallet at core harvest and paid in full (the #648 clamp
+  not binding) on every P1->P5 hop, no seed left behind after a core and every seed through P5's
+  core. It prints each step's p*, the sold ore step (amber, never gated), the planet rows' measured
+  minutes and the paceScale a miss retunes first, and writes `balance-report/radius-rebaseline.ndjson`
+  for the paired bar (time to core within 10% of main; on P2-P10 the 22-30 min bar wins a
+  conflict), which the Tester reads beside main's run. `radiusRebaseline.test.ts` holds the fold on
+  real authority states and every bar on synthetic seeds. Hours of play, so it runs only when named.
+  The ore bar (GD lock of option (a) on #644) is judged off generation, not play: the lane
+  `src/logging/oreValueCensus.lane.test.ts` generates every fresh P1-P10 on the pacing seeds plus
+  the generator golden's pinned 4000000000, counts each pool (`oreValueCensus.ts`: ore cells at
+  their base sale price, solid cells per band) and gates each seed (`oreValueBars.ts`): generated
+  value at least x1.15 the planet before on P2-P10, ore cells rising strictly, band 1 the lowest
+  ore share and value per solid cell rising band by band. It prints each step split into the radius
+  part (R_p / R_p-1)^2 and the mix and price part, and writes
+  `balance-report/ore-value-census.ndjson` with R(p) and the steps. About 20 s a seed;
+  `oreValue.test.ts` holds the chunk count and every bar on synthetic pools.
 - **Material looks** (ticket 450, TD shape on #450 6226270701 and the Scalers' conditions):
   `src/features/roster/kindLook.test.ts` holds the roster's look provider to its rules: a fresh
   save shows no species (unseen kinds draw the family look), a species shows only once the

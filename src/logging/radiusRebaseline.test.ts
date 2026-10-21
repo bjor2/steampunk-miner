@@ -108,13 +108,6 @@ describe('radius re-baseline bars (ticket 644)', () => {
     )
   })
 
-  it('fails a planet whose ore cells grow less than x1.15 on the one before', () => {
-    const problems = gatedRadiusRebaselineProblemsOf(
-      threeSeeds((planet) => ({ ...onBars(planet), oreGrowth: planet === 6 ? 1.1 : 1.2 })),
-    )
-    expect(problems).toContain('planet 6 holds x1.100 the ore cells before it, under x1.15')
-  })
-
   it('fails a climb from the deepest point longer than a quarter of the trip from P2', () => {
     const problems = gatedRadiusRebaselineProblemsOf(
       threeSeeds((planet) => ({ ...onBars(planet), climbShare: 0.3 })),
@@ -158,6 +151,12 @@ describe('radius re-baseline bars (ticket 644)', () => {
   it('prints each planet row with its radius and measured minutes', () => {
     const lines = printedRadiusRebaselineLinesOf(threeSeeds(onBars))
     expect(lines).toContain('planet 5 row: radius 582, measured 26.0 min')
+  })
+
+  it('reports the sold ore step of each planet as an amber line', () => {
+    const lines = printedRadiusRebaselineLinesOf(threeSeeds(onBars))
+    expect(lines.some((line) => line.startsWith('planet 6 amber: sold ore x'))).toBe(true)
+    expect(lines.some((line) => line.startsWith('planet 1 amber: sold ore'))).toBe(false)
   })
 
   it('names the paceScale a measured miss retunes first', () => {
@@ -208,14 +207,13 @@ interface PlanetPlay {
   minutes: number
   /** The money per minute step over the #551 equilibrium step. */
   rateStepShare: number
-  oreGrowth: number
   climbShare: number
   /** The wallet at the core of the planet, in travel fees of its hop. */
   coreWalletFees: number
 }
 
 function onBars(_planet: number): PlanetPlay {
-  return { minutes: 26, rateStepShare: 1, oreGrowth: 1.2, climbShare: 0.2, coreWalletFees: 10 }
+  return { minutes: 26, rateStepShare: 1, climbShare: 0.2, coreWalletFees: 10 }
 }
 
 function threeSeeds(play: (planet: number) => PlanetPlay): RadiusRebaselineRun[] {
@@ -225,22 +223,18 @@ function threeSeeds(play: (planet: number) => PlanetPlay): RadiusRebaselineRun[]
 function runOf(worldSeed: number, play: (planet: number) => PlanetPlay): RadiusRebaselineRun {
   const drill = emptyDrillPaceTally()
   const radius = emptyRadiusRebaselineTally()
-  const oreCellsByPlanet = new Map<number, number>()
   let arrivalTick = 0
   let rate = 100
-  let oreCells = 1000
   for (let planet = 1; planet <= 10; planet++) {
     const plan = play(planet)
     if (planet > 1) rate *= equilibriumRateStepOf(planet, 1.51) * plan.rateStepShare
-    if (planet > 1) oreCells = Math.round(oreCells * plan.oreGrowth)
     const coreTick = arrivalTick + plan.minutes * TICKS_PER_MINUTE
     drill.planets.set(planet, drillPaceOf(planet, arrivalTick, coreTick))
     radius.planets.set(planet, radiusPaceOf(planet, arrivalTick, coreTick, rate, plan))
     radius.hops.push({ fromPlanet: planet, cost: travelFee(planet), walletBefore: ZERO_MONEY })
-    oreCellsByPlanet.set(planet, oreCells)
     arrivalTick = coreTick + TICKS_PER_MINUTE
   }
-  return { worldSeed, drill, radius, oreCellsByPlanet }
+  return { worldSeed, drill, radius }
 }
 
 function drillPaceOf(planet: number, arrivalTick: number, coreTick: number): PlanetDrillPace {
