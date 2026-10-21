@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-10-22T01:46:06+02:00",
+  "updated_at": "2026-10-22T01:46:19+02:00",
   "caps": {
     "grok": 12,
     "claude": 10,
@@ -122,22 +122,22 @@
     }
   ],
   "gate": {
-    "busy": 0,
+    "busy": 1,
     "max": 3
   },
   "tester": {
     "state": "running",
-    "phase": "probes",
-    "sha": "1de59278a41782f94b7c401ecdd44eb5c85de820",
-    "since": "2026-10-21T18:26:48Z",
+    "phase": "full",
+    "sha": "c42f04783d9d3d0093c9b7d2fc5765e762792bbc",
+    "since": "2026-10-21T23:46:09Z",
     "holds_gate": true,
     "claude_slot": null,
     "last_run": "2026-10-21T18:23:25Z",
     "last_nightly": "2026-10-15T20:43:15Z",
     "last_nightly_result": "full=FAIL balance-report=ok bench=FAIL balance-planets=ok balance-guns=ok balance-charges=ok balance-refinery=ok balance-heat=ok e2e=FAIL memory-soak=FAIL packaged-smoke=ok ",
     "main_red_sha": null,
-    "feature": 306,
-    "feature_title": "Grilling: Solar systems and terrain toughness tiers",
+    "feature": null,
+    "feature_title": null,
     "queue": [
       {
         "feature": 668,
