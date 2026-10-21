@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "updated_at": "2026-10-21T16:25:42Z",
+  "updated_at": "2026-10-21T16:27:41Z",
   "entries": {
     "steampunk-loop/1": {
       "loop": "steampunk-loop",
@@ -645,9 +645,9 @@
       "slot": null,
       "state": "working",
       "issue": null,
-      "note": "testing spec #574 (pacingReport counts two trips per surface visit (dock_entered at sell + workshop)) on 1de5927",
+      "note": "testing spec #306 (Grilling: Solar systems and terrain toughness tiers) on 1de5927",
       "stale_after_min": 420,
-      "updated_at": "2026-10-21T16:22:50Z",
+      "updated_at": "2026-10-21T16:27:41Z",
       "host": "grok-bot-vm-452660841"
     },
     "steampunk-loop/10": {
