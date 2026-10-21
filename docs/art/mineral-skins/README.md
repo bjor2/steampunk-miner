@@ -106,11 +106,46 @@ as before. No layer is shared with p1-b1, p1-b2 or within the batch.
   one centred on each tile, fading out before the cell edge); prismatic (long bars of light down
   the prism faces that meet the lamp, a column of the cell each, and sharp glints).
 
+## Batch p3-b1: P3's species 1 to 5 (ticket 598)
+
+The foothold-p3 pool's four commons and its metal uncommon, kind slots 1 to 5 on P3. The layers
+come from the species row, as on P1. No layer is shared within the batch, with P1 or with p3-b2.
+Authored through the Blender MCP (see Pipeline).
+
+<!-- p3-b1 -->
+
+| slot | species                   | base           | vein              | palette (shadow, body, light)                     | sheen        |
+| ---- | ------------------------- | -------------- | ----------------- | ------------------------------------------------- | ------------ |
+| 1    | `pig-iron-brassvein`      | `pitted-cast`  | `slag-knots`      | `pig-iron-grey` `#42474c` `#858e97` `#c2c6cb`     | `matte`      |
+| 2    | `soot-zinc-brassvein`     | `soot-dusted`  | `spangle-scales`  | `zinc-soot` `#4a5154` `#93a2a7` `#c9d0d3`         | `smudged`    |
+| 3    | `rail-quartz-quartzine`   | `frosted-face` | `rod-bundle`      | `rail-quartz-frost` `#646768` `#c7cecf` `#e3e6e7` | `silky`      |
+| 4    | `smoke-calcite-quartzine` | `smoke-rhombs` | `lens-stack`      | `calcite-smoke` `#484a52` `#9093a4` `#c8c9d2`     | `satin`      |
+| 5    | `step-bismuth-brassvein`  | `oxide-film`   | `hopper-terraces` | `bismuth-oxide` `#624262` `#c484c4` `#e2c2e2`     | `iridescent` |
+
+<!-- /p3-b1 -->
+
+- **Bases:** a cast face of fine mottle pocked with round blowholes, each dark with a pale lip;
+  pale zinc under drifts of soot, with darker runs where it settled and a dust of specks; a frosted
+  face, fine bright frost over a slow cloud, banded level across the prism with coarse striations;
+  smoky wisps crossed by calcite's rhombic cleavage (3 and 2 whole lines along u and v, so the
+  lattice repeats); the contour fringes of a thin oxide film, like oil on water.
+- **Veins:** four small trefoil knots of drawn iron; round spangle scales lapped in staggered rows,
+  each lower row over the one above and lifted at its foot; a bundle of thin round rods laid level,
+  like rails; flat biconvex lenses, two stacks of three and one alone; three hopper crystals, square
+  frames stepped up and in toward a hollow middle (the side bars stop at the end bars, so no two
+  faces lie on one another).
+- **Sheens:** matte (only the blowhole lips and a few burrs catch the lamp), smudged (zinc shows
+  where the soot was wiped: two broken diagonal swipes and the bare patches), silky (fine broken
+  level threads of light along the rods), satin (a soft glow toward one corner of each rhomb, never
+  a glint), iridescent (bright bands along the oxide fringes, and glints). Matte and satin share
+  the blowhole and rhomb fields of their bases, so the light sits where the stone is shaped.
+- **Seeds 501 to 591**, apart from p3-b2's 401 to 482, so no two P3 layers share a noise field.
+
 ## Batch p3-b2: P3's species 6 to 10 (ticket 599)
 
 The foothold-p3 pool's crystal and fossil uncommons and its three rares, kind slots 6 to 10 on P3.
 The layers come from the species row, as on P1. No layer is shared within the batch or with P1;
-P3's slots 1 to 5 (ticket 598) and 11 to 15 (ticket 600) add theirs after. Slots 16 and 17, the two
+P3's slots 1 to 5 (ticket 598, p3-b1) and 11 to 15 (ticket 600) add theirs. Slots 16 and 17, the two
 fossil commons of #453 (chalk bed, fish bed), are held: no ticket skins them, and a spec pins them
 unskinned.
 
@@ -187,9 +222,19 @@ cell, rimmed in the shadow end so it reads on a base of its own palette.
 ```
 BLENDER_USER_SCRIPTS=/tmp/empty blender -b --factory-startup --python-exit-code 1 \
   -P docs/art/mineral-skins/author_skin_layers.py -- [<kind>/<id> ...]   # sources, renders, skin-layers.json
-python3 docs/art/mineral-skins/skin_post.py p1-b2                         # cells, composites, sheets
+python3 docs/art/mineral-skins/skin_post.py p3-b2                         # cells, composites, sheets
 python3 docs/art/mineral-skins/skin_layers.py ramps p1-b1                 # the palette ramps of a batch's hue slots
 ```
+
+Through the Blender MCP (p3-b1 on): the open Blender is shared, so first drop
+`author_skin_layers`, `layer_art`, `skin_layers`, `ore_stage`, `author_tiles`, `ore_materials`,
+`ore_shapes`, `ladder_scene` and `hero_species` from `sys.modules` and put this worktree's
+`docs/art/mineral-skins`, `docs/art/ores`, `docs/art/ore-ladder`, `docs/art/ore-heroes` and
+`scripts/art` first on `sys.path`, then `import author_skin_layers` and call
+`author(['vein/<id>', ...])`. `reset_scene` empties the open file in place, so the MCP keeps its
+output. The post step reads every listed layer's render, so a fresh worktree authors them all once
+(the committed cells come out byte-identical); restore the earlier batches' re-saved `.blend`
+files from git afterwards. A batch's noise seeds stay apart from the other batches of its planet.
 
 A new batch adds its layer and skin rows to `mineralSkins.json` (the palette ramp from
 `skin_layers.py ramps`: shadow at half the hue slot's luma, light halfway to white), a recipe per
@@ -290,8 +335,49 @@ for corundum, 1.63 for beryl). Checked by eye on `p1-b3.phone-x4.png`, `p1-b3.de
 `p1-b3.scale-x4` copies and `p1.scale-x4.png` with its `-deutan` and `-gray` copies, now all
 twelve P1 skins side by side.
 
-From `sheets/p3-b2.distinct.json`, at 22 px a tile over P3's band 3 rock (luma 0.29). P3's slots 1
-to 5 (ticket 598) are not skinned yet, so all ten pairs are within the batch:
+From `sheets/p3-b1.distinct.json`, at 22 px a tile over P3's band 3 rock (luma 0.29). It is P3's
+first batch, so these are all ten pairs; its pairs against p3-b2 are in `p3-b2.distinct.json`:
+
+<!-- p3-b1-readings -->
+
+| pair                              | colour apart | deuteranopia apart | luma apart | texture apart |
+| --------------------------------- | ------------ | ------------------ | ---------- | ------------- |
+| pig iron vs soot zinc             | 0.164        | 0.169              | 0.098      | 0.100         |
+| pig iron vs rail quartz           | 0.350        | 0.351              | 0.207      | 0.065         |
+| pig iron vs smoke calcite (least) | 0.103        | 0.095              | 0.053      | 0.056         |
+| pig iron vs step bismuth          | 0.254        | 0.158              | 0.071      | 0.071         |
+| soot zinc vs rail quartz          | 0.186        | 0.183              | 0.109      | 0.094         |
+| soot zinc vs smoke calcite        | 0.068        | 0.079              | 0.045      | 0.100         |
+| soot zinc vs step bismuth         | 0.174        | 0.091              | 0.027      | 0.100         |
+| rail quartz vs smoke calcite      | 0.250        | 0.259              | 0.154      | 0.071         |
+| rail quartz vs step bismuth       | 0.223        | 0.234              | 0.136      | 0.070         |
+| smoke calcite vs step bismuth     | 0.173        | 0.076              | 0.018      | 0.074         |
+
+<!-- /p3-b1-readings -->
+
+The materials table gives these five four cool near-greys: pig iron (hue 210, luma 0.55), smoke
+calcite (232, 0.58), soot zinc (195, 0.62) and rail quartz (190, 0.80). Pig iron and smoke calcite
+are the closest pair of the batch. The pig iron's blowholes were made larger, darker and more
+numerous until the pocked face still showed at 22 px, and its base lifted only so far that the skin
+averages its own hue slot's luma; the calcite's rhomb cleavage was drawn bold, so at a phone's tile
+it reads as diagonal stripes against the pig iron's even pepper. Soot zinc is the one with broad
+dark drifts, bright swipes and a lapped patch of scales. Step bismuth is the batch's only warm hue;
+under deuteranopia it drifts toward the calcite (0.076), where the oxide fringes and hollow hoppers
+stand against the rhombs.
+
+Against p3-b2 the closest pair on the planet is **rail quartz vs native platinum** (colour 0.014,
+deuteranopia 0.015, texture 0.059): their hue slots are all but one (190 at 0.80, 220 at 0.78).
+Rail quartz is laid level for that reason, with light and dark bands, rods and silk threads all
+running across the face, while the platinum's sweeps and pebble stringer run on the diagonal; at
+22 px the one reads as bands and the other as streaks. The next closest are step bismuth vs coiled
+ammonite (0.092 / 0.075: violet fringes and hoppers against rose bands and coils) and soot zinc vs
+coiled ammonite under deuteranopia (0.017, texture 0.095: drifts and scales against level bands).
+Every skin sits above its rock (contrast 1.84 for pig iron to 2.45 for rail quartz). Checked by eye
+on `p3-b1.phone-x4.png`, `p3-b1.desktop.png`, the `p3-b1.scale-x4` copies with `-deutan` and
+`-gray`, and `p3.scale-x4.png` (P3's ten skins side by side, with its blind copies).
+
+From `sheets/p3-b2.distinct.json`, at 22 px a tile over P3's band 3 rock (luma 0.29). The ten pairs
+below are within the batch; the report also holds its 25 pairs against p3-b1 (ticket 598, above):
 
 <!-- p3-b2-readings -->
 
@@ -319,9 +405,8 @@ turns khaki beside the shell's yellow and the ammonite's grey (0.10 and 0.12): a
 darkest of the three, with upright streaks and end-on hexagons where the shell has rings and fans
 and the ammonite level bands and spirals. Every skin sits above P3's slate rock (contrast 1.95 for
 apatite to 2.43 for platinum). Checked by eye on `p3-b2.phone-x4.png`, `p3-b2.desktop.png` and
-the `p3-b2.scale-x4` copies with `-deutan` and `-gray`. The planet strip `p3.scale` is written by
-the next P3 batch to post; `p3-b1` must sit before `p3-b2` in `BATCHES` so ticket 598 measures
-against this batch.
+the `p3-b2.scale-x4` copies with `-deutan` and `-gray`. `p3-b1` sits before `p3-b2` in `BATCHES`, so
+this batch's post measures it against p3-b1 and writes the planet strip `p3.scale`.
 
 Known limits: the cells are unlit tone, so a skin does not turn with the vehicle's lamp (the vein's
 own shading is baked from the stage's fixed headlamp, as the hero sprites are); the earthy sheen

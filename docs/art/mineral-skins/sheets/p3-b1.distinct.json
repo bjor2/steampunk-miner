@@ -1,0 +1,120 @@
+{
+  "batch": "p3-b1",
+  "tilePx": 22,
+  "rockLuma": 0.289,
+  "skins": {
+    "pig-iron-brassvein": {
+      "meanHex": "#8c949c",
+      "luma": 0.574,
+      "hueDeg": 210.3,
+      "rockContrast": 1.84
+    },
+    "soot-zinc-brassvein": {
+      "meanHex": "#a3aeb2",
+      "luma": 0.672,
+      "hueDeg": 195.8,
+      "rockContrast": 2.13
+    },
+    "rail-quartz-quartzine": {
+      "meanHex": "#c3c9ca",
+      "luma": 0.781,
+      "hueDeg": 188.7,
+      "rockContrast": 2.45
+    },
+    "smoke-calcite-quartzine": {
+      "meanHex": "#9d9fad",
+      "luma": 0.627,
+      "hueDeg": 231.2,
+      "rockContrast": 2.0
+    },
+    "step-bismuth-brassvein": {
+      "meanHex": "#c191c1",
+      "luma": 0.645,
+      "hueDeg": 300.0,
+      "rockContrast": 2.05
+    }
+  },
+  "pairs": [
+    {
+      "a": "pig-iron-brassvein",
+      "b": "soot-zinc-brassvein",
+      "colourDistance": 0.164,
+      "deutanDistance": 0.169,
+      "lumaDifference": 0.098,
+      "textureDifference": 0.1
+    },
+    {
+      "a": "pig-iron-brassvein",
+      "b": "rail-quartz-quartzine",
+      "colourDistance": 0.35,
+      "deutanDistance": 0.351,
+      "lumaDifference": 0.207,
+      "textureDifference": 0.065
+    },
+    {
+      "a": "pig-iron-brassvein",
+      "b": "smoke-calcite-quartzine",
+      "colourDistance": 0.103,
+      "deutanDistance": 0.095,
+      "lumaDifference": 0.053,
+      "textureDifference": 0.056
+    },
+    {
+      "a": "pig-iron-brassvein",
+      "b": "step-bismuth-brassvein",
+      "colourDistance": 0.254,
+      "deutanDistance": 0.158,
+      "lumaDifference": 0.071,
+      "textureDifference": 0.071
+    },
+    {
+      "a": "soot-zinc-brassvein",
+      "b": "rail-quartz-quartzine",
+      "colourDistance": 0.186,
+      "deutanDistance": 0.183,
+      "lumaDifference": 0.109,
+      "textureDifference": 0.094
+    },
+    {
+      "a": "soot-zinc-brassvein",
+      "b": "smoke-calcite-quartzine",
+      "colourDistance": 0.068,
+      "deutanDistance": 0.079,
+      "lumaDifference": 0.045,
+      "textureDifference": 0.1
+    },
+    {
+      "a": "soot-zinc-brassvein",
+      "b": "step-bismuth-brassvein",
+      "colourDistance": 0.174,
+      "deutanDistance": 0.091,
+      "lumaDifference": 0.027,
+      "textureDifference": 0.1
+    },
+    {
+      "a": "rail-quartz-quartzine",
+      "b": "smoke-calcite-quartzine",
+      "colourDistance": 0.25,
+      "deutanDistance": 0.259,
+      "lumaDifference": 0.154,
+      "textureDifference": 0.071
+    },
+    {
+      "a": "rail-quartz-quartzine",
+      "b": "step-bismuth-brassvein",
+      "colourDistance": 0.223,
+      "deutanDistance": 0.234,
+      "lumaDifference": 0.136,
+      "textureDifference": 0.07
+    },
+    {
+      "a": "smoke-calcite-quartzine",
+      "b": "step-bismuth-brassvein",
+      "colourDistance": 0.173,
+      "deutanDistance": 0.076,
+      "lumaDifference": 0.018,
+      "textureDifference": 0.074
+    }
+  ],
+  "leastDifferentPair": ["pig-iron-brassvein", "smoke-calcite-quartzine"]
+}
