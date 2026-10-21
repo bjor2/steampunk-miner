@@ -740,6 +740,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/audio/soundRules.test.ts` | 8 | 8 |
 | `src/systems/audio/soundUnlock.test.ts` | 8 | 8 |
 | `src/systems/audio/voicePool.test.ts` | 3 | 3 |
+| `src/systems/audio/warnBells.test.ts` | 5 | 5 |
 
 ### `authority`
 
@@ -959,6 +960,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/debug/debugSaves.test.ts` | 5 | 5 |
 | `src/debug/debugScreens.test.ts` | 34 | 33 |
 | `src/debug/debugSheet.test.ts` | 3 | 3 |
+| `src/debug/debugWarnings.test.ts` | 3 | 3 |
 | `src/debug/sliceDebugCommands.test.ts` | 3 | 3 |
 
 ### `devFlags`
@@ -1364,7 +1366,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/scene/registries/sceneLayerBudget.test.ts` | 7 | 7 |
 | `src/scene/registries/worldPieces.test.ts` | 3 | 3 |
 | `src/scene/sceneDisposal.test.ts` | 8 | 3 |
-| `src/scene/soundCuePlayer.test.ts` | 4 | 4 |
+| `src/scene/soundCuePlayer.test.ts` | 5 | 5 |
 | `src/scene/sprayIntake.test.ts` | 3 | 3 |
 | `src/scene/terrainHeroAtlas.test.ts` | 5 | 5 |
 | `src/scene/terrainKindLooks.test.ts` | 4 | 4 |
@@ -1441,6 +1443,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/store/titleMenu.test.ts` | 9 | 9 |
 | `src/store/touchReplay.test.ts` | 2 | 2 |
 | `src/store/touchRuntime.test.ts` | 20 | 19 |
+| `src/store/warningSlice.test.ts` | 6 | 6 |
 | `src/store/worldSaveOwnership.test.ts` | 7 | 7 |
 
 ### `systems-core`
@@ -1551,6 +1554,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/ui/hud/hudRows.test.ts` | 6 | 6 |
 | `src/ui/hud/hudStripView.test.ts` | 15 | 15 |
 | `src/ui/hud/hudText.test.ts` | 6 | 6 |
+| `src/ui/hud/warningGlowView.test.ts` | 4 | 4 |
 | `src/ui/iconCoverage.test.ts` | 9 | 9 |
 | `src/ui/kit/itemCard.test.ts` | 11 | 11 |
 | `src/ui/kit/rarityName.test.ts` | 4 | 4 |
@@ -1570,6 +1574,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/ui/touch/touchBindingTiles.test.ts` | 11 | 11 |
 | `src/ui/touch/touchCoverage.test.ts` | 10 | 5 |
 | `src/ui/touch/touchFunnel.test.ts` | 1 | 1 |
+| `src/ui/touch/warningHaptics.test.ts` | 2 | 2 |
 | `src/ui/uiBudget.test.ts` | 3 | 3 |
 
 ### `unlocks`
@@ -1645,7 +1650,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/views/deviceNotices.test.ts` | 6 | 6 |
 | `src/systems/views/engineTrackParity.test.ts` | 7 | 7 |
 | `src/systems/views/gainText.test.ts` | 6 | 6 |
-| `src/systems/views/hazardStripPlace.test.ts` | 2 | 2 |
+| `src/systems/views/hazardStripPlace.test.ts` | 6 | 6 |
 | `src/systems/views/hazardStripView.test.ts` | 3 | 3 |
 | `src/systems/views/heatViews.test.ts` | 5 | 5 |
 | `src/systems/views/hintRoom.test.ts` | 7 | 7 |
@@ -1653,7 +1658,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/views/holdTrackNote.test.ts` | 5 | 5 |
 | `src/systems/views/hudCallouts.test.ts` | 8 | 8 |
 | `src/systems/views/hudClearView.test.ts` | 18 | 15 |
-| `src/systems/views/hudCompact.test.ts` | 3 | 3 |
+| `src/systems/views/hudCompact.test.ts` | 6 | 6 |
 | `src/systems/views/hudCoverageBudget.test.ts` | 24 | 14 |
 | `src/systems/views/hudCoverageReport.test.ts` | 10 | 9 |
 | `src/systems/views/hudModel.test.ts` | 27 | 27 |
@@ -1690,6 +1695,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/views/upgradeBayModel.test.ts` | 18 | 18 |
 | `src/systems/views/upgradePreview.test.ts` | 15 | 15 |
 | `src/systems/views/vehicleItemRows.test.ts` | 5 | 5 |
+| `src/systems/views/warningWatch.test.ts` | 16 | 16 |
 
 ### `world`
 

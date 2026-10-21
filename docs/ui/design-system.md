@@ -123,8 +123,25 @@ the tier again (G&V). A tier is an edge glow (section 10) in the tier's colour, 
 icon pulsing on the strip, the tier's sound cue and a haptic pulse (`hapticMs` 10, 30, 60) under
 the haptics setting (#173). Never a text box during a cut (GD lock); the words live in the detail
 behind the gear button. Cargo warns on room left and heat on room to the limit, so one rule covers
-a bar that fills and a bar that empties. The HUD's `hullCriticalPercent` 25 in `data/hud/hud.json`
-becomes the ladder's 15% tier when #685 lands; it is listed here so no second threshold survives.
+a bar that fills and a bar that empties. The HUD's old `hullCriticalPercent` 25 in
+`data/hud/hud.json` is gone: hull critical is the ladder's 15% tier since #685, so no second
+threshold survives.
+
+**The warning layer as built** (#685): `stepWarningWatch` (`systems/views/warningWatch.ts`) reads
+the strip's bars (hull and fuel left, cargo room), the heat line's room and the collapse status,
+which stands at the critical line while a block near the rig telegraphs (a yes or no, pulsing fast
+like a critical hull). A reading that drops past several tiers at once rings the deepest alone. The
+HUD feeds the store's warning slice on each re-read, so nothing fires while the HUD is down. The
+glow (`ui/hud/WarningGlow.tsx`) is the deepest tier any reading stands in now, carries no
+`data-hud` box and no words; the warning readout's glyph on the strip (the heat line itself)
+pulses with it. The bells are the kernel's `ui.warn.*` cues, looked up beside the slices' cue
+registry (a slice's ids carry its prefix, so none can take a `ui.` id), ducked 6 dB while the drill
+cuts. `ui.getWarnings()` reads the glow, the watch and the run's firings. On a phone the hazard
+strip of #316 keeps its reach and line along the drive but slides out of the shaft to the edge:
+the left edge lane for a drive up or down, under the strip for a drive across
+(`hazardStripEdgeShiftInto`). The status row holds 3 icons on a phone and 6 on desktop from the
+same priority list (`statusIconsMaxOf`). No toast was built: a warning never needs one, and the
+toast component stays with the first ticket that shows one.
 
 Haptics (`haptics`): 10 ms on a tap and on a long press that opens a card, the ladder's pulses
 above, all behind the one haptics setting; the drill and hit pulses of `constants/touch.ts` stay

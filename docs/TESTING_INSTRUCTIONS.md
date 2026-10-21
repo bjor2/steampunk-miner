@@ -1386,6 +1386,17 @@ incomePerHour}` go to `balance-report/drill-pace.ndjson`, which `pushTestMetrics
   reveals and the second acts with Close and the tabs out of the top 15%; desktop docks, narrowing
   the stage by `layout.sheetDock.widthPx`, and widens it again on Close; Escape closes it
   everywhere. The screenshot suite shoots it as `base-sheet`. Box Tester only.
+- **Warning layer** (ticket 685, spec #678): the ladder is pure (`systems/views/warningWatch.ts`:
+  each tier fires once on the way in and re-arms 5% above it, the deepest of several at once rings
+  alone, the glow holds the deepest tier now), fed from the HUD's readings through the store's
+  warning slice; a test scene in `warningWatch.test.ts` drives hull, fuel, a collapse and heat on
+  planet 8 through real commands plus a full hold and sees each fire once. The bells
+  (`systems/audio/warnBells.ts`) and the haptics listen to `store/warningBroadcast.ts`, never the
+  store. `ui.getWarnings()` reads the glow, each readout's fired tier and the run's firings in
+  order. `e2e/browser/hud/warningLayer.spec.ts` runs 360x640 and 1280x800: hull and fuel down the
+  ladder, the staged full hold, a collapse under the rig, each tier exactly once; the glow has no
+  `data-hud` box, no box enters the middle band, and the status row holds 3 icons on the phone and
+  6 on desktop. Box Tester only.
 - **Touch controls held upright** (ticket 485, spec #470): `e2e/browser/screens/portraitTouch.spec.ts`
   runs in the matrix's portrait touch cells (390x844, 412x915, 820x1180) and skips elsewhere. It
   measures the stick zone (the lower 45% of the height from the thumb's lower corner, ending at a
