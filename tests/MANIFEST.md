@@ -604,12 +604,14 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/tech-tree/ui/nodeElement.test.ts` | 6 | 6 |
 | `src/features/tech-tree/ui/techTreeScreen.test.ts` | 16 | 16 |
 
-### `terrain-tools`: 47 files, 383 tests
+### `terrain-tools`: 49 files, 395 tests
 
 | File | Tests | Sites |
 | --- | --- | --- |
+| `src/features/terrain-tools/collapseDeathReportRows.test.ts` | 3 | 3 |
 | `src/features/terrain-tools/foamCurePace.lane.test.ts` | 11 | 1 |
-| `src/features/terrain-tools/foamPace.test.ts` | 3 | 1 |
+| `src/features/terrain-tools/foamPace.test.ts` | 5 | 3 |
+| `src/features/terrain-tools/foamPaceGate.test.ts` | 7 | 7 |
 | `src/features/terrain-tools/foamRestockPace.lane.test.ts` | 11 | 1 |
 | `src/features/terrain-tools/logging.test.ts` | 2 | 2 |
 | `src/features/terrain-tools/magnetFieldsBench.test.ts` | 2 | 2 |

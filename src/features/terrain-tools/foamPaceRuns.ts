@@ -8,10 +8,22 @@
  * run cannot pass, and `balance:bore` gates it on its own. Only specs use it.
  */
 import type { CommandIntent } from '../../systems/authority/authorityCommand'
+import type { DomainEvent } from '../../systems/authority/domainEvent'
 import { setVehicleLoadoutCommand } from '../../systems/authority/loadoutCommands'
 import type { SliceRun } from '../../systems/bot/playSlice'
+import {
+  add,
+  div,
+  floor,
+  fromCanonical,
+  fromSafeInteger,
+  mul,
+  toSafeInteger,
+  ZERO_MONEY,
+  type Money,
+} from '../../systems/money'
 import { withMagnetHand } from './magnetHand'
-import { coreRunOn, MAGNET_PACE_SEEDS } from './magnetPaceRuns'
+import { BASIS_POINTS, coreRunOn, MAGNET_PACE_SEEDS } from './magnetPaceRuns'
 import { LODE_CLAMP_ID } from './systems/lodeClamp'
 import { STABILISER_FOAM_ID } from './systems/stabiliserFoam'
 
@@ -45,4 +57,37 @@ export function foamPaceRunsOn(planet: number, seed: number): FoamPaceRuns {
 /** How many sprays of foam set cells in the run. */
 export function foamSpraysOf(run: SliceRun): number {
   return run.events.filter((event) => event.type === 'terrain-tools.FoamSet').length
+}
+
+/** Whether the rig was destroyed at any point of the run, by any cause. */
+export function hasRigDied(run: SliceRun): boolean {
+  return run.events.some((event) => event.type === 'VehicleDestroyed')
+}
+
+/** How many times a collapse destroyed the rig in the run. */
+export function collapseDeathsOf(run: SliceRun): number {
+  return run.events.filter(
+    (event) => event.type === 'VehicleDestroyed' && event.cause === 'collapse',
+  ).length
+}
+
+/** The lining billed at the Sell bay over the run's sale income, in whole basis points. */
+export function liningShareBpOf(run: SliceRun): number {
+  const share = div(sumOf(run, liningBilledOf), sumOf(run, saleValueOf))
+  return toSafeInteger(floor(mul(share, fromSafeInteger(BASIS_POINTS))))
+}
+
+function sumOf(run: SliceRun, amountOf: (event: DomainEvent) => string | null): Money {
+  return run.events
+    .map(amountOf)
+    .map((amount) => (amount === null ? ZERO_MONEY : fromCanonical(amount)))
+    .reduce(add, ZERO_MONEY)
+}
+
+function liningBilledOf(event: DomainEvent): string | null {
+  return event.type === 'LiningSettled' ? event.billed : null
+}
+
+function saleValueOf(event: DomainEvent): string | null {
+  return event.type === 'ResourceSold' ? event.value : null
 }
