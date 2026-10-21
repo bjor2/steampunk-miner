@@ -39,6 +39,14 @@ export interface RigLookTail {
   glow: readonly (readonly number[])[]
 }
 
+/** A track's upgrade plaque templates (ticket 585), as `rigLook.json` holds them. */
+export interface RigLookPlaque {
+  /** The fact on a named step; `{stepName}` is the owned step's `card`. */
+  step: string
+  /** The fact above the top step; `{stepName}` the top step's card, `{grade}` the tail grade. */
+  tail: string
+}
+
 /** One track's look rows, as `rigLook.json` holds them. */
 export interface TrackLookRows {
   /** An upgrade track id (`UPGRADE_IDS`), checked when the table loads. */
@@ -50,6 +58,10 @@ export interface TrackLookRows {
    * while it shows (ticket 640); absent, the look lies over the rig and hides nothing.
    */
   replaces?: string
+  /**
+   * The upgrade plaque's fitting fact templates (ticket 585); absent, the plaque keeps its facts.
+   */
+  plaque?: RigLookPlaque
   /** Part slot groups (`slotOfPartId`) the glows land on, one glow per group. */
   glowSlots: readonly (readonly string[])[]
   /** The cap (a key of the table's `glowCaps`) every glow of the track stays below. */

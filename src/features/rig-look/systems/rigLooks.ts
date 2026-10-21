@@ -1,7 +1,7 @@
 /**
  * Every track's look ladder, made once from a checked table (#577): the one per-track registry the
- * vehicle look sources, the part swaps and the debug read all ask. `rigLookOf` is the shipped
- * table's answer for a track and an owned purchase count, nothing else.
+ * vehicle look sources, the part swaps, the plaque and the debug read all ask. `rigLookOf` and
+ * `rigLookPlaqueFactOf` are the shipped table's answers for a track and an owned purchase count.
  */
 import {
   createTrackLookFrames,
@@ -9,6 +9,7 @@ import {
   type RigLookFrame,
   type TrackLookFrames,
 } from './render/rigLookFrames'
+import { plaqueFactOf } from './rigLookPlaque'
 import { RIG_LOOK_TABLE } from './rigLookTable'
 import type { RigLookTable } from './rigLookTableChecks'
 
@@ -32,4 +33,10 @@ export function trackLookFramesOf(looks: RigLooks, track: string): TrackLookFram
 export function rigLookOf(track: string, n: number): RigLookFrame | null {
   const frames = trackLookFramesOf(SHIPPED_RIG_LOOKS, track)
   return frames === null ? null : lookFrameAt(frames, n)
+}
+
+/** The plaque's fitting fact for `n` owned purchases on `track` (ticket 585); null for none. */
+export function rigLookPlaqueFactOf(track: string, n: number): string | null {
+  const frames = trackLookFramesOf(SHIPPED_RIG_LOOKS, track)
+  return frames === null ? null : plaqueFactOf(frames.rows, n)
 }

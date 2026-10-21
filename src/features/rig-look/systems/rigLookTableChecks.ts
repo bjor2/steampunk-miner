@@ -6,12 +6,14 @@
  * alike, the wrap included, so neighbouring counts always show different looks; and the glows on
  * each part slot, summed over every track that lights it, stay below the lowest cap among them.
  * A step's part is a `vehicle` part or a part of one of the table's look assets (the rig-look seam,
- * ticket 640: TD ruling on #579), and the `vehicle` slot a look part hides has one owner.
+ * ticket 640: TD ruling on #579), and the `vehicle` slot a look part hides has one owner. A plaque
+ * template shows its placeholders once each and names only steps that carry a card (ticket 585).
  */
 import { isVehiclePartId } from '../../../systems/art/artIds'
 import { isAttachId } from '../../../systems/registries/vehicleAttach'
 import type { RigLookStepRow, RigLookTail, TrackLookRows } from './render/rigLookIndex'
 import { VEHICLE_LOOK_ASSET_ID } from './render/rigLookFrames'
+import { plaqueProblemsOf } from './rigLookPlaque'
 
 export interface RigLookTable {
   /** Named glow caps; a track's `glowCap` names one. */
@@ -64,6 +66,7 @@ function trackProblemsOf(
     ...stepProblemsOf(rows),
     ...stepPartProblemsOf(rows, table),
     ...tailProblemsOf(rows),
+    ...plaqueProblemsOf(rows),
   ].map((problem) => `${rows.track}: ${problem}`)
 }
 
