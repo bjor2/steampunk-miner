@@ -220,7 +220,7 @@
         },
         {
           "title": "Same first layer on every planet",
-          "description": "The top 3 cells of rock are as soft on every planet of the first solar system as on planet 1, then harden a cell at a time (at most 1.5x a cell) to the planet's own band-1 rock; deeper bands keep their full hardness. Saved worlds keep the hardness they were made with.",
+          "description": "The top 3 cells of rock are as soft on every planet of the first solar system as on planet 1, then harden a cell at a time (at most 1.5x a cell) to the planet's own band-1 rock; deeper bands keep their full hardness. The layer is counted in cells, so a bigger planet never stretches or shortens it. Saved worlds keep the hardness they were made with.",
           "status": "built",
           "issues": [625, 306]
         },
@@ -395,9 +395,9 @@
         },
         {
           "title": "Growing planets",
-          "description": "Each planet is larger than the last, from 300 m radius toward 1000 m.",
+          "description": "Each planet is larger than the last, from 300 m radius toward 1000 m. Planets 1 to 10 take their size from the planet list (421 m on planet 2, 703 m on planet 10), and the core, the depth bands and everything placed by band grow with it. Saved worlds keep the size they were made with.",
           "status": "built",
-          "issues": [6]
+          "issues": [6, 642, 643]
         },
         {
           "title": "Seeded worlds",

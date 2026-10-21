@@ -264,9 +264,11 @@ programs }` from three's `renderer.info` of the game canvas), read only when cal
   K(p) = max(4, ceil(ln H_b1 / ln 1.5)) cells (4, 16 on P10, 66 on P40) reaching band 1's own value at
   its last cell, every deeper cell absolute, felt cut speed for the arriving on-curve rig changing at
   most 1.5x a cell from P2 to P42, P1 and every planet stamped before ore rules 5 on the shipped band
-  values, ore cells at their own tier, the band-1 cap first on P43 and a harder surface keyed on its
-  solar-system row with a planet row on top. `src/logging/surfaceLayerReport.test.ts` holds the
-  `balance:report` rows (first capped planet, each capped planet amber with its step);
+  values, ore cells at their own tier, the band-1 cap first on P43 on the ladder, the ramp never
+  shortened at a registry row's radius (ticket 643, a fake 100-tile P10) and a harder surface keyed
+  on its solar-system row with a planet row on top. `src/logging/surfaceLayerReport.test.ts` holds
+  the `balance:report` rows (the first planet whose ramp reaches past band 1, each such planet
+  amber: cut to fit with its step, or uncut with its cells past band 1);
   `generatorGolden.test.ts` checks rules 5 make the cells rules 4 did, and `oreRulesOldSaves.test.ts`
   loads a generator 11 save of P5 under rules 4 with main's column pin and its shipped surface.
 - **P2 species pool** (ticket 632, GD lock (b) on #595 6306010182; HS, VS and G&V on #576):
@@ -286,6 +288,18 @@ programs }` from three's `renderer.info` of the game canvas), read only when cal
   changes each planet's radius (to 300, one tile more and twice it) and holds every band's hardness,
   ore value and price, the surface rock by depth, core hardness, `paceScale` and upgrade prices
   byte-identical.
+- **World generation reads the radius** (ticket 643, GD lock R2 on #302 6306854642 and its
+  addendum 6306861669): `src/features/ores/planetRadius.worldgen.test.ts` generates each fresh P1
+  to P10 at its registry row's radius with its core and band starts, keeps #6's ladder past the last
+  row (never below it) and on a planet a save holds under ore rules 6, and holds fresh radii
+  non-decreasing to P200. `planetParams.test.ts` checks the `planetRadius` seam with a fake
+  registry (row radius under rules 7, the ladder past the last row, with no provider and under rules
+  6 or earlier, P1 byte-identical). `generatorGolden.test.ts` pins the registry-sized P2, P8 and P10
+  and holds P1, P11 and P60 under rules 7 to the cells rules 6 made; `oreRulesOldSaves.test.ts` loads
+  a generator 12 save of P5 under rules 6 on its ladder radius of 580 with main's column pin.
+  `enemyStats.test.ts` holds the spawn density to the planet's own radius against the reference
+  planet's under the same rules. The P2 to P10 minutes, p* and the economy bars at the new radii are
+  ticket 644's paired run.
 - **Material looks** (ticket 450, TD shape on #450 6226270701 and the Scalers' conditions):
   `src/features/roster/kindLook.test.ts` holds the roster's look provider to its rules: a fresh
   save shows no species (unseen kinds draw the family look), a species shows only once the
