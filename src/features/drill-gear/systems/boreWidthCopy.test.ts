@@ -21,8 +21,7 @@ import { TWIN_BIT_ID } from './twinBit'
 const BARE_BORE_CELLS = 2
 const WIDER_NOT_FASTER =
   'Note: a wider bore, not a faster one: each side cell costs its full energy and heat'
-const SIDEGRADE =
-  "Note: a one-off sidegrade: no level track, and the drill's own speed is unchanged"
+const SIDEGRADE = 'Note: a one-off sidegrade: no level track, and drill speed is unchanged'
 const SPEED_CLAIM = /faster(?! one)|speed (up|gain|boost)|quicker|\+\d+% (speed|pace)/i
 
 function cardLinesOf(itemId: string, level = 0): string[] {

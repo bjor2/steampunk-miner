@@ -21,8 +21,7 @@ const PERCENT_OF_BASIS_POINTS = 100
 
 export const WIDER_NOT_FASTER_NOTE =
   'a wider bore, not a faster one: each side cell costs its full energy and heat'
-export const SIDEGRADE_NOTE =
-  "a one-off sidegrade: no level track, and the drill's own speed is unchanged"
+export const SIDEGRADE_NOTE = 'a one-off sidegrade: no level track, and drill speed is unchanged'
 
 /** The bore's width in metres with `sideCells` side cells. */
 export function boreWidthMOf(sideCells: number): number {
