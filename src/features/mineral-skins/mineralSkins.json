@@ -1,5 +1,5 @@
 {
-  "$comment": "The mineral skins of #576 (GD ruling 20 Oct 2026, ticket 591): a species' skin is four layers drawn bottom first, a base texture, a vein or crystal shape, a palette and a sheen, each an id of its layer list below. A skin row names its species (a materials.json id) and one id per layer; no two species of one pool share all four, so no two species on one planet look alike. A palette is a ramp of three display colours, shadow, body and light, darkest first; its body is the hue slot colour of the species wearing it (ticket 450), so the skin keeps the hue guards of materials.json. The base, vein and sheen layers are drawn in Blender, one cell each (docs/art/mineral-skins, skin-layers.json). Look only: no price, gate, income, generation or save reads it. The batch tickets (#592 to #606) add the layers and rows, 15 species per planet on P1 to P5; #592 skins P1's slots 1 to 5, #593 its slots 6 to 10, #594 its slots 11 and 12 (the legacy pool has 12 species); #598 skins P3's slots 1 to 5 and #599 its slots 6 to 10 (the foothold-p3 pool; its slots 16 and 17, the two fossil commons of #453, are held).",
+  "$comment": "The mineral skins of #576 (GD ruling 20 Oct 2026, ticket 591): a species' skin is four layers drawn bottom first, a base texture, a vein or crystal shape, a palette and a sheen, each an id of its layer list below. A skin row names its species (a materials.json id) and one id per layer; no two species of one pool share all four, so no two species on one planet look alike. A palette is a ramp of three display colours, shadow, body and light, darkest first; its body is the hue slot colour of the species wearing it (ticket 450), so the skin keeps the hue guards of materials.json. The base, vein and sheen layers are drawn in Blender, one cell each (docs/art/mineral-skins, skin-layers.json). Look only: no price, gate, income, generation or save reads it. The batch tickets (#592 to #606) add the layers and rows, 15 species per planet on P1 to P5; #592 skins P1's slots 1 to 5, #593 its slots 6 to 10, #594 its slots 11 and 12 (the legacy pool has 12 species); #598 skins P3's slots 1 to 5 and #599 its slots 6 to 10 (the foothold-p3 pool; its slots 16 and 17, the two fossil commons of #453, are held); #603 P4's slots 11 to 15. A signature row dresses the signature material of its planet, the slotless 16th material (#453 E1), keyed by the planet: one per planet, apart from every species of the planet's pool, its palette's body inside the hue and luma bands of the family's look (ore-visuals, #151) since it has no hue slot; #603 adds P4's.",
   "layers": {
     "base": [
       {
@@ -67,6 +67,24 @@
       },
       {
         "id": "oxide-film"
+      },
+      {
+        "id": "blued-temper"
+      },
+      {
+        "id": "dichroic-zones"
+      },
+      {
+        "id": "sutured-plates"
+      },
+      {
+        "id": "watered-damask"
+      },
+      {
+        "id": "inner-feathers"
+      },
+      {
+        "id": "riveted-plate"
       }
     ],
     "vein": [
@@ -135,6 +153,24 @@
       },
       {
         "id": "hopper-terraces"
+      },
+      {
+        "id": "coil-springs"
+      },
+      {
+        "id": "cyclic-twins"
+      },
+      {
+        "id": "sclerotic-ring"
+      },
+      {
+        "id": "star-bursts"
+      },
+      {
+        "id": "spindle-spray"
+      },
+      {
+        "id": "broken-cogs"
       }
     ],
     "palette": [
@@ -225,6 +261,30 @@
       {
         "id": "bismuth-oxide",
         "ramp": ["#624262", "#c484c4", "#e2c2e2"]
+      },
+      {
+        "id": "clockspring-blue",
+        "ramp": ["#3c4662", "#788bc5", "#bcc5e2"]
+      },
+      {
+        "id": "alexandrite-shift",
+        "ramp": ["#643649", "#43b18d", "#a1d8c6"]
+      },
+      {
+        "id": "ichthyosaur-slate",
+        "ramp": ["#505d60", "#9fbabf", "#cfdcdf"]
+      },
+      {
+        "id": "starsteel-lavender",
+        "ramp": ["#5a5a69", "#b4b4d2", "#dadae8"]
+      },
+      {
+        "id": "painite-red",
+        "ramp": ["#70262c", "#e04d59", "#f0a6ac"]
+      },
+      {
+        "id": "cogwork-patina",
+        "ramp": ["#236052", "#46c1a4", "#a2e0d2"]
       }
     ],
     "sheen": [
@@ -293,6 +353,24 @@
       },
       {
         "id": "iridescent"
+      },
+      {
+        "id": "filed-gleam"
+      },
+      {
+        "id": "sector-flash"
+      },
+      {
+        "id": "greasy"
+      },
+      {
+        "id": "watered-shimmer"
+      },
+      {
+        "id": "fire-glint"
+      },
+      {
+        "id": "worn-brass"
       }
     ]
   },
@@ -450,6 +528,50 @@
       "vein": "ammonite-coils",
       "palette": "ammonite-rose",
       "sheen": "pearly"
+    },
+    {
+      "species": "clockspring-steel-brassvein",
+      "base": "blued-temper",
+      "vein": "coil-springs",
+      "palette": "clockspring-blue",
+      "sheen": "filed-gleam"
+    },
+    {
+      "species": "alexandrite-quartzine",
+      "base": "dichroic-zones",
+      "vein": "cyclic-twins",
+      "palette": "alexandrite-shift",
+      "sheen": "sector-flash"
+    },
+    {
+      "species": "ichthyosaur-eye-amberbone",
+      "base": "sutured-plates",
+      "vein": "sclerotic-ring",
+      "palette": "ichthyosaur-slate",
+      "sheen": "greasy"
+    },
+    {
+      "species": "starsteel-brassvein",
+      "base": "watered-damask",
+      "vein": "star-bursts",
+      "palette": "starsteel-lavender",
+      "sheen": "watered-shimmer"
+    },
+    {
+      "species": "painite-quartzine",
+      "base": "inner-feathers",
+      "vein": "spindle-spray",
+      "palette": "painite-red",
+      "sheen": "fire-glint"
+    }
+  ],
+  "signatures": [
+    {
+      "planet": 4,
+      "base": "riveted-plate",
+      "vein": "broken-cogs",
+      "palette": "cogwork-patina",
+      "sheen": "worn-brass"
     }
   ]
 }

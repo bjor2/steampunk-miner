@@ -1,5 +1,5 @@
 {
-  "$comment": "The drawn layer cells of the mineral skins (#576, tickets 592 to 606): one 256 px cell per base, vein and sheen layer of mineralSkins.json at 256 px/m, the 1 m ore cell. base: opaque, its luminance the ramp coordinate, seamless at its edges. vein: the shape, its luminance the ramp coordinate and its alpha the mask. sheen: the lustre highlight strength, seamless. Palettes are data in mineralSkins.json.",
+  "$comment": "The drawn layer cells of the mineral skins (#576, tickets 592 to 606): one 256 px cell per base, vein and sheen layer of mineralSkins.json at 256 px/m, the 1 m ore cell; p<n>-signature wears a planet's signature skin row. base: opaque, its luminance the ramp coordinate, seamless at its edges. vein: the shape, its luminance the ramp coordinate and its alpha the mask. sheen: the lustre highlight strength, seamless. Palettes are data in mineralSkins.json.",
   "cellPx": 256,
   "pxPerMetre": 256,
   "layers": [
@@ -158,6 +158,48 @@
       "wornBy": ["step-bismuth-brassvein"]
     },
     {
+      "kind": "base",
+      "id": "blued-temper",
+      "cell": "cells/base/blued-temper.png",
+      "blend": "blend/base-blued-temper.blend",
+      "wornBy": ["clockspring-steel-brassvein"]
+    },
+    {
+      "kind": "base",
+      "id": "dichroic-zones",
+      "cell": "cells/base/dichroic-zones.png",
+      "blend": "blend/base-dichroic-zones.blend",
+      "wornBy": ["alexandrite-quartzine"]
+    },
+    {
+      "kind": "base",
+      "id": "sutured-plates",
+      "cell": "cells/base/sutured-plates.png",
+      "blend": "blend/base-sutured-plates.blend",
+      "wornBy": ["ichthyosaur-eye-amberbone"]
+    },
+    {
+      "kind": "base",
+      "id": "watered-damask",
+      "cell": "cells/base/watered-damask.png",
+      "blend": "blend/base-watered-damask.blend",
+      "wornBy": ["starsteel-brassvein"]
+    },
+    {
+      "kind": "base",
+      "id": "inner-feathers",
+      "cell": "cells/base/inner-feathers.png",
+      "blend": "blend/base-inner-feathers.blend",
+      "wornBy": ["painite-quartzine"]
+    },
+    {
+      "kind": "base",
+      "id": "riveted-plate",
+      "cell": "cells/base/riveted-plate.png",
+      "blend": "blend/base-riveted-plate.blend",
+      "wornBy": ["p4-signature"]
+    },
+    {
       "kind": "vein",
       "id": "nugget-cluster",
       "cell": "cells/vein/nugget-cluster.png",
@@ -312,6 +354,48 @@
       "wornBy": ["step-bismuth-brassvein"]
     },
     {
+      "kind": "vein",
+      "id": "coil-springs",
+      "cell": "cells/vein/coil-springs.png",
+      "blend": "blend/vein-coil-springs.blend",
+      "wornBy": ["clockspring-steel-brassvein"]
+    },
+    {
+      "kind": "vein",
+      "id": "cyclic-twins",
+      "cell": "cells/vein/cyclic-twins.png",
+      "blend": "blend/vein-cyclic-twins.blend",
+      "wornBy": ["alexandrite-quartzine"]
+    },
+    {
+      "kind": "vein",
+      "id": "sclerotic-ring",
+      "cell": "cells/vein/sclerotic-ring.png",
+      "blend": "blend/vein-sclerotic-ring.blend",
+      "wornBy": ["ichthyosaur-eye-amberbone"]
+    },
+    {
+      "kind": "vein",
+      "id": "star-bursts",
+      "cell": "cells/vein/star-bursts.png",
+      "blend": "blend/vein-star-bursts.blend",
+      "wornBy": ["starsteel-brassvein"]
+    },
+    {
+      "kind": "vein",
+      "id": "spindle-spray",
+      "cell": "cells/vein/spindle-spray.png",
+      "blend": "blend/vein-spindle-spray.blend",
+      "wornBy": ["painite-quartzine"]
+    },
+    {
+      "kind": "vein",
+      "id": "broken-cogs",
+      "cell": "cells/vein/broken-cogs.png",
+      "blend": "blend/vein-broken-cogs.blend",
+      "wornBy": ["p4-signature"]
+    },
+    {
       "kind": "sheen",
       "id": "earthy",
       "cell": "cells/sheen/earthy.png",
@@ -464,6 +548,48 @@
       "cell": "cells/sheen/iridescent.png",
       "blend": "blend/sheen-iridescent.blend",
       "wornBy": ["step-bismuth-brassvein"]
+    },
+    {
+      "kind": "sheen",
+      "id": "filed-gleam",
+      "cell": "cells/sheen/filed-gleam.png",
+      "blend": "blend/sheen-filed-gleam.blend",
+      "wornBy": ["clockspring-steel-brassvein"]
+    },
+    {
+      "kind": "sheen",
+      "id": "sector-flash",
+      "cell": "cells/sheen/sector-flash.png",
+      "blend": "blend/sheen-sector-flash.blend",
+      "wornBy": ["alexandrite-quartzine"]
+    },
+    {
+      "kind": "sheen",
+      "id": "greasy",
+      "cell": "cells/sheen/greasy.png",
+      "blend": "blend/sheen-greasy.blend",
+      "wornBy": ["ichthyosaur-eye-amberbone"]
+    },
+    {
+      "kind": "sheen",
+      "id": "watered-shimmer",
+      "cell": "cells/sheen/watered-shimmer.png",
+      "blend": "blend/sheen-watered-shimmer.blend",
+      "wornBy": ["starsteel-brassvein"]
+    },
+    {
+      "kind": "sheen",
+      "id": "fire-glint",
+      "cell": "cells/sheen/fire-glint.png",
+      "blend": "blend/sheen-fire-glint.blend",
+      "wornBy": ["painite-quartzine"]
+    },
+    {
+      "kind": "sheen",
+      "id": "worn-brass",
+      "cell": "cells/sheen/worn-brass.png",
+      "blend": "blend/sheen-worn-brass.blend",
+      "wornBy": ["p4-signature"]
     }
   ]
 }

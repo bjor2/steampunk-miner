@@ -1,7 +1,8 @@
 """
 The Blender recipes of the mineral skin layers (#576, ticket 592 for P1's slots 1 to 5, ticket 593
 for its slots 6 to 10, ticket 594 for 11 and 12, ticket 598 for P3's slots 1 to 5, ticket 599 for
-its slots 6 to 10): one per layer id of `mineralSkins.json`. A layer id with no recipe fails, never falls back.
+its slots 6 to 10, ticket 603 for P4's slots 11 to 15 and its signature material): one per layer id
+of `mineralSkins.json`. A layer id with no recipe fails, never falls back.
 
 - `base` and `sheen` are seamless textures on the 1 m cell: an emission material on a 1 m quad
   whose value is the ramp coordinate (base, mean about 0.5) or the highlight strength (sheen,
@@ -434,6 +435,74 @@ def oxide_film_of(graph):
     return stretched(graph, graph.noise(2, 2, seed=541, detail=3, roughness=0.5))
 
 
+def base_blued_temper(graph):
+    """Clockspring steel: slow bands of temper colour drifting across drawn steel, fine draw-file lines under them."""
+    warp = graph.noise(2, 2, seed=401, detail=3, roughness=0.5)
+    temper = tiles.strata(graph, 2, warp, 2.6)
+    filed = graph.math('SINE', graph.mul_add(graph.u, 2.0 * math.pi * 61.0, graph.mul(graph.noise(3, 30, seed=402, detail=2), 2.0)))
+    tone = around_half(graph, temper, 0.62)
+    tone = graph.plus(tone, graph.mul(filed, 0.05))
+    return graph.plus(tone, graph.mul(graph.minus(stretched(graph, graph.noise(50, 50, seed=403, detail=4)), 0.5), 0.06))
+
+
+def base_dichroic_zones(graph):
+    """Alexandrite: the stone split into soft zones of its two colours, deep and light, turning one into the other."""
+    zones = graph.smooth(stretched(graph, graph.noise(3, 3, seed=411, detail=3, roughness=0.5)), 0.42, 0.58)
+    swirl = stretched(graph, graph.noise(8, 8, seed=412, detail=3))
+    tone = graph.mul_add(zones, 0.56, 0.2)
+    return graph.plus(tone, graph.mul(graph.minus(swirl, 0.5), 0.2))
+
+
+def base_sutured_plates(graph):
+    """Ichthyosaur eye: bone plates meeting at wavy sutures, each plate its own tone, pitted with fine pores."""
+    plates = graph.voronoi(5, 5, seed=421)
+    wiggle = graph.mul(graph.minus(graph.noise(30, 30, seed=422, detail=2), 0.5), 0.05)
+    edge = graph.plus(graph.voronoi(5, 5, seed=421, feature='DISTANCE_TO_EDGE')['Distance'], wiggle)
+    tone = graph.mul_add(graph.add('ShaderNodeSeparateColor', [(0, plates['Color'])]).outputs[0], 0.24, 0.42)
+    pores = sprinkled(graph, 34, 423, 0.3, 0.55)
+    tone = graph.minus(tone, graph.mul(graph.smooth(edge, 0.03, 0.0), 0.3))
+    return graph.minus(graph.plus(tone, graph.mul(graph.smooth(edge, 0.05, 0.12), 0.08)), graph.mul(pores, 0.2))
+
+
+def base_watered_damask(graph):
+    """Starsteel: watered steel, many thin layers folded into tight ripples, pale and dark in turn."""
+    warp = graph.noise(2, 2, seed=431, detail=2, roughness=0.4)
+    layers = tiles.strata(graph, 11, warp, 5.0)
+    fine = tiles.strata(graph, 33, warp, 15.0)
+    tone = around_half(graph, layers, 0.7)
+    return graph.plus(tone, graph.mul(graph.minus(fine, 0.5), 0.12))
+
+
+def base_inner_feathers(graph):
+    """Painite: a deep, dark body with curved healed-fracture feathers caught bright inside it."""
+    body = stretched(graph, graph.noise(3, 3, seed=441, detail=3, roughness=0.5))
+    rings = graph.math('SINE', graph.mul(graph.voronoi(3, 3, seed=442)['Distance'], 30.0))
+    lit = graph.smooth(stretched(graph, graph.noise(4, 4, seed=443, detail=2)), 0.55, 0.72)
+    feather = graph.mul(graph.smooth(rings, 0.75, 0.98), lit)
+    tone = graph.mul_add(body, 0.34, 0.36)
+    return graph.plus(tone, graph.mul(feather, 0.4))
+
+
+def base_riveted_plate(graph):
+    """P4's signature, cogwork: corroded plate in seamed panels, rivet heads along the seams, patina pits."""
+    x, z = graph.u, graph.v
+    seam = tiles.seam_distance(graph, graph.periodic(x, 0.5), graph.periodic(z, 0.5))
+    rivets = riveted_seams(graph, x, z)
+    pits = sprinkled(graph, 22, 452, 0.35, 0.5)
+    grime = stretched(graph, graph.noise(6, 6, seed=451, detail=4, roughness=0.55))
+    tone = around_half(graph, grime, 0.5)
+    tone = graph.minus(tone, graph.mul(graph.smooth(seam, 0.012, 0.0), 0.34))
+    tone = graph.minus(tone, graph.mul(pits, 0.18))
+    return graph.plus(tone, graph.mul(rivets, 0.36))
+
+
+def riveted_seams(graph, x, z):
+    """Rivet heads every eighth of the cell along both seams of the half-cell panels, set in from the seam."""
+    across = tiles.rivet_row(graph, x, z, 0.5, 0.125, 0.045, 0.018)
+    up = tiles.rivet_row(graph, z, x, 0.5, 0.125, 0.045, 0.018)
+    return graph.math('MAXIMUM', across, up)
+
+
 # --- sheen: the lustre's highlights -----------------------------------------------------------------
 
 
@@ -617,6 +686,63 @@ def sheen_iridescent(graph):
     bands = graph.smooth(graph.math('SINE', graph.plus(graph.mul(film, 44.0), 1.2)), 0.6, 0.95)
     glint = graph.smooth(graph.voronoi(13, 13, seed=591)['Distance'], 0.06, 0.012)
     return graph.plus(graph.mul(bands, 0.45), graph.mul(glint, 0.6))
+
+
+def sheen_filed_gleam(graph):
+    """Filed gleam (clockspring steel): short bright strokes along the draw-file lines, and a few glints."""
+    strokes = graph.smooth(stretched(graph, graph.noise(40, 3, seed=461, detail=2)), 0.66, 0.8)
+    glint = graph.smooth(graph.voronoi(15, 15, seed=462)['Distance'], 0.06, 0.012)
+    return graph.plus(graph.mul(strokes, 0.5), graph.mul(glint, 0.75))
+
+
+def sheen_sector_flash(graph):
+    """Sector flash (alexandrite): the six sectors of a twinned crystal flash in turn, sharp glints between."""
+    x, y = graph.minus(graph.u, 0.5), graph.minus(graph.v, 0.5)
+    angle = graph.math('ARCTAN2', y, x)
+    turn = graph.mul_add(angle, 3.0 / math.pi, 3.0)
+    sector = graph.math('FLOOR', turn)
+    point = graph.add('ShaderNodeCombineXYZ', [(0, sector), (1, 7.0), (2, 471.0)]).outputs[0]
+    pick = graph.add('ShaderNodeTexWhiteNoise', [('Vector', point)], {'noise_dimensions': '3D'}).outputs['Value']
+    # Soft at the sector's sides, so a flash is a glow across a face, never a hard wedge.
+    inside = graph.math('FRACT', turn)
+    sides = graph.smooth(graph.math('MINIMUM', inside, graph.minus(1.0, inside)), 0.0, 0.35)
+    radius = graph.math('SQRT', graph.plus(graph.mul(x, x), graph.mul(y, y)))
+    flash = graph.mul(graph.mul(graph.smooth(pick, 0.55, 0.62), sides), graph.smooth(radius, 0.46, 0.2))
+    glint = graph.smooth(graph.voronoi(12, 12, seed=472)['Distance'], 0.07, 0.015)
+    return graph.plus(graph.mul(flash, 0.3), graph.mul(glint, 0.85))
+
+
+def sheen_greasy(graph):
+    """Greasy (ichthyosaur eye): a dull oily film in soft patches over the bone, no hard glint at all."""
+    film = graph.smooth(stretched(graph, graph.noise(4, 4, seed=481, detail=3)), 0.5, 0.78)
+    return graph.mul(film, 0.24)
+
+
+def sheen_watered_shimmer(graph):
+    """Watered shimmer (starsteel): the pale layers of the damask catch the light along their ripples."""
+    warp = graph.noise(2, 2, seed=431, detail=2, roughness=0.4)
+    layers = tiles.strata(graph, 11, warp, 5.0)
+    band = graph.smooth(layers, 0.8, 0.96)
+    fade = graph.smooth(stretched(graph, graph.noise(2, 2, seed=491, detail=2)), 0.3, 0.7)
+    return graph.mul(graph.mul(band, fade), 0.7)
+
+
+def sheen_fire_glint(graph):
+    """Fire glint (painite): few, very strong glints with a soft halo each, as deep red stone throws them back."""
+    cells = graph.voronoi(6, 6, seed=501)['Distance']
+    core = graph.smooth(cells, 0.05, 0.01)
+    halo = graph.smooth(cells, 0.16, 0.03)
+    return graph.plus(graph.mul(core, 0.95), graph.mul(halo, 0.22))
+
+
+def sheen_worn_brass(graph):
+    """Worn brass (P4's signature): rivet heads and seam lips rubbed bright, scuffed patches between."""
+    x, z = graph.u, graph.v
+    rivets = riveted_seams(graph, x, z)
+    seam = tiles.seam_distance(graph, graph.periodic(x, 0.5), graph.periodic(z, 0.5))
+    lip = graph.mul(graph.smooth(seam, 0.012, 0.02), graph.smooth(seam, 0.03, 0.02))
+    scuff = graph.smooth(stretched(graph, graph.noise(9, 9, seed=511, detail=3)), 0.66, 0.82)
+    return graph.plus(graph.plus(graph.mul(graph.smooth(rivets, 0.3, 0.8), 0.85), graph.mul(lip, 0.4)), graph.mul(scuff, 0.3))
 
 
 # --- vein: the crystal or vein shape, by the row's silhouette ----------------------------------------
@@ -994,6 +1120,111 @@ def hopper_frames(name, centre, side, turn):
     return frames
 
 
+def vein_coil_springs(rng, body):
+    """Clockspring steel: three coiled springs of steel wire lying in the face, half-sunk."""
+    marks = []
+    for i, (cx, cz, angle) in enumerate(((-0.12, 0.17, 0.3), (0.13, -0.02, -0.5), (-0.08, -0.2, 0.1))):
+        turns, radius, length = rng.choice((5, 6)), rng.uniform(0.045, 0.06), rng.uniform(0.24, 0.3)
+        marks.append(shapes.add_tube('spring-%d' % i, helix_path((cx, cz), angle, turns, radius, length), 0.012, resolution=3))
+    return assign_all(marks, body)
+
+
+def helix_path(centre, angle, turns, radius, length, steps_per_turn=16):
+    """A helix along `angle` lying on the face, its coils standing clear of the rock (y), centred on `centre`."""
+    along, across = (math.cos(angle), math.sin(angle)), (-math.sin(angle), math.cos(angle))
+    points = []
+    for k in range(turns * steps_per_turn + 1):
+        t = k / (turns * steps_per_turn)
+        turn = t * turns * math.tau
+        reach = (t - 0.5) * length
+        side = math.cos(turn) * radius
+        points.append((centre[0] + along[0] * reach + across[0] * side, -radius * (1.05 + math.sin(turn) * 0.8),
+                       centre[1] + along[1] * reach + across[1] * side))
+    return points
+
+
+def vein_cyclic_twins(rng, body):
+    """Alexandrite: cyclic twins, three tabular crystals grown through each other at 60 degrees into a six-rayed sixling."""
+    marks = []
+    for i, (x, z, size) in enumerate(((-0.1, 0.1, 0.36), (0.18, -0.17, 0.24))):
+        spin = rng.uniform(0.0, math.pi / 3)
+        for j in range(3):
+            plate = shapes.add_cube('twin-%d-%d' % (i, j), 1.0, (x, -0.02, z), scale=(size, 0.03, size * 0.17),
+                                    rotation=(rng.uniform(-0.12, 0.12), spin + j * math.pi / 3, 0.0))
+            shapes.bevel(plate, 0.008, segments=1)
+            marks.append(plate)
+    return assign_all(marks, body)
+
+
+def vein_sclerotic_ring(rng, body):
+    """Ichthyosaur eye: the sclerotic ring, small bone plates lapped like shingles round the eye, one whole, one broken."""
+    marks = []
+    for ring, (cx, cz, radius, count, kept) in enumerate(((-0.06, 0.06, 0.2, 14, 14), (0.24, -0.25, 0.1, 9, 6))):
+        for i in range(kept):
+            angle = math.tau * i / count
+            at = (cx + math.cos(angle) * radius, -0.02 - 0.004 * (i % 2), cz + math.sin(angle) * radius)
+            width = math.tau * radius / count * 1.25
+            plate = shapes.add_cube('plate-%d-%d' % (ring, i), 1.0, at, scale=(width, 0.02, radius * 0.45),
+                                    rotation=(0.0, -angle + math.pi / 2 + 0.25, 0.0))
+            shapes.bevel(plate, 0.005, segments=1)
+            marks.append(plate)
+    return assign_all(marks, body)
+
+
+def vein_star_bursts(rng, body):
+    """Starsteel: six-rayed stars standing proud of the steel, a large one and its scattered small ones."""
+    marks = []
+    stars = [((-0.06, 0.06), 0.2)] + [(at, rng.uniform(0.05, 0.08)) for at in ((0.24, 0.22), (-0.24, -0.22), (0.22, -0.2))]
+    for i, (centre, outer) in enumerate(stars):
+        points = shapes.star_points(centre, outer, outer * 0.38, arms=6, phase=rng.uniform(0.0, math.pi / 3))
+        star = shapes.add_polygon('star-%d' % i, points, -0.02, 0.016)
+        shapes.bevel(star, 0.004, segments=1)
+        marks.append(star)
+    return assign_all(marks, body)
+
+
+def vein_spindle_spray(rng, body):
+    """Painite: long four-sided spindles, tapering to a point at both ends, sprayed from one root."""
+    marks = []
+    root = (0.04, -0.06)
+    for i in range(5):
+        angle = math.radians(20 + 36 * i) + rng.uniform(-0.1, 0.1)
+        length, radius = rng.uniform(0.22, 0.3), rng.uniform(0.025, 0.035)
+        centre = (root[0] + math.cos(angle) * length * 0.45, root[1] + math.sin(angle) * length * 0.45)
+        points = shapes.shard_points(centre, length * 0.5, radius, angle)
+        spindle = shapes.add_polygon('spindle-%d' % i, points, -0.03, radius * 1.4)
+        shapes.bevel(spindle, radius * 0.35, segments=1)
+        marks.append(spindle)
+    return assign_all(marks, body)
+
+
+def vein_broken_cogs(rng, body):
+    """P4's signature, cogwork: two toothed cog wheels with their hubs, the larger one broken, a sheared tooth beside it."""
+    marks = []
+    for i, (cx, cz, radius, teeth, missing) in enumerate(((-0.08, 0.06, 0.2, 12, 3), (0.2, -0.2, 0.1, 8, 0))):
+        kept = teeth - missing
+        points = cog_points((cx, cz), radius, teeth, kept)
+        marks.append(shapes.add_polygon('cog-%d' % i, points, -0.02, 0.02))
+        marks.append(shapes.add_prism('hub-%d' % i, radius * 0.22, 0.03, (cx, -0.035, cz), rotation=shapes.facing_camera(), sides=12))
+    marks.append(shapes.add_polygon('tooth', [(0.2, 0.17), (0.27, 0.15), (0.28, 0.2), (0.22, 0.23)], -0.02, 0.02))
+    return assign_all(marks, body)
+
+
+def cog_points(centre, radius, teeth, kept):
+    """A cog's outline: square teeth round a rim, the last `teeth - kept` sheared off flush to the rim."""
+    cx, cz = centre
+    rim, tip = radius * 0.8, radius
+    points = []
+    if kept < teeth:
+        points.append((cx, cz))
+    for k in range(kept):
+        start = math.tau * k / teeth
+        for share, reach in ((0.0, rim), (0.15, tip), (0.5, tip), (0.65, rim)):
+            angle = start + math.tau * share / teeth
+            points.append((cx + math.cos(angle) * reach, cz + math.sin(angle) * reach))
+    if kept < teeth:
+        points.append((cx + math.cos(math.tau * kept / teeth) * rim, cz + math.sin(math.tau * kept / teeth) * rim))
+    return points
 
 def kinked_path(start, end, rng, segments):
     """A wire from start to end, wobbling in the face at every inner point."""
@@ -1039,6 +1270,12 @@ BASES = {
     'frosted-face': base_frosted_face,
     'smoke-rhombs': base_smoke_rhombs,
     'oxide-film': base_oxide_film,
+    'blued-temper': base_blued_temper,
+    'dichroic-zones': base_dichroic_zones,
+    'sutured-plates': base_sutured_plates,
+    'watered-damask': base_watered_damask,
+    'inner-feathers': base_inner_feathers,
+    'riveted-plate': base_riveted_plate,
 }
 SHEENS = {
     'earthy': sheen_earthy,
@@ -1063,6 +1300,12 @@ SHEENS = {
     'silky': sheen_silky,
     'satin': sheen_satin,
     'iridescent': sheen_iridescent,
+    'filed-gleam': sheen_filed_gleam,
+    'sector-flash': sheen_sector_flash,
+    'greasy': sheen_greasy,
+    'watered-shimmer': sheen_watered_shimmer,
+    'fire-glint': sheen_fire_glint,
+    'worn-brass': sheen_worn_brass,
 }
 VEINS = {
     'nugget-cluster': vein_nugget_cluster,
@@ -1087,6 +1330,12 @@ VEINS = {
     'rod-bundle': vein_rod_bundle,
     'lens-stack': vein_lens_stack,
     'hopper-terraces': vein_hopper_terraces,
+    'coil-springs': vein_coil_springs,
+    'cyclic-twins': vein_cyclic_twins,
+    'sclerotic-ring': vein_sclerotic_ring,
+    'star-bursts': vein_star_bursts,
+    'spindle-spray': vein_spindle_spray,
+    'broken-cogs': vein_broken_cogs,
 }
 RECIPES = {'base': BASES, 'vein': VEINS, 'sheen': SHEENS}
 

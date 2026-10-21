@@ -39,15 +39,28 @@ SHADOW_LUMA_SHARE = 0.5
 LIGHT_LUMA_SHARE = 0.5
 # The batches of #576: a planet's species by roster slot, five a ticket (#592 is P1 slots 1 to 5,
 # #593 its slots 6 to 10, #594 its last two, 11 and 12: the legacy pool has 12 species; #598 is P3
-# slots 1 to 5 and #599 its slots 6 to 10, of the foothold-p3 pool), named `p<planet>-b<n>`. Keep a planet's batches in
-# slot order: a batch is measured against the ones listed before it (`earlier_batches`).
+# slots 1 to 5 and #599 its slots 6 to 10, of the foothold-p3 pool; #603 is P4 slots 11 to 15 and
+# the planet's signature material), named `p<planet>-b<n>`. A batch is measured against all of its
+# planet's other batches (`planet_mates`). A batch's `signature` is the planet whose signature skin
+# row it adds.
 BATCHES = {
     'p1-b1': {'pool': 'legacy', 'slots': ('legacy.c1', 'legacy.c2', 'legacy.c3', 'legacy.c4', 'legacy.c5')},
     'p1-b2': {'pool': 'legacy', 'slots': ('legacy.u1', 'legacy.u2', 'legacy.u3', 'legacy.u4', 'legacy.r1')},
     'p1-b3': {'pool': 'legacy', 'slots': ('legacy.r2', 'legacy.r3')},
     'p3-b1': {'pool': 'foothold-p3', 'slots': ('mixed.c1', 'mixed.c2', 'mixed.c3', 'mixed.c4', 'mixed.u1')},
     'p3-b2': {'pool': 'foothold-p3', 'slots': ('mixed.u2', 'mixed.u3', 'mixed.r1', 'mixed.r2', 'mixed.r3')},
+    'p4-b3': {'pool': 'foothold-p4', 'slots': ('mixed.e1', 'mixed.e2', 'mixed.e3', 'mixed.m1', 'mixed.m2'),
+              'signature': 4},
 }
+# A signature material has no hue slot (#453 E1): its palette is built on a slot-shaped look chosen
+# inside its family's hue and luma bands of docs/art/ores (#151; relic 155-168 degrees, luma
+# 0.46-0.68), which the slice's loader holds it to.
+SIGNATURE_LOOKS = {
+    4: {'id': 'p4-signature', 'hue': 166, 'saturation': 0.5, 'luma': 0.6},
+}
+# A colour-change species' shadow end sits on its second colour, not on its own hue: alexandrite is
+# green by lamplight and red by candle, so its ramp runs from raspberry through the green body.
+SHADOW_HUES = {'alexandrite': 335}
 
 
 def load_skins():
@@ -63,8 +76,9 @@ def species_by_id(materials=None):
 
 def batch_skins(batch, skins=None, materials=None):
     """
-    The batch's skin rows in roster-slot order, each with its species row attached. A slot is read
-    in the batch's pool: the foothold pools of P3 to P7 bind the same `mixed.*` slots.
+    The batch's skin rows in roster-slot order, each with its species row attached, then its
+    signature skin, if it has one, under the wearer name `p<planet>-signature`. A slot is read in
+    the batch's pool: the foothold pools of P3 to P7 bind the same `mixed.*` slots.
     """
     skins = skins or load_skins()
     rows = species_by_id(materials)
@@ -74,17 +88,33 @@ def batch_skins(batch, skins=None, materials=None):
     missing = [slot for slot in BATCHES[batch]['slots'] if slot not in by_slot]
     if missing:
         raise SystemExit('batch %s has no skin row for slot(s) %s' % (batch, ', '.join(missing)))
-    return [by_slot[slot] for slot in BATCHES[batch]['slots']]
+    return [by_slot[slot] for slot in BATCHES[batch]['slots']] + batch_signature_skins(batch, skins)
+
+
+def batch_signature_skins(batch, skins):
+    planet = BATCHES[batch].get('signature')
+    if planet is None:
+        return []
+    found = [row for row in skins.get('signatures', []) if row['planet'] == planet]
+    if not found:
+        raise SystemExit('batch %s has no signature skin row for planet %d' % (batch, planet))
+    return [dict(found[0], species=signature_wearer(planet), row={'hue': SIGNATURE_LOOKS[planet]})]
+
+
+def signature_wearer(planet):
+    return 'p%d-signature' % planet
 
 
 def planet_of(batch):
     return batch.split('-')[0]
 
 
-def earlier_batches(batch):
-    """The batches of the same planet before this one: the skins it must stand apart from on screen."""
-    names = list(BATCHES)
-    return [name for name in names[:names.index(batch)] if planet_of(name) == planet_of(batch)]
+def planet_mates(batch):
+    """
+    The planet's other batches: the skins this one must stand apart from on screen. Every one, not
+    only those before it, since a planet's batches may land out of order (P4's third before its first).
+    """
+    return [name for name in BATCHES if name != batch and planet_of(name) == planet_of(batch)]
 
 
 # --- the palette ramp ------------------------------------------------------------------------------
@@ -95,10 +125,15 @@ def rgb_of_hex(hex_colour):
 
 
 def ramp_of_slot(slot):
-    """Shadow, body, light: the body is the hue slot's colour (ticket 450), the ends on its hue."""
+    """
+    Shadow, body, light: the body is the hue slot's colour (ticket 450), the ends on its hue, or the
+    shadow on a colour-change species' second hue (SHADOW_HUES).
+    """
     body = rgb_of_hex(species.slot_hex(slot))
     luma = species.luma_of_rgb(body)
-    shadow = species.with_luma(body, luma * SHADOW_LUMA_SHARE)
+    shadow_hue = SHADOW_HUES.get(slot['id'])
+    shadow_body = body if shadow_hue is None else rgb_of_hex(species.slot_hex(dict(slot, hue=shadow_hue)))
+    shadow = species.with_luma(shadow_body, luma * SHADOW_LUMA_SHARE)
     light = species.with_luma(body, luma + (1 - luma) * LIGHT_LUMA_SHARE)
     return [species.hex_of_rgb(shadow), species.hex_of_rgb(body), species.hex_of_rgb(light)]
 
@@ -115,14 +150,17 @@ def blend_path(kind, layer_id):
 
 
 def worn_by(skins, kind, layer_id):
-    return sorted(skin['species'] for skin in skins['skins'] if skin[kind] == layer_id)
+    wearers = [skin['species'] for skin in skins['skins'] if skin[kind] == layer_id]
+    wearers += [signature_wearer(row['planet']) for row in skins.get('signatures', []) if row[kind] == layer_id]
+    return sorted(wearers)
 
 
 def cell_table_of(skins=None):
     skins = skins or load_skins()
     return {
         '$comment': 'The drawn layer cells of the mineral skins (#576, tickets 592 to 606): one %d px cell per '
-                    'base, vein and sheen layer of mineralSkins.json at %d px/m, the 1 m ore cell. base: '
+                    'base, vein and sheen layer of mineralSkins.json at %d px/m, the 1 m ore cell; '
+                    'p<n>-signature wears a planet\'s signature skin row. base: '
                     'opaque, its luminance the ramp coordinate, seamless at its edges. vein: the shape, its '
                     'luminance the ramp coordinate and its alpha the mask. sheen: the lustre highlight '
                     'strength, seamless. Palettes are data in mineralSkins.json.' % (CELL_PX, PX_PER_M),

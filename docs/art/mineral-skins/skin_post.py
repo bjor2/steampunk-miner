@@ -5,7 +5,7 @@ skin of a batch composited by the rule in README.md, and the batch's review shee
 stacks, the skins at 256 px, the skins in a patch of ground at desktop (85 px a tile) and phone
 (22 px a tile, 360 px wide) sizes, the game-scale strip with its greyscale and deuteranopia
 copies, and the distinctness report between every pair of the batch's skins and between each of
-them and the skins of the planet's earlier batches. A batch after a planet's first also writes the
+them and the skins of the planet's other batches. A batch with mates on its planet also writes the
 planet's game-scale strip, every skin of it so far, since no two species of a planet may look
 alike. Pillow and numpy; Blender's Python has neither.
 
@@ -61,6 +61,7 @@ PATCH_RUNS = (
     ((9, 2), (10, 2), (10, 3)),
     ((13, 1), (13, 2), (14, 2)),
     ((3, 4), (4, 4), (4, 5), (8, 4)),
+    ((11, 4), (12, 4), (12, 5)),
 )
 
 
@@ -72,7 +73,7 @@ def main():
     cells = write_cells()
     skins = layers.batch_skins(batch)
     ramps = {entry['id']: entry['ramp'] for entry in layers.load_skins()['layers']['palette']}
-    mates = [skin for earlier in layers.earlier_batches(batch) for skin in layers.batch_skins(earlier)]
+    mates = [skin for mate in layers.planet_mates(batch) for skin in layers.batch_skins(mate)]
     composites = {skin['species']: composite_of(skin, cells, ramps) for skin in skins + mates}
     write_layer_sheet(batch, skins, cells, ramps, composites)
     write_skin_sheet(batch, skins, composites)
@@ -93,10 +94,18 @@ def main():
 
 
 def write_cells():
-    """Every drawn layer's render as its committed cell: grey for base and sheen, grey + alpha for a vein."""
+    """
+    Every drawn layer's render as its committed cell: grey for base and sheen, grey + alpha for a
+    vein. A layer with no render in art/build (a checkout that authored only its own batch) keeps
+    its committed cell as it is, so a batch re-renders only its new layers.
+    """
     cells = {}
     for entry in layers.cell_table_of()['layers']:
-        render = post.read_rgba(os.path.join(layers.BUILD_DIR, '%s-%s.png' % (entry['kind'], entry['id'])))
+        render_path = os.path.join(layers.BUILD_DIR, '%s-%s.png' % (entry['kind'], entry['id']))
+        if not os.path.exists(render_path):
+            cells[(entry['kind'], entry['id'])] = committed_cell(entry)
+            continue
+        render = post.read_rgba(render_path)
         grey = rec601_of(render[:, :, :3])
         alpha = render[:, :, 3] if entry['kind'] == 'vein' else np.ones_like(grey)
         if entry['kind'] == 'vein':
@@ -106,6 +115,12 @@ def write_cells():
         write_grey(path, grey, alpha if entry['kind'] == 'vein' else None)
         cells[(entry['kind'], entry['id'])] = np.stack([grey, alpha], axis=2)
     return cells
+
+
+def committed_cell(entry):
+    """The cell as committed: grey, and its alpha (1 for a base or a sheen)."""
+    grey_alpha = np.asarray(Image.open(os.path.join(HERE, entry['cell'])).convert('LA'), dtype=np.float32) / 255.0
+    return grey_alpha if entry['kind'] == 'vein' else np.stack([grey_alpha[:, :, 0], np.ones_like(grey_alpha[:, :, 0])], axis=2)
 
 
 def rimmed(grey, alpha):
@@ -234,8 +249,8 @@ def write_magnified(path, factor):
 def write_distinctness(batch, skins, mates, composites):
     """
     Per skin of the batch at the phone tile (22 px): mean colour, luma and hue, and its contrast
-    against the rock. Per pair, the batch's own and each of its skins against the planet's earlier
-    ones (`mates`): how far apart the mean colours are (display RGB, and seen with deuteranopia), the
+    against the rock. Per pair, the batch's own and each of its skins against the planet's other
+    batches' (`mates`): how far apart the mean colours are (display RGB, and seen with deuteranopia), the
     lumas, and the textures (mean absolute difference of the two greyscale tiles, each about its
     own mean). The least different pair is named so the README can say it.
     """
