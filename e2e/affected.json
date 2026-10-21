@@ -582,6 +582,24 @@
       ]
     },
     {
+      "why": "The design system's layout switch and the HUD coverage overlay (ticket 682): data-layout from the density switch, the reserved boxes and middle band, the overlay and its debug reads. tokens.css and designTokens.json stay unmapped: they reach every screen.",
+      "paths": [
+        "src/systems/views/designTokenCss.ts",
+        "src/systems/views/designSystem.ts",
+        "src/systems/views/hudCoverageBudget.ts",
+        "src/systems/views/hudCoverageReport.ts",
+        "src/systems/views/screenLayout.ts",
+        "src/ui/stage/screenFit.ts",
+        "src/ui/hud/measuredBoxes.ts",
+        "src/ui/debug/HudCoverageOverlay.tsx",
+        "src/ui/debug/HudCoverageOverlay.module.css",
+        "src/ui/debug/hudCoverageSwitch.ts",
+        "src/ui/debug/measureHudCoverage.ts",
+        "src/debug/debugHudCoverage.ts"
+      ],
+      "specs": ["e2e/browser/hud/hudCoverage.spec.ts"]
+    },
+    {
       "why": "The touch controls held upright (ticket 485): the lower-45% stick zone, a phone's two-row cluster, the tile lane the slot column and the fire tile keep to, and the left-hand mirror.",
       "paths": [
         "src/ui/touch/**",

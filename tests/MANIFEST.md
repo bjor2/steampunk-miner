@@ -948,6 +948,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/debug/debugApi.test.ts` | 52 | 51 |
 | `src/debug/debugArtefact.test.ts` | 5 | 5 |
 | `src/debug/debugDevFlags.test.ts` | 4 | 4 |
+| `src/debug/debugHudCoverage.test.ts` | 5 | 5 |
 | `src/debug/debugHudLayout.test.ts` | 5 | 5 |
 | `src/debug/debugLining.test.ts` | 4 | 4 |
 | `src/debug/debugLiveTime.test.ts` | 3 | 3 |
@@ -1629,6 +1630,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/views/compactNumbers.test.ts` | 3 | 3 |
 | `src/systems/views/designSystem.test.ts` | 19 | 19 |
 | `src/systems/views/designSystemDoc.test.ts` | 4 | 4 |
+| `src/systems/views/designTokenCss.test.ts` | 15 | 13 |
 | `src/systems/views/deviceNotices.test.ts` | 6 | 6 |
 | `src/systems/views/engineTrackParity.test.ts` | 7 | 7 |
 | `src/systems/views/hazardStripPlace.test.ts` | 2 | 2 |
@@ -1640,6 +1642,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/views/hudClearView.test.ts` | 18 | 15 |
 | `src/systems/views/hudCompact.test.ts` | 5 | 5 |
 | `src/systems/views/hudCoverageBudget.test.ts` | 24 | 14 |
+| `src/systems/views/hudCoverageReport.test.ts` | 10 | 9 |
 | `src/systems/views/hudModel.test.ts` | 27 | 27 |
 | `src/systems/views/hudStaging.test.ts` | 6 | 6 |
 | `src/systems/views/itemCardElement.test.ts` | 7 | 7 |

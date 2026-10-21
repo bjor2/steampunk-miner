@@ -1318,6 +1318,18 @@ incomePerHour}` go to `balance-report/drill-pace.ndjson`, which `pushTestMetrics
   annotation on the sweep. With every control owned, held sideways, the pairs a slot or the fire
   tile makes with a HUD box are logged as a `tile-lane` annotation, not asserted: #485 kept the
   sideways tile lane where it meets the readouts and the east threat marker. Box Tester only.
+- **Layout tokens and the HUD coverage overlay** (ticket 682, spec #678): `tokens.css` declares
+  every token of `src/data/design/designTokens.json` as `systems/views/designTokenCss.ts` names it,
+  the phone values on `:root` and the desktop's under `data-layout="desktop"`, which the shell
+  writes from the HUD density switch; `designTokenCss.test.ts` fails when the sheet and the JSON
+  disagree, so a token changes in the JSON and its value is copied to the sheet. The overlay is
+  switched by `ui.showHudCoverage(true|false)` and its numbers read by `ui.getHudCoverage()`
+  (pure report: `systems/views/hudCoverageReport.ts`, every `data-hud` box but the touch
+  controls). `e2e/browser/hud/hudCoverage.spec.ts` runs #689's four cells (360x640, 390x844,
+  1280x800, 1440x900): the root's layout tokens, the band where the design puts it, the readout,
+  and the reserved layout within 12% / 8%; the measured share of the HUD on screen is logged as a
+  `hud-coverage` annotation until the strip rebuild (#684) and the screenshot suite (#689) assert
+  it. Box Tester only.
 - **Touch controls held upright** (ticket 485, spec #470): `e2e/browser/screens/portraitTouch.spec.ts`
   runs in the matrix's portrait touch cells (390x844, 412x915, 820x1180) and skips elsewhere. It
   measures the stick zone (the lower 45% of the height from the thumb's lower corner, ending at a

@@ -190,6 +190,22 @@ Safe-area insets (`--safe-*`, ticket 483) push every box inward; they never shri
 `hudCoverageBudget.test.ts` proves these; the #682 overlay reports the measured union of the real
 boxes and marks the band; #689 fails on a box over budget or inside the band.
 
+**The coverage overlay** (#682): `steampunkDebug.ui.showHudCoverage(true)` draws the middle band,
+the phone's top keep-out and stick zone, these reserved boxes (dashed brass) and every measured
+`data-hud` box (red inside the band) with one line, `HUD <measured>% / <budget>% · layout
+<reserved>%`; `ui.getHudCoverage()` returns the same report (`hudCoverageReport.ts`). Touch
+controls are left out, as above. The reserved layout is the budget the rebuild fills (11.66% at
+360x640, 4.27% at 1440x900); the measured share is today's HUD until #684 replaces it.
+
+**In CSS** (#682): every token a style sheet can use is a custom property in
+`src/ui/kit/tokens.css` (named by `designTokenCss.ts`, held to the JSON by
+`designTokenCss.test.ts`). The shell writes
+`data-layout="phone|desktop"` on the root from the same density switch, so `--strip-height`,
+`--strip-max-width`, `--slot-cell`, `--slot-columns` and `--warn-glow-thickness` follow the
+breakpoint, and `--slot-columns` the orientation. `--hud-inset-*` put a box's outer edge past the
+safe area (`--safe-*`): the strip right under the top inset, the other sides `--layout-margin` in.
+A planet's skin is written on the root on every arrival (`ui/stage/planetSkin.ts`).
+
 **Mockup, 360x640 (phone, upright).** Scale 1 character = 8 px across, 16 px down.
 
 ```
