@@ -27,6 +27,16 @@ const PHONE_CELLS: Array<[string, ScreenSize, SafeInsets]> = [
   ['390x844', { width: 390, height: 844 }, UPRIGHT_INSETS],
   ['844x390', { width: 844, height: 390 }, SIDEWAYS_INSETS],
 ]
+/**
+ * The band cells: the ruled 360x640 bare (G&V on #691 placed the bar over the cluster's row
+ * there, y 452-544), the tall and sideways phones with their insets. A 640 px screen under a
+ * 34 px home bar has no room for the cluster's row, the bar and the band together.
+ */
+const BAND_CELLS: Array<[string, ScreenSize, SafeInsets]> = [
+  ['360x640 bare', { width: 360, height: 640 }, NO_INSETS],
+  ['390x844 insets on', { width: 390, height: 844 }, UPRIGHT_INSETS],
+  ['844x390 insets on', { width: 844, height: 390 }, SIDEWAYS_INSETS],
+]
 const DESKTOP_CELLS: Array<[string, ScreenSize]> = [
   ['1280x800', { width: 1280, height: 800 }],
   ['1440x900', { width: 1440, height: 900 }],
@@ -59,10 +69,11 @@ describe('HUD coverage budget', () => {
     expect(notched).toBeCloseTo(bare, 6)
   })
 
-  it('lays the worked phone budget out at 360x640: strip, six slot cells in two rows, a 4 px gauge', () => {
+  it('lays the worked phone budget out at 360x640: strip, six slot cells in two rows over the cluster, a 4 px gauge', () => {
     const boxes = hudBudgetBoxesOf('phone', { width: 360, height: 640 })
     expect(boxes.strip).toEqual({ left: 0, top: 0, right: 360, bottom: 36 })
-    expect(boxes.toolSlots).toEqual({ left: 212, top: 540, right: 352, bottom: 632 })
+    // The G&V ruling on #691: the bar right-aligned on the cluster's one row (560-632).
+    expect(boxes.toolSlots).toEqual({ left: 212, top: 452, right: 352, bottom: 544 })
     expect(boxes.edgeGauge).toEqual({ left: 354, top: 192, right: 358, bottom: 448 })
   })
 
@@ -71,25 +82,24 @@ describe('HUD coverage budget', () => {
     const { toolSlots } = hudBudgetBoxesOf('phone', screen, SIDEWAYS_INSETS)
     expect(toolSlots.right - toolSlots.left).toBe(6 * 44 + 5 * 4)
     expect(toolSlots.bottom - toolSlots.top).toBe(44)
+    // Left of Interact, the cluster's foot, a cluster gap clear of it.
+    expect(toolSlots.right).toBe(844 - 47 - 8 - 72 - 8)
   })
 
-  it('lays the desktop strip out centred at its widest, with eight slots and the gear in one row', () => {
+  it('lays the desktop strip out centred at its widest, with eight slots, the overflow and the gear in one row', () => {
     const boxes = hudBudgetBoxesOf('desktop', { width: 1440, height: 900 })
     expect(boxes.strip).toEqual({ left: 360, top: 0, right: 1080, bottom: 44 })
-    expect(boxes.toolSlots.right - boxes.toolSlots.left).toBe(9 * 48 + 8 * 4)
+    expect(boxes.toolSlots.right - boxes.toolSlots.left).toBe(10 * 48 + 9 * 4)
     expect(boxes.toolSlots.bottom - boxes.toolSlots.top).toBe(48)
   })
 })
 
 describe('HUD keep-outs', () => {
-  it.each(PHONE_CELLS)(
-    'keeps every phone box out of the middle band at %s, insets on',
-    (_, screen, insets) => {
-      const boxes = hudBudgetBoxesOf('phone', screen, insets)
-      expect(isOutsideMiddleBand(boxes.strip, screen)).toBe(true)
-      expect(isOutsideMiddleBand(boxes.toolSlots, screen)).toBe(true)
-    },
-  )
+  it.each(BAND_CELLS)('keeps every phone box out of the middle band at %s', (_, screen, insets) => {
+    const boxes = hudBudgetBoxesOf('phone', screen, insets)
+    expect(isOutsideMiddleBand(boxes.strip, screen)).toBe(true)
+    expect(isOutsideMiddleBand(boxes.toolSlots, screen)).toBe(true)
+  })
 
   it.each(DESKTOP_CELLS)('keeps every desktop box out of the middle band at %s', (_, screen) => {
     const boxes = hudBudgetBoxesOf('desktop', screen)

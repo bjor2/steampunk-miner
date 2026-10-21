@@ -7,6 +7,11 @@
  * nothing on a phone takes a tap. Pure geometry in CSS pixels; the coverage overlay (#682) and
  * the screenshot suite (#689) measure the real boxes against the same numbers.
  */
+import {
+  CLUSTER_GAP_PX,
+  INTERACT_BUTTON_PX,
+  TOOL_BAR_OVER_CLUSTER_GAP_PX,
+} from '../../constants/touch'
 import { DESIGN_TOKENS, type DesignTokens, type LayoutKind } from './designSystem'
 import { coveredAreaOf, doBoxesOverlap, type ScreenBox, type ScreenSize } from './hudClearView'
 
@@ -120,7 +125,11 @@ function stripBoxOf(
   return { left, top: insets.top, right: left + width, bottom: insets.top + strip.heightPx[kind] }
 }
 
-/** The slot cells plus the overflow tray and the gear button, a grid in the thumb's corner. */
+/**
+ * The slot cells plus the overflow tray and the gear button, a grid in the thumb's corner. On a
+ * phone the touch cluster keeps the corner (G&V ruling on #691): held upright the bar stands on
+ * the cluster's one row, held sideways it sits left of Interact, the cluster's foot.
+ */
 function toolSlotBoxOf(
   kind: LayoutKind,
   screen: ScreenSize,
@@ -134,16 +143,32 @@ function toolSlotBoxOf(
   const cell = toolSlots.cellPx[kind]
   const width = columns * cell + (columns - 1) * toolSlots.gapPx
   const height = rows * cell + (rows - 1) * toolSlots.gapPx
-  const right = screen.width - insets.right - marginPx
-  const bottom = screen.height - insets.bottom - marginPx
+  const lift = clusterClearanceOf(kind, screen)
+  const right = screen.width - insets.right - marginPx - lift.right
+  const bottom = screen.height - insets.bottom - marginPx - lift.bottom
   return { left: right - width, top: bottom - height, right, bottom }
+}
+
+/** How far the cluster pushes the bar off the corner: up when held upright, left sideways. */
+function clusterClearanceOf(
+  kind: LayoutKind,
+  screen: ScreenSize,
+): { right: number; bottom: number } {
+  if (kind === 'desktop') return { right: 0, bottom: 0 }
+  if (isUpright(screen))
+    return { right: 0, bottom: INTERACT_BUTTON_PX + TOOL_BAR_OVER_CLUSTER_GAP_PX }
+  return { right: INTERACT_BUTTON_PX + CLUSTER_GAP_PX, bottom: 0 }
+}
+
+function isUpright(screen: ScreenSize): boolean {
+  return screen.height > screen.width
 }
 
 /** A phone held upright stacks the cells in a grid; sideways, and on desktop, they make one row. */
 function slotColumnsOf(kind: LayoutKind, screen: ScreenSize, tokens: DesignTokens): number {
   const { columns } = tokens.layout.toolSlots
   if (kind === 'desktop') return columns.desktop
-  return screen.height > screen.width ? columns.phonePortrait : columns.phoneLandscape
+  return isUpright(screen) ? columns.phonePortrait : columns.phoneLandscape
 }
 
 /** A thin gauge in the right edge lane, spanning the middle band's rows. */

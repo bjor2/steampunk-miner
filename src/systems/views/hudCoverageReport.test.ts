@@ -101,7 +101,7 @@ describe('HUD coverage report', () => {
     expect(insets).toEqual(UPRIGHT_INSETS)
     const report = hudCoverageReportOf({ kind: 'phone', screen: PHONE, insets, measured: [] })
     expect(report.reserved.strip.top).toBe(47)
-    expect(report.reserved.toolSlots.bottom).toBe(640 - 34 - 8)
+    expect(report.reserved.toolSlots.bottom).toBe(640 - 34 - 8 - 72 - 16)
   })
 
   it('writes one line with the measured share, the budget and the reserved layout', () => {

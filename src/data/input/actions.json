@@ -80,7 +80,7 @@
       "displayName": "Fire bore gun",
       "contexts": ["vehicle"],
       "kind": "press",
-      "keyboard": ["MouseLeft", "KeyX"],
+      "keyboard": ["MouseLeft", "KeyX", "Digit8"],
       "gamepad": ["PadRT"]
     },
     {
@@ -224,7 +224,7 @@
       "displayName": "Use flank gear",
       "contexts": ["vehicle"],
       "kind": "press",
-      "keyboard": ["KeyF"],
+      "keyboard": ["KeyF", "Digit6"],
       "gamepad": ["PadX"]
     },
     {
@@ -232,7 +232,7 @@
       "displayName": "Use collar gear",
       "contexts": ["vehicle"],
       "kind": "press",
-      "keyboard": ["KeyC"],
+      "keyboard": ["KeyC", "Digit7"],
       "gamepad": ["PadLT"]
     }
   ]

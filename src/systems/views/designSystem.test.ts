@@ -35,7 +35,8 @@ describe('design tokens', () => {
   it('show heat only above 60% and reserve the HS slot kinds by layout', () => {
     expect(DESIGN_TOKENS.layout.strip.heatShowsAbovePercent).toBe(60)
     expect(DESIGN_TOKENS.layout.toolSlots.count).toEqual({ phone: 4, desktop: 8 })
-    expect(DESIGN_TOKENS.layout.toolSlots.overflow).toEqual({ phone: true, desktop: false })
+    // The Scaler's HS condition the Producer made a done-when on #691: overflow past 8 on desktop.
+    expect(DESIGN_TOKENS.layout.toolSlots.overflow).toEqual({ phone: true, desktop: true })
     expect(DESIGN_TOKENS.layout.statusIcons.count).toEqual({ phone: 3, desktop: 6 })
     expect(DESIGN_TOKENS.layout.tabsMax).toBe(8)
   })

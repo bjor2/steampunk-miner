@@ -71,7 +71,11 @@ describe('action map', () => {
 
   it("binds the drill sockets' gear to KeyF and KeyC while driving, rebindable (#205)", () => {
     const bindings = defaultBindings(ACTION_MAP)
-    expect([bindings.use_drill_flank, bindings.use_drill_collar]).toEqual([['KeyF'], ['KeyC']])
+    // Digit6 and Digit7 are the tool slot bar's second keys for cells 6 and 7 (ticket 691).
+    expect([bindings.use_drill_flank, bindings.use_drill_collar]).toEqual([
+      ['KeyF', 'Digit6'],
+      ['KeyC', 'Digit7'],
+    ])
     expect(actionsOfChord(ACTION_MAP, bindings, 'vehicle', 'KeyF')).toEqual(['use_drill_flank'])
     expect(actionsOfChord(ACTION_MAP, bindings, 'platform', 'KeyC')).toEqual([])
     const rebound = bindingsWithOverrides(ACTION_MAP, { use_drill_collar: { keyboard: ['KeyJ'] } })
@@ -83,7 +87,8 @@ describe('action map', () => {
 
   it('fires the bore gun with the left mouse button or X while driving, a press (#345)', () => {
     const bindings = defaultBindings(ACTION_MAP)
-    expect(bindings.fire_ground_gun).toEqual(['MouseLeft', 'KeyX'])
+    // Digit8 is the tool slot bar's key for cell 8, the bore gun (ticket 691).
+    expect(bindings.fire_ground_gun).toEqual(['MouseLeft', 'KeyX', 'Digit8'])
     expect(ACTION_MAP.actions.find((action) => action.id === 'fire_ground_gun')?.kind).toBe('press')
     expect(actionsOfChord(ACTION_MAP, bindings, 'vehicle', 'MouseLeft')).toEqual([
       'fire_ground_gun',

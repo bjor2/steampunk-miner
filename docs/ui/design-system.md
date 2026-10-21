@@ -187,11 +187,11 @@ Safe-area insets (`--safe-*`, ticket 483) push every box inward; they never shri
 `hudCoverageBudget.ts`; everything else over the view is a transient (a float-up, a toast under
 2 s), an edge (a glow, the hazard strip of #316) or a sheet, which is a mode, not HUD.
 
-| Box        | Phone                                                                       | Desktop                                        |
-| ---------- | --------------------------------------------------------------------------- | ---------------------------------------------- |
-| strip      | full width to 600 px, 36 px tall, under the top inset                       | 720 px centred, 44 px tall                     |
-| tool slots | 4 slots + overflow + gear: 3x2 grid of 44 px upright, one row of 6 sideways | 8 slots + gear, one row of 48 px, bottom right |
-| edge gauge | 4 px wide in the right edge lane, spanning the middle band, surface to core | the same                                       |
+| Box        | Phone                                                                       | Desktop                                                   |
+| ---------- | --------------------------------------------------------------------------- | --------------------------------------------------------- |
+| strip      | full width to 600 px, 36 px tall, under the top inset                       | 720 px centred, 44 px tall                                |
+| tool slots | 4 slots + overflow + gear: 3x2 grid of 44 px upright, one row of 6 sideways | 8 slots + overflow + gear, one row of 48 px, bottom right |
+| edge gauge | 4 px wide in the right edge lane, spanning the middle band, surface to core | the same                                                  |
 
 **Coverage budget** (`layout.coverageMaxPercent`): the union of every `data-hud` box is at most
 **12% of a phone screen and 8% of desktop**. The worked budget at the #689 cells, insets on:
@@ -201,8 +201,8 @@ Safe-area insets (`--safe-*`, ticket 483) push every box inward; they never shri
 | 360x640 phone    | 12,960 px | 12,880 | 1,024      | **11.66%** | 12%    |
 | 390x844 phone    | 14,040    | 12,880 | 1,352      | 8.59%      | 12%    |
 | 844x390 sideways | 21,600    | 12,496 | 624        | 10.55%     | 12%    |
-| 1280x800 desktop | 28,160    | 22,272 | 1,280      | 5.05%      | 8%     |
-| 1440x900 desktop | 31,680    | 22,272 | 1,440      | 4.27%      | 8%     |
+| 1280x800 desktop | 28,160    | 24,768 | 1,280      | 5.29%      | 8%     |
+| 1440x900 desktop | 31,680    | 24,768 | 1,440      | 4.47%      | 8%     |
 
 `hudCoverageBudget.test.ts` proves these; the #682 overlay reports the measured union of the real
 boxes and marks the band; #689 fails on a box over budget or inside the band.
@@ -212,7 +212,7 @@ the phone's top keep-out and stick zone, these reserved boxes (dashed brass) and
 `data-hud` box (red inside the band) with one line, `HUD <measured>% / <budget>% · layout
 <reserved>%`; `ui.getHudCoverage()` returns the same report (`hudCoverageReport.ts`). Touch
 controls are left out, as above. The reserved layout is the budget the rebuild fills (11.66% at
-360x640, 4.27% at 1440x900); the measured share is today's HUD until #684 replaces it.
+360x640, 4.47% at 1440x900); the measured share is today's HUD until #684 replaces it.
 
 **The strip as built** (#684): the gauges, readouts and status panels are gone; `HudStrip` (a
 `strip` box) holds the three bars (`kit/GaugeBar.tsx`), the heat line, one number (money on
@@ -273,7 +273,7 @@ share and is not a HUD box.
 |                        v                    ||
 |                                              | 630   middle band bottom
 |  docked sheet (optional, beside the view)    |
-|                      1 2 3 4 5 6 7 8 [*]     | 844   slot row 464x48, number-key hotkeys
+|                    1 2 3 4 5 6 7 8 [+][*]    | 844   slot row 516x48, number-key hotkeys
 +----------------------------------------------+ 900
 ```
 
@@ -653,10 +653,10 @@ Generated from `designTokens.json`; a row is the token's path and its value. The
 | `layout.toolSlots.count.phone`                        | 4                       |
 | `layout.toolSlots.count.desktop`                      | 8                       |
 | `layout.toolSlots.overflow.phone`                     | true                    |
-| `layout.toolSlots.overflow.desktop`                   | false                   |
+| `layout.toolSlots.overflow.desktop`                   | true                    |
 | `layout.toolSlots.columns.phonePortrait`              | 3                       |
 | `layout.toolSlots.columns.phoneLandscape`             | 6                       |
-| `layout.toolSlots.columns.desktop`                    | 9                       |
+| `layout.toolSlots.columns.desktop`                    | 10                      |
 | `layout.toolSlots.cellPx.phone`                       | 44                      |
 | `layout.toolSlots.cellPx.desktop`                     | 48                      |
 | `layout.toolSlots.gapPx`                              | 4                       |

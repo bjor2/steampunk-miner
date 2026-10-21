@@ -88,7 +88,7 @@ describe('design tokens: tokens.css', () => {
       '--strip-height': '44px',
       '--strip-max-width': '720px',
       '--slot-cell': '48px',
-      '--slot-columns': '9',
+      '--slot-columns': '10',
       '--warn-glow-thickness': '32px',
     })
     expect(sheet.phoneLandscape).toEqual({ '--slot-columns': '6' })

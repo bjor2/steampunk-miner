@@ -33,6 +33,11 @@ export const INTERACT_BUTTON_PX = 72
 export const CLUSTER_BUTTON_PX = 56
 /** At least this much between two hit boxes. */
 export const CLUSTER_GAP_PX = 8
+/**
+ * The tool slot bar's gap above the cluster's one row on a phone held upright (G&V ruling on
+ * #691: the bar at y 452-544 over the cluster's row at 560-632 on 360 x 640).
+ */
+export const TOOL_BAR_OVER_CLUSTER_GAP_PX = 16
 
 /** Two taps this close in time and place reset the zoom like `0` does. */
 export const DOUBLE_TAP_MS = 300

@@ -171,8 +171,8 @@
     "statusIcons": { "count": { "phone": 3, "desktop": 6 }, "sizePx": 16 },
     "toolSlots": {
       "count": { "phone": 4, "desktop": 8 },
-      "overflow": { "phone": true, "desktop": false },
-      "columns": { "phonePortrait": 3, "phoneLandscape": 6, "desktop": 9 },
+      "overflow": { "phone": true, "desktop": true },
+      "columns": { "phonePortrait": 3, "phoneLandscape": 6, "desktop": 10 },
       "cellPx": { "phone": 44, "desktop": 48 },
       "gapPx": 4,
       "cooldownRingPx": 3
