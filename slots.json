@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-10-21T20:40:02+02:00",
+  "updated_at": "2026-10-21T20:42:32+02:00",
   "caps": {
     "grok": 12,
     "claude": 10,
@@ -91,12 +91,11 @@
         },
         {
           "slot": "C8",
-          "state": "busy",
-          "ticket": 702,
-          "grok_slot": 5,
-          "kind": "dev",
-          "since": "2026-10-21T19:53:00+02:00",
-          "wave": "678-1B"
+          "state": "free",
+          "ticket": null,
+          "grok_slot": null,
+          "kind": null,
+          "since": null
         },
         {
           "slot": "C9",
@@ -116,14 +115,14 @@
         }
       ],
       "size": 4,
-      "used": 1,
-      "free": 3,
+      "used": 0,
+      "free": 4,
       "claims_last_hour": 2,
       "name": "Claude Max 2"
     }
   ],
   "gate": {
-    "busy": 2,
+    "busy": 1,
     "max": 3
   },
   "tester": {
@@ -184,11 +183,9 @@
     },
     {
       "slot": 5,
-      "state": "dev",
-      "ticket": 702,
-      "since": "2026-10-21T19:53:00+02:00",
-      "claude_slot": 8,
-      "wave": "678-1B"
+      "state": "free",
+      "ticket": null,
+      "since": null
     },
     {
       "slot": 6,
@@ -296,12 +293,11 @@
     },
     {
       "slot": 8,
-      "state": "busy",
-      "ticket": 702,
-      "grok_slot": 5,
-      "since": "2026-10-21T19:53:00+02:00",
-      "account": 2,
-      "wave": "678-1B"
+      "state": "free",
+      "ticket": null,
+      "grok_slot": null,
+      "since": null,
+      "account": 2
     },
     {
       "slot": 9,
@@ -330,8 +326,8 @@
   "totals": {
     "grok": {
       "size": 12,
-      "used": 4,
-      "dev": 3,
+      "used": 3,
+      "dev": 2,
       "dev_cap": 8,
       "planner": 1,
       "planner_cap": 4
@@ -339,8 +335,8 @@
     "claude": {
       "size": 10,
       "enabled": 10,
-      "used": 3,
-      "free": 7,
+      "used": 2,
+      "free": 8,
       "external": 0
     }
   },
@@ -361,7 +357,7 @@
           705
         ],
         "done": [],
-        "live": 1
+        "live": 0
       },
       {
         "number": 701,
