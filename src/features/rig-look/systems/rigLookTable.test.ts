@@ -124,6 +124,12 @@ describe('rig look table', () => {
     )
   })
 
+  it("refuses the bore gun's point, where the bought Armoury modules ride (ticket 589)", () => {
+    expect(problemsOf({ slot: 'hull.front' })).toEqual([
+      'engine: slot hull.front is a module or wagon point',
+    ])
+  })
+
   it("refuses a slot that is not an attach point, or another track's", () => {
     expect(problemsOf({ slot: 'hull.keel' })).toEqual([
       'engine: slot hull.keel is not a vehicle-attach point',

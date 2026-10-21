@@ -24,8 +24,12 @@ export interface RigLookTable {
 }
 
 /**
- * The five aetheric module points (TD lock on #265, ticket 376) and the wagon hitch (`hull.hitch`,
- * TD after the Horizontal Scaler review on #162): a rig-look part never takes one (HS on #577).
+ * The five aetheric module points (TD lock on #265, ticket 376), the wagon hitch (`hull.hitch`,
+ * TD after the Horizontal Scaler review on #162) and the bore gun's point (`hull.front`, ticket
+ * 315), where every bought `bore_gun` module rides the gun (ticket 321): a rig-look part never
+ * takes one (HS on #577, which names the bore_gun mounts). `hull.turret` stays open: it is the
+ * `combat` line's own showcase point (#588), and a fitted `auto_guns` module wins it at run time,
+ * since the turret's modules list their parts there (ticket 589).
  */
 export const MODULE_ATTACH_POINTS: readonly string[] = [
   'hull.nose',
@@ -34,6 +38,7 @@ export const MODULE_ATTACH_POINTS: readonly string[] = [
   'hull.flank',
   'hull.stack.side',
   'hull.hitch',
+  'hull.front',
 ]
 
 const LADDER_MIN = 2
