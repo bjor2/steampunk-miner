@@ -56,18 +56,37 @@ function partSlotsOfOtherAssets(): Set<string> {
   )
 }
 
+type DrillLook554 = (typeof DRILL_LOOK_554.looks)[number]
+
+/**
+ * #554's look with its bit glow on `nose`: the drill tip's crowns stand in the bit's place
+ * (ticket 579), so the bit's glow lights them too and the nose stays the brightest part (ticket
+ * 590). Colours and glows stay #554's.
+ */
+function withNoseSlots(look: DrillLook554, nose: readonly string[]): DrillLook554 {
+  if (look === null) return null
+  return {
+    ...look,
+    glows: look.glows.map((glow, at) => (at === 0 ? { ...glow, slots: [...nose] } : glow)),
+  }
+}
+
 describe('rig look on the vehicle', () => {
   it('registers one look source per track of the table, keyed rig-look.<track>', () => {
     const ids = vehicleLookSources().map((source) => source.id)
     for (const rows of RIG_LOOK_TABLE.tracks) expect(ids).toContain(rigLookSourceIdOf(rows.track))
   })
 
-  it('paints drill_power exactly as #554 did for every purchase count up to 100', () => {
+  it("paints drill_power as #554 did for every count up to 100, its bit glow on the tip's crowns too", () => {
     const state = createScriptedSession().state()
     const looks = Array.from({ length: 101 }, (_, n) =>
       sourceOf('drill_power').lookOf(withLevel(state, 'p1', 'drill_power', n), 'p1', 0),
     )
-    expect(looks).toEqual(DRILL_LOOK_554.stageOf.map((stage) => DRILL_LOOK_554.looks[stage]))
+    const crowns = SHIPPED_RIG_LOOKS.tracks.find((frames) => frames.rows.track === 'drill_tip')!
+    const nose = ['drill-bit', ...crowns.rows.steps.flatMap((step) => step.part ?? [])]
+    expect(looks).toEqual(
+      DRILL_LOOK_554.stageOf.map((stage) => withNoseSlots(DRILL_LOOK_554.looks[stage], nose)),
+    )
   })
 
   it('paints a new look at drill_power 101, where #554 held its last row', () => {
