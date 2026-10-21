@@ -221,12 +221,13 @@ describe('tech tree screen: node cards', () => {
     )!
     expect(card.notes).toEqual([
       "Note: doesn't stack with the reach boom; the longer cut ahead wins",
+      "Note: a one-off sidegrade: no level track, and the drill's own speed is unchanged",
     ])
     const plain = nodeCardModelOf(
       sessionOnPlanet(16).state(),
       PLAYER,
       registeredTechTree(),
-      forkNodeIdOf('drill-gear', 'wide'),
+      'tech.extraction.resonance_fork',
     )!
     expect(plain.notes).toEqual([])
   })

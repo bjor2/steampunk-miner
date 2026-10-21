@@ -15,7 +15,8 @@
  *   economy file is refused past. It never cuts a flank cell. It is the pacing bot's pick: the bot
  *   bores straight down, and its scripted bore cuts with the gear (GD ruling on #392).
  *
- * The cards name neither the leaned row nor its item, and no ore family (the #255 guard).
+ * The cards name neither the leaned row nor its item, and no ore family (the #255 guard). Both read
+ * as one-off sidegrades, and Wide gives its bore width and ore gain (ticket 621, `boreWidthCopy`).
  */
 import { vehicleOf, type AuthorityState } from '../../../systems/authority/authorityState'
 import type { DrillGearAsk } from '../../../systems/economy/drillGearCaps'
@@ -24,8 +25,10 @@ import { FACING } from '../../../systems/vehicle/vehiclePose'
 import { isToggleEngaged } from '../../power-up-core'
 import { activeForkBranchOf, forkPairOf, type ForkPair, type TechLane } from '../../tech-tree'
 import { plungeCrownNotes } from './aheadCutNotes'
+import { SIDEGRADE_NOTE, wideBranchNotesOf } from './boreWidthCopy'
 import { gearAskInPlayOf, SIDE_CUTTERS_ID } from './cuttersAndBoom'
 import { DRILL_GEAR_ECONOMY, type DrillGearStatName } from './drillGearEconomy'
+import { widestSideCutterCells } from './sideCutterMarks'
 
 const LANE: TechLane = 'drill-gear'
 
@@ -46,6 +49,10 @@ export const DRILL_GEAR_FORK: ForkPair = forkPairOf(LANE, [
     unlocks: GALLERY_REAMERS_ID,
     description: 'Fluted reamers ride the flanks and carve a broad gallery as you go.',
     label: 'horizontal',
+    cardNotes: wideBranchNotesOf(
+      forkValueOf(GALLERY_REAMERS_ID, 'sideCells'),
+      widestSideCutterCells(),
+    ),
   },
   {
     branch: DEEP_BRANCH,
@@ -55,7 +62,7 @@ export const DRILL_GEAR_FORK: ForkPair = forkPairOf(LANE, [
     unlocks: PLUNGE_CROWN_ID,
     description: 'A hardened crown bites the next cell down before the bit arrives.',
     label: 'horizontal',
-    cardNotes: plungeCrownNotes(),
+    cardNotes: [...plungeCrownNotes(), SIDEGRADE_NOTE],
     isPacingBotPick: true,
   },
 ])

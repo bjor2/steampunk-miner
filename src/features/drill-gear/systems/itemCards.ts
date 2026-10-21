@@ -11,18 +11,27 @@ import type { ItemDescriptionEntry } from '../../../systems/registries/itemDescr
 import { hasNoNextLevel, type DescribedStatLineSpec } from '../../descriptions'
 import { isMasteredAt, milestoneLineSpecsOf } from '../../tech-tree'
 import { reachBoomNotesOf } from './aheadCutNotes'
+import { noteLineSpecOf, SIDEGRADE_NOTE, widthLineSpecsOf } from './boreWidthCopy'
 import { cardLinesOf, type CardLine } from './cardLines'
-import { REACH_BOOM_ID } from './cuttersAndBoom'
+import { REACH_BOOM_ID, SIDE_CUTTERS_ID } from './cuttersAndBoom'
 import { DRILL_GEAR_FORK, PLUNGE_CROWN_ID } from './drillGearFork'
 import {
   drillGearItemOf,
+  gearValueOf,
   markLadderOf,
   SHIPPED_DRILL_GEAR,
   type DrillGearItem,
 } from './drillGearItems'
 import { cardOfMark, SIDE_CUTTER_MARKS } from './sideCutterMarks'
+import { TWIN_BIT_ID } from './twinBit'
 
 const FIRST_MARK = 1
+
+/** Each item's "Note" lines, read when the cards below are built. */
+const NOTES_BY_ITEM: Readonly<Record<string, () => string[]>> = {
+  [REACH_BOOM_ID]: () => [...reachBoomNotesOf(DRILL_GEAR_FORK, PLUNGE_CROWN_ID), SIDEGRADE_NOTE],
+  [TWIN_BIT_ID]: () => [SIDEGRADE_NOTE],
+}
 
 export const DRILL_GEAR_ITEM_CARDS: readonly ItemDescriptionEntry[] = [
   ...SHIPPED_DRILL_GEAR.map(cardOf),
@@ -41,26 +50,26 @@ function cardOf(item: DrillGearItem): ItemDescriptionEntry {
     flavour: item.description,
     statLines: [
       ...cardLinesOf(item.itemId, FIRST_MARK).map(lineSpecOf),
+      ...widthLinesOf(item),
       ...notesOf(item).map(noteLineSpecOf),
       ...milestoneLineSpecsOf(markLadderOf(item)),
     ],
   }
 }
 
-/** The card's "Note" lines (Content on #392); none for most items. */
-function notesOf(item: DrillGearItem): string[] {
-  return item.itemId === REACH_BOOM_ID ? reachBoomNotesOf(DRILL_GEAR_FORK, PLUNGE_CROWN_ID) : []
+/** The side cutters' bore width and ore gain at their own side cells (ticket 621); none for others. */
+function widthLinesOf(item: DrillGearItem): DescribedStatLineSpec[] {
+  return item.itemId === SIDE_CUTTERS_ID
+    ? widthLineSpecsOf(gearValueOf(SIDE_CUTTERS_ID, 'sideCells'))
+    : []
 }
 
-/** A line of words labelled "Note", the same at every Mark (#351: no comma before the colon). */
-function noteLineSpecOf(note: string): DescribedStatLineSpec {
-  return {
-    label: 'Note',
-    kind: 'linearInt',
-    value: () => 0,
-    textOf: () => note,
-    nextLevel: hasNoNextLevel,
-  }
+/**
+ * The card's "Note" lines (Content on #392): the boom's doesn't-stack line, and the drill types'
+ * sidegrade line (VS on #308, ticket 621); none for most items.
+ */
+function notesOf(item: DrillGearItem): string[] {
+  return NOTES_BY_ITEM[item.itemId]?.() ?? []
 }
 
 function lineSpecOf(line: CardLine, index: number): DescribedStatLineSpec {

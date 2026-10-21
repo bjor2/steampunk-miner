@@ -19,6 +19,7 @@ import type { VehicleItem } from '../../../systems/registries/vehicleLoadout'
 import { isItemOwned, type VehicleLoadout } from '../../../systems/vehicle/loadoutState'
 import { hasNoNextLevel, type DescribedStatLineSpec } from '../../descriptions'
 import type { TechNode } from '../../tech-tree'
+import { widthLineSpecsOf } from './boreWidthCopy'
 import { DRILL_GEAR_ECONOMY } from './drillGearEconomy'
 import type { DrillGearNode } from './drillGearItems'
 
@@ -61,6 +62,11 @@ export const SIDE_CUTTER_MARKS: readonly SideCutterMark[] = [
 export function ownedSideCutterCellsOf(loadout: VehicleLoadout): number | null {
   const owned = SIDE_CUTTER_MARKS.filter((mark) => isItemOwned(loadout, mark.itemId))
   return owned.length === 0 ? null : Math.max(...owned.map(sideCellsOfMark))
+}
+
+/** The side cells of the widest width Mark the lane sells. */
+export function widestSideCutterCells(): number {
+  return Math.max(...SIDE_CUTTER_MARKS.map(sideCellsOfMark))
 }
 
 /** The width Mark sold as `itemId`, or null for any other item. */
@@ -106,13 +112,20 @@ export function offerOfMark(mark: SideCutterMark): VehicleItemOffer {
   return { name: mark.name, price: sideCutterMarkPriceOf(mark) }
 }
 
-/** Its card: the side cells it cuts and its price, neither stepping (it has no Marks of its own). */
+/**
+ * Its card: the side cells it cuts, its bore width and ore gain (ticket 621) and its price, none
+ * stepping (it has no Marks of its own).
+ */
 export function cardOfMark(mark: SideCutterMark): ItemDescriptionEntry {
   return {
     id: `drill-gear.${mark.itemId.slice('gear.'.length)}`,
     matches: { kind: 'vehicle-item', id: mark.itemId },
     flavour: mark.description,
-    statLines: [sideCellsLineOf(mark), priceLineOf(mark)],
+    statLines: [
+      sideCellsLineOf(mark),
+      ...widthLineSpecsOf(sideCellsOfMark(mark)),
+      priceLineOf(mark),
+    ],
   }
 }
 
