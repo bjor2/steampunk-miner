@@ -1,0 +1,31 @@
+{
+  "about": "The cargo_hold track's rig-look parts (ticket 580, wave 576-1A of the rig look ladder #576): one asset at the track's attach slot, one part per look step. The thresholds are Systems' table (#157, comment 6300543785) and the names Progression's (comment 6300549964); the wiring (#581) reads them from the rig-look registry (#577), not from here.",
+  "assetId": "vehicle-look-cargo-hold",
+  "track": "cargo_hold",
+  "attach": "hull.cargo",
+  "z": 3,
+  "replaces": "t1-hopper",
+  "looks": [
+    {
+      "part": "ore-hatch",
+      "name": "Ore hatch",
+      "purchases": 0,
+      "unnamedDefault": true
+    },
+    {
+      "part": "plank-crate",
+      "name": "Plank crate",
+      "purchases": 23
+    },
+    {
+      "part": "ore-hopper",
+      "name": "Ore hopper",
+      "purchases": 31
+    },
+    {
+      "part": "riveted-bin",
+      "name": "Riveted bin",
+      "purchases": 33
+    }
+  ]
+}
