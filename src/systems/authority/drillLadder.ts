@@ -6,8 +6,13 @@
  * broke, so the ladder compares levels on the same ground with the drill law and #399's exact
  * carry (no whole-tick rounding per cell).
  *
- * Motion is left out: after its first, resting tick the pose sits past the column's foot, so every
- * tick's reach is its work's alone. #397's cut-follow adds the vehicle's travel time to the ladder.
+ * Motion is held to the cut: after its first, resting tick the pose moves toward a little past the
+ * column's foot only as far as the ground ahead of its face is open (ticket 570: the stamp rides the
+ * body's face, a step ahead of it, so a pose jumped past ground the cut never reached would cut
+ * nothing). The front's step is the drill law's, so in rock every tick's reach is its work's alone.
+ * A natural cave the column crosses is open ground the body drops through in one tick; the front
+ * then crosses the cave's air at its catch-up pace (`sweptStampAt.ts`), a few ticks main's pose past
+ * the foot never paid, more on a faster rig. #397's cut-follow adds the vehicle's travel time.
  */
 import { energyMax } from '../economy/vehicleStats'
 import { NO_DRIVE } from '../vehicle/driveSigns'
@@ -19,6 +24,7 @@ import { materialCellAt } from '../world/worldState'
 import { vehicleOf, type AuthorityState } from './authorityState'
 import type { DomainEventBody } from './domainEvent'
 import { drillAlongStep } from './drillStepCut'
+import { stepIntoOpenGround, type Point } from './faceHoldFixtures'
 import { planetParamsOf } from './planetOfState'
 import { createScriptedSession, FREEZE_ENEMIES, GROUND, poseAbove } from './scriptedSession'
 
@@ -38,7 +44,7 @@ export const LADDER_COLUMN = GROUND.tx
  */
 const DEEP_TANK_PURCHASES = 17
 const HOLD_PURCHASES = 51
-/** Cells past the column's foot the pose waits at, so the stamp's centre crosses the last cell. */
+/** Cells past the column's foot the pose heads for, so the stamp's front crosses the last cell. */
 const FOOT_OVERSHOOT_CELLS = 3
 /** A cut that has not finished by now is stuck, never slow: about 28 minutes. */
 const MAX_TICKS = 100_000
@@ -94,10 +100,11 @@ function columnCellsBelow({ state, params, top }: Rig, count: number): TilePoint
 /** Ticks of the swept cut, from its first, until every one of `cells` has broken. */
 function ticksToBreakAll(rig: Rig, cells: readonly TilePoint[]): number {
   const standing = new Set(cells.map(tileKeyOf))
-  const foot = footPoseOf(rig.top, cells)
+  const foot = footOf(rig.top, cells)
   let state = rig.state
+  let pose = rig.top
   for (let tick = 1; tick <= MAX_TICKS; tick++) {
-    const pose = tick === 1 ? rig.top : foot
+    if (tick > 1) pose = { ...pose, ...stepIntoOpenGround(state.world, rig.params, pose, foot) }
     const ticked = { ...state, tick: rig.state.tick + tick }
     const step = { pose, drive: NO_DRIVE, isLifting: false }
     const effect = drillAlongStep(ticked, rig.params, 'p1', noseTileOf(pose), step)
@@ -108,10 +115,10 @@ function ticksToBreakAll(rig: Rig, cells: readonly TilePoint[]): number {
   throw new Error(`the column still stood after ${MAX_TICKS} ticks`)
 }
 
-/** The resting pose moved down the column to a little past its last cell. */
-function footPoseOf(top: VehiclePose, cells: readonly TilePoint[]): VehiclePose {
+/** A little past the column's last cell, below the resting pose. */
+function footOf(top: VehiclePose, cells: readonly TilePoint[]): Point {
   const last = cells[cells.length - 1]
-  return { ...top, y: (last.ty - FOOT_OVERSHOOT_CELLS) * 1000 + 500 }
+  return { x: top.x, y: (last.ty - FOOT_OVERSHOOT_CELLS) * 1000 + 500 }
 }
 
 function removeBrokenCells(standing: Set<string>, events: readonly DomainEventBody[]): void {

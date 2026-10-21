@@ -36,25 +36,33 @@ Bjor's order of 18 Oct (level 20 about 50x today's) as the GD ruled it on #551: 
 - **Flag-off path:** with `drill.sweptCut` off the body is held to 18 m/s and the report capsule to
   950 mm a tick; that fallback is unsupported above 18 m/s, a documented deviation, not a pass.
 
-The tables below were measured at ticket 552 with this law.
+The tables below were measured at ticket 552 with this law and re-measured at ticket 570, when the
+swept cut began riding its face.
 
-## Table (ticket 552)
+## Table (ticket 570)
 
 **What is cut:** 50 ground cells straight down from the planet 1 surface, seed 83921 (the scripted
 sessions' and the #416 drill-down run's seed), column 20. With this seed the planet's radius is 300
 tiles, so the first 24 cells are band 1 (hardness 1) and the other 26 are band 2 (hardness 1.2544).
 The rig keeps `drill_tip` 0 (tip 1), so band 2 cuts at efficiency (1 / 1.2544)^2. Its tank is full
 and its hold never fills, and enemies are frozen. **How:** the authority's swept cut
-(`systems/authority/drillLadder.ts`) with #399's exact carry; the pose waits past the column's
-foot, so the cut alone sets the time.
+(`systems/authority/drillLadder.ts`) with #399's exact carry. Since ticket 570 the stamp rides the
+body's face, so the pose moves down only into ground the cut opened; in rock the cut alone sets
+the time. In band 2 the column crosses a natural cave (rows 264 to 256). The body
+drops through it in one tick and the front follows through the cave's air at its catch-up pace,
+which ticket 552's pose, parked past the foot, never paid (about 18 ticks at level 15). That crossing
+is why levels 5 to 20 read slower than at ticket 552; the band-1 cut is unchanged or a few ticks
+quicker (the stored-step table below).
 
 | drill level | ticks | seconds | cells/s | x previous | law x previous |
 | ----------: | ----: | ------: | ------: | ---------: | -------------: |
-|           1 |  2969 |  49.483 |   1.010 |            |                |
-|           5 |  1244 |  20.733 |   2.412 |      2.387 |          2.387 |
-|          10 |   419 |   6.983 |   7.160 |      2.969 |          2.967 |
-|          15 |   141 |   2.350 |  21.277 |      2.972 |          2.967 |
-|          20 |    48 |   0.800 |  62.500 |      2.938 |          2.967 |
+|           1 |  2964 |  49.400 |   1.012 |            |                |
+|           5 |  1264 |  21.067 |   2.373 |      2.345 |          2.387 |
+|          10 |   443 |   7.383 |   6.772 |      2.853 |          2.967 |
+|          15 |   156 |   2.600 |  19.231 |      2.840 |          2.967 |
+|          20 |    55 |   0.917 |  54.545 |      2.836 |          2.967 |
+
+At ticket 552 the same column read 2969, 1244, 419, 141 and 48 ticks.
 
 - **cells/s** is the column's average, 50 cells over its time. Band 2 is slower than band 1.
 - **x previous** is how many times faster this level cut the column than the row above.
@@ -85,14 +93,15 @@ and tip (1) it used and the expected cut. Since ticket 558 stored 20 counts in a
 153 sub-steps a cell (94.118 cells/s, 0.02% under the law of 94.14); the 20-cell column reads in
 whole ticks, 13 of them, so the row still reads 92.308 cells/s (-1.9%). Its rows go to `drill-ladder.ndjson` on
 `test-metrics` and the status page's Drill speed panel sets them beside the browser descent
-([loop-status.md](../loop-status.md#drill-speed-panel-ticket-434)). At ticket 552:
+([loop-status.md](../loop-status.md#drill-speed-panel-ticket-434)). At ticket 570 (ticket 552
+read 795, 333, 112, 38 and 13 ticks: the riding front starts biting a few ticks sooner):
 
 | stored step | ticks | seconds | cells/s | x previous | law x previous |
 | ----------: | ----: | ------: | ------: | ---------: | -------------: |
-|           1 |   795 |  13.250 |   1.509 |            |                |
-|           5 |   333 |   5.550 |   3.604 |      2.387 |          2.387 |
-|          10 |   112 |   1.867 |  10.714 |      2.973 |          2.967 |
-|          15 |    38 |   0.633 |  31.579 |      2.947 |          2.967 |
+|           1 |   776 |  12.933 |   1.546 |            |                |
+|           5 |   325 |   5.417 |   3.692 |      2.388 |          2.387 |
+|          10 |   110 |   1.833 |  10.909 |      2.955 |          2.967 |
+|          15 |    38 |   0.633 |  31.579 |      2.895 |          2.967 |
 |          20 |    13 |   0.217 |  92.308 |      2.923 |          2.967 |
 
 ## Starting rigs: cut-follow speed per stored step (ticket 431)
