@@ -6,7 +6,7 @@
  * holds is never shown. Read only from the slot entry: a slot whose header holds no summary names
  * its planet from the entry's index and shows its depth and money as unknown.
  */
-import SAVE_MENU_TEXT from '../../data/saveMenu/saveMenu.json'
+import { SAVE_MENU_TEXT } from './saveMenuText'
 import { exactAmount, formatAmount } from '../displayAmount'
 import { fromCanonical } from '../money'
 import { planetDisplayNameOf } from '../registries/planetNames'

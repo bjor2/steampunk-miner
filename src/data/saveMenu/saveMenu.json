@@ -1,4 +1,50 @@
 {
+  "titleMenu": {
+    "gameName": "Steampunk Miner",
+    "newGame": "New Game",
+    "continue": "Continue",
+    "continueSummary": "{slotName} · {planetName} · {playtime}",
+    "load": "Load",
+    "back": "Back",
+    "loadSlot": "Load",
+    "loadRefused": "Load refused",
+    "confirmNewGame": {
+      "title": "Start new game?",
+      "line": "You start again from planet 1; nothing carries over.",
+      "warning": "The autosave is replaced at the first checkpoint; named slots stay.",
+      "start": "Start new game",
+      "cancel": "Cancel"
+    },
+    "generatorNotes": {
+      "older": "Made by an older world generator: it updates as it loads",
+      "newer": "Made by a newer build: this build cannot load it"
+    }
+  },
+  "pauseMenu": {
+    "paused": "Paused",
+    "pausedLine": "The world holds still until you resume.",
+    "resume": "Resume",
+    "saveGame": "Save game",
+    "settings": "Settings",
+    "back": "Back"
+  },
+  "savePage": {
+    "title": "Save game",
+    "line": "Pick a slot; a used slot asks before it is overwritten.",
+    "blankNameTip": "A blank name saves under the planet's name.",
+    "saveHere": "Save here",
+    "overwrite": "Overwrite",
+    "confirmOverwrite": "Confirm overwrite",
+    "emptySlot": "Empty slot",
+    "readingSaves": "Reading saves…",
+    "savedTo": "Saved to slot {slotNumber}",
+    "notSaved": "Not saved: {problems}"
+  },
+  "slot": {
+    "defaultName": "Planet {planetIndex}",
+    "savedAt": "Saved {savedAt}",
+    "savedAtUnknown": "Unknown"
+  },
   "scrapConfirm": {
     "question": "Scrap {slotName}? This can't be undone.",
     "scrap": "Scrap",

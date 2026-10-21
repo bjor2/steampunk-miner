@@ -5,7 +5,7 @@
  * game or a save already in the slot layout never shows it. The copy is `ui.saveMenu` data and
  * keeps to the #678 toast budget (6 words, 2 s).
  */
-import SAVE_MENU_TEXT from '../../data/saveMenu/saveMenu.json'
+import { SAVE_MENU_TEXT } from './saveMenuText'
 import type { SaveMigration } from '../save/saveMigrations'
 
 export const LEDGER_TOAST_TEXT: string = SAVE_MENU_TEXT.ledgerToast

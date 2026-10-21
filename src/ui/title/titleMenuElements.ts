@@ -6,22 +6,25 @@
  * lost: the confirm's three sentences are now its title, its line and its warning.
  */
 import { HINT_PLAQUE_ICON_ID, hudLabelIconIdOf } from '../../systems/art/icons/iconSet'
+import { fillSaveMenuText, SAVE_MENU_TEXT } from '../../systems/views/saveMenuText'
 import type { TitleSlotRow } from '../../systems/views/titleMenuModel'
 import type { ElementText } from '../../systems/views/uiText'
 import type { IconValue } from '../kit/TitleOneLine'
 import { slotSummaryFactsOf } from '../save/slotSummaryFacts'
 
+const TITLE_TEXT = SAVE_MENU_TEXT.titleMenu
+
 export const GAME_NAME_TEXT: ElementText = {
   id: 'title.game',
-  title: 'Steampunk Miner',
+  title: TITLE_TEXT.gameName,
   oneLine: '',
   tooltipLines: [],
 }
 
 export const NEW_GAME_CONFIRM_TEXT: ElementText = {
   id: 'title.confirm-new-game',
-  title: 'Start new game?',
-  oneLine: 'You start again from planet 1; nothing carries over.',
+  title: TITLE_TEXT.confirmNewGame.title,
+  oneLine: TITLE_TEXT.confirmNewGame.line,
   tooltipLines: [],
 }
 
@@ -29,14 +32,14 @@ export const NEW_GAME_CONFIRM_TEXT: ElementText = {
 export const NEW_GAME_FACTS: readonly IconValue[] = [
   {
     iconId: HINT_PLAQUE_ICON_ID,
-    text: 'The autosave is replaced at the first checkpoint; named slots stay.',
+    text: TITLE_TEXT.confirmNewGame.warning,
     holds: 'warning',
   },
 ]
 
 export const LOAD_REFUSED_TEXT: ElementText = {
   id: 'title.load-refused',
-  title: 'Load refused',
+  title: TITLE_TEXT.loadRefused,
   oneLine: '',
   tooltipLines: [],
 }
@@ -46,7 +49,7 @@ export function titleSlotTextOf(row: TitleSlotRow): ElementText {
     id: `title.slot.${row.slot}`,
     title: row.name,
     oneLine: '',
-    tooltipLines: [`Saved ${row.savedAtText}`],
+    tooltipLines: [fillSaveMenuText(SAVE_MENU_TEXT.slot.savedAt, { savedAt: row.savedAtText })],
   }
 }
 

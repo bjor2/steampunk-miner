@@ -6,15 +6,16 @@
  */
 import { hudLabelIconIdOf } from '../../systems/art/icons/iconSet'
 import type { SaveSlotRow } from '../../systems/views/pauseMenuModel'
+import { fillSaveMenuText, SAVE_MENU_TEXT } from '../../systems/views/saveMenuText'
 import type { ElementText } from '../../systems/views/uiText'
 import type { IconValue } from '../kit/TitleOneLine'
 import { slotSummaryFactsOf } from '../save/slotSummaryFacts'
 
 export const SAVE_PAGE_TEXT: ElementText = {
   id: 'pause.save',
-  title: 'Save game',
-  oneLine: 'Pick a slot; a used slot asks before it is overwritten.',
-  tooltipLines: ["A blank name saves under the planet's name."],
+  title: SAVE_MENU_TEXT.savePage.title,
+  oneLine: SAVE_MENU_TEXT.savePage.line,
+  tooltipLines: [SAVE_MENU_TEXT.savePage.blankNameTip],
 }
 
 /** `savedAtText` is the wall time in the player's zone, which only the view knows. */
@@ -23,7 +24,7 @@ export function pauseSlotTextOf(row: SaveSlotRow, savedAtText: string): ElementT
     id: `pause.slot.${row.slot}`,
     title: row.title,
     oneLine: '',
-    tooltipLines: savedAtText === '' ? [] : [`Saved ${savedAtText}`],
+    tooltipLines: savedAtText === '' ? [] : [savedAtLineOf(savedAtText)],
   }
 }
 
@@ -34,4 +35,8 @@ export function pauseSlotFactsOf(row: SaveSlotRow): IconValue[] {
     ...slotSummaryFactsOf(row.summary),
     { iconId: hudLabelIconIdOf('tile_time'), text: row.playtimeText },
   ]
+}
+
+function savedAtLineOf(savedAtText: string): string {
+  return fillSaveMenuText(SAVE_MENU_TEXT.slot.savedAt, { savedAt: savedAtText })
 }

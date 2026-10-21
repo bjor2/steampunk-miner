@@ -10,9 +10,9 @@
  * only: the save itself goes through the checkpoint, never through the authority.
  */
 import { TICKS_PER_SECOND } from '../../constants/physics'
-import SAVE_MENU_TEXT from '../../data/saveMenu/saveMenu.json'
 import { manualSlotKeys, type SaveSlotEntry, type SaveSlotKey } from '../save/saveSlotIndex'
 import type { FocusStop } from './menuFocus'
+import { fillSaveMenuText, SAVE_MENU_TEXT } from './saveMenuText'
 import { slotSummaryLineOf, type SlotSummaryLine } from './slotSummaryLine'
 import { UI_ID_TEMPLATES, UI_IDS } from './screenIds'
 import { uiButton, type ScreenButton } from './viewParts'
@@ -41,7 +41,7 @@ export interface PauseMenuState {
 
 export interface SaveSlotRow {
   slot: SaveSlotKey
-  /** The save's name, "Empty slot", or "Reading saves…" until the list is in. */
+  /** The save's name, the empty slot's title, or "Reading saves…" until the list is in. */
   title: string
   /** The save's planet, depth and money; null for an empty slot. */
   summary: SlotSummaryLine | null
@@ -83,6 +83,8 @@ export const SAVE_NAME_MAX_CHARS = 40
 
 const SECONDS_PER_MINUTE = 60
 const MINUTES_PER_HOUR = 60
+const PAUSE_TEXT = SAVE_MENU_TEXT.pauseMenu
+const SAVE_PAGE_TEXT = SAVE_MENU_TEXT.savePage
 
 export function pauseMenuOpenAt(planetIndex: number): PauseMenuState {
   return {
@@ -97,7 +99,7 @@ export function pauseMenuOpenAt(planetIndex: number): PauseMenuState {
 }
 
 export function defaultSaveNameOf(planetIndex: number): string {
-  return `Planet ${planetIndex}`
+  return fillSaveMenuText(SAVE_MENU_TEXT.slot.defaultName, { planetIndex })
 }
 
 /** The typed name cut to the cap; blank names the save after its planet. */
@@ -118,7 +120,7 @@ export function isScrapUnconfirmed(menu: PauseMenuState, slot: SaveSlotKey): boo
 
 /** "Scrap Deep vein? This can't be undone." */
 export function scrapQuestionOf(slotName: string): string {
-  return SAVE_MENU_TEXT.scrapConfirm.question.replace('{slotName}', slotName)
+  return fillSaveMenuText(SAVE_MENU_TEXT.scrapConfirm.question, { slotName })
 }
 
 /** The authority tick as hours, minutes and seconds of play: `1:02:03`. */
@@ -130,10 +132,10 @@ export function playtimeTextOf(ticks: number): string {
 }
 
 export function selectPauseMenuModel(menu: PauseMenuState): PauseMenuModel {
-  const resume = uiButton(UI_IDS.pauseResume, 'Resume', { kind: 'closePauseMenu' })
-  const saveGame = uiButton(UI_IDS.pauseSaveGame, 'Save game', { kind: 'openSaveSlots' })
-  const settings = uiButton(UI_IDS.pauseSettings, 'Settings', { kind: 'openSettings' })
-  const back = uiButton(UI_IDS.pauseBack, 'Back', { kind: 'closeSaveSlots' })
+  const resume = uiButton(UI_IDS.pauseResume, PAUSE_TEXT.resume, { kind: 'closePauseMenu' })
+  const saveGame = uiButton(UI_IDS.pauseSaveGame, PAUSE_TEXT.saveGame, { kind: 'openSaveSlots' })
+  const settings = uiButton(UI_IDS.pauseSettings, PAUSE_TEXT.settings, { kind: 'openSettings' })
+  const back = uiButton(UI_IDS.pauseBack, PAUSE_TEXT.back, { kind: 'closeSaveSlots' })
   const slots = slotRowsOf(menu)
   const focusStops =
     menu.page === 'main' ? [resume, saveGame, settings] : [...slotButtons(slots), back]
@@ -220,14 +222,14 @@ function slotButtonOf(
   entry: SaveSlotEntry | null,
 ): ScreenButton {
   const id = UI_ID_TEMPLATES.pauseSlotSave(slot)
-  if (entry === null) return uiButton(id, 'Save here', { kind: 'saveToSlot', slot })
+  if (entry === null) return uiButton(id, SAVE_PAGE_TEXT.saveHere, { kind: 'saveToSlot', slot })
   if (menu.armedSlot === slot)
-    return uiButton(id, 'Confirm overwrite', { kind: 'saveToSlot', slot })
-  return uiButton(id, 'Overwrite', { kind: 'armOverwrite', slot })
+    return uiButton(id, SAVE_PAGE_TEXT.confirmOverwrite, { kind: 'saveToSlot', slot })
+  return uiButton(id, SAVE_PAGE_TEXT.overwrite, { kind: 'armOverwrite', slot })
 }
 
 function emptySlotTitleOf(menu: PauseMenuState): string {
-  return menu.slotEntries === null ? 'Reading saves…' : 'Empty slot'
+  return menu.slotEntries === null ? SAVE_PAGE_TEXT.readingSaves : SAVE_PAGE_TEXT.emptySlot
 }
 
 function entryOfSlot(entries: readonly SaveSlotEntry[], slot: SaveSlotKey): SaveSlotEntry | null {
@@ -235,12 +237,14 @@ function entryOfSlot(entries: readonly SaveSlotEntry[], slot: SaveSlotKey): Save
 }
 
 function noticeOf(menu: PauseMenuState): string {
-  if (menu.saveProblems.length > 0) return `Not saved: ${menu.saveProblems.join('; ')}`
-  return menu.savedSlot === null ? '' : `Saved to ${slotLabelOf(menu.savedSlot)}`
+  if (menu.saveProblems.length > 0)
+    return fillSaveMenuText(SAVE_PAGE_TEXT.notSaved, { problems: menu.saveProblems.join('; ') })
+  return menu.savedSlot === null ? '' : savedToTextOf(menu.savedSlot)
 }
 
-function slotLabelOf(slot: SaveSlotKey): string {
-  return slot.replace('slot-', 'slot ')
+/** The pause menu saves only to the manual slots, `slot-2` reads "Saved to slot 2". */
+function savedToTextOf(slot: SaveSlotKey): string {
+  return fillSaveMenuText(SAVE_PAGE_TEXT.savedTo, { slotNumber: slot.replace('slot-', '') })
 }
 
 function twoDigits(value: number): string {

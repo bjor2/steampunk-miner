@@ -15,6 +15,7 @@ import type { SaveSlotEntry, SaveSlotKey, SlotGeneratorStanding } from '../save/
 import { latestSlotOf, slotGeneratorStandingOf } from '../save/saveSlotIndex'
 import { TICKS_PER_SECOND } from '../../constants/physics'
 import type { FocusStop } from './menuFocus'
+import { fillSaveMenuText, SAVE_MENU_TEXT } from './saveMenuText'
 import { slotSummaryLineOf, type SlotSummaryLine } from './slotSummaryLine'
 import { uiButton, type ScreenButton } from './viewParts'
 
@@ -90,9 +91,9 @@ const MS_PER_MINUTE = 60_000
 const GENERATOR_NOTES: Record<SlotGeneratorStanding, string | null> = {
   current: null,
   unknown: null,
-  older: 'Made by an older world generator: it updates as it loads',
-  newer: 'Made by a newer build: this build cannot load it',
+  ...SAVE_MENU_TEXT.titleMenu.generatorNotes,
 }
+const TITLE_TEXT = SAVE_MENU_TEXT.titleMenu
 /** `YYYY-MM-DDTHH:MM` of an ISO string. */
 const ISO_MINUTE_LENGTH = 16
 
@@ -129,7 +130,7 @@ export function playtimeTextOf(playtimeTicks: number): string {
 
 /** The wall time at the player's offset, to the minute; a v1 save has none. */
 export function savedAtTextOf(savedAtMs: number | null, utcOffsetMinutes: number): string {
-  if (savedAtMs === null) return 'Unknown'
+  if (savedAtMs === null) return SAVE_MENU_TEXT.slot.savedAtUnknown
   const shifted = new Date(savedAtMs + utcOffsetMinutes * MS_PER_MINUTE).toISOString()
   return shifted.slice(0, ISO_MINUTE_LENGTH).replace('T', ' ')
 }
@@ -139,13 +140,13 @@ function mainPageButtons(
 ): Pick<TitleMenuModel, 'newGame' | 'continueGame' | 'load'> {
   const noSaveReason = slots.length === 0 ? 'no_save' : null
   return {
-    newGame: uiButton(TITLE_MENU_IDS.newGame, 'New Game', { kind: 'pressNewGame' }),
+    newGame: uiButton(TITLE_MENU_IDS.newGame, TITLE_TEXT.newGame, { kind: 'pressNewGame' }),
     continueGame: {
-      ...uiButton(TITLE_MENU_IDS.continueGame, 'Continue', { kind: 'continueGame' }),
+      ...uiButton(TITLE_MENU_IDS.continueGame, TITLE_TEXT.continue, { kind: 'continueGame' }),
       reason: noSaveReason,
     },
     load: {
-      ...uiButton(TITLE_MENU_IDS.load, 'Load', { kind: 'showTitlePage', page: 'load' }),
+      ...uiButton(TITLE_MENU_IDS.load, TITLE_TEXT.load, { kind: 'showTitlePage', page: 'load' }),
       reason: noSaveReason,
     },
   }
@@ -154,11 +155,11 @@ function mainPageButtons(
 function otherPageButtons(): Pick<TitleMenuModel, 'back' | 'confirmNewGame' | 'cancelNewGame'> {
   const toMain = { kind: 'showTitlePage', page: 'main' } as const
   return {
-    back: uiButton(TITLE_MENU_IDS.back, 'Back', toMain),
-    confirmNewGame: uiButton(TITLE_MENU_IDS.confirmNewGame, 'Start new game', {
+    back: uiButton(TITLE_MENU_IDS.back, TITLE_TEXT.back, toMain),
+    confirmNewGame: uiButton(TITLE_MENU_IDS.confirmNewGame, TITLE_TEXT.confirmNewGame.start, {
       kind: 'confirmNewGame',
     }),
-    cancelNewGame: uiButton(TITLE_MENU_IDS.cancelNewGame, 'Cancel', toMain),
+    cancelNewGame: uiButton(TITLE_MENU_IDS.cancelNewGame, TITLE_TEXT.confirmNewGame.cancel, toMain),
   }
 }
 
@@ -193,7 +194,7 @@ function slotRowOf(entry: SaveSlotEntry, sources: TitleMenuSources): TitleSlotRo
     playtimeText: playtimeTextOf(entry.playtimeTicks),
     savedAtText: savedAtTextOf(entry.savedAtMs, offset),
     generatorNote: GENERATOR_NOTES[slotGeneratorStandingOf(entry)],
-    load: uiButton(TITLE_MENU_ID_TEMPLATES.slotLoad(entry.slot), 'Load', {
+    load: uiButton(TITLE_MENU_ID_TEMPLATES.slotLoad(entry.slot), TITLE_TEXT.loadSlot, {
       kind: 'loadSlot',
       slot: entry.slot,
     }),
@@ -202,7 +203,11 @@ function slotRowOf(entry: SaveSlotEntry, sources: TitleMenuSources): TitleSlotRo
 
 function slotSummaryOf(entry: SaveSlotEntry): string {
   const { planetText } = slotSummaryLineOf(entry)
-  return [entry.name, planetText, playtimeTextOf(entry.playtimeTicks)].join(' · ')
+  return fillSaveMenuText(TITLE_TEXT.continueSummary, {
+    slotName: entry.name,
+    planetName: planetText,
+    playtime: playtimeTextOf(entry.playtimeTicks),
+  })
 }
 
 function twoDigits(value: number): string {
