@@ -114,6 +114,7 @@
   --status-icon-size: 16px;
   --slot-gap: 4px;
   --slot-cooldown-ring: 3px;
+  --sheet-dock-width: 400px;
   /* Where a HUD box's outer edge sits: the strip right under the top inset, the rest a margin in. */
   --hud-inset-top: var(--safe-top);
   --hud-inset-right: calc(var(--safe-right) + var(--layout-margin));

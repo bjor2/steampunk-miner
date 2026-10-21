@@ -162,6 +162,7 @@ function layoutPropertiesOf(tokens: DesignTokens): CssProperties {
     '--status-icon-size': `${layout.statusIcons.sizePx}px`,
     '--slot-gap': `${layout.toolSlots.gapPx}px`,
     '--slot-cooldown-ring': `${layout.toolSlots.cooldownRingPx}px`,
+    '--sheet-dock-width': `${layout.sheetDock.widthPx}px`,
   }
 }
 

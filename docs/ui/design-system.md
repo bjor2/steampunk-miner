@@ -584,6 +584,8 @@ Generated from `designTokens.json`; a row is the token's path and its value. The
 | `layout.toolSlots.gapPx`                              | 4                       |
 | `layout.toolSlots.cooldownRingPx`                     | 3                       |
 | `layout.tabsMax`                                      | 8                       |
+| `layout.sheetDock.widthPx`                            | 400                     |
+| `layout.sheetDock.minViewPx`                          | 640                     |
 | `layout.coverageMaxPercent.phone`                     | 12                      |
 | `layout.coverageMaxPercent.desktop`                   | 8                       |
 | `layout.mockups.phone`                                | width 360 · height 640  |
