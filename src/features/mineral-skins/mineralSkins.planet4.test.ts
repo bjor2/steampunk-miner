@@ -21,10 +21,13 @@ describe('mineral skins of planet 4', () => {
     expect(planetSkinsOf(PLANET_4)[kindSlot - 1]?.speciesId).toBe(species?.id)
   })
 
-  it.each(HELD_FOSSIL_SLOTS)("holds the skin of #453's fossil common in kind slot %i", (kindSlot) => {
-    expect(planetSpeciesOf(PLANET_4, kindSlot)?.family).toBe('fossil')
-    expect(planetSkinsOf(PLANET_4)[kindSlot - 1]).toBeNull()
-  })
+  it.each(HELD_FOSSIL_SLOTS)(
+    "holds the skin of #453's fossil common in kind slot %i",
+    (kindSlot) => {
+      expect(planetSpeciesOf(PLANET_4, kindSlot)?.family).toBe('fossil')
+      expect(planetSkinsOf(PLANET_4)[kindSlot - 1]).toBeNull()
+    },
+  )
 
   it("dresses the planet's relic signature in its own skin", () => {
     expect(signatureSkinOf(PLANET_4)?.oreTypeId).toBe(`relic_t${oreTierOf(4, 5, 0)}`)
