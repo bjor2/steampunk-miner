@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest'
+import type { AuthorityState } from '../../../systems/authority/authorityState'
 import { wordCountOf } from '../../../systems/views/uiTextBudget'
 import { LAB_FIXTURE_SLICE } from '../treeFixtureSlice'
 import { PLAYER, researchAll, sessionOnPlanet, withFixtureTree } from '../treeTestSession'
@@ -15,6 +16,7 @@ import { treeScreenModelOf } from './treeScreenModel'
 const GRAPPLE = 'tech.mobility.grapple_winch'
 const GRAPPLE_ITEM = 'power.grapple_winch'
 const EVERYTHING = { search: '', filters: [] }
+const walletOf = (state: AuthorityState) => state.players[PLAYER].wallet
 
 function cardsOn(planetIndex: number, money: string, researched: readonly string[] = []) {
   return withFixtureTree(() => {
@@ -22,7 +24,11 @@ function cardsOn(planetIndex: number, money: string, researched: readonly string
     researchAll(session, researched)
     session.submit({ type: 'debug.setMoney', payload: { amount: money } })
     const tree = registeredTechTree()
-    return patentCardsOf(treeScreenModelOf(session.state(), PLAYER, tree, EVERYTHING), tree)
+    return patentCardsOf(
+      treeScreenModelOf(session.state(), PLAYER, tree, EVERYTHING),
+      tree,
+      walletOf(session.state()),
+    )
   }, [LAB_FIXTURE_SLICE])
 }
 
@@ -38,7 +44,10 @@ describe('patent cards', () => {
       const session = sessionOnPlanet(3, '5000')
       const tree = registeredTechTree()
       const model = treeScreenModelOf(session.state(), PLAYER, tree, EVERYTHING)
-      return [patentCardsOf(model, tree), affordabilityListOf(model)] as const
+      return [
+        patentCardsOf(model, tree, walletOf(session.state())),
+        affordabilityListOf(model),
+      ] as const
     }, [LAB_FIXTURE_SLICE])
     expect(ids[0].map((card) => card.nodeId)).toEqual(ids[1].map((card) => card.id))
   })
@@ -47,6 +56,18 @@ describe('patent cards', () => {
     const grapple = cardOf(cardsOn(3, '0'), GRAPPLE)
     expect(grapple).toMatchObject({ isMuted: true, researchNodeId: GRAPPLE })
     expect(grapple.priceText).not.toBeNull()
+  })
+
+  it('greys the price of a node the wallet is short for even while it waits on something else', () => {
+    const cards = withFixtureTree(() => {
+      const session = sessionOnPlanet(3, '0')
+      const tree = registeredTechTree()
+      const model = treeScreenModelOf(session.state(), PLAYER, tree, EVERYTHING)
+      return patentCardsOf(model, tree, walletOf(session.state()))
+    })
+    const priced = cards.filter((card) => card.priceText !== null)
+    expect(priced.length).toBeGreaterThan(0)
+    expect(priced.every((card) => card.isMuted)).toBe(true)
   })
 
   it('offers a researched item’s next Mark with the stat it steps as gain text', () => {
@@ -71,7 +92,8 @@ describe('patent cards', () => {
   it('keeps every title of the shipped tree to 3 words and every line to one of 12 words', () => {
     const session = sessionOnPlanet(40, '1e30')
     const tree = registeredTechTree()
-    const cards = patentCardsOf(treeScreenModelOf(session.state(), PLAYER, tree, EVERYTHING), tree)
+    const model = treeScreenModelOf(session.state(), PLAYER, tree, EVERYTHING)
+    const cards = patentCardsOf(model, tree, walletOf(session.state()))
     expect(cards.length).toBeGreaterThan(0)
     expect(cards.filter((card) => wordCountOf(card.title) > 3).map((card) => card.title)).toEqual(
       [],

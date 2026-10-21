@@ -2,12 +2,12 @@
  * The Patent Office's cards (spec #678, ticket 687; design-system.md sections 10 and 11): the tech
  * tree on the shared sheet, one card per node the screen model shows, in the order the wallet
  * reaches them (`treeList`). A card is the node's name, one line and the price as its figure,
- * greyed while the wallet is short. The line is gain text: a researched item with Marks offers its
+ * greyed while the wallet is short of it, whatever else the node still waits on. The line is gain text: a researched item with Marks offers its
  * next Mark and says what it changes ("Mk II: -10% cooldown", or the Mark's milestone verb); a
  * node not yet researched says what it is, and a locked one why. Never a stat table.
  */
 import { gainTextOf } from '../../../systems/views/gainText'
-import { fromSafeInteger } from '../../../systems/money'
+import { cmp, fromSafeInteger, type Money } from '../../../systems/money'
 import { wordCountOf } from '../../../systems/views/uiTextBudget'
 import { ONE_LINE_WORDS_MAX } from '../../../constants/uiParts'
 import { markStepOf, type MarkStatName } from './markLadder'
@@ -46,27 +46,34 @@ const RESEARCHED_LINE = 'Researched'
 /** What a node's own line says when its flavour runs past one line. */
 const UNLOCKS_LINE_PREFIX = 'Unlocks'
 
-export function patentCardsOf(model: TreeScreenModel, tree: TechTree): PatentCard[] {
-  return affordabilityListOf(model).map((card) => patentCardOf(card, tree))
+/** What every card of one list reads besides its node: the tree and the player's wallet. */
+interface PatentContext {
+  tree: TechTree
+  wallet: Money
 }
 
-function patentCardOf(card: NodeCardModel, tree: TechTree): PatentCard {
+export function patentCardsOf(model: TreeScreenModel, tree: TechTree, wallet: Money): PatentCard[] {
+  const context = { tree, wallet }
+  return affordabilityListOf(model).map((card) => patentCardOf(card, context))
+}
+
+function patentCardOf(card: NodeCardModel, context: PatentContext): PatentCard {
   const chip = card.markChip
-  if (card.status === 'researched' && chip !== null) return markCardOf(card, chip, tree)
+  if (card.status === 'researched' && chip !== null) return markCardOf(card, chip, context)
   if (card.status === 'researched') return researchedCardOf(card)
-  return nodeResearchCardOf(card)
+  return nodeResearchCardOf(card, context.wallet)
 }
 
 /**
  * A node still to research: its price, greyed when only the wallet stands in the way, and what
  * it is; a locked node says why instead.
  */
-function nodeResearchCardOf(card: NodeCardModel): PatentCard {
+function nodeResearchCardOf(card: NodeCardModel, wallet: Money): PatentCard {
   return {
     ...cardBaseOf(card),
     line: card.status === 'locked' ? (card.refusalText ?? ownLineOf(card)) : ownLineOf(card),
     priceText: card.costText,
-    isMuted: card.status === 'available',
+    isMuted: isShortOf(wallet, card.cost),
     researchNodeId: card.id,
   }
 }
@@ -88,14 +95,14 @@ function researchedCardOf(card: NodeCardModel): PatentCard {
 }
 
 /** A researched item with Marks: the next Mark and its gain, or the mastered plate. */
-function markCardOf(card: NodeCardModel, chip: MarkChipModel, tree: TechTree): PatentCard {
+function markCardOf(card: NodeCardModel, chip: MarkChipModel, context: PatentContext): PatentCard {
   const next = chip.next
   if (next === null) return { ...researchedCardOf(card), line: chip.text }
   return {
     ...cardBaseOf(card),
-    line: nextMarkLineOf(card, next.nodeId, tree),
+    line: nextMarkLineOf(card, next.nodeId, context.tree),
     priceText: next.costText,
-    isMuted: next.status === 'available',
+    isMuted: isShortOf(context.wallet, next.cost),
     researchNodeId: next.nodeId,
   }
 }
@@ -125,6 +132,10 @@ function markGainLineOf(ladder: MarkLadder, mark: number): string {
     MARK_STAT_WORDS[after.stepped],
   )
   return `${markText}: ${gain}`
+}
+
+function isShortOf(wallet: Money, price: Money): boolean {
+  return cmp(wallet, price) < 0
 }
 
 function cardBaseOf(card: NodeCardModel): Pick<PatentCard, 'id' | 'nodeId' | 'title' | 'iconId'> {

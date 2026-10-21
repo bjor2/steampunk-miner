@@ -35,6 +35,7 @@ export interface MarkChipModel {
 export interface NextMarkModel {
   nodeId: string
   status: NodeStatus
+  cost: Money
   costText: string
 }
 
@@ -208,6 +209,7 @@ function nextMarkOf(bearer: MarkBearer, mark: number, context: CardContext): Nex
   return {
     nodeId: node.id,
     status: statusOf(refusalOf(node, context)),
+    cost: nodeCost(node),
     costText: formatPrice(nodeCost(node)),
   }
 }

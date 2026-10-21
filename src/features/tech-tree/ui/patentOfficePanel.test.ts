@@ -8,6 +8,9 @@ import { LAB_FIXTURE_SLICE } from '../treeFixtureSlice'
 import { PLAYER, sessionOnPlanet, withFixtureTree } from '../treeTestSession'
 import { nodeTestIdOf } from './nodeTestIds'
 import { PatentOfficePanelView } from './PatentOfficePanel'
+import type { AuthorityState } from '../../../systems/authority/authorityState'
+
+const walletOf = (state: AuthorityState) => state.players[PLAYER].wallet
 
 // The Patent Office as drawn (ticket 687): a sheet card per node carrying the node's test id, its
 // price greyed while the wallet is short, its line the gain text, never a stat table.
@@ -19,7 +22,7 @@ function drawnPatentOffice(money: string): string {
     const session = sessionOnPlanet(3, money)
     const tree = registeredTechTree()
     const model = treeScreenModelOf(session.state(), PLAYER, tree, { search: '', filters: [] })
-    const cards = patentCardsOf(model, tree)
+    const cards = patentCardsOf(model, tree, walletOf(session.state()))
     return renderToString(createElement(PatentOfficePanelView, { cards, onResearch: () => {} }))
   }, [LAB_FIXTURE_SLICE])
 }

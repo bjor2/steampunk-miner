@@ -31,8 +31,10 @@ export function usePatentCards(): readonly PatentCard[] {
 }
 
 function readPatentCards(playerId: string): PatentCard[] {
+  const state = readAuthorityState()
   const tree = registeredTechTree()
-  return patentCardsOf(treeScreenModelOf(readAuthorityState(), playerId, tree, EVERY_NODE), tree)
+  const model = treeScreenModelOf(state, playerId, tree, EVERY_NODE)
+  return patentCardsOf(model, tree, state.players[playerId].wallet)
 }
 
 /** Bumps the revision on each batch holding a tree event, while the tab is drawn. */
