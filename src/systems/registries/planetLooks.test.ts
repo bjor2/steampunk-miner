@@ -87,9 +87,7 @@ describe('planet looks', () => {
   })
 
   it('lights the look’s band where the planet class has none', () => {
-    expect(withRegistrations([lookSliceFor(3)], () => planetSkyBandOf(PLANET_3))).toEqual(
-      DUST_BAND,
-    )
+    expect(withRegistrations([lookSliceFor(3)], () => planetSkyBandOf(PLANET_3))).toEqual(DUST_BAND)
   })
 
   it('lets the planet class’s band win over the look’s', () => {
