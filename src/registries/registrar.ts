@@ -118,6 +118,7 @@ import { BAY_SCREEN_REGISTRY } from '../ui/registries/bayScreens'
 import { HUD_PANEL_REGISTRY } from '../ui/registries/hudPanels'
 import { MONEY_COUNTER_REGISTRY } from '../ui/registries/moneyCounter'
 import { SCREEN_REGISTRY } from '../ui/registries/screens'
+import { SHEET_TAB_REGISTRY } from '../ui/registries/sheetTabs'
 import { TOUCH_BINDING_REGISTRY } from '../ui/registries/touchBindings'
 import type { SliceDefinition, SliceRegistrar } from './sliceDefinition'
 
@@ -187,6 +188,7 @@ export function registrarFor(sliceId: string): SliceRegistrar {
     incomeRate: (rate) => addIncomeRate(sliceId, rate),
     tripCapSource: (source) => add(TRIP_CAP_SOURCE_REGISTRY, source),
     screen: (panel) => add(SCREEN_REGISTRY, panel),
+    sheetTab: (tab) => add(SHEET_TAB_REGISTRY, tab),
     soundCue: (cue) => add(SOUND_CUE_REGISTRY, cue),
     oneShot: (oneShot) => add(ONE_SHOT_REGISTRY, oneShot),
     chargeBlastCue: (provider) => add(CHARGE_BLAST_CUE_REGISTRY, provider),

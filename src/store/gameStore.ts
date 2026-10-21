@@ -145,6 +145,7 @@ import {
   type SaveKeepingValues,
 } from './saveKeepingSlice'
 import { runFastForwardSteps, runScenarioScript, submitEach } from './scenarioSteps'
+import { sheetActionsOf, STARTING_SHEET, type SheetActions, type SheetValues } from './sheetSlice'
 import {
   soundUnlockActionsOf,
   STARTING_SOUND_UNLOCK,
@@ -189,6 +190,8 @@ export interface GameState
     PauseMenuActions,
     TapSheetValues,
     TapSheetActions,
+    SheetValues,
+    SheetActions,
     SoundUnlockValues,
     SoundUnlockActions,
     TitleMenuValues,
@@ -295,6 +298,7 @@ type GameValues = Pick<
   | keyof LiveStepValues
   | keyof PauseMenuValues
   | keyof TapSheetValues
+  | keyof SheetValues
   | keyof SoundUnlockValues
   | keyof TitleMenuValues
   | keyof SaveKeepingValues
@@ -324,6 +328,7 @@ export const STARTING_VALUES: GameValues = {
   ...STARTING_LIVE_STEP,
   ...STARTING_PAUSE_MENU,
   ...STARTING_TAP_SHEET,
+  ...STARTING_SHEET,
   ...STARTING_SOUND_UNLOCK,
   ...STARTING_TITLE_MENU,
   ...STARTING_SAVE_KEEPING,
@@ -349,6 +354,7 @@ export const useGameStore = create<GameState>()((set, get) => ({
   ...liveStepActionsOf(set, get),
   ...pauseMenuActionsOf(set, get),
   ...tapSheetActionsOf(set, get),
+  ...sheetActionsOf(set, get),
   ...soundUnlockActionsOf(set),
   ...titleMenuActionsOf(set, get),
   ...saveKeepingActionsOf(set, get),

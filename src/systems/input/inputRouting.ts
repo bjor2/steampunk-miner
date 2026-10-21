@@ -6,9 +6,10 @@
  * Contexts are layers: the title menu over everything while it is open (ticket 403: nothing
  * reaches the game behind it), then `settings`, then the pause menu (ticket 404), then the
  * artefact cache's cards while open (#46), then a slice's full screen while one is open (ticket
- * 211), then `platform` while docked (the screen is open exactly then), else `vehicle`. Escape
- * closes the top layer: settings, the pause menu (its save page steps back to the first page), the
- * cards (no pick, the cache stays live), the slice screen, then the platform screen (that is
+ * 211), then the base sheet while it is open (ticket 686), then `platform` while docked (the screen
+ * is open exactly then), else `vehicle`. Escape closes the top layer: settings, the pause menu (its
+ * save page steps back to the first page), the cards (no pick, the cache stays live), the slice
+ * screen, the sheet, then the platform screen (that is
  * `Undock`), and in `vehicle` it opens the pause menu. `interact` opens a live cache the
  * vehicle is over, else docks. An action outside its context, a dock or open the authority would
  * refuse, the quick action away from the shops (#37, #40, #170), a tow call while the vehicle can
@@ -51,6 +52,7 @@ export type InputReaction =
   | { kind: 'stepBackInPauseMenu' }
   | { kind: 'closeArtefactChoice' }
   | { kind: 'dismissScreen' }
+  | { kind: 'closeSheet' }
   | { kind: 'moveFocus'; step: -1 | 1 }
   | { kind: 'activateFocused' }
   | { kind: 'zoom'; change: ZoomChange }
@@ -91,6 +93,8 @@ export interface OpenOverlays {
   isArtefactChoiceOpen: boolean
   /** The slice screen drawn (ticket 211); null while none is. */
   openScreenId: string | null
+  /** The base sheet's open tab (ticket 686); null while the sheet is shut. */
+  openSheetTabId: string | null
 }
 
 type ReactionRule = (situation: InputSituation) => InputReaction
@@ -147,6 +151,9 @@ const REACTIONS_BY_LAYER: Readonly<
   screen: {
     ui_cancel: () => ({ kind: 'dismissScreen' }),
   },
+  sheet: {
+    ui_cancel: () => ({ kind: 'closeSheet' }),
+  },
   title: {
     ...MENU_REACTIONS,
     ui_cancel: () => ({ kind: 'showTitlePage', page: 'main' }),
@@ -160,7 +167,7 @@ export function reactionToPress(action: ActionId, situation: InputSituation): In
 
 /**
  * The layer input goes to: the title menu, settings, the pause menu, the cache's cards, a slice
- * screen, else the dock screen.
+ * screen, the base sheet, else the dock screen.
  */
 export function topLayerOf(vehicleMode: VehicleMode, overlays: OpenOverlays): InputContext {
   if (overlays.titleMenu !== null) return 'title'
@@ -168,6 +175,7 @@ export function topLayerOf(vehicleMode: VehicleMode, overlays: OpenOverlays): In
   if (overlays.pauseMenu !== null) return 'pause'
   if (overlays.isArtefactChoiceOpen) return 'artefact'
   if (overlays.openScreenId !== null) return 'screen'
+  if (overlays.openSheetTabId !== null) return 'sheet'
   return vehicleMode === 'docked' ? 'platform' : 'vehicle'
 }
 

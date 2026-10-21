@@ -23,14 +23,15 @@ export const INPUT_CONTEXTS = [
   'settings',
   'pause',
   'screen',
+  'sheet',
   'title',
 ] as const
 
 /**
  * `vehicle` while driving, `platform` on the dock screen, `settings` on the overlay (#33),
  * `artefact` while the cache's three cards are open (#46), `screen` while a slice's full screen is
- * (ticket 211), `pause` while the pause menu is (ticket 404), `title` while the title menu is
- * (ticket 403).
+ * (ticket 211), `sheet` while the base sheet is (ticket 686), `pause` while the pause menu is
+ * (ticket 404), `title` while the title menu is (ticket 403).
  */
 export type InputContext = (typeof INPUT_CONTEXTS)[number]
 

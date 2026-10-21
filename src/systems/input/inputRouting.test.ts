@@ -38,6 +38,7 @@ const AT_UPGRADE_BAY: InputSituation = { ...DOCKED, dockedBay: 'upgrade' }
 const SETTINGS: InputSituation = { ...DRIVING, layer: 'settings' }
 const CARDS: InputSituation = { ...DRIVING, layer: 'artefact' }
 const SLICE_SCREEN: InputSituation = { ...DOCKED, layer: 'screen' }
+const SHEET: InputSituation = { ...DOCKED, layer: 'sheet' }
 const PAUSED: InputSituation = { ...DRIVING, layer: 'pause' }
 const NO_OVERLAY = {
   titleMenu: null,
@@ -45,6 +46,7 @@ const NO_OVERLAY = {
   pauseMenu: null,
   isArtefactChoiceOpen: false,
   openScreenId: null,
+  openSheetTabId: null,
 }
 
 const TITLE_OPEN = { ...NO_OVERLAY, titleMenu: { page: 'load' as const, slots: [], problems: [] } }
@@ -205,6 +207,20 @@ describe('input routing', () => {
     expect(topLayerOf('docked', screenOpen)).toBe('screen')
     expect(topLayerOf('active', screenOpen)).toBe('screen')
     expect(topLayerOf('active', { ...screenOpen, isArtefactChoiceOpen: true })).toBe('artefact')
+  })
+
+  it('puts the base sheet over the dock screen and the vehicle, and under a slice screen', () => {
+    const sheetOpen = { ...NO_OVERLAY, openSheetTabId: 'example.cards' }
+    expect(topLayerOf('docked', sheetOpen)).toBe('sheet')
+    expect(topLayerOf('active', sheetOpen)).toBe('sheet')
+    expect(topLayerOf('active', { ...sheetOpen, openScreenId: 'example.screen' })).toBe('screen')
+    expect(topLayerOf('active', { ...sheetOpen, pauseMenu: {} })).toBe('pause')
+  })
+
+  it('closes the base sheet on Back without undocking, and drives nothing under it', () => {
+    expect(reactionToPress('ui_cancel', SHEET)).toEqual({ kind: 'closeSheet' })
+    expect(reactionToPress('quick_service', SHEET)).toEqual({ kind: 'none' })
+    expect(reactionToPress('interact', SHEET)).toEqual({ kind: 'none' })
   })
 
   it('puts the title menu over every other layer', () => {

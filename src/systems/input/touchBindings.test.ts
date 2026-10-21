@@ -107,7 +107,7 @@ describe('touch binding coverage (#474)', () => {
   it('lists every layer where an action with a key has no touch binding', () => {
     const slotOnly = [rowOf({ gesture: 'tap', action: 'use_slot_1' })]
     expect(touchCoverageGapsOf(slotOnly, map)).toEqual(
-      ['platform', 'artefact', 'settings', 'pause', 'screen', 'title'].map(
+      ['platform', 'artefact', 'settings', 'pause', 'screen', 'sheet', 'title'].map(
         (layer) => `"ui_cancel" has a key in "${layer}" but no touch binding`,
       ),
     )
@@ -118,7 +118,7 @@ describe('touch binding coverage (#474)', () => {
       rowOf({ gesture: 'tap', action: 'use_slot_1' }),
       rowOf({ gesture: 'none', action: 'ui_cancel' }, { reason: 'Back', contexts: ['platform'] }),
     ]
-    expect(touchCoverageGapsOf(rows, map)).toHaveLength(5)
+    expect(touchCoverageGapsOf(rows, map)).toHaveLength(6)
     expect(touchCoverageGapsOf(rows, map)).not.toContain(
       '"ui_cancel" has a key in "platform" but no touch binding',
     )

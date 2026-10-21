@@ -54,6 +54,7 @@ import { menuScreenOf, type ScreenSources } from './screenModels'
 import { screenIdProblems, winningScreenId } from '../ui/registries/screens'
 import type { TitleMenuActions } from './titleMenuSlice'
 import type { SaveKeepingActions } from './saveKeepingSlice'
+import type { SheetValues } from './sheetSlice'
 import type { VehicleReplica } from './vehicleReplica'
 
 export interface PresentationValues {
@@ -177,7 +178,7 @@ type SliceHost = PresentationValues &
   PauseMenuActions &
   TitleMenuActions &
   Pick<SaveKeepingActions, 'exportSave' | 'importSave'> &
-  ScreenSources & { vehicle: VehicleReplica }
+  ScreenSources & { vehicle: VehicleReplica } & Pick<SheetValues, 'openSheetTabId'>
 
 type SetSlice = (partial: Partial<PresentationValues>) => void
 

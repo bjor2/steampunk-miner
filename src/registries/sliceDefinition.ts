@@ -81,6 +81,7 @@ import type { SliceBayScreen } from '../ui/registries/bayScreens'
 import type { HudPanel } from '../ui/registries/hudPanels'
 import type { MoneyCounterProvider } from '../ui/registries/moneyCounter'
 import type { ScreenPanel } from '../ui/registries/screens'
+import type { SheetTab } from '../ui/registries/sheetTabs'
 import type { TouchBindingRow } from '../ui/registries/touchBindings'
 
 export { FeaturesNotLoadedError } from '../systems/registries/seal'
@@ -253,6 +254,8 @@ export interface SliceRegistrar {
   tripCapSource(source: TripCapSource): void
   /** A full screen the kernel shell draws while the store holds it open. */
   screen(panel: ScreenPanel): void
+  /** A tab on the one base sheet, shown while its `isShownOn` says so (ticket 686). */
+  sheetTab(tab: SheetTab): void
   /** A synthesised sound with its voice budget, played on `requestSoundCue` (#180). */
   soundCue(cue: SoundCue): void
   /** A name for one of the kernel's own sounds, played on `requestOneShot` (ticket 372). */

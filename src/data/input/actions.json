@@ -1,6 +1,6 @@
 {
   "inputMapVersion": 2,
-  "contexts": ["vehicle", "platform", "artefact", "settings", "pause", "screen", "title"],
+  "contexts": ["vehicle", "platform", "artefact", "settings", "pause", "screen", "sheet", "title"],
   "reservedKeys": ["Escape", "PadStart"],
   "actions": [
     {
@@ -142,7 +142,7 @@
     {
       "id": "ui_cancel",
       "displayName": "Back",
-      "contexts": ["platform", "artefact", "settings", "pause", "screen", "title"],
+      "contexts": ["platform", "artefact", "settings", "pause", "screen", "sheet", "title"],
       "kind": "press",
       "keyboard": ["Escape", "Backspace"],
       "gamepad": ["PadB", "PadStart"]

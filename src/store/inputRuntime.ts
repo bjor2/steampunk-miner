@@ -281,6 +281,7 @@ function applyReaction(reaction: InputReaction): void {
   else if (reaction.kind === 'closeSettings') game.closeSettings()
   else if (reaction.kind === 'closeArtefactChoice') game.closeArtefactChoice()
   else if (reaction.kind === 'dismissScreen') game.dismissScreen()
+  else if (reaction.kind === 'closeSheet') game.closeSheet()
   else if (reaction.kind === 'moveFocus') game.moveFocus(reaction.step)
   else if (reaction.kind === 'activateFocused') game.activateFocusedControl()
   else if (reaction.kind === 'zoom') game.zoom(reaction.change)
