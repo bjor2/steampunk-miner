@@ -74,3 +74,6 @@ export const HINT_CHIP_GAP_PX = 8
 
 /** How often the compact HUD re-measures its room for the hint chip (#500): 4 times a second. */
 export const HINT_ROOM_POLL_MS = 250
+
+/** How often the HUD coverage overlay (ticket 682) re-measures: the hint room's 4 times a second. */
+export const HUD_COVERAGE_POLL_MS = HINT_ROOM_POLL_MS

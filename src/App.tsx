@@ -10,6 +10,7 @@ import { PauseMenu } from './ui/pause/PauseMenu'
 import { SettingsPanel } from './ui/settings/SettingsPanel'
 import { DevFlagBadge } from './ui/debug/DevFlagBadge'
 import { DevFlagPanel } from './ui/debug/DevFlagPanel'
+import { HudCoverageOverlay } from './ui/debug/HudCoverageOverlay'
 import { VersionLabel } from './ui/debug/VersionLabel'
 import { DeviceNotices } from './ui/stage/DeviceNotices'
 import { GameStage } from './ui/stage/GameStage'
@@ -43,6 +44,7 @@ export default function App() {
       <VersionLabel />
       <DevFlagBadge />
       <DevFlagPanel />
+      <HudCoverageOverlay />
       <UnsupportedDeviceCard />
     </GameStage>
   )

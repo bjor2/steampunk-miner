@@ -65,6 +65,8 @@ import { screenIdProblems } from '../ui/registries/screens'
 import { readFittedScreen } from '../ui/stage/screenFit'
 import type { ScreenLayout } from '../systems/views/screenLayout'
 import type { ScreenBox } from '../systems/views/hudClearView'
+import type { HudCoverageReport } from '../systems/views/hudCoverageReport'
+import { hudCoverageNow, showHudCoverageUnlessRefused } from './debugHudCoverage'
 import { showHintUnlessRefused, stageHudUnlessRefused, vehicleScreenBoxNow } from './debugHudLayout'
 import {
   readDrawnKindLooks,
@@ -156,6 +158,10 @@ export interface DebugUi {
   stageHud(staging: unknown): DebugResult
   /** Puts a hint of the table up next, with no gap to wait (#500); the compact HUD's room holds. */
   showHint(hintId: unknown): DebugResult
+  /** Shows or hides the HUD coverage overlay (ticket 682): the middle band, boxes and shares. */
+  showHudCoverage(shown: unknown): DebugResult
+  /** The HUD's coverage the page measures now, against the layout's budget (ticket 682). */
+  getHudCoverage(): DebugResult<{ report: HudCoverageReport }>
   /** The ground's material look table as the shader draws it now (ticket 450). */
   getKindLooks(): DebugResult<{ looks: DrawnKindLooks }>
   /** Shows every kind of the planet as if met, for eye checks and the frame A/B (ticket 450). */
@@ -237,6 +243,8 @@ export function createDebugUi(): DebugUi {
     getVehicleScreenBox: vehicleScreenBoxNow,
     stageHud: stageHudUnlessRefused,
     showHint: showHintUnlessRefused,
+    showHudCoverage: showHudCoverageUnlessRefused,
+    getHudCoverage: hudCoverageNow,
     getKindLooks: readDrawnKindLooks,
     showEveryKindLook,
     showSeenKindLooksOnly,

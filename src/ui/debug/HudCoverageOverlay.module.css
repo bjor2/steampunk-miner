@@ -1,0 +1,69 @@
+/*
+ * Ticket 682: the coverage overlay, over every layer in window coordinates (the boxes are
+ * `getBoundingClientRect` rects), never a target. A debug view, so it uses the design tokens
+ * plainly and draws no art.
+ */
+.overlay {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 1000;
+}
+
+.band,
+.keepOut,
+.reserved,
+.measured,
+.inBand {
+  position: absolute;
+  box-sizing: border-box;
+}
+
+/* The middle band: where the drill head sits and no HUD box may enter. */
+.band {
+  border-block: var(--frame-bezel) dashed var(--color-teal);
+  background: repeating-linear-gradient(
+    45deg,
+    rgb(63 167 160 / 0.18) 0 var(--space-1),
+    transparent var(--space-1) var(--space-3)
+  );
+}
+
+.keepOut {
+  border: var(--frame-hairline) dotted var(--color-parchment);
+}
+
+/* The design's reserved boxes, the layout the HUD rebuild fills. */
+.reserved {
+  border: var(--frame-bezel) dashed var(--color-brass);
+}
+
+/* Steel, so a measured box reads apart from the brass frames it outlines. */
+.measured {
+  border: var(--frame-bezel) solid var(--color-steel);
+}
+
+.inBand {
+  border: var(--frame-double) solid var(--color-danger);
+  background: rgb(200 56 42 / 0.25);
+}
+
+.readout {
+  position: absolute;
+  left: 50%;
+  bottom: calc(var(--hud-inset-bottom) + var(--slot-cell) * 2 + var(--space-3));
+  transform: translateX(-50%);
+  margin: 0;
+  padding: var(--space-1) var(--space-2);
+  border: var(--frame-hairline) solid var(--color-verdigris);
+  border-radius: var(--radius-panel);
+  background: var(--color-panel);
+  color: var(--color-text);
+  font-family: var(--font-numerals);
+  font-size: var(--type-label);
+  white-space: nowrap;
+}
+
+.readout[data-within-budget='false'] {
+  border-color: var(--color-danger);
+}

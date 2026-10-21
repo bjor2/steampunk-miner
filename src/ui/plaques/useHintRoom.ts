@@ -9,7 +9,9 @@ import { HINT_ROOM_POLL_MS } from '../../constants/screen'
 import { useGameStore } from '../../store/gameStore'
 import { hintRoomOf, type HintRoom } from '../../systems/views/hintRoom'
 import type { ScreenBox } from '../../systems/views/hudClearView'
+import type { MeasuredHudBox } from '../../systems/views/hudCoverageReport'
 import { HUD_BOX_ATTRIBUTE, HUD_BOX_IDS, HUD_ZONE_ATTRIBUTE } from '../hud/hudBoxes'
+import { boxOf, measuredBoxesOf } from '../hud/measuredBoxes'
 import { DEVICE_UI_IDS } from '../stage/deviceIds'
 import { readFittedScreen } from '../stage/screenFit'
 import type { HintChipPlace } from './HintChip'
@@ -22,10 +24,6 @@ const ROW_IDS: ReadonlySet<string> = new Set([
   HUD_BOX_IDS.techTree,
   HUD_BOX_IDS.prompts,
 ])
-
-interface MeasuredBox extends ScreenBox {
-  id: string
-}
 
 export function useHintRoom(isCompact: boolean): HintChipPlace | null {
   const [place, setPlace] = useState<HintChipPlace | null>(null)
@@ -76,20 +74,8 @@ function measureHintRoom(): (HintRoom & { layer: ScreenBox }) | null {
   return { ...room, layer }
 }
 
-function measuredHudBoxes(): MeasuredBox[] {
+function measuredHudBoxes(): MeasuredHudBox[] {
   return measuredBoxesOf(`[${HUD_BOX_ATTRIBUTE}]`, HUD_BOX_ATTRIBUTE)
-}
-
-/** Every drawn element the selector finds, with its box; a hidden one has no area and is left out. */
-function measuredBoxesOf(selector: string, attribute: string): MeasuredBox[] {
-  return [...document.querySelectorAll(selector)]
-    .map((element) => ({ ...boxOf(element), id: element.getAttribute(attribute) ?? '' }))
-    .filter((box) => box.right > box.left && box.bottom > box.top)
-}
-
-function boxOf(element: Element): ScreenBox {
-  const { left, top, right, bottom } = element.getBoundingClientRect()
-  return { left, top, right, bottom }
 }
 
 function isSameBox(a: ScreenBox, b: ScreenBox): boolean {

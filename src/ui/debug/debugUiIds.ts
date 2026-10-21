@@ -1,6 +1,6 @@
 /**
- * `data-testid`s of the version label, the debug flag panel and its badge (ticket 549), and the
- * panel's material pop switch (ticket 614). Apart from `UI_IDS`, which names what the player
+ * `data-testid`s of the version label, the debug flag panel and its badge (ticket 549), the
+ * panel's material pop switch (ticket 614) and the HUD coverage overlay (ticket 682). Apart from `UI_IDS`, which names what the player
  * screens' view models draw.
  */
 export const DEBUG_UI_IDS = {
@@ -11,6 +11,9 @@ export const DEBUG_UI_IDS = {
   devFlagReset: 'dev-flag-reset',
   devFlagClose: 'dev-flag-close',
   materialPopSwitch: 'material-pop-switch',
+  hudCoverage: 'hud-coverage',
+  hudCoverageBand: 'hud-coverage-band',
+  hudCoverageReadout: 'hud-coverage-readout',
 } as const
 
 export const DEBUG_UI_ID_TEMPLATES = {
