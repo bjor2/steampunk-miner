@@ -658,9 +658,12 @@ the last step of the stepped cone behind it: `cutter-crown` is that crown piece 
 Progression's `steel-cone`, `fluted-bit`, `toothed-crown`, `gem-set-crown` and `aether-cut-crown`.
 Every look keeps inside the crown's own silhouette (its disc and its eight tooth positions) and the
 cone's, so the rig's outline never grows, and the crowns carry the rig's hot core so the nose stays
-the brightest part. Nothing registers or draws it yet: the per-track registry (#577) names the asset
-from the track id and the wiring (#579) swaps the part on the slot and runs the tail above the top
-step. `docs/art/rig-look-drill-tip/author_drill_tip_looks.py` wrote the first version of the
+the brightest part. The wiring ([#579](https://github.com/bjor2/steampunk-miner/issues/579))
+registers it through `r.artAssets` from `rigLook.json`'s `lookAssets` and exports it to
+`public/assets/vehicle/`; each step row names its part with `asset: "vehicle-look-drill-tip"`, the
+track's `replaces: "drill-bit"` hides the rig's bit under it on the swivelling head, and the look
+parts join the track's glow slots so the tail above the top step paints them. Below 70 purchases
+nothing is swapped, so `cutter-crown` ships unused. `docs/art/rig-look-drill-tip/author_drill_tip_looks.py` wrote the first version of the
 `.blend`; from then on it is the source. The part table, the outline check at tiers 1 to 3 and the
 review renders, at desktop and at a 360 px phone's size, are in
 [docs/art/rig-look-drill-tip/](art/rig-look-drill-tip/README.md).

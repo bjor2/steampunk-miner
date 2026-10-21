@@ -9,9 +9,8 @@ counts the player leaves planets 1, 2, 3, 5 and 8 with, and the linear tail abov
 every later purchase visible. Progression named the steps Steel cone, Fluted bit, Toothed crown,
 Gem-set crown and Aether-cut crown (6300549964); the base rig's cutter crown is the unnamed default.
 
-**Not wired.** Nothing registers, exports or draws the asset: the per-track rig-look registry is
-#577 and the drill tip's wiring, which reads the thresholds from the registry's rows and swaps the
-part on the slot, is #579. `drillTipLooks.json` here is the one table this folder's scripts share;
+**Wired by #579.** The rig-look slice registers and exports the asset and swaps each step's part
+onto the slot from the registry's rows (`src/features/rig-look/rigLook.json`, #577). `drillTipLooks.json` here is the one table this folder's scripts share;
 the wiring keeps its own rows (#576 "Registry": data, not code). The asset id follows the #52 kebab
 form under the vehicle category, `vehicle-look-<track>`, so the registry can name it from the track
 id; the part ids are the step names.

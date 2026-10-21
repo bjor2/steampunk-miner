@@ -196,6 +196,14 @@ describe('rig look table', () => {
   it('names each shipped look asset with the parts its Blender file has', () => {
     expect(RIG_LOOK_TABLE.lookAssets).toEqual({
       'vehicle-look-boiler': ['kettle-boiler', 'twin-drum-boiler'],
+      'vehicle-look-drill-tip': [
+        'aether-cut-crown',
+        'cutter-crown',
+        'fluted-bit',
+        'gem-set-crown',
+        'steel-cone',
+        'toothed-crown',
+      ],
       'vehicle-look-hull': [
         'banded-iron',
         'brass-trimmed-armour',

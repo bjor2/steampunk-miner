@@ -4,7 +4,8 @@
  * and asks which attach points a mounted module or item holds only while an owned look has a part,
  * so a rig with no look parts costs one pass over its tracks and allocates nothing. While one has
  * a part, the taken points are read from `mountedPartsShown()`, which copies its list each step;
- * no shipped row has a part until the wiring tickets (T7-T11) land the art.
+ * the drill tip's steps have parts from 70 purchases (ticket 579), the other tracks' rows once
+ * their wiring tickets land the art.
  */
 import { mountedPartsShown } from '../../../scene/mountedPartsPresence'
 import { readAuthorityState } from '../../../store/authorityLink'

@@ -1,0 +1,159 @@
+{
+  "assetId": "vehicle-look-drill-tip",
+  "schema": 1,
+  "source": {
+    "blend": "art/blender/vehicle-look-drill-tip/vehicle-look-drill-tip.blend",
+    "sha256": "89dca37910f93251b8bc0b1f6c3bf72aa908ab593936ee99dcf95db02c219980",
+    "blender": "4.2.9 LTS"
+  },
+  "pxPerMetre": 512,
+  "atlasPx": [
+    128,
+    512
+  ],
+  "maps": {
+    "albedo": "vehicle-look-drill-tip.albedo.ktx2",
+    "normal": "vehicle-look-drill-tip.normal.ktx2",
+    "emissive": "vehicle-look-drill-tip.emissive.ktx2"
+  },
+  "parts": [
+    {
+      "id": "aether-cut-crown",
+      "tier": 1,
+      "rect": [
+        8,
+        8,
+        90,
+        58
+      ],
+      "sizeM": [
+        0.1741,
+        0.1122
+      ],
+      "pivotM": [
+        0.0,
+        0.0561
+      ],
+      "atM": [
+        0.0,
+        0.0
+      ],
+      "z": 9
+    },
+    {
+      "id": "cutter-crown",
+      "tier": 1,
+      "rect": [
+        8,
+        82,
+        90,
+        58
+      ],
+      "sizeM": [
+        0.1741,
+        0.1122
+      ],
+      "pivotM": [
+        0.0,
+        0.0561
+      ],
+      "atM": [
+        0.0,
+        0.0
+      ],
+      "z": 9
+    },
+    {
+      "id": "fluted-bit",
+      "tier": 1,
+      "rect": [
+        8,
+        230,
+        85,
+        44
+      ],
+      "sizeM": [
+        0.166,
+        0.0854
+      ],
+      "pivotM": [
+        0.0,
+        0.0427
+      ],
+      "atM": [
+        0.0,
+        0.0
+      ],
+      "z": 9
+    },
+    {
+      "id": "gem-set-crown",
+      "tier": 1,
+      "rect": [
+        8,
+        290,
+        82,
+        44
+      ],
+      "sizeM": [
+        0.1601,
+        0.0842
+      ],
+      "pivotM": [
+        0.0,
+        0.0421
+      ],
+      "atM": [
+        0.0,
+        0.0
+      ],
+      "z": 9
+    },
+    {
+      "id": "steel-cone",
+      "tier": 1,
+      "rect": [
+        8,
+        350,
+        85,
+        31
+      ],
+      "sizeM": [
+        0.166,
+        0.0596
+      ],
+      "pivotM": [
+        0.0,
+        0.0298
+      ],
+      "atM": [
+        0.0,
+        0.0
+      ],
+      "z": 9
+    },
+    {
+      "id": "toothed-crown",
+      "tier": 1,
+      "rect": [
+        8,
+        156,
+        90,
+        58
+      ],
+      "sizeM": [
+        0.1741,
+        0.1122
+      ],
+      "pivotM": [
+        0.0,
+        0.0561
+      ],
+      "atM": [
+        0.0,
+        0.0
+      ],
+      "z": 9
+    }
+  ]
+}
