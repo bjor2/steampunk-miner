@@ -269,6 +269,49 @@ teeth). No layer is shared within the batch or with P1 or p3-b2.
 - **Seeds 601 to 661**, apart from p3-b1's 501 to 591 and p3-b2's 401 to 482, so no two P3 layers
   share a noise field.
 
+## Batch p4-b1: P4's species 1 to 5 (ticket 601)
+
+The `foothold-p4` pool's four commons and its metal uncommon, kind slots 1 to 5 on P4. P4's slots
+11 to 15 and its signature material came first (ticket 603, p4-b3), so this batch's report measures
+it against them (`planet_mates`); slots 6 to 10 come with #602. Slots 16 and 17 are #453's two
+appended fossil commons (grey marl, crinoid stem), whose skins are held. The layers come from the
+species rows as before; no layer is shared with another batch or within this one.
+
+<!-- p4-b1 -->
+
+| slot | species                  | base              | vein              | palette (shadow, body, light)                      | sheen            |
+| ---- | ------------------------ | ----------------- | ----------------- | -------------------------------------------------- | ---------------- |
+| 1    | `bog-iron-brassvein`     | `peat-crumb`      | `limonite-clods`  | `bog-iron-rust` `#563732` `#ac6e65` `#d6b7b2`      | `damp-dull`      |
+| 2    | `cobalt-bloom-brassvein` | `bloom-crust`     | `globular-tufts`  | `cobalt-bloom-pink` `#643e58` `#c77daf` `#e3bed7`  | `bloom-sparkle`  |
+| 3    | `rain-quartz-quartzine`  | `dew-beads`       | `needle-sheaves`  | `rain-quartz-mist` `#66696c` `#ccd2d7` `#e5e8eb`   | `dew-glints`     |
+| 4    | `canal-jasper-quartzine` | `ribbon-stripes`  | `canal-cobbles`   | `canal-jasper-green` `#2d4b37` `#5a966e` `#accbb6` | `tumbled-polish` |
+| 5    | `antimony-brassvein`     | `bladed-stibnite` | `stibnite-sprays` | `antimony-silver` `#575a5d` `#aeb3ba` `#d7d9dc`    | `blade-flash`    |
+
+<!-- /p4-b1 -->
+
+- **Bases:** bog ore broken into crumbs, each its own tone, with dark gaps, threads of rotted
+  rootlet wandering up the face and rusty mottles; dark host rock crusted in patches of powdery
+  bloom, each patch fringed where the crust thins; a pale clear face beaded with dew, each bead a
+  dark rim round a bright crown, over faint upright needles in the stone; level ribbons of jasper,
+  dark and pale in turn and of unequal widths (two strata sets, 5 and 8 beds a cell), bent by a slow
+  warp, over fine chert laminae and grain; long stibnite blades packed side by side on a steep slant
+  (3u - v, six blades a unit, six tones in turn, so the lattice repeats), each striated along its
+  length with a pale lip and dark seams.
+- **Veins:** four soft clods of limonite heaped low, knobbly with small lumps stuck on, and a few
+  crumbs fallen off; six globular tufts of bloom, each a small dome bristling with hair-fine
+  needles all round; two sheaves of hair-fine needles crossed at a slant, pinched at the waist and
+  fanned at both ends; five big flat-lying cobbles packed together as ballast; two broom-like sprays
+  of slender square-ended prisms, many and close, spreading only a little from their roots
+  (painite's spindles in p4-b3 fan wide and taper).
+- **Sheens:** damp dull (a faint wet sheen in the hollows and a few motes: bog ore drinks the
+  light); bloom sparkle (the crust's tiny crystals spark, only where the bloom lies); dew glints (a
+  hard point of light on every bead's crown over a wide faint gleam); tumbled polish (the pale
+  ribbons shine in a slow sweep, a few glints); blade flash (two blades in six throw the lamp back
+  along their length, broken where a blade ends). Each sheen but the damp dull shares its base's
+  field (bloom patches, dew, ribbons, blades), so the light sits where the stone is shaped.
+- **Seeds 701 to 792**, apart from p4-b3's 401 to 511, so no two P4 layers share a noise field
+  (p2-b1 draws the same numbers on another planet, as the seed rule is per planet).
+
 ## Batch p4-b3: P4's species 11 to 15 and its signature material (ticket 603)
 
 The `foothold-p4` pool's three epics and two mythics, kind slots 11 to 15 on P4, and the skin of
@@ -654,6 +697,50 @@ wheels and a ring-grained plate where the apatite has end-on hexagons and uprigh
 new skin sits above P3's slate rock (contrast 1.71 for the signature to 2.72 for heart diamond).
 Checked by eye on `p3-b3.phone-x4.png`, `p3-b3.desktop.png`, the `p3-b3.scale-x4` copies and
 `p3.scale-x4.png` with its `-deutan` and `-gray` copies, all sixteen P3 skins side by side.
+
+From `sheets/p4-b1.distinct.json`, at 22 px a tile over P4's band 3 rock (`palette.planet_2`, luma
+0.29). The first ten pairs are within the batch; the rest are the closest pairs against p4-b3's
+skins and P4's signature (the report holds all 40):
+
+<!-- p4-b1-readings -->
+
+| pair                                                  | colour apart | deuteranopia apart | luma apart | texture apart |
+| ----------------------------------------------------- | ------------ | ------------------ | ---------- | ------------- |
+| cobalt bloom vs antimony (least apart)                | 0.185        | 0.115              | 0.071      | 0.094         |
+| bog iron vs cobalt bloom                              | 0.255        | 0.245              | 0.079      | 0.084         |
+| rain quartz vs antimony                               | 0.263        | 0.264              | 0.153      | 0.077         |
+| bog iron vs canal jasper                              | 0.289        | 0.075              | 0.020      | 0.097         |
+| canal jasper vs antimony                              | 0.316        | 0.242              | 0.130      | 0.107         |
+| bog iron vs antimony                                  | 0.337        | 0.317              | 0.150      | 0.076         |
+| cobalt bloom vs rain quartz                           | 0.366        | 0.375              | 0.224      | 0.084         |
+| cobalt bloom vs canal jasper                          | 0.380        | 0.174              | 0.059      | 0.106         |
+| rain quartz vs canal jasper                           | 0.566        | 0.498              | 0.283      | 0.097         |
+| bog iron vs rain quartz                               | 0.569        | 0.571              | 0.303      | 0.061         |
+| alexandrite vs canal jasper (planet-wide least apart) | 0.067        | 0.066              | 0.007      | 0.117         |
+| signature vs antimony                                 | 0.308        | 0.045              | 0.021      | 0.079         |
+| starsteel vs antimony                                 | 0.121        | 0.113              | 0.051      | 0.101         |
+| ichthyosaur eye vs rain quartz                        | 0.129        | 0.103              | 0.065      | 0.047         |
+| painite vs bog iron                                   | 0.251        | 0.101              | 0.008      | 0.048         |
+| alexandrite vs cobalt bloom                           | 0.355        | 0.111              | 0.052      | 0.121         |
+
+<!-- /p4-b1-readings -->
+
+Within the batch every pair stands well apart; the closest, cobalt bloom against antimony, still
+differs by 0.185 in colour, and pink bloom patches stand against grey slanted blades. Under
+deuteranopia bog iron and canal jasper come closest (0.075): there the crumbs and clods stand
+against level ribbons and cobbles. Planet-wide the materials table gives canal jasper nearly
+alexandrite's green (hue slots 140 and 160 at lumas 0.50 and 0.55), so colour barely parts them
+(0.067). Texture does, by the largest margin in the report (0.117): the jasper is level dark and
+pale ribbons with flat cobbles, the alexandrite soft raspberry-shadowed zones with two sixlings.
+The jasper sits on its own slot's luma (0.50), a shade under the alexandrite. Under deuteranopia
+antimony and P4's signature go the same grey (0.045). A brighter antimony did not part them (its
+luma at 0.67 left them 0.042 apart, and closed starsteel to 0.061), so the antimony sits a shade
+under its slot (luma 0.63) and texture parts the two: steep bladed stibnite with broom sprays
+against riveted half-cell panels with rivet rows and broken cogs. Rain quartz is the planet's
+palest skin, dew-beaded, apart from the ichthyosaur eye's bone plates. Every skin sits above its
+rock (contrast 1.57 for bog iron to 2.47 for rain quartz). Checked by eye on `p4-b1.phone-x4.png`,
+`p4-b1.desktop.png`, the `p4-b1.layers.jpg` sheet and the planet strip `p4.scale-x4` with its
+`-deutan` and `-gray` copies.
 
 From `sheets/p4-b3.distinct.json`, at 22 px a tile over P4's band 3 rock (`palette.planet_2`, the
 slate P3 wears too, luma 0.29). P4 has no other batch yet, so these are the batch's own fifteen
