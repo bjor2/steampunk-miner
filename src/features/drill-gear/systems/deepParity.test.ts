@@ -14,6 +14,7 @@ import {
 import type { DomainEvent } from '../../../systems/authority/domainEvent'
 import { ticksPerCell } from '../../../systems/authority/groundDrill'
 import { heatThrottledDrill } from '../../../systems/authority/heatRules'
+import { planetParamsOf } from '../../../systems/authority/planetOfState'
 import { drillQuantumAt } from '../../../systems/authority/stepBoundRead'
 import {
   continueScriptedSession,
@@ -30,7 +31,7 @@ import { ENERGY_QUANTA_PER_TICK } from '../../../systems/vehicle/energyQuanta'
 import { setUpgradeCommand } from '../../../systems/vehicle/vehicleCommands'
 import { FACING, type VehiclePose } from '../../../systems/vehicle/vehiclePose'
 import { cellDensitySum } from '../../../systems/world/cellYield'
-import { planetParamsFor } from '../../../systems/world/planetParams'
+import { planetParamsFor, type PlanetParams } from '../../../systems/world/planetParams'
 import { surfaceRowOfColumn, type TilePoint } from '../../../systems/world/tileGrid'
 import { EMPTY_WORLD, materialCellAt } from '../../../systems/world/worldState'
 import { DEEP_BRANCH } from './drillGearFork'
@@ -168,10 +169,14 @@ function playerChargedCutOn(planet: number): ReportedCut {
   })
 }
 
-/** The ticks the on-curve drill of `planet` takes to break `tile`. */
+/**
+ * The ticks the on-curve drill of `planet` takes to break `tile`, on the session's own planet: its
+ * ore rules stamp carries the surface layer (ticket 625), which the unstamped params lack.
+ */
 function ownTicksOf(planet: number, tile: TilePoint): number | null {
-  const params = planetParamsFor(SEED, planet)
-  const drillStats = heatThrottledDrill(planet, deepSessionOn(planet).vehicle())
+  const session = deepSessionOn(planet)
+  const params = planetParamsOf(session.state().planet) as PlanetParams
+  const drillStats = heatThrottledDrill(planet, session.vehicle())
   return ticksPerCell(drillStats, params, tile, materialCellAt(EMPTY_WORLD, params, tile))
 }
 
