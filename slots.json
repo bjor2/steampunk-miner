@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-10-21T05:50:37+02:00",
+  "updated_at": "2026-10-21T05:52:21+02:00",
   "caps": {
     "grok": 12,
     "claude": 10,
@@ -20,10 +20,10 @@
         {
           "slot": "C1",
           "state": "busy",
-          "ticket": 586,
+          "ticket": 579,
           "grok_slot": 1,
           "kind": "dev",
-          "since": "2026-10-21T04:55:00+02:00",
+          "since": "2026-10-21T05:52:00+02:00",
           "wave": "576-1A"
         },
         {
@@ -167,8 +167,8 @@
     {
       "slot": 1,
       "state": "dev",
-      "ticket": 586,
-      "since": "2026-10-21T04:55:00+02:00",
+      "ticket": 579,
+      "since": "2026-10-21T05:52:00+02:00",
       "claude_slot": 1,
       "wave": "576-1A"
     },
@@ -257,9 +257,9 @@
     {
       "slot": 1,
       "state": "busy",
-      "ticket": 586,
+      "ticket": 579,
       "grok_slot": 1,
-      "since": "2026-10-21T04:55:00+02:00",
+      "since": "2026-10-21T05:52:00+02:00",
       "account": 1,
       "wave": "576-1A"
     },
@@ -342,10 +342,10 @@
     }
   ],
   "last_refill": {
-    "at": "2026-10-21 05:50 CEST",
+    "at": "2026-10-21 05:52 CEST",
     "mode": "refill-dev",
-    "triggers": "#640",
-    "started": "#583->C2/A1",
+    "triggers": "#586",
+    "started": "#579->C1/A1",
     "note": "spawned 1 worker(s)"
   },
   "totals": {
@@ -541,7 +541,8 @@
         ],
         "done": [
           577,
-          578
+          578,
+          586
         ],
         "live": 1
       },
