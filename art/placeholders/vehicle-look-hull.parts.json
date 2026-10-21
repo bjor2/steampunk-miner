@@ -1,0 +1,72 @@
+{
+  "assetId": "vehicle-look-hull",
+  "schema": 1,
+  "source": {
+    "blend": "art/blender/vehicle-look-hull/vehicle-look-hull.blend",
+    "sha256": null,
+    "blender": null
+  },
+  "pxPerMetre": 512,
+  "atlasPx": [512, 1024],
+  "maps": {
+    "albedo": "vehicle-look-hull.albedo.ktx2",
+    "normal": "vehicle-look-hull.normal.ktx2",
+    "emissive": "vehicle-look-hull.emissive.ktx2"
+  },
+  "parts": [
+    {
+      "id": "banded-iron",
+      "tier": 1,
+      "rect": [8, 332, 246, 145],
+      "sizeM": [0.48, 0.2813],
+      "pivotM": [0.24, 0.2715],
+      "atM": [0.0, 0.0],
+      "z": 5
+    },
+    {
+      "id": "brass-trimmed-armour",
+      "tier": 1,
+      "rect": [8, 8, 246, 146],
+      "sizeM": [0.48, 0.2841],
+      "pivotM": [0.24, 0.2743],
+      "atM": [0.0, 0.0],
+      "z": 5
+    },
+    {
+      "id": "bronze-pod",
+      "tier": 1,
+      "rect": [274, 654, 182, 131],
+      "sizeM": [0.3541, 0.2556],
+      "pivotM": [0.2183, 0.2458],
+      "atM": [0.0, 0.0],
+      "z": 2
+    },
+    {
+      "id": "filigree-armour",
+      "tier": 1,
+      "rect": [8, 170, 246, 146],
+      "sizeM": [0.48, 0.2845],
+      "pivotM": [0.24, 0.2747],
+      "atM": [0.0, 0.0],
+      "z": 5
+    },
+    {
+      "id": "layered-armour",
+      "tier": 1,
+      "rect": [8, 493, 246, 145],
+      "sizeM": [0.48, 0.283],
+      "pivotM": [0.24, 0.2732],
+      "atM": [0.0, 0.0],
+      "z": 5
+    },
+    {
+      "id": "riveted-plate",
+      "tier": 1,
+      "rect": [8, 654, 250, 144],
+      "sizeM": [0.487, 0.2808],
+      "pivotM": [0.24, 0.271],
+      "atM": [0.0, 0.0],
+      "z": 5
+    }
+  ]
+}

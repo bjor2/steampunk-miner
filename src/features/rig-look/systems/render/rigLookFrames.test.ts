@@ -107,4 +107,36 @@ describe('rig look frames', () => {
     ])
     expect(new Set(tail.map((frame) => frame.partId))).toEqual(new Set(['piston.2']))
   })
+
+  it("carries a step's asset and hidden slot as a pure function of (track, n), tail included", () => {
+    const steps = SHIPPED_RIG_LOOKS.tracks[0].rows.steps.map((step) => ({
+      ...step,
+      part: 'twin-drum-boiler',
+      asset: 'vehicle-look-boiler',
+    }))
+    const rows = { ...SHIPPED_RIG_LOOKS.tracks[0].rows, replaces: 'boiler', steps }
+    const frames = createTrackLookFrames(rows)
+    const first = steps[0].from
+    for (const n of SWEEP) {
+      const frame = lookFrameAt(frames, n)
+      expect(frame.assetId).toBe(n < first ? null : 'vehicle-look-boiler')
+      expect(frame.replacesSlot).toBe(n < first ? null : 'boiler')
+      expect(lookFrameAt(createTrackLookFrames(rows), n)).toEqual(frame)
+    }
+    expect(unchangedNeighbours(frames)).toEqual([])
+  })
+
+  it('leaves a vehicle step its own slot: no asset of its own, nothing hidden', () => {
+    const steps = SHIPPED_RIG_LOOKS.tracks[0].rows.steps.map((step) => ({
+      ...step,
+      part: 't3-drill-bit',
+    }))
+    const frames = createTrackLookFrames({
+      ...SHIPPED_RIG_LOOKS.tracks[0].rows,
+      replaces: 'drill-bit',
+      steps,
+    })
+    expect(lookFrameAt(frames, 101)).toMatchObject({ assetId: 'vehicle', replacesSlot: null })
+    expect(shownOf(lookFrameAt(frames, 101))).not.toBe(shownOf(lookFrameAt(frames, 100)))
+  })
 })

@@ -31,8 +31,27 @@ const GOOD_TRACK: TrackLookRows = {
   },
 }
 
+const LOOK_ASSETS: RigLookTable['lookAssets'] = {
+  'vehicle-look-boiler': ['kettle-boiler', 'twin-drum-boiler'],
+}
+
+/** GOOD_TRACK's steps cut from the boiler look asset, standing in the piston's slot. */
+const LOOK_TRACK: Partial<TrackLookRows> = {
+  replaces: 'piston',
+  steps: GOOD_TRACK.steps.map((step) => ({
+    ...step,
+    asset: 'vehicle-look-boiler',
+    part: 'twin-drum-boiler',
+  })),
+}
+
+function lookStepProblemsOf(step: Partial<TrackLookRows['steps'][number]>): string[] {
+  const [first, second] = LOOK_TRACK.steps!
+  return problemsOf({ ...LOOK_TRACK, steps: [{ ...first, ...step }, second] })
+}
+
 function tableWith(...tracks: TrackLookRows[]): RigLookTable {
-  return { glowCaps: { drillNose: 3, rigBody: 1 }, tracks }
+  return { glowCaps: { drillNose: 3, rigBody: 1 }, lookAssets: LOOK_ASSETS, tracks }
 }
 
 function problemsOf(rows: Partial<TrackLookRows>, ...others: TrackLookRows[]): string[] {
@@ -172,5 +191,84 @@ describe('rig look table', () => {
     expect(() => readRigLookTable(table)).toThrow(
       'rigLook.json: combat: not an upgrade track; combat: slot hull.nose is a module or wagon point',
     )
+  })
+
+  it('names each shipped look asset with the parts its Blender file has', () => {
+    expect(RIG_LOOK_TABLE.lookAssets).toEqual({
+      'vehicle-look-boiler': ['kettle-boiler', 'twin-drum-boiler'],
+      'vehicle-look-hull': [
+        'banded-iron',
+        'brass-trimmed-armour',
+        'bronze-pod',
+        'filigree-armour',
+        'layered-armour',
+        'riveted-plate',
+      ],
+    })
+  })
+
+  it('loads steps cut from a look asset, standing in a vehicle part slot', () => {
+    expect(problemsOf(LOOK_TRACK)).toEqual([])
+    expect(problemsOf({ ...LOOK_TRACK, replaces: undefined })).toEqual([])
+  })
+
+  it('refuses an asset that is not one of the look assets', () => {
+    expect(lookStepProblemsOf({ asset: 'vehicle-look-gone' })).toEqual([
+      'engine: step from 2: asset vehicle-look-gone is not a look asset',
+    ])
+  })
+
+  it('refuses a part its look asset does not have', () => {
+    expect(lookStepProblemsOf({ part: 'kettle-drum' })).toEqual([
+      'engine: step from 2: part kettle-drum is not a part of vehicle-look-boiler',
+    ])
+  })
+
+  it('refuses a vehicle step whose part is not a vehicle part, and an asset with no part', () => {
+    expect(lookStepProblemsOf({ asset: undefined })).toEqual([
+      'engine: step from 2: part twin-drum-boiler is not a vehicle part',
+    ])
+    expect(lookStepProblemsOf({ asset: undefined, part: 't3-drill-bit' })).toEqual([])
+    expect(lookStepProblemsOf({ part: null })).toEqual([
+      'engine: step from 2: names vehicle-look-boiler but no part',
+    ])
+  })
+
+  it('refuses a look part on any module, wagon or aetheric point', () => {
+    for (const slot of MODULE_ATTACH_POINTS) {
+      expect(problemsOf({ ...LOOK_TRACK, slot })).toEqual([
+        `engine: slot ${slot} is a module or wagon point`,
+      ])
+    }
+  })
+
+  it('refuses a hidden slot that is not a vehicle part slot, or one another track hides', () => {
+    expect(problemsOf({ ...LOOK_TRACK, replaces: 'keel' })).toEqual([
+      'engine: replaces keel, which is not a vehicle part slot',
+    ])
+    const boiler = {
+      ...GOOD_TRACK,
+      track: 'boiler',
+      slot: 'hull.boiler',
+      glowSlots: [['boiler']],
+      replaces: 'piston',
+    }
+    expect(problemsOf(LOOK_TRACK, boiler)).toEqual(["boiler: replaces piston, another track's"])
+  })
+
+  it('refuses a look asset outside the vehicle category, with no part or a repeated one', () => {
+    const table = {
+      ...tableWith(GOOD_TRACK),
+      lookAssets: {
+        'prop-look': ['a'],
+        'vehicle-look-empty': [],
+        'vehicle-look-twice': ['a', 'a'],
+      },
+    }
+    expect(rigLookTableProblemsOf(table, UPGRADE_IDS)).toEqual([
+      'look asset prop-look: is not a vehicle- asset',
+      'look asset vehicle-look-empty: has no part',
+      'look asset vehicle-look-twice: repeats a part',
+    ])
   })
 })

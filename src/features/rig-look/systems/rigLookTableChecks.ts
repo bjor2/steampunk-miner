@@ -5,13 +5,19 @@
  * each differs from the one before; every tail ladder has 2 to 8 entries and no two neighbours
  * alike, the wrap included, so neighbouring counts always show different looks; and the glows on
  * each part slot, summed over every track that lights it, stay below the lowest cap among them.
+ * A step's part is a `vehicle` part or a part of one of the table's look assets (the rig-look seam,
+ * ticket 640: TD ruling on #579), and the `vehicle` slot a look part hides has one owner.
  */
+import { isVehiclePartId } from '../../../systems/art/artIds'
 import { isAttachId } from '../../../systems/registries/vehicleAttach'
-import type { RigLookTail, TrackLookRows } from './render/rigLookIndex'
+import type { RigLookStepRow, RigLookTail, TrackLookRows } from './render/rigLookIndex'
+import { VEHICLE_LOOK_ASSET_ID } from './render/rigLookFrames'
 
 export interface RigLookTable {
   /** Named glow caps; a track's `glowCap` names one. */
   glowCaps: Readonly<Record<string, number>>
+  /** The look assets a step may cut its part from, each with its part ids (`r.artAssets`). */
+  lookAssets: Readonly<Record<string, readonly string[]>>
   tracks: readonly TrackLookRows[]
 }
 
@@ -38,8 +44,10 @@ export function rigLookTableProblemsOf(
   knownTracks: readonly string[],
 ): string[] {
   return [
+    ...lookAssetProblemsOf(table),
     ...table.tracks.flatMap((rows) => trackProblemsOf(rows, table, knownTracks)),
     ...sharedPointProblemsOf(table.tracks),
+    ...sharedHiddenSlotProblemsOf(table.tracks),
     ...glowCapProblemsOf(table),
   ]
 }
@@ -52,7 +60,9 @@ function trackProblemsOf(
   return [
     ...trackIdProblemsOf(rows, table, knownTracks),
     ...slotProblemsOf(rows),
+    ...replacedSlotProblemsOf(rows),
     ...stepProblemsOf(rows),
+    ...stepPartProblemsOf(rows, table),
     ...tailProblemsOf(rows),
   ].map((problem) => `${rows.track}: ${problem}`)
 }
@@ -81,6 +91,40 @@ function slotProblemsOf(rows: TrackLookRows): string[] {
     problems.push('needs at least one glow slot in every group')
   }
   return problems
+}
+
+/** A look asset is a `vehicle-` asset of its own with at least one part, none repeated. */
+function lookAssetProblemsOf(table: RigLookTable): string[] {
+  return Object.entries(table.lookAssets).flatMap(([assetId, parts]) => {
+    const problems: string[] = []
+    if (!assetId.startsWith(`${VEHICLE_LOOK_ASSET_ID}-`)) problems.push('is not a vehicle- asset')
+    if (parts.length === 0) problems.push('has no part')
+    if (new Set(parts).size !== parts.length) problems.push('repeats a part')
+    return problems.map((problem) => `look asset ${assetId}: ${problem}`)
+  })
+}
+
+function replacedSlotProblemsOf(rows: TrackLookRows): string[] {
+  if (rows.replaces === undefined || isVehiclePartId(`t1-${rows.replaces}`)) return []
+  return [`replaces ${rows.replaces}, which is not a vehicle part slot`]
+}
+
+/** Each step's part is a `vehicle` part or a part of the look asset the step names. */
+function stepPartProblemsOf(rows: TrackLookRows, table: RigLookTable): string[] {
+  return rows.steps.flatMap((step) =>
+    partProblemsOf(step, table).map((problem) => `step from ${step.from}: ${problem}`),
+  )
+}
+
+function partProblemsOf(step: RigLookStepRow, table: RigLookTable): string[] {
+  const assetId = step.asset ?? VEHICLE_LOOK_ASSET_ID
+  if (step.part === null) return step.asset === undefined ? [] : [`names ${assetId} but no part`]
+  if (assetId === VEHICLE_LOOK_ASSET_ID) {
+    return isVehiclePartId(step.part) ? [] : [`part ${step.part} is not a vehicle part`]
+  }
+  const parts = table.lookAssets[assetId]
+  if (parts === undefined) return [`asset ${assetId} is not a look asset`]
+  return parts.includes(step.part) ? [] : [`part ${step.part} is not a part of ${assetId}`]
 }
 
 function stepProblemsOf(rows: TrackLookRows): string[] {
@@ -148,6 +192,22 @@ function sharedPointProblemsOf(tracks: readonly TrackLookRows[]): string[] {
   return tracks
     .filter((rows, at) => tracks.findIndex((other) => other.slot === rows.slot) !== at)
     .map((rows) => `${rows.track}: slot ${rows.slot} is another track's`)
+}
+
+/** One owner per hidden `vehicle` slot: two looks never stand in the same part. */
+function sharedHiddenSlotProblemsOf(tracks: readonly TrackLookRows[]): string[] {
+  return tracks
+    .filter((rows, at) => isSecondToHide(tracks, rows, at))
+    .map((rows) => `${rows.track}: replaces ${rows.replaces}, another track's`)
+}
+
+function isSecondToHide(
+  tracks: readonly TrackLookRows[],
+  rows: TrackLookRows,
+  at: number,
+): boolean {
+  if (rows.replaces === undefined) return false
+  return tracks.findIndex((other) => other.replaces === rows.replaces) !== at
 }
 
 /** Per part slot: the brightest glow each track can put there, summed, under the lowest cap. */

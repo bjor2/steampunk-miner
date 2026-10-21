@@ -598,9 +598,11 @@ The art half of the boiler line of the rig look ladder
 step the Game Director locked for the `boiler` track, `art/blender/vehicle-look-boiler/`, with the
 base look beside it. Each part is authored with the track's attach slot, `hull.boiler`, at the
 origin, fills the footprint of the rig's own `t1-boiler` dome and is meant to stand in its place:
-`kettle-boiler` is that dome piece for piece, `twin-drum-boiler` the step at 16 purchases. Nothing
-registers or draws it yet: the per-track registry (#577) names the asset from the track id and the
-wiring (#583) swaps the part on the slot and runs the tail above the step.
+`kettle-boiler` is that dome piece for piece, `twin-drum-boiler` the step at 16 purchases. The
+rig-look seam ([#640](https://github.com/bjor2/steampunk-miner/issues/640)) registers it through
+`r.artAssets` from `rigLook.json`'s `lookAssets` and exports it to `public/assets/vehicle/`; a
+step row names it as its `asset`, and the track's `replaces: "boiler"` hides the rig's dome under
+it. The wiring (#583) fills the step's part and runs the tail above the step.
 `docs/art/rig-look-boiler/author_boiler_looks.py` wrote the first version of the `.blend`; from
 then on it is the source. The part table, the outline check and the review renders, at desktop and
 at a 360 px phone's size, are in [docs/art/rig-look-boiler/](art/rig-look-boiler/README.md).
@@ -616,9 +618,11 @@ part is authored with the track's attach slot, `hull.plates`, at the origin, on 
 tangent to its cross-section, a hatch opening round the porthole, two brass lifting eyes at the
 slot. No rig part sits on the slot, so a look lies over the pod rather than replacing a part;
 `bronze-pod` is the pod's own bands and porthole piece for piece, the five armours the steps at
-20, 80, 140, 260 and 440 purchases. Nothing registers or draws it yet: the per-track registry
-(#577) names the asset from the track id and the wiring (#585) swaps the part on the slot and runs
-the tail above the top step. `docs/art/rig-look-hull/author_hull_looks.py` wrote the first version
+20, 80, 140, 260 and 440 purchases. The rig-look seam
+([#640](https://github.com/bjor2/steampunk-miner/issues/640)) registers it through `r.artAssets`
+from `rigLook.json`'s `lookAssets` and exports it to `public/assets/vehicle/`; with no `replaces`
+on the track, the look lies over the pod and hides nothing. The wiring (#585) fills the steps'
+parts and runs the tail above the top step. `docs/art/rig-look-hull/author_hull_looks.py` wrote the first version
 of the `.blend`; from then on it is the source. The part table, the outline check and the review
 renders, at desktop and at a 360 px phone's size, are in
 [docs/art/rig-look-hull/](art/rig-look-hull/README.md).

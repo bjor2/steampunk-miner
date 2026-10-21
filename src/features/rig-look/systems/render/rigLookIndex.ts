@@ -12,8 +12,13 @@
 export interface RigLookStepRow {
   /** The owned purchase count from which this step shows; integers rising from 1. */
   from: number
-  /** The `vehicle` part drawn in its slot from this step, null while the art is not in (T2-T6). */
+  /** The part drawn on the track's slot from this step, null while the art is not in (T2-T6). */
   part: string | null
+  /**
+   * The asset `part` is cut from (ticket 640): one of the table's `lookAssets`; absent is the
+   * `vehicle` asset, whose tiered part then takes its own slot.
+   */
+  asset?: string
   /** Progression's step name for the card line (`Fitting: {card}`), null for #554's rows. */
   card: string | null
   /** `#rrggbb` of the glow on the track's glow slots. */
@@ -40,6 +45,11 @@ export interface TrackLookRows {
   track: string
   /** The one vehicle-attach point the track's parts swap on. */
   slot: string
+  /**
+   * The `vehicle` part slot (`boiler`) a look part of another asset stands in place of, hidden
+   * while it shows (ticket 640); absent, the look lies over the rig and hides nothing.
+   */
+  replaces?: string
   /** Part slot groups (`slotOfPartId`) the glows land on, one glow per group. */
   glowSlots: readonly (readonly string[])[]
   /** The cap (a key of the table's `glowCaps`) every glow of the track stays below. */

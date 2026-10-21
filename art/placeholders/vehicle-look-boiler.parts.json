@@ -1,0 +1,36 @@
+{
+  "assetId": "vehicle-look-boiler",
+  "schema": 1,
+  "source": {
+    "blend": "art/blender/vehicle-look-boiler/vehicle-look-boiler.blend",
+    "sha256": null,
+    "blender": null
+  },
+  "pxPerMetre": 512,
+  "atlasPx": [512, 512],
+  "maps": {
+    "albedo": "vehicle-look-boiler.albedo.ktx2",
+    "normal": "vehicle-look-boiler.normal.ktx2",
+    "emissive": "vehicle-look-boiler.emissive.ktx2"
+  },
+  "parts": [
+    {
+      "id": "kettle-boiler",
+      "tier": 1,
+      "rect": [8, 8, 256, 164],
+      "sizeM": [0.5, 0.3185],
+      "pivotM": [0.24, 0.1175],
+      "atM": [0.0, 0.0],
+      "z": 3
+    },
+    {
+      "id": "twin-drum-boiler",
+      "tier": 1,
+      "rect": [8, 188, 256, 164],
+      "sizeM": [0.5, 0.3185],
+      "pivotM": [0.24, 0.1175],
+      "atM": [0.0, 0.0],
+      "z": 3
+    }
+  ]
+}

@@ -4,7 +4,8 @@
  * the tint moves every tail step, the plating once per lap of the palette, the glow once per lap of
  * both, so neighbouring counts always differ and a track holds at most K + 1 + P x L x G looks,
  * whatever the count. Tail step 0 is the top step itself, so #554's rows paint exactly as before up
- * to their last threshold. Asked every frame: `lookFrameAt` allocates nothing.
+ * to their last threshold. Asked every frame: `lookFrameAt` allocates nothing. A frame's part and
+ * asset are a pure function of (track, n), never saved (ticket 640).
  */
 import {
   lookPurchasesOf,
@@ -15,6 +16,9 @@ import {
   type TrackLookRows,
 } from './rigLookIndex'
 
+/** The asset a step's part comes from when its row names none (the swap's default, ticket 640). */
+export const VEHICLE_LOOK_ASSET_ID = 'vehicle'
+
 /** What a track's slot shows at one look step. */
 export interface RigLookFrame {
   track: string
@@ -22,7 +26,11 @@ export interface RigLookFrame {
   step: number
   /** The part swapped onto `slot`, null for the base part (or a step whose art is not in). */
   partId: string | null
+  /** The asset `partId` is cut from (`vehicle` unless the row names one), null with no part. */
+  assetId: string | null
   slot: string
+  /** The `vehicle` part slot a look part of another asset hides, null for none. */
+  replacesSlot: string | null
   /** `#rrggbb` of the glow on the track's glow slots, null for the base look. */
   tint: string | null
   /** One glow per glow slot group; zeros on the base look. */
@@ -69,7 +77,9 @@ function baseFrameOf(rows: TrackLookRows): RigLookFrame {
     track: rows.track,
     step: 0,
     partId: null,
+    assetId: null,
     slot: rows.slot,
+    replacesSlot: null,
     tint: null,
     glows: rows.glowSlots.map(() => 0),
     plating: null,
@@ -81,7 +91,9 @@ function stepFrameOf(rows: TrackLookRows, row: RigLookStepRow, step: number): Ri
     track: rows.track,
     step,
     partId: row.part,
+    assetId: assetIdOf(row),
     slot: rows.slot,
+    replacesSlot: replacesSlotOf(rows, row),
     tint: row.colour,
     glows: row.glows,
     plating: null,
@@ -96,9 +108,22 @@ function tailLapOf(rows: TrackLookRows): RigLookFrame[] {
     track: rows.track,
     step: rows.steps.length,
     partId: topStepOf(rows).part,
+    assetId: assetIdOf(topStepOf(rows)),
     slot: rows.slot,
+    replacesSlot: replacesSlotOf(rows, topStepOf(rows)),
     tint: palette[at % palette.length],
     glows: glow[Math.floor(at / (palette.length * plating.length)) % glow.length],
     plating: plating[Math.floor(at / palette.length) % plating.length],
   }))
+}
+
+function assetIdOf(row: RigLookStepRow): string | null {
+  return row.part === null ? null : (row.asset ?? VEHICLE_LOOK_ASSET_ID)
+}
+
+/** Only another asset's part hides a slot: a `vehicle` part takes its own. */
+function replacesSlotOf(rows: TrackLookRows, row: RigLookStepRow): string | null {
+  const assetId = assetIdOf(row)
+  if (assetId === null || assetId === VEHICLE_LOOK_ASSET_ID) return null
+  return rows.replaces ?? null
 }

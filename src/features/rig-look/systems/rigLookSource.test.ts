@@ -139,6 +139,7 @@ describe('rig look on the vehicle', () => {
     const table = readRigLookTable(
       {
         glowCaps: { rigBody: 1 },
+        lookAssets: {},
         tracks: [
           {
             track: 'combat',

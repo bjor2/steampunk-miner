@@ -13,6 +13,8 @@ export interface RigLookReading {
   step: number
   tail: number
   partId: string | null
+  /** The asset `partId` is cut from (ticket 640), null with no part. */
+  assetId: string | null
   /** The glow colour, null on the base look. */
   tint: string | null
   plating: string | null
@@ -30,7 +32,7 @@ function readingOf(
   playerId: string,
 ): RigLookReading {
   const purchases = ownedPurchasesOf(state, playerId, frames.rows.track)
-  const { partId, tint, plating } = rigLookOfPlayer(frames, state, playerId)
+  const { partId, assetId, tint, plating } = rigLookOfPlayer(frames, state, playerId)
   const index = rigLookIndexOf(frames.rows, purchases)
-  return { track: frames.rows.track, purchases, ...index, partId, tint, plating }
+  return { track: frames.rows.track, purchases, ...index, partId, assetId, tint, plating }
 }
