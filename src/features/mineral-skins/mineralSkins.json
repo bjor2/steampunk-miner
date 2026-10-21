@@ -1,5 +1,5 @@
 {
-  "$comment": "The mineral skins of #576 (GD ruling 20 Oct 2026, ticket 591): a species' skin is four layers drawn bottom first, a base texture, a vein or crystal shape, a palette and a sheen, each an id of its layer list below. A skin row names its species (a materials.json id) and one id per layer; no two species of one pool share all four, so no two species on one planet look alike. A palette is a ramp of three display colours, shadow, body and light, darkest first; its body is the hue slot colour of the species wearing it (ticket 450), so the skin keeps the hue guards of materials.json. The base, vein and sheen layers are drawn in Blender, one cell each (docs/art/mineral-skins, skin-layers.json). Look only: no price, gate, income, generation or save reads it. The batch tickets (#592 to #606) add the layers and rows, 15 species per planet on P1 to P5; #592 skins P1's slots 1 to 5, #593 its slots 6 to 10, #594 its slots 11 and 12 (the legacy pool has 12 species); #598 skins P3's slots 1 to 5, #599 its slots 6 to 10 and #600 its slots 11 to 15 (the foothold-p3 pool; its slots 16 and 17, the two fossil commons of #453, are held); #603 P4's slots 11 to 15; #604 P5's slots 1 to 5 (the foothold-p5 pool; its slots 16 and 17, #453's fossil commons, are held). A signature row dresses the signature material of its planet, the slotless 16th material (#453 E1), keyed by the planet: one per planet, apart from every species of the planet's pool, its palette's body inside the hue and luma bands of the family's look (ore-visuals, #151) since it has no hue slot; #600 adds P3's and #603 P4's.",
+  "$comment": "The mineral skins of #576 (GD ruling 20 Oct 2026, ticket 591): a species' skin is four layers drawn bottom first, a base texture, a vein or crystal shape, a palette and a sheen, each an id of its layer list below. A skin row names its species (a materials.json id) and one id per layer; no two species of one pool share all four, so no two species on one planet look alike. A palette is a ramp of three display colours, shadow, body and light, darkest first; its body is the hue slot colour of the species wearing it (ticket 450), so the skin keeps the hue guards of materials.json. The base, vein and sheen layers are drawn in Blender, one cell each (docs/art/mineral-skins, skin-layers.json). Look only: no price, gate, income, generation or save reads it. The batch tickets (#592 to #606) add the layers and rows, 15 species per planet on P1 to P5; #592 skins P1's slots 1 to 5, #593 its slots 6 to 10, #594 its slots 11 and 12 (the legacy pool has 12 species); #598 skins P3's slots 1 to 5, #599 its slots 6 to 10 and #600 its slots 11 to 15 (the foothold-p3 pool; its slots 16 and 17, the two fossil commons of #453, are held); #603 P4's slots 11 to 15; #604 P5's slots 1 to 5 (the foothold-p5 pool; its slots 16 and 17, #453's fossil commons, are held); #595 P2's slots 1 to 5 (the foothold-p2 pool of #632, on the legacy slots). A signature row dresses the signature material of its planet, the slotless 16th material (#453 E1), keyed by the planet: one per planet, apart from every species of the planet's pool, its palette's body inside the hue and luma bands of the family's look (ore-visuals, #151) since it has no hue slot; #600 adds P3's and #603 P4's.",
   "layers": {
     "base": [
       {
@@ -118,6 +118,21 @@
       },
       {
         "id": "leopard-nodules"
+      },
+      {
+        "id": "slaty-cleavage"
+      },
+      {
+        "id": "ochre-powder"
+      },
+      {
+        "id": "gravel-bed"
+      },
+      {
+        "id": "sulphur-crumb"
+      },
+      {
+        "id": "graphite-smear"
       }
     ],
     "vein": [
@@ -237,6 +252,21 @@
       },
       {
         "id": "seed-pods"
+      },
+      {
+        "id": "split-slabs"
+      },
+      {
+        "id": "ochre-lumps"
+      },
+      {
+        "id": "rivet-grains"
+      },
+      {
+        "id": "crumbled-masses"
+      },
+      {
+        "id": "flake-books"
       }
     ],
     "palette": [
@@ -395,6 +425,26 @@
       {
         "id": "chromite-steel",
         "ramp": ["#4a4852", "#9491a5", "#cac8d2"]
+      },
+      {
+        "id": "slate-grey",
+        "ramp": ["#424852", "#8590a3", "#c2c8d1"]
+      },
+      {
+        "id": "rust-ochre",
+        "ramp": ["#663528", "#cd6a51", "#e6b4a8"]
+      },
+      {
+        "id": "tin-gravel",
+        "ramp": ["#5c5f61", "#b8bec2", "#dcdee0"]
+      },
+      {
+        "id": "sulphur-yellow",
+        "ramp": ["#737010", "#e6e021", "#f2f090"]
+      },
+      {
+        "id": "graphite-black",
+        "ramp": ["#424248", "#838391", "#c1c1c8"]
       }
     ],
     "sheen": [
@@ -514,6 +564,21 @@
       },
       {
         "id": "wet-gloss"
+      },
+      {
+        "id": "cleavage-sheen"
+      },
+      {
+        "id": "powdery"
+      },
+      {
+        "id": "grain-caps"
+      },
+      {
+        "id": "sugary"
+      },
+      {
+        "id": "slick"
       }
     ]
   },
@@ -776,6 +841,41 @@
       "vein": "seed-pods",
       "palette": "chromite-steel",
       "sheen": "wet-gloss"
+    },
+    {
+      "species": "p2-c1",
+      "base": "slaty-cleavage",
+      "vein": "split-slabs",
+      "palette": "slate-grey",
+      "sheen": "cleavage-sheen"
+    },
+    {
+      "species": "p2-c2",
+      "base": "ochre-powder",
+      "vein": "ochre-lumps",
+      "palette": "rust-ochre",
+      "sheen": "powdery"
+    },
+    {
+      "species": "p2-c3",
+      "base": "gravel-bed",
+      "vein": "rivet-grains",
+      "palette": "tin-gravel",
+      "sheen": "grain-caps"
+    },
+    {
+      "species": "p2-c4",
+      "base": "sulphur-crumb",
+      "vein": "crumbled-masses",
+      "palette": "sulphur-yellow",
+      "sheen": "sugary"
+    },
+    {
+      "species": "p2-c5",
+      "base": "graphite-smear",
+      "vein": "flake-books",
+      "palette": "graphite-black",
+      "sheen": "slick"
     }
   ],
   "signatures": [

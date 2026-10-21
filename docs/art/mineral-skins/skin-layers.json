@@ -277,6 +277,40 @@
       "wornBy": ["chromite-brassvein"]
     },
     {
+      "id": "slaty-cleavage",
+      "cell": "cells/base/slaty-cleavage.png",
+      "blend": "blend/base-slaty-cleavage.blend",
+      "wornBy": ["p2-c1"]
+    },
+    {
+      "kind": "base",
+      "id": "ochre-powder",
+      "cell": "cells/base/ochre-powder.png",
+      "blend": "blend/base-ochre-powder.blend",
+      "wornBy": ["p2-c2"]
+    },
+    {
+      "kind": "base",
+      "id": "gravel-bed",
+      "cell": "cells/base/gravel-bed.png",
+      "blend": "blend/base-gravel-bed.blend",
+      "wornBy": ["p2-c3"]
+    },
+    {
+      "kind": "base",
+      "id": "sulphur-crumb",
+      "cell": "cells/base/sulphur-crumb.png",
+      "blend": "blend/base-sulphur-crumb.blend",
+      "wornBy": ["p2-c4"]
+    },
+    {
+      "kind": "base",
+      "id": "graphite-smear",
+      "cell": "cells/base/graphite-smear.png",
+      "blend": "blend/base-graphite-smear.blend",
+      "wornBy": ["p2-c5"]
+    },
+    {
       "kind": "vein",
       "id": "nugget-cluster",
       "cell": "cells/vein/nugget-cluster.png",
@@ -550,6 +584,40 @@
       "wornBy": ["chromite-brassvein"]
     },
     {
+      "id": "split-slabs",
+      "cell": "cells/vein/split-slabs.png",
+      "blend": "blend/vein-split-slabs.blend",
+      "wornBy": ["p2-c1"]
+    },
+    {
+      "kind": "vein",
+      "id": "ochre-lumps",
+      "cell": "cells/vein/ochre-lumps.png",
+      "blend": "blend/vein-ochre-lumps.blend",
+      "wornBy": ["p2-c2"]
+    },
+    {
+      "kind": "vein",
+      "id": "rivet-grains",
+      "cell": "cells/vein/rivet-grains.png",
+      "blend": "blend/vein-rivet-grains.blend",
+      "wornBy": ["p2-c3"]
+    },
+    {
+      "kind": "vein",
+      "id": "crumbled-masses",
+      "cell": "cells/vein/crumbled-masses.png",
+      "blend": "blend/vein-crumbled-masses.blend",
+      "wornBy": ["p2-c4"]
+    },
+    {
+      "kind": "vein",
+      "id": "flake-books",
+      "cell": "cells/vein/flake-books.png",
+      "blend": "blend/vein-flake-books.blend",
+      "wornBy": ["p2-c5"]
+    },
+    {
       "kind": "sheen",
       "id": "earthy",
       "cell": "cells/sheen/earthy.png",
@@ -821,6 +889,40 @@
       "cell": "cells/sheen/wet-gloss.png",
       "blend": "blend/sheen-wet-gloss.blend",
       "wornBy": ["chromite-brassvein"]
+    },
+    {
+      "id": "cleavage-sheen",
+      "cell": "cells/sheen/cleavage-sheen.png",
+      "blend": "blend/sheen-cleavage-sheen.blend",
+      "wornBy": ["p2-c1"]
+    },
+    {
+      "kind": "sheen",
+      "id": "powdery",
+      "cell": "cells/sheen/powdery.png",
+      "blend": "blend/sheen-powdery.blend",
+      "wornBy": ["p2-c2"]
+    },
+    {
+      "kind": "sheen",
+      "id": "grain-caps",
+      "cell": "cells/sheen/grain-caps.png",
+      "blend": "blend/sheen-grain-caps.blend",
+      "wornBy": ["p2-c3"]
+    },
+    {
+      "kind": "sheen",
+      "id": "sugary",
+      "cell": "cells/sheen/sugary.png",
+      "blend": "blend/sheen-sugary.blend",
+      "wornBy": ["p2-c4"]
+    },
+    {
+      "kind": "sheen",
+      "id": "slick",
+      "cell": "cells/sheen/slick.png",
+      "blend": "blend/sheen-slick.blend",
+      "wornBy": ["p2-c5"]
     }
   ]
 }

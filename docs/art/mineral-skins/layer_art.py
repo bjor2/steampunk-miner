@@ -2,8 +2,9 @@
 The Blender recipes of the mineral skin layers (#576, ticket 592 for P1's slots 1 to 5, ticket 593
 for its slots 6 to 10, ticket 594 for 11 and 12, ticket 598 for P3's slots 1 to 5, ticket 599 for
 its slots 6 to 10, ticket 600 for its slots 11 to 15 and its relic signature, ticket 603 for P4's
-slots 11 to 15 and its signature material, ticket 604 for P5's slots 1 to 5): one per layer id of
-`mineralSkins.json`. A layer id with no recipe fails, never falls back.
+slots 11 to 15 and its signature material, ticket 604 for P5's slots 1 to 5, ticket 595 for P2's
+slots 1 to 5): one per layer id of `mineralSkins.json`. A layer id with no recipe fails, never
+falls back.
 
 - `base` and `sheen` are seamless textures on the 1 m cell: an emission material on a 1 m quad
   whose value is the ramp coordinate (base, mean about 0.5) or the highlight strength (sheen,
@@ -730,6 +731,73 @@ def chromite_seeds_of(graph, radius):
     return sprinkled(graph, 7, 641, radius, 0.85)
 
 
+def base_slaty_cleavage(graph):
+    """Slate shale: fine slaty cleavage on a slight slant, broad silt beds across it, sheets stepped off along it."""
+    warp = graph.noise(2, 2, seed=701, detail=2)
+    beds = graph.mul_add(graph.math('SINE', graph.mul(slanted(graph, 1, 2, warp, 0.6), 2.0 * math.pi)), 0.5, 0.5)
+    laminae = graph.math('SINE', graph.mul(slanted(graph, 3, 26, warp, 0.6), 2.0 * math.pi))
+    tone = around_half(graph, beds, 0.5)
+    tone = graph.plus(tone, graph.mul(laminae, 0.06))
+    tone = graph.minus(tone, graph.mul(slate_sheet_edges(graph, warp), 0.26))
+    return graph.plus(tone, graph.mul(graph.minus(stretched(graph, graph.noise(60, 60, seed=702, detail=4)), 0.5), 0.08))
+
+
+def slanted(graph, per_u, per_v, warp, warp_lines):
+    """per_u * u + per_v * v, bent by `warp`: whole lines along u and v, so a set of them repeats at the cell edge."""
+    return graph.plus(graph.mul_add(graph.u, per_u, graph.mul(graph.v, per_v)), graph.mul(graph.minus(warp, 0.5), warp_lines))
+
+
+def slate_sheet_edges(graph, warp):
+    """The edges where a sheet of slate split off: dark lines along the cleavage every few laminae, broken by a noise."""
+    across = graph.plus(slanted(graph, 1, 6, warp, 0.6), graph.mul(graph.minus(graph.noise(3, 3, seed=703, detail=2), 0.5), 0.2))
+    line = graph.smooth(graph.math('ABSOLUTE', graph.periodic(across, 1.0)), 0.035, 0.0)
+    broken = graph.smooth(stretched(graph, graph.noise(5, 3, seed=704, detail=2)), 0.35, 0.55)
+    return graph.mul(line, broken)
+
+
+def base_ochre_powder(graph):
+    """Rust ochre: soft powdery earth stained in rusty drifts, the stain run down the face in streaks, a dust of pale grains."""
+    stain = stretched(graph, graph.noise(4, 4, seed=711, detail=4, roughness=0.6))
+    runs = stretched(graph, graph.noise(22, 2, seed=712, detail=3))
+    dust = sprinkled(graph, 44, 713, 0.32, 0.5)
+    tone = around_half(graph, stain, 0.7)
+    tone = graph.plus(tone, graph.mul(graph.minus(runs, 0.5), 0.28))
+    return graph.plus(graph.minus(tone, 0.04), graph.mul(dust, 0.2))
+
+
+def base_gravel_bed(graph):
+    """Tin gravel: a packed bed of rounded grains, each its own grey, domed to its middle, dark grit in the gaps between."""
+    grains = graph.voronoi(9, 9, seed=721)
+    edge = graph.voronoi(9, 9, seed=721, feature='DISTANCE_TO_EDGE')['Distance']
+    tone = graph.mul_add(graph.add('ShaderNodeSeparateColor', [(0, grains['Color'])]).outputs[0], 0.3, 0.32)
+    tone = graph.plus(tone, graph.mul(graph.smooth(edge, 0.0, 0.3), 0.24))
+    tone = graph.minus(tone, graph.mul(graph.smooth(edge, 0.06, 0.0), 0.34))
+    return graph.plus(tone, graph.mul(graph.minus(stretched(graph, graph.noise(70, 70, seed=722, detail=4)), 0.5), 0.1))
+
+
+def base_sulphur_crumb(graph):
+    """Sulphur crust: a crumbly crust broken into clods along soft cracks, porous with small pits, pale bloom on the clods."""
+    clods = graph.voronoi(6, 6, seed=731, feature='DISTANCE_TO_EDGE')['Distance']
+    pits = sprinkled(graph, 28, 732, 0.4, 0.6)
+    bloom = graph.smooth(stretched(graph, graph.noise(5, 5, seed=733, detail=3)), 0.5, 0.75)
+    grain = stretched(graph, graph.noise(80, 80, seed=734, detail=4))
+    tone = graph.mul_add(graph.smooth(clods, 0.0, 0.18), 0.3, 0.36)
+    tone = graph.plus(tone, graph.mul(bloom, 0.16))
+    tone = graph.minus(tone, graph.mul(pits, 0.3))
+    return graph.plus(tone, graph.mul(graph.minus(grain, 0.5), 0.14))
+
+
+def base_graphite_smear(graph):
+    """Graphite seam: soft black smears drawn level along the seam, deep and pale in turn, a few polished lenses."""
+    smear = stretched(graph, graph.noise(2, 9, seed=741, detail=4, roughness=0.55))
+    # No regular lines: slate shale's sheet edges are the planet's ruled grey, so graphite stays a smear.
+    fine = stretched(graph, graph.noise(4, 40, seed=742, detail=3))
+    lens = graph.smooth(stretched(graph, graph.noise(3, 12, seed=743, detail=2)), 0.68, 0.8)
+    tone = around_half(graph, smear, 0.95)
+    tone = graph.plus(tone, graph.mul(graph.minus(fine, 0.5), 0.14))
+    return graph.plus(graph.minus(tone, 0.05), graph.mul(lens, 0.18))
+
+
 # --- sheen: the lustre's highlights -----------------------------------------------------------------
 
 
@@ -1071,6 +1139,43 @@ def sheen_wet_gloss(graph):
     bead = chromite_seeds_of(graph, CHROMITE_BEAD_RADIUS)
     sheen = graph.smooth(stretched(graph, graph.noise(3, 3, seed=691, detail=2)), 0.5, 0.85)
     return graph.plus(graph.mul(bead, 0.85), graph.mul(sheen, 0.1))
+
+
+def sheen_cleavage_sheen(graph):
+    """Cleavage sheen (slate shale): a faint sheen along the lip of each split sheet, a dim wash over the cleavage."""
+    warp = graph.noise(2, 2, seed=701, detail=2)
+    across = graph.plus(slanted(graph, 1, 6, warp, 0.6), graph.mul(graph.minus(graph.noise(3, 3, seed=703, detail=2), 0.5), 0.2))
+    lip = graph.mul(graph.smooth(graph.periodic(across, 1.0), 0.02, 0.05), graph.smooth(graph.periodic(across, 1.0), 0.11, 0.06))
+    wash = graph.smooth(stretched(graph, graph.noise(3, 3, seed=751, detail=2)), 0.45, 0.8)
+    return graph.plus(graph.mul(lip, 0.4), graph.mul(wash, 0.1))
+
+
+def sheen_powdery(graph):
+    """Powdery (rust ochre): no gloss at all, only a soft dusty lift in patches where the powder lies thick."""
+    patches = graph.smooth(stretched(graph, graph.noise(5, 5, seed=761, detail=3)), 0.55, 0.85)
+    return graph.mul(patches, 0.12)
+
+
+def sheen_grain_caps(graph):
+    """Grain caps (tin gravel): a small bright cap on the middle of every rounded grain, and a few hard metal glints."""
+    edge = graph.voronoi(9, 9, seed=721, feature='DISTANCE_TO_EDGE')['Distance']
+    caps = graph.smooth(edge, 0.1, 0.2)
+    glint = graph.smooth(graph.voronoi(17, 17, seed=771)['Distance'], 0.06, 0.012)
+    return graph.plus(graph.mul(caps, 0.36), graph.mul(glint, 0.55))
+
+
+def sheen_sugary(graph):
+    """Sugary (sulphur crust): a dense frost of tiny glints, each a crystal face of the crumb, over a weak resin wash."""
+    frost = sprinkled(graph, 54, 781, 0.28, 0.3)
+    wash = graph.smooth(stretched(graph, graph.noise(3, 3, seed=782, detail=2)), 0.45, 0.8)
+    return graph.plus(graph.mul(frost, 0.7), graph.mul(wash, 0.12))
+
+
+def sheen_slick(graph):
+    """Slick (graphite seam): long level smears of greasy shine where the seam was rubbed, a broad dull gloss beneath."""
+    smears = graph.smooth(stretched(graph, graph.noise(2, 16, seed=791, detail=3)), 0.58, 0.8)
+    broad = graph.smooth(stretched(graph, graph.noise(2, 2, seed=792, detail=2)), 0.4, 0.8)
+    return graph.plus(graph.mul(smears, 0.7), graph.mul(broad, 0.16))
 
 
 # --- vein: the crystal or vein shape, by the row's silhouette ----------------------------------------
@@ -1777,6 +1882,88 @@ def almond_seed(name, centre, length, angle):
                                 scale=(1.0, 0.36, 0.55), rotation=(0.0, -angle, 0.0))
 
 
+
+
+def vein_split_slabs(rng, body):
+    """Slate shale: long thin slabs split off the seam, stacked level with gaps between, each end broken on a slant."""
+    marks = []
+    for i in range(5):
+        z = 0.24 - i * 0.12 + rng.uniform(-0.01, 0.01)
+        left, right = -0.32 + rng.uniform(0.0, 0.1), 0.32 - rng.uniform(0.0, 0.1)
+        height = rng.uniform(0.045, 0.06)
+        lean = rng.uniform(0.02, 0.05) * (1 if i % 2 == 0 else -1)
+        points = [(left, z - height / 2), (right - lean, z - height / 2), (right + lean, z + height / 2), (left + lean * 1.5, z + height / 2)]
+        slab = shapes.add_polygon('slab-%d' % i, points, -0.02 - 0.004 * i, 0.016)
+        slab.rotation_euler = (rng.uniform(-0.25, -0.1), 0.0, rng.uniform(-0.04, 0.04))
+        shapes.bevel(slab, 0.004, segments=1)
+        marks.append(slab)
+    return assign_all(marks, body)
+
+
+def vein_ochre_lumps(rng, body):
+    """Rust ochre: soft earthy lumps, lop-sided and faceted where they crumbled, with loose crumbs round them."""
+    marks = []
+    for i, (x, z) in enumerate(shapes.scatter_positions(rng, 5, 0.24, 0.17)):
+        radius = rng.uniform(0.07, 0.1)
+        lump = shapes.add_icosphere('lump-%d' % i, radius, (x, 0.0, z), subdivisions=1,
+                                    scale=(rng.uniform(0.9, 1.3), 0.6, rng.uniform(0.7, 1.0)), rotation=(rng.uniform(0, 1), rng.uniform(0, math.tau), rng.uniform(0, 1)))
+        marks.append(lump)
+        for j in range(3):
+            angle = rng.uniform(0, math.tau)
+            at = (x + math.cos(angle) * radius * 1.5, -0.005, z + math.sin(angle) * radius * 1.3)
+            marks.append(shapes.add_icosphere('crumb-%d-%d' % (i, j), rng.uniform(0.012, 0.02), at, subdivisions=1, scale=(1.0, 0.7, 0.8)))
+    return assign_all(marks, body)
+
+
+def vein_rivet_grains(rng, body):
+    """Tin gravel: loose grains shaped like spent rivets, a domed head on a short shank, lying every way on the face."""
+    marks = []
+    for i, (x, z) in enumerate(shapes.scatter_positions(rng, 11, VEIN_EXTENT_M - 0.03, 0.1)):
+        angle, head = rng.uniform(0, math.tau), rng.uniform(0.026, 0.034)
+        along = (math.cos(angle), math.sin(angle))
+        shank = shapes.add_prism('shank-%d' % i, head * 0.45, head * 1.8, (x - along[0] * head * 0.9, -head * 0.3, z - along[1] * head * 0.9),
+                                 rotation=(0.0, math.pi / 2 - angle, 0.0), sides=8)
+        cap = shapes.add_icosphere('head-%d' % i, head, (x, -head * 0.25, z), subdivisions=2, scale=(0.6, 1.0, 1.0),
+                                   rotation=(0.0, -angle, 0.0))
+        marks += [shank, cap]
+    return assign_all(marks, body)
+
+
+def vein_crumbled_masses(rng, body):
+    """Sulphur crust: two crumbly masses, each a heap of rounded clods grown together, broken chips fallen off their edge."""
+    marks = []
+    for mass, (cx, cz, reach) in enumerate(((-0.1, 0.1, 0.17), (0.16, -0.16, 0.12))):
+        for i, (dx, dz) in enumerate(shapes.scatter_positions(rng, 7, reach, reach * 0.35)):
+            radius = rng.uniform(0.05, 0.075) * reach / 0.17 + 0.02
+            marks.append(shapes.add_icosphere('clod-%d-%d' % (mass, i), radius, (cx + dx, 0.0, cz + dz), subdivisions=2,
+                                              scale=(1.0, 0.65, rng.uniform(0.8, 1.0))))
+        for j in range(3):
+            angle = rng.uniform(0, math.tau)
+            size = rng.uniform(0.02, 0.03)
+            chip = shapes.add_cube('chip-%d-%d' % (mass, j), size, (cx + math.cos(angle) * reach * 1.45, -0.005, cz + math.sin(angle) * reach * 1.45),
+                                   rotation=(rng.uniform(0, 1), rng.uniform(0, math.tau), rng.uniform(0, 1)))
+            marks.append(chip)
+    return assign_all(marks, body)
+
+
+def vein_flake_books(rng, body):
+    """Graphite seam: books of thin hexagonal flakes stacked a little askew, and a few loose flakes slid off them."""
+    marks = []
+    books = [((-0.12, 0.12), 0.11, 4), ((0.15, -0.08), 0.09, 3), ((-0.16, -0.2), 0.07, 3)]
+    for book, ((x, z), radius, count) in enumerate(books):
+        for i in range(count):
+            at = (x + 0.012 * i + rng.uniform(-0.006, 0.006), -0.012 - 0.01 * i, z + 0.008 * i)
+            flake = shapes.add_prism('flake-%d-%d' % (book, i), radius * (1 - 0.07 * i), 0.008, at,
+                                     rotation=(math.pi / 2 + rng.uniform(-0.12, 0.12), rng.uniform(0, math.pi / 3), 0.0), sides=6)
+            shapes.bevel(flake, 0.002, segments=1)
+            marks.append(flake)
+    for i, (x, z) in enumerate(((0.26, 0.2), (0.24, -0.27), (0.04, 0.27))):
+        loose = shapes.add_prism('loose-%d' % i, rng.uniform(0.035, 0.045), 0.007, (x, -0.01, z),
+                                 rotation=(math.pi / 2 + rng.uniform(-0.3, 0.3), rng.uniform(0, math.pi / 3), 0.0), sides=6)
+        marks.append(loose)
+    return assign_all(marks, body)
+
+
 def kinked_path(start, end, rng, segments):
     """A wire from start to end, wobbling in the face at every inner point."""
     points = []
@@ -1838,6 +2025,11 @@ BASES = {
     'split-lamellae': base_split_lamellae,
     'fortification-bands': base_fortification_bands,
     'leopard-nodules': base_leopard_nodules,
+    'slaty-cleavage': base_slaty_cleavage,
+    'ochre-powder': base_ochre_powder,
+    'gravel-bed': base_gravel_bed,
+    'sulphur-crumb': base_sulphur_crumb,
+    'graphite-smear': base_graphite_smear,
 }
 SHEENS = {
     'earthy': sheen_earthy,
@@ -1879,6 +2071,11 @@ SHEENS = {
     'moon-sheen': sheen_moon_sheen,
     'banded-gloss': sheen_banded_gloss,
     'wet-gloss': sheen_wet_gloss,
+    'cleavage-sheen': sheen_cleavage_sheen,
+    'powdery': sheen_powdery,
+    'grain-caps': sheen_grain_caps,
+    'sugary': sheen_sugary,
+    'slick': sheen_slick,
 }
 VEINS = {
     'nugget-cluster': vein_nugget_cluster,
@@ -1920,6 +2117,11 @@ VEINS = {
     'swallowtail-blades': vein_swallowtail_blades,
     'split-geodes': vein_split_geodes,
     'seed-pods': vein_seed_pods,
+    'split-slabs': vein_split_slabs,
+    'ochre-lumps': vein_ochre_lumps,
+    'rivet-grains': vein_rivet_grains,
+    'crumbled-masses': vein_crumbled_masses,
+    'flake-books': vein_flake_books,
 }
 RECIPES = {'base': BASES, 'vein': VEINS, 'sheen': SHEENS}
 
