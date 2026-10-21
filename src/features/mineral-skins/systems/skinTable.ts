@@ -4,35 +4,51 @@
  * species of the materials table and one id of each layer list; a species wears at most one skin,
  * and no two species of one pool share all four layers. A planet's species are its pool's
  * (ticket 542), so the pool guard keeps any two species of one planet apart. A palette's body is
- * the hue slot colour of every species wearing it (ticket 592). An empty table loads, so the batch
- * tickets land rows one planet at a time.
+ * the hue slot colour of every species wearing it (ticket 592). A planet's signature material, the
+ * slotless 16th material, wears the skin of its `signatures` row (ticket 603), which must differ
+ * from every species of the planet's pool. An empty table loads, so the batch tickets land rows one
+ * planet at a time; a file with no `signatures` list has none.
  */
 import type { Rgb } from '../../../systems/render/colour'
 import { hueSlotColourOf, MATERIALS, type MaterialTable } from '../../materials'
 import mineralSkinsFile from '../mineralSkins.json'
 import { rampBodyProblems, type PaletteRamp } from './paletteRamps'
+import { signatureMaterialsByPlanet, type SignatureMaterial } from './signatureMaterial'
+import { signatureSkinProblems } from './signatureSkinGuards'
 import {
+  layersOfRow,
   SKIN_LAYER_KINDS,
   sharedSkinProblems,
   skinOfRow,
+  wornSignatureSkinOf,
+  wornSpeciesSkinOf,
+  type SignatureSkinRow,
   type SkinLayerKind,
   type SkinRow,
+  type WornSkin,
 } from './skinLayers'
-import { layerEntryShapeProblems, skinRowShapeProblems } from './skinRowShape'
+import {
+  layerEntryShapeProblems,
+  signatureRowShapeProblems,
+  skinRowShapeProblems,
+} from './skinRowShape'
 
 export interface SkinTable {
   /** Each kind's layer ids, sorted. */
   layers: Readonly<Record<SkinLayerKind, readonly string[]>>
   /** Sorted by species id. */
   skins: readonly SkinRow[]
+  /** Sorted by planet index. */
+  signatures: readonly SignatureSkinRow[]
   /** Each palette id's ramp. */
   ramps: ReadonlyMap<string, PaletteRamp>
 }
 
-/** What the guards measure skins against: each species' pool and hue slot colour. */
+/** What the guards measure skins against: each species' pool and hue slot colour, each signature. */
 export interface SkinGuardContext {
   poolBySpecies: ReadonlyMap<string, string>
   hueColourBySpecies: ReadonlyMap<string, Rgb>
+  signatureByPlanet: ReadonlyMap<number, SignatureMaterial>
 }
 
 type Raw = Record<string, unknown>
@@ -41,6 +57,7 @@ export function skinGuardContext(materials: MaterialTable = MATERIALS): SkinGuar
   return {
     poolBySpecies: new Map(materials.materials.map((material) => [material.id, material.pool])),
     hueColourBySpecies: hueColourBySpeciesOf(materials),
+    signatureByPlanet: signatureMaterialsByPlanet(),
   }
 }
 
@@ -52,6 +69,7 @@ export function skinTableProblems(raw: unknown, context: SkinGuardContext): stri
   if (!hasListsOfTable(file)) {
     return [`skins and layers.${SKIN_LAYER_KINDS.join(', layers.')} must be lists`]
   }
+  if (!hasSignatureList(file)) return ['signatures must be a list when given']
   const shapeProblems = fileShapeProblems(file)
   if (shapeProblems.length > 0) return shapeProblems
   return crossRowProblems(tableOf(file), context)
@@ -79,11 +97,18 @@ function hasListsOfTable(file: Raw): boolean {
   return Array.isArray(file.skins) && SKIN_LAYER_KINDS.every((kind) => Array.isArray(layers[kind]))
 }
 
+function hasSignatureList(file: Raw): boolean {
+  return file.signatures === undefined || Array.isArray(file.signatures)
+}
+
 function fileShapeProblems(file: Raw): string[] {
   const layers = file.layers as Record<SkinLayerKind, Raw[]>
   return [
     ...SKIN_LAYER_KINDS.flatMap((kind) => layerListProblems(layers[kind], kind)),
     ...(file.skins as Raw[]).flatMap((row, at) => skinRowShapeProblems(row, `skins[${at}]`)),
+    ...signatureRowsOf(file).flatMap((row, at) =>
+      signatureRowShapeProblems(row, `signatures[${at}]`),
+    ),
   ]
 }
 
@@ -92,7 +117,8 @@ function crossRowProblems(table: SkinTable, context: SkinGuardContext): string[]
     ...unknownSpeciesProblems(table.skins, context),
     ...twoSkinProblems(table.skins),
     ...unknownLayerProblems(table),
-    ...poolsOf(context).flatMap((pool) => sharedSkinProblemsOfPool(table.skins, pool, context)),
+    ...signatureSkinProblems(table, context.signatureByPlanet),
+    ...poolsOf(context).flatMap((pool) => sharedSkinProblemsOfPool(table, pool, context)),
     ...rampBodyProblems(table.skins, table.ramps, context.hueColourBySpecies),
   ]
 }
@@ -130,14 +156,33 @@ function unknownLayerProblems(table: SkinTable): string[] {
   )
 }
 
-/** Within a pool, since a planet's species are its pool's (ticket 542). */
+/** Within a pool, since a planet's species are its pool's (ticket 542), with its planets' signatures. */
 function sharedSkinProblemsOfPool(
-  skins: readonly SkinRow[],
+  table: SkinTable,
   pool: string,
   context: SkinGuardContext,
 ): string[] {
-  const ofPool = skins.filter((skin) => context.poolBySpecies.get(skin.species) === pool)
-  return sharedSkinProblems(ofPool.map(skinOfRow)).map((problem) => `${problem} in pool ${pool}`)
+  const worn = [
+    ...speciesSkinsOfPool(table, pool, context),
+    ...signatureSkinsOfPool(table, pool, context),
+  ]
+  return sharedSkinProblems(worn).map((problem) => `${problem} in pool ${pool}`)
+}
+
+function speciesSkinsOfPool(table: SkinTable, pool: string, context: SkinGuardContext): WornSkin[] {
+  return table.skins
+    .filter((skin) => context.poolBySpecies.get(skin.species) === pool)
+    .map((skin) => wornSpeciesSkinOf(skinOfRow(skin)))
+}
+
+function signatureSkinsOfPool(
+  table: SkinTable,
+  pool: string,
+  context: SkinGuardContext,
+): WornSkin[] {
+  return table.signatures
+    .filter((row) => context.signatureByPlanet.get(row.planet)?.pool === pool)
+    .map((row) => wornSignatureSkinOf(row.planet, layersOfRow(row)))
 }
 
 function poolsOf(context: SkinGuardContext): string[] {
@@ -152,8 +197,15 @@ function tableOf(file: Raw): SkinTable {
       SKIN_LAYER_KINDS.map((kind) => [kind, layers[kind].map((entry) => entry.id).sort()]),
     ) as Record<SkinLayerKind, string[]>,
     skins: (file.skins as SkinRow[]).map((row) => ({ ...row })).sort(bySpecies),
+    signatures: (signatureRowsOf(file) as SignatureSkinRow[])
+      .map((row) => ({ ...row }))
+      .sort((a, b) => a.planet - b.planet),
     ramps: new Map(palettes.map((palette) => [palette.id, palette.ramp])),
   }
+}
+
+function signatureRowsOf(file: Raw): Raw[] {
+  return (file.signatures ?? []) as Raw[]
 }
 
 /** Code-unit order, as the kernel registries sort, so every machine lists the same skins. */

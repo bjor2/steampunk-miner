@@ -5,13 +5,22 @@ import { readAuthorityState } from '../../../store/authorityLink'
 import { resetGameStore, useGameStore } from '../../../store/gameStore'
 import { freshPlanetParamsFor } from '../../../systems/world/planetParams'
 import { planetRosterOf, planetSpeciesOf } from '../../roster'
-import type { SkinRow } from './skinLayers'
-import { planetSkinProblems, planetSkinsOf, seenSkinOf, skinOfSpecies } from './mineralSkin'
+import { oreTierOf } from '../../ores'
+import type { SignatureSkinRow, SkinRow } from './skinLayers'
+import {
+  planetSkinProblems,
+  planetSkinsOf,
+  seenSignatureSkinOf,
+  seenSkinOf,
+  signatureSkinOf,
+  skinOfSpecies,
+} from './mineralSkin'
 import type { SkinTable } from './skinTable'
 
 // The layered skin generator of ticket 591 (#576): a skin stacks the four layers its species' row
 // chooses, a planet's skins follow its roster through its pool (ticket 542), and a player sees a
-// skin only once they have met the species (ticket 546).
+// skin only once they have met the species (ticket 546). A planet's signature material wears its
+// planet's signature skin, seen once its ore is met (ticket 603).
 
 const SEED = 83921
 
@@ -26,23 +35,36 @@ function skinRow(species: string, base = 'granular'): SkinRow {
 }
 
 /** A table literal, past the loader's guards, so the planet check is tried on its own. */
-function tableOf(skins: readonly SkinRow[]): SkinTable {
+function tableOf(
+  skins: readonly SkinRow[],
+  signatures: readonly SignatureSkinRow[] = [],
+): SkinTable {
   const layers = { base: ['glassy', 'granular'], vein: ['brass-thread'], palette: ['umber'] }
-  return { layers: { ...layers, sheen: ['dull'] }, skins, ramps: new Map() }
+  return { layers: { ...layers, sheen: ['dull'] }, skins, signatures, ramps: new Map() }
+}
+
+function signatureRow(planet: number, base = 'granular'): SignatureSkinRow {
+  return { planet, base, vein: 'brass-thread', palette: 'umber', sheen: 'dull' }
 }
 
 /** A codex stand-in that has met exactly the listed species. */
 function metSlice(speciesIds: readonly string[]): SliceDefinition {
+  return metKeysSlice(speciesIds.map((id) => `material:${id}`))
+}
+
+/** A codex stand-in that has discovered exactly the listed keys. */
+function metKeysSlice(keys: readonly string[]): SliceDefinition {
   return {
     id: 'met-probe',
     register: (r) =>
       r.discovery({
         id: 'met-probe.discovery',
-        hasDiscovered: (_state, _playerId, key) =>
-          speciesIds.some((id) => key === `material:${id}`),
+        hasDiscovered: (_state, _playerId, key) => keys.includes(key),
       }),
   }
 }
+
+const RELIC_ON_4 = `relic_t${oreTierOf(4, 5, 0)}`
 
 describe('mineral skin generator', () => {
   beforeEach(() => resetGameStore())
@@ -104,6 +126,42 @@ describe('mineral skin generator', () => {
     withRegistrations([metSlice([met])], () => {
       expect(seenSkinOf(state, playerId, params, 1, table)?.speciesId).toBe(met)
       expect(seenSkinOf(state, playerId, params, 2, table)).toBeNull()
+    })
+  })
+
+  it("dresses the planet's signature material in its planet's row", () => {
+    const table = tableOf([], [signatureRow(4)])
+    expect(signatureSkinOf(freshPlanetParamsFor(SEED, 4), table)).toEqual({
+      planetIndex: 4,
+      oreTypeId: RELIC_ON_4,
+      layers: [
+        { kind: 'base', id: 'granular' },
+        { kind: 'vein', id: 'brass-thread' },
+        { kind: 'palette', id: 'umber' },
+        { kind: 'sheen', id: 'dull' },
+      ],
+    })
+    expect(signatureSkinOf(freshPlanetParamsFor(SEED, 3), table)).toBeNull()
+  })
+
+  it('names a signature that shares all four layers with a species of its planet', () => {
+    const params = freshPlanetParamsFor(SEED, 4)
+    const species = speciesIdAt(4, 11)
+    expect(planetSkinProblems(params, tableOf([skinRow(species)], [signatureRow(4)]))).toEqual([
+      `the signature of planet 4 shares base granular, vein brass-thread, palette umber, sheen dull with ${species}`,
+    ])
+    const apart = tableOf([skinRow(species)], [signatureRow(4, 'glassy')])
+    expect(planetSkinProblems(params, apart)).toEqual([])
+  })
+
+  it('shows the signature skin only once the player has met its ore', () => {
+    const table = tableOf([], [signatureRow(4)])
+    const params = freshPlanetParamsFor(SEED, 4)
+    const state = readAuthorityState()
+    const { playerId } = useGameStore.getState()
+    expect(seenSignatureSkinOf(state, playerId, params, table)).toBeNull()
+    withRegistrations([metKeysSlice([`ore:${RELIC_ON_4}`])], () => {
+      expect(seenSignatureSkinOf(state, playerId, params, table)?.oreTypeId).toBe(RELIC_ON_4)
     })
   })
 })
