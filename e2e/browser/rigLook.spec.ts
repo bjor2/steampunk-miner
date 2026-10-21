@@ -2,11 +2,14 @@
  * The rig look ladder in the browser (#577): each upgrade track's look steps up at its first
  * threshold of `rigLook.json` and keeps changing on every purchase above its top step, painted as
  * glows on the car's own parts, so the frame stays inside #38's 150 draw calls; the boiler's step
- * swaps in its twin-drum look part (ticket 583). Asserted through `steampunkDebug`, never pixels;
- * the boiler's screenshots are attached for review.
+ * swaps in its twin-drum look part (ticket 583), and each hull step lays its armour over the pod,
+ * hiding no rig part, while the hull plaque names the owned step and grades the tail (ticket 585).
+ * Asserted through `steampunkDebug` and test ids, never pixels; the boiler's and the hull's
+ * screenshots are attached for review.
  */
 import { expect, test, type Page } from '@playwright/test'
 import type { DebugApi } from '../../src/debug/debugApi'
+import { WORKSHOP_TEST_IDS } from '../../src/features/workshop/ui/testIds'
 
 declare global {
   interface Window {
@@ -109,12 +112,12 @@ const VIEWPORTS = [
   { name: 'phone', width: 360, height: 780 },
 ]
 
-interface BoilerReading {
+interface PartsReading {
   lookPartIds: string[]
   partIds: string[]
 }
 
-function boilerReadingOf(page: Page): Promise<BoilerReading> {
+function vehiclePartsOf(page: Page): Promise<PartsReading> {
   return page.evaluate(() => {
     const parts = window.steampunkDebug!.vehicleParts()
     if (!parts.ok) throw new Error('no vehicle parts')
@@ -129,11 +132,11 @@ test.describe('boiler rig look (ticket 583)', () => {
     }) => {
       await page.setViewportSize(viewport)
       const errors = await openGame(page)
-      const readings: BoilerReading[] = []
+      const readings: PartsReading[] = []
       for (const purchases of BOILER_COUNTS) {
         await setUpgrade(page, 'boiler', purchases)
         await expect.poll(async () => (await rigLookOf(page, 'boiler')).purchases).toBe(purchases)
-        readings.push(await boilerReadingOf(page))
+        readings.push(await vehiclePartsOf(page))
         await test.info().attach(`boiler ${purchases}, ${viewport.name}`, {
           body: await page.screenshot(),
           contentType: 'image/png',
@@ -144,6 +147,93 @@ test.describe('boiler rig look (ticket 583)', () => {
       for (const reading of readings.slice(1)) {
         expect(reading.lookPartIds).toContain(BOILER_LOOK_PART)
         expect(reading.partIds.some((id) => /^t\d-boiler$/.test(id))).toBe(false)
+      }
+      expect(errors).toEqual([])
+    })
+  }
+})
+
+/**
+ * Each hull step (Systems' table on #157) with Progression's name, the purchase before the first,
+ * and two tail points above the top step (ticket 585).
+ */
+const HULL_COUNTS: readonly { purchases: number; part: string | null; fitting: string | null }[] = [
+  { purchases: 19, part: null, fitting: null },
+  { purchases: 20, part: 'riveted-plate', fitting: 'Fitting: Riveted plate' },
+  { purchases: 80, part: 'banded-iron', fitting: 'Fitting: Banded iron' },
+  { purchases: 140, part: 'brass-trimmed-armour', fitting: 'Fitting: Brass-trimmed armour' },
+  { purchases: 260, part: 'layered-armour', fitting: 'Fitting: Layered armour' },
+  { purchases: 440, part: 'filigree-armour', fitting: 'Fitting: Filigree armour' },
+  { purchases: 441, part: 'filigree-armour', fitting: 'Fitting: Filigree armour · Grade 1' },
+  { purchases: 540, part: 'filigree-armour', fitting: 'Fitting: Filigree armour · Grade 100' },
+]
+
+/** The tail grades the plaque must fit at 360 px (VS on #579): in full to 9999, then cut. */
+const HULL_GRADES = [1, 101, 9_999, 1_000_000]
+const HULL_TOP_STEP = 440
+const HULL_FITTING = `[data-testid="${WORKSHOP_TEST_IDS.plaqueFitting('hull')}"]`
+const HULL_PLAQUE = '[data-plaque="hull"]'
+
+async function openAtTheWorkshop(page: Page): Promise<string[]> {
+  const errors = await openGame(page)
+  await page.evaluate(() => {
+    const debug = window.steampunkDebug!
+    for (const result of [debug.giveMoney('1e9'), debug.teleportToDock('upgrade')]) {
+      if (!result.ok) throw new Error(result.problems.join('; '))
+    }
+  })
+  await expect(page.locator(HULL_PLAQUE)).toBeAttached({ timeout: 60_000 })
+  return errors
+}
+
+/** How far the fitting fact runs past its plaque's right edge, in CSS pixels (0: inside it). */
+async function fittingOverflowOf(page: Page): Promise<number> {
+  const plaque = await page.locator(HULL_PLAQUE).boundingBox()
+  const fitting = await page.locator(HULL_FITTING).boundingBox()
+  if (plaque === null || fitting === null) throw new Error('the hull plaque is not laid out')
+  return Math.max(0, fitting.x + fitting.width - (plaque.x + plaque.width))
+}
+
+test.describe('hull rig look (ticket 585)', () => {
+  for (const viewport of VIEWPORTS) {
+    test(`lays each hull armour over the pod and names it on the plaque, ${viewport.name}`, async ({
+      page,
+    }) => {
+      await page.setViewportSize(viewport)
+      const errors = await openAtTheWorkshop(page)
+      const rigParts: string[][] = []
+      for (const { purchases, part, fitting } of HULL_COUNTS) {
+        await setUpgrade(page, 'hull', purchases)
+        await expect.poll(async () => (await rigLookOf(page, 'hull')).purchases).toBe(purchases)
+        const reading = await vehiclePartsOf(page)
+        rigParts.push(reading.partIds)
+        const hullLooks = reading.lookPartIds.filter((id) => id.startsWith('vehicle-look-hull/'))
+        expect(hullLooks).toEqual(part === null ? [] : [`vehicle-look-hull/${part}`])
+        if (fitting === null) await expect(page.locator(HULL_FITTING)).toHaveCount(0)
+        else await expect(page.locator(HULL_FITTING)).toHaveText(fitting)
+        await test.info().attach(`hull ${purchases}, ${viewport.name}`, {
+          body: await page.screenshot(),
+          contentType: 'image/png',
+        })
+      }
+      for (const parts of rigParts) expect(parts).toEqual(rigParts[0])
+      expect(errors).toEqual([])
+    })
+
+    test(`fits the hull tail grade at 1, 101, 9999 and 1e6 on the plaque, ${viewport.name}`, async ({
+      page,
+    }) => {
+      await page.setViewportSize(viewport)
+      const errors = await openAtTheWorkshop(page)
+      for (const grade of HULL_GRADES) {
+        await setUpgrade(page, 'hull', HULL_TOP_STEP + grade)
+        await expect(page.locator(HULL_FITTING)).toContainText('· Grade ')
+        await page.locator(HULL_PLAQUE).scrollIntoViewIfNeeded()
+        expect(await fittingOverflowOf(page), `grade ${grade}`).toBeLessThanOrEqual(1)
+        await test.info().attach(`hull grade ${grade}, ${viewport.name}`, {
+          body: await page.screenshot(),
+          contentType: 'image/png',
+        })
       }
       expect(errors).toEqual([])
     })
