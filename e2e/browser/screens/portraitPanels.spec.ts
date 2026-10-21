@@ -12,7 +12,6 @@ import { TREE_TEST_IDS } from '../../../src/features/tech-tree/ui/nodeTestIds'
 import { DESIGN_TOKENS } from '../../../src/systems/views/designSystem'
 import { SHEET_UI_IDS } from '../../../src/ui/sheet/sheetIds'
 import { UI_IDS } from '../../../src/ui/ids'
-import { SHEET_UI_IDS } from '../../../src/ui/sheet/sheetIds'
 import {
   boxOf,
   currentCell,
