@@ -7,12 +7,14 @@
  * sighting rows. The epic and mythic trip clamp prices every unit that reaches the hold
  * (`orePickup`, ticket 509), keeps its ledger in the `ores.rarity-trip` section and resets it at the
  * dock and on a rescue (protocol 82). The planet registry's rows give world generation each planet's
- * radius (`planetRadius`, ticket 643).
+ * radius (`planetRadius`, ticket 643) and the hazard pockets of planets 2 to 5 (`hazardPockets`,
+ * ticket 652).
  */
 import type { SliceDefinition } from '../../registries/sliceDefinition'
 import { oresDebugActions } from './debug'
 import { oreReportRows } from './oreReportRows'
 import { kernelOreAliases } from './systems/kernelOreAliases'
+import { HAZARD_POCKETS_PROVIDER } from './systems/hazardPockets'
 import { oreLeadHook } from './systems/leadRoll'
 import { PLANET_RADIUS_PROVIDER } from './systems/planetRadiusProvider'
 import { oreTypeProvider } from './systems/oreTypeProvider'
@@ -25,6 +27,7 @@ export const slice: SliceDefinition = {
     r.oreTypes(oreTypeProvider)
     r.generationHook(oreLeadHook)
     r.planetRadius(PLANET_RADIUS_PROVIDER)
+    r.hazardPockets(HAZARD_POCKETS_PROVIDER)
     r.discoveryAliases(kernelOreAliases())
     r.orePickup(RARITY_PICKUP_PROVIDER)
     r.saveSection(RARITY_TRIP_SECTION)

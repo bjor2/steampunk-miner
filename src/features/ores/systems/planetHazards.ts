@@ -16,7 +16,7 @@
  *   tag, a full stop, one clause, no digits, at most `CARD_LINE_CHARACTERS` so it wraps to two
  *   lines on the 360 px card. Ticket 654 shows it keyed by this row.
  *
- * Nothing generates or shows a hazard yet: ticket 652 paints the pockets and ticket 654 the card.
+ * The pockets lie in the ground from ticket 652 (`hazardPockets.ts`); ticket 654 shows the card.
  */
 import { hazardKindProblems, isWholeBetween } from './hazardKinds'
 import type { PlanetRows } from './planetRows'

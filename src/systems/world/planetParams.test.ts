@@ -13,7 +13,9 @@ import {
   DEPTH_CURVE_ORE_RULES,
   freshPlanetParamsFor,
   freshRadiusTilesOf,
+  HAZARD_POCKET_ORE_RULES,
   isDepthCurvePlanet,
+  isHazardPocketPlanet,
   ORE_RULES_FROM_PLANET,
   ORE_RULES_VERSION,
   planetParamsFor,
@@ -156,11 +158,25 @@ describe('planet params ore rules (ticket 445)', () => {
     expect(Object.keys(stamped).at(-1)).toBe('oreRulesVersion')
   })
 
-  it('stamps fresh planet 1 with ore rules 2 and planet 2 on with rules 7 (446, 448, #453, 625, 632, 643)', () => {
+  it('stamps fresh planet 1 with ore rules 2 and planet 2 on with rules 8 (446, 448, #453, 625, 632, 643, 652)', () => {
     const stamps = [1, 2, 3, 4, 60].map((index) => freshPlanetParamsFor(1, index).oreRulesVersion)
     expect(ORE_RULES_FROM_PLANET).toBe(1)
-    expect(ORE_RULES_VERSION).toBe(7)
-    expect(stamps).toEqual([2, 7, 7, 7, 7])
+    expect(ORE_RULES_VERSION).toBe(8)
+    expect(stamps).toEqual([2, 8, 8, 8, 8])
+  })
+
+  it('holds hazard pockets only on a planet from 2 entered under ore rules 8 (ticket 652)', () => {
+    expect(HAZARD_POCKET_ORE_RULES).toBe(ORE_RULES_VERSION)
+    const isPocketPlanet = (planet: number, rules?: number) =>
+      isHazardPocketPlanet(planetParamsFor(83921, planet, rules))
+    expect([2, 3, 5, 60].map((planet) => isPocketPlanet(planet, 8))).toEqual([
+      true,
+      true,
+      true,
+      true,
+    ])
+    expect([1, 2, 5].map((planet) => isPocketPlanet(planet, 7))).toEqual([false, false, false])
+    expect([isPocketPlanet(1, 8), isPocketPlanet(3)]).toEqual([false, false])
   })
 
   it('still reads a planet stamped with ore rules 1 (ticket 445)', () => {
@@ -242,7 +258,9 @@ describe('planet params radius from the planet registry (ticket 643)', () => {
   })
 
   it('stamps fresh planets with the rules that read the registry, from planet 2', () => {
-    expect(RADIUS_ROWS_ORE_RULES).toBe(ORE_RULES_VERSION)
+    expect(freshPlanetParamsFor(83921, 2).oreRulesVersion).toBeGreaterThanOrEqual(
+      RADIUS_ROWS_ORE_RULES,
+    )
     const radii = underThreeRows(() => [2, 3, 4].map((planet) => freshRadiusTilesOf(planet)))
     expect(radii).toEqual([450, 520, radiusForPlanet(4)])
     expect(underThreeRows(() => freshPlanetParamsFor(83921, 3).radiusTiles)).toBe(520)

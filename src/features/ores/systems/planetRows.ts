@@ -19,7 +19,7 @@
  * - `hazard`: the planet's own hazard (ticket 651, `planetHazards.ts`), on planets 2 to 5 and never
  *   on planet 1; its kind is a row of `planets.hazards` (`hazardKinds.ts`).
  *
- * World generation reads the radius from ticket 643; the hazards wait for ticket 652.
+ * World generation reads the radius from ticket 643 and the hazard pockets from ticket 652.
  */
 import { hazardCapsOf, hazardKindsOf, type HazardCaps, type HazardKinds } from './hazardKinds'
 import { planetHazardOf, planetHazardProblems, type PlanetHazard } from './planetHazards'

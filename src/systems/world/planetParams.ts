@@ -20,6 +20,10 @@
  * (`registries/planetRadii.ts`, the rows of ticket 642), and the core, the bands and every depth
  * placed by band follow it. A planet with no row, and every planet stamped earlier, keeps #6's
  * ladder (`radiusForPlanet`), so a save never regenerates and the ladder stays a versioned path.
+ *
+ * From ore rules 8 (ticket 652, spec #647) planets 2 to 5 hold their registry row's hazard pockets
+ * (`registries/hazardPockets.ts`): a read of the planet and the cell, never a repaint, so the cells
+ * stay byte-identical, while a planet a save holds under rules 7 or earlier meets no pocket.
  */
 import { hashCell } from '../cellRandom'
 import { ECONOMY } from '../economy/economy'
@@ -101,10 +105,11 @@ export interface PlanetParams {
  * per ore patch (ticket 446), 3 the depth density curve from planet 3 (ticket 448), 4 the mixed
  * kinds table's roster from planet 3 (#453), 5 the pinned surface layer from planet 2 (ticket 625),
  * 6 planet 2's own species pool on the legacy kind slots (ticket 632), 7 the planet registry's radius
- * from planet 2 (ticket 643). The stamp records the ground rules a planet was entered under, its
+ * from planet 2 (ticket 643), 8 the planet registry's hazard pockets from planet 2 (ticket 652). The
+ * stamp records the ground rules a planet was entered under, its
  * rock's hardness, its species pool and its size with them.
  */
-export const ORE_RULES_VERSION = 7
+export const ORE_RULES_VERSION = 8
 
 /** The ore rules that add the depth density curve (ticket 448). */
 export const DEPTH_CURVE_ORE_RULES = 3
@@ -124,6 +129,12 @@ export const RADIUS_ROWS_ORE_RULES = 7
 /** Planet 1's row is the ladder's 300 tiles, so the registry radius first changes planet 2. */
 const RADIUS_ROWS_FIRST_PLANET = 2
 
+/** The ore rules that hold each planet's hazard pockets (ticket 652). */
+export const HAZARD_POCKET_ORE_RULES = 8
+
+/** Planet 1 holds no hazard and stays byte-identical, so the pockets first change planet 2 (651). */
+const HAZARD_POCKET_FIRST_PLANET = 2
+
 /**
  * The first planet each ore rules version changes, version 1 first: the rarity rows from P3 (the
  * `ores` slice's `mixedRowsFromPlanet`), the roster from P1 (TD ruling on ticket 446, section 4),
@@ -131,7 +142,8 @@ const RADIUS_ROWS_FIRST_PLANET = 2
  * mixed roster where the mixed rows start (#453: P1 and P2 keep the legacy roster), the surface
  * layer from planet 2 (ticket 625: P1 stays byte-identical), P2's species pool (ticket 632, the
  * `ores` slice's `poolsBeforeOreRules`: an older P2 keeps the legacy species), the registry radius
- * from planet 2 (ticket 643: P1's row is its ladder radius).
+ * from planet 2 (ticket 643: P1's row is its ladder radius), the hazard pockets from planet 2
+ * (ticket 652: P1 holds no hazard).
  */
 const ORE_RULES_FIRST_PLANETS: readonly number[] = [
   3,
@@ -141,6 +153,7 @@ const ORE_RULES_FIRST_PLANETS: readonly number[] = [
   SURFACE_LAYER_FIRST_PLANET,
   P2_SPECIES_POOL_FIRST_PLANET,
   RADIUS_ROWS_FIRST_PLANET,
+  HAZARD_POCKET_FIRST_PLANET,
 ]
 
 /** The first planet any ore rules change, so the first a fresh session stamps: planet 1. */
@@ -190,8 +203,8 @@ export function planetParamsFor(
 /**
  * The ore rules a planet entered now is stamped with: the newest version that changes it, none
  * before `ORE_RULES_FROM_PLANET`. Planet 1 stays on rules 2, which the curve, the surface layer,
- * P2's pool and the registry radius leave as they were, so its sessions and digests do not move with
- * tickets 448, 625, 632, 643.
+ * P2's pool, the registry radius and the hazard pockets leave as they were, so its sessions and
+ * digests do not move with tickets 448, 625, 632, 643, 652.
  */
 export function oreRulesVersionOnEntry(planetIndex: number): number | undefined {
   const changing = ORE_RULES_FIRST_PLANETS.map((first, at) => (planetIndex >= first ? at + 1 : 0))
@@ -206,6 +219,12 @@ export function isDepthCurvePlanet(
 ): boolean {
   const isUnderCurveRules = (oreRulesVersion ?? 0) >= DEPTH_CURVE_ORE_RULES
   return isUnderCurveRules && planetIndex >= ECONOMY.planets.depthDensity.fromPlanet
+}
+
+/** Whether a planet may hold hazard pockets (ticket 652): rules 8 or later, from planet 2. */
+export function isHazardPocketPlanet(params: PlanetParams): boolean {
+  const isUnderPocketRules = (params.oreRulesVersion ?? 0) >= HAZARD_POCKET_ORE_RULES
+  return isUnderPocketRules && params.planetIndex >= HAZARD_POCKET_FIRST_PLANET
 }
 
 /** Whether a planet's rock follows the pinned surface layer (ticket 625): rules 5 or later. */
