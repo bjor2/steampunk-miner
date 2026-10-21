@@ -1143,6 +1143,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/physics/levelLegDeadStop.lane.test.ts` | 16 | 1 |
 | `src/physics/levelReleaseTrace.lane.test.ts` | 2 | 2 |
 | `src/physics/liveFixedStep.test.ts` | 7 | 7 |
+| `src/physics/materialPopSideBySide.test.ts` | 50 | 9 |
 | `src/physics/physicsStats.test.ts` | 3 | 3 |
 | `src/physics/postCutHalo.test.ts` | 9 | 3 |
 | `src/physics/storedLevelReleaseTrace.lane.test.ts` | 2 | 2 |

@@ -823,6 +823,13 @@ incomePerHour}` go to `balance-report/drill-pace.ndjson`, which `pushTestMetrics
   rare shown per 0.25 s, frame cost printed). `src/systems/render/sprayPool.test.ts` holds the
   pool's 24 reserved slots, and `src/scene/materialPops.test.ts` drills a cell in B and A and
   asserts the hold, events and digest equal. `ui.getSprayStats().stats.pops` reads the thinning.
+- **Material pop A beside B** (ticket 617, #442): `src/physics/materialPopSideBySide.test.ts` rides
+  #570's probe row (straight down on planet 1 through the live loop) at L1, L20 and the 84 m/s rig,
+  30 and 144 fps, once per mode. Both modes keep #570's bars (gap ≤ 0.10 m, no whole-cell drop,
+  L20 descent/cut ≥ 0.891), the body and the digest match tick for tick (so #514's authority cost
+  is the same), every B pop starts 0 or 1 tick after its cell's carve tick, A starts none, and the
+  intake's cost per carved batch is printed. 840 and 8400 m/s are `it.todo` until a live rig
+  reaches them; `popRows.test.ts` covers those speeds on the intake alone.
 - **Known red** (ticket 419, the TD on #396 section 2): `CAMPAIGN_PACING_KNOWN_RED`
   (`src/constants/knownRed.ts`) is the one exported known-red marker in the repo (lanes and specs
   keep local ones with a ruling, as `subStepFloor.test.ts` kept #558's until ticket 558): one gate
