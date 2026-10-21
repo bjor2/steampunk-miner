@@ -197,6 +197,18 @@ the phone's top keep-out and stick zone, these reserved boxes (dashed brass) and
 controls are left out, as above. The reserved layout is the budget the rebuild fills (11.66% at
 360x640, 4.27% at 1440x900); the measured share is today's HUD until #684 replaces it.
 
+**The strip as built** (#684): the gauges, readouts and status panels are gone; `HudStrip` (a
+`strip` box) holds the three bars (`kit/GaugeBar.tsx`), the heat line, one number (money on
+`kit/Odometer.tsx` with the next-upgrade chip on the surface, depth underground) and the status
+row, all read from `hudStripOf` (`systems/views/hudStrip.ts`). `EdgeGauge` is the `edge-gauge` box.
+The gear button is the `gear` box at the slot cell's size (44 px on a phone, under the kit's
+coarse 56 px `--control-min`, so it fits between the band's foot and the touch cluster at
+360x640, the cluster's foot moved to the layout margin there); it opens `HudDetail`, a plate that
+is a mode, not a box, with every exact value and word the panels showed, their ids unchanged. The
+"DEBUG RUN" mark labels a debug run, not the player's HUD, and carries no box. Measured headless
+with the #682 report (debug build, after undocking): **11.58% at 360x640** on the pad with the dock
+prompt up, 8.32% two tiles down, nothing in the band; **4.79% at 1280x800**.
+
 **In CSS** (#682): every token a style sheet can use is a custom property in
 `src/ui/kit/tokens.css` (named by `designTokenCss.ts`, held to the JSON by
 `designTokenCss.test.ts`). The shell writes

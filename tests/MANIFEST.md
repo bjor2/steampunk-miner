@@ -1058,7 +1058,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/input/preferences.test.ts` | 24 | 24 |
 | `src/systems/input/promptLabel.test.ts` | 8 | 8 |
 | `src/systems/input/touchBindings.test.ts` | 16 | 16 |
-| `src/systems/input/touchControls.test.ts` | 25 | 18 |
+| `src/systems/input/touchControls.test.ts` | 26 | 19 |
 
 ### `logging`
 
@@ -1422,6 +1422,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/store/domainEventBroadcast.test.ts` | 3 | 3 |
 | `src/store/gameStore.test.ts` | 26 | 26 |
 | `src/store/hintSlice.test.ts` | 15 | 15 |
+| `src/store/hudDetailSlice.test.ts` | 4 | 4 |
 | `src/store/inputRuntime.test.ts` | 51 | 51 |
 | `src/store/ledgerToast.test.ts` | 5 | 5 |
 | `src/store/liveStepSlice.test.ts` | 22 | 22 |
@@ -1550,9 +1551,9 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | File | Tests | Sites |
 | --- | --- | --- |
 | `src/ui/hud/hudBoxes.test.ts` | 8 | 5 |
-| `src/ui/hud/hudCompact.test.ts` | 8 | 8 |
-| `src/ui/hud/hudPanels.test.ts` | 6 | 6 |
-| `src/ui/hud/hudRows.test.ts` | 7 | 7 |
+| `src/ui/hud/hudPanels.test.ts` | 5 | 5 |
+| `src/ui/hud/hudRows.test.ts` | 6 | 6 |
+| `src/ui/hud/hudStripView.test.ts` | 15 | 15 |
 | `src/ui/hud/hudText.test.ts` | 6 | 6 |
 | `src/ui/iconCoverage.test.ts` | 9 | 9 |
 | `src/ui/kit/itemCard.test.ts` | 13 | 13 |
@@ -1653,11 +1654,12 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/views/holdTrackNote.test.ts` | 5 | 5 |
 | `src/systems/views/hudCallouts.test.ts` | 8 | 8 |
 | `src/systems/views/hudClearView.test.ts` | 18 | 15 |
-| `src/systems/views/hudCompact.test.ts` | 5 | 5 |
+| `src/systems/views/hudCompact.test.ts` | 3 | 3 |
 | `src/systems/views/hudCoverageBudget.test.ts` | 24 | 14 |
 | `src/systems/views/hudCoverageReport.test.ts` | 10 | 9 |
 | `src/systems/views/hudModel.test.ts` | 27 | 27 |
 | `src/systems/views/hudStaging.test.ts` | 6 | 6 |
+| `src/systems/views/hudStrip.test.ts` | 19 | 19 |
 | `src/systems/views/itemCardElement.test.ts` | 7 | 7 |
 | `src/systems/views/itemCardText.test.ts` | 5 | 5 |
 | `src/systems/views/itemCopyBudget.test.ts` | 7 | 7 |

@@ -559,7 +559,8 @@
       "paths": [
         "src/ui/kit/**",
         "src/ui/sheets/**",
-        "src/ui/hud/HudBanner.tsx",
+        "src/ui/hud/DetailStatus.tsx",
+        "src/ui/hud/StripStatuses.tsx",
         "src/ui/platform/BayHeader.tsx",
         "src/ui/platform/MoneyCounter.tsx",
         "src/ui/ScreenButtonView.module.css",
@@ -657,7 +658,7 @@
       "specs": ["e2e/browser/hud/hudCoverage.spec.ts"]
     },
     {
-      "why": "The UI screenshot suite (ticket 689): the HUD on the surface and drilling, and every sheet, at 360x640, 390x844, 1280x800 and 1440x900, failing on overflow, a target under 44 px, coverage over budget or a box in the middle band. Anything the HUD, the coverage report or a sheet draws reaches it.",
+      "why": "The UI screenshot suite (ticket 689): the HUD on the surface (with money at 1e15, ticket 684) and drilling, and every sheet, at 360x640, 390x844, 1280x800 and 1440x900, failing on overflow, a target under 44 px, coverage over budget or a box in the middle band. Anything the HUD, the coverage report or a sheet draws reaches it.",
       "paths": [
         "src/ui/hud/**",
         "src/ui/touch/**",
@@ -675,6 +676,15 @@
         "src/systems/views/hudCoverageReport.ts",
         "src/systems/views/designSystem.ts",
         "src/systems/views/screenLayout.ts",
+        "src/systems/views/hudStrip.ts",
+        "src/systems/views/nextUpgradeChip.ts",
+        "src/systems/views/warningLadder.ts",
+        "src/systems/views/odometer.ts",
+        "src/store/hudDetailSlice.ts",
+        "src/ui/kit/GaugeBar.tsx",
+        "src/ui/kit/GaugeBar.module.css",
+        "src/ui/kit/Odometer.tsx",
+        "src/ui/kit/Odometer.module.css",
         "src/features/workshop/ui/**",
         "src/features/tech-tree/ui/**",
         "src/features/power-up-core/ui/**"
