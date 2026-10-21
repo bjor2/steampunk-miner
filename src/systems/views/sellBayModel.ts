@@ -1,6 +1,7 @@
 /**
- * `selectSellBayModel` (#37 Sell bay screen): the shop rows from #33 (tier, family, amount, unit
- * value, line value, Sell, Sell all), the player's ready Refinery batches with Collect (#105), the
+ * `selectSellBayModel` (#37 Sell bay screen): the Hold row, the hold's units and sale value with
+ * the button that opens the Hold tab of the base sheet, where #33's sale by tier and Sell all now
+ * live (ticket 688), the player's ready Refinery batches with Collect (#105), the
  * visit's lining bill with what it paid and what leaving forgives (#128), Recharge with its cost,
  * and "Sell, repair and recharge" with its exact total (refined batches included) as the focused
  * default, under the shared header and footer. A pure function of the authority replica and the
@@ -27,14 +28,16 @@ import { KERNEL_ITEMS } from '../registries/kernelItems'
 import { serviceCardOf, type ItemCardModel } from './itemCardModel'
 import type { FocusStop } from './menuFocus'
 import { UI_IDS } from './screenIds'
+import { holdTotalsOf } from './holdSheet'
+import { KERNEL_SHEET_TAB_IDS } from './kernelSheetTabIds'
 import { liningPanelOf, type LiningPanel } from './liningPanel'
 import { refinedPanelOf, type RefinedPanel } from './refinedPanel'
-import { shopPanelOf, type ShopPanel } from './shopPanel'
 import {
   amountReading,
   priceReading,
   commandButton,
   statReading,
+  uiButton,
   withIcon,
   type AmountReading,
   type ScreenButton,
@@ -58,9 +61,16 @@ export interface QuickServiceReading {
   card: ItemCardModel
 }
 
+/** The hold at a glance, and the button that opens the Hold tab to sell it (ticket 688). */
+export interface HoldRow {
+  cargoTotalText: string
+  value: AmountReading
+  open: ScreenButton
+}
+
 export interface SellBayModel {
   header: BayHeader
-  shop: ShopPanel
+  hold: HoldRow
   /** Null before the platform has the Refinery bay (#105). */
   refined: RefinedPanel | null
   /** Null while the vehicle has no lining bill (#128). */
@@ -82,28 +92,36 @@ export function selectSellBayModel(
   playerId: string,
   ui: BayUiState,
 ): SellBayModel {
-  const shop = shopPanelOf(state, playerId)
+  const hold = holdRowOf(state, playerId)
   const refined = refinedPanelOf(state, playerId)
   const charging = chargingPanelOf(state, playerId)
   const quickService = quickServiceOf(state, playerId, ui)
   const footer = bayFooterOf(state, playerId, ui)
   return {
     header: bayHeaderOf(state, playerId, 'sell'),
-    shop,
+    hold,
     refined,
     lining: liningPanelOf(state, playerId),
     charging,
     quickService,
     footer,
-    focusStops: sellBayFocusStops(shop, refined, charging, quickService, footer),
+    focusStops: sellBayFocusStops(hold, refined, charging, quickService, footer),
     buttons: [
-      ...shopButtonsOf(shop),
+      hold.open,
       ...refinedButtonsOf(refined),
       charging.recharge,
       quickService.button,
       ...footerButtonsOf(footer),
     ],
   }
+}
+
+function holdRowOf(state: AuthorityState, playerId: string): HoldRow {
+  const open = uiButton(UI_IDS.sellbayHold, 'Open', {
+    kind: 'openSheet',
+    tabId: KERNEL_SHEET_TAB_IDS.hold,
+  })
+  return { ...holdTotalsOf(state, playerId), open: withIcon(open, buttonIconIdOf('sell')) }
 }
 
 function chargingPanelOf(state: AuthorityState, playerId: string): ChargingPanel {
@@ -155,12 +173,8 @@ function refinedButtonsOf(refined: RefinedPanel | null): ScreenButton[] {
   return refined === null ? [] : [refined.collect]
 }
 
-function shopButtonsOf(shop: ShopPanel): ScreenButton[] {
-  return [...shop.rows.map((row) => row.sell), shop.sellAll]
-}
-
 function sellBayFocusStops(
-  shop: ShopPanel,
+  hold: HoldRow,
   refined: RefinedPanel | null,
   charging: ChargingPanel,
   quickService: QuickServiceReading,
@@ -168,7 +182,7 @@ function sellBayFocusStops(
 ): FocusStop[] {
   return [
     stopIn('quick')(quickService.button),
-    ...shopButtonsOf(shop).map(stopIn('shop')),
+    stopIn('hold')(hold.open),
     ...refinedButtonsOf(refined).map(stopIn('refined')),
     stopIn('charging')(charging.recharge),
     ...footerButtonsOf(footer).map(stopIn('footer')),

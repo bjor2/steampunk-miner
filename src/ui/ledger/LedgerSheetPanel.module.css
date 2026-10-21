@@ -1,0 +1,74 @@
+/*
+ * The Ledger on the base sheet (ticket 688): the pause menu's save page as was, its slots in the
+ * sheet's one scroll area instead of a scroll area of their own.
+ */
+.ledger {
+  font-family: var(--font-mono);
+}
+
+.name {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin-bottom: var(--space-2);
+}
+
+.nameField {
+  flex: 1;
+  /* A text field is a target too: the 44 px floor, 56 on touch (#173, #470), border included. */
+  box-sizing: border-box;
+  min-height: var(--control-min);
+  padding: var(--space-1) var(--space-2);
+  border: 1px solid var(--color-brass);
+  border-radius: var(--radius-panel);
+  background: var(--color-bg);
+  color: var(--color-parchment);
+  font: inherit;
+}
+
+.nameField:focus-visible {
+  outline: var(--focus-ring);
+  outline-offset: var(--focus-ring-offset);
+}
+
+.slots {
+  margin: 0 0 var(--space-2);
+  padding: 0;
+  list-style: none;
+}
+
+.slot {
+  padding: 2px 0;
+}
+
+/* Save or Overwrite beside Scrap; wraps under the title on a narrow phone. */
+.slotButtons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1);
+}
+
+/* Ticket 704: the Scrap question under its row; a 40-character name wraps, never overflows. */
+.scrapQuestion {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-1) var(--space-2);
+  padding: var(--space-1) 0;
+}
+
+.question {
+  flex: 1 1 12rem;
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+/* An empty slot reads in italics, by shape and never dimmer than the readable floor (#422). */
+.slot[data-empty] [data-ui-text] > span {
+  font-style: italic;
+}
+
+.notice {
+  margin: var(--space-1) 0;
+}

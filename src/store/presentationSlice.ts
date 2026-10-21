@@ -54,7 +54,7 @@ import { menuScreenOf, type ScreenSources } from './screenModels'
 import { screenIdProblems, winningScreenId } from '../ui/registries/screens'
 import type { TitleMenuActions } from './titleMenuSlice'
 import type { SaveKeepingActions } from './saveKeepingSlice'
-import type { SheetValues } from './sheetSlice'
+import type { SheetActions, SheetValues } from './sheetSlice'
 import type { VehicleReplica } from './vehicleReplica'
 
 export interface PresentationValues {
@@ -178,7 +178,8 @@ type SliceHost = PresentationValues &
   PauseMenuActions &
   TitleMenuActions &
   Pick<SaveKeepingActions, 'exportSave' | 'importSave'> &
-  ScreenSources & { vehicle: VehicleReplica } & Pick<SheetValues, 'openSheetTabId'>
+  ScreenSources & { vehicle: VehicleReplica } & Pick<SheetValues, 'openSheetTabId'> &
+  Pick<SheetActions, 'openSheet'>
 
 type SetSlice = (partial: Partial<PresentationValues>) => void
 
@@ -346,6 +347,7 @@ function runButtonAction(state: SliceHost, action: ButtonAction): void {
   else if (action.kind === 'resetBindings') state.resetBindings()
   else if (action.kind === 'exportSave') state.exportSave()
   else if (action.kind === 'importSave') void state.importSave()
+  else if (action.kind === 'openSheet') state.openSheet(action.tabId)
   else runMenuAction(state, action)
 }
 

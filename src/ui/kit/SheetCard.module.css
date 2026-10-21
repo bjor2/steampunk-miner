@@ -27,6 +27,12 @@
   outline-offset: var(--focus-ring-offset);
 }
 
+/* The menu's focus from the pad or the keys (ticket 688): the screen buttons' double frame. */
+.card[data-focused] {
+  outline: 3px double var(--color-brass);
+  outline-offset: 2px;
+}
+
 .head {
   display: flex;
   align-items: center;
@@ -72,6 +78,7 @@
 }
 
 .card[data-revealed] .reveal,
+.card[data-focused] .reveal,
 .card:focus-visible .reveal {
   grid-template-rows: 1fr;
   opacity: 1;

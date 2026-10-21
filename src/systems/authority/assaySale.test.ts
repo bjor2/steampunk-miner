@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { toCanonical } from '../money'
-import { shopPanelOf } from '../views/shopPanel'
+import { holdSheetOf } from '../views/holdSheet'
 import type { DomainEvent } from './domainEvent'
 import { serviceQuote } from './platformServices'
 import {
@@ -47,9 +47,9 @@ describe('selling with assay_beacon (#46)', () => {
     expect(soldValueOf(events)).toMatchObject({ value: '3e+1' })
   })
 
-  it('shows the lifted unit value on the shop row and in the sell-all quote', () => {
+  it('shows the lifted unit value on the Hold card and in the sell-all quote', () => {
     const session = dockedWithThreeOre(true)
-    const [row] = shopPanelOf(session.state(), 'p1').rows
+    const [row] = holdSheetOf(session.state(), 'p1').tiers
     expect(row).toMatchObject({ tier: 1, isAssayed: true, unitValue: { exact: '2.25e+1' } })
     expect(toCanonical(serviceQuote(session.state(), 'p1').saleValue)).toBe('6.75e+1')
   })

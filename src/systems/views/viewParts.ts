@@ -32,6 +32,8 @@ export type ButtonAction =
   /** Settings' save file (ticket 479): the session's last save out, or a picked file in. */
   | { kind: 'exportSave' }
   | { kind: 'importSave' }
+  /** Opens the base sheet on a tab (ticket 688: the Sell bay's Hold row opens the Hold). */
+  | { kind: 'openSheet'; tabId: string }
   /** The pause menu (ticket 404): Resume, its save page, a slot's save or overwrite's first press. */
   | { kind: 'closePauseMenu' }
   | { kind: 'openSaveSlots' }

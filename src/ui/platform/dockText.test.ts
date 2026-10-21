@@ -52,7 +52,8 @@ describe('dock text budget (spec #422, pass #427)', () => {
   it('keeps every Sell bay price on its element, never in a tooltip', () => {
     sellBayMarkupOf(withLiningBill(sessionWithReadyBatch()))
     const lines = everyRecordedLine()
-    expect(lines.filter((line) => line.holds === 'price').length).toBeGreaterThan(5)
+    // The quick total, the charging price and cost and the lining bill; ore prices are the Hold's (ticket 688).
+    expect(lines.filter((line) => line.holds === 'price').length).toBeGreaterThanOrEqual(4)
     expect(lines.filter((line) => line.holds !== undefined && line.tag === 'tooltip')).toEqual([])
   })
 

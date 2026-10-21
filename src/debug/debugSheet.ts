@@ -5,6 +5,7 @@
  */
 import { readShownSheetTabIds } from '../store/screenReads'
 import { useGameStore } from '../store/gameStore'
+import { sheetTabShownOf } from '../store/sheetSlice'
 import { layoutKindOf } from '../systems/views/designSystem'
 import { sheetPlacementOf, type SheetPlacement } from '../systems/views/sheetLayout'
 import { sheetTabIdProblems } from '../ui/registries/sheetTabs'
@@ -12,7 +13,7 @@ import { readFittedScreen } from '../ui/stage/screenFit'
 import type { DebugResult } from './debugScreens'
 
 export interface SheetReading {
-  /** The tab the store holds open; null while the sheet is shut. */
+  /** The tab the sheet shows: the open one, or the Ledger on the pause save page (ticket 688). */
   openTabId: string | null
   /** Every tab the bar shows now, in order. */
   shownTabIds: string[]
@@ -38,7 +39,7 @@ export function sheetNow(): DebugResult<{ sheet: SheetReading }> {
   return {
     ok: true,
     sheet: {
-      openTabId: game.openSheetTabId,
+      openTabId: sheetTabShownOf(game),
       shownTabIds: readShownSheetTabIds(),
       placement: placementNow(),
       revealedCardId: game.revealedSheetCardId,

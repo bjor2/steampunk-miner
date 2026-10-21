@@ -42,17 +42,23 @@ function eventsAfter(session: Session, run: () => void) {
 }
 
 describe('sell bay model', () => {
-  it('lists a row per held tier and values Sell all exactly as the sale pays (#33 acceptance 8)', () => {
+  it('values the Hold row exactly as selling the whole hold pays (#33 acceptance 8)', () => {
     const session = createScriptedSession()
     surfaceOreTiles(4).forEach((tile, index) => mineTile(session, 1 + index * 50, tile))
     session.submit(400, teleportToDockCommand('sell'))
     const model = sellBayOf(session)
-    expect(model.shop.rows.length).toBeGreaterThan(0)
-    expect(model.shop.rows.every((row) => row.family === 'mixed' && row.tier > 0)).toBe(true)
     const [sold] = eventsAfter(session, () => session.submit(401, sellCargoCommand('all'))).filter(
       (event) => event.type === 'ResourceSold',
     )
-    expect(sold.type === 'ResourceSold' && sold.value).toBe(model.shop.sellAllValue.exact)
+    expect(sold.type === 'ResourceSold' && sold.value).toBe(model.hold.value.exact)
+  })
+
+  it('sells nothing itself: its Hold row opens the Hold tab of the sheet (ticket 688)', () => {
+    const model = sellBayOf(dockedSession())
+    expect(model.hold.open.action).toEqual({ kind: 'openSheet', tabId: 'hold' })
+    expect(model.buttons.filter((button) => button.action.kind === 'submit')).not.toContainEqual(
+      expect.objectContaining({ action: { kind: 'submit', intent: sellCargoCommand('all') } }),
+    )
   })
 
   it('totals the quick action as cargo value plus repair plus recharge at current prices', () => {
@@ -80,14 +86,11 @@ describe('sell bay model', () => {
     expect(ids.filter((id) => /upgrade|casing|repair/.test(id))).toEqual([])
   })
 
-  it('carries wrong_bay on its buttons when the vehicle is docked at the Upgrade bay', () => {
+  it('keeps the quick action live when the vehicle is docked at the Upgrade bay (#170)', () => {
     const session = createScriptedSession()
     surfaceOreTiles(2).forEach((tile, index) => mineTile(session, 1 + index * 50, tile))
     session.submit(200, teleportToDockCommand('upgrade'))
-    const model = sellBayOf(session)
-    expect(model.shop.sellAll.reason).toBe('wrong_bay')
-    // The quick action works at both shops (#170).
-    expect(model.quickService.button.reason).toBeNull()
+    expect(sellBayOf(session).quickService.button.reason).toBeNull()
   })
 
   it('says core_short at 62 fragments and ready at 63 with 60.8 money', () => {

@@ -18,6 +18,7 @@ import { selectArtefactChoiceModel } from '../../views/artefactChoiceModel'
 import { bayHeaderOf, footerButtonsOf, type BayUiState } from '../../views/bayFrame'
 import { energyWarningMarkers, selectHudModel, type HudModel } from '../../views/hudModel'
 import { vehicleModeMarkers } from '../../views/hudReadings'
+import { holdSheetOf, type HoldSheet } from '../../views/holdSheet'
 import { selectRefineryBayModel } from '../../views/refineryBayModel'
 import { selectSellBayModel, type SellBayModel } from '../../views/sellBayModel'
 import { selectSettingsModel } from '../../views/settingsModel'
@@ -99,17 +100,18 @@ function upgradeBayIconsOf(model: UpgradeBayModel): string[] {
   ]
 }
 
-function sellBayIconsOf(model: SellBayModel): string[] {
+function sellBayIconsOf({ model, hold }: { model: SellBayModel; hold: HoldSheet }): string[] {
   return [
-    ...model.shop.rows.map((row) => row.iconId),
+    ...hold.tiers.map((card) => card.iconId),
     ...(model.refined?.lines.map((line) => line.iconId) ?? []),
-    ...buttonIcons([model.shop.sellAll, model.charging.recharge, model.quickService.button]),
+    ...buttonIcons([hold.sellAll.sell, model.hold.open]),
+    ...buttonIcons([model.charging.recharge, model.quickService.button]),
     ...buttonIcons(model.refined === null ? [] : [model.refined.collect]),
   ]
 }
 
-/** The Sell bay with ore held, after a planet 3 refine batch is ready (#105). */
-function sellBayWithOreAndRefined(): SellBayModel {
+/** The Sell bay and the Hold with ore held, after a planet 3 refine batch is ready (#105). */
+function sellBayWithOreAndRefined(): { model: SellBayModel; hold: HoldSheet } {
   const session = sessionOnPlanet(3, '1e30')
   session.submit(0, { type: 'debug.setUpgrade', payload: { upgradeId: 'drill_power', level: 250 } })
   session.submit(0, { type: 'debug.setUpgrade', payload: { upgradeId: 'drill_tip', level: 130 } })
@@ -122,9 +124,10 @@ function sellBayWithOreAndRefined(): SellBayModel {
   expect(unresolvedIconIds(refineryIconsOf(refinery), SHIPPED_ART)).toEqual([])
   dockAtBayOf(session, tick + 2 + 180 * 60, REFINERY_SITE, 'sell')
   const sell = selectSellBayModel(session.state(), 'p1', UI)
-  expect(sell.shop.rows.length).toBeGreaterThan(0)
+  const hold = holdSheetOf(session.state(), 'p1')
+  expect(hold.tiers.length).toBeGreaterThan(0)
   expect(sell.refined?.lines.length).toBe(1)
-  return sell
+  return { model: sell, hold }
 }
 
 function refineryIconsOf(model: ReturnType<typeof selectRefineryBayModel>): string[] {
@@ -179,7 +182,7 @@ describe('icon coverage (#158 section 3)', () => {
     expect(unresolvedIconIds(upgradeBayIconsOf(everyUpgradeRow()), SHIPPED_ART)).toEqual([])
   })
 
-  it('gives every Sell and Refinery bay row and button an icon, ore rows by their tier', () => {
+  it('gives every Sell and Refinery bay row, Hold card and button an icon, ore by its tier', () => {
     expect(unresolvedIconIds(sellBayIconsOf(sellBayWithOreAndRefined()), SHIPPED_ART)).toEqual([])
   })
 

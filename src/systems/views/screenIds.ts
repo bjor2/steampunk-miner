@@ -78,9 +78,14 @@ export const UI_IDS = {
   platformCoreBay: 'platform-core-bay',
   platformCoreBayGauge: 'platform-core-bay-gauge',
   platformState: 'platform-state',
-  shopCargoTotal: 'shop-cargo-total',
-  shopSellAll: 'shop-sell-all',
-  shopSellAllValue: 'shop-sell-all-value',
+  /** The Sell bay's Hold row (ticket 688): units, sale value, and the button opening the Hold. */
+  sellbayHoldCargo: 'sellbay-hold-cargo',
+  sellbayHoldValue: 'sellbay-hold-value',
+  sellbayHold: 'sellbay-hold',
+  /** The Ledger tab's content, the pause menu's save page (ticket 688). */
+  ledger: 'ledger',
+  /** The Hold tab's Sell all card (ticket 688). */
+  holdSellAll: 'hold-sell-all',
   workshopRepair: 'workshop-repair',
   chargingEnergy: 'charging-energy',
   chargingPrice: 'charging-price',
@@ -131,8 +136,8 @@ export const UI_ID_TEMPLATES = {
   hudStatus: (status: string) => `hud-status-${status}`,
   hudBar: (gauge: string) => `hud-bar-${gauge}`,
   hudDetailStatus: (status: string) => `hud-detail-status-${status}`,
-  shopRow: (tier: number) => `shop-row-${tier}`,
-  shopSell: (tier: number) => `shop-sell-${tier}`,
+  /** One held tier's Sell card on the Hold tab (ticket 688). */
+  holdSell: (tier: number) => `hold-sell-${tier}`,
   refinerybayOre: (tier: number) => `refinerybay-ore-${tier}`,
   refinerybayQueue: (tier: number) => `refinerybay-queue-${tier}`,
   refinerybaySlot: (index: number) => `refinerybay-slot-${index}`,

@@ -1,10 +1,10 @@
 /**
  * The Sell bay screen (#37): "Sell, repair and recharge" with its exact total (highlighted on the
- * first visit, #16), the shop, the refined batches once the platform has the Refinery bay (#105),
+ * first visit, #16), the Hold row that opens the Hold tab of the base sheet (ticket 688), the refined batches once the platform has the Refinery bay (#105),
  * the visit's lining bill while there is one (#128) and the charging station, each on the shared
  * Title+OneLine element (spec #422, pass #427), in the shared scroll area. Markup only.
  */
-import type { QuickServiceReading, SellBayModel } from '../../systems/views/sellBayModel'
+import type { HoldRow, QuickServiceReading, SellBayModel } from '../../systems/views/sellBayModel'
 import { UI_IDS } from '../ids'
 import { ScrollArea } from '../kit/ScrollArea'
 import { TitleOneLine } from '../kit/TitleOneLine'
@@ -14,8 +14,12 @@ import { ChargingPanel } from './ChargingPanel'
 import { LiningPanel } from './LiningPanel'
 import styles from './Platform.module.css'
 import { RefinedPanel } from './RefinedPanel'
-import { quickServiceElementOf, quickServiceFactsOf } from './sellBayElements'
-import { ShopPanel } from './ShopPanel'
+import {
+  HOLD_ROW_TEXT,
+  holdRowFactsOf,
+  quickServiceElementOf,
+  quickServiceFactsOf,
+} from './sellBayElements'
 
 export function SellBayView({ model, focusedId }: { model: SellBayModel; focusedId: string }) {
   return (
@@ -23,7 +27,7 @@ export function SellBayView({ model, focusedId }: { model: SellBayModel; focused
       <ScrollArea className={styles.panelsFrame}>
         <div className={styles.sellPanels} data-testid={UI_IDS.sellbayScreen}>
           <QuickServiceAction quickService={model.quickService} focusedId={focusedId} />
-          <ShopPanel shop={model.shop} focusedId={focusedId} />
+          <HoldAction hold={model.hold} focusedId={focusedId} />
           {model.refined === null ? null : (
             <RefinedPanel refined={model.refined} focusedId={focusedId} />
           )}
@@ -32,6 +36,16 @@ export function SellBayView({ model, focusedId }: { model: SellBayModel; focused
         </div>
       </ScrollArea>
     </BayFrame>
+  )
+}
+
+function HoldAction({ hold, focusedId }: { hold: HoldRow; focusedId: string }) {
+  return (
+    <TitleOneLine text={HOLD_ROW_TEXT} facts={holdRowFactsOf(hold)}>
+      <span className={styles.action}>
+        <ScreenButtonView button={hold.open} focusedId={focusedId} />
+      </span>
+    </TitleOneLine>
   )
 }
 

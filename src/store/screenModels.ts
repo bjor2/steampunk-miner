@@ -12,6 +12,8 @@ import { selectHudModel, type HudModel } from '../systems/views/hudModel'
 import type { HintBoard } from '../systems/hints/hintBoard'
 import type { TransmissionBoard } from '../systems/hints/transmissionBoard'
 import type { FocusStop } from '../systems/views/menuFocus'
+import { holdSheetOf, type HoldSheet } from '../systems/views/holdSheet'
+import { KERNEL_SHEET_TAB_IDS } from '../systems/views/kernelSheetTabIds'
 import {
   isQuickServiceHighlighted,
   selectPlaqueModel,
@@ -82,6 +84,8 @@ export interface ScreenSources {
   arePlaquesAllowed: boolean
   pauseMenu: PauseMenuState | null
   titleMenu: TitleMenu | null
+  /** The base sheet's open tab (ticket 686); the Hold's cards are its focus stops (ticket 688). */
+  openSheetTabId: string | null
 }
 
 export interface MenuScreen {
@@ -160,6 +164,11 @@ export function pauseMenuModelOf(sources: ScreenSources): PauseMenuModel | null 
   return sources.pauseMenu === null ? null : selectPauseMenuModel(sources.pauseMenu)
 }
 
+/** The Hold tab of the base sheet (ticket 688), as it draws now, docked or not. */
+export function holdSheetModelOf(sources: ScreenSources): HoldSheet {
+  return holdSheetOf(readAuthorityState(), sources.playerId)
+}
+
 export function artefactChoiceModelOf(sources: ScreenSources): ArtefactChoiceModel {
   return selectArtefactChoiceModel(readAuthorityState(), sources.playerId)
 }
@@ -185,6 +194,7 @@ export function menuScreenOf(layer: InputContext, sources: ScreenSources): MenuS
   if (layer === 'settings') return settingsMenu(settingsModelOf(sources))
   if (layer === 'pause') return pauseMenu(pauseMenuModelOf(sources))
   if (layer === 'artefact') return artefactMenu(artefactChoiceModelOf(sources))
+  if (layer === 'sheet') return sheetMenu(sources)
   return NO_MENU
 }
 
@@ -200,6 +210,13 @@ function bayStartFocus(screen: NonNullable<BayScreen>): string {
   if (screen.bay === 'sell') return SELL_BAY_START_FOCUS
   if (screen.bay === 'upgrade') return upgradeBayStartFocus(screen.model)
   return refineryBayStartFocus(screen.model)
+}
+
+/** Only the Hold's Sell cards take menu focus on the sheet; another tab's cards are touch and mouse. */
+function sheetMenu(sources: ScreenSources): MenuScreen {
+  if (sources.openSheetTabId !== KERNEL_SHEET_TAB_IDS.hold) return NO_MENU
+  const { focusStops, buttons } = holdSheetModelOf(sources)
+  return { focusStops, startFocus: focusStops[0].id, buttons }
 }
 
 function settingsMenu(model: SettingsModel): MenuScreen {

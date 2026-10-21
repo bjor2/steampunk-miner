@@ -10,7 +10,7 @@ import { selectTitleMenuModel, type TitleMenu } from '../systems/views/titleMenu
 import { forgetUiTexts, registeredUiTexts, type UiTextLine } from '../systems/views/uiText'
 import { uiTextProblemsOf } from '../systems/views/uiTextBudget'
 import { unregisteredTextsOf } from '../systems/views/unregisteredText'
-import { PauseMenuView } from './pause/PauseMenuView'
+import { LedgerView } from './ledger/LedgerSheetPanel'
 import { SettingsView } from './settings/SettingsView'
 import { TitleMenuView } from './title/TitleMenuView'
 
@@ -81,7 +81,7 @@ describe('menu text budget (spec #422, pass #429)', () => {
     expect(warnings[0].text).toContain('named slots stay')
   })
 
-  it('draws the pause save page with saves and a notice on registered elements only', () => {
+  it('draws the Ledger, the pause save page, with saves and a notice on registered elements only', () => {
     const model = selectPauseMenuModel({
       ...pauseMenuOpenAt(1),
       page: 'save',
@@ -90,7 +90,7 @@ describe('menu text budget (spec #422, pass #429)', () => {
       savedSlot: 'slot-2',
     })
     const markup = markupOf(
-      createElement(PauseMenuView, {
+      createElement(LedgerView, {
         model,
         focusedId: model.startFocus,
         onSaveNameChange: () => undefined,

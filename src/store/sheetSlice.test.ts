@@ -3,7 +3,8 @@ import { beforeEach, describe, expect, it } from 'vitest'
 import { withRegistrations } from '../registries/registrar'
 import type { SliceDefinition } from '../registries/sliceDefinition'
 import { createScriptedSession } from '../systems/authority/scriptedSession'
-import { shownSheetTabsOn, type SheetTab } from '../ui/registries/sheetTabs'
+import { KERNEL_SHEET_TABS, shownSheetTabsOn, type SheetTab } from '../ui/registries/sheetTabs'
+import { sheetTabShownOf } from './sheetSlice'
 import { resetGameStore, useGameStore } from './gameStore'
 
 // The base sheet (spec #678, ticket 686): tabs are registered data, the store holds the open tab
@@ -33,13 +34,23 @@ describe('sheet tabs', () => {
   it('lists the shown tabs in order, then by id', () => {
     const state = createScriptedSession().state()
     const ids = withRegistrations([PROBE], () => shownSheetTabsOn(state, 'p1').map((tab) => tab.id))
-    expect(ids).toEqual(['sheet-probe.outfitter', 'sheet-probe.hold'])
+    expect(ids).toEqual(['sheet-probe.outfitter', 'sheet-probe.hold', 'hold', 'ledger'])
+  })
+
+  it('shows the kernel Hold and Ledger with no slice registered (ticket 688)', () => {
+    const state = createScriptedSession().state()
+    const ids = withRegistrations([], () => shownSheetTabsOn(state, 'p1').map((tab) => tab.id))
+    expect(ids).toEqual(['hold', 'ledger'])
+    expect(KERNEL_SHEET_TABS.map((tab) => tab.title)).toEqual(['Hold', 'Ledger'])
   })
 
   it('leaves a tab off the bar while it says it is not shown', () => {
     const hidden = sliceWith(tabOf('sheet-probe.hold', 1, { isShownOn: () => false }))
     const state = createScriptedSession().state()
-    expect(withRegistrations([hidden], () => shownSheetTabsOn(state, 'p1'))).toEqual([])
+    const ids = withRegistrations([hidden], () =>
+      shownSheetTabsOn(state, 'p1').map((tab) => tab.id),
+    )
+    expect(ids).not.toContain('sheet-probe.hold')
   })
 
   it('refuses a tab title over the three-word budget at the seal', () => {
@@ -102,5 +113,77 @@ describe('sheet', () => {
     game().pressSheetCard('sheet-probe.drill', 'touch')
     game().closeSheet()
     expect({ money: game().money, vehicle: game().vehicle }).toEqual(before)
+  })
+})
+
+/** The pause save page's slot list settles after the checkpoint reads it. */
+const settle = () => new Promise((resolve) => setTimeout(resolve, 0))
+
+describe('ledger on the sheet (ticket 688)', () => {
+  it('opens the pause menu on its save page when the Ledger is picked, so the world holds', async () => {
+    game().openSheet('ledger')
+    await settle()
+    expect(game().pauseMenu?.page).toBe('save')
+    expect(sheetTabShownOf(game())).toBe('ledger')
+    expect(game().openSheetTabId).toBeNull()
+  })
+
+  it('shows the Ledger exactly while the pause menu is on its save page', async () => {
+    game().openPauseMenu()
+    expect(sheetTabShownOf(game())).toBeNull()
+    await game().openSaveSlots()
+    expect(sheetTabShownOf(game())).toBe('ledger')
+    game().stepBackInPauseMenu()
+    expect(game().pauseMenu?.page).toBe('main')
+    expect(sheetTabShownOf(game())).toBeNull()
+  })
+
+  it("steps back to the pause menu's first page when the Ledger's Close is pressed", async () => {
+    game().openPauseMenu()
+    await game().openSaveSlots()
+    game().closeSheet()
+    expect(game().pauseMenu?.page).toBe('main')
+    expect(sheetTabShownOf(game())).toBeNull()
+  })
+
+  it('leaves the pause menu, so the world runs again, when the Hold is picked from the Ledger', async () => {
+    game().openPauseMenu()
+    await game().openSaveSlots()
+    game().openSheet('hold')
+    expect(game().pauseMenu).toBeNull()
+    expect(sheetTabShownOf(game())).toBe('hold')
+  })
+
+  it('closes the Ledger with the pause menu', async () => {
+    game().openPauseMenu()
+    await game().openSaveSlots()
+    game().closePauseMenu()
+    expect(sheetTabShownOf(game())).toBeNull()
+  })
+})
+
+describe('hold on the sheet (ticket 688)', () => {
+  it('opens the Hold from the Sell bay row button', () => {
+    game().teleportToDock('sell')
+    expect(game().pressScreenButton('sellbay-hold')).toBe(true)
+    expect(game().openSheetTabId).toBe('hold')
+  })
+
+  it('puts the pad and the keys on the Hold cards, where a refused Sell changes nothing', () => {
+    game().teleportToDock('sell')
+    game().openSheet('hold')
+    game().moveFocus(1)
+    expect(game().focusedControlId).toBe('hold-sell-all')
+    const money = game().money
+    expect(game().pressScreenButton('hold-sell-all')).toBe(false)
+    expect(game().money).toBe(money)
+  })
+
+  it('gives no menu focus on another tab of the sheet', () => {
+    withRegistrations([PROBE], () => {
+      game().openSheet('sheet-probe.hold')
+      game().moveFocus(1)
+      expect(game().focusedControlId || null).toBeNull()
+    })
   })
 })

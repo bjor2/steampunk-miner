@@ -12,6 +12,7 @@ import type { MusicMoment } from '../systems/audio/musicLayers'
 import type { HudModel } from '../systems/views/hudModel'
 import type { PlaqueModel } from '../systems/views/plaqueModel'
 import type { SellBayModel } from '../systems/views/sellBayModel'
+import type { HoldSheet } from '../systems/views/holdSheet'
 import type { UpgradeBayModel } from '../systems/views/upgradeBayModel'
 import type { RefineryBayModel } from '../systems/views/refineryBayModel'
 import type { SettingsModel } from '../systems/views/settingsModel'
@@ -33,6 +34,7 @@ import { inputLayerOf } from './presentationSlice'
 import {
   artefactChoiceModelOf,
   bayScreenOf,
+  holdSheetModelOf,
   hudModelOf,
   pauseMenuModelOf,
   plaqueModelOf,
@@ -77,6 +79,11 @@ export function readShownSheetTabIds(): string[] {
 /** The Sell bay's model, as it would draw now, docked there or not. */
 export function readSellBayModel(): SellBayModel {
   return sellBayModelOf(useGameStore.getState())
+}
+
+/** The Hold tab (ticket 688), as it would draw now, docked or not. */
+export function readHoldSheetModel(): HoldSheet {
+  return holdSheetModelOf(useGameStore.getState())
 }
 
 /** The Upgrade bay's model, as it would draw now, docked there or not. */

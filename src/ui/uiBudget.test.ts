@@ -100,8 +100,7 @@ function pauseMenuMarkup(): string {
   game().openPauseMenu()
   const model = openedModelOf(readPauseMenuModel(), 'pause menu')
   const focusedId = focusOnScreen(model.focusStops, null, model.startFocus)
-  const onSaveNameChange = game().setPauseSaveName
-  return renderToString(createElement(PauseMenuView, { model, focusedId, onSaveNameChange }))
+  return renderToString(createElement(PauseMenuView, { model, focusedId }))
 }
 
 function settingsMarkup(): string {

@@ -6,6 +6,7 @@ import { createRunLog, installRunLog, uninstallRunLog } from '../logging/runLog'
 import { resetGameStore, useGameStore } from '../store/gameStore'
 import { pressAction, releaseAction, resetInput } from '../store/inputRuntime'
 import {
+  readHoldSheetModel,
   readHudModel,
   readPlaqueModel,
   readSellBayModel,
@@ -45,6 +46,7 @@ import { selectHudModel, type HudModel } from '../systems/views/hudModel'
 import { hudStripOf } from '../systems/views/hudStrip'
 import type { BayFooter, BayHeader } from '../systems/views/bayFrame'
 import { selectSellBayModel, type SellBayModel } from '../systems/views/sellBayModel'
+import { holdSheetOf } from '../systems/views/holdSheet'
 import { selectUpgradeBayModel, type UpgradeBayModel } from '../systems/views/upgradeBayModel'
 import { selectRefineryBayModel, type RefineryBayModel } from '../systems/views/refineryBayModel'
 import {
@@ -66,6 +68,8 @@ import { LedgerToastView } from './save/LedgerToast'
 import { UnsavedChipView } from './save/UnsavedChip'
 import { SettingsView } from './settings/SettingsView'
 import { PauseMenuView } from './pause/PauseMenuView'
+import { LedgerView } from './ledger/LedgerSheetPanel'
+import { HoldSheetView } from './hold/HoldSheetPanel'
 import {
   pauseMenuOpenAt,
   selectPauseMenuModel,
@@ -236,13 +240,13 @@ function bayFrameTexts(header: BayHeader, footer: BayFooter): Partial<Record<UiI
 }
 
 function sellBayTexts(model: SellBayModel): Partial<Record<UiId, string | null>> {
-  const { shop, charging, quickService } = model
+  const { hold, charging, quickService } = model
   return {
     ...bayFrameTexts(model.header, model.footer),
     [UI_IDS.sellbayScreen]: null,
-    [UI_IDS.shopCargoTotal]: shop.cargoTotalText,
-    [UI_IDS.shopSellAll]: shop.sellAll.label,
-    [UI_IDS.shopSellAllValue]: shop.sellAllValue.text,
+    [UI_IDS.sellbayHoldCargo]: hold.cargoTotalText,
+    [UI_IDS.sellbayHoldValue]: hold.value.text,
+    [UI_IDS.sellbayHold]: hold.open.label,
     [UI_IDS.chargingEnergy]: charging.energyText,
     [UI_IDS.chargingPrice]: charging.price.text,
     [UI_IDS.chargingCost]: charging.cost.text,
@@ -337,7 +341,12 @@ function pauseMenuTexts(model: PauseMenuModel): Partial<Record<UiId, string | nu
       ...notice,
     }
   }
-  return { [UI_IDS.pauseSaveName]: null, [UI_IDS.pauseBack]: model.back.label, ...notice }
+  return {
+    [UI_IDS.ledger]: null,
+    [UI_IDS.pauseSaveName]: null,
+    [UI_IDS.pauseBack]: model.back.label,
+    ...notice,
+  }
 }
 
 function artefactChoiceTexts(model: ArtefactChoiceModel): Partial<Record<UiId, string | null>> {
@@ -398,6 +407,14 @@ function renderSellBay(): string[] {
   const model = readSellBayModel()
   const element = createElement(SellBayView, { model, focusedId: 'platform-quick-service' })
   return checkScreen(element, sellBayTexts(model))
+}
+
+/** The Hold tab of the base sheet (ticket 688): its Sell all card is there with an empty hold. */
+function renderHold(): string[] {
+  const hold = readHoldSheetModel()
+  return checkScreen(createElement(HoldSheetView, { hold, focusedId: null }), {
+    [UI_IDS.holdSellAll]: null,
+  })
 }
 
 function renderUpgradeBay(): string[] {
@@ -465,7 +482,7 @@ function renderSettings(): string[] {
   )
 }
 
-/** The pause menu's first page, then its save page with a notice (ticket 404). */
+/** The pause menu's first page, then its save page with a notice, the Ledger (tickets 404, 688). */
 function renderPauseMenu(): string[] {
   const onSaveNameChange = () => undefined
   const main = selectPauseMenuModel(pauseMenuOpenAt(1))
@@ -477,11 +494,11 @@ function renderPauseMenu(): string[] {
   })
   return [
     ...checkScreen(
-      createElement(PauseMenuView, { model: main, focusedId: main.startFocus, onSaveNameChange }),
+      createElement(PauseMenuView, { model: main, focusedId: main.startFocus }),
       pauseMenuTexts(main),
     ),
     ...checkScreen(
-      createElement(PauseMenuView, { model: save, focusedId: save.startFocus, onSaveNameChange }),
+      createElement(LedgerView, { model: save, focusedId: save.startFocus, onSaveNameChange }),
       pauseMenuTexts(save),
     ),
   ]
@@ -712,6 +729,7 @@ function expectEveryIdRendered(): void {
   game().giveMoney('60.8')
   game().pressScreenButton('platform-travel')
   keep(renderSellBay())
+  keep(renderHold())
   keep(renderUpgradeBay())
   game().setBindings({ lift: { keyboard: ['KeyE'] } })
   // No file transfer is installed here, so the export is refused and its problem line shows.
@@ -772,22 +790,13 @@ describe('screen ids (#33 acceptance 12)', () => {
     expect(html).not.toContain('data-item-card')
   })
 
-  it('carries the tier and family on every shop row', () => {
+  it('draws a Sell card per held tier on the Hold, each carrying its sell id', () => {
     const session = sessionWithOre(4)
     session.submit(400, teleportToDockCommand('sell'))
-    const model = selectSellBayModel(session.state(), 'p1', {
-      isTravelArmed: false,
-      isQuickServiceHighlighted: false,
-      focusedId: null,
-      installingUpgradeId: null,
-    })
-    const html = renderToString(createElement(SellBayView, { model, focusedId: '' }))
-    const rows = [...html.matchAll(/data-testid="shop-row-\d+"[^>]*/g)]
-    expect(rows.length).toBe(model.shop.rows.length)
-    expect(rows.length).toBeGreaterThan(0)
-    for (const row of rows) {
-      expect(row[0]).toMatch(/data-tier="\d+"/)
-      expect(row[0]).toMatch(/data-family="mixed"/)
-    }
+    const hold = holdSheetOf(session.state(), 'p1')
+    const html = renderToString(createElement(HoldSheetView, { hold, focusedId: null }))
+    const cards = [...html.matchAll(/data-testid="hold-sell-(\d+)"/g)].map(([, tier]) => tier)
+    expect(cards.length).toBeGreaterThan(0)
+    expect(cards).toEqual(hold.tiers.map((card) => String(card.tier)))
   })
 })

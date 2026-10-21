@@ -39,7 +39,11 @@ describe('debug api: base sheet (ticket 686)', () => {
       expect(ui().openSheet('sheet-probe.hold')).toEqual({ ok: true })
       const reading = ui().getSheet()
       expect(reading.ok && reading.sheet.openTabId).toBe('sheet-probe.hold')
-      expect(reading.ok && reading.sheet.shownTabIds).toEqual(['sheet-probe.hold'])
+      expect(reading.ok && reading.sheet.shownTabIds).toEqual([
+        'sheet-probe.hold',
+        'hold',
+        'ledger',
+      ])
       expect(ui().closeSheet()).toEqual({ ok: true })
       const shut = ui().getSheet()
       expect(shut.ok && shut.sheet.openTabId).toBeNull()

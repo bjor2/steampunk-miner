@@ -1,7 +1,8 @@
 /**
  * The Sell bay's panels on the shared Title+OneLine element (spec #422, pass #427): the quick
  * action and Recharge as their kernel item cards (Content's mapping on #422), each shop row,
- * refined batch and lining amount as a title with glyph-and-value facts on the #33 ids. A price
+ * refined batch and lining amount as a title with glyph-and-value facts on the #33 ids, and the
+ * Hold row that opens the Hold tab of the base sheet, where ore is sold since ticket 688. A price
  * stays a visible fact; what a bare number means moves from its old label to the panel's tooltip,
  * so no text is lost.
  */
@@ -9,23 +10,13 @@ import { gaugeIconIdOf, hudLabelIconIdOf } from '../../systems/art/icons/iconSet
 import { itemCardElementOf, type ItemCardElement } from '../../systems/views/itemCardElement'
 import type { LiningPanel } from '../../systems/views/liningPanel'
 import type { RefinedLine, RefinedPanel } from '../../systems/views/refinedPanel'
-import type { ChargingPanel, QuickServiceReading } from '../../systems/views/sellBayModel'
-import type { ShopPanel, ShopRow } from '../../systems/views/shopPanel'
+import type { ChargingPanel, HoldRow, QuickServiceReading } from '../../systems/views/sellBayModel'
 import type { ElementText, UiTextUnderTitle } from '../../systems/views/uiText'
 import { UI_IDS } from '../ids'
 import type { IconValue } from '../kit/TitleOneLine'
 import { moneyFactOf, priceFactOf, titleOnlyTextOf } from './dockFacts'
 
 const UNITS_ICON_ID = gaugeIconIdOf('cargo')
-
-/** The assay glyph on a lifted price (#46), named in full in the row's tooltip. */
-const ASSAY_MARK = '◈'
-
-export const SHOP_HEADING: UiTextUnderTitle = {
-  id: 'dock.shop',
-  oneLine: 'Sell ore by tier, or the whole hold at once.',
-  tooltipLines: ['Each row: units held, price per unit, then the row value.'],
-}
 
 export const CHARGING_HEADING: UiTextUnderTitle = {
   id: 'dock.charging',
@@ -54,27 +45,20 @@ export function quickServiceFactsOf(quickService: QuickServiceReading): IconValu
   return [priceFactOf(quickService.total, UI_IDS.platformQuickTotal)]
 }
 
-export function shopRowTextOf(row: ShopRow): ElementText {
-  const tooltipLines = row.isAssayed ? [`${ASSAY_MARK} Assay Beacon: mid-band price`] : []
-  return { id: `dock.shop.t${row.tier}`, title: `Tier ${row.tier} ore`, oneLine: '', tooltipLines }
+export const HOLD_ROW_TEXT: ElementText = {
+  id: 'dock.hold',
+  title: 'Hold',
+  oneLine: 'Sell ore by tier, or the whole hold at once.',
+  tooltipLines: ['Units held against capacity, then what the hold pays.'],
 }
 
-export function shopRowFactsOf(row: ShopRow): IconValue[] {
-  const unitPrice = priceFactOf(row.unitValue)
-  const shownPrice = row.isAssayed ? `${ASSAY_MARK} ${unitPrice.text}` : unitPrice.text
+export function holdRowFactsOf(hold: HoldRow): IconValue[] {
   return [
-    { iconId: row.iconId, text: String(row.amount) },
-    { ...unitPrice, text: shownPrice },
-    { ...moneyFactOf(row.lineValue), iconId: hudLabelIconIdOf('cargo_value') },
-  ]
-}
-
-export const SHOP_HOLD_TEXT: ElementText = titleOnlyTextOf('dock.shop.hold', 'Hold')
-
-export function shopHoldFactsOf(shop: ShopPanel): IconValue[] {
-  return [
-    { iconId: UNITS_ICON_ID, text: shop.cargoTotalText, testId: UI_IDS.shopCargoTotal },
-    priceFactOf(shop.sellAllValue, UI_IDS.shopSellAllValue),
+    { iconId: UNITS_ICON_ID, text: hold.cargoTotalText, testId: UI_IDS.sellbayHoldCargo },
+    {
+      ...moneyFactOf(hold.value, UI_IDS.sellbayHoldValue),
+      iconId: hudLabelIconIdOf('cargo_value'),
+    },
   ]
 }
 
