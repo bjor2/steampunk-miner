@@ -23,7 +23,7 @@ import type { ItemRef } from '../registries/itemDescriber'
 import { carriedOf, chargesThatFitOf, rackCapacityOf } from '../vehicle/vehicleCharges'
 import { itemCardOf, SHOP_SOURCE, type ItemCardModel } from './itemCardModel'
 import { UI_ID_TEMPLATES, UI_IDS } from './screenIds'
-import { amountReading, commandButton, type AmountReading, type ScreenButton } from './viewParts'
+import { priceReading, commandButton, type AmountReading, type ScreenButton } from './viewParts'
 import { buyStateOf, isBuyOpen, type BuyState, type RowBadge } from './workshopRows'
 
 /** The ids one row's cells carry; the Buy button's is on `buy`. */
@@ -98,7 +98,7 @@ function restockRowOf(state: AuthorityState, playerId: string, size: number): Ch
     charges.isRackMounted ? 'Restock' : 'Buy rack',
     restockChargesCommand(size, Math.max(fitting, 1)),
   )
-  const cost = amountReading(restockPriceOf(state, size, fitting))
+  const cost = priceReading(restockPriceOf(state, size, fitting))
   const label = size === SHIPPED_SIZE ? 'Charges' : `Charges size ${size}`
   return {
     ids: restockRowIdsOf(size),
@@ -134,7 +134,7 @@ function rackRowOf(state: AuthorityState, playerId: string): ChargeRow {
     buyChargeRackSlotCommand(CLICK_CHAIN),
   )
   const capacity = rackCapacityOf(charges)
-  const cost = isTop ? null : amountReading(rackSlotPriceOf(state, playerId))
+  const cost = isTop ? null : priceReading(rackSlotPriceOf(state, playerId))
   return {
     ids: RACK_IDS,
     iconId: CHARGE_RACK_ICON_ID,

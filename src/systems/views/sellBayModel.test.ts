@@ -103,11 +103,13 @@ describe('sell bay model', () => {
     expect(travel).toMatchObject({ state: 'ready', fee: { text: '0' } })
   })
 
-  it('shows the fee the hop would charge: the full 60.75 with money to spare, less when short', () => {
+  it('shows the fee the hop would charge: 60.75 up to 60.8 with money to spare, less when short', () => {
     const session = dockedSession()
     session.submit(2, setCoreFragmentsCommand(63))
     session.submit(2, grantMoneyCommand('1e4'))
-    expect(sellBayOf(session).footer.travel).toMatchObject({ fee: { text: '60.75' } })
+    expect(sellBayOf(session).footer.travel).toMatchObject({
+      fee: { text: '60.8', exact: '6.075e+1' },
+    })
     const short = dockedSession()
     short.submit(2, setCoreFragmentsCommand(63))
     short.submit(2, grantMoneyCommand('1470'))

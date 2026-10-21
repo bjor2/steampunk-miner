@@ -48,7 +48,7 @@ import { focusOnScreen, type FocusStop } from './menuFocus'
 import { UI_IDS } from './screenIds'
 import { upgradePreviewOf, type UpgradePreview } from './upgradePreview'
 import {
-  amountReading,
+  priceReading,
   commandButton,
   withIcon,
   type AmountReading,
@@ -174,7 +174,7 @@ function casingRowOf(state: AuthorityState, playerId: string): CasingRow {
     'Buy',
     buyCasingGradeCommand(CLICK_CHAIN),
   )
-  const cost = amountReading(nextCasingPrice(state, playerId))
+  const cost = priceReading(nextCasingPrice(state, playerId))
   return {
     iconId: CASING_ICON_ID,
     label: 'Casing',
@@ -205,7 +205,7 @@ function repairReadingOf(state: AuthorityState, playerId: string): RepairReading
     commandButton(state, playerId, UI_IDS.workshopRepair, 'Repair', repairHullCommand()),
     iconId,
   )
-  const cost = amountReading(repairCostOf(state, playerId))
+  const cost = priceReading(repairCostOf(state, playerId))
   const service = { item: KERNEL_ITEMS.repair, name: 'Repair', iconId, button, cost }
   return {
     hullText: hullGaugeText(vehicle.hull, statsOfVehicle(vehicle).hullMax),

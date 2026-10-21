@@ -5,7 +5,7 @@ import {
   type ScriptedSession,
 } from '../../../systems/authority/scriptedSession'
 import { stateDigest } from '../../../systems/authority/stateDigest'
-import { formatAmount } from '../../../systems/displayAmount'
+import { formatPrice } from '../../../systems/displayAmount'
 import { bandOrePriceAt } from '../../../systems/economy/bandOreCost'
 import { fromSafeInteger, mul, toCanonical } from '../../../systems/money'
 import { describeItem } from '../../../systems/registries/itemDescriber'
@@ -139,7 +139,7 @@ describe('terrain-tools: stabiliser foam restock (ticket 394)', () => {
       { playerId: 'p1', planetIndex: FOAM_PLANET, level: 1, view },
     )
     const charges = card?.statLines.find((line) => line.label === 'Charges')
-    const price = formatAmount(foamRestockPriceAt(FOAM_PLANET))
+    const price = formatPrice(foamRestockPriceAt(FOAM_PLANET))
     expect(charges?.now).toBe(`1 left; restock ${price} a charge at the Upgrade bay`)
   })
 })

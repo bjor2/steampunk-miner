@@ -56,7 +56,7 @@ import { heatReadingOf, type HeatReading } from './heatReading'
 import { combatStatusStackOf, isCollapseWarnedFor, type CombatStatusStack } from './combatStatuses'
 import { threatMarkersOf, type ThreatMarker } from './threatMarkers'
 import { tileTimeAhead, type TileTime } from './tileTime'
-import { amountReading, type AmountReading } from './viewParts'
+import { amountReading, priceReading, type AmountReading } from './viewParts'
 import { returnReserveUnits } from '../vehicle/returnReserve'
 
 export interface HudSources {
@@ -240,7 +240,7 @@ function cargoGaugeOf(vehicle: VehicleState): CargoReading {
 
 function liningBillOf(vehicle: VehicleState): AmountReading | null {
   if (cmp(vehicle.liningBill, ZERO_MONEY) === 0) return null
-  return amountReading(vehicle.liningBill)
+  return priceReading(vehicle.liningBill)
 }
 
 function energyWarningOf(vehicle: VehicleState, depthTiles: number): EnergyWarning {

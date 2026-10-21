@@ -24,7 +24,7 @@ function plaqueOf(materials: readonly NewMaterial[]): MaterialPlaque {
 describe('popup text', () => {
   it('counts a chip with a times sign', () => {
     expect(chipCountTextOf(12)).toBe('×12')
-    expect(chipCountTextOf(12_345)).toBe('×12,345')
+    expect(chipCountTextOf(12_345)).toBe('×12.3k')
   })
 
   it('names the first material with its family, grade and unit price', () => {

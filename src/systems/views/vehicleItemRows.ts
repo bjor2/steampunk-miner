@@ -11,7 +11,7 @@ import { vehicleItemsOnSale, type VehicleItemOnSale } from '../authority/vehicle
 import { vehicleItemRefOf } from '../registries/kernelItems'
 import { itemCardOf, SHOP_SOURCE, type ItemCardModel } from './itemCardModel'
 import { UI_ID_TEMPLATES } from './screenIds'
-import { amountReading, commandButton, type AmountReading, type ScreenButton } from './viewParts'
+import { priceReading, commandButton, type AmountReading, type ScreenButton } from './viewParts'
 import { buyStateOf, isBuyOpen, type BuyState } from './workshopRows'
 
 export interface VehicleItemRow {
@@ -47,7 +47,7 @@ function vehicleItemRowOf(
     'Buy',
     buyVehicleItemCommand(item.id),
   )
-  const cost = amountReading(offer.price)
+  const cost = priceReading(offer.price)
   return {
     itemId: item.id,
     iconId: item.iconId,

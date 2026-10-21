@@ -30,6 +30,7 @@ import type { FocusStop } from './menuFocus'
 import { UI_IDS } from './screenIds'
 import {
   amountReading,
+  priceReading,
   commandButton,
   uiButton,
   withIcon,
@@ -156,7 +157,7 @@ function travelReadingOf(state: AuthorityState, playerId: string, isArmed: boole
       reason,
       iconId: buttonIconIdOf('travel'),
     },
-    fee: amountReading(travelChargeNow(state, playerId)),
+    fee: priceReading(travelChargeNow(state, playerId)),
     fragmentsText: `${state.platform.coreBay} / ${coreNeededOf(state.planet) ?? 0}`,
     state: reason ?? 'ready',
     isArmed,

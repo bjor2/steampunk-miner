@@ -32,7 +32,7 @@ describe('exact amount', () => {
   it('shows the short text and the whole canonical amount on the sheet', () => {
     const markup = renderToString(createElement(ExactAmountSheetView, { exact: P200_WALLET }))
     expect(markup).toContain(`data-testid="${EXACT_AMOUNT_IDS.sheet}"`)
-    expect(markup).toContain('-1.23e149')
+    expect(markup).toContain('-1e149')
     expect(markup).toMatch(
       new RegExp(
         `data-testid="${EXACT_AMOUNT_IDS.text}"[^>]*>.*${P200_WALLET.replace(/[.+]/g, '\\$&')}`,

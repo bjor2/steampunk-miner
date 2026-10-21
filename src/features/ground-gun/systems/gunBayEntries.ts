@@ -13,7 +13,7 @@ import type { BayEntry, BayEntrySource } from '../../../systems/registries/bayEn
 import type { ItemRef } from '../../../systems/registries/itemDescriber'
 import { itemCardOf, SHOP_SOURCE, type ItemCardModel } from '../../../systems/views/itemCardModel'
 import { UI_ID_TEMPLATES } from '../../../systems/views/screenIds'
-import { amountReading, commandButton, type ScreenButton } from '../../../systems/views/viewParts'
+import { priceReading, commandButton, type ScreenButton } from '../../../systems/views/viewParts'
 import { cardPriceOf } from './boreGunCards'
 import {
   BORE_GUN_KIND,
@@ -79,7 +79,7 @@ function mountEntryOf(state: AuthorityState, playerId: string): BayEntry {
     iconId: part.iconId,
     label: part.label,
     levelText: 'Mount',
-    cost: amountReading(mountPrice()),
+    cost: priceReading(mountPrice()),
     effectText: `${GROUND_GUN.bore.boreRangeBase} cells reach`,
     buy,
     card: cardOf(state, playerId, part, 0, buy),
@@ -102,7 +102,7 @@ function trackEntryOf(
     iconId: part.iconId,
     label: part.label,
     levelText: trackLevelTextOf(level, isMastered),
-    cost: amountReading(shownTrackPriceOf(levels, trackId)),
+    cost: priceReading(shownTrackPriceOf(levels, trackId)),
     effectText: trackEffectTextOf(trackId, level, isMastered),
     buy: isMastered ? null : buy,
     card: cardOf(state, playerId, part, level, buy),
@@ -146,7 +146,7 @@ function cardOf(
     item,
     iconId: part.iconId,
     name: part.label,
-    cost: price === null ? null : amountReading(price),
+    cost: price === null ? null : priceReading(price),
     level,
     buy,
     source: SHOP_SOURCE,

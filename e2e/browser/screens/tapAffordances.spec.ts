@@ -11,7 +11,7 @@ import { EXACT_AMOUNT_IDS } from '../../../src/ui/sheets/exactAmountIds'
 import { skipWhereEngineIsMissing } from '../mobile/mobileHelpers'
 import { currentCell, openGame } from './screenHelpers'
 
-/** A planet-200 wallet whose short text, 1.23e149, hides most of its digits (TD on #470). */
+/** A planet-200 wallet whose short text, 1e149, hides most of its digits (TD on #470). */
 const P200_WALLET = '1.234567890123e149'
 const P200_WALLET_EXACT = '1.234567890123e+149'
 /** The workshop's Repair element: its brass tooltip is Repair's card (pass #425). */
@@ -92,7 +92,7 @@ test.describe('screen matrix: tap-only affordances (ticket 476)', () => {
     const errors = await openGame(page, currentCell())
     await dockWithMoney(page, 'sell', P200_WALLET)
     const money = page.getByTestId('platform-money')
-    await expect(money).toHaveText('1.23e149', { timeout: 30_000 })
+    await expect(money).toHaveText('1e149', { timeout: 30_000 })
     const moneyBox = await money.boundingBox()
     const headerBox = await page.locator('header:has([data-testid="platform-money"])').boundingBox()
     expect(moneyBox).not.toBeNull()

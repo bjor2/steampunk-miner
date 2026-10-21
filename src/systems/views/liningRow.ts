@@ -20,7 +20,7 @@ import { isLiningTypeOwned, type VehicleLining } from '../vehicle/liningType'
 import { liningItemOf } from '../registries/kernelItems'
 import { itemCardOf, SHOP_SOURCE, type ItemCardModel } from './itemCardModel'
 import { UI_IDS } from './screenIds'
-import { amountReading, commandButton, type AmountReading, type ScreenButton } from './viewParts'
+import { priceReading, commandButton, type AmountReading, type ScreenButton } from './viewParts'
 import { buyStateOf, isBuyOpen, type BuyState, type RowBadge } from './workshopRows'
 
 export interface LiningRow {
@@ -59,7 +59,7 @@ export function liningRowOf(state: AuthorityState, playerId: string): LiningRow 
   const lining = liningOf(state, playerId)
   const button = liningButtonOf(state, playerId, lining, offered)
   const isOwned = isLiningTypeOwned(lining, offered)
-  const cost = amountReading(isOwned ? ZERO_MONEY : liningPriceOf(offered))
+  const cost = priceReading(isOwned ? ZERO_MONEY : liningPriceOf(offered))
   return {
     iconId: REFRACTORY_LINING_ICON_ID,
     label: 'Lining',

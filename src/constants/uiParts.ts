@@ -22,13 +22,6 @@ export const TOOLTIP_LINE_WORDS_MAX = 12
  */
 export const FACT_LINE_WORDS_MAX = 12
 
-/**
- * The most characters a money text takes up to 1e999, sign included: `-1.00e149` at planet 200
- * (`formatAmount`, #32). A money slot is at least this wide, so a compact amount never overflows
- * it; the exact amount is a tap away (ticket 476, VS condition 3 on #470).
- */
-export const MONEY_TEXT_CHARS_MAX = 9
-
 /** A mouse resting on an element opens its tooltip after this long ("about 200 ms"). */
 export const TOOLTIP_HOVER_MS = 200
 /** A touch held this long opens the tooltip while held; releasing it fires no action (as #164). */

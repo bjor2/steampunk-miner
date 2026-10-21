@@ -14,7 +14,7 @@ describe('vehicle readout', () => {
 
   it('shows a hull far past a million in short scientific text', () => {
     expect(hullGaugeText(fromCanonical('2.5e400'), fromCanonical('3.141592e400'))).toBe(
-      '2.50e400 / 3.14e400',
+      '2e400 / 3e400',
     )
   })
 })

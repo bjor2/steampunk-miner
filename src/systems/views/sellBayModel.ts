@@ -32,6 +32,7 @@ import { refinedPanelOf, type RefinedPanel } from './refinedPanel'
 import { shopPanelOf, type ShopPanel } from './shopPanel'
 import {
   amountReading,
+  priceReading,
   commandButton,
   statReading,
   withIcon,
@@ -108,7 +109,7 @@ export function selectSellBayModel(
 function chargingPanelOf(state: AuthorityState, playerId: string): ChargingPanel {
   const vehicle = state.players[playerId].vehicle
   const iconId = buttonIconIdOf('recharge')
-  const cost = amountReading(rechargeCostOf(state, playerId))
+  const cost = priceReading(rechargeCostOf(state, playerId))
   const recharge = withIcon(
     commandButton(state, playerId, UI_IDS.chargingRecharge, 'Recharge', rechargeEnergyCommand()),
     iconId,

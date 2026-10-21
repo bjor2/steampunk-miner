@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { moneyShortRejection } from '../authority/platformServices'
-import { formatAmount } from '../displayAmount'
+import { formatAmount, formatPrice } from '../displayAmount'
 import { UPGRADE_IDS } from '../economy/economyDefinition'
 import { stepPrice } from '../economy/upgradePrices'
 import { onCurveSteps } from '../economy/vehicleStats'
@@ -34,14 +34,14 @@ describe('compact HUD numbers (#500, VS)', () => {
   })
 
   it('keeps the widest form the formatter prints within the box: a sign and a four-digit exponent', () => {
-    expect(formatAmount(fromCanonical('-9.99999e+4000'))).toBe('-9.99e4000')
-    expect('-9.99e4000'.length).toBe(COMPACT_VALUE_CHARS_MAX)
+    expect(formatAmount(fromCanonical('-9.99999e+4000'))).toBe('-9e4000')
+    expect('-9e4000'.length).toBeLessThanOrEqual(COMPACT_VALUE_CHARS_MAX)
   })
 
   it('never lets a rounded compact number read as affordable when the exact value is not', () => {
     const price = fromCanonical('1239999')
     const wallet = sub(price, fromCanonical('9999'))
-    expect(formatAmount(wallet)).toBe(formatAmount(price))
+    expect([formatAmount(wallet), formatPrice(price)]).toEqual(['1.23M', '1.24M'])
     expect(moneyShortRejection(wallet, price)?.reason).toBe('money_short')
     expect(moneyShortRejection(price, price)).toBeNull()
   })

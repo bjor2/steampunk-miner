@@ -3,7 +3,7 @@
  * sale paid a lining bill, reads the summed X of the burst's sales, formatted once, and fades out
  * after its hold. Iron grey, not brass: the bill is not money the player can spend.
  */
-import { amountReading } from '../../../systems/views/viewParts'
+import { priceReading } from '../../../systems/views/viewParts'
 import { useSellBurstStore } from '../store/sellBurstStore'
 import { liningBilledOf } from '../systems/liningTag'
 import { trackLiningTag } from './liningTagAnchor'
@@ -15,7 +15,7 @@ export function LiningTag() {
   const phase = useSellBurstStore((state) => state.tagPhase)
   const burst = useSellBurstStore((state) => state.burst)
   if (phase === 'hidden' || burst === null) return null
-  const billed = amountReading(liningBilledOf(burst))
+  const billed = priceReading(liningBilledOf(burst))
   return (
     <span
       ref={trackLiningTag}

@@ -16,7 +16,7 @@ import { KERNEL_ITEMS } from '../registries/kernelItems'
 import { itemCardOf, SHOP_SOURCE, type ItemCardModel } from './itemCardModel'
 import { UI_IDS } from './screenIds'
 import { stepLevelText } from './stepLevelText'
-import { amountReading, commandButton, type AmountReading, type ScreenButton } from './viewParts'
+import { priceReading, commandButton, type AmountReading, type ScreenButton } from './viewParts'
 import { buyStateOf, isBuyOpen, type BuyState, type RowBadge } from './workshopRows'
 
 export interface GunRow {
@@ -50,7 +50,7 @@ export function gunRowOf(state: AuthorityState, playerId: string): GunRow | null
     buyLabelOf(gun),
     buyGunCommand(CLICK_CHAIN),
   )
-  const cost = amountReading(nextGunPriceOf(state, playerId))
+  const cost = priceReading(nextGunPriceOf(state, playerId))
   return {
     iconId: GUN_ICON_ID,
     label: 'Guns',

@@ -46,9 +46,9 @@ describe('compareRuns', () => {
     const b = summaryOf({ runId: 'run_b', moneyEarned: '1e+41' })
     const comparison = compareRuns(a, b)
     expect(comparison.ok && rowNamed(comparison.rows, 'money earned')?.change).toBe(
-      '-1.00e41 (-50%)',
+      '-1.0e41 (-50%)',
     )
-    expect(comparison.ok && rowNamed(comparison.rows, 'income per minute')?.a).toBe('2.00e40')
+    expect(comparison.ok && rowNamed(comparison.rows, 'income per minute')?.a).toBe('2.0e40')
   })
 
   it('shows lining paid next to lining charged and forgiven, so an unpaid share is visible', () => {

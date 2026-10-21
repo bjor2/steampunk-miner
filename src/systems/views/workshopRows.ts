@@ -20,7 +20,7 @@ import { BAND_COUNT } from '../world/planetGeometry'
 import { trackItemOf } from '../registries/kernelItems'
 import { itemCardOf, SHOP_SOURCE, type ItemCardModel } from './itemCardModel'
 import {
-  amountReading,
+  priceReading,
   commandButton,
   statReading,
   type AmountReading,
@@ -126,7 +126,7 @@ function workshopRowOf(
     'Buy',
     buyUpgradeCommand(upgradeId, CLICK_CHAIN),
   )
-  const cost = amountReading(nextUpgradePrice(state, playerId, upgradeId))
+  const cost = priceReading(nextUpgradePrice(state, playerId, upgradeId))
   const iconId = trackIconIdOf(upgradeId)
   const label = TRACK_LABELS[upgradeId]
   return {

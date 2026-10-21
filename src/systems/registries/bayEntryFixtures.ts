@@ -10,7 +10,7 @@ import { fromSafeInteger } from '../money'
 import { buyCasingGradeCommand } from '../platform/platformCommands'
 import { itemCardOf, SHOP_SOURCE } from '../views/itemCardModel'
 import { UI_ID_TEMPLATES } from '../views/screenIds'
-import { amountReading, commandButton } from '../views/viewParts'
+import { priceReading, commandButton } from '../views/viewParts'
 import type { BayEntry, BayEntrySource } from './bayEntries'
 import type { ItemRef } from './itemDescriber'
 
@@ -66,7 +66,7 @@ function bayEntryOf(state: AuthorityState, playerId: string, probe: ProbeEntry):
     'Buy',
     buyCasingGradeCommand(CLICK_CHAIN),
   )
-  const cost = amountReading(PROBE_PRICE)
+  const cost = priceReading(PROBE_PRICE)
   const item = probe.item ?? { kind: 'module', id: probe.entryId }
   return {
     entryId: probe.entryId,

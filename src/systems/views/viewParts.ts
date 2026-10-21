@@ -7,7 +7,7 @@ import type { AuthorityState } from '../authority/authorityState'
 import type { CommandIntent } from '../authority/authorityCommand'
 import { refusalOfIntent } from '../authority/applyCommand'
 import type { RejectionReason } from '../authority/domainEvent'
-import { exactAmount, formatAmount } from '../displayAmount'
+import { exactAmount, formatAmount, formatPrice } from '../displayAmount'
 import type { ActionId } from '../input/actionMap'
 import type { PreferenceName } from '../input/preferences'
 import { floorMilli, fromCanonical, type Money } from '../money'
@@ -66,13 +66,19 @@ export function withIcon(button: ScreenButton, iconId: string): ScreenButton {
   return { ...button, iconId }
 }
 
+/** A balance, an income or a count: the short text rounds toward zero (ticket 681). */
 export function amountReading(amount: Money | number): AmountReading {
   return { text: formatAmount(amount), exact: exactAmount(amount) }
 }
 
+/** A price, a fee or a bill: the short text rounds up, so it never reads cheaper (ticket 681). */
+export function priceReading(amount: Money | number): AmountReading {
+  return { text: formatPrice(amount), exact: exactAmount(amount) }
+}
+
 /**
- * A canonical stat for display: kept to the 3 decimals the formatter shows below 1,000, cut
- * toward zero like the formatter; the exact string stays beside it.
+ * A canonical stat for display: kept to the 3 decimals the formatter shows at most, cut toward
+ * zero like the formatter; the exact string stays beside it.
  */
 export function statReading(canonical: string): AmountReading {
   return { text: formatAmount(floorMilli(fromCanonical(canonical))), exact: canonical }

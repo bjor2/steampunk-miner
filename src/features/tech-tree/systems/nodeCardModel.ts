@@ -8,7 +8,7 @@
  * card on the map's planet ruler.
  */
 import type { AuthorityState } from '../../../systems/authority/authorityState'
-import { formatAmount } from '../../../systems/displayAmount'
+import { formatPrice } from '../../../systems/displayAmount'
 import type { Money } from '../../../systems/money'
 import { markNodeIdOf, markNodeOf, type MarkBearer } from './markNodes'
 import { nodeCost } from './nodeCost'
@@ -81,7 +81,7 @@ const REFUSAL_TEXT: Readonly<Record<TechNodeRefusal, RefusalText>> = {
   held_feature: () => 'Not in the game yet',
   missing_prereq: (node, context) => `Needs: ${missingPrereqNamesOf(node, context).join(', ')}`,
   not_owned: () => 'Own the gear it works with first',
-  money_short: (node) => `Price: ${formatAmount(nodeCost(node))}`,
+  money_short: (node) => `Price: ${formatPrice(nodeCost(node))}`,
 }
 
 const ROMAN_NUMERALS: readonly (readonly [number, string])[] = [
@@ -126,7 +126,7 @@ export function nodeCardOf(node: TreeNode, context: CardContext): NodeCardModel 
     refusal,
     refusalText: refusal === null ? null : REFUSAL_TEXT[refusal](node, context),
     cost: nodeCost(node),
-    costText: formatAmount(nodeCost(node)),
+    costText: formatPrice(nodeCost(node)),
     prereqNames: prereqNamesOf(node, context),
     prereqText: prereqNamesOf(node, context).join(', ') || 'Nothing',
     markChip: markChipOf(node, context),
@@ -208,6 +208,6 @@ function nextMarkOf(bearer: MarkBearer, mark: number, context: CardContext): Nex
   return {
     nodeId: node.id,
     status: statusOf(refusalOf(node, context)),
-    costText: formatAmount(nodeCost(node)),
+    costText: formatPrice(nodeCost(node)),
   }
 }

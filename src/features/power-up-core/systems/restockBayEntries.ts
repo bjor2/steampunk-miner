@@ -17,7 +17,7 @@ import { contentOf } from '../../../systems/registries/content'
 import { vehicleItemRefOf } from '../../../systems/registries/kernelItems'
 import { itemCardOf, SHOP_SOURCE } from '../../../systems/views/itemCardModel'
 import { UI_ID_TEMPLATES } from '../../../systems/views/screenIds'
-import { amountReading, commandButton } from '../../../systems/views/viewParts'
+import { priceReading, commandButton } from '../../../systems/views/viewParts'
 import { chargesLeftOf } from './chargeState'
 import { restockBillOf, type ConsumableRestock, type RestockBill } from './consumableRestock'
 import { powerUpAtMarkOf } from './powerUpMarks'
@@ -55,7 +55,7 @@ function restockEntryOf(
   const intent = restockConsumableIntent(restock.itemId)
   const buyId = UI_ID_TEMPLATES.upgradebayEntryBuy(entryId)
   const buy = commandButton(state, playerId, buyId, 'Restock', intent)
-  const cost = amountReading(shownPriceOf(bill))
+  const cost = priceReading(shownPriceOf(bill))
   return {
     entryId,
     iconId: restock.iconId,

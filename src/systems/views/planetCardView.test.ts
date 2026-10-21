@@ -20,7 +20,7 @@ describe('planet card view', () => {
       ],
     })
     expect(view.lines[0].values).toEqual([
-      { label: 'Toughness', text: '1.23e6 ×' },
+      { label: 'Toughness', text: '1.23M ×' },
       { label: 'Shells', text: '12' },
     ])
   })

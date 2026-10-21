@@ -6,7 +6,7 @@
  * recharge", which it does while `hint_dock` is up (#16: the first visit).
  */
 import { TRANSMISSION_ICON_ID } from '../art/icons/iconSet'
-import { formatAmount } from '../displayAmount'
+import { formatAmount, formatPrice } from '../displayAmount'
 import { isHintShown, hintDefOf, type HintBoard, type ShownHint } from '../hints/hintBoard'
 import { DOCK_HINT_ID, HINT_TABLE, type HintTable } from '../hints/hintTable'
 import type { TransmissionBoard } from '../hints/transmissionBoard'
@@ -95,5 +95,6 @@ function placeholderText(name: string, prompts: PromptSource, shown?: ShownHint)
   if (word !== null) return word
   const cost = shown?.rescueCost
   if (cost === null || cost === undefined) return ''
-  return formatAmount(fromCanonical(name === 'fee' ? cost.fee : cost.cargoLostValue))
+  if (name === 'fee') return formatPrice(fromCanonical(cost.fee))
+  return formatAmount(fromCanonical(cost.cargoLostValue))
 }

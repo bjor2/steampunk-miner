@@ -8,7 +8,7 @@ import type { AuthorityState } from '../authority/authorityState'
 import { liningBilledThisVisit } from '../authority/liningBill'
 import { cmp, ZERO_MONEY, type Money } from '../money'
 import type { VehicleState } from '../vehicle/vehicleState'
-import { amountReading, type AmountReading } from './viewParts'
+import { amountReading, priceReading, type AmountReading } from './viewParts'
 
 export interface LiningPanel {
   billed: AmountReading
@@ -22,7 +22,7 @@ export function liningPanelOf(state: AuthorityState, playerId: string): LiningPa
   const billed = liningBilledThisVisit(vehicle)
   if (cmp(billed, ZERO_MONEY) === 0) return null
   return {
-    billed: amountReading(billed),
+    billed: priceReading(billed),
     paid: amountReading(vehicle.liningPaidThisVisit ?? ZERO_MONEY),
     forgiven: amountReading(forgivenOnLeaving(vehicle)),
   }

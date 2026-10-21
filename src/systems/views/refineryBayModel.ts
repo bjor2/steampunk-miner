@@ -29,6 +29,7 @@ import type { FocusStop } from './menuFocus'
 import { UI_ID_TEMPLATES, UI_IDS } from './screenIds'
 import {
   amountReading,
+  priceReading,
   commandButton,
   withIcon,
   type AmountReading,
@@ -85,7 +86,7 @@ export function selectRefineryBayModel(
   )
   const footer = bayFooterOf(state, playerId, ui)
   const price = nextRefinerySlotPrice(state)
-  const slotPrice = price === null ? null : amountReading(price)
+  const slotPrice = price === null ? null : priceReading(price)
   return {
     header: bayHeaderOf(state, playerId, 'refinery'),
     ore,

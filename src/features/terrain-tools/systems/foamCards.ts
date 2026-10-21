@@ -12,7 +12,7 @@
  * restock's bay entry lists owned foam only.
  */
 import { TICKS_PER_SECOND } from '../../../constants/physics'
-import { formatAmount } from '../../../systems/displayAmount'
+import { formatPrice } from '../../../systems/displayAmount'
 import type { Money } from '../../../systems/money'
 import type { ItemCtx, ItemRef } from '../../../systems/registries/itemDescriber'
 import { hasNoNextLevel, type DescribedStatLineSpec } from '../../descriptions'
@@ -88,7 +88,7 @@ export function foamLineTextAt(line: FoamCardLine, mark: number, stock: FoamStoc
     .replace('{coneRadiusBonus}', `${coneBonusAt(foam, mark)}`)
     .replace('{coneRadiusCap}', `${coneBonusAt(foam, lastMarkOf(markLadderOf(foam)))}`)
     .replace('{charges}', `${stock.chargesLeft}`)
-    .replace('{unitPrice}', formatAmount(stock.unitPrice))
+    .replace('{unitPrice}', formatPrice(stock.unitPrice))
     .replace('{cureMark}', `${foamCureMark()}`)
 }
 
