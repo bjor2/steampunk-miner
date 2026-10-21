@@ -8,11 +8,13 @@
  * A step's part is a `vehicle` part or a part of one of the table's look assets (the rig-look seam,
  * ticket 640: TD ruling on #579), and the `vehicle` slot a look part hides has one owner. A plaque
  * template shows its placeholders once each and names only steps that carry a card (ticket 585).
+ * Step planets rise, one step a planet (ticket 590).
  */
 import { isVehiclePartId } from '../../../systems/art/artIds'
 import { isAttachId } from '../../../systems/registries/vehicleAttach'
 import type { RigLookStepRow, RigLookTail, TrackLookRows } from './render/rigLookIndex'
 import { VEHICLE_LOOK_ASSET_ID } from './render/rigLookFrames'
+import { stepPlanetProblemsOf } from './rigLookPlanets'
 import { plaqueProblemsOf } from './rigLookPlaque'
 
 export interface RigLookTable {
@@ -69,6 +71,7 @@ function trackProblemsOf(
     ...slotProblemsOf(rows),
     ...replacedSlotProblemsOf(rows),
     ...stepProblemsOf(rows),
+    ...stepPlanetProblemsOf(rows),
     ...stepPartProblemsOf(rows, table),
     ...tailProblemsOf(rows),
     ...plaqueProblemsOf(rows),

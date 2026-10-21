@@ -12,6 +12,11 @@
 export interface RigLookStepRow {
   /** The owned purchase count from which this step shows; integers rising from 1. */
   from: number
+  /**
+   * The planet Systems took `from` from, left at that count (#157 comment 6300543785; ticket 590);
+   * absent on #554's drill_power rows. The look never reads it: only the pacing check does.
+   */
+  planet?: number
   /** The part drawn on the track's slot from this step, null while the art is not in (T2-T6). */
   part: string | null
   /**
