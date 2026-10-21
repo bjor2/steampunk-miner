@@ -1,0 +1,32 @@
+{
+  "about": "The engine track's rig-look parts (ticket 586, wave 576-1A of the rig look ladder #576): one asset at the track's attach slot, one part per look step and the base look beside them. The thresholds are Systems' table (#157, comment 6300543785) and the names Progression's (comment 6300549964); the wiring (#587) reads them from the rig-look registry (#577), not from here.",
+  "assetId": "vehicle-look-engine",
+  "track": "engine",
+  "attach": "chassis.drive",
+  "z": 2,
+  "replaces": null,
+  "footprintM": [-0.09, -0.45, 0.09, -0.27],
+  "looks": [
+    {
+      "part": "hub-cap",
+      "name": "Hub cap",
+      "purchases": 0,
+      "unnamedDefault": true
+    },
+    {
+      "part": "single-piston",
+      "name": "Single piston",
+      "purchases": 2
+    },
+    {
+      "part": "triple-flywheel",
+      "name": "Triple flywheel",
+      "purchases": 18
+    },
+    {
+      "part": "guild-turbine",
+      "name": "Guild turbine",
+      "purchases": 26
+    }
+  ]
+}
