@@ -17,7 +17,13 @@
  * shape on #453, 6236465674): `kinds.pools` maps the planet index to a pool, never the seed, so a
  * pool changes which species a slot shows and never a stored cell.
  */
-import { ORE_ROWS, rarityRowSetOfPlanet, type KindSlot, type RarityRowSet } from '../../ores'
+import {
+  ORE_ROWS,
+  poolOfPlanetUnder,
+  rarityRowSetOfPlanet,
+  type KindSlot,
+  type RarityRowSet,
+} from '../../ores'
 import type { PlanetParams } from '../../../systems/world/planetParams'
 import { NO_KIND_SLOT } from '../../../systems/world/worldCell'
 
@@ -43,11 +49,13 @@ export function rosterKindOf(params: PlanetParams, kindSlot: number): KindSlot |
 }
 
 /**
- * The species pool the planet's kind slots resolve to, from its index alone. Null past the pools
- * table (P8+, #453): there a slot binds no species instead of borrowing another planet's pool.
+ * The species pool the planet's kind slots resolve to, from its index and ore rules stamp, never
+ * the seed: a planet a save holds under rules older than its pool's keeps the pool it was entered
+ * with (ticket 632). Null past the pools table (P8+, #453): there a slot binds no species instead
+ * of borrowing another planet's pool.
  */
 export function poolOfPlanet(params: PlanetParams): string | null {
-  return ORE_ROWS.kinds.poolByPlanet.get(params.planetIndex) ?? null
+  return poolOfPlanetUnder(ORE_ROWS.kinds, params.planetIndex, params.oreRulesVersion)
 }
 
 function hasRosterOfSet(params: PlanetParams, set: RarityRowSet): boolean {

@@ -1,7 +1,8 @@
 import { describe, expect, it } from 'vitest'
+import { ORE_RULES_VERSION } from '../../../systems/world/planetParams'
 import economyFile from '../ores.economy.json'
 import familiesFile from '../oreFamilies.json'
-import { isSlotLiveInBand } from './kindRows'
+import { isSlotLiveInBand, kindRowsOf, poolOfPlanetUnder } from './kindRows'
 import { ORE_ROWS, oreRowProblems } from './oreRows'
 
 // The kind slot tables (TD ruling on ticket 446, addendum 6226264758; Systems' kinds.legacy,
@@ -16,6 +17,12 @@ function problemsWithLegacy(
   rosterMaxKinds = economyFile.ore.kinds.rosterMaxKinds,
 ): string[] {
   const kinds = { ...economyFile.ore.kinds, rosterMaxKinds, legacy }
+  return oreRowProblems({ ore: { ...economyFile.ore, kinds } }, familiesFile)
+}
+
+/** The shipped files with the earlier pools table replaced. */
+function problemsWithEarlierPools(poolsBeforeOreRules: unknown): string[] {
+  const kinds = { ...economyFile.ore.kinds, poolsBeforeOreRules }
   return oreRowProblems({ ore: { ...economyFile.ore, kinds } }, familiesFile)
 }
 
@@ -149,6 +156,45 @@ describe('ore kind pools', () => {
     ])
     expect(problemsWithPools(['legacy'])).toEqual([
       'ore.kinds.pools must map planet indices to pool ids',
+    ])
+  })
+})
+
+// The pools a planet had under older ore rules (ticket 632, GD lock (b) on #595): a planet a save
+// holds under rules older than its pool's keeps the pool it was entered with.
+describe('ore kind pools before an ore rules version', () => {
+  const EARLIER = { 3: { 2: 'older-p2' }, 5: { 2: 'legacy', 3: 'old-p3' } }
+  const kinds = kindRowsOf({ ...economyFile.ore.kinds, poolsBeforeOreRules: EARLIER })
+  const today = (planet: number) => kinds.poolByPlanet.get(planet)
+
+  it('resolves a stamp to the pool of the earliest rules it predates, and from them on to today', () => {
+    expect([undefined, 1, 2, 3, 4, 5].map((rules) => poolOfPlanetUnder(kinds, 2, rules))).toEqual([
+      'older-p2',
+      'older-p2',
+      'older-p2',
+      'legacy',
+      'legacy',
+      today(2),
+    ])
+    expect([4, 5].map((rules) => poolOfPlanetUnder(kinds, 3, rules))).toEqual(['old-p3', today(3)])
+  })
+
+  it('leaves a planet the table does not name on its pool, and none past the pools table', () => {
+    expect(poolOfPlanetUnder(kinds, 4, 1)).toBe(today(4))
+    expect(poolOfPlanetUnder(kinds, 8, 1)).toBeNull()
+  })
+
+  it('refuses a version this build does not know, an unnamed planet and a pool id not kebab-case', () => {
+    expect(problemsWithEarlierPools({ 1: { 2: 'legacy' }, 99: { 2: 'legacy' } })).toEqual([
+      `ore.kinds.poolsBeforeOreRules.1 must be an ore rules version from 2 to ${ORE_RULES_VERSION}`,
+      `ore.kinds.poolsBeforeOreRules.99 must be an ore rules version from 2 to ${ORE_RULES_VERSION}`,
+    ])
+    expect(problemsWithEarlierPools({ 3: { 9: 'legacy', 2: 'Old P2' } })).toEqual([
+      'ore.kinds.poolsBeforeOreRules.3.2 must be a kebab-case pool id',
+      'ore.kinds.poolsBeforeOreRules.3.9 names a planet pools does not',
+    ])
+    expect(problemsWithEarlierPools(['legacy'])).toEqual([
+      'ore.kinds.poolsBeforeOreRules must map ore rules versions to planet pools',
     ])
   })
 })

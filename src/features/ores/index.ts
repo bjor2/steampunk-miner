@@ -21,8 +21,8 @@ export {
 } from './systems/oreCatalogue'
 export type { CatalogueKnobs, LeadWeights, OreFamily } from './systems/oreRows'
 export { ORE_ROWS } from './systems/oreRows'
-export type { KindRows, KindSlot } from './systems/kindRows'
-export { isSlotLiveInBand } from './systems/kindRows'
+export type { EarlierPool, KindRows, KindSlot } from './systems/kindRows'
+export { isSlotLiveInBand, poolOfPlanetUnder } from './systems/kindRows'
 export { leadOfCell, leadOfPatch, ORE_LEAD_HOOK_ID, oreLeadHook } from './systems/leadRoll'
 export type { RarityRowSet, RarityRows, RarityTier } from './systems/rarityRows'
 export {
