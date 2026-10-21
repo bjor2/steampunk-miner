@@ -341,6 +341,27 @@
     },
     {
       "kind": "base",
+      "id": "starred-wine",
+      "cell": "cells/base/starred-wine.png",
+      "blend": "blend/base-starred-wine.blend",
+      "wornBy": ["p2-r1"]
+    },
+    {
+      "kind": "base",
+      "id": "harlequin-patches",
+      "cell": "cells/base/harlequin-patches.png",
+      "blend": "blend/base-harlequin-patches.blend",
+      "wornBy": ["p2-r2"]
+    },
+    {
+      "kind": "base",
+      "id": "trigon-smoke",
+      "cell": "cells/base/trigon-smoke.png",
+      "blend": "blend/base-trigon-smoke.blend",
+      "wornBy": ["p2-r3"]
+    },
+    {
+      "kind": "base",
       "id": "peat-crumb",
       "cell": "cells/base/peat-crumb.png",
       "blend": "blend/base-peat-crumb.blend",
@@ -824,6 +845,27 @@
     },
     {
       "kind": "vein",
+      "id": "rayed-garnets",
+      "cell": "cells/vein/rayed-garnets.png",
+      "blend": "blend/vein-rayed-garnets.blend",
+      "wornBy": ["p2-r1"]
+    },
+    {
+      "kind": "vein",
+      "id": "framed-ovals",
+      "cell": "cells/vein/framed-ovals.png",
+      "blend": "blend/vein-framed-ovals.blend",
+      "wornBy": ["p2-r2"]
+    },
+    {
+      "kind": "vein",
+      "id": "point-on-octahedra",
+      "cell": "cells/vein/point-on-octahedra.png",
+      "blend": "blend/vein-point-on-octahedra.blend",
+      "wornBy": ["p2-r3"]
+    },
+    {
+      "kind": "vein",
       "id": "limonite-clods",
       "cell": "cells/vein/limonite-clods.png",
       "blend": "blend/vein-limonite-clods.blend",
@@ -1304,6 +1346,27 @@
       "cell": "cells/sheen/satin-streaks.png",
       "blend": "blend/sheen-satin-streaks.blend",
       "wornBy": ["p2-u4"]
+    },
+    {
+      "kind": "sheen",
+      "id": "six-ray-sparks",
+      "cell": "cells/sheen/six-ray-sparks.png",
+      "blend": "blend/sheen-six-ray-sparks.blend",
+      "wornBy": ["p2-r1"]
+    },
+    {
+      "kind": "sheen",
+      "id": "colour-play",
+      "cell": "cells/sheen/colour-play.png",
+      "blend": "blend/sheen-colour-play.blend",
+      "wornBy": ["p2-r2"]
+    },
+    {
+      "kind": "sheen",
+      "id": "adamant-glints",
+      "cell": "cells/sheen/adamant-glints.png",
+      "blend": "blend/sheen-adamant-glints.blend",
+      "wornBy": ["p2-r3"]
     },
     {
       "kind": "sheen",

@@ -5,7 +5,8 @@ its slots 6 to 10, ticket 600 for its slots 11 to 15 and its relic signature, ti
 slots 1 to 5, ticket 602 for its slots 6 to 10, ticket 603 for its slots 11 to 15 and its signature
 material, ticket 604 for P5's slots 1 to 5, ticket 605 for its slots 6 to 10, ticket 606 for its slots
 11 to 15 and its signature material, ticket 595 for P2's slots 1 to 5, ticket 596 for its slots 6 to
-9): one per layer id of `mineralSkins.json`. A layer id with no recipe fails, never falls back.
+9, ticket 597 for its slots 10 to 12): one per layer id of `mineralSkins.json`. A layer id with no
+recipe fails, never falls back.
 
 - `base` and `sheen` are seamless textures on the 1 m cell: an emission material on a 1 m quad
   whose value is the ramp coordinate (base, mean about 0.5) or the highlight strength (sheen,
@@ -49,6 +50,9 @@ VEIN_HEX = '#c4c4c4'
 WIDMANSTATTEN_SETS = ((0, 5, 601), (4, 3, 602), (-4, 3, 603))
 TRIANGLE_FACETS = ((0, 4), (4, 2), (-4, 2))
 STAR_DOMES = (((-0.15, 0.13), 0.11), ((0.16, -0.02), 0.12), ((-0.07, -0.2), 0.08))
+# P2 batch 3 (ticket 597): the star garnets' centres and radii, shared by the vein and its sheen.
+STAR_GARNETS = (((-0.17, 0.15), 0.1), ((0.13, 0.17), 0.085), ((0.03, -0.05), 0.115), ((-0.2, -0.19), 0.08),
+                ((0.22, -0.2), 0.07))
 # Centre, radius, teeth, phase: each wheel meshes with the one before it.
 GEAR_TRAIN = (((-0.1, 0.08), 0.19, 16, 0.0), ((0.118, -0.103), 0.12, 10, 0.2), ((0.236, 0.037), 0.08, 7, 0.1))
 TRELLIS_RODS = 2
@@ -884,6 +888,87 @@ def galena_weave_of(graph):
     upright_fibre = stretched(graph, graph.noise(64, 4, seed=832, detail=3))
     fibre = graph.mul_add(graph.minus(upright_fibre, level_fibre), upright, level_fibre)
     return {'blocks': blocks, 'upright': upright, 'fibre': fibre}
+
+
+def base_starred_wine(graph):
+    """Star garnet: a deep wine body clouded by depth, darker pockets where the stone is thick, fine silk needles in three sets."""
+    depth = stretched(graph, graph.noise(3, 3, seed=901, detail=3, roughness=0.5))
+    pockets = graph.smooth(graph.voronoi(4, 4, seed=902)['Distance'], 0.15, 0.55)
+    tone = graph.minus(around_half(graph, depth, 0.42), graph.mul(graph.minus(1.0, pockets), 0.08))
+    return graph.plus(graph.plus(tone, 0.02), graph.mul(garnet_silk_of(graph), 0.16))
+
+
+def garnet_silk_of(graph):
+    """The star garnet's silk: needles in three sets 60 degrees apart (whole lines along u and v), the threads its stars are drawn from."""
+    sets = [silk_needles(graph, per_u, per_v, seed) for per_u, per_v, seed in ((0, 9, 903), (8, 5, 904), (-8, 5, 905))]
+    return graph.math('MAXIMUM', graph.math('MAXIMUM', sets[0], sets[1]), sets[2])
+
+
+def base_harlequin_patches(graph):
+    """Verdigris opal: milky green opal broken into harlequin patches, squares stood on their corners, each its own depth."""
+    patches = harlequin_patches_of(graph)
+    milk = stretched(graph, graph.noise(3, 3, seed=912, detail=4, roughness=0.55))
+    tone = around_half(graph, milk, 0.3)
+    tone = graph.plus(tone, graph.mul(graph.mul(graph.minus(patches['tone'], 0.5), graph.smooth(patches['edge'], 0.0, 0.08)), 0.5))
+    return graph.minus(tone, graph.mul(graph.smooth(patches['edge'], 0.03, 0.0), 0.08))
+
+
+HARLEQUIN_LINES = 4
+
+
+def harlequin_patches_of(graph):
+    """
+    The harlequin mosaic: two sets of diagonal lines, whole numbers along u and v so it repeats, cut
+    the cell into squares on their corners, slightly wavered. Per pixel: its patch's `tone` and
+    `pick` (0..1, one each per patch), its place `along` the patch's diagonal (0..1) and its `edge`,
+    the distance to the patch's nearest side (0 on it, 0.5 at the middle).
+    """
+    waver = graph.mul(graph.minus(graph.noise(2, 2, seed=911, detail=2), 0.5), 0.3)
+    rising = graph.plus(graph.mul_add(graph.u, HARLEQUIN_LINES, graph.mul(graph.v, HARLEQUIN_LINES)), waver)
+    falling = graph.plus(graph.mul_add(graph.u, HARLEQUIN_LINES, graph.mul(graph.v, -HARLEQUIN_LINES)), waver)
+    patch = {'column': graph.math('FLOOR', rising), 'row': graph.math('FLOOR', falling)}
+    x, y = graph.math('FRACT', rising), graph.math('FRACT', falling)
+    edge = graph.math('MINIMUM', graph.math('MINIMUM', x, graph.minus(1.0, x)), graph.math('MINIMUM', y, graph.minus(1.0, y)))
+    return {'tone': block_random(graph, patch, 913), 'pick': block_random(graph, patch, 914), 'along': x, 'edge': edge}
+
+
+def base_trigon_smoke(graph):
+    """Smoke diamond: a grey-violet body drifting with smoke, and small triangular trigons etched into its faces, each pit with a bright rim."""
+    smoke = smoke_wisps_of(graph)
+    trigons = trigons_of(graph)
+    tone = around_half(graph, smoke, 0.8)
+    tone = graph.minus(tone, graph.mul(trigons['pit'], 0.26))
+    return graph.plus(graph.plus(tone, graph.mul(trigons['rim'], 0.2)), 0.04)
+
+
+def smoke_wisps_of(graph):
+    """
+    Smoke in round billows over a broad drift. Never level: graphite seam, P2's other grey (one luma
+    with smoke diamond in #632's hue slots), is drawn in level smears.
+    """
+    drift = graph.mul(graph.minus(graph.noise(2, 2, seed=921, detail=2), 0.5), 0.6)
+    billows = stretched(graph, graph.noise(5, 5, seed=922, detail=3, roughness=0.5))
+    return graph.plus(graph.mul_add(billows, 0.8, 0.1), graph.mul(drift, 0.3))
+
+
+TRIGON_BLOCKS = 4
+
+
+def trigons_of(graph):
+    """
+    Point-down triangular etch pits on a staggered 4 x 4 lattice, on most of the blocks, each its
+    own size: `pit` is 1 inside a trigon, `rim` 1 on its edge.
+    """
+    blocks = lattice_of(graph, TRIGON_BLOCKS, TRIGON_BLOCKS, stagger=0.5)
+    x, y = graph.minus(blocks['x'], 0.5), graph.minus(blocks['y'], 0.5)
+    # The triangle's distance: its flat top, then its two sides leaning to the point at the foot.
+    reach = graph.math('MAXIMUM', y, graph.math('MAXIMUM', graph.mul_add(x, 0.866, graph.mul(y, -0.5)), graph.mul_add(x, -0.866, graph.mul(y, -0.5))))
+    size = graph.mul_add(block_random(graph, blocks, 923), 0.16, 0.14)
+    shown = graph.smooth(block_random(graph, blocks, 924), 0.3, 0.32)
+    inside = graph.minus(reach, size)
+    pit = graph.mul(graph.smooth(inside, 0.01, -0.01), shown)
+    rim = graph.mul(graph.smooth(graph.math('ABSOLUTE', inside), 0.025, 0.0), shown)
+    return {'pit': pit, 'rim': rim}
 
 
 def base_peat_crumb(graph):
@@ -1806,6 +1891,35 @@ def sheen_satin_streaks(graph):
     flash = graph.mul(graph.smooth(block_random(graph, weave['blocks'], 835), 0.86, 0.9),
                       graph.smooth(block_edge(graph, weave['blocks']), 0.03, 0.06))
     return graph.plus(graph.mul(shimmer, 0.32), graph.mul(flash, 0.5))
+
+
+def sheen_six_ray_sparks(graph):
+    """Six-ray sparks (star garnet): a small sharp six-rayed star on each garnet, a hot point at its heart, faint silk light between."""
+    light = graph.mul(garnet_silk_of(graph), 0.12)
+    for (cx, cz), radius in STAR_GARNETS:
+        x, y = graph.minus(graph.u, cx + 0.5), graph.minus(graph.v, cz + 0.5)
+        reach = graph.math('SQRT', graph.plus(graph.mul(x, x), graph.mul(y, y)))
+        rays = [star_ray(graph, x, y, math.radians(angle)) for angle in (0.0, 60.0, 120.0)]
+        star = graph.mul(graph.math('MAXIMUM', graph.math('MAXIMUM', rays[0], rays[1]), rays[2]), graph.smooth(reach, radius * 1.1, radius * 0.1))
+        spark = graph.plus(graph.mul(star, 0.7), graph.mul(graph.smooth(reach, radius * 0.25, 0.0), 0.3))
+        light = graph.math('MAXIMUM', light, spark)
+    return light
+
+
+def sheen_colour_play(graph):
+    """Colour play (verdigris opal): whole harlequin patches flaring at once, each brightest toward one corner, with pinfire between."""
+    patches = harlequin_patches_of(graph)
+    roll = graph.mul_add(patches['along'], 0.6, 0.4)
+    flare = graph.mul(graph.mul(graph.smooth(patches['pick'], 0.55, 0.62), graph.smooth(patches['edge'], 0.0, 0.06)), roll)
+    pinfire = sprinkled(graph, 28, 915, 0.28, 0.3)
+    return graph.plus(graph.mul(flare, 0.62), graph.mul(pinfire, 0.4))
+
+
+def sheen_adamant_glints(graph):
+    """Adamant glints (smoke diamond): the hard lustre of diamond: bright trigon rims, a few hard sparks, the smoke itself dull."""
+    trigons = trigons_of(graph)
+    sparks = sprinkled(graph, 18, 925, 0.26, 0.5)
+    return graph.plus(graph.mul(trigons['rim'], 0.6), graph.mul(sparks, 0.95))
 
 
 def sheen_damp_dull(graph):
@@ -2846,6 +2960,43 @@ def vein_dice_cubes(rng, body):
     return assign_all(marks, body)
 
 
+def vein_rayed_garnets(rng, body):
+    """Star garnet: dodecahedral garnets seen down their threefold axis, six rhomb faces meeting in a low point, so each throws six rays."""
+    marks = []
+    for i, ((x, z), radius) in enumerate(STAR_GARNETS):
+        height = radius * 0.8
+        garnet = shapes.add_cone('garnet-%d' % i, radius, height, (x, -height / 2 + 0.01, z),
+                                 rotation=(math.pi / 2, rng.uniform(0.0, math.pi / 3), 0.0), sides=6)
+        shapes.bevel(garnet, radius * 0.05, segments=1)
+        marks.append(garnet)
+    return assign_all(marks, body)
+
+
+def vein_framed_ovals(rng, body):
+    """Verdigris opal: oval opal domes set in the stone, each in a raised frame of the matrix it grew in."""
+    marks = []
+    for i, (x, z) in enumerate(shapes.scatter_positions(rng, 4, 0.2, 0.22)):
+        radius, angle = rng.uniform(0.07, 0.1), rng.uniform(-0.5, 0.5)
+        marks.append(shapes.add_icosphere('oval-%d' % i, radius, (x, -0.004, z), subdivisions=3,
+                                          scale=(1.0, 0.35, 0.65), rotation=(0.0, angle, 0.0)))
+        marks.append(shapes.add_torus('frame-%d' % i, radius * 1.08, radius * 0.13, (x, -0.006, z),
+                                      rotation=(math.pi / 2, angle, 0.0), scale=(1.0, 0.65, 0.6)))
+    return assign_all(marks, body)
+
+
+def vein_point_on_octahedra(rng, body):
+    """Smoke diamond: octahedra stood point-on to the face, a square outline turned to a diamond, four faces meeting in the point."""
+    marks = []
+    for i, (x, z) in enumerate(shapes.scatter_positions(rng, 5, 0.22, 0.17)):
+        radius = rng.uniform(0.08, 0.11) if i < 3 else rng.uniform(0.055, 0.07)
+        # The cone's four corners already lie up, down and to the sides: a diamond on the face.
+        octahedron = shapes.add_cone('octahedron-%d' % i, radius, radius, (x, -radius / 2 + 0.01, z),
+                                     rotation=(math.pi / 2, rng.uniform(-0.15, 0.15), 0.0), sides=4)
+        shapes.bevel(octahedron, 0.002, segments=1)
+        marks.append(octahedron)
+    return assign_all(marks, body)
+
+
 def vein_limonite_clods(rng, body):
     """Bog iron: soft rounded clods of limonite heaped low on the face, knobbly with small lumps stuck on, a few crumbs fallen off."""
     marks = []
@@ -3457,6 +3608,9 @@ BASES = {
     'oxide-stairs': base_oxide_stairs,
     'adularia-milk': base_adularia_milk,
     'cubic-cleavage': base_cubic_cleavage,
+    'starred-wine': base_starred_wine,
+    'harlequin-patches': base_harlequin_patches,
+    'trigon-smoke': base_trigon_smoke,
     'peat-crumb': base_peat_crumb,
     'bloom-crust': base_bloom_crust,
     'dew-beads': base_dew_beads,
@@ -3528,6 +3682,9 @@ SHEENS = {
     'step-edge-flash': sheen_step_edge_flash,
     'schiller-glow': sheen_schiller_glow,
     'satin-streaks': sheen_satin_streaks,
+    'six-ray-sparks': sheen_six_ray_sparks,
+    'colour-play': sheen_colour_play,
+    'adamant-glints': sheen_adamant_glints,
     'damp-dull': sheen_damp_dull,
     'bloom-sparkle': sheen_bloom_sparkle,
     'dew-glints': sheen_dew_glints,
@@ -3599,6 +3756,9 @@ VEINS = {
     'stair-crystals': vein_stair_crystals,
     'lenticle-scatter': vein_lenticle_scatter,
     'dice-cubes': vein_dice_cubes,
+    'rayed-garnets': vein_rayed_garnets,
+    'framed-ovals': vein_framed_ovals,
+    'point-on-octahedra': vein_point_on_octahedra,
     'limonite-clods': vein_limonite_clods,
     'globular-tufts': vein_globular_tufts,
     'needle-sheaves': vein_needle_sheaves,

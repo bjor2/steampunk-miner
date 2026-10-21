@@ -9,12 +9,14 @@ import { planetSkinsOf } from './systems/mineralSkin'
 // species by roster slot, five a ticket, from the foothold-p2 pool of ticket 632 on the legacy kind
 // slots. Ticket 595 skins slots 1 to 5, the pool's five commons (slate shale, rust ochre, tin
 // gravel, sulphur crust, graphite seam); ticket 596 slots 6 to 9, its four uncommons (cobalt bloom,
-// bismuth stair, moonstone lens, galena cube). A P2 entered before that pool, under ore rules 5,
-// keeps the legacy species, so it keeps the skins planet 1 shows.
+// bismuth stair, moonstone lens, galena cube); ticket 597 slots 10 to 12, its three rares (star
+// garnet, verdigris opal, smoke diamond). The pool binds the 12 legacy slots, so P2 has no slots 13
+// to 15. A P2 entered before that pool, under ore rules 5, keeps the legacy species, so it keeps the
+// skins planet 1 shows.
 
 const SEED = 83921
 const PLANET_2 = freshPlanetParamsFor(SEED, 2)
-const SKINNED_SLOTS = [1, 2, 3, 4, 5, 6, 7, 8, 9]
+const SKINNED_SLOTS = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
 /** The ore rules a P2 world was entered under before its own pool (ticket 632). */
 const RULES_BEFORE_P2_POOL = 5
 
@@ -32,6 +34,12 @@ describe('mineral skins of planet 2', () => {
     const species = planetSpeciesOf(PLANET_2, kindSlot)
     expect(species?.pool).toBe('foothold-p2')
     expect(planetSkinsOf(PLANET_2)[kindSlot - 1]?.speciesId).toBe(species?.id)
+  })
+
+  it('skins every kind slot of the planet', () => {
+    expect(skinnedSpeciesOf(PLANET_2)).toEqual(
+      SKINNED_SLOTS.map((kindSlot) => planetSpeciesOf(PLANET_2, kindSlot)?.id),
+    )
   })
 
   it('keeps the skins planet 1 shows on a planet 2 entered before its own pool', () => {
