@@ -41,10 +41,11 @@ LIGHT_LUMA_SHARE = 0.5
 # #593 its slots 6 to 10, #594 its last two, 11 and 12: the legacy pool has 12 species; #598 is P3
 # slots 1 to 5, #599 its slots 6 to 10 and #600 its slots 11 to 15 and the planet's signature
 # material, of the foothold-p3 pool; #601 is P4 slots 1 to 5 and #603 its slots 11 to 15 and the
-# planet's signature material; #604 is P5 slots 1 to 5, of the foothold-p5 pool; #595 is P2 slots 1
-# to 5, of the foothold-p2 pool, which binds the legacy slots), named `p<planet>-b<n>`, in slot
-# order. A batch is measured against all of its planet's other batches (`planet_mates`). A batch's
-# `signature` is the planet whose signature skin row it adds.
+# planet's signature material; #604 is P5 slots 1 to 5 and #605 its slots 6 to 10, of the
+# foothold-p5 pool; #595 is P2 slots 1 to 5, of the foothold-p2 pool, which binds the legacy
+# slots), named `p<planet>-b<n>`, in slot order. A batch is measured against all of its planet's
+# other batches (`planet_mates`). A batch's `signature` is the planet whose signature skin row it
+# adds.
 BATCHES = {
     'p1-b1': {'pool': 'legacy', 'slots': ('legacy.c1', 'legacy.c2', 'legacy.c3', 'legacy.c4', 'legacy.c5')},
     'p1-b2': {'pool': 'legacy', 'slots': ('legacy.u1', 'legacy.u2', 'legacy.u3', 'legacy.u4', 'legacy.r1')},
@@ -58,6 +59,7 @@ BATCHES = {
     'p4-b3': {'pool': 'foothold-p4', 'slots': ('mixed.e1', 'mixed.e2', 'mixed.e3', 'mixed.m1', 'mixed.m2'),
               'signature': 4},
     'p5-b1': {'pool': 'foothold-p5', 'slots': ('mixed.c1', 'mixed.c2', 'mixed.c3', 'mixed.c4', 'mixed.u1')},
+    'p5-b2': {'pool': 'foothold-p5', 'slots': ('mixed.u2', 'mixed.u3', 'mixed.r1', 'mixed.r2', 'mixed.r3')},
 }
 # A signature material has no hue slot (#453 E1): its palette is built on a slot-shaped look chosen
 # inside its family's hue and luma bands of docs/art/ores (#151; relic 155-168 degrees, luma

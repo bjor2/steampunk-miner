@@ -3,8 +3,8 @@ The Blender recipes of the mineral skin layers (#576, ticket 592 for P1's slots 
 for its slots 6 to 10, ticket 594 for 11 and 12, ticket 598 for P3's slots 1 to 5, ticket 599 for
 its slots 6 to 10, ticket 600 for its slots 11 to 15 and its relic signature, ticket 601 for P4's
 slots 1 to 5, ticket 603 for its slots 11 to 15 and its signature material, ticket 604 for P5's
-slots 1 to 5, ticket 595 for P2's slots 1 to 5): one per layer id of `mineralSkins.json`. A layer
-id with no recipe fails, never falls back.
+slots 1 to 5, ticket 605 for its slots 6 to 10, ticket 595 for P2's slots 1 to 5): one per layer id
+of `mineralSkins.json`. A layer id with no recipe fails, never falls back.
 
 - `base` and `sheen` are seamless textures on the 1 m cell: an emission material on a 1 m quad
   whose value is the ramp coordinate (base, mean about 0.5) or the highlight strength (sheen,
@@ -909,6 +909,105 @@ def blade_edge_of(graph, blade):
     return graph.math('MINIMUM', blade, graph.minus(1.0, blade))
 
 
+def base_oily_swirls(graph):
+    """Peridot: olivine's oily body, slow bands swirled round by a warp, cloudy, with dark basalt flecks caught in it."""
+    swirl = olivine_swirl_of(graph)
+    cloud = stretched(graph, graph.noise(3, 3, seed=703, detail=3))
+    fleck = sprinkled(graph, 10, 704, 0.42, 0.45)
+    tone = graph.plus(graph.mul(swirl, 0.16), 0.53)
+    tone = graph.plus(tone, graph.mul(graph.minus(cloud, 0.5), 0.24))
+    return graph.minus(tone, graph.mul(fleck, 0.42))
+
+
+OLIVINE_SWIRLS = 5.0
+
+
+def olivine_swirl_of(graph):
+    """The swirl bands (-1..1): contour lines of a warped noise, shared by the base and the oil film's light."""
+    field = stretched(graph, graph.noise(2, 2, seed=701, detail=3, roughness=0.55))
+    warp = graph.mul(graph.minus(graph.noise(4, 4, seed=702, detail=2), 0.5), 0.5)
+    return graph.math('SINE', graph.mul(graph.plus(field, warp), OLIVINE_SWIRLS * math.tau))
+
+
+def base_phosphate_beds(graph):
+    """
+    Shark tooth: a bone bed, level beds of grey phosphatic sand, each its own tone, fine grit in them and
+    dark phosphate pellets along the bed partings.
+    """
+    warp = graph.noise(2, 2, seed=711, detail=2)
+    beds = tiles.strata(graph, PHOSPHATE_BEDS, warp, 0.6)
+    parting = graph.smooth(beds, 0.12, 0.0)
+    grit = stretched(graph, graph.noise(64, 64, seed=712, detail=5))
+    pellet = sprinkled(graph, 18, 713, 0.42, 0.4)
+    # Chromite has the shark tooth's colour (hue slots 250 and 222, both at luma 0.58), and is round
+    # dark seeds in a pale matrix; the bone bed is laid level and bold, so at a phone's 22 px tile it
+    # reads as stripes, as P3's rail quartz parts from native platinum.
+    tone = around_half(graph, beds, 0.62)
+    tone = graph.plus(tone, graph.mul(graph.minus(grit, 0.5), 0.16))
+    tone = graph.minus(tone, graph.mul(parting, 0.22))
+    return graph.minus(tone, graph.mul(graph.mul(pellet, graph.smooth(beds, 0.45, 0.2)), 0.3))
+
+
+PHOSPHATE_BEDS = 6
+
+
+def base_bladed_columns(graph):
+    """Wolfram: wolframite grown in upright blades, each its own tone, striated along its length, dark seams between."""
+    blades = wolfram_blades_of(graph)
+    face = graph.mul_add(block_random(graph, blades, 721), 0.38, 0.32)
+    seam = graph.smooth(graph.math('MINIMUM', blades['x'], graph.minus(1.0, blades['x'])), 0.06, 0.0)
+    striae = graph.math('SINE', graph.mul(graph.u, 96.0 * math.tau))
+    drift = stretched(graph, graph.noise(2, 6, seed=722, detail=3))
+    tone = graph.plus(face, graph.mul(striae, 0.04))
+    tone = graph.plus(tone, graph.mul(graph.minus(drift, 0.5), 0.2))
+    return graph.minus(tone, graph.mul(seam, 0.3))
+
+
+WOLFRAM_BLADES = 8
+
+
+def wolfram_blades_of(graph):
+    """
+    The blades: the cell cut into upright columns, two rows staggered by a third so no seam runs right
+    across. Shared by the base and the fibre satin's streaks. Wolfram stands upright where P5's shark
+    tooth bone bed lies level (hue slots 212 and 222 at lumas 0.64 and 0.58).
+    """
+    return lattice_of(graph, WOLFRAM_BLADES, 2, stagger=0.35)
+
+
+def base_ember_depths(graph):
+    """Fire garnet: a deep red body lit from inside, soft glowing cores where the stone is thickest, a faint grain."""
+    glow = garnet_glow_of(graph)
+    cloud = stretched(graph, graph.noise(3, 3, seed=732, detail=3))
+    grain = stretched(graph, graph.noise(60, 60, seed=733, detail=4))
+    tone = graph.plus(graph.mul(glow, 0.46), 0.41)
+    tone = graph.plus(tone, graph.mul(graph.minus(cloud, 0.5), 0.2))
+    return graph.plus(tone, graph.mul(graph.minus(grain, 0.5), 0.08))
+
+
+def garnet_glow_of(graph):
+    """1 at a glowing core, falling off to 0 between them: shared by the base and the ember glow's halos."""
+    return graph.smooth(graph.voronoi(4, 4, seed=731)['Distance'], 0.62, 0.0)
+
+
+def base_spongy_bone(graph):
+    """Saurian vertebra: spongy bone, a pale lattice of struts round dark pores, a denser smooth patch of cortex here and there."""
+    pores = vertebra_pores_of(graph)
+    cortex = graph.smooth(stretched(graph, graph.noise(2, 2, seed=742, detail=3)), 0.72, 0.88)
+    grain = stretched(graph, graph.noise(48, 48, seed=743, detail=4))
+    open_pore = graph.mul(pores, graph.minus(1.0, cortex))
+    tone = graph.plus(graph.mul(graph.minus(grain, 0.5), 0.12), 0.68)
+    return graph.minus(tone, graph.mul(open_pore, 0.5))
+
+
+VERTEBRA_PORES = 11
+
+
+def vertebra_pores_of(graph):
+    """1 inside a pore, 0 on the struts between: shared by the base and the bone dust on the struts."""
+    return graph.smooth(graph.voronoi(VERTEBRA_PORES, VERTEBRA_PORES, seed=741)['Distance'], 0.62, 0.4)
+
+
 # --- sheen: the lustre's highlights -----------------------------------------------------------------
 
 
@@ -1327,6 +1426,48 @@ def sheen_blade_flash(graph):
     inside = graph.smooth(blade_edge_of(graph, graph.math('FRACT', across)), 0.05, 0.15)
     glint = graph.smooth(graph.voronoi(16, 16, seed=792)['Distance'], 0.05, 0.012)
     return graph.plus(graph.mul(graph.mul(picked, graph.mul(broken, inside)), 0.75), graph.mul(glint, 0.45))
+
+
+def sheen_oil_film(graph):
+    """Oil film: light lying along the swirl bands as on an oily face, waxing and waning, never a glint."""
+    bands = graph.smooth(olivine_swirl_of(graph), 0.55, 0.95)
+    wax = graph.smooth(stretched(graph, graph.noise(2, 2, seed=751, detail=2)), 0.3, 0.75)
+    broad = graph.smooth(stretched(graph, graph.noise(3, 3, seed=752, detail=2)), 0.5, 0.85)
+    return graph.plus(graph.mul(graph.mul(bands, wax), 0.42), graph.mul(broad, 0.12))
+
+
+def sheen_enamel_glaze(graph):
+    """Enamel glaze: long level streaks of light along the bed tops, as on polished tooth enamel, and a few sharp glints."""
+    warp = graph.noise(2, 2, seed=711, detail=2)
+    tops = graph.smooth(tiles.strata(graph, PHOSPHATE_BEDS, warp, 0.6), 0.82, 0.98)
+    runs = graph.smooth(stretched(graph, graph.noise(3, 8, seed=761, detail=2)), 0.4, 0.7)
+    glint = graph.smooth(graph.voronoi(9, 9, seed=762)['Distance'], 0.05, 0.012)
+    return graph.plus(graph.mul(graph.mul(tops, runs), 0.5), graph.mul(glint, 0.6))
+
+
+def sheen_fibre_satin(graph):
+    """Fibre satin: a soft upright streak of light down every other blade, broken along its length, a broad sheen beneath."""
+    blades = wolfram_blades_of(graph)
+    lit = graph.smooth(block_random(graph, blades, 771), 0.45, 0.6)
+    middle = graph.smooth(graph.math('ABSOLUTE', graph.minus(blades['x'], 0.5)), 0.45, 0.1)
+    broken = graph.smooth(stretched(graph, graph.noise(4, 10, seed=772, detail=2)), 0.35, 0.65)
+    broad = graph.smooth(stretched(graph, graph.noise(2, 2, seed=773, detail=2)), 0.5, 0.85)
+    return graph.plus(graph.mul(graph.mul(graph.mul(lit, middle), broken), 0.46), graph.mul(broad, 0.12))
+
+
+def sheen_ember_glow(graph):
+    """Ember glow: a soft halo round each glowing core, as if the garnet held a coal, with a bright point in the brightest."""
+    glow = garnet_glow_of(graph)
+    halo = graph.smooth(glow, 0.3, 0.95)
+    point = graph.smooth(graph.voronoi(4, 4, seed=731)['Distance'], 0.08, 0.02)
+    return graph.plus(graph.mul(halo, 0.4), graph.mul(point, 0.5))
+
+
+def sheen_bone_dust(graph):
+    """Bone dust: a dry, faint lift on the struts between the pores and pale specks of dust; old bone takes no gloss."""
+    struts = graph.minus(1.0, vertebra_pores_of(graph))
+    speck = sprinkled(graph, 22, 791, 0.3, 0.3)
+    return graph.plus(graph.mul(struts, 0.12), graph.mul(speck, 0.22))
 
 
 # --- vein: the crystal or vein shape, by the row's silhouette ----------------------------------------
@@ -2193,6 +2334,119 @@ def vein_stibnite_sprays(rng, body):
     return assign_all(marks, body)
 
 
+def vein_olive_drops(rng, body):
+    """Peridot: rounded olive drops, each a plump body drawn to a point, lying in a loose cluster on the face."""
+    marks = []
+    for i, (x, z) in enumerate(shapes.scatter_positions(rng, 7, 0.26, 0.15)):
+        size = rng.uniform(0.045, 0.065)
+        marks += olive_drop('drop-%d' % i, (x, z), size, rng.uniform(0.0, math.tau))
+    return assign_all(marks, body)
+
+
+def olive_drop(name, centre, size, angle):
+    """A drop: a flattened round body and a four-sided point running out of it along `angle` in the face."""
+    drop = shapes.add_icosphere(name, size, (centre[0], -size * 0.3, centre[1]), subdivisions=3, scale=(1.0, 0.55, 0.9))
+    reach = size * 1.15
+    tip_at = (centre[0] + math.cos(angle) * reach, -size * 0.25, centre[1] + math.sin(angle) * reach)
+    tip = shapes.add_cone(name + '-tip', size * 0.62, size * 1.1, tip_at, rotation=(0.0, math.pi / 2 - angle, 0.0), sides=8)
+    tip.scale = (1.0, 0.55, 1.0)
+    return [drop, tip]
+
+
+def vein_serrated_teeth(rng, body):
+    """Shark tooth: flat triangular teeth with serrated edges, each over the broad lobed root it grew from."""
+    marks = []
+    for i, (x, z, height, turn) in enumerate(((-0.15, 0.06, 0.3, 0.25), (0.17, 0.12, 0.22, -0.35), (0.06, -0.21, 0.18, 2.9))):
+        marks += shark_tooth(('tooth-%d' % i), (x, z), height * rng.uniform(0.95, 1.05), turn)
+    return assign_all(marks, body)
+
+
+def shark_tooth(name, centre, height, turn):
+    """The crown, a triangle of `height` with fine serrations up each edge, standing proud of its root, both turned by `turn`."""
+    half, base_z = height * 0.4, -height * 0.4
+    left = [crown_edge_point(-half, base_z, height, k) for k in range(SERRATIONS)]
+    right = [crown_edge_point(half, base_z, height, k) for k in range(SERRATIONS, 0, -1)]
+    crown = left + [(0.0, base_z + height)] + right
+    root = [(-half * 1.1, base_z + height * 0.05), (-half * 0.8, base_z - height * 0.12), (-half * 0.15, base_z - height * 0.06),
+            (0.0, base_z - height * 0.02), (half * 0.15, base_z - height * 0.06), (half * 0.8, base_z - height * 0.12),
+            (half * 1.1, base_z + height * 0.05)]
+    placed = [[turned_point(point, centre, turn) for point in outline] for outline in (crown, root)]
+    tooth = shapes.add_polygon(name, placed[0], -0.018, 0.012)
+    shapes.bevel(tooth, 0.003, segments=2)
+    return [tooth, shapes.add_polygon(name + '-root', placed[1], -0.008, 0.01)]
+
+
+SERRATIONS = 14
+
+
+def crown_edge_point(half, base_z, height, k):
+    """
+    Step `k` up one edge of the crown from its foot (-half or +half) to its tip: the edge bowed in a
+    little, as a shark's tooth is, and every other step set out by a fine serration.
+    """
+    t = k / SERRATIONS
+    hollow = 0.12 * math.sin(t * math.pi)
+    notch = height * 0.02 if k % 2 else 0.0
+    side = 1.0 if half > 0 else -1.0
+    return (half * (1.0 - t) - side * half * hollow + side * notch, base_z + height * t)
+
+
+def turned_point(point, centre, turn):
+    """`point`, given about the origin, turned by `turn` in the face and moved to `centre`."""
+    x, z = point
+    return (centre[0] + x * math.cos(turn) - z * math.sin(turn), centre[1] + x * math.sin(turn) + z * math.cos(turn))
+
+
+def vein_crossed_bars(rng, body):
+    """Wolfram: heavy square bars of wolframite in a heap, three laid one way and two crossed over them on the diagonals."""
+    marks = []
+    for i, (x, z, angle, length) in enumerate(((-0.04, 0.17, 0.14, 0.46), (0.0, 0.02, 0.06, 0.54), (0.05, -0.14, 0.2, 0.44),
+                                                (-0.05, 0.0, 0.85, 0.44), (0.1, -0.02, 2.45, 0.4))):
+        width = rng.uniform(0.05, 0.06)
+        lift = -0.03 if i >= 3 else -0.012
+        bar = shapes.add_cube('bar-%d' % i, 1.0, (x, lift, z), scale=(length, width * 0.8, width), rotation=(0.0, -angle, 0.0))
+        shapes.bevel(bar, 0.006, segments=1)
+        marks.append(bar)
+    return assign_all(marks, body)
+
+
+def vein_faceted_spheres(rng, body):
+    """Fire garnet: round garnets, each a ball of flat facets that catch the lamp one by one, a few half-sunk in the face."""
+    marks = []
+    for i, (x, z) in enumerate(shapes.scatter_positions(rng, 6, 0.25, 0.17)):
+        radius = rng.uniform(0.05, 0.08)
+        ball = shapes.add_icosphere('garnet-%d' % i, radius, (x, -radius * rng.uniform(0.1, 0.5), z), subdivisions=1,
+                                    rotation=(rng.uniform(0, math.tau), rng.uniform(0, math.tau), rng.uniform(0, math.tau)))
+        for polygon in ball.data.polygons:
+            polygon.use_smooth = False
+        marks.append(ball)
+    return assign_all(marks, body)
+
+
+def vein_vertebra_column(rng, body):
+    """Saurian vertebra: a short run of vertebrae along a gentle curve, each a waisted spool with its spine and two side processes."""
+    marks = []
+    for k in range(4):
+        t = (k - 1.5) / 1.5
+        centre = (t * 0.24, 0.02 - 0.06 * t * t)
+        angle = math.atan2(-0.12 * t, 1.0)
+        marks += vertebra_of('vertebra-%d' % k, centre, rng.uniform(0.064, 0.07), angle)
+    return assign_all(marks, body)
+
+
+def vertebra_of(name, centre, radius, angle):
+    """The centrum, a short round spool along `angle`, its neural spine up the face and two transverse processes."""
+    spool = shapes.add_prism(name, radius, radius * 1.8, (centre[0], -radius * 0.35, centre[1]), rotation=(0.0, math.pi / 2 - angle, 0.0), sides=18)
+    spool.scale = (0.85, 0.55, 1.0)
+    shapes.bevel(spool, radius * 0.2, segments=2)
+    spine = [turned_point(point, centre, angle) for point in
+             ((-radius * 0.4, radius * 0.6), (-radius * 0.22, radius * 1.9), (-radius * 0.5, radius * 2.6), (radius * 0.5, radius * 2.7),
+              (radius * 0.22, radius * 1.9), (radius * 0.4, radius * 0.6))]
+    processes = [turned_point(point, centre, angle) for point in
+                 ((-radius * 0.25, -radius * 0.2), (-radius * 0.3, -radius * 1.9), (radius * 0.3, -radius * 1.9), (radius * 0.25, -radius * 0.2))]
+    return [spool, shapes.add_polygon(name + '-spine', spine, -0.01, 0.012), shapes.add_polygon(name + '-process', processes, -0.008, 0.01)]
+
+
 def kinked_path(start, end, rng, segments):
     """A wire from start to end, wobbling in the face at every inner point."""
     points = []
@@ -2264,6 +2518,11 @@ BASES = {
     'dew-beads': base_dew_beads,
     'ribbon-stripes': base_ribbon_stripes,
     'bladed-stibnite': base_bladed_stibnite,
+    'oily-swirls': base_oily_swirls,
+    'phosphate-beds': base_phosphate_beds,
+    'bladed-columns': base_bladed_columns,
+    'ember-depths': base_ember_depths,
+    'spongy-bone': base_spongy_bone,
 }
 SHEENS = {
     'earthy': sheen_earthy,
@@ -2315,6 +2574,11 @@ SHEENS = {
     'dew-glints': sheen_dew_glints,
     'tumbled-polish': sheen_tumbled_polish,
     'blade-flash': sheen_blade_flash,
+    'oil-film': sheen_oil_film,
+    'enamel-glaze': sheen_enamel_glaze,
+    'fibre-satin': sheen_fibre_satin,
+    'ember-glow': sheen_ember_glow,
+    'bone-dust': sheen_bone_dust,
 }
 VEINS = {
     'nugget-cluster': vein_nugget_cluster,
@@ -2366,6 +2630,11 @@ VEINS = {
     'needle-sheaves': vein_needle_sheaves,
     'canal-cobbles': vein_canal_cobbles,
     'stibnite-sprays': vein_stibnite_sprays,
+    'olive-drops': vein_olive_drops,
+    'serrated-teeth': vein_serrated_teeth,
+    'crossed-bars': vein_crossed_bars,
+    'faceted-spheres': vein_faceted_spheres,
+    'vertebra-column': vein_vertebra_column,
 }
 RECIPES = {'base': BASES, 'vein': VEINS, 'sheen': SHEENS}
 

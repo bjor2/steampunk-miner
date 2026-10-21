@@ -347,6 +347,41 @@
       "wornBy": ["antimony-brassvein"]
     },
     {
+      "kind": "base",
+      "id": "oily-swirls",
+      "cell": "cells/base/oily-swirls.png",
+      "blend": "blend/base-oily-swirls.blend",
+      "wornBy": ["peridot-quartzine"]
+    },
+    {
+      "kind": "base",
+      "id": "phosphate-beds",
+      "cell": "cells/base/phosphate-beds.png",
+      "blend": "blend/base-phosphate-beds.blend",
+      "wornBy": ["shark-tooth-amberbone"]
+    },
+    {
+      "kind": "base",
+      "id": "bladed-columns",
+      "cell": "cells/base/bladed-columns.png",
+      "blend": "blend/base-bladed-columns.blend",
+      "wornBy": ["wolfram-brassvein"]
+    },
+    {
+      "kind": "base",
+      "id": "ember-depths",
+      "cell": "cells/base/ember-depths.png",
+      "blend": "blend/base-ember-depths.blend",
+      "wornBy": ["fire-garnet-quartzine"]
+    },
+    {
+      "kind": "base",
+      "id": "spongy-bone",
+      "cell": "cells/base/spongy-bone.png",
+      "blend": "blend/base-spongy-bone.blend",
+      "wornBy": ["saurian-vertebra-amberbone"]
+    },
+    {
       "kind": "vein",
       "id": "nugget-cluster",
       "cell": "cells/vein/nugget-cluster.png",
@@ -690,6 +725,41 @@
       "wornBy": ["antimony-brassvein"]
     },
     {
+      "kind": "vein",
+      "id": "olive-drops",
+      "cell": "cells/vein/olive-drops.png",
+      "blend": "blend/vein-olive-drops.blend",
+      "wornBy": ["peridot-quartzine"]
+    },
+    {
+      "kind": "vein",
+      "id": "serrated-teeth",
+      "cell": "cells/vein/serrated-teeth.png",
+      "blend": "blend/vein-serrated-teeth.blend",
+      "wornBy": ["shark-tooth-amberbone"]
+    },
+    {
+      "kind": "vein",
+      "id": "crossed-bars",
+      "cell": "cells/vein/crossed-bars.png",
+      "blend": "blend/vein-crossed-bars.blend",
+      "wornBy": ["wolfram-brassvein"]
+    },
+    {
+      "kind": "vein",
+      "id": "faceted-spheres",
+      "cell": "cells/vein/faceted-spheres.png",
+      "blend": "blend/vein-faceted-spheres.blend",
+      "wornBy": ["fire-garnet-quartzine"]
+    },
+    {
+      "kind": "vein",
+      "id": "vertebra-column",
+      "cell": "cells/vein/vertebra-column.png",
+      "blend": "blend/vein-vertebra-column.blend",
+      "wornBy": ["saurian-vertebra-amberbone"]
+    },
+    {
       "kind": "sheen",
       "id": "earthy",
       "cell": "cells/sheen/earthy.png",
@@ -1031,6 +1101,41 @@
       "cell": "cells/sheen/blade-flash.png",
       "blend": "blend/sheen-blade-flash.blend",
       "wornBy": ["antimony-brassvein"]
+    },
+    {
+      "kind": "sheen",
+      "id": "oil-film",
+      "cell": "cells/sheen/oil-film.png",
+      "blend": "blend/sheen-oil-film.blend",
+      "wornBy": ["peridot-quartzine"]
+    },
+    {
+      "kind": "sheen",
+      "id": "enamel-glaze",
+      "cell": "cells/sheen/enamel-glaze.png",
+      "blend": "blend/sheen-enamel-glaze.blend",
+      "wornBy": ["shark-tooth-amberbone"]
+    },
+    {
+      "kind": "sheen",
+      "id": "fibre-satin",
+      "cell": "cells/sheen/fibre-satin.png",
+      "blend": "blend/sheen-fibre-satin.blend",
+      "wornBy": ["wolfram-brassvein"]
+    },
+    {
+      "kind": "sheen",
+      "id": "ember-glow",
+      "cell": "cells/sheen/ember-glow.png",
+      "blend": "blend/sheen-ember-glow.blend",
+      "wornBy": ["fire-garnet-quartzine"]
+    },
+    {
+      "kind": "sheen",
+      "id": "bone-dust",
+      "cell": "cells/sheen/bone-dust.png",
+      "blend": "blend/sheen-bone-dust.blend",
+      "wornBy": ["saurian-vertebra-amberbone"]
     }
   ]
 }

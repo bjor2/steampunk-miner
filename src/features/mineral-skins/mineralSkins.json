@@ -1,5 +1,5 @@
 {
-  "$comment": "The mineral skins of #576 (GD ruling 20 Oct 2026, ticket 591): a species' skin is four layers drawn bottom first, a base texture, a vein or crystal shape, a palette and a sheen, each an id of its layer list below. A skin row names its species (a materials.json id) and one id per layer; no two species of one pool share all four, so no two species on one planet look alike. A palette is a ramp of three display colours, shadow, body and light, darkest first; its body is the hue slot colour of the species wearing it (ticket 450), so the skin keeps the hue guards of materials.json. The base, vein and sheen layers are drawn in Blender, one cell each (docs/art/mineral-skins, skin-layers.json). Look only: no price, gate, income, generation or save reads it. The batch tickets (#592 to #606) add the layers and rows, 15 species per planet on P1 to P5; #592 skins P1's slots 1 to 5, #593 its slots 6 to 10, #594 its slots 11 and 12 (the legacy pool has 12 species); #598 skins P3's slots 1 to 5, #599 its slots 6 to 10 and #600 its slots 11 to 15 (the foothold-p3 pool; its slots 16 and 17, the two fossil commons of #453, are held); #601 P4's slots 1 to 5 and #603 its slots 11 to 15 (the foothold-p4 pool; its slots 16 and 17, #453's fossil commons, are held); #604 P5's slots 1 to 5 (the foothold-p5 pool; its slots 16 and 17, #453's fossil commons, are held); #595 P2's slots 1 to 5 (the foothold-p2 pool of #632, on the legacy slots). A signature row dresses the signature material of its planet, the slotless 16th material (#453 E1), keyed by the planet: one per planet, apart from every species of the planet's pool, its palette's body inside the hue and luma bands of the family's look (ore-visuals, #151) since it has no hue slot; #600 adds P3's and #603 P4's.",
+  "$comment": "The mineral skins of #576 (GD ruling 20 Oct 2026, ticket 591): a species' skin is four layers drawn bottom first, a base texture, a vein or crystal shape, a palette and a sheen, each an id of its layer list below. A skin row names its species (a materials.json id) and one id per layer; no two species of one pool share all four, so no two species on one planet look alike. A palette is a ramp of three display colours, shadow, body and light, darkest first; its body is the hue slot colour of the species wearing it (ticket 450), so the skin keeps the hue guards of materials.json. The base, vein and sheen layers are drawn in Blender, one cell each (docs/art/mineral-skins, skin-layers.json). Look only: no price, gate, income, generation or save reads it. The batch tickets (#592 to #606) add the layers and rows, 15 species per planet on P1 to P5; #592 skins P1's slots 1 to 5, #593 its slots 6 to 10, #594 its slots 11 and 12 (the legacy pool has 12 species); #598 skins P3's slots 1 to 5, #599 its slots 6 to 10 and #600 its slots 11 to 15 (the foothold-p3 pool; its slots 16 and 17, the two fossil commons of #453, are held); #601 P4's slots 1 to 5 and #603 its slots 11 to 15 (the foothold-p4 pool; its slots 16 and 17, #453's fossil commons, are held); #604 P5's slots 1 to 5 and #605 its slots 6 to 10 (the foothold-p5 pool; its slots 16 and 17, #453's fossil commons, are held); #595 P2's slots 1 to 5 (the foothold-p2 pool of #632, on the legacy slots). A signature row dresses the signature material of its planet, the slotless 16th material (#453 E1), keyed by the planet: one per planet, apart from every species of the planet's pool, its palette's body inside the hue and luma bands of the family's look (ore-visuals, #151) since it has no hue slot; #600 adds P3's and #603 P4's.",
   "layers": {
     "base": [
       {
@@ -148,6 +148,21 @@
       },
       {
         "id": "bladed-stibnite"
+      },
+      {
+        "id": "oily-swirls"
+      },
+      {
+        "id": "phosphate-beds"
+      },
+      {
+        "id": "bladed-columns"
+      },
+      {
+        "id": "ember-depths"
+      },
+      {
+        "id": "spongy-bone"
       }
     ],
     "vein": [
@@ -297,6 +312,21 @@
       },
       {
         "id": "stibnite-sprays"
+      },
+      {
+        "id": "olive-drops"
+      },
+      {
+        "id": "serrated-teeth"
+      },
+      {
+        "id": "crossed-bars"
+      },
+      {
+        "id": "faceted-spheres"
+      },
+      {
+        "id": "vertebra-column"
       }
     ],
     "palette": [
@@ -495,6 +525,26 @@
       {
         "id": "antimony-silver",
         "ramp": ["#575a5d", "#aeb3ba", "#d7d9dc"]
+      },
+      {
+        "id": "peridot-olive",
+        "ramp": ["#475d1b", "#8eba36", "#c7dc9b"]
+      },
+      {
+        "id": "shark-tooth-grey",
+        "ramp": ["#474a51", "#8e94a2", "#c6cad0"]
+      },
+      {
+        "id": "wolfram-steel",
+        "ramp": ["#4e5257", "#9ca5ae", "#ced2d6"]
+      },
+      {
+        "id": "fire-garnet-red",
+        "ramp": ["#70283a", "#e05074", "#f0a8ba"]
+      },
+      {
+        "id": "saurian-bone",
+        "ramp": ["#5c5c48", "#b7b78f", "#dbdbc7"]
       }
     ],
     "sheen": [
@@ -644,6 +694,21 @@
       },
       {
         "id": "blade-flash"
+      },
+      {
+        "id": "oil-film"
+      },
+      {
+        "id": "enamel-glaze"
+      },
+      {
+        "id": "fibre-satin"
+      },
+      {
+        "id": "ember-glow"
+      },
+      {
+        "id": "bone-dust"
       }
     ]
   },
@@ -976,6 +1041,41 @@
       "vein": "stibnite-sprays",
       "palette": "antimony-silver",
       "sheen": "blade-flash"
+    },
+    {
+      "species": "peridot-quartzine",
+      "base": "oily-swirls",
+      "vein": "olive-drops",
+      "palette": "peridot-olive",
+      "sheen": "oil-film"
+    },
+    {
+      "species": "shark-tooth-amberbone",
+      "base": "phosphate-beds",
+      "vein": "serrated-teeth",
+      "palette": "shark-tooth-grey",
+      "sheen": "enamel-glaze"
+    },
+    {
+      "species": "wolfram-brassvein",
+      "base": "bladed-columns",
+      "vein": "crossed-bars",
+      "palette": "wolfram-steel",
+      "sheen": "fibre-satin"
+    },
+    {
+      "species": "fire-garnet-quartzine",
+      "base": "ember-depths",
+      "vein": "faceted-spheres",
+      "palette": "fire-garnet-red",
+      "sheen": "ember-glow"
+    },
+    {
+      "species": "saurian-vertebra-amberbone",
+      "base": "spongy-bone",
+      "vein": "vertebra-column",
+      "palette": "saurian-bone",
+      "sheen": "bone-dust"
     }
   ],
   "signatures": [
