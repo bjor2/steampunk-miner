@@ -279,10 +279,11 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/ground-gun/turretPace.lane.test.ts` | 1 | 1 |
 | `src/features/ground-gun/ui/fireGauge.test.ts` | 3 | 3 |
 
-### `materials`: 3 files, 52 tests
+### `materials`: 4 files, 60 tests
 
 | File | Tests | Sites |
 | --- | --- | --- |
+| `src/features/materials/systems/materialNames.test.ts` | 8 | 3 |
 | `src/features/materials/systems/materialTable.test.ts` | 41 | 38 |
 | `src/features/materials/systems/render/heroAtlases.test.ts` | 6 | 6 |
 | `src/features/materials/systems/render/rarityLooks.test.ts` | 5 | 5 |
