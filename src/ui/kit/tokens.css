@@ -1,14 +1,130 @@
 /* Design tokens only. No classes here: those live in a CSS Module beside their component. */
 :root {
+  /*
+   * The design system's tokens (spec #678, ticket 682; docs/ui/design-system.md). Every value from
+   * `--color-bg` down to `--warn-glow-thickness` is a token of `src/data/design/designTokens.json`
+   * as `systems/views/designTokenCss.ts` names it; `designTokenCss.test.ts` fails when the two
+   * disagree, so change the JSON and copy the value here. The colours carry over from #13, #41,
+   * #105 and #423; the four skinnable ones (`accent`, `accent-soft`, `glow`, `dial-face`) are
+   * rewritten on the root by the planet's skin (section 14).
+   */
   --color-bg: #1b1613;
+  /* Section 2: a panel is the panel colour at the panel opacity (#45), the world shows through. */
+  --color-panel: rgb(27 22 19 / 0.85);
+  --color-text: #f3ead8;
+  --color-parchment: #e9dcc0;
   --color-brass: #c9a24b;
   --color-copper: #b87333;
   --color-amber: #e0a040;
   --color-teal: #3fa7a0;
-  /* #105: the Refinery bay's furnace glow. */
+  --color-verdigris: #4fa8a0;
+  /* #105: the Refinery bay's furnace glow; the ladder's critical tier. */
   --color-ember: #e0602a;
-  --color-parchment: #e9dcc0;
-  --color-panel: rgb(27 22 19 / 0.85);
+  --color-iron: #3a3632;
+  --color-steel: #8a94a0;
+  --color-danger: #c8382a;
+  --color-accent: #c9a24b;
+  --color-accent-soft: #e0a040;
+  --color-glow: #e0a040;
+  --color-dial-face: #e9dcc0;
+  /* Section 3: brass is the frame, never the fill; a bar fills with what it measures. */
+  --gauge-fill-hull: var(--color-copper);
+  --gauge-fill-fuel: var(--color-amber);
+  --gauge-fill-cargo: var(--color-verdigris);
+  --gauge-fill-heat: var(--color-ember);
+  --glass-sheen-opacity: 0.08;
+  --material-brass-highlight: #efd27a;
+  --material-brass-base: #c9a24b;
+  --material-brass-shadow: #6e5220;
+  --material-copper-highlight: #e0995c;
+  --material-copper-base: #b87333;
+  --material-copper-shadow: #5e3414;
+  --material-iron-highlight: #5c5650;
+  --material-iron-base: #3a3632;
+  --material-iron-shadow: #17140f;
+  --material-steel-highlight: #b8c0c8;
+  --material-steel-base: #8a94a0;
+  --material-steel-shadow: #454c54;
+  --material-parchment-highlight: #f6efdc;
+  --material-parchment-base: #e9dcc0;
+  --material-parchment-shadow: #b9a888;
+  /* Section 4: rem, so every size grows with --ui-scale (#173); 14 px is the GD's floor. */
+  --font-body: 'Georgia', 'Times New Roman', serif;
+  --font-numerals: ui-monospace, 'Cascadia Mono', Consolas, monospace;
+  --type-min: 0.875rem;
+  --type-label: 0.875rem;
+  --type-body: 1rem;
+  --type-odometer: 1.125rem;
+  --type-title: 1.25rem;
+  --type-display: 1.5rem;
+  --line-height: 1.3;
+  --label-tracking: 0.08em;
+  /* Section 5. */
+  --space-1: calc(4px * var(--ui-scale));
+  --space-2: calc(8px * var(--ui-scale));
+  --space-3: calc(16px * var(--ui-scale));
+  --space-4: calc(24px * var(--ui-scale));
+  --space-5: calc(32px * var(--ui-scale));
+  --radius-panel: 6px;
+  --radius-card: 4px;
+  --radius-chip: 12px;
+  --frame-hairline: 1px;
+  --frame-bezel: 2px;
+  --frame-double: 3px;
+  --frame-rivet: 3px;
+  /* Section 6: every transition 200 ms or less; the needle, odometer and glow have their own caps. */
+  --motion-max: 200ms;
+  --motion-instant: 80ms;
+  --motion-quick: 120ms;
+  --motion-standard: 160ms;
+  --motion-sheet: 200ms;
+  --ease-enter: cubic-bezier(0.2, 0.8, 0.2, 1);
+  --ease-exit: cubic-bezier(0.4, 0, 1, 1);
+  --ease-needle: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --needle-ease-min: 150ms;
+  --needle-ease-max: 250ms;
+  --needle-lag-max: 300ms;
+  --needle-overshoot: 0.06;
+  --odometer-roll-max: 600ms;
+  --odometer-digit: 120ms;
+  --float-up: 600ms;
+  --glow-pulse: 1000ms;
+  --toast-max: 2000ms;
+  /* Section 7: the warning ladder's tiers, as edge glows. */
+  --warn-low: var(--color-amber);
+  --warn-critical: var(--color-ember);
+  --warn-empty: var(--color-danger);
+  --warn-glow-opacity: 0.6;
+  /*
+   * Section 9: the keep-outs as shares of the stage, the edge lanes, the strip and the slot cells.
+   * The phone layout's values sit here (phone first); `data-layout`, which the shell writes from
+   * the HUD density switch (#500 ruling 5), swaps in the desktop's below.
+   */
+  --tap-target-min: 44px;
+  --coarse-target: 56px;
+  --top-keep-out: 15%;
+  --thumb-zone-height: 45%;
+  --stick-zone-width: 40%;
+  --middle-band-top: 30%;
+  --middle-band-bottom: 70%;
+  --edge-lane: 8px;
+  --layout-margin: 8px;
+  --strip-bar-height: 8px;
+  --edge-gauge-width: 4px;
+  --status-icon-size: 16px;
+  --slot-gap: 4px;
+  --slot-cooldown-ring: 3px;
+  /* Where a HUD box's outer edge sits: the strip right under the top inset, the rest a margin in. */
+  --hud-inset-top: var(--safe-top);
+  --hud-inset-right: calc(var(--safe-right) + var(--layout-margin));
+  --hud-inset-bottom: calc(var(--safe-bottom) + var(--layout-margin));
+  --hud-inset-left: calc(var(--safe-left) + var(--layout-margin));
+  --strip-height: 36px;
+  --strip-max-width: 600px;
+  --slot-cell: 44px;
+  --slot-columns: 3;
+  --warn-glow-thickness: 24px;
+
   /* #41 casing feel: the bay teal for lining that holds its band, amber for lining that does not. */
   --color-casing-safe: #4fa8a0;
   --color-casing-weak: #e0a030;
@@ -28,20 +144,28 @@
   --safe-left: env(safe-area-inset-left, 0px);
   --control-min: 44px;
   --shop-text: 17.6px;
-  --space-1: calc(4px * var(--ui-scale));
-  --space-2: calc(8px * var(--ui-scale));
-  --space-3: calc(16px * var(--ui-scale));
-  --radius-panel: 6px;
   /* #173: every control's keyboard focus ring, the hook a focus-driven UI (#168) can use later. */
   --focus-ring: 3px solid var(--color-amber);
   --focus-ring-offset: 2px;
   /*
    * The readable floor (spec #422 ruling 2, build #423): nothing on a dark panel is smaller or
    * dimmer than these. 15 px at the 800 px reference (a rem, so it grows with --ui-scale; 15 epx
-   * is the 10-foot guide's main text), and a parchment at about 14:1 on --color-bg.
+   * is the 10-foot guide's main text), and `--color-text`, a parchment at about 14:1 on --color-bg.
    */
   --text-min: 0.9375rem;
-  --color-text: #f3ead8;
-  --font-body: 'Georgia', 'Times New Roman', serif;
   --font-mono: ui-monospace, 'Cascadia Mono', Consolas, monospace;
+}
+
+/* Section 9: the desktop layout, a first-class layout equal to the phone's (Bjor via HS). */
+:root[data-layout='desktop'] {
+  --strip-height: 44px;
+  --strip-max-width: 720px;
+  --slot-cell: 48px;
+  --slot-columns: 9;
+  --warn-glow-thickness: 32px;
+}
+
+/* A phone held sideways lays its slot cells in one row. */
+:root[data-layout='phone'][data-orientation='landscape'] {
+  --slot-columns: 6;
 }

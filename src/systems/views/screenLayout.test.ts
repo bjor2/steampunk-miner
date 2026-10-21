@@ -56,6 +56,7 @@ describe('screen layout: orientation', () => {
     expect(screenAttributesOf(screenLayoutOf(phone(390, 844), false))).toEqual({
       'data-orientation': 'portrait',
       'data-hud-density': 'compact',
+      'data-layout': 'phone',
     })
   })
 })

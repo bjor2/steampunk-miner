@@ -19,6 +19,7 @@ import {
   UI_SCALE_REFERENCE_SHORT_AXIS_PX,
 } from '../../constants/screen'
 import { SHOP_TEXT_REFERENCE_PX, STAGE_MAX_ASPECT } from '../../constants/scene'
+import { layoutKindOf } from './designSystem'
 import { vehicleKeepClearOf } from './hudClearView'
 
 /** The window in CSS pixels and whether its primary pointer is a finger, as the shell reads it. */
@@ -172,9 +173,17 @@ export function hintChipMaxHeightOf(heightPixels: number): number {
   return (heightPixels * HINT_CHIP_MAX_HEIGHT_PERCENT) / PERCENT
 }
 
-/** The layout as the attributes on the page root: what panels and the HUD switch layout on. */
+/**
+ * The layout as the attributes on the page root: what panels and the HUD switch layout on.
+ * `data-layout` is the design system's phone or desktop (ticket 682), read from the density so
+ * the two never disagree; `tokens.css` swaps the layout tokens on it.
+ */
 export function screenAttributesOf(layout: ScreenLayout): Record<string, string> {
-  return { 'data-orientation': layout.orientation, 'data-hud-density': layout.hudDensity }
+  return {
+    'data-orientation': layout.orientation,
+    'data-hud-density': layout.hudDensity,
+    'data-layout': layoutKindOf(layout.hudDensity),
+  }
 }
 
 /**

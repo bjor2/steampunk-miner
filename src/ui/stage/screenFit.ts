@@ -1,9 +1,10 @@
 /**
  * Keeps the stage and the UI fitted to the screen (#173): lays the screen out again on every
  * resize, rotation, change of pointer and switch of TV mode, and hands the result to the shell as
- * the page root's custom properties, its `data-orientation` (ticket 483) and its
- * `data-hud-density` (#500). The one writer of all three, so panels switch their portrait layout
- * and the HUD its compact one from this one source; React reads the layout through
+ * the page root's custom properties, its `data-orientation` (ticket 483), its
+ * `data-hud-density` (#500) and the design system's `data-layout` (ticket 682). The one writer of
+ * them all, so panels switch their portrait layout, the HUD its compact one and the tokens their
+ * phone or desktop values from this one source; React reads the layout through
  * `subscribeFittedScreen`, which a refit notifies.
  */
 import type { Shell } from '../../shell/shell'
