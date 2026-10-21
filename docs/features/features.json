@@ -477,6 +477,12 @@
               ]
             },
             {
+              "title": "First-five looks",
+              "description": "Planets 2 to 5 each wear their own rock tint, horizon and sky band, read from the planet's registry row; planet 1 looks as before.",
+              "status": "built",
+              "issues": [653]
+            },
+            {
               "title": "Heat / lava planets",
               "description": "Planets 8 to 16 (the Fire act): a heat gauge, lava pockets and a firebrick palette, announced by a stinger.",
               "status": "built",

@@ -324,6 +324,20 @@ programs }` from three's `renderer.info` of the game canvas), read only when cal
   plain ground inside the row's window, counted in radial cells; planet 1, planets past 5 and every
   P2 to P5 a save holds under ore rules 7 or earlier meet none; and a fresh P2 to P5 generates the
   cells rules 7 made, since a pocket is a read and never a repaint.
+- **Per-planet looks for P2 to P5** (ticket 653, spec #647): `src/features/ores/systems/planetLooks.test.ts`
+  holds each of planets 2 to 5 to its row look (rock surface and deep, horizon, sky band) and planet 1
+  and planets past 5 to none, planet 1 to its archetype palette with no band, planets 1 to 5 to a
+  pairwise different rock and horizon and 2 to 5 to different bands (32 channel steps apart), every
+  look's rock to at most the brightest archetype host rock (the luma materials' hue slots sit above),
+  and every planet's params to the same with and without the look (existing worlds keep their stamp).
+  The loader refuses a look on planet 1, a missing one on planets 2 to 5, a bad colour, a rock too
+  bright, a band out of bounds, two planets sharing a look and stray fields. The kernel's
+  `planetLooks.test.ts` holds the seam: the shown palette takes rock and horizon from a look and keeps
+  the archetype's pad, core and underground, a planet class's band wins over the look's, and a look
+  recolours a chunk's rock with every ore colour unchanged (inside #151's tint caps).
+  `casingLiningLook.test.ts` reads every planet's shown palette too. `e2e/browser/planetLooks.spec.ts`
+  (box Tester) checks the drawn band and the pairwise looks in a 360 px window and attaches each
+  planet's review shot.
 - **Material looks** (ticket 450, TD shape on #450 6226270701 and the Scalers' conditions):
   `src/features/roster/kindLook.test.ts` holds the roster's look provider to its rules: a fresh
   save shows no species (unseen kinds draw the family look), a species shows only once the
