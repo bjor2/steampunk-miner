@@ -326,6 +326,19 @@ the order the wallet reaches it; a researched item's card offers its next Mark w
 gain ("Mk II: -10% cooldown") or milestone verb, a locked one says why. The HUD's tree button
 opens it. The lane map, its pan and pinch, the node sheet and the plaques around the car are gone.
 
+**Cargo and saves on the sheet (#688).** The kernel's own tabs, the **Hold** and the **Ledger**, sit
+on the bar everywhere (`KERNEL_SHEET_TABS`, after the Outfitter and the Patent Office). The Hold is
+the Sell bay's ore panel as was: one Sell card per held tier (the tier's ore icon, `Tier N ore`,
+the line value as its figure, "12 held, 4.5k each." as its line) and Sell all. Each card carries
+the authority's refusal of its sale, so it is greyed away from the Sell bay and acts only docked
+there; the pad and the keys step over the cards as menu focus, marked by the screen buttons'
+double frame. The Sell bay keeps Quick service, Refined, Lining and Charging, and one Hold row whose
+Open opens the Hold. The Ledger is the pause menu's save page as was (#672 copy, #703 slot line,
+#704 Scrap), drawn in the sheet's one scroll area: Save game opens it and the pause plate gives
+way, the world stays held, the pause menu's focus stops and Escape still drive it, its Close steps
+back to the pause menu's first page, and picking another tab leaves the pause menu. The title
+menu's Load page is unchanged.
+
 ## 11. Copy
 
 **Vocabulary** (Progression, GD lock): the places are the **Outfitter** (the upgrade bay's sheet,

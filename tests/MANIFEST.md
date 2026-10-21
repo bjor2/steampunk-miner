@@ -1433,7 +1433,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/store/runSnapshots.test.ts` | 10 | 10 |
 | `src/store/saveKeeping.test.ts` | 15 | 15 |
 | `src/store/saveResumeLog.test.ts` | 2 | 2 |
-| `src/store/sheetSlice.test.ts` | 10 | 10 |
+| `src/store/sheetSlice.test.ts` | 19 | 19 |
 | `src/store/sliceRun.test.ts` | 7 | 7 |
 | `src/store/slowDeviceChip.test.ts` | 2 | 2 |
 | `src/store/soundUnlockSlice.test.ts` | 4 | 4 |
@@ -1649,6 +1649,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/views/hazardStripView.test.ts` | 3 | 3 |
 | `src/systems/views/heatViews.test.ts` | 5 | 5 |
 | `src/systems/views/hintRoom.test.ts` | 7 | 7 |
+| `src/systems/views/holdSheet.test.ts` | 7 | 7 |
 | `src/systems/views/holdTrackNote.test.ts` | 5 | 5 |
 | `src/systems/views/hudCallouts.test.ts` | 8 | 8 |
 | `src/systems/views/hudClearView.test.ts` | 18 | 15 |
@@ -1673,7 +1674,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/views/refineryBayModel.test.ts` | 4 | 4 |
 | `src/systems/views/screenLayout.test.ts` | 26 | 26 |
 | `src/systems/views/scrollRail.test.ts` | 5 | 5 |
-| `src/systems/views/sellBayModel.test.ts` | 14 | 14 |
+| `src/systems/views/sellBayModel.test.ts` | 15 | 15 |
 | `src/systems/views/settingsModel.test.ts` | 5 | 5 |
 | `src/systems/views/sheetLayout.test.ts` | 11 | 11 |
 | `src/systems/views/slotSummaryLine.test.ts` | 7 | 7 |
