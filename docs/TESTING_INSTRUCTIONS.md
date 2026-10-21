@@ -269,6 +269,14 @@ programs }` from three's `renderer.info` of the game canvas), read only when cal
   `balance:report` rows (first capped planet, each capped planet amber with its step);
   `generatorGolden.test.ts` checks rules 5 make the cells rules 4 did, and `oreRulesOldSaves.test.ts`
   loads a generator 11 save of P5 under rules 4 with main's column pin and its shipped surface.
+- **P2 species pool** (ticket 632, GD lock (b) on #595 6306010182; HS, VS and G&V on #576):
+  `src/features/roster/roster.p2Pool.test.ts` enters a fresh P2 under ore rules 6 on its own
+  `foothold-p2` species, one per legacy kind slot, loads a P2 saved under rules 5 on the legacy
+  species P1 shows, and reads the same whole-planet cells on both. `kindRows.test.ts` holds the
+  `poolsBeforeOreRules` table and its resolver, `rosterSpecies.test.ts` every kind of P1, a fresh P2
+  and a rules-5 P2 to one species of its pool, and `materialTable.test.ts` the 12 rows to their
+  slot's family, rarity and window with looks no other species wears. Income, p* and P2's time do
+  not move because the cells and kind slots do not: the Tester's `balance:report` confirms them.
 - **Material looks** (ticket 450, TD shape on #450 6226270701 and the Scalers' conditions):
   `src/features/roster/kindLook.test.ts` holds the roster's look provider to its rules: a fresh
   save shows no species (unseen kinds draw the family look), a species shows only once the

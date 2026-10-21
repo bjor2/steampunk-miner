@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { freshPlanetParamsFor } from '../../../systems/world/planetParams'
+import { freshPlanetParamsFor, planetParamsFor } from '../../../systems/world/planetParams'
 import { MATERIALS, type Material } from '../../materials'
 import { ORE_ROWS, rarityRowSetOfPlanet, type KindSlot } from '../../ores'
 import { planetRosterOf, poolOfPlanet } from './planetRoster'
@@ -9,7 +9,8 @@ import { planetRosterOf, poolOfPlanet } from './planetRoster'
 // rarity and window equal the slot's, and every slot of the legacy table holds exactly one species.
 // The pool guard of ticket 542 (TD shape on #453, 6236465674): every pool of `kinds.pools` holds
 // exactly one species for every slot a planet of it can ask for, and no species row's pool is
-// unmapped.
+// unmapped. P2's own pool (ticket 632, GD lock (b) on #595) binds the legacy slots, and a P2 a save
+// holds under ore rules 5 or earlier keeps the legacy species.
 
 const SEED = 83921
 const ALL_SLOTS: readonly KindSlot[] = Object.values(ORE_ROWS.kinds.slotsBySet).flat()
@@ -62,15 +63,19 @@ describe('roster species', () => {
     expect(counts).toEqual(ORE_ROWS.kinds.slotsBySet.legacy.map(() => 1))
   })
 
-  it('draws planets 1 and 2 from the legacy rows, every roster kind with its species', () => {
-    for (const index of [1, 2]) {
-      const params = freshPlanetParamsFor(SEED, index)
+  it.each([
+    { planet: 'planet 1', params: freshPlanetParamsFor(SEED, 1), pool: 'legacy' },
+    { planet: 'a fresh planet 2', params: freshPlanetParamsFor(SEED, 2), pool: 'foothold-p2' },
+    { planet: 'planet 2 under ore rules 5', params: planetParamsFor(SEED, 2, 5), pool: 'legacy' },
+  ])(
+    'draws $planet from the legacy rows and the $pool pool, every kind its species',
+    ({ params, pool }) => {
       expect(rarityRowSetOfPlanet(params)).toBe('legacy')
-      expect(poolOfPlanet(params)).toBe('legacy')
-      const species = planetRosterOf(params).map((slot) => speciesOfSlot('legacy', slot.slotId))
+      expect(poolOfPlanet(params)).toBe(pool)
+      const species = planetRosterOf(params).map((slot) => speciesOfSlot(pool, slot.slotId))
       expect(species.map((found) => found.length)).toEqual(Array(12).fill(1))
-    }
-  })
+    },
+  )
 
   it('maps every planet from 1 to 7 to a pool', () => {
     const unmapped = [1, 2, 3, 4, 5, 6, 7].filter(

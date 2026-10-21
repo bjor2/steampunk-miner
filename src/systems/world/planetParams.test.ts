@@ -151,11 +151,11 @@ describe('planet params ore rules (ticket 445)', () => {
     expect(Object.keys(stamped).at(-1)).toBe('oreRulesVersion')
   })
 
-  it('stamps fresh planet 1 with ore rules 2 and planet 2 on with rules 5 (446, 448, #453, 625)', () => {
+  it('stamps fresh planet 1 with ore rules 2 and planet 2 on with rules 6 (446, 448, #453, 625, 632)', () => {
     const stamps = [1, 2, 3, 4, 60].map((index) => freshPlanetParamsFor(1, index).oreRulesVersion)
     expect(ORE_RULES_FROM_PLANET).toBe(1)
-    expect(ORE_RULES_VERSION).toBe(5)
-    expect(stamps).toEqual([2, 5, 5, 5, 5])
+    expect(ORE_RULES_VERSION).toBe(6)
+    expect(stamps).toEqual([2, 6, 6, 6, 6])
   })
 
   it('still reads a planet stamped with ore rules 1 (ticket 445)', () => {

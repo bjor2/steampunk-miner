@@ -279,11 +279,11 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/ground-gun/turretPace.lane.test.ts` | 1 | 1 |
 | `src/features/ground-gun/ui/fireGauge.test.ts` | 3 | 3 |
 
-### `materials`: 3 files, 48 tests
+### `materials`: 3 files, 52 tests
 
 | File | Tests | Sites |
 | --- | --- | --- |
-| `src/features/materials/systems/materialTable.test.ts` | 37 | 34 |
+| `src/features/materials/systems/materialTable.test.ts` | 41 | 38 |
 | `src/features/materials/systems/render/heroAtlases.test.ts` | 6 | 6 |
 | `src/features/materials/systems/render/rarityLooks.test.ts` | 5 | 5 |
 
@@ -374,7 +374,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/ore-visuals/systems/oreGradeChannels.test.ts` | 7 | 7 |
 | `src/features/ore-visuals/systems/render/oreLookProvider.test.ts` | 21 | 10 |
 
-### `ores`: 17 files, 117 tests
+### `ores`: 17 files, 121 tests
 
 | File | Tests | Sites |
 | --- | --- | --- |
@@ -384,7 +384,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/ores/rarityPickupRoutes.test.ts` | 4 | 2 |
 | `src/features/ores/rarityTripRun.test.ts` | 5 | 3 |
 | `src/features/ores/systems/kernelOreAliases.test.ts` | 2 | 2 |
-| `src/features/ores/systems/kindRows.test.ts` | 12 | 12 |
+| `src/features/ores/systems/kindRows.test.ts` | 16 | 16 |
 | `src/features/ores/systems/leadRoll.test.ts` | 20 | 12 |
 | `src/features/ores/systems/oreCatalogue.test.ts` | 9 | 9 |
 | `src/features/ores/systems/oreCensus.test.ts` | 4 | 4 |
@@ -461,7 +461,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/rig-look/systems/rigLookSource.test.ts` | 13 | 13 |
 | `src/features/rig-look/systems/rigLookTable.test.ts` | 16 | 16 |
 
-### `roster`: 13 files, 208 tests
+### `roster`: 14 files, 211 tests
 
 | File | Tests | Sites |
 | --- | --- | --- |
@@ -469,6 +469,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/roster/rarityShares.test.ts` | 18 | 18 |
 | `src/features/roster/roster.byteIdentity.lane.test.ts` | 5 | 1 |
 | `src/features/roster/roster.byteIdentity.test.ts` | 29 | 15 |
+| `src/features/roster/roster.p2Pool.test.ts` | 3 | 3 |
 | `src/features/roster/roster.pacing.lane.test.ts` | 1 | 1 |
 | `src/features/roster/roster.poolSeam.test.ts` | 7 | 1 |
 | `src/features/roster/systems/planetRoster.test.ts` | 10 | 10 |

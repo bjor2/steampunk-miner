@@ -243,11 +243,18 @@ describe('roster hero atlases (ticket 451)', () => {
     expect(heroAtlasOfPlanet(8)).toBe(null)
   })
 
+  // P2's own pool (ticket 632) has no hero art yet, so a fresh P2 shows none; a P2 a save holds
+  // under ore rules 5 keeps the legacy heroes its atlas packs.
   it("gives every hero of the P1 and P2 rosters a cell of its planet's atlas", () => {
-    for (const planet of [1, 2]) {
-      const cells = heroAtlasOfPlanet(planet)?.cells ?? []
-      const heroes = shownLooks(freshPlanetParamsFor(SEED, planet)).filter((look) => look.isHero)
-      expect(heroes.length, `planet ${planet}`).toBeGreaterThan(0)
+    const rosters = [
+      { params: freshPlanetParamsFor(SEED, 1), heroCount: 4 },
+      { params: planetParamsFor(SEED, 2, 5), heroCount: 4 },
+      { params: freshPlanetParamsFor(SEED, 2), heroCount: 0 },
+    ]
+    for (const { params, heroCount } of rosters) {
+      const cells = heroAtlasOfPlanet(params.planetIndex)?.cells ?? []
+      const heroes = shownLooks(params).filter((look) => look.isHero)
+      expect(heroes.length, `planet ${params.planetIndex}`).toBe(heroCount)
       expect(heroes.filter((look) => !cells.includes(look.speciesId))).toEqual([])
     }
   })

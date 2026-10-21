@@ -37,7 +37,7 @@ describe('travel', () => {
       toCanonical(sub(fromCanonical('1000'), travelFee(1))),
     )
     expect(toCanonical(travelFee(1))).toBe('6.075e+1')
-    expect(session.state().planet).toEqual({ index: 2, seed: WORLD_SEED, oreRulesVersion: 5 })
+    expect(session.state().planet).toEqual({ index: 2, seed: WORLD_SEED, oreRulesVersion: 6 })
     expect(events[0]).toMatchObject({
       type: 'TravelStarted',
       fromPlanet: 1,

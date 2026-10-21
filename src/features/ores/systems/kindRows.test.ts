@@ -26,9 +26,9 @@ function problemsWithEarlierPools(poolsBeforeOreRules: unknown): string[] {
   return oreRowProblems({ ore: { ...economyFile.ore, kinds } }, familiesFile)
 }
 
-/** The shipped files with the planet-to-pool table replaced. */
+/** The shipped files with the planet-to-pool table replaced, and no earlier pools to name it. */
 function problemsWithPools(pools: unknown): string[] {
-  const kinds = { ...economyFile.ore.kinds, pools }
+  const kinds = { ...economyFile.ore.kinds, pools, poolsBeforeOreRules: undefined }
   return oreRowProblems({ ore: { ...economyFile.ore, kinds } }, familiesFile)
 }
 
@@ -127,10 +127,10 @@ describe('ore kind slots', () => {
 describe('ore kind pools', () => {
   const poolOf = (planet: number) => ORE_ROWS.kinds.poolByPlanet.get(planet)
 
-  it('keeps planets 1 and 2 on the legacy pool and gives P3, P4 and P5 a pool each', () => {
+  it('keeps planet 1 on the legacy pool and gives P2, P3, P4 and P5 a pool each', () => {
     expect([1, 2, 3, 4, 5].map(poolOf)).toEqual([
       'legacy',
-      'legacy',
+      'foothold-p2',
       'foothold-p3',
       'foothold-p4',
       'foothold-p5',
@@ -177,6 +177,14 @@ describe('ore kind pools before an ore rules version', () => {
       today(2),
     ])
     expect([4, 5].map((rules) => poolOfPlanetUnder(kinds, 3, rules))).toEqual(['old-p3', today(3)])
+  })
+
+  it('keeps planet 2 as a save holds it under ore rules 5 or earlier on the legacy pool', () => {
+    const poolsOfP2 = [undefined, 2, 5, 6].map((rules) =>
+      poolOfPlanetUnder(ORE_ROWS.kinds, 2, rules),
+    )
+    expect(poolsOfP2).toEqual(['legacy', 'legacy', 'legacy', 'foothold-p2'])
+    expect(poolOfPlanetUnder(ORE_ROWS.kinds, 1, 2)).toBe('legacy')
   })
 
   it('leaves a planet the table does not name on its pool, and none past the pools table', () => {

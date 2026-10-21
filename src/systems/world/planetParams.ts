@@ -93,10 +93,11 @@ export interface PlanetParams {
 /**
  * The newest ore rules: 1 is the rarity rows (ticket 445), 2 adds the material roster, a kind slot
  * per ore patch (ticket 446), 3 the depth density curve from planet 3 (ticket 448), 4 the mixed
- * kinds table's roster from planet 3 (#453), 5 the pinned surface layer from planet 2 (ticket 625).
- * The stamp records the ground rules a planet was entered under, its rock's hardness with them.
+ * kinds table's roster from planet 3 (#453), 5 the pinned surface layer from planet 2 (ticket 625),
+ * 6 planet 2's own species pool on the legacy kind slots (ticket 632). The stamp records the ground
+ * rules a planet was entered under, its rock's hardness and its species pool with them.
  */
-export const ORE_RULES_VERSION = 5
+export const ORE_RULES_VERSION = 6
 
 /** The ore rules that add the depth density curve (ticket 448). */
 export const DEPTH_CURVE_ORE_RULES = 3
@@ -107,12 +108,16 @@ export const SURFACE_LAYER_ORE_RULES = 5
 /** Planet 1's band 1 is already as soft as the surface, so the layer first changes planet 2. */
 const SURFACE_LAYER_FIRST_PLANET = 2
 
+/** Planet 1 keeps the legacy pool byte-for-byte, so P2's own pool first changes planet 2 (632). */
+const P2_SPECIES_POOL_FIRST_PLANET = 2
+
 /**
  * The first planet each ore rules version changes, version 1 first: the rarity rows from P3 (the
  * `ores` slice's `mixedRowsFromPlanet`), the roster from P1 (TD ruling on ticket 446, section 4),
  * the depth curve from its `fromPlanet` (GD on ticket 448: P1 and P2 keep the step bands), the
  * mixed roster where the mixed rows start (#453: P1 and P2 keep the legacy roster), the surface
- * layer from planet 2 (ticket 625: P1 stays byte-identical).
+ * layer from planet 2 (ticket 625: P1 stays byte-identical), P2's species pool (ticket 632, the
+ * `ores` slice's `poolsBeforeOreRules`: an older P2 keeps the legacy species).
  */
 const ORE_RULES_FIRST_PLANETS: readonly number[] = [
   3,
@@ -120,6 +125,7 @@ const ORE_RULES_FIRST_PLANETS: readonly number[] = [
   ECONOMY.planets.depthDensity.fromPlanet,
   3,
   SURFACE_LAYER_FIRST_PLANET,
+  P2_SPECIES_POOL_FIRST_PLANET,
 ]
 
 /** The first planet any ore rules change, so the first a fresh session stamps: planet 1. */
@@ -168,8 +174,8 @@ export function planetParamsFor(
 
 /**
  * The ore rules a planet entered now is stamped with: the newest version that changes it, none
- * before `ORE_RULES_FROM_PLANET`. Planet 1 stays on rules 2, which the curve and the surface layer
- * leave as they were, so its sessions and digests do not move with tickets 448 and 625.
+ * before `ORE_RULES_FROM_PLANET`. Planet 1 stays on rules 2, which the curve, the surface layer and
+ * P2's pool leave as they were, so its sessions and digests do not move with tickets 448, 625, 632.
  */
 export function oreRulesVersionOnEntry(planetIndex: number): number | undefined {
   const changing = ORE_RULES_FIRST_PLANETS.map((first, at) => (planetIndex >= first ? at + 1 : 0))

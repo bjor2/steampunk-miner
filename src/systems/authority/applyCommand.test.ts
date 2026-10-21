@@ -65,7 +65,7 @@ describe('authority: determinism', () => {
   // none here, K8 #218), generator 10 (planets are entered under ore rules 2, ticket 446) and
   // generator 12 (planet 2 is entered under ore rules 5, the surface layer, ticket 625).
   it('pins the digest of a known session, so a rule change shows up as a decision', () => {
-    expect(stateDigest(replay(SESSION).state)).toBe('f1b3e81930533efc')
+    expect(stateDigest(replay(SESSION).state)).toBe('aaabccb0e7b039ab')
   })
 
   it('gives a different digest when one command differs', () => {
@@ -82,7 +82,7 @@ describe('authority: determinism', () => {
 describe('authority: debug commands', () => {
   it('moves the session to another planet and seed', () => {
     const { state } = replay(SESSION.slice(0, 2))
-    expect(state.planet).toEqual({ index: 2, seed: 83921, oreRulesVersion: 5 })
+    expect(state.planet).toEqual({ index: 2, seed: 83921, oreRulesVersion: 6 })
   })
 
   it('adds granted money exactly to all 40 digits', () => {

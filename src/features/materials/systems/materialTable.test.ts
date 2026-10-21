@@ -269,6 +269,45 @@ describe('legacy materials', () => {
   })
 })
 
+// Ticket 632 (GD lock (b) on #595, Progression's species list): P2's own 12 species, one on each
+// legacy kind slot with that slot's family, rarity and window, ids `p2-<slot>`, every one a look no
+// other species wears, and no hero until hero art packs one into P2's atlas.
+describe('foothold-p2 materials', () => {
+  const p2 = MATERIALS.materials.filter((material) => material.pool === 'foothold-p2')
+  const legacy = MATERIALS.materials.filter((material) => material.pool === 'legacy')
+
+  it('puts one species on each legacy slot, 5 common, 4 uncommon and 3 rare, ids p2-<slot>', () => {
+    const slots = p2.map((material) => material.slot).sort()
+    expect(slots).toEqual(legacy.map((material) => material.slot).sort())
+    expect(p2.map((material) => material.id)).toEqual(
+      p2.map((material) => `p2-${material.slot.replace('legacy.', '')}`),
+    )
+    const countOf = (rarity: string) => p2.filter((material) => material.rarity === rarity).length
+    expect(MATERIAL_RARITIES.map(countOf)).toEqual([5, 4, 3, 0, 0])
+  })
+
+  it("keeps the family, rarity and band window of the legacy species on the species' slot", () => {
+    const descriptorOf = ({ slot, family, rarity, gradeBand }: (typeof p2)[number]) =>
+      `${slot} ${family} ${rarity} ${gradeBand.join('-')}`
+    expect(p2.map(descriptorOf).sort()).toEqual(legacy.map(descriptorOf).sort())
+  })
+
+  it('gives every species its own hue slot and a silhouette and pattern pair no other wears', () => {
+    const lookKeysOf = (rows: readonly (typeof p2)[number][]) =>
+      rows.flatMap((material) => [material.hueSlot, `${material.silhouette}|${material.pattern}`])
+    const others = lookKeysOf(
+      MATERIALS.materials.filter((material) => material.pool !== 'foothold-p2'),
+    )
+    const own = lookKeysOf(p2)
+    expect(own.filter((key) => others.includes(key))).toEqual([])
+    expect(new Set(own).size).toBe(own.length)
+  })
+
+  it('marks no hero, so every species draws its procedural look', () => {
+    expect(p2.filter((material) => material.hero).map((material) => material.id)).toEqual([])
+  })
+})
+
 // #453 (Systems' kinds.mixed, 6235087481, with Option B; the per-planet pools of ticket 542): each
 // foothold pool holds a species for every mixed slot, 4/3/3/3/2 plus two fossil commons for a
 // swapped band 3, under the act's metal, crystal and fossil families, each with a look of its own.
