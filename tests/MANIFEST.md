@@ -457,7 +457,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/power-up-core/systems/useRefusals.test.ts` | 3 | 3 |
 | `src/features/power-up-core/systems/useResolution.test.ts` | 12 | 12 |
 
-### `rig-look`: 7 files, 79 tests
+### `rig-look`: 9 files, 120 tests
 
 | File | Tests | Sites |
 | --- | --- | --- |
@@ -466,6 +466,8 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/rig-look/systems/render/rigLookParts.test.ts` | 9 | 9 |
 | `src/features/rig-look/systems/rigLookArt.test.ts` | 6 | 4 |
 | `src/features/rig-look/systems/rigLookBoiler.test.ts` | 9 | 7 |
+| `src/features/rig-look/systems/rigLookHull.test.ts` | 15 | 9 |
+| `src/features/rig-look/systems/rigLookPlaque.test.ts` | 26 | 14 |
 | `src/features/rig-look/systems/rigLookSource.test.ts` | 13 | 13 |
 | `src/features/rig-look/systems/rigLookTable.test.ts` | 24 | 24 |
 
@@ -651,7 +653,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/terrain-tools/systems/vehicleAnchors.test.ts` | 20 | 2 |
 | `src/features/terrain-tools/terrainReplay.test.ts` | 2 | 1 |
 
-### `workshop`: 13 files, 93 tests
+### `workshop`: 14 files, 98 tests
 
 | File | Tests | Sites |
 | --- | --- | --- |
@@ -667,6 +669,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/workshop/systems/render/purchaseSound.test.ts` | 9 | 9 |
 | `src/features/workshop/systems/render/showcaseReactions.test.ts` | 8 | 8 |
 | `src/features/workshop/systems/render/turntableBeat.test.ts` | 2 | 2 |
+| `src/features/workshop/ui/plaqueFacts.test.ts` | 5 | 5 |
 | `src/features/workshop/ui/showcaseCards.test.ts` | 4 | 3 |
 
 ## Kernel
