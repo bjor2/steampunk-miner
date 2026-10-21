@@ -90,3 +90,15 @@ describe('sound cue player', () => {
     })
   })
 })
+
+describe('warning bells through the cue player (ticket 685)', () => {
+  it('plays a ladder bell with no slice registered, and a second steals the first', () => {
+    const played: Played[] = []
+    const player = createSoundCuePlayer(recordingSoundOut(played))
+    player.play({ cueId: 'ui.warn.low', pitchSemitones: 0, gain: 1 })
+    player.play({ cueId: 'ui.warn.low', pitchSemitones: 0, gain: 1 })
+    expect(played).toHaveLength(2)
+    expect(played[0].fadedOverSeconds).not.toBeNull()
+    expect(player.soundingCountOf('ui.warn.low')).toBe(1)
+  })
+})

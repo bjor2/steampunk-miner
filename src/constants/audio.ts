@@ -69,3 +69,16 @@ export const VALVE_CLICK_SECONDS = 0.06
  * (the Vertical Scaler on #442).
  */
 export const PICKUP_CHIMES_PER_SECOND_MAX = 12
+
+/**
+ * The warning ladder's bells (ticket 685; docs/ui/design-system.md section 8): the bell family,
+ * descending in pitch from low to critical to empty (C6, A5, E5), each a struck sine with a softer
+ * minor-third tierce and octave over it, so it reads as a bell and never as the pickup chime.
+ * Placeholders by ear, synthesised as every #13 sound is; how long each rings is the token's
+ * `maxMs`. Gains are ratios so no decimal matches an economy value.
+ */
+export const WARN_BELL_HZ = { low: 1047, critical: 880, empty: 659 } as const
+export const WARN_BELL_GAIN = 4 / 25
+export const WARN_BELL_TIERCE_RATIO = 6 / 5
+export const WARN_BELL_TIERCE_GAIN = 1 / 20
+export const WARN_BELL_OCTAVE_GAIN = 3 / 50

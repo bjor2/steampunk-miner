@@ -3,7 +3,8 @@
  * tier, at most 12 a second, ticket 615, the dock and upgrade clanks, a hit's thud, the core and travel stingers, casing's hiss and
  * pop, a charge's blast, its thump delayed by the blast cue with distance, #213, a slot hold's
  * cancel clank and finish chime, ticket 253), the music stingers (#49), the slices' sound cues
- * within their voice budgets (#180, `soundCuePlayer.ts`), the kernel one-shots slices ask for by
+ * within their voice budgets (#180, `soundCuePlayer.ts`) with the warning ladder's bells (ticket
+ * 685), the kernel one-shots slices ask for by
  * name (ticket 372, `oneShotPlayer.ts`) and, every frame, the drill, engine and
  * steam loops and the crossfaded music layers. What each voice plays comes from the pure rules in
  * `systems/audio` and the audio view model; this only hands it to the shell's sound output.
@@ -18,6 +19,7 @@ import { useGameStore } from '../store/gameStore'
 import { listenForStingers } from '../store/musicStingerRecord'
 import { listenForOneShots } from '../store/oneShotRequests'
 import { listenForSoundCues } from '../store/soundCueRequests'
+import { listenForWarnings } from '../store/warningBroadcast'
 import { readAudioModel, readDrillVoice, readHudModel } from '../store/screenReads'
 import type { DrillVoice } from '../systems/audio/drillVoice'
 import {
@@ -38,6 +40,8 @@ import {
 } from '../systems/audio/soundRules'
 import type { FeedbackCue } from '../systems/feedback/feedbackCues'
 import { VALVE_CLICK_PLAY, VALVE_CLICK_TONE } from '../systems/audio/valveClick'
+import { warnBellGainOf } from '../systems/audio/warnBells'
+import type { WarningFiring } from '../systems/views/warningWatch'
 import {
   createDelayedThumps,
   delayThump,
@@ -49,7 +53,7 @@ import { drillPresence } from './drillPresence'
 import { motionPresence } from './motionPresence'
 import { createOneShotPlayer } from './oneShotPlayer'
 import { createPickupChimePlayer, type PickupChimePlayer } from './pickupChimePlayer'
-import { createSoundCuePlayer } from './soundCuePlayer'
+import { createSoundCuePlayer, type SoundCuePlayer } from './soundCuePlayer'
 
 /** The drill's load and the music's targets are re-read as often as the HUD re-reads. */
 const LOAD_REFRESH_SECONDS = SCREEN_REFRESH_MS / 1000
@@ -93,6 +97,7 @@ export function SoundStage() {
     [sound, thumps, chimes],
   )
   useEffect(() => listenForSoundCues(cues.play), [cues])
+  useEffect(() => listenForWarnings((firing) => ringWarnBell(cues, firing)), [cues])
   useEffect(() => listenForOneShots(oneShots.play), [oneShots])
   useEffect(
     () => listenForStingers((stingerId) => sound.playMusicStinger(stingerId, planetTuning())),
@@ -138,6 +143,15 @@ const CUE_SOUNDS: Readonly<Record<FeedbackCue['kind'], CuePlayer>> = {
   autoValveClick: (sound) => {
     sound.playCueTone(VALVE_CLICK_TONE, VALVE_CLICK_PLAY)
   },
+}
+
+/** Ticket 685: the tier's bell, ducked while the drill's voice is cutting. */
+function ringWarnBell(cues: SoundCuePlayer, firing: WarningFiring): void {
+  cues.play({
+    cueId: firing.cueId,
+    pitchSemitones: 0,
+    gain: warnBellGainOf(drillPresence.isDrilling),
+  })
 }
 
 /** Rock breaking all at once: the collapse's crash, until the blast has its own sound. */

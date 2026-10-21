@@ -5,8 +5,9 @@
  * `requestSoundCue` (`store/soundCueRequests.ts`); the sound stage plays it through `SoundOut`,
  * and past the budget the cue's oldest voice is stolen with a short fade. Slices never touch audio
  * themselves, and a scene layer still never writes the sound. With no cue registered nothing new
- * sounds.
+ * sounds. The kernel's own `ui.` cues (the warning bells, ticket 685) are looked up beside them.
  */
+import { WARN_BELL_CUES } from '../audio/warnBells'
 import { defineRegistry, entriesOf, type SealedRegistration } from './seal'
 
 export type CueWave = 'sine' | 'square' | 'sawtooth' | 'triangle'
@@ -51,9 +52,16 @@ export interface SoundCuePlay {
 
 export const SOUND_CUE_REGISTRY = defineRegistry<SoundCue>('soundCues', soundCueSealProblem)
 
-/** The registered cue `id`, or null. */
+/**
+ * The cue `id`: one of the kernel's own `ui.` cues (the warning bells, ticket 685), which no
+ * slice can register since a slice's ids carry its prefix, or one a slice registered; else null.
+ */
 export function soundCueById(id: string): SoundCue | null {
-  return entriesOf(SOUND_CUE_REGISTRY).find((cue) => cue.id === id) ?? null
+  return (
+    WARN_BELL_CUES.find((cue) => cue.id === id) ??
+    entriesOf(SOUND_CUE_REGISTRY).find((cue) => cue.id === id) ??
+    null
+  )
 }
 
 /** Why the cue cannot be played as registered; empty when it can. */
