@@ -28,8 +28,6 @@ export interface SheetCardProps {
   figure?: ReactNode
   /** Greyed, as a price the wallet cannot pay (#687); the press still reaches the action. */
   isMuted?: boolean
-  /** The store's menu focus is on it (ticket 688: the pad and the keys over the Hold's cards). */
-  isFocused?: boolean
   testId?: string
 }
 
@@ -51,7 +49,6 @@ export function SheetCardView({
   iconId = null,
   figure = null,
   isMuted = false,
-  isFocused = false,
   testId,
   isRevealed,
   isFocused = false,
@@ -76,7 +73,6 @@ export function SheetCardView({
       data-revealed={isRevealed || isFocused || undefined}
       data-focused={isFocused || undefined}
       data-muted={isMuted || undefined}
-      data-focused={isFocused || undefined}
       data-testid={testId}
       onPointerDown={onPointerDown}
       onMouseDown={keepFocusOnGame}

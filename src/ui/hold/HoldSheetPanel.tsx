@@ -9,7 +9,7 @@ import { useGameStore } from '../../store/gameStore'
 import { readHoldSheetModel } from '../../store/screenReads'
 import type { HoldSellAllCard, HoldSheet, HoldTierCard } from '../../systems/views/holdSheet'
 import type { AmountReading, ScreenButton } from '../../systems/views/viewParts'
-import { SheetCard } from '../kit/SheetCard'
+import { MenuSheetCard } from '../kit/MenuSheetCard'
 import { useScreenModel } from '../useScreenModel'
 import styles from './HoldSheetPanel.module.css'
 
@@ -72,14 +72,13 @@ function SellCard({
   focusedId: string | null
 }) {
   return (
-    <SheetCard
+    <MenuSheetCard
       text={{ id: button.id, title, line }}
       iconId={iconId}
       figure={<span data-exact={value.exact}>{value.text}</span>}
       isMuted={button.reason !== null}
-      isFocused={focusedId === button.id}
-      testId={button.id}
-      onAct={() => useGameStore.getState().pressScreenButton(button.id)}
+      buttonId={button.id}
+      focusedId={focusedId}
     />
   )
 }

@@ -186,11 +186,12 @@ function utcOffsetMinutesAt(savedAtMs: number): number {
 
 /**
  * The focusable buttons of a menu layer; the vehicle layer has none. A sheet open over a docked
- * bay works on the bay's buttons, which its tab may draw as cards (the Outfitter, ticket 687).
+ * bay works on the bay's buttons, which its tab may draw as cards (the Outfitter, ticket 687); the
+ * Hold works on its own Sell cards, docked or not (ticket 688).
  */
 export function menuScreenOf(layer: InputContext, sources: ScreenSources): MenuScreen {
   if (layer === 'title') return titleMenu(titleMenuModelOf(sources))
-  if (layer === 'platform' || layer === 'sheet') return bayMenu(bayScreenOf(sources))
+  if (layer === 'platform') return bayMenu(bayScreenOf(sources))
   if (layer === 'settings') return settingsMenu(settingsModelOf(sources))
   if (layer === 'pause') return pauseMenu(pauseMenuModelOf(sources))
   if (layer === 'artefact') return artefactMenu(artefactChoiceModelOf(sources))
@@ -212,9 +213,8 @@ function bayStartFocus(screen: NonNullable<BayScreen>): string {
   return refineryBayStartFocus(screen.model)
 }
 
-/** Only the Hold's Sell cards take menu focus on the sheet; another tab's cards are touch and mouse. */
 function sheetMenu(sources: ScreenSources): MenuScreen {
-  if (sources.openSheetTabId !== KERNEL_SHEET_TAB_IDS.hold) return NO_MENU
+  if (sources.openSheetTabId !== KERNEL_SHEET_TAB_IDS.hold) return bayMenu(bayScreenOf(sources))
   const { focusStops, buttons } = holdSheetModelOf(sources)
   return { focusStops, startFocus: focusStops[0].id, buttons }
 }

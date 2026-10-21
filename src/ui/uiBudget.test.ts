@@ -26,6 +26,7 @@ import { Hud } from './hud/Hud'
 import { PauseMenuView } from './pause/PauseMenuView'
 import { PlatformScreen } from './platform/PlatformScreen'
 import { sheetTabById } from './registries/sheetTabs'
+import { sheetPanelOf } from './sheet/kernelSheetPanels'
 import { SettingsView } from './settings/SettingsView'
 import { TitleMenuView } from './title/TitleMenuView'
 
@@ -64,7 +65,8 @@ async function dockedBayMarkup(bay: 'upgrade' | 'sell'): Promise<string> {
 /**
  * The content of the sheet tab whose id starts with `prefix` (ticket 687: the Upgrade bay's
  * Outfitter and the tech tree's Patent Office are tabs, found by the panel's id prefix, as a slice
- * registers them). The sheet's own frame is the kit's (#686), drawn the same round every tab.
+ * registers them; ticket 688: the kernel's Hold and Ledger). The sheet's own frame is the kit's
+ * (#686), drawn the same round every tab.
  */
 function sheetTabMarkup(prefix: string): string {
   const tab = readShownSheetTabIds()
@@ -72,7 +74,9 @@ function sheetTabMarkup(prefix: string): string {
     .find((entry) => entry?.id.startsWith(prefix))
   if (tab === undefined || tab === null) throw new Error(`no sheet tab starts with ${prefix}`)
   game().openSheet(tab.id)
-  return markupOf(tab.Panel)
+  const Panel = sheetPanelOf(tab.id)
+  if (Panel === null) throw new Error(`sheet tab ${tab.id} draws no panel`)
+  return markupOf(Panel)
 }
 
 /** The Upgrade bay's frame over the car, then its Outfitter on the base sheet (ticket 687). */
@@ -109,13 +113,18 @@ function settingsMarkup(): string {
   return renderToString(createElement(SettingsView, { model, focusedId: SETTINGS_START_FOCUS }))
 }
 
-/** Title, pause and settings, each from a fresh start: the panels the rest of the game opens. */
+/**
+ * Title, pause and settings, each from a fresh start: the panels the rest of the game opens; then
+ * the kernel's sheet tabs, the Hold and the Ledger (ticket 688).
+ */
 async function otherPanelsMarkup(): Promise<string> {
   const title = await titleMenuMarkup()
   resetGameStore()
   const pause = pauseMenuMarkup()
   resetGameStore()
-  return [title, pause, settingsMarkup()].join('')
+  const settings = settingsMarkup()
+  resetGameStore()
+  return [title, pause, settings, sheetTabMarkup('hold'), sheetTabMarkup('ledger')].join('')
 }
 
 const FIXTURES: readonly PanelFixture[] = [
