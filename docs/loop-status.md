@@ -168,6 +168,17 @@ decision is needed. While main is red, `pick_tickets` also picks any open `build
 issue (`red_fix_tickets`), even if it is not under #90 or in `EXTRA_TICKETS`. Together these stop
 the idle state of 13 Oct, when main was red with no open fix ticket and all 8 slots sat empty.
 
+**Red-main fixes skip waves, one at a time (since 2026-10-21):** a red-main fix ticket is an open
+`build` issue labelled `needs-fix` or titled `Fix red main…` (the Tester's auto-filed title; the
+label can be lost in a `needs-planner` round, which is how #664/#665 sat idle on 21 Oct). In
+`pick_tickets` these come first, whether main is red or not: they need no wave plan, are never
+skipped as "in no wave", pass the main-red fixes-only filter, are not counted against any wave cap,
+and are not reported as `NEEDS_WAVE_PLAN`. The claim logic runs at most **one red-main fix at a
+time**: while one sits in a slot or is `push_pending` (not yet merged), no other red-main fix is
+claimed, and at most one is claimed per pass; the next one starts once the current one has merged
+and closed. Every other filter (in-progress, needs-planner, blocked, on-hold, hitl, attempts,
+blocked_by) still applies.
+
 A session that pauses its ticket at `needs-planner` (a planner question, not a failed build) gets
 its attempt refunded in `state.json` (`attempts`, floor 0), so it never runs out of tries while
 waiting on planners. Needs attention shows it as "needs-planner (attempt refunded)". Real failures
