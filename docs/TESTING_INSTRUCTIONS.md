@@ -1342,8 +1342,17 @@ incomePerHour}` go to `balance-report/drill-pace.ndjson`, which `pushTestMetrics
   controls). `e2e/browser/hud/hudCoverage.spec.ts` runs #689's four cells (360x640, 390x844,
   1280x800, 1440x900): the root's layout tokens, the band where the design puts it, the readout,
   and the reserved layout within 12% / 8%; the measured share of the HUD on screen is logged as a
-  `hud-coverage` annotation until the strip rebuild (#684) and the screenshot suite (#689) assert
-  it. Box Tester only.
+  `hud-coverage` annotation; the screenshot suite (#689) asserts it. Box Tester only.
+- **UI screenshot suite** (ticket 689, spec #678): `e2e/browser/ui/uiShots.spec.ts` runs the same
+  four cells (`ui/uiShotCells.ts`) in the `chromium` project: the HUD on the surface and two tiles
+  down, and every sheet in the `ui/uiShotSheets.ts` table (the bays, settings, the pause menu and
+  its save page, the tech tree's map and list, the planet card, the title menu). Each test writes
+  its shot first (`npm run ui:screens:update` puts them in `docs/ui/screens/`, never compared),
+  then fails on text that runs out of its box or panel or a page that scrolls sideways, a target a
+  tap can reach under 44 px (`MIN_TARGET_PX`; `data-tap-exact` amounts are text), and, on the HUD
+  shots, the measured share over 12% / 8% (`ui.getHudCoverage()`'s `isMeasuredWithinBudget`) or a
+  `data-hud` box, touch controls included, in the middle band. The measured share is logged as a
+  `hud-coverage` annotation either way. A new sheet joins the table as one row. Box Tester only.
 - **Touch controls held upright** (ticket 485, spec #470): `e2e/browser/screens/portraitTouch.spec.ts`
   runs in the matrix's portrait touch cells (390x844, 412x915, 820x1180) and skips elsewhere. It
   measures the stick zone (the lower 45% of the height from the thumb's lower corner, ending at a

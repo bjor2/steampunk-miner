@@ -25,6 +25,7 @@ Versions mirror `infernal-bistro` (same owner). The game is 2D: an orthographic 
 | `npm run golden:update`                   | rewrite `tests/golden/` after a version bump              |
 | `npm run tests:manifest`                  | refresh `tests/MANIFEST.md` after adding or moving tests  |
 | `npm run screens:update`                  | rewrite the screen matrix shots in `docs/screens/`        |
+| `npm run ui:screens:update`               | rewrite the UI suite shots in `docs/ui/screens/` (#689)   |
 | `npm run balance:report` / `:baseline`    | pacing bot report vs the committed baseline / rewrite it  |
 | `npm run balance:guns`                    | bot to planet 7 with and without `auto_guns` (reported)   |
 | `npm run balance:bore`                    | 3 seeds to P10: bore gun never vs forced, 0.98x (#347)    |

@@ -634,6 +634,31 @@
       "specs": ["e2e/browser/hud/hudCoverage.spec.ts"]
     },
     {
+      "why": "The UI screenshot suite (ticket 689): the HUD on the surface and drilling, and every sheet, at 360x640, 390x844, 1280x800 and 1440x900, failing on overflow, a target under 44 px, coverage over budget or a box in the middle band. Anything the HUD, the coverage report or a sheet draws reaches it.",
+      "paths": [
+        "src/ui/hud/**",
+        "src/ui/touch/**",
+        "src/ui/sheets/**",
+        "src/ui/platform/**",
+        "src/ui/settings/**",
+        "src/ui/pause/**",
+        "src/ui/save/**",
+        "src/ui/title/**",
+        "src/ui/planet/**",
+        "src/ui/stage/screenFit.ts",
+        "src/ui/debug/measureHudCoverage.ts",
+        "src/debug/debugHudCoverage.ts",
+        "src/systems/views/hudCoverageBudget.ts",
+        "src/systems/views/hudCoverageReport.ts",
+        "src/systems/views/designSystem.ts",
+        "src/systems/views/screenLayout.ts",
+        "src/features/workshop/ui/**",
+        "src/features/tech-tree/ui/**",
+        "src/features/power-up-core/ui/**"
+      ],
+      "specs": ["e2e/browser/ui/uiShots.spec.ts"]
+    },
+    {
       "why": "The touch controls held upright (ticket 485): the lower-45% stick zone, a phone's two-row cluster, the tile lane the slot column and the fire tile keep to, and the left-hand mirror.",
       "paths": [
         "src/ui/touch/**",
