@@ -309,6 +309,23 @@ second tap, a click or Enter acts (`cardReveal.ts`). Under Reduce Motion the shu
 fold snaps. The tab, card and sheet frames take the #683 art through `--art-tab-frame*`,
 `--art-card-frame` and `--art-sheet-frame`, with the CSS frames behind them.
 
+**The Outfitter and the Patent Office as built (#687).** Both are tabs on the base sheet, each a
+list of cards: a title, one line of gain text and the price as the figure, greyed (`isMuted`)
+while the wallet is short. Gain text is `systems/views/gainText.ts`: the stat and its change as a
+share read in decimal and rounded toward zero ("+24% drill speed", "-12% cooldown"), never a
+before-and-after table. The **Outfitter** (`workshop.outfitter`, order 10) is the Upgrade bay
+(`systems/views/outfitterCards.ts`): the six tracks, Casing, lining, guns, charges and rack, the
+researched items, the slices' bay entries and Repair, each card the bay's own button
+(`kit/MenuSheetCard.tsx`, its `data-testid` the #33 buy id). Docking at the bay opens the sheet on
+it and undocking shuts it; the bay's slim frame (header, footer, an Outfitter button) stays under
+it, so on a phone Close shows the car and the way out, and on desktop the car stays in view beside
+the docked sheet. A sheet open over a docked bay walks and confirms that bay's menu, so the pad's
+d-pad lights a card (`data-focused`) and A buys it. The **Patent Office**
+(`tech-tree.patent-office`, order 20) is the tech tree (`patentCards.ts`): one card per node in
+the order the wallet reaches it; a researched item's card offers its next Mark with that Mark's
+gain ("Mk II: -10% cooldown") or milestone verb, a locked one says why. The HUD's tree button
+opens it. The lane map, its pan and pinch, the node sheet and the plaques around the car are gone.
+
 ## 11. Copy
 
 **Vocabulary** (Progression, GD lock): the places are the **Outfitter** (the upgrade bay's sheet,

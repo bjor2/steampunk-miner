@@ -105,7 +105,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/combos/systems/combosEconomy.test.ts` | 4 | 4 |
 | `src/features/combos/systems/render/anchorTilt.test.ts` | 7 | 7 |
 
-### `descriptions`: 5 files, 53 tests
+### `descriptions`: 4 files, 49 tests
 
 | File | Tests | Sites |
 | --- | --- | --- |
@@ -113,7 +113,6 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/descriptions/systems/flavourRules.test.ts` | 8 | 8 |
 | `src/features/descriptions/systems/kernelEntries.test.ts` | 32 | 19 |
 | `src/features/descriptions/systems/liningCards.test.ts` | 3 | 3 |
-| `src/features/descriptions/ui/upgradeBayCards.test.ts` | 4 | 4 |
 
 ### `dock-buildings`: 10 files, 46 tests
 
@@ -549,7 +548,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/sensing/systems/threatPeriscope.test.ts` | 6 | 6 |
 | `src/features/sensing/systems/useResolution.test.ts` | 16 | 16 |
 
-### `tech-tree`: 63 files, 453 tests
+### `tech-tree`: 60 files, 422 tests
 
 | File | Tests | Sites |
 | --- | --- | --- |
@@ -563,7 +562,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/tech-tree/rushHand.test.ts` | 3 | 3 |
 | `src/features/tech-tree/rushPace.lane.test.ts` | 1 | 1 |
 | `src/features/tech-tree/scene/extractorDeploy.test.ts` | 3 | 3 |
-| `src/features/tech-tree/store/treeScreenStore.test.ts` | 6 | 6 |
+| `src/features/tech-tree/store/treeScreenStore.test.ts` | 2 | 2 |
 | `src/features/tech-tree/systems/aethericCards.vision.test.ts` | 2 | 2 |
 | `src/features/tech-tree/systems/aethericLane.test.ts` | 5 | 5 |
 | `src/features/tech-tree/systems/anchorAffordability.test.ts` | 3 | 3 |
@@ -587,12 +586,11 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/tech-tree/systems/itemShop.test.ts` | 7 | 7 |
 | `src/features/tech-tree/systems/lanePace.test.ts` | 4 | 4 |
 | `src/features/tech-tree/systems/loadoutYieldCap.test.ts` | 7 | 7 |
-| `src/features/tech-tree/systems/mapGestures.test.ts` | 6 | 6 |
 | `src/features/tech-tree/systems/markLadder.test.ts` | 21 | 21 |
 | `src/features/tech-tree/systems/nodeCost.test.ts` | 7 | 7 |
-| `src/features/tech-tree/systems/nodePress.test.ts` | 2 | 2 |
 | `src/features/tech-tree/systems/nodeSpendShare.diagnostic.test.ts` | 0 | 1 |
 | `src/features/tech-tree/systems/nodeSpendShare.test.ts` | 7 | 7 |
+| `src/features/tech-tree/systems/patentCards.test.ts` | 5 | 5 |
 | `src/features/tech-tree/systems/priceOnly.test.ts` | 6 | 6 |
 | `src/features/tech-tree/systems/render/extractorPose.test.ts` | 6 | 6 |
 | `src/features/tech-tree/systems/render/forkPieces.test.ts` | 5 | 5 |
@@ -613,9 +611,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/tech-tree/systems/treeSpendGuard.test.ts` | 9 | 9 |
 | `src/features/tech-tree/systems/unlockRules.test.ts` | 14 | 14 |
 | `src/features/tech-tree/treeSpendGuard.lane.test.ts` | 8 | 8 |
-| `src/features/tech-tree/ui/nodeCardHold.test.ts` | 4 | 4 |
-| `src/features/tech-tree/ui/nodeElement.test.ts` | 6 | 6 |
-| `src/features/tech-tree/ui/techTreeScreen.test.ts` | 16 | 16 |
+| `src/features/tech-tree/ui/patentOfficePanel.test.ts` | 2 | 2 |
 
 ### `terrain-tools`: 49 files, 395 tests
 
@@ -671,7 +667,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/terrain-tools/systems/vehicleAnchors.test.ts` | 20 | 2 |
 | `src/features/terrain-tools/terrainReplay.test.ts` | 2 | 1 |
 
-### `workshop`: 14 files, 98 tests
+### `workshop`: 12 files, 89 tests
 
 | File | Tests | Sites |
 | --- | --- | --- |
@@ -687,8 +683,6 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/workshop/systems/render/purchaseSound.test.ts` | 9 | 9 |
 | `src/features/workshop/systems/render/showcaseReactions.test.ts` | 8 | 8 |
 | `src/features/workshop/systems/render/turntableBeat.test.ts` | 2 | 2 |
-| `src/features/workshop/ui/plaqueFacts.test.ts` | 5 | 5 |
-| `src/features/workshop/ui/showcaseCards.test.ts` | 4 | 3 |
 
 ## Kernel
 
@@ -1052,7 +1046,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/input/actionMap.test.ts` | 28 | 28 |
 | `src/systems/input/buildIntent.test.ts` | 11 | 11 |
 | `src/systems/input/cleanTap.test.ts` | 5 | 5 |
-| `src/systems/input/inputRouting.test.ts` | 31 | 31 |
+| `src/systems/input/inputRouting.test.ts` | 32 | 32 |
 | `src/systems/input/padCodes.test.ts` | 4 | 4 |
 | `src/systems/input/padFrame.test.ts` | 7 | 7 |
 | `src/systems/input/preferences.test.ts` | 24 | 24 |
@@ -1428,6 +1422,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/store/ledgerToast.test.ts` | 5 | 5 |
 | `src/store/liveStepSlice.test.ts` | 22 | 22 |
 | `src/store/materialPopSlice.test.ts` | 4 | 4 |
+| `src/store/outfitterPress.test.ts` | 3 | 3 |
 | `src/store/padRuntime.test.ts` | 16 | 14 |
 | `src/store/partInstall.test.ts` | 5 | 5 |
 | `src/store/pauseMenuSlice.test.ts` | 15 | 15 |
@@ -1557,7 +1552,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/ui/hud/hudStripView.test.ts` | 15 | 15 |
 | `src/ui/hud/hudText.test.ts` | 6 | 6 |
 | `src/ui/iconCoverage.test.ts` | 9 | 9 |
-| `src/ui/kit/itemCard.test.ts` | 13 | 13 |
+| `src/ui/kit/itemCard.test.ts` | 11 | 11 |
 | `src/ui/kit/rarityName.test.ts` | 4 | 4 |
 | `src/ui/kit/uiParts.test.ts` | 16 | 16 |
 | `src/ui/menuText.test.ts` | 5 | 5 |
@@ -1566,8 +1561,9 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/ui/platform/bayPanels.test.ts` | 8 | 8 |
 | `src/ui/platform/bayScreens.test.ts` | 6 | 6 |
 | `src/ui/platform/dockText.test.ts` | 4 | 4 |
+| `src/ui/platform/outfitterPanel.test.ts` | 2 | 2 |
 | `src/ui/projection/worldToScreen.test.ts` | 7 | 5 |
-| `src/ui/screenIds.test.ts` | 4 | 4 |
+| `src/ui/screenIds.test.ts` | 3 | 3 |
 | `src/ui/screens/sliceScreen.test.ts` | 8 | 8 |
 | `src/ui/sheet/baseSheet.test.ts` | 13 | 13 |
 | `src/ui/sheets/exactAmountSheet.test.ts` | 3 | 3 |
@@ -1648,6 +1644,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/views/designTokenCss.test.ts` | 15 | 13 |
 | `src/systems/views/deviceNotices.test.ts` | 6 | 6 |
 | `src/systems/views/engineTrackParity.test.ts` | 7 | 7 |
+| `src/systems/views/gainText.test.ts` | 6 | 6 |
 | `src/systems/views/hazardStripPlace.test.ts` | 2 | 2 |
 | `src/systems/views/hazardStripView.test.ts` | 3 | 3 |
 | `src/systems/views/heatViews.test.ts` | 5 | 5 |
@@ -1666,6 +1663,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/views/itemCopyBudget.test.ts` | 7 | 7 |
 | `src/systems/views/ledgerToast.test.ts` | 4 | 4 |
 | `src/systems/views/menuFocus.test.ts` | 2 | 2 |
+| `src/systems/views/outfitterCards.test.ts` | 6 | 6 |
 | `src/systems/views/overlaySeats.test.ts` | 5 | 5 |
 | `src/systems/views/pauseMenuModel.test.ts` | 11 | 11 |
 | `src/systems/views/planetCardView.test.ts` | 1 | 1 |
@@ -1688,7 +1686,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/views/uiText.test.ts` | 20 | 20 |
 | `src/systems/views/unregisteredText.test.ts` | 5 | 5 |
 | `src/systems/views/unsavedChipText.test.ts` | 2 | 2 |
-| `src/systems/views/upgradeBayModel.test.ts` | 19 | 19 |
+| `src/systems/views/upgradeBayModel.test.ts` | 18 | 18 |
 | `src/systems/views/upgradePreview.test.ts` | 15 | 15 |
 | `src/systems/views/vehicleItemRows.test.ts` | 5 | 5 |
 
