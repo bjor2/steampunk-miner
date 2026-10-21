@@ -3,6 +3,7 @@ import { readAuthorityState } from '../store/authorityLink'
 import { listenForCarvedCells } from '../store/carveCompleteBroadcast'
 import { listenForDomainEvents } from '../store/domainEventBroadcast'
 import { readAuthorityTick, resetGameStore, useGameStore } from '../store/gameStore'
+import { vehicleOf } from '../systems/authority/authorityState'
 import type { DomainEvent } from '../systems/authority/domainEvent'
 import { surfaceOreTiles } from '../systems/authority/scriptedSession'
 import { stateDigest } from '../systems/authority/stateDigest'
@@ -95,7 +96,7 @@ function drillWithPops(mode: MaterialPopMode): Drilled {
   drillTileAway()
   return {
     digest: stateDigest(readAuthorityState()),
-    cargo: readAuthorityState().vehicles,
+    cargo: vehicleOf(readAuthorityState(), game().playerId).cargo,
     heard: heard.map((event) => event.type),
     carvedTicks,
     startedPops: sprayPresence.pops.started - startedBefore,
