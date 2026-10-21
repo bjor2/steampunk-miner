@@ -2,9 +2,10 @@
  * The pause menu drawn from its view model (ticket 404): Resume, Save game and Settings, or the
  * save page with the name field, one row per manual slot, the notice line and Back. Each page is
  * one shared Title+OneLine element over its controls (spec #422, pass #429), and the slots scroll
- * in the shared scroll area. Markup only.
+ * in the shared scroll area. A saved slot's Scrap, once pressed, asks its question under the row
+ * with Scrap and Keep (ticket 704). Markup only.
  */
-import type { PauseMenuModel, SaveSlotRow } from '../../systems/views/pauseMenuModel'
+import type { PauseMenuModel, SaveSlotRow, ScrapConfirm } from '../../systems/views/pauseMenuModel'
 import { ScrollArea } from '../kit/ScrollArea'
 import { TitleOneLine } from '../kit/TitleOneLine'
 import { UI_ID_TEMPLATES, UI_IDS } from '../ids'
@@ -95,9 +96,45 @@ function SlotLine({ row, focusedId }: { row: SaveSlotRow; focusedId: string }) {
         layout="row"
         isTooltipHeldOpen={focusedId === row.button.id}
       >
-        <ScreenButtonView button={row.button} focusedId={focusedId} />
+        <SlotButtons row={row} focusedId={focusedId} />
       </TitleOneLine>
+      {row.scrapConfirm && (
+        <ScrapQuestion slot={row.slot} confirm={row.scrapConfirm} focusedId={focusedId} />
+      )}
     </li>
+  )
+}
+
+/** While the row asks, its own buttons give way to the question's two. */
+function SlotButtons({ row, focusedId }: { row: SaveSlotRow; focusedId: string }) {
+  if (row.scrapConfirm) return null
+  return (
+    <div className={styles.slotButtons}>
+      <ScreenButtonView button={row.button} focusedId={focusedId} />
+      {row.scrap && <ScreenButtonView button={row.scrap} focusedId={focusedId} />}
+    </div>
+  )
+}
+
+function ScrapQuestion({
+  slot,
+  confirm,
+  focusedId,
+}: {
+  slot: SaveSlotRow['slot']
+  confirm: ScrapConfirm
+  focusedId: string
+}) {
+  return (
+    <div className={styles.scrapQuestion} role="alertdialog" aria-label={confirm.question}>
+      <p className={styles.question} data-testid={UI_ID_TEMPLATES.pauseSlotScrapQuestion(slot)}>
+        {confirm.question}
+      </p>
+      <div className={styles.slotButtons}>
+        <ScreenButtonView button={confirm.scrap} focusedId={focusedId} />
+        <ScreenButtonView button={confirm.keep} focusedId={focusedId} />
+      </div>
+    </div>
   )
 }
 

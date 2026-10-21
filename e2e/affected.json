@@ -350,6 +350,20 @@
       "specs": ["e2e/browser/pauseSave.spec.ts"]
     },
     {
+      "why": "Scrapping a save slot from the pause menu (ticket 704): the pause slice and model, their ui.saveMenu copy, the view and its layout, the checkpoint's delete and its save_deleted line.",
+      "paths": [
+        "src/store/pauseMenuSlice.ts",
+        "src/store/checkpoint.ts",
+        "src/store/checkpointLines.ts",
+        "src/store/slotWriteQueue.ts",
+        "src/systems/views/pauseMenuModel.ts",
+        "src/data/saveMenu/**",
+        "src/ui/pause/**",
+        "src/debug/debugSaves.ts"
+      ],
+      "specs": ["e2e/browser/pauseScrap.spec.ts"]
+    },
+    {
       "why": "Save keeping (ticket 479): the checkpoint and its write queue, the save-keeping slice, the browser shell's mirrored save folder and file hooks, and the debug saves that export and import.",
       "paths": [
         "src/store/checkpoint.ts",
