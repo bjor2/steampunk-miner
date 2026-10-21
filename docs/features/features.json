@@ -595,7 +595,7 @@
         },
         {
           "title": "Ore catalogue and deeper previews",
-          "description": "Every ore is a family at a tier with a graded name, such as Raw Brassvein or Crystal Quartzine, from a twelve-family catalogue. A few patches in each band hold ore one or two tiers deeper, worth and as hard as that deeper ore, and more of them the deeper the band. Planets still grow only metal and crystal until the per-planet ore mix lands.",
+          "description": "Every ore is a family at a tier, from a twelve-family catalogue; a mined unit shows its species' own name, such as Ironstone or Clouded, and the grade stays a number and a look. A few patches in each band hold ore one or two tiers deeper, worth and as hard as that deeper ore, and more of them the deeper the band. Planets still grow only metal and crystal until the per-planet ore mix lands.",
           "status": "built",
           "issues": [140, 146]
         },
