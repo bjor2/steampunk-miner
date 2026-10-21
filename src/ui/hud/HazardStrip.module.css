@@ -2,8 +2,9 @@
  * The hazard strip (ticket 341): a zero-size anchor at the screen's middle, where the camera holds
  * the rig, turned to the drive; the track runs out from it toward the leading edge. Its length is a
  * fixed share of the screen whatever the speed (the GD lock's fixed pixel budget); `--strip-inner`
- * and `--strip-length` come from `constants/hazardStrip.ts` on the element. Placeholder look,
- * tuned by eye in `npm run dev`.
+ * and `--strip-length` come from `constants/hazardStrip.ts` on the element. On a phone the
+ * anchor first slides by `--strip-shift-x/y` out of the shaft to the screen's edge (ticket 685).
+ * Placeholder look, tuned by eye in `npm run dev`.
  */
 .strip {
   position: absolute;
@@ -11,7 +12,8 @@
   left: 50%;
   width: 0;
   height: 0;
-  transform: rotate(var(--strip-turn, 0deg));
+  transform: translate(var(--strip-shift-x, 0px), var(--strip-shift-y, 0px))
+    rotate(var(--strip-turn, 0deg));
 }
 
 .track {
