@@ -106,6 +106,46 @@ as before. No layer is shared with p1-b1, p1-b2 or within the batch.
   one centred on each tile, fading out before the cell edge); prismatic (long bars of light down
   the prism faces that meet the lamp, a column of the cell each, and sharp glints).
 
+## Batch p3-b2: P3's species 6 to 10 (ticket 599)
+
+The foothold-p3 pool's crystal and fossil uncommons and its three rares, kind slots 6 to 10 on P3.
+The layers come from the species row, as on P1. No layer is shared within the batch or with P1;
+P3's slots 1 to 5 (ticket 598) and 11 to 15 (ticket 600) add theirs after. Slots 16 and 17, the two
+fossil commons of #453 (chalk bed, fish bed), are held: no ticket skins them, and a spec pins them
+unskinned.
+
+<!-- p3-b2 -->
+
+| slot | species                     | base                  | vein             | palette (shadow, body, light)                 | sheen         |
+| ---- | --------------------------- | --------------------- | ---------------- | --------------------------------------------- | ------------- |
+| 6    | `green-apatite-quartzine`   | `etched-glass`        | `hex-ends`       | `apatite-green` `#2a6045` `#55bf8a` `#aadfc4` | `subresinous` |
+| 7    | `ribbed-shell-amberbone`    | `growth-lines`        | `ribbed-valves`  | `shell-cream` `#5d5c40` `#bab880` `#dcdcc0`   | `dull`        |
+| 8    | `native-platinum-brassvein` | `burnished-scratches` | `rolled-pebbles` | `platinum-pale` `#626466` `#c5c7cb` `#e2e3e5` | `polished`    |
+| 9    | `blue-topaz-quartzine`      | `cleaved-clear`       | `wedge-blocks`   | `topaz-blue` `#44606e` `#88c0dc` `#c4e0ee`    | `limpid`      |
+| 10   | `coiled-ammonite-amberbone` | `nacre-sheets`        | `ammonite-coils` | `ammonite-rose` `#63505a` `#c6a0b3` `#e2d0d9` | `pearly`      |
+
+<!-- /p3-b2 -->
+
+- **Bases:** clear glassy stone with fine striae up the prism and small etch pits, each with a pale
+  lip; a chalky matrix packed with shells, each a set of growth rings round its beak; a burnished
+  face with a soft mottle of wear, long hairline scratches in two crossing sets and a few pits;
+  clear stone crossed by flat basal cleavage cracks, a bright edge on each, and small liquid
+  inclusions; thin wavy sheets of nacre crossed by the frilled suture lines of the shell.
+- **Veins:** stubby hexagonal prisms seen end on, tipped so a side face or two shows (blue
+  corundum's barrels and red beryl's columns on P1 lie along the face); three fan-shaped valves,
+  nine ribs from the beak to a scalloped rim; flattened water-rolled pebbles in a gravel stringer;
+  three upright blocks under pitched wedge ends, tipped back so the two roof faces catch the lamp;
+  two shells coiled flat in a widening spiral, each whorl a run of chambers.
+- **Sheens:** subresinous (soft gloss drawn out in streaks up the prism, a few small glints), dull
+  (a faint even lift and nothing sharp), polished (broad diagonal sweeps, as a rolled pebble mirrors
+  the lamp, and hard glints), limpid (light caught along the cleavage cracks, a wide faint gleam,
+  pinpoint glints), pearly (soft edgeless bands along the nacre sheets, brightest where the shell
+  swells). The limpid and pearly sheens follow the very cracks and sheets of their bases (the same
+  seeds), so the light sits where the stone breaks.
+- **P3's rock.** P3 wears `palette.planet_2` (planetTable.ts: planets past the slice reuse the heavy
+  archetype until the heat act), a slate blue darker than P1's ground (band 3 luma 0.29). The post
+  step lays a batch's skins in its own planet's rock (`ROCK_PALETTES` in `skin_post.py`).
+
 ## Compositing
 
 What a renderer draws for a skin, per pixel, in display values (0..1), from the row's layers:
@@ -249,6 +289,39 @@ where ironstone has dark blotches and nuggets. Every new skin sits above its roc
 for corundum, 1.63 for beryl). Checked by eye on `p1-b3.phone-x4.png`, `p1-b3.desktop.png`, the
 `p1-b3.scale-x4` copies and `p1.scale-x4.png` with its `-deutan` and `-gray` copies, now all
 twelve P1 skins side by side.
+
+From `sheets/p3-b2.distinct.json`, at 22 px a tile over P3's band 3 rock (luma 0.29). P3's slots 1
+to 5 (ticket 598) are not skinned yet, so all ten pairs are within the batch:
+
+<!-- p3-b2-readings -->
+
+| pair                               | colour apart | deuteranopia apart | luma apart | texture apart |
+| ---------------------------------- | ------------ | ------------------ | ---------- | ------------- |
+| apatite vs shell                   | 0.348        | 0.104              | 0.087      | 0.062         |
+| apatite vs platinum                | 0.451        | 0.262              | 0.162      | 0.059         |
+| apatite vs topaz                   | 0.327        | 0.272              | 0.086      | 0.064         |
+| apatite vs ammonite                | 0.406        | 0.115              | 0.058      | 0.070         |
+| shell vs platinum                  | 0.272        | 0.262              | 0.075      | 0.049         |
+| shell vs topaz                     | 0.360        | 0.322              | 0.001      | 0.055         |
+| shell vs ammonite                  | 0.188        | 0.186              | 0.029      | 0.059         |
+| platinum vs topaz                  | 0.225        | 0.144              | 0.076      | 0.056         |
+| platinum vs ammonite (least apart) | 0.180        | 0.184              | 0.104      | 0.063         |
+| topaz vs ammonite                  | 0.275        | 0.158              | 0.028      | 0.059         |
+
+<!-- /p3-b2-readings -->
+
+The five hue slots are far apart (green, cream, near-white, sky blue, rose), so colour parts every
+pair. The closest, platinum against ammonite, are told apart by luma (platinum is the planet's
+brightest skin, 0.77 against 0.67) and by direction: platinum's sweeps and pebble stringer run
+diagonal, the ammonite's nacre bands run level round its coils. Shell against topaz have one luma,
+but cream against blue keep them 0.32 apart even under deuteranopia. With deuteranopia the apatite
+turns khaki beside the shell's yellow and the ammonite's grey (0.10 and 0.12): apatite is the
+darkest of the three, with upright streaks and end-on hexagons where the shell has rings and fans
+and the ammonite level bands and spirals. Every skin sits above P3's slate rock (contrast 1.95 for
+apatite to 2.43 for platinum). Checked by eye on `p3-b2.phone-x4.png`, `p3-b2.desktop.png` and
+the `p3-b2.scale-x4` copies with `-deutan` and `-gray`. The planet strip `p3.scale` is written by
+the next P3 batch to post; `p3-b1` must sit before `p3-b2` in `BATCHES` so ticket 598 measures
+against this batch.
 
 Known limits: the cells are unlit tone, so a skin does not turn with the vehicle's lamp (the vein's
 own shading is baked from the stage's fixed headlamp, as the hero sprites are); the earthy sheen

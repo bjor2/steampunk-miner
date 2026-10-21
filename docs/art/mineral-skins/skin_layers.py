@@ -39,7 +39,8 @@ SHADOW_LUMA_SHARE = 0.5
 LIGHT_LUMA_SHARE = 0.5
 # The batches of #576: a planet's species by roster slot, five a ticket (#592 is P1 slots 1 to 5,
 # #593 its slots 6 to 10, #594 its last two, 11 and 12: the legacy pool has 12 species; #599 is P3
-# slots 6 to 10 of the foothold-p3 pool), named `p<planet>-b<n>`.
+# slots 6 to 10 of the foothold-p3 pool), named `p<planet>-b<n>`. Keep a planet's batches in
+# slot order: a batch is measured against the ones listed before it (`earlier_batches`).
 BATCHES = {
     'p1-b1': {'pool': 'legacy', 'slots': ('legacy.c1', 'legacy.c2', 'legacy.c3', 'legacy.c4', 'legacy.c5')},
     'p1-b2': {'pool': 'legacy', 'slots': ('legacy.u1', 'legacy.u2', 'legacy.u3', 'legacy.u4', 'legacy.r1')},
