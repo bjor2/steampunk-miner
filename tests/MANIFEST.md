@@ -874,7 +874,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/authority/terrain/terrainEditPlan.test.ts` | 5 | 5 |
 | `src/systems/authority/terrain/terrainEditQueue.test.ts` | 5 | 5 |
 | `src/systems/authority/travelAtSpeed.test.ts` | 6 | 3 |
-| `src/systems/authority/travelRules.test.ts` | 12 | 12 |
+| `src/systems/authority/travelRules.test.ts` | 14 | 14 |
 | `src/systems/authority/vehicleCommands.test.ts` | 27 | 27 |
 | `src/systems/authority/vehicleItemRules.test.ts` | 10 | 10 |
 | `src/systems/authority/widthDescentBars.test.ts` | 2 | 2 |
@@ -982,6 +982,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/economy/readEconomy.test.ts` | 25 | 25 |
 | `src/systems/economy/refineryEconomy.test.ts` | 6 | 6 |
 | `src/systems/economy/trackKind.test.ts` | 1 | 1 |
+| `src/systems/economy/travelCharge.test.ts` | 7 | 7 |
 | `src/systems/economy/upgradePrices.test.ts` | 9 | 9 |
 | `src/systems/economy/upgradeSteps.test.ts` | 17 | 15 |
 | `src/systems/economy/vehicleStats.test.ts` | 22 | 15 |
@@ -1100,6 +1101,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/logging/sessionAnalysis/summaryComparison.test.ts` | 3 | 3 |
 | `src/logging/subStepFloor.test.ts` | 4 | 4 |
 | `src/logging/surfaceLayerReport.test.ts` | 3 | 3 |
+| `src/logging/travelClampReport.test.ts` | 2 | 2 |
 | `src/logging/tripCellEnergy.lane.test.ts` | 1 | 1 |
 | `src/logging/tripCellEnergy.test.ts` | 2 | 2 |
 | `src/logging/wreckerDiveReport.test.ts` | 6 | 6 |
@@ -1629,7 +1631,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/views/refineryBayModel.test.ts` | 4 | 4 |
 | `src/systems/views/screenLayout.test.ts` | 26 | 26 |
 | `src/systems/views/scrollRail.test.ts` | 5 | 5 |
-| `src/systems/views/sellBayModel.test.ts` | 13 | 13 |
+| `src/systems/views/sellBayModel.test.ts` | 14 | 14 |
 | `src/systems/views/settingsModel.test.ts` | 5 | 5 |
 | `src/systems/views/titleMenuModel.test.ts` | 7 | 7 |
 | `src/systems/views/titleOnlyText.test.ts` | 5 | 5 |
