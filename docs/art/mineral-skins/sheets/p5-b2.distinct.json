@@ -1,0 +1,320 @@
+{
+  "batch": "p5-b2",
+  "tilePx": 22,
+  "rockLuma": 0.289,
+  "skins": {
+    "peridot-quartzine": {
+      "meanHex": "#96bb4b",
+      "luma": 0.639,
+      "hueDeg": 79.7,
+      "rockContrast": 2.03
+    },
+    "shark-tooth-amberbone": {
+      "meanHex": "#8b909a",
+      "luma": 0.562,
+      "hueDeg": 221.2,
+      "rockContrast": 1.81
+    },
+    "wolfram-brassvein": {
+      "meanHex": "#9fa6ae",
+      "luma": 0.647,
+      "hueDeg": 210.3,
+      "rockContrast": 2.06
+    },
+    "fire-garnet-quartzine": {
+      "meanHex": "#d25171",
+      "luma": 0.483,
+      "hueDeg": 345.0,
+      "rockContrast": 1.57
+    },
+    "saurian-vertebra-amberbone": {
+      "meanHex": "#b6b698",
+      "luma": 0.701,
+      "hueDeg": 60.0,
+      "rockContrast": 2.22
+    }
+  },
+  "pairs": [
+    {
+      "a": "furnace-iron-brassvein",
+      "b": "peridot-quartzine",
+      "colourDistance": 0.339,
+      "deutanDistance": 0.323,
+      "lumaDifference": 0.157,
+      "textureDifference": 0.067
+    },
+    {
+      "a": "furnace-iron-brassvein",
+      "b": "shark-tooth-amberbone",
+      "colourDistance": 0.245,
+      "deutanDistance": 0.202,
+      "lumaDifference": 0.08,
+      "textureDifference": 0.123
+    },
+    {
+      "a": "furnace-iron-brassvein",
+      "b": "wolfram-brassvein",
+      "colourDistance": 0.349,
+      "deutanDistance": 0.332,
+      "lumaDifference": 0.165,
+      "textureDifference": 0.069
+    },
+    {
+      "a": "furnace-iron-brassvein",
+      "b": "fire-garnet-quartzine",
+      "colourDistance": 0.224,
+      "deutanDistance": 0.066,
+      "lumaDifference": 0.001,
+      "textureDifference": 0.064
+    },
+    {
+      "a": "furnace-iron-brassvein",
+      "b": "saurian-vertebra-amberbone",
+      "colourDistance": 0.353,
+      "deutanDistance": 0.367,
+      "lumaDifference": 0.219,
+      "textureDifference": 0.091
+    },
+    {
+      "a": "magnetite-brassvein",
+      "b": "peridot-quartzine",
+      "colourDistance": 0.352,
+      "deutanDistance": 0.383,
+      "lumaDifference": 0.133,
+      "textureDifference": 0.082
+    },
+    {
+      "a": "magnetite-brassvein",
+      "b": "shark-tooth-amberbone",
+      "colourDistance": 0.096,
+      "deutanDistance": 0.099,
+      "lumaDifference": 0.056,
+      "textureDifference": 0.129
+    },
+    {
+      "a": "magnetite-brassvein",
+      "b": "wolfram-brassvein",
+      "colourDistance": 0.237,
+      "deutanDistance": 0.245,
+      "lumaDifference": 0.141,
+      "textureDifference": 0.082
+    },
+    {
+      "a": "magnetite-brassvein",
+      "b": "fire-garnet-quartzine",
+      "colourDistance": 0.379,
+      "deutanDistance": 0.131,
+      "lumaDifference": 0.023,
+      "textureDifference": 0.077
+    },
+    {
+      "a": "magnetite-brassvein",
+      "b": "saurian-vertebra-amberbone",
+      "colourDistance": 0.305,
+      "deutanDistance": 0.328,
+      "lumaDifference": 0.195,
+      "textureDifference": 0.098
+    },
+    {
+      "a": "selenite-blade-quartzine",
+      "b": "peridot-quartzine",
+      "colourDistance": 0.616,
+      "deutanDistance": 0.554,
+      "lumaDifference": 0.202,
+      "textureDifference": 0.057
+    },
+    {
+      "a": "selenite-blade-quartzine",
+      "b": "shark-tooth-amberbone",
+      "colourDistance": 0.47,
+      "deutanDistance": 0.473,
+      "lumaDifference": 0.279,
+      "textureDifference": 0.116
+    },
+    {
+      "a": "selenite-blade-quartzine",
+      "b": "wolfram-brassvein",
+      "colourDistance": 0.329,
+      "deutanDistance": 0.327,
+      "lumaDifference": 0.194,
+      "textureDifference": 0.057
+    },
+    {
+      "a": "selenite-blade-quartzine",
+      "b": "fire-garnet-quartzine",
+      "colourDistance": 0.661,
+      "deutanDistance": 0.589,
+      "lumaDifference": 0.358,
+      "textureDifference": 0.054
+    },
+    {
+      "a": "selenite-blade-quartzine",
+      "b": "saurian-vertebra-amberbone",
+      "colourDistance": 0.307,
+      "deutanDistance": 0.298,
+      "lumaDifference": 0.14,
+      "textureDifference": 0.08
+    },
+    {
+      "a": "ember-agate-quartzine",
+      "b": "peridot-quartzine",
+      "colourDistance": 0.375,
+      "deutanDistance": 0.245,
+      "lumaDifference": 0.063,
+      "textureDifference": 0.056
+    },
+    {
+      "a": "ember-agate-quartzine",
+      "b": "shark-tooth-amberbone",
+      "colourDistance": 0.26,
+      "deutanDistance": 0.121,
+      "lumaDifference": 0.014,
+      "textureDifference": 0.116
+    },
+    {
+      "a": "ember-agate-quartzine",
+      "b": "wolfram-brassvein",
+      "colourDistance": 0.283,
+      "deutanDistance": 0.189,
+      "lumaDifference": 0.071,
+      "textureDifference": 0.061
+    },
+    {
+      "a": "ember-agate-quartzine",
+      "b": "fire-garnet-quartzine",
+      "colourDistance": 0.187,
+      "deutanDistance": 0.105,
+      "lumaDifference": 0.093,
+      "textureDifference": 0.056
+    },
+    {
+      "a": "ember-agate-quartzine",
+      "b": "saurian-vertebra-amberbone",
+      "colourDistance": 0.25,
+      "deutanDistance": 0.201,
+      "lumaDifference": 0.125,
+      "textureDifference": 0.078
+    },
+    {
+      "a": "chromite-brassvein",
+      "b": "peridot-quartzine",
+      "colourDistance": 0.388,
+      "deutanDistance": 0.381,
+      "lumaDifference": 0.042,
+      "textureDifference": 0.067
+    },
+    {
+      "a": "chromite-brassvein",
+      "b": "shark-tooth-amberbone",
+      "colourDistance": 0.075,
+      "deutanDistance": 0.063,
+      "lumaDifference": 0.035,
+      "textureDifference": 0.121
+    },
+    {
+      "a": "chromite-brassvein",
+      "b": "wolfram-brassvein",
+      "colourDistance": 0.078,
+      "deutanDistance": 0.087,
+      "lumaDifference": 0.05,
+      "textureDifference": 0.07
+    },
+    {
+      "a": "chromite-brassvein",
+      "b": "fire-garnet-quartzine",
+      "colourDistance": 0.407,
+      "deutanDistance": 0.226,
+      "lumaDifference": 0.114,
+      "textureDifference": 0.069
+    },
+    {
+      "a": "chromite-brassvein",
+      "b": "saurian-vertebra-amberbone",
+      "colourDistance": 0.185,
+      "deutanDistance": 0.21,
+      "lumaDifference": 0.104,
+      "textureDifference": 0.082
+    },
+    {
+      "a": "peridot-quartzine",
+      "b": "shark-tooth-amberbone",
+      "colourDistance": 0.356,
+      "deutanDistance": 0.365,
+      "lumaDifference": 0.077,
+      "textureDifference": 0.119
+    },
+    {
+      "a": "peridot-quartzine",
+      "b": "wolfram-brassvein",
+      "colourDistance": 0.399,
+      "deutanDistance": 0.377,
+      "lumaDifference": 0.008,
+      "textureDifference": 0.069
+    },
+    {
+      "a": "peridot-quartzine",
+      "b": "fire-garnet-quartzine",
+      "colourDistance": 0.499,
+      "deutanDistance": 0.268,
+      "lumaDifference": 0.156,
+      "textureDifference": 0.061
+    },
+    {
+      "a": "peridot-quartzine",
+      "b": "saurian-vertebra-amberbone",
+      "colourDistance": 0.328,
+      "deutanDistance": 0.276,
+      "lumaDifference": 0.062,
+      "textureDifference": 0.075
+    },
+    {
+      "a": "shark-tooth-amberbone",
+      "b": "wolfram-brassvein",
+      "colourDistance": 0.142,
+      "deutanDistance": 0.146,
+      "lumaDifference": 0.085,
+      "textureDifference": 0.122
+    },
+    {
+      "a": "shark-tooth-amberbone",
+      "b": "fire-garnet-quartzine",
+      "colourDistance": 0.402,
+      "deutanDistance": 0.172,
+      "lumaDifference": 0.079,
+      "textureDifference": 0.122
+    },
+    {
+      "a": "shark-tooth-amberbone",
+      "b": "saurian-vertebra-amberbone",
+      "colourDistance": 0.228,
+      "deutanDistance": 0.244,
+      "lumaDifference": 0.139,
+      "textureDifference": 0.13
+    },
+    {
+      "a": "wolfram-brassvein",
+      "b": "fire-garnet-quartzine",
+      "colourDistance": 0.455,
+      "deutanDistance": 0.285,
+      "lumaDifference": 0.164,
+      "textureDifference": 0.063
+    },
+    {
+      "a": "wolfram-brassvein",
+      "b": "saurian-vertebra-amberbone",
+      "colourDistance": 0.141,
+      "deutanDistance": 0.148,
+      "lumaDifference": 0.054,
+      "textureDifference": 0.088
+    },
+    {
+      "a": "fire-garnet-quartzine",
+      "b": "saurian-vertebra-amberbone",
+      "colourDistance": 0.437,
+      "deutanDistance": 0.305,
+      "lumaDifference": 0.218,
+      "textureDifference": 0.083
+    }
+  ],
+  "leastDifferentPair": ["chromite-brassvein", "wolfram-brassvein"]
+}

@@ -403,6 +403,45 @@ species rows as before; no layer is shared with another batch or within this one
   where the stone is shaped.
 - **Seeds 601 to 691**, apart from every other batch's.
 
+## Batch p5-b2: P5's species 6 to 10 (ticket 605)
+
+The `foothold-p5` pool's crystal and fossil uncommons and its three rares, kind slots 6 to 10 on P5.
+The layers come from the species rows as before; no layer is shared with another batch or within
+this one. P5's slots 16 and 17, #453's coprolite and ash bed, stay held, and P5's slots 11 to 15
+and its signature material come with #606. These layers were authored through the Blender MCP, in
+the shared Blender (the procedure under Pipeline), and a second run wrote byte-identical cells.
+
+<!-- p5-b2 -->
+
+| slot | species                      | base             | vein              | palette (shadow, body, light)                    | sheen          |
+| ---- | ---------------------------- | ---------------- | ----------------- | ------------------------------------------------ | -------------- |
+| 6    | `peridot-quartzine`          | `oily-swirls`    | `olive-drops`     | `peridot-olive` `#475d1b` `#8eba36` `#c7dc9b`    | `oil-film`     |
+| 7    | `shark-tooth-amberbone`      | `phosphate-beds` | `serrated-teeth`  | `shark-tooth-grey` `#474a51` `#8e94a2` `#c6cad0` | `enamel-glaze` |
+| 8    | `wolfram-brassvein`          | `bladed-columns` | `crossed-bars`    | `wolfram-steel` `#4e5257` `#9ca5ae` `#ced2d6`    | `fibre-satin`  |
+| 9    | `fire-garnet-quartzine`      | `ember-depths`   | `faceted-spheres` | `fire-garnet-red` `#70283a` `#e05074` `#f0a8ba`  | `ember-glow`   |
+| 10   | `saurian-vertebra-amberbone` | `spongy-bone`    | `vertebra-column` | `saurian-bone` `#5c5c48` `#b7b78f` `#dbdbc7`     | `bone-dust`    |
+
+<!-- /p5-b2 -->
+
+- **Bases:** olivine's oily body, slow bands swirled round by a warp, clouded, with dark basalt
+  flecks caught in it; a bone bed, six level beds of grey phosphatic sand, fine grit and dark
+  phosphate pellets along the partings; wolframite grown in upright blades, eight across in two
+  staggered rows, each its own tone and finely striated, dark seams between; a deep red body lit from
+  inside, soft glowing cores where the stone is thickest; spongy bone, a pale lattice of struts round
+  dark pores, eleven across so they still show at 22 px, with a few smooth patches of cortex.
+- **Veins:** seven olive drops, each a plump body drawn to a point; three flat triangular teeth with
+  fine serrations up their slightly hollow edges, each over its lobed root; a heap of square bars,
+  three laid one way and two crossed over them on the diagonals; six round garnets, balls of flat
+  facets, some half-sunk; a short run of four vertebrae along a gentle curve, each a waisted spool
+  with its spine flared at the top and a process below.
+- **Sheens:** oil film (light lying along the swirl bands, waxing and waning, never a glint); enamel
+  glaze (long level streaks along the bed tops and a few sharp glints); fibre satin (a soft upright
+  streak down every other blade, broken along its length); ember glow (a soft halo round each
+  glowing core and a bright point in it); bone dust (a dry faint lift on the struts and pale specks;
+  old bone takes no gloss). Each sheen shares its base's field (swirls, beds, blades, cores, pores),
+  so the light sits where the stone is shaped.
+- **Seeds 701 to 791**, apart from P5's other batch.
+
 ## Compositing
 
 What a renderer draws for a skin, per pixel, in display values (0..1), from the row's layers:
@@ -805,6 +844,49 @@ deuteranopia both reds go khaki (0.17); the flakes against the rings keep them a
 the planet's only near-white. Every skin sits above its rock (contrast 1.57 for furnace iron to
 2.63 for selenite). Checked by eye on `p5-b1.phone-x4.png`, `p5-b1.desktop.png`, the
 `p5-b1.layers.jpg` sheet and the `p5-b1.scale-x4` copies with `-deutan` and `-gray`.
+
+From `sheets/p5-b2.distinct.json`, at 22 px a tile over P5's band 3 rock (luma 0.29). The first
+ten pairs are within the batch; the rest are its closest pairs against p5-b1 (the report holds all
+25):
+
+<!-- p5-b2-readings -->
+
+| pair                              | colour apart | deuteranopia apart | luma apart | texture apart |
+| --------------------------------- | ------------ | ------------------ | ---------- | ------------- |
+| wolfram vs saurian vertebra       | 0.141        | 0.148              | 0.054      | 0.088         |
+| shark tooth vs wolfram            | 0.142        | 0.146              | 0.085      | 0.122         |
+| shark tooth vs saurian vertebra   | 0.228        | 0.244              | 0.139      | 0.130         |
+| peridot vs saurian vertebra       | 0.328        | 0.276              | 0.062      | 0.075         |
+| peridot vs shark tooth            | 0.356        | 0.365              | 0.077      | 0.119         |
+| peridot vs wolfram                | 0.399        | 0.377              | 0.008      | 0.069         |
+| shark tooth vs fire garnet        | 0.402        | 0.172              | 0.079      | 0.122         |
+| fire garnet vs saurian vertebra   | 0.437        | 0.305              | 0.218      | 0.083         |
+| wolfram vs fire garnet            | 0.455        | 0.285              | 0.164      | 0.063         |
+| peridot vs fire garnet            | 0.499        | 0.268              | 0.156      | 0.061         |
+| chromite vs wolfram (least apart) | 0.078        | 0.087              | 0.050      | 0.070         |
+| chromite vs shark tooth           | 0.075        | 0.063              | 0.035      | 0.121         |
+| magnetite vs shark tooth          | 0.096        | 0.099              | 0.056      | 0.129         |
+| ember agate vs fire garnet        | 0.187        | 0.105              | 0.093      | 0.056         |
+| furnace iron vs fire garnet       | 0.224        | 0.066              | 0.001      | 0.064         |
+
+<!-- /p5-b2-readings -->
+
+The materials table gives P5 four cool near-greys across its first two batches: magnetite (244
+degrees, luma 0.50), shark tooth (222, 0.58), chromite (250, 0.58) and wolfram (212, 0.64). Colour
+barely parts them (0.08 for chromite against wolfram and against shark tooth), so the bases are
+drawn in three directions that still show at 22 px. The bone bed is laid level in bold beds, wolfram
+stands in upright blades, and chromite stays round black seeds in a pale matrix; so the shark tooth
+and chromite, one colour, are 0.12 apart in texture, among the report's largest. Fire garnet,
+P5's third red, is the saturated one: 0.19 from ember agate and 0.22 from furnace iron. Its base
+first came out a shade dark (luma 0.47), so its body was lifted until the skin averages its slot's
+luma (0.48 against 0.50). The bone's pores were made larger and denser until they showed at a
+phone's tile, which also brought the saurian vertebra down onto its slot (0.70). Under deuteranopia
+fire garnet and furnace iron both go khaki at one luma (0.066 apart). There, soft glowing cores and
+faceted balls stand against dark flakes with pale rims and clinkers. Peridot is the planet's only
+green. Every skin sits above its rock (contrast 1.57 for fire garnet to 2.22 for saurian vertebra).
+Checked by eye on `p5-b2.phone-x4.png`, `p5-b2.desktop.png`, the `p5-b2.layers.jpg` sheet, the
+`p5-b2.scale-x4` copies with `-deutan` and `-gray`, and `p5.scale-x4.png` (P5's ten skins side by
+side, with its blind copies).
 
 Known limits: the cells are unlit tone, so a skin does not turn with the vehicle's lamp (the vein's
 own shading is baked from the stage's fixed headlamp, as the hero sprites are); the earthy sheen
