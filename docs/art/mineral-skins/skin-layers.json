@@ -312,6 +312,41 @@
       "wornBy": ["p2-c5"]
     },
     {
+      "kind": "base",
+      "id": "peat-crumb",
+      "cell": "cells/base/peat-crumb.png",
+      "blend": "blend/base-peat-crumb.blend",
+      "wornBy": ["bog-iron-brassvein"]
+    },
+    {
+      "kind": "base",
+      "id": "bloom-crust",
+      "cell": "cells/base/bloom-crust.png",
+      "blend": "blend/base-bloom-crust.blend",
+      "wornBy": ["cobalt-bloom-brassvein"]
+    },
+    {
+      "kind": "base",
+      "id": "dew-beads",
+      "cell": "cells/base/dew-beads.png",
+      "blend": "blend/base-dew-beads.blend",
+      "wornBy": ["rain-quartz-quartzine"]
+    },
+    {
+      "kind": "base",
+      "id": "ribbon-stripes",
+      "cell": "cells/base/ribbon-stripes.png",
+      "blend": "blend/base-ribbon-stripes.blend",
+      "wornBy": ["canal-jasper-quartzine"]
+    },
+    {
+      "kind": "base",
+      "id": "bladed-stibnite",
+      "cell": "cells/base/bladed-stibnite.png",
+      "blend": "blend/base-bladed-stibnite.blend",
+      "wornBy": ["antimony-brassvein"]
+    },
+    {
       "kind": "vein",
       "id": "nugget-cluster",
       "cell": "cells/vein/nugget-cluster.png",
@@ -620,6 +655,41 @@
       "wornBy": ["p2-c5"]
     },
     {
+      "kind": "vein",
+      "id": "limonite-clods",
+      "cell": "cells/vein/limonite-clods.png",
+      "blend": "blend/vein-limonite-clods.blend",
+      "wornBy": ["bog-iron-brassvein"]
+    },
+    {
+      "kind": "vein",
+      "id": "globular-tufts",
+      "cell": "cells/vein/globular-tufts.png",
+      "blend": "blend/vein-globular-tufts.blend",
+      "wornBy": ["cobalt-bloom-brassvein"]
+    },
+    {
+      "kind": "vein",
+      "id": "needle-sheaves",
+      "cell": "cells/vein/needle-sheaves.png",
+      "blend": "blend/vein-needle-sheaves.blend",
+      "wornBy": ["rain-quartz-quartzine"]
+    },
+    {
+      "kind": "vein",
+      "id": "canal-cobbles",
+      "cell": "cells/vein/canal-cobbles.png",
+      "blend": "blend/vein-canal-cobbles.blend",
+      "wornBy": ["canal-jasper-quartzine"]
+    },
+    {
+      "kind": "vein",
+      "id": "stibnite-sprays",
+      "cell": "cells/vein/stibnite-sprays.png",
+      "blend": "blend/vein-stibnite-sprays.blend",
+      "wornBy": ["antimony-brassvein"]
+    },
+    {
       "kind": "sheen",
       "id": "earthy",
       "cell": "cells/sheen/earthy.png",
@@ -926,6 +996,41 @@
       "cell": "cells/sheen/slick.png",
       "blend": "blend/sheen-slick.blend",
       "wornBy": ["p2-c5"]
+    },
+    {
+      "kind": "sheen",
+      "id": "damp-dull",
+      "cell": "cells/sheen/damp-dull.png",
+      "blend": "blend/sheen-damp-dull.blend",
+      "wornBy": ["bog-iron-brassvein"]
+    },
+    {
+      "kind": "sheen",
+      "id": "bloom-sparkle",
+      "cell": "cells/sheen/bloom-sparkle.png",
+      "blend": "blend/sheen-bloom-sparkle.blend",
+      "wornBy": ["cobalt-bloom-brassvein"]
+    },
+    {
+      "kind": "sheen",
+      "id": "dew-glints",
+      "cell": "cells/sheen/dew-glints.png",
+      "blend": "blend/sheen-dew-glints.blend",
+      "wornBy": ["rain-quartz-quartzine"]
+    },
+    {
+      "kind": "sheen",
+      "id": "tumbled-polish",
+      "cell": "cells/sheen/tumbled-polish.png",
+      "blend": "blend/sheen-tumbled-polish.blend",
+      "wornBy": ["canal-jasper-quartzine"]
+    },
+    {
+      "kind": "sheen",
+      "id": "blade-flash",
+      "cell": "cells/sheen/blade-flash.png",
+      "blend": "blend/sheen-blade-flash.blend",
+      "wornBy": ["antimony-brassvein"]
     }
   ]
 }

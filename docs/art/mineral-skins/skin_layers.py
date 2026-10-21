@@ -40,11 +40,11 @@ LIGHT_LUMA_SHARE = 0.5
 # The batches of #576: a planet's species by roster slot, five a ticket (#592 is P1 slots 1 to 5,
 # #593 its slots 6 to 10, #594 its last two, 11 and 12: the legacy pool has 12 species; #598 is P3
 # slots 1 to 5, #599 its slots 6 to 10 and #600 its slots 11 to 15 and the planet's signature
-# material, of the foothold-p3 pool; #603 is P4 slots 11 to 15 and the planet's signature material;
-# #604 is P5 slots 1 to 5, of the foothold-p5 pool; #595 is P2 slots 1 to 5, of the foothold-p2
-# pool, which binds the legacy slots), named `p<planet>-b<n>`, in slot order. A batch is measured
-# against all of its planet's other batches (`planet_mates`). A batch's `signature` is the planet
-# whose signature skin row it adds.
+# material, of the foothold-p3 pool; #601 is P4 slots 1 to 5 and #603 its slots 11 to 15 and the
+# planet's signature material; #604 is P5 slots 1 to 5, of the foothold-p5 pool; #595 is P2 slots 1
+# to 5, of the foothold-p2 pool, which binds the legacy slots), named `p<planet>-b<n>`, in slot
+# order. A batch is measured against all of its planet's other batches (`planet_mates`). A batch's
+# `signature` is the planet whose signature skin row it adds.
 BATCHES = {
     'p1-b1': {'pool': 'legacy', 'slots': ('legacy.c1', 'legacy.c2', 'legacy.c3', 'legacy.c4', 'legacy.c5')},
     'p1-b2': {'pool': 'legacy', 'slots': ('legacy.u1', 'legacy.u2', 'legacy.u3', 'legacy.u4', 'legacy.r1')},
@@ -54,6 +54,7 @@ BATCHES = {
     'p3-b2': {'pool': 'foothold-p3', 'slots': ('mixed.u2', 'mixed.u3', 'mixed.r1', 'mixed.r2', 'mixed.r3')},
     'p3-b3': {'pool': 'foothold-p3', 'slots': ('mixed.e1', 'mixed.e2', 'mixed.e3', 'mixed.m1', 'mixed.m2'),
               'signature': 3},
+    'p4-b1': {'pool': 'foothold-p4', 'slots': ('mixed.c1', 'mixed.c2', 'mixed.c3', 'mixed.c4', 'mixed.u1')},
     'p4-b3': {'pool': 'foothold-p4', 'slots': ('mixed.e1', 'mixed.e2', 'mixed.e3', 'mixed.m1', 'mixed.m2'),
               'signature': 4},
     'p5-b1': {'pool': 'foothold-p5', 'slots': ('mixed.c1', 'mixed.c2', 'mixed.c3', 'mixed.c4', 'mixed.u1')},

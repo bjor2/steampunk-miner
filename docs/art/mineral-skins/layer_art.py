@@ -1,10 +1,10 @@
 """
 The Blender recipes of the mineral skin layers (#576, ticket 592 for P1's slots 1 to 5, ticket 593
 for its slots 6 to 10, ticket 594 for 11 and 12, ticket 598 for P3's slots 1 to 5, ticket 599 for
-its slots 6 to 10, ticket 600 for its slots 11 to 15 and its relic signature, ticket 603 for P4's
-slots 11 to 15 and its signature material, ticket 604 for P5's slots 1 to 5, ticket 595 for P2's
-slots 1 to 5): one per layer id of `mineralSkins.json`. A layer id with no recipe fails, never
-falls back.
+its slots 6 to 10, ticket 600 for its slots 11 to 15 and its relic signature, ticket 601 for P4's
+slots 1 to 5, ticket 603 for its slots 11 to 15 and its signature material, ticket 604 for P5's
+slots 1 to 5, ticket 595 for P2's slots 1 to 5): one per layer id of `mineralSkins.json`. A layer
+id with no recipe fails, never falls back.
 
 - `base` and `sheen` are seamless textures on the 1 m cell: an emission material on a 1 m quad
   whose value is the ramp coordinate (base, mean about 0.5) or the highlight strength (sheen,
@@ -796,6 +796,117 @@ def base_graphite_smear(graph):
     tone = around_half(graph, smear, 0.95)
     tone = graph.plus(tone, graph.mul(graph.minus(fine, 0.5), 0.14))
     return graph.plus(graph.minus(tone, 0.05), graph.mul(lens, 0.18))
+def base_peat_crumb(graph):
+    """Bog iron: crumbly ore dug wet from peat, each crumb its own tone, dark rootlet fibres through it and rusty mottles."""
+    crumbs = graph.voronoi(16, 16, seed=701)
+    edge = graph.voronoi(16, 16, seed=701, feature='DISTANCE_TO_EDGE')['Distance']
+    rust = graph.smooth(stretched(graph, graph.noise(4, 4, seed=702, detail=4, roughness=0.55)), 0.55, 0.75)
+    tone = graph.mul_add(graph.add('ShaderNodeSeparateColor', [(0, crumbs['Color'])]).outputs[0], 0.3, 0.33)
+    tone = graph.minus(tone, graph.mul(graph.smooth(edge, 0.07, 0.0), 0.24))
+    tone = graph.plus(tone, graph.mul(rust, 0.24))
+    return graph.minus(tone, graph.mul(rootlet_fibres_of(graph), 0.26))
+
+
+def rootlet_fibres_of(graph):
+    """Rotted rootlets: thin dark threads wandering up the face, where a long noise crosses its middle."""
+    wander = graph.noise(3, 12, seed=703, detail=3)
+    return graph.smooth(graph.math('ABSOLUTE', graph.minus(wander, 0.5)), 0.018, 0.0)
+
+
+def base_bloom_crust(graph):
+    """Cobalt bloom: dark host rock crusted in patches of powdery pink bloom, each patch with a fringe where the crust thins."""
+    patch = bloom_patches_of(graph)
+    host = stretched(graph, graph.noise(18, 18, seed=712, detail=3))
+    powder = stretched(graph, graph.noise(90, 90, seed=713, detail=4))
+    fringe = graph.mul(graph.mul(patch, graph.minus(1.0, patch)), 4.0)
+    tone = graph.plus(0.3, graph.mul(graph.minus(host, 0.5), 0.14))
+    tone = graph.plus(tone, graph.mul(patch, 0.38))
+    tone = graph.plus(tone, graph.mul(graph.mul(graph.minus(powder, 0.5), 0.24), patch))
+    return graph.minus(tone, graph.mul(fringe, 0.1))
+
+
+def bloom_patches_of(graph):
+    """The bloom: 1 on the crust, 0 on bare rock, soft at the edge; the bloom sparkle lights only the crust."""
+    return graph.smooth(stretched(graph, graph.noise(5, 5, seed=711, detail=5, roughness=0.6)), 0.44, 0.56)
+
+
+def base_dew_beads(graph):
+    """Rain quartz: a pale clear face beaded all over with dew, each bead a dark rim round a bright crown, faint needles in the stone."""
+    cloud = stretched(graph, graph.noise(3, 3, seed=722, detail=3))
+    needles = stretched(graph, graph.noise(36, 3, seed=723, detail=2))
+    rim = graph.math('MAXIMUM', graph.minus(dew_beads_of(graph, DEW_RIM_RADIUS), dew_beads_of(graph, DEW_BODY_RADIUS)), 0.0)
+    crown = dew_beads_of(graph, DEW_CROWN_RADIUS)
+    tone = graph.plus(around_half(graph, cloud, 0.3), graph.mul(graph.minus(needles, 0.5), 0.16))
+    tone = graph.minus(tone, graph.mul(rim, 0.36))
+    return graph.plus(tone, graph.mul(crown, 0.3))
+
+
+DEW_RIM_RADIUS, DEW_BODY_RADIUS, DEW_CROWN_RADIUS = 0.5, 0.36, 0.16
+
+
+def dew_beads_of(graph, radius):
+    """The dew, one dot field shared by the base and the dew glints' bright crowns."""
+    return sprinkled(graph, 9, 721, radius, 0.75)
+
+
+def base_ribbon_stripes(graph):
+    """Canal jasper: level ribbons of jasper, dark and pale in turn, each its own width, bent by a slow warp, a fine chert grain."""
+    ribbons = jasper_ribbons_of(graph)
+    fine = tiles.strata(graph, 29, graph.noise(2, 2, seed=732, detail=2), 1.0)
+    grain = stretched(graph, graph.noise(70, 70, seed=733, detail=5))
+    tone = around_half(graph, graph.smooth(ribbons, 0.3, 0.7), 0.56)
+    tone = graph.plus(tone, graph.mul(graph.minus(fine, 0.5), 0.1))
+    tone = graph.plus(tone, graph.mul(graph.minus(grain, 0.5), 0.1))
+    # Alexandrite (#603) wears nearly the jasper's green (hue slots 160 and 140 at lumas 0.55 and
+    # 0.50), so level ribbons against its soft zones and sixlings tell them apart at a phone's 22 px
+    # tile, and the jasper sits on its own slot's luma, a shade under the alexandrite's.
+    return graph.minus(tone, 0.03)
+
+
+def jasper_ribbons_of(graph):
+    """
+    The ribbons, 0..1 across v: two strata sets, 5 and 8 beds a cell, summed so the ribbons come in
+    unequal widths; shared by the base and the tumbled polish on the pale ribbons.
+    """
+    warp = graph.noise(2, 2, seed=731, detail=2)
+    wide = tiles.strata(graph, 5, warp, 1.2)
+    narrow = tiles.strata(graph, 8, warp, 1.2)
+    return graph.mul(graph.plus(wide, narrow), 0.5)
+
+
+def base_bladed_stibnite(graph):
+    """Antimony: long blades packed side by side on a steep slant, each its own tone, striated along its length, dark seams between."""
+    across = stibnite_blades_of(graph)
+    blade = graph.math('FRACT', across)
+    shade = graph.math('SINE', graph.mul(blade_index_of(graph, across), 2.3))
+    length = stretched(graph, graph.noise(3, 3, seed=741, detail=3))
+    # A shade under the usual mean: starsteel and the ichthyosaur eye (#603, lumas 0.68 and 0.72) sit
+    # just over the antimony's slot (0.70), so the blades, with their flash, average a shade under it.
+    tone = graph.plus(0.41, graph.mul(shade, 0.15))
+    tone = graph.plus(tone, graph.mul(graph.minus(length, 0.5), 0.3))
+    tone = graph.plus(tone, graph.mul(graph.math('SINE', graph.mul(across, 4.0 * math.tau)), 0.04))
+    tone = graph.plus(tone, graph.mul(graph.smooth(blade, 0.78, 0.92), 0.12))
+    return graph.minus(tone, graph.mul(graph.smooth(blade_edge_of(graph, blade), 0.06, 0.0), 0.3))
+
+
+def stibnite_blades_of(graph):
+    """
+    The blade coordinate: 3u - v, six blades a unit, so lines of it run steeply up to the right
+    and 18 blades cross the cell along u, 6 along v (whole blades both ways, so it repeats).
+    """
+    return graph.mul(graph.minus(graph.mul(graph.u, 3.0), graph.v), 6.0)
+
+
+def blade_index_of(graph, across):
+    """Which blade, folded to six in turn: the lattice shifts by whole multiples of six at the cell edge."""
+    return graph.math('FLOORED_MODULO', graph.math('FLOOR', across), STIBNITE_TONES)
+
+
+STIBNITE_TONES = 6.0
+
+
+def blade_edge_of(graph, blade):
+    return graph.math('MINIMUM', blade, graph.minus(1.0, blade))
 
 
 # --- sheen: the lustre's highlights -----------------------------------------------------------------
@@ -1176,6 +1287,46 @@ def sheen_slick(graph):
     smears = graph.smooth(stretched(graph, graph.noise(2, 16, seed=791, detail=3)), 0.58, 0.8)
     broad = graph.smooth(stretched(graph, graph.noise(2, 2, seed=792, detail=2)), 0.4, 0.8)
     return graph.plus(graph.mul(smears, 0.7), graph.mul(broad, 0.16))
+def sheen_damp_dull(graph):
+    """Damp dull: bog ore drinks the light; a faint wet sheen in the low hollows and a few motes on the rust."""
+    damp = graph.smooth(stretched(graph, graph.noise(3, 3, seed=751, detail=3)), 0.6, 0.85)
+    motes = graph.smooth(graph.voronoi(34, 34, seed=752)['Distance'], 0.09, 0.03)
+    return graph.plus(graph.mul(damp, 0.14), graph.mul(motes, 0.16))
+
+
+def sheen_bloom_sparkle(graph):
+    """Bloom sparkle: the powdery crust is dull, but its tiny crystals spark, only where the bloom lies."""
+    patch = bloom_patches_of(graph)
+    spark = graph.smooth(graph.voronoi(40, 40, seed=761)['Distance'], 0.13, 0.04)
+    return graph.mul(patch, graph.plus(graph.mul(spark, 0.6), 0.08))
+
+
+def sheen_dew_glints(graph):
+    """Dew glints: a hard point of light on the crown of every dew bead, over a wide faint gleam on the wet face."""
+    crown = dew_beads_of(graph, DEW_GLINT_RADIUS)
+    gleam = graph.smooth(stretched(graph, graph.noise(2, 2, seed=771, detail=2)), 0.45, 0.85)
+    return graph.plus(graph.mul(crown, 0.9), graph.mul(gleam, 0.12))
+
+
+DEW_GLINT_RADIUS = 0.2
+
+
+def sheen_tumbled_polish(graph):
+    """Tumbled polish: the pale ribbons shine as a barge-worn cobble does, brightest in a slow sweep, a few glints."""
+    pale = graph.smooth(jasper_ribbons_of(graph), 0.6, 0.9)
+    sweep = graph.smooth(stretched(graph, graph.noise(2, 2, seed=781, detail=2)), 0.3, 0.8)
+    glint = graph.smooth(graph.voronoi(12, 12, seed=782)['Distance'], 0.05, 0.012)
+    return graph.plus(graph.mul(graph.mul(pale, sweep), 0.4), graph.mul(glint, 0.5))
+
+
+def sheen_blade_flash(graph):
+    """Blade flash: two blades in six throw the lamp back along their whole length, broken where the blade ends, fine glints."""
+    across = stibnite_blades_of(graph)
+    picked = graph.smooth(graph.math('SINE', graph.mul(blade_index_of(graph, across), 2.3)), 0.5, 0.65)
+    broken = graph.smooth(stretched(graph, graph.noise(3, 3, seed=791, detail=3)), 0.3, 0.5)
+    inside = graph.smooth(blade_edge_of(graph, graph.math('FRACT', across)), 0.05, 0.15)
+    glint = graph.smooth(graph.voronoi(16, 16, seed=792)['Distance'], 0.05, 0.012)
+    return graph.plus(graph.mul(graph.mul(picked, graph.mul(broken, inside)), 0.75), graph.mul(glint, 0.45))
 
 
 # --- vein: the crystal or vein shape, by the row's silhouette ----------------------------------------
@@ -1961,6 +2112,84 @@ def vein_flake_books(rng, body):
         loose = shapes.add_prism('loose-%d' % i, rng.uniform(0.035, 0.045), 0.007, (x, -0.01, z),
                                  rotation=(math.pi / 2 + rng.uniform(-0.3, 0.3), rng.uniform(0, math.pi / 3), 0.0), sides=6)
         marks.append(loose)
+def vein_limonite_clods(rng, body):
+    """Bog iron: soft rounded clods of limonite heaped low on the face, knobbly with small lumps stuck on, a few crumbs fallen off."""
+    marks = []
+    for i, (x, z) in enumerate(((-0.1, 0.02), (0.08, 0.06), (-0.01, -0.12), (0.17, -0.12))):
+        size = rng.uniform(0.08, 0.105)
+        clod = shapes.add_icosphere('clod-%d' % i, size, (x, -size * 0.25, z), subdivisions=3,
+                                    scale=(rng.uniform(1.0, 1.25), 0.55, rng.uniform(0.75, 0.95)), rotation=(0.0, rng.uniform(0, math.tau), 0.0))
+        marks.append(roughened(clod, rng, size * 0.08))
+        for k in range(3):
+            angle = rng.uniform(0, math.tau)
+            knob = size * rng.uniform(0.3, 0.42)
+            at = (x + math.cos(angle) * size * 0.85, -size * 0.3, z + math.sin(angle) * size * 0.65)
+            marks.append(shapes.add_icosphere('knob-%d-%d' % (i, k), knob, at, subdivisions=2, scale=(1.0, 0.7, 0.9)))
+    for i, (x, z) in enumerate(shapes.scatter_positions(rng, 6, 0.3, 0.1)):
+        if abs(x) < 0.26 and abs(z + 0.04) < 0.2:
+            continue
+        crumb = rng.uniform(0.018, 0.03)
+        marks.append(roughened(shapes.add_icosphere('crumb-%d' % i, crumb, (x, -crumb * 0.3, z), subdivisions=1), rng, crumb * 0.2))
+    return assign_all(marks, body)
+
+
+def vein_globular_tufts(rng, body):
+    """Cobalt bloom: small globular tufts of bloom, each a dome bristling with short hair-fine needles all round, scattered on the crust."""
+    marks = []
+    tufts = ((-0.2, 0.18, 0.07), (0.12, 0.22, 0.05), (0.02, 0.0, 0.08), (-0.22, -0.16, 0.055), (0.24, -0.06, 0.06), (0.1, -0.24, 0.045))
+    for i, (x, z, reach) in enumerate(tufts):
+        marks.append(shapes.add_icosphere('tuft-%d' % i, reach * 0.42, (x, -reach * 0.1, z), subdivisions=2, scale=(1.0, 0.6, 1.0)))
+        count = int(reach * 260)
+        for k in range(count):
+            angle = math.tau * k / count + rng.uniform(-0.08, 0.08)
+            length = reach * rng.uniform(0.75, 1.0)
+            tip = (x + math.cos(angle) * length, -reach * 0.05, z + math.sin(angle) * length)
+            marks.append(shapes.add_tube('hair-%d-%d' % (i, k), [(x, -reach * 0.18, z), tip], 0.0035, resolution=1))
+    return assign_all(marks, body)
+
+
+def vein_needle_sheaves(rng, body):
+    """Rain quartz: hair-thin needles in two sheaves crossed at a slant, each sheaf pinched at its waist and fanned at both ends."""
+    marks = []
+    for sheaf, (cx, cz, angle, length) in enumerate(((-0.04, 0.04, math.radians(62), 0.62), (0.06, -0.06, math.radians(-28), 0.5))):
+        axis, side = (math.cos(angle), math.sin(angle)), (-math.sin(angle), math.cos(angle))
+        for k in range(9):
+            spread = (k - 4) / 4.0
+            fan = spread * 0.05 + rng.uniform(-0.008, 0.008)
+            half = length * rng.uniform(0.4, 0.5)
+            ends = [(cx + axis[0] * half * end + side[0] * fan * end * 1.0 + side[0] * spread * 0.006,
+                     cz + axis[1] * half * end + side[1] * fan * end * 1.0 + side[1] * spread * 0.006) for end in (-1.0, 1.0)]
+            y = -0.012 - sheaf * 0.01
+            marks.append(shapes.add_tube('needle-%d-%d' % (sheaf, k), [(ends[0][0], y, ends[0][1]), (ends[1][0], y, ends[1][1])],
+                                         rng.uniform(0.0045, 0.006), resolution=1))
+    return assign_all(marks, body)
+
+
+def vein_canal_cobbles(rng, body):
+    """Canal jasper: five big rounded cobbles packed together as the bargemen stow ballast, each lying flat on the face."""
+    marks = []
+    for i, (x, z, size) in enumerate(((-0.14, 0.1, 0.12), (0.1, 0.13, 0.1), (-0.02, -0.08, 0.11), (0.21, -0.1, 0.085), (-0.24, -0.15, 0.08))):
+        cobble = shapes.add_icosphere('cobble-%d' % i, size, (x, -size * 0.18, z), subdivisions=3,
+                                      scale=(rng.uniform(1.0, 1.2), 0.42, rng.uniform(0.72, 0.88)), rotation=(0.0, rng.uniform(-0.5, 0.5), 0.0))
+        marks.append(roughened(cobble, rng, size * 0.03))
+    return assign_all(marks, body)
+
+
+def vein_stibnite_sprays(rng, body):
+    """
+    Antimony: two sprays of long slender square prisms, many and close, spreading only a little
+    from their roots like a broom, each blade cut off square (painite's spindles fan wide and taper).
+    """
+    marks = []
+    for spray, (root, heading) in enumerate((((-0.3, -0.3), math.radians(48)), ((0.32, -0.24), math.radians(118)))):
+        for k in range(9):
+            angle = heading + math.radians(-14 + 28 * k / 8) + rng.uniform(-0.03, 0.03)
+            length, width = rng.uniform(0.3, 0.44) * (0.8 if spray else 1.0), rng.uniform(0.011, 0.016)
+            centre = (root[0] + math.cos(angle) * length * 0.5, -width * 0.6, root[1] + math.sin(angle) * length * 0.5)
+            blade = shapes.add_cube('stibnite-%d-%d' % (spray, k), 1.0, centre, scale=(length, width, width),
+                                    rotation=(rng.uniform(0, 0.8), -angle, 0.0))
+            shapes.bevel(blade, 0.002, segments=1)
+            marks.append(blade)
     return assign_all(marks, body)
 
 
@@ -2030,6 +2259,11 @@ BASES = {
     'gravel-bed': base_gravel_bed,
     'sulphur-crumb': base_sulphur_crumb,
     'graphite-smear': base_graphite_smear,
+    'peat-crumb': base_peat_crumb,
+    'bloom-crust': base_bloom_crust,
+    'dew-beads': base_dew_beads,
+    'ribbon-stripes': base_ribbon_stripes,
+    'bladed-stibnite': base_bladed_stibnite,
 }
 SHEENS = {
     'earthy': sheen_earthy,
@@ -2076,6 +2310,11 @@ SHEENS = {
     'grain-caps': sheen_grain_caps,
     'sugary': sheen_sugary,
     'slick': sheen_slick,
+    'damp-dull': sheen_damp_dull,
+    'bloom-sparkle': sheen_bloom_sparkle,
+    'dew-glints': sheen_dew_glints,
+    'tumbled-polish': sheen_tumbled_polish,
+    'blade-flash': sheen_blade_flash,
 }
 VEINS = {
     'nugget-cluster': vein_nugget_cluster,
@@ -2122,6 +2361,11 @@ VEINS = {
     'rivet-grains': vein_rivet_grains,
     'crumbled-masses': vein_crumbled_masses,
     'flake-books': vein_flake_books,
+    'limonite-clods': vein_limonite_clods,
+    'globular-tufts': vein_globular_tufts,
+    'needle-sheaves': vein_needle_sheaves,
+    'canal-cobbles': vein_canal_cobbles,
+    'stibnite-sprays': vein_stibnite_sprays,
 }
 RECIPES = {'base': BASES, 'vein': VEINS, 'sheen': SHEENS}
 
