@@ -1,17 +1,17 @@
 /**
- * The Workshop showcase (#177, spec #180): read through `steampunkDebug.features.workshop`, the
- * authority snapshot and the bay's #33 ids, never pixels. A click on a plaque's Buy buys exactly
- * one step; holding the pointer on it chains steps until let go; `holdBuy` runs a 10-step chain
- * across a big level-up; a hold stops on can't afford with its cue; the hold plaque shows its units
- * and, past the planet's largest band, a muted note (ticket 553); and the showcase keeps the
- * kernel rows' ids while the preview's second WebGL context stays unmounted. On touch (the GD's
- * input rules on #164), each plaque is its track's item card: the first tap opens it and buys
- * nothing, and a held touch on its Buy then chains.
+ * The Workshop showcase (#177, spec #180) with what it sells on the Outfitter (spec #678, ticket
+ * 687): read through `steampunkDebug`, the authority snapshot and the bay's #33 buy ids, never
+ * pixels. Docking opens the base sheet on the Outfitter, beside the car on desktop; a click on a
+ * card buys exactly one step; a card the wallet is short for is greyed and buys nothing;
+ * `holdBuy` still runs a 10-step chain across a big level-up and a hold stops on can't afford with
+ * its cue; and the preview's second WebGL context never mounts. On touch a card's first tap shows
+ * its gain text and buys nothing, the second buys one step.
  */
 import { expect, test, type Page } from '@playwright/test'
 import type { DebugApi } from '../../src/debug/debugApi'
 import { UPGRADE_IDS } from '../../src/systems/economy/economyDefinition'
 import { UI_ID_TEMPLATES, UI_IDS } from '../../src/systems/views/screenIds'
+import { SHEET_UI_IDS } from '../../src/ui/sheet/sheetIds'
 import { WORKSHOP_TEST_IDS } from '../../src/features/workshop/ui/testIds'
 
 declare global {
@@ -21,6 +21,7 @@ declare global {
 }
 
 const SHOWCASE = '[data-slice-screen="workshop.showcase"]'
+const OUTFITTER_TAB_ID = 'workshop.outfitter'
 
 interface ChainReading {
   hold: { upgradeId: string; steps: number; end: string | null } | null
@@ -39,6 +40,7 @@ async function openAtTheShowcase(page: Page, money = '1e9'): Promise<string[]> {
     }
   }, money)
   await expect(page.locator(SHOWCASE)).toBeVisible({ timeout: 60_000 })
+  await expect(page.getByTestId(SHEET_UI_IDS.outfitterCards)).toBeVisible({ timeout: 30_000 })
   return errors
 }
 
@@ -51,6 +53,14 @@ function stepOf(page: Page, track: string): Promise<number> {
     }
     return Object.values(state.players)[0].vehicle.levels[upgradeId]
   }, track)
+}
+
+function openSheetTabOf(page: Page): Promise<string | null> {
+  return page.evaluate(() => {
+    const result = window.steampunkDebug!.ui.getSheet()
+    if (!result.ok) throw new Error(result.problems.join('; '))
+    return result.sheet.openTabId
+  })
 }
 
 function previewPanelHeight(page: Page): Promise<number> {
@@ -75,56 +85,49 @@ async function chainOnceEnded(page: Page): Promise<ChainReading> {
   return chainNow(page)
 }
 
-test.describe('workshop showcase (#177)', () => {
-  test("a click on a plaque's Buy buys exactly one step", async ({ page }) => {
+test.describe('workshop showcase (#177) and its Outfitter (ticket 687)', () => {
+  test('docking opens the sheet on the Outfitter, and undocking shuts it', async ({ page }) => {
     test.setTimeout(180_000)
     const errors = await openAtTheShowcase(page)
-    await page.getByTestId(WORKSHOP_TEST_IDS.plaqueBuy('engine')).click()
-
-    expect((await chainOnceEnded(page)).tally).toMatchObject({ steps: 1, cue: 'ka_chunk' })
-    expect(await stepOf(page, 'engine')).toBe(1)
-    await expect(page.getByTestId(UI_ID_TEMPLATES.workshopUpgradeLevel('engine'))).toHaveText(
-      '0 · 1/9',
-    )
+    expect(await openSheetTabOf(page)).toBe(OUTFITTER_TAB_ID)
+    await page.getByTestId(UI_IDS.platformUndock).click()
+    await expect.poll(() => openSheetTabOf(page), { timeout: 30_000 }).toBeNull()
     expect(errors).toEqual([])
   })
 
-  // Ticket 553 (the Game Director's hold card): the real units always show, and past planet 1's
-  // largest band (97 ore) a muted note says so while the purchase stays on sale.
-  test('the hold plaque shows its units and the past-the-band note, and still sells', async ({
+  test("a click on a track's card buys exactly one step", async ({ page }) => {
+    test.setTimeout(180_000)
+    const errors = await openAtTheShowcase(page)
+    const engine = page.getByTestId(UI_ID_TEMPLATES.workshopUpgradeBuy('engine'))
+    await expect(engine.locator('[data-sheet-card-line]')).toContainText('% top speed')
+    await engine.click()
+    await expect.poll(() => stepOf(page, 'engine'), { timeout: 30_000 }).toBe(1)
+    await page.waitForTimeout(1000)
+    expect(await stepOf(page, 'engine')).toBe(1)
+    expect(errors).toEqual([])
+  })
+
+  test('greys a card the wallet is short for, and buys nothing on its press', async ({ page }) => {
+    test.setTimeout(180_000)
+    const errors = await openAtTheShowcase(page, '0')
+    const boiler = page.getByTestId(UI_ID_TEMPLATES.workshopUpgradeBuy('boiler'))
+    await expect(boiler).toHaveAttribute('data-muted', 'true')
+    await boiler.click()
+    await page.waitForTimeout(1000)
+    expect(await stepOf(page, 'boiler')).toBe(0)
+    expect(errors).toEqual([])
+  })
+
+  test('Escape shuts the sheet over the dock, and the bay’s button opens it again', async ({
     page,
   }) => {
     test.setTimeout(180_000)
     const errors = await openAtTheShowcase(page)
-    await page.evaluate(() => {
-      const result = window.steampunkDebug!.setUpgrade('cargo_hold', 24)
-      if (!result.ok) throw new Error(result.problems.join('; '))
-    })
-    await expect(
-      page.getByTestId(UI_ID_TEMPLATES.workshopUpgradeLevel('cargo_hold')),
-    ).toContainText('Hold: 98 ore (+')
-    await expect(page.getByTestId(WORKSHOP_TEST_IDS.plaqueNote('cargo_hold'))).toHaveText(
-      'More than this planet holds. Pays off on deeper planets.',
-    )
-    await page.getByTestId(WORKSHOP_TEST_IDS.plaqueBuy('cargo_hold')).click()
-    await chainOnceEnded(page)
-    expect(await stepOf(page, 'cargo_hold')).toBe(25)
-    expect(errors).toEqual([])
-  })
-
-  test('holding the pointer on Buy chains steps until it is let go', async ({ page }) => {
-    test.setTimeout(180_000)
-    const errors = await openAtTheShowcase(page)
-    await page.getByTestId(WORKSHOP_TEST_IDS.plaqueBuy('boiler')).hover()
-    await page.mouse.down()
-    await expect.poll(() => stepOf(page, 'boiler'), { timeout: 60_000 }).toBeGreaterThanOrEqual(4)
-    await page.mouse.up()
-    const reading = await chainOnceEnded(page)
-    const bought = await stepOf(page, 'boiler')
-    await page.waitForTimeout(2000)
-
-    expect(reading.tally?.cue).toBe('ka_chunk')
-    expect(await stepOf(page, 'boiler')).toBe(bought)
+    await page.evaluate(() => window.steampunkDebug!.input.tap('ui_cancel'))
+    await expect.poll(() => openSheetTabOf(page)).toBeNull()
+    await expect(page.locator(SHOWCASE)).toBeVisible()
+    await page.getByTestId(WORKSHOP_TEST_IDS.openOutfitter).click()
+    await expect.poll(() => openSheetTabOf(page)).toBe(OUTFITTER_TAB_ID)
     expect(errors).toEqual([])
   })
 
@@ -138,9 +141,6 @@ test.describe('workshop showcase (#177)', () => {
 
     expect(reading.hold).toMatchObject({ upgradeId: 'drill_power', steps: 10, end: 'release' })
     expect(await stepOf(page, 'drill_power')).toBe(10)
-    await expect(page.getByTestId(UI_ID_TEMPLATES.workshopUpgradeLevel('drill_power'))).toHaveText(
-      '1',
-    )
     expect(errors).toEqual([])
   })
 
@@ -158,48 +158,35 @@ test.describe('workshop showcase (#177)', () => {
     expect(errors).toEqual([])
   })
 
-  test("keeps the bay rows' #33 ids and never mounts the preview's second WebGL context", async ({
+  test("carries the bay's buy ids on the cards and never mounts the preview's WebGL context", async ({
     page,
   }) => {
     test.setTimeout(180_000)
     const errors = await openAtTheShowcase(page)
     for (const track of UPGRADE_IDS) {
-      await expect(page.getByTestId(UI_ID_TEMPLATES.workshopUpgradeBuy(track))).toBeVisible()
-      await expect(page.getByTestId(UI_ID_TEMPLATES.workshopUpgradeCost(track))).toBeVisible()
+      await expect(page.getByTestId(UI_ID_TEMPLATES.workshopUpgradeBuy(track))).toBeAttached()
     }
-    await expect(page.getByTestId(UI_IDS.upgradebayCasingBuy)).toBeVisible()
-    await expect(page.getByTestId(UI_IDS.upgradebayPreview)).toHaveCount(0)
+    await expect(page.getByTestId(UI_IDS.upgradebayCasingBuy)).toBeAttached()
+    await expect(page.getByTestId(UI_IDS.workshopRepair)).toBeAttached()
     expect(await previewPanelHeight(page)).toBe(0)
     expect(errors).toEqual([])
   })
 })
 
-test.describe('workshop showcase on touch (#177, the GD input rules on #164)', () => {
-  test.use({ hasTouch: true })
+test.describe('the Outfitter on touch (ticket 687, card rules of #686)', () => {
+  test.use({ hasTouch: true, isMobile: true, viewport: { width: 360, height: 640 } })
 
-  test("a first tap opens a plaque's card, and a held touch on its Buy then chains", async ({
+  test("a first tap shows a card's gain text and buys nothing; the second buys one step", async ({
     page,
   }) => {
     test.setTimeout(240_000)
     const errors = await openAtTheShowcase(page)
-    const plaque = page.getByTestId(UI_ID_TEMPLATES.workshopUpgradeBuy('drill_tip'))
-    const buy = page.getByTestId(WORKSHOP_TEST_IDS.plaqueBuy('drill_tip'))
-    await buy.tap()
-    await expect(plaque).toHaveAttribute('aria-expanded', 'true', { timeout: 15_000 })
+    const tip = page.getByTestId(UI_ID_TEMPLATES.workshopUpgradeBuy('drill_tip'))
+    await tip.tap()
+    await expect(tip).toHaveAttribute('data-revealed', 'true', { timeout: 15_000 })
     expect(await stepOf(page, 'drill_tip')).toBe(0)
-
-    const fingers = await page.context().newCDPSession(page)
-    const box = (await buy.boundingBox())!
-    const finger = { x: box.x + box.width / 2, y: box.y + box.height / 2 }
-    await fingers.send('Input.dispatchTouchEvent', { type: 'touchStart', touchPoints: [finger] })
-    await expect
-      .poll(() => stepOf(page, 'drill_tip'), { timeout: 60_000 })
-      .toBeGreaterThanOrEqual(3)
-    await fingers.send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] })
-    const reading = await chainOnceEnded(page)
-
-    expect(reading.hold).toMatchObject({ upgradeId: 'drill_tip', end: 'release' })
-    expect(await stepOf(page, 'drill_tip')).toBe(reading.tally?.steps)
+    await tip.tap()
+    await expect.poll(() => stepOf(page, 'drill_tip'), { timeout: 30_000 }).toBe(1)
     expect(errors).toEqual([])
   })
 })

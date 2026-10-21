@@ -175,10 +175,13 @@ function utcOffsetMinutesAt(savedAtMs: number): number {
   return -new Date(savedAtMs).getTimezoneOffset()
 }
 
-/** The focusable buttons of a menu layer; the vehicle layer has none. */
+/**
+ * The focusable buttons of a menu layer; the vehicle layer has none. A sheet open over a docked
+ * bay works on the bay's buttons, which its tab may draw as cards (the Outfitter, ticket 687).
+ */
 export function menuScreenOf(layer: InputContext, sources: ScreenSources): MenuScreen {
   if (layer === 'title') return titleMenu(titleMenuModelOf(sources))
-  if (layer === 'platform') return bayMenu(bayScreenOf(sources))
+  if (layer === 'platform' || layer === 'sheet') return bayMenu(bayScreenOf(sources))
   if (layer === 'settings') return settingsMenu(settingsModelOf(sources))
   if (layer === 'pause') return pauseMenu(pauseMenuModelOf(sources))
   if (layer === 'artefact') return artefactMenu(artefactChoiceModelOf(sources))

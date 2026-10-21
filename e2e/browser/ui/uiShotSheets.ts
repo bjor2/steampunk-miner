@@ -2,13 +2,12 @@
  * Every sheet the UI screenshot suite shoots (spec #678, ticket 689), as data: its shot name, the
  * root its findings are read under, the parts that pan, and how a fresh game reaches it. A sheet
  * the shared sheet component (#686) or a later ticket adds joins as one row. Today's sheets are the
- * ones the upright panel spec (#487) walks: the Sell and Upgrade bays, the settings, the pause menu
- * and its save page, the tech tree's map and list, the planet card and the title menu; and the
- * HUD strip's detail behind the gear button (ticket 684).
+ * ones the upright panel spec (#487) walks: the Sell bay, the Upgrade bay's Outfitter on the base
+ * sheet (#687), the settings, the pause menu and its save page, the tech tree's map and list, the
+ * planet card and the title menu; and the HUD strip's detail behind the gear button (ticket 684).
  */
 import { expect, type Page } from '@playwright/test'
 import { TREE_TEST_IDS } from '../../../src/features/tech-tree/ui/nodeTestIds'
-import { WORKSHOP_TEST_IDS } from '../../../src/features/workshop/ui/testIds'
 import { UI_IDS } from '../../../src/ui/ids'
 import { SHEET_UI_IDS } from '../../../src/ui/sheet/sheetIds'
 import { dockAt } from '../screens/screenHelpers'
@@ -32,8 +31,8 @@ export const UI_SHEETS: readonly UiSheet[] = [
   { shot: 'sell-bay', rootSelector: PLATFORM, pannedTestIds: [], open: openSellBay },
   {
     shot: 'upgrade-bay',
-    rootSelector: PLATFORM,
-    pannedTestIds: [WORKSHOP_TEST_IDS.carousel],
+    rootSelector: `[data-testid="${SHEET_UI_IDS.baseSheet}"]`,
+    pannedTestIds: [],
     open: openUpgradeBay,
   },
   {
@@ -97,9 +96,13 @@ async function openSellBay(page: Page): Promise<void> {
   await dockAt(page, 'sell')
 }
 
+/** Docking at the Upgrade bay opens the base sheet on the Outfitter (ticket 687). */
 async function openUpgradeBay(page: Page): Promise<void> {
   await giveMoney(page, '1e9')
   await dockAt(page, 'upgrade')
+  await expect(page.getByTestId(SHEET_UI_IDS.outfitterCards)).toBeVisible({
+    timeout: OPEN_TIMEOUT_MS,
+  })
 }
 
 async function openSettings(page: Page): Promise<void> {
@@ -164,9 +167,15 @@ async function openTitleMenu(page: Page): Promise<void> {
   await expect(page.getByTestId('title-menu')).toBeVisible({ timeout: 60_000 })
 }
 
-/** Closes the bay the game starts docked at; play resumes once its shutter has shut. */
+/**
+ * Closes the bay the game starts docked at; play resumes once its shutter has shut. A sheet the
+ * bay opened (the Outfitter, ticket 687) takes Escape first, so it is shut before.
+ */
 export async function undock(page: Page): Promise<void> {
-  await page.evaluate(() => window.steampunkDebug!.input.tap('ui_cancel'))
+  await page.evaluate(() => {
+    window.steampunkDebug!.ui.closeSheet()
+    window.steampunkDebug!.input.tap('ui_cancel')
+  })
   await expect
     .poll(() =>
       page.evaluate(() => {

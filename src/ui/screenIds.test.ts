@@ -3,7 +3,7 @@ import { renderToString } from 'react-dom/server'
 import { afterEach, beforeEach, describe, expect, it } from 'vitest'
 import { createMemorySink } from '../logging/eventSink'
 import { createRunLog, installRunLog, uninstallRunLog } from '../logging/runLog'
-import { resetGameStore, takeSessionSnapshot, useGameStore } from '../store/gameStore'
+import { resetGameStore, useGameStore } from '../store/gameStore'
 import { pressAction, releaseAction, resetInput } from '../store/inputRuntime'
 import {
   readHudModel,
@@ -252,53 +252,18 @@ function sellBayTexts(model: SellBayModel): Partial<Record<UiId, string | null>>
   }
 }
 
+/** The Outfitter's cards (ticket 687) carry the bay's button ids; a card's text is its own. */
 function upgradeBayTexts(model: UpgradeBayModel): Partial<Record<UiId, string | null>> {
-  const { repair, casing } = model
   return {
     ...bayFrameTexts(model.header, model.footer),
     [UI_IDS.upgradebayScreen]: null,
-    [UI_IDS.workshopHull]: repair.hullText,
-    [UI_IDS.workshopRepair]: repair.button.label,
-    [UI_IDS.workshopRepairCost]: repair.cost.text,
-    [UI_IDS.workshopVisualTier]: String(model.visualTier),
-    [UI_IDS.upgradebayCasing]: null,
-    [UI_IDS.upgradebayCasingGrade]: casing.gradeText,
-    [UI_IDS.upgradebayCasingCost]: casing.cost.text,
-    [UI_IDS.upgradebayCasingBuy]: casing.buy.label,
-    ...(model.lining === null
-      ? {}
-      : {
-          [UI_IDS.upgradebayLining]: null,
-          [UI_IDS.upgradebayLiningActive]: model.lining.activeText,
-          [UI_IDS.upgradebayLiningCost]: model.lining.cost.text,
-          [UI_IDS.upgradebayLiningEffect]: model.lining.effectText,
-          [UI_IDS.upgradebayLiningButton]: model.lining.button.label,
-        }),
-    ...(model.guns === null
-      ? {}
-      : {
-          [UI_IDS.upgradebayGuns]: null,
-          [UI_IDS.upgradebayGunsLevel]: model.guns.levelText,
-          [UI_IDS.upgradebayGunsCost]: model.guns.cost.text,
-          [UI_IDS.upgradebayGunsEffect]: model.guns.effectText,
-          [UI_IDS.upgradebayGunsBuy]: model.guns.buy.label,
-        }),
+    [UI_IDS.workshopRepair]: null,
+    [UI_IDS.upgradebayCasingBuy]: null,
+    ...(model.lining === null ? {} : { [UI_IDS.upgradebayLiningButton]: null }),
+    ...(model.guns === null ? {} : { [UI_IDS.upgradebayGunsBuy]: null }),
     ...(model.charges === null
       ? {}
-      : {
-          [UI_IDS.upgradebayCharges]: null,
-          [UI_IDS.upgradebayChargesCarried]: model.charges.restock[0].levelText,
-          [UI_IDS.upgradebayChargesCost]: model.charges.restock[0].cost?.text ?? '-',
-          [UI_IDS.upgradebayChargesEffect]: model.charges.restock[0].effectText,
-          [UI_IDS.upgradebayChargesRestock]: model.charges.restock[0].buy.label,
-          [UI_IDS.upgradebayRack]: null,
-          [UI_IDS.upgradebayRackSize]: model.charges.rack.levelText,
-          [UI_IDS.upgradebayRackCost]: model.charges.rack.cost?.text ?? '-',
-          [UI_IDS.upgradebayRackEffect]: model.charges.rack.effectText,
-          [UI_IDS.upgradebayRackBuy]: model.charges.rack.buy.label,
-        }),
-    [UI_IDS.upgradebayPreview]: null,
-    [UI_IDS.upgradebayQuickService]: model.quickService.label,
+      : { [UI_IDS.upgradebayChargesRestock]: null, [UI_IDS.upgradebayRackBuy]: null }),
   }
 }
 
@@ -788,41 +753,23 @@ const DESCRIBER_PROBE: SliceDefinition = {
 }
 
 describe('screen ids (#33 acceptance 12)', () => {
-  // The ids are the empty fast path's contract: with a describer registered, a shop row draws as
-  // its item card, whose contract is `data-item-card` plus the buy id (GD and TD locks on #164).
+  // The ids are the empty fast path's contract; the Upgrade bay's rows are the Outfitter's sheet
+  // cards (ticket 687), which carry the buy id with a describer registered or not.
   it('renders every UI_IDS id somewhere with the model value as its text', () => {
     withRegistrations([], expectEveryIdRendered)
   })
 
-  it('draws each Upgrade bay row as its item card, carrying the buy id, once a describer answers', () => {
+  it('draws each Upgrade bay row as an Outfitter card carrying its buy id (ticket 687)', () => {
     game().giveMoney('1e6')
     game().teleportToDock('upgrade')
     const model = readUpgradeBayModel()
     const html = withRegistrations([DESCRIBER_PROBE], () =>
-      renderToString(
-        createElement(UpgradeBayView, { model: readUpgradeBayModel(), focusedId: '' }),
-      ),
+      renderToString(createElement(UpgradeBayView, { model, focusedId: '' })),
     )
     for (const buy of [...model.tracks.map((row) => row.buy), model.casing.buy]) {
-      expect(html).toMatch(new RegExp(`data-item-card="[^"]+"[^>]*data-testid="${buy.id}"`))
+      expect(html).toMatch(new RegExp(`data-sheet-card="[^"]+"[^>]*data-testid="${buy.id}"`))
     }
-    expect(textOfTestId(html, UI_IDS.upgradebayCasing)).toBeNull()
-  })
-
-  it('marks the preview with the focused track and the tier after its purchase, digest untouched', () => {
-    game().setUpgrade('boiler', 70)
-    game().setUpgrade('engine', 9)
-    game().teleportToDock('upgrade')
-    const digest = takeSessionSnapshot().digest
-    game().moveFocus(1)
-    game().moveFocus(1)
-    const html = renderToString(
-      createElement(UpgradeBayView, { model: readUpgradeBayModel(), focusedId: '' }),
-    )
-    expect(html).toMatch(
-      /data-testid="upgradebay-preview" data-highlight="engine" data-visual-tier="2"/,
-    )
-    expect(takeSessionSnapshot().digest).toBe(digest)
+    expect(html).not.toContain('data-item-card')
   })
 
   it('carries the tier and family on every shop row', () => {

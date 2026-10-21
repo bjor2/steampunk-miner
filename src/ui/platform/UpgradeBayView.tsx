@@ -1,16 +1,16 @@
 /**
- * The Upgrade bay screen (#37, #45 wire): the tracks, the Casing row and repair on the left 45%,
- * the live vehicle preview on the right 55%, and the quick action, which works at both shops
- * (#170); the tracks scroll in the shared scroll area (spec #422 ruling 3). Markup only.
+ * The Upgrade bay in the kernel's own bay frame (#37), drawn only while no slice registers the bay's
+ * screen (`bayScreens`, ticket 227: "empty means today"): the header, the Outfitter's cards (ticket
+ * 687) in the shared scroll area, and the footer. With the workshop slice loaded the cards are on
+ * the base sheet instead. Markup only.
  */
+import { outfitterCardsOf } from '../../systems/views/outfitterCards'
 import type { UpgradeBayModel } from '../../systems/views/upgradeBayModel'
 import { UI_IDS } from '../ids'
 import { ScrollArea } from '../kit/ScrollArea'
-import { ScreenButtonView } from '../ScreenButtonView'
 import { BayFrame } from './BayFrame'
+import { OutfitterPanelView } from './OutfitterPanel'
 import styles from './Platform.module.css'
-import { TracksPanel } from './TracksPanel'
-import { VehiclePreviewPanel } from './VehiclePreviewPanel'
 
 export function UpgradeBayView({
   model,
@@ -21,15 +21,9 @@ export function UpgradeBayView({
 }) {
   return (
     <BayFrame header={model.header} footer={model.footer} focusedId={focusedId}>
-      <div className={styles.upgradePanels} data-testid={UI_IDS.upgradebayScreen}>
-        <ScrollArea className={styles.tracksFrame}>
-          <TracksPanel model={model} focusedId={focusedId} />
-        </ScrollArea>
-        <VehiclePreviewPanel preview={model.preview} tierIconId={model.tierIconId} />
-        <span className={styles.wideRow}>
-          <ScreenButtonView button={model.quickService} focusedId={focusedId} />
-        </span>
-      </div>
+      <ScrollArea className={styles.tracksFrame} testId={UI_IDS.upgradebayScreen}>
+        <OutfitterPanelView cards={outfitterCardsOf(model)} focusedId={focusedId} />
+      </ScrollArea>
     </BayFrame>
   )
 }

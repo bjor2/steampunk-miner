@@ -5,6 +5,8 @@
  * bay entries, then Repair. A card is a title, one line of gain text ("+24% drill speed") and the
  * price as its figure, greyed while the wallet is short; never a stat table. Pressing a card
  * presses the bay's own button, so the authority, the ids and the refusals stay the bay model's.
+ * The slice that draws the bay may add a note to a track's line (the rig look's owned step,
+ * ticket 585), after the gain.
  */
 import type { UpgradeId } from '../economy/economyDefinition'
 import { fromCanonical } from '../money'
@@ -45,11 +47,23 @@ const TRACK_GAIN: Readonly<Record<UpgradeId, { stat: string; word: string }>> = 
 
 const CASING_LINE = '+1 casing grade'
 
+const MASTERED_LINE = 'Mastered'
+
 const CARD_ID_PREFIX = 'upgrade-bay.card.'
 
-export function outfitterCardsOf(model: UpgradeBayModel): OutfitterCard[] {
+const NOTE_JOIN = ' · '
+
+/** A note after a track's gain text, or null for none. */
+export type TrackNote = (row: WorkshopRow) => string | null
+
+const NO_TRACK_NOTE: TrackNote = () => null
+
+export function outfitterCardsOf(
+  model: UpgradeBayModel,
+  trackNoteOf: TrackNote = NO_TRACK_NOTE,
+): OutfitterCard[] {
   return [
-    ...model.tracks.map(trackCardOf),
+    ...model.tracks.map((row) => trackCardOf(row, trackNoteOf(row))),
     casingCardOf(model.casing),
     ...optionalCards(model.lining, liningCardOf),
     ...optionalCards(model.guns, gunCardOf),
@@ -60,10 +74,11 @@ export function outfitterCardsOf(model: UpgradeBayModel): OutfitterCard[] {
   ]
 }
 
-function trackCardOf(row: WorkshopRow): OutfitterCard {
+function trackCardOf(row: WorkshopRow, note: string | null): OutfitterCard {
+  const gain = trackGainTextOf(row)
   return {
     ...buyCardOf(`track.${row.upgradeId}`, row.label, row.iconId, row.cost, row.buy),
-    line: trackGainTextOf(row),
+    line: note === null ? gain : `${gain}${NOTE_JOIN}${note}`,
   }
 }
 
@@ -94,7 +109,7 @@ function chargeCardsOf(rows: ChargeRows | null): OutfitterCard[] {
 
 function chargeCardOf(row: ChargeRow): OutfitterCard {
   return {
-    ...buyCardOf(`charges.${row.ids.row}`, row.label, row.iconId, row.cost, row.buy),
+    ...buyCardOf(`charges.${row.key}`, row.label, row.iconId, row.cost, row.buy),
     line: row.effectText,
   }
 }
@@ -106,9 +121,10 @@ function itemCardOf(row: VehicleItemRow): OutfitterCard {
   }
 }
 
+/** A Mastered entry has no buy left: it says so, with no price. */
 function entryCardOf(row: BayEntryRow): OutfitterCard {
   const card = buyCardOf(`entry.${row.entryId}`, row.label, row.iconId, row.cost, row.buy)
-  return { ...card, line: row.effectText ?? row.levelText ?? '' }
+  return { ...card, line: row.isMastered ? MASTERED_LINE : (row.effectText ?? row.levelText ?? '') }
 }
 
 function repairCardOf(repair: RepairReading): OutfitterCard {

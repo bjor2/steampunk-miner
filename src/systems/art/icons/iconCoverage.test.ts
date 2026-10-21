@@ -95,7 +95,7 @@ function upgradeBayIconsOf(model: UpgradeBayModel): string[] {
     model.header.planetIconId,
     model.header.platformStateIconId,
     model.header.coreBay.iconId,
-    ...buttonIcons([model.repair.button, model.quickService, ...footerButtonsOf(model.footer)]),
+    ...buttonIcons([model.repair.button, ...footerButtonsOf(model.footer)]),
   ]
 }
 

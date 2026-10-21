@@ -1,19 +1,19 @@
 /*
  * The showcase over the scene (#180 section 1): no fill where the car stands, so the main canvas
- * shows through, and panels only where text needs a ground. Every class of the screen and its
- * rows' layout lives here.
+ * shows through, and a brass band only where text needs a ground, the header on top and the
+ * footer below. What the bay sells is on the base sheet (ticket 687).
  */
 .showcase {
   position: absolute;
   inset: 3% 3% 3%;
   display: grid;
   grid-template-rows: auto 1fr auto;
+  grid-template-columns: minmax(0, 1fr);
   gap: var(--space-2);
   font-family: var(--font-mono);
   font-variant-numeric: tabular-nums;
   color: var(--color-parchment);
   pointer-events: none;
-  /* The plaques' raised layer stays inside the showcase, under any screen opened over the bay. */
   isolation: isolate;
 }
 
@@ -32,81 +32,13 @@
   padding: var(--space-2) var(--space-3);
 }
 
-.stage {
-  position: relative;
-  display: grid;
-  grid-template-columns: minmax(11em, 24%) 1fr minmax(11em, 24%);
-  gap: var(--space-3);
-  min-height: 0;
-}
-
-/*
- * A column of plaques scrolls in the shared scroll area when the screen is too short for it. The
- * frame fills its grid cell and is the size container, so the column centres its plaques in it.
- */
-.columnFrame {
-  z-index: 1;
-  height: 100%;
-  container-type: size;
-}
-
-.column {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  gap: var(--space-2);
-  min-height: 100cqh;
-}
-
 /* The window the car is seen through: empty, and the pointer passes to nothing. */
 .car {
+  min-height: 0;
   pointer-events: none;
 }
 
-.leaders {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  overflow: hidden;
-  pointer-events: none;
-}
-
-.leaders line {
-  stroke: rgb(201 162 75 / 0.45);
-  stroke-width: 1.5;
-  stroke-dasharray: 4 3;
-}
-
-.leaders line[data-selected] {
-  stroke: var(--color-brass);
-  stroke-width: 2.5;
-  stroke-dasharray: none;
-}
-
-.service {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--space-3);
-  align-items: center;
-}
-
-.serviceRows {
-  flex: 1 1 32em;
-}
-
-.serviceActions,
-.serviceButtons {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--space-2);
-  align-items: center;
-}
-
-/*
- * A phone held sideways keeps the reference type size (#173), so the bands would fill its short
- * screen: they cap at a quarter of it and scroll, and the plaques' columns scroll in the rest.
- */
+/* A phone held sideways keeps the reference type size (#173): the bands cap and scroll. */
 @media (max-height: 600px) {
   .showcase {
     inset: 1%;
@@ -124,57 +56,9 @@
 }
 
 /*
- * A screen held upright (#173 section 3, #470 PT-5): one band on top holds the header and the
- * bay's rows, capped at a third of the screen and scrolling; the car shows in the middle and the
- * plaques lie in one row under it, each nearly a phone's width so the next one shows at the edge,
- * a swipe snapping from plaque to plaque. It ends a gap above the touch cluster's 72 px Interact
- * row in its 16 px corner inset, and on a phone, as the kernel's bays do (`Platform.module.css`),
- * starts under the compact HUD's top row.
+ * Upright on a phone (#470 PT-5) the bands start under the compact HUD's top row and end a gap
+ * above the touch cluster's 72 px Interact row, as the kernel's bays do (`Platform.module.css`).
  */
-.showcase[data-plaque-layout='carousel'] {
-  inset: 10% 0 calc(72px + var(--space-3) + var(--space-2));
-  /* The carousel's row is wider than the screen; the column must not grow to it. */
-  grid-template-columns: minmax(0, 1fr);
-  grid-template-rows: auto minmax(0, 1fr);
-  gap: var(--space-1);
-}
-
-:global([data-hud-density='compact']) .showcase[data-plaque-layout='carousel'] {
-  top: 72px;
-}
-
-.showcase[data-plaque-layout='carousel'] .bandFrame {
-  max-height: 33vh;
-  max-height: 33dvh;
-}
-
-.showcase[data-plaque-layout='carousel'] .band {
-  padding: var(--space-1) var(--space-2);
-}
-
-.showcase[data-plaque-layout='carousel'] .stage {
-  grid-template-columns: minmax(0, 1fr);
-  grid-template-rows: minmax(0, 1fr) auto;
-  gap: var(--space-1);
-}
-
-.carouselFrame {
-  z-index: 1;
-}
-
-/* The scroll area's viewport is the frame's first child: it snaps the row plaque by plaque. */
-.carouselFrame > :first-child {
-  scroll-snap-type: x mandatory;
-}
-
-.carousel {
-  display: flex;
-  gap: var(--space-2);
-  width: max-content;
-  padding: 0 var(--space-2);
-}
-
-.carousel > * {
-  width: min(88vw, 24rem);
-  scroll-snap-align: center;
+:global([data-orientation='portrait'][data-hud-density='compact']) .showcase {
+  inset: 72px 0 calc(72px + var(--space-3) + var(--space-2));
 }

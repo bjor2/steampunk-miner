@@ -102,7 +102,7 @@
     {
       "id": "ui_up",
       "displayName": "Focus up",
-      "contexts": ["platform", "artefact", "settings", "pause", "title"],
+      "contexts": ["platform", "artefact", "settings", "pause", "sheet", "title"],
       "kind": "press",
       "keyboard": ["ArrowUp", "KeyW"],
       "gamepad": ["PadUp", "PadLStickUp"]
@@ -110,7 +110,7 @@
     {
       "id": "ui_down",
       "displayName": "Focus down",
-      "contexts": ["platform", "artefact", "settings", "pause", "title"],
+      "contexts": ["platform", "artefact", "settings", "pause", "sheet", "title"],
       "kind": "press",
       "keyboard": ["ArrowDown", "KeyS"],
       "gamepad": ["PadDown", "PadLStickDown"]
@@ -118,7 +118,7 @@
     {
       "id": "ui_left",
       "displayName": "Focus left",
-      "contexts": ["platform", "artefact", "settings", "pause", "title"],
+      "contexts": ["platform", "artefact", "settings", "pause", "sheet", "title"],
       "kind": "press",
       "keyboard": ["ArrowLeft", "KeyA"],
       "gamepad": ["PadLeft", "PadLStickLeft"]
@@ -126,7 +126,7 @@
     {
       "id": "ui_right",
       "displayName": "Focus right",
-      "contexts": ["platform", "artefact", "settings", "pause", "title"],
+      "contexts": ["platform", "artefact", "settings", "pause", "sheet", "title"],
       "kind": "press",
       "keyboard": ["ArrowRight", "KeyD"],
       "gamepad": ["PadRight", "PadLStickRight"]
@@ -134,7 +134,7 @@
     {
       "id": "ui_confirm",
       "displayName": "Confirm",
-      "contexts": ["platform", "artefact", "settings", "pause", "title"],
+      "contexts": ["platform", "artefact", "settings", "pause", "sheet", "title"],
       "kind": "press",
       "keyboard": ["Enter", "Space", "KeyE"],
       "gamepad": ["PadA"]

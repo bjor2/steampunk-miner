@@ -17,18 +17,18 @@ export interface SheetTab {
   title: string
   /** Tabs read left to right by order, then by id. */
   order: number
-  /** Whether the tab shows on the bar now, read from the authority replica. */
-  isShownOn(state: AuthorityState): boolean
+  /** Whether the tab shows on the bar now for the local player, read from the authority replica. */
+  isShownOn(state: AuthorityState, playerId: string): boolean
   /** The tab's content, drawn in the sheet's scroll area; it takes no props. */
   Panel: ComponentType
 }
 
 export const SHEET_TAB_REGISTRY = defineRegistry<SheetTab>('sheetTabs', sheetTabSealProblem)
 
-/** The tabs the bar shows on `state`, in order. */
-export function shownSheetTabsOn(state: AuthorityState): readonly SheetTab[] {
+/** The tabs the bar shows `playerId` on `state`, in order. */
+export function shownSheetTabsOn(state: AuthorityState, playerId: string): readonly SheetTab[] {
   return [...entriesOf(SHEET_TAB_REGISTRY)]
-    .filter((tab) => tab.isShownOn(state))
+    .filter((tab) => tab.isShownOn(state, playerId))
     .sort(byOrderThenId)
 }
 

@@ -223,6 +223,12 @@ describe('input routing', () => {
     expect(reactionToPress('interact', SHEET)).toEqual({ kind: 'none' })
   })
 
+  it('walks and confirms menu focus on the base sheet, as the pad buys on the Outfitter (687)', () => {
+    expect(reactionToPress('ui_down', SHEET)).toEqual({ kind: 'moveFocus', step: 1 })
+    expect(reactionToPress('ui_up', SHEET)).toEqual({ kind: 'moveFocus', step: -1 })
+    expect(reactionToPress('ui_confirm', SHEET)).toEqual({ kind: 'activateFocused' })
+  })
+
   it('puts the title menu over every other layer', () => {
     expect(topLayerOf('docked', { ...TITLE_OPEN, isSettingsOpen: true })).toBe('title')
     expect(topLayerOf('active', { ...TITLE_OPEN, openScreenId: 'example.screen' })).toBe('title')

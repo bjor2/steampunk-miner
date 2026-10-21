@@ -149,7 +149,7 @@ describe('upgrade bay model: the charge rows (#109)', () => {
     const rows = upgradeBayOf(atUpgradeBayOn(10)).charges?.restock
     expect(rows?.map((row) => row.label)).toEqual(['Charges', 'Charges size 2'])
     expect(rows?.[1]).toMatchObject({
-      ids: { row: UI_ID_TEMPLATES.upgradebayChargeSize(2) },
+      key: 'charges-2',
       levelText: '0/3',
       cost: { exact: toCanonical(chargePrice(2, 3, 10)) },
       buy: { id: UI_ID_TEMPLATES.upgradebayChargeSizeRestock(2), reason: null },

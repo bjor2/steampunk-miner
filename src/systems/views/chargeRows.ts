@@ -26,16 +26,9 @@ import { UI_ID_TEMPLATES, UI_IDS } from './screenIds'
 import { priceReading, commandButton, type AmountReading, type ScreenButton } from './viewParts'
 import { buyStateOf, isBuyOpen, type BuyState, type RowBadge } from './workshopRows'
 
-/** The ids one row's cells carry; the Buy button's is on `buy`. */
-export interface ChargeRowIds {
-  row: string
-  level: string
-  cost: string
-  effect: string
-}
-
 export interface ChargeRow {
-  ids: ChargeRowIds
+  /** `charges` for the shipped size, `charges-<size>` for a bigger one, `rack`: the row's name. */
+  key: string
   iconId: string
   label: string
   /** "2/3" carried of what fits for a Charges row; "3 → 4" or "8 (top)" for the Rack row. */
@@ -59,13 +52,6 @@ export interface ChargeRows {
 }
 
 const SHIPPED_SIZE = 1
-
-const RACK_IDS: ChargeRowIds = {
-  row: UI_IDS.upgradebayRack,
-  level: UI_IDS.upgradebayRackSize,
-  cost: UI_IDS.upgradebayRackCost,
-  effect: UI_IDS.upgradebayRackEffect,
-}
 
 /** The rows, or null while the Upgrade bay shows no charges. */
 export function chargeRowsOf(state: AuthorityState, playerId: string): ChargeRows | null {
@@ -101,7 +87,7 @@ function restockRowOf(state: AuthorityState, playerId: string, size: number): Ch
   const cost = priceReading(restockPriceOf(state, size, fitting))
   const label = size === SHIPPED_SIZE ? 'Charges' : `Charges size ${size}`
   return {
-    ids: restockRowIdsOf(size),
+    key: restockKeyOf(size),
     iconId: BLASTING_CHARGES_ICON_ID,
     label,
     levelText: `${carried}/${carried + fitting}`,
@@ -136,7 +122,7 @@ function rackRowOf(state: AuthorityState, playerId: string): ChargeRow {
   const capacity = rackCapacityOf(charges)
   const cost = isTop ? null : priceReading(rackSlotPriceOf(state, playerId))
   return {
-    ids: RACK_IDS,
+    key: 'rack',
     iconId: CHARGE_RACK_ICON_ID,
     label: 'Rack',
     levelText: isTop ? `${capacity} (top)` : `${capacity} → ${capacity + 1}`,
@@ -163,22 +149,9 @@ function chargeItemOf(size: number): ItemRef {
   return size === SHIPPED_SIZE ? KERNEL_ITEMS.charges : { ...KERNEL_ITEMS.charges, grade: size }
 }
 
-/** Size 1 keeps the shipped Charges row's ids; the bigger sizes take theirs from a template. */
-function restockRowIdsOf(size: number): ChargeRowIds {
-  if (size === SHIPPED_SIZE) {
-    return {
-      row: UI_IDS.upgradebayCharges,
-      level: UI_IDS.upgradebayChargesCarried,
-      cost: UI_IDS.upgradebayChargesCost,
-      effect: UI_IDS.upgradebayChargesEffect,
-    }
-  }
-  return {
-    row: UI_ID_TEMPLATES.upgradebayChargeSize(size),
-    level: UI_ID_TEMPLATES.upgradebayChargeSizeCarried(size),
-    cost: UI_ID_TEMPLATES.upgradebayChargeSizeCost(size),
-    effect: UI_ID_TEMPLATES.upgradebayChargeSizeEffect(size),
-  }
+/** Size 1 keeps the shipped Charges row's name; the bigger sizes add theirs. */
+function restockKeyOf(size: number): string {
+  return size === SHIPPED_SIZE ? 'charges' : `charges-${size}`
 }
 
 function restockButtonIdOf(size: number): string {

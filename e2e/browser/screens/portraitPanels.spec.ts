@@ -1,6 +1,6 @@
 /**
  * The panels held upright (#470 PT-5, ticket 487) in the matrix's portrait cells: the Sell and
- * Upgrade bays, the workshop's plaque carousel under the car, the settings, the pause and title
+ * Upgrade bays, the Upgrade bay's Outfitter sheet (#687), the settings, the pause and title
  * menus, the planet card and the tech tree each fit the safe area, with no text running out of
  * its panel sideways, no two targets on top of each other, nothing over a touch button or the
  * Tech tree button, and every target at least 48 px. Every upgrade plaque shows its level, price
@@ -12,7 +12,8 @@ import { expect, test, type Page } from '@playwright/test'
 import { HUD_COMPACT_COARSE_SHORT_AXIS_PX } from '../../../src/constants/screen'
 import { MAP_ZOOM_MAX } from '../../../src/features/tech-tree/systems/mapGestures'
 import { TREE_TEST_IDS } from '../../../src/features/tech-tree/ui/nodeTestIds'
-import { WORKSHOP_TEST_IDS } from '../../../src/features/workshop/ui/testIds'
+import { DESIGN_TOKENS } from '../../../src/systems/views/designSystem'
+import { SHEET_UI_IDS } from '../../../src/ui/sheet/sheetIds'
 import { UI_IDS } from '../../../src/ui/ids'
 import {
   boxOf,
@@ -185,8 +186,12 @@ async function giveMoney(page: Page, amount: string): Promise<void> {
   }, amount)
 }
 
+/** A sheet the bay opened (the Outfitter, ticket 687) takes Escape first, so it is shut before. */
 async function undock(page: Page): Promise<void> {
-  await page.evaluate(() => window.steampunkDebug!.input.tap('ui_cancel'))
+  await page.evaluate(() => {
+    window.steampunkDebug!.ui.closeSheet()
+    window.steampunkDebug!.input.tap('ui_cancel')
+  })
   await expect
     .poll(() =>
       page.evaluate(() => {
@@ -240,43 +245,24 @@ test.describe('screen matrix: panels held upright (ticket 487)', () => {
     expect(errors).toEqual([])
   })
 
-  test('lays the workshop plaques in one carousel under the car, each showing its level, price and Needs line', async ({
+  test('opens the Outfitter as the full sheet on a dock at the Upgrade bay, each card a priced target (ticket 687)', async ({
     page,
   }) => {
     test.setTimeout(120_000)
     const errors = await openGame(page, currentCell())
     await giveMoney(page, '1e9')
     await dockAt(page, 'upgrade')
-    const selector = `[data-testid="${UI_IDS.platformScreen}"]`
-    const panel = await expectPanelFits(page, selector, [WORKSHOP_TEST_IDS.carousel])
-    expect(await coveredBy(page, panel)).toEqual([])
-    const carousel = await boxOf(page, WORKSHOP_TEST_IDS.carousel)
-    expect(isInside(carousel, panel)).toBe(true)
-    const car = await page.evaluate(() => window.steampunkDebug!.ui.getVehicleScreenBox())
-    expect(car.ok).toBe(true)
-    if (!car.ok) return
-    const bands = await page.locator(`${selector} [data-scroll-area]`).evaluateAll((frames) =>
-      frames.map((frame) => {
-        const { left, top, right, bottom, width, height } = frame.getBoundingClientRect()
-        return { left, top, right, bottom, width, height }
-      }),
-    )
-    const carBox = {
-      ...car.box,
-      width: car.box.right - car.box.left,
-      height: car.box.bottom - car.box.top,
+    const sheet = `[data-testid="${SHEET_UI_IDS.baseSheet}"]`
+    await expect(page.getByTestId(SHEET_UI_IDS.outfitterCards)).toBeVisible({ timeout: 30_000 })
+    const frame = await boxBySelector(page, sheet)
+    expect(frame.right).toBeLessThanOrEqual(currentCell().viewport.width + SLACK_PX)
+    const cards = page.locator(`${sheet} [data-sheet-card]`)
+    expect(await cards.count()).toBeGreaterThanOrEqual(8)
+    for (const card of await cards.all()) {
+      const box = (await card.boundingBox())!
+      expect(box.height).toBeGreaterThanOrEqual(DESIGN_TOKENS.layout.tapTargetMinPx - SLACK_PX)
     }
-    expect(bands.filter((band) => overlaps(band, carBox))).toEqual([])
-    const plaques = page.locator(`[data-testid="${WORKSHOP_TEST_IDS.carousel}"] [data-plaque]`)
-    expect(await plaques.count()).toBe(6)
-    for (const plaque of await plaques.all()) {
-      await expect(plaque.locator('[data-ui-text]').first()).toBeVisible()
-      for (const fact of await plaque.locator('[data-exact]').all())
-        await expect(fact).toBeVisible()
-      for (const lock of await plaque.locator('[data-lock-reason]').all())
-        await expect(lock).toBeVisible()
-    }
-    await expect(page.getByTestId('workshop-upgrade-drill_tip-buy')).toContainText('Level')
+    await expect(page.getByTestId('workshop-upgrade-drill_tip-buy')).toContainText(/\d/)
     expect(errors).toEqual([])
   })
 

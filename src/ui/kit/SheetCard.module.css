@@ -78,6 +78,12 @@
   transition-timing-function: var(--ease-enter);
 }
 
+/* The game's menu focus (a pad's d-pad, ticket 687) rings the card as the keyboard's focus does. */
+.card[data-focused] {
+  outline: var(--focus-ring);
+  outline-offset: var(--focus-ring-offset);
+}
+
 /* Desktop's hover detail replaces the phone's tap-to-reveal (design-system.md section 9). */
 @media (hover: hover) {
   .card:hover .reveal {

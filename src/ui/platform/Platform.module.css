@@ -49,7 +49,6 @@
 }
 
 .sellPanels,
-.upgradePanels,
 .refineryPanels {
   display: grid;
   gap: var(--space-2);
@@ -68,17 +67,6 @@
 /* #105: the hold's ore beside the slots. */
 .refineryPanels {
   grid-template-columns: 1fr 1fr;
-}
-
-/* #45 wire: the track rows take 45% of the width, the live preview 55%. */
-.upgradePanels {
-  grid-template-columns: 45fr 55fr;
-  grid-template-rows: 1fr auto;
-  overflow: hidden;
-}
-
-.wideRow {
-  grid-column: 1 / -1;
 }
 
 /*
@@ -159,8 +147,7 @@
   }
 
   .sellPanels,
-  .refineryPanels,
-  .upgradePanels {
+  .refineryPanels {
     grid-template-columns: 1fr;
   }
 }
@@ -177,7 +164,6 @@
 }
 
 :global([data-orientation='portrait'][data-hud-density='compact']) .sellPanels,
-:global([data-orientation='portrait'][data-hud-density='compact']) .refineryPanels,
-:global([data-orientation='portrait'][data-hud-density='compact']) .upgradePanels {
+:global([data-orientation='portrait'][data-hud-density='compact']) .refineryPanels {
   grid-template-columns: 1fr;
 }

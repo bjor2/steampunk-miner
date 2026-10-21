@@ -1,58 +1,57 @@
 /**
  * The Upgrade bay as a showcase (#180 sections 1 and 2; the GD's "the rig is the hero"): the bay
- * header on top, the car in the middle with nothing over it, the six track plaques beside it on
- * the side its part sits, each with a leader line to its part, and the bay's other rows and the
- * footer below; the columns and, on a short screen, the bands scroll in the shared scroll area
- * (spec #422 ruling 3, pass #425). On a screen held upright the plaques collapse to one carousel
- * under the car, swiped sideways, the bay's rows join the header's band, and the leader lines
- * drop while the selected part stays lit (#173 section 3, #470 PT-5). Registered as the `upgrade` bay's screen, drawn over the scene in
- * place of the kernel's menu (`bayScreens`, K-b ticket 227). Markup only.
+ * header on top, the car in the middle with nothing over it, and the footer below with the button
+ * that opens the bay's sheet. What the bay sells is the Outfitter on the one base sheet (spec #678,
+ * ticket 687), which opens as the rig docks: beside the car on desktop, over it on a phone until
+ * Close. Registered as the `upgrade` bay's screen, drawn over the scene in place of the kernel's
+ * frame (`bayScreens`, K-b ticket 227). Markup only.
  */
 import type { CSSProperties, ReactNode } from 'react'
 import { useGameStore } from '../../../store/gameStore'
 import { readUpgradeBayModel } from '../../../store/screenReads'
 import { focusOnScreen } from '../../../systems/views/menuFocus'
 import { upgradeBayStartFocus, type UpgradeBayModel } from '../../../systems/views/upgradeBayModel'
+import type { ElementText } from '../../../systems/views/uiText'
 import { UI_IDS } from '../../../ui/ids'
-import { BayFooter } from '../../../ui/platform/BayFooter'
+import { Button } from '../../../ui/kit/Button'
 import { ScrollArea } from '../../../ui/kit/ScrollArea'
+import { TitleOneLine } from '../../../ui/kit/TitleOneLine'
+import { BayFooter } from '../../../ui/platform/BayFooter'
 import { BayHeader } from '../../../ui/platform/BayHeader'
 import { useScreenModel } from '../../../ui/useScreenModel'
-import { useHudOrientation } from '../../../ui/hud/useHudOrientation'
-import { rowsOnSide, type PlaqueSide } from '../systems/plaqueReading'
-import { LeaderLines } from './LeaderLines'
-import { ServiceRows } from './ServiceRows'
-import { TrackPlaque } from './TrackPlaque'
+import { OUTFITTER_TAB } from './outfitterTab'
 import { WORKSHOP_TEST_IDS } from './testIds'
+import { openOutfitter, useOutfitterWhileDocked } from './useOutfitterWhileDocked'
 import { useShowcaseClock } from './useShowcaseClock'
 import styles from './ShowcaseScreen.module.css'
 
 /** The layout's `--shop-text`, as the kernel's bay frame sets it (`BayFrame`). */
 const SHOP_TYPE = { fontSize: 'var(--shop-text)', '--kit-label-size': '1em' } as CSSProperties
 
-/** Plaques beside the car on the side their part sits, or one carousel under it held upright. */
-export type PlaqueLayout = 'beside' | 'carousel'
-
-/** Both sides' plaques in one row for the carousel, left to right as the columns stand. */
-const CAROUSEL_SIDES: readonly PlaqueSide[] = ['rear', 'front']
+const OUTFITTER_TEXT: ElementText = {
+  id: 'workshop.outfitter.open',
+  title: OUTFITTER_TAB.title,
+  oneLine: '',
+  tooltipLines: [],
+}
 
 export function ShowcaseScreen() {
   const model = useScreenModel(readUpgradeBayModel)
   const focusedId = useUpgradeBayFocus(model)
-  const plaqueLayout = usePlaqueLayout()
   useShowcaseClock()
-  return <ShowcaseView model={model} focusedId={focusedId} plaqueLayout={plaqueLayout} />
+  useOutfitterWhileDocked()
+  return <ShowcaseView model={model} focusedId={focusedId} onOpenOutfitter={openOutfitter} />
 }
 
-/** The showcase's markup for a bay model, the resolved menu focus and where the plaques go. */
+/** The showcase's markup for a bay model and the resolved menu focus. */
 export function ShowcaseView({
   model,
   focusedId,
-  plaqueLayout = 'beside',
+  onOpenOutfitter,
 }: {
   model: UpgradeBayModel
   focusedId: string
-  plaqueLayout?: PlaqueLayout
+  onOpenOutfitter: () => void
 }) {
   return (
     <div
@@ -61,104 +60,20 @@ export function ShowcaseView({
       data-testid={UI_IDS.platformScreen}
       data-bay={model.header.bay}
       data-accent={model.header.accent}
-      data-plaque-layout={plaqueLayout}
     >
-      {plaqueLayout === 'carousel' ? (
-        <CarouselShowcase model={model} focusedId={focusedId} />
-      ) : (
-        <BesideShowcase model={model} focusedId={focusedId} />
-      )}
+      <Band>
+        <BayHeader header={model.header} />
+      </Band>
+      <div className={styles.car} data-testid={UI_IDS.upgradebayScreen}>
+        <div className={styles.car} data-testid={WORKSHOP_TEST_IDS.showcase} />
+      </div>
+      <Band>
+        <TitleOneLine text={OUTFITTER_TEXT} level="span" layout="row">
+          <Button label="Open" onPress={onOpenOutfitter} testId={WORKSHOP_TEST_IDS.openOutfitter} />
+        </TitleOneLine>
+        <BayFooter bay={model.header.bay} footer={model.footer} focusedId={focusedId} />
+      </Band>
     </div>
-  )
-}
-
-/** The header band on top, the plaques either side of the car, the bay's rows band below. */
-function BesideShowcase({ model, focusedId }: { model: UpgradeBayModel; focusedId: string }) {
-  return (
-    <>
-      <Band>
-        <BayHeader header={model.header} />
-      </Band>
-      <div className={styles.stage} data-testid={UI_IDS.upgradebayScreen}>
-        <PlaqueColumn side="rear" model={model} focusedId={focusedId} />
-        <div className={styles.car} data-testid={WORKSHOP_TEST_IDS.showcase} />
-        <PlaqueColumn side="front" model={model} focusedId={focusedId} />
-        <LeaderLines />
-      </div>
-      <Band>
-        <BayRows model={model} focusedId={focusedId} />
-      </Band>
-    </>
-  )
-}
-
-/**
- * Upright, the camera stands the car low in the window (#484), so the header and the bay's rows
- * share the top band, the car shows in the middle with nothing over it, and the plaques are swiped
- * sideways under it (#173 section 3).
- */
-function CarouselShowcase({ model, focusedId }: { model: UpgradeBayModel; focusedId: string }) {
-  return (
-    <>
-      <Band>
-        <BayHeader header={model.header} />
-        <BayRows model={model} focusedId={focusedId} />
-      </Band>
-      <div className={styles.stage} data-testid={UI_IDS.upgradebayScreen}>
-        <div className={styles.car} data-testid={WORKSHOP_TEST_IDS.showcase} />
-        <ScrollArea className={styles.carouselFrame} testId={WORKSHOP_TEST_IDS.carousel}>
-          <div className={styles.carousel}>
-            {carouselRowsOf(model.tracks).map((row) => (
-              <TrackPlaque
-                key={row.upgradeId}
-                row={row}
-                focusedId={focusedId}
-                moneyIconId={model.header.moneyIconId}
-              />
-            ))}
-          </div>
-        </ScrollArea>
-      </div>
-    </>
-  )
-}
-
-function carouselRowsOf(tracks: UpgradeBayModel['tracks']): UpgradeBayModel['tracks'] {
-  return CAROUSEL_SIDES.flatMap((side) => rowsOnSide(tracks, side))
-}
-
-/** The bay's other rows (Casing, lining, guns, repair) and the footer. */
-function BayRows({ model, focusedId }: { model: UpgradeBayModel; focusedId: string }) {
-  return (
-    <>
-      <ServiceRows model={model} focusedId={focusedId} />
-      <BayFooter bay={model.header.bay} footer={model.footer} focusedId={focusedId} />
-    </>
-  )
-}
-
-function PlaqueColumn({
-  side,
-  model,
-  focusedId,
-}: {
-  side: PlaqueSide
-  model: UpgradeBayModel
-  focusedId: string
-}) {
-  return (
-    <ScrollArea className={styles.columnFrame}>
-      <div className={styles.column} data-side={side}>
-        {rowsOnSide(model.tracks, side).map((row) => (
-          <TrackPlaque
-            key={row.upgradeId}
-            row={row}
-            focusedId={focusedId}
-            moneyIconId={model.header.moneyIconId}
-          />
-        ))}
-      </div>
-    </ScrollArea>
   )
 }
 
@@ -169,11 +84,6 @@ function Band({ children }: { children: ReactNode }) {
       <div className={styles.band}>{children}</div>
     </ScrollArea>
   )
-}
-
-/** Held upright even a tablet's side columns are too narrow for a plaque, so any portrait screen. */
-function usePlaqueLayout(): PlaqueLayout {
-  return useHudOrientation() === 'portrait' ? 'carousel' : 'beside'
 }
 
 function useUpgradeBayFocus(model: UpgradeBayModel): string {

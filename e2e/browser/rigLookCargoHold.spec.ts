@@ -2,7 +2,7 @@
  * The cargo hold's rig looks in the browser (ticket 581): from 23 purchases each step of
  * `rigLook.json` swaps its part of `vehicle-look-cargo-hold` onto `hull.cargo` in place of the
  * rig's ore hatch (`t1-hopper`), the tail keeps the top part, and the look leaves the physics world
- * as it was; the cargo hold plaque names the owned step and grades the tail (#585's template).
+ * as it was; the cargo hold card names the owned step and grades the tail (#585's template).
  * Asserted through `steampunkDebug`, never pixels; the shots at every step and two tail points,
  * desktop and 360 px, by the rig's tier 1 and tier 3 shape, are written to the test's output
  * folder for review, never compared.
@@ -10,7 +10,7 @@
 import { expect, test, type Page } from '@playwright/test'
 import { VIEW_SHORT_AXIS_MIN_M } from '../../src/constants/scene'
 import type { DebugApi } from '../../src/debug/debugApi'
-import { WORKSHOP_TEST_IDS } from '../../src/features/workshop/ui/testIds'
+import { UI_ID_TEMPLATES } from '../../src/systems/views/screenIds'
 
 declare global {
   interface Window {
@@ -29,14 +29,14 @@ const LOOKS = [
   { purchases: 35, part: 'riveted-bin', fitting: 'Fitting: Riveted bin · Grade 2' },
 ]
 /**
- * Tail grades the plaque must fit at 360 px. The hold's units stay safe integers only to about
+ * Tail grades the card must fit at 360 px. The hold's units stay safe integers only to about
  * purchase 250 (1.15 a purchase, ticket 553), so the game cannot own grade 9999; the unit spec
- * measures that text's width instead (rigLookPlaque.test.ts).
+ * measures that text's width instead (rigLookCard.test.ts).
  */
 const TAIL_GRADES = [1, 101, 200]
 const TOP_STEP = 33
-const FITTING = `[data-testid="${WORKSHOP_TEST_IDS.plaqueFitting('cargo_hold')}"]`
-const PLAQUE = '[data-plaque="cargo_hold"]'
+const CARD = `[data-testid="${UI_ID_TEMPLATES.workshopUpgradeBuy('cargo_hold')}"]`
+const FITTING = `${CARD} [data-sheet-card-line]`
 const VIEWPORTS = [
   { name: 'desktop', size: { width: 1280, height: 720 } },
   { name: 'phone', size: { width: 360, height: 640 } },
@@ -76,16 +76,16 @@ async function openAtTheWorkshop(page: Page): Promise<string[]> {
       if (!result.ok) throw new Error(result.problems.join('; '))
     }
   })
-  await expect(page.locator(PLAQUE)).toBeAttached({ timeout: 60_000 })
+  await expect(page.locator(CARD)).toBeAttached({ timeout: 60_000 })
   return errors
 }
 
-/** How far the fitting fact runs past its plaque's right edge, in CSS pixels (0: inside it). */
+/** How far the fitting fact runs past its card's right edge, in CSS pixels (0: inside it). */
 async function fittingOverflowOf(page: Page): Promise<number> {
-  const plaque = await page.locator(PLAQUE).boundingBox()
+  const card = await page.locator(CARD).boundingBox()
   const fitting = await page.locator(FITTING).boundingBox()
-  if (plaque === null || fitting === null) throw new Error('the cargo hold plaque is not laid out')
-  return Math.max(0, fitting.x + fitting.width - (plaque.x + plaque.width))
+  if (card === null || fitting === null) throw new Error('the cargo hold card is not laid out')
+  return Math.max(0, fitting.x + fitting.width - (card.x + card.width))
 }
 
 function setUpgrade(page: Page, track: string, purchases: number): Promise<void> {
@@ -150,20 +150,20 @@ test.describe('cargo hold look (ticket 581)', () => {
   })
 
   for (const viewport of VIEWPORTS) {
-    test(`names the owned step on the plaque and grades the tail, ${viewport.name}`, async ({
+    test(`names the owned step on the card and grades the tail, ${viewport.name}`, async ({
       page,
     }) => {
       await page.setViewportSize(viewport.size)
       const errors = await openAtTheWorkshop(page)
       for (const { purchases, fitting } of LOOKS) {
         await setUpgrade(page, 'cargo_hold', purchases)
-        if (fitting === null) await expect(page.locator(FITTING)).toHaveCount(0)
-        else await expect(page.locator(FITTING)).toHaveText(fitting)
+        if (fitting === null) await expect(page.locator(FITTING)).not.toContainText('Fitting:')
+        else await expect(page.locator(FITTING)).toContainText(fitting)
       }
       for (const grade of TAIL_GRADES) {
         await setUpgrade(page, 'cargo_hold', TOP_STEP + grade)
         await expect(page.locator(FITTING)).toContainText('· Grade ')
-        await page.locator(PLAQUE).scrollIntoViewIfNeeded()
+        await page.locator(CARD).scrollIntoViewIfNeeded()
         expect(await fittingOverflowOf(page), `grade ${grade}`).toBeLessThanOrEqual(1)
         await test.info().attach(`cargo hold grade ${grade}, ${viewport.name}`, {
           body: await page.screenshot(),

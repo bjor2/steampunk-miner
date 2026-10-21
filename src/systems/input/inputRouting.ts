@@ -6,7 +6,8 @@
  * Contexts are layers: the title menu over everything while it is open (ticket 403: nothing
  * reaches the game behind it), then `settings`, then the pause menu (ticket 404), then the
  * artefact cache's cards while open (#46), then a slice's full screen while one is open (ticket
- * 211), then the base sheet while it is open (ticket 686), then `platform` while docked (the screen
+ * 211), then the base sheet while it is open (ticket 686; its menu keys walk the buttons of the bay
+ * it is open over, ticket 687), then `platform` while docked (the screen
  * is open exactly then), else `vehicle`. Escape closes the top layer: settings, the pause menu (its
  * save page steps back to the first page), the cards (no pick, the cache stays live), the slice
  * screen, the sheet, then the platform screen (that is
@@ -152,6 +153,7 @@ const REACTIONS_BY_LAYER: Readonly<
     ui_cancel: () => ({ kind: 'dismissScreen' }),
   },
   sheet: {
+    ...MENU_REACTIONS,
     ui_cancel: () => ({ kind: 'closeSheet' }),
   },
   title: {

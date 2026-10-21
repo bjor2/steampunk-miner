@@ -211,18 +211,6 @@ describe('upgrade bay model', () => {
     expect(model.tracks.every((row) => row.buy.reason === 'wrong_bay')).toBe(true)
   })
 
-  it('offers the quick action here too (#170), outside the focus order: Q runs it', () => {
-    const session = atUpgradeBay('100')
-    session.submit(3, { type: 'debug.setEnergy', payload: { energy: '75' } })
-    const model = upgradeBayOf(session)
-    expect(model.quickService).toMatchObject({
-      id: UI_IDS.upgradebayQuickService,
-      label: 'Sell, repair, recharge',
-      reason: null,
-    })
-    expect(model.focusStops.map((stop) => stop.id)).not.toContain(UI_IDS.upgradebayQuickService)
-  })
-
   it('orders focus tracks, casing, lining, guns, repair, footer and starts on the first track', () => {
     // The kernel's own rows: a slice's bay entries (ticket 344) join before Repair. The lining and
     // the guns are on sale from planet 1 (#411).

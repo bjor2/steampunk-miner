@@ -105,9 +105,6 @@ function upgradeBay(focusedId: string): ReactElement {
   return createElement(UpgradeBayView, { model: readUpgradeBayModel(), focusedId })
 }
 
-/** The shared element's brass tooltip plate (spec #422): the card's lines past its one line. */
-const TOOLTIP_PLATE = /<div role="tooltip"[^>]*>.*?<\/div>/s
-
 function textOf(html: string): string {
   return html
     .replace(/<[^>]*>/g, '')
@@ -125,9 +122,7 @@ describe('item card: empty fast path', () => {
     )
     expect(withEntriesOnly).toBe(withNone)
     expect(withNone).not.toContain('data-item-card')
-    expect(withNone).toContain(
-      `data-testid="${UI_ID_TEMPLATES.workshopUpgradeLevel('drill_power')}"`,
-    )
+    expect(withNone).toContain(`data-testid="${DRILL_BUY}"`)
   })
 
   it('falls back to the kernel artefact summaries while no describer is registered', () => {
@@ -143,35 +138,8 @@ describe('item card: shop row', () => {
     game().teleportToDock('upgrade')
   })
 
-  // Pass #425 (spec #422): the closed row shows the name, the first stat line and the price; the
-  // rest of the card waits in its brass tooltip, hidden until the row opens.
-  it('shows a closed compact row as the name, the first stat line with its change and the price', () => {
-    const html = renderDescribed(() => upgradeBay(UI_ID_TEMPLATES.workshopUpgradeBuy('engine')))
-    const row = rowOf(html, 'track:drill_power')
-    const shown = textOf(row.replace(TOOLTIP_PLATE, ''))
-    expect(row).toContain('data-variant="compact"')
-    expect(shown).toContain('Drill power 57 → 70 +13 (+22.8%)')
-    expect(row).toMatch(/data-exact="[^"]+"[^>]*>(?:<[^>]*>)*[^<]*\d/)
-    expect(shown).not.toContain('A fake ledger line')
-    expect(TOOLTIP_PLATE.exec(row)?.[0]).toContain('hidden')
-  })
-
-  // The open row says the major and the cap in the compact words of the GD ruling on #425.
-  it('opens the full card in place on the focused row, with every stat line field', () => {
-    const row = rowOf(
-      renderDescribed(() => upgradeBay(DRILL_BUY)),
-      'track:drill_power',
-    )
-    expect(row).toContain('aria-expanded="true"')
-    expect(TOOLTIP_PLATE.exec(row)?.[0]).not.toContain('hidden')
-    const text = textOf(row)
-    expect(text).toContain('Drill power 57 → 70 +13 (+22.8%)')
-    expect(text).toContain('Major in 3: 1.20e6, cap 92 (12.5% to go)')
-    expect(text).toContain('A fake ledger line for drill_power.')
-    expect(text).toContain('Available from planet 8')
-    expect(text).toContain('Lets the drill take crystal ore')
-  })
-
+  // The Upgrade bay's rows left the item card for the Outfitter's sheet cards (ticket 687: gain
+  // text, no stat tables); the store's tap still opens before it buys.
   it('buys nothing on the first tap and buys once on the second', () => {
     game().tapItemCard(DRILL_BUY)
     const afterFirst = drillLevel()
@@ -291,14 +259,6 @@ function drillLevel(): number {
 function artefactCards(): ReactElement {
   const model = selectArtefactChoiceModel(readAuthorityState(), game().playerId)
   return createElement(ArtefactChoiceView, { model, focusedId: 'artefact-leave' })
-}
-
-/** The element carrying `data-item-card="id"`, up to the next card. */
-function rowOf(html: string, itemCardId: string): string {
-  const start = html.indexOf(`data-item-card="${itemCardId}"`)
-  expect(start, `${itemCardId} is drawn as an item card`).toBeGreaterThanOrEqual(0)
-  const next = html.indexOf('data-item-card=', start + 1)
-  return html.slice(html.lastIndexOf('<', start), next < 0 ? undefined : next)
 }
 
 /** The shared element `textId` up to its tooltip plate: what shows before the tooltip opens. */

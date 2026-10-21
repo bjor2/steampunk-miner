@@ -12,19 +12,14 @@
  * The preview is presentation only (#37, `upgradePreview`): focus and the install animation are UI
  * state, so moving focus never touches the authority or the digest.
  *
- * The quick action works here as at the Sell bay (#170); as on the old sign (#40) it is never a
- * focus stop, and `quick_service` (Q) runs it.
+ * The quick action is the Sell bay's (#170): the Outfitter (ticket 687) draws no button for it.
  */
 import { buttonIconIdOf, CASING_ICON_ID, PREVIEW_TIER_ICON_ID } from '../art/icons/iconSet'
 import type { AuthorityState } from '../authority/authorityState'
 import { nextCasingPrice } from '../authority/casingRules'
 import { repairCostOf } from '../authority/platformServices'
 import { visualTier } from '../economy/vehicleStats'
-import {
-  buyCasingGradeCommand,
-  quickServiceCommand,
-  repairHullCommand,
-} from '../platform/platformCommands'
+import { buyCasingGradeCommand, repairHullCommand } from '../platform/platformCommands'
 import { CLICK_CHAIN } from '../authority/purchaseChain'
 import { hullGaugeText } from '../vehicle/vehicleReadout'
 import { statsOfVehicle } from '../vehicle/vehicleState'
@@ -107,8 +102,6 @@ export interface UpgradeBayModel {
   /** The preview's tier gauge glyph (#158). */
   tierIconId: string
   preview: UpgradePreview
-  /** "Sell, repair and recharge" is the Sell bay's: disabled here with `wrong_bay`. */
-  quickService: ScreenButton
   footer: BayFooter
   /** Every focusable button in reading order with its panel. */
   focusStops: FocusStop[]
@@ -133,7 +126,6 @@ export function selectUpgradeBayModel(
   const footer = bayFooterOf(state, playerId, ui)
   const rows: ShopRows = { tracks, casing, lining, guns, charges, items, entries, repair }
   const focusStops = upgradeBayFocusStops(rows, footer)
-  const quickService = quickServiceOf(state, playerId)
   return {
     header: bayHeaderOf(state, playerId, 'upgrade'),
     tracks,
@@ -153,10 +145,9 @@ export function selectUpgradeBayModel(
       casingGradeAfter: casing.gradeAfter,
       installing: ui.installingUpgradeId,
     }),
-    quickService,
     footer,
     focusStops,
-    buttons: [...focusedButtonsOf(rows, footer), quickService],
+    buttons: focusedButtonsOf(rows, footer),
   }
 }
 
@@ -213,19 +204,6 @@ function repairReadingOf(state: AuthorityState, playerId: string): RepairReading
     cost,
     card: serviceCardOf(state, playerId, service),
   }
-}
-
-function quickServiceOf(state: AuthorityState, playerId: string): ScreenButton {
-  return withIcon(
-    commandButton(
-      state,
-      playerId,
-      UI_IDS.upgradebayQuickService,
-      'Sell, repair, recharge',
-      quickServiceCommand(),
-    ),
-    buttonIconIdOf('quick_service'),
-  )
 }
 
 /** The bay's rows of things to buy, in reading order. */

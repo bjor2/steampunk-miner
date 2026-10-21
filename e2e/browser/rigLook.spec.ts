@@ -3,13 +3,13 @@
  * threshold of `rigLook.json` and keeps changing on every purchase above its top step, painted as
  * glows on the car's own parts, so the frame stays inside #38's 150 draw calls; the boiler's step
  * swaps in its twin-drum look part (ticket 583), and each hull step lays its armour over the pod,
- * hiding no rig part, while the hull plaque names the owned step and grades the tail (ticket 585).
+ * hiding no rig part, while the hull card names the owned step and grades the tail (ticket 585).
  * Asserted through `steampunkDebug` and test ids, never pixels; the boiler's and the hull's
  * screenshots are attached for review.
  */
 import { expect, test, type Page } from '@playwright/test'
 import type { DebugApi } from '../../src/debug/debugApi'
-import { WORKSHOP_TEST_IDS } from '../../src/features/workshop/ui/testIds'
+import { UI_ID_TEMPLATES } from '../../src/systems/views/screenIds'
 
 declare global {
   interface Window {
@@ -168,11 +168,11 @@ const HULL_COUNTS: readonly { purchases: number; part: string | null; fitting: s
   { purchases: 540, part: 'filigree-armour', fitting: 'Fitting: Filigree armour · Grade 100' },
 ]
 
-/** The tail grades the plaque must fit at 360 px (VS on #579): in full to 9999, then cut. */
+/** The tail grades the card must fit at 360 px (VS on #579): in full to 9999, then cut. */
 const HULL_GRADES = [1, 101, 9_999, 1_000_000]
 const HULL_TOP_STEP = 440
-const HULL_FITTING = `[data-testid="${WORKSHOP_TEST_IDS.plaqueFitting('hull')}"]`
-const HULL_PLAQUE = '[data-plaque="hull"]'
+const HULL_CARD = `[data-testid="${UI_ID_TEMPLATES.workshopUpgradeBuy('hull')}"]`
+const HULL_FITTING = `${HULL_CARD} [data-sheet-card-line]`
 
 async function openAtTheWorkshop(page: Page): Promise<string[]> {
   const errors = await openGame(page)
@@ -182,21 +182,21 @@ async function openAtTheWorkshop(page: Page): Promise<string[]> {
       if (!result.ok) throw new Error(result.problems.join('; '))
     }
   })
-  await expect(page.locator(HULL_PLAQUE)).toBeAttached({ timeout: 60_000 })
+  await expect(page.locator(HULL_CARD)).toBeAttached({ timeout: 60_000 })
   return errors
 }
 
-/** How far the fitting fact runs past its plaque's right edge, in CSS pixels (0: inside it). */
+/** How far the fitting fact runs past its card's right edge, in CSS pixels (0: inside it). */
 async function fittingOverflowOf(page: Page): Promise<number> {
-  const plaque = await page.locator(HULL_PLAQUE).boundingBox()
+  const card = await page.locator(HULL_CARD).boundingBox()
   const fitting = await page.locator(HULL_FITTING).boundingBox()
-  if (plaque === null || fitting === null) throw new Error('the hull plaque is not laid out')
-  return Math.max(0, fitting.x + fitting.width - (plaque.x + plaque.width))
+  if (card === null || fitting === null) throw new Error('the hull card is not laid out')
+  return Math.max(0, fitting.x + fitting.width - (card.x + card.width))
 }
 
 test.describe('hull rig look (ticket 585)', () => {
   for (const viewport of VIEWPORTS) {
-    test(`lays each hull armour over the pod and names it on the plaque, ${viewport.name}`, async ({
+    test(`lays each hull armour over the pod and names it on the card, ${viewport.name}`, async ({
       page,
     }) => {
       await page.setViewportSize(viewport)
@@ -209,8 +209,8 @@ test.describe('hull rig look (ticket 585)', () => {
         rigParts.push(reading.partIds)
         const hullLooks = reading.lookPartIds.filter((id) => id.startsWith('vehicle-look-hull/'))
         expect(hullLooks).toEqual(part === null ? [] : [`vehicle-look-hull/${part}`])
-        if (fitting === null) await expect(page.locator(HULL_FITTING)).toHaveCount(0)
-        else await expect(page.locator(HULL_FITTING)).toHaveText(fitting)
+        if (fitting === null) await expect(page.locator(HULL_FITTING)).not.toContainText('Fitting:')
+        else await expect(page.locator(HULL_FITTING)).toContainText(fitting)
         await test.info().attach(`hull ${purchases}, ${viewport.name}`, {
           body: await page.screenshot(),
           contentType: 'image/png',
@@ -220,7 +220,7 @@ test.describe('hull rig look (ticket 585)', () => {
       expect(errors).toEqual([])
     })
 
-    test(`fits the hull tail grade at 1, 101, 9999 and 1e6 on the plaque, ${viewport.name}`, async ({
+    test(`fits the hull tail grade at 1, 101, 9999 and 1e6 on the card, ${viewport.name}`, async ({
       page,
     }) => {
       await page.setViewportSize(viewport)
@@ -228,7 +228,7 @@ test.describe('hull rig look (ticket 585)', () => {
       for (const grade of HULL_GRADES) {
         await setUpgrade(page, 'hull', HULL_TOP_STEP + grade)
         await expect(page.locator(HULL_FITTING)).toContainText('· Grade ')
-        await page.locator(HULL_PLAQUE).scrollIntoViewIfNeeded()
+        await page.locator(HULL_CARD).scrollIntoViewIfNeeded()
         expect(await fittingOverflowOf(page), `grade ${grade}`).toBeLessThanOrEqual(1)
         await test.info().attach(`hull grade ${grade}, ${viewport.name}`, {
           body: await page.screenshot(),

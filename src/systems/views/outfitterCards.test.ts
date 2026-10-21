@@ -83,3 +83,19 @@ describe('outfitter cards', () => {
     expect(cards.every((card) => wordCountOf(card.line) <= 12)).toBe(true)
   })
 })
+
+describe('outfitter cards: a track note', () => {
+  it('adds the drawing slice’s note after a track’s gain text, and to no other card', () => {
+    const { model } = cardsAtUpgradeBay('0')
+    const plain = outfitterCardsOf(model)
+    const noted = outfitterCardsOf(model, (row) =>
+      row.upgradeId === 'hull' ? 'Fitting: Plate' : null,
+    )
+    const hull = noted.find((card) => card.id === 'upgrade-bay.card.track.hull')!
+    const plainHull = plain.find((card) => card.id === 'upgrade-bay.card.track.hull')!
+    expect(hull.line).toBe(`${plainHull.line} · Fitting: Plate`)
+    expect(noted.filter((card) => card !== hull)).toEqual(
+      plain.filter((card) => card.id !== hull.id),
+    )
+  })
+})

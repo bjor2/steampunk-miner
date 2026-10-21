@@ -69,7 +69,9 @@ export function readSliceBayScreenIdAt(bay: BayId): string | null {
 
 /** The base sheet's tabs shown now, in order (ticket 686): ids, so a re-read compares cheaply. */
 export function readShownSheetTabIds(): string[] {
-  return shownSheetTabsOn(readAuthorityState()).map((tab) => tab.id)
+  return shownSheetTabsOn(readAuthorityState(), useGameStore.getState().playerId).map(
+    (tab) => tab.id,
+  )
 }
 
 /** The Sell bay's model, as it would draw now, docked there or not. */

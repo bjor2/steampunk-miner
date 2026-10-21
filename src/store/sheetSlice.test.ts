@@ -32,14 +32,14 @@ beforeEach(() => resetGameStore())
 describe('sheet tabs', () => {
   it('lists the shown tabs in order, then by id', () => {
     const state = createScriptedSession().state()
-    const ids = withRegistrations([PROBE], () => shownSheetTabsOn(state).map((tab) => tab.id))
+    const ids = withRegistrations([PROBE], () => shownSheetTabsOn(state, 'p1').map((tab) => tab.id))
     expect(ids).toEqual(['sheet-probe.outfitter', 'sheet-probe.hold'])
   })
 
   it('leaves a tab off the bar while it says it is not shown', () => {
     const hidden = sliceWith(tabOf('sheet-probe.hold', 1, { isShownOn: () => false }))
     const state = createScriptedSession().state()
-    expect(withRegistrations([hidden], () => shownSheetTabsOn(state))).toEqual([])
+    expect(withRegistrations([hidden], () => shownSheetTabsOn(state, 'p1'))).toEqual([])
   })
 
   it('refuses a tab title over the three-word budget at the seal', () => {

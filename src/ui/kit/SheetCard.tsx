@@ -6,7 +6,7 @@
  * once. The whole card is the one 44 px target. It records its texts in the budget registry like
  * the Title+OneLine element, so the copy budgets read the cards as drawn.
  */
-import type { MouseEvent, PointerEvent, ReactNode } from 'react'
+import type { FocusEvent, MouseEvent, PointerEvent, ReactNode } from 'react'
 import { recordUiText } from '../../systems/views/uiText'
 import { VectorIcon } from '../VectorIcon'
 import styles from './SheetCard.module.css'
@@ -51,12 +51,17 @@ export function SheetCardView({
   isMuted = false,
   testId,
   isRevealed,
+  isFocused = false,
   onPointerDown,
   onPress,
+  onFocus,
 }: Omit<SheetCardProps, 'onAct'> & {
   isRevealed: boolean
+  /** The game's menu focus is on it (a pad's d-pad, ticket 687): lit, its line shown. */
+  isFocused?: boolean
   onPointerDown: (event: PointerEvent) => void
   onPress: (event: MouseEvent) => void
+  onFocus?: (event: FocusEvent) => void
 }) {
   recordUiText({ id: text.id, title: text.title, oneLine: text.line, tooltipLines: [], lines: [] })
   return (
@@ -65,12 +70,14 @@ export function SheetCardView({
       className={styles.card}
       data-sheet-card={text.id}
       data-ui-text={text.id}
-      data-revealed={isRevealed || undefined}
+      data-revealed={isRevealed || isFocused || undefined}
+      data-focused={isFocused || undefined}
       data-muted={isMuted || undefined}
       data-testid={testId}
       onPointerDown={onPointerDown}
       onMouseDown={keepFocusOnGame}
       onClick={onPress}
+      onFocus={onFocus}
     >
       <span className={styles.head}>
         {iconId !== null && <VectorIcon iconId={iconId} size="menu" />}
