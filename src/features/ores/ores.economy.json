@@ -75,6 +75,11 @@
     "planets": {
       "radiusRule": { "baseTiles": 300, "lnCoefficient": 175, "lnCoefficientBounds": [150, 200] },
       "hazardCaps": { "hullShareBp": 500, "energyShareBp": 2500, "diveHullCapBp": 2500 },
+      "generatedNames": {
+        "fromPlanet": 8,
+        "stems": ["Ash", "Brass", "Cinder", "Copper", "Gear", "Iron", "Smoke", "Tin"],
+        "endings": ["holt", "mere", "fell", "worth", "gate", "combe", "stead", "ford"]
+      },
       "hazards": {
         "rockfall": { "effect": "refill", "hullShareBp": 300 },
         "firedamp": { "effect": "drain", "energyShareBp": 1500, "ticks": 180 },
@@ -82,9 +87,16 @@
         "steamvent": { "effect": "shove", "hullShareBp": 200, "shoveTiles": 3, "ticks": 20 }
       },
       "rows": [
-        { "planet": 1, "pool": "legacy", "radiusTiles": 300, "measuredMinutes": null },
+        {
+          "planet": 1,
+          "name": "Hearthmoor",
+          "pool": "legacy",
+          "radiusTiles": 300,
+          "measuredMinutes": null
+        },
         {
           "planet": 2,
+          "name": "Gravelholm",
           "pool": "foothold-p2",
           "radiusTiles": 421,
           "measuredMinutes": null,
@@ -100,6 +112,7 @@
         },
         {
           "planet": 3,
+          "name": "Coalfen",
           "pool": "foothold-p3",
           "radiusTiles": 492,
           "measuredMinutes": null,
@@ -115,6 +128,7 @@
         },
         {
           "planet": 4,
+          "name": "Spinegarth",
           "pool": "foothold-p4",
           "radiusTiles": 543,
           "measuredMinutes": null,
@@ -130,6 +144,7 @@
         },
         {
           "planet": 5,
+          "name": "Kettlecrag",
           "pool": "foothold-p5",
           "radiusTiles": 582,
           "measuredMinutes": null,
@@ -143,8 +158,20 @@
             "pocketChanceBp": 400
           }
         },
-        { "planet": 6, "pool": "foothold-p6-p7", "radiusTiles": 614, "measuredMinutes": null },
-        { "planet": 7, "pool": "foothold-p6-p7", "radiusTiles": 641, "measuredMinutes": null },
+        {
+          "planet": 6,
+          "name": "Salt Reach",
+          "pool": "foothold-p6-p7",
+          "radiusTiles": 614,
+          "measuredMinutes": null
+        },
+        {
+          "planet": 7,
+          "name": "Windmesa",
+          "pool": "foothold-p6-p7",
+          "radiusTiles": 641,
+          "measuredMinutes": null
+        },
         { "planet": 8, "radiusTiles": 664, "measuredMinutes": null },
         { "planet": 9, "radiusTiles": 685, "measuredMinutes": null },
         { "planet": 10, "radiusTiles": 703, "measuredMinutes": null }

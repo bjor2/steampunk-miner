@@ -22,6 +22,14 @@ export const TOOLTIP_LINE_WORDS_MAX = 12
  */
 export const FACT_LINE_WORDS_MAX = 12
 
+/**
+ * The most characters a planet's display name takes (ticket 702), generated names included. Sized
+ * for the `display` role (24 px, the arrival name) on the narrowest screen: at a 0.6 em serif
+ * advance, 16 characters are 231 px, inside 360 px less the 8 px margins at `--ui-scale` 1, which
+ * 1280x800 keeps too (short axis 800). The 16 px slot line (#703) takes the same name in 154 px.
+ */
+export const PLANET_NAME_CHARACTERS_MAX = 16
+
 /** A mouse resting on an element opens its tooltip after this long ("about 200 ms"). */
 export const TOOLTIP_HOVER_MS = 200
 /** A touch held this long opens the tooltip while held; releasing it fires no action (as #164). */

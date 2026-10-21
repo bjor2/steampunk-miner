@@ -54,6 +54,7 @@ import type { CellGateLookProvider } from '../systems/registries/cellGateLook'
 import type { KindLookProvider } from '../systems/registries/kindLook'
 import type { MagneticGroundProvider } from '../systems/registries/magneticGround'
 import type { PlanetCardLineSource } from '../systems/registries/planetCardLines'
+import type { PlanetNameProvider } from '../systems/registries/planetNames'
 import type { PlanetRadiusProvider } from '../systems/registries/planetRadii'
 import type { HazardPocketsProvider } from '../systems/registries/hazardPockets'
 import type { PlanetSkyBandProvider } from '../systems/registries/planetSkyBand'
@@ -263,6 +264,8 @@ export interface SliceRegistrar {
   planetRadius(provider: PlanetRadiusProvider): void
   /** One provider across all slices: each planet's hazard pockets from its row (ticket 652). */
   hazardPockets(provider: HazardPocketsProvider): void
+  /** One provider across all slices: each planet's display name, row or generated (ticket 702). */
+  planetName(provider: PlanetNameProvider): void
   /**
    * A planet class's tag, arrival line and values on the kernel's planet card (ticket 343): shown
    * once its `featureId` row is open, the hazard and gate kind only, never an unlock id.

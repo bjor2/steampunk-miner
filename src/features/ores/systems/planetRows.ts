@@ -18,14 +18,24 @@
  *   may carry a reason.
  * - `hazard`: the planet's own hazard (ticket 651, `planetHazards.ts`), on planets 2 to 5 and never
  *   on planet 1; its kind is a row of `planets.hazards` (`hazardKinds.ts`).
+ * - `name`: the planet's display name (ticket 702, `planetNames.ts`) on every planet before
+ *   `planets.generatedNames.fromPlanet`; later planets take a generated one.
  *
  * World generation reads the radius from ticket 643 and the hazard pockets from ticket 652.
  */
 import { hazardCapsOf, hazardKindsOf, type HazardCaps, type HazardKinds } from './hazardKinds'
 import { planetHazardOf, planetHazardProblems, type PlanetHazard } from './planetHazards'
+import {
+  generatedPlanetNameOf,
+  generatedPlanetNamesOf,
+  planetNameProblems,
+  type GeneratedPlanetNames,
+} from './planetNames'
 
 export interface PlanetRow {
   planetIndex: number
+  /** The planet's display name; null on a planet the generator names. */
+  name: string | null
   /** The species pool id; null past the last pooled planet. */
   pool: string | null
   radiusTiles: number
@@ -53,6 +63,8 @@ export interface PlanetRows {
   hazards: HazardKinds
   /** The most any one hazard contact, and a whole dive, may cost. */
   hazardCaps: HazardCaps
+  /** How a planet with no name on its row, or past the last row, is named (ticket 702). */
+  generatedNames: GeneratedPlanetNames
 }
 
 /** What the guards check the rows against. */
@@ -66,7 +78,15 @@ type Raw = Record<string, unknown>
 const PATH = 'ore.planets'
 /** A pool id is kebab-case, as a `materials.json` row writes its `pool`. */
 const POOL_ID = /^[a-z][a-z0-9]*(-[a-z0-9]+)*$/
-const ROW_FIELDS = ['planet', 'pool', 'radiusTiles', 'measuredMinutes', 'radiusShrinkWhy', 'hazard']
+const ROW_FIELDS = [
+  'planet',
+  'name',
+  'pool',
+  'radiusTiles',
+  'measuredMinutes',
+  'radiusShrinkWhy',
+  'hazard',
+]
 const FIRST_PLANET = 1
 
 /** Why the `planets` block is not the planet registry; empty when it is. */
@@ -76,6 +96,7 @@ export function planetRowProblems(planets: unknown, context: PlanetRowContext): 
     ...radiusRuleProblems(planets.radiusRule),
     ...rowListProblems(planets.rows, context),
     ...planetHazardProblems(planets, planets.rows),
+    ...planetNameProblems(planets, planets.rows),
   ]
 }
 
@@ -92,12 +113,19 @@ export function planetRowsOf(planets: Raw): PlanetRows {
     rows: (planets.rows as Raw[]).map(planetRowOf),
     hazards: hazardKindsOf(planets.hazards as Raw),
     hazardCaps: hazardCapsOf(planets.hazardCaps as Raw),
+    generatedNames: generatedPlanetNamesOf(planets.generatedNames as Raw),
   }
 }
 
 /** The planet's frozen radius in tiles, or null past the registry's last row. */
 export function radiusTilesOfPlanet(planets: PlanetRows, planetIndex: number): number | null {
   return planets.rows[planetIndex - FIRST_PLANET]?.radiusTiles ?? null
+}
+
+/** The planet's display name: its row's, or the generated one past the named rows. */
+export function nameOfPlanet(planets: PlanetRows, planetIndex: number): string {
+  const rowName = planets.rows[planetIndex - FIRST_PLANET]?.name ?? null
+  return rowName ?? generatedPlanetNameOf(planets.generatedNames, planetIndex)
 }
 
 /** Planet index to pool id, for every planet that has a pool. */
@@ -125,6 +153,7 @@ export function isPlainMap(value: unknown): value is Raw {
 function planetRowOf(row: Raw): PlanetRow {
   return {
     planetIndex: row.planet as number,
+    name: (row.name as string | undefined) ?? null,
     pool: (row.pool as string | undefined) ?? null,
     radiusTiles: row.radiusTiles as number,
     measuredMinutes: row.measuredMinutes as number | null,

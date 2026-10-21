@@ -288,6 +288,13 @@ programs }` from three's `renderer.info` of the game canvas), read only when cal
   changes each planet's radius (to 300, one tile more and twice it) and holds every band's hardness,
   ore value and price, the surface rock by depth, core hardness, `paceScale` and upgrade prices
   byte-identical.
+- **Planet display names** (ticket 702, spec #678): `src/features/ores/systems/planetNames.test.ts`
+  holds Planet & Narrative's names on P1 to P7, a name for every planet past the rows (to 640,000),
+  the 64 distinct generated names before the lap numbers, the longest name within 16 characters
+  with a four-digit lap, the 16-character budget at the 24 px display size on 360x640 and 1280x800
+  (`uiScaleOf`), and the loader refusing a missing, stray, shared, digit-bearing or overlong name.
+  `src/systems/registries/planetNames.test.ts` checks the `planetName` seam (`Planet {n}` with no
+  provider, one provider at most).
 - **World generation reads the radius** (ticket 643, GD lock R2 on #302 6306854642 and its
   addendum 6306861669): `src/features/ores/planetRadius.worldgen.test.ts` generates each fresh P1
   to P10 at its registry row's radius with its core and band starts, keeps #6's ladder past the last
