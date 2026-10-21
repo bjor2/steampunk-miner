@@ -159,6 +159,48 @@
     },
     {
       "kind": "base",
+      "id": "widmanstatten-etch",
+      "cell": "cells/base/widmanstatten-etch.png",
+      "blend": "blend/base-widmanstatten-etch.blend",
+      "wornBy": ["meteoric-iron-brassvein"]
+    },
+    {
+      "kind": "base",
+      "id": "hex-zoning",
+      "cell": "cells/base/hex-zoning.png",
+      "blend": "blend/base-hex-zoning.blend",
+      "wornBy": ["star-sapphire-quartzine"]
+    },
+    {
+      "kind": "base",
+      "id": "opal-potch",
+      "cell": "cells/base/opal-potch.png",
+      "blend": "blend/base-opal-potch.blend",
+      "wornBy": ["opal-jaw-amberbone"]
+    },
+    {
+      "kind": "base",
+      "id": "hammer-facets",
+      "cell": "cells/base/hammer-facets.png",
+      "blend": "blend/base-hammer-facets.blend",
+      "wornBy": ["orichalcum-brassvein"]
+    },
+    {
+      "kind": "base",
+      "id": "triangle-facets",
+      "cell": "cells/base/triangle-facets.png",
+      "blend": "blend/base-triangle-facets.blend",
+      "wornBy": ["heart-diamond-quartzine"]
+    },
+    {
+      "kind": "base",
+      "id": "clock-plate",
+      "cell": "cells/base/clock-plate.png",
+      "blend": "blend/base-clock-plate.blend",
+      "wornBy": ["p3-signature"]
+    },
+    {
+      "kind": "base",
       "id": "blued-temper",
       "cell": "cells/base/blued-temper.png",
       "blend": "blend/base-blued-temper.blend",
@@ -390,6 +432,48 @@
     },
     {
       "kind": "vein",
+      "id": "crusted-slabs",
+      "cell": "cells/vein/crusted-slabs.png",
+      "blend": "blend/vein-crusted-slabs.blend",
+      "wornBy": ["meteoric-iron-brassvein"]
+    },
+    {
+      "kind": "vein",
+      "id": "cabochon-domes",
+      "cell": "cells/vein/cabochon-domes.png",
+      "blend": "blend/vein-cabochon-domes.blend",
+      "wornBy": ["star-sapphire-quartzine"]
+    },
+    {
+      "kind": "vein",
+      "id": "toothed-jaw",
+      "cell": "cells/vein/toothed-jaw.png",
+      "blend": "blend/vein-toothed-jaw.blend",
+      "wornBy": ["opal-jaw-amberbone"]
+    },
+    {
+      "kind": "vein",
+      "id": "lattice-trellis",
+      "cell": "cells/vein/lattice-trellis.png",
+      "blend": "blend/vein-lattice-trellis.blend",
+      "wornBy": ["orichalcum-brassvein"]
+    },
+    {
+      "kind": "vein",
+      "id": "octahedra",
+      "cell": "cells/vein/octahedra.png",
+      "blend": "blend/vein-octahedra.blend",
+      "wornBy": ["heart-diamond-quartzine"]
+    },
+    {
+      "kind": "vein",
+      "id": "gear-train",
+      "cell": "cells/vein/gear-train.png",
+      "blend": "blend/vein-gear-train.blend",
+      "wornBy": ["p3-signature"]
+    },
+    {
+      "kind": "vein",
       "id": "coil-springs",
       "cell": "cells/vein/coil-springs.png",
       "blend": "blend/vein-coil-springs.blend",
@@ -618,6 +702,48 @@
       "cell": "cells/sheen/iridescent.png",
       "blend": "blend/sheen-iridescent.blend",
       "wornBy": ["step-bismuth-brassvein"]
+    },
+    {
+      "kind": "sheen",
+      "id": "lamella-flash",
+      "cell": "cells/sheen/lamella-flash.png",
+      "blend": "blend/sheen-lamella-flash.blend",
+      "wornBy": ["meteoric-iron-brassvein"]
+    },
+    {
+      "kind": "sheen",
+      "id": "asterism",
+      "cell": "cells/sheen/asterism.png",
+      "blend": "blend/sheen-asterism.blend",
+      "wornBy": ["star-sapphire-quartzine"]
+    },
+    {
+      "kind": "sheen",
+      "id": "opal-flash",
+      "cell": "cells/sheen/opal-flash.png",
+      "blend": "blend/sheen-opal-flash.blend",
+      "wornBy": ["opal-jaw-amberbone"]
+    },
+    {
+      "kind": "sheen",
+      "id": "hammered-shine",
+      "cell": "cells/sheen/hammered-shine.png",
+      "blend": "blend/sheen-hammered-shine.blend",
+      "wornBy": ["orichalcum-brassvein"]
+    },
+    {
+      "kind": "sheen",
+      "id": "facet-fire",
+      "cell": "cells/sheen/facet-fire.png",
+      "blend": "blend/sheen-facet-fire.blend",
+      "wornBy": ["heart-diamond-quartzine"]
+    },
+    {
+      "kind": "sheen",
+      "id": "perlage-gleam",
+      "cell": "cells/sheen/perlage-gleam.png",
+      "blend": "blend/sheen-perlage-gleam.blend",
+      "wornBy": ["p3-signature"]
     },
     {
       "kind": "sheen",
