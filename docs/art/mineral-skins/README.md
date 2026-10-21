@@ -230,6 +230,48 @@ this one.
   outside those bands. Luma 0.60 rather than the band's top keeps it apart from the two pale skins
   under deuteranopia (0.66 gave 0.07 against starsteel; 0.60 gives 0.10).
 
+## Batch p5-b1: P5's species 1 to 5 (ticket 604)
+
+The `foothold-p5` pool's four commons and its metal uncommon, kind slots 1 to 5 on P5. P5's slots
+16 and 17 are #453's two appended fossil commons (coprolite, ash bed), whose skins are held: this
+batch does not skin them. P5's slots 6 to 15 and its signature material come with #605 and #606,
+after this batch, so their reports compare against it (`planet_mates`). The layers come from the
+species rows as before; no layer is shared with another batch or within this one.
+
+<!-- p5-b1 -->
+
+| slot | species                    | base                  | vein                 | palette (shadow, body, light)                    | sheen          |
+| ---- | -------------------------- | --------------------- | -------------------- | ------------------------------------------------ | -------------- |
+| 1    | `furnace-iron-brassvein`   | `scorched-scale`      | `fused-clinkers`     | `furnace-iron-red` `#523434` `#a56868` `#d2b4b4` | `burnt-matte`  |
+| 2    | `magnetite-brassvein`      | `black-grain`         | `field-filings`      | `magnetite-black` `#403f46` `#7f7e8c` `#bfbec6`  | `steel-glints` |
+| 3    | `selenite-blade-quartzine` | `split-lamellae`      | `swallowtail-blades` | `selenite-white` `#6f7071` `#dee1e2` `#eef0f0`   | `moon-sheen`   |
+| 4    | `ember-agate-quartzine`    | `fortification-bands` | `split-geodes`       | `ember-agate-red` `#64383c` `#c97177` `#e4b8bb`  | `banded-gloss` |
+| 5    | `chromite-brassvein`       | `leopard-nodules`     | `seed-pods`          | `chromite-steel` `#4a4852` `#9491a5` `#cac8d2`   | `wet-gloss`    |
+
+<!-- /p5-b1 -->
+
+- **Bases:** fired iron under flaking heat scale, two in five Voronoi cells flaked dark with pale
+  cracked rims, over scorch clouds and a fine grain; a black granular mass of grains, twelve across
+  the cell so they still show at 22 px, each its own tone, with dark seams; soft selenite sheets
+  split along one cleavage (u + 3v, 16 sheets across, four tones in turn, so the lattice repeats),
+  each sheet's peeled edge pale and fine fibres along it; agate's fortification bands nested round
+  a few centres, with a pale quartz core; round black chromite seeds packed in a paler serpentine
+  matrix, streaked with fine veinlets.
+- **Veins:** clinkers, rough lumps (every vertex knocked) fused into three clumps; magnetite grit
+  drawn into a lodestone's field, needle grains strung end to end round the circles through both
+  poles (in the plane the field lines of two opposite poles are exactly those circles) and along the
+  line between them; two swallowtail twins, pairs of flat blades from one root in a V, and two loose
+  blades along the base's cleavage; two split geodes, a thick rind round a banded wall and a druse of
+  small crystals pointing into the hollow, through which the base shows; a split pod's curved row of
+  almond seeds and a few spilled beside it.
+- **Sheens:** burnt matte (only the heat scale's lifted rims and a faint warm cloud take the light);
+  steel glints (one grain facet in seven flashes whole, and pinpoint sparks); moon sheen (a cool soft
+  glow along each sheet's peeled edge, waxing and waning across the face); banded gloss (alternate
+  agate bands lit in a slow sweep, a few glints); wet gloss (a bright bead of light on each chromite
+  seed). Each sheen shares its base's field (scale, grains, sheets, bands, seeds), so the light sits
+  where the stone is shaped.
+- **Seeds 601 to 691**, apart from every other batch's.
+
 ## Compositing
 
 What a renderer draws for a skin, per pixel, in display values (0..1), from the row's layers:
@@ -488,6 +530,39 @@ and the signature all go pale grey (0.07 to 0.13 apart); there the plates and ri
 the panels with their rivet rows keep them apart. Every skin sits above its rock (contrast 1.60 for
 painite to 2.27 for the eye). Checked by eye on `p4-b3.phone-x4.png`, `p4-b3.desktop.png`, the
 `p4-b3.skins.jpg` sheet and the `p4-b3.scale-x4` copies with `-deutan` and `-gray`.
+
+From `sheets/p5-b1.distinct.json`, at 22 px a tile over P5's band 3 rock (`palette.planet_2`, the
+slate P3 and P4 wear, luma 0.29). P5 has no other batch yet, so these are all ten pairs:
+
+<!-- p5-b1-readings -->
+
+| pair                                | colour apart | deuteranopia apart | luma apart | texture apart |
+| ----------------------------------- | ------------ | ------------------ | ---------- | ------------- |
+| magnetite vs chromite (least apart) | 0.166        | 0.162              | 0.091      | 0.084         |
+| furnace iron vs ember agate         | 0.186        | 0.166              | 0.094      | 0.059         |
+| furnace iron vs magnetite           | 0.190        | 0.127              | 0.024      | 0.084         |
+| ember agate vs chromite             | 0.249        | 0.152              | 0.021      | 0.058         |
+| magnetite vs ember agate            | 0.273        | 0.152              | 0.070      | 0.076         |
+| furnace iron vs chromite            | 0.286        | 0.263              | 0.115      | 0.072         |
+| selenite blade vs chromite          | 0.401        | 0.414              | 0.244      | 0.053         |
+| selenite blade vs ember agate       | 0.495        | 0.484              | 0.265      | 0.053         |
+| magnetite vs selenite blade         | 0.564        | 0.572              | 0.335      | 0.075         |
+| furnace iron vs selenite blade      | 0.636        | 0.646              | 0.359      | 0.061         |
+
+<!-- /p5-b1-readings -->
+
+The materials table gives P5 two reds in this batch, furnace iron (0 degrees, luma 0.48) and ember
+agate (356 degrees, luma 0.55), and two blue-greys, magnetite (244, 0.50) and chromite (250, 0.58).
+With the bases at a mean of one half the reds came out 0.088 apart (luma 0.027). So, as P3's pig
+iron sits a shade under its slot, the scorched scale was lowered and the agate's bands raised until
+the skins average their slots' lumas (0.48 and 0.58). That puts them 0.19 apart; the crackle of dark
+flakes and clinkers still stands against nested rings and geodes. Magnetite and chromite are parted
+by luma and by grain: magnetite is a coarse mosaic of grains with flashing facets and the loops of
+the field, chromite a pale matrix pocked with round black seeds, each with its bead of light. Under
+deuteranopia both reds go khaki (0.17); the flakes against the rings keep them apart. Selenite is
+the planet's only near-white. Every skin sits above its rock (contrast 1.57 for furnace iron to
+2.63 for selenite). Checked by eye on `p5-b1.phone-x4.png`, `p5-b1.desktop.png`, the
+`p5-b1.layers.jpg` sheet and the `p5-b1.scale-x4` copies with `-deutan` and `-gray`.
 
 Known limits: the cells are unlit tone, so a skin does not turn with the vehicle's lamp (the vein's
 own shading is baked from the stage's fixed headlamp, as the hero sprites are); the earthy sheen

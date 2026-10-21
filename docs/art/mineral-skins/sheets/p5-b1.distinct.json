@@ -1,0 +1,120 @@
+{
+  "batch": "p5-b1",
+  "tilePx": 22,
+  "rockLuma": 0.289,
+  "skins": {
+    "furnace-iron-brassvein": {
+      "meanHex": "#9f6b6b",
+      "luma": 0.482,
+      "hueDeg": 0.0,
+      "rockContrast": 1.57
+    },
+    "magnetite-brassvein": {
+      "meanHex": "#81808b",
+      "luma": 0.506,
+      "hueDeg": 245.2,
+      "rockContrast": 1.64
+    },
+    "selenite-blade-quartzine": {
+      "meanHex": "#d5d7d8",
+      "luma": 0.841,
+      "hueDeg": 195.3,
+      "rockContrast": 2.63
+    },
+    "ember-agate-quartzine": {
+      "meanHex": "#c67c82",
+      "luma": 0.576,
+      "hueDeg": 355.8,
+      "rockContrast": 1.85
+    },
+    "chromite-brassvein": {
+      "meanHex": "#9895a6",
+      "luma": 0.597,
+      "hueDeg": 249.5,
+      "rockContrast": 1.91
+    }
+  },
+  "pairs": [
+    {
+      "a": "furnace-iron-brassvein",
+      "b": "magnetite-brassvein",
+      "colourDistance": 0.19,
+      "deutanDistance": 0.127,
+      "lumaDifference": 0.024,
+      "textureDifference": 0.084
+    },
+    {
+      "a": "furnace-iron-brassvein",
+      "b": "selenite-blade-quartzine",
+      "colourDistance": 0.636,
+      "deutanDistance": 0.646,
+      "lumaDifference": 0.359,
+      "textureDifference": 0.061
+    },
+    {
+      "a": "furnace-iron-brassvein",
+      "b": "ember-agate-quartzine",
+      "colourDistance": 0.186,
+      "deutanDistance": 0.166,
+      "lumaDifference": 0.094,
+      "textureDifference": 0.059
+    },
+    {
+      "a": "furnace-iron-brassvein",
+      "b": "chromite-brassvein",
+      "colourDistance": 0.286,
+      "deutanDistance": 0.263,
+      "lumaDifference": 0.115,
+      "textureDifference": 0.072
+    },
+    {
+      "a": "magnetite-brassvein",
+      "b": "selenite-blade-quartzine",
+      "colourDistance": 0.564,
+      "deutanDistance": 0.572,
+      "lumaDifference": 0.335,
+      "textureDifference": 0.075
+    },
+    {
+      "a": "magnetite-brassvein",
+      "b": "ember-agate-quartzine",
+      "colourDistance": 0.273,
+      "deutanDistance": 0.152,
+      "lumaDifference": 0.07,
+      "textureDifference": 0.076
+    },
+    {
+      "a": "magnetite-brassvein",
+      "b": "chromite-brassvein",
+      "colourDistance": 0.166,
+      "deutanDistance": 0.162,
+      "lumaDifference": 0.091,
+      "textureDifference": 0.084
+    },
+    {
+      "a": "selenite-blade-quartzine",
+      "b": "ember-agate-quartzine",
+      "colourDistance": 0.495,
+      "deutanDistance": 0.484,
+      "lumaDifference": 0.265,
+      "textureDifference": 0.053
+    },
+    {
+      "a": "selenite-blade-quartzine",
+      "b": "chromite-brassvein",
+      "colourDistance": 0.401,
+      "deutanDistance": 0.414,
+      "lumaDifference": 0.244,
+      "textureDifference": 0.053
+    },
+    {
+      "a": "ember-agate-quartzine",
+      "b": "chromite-brassvein",
+      "colourDistance": 0.249,
+      "deutanDistance": 0.152,
+      "lumaDifference": 0.021,
+      "textureDifference": 0.058
+    }
+  ],
+  "leastDifferentPair": ["furnace-iron-brassvein", "ember-agate-quartzine"]
+}
