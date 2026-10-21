@@ -6,30 +6,48 @@
   align-items: center;
 }
 
+/*
+ * Ticket 683: the baked brass dial (design-system.md section 13) carries the rim, the face and
+ * the ticks; the conic ticks are its placeholder while the asset is not final.
+ */
 .dial {
   grid-row: span 2;
   position: relative;
   width: calc(44px * var(--ui-scale));
   height: calc(44px * var(--ui-scale));
-  border: 2px solid var(--color-brass);
   border-radius: 50%;
-  background: repeating-conic-gradient(
-    from -120deg,
-    var(--color-brass) 0deg 1.5deg,
-    transparent 1.5deg 30deg
-  );
+  background: var(
+      --art-gauge-dial,
+      repeating-conic-gradient(
+        from -120deg,
+        var(--color-brass) 0deg 1.5deg,
+        transparent 1.5deg 30deg
+      )
+    )
+    center / 100% 100% no-repeat;
+}
+
+/* The face is skinnable (`dialFace`): the planet's colour through the sprite's tint mask. */
+.dial::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: var(--color-dial-face, var(--color-parchment));
+  mask: var(--art-gauge-dial-tint, linear-gradient(transparent, transparent)) center / 100% 100%
+    no-repeat;
+  -webkit-mask: var(--art-gauge-dial-tint, linear-gradient(transparent, transparent)) center / 100%
+    100% no-repeat;
 }
 
 .dial[data-hatched] {
-  background-image: repeating-linear-gradient(
-    45deg,
-    rgb(201 162 75 / 0.6) 0 3px,
-    transparent 3px 7px
-  );
+  background-image:
+    repeating-linear-gradient(45deg, rgb(201 162 75 / 0.6) 0 3px, transparent 3px 7px),
+    var(--art-gauge-dial, none);
 }
 
 .needle {
   position: absolute;
+  z-index: 1;
   left: calc(50% - 1px);
   bottom: 50%;
   width: 2px;

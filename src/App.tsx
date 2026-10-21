@@ -15,6 +15,7 @@ import { VersionLabel } from './ui/debug/VersionLabel'
 import { DeviceNotices } from './ui/stage/DeviceNotices'
 import { GameStage } from './ui/stage/GameStage'
 import { UnsupportedDeviceCard } from './ui/stage/UnsupportedDeviceCard'
+import { UiArtTokens } from './ui/kit/UiArtTokens'
 import { SliceScreen } from './ui/screens/SliceScreen'
 import { LedgerToast } from './ui/save/LedgerToast'
 import { UnsavedChip } from './ui/save/UnsavedChip'
@@ -26,6 +27,7 @@ import { TravelTransitionCard } from './ui/TravelTransitionCard'
 export default function App() {
   return (
     <GameStage scene={<GameScene />}>
+      <UiArtTokens />
       <Hud />
       <PlatformScreen />
       <AboveBayLayer />
