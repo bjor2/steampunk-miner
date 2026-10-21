@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-10-21T15:01:27+02:00",
+  "updated_at": "2026-10-21T15:07:01+02:00",
   "caps": {
     "grok": 12,
     "claude": 10,
@@ -33,7 +33,7 @@
           "grok_slot": null,
           "kind": "aux",
           "since": null,
-          "label": "wave-plan 157"
+          "label": "wave-plan 401"
         },
         {
           "slot": "C3",
@@ -71,7 +71,7 @@
       "size": 6,
       "used": 2,
       "free": 4,
-      "claims_last_hour": 5,
+      "claims_last_hour": 6,
       "name": "Claude Max 1"
     },
     {
@@ -256,7 +256,7 @@
       "grok_slot": null,
       "since": null,
       "kind": "aux",
-      "label": "wave-plan 157",
+      "label": "wave-plan 401",
       "account": 1
     },
     {
@@ -325,11 +325,11 @@
     }
   ],
   "last_refill": {
-    "at": "2026-10-21 15:01 CEST",
+    "at": "2026-10-21 15:07 CEST",
     "mode": "refill-dev",
     "triggers": "claude-run:wave-plan",
-    "started": "#664->C1/A1",
-    "note": "spawned 1 worker(s)"
+    "started": "",
+    "note": "no pickable build ticket"
   },
   "totals": {
     "grok": {
