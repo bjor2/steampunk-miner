@@ -27,9 +27,11 @@
  * (`systems/shippedTools.ts`). The lane's P16 fork (ticket 269), built on no magnet: the Bracer
  * props warning collapse blocks round its rig through the same `collapseBraces` seam, fed by a
  * reaction to `CollapseWarned`; the Breaker fractures the plain ground past each charge it blasts,
- * as a blast effect on the K6 queue. No side effects at import; the loader calls `register`.
+ * as a blast effect on the K6 queue. The reports carry a row of the rig's collapse deaths per planet
+ * (Systems ruling on #664). No side effects at import; the loader calls `register`.
  */
 import type { SliceDefinition } from '../../registries/sliceDefinition'
+import { collapseDeathReportRows } from './collapseDeathReportRows'
 import { terrainToolsDebugActions } from './debug'
 import { TERRAIN_PROJECTIONS, TERRAIN_RUN_EVENTS } from './logging'
 import { MAGNET_FIELD_LAYER_ID, MagnetFieldLayer } from './scene/MagnetFieldLayer'
@@ -88,6 +90,7 @@ export const slice: SliceDefinition = {
     })
     r.eventProjections(TERRAIN_PROJECTIONS)
     r.runEvents(TERRAIN_RUN_EVENTS)
+    r.reportRows(collapseDeathReportRows)
     // steampunkDebug.features['terrain-tools'].getBeacon() / .getClampLattice() / .getFoam()
     //   / .statPreview(itemId, mark, planet) / .getMagnetFields()
     r.debugActions(terrainToolsDebugActions)
