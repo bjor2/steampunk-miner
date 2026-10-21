@@ -410,6 +410,41 @@
       "wornBy": ["saurian-vertebra-amberbone"]
     },
     {
+      "kind": "base",
+      "id": "rosy-haze",
+      "cell": "cells/base/rosy-haze.png",
+      "blend": "blend/base-rosy-haze.blend",
+      "wornBy": ["rose-quartz-quartzine"]
+    },
+    {
+      "kind": "base",
+      "id": "ripple-shale",
+      "cell": "cells/base/ripple-shale.png",
+      "blend": "blend/base-ripple-shale.blend",
+      "wornBy": ["trilobite-amberbone"]
+    },
+    {
+      "kind": "base",
+      "id": "sulphide-tarnish",
+      "cell": "cells/base/sulphide-tarnish.png",
+      "blend": "blend/base-sulphide-tarnish.blend",
+      "wornBy": ["wire-silver-brassvein"]
+    },
+    {
+      "kind": "base",
+      "id": "two-tone-pencils",
+      "cell": "cells/base/two-tone-pencils.png",
+      "blend": "blend/base-two-tone-pencils.blend",
+      "wornBy": ["watermelon-tourmaline-quartzine"]
+    },
+    {
+      "kind": "base",
+      "id": "radial-guards",
+      "cell": "cells/base/radial-guards.png",
+      "blend": "blend/base-radial-guards.blend",
+      "wornBy": ["belemnite-amberbone"]
+    },
+    {
       "kind": "vein",
       "id": "nugget-cluster",
       "cell": "cells/vein/nugget-cluster.png",
@@ -816,6 +851,41 @@
       "wornBy": ["saurian-vertebra-amberbone"]
     },
     {
+      "kind": "vein",
+      "id": "quartz-masses",
+      "cell": "cells/vein/quartz-masses.png",
+      "blend": "blend/vein-quartz-masses.blend",
+      "wornBy": ["rose-quartz-quartzine"]
+    },
+    {
+      "kind": "vein",
+      "id": "lobed-segments",
+      "cell": "cells/vein/lobed-segments.png",
+      "blend": "blend/vein-lobed-segments.blend",
+      "wornBy": ["trilobite-amberbone"]
+    },
+    {
+      "kind": "vein",
+      "id": "ramshorn-curls",
+      "cell": "cells/vein/ramshorn-curls.png",
+      "blend": "blend/vein-ramshorn-curls.blend",
+      "wornBy": ["wire-silver-brassvein"]
+    },
+    {
+      "kind": "vein",
+      "id": "pencil-prisms",
+      "cell": "cells/vein/pencil-prisms.png",
+      "blend": "blend/vein-pencil-prisms.blend",
+      "wornBy": ["watermelon-tourmaline-quartzine"]
+    },
+    {
+      "kind": "vein",
+      "id": "bullet-darts",
+      "cell": "cells/vein/bullet-darts.png",
+      "blend": "blend/vein-bullet-darts.blend",
+      "wornBy": ["belemnite-amberbone"]
+    },
+    {
       "kind": "sheen",
       "id": "earthy",
       "cell": "cells/sheen/earthy.png",
@@ -1220,6 +1290,41 @@
       "cell": "cells/sheen/bone-dust.png",
       "blend": "blend/sheen-bone-dust.blend",
       "wornBy": ["saurian-vertebra-amberbone"]
+    },
+    {
+      "kind": "sheen",
+      "id": "inner-glow",
+      "cell": "cells/sheen/inner-glow.png",
+      "blend": "blend/sheen-inner-glow.blend",
+      "wornBy": ["rose-quartz-quartzine"]
+    },
+    {
+      "kind": "sheen",
+      "id": "crest-gleam",
+      "cell": "cells/sheen/crest-gleam.png",
+      "blend": "blend/sheen-crest-gleam.blend",
+      "wornBy": ["trilobite-amberbone"]
+    },
+    {
+      "kind": "sheen",
+      "id": "untarnished-gleam",
+      "cell": "cells/sheen/untarnished-gleam.png",
+      "blend": "blend/sheen-untarnished-gleam.blend",
+      "wornBy": ["wire-silver-brassvein"]
+    },
+    {
+      "kind": "sheen",
+      "id": "prism-lines",
+      "cell": "cells/sheen/prism-lines.png",
+      "blend": "blend/sheen-prism-lines.blend",
+      "wornBy": ["watermelon-tourmaline-quartzine"]
+    },
+    {
+      "kind": "sheen",
+      "id": "guard-crescents",
+      "cell": "cells/sheen/guard-crescents.png",
+      "blend": "blend/sheen-guard-crescents.blend",
+      "wornBy": ["belemnite-amberbone"]
     }
   ]
 }

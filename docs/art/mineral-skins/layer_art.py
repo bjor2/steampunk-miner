@@ -2,10 +2,10 @@
 The Blender recipes of the mineral skin layers (#576, ticket 592 for P1's slots 1 to 5, ticket 593
 for its slots 6 to 10, ticket 594 for 11 and 12, ticket 598 for P3's slots 1 to 5, ticket 599 for
 its slots 6 to 10, ticket 600 for its slots 11 to 15 and its relic signature, ticket 601 for P4's
-slots 1 to 5, ticket 603 for its slots 11 to 15 and its signature material, ticket 604 for P5's
-slots 1 to 5, ticket 605 for its slots 6 to 10, ticket 595 for P2's slots 1 to 5, ticket 596 for its
-slots 6 to 9): one per layer id of `mineralSkins.json`. A layer id with no recipe fails, never falls
-back.
+slots 1 to 5, ticket 602 for its slots 6 to 10, ticket 603 for its slots 11 to 15 and its signature
+material, ticket 604 for P5's slots 1 to 5, ticket 605 for its slots 6 to 10, ticket 595 for P2's
+slots 1 to 5, ticket 596 for its slots 6 to 9): one per layer id of `mineralSkins.json`. A layer id
+with no recipe fails, never falls back.
 
 - `base` and `sheen` are seamless textures on the 1 m cell: an emission material on a 1 m quad
   whose value is the ramp coordinate (base, mean about 0.5) or the highlight strength (sheen,
@@ -1098,6 +1098,143 @@ def vertebra_pores_of(graph):
     return graph.smooth(graph.voronoi(VERTEBRA_PORES, VERTEBRA_PORES, seed=741)['Distance'], 0.62, 0.4)
 
 
+def base_rosy_haze(graph):
+    """Rose quartz: massive milky quartz in a soft rosy haze, deeper in slow clouds, crossed by pale healed fractures with a faint dark side."""
+    haze = stretched(graph, graph.noise(3, 3, seed=801, detail=4, roughness=0.55))
+    mist = stretched(graph, graph.noise(40, 40, seed=802, detail=3))
+    fracture, side = healed_fractures_of(graph)
+    tone = around_half(graph, haze, 0.42)
+    tone = graph.plus(tone, graph.mul(graph.minus(mist, 0.5), 0.08))
+    tone = graph.minus(tone, graph.mul(side, 0.12))
+    return graph.plus(tone, graph.mul(fracture, 0.3))
+
+
+def healed_fractures_of(graph):
+    """The pale line on each healed crack and the faint dark side beside it."""
+    edge = rose_fracture_edge_of(graph)
+    line = graph.smooth(edge, 0.014, 0.004)
+    return line, graph.math('MAXIMUM', graph.minus(graph.smooth(edge, 0.05, 0.014), line), 0.0)
+
+
+def rose_fracture_edge_of(graph):
+    """
+    The distance to the nearest healed fracture, a Voronoi net four cells across bent by a fine
+    wobble: shared by the base and the inner glow, which pools away from the cracks.
+    """
+    wobble = graph.mul(graph.minus(graph.noise(8, 8, seed=804, detail=2), 0.5), 0.04)
+    return graph.plus(graph.voronoi(4, 4, seed=803, feature='DISTANCE_TO_EDGE')['Distance'], wobble)
+
+
+def base_ripple_shale(graph):
+    """Trilobite: dark shale with ripple marks, low ridges drawn on a gentle slant, slow up one side and steep down the other, over fine laminae."""
+    ripple = ripple_marks_of(graph)
+    ridge = graph.mul(graph.smooth(ripple, 0.0, RIPPLE_CREST), graph.smooth(ripple, 1.0, RIPPLE_CREST + 0.03))
+    lamina = tiles.strata(graph, 31, graph.noise(2, 2, seed=812, detail=2), 0.8)
+    grain = stretched(graph, graph.noise(60, 60, seed=813, detail=5))
+    tone = graph.plus(0.3, graph.mul(ridge, 0.42))
+    tone = graph.plus(tone, graph.mul(graph.minus(lamina, 0.5), 0.1))
+    return graph.plus(tone, graph.mul(graph.minus(grain, 0.5), 0.12))
+
+
+RIPPLE_CREST = 0.84
+
+
+def ripple_marks_of(graph):
+    """
+    Where each pixel sits in its ripple, 0..1 from trough to trough: lines of 2u + 6v, so six
+    ripples cross the cell along v and two along u (whole ripples both ways, so it repeats), bent
+    by a slow warp. Shared by the base and the crest gleam.
+    """
+    warp = graph.mul(graph.minus(graph.noise(2, 2, seed=811, detail=2), 0.5), 1.4)
+    return graph.math('FRACT', graph.plus(graph.plus(graph.mul(graph.u, 2.0), graph.mul(graph.v, 6.0)), warp))
+
+
+def base_sulphide_tarnish(graph):
+    """Wire silver: a pale silver-white host gone black where the silver tarnished, sooty sulphide blotches with a brown fringe, bright silver threads through the clean stone."""
+    tarnish = silver_tarnish_of(graph)
+    host = stretched(graph, graph.noise(10, 10, seed=822, detail=4))
+    fringe = graph.mul(graph.mul(tarnish, graph.minus(1.0, tarnish)), 4.0)
+    # Rose quartz (slot luma 0.78) and wire silver both read pale grey under deuteranopia, so the
+    # silver's tarnish runs heavy and its clean stone a shade low: the skin averages under its slot
+    # (0.80), between the ichthyosaur eye's luma and the rose's.
+    tone = graph.plus(0.66, graph.mul(graph.minus(host, 0.5), 0.16))
+    tone = graph.minus(tone, graph.mul(tarnish, 0.46))
+    tone = graph.minus(tone, graph.mul(fringe, 0.06))
+    return graph.plus(tone, graph.mul(silver_threads_of(graph), 0.2))
+
+
+def silver_tarnish_of(graph):
+    """The tarnish, 1 on black sulphide and 0 on clean stone: the untarnished gleam lights only the clean stone."""
+    return graph.smooth(stretched(graph, graph.noise(4, 4, seed=821, detail=5, roughness=0.6)), 0.45, 0.57)
+
+
+def silver_threads_of(graph):
+    """Thin threads of bright silver where a slow noise crosses its middle, off the tarnish."""
+    threads = graph.smooth(graph.math('ABSOLUTE', graph.minus(graph.noise(6, 6, seed=823, detail=3), 0.5)), 0.014, 0.0)
+    return graph.mul(threads, graph.minus(1.0, silver_tarnish_of(graph)))
+
+
+def base_two_tone_pencils(graph):
+    """Watermelon tourmaline: pencils packed upright side by side, each pink down its heart and green at its rind, striated along its length, broken across here and there."""
+    pencil = tourmaline_pencils_of(graph)
+    striae = stretched(graph, graph.noise(60, 3, seed=832, detail=2))
+    cracked = graph.smooth(block_random(graph, pencil, 834), 0.45, 0.5)
+    crack = graph.smooth(graph.math('ABSOLUTE', graph.minus(graph.math('FRACT', graph.plus(graph.mul(graph.v, 2.0), block_random(graph, pencil, 833))), 0.5)), 0.485, 0.5)
+    tone = graph.plus(0.46, graph.mul(graph.minus(striae, 0.5), 0.12))
+    tone = graph.plus(tone, graph.mul(pencil_heart_of(graph, pencil), 0.38))
+    tone = graph.minus(tone, graph.mul(graph.smooth(pencil_edge_of(graph, pencil), 0.06, 0.0), 0.3))
+    return graph.minus(tone, graph.mul(graph.mul(crack, cracked), 0.25))
+
+
+TOURMALINE_PENCILS = 7
+
+
+def tourmaline_pencils_of(graph):
+    """Seven upright pencils across the cell, each one block of a one-row lattice: shared by the base and the prism lines."""
+    return lattice_of(graph, TOURMALINE_PENCILS, 1)
+
+
+def pencil_heart_of(graph, pencil):
+    """1 down a pencil's pink heart, each heart its own width, soft at its edge."""
+    half_width = graph.mul_add(block_random(graph, pencil, 831), 0.1, 0.12)
+    return graph.smooth(graph.math('ABSOLUTE', graph.minus(pencil['x'], 0.5)), half_width, graph.minus(half_width, 0.06))
+
+
+def pencil_edge_of(graph, pencil):
+    return graph.math('MINIMUM', pencil['x'], graph.minus(1.0, pencil['x']))
+
+
+def base_radial_guards(graph):
+    """Belemnite: a polished slab cut across the guards, each a disc of amber calcite, fibres radiating from a dark apical point through fine growth rings, in a smooth matrix."""
+    guard = belemnite_guards_of(graph)
+    inside = graph.smooth(guard['reach'], 1.0, 0.9)
+    fibres = graph.math('SINE', graph.mul(guard['angle'], BELEMNITE_FIBRES))
+    rings = graph.math('SINE', graph.mul(guard['reach'], 9.0 * math.tau))
+    matrix = stretched(graph, graph.noise(6, 6, seed=842, detail=3))
+    ground = graph.plus(0.36, graph.mul(graph.minus(matrix, 0.5), 0.12))
+    disc = graph.plus(0.62, graph.mul(fibres, 0.07))
+    disc = graph.plus(disc, graph.mul(rings, 0.06))
+    disc = graph.minus(disc, graph.mul(graph.smooth(guard['reach'], 0.14, 0.05), 0.34))
+    return graph.mul_add(graph.minus(disc, ground), inside, ground)
+
+
+BELEMNITE_FIBRES = 48.0
+
+
+def belemnite_guards_of(graph):
+    """
+    The guard sections, one a block of a staggered 3 by 3 lattice, each its own size and a little
+    off the block's middle: a pixel's reach (0 at the apical point, 1 on the guard's edge) and its
+    angle round the point. Shared by the base and the guard crescents.
+    """
+    lattice = lattice_of(graph, 3, 3, stagger=0.5)
+    size = graph.mul_add(block_random(graph, lattice, 841), 0.1, 0.3)
+    dx = graph.minus(lattice['x'], graph.mul_add(block_random(graph, lattice, 843), 0.12, 0.44))
+    dy = graph.minus(lattice['y'], graph.mul_add(block_random(graph, lattice, 844), 0.12, 0.44))
+    distance = graph.math('SQRT', graph.mul_add(dx, dx, graph.mul(dy, dy)))
+    return {'reach': graph.math('DIVIDE', distance, size), 'angle': graph.math('ARCTAN2', dy, dx)}
+
+
 # --- sheen: the lustre's highlights -----------------------------------------------------------------
 
 
@@ -1592,6 +1729,60 @@ def sheen_bone_dust(graph):
     struts = graph.minus(1.0, vertebra_pores_of(graph))
     speck = sprinkled(graph, 22, 791, 0.3, 0.3)
     return graph.plus(graph.mul(struts, 0.12), graph.mul(speck, 0.22))
+
+
+def sheen_inner_glow(graph):
+    """Inner glow: milky rose quartz holds the light, so it pools softly in the middle of each piece between the cracks; the healed cracks catch a thin line, a few glints."""
+    pool = graph.smooth(rose_fracture_edge_of(graph), 0.04, 0.22)
+    swell = stretched(graph, graph.noise(2, 2, seed=851, detail=2))
+    fracture, _ = healed_fractures_of(graph)
+    glint = graph.smooth(graph.voronoi(10, 10, seed=852)['Distance'], 0.05, 0.012)
+    glow = graph.plus(graph.mul(graph.mul(pool, swell), 0.32), graph.mul(fracture, 0.25))
+    return graph.plus(glow, graph.mul(glint, 0.4))
+
+
+def sheen_crest_gleam(graph):
+    """Crest gleam: the fossil shale is dull, but the crest of every ripple catches a thin line of light, broken along its length."""
+    crest = graph.smooth(graph.math('ABSOLUTE', graph.minus(ripple_marks_of(graph), RIPPLE_CREST)), 0.05, 0.0)
+    broken = graph.smooth(stretched(graph, graph.noise(4, 4, seed=861, detail=3)), 0.35, 0.6)
+    wash = graph.smooth(stretched(graph, graph.noise(2, 2, seed=862, detail=2)), 0.4, 0.9)
+    return graph.plus(graph.mul(graph.mul(crest, broken), 0.45), graph.mul(wash, 0.06))
+
+
+def sheen_untarnished_gleam(graph):
+    """Untarnished gleam: the clean silver shines in a slow sweep and its threads flash, the black tarnish takes no light at all."""
+    clean = graph.minus(1.0, silver_tarnish_of(graph))
+    sweep = graph.smooth(stretched(graph, graph.noise(2, 2, seed=871, detail=2)), 0.3, 0.8)
+    glint = graph.smooth(graph.voronoi(18, 18, seed=872)['Distance'], 0.05, 0.012)
+    gleam = graph.plus(graph.mul(graph.mul(clean, sweep), 0.4), graph.mul(silver_threads_of(graph), 0.55))
+    return graph.plus(gleam, graph.mul(graph.mul(glint, clean), 0.4))
+
+
+def sheen_prism_lines(graph):
+    """Prism lines: each glassy pencil throws back the lamp along two facet edges, one bright and one faint, broken where the pencil is, with sharp glints."""
+    across = tourmaline_pencils_of(graph)['x']
+    bright = graph.smooth(graph.math('ABSOLUTE', graph.minus(across, 0.22)), 0.04, 0.0)
+    faint = graph.smooth(graph.math('ABSOLUTE', graph.minus(across, 0.78)), 0.03, 0.0)
+    broken = graph.smooth(stretched(graph, graph.noise(3, 6, seed=881, detail=3)), 0.3, 0.55)
+    glint = graph.smooth(graph.voronoi(14, 14, seed=882)['Distance'], 0.05, 0.012)
+    lines = graph.mul(graph.plus(graph.mul(bright, 0.6), graph.mul(faint, 0.3)), broken)
+    return graph.plus(lines, graph.mul(glint, 0.5))
+
+
+def sheen_guard_crescents(graph):
+    """Guard crescents: each polished guard throws a crescent of light from its rim on the lamp's side, the slab under a faint polish, a few glints."""
+    guard = belemnite_guards_of(graph)
+    inside = graph.smooth(guard['reach'], 1.0, 0.9)
+    lamp_side = graph.smooth(graph.math('COSINE', graph.minus(guard['angle'], LAMP_ANGLE)), 0.55, 1.0)
+    crescent = graph.mul(graph.mul(inside, lamp_side), graph.smooth(guard['reach'], 0.5, 0.85))
+    polish = graph.smooth(stretched(graph, graph.noise(2, 2, seed=891, detail=2)), 0.4, 0.9)
+    glint = graph.smooth(graph.voronoi(12, 12, seed=892)['Distance'], 0.05, 0.012)
+    shine = graph.plus(graph.mul(crescent, 0.5), graph.mul(polish, 0.1))
+    return graph.plus(shine, graph.mul(glint, 0.4))
+
+
+# Up and to the left, where the ore stage's key lamp stands.
+LAMP_ANGLE = 0.75 * math.pi
 
 
 # --- vein: the crystal or vein shape, by the row's silhouette ----------------------------------------
@@ -2639,6 +2830,188 @@ def vertebra_of(name, centre, radius, angle):
     return [spool, shapes.add_polygon(name + '-spine', spine, -0.01, 0.012), shapes.add_polygon(name + '-process', processes, -0.008, 0.01)]
 
 
+def vein_quartz_masses(rng, body):
+    """Rose quartz: three big broken masses of massive quartz, flat conchoidal faces meeting at blunt edges, a few chips knocked off them."""
+    marks = []
+    for i, (x, z, size) in enumerate(((-0.13, 0.09, 0.13), (0.14, 0.04, 0.11), (-0.01, -0.17, 0.1))):
+        mass = shapes.add_icosphere('mass-%d' % i, size, (x, -size * 0.2, z), subdivisions=1,
+                                    scale=(rng.uniform(1.0, 1.3), 0.5, rng.uniform(0.8, 1.0)),
+                                    rotation=(rng.uniform(0, 1), rng.uniform(0, math.tau), rng.uniform(0, 1)))
+        marks.append(faceted(roughened(mass, rng, size * 0.12)))
+    for j, (x, z) in enumerate(((0.27, 0.2), (-0.28, -0.12), (0.2, -0.2), (0.06, 0.24))):
+        size = rng.uniform(0.025, 0.04)
+        chip = shapes.add_cube('chip-%d' % j, size, (x, -size * 0.3, z), rotation=(rng.uniform(0, 1), rng.uniform(0, math.tau), rng.uniform(0, 1)))
+        shapes.bevel(chip, size * 0.1, segments=1)
+        marks.append(chip)
+    return assign_all(marks, body)
+
+
+def faceted(obj):
+    """Flat faces, as broken quartz shows: no smoothing across an edge."""
+    for polygon in obj.data.polygons:
+        polygon.use_smooth = False
+    return obj
+
+
+def vein_lobed_segments(rng, body):
+    """Trilobite: two whole trilobites, a head shield with its genal spines, a thorax of segments each cut into three lobes, and a small tail shield."""
+    marks = []
+    for i, (centre, length, heading) in enumerate((((-0.05, 0.06), 0.42, math.radians(68)), ((0.2, -0.2), 0.22, math.radians(-25)))):
+        marks += trilobite('trilobite-%d' % i, Trilobite(centre, length, heading))
+    return assign_all(marks, body)
+
+
+class Trilobite:
+    """A trilobite's frame in the face: points by how far along its body (head end +) and across it."""
+
+    def __init__(self, centre, length, heading):
+        self.centre, self.length = centre, length
+        self.axis = (math.cos(heading), math.sin(heading))
+        self.side = (-math.sin(heading), math.cos(heading))
+        self.heading = heading
+        self.half_width = length * 0.32
+
+    def at(self, along, across):
+        return (self.centre[0] + self.axis[0] * along + self.side[0] * across,
+                self.centre[1] + self.axis[1] * along + self.side[1] * across)
+
+
+TRILOBITE_SEGMENTS = 8
+
+
+def trilobite(name, frame):
+    return head_shield(name, frame) + thorax(name, frame) + [tail_shield(name, frame)]
+
+
+def head_shield(name, frame):
+    """The cephalon: a half-round shield whose back corners run out into genal spines, its glabella and two eyes raised on it."""
+    length, width = frame.length, frame.half_width
+    arc = [frame.at(length * 0.22 + length * 0.28 * math.cos(phi), width * math.sin(phi))
+           for phi in (math.pi * (k / 12 - 0.5) for k in range(13))]
+    back = [frame.at(0.0, width * 1.05), frame.at(length * 0.2, width * 0.78), frame.at(length * 0.2, -width * 0.78), frame.at(0.0, -width * 1.05)]
+    shield = shapes.add_polygon('%s-head' % name, arc + back, -0.012, 0.012)
+    shapes.bevel(shield, 0.003, segments=1)
+    turn = (0.0, -frame.heading, 0.0)
+    middle = frame.at(length * 0.33, 0.0)
+    glabella = shapes.add_icosphere('%s-glabella' % name, width * 0.3, (middle[0], -0.02, middle[1]), subdivisions=2,
+                                    scale=(1.3, 0.45, 0.9), rotation=turn)
+    eyes = [shapes.add_icosphere('%s-eye-%d' % (name, i), width * 0.1, (eye[0], -0.018, eye[1]), subdivisions=2,
+                                 scale=(1.0, 0.5, 0.7), rotation=turn)
+            for i, eye in enumerate((frame.at(length * 0.3, width * 0.5), frame.at(length * 0.3, -width * 0.5)))]
+    return [shield, glabella] + eyes
+
+
+def thorax(name, frame):
+    """The thorax: segments narrowing to the tail, each a raised axial ring between two pleurae swept back at their tips."""
+    pieces = []
+    step = frame.length * 0.5 / TRILOBITE_SEGMENTS
+    for k in range(TRILOBITE_SEGMENTS):
+        front = frame.length * 0.2 - k * step
+        rear, sweep = front - step * 0.78, step * 0.5
+        width = frame.half_width * (1 - 0.3 * k / (TRILOBITE_SEGMENTS - 1))
+        ring = width * 0.3
+        axial = shapes.add_polygon('%s-axial-%d' % (name, k), [frame.at(front, -ring), frame.at(front, ring), frame.at(rear, ring), frame.at(rear, -ring)],
+                                   -0.02, 0.02)
+        shapes.bevel(axial, 0.004, segments=1)
+        pieces.append(axial)
+        for side in (-1, 1):
+            inner = side * (ring + 0.006)
+            outline = [frame.at(front, inner), frame.at(front - sweep, side * width), frame.at(rear - sweep, side * width), frame.at(rear, inner)]
+            pieces.append(shapes.add_polygon('%s-pleura-%d-%d' % (name, k, side), outline, -0.012, 0.012))
+    return pieces
+
+
+def tail_shield(name, frame):
+    """The pygidium: a small half-round shield closing the tail."""
+    length, width = frame.length, frame.half_width * 0.62
+    arc = [frame.at(-length * 0.3 - length * 0.17 * math.cos(phi), width * math.sin(phi))
+           for phi in (math.pi * (k / 10 - 0.5) for k in range(11))]
+    tail = shapes.add_polygon('%s-tail' % name, arc, -0.012, 0.014)
+    shapes.bevel(tail, 0.003, segments=1)
+    return tail
+
+
+def vein_ramshorn_curls(rng, body):
+    """Wire silver: thick wires of native silver grown out of the rock and curled like a ram's horn, each bending ever tighter toward its tip."""
+    marks = []
+    for i, (root, heading, length, turn, radius) in enumerate(RAMSHORN_WIRES):
+        path = curl_path(root, math.radians(heading), length, math.radians(turn))
+        marks.append(shapes.add_tube('curl-%d' % i, path, radius * rng.uniform(0.9, 1.1), resolution=3))
+    return assign_all(marks, body)
+
+
+# Root, heading (degrees), length, turn over the wire (degrees), thickness: kept inside the cell.
+RAMSHORN_WIRES = (
+    ((-0.24, -0.32), 85, 0.62, -470, 0.018),
+    ((0.3, -0.3), 110, 0.5, 450, 0.016),
+    ((0.3, 0.3), 200, 0.36, 400, 0.013),
+    ((-0.32, 0.0), 60, 0.28, -360, 0.01),
+)
+RAMSHORN_STEPS = 48
+
+
+def curl_path(root, heading, length, turn):
+    """A curve whose heading turns with the cube of how far along it is: nearly straight from the root, curling tight at the tip."""
+    x, z = root
+    points = [(x, -0.02, z)]
+    for k in range(1, RAMSHORN_STEPS + 1):
+        angle = heading + turn * (k / RAMSHORN_STEPS) ** 3
+        x, z = x + math.cos(angle) * length / RAMSHORN_STEPS, z + math.sin(angle) * length / RAMSHORN_STEPS
+        points.append((x, -0.02, z))
+    return points
+
+
+def vein_pencil_prisms(rng, body):
+    """Watermelon tourmaline: thick three-sided pencils, rounded at their edges and cut off flat, lying side by side, and one stood on end to show its rounded triangle."""
+    marks = []
+    for i in range(5):
+        lean = math.radians(-12 + 6 * i) + rng.uniform(-0.05, 0.05)
+        length, radius = rng.uniform(0.3, 0.42), rng.uniform(0.035, 0.045)
+        centre = (-0.22 + 0.085 * i + rng.uniform(-0.01, 0.01), -radius * 0.5, -0.04 + rng.uniform(-0.04, 0.04))
+        marks.append(pencil_prism('pencil-%d' % i, radius, length, centre, (0.0, lean, rng.uniform(0, math.tau))))
+    marks.append(pencil_prism('pencil-end', 0.05, 0.06, (0.25, -0.03, -0.2), (-math.pi / 2, 0.0, rng.uniform(0, math.tau))))
+    return assign_all(marks, body)
+
+
+def pencil_prism(name, radius, length, centre, rotation):
+    """A three-sided prism, its edges rounded off; spun about its own axis first (ZYX), then laid in the face."""
+    pencil = shapes.add_prism(name, radius, length, centre, sides=3)
+    pencil.rotation_mode = 'ZYX'
+    pencil.rotation_euler = rotation
+    shapes.bevel(pencil, radius * 0.3, segments=2)
+    return pencil
+
+
+def vein_bullet_darts(rng, body):
+    """Belemnite: bullet-shaped guards lying every way on the face, a round body tapering to a long point, one snapped in two."""
+    marks = []
+    for i, (x, z, angle, length) in enumerate(BELEMNITE_DARTS):
+        radius = rng.uniform(0.026, 0.034)
+        marks += bullet_dart('dart-%d' % i, (x, -radius * 0.3, z), length, radius, angle)
+    shank, point = bullet_dart('dart-snapped', (0.2, -0.01, -0.26), 0.24, 0.03, 1.4)
+    point.location += Vector((math.sin(1.4), 0.0, math.cos(1.4))) * 0.03
+    point.rotation_euler.y += 0.15
+    return assign_all(marks + [shank, point], body)
+
+
+# Centre (x, z), the angle of the guard's axis about Y (0 is straight up), its length.
+BELEMNITE_DARTS = ((-0.18, 0.12, 1.1, 0.3), (0.12, 0.16, -0.5, 0.26), (0.02, -0.08, 2.0, 0.32), (-0.2, -0.2, 0.3, 0.2))
+
+
+def bullet_dart(name, centre, length, radius, angle):
+    """A round guard of `length` along `angle` in the face: a blunt cylinder and a long cone to its point."""
+    axis = Vector((math.sin(angle), 0.0, math.cos(angle)))
+    point_length = length * 0.4
+    shank_length = length - point_length
+    shank = shapes.add_prism(name, radius, shank_length, centre, rotation=(0.0, angle, 0.0), sides=16)
+    tip_at = Vector(centre) + axis * (shank_length + point_length) / 2
+    point = shapes.add_cone('%s-point' % name, radius, point_length, tuple(tip_at), rotation=(0.0, angle, 0.0), sides=16)
+    shapes.bevel(shank, radius * 0.2, segments=2)
+    for part in (shank, point):
+        shapes.shade_smooth(part)
+    return [shank, point]
+
+
 def kinked_path(start, end, rng, segments):
     """A wire from start to end, wobbling in the face at every inner point."""
     points = []
@@ -2719,6 +3092,11 @@ BASES = {
     'bladed-columns': base_bladed_columns,
     'ember-depths': base_ember_depths,
     'spongy-bone': base_spongy_bone,
+    'rosy-haze': base_rosy_haze,
+    'ripple-shale': base_ripple_shale,
+    'sulphide-tarnish': base_sulphide_tarnish,
+    'two-tone-pencils': base_two_tone_pencils,
+    'radial-guards': base_radial_guards,
 }
 SHEENS = {
     'earthy': sheen_earthy,
@@ -2779,6 +3157,11 @@ SHEENS = {
     'fibre-satin': sheen_fibre_satin,
     'ember-glow': sheen_ember_glow,
     'bone-dust': sheen_bone_dust,
+    'inner-glow': sheen_inner_glow,
+    'crest-gleam': sheen_crest_gleam,
+    'untarnished-gleam': sheen_untarnished_gleam,
+    'prism-lines': sheen_prism_lines,
+    'guard-crescents': sheen_guard_crescents,
 }
 VEINS = {
     'nugget-cluster': vein_nugget_cluster,
@@ -2839,6 +3222,11 @@ VEINS = {
     'crossed-bars': vein_crossed_bars,
     'faceted-spheres': vein_faceted_spheres,
     'vertebra-column': vein_vertebra_column,
+    'quartz-masses': vein_quartz_masses,
+    'lobed-segments': vein_lobed_segments,
+    'ramshorn-curls': vein_ramshorn_curls,
+    'pencil-prisms': vein_pencil_prisms,
+    'bullet-darts': vein_bullet_darts,
 }
 RECIPES = {'base': BASES, 'vein': VEINS, 'sheen': SHEENS}
 

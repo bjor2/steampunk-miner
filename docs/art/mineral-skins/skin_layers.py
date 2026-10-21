@@ -40,11 +40,11 @@ LIGHT_LUMA_SHARE = 0.5
 # The batches of #576: a planet's species by roster slot, five a ticket (#592 is P1 slots 1 to 5,
 # #593 its slots 6 to 10, #594 its last two, 11 and 12: the legacy pool has 12 species; #598 is P3
 # slots 1 to 5, #599 its slots 6 to 10 and #600 its slots 11 to 15 and the planet's signature
-# material, of the foothold-p3 pool; #601 is P4 slots 1 to 5 and #603 its slots 11 to 15 and the
-# planet's signature material; #604 is P5 slots 1 to 5 and #605 its slots 6 to 10, of the
-# foothold-p5 pool; #595 is P2 slots 1 to 5, of the foothold-p2 pool, which binds the legacy
-# slots, and #596 its slots 6 to 9, the four uncommons), named `p<planet>-b<n>`, in slot order. A
-# batch is measured against all of its planet's other batches (`planet_mates`). A batch's
+# material, of the foothold-p3 pool; #601 is P4 slots 1 to 5, #602 its slots 6 to 10 and #603 its
+# slots 11 to 15 and the planet's signature material; #604 is P5 slots 1 to 5 and #605 its slots 6
+# to 10, of the foothold-p5 pool; #595 is P2 slots 1 to 5, of the foothold-p2 pool, which binds the
+# legacy slots, and #596 its slots 6 to 9, the four uncommons), named `p<planet>-b<n>`, in slot
+# order. A batch is measured against all of its planet's other batches (`planet_mates`). A batch's
 # `signature` is the planet whose signature skin row it adds.
 BATCHES = {
     'p1-b1': {'pool': 'legacy', 'slots': ('legacy.c1', 'legacy.c2', 'legacy.c3', 'legacy.c4', 'legacy.c5')},
@@ -57,6 +57,7 @@ BATCHES = {
     'p3-b3': {'pool': 'foothold-p3', 'slots': ('mixed.e1', 'mixed.e2', 'mixed.e3', 'mixed.m1', 'mixed.m2'),
               'signature': 3},
     'p4-b1': {'pool': 'foothold-p4', 'slots': ('mixed.c1', 'mixed.c2', 'mixed.c3', 'mixed.c4', 'mixed.u1')},
+    'p4-b2': {'pool': 'foothold-p4', 'slots': ('mixed.u2', 'mixed.u3', 'mixed.r1', 'mixed.r2', 'mixed.r3')},
     'p4-b3': {'pool': 'foothold-p4', 'slots': ('mixed.e1', 'mixed.e2', 'mixed.e3', 'mixed.m1', 'mixed.m2'),
               'signature': 4},
     'p5-b1': {'pool': 'foothold-p5', 'slots': ('mixed.c1', 'mixed.c2', 'mixed.c3', 'mixed.c4', 'mixed.u1')},
@@ -74,6 +75,9 @@ SIGNATURE_LOOKS = {
 # Bismuth's oxide skin runs through the temper colours, so its shadow sits on magenta under the
 # cyan body (ticket 596).
 SHADOW_HUES = {'alexandrite': 335, 'bismuth-rainbow': 300}
+# A two-tone species' light end sits on its heart's colour: watermelon tourmaline is pink at heart
+# and green at the rind, so its ramp runs from the green body up to a pale pink.
+LIGHT_HUES = {'watermelon-tourmaline': 345}
 
 
 def load_skins():
@@ -140,15 +144,20 @@ def rgb_of_hex(hex_colour):
 def ramp_of_slot(slot):
     """
     Shadow, body, light: the body is the hue slot's colour (ticket 450), the ends on its hue, or the
-    shadow on a colour-change species' second hue (SHADOW_HUES).
+    shadow on a colour-change species' second hue (SHADOW_HUES) and the light on a two-tone
+    species' heart (LIGHT_HUES).
     """
     body = rgb_of_hex(species.slot_hex(slot))
     luma = species.luma_of_rgb(body)
-    shadow_hue = SHADOW_HUES.get(slot['id'])
-    shadow_body = body if shadow_hue is None else rgb_of_hex(species.slot_hex(dict(slot, hue=shadow_hue)))
-    shadow = species.with_luma(shadow_body, luma * SHADOW_LUMA_SHARE)
-    light = species.with_luma(body, luma + (1 - luma) * LIGHT_LUMA_SHARE)
+    shadow = species.with_luma(end_colour_of(slot, body, SHADOW_HUES), luma * SHADOW_LUMA_SHARE)
+    light = species.with_luma(end_colour_of(slot, body, LIGHT_HUES), luma + (1 - luma) * LIGHT_LUMA_SHARE)
     return [species.hex_of_rgb(shadow), species.hex_of_rgb(body), species.hex_of_rgb(light)]
+
+
+def end_colour_of(slot, body, end_hues):
+    """The colour a ramp end is drawn from: the body, or the slot's look turned to the end's own hue."""
+    hue = end_hues.get(slot['id'])
+    return body if hue is None else rgb_of_hex(species.slot_hex(dict(slot, hue=hue)))
 
 
 # --- the cell table --------------------------------------------------------------------------------
