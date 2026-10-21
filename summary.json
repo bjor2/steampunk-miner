@@ -1,32 +1,8 @@
 {
  "schema": 1,
- "updatedAt": "2026-10-21T06:15:58.829Z",
+ "updatedAt": "2026-10-21T06:47:24.369Z",
  "lastRuns": 50,
  "runs": [
-  {
-   "id": 1792007039196,
-   "url": "https://github.com/bjor2/steampunk-miner/commit/753bf01c96f03868faf55013bebd60cb8e8eb101",
-   "event": "pass",
-   "mode": "scoped",
-   "sha": "753bf01c96f03868faf55013bebd60cb8e8eb101",
-   "branch": "main",
-   "startedAt": "2026-10-14T19:43:03Z",
-   "jobConclusion": "success",
-   "timedOut": false,
-   "jobDurationSec": 56,
-   "source": "box",
-   "phase": "fast",
-   "job": "fast",
-   "feature": 311,
-   "tickets": [
-    312
-   ],
-   "reportFound": true,
-   "files": 13,
-   "tests": 90,
-   "failed": 0,
-   "failedFiles": 0
-  },
   {
    "id": 1792007414057,
    "url": "https://github.com/bjor2/steampunk-miner/commit/753bf01c96f03868faf55013bebd60cb8e8eb101",
@@ -1623,14 +1599,36 @@
    "tests": 10927,
    "failed": 8,
    "failedFiles": 7
+  },
+  {
+   "id": 1792565241961,
+   "url": "https://github.com/bjor2/steampunk-miner/commit/23cacc8f5df25d9cfbaa5e6661feb03dda5ad1fe",
+   "event": "nightly",
+   "mode": "nightly",
+   "sha": "23cacc8f5df25d9cfbaa5e6661feb03dda5ad1fe",
+   "branch": "main",
+   "startedAt": "2026-10-21T06:44:18Z",
+   "jobConclusion": "success",
+   "timedOut": false,
+   "jobDurationSec": 183,
+   "source": "box",
+   "phase": "nightly",
+   "job": "balance-report",
+   "feature": null,
+   "tickets": [],
+   "reportFound": false,
+   "files": 0,
+   "tests": 0,
+   "failed": 0,
+   "failedFiles": 0
   }
  ],
  "pipeline": {
   "modes": {
-   "scoped": 12,
    "nightly-only": 9,
    "full": 17,
-   "nightly": 12
+   "nightly": 13,
+   "scoped": 11
   },
   "timedOut": [],
   "withoutReport": [
@@ -1640,132 +1638,9 @@
    1792096855542,
    1792133126544
   ],
-  "scopingSuspects": [
-   {
-    "file": "src/debug/debugScreens.test.ts",
-    "nightlyRunId": 1792563355761,
-    "lastPerPushStatus": "passed"
-   },
-   {
-    "file": "src/features/planet-mix/magneticPlanetPace.test.ts",
-    "nightlyRunId": 1792563355761,
-    "lastPerPushStatus": "passed"
-   },
-   {
-    "file": "src/features/terrain-tools/foamPace.test.ts",
-    "nightlyRunId": 1792563355761,
-    "lastPerPushStatus": "passed"
-   },
-   {
-    "file": "src/logging/drillLadder.test.ts",
-    "nightlyRunId": 1792563355761,
-    "lastPerPushStatus": "passed"
-   },
-   {
-    "file": "src/logging/drillLadderSteps.test.ts",
-    "nightlyRunId": 1792563355761,
-    "lastPerPushStatus": "passed"
-   },
-   {
-    "file": "src/logging/subStepFloor.test.ts",
-    "nightlyRunId": 1792563355761,
-    "lastPerPushStatus": "passed"
-   },
-   {
-    "file": "src/systems/bot/botShopping.test.ts",
-    "nightlyRunId": 1792563355761,
-    "lastPerPushStatus": "passed"
-   }
-  ]
+  "scopingSuspects": []
  },
  "features": {
-  "tooling-tests": {
-   "files": 3,
-   "p50Ms": 266,
-   "p95Ms": 1202,
-   "fileRuns": 65,
-   "failedFileRuns": 1,
-   "lastFailure": {
-    "runId": 1792355624413,
-    "sha": "20ef31bc5eb28b2b93cd4e84e1b03914c67d76cc",
-    "at": "2026-10-18T18:18:05Z",
-    "tests": [
-     "test manifest on main lists every test file on disk with its current test sites"
-    ],
-    "file": "scripts/tests/manifestDrift.test.mjs"
-   },
-   "passRate": 0.9846153846153847
-  },
-  "slice-loader": {
-   "files": 4,
-   "p50Ms": 2891,
-   "p95Ms": 24191,
-   "fileRuns": 83,
-   "failedFileRuns": 0,
-   "lastFailure": null,
-   "passRate": 1
-  },
-  "workshop": {
-   "files": 13,
-   "p50Ms": 1336,
-   "p95Ms": 4540,
-   "fileRuns": 269,
-   "failedFileRuns": 0,
-   "lastFailure": null,
-   "passRate": 1
-  },
-  "authority": {
-   "files": 138,
-   "p50Ms": 366234,
-   "p95Ms": 953433,
-   "fileRuns": 2420,
-   "failedFileRuns": 7,
-   "lastFailure": {
-    "runId": 1792387372406,
-    "sha": "3c42a9188dc141fca748d0d254a7dca6217ddb49",
-    "at": "2026-10-19T01:54:58Z",
-    "tests": [
-     "authority dev flag reads leave the module global to the shipped defaults: no rule reads it"
-    ],
-    "file": "src/systems/authority/devFlagReads.test.ts"
-   },
-   "passRate": 0.9971074380165289
-  },
-  "economy": {
-   "files": 31,
-   "p50Ms": 1238,
-   "p95Ms": 6036,
-   "fileRuns": 531,
-   "failedFileRuns": 8,
-   "lastFailure": {
-    "runId": 1792319779169,
-    "sha": "46fdb0d0611037d2f1b7a5a3d11a6d8d5717c9f2",
-    "at": "2026-10-18T06:48:10Z",
-    "tests": [
-     "economy source scan finds no economy price, ratio or fee number in game code outside economy.json"
-    ],
-    "file": "src/systems/economy/economySourceScan.test.ts"
-   },
-   "passRate": 0.9849340866290018
-  },
-  "systems-core": {
-   "files": 14,
-   "p50Ms": 1675,
-   "p95Ms": 5483,
-   "fileRuns": 254,
-   "failedFileRuns": 0,
-   "lastFailure": null,
-   "passRate": 1
-  },
-  "vehicle": {
-   "files": 42,
-   "p50Ms": 630,
-   "p95Ms": 2489,
-   "fileRuns": 705,
-   "failedFileRuns": 0,
-   "lastFailure": null,
-   "passRate": 1
-  },
   "pacing-bot": {
    "files": 4,
    "p50Ms": 2015167,
@@ -1836,6 +1711,23 @@
    "failedFileRuns": 0,
    "lastFailure": null,
    "passRate": 1
+  },
+  "tooling-tests": {
+   "files": 3,
+   "p50Ms": 266,
+   "p95Ms": 1202,
+   "fileRuns": 64,
+   "failedFileRuns": 1,
+   "lastFailure": {
+    "runId": 1792355624413,
+    "sha": "20ef31bc5eb28b2b93cd4e84e1b03914c67d76cc",
+    "at": "2026-10-18T18:18:05Z",
+    "tests": [
+     "test manifest on main lists every test file on disk with its current test sites"
+    ],
+    "file": "scripts/tests/manifestDrift.test.mjs"
+   },
+   "passRate": 0.984375
   },
   "debug": {
    "files": 12,
@@ -1913,6 +1805,15 @@
    "p50Ms": 216,
    "p95Ms": 318,
    "fileRuns": 208,
+   "failedFileRuns": 0,
+   "lastFailure": null,
+   "passRate": 1
+  },
+  "slice-loader": {
+   "files": 4,
+   "p50Ms": 2891,
+   "p95Ms": 24191,
+   "fileRuns": 82,
    "failedFileRuns": 0,
    "lastFailure": null,
    "passRate": 1
@@ -2107,6 +2008,15 @@
    },
    "passRate": 0.9973591549295775
   },
+  "workshop": {
+   "files": 13,
+   "p50Ms": 1348,
+   "p95Ms": 4540,
+   "fileRuns": 262,
+   "failedFileRuns": 0,
+   "lastFailure": null,
+   "passRate": 1
+  },
   "logging": {
    "files": 63,
    "p50Ms": 97766,
@@ -2221,6 +2131,23 @@
    "lastFailure": null,
    "passRate": 1
   },
+  "authority": {
+   "files": 138,
+   "p50Ms": 366234,
+   "p95Ms": 953433,
+   "fileRuns": 2419,
+   "failedFileRuns": 7,
+   "lastFailure": {
+    "runId": 1792387372406,
+    "sha": "3c42a9188dc141fca748d0d254a7dca6217ddb49",
+    "at": "2026-10-19T01:54:58Z",
+    "tests": [
+     "authority dev flag reads leave the module global to the shipped defaults: no rule reads it"
+    ],
+    "file": "src/systems/authority/devFlagReads.test.ts"
+   },
+   "passRate": 0.9971062422488631
+  },
   "bot": {
    "files": 34,
    "p50Ms": 791837,
@@ -2237,6 +2164,32 @@
     "file": "src/systems/bot/botShopping.test.ts"
    },
    "passRate": 0.9948453608247423
+  },
+  "systems-core": {
+   "files": 14,
+   "p50Ms": 1675,
+   "p95Ms": 5483,
+   "fileRuns": 253,
+   "failedFileRuns": 0,
+   "lastFailure": null,
+   "passRate": 1
+  },
+  "economy": {
+   "files": 31,
+   "p50Ms": 1238,
+   "p95Ms": 6036,
+   "fileRuns": 530,
+   "failedFileRuns": 8,
+   "lastFailure": {
+    "runId": 1792319779169,
+    "sha": "46fdb0d0611037d2f1b7a5a3d11a6d8d5717c9f2",
+    "at": "2026-10-18T06:48:10Z",
+    "tests": [
+     "economy source scan finds no economy price, ratio or fee number in game code outside economy.json"
+    ],
+    "file": "src/systems/economy/economySourceScan.test.ts"
+   },
+   "passRate": 0.9849056603773585
   },
   "enemies": {
    "files": 1,
@@ -2323,6 +2276,15 @@
    "p50Ms": 148,
    "p95Ms": 343,
    "fileRuns": 75,
+   "failedFileRuns": 0,
+   "lastFailure": null,
+   "passRate": 1
+  },
+  "vehicle": {
+   "files": 42,
+   "p50Ms": 630,
+   "p95Ms": 2489,
+   "fileRuns": 704,
    "failedFileRuns": 0,
    "lastFailure": null,
    "passRate": 1
@@ -2444,226 +2406,6 @@
   }
  },
  "files": {
-  "scripts/tests/manifestDrift.test.mjs": {
-   "feature": "tooling-tests",
-   "runs": 29,
-   "lastMs": 272,
-   "p50Ms": 250,
-   "p95Ms": 390,
-   "passRate": 0.9655172413793104,
-   "lastStatus": "passed",
-   "lastRunId": 1792563355761,
-   "lastFailure": {
-    "runId": 1792355624413,
-    "sha": "20ef31bc5eb28b2b93cd4e84e1b03914c67d76cc",
-    "at": "2026-10-18T18:18:05Z",
-    "tests": [
-     "test manifest on main lists every test file on disk with its current test sites"
-    ]
-   },
-   "flaky": false,
-   "slowest": [
-    [
-     "test manifest on main lists every test file on disk with its current test sites",
-     192
-    ]
-   ]
-  },
-  "src/features/loadFeatures.test.ts": {
-   "feature": "slice-loader",
-   "runs": 28,
-   "lastMs": 3,
-   "p50Ms": 3,
-   "p95Ms": 7,
-   "passRate": 1,
-   "lastStatus": "passed",
-   "lastRunId": 1792563355761,
-   "lastFailure": null,
-   "flaky": false,
-   "slowest": []
-  },
-  "src/features/workshop/debug.test.ts": {
-   "feature": "workshop",
-   "runs": 24,
-   "lastMs": 662,
-   "p50Ms": 191,
-   "p95Ms": 662,
-   "passRate": 1,
-   "lastStatus": "passed",
-   "lastRunId": 1792563355761,
-   "lastFailure": null,
-   "flaky": false,
-   "slowest": [
-    [
-     "workshop: debug actions previews a held chain at the Upgrade bay with money as canonical strings",
-     420
-    ],
-    [
-     "workshop: debug actions holds a track until the asked steps have landed, through the real controller",
-     184
-    ]
-   ]
-  },
-  "src/features/workshop/scene/showcaseParts.test.ts": {
-   "feature": "workshop",
-   "runs": 24,
-   "lastMs": 109,
-   "p50Ms": 58,
-   "p95Ms": 118,
-   "passRate": 1,
-   "lastStatus": "passed",
-   "lastRunId": 1792563355761,
-   "lastFailure": null,
-   "flaky": false,
-   "slowest": []
-  },
-  "src/features/workshop/store/workshopStore.test.ts": {
-   "feature": "workshop",
-   "runs": 24,
-   "lastMs": 3141,
-   "p50Ms": 649,
-   "p95Ms": 3141,
-   "passRate": 1,
-   "lastStatus": "passed",
-   "lastRunId": 1792563355761,
-   "lastFailure": null,
-   "flaky": false,
-   "slowest": [
-    [
-     "workshop hold-to-buy controller takes the same ticks at 30 and 144 frames a second",
-     1140
-    ],
-    [
-     "workshop hold-to-buy controller steps a held chain on G&V's curve, each held step its own command with the hold's id",
-     415
-    ],
-    [
-     "workshop hold-to-buy controller stops at can't afford with the soft clunk, and the steps before it stand",
-     225
-    ]
-   ]
-  },
-  "src/features/workshop/systems/chainCues.test.ts": {
-   "feature": "workshop",
-   "runs": 19,
-   "lastMs": 2,
-   "p50Ms": 3,
-   "p95Ms": 6,
-   "passRate": 1,
-   "lastStatus": "passed",
-   "lastRunId": 1792563355761,
-   "lastFailure": null,
-   "flaky": false,
-   "slowest": []
-  },
-  "src/features/workshop/systems/holdChain.test.ts": {
-   "feature": "workshop",
-   "runs": 19,
-   "lastMs": 5,
-   "p50Ms": 7,
-   "p95Ms": 13,
-   "passRate": 1,
-   "lastStatus": "passed",
-   "lastRunId": 1792563355761,
-   "lastFailure": null,
-   "flaky": false,
-   "slowest": []
-  },
-  "src/features/workshop/systems/render/purchaseSound.test.ts": {
-   "feature": "workshop",
-   "runs": 19,
-   "lastMs": 5,
-   "p50Ms": 4,
-   "p95Ms": 18,
-   "passRate": 1,
-   "lastStatus": "passed",
-   "lastRunId": 1792563355761,
-   "lastFailure": null,
-   "flaky": false,
-   "slowest": []
-  },
-  "src/features/workshop/ui/showcaseCards.test.ts": {
-   "feature": "workshop",
-   "runs": 24,
-   "lastMs": 333,
-   "p50Ms": 290,
-   "p95Ms": 355,
-   "passRate": 1,
-   "lastStatus": "passed",
-   "lastRunId": 1792563355761,
-   "lastFailure": null,
-   "flaky": false,
-   "slowest": [
-    [
-     "workshop: the plaques as item cards draws each plaque as its track’s compact card, carrying the buy id once (beside)",
-     255
-    ]
-   ]
-  },
-  "src/systems/authority/moneyRounding.test.ts": {
-   "feature": "authority",
-   "runs": 29,
-   "lastMs": 29,
-   "p50Ms": 5,
-   "p95Ms": 14,
-   "passRate": 1,
-   "lastStatus": "passed",
-   "lastRunId": 1792563355761,
-   "lastFailure": null,
-   "flaky": false,
-   "slowest": []
-  },
-  "src/systems/economy/economySourceScan.test.ts": {
-   "feature": "economy",
-   "runs": 29,
-   "lastMs": 156,
-   "p50Ms": 199,
-   "p95Ms": 1342,
-   "passRate": 0.7241379310344828,
-   "lastStatus": "passed",
-   "lastRunId": 1792563355761,
-   "lastFailure": {
-    "runId": 1792319779169,
-    "sha": "46fdb0d0611037d2f1b7a5a3d11a6d8d5717c9f2",
-    "at": "2026-10-18T06:48:10Z",
-    "tests": [
-     "economy source scan finds no economy price, ratio or fee number in game code outside economy.json"
-    ]
-   },
-   "flaky": false,
-   "slowest": [
-    [
-     "economy source scan finds no economy price, ratio or fee number in game code outside economy.json",
-     102
-    ]
-   ]
-  },
-  "src/systems/globalSheetGuard.test.ts": {
-   "feature": "systems-core",
-   "runs": 21,
-   "lastMs": 2,
-   "p50Ms": 3,
-   "p95Ms": 5,
-   "passRate": 1,
-   "lastStatus": "passed",
-   "lastRunId": 1792563355761,
-   "lastFailure": null,
-   "flaky": false,
-   "slowest": []
-  },
-  "src/systems/vehicle/vehicleStats.test.ts": {
-   "feature": "vehicle",
-   "runs": 29,
-   "lastMs": 12,
-   "p50Ms": 13,
-   "p95Ms": 32,
-   "passRate": 1,
-   "lastStatus": "passed",
-   "lastRunId": 1792563355761,
-   "lastFailure": null,
-   "flaky": false,
-   "slowest": []
-  },
   "src/logging/assayPacingGate.test.ts": {
    "feature": "pacing-bot",
    "runs": 11,
@@ -3185,6 +2927,31 @@
    "lastFailure": null,
    "flaky": false,
    "slowest": []
+  },
+  "scripts/tests/manifestDrift.test.mjs": {
+   "feature": "tooling-tests",
+   "runs": 28,
+   "lastMs": 272,
+   "p50Ms": 250,
+   "p95Ms": 390,
+   "passRate": 0.9642857142857143,
+   "lastStatus": "passed",
+   "lastRunId": 1792563355761,
+   "lastFailure": {
+    "runId": 1792355624413,
+    "sha": "20ef31bc5eb28b2b93cd4e84e1b03914c67d76cc",
+    "at": "2026-10-18T18:18:05Z",
+    "tests": [
+     "test manifest on main lists every test file on disk with its current test sites"
+    ]
+   },
+   "flaky": false,
+   "slowest": [
+    [
+     "test manifest on main lists every test file on disk with its current test sites",
+     192
+    ]
+   ]
   },
   "scripts/tests/movePrGuard.test.mjs": {
    "feature": "tooling-tests",
@@ -5902,6 +5669,19 @@
    "lastMs": 6,
    "p50Ms": 7,
    "p95Ms": 25,
+   "passRate": 1,
+   "lastStatus": "passed",
+   "lastRunId": 1792563355761,
+   "lastFailure": null,
+   "flaky": false,
+   "slowest": []
+  },
+  "src/features/loadFeatures.test.ts": {
+   "feature": "slice-loader",
+   "runs": 27,
+   "lastMs": 3,
+   "p50Ms": 3,
+   "p95Ms": 7,
    "passRate": 1,
    "lastStatus": "passed",
    "lastRunId": 1792563355761,
@@ -9643,12 +9423,99 @@
     ]
    ]
   },
+  "src/features/workshop/debug.test.ts": {
+   "feature": "workshop",
+   "runs": 23,
+   "lastMs": 662,
+   "p50Ms": 191,
+   "p95Ms": 662,
+   "passRate": 1,
+   "lastStatus": "passed",
+   "lastRunId": 1792563355761,
+   "lastFailure": null,
+   "flaky": false,
+   "slowest": [
+    [
+     "workshop: debug actions previews a held chain at the Upgrade bay with money as canonical strings",
+     420
+    ],
+    [
+     "workshop: debug actions holds a track until the asked steps have landed, through the real controller",
+     184
+    ]
+   ]
+  },
+  "src/features/workshop/scene/showcaseParts.test.ts": {
+   "feature": "workshop",
+   "runs": 23,
+   "lastMs": 109,
+   "p50Ms": 58,
+   "p95Ms": 118,
+   "passRate": 1,
+   "lastStatus": "passed",
+   "lastRunId": 1792563355761,
+   "lastFailure": null,
+   "flaky": false,
+   "slowest": []
+  },
+  "src/features/workshop/store/workshopStore.test.ts": {
+   "feature": "workshop",
+   "runs": 23,
+   "lastMs": 3141,
+   "p50Ms": 661,
+   "p95Ms": 3141,
+   "passRate": 1,
+   "lastStatus": "passed",
+   "lastRunId": 1792563355761,
+   "lastFailure": null,
+   "flaky": false,
+   "slowest": [
+    [
+     "workshop hold-to-buy controller takes the same ticks at 30 and 144 frames a second",
+     1140
+    ],
+    [
+     "workshop hold-to-buy controller steps a held chain on G&V's curve, each held step its own command with the hold's id",
+     415
+    ],
+    [
+     "workshop hold-to-buy controller stops at can't afford with the soft clunk, and the steps before it stand",
+     225
+    ]
+   ]
+  },
+  "src/features/workshop/systems/chainCues.test.ts": {
+   "feature": "workshop",
+   "runs": 18,
+   "lastMs": 2,
+   "p50Ms": 3,
+   "p95Ms": 6,
+   "passRate": 1,
+   "lastStatus": "passed",
+   "lastRunId": 1792563355761,
+   "lastFailure": null,
+   "flaky": false,
+   "slowest": []
+  },
   "src/features/workshop/systems/chainPreview.test.ts": {
    "feature": "workshop",
    "runs": 20,
    "lastMs": 141,
    "p50Ms": 117,
    "p95Ms": 162,
+   "passRate": 1,
+   "lastStatus": "passed",
+   "lastRunId": 1792563355761,
+   "lastFailure": null,
+   "flaky": false,
+   "slowest": []
+  },
+  "src/features/workshop/systems/holdChain.test.ts": {
+   "feature": "workshop",
+   "runs": 18,
+   "lastMs": 5,
+   "p50Ms": 7,
+   "p95Ms": 13,
    "passRate": 1,
    "lastStatus": "passed",
    "lastRunId": 1792563355761,
@@ -9695,6 +9562,19 @@
    "flaky": false,
    "slowest": []
   },
+  "src/features/workshop/systems/render/purchaseSound.test.ts": {
+   "feature": "workshop",
+   "runs": 18,
+   "lastMs": 5,
+   "p50Ms": 4,
+   "p95Ms": 18,
+   "passRate": 1,
+   "lastStatus": "passed",
+   "lastRunId": 1792563355761,
+   "lastFailure": null,
+   "flaky": false,
+   "slowest": []
+  },
   "src/features/workshop/systems/render/showcaseReactions.test.ts": {
    "feature": "workshop",
    "runs": 22,
@@ -9720,6 +9600,24 @@
    "lastFailure": null,
    "flaky": false,
    "slowest": []
+  },
+  "src/features/workshop/ui/showcaseCards.test.ts": {
+   "feature": "workshop",
+   "runs": 23,
+   "lastMs": 333,
+   "p50Ms": 290,
+   "p95Ms": 355,
+   "passRate": 1,
+   "lastStatus": "passed",
+   "lastRunId": 1792563355761,
+   "lastFailure": null,
+   "flaky": false,
+   "slowest": [
+    [
+     "workshop: the plaques as item cards draws each plaque as its track’s compact card, carrying the buy id once (beside)",
+     255
+    ]
+   ]
   },
   "src/logging/attritionReport.test.ts": {
    "feature": "logging",
@@ -12887,6 +12785,19 @@
     ]
    ]
   },
+  "src/systems/authority/moneyRounding.test.ts": {
+   "feature": "authority",
+   "runs": 28,
+   "lastMs": 29,
+   "p50Ms": 5,
+   "p95Ms": 14,
+   "passRate": 1,
+   "lastStatus": "passed",
+   "lastRunId": 1792563355761,
+   "lastFailure": null,
+   "flaky": false,
+   "slowest": []
+  },
   "src/systems/authority/platformCommands.test.ts": {
    "feature": "authority",
    "runs": 20,
@@ -13999,6 +13910,31 @@
    "flaky": false,
    "slowest": []
   },
+  "src/systems/economy/economySourceScan.test.ts": {
+   "feature": "economy",
+   "runs": 28,
+   "lastMs": 156,
+   "p50Ms": 199,
+   "p95Ms": 1342,
+   "passRate": 0.7142857142857143,
+   "lastStatus": "passed",
+   "lastRunId": 1792563355761,
+   "lastFailure": {
+    "runId": 1792319779169,
+    "sha": "46fdb0d0611037d2f1b7a5a3d11a6d8d5717c9f2",
+    "at": "2026-10-18T06:48:10Z",
+    "tests": [
+     "economy source scan finds no economy price, ratio or fee number in game code outside economy.json"
+    ]
+   },
+   "flaky": false,
+   "slowest": [
+    [
+     "economy source scan finds no economy price, ratio or fee number in game code outside economy.json",
+     102
+    ]
+   ]
+  },
   "src/systems/economy/economyTables.test.ts": {
    "feature": "economy",
    "runs": 19,
@@ -14289,6 +14225,19 @@
      208
     ]
    ]
+  },
+  "src/systems/globalSheetGuard.test.ts": {
+   "feature": "systems-core",
+   "runs": 20,
+   "lastMs": 2,
+   "p50Ms": 3,
+   "p95Ms": 5,
+   "passRate": 1,
+   "lastStatus": "passed",
+   "lastRunId": 1792563355761,
+   "lastFailure": null,
+   "flaky": false,
+   "slowest": []
   },
   "src/systems/hints/hintAcceptance.test.ts": {
    "feature": "hints",
@@ -16602,6 +16551,19 @@
    "lastMs": 2,
    "p50Ms": 2,
    "p95Ms": 4,
+   "passRate": 1,
+   "lastStatus": "passed",
+   "lastRunId": 1792563355761,
+   "lastFailure": null,
+   "flaky": false,
+   "slowest": []
+  },
+  "src/systems/vehicle/vehicleStats.test.ts": {
+   "feature": "vehicle",
+   "runs": 28,
+   "lastMs": 12,
+   "p50Ms": 13,
+   "p95Ms": 32,
    "passRate": 1,
    "lastStatus": "passed",
    "lastRunId": 1792563355761,
