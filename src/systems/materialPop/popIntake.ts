@@ -17,6 +17,7 @@ import {
   startQueuedSpecial,
   thinPopFinds,
   type PopSink,
+  type PopTally,
   type PopThinning,
 } from './popThinning'
 import type { PopRequest } from '../render/popPieces'
@@ -36,14 +37,23 @@ export interface PopScene {
   ladder: PopLadder
 }
 
-export function createPopIntake(pool: SprayPool, scene: PopScene, tally: SprayTally): PopIntake {
+/** Pops count in `tallies.spray` as the pool admits them and in `tallies.pops` as they thin. */
+export function createPopIntake(
+  pool: SprayPool,
+  scene: PopScene,
+  tallies: { spray: SprayTally; pops: PopTally },
+): PopIntake {
   const request = createPopRequest()
   const sink: PopSink = {
     startPop: (find, serial) =>
-      admitPop(pool, writePopRequest(find, scene.rig, scene.ladder, serial, request), tally),
+      admitPop(
+        pool,
+        writePopRequest(find, scene.rig, scene.ladder, serial, request),
+        tallies.spray,
+      ),
     mergeIntoPop: (serial) => mergeIntoPop(pool, serial),
   }
-  return { pool, thinning: createPopThinning(), finds: [], request, sink }
+  return { pool, thinning: createPopThinning(tallies.pops), finds: [], request, sink }
 }
 
 /** One batch's carved cells, carved at `tick`, into pops. */

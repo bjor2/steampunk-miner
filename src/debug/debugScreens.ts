@@ -97,7 +97,8 @@ export interface DebugUi {
   getRenderStats(): DebugResult<{ stats: RenderStats }>
   /**
    * The kernel spray layer since load (ticket 348): pieces asked for, dropped for want of room,
-   * tracer pieces a blast evicted, the most drawn in a frame and the budget it declares.
+   * tracer pieces a blast evicted, the most drawn in a frame and the budget it declares; `pops`
+   * counts option B's material pops (ticket 616): started, merged, dropped, queued, start lag.
    */
   getSprayStats(): DebugResult<{ stats: SprayStats }>
   /** Live geometries, textures and compiled programs in three's `renderer.info` (#119). */
@@ -374,5 +375,11 @@ function resultOf(problems: string[]): DebugResult {
 }
 
 function sprayStatsNow(): SprayStats {
-  return { ...sprayPresence, peak: { ...sprayPresence.peak }, budget: KERNEL_SCENE_LAYER_BUDGET }
+  const { peak, pops } = sprayPresence
+  return {
+    ...sprayPresence,
+    peak: { ...peak },
+    pops: { ...pops },
+    budget: KERNEL_SCENE_LAYER_BUDGET,
+  }
 }

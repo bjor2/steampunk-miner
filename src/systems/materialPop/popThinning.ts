@@ -69,7 +69,12 @@ const OPEN_MOST = 2 * POP_RESERVED_SLOTS
 const NEVER = -TICKS_PER_SECOND - 1
 const LANE_ORDER: readonly PopLane[] = ['special', 'guarded', 'common']
 
-export function createPopThinning(): PopThinning {
+export function createPopTally(): PopTally {
+  return { finds: 0, started: 0, merged: 0, dropped: 0, queued: 0, startLagTicksMost: 0 }
+}
+
+/** `tally` is where thinning counts, the scene's presence record for the debug read. */
+export function createPopThinning(tally: PopTally = createPopTally()): PopThinning {
   return {
     ratePerSecond: POP_RATE_PER_SECOND,
     startTicks: new Int32Array(RATE_MOST).fill(NEVER),
@@ -83,7 +88,7 @@ export function createPopThinning(): PopThinning {
     queueLength: 0,
     lastSpecialTick: NEVER,
     nextSerial: 1,
-    tally: { finds: 0, started: 0, merged: 0, dropped: 0, queued: 0, startLagTicksMost: 0 },
+    tally,
   }
 }
 

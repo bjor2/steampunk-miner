@@ -40,6 +40,9 @@ export const POP_SPECIALS_PER_TICK = 1
 /** The hold anchor: on the hull's local up, this far above the rig's drawn centre, metres. */
 export const POP_HOLD_ANCHOR_UP_M = 3 / 10
 
+/** The nose tile's centre is one tile ahead of the hull's (`noseTileOf`): no pop starts past it. */
+export const POP_NOSE_REACH_M = 1
+
 /**
  * Pops draw under the enemies (0.08) and their halos (0.07), the nose riders and the hazard pips,
  * and under the collapse telegraph (0.27); the rest of the spray stays at 0.32.

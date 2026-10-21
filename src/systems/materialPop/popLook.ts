@@ -75,3 +75,8 @@ export function popGlintAt(ageSeconds: number): number {
 function uncappedSizeOf(step: number): number {
   return POP_COMMON_SIZE_CELLS * Math.pow(POP_SIZE_STEP_RATIO, Math.max(0, step))
 }
+
+/** A merged pop's badge: how many cells it holds. */
+export function popBadgeTextOf(cells: number): string {
+  return `×${cells}`
+}

@@ -6,6 +6,10 @@
  * One `InstancedMesh`, one draw call, coloured per piece by kind. Presentation only, on the render
  * delta with its own seed; the pool is render-local (ticket 339, `localParticles`), drawn outside
  * the world root. It declares `SPRAY_LAYER_BUDGET` against `SCENE_LAYER_LINE` (#213).
+ *
+ * Option B's material pops (ticket 616) share the pool and the draw call: in mode B the carve
+ * hook's cells pop into it, and each pop flies to the hold in the rig's frame under the enemies,
+ * its merged count written to the badge presence the HUD reads.
  */
 import { useFrame } from '@react-three/fiber'
 import { useEffect, useMemo } from 'react'
@@ -13,6 +17,7 @@ import { Color, InstancedMesh, MeshBasicMaterial, Object3D, PlaneGeometry } from
 import { SPRAY_CAPACITY, SPRAY_LOOKS } from '../constants/spray'
 import {
   createSprayPool,
+  isPopAt,
   pieceSizeAt,
   pieceTurnAt,
   SPRAY_KINDS,
@@ -21,6 +26,15 @@ import {
 } from '../systems/render/sprayPool'
 import { useDisposeEachOnRelease } from './disposeOnRelease'
 import { createPoolOrigin, followRenderOrigin } from './localParticles'
+import {
+  createRigFrame,
+  createScenePops,
+  paceScenePops,
+  popCarvedCellsInModeB,
+  readDrawnRig,
+} from './materialPops'
+import { clearPopBadges } from './popBadgePresence'
+import { createPopPlacementScratch, placePopPiece, type PopPlacementScratch } from './popPlacement'
 import { admitRequestedSprays } from './sprayIntake'
 import { sprayPresence } from './sprayPresence'
 
@@ -34,33 +48,56 @@ export function SprayLayer() {
   const pool = useMemo(() => createSprayPool(), [])
   const poolOrigin = useMemo(createPoolOrigin, [])
   const mesh = useMemo(createSprayMesh, [])
-  const piece = useMemo(() => new Object3D(), [])
+  const pops = useMemo(() => createScenePops(pool), [pool])
+  const scratch = useMemo(createPieceScratch, [])
   useDisposeEachOnRelease(useMemo(() => gpuResourcesOf(mesh), [mesh]))
   useEffect(() => admitRequestedSprays(pool, poolOrigin), [pool, poolOrigin])
-  useFrame((_, delta) => {
+  useEffect(() => popCarvedCellsInModeB(pops), [pops])
+  useFrame((state, delta) => {
     followRenderOrigin(pool.particles, poolOrigin)
     stepSprayPool(pool, delta)
-    placePieces(pool, mesh, piece)
+    paceScenePops(pops, state.size.width)
+    placePieces(pool, mesh, scratch)
     recordFrameDraw(pool.particles.count)
   })
   return <primitive object={mesh} />
 }
 
-/** Each piece tumbles and shrinks away over its life, in its kind's colour. */
-function placePieces(pool: SprayPool, mesh: InstancedMesh, piece: Object3D): void {
-  const { particles } = pool
-  for (let at = 0; at < particles.count; at++) {
-    const size = pieceSizeAt(pool, at)
-    piece.position.set(particles.x[at], particles.y[at], SPRAY_Z)
-    piece.rotation.set(0, 0, pieceTurnAt(pool, at))
-    piece.scale.set(size, size, 1)
+interface PieceScratch {
+  piece: Object3D
+  colour: Color
+  pop: PopPlacementScratch
+}
+
+function createPieceScratch(): PieceScratch {
+  const pop = createPopPlacementScratch(createRigFrame())
+  return { piece: new Object3D(), colour: new Color(), pop }
+}
+
+/** Spray tumbles and shrinks away in its kind's colour; a pop flies to the hold. */
+function placePieces(pool: SprayPool, mesh: InstancedMesh, scratch: PieceScratch): void {
+  const { piece } = scratch
+  readDrawnRig(scratch.pop.rig)
+  clearPopBadges()
+  for (let at = 0; at < pool.particles.count; at++) {
+    if (isPopAt(pool, at)) placePopPiece(pool, at, scratch.pop, piece, scratch.colour)
+    else placeSprayPiece(pool, at, piece, scratch.colour)
     piece.updateMatrix()
     mesh.setMatrixAt(at, piece.matrix)
-    mesh.setColorAt(at, KIND_COLOURS[pool.kinds[at]])
+    mesh.setColorAt(at, scratch.colour)
   }
-  mesh.count = particles.count
+  mesh.count = pool.particles.count
   mesh.instanceMatrix.needsUpdate = true
   if (mesh.instanceColor) mesh.instanceColor.needsUpdate = true
+}
+
+function placeSprayPiece(pool: SprayPool, at: number, piece: Object3D, colour: Color): void {
+  const { particles } = pool
+  const size = pieceSizeAt(pool, at)
+  piece.position.set(particles.x[at], particles.y[at], SPRAY_Z)
+  piece.rotation.set(0, 0, pieceTurnAt(pool, at))
+  piece.scale.set(size, size, 1)
+  colour.copy(KIND_COLOURS[pool.kinds[at]])
 }
 
 /** The pool draws one call while it holds any piece. */
