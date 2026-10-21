@@ -3,10 +3,12 @@ import { contentOf } from '../../systems/registries/content'
 import { acceptedSlotsOf, LOADOUT_SLOT_IDS } from '../../systems/registries/vehicleLoadout'
 import { SLOT_ACTION_IDS } from '../../systems/input/touchControls'
 import { actionsOfRule, type TouchAnchor } from '../../systems/input/touchBindings'
+import { toolSlotRowOf } from '../registries/toolSlots'
 import { touchBindingRows, type TouchBindingRow } from '../registries/touchBindings'
 
 // The first rows' coverage list (#474: the HS list on #470), judged on the loaded slices: every
-// item the HS names is reached on touch by a row, or by the slot taps its slot answers to.
+// item the HS names is reached on touch by a row, or by the slot taps its slot answers to. The
+// tools are tool slot bar cells since ticket 691, and their rows join the touch bindings.
 
 const POWER_UP_SLOT_IDS = LOADOUT_SLOT_IDS.filter((slot) => slot.startsWith('powerup.'))
 
@@ -34,32 +36,33 @@ function slotTapRowOf(slot: string): TouchBindingRow | undefined {
 }
 
 describe('touch coverage of the HS list', () => {
-  it.each(['bore_gun', 'weapon.cementing_round'])(
-    'fires %s from the fire tile, whose drag has a tap path',
-    (anchor) => {
-      const [row] = rowsAnchoredOn(anchor)
-      expect(row.touch).toEqual({
-        gesture: 'drag',
-        action: 'fire_ground_gun',
-        tapPath: 'fire_ground_gun',
-      })
-      expect(row.Tile).toBeDefined()
-    },
-  )
-
-  it('detonates through the plant button once remote_detonator is open', () => {
-    const [row] = rowsAnchoredOn('remote_detonator')
-    expect(row.touch).toEqual({ gesture: 'tap', action: 'plant_charge' })
-    expect(touchBindingRows().some((kernel) => kernel.id === 'kernel.cluster_plant_charge')).toBe(
-      true,
-    )
+  it('fires the bore gun from its tool slot cell, whose drag has a tap path', () => {
+    const [row] = rowsAnchoredOn('bore_gun')
+    expect(row.touch).toEqual({
+      gesture: 'drag',
+      action: 'fire_ground_gun',
+      tapPath: 'fire_ground_gun',
+    })
+    expect(toolSlotRowOf(row.id)).not.toBeNull()
   })
 
-  it('taps every power-up slot with its own key, from a tile drawn while it holds an item', () => {
+  it('fires the cementing round with the bore gun, from the same cell (ticket 691)', () => {
+    expect(rowsAnchoredOn('weapon.cementing_round')).toEqual([])
+    const fires = touchBindingRows().filter((row) => row.touch.action === 'fire_ground_gun')
+    expect(fires.map((row) => row.id)).toEqual(['ground-gun.bore_gun'])
+  })
+
+  it('detonates through the Plant charge cell once remote_detonator is open', () => {
+    const [row] = rowsAnchoredOn('remote_detonator')
+    expect(row.touch).toEqual({ gesture: 'tap', action: 'plant_charge' })
+    expect(toolSlotRowOf('kernel.tool_plant_charge')).not.toBeNull()
+  })
+
+  it('taps every power-up slot with its own key, from a tool slot cell shown while it holds an item', () => {
     const rows = POWER_UP_SLOT_IDS.map(slotTapRowOf)
     expect(rows.map((row) => row?.touch.gesture)).toEqual(POWER_UP_SLOT_IDS.map(() => 'tap'))
     expect(rows.map((row) => row?.touch.action)).toEqual(SLOT_ACTION_IDS)
-    expect(rows.every((row) => row?.Tile !== undefined)).toBe(true)
+    expect(rows.every((row) => toolSlotRowOf(row!.id) !== null)).toBe(true)
   })
 
   it.each(SLOT_USED_ITEM_IDS)('reaches %s through a power-up slot tap', (itemId) => {

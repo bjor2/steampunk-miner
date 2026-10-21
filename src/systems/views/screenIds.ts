@@ -52,6 +52,8 @@ export const UI_IDS = {
   hudEdgeGauge: 'hud-edge-gauge',
   hudEdgeGlow: 'hud-edge-glow',
   hudGear: 'hud-gear',
+  hudToolSlots: 'hud-tool-slots',
+  hudToolOverflow: 'hud-tool-overflow',
   hudDetail: 'hud-detail',
   hudDetailState: 'hud-detail-state',
   hudDetailStatuses: 'hud-detail-statuses',

@@ -1,13 +1,13 @@
 /**
- * The touch slot column as data (#162 section 2.3, #173): one 56 px button for each slot that holds
- * a power-up a press can use, slot 1 first, with its charge pips, cooldown ring and the ring an
- * item's hold fills (ticket 253). An empty or
- * locked slot draws nothing, so a P1 phone still shows just the stick and Interact (#173
- * acceptance 3). A drill socket holding gear a press uses gets a tile after slot 5 that presses
- * the socket's key, so a touch-only player can flip the side cutters (#244). Each button reads its item at the player's Mark (#249): its pips, its cooldown
- * and the Mark a brass plate on the cradle will show. A sibling-link that fires a slotted item
- * flashes that item's tile (ticket 274), and an item whose Mark reached its link carries the link
- * for the card's switch.
+ * The slots' tool cells as data (#162 section 2.3, #173; on the tool slot bar since ticket 691):
+ * one cell for each slot that holds a power-up a press can use, slot 1 first, with its charges,
+ * cooldown ring and the ring an item's hold fills (ticket 253). An empty or locked slot draws
+ * nothing, so a P1 phone still shows just the stick and Interact (#173 acceptance 3). A drill
+ * socket holding gear a press uses gets a cell after slot 5 that presses the socket's key, so a
+ * touch-only player can flip the side cutters (#244). Each button reads its item at the player's
+ * Mark (#249): its charges, its cooldown and the Mark a brass plate on the cradle will show. A
+ * sibling-link that fires a slotted item flashes that item's cell (ticket 274), and an item whose
+ * Mark reached its link carries the link for the card's switch.
  */
 import { TICKS_PER_SECOND } from '../../../constants/physics'
 import { vehicleOf, type AuthorityState } from '../../../systems/authority/authorityState'
@@ -74,16 +74,25 @@ export interface SlotLink {
 const LINK_FLASH_TICKS = TICKS_PER_SECOND / 2
 
 export function slotButtonsOf(state: AuthorityState, playerId: string): SlotButton[] {
-  const vehicle = vehicleOf(state, playerId)
-  const value = powerUpStateOf(state, playerId)
-  return PRESSABLE_SLOTS.flatMap((slot) => {
-    const powerUp = pressablePowerUpOf(vehicle, slot)
-    if (powerUp === null) return []
-    return [slotButtonOf(state, playerId, value, atResearchedMark(state, playerId, powerUp), slot)]
-  })
+  return PRESSABLE_SLOTS.flatMap((slot) => slotButtonOf(state, playerId, slot) ?? [])
 }
 
-function slotButtonOf(
+/**
+ * One slot's button, or null while the slot holds nothing a press can use: the slot's cell on the
+ * tool slot bar reads this as its face (ticket 691).
+ */
+export function slotButtonOf(
+  state: AuthorityState,
+  playerId: string,
+  slot: PressableSlot,
+): SlotButton | null {
+  const powerUp = pressablePowerUpOf(vehicleOf(state, playerId), slot)
+  if (powerUp === null) return null
+  const value = powerUpStateOf(state, playerId)
+  return buttonOfPowerUp(state, playerId, value, atResearchedMark(state, playerId, powerUp), slot)
+}
+
+function buttonOfPowerUp(
   state: AuthorityState,
   playerId: string,
   value: PowerUpState,

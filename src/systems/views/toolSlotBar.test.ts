@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import type { ToolFace } from '../input/toolSlots'
-import { nextTrayPageOf, toolBarLayoutOf, type ShownTool } from './toolSlotBar'
+import { chargeBadgeTextOf, nextTrayPageOf, toolBarLayoutOf, type ShownTool } from './toolSlotBar'
 
 // The tool slot bar's layout (ticket 691, the HS kinds of #678): 4 thumb cells and an overflow
 // tray on a phone, cell n at position n with Digit n on desktop and the tray past 8.
@@ -72,5 +72,18 @@ describe('tool slot bar layout', () => {
     const layout = toolBarLayoutOf([1, 2].map(toolAt), 'phone', 2)
     expect(positionsOf(layout!.cells)).toEqual([1, 2, null, null])
     expect(layout!.tray).toBeNull()
+  })
+})
+
+describe('tool slot charges badge', () => {
+  it('counts the charges left once a tool holds more than one, and none for one or none', () => {
+    expect(chargeBadgeTextOf({ ...FACE, chargesLeft: 2, chargesMax: 3 })).toBe('2')
+    expect(chargeBadgeTextOf({ ...FACE, chargesLeft: 0, chargesMax: 3 })).toBe('0')
+    expect(chargeBadgeTextOf({ ...FACE, chargesLeft: 1, chargesMax: 1 })).toBeNull()
+    expect(chargeBadgeTextOf(FACE)).toBeNull()
+  })
+
+  it('shortens a large count through the shared formatter', () => {
+    expect(chargeBadgeTextOf({ ...FACE, chargesLeft: 12_345, chargesMax: 20_000 })).toBe('12.3k')
   })
 })

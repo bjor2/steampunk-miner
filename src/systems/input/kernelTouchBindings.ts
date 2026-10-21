@@ -1,10 +1,12 @@
 /**
  * The kernel's own touch controls as binding rows (#474), read before the slices' rows: the
- * floating stick's four drive actions, the cluster's buttons (`touchControls.ts`, #173), the charge
- * size badge on Plant charge (ticket 473), the pause button (ticket 472), the stage's double tap,
- * and the actions the kernel leaves with no touch control, each with its reason.
+ * floating stick's four drive actions, the cluster's buttons (`touchControls.ts`, #173), the tool
+ * slot bar's kernel cells, Plant charge and the guns toggle (ticket 691), the charge size badge on
+ * Plant charge (ticket 473), the pause button (ticket 472), the stage's double tap, and the
+ * actions the kernel leaves with no touch control, each with its reason.
  */
 import type { ActionId } from './actionMap'
+import { KERNEL_TOOL_SLOT_RULES } from './toolSlots'
 import { CLUSTER_ACTION_IDS, PAUSE_ACTION_ID } from './touchControls'
 import type { TouchBindingRule } from './touchBindings'
 
@@ -16,6 +18,7 @@ const MENU_FOCUS_ACTION_IDS = ['ui_up', 'ui_down', 'ui_left', 'ui_right'] as con
 export const KERNEL_TOUCH_BINDINGS: readonly TouchBindingRule[] = [
   ...STICK_ACTION_IDS.map((action) => rowOf(`stick_${action}`, { gesture: 'drag', action })),
   ...CLUSTER_ACTION_IDS.map((action) => rowOf(`cluster_${action}`, { gesture: 'tap', action })),
+  ...KERNEL_TOOL_SLOT_RULES.map(({ id, anchor, touch }) => ({ id, anchor, touch })),
   rowOf('charge_size_badge', { gesture: 'tap', action: 'next_charge_size' }),
   rowOf('pause_button', { gesture: 'tap', action: PAUSE_ACTION_ID }),
   rowOf('double_tap_zoom_reset', { gesture: 'tap', action: 'zoom_reset' }),

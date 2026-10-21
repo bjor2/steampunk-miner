@@ -127,12 +127,14 @@
   --slot-columns: 3;
   --warn-glow-thickness: 24px;
   /*
-   * The touch cluster's size (#173, ticket 485): always three tracks wide, two rows held upright on
-   * a phone. The touch controls lay their stick zone and tile lane by it, and the HUD's gear
-   * button (ticket 684) stands on it, so both read one copy.
+   * The touch cluster's size (#173, ticket 485): three tracks wide, one row since ticket 691. The
+   * touch controls lay their stick zone and tile lane by it, and the HUD's tool slot bar stands on
+   * it a gap above (the G&V ruling on #691: y 452-544 over the row at 560-632 on 360 x 640), so
+   * both read one copy.
    */
   --touch-cluster-width: calc(56px + 8px + 56px + 8px + 72px);
-  --touch-cluster-height-upright: calc(56px + 8px + 72px);
+  --touch-cluster-height-upright: 72px;
+  --tool-bar-over-cluster-gap: 16px;
 
   /* #41 casing feel: the bay teal for lining that holds its band, amber for lining that does not. */
   --color-casing-safe: #4fa8a0;

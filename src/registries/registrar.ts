@@ -119,6 +119,7 @@ import { HUD_PANEL_REGISTRY } from '../ui/registries/hudPanels'
 import { MONEY_COUNTER_REGISTRY } from '../ui/registries/moneyCounter'
 import { SCREEN_REGISTRY } from '../ui/registries/screens'
 import { SHEET_TAB_REGISTRY } from '../ui/registries/sheetTabs'
+import { TOOL_SLOT_REGISTRY } from '../ui/registries/toolSlots'
 import { TOUCH_BINDING_REGISTRY } from '../ui/registries/touchBindings'
 import type { SliceDefinition, SliceRegistrar } from './sliceDefinition'
 
@@ -173,6 +174,7 @@ export function registrarFor(sliceId: string): SliceRegistrar {
     buildingAttachUse: (use) => add(BUILDING_ATTACH_USE_REGISTRY, use),
     hudPanel: (panel) => add(HUD_PANEL_REGISTRY, panel),
     touchBinding: (row) => add(TOUCH_BINDING_REGISTRY, row),
+    toolSlot: (row) => add(TOOL_SLOT_REGISTRY, row),
     bayPanel: (panel) => add(BAY_PANEL_REGISTRY, panel),
     bayScreen: (screen) => add(BAY_SCREEN_REGISTRY, screen),
     moneyCounter: (provider) => add(MONEY_COUNTER_REGISTRY, provider),

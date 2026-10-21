@@ -3,14 +3,16 @@
  * carries `data-hud="<id>"` on its root, so the layout specs measure each box, check that no two
  * overlap and add up how much of the view they cover. Full-screen wrappers carry none; the
  * transparent stick zone carries `data-hud-zone="stick"`, a keep-out that covers nothing. The
- * strip, the edge gauge and the gear button are the design's reserved boxes (ticket 684); the
- * strip's detail is a mode the gear opens, not a box.
+ * strip, the edge gauge and the gear button are the design's reserved boxes (ticket 684), and so
+ * is each drawn cell of the tool slot bar (ticket 691); the strip's detail is a mode the gear
+ * opens, not a box.
  * This table is the one list the components and the specs read.
  */
 export const HUD_BOX_IDS = {
   strip: 'strip',
   edgeGauge: 'edge-gauge',
   gear: 'gear',
+  toolSlot: 'tool-slot',
   techTree: 'tech-tree',
   hint: 'hint',
   transmission: 'transmission',

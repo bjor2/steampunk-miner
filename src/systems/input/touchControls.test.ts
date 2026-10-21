@@ -21,7 +21,6 @@ const AT_REST_P1: TouchSituation = {
   layer: 'vehicle',
   vehicleMode: 'active',
   dockedBay: null,
-  hasGuns: false,
   hasChargeRack: false,
   plantingChargeSize: 1,
   nextChargeSize: null,
@@ -94,12 +93,8 @@ describe('touch cluster (#173)', () => {
     expect(clusterActionsOf({ ...AT_REST_P1, layer: 'platform', dockedBay: 'upgrade' })).toEqual([])
   })
 
-  it('shows Guns and Plant charge only with the part owned', () => {
-    expect(clusterActionsOf({ ...AT_REST_P1, hasGuns: true, hasChargeRack: true })).toEqual([
-      'interact',
-      'plant_charge',
-      'toggle_guns',
-    ])
+  it('keeps Plant charge and the guns toggle off the cluster, on the tool slot bar (ticket 691)', () => {
+    expect(clusterActionsOf({ ...AT_REST_P1, hasChargeRack: true })).toEqual(['interact'])
   })
 
   it('shows Rescue only while the vehicle waits for the tow', () => {

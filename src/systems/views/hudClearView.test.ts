@@ -192,10 +192,11 @@ const STACKED_CELLS = [
 const SIZE_BADGE_PX = 48
 
 /**
- * Every touch control the vehicle layer can show at once while drilling: Interact, plant charge,
- * the guns and the tow call (`clusterActionsOf`; quick service is the platform's), the size badge,
- * the slot column's five power-up slots and two drill sockets and the fire tile at the cluster
- * button's 56 px, and the pause button as measured on a finger (56 px).
+ * Every touch control the vehicle layer can show at once while drilling, as the cluster drew them
+ * before ticket 691: Interact, plant charge, the guns and the tow call, the size badge, five
+ * power-up slots, two drill sockets and the fire tile at the cluster button's 56 px, and the pause
+ * button as measured on a finger (56 px). The tool slot bar's 44 px cells cover less, so this
+ * stays an upper bound.
  */
 const MOST_CONTROLS_AREA =
   INTERACT_BUTTON_PX ** 2 +

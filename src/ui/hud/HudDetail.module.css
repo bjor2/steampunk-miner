@@ -1,7 +1,7 @@
 /*
- * The strip's detail (ticket 684): a brass-framed plate over the view. Desktop: under the gear at
+ * The strip's detail (ticket 684): a brass-framed plate over the view. Desktop: under the strip at
  * the right margin. A phone held upright: the width between the margins, from under the strip
- * down to the gear. Held sideways: the left half, under the strip. It scrolls inside, and takes
+ * down to the tool slot bar, whose last cell is the gear (ticket 691). Held sideways: the left half, under the strip. It scrolls inside, and takes
  * the pointer so a scroll never reaches the canvas.
  */
 .detail {
@@ -31,8 +31,8 @@
   top: calc(var(--strip-height) + var(--space-2));
   right: var(--layout-margin);
   bottom: calc(
-    var(--layout-margin) + var(--touch-cluster-height-upright) + 2 * var(--slot-gap) +
-      var(--slot-cell)
+    var(--layout-margin) + var(--touch-cluster-height-upright) + var(--tool-bar-over-cluster-gap) +
+      2 * var(--slot-cell) + 2 * var(--slot-gap)
   );
   left: var(--layout-margin);
   width: auto;

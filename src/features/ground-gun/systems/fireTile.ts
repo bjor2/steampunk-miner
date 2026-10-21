@@ -6,6 +6,7 @@
  */
 import { boresOf, type PendingBore } from '../../../systems/authority/bore/boreState'
 import type { AuthorityState } from '../../../systems/authority/authorityState'
+import type { ToolFace } from '../../../systems/input/toolSlots'
 import { gunLevelsOf, isGunMounted } from './gunLevels'
 
 export interface FireTileModel {
@@ -23,6 +24,27 @@ export function fireTileOf(state: AuthorityState, playerId: string): FireTileMod
   const bore = latestBoreOf(state, playerId)
   if (bore === null || state.tick >= bore.nextShotTick) return READY
   return { recoveryFilledPercent: filledPercentOf(bore, state.tick), isRecovering: true }
+}
+
+/** The bore gun's glyph: its mount, as the tile has always drawn it. */
+export const FIRE_TOOL_ICON_ID = 'bore-gun-mount'
+
+/**
+ * The tile as the tool slot bar's cell reads it (ticket 691): the kernel's cooldown ring is the
+ * share of the wait still to run, the tile's filled ring turned around; null with no gun.
+ */
+export function fireToolFaceOf(state: AuthorityState, playerId: string): ToolFace | null {
+  const tile = fireTileOf(state, playerId)
+  if (tile === null) return null
+  return {
+    iconId: FIRE_TOOL_ICON_ID,
+    name: 'Bore gun',
+    cooldownPercent: FULL - tile.recoveryFilledPercent,
+    chargesLeft: 0,
+    chargesMax: 0,
+    isOn: false,
+    isActing: false,
+  }
 }
 
 /** The player's bore whose recovery ends last: the one the next shot waits on. */

@@ -1,0 +1,85 @@
+/*
+ * The tool slot bar (ticket 691; design-system.md section 9). A grid of `--slot-columns` cells of
+ * `--slot-cell` with `--slot-gap` between, the gear in its last cell. Desktop: the bottom right
+ * at the layout margin, lifted over the touch cluster's row while the touch controls show. A
+ * phone held upright: right-aligned on the cluster's row a gap above it (the G&V ruling on #691:
+ * y 452-544 at 360 x 640, the cluster at 560-632). Held sideways: one row left of Interact (72 px)
+ * and the cluster gap (8 px, `constants/touch.ts`). Mirrored for the left hand. The HUD lies in
+ * the safe area, so the margins are the layout margin's.
+ */
+.bar {
+  position: absolute;
+  right: var(--layout-margin);
+  bottom: var(--layout-margin);
+  display: grid;
+  grid-template-columns: repeat(var(--slot-columns), var(--slot-cell));
+  grid-auto-rows: var(--slot-cell);
+  gap: var(--slot-gap);
+  pointer-events: none;
+}
+
+.bar[data-hand='left'] {
+  right: auto;
+  left: var(--layout-margin);
+  direction: rtl;
+}
+
+.bar[data-over-cluster] {
+  bottom: calc(
+    var(--space-3) + var(--touch-cluster-height-upright) + var(--tool-bar-over-cluster-gap)
+  );
+}
+
+:global([data-orientation='portrait'][data-hud-density='compact']) .bar {
+  bottom: calc(
+    var(--layout-margin) + var(--touch-cluster-height-upright) + var(--tool-bar-over-cluster-gap)
+  );
+}
+
+:global([data-orientation='landscape'][data-hud-density='compact']) .bar {
+  right: calc(var(--layout-margin) + 72px + 8px);
+  bottom: var(--layout-margin);
+}
+
+:global([data-orientation='landscape'][data-hud-density='compact']) .bar[data-hand='left'] {
+  right: auto;
+  left: calc(var(--layout-margin) + 72px + 8px);
+}
+
+/* While the touch gesture surface lies over the HUD the cells rise over it (ticket 684). */
+.bar[data-raised] {
+  z-index: 1;
+}
+
+/* An empty cell: nothing drawn, no box, so the next cells and the gear keep their places. */
+.well {
+  width: var(--slot-cell);
+  height: var(--slot-cell);
+}
+
+/*
+ * The charge size badge riding Plant charge's upper corner (ticket 473), inside the cell's box:
+ * the size it plants, a tap steps it.
+ */
+.sizeBadge {
+  position: absolute;
+  top: 1px;
+  right: 1px;
+  display: grid;
+  place-items: center;
+  width: 20px;
+  height: 20px;
+  padding: 0;
+  border: 1px solid var(--color-brass);
+  border-radius: 50%;
+  background: var(--color-panel);
+  color: var(--color-brass);
+  font-size: 0.7rem;
+  font-weight: 700;
+  pointer-events: auto;
+  touch-action: none;
+}
+
+.sizeBadge[data-pressed] {
+  color: var(--color-parchment);
+}

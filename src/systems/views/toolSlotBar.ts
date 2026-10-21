@@ -7,6 +7,7 @@
  * leaves the bar's reserved box (the middle band and the stick zone stay clear). With no tool
  * shown there is no bar (#173 acceptance 3). Pure; the bar component draws what this returns.
  */
+import { formatAmount } from '../displayAmount'
 import type { ToolFace } from '../input/toolSlots'
 import { DESIGN_TOKENS, type DesignTokens, type LayoutKind } from './designSystem'
 
@@ -45,6 +46,14 @@ export function toolBarLayoutOf(
     cells: shownPage === 0 ? thumbs : padTo(trayPageOf(tray, shownPage, count), count),
     tray: pages === 0 ? null : { page: shownPage, pages },
   }
+}
+
+/**
+ * The charges badge (the VS condition on #691): the charges left through the shared formatter
+ * (#681) while the tool holds more than one; a single-charge tool shows its cooldown ring alone.
+ */
+export function chargeBadgeTextOf({ chargesLeft, chargesMax }: ToolFace): string | null {
+  return chargesMax > 1 ? formatAmount(chargesLeft) : null
 }
 
 /** The page the overflow cell turns to: the next tray page, then back to the thumb cells. */

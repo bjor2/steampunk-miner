@@ -21,7 +21,6 @@ import type { TitleMenuModel } from '../systems/views/titleMenuModel'
 import { dockedBayOf } from '../systems/authority/dockRules'
 import { chargesOf } from '../systems/authority/charges/chargeRules'
 import type { TouchSituation } from '../systems/input/touchControls'
-import { mountedGunModeOf } from '../systems/vehicle/vehicleGun'
 import { chargeSizeToPlantOf, nextChargeSizeOf } from '../systems/vehicle/chargeSelection'
 import type { BayId } from '../systems/world/dockBays'
 import { shownBayScreenIdOf } from '../ui/registries/bayScreens'
@@ -146,7 +145,6 @@ export function readTouchSituation(): TouchSituation {
     layer: inputLayerOf(game),
     vehicleMode: game.vehicle.mode,
     dockedBay: dockedBayOf(state, game.playerId),
-    hasGuns: mountedGunModeOf(state.players[game.playerId].vehicle.gun) !== null,
     hasChargeRack: charges.isRackMounted,
     plantingChargeSize: chargeSizeToPlantOf(charges, game.chosenChargeSize),
     nextChargeSize: nextChargeSizeOf(charges, game.chosenChargeSize),

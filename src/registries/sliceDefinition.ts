@@ -82,6 +82,7 @@ import type { HudPanel } from '../ui/registries/hudPanels'
 import type { MoneyCounterProvider } from '../ui/registries/moneyCounter'
 import type { ScreenPanel } from '../ui/registries/screens'
 import type { SheetTab } from '../ui/registries/sheetTabs'
+import type { ToolSlotRow } from '../ui/registries/toolSlots'
 import type { TouchBindingRow } from '../ui/registries/touchBindings'
 
 export { FeaturesNotLoadedError } from '../systems/registries/seal'
@@ -212,6 +213,11 @@ export interface SliceRegistrar {
    * gesture, the anchor that exposes it and the tile it draws; refused at the seal on a rule.
    */
   touchBinding(row: TouchBindingRow): void
+  /**
+   * An active tool on the tool slot bar (ticket 691, the HS kinds of #678): its fixed position,
+   * the action a key or tap presses and its face read; also a touch binding, sealed by its rules.
+   */
+  toolSlot(row: ToolSlotRow): void
   /** A panel in the bay header, left of the money, or in the layer above the bay screen. */
   bayPanel(panel: BayPanel): void
   /** A bay's whole screen, one per bay, shown once its schedule row is open (#180). */

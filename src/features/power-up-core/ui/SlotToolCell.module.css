@@ -1,0 +1,68 @@
+/*
+ * What rides a slot's tool cell (ticket 691; the cell itself is the kernel's `ToolCell`): the hold
+ * ring around the cell, the link flash and the held slot's item card above the bar.
+ */
+
+/*
+ * The hold ring sits just outside the cell and fills clockwise with `--hold`, the share already
+ * held (ticket 253). No transition: when the hold is cancelled it snaps back at once.
+ */
+.holdRing {
+  position: absolute;
+  inset: -3px;
+  border-radius: var(--radius-panel);
+  background: conic-gradient(var(--color-teal) var(--hold, 0%), transparent 0);
+  padding: 3px;
+  mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  mask-composite: exclude;
+  pointer-events: none;
+}
+
+/*
+ * A sibling-link fired this item (ticket 274): its cell lights up for half a second while its
+ * cooldown ring starts, so the player sees where the charge went. A steady glow, no motion.
+ */
+.linkFlash {
+  position: absolute;
+  inset: 0;
+  border-radius: var(--radius-panel);
+  box-shadow: 0 0 0 3px var(--color-amber);
+  pointer-events: none;
+}
+
+/* The held slot's item card opens above the bar, toward the screen's middle; a mode, not a box. */
+.card {
+  position: absolute;
+  right: 0;
+  bottom: calc(100% + 8px);
+  width: min(18rem, calc(100vw - 2 * var(--layout-margin)));
+  direction: ltr;
+  pointer-events: none;
+}
+
+/* The bar mirrored for the left hand: the card opens toward the middle from the left edge. */
+:global([data-hand='left']) .card {
+  right: auto;
+  left: 0;
+}
+
+/* Kept open after a long press, the card carrying a link switch takes taps (ticket 274). */
+.card[data-pinned] {
+  pointer-events: auto;
+}
+
+.linkSwitch {
+  display: block;
+  margin-top: var(--space-2);
+}
+
+.cardName {
+  padding: var(--space-2);
+  border: 2px solid var(--color-brass);
+  border-radius: var(--radius-panel);
+  background: var(--color-panel);
+  color: var(--color-parchment);
+  white-space: nowrap;
+}

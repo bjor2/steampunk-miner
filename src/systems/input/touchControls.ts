@@ -16,7 +16,6 @@ import { ZOOM_STEP_FACTOR } from '../../constants/scene'
 import {
   buttonIconIdOf,
   combatStatusIconIdOf,
-  hudLabelIconIdOf,
   panelIconIdOf,
   vehicleStateIconIdOf,
 } from '../art/icons/iconSet'
@@ -24,11 +23,13 @@ import type { VehicleMode } from '../vehicle/vehicleState'
 import type { BayId } from '../world/dockBays'
 import type { ActionId, InputContext } from './actionMap'
 
-/** The cluster's buttons in a fixed order; each presses the action of the same id. */
+/**
+ * The cluster's buttons in a fixed order; each presses the action of the same id. Plant charge and
+ * the guns toggle are tool slot bar cells since ticket 691 (the G&V ruling, option 1), so the
+ * cluster keeps one row in the corner.
+ */
 export const CLUSTER_ACTION_IDS = [
   'interact',
-  'plant_charge',
-  'toggle_guns',
   'request_rescue',
   'quick_service',
 ] as const satisfies readonly ActionId[]
@@ -74,7 +75,6 @@ export interface TouchSituation {
   layer: InputContext
   vehicleMode: VehicleMode
   dockedBay: BayId | null
-  hasGuns: boolean
   hasChargeRack: boolean
   /** The size `plant_charge` plants now (`chargeSizeToPlantOf`), drawn on the size badge. */
   plantingChargeSize: number
@@ -108,8 +108,9 @@ export function clusterActionsOf(situation: TouchSituation): ClusterActionId[] {
 }
 
 /**
- * The size the badge on Plant charge shows, or null for no badge (ticket 473): a tap on it presses
- * `next_charge_size` as V does, so it is drawn only while Plant charge is and V would step a size.
+ * The size the badge on the bar's Plant charge cell shows, or null for no badge (ticket 473): a
+ * tap on it presses `next_charge_size` as V does, so it is drawn only while driving with the rack
+ * on and V would step a size.
  */
 export function chargeSizeBadgeOf(situation: TouchSituation): number | null {
   if (!isChargeSizeSteppable(situation)) return null
@@ -191,22 +192,18 @@ export function heldChangesOf(
 
 const CLUSTER_ICON_IDS: Readonly<Record<ClusterActionId, string>> = {
   interact: vehicleStateIconIdOf('docked'),
-  plant_charge: hudLabelIconIdOf('charges'),
-  toggle_guns: hudLabelIconIdOf('guns'),
   request_rescue: combatStatusIconIdOf('tow'),
   quick_service: buttonIconIdOf('quick_service'),
 }
 
 const CLUSTER_RULES: Readonly<Record<ClusterActionId, (situation: TouchSituation) => boolean>> = {
   interact: ({ layer }) => layer === 'vehicle',
-  plant_charge: ({ layer, hasChargeRack }) => layer === 'vehicle' && hasChargeRack,
-  toggle_guns: ({ layer, hasGuns }) => layer === 'vehicle' && hasGuns,
   request_rescue: ({ layer, vehicleMode }) => layer === 'vehicle' && isWaitingForTow(vehicleMode),
   quick_service: ({ layer, dockedBay }) => layer === 'platform' && dockedBay === 'sell',
 }
 
-function isChargeSizeSteppable(situation: TouchSituation): boolean {
-  return CLUSTER_RULES.plant_charge(situation) && situation.nextChargeSize !== null
+function isChargeSizeSteppable({ layer, hasChargeRack, nextChargeSize }: TouchSituation): boolean {
+  return layer === 'vehicle' && hasChargeRack && nextChargeSize !== null
 }
 
 /** The tow is called only for a vehicle that cannot move on its own (#7), as `R` is. */

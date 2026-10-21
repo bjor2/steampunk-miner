@@ -62,7 +62,7 @@ import { BORE_GUN_MODULE_SELLER } from './systems/moduleSales'
 import { BurstToggle } from './ui/BurstToggle'
 import { FireGauge } from './ui/FireGauge'
 import { FireReticle } from './ui/FireReticle'
-import { FIRE_TOUCH_BINDINGS } from './ui/fireTouchBindings'
+import { FIRE_TOOL_SLOT } from './ui/fireToolSlot'
 
 /** Over the chips (10): an aim the finger is making matters more than a glanceable count. */
 const RETICLE_OVERLAY_PRIORITY = 20
@@ -101,8 +101,8 @@ export const slice: SliceDefinition = {
     r.runEvents(GROUND_GUN_RUN_EVENTS)
     r.hudPanel({ id: 'ground-gun.fire-gauge', slot: 'gauges', Panel: FireGauge })
     r.hudPanel({ id: 'ground-gun.burst-toggle', slot: 'gauges', Panel: BurstToggle })
-    // The touch fire tile, for the gun and its shoring shot (#474).
-    FIRE_TOUCH_BINDINGS.forEach((row) => r.touchBinding(row))
+    // The bore gun's cell on the tool slot bar, for the gun and its shoring shot (ticket 691).
+    r.toolSlot(FIRE_TOOL_SLOT)
     r.hudPanel({
       id: 'ground-gun.reticle',
       slot: 'overlay',

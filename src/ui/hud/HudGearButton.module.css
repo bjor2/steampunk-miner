@@ -1,42 +1,10 @@
 /*
- * The gear button (ticket 684; design-system.md sections 9 and 10). Desktop: under the strip at
- * the right margin, where the readouts stood. A phone held upright: the thumb zone, a slot gap
- * above the touch cluster's outer column (`TouchControls.module.css` sets the cluster's foot at
- * the layout margin there so the button clears the middle band at 360 x 640). Held sideways: left
- * of the cluster's foot. Mirrored for the left hand.
+ * The gear button (ticket 684; design-system.md sections 9 and 10): the last cell of the tool slot
+ * bar's grid (ticket 691), which places it and mirrors it for the left hand.
  */
 .gear {
-  position: absolute;
   line-height: 0;
-  top: calc(var(--strip-height) + var(--space-2));
-  right: var(--layout-margin);
   pointer-events: auto;
-}
-
-.gear[data-hand='left'] {
-  right: auto;
-  left: var(--layout-margin);
-}
-
-:global([data-hud-density='compact']) .gear {
-  top: auto;
-  right: var(--space-3);
-  bottom: calc(var(--layout-margin) + var(--touch-cluster-height-upright) + var(--slot-gap));
-}
-
-:global([data-hud-density='compact']) .gear[data-hand='left'] {
-  right: auto;
-  left: var(--space-3);
-}
-
-:global([data-orientation='landscape'][data-hud-density='compact']) .gear {
-  right: calc(var(--space-3) + var(--touch-cluster-width) + var(--slot-gap));
-  bottom: var(--space-3);
-}
-
-:global([data-orientation='landscape'][data-hud-density='compact']) .gear[data-hand='left'] {
-  right: auto;
-  left: calc(var(--space-3) + var(--touch-cluster-width) + var(--slot-gap));
 }
 
 /*
@@ -67,13 +35,4 @@
 .button:focus-visible {
   outline: var(--focus-ring);
   outline-offset: var(--focus-ring-offset);
-}
-
-/*
- * While the touch gesture surface lies over the HUD (the vehicle has the input on a touch
- * screen), the button rises over it, as a tappable amount does (ticket 476); under a menu it sits
- * back, so the menu covers it.
- */
-.gear[data-raised] {
-  z-index: 1;
 }

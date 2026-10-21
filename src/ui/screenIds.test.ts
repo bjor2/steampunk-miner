@@ -58,6 +58,7 @@ import type { PlaqueModel } from '../systems/views/plaqueModel'
 import type { SettingsModel } from '../systems/views/settingsModel'
 import { FACING } from '../systems/vehicle/vehiclePose'
 import { HudView } from './hud/HudView'
+import { ToolSlotBarView } from './toolSlots/ToolSlotBar'
 import { SlowDeviceChipView } from './hud/SlowDeviceChip'
 import { UI_IDS, type UiId } from './ids'
 import { RefineryBayView } from './platform/RefineryBayView'
@@ -385,6 +386,35 @@ function renderSliceScreen(): string[] {
     onDismiss: () => undefined,
   })
   return withRegistrations([probe], () => checkScreen(frame, { [UI_IDS.sliceScreen]: null }))
+}
+
+/**
+ * The tool slot bar with five tools on a phone (ticket 691): the bar, and the overflow cell that
+ * opens the fifth. Neither carries text: the cells are icons and rings.
+ */
+function renderToolSlotBar(): string[] {
+  const tools = [1, 2, 3, 4, 5].map((position) => ({
+    rowId: `ids-probe.${position}`,
+    position,
+    face: {
+      iconId: 'icon-charges',
+      name: 'Probe',
+      cooldownPercent: 0,
+      chargesLeft: 0,
+      chargesMax: 0,
+      isOn: false,
+      isActing: false,
+    },
+  }))
+  const bar = createElement(ToolSlotBarView, {
+    tools,
+    kind: 'phone',
+    isDetailOpen: false,
+    isLeftHanded: false,
+    isRaised: false,
+    isOverCluster: false,
+  })
+  return checkScreen(bar, { [UI_IDS.hudToolSlots]: null, [UI_IDS.hudToolOverflow]: null })
 }
 
 /** The slow-device chip, which the store shows only while the frame cap drops ticks (ticket 480). */
@@ -755,6 +785,7 @@ function expectEveryIdRendered(): void {
   keep(renderLiningVisit())
   keep(renderSliceScreen())
   keep(renderSlowDeviceChip())
+  keep(renderToolSlotBar())
   keep(renderPauseMenu())
   keep(renderUnsavedChip())
   keep(renderLedgerToast())

@@ -1,0 +1,15 @@
+/*
+ * The auto lamp riding the bore gun's tool cell (GD 3b on #314; on the bar since ticket 691): in
+ * the cell's upper corner, inside its box, so it adds no box and never reaches the middle band.
+ */
+.lampCorner {
+  position: absolute;
+  top: 1px;
+  right: 1px;
+  line-height: 0;
+}
+
+.lampCorner > button {
+  width: 20px;
+  height: 20px;
+}

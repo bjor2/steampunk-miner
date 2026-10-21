@@ -8,6 +8,7 @@ import { TOUCH_HELD_ANCHOR_IDS } from '../../systems/input/touchBindings'
 import { touchBindingRows } from '../registries/touchBindings'
 import { PlaquesView } from '../plaques/PlaquesView'
 import { TouchControlsView } from '../touch/TouchControls'
+import { ToolSlotBarView } from '../toolSlots/ToolSlotBar'
 import { everyReadoutOf } from './hudFixtures'
 import { HUD_BOX_IDS, HUD_ZONE_ATTRIBUTE, STICK_ZONE_ID } from './hudBoxes'
 import { HudView } from './HudView'
@@ -20,15 +21,38 @@ const PLAQUES = {
   transmission: { id: 'tx_intro', iconId: 'icon-transmission', lines: ['Welcome, driller.'] },
 }
 
+/** The bar with Plant charge on it (ticket 691): its cell is a `tool-slot` box. */
+const PLANT_TOOL = {
+  rowId: 'kernel.tool_plant_charge',
+  position: 9,
+  face: {
+    iconId: 'icon-charges',
+    name: 'Plant charge',
+    cooldownPercent: 0,
+    chargesLeft: 0,
+    chargesMax: 0,
+    isOn: false,
+    isActing: false,
+  },
+}
+
 const hudBoxesIn = (html: string) => [...html.matchAll(/data-hud="([^"]+)"/g)].map((m) => m[1])
 
 function drawEveryBox(): string {
   const hud = createElement(HudView, { model: everyReadoutOf(readHudModel()), isFlashing: false })
   const touch = createElement(TouchControlsView, {
-    situation: { ...readTouchSituation(), hasGuns: true, hasChargeRack: true },
+    situation: readTouchSituation(),
     isLeftHanded: false,
   })
-  return [hud, createElement(PlaquesView, { model: PLAQUES }), touch]
+  const bar = createElement(ToolSlotBarView, {
+    tools: [PLANT_TOOL],
+    kind: 'phone',
+    isDetailOpen: false,
+    isLeftHanded: false,
+    isRaised: false,
+    isOverCluster: false,
+  })
+  return [hud, createElement(PlaquesView, { model: PLAQUES }), touch, bar]
     .map((element) => renderToString(element))
     .join('')
 }
