@@ -53,6 +53,27 @@ describe('menu text budget (spec #422, pass #429)', () => {
     expectEveryTextRegisteredWithinBudget(markup)
   })
 
+  it("draws a save's summary with its core gauge on the slot line, within budget (ticket 703)", () => {
+    const summarised: SaveSlotEntry = {
+      ...MANUAL,
+      summary: {
+        planetIndex: 5,
+        planetName: 'Kettlecrag',
+        money: '1e+300',
+        deepestMetres: 120,
+        coreDepthMetres: 480,
+        drillLevel: 1_000_000,
+      },
+    }
+    const markup = titleMarkupOf({ page: 'load', slots: [AUTOSAVE, summarised] })
+    expect(markup).toContain('Kettlecrag')
+    expect(markup).toContain('role="meter"')
+    expect(markup).toContain('data-permille="250"')
+    expect(markup).toContain('>1e300<')
+    expect(markup).not.toContain('1,000,000')
+    expectEveryTextRegisteredWithinBudget(markup)
+  })
+
   it('keeps the New Game warning on the element, never in a tooltip', () => {
     expectEveryTextRegisteredWithinBudget(titleMarkupOf({ page: 'confirmNewGame' }))
     const warnings = everyRecordedLine().filter((line) => line.holds === 'warning')

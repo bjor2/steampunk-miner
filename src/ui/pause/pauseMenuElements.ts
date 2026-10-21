@@ -1,12 +1,14 @@
 /**
  * The pause menu's text on the shared Title+OneLine element (spec #422, pass #429): each page is a
- * title and one line over its controls, and a save slot is its save's name with planet and
- * playtime as glyph plus value and its wall time in the tooltip.
+ * title and one line over its controls, and a save slot is its save's name with its summary
+ * (planet, depth with its core gauge, money; ticket 703) and playtime as glyph plus value and its
+ * wall time in the tooltip.
  */
 import { hudLabelIconIdOf } from '../../systems/art/icons/iconSet'
 import type { SaveSlotRow } from '../../systems/views/pauseMenuModel'
 import type { ElementText } from '../../systems/views/uiText'
 import type { IconValue } from '../kit/TitleOneLine'
+import { slotSummaryFactsOf } from '../save/slotSummaryFacts'
 
 export const PAUSED_TEXT: ElementText = {
   id: 'pause.paused',
@@ -32,8 +34,11 @@ export function pauseSlotTextOf(row: SaveSlotRow, savedAtText: string): ElementT
   }
 }
 
-/** "Planet 3 · 0:12:05" beside the planet glyph; nothing for an empty slot. */
+/** The save's summary and its playtime as glyph plus value; nothing for an empty slot. */
 export function pauseSlotFactsOf(row: SaveSlotRow): IconValue[] {
-  if (row.detailText === '') return []
-  return [{ iconId: hudLabelIconIdOf('planet'), text: row.detailText }]
+  if (row.summary === null) return []
+  return [
+    ...slotSummaryFactsOf(row.summary),
+    { iconId: hudLabelIconIdOf('tile_time'), text: row.playtimeText },
+  ]
 }

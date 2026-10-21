@@ -365,6 +365,26 @@
       "specs": ["e2e/browser/pauseScrap.spec.ts"]
     },
     {
+      "why": "The save slot line's summary (ticket 703): the header summary the checkpoint writes, the slot index that carries it, the slot line model, the menus' facts and the mini core gauge, at 360x640 and 1280x800.",
+      "paths": [
+        "src/store/checkpoint.ts",
+        "src/systems/save/saveSlot.ts",
+        "src/systems/save/saveSlotIndex.ts",
+        "src/systems/save/saveSlotSummary.ts",
+        "src/systems/world/openedDepth.ts",
+        "src/systems/views/slotSummaryLine.ts",
+        "src/systems/views/pauseMenuModel.ts",
+        "src/systems/views/titleMenuModel.ts",
+        "src/data/saveMenu/**",
+        "src/ui/save/slotSummaryFacts.ts",
+        "src/ui/kit/MiniGauge.*",
+        "src/ui/kit/TitleOneLine.*",
+        "src/ui/pause/**",
+        "src/ui/title/**"
+      ],
+      "specs": ["e2e/browser/slotSummary.spec.ts"]
+    },
+    {
       "why": "Save keeping (ticket 479): the checkpoint and its write queue, the save-keeping slice, the browser shell's mirrored save folder and file hooks, and the debug saves that export and import.",
       "paths": [
         "src/store/checkpoint.ts",

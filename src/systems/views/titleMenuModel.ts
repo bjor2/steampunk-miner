@@ -3,7 +3,8 @@
  * Game, Continue (the newest slot of the index, disabled with no save) and Load (the slot list,
  * disabled with no save). New Game asks first when any save exists, since the autosave is
  * replaced at the new game's first checkpoint; the named slots stay. The load page lists each slot
- * with its name, planet, playtime and wall time, and flags a slot whose world another generator made
+ * with its name, the header's summary (planet name, deepest depth with its core gauge and money,
+ * ticket 703), playtime and wall time, and flags a slot whose world another generator made
  * (ticket 670) before it is loaded. Local presentation only: nothing here is a
  * command.
  *
@@ -14,6 +15,7 @@ import type { SaveSlotEntry, SaveSlotKey, SlotGeneratorStanding } from '../save/
 import { latestSlotOf, slotGeneratorStandingOf } from '../save/saveSlotIndex'
 import { TICKS_PER_SECOND } from '../../constants/physics'
 import type { FocusStop } from './menuFocus'
+import { slotSummaryLineOf, type SlotSummaryLine } from './slotSummaryLine'
 import { uiButton, type ScreenButton } from './viewParts'
 
 export type TitleMenuPage = 'main' | 'load' | 'confirmNewGame'
@@ -32,10 +34,9 @@ export interface TitleMenuSources {
   utcOffsetMinutesAt(savedAtMs: number): number
 }
 
-export interface TitleSlotRow {
+export interface TitleSlotRow extends SlotSummaryLine {
   slot: SaveSlotKey
   name: string
-  planetText: string
   playtimeText: string
   savedAtText: string
   /** Why the slot's world is not this build's; null when it is, or when the entry cannot tell. */
@@ -47,7 +48,7 @@ export interface TitleMenuModel {
   page: TitleMenuPage
   newGame: ScreenButton
   continueGame: ScreenButton
-  /** The slot Continue loads, as "Autosave · Planet 3 · 0:42:10"; null with no save. */
+  /** The slot Continue loads, as "Autosave · Coalfen · 0:42:10"; null with no save. */
   continueSummary: string | null
   load: ScreenButton
   slotRows: TitleSlotRow[]
@@ -188,7 +189,7 @@ function slotRowOf(entry: SaveSlotEntry, sources: TitleMenuSources): TitleSlotRo
   return {
     slot: entry.slot,
     name: entry.name,
-    planetText: planetTextOf(entry.planetIndex),
+    ...slotSummaryLineOf(entry),
     playtimeText: playtimeTextOf(entry.playtimeTicks),
     savedAtText: savedAtTextOf(entry.savedAtMs, offset),
     generatorNote: GENERATOR_NOTES[slotGeneratorStandingOf(entry)],
@@ -200,13 +201,8 @@ function slotRowOf(entry: SaveSlotEntry, sources: TitleMenuSources): TitleSlotRo
 }
 
 function slotSummaryOf(entry: SaveSlotEntry): string {
-  return [entry.name, planetTextOf(entry.planetIndex), playtimeTextOf(entry.playtimeTicks)].join(
-    ' · ',
-  )
-}
-
-function planetTextOf(planetIndex: number): string {
-  return `Planet ${planetIndex}`
+  const { planetText } = slotSummaryLineOf(entry)
+  return [entry.name, planetText, playtimeTextOf(entry.playtimeTicks)].join(' · ')
 }
 
 function twoDigits(value: number): string {

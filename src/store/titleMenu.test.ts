@@ -13,6 +13,7 @@ import { openFeatureIdsOf } from '../systems/authority/featureUnlocks'
 import { takeSnapshot } from '../systems/authority/sessionSnapshot'
 import { stateDigest } from '../systems/authority/stateDigest'
 import { fromCanonical } from '../systems/money'
+import { planetDisplayNameOf } from '../systems/registries/planetNames'
 import { saveSlotOf } from '../systems/save/saveSlot'
 import { slotEntryOf, type SaveSlotKey } from '../systems/save/saveSlotIndex'
 import { TITLE_MENU_IDS, TITLE_MENU_ID_TEMPLATES } from '../systems/views/titleMenuModel'
@@ -147,7 +148,7 @@ describe('title menu (ticket 403)', () => {
     await plantSave('autosave', baselineState(), 'Autosave', WALL_CLOCK_MS - 1000)
     const digest = await plantSave('slot-2', progressedState(), 'Deep run', WALL_CLOCK_MS)
     await game().openTitleMenu()
-    expect(model().continueSummary).toBe('Deep run · Planet 12 · 0:00:00')
+    expect(model().continueSummary).toBe(`Deep run · ${planetDisplayNameOf(12)} · 0:00:00`)
     tap('ui_confirm')
     await vi.waitFor(() => expect(game().titleMenu).toBeNull())
     expect(linesNamed('checkpoint_loaded').map((line) => line.data)).toEqual([
@@ -163,8 +164,8 @@ describe('title menu (ticket 403)', () => {
     await game().openTitleMenu()
     game().pressScreenButton(TITLE_MENU_IDS.load)
     expect(model().slotRows.map(({ name, planetText }) => ({ name, planetText }))).toEqual([
-      { name: 'Autosave', planetText: 'Planet 12' },
-      { name: 'Start', planetText: 'Planet 1' },
+      { name: 'Autosave', planetText: planetDisplayNameOf(12) },
+      { name: 'Start', planetText: planetDisplayNameOf(1) },
     ])
     tap('ui_cancel')
     expect(model().page).toBe('main')

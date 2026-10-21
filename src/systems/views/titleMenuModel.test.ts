@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { GENERATOR_VERSION } from '../generatorVersion'
+import { planetDisplayNameOf } from '../registries/planetNames'
 import type { SaveSlotEntry } from '../save/saveSlotIndex'
 import {
   isNewGameConfirmNeeded,
@@ -52,7 +53,7 @@ describe('title menu model (ticket 403)', () => {
   it('offers Continue on the newest slot and focuses it when a save exists', () => {
     const model = modelOf({ slots: [AUTOSAVE, MANUAL] })
     expect(model.continueGame.reason).toBeNull()
-    expect(model.continueSummary).toBe('Before the core · Planet 5 · 2:00:05')
+    expect(model.continueSummary).toBe(`Before the core · ${planetDisplayNameOf(5)} · 2:00:05`)
     expect(model.startFocus).toBe(TITLE_MENU_IDS.continueGame)
     expect(model.buttons.map((button) => button.id)).toEqual([
       TITLE_MENU_IDS.continueGame,
@@ -75,14 +76,14 @@ describe('title menu model (ticket 403)', () => {
       {
         slot: 'autosave',
         name: 'Autosave',
-        planetText: 'Planet 3',
+        planetText: planetDisplayNameOf(3),
         playtimeText: '0:42:10',
         savedAtText: '2026-10-14 20:07',
       },
       {
         slot: 'slot-2',
         name: 'Before the core',
-        planetText: 'Planet 5',
+        planetText: planetDisplayNameOf(5),
         playtimeText: '2:00:05',
         savedAtText: '2026-10-14 21:30',
       },

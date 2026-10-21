@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest'
+import { planetDisplayNameOf } from '../registries/planetNames'
 import type { SaveSlotEntry } from '../save/saveSlotIndex'
 import {
   isOverwriteUnconfirmed,
@@ -39,7 +40,7 @@ describe('pause menu model', () => {
     expect(model.saveName).toBe('Planet 3')
   })
 
-  it('lists every manual slot on the save page, a saved one with its planet and playtime', () => {
+  it('lists every manual slot on the save page, a saved one with its summary and playtime', () => {
     const model = selectPauseMenuModel(SAVE_PAGE)
     expect(model.slots.map((row) => row.slot)).toEqual([
       'slot-1',
@@ -54,11 +55,16 @@ describe('pause menu model', () => {
     ])
     expect(rowOf(SAVE_PAGE, 'slot-2')).toMatchObject({
       title: 'Deep vein',
-      detailText: 'Planet 4 · 1:02:03',
+      summary: { planetText: planetDisplayNameOf(4) },
+      playtimeText: '1:02:03',
       savedAtMs: SAVED.savedAtMs,
       isEmpty: false,
     })
-    expect(rowOf(SAVE_PAGE, 'slot-1')).toMatchObject({ title: 'Empty slot', isEmpty: true })
+    expect(rowOf(SAVE_PAGE, 'slot-1')).toMatchObject({
+      title: 'Empty slot',
+      summary: null,
+      isEmpty: true,
+    })
     expect(model.focusStops.at(-1)?.id).toBe('pause-back')
   })
 

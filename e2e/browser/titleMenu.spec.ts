@@ -77,9 +77,12 @@ test('new game, save, title, continue restores the same state hash', async ({ pa
   const withSave = await readTitleMenu(page)
   expect(withSave?.continueGame.reason).toBeNull()
   expect(withSave?.startFocus).toBe('title-continue')
+  // Planet 1's display name, its row in ores.economy.json (ticket 702), from the save's summary.
   expect(withSave?.slotRows.map(({ slot, planetText }) => ({ slot, planetText }))).toEqual([
-    { slot: 'autosave', planetText: 'Planet 1' },
+    { slot: 'autosave', planetText: 'Hearthmoor' },
   ])
+  expect(withSave?.slotRows[0].money.text).not.toBe('unknown')
+  expect(withSave?.slotRows[0].depth.gaugePermille).not.toBeNull()
   await tapConfirm(page)
   const loaded = await waitForLine(page, 'checkpoint_loaded')
   expect(loaded.data).toEqual({

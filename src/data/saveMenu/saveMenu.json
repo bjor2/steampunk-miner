@@ -4,5 +4,8 @@
     "scrap": "Scrap",
     "keep": "Keep"
   },
-  "ledgerToast": "Old ledger restored."
+  "ledgerToast": "Old ledger restored.",
+  "slotLine": {
+    "unknown": "unknown"
+  }
 }

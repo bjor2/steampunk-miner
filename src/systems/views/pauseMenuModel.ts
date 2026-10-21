@@ -1,7 +1,8 @@
 /**
  * `selectPauseMenuModel` (#401 C, ticket 404): the pause menu as data. Escape or Start opens it
  * from driving and holds the fixed step; its first page offers Resume, Save game and Settings, and
- * Save game lists the manual slots with each save's name, planet, playtime and wall time. An
+ * Save game lists the manual slots with each save's name, the header's summary (planet name,
+ * deepest depth with its core gauge and money, ticket 703), playtime and wall time. An
  * empty slot saves at once under the typed name; a slot holding a save asks for a second press
  * (`armOverwrite`, then "Confirm overwrite"), as Travel does (#33 section 6). A saved slot's Scrap
  * (ticket 704) asks "Scrap {slotName}? This can't be undone." in its row, with Scrap and Keep;
@@ -12,6 +13,7 @@ import { TICKS_PER_SECOND } from '../../constants/physics'
 import SAVE_MENU_TEXT from '../../data/saveMenu/saveMenu.json'
 import { manualSlotKeys, type SaveSlotEntry, type SaveSlotKey } from '../save/saveSlotIndex'
 import type { FocusStop } from './menuFocus'
+import { slotSummaryLineOf, type SlotSummaryLine } from './slotSummaryLine'
 import { UI_ID_TEMPLATES, UI_IDS } from './screenIds'
 import { uiButton, type ScreenButton } from './viewParts'
 
@@ -41,8 +43,10 @@ export interface SaveSlotRow {
   slot: SaveSlotKey
   /** The save's name, "Empty slot", or "Reading saves…" until the list is in. */
   title: string
-  /** "Planet 3 · 0:12:05"; blank for an empty slot. */
-  detailText: string
+  /** The save's planet, depth and money; null for an empty slot. */
+  summary: SlotSummaryLine | null
+  /** "0:12:05"; blank for an empty slot. */
+  playtimeText: string
   /** The wall time the save was written, for the view to show in local time; null when unknown. */
   savedAtMs: number | null
   isEmpty: boolean
@@ -177,7 +181,8 @@ function slotRowOf(
   return {
     slot,
     title: entry?.name ?? emptySlotTitleOf(menu),
-    detailText: entry === null ? '' : slotDetailOf(entry),
+    summary: entry === null ? null : slotSummaryLineOf(entry),
+    playtimeText: entry === null ? '' : playtimeTextOf(entry.playtimeTicks),
     savedAtMs: entry?.savedAtMs ?? null,
     isEmpty: entry === null,
     button: slotButtonOf(menu, slot, entry),
@@ -223,10 +228,6 @@ function slotButtonOf(
 
 function emptySlotTitleOf(menu: PauseMenuState): string {
   return menu.slotEntries === null ? 'Reading saves…' : 'Empty slot'
-}
-
-function slotDetailOf(entry: SaveSlotEntry): string {
-  return `Planet ${entry.planetIndex} · ${playtimeTextOf(entry.playtimeTicks)}`
 }
 
 function entryOfSlot(entries: readonly SaveSlotEntry[], slot: SaveSlotKey): SaveSlotEntry | null {
