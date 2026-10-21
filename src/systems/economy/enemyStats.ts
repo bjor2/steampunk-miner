@@ -8,7 +8,7 @@
  */
 import { TICKS_PER_SECOND } from '../../constants/physics'
 import { ceil, cmp, div, fromSafeInteger, mul, toSafeInteger, type BigStat } from '../money'
-import { radiusForPlanet } from '../world/planetParams'
+import { radiusTilesUnder, type PlanetParams } from '../world/planetParams'
 import { compoundRatio, growGeometric, saturate } from './curveFamilies'
 import { ECONOMY } from './economy'
 import type { EnemyDef, EnemyKind, HitArc } from './economyDefinition'
@@ -126,13 +126,18 @@ export function sideHitShareOfHull(kind: EnemyKind, tier: number, hullLevel: num
   return div(sideHit, hullMax(hullLevel))
 }
 
+/** What the spawn density reads of a planet: its index, its radius and the rules that sized it. */
+export type SizedPlanet = Pick<PlanetParams, 'planetIndex' | 'radiusTiles' | 'oreRulesVersion'>
+
 /**
  * The multiplier on every band's spawn density (#131 Systems):
- * `m(p) = max(floor, min(1, (R(ref) / R(p))^exponent))` from `fromPlanet` on, 1 before it.
+ * `m(p) = max(floor, min(1, (R(ref) / R(p))^exponent))` from `fromPlanet` on, 1 before it. R(p) is
+ * the planet's own radius and R(ref) the reference planet's under the same ore rules, so a planet
+ * sized by the registry (ticket 643) is compared with a registry planet and a save's with the ladder.
  */
-export function spawnDensityScale(planetIndex: number): BigStat {
-  if (planetIndex < enemies.combat.densityByRadius.fromPlanet) return FULL_DENSITY
-  return clampSpawnDensityScale(radiusRatioPower(planetIndex))
+export function spawnDensityScale(planet: SizedPlanet): BigStat {
+  if (planet.planetIndex < enemies.combat.densityByRadius.fromPlanet) return FULL_DENSITY
+  return clampSpawnDensityScale(radiusRatioPower(planet))
 }
 
 export function enemyDefOf(kind: EnemyKind): EnemyDef {
@@ -151,11 +156,11 @@ function lungeTilesOf(enemy: EnemyDef): number {
   return (enemy.lungeTilesPerSecond * enemy.lungeTicks) / TICKS_PER_SECOND
 }
 
-function radiusRatioPower(planetIndex: number): BigStat {
+function radiusRatioPower(planet: SizedPlanet): BigStat {
   const { refPlanet, exponent } = enemies.combat.densityByRadius
   const ratio = div(
-    fromSafeInteger(radiusForPlanet(refPlanet)),
-    fromSafeInteger(radiusForPlanet(planetIndex)),
+    fromSafeInteger(radiusTilesUnder(refPlanet, planet.oreRulesVersion)),
+    fromSafeInteger(planet.radiusTiles),
   )
   return compoundRatio(ratio, exponent)
 }

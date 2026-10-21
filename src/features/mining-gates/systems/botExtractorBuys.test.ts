@@ -14,7 +14,7 @@ import { setPlanetCommand, setPlanetSeedCommand } from '../../../systems/startSc
 import { setUpgradeCommand } from '../../../systems/vehicle/vehicleCommands'
 import { botPurchases } from '../../../systems/registries/botPurchases'
 import { dockSiteOf } from '../../../systems/world/dockSite'
-import { planetParamsFor } from '../../../systems/world/planetParams'
+import { freshPlanetParamsFor } from '../../../systems/world/planetParams'
 import { FIXTURE_SEED } from './gateFixtures'
 import { GATE_ROWS } from './gateRows'
 import { availableFromPlanet, ownsRig } from './rigs'
@@ -47,7 +47,7 @@ function botArrivedBroke(planetIndex: number): { session: BotSession; planet: Bo
     'p1',
   )
   for (const intent of arrivedBroke(planetIndex)) session.submit(intent)
-  const params = planetParamsFor(FIXTURE_SEED, planetIndex)
+  const params = freshPlanetParamsFor(FIXTURE_SEED, planetIndex)
   const layout = newMineLayout(params, dockSiteOf(params))
   return {
     session,

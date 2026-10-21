@@ -10,7 +10,7 @@ import {
   toCanonical,
   type Money,
 } from '../money'
-import { radiusForPlanet } from '../world/planetParams'
+import { freshPlanetParamsFor, planetParamsFor, radiusForPlanet } from '../world/planetParams'
 import { ENEMY_KINDS } from './economyDefinition'
 import { ECONOMY } from './economy'
 import {
@@ -232,30 +232,43 @@ describe('enemy parity with an on-curve player (#9, #20 acceptance 4)', () => {
   )
 })
 
-/** `(R(6) / R(p))^2`, the landed density step of #131 written out. */
-function squaredRadiusRatioTo6(planetIndex: number): Money {
-  const ratio = div(
-    fromSafeInteger(radiusForPlanet(6)),
-    fromSafeInteger(radiusForPlanet(planetIndex)),
-  )
+const SEED = 83921
+
+/** `(R / R(p))^2`, the landed density step of #131 written out. */
+function squaredRadiusRatio(refRadiusTiles: number, radiusTiles: number): Money {
+  const ratio = div(fromSafeInteger(refRadiusTiles), fromSafeInteger(radiusTiles))
   return mul(ratio, ratio)
+}
+
+/** A planet as a save written before ticket 643 holds it: unstamped, on #6's ladder. */
+function ladderPlanet(planetIndex: number) {
+  return planetParamsFor(SEED, planetIndex)
 }
 
 describe('spawn density by planet size (#131)', () => {
   it('keeps every band at full density on planets 1 to 6', () => {
-    for (const planet of [1, 2, 3, 4, 5, 6]) expect(spawnDensityScale(planet)).toEqual(m('1'))
+    for (const planet of [1, 2, 3, 4, 5, 6]) {
+      expect(spawnDensityScale(freshPlanetParamsFor(SEED, planet))).toEqual(m('1'))
+    }
   })
 
-  it('thins every band from planet 7 by (R(6) / R(p))^2, so planet 9 keeps (618 / 700)^2', () => {
+  it('thins every band from planet 7 by (R(6) / R(p))^2 of registry radii, so planet 9 keeps (614 / 685)^2', () => {
+    expect(freshPlanetParamsFor(SEED, 9).radiusTiles).toBe(685)
+    expect(spawnDensityScale(freshPlanetParamsFor(SEED, 7))).toEqual(squaredRadiusRatio(614, 641))
+    expect(spawnDensityScale(freshPlanetParamsFor(SEED, 9))).toEqual(squaredRadiusRatio(614, 685))
+  })
+
+  it("keeps a save's ladder planet on ladder radii, so its planet 9 still keeps (618 / 700)^2 (ticket 643)", () => {
     expect(radiusForPlanet(9)).toBe(700)
-    expect(spawnDensityScale(7)).toEqual(squaredRadiusRatioTo6(7))
-    expect(spawnDensityScale(9)).toEqual(squaredRadiusRatioTo6(9))
+    expect(spawnDensityScale(ladderPlanet(7))).toEqual(squaredRadiusRatio(618, 650))
+    expect(spawnDensityScale(ladderPlanet(9))).toEqual(squaredRadiusRatio(618, 700))
   })
 
-  it('holds the 0.6 floor from planet 16, where (618 / 800)^2 falls under it', () => {
-    expect(cmp(spawnDensityScale(15), m('0.6'))).toBeGreaterThan(0)
-    expect(spawnDensityScale(16)).toEqual(m('0.6'))
-    expect(spawnDensityScale(40)).toEqual(m('0.6'))
+  it('holds the 0.6 floor from planet 16, where (614 / 800)^2 falls under it', () => {
+    const fresh = (planet: number) => spawnDensityScale(freshPlanetParamsFor(SEED, planet))
+    expect(cmp(fresh(15), m('0.6'))).toBeGreaterThan(0)
+    expect(fresh(16)).toEqual(m('0.6'))
+    expect(fresh(40)).toEqual(m('0.6'))
   })
 })
 

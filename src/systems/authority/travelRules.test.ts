@@ -4,7 +4,7 @@ import { GENERATOR_VERSION } from '../generatorVersion'
 import { fromCanonical, sub, toCanonical } from '../money'
 import { bayPoseAt, dockedPoseAt } from '../vehicle/vehiclePose'
 import { dockSiteOf } from '../world/dockSite'
-import { planetParamsFor } from '../world/planetParams'
+import { freshPlanetParamsFor, planetParamsFor } from '../world/planetParams'
 import type { DomainEvent } from './domainEvent'
 import { createScriptedSession, GROUND, poseAbove, typesOf, WORLD_SEED } from './scriptedSession'
 import { stateDigest } from './stateDigest'
@@ -37,7 +37,7 @@ describe('travel', () => {
       toCanonical(sub(fromCanonical('1e4'), travelFee(1))),
     )
     expect(toCanonical(travelFee(1))).toBe('6.075e+1')
-    expect(session.state().planet).toEqual({ index: 2, seed: WORLD_SEED, oreRulesVersion: 6 })
+    expect(session.state().planet).toEqual({ index: 2, seed: WORLD_SEED, oreRulesVersion: 7 })
     expect(events[0]).toMatchObject({
       type: 'TravelStarted',
       fromPlanet: 1,
@@ -59,13 +59,13 @@ describe('travel', () => {
       'ArtefactCacheSpawned',
       'StateDigested',
     ])
-    const planet2 = planetParamsFor(WORLD_SEED, 2)
+    const planet2 = freshPlanetParamsFor(WORLD_SEED, 2)
     expect(events[2]).toMatchObject({ planetIndex: 2 })
     expect(events[3]).toMatchObject({ featureId: 'planet_2' })
     expect(events[4]).toMatchObject({
       planetSeed: planet2.planetSeed,
       generatorVersion: GENERATOR_VERSION,
-      radius: 400,
+      radius: 421,
     })
     expect(events[5]).toMatchObject({ band: 2 })
     expect(events[6]).toMatchObject({ scope: 'travel', digest: stateDigest(session.state()) })
@@ -82,14 +82,14 @@ describe('travel', () => {
     session.submit(5, { type: 'dock', payload: { bay: 'upgrade' } })
     expect(canTravel(session.state(), 'p1')).toBe(true)
     expect(typesOf(session.submit(10, travelTo(2)))).toContain('TravelStarted')
-    const site = dockSiteOf(planetParamsFor(WORLD_SEED, 2))
+    const site = dockSiteOf(freshPlanetParamsFor(WORLD_SEED, 2))
     expect(session.vehicle()).toMatchObject({ mode: 'docked', pose: dockedPoseAt(site) })
   })
 
   it('places the docked vehicle on planet 2 dock site with a fresh world and core', () => {
     const session = dockedWith(63)
     session.submit(10, travelTo(2))
-    const site = dockSiteOf(planetParamsFor(WORLD_SEED, 2))
+    const site = dockSiteOf(freshPlanetParamsFor(WORLD_SEED, 2))
     expect(session.vehicle()).toMatchObject({ mode: 'docked', pose: dockedPoseAt(site) })
     expect(session.state().world).toEqual({ chunks: {} })
     expect(session.state().core).toEqual({

@@ -9,7 +9,12 @@ import { GOLDEN_SCRIPTS, stampScript } from '../../systems/replay/goldenScripts'
 import { replayRun } from '../../systems/replay/replayRun'
 import { readSaveSlot, saveSlotOf } from '../../systems/save/saveSlot'
 import { generateChunkCells } from '../../systems/world/generateChunk'
-import { freshPlanetParamsFor, type PlanetParams } from '../../systems/world/planetParams'
+import {
+  freshPlanetParamsFor,
+  oreRulesVersionOnEntry,
+  planetParamsFor,
+  type PlanetParams,
+} from '../../systems/world/planetParams'
 import { starterVeinTiles } from '../../systems/world/starterVein'
 import { CHUNK_SIZE, chunkRangeOfDisc, firstTileOfChunk } from '../../systems/world/tileGrid'
 import {
@@ -37,7 +42,8 @@ import { liveRosterIndicesOf } from './systems/rosterFold'
 // `roster.byteIdentity.test` (TD ruling on ticket 446, 6226236698 section 5, addendum 6226264758
 // amendment 4). A: the roster fold off against on changes no masked cell, density, band count or
 // family histogram (the pacing seeds here, all 64 in `roster.byteIdentity.lane.test.ts`). B: the
-// masked P1 and P2 cells and their per-band, per-family and per-tier counts are main's at f49323ba.
+// masked P1 and P2 cells and their per-band, per-family and per-tier counts are main's at f49323ba,
+// read at the ladder size main had (ore rules 6; ticket 643 resizes a fresh P2).
 // C: the properties of the drawn roster, on P1 and P2 and, since the mixed table (#453), on P3 to
 // P5 over the pacing seeds. D, the pacing line, is `roster.pacing.lane.test.ts`.
 
@@ -68,11 +74,20 @@ const SIGMA_TOLERANCE = 4
 const COMMON_PLANET_BOUND_BP = 4000
 const RARE_BOUND_BP = 1500
 
+/** The ore rules before the registry radius (ticket 643): P2 at #6's ladder size, as main pinned. */
+const LADDER_ORE_RULES = 6
+
 const censusCache = new Map<string, PlanetCensus>()
+
+/** The planet as entered fresh before ticket 643 resized P2 to P10: what main's pins were taken on. */
+function ladderPlanetParamsFor(seed: number, planetIndex: number): PlanetParams {
+  const rules = Math.min(oreRulesVersionOnEntry(planetIndex) ?? 0, LADDER_ORE_RULES)
+  return planetParamsFor(seed, planetIndex, rules)
+}
 
 /** The stamped planet's census, kept for the other checks of this file. */
 function censusOf(params: PlanetParams): PlanetCensus {
-  const key = `${params.worldSeed}:${params.planetIndex}`
+  const key = `${params.worldSeed}:${params.planetIndex}:${params.oreRulesVersion}`
   const kept = censusCache.get(key) ?? planetCensusOf(params)
   censusCache.set(key, kept)
   return kept
@@ -81,13 +96,15 @@ function censusOf(params: PlanetParams): PlanetCensus {
 /** The masked digest of the 8 named seeds of a planet, as main recorded it. */
 function namedMaskedDigestOf(planetIndex: number): string {
   const digests = NAMED_SEEDS.map(
-    (seed) => censusOf(freshPlanetParamsFor(seed, planetIndex)).maskedDigest,
+    (seed) => censusOf(ladderPlanetParamsFor(seed, planetIndex)).maskedDigest,
   )
   return fnv1a64Hex(digests.join(''))
 }
 
 function drawsDigestOf(planetIndex: number): string {
-  const draws = NAMED_SEEDS.flatMap((seed) => patchDrawsOf(freshPlanetParamsFor(seed, planetIndex)))
+  const draws = NAMED_SEEDS.flatMap((seed) =>
+    patchDrawsOf(ladderPlanetParamsFor(seed, planetIndex)),
+  )
   return fnv1a64Hex(draws.map((draw) => draw.kindSlot).join(','))
 }
 

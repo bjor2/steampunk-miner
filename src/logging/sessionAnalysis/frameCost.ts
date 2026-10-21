@@ -6,7 +6,7 @@
  */
 import { FRAME_BUDGET_MS } from '../../constants/scene'
 import { bandOfTile } from '../../systems/world/planetGeometry'
-import { planetParamsFor, type PlanetParams } from '../../systems/world/planetParams'
+import { freshPlanetParamsFor, type PlanetParams } from '../../systems/world/planetParams'
 import { surfaceRowOfColumn } from '../../systems/world/tileGrid'
 import type { RunEvent } from '../runEvent'
 import { eventsNamed, type SessionLog } from './sessionTable'
@@ -69,7 +69,7 @@ function byPlanetThenDepth(a: PerfSample, b: PerfSample): number {
 function createBandReader(worldSeed: number): (sample: PerfSample) => number {
   const paramsByPlanet = new Map<number, PlanetParams>()
   return ({ planet, depthTiles }) => {
-    const params = paramsByPlanet.get(planet) ?? planetParamsFor(worldSeed, planet)
+    const params = paramsByPlanet.get(planet) ?? freshPlanetParamsFor(worldSeed, planet)
     paramsByPlanet.set(planet, params)
     return bandOfTile(params, 0, surfaceRowOfColumn(0, params.radiusTiles) - depthTiles)
   }

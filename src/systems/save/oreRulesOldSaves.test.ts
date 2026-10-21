@@ -87,6 +87,19 @@ const RULES_FOUR_PLANET_5_PIN: ColumnPin = {
   value: '2.0931487044e+7',
 }
 
+/**
+ * Ticket 643: a generator 12 save holding planet 5 under ore rules 6, on #6's ladder radius of 580
+ * before the planet registry's 582, pinned on main at ebc24073f (generator 12) over the same column.
+ * It is the rules 4 pin: the surface layer and P2's pool change no cell of planet 5.
+ */
+const RULES_SIX_PLANET_5_PIN: ColumnPin = {
+  chunks: '920dd8e474b6422e',
+  ores: '6a6b69294f5d9cf0',
+  oreCells: 5734,
+  value: '2.0931487044e+7',
+}
+const LADDER_RADIUS_PLANET_5 = 580
+
 const FIXTURES = [
   ['pre-175 planet 1', PLANET_1_SAVE],
   ['pre-181 planet 5', PLANET_5_SAVE],
@@ -115,6 +128,12 @@ function rulesTwoPlanet5(): AuthorityState {
 function rulesFourPlanet5(): AuthorityState {
   const state = loaded(PLANET_5_SAVE)
   return { ...state, planet: { ...state.planet, oreRulesVersion: 4 } }
+}
+
+/** The pre-181 planet 5 state as if entered under ore rules 6, the last before the registry radius. */
+function rulesSixPlanet5(): AuthorityState {
+  const state = loaded(PLANET_5_SAVE)
+  return { ...state, planet: { ...state.planet, oreRulesVersion: 6 } }
 }
 
 /** That state saved as generator `generatorVersion` wrote it. */
@@ -168,6 +187,7 @@ describe('saves written before the ore rules', () => {
       { version: 'generatorVersion', from: 9, to: 10 },
       { version: 'generatorVersion', from: 10, to: 11 },
       { version: 'generatorVersion', from: 11, to: 12 },
+      { version: 'generatorVersion', from: 12, to: 13 },
     ])
     expect('state' in reading && stateDigest(reading.state)).toBe(stateDigest(loaded(file)))
   })
@@ -179,6 +199,7 @@ describe('saves written before the ore rules', () => {
       { version: 'generatorVersion', from: 9, to: 10 },
       { version: 'generatorVersion', from: 10, to: 11 },
       { version: 'generatorVersion', from: 11, to: 12 },
+      { version: 'generatorVersion', from: 12, to: 13 },
     ])
     expect(reading.state.planet.oreRulesVersion).toBe(1)
     expect(stateDigest(reading.state)).toBe(stateDigest(rulesOnePlanet5()))
@@ -193,6 +214,7 @@ describe('saves written before the ore rules', () => {
     expect(reading.migrations.filter((step) => 'version' in step)).toEqual([
       { version: 'generatorVersion', from: 10, to: 11 },
       { version: 'generatorVersion', from: 11, to: 12 },
+      { version: 'generatorVersion', from: 12, to: 13 },
     ])
     expect(reading.state.planet.oreRulesVersion).toBe(2)
     expect(stateDigest(reading.state)).toBe(stateDigest(rulesTwoPlanet5()))
@@ -206,6 +228,7 @@ describe('saves written before the ore rules', () => {
     if (!('state' in reading)) throw new Error(reading.problems.join('; '))
     expect(reading.migrations.filter((step) => 'version' in step)).toEqual([
       { version: 'generatorVersion', from: 11, to: 12 },
+      { version: 'generatorVersion', from: 12, to: 13 },
     ])
     expect(reading.state.planet.oreRulesVersion).toBe(4)
     expect(stateDigest(reading.state)).toBe(stateDigest(rulesFourPlanet5()))
@@ -215,5 +238,18 @@ describe('saves written before the ore rules', () => {
     expect(toCanonical(hardnessOfTile(params, surfaceTile, GROUND_CELL))).toBe(
       toCanonical(blockHardness(5, 1)),
     )
+  })
+
+  it('load a generator 12 save of a planet under ore rules 6 on its ladder radius, every cell as main made it (ticket 643)', () => {
+    const reading = readMigratedSaveSlot(generatorSaveOf(rulesSixPlanet5(), 12))
+    if (!('state' in reading)) throw new Error(reading.problems.join('; '))
+    expect(reading.migrations.filter((step) => 'version' in step)).toEqual([
+      { version: 'generatorVersion', from: 12, to: 13 },
+    ])
+    expect(reading.state.planet.oreRulesVersion).toBe(6)
+    expect(stateDigest(reading.state)).toBe(stateDigest(rulesSixPlanet5()))
+    const params = planetParamsOf(reading.state.planet) as PlanetParams
+    expect(params.radiusTiles).toBe(LADDER_RADIUS_PLANET_5)
+    expect(columnPinOf(params)).toEqual(RULES_SIX_PLANET_5_PIN)
   })
 })

@@ -7,7 +7,7 @@ import { coreFragmentsNeeded } from './economy/planetEconomy'
 import { FACILITY_IDS } from './registeredIds'
 import { isObject, quote, rangeRule, registeredIdRule } from './scenarioFieldRules'
 import { coreTileCount } from './world/planetGeometry'
-import { planetParamsFor } from './world/planetParams'
+import { freshPlanetParamsFor } from './world/planetParams'
 
 /** Each facility is a registered id at its one level (#8, #11 amendment 1). */
 export function facilityLevelProblems(value: unknown, path: string): string[] {
@@ -40,7 +40,9 @@ export function platformStateProblems(
 function coreNeededAtStart(start: Record<string, unknown>, worldSeed: unknown): number | null {
   const planet = start.planet ?? 1
   if (!isUint32(worldSeed) || !Number.isSafeInteger(planet) || (planet as number) < 1) return null
-  return coreFragmentsNeeded(coreTileCount(planetParamsFor(worldSeed as number, planet as number)))
+  return coreFragmentsNeeded(
+    coreTileCount(freshPlanetParamsFor(worldSeed as number, planet as number)),
+  )
 }
 
 function isUint32(value: unknown): boolean {

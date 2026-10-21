@@ -53,6 +53,12 @@
  * never regenerates mid-run; every cell, edit and the whole state are kept, and the next planet
  * from planet 2 is stamped with rules 5.
  *
+ * Generator 12 -> 13 (ticket 643): a planet entered under ore rules 7 from planet 2 takes its
+ * radius from the planet registry, and its core, bands and band-placed content with it. A save
+ * written before it holds its planet under rules 6 or earlier, so that planet keeps #6's ladder
+ * radius and never regenerates mid-run; every cell, edit and the whole state are kept, and the next
+ * planet from planet 2 is stamped with rules 7.
+ *
  * Format 1 -> 2 (#401): the slot layout. A v1 file was the checkpoint of the single slot, so it
  * becomes the autosave with no wall time, and its header gains the ids of the rows its state opens
  * (`savedUnlocks.ts`). Its sections are kept byte for byte: money, levels and everything else.
@@ -150,6 +156,7 @@ const SAVE_MIGRATION_STEPS: readonly SaveMigrationStep[] = [
   { version: 'generatorVersion', from: 9, to: 10, migrate: keepCellsWithoutRoster },
   { version: 'generatorVersion', from: 10, to: 11, migrate: keepStepBandDensity },
   { version: 'generatorVersion', from: 11, to: 12, migrate: keepShippedSurface },
+  { version: 'generatorVersion', from: 12, to: 13, migrate: keepLadderRadius },
   { version: 'formatVersion', from: 1, to: 2, migrate: addSlotHeader },
   { version: 'formatVersion', from: 2, to: 3, migrate: packChunkTable },
 ]
@@ -284,6 +291,10 @@ function keepStepBandDensity(file: MigratingFile): MigratingFile | null {
 
 function keepShippedSurface(file: MigratingFile): MigratingFile | null {
   return keptUnderGenerator(file, 12)
+}
+
+function keepLadderRadius(file: MigratingFile): MigratingFile | null {
+  return keptUnderGenerator(file, 13)
 }
 
 function keptUnderGenerator(file: MigratingFile, generatorVersion: number): MigratingFile | null {

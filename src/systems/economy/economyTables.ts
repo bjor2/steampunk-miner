@@ -5,7 +5,7 @@
  */
 import type { BigStat, Money } from '../money'
 import { BAND_COUNT } from '../world/planetGeometry'
-import { coreRadiusFor, radiusForPlanet } from '../world/planetParams'
+import { coreRadiusFor, freshRadiusTilesOf } from '../world/planetParams'
 import { discTileCount } from '../world/tileGrid'
 import type { EnemyKind } from './economyDefinition'
 import {
@@ -95,7 +95,7 @@ export function enemyStatsTable(kind: EnemyKind, planetCount: number): EnemyStat
 }
 
 export function planetEconomyRow(planetIndex: number): PlanetEconomyRow {
-  const radiusTiles = radiusForPlanet(planetIndex)
+  const radiusTiles = freshRadiusTilesOf(planetIndex)
   const coreRadiusTiles = coreRadiusFor(radiusTiles)
   const coreTileCount = discTileCount(coreRadiusTiles)
   return {

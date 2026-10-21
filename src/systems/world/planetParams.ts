@@ -15,11 +15,17 @@
  * `oreDensityBp` are the curve's band means, its patch lattice stays the one the step-band rows
  * lay (`patchLatticeDensityBp`, present only there) and each patch is thinned to the curve at its
  * centre (`orePatches.ts`).
+ *
+ * From ore rules 7 (ticket 643, GD lock R2 on #302) a planet's radius is its planet registry row's
+ * (`registries/planetRadii.ts`, the rows of ticket 642), and the core, the bands and every depth
+ * placed by band follow it. A planet with no row, and every planet stamped earlier, keeps #6's
+ * ladder (`radiusForPlanet`), so a save never regenerates and the ladder stays a versioned path.
  */
 import { hashCell } from '../cellRandom'
 import { ECONOMY } from '../economy/economy'
 import { isHeatPlanet } from '../economy/heatEconomy'
 import { refineryUnlockPlanet } from '../economy/refineryEconomy'
+import { rowRadiusTilesOf } from '../registries/planetRadii'
 import { BAY_IDS, SLICE_BAY_IDS, type BayId } from './dockBays'
 import {
   ARTEFACT_CACHE_BANDS,
@@ -94,10 +100,11 @@ export interface PlanetParams {
  * The newest ore rules: 1 is the rarity rows (ticket 445), 2 adds the material roster, a kind slot
  * per ore patch (ticket 446), 3 the depth density curve from planet 3 (ticket 448), 4 the mixed
  * kinds table's roster from planet 3 (#453), 5 the pinned surface layer from planet 2 (ticket 625),
- * 6 planet 2's own species pool on the legacy kind slots (ticket 632). The stamp records the ground
- * rules a planet was entered under, its rock's hardness and its species pool with them.
+ * 6 planet 2's own species pool on the legacy kind slots (ticket 632), 7 the planet registry's radius
+ * from planet 2 (ticket 643). The stamp records the ground rules a planet was entered under, its
+ * rock's hardness, its species pool and its size with them.
  */
-export const ORE_RULES_VERSION = 6
+export const ORE_RULES_VERSION = 7
 
 /** The ore rules that add the depth density curve (ticket 448). */
 export const DEPTH_CURVE_ORE_RULES = 3
@@ -111,13 +118,20 @@ const SURFACE_LAYER_FIRST_PLANET = 2
 /** Planet 1 keeps the legacy pool byte-for-byte, so P2's own pool first changes planet 2 (632). */
 const P2_SPECIES_POOL_FIRST_PLANET = 2
 
+/** The ore rules that read the planet's radius from its registry row (ticket 643). */
+export const RADIUS_ROWS_ORE_RULES = 7
+
+/** Planet 1's row is the ladder's 300 tiles, so the registry radius first changes planet 2. */
+const RADIUS_ROWS_FIRST_PLANET = 2
+
 /**
  * The first planet each ore rules version changes, version 1 first: the rarity rows from P3 (the
  * `ores` slice's `mixedRowsFromPlanet`), the roster from P1 (TD ruling on ticket 446, section 4),
  * the depth curve from its `fromPlanet` (GD on ticket 448: P1 and P2 keep the step bands), the
  * mixed roster where the mixed rows start (#453: P1 and P2 keep the legacy roster), the surface
  * layer from planet 2 (ticket 625: P1 stays byte-identical), P2's species pool (ticket 632, the
- * `ores` slice's `poolsBeforeOreRules`: an older P2 keeps the legacy species).
+ * `ores` slice's `poolsBeforeOreRules`: an older P2 keeps the legacy species), the registry radius
+ * from planet 2 (ticket 643: P1's row is its ladder radius).
  */
 const ORE_RULES_FIRST_PLANETS: readonly number[] = [
   3,
@@ -126,6 +140,7 @@ const ORE_RULES_FIRST_PLANETS: readonly number[] = [
   3,
   SURFACE_LAYER_FIRST_PLANET,
   P2_SPECIES_POOL_FIRST_PLANET,
+  RADIUS_ROWS_FIRST_PLANET,
 ]
 
 /** The first planet any ore rules change, so the first a fresh session stamps: planet 1. */
@@ -146,7 +161,7 @@ export function planetParamsFor(
   assertValidWorldSeed(worldSeed)
   assertValidPlanetIndex(planetIndex)
   assertValidOreRulesVersion(oreRulesVersion)
-  const radiusTiles = radiusForPlanet(planetIndex)
+  const radiusTiles = radiusTilesUnder(planetIndex, oreRulesVersion)
   return {
     worldSeed,
     planetIndex,
@@ -174,8 +189,9 @@ export function planetParamsFor(
 
 /**
  * The ore rules a planet entered now is stamped with: the newest version that changes it, none
- * before `ORE_RULES_FROM_PLANET`. Planet 1 stays on rules 2, which the curve, the surface layer and
- * P2's pool leave as they were, so its sessions and digests do not move with tickets 448, 625, 632.
+ * before `ORE_RULES_FROM_PLANET`. Planet 1 stays on rules 2, which the curve, the surface layer,
+ * P2's pool and the registry radius leave as they were, so its sessions and digests do not move with
+ * tickets 448, 625, 632, 643.
  */
 export function oreRulesVersionOnEntry(planetIndex: number): number | undefined {
   const changing = ORE_RULES_FIRST_PLANETS.map((first, at) => (planetIndex >= first ? at + 1 : 0))
@@ -236,6 +252,29 @@ function dockBaysOf(planetIndex: number): readonly BayId[] {
 export function padLastColumnOf(planetIndex: number): number {
   const counters = DOCK_COUNTER_BUILDING_PLANETS.filter((planet) => planet <= planetIndex).length
   return PAD_LAST_COLUMN_BASE + PAD_COLUMNS_PER_COUNTER_BUILDING * counters
+}
+
+/**
+ * The planet's radius in tiles under its ore rules: from rules 7 its registry row's (ticket 643),
+ * #6's ladder for a planet with no row and for every planet stamped earlier.
+ */
+export function radiusTilesUnder(planetIndex: number, oreRulesVersion: number | undefined): number {
+  return registryRadiusOf(planetIndex, oreRulesVersion) ?? radiusForPlanet(planetIndex)
+}
+
+/** Whether the planet is sized by its registry row: ore rules 7 or later and a row to read. */
+export function isRegistrySizedPlanet(params: PlanetParams): boolean {
+  return registryRadiusOf(params.planetIndex, params.oreRulesVersion) !== null
+}
+
+function registryRadiusOf(planetIndex: number, oreRulesVersion: number | undefined) {
+  const isRegistryRadius = (oreRulesVersion ?? 0) >= RADIUS_ROWS_ORE_RULES
+  return isRegistryRadius ? rowRadiusTilesOf(planetIndex) : null
+}
+
+/** The radius of the planet as this build enters it fresh: what a model of a new planet reads. */
+export function freshRadiusTilesOf(planetIndex: number): number {
+  return radiusTilesUnder(planetIndex, oreRulesVersionOnEntry(planetIndex))
 }
 
 /** #6 section 2: 300 on planet 1, 400 on planet 2, approaching 1000. */

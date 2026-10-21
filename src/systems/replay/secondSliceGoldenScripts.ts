@@ -8,7 +8,7 @@ import { MM_PER_METRE } from '../../constants/physics'
 import { blockContaining, blockIdOf } from '../world/collapseBlock'
 import { artefactCacheTile } from '../world/artefactCache'
 import { dockSiteOf } from '../world/dockSite'
-import { planetParamsFor } from '../world/planetParams'
+import { freshPlanetParamsFor, planetParamsFor } from '../world/planetParams'
 import type { BayId } from '../world/dockBays'
 import type { TilePoint } from '../world/tileGrid'
 import type { CommandIntent } from '../authority/authorityCommand'
@@ -29,7 +29,6 @@ const PARK_TICKS = 600
 const PARK_EVERY_TICKS = 60
 /** The planet 1 cache sits in band 3 (#46), where crawlers spawn; they are frozen first. */
 const CACHE_PLANET_1 = artefactCacheTile(planetParamsFor(WORLD_SEED, 1))
-const CACHE_PLANET_2 = artefactCacheTile(planetParamsFor(WORLD_SEED, 2))
 
 export const SECOND_SLICE_GOLDEN_SCRIPTS: readonly GoldenScript[] = [
   casingDigScript({
@@ -121,6 +120,8 @@ function dockAt(tick: number, bay: BayId): ScriptedCommand[] {
 
 function artefactCommands(): ScriptedCommand[] {
   const open: CommandIntent = { type: 'openArtefactCache', payload: {} }
+  // Planet 2 as `debug.setPlanet` enters it: sized by the planet registry (ticket 643).
+  const cachePlanet2 = artefactCacheTile(freshPlanetParamsFor(WORLD_SEED, 2))
   return [
     { tick: 1, ...FREEZE_ENEMIES },
     { tick: 2, ...poseOnTile(CACHE_PLANET_1) },
@@ -128,7 +129,7 @@ function artefactCommands(): ScriptedCommand[] {
     { tick: 4, type: 'chooseArtefact', payload: { optionId: 'artefact.assay_beacon' } },
     { tick: 5, type: 'debug.setPlanet', payload: { planetIndex: 2 } },
     { tick: 6, ...FREEZE_ENEMIES },
-    { tick: 7, ...poseOnTile(CACHE_PLANET_2) },
+    { tick: 7, ...poseOnTile(cachePlanet2) },
     { tick: 8, ...open },
   ] as ScriptedCommand[]
 }

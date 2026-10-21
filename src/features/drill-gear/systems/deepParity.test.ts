@@ -31,7 +31,7 @@ import { ENERGY_QUANTA_PER_TICK } from '../../../systems/vehicle/energyQuanta'
 import { setUpgradeCommand } from '../../../systems/vehicle/vehicleCommands'
 import { FACING, type VehiclePose } from '../../../systems/vehicle/vehiclePose'
 import { cellDensitySum } from '../../../systems/world/cellYield'
-import { planetParamsFor, type PlanetParams } from '../../../systems/world/planetParams'
+import { freshPlanetParamsFor, type PlanetParams } from '../../../systems/world/planetParams'
 import { surfaceRowOfColumn, type TilePoint } from '../../../systems/world/tileGrid'
 import { EMPTY_WORLD, materialCellAt } from '../../../systems/world/worldState'
 import { DEEP_BRANCH } from './drillGearFork'
@@ -73,7 +73,7 @@ function deepSessionOn(planet: number) {
 
 /** The tile under a miner sunk into the planet's surface, away from the pad. */
 function targetOn(planet: number): TilePoint {
-  const params = planetParamsFor(SEED, planet)
+  const params = freshPlanetParamsFor(SEED, planet)
   return { tx: 20, ty: surfaceRowOfColumn(20, params.radiusTiles) - 1 }
 }
 
@@ -114,7 +114,7 @@ function chargedCutOf(
   target: TilePoint,
   aheadTile: TilePoint,
 ): ReportedCut {
-  const params = planetParamsFor(SEED, before.planet.index)
+  const params = planetParamsOf(before.planet) as PlanetParams
   const quantum = drillQuantumAt(before, PLAYER)
   const removed = lawWorkRemovedOf(before, after.world, tilesAround(target, 3), PLAYER, quantum)
   return {

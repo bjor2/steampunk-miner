@@ -3,7 +3,7 @@ import { oreTier } from '../economy/oreEconomy'
 import { add, fromCanonical, sub, toCanonical, ZERO_MONEY, type Money } from '../money'
 import { setPlanetCommand, setPlanetSeedCommand } from '../startScenarioCommands'
 import { dockSiteOf } from '../world/dockSite'
-import { planetParamsFor } from '../world/planetParams'
+import { freshPlanetParamsFor } from '../world/planetParams'
 import { withVehicle } from './authorityState'
 import { digTenMetresUntil } from './casingDigFixtures'
 import type { DomainEvent } from './domainEvent'
@@ -42,7 +42,7 @@ const DRILL_FOR_LATER_PLANETS = [
 ] as const
 
 /** Planet 2's surface ore is tier 4 (#6: t = 3(p-1) + b), worth 33.75 a unit against tier 1's 10. */
-const PLANET_2 = planetParamsFor(WORLD_SEED, 2)
+const PLANET_2 = freshPlanetParamsFor(WORLD_SEED, 2)
 const RICH_TIER = 4
 
 const settledOf = (events: readonly DomainEvent[]) =>

@@ -7,7 +7,7 @@ import type { ScriptedCommand } from '../systems/fastForward'
 import { isSliceEndReached } from '../systems/sliceProgress'
 import { FACING, bayPoseAt, dockedPoseAt } from '../systems/vehicle/vehiclePose'
 import { dockSiteOf } from '../systems/world/dockSite'
-import { planetParamsFor, type PlanetParams } from '../systems/world/planetParams'
+import { freshPlanetParamsFor, type PlanetParams } from '../systems/world/planetParams'
 import type { TilePoint } from '../systems/world/tileGrid'
 import type { FeedbackCue } from '../systems/feedback/feedbackCues'
 import {
@@ -41,8 +41,8 @@ afterEach(() => uninstallRunLog())
 const game = () => useGameStore.getState()
 
 /** The fresh profile's world seed (the store's starting planet), planet 1 then planet 2. */
-const PLANET_1 = planetParamsFor(1, 1)
-const PLANET_2 = planetParamsFor(1, 2)
+const PLANET_1 = freshPlanetParamsFor(1, 1)
+const PLANET_2 = freshPlanetParamsFor(1, 2)
 const SIX_TRACKS = ['cargo_hold', 'boiler', 'engine', 'hull', 'drill_power', 'drill_tip']
 
 /** What the #2 acceptance sequence asks for, in order (#24 acceptance). */

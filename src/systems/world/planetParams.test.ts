@@ -5,14 +5,19 @@ import { ARCHETYPE_IDS } from '../registeredIds'
 import { dockSiteOf } from './dockSite'
 import { coreTileCount } from './planetGeometry'
 import { fnv1a64Hex } from '../authority/stateDigest'
+import { withRegistrations } from '../../registries/registrar'
+import type { SliceDefinition } from '../../registries/sliceDefinition'
 import {
+  bandStartsFor,
   coreRadiusFor,
   DEPTH_CURVE_ORE_RULES,
   freshPlanetParamsFor,
+  freshRadiusTilesOf,
   isDepthCurvePlanet,
   ORE_RULES_FROM_PLANET,
   ORE_RULES_VERSION,
   planetParamsFor,
+  RADIUS_ROWS_ORE_RULES,
   radiusForPlanet,
 } from './planetParams'
 import {
@@ -151,11 +156,11 @@ describe('planet params ore rules (ticket 445)', () => {
     expect(Object.keys(stamped).at(-1)).toBe('oreRulesVersion')
   })
 
-  it('stamps fresh planet 1 with ore rules 2 and planet 2 on with rules 6 (446, 448, #453, 625, 632)', () => {
+  it('stamps fresh planet 1 with ore rules 2 and planet 2 on with rules 7 (446, 448, #453, 625, 632, 643)', () => {
     const stamps = [1, 2, 3, 4, 60].map((index) => freshPlanetParamsFor(1, index).oreRulesVersion)
     expect(ORE_RULES_FROM_PLANET).toBe(1)
-    expect(ORE_RULES_VERSION).toBe(6)
-    expect(stamps).toEqual([2, 6, 6, 6, 6])
+    expect(ORE_RULES_VERSION).toBe(7)
+    expect(stamps).toEqual([2, 7, 7, 7, 7])
   })
 
   it('still reads a planet stamped with ore rules 1 (ticket 445)', () => {
@@ -189,5 +194,63 @@ describe('planet params under the depth density curve (ticket 448)', () => {
       expect(params.patchSeedChanceBp).toEqual(PATCH_SEED_CHANCE_BP)
       expect('patchLatticeDensityBp' in params).toBe(false)
     }
+  })
+})
+
+/** A slice whose planet registry has rows for planets 1 to 3 only. */
+const THREE_ROW_REGISTRY: SliceDefinition = {
+  id: 'fake',
+  register(r) {
+    r.planetRadius({
+      id: 'fake.radius',
+      radiusTilesOf: (planet) => [300, 450, 520][planet - 1] ?? null,
+    })
+  },
+}
+
+function underThreeRows<T>(run: () => T): T {
+  return withRegistrations([THREE_ROW_REGISTRY], run)
+}
+
+describe('planet params radius from the planet registry (ticket 643)', () => {
+  it('sizes a planet under ore rules 7 by its registry row: the core, the bands and the stamp follow', () => {
+    const params = underThreeRows(() => planetParamsFor(83921, 2, RADIUS_ROWS_ORE_RULES))
+    expect(params.radiusTiles).toBe(450)
+    expect(params.coreRadiusTiles).toBe(coreRadiusFor(450))
+    expect(params.bandStartsHalfTileSq).toEqual(bandStartsFor(450))
+    expect(params).toEqual({
+      ...planetParamsFor(83921, 2, 6),
+      radiusTiles: 450,
+      coreRadiusTiles: coreRadiusFor(450),
+      bandStartsHalfTileSq: bandStartsFor(450),
+      oreRulesVersion: RADIUS_ROWS_ORE_RULES,
+    })
+  })
+
+  it("keeps #6's ladder past the registry's last row and with no registry at all", () => {
+    const pastLastRow = underThreeRows(() => planetParamsFor(83921, 4, RADIUS_ROWS_ORE_RULES))
+    expect(pastLastRow.radiusTiles).toBe(radiusForPlanet(4))
+    const noRegistry = withRegistrations([], () => planetParamsFor(83921, 2, RADIUS_ROWS_ORE_RULES))
+    expect(noRegistry.radiusTiles).toBe(radiusForPlanet(2))
+  })
+
+  it('keeps the ladder on a planet a save holds under ore rules 6 or earlier, so it never regenerates', () => {
+    for (const rules of [undefined, 2, 5, 6]) {
+      const held = underThreeRows(() => planetParamsFor(83921, 2, rules))
+      expect(held.radiusTiles, `rules ${rules}`).toBe(400)
+    }
+  })
+
+  it('stamps fresh planets with the rules that read the registry, from planet 2', () => {
+    expect(RADIUS_ROWS_ORE_RULES).toBe(ORE_RULES_VERSION)
+    const radii = underThreeRows(() => [2, 3, 4].map((planet) => freshRadiusTilesOf(planet)))
+    expect(radii).toEqual([450, 520, radiusForPlanet(4)])
+    expect(underThreeRows(() => freshPlanetParamsFor(83921, 3).radiusTiles)).toBe(520)
+  })
+
+  it('reads planet 1 at its ladder radius on rules 2, so its params stay byte-identical', () => {
+    const fresh = underThreeRows(() => freshPlanetParamsFor(83921, 1))
+    expect(fresh).toEqual(planetParamsFor(83921, 1, 2))
+    expect(fresh.radiusTiles).toBe(300)
   })
 })

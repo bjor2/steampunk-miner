@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest'
 import { FACING } from '../vehicle/vehiclePose'
 import { artefactCacheTile } from '../world/artefactCache'
 import { chunkDigest } from '../world/chunkDigest'
-import { planetParamsFor } from '../world/planetParams'
+import { freshPlanetParamsFor } from '../world/planetParams'
 import { chunkOfTile, type TilePoint } from '../world/tileGrid'
 import { currentDensityOfChunk, currentCellsOfChunk } from '../world/worldState'
 import type { CommandIntent } from './authorityCommand'
@@ -69,7 +69,7 @@ function sessionAtCache(): ScriptedSession {
 }
 
 function cacheChunkDigest(session: ScriptedSession, tile: TilePoint): string {
-  const params = planetParamsFor(WORLD_SEED, session.state().planet.index)
+  const params = freshPlanetParamsFor(WORLD_SEED, session.state().planet.index)
   const [cx, cy] = [chunkOfTile(tile.tx), chunkOfTile(tile.ty)]
   return chunkDigest({
     cells: currentCellsOfChunk(session.state().world, params, cx, cy),
@@ -187,7 +187,7 @@ describe('choosing an artefact (#46)', () => {
 })
 
 describe('the planet 2 cache (#46 amendments)', () => {
-  const planet2 = planetParamsFor(WORLD_SEED, 2)
+  const planet2 = freshPlanetParamsFor(WORLD_SEED, 2)
   const cache2 = artefactCacheTile(planet2)
 
   it('is inert to a player who already holds an artefact: interact submits nothing that applies', () => {

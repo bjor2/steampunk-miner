@@ -6,6 +6,8 @@ import { generateChunk } from './generateChunk'
 import {
   DEPTH_CURVE_ORE_RULES,
   planetParamsFor,
+  RADIUS_ROWS_ORE_RULES,
+  radiusForPlanet,
   SURFACE_LAYER_ORE_RULES,
   type PlanetParams,
 } from './planetParams'
@@ -14,6 +16,8 @@ import {
 const ROSTER_ORE_RULES = 2
 /** The ore rules of the mixed roster (#453), the last before the surface layer (ticket 625). */
 const MIXED_ROSTER_ORE_RULES = 4
+/** The ore rules of P2's own species pool (ticket 632), the last before the registry radius. */
+const P2_POOL_ORE_RULES = 6
 import { chunkRangeOfDisc } from './tileGrid'
 
 /**
@@ -28,14 +32,16 @@ import { chunkRangeOfDisc } from './tileGrid'
  * were while the P3+ kind table is empty, and the depth density curve of a planet from 3 entered under
  * ore rules 3 under 11, ticket 448, pinned by the curve digests and leaving every rules 2 digest as
  * it was, and the surface layer of a planet from 2 entered under ore rules 5 under 12, ticket 625,
- * which changes rock hardness only and so no cell, with the features loaded as the game loads
- * them): a committed
+ * which changes rock hardness only and so no cell, and the planet registry's radius of a planet from
+ * 2 entered under ore rules 7 under 13, ticket 643, pinned by the registry digests and leaving
+ * planet 1 and every planet past the registry's last row as rules 6 made them, with the features
+ * loaded as the game loads them): a committed
  * digest of the generator's cells and density. If this fails, the
  * generator changed what a seed makes: bump GENERATOR_VERSION (saves and replays of the old
  * world are then refused) and update the version and digests below in the same commit.
  */
 const GOLDEN = {
-  generatorVersion: 12,
+  generatorVersion: 13,
   wholePlanet1: '4219af3346401cb7',
   wholePlanet2: 'ff1572afae8b0e0f',
   farPlanetChunks: 'c602124184c77617',
@@ -50,6 +56,9 @@ const GOLDEN = {
   curveHeatPlanetChunks: 'c7bc93daae708f37',
   curvePlanet10Chunks: '4f76a8c7f7cf0c68',
   curvePlanet60Chunks: 'aec86f680144e408',
+  registryWholePlanet2: '6ca889f56379795a',
+  registryHeatPlanetChunks: 'd568c7407fa2f81b',
+  registryPlanet10Chunks: 'cda25bf497309628',
 }
 
 /** One digest over every chunk's digest in a fixed order. */
@@ -155,6 +164,30 @@ describe('generator golden digest', () => {
     for (const planet of [3, 8, 10, 60]) {
       const before = planetParamsFor(83921, planet, MIXED_ROSTER_ORE_RULES)
       expect(digestOfChunks(layered(83921, planet), HEAT_PLANET_CHUNKS), `planet ${planet}`).toBe(
+        digestOfChunks(before, HEAT_PLANET_CHUNKS),
+      )
+    }
+  })
+
+  it('makes the committed planets 2, 8 and 10 sized by the planet registry, ore rules 7 (ticket 643)', () => {
+    const sized = (seed: number, planet: number) =>
+      planetParamsFor(seed, planet, RADIUS_ROWS_ORE_RULES)
+    const planet2 = sized(4_000_000_000, 2)
+    expect(planet2.radiusTiles).not.toBe(radiusForPlanet(2))
+    expect(digestOfChunks(planet2, everyChunkOf(planet2))).toBe(GOLDEN.registryWholePlanet2)
+    expect(digestOfChunks(sized(83921, 8), HEAT_PLANET_CHUNKS)).toBe(
+      GOLDEN.registryHeatPlanetChunks,
+    )
+    expect(digestOfChunks(sized(83921, 10), HEAT_PLANET_CHUNKS)).toBe(GOLDEN.registryPlanet10Chunks)
+  })
+
+  it("makes planet 1 and the planets past the registry's last row under ore rules 7 as rules 6 did", () => {
+    const planet1 = planetParamsFor(83921, 1, RADIUS_ROWS_ORE_RULES)
+    expect(digestOfChunks(planet1, everyChunkOf(planet1))).toBe(GOLDEN.stampedWholePlanet1)
+    for (const planet of [11, 60]) {
+      const before = planetParamsFor(83921, planet, P2_POOL_ORE_RULES)
+      const sized = planetParamsFor(83921, planet, RADIUS_ROWS_ORE_RULES)
+      expect(digestOfChunks(sized, HEAT_PLANET_CHUNKS), `planet ${planet}`).toBe(
         digestOfChunks(before, HEAT_PLANET_CHUNKS),
       )
     }

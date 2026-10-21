@@ -10,7 +10,7 @@ import { PACING_TARGETS } from '../constants/pacingTargets'
 import { TICKS_PER_SECOND } from '../constants/physics'
 import { UPGRADE_IDS } from '../systems/economy/economyDefinition'
 import { bandOfTile } from '../systems/world/planetGeometry'
-import { planetParamsFor } from '../systems/world/planetParams'
+import { freshPlanetParamsFor } from '../systems/world/planetParams'
 import type { TilePoint } from '../systems/world/tileGrid'
 import type { RunEventName } from './eventNames'
 import { derivePurchaseChains, type PurchaseChain } from './purchaseChains'
@@ -153,7 +153,7 @@ function deepenEarlyBand(report: PacingReport, band: number): void {
 
 /** The band of a destroyed tile: the bot has dug there (#4 band thresholds of the planet). */
 function bandOfCell({ planet }: RunEvent, { tx, ty }: TilePoint, worldSeed: number): number {
-  return bandOfTile(planetParamsFor(worldSeed, planet), tx, ty)
+  return bandOfTile(freshPlanetParamsFor(worldSeed, planet), tx, ty)
 }
 
 /** One of the three gates the bot is held to (#29, S11 #65), and what it misses there. */

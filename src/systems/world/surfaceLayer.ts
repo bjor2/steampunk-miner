@@ -9,13 +9,20 @@
  * and not inside `R - d - 1`, compared on squared half-tile radii so it needs no square root (#4).
  * The ramp's step is `eta^(rise / K)`, `rise` the tiers from the surface to band 1, taken as the
  * fixed-iteration `nthRoot` of `eta` raised to whole powers, so every OS computes the same digits.
+ *
+ * The layer stays in whole cells from the surface at any radius (GD lock R2 on #302, ticket 643).
+ * On a planet sized by its registry row (the solved radius) a ramp deeper than band 1 is never
+ * shortened: it runs on past band 1 into band 2. Elsewhere, on #6's ladder past the last row and
+ * on every planet stamped before ore rules 7, it is cut to fit band 1 (ticket 625), so an endless
+ * planet's ramp never outgrows the planet. The report names the first planet where the ramp
+ * reaches past band 1 either way (`surfaceLayerReport.ts`).
  */
 import { ECONOMY } from '../economy/economy'
 import { compoundRatio } from '../economy/curveFamilies'
 import { oreTier } from '../economy/oreEconomy'
 import { surfaceTiersOf, type SurfaceLayerRules } from '../economy/surfaceLayerRules'
 import { cmp, mul, nthRoot, powInt, type BigStat } from '../money'
-import { isSurfaceLayerPlanet, type PlanetParams } from './planetParams'
+import { isRegistrySizedPlanet, isSurfaceLayerPlanet, type PlanetParams } from './planetParams'
 import { halfTileDistanceSq, halfTileRadiusSq, type TilePoint } from './tileGrid'
 
 export interface SurfaceLayer {
@@ -24,6 +31,8 @@ export interface SurfaceLayer {
   rampCells: number
   /** K(p) before the band-1 cap; above `rampCells` where the cap binds. */
   uncappedRampCells: number
+  /** The whole cells of depth that lie in band 1 at every tile. */
+  bandOneCells: number
   /** The hardness ratio between neighbouring ramp cells: at most `rampStepRatio` uncapped. */
   rampStepRatio: BigStat
   /** The rock hardness of each depth above band 1's own value, from the surface cell down. */
@@ -55,6 +64,11 @@ export function isRampCapped(layer: SurfaceLayer): boolean {
   return layer.rampCells < layer.uncappedRampCells
 }
 
+/** Whether the pinned cells and the uncut ramp reach deeper than band 1 (capped or not). */
+export function isRampPastBandOne(layer: SurfaceLayer): boolean {
+  return layer.pinnedCells + layer.uncappedRampCells > layer.bandOneCells
+}
+
 /** The layer of `params` under `rules`: what `surfaceLayerOf` caches for this build's rules. */
 export function buildSurfaceLayer(
   params: PlanetParams,
@@ -63,14 +77,17 @@ export function buildSurfaceLayer(
   const surfaceTiers = surfaceTiersOf(rules, params.planetIndex)
   const riseTiers = oreTier(params.planetIndex, BAND_ONE) - 1 - surfaceTiers
   if (riseTiers <= 0) return null
-  return rampedLayerOf(rules, { surfaceTiers, riseTiers, capCells: capCellsOf(params, rules) })
+  const bandOneCells = bandOneDepthCells(params)
+  const capCells = rampCapCellsOf(params, rules, bandOneCells)
+  return rampedLayerOf(rules, { surfaceTiers, riseTiers, bandOneCells, capCells })
 }
 
 interface LayerShape {
   surfaceTiers: number
   /** The hardness tiers from the surface up to band 1's rock. */
   riseTiers: number
-  /** The most ramp cells band 1 holds below the pinned cells. */
+  bandOneCells: number
+  /** The most ramp cells the planet's rules allow below the pinned cells. */
   capCells: number
 }
 
@@ -82,13 +99,16 @@ function rampedLayerOf(rules: SurfaceLayerRules, shape: LayerShape): SurfaceLaye
     pinnedCells: rules.pinnedCells,
     rampCells,
     uncappedRampCells,
+    bandOneCells: shape.bandOneCells,
     rampStepRatio: powInt(stepRoot, shape.riseTiers),
     hardnessByDepth: hardnessByDepthOf(rules.pinnedCells, rampCells, shape, stepRoot),
   }
 }
 
-function capCellsOf(params: PlanetParams, rules: SurfaceLayerRules): number {
-  return bandOneDepthCells(params) - rules.pinnedCells
+/** No cap at a registry row's solved radius (ticket 643); band 1 minus the pinned cells elsewhere. */
+function rampCapCellsOf(params: PlanetParams, rules: SurfaceLayerRules, bandOneCells: number) {
+  const isNeverShortened = isRegistrySizedPlanet(params)
+  return isNeverShortened ? Number.POSITIVE_INFINITY : bandOneCells - rules.pinnedCells
 }
 
 /**
@@ -148,7 +168,8 @@ function layerDepthOf(params: PlanetParams, tile: TilePoint, cells: number): num
 
 function cacheKeyOf(params: PlanetParams): string {
   const bandTwoStart = params.bandStartsHalfTileSq[0]
-  return `${params.planetIndex}:${params.oreRulesVersion}:${params.radiusTiles}:${bandTwoStart}`
+  const sizing = isRegistrySizedPlanet(params) ? 'row' : 'ladder'
+  return `${params.planetIndex}:${params.oreRulesVersion}:${params.radiusTiles}:${bandTwoStart}:${sizing}`
 }
 
 function cachedLayerOf(

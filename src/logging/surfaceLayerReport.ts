@@ -1,16 +1,23 @@
 /**
- * The surface layer's band-1 cap, reported only (ticket 625; the VS confirmation on #625,
- * 6301930425): K(p) grows about 1.68 cells a planet, so somewhere past the campaign the pinned
- * cells and the ramp no longer fit inside band 1 and the ramp is cut to fit, its per-cell step then
- * above 1.5x. The report names the first planet where that happens and lists each capped planet
- * amber with its actual step. Derived from the pure rules alone; nothing here is a run event.
+ * The surface layer against band 1, reported only (ticket 625; GD lock R2 on #302, 6306854642,
+ * ticket 643): K(p) grows about 1.68 cells a planet while the layer stays in whole cells at any
+ * radius, so somewhere past the campaign the pinned cells and the ramp reach deeper than band 1. On
+ * a planet at its registry row's solved radius the ramp is never shortened and runs past band 1; on
+ * #6's ladder it is cut to fit, its step then above 1.5x. The report names the first planet where
+ * the ramp reaches past band 1 and lists each such planet amber. Derived from the pure rules alone;
+ * nothing here is a run event.
  */
 import { SURFACE_REPORT_LAST_PLANET } from '../constants/balance'
 import { toFixedText } from '../systems/money'
 import { freshPlanetParamsFor } from '../systems/world/planetParams'
-import { isRampCapped, surfaceLayerOf, type SurfaceLayer } from '../systems/world/surfaceLayer'
+import {
+  isRampCapped,
+  isRampPastBandOne,
+  surfaceLayerOf,
+  type SurfaceLayer,
+} from '../systems/world/surfaceLayer'
 
-export interface CappedRamp {
+export interface RampPastBandOne {
   planet: number
   layer: SurfaceLayer
 }
@@ -19,29 +26,44 @@ export interface CappedRamp {
 const ANY_WORLD_SEED = 0
 const STEP_PLACES = 3
 
-/** The planets from 1 to `lastPlanet` whose ramp the band-1 cap shortened, in order. */
-export function cappedRampsThrough(lastPlanet: number): CappedRamp[] {
-  return Array.from({ length: lastPlanet }, (_, at) => at + 1).flatMap(cappedRampOn)
+/** The planets from 1 to `lastPlanet`, entered fresh, whose ramp reaches past band 1, in order. */
+export function rampsPastBandOneThrough(lastPlanet: number): RampPastBandOne[] {
+  return Array.from({ length: lastPlanet }, (_, at) => at + 1).flatMap(rampPastBandOneOn)
 }
 
-/** The report's lines: the first planet where the cap binds, then each capped planet amber. */
-export function surfaceLayerCapLines(lastPlanet: number = SURFACE_REPORT_LAST_PLANET): string[] {
-  const capped = cappedRampsThrough(lastPlanet)
-  return [firstCappedLine(capped, lastPlanet), ...capped.map(amberLineOf)]
+/** The report's lines: the first planet where the ramp reaches past band 1, then each one amber. */
+export function surfaceLayerBandOneLines(
+  lastPlanet: number = SURFACE_REPORT_LAST_PLANET,
+): string[] {
+  const past = rampsPastBandOneThrough(lastPlanet)
+  return [firstPastLine(past, lastPlanet), ...past.map(amberLineOf)]
 }
 
-function cappedRampOn(planet: number): CappedRamp[] {
+function rampPastBandOneOn(planet: number): RampPastBandOne[] {
   const layer = surfaceLayerOf(freshPlanetParamsFor(ANY_WORLD_SEED, planet))
-  return layer !== null && isRampCapped(layer) ? [{ planet, layer }] : []
+  return layer !== null && isRampPastBandOne(layer) ? [{ planet, layer }] : []
 }
 
-function firstCappedLine(capped: readonly CappedRamp[], lastPlanet: number): string {
-  if (capped.length === 0) return `the band-1 cap binds on no planet through planet ${lastPlanet}`
-  return `the band-1 cap first binds on planet ${capped[0].planet}`
+function firstPastLine(past: readonly RampPastBandOne[], lastPlanet: number): string {
+  if (past.length === 0) return `the ramp stays inside band 1 on every planet to ${lastPlanet}`
+  return `the ramp first reaches past band 1 on planet ${past[0].planet}`
 }
 
-function amberLineOf({ planet, layer }: CappedRamp): string {
+function amberLineOf({ planet, layer }: RampPastBandOne): string {
   const step = toFixedText(layer.rampStepRatio, STEP_PLACES)
-  const cells = `${layer.rampCells} of ${layer.uncappedRampCells} cells`
-  return `planet ${planet} amber: ramp capped at ${cells}, ${step}x a cell`
+  return `planet ${planet} amber: ${rampTextOf(layer)}, ${step}x a cell`
+}
+
+/** Cut to fit band 1 on #6's ladder; uncut, past it, at a registry row's solved radius. */
+function rampTextOf(layer: SurfaceLayer): string {
+  return isRampCapped(layer) ? cutRampOf(layer) : uncutRampOf(layer)
+}
+
+function cutRampOf(layer: SurfaceLayer): string {
+  return `ramp capped at ${layer.rampCells} of ${layer.uncappedRampCells} cells`
+}
+
+function uncutRampOf(layer: SurfaceLayer): string {
+  const layerCells = layer.pinnedCells + layer.rampCells
+  return `layer ${layerCells} cells, ${layerCells - layer.bandOneCells} past band 1`
 }

@@ -26,6 +26,9 @@ import {
   type ArtefactChoiceModel,
 } from '../systems/views/artefactChoiceModel'
 import { artefactCacheTile } from '../systems/world/artefactCache'
+import { planetParamsOf } from '../systems/authority/planetOfState'
+import { dockSiteOf } from '../systems/world/dockSite'
+import type { PlanetParams } from '../systems/world/planetParams'
 import { plantOnWall, prepareBlaster } from '../systems/authority/charges/chargeFixtures'
 import { ArtefactChoiceView } from './artefact/ArtefactChoiceView'
 import { SliceScreenView } from './screens/SliceScreen'
@@ -46,7 +49,6 @@ import { selectRefineryBayModel, type RefineryBayModel } from '../systems/views/
 import {
   dockAtBayOf,
   mineSurfaceOre,
-  REFINERY_SITE,
   sessionOnPlanet,
 } from '../systems/authority/refinery/refineryFixtures'
 import type { PlaqueModel } from '../systems/views/plaqueModel'
@@ -409,8 +411,11 @@ function renderRefineryScreens(): string[] {
   const session = sessionOnPlanet(3, '1e30')
   session.submit(0, { type: 'debug.setUpgrade', payload: { upgradeId: 'drill_power', level: 250 } })
   session.submit(0, { type: 'debug.setUpgrade', payload: { upgradeId: 'drill_tip', level: 130 } })
-  const tick = mineSurfaceOre(session, 10, 6)
-  dockAtBayOf(session, tick, REFINERY_SITE, 'refinery')
+  // The session's own planet 3: sized by the ladder here, where no slice registers its radius.
+  const params = planetParamsOf(session.state().planet) as PlanetParams
+  const site = dockSiteOf(params)
+  const tick = mineSurfaceOre(session, 10, 6, params)
+  dockAtBayOf(session, tick, site, 'refinery')
   const tier = Number.parseInt(Object.keys(session.vehicle().cargo.ore)[0], 10)
   session.submit(tick + 1, { type: 'queueRefine', payload: { resourceTier: tier, units: 2 } })
   const ui = {
@@ -421,7 +426,7 @@ function renderRefineryScreens(): string[] {
   }
   const refinery = selectRefineryBayModel(session.state(), 'p1', ui)
   expect(refinery.ore.length).toBeGreaterThan(0)
-  dockAtBayOf(session, tick + 2 + 180 * 60, REFINERY_SITE, 'sell')
+  dockAtBayOf(session, tick + 2 + 180 * 60, site, 'sell')
   const sell = selectSellBayModel(session.state(), 'p1', ui)
   expect(sell.refined?.lines).toHaveLength(1)
   return [

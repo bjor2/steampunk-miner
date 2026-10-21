@@ -1,4 +1,6 @@
 import { describe, expect, it } from 'vitest'
+import { withRegistrations } from '../../registries/registrar'
+import type { SliceDefinition } from '../../registries/sliceDefinition'
 import { hardnessOfTile } from '../authority/groundDrill'
 import { ECONOMY } from '../economy/economy'
 import { blockHardness, oreHardness, oreTier } from '../economy/oreEconomy'
@@ -8,7 +10,14 @@ import { cmp, div, fromCanonical, toCanonical, type BigStat } from '../money'
 import { drillWorkPerTick, tileWorkToBreak, type DrillStats } from '../vehicle/drillRule'
 import { freshPlanetParamsFor, planetParamsFor, type PlanetParams } from './planetParams'
 import { bandOfTile } from './planetGeometry'
-import { buildSurfaceLayer, isRampCapped, surfaceLayerOf } from './surfaceLayer'
+import {
+  buildSurfaceLayer,
+  isRampCapped,
+  isRampPastBandOne,
+  surfaceLayerOf,
+  surfaceRockHardnessAt,
+} from './surfaceLayer'
+import type { TilePoint } from './tileGrid'
 import { GROUND_CELL, oreCell, RESOURCE_FAMILY } from './worldCell'
 
 // Ticket 625: Systems' spec on #306 (6301879176), the ramp amendment (6301918833) and the VS
@@ -56,6 +65,26 @@ function largestNeighbourRatio(values: readonly BigStat[]): BigStat {
   }, ONE)
 }
 
+/** A registry whose planet 10 is 100 tiles: band 1 is 8 whole cells, too few for its ramp. */
+const TINY_PLANET_10: SliceDefinition = {
+  id: 'fake',
+  register: (r) =>
+    r.planetRadius({ id: 'fake.radius', radiusTilesOf: (planet) => (planet === 10 ? 100 : null) }),
+}
+
+/** Band-2 rock tiles of the first octant no deeper than `layerCells` below the surface. */
+function rampCellsInBandTwo(params: PlanetParams, layerCells: number): TilePoint[] {
+  const tiles: TilePoint[] = []
+  const shallowest = params.radiusTiles - layerCells
+  for (let tx = 0; tx * tx * 2 <= params.radiusTiles * params.radiusTiles; tx++) {
+    for (let ty = params.radiusTiles; ty >= tx && ty * ty + tx * tx >= shallowest ** 2; ty--) {
+      const isRockInRamp = surfaceRockHardnessAt(params, { tx, ty }) !== null
+      if (isRockInRamp && bandOfTile(params, tx, ty) === 2) tiles.push({ tx, ty })
+    }
+  }
+  return tiles
+}
+
 function layerOn(planetIndex: number) {
   const layer = surfaceLayerOf(freshPlanetParamsFor(WORLD_SEED, planetIndex))
   if (layer === null) throw new Error(`no surface layer on planet ${planetIndex}`)
@@ -90,9 +119,9 @@ describe('surface layer', () => {
 
   it('keeps every deeper band at its absolute value: no band is rebased', () => {
     const params = freshPlanetParamsFor(WORLD_SEED, 10)
-    const shipped = planetParamsFor(WORLD_SEED, 10, 4)
     for (let depth = 60; depth < params.radiusTiles - params.coreRadiusTiles - 1; depth += 37) {
-      expect(toCanonical(rockAt(params, depth))).toBe(toCanonical(rockAt(shipped, depth)))
+      const band = bandOfTile(params, 0, columnTile(params, depth).ty)
+      expect(toCanonical(rockAt(params, depth))).toBe(toCanonical(blockHardness(10, band)))
     }
   })
 
@@ -129,7 +158,7 @@ describe('surface layer', () => {
     expect(toCanonical(hardness)).toBe(toCanonical(oreHardness(oreTier(10, 1))))
   })
 
-  it('caps the ramp at band 1 minus the pinned cells first on planet 43, its step then above 1.5x', () => {
+  it('caps the ramp at band 1 minus the pinned cells on the ladder, first on planet 43, its step then above 1.5x', () => {
     const capped = Array.from({ length: 60 }, (_, at) => at + 2).filter((planet) => {
       return isRampCapped(layerOn(planet))
     })
@@ -138,6 +167,33 @@ describe('surface layer', () => {
     expect(layer.rampCells).toBeLessThan(layer.uncappedRampCells)
     expect(cmp(layer.rampStepRatio, MAX_STEP)).toBe(1)
     expect(cmp(layerOn(42).rampStepRatio, MAX_STEP)).toBeLessThanOrEqual(0)
+  })
+
+  it('never shortens the ramp at a registry row radius: it runs on into band 2 (ticket 643)', () => {
+    withRegistrations([TINY_PLANET_10], () => {
+      const params = freshPlanetParamsFor(WORLD_SEED, 10)
+      const layer = layerOn(10)
+      expect(params.radiusTiles).toBe(100)
+      expect(isRampCapped(layer)).toBe(false)
+      expect(isRampPastBandOne(layer)).toBe(true)
+      expect(layer.rampCells).toBe(16)
+      const softBandTwo = rampCellsInBandTwo(params, layer.pinnedCells + layer.rampCells)
+      expect(softBandTwo.length).toBeGreaterThan(0)
+      for (const tile of softBandTwo) {
+        const hardness = hardnessOfTile(params, tile, GROUND_CELL)
+        expect(cmp(hardness, blockHardness(10, 1))).toBe(-1)
+      }
+    })
+  })
+
+  it('keeps the ramp in whole cells from the surface at any radius: the registry radius leaves it as the ladder had it (ticket 643)', () => {
+    for (const planet of [2, 5, 10]) {
+      const sized = layerOn(planet)
+      const ladder = surfaceLayerOf(planetParamsFor(WORLD_SEED, planet, 6))
+      expect(sized.hardnessByDepth.map(toCanonical), `planet ${planet}`).toEqual(
+        ladder?.hardnessByDepth.map(toCanonical),
+      )
+    }
   })
 
   it('keys a harder surface on its solar system row, and a planet row on top of its system', () => {

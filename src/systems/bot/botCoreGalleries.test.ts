@@ -9,7 +9,7 @@ import { setPlanetCommand, setPlanetSeedCommand } from '../startScenarioCommands
 import { setUpgradeCommand } from '../vehicle/vehicleCommands'
 import { dockSiteOf } from '../world/dockSite'
 import { coreTileCount } from '../world/planetGeometry'
-import { planetParamsFor } from '../world/planetParams'
+import { freshPlanetParamsFor } from '../world/planetParams'
 import type { TilePoint } from '../world/tileGrid'
 import { noRouteDeaths } from './botDeathReplay'
 import type { BotPlanet } from './botPilot'
@@ -57,7 +57,7 @@ function botOnPlanet9(): { session: BotSession; planet: BotPlanet } {
   })
   const session = createBotSession(start, 'p1')
   for (const intent of ARRIVED_ON_PLANET_9) session.submit(intent)
-  const params = planetParamsFor(OFF_CENTRE_SEED, OFF_CENTRE_PLANET)
+  const params = freshPlanetParamsFor(OFF_CENTRE_SEED, OFF_CENTRE_PLANET)
   const layout = newMineLayout(params, dockSiteOf(params))
   return {
     session,
@@ -125,14 +125,14 @@ function coreTilesTheGoalReaches(layout: MineLayout): Set<string> {
 
 /** Planet 9's layout with the shaft entering from column `top` and through the core at `atCore`. */
 function layoutThroughCoreAt(top: number, atCore: number): MineLayout {
-  const params = planetParamsFor(OFF_CENTRE_SEED, OFF_CENTRE_PLANET)
+  const params = freshPlanetParamsFor(OFF_CENTRE_SEED, OFF_CENTRE_PLANET)
   const layout = { ...newMineLayout(params, dockSiteOf(params)), shaftColumn: top }
   layout.shaftJogs.push({ row: params.coreRadiusTiles + 4, column: atCore })
   return layout
 }
 
 describe('pacing bot core gallery rows (#136)', () => {
-  const params = planetParamsFor(OFF_CENTRE_SEED, OFF_CENTRE_PLANET)
+  const params = freshPlanetParamsFor(OFF_CENTRE_SEED, OFF_CENTRE_PLANET)
   const radius = params.coreRadiusTiles
   const needed = coreFragmentsNeeded(coreTileCount(params))
   const shaftColumns = rangeOf(-radius, radius)

@@ -254,8 +254,8 @@ export const CAMPAIGN_LAST_PLANET = 40
 
 /**
  * The last planet the surface layer report reads (ticket 625): the tree lane's P60
- * (`balance:tree`), past the campaign, so the first planet where the band-1 cap binds shows before
- * endless play reaches it (VS on #625).
+ * (`balance:tree`), past the campaign, so the first planet where the ramp runs past band 1 shows
+ * before endless play reaches it (VS on #625).
  */
 export const SURFACE_REPORT_LAST_PLANET = 60
 

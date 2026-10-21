@@ -41,6 +41,8 @@ const ROSTER_STEP = { version: 'generatorVersion', from: 9, to: 10 }
 const DEPTH_CURVE_STEP = { version: 'generatorVersion', from: 10, to: 11 }
 /** Ticket 625: rock on a planet entered under ore rules 5 is pinned at the surface. */
 const SURFACE_LAYER_STEP = { version: 'generatorVersion', from: 11, to: 12 }
+/** Ticket 643: a planet entered under ore rules 7 takes its radius from the planet registry. */
+const REGISTRY_RADIUS_STEP = { version: 'generatorVersion', from: 12, to: 13 }
 /** K8 #218: every fixture was written before the charge racks went by size. */
 const CHARGE_RACK_STEP = { version: 'snapshotVersion', from: 19, to: 20 }
 /** Ticket 399: every fixture was written before the swept cut's cursor carried work. */
@@ -90,7 +92,7 @@ describe('save migration chain', () => {
     ])
   })
 
-  it('loads a pre-#175 save through the snapshot 18 -> 19, 19 -> 20 and 20 -> 21 steps, then the generator 5 -> 6, 6 -> 7, 7 -> 8, 8 -> 9, 9 -> 10, 10 -> 11 and 11 -> 12 steps', () => {
+  it('loads a pre-#175 save through the snapshot 18 -> 19, 19 -> 20 and 20 -> 21 steps, then the generator 5 -> 6, 6 -> 7, 7 -> 8, 8 -> 9, 9 -> 10, 10 -> 11, 11 -> 12 and 12 -> 13 steps', () => {
     const reading = withRegistrations([], () => restored(PLANET_1_SAVE))
     expect(reading.migrations).toEqual([
       SNAPSHOT_STEP,
@@ -103,6 +105,7 @@ describe('save migration chain', () => {
       ROSTER_STEP,
       DEPTH_CURVE_STEP,
       SURFACE_LAYER_STEP,
+      REGISTRY_RADIUS_STEP,
       SLOT_FORMAT_STEP,
       PACKED_CHUNKS_STEP,
     ])
@@ -125,6 +128,7 @@ describe('save migration chain', () => {
       ROSTER_STEP,
       DEPTH_CURVE_STEP,
       SURFACE_LAYER_STEP,
+      REGISTRY_RADIUS_STEP,
       SLOT_FORMAT_STEP,
       PACKED_CHUNKS_STEP,
       { restoredSections: [{ section: 'save-probe.notes' }] },
@@ -173,10 +177,10 @@ describe('save migration chain', () => {
     )
   })
 
-  it('writes the params this build generates and generator version 12', () => {
+  it('writes the params this build generates and generator version 13', () => {
     const { migrated } = migrateSaveSlot(PLANET_10_SAVE)
     expect(migrated).toMatchObject({
-      generatorVersion: 12,
+      generatorVersion: 13,
       world: { params: planetParamsFor(83921, 10) },
     })
   })
@@ -192,13 +196,30 @@ describe('save migration chain', () => {
         ROSTER_STEP,
         DEPTH_CURVE_STEP,
         SURFACE_LAYER_STEP,
+        REGISTRY_RADIUS_STEP,
       ],
     ],
-    [7, '#147', [ORE_MIX_STEP, ORE_RULES_STEP, ROSTER_STEP, DEPTH_CURVE_STEP, SURFACE_LAYER_STEP]],
-    [8, 'ticket 445', [ORE_RULES_STEP, ROSTER_STEP, DEPTH_CURVE_STEP, SURFACE_LAYER_STEP]],
-    [9, 'ticket 446', [ROSTER_STEP, DEPTH_CURVE_STEP, SURFACE_LAYER_STEP]],
-    [10, 'ticket 448', [DEPTH_CURVE_STEP, SURFACE_LAYER_STEP]],
-    [11, 'ticket 625', [SURFACE_LAYER_STEP]],
+    [
+      7,
+      '#147',
+      [
+        ORE_MIX_STEP,
+        ORE_RULES_STEP,
+        ROSTER_STEP,
+        DEPTH_CURVE_STEP,
+        SURFACE_LAYER_STEP,
+        REGISTRY_RADIUS_STEP,
+      ],
+    ],
+    [
+      8,
+      'ticket 445',
+      [ORE_RULES_STEP, ROSTER_STEP, DEPTH_CURVE_STEP, SURFACE_LAYER_STEP, REGISTRY_RADIUS_STEP],
+    ],
+    [9, 'ticket 446', [ROSTER_STEP, DEPTH_CURVE_STEP, SURFACE_LAYER_STEP, REGISTRY_RADIUS_STEP]],
+    [10, 'ticket 448', [DEPTH_CURVE_STEP, SURFACE_LAYER_STEP, REGISTRY_RADIUS_STEP]],
+    [11, 'ticket 625', [SURFACE_LAYER_STEP, REGISTRY_RADIUS_STEP]],
+    [12, 'ticket 643', [REGISTRY_RADIUS_STEP]],
   ])(
     'keeps every chunk edit, the wallet and the levels of a generator %i save (%s)',
     (generatorVersion, _, steps) => {
@@ -244,7 +265,7 @@ describe('save migration chain', () => {
 describe('save migration chain: levels to steps (#181)', () => {
   const saved = PLANET_5_SAVE.profile.players.p1
 
-  it('loads a pre-#181 save through the snapshot 18 -> 19, 19 -> 20 and 20 -> 21 steps, then the generator 6 -> 7, 7 -> 8, 8 -> 9, 9 -> 10, 10 -> 11 and 11 -> 12 steps', () => {
+  it('loads a pre-#181 save through the snapshot 18 -> 19, 19 -> 20 and 20 -> 21 steps, then the generator 6 -> 7, 7 -> 8, 8 -> 9, 9 -> 10, 10 -> 11, 11 -> 12 and 12 -> 13 steps', () => {
     expect(versionStepsOf(restored(PLANET_5_SAVE))).toEqual([
       SNAPSHOT_STEP,
       CHARGE_RACK_STEP,
@@ -255,6 +276,7 @@ describe('save migration chain: levels to steps (#181)', () => {
       ROSTER_STEP,
       DEPTH_CURVE_STEP,
       SURFACE_LAYER_STEP,
+      REGISTRY_RADIUS_STEP,
       SLOT_FORMAT_STEP,
       PACKED_CHUNKS_STEP,
     ])

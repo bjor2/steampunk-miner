@@ -105,7 +105,7 @@ function spawnPlanetOf(params: PlanetParams): SpawnPlanet {
 
 function densityKeepBelowOf(params: PlanetParams): number {
   const range = fromSafeInteger(DENSITY_ROLL_RANGE)
-  return toSafeInteger(floor(mul(spawnDensityScale(params.planetIndex), range)))
+  return toSafeInteger(floor(mul(spawnDensityScale(params), range)))
 }
 
 function generateSpawnPoints(planet: SpawnPlanet, cx: number, cy: number): SpawnPoint[] {

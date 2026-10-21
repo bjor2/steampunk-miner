@@ -20,7 +20,7 @@ import { formatNdjsonLine } from '../src/logging/ndjson'
 import { loggedCommandsOf } from '../src/logging/commandLog'
 import { reportRowLines } from '../src/logging/reportRows'
 import { travelClampLines } from '../src/logging/travelClampReport'
-import { surfaceLayerCapLines } from '../src/logging/surfaceLayerReport'
+import { surfaceLayerBandOneLines } from '../src/logging/surfaceLayerReport'
 import {
   formatSeedPacingTable,
   medianPacingReport,
@@ -84,7 +84,10 @@ const report = [
   ]),
   listSection('Tunnel wrecker (reported only, #111)', wreckerDiveLines(deriveWreckerDives(events))),
   listSection('Slice report rows (reported only, #223)', reportRowLines(runs)),
-  listSection('Surface layer band-1 cap (reported only, ticket 625)', surfaceLayerCapLines()),
+  listSection(
+    'Surface layer past band 1 (reported only, tickets 625, 643)',
+    surfaceLayerBandOneLines(),
+  ),
   listSection('Travel fee clamp binds (reported only, ticket 648)', travelClampLines(runs)),
   spreeSection(runs),
   comparisonSection(summary),

@@ -17,6 +17,10 @@
  * rules 3 from planet 3 (ticket 448), while planets 1 and 2 and every planet a save holds keep the
  * step bands; version 12 pins the rock of the top 3 cells at the surface hardness and ramps it to
  * band 1's value on every planet entered under ore rules 5 from planet 2 (ticket 625), the cells
- * themselves unchanged, while planet 1 and every planet a save holds keep the shipped band hardness.
+ * themselves unchanged, while planet 1 and every planet a save holds keep the shipped band hardness;
+ * version 13 sizes every planet entered under ore rules 7 from planet 2 by its planet registry row
+ * (ticket 643), its core, bands and band-placed content with it, and never shortens the surface
+ * ramp to fit band 1, while planet 1 (whose row is its ladder radius), every planet past the last
+ * row and every planet a save holds keep #6's ladder.
  */
-export const GENERATOR_VERSION = 12
+export const GENERATOR_VERSION = 13
