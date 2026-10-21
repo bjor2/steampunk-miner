@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-10-21T08:44:24+02:00",
+  "updated_at": "2026-10-21T08:47:36+02:00",
   "caps": {
     "grok": 12,
     "claude": 10,
@@ -121,14 +121,14 @@
     }
   ],
   "gate": {
-    "busy": 1,
+    "busy": 2,
     "max": 3
   },
   "tester": {
     "state": "running",
-    "phase": "nightly-balance-report",
+    "phase": "nightly-bench",
     "sha": "23cacc8f5df25d9cfbaa5e6661feb03dda5ad1fe",
-    "since": "2026-10-21T06:44:18Z",
+    "since": "2026-10-21T06:47:29Z",
     "holds_gate": true,
     "claude_slot": null,
     "last_run": "2026-10-19T11:54:41Z",
@@ -322,11 +322,11 @@
     }
   ],
   "last_refill": {
-    "at": "2026-10-21 08:39 CEST",
-    "mode": "refill-dev",
-    "triggers": "#606",
-    "started": "#606->C2/A1",
-    "note": "spawned 1 worker(s)"
+    "at": "2026-10-21 08:44 CEST",
+    "mode": "pass",
+    "triggers": "#602",
+    "started": "",
+    "note": "no pickable build ticket"
   },
   "totals": {
     "grok": {
