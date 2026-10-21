@@ -194,7 +194,7 @@ boxes and marks the band; #689 fails on a box over budget or inside the band.
 
 ```
 +--------------------------------------------+ 0      safe-top above this line
-| [hull====] [fuel====] [cargo==]  1 234 m ooo|        strip 36 px: 3 bars, depth, 3 status icons
+| [hull===] [fuel===] [cargo==] 1 234 m ooo |        strip 36 px: 3 bars, depth, 3 status icons
 +--------------------------------------------+ 36     heat: a 4 px ember line along the strip's foot
 |                                            |
 |                                            |
@@ -220,7 +220,7 @@ share and is not a HUD box.
 
 ```
 +----------------------------------------------+ 0
-|           [hull==][fuel==][cargo=] 1 234 m oooooo        |   strip 720x44 centred: 6 status icons
+|     [hull==][fuel==][cargo=] 1 234 m oooooo  |        strip 720x44 centred: 6 status icons
 |                                              | 44
 |                                              |
 |                                              | 270   middle band top
