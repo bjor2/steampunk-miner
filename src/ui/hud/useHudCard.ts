@@ -1,5 +1,5 @@
 /**
- * The tap card of a compact HUD box (#500): a clean tap on the box (one finger, released inside,
+ * The tap card of a compact HUD box (#500; since the strip of ticket 684, the hint chip's): a clean tap on the box (one finger, released inside,
  * no drag; `systems/input/cleanTap.ts`) opens the card that shows the box with its words, and
  * the next one closes it. A press on a control or a tappable amount inside is that control's
  * own. UI state only, never a command; a touch that starts outside the box never reaches it.

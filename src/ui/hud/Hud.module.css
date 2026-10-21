@@ -6,209 +6,18 @@
   pointer-events: none;
 }
 
-.cluster,
-.position,
-.banner,
+/* The dock arrow in the strip's detail (`DetailReadouts`), turned to its octant. */
+.arrow {
+  display: inline-block;
+  transform: rotate(var(--arrow-turn, 0deg));
+}
+
 .prompts {
   position: absolute;
   padding: var(--space-2) var(--space-3);
   border: 1px solid var(--color-brass);
   border-radius: var(--radius-panel);
   background: var(--color-panel);
-}
-
-.cluster {
-  top: var(--space-3);
-  left: var(--space-3);
-  display: grid;
-  gap: var(--space-2);
-}
-
-/* A dial beside its element: the gauge's name over its glyph-and-value facts (pass #428). */
-.gauge {
-  display: grid;
-  grid-template-columns: auto 1fr;
-  column-gap: var(--space-2);
-  align-items: center;
-}
-
-.position {
-  top: var(--space-3);
-  right: var(--space-3);
-  display: grid;
-  gap: var(--space-1);
-  min-width: 10rem;
-}
-
-/* A row's value drawn as markup (a badge, a lamp, the arrow), its glyph first. */
-.value {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--space-1);
-}
-
-/* #41 casing feel: the bay teal while the grade holds the band, flashing amber when it does not. */
-.casingBadge {
-  color: var(--color-casing-safe);
-}
-
-.casingBadge[data-state='short'] {
-  color: var(--color-casing-weak);
-  animation: casing-flash 0.8s steps(2, jump-none) infinite;
-}
-
-/* #107: the guns are on Auto but the rescue floor holds them; the low-energy amber, said in text. */
-.gunsIdle {
-  color: var(--color-amber);
-  text-align: right;
-}
-
-/* The bore gun's brass auto lamp (ticket 317): dark off, green firing, amber holding. */
-.autoLamp::before {
-  content: '';
-  display: inline-block;
-  width: 0.6em;
-  height: 0.6em;
-  margin-right: 0.3em;
-  border: 1px solid var(--color-brass);
-  border-radius: 50%;
-  background: var(--color-bg);
-}
-
-.autoLamp[data-lamp='green']::before {
-  background: var(--color-teal);
-}
-
-.autoLamp[data-lamp='amber'] {
-  color: var(--color-amber);
-}
-
-.autoLamp[data-lamp='amber']::before {
-  background: var(--color-amber);
-}
-
-@keyframes casing-flash {
-  to {
-    opacity: 0.4;
-  }
-}
-
-/* #111 telegraph: a tunnel wrecker gnaws the route, a slow amber pulse in the same badge. */
-.casingBadge[data-state='gnawed'] {
-  color: var(--color-casing-weak);
-  animation: casing-pulse 1.2s ease-in-out infinite alternate;
-}
-
-@keyframes casing-pulse {
-  to {
-    opacity: 0.35;
-    text-shadow: 0 0 6px var(--color-casing-weak);
-  }
-}
-
-.arrow {
-  display: inline-block;
-  transform: rotate(var(--arrow-turn, 0deg));
-}
-
-.banner {
-  top: var(--space-3);
-  left: 50%;
-  transform: translateX(-50%);
-  display: flex;
-  align-items: center;
-  gap: var(--space-3);
-}
-
-.state {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--space-1);
-}
-
-/* #158 "Combat statuses": the stack of triangle icons, hidden while it is empty. */
-.statuses {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--space-1);
-}
-
-.statuses:empty {
-  display: none;
-}
-
-/* Urgency is a pulse rate; with flashes off, a thicker rim says the same. */
-.status {
-  display: inline-flex;
-  gap: var(--space-1);
-  align-items: center;
-  border: 2px solid transparent;
-  border-radius: 4px;
-}
-
-.status[data-urgency='slow'][data-pulsing] {
-  animation: status-pulse 1.6s ease-in-out infinite;
-}
-
-.status[data-urgency='fast'][data-pulsing] {
-  animation: status-pulse 0.6s ease-in-out infinite;
-}
-
-.status[data-urgency='slow']:not([data-pulsing]) {
-  border-color: var(--color-ember);
-}
-
-.status[data-urgency='fast']:not([data-pulsing]) {
-  border-width: 3px;
-  border-color: var(--color-ember);
-}
-
-@keyframes status-pulse {
-  50% {
-    opacity: 0.35;
-  }
-}
-
-/* The "+N more" pip: the statuses that did not fit the three. */
-.statusMore {
-  padding: 0 var(--space-1);
-  border: 1px solid var(--color-ember);
-  border-radius: 1em;
-  color: var(--color-ember);
-  font-weight: bold;
-}
-
-/* Text, an icon id and hatching carry the warning; the blink is only an extra. */
-.warning {
-  display: inline-flex;
-  align-items: center;
-  padding: 0 var(--space-1);
-  background-image: repeating-linear-gradient(
-    45deg,
-    rgb(201 162 75 / 0.35) 0 4px,
-    transparent 4px 8px
-  );
-}
-
-.warning[data-level='critical']::before {
-  content: '!! ';
-}
-
-.warning[data-level='low']::before {
-  content: '! ';
-}
-
-.warning[data-flashing] {
-  animation: blink 1s steps(2, start) infinite;
-}
-
-@keyframes blink {
-  to {
-    visibility: hidden;
-  }
-}
-
-.prompts {
   bottom: var(--space-3);
   left: 50%;
   transform: translateX(-50%);
@@ -283,28 +92,26 @@
 }
 
 /*
- * The compact HUD (#500 TD shape 4.2; GD rulings 2, 4 and 7): on a phone the same boxes become
- * grid cells along the top edge instead of floating panels, so no two can overlap. Held upright:
- * the gauges and the Tech tree button on the first row, either side of the pause button's gap
- * (`right: 30%`, ticket 472), then the gauges, the readouts and the prompts across the width.
- * Sideways: the gauges along the top edge up to the pause button, above the vehicle's keep-clear
- * square; under them a left column (status, prompts) that stops at that square
- * (`--vehicle-clear-left`) and a right column (Tech tree, readouts) past the pause button. The
- * threat markers keep the space under the rows. Each box takes a clean tap for its card.
+ * The compact HUD (#500 TD shape 4.2; GD rulings 2, 4 and 7; the strip of ticket 684): on a phone
+ * the strip spans the top edge and the rest are grid cells under it, so no two can overlap. Held
+ * upright: the Tech tree button on the first row, right of the pause button's gap (`right: 30%`,
+ * ticket 472), which keeps the row at least a control tall; then the prompts across the width.
+ * Sideways: a left column of prompts that stops at the vehicle's keep-clear square
+ * (`--vehicle-clear-left`) and the Tech tree past the pause button. The threat markers keep the
+ * space under the rows.
  */
 .hud[data-density='compact'] {
   display: grid;
   grid-template-columns: minmax(0, calc(70% - 61px)) minmax(0, 1fr) auto;
-  grid-template-rows: repeat(4, min-content) minmax(0, 1fr);
+  grid-template-rows: minmax(var(--control-min), min-content) min-content minmax(0, 1fr);
   grid-template-areas:
-    'status . tech'
-    'gauges gauges gauges'
-    'readouts readouts readouts'
+    '. . tech'
     'prompts prompts prompts'
     'threats threats threats';
   align-items: start;
   gap: var(--space-2);
   padding: var(--space-2);
+  padding-top: calc(var(--strip-height) + var(--space-2));
 }
 
 :global([data-orientation='landscape']) .hud[data-density='compact'] {
@@ -313,89 +120,17 @@
     minmax(0, 1fr)
     calc(56px + var(--space-2))
     minmax(0, calc(30% - 12px));
-  grid-template-rows: repeat(3, min-content) minmax(0, 1fr);
+  grid-template-rows: min-content minmax(0, 1fr);
   grid-template-areas:
-    'gauges gauges . tech'
-    'status . . readouts'
-    'prompts . . readouts'
+    'prompts . . tech'
     'threats threats threats threats';
 }
 
-.hud[data-density='compact'] .cluster,
-.hud[data-density='compact'] .position,
-.hud[data-density='compact'] .banner,
 .hud[data-density='compact'] .prompts {
   position: static;
   min-width: 0;
   padding: var(--space-1) var(--space-2);
   transform: none;
-}
-
-.hud[data-density='compact'] .cluster,
-.hud[data-density='compact'] .position,
-.hud[data-density='compact'] .banner {
-  pointer-events: auto;
-  touch-action: manipulation;
-}
-
-.hud[data-density='compact'] .cluster {
-  grid-area: gauges;
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--space-1) var(--space-2);
-}
-
-.hud[data-density='compact'] .gauge {
-  display: flex;
-  align-items: center;
-  gap: var(--space-1);
-}
-
-/* The glyph names the gauge and the number reads it; the dial's sweep is the card's. */
-.hud[data-density='compact'] .gauge > :first-child {
-  display: none;
-}
-
-.hud[data-density='compact'] [data-card-open] .gauge > :first-child {
-  display: block;
-}
-
-.hud[data-density='compact'] .position {
-  grid-area: readouts;
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--space-1) var(--space-3);
-  min-width: 0;
-}
-
-.hud[data-density='compact'] .banner {
-  grid-area: status;
-  justify-self: start;
-  flex-wrap: wrap;
-  max-width: 100%;
-}
-
-.hud[data-density='compact'] .statuses {
-  flex-wrap: wrap;
-}
-
-.hud[data-density='compact'] .status {
-  white-space: nowrap;
-}
-
-/* The guns on Auto held by the rescue floor: the card says why, the row shows it in amber. */
-.hud[data-density='compact'] [data-idle] {
-  color: var(--color-amber);
-}
-
-.chipMore {
-  color: var(--color-ember);
-  font-weight: bold;
-}
-
-/* Held upright (#486): the number a chip's title carries, beside its icon; the words are the card's. */
-.chipValue {
-  font-variant-numeric: tabular-nums;
 }
 
 /*
@@ -447,10 +182,4 @@
   align-self: stretch;
   inset: auto;
   margin-bottom: calc(var(--control-min) * 3);
-}
-
-/* An open card is the box drawn with its words, above the rows it may cover while open. */
-.hud[data-density='compact'] [data-card-open] {
-  position: relative;
-  z-index: 1;
 }

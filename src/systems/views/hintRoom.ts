@@ -22,7 +22,7 @@ export interface HintRoomInput {
   orientation: StageOrientation
   /** The area the HUD lays out in: the safe area. */
   safeArea: ScreenBox
-  /** The HUD's top rows (gauges, status, readouts, Tech tree, prompts): the chip goes under them. */
+  /** The HUD's top rows (the strip, the Tech tree, the prompts): the chip goes under them. */
   rows: readonly ScreenBox[]
   /** Every box that covers the view: the HUD's and the visible touch buttons. */
   covering: readonly ScreenBox[]

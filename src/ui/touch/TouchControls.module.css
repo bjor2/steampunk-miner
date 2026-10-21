@@ -12,8 +12,6 @@
    */
   --touch-tile-lane-top: 20%;
   --touch-tile-lane-bottom: calc(var(--space-3) + 56px + 8px + 72px + 8px);
-  /* The cluster's grid is always three tracks wide, shown buttons or not. */
-  --touch-cluster-width: calc(56px + 8px + 56px + 8px + 72px);
 
   position: absolute;
   inset: 0;
@@ -26,6 +24,18 @@
  */
 :global([data-orientation='portrait']) .controls {
   --touch-tile-lane-top: 40%;
+}
+
+/*
+ * A phone held upright (ticket 684): the cluster's foot sits at the layout margin and the HUD's
+ * gear button stands a slot gap above its outer column, so on 360 x 640 the button ends at the
+ * middle band's foot; the tiles keep to the lane above the button.
+ */
+:global([data-orientation='portrait'][data-hud-density='compact']) .controls {
+  --touch-tile-lane-bottom: calc(
+    var(--layout-margin) + var(--touch-cluster-height-upright) + var(--slot-gap) +
+      var(--slot-cell) + 8px
+  );
 }
 
 /* Pinch and double tap anywhere the stick and the buttons are not; the browser never zooms. */
@@ -83,12 +93,12 @@
 }
 
 /*
- * The pause button (ticket 472): 44 px on the top edge, in the gap between the centred banner and
- * the position panel, clear of both thumbs and of the HUD.
+ * The pause button (ticket 472): 44 px near the top edge, just under the HUD's strip (ticket
+ * 684), clear of both thumbs and of the HUD.
  */
 .pause {
   position: absolute;
-  top: var(--space-3);
+  top: calc(var(--strip-height) + var(--space-2));
   right: 30%;
   pointer-events: none;
 }
@@ -133,6 +143,7 @@
  * clear of the full HUD's bottom-centre hint plaque.
  */
 :global([data-orientation='portrait'][data-hud-density='compact']) .cluster {
+  bottom: var(--layout-margin);
   grid-template-rows: 56px 72px;
   grid-template-areas:
     'toggle_guns charge_size plant_charge'

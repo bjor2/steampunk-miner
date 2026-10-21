@@ -1,0 +1,63 @@
+/*
+ * The gear button (ticket 684; design-system.md sections 9 and 10). Desktop: under the strip at
+ * the right margin, where the readouts stood. A phone held upright: the thumb zone, a slot gap
+ * above the touch cluster's outer column (`TouchControls.module.css` sets the cluster's foot at
+ * the layout margin there so the button clears the middle band at 360 x 640). Held sideways: left
+ * of the cluster's foot. Mirrored for the left hand.
+ */
+.gear {
+  position: absolute;
+  top: calc(var(--strip-height) + var(--space-2));
+  right: var(--layout-margin);
+  pointer-events: auto;
+}
+
+.gear[data-hand='left'] {
+  right: auto;
+  left: var(--layout-margin);
+}
+
+:global([data-hud-density='compact']) .gear {
+  top: auto;
+  right: var(--space-3);
+  bottom: calc(var(--layout-margin) + var(--touch-cluster-height-upright) + var(--slot-gap));
+}
+
+:global([data-hud-density='compact']) .gear[data-hand='left'] {
+  right: auto;
+  left: var(--space-3);
+}
+
+:global([data-orientation='landscape'][data-hud-density='compact']) .gear {
+  right: calc(var(--space-3) + var(--touch-cluster-width) + var(--slot-gap));
+  bottom: var(--space-3);
+}
+
+:global([data-orientation='landscape'][data-hud-density='compact']) .gear[data-hand='left'] {
+  right: auto;
+  left: calc(var(--space-3) + var(--touch-cluster-width) + var(--slot-gap));
+}
+
+/* The baked plate (48 px, ticket 683) at the slot cell size; a brass ring while art is missing. */
+.button {
+  display: block;
+  width: var(--slot-cell);
+  height: var(--slot-cell);
+  padding: 0;
+  border: var(--frame-bezel) solid var(--color-brass);
+  border-radius: var(--radius-panel);
+  background: var(--color-panel);
+  background: var(--art-gear-button, var(--color-panel)) center / 100% 100% no-repeat;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+
+.button[aria-expanded='true'] {
+  background: var(--art-gear-button-pressed, var(--color-iron)) center / 100% 100% no-repeat;
+  border-color: var(--color-accent);
+}
+
+.button:focus-visible {
+  outline: var(--focus-ring);
+  outline-offset: var(--focus-ring-offset);
+}

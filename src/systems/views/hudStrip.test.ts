@@ -12,7 +12,7 @@ import {
   depthStripTextOf,
   edgePermilleOf,
   hudStripOf,
-  moneyChangeTextOf,
+  moneyChangeOf,
   type StripBar,
 } from './hudStrip'
 import { odometerCellsOf } from './odometer'
@@ -83,18 +83,18 @@ describe('HUD strip bars (ticket 684)', () => {
     expect(hudStripOf(fullHold).bars[2].tier).toBe('empty')
   })
 
-  it('shows the heat bar only above 60% of its gauge', () => {
+  it('draws the heat line only above 60% of its gauge, never as a fourth bar', () => {
     const model = hudOf(createScriptedSession())
     const threshold = DESIGN_TOKENS.layout.strip.heatShowsAbovePercent * 10
-    expect(barIds(hudStripOf(withHeatAt(model, threshold)).bars)).not.toContain('heat')
-    const hot = hudStripOf(withHeatAt(model, threshold + 1)).bars
-    expect(barIds(hot)).toEqual(['hull', 'fuel', 'cargo', 'heat'])
-    expect(hot[3].fillPermille).toBe(threshold + 1)
-    expect(hudStripOf(withHeatAt(model, 1000)).bars[3].tier).toBe('empty')
+    expect(hudStripOf(withHeatAt(model, threshold)).heat).toBeNull()
+    const hot = hudStripOf(withHeatAt(model, threshold + 1))
+    expect(barIds(hot.bars)).toEqual(['hull', 'fuel', 'cargo'])
+    expect(hot.heat).toMatchObject({ id: 'heat', fillPermille: threshold + 1, tier: 'ok' })
+    expect(hudStripOf(withHeatAt(model, 1000)).heat?.tier).toBe('empty')
   })
 
-  it('draws no heat bar off the heat planets', () => {
-    expect(barIds(hudStripOf(hudOf(createScriptedSession())).bars)).not.toContain('heat')
+  it('draws no heat line off the heat planets', () => {
+    expect(hudStripOf(hudOf(createScriptedSession())).heat).toBeNull()
   })
 })
 
@@ -176,12 +176,12 @@ describe('warning ladder tiers (design section 7)', () => {
 
 describe('money float-up (ticket 684)', () => {
   it('says a gain rounded down and a spend rounded up', () => {
-    expect(moneyChangeTextOf('100', '12445')).toBe('+12.3k')
-    expect(moneyChangeTextOf('12445', '100')).toBe('-12.4k')
+    expect(moneyChangeOf('100', '12445')).toEqual({ text: '+12.3k', isGain: true })
+    expect(moneyChangeOf('12445', '100')).toEqual({ text: '-12.4k', isGain: false })
   })
 
   it('says nothing when the money did not change', () => {
-    expect(moneyChangeTextOf('1e15', '1e15')).toBeNull()
+    expect(moneyChangeOf('1e15', '1e15')).toBeNull()
   })
 })
 

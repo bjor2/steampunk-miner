@@ -1,0 +1,48 @@
+/*
+ * The edge gauge (ticket 684; design-system.md section 9): `--edge-gauge-width` wide, centred in
+ * the right `--edge-lane`, from the middle band's top to its foot. The trough is the baked sprite
+ * (`--art-edge-gauge`, 8 px nine-slice caps) over a brass hairline; the mark is the skin's accent.
+ */
+.edge {
+  position: absolute;
+  top: var(--middle-band-top);
+  right: calc((var(--edge-lane) - var(--edge-gauge-width)) / 2);
+  bottom: calc(100% - var(--middle-band-bottom));
+  width: var(--edge-gauge-width);
+  pointer-events: none;
+}
+
+.edge > * {
+  height: 100%;
+}
+
+.trough {
+  position: relative;
+  display: block;
+  box-sizing: border-box;
+  height: 100%;
+  border: var(--frame-hairline) solid var(--color-brass);
+  border-radius: var(--edge-gauge-width);
+  background: var(--material-iron-shadow);
+  border-image: var(--art-edge-gauge) var(--art-edge-gauge-slice) fill / var(--art-edge-gauge-width);
+}
+
+/* The rig's mark: a brass bead that slides from the surface (top) to the core (foot). */
+.mark {
+  position: absolute;
+  top: calc(var(--mark) * 100%);
+  left: 50%;
+  width: calc(var(--edge-gauge-width) + 4px);
+  height: calc(var(--edge-gauge-width) + 4px);
+  border-radius: 50%;
+  background: var(--color-accent);
+  box-shadow: 0 0 0 1px var(--color-bg);
+  transform: translate(-50%, -50%);
+  transition: top var(--needle-ease-max) var(--ease-needle);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mark {
+    transition: none;
+  }
+}

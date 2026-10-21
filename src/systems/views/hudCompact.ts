@@ -1,24 +1,19 @@
 /**
- * The compact HUD's status row (#500, GD ruling 4; TD shape 4.2): on a phone the banner is one
- * row of at most `MOST_STATUSES_SHOWN` chips, each an icon and a title of at most two words, so
- * the persistent top HUD never shows more than six label words. The vehicle state is its icon
- * alone while under way and a one-word chip otherwise; a combat status or a secondary one (cargo
- * full, the tow) is a chip in priority order; the rest fold into a "+N" count. A call-out's line
- * after its colon, and every gauge and readout name, live in the box's tap card instead.
- * Display only: the same model the full banner draws, read the compact way.
- *
- * With every control owned the view keeps its clear floor only if each row stays one line (#486,
- * the stacked case GD ruling 2 on #500 left to it): so a chip is its icon and the number its
- * title carries, its words in the status box's card as every gauge and readout name already is,
- * and a closed reading leaves the control it names in brackets to its card. Held upright the
- * threats are chips in the rows, since a marker at the screen's edge sits where the vehicle leans.
+ * The strip's status row (#500, GD ruling 4; TD shape 4.2; on the strip since ticket 684): at
+ * most `MOST_STATUSES_SHOWN` chips, each an icon and a title of at most two words, so the
+ * always-on HUD never shows more than six label words. The vehicle state is its icon alone while
+ * under way and a one-word chip otherwise; a combat status or a secondary one (cargo full, the
+ * tow) is a chip in priority order; the rest fold into a "+N" count. A chip is its icon and the
+ * number its title carries (#486), its words in the strip's detail behind the gear button.
+ * Display only: the same model the detail draws, read the compact way. Held upright the threats
+ * are chips in the rows, since a marker at the screen's edge sits where the vehicle leans.
  */
 import { MOST_STATUSES_SHOWN, type CombatStatusStack, type StatusUrgency } from './combatStatuses'
 import { calloutTextOf } from './hudCallouts'
 import type { VehicleStateReading } from './hudReadings'
 import type { HudDensity, StageOrientation } from './screenLayout'
 import { wordCountOf } from './uiTextBudget'
-import type { UiText, UiTextTitlePlace } from './uiText'
+import type { UiText } from './uiText'
 
 /** One chip of the compact row: its icon, its words and how fast it pulses. */
 export interface CompactChip {
@@ -60,9 +55,6 @@ const STATE_CHIP_ID = 'state'
 /** A unit set apart from its number ("0.5 s", "10 s"): glued on, it reads as the number's. */
 const SPACED_UNIT = /(\d) (?=[a-z%]{1,3}\b)/g
 
-/** The control a reading names after its value, in brackets: " (Guns button)", " (C)". */
-const BRACKETED_CONTROL = / \([^()]*\)$/
-
 /** A word of a title that holds a number: "x2", "0.5s", "10s". */
 const NUMBER_WORD = /\S*\d\S*/g
 
@@ -96,15 +88,6 @@ export function isUprightCompactHud(density: HudDensity, orientation: StageOrien
 /** The numbers a chip's title carries ("x2", "0.5s"), drawn by its icon when the words are not. */
 export function compactChipValueOf(title: string): string {
   return (title.match(NUMBER_WORD) ?? []).join(' ')
-}
-
-/**
- * A reading's text in its box: the closed compact row leaves out the control the reading names in
- * brackets ("Auto (Guns button)" reads "Auto"), which its card still says (#486); the full HUD
- * and the open card show the whole text.
- */
-export function compactReadingTextOf(text: string, titlePlace: UiTextTitlePlace): string {
-  return titlePlace === 'card' ? text.replace(BRACKETED_CONTROL, '') : text
 }
 
 /** Label words an element shows on screen: its title unless the card holds it, and its line. */

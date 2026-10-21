@@ -1,7 +1,7 @@
 /**
  * The HUD strip (spec #678, ticket 684; docs/ui/design-system.md sections 9 and 12) as a pure
  * view of the HUD model: one thin top box of three fraction-only gauge bars (hull, fuel, cargo),
- * the heat bar only above 60%, and one number: the money on the surface, with the next-upgrade
+ * the heat line along its foot only above 60%, and one number: the money on the surface, with the next-upgrade
  * chip beside it, and the depth underground, where it is the only number. Speed is never on the
  * strip. The edge gauge beside it is the way from the surface to the core, with no number. Every
  * exact value and word sits in the detail behind the gear button.
@@ -30,11 +30,18 @@ export type StripNumber =
 
 export interface HudStrip {
   bars: readonly StripBar[]
+  /** The heat line along the strip's foot, above 60% of the gauge only; null below or off it. */
+  heat: StripBar | null
   number: StripNumber
   /** On the surface and at the dock only (GD ruling 21 Oct 18:33); null underground. */
   nextUpgrade: NextUpgradeChip | null
   /** The rig's mark on the edge gauge: 0 at the surface, 1000 at the core's edge. */
   edgePermille: number
+}
+
+export interface MoneyChange {
+  text: string
+  isGain: boolean
 }
 
 const PERMILLE = 1000
@@ -47,6 +54,7 @@ export function hudStripOf(model: HudModel, tokens: DesignTokens = DESIGN_TOKENS
   const isOnSurface = isOnSurfaceOf(model)
   return {
     bars: stripBarsOf(model, tokens),
+    heat: heatLineOf(model.heat, tokens),
     number: isOnSurface ? moneyNumberOf(model) : depthNumberOf(model, tokens),
     nextUpgrade: isOnSurface ? model.nextUpgrade : null,
     edgePermille: edgePermilleOf(model.depth.depthTiles, model.coreDistance),
@@ -76,22 +84,27 @@ export function edgePermilleOf(depthTiles: number, coreDistance: number | null):
  * The float-up beside the money when it changes (design section 6): a gain rounded down as a
  * balance is, a spend rounded up as a price is; null when nothing changed.
  */
-export function moneyChangeTextOf(previousExact: string, nextExact: string): string | null {
+export function moneyChangeOf(previousExact: string, nextExact: string): MoneyChange | null {
   const previous = fromCanonical(previousExact)
   const next = fromCanonical(nextExact)
   const way = cmp(next, previous)
   if (way === 0) return null
-  return way > 0 ? `+${formatAmount(sub(next, previous))}` : `-${formatPrice(sub(previous, next))}`
+  if (way > 0) return { text: `+${formatAmount(sub(next, previous))}`, isGain: true }
+  return { text: `-${formatPrice(sub(previous, next))}`, isGain: false }
 }
 
 function stripBarsOf(model: HudModel, tokens: DesignTokens): StripBar[] {
-  const { hull, energy, cargo, heat } = model
+  const { hull, energy, cargo } = model
   return [
     barOf('hull', hull, hull.permille, tokens),
     barOf('fuel', energy, energy.permille, tokens),
     barOf('cargo', cargo, PERMILLE - cargo.permille, tokens),
-    ...(heat !== null && isHeatShown(heat.permille, tokens) ? [heatBarOf(heat, tokens)] : []),
   ]
+}
+
+function heatLineOf(heat: GaugeReading | null, tokens: DesignTokens): StripBar | null {
+  if (heat === null || !isHeatShown(heat.permille, tokens)) return null
+  return barOf('heat', heat, PERMILLE - clampPermille(heat.permille), tokens)
 }
 
 function barOf(
@@ -106,10 +119,6 @@ function barOf(
     fillPermille: clampPermille(reading.permille),
     tier: ladderTierOf(clampPermille(leftPermille), tokens),
   }
-}
-
-function heatBarOf(heat: GaugeReading, tokens: DesignTokens): StripBar {
-  return barOf('heat', heat, PERMILLE - clampPermille(heat.permille), tokens)
 }
 
 /** GD lock: the heat shows only above 60% of its gauge. */

@@ -153,6 +153,12 @@ import {
   type SoundUnlockValues,
 } from './soundUnlockSlice'
 import {
+  hudDetailActionsOf,
+  STARTING_HUD_DETAIL,
+  type HudDetailActions,
+  type HudDetailValues,
+} from './hudDetailSlice'
+import {
   STARTING_TAP_SHEET,
   tapSheetActionsOf,
   type TapSheetActions,
@@ -192,6 +198,8 @@ export interface GameState
     TapSheetActions,
     SheetValues,
     SheetActions,
+    HudDetailValues,
+    HudDetailActions,
     SoundUnlockValues,
     SoundUnlockActions,
     TitleMenuValues,
@@ -299,6 +307,7 @@ type GameValues = Pick<
   | keyof PauseMenuValues
   | keyof TapSheetValues
   | keyof SheetValues
+  | keyof HudDetailValues
   | keyof SoundUnlockValues
   | keyof TitleMenuValues
   | keyof SaveKeepingValues
@@ -329,6 +338,7 @@ export const STARTING_VALUES: GameValues = {
   ...STARTING_PAUSE_MENU,
   ...STARTING_TAP_SHEET,
   ...STARTING_SHEET,
+  ...STARTING_HUD_DETAIL,
   ...STARTING_SOUND_UNLOCK,
   ...STARTING_TITLE_MENU,
   ...STARTING_SAVE_KEEPING,
@@ -355,6 +365,7 @@ export const useGameStore = create<GameState>()((set, get) => ({
   ...pauseMenuActionsOf(set, get),
   ...tapSheetActionsOf(set, get),
   ...sheetActionsOf(set, get),
+  ...hudDetailActionsOf(set, get),
   ...soundUnlockActionsOf(set),
   ...titleMenuActionsOf(set, get),
   ...saveKeepingActionsOf(set, get),

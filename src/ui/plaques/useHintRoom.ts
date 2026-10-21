@@ -16,14 +16,15 @@ import { DEVICE_UI_IDS } from '../stage/deviceIds'
 import { readFittedScreen } from '../stage/screenFit'
 import type { HintChipPlace } from './HintChip'
 
-/** The HUD boxes the chip sits under: the grid's top rows. */
+/** The HUD boxes the chip sits under: the strip (ticket 684) and the grid's rows under it. */
 const ROW_IDS: ReadonlySet<string> = new Set([
-  HUD_BOX_IDS.gauges,
-  HUD_BOX_IDS.status,
-  HUD_BOX_IDS.readouts,
+  HUD_BOX_IDS.strip,
   HUD_BOX_IDS.techTree,
   HUD_BOX_IDS.prompts,
 ])
+
+/** The boxes the chip never sits on: the touch buttons and the gear button (ticket 684). */
+const KEEP_OUT_IDS: ReadonlySet<string> = new Set([HUD_BOX_IDS.control, HUD_BOX_IDS.gear])
 
 export function useHintRoom(isCompact: boolean): HintChipPlace | null {
   const [place, setPlace] = useState<HintChipPlace | null>(null)
@@ -67,7 +68,7 @@ function measureHintRoom(): (HintRoom & { layer: ScreenBox }) | null {
     rows: boxes.filter((box) => ROW_IDS.has(box.id)),
     covering: boxes.filter((box) => box.id !== HUD_BOX_IDS.hint),
     keepOut: [
-      ...boxes.filter((box) => box.id === HUD_BOX_IDS.control),
+      ...boxes.filter((box) => KEEP_OUT_IDS.has(box.id)),
       ...measuredBoxesOf(`[${HUD_ZONE_ATTRIBUTE}]`, HUD_ZONE_ATTRIBUTE),
     ],
   })

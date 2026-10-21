@@ -42,6 +42,7 @@ import {
 } from '../systems/vehicle/vehicleCommands'
 import { calloutTextOf, SLOW_DEVICE_TEXT } from '../systems/views/hudCallouts'
 import { selectHudModel, type HudModel } from '../systems/views/hudModel'
+import { hudStripOf } from '../systems/views/hudStrip'
 import type { BayFooter, BayHeader } from '../systems/views/bayFrame'
 import { selectSellBayModel, type SellBayModel } from '../systems/views/sellBayModel'
 import { selectUpgradeBayModel, type UpgradeBayModel } from '../systems/views/upgradeBayModel'
@@ -123,9 +124,15 @@ function calloutShown(text: string): string {
   return shown.title + shown.oneLine
 }
 
+/** The HUD with the strip's detail open (ticket 684), so every readout behind the gear draws. */
+function hudWithDetail(model: HudModel, isFlashing: boolean): ReactElement {
+  return createElement(HudView, { model, isFlashing, isDetailOpen: true })
+}
+
 /** What each id's text must be; null for a gauge dial, which shows a needle and no text. */
 function hudTexts(model: HudModel): Partial<Record<UiId, string | null>> {
   return {
+    ...stripTexts(model),
     [UI_IDS.hudEnergyGauge]: null,
     [UI_IDS.hudEnergyText]: model.energy.text,
     [UI_IDS.hudHullGauge]: null,
@@ -155,8 +162,10 @@ function hudTexts(model: HudModel): Partial<Record<UiId, string | null>> {
       : {}),
     [UI_IDS.hudTileTime]: model.tileTime.text,
     [UI_IDS.hudStatuses]: null,
+    [UI_IDS.hudDetailStatuses]: null,
     [UI_IDS.hudHazardStrip]: null,
-    [UI_IDS.hudState]: model.vehicleState.text,
+    [UI_IDS.hudState]: null,
+    [UI_IDS.hudDetailState]: model.vehicleState.text,
     ...(model.cargo.isFull ? { [UI_IDS.hudCargoFull]: 'FULL' } : {}),
     ...(model.dockArrow === null
       ? {}
@@ -180,6 +189,28 @@ function hudTexts(model: HudModel): Partial<Record<UiId, string | null>> {
     ...(model.warning.level === 'ok'
       ? {}
       : { [UI_IDS.hudWarningEnergy]: calloutShown(model.warning.text) }),
+  }
+}
+
+/**
+ * The strip (ticket 684): its bars and the edge gauge draw no number; its one number is the money
+ * on the surface with the next-upgrade chip, the depth underground; the heat line shows above 60%.
+ */
+function stripTexts(model: HudModel): Partial<Record<UiId, string | null>> {
+  const strip = hudStripOf(model)
+  return {
+    [UI_IDS.hudStrip]: null,
+    [UI_IDS.hudEdgeGauge]: null,
+    [UI_IDS.hudGear]: null,
+    [UI_IDS.hudDetail]: null,
+    [UI_IDS.hudMoneyFloat]: '',
+    ...(strip.number.kind === 'money'
+      ? { [UI_IDS.hudStripMoney]: strip.number.text }
+      : { [UI_IDS.hudStripDepth]: strip.number.text }),
+    ...(strip.nextUpgrade === null
+      ? {}
+      : { [UI_IDS.hudNextUpgrade]: strip.nextUpgrade.price.text }),
+    ...(strip.heat === null ? {} : { [UI_IDS.hudHeatLine]: null }),
   }
 }
 
@@ -390,7 +421,7 @@ function renderSlowDeviceChip(): string[] {
 
 function renderHud(): string[] {
   const model = readHudModel()
-  return checkScreen(createElement(HudView, { model, isFlashing: true }), hudTexts(model))
+  return checkScreen(hudWithDetail(model, true), hudTexts(model))
 }
 
 function renderPlaques(): string[] {
@@ -509,8 +540,8 @@ function renderFullHoldHud(): string[] {
   })
   expect(model.cargo.isFull).toBe(true)
   return [
-    ...checkScreen(createElement(HudView, { model, isFlashing: false }), hudTexts(model)),
-    ...checkScreen(createElement(HudView, { model: withCoreInHold(model), isFlashing: false }), {
+    ...checkScreen(hudWithDetail(model, false), hudTexts(model)),
+    ...checkScreen(hudWithDetail(withCoreInHold(model), false), {
       [UI_IDS.hudCargoCore]: CORE_TEXT,
     }),
   ]
@@ -541,7 +572,7 @@ function renderAtArtefactCache(): string[] {
   expect(hud.cachePrompt.isShown).toBe(true)
   const cards = selectArtefactChoiceModel(session.state(), 'p1')
   return [
-    ...checkScreen(createElement(HudView, { model: hud, isFlashing: false }), hudTexts(hud)),
+    ...checkScreen(hudWithDetail(hud, false), hudTexts(hud)),
     ...checkScreen(
       createElement(ArtefactChoiceView, { model: cards, focusedId: 'artefact-leave' }),
       artefactChoiceTexts(cards),
@@ -571,7 +602,7 @@ function renderWithGuns(): string[] {
   })
   expect(bay.guns).not.toBeNull()
   return [
-    ...checkScreen(createElement(HudView, { model: hud, isFlashing: false }), hudTexts(hud)),
+    ...checkScreen(hudWithDetail(hud, false), hudTexts(hud)),
     ...checkScreen(
       createElement(UpgradeBayView, { model: bay, focusedId: '' }),
       upgradeBayTexts(bay),
@@ -597,7 +628,7 @@ function renderWithCharges(): string[] {
   const bay = upgradeBayOn(7)
   expect(bay.charges).not.toBeNull()
   return [
-    ...checkScreen(createElement(HudView, { model: hud, isFlashing: false }), hudTexts(hud)),
+    ...checkScreen(hudWithDetail(hud, false), hudTexts(hud)),
     ...checkScreen(
       createElement(UpgradeBayView, { model: bay, focusedId: '' }),
       upgradeBayTexts(bay),
@@ -626,7 +657,7 @@ function renderWithHeat(): string[] {
   })
   expect(bay.lining).not.toBeNull()
   return [
-    ...checkScreen(createElement(HudView, { model: hud, isFlashing: false }), hudTexts(hud)),
+    ...checkScreen(hudWithDetail(hud, false), hudTexts(hud)),
     ...checkScreen(
       createElement(UpgradeBayView, { model: bay, focusedId: '' }),
       upgradeBayTexts(bay),
@@ -646,8 +677,20 @@ function renderWithBoreAuto(): string[] {
       prompts: promptSourceOf(game()),
     })
     expect(hud.boreAuto?.colour).toBe('green')
-    return checkScreen(createElement(HudView, { model: hud, isFlashing: false }), hudTexts(hud))
+    return checkScreen(hudWithDetail(hud, false), hudTexts(hud))
   })
+}
+
+/** The HUD a few tiles down: the strip's number is the depth, with no chip (ticket 684). */
+function renderUnderground(): string[] {
+  const hud = selectHudModel({
+    state: createScriptedSession().state(),
+    playerId: 'p1',
+    depthTiles: 12,
+    prompts: promptSourceOf(game()),
+  })
+  expect(hudStripOf(hud).number.kind).toBe('depth')
+  return checkScreen(hudWithDetail(hud, false), hudTexts(hud))
 }
 
 function upgradeBayOn(planetIndex: number): UpgradeBayModel {
@@ -723,6 +766,7 @@ function expectEveryIdRendered(): void {
   keep(renderWithCharges())
   keep(renderWithHeat())
   keep(renderWithBoreAuto())
+  keep(renderUnderground())
   keep(renderRefineryScreens())
   keep(renderLiningVisit())
   keep(renderSliceScreen())

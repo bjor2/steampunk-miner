@@ -42,7 +42,9 @@ const overlayCardSlice: SliceDefinition = {
 
 function hudMarkupWith(slices: readonly SliceDefinition[]): string {
   return withRegistrations(slices, () =>
-    renderToString(createElement(HudView, { model: readHudModel(), isFlashing: false })),
+    renderToString(
+      createElement(HudView, { model: readHudModel(), isFlashing: false, isDetailOpen: true }),
+    ),
   )
 }
 
@@ -51,16 +53,13 @@ const testIdAt = (html: string, id: string) => html.indexOf(`data-testid="${id}"
 beforeEach(() => resetGameStore())
 
 describe('HUD slice panels', () => {
-  it("draws a banner panel after the banner's kernel markup and before the position panel", () => {
-    const html = hudMarkupWith([panelSliceOf('banner')])
-    const probe = testIdAt(html, 'hud-probe')
-    expect(probe).toBeGreaterThan(testIdAt(html, UI_IDS.hudState))
-    expect(probe).toBeLessThan(testIdAt(html, UI_IDS.hudDepth))
-  })
-
-  it('draws a gauges panel before the banner', () => {
-    const html = hudMarkupWith([panelSliceOf('gauges')])
-    expect(testIdAt(html, 'hud-probe')).toBeLessThan(testIdAt(html, UI_IDS.hudState))
+  it('draws the gauges, banner and position panels after the strip and before the edge gauge', () => {
+    for (const slot of ['gauges', 'banner', 'position'] as const) {
+      const html = hudMarkupWith([panelSliceOf(slot)])
+      const probe = testIdAt(html, 'hud-probe')
+      expect(probe).toBeGreaterThan(testIdAt(html, UI_IDS.hudState))
+      expect(probe).toBeLessThan(testIdAt(html, UI_IDS.hudEdgeGauge))
+    }
   })
 
   it('adds only the panel to the HUD, and nothing while no panel is registered', () => {
@@ -68,10 +67,10 @@ describe('HUD slice panels', () => {
     expect(withPanel.replace(PROBE_MARKUP, '')).toBe(hudMarkupWith([]))
   })
 
-  it('draws an overlay panel under every other slot, before the gauges', () => {
+  it('draws an overlay panel under every other slot, before the strip', () => {
     const html = hudMarkupWith([overlayProbeSlice])
     expect(testIdAt(html, 'hud-probe')).toBeGreaterThanOrEqual(0)
-    expect(testIdAt(html, 'hud-probe')).toBeLessThan(testIdAt(html, UI_IDS.hudEnergyGauge))
+    expect(testIdAt(html, 'hud-probe')).toBeLessThan(testIdAt(html, UI_IDS.hudStrip))
   })
 
   it('adds only the overlay layer and its panel, the first markup inside the HUD', () => {

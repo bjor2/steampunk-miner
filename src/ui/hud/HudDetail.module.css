@@ -1,0 +1,232 @@
+/*
+ * The strip's detail (ticket 684): a brass-framed plate over the view. Desktop: under the gear at
+ * the right margin. A phone held upright: the width between the margins, from under the strip
+ * down to the gear. Held sideways: the left half, under the strip. It scrolls inside, and takes
+ * the pointer so a scroll never reaches the canvas.
+ */
+.detail {
+  position: absolute;
+  top: calc(var(--strip-height) + var(--space-2) + var(--slot-cell) + var(--space-2));
+  right: var(--layout-margin);
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  width: min(26rem, calc(100% - 2 * var(--layout-margin)));
+  max-height: calc(100% - var(--strip-height) - var(--slot-cell) - 4 * var(--space-2));
+  padding: var(--space-2) var(--space-3);
+  border: var(--frame-double) double var(--color-brass);
+  border-radius: var(--radius-panel);
+  background: var(--color-panel);
+  font-family: var(--font-mono);
+  pointer-events: auto;
+}
+
+.detail[data-hand='left'] {
+  right: auto;
+  left: var(--layout-margin);
+}
+
+:global([data-hud-density='compact']) .detail {
+  top: calc(var(--strip-height) + var(--space-2));
+  right: var(--layout-margin);
+  bottom: calc(
+    var(--layout-margin) + var(--touch-cluster-height-upright) + 2 * var(--slot-gap) +
+      var(--slot-cell)
+  );
+  left: var(--layout-margin);
+  width: auto;
+  max-height: none;
+}
+
+:global([data-orientation='landscape'][data-hud-density='compact']) .detail {
+  right: auto;
+  bottom: var(--layout-margin);
+  width: min(26rem, 50%);
+}
+
+:global([data-orientation='landscape'][data-hud-density='compact']) .detail[data-hand='left'] {
+  right: var(--layout-margin);
+  left: auto;
+}
+
+.scroll {
+  flex: 1 1 auto;
+  min-height: 0;
+}
+
+.gauges,
+.readouts,
+.status {
+  display: grid;
+  gap: var(--space-2);
+  padding-bottom: var(--space-2);
+}
+
+.readouts,
+.status {
+  padding-top: var(--space-2);
+  border-top: var(--frame-hairline) solid var(--color-brass);
+}
+
+/* A dial beside its element: the gauge's name over its glyph-and-value facts (pass #428). */
+.gauge {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  column-gap: var(--space-2);
+  align-items: center;
+}
+
+/* A row's value drawn as markup (a badge, a lamp, the arrow), its glyph first. */
+.value {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+}
+
+/* #41 casing feel: the bay teal while the grade holds the band, flashing amber when it does not. */
+.casingBadge {
+  color: var(--color-casing-safe);
+}
+
+.casingBadge[data-state='short'] {
+  color: var(--color-casing-weak);
+  animation: casing-flash 0.8s steps(2, jump-none) infinite;
+}
+
+@keyframes casing-flash {
+  to {
+    opacity: 0.4;
+  }
+}
+
+/* #111 telegraph: a tunnel wrecker gnaws the route, a slow amber pulse in the same badge. */
+.casingBadge[data-state='gnawed'] {
+  color: var(--color-casing-weak);
+  animation: casing-pulse 1.2s ease-in-out infinite alternate;
+}
+
+@keyframes casing-pulse {
+  to {
+    opacity: 0.35;
+    text-shadow: 0 0 6px var(--color-casing-weak);
+  }
+}
+
+/* #107: the guns are on Auto but the rescue floor holds them; the low-energy amber, said in text. */
+.gunsIdle {
+  color: var(--color-amber);
+}
+
+/* The bore gun's brass auto lamp (ticket 317): dark off, green firing, amber holding. */
+.autoLamp::before {
+  content: '';
+  display: inline-block;
+  width: 0.6em;
+  height: 0.6em;
+  margin-right: 0.3em;
+  border: 1px solid var(--color-brass);
+  border-radius: 50%;
+  background: var(--color-bg);
+}
+
+.autoLamp[data-lamp='green']::before {
+  background: var(--color-teal);
+}
+
+.autoLamp[data-lamp='amber'] {
+  color: var(--color-amber);
+}
+
+.autoLamp[data-lamp='amber']::before {
+  background: var(--color-amber);
+}
+
+.state {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+}
+
+/* #158 "Combat statuses": the stack of triangle icons with their words, hidden while empty. */
+.statuses {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-1) var(--space-3);
+}
+
+.statuses:empty {
+  display: none;
+}
+
+/* Urgency is a pulse rate; with flashes off, a thicker rim says the same. */
+.statusIcon {
+  display: inline-flex;
+  gap: var(--space-1);
+  align-items: center;
+  border: 2px solid transparent;
+  border-radius: var(--radius-card);
+}
+
+.statusIcon[data-urgency='slow'][data-pulsing] {
+  animation: status-pulse 1.6s ease-in-out infinite;
+}
+
+.statusIcon[data-urgency='fast'][data-pulsing] {
+  animation: status-pulse 0.6s ease-in-out infinite;
+}
+
+.statusIcon[data-urgency='slow']:not([data-pulsing]) {
+  border-color: var(--color-ember);
+}
+
+.statusIcon[data-urgency='fast']:not([data-pulsing]) {
+  border-width: 3px;
+  border-color: var(--color-ember);
+}
+
+@keyframes status-pulse {
+  50% {
+    opacity: 0.35;
+  }
+}
+
+/* The "+N more" pip: the statuses that did not fit the three. */
+.statusMore {
+  padding: 0 var(--space-1);
+  border: 1px solid var(--color-ember);
+  border-radius: 1em;
+  color: var(--color-ember);
+  font-weight: bold;
+}
+
+/* Text, an icon id and hatching carry the warning; the blink is only an extra. */
+.warning {
+  display: inline-flex;
+  align-items: center;
+  padding: 0 var(--space-1);
+  background-image: repeating-linear-gradient(
+    45deg,
+    rgb(201 162 75 / 0.35) 0 4px,
+    transparent 4px 8px
+  );
+}
+
+.warning[data-level='critical']::before {
+  content: '!! ';
+}
+
+.warning[data-level='low']::before {
+  content: '! ';
+}
+
+.warning[data-flashing] {
+  animation: blink 1s steps(2, start) infinite;
+}
+
+@keyframes blink {
+  to {
+    visibility: hidden;
+  }
+}

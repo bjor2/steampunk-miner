@@ -1,48 +1,25 @@
 /**
- * Top right (#33 section 5): depth (or ALT) and band, the casing grade badge (#41), the guns' mode
- * and their low-steam badge (#107), the bore gun's auto lamp once the steam sear is researched
- * (ticket 317), the charges carried with the plant key (#109), the dock arrow
- * with its distance, tiles to the core's edge, and the time per tile in front of the drill. Each
- * line is one shared Title+OneLine row (spec #422, pass #428): its name as the title, then its
- * value beside the glyph of the icon set (#158). On the compact HUD (#500) a row is its glyph and
- * value; the names and the guns-idle line show in the box's tap card, the idle guns in amber.
- * The closed compact row also leaves the guns' and the charges' control to the card (#486).
+ * The detail's readouts (#33 section 5; behind the strip's gear button since ticket 684): depth
+ * (or ALT) and band, the casing grade badge (#41), the guns' mode and their low-steam line (#107),
+ * the bore gun's auto lamp once the steam sear is researched (ticket 317), the charges carried
+ * with the plant key (#109), the dock arrow with its distance, tiles to the core's edge, and the
+ * time per tile in front of the drill. Each line is one shared Title+OneLine row (spec #422, pass
+ * #428): its name as the title, then its value beside the glyph of the icon set (#158).
  */
 import type { ReactNode } from 'react'
 import { hudLabelIconIdOf, type HudLabelId } from '../../systems/art/icons/iconSet'
 import { calloutTextOf, readoutTextOf } from '../../systems/views/hudCallouts'
-import { compactReadingTextOf } from '../../systems/views/hudCompact'
 import type { HudModel } from '../../systems/views/hudModel'
-import type { HudDensity } from '../../systems/views/screenLayout'
-import type { UiTextTitlePlace } from '../../systems/views/uiText'
 import { UI_IDS } from '../ids'
 import { TitleOneLine, type IconValue } from '../kit/TitleOneLine'
 import { VectorIcon } from '../VectorIcon'
 import { CompassArrow } from './CompassArrow'
-import { HudBox } from './HudBox'
-import styles from './Hud.module.css'
+import styles from './HudDetail.module.css'
 
-export function PositionPanel({
-  model,
-  density = 'full',
-}: {
-  model: HudModel
-  density?: HudDensity
-}) {
-  return (
-    <HudBox id="readouts" className={styles.position} density={density}>
-      {(titlePlace) => <Readouts model={model} titlePlace={titlePlace} />}
-    </HudBox>
-  )
-}
-
-function Readouts({ model, titlePlace }: { model: HudModel; titlePlace: UiTextTitlePlace }) {
+export function DetailReadouts({ model }: { model: HudModel }) {
   const { depth, casing, guns, boreAuto, charges, dockArrow, coreDistance, tileTime } = model
-  const readingOf = (text: string) => compactReadingTextOf(text, titlePlace)
-  const isIdleLineShown = guns?.isIdle === true && titlePlace === 'element'
-  const Line = titlePlace === 'card' ? CompactLine : FullLine
   return (
-    <>
+    <div className={styles.readouts}>
       <Line id="hud.depth" label="Depth" facts={[factOf('depth', depth.text, UI_IDS.hudDepth)]} />
       <Line
         id="hud.band"
@@ -69,11 +46,11 @@ function Readouts({ model, titlePlace }: { model: HudModel; titlePlace: UiTextTi
             data-mode={guns.mode}
             data-idle={guns.isIdle || undefined}
           >
-            {readingOf(guns.text)}
+            {guns.text}
           </span>
         </Line>
       )}
-      {isIdleLineShown && (
+      {guns?.isIdle === true && (
         <div className={styles.gunsIdle} data-testid={UI_IDS.hudGunsIdle}>
           <TitleOneLine text={calloutTextOf('hud.guns-idle', guns.idleText)} level="span" />
         </div>
@@ -95,9 +72,7 @@ function Readouts({ model, titlePlace }: { model: HudModel; titlePlace: UiTextTi
         <Line
           id="hud.charges"
           label="Charges"
-          facts={[
-            { ...factOf('charges', readingOf(charges.text), UI_IDS.hudCharges), holds: 'charges' },
-          ]}
+          facts={[{ ...factOf('charges', charges.text, UI_IDS.hudCharges), holds: 'charges' }]}
         />
       )}
       {dockArrow !== null && (
@@ -126,7 +101,7 @@ function Readouts({ model, titlePlace }: { model: HudModel; titlePlace: UiTextTi
           {tileTime.text}
         </span>
       </Line>
-    </>
+    </div>
   )
 }
 
@@ -140,22 +115,7 @@ interface LineProps {
 }
 
 /** One readout row: its name, then its value as a fact or, when it carries a state, as markup. */
-function FullLine(props: LineProps) {
-  return <ReadoutLine {...props} titlePlace="element" />
-}
-
-/** The compact row (#500): the glyph and value, its name kept for the tap card. */
-function CompactLine(props: LineProps) {
-  return <ReadoutLine {...props} titlePlace="card" />
-}
-
-function ReadoutLine({
-  id,
-  label,
-  facts = NO_FACTS,
-  titlePlace,
-  children,
-}: LineProps & { titlePlace: UiTextTitlePlace }) {
+function Line({ id, label, facts = NO_FACTS, children }: LineProps) {
   return (
     <TitleOneLine
       text={readoutTextOf(id, label)}
@@ -163,7 +123,6 @@ function ReadoutLine({
       level="span"
       layout="row"
       glyphSize="hud"
-      titlePlace={titlePlace}
     >
       {children !== undefined && <span className={styles.value}>{children}</span>}
     </TitleOneLine>

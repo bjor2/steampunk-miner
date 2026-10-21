@@ -1,0 +1,54 @@
+/* The strip's status row (ticket 684; #158 combat statuses): icons only, one line. */
+.statuses {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  gap: var(--space-1);
+  white-space: nowrap;
+}
+
+.state {
+  display: inline-flex;
+  align-items: center;
+}
+
+/* Urgency is a pulse rate; with flashes off, a thicker rim says the same. */
+.status {
+  display: inline-flex;
+  align-items: center;
+  border: 2px solid transparent;
+  border-radius: var(--radius-card);
+}
+
+.status[data-urgency='slow'][data-pulsing] {
+  animation: status-pulse 1.6s ease-in-out infinite;
+}
+
+.status[data-urgency='fast'][data-pulsing] {
+  animation: status-pulse 0.6s ease-in-out infinite;
+}
+
+.status[data-urgency='slow']:not([data-pulsing]) {
+  border-color: var(--color-ember);
+}
+
+.status[data-urgency='fast']:not([data-pulsing]) {
+  border-width: 3px;
+  border-color: var(--color-ember);
+}
+
+@keyframes status-pulse {
+  50% {
+    opacity: 0.35;
+  }
+}
+
+.chipValue {
+  font-family: var(--font-numerals);
+  font-variant-numeric: tabular-nums;
+}
+
+.chipMore {
+  color: var(--color-ember);
+  font-weight: bold;
+}

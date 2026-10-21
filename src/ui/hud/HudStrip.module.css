@@ -1,0 +1,155 @@
+/*
+ * The strip (ticket 684; design-system.md section 9): full width up to `--strip-max-width`,
+ * `--strip-height` tall, right under the top inset (the HUD is the safe area), opaque enamel so
+ * the bars read on any ground, a brass rule at its foot. One line, nothing wraps; the bars give
+ * up width first, so money at 1e15 and its chip fit a 360 px phone.
+ */
+.strip {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  width: min(100%, var(--strip-max-width));
+  height: var(--strip-height);
+  padding: 0 var(--space-2);
+  border-bottom: var(--frame-bezel) solid var(--color-brass);
+  background: linear-gradient(
+    var(--material-iron-highlight),
+    var(--material-iron-base) 35%,
+    var(--material-iron-shadow)
+  );
+  color: var(--color-text);
+  font-size: var(--type-label);
+  white-space: nowrap;
+  transform: translateX(-50%);
+}
+
+/* On desktop the strip is a centred plate: its lower corners round off. */
+:global([data-layout='desktop']) .strip {
+  border: var(--frame-bezel) solid var(--color-brass);
+  border-top: none;
+  border-radius: 0 0 var(--radius-panel) var(--radius-panel);
+}
+
+.bars {
+  display: flex;
+  flex: 1 1 auto;
+  align-items: center;
+  gap: var(--space-1);
+  min-width: 0;
+}
+
+.number {
+  position: relative;
+  flex: none;
+}
+
+.number > * {
+  flex-wrap: nowrap;
+  gap: var(--space-1);
+}
+
+.depth {
+  color: var(--color-parchment);
+  font-family: var(--font-numerals);
+  font-size: var(--type-odometer);
+  font-variant-numeric: tabular-nums;
+}
+
+/* The next-upgrade chip: a pill (`--radius-chip`) of its icon and price, no label. */
+.chip {
+  flex: none;
+  padding: 0 var(--space-1);
+  border: var(--frame-hairline) solid var(--color-brass);
+  border-radius: var(--radius-chip);
+  background: var(--color-panel);
+}
+
+.chip > * {
+  flex-wrap: nowrap;
+  gap: 0;
+}
+
+.chip p {
+  gap: var(--space-1);
+  font-family: var(--font-numerals);
+  font-size: var(--type-label);
+}
+
+/* The float-up rises from the number's foot and fades; it covers no box and takes no tap. */
+.floatLayer {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  pointer-events: none;
+}
+
+.floatUp {
+  display: block;
+  color: var(--color-brass);
+  font-family: var(--font-numerals);
+  font-size: var(--type-label);
+  animation: float-up var(--float-up) var(--ease-exit) both;
+}
+
+.floatUp[data-gain='false'] {
+  color: var(--color-copper);
+}
+
+@keyframes float-up {
+  from {
+    transform: translateY(var(--space-3));
+    opacity: 1;
+  }
+
+  to {
+    transform: translateY(0);
+    opacity: 0;
+  }
+}
+
+/* The heat line: 4 px of ember along the strip's foot, its length the heat. */
+.heat {
+  position: absolute;
+  right: 0;
+  bottom: calc(-1 * var(--frame-bezel));
+  left: 0;
+  height: 4px;
+  pointer-events: none;
+}
+
+.heatFill {
+  position: absolute;
+  inset: 0;
+  background: var(--gauge-fill-heat);
+  transform: scaleX(var(--fill));
+  transform-origin: left center;
+  transition: transform var(--needle-ease-max) var(--ease-needle);
+}
+
+.heat:not([data-tier='ok']) .heatFill {
+  background-image: repeating-linear-gradient(
+    45deg,
+    rgb(27 22 19 / 0.55) 0 3px,
+    transparent 3px 6px
+  );
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .heatFill {
+    transition: none;
+  }
+
+  .floatUp {
+    animation-name: float-fade;
+  }
+}
+
+@keyframes float-fade {
+  to {
+    opacity: 0;
+  }
+}

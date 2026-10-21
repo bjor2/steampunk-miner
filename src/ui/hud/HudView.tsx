@@ -1,22 +1,25 @@
 /**
- * The in-run HUD drawn from its view model (#33 section 5); markup only. Each kernel component is
- * followed by its slot's slice panels (feature-slices.md 3.14). The overlay layer (#208) comes
- * first, so every other slot draws above it, and option B's pop badges (ticket 616) right after
- * it. The density (#500) is the layout shell's: `compact` lays the gauges, the status row and the
- * readouts out as rows on a phone, the same components.
- * Held upright (#486) the threats are chips leading the prompts' row, and the slices' threat and
- * prompt panels join that row instead of floating over the view.
+ * The in-run HUD drawn from its view model (#33 section 5; the strip of ticket 684); markup only.
+ * The strip is the one always-on top box, the edge gauge sits in the right edge lane and the gear
+ * button opens the strip's detail. Each kernel slot is followed by its slice panels
+ * (feature-slices.md 3.14): `gauges`, `banner` and `position` keep their order after the strip,
+ * so a slice's own panel still lays itself out. The overlay layer (#208) comes first, so every
+ * other slot draws above it, and option B's pop badges (ticket 616) right after it. The density
+ * (#500) is the layout shell's. Held upright (#486) the threats are chips leading the prompts'
+ * row, and the slices' threat and prompt panels join that row instead of floating over the view.
  */
 import { isUprightCompactHud } from '../../systems/views/hudCompact'
 import type { HudModel } from '../../systems/views/hudModel'
+import { hudStripOf } from '../../systems/views/hudStrip'
 import type { HudDensity, StageOrientation } from '../../systems/views/screenLayout'
-import { GaugeCluster } from './GaugeCluster'
+import { EdgeGauge } from './EdgeGauge'
 import { HazardStrip } from './HazardStrip'
-import { HudBanner } from './HudBanner'
+import { HudDetail } from './HudDetail'
+import { HudGearButton } from './HudGearButton'
+import { HudStrip } from './HudStrip'
 import { OverlayLayer } from '../overlay/OverlayLayer'
 import { HudPrompts } from './HudPrompts'
 import { PopBadges } from './PopBadges'
-import { PositionPanel } from './PositionPanel'
 import { SlicePanels } from './SlicePanels'
 import { ThreatChips } from './ThreatChips'
 import { ThreatMarkers } from './ThreatMarkers'
@@ -27,25 +30,33 @@ export function HudView({
   isFlashing,
   density = 'full',
   orientation = 'landscape',
+  isDetailOpen = false,
+  isLeftHanded = false,
 }: {
   model: HudModel
   isFlashing: boolean
   density?: HudDensity
   orientation?: StageOrientation
+  isDetailOpen?: boolean
+  isLeftHanded?: boolean
 }) {
   const isUpright = isUprightCompactHud(density, orientation)
+  const strip = hudStripOf(model)
   return (
     <div className={styles.hud} data-density={density}>
       <OverlayLayer />
       <PopBadges />
-      <GaugeCluster model={model} density={density} />
+      <HudStrip strip={strip} model={model} isFlashing={isFlashing} />
       <SlicePanels slot="gauges" />
-      <HudBanner model={model} isFlashing={isFlashing} density={density} />
       <SlicePanels slot="banner" />
-      <PositionPanel model={model} density={density} />
       <SlicePanels slot="position" />
+      <EdgeGauge permille={strip.edgePermille} />
       {isUpright ? <UprightAlerts model={model} /> : <EdgeAlerts model={model} />}
       <HazardStrip />
+      <HudGearButton isOpen={isDetailOpen} isLeftHanded={isLeftHanded} />
+      {isDetailOpen && (
+        <HudDetail model={model} isFlashing={isFlashing} isLeftHanded={isLeftHanded} />
+      )}
     </div>
   )
 }

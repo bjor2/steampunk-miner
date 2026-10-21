@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { compactReadingTextOf, compactChipValueOf, isUprightCompactHud } from './hudCompact'
+import { compactChipValueOf, isUprightCompactHud } from './hudCompact'
 
 describe('compact HUD rows (#486)', () => {
   it('lays threats and prompts out as rows only on the compact HUD held upright', () => {
@@ -18,15 +18,5 @@ describe('compact HUD rows (#486)', () => {
   it('draws no number for a title of words alone', () => {
     expect(compactChipValueOf('HULL CRITICAL')).toBe('')
     expect(compactChipValueOf('FULL')).toBe('')
-  })
-
-  it('leaves the control a reading names to its card on the closed compact row', () => {
-    expect(compactReadingTextOf('Auto (Guns button)', 'card')).toBe('Auto')
-    expect(compactReadingTextOf('2/4 (C)', 'card')).toBe('2/4')
-    expect(compactReadingTextOf('288', 'card')).toBe('288')
-  })
-
-  it('keeps a reading whole on the full HUD and in its open card', () => {
-    expect(compactReadingTextOf('Auto (Guns button)', 'element')).toBe('Auto (Guns button)')
   })
 })

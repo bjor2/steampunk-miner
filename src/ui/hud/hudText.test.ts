@@ -12,11 +12,12 @@ import { HudView } from './HudView'
 import { SlowDeviceChipView } from './SlowDeviceChip'
 
 // Spec #422, pass #428: the HUD is handed a model with every readout and call-out up at once
-// (`everyReadoutOf`) and judged as the budget test does.
+// (`everyReadoutOf`) and judged as the budget test does, the strip's detail open (ticket 684), so
+// every readout and call-out the gear button holds is drawn too.
 
 function drawEveryReadout(): string {
   const model = everyReadoutOf(readHudModel())
-  return renderToString(createElement(HudView, { model, isFlashing: true }))
+  return renderToString(createElement(HudView, { model, isFlashing: true, isDetailOpen: true }))
 }
 
 beforeEach(() => {
@@ -46,11 +47,11 @@ describe('HUD text budget (spec #422, pass #428)', () => {
     expect(texts.flatMap(uiTextProblemsOf)).toEqual([])
   })
 
-  it('shows the charges and the lining bill on the element, never in a tooltip', () => {
+  it('shows the charges, the lining bill and the next upgrade on the element, never in a tooltip', () => {
     drawEveryReadout()
     const lines = registeredUiTexts().flatMap((text) => text.lines)
     const held = lines.filter((line) => line.holds !== undefined)
-    expect(held.map((line) => line.holds).sort()).toEqual(['charges', 'price'])
+    expect(held.map((line) => line.holds).sort()).toEqual(['charges', 'price', 'price'])
     expect(held.every((line) => line.tag === 'visible')).toBe(true)
   })
 

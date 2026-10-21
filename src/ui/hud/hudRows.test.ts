@@ -8,14 +8,13 @@ import type { HudModel } from '../../systems/views/hudModel'
 import type { StageOrientation } from '../../systems/views/screenLayout'
 import { forgetUiTexts, registeredUiTexts } from '../../systems/views/uiText'
 import { unregisteredTextsOf } from '../../systems/views/unregisteredText'
-import { HudBanner } from './HudBanner'
 import { everyReadoutOf } from './hudFixtures'
 import { HudView } from './HudView'
-import { PositionPanel } from './PositionPanel'
+import { StripStatuses } from './StripStatuses'
 
-// #486: the compact HUD's status row is glyphs and numbers, its readings leave their bracketed
-// control to the card, and held upright the threats are chips in the prompts' row instead of
-// markers at the screen's edge. The full HUD draws as before.
+// #486: the status row (on the strip since ticket 684) is glyphs and numbers, and held upright
+// the threats are chips in the prompts' row instead of markers at the screen's edge. The full
+// HUD draws as before.
 
 const MARKUP_TOKEN = /<\/[^>]*>|<[a-zA-Z][^>]*>|[^<]+/g
 const VOID_TAG = /^<(?:br|img|input|hr|meta|link|source|path|circle|rect|use)\b|\/>$/
@@ -58,25 +57,13 @@ beforeEach(() => {
 
 afterEach(() => forgetUiTexts())
 
-describe('compact HUD rows (#486)', () => {
-  it('draws each status chip as its icon and number, its words kept for the card', () => {
-    renderToString(
-      createElement(HudBanner, { model: worstModel(), isFlashing: false, density: 'compact' }),
-    )
+describe('strip status row (#486, ticket 684)', () => {
+  it('draws each status chip as its icon and number, its words kept for the detail', () => {
+    renderToString(createElement(StripStatuses, { model: worstModel(), isFlashing: false }))
     const chips = chipTexts()
     expect(chips.length).toBeGreaterThan(0)
     expect(chips.every((chip) => chip.titlePlace === 'card' && chip.title !== '')).toBe(true)
     expect(chips.reduce((words, chip) => words + shownLabelWordsOf(chip), 0)).toBe(0)
-  })
-
-  it('leaves the guns and charges controls to the card on the closed compact readouts', () => {
-    const draw = (density: 'compact' | 'full') =>
-      renderToString(createElement(PositionPanel, { model: worstModel(), density }))
-    const compact = draw('compact')
-    expect(compact).toContain('Auto')
-    expect(compact).not.toContain('Auto (G)')
-    expect(compact).not.toContain('2/4 (C)')
-    expect(draw('full')).toContain('Auto (G)')
   })
 })
 

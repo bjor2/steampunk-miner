@@ -1,0 +1,46 @@
+/* The odometer (ticket 684): tabular numerals at the odometer size, digits on a parchment drum. */
+.odometer {
+  display: inline-flex;
+  align-items: stretch;
+  color: var(--color-parchment);
+  font-family: var(--font-numerals);
+  font-size: var(--type-odometer);
+  font-variant-numeric: tabular-nums;
+  line-height: var(--line-height);
+  white-space: nowrap;
+}
+
+.cell {
+  display: inline-block;
+  overflow: hidden;
+}
+
+/* A drum cell: the parchment's three stops, the digit inked dark on it. */
+.cell[data-digit] {
+  padding: 0 1px;
+  background: linear-gradient(
+    var(--material-parchment-shadow),
+    var(--material-parchment-highlight) 45%,
+    var(--material-parchment-base) 60%,
+    var(--material-parchment-shadow)
+  );
+  color: var(--color-bg);
+}
+
+/* A new digit is a new cell (keyed by place and digit), so it rolls up into the window. */
+.cell[data-digit] .face {
+  display: inline-block;
+  animation: odometer-roll var(--odometer-roll-max) var(--ease-enter) both;
+}
+
+@keyframes odometer-roll {
+  from {
+    transform: translateY(100%);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cell[data-digit] .face {
+    animation: none;
+  }
+}
