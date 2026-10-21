@@ -12,6 +12,11 @@ describe('drill bore', () => {
     expect(BODY_HALF_SIZE_MM * 2).toBe(bodyWidthMm)
   })
 
+  it('ships the 950 mm stamp radius protocol 100 cut until ticket 662 narrows the row', () => {
+    expect(DRILL_BORE_ROWS.sideClearanceMm).toBe(WIDE_BORE_CLEARANCE_MM)
+    expect(drillStampRadiusMm()).toBe(950)
+  })
+
   it('cuts decision #36’s 1.9 m bore, lift and ring lag at a clearance of 0.5 m', () => {
     withDrillSideClearance(WIDE_BORE_CLEARANCE_MM, () => {
       expect(drillStampRadiusMm()).toBe(950)

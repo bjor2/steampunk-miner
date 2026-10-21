@@ -62,9 +62,6 @@ export interface DrillBoreRows {
  */
 export const DRILL_BORE_ROWS: DrillBoreRows = { sideClearanceMm: 500 }
 
-/** The range the GD lock on #661 lets the side clearance be tuned in, in mm. */
-export const DRILL_SIDE_CLEARANCE_RANGE_MM = { min: 100, max: 200 } as const
-
 /**
  * Where the stamp sits (#40: the drill axis is the 4-way facing in the local frame): this far
  * ahead of the body's centre along the facing, so it bites just past the 0.9 m body's face.
