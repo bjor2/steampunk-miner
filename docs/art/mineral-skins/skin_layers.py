@@ -41,11 +41,12 @@ LIGHT_LUMA_SHARE = 0.5
 # #593 its slots 6 to 10, #594 its last two, 11 and 12: the legacy pool has 12 species; #598 is P3
 # slots 1 to 5, #599 its slots 6 to 10 and #600 its slots 11 to 15 and the planet's signature
 # material, of the foothold-p3 pool; #601 is P4 slots 1 to 5, #602 its slots 6 to 10 and #603 its
-# slots 11 to 15 and the planet's signature material; #604 is P5 slots 1 to 5 and #605 its slots 6
-# to 10, of the foothold-p5 pool; #595 is P2 slots 1 to 5, of the foothold-p2 pool, which binds the
-# legacy slots, and #596 its slots 6 to 9, the four uncommons), named `p<planet>-b<n>`, in slot
-# order. A batch is measured against all of its planet's other batches (`planet_mates`). A batch's
-# `signature` is the planet whose signature skin row it adds.
+# slots 11 to 15 and the planet's signature material; #604 is P5 slots 1 to 5, #605 its slots 6 to 10
+# and #606 its slots 11 to 15 and the planet's signature material, of the foothold-p5 pool; #595 is
+# P2 slots 1 to 5, of the foothold-p2 pool, which binds the legacy slots, and #596 its slots 6 to 9,
+# the four uncommons), named `p<planet>-b<n>`, in slot order. A batch is measured against all of its
+# planet's other batches (`planet_mates`). A batch's `signature` is the planet whose signature skin
+# row it adds.
 BATCHES = {
     'p1-b1': {'pool': 'legacy', 'slots': ('legacy.c1', 'legacy.c2', 'legacy.c3', 'legacy.c4', 'legacy.c5')},
     'p1-b2': {'pool': 'legacy', 'slots': ('legacy.u1', 'legacy.u2', 'legacy.u3', 'legacy.u4', 'legacy.r1')},
@@ -62,6 +63,8 @@ BATCHES = {
               'signature': 4},
     'p5-b1': {'pool': 'foothold-p5', 'slots': ('mixed.c1', 'mixed.c2', 'mixed.c3', 'mixed.c4', 'mixed.u1')},
     'p5-b2': {'pool': 'foothold-p5', 'slots': ('mixed.u2', 'mixed.u3', 'mixed.r1', 'mixed.r2', 'mixed.r3')},
+    'p5-b3': {'pool': 'foothold-p5', 'slots': ('mixed.e1', 'mixed.e2', 'mixed.e3', 'mixed.m1', 'mixed.m2'),
+              'signature': 5},
 }
 # A signature material has no hue slot (#453 E1): its palette is built on a slot-shaped look chosen
 # inside its family's hue and luma bands of docs/art/ores (#151; relic 155-168 degrees, luma
@@ -69,15 +72,19 @@ BATCHES = {
 SIGNATURE_LOOKS = {
     3: {'id': 'p3-signature', 'hue': 163, 'saturation': 0.5, 'luma': 0.5},
     4: {'id': 'p4-signature', 'hue': 166, 'saturation': 0.5, 'luma': 0.6},
+    5: {'id': 'p5-signature', 'hue': 157, 'saturation': 0.5, 'luma': 0.52},
 }
 # A colour-change species' shadow end sits on its second colour, not on its own hue: alexandrite is
 # green by lamplight and red by candle, so its ramp runs from raspberry through the green body.
 # Bismuth's oxide skin runs through the temper colours, so its shadow sits on magenta under the
 # cyan body (ticket 596).
 SHADOW_HUES = {'alexandrite': 335, 'bismuth-rainbow': 300}
-# A two-tone species' light end sits on its heart's colour: watermelon tourmaline is pink at heart
-# and green at the rind, so its ramp runs from the green body up to a pale pink.
-LIGHT_HUES = {'watermelon-tourmaline': 345}
+# A light end can sit off the species' own hue. A two-tone species' light end sits on its heart's
+# colour: watermelon tourmaline is pink at heart and green at the rind, so its ramp runs from the
+# green body up to a pale pink. An inner-fire species' light end sits on its flame: furnace ruby is
+# "a ruby with a flame inside", so its ramp runs from its red body up into a flame orange, which also
+# parts it from fire garnet, the hue slot five degrees from it on P5.
+LIGHT_HUES = {'watermelon-tourmaline': 345, 'furnace-ruby': 25}
 
 
 def load_skins():
@@ -145,7 +152,7 @@ def ramp_of_slot(slot):
     """
     Shadow, body, light: the body is the hue slot's colour (ticket 450), the ends on its hue, or the
     shadow on a colour-change species' second hue (SHADOW_HUES) and the light on a two-tone
-    species' heart (LIGHT_HUES).
+    species' heart or an inner-fire species' flame (LIGHT_HUES).
     """
     body = rgb_of_hex(species.slot_hex(slot))
     luma = species.luma_of_rgb(body)

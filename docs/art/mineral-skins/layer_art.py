@@ -3,9 +3,9 @@ The Blender recipes of the mineral skin layers (#576, ticket 592 for P1's slots 
 for its slots 6 to 10, ticket 594 for 11 and 12, ticket 598 for P3's slots 1 to 5, ticket 599 for
 its slots 6 to 10, ticket 600 for its slots 11 to 15 and its relic signature, ticket 601 for P4's
 slots 1 to 5, ticket 602 for its slots 6 to 10, ticket 603 for its slots 11 to 15 and its signature
-material, ticket 604 for P5's slots 1 to 5, ticket 605 for its slots 6 to 10, ticket 595 for P2's
-slots 1 to 5, ticket 596 for its slots 6 to 9): one per layer id of `mineralSkins.json`. A layer id
-with no recipe fails, never falls back.
+material, ticket 604 for P5's slots 1 to 5, ticket 605 for its slots 6 to 10, ticket 606 for its slots
+11 to 15 and its signature material, ticket 595 for P2's slots 1 to 5, ticket 596 for its slots 6 to
+9): one per layer id of `mineralSkins.json`. A layer id with no recipe fails, never falls back.
 
 - `base` and `sheen` are seamless textures on the 1 m cell: an emission material on a 1 m quad
   whose value is the ramp coordinate (base, mean about 0.5) or the highlight strength (sheen,
@@ -1235,6 +1235,167 @@ def belemnite_guards_of(graph):
     return {'reach': graph.math('DIVIDE', distance, size), 'angle': graph.math('ARCTAN2', dy, dx)}
 
 
+def base_flame_tongues(graph):
+    """Firebrass: brass grown in the rock, lit from below in rows of flame tongues licking upward, a fine hammered grain."""
+    flames = firebrass_flames_of(graph)
+    glow = stretched(graph, graph.noise(3, 3, seed=803, detail=3))
+    grain = stretched(graph, graph.noise(56, 56, seed=804, detail=4))
+    tone = graph.plus(graph.mul(flames, 0.46), 0.34)
+    tone = graph.plus(tone, graph.mul(graph.minus(glow, 0.5), 0.18))
+    return graph.plus(tone, graph.mul(graph.minus(grain, 0.5), 0.08))
+
+
+FLAME_ROWS = 3
+
+
+def firebrass_flames_of(graph):
+    """
+    The flame tongues (0..1): in each row a tall wavering column field that thins toward the row's top,
+    so the tongues rise from a lit foot and taper; the foot fades in over a dark seam, so a row does not
+    end in a hard line. Shared by the base and the flame flicker.
+    """
+    rows = lattice_of(graph, 1, FLAME_ROWS)
+    columns = stretched(graph, graph.noise(16, 3, seed=801, detail=2))
+    lick = graph.mul(graph.minus(graph.noise(6, 9, seed=802, detail=2), 0.5), 0.3)
+    height = graph.plus(rows['y'], lick)
+    tongues = graph.smooth(graph.minus(columns, graph.mul(height, 0.8)), -0.05, 0.3)
+    return graph.mul(tongues, graph.smooth(rows['y'], 0.0, 0.12))
+
+
+def base_heat_shimmer(graph):
+    """Heat spinel: a clear pink body seen through rising heat, upright shimmer columns wavering up it over a slow warm cloud."""
+    shimmer = spinel_shimmer_of(graph)
+    cloud = stretched(graph, graph.noise(2, 2, seed=813, detail=3))
+    fine = stretched(graph, graph.noise(40, 40, seed=814, detail=3))
+    tone = graph.minus(around_half(graph, cloud, 0.36), 0.11)
+    tone = graph.plus(tone, graph.mul(shimmer, 0.2))
+    return graph.plus(tone, graph.mul(graph.minus(fine, 0.5), 0.06))
+
+
+SHIMMER_BANDS = 5
+
+
+def spinel_shimmer_of(graph):
+    """
+    The shimmer columns (-1..1): upright bands bent hard by a fine warp, as air rising over a furnace
+    bends the light. Upright, since P5's shark tooth lies in level beds at the spinel's luma and the
+    two go one grey under deuteranopia. Shared with the banked glow.
+    """
+    warp = graph.noise(3, 8, seed=811, detail=2)
+    drift = graph.noise(2, 2, seed=812, detail=2)
+    phase = graph.mul_add(graph.u, SHIMMER_BANDS, graph.mul(graph.minus(warp, 0.5), 1.6))
+    phase = graph.plus(phase, graph.mul(graph.minus(drift, 0.5), 2.0))
+    return graph.math('SINE', graph.mul(phase, math.tau))
+
+
+def base_heartwood_grain(graph):
+    """Petrified heartwood: a branch turned to stone, upright growth rings drawn out along the grain and bent round knots, dark checks across."""
+    rings = heartwood_rings_of(graph)
+    knot = graph.smooth(heartwood_knots_of(graph), 0.16, 0.08)
+    check = heartwood_checks_of(graph)
+    grain = stretched(graph, graph.noise(6, 40, seed=825, detail=3))
+    tone = graph.minus(0.56, graph.mul(rings, 0.3))
+    tone = graph.plus(tone, graph.mul(graph.minus(grain, 0.5), 0.1))
+    tone = graph.minus(tone, graph.mul(knot, 0.34))
+    return graph.minus(tone, graph.mul(check, 0.3))
+
+
+HEARTWOOD_RINGS = 12
+
+
+def heartwood_rings_of(graph):
+    """The growth rings (0..1, 1 on a late-wood line): upright, wavering, bulged round the knots. Shared with the chalcedony gleam."""
+    warp = graph.noise(2, 3, seed=821, detail=3)
+    bulge = graph.smooth(heartwood_knots_of(graph), 0.4, 0.0)
+    phase = graph.mul_add(graph.u, HEARTWOOD_RINGS, graph.mul(graph.minus(warp, 0.5), 2.4))
+    phase = graph.plus(phase, graph.mul(bulge, 2.4))
+    return graph.smooth(graph.math('SINE', graph.mul(phase, math.tau)), 0.3, 0.95)
+
+
+def heartwood_knots_of(graph):
+    """The distance to the nearest knot: the rings bulge round it and its dark eye sits on it."""
+    return graph.voronoi(2, 2, seed=822)['Distance']
+
+
+def heartwood_checks_of(graph):
+    """The drying checks: short dark cracks across the grain, broken off by a noise."""
+    across = graph.mul_add(graph.v, 7.0, graph.mul(graph.noise(3, 3, seed=823, detail=2), 0.8))
+    line = graph.smooth(graph.math('ABSOLUTE', graph.periodic(across, 1.0)), 0.03, 0.0)
+    return graph.mul(line, graph.smooth(stretched(graph, graph.noise(9, 3, seed=824, detail=2)), 0.55, 0.7))
+
+
+def base_molten_pour(graph):
+    """Core gold: gold that set as it flowed, bright rivulets threading a wrinkled cooled skin, the skin's folds pushed across the flow."""
+    rivulets = molten_rivulets_of(graph)
+    folds = graph.math('SINE', graph.mul(graph.mul_add(graph.u, 22.0, graph.mul(graph.noise(3, 3, seed=833, detail=2), 4.0)), math.tau))
+    skin = stretched(graph, graph.noise(5, 5, seed=834, detail=4))
+    tone = graph.plus(graph.mul(graph.minus(skin, 0.5), 0.22), 0.45)
+    tone = graph.plus(tone, graph.mul(folds, 0.06))
+    return graph.plus(tone, graph.mul(rivulets, 0.42))
+
+
+def molten_rivulets_of(graph):
+    """1 along a rivulet of still-bright gold, 0 on the skin: the ridge lines of a warped noise. Shared with the molten sheen."""
+    field = graph.noise(3, 3, seed=831, detail=3)
+    warp = graph.mul(graph.minus(graph.noise(6, 6, seed=832, detail=2), 0.5), 0.12)
+    ridge = graph.math('ABSOLUTE', graph.minus(graph.plus(field, warp), 0.5))
+    return graph.smooth(ridge, 0.035, 0.0)
+
+
+def base_hearth_zones(graph):
+    """
+    Furnace ruby: a deep red body grown in hexagonal zones round a flame-bright heart, darker outward,
+    crisp zone lines. Fire garnet has nearly its colour (hue slots 345 and 350 degrees at one luma) and
+    soft round glowing cores; the ruby's honeycomb is drawn bold, bright heart to dark rim, so the two
+    stand apart by texture at a phone's tile.
+    """
+    ring = ruby_zone_ring_of(graph)
+    lines = graph.smooth(graph.math('SINE', graph.mul(ring, 44.0)), 0.75, 0.97)
+    cloud = stretched(graph, graph.noise(3, 3, seed=842, detail=3))
+    tone = graph.minus(0.98, graph.mul(ring, 1.4))
+    tone = graph.plus(tone, graph.mul(graph.minus(cloud, 0.5), 0.12))
+    tone = graph.minus(tone, graph.mul(lines, 0.18))
+    return graph.plus(tone, graph.mul(graph.smooth(ring, 0.12, 0.0), 0.2))
+
+
+def ruby_zone_ring_of(graph):
+    """The hexagonal distance from a zone's heart (0 there, about 0.5 at its edge), two zones by two, wobbled: shared with the ruby fire."""
+    zones = lattice_of(graph, 2, 2, stagger=0.5)
+    return graph.plus(hex_ring(graph, zones), graph.mul(graph.minus(graph.noise(4, 4, seed=841, detail=2), 0.5), 0.05))
+
+
+def base_enamel_dial(graph):
+    """P5's signature, cogwork: enamelled clock dials half a cell across, a chapter ring of hour marks, the glaze crazed by the furnace, brass between."""
+    dial = dial_of(graph)
+    crazing = graph.smooth(graph.voronoi(9, 9, seed=851, feature='DISTANCE_TO_EDGE')['Distance'], 0.012, 0.0)
+    wear = stretched(graph, graph.noise(4, 4, seed=852, detail=3))
+    face = graph.smooth(dial['radius'], 0.46, 0.44)
+    tone = graph.plus(graph.mul(face, 0.3), 0.28)
+    tone = graph.plus(tone, graph.mul(graph.minus(wear, 0.5), 0.14))
+    tone = graph.minus(tone, graph.mul(graph.mul(dial['marks'], face), 0.34))
+    tone = graph.minus(tone, graph.mul(graph.mul(crazing, face), 0.16))
+    return graph.plus(tone, graph.mul(graph.smooth(dial['radius'], 0.04, 0.025), 0.3))
+
+
+DIALS = 2
+
+
+def dial_of(graph):
+    """
+    Each dial's radius (0 at its arbor, 0.5 at its block's edge) and its marks: the chapter ring's two
+    circles and twelve hour ticks between them. Shared by the base and the dial glaze.
+    """
+    dials = lattice_of(graph, DIALS, DIALS)
+    x, y = graph.minus(dials['x'], 0.5), graph.minus(dials['y'], 0.5)
+    radius = graph.math('SQRT', graph.plus(graph.mul(x, x), graph.mul(y, y)))
+    hour = graph.math('ABSOLUTE', graph.periodic(graph.mul(graph.math('ARCTAN2', y, x), 12.0 / math.tau), 1.0))
+    band = graph.mul(graph.smooth(radius, 0.3, 0.32), graph.smooth(radius, 0.4, 0.38))
+    ticks = graph.mul(graph.smooth(hour, 0.08, 0.04), band)
+    circles = graph.math('MAXIMUM', graph.smooth(graph.math('ABSOLUTE', graph.minus(radius, 0.3)), 0.012, 0.0),
+                         graph.smooth(graph.math('ABSOLUTE', graph.minus(radius, 0.4)), 0.012, 0.0))
+    return {'radius': radius, 'x': x, 'y': y, 'marks': graph.math('MAXIMUM', ticks, circles)}
+
+
 # --- sheen: the lustre's highlights -----------------------------------------------------------------
 
 
@@ -1783,6 +1944,55 @@ def sheen_guard_crescents(graph):
 
 # Up and to the left, where the ore stage's key lamp stands.
 LAMP_ANGLE = 0.75 * math.pi
+
+
+def sheen_flame_flicker(graph):
+    """Flame flicker (firebrass): light at the flame tongues' tips, flickering in and out along the rows, a few hot glints."""
+    tips = graph.mul(firebrass_flames_of(graph), graph.smooth(lattice_of(graph, 1, FLAME_ROWS)['y'], 0.25, 0.6))
+    flicker = graph.smooth(stretched(graph, graph.noise(5, 5, seed=806, detail=2)), 0.35, 0.7)
+    glint = graph.smooth(graph.voronoi(10, 10, seed=807)['Distance'], 0.05, 0.012)
+    return graph.plus(graph.mul(graph.mul(tips, flicker), 0.55), graph.mul(glint, 0.6))
+
+
+def sheen_banked_glow(graph):
+    """Banked glow (heat spinel): the stone holds the heat, a soft glow along the shimmer crests and a warm bloom beneath, a few glints."""
+    crests = graph.smooth(spinel_shimmer_of(graph), 0.4, 0.95)
+    bloom = graph.smooth(stretched(graph, graph.noise(2, 2, seed=813, detail=3)), 0.45, 0.85)
+    glint = graph.smooth(graph.voronoi(8, 8, seed=816)['Distance'], 0.05, 0.012)
+    return graph.plus(graph.plus(graph.mul(crests, 0.26), graph.mul(bloom, 0.2)), graph.mul(glint, 0.55))
+
+
+def sheen_chalcedony_gleam(graph):
+    """Chalcedony gleam (petrified heartwood): where the wood turned to chalcedony, a waxy gleam runs along the late-wood lines."""
+    lines = heartwood_rings_of(graph)
+    silica = graph.smooth(stretched(graph, graph.noise(3, 3, seed=826, detail=3)), 0.5, 0.75)
+    broad = graph.smooth(stretched(graph, graph.noise(2, 2, seed=827, detail=2)), 0.55, 0.85)
+    return graph.plus(graph.mul(graph.mul(lines, silica), 0.42), graph.mul(broad, 0.1))
+
+
+def sheen_molten_sheen(graph):
+    """Molten sheen (core gold): the rivulets still shine like liquid metal, a broad wet glare round them and hard glints on the skin."""
+    rivulets = molten_rivulets_of(graph)
+    glare = graph.smooth(graph.math('ABSOLUTE', graph.minus(graph.noise(3, 3, seed=831, detail=3), 0.5)), 0.1, 0.0)
+    glint = graph.smooth(graph.voronoi(12, 12, seed=836)['Distance'], 0.05, 0.012)
+    return graph.plus(graph.plus(graph.mul(rivulets, 0.6), graph.mul(glare, 0.2)), graph.mul(glint, 0.5))
+
+
+def sheen_ruby_fire(graph):
+    """Ruby fire (furnace ruby): a flame-bright glow in each zone's heart, as if a coal burned inside, and sharp red sparks."""
+    ring = ruby_zone_ring_of(graph)
+    heart = graph.smooth(ring, 0.2, 0.0)
+    spark = graph.smooth(graph.voronoi(14, 14, seed=846)['Distance'], 0.05, 0.012)
+    return graph.plus(graph.mul(heart, 0.6), graph.mul(spark, 0.7))
+
+
+def sheen_dial_glaze(graph):
+    """Dial glaze (P5's signature): a window of light swept across each glazed dial, the crazing catching it, the brass between dull."""
+    dial = dial_of(graph)
+    face = graph.smooth(dial['radius'], 0.46, 0.44)
+    sweep = graph.smooth(graph.math('ABSOLUTE', graph.plus(graph.minus(dial['x'], dial['y']), 0.1)), 0.14, 0.04)
+    crazing = graph.smooth(graph.voronoi(9, 9, seed=851, feature='DISTANCE_TO_EDGE')['Distance'], 0.02, 0.005)
+    return graph.mul(face, graph.plus(graph.mul(sweep, 0.5), graph.mul(crazing, 0.25)))
 
 
 # --- vein: the crystal or vein shape, by the row's silhouette ----------------------------------------
@@ -3012,6 +3222,171 @@ def bullet_dart(name, centre, length, radius, angle):
     return [shank, point]
 
 
+def vein_curled_ribbons(rng, body):
+    """Firebrass: thin ribbons of brass grown out of the rock, each curling up at its end, twisting so it narrows and widens."""
+    marks = []
+    for i, (x, z, start_angle, turn) in enumerate(((-0.1, 0.16, 0.2, 4.2), (0.2, 0.0, 2.6, -4.0), (-0.06, -0.2, -0.4, 3.6))):
+        path = ribbon_tail((x, z), start_angle, turn, rng) + spiral_path((x, z), rng.uniform(0.08, 0.1), start_angle, turn)
+        ribbon = shapes.add_polygon('ribbon-%d' % i, ribbon_outline(path, 0.034), -0.012, 0.008)
+        shapes.bevel(ribbon, 0.002, segments=1)
+        marks.append(ribbon)
+    return assign_all(marks, body)
+
+
+def ribbon_tail(centre, start_angle, turn, rng, steps=16):
+    """The straight-ish length a ribbon runs before it curls: from its root, wavering, into the curl's loose end."""
+    reach = 0.09
+    loose = (centre[0] + math.cos(start_angle) * reach, centre[1] + math.sin(start_angle) * reach)
+    heading = start_angle - math.copysign(math.pi / 2, turn)
+    length, sway = rng.uniform(0.16, 0.2), rng.uniform(0.015, 0.025)
+    points = []
+    for k in range(steps):
+        t = 1.0 - k / steps
+        side = math.sin(t * math.pi * 2.0) * sway
+        points.append((loose[0] - math.cos(heading) * length * t - math.sin(heading) * side,
+                       loose[1] - math.sin(heading) * length * t + math.cos(heading) * side))
+    return points
+
+
+def spiral_path(centre, reach, start_angle, turn, steps=40):
+    """A curl drawn inward from its loose end: a spiral round `centre` from radius `reach` to a third of it, through `turn` radians."""
+    points = []
+    for k in range(steps + 1):
+        t = k / steps
+        radius = reach * (1.0 - 0.66 * t)
+        angle = start_angle + turn * t
+        points.append((centre[0] + math.cos(angle) * radius, centre[1] + math.sin(angle) * radius))
+    return points
+
+
+def ribbon_outline(path, width):
+    """A ribbon of `width` along `path`, narrowing where it twists (every third of its length), as one closed outline."""
+    left, right = [], []
+    for k, (x, z) in enumerate(path):
+        ahead, behind = path[min(k + 1, len(path) - 1)], path[max(k - 1, 0)]
+        dx, dz = ahead[0] - behind[0], ahead[1] - behind[1]
+        length = math.hypot(dx, dz) or 1.0
+        half = width * 0.5 * (0.35 + 0.65 * abs(math.cos(3.0 * math.pi * k / (len(path) - 1))))
+        left.append((x - dz / length * half, z + dx / length * half))
+        right.append((x + dz / length * half, z - dx / length * half))
+    return left + right[::-1]
+
+
+def vein_spinel_macles(rng, body):
+    """Heat spinel: spinel-law twins, flat triangular macles with a stepped re-entrant face, and two small octahedra beside them."""
+    marks = []
+    for i, (x, z, size) in enumerate(((-0.12, 0.1, 0.17), (0.15, 0.13, 0.12), (0.06, -0.16, 0.14))):
+        spin = rng.uniform(0.0, math.tau / 3)
+        plate = shapes.add_polygon('macle-%d' % i, shapes.regular_points((x, z), size, 3, spin), -0.012, 0.024)
+        twin = shapes.add_polygon('macle-%d-twin' % i, shapes.regular_points((x, z), size * 0.62, 3, spin + math.pi / 3), -0.036, 0.018)
+        for mark in (plate, twin):
+            shapes.bevel(mark, 0.012, segments=1)
+        marks += [plate, twin]
+    for i, (x, z) in enumerate(((-0.2, -0.18), (0.25, -0.05))):
+        radius = rng.uniform(0.04, 0.05)
+        turn = (rng.uniform(0.4, 0.8), rng.uniform(0.0, math.pi / 2), 0.0)
+        for half, flip in (('top', 0.0), ('foot', math.pi)):
+            pyramid = shapes.add_cone('octahedron-%d-%s' % (i, half), radius, radius, (x, -radius * 0.4, z), rotation=(turn[0] + flip, turn[1], turn[2]), sides=4)
+            pyramid.data.transform(Matrix.Translation((0.0, 0.0, radius / 2)))
+            marks.append(pyramid)
+    return assign_all(marks, body)
+
+
+def vein_log_rounds(rng, body):
+    """Petrified heartwood: a stone branch lying along the face with a broken stub, and two sawn rounds standing end on, rings and bark."""
+    marks = []
+    branch = shapes.add_prism('branch', 0.055, 0.46, (-0.02, -0.03, 0.17), rotation=(0.0, math.pi / 2 - 0.12, 0.0), sides=20)
+    branch.scale = (1.0, 0.7, 1.0)
+    stub = shapes.add_prism('stub', 0.03, 0.09, (0.08, -0.03, 0.24), rotation=(0.0, -0.7, 0.0), sides=12)
+    marks += [branch, stub]
+    for i, (x, z, radius) in enumerate(((-0.12, -0.14, 0.12), (0.17, -0.12, 0.09))):
+        marks += log_round('round-%d' % i, (x, z), radius * rng.uniform(0.95, 1.05))
+    return assign_all(marks, body)
+
+
+def log_round(name, centre, radius):
+    """A sawn round seen end on: its body, a bark rim and three growth rings standing out of the cut face."""
+    round_ = shapes.add_prism(name, radius, 0.05, (centre[0], -0.025, centre[1]), rotation=shapes.facing_camera(), sides=24)
+    bark = shapes.add_torus(name + '-bark', radius, 0.012, (centre[0], -0.05, centre[1]), rotation=(math.pi / 2, 0.0, 0.0))
+    rings = [shapes.add_torus('%s-ring-%d' % (name, k), radius * share, 0.004, (centre[0], -0.05, centre[1]), rotation=(math.pi / 2, 0.0, 0.0))
+             for k, share in enumerate((0.3, 0.55, 0.78))]
+    return [round_, bark] + rings
+
+
+def vein_gold_blooms(rng, body):
+    """Core gold: blooms of gold, rosettes of rounded petals round a bead, as gold crystallises out of the melt."""
+    marks = []
+    for i, (x, z, size) in enumerate(((-0.1, 0.1, 0.13), (0.17, -0.06, 0.1), (-0.06, -0.19, 0.08))):
+        petals = rng.choice((7, 8))
+        phase = rng.uniform(0.0, math.tau)
+        marks.append(gold_bead('bloom-%d' % i, (x, -0.02, z), size * 0.32))
+        for k in range(petals):
+            angle = phase + math.tau * k / petals
+            at = (x + math.cos(angle) * size * 0.62, -size * 0.12, z + math.sin(angle) * size * 0.62)
+            marks.append(shapes.add_icosphere('bloom-%d-petal-%d' % (i, k), size * rng.uniform(0.3, 0.44), at, subdivisions=2, scale=(1.0, 0.5, 0.7),
+                                              rotation=(0.0, -angle, 0.0)))
+    return assign_all(marks, body)
+
+
+def vein_heart_crystals(rng, body):
+    """Furnace ruby: heart-shaped rubies with bevelled facet edges, a raised table on each, one small heart beside two large."""
+    marks = []
+    for i, (x, z, size, turn) in enumerate(((-0.12, 0.08, 0.26, 0.15), (0.17, 0.12, 0.2, -0.25), (0.06, -0.18, 0.15, 0.05))):
+        size *= rng.uniform(0.95, 1.05)
+        heart = shapes.add_polygon('heart-%d' % i, heart_points((x, z), size, turn), -0.012, 0.03)
+        table = shapes.add_polygon('heart-%d-table' % i, heart_points((x, z + size * 0.05), size * 0.5, turn), -0.042, 0.012)
+        shapes.bevel(heart, size * 0.12, segments=1)
+        shapes.bevel(table, size * 0.04, segments=1)
+        marks += [heart, table]
+    return assign_all(marks, body)
+
+
+def heart_points(centre, size, turn, steps=48):
+    """The classic heart curve, `size` across, its point down, turned by `turn` in the face."""
+    points = []
+    for k in range(steps):
+        t = math.tau * k / steps
+        x = 16 * math.sin(t) ** 3
+        z = 13 * math.cos(t) - 5 * math.cos(2 * t) - 2 * math.cos(3 * t) - math.cos(4 * t)
+        points.append(turned_point((x * size / 32.0, z * size / 32.0), centre, turn))
+    return points
+
+
+def vein_escapement(rng, body):
+    """P5's signature, cogwork: a clock's escapement, the escape wheel's hooked teeth and its spokes, the anchor rocking over it."""
+    wheel_at, radius = (-0.03, -0.08), 0.2
+    marks = [shapes.add_polygon('escape-wheel', escape_wheel_points(wheel_at, radius, 15), -0.012, 0.02),
+             shapes.add_prism('arbor', 0.03, 0.03, (wheel_at[0], -0.04, wheel_at[1]), rotation=shapes.facing_camera(), sides=12),
+             shapes.add_torus('crossing', radius * 0.55, 0.01, (wheel_at[0], -0.034, wheel_at[1]), rotation=(math.pi / 2, 0.0, 0.0))]
+    for k in range(4):
+        angle = rng.uniform(0.0, 0.2) + math.tau * k / 4
+        reach = (wheel_at[0] + math.cos(angle) * radius * 0.5, wheel_at[1] + math.sin(angle) * radius * 0.5)
+        marks.append(shapes.add_tube('spoke-%d' % k, [(wheel_at[0], -0.034, wheel_at[1]), (reach[0], -0.034, reach[1])], 0.009))
+    marks += escape_anchor((wheel_at[0], wheel_at[1] + radius * 1.45), radius)
+    return assign_all(marks, body)
+
+
+def escape_wheel_points(centre, radius, teeth):
+    """The escape wheel's rim: `teeth` hooked teeth, each a long slope up to a sharp tip and a short drop back to the root."""
+    points = []
+    for k in range(teeth):
+        start = math.tau * k / teeth
+        pitch = math.tau / teeth
+        for share, reach in ((0.0, radius * 0.78), (0.75, radius), (0.82, radius * 0.92), (0.9, radius * 0.78)):
+            angle = start + pitch * share
+            points.append((centre[0] + math.cos(angle) * reach, centre[1] + math.sin(angle) * reach))
+    return points
+
+
+def escape_anchor(pivot, radius):
+    """The anchor: two arms from its pivot down to the pallets that catch the escape wheel's teeth, and the pivot's boss."""
+    arms = [(pivot[0], pivot[1]), (pivot[0] - radius * 0.62, pivot[1] - radius * 0.42), (pivot[0] - radius * 0.66, pivot[1] - radius * 0.62)]
+    other = [(pivot[0], pivot[1]), (pivot[0] + radius * 0.62, pivot[1] - radius * 0.42), (pivot[0] + radius * 0.58, pivot[1] - radius * 0.64)]
+    return [shapes.add_tube('anchor-left', [(x, -0.04, z) for x, z in arms], 0.014),
+            shapes.add_tube('anchor-right', [(x, -0.04, z) for x, z in other], 0.014),
+            shapes.add_prism('anchor-boss', 0.035, 0.03, (pivot[0], -0.045, pivot[1]), rotation=shapes.facing_camera(), sides=12)]
+
+
 def kinked_path(start, end, rng, segments):
     """A wire from start to end, wobbling in the face at every inner point."""
     points = []
@@ -3097,6 +3472,12 @@ BASES = {
     'sulphide-tarnish': base_sulphide_tarnish,
     'two-tone-pencils': base_two_tone_pencils,
     'radial-guards': base_radial_guards,
+    'flame-tongues': base_flame_tongues,
+    'heat-shimmer': base_heat_shimmer,
+    'heartwood-grain': base_heartwood_grain,
+    'molten-pour': base_molten_pour,
+    'hearth-zones': base_hearth_zones,
+    'enamel-dial': base_enamel_dial,
 }
 SHEENS = {
     'earthy': sheen_earthy,
@@ -3162,6 +3543,12 @@ SHEENS = {
     'untarnished-gleam': sheen_untarnished_gleam,
     'prism-lines': sheen_prism_lines,
     'guard-crescents': sheen_guard_crescents,
+    'flame-flicker': sheen_flame_flicker,
+    'banked-glow': sheen_banked_glow,
+    'chalcedony-gleam': sheen_chalcedony_gleam,
+    'molten-sheen': sheen_molten_sheen,
+    'ruby-fire': sheen_ruby_fire,
+    'dial-glaze': sheen_dial_glaze,
 }
 VEINS = {
     'nugget-cluster': vein_nugget_cluster,
@@ -3227,6 +3614,12 @@ VEINS = {
     'ramshorn-curls': vein_ramshorn_curls,
     'pencil-prisms': vein_pencil_prisms,
     'bullet-darts': vein_bullet_darts,
+    'curled-ribbons': vein_curled_ribbons,
+    'spinel-macles': vein_spinel_macles,
+    'log-rounds': vein_log_rounds,
+    'gold-blooms': vein_gold_blooms,
+    'heart-crystals': vein_heart_crystals,
+    'escapement': vein_escapement,
 }
 RECIPES = {'base': BASES, 'vein': VEINS, 'sheen': SHEENS}
 

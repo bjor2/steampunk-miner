@@ -445,6 +445,48 @@
       "wornBy": ["belemnite-amberbone"]
     },
     {
+      "kind": "base",
+      "id": "flame-tongues",
+      "cell": "cells/base/flame-tongues.png",
+      "blend": "blend/base-flame-tongues.blend",
+      "wornBy": ["firebrass-brassvein"]
+    },
+    {
+      "kind": "base",
+      "id": "heat-shimmer",
+      "cell": "cells/base/heat-shimmer.png",
+      "blend": "blend/base-heat-shimmer.blend",
+      "wornBy": ["heat-spinel-quartzine"]
+    },
+    {
+      "kind": "base",
+      "id": "heartwood-grain",
+      "cell": "cells/base/heartwood-grain.png",
+      "blend": "blend/base-heartwood-grain.blend",
+      "wornBy": ["petrified-heartwood-amberbone"]
+    },
+    {
+      "kind": "base",
+      "id": "molten-pour",
+      "cell": "cells/base/molten-pour.png",
+      "blend": "blend/base-molten-pour.blend",
+      "wornBy": ["core-gold-brassvein"]
+    },
+    {
+      "kind": "base",
+      "id": "hearth-zones",
+      "cell": "cells/base/hearth-zones.png",
+      "blend": "blend/base-hearth-zones.blend",
+      "wornBy": ["furnace-ruby-quartzine"]
+    },
+    {
+      "kind": "base",
+      "id": "enamel-dial",
+      "cell": "cells/base/enamel-dial.png",
+      "blend": "blend/base-enamel-dial.blend",
+      "wornBy": ["p5-signature"]
+    },
+    {
       "kind": "vein",
       "id": "nugget-cluster",
       "cell": "cells/vein/nugget-cluster.png",
@@ -886,6 +928,48 @@
       "wornBy": ["belemnite-amberbone"]
     },
     {
+      "kind": "vein",
+      "id": "curled-ribbons",
+      "cell": "cells/vein/curled-ribbons.png",
+      "blend": "blend/vein-curled-ribbons.blend",
+      "wornBy": ["firebrass-brassvein"]
+    },
+    {
+      "kind": "vein",
+      "id": "spinel-macles",
+      "cell": "cells/vein/spinel-macles.png",
+      "blend": "blend/vein-spinel-macles.blend",
+      "wornBy": ["heat-spinel-quartzine"]
+    },
+    {
+      "kind": "vein",
+      "id": "log-rounds",
+      "cell": "cells/vein/log-rounds.png",
+      "blend": "blend/vein-log-rounds.blend",
+      "wornBy": ["petrified-heartwood-amberbone"]
+    },
+    {
+      "kind": "vein",
+      "id": "gold-blooms",
+      "cell": "cells/vein/gold-blooms.png",
+      "blend": "blend/vein-gold-blooms.blend",
+      "wornBy": ["core-gold-brassvein"]
+    },
+    {
+      "kind": "vein",
+      "id": "heart-crystals",
+      "cell": "cells/vein/heart-crystals.png",
+      "blend": "blend/vein-heart-crystals.blend",
+      "wornBy": ["furnace-ruby-quartzine"]
+    },
+    {
+      "kind": "vein",
+      "id": "escapement",
+      "cell": "cells/vein/escapement.png",
+      "blend": "blend/vein-escapement.blend",
+      "wornBy": ["p5-signature"]
+    },
+    {
       "kind": "sheen",
       "id": "earthy",
       "cell": "cells/sheen/earthy.png",
@@ -1325,6 +1409,48 @@
       "cell": "cells/sheen/guard-crescents.png",
       "blend": "blend/sheen-guard-crescents.blend",
       "wornBy": ["belemnite-amberbone"]
+    },
+    {
+      "kind": "sheen",
+      "id": "flame-flicker",
+      "cell": "cells/sheen/flame-flicker.png",
+      "blend": "blend/sheen-flame-flicker.blend",
+      "wornBy": ["firebrass-brassvein"]
+    },
+    {
+      "kind": "sheen",
+      "id": "banked-glow",
+      "cell": "cells/sheen/banked-glow.png",
+      "blend": "blend/sheen-banked-glow.blend",
+      "wornBy": ["heat-spinel-quartzine"]
+    },
+    {
+      "kind": "sheen",
+      "id": "chalcedony-gleam",
+      "cell": "cells/sheen/chalcedony-gleam.png",
+      "blend": "blend/sheen-chalcedony-gleam.blend",
+      "wornBy": ["petrified-heartwood-amberbone"]
+    },
+    {
+      "kind": "sheen",
+      "id": "molten-sheen",
+      "cell": "cells/sheen/molten-sheen.png",
+      "blend": "blend/sheen-molten-sheen.blend",
+      "wornBy": ["core-gold-brassvein"]
+    },
+    {
+      "kind": "sheen",
+      "id": "ruby-fire",
+      "cell": "cells/sheen/ruby-fire.png",
+      "blend": "blend/sheen-ruby-fire.blend",
+      "wornBy": ["furnace-ruby-quartzine"]
+    },
+    {
+      "kind": "sheen",
+      "id": "dial-glaze",
+      "cell": "cells/sheen/dial-glaze.png",
+      "blend": "blend/sheen-dial-glaze.blend",
+      "wornBy": ["p5-signature"]
     }
   ]
 }
