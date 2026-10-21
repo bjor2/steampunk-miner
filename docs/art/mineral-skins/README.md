@@ -225,6 +225,8 @@ teeth). No layer is shared within the batch or with P1 or p3-b2.
   ground draws `relic_t11` in today (163 degrees, `oreLookOfType`) at the family's saturation
   (0.5). Its luma is 0.50, darker than the ground's 0.62, so it stays a step from green apatite
   (luma 0.60, hue 150), the planet's other green.
+- **Seeds 601 to 661**, apart from p3-b1's 501 to 591 and p3-b2's 401 to 482, so no two P3 layers
+  share a noise field.
 
 ## Batch p4-b3: P4's species 11 to 15 and its signature material (ticket 603)
 
@@ -547,35 +549,36 @@ planet's other batches (`planet_mates`), so its post holds p3-b2's pairs against
 and writes the planet strip `p3.scale`.
 
 From `sheets/p3-b3.distinct.json`, at 22 px a tile over P3's band 3 rock (luma 0.29). The report
-holds the 15 pairs within the batch and 30 against p3-b2. P3's slots 1 to 5 (ticket 598) have not
-landed, so they are not measured. The closest pairs:
+holds the 15 pairs within the batch and 60 against p3-b1 and p3-b2. The closest pairs:
 
 <!-- p3-b3-readings -->
 
-| pair                                 | colour apart | deuteranopia apart | luma apart | texture apart |
-| ------------------------------------ | ------------ | ------------------ | ---------- | ------------- |
-| platinum vs opal jaw (least apart)   | 0.087        | 0.022              | 0.003      | 0.060         |
-| ammonite vs meteoric iron            | 0.102        | 0.040              | 0.001      | 0.081         |
-| apatite vs signature                 | 0.132        | 0.124              | 0.080      | 0.052         |
-| topaz vs opal jaw                    | 0.163        | 0.151              | 0.080      | 0.055         |
-| meteoric iron vs opal jaw (in batch) | 0.176        | 0.195              | 0.109      | 0.090         |
-| opal jaw vs heart diamond (in batch) | 0.217        | 0.144              | 0.095      | 0.064         |
+| pair                                   | colour apart | deuteranopia apart | luma apart | texture apart |
+| -------------------------------------- | ------------ | ------------------ | ---------- | ------------- |
+| soot zinc vs meteoric iron (least)     | 0.036        | 0.035              | 0.012      | 0.102         |
+| smoke calcite vs meteoric iron         | 0.061        | 0.059              | 0.033      | 0.083         |
+| rail quartz vs opal jaw                | 0.077        | 0.041              | 0.014      | 0.062         |
+| platinum vs opal jaw                   | 0.088        | 0.053              | 0.023      | 0.055         |
+| ammonite vs meteoric iron              | 0.104        | 0.039              | 0.008      | 0.074         |
+| apatite vs signature                   | 0.132        | 0.124              | 0.080      | 0.056         |
+| opal jaw vs heart diamond (in batch)   | 0.189        | 0.112              | 0.076      | 0.056         |
+| meteoric iron vs star sapphire (batch) | 0.206        | 0.269              | 0.078      | 0.075         |
 
 <!-- /p3-b3-readings -->
 
-The hue slots of native platinum (near-white, luma 0.78) and opal jaw (pale cyan, 0.78) sit at one
-luma, so with deuteranopia their mean colours all but meet (0.022). Texture keeps them apart. The
-opal's patch mosaic was made bolder until it still showed at 22 px, and its jawbone and teeth
-thicker. Platinum reads as diagonal sweeps and a pebble stringer; the opal reads as blotches and a
-level jaw. Coiled ammonite and meteoric iron also share a luma (0.67). There the Widmanstätten
-crosshatch, the largest texture gap of the pair list, stands against the ammonite's level waves
-and spirals. The signature's teal is 0.13 from green apatite: it is darker (0.53 against 0.61),
-with gear wheels and a ring-grained plate where the apatite has end-on hexagons and upright striae.
-Every new skin sits above P3's slate rock (contrast 1.71 for the signature to 2.72 for heart
-diamond). Checked by eye on `p3-b3.phone-x4.png`, `p3-b3.desktop.png`, the `p3-b3.scale-x4` copies
-and `p3.scale-x4.png` with its `-deutan` and `-gray` copies, now P3's eleven skins side by side
-(p3-b2, then this batch). When ticket 598's p3-b1 lands, its post run measures against both batches
-(`planet_mates`).
+Meteoric iron (hue 237, luma 0.64) is one of P3's cool near-greys, beside p3-b1's soot zinc,
+smoke calcite and pig iron. Its mean colour all but meets soot zinc's (0.036), so texture keeps
+them apart, the largest texture gap of the list: at 22 px the iron is fine diagonal bright streaks
+of the Widmanstätten bands, the zinc broad dark drifts and bright swipes, the calcite a diamond
+lattice. Native platinum, rail quartz and opal jaw share a luma near 0.79. The opal's patch mosaic
+was drawn bold and its jawbone and teeth thick, so it reads as blotches and a level jaw against
+the platinum's diagonal sweeps and the rail quartz's level bands. Coiled ammonite and meteoric
+iron share a luma (0.67): the crosshatch stands against the ammonite's level waves and spirals.
+The signature's teal is 0.13 from green apatite: it is darker (0.53 against 0.61), with gear
+wheels and a ring-grained plate where the apatite has end-on hexagons and upright striae. Every
+new skin sits above P3's slate rock (contrast 1.71 for the signature to 2.72 for heart diamond).
+Checked by eye on `p3-b3.phone-x4.png`, `p3-b3.desktop.png`, the `p3-b3.scale-x4` copies and
+`p3.scale-x4.png` with its `-deutan` and `-gray` copies, all sixteen P3 skins side by side.
 
 From `sheets/p4-b3.distinct.json`, at 22 px a tile over P4's band 3 rock (`palette.planet_2`, the
 slate P3 wears too, luma 0.29). P4 has no other batch yet, so these are the batch's own fifteen

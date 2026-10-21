@@ -44,7 +44,7 @@ VEIN_HEX = '#c4c4c4'
 # the light falls on the very bands, facets and domes. A line set is whole numbers of lines along u
 # and v, so it repeats at the cell edge; vein positions are metres from the cell's middle (u = x + 0.5,
 # v = z + 0.5 on the texture quad).
-WIDMANSTATTEN_SETS = ((0, 5, 501), (4, 3, 502), (-4, 3, 503))
+WIDMANSTATTEN_SETS = ((0, 5, 601), (4, 3, 602), (-4, 3, 603))
 TRIANGLE_FACETS = ((0, 4), (4, 2), (-4, 2))
 STAR_DOMES = (((-0.15, 0.13), 0.11), ((0.16, -0.02), 0.12), ((-0.07, -0.2), 0.08))
 # Centre, radius, teeth, phase: each wheel meshes with the one before it.
@@ -452,7 +452,7 @@ def oxide_film_of(graph):
 def base_widmanstatten_etch(graph):
     """Meteoric iron: an etched face of broad kamacite bands in three sets at about 60 degrees, bright taenite rims, dark plessite between."""
     sets = [kamacite_set(graph, per_u, per_v, seed) for per_u, per_v, seed in WIDMANSTATTEN_SETS]
-    plessite = stretched(graph, graph.noise(40, 40, seed=504, detail=5))
+    plessite = stretched(graph, graph.noise(40, 40, seed=604, detail=5))
     tone = graph.mul_add(plessite, 0.14, 0.33)
     for (band, rim), lift in zip(sets, (0.2, 0.12, 0.27)):
         tone = graph.plus(tone, graph.mul(band, lift))
@@ -476,9 +476,9 @@ def kamacite_set(graph, per_u, per_v, seed):
 def base_hex_zoning(graph):
     """Star sapphire: a deep blue body grown in hexagonal colour zones round one core a cell, pale and deep in turn."""
     zones_of = lattice_of(graph, 1, 1)
-    ring = graph.plus(hex_ring(graph, zones_of), graph.mul(graph.minus(graph.noise(3, 3, seed=511, detail=2), 0.5), 0.05))
+    ring = graph.plus(hex_ring(graph, zones_of), graph.mul(graph.minus(graph.noise(3, 3, seed=611, detail=2), 0.5), 0.05))
     zones = graph.math('SINE', graph.mul(ring, 30.0))
-    depth = stretched(graph, graph.noise(2, 2, seed=512, detail=3))
+    depth = stretched(graph, graph.noise(2, 2, seed=612, detail=3))
     tone = around_half(graph, depth, 0.36)
     return graph.minus(graph.plus(tone, graph.mul(zones, 0.16)), graph.mul(graph.smooth(ring, 0.06, 0.0), 0.12))
 
@@ -493,13 +493,13 @@ def hex_ring(graph, lattice):
 
 def base_opal_potch(graph):
     """Opal jaw: milky common opal where the bone was, a mosaic of soft patches each its own depth, faint bone fibres."""
-    patches = graph.voronoi(6, 6, seed=521)
+    patches = graph.voronoi(6, 6, seed=621)
     tone_of_patch = graph.add('ShaderNodeSeparateColor', [(0, patches['Color'])]).outputs[0]
-    edge = graph.voronoi(6, 6, seed=521, feature='DISTANCE_TO_EDGE')['Distance']
+    edge = graph.voronoi(6, 6, seed=621, feature='DISTANCE_TO_EDGE')['Distance']
     soft = graph.smooth(edge, 0.0, 0.12)
-    milk = stretched(graph, graph.noise(3, 3, seed=522, detail=4, roughness=0.55))
-    fibre_line = graph.smooth(graph.math('ABSOLUTE', graph.periodic(graph.mul_add(graph.v, 19.0, graph.mul(graph.noise(2, 2, seed=523, detail=2), 2.0)), 1.0)), 0.12, 0.0)
-    fibre_runs = graph.smooth(stretched(graph, graph.noise(10, 3, seed=524, detail=2)), 0.5, 0.62)
+    milk = stretched(graph, graph.noise(3, 3, seed=622, detail=4, roughness=0.55))
+    fibre_line = graph.smooth(graph.math('ABSOLUTE', graph.periodic(graph.mul_add(graph.v, 19.0, graph.mul(graph.noise(2, 2, seed=623, detail=2), 2.0)), 1.0)), 0.12, 0.0)
+    fibre_runs = graph.smooth(stretched(graph, graph.noise(10, 3, seed=624, detail=2)), 0.5, 0.62)
     tone = around_half(graph, milk, 0.36)
     # Bold patches: the hue slot sits by platinum's at one luma, so the mosaic must read at 22 px.
     tone = graph.plus(tone, graph.mul(graph.mul(graph.minus(tone_of_patch, 0.5), soft), 0.55))
@@ -508,12 +508,12 @@ def base_opal_potch(graph):
 
 def base_hammer_facets(graph):
     """Orichalcum: worked metal beaten into shallow facets, each lit a little differently, a bright ridge where two meet."""
-    facets = graph.voronoi(7, 7, seed=531)
-    edge = graph.voronoi(7, 7, seed=531, feature='DISTANCE_TO_EDGE')['Distance']
+    facets = graph.voronoi(7, 7, seed=631)
+    edge = graph.voronoi(7, 7, seed=631, feature='DISTANCE_TO_EDGE')['Distance']
     tilt = graph.add('ShaderNodeSeparateColor', [(0, facets['Color'])]).outputs[0]
     dish = graph.smooth(facets['Distance'], 0.0, 0.6)
     ridge = graph.smooth(edge, 0.04, 0.0)
-    grain = stretched(graph, graph.noise(80, 80, seed=532, detail=4))
+    grain = stretched(graph, graph.noise(80, 80, seed=632, detail=4))
     tone = graph.mul_add(tilt, 0.3, 0.33)
     tone = graph.plus(tone, graph.mul(dish, 0.1))
     tone = graph.plus(tone, graph.mul(ridge, 0.22))
@@ -534,9 +534,9 @@ def base_triangle_facets(graph):
 def base_clock_plate(graph):
     """P3's relic signature: a clock plate, its brass engine-turned in overlapping perlage circles, pierced by pivot holes."""
     tone = graph.mul_add(perlage_swirl(graph), 0.16, 0.44)
-    wear = stretched(graph, graph.noise(3, 3, seed=541, detail=3))
-    hole = sprinkled(graph, 3, 542, 0.16, 0.7)
-    lip = graph.mul(sprinkled(graph, 3, 542, 0.24, 0.7), graph.minus(1.0, hole))
+    wear = stretched(graph, graph.noise(3, 3, seed=641, detail=3))
+    hole = sprinkled(graph, 3, 642, 0.16, 0.7)
+    lip = graph.mul(sprinkled(graph, 3, 642, 0.24, 0.7), graph.minus(1.0, hole))
     tone = graph.plus(tone, graph.mul(graph.minus(wear, 0.5), 0.2))
     return graph.plus(graph.minus(tone, graph.mul(hole, 0.42)), graph.mul(lip, 0.18))
 
@@ -919,7 +919,7 @@ def sheen_lamella_flash(graph):
     """Lamella flash: one set of kamacite bands throws the lamp back at a time; the other sets stay dark, a few hard glints."""
     per_u, per_v, seed = WIDMANSTATTEN_SETS[2]
     band, _ = kamacite_set(graph, per_u, per_v, seed)
-    glint = graph.smooth(graph.voronoi(12, 12, seed=551)['Distance'], 0.05, 0.012)
+    glint = graph.smooth(graph.voronoi(12, 12, seed=651)['Distance'], 0.05, 0.012)
     return graph.plus(graph.mul(band, 0.5), graph.mul(glint, 0.7))
 
 
@@ -938,18 +938,18 @@ def sheen_asterism(graph):
 
 def sheen_opal_flash(graph):
     """Opal flash: play of colour, whole patches of the mosaic flaring at once under the lamp, pinfire specks between."""
-    patches = graph.voronoi(6, 6, seed=521)
+    patches = graph.voronoi(6, 6, seed=621)
     pick = graph.add('ShaderNodeTexWhiteNoise', [('Vector', patches['Position'])], {'noise_dimensions': '3D'}).outputs['Value']
-    edge = graph.voronoi(6, 6, seed=521, feature='DISTANCE_TO_EDGE')['Distance']
+    edge = graph.voronoi(6, 6, seed=621, feature='DISTANCE_TO_EDGE')['Distance']
     flare = graph.mul(graph.smooth(pick, 0.62, 0.7), graph.smooth(edge, 0.0, 0.1))
-    pinfire = sprinkled(graph, 30, 561, 0.3, 0.25)
+    pinfire = sprinkled(graph, 30, 661, 0.3, 0.25)
     return graph.plus(graph.mul(flare, 0.6), graph.mul(pinfire, 0.5))
 
 
 def sheen_hammered_shine(graph):
     """Hammered shine: a bright spot in each facet that faces the lamp, the beaten ridges gleaming, a warm overall lift."""
-    facets = graph.voronoi(7, 7, seed=531)
-    edge = graph.voronoi(7, 7, seed=531, feature='DISTANCE_TO_EDGE')['Distance']
+    facets = graph.voronoi(7, 7, seed=631)
+    edge = graph.voronoi(7, 7, seed=631, feature='DISTANCE_TO_EDGE')['Distance']
     pick = graph.add('ShaderNodeTexWhiteNoise', [('Vector', facets['Position'])], {'noise_dimensions': '3D'}).outputs['Value']
     spot = graph.mul(graph.smooth(facets['Distance'], 0.32, 0.05), graph.smooth(pick, 0.45, 0.55))
     ridge = graph.smooth(edge, 0.025, 0.0)
@@ -973,7 +973,7 @@ def sheen_perlage_gleam(graph):
     x, y = graph.minus(circles['x'], 0.5), graph.minus(circles['y'], 0.5)
     lit_side = graph.smooth(graph.plus(x, y), -0.05, 0.35)
     crescent = graph.mul(graph.mul(perlage_swirl(graph), lit_side), 0.42)
-    jewel = sprinkled(graph, 3, 542, 0.07, 0.7)
+    jewel = sprinkled(graph, 3, 642, 0.07, 0.7)
     return graph.plus(crescent, graph.mul(jewel, 0.9))
 
 
