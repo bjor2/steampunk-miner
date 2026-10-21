@@ -1,5 +1,5 @@
 {
-  "$comment": "The mineral skins of #576 (GD ruling 20 Oct 2026, ticket 591): a species' skin is four layers drawn bottom first, a base texture, a vein or crystal shape, a palette and a sheen, each an id of its layer list below. A skin row names its species (a materials.json id) and one id per layer; no two species of one pool share all four, so no two species on one planet look alike. A palette is a ramp of three display colours, shadow, body and light, darkest first; its body is the hue slot colour of the species wearing it (ticket 450), so the skin keeps the hue guards of materials.json. The base, vein and sheen layers are drawn in Blender, one cell each (docs/art/mineral-skins, skin-layers.json). Look only: no price, gate, income, generation or save reads it. The batch tickets (#592 to #606) add the layers and rows, 15 species per planet on P1 to P5; #592 skins P1's slots 1 to 5, #593 its slots 6 to 10.",
+  "$comment": "The mineral skins of #576 (GD ruling 20 Oct 2026, ticket 591): a species' skin is four layers drawn bottom first, a base texture, a vein or crystal shape, a palette and a sheen, each an id of its layer list below. A skin row names its species (a materials.json id) and one id per layer; no two species of one pool share all four, so no two species on one planet look alike. A palette is a ramp of three display colours, shadow, body and light, darkest first; its body is the hue slot colour of the species wearing it (ticket 450), so the skin keeps the hue guards of materials.json. The base, vein and sheen layers are drawn in Blender, one cell each (docs/art/mineral-skins, skin-layers.json). Look only: no price, gate, income, generation or save reads it. The batch tickets (#592 to #606) add the layers and rows, 15 species per planet on P1 to P5; #592 skins P1's slots 1 to 5, #593 its slots 6 to 10, #594 its slots 11 and 12 (the legacy pool has 12 species).",
   "layers": {
     "base": [
       {
@@ -31,6 +31,12 @@
       },
       {
         "id": "quartz-veined"
+      },
+      {
+        "id": "rutile-silk"
+      },
+      {
+        "id": "clear-depths"
       }
     ],
     "vein": [
@@ -63,6 +69,12 @@
       },
       {
         "id": "wire-dendrite"
+      },
+      {
+        "id": "hex-barrels"
+      },
+      {
+        "id": "hex-columns"
       }
     ],
     "palette": [
@@ -105,6 +117,14 @@
       {
         "id": "gold-vein",
         "ramp": ["#706609", "#e0cc12", "#f0e689"]
+      },
+      {
+        "id": "corundum-blue",
+        "ramp": ["#2a4074", "#5581e7", "#aac0f3"]
+      },
+      {
+        "id": "beryl-red",
+        "ramp": ["#6e2b34", "#db5667", "#edabb3"]
       }
     ],
     "sheen": [
@@ -137,6 +157,12 @@
       },
       {
         "id": "brilliant"
+      },
+      {
+        "id": "adamantine"
+      },
+      {
+        "id": "prismatic"
       }
     ]
   },
@@ -210,6 +236,20 @@
       "vein": "wire-dendrite",
       "palette": "gold-vein",
       "sheen": "brilliant"
+    },
+    {
+      "species": "blue-corundum-quartzine",
+      "base": "rutile-silk",
+      "vein": "hex-barrels",
+      "palette": "corundum-blue",
+      "sheen": "adamantine"
+    },
+    {
+      "species": "red-beryl-quartzine",
+      "base": "clear-depths",
+      "vein": "hex-columns",
+      "palette": "beryl-red",
+      "sheen": "prismatic"
     }
   ]
 }

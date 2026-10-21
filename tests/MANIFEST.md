@@ -285,13 +285,13 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/materials/systems/render/heroAtlases.test.ts` | 6 | 6 |
 | `src/features/materials/systems/render/rarityLooks.test.ts` | 5 | 5 |
 
-### `mineral-skins`: 5 files, 63 tests
+### `mineral-skins`: 5 files, 71 tests
 
 | File | Tests | Sites |
 | --- | --- | --- |
 | `src/features/mineral-skins/mineralSkins.art.test.ts` | 31 | 3 |
 | `src/features/mineral-skins/mineralSkins.noTwoAlike.test.ts` | 8 | 2 |
-| `src/features/mineral-skins/mineralSkins.planet1.test.ts` | 5 | 1 |
+| `src/features/mineral-skins/mineralSkins.planet1.test.ts` | 13 | 2 |
 | `src/features/mineral-skins/systems/mineralSkin.test.ts` | 7 | 7 |
 | `src/features/mineral-skins/systems/skinTable.test.ts` | 12 | 12 |
 

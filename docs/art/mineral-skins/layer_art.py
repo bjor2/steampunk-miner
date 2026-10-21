@@ -1,6 +1,7 @@
 """
 The Blender recipes of the mineral skin layers (#576, ticket 592 for P1's slots 1 to 5, ticket 593
-for its slots 6 to 10): one per layer id of `mineralSkins.json`. A layer id with no recipe fails, never falls back.
+for its slots 6 to 10, ticket 594 for 11 and 12): one per layer id of `mineralSkins.json`. A layer
+id with no recipe fails, never falls back.
 
 - `base` and `sheen` are seamless textures on the 1 m cell: an emission material on a 1 m quad
   whose value is the ramp coordinate (base, mean about 0.5) or the highlight strength (sheen,
@@ -239,6 +240,39 @@ def base_quartz_veined(graph):
     return graph.plus(tone, graph.mul(veinlet, 0.5))
 
 
+def base_rutile_silk(graph):
+    """Blue corundum: a deep, softly clouded body crossed by fine rutile silk, needles in three sets at 60 degrees."""
+    body = stretched(graph, graph.noise(3, 3, seed=301, detail=3, roughness=0.55))
+    silk = graph.math('MAXIMUM', graph.math('MAXIMUM', silk_needles(graph, 0, 16, 302), silk_needles(graph, 14, 8, 303)),
+                      silk_needles(graph, -14, 8, 304))
+    tone = around_half(graph, body, 0.5)
+    return graph.minus(graph.plus(tone, graph.mul(silk, 0.3)), 0.05)
+
+
+def silk_needles(graph, per_u, per_v, seed):
+    """
+    One set of silk: thin straight lines across the cell, whole numbers of them along u and v so
+    the set repeats at the cell edge, broken into short needles by a fine noise.
+    """
+    across = graph.mul_add(graph.u, per_u, graph.mul(graph.v, per_v))
+    jitter = graph.mul(graph.minus(graph.noise(4, 4, seed=seed, detail=2), 0.5), 0.3)
+    line = graph.smooth(graph.math('ABSOLUTE', graph.periodic(graph.plus(across, jitter), 1.0)), 0.09, 0.0)
+    needles = graph.smooth(stretched(graph, graph.noise(20, 20, seed=seed + 50, detail=2)), 0.5, 0.66)
+    return graph.mul(line, needles)
+
+
+def base_clear_depths(graph):
+    """Red beryl: clear stone, a slow swell of depth, fine growth tubes along the column, faint healed veils."""
+    depth = stretched(graph, graph.noise(2, 2, seed=321, detail=2))
+    tube = graph.smooth(graph.math('ABSOLUTE', graph.periodic(graph.mul(graph.u, 11.0), 1.0)), 0.1, 0.0)
+    tube_runs = graph.smooth(stretched(graph, graph.noise(12, 3, seed=322, detail=2)), 0.5, 0.62)
+    edge = graph.voronoi(3, 3, seed=323, feature='DISTANCE_TO_EDGE')['Distance']
+    veil = graph.mul(graph.smooth(edge, 0.02, 0.0), graph.smooth(stretched(graph, graph.noise(6, 6, seed=324, detail=2)), 0.45, 0.6))
+    tone = around_half(graph, depth, 0.45)
+    tone = graph.plus(tone, graph.mul(graph.mul(tube, tube_runs), 0.24))
+    return graph.minus(tone, graph.mul(veil, 0.2))
+
+
 # --- sheen: the lustre's highlights -----------------------------------------------------------------
 
 
@@ -313,6 +347,33 @@ def sheen_brilliant(graph):
     threads = graph.smooth(ridge, 0.018, 0.004)
     glint = graph.smooth(graph.voronoi(14, 14, seed=292)['Distance'], 0.06, 0.012)
     return graph.plus(graph.mul(threads, 0.7), graph.mul(glint, 0.85))
+
+
+def sheen_adamantine(graph):
+    """Adamantine: a hard bright lustre, strong glints, and the six-rayed star the silk throws under the lamp."""
+    x, y = graph.minus(graph.u, 0.5), graph.minus(graph.v, 0.5)
+    radius = graph.math('SQRT', graph.plus(graph.mul(x, x), graph.mul(y, y)))
+    rays = [star_ray(graph, x, y, math.radians(angle)) for angle in (0.0, 60.0, 120.0)]
+    star = graph.mul(graph.math('MAXIMUM', graph.math('MAXIMUM', rays[0], rays[1]), rays[2]), graph.smooth(radius, 0.44, 0.06))
+    bloom = graph.smooth(radius, 0.3, 0.0)
+    glint = graph.smooth(graph.voronoi(16, 16, seed=301)['Distance'], 0.09, 0.025)
+    return graph.plus(graph.plus(graph.mul(star, 0.5), graph.mul(bloom, 0.22)), graph.mul(glint, 0.9))
+
+
+def star_ray(graph, x, y, angle):
+    """A soft bright line through the cell's middle at `angle`: 1 on it, 0 a few pixels off."""
+    across = graph.math('ABSOLUTE', graph.minus(graph.mul(x, math.sin(angle)), graph.mul(y, math.cos(angle))))
+    return graph.smooth(across, 0.03, 0.004)
+
+
+def sheen_prismatic(graph):
+    """Prismatic: long bars of light down the prism faces that meet the lamp, and sharp glints."""
+    faces = lattice_of(graph, 7, 1)
+    flash = graph.smooth(block_random(graph, faces, 311), 0.58, 0.66)
+    inset = graph.smooth(graph.math('MINIMUM', faces['x'], graph.minus(1.0, faces['x'])), 0.06, 0.16)
+    fade = graph.smooth(stretched(graph, graph.noise(3, 2, seed=312, detail=2)), 0.35, 0.7)
+    glint = graph.smooth(graph.voronoi(11, 11, seed=313)['Distance'], 0.08, 0.02)
+    return graph.plus(graph.mul(graph.mul(graph.mul(flash, inset), fade), 0.7), graph.mul(glint, 0.8))
 
 
 # --- vein: the crystal or vein shape, by the row's silhouette ----------------------------------------
@@ -463,6 +524,43 @@ def vein_wire_dendrite(rng, body):
         marks.append(gold_bead('tip-%d' % i, end, 0.03))
     return assign_all(marks, body)
 
+def vein_hex_barrels(rng, body):
+    """Blue corundum: barrel-shaped hexagonal crystals, a six-sided body tapering to a point at each end."""
+    marks = []
+    for i, (x, z) in enumerate(shapes.scatter_positions(rng, 4, 0.19, 0.2)):
+        length, radius = rng.uniform(0.16, 0.22), rng.uniform(0.05, 0.065)
+        angle = rng.uniform(0.0, math.pi)
+        marks += hex_barrel('barrel-%d' % i, (x, -radius * 0.3, z), length, radius, angle)
+    return assign_all(marks, body)
+
+
+def hex_barrel(name, centre, length, radius, angle):
+    """A hexagonal prism of `length` along `angle` in the face, a six-sided cone on each end."""
+    axis = (math.sin(angle), 0.0, math.cos(angle))
+    cap = radius * 0.9
+    reach = (length + cap) / 2
+    body = shapes.add_prism(name, radius, length, centre, rotation=(0.0, angle, 0.0))
+    ends = [shapes.add_cone('%s-%s' % (name, end), radius, cap,
+                            (centre[0] + axis[0] * reach * sign, centre[1], centre[2] + axis[2] * reach * sign),
+                            rotation=(0.0 if sign > 0 else math.pi, angle, 0.0))
+            for end, sign in (('top', 1), ('foot', -1))]
+    return [body] + ends
+
+
+def vein_hex_columns(rng, body):
+    """Red beryl: flat-ended hexagonal columns rising side by side from one root, tipped so their ends show."""
+    marks = []
+    for i in range(5):
+        lean = math.radians(-24 + 12 * i) + rng.uniform(-0.06, 0.06)
+        length, radius = rng.uniform(0.2, 0.34), rng.uniform(0.035, 0.055)
+        foot = (-0.08 + 0.04 * i + rng.uniform(-0.02, 0.02), -0.3)
+        centre = (foot[0] + math.sin(lean) * length / 2, -radius * 0.3, foot[1] + math.cos(lean) * length / 2)
+        column = shapes.add_prism('column-%d' % i, radius, length, centre, rotation=(0.35, lean, 0.0))
+        shapes.bevel(column, radius * 0.06, segments=1)
+        marks.append(column)
+    return assign_all(marks, body)
+
+
 
 def kinked_path(start, end, rng, segments):
     """A wire from start to end, wobbling in the face at every inner point."""
@@ -496,6 +594,8 @@ BASES = {
     'resin-flow': base_resin_flow,
     'zoned-growth': base_zoned_growth,
     'quartz-veined': base_quartz_veined,
+    'rutile-silk': base_rutile_silk,
+    'clear-depths': base_clear_depths,
 }
 SHEENS = {
     'earthy': sheen_earthy,
@@ -508,6 +608,8 @@ SHEENS = {
     'resinous': sheen_resinous,
     'fluorescent': sheen_fluorescent,
     'brilliant': sheen_brilliant,
+    'adamantine': sheen_adamantine,
+    'prismatic': sheen_prismatic,
 }
 VEINS = {
     'nugget-cluster': vein_nugget_cluster,
@@ -520,6 +622,8 @@ VEINS = {
     'bead-drops': vein_bead_drops,
     'twinned-cubes': vein_twinned_cubes,
     'wire-dendrite': vein_wire_dendrite,
+    'hex-barrels': vein_hex_barrels,
+    'hex-columns': vein_hex_columns,
 }
 RECIPES = {'base': BASES, 'vein': VEINS, 'sheen': SHEENS}
 

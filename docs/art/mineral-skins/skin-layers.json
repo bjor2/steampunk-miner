@@ -74,6 +74,20 @@
       "wornBy": ["vein-gold-brassvein"]
     },
     {
+      "kind": "base",
+      "id": "rutile-silk",
+      "cell": "cells/base/rutile-silk.png",
+      "blend": "blend/base-rutile-silk.blend",
+      "wornBy": ["blue-corundum-quartzine"]
+    },
+    {
+      "kind": "base",
+      "id": "clear-depths",
+      "cell": "cells/base/clear-depths.png",
+      "blend": "blend/base-clear-depths.blend",
+      "wornBy": ["red-beryl-quartzine"]
+    },
+    {
       "kind": "vein",
       "id": "nugget-cluster",
       "cell": "cells/vein/nugget-cluster.png",
@@ -144,6 +158,20 @@
       "wornBy": ["vein-gold-brassvein"]
     },
     {
+      "kind": "vein",
+      "id": "hex-barrels",
+      "cell": "cells/vein/hex-barrels.png",
+      "blend": "blend/vein-hex-barrels.blend",
+      "wornBy": ["blue-corundum-quartzine"]
+    },
+    {
+      "kind": "vein",
+      "id": "hex-columns",
+      "cell": "cells/vein/hex-columns.png",
+      "blend": "blend/vein-hex-columns.blend",
+      "wornBy": ["red-beryl-quartzine"]
+    },
+    {
       "kind": "sheen",
       "id": "earthy",
       "cell": "cells/sheen/earthy.png",
@@ -212,6 +240,20 @@
       "cell": "cells/sheen/brilliant.png",
       "blend": "blend/sheen-brilliant.blend",
       "wornBy": ["vein-gold-brassvein"]
+    },
+    {
+      "kind": "sheen",
+      "id": "adamantine",
+      "cell": "cells/sheen/adamantine.png",
+      "blend": "blend/sheen-adamantine.blend",
+      "wornBy": ["blue-corundum-quartzine"]
+    },
+    {
+      "kind": "sheen",
+      "id": "prismatic",
+      "cell": "cells/sheen/prismatic.png",
+      "blend": "blend/sheen-prismatic.blend",
+      "wornBy": ["red-beryl-quartzine"]
     }
   ]
 }
