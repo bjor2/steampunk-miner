@@ -317,6 +317,12 @@ programs }` from three's `renderer.info` of the game canvas), read only when cal
   unknown kind, a window that does not rise, a lattice or chance out of bounds, copy that breaks the
   card rule, an effect without its numbers or over `hazardCaps`, and stray fields. Whether a pocket
   is met on the three pacing seeds is ticket 652's worldgen spec.
+- **Hazard card lines for P2 to P5** (ticket 654): `src/features/ores/systems/hazardCardSource.test.ts`
+  reads the kernel's `planetCardOf` on a fresh state: each of planets 2 to 5 shows its own row's tag
+  and arrival line (at most 64 characters, two lines of the 360 px card), planet 1 and planets past
+  5 show no hazard line, and a magnetic planet keeps its class card alone.
+  `e2e/browser/planetCard.spec.ts` (box Tester) reads each line through `steampunkDebug.ui` and
+  checks the card and its texts stay inside a 360 px window.
 - **Hazard pockets in the ground** (ticket 652): `src/features/ores/systems/hazardPockets.test.ts`
   reads the pockets through the kernel's `hazardPockets` seam on generated cells. On each of the
   pacing seeds 83921, 31415 and 27182, each of planets 2 to 5 holds a pocket of its own row's kind

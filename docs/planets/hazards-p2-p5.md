@@ -96,7 +96,8 @@ characters. The spec also checks no line names an unlock id, which the card regi
 **For ticket 654.** `planetCardLines` sources must name a schedule row (`featureId`) that is open
 on the planet, and the Horizontal Scaler asked for no new stats.json row. The `planet_2` row
 (planet 2, shipped) is open on every planet from 2, so one source keyed on it can read the row's
-hazard through `hazardOfPlanet` from the `ores` index. That is a choice for ticket 654 to confirm.
+hazard through `hazardOfPlanet` from the `ores` index. Ticket 654 built it that way: the `ores`
+source `ores.hazard-card` (`hazardCardSource.ts`) waits on `planet_2` and reads the row's copy.
 
 ## Numbers that are provisional
 
