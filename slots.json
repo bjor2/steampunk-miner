@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-10-21T14:19:21+02:00",
+  "updated_at": "2026-10-21T14:30:59+02:00",
   "caps": {
     "grok": 12,
     "claude": 10,
@@ -19,12 +19,11 @@
       "slots": [
         {
           "slot": "C1",
-          "state": "busy",
-          "ticket": 665,
-          "grok_slot": 1,
-          "kind": "dev",
-          "since": "2026-10-21T14:10:00+02:00",
-          "wave": null
+          "state": "free",
+          "ticket": null,
+          "grok_slot": null,
+          "kind": null,
+          "since": null
         },
         {
           "slot": "C2",
@@ -68,9 +67,9 @@
         }
       ],
       "size": 6,
-      "used": 1,
-      "free": 5,
-      "claims_last_hour": 1,
+      "used": 0,
+      "free": 6,
+      "claims_last_hour": 2,
       "name": "Claude Max 1"
     },
     {
@@ -161,11 +160,9 @@
   "grok": [
     {
       "slot": 1,
-      "state": "dev",
-      "ticket": 665,
-      "since": "2026-10-21T14:10:00+02:00",
-      "claude_slot": 1,
-      "wave": null
+      "state": "free",
+      "ticket": null,
+      "since": null
     },
     {
       "slot": 2,
@@ -241,12 +238,11 @@
   "claude": [
     {
       "slot": 1,
-      "state": "busy",
-      "ticket": 665,
-      "grok_slot": 1,
-      "since": "2026-10-21T14:10:00+02:00",
-      "account": 1,
-      "wave": null
+      "state": "free",
+      "ticket": null,
+      "grok_slot": null,
+      "since": null,
+      "account": 1
     },
     {
       "slot": 2,
@@ -322,17 +318,17 @@
     }
   ],
   "last_refill": {
-    "at": "2026-10-21 14:10 CEST",
-    "mode": "refill-dev",
-    "triggers": "#664",
-    "started": "#665->C1/A1",
-    "note": "spawned 1 worker(s)"
+    "at": "2026-10-21 14:30 CEST",
+    "mode": "recheck",
+    "triggers": "#665",
+    "started": "",
+    "note": "no pickable build ticket"
   },
   "totals": {
     "grok": {
       "size": 12,
-      "used": 2,
-      "dev": 1,
+      "used": 1,
+      "dev": 0,
       "dev_cap": 8,
       "planner": 1,
       "planner_cap": 4
@@ -340,8 +336,8 @@
     "claude": {
       "size": 10,
       "enabled": 10,
-      "used": 1,
-      "free": 9,
+      "used": 0,
+      "free": 10,
       "external": 0
     }
   },
@@ -349,6 +345,20 @@
     "mode": "on",
     "parallel": 1,
     "list": [
+      {
+        "number": 667,
+        "key": "308-2B",
+        "map": 308,
+        "lane": "remote",
+        "mode": "solo",
+        "state": "ready",
+        "tickets": [
+          641,
+          647
+        ],
+        "done": [],
+        "live": 0
+      },
       {
         "number": 660,
         "key": "647-2A",
@@ -450,10 +460,11 @@
         "mode": "solo",
         "state": "ready",
         "tickets": [
-          623,
           661,
           662,
-          663
+          663,
+          623,
+          666
         ],
         "done": [],
         "live": 0
