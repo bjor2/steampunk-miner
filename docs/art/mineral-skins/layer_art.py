@@ -1,7 +1,7 @@
 """
 The Blender recipes of the mineral skin layers (#576, ticket 592 for P1's slots 1 to 5, ticket 593
-for its slots 6 to 10, ticket 594 for 11 and 12): one per layer id of `mineralSkins.json`. A layer
-id with no recipe fails, never falls back.
+for its slots 6 to 10, ticket 594 for 11 and 12, ticket 599 for P3's slots 6 to 10): one per layer
+id of `mineralSkins.json`. A layer id with no recipe fails, never falls back.
 
 - `base` and `sheen` are seamless textures on the 1 m cell: an emission material on a 1 m quad
   whose value is the ramp coordinate (base, mean about 0.5) or the highlight strength (sheen,
@@ -273,6 +273,78 @@ def base_clear_depths(graph):
     return graph.minus(tone, graph.mul(veil, 0.2))
 
 
+def base_etched_glass(graph):
+    """Green apatite: clear glassy stone, fine striae up the prism, and small etch pits with a pale lip."""
+    depth = stretched(graph, graph.noise(3, 3, seed=401, detail=3))
+    jitter = graph.mul(graph.minus(graph.noise(3, 3, seed=402, detail=2), 0.5), 0.6)
+    striae = graph.smooth(graph.math('ABSOLUTE', graph.periodic(graph.mul_add(graph.u, 26.0, jitter), 1.0)), 0.12, 0.0)
+    striae_runs = graph.smooth(stretched(graph, graph.noise(6, 2, seed=403, detail=2)), 0.45, 0.7)
+    pit = sprinkled(graph, 11, 404, 0.34, 0.55)
+    lip = graph.mul(sprinkled(graph, 11, 404, 0.5, 0.55), graph.minus(1.0, pit))
+    tone = around_half(graph, depth, 0.5)
+    tone = graph.plus(tone, graph.mul(graph.mul(striae, striae_runs), 0.14))
+    return graph.plus(graph.minus(tone, graph.mul(pit, 0.36)), graph.mul(lip, 0.16))
+
+
+def base_growth_lines(graph):
+    """Ribbed shell: chalky matrix packed with shells, each a set of fine growth rings round its beak."""
+    shells = graph.voronoi(3, 3, seed=411)
+    rings = graph.math('SINE', graph.mul(shells['Distance'], 70.0))
+    bands = graph.math('SINE', graph.mul(shells['Distance'], 18.0))
+    tone_of_shell = graph.add('ShaderNodeSeparateColor', [(0, shells['Color'])]).outputs[0]
+    chalk = stretched(graph, graph.noise(48, 48, seed=412, detail=5))
+    tone = graph.mul_add(tone_of_shell, 0.18, 0.41)
+    tone = graph.plus(tone, graph.plus(graph.mul(rings, 0.07), graph.mul(bands, 0.11)))
+    return graph.plus(tone, graph.mul(graph.minus(chalk, 0.5), 0.18))
+
+
+def base_burnished_scratches(graph):
+    """Native platinum: a burnished face, a soft mottle of wear, long fine scratches in two crossing sets, a few pits."""
+    wear = stretched(graph, graph.noise(4, 4, seed=421, detail=3, roughness=0.5))
+    scratches = graph.math('MAXIMUM', long_scratches(graph, 7, 19, 422), graph.mul(long_scratches(graph, 13, -5, 423), 0.6))
+    pits = sprinkled(graph, 14, 424, 0.3, 0.3)
+    tone = around_half(graph, wear, 0.34)
+    tone = graph.minus(tone, graph.mul(scratches, 0.2))
+    return graph.minus(tone, graph.mul(pits, 0.34))
+
+
+def long_scratches(graph, per_u, per_v, seed):
+    """
+    One set of scratches: hairlines across the cell, whole numbers of them along u and v so the set
+    repeats at the cell edge, each kept only in long runs, as a pebble rolled across grit scores it.
+    """
+    across = graph.mul_add(graph.u, per_u, graph.mul(graph.v, per_v))
+    line = graph.smooth(graph.math('ABSOLUTE', graph.periodic(across, 1.0)), 0.07, 0.0)
+    runs = graph.smooth(stretched(graph, graph.noise(4, 4, seed=seed, detail=2)), 0.56, 0.64)
+    return graph.mul(line, runs)
+
+
+def base_cleaved_clear(graph):
+    """Blue topaz: clear stone, a slow depth, flat basal cleavage cracks across it, and small liquid inclusions."""
+    depth = stretched(graph, graph.noise(2, 3, seed=431, detail=2))
+    warp = graph.mul(graph.minus(graph.noise(2, 2, seed=432, detail=1), 0.5), 0.2)
+    crack = graph.smooth(graph.math('ABSOLUTE', graph.periodic(graph.mul_add(graph.v, 4.0, warp), 1.0)), 0.035, 0.0)
+    crack_runs = graph.smooth(stretched(graph, graph.noise(3, 4, seed=433, detail=2)), 0.4, 0.55)
+    gleam = graph.smooth(graph.math('ABSOLUTE', graph.periodic(graph.mul_add(graph.v, 4.0, graph.plus(warp, 0.06)), 1.0)), 0.05, 0.0)
+    drops = sprinkled(graph, 9, 434, 0.22, 0.45)
+    tone = around_half(graph, depth, 0.42)
+    cracks = graph.mul(crack, crack_runs)
+    tone = graph.plus(graph.minus(tone, graph.mul(cracks, 0.3)), graph.mul(graph.mul(gleam, crack_runs), 0.14))
+    return graph.minus(tone, graph.mul(drops, 0.22))
+
+
+def base_nacre_sheets(graph):
+    """Coiled ammonite: thin wavy sheets of nacre laid one on another, crossed by the frilled suture lines of the shell."""
+    warp = graph.noise(2, 2, seed=441, detail=3, roughness=0.55)
+    sheets = tiles.strata(graph, 13, warp, 2.6)
+    swell = stretched(graph, graph.noise(3, 3, seed=442, detail=2))
+    frill = graph.math('ABSOLUTE', graph.minus(graph.noise(3, 3, seed=443, detail=4, roughness=0.55), 0.5))
+    suture = graph.smooth(frill, 0.011, 0.003)
+    tone = around_half(graph, swell, 0.38)
+    tone = graph.plus(tone, graph.mul(graph.minus(sheets, 0.5), 0.2))
+    return graph.minus(tone, graph.mul(suture, 0.34))
+
+
 # --- sheen: the lustre's highlights -----------------------------------------------------------------
 
 
@@ -374,6 +446,45 @@ def sheen_prismatic(graph):
     fade = graph.smooth(stretched(graph, graph.noise(3, 2, seed=312, detail=2)), 0.35, 0.7)
     glint = graph.smooth(graph.voronoi(11, 11, seed=313)['Distance'], 0.08, 0.02)
     return graph.plus(graph.mul(graph.mul(graph.mul(flash, inset), fade), 0.7), graph.mul(glint, 0.8))
+
+
+def sheen_subresinous(graph):
+    """Subresinous: a soft gloss drawn out in streaks up the prism, a few small glints, never a hard flash."""
+    streak = graph.smooth(stretched(graph, graph.noise(12, 2, seed=451, detail=2)), 0.58, 0.82)
+    glint = graph.smooth(graph.voronoi(9, 9, seed=452)['Distance'], 0.05, 0.012)
+    return graph.plus(graph.mul(streak, 0.34), graph.mul(glint, 0.55))
+
+
+def sheen_dull(graph):
+    """Dull: the chalky shell drinks the light, a faint even lift over the ribs and nothing sharp."""
+    lift = graph.smooth(stretched(graph, graph.noise(4, 4, seed=461, detail=2)), 0.45, 0.8)
+    return graph.mul(lift, 0.1)
+
+
+def sheen_polished(graph):
+    """Polished: broad bright sweeps across the burnished face, as a rolled pebble mirrors the lamp, and hard glints."""
+    sweep_warp = graph.mul(graph.minus(graph.noise(2, 2, seed=471, detail=2), 0.5), 0.5)
+    sweep = graph.math('SINE', graph.mul(graph.mul_add(graph.u, 2.0, graph.plus(graph.mul(graph.v, 1.0), sweep_warp)), math.tau))
+    glint = graph.smooth(graph.voronoi(13, 13, seed=472)['Distance'], 0.07, 0.015)
+    return graph.plus(graph.mul(graph.smooth(sweep, 0.6, 0.97), 0.42), graph.mul(glint, 0.75))
+
+
+def sheen_limpid(graph):
+    """Limpid: light caught along the cleavage cracks as clear water catches it, a wide faint gleam, and pinpoint glints."""
+    warp = graph.mul(graph.minus(graph.noise(2, 2, seed=432, detail=1), 0.5), 0.2)
+    crack_runs = graph.smooth(stretched(graph, graph.noise(3, 4, seed=433, detail=2)), 0.4, 0.55)
+    flash = graph.smooth(graph.math('ABSOLUTE', graph.periodic(graph.mul_add(graph.v, 4.0, graph.plus(warp, 0.06)), 1.0)), 0.04, 0.0)
+    gleam = graph.smooth(stretched(graph, graph.noise(2, 2, seed=481, detail=2)), 0.5, 0.8)
+    glint = graph.smooth(graph.voronoi(15, 15, seed=482)['Distance'], 0.05, 0.01)
+    return graph.plus(graph.plus(graph.mul(graph.mul(flash, crack_runs), 0.75), graph.mul(gleam, 0.18)), graph.mul(glint, 0.85))
+
+
+def sheen_pearly(graph):
+    """Pearly: soft bands of sheen along the nacre sheets, broad and edgeless, brightest where the shell swells."""
+    warp = graph.noise(2, 2, seed=441, detail=3, roughness=0.55)
+    bands = graph.smooth(tiles.strata(graph, 13, warp, 2.6), 0.55, 0.95)
+    swell = graph.smooth(stretched(graph, graph.noise(3, 3, seed=442, detail=2)), 0.4, 0.75)
+    return graph.mul(graph.mul(bands, graph.mul_add(swell, 0.6, 0.4)), 0.46)
 
 
 # --- vein: the crystal or vein shape, by the row's silhouette ----------------------------------------
@@ -561,6 +672,97 @@ def vein_hex_columns(rng, body):
     return assign_all(marks, body)
 
 
+def vein_hex_ends(rng, body):
+    """Green apatite: stubby hexagonal prisms seen end on, tipped a little so a side face or two shows."""
+    marks = []
+    for i, (x, z) in enumerate(shapes.scatter_positions(rng, 6, 0.27, 0.15)):
+        radius = rng.uniform(0.045, 0.08)
+        prism = shapes.add_prism('end-%d' % i, radius, radius * 1.1, (x, -radius * 0.4, z),
+                                 rotation=(math.pi / 2 + rng.uniform(-0.35, 0.35), rng.uniform(0.0, math.pi / 3), rng.uniform(-0.35, 0.35)))
+        shapes.bevel(prism, radius * 0.05, segments=1)
+        marks.append(prism)
+    return assign_all(marks, body)
+
+
+def vein_ribbed_valves(rng, body):
+    """Ribbed shell: fan-shaped shells half-sunk in the face, ribs running out from the beak to the scalloped rim."""
+    marks = []
+    for i, (x, z) in enumerate(((-0.14, 0.11), (0.15, -0.04), (-0.08, -0.2))):
+        reach = rng.uniform(0.13, 0.17) if i < 2 else 0.1
+        facing = rng.uniform(0.0, math.tau)
+        marks += ribbed_valve('valve-%d' % i, (x, z), reach, facing)
+    return assign_all(marks, body)
+
+
+def ribbed_valve(name, beak, reach, facing):
+    """One valve: a flat fan of `reach` from its beak, opened over 130 degrees about `facing`, nine ribs over it."""
+    spread = math.radians(130)
+    rim = [(beak[0] + math.cos(facing - spread / 2 + spread * k / 12) * reach,
+            beak[1] + math.sin(facing - spread / 2 + spread * k / 12) * reach) for k in range(13)]
+    shell = shapes.add_polygon(name, [beak] + rim, -0.012, 0.012)
+    ribs = []
+    for k in range(9):
+        angle = facing - spread / 2 + spread * (k + 0.5) / 9
+        tip = (beak[0] + math.cos(angle) * reach * 0.97, beak[1] + math.sin(angle) * reach * 0.97)
+        middle = ((beak[0] + tip[0]) / 2, -0.03, (beak[1] + tip[1]) / 2)
+        ribs.append(shapes.add_tube('%s-rib-%d' % (name, k), [(beak[0], -0.015, beak[1]), middle, (tip[0], -0.022, tip[1])],
+                                    reach * 0.07, resolution=2))
+    return [shell] + ribs
+
+
+def vein_rolled_pebbles(rng, body):
+    """Native platinum: smooth flattened pebbles, water-rolled, lying in a gravel stringer across the face."""
+    marks = []
+    for i in range(9):
+        t = i / 8
+        x = -0.3 + 0.6 * t + rng.uniform(-0.025, 0.025)
+        z = -0.06 + 0.12 * math.sin(t * math.pi * 1.4) + rng.uniform(-0.05, 0.05)
+        size = rng.uniform(0.035, 0.07)
+        pebble = shapes.add_icosphere('pebble-%d' % i, size, (x, -size * 0.2, z), subdivisions=3,
+                                      scale=(rng.uniform(1.2, 1.5), 0.5, rng.uniform(0.75, 0.95)),
+                                      rotation=(0.0, rng.uniform(-0.6, 0.6), 0.0))
+        marks.append(pebble)
+    return assign_all(marks, body)
+
+
+def vein_wedge_blocks(rng, body):
+    """Blue topaz: upright blocks each under a pitched wedge end, tipped back so the two roof faces catch the lamp."""
+    marks = []
+    for i, x in enumerate((-0.2, 0.0, 0.19)):
+        width, height = rng.uniform(0.1, 0.13), rng.uniform(0.2, 0.3)
+        foot = -0.26 + rng.uniform(0.0, 0.05)
+        half = width / 2
+        outline = [(x - half, foot), (x + half, foot), (x + half, foot + height), (x, foot + height + half * 0.9), (x - half, foot + height)]
+        block = shapes.add_polygon('block-%d' % i, outline, -0.02, rng.uniform(0.06, 0.08))
+        block.rotation_euler = (rng.uniform(0.35, 0.5), rng.uniform(-0.15, 0.15), rng.uniform(-0.3, 0.3))
+        shapes.bevel(block, 0.004, segments=1)
+        marks.append(block)
+    return assign_all(marks, body)
+
+
+def vein_ammonite_coils(rng, body):
+    """Coiled ammonite: shells coiled flat in a widening spiral, each whorl a run of ribbed chambers."""
+    marks = []
+    for i, (cx, cz, outer) in enumerate(((-0.09, 0.07, 0.21), (0.21, -0.2, 0.11))):
+        marks += ammonite_coil('coil-%d' % i, (cx, cz), outer, rng.uniform(0.0, math.tau))
+    return assign_all(marks, body)
+
+
+def ammonite_coil(name, centre, outer, phase):
+    """A logarithmic spiral of chambers out to `outer`, each chamber a bead as thick as a third of its whorl."""
+    turns, growth = 2.6, 0.17
+    chambers = []
+    count = 34
+    for k in range(count):
+        angle = turns * math.tau * k / (count - 1)
+        reach = outer * math.exp(growth * (angle - turns * math.tau))
+        radius = max(reach * 0.32, 0.006)
+        at = (centre[0] + math.cos(angle + phase) * reach, -radius * 0.3, centre[1] + math.sin(angle + phase) * reach)
+        chambers.append(shapes.add_icosphere('%s-%d' % (name, k), radius, at, subdivisions=2, scale=(1.0, 0.55, 1.0),
+                                             rotation=(0.0, -(angle + phase), 0.0)))
+    return chambers
+
+
 
 def kinked_path(start, end, rng, segments):
     """A wire from start to end, wobbling in the face at every inner point."""
@@ -596,6 +798,11 @@ BASES = {
     'quartz-veined': base_quartz_veined,
     'rutile-silk': base_rutile_silk,
     'clear-depths': base_clear_depths,
+    'etched-glass': base_etched_glass,
+    'growth-lines': base_growth_lines,
+    'burnished-scratches': base_burnished_scratches,
+    'cleaved-clear': base_cleaved_clear,
+    'nacre-sheets': base_nacre_sheets,
 }
 SHEENS = {
     'earthy': sheen_earthy,
@@ -610,6 +817,11 @@ SHEENS = {
     'brilliant': sheen_brilliant,
     'adamantine': sheen_adamantine,
     'prismatic': sheen_prismatic,
+    'subresinous': sheen_subresinous,
+    'dull': sheen_dull,
+    'polished': sheen_polished,
+    'limpid': sheen_limpid,
+    'pearly': sheen_pearly,
 }
 VEINS = {
     'nugget-cluster': vein_nugget_cluster,
@@ -624,6 +836,11 @@ VEINS = {
     'wire-dendrite': vein_wire_dendrite,
     'hex-barrels': vein_hex_barrels,
     'hex-columns': vein_hex_columns,
+    'hex-ends': vein_hex_ends,
+    'ribbed-valves': vein_ribbed_valves,
+    'rolled-pebbles': vein_rolled_pebbles,
+    'wedge-blocks': vein_wedge_blocks,
+    'ammonite-coils': vein_ammonite_coils,
 }
 RECIPES = {'base': BASES, 'vein': VEINS, 'sheen': SHEENS}
 

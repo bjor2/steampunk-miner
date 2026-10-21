@@ -1,5 +1,5 @@
 {
-  "$comment": "The mineral skins of #576 (GD ruling 20 Oct 2026, ticket 591): a species' skin is four layers drawn bottom first, a base texture, a vein or crystal shape, a palette and a sheen, each an id of its layer list below. A skin row names its species (a materials.json id) and one id per layer; no two species of one pool share all four, so no two species on one planet look alike. A palette is a ramp of three display colours, shadow, body and light, darkest first; its body is the hue slot colour of the species wearing it (ticket 450), so the skin keeps the hue guards of materials.json. The base, vein and sheen layers are drawn in Blender, one cell each (docs/art/mineral-skins, skin-layers.json). Look only: no price, gate, income, generation or save reads it. The batch tickets (#592 to #606) add the layers and rows, 15 species per planet on P1 to P5; #592 skins P1's slots 1 to 5, #593 its slots 6 to 10, #594 its slots 11 and 12 (the legacy pool has 12 species).",
+  "$comment": "The mineral skins of #576 (GD ruling 20 Oct 2026, ticket 591): a species' skin is four layers drawn bottom first, a base texture, a vein or crystal shape, a palette and a sheen, each an id of its layer list below. A skin row names its species (a materials.json id) and one id per layer; no two species of one pool share all four, so no two species on one planet look alike. A palette is a ramp of three display colours, shadow, body and light, darkest first; its body is the hue slot colour of the species wearing it (ticket 450), so the skin keeps the hue guards of materials.json. The base, vein and sheen layers are drawn in Blender, one cell each (docs/art/mineral-skins, skin-layers.json). Look only: no price, gate, income, generation or save reads it. The batch tickets (#592 to #606) add the layers and rows, 15 species per planet on P1 to P5; #592 skins P1's slots 1 to 5, #593 its slots 6 to 10, #594 its slots 11 and 12 (the legacy pool has 12 species); #599 skins P3's slots 6 to 10 (the foothold-p3 pool; its slots 16 and 17, the two fossil commons of #453, are held).",
   "layers": {
     "base": [
       {
@@ -37,6 +37,21 @@
       },
       {
         "id": "clear-depths"
+      },
+      {
+        "id": "etched-glass"
+      },
+      {
+        "id": "growth-lines"
+      },
+      {
+        "id": "burnished-scratches"
+      },
+      {
+        "id": "cleaved-clear"
+      },
+      {
+        "id": "nacre-sheets"
       }
     ],
     "vein": [
@@ -75,6 +90,21 @@
       },
       {
         "id": "hex-columns"
+      },
+      {
+        "id": "hex-ends"
+      },
+      {
+        "id": "ribbed-valves"
+      },
+      {
+        "id": "rolled-pebbles"
+      },
+      {
+        "id": "wedge-blocks"
+      },
+      {
+        "id": "ammonite-coils"
       }
     ],
     "palette": [
@@ -125,6 +155,26 @@
       {
         "id": "beryl-red",
         "ramp": ["#6e2b34", "#db5667", "#edabb3"]
+      },
+      {
+        "id": "apatite-green",
+        "ramp": ["#2a6045", "#55bf8a", "#aadfc4"]
+      },
+      {
+        "id": "shell-cream",
+        "ramp": ["#5d5c40", "#bab880", "#dcdcc0"]
+      },
+      {
+        "id": "platinum-pale",
+        "ramp": ["#626466", "#c5c7cb", "#e2e3e5"]
+      },
+      {
+        "id": "topaz-blue",
+        "ramp": ["#44606e", "#88c0dc", "#c4e0ee"]
+      },
+      {
+        "id": "ammonite-rose",
+        "ramp": ["#63505a", "#c6a0b3", "#e2d0d9"]
       }
     ],
     "sheen": [
@@ -163,6 +213,21 @@
       },
       {
         "id": "prismatic"
+      },
+      {
+        "id": "subresinous"
+      },
+      {
+        "id": "dull"
+      },
+      {
+        "id": "polished"
+      },
+      {
+        "id": "limpid"
+      },
+      {
+        "id": "pearly"
       }
     ]
   },
@@ -250,6 +315,41 @@
       "vein": "hex-columns",
       "palette": "beryl-red",
       "sheen": "prismatic"
+    },
+    {
+      "species": "green-apatite-quartzine",
+      "base": "etched-glass",
+      "vein": "hex-ends",
+      "palette": "apatite-green",
+      "sheen": "subresinous"
+    },
+    {
+      "species": "ribbed-shell-amberbone",
+      "base": "growth-lines",
+      "vein": "ribbed-valves",
+      "palette": "shell-cream",
+      "sheen": "dull"
+    },
+    {
+      "species": "native-platinum-brassvein",
+      "base": "burnished-scratches",
+      "vein": "rolled-pebbles",
+      "palette": "platinum-pale",
+      "sheen": "polished"
+    },
+    {
+      "species": "blue-topaz-quartzine",
+      "base": "cleaved-clear",
+      "vein": "wedge-blocks",
+      "palette": "topaz-blue",
+      "sheen": "limpid"
+    },
+    {
+      "species": "coiled-ammonite-amberbone",
+      "base": "nacre-sheets",
+      "vein": "ammonite-coils",
+      "palette": "ammonite-rose",
+      "sheen": "pearly"
     }
   ]
 }

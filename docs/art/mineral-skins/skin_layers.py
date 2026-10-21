@@ -38,12 +38,13 @@ PX_PER_M = 256
 SHADOW_LUMA_SHARE = 0.5
 LIGHT_LUMA_SHARE = 0.5
 # The batches of #576: a planet's species by roster slot, five a ticket (#592 is P1 slots 1 to 5,
-# #593 its slots 6 to 10, #594 its last two, 11 and 12: the legacy pool has 12 species), named
-# `p<planet>-b<n>`.
+# #593 its slots 6 to 10, #594 its last two, 11 and 12: the legacy pool has 12 species; #599 is P3
+# slots 6 to 10 of the foothold-p3 pool), named `p<planet>-b<n>`.
 BATCHES = {
     'p1-b1': {'pool': 'legacy', 'slots': ('legacy.c1', 'legacy.c2', 'legacy.c3', 'legacy.c4', 'legacy.c5')},
     'p1-b2': {'pool': 'legacy', 'slots': ('legacy.u1', 'legacy.u2', 'legacy.u3', 'legacy.u4', 'legacy.r1')},
     'p1-b3': {'pool': 'legacy', 'slots': ('legacy.r2', 'legacy.r3')},
+    'p3-b2': {'pool': 'foothold-p3', 'slots': ('mixed.u2', 'mixed.u3', 'mixed.r1', 'mixed.r2', 'mixed.r3')},
 }
 
 
@@ -59,10 +60,15 @@ def species_by_id(materials=None):
 
 
 def batch_skins(batch, skins=None, materials=None):
-    """The batch's skin rows in roster-slot order, each with its species row attached."""
+    """
+    The batch's skin rows in roster-slot order, each with its species row attached. A slot is read
+    in the batch's pool: the foothold pools of P3 to P7 bind the same `mixed.*` slots.
+    """
     skins = skins or load_skins()
     rows = species_by_id(materials)
-    by_slot = {rows[skin['species']]['slot']: dict(skin, row=rows[skin['species']]) for skin in skins['skins']}
+    pool = BATCHES[batch]['pool']
+    by_slot = {rows[skin['species']]['slot']: dict(skin, row=rows[skin['species']])
+               for skin in skins['skins'] if rows[skin['species']]['pool'] == pool}
     missing = [slot for slot in BATCHES[batch]['slots'] if slot not in by_slot]
     if missing:
         raise SystemExit('batch %s has no skin row for slot(s) %s' % (batch, ', '.join(missing)))

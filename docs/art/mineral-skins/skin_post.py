@@ -41,6 +41,12 @@ STRIP_MAGNIFY = 4
 GAP_PX = 6
 LABEL_PX = 14
 JPEG_QUALITY = 90
+# The palette each planet's ground wears (planetTable.ts PLANET_ARCHETYPES: P1 archetype.base, P2
+# on archetype.heavy until the heat act at P8).
+ROCK_PALETTES = {'p1': 'palette.planet_1', 'p2': 'palette.planet_2', 'p3': 'palette.planet_2',
+                 'p4': 'palette.planet_2', 'p5': 'palette.planet_2'}
+# The planet of the batch being posted: its rock is the ground every sheet lays a skin in.
+rock_planet = 'p1'
 BACKGROUND = (0.07, 0.05, 0.05)
 # A vein's rim: its mask grown by 3 px (about 1 cm) at a ramp coordinate near the shadow, so the
 # shape reads against a base of its own palette at every zoom.
@@ -60,6 +66,8 @@ PATCH_RUNS = (
 
 def main():
     batch = sys.argv[1] if len(sys.argv) > 1 else 'p1-b1'
+    global rock_planet
+    rock_planet = layers.planet_of(batch)
     os.makedirs(SHEET_DIR, exist_ok=True)
     cells = write_cells()
     skins = layers.batch_skins(batch)
@@ -272,9 +280,9 @@ def printable(measure):
 
 
 def rock_rgb():
-    """Planet 1's band 3, mixed surface to deep like bandPalette.ts: the vein's stage rock."""
+    """The batch planet's band 3, mixed surface to deep like bandPalette.ts: the rock a skin sits in."""
     with open(ART_DIRECTION_PATH, encoding='utf-8') as file:
-        palette = json.load(file)['palettes']['palette.planet_1']
+        palette = json.load(file)['palettes'][ROCK_PALETTES[rock_planet]]
     surface, deep = post.rgb_of_hex(palette['surface']), post.rgb_of_hex(palette['deep'])
     return np.array([a + (b - a) * 0.5 for a, b in zip(surface, deep)], dtype=np.float32)
 

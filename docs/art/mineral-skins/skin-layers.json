@@ -88,6 +88,41 @@
       "wornBy": ["red-beryl-quartzine"]
     },
     {
+      "kind": "base",
+      "id": "etched-glass",
+      "cell": "cells/base/etched-glass.png",
+      "blend": "blend/base-etched-glass.blend",
+      "wornBy": ["green-apatite-quartzine"]
+    },
+    {
+      "kind": "base",
+      "id": "growth-lines",
+      "cell": "cells/base/growth-lines.png",
+      "blend": "blend/base-growth-lines.blend",
+      "wornBy": ["ribbed-shell-amberbone"]
+    },
+    {
+      "kind": "base",
+      "id": "burnished-scratches",
+      "cell": "cells/base/burnished-scratches.png",
+      "blend": "blend/base-burnished-scratches.blend",
+      "wornBy": ["native-platinum-brassvein"]
+    },
+    {
+      "kind": "base",
+      "id": "cleaved-clear",
+      "cell": "cells/base/cleaved-clear.png",
+      "blend": "blend/base-cleaved-clear.blend",
+      "wornBy": ["blue-topaz-quartzine"]
+    },
+    {
+      "kind": "base",
+      "id": "nacre-sheets",
+      "cell": "cells/base/nacre-sheets.png",
+      "blend": "blend/base-nacre-sheets.blend",
+      "wornBy": ["coiled-ammonite-amberbone"]
+    },
+    {
       "kind": "vein",
       "id": "nugget-cluster",
       "cell": "cells/vein/nugget-cluster.png",
@@ -172,6 +207,41 @@
       "wornBy": ["red-beryl-quartzine"]
     },
     {
+      "kind": "vein",
+      "id": "hex-ends",
+      "cell": "cells/vein/hex-ends.png",
+      "blend": "blend/vein-hex-ends.blend",
+      "wornBy": ["green-apatite-quartzine"]
+    },
+    {
+      "kind": "vein",
+      "id": "ribbed-valves",
+      "cell": "cells/vein/ribbed-valves.png",
+      "blend": "blend/vein-ribbed-valves.blend",
+      "wornBy": ["ribbed-shell-amberbone"]
+    },
+    {
+      "kind": "vein",
+      "id": "rolled-pebbles",
+      "cell": "cells/vein/rolled-pebbles.png",
+      "blend": "blend/vein-rolled-pebbles.blend",
+      "wornBy": ["native-platinum-brassvein"]
+    },
+    {
+      "kind": "vein",
+      "id": "wedge-blocks",
+      "cell": "cells/vein/wedge-blocks.png",
+      "blend": "blend/vein-wedge-blocks.blend",
+      "wornBy": ["blue-topaz-quartzine"]
+    },
+    {
+      "kind": "vein",
+      "id": "ammonite-coils",
+      "cell": "cells/vein/ammonite-coils.png",
+      "blend": "blend/vein-ammonite-coils.blend",
+      "wornBy": ["coiled-ammonite-amberbone"]
+    },
+    {
       "kind": "sheen",
       "id": "earthy",
       "cell": "cells/sheen/earthy.png",
@@ -254,6 +324,41 @@
       "cell": "cells/sheen/prismatic.png",
       "blend": "blend/sheen-prismatic.blend",
       "wornBy": ["red-beryl-quartzine"]
+    },
+    {
+      "kind": "sheen",
+      "id": "subresinous",
+      "cell": "cells/sheen/subresinous.png",
+      "blend": "blend/sheen-subresinous.blend",
+      "wornBy": ["green-apatite-quartzine"]
+    },
+    {
+      "kind": "sheen",
+      "id": "dull",
+      "cell": "cells/sheen/dull.png",
+      "blend": "blend/sheen-dull.blend",
+      "wornBy": ["ribbed-shell-amberbone"]
+    },
+    {
+      "kind": "sheen",
+      "id": "polished",
+      "cell": "cells/sheen/polished.png",
+      "blend": "blend/sheen-polished.blend",
+      "wornBy": ["native-platinum-brassvein"]
+    },
+    {
+      "kind": "sheen",
+      "id": "limpid",
+      "cell": "cells/sheen/limpid.png",
+      "blend": "blend/sheen-limpid.blend",
+      "wornBy": ["blue-topaz-quartzine"]
+    },
+    {
+      "kind": "sheen",
+      "id": "pearly",
+      "cell": "cells/sheen/pearly.png",
+      "blend": "blend/sheen-pearly.blend",
+      "wornBy": ["coiled-ammonite-amberbone"]
     }
   ]
 }
