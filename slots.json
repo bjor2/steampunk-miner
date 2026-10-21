@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-10-21T23:25:26+02:00",
+  "updated_at": "2026-10-21T23:36:23+02:00",
   "caps": {
     "grok": 12,
     "claude": 10,
@@ -20,11 +20,11 @@
         {
           "slot": "C1",
           "state": "busy",
-          "ticket": 684,
+          "ticket": 685,
           "grok_slot": 1,
           "kind": "dev",
-          "since": "2026-10-21T22:07:00+02:00",
-          "wave": "678-1A"
+          "since": "2026-10-21T23:36:00+02:00",
+          "wave": "678-2A"
         },
         {
           "slot": "C2",
@@ -71,7 +71,7 @@
       "size": 6,
       "used": 2,
       "free": 4,
-      "claims_last_hour": 2,
+      "claims_last_hour": 3,
       "name": "Claude Max 1"
     },
     {
@@ -155,10 +155,10 @@
     {
       "slot": 1,
       "state": "dev",
-      "ticket": 684,
-      "since": "2026-10-21T22:07:00+02:00",
+      "ticket": 685,
+      "since": "2026-10-21T23:36:00+02:00",
       "claude_slot": 1,
-      "wave": "678-1A"
+      "wave": "678-2A"
     },
     {
       "slot": 2,
@@ -239,11 +239,11 @@
     {
       "slot": 1,
       "state": "busy",
-      "ticket": 684,
+      "ticket": 685,
       "grok_slot": 1,
-      "since": "2026-10-21T22:07:00+02:00",
+      "since": "2026-10-21T23:36:00+02:00",
       "account": 1,
-      "wave": "678-1A"
+      "wave": "678-2A"
     },
     {
       "slot": 2,
@@ -321,11 +321,11 @@
     }
   ],
   "last_refill": {
-    "at": "2026-10-21 23:25 CEST",
+    "at": "2026-10-21 23:36 CEST",
     "mode": "refill-dev",
-    "triggers": "#656",
-    "started": "",
-    "note": "no pickable build ticket"
+    "triggers": "#684",
+    "started": "#685->C1/A1",
+    "note": "spawned 1 worker(s)"
   },
   "totals": {
     "grok": {
@@ -418,33 +418,7 @@
         "done": [
           686
         ],
-        "live": 2
-      },
-      {
-        "number": 692,
-        "key": "678-1A",
-        "map": 678,
-        "lane": "remote",
-        "mode": "solo",
-        "state": "running",
-        "tickets": [
-          679,
-          680,
-          681,
-          682,
-          683,
-          684,
-          689
-        ],
-        "done": [
-          679,
-          680,
-          681,
-          682,
-          683,
-          689
-        ],
-        "live": 1
+        "live": 3
       },
       {
         "number": 677,
