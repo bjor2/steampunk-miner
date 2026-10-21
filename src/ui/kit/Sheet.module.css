@@ -1,0 +1,186 @@
+/*
+ * The shared sheet (ticket 686, design-system.md sections 9 and 10): the baked sheet frame (#683)
+ * over the panel colour, a column of title, scroll area and controls. Full on a phone, the
+ * controls sit at the foot in the thumb zone and the shutter rises from it; docked on desktop the
+ * controls follow the title and the shutter comes in from the right. `--sheet-shutter` is the
+ * sheet duration from the tokens (200 ms), set inline from `sheetTransitionOf`.
+ */
+.sheet {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  box-sizing: border-box;
+  padding: var(--space-3);
+  border: var(--frame-double) double var(--color-brass);
+  border-radius: var(--radius-panel);
+  border-image: var(--art-sheet-frame) var(--art-sheet-frame-slice) fill /
+    var(--art-sheet-frame-width);
+  background: var(--color-panel);
+  color: var(--color-parchment);
+  font-family: var(--font-body);
+  font-size: var(--type-body);
+  overflow: hidden;
+  pointer-events: auto;
+  animation-duration: var(--sheet-shutter);
+  animation-fill-mode: both;
+}
+
+/* A closing sheet takes no input; the layer under it already has the keys. */
+.sheet[data-transition='closing'] * {
+  pointer-events: none !important;
+}
+
+.title {
+  margin: 0;
+  color: var(--color-brass);
+  font-size: var(--type-title);
+  font-weight: normal;
+  letter-spacing: var(--label-tracking);
+}
+
+.body {
+  flex: 1 1 0;
+}
+
+.controls {
+  display: flex;
+  align-items: flex-end;
+  gap: var(--space-2);
+  border-top: var(--frame-hairline) solid rgb(201 162 75 / 0.4);
+  padding-top: var(--space-2);
+}
+
+.controls > [data-sheet-tabs] {
+  flex: 1;
+  min-width: 0;
+}
+
+.close {
+  flex: none;
+  margin-left: auto;
+  min-width: var(--tap-target-min);
+  min-height: var(--tap-target-min);
+  padding: 0 var(--space-3);
+  border: var(--frame-hairline) solid var(--color-brass);
+  border-radius: var(--radius-panel);
+  background: transparent;
+  color: var(--color-parchment);
+  font: inherit;
+  font-size: var(--type-label);
+  letter-spacing: var(--label-tracking);
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+.close:focus-visible {
+  outline: var(--focus-ring);
+  outline-offset: var(--focus-ring-offset);
+}
+
+@media (hover: hover) {
+  .close:hover {
+    background: rgb(201 162 75 / 0.15);
+  }
+}
+
+/* Docked beside the view: the controls under the title, as a desktop panel reads. */
+.sheet[data-placement='docked'] .controls {
+  order: -1;
+  border-top: none;
+  border-bottom: var(--frame-hairline) solid rgb(201 162 75 / 0.4);
+  padding: 0 0 var(--space-2);
+}
+
+.sheet[data-placement='docked'] .title {
+  order: -2;
+}
+
+.sheet[data-placement='full'][data-transition='opening'][data-transition-kind='shutter'] {
+  animation-name: rise-in;
+  animation-timing-function: var(--ease-enter);
+}
+
+.sheet[data-placement='full'][data-transition='closing'][data-transition-kind='shutter'] {
+  animation-name: rise-out;
+  animation-timing-function: var(--ease-exit);
+}
+
+.sheet[data-placement='docked'][data-transition='opening'][data-transition-kind='shutter'] {
+  animation-name: slide-in;
+  animation-timing-function: var(--ease-enter);
+}
+
+.sheet[data-placement='docked'][data-transition='closing'][data-transition-kind='shutter'] {
+  animation-name: slide-out;
+  animation-timing-function: var(--ease-exit);
+}
+
+.sheet[data-transition='opening'][data-transition-kind='fade'] {
+  animation-name: fade-in;
+}
+
+.sheet[data-transition='closing'][data-transition-kind='fade'] {
+  animation-name: fade-out;
+}
+
+@keyframes rise-in {
+  from {
+    transform: translateY(100%);
+  }
+
+  to {
+    transform: translateY(0);
+  }
+}
+
+@keyframes rise-out {
+  from {
+    transform: translateY(0);
+  }
+
+  to {
+    transform: translateY(100%);
+  }
+}
+
+@keyframes slide-in {
+  from {
+    transform: translateX(100%);
+  }
+
+  to {
+    transform: translateX(0);
+  }
+}
+
+@keyframes slide-out {
+  from {
+    transform: translateX(0);
+  }
+
+  to {
+    transform: translateX(100%);
+  }
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes fade-out {
+  from {
+    opacity: 1;
+  }
+
+  to {
+    opacity: 0;
+  }
+}

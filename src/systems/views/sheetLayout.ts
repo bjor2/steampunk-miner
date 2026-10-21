@@ -21,6 +21,8 @@ export interface SheetTabBar {
   tabIds: readonly string[]
   /** The tab the sheet shows: the one asked for, else the first; null with no tab to show. */
   activeTabId: string | null
+  /** A lone tab is the sheet's title alone; the bar shows once there is a choice of two. */
+  isShown: boolean
   /** More tabs than `layout.tabsMax` fit before the bar scrolls sideways. */
   isScrolling: boolean
 }
@@ -49,6 +51,7 @@ export function sheetTabBarOf(
   return {
     tabIds,
     activeTabId: activeTabIdOf(tabIds, askedTabId),
+    isShown: tabIds.length > 1,
     isScrolling: tabIds.length > tokens.layout.tabsMax,
   }
 }

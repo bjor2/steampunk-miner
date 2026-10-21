@@ -52,6 +52,11 @@ describe('sheet tab bar', () => {
     expect(sheetTabBarOf([], 'probe.tab-0').activeTabId).toBeNull()
   })
 
+  it('shows the bar only once there are two tabs to choose between', () => {
+    expect(sheetTabBarOf(tabsOf(1), null).isShown).toBe(false)
+    expect(sheetTabBarOf(tabsOf(2), null).isShown).toBe(true)
+  })
+
   it('scrolls sideways only past the design tab budget', () => {
     const tabsMax = DESIGN_TOKENS.layout.tabsMax
     expect(sheetTabBarOf(tabsOf(tabsMax), null).isScrolling).toBe(false)

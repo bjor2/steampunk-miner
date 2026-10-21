@@ -1,13 +1,14 @@
 /*
  * #173: the canvas's rectangle, the whole window up to 64:27 and a centred band past it. Held upright
- * it is always the whole window (ticket 483).
+ * it is always the whole window (ticket 483). A docked sheet on desktop (ticket 686) takes its
+ * column off the right, so the view narrows instead of being covered.
  */
 .stage {
   position: absolute;
   top: 0;
   bottom: 0;
   left: var(--stage-left);
-  width: var(--stage-width);
+  width: calc(var(--stage-width) - var(--sheet-docked-width, 0px));
   overflow: hidden;
 }
 

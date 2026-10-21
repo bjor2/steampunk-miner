@@ -1,0 +1,12 @@
+/*
+ * The desktop dock (ticket 686): the column at the stage's right edge that the narrowed stage
+ * frees, `--sheet-docked-width` wide (0 while no docked sheet is drawn), inside the safe area.
+ */
+.dock {
+  position: absolute;
+  top: var(--safe-top);
+  bottom: var(--safe-bottom);
+  left: calc(var(--stage-left) + var(--stage-width) - var(--sheet-docked-width, 0px));
+  width: calc(var(--sheet-docked-width, 0px) - var(--safe-right));
+  overflow: hidden;
+}

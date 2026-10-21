@@ -17,6 +17,8 @@ import { GameStage } from './ui/stage/GameStage'
 import { UnsupportedDeviceCard } from './ui/stage/UnsupportedDeviceCard'
 import { UiArtTokens } from './ui/kit/UiArtTokens'
 import { SliceScreen } from './ui/screens/SliceScreen'
+import { BaseSheet } from './ui/sheet/BaseSheet'
+import { SheetDock } from './ui/sheet/SheetDock'
 import { LedgerToast } from './ui/save/LedgerToast'
 import { UnsavedChip } from './ui/save/UnsavedChip'
 import { ExactAmountSheet } from './ui/sheets/ExactAmountSheet'
@@ -26,7 +28,7 @@ import { TravelTransitionCard } from './ui/TravelTransitionCard'
 
 export default function App() {
   return (
-    <GameStage scene={<GameScene />}>
+    <GameStage scene={<GameScene />} dock={<SheetDock />}>
       <UiArtTokens />
       <Hud />
       <PlatformScreen />
@@ -36,6 +38,7 @@ export default function App() {
       <TravelTransitionCard />
       <PlanetCard />
       <EndOfSliceCard />
+      <BaseSheet at="full" />
       <SliceScreen />
       <ArtefactChoice />
       <PauseMenu />

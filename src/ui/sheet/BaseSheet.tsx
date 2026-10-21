@@ -1,0 +1,104 @@
+/**
+ * The one base sheet (spec #678, ticket 686; HS: one tabbed base panel, tabs from data): draws the
+ * store's open tab in the shared sheet frame at its placement, the bar of every tab shown now, and
+ * the tab's own content in the sheet's scroll area. Mounted twice, once over the stage for the
+ * phone's full sheet and once in the desktop dock beside it; only the mount whose placement the
+ * screen takes ever opens, so one sheet shows. Presentation only: no command, no log line.
+ */
+import type { ReactNode } from 'react'
+import { useGameStore } from '../../store/gameStore'
+import { readShownSheetTabIds } from '../../store/screenReads'
+import { sheetTabBarOf, type SheetPlacement } from '../../systems/views/sheetLayout'
+import { Sheet } from '../kit/Sheet'
+import type { SheetTabLabel } from '../kit/SheetTabBar'
+import { sheetTabById, type SheetTab } from '../registries/sheetTabs'
+import { useScreenModel } from '../useScreenModel'
+import { SHEET_UI_IDS } from './sheetIds'
+import { useSheetPlacement } from './useSheetPlacement'
+import { useSheetShutter, type SheetShutter } from './useSheetShutter'
+
+export function BaseSheet({
+  at,
+  children = null,
+}: {
+  at: SheetPlacement
+  /** What lives only while this mount draws the sheet, closing included (the dock's narrowing). */
+  children?: ReactNode
+}) {
+  const openTabId = useGameStore((state) => state.openSheetTabId)
+  const isPlacedHere = useSheetPlacement() === at
+  const shutter = useSheetShutter(isPlacedHere ? openTabId : null)
+  if (shutter.tabId === null) return null
+  return (
+    <>
+      <ShownBaseSheet placement={at} shutter={shutter} />
+      {children}
+    </>
+  )
+}
+
+function ShownBaseSheet({
+  placement,
+  shutter,
+}: {
+  placement: SheetPlacement
+  shutter: SheetShutter
+}) {
+  const shownTabIds = useScreenModel(readShownSheetTabIds)
+  const openSheet = useGameStore((state) => state.openSheet)
+  const closeSheet = useGameStore((state) => state.closeSheet)
+  return (
+    <BaseSheetView
+      placement={placement}
+      shutter={shutter}
+      shownTabIds={shownTabIds}
+      onSelectTab={openSheet}
+      onClose={closeSheet}
+    />
+  )
+}
+
+/** The sheet as the store's values draw it: the shutter's tab, else the first shown, in its frame. */
+export function BaseSheetView({
+  placement,
+  shutter,
+  shownTabIds,
+  onSelectTab,
+  onClose,
+}: {
+  placement: SheetPlacement
+  shutter: SheetShutter
+  shownTabIds: readonly string[]
+  onSelectTab: (tabId: string) => void
+  onClose: () => void
+}) {
+  const tabBar = sheetTabBarOf(shownTabIds, shutter.tabId)
+  const activeTab = tabBar.activeTabId === null ? null : sheetTabById(tabBar.activeTabId)
+  if (activeTab === null) return null
+  return (
+    <Sheet
+      placement={placement}
+      phase={shutter.phase}
+      transition={shutter.transition}
+      title={activeTab.title}
+      tabs={tabLabelsOf(tabBar.tabIds)}
+      tabBar={tabBar}
+      onSelectTab={onSelectTab}
+      onClose={onClose}
+      testId={SHEET_UI_IDS.baseSheet}
+    >
+      <activeTab.Panel />
+    </Sheet>
+  )
+}
+
+function tabLabelsOf(tabIds: readonly string[]): SheetTabLabel[] {
+  return tabIds
+    .map(sheetTabById)
+    .filter(isTab)
+    .map(({ id, title }) => ({ id, title }))
+}
+
+function isTab(tab: SheetTab | null): tab is SheetTab {
+  return tab !== null
+}

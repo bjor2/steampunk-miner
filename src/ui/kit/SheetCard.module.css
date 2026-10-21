@@ -1,0 +1,92 @@
+/*
+ * The sheet's card (ticket 686, design-system.md section 10): the baked card frame (#683) over a
+ * brass hairline, the whole card one 44 px target with 14 px text at least. The line folds away
+ * until a tap reveals it (`data-revealed`), a resting mouse hovers it or the keyboard focuses it;
+ * the fold takes the quick duration, or none under Reduce Motion (`--sheet-fold`, the sheet's).
+ */
+.card {
+  display: block;
+  box-sizing: border-box;
+  width: 100%;
+  min-height: var(--tap-target-min);
+  padding: var(--space-2) var(--space-3);
+  border: var(--frame-hairline) solid var(--color-brass);
+  border-radius: var(--radius-card);
+  border-image: var(--art-card-frame) var(--art-card-frame-slice) fill / var(--art-card-frame-width);
+  background: var(--color-panel);
+  color: var(--color-parchment);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  pointer-events: auto;
+  touch-action: manipulation;
+}
+
+.card:focus-visible {
+  outline: var(--focus-ring);
+  outline-offset: var(--focus-ring-offset);
+}
+
+.head {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-height: calc(var(--tap-target-min) - 2 * var(--space-2));
+}
+
+.title {
+  flex: 1;
+  min-width: 0;
+  color: var(--color-text);
+  font-size: var(--type-title);
+  line-height: var(--line-height);
+}
+
+.figure {
+  flex: none;
+  color: var(--color-brass);
+  font-family: var(--font-numerals);
+  font-size: var(--type-body);
+}
+
+.card[data-muted] .figure,
+.card[data-muted] .title {
+  color: var(--color-steel);
+}
+
+/* The line folds to nothing and opens to its height without measuring it (grid rows 0fr to 1fr). */
+.reveal {
+  display: grid;
+  grid-template-rows: 0fr;
+  opacity: 0;
+  transition:
+    grid-template-rows var(--sheet-fold, var(--motion-quick)) var(--ease-exit),
+    opacity var(--motion-quick) var(--ease-exit);
+}
+
+.line {
+  overflow: hidden;
+  min-height: 0;
+  font-size: var(--type-body);
+  line-height: var(--line-height);
+}
+
+.card[data-revealed] .reveal,
+.card:focus-visible .reveal {
+  grid-template-rows: 1fr;
+  opacity: 1;
+  transition-timing-function: var(--ease-enter);
+}
+
+/* Desktop's hover detail replaces the phone's tap-to-reveal (design-system.md section 9). */
+@media (hover: hover) {
+  .card:hover .reveal {
+    grid-template-rows: 1fr;
+    opacity: 1;
+    transition-timing-function: var(--ease-enter);
+  }
+
+  .card:hover {
+    background-color: rgb(201 162 75 / 0.12);
+  }
+}

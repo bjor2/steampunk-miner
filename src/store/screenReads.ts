@@ -24,6 +24,7 @@ import { mountedGunModeOf } from '../systems/vehicle/vehicleGun'
 import { chargeSizeToPlantOf, nextChargeSizeOf } from '../systems/vehicle/chargeSelection'
 import type { BayId } from '../systems/world/dockBays'
 import { shownBayScreenIdOf } from '../ui/registries/bayScreens'
+import { shownSheetTabsOn } from '../ui/registries/sheetTabs'
 import { readAuthorityState } from './authorityLink'
 import { useGameStore } from './gameStore'
 import type { ArtefactChoiceModel } from '../systems/views/artefactChoiceModel'
@@ -64,6 +65,11 @@ export function readDockedBay(): BayId | null {
  */
 export function readSliceBayScreenIdAt(bay: BayId): string | null {
   return shownBayScreenIdOf(readAuthorityState(), bay)
+}
+
+/** The base sheet's tabs shown now, in order (ticket 686): ids, so a re-read compares cheaply. */
+export function readShownSheetTabIds(): string[] {
+  return shownSheetTabsOn(readAuthorityState()).map((tab) => tab.id)
 }
 
 /** The Sell bay's model, as it would draw now, docked there or not. */
