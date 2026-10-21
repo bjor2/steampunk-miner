@@ -12,7 +12,7 @@ ticket 642's rows), the kinds in `planets.hazards` and the caps in `planets.haza
 is `src/features/ores/systems/planetHazards.ts` and `hazardKinds.ts`; `planetHazards.test.ts` holds
 every rule below. Ticket 652 lays the pockets, ticket 653 the look, ticket 654 the card. Ticket 653
 gave each planet its rock tint, horizon and sky band on the same row (feature-slices.md 3.79); the
-pockets' own look in the rock waits on ticket 652's pocket read.
+pockets' own look in the rock, read through ticket 652's `hazardPocketKindAt`, is a ticket of its own.
 
 ## The four hazards
 
