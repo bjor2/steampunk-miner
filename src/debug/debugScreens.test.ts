@@ -206,7 +206,7 @@ describe('debug api: input acts like play (#33 acceptance 3 and 11)', () => {
     expect(replay.digests.at(-1)?.digest).toBe(takeSessionSnapshot().digest)
   })
 
-  it('registers the 56 event names from before the controls and HUD, plus hint_shown, casing, the four #46 artefact events, collapse, the lining charge, the tunnel wrecker, the guns, the refinery, the lining bill, blasting charges, heat, benchmark results, the memory sample, the loadout, the gate hit, the live blast, save migrations, the charge sizes, the snapshot line, the item purchase, the ore sample, the magnetic hazard, the bore gun, the collapse brace, auto mode, the hazard strip tier, the strut, the drill cut line, the turret burst and the new game', () => {
+  it('registers the 56 event names from before the controls and HUD, plus hint_shown, casing, the four #46 artefact events, collapse, the lining charge, the tunnel wrecker, the guns, the refinery, the lining bill, blasting charges, heat, benchmark results, the memory sample, the loadout, the gate hit, the live blast, save migrations, the charge sizes, the snapshot line, the item purchase, the ore sample, the magnetic hazard, the bore gun, the collapse brace, auto mode, the hazard strip tier, the strut, the drill cut line, the turret burst, the new game and the material pop mode', () => {
     // #41 added `casing_upgraded`, `casing_placed`, `casing_drilled` and the two grade edges; #46 four
     // artefact events; #43 `collapse_warning`, `collapse_cancelled` and `collapse`; #76 `casing_lined`;
     // #111 `ring_gnawed`, `wrecker_spawned` and `wrecker_fled`; #93 `gun_mounted`, `gun_upgraded`,
@@ -223,7 +223,8 @@ describe('debug api: input acts like play (#33 acceptance 3 and 11)', () => {
     // `auto_acted` and `auto_act_overridden`; ticket 341 `hazard_strip_tier` (perf runs only);
     // ticket 379 `strut_placed`; ticket 335 `drill_cut`; ticket 383 `turret_burst_set`; ticket
     // 403 `new_game_started`; ticket 479 `checkpoint_failed`, `save_exported` and `save_imported`;
-    // ticket 477 `gpu_capabilities` (perf runs only); the controls and the HUD still add none.
+    // ticket 477 `gpu_capabilities` (perf runs only); ticket 614 `material_pop_mode_set`; the
+    // controls and the HUD still add none.
     expect(ALL_RUN_EVENT_NAMES).toHaveLength(
       62 +
         4 +
@@ -255,6 +256,7 @@ describe('debug api: input acts like play (#33 acceptance 3 and 11)', () => {
         1 +
         1 +
         3 +
+        1 +
         1,
     )
   })
