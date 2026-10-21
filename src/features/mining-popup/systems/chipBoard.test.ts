@@ -19,6 +19,7 @@ function faceOf(oreId: string, speciesId: string | null = null): OreFace {
     speciesId,
     name,
     family: 'metal',
+    grade: 1,
     gradeName: 'Raw',
     iconId: 'none',
     swatch: 'red',

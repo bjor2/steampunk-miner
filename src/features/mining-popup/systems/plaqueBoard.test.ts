@@ -14,6 +14,7 @@ function material(oreId: string): NewMaterial {
     speciesId: null,
     name: oreId,
     family: 'metal',
+    grade: 1,
     gradeName: 'Raw',
     iconId: 'none',
     swatch: 'red',

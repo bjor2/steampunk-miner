@@ -1,8 +1,9 @@
 /**
  * The HUD overlay's resource chips (#172 §1): each chip is an overlay card riding beside the
  * vehicle, away from where it is going, rising as it shows and fading at the end of its life. A
- * named chip draws its name in its seen rarity's colour (ticket 454). Reads only the popup store
- * and the reduce-motion switch; the cards place themselves every frame (#208).
+ * named chip draws its name in its seen rarity's colour (ticket 454) and its grade as a pip after
+ * it (ticket 695). Reads only the popup store and the reduce-motion switch; the cards place
+ * themselves every frame (#208).
  */
 import { useMemo, type CSSProperties } from 'react'
 import { useGameStore } from '../../../store/gameStore'
@@ -14,6 +15,7 @@ import { chipPhaseAt, chipsShownAt, type ResourceChip } from '../systems/chipBoa
 import { chipCountTextOf } from '../systems/popupText'
 import { chipStackOf } from '../systems/render/chipPlacement'
 import { chipAnchorOf } from './chipAnchor'
+import { GradePip } from './GradePip'
 import { MINING_POPUP_TEST_IDS } from './testIds'
 import { OreIcon } from './OreIcon'
 import { useCarveFeed } from './useCarveFeed'
@@ -60,6 +62,7 @@ function ChipCard({ chip, tick }: { chip: ResourceChip; tick: number }) {
         {chip.isNamed && (
           <span className={styles.name}>
             <RarityName rarity={rarity}>{chip.face.name}</RarityName>
+            <GradePip face={chip.face} />
           </span>
         )}
         <span key={chip.count} className={styles.count}>

@@ -332,7 +332,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/mining-gates/systems/rigs.test.ts` | 8 | 8 |
 | `src/features/mining-gates/systems/toolsAndGear.test.ts` | 3 | 3 |
 
-### `mining-popup`: 9 files, 61 tests
+### `mining-popup`: 9 files, 62 tests
 
 | File | Tests | Sites |
 | --- | --- | --- |
@@ -340,7 +340,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/mining-popup/store/miningPopupStore.test.ts` | 11 | 11 |
 | `src/features/mining-popup/systems/chipBoard.test.ts` | 12 | 12 |
 | `src/features/mining-popup/systems/oreFace.species.test.ts` | 5 | 5 |
-| `src/features/mining-popup/systems/oreFace.test.ts` | 4 | 4 |
+| `src/features/mining-popup/systems/oreFace.test.ts` | 5 | 5 |
 | `src/features/mining-popup/systems/plaqueBoard.test.ts` | 5 | 5 |
 | `src/features/mining-popup/systems/popupText.test.ts` | 3 | 3 |
 | `src/features/mining-popup/systems/render/chipPlacement.test.ts` | 8 | 8 |

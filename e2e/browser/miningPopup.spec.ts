@@ -3,7 +3,8 @@
  * and the DOM's test ids, never pixels. Drilling the first surface ore of the committed start
  * scenario shows its chip and the NEW MATERIAL plaque, a second tile of the type shows no second
  * plaque, and both clear on the game's own clock with no input. At a phone's 360 px and a
- * desktop's 1280 px both name the unit by its species alone, never `<grade> <family>` (ticket 695).
+ * desktop's 1280 px both name the unit by its species alone, never `<grade> <family>`, with its
+ * rarity on the name and its grade as a pip of 1 to 5 dots after it (ticket 695).
  * The page's clock is held from the drill until the DOM is read, so a busy box never outlives a
  * 1.4 s chip between two checks.
  */
@@ -20,8 +21,8 @@ declare global {
 
 interface PopupShown {
   tick: number
-  chips: { oreId: string; speciesId: string | null; name: string; count: number }[]
-  plaque: { oreIds: string[]; names: string[]; phase: string } | null
+  chips: { oreId: string; speciesId: string | null; name: string; grade: number; count: number }[]
+  plaque: { oreIds: string[]; names: string[]; grades: number[]; phase: string } | null
   plaquesShown: number
 }
 
@@ -51,6 +52,15 @@ const POPUP_VIEWPORTS = [
 /** The ores slice's grade names and family names (`oreGrade.ts`, `oreFamilies.json`). */
 const GRADE_NAMES = ['Raw', 'Lustrous', 'Crystal', 'Lumen', 'Aether']
 const FAMILY_NAMES = ['Brassvein', 'Quartzine']
+
+/** The species name carries its seen rarity, and a pip after it the grade with no text. */
+async function expectRarityAndGradeCues(page: Page, testId: string, grade: number): Promise<void> {
+  const shown = page.getByTestId(testId)
+  await expect(shown.locator('[data-rarity]').first()).not.toHaveAttribute('data-rarity', '')
+  const pip = shown.locator('[data-grade]').first()
+  await expect(pip).toHaveAttribute('data-grade', String(grade))
+  await expect(pip).toHaveText('')
+}
 
 async function openStartScenario(page: Page): Promise<string[]> {
   const errors: string[] = []
@@ -167,8 +177,11 @@ test.describe('mining popup (#178)', () => {
       expect(GRADE_NAMES).not.toContain(chip.name.split(' ')[0])
       expect(FAMILY_NAMES).not.toContain(chip.name.split(' ').at(-1))
       expect(shown.plaque?.names).toEqual([chip.name])
+      expect(shown.plaque?.grades).toEqual([chip.grade])
       await expect(page.getByTestId('mining-popup-chip')).toContainText(chip.name)
       await expect(page.getByTestId('mining-popup-plaque')).toContainText(chip.name)
+      await expectRarityAndGradeCues(page, 'mining-popup-chip', chip.grade)
+      await expectRarityAndGradeCues(page, 'mining-popup-plaque', chip.grade)
       expect(errors).toEqual([])
     })
   }

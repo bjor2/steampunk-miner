@@ -18,6 +18,7 @@ export const miningPopupDebugActions: Readonly<Record<string, DebugAction>> = {
         oreId: face.oreId,
         speciesId: face.speciesId,
         name: face.name,
+        grade: face.grade,
         count,
         slot,
         isNamed,
@@ -28,6 +29,7 @@ export const miningPopupDebugActions: Readonly<Record<string, DebugAction>> = {
           : {
               oreIds: plaque.materials.map(({ face }) => face.oreId),
               names: plaque.materials.map(({ face }) => face.name),
+              grades: plaque.materials.map(({ face }) => face.grade),
               phase: plaquePhaseAt(plaque, tick),
             },
       plaquesShown: plaqueBoard.nextSerial,

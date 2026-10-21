@@ -1,0 +1,21 @@
+/*
+ * `--grade-dots` brass dots in a row on a thin brass rim (ticket 695): the width grows by one dot
+ * per grade, so the shape, not a colour, says the grade. Brass on the dark panel holds the HUD's
+ * frame contrast. Sizes follow the text, so the pip scales with --ui-scale like the name.
+ */
+.pip {
+  --pip-dot: 0.32em;
+  --pip-step: 0.48em;
+
+  display: inline-block;
+  box-sizing: content-box;
+  width: calc(var(--grade-dots, 1) * var(--pip-step) - (var(--pip-step) - var(--pip-dot)));
+  height: var(--pip-dot);
+  margin-left: var(--space-1);
+  padding: 0.12em;
+  border: 1px solid var(--color-brass);
+  border-radius: 999px;
+  background: radial-gradient(circle closest-side, var(--color-brass) 92%, transparent 100%) 0 50% /
+    var(--pip-step) var(--pip-dot) repeat-x;
+  vertical-align: middle;
+}

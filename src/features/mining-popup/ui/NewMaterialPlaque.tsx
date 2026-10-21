@@ -3,8 +3,8 @@
  * top band, in the bottom band while the vehicle lifts at speed, and one line in the bottom band
  * on a screen whose top band has no room for it (`plaqueFitOf`). It comes in, holds and fades on
  * the authority's clock and never takes a click. The first material's name shows in its seen
- * rarity's colour (ticket 454). Reads only the popup store, the local vehicle and the
- * reduce-motion switch.
+ * rarity's colour (ticket 454), and each name has its grade's pip after it (ticket 695). Reads
+ * only the popup store, the local vehicle and the reduce-motion switch.
  */
 import { useMemo } from 'react'
 import { readAuthorityState } from '../../../store/authorityLink'
@@ -18,6 +18,7 @@ import { plaqueBandOn, plaqueFitOf, type PlaqueFit } from '../systems/render/pla
 import { readFittedScreen } from '../../../ui/stage/screenFit'
 import { rarityNameOf } from '../../../systems/views/rarityName'
 import { RarityName } from '../../../ui/kit/RarityName'
+import { GradePip } from './GradePip'
 import { OreIcon } from './OreIcon'
 import { MINING_POPUP_TEST_IDS } from './testIds'
 import { usePopupClock } from './usePopupClock'
@@ -74,6 +75,7 @@ function NewMaterialPlaqueView({
         <span className={styles.title}>{text.title}</span>
         <strong className={styles.name}>
           <RarityName rarity={rarity}>{text.name}</RarityName>
+          <GradePip face={plaque.materials[0].face} />
         </strong>
         <span className={styles.detail}>{text.detail}</span>
         <span className={styles.price}>{text.price}</span>
@@ -81,6 +83,7 @@ function NewMaterialPlaqueView({
           <span key={face.oreId} className={styles.joined}>
             <OreIcon face={face} size="chip" />
             {face.name}
+            <GradePip face={face} />
           </span>
         ))}
       </span>

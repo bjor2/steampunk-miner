@@ -9,6 +9,7 @@ function material(oreId: string, name: string, unitPriceText: string): NewMateri
     speciesId: null,
     name,
     family: 'crystal',
+    grade: 2,
     gradeName: 'Lustrous',
     iconId: 'none',
     swatch: 'red',

@@ -21,6 +21,8 @@ export interface OreFace {
   /** The species' own name, else the ore type's; never a grade before a family (ticket 695). */
   name: string
   family: string
+  /** 1 Raw to 5 Aether (#151): drawn as a pip after the name, never in it (ticket 695). */
+  grade: number
   gradeName: string
   /** A #158 icon id, or `none` while the ore has no icon of its own. */
   iconId: string
@@ -47,12 +49,14 @@ export function oreFaceOf(
 ): OreFace | null {
   const ore = oreTypeNamed(oreId)
   if (ore === null) return null
+  const grade = gradeOf(ore)
   return {
     oreId,
     speciesId: species?.id ?? null,
     name: species === null ? ore.name : speciesNameOf(species.epithet),
     family: ore.family,
-    gradeName: gradeNameOf(ore),
+    grade,
+    gradeName: ORE_GRADE_NAMES[grade - 1],
     iconId: ore.iconId,
     swatch: planet === null ? NO_PLANET_SWATCH : swatchOf(ore, planet),
   }
@@ -71,9 +75,9 @@ function kernelOreNamed(oreId: string): OreType | null {
 }
 
 /** #151: the catalogue's grade, else the grade the tier reaches on the `oreGrades` thresholds. */
-function gradeNameOf(ore: OreType): string {
+function gradeOf(ore: OreType): number {
   const grade = ore.grade > NO_CATALOGUE_GRADE ? ore.grade : oreGradeOf(ore.tier)
-  return ORE_GRADE_NAMES[Math.min(grade, ORE_GRADE_NAMES.length) - 1]
+  return Math.min(grade, ORE_GRADE_NAMES.length)
 }
 
 /** The look the ground draws an ore cell of this type in, asked of the ore-look seam. */
