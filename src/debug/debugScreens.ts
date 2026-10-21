@@ -67,6 +67,7 @@ import type { ScreenLayout } from '../systems/views/screenLayout'
 import type { ScreenBox } from '../systems/views/hudClearView'
 import type { HudCoverageReport } from '../systems/views/hudCoverageReport'
 import { hudCoverageNow, showHudCoverageUnlessRefused } from './debugHudCoverage'
+import { closeSheetNow, openSheetUnlessRefused, sheetNow, type SheetReading } from './debugSheet'
 import { showHintUnlessRefused, stageHudUnlessRefused, vehicleScreenBoxNow } from './debugHudLayout'
 import {
   readDrawnKindLooks,
@@ -162,6 +163,12 @@ export interface DebugUi {
   showHudCoverage(shown: unknown): DebugResult
   /** The HUD's coverage the page measures now, against the layout's budget (ticket 682). */
   getHudCoverage(): DebugResult<{ report: HudCoverageReport }>
+  /** Opens the base sheet on a registered tab (ticket 686); refused for an id no slice registered. */
+  openSheet(tabId: unknown): DebugResult
+  /** Closes the base sheet, as its Close or `input.tap('ui_cancel')` does. */
+  closeSheet(): DebugResult
+  /** The base sheet's open tab, the tabs it shows, its placement and the revealed card. */
+  getSheet(): DebugResult<{ sheet: SheetReading }>
   /** The ground's material look table as the shader draws it now (ticket 450). */
   getKindLooks(): DebugResult<{ looks: DrawnKindLooks }>
   /** Shows every kind of the planet as if met, for eye checks and the frame A/B (ticket 450). */
@@ -245,6 +252,9 @@ export function createDebugUi(): DebugUi {
     showHint: showHintUnlessRefused,
     showHudCoverage: showHudCoverageUnlessRefused,
     getHudCoverage: hudCoverageNow,
+    openSheet: openSheetUnlessRefused,
+    closeSheet: closeSheetNow,
+    getSheet: sheetNow,
     getKindLooks: readDrawnKindLooks,
     showEveryKindLook,
     showSeenKindLooksOnly,
