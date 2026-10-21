@@ -442,6 +442,41 @@
               "issues": [10, 24]
             },
             {
+              "group": true,
+              "title": "First-five hazards",
+              "description": "One hazard per planet on P2 to P5, each read as a line on the planet card on arrival (design: ticket 651).",
+              "children": [
+                {
+                  "title": "Rockfall",
+                  "description": "Pockets of loose scree under the surface of the heavy planet; cut one and the rubble above pours into the cut and crushes.",
+                  "status": "planned",
+                  "issues": [651, 652, 653, 654],
+                  "planet": 2
+                },
+                {
+                  "title": "Firedamp",
+                  "description": "Sealed gas pockets in the fossil planet's rock; breach one and the boiler chokes for a few seconds.",
+                  "status": "planned",
+                  "issues": [651, 652, 653, 654],
+                  "planet": 3
+                },
+                {
+                  "title": "Spinecrystal",
+                  "description": "Brittle crystal clusters in the crystal-rich ground; cut one and it shatters against the bit and scores the hull.",
+                  "status": "planned",
+                  "issues": [651, 652, 653, 654],
+                  "planet": 4
+                },
+                {
+                  "title": "Steam vents",
+                  "description": "Pressurised vents in the ground; cut one and it blows, scalding the hull and shoving the miner back up the shaft.",
+                  "status": "planned",
+                  "issues": [651, 652, 653, 654],
+                  "planet": 5
+                }
+              ]
+            },
+            {
               "title": "Heat / lava planets",
               "description": "Planets 8 to 16 (the Fire act): a heat gauge, lava pockets and a firebrick palette, announced by a stinger.",
               "status": "built",

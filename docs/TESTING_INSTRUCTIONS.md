@@ -300,6 +300,16 @@ programs }` from three's `renderer.info` of the game canvas), read only when cal
   `enemyStats.test.ts` holds the spawn density to the planet's own radius against the reference
   planet's under the same rules. The P2 to P10 minutes, p* and the economy bars at the new radii are
   ticket 644's paired run.
+- **Per-planet hazards for P2 to P5** (ticket 651, spec #647; design note `docs/planets/hazards-p2-p5.md`):
+  `src/features/ores/systems/planetHazards.test.ts` holds each of planets 2 to 5 to its own hazard
+  kind on its registry row and planet 1 to none, the kind table to its four effects and numbers,
+  the depth window to `floor(num * R / den)` whole cells, each window below the pinned surface layer
+  and inside band 1 on a fresh planet, the pad view to several pockets on average (seen within a
+  minute), and the card copy to a tag, one line of at most 64 characters with no digit and no
+  unlock id. The loader refuses a hazard on planet 1, a missing one on planets 2 to 5, a shared or
+  unknown kind, a window that does not rise, a lattice or chance out of bounds, copy that breaks the
+  card rule, an effect without its numbers or over `hazardCaps`, and stray fields. Whether a pocket
+  is met on the three pacing seeds is ticket 652's worldgen spec.
 - **Material looks** (ticket 450, TD shape on #450 6226270701 and the Scalers' conditions):
   `src/features/roster/kindLook.test.ts` holds the roster's look provider to its rules: a fresh
   save shows no species (unseen kinds draw the family look), a species shows only once the
