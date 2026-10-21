@@ -6,12 +6,15 @@
  * facings), so they are drawn around the head's pivot; every other part is drawn on the body. The
  * art may overhang the 0.9 m collider but never sizes it (#7): physics reads
  * `VEHICLE_COLLIDER_SIZE`, never this file. Parts a slice swaps in (#180, `partMotionRequests`)
- * take their slots whatever the tier.
+ * take their slots whatever the tier; another asset's look parts (ticket 640) hide the slots they
+ * stand in and are drawn beside these quads (`lookPartQuads`).
  */
 import type { ArtCatalogue } from '../art/artCatalogue'
 import { slotOfPartId } from '../art/artIds'
 import { assetQuadsOf, atlasMapsOf, type AssetQuad, type AtlasMaps } from '../art/assetLook'
 import { NO_SWAPS } from '../art/placeholderLook'
+import type { PartSwapRequest } from '../registries/partMotionRequests'
+import { hiddenSlotsOf, lookHeadQuadsOf, NO_LOOK_SWAPS, type LookPartQuad } from './lookPartQuads'
 import { createPartPose, writePartPose, type PartMotion, type PartPose } from './partMotion'
 
 export const VEHICLE_ASSET_ID = 'vehicle'
@@ -28,8 +31,9 @@ export function vehiclePartIdsOf(
   art: ArtCatalogue,
   visualTier: number,
   swappedPartIds: readonly string[] = NO_SWAPS,
+  looks: readonly PartSwapRequest[] = NO_LOOK_SWAPS,
 ): string[] {
-  return assetQuadsOf(art, VEHICLE_ASSET_ID, visualTier, swappedPartIds).map((quad) => quad.partId)
+  return shownVehicleQuadsOf(art, visualTier, swappedPartIds, looks).map((quad) => quad.partId)
 }
 
 /** The maps the vehicle's parts are cut from, or null while it is a placeholder. */
@@ -48,8 +52,8 @@ export function vehiclePartPosesOf(
   isMotionReduced: boolean,
 ): Record<string, PartPose> {
   const poses: Record<string, PartPose> = {}
-  const swapped = motion.requested.shownPartIds
-  for (const quad of assetQuadsOf(art, VEHICLE_ASSET_ID, visualTier, swapped)) {
+  const { shownPartIds, shownLooks } = motion.requested
+  for (const quad of shownVehicleQuadsOf(art, visualTier, shownPartIds, shownLooks)) {
     const pose = createPartPose()
     writePartPose(motion, slotOfPartId(quad.partId), quad.size[1] / 2, isMotionReduced, pose)
     poses[quad.partId] = pose
@@ -62,8 +66,9 @@ export function vehicleBodyQuadsOf(
   art: ArtCatalogue,
   visualTier: number,
   swappedPartIds: readonly string[] = NO_SWAPS,
+  looks: readonly PartSwapRequest[] = NO_LOOK_SWAPS,
 ): AssetQuad[] {
-  return assetQuadsOf(art, VEHICLE_ASSET_ID, visualTier, swappedPartIds).filter(
+  return shownVehicleQuadsOf(art, visualTier, swappedPartIds, looks).filter(
     (quad) => !isOnDrillHead(quad),
   )
 }
@@ -76,13 +81,28 @@ export function drillHeadQuadsOf(
   art: ArtCatalogue,
   visualTier: number,
   swappedPartIds: readonly string[] = NO_SWAPS,
+  looks: readonly PartSwapRequest[] = NO_LOOK_SWAPS,
 ): AssetQuad[] {
-  const quads = assetQuadsOf(art, VEHICLE_ASSET_ID, visualTier, swappedPartIds).filter(
-    isOnDrillHead,
-  )
-  const head = quads.find((quad) => slotOfPartId(quad.partId) === DRILL_HEAD_SLOT)
+  const head = headPlateOf(art, visualTier, swappedPartIds)
   if (head === undefined) return []
-  return quads.map((quad) => relativeToHead(quad, head))
+  return shownVehicleQuadsOf(art, visualTier, swappedPartIds, looks)
+    .filter(isOnDrillHead)
+    .map((quad) => relativeToHead(quad, head))
+}
+
+/** The look parts the drill head carries, placed like `drillHeadQuadsOf`'s. */
+export function drillHeadLookQuadsOf(
+  art: ArtCatalogue,
+  visualTier: number,
+  swappedPartIds: readonly string[],
+  looks: readonly PartSwapRequest[],
+): LookPartQuad[] {
+  const head = headPlateOf(art, visualTier, swappedPartIds)
+  if (head === undefined) return []
+  return lookHeadQuadsOf(art, looks).map((look) => ({
+    ...look,
+    quad: relativeToHead(look.quad, head),
+  }))
 }
 
 /** The head plate's width, which sets how far ahead of the collider the head reaches. */
@@ -93,6 +113,29 @@ export function drillHeadSizeOf(
 ): number {
   const head = drillHeadQuadsOf(art, visualTier, swappedPartIds).find((quad) => quad.z === 0)
   return head === undefined ? 0 : head.size[0]
+}
+
+/** The tier's quads with the swaps in and the slots a look stands in left out. */
+function shownVehicleQuadsOf(
+  art: ArtCatalogue,
+  visualTier: number,
+  swappedPartIds: readonly string[],
+  looks: readonly PartSwapRequest[],
+): AssetQuad[] {
+  const quads = assetQuadsOf(art, VEHICLE_ASSET_ID, visualTier, swappedPartIds)
+  if (looks.length === 0) return quads
+  const hidden = hiddenSlotsOf(art, looks)
+  return quads.filter((quad) => !hidden.includes(slotOfPartId(quad.partId)))
+}
+
+function headPlateOf(
+  art: ArtCatalogue,
+  visualTier: number,
+  swappedPartIds: readonly string[],
+): AssetQuad | undefined {
+  return assetQuadsOf(art, VEHICLE_ASSET_ID, visualTier, swappedPartIds).find(
+    (quad) => slotOfPartId(quad.partId) === DRILL_HEAD_SLOT,
+  )
 }
 
 function relativeToHead(quad: AssetQuad, head: AssetQuad): AssetQuad {

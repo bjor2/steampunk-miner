@@ -26,12 +26,34 @@ export interface PartPoseRequest {
   glow: number
 }
 
-/** Each part drawn in its own slot, in place of what the visual tier shows there. */
+/**
+ * Each part drawn in its own slot, in place of what the visual tier shows there. A part of another
+ * asset (the rig-look seam, ticket 640: `vehicle-look-boiler`) is drawn at `attach`'s point and
+ * stands in place of the `vehicle` part slot it `replacesSlot`, hidden while it shows; an asset or
+ * part the art lacks draws nothing and leaves the base part in place.
+ */
 export interface PartSwapRequest {
   kind: 'swap'
   attach: AttachId
-  /** Part ids of the `vehicle` asset: `t3-drill-bit`, `t2-stack-2`. */
+  /** Part ids of `assetId`: `t3-drill-bit`, `t2-stack-2` on the `vehicle` asset. */
   partIds: readonly string[]
+  /** The asset the parts come from; absent is `vehicle`, so the swap is exactly the old one. */
+  assetId?: string
+  /** For another asset's parts: the `vehicle` part slot (`boiler`) they hide; absent hides none. */
+  replacesSlot?: string
+}
+
+/** The asset a swap with no `assetId` draws from: the base vehicle. */
+export const BASE_SWAP_ASSET_ID = 'vehicle'
+
+/** The asset `request`'s parts come from. */
+export function swapAssetIdOf(request: PartSwapRequest): string {
+  return request.assetId ?? BASE_SWAP_ASSET_ID
+}
+
+/** Whether `request` swaps parts of the base vehicle (the swaps before ticket 640). */
+export function isBaseVehicleSwap(request: PartSwapRequest): boolean {
+  return swapAssetIdOf(request) === BASE_SWAP_ASSET_ID
 }
 
 export type PartMotionRequest = PartPoseRequest | PartSwapRequest

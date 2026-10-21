@@ -17,10 +17,11 @@ import {
 import { listenForDomainEvents } from '../store/domainEventBroadcast'
 import { useGameStore } from '../store/gameStore'
 import type { AssetQuad } from '../systems/art/assetLook'
+import { lookBodyQuadsOf } from '../systems/render/lookPartQuads'
 import { vehicleBodyQuadsOf } from '../systems/render/vehicleLook'
 import { useDisposeOnRelease } from './disposeOnRelease'
 import { SHIPPED_ART } from './shippedArt'
-import { useSwappedPartIds } from './useSwappedPartIds'
+import { useSwappedParts, type SwappedParts } from './useSwappedParts'
 import { paintVehicleLook, showVehicleOutline } from './vehicleLookPaint'
 import { drawVehicleLookNow, followLookFlashes } from './vehicleLookPresence'
 
@@ -48,11 +49,8 @@ export function VehicleLook({ children }: { children: ReactNode }) {
 /** Each body part's frame, a margin past its edges, behind the body: together one outline. */
 function BodyOutline({ material }: { material: MeshBasicMaterial }) {
   const visualTier = useGameStore((state) => state.vehicle.visualTier)
-  const swapped = useSwappedPartIds()
-  const quads = useMemo(
-    () => vehicleBodyQuadsOf(SHIPPED_ART, visualTier, swapped),
-    [visualTier, swapped],
-  )
+  const swapped = useSwappedParts()
+  const quads = useMemo(() => outlinedQuadsOf(visualTier, swapped), [visualTier, swapped])
   return (
     <>
       {quads.map((quad) => (
@@ -66,6 +64,14 @@ function BodyOutline({ material }: { material: MeshBasicMaterial }) {
       ))}
     </>
   )
+}
+
+/** The body's parts and the look parts standing on it. */
+function outlinedQuadsOf(visualTier: number, swapped: SwappedParts): AssetQuad[] {
+  return [
+    ...vehicleBodyQuadsOf(SHIPPED_ART, visualTier, swapped.partIds, swapped.looks),
+    ...lookBodyQuadsOf(SHIPPED_ART, swapped.looks).map((look) => look.quad),
+  ]
 }
 
 function outlineSizeOf(quad: AssetQuad): [number, number] {

@@ -20,6 +20,21 @@ const bigLevel: PartMotionRequest = {
   partIds: ['t3-stack', 't2-stack-2'],
 }
 
+const boilerLook: PartMotionRequest = {
+  kind: 'swap',
+  attach: 'hull.boiler',
+  partIds: ['drum'],
+  assetId: 'vehicle-look-boiler',
+  replacesSlot: 'boiler',
+}
+
+const hullLook: PartMotionRequest = {
+  kind: 'swap',
+  attach: 'hull.plates',
+  partIds: ['plate'],
+  assetId: 'vehicle-look-hull',
+}
+
 function sourceOf(id: string, requests: PartMotionRequest[]): PartMotionRequestSource {
   return { id, requestsNow: () => requests }
 }
@@ -52,5 +67,35 @@ describe('requested parts', () => {
     foldPartRequests(requested, [])
     expect(requested.shownVersion).toBe(afterSwap + 1)
     expect(requested.shownPartIds).toEqual([])
+  })
+
+  it('folds a swap with no asset id, or the vehicle id, exactly as a vehicle swap', () => {
+    const plain = createRequestedParts()
+    const named = createRequestedParts()
+    foldPartRequests(plain, [sourceOf('a.one', [bigLevel])])
+    foldPartRequests(named, [sourceOf('a.one', [{ ...bigLevel, assetId: 'vehicle' }])])
+    expect(named).toEqual(plain)
+    expect(plain.shownLooks).toEqual([])
+  })
+
+  it("keeps another asset's swap apart from the vehicle parts, by point", () => {
+    const requested = createRequestedParts()
+    foldPartRequests(requested, [sourceOf('a.one', [bigLevel, hullLook, boilerLook])])
+    expect(requested.shownPartIds).toEqual(['t2-stack-2', 't3-stack'])
+    expect(requested.shownLooks).toEqual([boilerLook, hullLook])
+    expect(requested.attach).toEqual(['hull.boiler', 'hull.plates', 'hull.stack'])
+  })
+
+  it('moves the swap version once when a look starts, never for an equal rebuilt request', () => {
+    const requested = createRequestedParts()
+    foldPartRequests(requested, [])
+    const before = requested.shownVersion
+    foldPartRequests(requested, [sourceOf('a.one', [boilerLook])])
+    for (let step = 0; step < 50; step++) {
+      foldPartRequests(requested, [sourceOf('a.one', [{ ...boilerLook, partIds: ['drum'] }])])
+    }
+    expect(requested.shownVersion).toBe(before + 1)
+    foldPartRequests(requested, [sourceOf('a.one', [{ ...boilerLook, replacesSlot: undefined }])])
+    expect(requested.shownVersion).toBe(before + 2)
   })
 })

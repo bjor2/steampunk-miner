@@ -1,7 +1,8 @@
 /**
  * The run vehicle's body parts (#52, #51), drawn from the `vehicle` asset's sidecar at the
  * authority replica's visual tier (#7: derived from the levels, never decided here), so an upgrade
- * threshold shows on the vehicle (37.7), with the parts a slice swaps in (#180). Drawn inside the
+ * threshold shows on the vehicle (37.7), with the parts a slice swaps in (#180) and the look parts
+ * of other assets standing in their slots (ticket 640). Drawn inside the
  * vehicle's body group, so it turns with the body; the drill head's parts are `DrillHeadView`'s.
  * Each part moves as the game state drives it (#48); a hit recoils the body, and a casing ring
  * laid behind it swings the rear arms (ticket 393).
@@ -10,11 +11,13 @@ import { useEffect, useMemo } from 'react'
 import { listenForFeedback } from '../store/feedbackBroadcast'
 import { useGameStore } from '../store/gameStore'
 import type { FeedbackCue } from '../systems/feedback/feedbackCues'
+import { lookBodyQuadsOf, lookPartKeyOf } from '../systems/render/lookPartQuads'
 import { vehicleAtlasMaps, vehicleBodyQuadsOf } from '../systems/render/vehicleLook'
+import { LookPartMesh } from './LookPartMesh'
 import { recoilVehicleParts, swingCasingArms } from './partMotionPresence'
 import { PartQuadMesh } from './PartQuadMesh'
 import { SHIPPED_ART } from './shippedArt'
-import { useSwappedPartIds } from './useSwappedPartIds'
+import { useSwappedParts } from './useSwappedParts'
 
 /** Parts sit just in front of the tiles. */
 const BODY_Z = 0.1
@@ -22,16 +25,20 @@ const maps = vehicleAtlasMaps(SHIPPED_ART)
 
 export function VehiclePlaceholder() {
   const visualTier = useGameStore((state) => state.vehicle.visualTier)
-  const swapped = useSwappedPartIds()
+  const swapped = useSwappedParts()
   const quads = useMemo(
-    () => vehicleBodyQuadsOf(SHIPPED_ART, visualTier, swapped),
+    () => vehicleBodyQuadsOf(SHIPPED_ART, visualTier, swapped.partIds, swapped.looks),
     [visualTier, swapped],
   )
+  const looks = useMemo(() => lookBodyQuadsOf(SHIPPED_ART, swapped.looks), [swapped])
   useEffect(() => listenForFeedback(movePartsOnCue), [])
   return (
     <>
       {quads.map((quad) => (
         <PartQuadMesh key={quad.partId} quad={quad} maps={maps} baseZ={BODY_Z} />
+      ))}
+      {looks.map((look) => (
+        <LookPartMesh key={lookPartKeyOf(look)} look={look} baseZ={BODY_Z} />
       ))}
     </>
   )

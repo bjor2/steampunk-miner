@@ -40,6 +40,7 @@ import {
 import { statsOfVehicle } from '../systems/vehicle/vehicleState'
 import type { PartPose } from '../systems/render/partMotion'
 import { gunPartIdsOf } from '../systems/render/gunLook'
+import { lookPartIdsOf } from '../systems/render/lookPartQuads'
 import { vehiclePartIdsOf, vehiclePartPosesOf } from '../systems/render/vehicleLook'
 import { isEnemyKind } from '../systems/authority/combat/combatDebugRules'
 import {
@@ -131,6 +132,8 @@ export interface VehiclePartsReport {
   /** Null with no rack bolted on. */
   rackCharges: number | null
   partIds: string[]
+  /** Other assets' look parts the slices swap on (ticket 640), `<assetId>/<partId>`. */
+  lookPartIds: string[]
   poses: Record<string, PartPose>
   /** The attach points a slice's part motion or swap names this tick (#180, sorted). */
   requestedAttach: string[]
@@ -323,14 +326,16 @@ function depthTilesOfBp(depthBp: number): number {
 
 function vehiclePartsReport(): VehiclePartsReport {
   const { vehicle, prefs } = game()
+  const { shownPartIds, shownLooks } = partMotion.requested
   return {
     visualTier: vehicle.visualTier,
     gunLevel: vehicle.gunLevel,
     rackCharges: vehicle.rackCharges,
     partIds: [
-      ...vehiclePartIdsOf(SHIPPED_ART, vehicle.visualTier, partMotion.requested.shownPartIds),
+      ...vehiclePartIdsOf(SHIPPED_ART, vehicle.visualTier, shownPartIds, shownLooks),
       ...gunPartIdsOf(SHIPPED_ART, vehicle.gunLevel),
     ],
+    lookPartIds: lookPartIdsOf(SHIPPED_ART, shownLooks),
     poses: vehiclePartPosesOf(SHIPPED_ART, partMotion, vehicle.visualTier, !prefs.shake),
     requestedAttach: [...partMotion.requested.attach],
     mounted: mountedPartsShown(),
