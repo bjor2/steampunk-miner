@@ -181,6 +181,55 @@ unskinned.
   archetype until the heat act), a slate blue darker than P1's ground (band 3 luma 0.29). The post
   step lays a batch's skins in its own planet's rock (`ROCK_PALETTES` in `skin_post.py`).
 
+## Batch p4-b3: P4's species 11 to 15 and its signature material (ticket 603)
+
+The `foothold-p4` pool's three epics and two mythics, kind slots 11 to 15 on P4, and the skin of
+the planet's signature material: the relic (Cogwork) ore at its band-5 tier, `relic_t14`, the
+slotless 16th material of #453 E1. It has no species row, so its skin is the planet's `signatures`
+row in the table (feature-slices 3.73). P4's slots 16 and 17 are #453's two appended fossil commons
+(grey marl, crinoid stem), whose skins are held: this batch does not skin them. P4's slots 1 to 10
+come with #601 and #602, after this batch, so their reports compare against it (`planet_mates`).
+The species' layers come from their rows as before; no layer is shared with P1's batches or within
+this one.
+
+<!-- p4-b3 -->
+
+| slot | wearer                        | base             | vein             | palette (shadow, body, light)                      | sheen             |
+| ---- | ----------------------------- | ---------------- | ---------------- | -------------------------------------------------- | ----------------- |
+| 11   | `clockspring-steel-brassvein` | `blued-temper`   | `coil-springs`   | `clockspring-blue` `#3c4662` `#788bc5` `#bcc5e2`   | `filed-gleam`     |
+| 12   | `alexandrite-quartzine`       | `dichroic-zones` | `cyclic-twins`   | `alexandrite-shift` `#643649` `#43b18d` `#a1d8c6`  | `sector-flash`    |
+| 13   | `ichthyosaur-eye-amberbone`   | `sutured-plates` | `sclerotic-ring` | `ichthyosaur-slate` `#505d60` `#9fbabf` `#cfdcdf`  | `greasy`          |
+| 14   | `starsteel-brassvein`         | `watered-damask` | `star-bursts`    | `starsteel-lavender` `#5a5a69` `#b4b4d2` `#dadae8` | `watered-shimmer` |
+| 15   | `painite-quartzine`           | `inner-feathers` | `spindle-spray`  | `painite-red` `#70262c` `#e04d59` `#f0a6ac`        | `fire-glint`      |
+| sig. | P4's signature, `relic_t14`   | `riveted-plate`  | `broken-cogs`    | `cogwork-patina` `#236052` `#46c1a4` `#a2e0d2`     | `worn-brass`      |
+
+<!-- /p4-b3 -->
+
+- **Bases:** slow temper bands drifting over drawn steel with fine draw-file lines; soft zones of
+  the stone's two colours; bone plates meeting at wavy sutures, pitted with pores; watered steel,
+  thin layers folded into ripples; a deep body with curved healed-fracture feathers caught bright
+  in it; corroded plate in seamed half-cell panels with rivet heads along both seams and patina
+  pits.
+- **Veins:** three coiled springs of wire lying on the face, standing clear of it; two sixlings,
+  three long tabular crystals grown through each other at 60 degrees; the sclerotic ring, small
+  bone plates lapped like shingles round the eye, one ring whole and one broken; six-rayed stars,
+  one large and three small; five four-sided spindles sprayed from one root; two toothed cogs with
+  their hubs, the larger one broken, and a sheared tooth beside it.
+- **Sheens:** filed gleam (short strokes along the file lines, a few glints); sector flash (the
+  six sectors of a twin glow in turn, soft at their sides, with sharp glints); greasy (a dull oily
+  film, no glint); watered shimmer (the pale damask layers catch the light along their ripples);
+  fire glint (few, very strong glints, each with a soft halo); worn brass (rivet heads and seam
+  lips rubbed bright, scuffed patches between).
+- **Alexandrite's colour change.** Alexandrite is green by lamplight and red by candle, so its
+  ramp puts the shadow on a raspberry hue (335 degrees, `SHADOW_HUES` in `skin_layers.py`) at the
+  usual half luma; the body is still its hue slot, as the loader asks. Its dark zones read red-violet,
+  which also moves it off the signature's teal.
+- **The signature's palette.** It has no hue slot, so its body is built the same way on a
+  slot-shaped look inside the relic family's #151 bands (hue 155-168 degrees, luma 0.46-0.68):
+  hue 166, saturation 0.5, luma 0.60 (`SIGNATURE_LOOKS`). The loader refuses a signature body
+  outside those bands. Luma 0.60 rather than the band's top keeps it apart from the two pale skins
+  under deuteranopia (0.66 gave 0.07 against starsteel; 0.60 gives 0.10).
+
 ## Compositing
 
 What a renderer draws for a skin, per pixel, in display values (0..1), from the row's layers:
@@ -211,7 +260,7 @@ cell, rimmed in the shadow end so it reads on a base of its own palette.
 | `sheets/<batch>.desktop.png`            | a 16 x 6 tile patch of band rock with each skin as a short run of ore tiles, at 85 px a tile (the default zoom on 1080p)     |
 | `sheets/<batch>.phone.png`, `-x4`       | the same patch at 22 px a tile in a 360 px wide strip (a phone), and magnified 4x for the eye                                |
 | `sheets/<batch>.scale.png`, `-x4`       | every skin as a 2 x 2 run on the rock at 85, 40 and 22 px a tile; `-x4-gray` and `-x4-deutan` are the blind copies           |
-| `sheets/<batch>.distinct.json`          | per skin at 22 px: mean colour, luma, hue and rock contrast; per pair (and against the planet's earlier batches): distances  |
+| `sheets/<batch>.distinct.json`          | per skin at 22 px: mean colour, luma, hue and rock contrast; per pair (and against the planet's other batches): distances    |
 | `sheets/p<n>.scale.png`, `-x4`          | every skin of planet n so far, in slot order, as in `<batch>.scale`: written by each batch after the planet's first          |
 | `skin_layers.py`                        | plain Python: the table and species rows, the palette ramp rule, the batches and the cell table writer                       |
 | `layer_art.py`, `author_skin_layers.py` | Blender: one recipe per layer id (a layer with no recipe fails), and the authoring of sources and renders                    |
@@ -239,7 +288,8 @@ files from git afterwards. A batch's noise seeds stay apart from the other batch
 A new batch adds its layer and skin rows to `mineralSkins.json` (the palette ramp from
 `skin_layers.py ramps`: shadow at half the hue slot's luma, light halfway to white), a recipe per
 new layer id in `layer_art.py`, and its slots to `BATCHES` in `skin_layers.py`. Renders land in
-`art/build/mineral-skins/` (gitignored). Cycles on the CPU with seed 0 and fixed threads: a second
+`art/build/mineral-skins/` (gitignored); the post step keeps the committed cell of any layer with
+no render there, so a checkout authors only its batch's new layers. Cycles on the CPU with seed 0 and fixed threads: a second
 run writes byte-identical cells. Set `PYTHONDONTWRITEBYTECODE=1`, or importing the hero module
 rewrites the tracked `docs/art/ore-heroes/__pycache__`.
 
@@ -407,6 +457,37 @@ and the ammonite level bands and spirals. Every skin sits above P3's slate rock 
 apatite to 2.43 for platinum). Checked by eye on `p3-b2.phone-x4.png`, `p3-b2.desktop.png` and
 the `p3-b2.scale-x4` copies with `-deutan` and `-gray`. `p3-b1` sits before `p3-b2` in `BATCHES`, so
 this batch's post measures it against p3-b1 and writes the planet strip `p3.scale`.
+
+From `sheets/p4-b3.distinct.json`, at 22 px a tile, on the same stage rock as P1's batches (P1's
+band 3, luma 0.31; `artDirection.json` has no P4 palette). P4 has no other batch yet, so these
+are the batch's own fifteen pairs; the closest eight:
+
+<!-- p4-b3-readings -->
+
+| pair                                       | colour apart | deuteranopia apart | luma apart | texture apart |
+| ------------------------------------------ | ------------ | ------------------ | ---------- | ------------- |
+| ichthyosaur eye vs starsteel (least apart) | 0.073        | 0.073              | 0.038      | 0.083         |
+| clockspring vs starsteel                   | 0.208        | 0.210              | 0.121      | 0.105         |
+| alexandrite vs signature                   | 0.227        | 0.231              | 0.102      | 0.105         |
+| clockspring vs ichthyosaur eye             | 0.243        | 0.283              | 0.159      | 0.097         |
+| clockspring vs alexandrite                 | 0.246        | 0.215              | 0.052      | 0.121         |
+| clockspring vs signature                   | 0.265        | 0.216              | 0.050      | 0.101         |
+| ichthyosaur eye vs signature               | 0.343        | 0.131              | 0.109      | 0.054         |
+| starsteel vs signature                     | 0.365        | 0.099              | 0.071      | 0.084         |
+
+<!-- /p4-b3-readings -->
+
+The materials table gives P4 two pale cool hue slots in this batch, ichthyosaur eye (190 degrees,
+luma 0.70) and starsteel (240 degrees, luma 0.72), so colour barely parts them (0.07), as it barely
+parts P1's tin, lead and nickel. Texture has to: the eye is a crackle of bone plates with a shingled
+ring, starsteel tight horizontal ripples with stars. Alexandrite and the signature are the two
+greens of the planet: alexandrite is darker (luma 0.51 against 0.61) with raspberry zones and two
+asterisk-shaped sixlings, the signature a brighter teal in riveted panels with cogs. Painite is the
+planet's only red so far and clockspring its only mid blue. Under deuteranopia the eye, starsteel
+and the signature all go pale grey (0.07 to 0.13 apart); there the plates and ring, the ripples and
+the panels with their rivet rows keep them apart. Every skin sits above its rock (contrast 1.50 for
+painite to 2.13 for the eye). Checked by eye on `p4-b3.phone-x4.png`, `p4-b3.desktop.png`, the
+`p4-b3.skins.jpg` sheet and the `p4-b3.scale-x4` copies with `-deutan` and `-gray`.
 
 Known limits: the cells are unlit tone, so a skin does not turn with the vehicle's lamp (the vein's
 own shading is baked from the stage's fixed headlamp, as the hero sprites are); the earthy sheen

@@ -1,0 +1,166 @@
+{
+  "batch": "p4-b3",
+  "tilePx": 22,
+  "rockLuma": 0.312,
+  "skins": {
+    "clockspring-steel-brassvein": {
+      "meanHex": "#808fbb",
+      "luma": 0.562,
+      "hueDeg": 225.1,
+      "rockContrast": 1.69
+    },
+    "alexandrite-quartzine": {
+      "meanHex": "#629284",
+      "luma": 0.51,
+      "hueDeg": 162.1,
+      "rockContrast": 1.55
+    },
+    "ichthyosaur-eye-amberbone": {
+      "meanHex": "#a8bec2",
+      "luma": 0.721,
+      "hueDeg": 189.6,
+      "rockContrast": 2.13
+    },
+    "starsteel-brassvein": {
+      "meanHex": "#acacc1",
+      "luma": 0.683,
+      "hueDeg": 240.0,
+      "rockContrast": 2.03
+    },
+    "painite-quartzine": {
+      "meanHex": "#db535e",
+      "luma": 0.491,
+      "hueDeg": 355.1,
+      "rockContrast": 1.5
+    },
+    "p4-signature": {
+      "meanHex": "#55bea6",
+      "luma": 0.612,
+      "hueDeg": 166.1,
+      "rockContrast": 1.83
+    }
+  },
+  "pairs": [
+    {
+      "a": "clockspring-steel-brassvein",
+      "b": "alexandrite-quartzine",
+      "colourDistance": 0.246,
+      "deutanDistance": 0.215,
+      "lumaDifference": 0.052,
+      "textureDifference": 0.121
+    },
+    {
+      "a": "clockspring-steel-brassvein",
+      "b": "ichthyosaur-eye-amberbone",
+      "colourDistance": 0.243,
+      "deutanDistance": 0.283,
+      "lumaDifference": 0.159,
+      "textureDifference": 0.097
+    },
+    {
+      "a": "clockspring-steel-brassvein",
+      "b": "starsteel-brassvein",
+      "colourDistance": 0.208,
+      "deutanDistance": 0.21,
+      "lumaDifference": 0.121,
+      "textureDifference": 0.105
+    },
+    {
+      "a": "clockspring-steel-brassvein",
+      "b": "painite-quartzine",
+      "colourDistance": 0.562,
+      "deutanDistance": 0.389,
+      "lumaDifference": 0.071,
+      "textureDifference": 0.091
+    },
+    {
+      "a": "clockspring-steel-brassvein",
+      "b": "p4-signature",
+      "colourDistance": 0.265,
+      "deutanDistance": 0.216,
+      "lumaDifference": 0.05,
+      "textureDifference": 0.101
+    },
+    {
+      "a": "alexandrite-quartzine",
+      "b": "ichthyosaur-eye-amberbone",
+      "colourDistance": 0.404,
+      "deutanDistance": 0.359,
+      "lumaDifference": 0.211,
+      "textureDifference": 0.108
+    },
+    {
+      "a": "alexandrite-quartzine",
+      "b": "starsteel-brassvein",
+      "colourDistance": 0.389,
+      "deutanDistance": 0.305,
+      "lumaDifference": 0.173,
+      "textureDifference": 0.113
+    },
+    {
+      "a": "alexandrite-quartzine",
+      "b": "painite-quartzine",
+      "colourDistance": 0.555,
+      "deutanDistance": 0.178,
+      "lumaDifference": 0.019,
+      "textureDifference": 0.116
+    },
+    {
+      "a": "alexandrite-quartzine",
+      "b": "p4-signature",
+      "colourDistance": 0.227,
+      "deutanDistance": 0.231,
+      "lumaDifference": 0.102,
+      "textureDifference": 0.105
+    },
+    {
+      "a": "ichthyosaur-eye-amberbone",
+      "b": "starsteel-brassvein",
+      "colourDistance": 0.073,
+      "deutanDistance": 0.073,
+      "lumaDifference": 0.038,
+      "textureDifference": 0.083
+    },
+    {
+      "a": "ichthyosaur-eye-amberbone",
+      "b": "painite-quartzine",
+      "colourDistance": 0.609,
+      "deutanDistance": 0.456,
+      "lumaDifference": 0.23,
+      "textureDifference": 0.044
+    },
+    {
+      "a": "ichthyosaur-eye-amberbone",
+      "b": "p4-signature",
+      "colourDistance": 0.343,
+      "deutanDistance": 0.131,
+      "lumaDifference": 0.109,
+      "textureDifference": 0.054
+    },
+    {
+      "a": "starsteel-brassvein",
+      "b": "painite-quartzine",
+      "colourDistance": 0.554,
+      "deutanDistance": 0.423,
+      "lumaDifference": 0.192,
+      "textureDifference": 0.078
+    },
+    {
+      "a": "starsteel-brassvein",
+      "b": "p4-signature",
+      "colourDistance": 0.365,
+      "deutanDistance": 0.099,
+      "lumaDifference": 0.071,
+      "textureDifference": 0.084
+    },
+    {
+      "a": "painite-quartzine",
+      "b": "p4-signature",
+      "colourDistance": 0.732,
+      "deutanDistance": 0.328,
+      "lumaDifference": 0.121,
+      "textureDifference": 0.049
+    }
+  ],
+  "leastDifferentPair": ["ichthyosaur-eye-amberbone", "starsteel-brassvein"]
+}
