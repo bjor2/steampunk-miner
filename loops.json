@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "updated_at": "2026-10-21T17:17:41Z",
+  "updated_at": "2026-10-21T17:19:06Z",
   "entries": {
     "steampunk-loop/1": {
       "loop": "steampunk-loop",
@@ -8,7 +8,7 @@
       "state": "working",
       "issue": 587,
       "note": "started 2026-10-21 19:09 CEST",
-      "updated_at": "2026-10-21T17:16:59Z",
+      "updated_at": "2026-10-21T17:19:06Z",
       "host": "grok-bot-vm-452660841"
     },
     "steampunk-loop/2": {
@@ -17,7 +17,7 @@
       "state": "working",
       "issue": 670,
       "note": "started 2026-10-21 19:13 CEST",
-      "updated_at": "2026-10-21T17:16:59Z",
+      "updated_at": "2026-10-21T17:19:06Z",
       "host": "grok-bot-vm-452660841"
     },
     "steampunk-loop/3": {
@@ -26,7 +26,7 @@
       "state": "working",
       "issue": 661,
       "note": "started 2026-10-21 18:51 CEST",
-      "updated_at": "2026-10-21T17:16:59Z",
+      "updated_at": "2026-10-21T17:19:06Z",
       "host": "grok-bot-vm-452660841"
     },
     "steampunk-loop/4": {
@@ -35,7 +35,7 @@
       "state": "working",
       "issue": 651,
       "note": "started 2026-10-21 18:51 CEST",
-      "updated_at": "2026-10-21T17:16:59Z",
+      "updated_at": "2026-10-21T17:19:06Z",
       "host": "grok-bot-vm-452660841"
     },
     "steampunk-loop": {
@@ -43,7 +43,7 @@
       "slot": null,
       "state": "working",
       "issue": null,
-      "note": "6/10 Claude slots busy, 1/4 planner slots; status check",
+      "note": "6/10 Claude slots busy, 1/4 planner slots; spawned 1 worker(s); delegated 0 spec(s); planner slots 1/4",
       "extra": {
         "active": 6,
         "max": 10,
@@ -597,7 +597,7 @@
         ],
         "push_pending": null
       },
-      "updated_at": "2026-10-21T17:16:59Z",
+      "updated_at": "2026-10-21T17:19:06Z",
       "host": "grok-bot-vm-452660841"
     },
     "perf-loop": {
@@ -615,7 +615,7 @@
       "state": "idle",
       "issue": null,
       "note": "free",
-      "updated_at": "2026-10-21T17:16:59Z",
+      "updated_at": "2026-10-21T17:19:06Z",
       "host": "grok-bot-vm-452660841"
     },
     "steampunk-loop/6": {
@@ -624,16 +624,16 @@
       "state": "idle",
       "issue": null,
       "note": "free",
-      "updated_at": "2026-10-21T17:16:59Z",
+      "updated_at": "2026-10-21T17:19:06Z",
       "host": "grok-bot-vm-452660841"
     },
     "steampunk-loop/7": {
       "loop": "steampunk-loop",
       "slot": "7",
-      "state": "idle",
-      "issue": null,
-      "note": "free; #679 landed on main and closed",
-      "updated_at": "2026-10-21T17:17:41Z",
+      "state": "working",
+      "issue": 680,
+      "note": "started 2026-10-21 19:19 CEST",
+      "updated_at": "2026-10-21T17:19:06Z",
       "host": "grok-bot-vm-452660841"
     },
     "steampunk-loop/8": {
@@ -642,7 +642,7 @@
       "state": "idle",
       "issue": null,
       "note": "free",
-      "updated_at": "2026-10-21T17:16:59Z",
+      "updated_at": "2026-10-21T17:19:06Z",
       "host": "grok-bot-vm-452660841"
     },
     "tester": {
@@ -661,7 +661,7 @@
       "state": "idle",
       "issue": null,
       "note": "free",
-      "updated_at": "2026-10-21T17:16:59Z",
+      "updated_at": "2026-10-21T17:19:06Z",
       "host": "grok-bot-vm-452660841"
     },
     "steampunk-loop/11": {
@@ -688,11 +688,18 @@
       "state": "working",
       "issue": 695,
       "note": "started 2026-10-21 19:09 CEST",
-      "updated_at": "2026-10-21T17:16:59Z",
+      "updated_at": "2026-10-21T17:19:06Z",
       "host": "grok-bot-vm-452660841"
     }
   },
   "events": [
+    {
+      "at": "2026-10-21T17:19:06Z",
+      "key": "steampunk-loop/7",
+      "state": "working",
+      "issue": 680,
+      "note": "started 2026-10-21 19:19 CEST"
+    },
     {
       "at": "2026-10-21T17:17:41Z",
       "key": "steampunk-loop/7",
@@ -1105,13 +1112,6 @@
       "state": "working",
       "issue": 664,
       "note": "started 2026-10-21 11:17 CEST"
-    },
-    {
-      "at": "2026-10-21T09:08:45Z",
-      "key": "tester",
-      "state": "paused",
-      "issue": null,
-      "note": "main red at 23cacc8: no new dev workers until tester.sh --full is green"
     }
   ]
 }
