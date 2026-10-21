@@ -38,6 +38,23 @@ export function reportPoseGatesOf(rows: readonly GatedRow[], shippedInterval: nu
   }
 }
 
+/** The width ladder's speed the #514 bar is judged at (ticket 620, TD shape on #308). */
+const LADDER_GATED_SPEED_MPS = 84
+
+/**
+ * Ticket 620's width ladder: W = 7 at 84 m/s within the 1.2 ms p50 bar at the shipped cadence, on
+ * both rigs. The ladder's other widths and speeds are logged, never judged.
+ */
+export function widthLadderGateOf(rows: readonly GatedRow[], shippedInterval: number) {
+  const gated = rows.filter((row) => isLadderGatedRow(row, shippedInterval))
+  return { narrowP50At84: isEveryRow(gated, isNarrowWithin) }
+}
+
+function isLadderGatedRow(row: GatedRow, shippedInterval: number): boolean {
+  const isShippedReport = row.mode === 'report' && row.interval === shippedInterval
+  return isShippedReport && row.width === NARROW && row.speedMps === LADDER_GATED_SPEED_MPS
+}
+
 /** The ratio a report row's tail runs at over the swept cut beside it, for the table. */
 export function p95OverSweptOf(rows: readonly GatedRow[], row: GatedRow): number | null {
   const swept = sweptBeside(rows, row)

@@ -20,6 +20,11 @@
  * legacy params of planet 1 (no ore rules stamp) took the one planet chunk cache from the
  * authority, so each step regenerated its chunks and read about 2.5 to 3 ms high.
  *
+ * Ticket 620 (the TD shape on #308): `-- --width-ladder` adds the side cutters' widths, s = 0 to 3
+ * side cells a side (W = 2 + s), each cut at 84, 840 and 8400 m/s through `drillAlongStep`, p50
+ * and p95 logged per row. Logged, never gated here: a width that fails the TD's bar goes back to
+ * the TD and the VS, never to a clamp on width (that would be a speed cap).
+ *
  * Ticket 420: the W = 7 cut again with each step logged as the game logs it, the drill span writer
  * on (`w7Logged`); its p50 must stay within noise of the bare `wide` row, since a span only adds to
  * a fixed accumulator a tick.
@@ -29,6 +34,7 @@ import { recordDomainEventsTo } from '../src/logging/domainEventLog'
 import { createMemorySink } from '../src/logging/eventSink'
 import { createRunLog } from '../src/logging/runLog'
 import { DENSITY_CELL_UNITS, TERRAIN_EDIT_UNITS_PER_TICK } from '../src/constants/terrainBudget'
+import { TICKS_PER_SECOND } from '../src/constants/physics'
 import { withRegistrations } from '../src/registries/registrar'
 import type { SliceDefinition } from '../src/registries/sliceDefinition'
 import type { AuthorityCommand } from '../src/systems/authority/authorityCommand'
@@ -44,6 +50,7 @@ import { FACING, noseTileOf, type VehiclePose } from '../src/systems/vehicle/veh
 import { cellDensitySum } from '../src/systems/world/cellYield'
 import type { PlanetParams } from '../src/systems/world/planetParams'
 import { logBenchmarkSeriesWhenAsked } from './bench/benchRunLog'
+import { CUT_LENGTH_MM } from './bench/reportPoseRigs'
 import { devFlagSetLine } from '../src/logging/devFlagReport'
 
 loadFeatures()
@@ -62,6 +69,11 @@ const FLOOR_BOUND = [
   { upgradeId: 'drill_power', level: 106 },
   { upgradeId: 'drill_tip', level: 600 },
 ]
+
+/** Ticket 620's ladder: the side cutters' widths at the TD's three speeds, on `--width-ladder`. */
+const isWidthLadder = process.argv.includes('--width-ladder')
+const LADDER_SIDE_CELLS = [0, 1, 2, 3]
+const LADDER_SPEEDS_MPS = [84, 840, 8400]
 
 /** A bench-only drill-gear source: `sideCells` cells on each side of the bore. */
 function sideCellsSlice(sideCells: number): SliceDefinition {
@@ -174,8 +186,8 @@ function reportOf(width: number, run: StepRun) {
   }
 }
 
-/** `STEPS` ticks of a level cut `strideMm` a tick long, each timed through `drillAlongStep`. */
-function cutAtStride(strideMm: number): number[] {
+/** `steps` ticks of a level cut `strideMm` a tick long, each timed through `drillAlongStep`. */
+function cutAtStride(strideMm: number, steps: number = STEPS): number[] {
   const session = createScriptedSession()
   for (const payload of FLOOR_BOUND) session.submit(0, { type: 'debug.setUpgrade', payload })
   session.submit(0, { type: 'debug.setEnergy', payload: { energy: '1000000' } })
@@ -184,7 +196,7 @@ function cutAtStride(strideMm: number): number[] {
   let state = session.state()
   const params = paramsOfSession(state)
   const timesMs: number[] = []
-  for (let tick = 1; tick <= STEPS; tick++) {
+  for (let tick = 1; tick <= steps; tick++) {
     const reported = vehicleOf(state, 'p1').pose as VehiclePose
     const pose = { ...reported, x: START.x + strideMm * tick }
     const step = { pose, drive: NO_DRIVE, isLifting: false }
@@ -200,6 +212,31 @@ function benchAtStride(strideMm: number): number[] {
   return Array.from({ length: REPS }, () => cutAtStride(strideMm)).flat()
 }
 
+/**
+ * `STEPS` ticks at `strideMm` in passes from a fresh cut, each pass as long as the line stays under
+ * ground (`CUT_LENGTH_MM`), so a fast stride never times ticks cutting past the planet's edge.
+ */
+function cutInPassesAt(strideMm: number): number[] {
+  const passTicks = Math.max(1, Math.min(STEPS, Math.floor(CUT_LENGTH_MM / strideMm)))
+  const passes = Math.ceil(STEPS / passTicks)
+  return Array.from({ length: passes }, () => cutAtStride(strideMm, passTicks)).flat()
+}
+
+/** One ladder row: `sideCells` a side cut at `speedMps`, its stride a tick in whole mm. */
+function benchLadderRow(sideCells: number, speedMps: number) {
+  const strideMm = Math.round((speedMps * 1000) / TICKS_PER_SECOND)
+  const timesMs = withRegistrations([sideCellsSlice(sideCells)], () => {
+    cutInPassesAt(strideMm)
+    return Array.from({ length: REPS }, () => cutInPassesAt(strideMm)).flat()
+  })
+  return { width: 2 + sideCells, sideCells, speedMps, strideMm, timesMs }
+}
+
+const ladder = isWidthLadder
+  ? LADDER_SIDE_CELLS.flatMap((sideCells) =>
+      LADDER_SPEEDS_MPS.map((speedMps) => benchLadderRow(sideCells, speedMps)),
+    )
+  : []
 const bare = benchAtWidth(0)
 const wide = benchAtWidth(5)
 const wideLogged = benchAtWidth(5, logIntoRunLog)
@@ -220,6 +257,11 @@ console.log(
       stepP95Ms: round(percentile(timesMs, 0.95)),
     })),
     budget: BUDGET,
+    widthLadder: ladder.map(({ timesMs, ...row }) => ({
+      ...row,
+      stepP50Ms: round(percentile(timesMs, 0.5)),
+      stepP95Ms: round(percentile(timesMs, 0.95)),
+    })),
   }),
 )
 logBenchmarkSeriesWhenAsked('drill-step', [
@@ -228,6 +270,11 @@ logBenchmarkSeriesWhenAsked('drill-step', [
   { name: 'drillStep.w7Logged', planet: 1, timesMs: wideLogged.timesMs },
   ...atBudget.map(({ strideMm, timesMs }) => ({
     name: `drillStep.stride${strideMm}`,
+    planet: 1,
+    timesMs,
+  })),
+  ...ladder.map(({ width, speedMps, timesMs }) => ({
+    name: `drillStep.w${width}.${speedMps}mps`,
     planet: 1,
     timesMs,
   })),

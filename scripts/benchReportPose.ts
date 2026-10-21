@@ -20,6 +20,9 @@
  * the same stride a tick (25 mm at 1.5 m/s, 117 mm at 7 m/s), interleaved rep by rep with the
  * report legs. At 3600 m/s the body crosses the cut in a tick, so only the every-tick cadences run.
  *
+ * Ticket 620: `-- --width-ladder` times the side cutters' widths instead (W = 2 + s, s = 0 to 3,
+ * and W = 7) at 84, 840 and 8400 m/s, judging only W = 7 at 84 m/s against the 1.2 ms p50 bar.
+ *
  * The command log's volume (Systems' ask on #441) is the reports' `commands.ndjson` bytes a second
  * while drilling, as the run log writes them (run-coded since #522). The cells a tick changed are
  * counted on a warm-up pass, never on a timed one.
@@ -36,7 +39,12 @@ import type { SliceDefinition } from '../src/registries/sliceDefinition'
 import type { AuthorityCommand } from '../src/systems/authority/authorityCommand'
 import { withDrillExactCarry } from '../src/systems/authority/cutCarryFixtures'
 import { logBenchmarkSeriesWhenAsked } from './bench/benchRunLog'
-import { p95OverSweptOf, REPORT_POSE_BAR, reportPoseGatesOf } from './bench/reportPoseBar'
+import {
+  p95OverSweptOf,
+  REPORT_POSE_BAR,
+  reportPoseGatesOf,
+  widthLadderGateOf,
+} from './bench/reportPoseBar'
 import { driveLeg, passTicksOf, type Leg, type LegRun } from './bench/reportPoseLegs'
 import {
   PLANET_1_RIG,
@@ -50,12 +58,23 @@ loadFeatures()
 
 const REPS = 3
 const TICKS = 240
-const WIDTHS = [
+const GATED_WIDTHS = [
   { width: 7, sideCells: 5 },
   { width: 27, sideCells: 25 },
 ]
 /** The probe's speeds, the stored-200 rig's 15 m/s body and the rigs' 60 m step bound. */
-const SPEEDS_MPS = [1.5, 7, 15, 3600]
+const GATED_SPEEDS_MPS = [1.5, 7, 15, 3600]
+/**
+ * Ticket 620's width ladder (TD shape on #308), on `--width-ladder`: the side cutters' widths
+ * W = 2 + s for s = 0 to 3, and the gate's W = 7, at 84, 840 and 8400 m/s. Only W = 7 at 84 m/s is
+ * judged (`widthLadderGateOf`); the rest is logged, and a failing width goes back to the TD and
+ * the VS, never to a clamp on width.
+ */
+const isWidthLadder = process.argv.includes('--width-ladder')
+const LADDER_WIDTHS = [0, 1, 2, 3, 5].map((sideCells) => ({ width: 2 + sideCells, sideCells }))
+const LADDER_SPEEDS_MPS = [84, 840, 8400]
+const WIDTHS = isWidthLadder ? LADDER_WIDTHS : GATED_WIDTHS
+const SPEEDS_MPS = isWidthLadder ? LADDER_SPEEDS_MPS : GATED_SPEEDS_MPS
 /** The paired mode: each cut also timed as the flag-on swept cut (TD addendum 6225108027). */
 const isPaired = process.argv.includes('--paired')
 /** Today's cadence, the shipped one and the steps between (the VS's fallback rule reads them). */
@@ -178,12 +197,15 @@ const runs = withDrillExactCarry(true, () => [
   ...groupsOf(PLANET_200_RIG),
 ])
 const rows = withSweptRatios(runs.map(({ leg, run }) => rowOf(leg, run)))
-const gates = reportPoseGatesOf(rows, DRILL_POSE_REPORT_INTERVAL_TICKS)
+const gates = isWidthLadder
+  ? widthLadderGateOf(rows, DRILL_POSE_REPORT_INTERVAL_TICKS)
+  : reportPoseGatesOf(rows, DRILL_POSE_REPORT_INTERVAL_TICKS)
 console.log(
   JSON.stringify({
     bench: 'reportPose',
     shippedInterval: DRILL_POSE_REPORT_INTERVAL_TICKS,
     isPaired,
+    isWidthLadder,
     rows,
     bar: REPORT_POSE_BAR,
     gates,
