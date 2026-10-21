@@ -3,10 +3,13 @@
  * from driving and holds the fixed step; its first page offers Resume, Save game and Settings, and
  * Save game lists the manual slots with each save's name, planet, playtime and wall time. An
  * empty slot saves at once under the typed name; a slot holding a save asks for a second press
- * (`armOverwrite`, then "Confirm overwrite"), as Travel does (#33 section 6). Local presentation
+ * (`armOverwrite`, then "Confirm overwrite"), as Travel does (#33 section 6). A saved slot's Scrap
+ * (ticket 704) asks "Scrap {slotName}? This can't be undone." in its row, with Scrap and Keep;
+ * the copy is `ui.saveMenu` data in `src/data/saveMenu/` (#672 ruling (b)). Local presentation
  * only: the save itself goes through the checkpoint, never through the authority.
  */
 import { TICKS_PER_SECOND } from '../../constants/physics'
+import SAVE_MENU_TEXT from '../../data/saveMenu/saveMenu.json'
 import { manualSlotKeys, type SaveSlotEntry, type SaveSlotKey } from '../save/saveSlotIndex'
 import type { FocusStop } from './menuFocus'
 import { UI_ID_TEMPLATES, UI_IDS } from './screenIds'
@@ -26,6 +29,8 @@ export interface PauseMenuState {
   saveName: string
   /** The slot whose Overwrite was pressed once; the next press there writes over it. */
   armedSlot: SaveSlotKey | null
+  /** The slot whose Scrap was pressed once; its row asks before the slot is emptied. */
+  scrapArmedSlot: SaveSlotKey | null
   /** The slot the last save went to, for the notice line; null before any save. */
   savedSlot: SaveSlotKey | null
   /** Why the last save was refused; empty when it was accepted. */
@@ -42,6 +47,16 @@ export interface SaveSlotRow {
   savedAtMs: number | null
   isEmpty: boolean
   button: ScreenButton
+  /** The first Scrap press; null for an empty slot and while the row asks. */
+  scrap: ScreenButton | null
+  /** The question with its Scrap and Keep while this slot's Scrap is armed; null otherwise. */
+  scrapConfirm: ScrapConfirm | null
+}
+
+export interface ScrapConfirm {
+  question: string
+  scrap: ScreenButton
+  keep: ScreenButton
 }
 
 export interface PauseMenuModel {
@@ -71,6 +86,7 @@ export function pauseMenuOpenAt(planetIndex: number): PauseMenuState {
     slotEntries: null,
     saveName: defaultSaveNameOf(planetIndex),
     armedSlot: null,
+    scrapArmedSlot: null,
     savedSlot: null,
     saveProblems: [],
   }
@@ -89,6 +105,16 @@ export function saveNameToWrite(typed: string, planetIndex: number): string {
 /** A slot holding a save is written over only from its armed second press. */
 export function isOverwriteUnconfirmed(menu: PauseMenuState, slot: SaveSlotKey): boolean {
   return entryOfSlot(menu.slotEntries ?? [], slot) !== null && menu.armedSlot !== slot
+}
+
+/** A slot is emptied only from its armed second Scrap, and only when it holds a save. */
+export function isScrapUnconfirmed(menu: PauseMenuState, slot: SaveSlotKey): boolean {
+  return entryOfSlot(menu.slotEntries ?? [], slot) === null || menu.scrapArmedSlot !== slot
+}
+
+/** "Scrap Deep vein? This can't be undone." */
+export function scrapQuestionOf(slotName: string): string {
+  return SAVE_MENU_TEXT.scrapConfirm.question.replace('{slotName}', slotName)
 }
 
 /** The authority tick as hours, minutes and seconds of play: `1:02:03`. */
@@ -128,8 +154,14 @@ export function pauseMenuButtonsOf(model: PauseMenuModel): ScreenButton[] {
   return [...slotButtons(model.slots), model.back]
 }
 
+/** Each row's buttons in reading order: Save or Overwrite and Scrap, or the question's two. */
 function slotButtons(slots: readonly SaveSlotRow[]): ScreenButton[] {
-  return slots.map((row) => row.button)
+  return slots.flatMap(rowButtonsOf)
+}
+
+function rowButtonsOf(row: SaveSlotRow): ScreenButton[] {
+  if (row.scrapConfirm !== null) return [row.scrapConfirm.scrap, row.scrapConfirm.keep]
+  return row.scrap === null ? [row.button] : [row.button, row.scrap]
 }
 
 function slotRowsOf(menu: PauseMenuState): SaveSlotRow[] {
@@ -149,6 +181,31 @@ function slotRowOf(
     savedAtMs: entry?.savedAtMs ?? null,
     isEmpty: entry === null,
     button: slotButtonOf(menu, slot, entry),
+    scrap: scrapButtonOf(menu, slot, entry),
+    scrapConfirm: scrapConfirmOf(menu, entry),
+  }
+}
+
+function scrapButtonOf(
+  menu: PauseMenuState,
+  slot: SaveSlotKey,
+  entry: SaveSlotEntry | null,
+): ScreenButton | null {
+  if (entry === null || menu.scrapArmedSlot === slot) return null
+  const label = SAVE_MENU_TEXT.scrapConfirm.scrap
+  return uiButton(UI_ID_TEMPLATES.pauseSlotScrap(slot), label, { kind: 'armScrap', slot })
+}
+
+function scrapConfirmOf(menu: PauseMenuState, entry: SaveSlotEntry | null): ScrapConfirm | null {
+  if (entry === null || menu.scrapArmedSlot !== entry.slot) return null
+  const { scrap, keep } = SAVE_MENU_TEXT.scrapConfirm
+  return {
+    question: scrapQuestionOf(entry.name),
+    scrap: uiButton(UI_ID_TEMPLATES.pauseSlotScrapConfirm(entry.slot), scrap, {
+      kind: 'scrapSlot',
+      slot: entry.slot,
+    }),
+    keep: uiButton(UI_ID_TEMPLATES.pauseSlotKeep(entry.slot), keep, { kind: 'keepSlot' }),
   }
 }
 

@@ -454,6 +454,12 @@ export const RUN_EVENT_REGISTRY = {
     level: 'core',
     payload: { epoch: 'integer', bytes: 'integer', digest: 'text' },
   },
+  // Ticket 704: the player scrapped a manual slot from the pause menu, after its confirm.
+  save_deleted: {
+    group: 'platform',
+    level: 'core',
+    payload: { slot: 'text' },
+  },
   // #170: an older save was brought up to this build by one step of the migration chain, logged
   // per step just before checkpoint_loaded; #181 added the snapshot step (levels to steps). #224:
   // one more line names the registered slice sections the save lacked, restored at their initial

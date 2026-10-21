@@ -38,6 +38,10 @@ export type ButtonAction =
   | { kind: 'closeSaveSlots' }
   | { kind: 'saveToSlot'; slot: SaveSlotKey }
   | { kind: 'armOverwrite'; slot: SaveSlotKey }
+  /** Ticket 704: a saved slot's Scrap asks first; the second Scrap empties it, Keep backs out. */
+  | { kind: 'armScrap'; slot: SaveSlotKey }
+  | { kind: 'scrapSlot'; slot: SaveSlotKey }
+  | { kind: 'keepSlot' }
   // The title menu (ticket 403): New Game (asking first when a save exists), its confirm,
   // Continue, one slot's Load, and a page change.
   | { kind: 'pressNewGame' }

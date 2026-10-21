@@ -6,17 +6,23 @@
  * logs `checkpoint_saved`; nothing here is authority state, a command or part of the digest.
  *
  * A slot holding a save is written over only from its armed second press, and no slot is written
- * before the list has been read, so an unseen save is never overwritten unasked.
+ * before the list has been read, so an unseen save is never overwritten unasked. A slot is
+ * scrapped (ticket 704) only from its armed second Scrap, through the checkpoint's queued delete,
+ * and logs `save_deleted`; Keep, or Escape while the row asks, leaves it as it was.
  */
 import type { RunEventPlace } from '../logging/runEvent'
 import type { SaveSlotEntry, SaveSlotKey } from '../systems/save/saveSlotIndex'
+import { UI_ID_TEMPLATES } from '../systems/views/screenIds'
 import {
   isOverwriteUnconfirmed,
+  isScrapUnconfirmed,
   pauseMenuOpenAt,
   saveNameToWrite,
   type PauseMenuState,
 } from '../systems/views/pauseMenuModel'
-import { listSaveSlots, saveToManualSlot } from './checkpoint'
+import { readAuthorityState } from './authorityLink'
+import { deleteSaveSlot, listSaveSlots, saveToManualSlot } from './checkpoint'
+import { recordSaveDeleted } from './checkpointLines'
 
 export interface PauseMenuValues {
   /** The pause menu while it is open; null while the game runs. */
@@ -39,6 +45,15 @@ export interface PauseMenuActions {
    * why it was refused, or [] once the save is written and listed.
    */
   saveToSlot(slot: SaveSlotKey): Promise<string[]>
+  /** The first Scrap on a saved slot: its row asks, with Keep focused. */
+  armScrap(slot: SaveSlotKey): void
+  /** Keep: the armed Scrap is dropped and the slot stays as it was. */
+  keepSlot(): void
+  /**
+   * The second Scrap: empties the armed slot, then reads the list again; returns why it was
+   * refused, or [] once the slot is gone from the list.
+   */
+  scrapSlot(slot: SaveSlotKey): Promise<string[]>
 }
 
 type SliceHost = PauseMenuValues &
@@ -61,28 +76,51 @@ export function pauseMenuActionsOf(set: SetSlice, get: () => SliceHost): PauseMe
       set({ pauseMenu: pauseMenuOpenAt(get().planetTier), focusedControlId: null }),
     closePauseMenu: () => set({ pauseMenu: null, focusedControlId: null }),
     stepBackInPauseMenu: () => {
-      if (get().pauseMenu?.page === 'save') get().closeSaveSlots()
+      if (isScrapAsking(get().pauseMenu)) get().keepSlot()
+      else if (get().pauseMenu?.page === 'save') get().closeSaveSlots()
       else get().closePauseMenu()
     },
     openSaveSlots: async () => {
-      changeMenu((menu) => ({ ...menu, page: 'save', slotEntries: null, armedSlot: null }))
+      changeMenu((menu) => ({ ...menu, page: 'save', slotEntries: null, ...UNARMED }))
       set({ focusedControlId: null })
       await readSlotList(changeMenu)
     },
     closeSaveSlots: () => {
-      changeMenu((menu) => ({ ...menu, page: 'main', armedSlot: null }))
+      changeMenu((menu) => ({ ...menu, page: 'main', ...UNARMED }))
       set({ focusedControlId: null })
     },
     setPauseSaveName: (name) => changeMenu((menu) => ({ ...menu, saveName: name })),
-    armOverwrite: (slot) => changeMenu((menu) => ({ ...menu, armedSlot: slot })),
+    armOverwrite: (slot) => changeMenu((menu) => ({ ...menu, ...UNARMED, armedSlot: slot })),
     saveToSlot: async (slot) => {
       const problems = saveIntoSlot(get(), slot)
       changeMenu((menu) => menuAfterSave(menu, slot, problems))
       if (problems.length === 0) await readSlotList(changeMenu)
       return problems
     },
+    armScrap: (slot) => {
+      changeMenu((menu) => ({ ...menu, ...UNARMED, scrapArmedSlot: slot }))
+      set({ focusedControlId: UI_ID_TEMPLATES.pauseSlotKeep(slot) })
+    },
+    keepSlot: () => {
+      const slot = get().pauseMenu?.scrapArmedSlot ?? null
+      if (slot === null) return
+      changeMenu((menu) => ({ ...menu, scrapArmedSlot: null }))
+      set({ focusedControlId: UI_ID_TEMPLATES.pauseSlotScrap(slot) })
+    },
+    scrapSlot: async (slot) => {
+      const problems = slotScrapProblems(get().pauseMenu, slot)
+      if (problems.length > 0) return problems
+      recordSaveDeleted(slot, runEventPlaceOf(get()), readAuthorityState().tick)
+      changeMenu((menu) => menuAfterScrap(menu, slot))
+      set({ focusedControlId: UI_ID_TEMPLATES.pauseSlotSave(slot) })
+      await deleteSaveSlot(slot)
+      await readSlotList(changeMenu)
+      return []
+    },
   }
 }
+
+const UNARMED = { armedSlot: null, scrapArmedSlot: null } as const
 
 /** A change to a menu that has since closed is dropped. */
 function changeOpenMenu(set: SetSlice, get: () => SliceHost, change: MenuChange): void {
@@ -109,13 +147,28 @@ function slotSaveProblems(menu: PauseMenuState | null, slot: SaveSlotKey): strin
   return isOverwriteUnconfirmed(menu, slot) ? [`${slot} holds a save: confirm the overwrite`] : []
 }
 
+function isScrapAsking(menu: PauseMenuState | null): boolean {
+  return (menu?.scrapArmedSlot ?? null) !== null
+}
+
+function slotScrapProblems(menu: PauseMenuState | null, slot: SaveSlotKey): string[] {
+  if (menu === null) return ['the pause menu is closed']
+  return isScrapUnconfirmed(menu, slot) ? [`${slot}: press Scrap again to confirm`] : []
+}
+
+/** A notice naming the scrapped slot as saved would point at an empty slot, so it goes too. */
+function menuAfterScrap(menu: PauseMenuState, slot: SaveSlotKey): PauseMenuState {
+  const savedSlot = menu.savedSlot === slot ? null : menu.savedSlot
+  return { ...menu, scrapArmedSlot: null, savedSlot }
+}
+
 function menuAfterSave(
   menu: PauseMenuState,
   slot: SaveSlotKey,
   problems: readonly string[],
 ): PauseMenuState {
   const savedSlot = problems.length === 0 ? slot : menu.savedSlot
-  return { ...menu, armedSlot: null, savedSlot, saveProblems: problems }
+  return { ...menu, ...UNARMED, savedSlot, saveProblems: problems }
 }
 
 function runEventPlaceOf(host: SliceHost): RunEventPlace {

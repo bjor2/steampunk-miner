@@ -1,7 +1,8 @@
 /**
  * What the checkpoint logs about the save folder (#26, #123, #470 P1-8): a slot save once the
- * shell has it, a save no store took, a save handed to the player as a file and a file brought in.
- * Each line carries the save's epoch and bytes, so a lost or moved save can be traced in the log.
+ * shell has it, a save no store took, a save handed to the player as a file, a file brought in
+ * and a slot the player scrapped. Each save's line carries its epoch and bytes, so a lost or moved
+ * save can be traced in the log.
  */
 import { getRunLog } from '../logging/runLog'
 import type { RunEventPlace } from '../logging/runEvent'
@@ -92,6 +93,11 @@ export function recordSaveImported(save: SlotSave, place: RunEventPlace): void {
     bytes: bytesOf(save.json),
     digest: save.digest,
   })
+}
+
+/** Stamped at the session's tick now, as the player confirmed the Scrap. */
+export function recordSaveDeleted(slot: SaveSlotKey, place: RunEventPlace, tick: number): void {
+  getRunLog().record({ ...place, tick }, 'save_deleted', { slot })
 }
 
 /** UTF-8 bytes, as the shell stores them. */

@@ -358,6 +358,9 @@ function runPauseMenuAction(state: SliceHost, action: ButtonAction): void {
   else if (action.kind === 'closeSaveSlots') state.closeSaveSlots()
   else if (action.kind === 'saveToSlot') void state.saveToSlot(action.slot)
   else if (action.kind === 'armOverwrite') state.armOverwrite(action.slot)
+  else if (action.kind === 'armScrap') state.armScrap(action.slot)
+  else if (action.kind === 'scrapSlot') void state.scrapSlot(action.slot)
+  else if (action.kind === 'keepSlot') state.keepSlot()
 }
 
 /** The title menu's buttons (ticket 403); a load settles later and reports its own refusal. */

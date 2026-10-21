@@ -179,4 +179,9 @@ export const UI_ID_TEMPLATES = {
   // A manual save slot's row and its save button (ticket 404), by slot key: `pause-slot-3-save`.
   pauseSlot: (slot: string) => `pause-${slot}`,
   pauseSlotSave: (slot: string) => `pause-${slot}-save`,
+  // Ticket 704: a saved slot's Scrap, and once armed its question, confirming Scrap and Keep.
+  pauseSlotScrap: (slot: string) => `pause-${slot}-scrap`,
+  pauseSlotScrapQuestion: (slot: string) => `pause-${slot}-scrap-question`,
+  pauseSlotScrapConfirm: (slot: string) => `pause-${slot}-scrap-confirm`,
+  pauseSlotKeep: (slot: string) => `pause-${slot}-keep`,
 } as const

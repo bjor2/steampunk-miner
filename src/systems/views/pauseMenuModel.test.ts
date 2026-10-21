@@ -2,9 +2,11 @@ import { describe, expect, it } from 'vitest'
 import type { SaveSlotEntry } from '../save/saveSlotIndex'
 import {
   isOverwriteUnconfirmed,
+  isScrapUnconfirmed,
   pauseMenuOpenAt,
   playtimeTextOf,
   saveNameToWrite,
+  scrapQuestionOf,
   selectPauseMenuModel,
   SAVE_NAME_MAX_CHARS,
   type PauseMenuState,
@@ -77,6 +79,48 @@ describe('pause menu model', () => {
     expect(isOverwriteUnconfirmed(SAVE_PAGE, 'slot-2')).toBe(true)
     expect(isOverwriteUnconfirmed(armed, 'slot-2')).toBe(false)
     expect(isOverwriteUnconfirmed(SAVE_PAGE, 'slot-1')).toBe(false)
+  })
+
+  it('offers Scrap on a saved slot only, after its save button in focus order', () => {
+    expect(rowOf(SAVE_PAGE, 'slot-1')?.scrap).toBeNull()
+    expect(rowOf(SAVE_PAGE, 'slot-2')?.scrap).toMatchObject({
+      id: 'pause-slot-2-scrap',
+      label: 'Scrap',
+      action: { kind: 'armScrap', slot: 'slot-2' },
+    })
+    const ids = selectPauseMenuModel(SAVE_PAGE).focusStops.map((stop) => stop.id)
+    expect(ids.slice(0, 4)).toEqual([
+      'pause-slot-1-save',
+      'pause-slot-2-save',
+      'pause-slot-2-scrap',
+      'pause-slot-3-save',
+    ])
+  })
+
+  it('asks before scrapping, with the slot name in the question and Scrap and Keep', () => {
+    const asking = { ...SAVE_PAGE, scrapArmedSlot: 'slot-2' as const }
+    const row = rowOf(asking, 'slot-2')
+    expect(row?.scrap).toBeNull()
+    expect(row?.scrapConfirm).toMatchObject({
+      question: "Scrap Deep vein? This can't be undone.",
+      scrap: { label: 'Scrap', action: { kind: 'scrapSlot', slot: 'slot-2' } },
+      keep: { label: 'Keep', action: { kind: 'keepSlot' } },
+    })
+    const ids = selectPauseMenuModel(asking).focusStops.map((stop) => stop.id)
+    expect(ids.slice(1, 3)).toEqual(['pause-slot-2-scrap-confirm', 'pause-slot-2-keep'])
+    expect(ids).not.toContain('pause-slot-2-save')
+    expect(rowOf(SAVE_PAGE, 'slot-2')?.scrapConfirm).toBeNull()
+  })
+
+  it('scraps a slot only from its armed second press, and never an empty one', () => {
+    const asking = { ...SAVE_PAGE, scrapArmedSlot: 'slot-2' as const }
+    expect(isScrapUnconfirmed(SAVE_PAGE, 'slot-2')).toBe(true)
+    expect(isScrapUnconfirmed(asking, 'slot-2')).toBe(false)
+    expect(isScrapUnconfirmed({ ...SAVE_PAGE, scrapArmedSlot: 'slot-1' }, 'slot-1')).toBe(true)
+  })
+
+  it('fills the slot name into the ui.saveMenu question', () => {
+    expect(scrapQuestionOf('Ore run')).toBe("Scrap Ore run? This can't be undone.")
   })
 
   it('says the slots are being read until the list is in', () => {

@@ -142,6 +142,51 @@ describe('pause menu', () => {
     expect(slotButton('slot-3')?.label).toBe('Overwrite')
   })
 
+  it('keeps a slot intact when Keep answers the Scrap question', async () => {
+    await openSavePage()
+    game().setPauseSaveName('Keeper')
+    await game().saveToSlot('slot-2')
+    game().pressScreenButton('pause-slot-2-scrap')
+    expect(game().focusedControlId).toBe('pause-slot-2-keep')
+    game().pressScreenButton('pause-slot-2-keep')
+    await checkpointWrites()
+    expect(slotFile('slot-2').slot.name).toBe('Keeper')
+    expect(readPauseMenuModel()?.slots[1]).toMatchObject({ title: 'Keeper', scrapConfirm: null })
+    expect(game().focusedControlId).toBe('pause-slot-2-scrap')
+  })
+
+  it('empties a slot on the second Scrap, lists it empty and logs save_deleted', async () => {
+    await openSavePage()
+    await game().saveToSlot('slot-2')
+    game().armScrap('slot-2')
+    expect(await game().scrapSlot('slot-2')).toEqual([])
+    expect(disk.items.has('saves/slot-2.json')).toBe(false)
+    expect((await listSaveSlots()).map((entry) => entry.slot)).not.toContain('slot-2')
+    expect(readPauseMenuModel()?.slots[1]).toMatchObject({ isEmpty: true, scrap: null })
+    expect(readPauseMenuModel()?.notice).toBe('')
+    const deleted = sink.events.filter((line) => line.event === 'save_deleted')
+    expect(deleted.map((line) => line.data)).toEqual([{ slot: 'slot-2' }])
+  })
+
+  it('refuses to scrap a slot whose Scrap was not pressed first', async () => {
+    await openSavePage()
+    await game().saveToSlot('slot-3')
+    expect(await game().scrapSlot('slot-3')).toEqual(['slot-3: press Scrap again to confirm'])
+    await checkpointWrites()
+    expect(disk.items.has('saves/slot-3.json')).toBe(true)
+    expect(sink.events.some((line) => line.event === 'save_deleted')).toBe(false)
+  })
+
+  it('backs out of the Scrap question on Escape before leaving the save page', async () => {
+    await openSavePage()
+    await game().saveToSlot('slot-1')
+    game().armScrap('slot-1')
+    pressKey('Escape')
+    expect(game().pauseMenu).toMatchObject({ page: 'save', scrapArmedSlot: null })
+    await checkpointWrites()
+    expect(disk.items.has('saves/slot-1.json')).toBe(true)
+  })
+
   it('writes no slot before the slot list has been read', async () => {
     game().openPauseMenu()
     const reading = game().openSaveSlots()
