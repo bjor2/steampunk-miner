@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "updated_at": "2026-10-21T19:43:26Z",
+  "updated_at": "2026-10-21T19:44:49Z",
   "entries": {
     "steampunk-loop/1": {
       "loop": "steampunk-loop",
@@ -8,7 +8,7 @@
       "state": "working",
       "issue": 689,
       "note": "started 2026-10-21 21:30 CEST",
-      "updated_at": "2026-10-21T19:43:26Z",
+      "updated_at": "2026-10-21T19:44:49Z",
       "host": "grok-bot-vm-452660841"
     },
     "steampunk-loop/2": {
@@ -17,7 +17,7 @@
       "state": "working",
       "issue": 705,
       "note": "started 2026-10-21 21:37 CEST",
-      "updated_at": "2026-10-21T19:43:26Z",
+      "updated_at": "2026-10-21T19:44:49Z",
       "host": "grok-bot-vm-452660841"
     },
     "steampunk-loop/3": {
@@ -26,7 +26,7 @@
       "state": "working",
       "issue": 683,
       "note": "started 2026-10-21 21:26 CEST",
-      "updated_at": "2026-10-21T19:43:26Z",
+      "updated_at": "2026-10-21T19:44:49Z",
       "host": "grok-bot-vm-452660841"
     },
     "steampunk-loop/4": {
@@ -35,7 +35,7 @@
       "state": "idle",
       "issue": null,
       "note": "free",
-      "updated_at": "2026-10-21T19:43:26Z",
+      "updated_at": "2026-10-21T19:44:49Z",
       "host": "grok-bot-vm-452660841"
     },
     "steampunk-loop": {
@@ -43,9 +43,9 @@
       "slot": null,
       "state": "working",
       "issue": null,
-      "note": "3/10 Claude slots busy, 1/4 planner slots; status check",
+      "note": "4/10 Claude slots busy, 1/4 planner slots; spawned 1 worker(s); delegated 0 spec(s); planner slots 1/4",
       "extra": {
-        "active": 3,
+        "active": 4,
         "max": 10,
         "max_attempts": 2,
         "attempts": {
@@ -610,7 +610,7 @@
         ],
         "push_pending": null
       },
-      "updated_at": "2026-10-21T19:43:26Z",
+      "updated_at": "2026-10-21T19:44:49Z",
       "host": "grok-bot-vm-452660841"
     },
     "perf-loop": {
@@ -628,7 +628,7 @@
       "state": "idle",
       "issue": null,
       "note": "free",
-      "updated_at": "2026-10-21T19:43:26Z",
+      "updated_at": "2026-10-21T19:44:49Z",
       "host": "grok-bot-vm-452660841"
     },
     "steampunk-loop/6": {
@@ -637,16 +637,16 @@
       "state": "idle",
       "issue": null,
       "note": "free",
-      "updated_at": "2026-10-21T19:43:26Z",
+      "updated_at": "2026-10-21T19:44:49Z",
       "host": "grok-bot-vm-452660841"
     },
     "steampunk-loop/7": {
       "loop": "steampunk-loop",
       "slot": "7",
-      "state": "idle",
-      "issue": null,
-      "note": "free",
-      "updated_at": "2026-10-21T19:43:26Z",
+      "state": "working",
+      "issue": 654,
+      "note": "started 2026-10-21 21:44 CEST",
+      "updated_at": "2026-10-21T19:44:49Z",
       "host": "grok-bot-vm-452660841"
     },
     "steampunk-loop/8": {
@@ -655,7 +655,7 @@
       "state": "idle",
       "issue": null,
       "note": "free",
-      "updated_at": "2026-10-21T19:43:26Z",
+      "updated_at": "2026-10-21T19:44:49Z",
       "host": "grok-bot-vm-452660841"
     },
     "tester": {
@@ -674,7 +674,7 @@
       "state": "idle",
       "issue": null,
       "note": "free",
-      "updated_at": "2026-10-21T19:43:26Z",
+      "updated_at": "2026-10-21T19:44:49Z",
       "host": "grok-bot-vm-452660841"
     },
     "steampunk-loop/11": {
@@ -701,11 +701,18 @@
       "state": "idle",
       "issue": null,
       "note": "free",
-      "updated_at": "2026-10-21T19:43:26Z",
+      "updated_at": "2026-10-21T19:44:49Z",
       "host": "grok-bot-vm-452660841"
     }
   },
   "events": [
+    {
+      "at": "2026-10-21T19:44:49Z",
+      "key": "steampunk-loop/7",
+      "state": "working",
+      "issue": 654,
+      "note": "started 2026-10-21 21:44 CEST"
+    },
     {
       "at": "2026-10-21T19:42:45Z",
       "key": "steampunk-loop/7",
@@ -1115,13 +1122,6 @@
     {
       "at": "2026-10-21T16:43:03Z",
       "key": "steampunk-loop/2",
-      "state": "idle",
-      "issue": null,
-      "note": "free"
-    },
-    {
-      "at": "2026-10-21T16:43:03Z",
-      "key": "steampunk-loop/1",
       "state": "idle",
       "issue": null,
       "note": "free"
