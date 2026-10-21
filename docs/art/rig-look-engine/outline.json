@@ -1,0 +1,34 @@
+{
+  "about": "Ticket 586: silhouette cells of each engine look on chassis.drive, on a 4 mm grid, outside the rig at rest at tiers 1 and 3, and, for the base look, the cells it adds to the tier-1 rig inside the hub window [-0.09, -0.45, 0.09, -0.27]; written by check_outline.py. `outsideRig` must be all zero; the base look's `addsToRig` must be zero.",
+  "looks": {
+    "hub-cap": {
+      "cells": 208,
+      "outsideRig": {
+        "tier-1": 0,
+        "tier-3": 0
+      },
+      "addsToRig": 0
+    },
+    "single-piston": {
+      "cells": 835,
+      "outsideRig": {
+        "tier-1": 0,
+        "tier-3": 0
+      }
+    },
+    "triple-flywheel": {
+      "cells": 1508,
+      "outsideRig": {
+        "tier-1": 0,
+        "tier-3": 0
+      }
+    },
+    "guild-turbine": {
+      "cells": 1396,
+      "outsideRig": {
+        "tier-1": 0,
+        "tier-3": 0
+      }
+    }
+  }
+}

@@ -665,6 +665,25 @@ step. `docs/art/rig-look-drill-tip/author_drill_tip_looks.py` wrote the first ve
 review renders, at desktop and at a 360 px phone's size, are in
 [docs/art/rig-look-drill-tip/](art/rig-look-drill-tip/README.md).
 
+## Rig-look parts: the engine
+
+The art half of the `engine` line of the rig look ladder
+([#576](https://github.com/bjor2/steampunk-miner/issues/576), built by
+[#586](https://github.com/bjor2/steampunk-miner/issues/586)): a Blender source for the three look
+steps Systems' table puts at 2, 18 and 26 purchases, `art/blender/vehicle-look-engine/`, with the
+base look beside them. Each part is authored with the track's attach slot, `chassis.drive`, at the
+origin, which is the middle roller's hub, and is a drive unit lying over that hub inside the
+roller's own disc: `hub-cap` is the leg's brass hub cap and axle nut piece for piece, then
+Progression's `single-piston`, `triple-flywheel` and `guild-turbine`. No rig part sits on the slot,
+so a look lies over the roller rather than replacing a part, the roller keeps rolling under it,
+and the rig's outline never grows; the turbine's glow stays at under a third of the nose's so the
+nose stays the brightest part. Nothing registers or draws it yet: the per-track registry (#577)
+names the asset from the track id and the wiring (#587) swaps the part on the slot and runs the
+tail above the top step. `docs/art/rig-look-engine/author_engine_looks.py` wrote the first version
+of the `.blend`; from then on it is the source. The part table, the outline check at tiers 1 and 3
+and the review renders, at desktop and at a 360 px phone's size, are in
+[docs/art/rig-look-engine/](art/rig-look-engine/README.md).
+
 ## Rig-look parts: the drill types
 
 The art half of the drill-type looks of

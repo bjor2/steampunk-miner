@@ -1,0 +1,128 @@
+{
+  "about": "Ticket 586: at a 360 px wide phone (30 px/m over the 12 m zoom), the pixels of the drive hub's footprint [-0.09, -0.45, 0.09, -0.27] that change from each look to the next (a channel moving more than 24 of 255; the bare rig to the base look should change none), and the brightest pixel (Rec. 709 luminance, 0-255) of the drill nose against the footprint and the rest of the rig for each look, the nose lit as while drilling: under `lit` on the phone-size renders, under `glow` on the tier-1 emission-only render at 512 px/m; written by sheet_engine_looks.py. The nose must stay the brightest glow.",
+  "lit": {
+    "tier-1": {
+      "phonePxPerM": 30.0,
+      "hubFootprintPx": {
+        "rig -> hub-cap": {
+          "changed": 0,
+          "of": 42
+        },
+        "hub-cap -> single-piston": {
+          "changed": 15,
+          "of": 42
+        },
+        "single-piston -> triple-flywheel": {
+          "changed": 20,
+          "of": 42
+        },
+        "triple-flywheel -> guild-turbine": {
+          "changed": 20,
+          "of": 42
+        }
+      },
+      "brightest": {
+        "rig": {
+          "nose": 203,
+          "hub": 185,
+          "restOfRig": 255
+        },
+        "hub-cap": {
+          "nose": 203,
+          "hub": 185,
+          "restOfRig": 255
+        },
+        "single-piston": {
+          "nose": 203,
+          "hub": 183,
+          "restOfRig": 255
+        },
+        "triple-flywheel": {
+          "nose": 203,
+          "hub": 189,
+          "restOfRig": 255
+        },
+        "guild-turbine": {
+          "nose": 203,
+          "hub": 193,
+          "restOfRig": 255
+        }
+      }
+    },
+    "tier-3": {
+      "phonePxPerM": 30.0,
+      "hubFootprintPx": {
+        "rig -> hub-cap": {
+          "changed": 0,
+          "of": 42
+        },
+        "hub-cap -> single-piston": {
+          "changed": 15,
+          "of": 42
+        },
+        "single-piston -> triple-flywheel": {
+          "changed": 19,
+          "of": 42
+        },
+        "triple-flywheel -> guild-turbine": {
+          "changed": 19,
+          "of": 42
+        }
+      },
+      "brightest": {
+        "rig": {
+          "nose": 253,
+          "hub": 187,
+          "restOfRig": 255
+        },
+        "hub-cap": {
+          "nose": 253,
+          "hub": 187,
+          "restOfRig": 255
+        },
+        "single-piston": {
+          "nose": 253,
+          "hub": 185,
+          "restOfRig": 255
+        },
+        "triple-flywheel": {
+          "nose": 253,
+          "hub": 189,
+          "restOfRig": 255
+        },
+        "guild-turbine": {
+          "nose": 253,
+          "hub": 192,
+          "restOfRig": 255
+        }
+      }
+    }
+  },
+  "glow": {
+    "rig": {
+      "nose": 247,
+      "hub": 15,
+      "restOfRig": 253
+    },
+    "hub-cap": {
+      "nose": 247,
+      "hub": 15,
+      "restOfRig": 253
+    },
+    "single-piston": {
+      "nose": 247,
+      "hub": 15,
+      "restOfRig": 253
+    },
+    "triple-flywheel": {
+      "nose": 247,
+      "hub": 15,
+      "restOfRig": 253
+    },
+    "guild-turbine": {
+      "nose": 247,
+      "hub": 127,
+      "restOfRig": 253
+    }
+  }
+}
