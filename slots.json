@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-10-21T03:15:45+02:00",
+  "updated_at": "2026-10-21T03:17:31+02:00",
   "caps": {
     "grok": 12,
     "claude": 10,
@@ -46,12 +46,11 @@
         },
         {
           "slot": "C4",
-          "state": "busy",
-          "ticket": 625,
-          "grok_slot": 7,
-          "kind": "dev",
-          "since": "2026-10-21T02:15:00+02:00",
-          "wave": "308-1D"
+          "state": "free",
+          "ticket": null,
+          "grok_slot": null,
+          "kind": null,
+          "since": null
         },
         {
           "slot": "C5",
@@ -72,8 +71,8 @@
         }
       ],
       "size": 6,
-      "used": 5,
-      "free": 1,
+      "used": 4,
+      "free": 2,
       "claims_last_hour": 5,
       "name": "Claude Max 1"
     },
@@ -153,6 +152,15 @@
           574
         ],
         "since": "2026-10-20T04:51:35+02:00"
+      },
+      {
+        "feature": 306,
+        "kind": "spec",
+        "title": "Grilling: Solar systems and terrain toughness tiers",
+        "tickets": [
+          625
+        ],
+        "since": "2026-10-21T03:15:50+02:00"
       }
     ]
   },
@@ -209,11 +217,9 @@
     },
     {
       "slot": 7,
-      "state": "dev",
-      "ticket": 625,
-      "since": "2026-10-21T02:15:00+02:00",
-      "claude_slot": 4,
-      "wave": "308-1D"
+      "state": "free",
+      "ticket": null,
+      "since": null
     },
     {
       "slot": 8,
@@ -280,12 +286,11 @@
     },
     {
       "slot": 4,
-      "state": "busy",
-      "ticket": 625,
-      "grok_slot": 7,
-      "since": "2026-10-21T02:15:00+02:00",
-      "account": 1,
-      "wave": "308-1D"
+      "state": "free",
+      "ticket": null,
+      "grok_slot": null,
+      "since": null,
+      "account": 1
     },
     {
       "slot": 5,
@@ -341,17 +346,17 @@
     }
   ],
   "last_refill": {
-    "at": "2026-10-21 03:15 CEST",
+    "at": "2026-10-21 03:17 CEST",
     "mode": "refill-dev",
-    "triggers": "#595",
-    "started": "#596->C2/A1",
-    "note": "spawned 1 worker(s)"
+    "triggers": "#625",
+    "started": "",
+    "note": "no pickable build ticket"
   },
   "totals": {
     "grok": {
       "size": 12,
-      "used": 9,
-      "dev": 8,
+      "used": 8,
+      "dev": 7,
       "dev_cap": 8,
       "planner": 1,
       "planner_cap": 4
@@ -359,8 +364,8 @@
     "claude": {
       "size": 10,
       "enabled": 10,
-      "used": 8,
-      "free": 2,
+      "used": 7,
+      "free": 3,
       "external": 0
     }
   },
@@ -368,19 +373,6 @@
     "mode": "on",
     "parallel": 1,
     "list": [
-      {
-        "number": 629,
-        "key": "308-1D",
-        "map": 308,
-        "lane": "remote",
-        "mode": "solo",
-        "state": "running",
-        "tickets": [
-          625
-        ],
-        "done": [],
-        "live": 1
-      },
       {
         "number": 627,
         "key": "308-1B",
