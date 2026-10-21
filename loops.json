@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "updated_at": "2026-10-21T23:45:16Z",
+  "updated_at": "2026-10-21T23:46:08Z",
   "entries": {
     "steampunk-loop/1": {
       "loop": "steampunk-loop",
@@ -672,9 +672,9 @@
       "slot": null,
       "state": "working",
       "issue": null,
-      "note": "testing spec #306 (Grilling: Solar systems and terrain toughness tiers) on 1de5927",
+      "note": "nightly run on c42f047 (nightly)",
       "stale_after_min": 420,
-      "updated_at": "2026-10-21T16:27:41Z",
+      "updated_at": "2026-10-21T23:46:08Z",
       "host": "grok-bot-vm-452660841"
     },
     "steampunk-loop/10": {
