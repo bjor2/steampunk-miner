@@ -23,12 +23,13 @@
  * after: over every cell the track and the swept cut's lead reach, for the bars per unit of law
  * work, and over a fixed stretch of the track both paths have passed, for the bars per metre. A
  * fresh swept step cuts a whole step ahead of the body, as far as the rig's stats bound allows
- * (60 m on the strongest rig), so the stretch starts past that lead. A `CommandRejected` or a
- * tank run dry fails the run.
+ * (60 m on the strongest rig), so the stretch starts past that lead. The rig carries a deep tank,
+ * so a slow rig's whole track fits in it; a `CommandRejected` or a tank run dry fails the run.
  */
 import { DRILL_SUBSTEPS_PER_TICK } from '../../constants/balance'
 import { MM_PER_METRE, TICKS_PER_SECOND, UP_VECTOR_SCALE } from '../../constants/physics'
 import { blockHardness } from '../economy/oreEconomy'
+import { energyMax } from '../economy/vehicleStats'
 import { subStepsPerTile } from '../vehicle/drillRule'
 import { ENERGY_QUANTA_PER_TICK } from '../vehicle/energyQuanta'
 import { stepDigTicksOf } from '../vehicle/sweptCut'
@@ -88,6 +89,13 @@ const REPORT_EVERY = 12
  * lasts long enough for one) or crushes the rig; the rings land behind the stamp, past its reach.
  */
 const CASING_GRADE = 5
+/**
+ * Boiler purchases for a tank of 758 units, as the drill ladder's (`drillLadder.ts`): the slowest
+ * rig's track (purchase 1 at 1.4 m/s, about 4,900 ticks) took about 146 of the start's 150 at
+ * protocol 95 and runs it dry since the swept cut rides its face and clears its full bore (ticket 570). The
+ * tank's size sets no cut and no charge, so no bar moves with it.
+ */
+const DEEP_TANK_PURCHASES = 17
 
 /** Cuts the track on `path` from a fresh rig of `drillPower`, tick by tick. */
 export function cutTrack(track: Track, path: TrackPath, drillPower: number): TrackRun {
@@ -182,9 +190,16 @@ function rigSession(drillPower: number): ScriptedSession {
 function sessionAtStart(frame: TrackFrame, drillPower: number): ScriptedSession {
   const session = rigSession(drillPower)
   session.submit(0, FREEZE_ENEMIES)
+  fillDeepTank(session)
   session.submit(0, setCasingGradeCommand(CASING_GRADE))
   session.submit(0, reportOf(frame, frame.start, { speedMmPerS: 0, ticks: 0 }))
   return session
+}
+
+function fillDeepTank(session: ScriptedSession): void {
+  const upgrade = { upgradeId: 'boiler', level: DEEP_TANK_PURCHASES }
+  session.submit(0, { type: 'debug.setUpgrade', payload: upgrade })
+  session.submit(0, { type: 'debug.setEnergy', payload: { energy: `${energyMax(upgrade.level)}` } })
 }
 
 interface TrackTick {
