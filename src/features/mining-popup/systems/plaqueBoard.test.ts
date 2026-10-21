@@ -11,6 +11,7 @@ import {
 function material(oreId: string): NewMaterial {
   const face: OreFace = {
     oreId,
+    speciesId: null,
     name: oreId,
     family: 'metal',
     gradeName: 'Raw',

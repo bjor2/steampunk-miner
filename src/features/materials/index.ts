@@ -24,6 +24,7 @@ export {
   MATERIAL_FLAVOUR_MAX_WORDS,
   MATERIAL_NAME_MAX_WORDS,
   materialNameOf,
+  speciesNameOf,
 } from './systems/materialCopyRules'
 export type { MaterialRarityLook } from './systems/render/rarityLooks'
 export { FRAMED_RARITIES, RARITY_LOOKS, rarityLookProblems } from './systems/render/rarityLooks'

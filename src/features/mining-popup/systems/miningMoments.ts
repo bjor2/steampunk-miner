@@ -3,9 +3,10 @@
  * (`CargoAdded`, the drill's or a blast's) is a chip pickup, the drill's once its cell is carved
  * (ticket 615), and the codex's first mine of a type
  * (`codex.OreDiscovered`) is a plaque line. A teammate's events never show here (#172 §4). Each
- * carries its unit's rarity once the material is seen (ticket 454, `findRarity.ts`); the plaque's
- * is the first unit of its type in the batch. Reads the authority state the events answered;
- * writes nothing.
+ * carries its unit's rarity once the material is seen (ticket 454, `findRarity.ts`) and is named by
+ * its unit's species where the unit names one (ticket 695, `findSpecies.ts`); the plaque's are the
+ * first unit of its type in the batch. Reads the authority state the events answered; writes
+ * nothing.
  */
 import type { AuthorityState } from '../../../systems/authority/authorityState'
 import { vehicleOf } from '../../../systems/authority/authorityState'
@@ -14,8 +15,10 @@ import { withoutCarvingPickups, type CarvedCell } from '../../../systems/materia
 import { planetParamsOf } from '../../../systems/authority/planetOfState'
 import { statsOfVehicle } from '../../../systems/vehicle/vehicleState'
 import type { SeenRarity } from '../../../systems/render/seenRarity'
+import type { Material } from '../../materials'
 import type { OrePickup } from './chipBoard'
 import { findRarityOf } from './findRarity'
+import { findSpeciesOf } from './findSpecies'
 import { oreFaceOf, type OreFace } from './oreFace'
 import type { NewMaterial } from './plaqueBoard'
 import { awayDirectionOf, motionOfPose, type VehicleMotion } from './render/chipPlacement'
@@ -70,11 +73,22 @@ export function materialMomentsOf(
   playerId: string,
 ): MaterialMoment[] {
   const pickups = pickupsOf(events, state, playerId)
-  return events.filter(isOreDiscovered).flatMap((discovered) => {
-    const face = localFaceOf(discovered, state, playerId)
-    if (face === null) return []
-    return [momentOf(discovered, face, firstRarityOf(pickups, face.oreId), state, playerId)]
-  })
+  return events
+    .filter(isOreDiscovered)
+    .flatMap((discovered) => localMomentsOf(discovered, pickups, state, playerId))
+}
+
+/** The plaque line of a first mine, faced and rated as the type's first unit in the batch. */
+function localMomentsOf(
+  discovered: OreDiscovered,
+  pickups: readonly OrePickup[],
+  state: AuthorityState,
+  playerId: string,
+): MaterialMoment[] {
+  const face = localFaceOf(discovered, state, playerId, null)
+  if (face === null) return []
+  const first = firstPickupOf(pickups, face.oreId)
+  return [momentOf(discovered, first?.face ?? face, first?.rarity ?? null, state, playerId)]
 }
 
 /** The unit `events[at]` brought into the local player's hold, or none for a teammate's. */
@@ -85,7 +99,7 @@ function localPickupsOf(
   state: AuthorityState,
   playerId: string,
 ): OrePickup[] {
-  const face = localFaceOf(added, state, playerId)
+  const face = localFaceOf(added, state, playerId, findSpeciesOf(events, at, state))
   if (face === null) return []
   return [pickupOf(added, face, findRarityOf(events, at, state, playerId), state, playerId)]
 }
@@ -107,8 +121,8 @@ function pickupOf(
   }
 }
 
-function firstRarityOf(pickups: readonly OrePickup[], oreId: string): SeenRarity | null {
-  return pickups.find((pickup) => pickup.face.oreId === oreId)?.rarity ?? null
+function firstPickupOf(pickups: readonly OrePickup[], oreId: string): OrePickup | undefined {
+  return pickups.find((pickup) => pickup.face.oreId === oreId)
 }
 
 /** The player's vehicle as last reported, against how fast it drives. */
@@ -132,9 +146,10 @@ function localFaceOf(
   event: CargoAdded | OreDiscovered,
   state: AuthorityState,
   playerId: string,
+  species: Material | null,
 ): OreFace | null {
   if (event.playerId !== playerId) return null
-  return oreFaceOf(event.oreId, planetParamsOf(state.planet))
+  return oreFaceOf(event.oreId, planetParamsOf(state.planet), species)
 }
 
 function isCargoAdded(event: DomainEvent): event is CargoAdded {

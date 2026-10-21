@@ -18,6 +18,7 @@ import { chipsShownAt } from '../systems/chipBoard'
 import { plaqueShownAt } from '../systems/plaqueBoard'
 import { resetMiningPopupStore, useMiningPopupStore } from './miningPopupStore'
 import { NO_DRIVE } from '../../../systems/vehicle/driveSigns'
+import { planetSpeciesOf } from '../../roster'
 
 // The popup hears the game as the HUD does: every batch the game store follows, through
 // listenForDomainEvents, and every cell the drill finished carving, through listenForCarvedCells,
@@ -98,18 +99,44 @@ function speciesLeadAt(tile: TilePoint): number | null {
   return kindLookProvider()?.kindLooksOf(params)[slot - 1]?.rarityLead ?? null
 }
 
+/** The species the tile's cell wears on the store's planet, read before it is mined. */
+function speciesIdAt(tile: TilePoint): string | null {
+  const state = readAuthorityState()
+  const params = planetParamsOf(state.planet)!
+  return planetSpeciesOf(params, kindSlotOfCell(cellAt(state.world, params, tile)))?.id ?? null
+}
+
+function speciesEpithetAt(tile: TilePoint): string | undefined {
+  const state = readAuthorityState()
+  const params = planetParamsOf(state.planet)!
+  return planetSpeciesOf(params, kindSlotOfCell(cellAt(state.world, params, tile)))?.epithet
+}
+
 function oreIdAt(tile: TilePoint): string | undefined {
   return oreTypeAtTile(readAuthorityState(), tile)?.id
 }
 
-/** Surface ore tiles of one type, read before any is mined. */
+/** Surface ore tiles of one type and one species, read before any is mined. */
 function tilesByType() {
   const tiles = surfaceOreTiles(20, PLANET_1)
   const firstId = oreIdAt(tiles[0])
+  const firstSpecies = speciesIdAt(tiles[0])
   return {
     oreId: firstId,
-    same: tiles.filter((tile) => oreIdAt(tile) === firstId),
+    same: tiles.filter((tile) => oreIdAt(tile) === firstId && speciesIdAt(tile) === firstSpecies),
   }
+}
+
+/** Two surface ore tiles of one ore type that wear different species, read before either is mined. */
+function twoSpeciesOfOneType(): [TilePoint, TilePoint] | null {
+  const tiles = surfaceOreTiles(60, PLANET_1).filter((tile) => speciesIdAt(tile) !== null)
+  for (const first of tiles) {
+    const second = tiles.find(
+      (tile) => oreIdAt(tile) === oreIdAt(first) && speciesIdAt(tile) !== speciesIdAt(first),
+    )
+    if (second !== undefined) return [first, second]
+  }
+  return null
 }
 
 describe('mining popup store', () => {
@@ -165,6 +192,26 @@ describe('mining popup store', () => {
     expect(line.rarity).toEqual(chip.rarity)
   })
 
+  it('names a drilled unit on its chip and plaque by its species alone (ticket 695)', () => {
+    const [tile] = tilesByType().same
+    const epithet = speciesEpithetAt(tile)
+    expect(epithet).toBeDefined()
+    mine([tile])
+    const [chip] = chipsShownAt(popup().chipBoard, popup().tick)
+    const [line] = plaqueShownAt(popup().plaqueBoard, popup().tick)!.materials
+    expect([chip.face.name, line.face.name]).toEqual([epithet, epithet])
+  })
+
+  it('gives two species of one ore type a chip each, under their own names (ticket 695)', () => {
+    const pair = twoSpeciesOfOneType()
+    expect(pair).not.toBeNull()
+    const epithets = pair!.map(speciesEpithetAt)
+    mine(pair!, 45)
+    const names = chipsShownAt(popup().chipBoard, popup().tick).map((chip) => chip.face.name)
+    expect(names).toEqual(epithets)
+    expect(new Set(names).size).toBe(2)
+  })
+
   it("leaves a blast's unit unspecified: it names no cell to read the rarity from", () => {
     const tile = surfaceOreTiles(20, PLANET_1).find(
       (candidate) => speciesLeadAt(candidate) !== null,
@@ -193,6 +240,7 @@ describe('mining popup store', () => {
     const [chip] = chipsShownAt(popup().chipBoard, tick)
     expect(chip.face.oreId).toBe(oreId)
     expect(chip.rarity).toBeNull()
+    expect([chip.face.speciesId, chip.face.name]).toEqual([null, 'Brassvein'])
   })
 
   it('shows the drill’s chip the tick its cell is carved, not the tick its unit is paid', () => {

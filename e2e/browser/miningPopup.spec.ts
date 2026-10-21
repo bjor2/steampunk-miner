@@ -2,8 +2,10 @@
  * The mining popup (#178, spec #172) in the preview build: read through the slice's debug read
  * and the DOM's test ids, never pixels. Drilling the first surface ore of the committed start
  * scenario shows its chip and the NEW MATERIAL plaque, a second tile of the type shows no second
- * plaque, and both clear on the game's own clock with no input. The page's clock is held from
- * the drill until the DOM is read, so a busy box never outlives a 1.4 s chip between two checks.
+ * plaque, and both clear on the game's own clock with no input. At a phone's 360 px and a
+ * desktop's 1280 px both name the unit by its species alone, never `<grade> <family>` (ticket 695).
+ * The page's clock is held from the drill until the DOM is read, so a busy box never outlives a
+ * 1.4 s chip between two checks.
  */
 import { readFileSync } from 'node:fs'
 import { expect, test, type Page } from '@playwright/test'
@@ -18,8 +20,8 @@ declare global {
 
 interface PopupShown {
   tick: number
-  chips: { oreId: string; count: number }[]
-  plaque: { oreIds: string[]; phase: string } | null
+  chips: { oreId: string; speciesId: string | null; name: string; count: number }[]
+  plaque: { oreIds: string[]; names: string[]; phase: string } | null
   plaquesShown: number
 }
 
@@ -41,6 +43,14 @@ const DRAW_FRAMES_MS = 250
 /** The tier-0 plaque's 3.35 s, with room for software WebGL's slow frames on a busy box. */
 const CLEARS_WITHIN_MS = 60_000
 const SLOW_BOX_TIMEOUT_MS = 120_000
+/** A phone and a desktop width (ticket 695: "a 360 px hover and a 1280 px hover"). */
+const POPUP_VIEWPORTS = [
+  { label: '360 px', size: { width: 360, height: 780 } },
+  { label: '1280 px', size: { width: 1280, height: 800 } },
+] as const
+/** The ores slice's grade names and family names (`oreGrade.ts`, `oreFamilies.json`). */
+const GRADE_NAMES = ['Raw', 'Lustrous', 'Crystal', 'Lumen', 'Aether']
+const FAMILY_NAMES = ['Brassvein', 'Quartzine']
 
 async function openStartScenario(page: Page): Promise<string[]> {
   const errors: string[] = []
@@ -139,4 +149,27 @@ test.describe('mining popup (#178)', () => {
     expect(shown.chips).toEqual([expect.objectContaining({ oreId: FIRST_ORE_ID, count: 1 })])
     expect([shown.plaque, shown.plaquesShown]).toEqual([null, 1])
   })
+
+  for (const viewport of POPUP_VIEWPORTS) {
+    test(`names the mined unit by its species at ${viewport.label} (ticket 695)`, async ({
+      page,
+    }) => {
+      test.setTimeout(SLOW_BOX_TIMEOUT_MS)
+      await page.setViewportSize(viewport.size)
+      await page.clock.install()
+      const errors = await openStartScenario(page)
+      await holdTime(page)
+      await drillFromAbove(page, FIRST_ORE)
+      await page.clock.runFor(DRAW_FRAMES_MS)
+      const shown = await popupShown(page)
+      const [chip] = shown.chips
+      expect(chip.speciesId).not.toBeNull()
+      expect(GRADE_NAMES).not.toContain(chip.name.split(' ')[0])
+      expect(FAMILY_NAMES).not.toContain(chip.name.split(' ').at(-1))
+      expect(shown.plaque?.names).toEqual([chip.name])
+      await expect(page.getByTestId('mining-popup-chip')).toContainText(chip.name)
+      await expect(page.getByTestId('mining-popup-plaque')).toContainText(chip.name)
+      expect(errors).toEqual([])
+    })
+  }
 })

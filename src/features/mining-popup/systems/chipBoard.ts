@@ -1,8 +1,10 @@
 /**
- * The resource chips (#172 §1): one chip per ore type; a pickup within 1.2 s of the last one merges
- * into it, extending its life up to 3 s from its first pickup; at most 3 chips at once, the oldest
- * giving way to a new one. From the 4th chip of a type on a planet only the icon and count show.
- * Pure: time is the authority tick of the pickup, the face and direction come in with it.
+ * The resource chips (#172 §1): one chip per shown type, the unit's species where it names one and
+ * its ore type else (ticket 695), so a chip never names a unit of another species. A pickup within
+ * 1.2 s of the last one merges into it, extending its life up to 3 s from its first pickup; at
+ * most 3 chips at once, the oldest giving way to a new one. From the 4th chip of a type on a
+ * planet only the icon and count show. Pure: time is the authority tick of the pickup, the face
+ * and direction come in with it.
  */
 import {
   CHIP_FADE_TICKS,
@@ -50,6 +52,7 @@ export interface ChipBoard {
   chips: readonly ResourceChip[]
   nextSerial: number
   planetIndex: number | null
+  /** Chips spawned on this planet, by shown type (`shownTypeOf`). */
   chipsSpawnedByOre: Readonly<Record<string, number>>
 }
 
@@ -91,7 +94,7 @@ function onPlanet(board: ChipBoard, planetIndex: number): ChipBoard {
 }
 
 function mergingChipOf(board: ChipBoard, pickup: OrePickup): ResourceChip | null {
-  const chip = board.chips.find((shown) => shown.face.oreId === pickup.face.oreId)
+  const chip = board.chips.find((shown) => isSameShownType(shown.face, pickup.face))
   if (chip === undefined) return null
   const isWithinMergeWindow = pickup.tick - chip.lastTick <= CHIP_MERGE_TICKS
   return isWithinMergeWindow && pickup.tick < lifeCapOf(chip) ? chip : null
@@ -109,22 +112,25 @@ function withMergedChip(board: ChipBoard, chip: ResourceChip, pickup: OrePickup)
 }
 
 function withSpawnedChip(board: ChipBoard, pickup: OrePickup): ChipBoard {
-  const kept = withRoomForOneMore(board.chips, pickup.face.oreId)
+  const kept = withRoomForOneMore(board.chips, pickup.face)
   const spawned = spawnedChipOf(board, kept, pickup)
   return {
     ...board,
     chips: [...kept, spawned],
     nextSerial: board.nextSerial + 1,
-    chipsSpawnedByOre: { ...board.chipsSpawnedByOre, [pickup.face.oreId]: spawnsOf(board, pickup) },
+    chipsSpawnedByOre: {
+      ...board.chipsSpawnedByOre,
+      [shownTypeOf(pickup.face)]: spawnsOf(board, pickup),
+    },
   }
 }
 
 /** One chip per type: drops the type's older chip, then the oldest chips until a new one fits. */
 function withRoomForOneMore(
   chips: readonly ResourceChip[],
-  oreId: string,
+  face: OreFace,
 ): readonly ResourceChip[] {
-  const others = chips.filter((chip) => chip.face.oreId !== oreId)
+  const others = chips.filter((chip) => !isSameShownType(chip.face, face))
   return others.slice(Math.max(0, others.length - (MOST_CHIPS_SHOWN - 1)))
 }
 
@@ -153,7 +159,7 @@ function rarerOf(shown: SeenRarity | null, picked: SeenRarity | null): SeenRarit
 }
 
 function spawnsOf(board: ChipBoard, pickup: OrePickup): number {
-  return (board.chipsSpawnedByOre[pickup.face.oreId] ?? 0) + 1
+  return (board.chipsSpawnedByOre[shownTypeOf(pickup.face)] ?? 0) + 1
 }
 
 function freeSlotOf(chips: readonly ResourceChip[]): number {
@@ -165,4 +171,13 @@ function freeSlotOf(chips: readonly ResourceChip[]): number {
 
 function lifeCapOf(chip: ResourceChip): number {
   return chip.firstTick + CHIP_LIFE_CAP_TICKS
+}
+
+/** What a chip counts as one type: the species where the unit names one, else the ore. */
+export function shownTypeOf(face: OreFace): string {
+  return face.speciesId ?? face.oreId
+}
+
+function isSameShownType(a: OreFace, b: OreFace): boolean {
+  return shownTypeOf(a) === shownTypeOf(b)
 }

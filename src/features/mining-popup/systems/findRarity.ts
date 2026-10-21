@@ -13,9 +13,8 @@ import { oreTier } from '../../../systems/economy/oreEconomy'
 import { seenRarityOfFind, type SeenRarity } from '../../../systems/render/seenRarity'
 import { bandOfTile } from '../../../systems/world/planetGeometry'
 import type { PlanetParams } from '../../../systems/world/planetParams'
+import { drilledCellBefore, type TileDestroyed } from './drilledCell'
 import { oreTypeNamed } from './oreFace'
-
-type TileDestroyed = Extract<DomainEvent, { type: 'TileDestroyed' }>
 
 const BAND_ONE = 1
 
@@ -32,12 +31,6 @@ export function findRarityOf(
   if (added.type !== 'CargoAdded' || cell === null || params === null) return null
   const lead = leadOfFind(params, added.oreId, cell)
   return lead === null ? null : seenRarityOfFind(state, playerId, params, lead)
-}
-
-/** The drill's broken cell: it raises `TileDestroyed` with no cause just before the unit. */
-function drilledCellBefore(previous: DomainEvent | undefined): TileDestroyed | null {
-  const isDrillBroken = previous?.type === 'TileDestroyed' && previous.cause === undefined
-  return isDrillBroken ? previous : null
 }
 
 /** Tiers above the band's own ore, as the roster binds a kind (`liveRosterIndicesOf`). */

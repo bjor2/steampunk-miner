@@ -6,6 +6,7 @@ import { chipCountTextOf, plaqueTextOf } from './popupText'
 function material(oreId: string, name: string, unitPriceText: string): NewMaterial {
   const face: OreFace = {
     oreId,
+    speciesId: null,
     name,
     family: 'crystal',
     gradeName: 'Lustrous',

@@ -16,6 +16,8 @@ export const miningPopupDebugActions: Readonly<Record<string, DebugAction>> = {
       tick,
       chips: chipsShownAt(chipBoard, tick).map(({ face, count, slot, isNamed }) => ({
         oreId: face.oreId,
+        speciesId: face.speciesId,
+        name: face.name,
         count,
         slot,
         isNamed,
@@ -25,6 +27,7 @@ export const miningPopupDebugActions: Readonly<Record<string, DebugAction>> = {
           ? null
           : {
               oreIds: plaque.materials.map(({ face }) => face.oreId),
+              names: plaque.materials.map(({ face }) => face.name),
               phase: plaquePhaseAt(plaque, tick),
             },
       plaquesShown: plaqueBoard.nextSerial,

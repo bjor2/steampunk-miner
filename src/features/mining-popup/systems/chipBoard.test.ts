@@ -12,8 +12,21 @@ import type { OreFace } from './oreFace'
 
 const UP = { along: 0, upward: 1 }
 
-function faceOf(oreId: string): OreFace {
-  return { oreId, name: oreId, family: 'metal', gradeName: 'Raw', iconId: 'none', swatch: 'red' }
+function faceOf(oreId: string, speciesId: string | null = null): OreFace {
+  const name = speciesId ?? oreId
+  return {
+    oreId,
+    speciesId,
+    name,
+    family: 'metal',
+    gradeName: 'Raw',
+    iconId: 'none',
+    swatch: 'red',
+  }
+}
+
+function speciesPickup(oreId: string, speciesId: string, tick: number): OrePickup {
+  return { ...pickup(oreId, tick), face: faceOf(oreId, speciesId) }
 }
 
 function pickup(oreId: string, tick: number, planetIndex = 1): OrePickup {
@@ -103,5 +116,26 @@ describe('resource chips', () => {
     const board = pickAll([0, 200, 400, 600].map((tick) => pickup('iron', tick)))
     const onPlanetTwo = addPickupToChips(board, pickup('iron', 800, 2))
     expect(chipsShownAt(onPlanetTwo, 800)[0].isNamed).toBe(true)
+  })
+
+  it('gives two species of one ore type a chip each, under their own names (ticket 695)', () => {
+    const board = pickAll([
+      speciesPickup('crystal_t1', 'clouded-quartzine', 0),
+      speciesPickup('crystal_t1', 'flint-glass-quartzine', 10),
+      speciesPickup('crystal_t1', 'clouded-quartzine', 20),
+    ])
+    const shown = chipsShownAt(board, 20).map((chip) => [chip.face.name, chip.count])
+    expect(shown).toEqual([
+      ['clouded-quartzine', 2],
+      ['flint-glass-quartzine', 1],
+    ])
+  })
+
+  it('merges one species mined at two tiers into one chip', () => {
+    const board = pickAll([
+      speciesPickup('metal_t1', 'ironstone-brassvein', 0),
+      speciesPickup('metal_t2', 'ironstone-brassvein', 10),
+    ])
+    expect(shownIds(board, 10)).toEqual(['metal_t1x2'])
   })
 })

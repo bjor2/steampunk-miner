@@ -1,8 +1,9 @@
 /**
  * What a chip and the plaque show of an ore (#172 §1, §2): its name, family and grade, its icon
- * and a swatch in the colour its tiles are drawn in on this planet. Until the ores slice (#146)
- * gives each type a #158 hex icon, the kernel ore has none (`iconId: 'none'`) and the swatch
- * stands in for it (Game Director on #178: key on `resourceTier`, tier 0 only).
+ * and a swatch in the colour its tiles are drawn in on this planet. The name is the unit's species
+ * where its cell names one (ticket 695, `findSpecies.ts`), else the ore type's. Until the ores
+ * slice (#146) gives each type a #158 hex icon, the kernel ore has none (`iconId: 'none'`) and the
+ * swatch stands in for it (Game Director on #178: key on `resourceTier`, tier 0 only).
  */
 import { oreTier } from '../../../systems/economy/oreEconomy'
 import { oreLookProvider } from '../../../systems/registries/oreLook'
@@ -11,9 +12,13 @@ import type { Rgb } from '../../../systems/render/colour'
 import { ORE_GRADE_NAMES, oreGradeOf } from '../../../systems/render/oreGrade'
 import type { PlanetParams } from '../../../systems/world/planetParams'
 import { oreCell, RESOURCE_FAMILY } from '../../../systems/world/worldCell'
+import { speciesNameOf, type Material } from '../../materials'
 
 export interface OreFace {
   oreId: string
+  /** The species the unit's cell wears (`materials.json`), or null when the unit names none. */
+  speciesId: string | null
+  /** The species' own name, else the ore type's; never a grade before a family (ticket 695). */
   name: string
   family: string
   gradeName: string
@@ -31,13 +36,21 @@ const NO_CATALOGUE_GRADE = 0
 /** Drawn when no planet is loaded: the brass of the HUD frames. */
 const NO_PLANET_SWATCH = 'rgb(201 162 75)'
 
-/** The face of the ore with this id on this planet; null for an id no ore answers to. */
-export function oreFaceOf(oreId: string, planet: PlanetParams | null): OreFace | null {
+/**
+ * The face of the ore with this id on this planet, named by `species` when the unit names one;
+ * null for an id no ore answers to.
+ */
+export function oreFaceOf(
+  oreId: string,
+  planet: PlanetParams | null,
+  species: Material | null = null,
+): OreFace | null {
   const ore = oreTypeNamed(oreId)
   if (ore === null) return null
   return {
     oreId,
-    name: ore.name,
+    speciesId: species?.id ?? null,
+    name: species === null ? ore.name : speciesNameOf(species.epithet),
     family: ore.family,
     gradeName: gradeNameOf(ore),
     iconId: ore.iconId,

@@ -8,6 +8,14 @@ import { flavourProblemsOf } from '../../descriptions'
 export const MATERIAL_NAME_MAX_WORDS = 4
 export const MATERIAL_FLAVOUR_MAX_WORDS = 12
 
+/**
+ * The species' own name, as the pickup popup shows a unit of it (ticket 695): the epithet alone,
+ * with no family after it, so two species of one family never read alike.
+ */
+export function speciesNameOf(epithet: string): string {
+  return epithet.trim()
+}
+
 /** `<epithet> <family name>`, the name a ledger line and the codex show. */
 export function materialNameOf(epithet: string, familyName: string): string {
   return `${epithet.trim()} ${familyName}`
