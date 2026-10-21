@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-10-21T04:55:41+02:00",
+  "updated_at": "2026-10-21T04:58:37+02:00",
   "caps": {
     "grok": 12,
     "claude": 10,
@@ -47,11 +47,11 @@
         {
           "slot": "C4",
           "state": "busy",
-          "ticket": 632,
-          "grok_slot": 8,
+          "ticket": 595,
+          "grok_slot": 2,
           "kind": "dev",
-          "since": "2026-10-21T03:58:00+02:00",
-          "wave": "576-1H"
+          "since": "2026-10-21T04:58:00+02:00",
+          "wave": "576-1E"
         },
         {
           "slot": "C5",
@@ -73,7 +73,7 @@
       "size": 6,
       "used": 4,
       "free": 2,
-      "claims_last_hour": 7,
+      "claims_last_hour": 5,
       "name": "Claude Max 1"
     },
     {
@@ -173,9 +173,11 @@
     },
     {
       "slot": 2,
-      "state": "free",
-      "ticket": null,
-      "since": null
+      "state": "dev",
+      "ticket": 595,
+      "since": "2026-10-21T04:58:00+02:00",
+      "claude_slot": 4,
+      "wave": "576-1E"
     },
     {
       "slot": 3,
@@ -219,11 +221,9 @@
     },
     {
       "slot": 8,
-      "state": "dev",
-      "ticket": 632,
-      "since": "2026-10-21T03:58:00+02:00",
-      "claude_slot": 4,
-      "wave": "576-1H"
+      "state": "free",
+      "ticket": null,
+      "since": null
     },
     {
       "slot": 9,
@@ -281,11 +281,11 @@
     {
       "slot": 4,
       "state": "busy",
-      "ticket": 632,
-      "grok_slot": 8,
-      "since": "2026-10-21T03:58:00+02:00",
+      "ticket": 595,
+      "grok_slot": 2,
+      "since": "2026-10-21T04:58:00+02:00",
       "account": 1,
-      "wave": "576-1H"
+      "wave": "576-1E"
     },
     {
       "slot": 5,
@@ -338,10 +338,10 @@
     }
   ],
   "last_refill": {
-    "at": "2026-10-21 04:55 CEST",
+    "at": "2026-10-21 04:58 CEST",
     "mode": "refill-dev",
-    "triggers": "#580 #617",
-    "started": "#586->C1/A1",
+    "triggers": "#632 claude-run:wave-plan",
+    "started": "#595->C4/A1",
     "note": "spawned 1 worker(s)"
   },
   "totals": {
@@ -397,19 +397,6 @@
         "live": 0
       },
       {
-        "number": 636,
-        "key": "576-1H",
-        "map": 576,
-        "lane": "remote",
-        "mode": "solo",
-        "state": "running",
-        "tickets": [
-          632
-        ],
-        "done": [],
-        "live": 1
-      },
-      {
         "number": 627,
         "key": "308-1B",
         "map": 308,
@@ -431,7 +418,7 @@
         "map": 316,
         "lane": "remote",
         "mode": "solo",
-        "state": "running",
+        "state": "paused",
         "tickets": [
           614,
           615,
@@ -495,7 +482,7 @@
         "done": [
           598
         ],
-        "live": 0
+        "live": 1
       },
       {
         "number": 609,
