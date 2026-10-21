@@ -24,12 +24,88 @@
     "prop": 512,
     "platform": 256,
     "ground": 256,
-    "casing": 256
+    "casing": 256,
+    "ui": 4
   },
   "maxAtlasPx": 4096,
   "atlasMarginPx": 8,
   "tilePx": 1024,
   "tileSamples": 16,
   "backdropPx": [2048, 1024],
-  "backdropSamples": 128
+  "backdropSamples": 128,
+  "uiPngScales": [1, 2],
+  "uiSprites": {
+    "ui-gauge-bar": {
+      "ui-gauge-bar": {
+        "sizePx": [96, 16],
+        "insetPx": [6, 6]
+      }
+    },
+    "ui-gauge-dial": {
+      "ui-gauge-dial": {
+        "sizePx": [64, 64]
+      }
+    },
+    "ui-edge-gauge": {
+      "ui-edge-gauge": {
+        "sizePx": [8, 64],
+        "insetPx": [0, 8]
+      }
+    },
+    "ui-odometer-drum": {
+      "ui-odometer-drum": {
+        "sizePx": [16, 240]
+      }
+    },
+    "ui-frame-sheet": {
+      "ui-frame-sheet": {
+        "sizePx": [128, 128],
+        "insetPx": [24, 24]
+      }
+    },
+    "ui-frame-card": {
+      "ui-frame-card": {
+        "sizePx": [96, 64],
+        "insetPx": [12, 12]
+      }
+    },
+    "ui-frame-tab": {
+      "ui-frame-tab": {
+        "sizePx": [64, 32],
+        "insetPx": [8, 8]
+      },
+      "ui-frame-tab-active": {
+        "sizePx": [64, 32],
+        "insetPx": [8, 8]
+      }
+    },
+    "ui-scroll-rail": {
+      "ui-scroll-rail": {
+        "sizePx": [8, 64],
+        "insetPx": [0, 8]
+      },
+      "ui-scroll-rail-thumb": {
+        "sizePx": [12, 24],
+        "insetPx": [0, 8]
+      }
+    },
+    "ui-slot-ring": {
+      "ui-slot-ring": {
+        "sizePx": [48, 48]
+      }
+    },
+    "ui-status-plate": {
+      "ui-status-plate": {
+        "sizePx": [24, 24]
+      }
+    },
+    "ui-gear-button": {
+      "ui-gear-button": {
+        "sizePx": [48, 48]
+      },
+      "ui-gear-button-pressed": {
+        "sizePx": [48, 48]
+      }
+    }
+  }
 }

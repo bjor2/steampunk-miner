@@ -8,7 +8,9 @@
  * and `atlasPx`, the atlas size the rects must fit. An optional `attach` array (#162 "vehicle
  * attach", K5; the shop buildings of #170) lists named points in the same frame, from the
  * `attach.<id>` empties of the `.blend`; it is checked only when present, and the schema stays 1.
- * The base vehicle must place every vehicle attach id (`sidecarAttach.ts`).
+ * The base vehicle must place every vehicle attach id (`sidecarAttach.ts`). A `ui` sprite's part
+ * (ticket 683, `uiArt.ts`) may carry nine-slice `insetPx` and a `tintable` flag; for that
+ * category the authoring unit is one CSS px, so `sizeM` is the sprite's 1x size.
  */
 import {
   ART_RULES,
@@ -19,6 +21,7 @@ import {
   type MapKind,
 } from './artIds'
 import { vehicleAttachProblems } from './sidecarAttach'
+import { UI_ART_CATEGORY, uiSpriteFilesOf } from './uiArt'
 
 export const SIDECAR_SCHEMA = 1
 
@@ -33,6 +36,10 @@ export interface SidecarPart {
   pivotM: Pair
   atM: Pair
   z: number
+  /** A UI nine-slice's insets `[x, y]` in CSS px at 1x (ticket 683); absent on any other part. */
+  insetPx?: Pair
+  /** A UI sprite with accent areas ships an alpha tint mask beside its PNG (ticket 683). */
+  tintable?: true
 }
 
 /** A named point of the asset's frame that code draws something at; never a part of its own. */
@@ -79,6 +86,16 @@ export function mapFilesOf(sidecar: PartsSidecar): string[] {
   return emissive === false ? [albedo, normal] : [albedo, normal, emissive]
 }
 
+/** Every file a final asset ships beside its sidecar: the maps, and a UI sprite's PNGs. */
+export function shippedFilesOf(sidecar: PartsSidecar): string[] {
+  const sprites = isUiAsset(sidecar.assetId) ? uiSpriteFilesOf(sidecar) : []
+  return [...mapFilesOf(sidecar), ...sprites]
+}
+
+function isUiAsset(assetId: string): boolean {
+  return categoryOfAssetId(assetId) === UI_ART_CATEGORY
+}
+
 function headerProblems(assetId: string, sidecar: PartsSidecar): string[] {
   const category = categoryOfAssetId(assetId)
   const problems: string[] = []
@@ -119,7 +136,35 @@ function partProblems(assetId: string, atlas: Pair, part: SidecarPart): string[]
   if (!isPivotInside(part.pivotM, part.sizeM)) problems.push('pivotM must lie inside sizeM')
   if (!isFinitePair(part.atM)) problems.push('atM must be two numbers')
   if (!Number.isSafeInteger(part.z)) problems.push('z must be a whole number')
-  return problems.map((problem) => `part "${part.id}" ${problem}`)
+  return [...problems, ...uiSpriteProblems(assetId, part)].map(
+    (problem) => `part "${part.id}" ${problem}`,
+  )
+}
+
+/** The UI sprite fields (ticket 683): insets inside the sprite, and only on a `ui` asset. */
+function uiSpriteProblems(assetId: string, part: SidecarPart): string[] {
+  const problems: string[] = []
+  if (!isUiAsset(assetId)) {
+    if (part.insetPx !== undefined) problems.push('insetPx belongs to a ui sprite only')
+    if (part.tintable !== undefined) problems.push('tintable belongs to a ui sprite only')
+    return problems
+  }
+  if (part.insetPx !== undefined && !isInsetInside(part.insetPx, part.sizeM)) {
+    problems.push('insetPx must be two whole CSS px, each under half the sprite')
+  }
+  if (part.tintable !== undefined && part.tintable !== true) {
+    problems.push('tintable is true or absent')
+  }
+  return problems
+}
+
+function isInsetInside(inset: Pair, size: Pair): boolean {
+  return (
+    inset.length === 2 &&
+    inset.every(
+      (value, axis) => Number.isSafeInteger(value) && value >= 0 && 2 * value < size[axis],
+    )
+  )
 }
 
 const ATTACH_ID = /^[a-z][a-z0-9_]*(\.[a-z0-9_]+)+$/

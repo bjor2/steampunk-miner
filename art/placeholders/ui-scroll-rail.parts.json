@@ -1,0 +1,38 @@
+{
+  "assetId": "ui-scroll-rail",
+  "schema": 1,
+  "source": {
+    "blend": "art/blender/ui-scroll-rail/ui-scroll-rail.blend",
+    "sha256": null,
+    "blender": null
+  },
+  "pxPerMetre": 4,
+  "atlasPx": [64, 512],
+  "maps": {
+    "albedo": "ui-scroll-rail.albedo.ktx2",
+    "normal": "ui-scroll-rail.normal.ktx2",
+    "emissive": false
+  },
+  "parts": [
+    {
+      "id": "ui-scroll-rail",
+      "tier": 1,
+      "rect": [8, 8, 32, 256],
+      "sizeM": [8.0, 64.0],
+      "pivotM": [4.0, 32.0],
+      "atM": [0.0, 0.0],
+      "z": 0,
+      "insetPx": [0, 8]
+    },
+    {
+      "id": "ui-scroll-rail-thumb",
+      "tier": 1,
+      "rect": [8, 280, 48, 96],
+      "sizeM": [12.0, 24.0],
+      "pivotM": [6.0, 12.0],
+      "atM": [28.0, 0.0],
+      "z": 0,
+      "insetPx": [0, 8]
+    }
+  ]
+}

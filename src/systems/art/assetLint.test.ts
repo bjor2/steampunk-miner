@@ -20,6 +20,7 @@ import { ktx2MapProblems, ktx2TileProblems } from './ktx2Header'
 import {
   mapFilesOf,
   placeholderDriftProblems,
+  shippedFilesOf,
   sidecarProblems,
   type PartsSidecar,
 } from './partsSidecar'
@@ -52,7 +53,7 @@ function shippedSidecarOf(entry: ManifestEntry): PartsSidecar | null {
 function expectedFilesOfManifest(): string[] {
   return SHIPPED_ART.manifest.assets.flatMap((entry) => {
     const sidecar = shippedSidecarOf(entry)
-    return expectedFilesOf(entry, sidecar === null ? [] : mapFilesOf(sidecar))
+    return expectedFilesOf(entry, sidecar === null ? [] : shippedFilesOf(sidecar))
   })
 }
 

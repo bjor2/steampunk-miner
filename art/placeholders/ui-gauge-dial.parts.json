@@ -1,0 +1,27 @@
+{
+  "assetId": "ui-gauge-dial",
+  "schema": 1,
+  "source": {
+    "blend": "art/blender/ui-gauge-dial/ui-gauge-dial.blend",
+    "sha256": null,
+    "blender": null
+  },
+  "pxPerMetre": 4,
+  "atlasPx": [512, 512],
+  "maps": {
+    "albedo": "ui-gauge-dial.albedo.ktx2",
+    "normal": "ui-gauge-dial.normal.ktx2",
+    "emissive": false
+  },
+  "parts": [
+    {
+      "id": "ui-gauge-dial",
+      "tier": 1,
+      "rect": [8, 8, 256, 256],
+      "sizeM": [64.0, 64.0],
+      "pivotM": [32.0, 32.0],
+      "atM": [0.0, 0.0],
+      "z": 0
+    }
+  ]
+}

@@ -18,6 +18,7 @@ import {
   shopBuildingAssetIds,
   shopBuildingMovingPartIds,
 } from './shopBuildingArt'
+import { UI_ART_CATEGORY, uiArtAssetIds, uiArtPartIds } from './uiArt'
 import { workshopShowcaseAssetIds, workshopShowcasePartIds } from './workshopShowcaseArt'
 
 export const ASSET_CATEGORIES = [
@@ -27,10 +28,19 @@ export const ASSET_CATEGORIES = [
   'prop',
   'ground',
   'casing',
+  UI_ART_CATEGORY,
 ] as const
 
 /** The `public/assets/<category>/` folder an exported asset lands in (#52 "Folders"). */
 export type AssetCategory = (typeof ASSET_CATEGORIES)[number]
+
+/**
+ * The categories drawn in the world at metres, which the texel density rule (#173) covers. The
+ * `ui` sprites (ticket 683) are CSS px for the DOM and never scale with the view.
+ */
+export const WORLD_ASSET_CATEGORIES: readonly AssetCategory[] = ASSET_CATEGORIES.filter(
+  (category) => category !== UI_ART_CATEGORY,
+)
 
 export const MAP_KINDS = ['albedo', 'normal', 'emissive'] as const
 
@@ -106,6 +116,8 @@ export function kernelBlenderAssetIds(): string[] {
     ...numbered('casing-grade', CASING_GRADE_COUNT),
     LAVA_TILE_ASSET_ID,
     ...refractoryCasingTileIds(),
+    // The UI chrome sprites the `art.*` design tokens name (ticket 683).
+    ...uiArtAssetIds(),
   ]
 }
 
@@ -208,11 +220,13 @@ function numbered(prefix: string, count: number): string[] {
  * (#8 `outpost`, `core_drive`), which are its collections in Blender (#52), the refinery
  * bay's three looks drawn over its frame (#105), the charge rack's slots, the planted
  * charge's fuse lamp, the shop buildings' moving parts (#170), the Workshop showcase's rig
- * and reaction pieces (#180) and the parts each slice asset names (#214).
+ * and reaction pieces (#180), the UI sprites' variants (ticket 683) and the parts each slice
+ * asset names (#214).
  */
 export function registryPartIds(): string[] {
   return [
     ...blenderAssetIds(),
+    ...uiArtPartIds(),
     ...PLATFORM_VISUAL_STATES.map(kebabOf),
     ...REFINERY_BAY_LOOKS.map(refineryLookPartIdOf),
     ...shopBuildingMovingPartIds(),

@@ -1,0 +1,28 @@
+{
+  "assetId": "ui-frame-sheet",
+  "schema": 1,
+  "source": {
+    "blend": "art/blender/ui-frame-sheet/ui-frame-sheet.blend",
+    "sha256": null,
+    "blender": null
+  },
+  "pxPerMetre": 4,
+  "atlasPx": [1024, 1024],
+  "maps": {
+    "albedo": "ui-frame-sheet.albedo.ktx2",
+    "normal": "ui-frame-sheet.normal.ktx2",
+    "emissive": false
+  },
+  "parts": [
+    {
+      "id": "ui-frame-sheet",
+      "tier": 1,
+      "rect": [8, 8, 512, 512],
+      "sizeM": [128.0, 128.0],
+      "pivotM": [64.0, 64.0],
+      "atM": [0.0, 0.0],
+      "z": 0,
+      "insetPx": [24, 24]
+    }
+  ]
+}

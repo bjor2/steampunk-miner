@@ -1,0 +1,28 @@
+{
+  "assetId": "ui-gauge-bar",
+  "schema": 1,
+  "source": {
+    "blend": "art/blender/ui-gauge-bar/ui-gauge-bar.blend",
+    "sha256": null,
+    "blender": null
+  },
+  "pxPerMetre": 4,
+  "atlasPx": [512, 128],
+  "maps": {
+    "albedo": "ui-gauge-bar.albedo.ktx2",
+    "normal": "ui-gauge-bar.normal.ktx2",
+    "emissive": false
+  },
+  "parts": [
+    {
+      "id": "ui-gauge-bar",
+      "tier": 1,
+      "rect": [8, 8, 384, 64],
+      "sizeM": [96.0, 16.0],
+      "pivotM": [48.0, 8.0],
+      "atM": [0.0, 0.0],
+      "z": 0,
+      "insetPx": [6, 6]
+    }
+  ]
+}

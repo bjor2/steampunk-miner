@@ -1,0 +1,27 @@
+{
+  "assetId": "ui-odometer-drum",
+  "schema": 1,
+  "source": {
+    "blend": "art/blender/ui-odometer-drum/ui-odometer-drum.blend",
+    "sha256": null,
+    "blender": null
+  },
+  "pxPerMetre": 4,
+  "atlasPx": [128, 1024],
+  "maps": {
+    "albedo": "ui-odometer-drum.albedo.ktx2",
+    "normal": "ui-odometer-drum.normal.ktx2",
+    "emissive": false
+  },
+  "parts": [
+    {
+      "id": "ui-odometer-drum",
+      "tier": 1,
+      "rect": [8, 8, 64, 960],
+      "sizeM": [16.0, 240.0],
+      "pivotM": [8.0, 120.0],
+      "atM": [0.0, 0.0],
+      "z": 0
+    }
+  ]
+}

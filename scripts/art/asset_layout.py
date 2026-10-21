@@ -12,7 +12,10 @@ import re
 
 REPO_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..'))
 SIDECAR_SCHEMA = 1
-CATEGORIES = ('vehicle', 'platform', 'enemy', 'prop', 'ground', 'casing')
+CATEGORIES = ('vehicle', 'platform', 'enemy', 'prop', 'ground', 'casing', 'ui')
+# The UI sprites (ticket 683) are authored at one unit per CSS px; their part may carry these.
+UI_CATEGORY = 'ui'
+UI_PART_KEYS = ('insetPx', 'tintable')
 MAP_KINDS = ('albedo', 'normal', 'emissive')
 # Metres in the sidecar are rounded so float noise from Blender never changes the file (#52 acc. 5).
 METRE_DECIMALS = 4
@@ -178,7 +181,7 @@ def attach_point_of(point):
 
 
 def sidecar_part_of(part, rect):
-    return {
+    written = {
         'id': part['id'],
         'tier': part['tier'],
         'rect': rect,
@@ -187,6 +190,10 @@ def sidecar_part_of(part, rect):
         'atM': [round_metres(v) for v in part['atM']],
         'z': part['z'],
     }
+    for key in UI_PART_KEYS:
+        if key in part:
+            written[key] = part[key]
+    return written
 
 
 def write_sidecar(path, sidecar):
