@@ -57,6 +57,7 @@ import { combatStatusStackOf, isCollapseWarnedFor, type CombatStatusStack } from
 import { threatMarkersOf, type ThreatMarker } from './threatMarkers'
 import { tileTimeAhead, type TileTime } from './tileTime'
 import { amountReading, priceReading, type AmountReading } from './viewParts'
+import { nextUpgradeChipOf, type NextUpgradeChip } from './nextUpgradeChip'
 import { returnReserveUnits } from '../vehicle/returnReserve'
 
 export interface HudSources {
@@ -106,6 +107,10 @@ export interface HudModel {
   hull: GaugeReading
   cargo: CargoReading
   cargoValue: AmountReading
+  /** The wallet, a balance: the strip's number on the surface (ticket 684). */
+  money: AmountReading
+  /** The cheaper of the drill's two tracks, the strip's chip on the surface (ticket 684). */
+  nextUpgrade: NextUpgradeChip
   /** The vehicle's unpaid lining, in the fee readout's style; null while the bill is empty. */
   liningBill: AmountReading | null
   depth: DepthReading
@@ -163,6 +168,8 @@ export function selectHudModel(sources: HudSources): HudModel {
     hull,
     cargo,
     cargoValue: amountReading(serviceQuote(state, playerId).saleValue),
+    money: amountReading(state.players[playerId].wallet),
+    nextUpgrade: nextUpgradeChipOf(state, playerId),
     liningBill: liningBillOf(vehicle),
     depth: depthReadingOf(state, playerId, sources.depthTiles),
     casing: casingBadgeOf(state, playerId),
