@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-10-21T04:16:57+02:00",
+  "updated_at": "2026-10-21T04:25:26+02:00",
   "caps": {
     "grok": 12,
     "claude": 10,
@@ -74,7 +74,7 @@
       "size": 6,
       "used": 5,
       "free": 1,
-      "claims_last_hour": 8,
+      "claims_last_hour": 7,
       "name": "Claude Max 1"
     },
     {
@@ -122,12 +122,12 @@
       "size": 4,
       "used": 2,
       "free": 2,
-      "claims_last_hour": 3,
+      "claims_last_hour": 4,
       "name": "Claude Max 2"
     }
   ],
   "gate": {
-    "busy": 1,
+    "busy": 2,
     "max": 3
   },
   "tester": {
@@ -346,9 +346,9 @@
     }
   ],
   "last_refill": {
-    "at": "2026-10-21 04:16 CEST",
+    "at": "2026-10-21 04:25 CEST",
     "mode": "refill-dev",
-    "triggers": "#585",
+    "triggers": "claude-run:wave-plan",
     "started": "",
     "note": "no pickable build ticket"
   },
@@ -527,6 +527,7 @@
         "mode": "solo",
         "state": "paused",
         "tickets": [
+          640,
           583,
           585
         ],
