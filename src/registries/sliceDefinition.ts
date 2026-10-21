@@ -54,6 +54,7 @@ import type { CellGateLookProvider } from '../systems/registries/cellGateLook'
 import type { KindLookProvider } from '../systems/registries/kindLook'
 import type { MagneticGroundProvider } from '../systems/registries/magneticGround'
 import type { PlanetCardLineSource } from '../systems/registries/planetCardLines'
+import type { PlanetRadiusProvider } from '../systems/registries/planetRadii'
 import type { PlanetSkyBandProvider } from '../systems/registries/planetSkyBand'
 import type { ShockShield } from '../systems/registries/shockShields'
 import type { OreDrillClassProvider } from '../systems/registries/oreDrillClasses'
@@ -257,6 +258,8 @@ export interface SliceRegistrar {
   chargeBlastCue(provider: ChargeBlastCueProvider): void
   /** One provider across all slices: a band of light in a planet's sky, the aurora (#293). */
   planetSkyBand(provider: PlanetSkyBandProvider): void
+  /** One provider across all slices: each planet's radius from the planet registry (ticket 643). */
+  planetRadius(provider: PlanetRadiusProvider): void
   /**
    * A planet class's tag, arrival line and values on the kernel's planet card (ticket 343): shown
    * once its `featureId` row is open, the hazard and gate kind only, never an unlock id.
