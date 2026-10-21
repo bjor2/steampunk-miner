@@ -4,7 +4,9 @@ import { speciesNameOf } from './materialCopyRules'
 
 // Ticket 699 (#576, Progression's rename table under GD lock): every species reads as its own
 // mineral, so no two share a name anywhere in the solar system, and no two on one planet (one pool,
-// ores.economy.json kinds.pools) share a sprite. Copy only: ids, prices and rarity stay.
+// ores.economy.json kinds.pools) share a sprite or a stem. A stem is the whole first word, split at
+// hyphens (GD ruling on #699, reading C), so Deep-Seam and Deep-Grade collide but Fire Garnet and
+// Firebrass do not. Copy only: ids, prices and rarity stay.
 
 function speciesByPool(): Map<string, Material[]> {
   const pools = new Map<string, Material[]>()
@@ -22,6 +24,10 @@ function nameKeyOf(material: Material): string {
   return speciesNameOf(material.epithet).toLowerCase()
 }
 
+function stemKeyOf(material: Material): string {
+  return nameKeyOf(material).split(/[\s-]/)[0]
+}
+
 function spriteKeyOf(material: Material): string {
   return `${material.silhouette}|${material.pattern}`
 }
@@ -35,6 +41,10 @@ describe('material names', () => {
     expect(repeatsOf(species.map(spriteKeyOf))).toEqual([])
   })
 
+  it.each([...speciesByPool()])('gives every %s species its own stem', (_pool, species) => {
+    expect(repeatsOf(species.map(stemKeyOf))).toEqual([])
+  })
+
   it('drops the colliding names of the rename table', () => {
     const renamed = new Map([
       ['p2-u1', 'Cobalt Bloom'],
@@ -46,7 +56,7 @@ describe('material names', () => {
       ['step-bismuth-brassvein', 'Hopper Lattice'],
       ['salt-shell-amberbone', 'Brine Shell'],
       ['bog-iron-brassvein', 'Bog Limonite'],
-      ['salt-iron-brassvein', 'Hematite Rose'],
+      ['salt-iron-brassvein', 'Specular Hematite'],
       ['thunder-iron-brassvein', 'Fulgurite'],
     ])
     const epithetOf = (id: string) => MATERIALS.materials.find((row) => row.id === id)?.epithet
