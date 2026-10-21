@@ -87,6 +87,7 @@ import {
   type DebugUi,
 } from './debugScreens'
 import { debugActionsBySlice, type SliceDebugActions } from './debugActionRegistry'
+import { createDebugBot, type DebugBot } from './debugBot'
 import { createDebugDevFlags, type DebugDevFlags } from './debugDevFlags'
 import { createDebugMaterialPop, type DebugMaterialPop } from './debugMaterialPop'
 import { createDebugSaves, type DebugSaves } from './debugSaves'
@@ -268,6 +269,8 @@ export interface DebugApi {
   saves: DebugSaves
   /** Actions pressed at the action layer (#33): their commands are ordinary play. */
   input: DebugInput
+  /** The pacing bot played on the live game (ticket 656): its commands are ordinary play. */
+  bot: DebugBot
   /** Slice debug actions, `features['<slice>'].<action>()` (docs/standards/feature-slices.md 3.14). */
   features: Readonly<Record<string, SliceDebugActions>>
   // stubs
@@ -472,6 +475,7 @@ export function createDebugApi(): DebugApi {
     ui: { ...createDebugUi(), ...createDebugDevFlags(), ...createDebugMaterialPop() },
     saves: createDebugSaves(),
     input: createDebugInput(),
+    bot: createDebugBot(),
     features: debugActionsBySlice(),
     teleportToCore: notImplemented('teleportToCore'),
     giveResource: notImplemented('giveResource'),
