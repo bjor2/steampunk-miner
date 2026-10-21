@@ -3,8 +3,9 @@ The Blender recipes of the mineral skin layers (#576, ticket 592 for P1's slots 
 for its slots 6 to 10, ticket 594 for 11 and 12, ticket 598 for P3's slots 1 to 5, ticket 599 for
 its slots 6 to 10, ticket 600 for its slots 11 to 15 and its relic signature, ticket 601 for P4's
 slots 1 to 5, ticket 603 for its slots 11 to 15 and its signature material, ticket 604 for P5's
-slots 1 to 5, ticket 605 for its slots 6 to 10, ticket 595 for P2's slots 1 to 5): one per layer id
-of `mineralSkins.json`. A layer id with no recipe fails, never falls back.
+slots 1 to 5, ticket 605 for its slots 6 to 10, ticket 595 for P2's slots 1 to 5, ticket 596 for its
+slots 6 to 9): one per layer id of `mineralSkins.json`. A layer id with no recipe fails, never falls
+back.
 
 - `base` and `sheen` are seamless textures on the 1 m cell: an emission material on a 1 m quad
   whose value is the ramp coordinate (base, mean about 0.5) or the highlight strength (sheen,
@@ -796,6 +797,95 @@ def base_graphite_smear(graph):
     tone = around_half(graph, smear, 0.95)
     tone = graph.plus(tone, graph.mul(graph.minus(fine, 0.5), 0.14))
     return graph.plus(graph.minus(tone, 0.05), graph.mul(lens, 0.18))
+
+def base_bloom_rosettes(graph):
+    """Cobalt bloom: soft round blooms of colour on a dull dark matrix, brightest at the heart under a powdery fringe, fine flecks between."""
+    bloom = cobalt_blooms_of(graph)
+    rings = graph.mul(graph.math('SINE', graph.mul(graph.voronoi(5, 5, seed=801)['Distance'], 44.0)), bloom)
+    flecks = sprinkled(graph, 36, 803, 0.3, 0.35)
+    tone = graph.mul_add(bloom, 0.46, 0.3)
+    tone = graph.plus(tone, graph.mul(rings, 0.05))
+    tone = graph.plus(tone, graph.mul(flecks, 0.24))
+    return graph.plus(tone, graph.mul(graph.minus(stretched(graph, graph.noise(70, 70, seed=804, detail=4)), 0.5), 0.1))
+
+
+def cobalt_blooms_of(graph):
+    """1 at a bloom's heart, falling off through a powdery fringe to 0 on the matrix between blooms."""
+    fringe = graph.mul(graph.minus(stretched(graph, graph.noise(30, 30, seed=802, detail=4, roughness=0.6)), 0.5), 0.24)
+    return graph.smooth(graph.plus(graph.voronoi(5, 5, seed=801)['Distance'], fringe), 0.6, 0.18)
+
+
+def base_oxide_stairs(graph):
+    """Bismuth stair: square stairs climbing to one corner of every block, each tread its own temper tone, a lip and a riser shadow on each."""
+    stairs = bismuth_stairs_of(graph)
+    lip = graph.smooth(stairs['rise'], 0.15, 0.0)
+    riser = graph.smooth(stairs['rise'], 0.85, 1.0)
+    tone = graph.mul_add(stairs['temper'], 0.6, 0.2)
+    tone = graph.plus(tone, graph.mul(lip, 0.12))
+    tone = graph.minus(tone, graph.mul(riser, 0.2))
+    return graph.plus(tone, graph.mul(graph.minus(stretched(graph, graph.noise(3, 3, seed=812, detail=3)), 0.5), 0.12))
+
+
+BISMUTH_STAIR_BLOCKS = 3
+BISMUTH_STAIR_TREADS = 5.0
+
+
+def bismuth_stairs_of(graph):
+    """
+    Per pixel of the stair blocks: `rise`, how far up its tread it sits (0 at the lip, 1 at the next
+    riser), and `temper`, its tread's tone, stepped through the oxide colours from a per-block start.
+    """
+    blocks = lattice_of(graph, BISMUTH_STAIR_BLOCKS, BISMUTH_STAIR_BLOCKS)
+    climb = graph.mul(graph.math('MAXIMUM', blocks['x'], blocks['y']), BISMUTH_STAIR_TREADS)
+    tread = graph.math('FLOOR', climb)
+    temper = graph.math('FRACT', graph.mul_add(tread, 0.29, block_random(graph, blocks, 811)))
+    return {'rise': graph.math('FRACT', climb), 'temper': temper}
+
+
+def base_adularia_milk(graph):
+    """Moonstone lens: milky feldspar in a soft cloud, a broad band of glow drifting across it, faint cleavage square to itself."""
+    cloud = stretched(graph, graph.noise(3, 3, seed=822, detail=3, roughness=0.45))
+    glow = graph.smooth(adularia_band_of(graph), 0.6, 0.95)
+    warp = graph.noise(2, 2, seed=821, detail=2)
+    level = graph.smooth(graph.math('ABSOLUTE', graph.periodic(slanted(graph, 0, 6, warp, 0.15), 1.0)), 0.02, 0.0)
+    upright = graph.smooth(graph.math('ABSOLUTE', graph.periodic(slanted(graph, 6, 0, warp, 0.15), 1.0)), 0.015, 0.0)
+    tone = graph.minus(around_half(graph, cloud, 0.45), 0.07)
+    tone = graph.plus(tone, graph.mul(glow, 0.2))
+    return graph.minus(tone, graph.mul(graph.math('MAXIMUM', level, upright), 0.1))
+
+
+def adularia_band_of(graph):
+    """The adularescence: one slow bent band per cell across the diagonal, 1 on its crest, 0 in its trough."""
+    warp = graph.noise(2, 2, seed=821, detail=2)
+    return graph.mul_add(graph.math('SINE', graph.mul(slanted(graph, 1, 1, warp, 0.8), 2.0 * math.pi)), 0.5, 0.5)
+
+
+def base_cubic_cleavage(graph):
+    """Galena cube: fine steel grain with a satin weave, laid level in one block and upright in the next, cut by square cleavage cracks."""
+    weave = galena_weave_of(graph)
+    cracks = graph.mul(graph.smooth(block_edge(graph, weave['blocks']), 0.022, 0.0),
+                       graph.smooth(stretched(graph, graph.noise(5, 5, seed=833, detail=2)), 0.3, 0.5))
+    tone = around_half(graph, weave['fibre'], 0.35)
+    # Level blocks darker than upright ones: the checker still reads at 22 px a tile, where tin gravel's grains blur.
+    tone = graph.plus(tone, graph.mul(graph.minus(weave['upright'], 0.5), 0.2))
+    tone = graph.plus(tone, graph.mul(graph.minus(block_random(graph, weave['blocks'], 834), 0.5), 0.1))
+    return graph.minus(graph.plus(tone, 0.03), graph.mul(cracks, 0.36))
+
+
+GALENA_BLOCKS = 4
+
+
+def galena_weave_of(graph):
+    """The cleavage blocks and the satin fibre in them: level fibres in one block, upright in the next, as a checker."""
+    blocks = lattice_of(graph, GALENA_BLOCKS, GALENA_BLOCKS)
+    upright = graph.math('FLOORED_MODULO', graph.plus(blocks['column'], blocks['row']), 2.0)
+    level_fibre = stretched(graph, graph.noise(4, 64, seed=831, detail=3))
+    upright_fibre = stretched(graph, graph.noise(64, 4, seed=832, detail=3))
+    fibre = graph.mul_add(graph.minus(upright_fibre, level_fibre), upright, level_fibre)
+    return {'blocks': blocks, 'upright': upright, 'fibre': fibre}
+
+
+
 def base_peat_crumb(graph):
     """Bog iron: crumbly ore dug wet from peat, each crumb its own tone, dark rootlet fibres through it and rusty mottles."""
     crumbs = graph.voronoi(16, 16, seed=701)
@@ -1386,6 +1476,40 @@ def sheen_slick(graph):
     smears = graph.smooth(stretched(graph, graph.noise(2, 16, seed=791, detail=3)), 0.58, 0.8)
     broad = graph.smooth(stretched(graph, graph.noise(2, 2, seed=792, detail=2)), 0.4, 0.8)
     return graph.plus(graph.mul(smears, 0.7), graph.mul(broad, 0.16))
+
+def sheen_fleck_glints(graph):
+    """Fleck glints (cobalt bloom): the blooms stay earthy, but sharp glints spark where their flecks meet the lamp, gathered in the blooms."""
+    # Sprinkled, not a Voronoi distance: a 4D distance seldom gets small, so its glints barely show (ticket 595).
+    glints = sprinkled(graph, 30, 805, 0.32, 0.45)
+    blooms = cobalt_blooms_of(graph)
+    return graph.plus(graph.mul(graph.mul(glints, graph.mul_add(blooms, 0.6, 0.4)), 0.85), graph.mul(blooms, 0.1))
+
+
+def sheen_step_edge_flash(graph):
+    """Step-edge flash (bismuth stair): a bright line on the lip of every tread, and whole treads flashing where their film meets the lamp."""
+    stairs = bismuth_stairs_of(graph)
+    lip = graph.smooth(stairs['rise'], 0.12, 0.0)
+    flash = graph.smooth(stairs['temper'], 0.8, 0.9)
+    return graph.plus(graph.mul(lip, 0.5), graph.mul(flash, 0.3))
+
+
+def sheen_schiller_glow(graph):
+    """Schiller glow (moonstone lens): the billowing light adularia floats across the face on the base's band, soft, never a hard glint."""
+    billow = graph.smooth(stretched(graph, graph.noise(4, 4, seed=823, detail=3)), 0.25, 0.75)
+    glow = graph.smooth(adularia_band_of(graph), 0.55, 0.98)
+    return graph.mul(graph.mul(glow, graph.mul_add(billow, 0.5, 0.5)), 0.5)
+
+
+def sheen_satin_streaks(graph):
+    """Satin streaks (galena cube): a soft fibrous shimmer along each block's grain, and a few cleavage faces flashing whole."""
+    weave = galena_weave_of(graph)
+    shimmer = graph.smooth(weave['fibre'], 0.55, 0.8)
+    flash = graph.mul(graph.smooth(block_random(graph, weave['blocks'], 835), 0.86, 0.9),
+                      graph.smooth(block_edge(graph, weave['blocks']), 0.03, 0.06))
+    return graph.plus(graph.mul(shimmer, 0.32), graph.mul(flash, 0.5))
+
+
+
 def sheen_damp_dull(graph):
     """Damp dull: bog ore drinks the light; a faint wet sheen in the low hollows and a few motes on the rust."""
     damp = graph.smooth(stretched(graph, graph.noise(3, 3, seed=751, detail=3)), 0.6, 0.85)
@@ -2253,6 +2377,75 @@ def vein_flake_books(rng, body):
         loose = shapes.add_prism('loose-%d' % i, rng.uniform(0.035, 0.045), 0.007, (x, -0.01, z),
                                  rotation=(math.pi / 2 + rng.uniform(-0.3, 0.3), rng.uniform(0, math.pi / 3), 0.0), sides=6)
         marks.append(loose)
+
+def vein_fleck_drifts(rng, body):
+    """Cobalt bloom: blue flecks in three drifts, each a trail of small flat chips tipped every way, thickest at its head."""
+    marks = []
+    for drift, ((x, z), angle, count) in enumerate((((-0.16, 0.16), -0.4, 12), ((0.1, -0.02), 0.5, 10), ((-0.1, -0.22), 0.1, 8))):
+        for i in range(count):
+            share = i / count
+            reach = 0.2 * share
+            spread = 0.025 * (1.0 + share)
+            at = (x + math.cos(angle) * reach + rng.uniform(-spread, spread), -0.006,
+                  z + math.sin(angle) * reach + rng.uniform(-spread, spread))
+            size = rng.uniform(0.03, 0.045) * (1.0 - 0.45 * share)
+            fleck = shapes.add_cube('fleck-%d-%d' % (drift, i), size, at, scale=(1.0, 0.25, rng.uniform(0.5, 0.9)),
+                                    rotation=(rng.uniform(-0.6, 0.6), rng.uniform(0, math.tau), rng.uniform(-0.6, 0.6)))
+            marks.append(fleck)
+    return assign_all(marks, body)
+
+
+def vein_stair_crystals(rng, body):
+    """Bismuth stair: three little stairs of flat treads, each stepped up and over from the one below, a raised rim on every tread."""
+    marks = []
+    for stair, ((x, z), across, steps) in enumerate((((-0.3, -0.06), 1, 4), ((-0.02, -0.32), 1, 4), ((0.28, 0.06), -1, 3))):
+        turn = rng.uniform(-0.15, 0.15)
+        for step in range(steps):
+            width, height = 0.1 - 0.008 * step, 0.06
+            at = (x + across * step * 0.068, -0.012 * (step + 1), z + step * height)
+            tread = shapes.add_cube('tread-%d-%d' % (stair, step), 1.0, at, scale=(width, 0.024, height), rotation=(0.0, turn, 0.0))
+            rim = shapes.add_cube('rim-%d-%d' % (stair, step), 1.0, (at[0], at[1] - 0.012, at[2] + height * 0.4),
+                                  scale=(width, 0.01, height * 0.18), rotation=(0.0, turn, 0.0))
+            for mark in (tread, rim):
+                shapes.bevel(mark, 0.002, segments=1)
+            marks += [tread, rim]
+    return assign_all(marks, body)
+
+
+def vein_lenticle_scatter(rng, body):
+    """Moonstone lens: loose lens-shaped stones lying apart, each a flat biconvex almond, the big ones with a small lens on the shoulder."""
+    marks = []
+    for i, (x, z) in enumerate(shapes.scatter_positions(rng, 6, 0.25, 0.15)):
+        radius, angle = rng.uniform(0.06, 0.1), rng.uniform(0, math.pi)
+        lens = shapes.add_icosphere('lens-%d' % i, radius, (x, -0.005, z), subdivisions=3,
+                                    scale=(1.0, 0.3, 0.55), rotation=(0.0, angle, 0.0))
+        marks.append(lens)
+        if radius > 0.08:
+            at = (x + math.cos(angle) * radius * 0.6, -0.025, z - math.sin(angle) * radius * 0.6 + radius * 0.3)
+            marks.append(shapes.add_icosphere('shoulder-%d' % i, radius * 0.45, at, subdivisions=3,
+                                              scale=(1.0, 0.3, 0.55), rotation=(0.0, angle + 0.6, 0.0)))
+    return assign_all(marks, body)
+
+
+def vein_dice_cubes(rng, body):
+    """Galena cube: heavy cubes square as dice, four sat square to the face in a cluster, one fallen on its edge, two small ones apart."""
+    marks = []
+    cluster = (((-0.15, 0.13), 0.15), ((0.02, 0.12), 0.13), ((-0.13, -0.04), 0.12), ((0.03, -0.03), 0.1))
+    for i, ((x, z), size) in enumerate(cluster):
+        cube = shapes.add_cube('die-%d' % i, size, (x, -size * 0.3, z), rotation=(0.0, rng.uniform(-0.08, 0.08), 0.0))
+        shapes.bevel(cube, size * 0.03, segments=1)
+        marks.append(cube)
+    fallen = shapes.add_cube('fallen', 0.11, (0.2, -0.04, -0.2), rotation=(0.0, 0.2, math.pi / 4))
+    shapes.bevel(fallen, 0.004, segments=1)
+    marks.append(fallen)
+    for i, ((x, z), size) in enumerate((((0.24, 0.2), 0.06), ((-0.24, -0.25), 0.07))):
+        small = shapes.add_cube('small-%d' % i, size, (x, -size * 0.3, z), rotation=(0.0, rng.uniform(-0.3, 0.3), 0.0))
+        shapes.bevel(small, size * 0.04, segments=1)
+        marks.append(small)
+    return assign_all(marks, body)
+
+
+
 def vein_limonite_clods(rng, body):
     """Bog iron: soft rounded clods of limonite heaped low on the face, knobbly with small lumps stuck on, a few crumbs fallen off."""
     marks = []
@@ -2513,6 +2706,10 @@ BASES = {
     'gravel-bed': base_gravel_bed,
     'sulphur-crumb': base_sulphur_crumb,
     'graphite-smear': base_graphite_smear,
+    'bloom-rosettes': base_bloom_rosettes,
+    'oxide-stairs': base_oxide_stairs,
+    'adularia-milk': base_adularia_milk,
+    'cubic-cleavage': base_cubic_cleavage,
     'peat-crumb': base_peat_crumb,
     'bloom-crust': base_bloom_crust,
     'dew-beads': base_dew_beads,
@@ -2569,6 +2766,10 @@ SHEENS = {
     'grain-caps': sheen_grain_caps,
     'sugary': sheen_sugary,
     'slick': sheen_slick,
+    'fleck-glints': sheen_fleck_glints,
+    'step-edge-flash': sheen_step_edge_flash,
+    'schiller-glow': sheen_schiller_glow,
+    'satin-streaks': sheen_satin_streaks,
     'damp-dull': sheen_damp_dull,
     'bloom-sparkle': sheen_bloom_sparkle,
     'dew-glints': sheen_dew_glints,
@@ -2625,6 +2826,10 @@ VEINS = {
     'rivet-grains': vein_rivet_grains,
     'crumbled-masses': vein_crumbled_masses,
     'flake-books': vein_flake_books,
+    'fleck-drifts': vein_fleck_drifts,
+    'stair-crystals': vein_stair_crystals,
+    'lenticle-scatter': vein_lenticle_scatter,
+    'dice-cubes': vein_dice_cubes,
     'limonite-clods': vein_limonite_clods,
     'globular-tufts': vein_globular_tufts,
     'needle-sheaves': vein_needle_sheaves,

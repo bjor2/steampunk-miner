@@ -43,14 +43,15 @@ LIGHT_LUMA_SHARE = 0.5
 # material, of the foothold-p3 pool; #601 is P4 slots 1 to 5 and #603 its slots 11 to 15 and the
 # planet's signature material; #604 is P5 slots 1 to 5 and #605 its slots 6 to 10, of the
 # foothold-p5 pool; #595 is P2 slots 1 to 5, of the foothold-p2 pool, which binds the legacy
-# slots), named `p<planet>-b<n>`, in slot order. A batch is measured against all of its planet's
-# other batches (`planet_mates`). A batch's `signature` is the planet whose signature skin row it
-# adds.
+# slots, and #596 its slots 6 to 9, the four uncommons), named `p<planet>-b<n>`, in slot order. A
+# batch is measured against all of its planet's other batches (`planet_mates`). A batch's
+# `signature` is the planet whose signature skin row it adds.
 BATCHES = {
     'p1-b1': {'pool': 'legacy', 'slots': ('legacy.c1', 'legacy.c2', 'legacy.c3', 'legacy.c4', 'legacy.c5')},
     'p1-b2': {'pool': 'legacy', 'slots': ('legacy.u1', 'legacy.u2', 'legacy.u3', 'legacy.u4', 'legacy.r1')},
     'p1-b3': {'pool': 'legacy', 'slots': ('legacy.r2', 'legacy.r3')},
     'p2-b1': {'pool': 'foothold-p2', 'slots': ('legacy.c1', 'legacy.c2', 'legacy.c3', 'legacy.c4', 'legacy.c5')},
+    'p2-b2': {'pool': 'foothold-p2', 'slots': ('legacy.u1', 'legacy.u2', 'legacy.u3', 'legacy.u4')},
     'p3-b1': {'pool': 'foothold-p3', 'slots': ('mixed.c1', 'mixed.c2', 'mixed.c3', 'mixed.c4', 'mixed.u1')},
     'p3-b2': {'pool': 'foothold-p3', 'slots': ('mixed.u2', 'mixed.u3', 'mixed.r1', 'mixed.r2', 'mixed.r3')},
     'p3-b3': {'pool': 'foothold-p3', 'slots': ('mixed.e1', 'mixed.e2', 'mixed.e3', 'mixed.m1', 'mixed.m2'),
@@ -70,7 +71,9 @@ SIGNATURE_LOOKS = {
 }
 # A colour-change species' shadow end sits on its second colour, not on its own hue: alexandrite is
 # green by lamplight and red by candle, so its ramp runs from raspberry through the green body.
-SHADOW_HUES = {'alexandrite': 335}
+# Bismuth's oxide skin runs through the temper colours, so its shadow sits on magenta under the
+# cyan body (ticket 596).
+SHADOW_HUES = {'alexandrite': 335, 'bismuth-rainbow': 300}
 
 
 def load_skins():

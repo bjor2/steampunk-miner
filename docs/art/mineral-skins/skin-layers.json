@@ -313,6 +313,34 @@
     },
     {
       "kind": "base",
+      "id": "bloom-rosettes",
+      "cell": "cells/base/bloom-rosettes.png",
+      "blend": "blend/base-bloom-rosettes.blend",
+      "wornBy": ["p2-u1"]
+    },
+    {
+      "kind": "base",
+      "id": "oxide-stairs",
+      "cell": "cells/base/oxide-stairs.png",
+      "blend": "blend/base-oxide-stairs.blend",
+      "wornBy": ["p2-u2"]
+    },
+    {
+      "kind": "base",
+      "id": "adularia-milk",
+      "cell": "cells/base/adularia-milk.png",
+      "blend": "blend/base-adularia-milk.blend",
+      "wornBy": ["p2-u3"]
+    },
+    {
+      "kind": "base",
+      "id": "cubic-cleavage",
+      "cell": "cells/base/cubic-cleavage.png",
+      "blend": "blend/base-cubic-cleavage.blend",
+      "wornBy": ["p2-u4"]
+    },
+    {
+      "kind": "base",
       "id": "peat-crumb",
       "cell": "cells/base/peat-crumb.png",
       "blend": "blend/base-peat-crumb.blend",
@@ -691,6 +719,34 @@
     },
     {
       "kind": "vein",
+      "id": "fleck-drifts",
+      "cell": "cells/vein/fleck-drifts.png",
+      "blend": "blend/vein-fleck-drifts.blend",
+      "wornBy": ["p2-u1"]
+    },
+    {
+      "kind": "vein",
+      "id": "stair-crystals",
+      "cell": "cells/vein/stair-crystals.png",
+      "blend": "blend/vein-stair-crystals.blend",
+      "wornBy": ["p2-u2"]
+    },
+    {
+      "kind": "vein",
+      "id": "lenticle-scatter",
+      "cell": "cells/vein/lenticle-scatter.png",
+      "blend": "blend/vein-lenticle-scatter.blend",
+      "wornBy": ["p2-u3"]
+    },
+    {
+      "kind": "vein",
+      "id": "dice-cubes",
+      "cell": "cells/vein/dice-cubes.png",
+      "blend": "blend/vein-dice-cubes.blend",
+      "wornBy": ["p2-u4"]
+    },
+    {
+      "kind": "vein",
       "id": "limonite-clods",
       "cell": "cells/vein/limonite-clods.png",
       "blend": "blend/vein-limonite-clods.blend",
@@ -1066,6 +1122,34 @@
       "cell": "cells/sheen/slick.png",
       "blend": "blend/sheen-slick.blend",
       "wornBy": ["p2-c5"]
+    },
+    {
+      "kind": "sheen",
+      "id": "fleck-glints",
+      "cell": "cells/sheen/fleck-glints.png",
+      "blend": "blend/sheen-fleck-glints.blend",
+      "wornBy": ["p2-u1"]
+    },
+    {
+      "kind": "sheen",
+      "id": "step-edge-flash",
+      "cell": "cells/sheen/step-edge-flash.png",
+      "blend": "blend/sheen-step-edge-flash.blend",
+      "wornBy": ["p2-u2"]
+    },
+    {
+      "kind": "sheen",
+      "id": "schiller-glow",
+      "cell": "cells/sheen/schiller-glow.png",
+      "blend": "blend/sheen-schiller-glow.blend",
+      "wornBy": ["p2-u3"]
+    },
+    {
+      "kind": "sheen",
+      "id": "satin-streaks",
+      "cell": "cells/sheen/satin-streaks.png",
+      "blend": "blend/sheen-satin-streaks.blend",
+      "wornBy": ["p2-u4"]
     },
     {
       "kind": "sheen",
