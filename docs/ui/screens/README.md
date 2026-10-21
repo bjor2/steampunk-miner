@@ -40,7 +40,8 @@ The phones are Chromium emulation (`isMobile`, `hasTouch`) at DPR 1, not shots f
 | `upgrade-bay`   | the Outfitter, opened on the sheet by docking   |
 | `settings`      | the settings, opened from the bay               |
 | `pause-menu`    | the pause menu                                  |
-| `save-page`     | the pause menu's save page                      |
+| `hold`          | the Hold on the sheet, from the Sell bay        |
+| `ledger`        | the Ledger on the sheet, from the pause menu    |
 | `patent-office` | the tech tree as the Patent Office on the sheet |
 | `planet-card`   | the planet card on arrival at planet 25         |
 | `base-sheet`    | the shared sheet on the example's probe tabs    |

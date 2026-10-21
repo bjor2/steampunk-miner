@@ -12,6 +12,7 @@ import { TREE_TEST_IDS } from '../../../src/features/tech-tree/ui/nodeTestIds'
 import { DESIGN_TOKENS } from '../../../src/systems/views/designSystem'
 import { SHEET_UI_IDS } from '../../../src/ui/sheet/sheetIds'
 import { UI_IDS } from '../../../src/ui/ids'
+import { SHEET_UI_IDS } from '../../../src/ui/sheet/sheetIds'
 import {
   boxOf,
   currentCell,
@@ -242,7 +243,7 @@ test.describe('screen matrix: panels held upright (ticket 487)', () => {
     expect(errors).toEqual([])
   })
 
-  test('fits the pause menu and its save page', async ({ page }) => {
+  test('fits the pause menu, and the Ledger its Save game opens on the sheet', async ({ page }) => {
     test.setTimeout(120_000)
     const errors = await openGame(page, currentCell())
     await undock(page)
@@ -251,8 +252,10 @@ test.describe('screen matrix: panels held upright (ticket 487)', () => {
     await expect(page.getByTestId(UI_IDS.pauseMenu)).toBeVisible()
     await expectPanelFits(page, selector)
     await page.getByText('Save game', { exact: true }).last().tap()
-    await expect(page.getByTestId(UI_IDS.pauseMenu)).toHaveAttribute('data-page', 'save')
-    await expectPanelFits(page, selector)
+    // Ticket 688: the save page is the Ledger on the base sheet, and the pause plate gives way.
+    await expect(page.getByTestId(UI_IDS.ledger)).toBeVisible()
+    await expect(page.getByTestId(UI_IDS.pauseMenu)).toHaveCount(0)
+    await expectPanelFits(page, `[data-testid="${SHEET_UI_IDS.baseSheet}"]`)
     expect(errors).toEqual([])
   })
 

@@ -3,9 +3,10 @@
  * root its findings are read under, the parts that pan, and how a fresh game reaches it. A sheet
  * the shared sheet component (#686) or a later ticket adds joins as one row. Today's sheets are the
  * ones the upright panel spec (#487) walks: the Sell bay, the Upgrade bay's Outfitter on the base
- * sheet (#687), the settings, the pause menu and its save page, the tech tree's Patent Office on
- * the base sheet (#687), the planet card and the title menu; and the HUD strip's detail behind the
- * gear button (ticket 684).
+ * sheet (#687), the settings, the pause menu, the tech tree's Patent Office on the base sheet
+ * (#687), the planet card and the title menu; the HUD strip's detail behind the gear button
+ * (ticket 684); and the base sheet's Hold and Ledger (ticket 688: the Sell bay's ore and the pause
+ * menu's save page as were).
  */
 import { expect, type Page } from '@playwright/test'
 import { TREE_TEST_IDS } from '../../../src/features/tech-tree/ui/nodeTestIds'
@@ -48,10 +49,16 @@ export const UI_SHEETS: readonly UiSheet[] = [
     open: openPauseMenu,
   },
   {
-    shot: 'save-page',
-    rootSelector: `[data-testid="${UI_IDS.pauseMenu}"] > *`,
+    shot: 'hold',
+    rootSelector: `[data-testid="${SHEET_UI_IDS.baseSheet}"]`,
     pannedTestIds: [],
-    open: openSavePage,
+    open: openHold,
+  },
+  {
+    shot: 'ledger',
+    rootSelector: `[data-testid="${SHEET_UI_IDS.baseSheet}"]`,
+    pannedTestIds: [],
+    open: openLedger,
   },
   {
     shot: 'patent-office',
@@ -111,10 +118,23 @@ async function openPauseMenu(page: Page): Promise<void> {
   await expect(page.getByTestId(UI_IDS.pauseMenu)).toBeVisible()
 }
 
-async function openSavePage(page: Page): Promise<void> {
+/** The Hold (ticket 688), from the Sell bay's Hold row: its Sell cards act there. */
+export async function openHold(page: Page): Promise<void> {
+  await dockAt(page, 'sell')
+  await page.getByTestId(UI_IDS.sellbayHold).click()
+  await expectSheetOpen(page)
+}
+
+/** The Ledger (ticket 688): the pause menu's Save game opens it on the sheet. */
+export async function openLedger(page: Page): Promise<void> {
   await openPauseMenu(page)
   await page.getByText('Save game', { exact: true }).last().click()
-  await expect(page.getByTestId(UI_IDS.pauseMenu)).toHaveAttribute('data-page', 'save')
+  await expect(page.getByTestId(UI_IDS.ledger)).toBeVisible()
+  await expectSheetOpen(page)
+}
+
+async function expectSheetOpen(page: Page): Promise<void> {
+  await expect(page.getByTestId(SHEET_UI_IDS.baseSheet)).toHaveAttribute('data-transition', 'open')
 }
 
 /** The tech tree is the Patent Office on the base sheet (ticket 687), opened as its HUD button does. */
@@ -147,7 +167,7 @@ export async function openBaseSheet(page: Page): Promise<void> {
     const result = debug.ui.openSheet('example.cards')
     if (!result.ok) throw new Error(result.problems.join('; '))
   })
-  await expect(page.getByTestId(SHEET_UI_IDS.baseSheet)).toHaveAttribute('data-transition', 'open')
+  await expectSheetOpen(page)
 }
 
 /** Ticket 684: the strip's detail, every exact value and word, behind the gear button. */

@@ -343,6 +343,7 @@
         "src/store/checkpoint.ts",
         "src/systems/views/pauseMenuModel.ts",
         "src/ui/pause/**",
+        "src/ui/ledger/**",
         "src/debug/debugSaves.ts",
         "src/data/input/actions.json",
         "src/systems/input/inputRouting.ts",
@@ -360,6 +361,7 @@
         "src/systems/views/pauseMenuModel.ts",
         "src/data/saveMenu/**",
         "src/ui/pause/**",
+        "src/ui/ledger/**",
         "src/debug/debugSaves.ts"
       ],
       "specs": ["e2e/browser/pauseScrap.spec.ts"]
@@ -380,6 +382,7 @@
         "src/ui/kit/MiniGauge.*",
         "src/ui/kit/TitleOneLine.*",
         "src/ui/pause/**",
+        "src/ui/ledger/**",
         "src/ui/title/**"
       ],
       "specs": ["e2e/browser/slotSummary.spec.ts"]
@@ -686,6 +689,8 @@
         "src/ui/platform/**",
         "src/ui/settings/**",
         "src/ui/pause/**",
+        "src/ui/hold/**",
+        "src/ui/ledger/**",
         "src/ui/save/**",
         "src/ui/title/**",
         "src/ui/planet/**",
@@ -757,6 +762,30 @@
       ]
     },
     {
+      "why": "Cargo and saves on the sheet (ticket 688): the kernel tabs, the Hold's Sell cards and their focus stops on the sheet layer, the Sell bay's Hold row, and the pause save page drawn as the Ledger with the pause slice still holding the world and the save flow.",
+      "paths": [
+        "src/ui/hold/**",
+        "src/ui/ledger/**",
+        "src/ui/pause/**",
+        "src/ui/sheet/**",
+        "src/ui/kit/SheetCard*",
+        "src/ui/registries/sheetTabs.ts",
+        "src/ui/platform/SellBayView.tsx",
+        "src/ui/platform/sellBayElements.ts",
+        "src/store/sheetSlice.ts",
+        "src/store/pauseMenuSlice.ts",
+        "src/store/screenModels.ts",
+        "src/store/presentationSlice.ts",
+        "src/debug/debugSheet.ts",
+        "src/systems/views/holdSheet.ts",
+        "src/systems/views/kernelSheetTabIds.ts",
+        "src/systems/views/sellBayModel.ts",
+        "src/systems/views/pauseMenuModel.ts",
+        "src/systems/input/inputRouting.ts"
+      ],
+      "specs": ["e2e/browser/ui/holdLedger.spec.ts"]
+    },
+    {
       "why": "The touch controls held upright (ticket 485): the lower-45% stick zone, a phone's two-row cluster, the tile lane the slot column and the fire tile keep to, and the left-hand mirror.",
       "paths": [
         "src/ui/touch/**",
@@ -780,6 +809,7 @@
         "src/ui/platform/**",
         "src/ui/settings/**",
         "src/ui/pause/**",
+        "src/ui/ledger/**",
         "src/ui/title/**",
         "src/ui/planet/**",
         "src/ui/artefact/**",
