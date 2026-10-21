@@ -1,43 +1,43 @@
 {
   "batch": "p4-b3",
   "tilePx": 22,
-  "rockLuma": 0.312,
+  "rockLuma": 0.289,
   "skins": {
     "clockspring-steel-brassvein": {
       "meanHex": "#808fbb",
       "luma": 0.562,
-      "hueDeg": 225.1,
-      "rockContrast": 1.69
+      "hueDeg": 225.0,
+      "rockContrast": 1.81
     },
     "alexandrite-quartzine": {
       "meanHex": "#629284",
       "luma": 0.51,
       "hueDeg": 162.1,
-      "rockContrast": 1.55
+      "rockContrast": 1.65
     },
     "ichthyosaur-eye-amberbone": {
       "meanHex": "#a8bec2",
       "luma": 0.721,
       "hueDeg": 189.6,
-      "rockContrast": 2.13
+      "rockContrast": 2.27
     },
     "starsteel-brassvein": {
       "meanHex": "#acacc1",
-      "luma": 0.683,
+      "luma": 0.684,
       "hueDeg": 240.0,
-      "rockContrast": 2.03
+      "rockContrast": 2.17
     },
     "painite-quartzine": {
       "meanHex": "#db535e",
       "luma": 0.491,
       "hueDeg": 355.1,
-      "rockContrast": 1.5
+      "rockContrast": 1.6
     },
     "p4-signature": {
       "meanHex": "#55bea6",
       "luma": 0.612,
       "hueDeg": 166.1,
-      "rockContrast": 1.83
+      "rockContrast": 1.95
     }
   },
   "pairs": [
@@ -62,7 +62,7 @@
       "b": "starsteel-brassvein",
       "colourDistance": 0.208,
       "deutanDistance": 0.21,
-      "lumaDifference": 0.121,
+      "lumaDifference": 0.122,
       "textureDifference": 0.105
     },
     {
@@ -94,7 +94,7 @@
       "b": "starsteel-brassvein",
       "colourDistance": 0.389,
       "deutanDistance": 0.305,
-      "lumaDifference": 0.173,
+      "lumaDifference": 0.174,
       "textureDifference": 0.113
     },
     {
@@ -118,7 +118,7 @@
       "b": "starsteel-brassvein",
       "colourDistance": 0.073,
       "deutanDistance": 0.073,
-      "lumaDifference": 0.038,
+      "lumaDifference": 0.037,
       "textureDifference": 0.083
     },
     {
@@ -142,7 +142,7 @@
       "b": "painite-quartzine",
       "colourDistance": 0.554,
       "deutanDistance": 0.423,
-      "lumaDifference": 0.192,
+      "lumaDifference": 0.193,
       "textureDifference": 0.078
     },
     {
@@ -150,7 +150,7 @@
       "b": "p4-signature",
       "colourDistance": 0.365,
       "deutanDistance": 0.099,
-      "lumaDifference": 0.071,
+      "lumaDifference": 0.072,
       "textureDifference": 0.084
     },
     {

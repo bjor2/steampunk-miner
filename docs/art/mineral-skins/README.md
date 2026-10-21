@@ -458,9 +458,9 @@ apatite to 2.43 for platinum). Checked by eye on `p3-b2.phone-x4.png`, `p3-b2.de
 the `p3-b2.scale-x4` copies with `-deutan` and `-gray`. `p3-b1` sits before `p3-b2` in `BATCHES`, so
 this batch's post measures it against p3-b1 and writes the planet strip `p3.scale`.
 
-From `sheets/p4-b3.distinct.json`, at 22 px a tile, on the same stage rock as P1's batches (P1's
-band 3, luma 0.31; `artDirection.json` has no P4 palette). P4 has no other batch yet, so these
-are the batch's own fifteen pairs; the closest eight:
+From `sheets/p4-b3.distinct.json`, at 22 px a tile over P4's band 3 rock (`palette.planet_2`, the
+slate P3 wears too, luma 0.29). P4 has no other batch yet, so these are the batch's own fifteen
+pairs; the closest eight:
 
 <!-- p4-b3-readings -->
 
@@ -485,8 +485,8 @@ greens of the planet: alexandrite is darker (luma 0.51 against 0.61) with raspbe
 asterisk-shaped sixlings, the signature a brighter teal in riveted panels with cogs. Painite is the
 planet's only red so far and clockspring its only mid blue. Under deuteranopia the eye, starsteel
 and the signature all go pale grey (0.07 to 0.13 apart); there the plates and ring, the ripples and
-the panels with their rivet rows keep them apart. Every skin sits above its rock (contrast 1.50 for
-painite to 2.13 for the eye). Checked by eye on `p4-b3.phone-x4.png`, `p4-b3.desktop.png`, the
+the panels with their rivet rows keep them apart. Every skin sits above its rock (contrast 1.60 for
+painite to 2.27 for the eye). Checked by eye on `p4-b3.phone-x4.png`, `p4-b3.desktop.png`, the
 `p4-b3.skins.jpg` sheet and the `p4-b3.scale-x4` copies with `-deutan` and `-gray`.
 
 Known limits: the cells are unlit tone, so a skin does not turn with the vehicle's lamp (the vein's
