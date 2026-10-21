@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-10-21T16:21:08+02:00",
+  "updated_at": "2026-10-21T16:45:16+02:00",
   "caps": {
     "grok": 12,
     "claude": 10,
@@ -354,6 +354,21 @@
     "mode": "on",
     "parallel": 1,
     "list": [
+      {
+        "number": 675,
+        "key": "401-1A",
+        "map": 401,
+        "lane": "remote",
+        "mode": "solo",
+        "state": "ready",
+        "tickets": [
+          670,
+          671,
+          672
+        ],
+        "done": [],
+        "live": 0
+      },
       {
         "number": 660,
         "key": "647-2A",
