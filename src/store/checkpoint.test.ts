@@ -217,9 +217,19 @@ describe('save slots (#401)', () => {
         savedAtMs: wallClockMs,
         formatVersion: SAVE_FORMAT_VERSION,
         generatorVersion: GENERATOR_VERSION,
+        summary: expect.objectContaining({ planetIndex: 1, deepestMetres: 0 }),
       },
     ])
     expect(savedFile().slot).toEqual({ name: 'Autosave', savedAtMs: wallClockMs })
+  })
+
+  it("writes the writing player's slot line summary into the header and still resumes (ticket 703)", async () => {
+    game().dock('sell')
+    await checkpointWrites()
+    const { summary, profile } = savedFile()
+    expect(summary?.money).toBe(profile.players[game().playerId].wallet)
+    expect((await listSaveSlots())[0].summary).toEqual(summary)
+    expect(await loadCheckpoint()).toMatchObject({ slot: 'autosave' })
   })
 
   it('writes a named manual slot beside the autosave and lists the autosave first', async () => {

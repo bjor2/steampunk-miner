@@ -48,6 +48,7 @@ describe('debug saves', () => {
           savedAtMs: WALL_CLOCK_MS,
           formatVersion: SAVE_FORMAT_VERSION,
           generatorVersion: GENERATOR_VERSION,
+          summary: expect.objectContaining({ planetIndex: 1, deepestMetres: 0 }),
         },
       ],
     })

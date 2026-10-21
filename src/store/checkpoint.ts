@@ -39,7 +39,7 @@ import {
   type MigratedSaveSlotReading,
   type SaveMigration,
 } from '../systems/save/saveMigrations'
-import { saveSlotOf, type SaveSlotFile } from '../systems/save/saveSlot'
+import { saveSlotOf, summarisedSaveSlotOf, type SaveSlotFile } from '../systems/save/saveSlot'
 import {
   AUTOSAVE_NAME,
   AUTOSAVE_SLOT,
@@ -143,14 +143,14 @@ function isDockedSaveDue(playerId: string): boolean {
 }
 
 function queueAutosave(target: SaveFolderInstall, place: RunEventPlace): void {
-  queueWrite(target, slotSaveOf(AUTOSAVE_SLOT, nextSaveFile(target, AUTOSAVE_NAME)), place)
+  queueWrite(target, slotSaveOf(AUTOSAVE_SLOT, nextSaveFile(target, AUTOSAVE_NAME, place)), place)
 }
 
 /** The player's save into a manual slot under `name`; an existing save there is replaced. */
 export function saveToManualSlot(slot: SaveSlotKey, name: string, place: RunEventPlace): string[] {
   const problems = manualSaveProblems(slot)
   if (installed === null || problems.length > 0) return problems
-  queueWrite(installed, slotSaveOf(slot, nextSaveFile(installed, name)), place)
+  queueWrite(installed, slotSaveOf(slot, nextSaveFile(installed, name, place)), place)
   return []
 }
 
@@ -164,10 +164,12 @@ function manualSlotProblems(slot: SaveSlotKey): string[] {
   return isManualSlotKey(slot) ? [] : [`${slot} is not a manual slot`]
 }
 
-function nextSaveFile(target: SaveFolderInstall, name: string): SaveSlotFile {
+/** The slot line's summary is the writing player's: only the host writes the world save. */
+function nextSaveFile(target: SaveFolderInstall, name: string, place: RunEventPlace): SaveSlotFile {
   lastEpoch += 1
   const slot: SaveSlotMeta = { name, savedAtMs: target.readWallClockMs() }
-  return saveSlotOf(takeSnapshot(readAuthorityState()), lastEpoch, slot)
+  const snapshot = takeSnapshot(readAuthorityState())
+  return summarisedSaveSlotOf(snapshot, lastEpoch, slot, place.playerId)
 }
 
 /**

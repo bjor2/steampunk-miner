@@ -2,7 +2,9 @@
  * The checkpoint save file (decisions #4 and #12, amended by #12 to one file per slot; #26):
  *
  *   header   formatVersion, slot (name and wall time, #401), snapshotVersion, generatorVersion,
- *            saveEpoch, tick, digest, and the open unlock ids (`savedUnlocks.ts`, #401)
+ *            saveEpoch, tick, digest, the open unlock ids (`savedUnlocks.ts`, #401), and the
+ *            slot line's read-only summary (`saveSlotSummary.ts`, ticket 703; optional, never read
+ *            back into play)
  *   world    the planet as seed + params + the deltas of the chunks play changed, packed into one
  *            table (`packedChunks.ts`, #401 VS2), the platform, the core, combat, the blocks
  *            warning or refilling (#43), loose lava (#113), live blasts and queued power-up terrain
@@ -54,6 +56,7 @@ import { GENERATOR_VERSION } from '../generatorVersion'
 import type { PlanetParams } from '../world/planetParams'
 import { packChunkDeltas, unpackChunkDeltas, type PackedChunks } from './packedChunks'
 import { slotMetaProblems, UNTIMED_AUTOSAVE, type SaveSlotMeta } from './saveSlotIndex'
+import { slotSummaryOf, type SaveSlotSummary } from './saveSlotSummary'
 import { unlocksOnLoad, unlocksToSave } from './savedUnlocks'
 
 /**
@@ -81,6 +84,8 @@ export interface SaveSlotFile extends Omit<SaveSections, 'world'> {
   /** The ids of the schedule rows open when it was written: the host world's (#401). */
   unlocked: string[]
   world: SavedWorldSection
+  /** What the slot line shows of the save (ticket 703); absent on a save written without one. */
+  summary?: SaveSlotSummary
 }
 
 /** The world section as the file holds it: its chunk deltas packed (#401 VS2). */
@@ -140,6 +145,21 @@ export function saveSlotOf(
     world: packedWorldOf(world),
     profile,
   }
+}
+
+/** The file the checkpoint writes: `saveSlotOf` with the slot line's summary of `playerId`. */
+export function summarisedSaveSlotOf(
+  snapshot: SessionSnapshot,
+  saveEpoch: number,
+  slot: SaveSlotMeta,
+  playerId: string,
+): SaveSlotFile {
+  const file = saveSlotOf(snapshot, saveEpoch, slot)
+  return withSlotSummary(file, slotSummaryOf(snapshot.state, playerId))
+}
+
+function withSlotSummary(file: SaveSlotFile, summary: SaveSlotSummary | null): SaveSlotFile {
+  return summary === null ? file : { ...file, summary }
 }
 
 /** The world section with its chunk deltas packed, every other field as it is. */

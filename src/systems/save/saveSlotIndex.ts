@@ -11,9 +11,13 @@
  * The entry carries the file's generator version (ticket 670), so the Load list flags a slot made by
  * another world generator before reading it. An entry kept before then has none: unknown, never
  * flagged on its own. The save format is unchanged: the field is optional on read.
+ *
+ * It carries the header's slot line summary too (ticket 703): absent for a file or a kept entry
+ * written without one, or holding one this build cannot read, which the slot line shows as unknown.
  */
 import { isJsonObject, isWholeNumber } from '../authority/payloadFields'
 import { GENERATOR_VERSION } from '../generatorVersion'
+import { readSlotSummary, type SaveSlotSummary } from './saveSlotSummary'
 
 export const AUTOSAVE_SLOT = 'autosave'
 
@@ -40,6 +44,8 @@ export interface SaveSlotEntry extends SaveSlotMeta {
   formatVersion: number
   /** The world generator the file was made by; null for an entry kept before ticket 670. */
   generatorVersion: number | null
+  /** The header's summary for the slot line; absent when unknown (ticket 703). */
+  summary?: SaveSlotSummary
 }
 
 /** The header fields an entry reads off a save file. */
@@ -50,6 +56,8 @@ export interface SaveSlotHeader {
   /** Null when the file's header holds no whole generator version. */
   generatorVersion: number | null
   world: { planetIndex: number }
+  /** The slot line's summary as the file holds it, read only through `readSlotSummary`. */
+  summary?: unknown
 }
 
 /** How a slot's world generator stands against this build's. */
@@ -85,7 +93,14 @@ export function slotEntryOf(slot: SaveSlotKey, header: SaveSlotHeader): SaveSlot
     savedAtMs: header.slot.savedAtMs,
     formatVersion: header.formatVersion,
     generatorVersion: header.generatorVersion,
+    ...summaryFieldOf(header.summary),
   }
+}
+
+/** The summary as an entry field, omitted when unknown so an entry without one is as it was. */
+function summaryFieldOf(raw: unknown): Pick<SaveSlotEntry, 'summary'> {
+  const summary = readSlotSummary(raw)
+  return summary === undefined ? {} : { summary }
 }
 
 /**
@@ -108,9 +123,11 @@ export function readSlotEntry(raw: unknown): SaveSlotEntry | null {
   if (slotMetaProblems(raw).length > 0) return null
   const wholeFields = [raw.planetIndex, raw.playtimeTicks, raw.formatVersion]
   if (!wholeFields.every(isWholeNumber)) return null
+  const { summary: _kept, ...entry } = raw as unknown as SaveSlotEntry
   return {
-    ...(raw as unknown as SaveSlotEntry),
+    ...entry,
     generatorVersion: wholeNumberOrNull(raw.generatorVersion),
+    ...summaryFieldOf(raw.summary),
   }
 }
 

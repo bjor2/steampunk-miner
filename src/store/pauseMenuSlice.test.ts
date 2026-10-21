@@ -96,6 +96,7 @@ describe('pause menu', () => {
       savedAtMs: WALL_CLOCK_MS,
       formatVersion: SAVE_FORMAT_VERSION,
       generatorVersion: GENERATOR_VERSION,
+      summary: expect.objectContaining({ planetIndex: 1, deepestMetres: 0 }),
     })
     expect(readPauseMenuModel()?.slots[1].title).toBe('Before the deep vein')
     expect(readPauseMenuModel()?.notice).toBe('Saved to slot 2')
