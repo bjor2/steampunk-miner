@@ -1328,6 +1328,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/save/saveSlot.test.ts` | 20 | 16 |
 | `src/systems/save/saveSlotIndex.test.ts` | 8 | 8 |
 | `src/systems/save/saveSlotSections.test.ts` | 3 | 3 |
+| `src/systems/save/saveTextRoundTrip.test.ts` | 3 | 3 |
 | `src/systems/save/saveWriteFailure.test.ts` | 3 | 3 |
 | `src/systems/save/savedUnlocks.test.ts` | 7 | 7 |
 | `src/systems/save/sizedChargeRacks.test.ts` | 3 | 3 |
@@ -1413,7 +1414,8 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/store/platformLoop.test.ts` | 4 | 4 |
 | `src/store/promptDevice.test.ts` | 2 | 2 |
 | `src/store/runSnapshots.test.ts` | 10 | 10 |
-| `src/store/saveKeeping.test.ts` | 14 | 14 |
+| `src/store/saveKeeping.test.ts` | 15 | 15 |
+| `src/store/saveResumeLog.test.ts` | 2 | 2 |
 | `src/store/sliceRun.test.ts` | 7 | 7 |
 | `src/store/slowDeviceChip.test.ts` | 2 | 2 |
 | `src/store/soundUnlockSlice.test.ts` | 4 | 4 |
