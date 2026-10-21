@@ -61,6 +61,7 @@
       "track": "drill_tip",
       "slot": "drill.head",
       "replaces": "drill-bit",
+      "plaque": { "step": "Fitting: {stepName}", "tail": "Fitting: {stepName} · Grade {grade}" },
       "glowSlots": [
         [
           "drill-bit",

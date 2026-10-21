@@ -457,7 +457,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/power-up-core/systems/useRefusals.test.ts` | 3 | 3 |
 | `src/features/power-up-core/systems/useResolution.test.ts` | 12 | 12 |
 
-### `rig-look`: 10 files, 134 tests
+### `rig-look`: 10 files, 141 tests
 
 | File | Tests | Sites |
 | --- | --- | --- |
@@ -468,7 +468,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/rig-look/systems/rigLookArt.test.ts` | 6 | 4 |
 | `src/features/rig-look/systems/rigLookBoiler.test.ts` | 9 | 7 |
 | `src/features/rig-look/systems/rigLookHull.test.ts` | 15 | 9 |
-| `src/features/rig-look/systems/rigLookPlaque.test.ts` | 26 | 14 |
+| `src/features/rig-look/systems/rigLookPlaque.test.ts` | 33 | 17 |
 | `src/features/rig-look/systems/rigLookSource.test.ts` | 13 | 13 |
 | `src/features/rig-look/systems/rigLookTable.test.ts` | 24 | 24 |
 

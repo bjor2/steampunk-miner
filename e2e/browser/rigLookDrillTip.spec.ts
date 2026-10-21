@@ -1,7 +1,8 @@
 /**
  * The drill tip's rig looks in the browser (ticket 579): from 70 purchases each step of
  * `rigLook.json` swaps its part of `vehicle-look-drill-tip` onto the drill head in place of the
- * rig's bit, the tail keeps the top part, and the look leaves the physics world as it was.
+ * rig's bit, the tail keeps the top part, and the look leaves the physics world as it was; the
+ * drill tip plaque names the owned step and grades the tail (#585's template).
  * Asserted through `steampunkDebug`, never pixels; the shots at every step and two tail points,
  * desktop and 360 px, by the rig's tier 1 and tier 3 shape, are written to the test's output
  * folder for review, never compared.
@@ -9,6 +10,7 @@
 import { expect, test, type Page } from '@playwright/test'
 import { VIEW_SHORT_AXIS_MIN_M } from '../../src/constants/scene'
 import type { DebugApi } from '../../src/debug/debugApi'
+import { WORKSHOP_TEST_IDS } from '../../src/features/workshop/ui/testIds'
 
 declare global {
   interface Window {
@@ -19,15 +21,20 @@ declare global {
 const ASSET_ID = 'vehicle-look-drill-tip'
 /** The bare rig, Systems' five steps (#157 comment 6300543785), then two tail points. */
 const LOOKS = [
-  { purchases: 69, part: null },
-  { purchases: 70, part: 'steel-cone' },
-  { purchases: 100, part: 'fluted-bit' },
-  { purchases: 130, part: 'toothed-crown' },
-  { purchases: 190, part: 'gem-set-crown' },
-  { purchases: 280, part: 'aether-cut-crown' },
-  { purchases: 281, part: 'aether-cut-crown' },
-  { purchases: 282, part: 'aether-cut-crown' },
+  { purchases: 69, part: null, fitting: null },
+  { purchases: 70, part: 'steel-cone', fitting: 'Fitting: Steel cone' },
+  { purchases: 100, part: 'fluted-bit', fitting: 'Fitting: Fluted bit' },
+  { purchases: 130, part: 'toothed-crown', fitting: 'Fitting: Toothed crown' },
+  { purchases: 190, part: 'gem-set-crown', fitting: 'Fitting: Gem-set crown' },
+  { purchases: 280, part: 'aether-cut-crown', fitting: 'Fitting: Aether-cut crown' },
+  { purchases: 281, part: 'aether-cut-crown', fitting: 'Fitting: Aether-cut crown · Grade 1' },
+  { purchases: 282, part: 'aether-cut-crown', fitting: 'Fitting: Aether-cut crown · Grade 2' },
 ]
+/** The tail grades the plaque must fit at 360 px (VS on #579): in full to 9999, then cut. */
+const TAIL_GRADES = [1, 101, 9_999, 1_000_000]
+const TOP_STEP = 280
+const FITTING = `[data-testid="${WORKSHOP_TEST_IDS.plaqueFitting('drill_tip')}"]`
+const PLAQUE = '[data-plaque="drill_tip"]'
 const VIEWPORTS = [
   { name: 'desktop', size: { width: 1280, height: 720 } },
   { name: 'phone', size: { width: 360, height: 640 } },
@@ -56,6 +63,26 @@ async function openGame(page: Page): Promise<string[]> {
   await page.waitForFunction(() => window.steampunkDebug !== undefined)
   await page.evaluate((zoom) => window.steampunkDebug!.ui.setZoom(zoom), VIEW_SHORT_AXIS_MIN_M)
   return errors
+}
+
+async function openAtTheWorkshop(page: Page): Promise<string[]> {
+  const errors = await openGame(page)
+  await page.evaluate(() => {
+    const debug = window.steampunkDebug!
+    for (const result of [debug.giveMoney('1e9'), debug.teleportToDock('upgrade')]) {
+      if (!result.ok) throw new Error(result.problems.join('; '))
+    }
+  })
+  await expect(page.locator(PLAQUE)).toBeAttached({ timeout: 60_000 })
+  return errors
+}
+
+/** How far the fitting fact runs past its plaque's right edge, in CSS pixels (0: inside it). */
+async function fittingOverflowOf(page: Page): Promise<number> {
+  const plaque = await page.locator(PLAQUE).boundingBox()
+  const fitting = await page.locator(FITTING).boundingBox()
+  if (plaque === null || fitting === null) throw new Error('the drill tip plaque is not laid out')
+  return Math.max(0, fitting.x + fitting.width - (plaque.x + plaque.width))
 }
 
 function setUpgrade(page: Page, track: string, purchases: number): Promise<void> {
@@ -120,6 +147,29 @@ test.describe('drill tip look (ticket 579)', () => {
   })
 
   for (const viewport of VIEWPORTS) {
+    test(`names the owned step on the plaque and grades the tail, ${viewport.name}`, async ({
+      page,
+    }) => {
+      await page.setViewportSize(viewport.size)
+      const errors = await openAtTheWorkshop(page)
+      for (const { purchases, fitting } of LOOKS) {
+        await setUpgrade(page, 'drill_tip', purchases)
+        if (fitting === null) await expect(page.locator(FITTING)).toHaveCount(0)
+        else await expect(page.locator(FITTING)).toHaveText(fitting)
+      }
+      for (const grade of TAIL_GRADES) {
+        await setUpgrade(page, 'drill_tip', TOP_STEP + grade)
+        await expect(page.locator(FITTING)).toContainText('· Grade ')
+        await page.locator(PLAQUE).scrollIntoViewIfNeeded()
+        expect(await fittingOverflowOf(page), `grade ${grade}`).toBeLessThanOrEqual(1)
+        await test.info().attach(`drill tip grade ${grade}, ${viewport.name}`, {
+          body: await page.screenshot(),
+          contentType: 'image/png',
+        })
+      }
+      expect(errors).toEqual([])
+    })
+
     test(`shoots every step and two tail points at ${viewport.name} size`, async ({ page }) => {
       await page.setViewportSize(viewport.size)
       const errors = await openGame(page)

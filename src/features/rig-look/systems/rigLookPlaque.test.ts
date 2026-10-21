@@ -14,6 +14,18 @@ const HULL_STEPS = [
   [440, 'Filigree armour'],
 ] as const
 
+/** Progression's drill tip names (#157 comment 6300549964) at Systems' thresholds (ticket 579). */
+const DRILL_TIP_STEPS = [
+  [70, 'Steel cone'],
+  [100, 'Fluted bit'],
+  [130, 'Toothed crown'],
+  [190, 'Gem-set crown'],
+  [280, 'Aether-cut crown'],
+] as const
+
+/** The tracks whose look rows carry a plaque template. */
+const PLAQUE_TRACKS: readonly string[] = ['drill_tip', 'boiler', 'hull']
+
 /** The widest plaque fact a 360 px plaque wraps onto its own line (Content's 4-word names). */
 const PHONE_FACT_CHARS_MAX = 44
 
@@ -52,8 +64,29 @@ describe('rig look plaque fact (ticket 585)', () => {
     expect(rigLookPlaqueFactOf('boiler', 17)).toBe('Fitting: Twin-drum boiler · Grade 1')
   })
 
+  it.each(DRILL_TIP_STEPS)('names the owned drill tip step from %i purchases: %s', (from, name) => {
+    expect(rigLookPlaqueFactOf('drill_tip', from - 1)).not.toBe(`Fitting: ${name}`)
+    expect(rigLookPlaqueFactOf('drill_tip', from)).toBe(`Fitting: ${name}`)
+  })
+
+  it('names no drill tip step below 70, then grades the tail above the Aether-cut crown', () => {
+    expect(rigLookPlaqueFactOf('drill_tip', 0)).toBeNull()
+    expect(rigLookPlaqueFactOf('drill_tip', 69)).toBeNull()
+    expect(rigLookPlaqueFactOf('drill_tip', 280)).toBe('Fitting: Aether-cut crown')
+    expect(rigLookPlaqueFactOf('drill_tip', 281)).toBe('Fitting: Aether-cut crown · Grade 1')
+    expect(rigLookPlaqueFactOf('drill_tip', 282)).toBe('Fitting: Aether-cut crown · Grade 2')
+    expect(rigLookPlaqueFactOf('drill_tip', 283)).toBe('Fitting: Aether-cut crown · Grade 3')
+  })
+
+  it('fits the widest drill tip fact at grades 1, 101, 9999 and 1e6 on a 360 px plaque', () => {
+    for (const grade of [1, 101, 9_999, 1_000_000]) {
+      const fact = rigLookPlaqueFactOf('drill_tip', 280 + grade)!
+      expect(fact.length, fact).toBeLessThanOrEqual(PHONE_FACT_CHARS_MAX)
+    }
+  })
+
   it('keeps every track without a plaque template off the plaque', () => {
-    const plain = UPGRADE_IDS.filter((track) => track !== 'hull' && track !== 'boiler')
+    const plain = UPGRADE_IDS.filter((track) => !PLAQUE_TRACKS.includes(track))
     for (const track of plain) {
       for (const n of [0, 1, 100, 1_000, 1_000_000])
         expect(rigLookPlaqueFactOf(track, n)).toBeNull()
@@ -99,7 +132,7 @@ describe('rig look tail grade text', () => {
 })
 
 describe('rig look plaque template checks', () => {
-  it('loads the shipped hull and boiler templates', () => {
+  it('loads the shipped drill tip, boiler and hull templates', () => {
     expect(rigLookTableProblemsOf(RIG_LOOK_TABLE, UPGRADE_IDS)).toEqual([])
   })
 
