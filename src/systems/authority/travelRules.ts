@@ -4,14 +4,16 @@
  * see a half-travelled session.
  *
  * Valid only for a docked vehicle, to the next planet, with at least `coreNeeded` fragments in the
- * bay and the travel fee in the wallet; otherwise it is refused with `not_docked`,
- * `not_next_planet`, `core_short` or `money_short` and nothing changes. It spends exactly the fee
- * and exactly `coreNeeded` fragments (surplus stays banked), moves the session to the new planet's
+ * bay; otherwise it is refused with `not_docked`, `not_next_planet` or `core_short` and nothing
+ * changes. Money never refuses it (ticket 648): the hop costs the clamped fee `travelChargeOf`,
+ * reduced or free when the wallet is short. It spends exactly that charge and exactly `coreNeeded`
+ * fragments (surplus stays banked), moves the session to the new planet's
  * dock site, and logs `travel_started`, `planet_unlocked`, a `feature_unlocked` per schedule row
  * opened on arrival (#88), `planet_entered`, `artefact_cache_spawned` (#46) and a `travel` digest.
  */
-import { travelFee } from '../economy/planetCharges'
-import { sub, toCanonical } from '../money'
+import { planetPriceRow } from '../economy/economyTables'
+import { travelChargeOf } from '../economy/travelCharge'
+import { sub, toCanonical, type Money } from '../money'
 import type { PlanetParams } from '../world/planetParams'
 import { vehicleOf, withWallet, type AuthorityState } from './authorityState'
 import {
@@ -28,7 +30,6 @@ import type { DomainEventBody } from './domainEvent'
 import { notDockedRejection } from './dockRules'
 import { artefactCacheSpawnOf, planetEntryOf, withSessionOnPlanet } from './planetEntry'
 import { noPlanetRejection, planetParamsOf } from './planetOfState'
-import { moneyShortRejection } from './platformServices'
 import { stateDigest } from './stateDigest'
 
 export const TRAVEL_RULES: { readonly travel: CommandRule<'travel'> } = {
@@ -55,7 +56,6 @@ export function travelRefusal(
     () => notDockedRejection(vehicleOf(state, playerId)),
     () => nextPlanetRejection(state, toPlanet),
     () => coreShortRejection(state),
-    () => moneyShortRejection(state.players[playerId].wallet, travelFee(state.planet.index)),
   ])
 }
 
@@ -78,10 +78,15 @@ function coreShortRejection(state: AuthorityState): Rejection | null {
   )
 }
 
-/** The fee and exactly `coreNeeded` fragments, said once in `travel_started`. */
+/** What `Travel` would charge the player now: never above the wallet, so it never refuses. */
+export function travelChargeNow(state: AuthorityState, playerId: string): Money {
+  return travelChargeOf(planetPriceRow(state.planet.index), state.players[playerId].wallet)
+}
+
+/** The charge and exactly `coreNeeded` fragments, said once in `travel_started`. */
 function payForTravel(state: AuthorityState, playerId: string, toPlanet: number): RuleEffect {
   const wallet = state.players[playerId].wallet
-  const fee = travelFee(state.planet.index)
+  const fee = travelChargeNow(state, playerId)
   const coreSpent = coreNeededOf(state.planet) ?? 0
   const paid = withWallet(state, playerId, sub(wallet, fee))
   return {

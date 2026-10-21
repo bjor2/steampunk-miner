@@ -30,11 +30,11 @@ function dockedWith(fragments: number, money = '1000') {
 
 describe('travel', () => {
   it('leaves 7 of 70 fragments, takes exactly the fee and lands on planet 2', () => {
-    const session = dockedWith(70)
+    const session = dockedWith(70, '1e4')
     const events = session.submit(10, travelTo(2))
     expect(session.state().platform.coreBay).toBe(7)
     expect(toCanonical(session.state().players.p1.wallet)).toBe(
-      toCanonical(sub(fromCanonical('1000'), travelFee(1))),
+      toCanonical(sub(fromCanonical('1e4'), travelFee(1))),
     )
     expect(toCanonical(travelFee(1))).toBe('6.075e+1')
     expect(session.state().planet).toEqual({ index: 2, seed: WORLD_SEED, oreRulesVersion: 6 })
@@ -113,11 +113,26 @@ describe('travel', () => {
     expect(canTravel(before, 'p1')).toBe(false)
   })
 
-  it('refuses with money_short below the fee and changes nothing', () => {
+  it('travels free with zero money, and nothing goes negative', () => {
+    const session = dockedWith(70, '0')
+    const events = session.submit(10, travelTo(2))
+    expect(events[0]).toMatchObject({ type: 'TravelStarted', cost: '0e+0' })
+    expect(session.state().planet.index).toBe(2)
+    expect(toCanonical(session.state().players.p1.wallet)).toBe('0e+0')
+  })
+
+  it('travels free below the next on-curve price (1423 on planet 1), keeping the money', () => {
     const session = dockedWith(70, '60.749')
-    const before = session.state()
-    expect(rejectionOf(session.submit(10, travelTo(2)))).toBe('money_short')
-    expect(session.state()).toBe(before)
+    expect(canTravel(session.state(), 'p1')).toBe(true)
+    expect(typesOf(session.submit(10, travelTo(2)))[0]).toBe('TravelStarted')
+    expect(toCanonical(session.state().players.p1.wallet)).toBe('6.0749e+1')
+  })
+
+  it('charges the reduced fee above the next on-curve price, leaving that price in the wallet', () => {
+    const session = dockedWith(70, '1450')
+    const events = session.submit(10, travelTo(2))
+    expect(events[0]).toMatchObject({ type: 'TravelStarted', cost: '2.7e+1' })
+    expect(toCanonical(session.state().players.p1.wallet)).toBe('1.423e+3')
   })
 
   it('refuses with not_docked away from the dock', () => {

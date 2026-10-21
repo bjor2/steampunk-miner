@@ -20,8 +20,7 @@ import type { AuthorityState } from '../authority/authorityState'
 import { coreNeededOf } from '../authority/coreBay'
 import type { RejectionReason } from '../authority/domainEvent'
 import type { PlatformVisualState } from '../authority/platformState'
-import { travelRefusal } from '../authority/travelRules'
-import { travelFee } from '../economy/planetCharges'
+import { travelChargeNow, travelRefusal } from '../authority/travelRules'
 import { travelCommand, undockCommand } from '../platform/platformCommands'
 import type { BayId } from '../world/dockBays'
 import type { UpgradeId } from '../economy/economyDefinition'
@@ -67,7 +66,7 @@ export interface BayHeader {
   platformStateIconId: string
 }
 
-/** `ready`, or the reason the authority refuses `Travel` now (`core_short`, `money_short`, ...). */
+/** `ready`, or the reason the authority refuses `Travel` now (`core_short`, `not_docked`, ...). */
 export type TravelState = 'ready' | RejectionReason
 
 export interface TravelReading {
@@ -157,7 +156,7 @@ function travelReadingOf(state: AuthorityState, playerId: string, isArmed: boole
       reason,
       iconId: buttonIconIdOf('travel'),
     },
-    fee: amountReading(travelFee(state.planet.index)),
+    fee: amountReading(travelChargeNow(state, playerId)),
     fragmentsText: `${state.platform.coreBay} / ${coreNeededOf(state.planet) ?? 0}`,
     state: reason ?? 'ready',
     isArmed,

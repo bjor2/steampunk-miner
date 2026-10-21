@@ -100,7 +100,18 @@ describe('sell bay model', () => {
     })
     session.submit(3, setCoreFragmentsCommand(63))
     const travel = sellBayOf(session).footer.travel!
-    expect(travel).toMatchObject({ state: 'ready', fee: { text: '60.75' } })
+    expect(travel).toMatchObject({ state: 'ready', fee: { text: '0' } })
+  })
+
+  it('shows the fee the hop would charge: the full 60.75 with money to spare, less when short', () => {
+    const session = dockedSession()
+    session.submit(2, setCoreFragmentsCommand(63))
+    session.submit(2, grantMoneyCommand('1e4'))
+    expect(sellBayOf(session).footer.travel).toMatchObject({ fee: { text: '60.75' } })
+    const short = dockedSession()
+    short.submit(2, setCoreFragmentsCommand(63))
+    short.submit(2, grantMoneyCommand('1470'))
+    expect(sellBayOf(short).footer.travel).toMatchObject({ fee: { text: '47' } })
   })
 
   it('submits Travel only from the armed button', () => {
