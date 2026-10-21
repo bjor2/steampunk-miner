@@ -14,10 +14,10 @@ import { cmp, fromFiniteNumber, mul, type BigStat, type Money } from '../money'
 import { metresPerSecondOfStep } from '../vehicle/cutSpeed'
 import { subStepsPerTileAt, ticksPerTile, type DrillStats } from '../vehicle/drillRule'
 import { drillQuantumOnPlanet } from '../vehicle/drillQuantum'
-import { drillTravelOnPlanet } from '../vehicle/travelParity'
+import { bandRockHardnessAt, drillTravelOnPlanet } from '../vehicle/travelParity'
 import { quantaOfUnits } from '../vehicle/energyQuanta'
 import { statsOfVehicle, type VehicleState } from '../vehicle/vehicleState'
-import { coreHardness } from '../economy/oreEconomy'
+import { blockHardness, coreHardness } from '../economy/oreEconomy'
 import { boreQuanta, groundHardnessAt, moveQuanta, moveTicks } from './botWorld'
 import { galleryOf, shaftTileAt, type MineLayout } from './mineLayout'
 import { nextRow } from './tripGoal'
@@ -157,8 +157,10 @@ function galleryTripOf(
     layout.params.planetIndex,
   )
   if (boreTicksHere === null) return null
+  const oreTicks = oreTileTicksOf(stats, layout, band)
+  if (oreTicks === null) return null
   const travel = travelOf(layout, travelSpeedThrough(stats, layout, row), row, boreTicksHere)
-  const gallery = galleryYield(layout, band, boreTicksHere)
+  const gallery = galleryYield(layout, band, { rock: boreTicksHere, ore: oreTicks })
   const tankLeft = tankQuanta * PLANNED_TANK_SHARE - travel.quanta
   return {
     travel,
@@ -178,6 +180,12 @@ function tileTicksOf(drill: DrillStats, hardness: BigStat, planetIndex: number):
   return subSteps === null ? null : subSteps / quantum
 }
 
+/** A tile of the band's own ore: its tier hardness, which the surface layer never softens. */
+function oreTileTicksOf(drill: DrillStats, layout: MineLayout, band: number): number | null {
+  const { planetIndex } = layout.params
+  return tileTicksOf(drill, blockHardness(planetIndex, band), planetIndex)
+}
+
 interface TravelCost {
   ticks: number
   quanta: number
@@ -185,11 +193,12 @@ interface TravelCost {
 
 /**
  * Travel parity on the way to `row` (ticket 553): `max(speedMax, k * cutSpeed)` through the
- * ground at that row, so an engine purchase below the drill's pace plans no gain, as it buys none
- * in the bot's world (`botTravelSpeedOf`).
+ * band rock at that row, so an engine purchase below the drill's pace plans no gain, as it buys
+ * none in the bot's world (`botTravelSpeedOf`). The band's rock, not the cell's: the game's parity
+ * ignores the softer surface layer (ticket 625), and so must the plan.
  */
 function travelSpeedThrough(stats: VehicleStats, layout: MineLayout, row: number): number {
-  const ground = groundHardnessAt(layout.params, shaftTileAt(layout, row))
+  const ground = bandRockHardnessAt(layout.params, shaftTileAt(layout, row))
   const drillTravel = metresPerSecondOfStep(drillTravelOnPlanet(stats, ground, layout.params))
   return Math.max(stats.engine.speedMax, drillTravel)
 }
@@ -221,12 +230,21 @@ interface GalleryYield {
   quantaPerTile: number
 }
 
-function galleryYield(layout: MineLayout, band: number, boreTicksHere: number): GalleryYield {
-  return {
-    unitsPerTile: layout.params.oreDensityBp[band - 1] / BASIS_POINTS,
-    ticksPerTile: boreTicksHere,
-    quantaPerTile: boreQuanta(boreTicksHere),
-  }
+/** Ticks to bore one gallery tile of the row's rock, and one of the band's own ore. */
+interface GalleryTileTicks {
+  rock: number
+  ore: number
+}
+
+/**
+ * A gallery tile's ticks: its rock, and its ore at the band's density. A band's rock and its own
+ * ore are equally hard, so before the surface layer (ticket 625) every tile cost the rock's; in
+ * that layer the rock is soft and the ore keeps its tier hardness, so the ore that pays is dearer.
+ */
+function galleryYield(layout: MineLayout, band: number, ticks: GalleryTileTicks): GalleryYield {
+  const unitsPerTile = layout.params.oreDensityBp[band - 1] / BASIS_POINTS
+  const ticksPerTile = ticks.rock + unitsPerTile * (ticks.ore - ticks.rock)
+  return { unitsPerTile, ticksPerTile, quantaPerTile: boreQuanta(ticksPerTile) }
 }
 
 function oreUnitValue(layout: MineLayout, band: number): Money {

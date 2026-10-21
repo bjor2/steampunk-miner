@@ -1,12 +1,17 @@
 /**
  * What a trip is for (#29): ore from one band, or the planet's core; and which gallery of the mine
- * serves it next. Ore galleries skip the rows that cross the core disc; core galleries are exactly
- * those rows, bored toward the planet's centre and then, if the core still needs it, the other way.
+ * serves it next. Ore galleries are the rows above the core disc; core galleries are exactly the
+ * rows that cross it, bored toward the planet's centre and then, if the core still needs it, the
+ * other way. A band's rows past the core are never an ore goal: reaching them bores the shaft
+ * through every deeper band and the core with the casing of the shallow one. Once the surface
+ * layer (ticket 625) made band 1 cheap, a trip that had bored out its near side kept boring that
+ * way and was crushed in band 2 or 3 before it sold anything.
  */
 import {
   bandOfRow,
   coreSideOf,
   galleryRows,
+  isAboveCore,
   isCoreRow,
   isSideDone,
   openSideOf,
@@ -45,7 +50,7 @@ function shallowestRowOpenOn(
 
 function isGoalRow(layout: MineLayout, row: number, goal: TripGoal): boolean {
   if (goal.kind === 'core') return isCoreRow(layout, row)
-  return !isCoreRow(layout, row) && bandOfRow(layout, row) === goal.band
+  return isAboveCore(layout, row) && bandOfRow(layout, row) === goal.band
 }
 
 export function sideFor(layout: MineLayout, row: number, goal: TripGoal): GallerySide | null {

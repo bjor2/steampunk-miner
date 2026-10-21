@@ -263,6 +263,11 @@ export function isCoreRow(layout: MineLayout, row: number): boolean {
   return row < coreRadiusTiles && row >= -coreRadiusTiles
 }
 
+/** Whether a row lies between the core and the shaft's mouth, on the dock's side of the planet. */
+export function isAboveCore(layout: MineLayout, row: number): boolean {
+  return row >= layout.params.coreRadiusTiles
+}
+
 /** Whether a tile lies in the core disc (#10), whatever the drill has done to it. */
 export function isCoreTileAt(layout: MineLayout, tile: TilePoint): boolean {
   return isCoreTile(layout.params, tile.tx, tile.ty)

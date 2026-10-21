@@ -29,6 +29,7 @@ import { cmp, floor, fromSafeInteger, mul, toSafeInteger, type BigStat } from '.
 import { MM_PER_METRE } from '../../constants/physics'
 import { BAND_COUNT, bandOfTile } from '../world/planetGeometry'
 import type { PlanetParams } from '../world/planetParams'
+import type { TilePoint } from '../world/tileGrid'
 import { cutStepMmOf, metresPerSecondOfStep } from './cutSpeed'
 import { drillQuantumOnPlanet } from './drillQuantum'
 import { subStepsPerTileAt, type DrillStats } from './drillRule'
@@ -124,7 +125,14 @@ export function bandRockHardnessOf(
   params: PlanetParams | null,
 ): BigStat | null {
   if (params === null || vehicle.pose === null) return null
-  const tile = tileOfMillimetres(vehicle.pose.x, vehicle.pose.y)
+  return bandRockHardnessAt(params, tileOfMillimetres(vehicle.pose.x, vehicle.pose.y))
+}
+
+/**
+ * The nominal ground at `tile`: its band's rock, never the cell's own hardness, so the surface
+ * layer (ticket 625) that softens the top cells of a cut leaves travel parity where it was.
+ */
+export function bandRockHardnessAt(params: PlanetParams, tile: TilePoint): BigStat {
   return blockHardness(params.planetIndex, bandOfTile(params, tile.tx, tile.ty))
 }
 

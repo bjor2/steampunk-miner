@@ -922,7 +922,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/bot/noFreeCellRuns.test.ts` | 2 | 2 |
 | `src/systems/bot/paceArrival.test.ts` | 8 | 4 |
 | `src/systems/bot/spreeTargets.test.ts` | 10 | 10 |
-| `src/systems/bot/tripEstimate.test.ts` | 1 | 1 |
+| `src/systems/bot/tripEstimate.test.ts` | 3 | 3 |
 
 ### `constants`
 

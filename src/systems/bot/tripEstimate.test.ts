@@ -1,11 +1,11 @@
 import { describe, expect, it } from 'vitest'
-import { startLevels, type UpgradeLevels } from '../economy/vehicleStats'
+import { onCurveSteps, startLevels, type UpgradeLevels } from '../economy/vehicleStats'
 import { cmp, fromSafeInteger } from '../money'
 import { ticksPerTile } from '../vehicle/drillRule'
 import { vehicleStatsAt } from '../economy/vehicleStats'
 import { dockSiteOf } from '../world/dockSite'
-import { planetParamsFor } from '../world/planetParams'
-import { newMineLayout } from './mineLayout'
+import { freshPlanetParamsFor, planetParamsFor, type PlanetParams } from '../world/planetParams'
+import { bandOfRow, galleryRows, markSideDone, newMineLayout, type MineLayout } from './mineLayout'
 import { bestOrePlan, fullTankMeans } from './tripEstimate'
 
 // The bot's planning model priced at real cells a second (ticket 559, #551 B2): a bored tile takes
@@ -32,3 +32,41 @@ describe('bot trip estimate (ticket 559)', () => {
     expect(cmp(plannedMoneyAt(once), plannedMoneyAt(fresh))).toBeGreaterThan(0)
   })
 })
+
+// Ticket 625: the surface layer softens band 1's top rock, never its ore, and makes the way down
+// cheap enough that a trip could bore on through the core for the same band's far-side rows.
+
+/** The magnetic pace run whose band 1 trip bored on toward the far side and was crushed. */
+const FAR_SIDE_PLANET = 25
+const FAR_SIDE_SEED = 27182
+
+describe('bot trip estimate on the surface layer (ticket 625)', () => {
+  it('plans no trip to a band once its rows above the core are bored out, though the far side has rows', () => {
+    const layout = freshMineOn(freshPlanetParamsFor(FAR_SIDE_SEED, FAR_SIDE_PLANET))
+    boreOutBandAboveCore(layout, BAND_1)
+    const means = fullTankMeans(onCurveSteps(FAR_SIDE_PLANET))
+    expect(bandRowsOf(layout, BAND_1).length).toBeGreaterThan(0)
+    expect(bestOrePlan(layout, means, BAND_1)).toBeNull()
+  })
+
+  it("plans no band 1 trip where the tip scratches the softened rock but not the band's ore", () => {
+    const layout = freshMineOn(freshPlanetParamsFor(83921, 20))
+    expect(bestOrePlan(layout, fullTankMeans(startLevels()), BAND_1)).toBeNull()
+  })
+})
+
+function freshMineOn(params: PlanetParams): MineLayout {
+  return newMineLayout(params, dockSiteOf(params))
+}
+
+function bandRowsOf(layout: MineLayout, band: number): number[] {
+  return galleryRows(layout).filter((row) => bandOfRow(layout, row) === band)
+}
+
+/** Marks both sides of every band row between the core and the surface as bored out. */
+function boreOutBandAboveCore(layout: MineLayout, band: number): void {
+  for (const row of bandRowsOf(layout, band).filter((row) => row > 0)) {
+    markSideDone(layout, row, 'east')
+    markSideDone(layout, row, 'west')
+  }
+}

@@ -9,7 +9,7 @@ import { leadCeiling } from './botCoreRule'
 import { buyUpgrades } from './botShopping'
 import { createBotSession, type BotSession } from './botSession'
 import { paramsOfSession } from './botWorld'
-import { newMineLayout } from './mineLayout'
+import { bandOfRow, galleryRows, markSideDone, newMineLayout, type MineLayout } from './mineLayout'
 
 const WORLD_SEED = 83921
 /** More money than any planet's tracks can absorb. */
@@ -70,16 +70,33 @@ function shoppedForTheCoreAtTipCapPlanet(): BotSession {
 }
 
 /** Shops with the core as the goal, so the forced core rule leads. */
-function shopForTheCore(session: BotSession): void {
-  const site = dockSiteOfPlanet(session.state().planet)!
+function shopForTheCore(session: BotSession, layout = freshMineOf(session)): void {
   buyUpgrades(session, {
-    layout: newMineLayout(paramsOfSession(session.state()), site),
+    layout,
     isCoreTheGoal: true,
     gunPolicy: 'never',
     hasMetBlastTile: false,
     restockSize: 1,
     chainPolicy: 'click',
   })
+}
+
+function freshMineOf(session: BotSession): MineLayout {
+  return newMineLayout(paramsOfSession(session.state()), dockSiteOfPlanet(session.state().planet)!)
+}
+
+/**
+ * A mine whose band 1 galleries are bored out, so its trips run to the deeper bands. On a fresh
+ * mine since the surface layer (ticket 625) the soft band 1 galleries pay best, and the bot rightly
+ * spends on the hold and the boiler there, where travel is short.
+ */
+function mineWithBandOneBoredOut(session: BotSession): MineLayout {
+  const layout = freshMineOf(session)
+  for (const row of galleryRows(layout).filter((row) => bandOfRow(layout, row) === 1)) {
+    markSideDone(layout, row, 'east')
+    markSideDone(layout, row, 'west')
+  }
+  return layout
 }
 
 describe('bot: shopping at the Upgrade bay', () => {
@@ -107,7 +124,7 @@ describe('bot: shopping at the Upgrade bay', () => {
   // hardest band (planet 2 before #552's per-purchase drill).
   it('buys the engine at the dock while a step still speeds travel in the deeper bands (#418)', () => {
     const session = botArrivedOnCurveAt(ENGINE_STILL_SPEEDS_PLANET)
-    shopForTheCore(session)
+    shopForTheCore(session, mineWithBandOneBoredOut(session))
     expect(isEngineStepWorthZero(session.state(), session.playerId)).toBe(false)
     expect(session.vehicle().levels.engine).toBeGreaterThan(
       onCurveStep('engine', ENGINE_STILL_SPEEDS_PLANET),
