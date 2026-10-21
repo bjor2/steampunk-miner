@@ -14,9 +14,10 @@ describe('HUD debug staging (#500)', () => {
     expect(stagedHudModelOf(QUIET, NO_HUD_STAGING)).toBe(QUIET)
   })
 
-  it('fills the hold and adds the cargo-full status once', () => {
+  it('fills the hold, its bar to the top, and adds the cargo-full status once', () => {
     const staged = stagedHudModelOf(QUIET, { isCargoFull: true, threatOctant: null })
     expect(staged.cargo.isFull).toBe(true)
+    expect(staged.cargo.permille).toBe(1000)
     expect(staged.statuses.secondary.map((status) => status.id)).toEqual(['cargo_full'])
     const again = stagedHudModelOf(staged, { isCargoFull: true, threatOctant: null })
     expect(again.statuses.secondary).toHaveLength(1)

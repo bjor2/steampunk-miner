@@ -717,6 +717,26 @@
       "specs": ["e2e/browser/ui/uiShots.spec.ts"]
     },
     {
+      "why": "The warning layer (ticket 685): the ladder watch and its store slice, the edge glow, the strip's pulsing glyphs and six-icon desktop row, the bells and haptics, the full-hold staging and the phone's edge hazard strip, read through ui.getWarnings().",
+      "paths": [
+        "src/systems/views/warningWatch.ts",
+        "src/systems/views/warningLadder.ts",
+        "src/systems/views/combatStatuses.ts",
+        "src/systems/views/hudCompact.ts",
+        "src/systems/views/hudStaging.ts",
+        "src/systems/views/hazardStripPlace.ts",
+        "src/systems/audio/warnBells.ts",
+        "src/store/warningSlice.ts",
+        "src/store/warningBroadcast.ts",
+        "src/debug/debugWarnings.ts",
+        "src/ui/hud/**",
+        "src/ui/kit/GaugeBar.tsx",
+        "src/ui/kit/GaugeBar.module.css",
+        "src/ui/touch/touchFollowers.ts"
+      ],
+      "specs": ["e2e/browser/hud/warningLayer.spec.ts"]
+    },
+    {
       "why": "The shared sheet (ticket 686): full over a phone with tap-to-reveal cards, docked beside the desktop view, the tab bar in the shared scroll area, Escape and Close. Its rules, store slice, kit parts, dock, stage and debug reads reach the sheet spec and the screenshot suite's sheet row.",
       "paths": [
         "src/ui/sheet/**",

@@ -22,6 +22,7 @@ export const NO_HUD_STAGING: HudStaging = { isCargoFull: false, threatOctant: nu
 
 const OCTANTS = 8
 const SCRIPTED_THREAT_KIND = 'crawler' as const
+const PERMILLE = 1000
 
 export function stagedHudModelOf(model: HudModel, staging: HudStaging): HudModel {
   const withCargo = staging.isCargoFull ? withFullHold(model) : model
@@ -67,7 +68,10 @@ function withFullHold(model: HudModel): HudModel {
         },
         ...statuses.secondary,
       ]
-  return { ...model, cargo: { ...model.cargo, isFull: true }, statuses: { ...statuses, secondary } }
+  // The bar reads full too, so the strip's hatch and the warning ladder see the hold the status
+  // names (ticket 685).
+  const cargo = { ...model.cargo, isFull: true, permille: PERMILLE }
+  return { ...model, cargo, statuses: { ...statuses, secondary } }
 }
 
 function withThreat(model: HudModel, octant: number): HudModel {
