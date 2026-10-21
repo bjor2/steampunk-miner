@@ -74,12 +74,75 @@
     },
     "planets": {
       "radiusRule": { "baseTiles": 300, "lnCoefficient": 175, "lnCoefficientBounds": [150, 200] },
+      "hazardCaps": { "hullShareBp": 500, "energyShareBp": 2500, "diveHullCapBp": 2500 },
+      "hazards": {
+        "rockfall": { "effect": "refill", "hullShareBp": 300 },
+        "firedamp": { "effect": "drain", "energyShareBp": 1500, "ticks": 180 },
+        "spinecrystal": { "effect": "bite", "hullShareBp": 200 },
+        "steamvent": { "effect": "shove", "hullShareBp": 200, "shoveTiles": 3, "ticks": 20 }
+      },
       "rows": [
         { "planet": 1, "pool": "legacy", "radiusTiles": 300, "measuredMinutes": null },
-        { "planet": 2, "pool": "foothold-p2", "radiusTiles": 421, "measuredMinutes": null },
-        { "planet": 3, "pool": "foothold-p3", "radiusTiles": 492, "measuredMinutes": null },
-        { "planet": 4, "pool": "foothold-p4", "radiusTiles": 543, "measuredMinutes": null },
-        { "planet": 5, "pool": "foothold-p5", "radiusTiles": 582, "measuredMinutes": null },
+        {
+          "planet": 2,
+          "pool": "foothold-p2",
+          "radiusTiles": 421,
+          "measuredMinutes": null,
+          "hazard": {
+            "kind": "rockfall",
+            "tag": "Rockfall",
+            "arrivalLine": "Rockfall. Loose scree pours into the cut; mind what hangs above.",
+            "fromDepth": [1, 40],
+            "toDepth": [1, 8],
+            "pocketTiles": 3,
+            "pocketChanceBp": 800
+          }
+        },
+        {
+          "planet": 3,
+          "pool": "foothold-p3",
+          "radiusTiles": 492,
+          "measuredMinutes": null,
+          "hazard": {
+            "kind": "firedamp",
+            "tag": "Firedamp",
+            "arrivalLine": "Firedamp. Sealed gas chokes the boiler when breached; back out.",
+            "fromDepth": [1, 32],
+            "toDepth": [1, 5],
+            "pocketTiles": 3,
+            "pocketChanceBp": 500
+          }
+        },
+        {
+          "planet": 4,
+          "pool": "foothold-p4",
+          "radiusTiles": 543,
+          "measuredMinutes": null,
+          "hazard": {
+            "kind": "spinecrystal",
+            "tag": "Spinecrystal",
+            "arrivalLine": "Spinecrystal. Brittle clusters shatter and score the hull.",
+            "fromDepth": [1, 40],
+            "toDepth": [1, 6],
+            "pocketTiles": 3,
+            "pocketChanceBp": 1000
+          }
+        },
+        {
+          "planet": 5,
+          "pool": "foothold-p5",
+          "radiusTiles": 582,
+          "measuredMinutes": null,
+          "hazard": {
+            "kind": "steamvent",
+            "tag": "Steam vents",
+            "arrivalLine": "Steam vents. A cut vent blasts up the shaft; stand clear of it.",
+            "fromDepth": [1, 48],
+            "toDepth": [1, 7],
+            "pocketTiles": 3,
+            "pocketChanceBp": 400
+          }
+        },
         { "planet": 6, "pool": "foothold-p6-p7", "radiusTiles": 614, "measuredMinutes": null },
         { "planet": 7, "pool": "foothold-p6-p7", "radiusTiles": 641, "measuredMinutes": null },
         { "planet": 8, "radiusTiles": 664, "measuredMinutes": null },

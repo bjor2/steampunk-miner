@@ -25,6 +25,13 @@ export type { EarlierPool, KindRows, KindSlot } from './systems/kindRows'
 export { isSlotLiveInBand, poolOfPlanetUnder } from './systems/kindRows'
 export type { PlanetRow, PlanetRows, RadiusRule } from './systems/planetRows'
 export { radiusTilesOfPlanet } from './systems/planetRows'
+export type { HazardCaps, HazardEffect, HazardKind, HazardKinds } from './systems/hazardKinds'
+export type { DepthFraction, DepthWindowCells, PlanetHazard } from './systems/planetHazards'
+export {
+  CARD_LINE_CHARACTERS,
+  hazardDepthWindowCellsOf,
+  hazardOfPlanet,
+} from './systems/planetHazards'
 export { leadOfCell, leadOfPatch, ORE_LEAD_HOOK_ID, oreLeadHook } from './systems/leadRoll'
 export type { RarityRowSet, RarityRows, RarityTier } from './systems/rarityRows'
 export {
