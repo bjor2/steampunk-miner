@@ -10,10 +10,11 @@
  * shown (#16), so none repeats after a reload, `viewShortAxisMetres` the player's zoom (#39; metres down the screen's height since ticket 484),
  * `musicVolume` and `musicMuted` the music settings (#49), `tvMode` the 10-foot UI with its safe
  * area (#173), `leftHanded` the mirrored touch controls and `haptics` their vibration (#173), and
- * `renderQuality` the render quality knob (ticket 477), set through its own action like the zoom. A
- * file written before the seen-set, the zoom, the music, the #173 settings or the quality knob
- * existed reads as nothing seen, the 12 m default, full music, TV mode and left-handed off, haptics
- * on and the quality on `auto`.
+ * `renderQuality` the render quality knob (ticket 477), set through its own action like the zoom, and
+ * `hasSeenLedgerToast` whether this profile has had the one-time v1 migration toast (ticket 705). A
+ * file written before the seen-set, the zoom, the music, the #173 settings, the quality knob or the
+ * toast flag existed reads as nothing seen, the 12 m default, full music, TV mode and left-handed
+ * off, haptics on, the quality on `auto` and the toast not yet shown.
  *
  * The file notes the `inputMapVersion` its bindings were made for. Bindings from an older map
  * (none noted is version 1) are discarded for the current defaults, never migrated (#40, the Game
@@ -55,6 +56,8 @@ export interface Preferences {
   haptics: boolean
   /** A render quality preset, or `auto` for the device's own lowered as frames drop (ticket 477). */
   renderQuality: RenderQualityChoice
+  /** `Old ledger restored.` has shown once on this profile (ticket 705); it never shows again. */
+  hasSeenLedgerToast: boolean
 }
 
 /** The settings a player toggles one by one (`ui.setPref`); bindings change through rebinding. */
@@ -90,6 +93,7 @@ export const DEFAULT_PREFERENCES: Preferences = {
   leftHanded: false,
   haptics: true,
   renderQuality: 'auto',
+  hasSeenLedgerToast: false,
 }
 
 const TOGGLE_NAMES = ['shake', 'flashes', 'hintsEnabled', 'musicMuted'] as const
@@ -122,6 +126,7 @@ const FILE_FIELDS = [
   'seenHints',
   'viewShortAxisMetres',
   'renderQuality',
+  'hasSeenLedgerToast',
 ]
 
 /** Fields a file from an earlier build may lack; they read as their defaults. */
@@ -135,6 +140,7 @@ const LATER_FIELDS: Pick<
   | 'leftHanded'
   | 'haptics'
   | 'renderQuality'
+  | 'hasSeenLedgerToast'
 > = {
   seenHints: [],
   viewShortAxisMetres: VIEW_SHORT_AXIS_DEFAULT_M,
@@ -144,6 +150,7 @@ const LATER_FIELDS: Pick<
   leftHanded: DEFAULT_PREFERENCES.leftHanded,
   haptics: DEFAULT_PREFERENCES.haptics,
   renderQuality: DEFAULT_PREFERENCES.renderQuality,
+  hasSeenLedgerToast: DEFAULT_PREFERENCES.hasSeenLedgerToast,
 }
 
 /** Only the input map before #40 existed when files did not note their version. */
@@ -251,7 +258,13 @@ function preferenceFileProblems(file: unknown): string[] {
     ...(fields.renderQuality === undefined
       ? []
       : renderQualityChoiceProblems(fields.renderQuality)),
+    ...ledgerToastFlagProblems(fields.hasSeenLedgerToast),
   ]
+}
+
+function ledgerToastFlagProblems(hasSeen: unknown): string[] {
+  if (hasSeen === undefined || typeof hasSeen === 'boolean') return []
+  return [`hasSeenLedgerToast must be true or false, got ${JSON.stringify(hasSeen)}`]
 }
 
 /** Absent is an empty seen-set; present, it lists known hint and transmission ids, once each. */

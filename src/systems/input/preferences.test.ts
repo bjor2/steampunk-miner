@@ -91,6 +91,28 @@ describe('preferences file', () => {
     expect(readPreferences(preferencesText(prefs)).prefs).toEqual(prefs)
   })
 
+  it('reads a file from before the ledger toast flag as not yet shown, and reads back the flag it wrote (ticket 705)', () => {
+    const { hasSeenLedgerToast: _seen, ...older } = DEFAULT_PREFERENCES
+    const text = JSON.stringify({ preferencesVersion: 1, ...older })
+    expect(readPreferences(text)).toMatchObject({
+      prefs: { hasSeenLedgerToast: false },
+      problems: [],
+    })
+    const prefs = { ...DEFAULT_PREFERENCES, hasSeenLedgerToast: true }
+    expect(readPreferences(preferencesText(prefs)).prefs).toEqual(prefs)
+  })
+
+  it('refuses a ledger toast flag that is not true or false', () => {
+    const text = JSON.stringify({
+      ...DEFAULT_PREFERENCES,
+      preferencesVersion: 1,
+      hasSeenLedgerToast: 'yes',
+    })
+    expect(readPreferences(text).problems).toEqual([
+      'hasSeenLedgerToast must be true or false, got "yes"',
+    ])
+  })
+
   it('refuses a render quality that is not auto or a preset', () => {
     const text = JSON.stringify({
       ...DEFAULT_PREFERENCES,

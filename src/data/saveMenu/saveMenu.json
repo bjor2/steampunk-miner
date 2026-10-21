@@ -3,5 +3,6 @@
     "question": "Scrap {slotName}? This can't be undone.",
     "scrap": "Scrap",
     "keep": "Keep"
-  }
+  },
+  "ledgerToast": "Old ledger restored."
 }
