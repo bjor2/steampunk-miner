@@ -316,33 +316,49 @@ as today. The odometer is the only rolling number.
 
 ## 13. Art brief: Blender gauges and frames (#683)
 
-Flat sprites, not models: each asset is a `parts` bake (docs/art-pipeline.md) rendered **at 1x and
-2x** CSS px as PNG for the DOM (`image-set()`, `border-image`), beside the KTX2 the WebGL layers use.
-The `ui-` category is new: #683 adds its derivation to `systems/art/artIds.ts` and the public
-folder `public/assets/ui/<id>/`. Every frame is a **nine-slice** with its insets in the sidecar, so
-one bake fits every size. Colour comes from the three material stops of section 3 baked in; a
-separate **tint mask** (alpha) marks the accent areas, so a planet skin tints them in CSS and the
-brass stays brass. Readable at 360 px means every stroke is at least 1 px at 1x.
+Flat sprites, not models: each asset is a `parts` bake (docs/art-pipeline.md, "UI chrome
+sprites") shipped **at 1x and 2x** CSS px as PNG for the DOM (`image-set()`, `border-image`),
+beside the KTX2 atlas the WebGL layers may use. The `ui-` category derives its ids from the
+`art.*` tokens (`systems/art/uiArt.ts`); the files live under `public/assets/ui/<id>/`. A sprite is
+authored at **one Blender unit per CSS px** and baked at 4 atlas px per CSS px, then box-filtered
+to its two PNGs, so every edge is anti-aliased. Every frame is a **nine-slice** whose insets
+(`insetPx`, one value per axis) the sidecar carries, so one bake fits every size; a frame is
+hollow, and the CSS behind it sets the body colour, so a translucent panel stays translucent.
+Colour is the three material stops of section 3 baked in (highlight up on a bezel, upside down in a
+well); a part with accent areas is `tintable` and ships a separate **tint mask** (alpha), so a
+planet skin colours those areas in CSS and the brass stays brass. Readable at 360 px means every
+stroke is at least 1 px at 1x; the review sheets are in `docs/art/ui-chrome/`.
 
-| Token            | Asset id           | 1x size (px)    | Form                                                     |
-| ---------------- | ------------------ | --------------- | -------------------------------------------------------- |
-| art.gaugeBar     | `ui-gauge-bar`     | 96 x 16         | nine-slice well + bezel, insets 6; fill drawn by CSS     |
-| art.gaugeDial    | `ui-gauge-dial`    | 64 x 64         | parchment face, 240-degree ticks, brass rim; needle CSS  |
-| art.edgeGauge    | `ui-edge-gauge`    | 8 x 64          | vertical nine-slice trough, insets 8; the mark is CSS    |
-| art.odometerDrum | `ui-odometer-drum` | 16 x 240        | ten digits stacked, 24 px each, parchment on iron        |
-| art.sheetFrame   | `ui-frame-sheet`   | 128 x 128       | nine-slice, insets 24, double brass frame, 4 rivets      |
-| art.cardFrame    | `ui-frame-card`    | 96 x 64         | nine-slice, insets 12, single bezel, rivets at corners   |
-| art.tabFrame     | `ui-frame-tab`     | 64 x 32         | nine-slice, insets 8, brass top edge; active variant     |
-| art.scrollRail   | `ui-scroll-rail`   | 8 x 64, 12 x 24 | the rail (vertical nine-slice) and the riveted thumb     |
-| art.slotRing     | `ui-slot-ring`     | 48 x 48         | brass ring over an iron well; cooldown drawn by CSS mask |
-| art.statusPlate  | `ui-status-plate`  | 24 x 24         | the triangle plate behind a status icon (#158 frame)     |
-| art.gearButton   | `ui-gear-button`   | 48 x 48         | a brass gear on a riveted plate, pressed variant         |
+| Token            | Asset id           | Parts and 1x size (px)                                                      | Insets, tint                |
+| ---------------- | ------------------ | --------------------------------------------------------------------------- | --------------------------- |
+| art.gaugeBar     | `ui-gauge-bar`     | 96 x 16: iron well in a 2 px brass bezel; fill is CSS                       | 6 x 6                       |
+| art.gaugeDial    | `ui-gauge-dial`    | 64 x 64: brass rim, face, 240-degree ticks, hub; needle CSS                 | face tintable (`dialFace`)  |
+| art.edgeGauge    | `ui-edge-gauge`    | 8 x 64: vertical trough, brass rails and caps; mark CSS                     | 0 x 8                       |
+| art.odometerDrum | `ui-odometer-drum` | 16 x 240: ten parchment digits, 24 px cells, 0 on top                       |                             |
+| art.sheetFrame   | `ui-frame-sheet`   | 128 x 128: double brass frame, iron band, 4 rivets                          | 24 x 24                     |
+| art.cardFrame    | `ui-frame-card`    | 96 x 64: single bezel over a hairline, corner studs                         | 12 x 12                     |
+| art.tabFrame     | `ui-frame-tab`     | 64 x 32 `ui-frame-tab` and `-active`: brass top edge, 1 px sides, open foot | 8 x 8; active edge tintable |
+| art.scrollRail   | `ui-scroll-rail`   | 8 x 64 `ui-scroll-rail` and 12 x 24 `-thumb` (riveted)                      | 0 x 8 each                  |
+| art.slotRing     | `ui-slot-ring`     | 48 x 48: brass ring over an iron well; cooldown is a CSS mask               | inner ring tintable         |
+| art.statusPlate  | `ui-status-plate`  | 24 x 24: the triangle plate behind a status icon (#158)                     |                             |
+| art.gearButton   | `ui-gear-button`   | 48 x 48 `ui-gear-button` and `-pressed`: gear on a riveted plate            | hub lamp tintable           |
 
-Each bakes with the existing export (`npm run art:export -- <id>`): one mesh per part, origin at the
-sprite's centre, orthographic along +Y, Cycles 1 sample seed 0; the `.blend` under
-`art/blender/<id>/`, its manifest entry `art/assets/<id>.json`, one spec per module
-(`systems/art/uiArt.test.ts`). The placeholder until the bake lands is the CSS frame of section 3,
-so nothing waits on art.
+**Drawing one.** `kit/UiArtTokens.tsx` writes one `:root` rule from the shipped catalogue: for a
+token `gaugeBar`, `--art-gauge-bar` is the `image-set()` of its two files, `--art-gauge-bar-size`
+its 1x size, and on a nine-slice `--art-gauge-bar-slice` and `--art-gauge-bar-width` are the
+`border-image` slice percentages and width; a variant adds its suffix (`--art-tab-frame-active`),
+a tintable part `-tint`. So a frame is
+`border-image: var(--art-sheet-frame) var(--art-sheet-frame-slice) fill / var(--art-sheet-frame-width)`,
+and a skin colour shows through `mask: var(--art-gauge-dial-tint)` over a `background` of the
+skinnable token. A token whose asset is a placeholder writes no variable, and the CSS frame behind
+`var()` stays, so nothing waits on art. The kit dial and scroll area draw theirs; the strip (#684),
+status icons (#685), sheet, tabs and cards (#686) and tool slots (#691) take the rest.
+
+Each bakes with the existing export (`npm run art:export -- <id>`): one mesh per sprite, origin at
+the sprite's centre, orthographic along +Y, Cycles 1 sample seed 0; the `.blend` under
+`art/blender/<id>/`, written first by `scripts/art/author_ui_chrome.py`, its manifest entry
+`art/assets/<id>.json`, the sprite table (`uiSprites`) in `art/asset-rules.json`, one spec per
+module (`systems/art/uiArt.test.ts`).
 
 ## 14. Reuse by data
 

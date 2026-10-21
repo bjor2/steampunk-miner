@@ -42,7 +42,7 @@ src/ui/icons/<id>.svg            vector icons, written by `npm run art:icons` fr
 ```
 
 The category is the id's prefix: `vehicle` (and the vehicle modules, `vehicle-*`), `platform-*`,
-`enemy-*`, `prop-*`, `ground-*` and `casing-*`.
+`enemy-*`, `prop-*`, `ground-*`, `casing-*` and `ui-*` (the DOM's chrome sprites, below).
 
 ## The icon set
 
@@ -715,6 +715,33 @@ the looks from owned state through the rig-look registry (#577).
 `docs/art/rig-look-drill-type/author_drill_type_looks.py` wrote the first version of the `.blend`;
 from then on it is the source. The look table, the reach check and the review renders, at desktop
 and at a 360 px phone's size, are in [docs/art/rig-look-drill-type/](art/rig-look-drill-type/README.md).
+
+## UI chrome sprites
+
+The HUD's gauges, frames and sheet chrome (ticket 683; the brief is
+[docs/ui/design-system.md](ui/design-system.md) section 13) are `parts` assets of the `ui`
+category, one per `art.*` design token (`src/systems/art/uiArt.ts` derives the ids; the sprite
+table `uiSprites` in `art/asset-rules.json` holds each part's 1x size and nine-slice insets). They
+differ from world art in three ways:
+
+- **One Blender unit is one CSS px at 1x.** The sidecar's `sizeM` is the sprite's 1x size and
+  `pxPerMetre.ui` (4) is the bake's supersample, not a density; the texel density rule covers the
+  world categories only (`WORLD_ASSET_CATEGORIES`).
+- **PNG for the DOM.** After the atlas bake, `scripts/art/ui_sprites.py` crops each part's
+  rectangle and box-filters it on premultiplied colour down to the `uiPngScales` (1x and 2x):
+  `public/assets/ui/<id>/<part>.png` and `<part>@2x.png`, beside the KTX2 maps. The lint expects
+  them (`shippedFilesOf`).
+- **Insets and tint.** A part whose object carries an `inset` custom property (one value, or
+  `[x, y]`) is a nine-slice and its sidecar part says `insetPx`; a part with a piece in the
+  `accent` material is `tintable` and also writes `<part>.tint.png` and `<part>.tint@2x.png`, a
+  white image whose alpha is the accent bake, which CSS uses as a mask for a planet skin's colour.
+
+`scripts/art/author_ui_chrome.py` wrote the first version of the eleven files: every sprite is a
+set of flat faces (no lights, no bevels; the albedo bake reads the base colour) in a material of
+the design tokens' three stops, a vertical gradient along the part, upside down for a well, or one
+flat stop. Frames are hollow so the CSS behind them sets the body colour. `kit/UiArtTokens.tsx`
+turns the shipped catalogue into `--art-<token>` custom properties; the review sheets and the
+full file list are in [docs/art/ui-chrome/](art/ui-chrome/README.md).
 
 ## The `parts.json` sidecar, schema 1
 
