@@ -111,7 +111,7 @@ as before. No layer is shared with p1-b1, p1-b2 or within the batch.
 P2's own pool, foothold-p2 (ticket 632, GD lock (b) on #595), binds a species of its own to each of
 the 12 legacy kind slots under ore rules 6. This batch skins its five commons, kind slots 1 to 5. The
 layers come from the species row, as on P1. No layer is shared within the batch or with any other
-planet's batches. P2's slots 6 to 10 and 11 and 12 come with tickets 596 and 597.
+planet's batches. P2's slots 6 to 9 come with ticket 596 (p2-b2), and 10 to 12 with ticket 597.
 
 <!-- p2-b1 -->
 
@@ -146,6 +146,45 @@ planet's batches. P2's slots 6 to 10 and 11 and 12 come with tickets 596 and 597
   stone's own shapes.
 - **Seeds 701 to 792.** P2's later batches keep apart from them.
 - **P2's rock** is `palette.planet_2`, the same slate blue P3 wears (band 3 luma 0.29).
+
+## Batch p2-b2: P2's species 6 to 9 (ticket 596)
+
+The foothold-p2 pool's four uncommons, kind slots 6 to 9 on P2 under ore rules 6. The layers come
+from the species row, as for p2-b1. No layer is shared within the batch or with any other batch.
+Bismuth's shadow sits on magenta (`SHADOW_HUES` in `skin_layers.py`), so its ramp runs through the
+temper colours of its oxide skin into the cyan body, the way alexandrite's runs from its candle red.
+
+<!-- p2-b2 -->
+
+| slot | species | base             | vein               | palette (shadow, body, light)                   | sheen             |
+| ---- | ------- | ---------------- | ------------------ | ----------------------------------------------- | ----------------- |
+| 6    | `p2-u1` | `bloom-rosettes` | `fleck-drifts`     | `cobalt-blue` `#38466e` `#708bdb` `#b8c5ed`     | `fleck-glints`    |
+| 7    | `p2-u2` | `oxide-stairs`   | `stair-crystals`   | `bismuth-rainbow` `#6c4c6c` `#82c5d0` `#c0e2e8` | `step-edge-flash` |
+| 8    | `p2-u3` | `adularia-milk`  | `lenticle-scatter` | `moonstone-milk` `#707072` `#dfe0e5` `#eff0f2`  | `schiller-glow`   |
+| 9    | `p2-u4` | `cubic-cleavage` | `dice-cubes`       | `galena-grey` `#585a5c` `#b0b3b9` `#d8d9dc`     | `satin-streaks`   |
+
+<!-- /p2-b2 -->
+
+- **Species:** cobalt bloom, bismuth stair, moonstone lens and galena cube (`p2-u1` to `p2-u4`).
+- **Bases:** soft round blooms of colour on a dull dark matrix, each brightest at its heart under a
+  powdery fringe and ringed faintly as it grew, with fine flecks between; square stairs climbing to
+  one corner of every block (three blocks by three, so it repeats), each tread its own temper tone,
+  a bright lip and a riser shadow on each; milky feldspar in a soft cloud, a broad bent band of
+  glow drifting across the diagonal, and faint cleavage square to itself; fine steel grain with a
+  satin weave, laid level in one block and upright in the next (four by four), the level blocks
+  darker, cut by square cleavage cracks broken here and there.
+- **Veins:** three drifts of small flat flecks tipped every way, each thickest at its head; three
+  little stairs of flat treads, each stepped up and over from the one below with a raised rim on
+  every tread; six loose lens-shaped stones, flat biconvex almonds lying apart, the big ones with a
+  small lens on the shoulder; four cubes square as dice in a cluster square to the face, one fallen
+  on its edge, and two small ones apart.
+- **Sheens:** fleck glints (the blooms stay earthy, with sharp glints sprinkled mostly over them and
+  a faint wash on their hearts), step-edge flash (a bright line on the lip of every tread, and whole
+  treads flashing at the top of their temper), schiller glow (the base's band of glow, billowing and
+  soft, never a hard glint), satin streaks (a soft shimmer along each block's grain, and a few whole
+  cleavage faces flashing). Each sheen reads its base's field (blooms, stairs, band, weave) through
+  the same seeds, so the light sits on the stone's own shapes.
+- **Seeds 801 to 835**, apart from p2-b1's 701 to 792 and from every other batch's.
 
 ## Batch p3-b1: P3's species 1 to 5 (ticket 598)
 
@@ -630,6 +669,46 @@ grains' distance to their edges, so each grain of tin gravel has its cap. Rust o
 red and sulphur the only yellow, the brightest skin (contrast 2.45). Every skin sits above its rock
 (contrast 1.60 for rust ochre to 2.45 for sulphur). Checked by eye on `p2-b1.phone-x4.png`,
 `p2-b1.desktop.png` and the `p2-b1.scale-x4` copies with `-deutan` and `-gray`.
+
+From `sheets/p2-b2.distinct.json`, at 22 px a tile over P2's band 3 rock (luma 0.29). The first six
+pairs are within the batch; the rest are the closest pairs against p2-b1's skins (the report holds
+all 26):
+
+<!-- p2-b2-readings -->
+
+| pair                               | colour apart | deuteranopia apart | luma apart | texture apart |
+| ---------------------------------- | ------------ | ------------------ | ---------- | ------------- |
+| cobalt vs bismuth                  | 0.306        | 0.383              | 0.203      | 0.081         |
+| cobalt vs moonstone                | 0.606        | 0.641              | 0.372      | 0.086         |
+| cobalt vs galena                   | 0.391        | 0.429              | 0.231      | 0.079         |
+| bismuth vs moonstone               | 0.326        | 0.263              | 0.169      | 0.104         |
+| bismuth vs galena                  | 0.153        | 0.070              | 0.028      | 0.093         |
+| moonstone vs galena                | 0.244        | 0.243              | 0.141      | 0.101         |
+| tin gravel vs galena (least apart) | 0.020        | 0.016              | 0.009      | 0.091         |
+| tin gravel vs bismuth              | 0.144        | 0.072              | 0.019      | 0.087         |
+| slate vs cobalt                    | 0.202        | 0.238              | 0.086      | 0.083         |
+| slate vs bismuth                   | 0.220        | 0.229              | 0.117      | 0.090         |
+| graphite vs cobalt                 | 0.221        | 0.242              | 0.061      | 0.090         |
+| slate vs galena                    | 0.242        | 0.241              | 0.145      | 0.092         |
+
+<!-- /p2-b2-readings -->
+
+The materials table gives galena grey (hue 220, luma 0.70) and tin gravel (hue 205, luma 0.74) one
+colour to the eye, so the closest pair on the planet is galena against tin gravel, and texture has
+to part them. Galena is a checker of satin blocks, level grain against upright, under square-on
+dice. Tin gravel is a mosaic of round grains with dark grit between. The first galena draft gave
+both kinds of block one tone, and at 22 px its weave blurred into the same pale grey as the gravel
+(texture 0.079). The level blocks are now darker than the upright ones, so the checker still shows
+on the phone, and the texture distance is 0.091, as far apart as slate and graphite. Under
+deuteranopia the bismuth's cyan falls toward the two greys (0.07). Its stairs still part it: high
+contrast L-shaped treads in a three-by-three lattice, where galena has a fine four-by-four checker
+and tin gravel has no straight line. Cobalt bloom is the planet's only saturated blue, and moonstone
+its palest skin. The first cobalt draft sat low on its rock (contrast 1.43), because the blooms
+were small on a dark matrix, and its glints read a 4D Voronoi distance that seldom gets small, so
+they hardly showed (the trap p2-b1's grain caps met). The blooms are now wider, and the glints are
+sprinkled. Every skin sits above its rock, with contrast from 1.58 for cobalt bloom to 2.68 for
+moonstone lens. Checked by eye on `p2-b2.phone-x4.png`, `p2-b2.desktop.png`, the `p2-b2.scale-x4`
+copies, and `p2.scale-x4.png` with its `-deutan` and `-gray` copies (P2's nine skins side by side).
 
 From `sheets/p3-b1.distinct.json`, at 22 px a tile over P3's band 3 rock (luma 0.29). It is P3's
 first batch, so these are all ten pairs; its pairs against p3-b2 are in `p3-b2.distinct.json`:
