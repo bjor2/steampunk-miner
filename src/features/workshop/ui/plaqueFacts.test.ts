@@ -61,7 +61,7 @@ describe('workshop: the plaque’s fitting fact', () => {
   })
 
   it('keeps the plaques without a template unchanged at any owned count', () => {
-    for (const id of ['drill_power', 'engine', 'cargo_hold'] as const) {
+    for (const id of ['drill_power', 'engine'] as const) {
       for (const level of [5, 100, 1_000]) {
         const row = { ...rowOf(id), level }
         expect(plaqueFactsOf(row, 'icon-money', null)).toEqual(

@@ -1,0 +1,113 @@
+{
+  "assetId": "vehicle-look-cargo-hold",
+  "schema": 1,
+  "source": {
+    "blend": "art/blender/vehicle-look-cargo-hold/vehicle-look-cargo-hold.blend",
+    "sha256": "b7af853e4b6f650b5cf3d77b02f21272188a0f5552c2fd7d3fa65584d49236d2",
+    "blender": "4.2.9 LTS"
+  },
+  "pxPerMetre": 512,
+  "atlasPx": [
+    256,
+    256
+  ],
+  "maps": {
+    "albedo": "vehicle-look-cargo-hold.albedo.ktx2",
+    "normal": "vehicle-look-cargo-hold.normal.ktx2",
+    "emissive": "vehicle-look-cargo-hold.emissive.ktx2"
+  },
+  "parts": [
+    {
+      "id": "ore-hatch",
+      "tier": 1,
+      "rect": [
+        8,
+        8,
+        113,
+        53
+      ],
+      "sizeM": [
+        0.22,
+        0.102
+      ],
+      "pivotM": [
+        0.075,
+        0.1
+      ],
+      "atM": [
+        0.0,
+        0.0
+      ],
+      "z": 3
+    },
+    {
+      "id": "ore-hopper",
+      "tier": 1,
+      "rect": [
+        8,
+        146,
+        108,
+        53
+      ],
+      "sizeM": [
+        0.21,
+        0.102
+      ],
+      "pivotM": [
+        0.065,
+        0.1
+      ],
+      "atM": [
+        0.0,
+        0.0
+      ],
+      "z": 3
+    },
+    {
+      "id": "plank-crate",
+      "tier": 1,
+      "rect": [
+        137,
+        77,
+        111,
+        53
+      ],
+      "sizeM": [
+        0.215,
+        0.102
+      ],
+      "pivotM": [
+        0.07,
+        0.1
+      ],
+      "atM": [
+        0.0,
+        0.0
+      ],
+      "z": 3
+    },
+    {
+      "id": "riveted-bin",
+      "tier": 1,
+      "rect": [
+        8,
+        77,
+        113,
+        53
+      ],
+      "sizeM": [
+        0.22,
+        0.102
+      ],
+      "pivotM": [
+        0.075,
+        0.1
+      ],
+      "atM": [
+        0.0,
+        0.0
+      ],
+      "z": 3
+    }
+  ]
+}

@@ -639,9 +639,13 @@ origin and is meant to stand in place of the rig's ore hatch on the fore deck, `
 `riveted-bin`. Cargo stays inside the rig's outline (the #576 HS rule), so every look keeps to the
 hatch's own 180 by 72 mm box and the steps differ by material and colour, not by growing the hold;
 the slot sits 28 mm above the lid, so each look carries a 10 mm stay up to it behind the steam ram,
-which covers it through its whole stroke. Nothing registers or draws it yet: the per-track registry
-(#577) names the asset from the track id and the wiring (#581) swaps the part on the slot and runs
-the tail above the top step. `docs/art/rig-look-cargo-hold/author_cargo_hold_looks.py` wrote the
+which covers it through its whole stroke. The wiring
+([#581](https://github.com/bjor2/steampunk-miner/issues/581)) registers it through `r.artAssets`
+from `rigLook.json`'s `lookAssets` and exports it to `public/assets/vehicle/` (4 parts, 256x256);
+each step row names its part with `asset: "vehicle-look-cargo-hold"`, the track's
+`replaces: "hopper"` hides the rig's `t1-hopper` under it, and the look parts join the track's glow
+slots so the tail above the top step paints them. Below 23 purchases nothing is swapped, so
+`ore-hatch` ships unused. `docs/art/rig-look-cargo-hold/author_cargo_hold_looks.py` wrote the
 first version of the `.blend`; from then on it is the source. The part table, the outline check at
 tiers 1 and 3 and the review renders, at desktop and at a 360 px phone's size, are in
 [docs/art/rig-look-cargo-hold/](art/rig-look-cargo-hold/README.md).

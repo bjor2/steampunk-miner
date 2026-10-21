@@ -23,8 +23,15 @@ const DRILL_TIP_STEPS = [
   [280, 'Aether-cut crown'],
 ] as const
 
+/** Progression's cargo hold names (#157 comment 6300549964) at Systems' thresholds (ticket 581). */
+const CARGO_HOLD_STEPS = [
+  [23, 'Plank crate'],
+  [31, 'Ore hopper'],
+  [33, 'Riveted bin'],
+] as const
+
 /** The tracks whose look rows carry a plaque template. */
-const PLAQUE_TRACKS: readonly string[] = ['drill_tip', 'boiler', 'hull']
+const PLAQUE_TRACKS: readonly string[] = ['drill_tip', 'boiler', 'cargo_hold', 'hull']
 
 /** The widest plaque fact a 360 px plaque wraps onto its own line (Content's 4-word names). */
 const PHONE_FACT_CHARS_MAX = 44
@@ -85,6 +92,30 @@ describe('rig look plaque fact (ticket 585)', () => {
     }
   })
 
+  it.each(CARGO_HOLD_STEPS)(
+    'names the owned cargo hold step from %i purchases: %s',
+    (from, name) => {
+      expect(rigLookPlaqueFactOf('cargo_hold', from - 1)).not.toBe(`Fitting: ${name}`)
+      expect(rigLookPlaqueFactOf('cargo_hold', from)).toBe(`Fitting: ${name}`)
+    },
+  )
+
+  it('names no cargo hold step below 23, then grades the tail above the Riveted bin', () => {
+    expect(rigLookPlaqueFactOf('cargo_hold', 0)).toBeNull()
+    expect(rigLookPlaqueFactOf('cargo_hold', 22)).toBeNull()
+    expect(rigLookPlaqueFactOf('cargo_hold', 33)).toBe('Fitting: Riveted bin')
+    expect(rigLookPlaqueFactOf('cargo_hold', 34)).toBe('Fitting: Riveted bin · Grade 1')
+    expect(rigLookPlaqueFactOf('cargo_hold', 35)).toBe('Fitting: Riveted bin · Grade 2')
+    expect(rigLookPlaqueFactOf('cargo_hold', 36)).toBe('Fitting: Riveted bin · Grade 3')
+  })
+
+  it('fits the widest cargo hold fact at grades 1, 101, 9999 and 1e6 on a 360 px plaque', () => {
+    for (const grade of [1, 101, 9_999, 1_000_000]) {
+      const fact = rigLookPlaqueFactOf('cargo_hold', 33 + grade)!
+      expect(fact.length, fact).toBeLessThanOrEqual(PHONE_FACT_CHARS_MAX)
+    }
+  })
+
   it('keeps every track without a plaque template off the plaque', () => {
     const plain = UPGRADE_IDS.filter((track) => !PLAQUE_TRACKS.includes(track))
     for (const track of plain) {
@@ -132,7 +163,7 @@ describe('rig look tail grade text', () => {
 })
 
 describe('rig look plaque template checks', () => {
-  it('loads the shipped drill tip, boiler and hull templates', () => {
+  it('loads the shipped drill tip, boiler, cargo hold and hull templates', () => {
     expect(rigLookTableProblemsOf(RIG_LOOK_TABLE, UPGRADE_IDS)).toEqual([])
   })
 
