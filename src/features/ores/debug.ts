@@ -1,9 +1,13 @@
 /**
  * Read-only debug actions (feature-slices.md 3.14), so e2e specs and balance probes can ask the
  * catalogue for a type and the lead weights without mining one:
- * `steampunkDebug.features.ores.typeOf('crystal', 12)`.
+ * `steampunkDebug.features.ores.typeOf('crystal', 12)`. `.getPlanetLook()` reads the planet shown
+ * now, its row's look and the sky band the kernel draws (ticket 653), for the e2e state assert.
  */
 import type { DebugAction } from '../../debug/debugActionRegistry'
+import { drawnSkyBand } from '../../scene/skyBandPresence'
+import { useGameStore } from '../../store/gameStore'
+import { planetLookOf } from '../../systems/registries/planetLooks'
 import { leadWeights, oreFamilies, oreTypeOf } from './systems/oreCatalogue'
 
 const BANDS = [1, 2, 3, 4, 5]
@@ -25,4 +29,18 @@ function typeOf(familyId: unknown, tier: unknown) {
   return { ok: true as const, ...oreTypeOf(String(familyId), tier as number) }
 }
 
-export const oresDebugActions: Readonly<Record<string, DebugAction>> = { describe, typeOf }
+function getPlanetLook() {
+  const planet = useGameStore.getState().planetTier
+  return {
+    ok: true as const,
+    planet,
+    look: planetLookOf(planet),
+    drawnSkyBandColour: drawnSkyBand()?.look.colour ?? null,
+  }
+}
+
+export const oresDebugActions: Readonly<Record<string, DebugAction>> = {
+  describe,
+  typeOf,
+  getPlanetLook,
+}

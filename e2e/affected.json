@@ -204,7 +204,8 @@
         "e2e/browser/magneticPlanet.spec.ts",
         "e2e/browser/chunkWorker.spec.ts",
         "e2e/browser/renderQuality.spec.ts",
-        "e2e/browser/materialLooks.spec.ts"
+        "e2e/browser/materialLooks.spec.ts",
+        "e2e/browser/planetLooks.spec.ts"
       ]
     },
     {
@@ -456,6 +457,25 @@
         "public/assets/prop/prop-magnetic-field/**"
       ],
       "specs": ["e2e/browser/magneticPlanet.spec.ts", "e2e/browser/render.spec.ts"]
+    },
+    {
+      "why": "Each planet's own look from its registry row (ticket 653): the ores slice's look rows and provider, the kernel's look seam, the shown palette, the sky and the strata tint.",
+      "paths": [
+        "src/features/ores/ores.economy.json",
+        "src/features/ores/debug.ts",
+        "src/features/ores/systems/planetLooks.ts",
+        "src/features/ores/systems/planetLookProvider.ts",
+        "src/features/ores/systems/planetRows.ts",
+        "src/systems/registries/planetLooks.ts",
+        "src/scene/SkyBackground.tsx",
+        "src/scene/terrainStrata.ts"
+      ],
+      "specs": [
+        "e2e/browser/planetLooks.spec.ts",
+        "e2e/browser/magneticPlanet.spec.ts",
+        "e2e/browser/render.spec.ts",
+        "e2e/browser/planetLooks.spec.ts"
+      ]
     },
     {
       "why": "The kernel planet card and the lines the slices add to it (ticket 343).",
