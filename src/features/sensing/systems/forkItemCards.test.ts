@@ -35,9 +35,7 @@ const FORK_NOTE = "Sensing fork: pick Scout or Diviner. The other branch's item 
 describe('sensing fork item cards', () => {
   it('reads the scout pinger with Content’s lines and the fork’s numbers', () => {
     const card = cardAt(SCOUT_PINGER, 0)
-    expect(card.flavour).toBe(
-      'A brass pinger that shouts into the rock and maps whatever shouts back.',
-    )
+    expect(card.flavour).toBe('A brass pinger shouts into the rock and maps whatever shouts back.')
     expect(linesOf(card)).toEqual([
       'Ping: marks lava, ore or open cave in every 4×4 block within 20 cells; never which cell, or what tier',
       'Lasts: marks stay until you dock',

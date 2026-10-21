@@ -71,7 +71,7 @@ export const TERRAIN_FORK: ForkPair = forkPairOf('terrain', [
     iconId: 'node-terrain-shoring-props',
     prereqs: [],
     unlocks: BRACER_FRAME,
-    description: 'Props swing out wherever the rock round you starts to give, and hold it.',
+    description: 'Props swing out wherever the rock starts to give, and hold it.',
     label: 'horizontal',
     marks: BRANCH_LADDERS[BRACER_FRAME],
   },

@@ -20,7 +20,7 @@ export function artefactEntries(): readonly DescribedEntry[] {
   return [
     kernelEntryOf(
       artefactItemOf(ARTEFACT_ID.oreWhisper),
-      'A listening coil that makes nearby ore glow through a skin of rock.',
+      'A listening coil makes nearby ore glow through a skin of rock.',
       [
         fixedLine('Glow range in metres', 'linearInt', () => ORE_WHISPER_RANGE_TILES),
         fixedLine('Sees through rock in metres', 'linearInt', () => ORE_WHISPER_ROCK_TILES),

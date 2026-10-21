@@ -50,14 +50,13 @@ export function serviceEntries(): readonly DescribedEntry[] {
       'Sell the hold, mend the hull and fill the boiler at once.',
       [REPAIRED_HULL, RECHARGED_ENERGY],
     ),
-    kernelEntryOf(
-      KERNEL_ITEMS.refine,
-      'The crucibles smelt a batch of ore so it sells for more than raw.',
-      [refineBatchLine(), REFINE_TIME],
-    ),
+    kernelEntryOf(KERNEL_ITEMS.refine, 'The crucibles smelt a batch of ore to sell above raw.', [
+      refineBatchLine(),
+      REFINE_TIME,
+    ]),
     kernelEntryOf(
       KERNEL_ITEMS.travel,
-      'The Guild ferries the miner and its gear out to the next planet.',
+      'The Guild ferries the miner and its gear to the next planet.',
       [fixedLine('Travel to planet', 'linearInt', nextPlanetOf)],
     ),
   ]
@@ -77,7 +76,7 @@ export function bayEntries(): readonly DescribedEntry[] {
     ),
     kernelEntryOf(
       bayItemOf('refinery'),
-      'A yard of crucibles that smelts ore into refined stock while you dig.',
+      'A yard of crucibles smelts ore into refined stock while you dig.',
       [fixedLine('Refinery slots', 'linearInt', refinerySlotsStart), REFINE_TIME],
     ),
   ]

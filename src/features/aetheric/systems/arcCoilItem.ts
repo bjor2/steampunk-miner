@@ -21,8 +21,7 @@ export const ARC_COIL_ICON_ID = 'item-power-arc-coil'
 export const ARC_COIL_UNLOCK_PLANET: number = FORK_TIER
 
 /** The flavour line: no digits, at most 80 characters, never "rig" (#162 acceptance 1, 2). */
-export const ARC_COIL_DESCRIPTION =
-  'Twin coils on the roof throw a bolt that leaps from one enemy to the next.'
+export const ARC_COIL_DESCRIPTION = 'Twin roof coils throw a bolt that leaps from enemy to enemy.'
 
 export const ARC_COIL_VEHICLE_ITEM: VehicleItem = {
   id: ARC_COIL_ID,

@@ -97,7 +97,7 @@ export const MAGNET_ITEMS: readonly MagnetItem[] = [
     itemId: 'power.lode_clamp',
     name: 'Lode clamp',
     iconId: 'item-power-lode-clamp',
-    description: 'A brass lattice that locks the rock in place for as long as you hold it.',
+    description: 'A brass lattice locks the rock in place while you hold it.',
     familyId: TERRAIN_MAGNETS_FAMILY,
     verb: 'anchor',
     input: 'hold',

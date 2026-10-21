@@ -56,7 +56,7 @@ const FORK_NOTE_LINE: ForkCardLine = {
 const FORK_CARDS: readonly ForkCard[] = [
   {
     itemId: SCOUT_PINGER,
-    flavour: 'A brass pinger that shouts into the rock and maps whatever shouts back.',
+    flavour: 'A brass pinger shouts into the rock and maps whatever shouts back.',
     lines: [
       {
         label: 'Ping',

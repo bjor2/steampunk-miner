@@ -48,7 +48,7 @@ export const SIDE_CUTTER_MARKS: readonly SideCutterMark[] = [
     name: 'Double side cutters',
     // The side cutters' icons until the drill-type art (#622) draws this part.
     iconId: 'item-gear-side-cutters',
-    description: 'A second gear train doubles the flank cutters and widens the bore again.',
+    description: 'A second gear train doubles the flank cutters and widens the bore.',
     node: {
       id: 'tech.drill_gear.side_cutters_mark_2',
       iconId: 'node-drill-gear-side-cutters',

@@ -23,7 +23,7 @@ export const LANTERN_UNLOCK_PLANET: number = FORK_TIER
 
 /** The flavour line: no digits, at most 80 characters, never "rig" (#162 acceptance 1, 2). */
 export const LANTERN_DESCRIPTION =
-  'An aether lantern on the nose lets the hull slip through one cell of ground.'
+  'An aether lantern lets the hull slip through one cell of ground.'
 
 export const LANTERN_VEHICLE_ITEM: VehicleItem = {
   id: LANTERN_ID,

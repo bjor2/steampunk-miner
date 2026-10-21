@@ -17,7 +17,7 @@
       "withoutRig": "lost",
       "attach": "drill.hood",
       "unlockedBy": "tech.extraction.containment_hood",
-      "description": "A chilled hood and canister rack that bottle volatile ore before it vents.",
+      "description": "A chilled hood and canisters that bottle volatile ore before it vents.",
       "lostAs": "vented"
     },
     {
@@ -36,7 +36,7 @@
       "withoutRig": "refused",
       "attach": "hull.front",
       "unlockedBy": "tech.extraction.induction_coil",
-      "description": "A copper coil ring that pulls magnetic ore clean out of the wall."
+      "description": "A copper coil ring that pulls magnetic ore out of the wall."
     },
     {
       "id": "rig.aether_tether",

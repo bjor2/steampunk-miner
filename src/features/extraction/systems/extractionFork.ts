@@ -71,7 +71,7 @@ export const EXTRACTION_FORK: ForkPair = forkPairOf('extraction', [
     iconId: 'item-passive-assay-lens',
     prereqs: [],
     unlocks: PROSPECTOR_SIEVE,
-    description: 'A sieve on the drain: it reads the ore first and takes only the richest grade.',
+    description: 'A sieve on the drain takes only the richest grade of ore.',
     label: 'horizontal',
     marks: BRANCH_LADDERS[PROSPECTOR_SIEVE],
   },

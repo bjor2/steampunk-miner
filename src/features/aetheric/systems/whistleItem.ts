@@ -21,7 +21,7 @@ export const WHISTLE_UNLOCK_PLANET = 15
 
 /** The flavour line: no digits, at most 80 characters, never "rig" (#162 acceptance 1, 2). */
 export const WHISTLE_DESCRIPTION =
-  'A brass whistle on the boiler stack sings a note that calls enemies away.'
+  'A whistle on the boiler stack sings a note calling enemies away.'
 
 export const WHISTLE_VEHICLE_ITEM: VehicleItem = {
   id: WHISTLE_ID,

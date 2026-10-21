@@ -47,7 +47,7 @@ export const DRILL_GEAR_FORK: ForkPair = forkPairOf(LANE, [
     iconId: 'icon-track-drill-power',
     prereqs: [],
     unlocks: GALLERY_REAMERS_ID,
-    description: 'Fluted reamers ride the flanks and carve a broad gallery as you go.',
+    description: 'Fluted reamers on the flanks carve a broad gallery as you go.',
     label: 'horizontal',
     cardNotes: wideBranchNotesOf(
       forkValueOf(GALLERY_REAMERS_ID, 'sideCells'),

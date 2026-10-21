@@ -39,9 +39,9 @@ const MEDIAN_BAND = 3
 const MOUNT_FLAVOUR = 'A brass bore gun punches a line of rock open.'
 
 const TRACK_FLAVOURS: Readonly<Record<GunTrackId, string>> = {
-  rate: 'A quicker breech and a hotter boiler let the bore gun fire again sooner.',
-  penetration: "A tempered bore head drives each shot with more of the drill's own bite.",
-  energy: 'Tighter seals and a leaner valve spend less steam on every cell it opens.',
+  rate: 'A quicker breech and hotter boiler let the bore gun fire sooner.',
+  penetration: "A tempered bore head lends each shot more of the drill's bite.",
+  energy: 'Tighter seals and a leaner valve spend less steam per cell opened.',
 }
 
 export function boreGunCards(): ItemDescriptionEntry[] {

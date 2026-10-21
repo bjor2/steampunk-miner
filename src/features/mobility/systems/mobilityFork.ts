@@ -44,7 +44,7 @@ export const MOBILITY_FORK: ForkPair = forkPairOf(LANE, [
     iconId: 'icon-track-engine',
     prereqs: [],
     unlocks: AIR_TRIM_ID,
-    description: 'Brass vanes catch the updraught, so the miner steers best off the ground.',
+    description: 'Brass vanes catch the updraught, so the miner steers best aloft.',
     label: 'horizontal',
   },
   {
@@ -53,7 +53,7 @@ export const MOBILITY_FORK: ForkPair = forkPairOf(LANE, [
     iconId: 'icon-track-hull',
     prereqs: [],
     unlocks: PLATED_SKIRTS_ID,
-    description: 'Riveted skirts brace the miner low, so it shrugs off blows on solid ground.',
+    description: 'Riveted skirts brace the miner low against blows on solid ground.',
     label: 'horizontal',
   },
 ])
