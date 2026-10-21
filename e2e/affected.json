@@ -131,12 +131,13 @@
       "specs": ["e2e/browser/drillLook.spec.ts", "e2e/browser/render.spec.ts"]
     },
     {
-      "why": "The rig look ladder: every upgrade track's look steps and linear tail, painted as glows on the car's own parts; it paints drill-look's drill_power rows too (ticket 577), and swaps the cargo hold and drill tip parts (tickets 579, 581).",
+      "why": "The rig look ladder: every upgrade track's look steps and linear tail, painted as glows on the car's own parts; it paints drill-look's drill_power rows too (ticket 577), and swaps the cargo hold and drill tip parts (tickets 579, 581); a fitted ground-gun item keeps its own part beside every look (ticket 589).",
       "paths": ["src/features/rig-look/**"],
       "specs": [
         "e2e/browser/rigLook.spec.ts",
         "e2e/browser/rigLookCargoHold.spec.ts",
         "e2e/browser/rigLookDrillTip.spec.ts",
+        "e2e/browser/rigLookGroundGunItems.spec.ts",
         "e2e/browser/drillLook.spec.ts",
         "e2e/browser/render.spec.ts"
       ]
