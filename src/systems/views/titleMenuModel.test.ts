@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest'
+import { GENERATOR_VERSION } from '../generatorVersion'
 import type { SaveSlotEntry } from '../save/saveSlotIndex'
 import {
   isNewGameConfirmNeeded,
@@ -18,6 +19,7 @@ const AUTOSAVE: SaveSlotEntry = {
   playtimeTicks: (42 * 60 + 10) * 60,
   savedAtMs: Date.UTC(2026, 9, 14, 18, 7),
   formatVersion: 2,
+  generatorVersion: GENERATOR_VERSION,
 }
 
 const MANUAL: SaveSlotEntry = {
@@ -27,6 +29,7 @@ const MANUAL: SaveSlotEntry = {
   playtimeTicks: (2 * 3600 + 5) * 60,
   savedAtMs: Date.UTC(2026, 9, 14, 19, 30),
   formatVersion: 2,
+  generatorVersion: GENERATOR_VERSION,
 }
 
 function modelOf(titleMenu: Partial<TitleMenu>) {
@@ -89,6 +92,23 @@ describe('title menu model (ticket 403)', () => {
       { kind: 'loadSlot', slot: 'slot-2' },
       { kind: 'showTitlePage', page: 'main' },
     ])
+  })
+
+  it('flags a slot another generator made before it is loaded, and never an entry that cannot tell', () => {
+    const slots = [
+      { ...AUTOSAVE, generatorVersion: null },
+      MANUAL,
+      { ...MANUAL, slot: 'slot-2' as const, generatorVersion: GENERATOR_VERSION - 1 },
+      { ...MANUAL, slot: 'slot-3' as const, generatorVersion: GENERATOR_VERSION + 1 },
+    ]
+    const model = modelOf({ page: 'load', slots })
+    expect(model.slotRows.map((row) => row.generatorNote)).toEqual([
+      null,
+      null,
+      'Made by an older world generator: it updates as it loads',
+      'Made by a newer build: this build cannot load it',
+    ])
+    expect(model.slotRows.every((row) => row.load.reason === null)).toBe(true)
   })
 
   it('starts the confirm page on Cancel, so a double press never throws a game away', () => {

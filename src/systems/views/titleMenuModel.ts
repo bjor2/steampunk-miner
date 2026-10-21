@@ -3,14 +3,15 @@
  * Game, Continue (the newest slot of the index, disabled with no save) and Load (the slot list,
  * disabled with no save). New Game asks first when any save exists, since the autosave is
  * replaced at the new game's first checkpoint; the named slots stay. The load page lists each slot
- * with its name, planet, playtime and wall time. Local presentation only: nothing here is a
+ * with its name, planet, playtime and wall time, and flags a slot whose world another generator made
+ * (ticket 670) before it is loaded. Local presentation only: nothing here is a
  * command.
  *
  * Its ids live here rather than in `UI_IDS`, as a slice screen's do: the title is not one of the
  * #33 play screens.
  */
-import type { SaveSlotEntry, SaveSlotKey } from '../save/saveSlotIndex'
-import { latestSlotOf } from '../save/saveSlotIndex'
+import type { SaveSlotEntry, SaveSlotKey, SlotGeneratorStanding } from '../save/saveSlotIndex'
+import { latestSlotOf, slotGeneratorStandingOf } from '../save/saveSlotIndex'
 import { TICKS_PER_SECOND } from '../../constants/physics'
 import type { FocusStop } from './menuFocus'
 import { uiButton, type ScreenButton } from './viewParts'
@@ -37,6 +38,8 @@ export interface TitleSlotRow {
   planetText: string
   playtimeText: string
   savedAtText: string
+  /** Why the slot's world is not this build's; null when it is, or when the entry cannot tell. */
+  generatorNote: string | null
   load: ScreenButton
 }
 
@@ -79,6 +82,16 @@ export const TITLE_MENU_ID_TEMPLATES = {
 const SECONDS_PER_MINUTE = 60
 const MINUTES_PER_HOUR = 60
 const MS_PER_MINUTE = 60_000
+/**
+ * An older generator's world is moved on by the migration chain as it loads; a newer one's is
+ * refused by `readSaveSlot`. An entry kept before ticket 670 cannot tell, so it says nothing.
+ */
+const GENERATOR_NOTES: Record<SlotGeneratorStanding, string | null> = {
+  current: null,
+  unknown: null,
+  older: 'Made by an older world generator: it updates as it loads',
+  newer: 'Made by a newer build: this build cannot load it',
+}
 /** `YYYY-MM-DDTHH:MM` of an ISO string. */
 const ISO_MINUTE_LENGTH = 16
 
@@ -178,6 +191,7 @@ function slotRowOf(entry: SaveSlotEntry, sources: TitleMenuSources): TitleSlotRo
     planetText: planetTextOf(entry.planetIndex),
     playtimeText: playtimeTextOf(entry.playtimeTicks),
     savedAtText: savedAtTextOf(entry.savedAtMs, offset),
+    generatorNote: GENERATOR_NOTES[slotGeneratorStandingOf(entry)],
     load: uiButton(TITLE_MENU_ID_TEMPLATES.slotLoad(entry.slot), 'Load', {
       kind: 'loadSlot',
       slot: entry.slot,

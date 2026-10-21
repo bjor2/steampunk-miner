@@ -1326,7 +1326,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/save/saveExactRoundTrip.test.ts` | 9 | 9 |
 | `src/systems/save/saveMigrations.test.ts` | 21 | 20 |
 | `src/systems/save/saveSlot.test.ts` | 20 | 16 |
-| `src/systems/save/saveSlotIndex.test.ts` | 8 | 8 |
+| `src/systems/save/saveSlotIndex.test.ts` | 11 | 11 |
 | `src/systems/save/saveSlotSections.test.ts` | 3 | 3 |
 | `src/systems/save/saveTextRoundTrip.test.ts` | 3 | 3 |
 | `src/systems/save/saveWriteFailure.test.ts` | 3 | 3 |
@@ -1647,7 +1647,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/views/scrollRail.test.ts` | 5 | 5 |
 | `src/systems/views/sellBayModel.test.ts` | 14 | 14 |
 | `src/systems/views/settingsModel.test.ts` | 5 | 5 |
-| `src/systems/views/titleMenuModel.test.ts` | 7 | 7 |
+| `src/systems/views/titleMenuModel.test.ts` | 8 | 8 |
 | `src/systems/views/titleOnlyText.test.ts` | 5 | 5 |
 | `src/systems/views/tooltipOpening.test.ts` | 9 | 9 |
 | `src/systems/views/uiBudgetRatchet.test.ts` | 8 | 8 |

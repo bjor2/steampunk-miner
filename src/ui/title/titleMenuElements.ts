@@ -2,7 +2,7 @@
  * The title menu's text on the shared Title+OneLine element (spec #422, pass #429): the game's
  * name heads every page, a save slot is its name with planet and playtime as glyph plus value and
  * its wall time in the tooltip, the New Game confirm is a title, one line and its warning, kept
- * visible, and a refused load is a title over its problem lines. No word of ticket 403's copy is
+ * visible, a slot another world generator made carries a warning, and a refused load is a title over its problem lines. No word of ticket 403's copy is
  * lost: the confirm's three sentences are now its title, its line and its warning.
  */
 import { HINT_PLAQUE_ICON_ID, hudLabelIconIdOf } from '../../systems/art/icons/iconSet'
@@ -53,5 +53,12 @@ export function titleSlotFactsOf(row: TitleSlotRow): IconValue[] {
   return [
     { iconId: hudLabelIconIdOf('planet'), text: row.planetText },
     { iconId: hudLabelIconIdOf('tile_time'), text: row.playtimeText },
+    ...generatorWarningsOf(row),
   ]
+}
+
+/** A slot another generator made is flagged before Load is pressed (ticket 670), kept visible. */
+function generatorWarningsOf(row: TitleSlotRow): IconValue[] {
+  if (row.generatorNote === null) return []
+  return [{ iconId: HINT_PLAQUE_ICON_ID, text: row.generatorNote, holds: 'warning' }]
 }
