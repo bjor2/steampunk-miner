@@ -1,8 +1,9 @@
 """
 The Blender recipes of the mineral skin layers (#576, ticket 592 for P1's slots 1 to 5, ticket 593
 for its slots 6 to 10, ticket 594 for 11 and 12, ticket 598 for P3's slots 1 to 5, ticket 599 for
-its slots 6 to 10, ticket 603 for P4's slots 11 to 15 and its signature material): one per layer id
-of `mineralSkins.json`. A layer id with no recipe fails, never falls back.
+its slots 6 to 10, ticket 603 for P4's slots 11 to 15 and its signature material, ticket 604 for
+P5's slots 1 to 5): one per layer id of `mineralSkins.json`. A layer id with no recipe fails, never
+falls back.
 
 - `base` and `sheen` are seamless textures on the 1 m cell: an emission material on a 1 m quad
   whose value is the ramp coordinate (base, mean about 0.5) or the highlight strength (sheen,
@@ -22,6 +23,7 @@ import random
 import sys
 
 import bpy
+from mathutils import Vector
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 REPO_ROOT = os.path.abspath(os.path.join(HERE, '..', '..', '..'))
@@ -503,6 +505,118 @@ def riveted_seams(graph, x, z):
     return graph.math('MAXIMUM', across, up)
 
 
+def base_scorched_scale(graph):
+    """Furnace iron: fired iron under flaking heat scale, dark flakes with cracked rims, scorch clouds and a fine grain."""
+    body = stretched(graph, graph.noise(4, 4, seed=601, detail=4, roughness=0.55))
+    scorch = graph.smooth(stretched(graph, graph.noise(2, 2, seed=602, detail=3)), 0.5, 0.8)
+    grain = stretched(graph, graph.noise(70, 70, seed=604, detail=5))
+    flake, rim = heat_scale_of(graph)
+    tone = graph.plus(around_half(graph, body, 0.45), graph.mul(graph.minus(grain, 0.5), 0.14))
+    tone = graph.minus(tone, graph.plus(graph.mul(scorch, 0.16), graph.mul(flake, 0.3)))
+    # Ember agate shares the furnace iron's red (hue slots 0 and 356 at lumas 0.48 and 0.55), so the
+    # cracked crust, with its rims lifted pale, has to tell them apart at a phone's 22 px tile, and
+    # the iron sits a shade under its slot's luma ("comes up warm and black") where the agate's
+    # chalcedony sits a shade over.
+    return graph.plus(graph.plus(tone, graph.mul(rim, 0.3)), 0.05)
+
+
+def heat_scale_of(graph):
+    """
+    The heat scale: two in five cells of a Voronoi field flaked dark, each flake (1 inside, 0 off it)
+    and its cracked rim (1 at the crack); the burnt-matte sheen lights the same rims.
+    """
+    cells = graph.voronoi(8, 8, seed=603)
+    edge = graph.voronoi(8, 8, seed=603, feature='DISTANCE_TO_EDGE')['Distance']
+    picked = picked_of(graph, cells, 0.4)
+    flake = graph.mul(picked, graph.smooth(edge, 0.02, 0.05))
+    rim = graph.mul(picked, graph.mul(graph.smooth(edge, 0.006, 0.014), graph.smooth(edge, 0.045, 0.02)))
+    return flake, rim
+
+
+def picked_of(graph, cells, share):
+    """1 on `share` of a Voronoi field's cells, 0 on the rest, the same everywhere inside a cell."""
+    picked = graph.add('ShaderNodeTexWhiteNoise', [('Vector', cells['Position'])], {'noise_dimensions': '3D'}).outputs['Value']
+    return graph.smooth(picked, 1.0 - share, 1.0 - share + 0.02)
+
+
+def base_black_grain(graph):
+    """Magnetite: a black granular mass of small octahedral grains, each its own tone, dark seams between."""
+    grains, edge = magnetite_grains_of(graph)
+    tone = graph.mul_add(graph.add('ShaderNodeSeparateColor', [(0, grains['Color'])]).outputs[0], 0.4, 0.32)
+    tone = graph.minus(tone, graph.mul(graph.smooth(edge, 0.08, 0.0), 0.3))
+    return graph.plus(tone, graph.mul(graph.minus(stretched(graph, graph.noise(3, 3, seed=612, detail=3)), 0.5), 0.3))
+
+
+# Coarse enough to show at a phone's 22 px tile (about two pixels a grain): chromite, P5's other
+# blue-grey metal (hue slots 244 and 250 at lumas 0.50 and 0.58), is round seeds in a pale matrix.
+MAGNETITE_GRAINS = 12
+
+
+def magnetite_grains_of(graph):
+    """The grains, one Voronoi field shared by the base and the steel-glints sheen's flashing facets."""
+    grains = graph.voronoi(MAGNETITE_GRAINS, MAGNETITE_GRAINS, seed=611)
+    edge = graph.voronoi(MAGNETITE_GRAINS, MAGNETITE_GRAINS, seed=611, feature='DISTANCE_TO_EDGE')['Distance']
+    return grains, edge
+
+
+def base_split_lamellae(graph):
+    """Selenite blade: soft sheets split along one cleavage, each its own tone, its peeled edge pale, fine fibres along it."""
+    sheet = lamella_of(graph)
+    tone = graph.mul_add(graph.math('FLOORED_MODULO', graph.math('FLOOR', sheet), 4.0), 0.06, 0.38)
+    tone = graph.plus(tone, graph.mul(graph.smooth(graph.math('FRACT', sheet), 0.7, 0.96), 0.18))
+    tone = graph.minus(tone, graph.mul(graph.smooth(graph.math('FRACT', sheet), 0.05, 0.0), 0.2))
+    fibre = graph.math('SINE', graph.mul(sheet, 9.0 * math.tau))
+    cloud = stretched(graph, graph.noise(3, 3, seed=621, detail=3))
+    return graph.plus(graph.plus(tone, graph.mul(fibre, 0.04)), graph.mul(graph.minus(cloud, 0.5), 0.2))
+
+
+def lamella_of(graph):
+    """
+    The sheet coordinate across selenite's cleavage: u + 3v, four sheets a unit, so 16 sheets cross the
+    cell and the lattice repeats at its edge (whole sheets along u and v, four tones in turn).
+    """
+    return graph.mul(graph.mul_add(graph.v, 3.0, graph.u), 4.0)
+
+
+def base_fortification_bands(graph):
+    """Ember agate: the fortification bands of agate, nested round a few centres, and a pale quartz core in each."""
+    distance = agate_distance_of(graph)
+    bands = graph.math('SINE', graph.mul(distance, AGATE_BANDS))
+    fine = graph.math('SINE', graph.mul(distance, AGATE_BANDS * 3.1))
+    core = graph.smooth(distance, 0.1, 0.05)
+    # Pale chalcedony a shade over the slot's luma, apart from the darker furnace iron (base_scorched_scale).
+    tone = graph.plus(graph.mul(bands, 0.22), 0.57)
+    tone = graph.plus(tone, graph.mul(fine, 0.06))
+    return graph.plus(tone, graph.mul(core, 0.34))
+
+
+AGATE_BANDS = 40.0
+
+
+def agate_distance_of(graph):
+    """The distance to the nearest band centre, wobbled so the bands bend: shared by the base and the banded gloss."""
+    wobble = graph.mul(graph.minus(graph.noise(5, 5, seed=632, detail=2), 0.5), 0.12)
+    return graph.plus(graph.voronoi(3, 3, seed=631)['Distance'], wobble)
+
+
+def base_leopard_nodules(graph):
+    """Chromite: round black seeds of chromite packed in a paler serpentine matrix, streaked with fine green-grey veinlets."""
+    matrix = stretched(graph, graph.noise(5, 5, seed=642, detail=5, roughness=0.55))
+    streak = graph.smooth(graph.math('ABSOLUTE', graph.minus(graph.noise(3, 3, seed=643, detail=3), 0.5)), 0.025, 0.0)
+    nodule = chromite_seeds_of(graph, CHROMITE_SEED_RADIUS)
+    tone = graph.plus(around_half(graph, matrix, 0.3), 0.14)
+    tone = graph.minus(tone, graph.mul(streak, 0.12))
+    return graph.minus(tone, graph.mul(nodule, 0.46))
+
+
+CHROMITE_SEED_RADIUS, CHROMITE_BEAD_RADIUS = 0.62, 0.3
+
+
+def chromite_seeds_of(graph, radius):
+    """The seeds, one dot field shared by the base and the wet gloss's bead of light on each seed."""
+    return sprinkled(graph, 7, 641, radius, 0.85)
+
+
 # --- sheen: the lustre's highlights -----------------------------------------------------------------
 
 
@@ -743,6 +857,45 @@ def sheen_worn_brass(graph):
     lip = graph.mul(graph.smooth(seam, 0.012, 0.02), graph.smooth(seam, 0.03, 0.02))
     scuff = graph.smooth(stretched(graph, graph.noise(9, 9, seed=511, detail=3)), 0.66, 0.82)
     return graph.plus(graph.plus(graph.mul(graph.smooth(rivets, 0.3, 0.8), 0.85), graph.mul(lip, 0.4)), graph.mul(scuff, 0.3))
+
+
+def sheen_burnt_matte(graph):
+    """Burnt matte: scorched iron drinks the light; only the heat scale's lifted rims and a faint warm cloud catch it."""
+    _, rim = heat_scale_of(graph)
+    cloud = graph.smooth(stretched(graph, graph.noise(3, 3, seed=651, detail=2)), 0.55, 0.85)
+    return graph.plus(graph.mul(rim, 0.4), graph.mul(cloud, 0.08))
+
+
+def sheen_steel_glints(graph):
+    """Steel glints: whole grain facets flash steel-bright where they meet the lamp, a few in each run, and pinpoint sparks."""
+    grains, edge = magnetite_grains_of(graph)
+    facet = graph.mul(picked_of(graph, grains, 0.14), graph.smooth(edge, 0.03, 0.08))
+    spark = graph.smooth(graph.voronoi(20, 20, seed=661)['Distance'], 0.05, 0.012)
+    return graph.plus(graph.mul(facet, 0.7), graph.mul(spark, 0.6))
+
+
+def sheen_moon_sheen(graph):
+    """Moon sheen: a cool soft glow running along each sheet's peeled edge, waxing and waning across the face."""
+    sheet = lamella_of(graph)
+    edge = graph.smooth(graph.math('FRACT', sheet), 0.6, 0.95)
+    wax = graph.smooth(stretched(graph, graph.noise(2, 2, seed=671, detail=2)), 0.3, 0.75)
+    broad = graph.smooth(stretched(graph, graph.noise(2, 2, seed=672, detail=2)), 0.5, 0.85)
+    return graph.plus(graph.mul(graph.mul(edge, wax), 0.6), graph.mul(broad, 0.14))
+
+
+def sheen_banded_gloss(graph):
+    """Banded gloss: polished agate takes the light on alternate bands, brightest in a slow sweep, with a few glints."""
+    bands = graph.smooth(graph.math('SINE', graph.mul(agate_distance_of(graph), AGATE_BANDS)), 0.55, 0.95)
+    sweep = graph.smooth(stretched(graph, graph.noise(2, 2, seed=681, detail=2)), 0.35, 0.8)
+    glint = graph.smooth(graph.voronoi(11, 11, seed=682)['Distance'], 0.05, 0.012)
+    return graph.plus(graph.mul(graph.mul(bands, sweep), 0.4), graph.mul(glint, 0.6))
+
+
+def sheen_wet_gloss(graph):
+    """Wet gloss: every chromite seed holds a bright bead of light at its crown, as if just wetted, over a faint sheen."""
+    bead = chromite_seeds_of(graph, CHROMITE_BEAD_RADIUS)
+    sheen = graph.smooth(stretched(graph, graph.noise(3, 3, seed=691, detail=2)), 0.5, 0.85)
+    return graph.plus(graph.mul(bead, 0.85), graph.mul(sheen, 0.1))
 
 
 # --- vein: the crystal or vein shape, by the row's silhouette ----------------------------------------
@@ -1226,6 +1379,137 @@ def cog_points(centre, radius, teeth, kept):
         points.append((cx + math.cos(math.tau * kept / teeth) * rim, cz + math.sin(math.tau * kept / teeth) * rim))
     return points
 
+
+def vein_fused_clinkers(rng, body):
+    """Furnace iron: clinkers, rough lumps fused into three clumps as they came out of the furnace, lying on the face."""
+    marks = []
+    for clump, (cx, cz, count) in enumerate(((-0.13, 0.14, 5), (0.15, -0.04, 6), (-0.08, -0.22, 4))):
+        for i, (dx, dz) in enumerate(shapes.scatter_positions(rng, count, 0.09, 0.05)):
+            size = rng.uniform(0.04, 0.065)
+            lump = shapes.add_icosphere('clinker-%d-%d' % (clump, i), size, (cx + dx, -size * 0.3, cz + dz), subdivisions=2,
+                                        scale=(rng.uniform(0.8, 1.25), 0.7, rng.uniform(0.7, 1.1)), rotation=(0.0, rng.uniform(0, math.tau), 0.0))
+            marks.append(roughened(lump, rng, size * 0.22))
+    return assign_all(marks, body)
+
+
+def roughened(obj, rng, amount):
+    """Every vertex knocked by up to `amount` on each axis: a clinker's slaggy, uneven skin."""
+    for vertex in obj.data.vertices:
+        vertex.co += Vector((rng.uniform(-amount, amount) / obj.scale[0], rng.uniform(-amount, amount) / obj.scale[1],
+                             rng.uniform(-amount, amount) / obj.scale[2]))
+    return obj
+
+
+def vein_field_filings(rng, body):
+    """
+    Magnetite: its grit drawn into the field lines of a lodestone, needle grains strung end to end
+    along loops from one pole to the other and along the line between them. In the plane the lines of
+    two opposite poles are circles through both, so each loop is one of those circles.
+    """
+    marks = []
+    turn = 0.35
+    lines = [circle_points(centre_z, FIELD_POLE_X, FILING_SPACING) for centre_z in FIELD_LINE_CENTRES]
+    lines.append(axis_points(FIELD_POLE_X, FILING_SPACING))
+    for line, points in enumerate(lines):
+        for k, (x, z, tangent) in enumerate(points):
+            x, z = x * math.cos(turn) - z * math.sin(turn), x * math.sin(turn) + z * math.cos(turn)
+            if max(abs(x), abs(z)) > VEIN_EXTENT_M:
+                continue
+            size = rng.uniform(0.011, 0.015)
+            grain = shapes.add_cube('filing-%d-%d' % (line, k), size, (x + rng.uniform(-0.003, 0.003), -size * 0.4, z + rng.uniform(-0.003, 0.003)),
+                                    scale=(rng.uniform(1.8, 2.3), 1.0, 1.0), rotation=(0.0, -(tangent + turn) + rng.uniform(-0.2, 0.2), 0.0))
+            marks.append(grain)
+    return assign_all(marks, body)
+
+
+FIELD_POLE_X = 0.16
+FIELD_LINE_CENTRES = (0.06, -0.06, 0.15, -0.15, 0.32, -0.32)
+FILING_SPACING = 0.03
+
+
+def circle_points(centre_z, pole_x, spacing):
+    """Points every `spacing` round the circle through both poles (±pole_x, 0) centred at (0, centre_z), each with its tangent's angle."""
+    radius = math.hypot(pole_x, centre_z)
+    steps = int(math.tau * radius / spacing)
+    angles = [math.tau * k / steps for k in range(steps)]
+    return [(math.cos(a) * radius, centre_z + math.sin(a) * radius, a + math.pi / 2) for a in angles]
+
+
+def axis_points(pole_x, spacing):
+    """Points every `spacing` along the straight line from one pole to the other, the field's middle line."""
+    steps = int(2 * pole_x / spacing)
+    return [(-pole_x + 2 * pole_x * k / steps, 0.0, 0.0) for k in range(steps + 1)]
+
+
+def vein_swallowtail_blades(rng, body):
+    """Selenite blade: two swallowtail twins, pairs of flat blades grown from one root in a V, and two loose blades along the cleavage."""
+    marks = []
+    for twin, (x, z, angle, length) in enumerate(((-0.22, -0.22, 0.95, 0.34), (0.26, 0.02, 2.2, 0.2))):
+        for side, spread in enumerate((-0.28, 0.28)):
+            marks.append(blade_of('twin-%d-%d' % (twin, side), (x, z), angle + spread, length, length * 0.12, -0.012 - side * 0.006))
+    for i, (x, z) in enumerate(((-0.32, 0.3), (0.02, -0.2))):
+        length = rng.uniform(0.16, 0.2)
+        marks.append(blade_of('blade-%d' % i, (x, z), CLEAVAGE_ANGLE + rng.uniform(-0.08, 0.08), length, length * 0.14, -0.01))
+    return assign_all(marks, body)
+
+
+# Along the base's sheets: lines of u + 3v constant run along (3, -1).
+CLEAVAGE_ANGLE = math.atan2(-1.0, 3.0)
+
+
+def blade_of(name, root, angle, length, width, y):
+    """A flat lath from `root` along `angle`, square at the root, its free end cut to a blunt point."""
+    along, side = (math.cos(angle), math.sin(angle)), (-math.sin(angle), math.cos(angle))
+    corners = ((0.0, -0.5), (0.82, -0.5), (1.0, 0.0), (0.82, 0.5), (0.0, 0.5))
+    points = [(root[0] + along[0] * a * length + side[0] * s * width, root[1] + along[1] * a * length + side[1] * s * width)
+              for a, s in corners]
+    blade = shapes.add_polygon(name, points, y, 0.008)
+    shapes.bevel(blade, 0.002, segments=1)
+    return blade
+
+
+def vein_split_geodes(rng, body):
+    """Ember agate: two geodes split open, a thick rind round a banded wall, a druse of small crystals pointing into the hollow."""
+    marks = []
+    for i, (x, z, radius) in enumerate(((-0.11, 0.1, 0.17), (0.18, -0.18, 0.11))):
+        marks += geode_of('geode-%d' % i, (x, z), radius, rng)
+    return assign_all(marks, body)
+
+
+def geode_of(name, centre, radius, rng):
+    """The rind and wall as flattened rings facing the camera, then the druse round the wall's inner edge."""
+    facing = (math.pi / 2, 0.0, 0.0)
+    rind = shapes.add_torus(name + '-rind', radius * 0.88, radius * 0.12, (centre[0], -0.01, centre[1]), rotation=facing, scale=(1.0, 1.0, 0.5))
+    wall = shapes.add_torus(name + '-wall', radius * 0.66, radius * 0.07, (centre[0], -0.006, centre[1]), rotation=facing, scale=(1.0, 1.0, 0.4))
+    druse = []
+    count = int(radius * 140)
+    for k in range(count):
+        angle = math.tau * k / count + rng.uniform(-0.05, 0.05)
+        reach = radius * rng.uniform(0.12, 0.2)
+        at = (centre[0] + math.cos(angle) * (radius * 0.56 - reach * 0.5), centre[1] + math.sin(angle) * (radius * 0.56 - reach * 0.5))
+        druse.append(shapes.add_polygon('%s-tooth-%d' % (name, k), shapes.shard_points(at, reach * 0.5, reach * 0.22, angle), -0.012, 0.01))
+    return [rind, wall] + druse
+
+
+def vein_seed_pods(rng, body):
+    """Chromite: almond seeds of chromite, a split pod's row of them in a curve, and a few spilled loose beside it."""
+    marks = []
+    for i in range(7):
+        t = i / 6.0
+        x, z = -0.24 + t * 0.42, 0.16 - 0.3 * (t - 0.5) ** 2 * 4 + 0.06
+        angle = math.atan2(-0.6 * (t - 0.5) * 4, 1.0) + math.pi / 2 + rng.uniform(-0.15, 0.15)
+        marks.append(almond_seed('pod-%d' % i, (x, z), rng.uniform(0.042, 0.05), angle))
+    for i, (x, z) in enumerate(shapes.scatter_positions(rng, 6, 0.2, 0.09)):
+        marks.append(almond_seed('spilled-%d' % i, (x * 1.2, z * 0.6 - 0.16), rng.uniform(0.032, 0.044), rng.uniform(0, math.tau)))
+    return assign_all(marks, body)
+
+
+def almond_seed(name, centre, length, angle):
+    """A glossy almond: a sphere drawn long along `angle` in the face, flattened toward the camera."""
+    return shapes.add_icosphere(name, length, (centre[0], -length * 0.2, centre[1]), subdivisions=3,
+                                scale=(1.0, 0.36, 0.55), rotation=(0.0, -angle, 0.0))
+
+
 def kinked_path(start, end, rng, segments):
     """A wire from start to end, wobbling in the face at every inner point."""
     points = []
@@ -1276,6 +1560,11 @@ BASES = {
     'watered-damask': base_watered_damask,
     'inner-feathers': base_inner_feathers,
     'riveted-plate': base_riveted_plate,
+    'scorched-scale': base_scorched_scale,
+    'black-grain': base_black_grain,
+    'split-lamellae': base_split_lamellae,
+    'fortification-bands': base_fortification_bands,
+    'leopard-nodules': base_leopard_nodules,
 }
 SHEENS = {
     'earthy': sheen_earthy,
@@ -1306,6 +1595,11 @@ SHEENS = {
     'watered-shimmer': sheen_watered_shimmer,
     'fire-glint': sheen_fire_glint,
     'worn-brass': sheen_worn_brass,
+    'burnt-matte': sheen_burnt_matte,
+    'steel-glints': sheen_steel_glints,
+    'moon-sheen': sheen_moon_sheen,
+    'banded-gloss': sheen_banded_gloss,
+    'wet-gloss': sheen_wet_gloss,
 }
 VEINS = {
     'nugget-cluster': vein_nugget_cluster,
@@ -1336,6 +1630,11 @@ VEINS = {
     'star-bursts': vein_star_bursts,
     'spindle-spray': vein_spindle_spray,
     'broken-cogs': vein_broken_cogs,
+    'fused-clinkers': vein_fused_clinkers,
+    'field-filings': vein_field_filings,
+    'swallowtail-blades': vein_swallowtail_blades,
+    'split-geodes': vein_split_geodes,
+    'seed-pods': vein_seed_pods,
 }
 RECIPES = {'base': BASES, 'vein': VEINS, 'sheen': SHEENS}
 

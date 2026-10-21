@@ -1,5 +1,5 @@
 {
-  "$comment": "The mineral skins of #576 (GD ruling 20 Oct 2026, ticket 591): a species' skin is four layers drawn bottom first, a base texture, a vein or crystal shape, a palette and a sheen, each an id of its layer list below. A skin row names its species (a materials.json id) and one id per layer; no two species of one pool share all four, so no two species on one planet look alike. A palette is a ramp of three display colours, shadow, body and light, darkest first; its body is the hue slot colour of the species wearing it (ticket 450), so the skin keeps the hue guards of materials.json. The base, vein and sheen layers are drawn in Blender, one cell each (docs/art/mineral-skins, skin-layers.json). Look only: no price, gate, income, generation or save reads it. The batch tickets (#592 to #606) add the layers and rows, 15 species per planet on P1 to P5; #592 skins P1's slots 1 to 5, #593 its slots 6 to 10, #594 its slots 11 and 12 (the legacy pool has 12 species); #598 skins P3's slots 1 to 5 and #599 its slots 6 to 10 (the foothold-p3 pool; its slots 16 and 17, the two fossil commons of #453, are held); #603 P4's slots 11 to 15. A signature row dresses the signature material of its planet, the slotless 16th material (#453 E1), keyed by the planet: one per planet, apart from every species of the planet's pool, its palette's body inside the hue and luma bands of the family's look (ore-visuals, #151) since it has no hue slot; #603 adds P4's.",
+  "$comment": "The mineral skins of #576 (GD ruling 20 Oct 2026, ticket 591): a species' skin is four layers drawn bottom first, a base texture, a vein or crystal shape, a palette and a sheen, each an id of its layer list below. A skin row names its species (a materials.json id) and one id per layer; no two species of one pool share all four, so no two species on one planet look alike. A palette is a ramp of three display colours, shadow, body and light, darkest first; its body is the hue slot colour of the species wearing it (ticket 450), so the skin keeps the hue guards of materials.json. The base, vein and sheen layers are drawn in Blender, one cell each (docs/art/mineral-skins, skin-layers.json). Look only: no price, gate, income, generation or save reads it. The batch tickets (#592 to #606) add the layers and rows, 15 species per planet on P1 to P5; #592 skins P1's slots 1 to 5, #593 its slots 6 to 10, #594 its slots 11 and 12 (the legacy pool has 12 species); #598 skins P3's slots 1 to 5 and #599 its slots 6 to 10 (the foothold-p3 pool; its slots 16 and 17, the two fossil commons of #453, are held); #603 P4's slots 11 to 15; #604 P5's slots 1 to 5 (the foothold-p5 pool; its slots 16 and 17, #453's fossil commons, are held). A signature row dresses the signature material of its planet, the slotless 16th material (#453 E1), keyed by the planet: one per planet, apart from every species of the planet's pool, its palette's body inside the hue and luma bands of the family's look (ore-visuals, #151) since it has no hue slot; #603 adds P4's.",
   "layers": {
     "base": [
       {
@@ -85,6 +85,21 @@
       },
       {
         "id": "riveted-plate"
+      },
+      {
+        "id": "scorched-scale"
+      },
+      {
+        "id": "black-grain"
+      },
+      {
+        "id": "split-lamellae"
+      },
+      {
+        "id": "fortification-bands"
+      },
+      {
+        "id": "leopard-nodules"
       }
     ],
     "vein": [
@@ -171,6 +186,21 @@
       },
       {
         "id": "broken-cogs"
+      },
+      {
+        "id": "fused-clinkers"
+      },
+      {
+        "id": "field-filings"
+      },
+      {
+        "id": "swallowtail-blades"
+      },
+      {
+        "id": "split-geodes"
+      },
+      {
+        "id": "seed-pods"
       }
     ],
     "palette": [
@@ -285,6 +315,26 @@
       {
         "id": "cogwork-patina",
         "ramp": ["#236052", "#46c1a4", "#a2e0d2"]
+      },
+      {
+        "id": "furnace-iron-red",
+        "ramp": ["#523434", "#a56868", "#d2b4b4"]
+      },
+      {
+        "id": "magnetite-black",
+        "ramp": ["#403f46", "#7f7e8c", "#bfbec6"]
+      },
+      {
+        "id": "selenite-white",
+        "ramp": ["#6f7071", "#dee1e2", "#eef0f0"]
+      },
+      {
+        "id": "ember-agate-red",
+        "ramp": ["#64383c", "#c97177", "#e4b8bb"]
+      },
+      {
+        "id": "chromite-steel",
+        "ramp": ["#4a4852", "#9491a5", "#cac8d2"]
       }
     ],
     "sheen": [
@@ -371,6 +421,21 @@
       },
       {
         "id": "worn-brass"
+      },
+      {
+        "id": "burnt-matte"
+      },
+      {
+        "id": "steel-glints"
+      },
+      {
+        "id": "moon-sheen"
+      },
+      {
+        "id": "banded-gloss"
+      },
+      {
+        "id": "wet-gloss"
       }
     ]
   },
@@ -563,6 +628,41 @@
       "vein": "spindle-spray",
       "palette": "painite-red",
       "sheen": "fire-glint"
+    },
+    {
+      "species": "furnace-iron-brassvein",
+      "base": "scorched-scale",
+      "vein": "fused-clinkers",
+      "palette": "furnace-iron-red",
+      "sheen": "burnt-matte"
+    },
+    {
+      "species": "magnetite-brassvein",
+      "base": "black-grain",
+      "vein": "field-filings",
+      "palette": "magnetite-black",
+      "sheen": "steel-glints"
+    },
+    {
+      "species": "selenite-blade-quartzine",
+      "base": "split-lamellae",
+      "vein": "swallowtail-blades",
+      "palette": "selenite-white",
+      "sheen": "moon-sheen"
+    },
+    {
+      "species": "ember-agate-quartzine",
+      "base": "fortification-bands",
+      "vein": "split-geodes",
+      "palette": "ember-agate-red",
+      "sheen": "banded-gloss"
+    },
+    {
+      "species": "chromite-brassvein",
+      "base": "leopard-nodules",
+      "vein": "seed-pods",
+      "palette": "chromite-steel",
+      "sheen": "wet-gloss"
     }
   ],
   "signatures": [

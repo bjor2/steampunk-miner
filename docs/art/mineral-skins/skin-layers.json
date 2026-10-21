@@ -200,6 +200,41 @@
       "wornBy": ["p4-signature"]
     },
     {
+      "kind": "base",
+      "id": "scorched-scale",
+      "cell": "cells/base/scorched-scale.png",
+      "blend": "blend/base-scorched-scale.blend",
+      "wornBy": ["furnace-iron-brassvein"]
+    },
+    {
+      "kind": "base",
+      "id": "black-grain",
+      "cell": "cells/base/black-grain.png",
+      "blend": "blend/base-black-grain.blend",
+      "wornBy": ["magnetite-brassvein"]
+    },
+    {
+      "kind": "base",
+      "id": "split-lamellae",
+      "cell": "cells/base/split-lamellae.png",
+      "blend": "blend/base-split-lamellae.blend",
+      "wornBy": ["selenite-blade-quartzine"]
+    },
+    {
+      "kind": "base",
+      "id": "fortification-bands",
+      "cell": "cells/base/fortification-bands.png",
+      "blend": "blend/base-fortification-bands.blend",
+      "wornBy": ["ember-agate-quartzine"]
+    },
+    {
+      "kind": "base",
+      "id": "leopard-nodules",
+      "cell": "cells/base/leopard-nodules.png",
+      "blend": "blend/base-leopard-nodules.blend",
+      "wornBy": ["chromite-brassvein"]
+    },
+    {
       "kind": "vein",
       "id": "nugget-cluster",
       "cell": "cells/vein/nugget-cluster.png",
@@ -396,6 +431,41 @@
       "wornBy": ["p4-signature"]
     },
     {
+      "kind": "vein",
+      "id": "fused-clinkers",
+      "cell": "cells/vein/fused-clinkers.png",
+      "blend": "blend/vein-fused-clinkers.blend",
+      "wornBy": ["furnace-iron-brassvein"]
+    },
+    {
+      "kind": "vein",
+      "id": "field-filings",
+      "cell": "cells/vein/field-filings.png",
+      "blend": "blend/vein-field-filings.blend",
+      "wornBy": ["magnetite-brassvein"]
+    },
+    {
+      "kind": "vein",
+      "id": "swallowtail-blades",
+      "cell": "cells/vein/swallowtail-blades.png",
+      "blend": "blend/vein-swallowtail-blades.blend",
+      "wornBy": ["selenite-blade-quartzine"]
+    },
+    {
+      "kind": "vein",
+      "id": "split-geodes",
+      "cell": "cells/vein/split-geodes.png",
+      "blend": "blend/vein-split-geodes.blend",
+      "wornBy": ["ember-agate-quartzine"]
+    },
+    {
+      "kind": "vein",
+      "id": "seed-pods",
+      "cell": "cells/vein/seed-pods.png",
+      "blend": "blend/vein-seed-pods.blend",
+      "wornBy": ["chromite-brassvein"]
+    },
+    {
       "kind": "sheen",
       "id": "earthy",
       "cell": "cells/sheen/earthy.png",
@@ -590,6 +660,41 @@
       "cell": "cells/sheen/worn-brass.png",
       "blend": "blend/sheen-worn-brass.blend",
       "wornBy": ["p4-signature"]
+    },
+    {
+      "kind": "sheen",
+      "id": "burnt-matte",
+      "cell": "cells/sheen/burnt-matte.png",
+      "blend": "blend/sheen-burnt-matte.blend",
+      "wornBy": ["furnace-iron-brassvein"]
+    },
+    {
+      "kind": "sheen",
+      "id": "steel-glints",
+      "cell": "cells/sheen/steel-glints.png",
+      "blend": "blend/sheen-steel-glints.blend",
+      "wornBy": ["magnetite-brassvein"]
+    },
+    {
+      "kind": "sheen",
+      "id": "moon-sheen",
+      "cell": "cells/sheen/moon-sheen.png",
+      "blend": "blend/sheen-moon-sheen.blend",
+      "wornBy": ["selenite-blade-quartzine"]
+    },
+    {
+      "kind": "sheen",
+      "id": "banded-gloss",
+      "cell": "cells/sheen/banded-gloss.png",
+      "blend": "blend/sheen-banded-gloss.blend",
+      "wornBy": ["ember-agate-quartzine"]
+    },
+    {
+      "kind": "sheen",
+      "id": "wet-gloss",
+      "cell": "cells/sheen/wet-gloss.png",
+      "blend": "blend/sheen-wet-gloss.blend",
+      "wornBy": ["chromite-brassvein"]
     }
   ]
 }
