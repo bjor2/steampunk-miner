@@ -17,6 +17,7 @@ const SAVED: SaveSlotEntry = {
   playtimeTicks: 60 * 3723,
   savedAtMs: 1_760_000_000_000,
   formatVersion: 2,
+  generatorVersion: null,
 }
 
 const SAVE_PAGE: PauseMenuState = { ...pauseMenuOpenAt(4), page: 'save', slotEntries: [SAVED] }

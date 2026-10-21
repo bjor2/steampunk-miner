@@ -26,6 +26,7 @@ const AUTOSAVE: SaveSlotEntry = {
   playtimeTicks: 42 * 60 * 60,
   savedAtMs: Date.UTC(2026, 9, 14, 18, 7),
   formatVersion: 2,
+  generatorVersion: null,
 }
 
 const MANUAL: SaveSlotEntry = {
@@ -35,6 +36,7 @@ const MANUAL: SaveSlotEntry = {
   playtimeTicks: 2 * 3600 * 60,
   savedAtMs: Date.UTC(2026, 9, 14, 19, 30),
   formatVersion: 2,
+  generatorVersion: null,
 }
 
 const LOAD_PROBLEM = 'the save was written by a newer build'

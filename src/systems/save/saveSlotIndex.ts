@@ -7,8 +7,13 @@
  * rebuilt from the file.
  *
  * Playtime is the authority's tick: the fixed step stands still while the game is paused or held.
+ *
+ * The entry carries the file's generator version (ticket 670), so the Load list flags a slot made by
+ * another world generator before reading it. An entry kept before then has none: unknown, never
+ * flagged on its own. The save format is unchanged: the field is optional on read.
  */
 import { isJsonObject, isWholeNumber } from '../authority/payloadFields'
+import { GENERATOR_VERSION } from '../generatorVersion'
 
 export const AUTOSAVE_SLOT = 'autosave'
 
@@ -33,6 +38,8 @@ export interface SaveSlotEntry extends SaveSlotMeta {
   planetIndex: number
   playtimeTicks: number
   formatVersion: number
+  /** The world generator the file was made by; null for an entry kept before ticket 670. */
+  generatorVersion: number | null
 }
 
 /** The header fields an entry reads off a save file. */
@@ -40,8 +47,13 @@ export interface SaveSlotHeader {
   formatVersion: number
   tick: number
   slot: SaveSlotMeta
+  /** Null when the file's header holds no whole generator version. */
+  generatorVersion: number | null
   world: { planetIndex: number }
 }
+
+/** How a slot's world generator stands against this build's. */
+export type SlotGeneratorStanding = 'current' | 'older' | 'newer' | 'unknown'
 
 export const AUTOSAVE_NAME = 'Autosave'
 
@@ -72,6 +84,7 @@ export function slotEntryOf(slot: SaveSlotKey, header: SaveSlotHeader): SaveSlot
     playtimeTicks: header.tick,
     savedAtMs: header.slot.savedAtMs,
     formatVersion: header.formatVersion,
+    generatorVersion: header.generatorVersion,
   }
 }
 
@@ -84,7 +97,9 @@ export function slotEntryOfFile(slot: SaveSlotKey, raw: unknown): SaveSlotEntry 
   const meta = raw.formatVersion === 1 ? UNTIMED_AUTOSAVE : raw.slot
   const wholeFields = [raw.formatVersion, raw.tick, raw.world.planetIndex]
   if (slotMetaProblems(meta).length > 0 || !wholeFields.every(isWholeNumber)) return null
-  return slotEntryOf(slot, { ...(raw as unknown as SaveSlotHeader), slot: meta as SaveSlotMeta })
+  const generatorVersion = wholeNumberOrNull(raw.generatorVersion)
+  const header = { ...(raw as unknown as SaveSlotHeader), slot: meta as SaveSlotMeta }
+  return slotEntryOf(slot, { ...header, generatorVersion })
 }
 
 /** The entry as the shell kept it, or null when it is missing or not an entry. */
@@ -92,7 +107,22 @@ export function readSlotEntry(raw: unknown): SaveSlotEntry | null {
   if (!isJsonObject(raw) || !isSaveSlotKey(raw.slot)) return null
   if (slotMetaProblems(raw).length > 0) return null
   const wholeFields = [raw.planetIndex, raw.playtimeTicks, raw.formatVersion]
-  return wholeFields.every(isWholeNumber) ? (raw as unknown as SaveSlotEntry) : null
+  if (!wholeFields.every(isWholeNumber)) return null
+  return {
+    ...(raw as unknown as SaveSlotEntry),
+    generatorVersion: wholeNumberOrNull(raw.generatorVersion),
+  }
+}
+
+function wholeNumberOrNull(value: unknown): number | null {
+  return isWholeNumber(value) ? (value as number) : null
+}
+
+/** Whether the slot's world came from this build's generator, an older or newer one, or unknown. */
+export function slotGeneratorStandingOf(entry: SaveSlotEntry): SlotGeneratorStanding {
+  if (entry.generatorVersion === null) return 'unknown'
+  if (entry.generatorVersion === GENERATOR_VERSION) return 'current'
+  return entry.generatorVersion < GENERATOR_VERSION ? 'older' : 'newer'
 }
 
 /** A header's `slot`: a name and a whole wall time or null. */

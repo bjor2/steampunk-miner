@@ -3,6 +3,7 @@ import { createMemorySink } from '../logging/eventSink'
 import { createRunLog, installRunLog, uninstallRunLog } from '../logging/runLog'
 import { stateDigest } from '../systems/authority/stateDigest'
 import { SAVE_FORMAT_VERSION, type SaveSlotFile } from '../systems/save/saveSlot'
+import { GENERATOR_VERSION } from '../systems/generatorVersion'
 import { checkpointWrites, installSaveFolder, listSaveSlots, loadSaveSlot } from './checkpoint'
 import { readAuthorityState } from './authorityLink'
 import { resetGameStore, useGameStore } from './gameStore'
@@ -94,6 +95,7 @@ describe('pause menu', () => {
       playtimeTicks: readAuthorityState().tick,
       savedAtMs: WALL_CLOCK_MS,
       formatVersion: SAVE_FORMAT_VERSION,
+      generatorVersion: GENERATOR_VERSION,
     })
     expect(readPauseMenuModel()?.slots[1].title).toBe('Before the deep vein')
     expect(readPauseMenuModel()?.notice).toBe('Saved to slot 2')

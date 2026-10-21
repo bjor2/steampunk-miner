@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest'
+import { GENERATOR_VERSION } from '../generatorVersion'
 import {
   AUTOSAVE_SLOT,
   freeManualSlotOf,
@@ -10,12 +11,25 @@ import {
   manualSlotKey,
   readSlotEntry,
   slotEntryOfFile,
+  slotGeneratorStandingOf,
   type SaveSlotEntry,
   type SaveSlotKey,
 } from './saveSlotIndex'
 
 function entry(slot: SaveSlotKey, savedAtMs: number | null): SaveSlotEntry {
-  return { slot, name: slot, planetIndex: 3, playtimeTicks: 600, savedAtMs, formatVersion: 2 }
+  return {
+    slot,
+    name: slot,
+    planetIndex: 3,
+    playtimeTicks: 600,
+    savedAtMs,
+    formatVersion: 2,
+    generatorVersion: GENERATOR_VERSION,
+  }
+}
+
+function entryMadeBy(generatorVersion: number | null): SaveSlotEntry {
+  return { ...entry('slot-1', 5), generatorVersion }
 }
 
 describe('save slot index', () => {
@@ -29,9 +43,10 @@ describe('save slot index', () => {
     expect(isSaveSlotKey('../slot-1')).toBe(false)
   })
 
-  it('reads an entry off a v2 header: name, planet, playtime, wall time and format version', () => {
+  it('reads an entry off a header: name, planet, playtime, wall time, format and generator', () => {
     const header = {
       formatVersion: 2,
+      generatorVersion: 12,
       slot: { name: 'Before the core', savedAtMs: 1_760_000_000_000 },
       tick: 7200,
       world: { planetIndex: 4 },
@@ -43,6 +58,7 @@ describe('save slot index', () => {
       playtimeTicks: 7200,
       savedAtMs: 1_760_000_000_000,
       formatVersion: 2,
+      generatorVersion: 12,
     })
   })
 
@@ -52,6 +68,7 @@ describe('save slot index', () => {
       name: 'Autosave',
       savedAtMs: null,
       formatVersion: 1,
+      generatorVersion: null,
     })
   })
 
@@ -87,5 +104,22 @@ describe('save slot index', () => {
       'slot-2',
       'slot-9',
     ])
+  })
+
+  it('reads a kept entry written before it carried a generator version as unknown', () => {
+    const { generatorVersion: _dropped, ...oldEntry } = entry('slot-1', 5)
+    const read = readSlotEntry(oldEntry)
+    expect(read?.generatorVersion).toBeNull()
+    expect(read === null ? null : slotGeneratorStandingOf(read)).toBe('unknown')
+  })
+
+  it("stands a slot made by this build's generator as current", () => {
+    expect(slotGeneratorStandingOf(entryMadeBy(GENERATOR_VERSION))).toBe('current')
+    expect(readSlotEntry(entryMadeBy(GENERATOR_VERSION))?.generatorVersion).toBe(GENERATOR_VERSION)
+  })
+
+  it('stands a slot made by another generator as older or newer', () => {
+    expect(slotGeneratorStandingOf(entryMadeBy(GENERATOR_VERSION - 1))).toBe('older')
+    expect(slotGeneratorStandingOf(entryMadeBy(GENERATOR_VERSION + 1))).toBe('newer')
   })
 })

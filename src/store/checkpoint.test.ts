@@ -8,6 +8,7 @@ import PRE_175_SAVE from '../systems/save/fixtures/pre-175-planet-1.save.json'
 import { loadedSaveDigestOf } from '../systems/save/loadedSaveDigest'
 import { readSaveSlot, type SaveSlotFile } from '../systems/save/saveSlot'
 import { SAVE_FORMAT_VERSION } from '../systems/save/saveSlot'
+import { GENERATOR_VERSION } from '../systems/generatorVersion'
 import {
   checkpointWrites,
   deleteSaveSlot,
@@ -215,6 +216,7 @@ describe('save slots (#401)', () => {
         playtimeTicks: savedFile().tick,
         savedAtMs: wallClockMs,
         formatVersion: SAVE_FORMAT_VERSION,
+        generatorVersion: GENERATOR_VERSION,
       },
     ])
     expect(savedFile().slot).toEqual({ name: 'Autosave', savedAtMs: wallClockMs })
@@ -308,6 +310,7 @@ describe('save slots (#401)', () => {
         playtimeTicks: PRE_175_SAVE.tick,
         savedAtMs: null,
         formatVersion: 1,
+        generatorVersion: PRE_175_SAVE.generatorVersion,
       },
     ])
     expect(disk.items.get('saves/autosave.json')).toBe(v1Text)
