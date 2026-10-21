@@ -17,3 +17,5 @@ npm run electron:build # unpacked Electron game folder in release/ (for Steam de
 
 Engineering rules for contributors and agents: [CLAUDE.md](CLAUDE.md). Steam status and what remains:
 [docs/steam.md](docs/steam.md). Debug/scenario API for tests and bots: [docs/TESTING_INSTRUCTIONS.md](docs/TESTING_INSTRUCTIONS.md).
+The UI's look, motion, sound, layout limits and copy rules, as tokens:
+[docs/ui/design-system.md](docs/ui/design-system.md).
