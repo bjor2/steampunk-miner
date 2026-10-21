@@ -30,8 +30,15 @@ const CARGO_HOLD_STEPS = [
   [33, 'Riveted bin'],
 ] as const
 
+/** Engine: Systems' thresholds (6300543785), Progression's names (6300549964), ticket 587. */
+const ENGINE_STEPS = [
+  [2, 'Single piston'],
+  [18, 'Triple flywheel'],
+  [26, 'Guild turbine'],
+] as const
+
 /** The tracks whose look rows carry a plaque template. */
-const PLAQUE_TRACKS: readonly string[] = ['drill_tip', 'boiler', 'cargo_hold', 'hull']
+const PLAQUE_TRACKS: readonly string[] = ['drill_tip', 'boiler', 'cargo_hold', 'hull', 'engine']
 
 /** The widest plaque fact a 360 px plaque wraps onto its own line (Content's 4-word names). */
 const PHONE_FACT_CHARS_MAX = 44
@@ -112,6 +119,28 @@ describe('rig look plaque fact (ticket 585)', () => {
   it('fits the widest cargo hold fact at grades 1, 101, 9999 and 1e6 on a 360 px plaque', () => {
     for (const grade of [1, 101, 9_999, 1_000_000]) {
       const fact = rigLookPlaqueFactOf('cargo_hold', 33 + grade)!
+      expect(fact.length, fact).toBeLessThanOrEqual(PHONE_FACT_CHARS_MAX)
+    }
+  })
+
+  it.each(ENGINE_STEPS)('names the owned engine step from %i purchases: %s', (from, name) => {
+    expect(rigLookPlaqueFactOf('engine', from - 1)).not.toBe(`Fitting: ${name}`)
+    expect(rigLookPlaqueFactOf('engine', from)).toBe(`Fitting: ${name}`)
+  })
+
+  it('names no engine step below 2, then grades the tail above the Guild turbine', () => {
+    expect(rigLookPlaqueFactOf('engine', 0)).toBeNull()
+    expect(rigLookPlaqueFactOf('engine', 1)).toBeNull()
+    expect(rigLookPlaqueFactOf('engine', 17)).toBe('Fitting: Single piston')
+    expect(rigLookPlaqueFactOf('engine', 26)).toBe('Fitting: Guild turbine')
+    expect(rigLookPlaqueFactOf('engine', 27)).toBe('Fitting: Guild turbine · Grade 1')
+    expect(rigLookPlaqueFactOf('engine', 28)).toBe('Fitting: Guild turbine · Grade 2')
+    expect(rigLookPlaqueFactOf('engine', 29)).toBe('Fitting: Guild turbine · Grade 3')
+  })
+
+  it('fits the widest engine fact at grades 1, 101, 9999 and 1e6 on a 360 px plaque', () => {
+    for (const grade of [1, 101, 9_999, 1_000_000]) {
+      const fact = rigLookPlaqueFactOf('engine', 26 + grade)!
       expect(fact.length, fact).toBeLessThanOrEqual(PHONE_FACT_CHARS_MAX)
     }
   })

@@ -88,7 +88,12 @@ describe('rig look on the vehicle', () => {
   it('steps up when a track is bought past its first step', () => {
     const session = createScriptedSession()
     session.submit(1, setUpgrade('engine', 2))
-    expect(sourceOf('engine').lookOf(session.state(), 'p1', 1)?.glows[0].slots).toEqual(['piston'])
+    expect(sourceOf('engine').lookOf(session.state(), 'p1', 1)?.glows[0].slots).toEqual([
+      'piston',
+      'single-piston',
+      'triple-flywheel',
+      'guild-turbine',
+    ])
   })
 
   it("paints each player's rig from their own purchases", () => {

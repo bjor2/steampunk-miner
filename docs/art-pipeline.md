@@ -684,9 +684,13 @@ roller's own disc: `hub-cap` is the leg's brass hub cap and axle nut piece for p
 Progression's `single-piston`, `triple-flywheel` and `guild-turbine`. No rig part sits on the slot,
 so a look lies over the roller rather than replacing a part, the roller keeps rolling under it,
 and the rig's outline never grows; the turbine's glow stays at under a third of the nose's so the
-nose stays the brightest part. Nothing registers or draws it yet: the per-track registry (#577)
-names the asset from the track id and the wiring (#587) swaps the part on the slot and runs the
-tail above the top step. `docs/art/rig-look-engine/author_engine_looks.py` wrote the first version
+nose stays the brightest part. The wiring
+([#587](https://github.com/bjor2/steampunk-miner/issues/587)) registers it through `r.artAssets`
+from `rigLook.json`'s `lookAssets` and exports it to `public/assets/vehicle/` (4 parts, 128x512);
+each step row names its part with `asset: "vehicle-look-engine"`, the track has no `replaces`, and
+the look parts join the track's glow slots so the tail above the top step paints them. The parts
+draw at `z` 3, over the chassis's 2, so the look covers the leg's own hub cap. Below 2 purchases
+nothing is drawn, so `hub-cap` ships unused. `docs/art/rig-look-engine/author_engine_looks.py` wrote the first version
 of the `.blend`; from then on it is the source. The part table, the outline check at tiers 1 and 3
 and the review renders, at desktop and at a 360 px phone's size, are in
 [docs/art/rig-look-engine/](art/rig-look-engine/README.md).

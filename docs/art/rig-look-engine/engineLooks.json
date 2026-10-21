@@ -3,7 +3,7 @@
   "assetId": "vehicle-look-engine",
   "track": "engine",
   "attach": "chassis.drive",
-  "z": 2,
+  "z": 3,
   "replaces": null,
   "footprintM": [-0.09, -0.45, 0.09, -0.27],
   "looks": [

@@ -10,9 +10,9 @@ dropped), and the linear tail above the top step keeps every later purchase visi
 named the steps Single piston, Triple flywheel and Guild turbine (6300549964); the base rig's hub
 cap is the unnamed default.
 
-**Not wired.** Nothing registers, exports or draws the asset: the per-track rig-look registry is
-#577 and the engine's wiring, which reads the thresholds from the registry's rows and swaps the
-part on the slot, is #587. `engineLooks.json` here is the one table this folder's scripts share;
+**Wired by #587.** The rig-look slice registers and exports the asset and lays each step's part
+on the slot from the registry's rows (`src/features/rig-look/rigLook.json`, #577); below 2
+purchases nothing is drawn, so `hub-cap` ships unused. `engineLooks.json` here is the one table this folder's scripts share;
 the wiring keeps its own rows (#576 "Registry": data, not code). The asset id follows the #52
 kebab form under the vehicle category, `vehicle-look-<track>`, so the registry can name it from
 the track id; the part ids are the step names.
@@ -31,7 +31,8 @@ sidecar with no offset. The slot is the middle roller's hub: `vehicle.parts.json
 `t1-wheel-2` both at (0, -0.36), where the middle leg's brass hub cap and axle nut (part of the
 chassis) sit in front of the roller's own discs. No rig part stands on the slot (the table's
 `replaces` is null), so a look lies over the roller's hub rather than replacing a part, the roller
-keeps rolling under it, and every rig part stays. Draw order `z` 2, the slot's.
+keeps rolling under it, and every rig part stays. Draw order `z` 3, one over the chassis's 2 (the
+wiring, #587, raised it from the slot's 2 so the look draws over the chassis's own hub cap).
 
 Every look is a drive unit on the axle and keeps inside the roller's own disc (radius 0.12 at
 tier 1, 0.13 at tier 3; the author script refuses a part reaching past 0.09 m from the hub), so
@@ -133,10 +134,11 @@ Against the ticket's acceptance, with the numbers the scripts wrote:
   green and blue) more than by detail; `readability.json` counts what changes. The hub cap to Single
   piston step is the least visible there (15 of 42); if #590's pixel-diff threshold asks for more,
   the crank disc is where to add brightness, keeping it under the flywheels' steel.
-- The look draws at the slot's `z` 2, the chassis's own, and the chassis's hub cap sits at the
-  slot: the wiring (#587) must draw the look over the chassis, as the hull's lies over the pod. If
-  the chassis drew over it, only the leg's 32 mm brass cap and 12 mm nut would show at the look's
-  centre, which every engine covers with a boss of its own.
+- The look first drew at the slot's `z` 2, the chassis's own, and the chassis's hub cap sits at the
+  slot, so the two would fight for the same depth. The wiring (#587) set every part's `z` to 3 in
+  the `.blend` (over the chassis's 2, under the thrusters' 4), so the look lies over the chassis as
+  the hull's lies over the pod. Had the chassis drawn over it, only the leg's 32 mm brass cap and
+  12 mm nut would show at the look's centre, which every engine covers with a boss of its own.
 - The roller turns with the ground speed and the look stands still over its hub, as a real axle
   cap does; the wiring may turn the flywheels and turbine with the roller if it wants them to spin.
 - The showcase's engine reaction lifts the rollers and chassis (`showcase.json`); a look on
