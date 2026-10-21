@@ -310,6 +310,13 @@ programs }` from three's `renderer.info` of the game canvas), read only when cal
   unknown kind, a window that does not rise, a lattice or chance out of bounds, copy that breaks the
   card rule, an effect without its numbers or over `hazardCaps`, and stray fields. Whether a pocket
   is met on the three pacing seeds is ticket 652's worldgen spec.
+- **Hazard pockets in the ground** (ticket 652): `src/features/ores/systems/hazardPockets.test.ts`
+  reads the pockets through the kernel's `hazardPockets` seam on generated cells. On each of the
+  pacing seeds 83921, 31415 and 27182, each of planets 2 to 5 holds a pocket of its own row's kind
+  within 20 columns of the dock point (the GD's "seen within a minute of landing"); every pocket is
+  plain ground inside the row's window, counted in radial cells; planet 1, planets past 5 and every
+  P2 to P5 a save holds under ore rules 7 or earlier meet none; and a fresh P2 to P5 generates the
+  cells rules 7 made, since a pocket is a read and never a repaint.
 - **Material looks** (ticket 450, TD shape on #450 6226270701 and the Scalers' conditions):
   `src/features/roster/kindLook.test.ts` holds the roster's look provider to its rules: a fresh
   save shows no species (unseen kinds draw the family look), a species shows only once the

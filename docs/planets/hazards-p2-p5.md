@@ -10,7 +10,7 @@ touch no power or cost curve.
 The rows live on the planet registry (`src/features/ores/ores.economy.json`, `planets.rows[].hazard`,
 ticket 642's rows), the kinds in `planets.hazards` and the caps in `planets.hazardCaps`. The loader
 is `src/features/ores/systems/planetHazards.ts` and `hazardKinds.ts`; `planetHazards.test.ts` holds
-every rule below. Ticket 652 paints the pockets, ticket 653 the look, ticket 654 the card.
+every rule below. Ticket 652 lays the pockets, ticket 653 the look, ticket 654 the card.
 
 ## The four hazards
 
@@ -59,9 +59,18 @@ P2–P5. A straight 40-cell shaft crosses about 13 blocks, so it meets a pocket 
 **P1 is byte-identical.** Planet 1's row holds no hazard and the loader refuses one there. Planets
 6 and on hold none yet.
 
-**Existing worlds keep their stamp.** Ticket 652 paints under a new ore rules version stamped from
+**Existing worlds keep their stamp.** Ticket 652 lays the pockets under ore rules 8, stamped from
 planet 2, so a P2–P5 planet a save holds under rules 7 or earlier has no pockets and never
 regenerates; the P1 and old-save goldens stay as they are.
+
+**As built (ticket 652).** A pocket is a read of the planet and the cell, never a repaint, as the
+magnetic class's electrified cells are: plain ground whose radial depth lies in the window and whose
+lattice block hashes under the chance, asked through the kernel's `hazardPockets` seam
+(`src/systems/registries/hazardPockets.ts`, provided by `src/features/ores/systems/hazardPockets.ts`).
+The generated cells of every planet stay byte-identical, so the generator version did not move. On
+seeds 83921, 31415 and 27182 every one of P2–P5 holds a pocket within 20 columns of the dock
+point (72 to 277 pocket tiles in those 41 columns, the nearest in column 0 or 1).
+The contact reaction (the four effects above) and each kind's look are not part of ticket 652.
 
 ## The card line
 
