@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "updated_at": "2026-10-21T17:16:59Z",
+  "updated_at": "2026-10-21T17:17:41Z",
   "entries": {
     "steampunk-loop/1": {
       "loop": "steampunk-loop",
@@ -630,10 +630,10 @@
     "steampunk-loop/7": {
       "loop": "steampunk-loop",
       "slot": "7",
-      "state": "working",
-      "issue": 679,
-      "note": "started 2026-10-21 18:45 CEST",
-      "updated_at": "2026-10-21T17:16:59Z",
+      "state": "idle",
+      "issue": null,
+      "note": "free; #679 landed on main and closed",
+      "updated_at": "2026-10-21T17:17:41Z",
       "host": "grok-bot-vm-452660841"
     },
     "steampunk-loop/8": {
@@ -693,6 +693,13 @@
     }
   },
   "events": [
+    {
+      "at": "2026-10-21T17:17:41Z",
+      "key": "steampunk-loop/7",
+      "state": "idle",
+      "issue": null,
+      "note": "free; #679 landed on main and closed"
+    },
     {
       "at": "2026-10-21T17:16:59Z",
       "key": "steampunk-loop/8",
@@ -1105,13 +1112,6 @@
       "state": "paused",
       "issue": null,
       "note": "main red at 23cacc8: no new dev workers until tester.sh --full is green"
-    },
-    {
-      "at": "2026-10-21T08:19:43Z",
-      "key": "steampunk-loop",
-      "state": "idle",
-      "issue": null,
-      "note": "status check; 1/4 planner slots"
     }
   ]
 }
