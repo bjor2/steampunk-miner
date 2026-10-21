@@ -3,8 +3,12 @@
  * `(family, tier)` pair. Family is look and identity only; tier is the one economic number, so value
  * and hardness read the tier alone (`oreSalePrice`, `oreHardness` in the kernel's oreEconomy).
  *
- *   t(p, b, lead) = 3(p-1) + b + lead        id `<family>_t<t>`        name `<gradeName> <familyName>`
+ *   t(p, b, lead) = 3(p-1) + b + lead        id `<family>_t<t>`        name `<familyName>`
  *   variant = (t-1) mod 4                    echo = t < 97 ? 0 : floor((t-97)/24) + 1
+ *
+ * The type name is the family's alone (ticket 695): a grade before it made every ore of a family
+ * read alike ("Raw Brassvein"), so the grade stays a number and a look. Where a unit names its
+ * cell, the popup shows the cell's species from the materials slice instead.
  *
  * Grades are #151's (`oreGrades` [4, 12, 30, 70]: Raw, Lustrous, Crystal, Lumen, Aether), read
  * from the kernel's `oreGrade`, the one reader of those thresholds. Vertical: the tier axis, the
@@ -14,13 +18,13 @@
  * the alien boundary (t 97, P33) and steps every 8 planets, so #140's own t 126 rule is retired.
  */
 import { oreTier } from '../../../systems/economy/oreEconomy'
-import { oreGradeNameOf, oreGradeOf } from '../../../systems/render/oreGrade'
+import { oreGradeOf } from '../../../systems/render/oreGrade'
 import { ORE_ROWS, type LeadWeights, type OreFamily, type OreRows } from './oreRows'
 
 export interface CatalogueOre {
   /** `<family>_t<tier>`. */
   id: string
-  /** `<gradeName> <familyName>`; the UI shows the tier beside it ("Tier 12 Crystal Pitchglow"). */
+  /** The family's display name, never a grade before it (ticket 695). */
   name: string
   family: string
   tier: number
@@ -43,7 +47,7 @@ export function oreTypeOf(familyId: string, tier: number, rows: OreRows = ORE_RO
   assertTier(tier)
   return {
     id: `${family.id}_t${tier}`,
-    name: `${oreGradeNameOf(tier)} ${family.name}`,
+    name: family.name,
     family: family.id,
     tier,
     grade: gradeOf(tier),

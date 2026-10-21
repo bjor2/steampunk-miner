@@ -23,17 +23,22 @@ function expectedValueMultiplier(band: number): number {
 }
 
 describe('ore catalogue', () => {
-  it('names a type by family and tier, and its grade and family by name', () => {
+  it('names a type by family and tier, and its family by name', () => {
     expect(oreTypeOf('radioactive', 12)).toEqual({
       id: 'radioactive_t12',
-      name: 'Crystal Pitchglow',
+      name: 'Pitchglow',
       family: 'radioactive',
       tier: 12,
       grade: 3,
       variant: 3,
       echo: 0,
     })
-    expect(oreTypeOf('metal', 1).name).toBe('Raw Brassvein')
+    expect(oreTypeOf('metal', 1).name).toBe('Brassvein')
+  })
+
+  it('never puts a grade in a type name, at any tier (ticket 695)', () => {
+    const names = CAMPAIGN_TIERS.map((tier) => oreTypeOf('crystal', tier).name)
+    expect(new Set(names)).toEqual(new Set(['Quartzine']))
   })
 
   it("grades tiers on #151's thresholds: G1 1-3, G2 4-11, G3 12-29, G4 30-69, G5 70+", () => {

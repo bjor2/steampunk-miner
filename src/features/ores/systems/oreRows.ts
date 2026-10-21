@@ -34,7 +34,7 @@ import { rarityRowProblems, rarityRowsOf, type RarityRowSet, type RarityRows } f
 
 export interface OreFamily {
   id: string
-  /** #141's display name; the type name is `<gradeName> <name>`. */
+  /** #141's display name, and the name of every type of the family (ticket 695). */
   name: string
   /** The value of the cell's 4-bit family field. */
   cellCode: number

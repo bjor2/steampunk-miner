@@ -28,7 +28,7 @@ describe('ore type provider', () => {
     )
     expect(ore).toEqual({
       id: 'crystal_t12',
-      name: 'Crystal Quartzine',
+      name: 'Quartzine',
       family: 'crystal',
       cellFamily: RESOURCE_FAMILY.crystal,
       tier: 12,
