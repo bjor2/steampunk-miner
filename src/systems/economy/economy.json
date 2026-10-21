@@ -24,7 +24,7 @@
         { "from": 6, "scale": "1.6" },
         { "from": 8, "scale": "1.7" }
       ],
-      "byPlanet": {}
+      "byPlanet": { "5": "1.44" }
     },
     "surfaceLayer": {
       "pinnedCells": 3,

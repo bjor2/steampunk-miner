@@ -57,8 +57,14 @@ describe('planet charges', () => {
 
   // Systems' rows on #553 (ticket 553, replacing Proposal 1 on #551): 2 -> 1.2, 3 -> 1.2,
   // 4 -> 1.3, 6 -> 1.6, 8 -> 1.7.
-  it('scales planets 2 and 3 by 1.2 and planets 4 and 5 by 1.3', () => {
-    expect([2, 3, 4, 5].map(paceScale)).toEqual([m('1.2'), m('1.2'), m('1.3'), m('1.3')])
+  it('scales planets 2 and 3 by 1.2 and planet 4 by 1.3', () => {
+    expect([2, 3, 4].map(paceScale)).toEqual([m('1.2'), m('1.2'), m('1.3')])
+  })
+
+  // Ticket 649: P5's own row, the geometric midpoint of P4 1.3 and P6 1.6, provisional until
+  // #644's paired-run re-baseline solves it.
+  it('scales planet 5 by its provisional 1.44, between the 1.3 and 1.6 of its neighbours', () => {
+    expect([4, 5, 6].map(paceScale)).toEqual([m('1.3'), m('1.44'), m('1.6')])
   })
 
   it('scales planets 6 and 7 by 1.6', () => {

@@ -7,7 +7,7 @@ C=dict(v0="10",rho="1.5",eta="1.2544",d0="1.5",dFirst=["1.12",18],gD="1.243",P0=
  c0=24,base=dict(drill_power="1",drill_tip="83",hull="46"),r="1.225",drillRow=dict(first="1",base="20",ratio="1.48"),rTip="1.500625",w=dict(drill_power=2,drill_tip=3,engine=1.5,boiler=1,cargo_hold=1,hull=2),
  purchaseRow=dict(cargo_hold=["2.4","1.15"],boiler=["2.4","1.20"],engine=["3.6","1.60"]),
  Hk="7",Dkc="17.5",Dkb="16.5",gE="1.12",ET0=1,etPlanet=6,etBand=1,KxE=60,tkill="1.5",
- paceFrom=[[2,"1.2"],[3,"1.2"],[4,"1.3"],[6,"1.6"],[8,"1.7"]])
+ paceFrom=[[2,"1.2"],[3,"1.2"],[4,"1.3"],[6,"1.6"],[8,"1.7"]],paceBy={"5":"1.44"})
 d=lambda s:D(str(s))
 def tier(p,b): return 3*(p-1)+b
 def V(t): return d(C['v0'])*d(C['rho'])**(t-1)
@@ -23,8 +23,9 @@ def coreTiles(Rr):
 def need(Rr): return -(-4*coreTiles(Rr)//10)
 def Lon(tr,p):
     return dict(drill_power=3*(p-1)+12,drill_tip=3*(p-1)+7,hull=6*(p-1)+2,cargo_hold=min(2*(p-1)+22,34),boiler=min((p-1)+4,16),engine=min(3*(p-1)+2,131))[tr]
-# paceScale(p) (#131 fromPlanet): the last row at or below p, else 1; it multiplies every price.
-def pace(p): return d(([s for f_,s in C['paceFrom'] if f_<=p] or ["1"])[-1])
+# paceScale(p) (#131 fromPlanet): the planet's own byPlanet row (P5 1.44, provisional until #644),
+# else the last row at or below p, else 1; it multiplies every price.
+def pace(p): return d(C['paceBy'].get(str(p)) or ([s for f_,s in C['paceFrom'] if f_<=p] or ["1"])[-1])
 # drill power's price rows per purchase (#551, ticket 552): price(0) = 1, price(n) = ceil(20 x 1.48^(n-1)), times pace(p).
 def drillRow(n):
     R_=C['drillRow']; return d(R_['first']) if n==0 else (d(R_['base'])*d(R_['ratio'])**(n-1)).to_integral_value(rounding=ROUND_CEILING)

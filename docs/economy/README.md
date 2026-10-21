@@ -48,7 +48,9 @@ The tables list **major levels** `L`, today's curves. A vehicle stores each trac
   boiler 4 + 1 a planet, stopping at Systems' 16-purchase tank (689 units) from P13, which keeps
   the old on-curve tank (P7 389 units against 390); the engine 2 + 3 a planet, stopping at 131,
   the last purchase under the old 3600 m/s sub-step floor (lifted by ticket 558). `paceScale` rows: 1.2 from P2, 1.3 from P4,
-  1.6 from P6, 1.7 from P8.
+  1.6 from P6, 1.7 from P8. P5 has its own `byPlanet` row, 1.44 (the geometric midpoint of 1.3
+  and 1.6, ticket 649). It is **provisional**: #644's P2–P10 paired-run re-baseline solves the
+  real value and replaces it. No horizontal content keys on it, and it has no stats.json row.
 - The design tables of the tip and hull do not change, because they read majors. `npm run balance:report` prints the
   pacing bot's spree targets per track (GD lock on #181): the median steps per bought track a
   visit, 6 to 12, and the share of above-median trips that buy 10 or more steps on one track, 25 to

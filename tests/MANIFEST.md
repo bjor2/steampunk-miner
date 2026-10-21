@@ -981,7 +981,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/economy/magnetCaps.test.ts` | 5 | 5 |
 | `src/systems/economy/oreEconomy.test.ts` | 7 | 7 |
 | `src/systems/economy/perPurchaseRows.test.ts` | 40 | 21 |
-| `src/systems/economy/planetCharges.test.ts` | 16 | 12 |
+| `src/systems/economy/planetCharges.test.ts` | 17 | 13 |
 | `src/systems/economy/readEconomy.test.ts` | 25 | 25 |
 | `src/systems/economy/refineryEconomy.test.ts` | 6 | 6 |
 | `src/systems/economy/trackKind.test.ts` | 1 | 1 |
