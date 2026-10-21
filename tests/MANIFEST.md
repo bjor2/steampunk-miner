@@ -1347,6 +1347,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/save/saveSlot.test.ts` | 20 | 16 |
 | `src/systems/save/saveSlotIndex.test.ts` | 11 | 11 |
 | `src/systems/save/saveSlotSections.test.ts` | 3 | 3 |
+| `src/systems/save/saveSlotSummary.test.ts` | 8 | 8 |
 | `src/systems/save/saveTextRoundTrip.test.ts` | 3 | 3 |
 | `src/systems/save/saveWriteFailure.test.ts` | 3 | 3 |
 | `src/systems/save/savedUnlocks.test.ts` | 7 | 7 |
@@ -1415,7 +1416,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/store/authorityReads.test.ts` | 3 | 3 |
 | `src/store/bayEntryPress.test.ts` | 2 | 2 |
 | `src/store/carveCompleteBroadcast.test.ts` | 3 | 3 |
-| `src/store/checkpoint.test.ts` | 22 | 22 |
+| `src/store/checkpoint.test.ts` | 23 | 23 |
 | `src/store/devFlagOverrides.test.ts` | 15 | 15 |
 | `src/store/devFlagPanel.test.ts` | 12 | 12 |
 | `src/store/devFlagSessions.test.ts` | 2 | 2 |
@@ -1559,7 +1560,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/ui/kit/itemCard.test.ts` | 13 | 13 |
 | `src/ui/kit/rarityName.test.ts` | 4 | 4 |
 | `src/ui/kit/uiParts.test.ts` | 16 | 16 |
-| `src/ui/menuText.test.ts` | 4 | 4 |
+| `src/ui/menuText.test.ts` | 5 | 5 |
 | `src/ui/plaques/hintChip.test.ts` | 3 | 3 |
 | `src/ui/platform/bayEntryRowView.test.ts` | 2 | 2 |
 | `src/ui/platform/bayPanels.test.ts` | 8 | 8 |
@@ -1677,6 +1678,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/views/sellBayModel.test.ts` | 14 | 14 |
 | `src/systems/views/settingsModel.test.ts` | 5 | 5 |
 | `src/systems/views/sheetLayout.test.ts` | 11 | 11 |
+| `src/systems/views/slotSummaryLine.test.ts` | 7 | 7 |
 | `src/systems/views/titleMenuModel.test.ts` | 8 | 8 |
 | `src/systems/views/titleOnlyText.test.ts` | 5 | 5 |
 | `src/systems/views/tooltipOpening.test.ts` | 9 | 9 |
@@ -1715,6 +1717,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/world/groundEdit.test.ts` | 19 | 15 |
 | `src/systems/world/lavaFlow.test.ts` | 6 | 6 |
 | `src/systems/world/lavaPockets.test.ts` | 7 | 7 |
+| `src/systems/world/openedDepth.test.ts` | 4 | 4 |
 | `src/systems/world/orePatches.test.ts` | 32 | 9 |
 | `src/systems/world/planetParams.test.ts` | 34 | 29 |
 | `src/systems/world/rimDwell.test.ts` | 6 | 6 |
