@@ -51,6 +51,7 @@ import {
   type SnapshotSources,
 } from './store/runSnapshots'
 import { parseScenario, type Scenario } from './systems/scenario'
+import { keepPlanetSkinned } from './ui/stage/planetSkin'
 import { keepScreenFitted } from './ui/stage/screenFit'
 import { keepHapticsPlaying, showTouchControlsOnTouch } from './ui/touch/touchFollowers'
 
@@ -87,6 +88,7 @@ export async function startGame(): Promise<void> {
   readDevFlagOverridesInDebugSession(shell)
   offerDebugSessionByGesture(shell)
   keepScreenFitted(shell)
+  keepPlanetSkinned(shell)
   noteRenderPointer(shell)
   showTouchControlsOnTouch(shell)
   holdPlayWhilePageHidden(shell)
