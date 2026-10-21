@@ -453,15 +453,16 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/power-up-core/systems/useRefusals.test.ts` | 3 | 3 |
 | `src/features/power-up-core/systems/useResolution.test.ts` | 12 | 12 |
 
-### `rig-look`: 5 files, 51 tests
+### `rig-look`: 6 files, 70 tests
 
 | File | Tests | Sites |
 | --- | --- | --- |
-| `src/features/rig-look/systems/render/rigLookFrames.test.ts` | 8 | 8 |
+| `src/features/rig-look/systems/render/rigLookFrames.test.ts` | 10 | 10 |
 | `src/features/rig-look/systems/render/rigLookIndex.test.ts` | 8 | 8 |
-| `src/features/rig-look/systems/render/rigLookParts.test.ts` | 6 | 6 |
+| `src/features/rig-look/systems/render/rigLookParts.test.ts` | 9 | 9 |
+| `src/features/rig-look/systems/rigLookArt.test.ts` | 6 | 4 |
 | `src/features/rig-look/systems/rigLookSource.test.ts` | 13 | 13 |
-| `src/features/rig-look/systems/rigLookTable.test.ts` | 16 | 16 |
+| `src/features/rig-look/systems/rigLookTable.test.ts` | 24 | 24 |
 
 ### `roster`: 14 files, 211 tests
 
@@ -1255,6 +1256,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/render/heroAtlas.test.ts` | 5 | 5 |
 | `src/systems/render/kindLookTable.test.ts` | 12 | 12 |
 | `src/systems/render/kindLooks.test.ts` | 6 | 6 |
+| `src/systems/render/lookPartQuads.test.ts` | 6 | 6 |
 | `src/systems/render/mountedPartLook.test.ts` | 8 | 4 |
 | `src/systems/render/oreGrade.test.ts` | 2 | 2 |
 | `src/systems/render/oreLook.test.ts` | 11 | 9 |
@@ -1267,7 +1269,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/render/renderQuality.test.ts` | 9 | 9 |
 | `src/systems/render/renderRate.test.ts` | 6 | 6 |
 | `src/systems/render/renderScale.test.ts` | 19 | 19 |
-| `src/systems/render/requestedParts.test.ts` | 3 | 3 |
+| `src/systems/render/requestedParts.test.ts` | 6 | 6 |
 | `src/systems/render/sampleClock.test.ts` | 3 | 3 |
 | `src/systems/render/sceneLights.test.ts` | 6 | 6 |
 | `src/systems/render/screenProjection.test.ts` | 5 | 5 |
