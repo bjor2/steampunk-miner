@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-10-21T10:24:02+02:00",
+  "updated_at": "2026-10-21T10:33:58+02:00",
   "caps": {
     "grok": 12,
     "claude": 10,
@@ -69,7 +69,7 @@
       "size": 6,
       "used": 0,
       "free": 6,
-      "claims_last_hour": 0,
+      "claims_last_hour": 1,
       "name": "Claude Max 1"
     },
     {
@@ -318,9 +318,9 @@
     }
   ],
   "last_refill": {
-    "at": "2026-10-21 10:06 CEST",
+    "at": "2026-10-21 10:33 CEST",
     "mode": "refill-dev",
-    "triggers": "#625",
+    "triggers": "claude-run:wave-plan",
     "started": "",
     "note": "no pickable build ticket"
   },
@@ -440,18 +440,18 @@
       },
       {
         "number": 627,
-        "key": "308-1B",
+        "key": "308-2A",
         "map": 308,
         "lane": "remote",
         "mode": "solo",
-        "state": "paused",
+        "state": "ready",
         "tickets": [
-          622,
-          623
+          623,
+          661,
+          662,
+          663
         ],
-        "done": [
-          622
-        ],
+        "done": [],
         "live": 0
       },
       {
