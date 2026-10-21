@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { planetParamsFor } from '../world/planetParams'
-import { bandColourOf, paletteOf } from './bandPalette'
+import { bandColourOf, paletteOf, shownPaletteOf } from './bandPalette'
 import { STRATA_TILE_M, strataRingBaseOf, strataTintsOf, strataTurnsOf } from './groundStrata'
 
 const planet1 = planetParamsFor(83921, 1)
@@ -21,16 +21,16 @@ describe('ground strata', () => {
   })
 
   it('leaves planet 1 untinted, since the maps are authored in its colours', () => {
-    for (const tint of strataTintsOf(planet1.paletteId)) {
+    for (const tint of strataTintsOf(planet1)) {
       for (const channel of tint) expect(channel).toBeCloseTo(1, 10)
     }
   })
 
-  it('tints planet 2 so a band’s authored colour becomes planet 2’s band colour', () => {
-    const tints = strataTintsOf(planet2.paletteId)
+  it('tints planet 2 so a band’s authored colour becomes planet 2’s shown band colour', () => {
+    const tints = strataTintsOf(planet2)
     for (const band of [1, 3, 5]) {
       const authored = bandColourOf(paletteOf(planet1.paletteId), band)
-      const wanted = bandColourOf(paletteOf(planet2.paletteId), band)
+      const wanted = bandColourOf(shownPaletteOf(planet2), band)
       const tinted = authored.map((channel, at) => channel * tints[band - 1][at])
       tinted.forEach((channel, at) => expect(channel).toBeCloseTo(wanted[at], 10))
     }

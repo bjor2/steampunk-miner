@@ -39,7 +39,7 @@ import { CELL_KIND, kindOfCell, kindSlotOfCell, NO_KIND_SLOT } from '../world/wo
 import { DENSITY_HALO_SIDE } from './densityHalo'
 import { BLOCKS_PER_CHUNK, BLOCKS_PER_CHUNK_SIDE, type BlockedTileInstances } from './groundBlocks'
 import { ART_DIRECTION, type BandPalette } from './artDirection'
-import { bandColourOf, paletteOf, tileShadeOf } from './bandPalette'
+import { bandColourOf, shownPaletteOf, tileShadeOf } from './bandPalette'
 import type { Rgb } from './colour'
 import { cellGateLookProvider, type CellGateLookProvider } from '../registries/cellGateLook'
 import { kindLookProvider, type KindLookProvider } from '../registries/kindLook'
@@ -161,7 +161,7 @@ function batchContextOf(
   cy: number,
   cells: Uint32Array,
 ): Omit<BatchContext, 'lining'> {
-  const palette = paletteOf(params.paletteId)
+  const palette = shownPaletteOf(params)
   return {
     params,
     palette,

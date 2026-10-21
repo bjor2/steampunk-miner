@@ -11,12 +11,13 @@
  * here in doubles (`strataRingBaseOf`), plus the small change from there to the fragment.
  *
  * The maps are authored at planet 1's band colours (scripts/art/author_tiles.py); another planet
- * tints them by the ratio of its band colour to planet 1's (#51 "planet 2 tints them").
+ * tints them by the ratio of its band colour to planet 1's (#51 "planet 2 tints them"), its row
+ * look's rock where it has one (ticket 653).
  */
 import { ART_RULES } from '../art/artIds'
 import { BAND_COUNT } from '../world/planetGeometry'
 import type { PlanetParams } from '../world/planetParams'
-import { bandColourOf, paletteOf } from './bandPalette'
+import { bandColourOf, paletteOf, shownPaletteOf } from './bandPalette'
 import type { Rgb } from './colour'
 
 /** One strata tile's side in metres: 1024 px at 256 px/m (#52). */
@@ -47,9 +48,9 @@ export function strataRingBaseOf(x: number, y: number, turns: readonly number[])
   }
 }
 
-/** Per channel, the planet's band colour over planet 1's: all ones on planet 1. */
-export function strataTintsOf(paletteId: string): Rgb[] {
-  const palette = paletteOf(paletteId)
+/** Per channel, the planet's shown band colour over planet 1's: all ones on planet 1. */
+export function strataTintsOf(params: PlanetParams): Rgb[] {
+  const palette = shownPaletteOf(params)
   const authored = paletteOf(STRATA_AUTHORED_PALETTE_ID)
   return BANDS.map((band) => ratioOf(bandColourOf(palette, band), bandColourOf(authored, band)))
 }

@@ -74,6 +74,7 @@ import { HULL_DAMAGE_INTERCEPT_REGISTRY } from '../systems/registries/hullDamage
 import { MAGNETIC_GROUND_REGISTRY } from '../systems/registries/magneticGround'
 import { PLANET_CARD_LINE_REGISTRY } from '../systems/registries/planetCardLines'
 import { PLANET_NAME_REGISTRY } from '../systems/registries/planetNames'
+import { PLANET_LOOK_REGISTRY } from '../systems/registries/planetLooks'
 import { PLANET_RADIUS_REGISTRY } from '../systems/registries/planetRadii'
 import { HAZARD_POCKETS_REGISTRY } from '../systems/registries/hazardPockets'
 import { PLANET_SKY_BAND_REGISTRY } from '../systems/registries/planetSkyBand'
@@ -193,6 +194,7 @@ export function registrarFor(sliceId: string): SliceRegistrar {
     planetRadius: (provider) => add(PLANET_RADIUS_REGISTRY, provider),
     hazardPockets: (provider) => add(HAZARD_POCKETS_REGISTRY, provider),
     planetName: (provider) => add(PLANET_NAME_REGISTRY, provider),
+    planetLook: (provider) => add(PLANET_LOOK_REGISTRY, provider),
     planetCardLine: (source) => addPrefixed(PLANET_CARD_LINE_REGISTRY, sliceId, source),
     boreGun: (provider) => add(BORE_GUN_REGISTRY, provider),
     boreLineListener: (listener) => add(BORE_LINE_LISTENER_REGISTRY, listener),

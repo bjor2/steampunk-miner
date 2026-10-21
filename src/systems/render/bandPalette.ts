@@ -5,14 +5,35 @@
  */
 import { SKY_FADE_DEPTH_TILES } from '../../constants/scene'
 import { cellRandomFloat } from '../cellRandom'
+import { planetLookOf, type PlanetLook } from '../registries/planetLooks'
 import { BAND_COUNT } from '../world/planetGeometry'
+import type { PlanetParams } from '../world/planetParams'
 import { ART_DIRECTION, type BandPalette } from './artDirection'
-import { mixRgb, scaleRgb, type Rgb } from './colour'
+import { mixRgb, rgbOfHex, scaleRgb, type Rgb } from './colour'
 
 export function paletteOf(paletteId: string): BandPalette {
   const palette = ART_DIRECTION.palettes[paletteId]
   if (palette === undefined) throw new RangeError(`no palette "${paletteId}" in artDirection.json`)
   return palette
+}
+
+/**
+ * The palette a planet is drawn in: its archetype's (#13), with its own row look's rock and horizon
+ * where it has one (ticket 653). The pad, core and underground stay the archetype's.
+ */
+export function shownPaletteOf(params: PlanetParams): BandPalette {
+  const palette = paletteOf(params.paletteId)
+  const look = planetLookOf(params.planetIndex)
+  return look === null ? palette : withPlanetLook(palette, look)
+}
+
+function withPlanetLook(palette: BandPalette, look: PlanetLook): BandPalette {
+  return {
+    ...palette,
+    surface: rgbOfHex(look.rockSurface),
+    deep: rgbOfHex(look.rockDeep),
+    sky: rgbOfHex(look.horizon),
+  }
 }
 
 /** Band 1 is the surface colour, band 5 the deep colour. */

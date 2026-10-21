@@ -2,12 +2,14 @@
  * A band of light in a planet's sky, just above its surface (GD ruling on #293 Q1, from the TD's
  * proposal): the magnetic planet's aurora first, and the frozen and hollow classes may reuse it, so
  * it is a planet-atmosphere seam, not a magnetic special case. One provider at most (`planet-mix`);
- * with none, or where it answers null, no planet draws a band. The kernel's `PlanetSkyBand` draws
+ * where it answers null the planet's own row look's band shows (ticket 653, `planetLooks.ts`), and
+ * with neither the planet draws no band. The kernel's `PlanetSkyBand` draws
  * the look as one ring mesh round the planet, 1 draw call from #38's co-op headroom, outside the
  * slices' `SCENE_LAYER_LINE`. Presentation only: nothing here reaches the authority state, a
  * snapshot or a digest.
  */
 import type { PlanetParams } from '../world/planetParams'
+import { planetLookOf } from './planetLooks'
 import { defineOneProviderRegistry, entriesOf } from './seal'
 
 /** A part of a Blender `parts` asset whose texture the band repeats round the planet. */
@@ -44,11 +46,18 @@ export const MIN_SKY_BAND_THICKNESS_M = 1 / 4
 export const PLANET_SKY_BAND_REGISTRY =
   defineOneProviderRegistry<PlanetSkyBandProvider>('planetSkyBand')
 
-/** The planet's band, held to sane bounds; null with no provider or where it answers none. */
+/**
+ * The planet's band, held to sane bounds: its class's band, else its row look's; null where
+ * neither answers.
+ */
 export function planetSkyBandOf(params: PlanetParams): PlanetSkyBandLook | null {
-  const [provider] = entriesOf(PLANET_SKY_BAND_REGISTRY)
-  const look = provider?.bandOf(params) ?? null
+  const look = classBandOf(params) ?? planetLookOf(params.planetIndex)?.skyBand ?? null
   return look === null ? null : boundedLook(look)
+}
+
+function classBandOf(params: PlanetParams): PlanetSkyBandLook | null {
+  const [provider] = entriesOf(PLANET_SKY_BAND_REGISTRY)
+  return provider?.bandOf(params) ?? null
 }
 
 function boundedLook(look: PlanetSkyBandLook): PlanetSkyBandLook {

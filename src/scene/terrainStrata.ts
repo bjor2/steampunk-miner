@@ -54,7 +54,7 @@ function writeStrataFit(uniforms: ShaderMaterial['uniforms'], params: PlanetPara
   uniforms.uStrataTurns.value = strataTurnsOf(params)
   uniforms.uBandStarts.value = [...params.bandStartsHalfTileSq]
   const tints: Vector3[] = uniforms.uStrataTint.value
-  strataTintsOf(params.paletteId).forEach(([red, green, blue], at) =>
+  strataTintsOf(params).forEach(([red, green, blue], at) =>
     tints[at].set(red, green, blue),
   )
 }

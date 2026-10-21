@@ -57,6 +57,7 @@ import type { PlanetCardLineSource } from '../systems/registries/planetCardLines
 import type { PlanetNameProvider } from '../systems/registries/planetNames'
 import type { PlanetRadiusProvider } from '../systems/registries/planetRadii'
 import type { HazardPocketsProvider } from '../systems/registries/hazardPockets'
+import type { PlanetLookProvider } from '../systems/registries/planetLooks'
 import type { PlanetSkyBandProvider } from '../systems/registries/planetSkyBand'
 import type { ShockShield } from '../systems/registries/shockShields'
 import type { OreDrillClassProvider } from '../systems/registries/oreDrillClasses'
@@ -266,6 +267,8 @@ export interface SliceRegistrar {
   hazardPockets(provider: HazardPocketsProvider): void
   /** One provider across all slices: each planet's display name, row or generated (ticket 702). */
   planetName(provider: PlanetNameProvider): void
+  /** One provider across all slices: each planet's rock, horizon and band from its row (ticket 653). */
+  planetLook(provider: PlanetLookProvider): void
   /**
    * A planet class's tag, arrival line and values on the kernel's planet card (ticket 343): shown
    * once its `featureId` row is open, the hazard and gate kind only, never an unlock id.

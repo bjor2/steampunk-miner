@@ -6,7 +6,7 @@
  */
 import { groundGatePresence } from '../scene/groundGatePresence'
 import { readPlanetWorld } from '../store/gameStore'
-import { bandColourOf, paletteOf } from '../systems/render/bandPalette'
+import { bandColourOf, shownPaletteOf } from '../systems/render/bandPalette'
 import {
   isLiningReadable,
   liningContrastAt,
@@ -38,7 +38,7 @@ function liningOfTile(tx: number, ty: number, pixelsPerCell: number): DrawnLinin
   const bits = groundGatePresence.gateBitsAt({ tx, ty })
   const { params } = readPlanetWorld()
   if (bits === null || params === null) return null
-  const rock = bandColourOf(paletteOf(params.paletteId), bandOfTile(params, tx, ty))
+  const rock = bandColourOf(shownPaletteOf(params), bandOfTile(params, tx, ty))
   const contrast = liningContrastAt(pixelsPerCell, rock)
   return { isLined: isLinedBits(bits), contrast, isReadable: isLiningReadable(contrast) }
 }
