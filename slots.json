@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-10-21T22:07:03+02:00",
+  "updated_at": "2026-10-21T22:14:51+02:00",
   "caps": {
     "grok": 12,
     "claude": 10,
@@ -83,12 +83,11 @@
       "slots": [
         {
           "slot": "C7",
-          "state": "busy",
-          "ticket": 691,
-          "grok_slot": 3,
-          "kind": "dev",
-          "since": "2026-10-21T22:07:00+02:00",
-          "wave": "678-2A"
+          "state": "free",
+          "ticket": null,
+          "grok_slot": null,
+          "kind": null,
+          "since": null
         },
         {
           "slot": "C8",
@@ -116,8 +115,8 @@
         }
       ],
       "size": 4,
-      "used": 1,
-      "free": 3,
+      "used": 0,
+      "free": 4,
       "claims_last_hour": 3,
       "name": "Claude Max 2"
     }
@@ -170,11 +169,9 @@
     },
     {
       "slot": 3,
-      "state": "dev",
-      "ticket": 691,
-      "since": "2026-10-21T22:07:00+02:00",
-      "claude_slot": 7,
-      "wave": "678-2A"
+      "state": "free",
+      "ticket": null,
+      "since": null
     },
     {
       "slot": 4,
@@ -288,12 +285,11 @@
     },
     {
       "slot": 7,
-      "state": "busy",
-      "ticket": 691,
-      "grok_slot": 3,
-      "since": "2026-10-21T22:07:00+02:00",
-      "account": 2,
-      "wave": "678-2A"
+      "state": "free",
+      "ticket": null,
+      "grok_slot": null,
+      "since": null,
+      "account": 2
     },
     {
       "slot": 8,
@@ -321,17 +317,17 @@
     }
   ],
   "last_refill": {
-    "at": "2026-10-21 22:07 CEST",
+    "at": "2026-10-21 22:14 CEST",
     "mode": "refill-dev",
-    "triggers": "#683",
-    "started": "#684->C1/A1 #686->C2/A1 #691->C7/A2",
-    "note": "spawned 3 worker(s)"
+    "triggers": "#691",
+    "started": "",
+    "note": "no pickable build ticket"
   },
   "totals": {
     "grok": {
       "size": 12,
-      "used": 4,
-      "dev": 3,
+      "used": 3,
+      "dev": 2,
       "dev_cap": 8,
       "planner": 1,
       "planner_cap": 4
@@ -339,8 +335,8 @@
     "claude": {
       "size": 10,
       "enabled": 10,
-      "used": 3,
-      "free": 7,
+      "used": 2,
+      "free": 8,
       "external": 0
     }
   },
@@ -403,7 +399,7 @@
           703
         ],
         "done": [],
-        "live": 2
+        "live": 1
       },
       {
         "number": 692,
