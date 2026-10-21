@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-10-21T15:12:22+02:00",
+  "updated_at": "2026-10-21T15:14:35+02:00",
   "caps": {
     "grok": 12,
     "claude": 10,
@@ -32,7 +32,7 @@
           "ticket": null,
           "grok_slot": null,
           "kind": "aux",
-          "since": null,
+          "since": "2026-10-21T15:13:00+02:00",
           "label": "wave-plan 401"
         },
         {
@@ -71,7 +71,7 @@
       "size": 6,
       "used": 2,
       "free": 4,
-      "claims_last_hour": 6,
+      "claims_last_hour": 7,
       "name": "Claude Max 1"
     },
     {
@@ -254,7 +254,7 @@
       "state": "busy",
       "ticket": null,
       "grok_slot": null,
-      "since": null,
+      "since": "2026-10-21T15:13:00+02:00",
       "kind": "aux",
       "label": "wave-plan 401",
       "account": 1
