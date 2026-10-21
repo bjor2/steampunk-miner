@@ -3,6 +3,7 @@ import type { SliceDefinition } from '../../registries/sliceDefinition'
 import { exampleDebugActions } from './debug'
 import { EXAMPLE_VEHICLE_PIECE_ID, ExampleVehiclePiece } from './scene/ExampleVehiclePiece'
 import { EXAMPLE_SCREEN_ID, ExampleScreen } from './ui/ExampleScreen'
+import { EXAMPLE_SHEET_TABS } from './ui/ExampleSheetTabs'
 import { UI_PARTS_SCREEN_ID, UiPartsScreen } from './ui/UiPartsScreen'
 
 export const slice: SliceDefinition = {
@@ -14,6 +15,8 @@ export const slice: SliceDefinition = {
     r.screen({ id: EXAMPLE_SCREEN_ID, priority: 0, render: ExampleScreen })
     // steampunkDebug.ui.openScreen('example.ui-parts'): the shared UI parts on one page (#423).
     r.screen({ id: UI_PARTS_SCREEN_ID, priority: 0, render: UiPartsScreen })
+    // steampunkDebug.features.example.showSheetTabs(), then ui.openSheet('example.cards') (#686).
+    EXAMPLE_SHEET_TABS.forEach((tab) => r.sheetTab(tab))
     // steampunkDebug.features.example.mountTestPiece(); the kernel's vehicle draws it on the car.
     r.vehiclePiece({ id: EXAMPLE_VEHICLE_PIECE_ID, Piece: ExampleVehiclePiece })
     // A real slice adds e.g. r.content('vehicle-item', [...]),
