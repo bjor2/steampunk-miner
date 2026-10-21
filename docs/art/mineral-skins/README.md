@@ -81,6 +81,31 @@ batch.
   a staggered row back into the cell, so the stepped and zoned bases repeat with no seam like the
   noise ones.
 
+## Batch p1-b3: P1's species 11 and 12 (ticket 594)
+
+The legacy pool's last two rares, kind slots 11 and 12 on P1 (and P2). The pool has 12 species,
+so P1 has no slots 13 to 15 and this batch closes the planet. The layers come from the species row,
+as before. No layer is shared with p1-b1, p1-b2 or within the batch.
+
+<!-- p1-b3 -->
+
+| slot | species                   | base           | vein          | palette (shadow, body, light)                 | sheen        |
+| ---- | ------------------------- | -------------- | ------------- | --------------------------------------------- | ------------ |
+| 11   | `blue-corundum-quartzine` | `rutile-silk`  | `hex-barrels` | `corundum-blue` `#2a4074` `#5581e7` `#aac0f3` | `adamantine` |
+| 12   | `red-beryl-quartzine`     | `clear-depths` | `hex-columns` | `beryl-red` `#6e2b34` `#db5667` `#edabb3`     | `prismatic`  |
+
+<!-- /p1-b3 -->
+
+- **Bases:** a deep, softly clouded body crossed by fine rutile silk, short needles in three sets
+  at 60 degrees (each set a whole number of lines along u and v, so it repeats with no seam); clear
+  stone with a slow swell of depth, fine growth tubes running up the column and faint healed veils.
+- **Veins:** four barrel-shaped hexagonal crystals, each a six-sided body tapering to a point at
+  both ends; five flat-ended hexagonal columns rising side by side from one root, tipped toward the
+  lamp so their ends show.
+- **Sheens:** adamantine (a hard bloom, strong glints, and the six-rayed star silky corundum throws,
+  one centred on each tile, fading out before the cell edge); prismatic (long bars of light down
+  the prism faces that meet the lamp, a column of the cell each, and sharp glints).
+
 ## Compositing
 
 What a renderer draws for a skin, per pixel, in display values (0..1), from the row's layers:
@@ -198,6 +223,32 @@ skin on the planet, with pale veinlets and a wire star. Violet fluorite is the o
 skin sits above its rock (contrast 1.66 for fluorite to 2.18 for gold). Checked by eye on
 `p1-b2.phone-x4.png`, `p1-b2.desktop.png`, the `p1-b2.scale-x4` copies and `p1.scale-x4.png`
 (P1's ten skins side by side at 85, 40 and 22 px a tile).
+
+From `sheets/p1-b3.distinct.json`, at 22 px a tile. The first pair is the batch's own; the rest
+are its closest pairs against p1-b1 and p1-b2 (the report holds all 21):
+
+<!-- p1-b3-readings -->
+
+| pair                               | colour apart | deuteranopia apart | luma apart | texture apart |
+| ---------------------------------- | ------------ | ------------------ | ---------- | ------------- |
+| corundum vs beryl                  | 0.657        | 0.532              | 0.028      | 0.053         |
+| fluorite vs corundum (least apart) | 0.232        | 0.152              | 0.039      | 0.074         |
+| copper vs corundum                 | 0.336        | 0.460              | 0.090      | 0.065         |
+| ironstone vs beryl                 | 0.367        | 0.136              | 0.053      | 0.067         |
+| amber vs beryl                     | 0.369        | 0.259              | 0.076      | 0.064         |
+| tin vs corundum                    | 0.369        | 0.431              | 0.142      | 0.096         |
+
+<!-- /p1-b3-readings -->
+
+Blue corundum is the planet's only blue and red beryl its only red, so colour alone parts each from
+the other ten. The closest pair is corundum against violet fluorite, the other cool hue. There,
+corundum's silk, star and barrels stand against fluorite's nested squares and twinned cubes, and the
+pair stays apart under deuteranopia (0.15). Under deuteranopia the beryl drifts toward ironstone's
+khaki (0.14). The beryl is still the paler, smoother skin, with a bright bar and upright columns
+where ironstone has dark blotches and nuggets. Every new skin sits above its rock (contrast 1.56
+for corundum, 1.63 for beryl). Checked by eye on `p1-b3.phone-x4.png`, `p1-b3.desktop.png`, the
+`p1-b3.scale-x4` copies and `p1.scale-x4.png` with its `-deutan` and `-gray` copies, now all
+twelve P1 skins side by side.
 
 Known limits: the cells are unlit tone, so a skin does not turn with the vehicle's lamp (the vein's
 own shading is baked from the stage's fixed headlamp, as the hero sprites are); the earthy sheen
