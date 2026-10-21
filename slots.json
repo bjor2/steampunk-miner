@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-10-21T22:48:13+02:00",
+  "updated_at": "2026-10-21T22:50:30+02:00",
   "caps": {
     "grok": 12,
     "claude": 10,
@@ -85,11 +85,11 @@
         {
           "slot": "C7",
           "state": "busy",
-          "ticket": null,
-          "grok_slot": null,
-          "kind": "aux",
-          "since": "2026-10-21T22:46:00+02:00",
-          "label": "wave-plan 647"
+          "ticket": 656,
+          "grok_slot": 6,
+          "kind": "dev",
+          "since": "2026-10-21T22:50:00+02:00",
+          "wave": "647-1C"
         },
         {
           "slot": "C8",
@@ -120,7 +120,7 @@
       "size": 4,
       "used": 2,
       "free": 2,
-      "claims_last_hour": 3,
+      "claims_last_hour": 4,
       "name": "Claude Max 2"
     }
   ],
@@ -198,9 +198,11 @@
     },
     {
       "slot": 6,
-      "state": "free",
-      "ticket": null,
-      "since": null
+      "state": "dev",
+      "ticket": 656,
+      "since": "2026-10-21T22:50:00+02:00",
+      "claude_slot": 7,
+      "wave": "647-1C"
     },
     {
       "slot": 7,
@@ -294,12 +296,11 @@
     {
       "slot": 7,
       "state": "busy",
-      "ticket": null,
-      "grok_slot": null,
-      "since": "2026-10-21T22:46:00+02:00",
-      "kind": "aux",
-      "label": "wave-plan 647",
-      "account": 2
+      "ticket": 656,
+      "grok_slot": 6,
+      "since": "2026-10-21T22:50:00+02:00",
+      "account": 2,
+      "wave": "647-1C"
     },
     {
       "slot": 8,
@@ -328,17 +329,17 @@
     }
   ],
   "last_refill": {
-    "at": "2026-10-21 22:48 CEST",
+    "at": "2026-10-21 22:50 CEST",
     "mode": "refill-dev",
-    "triggers": "#686",
-    "started": "#687->C2/A1 #688->C3/A1 #703->C8/A2",
-    "note": "spawned 3 worker(s)"
+    "triggers": "claude-run:wave-plan",
+    "started": "#656->C7/A2",
+    "note": "spawned 1 worker(s)"
   },
   "totals": {
     "grok": {
       "size": 12,
-      "used": 5,
-      "dev": 4,
+      "used": 6,
+      "dev": 5,
       "dev_cap": 8,
       "planner": 1,
       "planner_cap": 4
@@ -355,6 +356,19 @@
     "mode": "on",
     "parallel": 1,
     "list": [
+      {
+        "number": 708,
+        "key": "647-2A",
+        "map": 647,
+        "lane": "remote",
+        "mode": "solo",
+        "state": "blocked",
+        "tickets": [
+          707
+        ],
+        "done": [],
+        "live": 0
+      },
       {
         "number": 701,
         "key": "576-2A",
@@ -473,7 +487,7 @@
       },
       {
         "number": 660,
-        "key": "647-2A",
+        "key": "647-1D",
         "map": 647,
         "lane": "hitl",
         "mode": "bench",
@@ -490,12 +504,12 @@
         "map": 647,
         "lane": "remote",
         "mode": "solo",
-        "state": "blocked",
+        "state": "running",
         "tickets": [
           656
         ],
         "done": [],
-        "live": 0
+        "live": 1
       },
       {
         "number": 658,
