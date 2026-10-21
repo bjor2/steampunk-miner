@@ -1,10 +1,9 @@
 /**
- * The item cards the descriptions slice fills (#164, the Gameplay & Vehicle input rules on it),
- * read through `steampunkDebug` and the cards' data-* hooks, never pixels. Docked at the Upgrade
- * bay: by touch, a first tap on a shop entry opens its card and buys nothing, a second tap buys
- * once; menu focus (the gamepad's d-pad and A arrive as `ui_down` and `ui_confirm`) shows each
- * entry's card in turn and buys only on confirm; a mouse hover opens the Repair tooltip after its
- * delay; a 400 ms touch hold opens it with a haptic tick and its release repairs nothing.
+ * The Upgrade bay's entries as the Outfitter's sheet cards (ticket 687, the card rules of #686
+ * and the Gameplay & Vehicle input rules on #164), read through `steampunkDebug` and the cards'
+ * data-* hooks, never pixels. By touch, a first tap on an entry shows its gain text and buys
+ * nothing, a second tap buys once; menu focus (the gamepad's d-pad and A arrive as `ui_down` and
+ * `ui_confirm`) lights each entry in turn and buys only on confirm.
  *
  * A purchase is counted on the stored steps: every `upgrade_purchased` raises one track a step (#181).
  */
@@ -21,9 +20,6 @@ declare global {
 
 const DRILL_ENTRY = 'workshop-upgrade-drill_power-buy'
 const TIP_ENTRY = 'workshop-upgrade-drill_tip-buy'
-/** Repair's brass tooltip on the bay's service element (spec #422, pass #425). */
-const REPAIR_TOOLTIP = '[data-tooltip="upgrade-bay.service"]'
-const LONG_PRESS_MS = 400
 /** One page read takes about 1.5 s under software WebGL on a busy box. */
 const SLOW_POLL = { timeout: 15_000 }
 
@@ -68,32 +64,32 @@ function tapAction(page: Page, action: string): Promise<void> {
   }, action)
 }
 
-/** The compact entries whose card is open now. */
+/** The cards the game's menu focus lights now. */
 function openEntries(page: Page): Promise<string[]> {
   return page.evaluate(() =>
-    [...document.querySelectorAll('[data-variant="compact"][aria-expanded="true"]')].map(
+    [...document.querySelectorAll('[data-sheet-card][data-focused="true"]')].map(
       (entry) => entry.getAttribute('data-testid') ?? '',
     ),
   )
 }
 
 test.describe('item cards (#164)', () => {
-  test('opens a shop entry’s card on the first tap and buys it once on the second', async ({
+  test('shows an entry’s gain text on the first tap and buys it once on the second', async ({
     page,
   }) => {
     const errors = await openAtUpgradeBay(page)
     const before = await levelsTotal(page)
     await page.getByTestId(TIP_ENTRY).tap()
-    await expect(page.getByTestId(TIP_ENTRY)).toHaveAttribute('aria-expanded', 'true')
+    await expect(page.getByTestId(TIP_ENTRY)).toHaveAttribute('data-revealed', 'true')
     await expect(page.getByTestId(TIP_ENTRY)).toContainText('Drill tip')
-    await expect(page.getByTestId(TIP_ENTRY)).toContainText('Level 0 → 0 · 1/9')
+    await expect(page.getByTestId(TIP_ENTRY)).toContainText('% tip hardness')
     expect(await levelsTotal(page)).toBe(before)
     await page.getByTestId(TIP_ENTRY).tap()
     await expect.poll(() => levelsTotal(page), SLOW_POLL).toBe(before + 1)
     expect(errors).toEqual([])
   })
 
-  test('shows each focused entry’s card in turn and buys only on confirm', async ({ page }) => {
+  test('lights each focused entry in turn and buys only on confirm', async ({ page }) => {
     const errors = await openAtUpgradeBay(page)
     const before = await levelsTotal(page)
     const seen: string[] = []
@@ -111,37 +107,6 @@ test.describe('item cards (#164)', () => {
     expect(await levelsTotal(page)).toBe(before)
     await tapAction(page, 'ui_confirm')
     await expect.poll(() => levelsTotal(page), SLOW_POLL).toBe(before + 1)
-    expect(errors).toEqual([])
-  })
-
-  test('opens the Repair tooltip after a mouse hover', async ({ page }) => {
-    const errors = await openAtUpgradeBay(page)
-    await expect(page.locator(REPAIR_TOOLTIP)).toBeHidden()
-    await page.getByTestId('workshop-repair').hover()
-    await expect(page.locator(REPAIR_TOOLTIP)).toBeVisible()
-    await expect(page.locator(REPAIR_TOOLTIP)).toContainText('Platform fitters')
-    expect(errors).toEqual([])
-  })
-
-  test('opens the Repair card on a touch hold with a haptic tick, and the release repairs nothing', async ({
-    page,
-  }) => {
-    const errors = await openAtUpgradeBay(page)
-    await page.evaluate(() => {
-      const result = window.steampunkDebug!.setHull('1')
-      if (!result.ok) throw new Error(result.problems.join('; '))
-    })
-    const hullBefore = await page.getByTestId('workshop-hull').textContent()
-    const anchor = page.locator(`:has(> ${REPAIR_TOOLTIP})`)
-    const touch = { pointerType: 'touch', isPrimary: true, bubbles: true }
-    await anchor.dispatchEvent('pointerdown', touch)
-    await page.waitForTimeout(LONG_PRESS_MS + 100)
-    await expect(page.locator(REPAIR_TOOLTIP)).toBeVisible()
-    expect(await page.evaluate(() => window.vibrations)).toEqual([10])
-    await anchor.dispatchEvent('pointerup', touch)
-    await page.getByTestId('workshop-repair').dispatchEvent('click')
-    await expect(page.locator(REPAIR_TOOLTIP)).toBeHidden()
-    expect(await page.getByTestId('workshop-hull').textContent()).toBe(hullBefore)
     expect(errors).toEqual([])
   })
 })

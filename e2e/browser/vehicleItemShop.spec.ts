@@ -1,8 +1,8 @@
 /**
  * The store's buy path for tech-unlocked vehicle items in the preview build (ticket 248), read
  * through `steampunkDebug` and the rows' data-* hooks, never pixels. On planet 3 with the tree
- * researched through it, the Upgrade bay shows the grapple winch as a compact item card; a first
- * tap opens the card and buys nothing, a second buys it at exactly the card's price, and the row
+ * researched through it, the Outfitter (ticket 687) shows the grapple winch as a sheet card; a first
+ * tap shows its line and buys nothing, a second buys it at exactly the card's price, and the row
  * leaves the bay once the item is owned.
  */
 import { expect, test, type Page } from '@playwright/test'
@@ -70,7 +70,7 @@ test.describe('vehicle item shop (ticket 248)', () => {
     expect(before.itemIds).toContain(GRAPPLE)
     expect(before.cardPrice).not.toBeNull()
     await page.getByTestId(GRAPPLE_ENTRY).tap()
-    await expect(page.getByTestId(GRAPPLE_ENTRY)).toHaveAttribute('aria-expanded', 'true')
+    await expect(page.getByTestId(GRAPPLE_ENTRY)).toHaveAttribute('data-revealed', 'true')
     expect((await readShop(page)).money).toBe(before.money)
     await page.getByTestId(GRAPPLE_ENTRY).tap()
     await expect(page.getByTestId(GRAPPLE_ENTRY)).toHaveCount(0, { timeout: 15_000 })

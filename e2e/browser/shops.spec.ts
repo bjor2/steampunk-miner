@@ -3,7 +3,8 @@
  * Upgrade bay, the workshop showcase (#177) draws the car in the main canvas, where the retired
  * live preview framed it in a panel of its own (#39 acceptance 5; #180 section 7 retires the
  * preview), and the shop text is at least 2.2% of the short axis at 1080p and 4K; the shutter opens
- * and closes, and the seven icons sit on their plaques and rows.
+ * with the Outfitter on the base sheet (ticket 687) and Back closes both, and the seven icons sit
+ * on the Outfitter's cards.
  */
 import { expect, test, type Page } from '@playwright/test'
 import type { DebugApi } from '../../src/debug/debugApi'
@@ -35,6 +36,14 @@ function presentation(page: Page): Promise<BayPresentation> {
     const result = window.steampunkDebug!.ui.getBayPresentation()
     if (!result.ok) throw new Error(result.problems.join('; '))
     return result.presentation
+  })
+}
+
+function openSheetTabOf(page: Page): Promise<string | null> {
+  return page.evaluate(() => {
+    const result = window.steampunkDebug!.ui.getSheet()
+    if (!result.ok) throw new Error(result.problems.join('; '))
+    return result.sheet.openTabId
   })
 }
 
@@ -70,7 +79,7 @@ test.describe('bay screens (#62)', () => {
     expect(errors).toEqual([])
   })
 
-  test('opens the Upgrade bay behind the brass shutter and closes it again on undock', async ({
+  test('opens the Upgrade bay behind the brass shutter, its Outfitter on the sheet, and closes both on Back', async ({
     page,
   }) => {
     const errors = await openAtUpgradeBay(page)
@@ -79,12 +88,17 @@ test.describe('bay screens (#62)', () => {
       bay: 'upgrade',
       transition: { kind: 'shutter', seconds: 0.25 },
     })
+    expect(await openSheetTabOf(page)).toBe('workshop.outfitter')
+    // Back shuts the sheet first (ticket 687), then undocks.
+    await page.evaluate(() => window.steampunkDebug!.input.tap('ui_cancel'))
+    await expect.poll(() => openSheetTabOf(page)).toBeNull()
+    expect((await presentation(page)).shutter.phase).toBe('open')
     await page.evaluate(() => window.steampunkDebug!.input.tap('ui_cancel'))
     await expect.poll(async () => (await presentation(page)).shutter.phase).toBe('closed')
     expect(errors).toEqual([])
   })
 
-  test('puts an icon on every track row and on the Casing row', async ({ page }) => {
+  test('puts an icon on every track card and on the Casing card', async ({ page }) => {
     const errors = await openAtUpgradeBay(page)
     const iconIds = await page.evaluate(() => {
       const result = window.steampunkDebug!.ui.getUpgradeBayModel()

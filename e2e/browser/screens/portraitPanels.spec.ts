@@ -1,16 +1,13 @@
 /**
  * The panels held upright (#470 PT-5, ticket 487) in the matrix's portrait cells: the Sell and
  * Upgrade bays, the Upgrade bay's Outfitter sheet (#687), the settings, the pause and title
- * menus, the planet card and the tech tree each fit the safe area, with no text running out of
+ * menus, the planet card and the Patent Office sheet (#687) each fit the safe area, with no text running out of
  * its panel sideways, no two targets on top of each other, nothing over a touch button or the
- * Tech tree button, and every target at least 48 px. Every upgrade plaque shows its level, price
- * and any Needs line with no hover or hold. On a phone the tree pans with one finger, pinches with
- * two, opens a node's card as a bottom sheet on a tap, lists its nodes by affordability and walks
- * them with Next affordable. Geometry and state through the DOM and `steampunkDebug`, never pixels.
+ * Tech tree button, and every target at least 48 px (a sheet card at least the 44 px of the GD
+ * lock on #678). Geometry and state through the DOM and
+ * `steampunkDebug`, never pixels.
  */
 import { expect, test, type Page } from '@playwright/test'
-import { HUD_COMPACT_COARSE_SHORT_AXIS_PX } from '../../../src/constants/screen'
-import { MAP_ZOOM_MAX } from '../../../src/features/tech-tree/systems/mapGestures'
 import { TREE_TEST_IDS } from '../../../src/features/tech-tree/ui/nodeTestIds'
 import { DESIGN_TOKENS } from '../../../src/systems/views/designSystem'
 import { SHEET_UI_IDS } from '../../../src/ui/sheet/sheetIds'
@@ -29,11 +26,9 @@ import {
 const MIN_TARGET_PX = 48
 /** A layout's rounding pixel. */
 const SLACK_PX = 1
-const TREE_SCREEN = 'tech-tree-screen'
 const PLANET_CARD = 'planet-card'
 /** A planet whose card has a line to show on arrival (the magnetic class, ticket 289). */
 const PLANET_WITH_CARD = 25
-const STATUS_ORDER = ['affordable', 'available', 'locked', 'researched']
 
 /** What one panel's DOM shows wrong: texts out of it sideways, small targets, stacked targets. */
 interface PanelFindings {
@@ -46,11 +41,6 @@ test.beforeEach(() => {
   const cell = currentCell()
   test.skip(!cell.isTouch || !cell.isPortrait, 'these are the upright touch screens')
 })
-
-/** A phone, not the tablet: the compact HUD and the tree's pan, pinch and sheet. */
-function isPhone(): boolean {
-  return currentCell().viewport.width < HUD_COMPACT_COARSE_SHORT_AXIS_PX
-}
 
 /**
  * The panel under `selector`: every visible text of its own sideways inside it (a carousel or a
@@ -202,34 +192,10 @@ async function undock(page: Page): Promise<void> {
     .toBe('closed')
 }
 
-async function openTree(page: Page): Promise<void> {
-  await page.evaluate(() => window.steampunkDebug!.ui.openScreen('tech-tree.screen'))
-  await expect(page.getByTestId(TREE_SCREEN)).toBeVisible({ timeout: 30_000 })
-}
-
-function touchesOf(page: Page) {
-  return page.context().newCDPSession(page)
-}
-
-type TouchKind = 'touchStart' | 'touchMove' | 'touchEnd'
-
-async function touch(
-  session: Awaited<ReturnType<typeof touchesOf>>,
-  type: TouchKind,
-  points: { x: number; y: number }[],
-): Promise<void> {
-  await session.send('Input.dispatchTouchEvent', {
-    type,
-    touchPoints: points.map((point, id) => ({ ...point, id })),
-  })
-}
-
-function mapScroll(page: Page) {
-  return page.getByTestId(TREE_TEST_IDS.map).evaluate((frame) => {
-    const viewport = frame.firstElementChild as HTMLElement
-    const zoom = Number(viewport.style.getPropertyValue('--map-zoom') || 1)
-    return { left: viewport.scrollLeft, top: viewport.scrollTop, zoom }
-  })
+/** The HUD's tree button opens the base sheet on the Patent Office (ticket 687). */
+async function openPatentOffice(page: Page): Promise<void> {
+  await page.getByTestId('tech-tree-open').locator('button').tap()
+  await expect(page.getByTestId(TREE_TEST_IDS.patentCards)).toBeVisible({ timeout: 30_000 })
 }
 
 test.describe('screen matrix: panels held upright (ticket 487)', () => {
@@ -314,83 +280,24 @@ test.describe('screen matrix: panels held upright (ticket 487)', () => {
     expect(errors).toEqual([])
   })
 
-  test('fits the tech tree, its list sorted by affordability and Next affordable’s card', async ({
+  test('opens the Patent Office as the full sheet from the HUD button, each card a 44 px target', async ({
     page,
   }) => {
     test.setTimeout(120_000)
     const errors = await openGame(page, currentCell())
     await giveMoney(page, '1e4')
-    await openTree(page)
-    const screen = `[data-testid="${TREE_SCREEN}"]`
-    await expectPanelFits(page, screen, [TREE_TEST_IDS.map])
-    await page.getByTestId(TREE_TEST_IDS.showList).tap()
-    await expect(page.getByTestId(TREE_TEST_IDS.list)).toBeVisible()
-    await expectPanelFits(page, screen, [TREE_TEST_IDS.map])
-    const statuses = await page
-      .locator(`[data-testid="${TREE_TEST_IDS.list}"] [data-status]`)
-      .evaluateAll((nodes) => nodes.map((node) => node.getAttribute('data-status') ?? ''))
-    const ranks = statuses.map((status) => STATUS_ORDER.indexOf(status))
-    expect(ranks).toEqual([...ranks].sort((a, b) => a - b))
-    expect(statuses[0]).toBe('affordable')
-    const firstId = await page
-      .locator(`[data-testid="${TREE_TEST_IDS.list}"] [data-status="affordable"]`)
-      .first()
-      .getAttribute('data-testid')
-    await page.getByTestId(TREE_TEST_IDS.nextAffordable).tap()
-    const card = page.locator('[data-testid="tech-tree-card"]')
-    await expect(card).toBeVisible()
-    expect(`tech-tree-node-${await card.getAttribute('data-node-id')}`).toBe(firstId)
-    await expectPanelFits(page, screen, [TREE_TEST_IDS.map])
-    expect(errors).toEqual([])
-  })
-
-  test('pans the tree map with one finger, pinches it with two and opens a tapped node as a bottom sheet', async ({
-    page,
-  }) => {
-    test.skip(!isPhone(), 'the tablet keeps the lane list')
-    test.setTimeout(120_000)
-    const errors = await openGame(page, currentCell())
-    await giveMoney(page, '1e9')
-    await openTree(page)
-    const map = await boxOf(page, TREE_TEST_IDS.map)
-    const middle = { x: map.left + map.width / 2, y: map.top + map.height / 2 }
-    const touches = await touchesOf(page)
-    const before = await mapScroll(page)
-    await touch(touches, 'touchStart', [middle])
-    for (let step = 1; step <= 10; step++)
-      await touch(touches, 'touchMove', [{ x: middle.x - step * 15, y: middle.y - step * 8 }])
-    await touch(touches, 'touchEnd', [])
-    const panned = await mapScroll(page)
-    expect(panned.left).toBeGreaterThan(before.left + 100)
-    expect(panned.top).toBeGreaterThan(before.top + 50)
-    await expect(page.getByTestId(TREE_TEST_IDS.sheet)).toBeHidden()
-
-    await touch(touches, 'touchStart', [
-      { x: middle.x - 40, y: middle.y },
-      { x: middle.x + 40, y: middle.y },
-    ])
-    for (let step = 1; step <= 10; step++)
-      await touch(touches, 'touchMove', [
-        { x: middle.x - 40 - step * 6, y: middle.y },
-        { x: middle.x + 40 + step * 6, y: middle.y },
-      ])
-    await touch(touches, 'touchEnd', [])
-    const pinched = await mapScroll(page)
-    expect(pinched.zoom).toBeGreaterThan(1)
-    expect(pinched.zoom).toBeLessThanOrEqual(MAP_ZOOM_MAX)
-
-    await page.getByTestId(TREE_TEST_IDS.showList).tap()
-    const node = page.locator(`[data-testid="${TREE_TEST_IDS.list}"] [data-status]`).first()
-    await node.tap()
-    const sheet = page.getByTestId(TREE_TEST_IDS.sheet)
-    await expect(sheet).toBeVisible()
-    const sheetBox = await boxOf(page, TREE_TEST_IDS.sheet)
-    const screenBox = await boxOf(page, TREE_SCREEN)
-    expect(isInside(sheetBox, screenBox)).toBe(true)
-    expect(Math.abs(sheetBox.bottom - screenBox.bottom)).toBeLessThanOrEqual(SLACK_PX)
-    await expectPanelFits(page, `[data-testid="${TREE_TEST_IDS.sheet}"]`)
-    await page.getByTestId(TREE_TEST_IDS.sheetClose).tap()
-    await expect(sheet).toBeHidden()
+    await openPatentOffice(page)
+    const sheet = `[data-testid="${SHEET_UI_IDS.baseSheet}"]`
+    const frame = await boxBySelector(page, sheet)
+    expect(frame.right).toBeLessThanOrEqual(currentCell().viewport.width + SLACK_PX)
+    const keepOut = (currentCell().viewport.height * DESIGN_TOKENS.layout.topKeepOutPercent) / 100
+    expect((await boxBySelector(page, '[data-sheet-close]')).top).toBeGreaterThanOrEqual(keepOut)
+    const cards = page.locator(`[data-testid="${TREE_TEST_IDS.patentCards}"] [data-sheet-card]`)
+    expect(await cards.count()).toBeGreaterThan(0)
+    for (const card of (await cards.all()).slice(0, 12)) {
+      const box = (await card.boundingBox())!
+      expect(box.height).toBeGreaterThanOrEqual(DESIGN_TOKENS.layout.tapTargetMinPx - SLACK_PX)
+    }
     expect(errors).toEqual([])
   })
 })

@@ -3,7 +3,8 @@
  * slices register into, the rules over them, the `tech-tree` save section, the `unlock_node`
  * command, the lanes' P16 fork commands and their `tech-tree.forks` section (#255), the run
  * events, the pacing bot's research, fork and item purchases, the store's research answer
- * (ticket 248), the debug actions, the tree screen with its HUD button, the mounted gear's
+ * (ticket 248), the debug actions, the Patent Office tab on the base sheet with its HUD button
+ * (ticket 687), the mounted gear's
  * art assets (#166), and the gear, Mark plates and power-up effects drawn on the rig (ticket 250).
  * No side effects at import; the loader calls `register`.
  */
@@ -21,8 +22,8 @@ import { ITEM_BOT_PURCHASE, ITEM_RESEARCH } from './systems/itemShop'
 import { RESEARCH_BOT_PURCHASE } from './systems/researchBotPurchase'
 import { TECH_TREE_RULES } from './systems/techTreeCommands'
 import { TECH_TREE_SECTION } from './systems/techTreeSection'
+import { PATENT_OFFICE_TAB } from './ui/patentOfficeTab'
 import { TechTreeButton } from './ui/TechTreeButton'
-import { TECH_TREE_SCREEN_ID, TechTreeScreen } from './ui/TechTreeScreen'
 
 export const slice: SliceDefinition = {
   id: 'tech-tree',
@@ -50,7 +51,7 @@ export const slice: SliceDefinition = {
     // steampunkDebug.features['tech-tree'].unlockAll() / jumpToDepth(n) / shapeProblems() /
     // getRig() / previewPowerUpFx(itemId)
     r.debugActions(techTreeDebugActions)
-    r.screen({ id: TECH_TREE_SCREEN_ID, priority: 0, render: TechTreeScreen })
+    r.sheetTab(PATENT_OFFICE_TAB)
     r.hudPanel({ id: 'tech-tree.open', slot: 'position', Panel: TechTreeButton })
   },
 }

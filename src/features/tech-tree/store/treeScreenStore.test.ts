@@ -12,52 +12,11 @@ beforeEach(() => {
   resetTreeScreenStore()
 })
 
-describe('tech tree screen store', () => {
-  it('zooms from the overview to a lane and, with a node selected, to its card and back', () => {
-    screen().zoomIn()
-    expect(screen().zoom).toBe('lane')
-    screen().zoomIn()
-    expect(screen().zoom).toBe('lane')
-    screen().selectNode('tech.sensing.echo_sounder')
-    expect(screen().zoom).toBe('card')
-    screen().zoomOut()
-    screen().zoomOut()
-    screen().zoomOut()
-    expect(screen().zoom).toBe('overview')
-  })
-
-  it('focuses a lane at the lane zoom', () => {
-    screen().focusLane('mobility')
-    expect({ lane: screen().lane, zoom: screen().zoom }).toEqual({ lane: 'mobility', zoom: 'lane' })
-  })
-
-  it('shows the list or the map from the overview, leaving any open card', () => {
-    screen().selectNode('tech.sensing.echo_sounder')
-    screen().showTreeView('list')
-    expect({ view: screen().treeView, zoom: screen().zoom }).toEqual({
-      view: 'list',
-      zoom: 'overview',
-    })
-    screen().showTreeView('map')
-    expect(screen().treeView).toBe('map')
-  })
-
-  it("closes a node's card back to the view under it, keeping the node picked", () => {
-    screen().showTreeView('list')
-    screen().selectNode('tech.sensing.echo_sounder')
-    screen().closeNodeCard()
-    expect({
-      view: screen().treeView,
-      zoom: screen().zoom,
-      selected: screen().selectedNodeId,
-    }).toEqual({ view: 'list', zoom: 'overview', selected: 'tech.sensing.echo_sounder' })
-  })
-
-  it('toggles filters on and off', () => {
-    screen().toggleFilter('locked')
-    screen().toggleFilter('marks')
-    screen().toggleFilter('locked')
-    expect(screen().filters).toEqual(['marks'])
+describe('patent office store', () => {
+  it('bumps its revision on each tree change, so the tab reads the authority again', () => {
+    screen().noteTreeChanged()
+    screen().noteTreeChanged()
+    expect(screen().revision).toBe(2)
   })
 
   it('researches a node for the local player through the authority', () => {

@@ -8,7 +8,12 @@ import { createRunLog, installRunLog, uninstallRunLog } from '../logging/runLog'
 import { installSaveFolder } from '../store/checkpoint'
 import { resetGameStore, useGameStore } from '../store/gameStore'
 import { createMemorySaveFolder } from '../store/memorySaveFolder'
-import { readPauseMenuModel, readSettingsModel, readTitleMenuModel } from '../store/screenReads'
+import {
+  readPauseMenuModel,
+  readSettingsModel,
+  readShownSheetTabIds,
+  readTitleMenuModel,
+} from '../store/screenReads'
 import { focusOnScreen } from '../systems/views/menuFocus'
 import { SETTINGS_START_FOCUS } from '../systems/views/settingsModel'
 import { ratchetProblemsOf } from '../systems/views/uiBudgetRatchet'
@@ -20,8 +25,7 @@ import { unregisteredTextsOf } from '../systems/views/unregisteredText'
 import { Hud } from './hud/Hud'
 import { PauseMenuView } from './pause/PauseMenuView'
 import { PlatformScreen } from './platform/PlatformScreen'
-import { screensOf } from './registries/screens'
-import { SliceScreenView } from './screens/SliceScreen'
+import { sheetTabById } from './registries/sheetTabs'
 import { SettingsView } from './settings/SettingsView'
 import { TitleMenuView } from './title/TitleMenuView'
 
@@ -57,14 +61,28 @@ async function dockedBayMarkup(bay: 'upgrade' | 'sell'): Promise<string> {
   return markupOf(PlatformScreen)
 }
 
-/** The tree is a slice's full screen; the kernel finds it by the panel's id prefix. */
+/**
+ * The content of the sheet tab whose id starts with `prefix` (ticket 687: the Upgrade bay's
+ * Outfitter and the tech tree's Patent Office are tabs, found by the panel's id prefix, as a slice
+ * registers them). The sheet's own frame is the kit's (#686), drawn the same round every tab.
+ */
+function sheetTabMarkup(prefix: string): string {
+  const tab = readShownSheetTabIds()
+    .map(sheetTabById)
+    .find((entry) => entry?.id.startsWith(prefix))
+  if (tab === undefined || tab === null) throw new Error(`no sheet tab starts with ${prefix}`)
+  game().openSheet(tab.id)
+  return markupOf(tab.Panel)
+}
+
+/** The Upgrade bay's frame over the car, then its Outfitter on the base sheet (ticket 687). */
+async function upgradeBayMarkup(): Promise<string> {
+  return [await dockedBayMarkup('upgrade'), sheetTabMarkup('workshop.')].join('')
+}
+
+/** The tree is the Patent Office, a tab on the base sheet (ticket 687). */
 async function techTreeMarkup(): Promise<string> {
-  const screen = screensOf('full').find((entry) => entry.id.startsWith('tech-tree.'))
-  if (screen === undefined) throw new Error('the tech tree registered no screen')
-  game().openScreen(screen.id)
-  return renderToString(
-    createElement(SliceScreenView, { openScreenId: screen.id, onDismiss: game().dismissScreen }),
-  )
+  return sheetTabMarkup('tech-tree.')
 }
 
 async function hudMarkup(): Promise<string> {
@@ -102,7 +120,7 @@ async function otherPanelsMarkup(): Promise<string> {
 }
 
 const FIXTURES: readonly PanelFixture[] = [
-  { panel: 'upgrade-bay', draw: () => dockedBayMarkup('upgrade') },
+  { panel: 'upgrade-bay', draw: upgradeBayMarkup },
   { panel: 'tech-tree', draw: techTreeMarkup },
   { panel: 'dock', draw: () => dockedBayMarkup('sell') },
   { panel: 'hud', draw: hudMarkup },

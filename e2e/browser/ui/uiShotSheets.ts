@@ -3,8 +3,9 @@
  * root its findings are read under, the parts that pan, and how a fresh game reaches it. A sheet
  * the shared sheet component (#686) or a later ticket adds joins as one row. Today's sheets are the
  * ones the upright panel spec (#487) walks: the Sell bay, the Upgrade bay's Outfitter on the base
- * sheet (#687), the settings, the pause menu and its save page, the tech tree's map and list, the
- * planet card and the title menu; and the HUD strip's detail behind the gear button (ticket 684).
+ * sheet (#687), the settings, the pause menu and its save page, the tech tree's Patent Office on
+ * the base sheet (#687), the planet card and the title menu; and the HUD strip's detail behind the
+ * gear button (ticket 684).
  */
 import { expect, type Page } from '@playwright/test'
 import { TREE_TEST_IDS } from '../../../src/features/tech-tree/ui/nodeTestIds'
@@ -19,9 +20,8 @@ export interface UiSheet extends FindingsScope {
 }
 
 const PLATFORM = `[data-testid="${UI_IDS.platformScreen}"]`
-const TREE_SCREEN = 'tech-tree-screen'
-/** Ticket 211's slice screen id for the tree (`TECH_TREE_SCREEN_ID`). */
-const TREE_SCREEN_ID = 'tech-tree.screen'
+/** The tech tree's tab on the base sheet (`PATENT_OFFICE_TAB_ID`, ticket 687). */
+const PATENT_OFFICE_TAB_ID = 'tech-tree.patent-office'
 /** A planet whose card has a line to show on arrival (the magnetic class, ticket 289). */
 const PLANET_WITH_CARD = 25
 /** Software WebGL on a loaded box opens a screen slowly; a wait, not a judgement. */
@@ -54,16 +54,10 @@ export const UI_SHEETS: readonly UiSheet[] = [
     open: openSavePage,
   },
   {
-    shot: 'tech-tree',
-    rootSelector: `[data-testid="${TREE_SCREEN}"]`,
-    pannedTestIds: [TREE_TEST_IDS.map],
-    open: openTechTree,
-  },
-  {
-    shot: 'tech-tree-list',
-    rootSelector: `[data-testid="${TREE_SCREEN}"]`,
-    pannedTestIds: [TREE_TEST_IDS.map],
-    open: openTechTreeList,
+    shot: 'patent-office',
+    rootSelector: `[data-testid="${SHEET_UI_IDS.baseSheet}"]`,
+    pannedTestIds: [],
+    open: openPatentOffice,
   },
   {
     shot: 'planet-card',
@@ -123,16 +117,17 @@ async function openSavePage(page: Page): Promise<void> {
   await expect(page.getByTestId(UI_IDS.pauseMenu)).toHaveAttribute('data-page', 'save')
 }
 
-async function openTechTree(page: Page): Promise<void> {
+/** The tech tree is the Patent Office on the base sheet (ticket 687), opened as its HUD button does. */
+async function openPatentOffice(page: Page): Promise<void> {
   await giveMoney(page, '1e4')
-  await page.evaluate((id) => window.steampunkDebug!.ui.openScreen(id), TREE_SCREEN_ID)
-  await expect(page.getByTestId(TREE_SCREEN)).toBeVisible({ timeout: OPEN_TIMEOUT_MS })
-}
-
-async function openTechTreeList(page: Page): Promise<void> {
-  await openTechTree(page)
-  await page.getByTestId(TREE_TEST_IDS.showList).click()
-  await expect(page.getByTestId(TREE_TEST_IDS.list)).toBeVisible()
+  await undock(page)
+  await page.evaluate((id) => {
+    const result = window.steampunkDebug!.ui.openSheet(id)
+    if (!result.ok) throw new Error(result.problems.join('; '))
+  }, PATENT_OFFICE_TAB_ID)
+  await expect(page.getByTestId(TREE_TEST_IDS.patentCards)).toBeVisible({
+    timeout: OPEN_TIMEOUT_MS,
+  })
 }
 
 async function openPlanetCard(page: Page): Promise<void> {
@@ -141,8 +136,8 @@ async function openPlanetCard(page: Page): Promise<void> {
 }
 
 /**
- * The shared sheet (ticket 686) on the example slice's probe tabs, the only tabs registered until
- * the shop, tree, cargo and saves move onto it (#687, #688): full over a phone, docked on desktop.
+ * The shared sheet (ticket 686) on the example slice's probe tabs, a long card list that scrolls
+ * on a phone: full over a phone, docked on desktop.
  */
 export async function openBaseSheet(page: Page): Promise<void> {
   await undock(page)

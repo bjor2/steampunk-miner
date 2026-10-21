@@ -1,0 +1,6 @@
+/* The Patent Office's cards (ticket 687): one column in the sheet's scroll area, as the kit spaces them. */
+.cards {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}

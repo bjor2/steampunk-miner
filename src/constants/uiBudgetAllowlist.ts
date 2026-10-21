@@ -36,8 +36,7 @@ export const UI_BUDGET_PANELS: readonly UiBudgetPanel[] = [
     sourcePrefixes: [
       'src/features/workshop/ui/',
       'src/ui/platform/UpgradeBayView',
-      'src/ui/platform/TracksPanel',
-      'src/ui/platform/VehiclePreviewPanel',
+      'src/ui/platform/OutfitterPanel',
     ],
     textIdPrefixes: ['upgrade-bay.', 'workshop.'],
   },

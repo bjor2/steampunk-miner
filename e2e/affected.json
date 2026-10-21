@@ -160,7 +160,7 @@
       "specs": ["e2e/browser/sellBurst.spec.ts"]
     },
     {
-      "why": "The item cards fill the Upgrade bay entries and the workshop plaques.",
+      "why": "The item cards fill the bays' entries; the Outfitter's cards replaced the workshop plaques (ticket 687).",
       "paths": ["src/features/descriptions/**"],
       "specs": ["e2e/browser/itemCards.spec.ts", "e2e/browser/workshop.spec.ts"]
     },
@@ -729,6 +729,32 @@
         "src/features/example/store/sheetProbeStore.ts"
       ],
       "specs": ["e2e/browser/ui/sheet.spec.ts", "e2e/browser/ui/uiShots.spec.ts"]
+    },
+    {
+      "why": "The Outfitter and the Patent Office on the base sheet (ticket 687): the Upgrade bay's and the tree's cards with gain text and greyed prices, docking opening the sheet, the sheet walking the docked bay's menu, the rig look's fitting on a track card.",
+      "paths": [
+        "src/systems/views/outfitterCards.ts",
+        "src/systems/views/gainText.ts",
+        "src/ui/platform/OutfitterPanel*",
+        "src/ui/platform/UpgradeBayView.tsx",
+        "src/ui/kit/MenuSheetCard.tsx",
+        "src/store/screenModels.ts",
+        "src/systems/input/inputRouting.ts",
+        "src/data/input/actions.json",
+        "src/features/workshop/ui/**",
+        "src/features/tech-tree/ui/**",
+        "src/features/tech-tree/systems/patentCards.ts"
+      ],
+      "specs": [
+        "e2e/browser/workshop.spec.ts",
+        "e2e/browser/shops.spec.ts",
+        "e2e/browser/itemCards.spec.ts",
+        "e2e/browser/vehicleItemShop.spec.ts",
+        "e2e/browser/rigLook.spec.ts",
+        "e2e/browser/screens/portraitPanels.spec.ts",
+        "e2e/browser/screens/tapAffordances.spec.ts",
+        "e2e/browser/ui/uiShots.spec.ts"
+      ]
     },
     {
       "why": "The touch controls held upright (ticket 485): the lower-45% stick zone, a phone's two-row cluster, the tile lane the slot column and the fire tile keep to, and the left-hand mirror.",

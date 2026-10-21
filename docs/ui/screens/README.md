@@ -32,20 +32,19 @@ shot first, so the picture of a broken layout is there to look at.
 
 The phones are Chromium emulation (`isMobile`, `hasTouch`) at DPR 1, not shots from a device.
 
-| Shot             | What it shows                                   |
-| ---------------- | ----------------------------------------------- |
-| `hud-surface`    | the HUD on the pad, the bay shut                |
-| `hud-dig`        | the HUD two tiles down, drilling                |
-| `sell-bay`       | the Sell bay                                    |
-| `upgrade-bay`    | the Upgrade bay (the Outfitter) and its plaques |
-| `settings`       | the settings, opened from the bay               |
-| `pause-menu`     | the pause menu                                  |
-| `save-page`      | the pause menu's save page                      |
-| `tech-tree`      | the tech tree's map                             |
-| `tech-tree-list` | the tech tree's list                            |
-| `planet-card`    | the planet card on arrival at planet 25         |
-| `base-sheet`     | the shared sheet on the example's probe tabs    |
-| `title-menu`     | the title menu                                  |
+| Shot            | What it shows                                   |
+| --------------- | ----------------------------------------------- |
+| `hud-surface`   | the HUD on the pad, the bay shut                |
+| `hud-dig`       | the HUD two tiles down, drilling                |
+| `sell-bay`      | the Sell bay                                    |
+| `upgrade-bay`   | the Outfitter, opened on the sheet by docking   |
+| `settings`      | the settings, opened from the bay               |
+| `pause-menu`    | the pause menu                                  |
+| `save-page`     | the pause menu's save page                      |
+| `patent-office` | the tech tree as the Patent Office on the sheet |
+| `planet-card`   | the planet card on arrival at planet 25         |
+| `base-sheet`    | the shared sheet on the example's probe tabs    |
+| `title-menu`    | the title menu                                  |
 
 The sheets are a table, `e2e/browser/ui/uiShotSheets.ts`: a sheet the shared sheet component (#686)
 or a later ticket adds joins as one row.

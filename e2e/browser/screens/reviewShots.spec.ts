@@ -41,6 +41,7 @@ test.describe('screen matrix: review shots (#173)', () => {
     await dockAt(page, 'upgrade')
     await holdMidChain(page)
     await shoot(page, 'workshop')
+    await page.evaluate(() => window.steampunkDebug!.ui.closeSheet())
     await page.getByTestId('platform-settings').click()
     await expect(page.getByTestId('settings-panel')).toBeVisible()
     await shoot(page, 'settings')
@@ -100,7 +101,11 @@ async function shootTurnedMidDig(page: Page): Promise<void> {
 async function standOnTheTurntable(page: Page): Promise<void> {
   await page.evaluate((zoom) => window.steampunkDebug!.ui.setZoom(zoom), VIEW_SHORT_AXIS_MAX_M)
   await dockAt(page, 'upgrade')
-  await page.evaluate(() => window.steampunkDebug!.input.tap('ui_cancel'))
+  // Docking opens the Outfitter on the base sheet (ticket 687); shut it, then leave the bay.
+  await page.evaluate(() => {
+    window.steampunkDebug!.ui.closeSheet()
+    window.steampunkDebug!.input.tap('ui_cancel')
+  })
   await waitForArt(page)
 }
 
