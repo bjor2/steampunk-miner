@@ -65,6 +65,11 @@
   list-style: none;
 }
 
+/* A 40-character name with no space still wraps inside a 360 px phone's plate (#672). */
+.slotList [data-ui-text] > span {
+  overflow-wrap: anywhere;
+}
+
 .problems {
   margin: var(--space-2) 0 0;
   padding-left: var(--space-3);

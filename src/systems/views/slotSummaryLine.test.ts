@@ -8,8 +8,10 @@ import type { SaveSlotEntry } from '../save/saveSlotIndex'
 import type { SaveSlotSummary } from '../save/saveSlotSummary'
 import { DESIGN_TOKENS } from './designSystem'
 import { depthStripTextOf } from './hudStrip'
+import { SAVE_NAME_MAX_CHARS } from './pauseMenuModel'
 import { uiScaleOf } from './screenLayout'
 import { slotSummaryLineOf, UNKNOWN_SUMMARY_TEXT, type SlotSummaryLine } from './slotSummaryLine'
+import { playtimeTextOf } from './titleMenuModel'
 
 const OLD_ENTRY: SaveSlotEntry = {
   slot: 'slot-3',
@@ -48,6 +50,11 @@ const LONGEST_PLANET_NAME = 'Ashholtmere 9999'.slice(0, PLANET_NAME_CHARACTERS_M
 const LONGEST_DEPTH_METRES = 99_999_999
 const LONGEST_PLAYTIME = '999:59:59'
 const FACTS_ON_THE_LINE = 4
+/** Ticket 672's case: a 1e15 balance, 999 hours of play and a name at the 40-character cap. */
+const PLAYTIME_999H_TICKS = 999 * 3600 * 60
+const LONGEST_SAVE_NAME = 'Deep vein under the eastern brass gallery'.slice(0, SAVE_NAME_MAX_CHARS)
+/** The slot list wraps a long name (overflow-wrap: anywhere) to a second line on a phone. */
+const PHONE_NAME_LINES_MAX = 2
 
 /**
  * The slot line's facts at the menu type size: each fact a glyph (1em, menu size), its gap and its
@@ -133,4 +140,31 @@ describe('save slot line summary (ticket 703)', () => {
     const widestFactPx = Math.max(...texts.map((text) => slotLineWidthPx([text], phone.scale)))
     expect(widestFactPx).toBeLessThanOrEqual(phone.room)
   })
+  it('fits the slot line at 360x640 and 1280x800 with 1e15, 999h and a 40-character name (ticket 672)', () => {
+    const line = lineOf({ money: toCanonical(fromCanonical('1e15')) })
+    const texts = [
+      line.planetText,
+      line.depth.text,
+      line.money.text,
+      playtimeTextOf(PLAYTIME_999H_TICKS),
+    ]
+    expect(LONGEST_SAVE_NAME).toHaveLength(SAVE_NAME_MAX_CHARS)
+    expect(texts[3]).toBe('999:00:00')
+    const desktop = slotLineRoomPx([1280, 800])
+    const nameOnDesktopPx = nameWidthPx(LONGEST_SAVE_NAME, desktop.scale)
+    expect(nameOnDesktopPx + slotLineWidthPx(texts, desktop.scale)).toBeLessThanOrEqual(
+      desktop.room,
+    )
+    const phone = slotLineRoomPx([360, 640])
+    const widestFactPx = Math.max(...texts.map((text) => slotLineWidthPx([text], phone.scale)))
+    expect(widestFactPx).toBeLessThanOrEqual(phone.room)
+    const nameLines = Math.ceil(nameWidthPx(LONGEST_SAVE_NAME, phone.scale) / phone.room)
+    expect(nameLines).toBeLessThanOrEqual(PHONE_NAME_LINES_MAX)
+  })
 })
+
+/** A slot's name in the row layout's title, at the body size, with the gap before its facts. */
+function nameWidthPx(name: string, scale: number): number {
+  const fontPx = DESIGN_TOKENS.type.sizesPx.body * scale
+  return name.length * SERIF_ADVANCE_EM * fontPx + DESIGN_TOKENS.spacePx[2] * scale
+}

@@ -1568,6 +1568,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/ui/platform/dockText.test.ts` | 4 | 4 |
 | `src/ui/platform/outfitterPanel.test.ts` | 2 | 2 |
 | `src/ui/projection/worldToScreen.test.ts` | 7 | 5 |
+| `src/ui/saveMenuText.test.ts` | 4 | 4 |
 | `src/ui/screenIds.test.ts` | 3 | 3 |
 | `src/ui/screens/sliceScreen.test.ts` | 8 | 8 |
 | `src/ui/sheet/baseSheet.test.ts` | 13 | 13 |
@@ -1684,7 +1685,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/views/sellBayModel.test.ts` | 15 | 15 |
 | `src/systems/views/settingsModel.test.ts` | 5 | 5 |
 | `src/systems/views/sheetLayout.test.ts` | 11 | 11 |
-| `src/systems/views/slotSummaryLine.test.ts` | 7 | 7 |
+| `src/systems/views/slotSummaryLine.test.ts` | 8 | 8 |
 | `src/systems/views/titleMenuModel.test.ts` | 8 | 8 |
 | `src/systems/views/titleOnlyText.test.ts` | 5 | 5 |
 | `src/systems/views/tooltipOpening.test.ts` | 9 | 9 |

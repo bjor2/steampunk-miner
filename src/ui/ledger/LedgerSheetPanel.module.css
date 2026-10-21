@@ -64,6 +64,11 @@
   overflow-wrap: anywhere;
 }
 
+/* A 40-character name with no space still wraps inside a 360 px phone's plate (#672). */
+.slot [data-ui-text] > span {
+  overflow-wrap: anywhere;
+}
+
 /* An empty slot reads in italics, by shape and never dimmer than the readable floor (#422). */
 .slot[data-empty] [data-ui-text] > span {
   font-style: italic;
