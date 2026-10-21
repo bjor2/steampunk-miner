@@ -1,0 +1,120 @@
+{
+  "batch": "p2-b1",
+  "tilePx": 22,
+  "rockLuma": 0.289,
+  "skins": {
+    "p2-c1": {
+      "meanHex": "#8a93a1",
+      "luma": 0.571,
+      "hueDeg": 217.6,
+      "rockContrast": 1.83
+    },
+    "p2-c2": {
+      "meanHex": "#bb6751",
+      "luma": 0.493,
+      "hueDeg": 12.2,
+      "rockContrast": 1.6
+    },
+    "p2-c3": {
+      "meanHex": "#b1b5b8",
+      "luma": 0.707,
+      "hueDeg": 204.3,
+      "rockContrast": 2.23
+    },
+    "p2-c4": {
+      "meanHex": "#ddd837",
+      "luma": 0.78,
+      "hueDeg": 58.3,
+      "rockContrast": 2.45
+    },
+    "p2-c5": {
+      "meanHex": "#8a8a95",
+      "luma": 0.546,
+      "hueDeg": 240.0,
+      "rockContrast": 1.76
+    }
+  },
+  "pairs": [
+    {
+      "a": "p2-c1",
+      "b": "p2-c2",
+      "colourDistance": 0.408,
+      "deutanDistance": 0.322,
+      "lumaDifference": 0.078,
+      "textureDifference": 0.076
+    },
+    {
+      "a": "p2-c1",
+      "b": "p2-c3",
+      "colourDistance": 0.223,
+      "deutanDistance": 0.226,
+      "lumaDifference": 0.136,
+      "textureDifference": 0.089
+    },
+    {
+      "a": "p2-c1",
+      "b": "p2-c4",
+      "colourDistance": 0.596,
+      "deutanDistance": 0.59,
+      "lumaDifference": 0.209,
+      "textureDifference": 0.078
+    },
+    {
+      "a": "p2-c1",
+      "b": "p2-c5",
+      "colourDistance": 0.06,
+      "deutanDistance": 0.058,
+      "lumaDifference": 0.025,
+      "textureDifference": 0.092
+    },
+    {
+      "a": "p2-c2",
+      "b": "p2-c3",
+      "colourDistance": 0.51,
+      "deutanDistance": 0.469,
+      "lumaDifference": 0.214,
+      "textureDifference": 0.082
+    },
+    {
+      "a": "p2-c2",
+      "b": "p2-c4",
+      "colourDistance": 0.474,
+      "deutanDistance": 0.481,
+      "lumaDifference": 0.287,
+      "textureDifference": 0.062
+    },
+    {
+      "a": "p2-c2",
+      "b": "p2-c5",
+      "colourDistance": 0.357,
+      "deutanDistance": 0.273,
+      "lumaDifference": 0.053,
+      "textureDifference": 0.088
+    },
+    {
+      "a": "p2-c3",
+      "b": "p2-c4",
+      "colourDistance": 0.554,
+      "deutanDistance": 0.524,
+      "lumaDifference": 0.073,
+      "textureDifference": 0.074
+    },
+    {
+      "a": "p2-c3",
+      "b": "p2-c5",
+      "colourDistance": 0.267,
+      "deutanDistance": 0.275,
+      "lumaDifference": 0.161,
+      "textureDifference": 0.1
+    },
+    {
+      "a": "p2-c4",
+      "b": "p2-c5",
+      "colourDistance": 0.579,
+      "deutanDistance": 0.586,
+      "lumaDifference": 0.234,
+      "textureDifference": 0.084
+    }
+  ],
+  "leastDifferentPair": ["p2-c1", "p2-c5"]
+}

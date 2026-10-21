@@ -20,8 +20,8 @@ sheets below are the only pictures of a skin, and the kind look stays what the g
 
 ## Batch p1-b1: P1's species 1 to 5 (ticket 592)
 
-The legacy pool's five commons, kind slots 1 to 5 on P1 (P2 draws the same pool, so it shows
-them too). Each skin's layers follow its species row: the base its `pattern`, the vein its
+The legacy pool's five commons, kind slots 1 to 5 on P1 (a P2 entered before its own pool, under
+ore rules 5, draws the same pool, so it shows them too). Each skin's layers follow its species row: the base its `pattern`, the vein its
 `silhouette`, the palette its `hueSlot` and the sheen its lustre. No two of the five share any
 layer.
 
@@ -47,7 +47,7 @@ layer.
 
 ## Batch p1-b2: P1's species 6 to 10 (ticket 593)
 
-The legacy pool's four uncommons and its first rare, kind slots 6 to 10 on P1 (and P2). The
+The legacy pool's four uncommons and its first rare, kind slots 6 to 10 on P1 (and a P2 under ore rules 5). The
 layers come from the species row, as for p1-b1. Bright lead and violet fluorite share the `cubes`
 silhouette, so each gets a cube vein of its own: galena cleaves into cubes square to each other,
 while fluorite grows twins turned through one another. No layer is shared with p1-b1 or within the
@@ -83,7 +83,7 @@ batch.
 
 ## Batch p1-b3: P1's species 11 and 12 (ticket 594)
 
-The legacy pool's last two rares, kind slots 11 and 12 on P1 (and P2). The pool has 12 species,
+The legacy pool's last two rares, kind slots 11 and 12 on P1 (and a P2 under ore rules 5). The pool has 12 species,
 so P1 has no slots 13 to 15 and this batch closes the planet. The layers come from the species row,
 as before. No layer is shared with p1-b1, p1-b2 or within the batch.
 
@@ -105,6 +105,47 @@ as before. No layer is shared with p1-b1, p1-b2 or within the batch.
 - **Sheens:** adamantine (a hard bloom, strong glints, and the six-rayed star silky corundum throws,
   one centred on each tile, fading out before the cell edge); prismatic (long bars of light down
   the prism faces that meet the lamp, a column of the cell each, and sharp glints).
+
+## Batch p2-b1: P2's species 1 to 5 (ticket 595)
+
+P2's own pool, foothold-p2 (ticket 632, GD lock (b) on #595), binds a species of its own to each of
+the 12 legacy kind slots under ore rules 6. This batch skins its five commons, kind slots 1 to 5. The
+layers come from the species row, as on P1. No layer is shared within the batch or with any other
+planet's batches. P2's slots 6 to 10 and 11 and 12 come with tickets 596 and 597.
+
+<!-- p2-b1 -->
+
+| slot | species | base             | vein              | palette (shadow, body, light)                  | sheen            |
+| ---- | ------- | ---------------- | ----------------- | ---------------------------------------------- | ---------------- |
+| 1    | `p2-c1` | `slaty-cleavage` | `split-slabs`     | `slate-grey` `#424852` `#8590a3` `#c2c8d1`     | `cleavage-sheen` |
+| 2    | `p2-c2` | `ochre-powder`   | `ochre-lumps`     | `rust-ochre` `#663528` `#cd6a51` `#e6b4a8`     | `powdery`        |
+| 3    | `p2-c3` | `gravel-bed`     | `rivet-grains`    | `tin-gravel` `#5c5f61` `#b8bec2` `#dcdee0`     | `grain-caps`     |
+| 4    | `p2-c4` | `sulphur-crumb`  | `crumbled-masses` | `sulphur-yellow` `#737010` `#e6e021` `#f2f090` | `sugary`         |
+| 5    | `p2-c5` | `graphite-smear` | `flake-books`     | `graphite-black` `#424248` `#838391` `#c1c1c8` | `slick`          |
+
+<!-- /p2-b1 -->
+
+- **Species:** slate shale, rust ochre, tin gravel, sulphur crust and graphite seam (`p2-c1` to
+  `p2-c5`; the ids never follow the names, which the voice check may still change).
+- **Bases:** fine slaty cleavage on a slight slant, broad silt beds across it, and dark broken lines
+  where a sheet split off (whole lines along u and v, so it repeats); soft powdery earth stained in
+  rusty drifts, the stain run down the face in streaks, with a dust of pale grains; a packed bed of
+  rounded grains, each its own grey and domed to its middle, with dark grit in the gaps; a crumbly
+  crust broken into clods along soft cracks, porous with small pits and a pale bloom; soft black
+  smears drawn level, deep and pale in turn, with a few polished lenses and no ruled line.
+- **Veins:** five long thin slabs stacked level with gaps between, each end broken on a slant;
+  faceted earthy lumps, lop-sided where they crumbled, with loose crumbs round them; loose grains
+  shaped like spent rivets, a domed head on a short shank, lying every way; two crumbly heaps of
+  rounded clods grown together, with broken chips fallen off their edge; books of thin hexagonal
+  flakes stacked a little askew, and three loose flakes slid off them.
+- **Sheens:** cleavage sheen (a faint lip of light on each split sheet, a dim wash), powdery (no
+  gloss, only a soft dusty lift where the powder lies thick), grain caps (a bright cap on the middle
+  of every grain, a few hard glints), sugary (a dense frost of tiny glints over a weak resin wash),
+  slick (long level smears of greasy shine where the seam was rubbed). Cleavage sheen and grain caps
+  read the very sheet lines and grains of their bases (the same seeds), so the light sits on the
+  stone's own shapes.
+- **Seeds 701 to 792.** P2's later batches keep apart from them.
+- **P2's rock** is `palette.planet_2`, the same slate blue P3 wears (band 3 luma 0.29).
 
 ## Batch p3-b1: P3's species 1 to 5 (ticket 598)
 
@@ -473,6 +514,40 @@ where ironstone has dark blotches and nuggets. Every new skin sits above its roc
 for corundum, 1.63 for beryl). Checked by eye on `p1-b3.phone-x4.png`, `p1-b3.desktop.png`, the
 `p1-b3.scale-x4` copies and `p1.scale-x4.png` with its `-deutan` and `-gray` copies, now all
 twelve P1 skins side by side.
+
+From `sheets/p2-b1.distinct.json`, at 22 px a tile over P2's band 3 rock (luma 0.29). It is P2's
+first batch, so these are all ten pairs:
+
+<!-- p2-b1-readings -->
+
+| pair                            | colour apart | deuteranopia apart | luma apart | texture apart |
+| ------------------------------- | ------------ | ------------------ | ---------- | ------------- |
+| slate vs ochre                  | 0.408        | 0.322              | 0.078      | 0.076         |
+| slate vs tin gravel             | 0.223        | 0.226              | 0.136      | 0.089         |
+| slate vs sulphur                | 0.596        | 0.590              | 0.209      | 0.078         |
+| slate vs graphite (least apart) | 0.060        | 0.058              | 0.025      | 0.092         |
+| ochre vs tin gravel             | 0.510        | 0.469              | 0.214      | 0.082         |
+| ochre vs sulphur                | 0.474        | 0.481              | 0.287      | 0.062         |
+| ochre vs graphite               | 0.357        | 0.273              | 0.053      | 0.088         |
+| tin gravel vs sulphur           | 0.554        | 0.524              | 0.073      | 0.074         |
+| tin gravel vs graphite          | 0.267        | 0.275              | 0.161      | 0.100         |
+| sulphur vs graphite             | 0.579        | 0.586              | 0.234      | 0.084         |
+
+<!-- /p2-b1-readings -->
+
+The materials table gives P2's slate grey (hue 218, luma 0.56) and graphite (238, 0.52) all but one
+colour, so texture has to part them. That is the closest pair of the batch. Slate is laid on a slant,
+with broad diagonal beds and a stack of level slabs, and the faint lip of each sheet catches the
+light. Graphite has no ruled line: deep and pale smears run level, high in contrast, under bright
+slick streaks and hexagonal flake books. Its first draft carried level shear lines, which echoed the
+slate's sheet edges, so they were taken out; the graphite smears were deepened and the slick
+brightened, which lifted the texture distance from 0.079 to 0.092. At 22 px the slate reads as
+blue-grey diagonal bands and the graphite as neutral level streaks. The first draft of grain caps
+read a 4D Voronoi distance that seldom gets small, so it came out almost black. It now reads the
+grains' distance to their edges, so each grain of tin gravel has its cap. Rust ochre is the only warm
+red and sulphur the only yellow, the brightest skin (contrast 2.45). Every skin sits above its rock
+(contrast 1.60 for rust ochre to 2.45 for sulphur). Checked by eye on `p2-b1.phone-x4.png`,
+`p2-b1.desktop.png` and the `p2-b1.scale-x4` copies with `-deutan` and `-gray`.
 
 From `sheets/p3-b1.distinct.json`, at 22 px a tile over P3's band 3 rock (luma 0.29). It is P3's
 first batch, so these are all ten pairs; its pairs against p3-b2 are in `p3-b2.distinct.json`:
