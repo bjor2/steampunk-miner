@@ -10,57 +10,24 @@
 import { expect, test, type Page } from '@playwright/test'
 import { middleBandOf } from '../../../src/systems/views/hudCoverageBudget'
 import type { HudCoverageReport } from '../../../src/systems/views/hudCoverageReport'
-import { openGame, SLACK_PX, type HudLayoutCell } from './hudLayoutHelpers'
+import { UI_SHOT_CELLS, type UiShotCell } from '../ui/uiShotCells'
+import { openGame, SLACK_PX } from './hudLayoutHelpers'
 
-interface CoverageCell extends HudLayoutCell {
-  layout: 'phone' | 'desktop'
-  budgetPercent: number
+interface CoverageCell extends UiShotCell {
   stripHeight: string
   slotCell: string
 }
 
-const PHONE = { layout: 'phone', budgetPercent: 12, stripHeight: '36px', slotCell: '44px' } as const
-const DESKTOP = {
-  layout: 'desktop',
-  budgetPercent: 8,
-  stripHeight: '44px',
-  slotCell: '48px',
+/** The tokens `data-layout` switches (`tokens.css`): the strip's height and a slot's cell. */
+const LAYOUT_TOKENS = {
+  phone: { stripHeight: '36px', slotCell: '44px' },
+  desktop: { stripHeight: '44px', slotCell: '48px' },
 } as const
 
-const CELLS: readonly CoverageCell[] = [
-  {
-    name: 'phone-360x640',
-    viewport: { width: 360, height: 640 },
-    isTouch: true,
-    isTvMode: false,
-    floor: null,
-    ...PHONE,
-  },
-  {
-    name: 'phone-390x844',
-    viewport: { width: 390, height: 844 },
-    isTouch: true,
-    isTvMode: false,
-    floor: null,
-    ...PHONE,
-  },
-  {
-    name: 'desktop-1280x800',
-    viewport: { width: 1280, height: 800 },
-    isTouch: false,
-    isTvMode: false,
-    floor: null,
-    ...DESKTOP,
-  },
-  {
-    name: 'desktop-1440x900',
-    viewport: { width: 1440, height: 900 },
-    isTouch: false,
-    isTvMode: false,
-    floor: null,
-    ...DESKTOP,
-  },
-]
+const CELLS: readonly CoverageCell[] = UI_SHOT_CELLS.map((cell) => ({
+  ...cell,
+  ...LAYOUT_TOKENS[cell.layout],
+}))
 
 /** Software WebGL on a loaded box is slow; this is a wait, not a judgement. */
 const TEST_TIMEOUT_MS = 180_000
