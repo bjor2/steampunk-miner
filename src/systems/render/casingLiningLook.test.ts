@@ -1,7 +1,8 @@
 import { describe, expect, it } from 'vitest'
 import { CASING_LINING_LOOK, CASING_LINING_PHONE_CELL_PX } from '../../constants/scene'
-import { ART_DIRECTION } from './artDirection'
-import { bandColourOf, paletteOf } from './bandPalette'
+import { ART_DIRECTION, type BandPalette } from './artDirection'
+import { freshPlanetParamsFor } from '../world/planetParams'
+import { bandColourOf, paletteOf, shownPaletteOf } from './bandPalette'
 import {
   isLiningReadable,
   liningContrastAt,
@@ -13,18 +14,33 @@ import { scaleRgb, type Rgb } from './colour'
 const LOOK = CASING_LINING_LOOK
 const BANDS = [1, 2, 3, 4, 5]
 
-/** Every band of every planet palette, at its brightest and darkest tile shade. */
+/** Planets 1 to 10, whose registry rows may give their own rock (ticket 653). */
+const ROW_PLANETS = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+
+/**
+ * Every band of every planet palette, and of every planet's shown palette with its row look, at
+ * its brightest and darkest tile shade.
+ */
 function everyRock(): { name: string; rock: Rgb }[] {
+  const palettes = [
+    ...Object.keys(ART_DIRECTION.palettes).map((id) => ({ name: id, palette: paletteOf(id) })),
+    ...ROW_PLANETS.map((planet) => ({
+      name: `planet ${planet}`,
+      palette: shownPaletteOf(freshPlanetParamsFor(83921, planet)),
+    })),
+  ]
+  return palettes.flatMap(({ name, palette }) => shadedBandsOf(name, palette))
+}
+
+function shadedBandsOf(name: string, palette: BandPalette): { name: string; rock: Rgb }[] {
   const spread = ART_DIRECTION.tileShadeSpread
-  return Object.keys(ART_DIRECTION.palettes).flatMap((paletteId) =>
-    BANDS.flatMap((band) => {
-      const colour = bandColourOf(paletteOf(paletteId), band)
-      return [1 - spread, 1 + spread].map((shade) => ({
-        name: `${paletteId} band ${band} shade ${shade}`,
-        rock: scaleRgb(colour, shade),
-      }))
-    }),
-  )
+  return BANDS.flatMap((band) => {
+    const colour = bandColourOf(palette, band)
+    return [1 - spread, 1 + spread].map((shade) => ({
+      name: `${name} band ${band} shade ${shade}`,
+      rock: scaleRgb(colour, shade),
+    }))
+  })
 }
 
 describe('casing lining look (ticket 315)', () => {

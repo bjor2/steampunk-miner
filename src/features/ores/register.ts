@@ -8,7 +8,8 @@
  * (`orePickup`, ticket 509), keeps its ledger in the `ores.rarity-trip` section and resets it at the
  * dock and on a rescue (protocol 82). The planet registry's rows give world generation each planet's
  * radius (`planetRadius`, ticket 643), the hazard pockets of planets 2 to 5 (`hazardPockets`,
- * ticket 652) and every planet its display name (`planetName`, ticket 702).
+ * ticket 652) and every planet its display name (`planetName`, ticket 702); the renderer reads each
+ * planet's look (`planetLook`, ticket 653).
  */
 import type { SliceDefinition } from '../../registries/sliceDefinition'
 import { oresDebugActions } from './debug'
@@ -17,6 +18,7 @@ import { kernelOreAliases } from './systems/kernelOreAliases'
 import { HAZARD_POCKETS_PROVIDER } from './systems/hazardPockets'
 import { oreLeadHook } from './systems/leadRoll'
 import { PLANET_NAME_PROVIDER } from './systems/planetNameProvider'
+import { PLANET_LOOK_PROVIDER } from './systems/planetLookProvider'
 import { PLANET_RADIUS_PROVIDER } from './systems/planetRadiusProvider'
 import { oreTypeProvider } from './systems/oreTypeProvider'
 import { RARITY_PICKUP_PROVIDER, RARITY_TRIP_RESET } from './systems/rarityPickup'
@@ -30,6 +32,7 @@ export const slice: SliceDefinition = {
     r.planetRadius(PLANET_RADIUS_PROVIDER)
     r.hazardPockets(HAZARD_POCKETS_PROVIDER)
     r.planetName(PLANET_NAME_PROVIDER)
+    r.planetLook(PLANET_LOOK_PROVIDER)
     r.discoveryAliases(kernelOreAliases())
     r.orePickup(RARITY_PICKUP_PROVIDER)
     r.saveSection(RARITY_TRIP_SECTION)

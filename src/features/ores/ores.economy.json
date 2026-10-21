@@ -108,6 +108,12 @@
             "toDepth": [1, 8],
             "pocketTiles": 3,
             "pocketChanceBp": 800
+          },
+          "look": {
+            "rockSurface": "#5f6e7a",
+            "rockDeep": "#2b2438",
+            "horizon": "#8a7aa8",
+            "skyBand": { "colour": "#b8a68a", "heightM": 1, "thicknessM": 3, "flicker": 0 }
           }
         },
         {
@@ -124,6 +130,12 @@
             "toDepth": [1, 5],
             "pocketTiles": 3,
             "pocketChanceBp": 500
+          },
+          "look": {
+            "rockSurface": "#4f4b40",
+            "rockDeep": "#1c1a17",
+            "horizon": "#7f8f5e",
+            "skyBand": { "colour": "#a8d878", "heightM": 1, "thicknessM": 4, "flicker": 0.15 }
           }
         },
         {
@@ -140,6 +152,12 @@
             "toDepth": [1, 6],
             "pocketTiles": 3,
             "pocketChanceBp": 1000
+          },
+          "look": {
+            "rockSurface": "#41736a",
+            "rockDeep": "#14282c",
+            "horizon": "#8fb6c4",
+            "skyBand": { "colour": "#a8e4ff", "heightM": 2, "thicknessM": 3, "flicker": 0.3 }
           }
         },
         {
@@ -156,6 +174,12 @@
             "toDepth": [1, 7],
             "pocketTiles": 3,
             "pocketChanceBp": 400
+          },
+          "look": {
+            "rockSurface": "#6a5254",
+            "rockDeep": "#2a1a1c",
+            "horizon": "#b4aca2",
+            "skyBand": { "colour": "#f2ede4", "heightM": 1, "thicknessM": 6, "flicker": 0.2 }
           }
         },
         {
