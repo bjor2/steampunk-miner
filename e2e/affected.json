@@ -661,6 +661,25 @@
       "specs": ["e2e/browser/ui/uiShots.spec.ts"]
     },
     {
+      "why": "The shared sheet (ticket 686): full over a phone with tap-to-reveal cards, docked beside the desktop view, the tab bar in the shared scroll area, Escape and Close. Its rules, store slice, kit parts, dock, stage and debug reads reach the sheet spec and the screenshot suite's sheet row.",
+      "paths": [
+        "src/ui/sheet/**",
+        "src/ui/kit/Sheet*",
+        "src/ui/kit/useSheetCard.ts",
+        "src/ui/kit/ScrollArea*",
+        "src/ui/kit/useScrollRail.ts",
+        "src/ui/registries/sheetTabs.ts",
+        "src/ui/stage/GameStage*",
+        "src/store/sheetSlice.ts",
+        "src/debug/debugSheet.ts",
+        "src/systems/views/sheetLayout.ts",
+        "src/systems/views/cardReveal.ts",
+        "src/features/example/ui/ExampleSheetTabs*",
+        "src/features/example/store/sheetProbeStore.ts"
+      ],
+      "specs": ["e2e/browser/ui/sheet.spec.ts", "e2e/browser/ui/uiShots.spec.ts"]
+    },
+    {
       "why": "The touch controls held upright (ticket 485): the lower-45% stick zone, a phone's two-row cluster, the tile lane the slot column and the fire tile keep to, and the left-hand mirror.",
       "paths": [
         "src/ui/touch/**",

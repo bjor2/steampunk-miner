@@ -9,6 +9,7 @@ import { expect, type Page } from '@playwright/test'
 import { TREE_TEST_IDS } from '../../../src/features/tech-tree/ui/nodeTestIds'
 import { WORKSHOP_TEST_IDS } from '../../../src/features/workshop/ui/testIds'
 import { UI_IDS } from '../../../src/ui/ids'
+import { SHEET_UI_IDS } from '../../../src/ui/sheet/sheetIds'
 import { dockAt } from '../screens/screenHelpers'
 import type { FindingsScope } from './uiShotFindings'
 
@@ -71,6 +72,12 @@ export const UI_SHEETS: readonly UiSheet[] = [
     open: openPlanetCard,
   },
   {
+    shot: 'base-sheet',
+    rootSelector: `[data-testid="${SHEET_UI_IDS.baseSheet}"]`,
+    pannedTestIds: [],
+    open: openBaseSheet,
+  },
+  {
     shot: 'title-menu',
     rootSelector: '[data-testid="title-menu"] section',
     pannedTestIds: [],
@@ -121,6 +128,21 @@ async function openTechTreeList(page: Page): Promise<void> {
 async function openPlanetCard(page: Page): Promise<void> {
   await page.evaluate((planet) => window.steampunkDebug!.setPlanet(planet), PLANET_WITH_CARD)
   await expect(page.getByTestId('planet-card')).toBeVisible({ timeout: OPEN_TIMEOUT_MS })
+}
+
+/**
+ * The shared sheet (ticket 686) on the example slice's probe tabs, the only tabs registered until
+ * the shop, tree, cargo and saves move onto it (#687, #688): full over a phone, docked on desktop.
+ */
+export async function openBaseSheet(page: Page): Promise<void> {
+  await undock(page)
+  await page.evaluate(() => {
+    const debug = window.steampunkDebug!
+    debug.features.example!.showSheetTabs!()
+    const result = debug.ui.openSheet('example.cards')
+    if (!result.ok) throw new Error(result.problems.join('; '))
+  })
+  await expect(page.getByTestId(SHEET_UI_IDS.baseSheet)).toHaveAttribute('data-transition', 'open')
 }
 
 async function openTitleMenu(page: Page): Promise<void> {
