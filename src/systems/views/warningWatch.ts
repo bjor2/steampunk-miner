@@ -10,7 +10,8 @@
  */
 import type { CombatStatusStack } from './combatStatuses'
 import { DESIGN_TOKENS, type DesignTokens } from './designSystem'
-import type { HudStrip } from './hudStrip'
+import type { HudModel } from './hudModel'
+import { hudStripOf, type HudStrip } from './hudStrip'
 import { ladderTierNamed, ladderTierOf, LADDER_TIERS, type LadderTier } from './warningLadder'
 
 /** The readouts that warn, in the order a tie for the glow is settled by. */
@@ -102,6 +103,11 @@ export function warningReadingsOf(
     { id: 'heat', leftPermille: strip.heat?.leftPermille ?? PERMILLE },
     { id: 'collapse', leftPermille: collapseLeftPermilleOf(isCollapseWarned(statuses), tokens) },
   ]
+}
+
+/** The HUD model's readings, read through the strip the bars are drawn from. */
+export function hudWarningReadingsOf(model: HudModel): WarningReading[] {
+  return warningReadingsOf(hudStripOf(model), model.statuses)
 }
 
 /** The deepest tier any reading stands in now; the first readout in order wins a tie. */

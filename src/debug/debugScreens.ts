@@ -68,6 +68,7 @@ import type { ScreenBox } from '../systems/views/hudClearView'
 import type { HudCoverageReport } from '../systems/views/hudCoverageReport'
 import { hudCoverageNow, showHudCoverageUnlessRefused } from './debugHudCoverage'
 import { closeSheetNow, openSheetUnlessRefused, sheetNow, type SheetReading } from './debugSheet'
+import { warningsNow, type WarningsReading } from './debugWarnings'
 import { showHintUnlessRefused, stageHudUnlessRefused, vehicleScreenBoxNow } from './debugHudLayout'
 import {
   readDrawnKindLooks,
@@ -169,6 +170,8 @@ export interface DebugUi {
   closeSheet(): DebugResult
   /** The base sheet's open tab, the tabs it shows, its placement and the revealed card. */
   getSheet(): DebugResult<{ sheet: SheetReading }>
+  /** The edge glow, each readout's fired tier and the run's warning firings in order (ticket 685). */
+  getWarnings(): DebugResult<{ warnings: WarningsReading }>
   /** The ground's material look table as the shader draws it now (ticket 450). */
   getKindLooks(): DebugResult<{ looks: DrawnKindLooks }>
   /** Shows every kind of the planet as if met, for eye checks and the frame A/B (ticket 450). */
@@ -255,6 +258,7 @@ export function createDebugUi(): DebugUi {
     openSheet: openSheetUnlessRefused,
     closeSheet: closeSheetNow,
     getSheet: sheetNow,
+    getWarnings: warningsNow,
     getKindLooks: readDrawnKindLooks,
     showEveryKindLook,
     showSeenKindLooksOnly,

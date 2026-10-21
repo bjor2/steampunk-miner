@@ -1,13 +1,17 @@
 import { describe, expect, it } from 'vitest'
+import { forceCollapseCommand } from '../authority/collapse/collapseCommands'
+import { BAND_1_Y, digAlong, prepareDigger } from '../authority/collapse/collapseFixtures'
 import { createScriptedSession } from '../authority/scriptedSession'
+import { blockContaining, blockIdOf } from '../world/collapseBlock'
 import { KEYBOARD_PROMPTS } from '../input/promptFixtures'
-import { setHullCommand } from '../vehicle/vehicleCommands'
+import { setEnergyCommand, setHeatCommand, setHullCommand } from '../vehicle/vehicleCommands'
 import { combatStatusStackOf } from './combatStatuses'
 import { selectHudModel, type HudModel } from './hudModel'
 import { hudStripOf } from './hudStrip'
 import {
   ARMED_WARNING_WATCH,
   edgeGlowOf,
+  hudWarningReadingsOf,
   stepWarningWatch,
   warningReadingsOf,
   type WarningFiring,
@@ -166,5 +170,63 @@ describe('warning readings from the HUD (ticket 685)', () => {
     ])
     expect(step.glow).toEqual({ tier: 'critical', readoutId: 'collapse' })
     expect(leftOf(warningReadingsOf(hudStripOf(model), model.statuses), 'collapse')).toBe(1000)
+  })
+})
+
+/** Watches a run of HUD models one after another, as the HUD re-reads them. */
+function watchModels(models: readonly HudModel[]): WarningFiring[] {
+  let watch: WarningWatch = ARMED_WARNING_WATCH
+  return models.flatMap((model) => {
+    const step = stepWarningWatch(watch, hudWarningReadingsOf(model))
+    watch = step.watch
+    return step.firings
+  })
+}
+
+const firedOf = (firings: readonly WarningFiring[]) =>
+  firings.map((firing) => `${firing.readoutId}:${firing.tier}`)
+
+describe('every warning in a test scene (ticket 685)', () => {
+  it('fires low hull, low fuel, a full hold and a collapse once each as the run falls into them', () => {
+    const session = createScriptedSession()
+    prepareDigger(session, 0)
+    const dug = digAlong(session, 0, BAND_1_Y, 20500, 30500)
+    const back = digAlong(session, dug, BAND_1_Y, 30500, 26500, 0)
+    const calm = hudOf(session)
+    session.submit(back, setHullCommand('10'))
+    const hurt = hudOf(session)
+    session.submit(back, setEnergyCommand('0'))
+    const dry = hudOf(session)
+    const full = { ...dry, cargo: { ...dry.cargo, permille: 1000, isFull: true } }
+    session.submit(
+      back,
+      forceCollapseCommand(blockIdOf(blockContaining({ xMm: 26500, yMm: BAND_1_Y }))),
+    )
+    const telegraph = hudOf(session)
+    const collapsing = { ...telegraph, cargo: full.cargo }
+    const fired = watchModels([calm, hurt, hurt, dry, full, collapsing, collapsing])
+    expect(firedOf(fired)).toEqual([
+      'hull:critical',
+      'fuel:empty',
+      'cargo:empty',
+      'collapse:critical',
+    ])
+  })
+
+  it('fires the heat on a heat planet as the drill runs hot', () => {
+    const session = createScriptedSession()
+    session.submit(1, { type: 'debug.setPlanet', payload: { planetIndex: 8 } })
+    const cool = hudOf(session)
+    session.submit(2, setHeatCommand(75))
+    const warm = hudOf(session)
+    session.submit(3, setHeatCommand(90))
+    const hot = hudOf(session)
+    session.submit(4, setHeatCommand(100))
+    const limit = hudOf(session)
+    expect(firedOf(watchModels([cool, warm, hot, limit]))).toEqual([
+      'heat:low',
+      'heat:critical',
+      'heat:empty',
+    ])
   })
 })

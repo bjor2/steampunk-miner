@@ -171,6 +171,13 @@ import {
   type TitleMenuValues,
 } from './titleMenuSlice'
 import { vehicleReplicaOf, type VehicleReplica } from './vehicleReplica'
+import { forgetFiredWarnings } from './warningBroadcast'
+import {
+  STARTING_WARNINGS,
+  warningActionsOf,
+  type WarningActions,
+  type WarningValues,
+} from './warningSlice'
 
 type DebugActions = CombatDebugActions &
   GroundDebugActions &
@@ -200,6 +207,8 @@ export interface GameState
     SheetActions,
     HudDetailValues,
     HudDetailActions,
+    WarningValues,
+    WarningActions,
     SoundUnlockValues,
     SoundUnlockActions,
     TitleMenuValues,
@@ -308,6 +317,7 @@ type GameValues = Pick<
   | keyof TapSheetValues
   | keyof SheetValues
   | keyof HudDetailValues
+  | keyof WarningValues
   | keyof SoundUnlockValues
   | keyof TitleMenuValues
   | keyof SaveKeepingValues
@@ -339,6 +349,7 @@ export const STARTING_VALUES: GameValues = {
   ...STARTING_TAP_SHEET,
   ...STARTING_SHEET,
   ...STARTING_HUD_DETAIL,
+  ...STARTING_WARNINGS,
   ...STARTING_SOUND_UNLOCK,
   ...STARTING_TITLE_MENU,
   ...STARTING_SAVE_KEEPING,
@@ -366,6 +377,7 @@ export const useGameStore = create<GameState>()((set, get) => ({
   ...tapSheetActionsOf(set, get),
   ...sheetActionsOf(set, get),
   ...hudDetailActionsOf(set, get),
+  ...warningActionsOf(set, get),
   ...soundUnlockActionsOf(set),
   ...titleMenuActionsOf(set, get),
   ...saveKeepingActionsOf(set, get),
@@ -545,6 +557,7 @@ function startingAuthorityState(): AuthorityState {
 export function resetGameStore(authority: Authority = createStartingAuthority()): void {
   useGameStore.setState({ ...STARTING_VALUES })
   forgetMusicStingers()
+  forgetFiredWarnings()
   forgetBlastScorches()
   forgetCarveWatch()
   connectAuthority(authority, followAuthority)
