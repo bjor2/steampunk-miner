@@ -9,12 +9,14 @@
  * dock and on a rescue (protocol 82). The planet registry's rows give world generation each planet's
  * radius (`planetRadius`, ticket 643), the hazard pockets of planets 2 to 5 (`hazardPockets`,
  * ticket 652) and every planet its display name (`planetName`, ticket 702); the renderer reads each
- * planet's look (`planetLook`, ticket 653).
+ * planet's look (`planetLook`, ticket 653), and the planet card reads planets 2 to 5 their hazard's
+ * tag and arrival line (`planetCardLine`, ticket 654).
  */
 import type { SliceDefinition } from '../../registries/sliceDefinition'
 import { oresDebugActions } from './debug'
 import { oreReportRows } from './oreReportRows'
 import { kernelOreAliases } from './systems/kernelOreAliases'
+import { HAZARD_CARD_SOURCE } from './systems/hazardCardSource'
 import { HAZARD_POCKETS_PROVIDER } from './systems/hazardPockets'
 import { oreLeadHook } from './systems/leadRoll'
 import { PLANET_NAME_PROVIDER } from './systems/planetNameProvider'
@@ -33,6 +35,7 @@ export const slice: SliceDefinition = {
     r.hazardPockets(HAZARD_POCKETS_PROVIDER)
     r.planetName(PLANET_NAME_PROVIDER)
     r.planetLook(PLANET_LOOK_PROVIDER)
+    r.planetCardLine(HAZARD_CARD_SOURCE)
     r.discoveryAliases(kernelOreAliases())
     r.orePickup(RARITY_PICKUP_PROVIDER)
     r.saveSection(RARITY_TRIP_SECTION)
