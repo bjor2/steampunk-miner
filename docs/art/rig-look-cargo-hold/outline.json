@@ -18,12 +18,12 @@
       "changesRigOutline": 24
     },
     "ore-hopper": {
-      "cells": 727,
+      "cells": 751,
       "outsideRig": {
         "tier-1": 0,
         "tier-3": 0
       },
-      "changesRigOutline": 81
+      "changesRigOutline": 57
     },
     "riveted-bin": {
       "cells": 797,

@@ -1,0 +1,93 @@
+{
+  "about": "Ticket 580: at a 360 px wide phone (30 px/m over the 12 m zoom), the pixels of the hold's footprint (the rig's t1-hopper, which every look keeps to) that change between each look on hull.cargo and the next (a channel moving more than 24 of 255), and the brightest pixel (Rec. 709 luminance, 0-255) of the drill nose against the rest of the rig for each look, the nose lit as while drilling: under `lit` on the phone-size renders, under `glow` on the tier-1 emission-only render at 512 px/m; written by sheet_cargo_hold_looks.py. The nose must stay the brightest glow.",
+  "lit": {
+    "tier-1": {
+      "phonePxPerM": 30.0,
+      "holdFootprintPx": {
+        "ore-hatch -> plank-crate": {
+          "changed": 9,
+          "of": 21
+        },
+        "plank-crate -> ore-hopper": {
+          "changed": 12,
+          "of": 21
+        },
+        "ore-hopper -> riveted-bin": {
+          "changed": 14,
+          "of": 21
+        }
+      },
+      "brightest": {
+        "ore-hatch": {
+          "nose": 203,
+          "restOfRig": 255
+        },
+        "plank-crate": {
+          "nose": 203,
+          "restOfRig": 255
+        },
+        "ore-hopper": {
+          "nose": 203,
+          "restOfRig": 255
+        },
+        "riveted-bin": {
+          "nose": 203,
+          "restOfRig": 255
+        }
+      }
+    },
+    "tier-3": {
+      "phonePxPerM": 30.0,
+      "holdFootprintPx": {
+        "ore-hatch -> plank-crate": {
+          "changed": 9,
+          "of": 21
+        },
+        "plank-crate -> ore-hopper": {
+          "changed": 12,
+          "of": 21
+        },
+        "ore-hopper -> riveted-bin": {
+          "changed": 14,
+          "of": 21
+        }
+      },
+      "brightest": {
+        "ore-hatch": {
+          "nose": 255,
+          "restOfRig": 226
+        },
+        "plank-crate": {
+          "nose": 255,
+          "restOfRig": 226
+        },
+        "ore-hopper": {
+          "nose": 255,
+          "restOfRig": 226
+        },
+        "riveted-bin": {
+          "nose": 255,
+          "restOfRig": 226
+        }
+      }
+    }
+  },
+  "glow": {
+    "ore-hatch": {
+      "nose": 247,
+      "restOfRig": 253
+    },
+    "plank-crate": {
+      "nose": 247,
+      "restOfRig": 253
+    },
+    "ore-hopper": {
+      "nose": 247,
+      "restOfRig": 253
+    },
+    "riveted-bin": {
+      "nose": 247,
+      "restOfRig": 253
+    }
+  }
+}

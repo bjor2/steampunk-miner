@@ -623,6 +623,25 @@ of the `.blend`; from then on it is the source. The part table, the outline chec
 renders, at desktop and at a 360 px phone's size, are in
 [docs/art/rig-look-hull/](art/rig-look-hull/README.md).
 
+## Rig-look parts: the cargo hold
+
+The art half of the `cargo_hold` line of the rig look ladder
+([#576](https://github.com/bjor2/steampunk-miner/issues/576), built by
+[#580](https://github.com/bjor2/steampunk-miner/issues/580)): a Blender source for the three look
+steps Systems' table puts at 23, 31 and 33 purchases, `art/blender/vehicle-look-cargo-hold/`, with
+the base look beside them. Each part is authored with the track's attach slot, `hull.cargo`, at the
+origin and is meant to stand in place of the rig's ore hatch on the fore deck, `t1-hopper`:
+`ore-hatch` is that hatch piece for piece, then Progression's `plank-crate`, `ore-hopper` and
+`riveted-bin`. Cargo stays inside the rig's outline (the #576 HS rule), so every look keeps to the
+hatch's own 180 by 72 mm box and the steps differ by material and colour, not by growing the hold;
+the slot sits 28 mm above the lid, so each look carries a 10 mm stay up to it behind the steam ram,
+which covers it through its whole stroke. Nothing registers or draws it yet: the per-track registry
+(#577) names the asset from the track id and the wiring (#581) swaps the part on the slot and runs
+the tail above the top step. `docs/art/rig-look-cargo-hold/author_cargo_hold_looks.py` wrote the
+first version of the `.blend`; from then on it is the source. The part table, the outline check at
+tiers 1 and 3 and the review renders, at desktop and at a 360 px phone's size, are in
+[docs/art/rig-look-cargo-hold/](art/rig-look-cargo-hold/README.md).
+
 ## Rig-look parts: the drill tip
 
 The art half of the `drill_tip` line of the rig look ladder

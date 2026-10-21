@@ -26,7 +26,7 @@ the box, not by growing the hold.
 | Part          | Step (purchases) | Look                                                                  |
 | ------------- | ---------------- | --------------------------------------------------------------------- |
 | `ore-hatch`   | 0, the default   | the rig's own hatch, the same pieces as `t1-hopper`, re-based         |
-| `plank-crate` | 23               | an oak crate: five planks over a dark hold, iron straps, a brass hasp |
+| `plank-crate` | 23               | an oak crate under a tarred lid: five planks, iron straps, a brass hasp |
 | `ore-hopper`  | 31               | an open brass hopper on corner posts, heaped with ore over its lip    |
 | `riveted-bin` | 33               | a pale blued-steel bin with two riveted bands and a lit sight glass   |
 
@@ -60,7 +60,6 @@ LOOKS_TABLE = os.path.join(HERE, 'cargoHoldLooks.json')
 # art lands where the placeholder glow pointed; the sight glass glows under the nose seams' 1.6.
 kit.PALETTE.update({
     'plank': ((0.50, 0.30, 0.13), 0.75, 0.0),
-    'plank-light': ((0.64, 0.41, 0.18), 0.75, 0.0),
     'plank-dark': ((0.20, 0.12, 0.06), 0.85, 0.0),
     'ore-lump': ((0.86, 0.66, 0.28), 0.45, 0.0),
     'bin-steel': ((0.52, 0.66, 0.80), 0.3, 0.0),
@@ -84,13 +83,14 @@ HINGE = (0.01, 0.13, (-0.085, 0.0, 0.07))
 # height to 2 mm over the slot, 10 mm deep and clear behind the rod's back.
 STAY_SIZE = (0.01, 0.01, 0.037)
 STAY_AT = (0.12, 0.01, 0.0835)
-# The crate's five planks across the front, their straps and the hasp on the lid's edge.
+# The crate's five planks across the front, their straps and the hasp on the lid's edge. The lid is
+# tarred dark: at a phone's size the hold is three pixels tall and its top row is the lid, which
+# on the rig's hatch is bright brass, so a bright wooden lid read as the same look there.
 PLANK_XS = (-0.068, -0.034, 0.0, 0.034, 0.068)
-PLANK_SIZE = (0.026, 0.012, 0.056)
+PLANK_SIZE = (0.03, 0.012, 0.056)
 STRAP_X = 0.076
 STRAP_SIZE = (0.014, 0.012, LID_TOP)
-BAND_SIZE = (0.17, 0.012, 0.012)
-BAND_Z = 0.018
+NAIL_ZS = (0.012, 0.06)
 NAIL_RADIUS = 0.005
 HASP_SIZE = (0.02, 0.008, 0.016)
 # The hopper: a square funnel wide side up, stretched along X to the hatch's width, brass corner
@@ -104,9 +104,12 @@ POST_SIZE = (0.012, 0.12, LID_TOP)
 POST_X = 0.077
 LIP_SIZE = (0.17, 0.012, 0.008)
 LIP_Z = 0.054
-ORE_LUMPS = ((-0.062, 0.009), (-0.038, 0.011), (-0.012, 0.0095), (0.014, 0.011), (0.04, 0.0085), (0.064, 0.01))
-ORE_Y = -0.044
-ORE_Z = 0.061
+ORE_ROWS = (
+    (-0.044, 0.061, ((-0.062, 0.009), (-0.038, 0.011), (-0.012, 0.0095), (0.014, 0.011), (0.04, 0.0085), (0.064, 0.01))),
+    (-0.018, 0.06, ((-0.05, 0.01), (-0.024, 0.009), (0.002, 0.011), (0.028, 0.0095), (0.054, 0.01))),
+    (0.01, 0.058, ((-0.06, 0.009), (-0.034, 0.01), (-0.006, 0.0085), (0.02, 0.011), (0.046, 0.009), (0.068, 0.008))),
+    (0.036, 0.056, ((-0.046, 0.01), (-0.018, 0.009), (0.012, 0.01), (0.04, 0.0095))),
+)
 # The bin: two riveted bands, corner plates, a steel hinge in the hatch's own bump, a brass
 # handle on the lid's edge and the sight glass on the front.
 BAND_ZS = (0.01, 0.05)
@@ -188,8 +191,7 @@ def hatch_pieces():
 def crate_pieces():
     pieces = [
         box('plank-dark', FRAME_SIZE, (0.0, 0.0, FRAME_SIZE[2] / 2)),
-        box('plank-light', (LID_SIZE[0], LID_SIZE[1] / 2, LID_SIZE[2]), (0.0, -LID_SIZE[1] / 4, LID_Z)),
-        box('plank', (LID_SIZE[0], LID_SIZE[1] / 2, LID_SIZE[2]), (0.0, LID_SIZE[1] / 4, LID_Z)),
+        box('plank-dark', LID_SIZE, (0.0, 0.0, LID_Z)),
         box('brass', HASP_SIZE, (0.0, FRONT_Y - 0.009, 0.052)),
     ]
     pieces += [box('plank', PLANK_SIZE, (x, FRONT_Y - 0.002, FRAME_SIZE[2] / 2)) for x in PLANK_XS]
@@ -198,12 +200,11 @@ def crate_pieces():
 
 
 def strap_pieces():
-    """Iron straps down the crate's corners and a band across its planks, nailed."""
+    """Iron straps down the crate's corners, nailed top and bottom."""
     y = FRONT_Y - 0.004
     pieces = [box('iron-plate', STRAP_SIZE, (x, y, STRAP_SIZE[2] / 2)) for x in (-STRAP_X, STRAP_X)]
-    pieces.append(box('iron-plate', BAND_SIZE, (0.0, y, BAND_Z)))
     for x in (-STRAP_X, STRAP_X):
-        pieces += [sphere('iron', NAIL_RADIUS, (x, y - 0.006, z), flatten=0.6) for z in (BAND_Z, 0.06)]
+        pieces += [sphere('iron', NAIL_RADIUS, (x, y - 0.006, z), flatten=0.6) for z in NAIL_ZS]
     return pieces
 
 
@@ -224,8 +225,10 @@ def hopper_pieces():
 
 
 def ore_pieces():
-    """Ore heaped in the mouth, showing over the front lip and under the hatch's height."""
-    return [sphere('ore-lump', radius, (x, ORE_Y, ORE_Z), flatten=0.8) for x, radius in ORE_LUMPS]
+    """Ore heaped over the funnel's mouth in four rows, the front one showing over the lip from the
+    game's view, all under the hatch's height."""
+    return [sphere('ore-lump', radius, (x, y, z), flatten=0.8)
+            for y, z, lumps in ORE_ROWS for x, radius in lumps]
 
 
 # --- the riveted bin (the step at 33 purchases) --------------------------------------------------
