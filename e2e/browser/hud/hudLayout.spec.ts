@@ -8,7 +8,7 @@
  * every control owned and three status chips (#486 closed that gap), and logged on the small-phone
  * sweep, where a one-way ratchet waits for a number. With every control owned, sideways, the pairs
  * a slot or the fire tile makes with the HUD are logged, not asserted (#485 kept the tile lane).
- * The desktop, TV and tablet cells keep the full HUD. A cell that cannot reach the worst case
+ * The desktop, TV and tablet cells keep the full HUD: the strip centred on top (ticket 684). A cell that cannot reach the worst case
  * fails, never skips. Geometry through the DOM and `steampunkDebug` only.
  */
 import { expect, test, type Page } from '@playwright/test'
@@ -255,7 +255,7 @@ for (const cell of FULL_CELLS) {
       deviceScaleFactor: 1,
     })
 
-    test('leaves the full-density HUD boxes identical on the desktop, ultra-wide, tv and tablet cells', async ({
+    test('lays the strip centred under the top inset with no panel stack on the desktop, ultra-wide, tv and tablet cells', async ({
       page,
     }) => {
       test.setTimeout(TEST_TIMEOUT_MS)
@@ -263,16 +263,14 @@ for (const cell of FULL_CELLS) {
       expect(await densityOf(page)).toBe('full')
       const safe = await boxOfTestId(page, 'safe-area')
       const byId = new Map((await hudBoxes(page)).map((box) => [box.id, box]))
-      // Today's places (#33 section 5): gauges top left, readouts top right, banner top centre.
-      const gauges = byId.get('gauges')!
-      const readouts = byId.get('readouts')!
-      const status = byId.get('status')!
-      expect(gauges.left - safe.left).toBeLessThan(cell.viewport.width * 0.05)
-      expect(safe.right - readouts.right).toBeLessThan(cell.viewport.width * 0.05)
-      expect(
-        Math.abs((status.left + status.right) / 2 - (safe.left + safe.right) / 2),
-      ).toBeLessThan(2)
-      expect(await page.locator('[data-title-place="card"]').count()).toBe(0)
+      // Ticket 684: one strip at the top centre replaces the gauges, readouts and banner panels.
+      const strip = byId.get('strip')!
+      expect(Math.abs(strip.top - safe.top)).toBeLessThan(1)
+      expect(Math.abs((strip.left + strip.right) / 2 - (safe.left + safe.right) / 2)).toBeLessThan(
+        2,
+      )
+      expect(['gauges', 'readouts', 'status'].filter((id) => byId.has(id))).toEqual([])
+      expect(byId.get('gear')!.top).toBeGreaterThanOrEqual(strip.bottom)
       expect(errors).toEqual([])
     })
   })

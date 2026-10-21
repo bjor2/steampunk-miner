@@ -7,6 +7,7 @@
  */
 .gear {
   position: absolute;
+  line-height: 0;
   top: calc(var(--strip-height) + var(--space-2));
   right: var(--layout-margin);
   pointer-events: auto;
@@ -38,11 +39,17 @@
   left: calc(var(--space-3) + var(--touch-cluster-width) + var(--slot-gap));
 }
 
-/* The baked plate (48 px, ticket 683) at the slot cell size; a brass ring while art is missing. */
+/*
+ * The baked plate (48 px, ticket 683) at the slot cell size, a brass ring while art is missing.
+ * A slot cell is the design's tap size for the slot grid (section 9: 44 px on a phone), under
+ * the kit's coarse `--control-min`, which would push the button into the middle band at 360x640.
+ */
 .button {
   display: block;
   width: var(--slot-cell);
+  min-width: var(--slot-cell);
   height: var(--slot-cell);
+  min-height: var(--slot-cell);
   padding: 0;
   border: var(--frame-bezel) solid var(--color-brass);
   border-radius: var(--radius-panel);

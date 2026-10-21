@@ -1,11 +1,11 @@
 /**
  * The upright phone HUD's second slice (#486, spec #470; the GD's split on #500): held upright the
- * threats are chips leading the prompts' row, and the status row is glyphs and numbers with its
- * words in the status box's card. On every upright cell, in the worst case with a threat at each
+ * threats are chips leading the prompts' row, and the status row (on the strip since ticket 684)
+ * is glyphs and numbers with its words in the detail behind the gear button. On every upright cell, in the worst case with a threat at each
  * of the eight octants and three status chips, no two `data-hud` boxes overlap, every text sits
  * inside its box, every threat chip sits inside the prompts' row, none of them reaches the stick
  * zone or a touch button, the vehicle's body stays uncovered, and the overlay keeps its 16-card
- * cap. A clean tap on the status row opens the card with the chips' words. Geometry through the
+ * cap. A tap on the gear button opens the detail with the chips' words. Geometry through the
  * DOM and `steampunkDebug` only; a cell that cannot reach the worst case fails, never skips.
  */
 import { expect, test, type Page } from '@playwright/test'
@@ -72,19 +72,21 @@ for (const cell of UPRIGHT_CELLS) {
       const zone = await stickZone(page)
       expect(zone).not.toBeNull()
       const keepOut = [zone!, ...boxes.filter((box) => box.id === 'control')]
-      const rows = [prompts, ...boxes.filter((box) => box.id === 'status')]
+      const rows = [prompts, ...boxes.filter((box) => box.id === 'strip')]
       expect(namesOverlapping(rows, keepOut)).toEqual([])
     })
 
-    test('opens the status card with every chip title on a clean tap', async ({ page }) => {
+    test('says every status word in the detail the gear button opens, none on the strip', async ({
+      page,
+    }) => {
       test.setTimeout(TEST_TIMEOUT_MS)
       await openGame(page, cell)
       await reachEveryThreat(page, cell)
-      const status = page.locator('[data-hud="status"]')
-      await expect(status).not.toContainText('HULL CRITICAL')
-      await status.tap()
-      await expect(status).toContainText('HULL CRITICAL')
-      await expect(status).toContainText('CRITICAL ENERGY')
+      await expect(page.locator('[data-hud="strip"]')).not.toContainText('HULL CRITICAL')
+      await page.getByTestId('hud-gear').tap()
+      const detail = page.getByTestId('hud-detail')
+      await expect(detail).toContainText('HULL CRITICAL')
+      await expect(detail).toContainText('CRITICAL ENERGY')
     })
 
     test('keeps the overlay to its cap of 16 cards held upright', async ({ page }) => {

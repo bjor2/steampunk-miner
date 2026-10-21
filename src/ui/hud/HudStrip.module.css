@@ -79,11 +79,16 @@
   font-size: var(--type-label);
 }
 
-/* The float-up rises from the number's foot and fades; it covers no box and takes no tap. */
+/*
+ * The float-up rises over the number and fades, inside the strip's box, so it adds no area and
+ * spills nothing; a dark halo keeps it readable over the drum. It takes no tap.
+ */
 .floatLayer {
   position: absolute;
-  top: 100%;
-  left: 0;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   pointer-events: none;
 }
 
@@ -92,6 +97,10 @@
   color: var(--color-brass);
   font-family: var(--font-numerals);
   font-size: var(--type-label);
+  font-weight: bold;
+  text-shadow:
+    0 0 2px var(--color-bg),
+    0 0 4px var(--color-bg);
   animation: float-up var(--float-up) var(--ease-exit) both;
 }
 
@@ -101,12 +110,12 @@
 
 @keyframes float-up {
   from {
-    transform: translateY(var(--space-3));
+    transform: translateY(0.5em);
     opacity: 1;
   }
 
   to {
-    transform: translateY(0);
+    transform: translateY(-0.5em);
     opacity: 0;
   }
 }

@@ -3,7 +3,8 @@
  * root its findings are read under, the parts that pan, and how a fresh game reaches it. A sheet
  * the shared sheet component (#686) or a later ticket adds joins as one row. Today's sheets are the
  * ones the upright panel spec (#487) walks: the Sell and Upgrade bays, the settings, the pause menu
- * and its save page, the tech tree's map and list, the planet card and the title menu.
+ * and its save page, the tech tree's map and list, the planet card and the title menu; and the
+ * HUD strip's detail behind the gear button (ticket 684).
  */
 import { expect, type Page } from '@playwright/test'
 import { TREE_TEST_IDS } from '../../../src/features/tech-tree/ui/nodeTestIds'
@@ -78,6 +79,12 @@ export const UI_SHEETS: readonly UiSheet[] = [
     open: openBaseSheet,
   },
   {
+    shot: 'hud-detail',
+    rootSelector: `[data-testid="${UI_IDS.hudDetail}"]`,
+    pannedTestIds: [],
+    open: openHudDetail,
+  },
+  {
     shot: 'title-menu',
     rootSelector: '[data-testid="title-menu"] section',
     pannedTestIds: [],
@@ -143,6 +150,13 @@ export async function openBaseSheet(page: Page): Promise<void> {
     if (!result.ok) throw new Error(result.problems.join('; '))
   })
   await expect(page.getByTestId(SHEET_UI_IDS.baseSheet)).toHaveAttribute('data-transition', 'open')
+}
+
+/** Ticket 684: the strip's detail, every exact value and word, behind the gear button. */
+async function openHudDetail(page: Page): Promise<void> {
+  await undock(page)
+  await page.getByTestId(UI_IDS.hudGear).click()
+  await expect(page.getByTestId(UI_IDS.hudDetail)).toBeVisible()
 }
 
 async function openTitleMenu(page: Page): Promise<void> {

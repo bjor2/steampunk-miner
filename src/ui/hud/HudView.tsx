@@ -12,6 +12,7 @@ import { isUprightCompactHud } from '../../systems/views/hudCompact'
 import type { HudModel } from '../../systems/views/hudModel'
 import { hudStripOf } from '../../systems/views/hudStrip'
 import type { HudDensity, StageOrientation } from '../../systems/views/screenLayout'
+import { DebugRunMark } from './DebugRunMark'
 import { EdgeGauge } from './EdgeGauge'
 import { HazardStrip } from './HazardStrip'
 import { HudDetail } from './HudDetail'
@@ -53,6 +54,7 @@ export function HudView({
       <EdgeGauge permille={strip.edgePermille} />
       {isUpright ? <UprightAlerts model={model} /> : <EdgeAlerts model={model} />}
       <HazardStrip />
+      {model.isDebugRun && <DebugRunMark />}
       <HudGearButton isOpen={isDetailOpen} isLeftHanded={isLeftHanded} />
       {isDetailOpen && (
         <HudDetail model={model} isFlashing={isFlashing} isLeftHanded={isLeftHanded} />

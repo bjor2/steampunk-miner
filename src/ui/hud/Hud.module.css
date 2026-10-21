@@ -29,9 +29,22 @@
   display: none;
 }
 
+/*
+ * #11's mark, under the strip's left end (ticket 684): a run's label, not a HUD box. On the
+ * compact HUD it is the grid's `debug` cell, so the prompts' row lays out under it.
+ */
 .debugMark {
+  position: absolute;
+  top: calc(var(--strip-height) + var(--space-1));
+  left: var(--layout-margin);
   color: var(--color-copper);
   letter-spacing: 0.1em;
+  pointer-events: none;
+}
+
+.hud[data-density='compact'] .debugMark {
+  position: static;
+  grid-area: debug;
 }
 
 /* Ticket 480: the frame cap keeps dropping ticks; amber like the other "the rig is held" lines. */
@@ -94,10 +107,11 @@
 /*
  * The compact HUD (#500 TD shape 4.2; GD rulings 2, 4 and 7; the strip of ticket 684): on a phone
  * the strip spans the top edge and the rest are grid cells under it, so no two can overlap. Held
- * upright: the Tech tree button on the first row, right of the pause button's gap (`right: 30%`,
- * ticket 472), which keeps the row at least a control tall; then the prompts across the width.
- * Sideways: a left column of prompts that stops at the vehicle's keep-clear square
- * (`--vehicle-clear-left`) and the Tech tree past the pause button. The threat markers keep the
+ * upright: the debug mark and the Tech tree button on the first row, either side of the pause
+ * button's gap (`right: 30%`, ticket 472), which keeps the row at least a control tall; then the
+ * prompts across the width. Sideways: a left column of the debug mark over the prompts that stops
+ * at the vehicle's keep-clear square (`--vehicle-clear-left`) and the Tech tree past the pause
+ * button. The threat markers keep the
  * space under the rows.
  */
 .hud[data-density='compact'] {
@@ -105,7 +119,7 @@
   grid-template-columns: minmax(0, calc(70% - 61px)) minmax(0, 1fr) auto;
   grid-template-rows: minmax(var(--control-min), min-content) min-content minmax(0, 1fr);
   grid-template-areas:
-    '. . tech'
+    'debug . tech'
     'prompts prompts prompts'
     'threats threats threats';
   align-items: start;
@@ -120,9 +134,10 @@
     minmax(0, 1fr)
     calc(56px + var(--space-2))
     minmax(0, calc(30% - 12px));
-  grid-template-rows: min-content minmax(0, 1fr);
+  grid-template-rows: min-content min-content minmax(0, 1fr);
   grid-template-areas:
-    'prompts . . tech'
+    'debug . . tech'
+    'prompts . . .'
     'threats threats threats threats';
 }
 

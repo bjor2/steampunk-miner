@@ -1,7 +1,7 @@
 /**
  * The UI screenshot suite (spec #678, ticket 689): at 360x640 and 390x844 held upright and at
- * 1280x800 and 1440x900 (desktop is first-class, GD lock 21 Oct), the HUD on the surface and while
- * drilling, and every sheet of `uiShotSheets.ts`. Each shot is written first, for review by eye
+ * 1280x800 and 1440x900 (desktop is first-class, GD lock 21 Oct), the HUD on the surface, with
+ * money at 1e15 (ticket 684) and while drilling, and every sheet of `uiShotSheets.ts`. Each shot is written first, for review by eye
  * (`npm run ui:screens:update` puts them in `docs/ui/screens/<cell>/`), then the suite fails on
  * text that overflows, a tap target under 44 px, text under 14 px, the HUD over its coverage
  * budget (12% / 8%, the #682 overlay's report) or anything in the middle band. The shots are never
@@ -20,6 +20,7 @@ import {
   sheetFindingsOf,
 } from './uiShotFindings'
 import { UI_SHEETS, undock } from './uiShotSheets'
+import { UI_IDS } from '../../../src/ui/ids'
 
 /** Software WebGL on a loaded box is slow; this is a wait, not a judgement. */
 const TEST_TIMEOUT_MS = 180_000
@@ -59,6 +60,24 @@ for (const cell of UI_SHOT_CELLS) {
       await startDiggingDown(page)
       await waitForDepth(page, DRILLED_TILES)
       await shootAndLogCoverage(page, cell, 'hud-dig')
+      expect(await hudFindingsOf(page)).toEqual(NO_HUD_FINDINGS)
+      expect(errors).toEqual([])
+    })
+
+    // Ticket 684's done-when: the strip fits at 360 px with money at 1e15 on the odometer.
+    test('fits the strip with money at 1e15 and its chip, within budget and unspilled', async ({
+      page,
+    }) => {
+      test.setTimeout(TEST_TIMEOUT_MS)
+      const errors = await openPlainGame(page, cell)
+      await undock(page)
+      await page.evaluate(() => {
+        const result = window.steampunkDebug!.giveMoney('1e15')
+        if (!result.ok) throw new Error(result.problems.join('; '))
+      })
+      await expect(page.getByTestId(UI_IDS.hudStripMoney)).toHaveText('1.00Qa')
+      await expect(page.getByTestId(UI_IDS.hudNextUpgrade)).toBeVisible()
+      await shootAndLogCoverage(page, cell, 'hud-surface-1e15')
       expect(await hudFindingsOf(page)).toEqual(NO_HUD_FINDINGS)
       expect(errors).toEqual([])
     })

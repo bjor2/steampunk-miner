@@ -1,6 +1,6 @@
 /**
  * The money float-up (spec #678, ticket 684; design section 6): when the money changes, the
- * change rises from the strip's number and fades over `--float-up`, a gain in brass, a spend in
+ * change rises over the strip's number and fades over `--float-up`, a gain in brass, a spend in
  * copper and signed, so it never rests on colour. Shown on the surface and underground alike;
  * it covers no box and takes no tap.
  */
