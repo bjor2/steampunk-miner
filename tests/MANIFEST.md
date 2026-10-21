@@ -1096,6 +1096,11 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | --- | --- | --- |
 | `src/systems/materialPop/carveWatch.test.ts` | 10 | 10 |
 | `src/systems/materialPop/materialPopMode.test.ts` | 3 | 3 |
+| `src/systems/materialPop/popFinds.test.ts` | 6 | 6 |
+| `src/systems/materialPop/popFlight.test.ts` | 6 | 6 |
+| `src/systems/materialPop/popLook.test.ts` | 9 | 9 |
+| `src/systems/materialPop/popRows.test.ts` | 12 | 2 |
+| `src/systems/materialPop/popThinning.test.ts` | 9 | 9 |
 
 ### `pacing-bot`
 
@@ -1262,7 +1267,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/render/skyBandLook.test.ts` | 3 | 3 |
 | `src/systems/render/skyBandRing.test.ts` | 6 | 6 |
 | `src/systems/render/speedFraming.test.ts` | 25 | 13 |
-| `src/systems/render/sprayPool.test.ts` | 10 | 10 |
+| `src/systems/render/sprayPool.test.ts` | 15 | 15 |
 | `src/systems/render/stagedTurn.test.ts` | 2 | 2 |
 | `src/systems/render/stationIdleMotion.test.ts` | 9 | 9 |
 | `src/systems/render/vehicleLook.test.ts` | 10 | 8 |
@@ -1310,6 +1315,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/scene/VehiclePieces.test.ts` | 2 | 2 |
 | `src/scene/chunkHaloEdits.test.ts` | 1 | 1 |
 | `src/scene/chunkJobStream.test.ts` | 3 | 3 |
+| `src/scene/materialPops.test.ts` | 3 | 3 |
 | `src/scene/mountedPartsPresence.test.ts` | 3 | 3 |
 | `src/scene/oneShotPlayer.test.ts` | 5 | 5 |
 | `src/scene/partMotionPresence.test.ts` | 4 | 4 |

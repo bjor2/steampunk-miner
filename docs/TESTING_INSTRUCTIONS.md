@@ -813,6 +813,16 @@ incomePerHour}` go to `balance-report/drill-pace.ndjson`, which `pushTestMetrics
   `ui.setMaterialPopMode('A' | 'B')` (logged, never a command, never marks the run) and read it with
   `ui.getMaterialPopMode()`; `e2e/browser/materialPop.spec.ts` covers the URL, the panel switch,
   the lines and a reload starting on A again.
+- **Material pop option B** (ticket 616, #442): the pure rules sit in `src/systems/materialPop/`:
+  `popFinds.test.ts` pops only a carved cell whose unit reached the hold (a `DrillGated` cell, a
+  full hold and bare ground pop nothing), `popLook.test.ts` the 0.25 × 1.25^step ladder, the 0.8
+  cap, the glint and the 0.35-0.5 s ease-in flight, `popFlight.test.ts` the rig-frame flight that
+  never passes the nose and lands in a moving hold, `popThinning.test.ts` the 12/s (8/s narrow)
+  rate, merges inside 0.25 s, commons dropped first and specials queued, and `popRows.test.ts` the
+  VS rows (84, 840 and 8400 m/s on an all-rare and a common slab at 30 and 144 fps: pool ≤ 96, every
+  rare shown per 0.25 s, frame cost printed). `src/systems/render/sprayPool.test.ts` holds the
+  pool's 24 reserved slots, and `src/scene/materialPops.test.ts` drills a cell in B and A and
+  asserts the hold, events and digest equal. `ui.getSprayStats().stats.pops` reads the thinning.
 - **Known red** (ticket 419, the TD on #396 section 2): `CAMPAIGN_PACING_KNOWN_RED`
   (`src/constants/knownRed.ts`) is the one exported known-red marker in the repo (lanes and specs
   keep local ones with a ruling, as `subStepFloor.test.ts` kept #558's until ticket 558): one gate
