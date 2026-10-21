@@ -60,10 +60,22 @@ describe('HUD strip bars (ticket 684)', () => {
     const session = createScriptedSession()
     session.submit(0, setHullCommand('0'))
     const [hull, fuel, cargo] = hudStripOf(hudOf(session)).bars
-    expect(hull).toEqual({ id: 'hull', iconId: hull.iconId, fillPermille: 0, tier: 'empty' })
+    expect(hull).toEqual({
+      id: 'hull',
+      iconId: hull.iconId,
+      fillPermille: 0,
+      leftPermille: 0,
+      tier: 'empty',
+    })
     expect(fuel.fillPermille).toBe(1000)
     expect(cargo.fillPermille).toBe(0)
-    expect(Object.keys(fuel).sort()).toEqual(['fillPermille', 'iconId', 'id', 'tier'])
+    expect(Object.keys(fuel).sort()).toEqual([
+      'fillPermille',
+      'iconId',
+      'id',
+      'leftPermille',
+      'tier',
+    ])
   })
 
   it('hatches the fuel bar by the ladder tier of the fuel left', () => {

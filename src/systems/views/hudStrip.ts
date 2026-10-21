@@ -21,7 +21,9 @@ export interface StripBar {
   iconId: string
   /** The fill, 0..1000. */
   fillPermille: number
-  /** The tier of what the bar has left: hull and fuel left, cargo room, heat room. */
+  /** What the bar has left, 0..1000: hull and fuel left, cargo room, heat room. */
+  leftPermille: number
+  /** The tier of what the bar has left. */
   tier: LadderTier
 }
 
@@ -113,11 +115,13 @@ function barOf(
   leftPermille: number,
   tokens: DesignTokens,
 ): StripBar {
+  const left = clampPermille(leftPermille)
   return {
     id,
     iconId: reading.iconId,
     fillPermille: clampPermille(reading.permille),
-    tier: ladderTierOf(clampPermille(leftPermille), tokens),
+    leftPermille: left,
+    tier: ladderTierOf(left, tokens),
   }
 }
 

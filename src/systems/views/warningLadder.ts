@@ -3,7 +3,7 @@
  * critical at 15% and empty at 0% of what a bounded reading has left (hull and fuel left, cargo
  * room, heat room to the limit). Here only the tier a reading stands in now, which the strip's
  * bars hatch by (#684); firing each tier once on the way in, its re-arm, glow, sound and haptic
- * are the warning layer's (#685). The tiers come from the design tokens.
+ * are the warning layer's (`warningWatch.ts`, ticket 685). The tiers come from the design tokens.
  */
 import { DESIGN_TOKENS, type DesignTokens } from './designSystem'
 
@@ -21,9 +21,10 @@ export function ladderTierOf(
   const reached = tokens.warningLadder.tiers.filter(
     (tier) => leftPermille <= tier.atPercent * PERMILLE_PER_PERCENT,
   )
-  return tierNamed(reached.at(-1)?.name)
+  return ladderTierNamed(reached.at(-1)?.name)
 }
 
-function tierNamed(name: string | undefined): LadderTier {
+/** The tier a token names, `ok` for anything else. */
+export function ladderTierNamed(name: string | undefined): LadderTier {
   return LADDER_TIERS.find((tier) => tier === name) ?? 'ok'
 }
