@@ -137,6 +137,18 @@ function addParticle(pool: ParticlePool, random: SeededRandom, spray: Spray): vo
   pool.count = at + 1
 }
 
+/** Adds one particle that never moves by itself (a material pop, ticket 616); the caller places it. */
+export function addStillParticle(pool: ParticlePool, lifeSeconds: number): void {
+  const at = pool.count
+  pool.x[at] = 0
+  pool.y[at] = 0
+  pool.vx[at] = 0
+  pool.vy[at] = 0
+  pool.age[at] = 0
+  pool.life[at] = lifeSeconds
+  pool.count = at + 1
+}
+
 /** Frees a particle's slot: the last live particle moves into it. */
 export function removeParticleAt(pool: ParticlePool, at: number): void {
   const last = pool.count - 1

@@ -1,8 +1,13 @@
 import { describe, expect, it } from 'vitest'
 import { SPRAY_CAPACITY, SPRAY_LOOKS, SPRAY_LOW_PRIORITY_MOST } from '../../constants/spray'
+import { POP_RESERVED_SLOTS } from '../../constants/materialPop'
+import type { PopRequest } from './popPieces'
 import {
+  admitPop,
   admitSpray,
   createSprayPool,
+  isPopAt,
+  mergeIntoPop,
   kindAt,
   pieceSizeAt,
   stepSprayPool,
@@ -30,6 +35,20 @@ function lowPiecesIn(pool: SprayPool): number {
   let low = 0
   for (let at = 0; at < pool.particles.count; at++) low += pool.isLow[at]
   return low
+}
+
+function pop(overrides: Partial<PopRequest> = {}): PopRequest {
+  const start = { along: 0, upward: -1 }
+  const look = { sizeM: 0.3, colour: 0, isGlinting: false, lifeSeconds: 0.4 }
+  return { start, ...look, serial: 1, isGuarded: false, ...overrides }
+}
+
+function popsIn(pool: SprayPool, isGuarded: boolean): number {
+  let pops = 0
+  for (let at = 0; at < pool.particles.count; at++) {
+    if (isPopAt(pool, at) && pool.isGuarded[at] === (isGuarded ? 1 : 0)) pops++
+  }
+  return pops
 }
 
 function stepFor(pool: SprayPool, seconds: number, stepsPerSecond: number): void {
@@ -136,5 +155,65 @@ describe('spray pool', () => {
     const kinds = Array.from({ length: pool.particles.count }, (_, at) => kindAt(pool, at))
     expect(kinds).toEqual(['dust', 'dust', 'dust', 'dust'])
     expect(lowPiecesIn(pool)).toBe(0)
+  })
+
+  it('gives common pops the low share: a blast pushes them out, they push out nothing', () => {
+    const pool = createSprayPool()
+    const tally = freshTally()
+    for (let at = 0; at < SPRAY_LOW_PRIORITY_MOST + 4; at++) admitPop(pool, pop(), tally)
+    expect(popsIn(pool, false)).toBe(SPRAY_LOW_PRIORITY_MOST)
+    admitSpray(pool, request({ count: SPRAY_CAPACITY }), AT_ZERO, tally)
+    expect(popsIn(pool, false)).toBe(0)
+    expect(admitPop(pool, pop(), tally)).toBe(false)
+    expect(pool.particles.count).toBe(SPRAY_CAPACITY)
+  })
+
+  it('keeps rare pops through a blast and a common burst', () => {
+    const pool = createSprayPool()
+    const tally = freshTally()
+    for (let at = 0; at < 10; at++) admitPop(pool, pop({ isGuarded: true }), tally)
+    admitSpray(pool, request({ count: SPRAY_CAPACITY }), AT_ZERO, tally)
+    for (let at = 0; at < 20; at++) admitPop(pool, pop(), tally)
+    expect(popsIn(pool, true)).toBe(10)
+    expect(pool.particles.count).toBe(SPRAY_CAPACITY)
+  })
+
+  it('makes room for a rare pop in a full pool while its reserved slots last', () => {
+    const pool = createSprayPool()
+    const tally = freshTally()
+    admitSpray(pool, request({ priority: 'low', count: 8 }), AT_ZERO, tally)
+    admitSpray(pool, request({ count: SPRAY_CAPACITY }), AT_ZERO, tally)
+    for (let at = 0; at < POP_RESERVED_SLOTS + 5; at++) {
+      admitPop(pool, pop({ isGuarded: true }), tally)
+    }
+    expect(popsIn(pool, true)).toBe(POP_RESERVED_SLOTS)
+    expect(pool.guardedCount).toBe(POP_RESERVED_SLOTS)
+    expect(pool.particles.count).toBe(SPRAY_CAPACITY)
+    expect(lowPiecesIn(pool)).toBe(0)
+  })
+
+  it('never holds more than the pool’s 96 pieces, pops and spray together', () => {
+    const pool = createSprayPool()
+    const tally = freshTally()
+    for (let round = 0; round < 50; round++) {
+      admitSpray(pool, request({ count: 30 }), AT_ZERO, tally)
+      admitPop(pool, pop({ isGuarded: round % 2 === 0 }), tally)
+      admitSpray(pool, request({ priority: 'low', count: 9 }), AT_ZERO, tally)
+      expect(pool.particles.count).toBeLessThanOrEqual(SPRAY_CAPACITY)
+    }
+  })
+
+  it('counts a merged cell on its live pop, and lets the pop land after its flight', () => {
+    const pool = createSprayPool()
+    admitSpray(pool, request({ kind: 'spark', count: 3 }), AT_ZERO, freshTally())
+    admitPop(pool, pop({ serial: 7, lifeSeconds: 0.5 }), freshTally())
+    mergeIntoPop(pool, 7)
+    mergeIntoPop(pool, 7)
+    stepFor(pool, SPARKS_GONE_SECONDS, 60)
+    expect(pool.particles.count).toBe(1)
+    expect(pool.pops.count[0]).toBe(3)
+    stepFor(pool, 0.15, 60)
+    expect(pool.particles.count).toBe(0)
+    expect(pool.lowCount).toBe(0)
   })
 })
