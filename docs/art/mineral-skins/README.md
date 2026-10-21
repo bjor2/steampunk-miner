@@ -181,6 +181,51 @@ unskinned.
   archetype until the heat act), a slate blue darker than P1's ground (band 3 luma 0.29). The post
   step lays a batch's skins in its own planet's rock (`ROCK_PALETTES` in `skin_post.py`).
 
+## Batch p3-b3: P3's species 11 to 15 and its relic signature (ticket 600)
+
+The foothold-p3 pool's three epics and two mythics, kind slots 11 to 15 on P3, and the planet's
+signature material, `relic_t11`: the slotless 16th material (#453 E1), which has no species row and
+wears the planet's `signatures` row instead (`p3-signature` in the cell table). The layers come
+from the species row, as before, and the signature's from its family's look (Cogwork: cogs and gear
+teeth). No layer is shared within the batch or with P1 or p3-b2.
+
+<!-- p3-b3 -->
+
+| slot | species                    | base                 | vein              | palette (shadow, body, light)                   | sheen            |
+| ---- | -------------------------- | -------------------- | ----------------- | ----------------------------------------------- | ---------------- |
+| 11   | `meteoric-iron-brassvein`  | `widmanstatten-etch` | `crusted-slabs`   | `meteoric-steel` `#50505a` `#a0a1b4` `#d0d0da`  | `lamella-flash`  |
+| 12   | `star-sapphire-quartzine`  | `hex-zoning`         | `cabochon-domes`  | `sapphire-star` `#443f70` `#887edf` `#c3beef`   | `asterism`       |
+| 13   | `opal-jaw-amberbone`       | `opal-potch`         | `toothed-jaw`     | `opal-jaw-milk` `#566a68` `#add3cf` `#d6e9e7`   | `opal-flash`     |
+| 14   | `orichalcum-brassvein`     | `hammer-facets`      | `lattice-trellis` | `orichalcum-gold` `#5e5c10` `#bdb81f` `#dedc8f` | `hammered-shine` |
+| 15   | `heart-diamond-quartzine`  | `triangle-facets`    | `octahedra`       | `diamond-blush` `#767172` `#ece2e4` `#f6f0f2`   | `facet-fire`     |
+| sig. | `relic_t11` (P3 signature) | `clock-plate`        | `gear-train`      | `gearwork-teal` `#1c5242` `#37a485` `#9bd2c2`   | `perlage-gleam`  |
+
+<!-- /p3-b3 -->
+
+- **Bases:** an etched meteorite face, broad kamacite bands in three sets about 60 degrees apart with
+  bright taenite rims and dark plessite between; a deep body grown in hexagonal colour zones round one
+  core a cell; milky common opal where the bone was, a mosaic of soft patches each its own depth, faint
+  broken bone fibres; worked metal beaten into shallow facets with a bright ridge where two meet; a
+  clear body cut into triangular facets, each its own tone, crisp facet lines; a brass clock plate
+  engine-turned in overlapping perlage circles and pierced by pivot holes.
+- **Veins:** three angular slabs broken square from the mass; three smooth cabochon domes; a curved
+  jawbone with a row of conical teeth, two broken; a diagonal lattice of rods with a bead at every
+  crossing; sharp octahedra, two square pyramids base to base, tipped so three or four faces show;
+  three whole gear wheels meshing in a train, each toothed and hubbed (P4's signature, ticket 603,
+  wears broken cogs; P3's clockwork is intact).
+- **Sheens:** lamella flash (one set of kamacite bands throws the lamp back, the other sets stay dark);
+  asterism (a six-rayed star on each dome; the sheen and the vein share one dome layout,
+  `STAR_DOMES`, so each star sits on its dome); opal flash (whole patches of the mosaic flaring at
+  once, pinfire specks between); hammered shine (a bright spot in each facet facing the lamp, the
+  ridges gleaming); facet fire (a few facets blaze, sparks where the facet lines meet); perlage gleam
+  (a bright crescent on the lit side of each engine-turned circle, jewel glints in the pivot holes).
+- **The signature's palette.** A signature has no hue slot, so its ramp is built by `skin_layers.py`'s
+  rule on a slot-shaped look (`SIGNATURE_LOOKS`), chosen inside the relic family's #151 bands
+  (155-168 degrees, luma 0.46-0.68), which the slice's loader holds it to. It keeps the hue the
+  ground draws `relic_t11` in today (163 degrees, `oreLookOfType`) at the family's saturation
+  (0.5). Its luma is 0.50, darker than the ground's 0.62, so it stays a step from green apatite
+  (luma 0.60, hue 150), the planet's other green.
+
 ## Batch p4-b3: P4's species 11 to 15 and its signature material (ticket 603)
 
 The `foothold-p4` pool's three epics and two mythics, kind slots 11 to 15 on P4, and the skin of
@@ -497,8 +542,40 @@ turns khaki beside the shell's yellow and the ammonite's grey (0.10 and 0.12): a
 darkest of the three, with upright streaks and end-on hexagons where the shell has rings and fans
 and the ammonite level bands and spirals. Every skin sits above P3's slate rock (contrast 1.95 for
 apatite to 2.43 for platinum). Checked by eye on `p3-b2.phone-x4.png`, `p3-b2.desktop.png` and
-the `p3-b2.scale-x4` copies with `-deutan` and `-gray`. `p3-b1` sits before `p3-b2` in `BATCHES`, so
-this batch's post measures it against p3-b1 and writes the planet strip `p3.scale`.
+the `p3-b2.scale-x4` copies with `-deutan` and `-gray`. A batch is measured against all of its
+planet's other batches (`planet_mates`), so its post holds p3-b2's pairs against p3-b1 and p3-b3,
+and writes the planet strip `p3.scale`.
+
+From `sheets/p3-b3.distinct.json`, at 22 px a tile over P3's band 3 rock (luma 0.29). The report
+holds the 15 pairs within the batch and 30 against p3-b2. P3's slots 1 to 5 (ticket 598) have not
+landed, so they are not measured. The closest pairs:
+
+<!-- p3-b3-readings -->
+
+| pair                                 | colour apart | deuteranopia apart | luma apart | texture apart |
+| ------------------------------------ | ------------ | ------------------ | ---------- | ------------- |
+| platinum vs opal jaw (least apart)   | 0.087        | 0.022              | 0.003      | 0.060         |
+| ammonite vs meteoric iron            | 0.102        | 0.040              | 0.001      | 0.081         |
+| apatite vs signature                 | 0.132        | 0.124              | 0.080      | 0.052         |
+| topaz vs opal jaw                    | 0.163        | 0.151              | 0.080      | 0.055         |
+| meteoric iron vs opal jaw (in batch) | 0.176        | 0.195              | 0.109      | 0.090         |
+| opal jaw vs heart diamond (in batch) | 0.217        | 0.144              | 0.095      | 0.064         |
+
+<!-- /p3-b3-readings -->
+
+The hue slots of native platinum (near-white, luma 0.78) and opal jaw (pale cyan, 0.78) sit at one
+luma, so with deuteranopia their mean colours all but meet (0.022). Texture keeps them apart. The
+opal's patch mosaic was made bolder until it still showed at 22 px, and its jawbone and teeth
+thicker. Platinum reads as diagonal sweeps and a pebble stringer; the opal reads as blotches and a
+level jaw. Coiled ammonite and meteoric iron also share a luma (0.67). There the Widmanstätten
+crosshatch, the largest texture gap of the pair list, stands against the ammonite's level waves
+and spirals. The signature's teal is 0.13 from green apatite: it is darker (0.53 against 0.61),
+with gear wheels and a ring-grained plate where the apatite has end-on hexagons and upright striae.
+Every new skin sits above P3's slate rock (contrast 1.71 for the signature to 2.72 for heart
+diamond). Checked by eye on `p3-b3.phone-x4.png`, `p3-b3.desktop.png`, the `p3-b3.scale-x4` copies
+and `p3.scale-x4.png` with its `-deutan` and `-gray` copies, now P3's eleven skins side by side
+(p3-b2, then this batch). When ticket 598's p3-b1 lands, its post run measures against both batches
+(`planet_mates`).
 
 From `sheets/p4-b3.distinct.json`, at 22 px a tile over P4's band 3 rock (`palette.planet_2`, the
 slate P3 wears too, luma 0.29). P4 has no other batch yet, so these are the batch's own fifteen
