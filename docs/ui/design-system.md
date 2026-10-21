@@ -275,6 +275,7 @@ listed with the ticket that builds them. Every class lives in a CSS Module besid
 | bar           | a brass gauge bar, fraction only, no number; hatched under a ladder tier                                                                                                   | materials, framePx.bezel, gaugeFills, needle motion    | #684    |
 | gauge         | the brass dial (`kit/Gauge.tsx`), needle on the spring ease; used in detail views, not the strip                                                                           | motion.needle, materials.brass, colour.dialFace        | exists  |
 | edge gauge    | a 4 px vertical gauge in the right edge lane: surface at the top, core at the foot, the rig's mark between; no number                                                      | layout.edgeGauge, colour.accent                        | #684    |
+| slot gauge    | the edge gauge on its side beside a save slot's depth (`kit/MiniGauge.tsx`): surface at the left, core at the right, the deepest dig's bead between; no number             | layout.edgeGauge, colour.accent                        | #703    |
 | odometer      | money on a parchment drum, `type.odometer`, rolling under 0.6 s, the shared formatter's text, `data-exact` for the canonical value                                         | motion.odometer, numbers                               | #684    |
 | chip          | icon plus one value in a pill (`radiusPx.chip`): the next-upgrade chip, a status chip                                                                                      | radiusPx.chip, type.label                              | #684    |
 | status icon   | a 16 px triangle-framed icon (#158) in the strip's priority row, 3 on phone and 6 on desktop; a cooldown or count as a ring, no text                                       | layout.statusIcons                                     | #685    |
@@ -598,6 +599,7 @@ Generated from `designTokens.json`; a row is the token's path and its value. The
 | `layout.strip.barHeightPx`                            | 8                       |
 | `layout.strip.heatShowsAbovePercent`                  | 60                      |
 | `layout.edgeGauge.widthPx`                            | 4                       |
+| `layout.edgeGauge.slotLengthPx`                       | 24                      |
 | `layout.statusIcons.count.phone`                      | 3                       |
 | `layout.statusIcons.count.desktop`                    | 6                       |
 | `layout.statusIcons.sizePx`                           | 16                      |

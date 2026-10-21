@@ -1,0 +1,28 @@
+/*
+ * The mini core gauge (ticket 703): the edge gauge's trough (ticket 684) on its side, one
+ * `--edge-gauge-width` tall and `--slot-gauge-length` long, with the bead at `--mark` of the way.
+ */
+.trough {
+  position: relative;
+  display: inline-block;
+  flex: none;
+  box-sizing: border-box;
+  width: var(--slot-gauge-length);
+  height: var(--edge-gauge-width);
+  border: var(--frame-hairline) solid var(--color-brass);
+  border-radius: var(--edge-gauge-width);
+  background: var(--material-iron-shadow);
+}
+
+/* The deepest dig: a brass bead from the surface (left) to the core (right). */
+.mark {
+  position: absolute;
+  top: 50%;
+  left: calc(var(--mark) * 100%);
+  width: calc(var(--edge-gauge-width) + 4px);
+  height: calc(var(--edge-gauge-width) + 4px);
+  border-radius: 50%;
+  background: var(--color-accent);
+  box-shadow: 0 0 0 1px var(--color-bg);
+  transform: translate(-50%, -50%);
+}

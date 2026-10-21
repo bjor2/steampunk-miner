@@ -167,7 +167,7 @@
       "barHeightPx": 8,
       "heatShowsAbovePercent": 60
     },
-    "edgeGauge": { "widthPx": 4 },
+    "edgeGauge": { "widthPx": 4, "slotLengthPx": 24 },
     "statusIcons": { "count": { "phone": 3, "desktop": 6 }, "sizePx": 16 },
     "toolSlots": {
       "count": { "phone": 4, "desktop": 8 },

@@ -159,6 +159,7 @@ function layoutPropertiesOf(tokens: DesignTokens): CssProperties {
     '--layout-margin': `${layout.marginPx}px`,
     '--strip-bar-height': `${layout.strip.barHeightPx}px`,
     '--edge-gauge-width': `${layout.edgeGauge.widthPx}px`,
+    '--slot-gauge-length': `${layout.edgeGauge.slotLengthPx}px`,
     '--status-icon-size': `${layout.statusIcons.sizePx}px`,
     '--slot-gap': `${layout.toolSlots.gapPx}px`,
     '--slot-cooldown-ring': `${layout.toolSlots.cooldownRingPx}px`,

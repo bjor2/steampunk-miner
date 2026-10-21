@@ -16,6 +16,7 @@ import {
 } from '../../systems/views/uiText'
 import { VectorIcon, type IconSize } from '../VectorIcon'
 import { AmountText } from './AmountText'
+import { MiniGauge } from './MiniGauge'
 import styles from './TitleOneLine.module.css'
 import { Tooltip } from './Tooltip'
 
@@ -33,6 +34,8 @@ export interface IconValue {
   isMoneyShort?: boolean
   /** Changes once per event the value flashes for; a new key redraws it, replaying the flash. */
   flashKey?: number
+  /** A depth's way from the surface to the core, 0..1000, drawn as a mini gauge after the value. */
+  gaugePermille?: number
 }
 
 /** `h1` is the game's name on the title screen; panels use `h2`, cards `h3`, rows `span`. */
@@ -146,6 +149,7 @@ function FactRow({ facts, glyphSize }: { facts: readonly IconValue[]; glyphSize:
         >
           <VectorIcon iconId={fact.iconId} size={glyphSize} />
           <AmountText text={fact.text} exact={fact.exact} />
+          {fact.gaugePermille !== undefined && <MiniGauge permille={fact.gaugePermille} />}
         </span>
       ))}
     </p>
