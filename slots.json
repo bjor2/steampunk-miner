@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-10-21T15:07:01+02:00",
+  "updated_at": "2026-10-21T15:12:22+02:00",
   "caps": {
     "grok": 12,
     "claude": 10,
@@ -325,7 +325,7 @@
     }
   ],
   "last_refill": {
-    "at": "2026-10-21 15:07 CEST",
+    "at": "2026-10-21 15:12 CEST",
     "mode": "refill-dev",
     "triggers": "claude-run:wave-plan",
     "started": "",
