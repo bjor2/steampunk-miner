@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-10-22T01:51:08+02:00",
+  "updated_at": "2026-10-22T01:53:54+02:00",
   "caps": {
     "grok": 12,
     "claude": 10,
@@ -19,12 +19,11 @@
       "slots": [
         {
           "slot": "C1",
-          "state": "busy",
-          "ticket": 685,
-          "grok_slot": 1,
-          "kind": "dev",
-          "since": "2026-10-21T23:36:00+02:00",
-          "wave": "678-2A"
+          "state": "free",
+          "ticket": null,
+          "grok_slot": null,
+          "kind": null,
+          "since": null
         },
         {
           "slot": "C2",
@@ -64,17 +63,18 @@
         },
         {
           "slot": "C6",
-          "state": "free",
+          "state": "busy",
           "ticket": null,
           "grok_slot": null,
-          "kind": null,
-          "since": null
+          "kind": "aux",
+          "since": "2026-10-22T01:52:00+02:00",
+          "label": "wave-plan 647"
         }
       ],
       "size": 6,
       "used": 5,
       "free": 1,
-      "claims_last_hour": 3,
+      "claims_last_hour": 4,
       "name": "Claude Max 1"
     },
     {
@@ -128,7 +128,7 @@
     }
   ],
   "gate": {
-    "busy": 2,
+    "busy": 1,
     "max": 3
   },
   "tester": {
@@ -159,11 +159,9 @@
   "grok": [
     {
       "slot": 1,
-      "state": "dev",
-      "ticket": 685,
-      "since": "2026-10-21T23:36:00+02:00",
-      "claude_slot": 1,
-      "wave": "678-2A"
+      "state": "free",
+      "ticket": null,
+      "since": null
     },
     {
       "slot": 2,
@@ -253,12 +251,11 @@
   "claude": [
     {
       "slot": 1,
-      "state": "busy",
-      "ticket": 685,
-      "grok_slot": 1,
-      "since": "2026-10-21T23:36:00+02:00",
-      "account": 1,
-      "wave": "678-2A"
+      "state": "free",
+      "ticket": null,
+      "grok_slot": null,
+      "since": null,
+      "account": 1
     },
     {
       "slot": 2,
@@ -298,10 +295,12 @@
     },
     {
       "slot": 6,
-      "state": "free",
+      "state": "busy",
       "ticket": null,
       "grok_slot": null,
-      "since": null,
+      "since": "2026-10-22T01:52:00+02:00",
+      "kind": "aux",
+      "label": "wave-plan 647",
       "account": 1
     },
     {
@@ -341,17 +340,17 @@
     }
   ],
   "last_refill": {
-    "at": "2026-10-22 01:22 CEST",
+    "at": "2026-10-22 01:53 CEST",
     "mode": "refill-dev",
-    "triggers": "#688",
+    "triggers": "#685",
     "started": "",
-    "note": "no pickable build ticket"
+    "note": "load guard (1-min load 14.77 > 14)"
   },
   "totals": {
     "grok": {
       "size": 12,
-      "used": 9,
-      "dev": 8,
+      "used": 8,
+      "dev": 7,
       "dev_cap": 8,
       "planner": 1,
       "planner_cap": 4
@@ -441,7 +440,7 @@
           688,
           703
         ],
-        "live": 2
+        "live": 1
       },
       {
         "number": 677,
