@@ -1,10 +1,11 @@
 /**
- * The text budget (spec #422 ruling 1): a title of at most 4 words, one line of at most 12 words
- * and one sentence, a tooltip of at most 3 lines of at most 12 words. Those are budget breaches a
- * panel's allowlist entry may cover while its pass trims it (#424). The tag rules are not: a line
- * holding a price, a Needs line, charges, a warning or a lock reason never sits in the tooltip, and
- * a visible fact line is at most 12 words (GD on #424). Pure: the budget test and a review read the
- * problems; the game never does.
+ * The text budget (spec #422 ruling 1): a title of at most 3 words (4 until spec #678's GD lock,
+ * ticket 680), one line of at most 12 words and one sentence, a tooltip of at most 3 lines of at
+ * most 12 words. Those are budget breaches a panel's allowlist entry may cover while its pass trims
+ * it (#424). The tag rules are not: a line holding a price, a Needs line, charges, a warning or a
+ * lock reason never sits in the tooltip, a visible fact line is at most 12 words (GD on #424), and
+ * a price line is a number only (spec #678). Pure: the budget test and a review read the problems;
+ * the game never does.
  */
 import {
   FACT_LINE_WORDS_MAX,
@@ -97,7 +98,12 @@ function tooltipLineBreachesOf(line: UiTextLine): UiBudgetBreach[] {
 }
 
 function lineTagProblemsOf(line: UiTextLine): string[] {
-  return [...heldInTooltipProblemsOf(line), ...untaggedNeedsProblemsOf(line), ...factWordsOf(line)]
+  return [
+    ...heldInTooltipProblemsOf(line),
+    ...untaggedNeedsProblemsOf(line),
+    ...factWordsOf(line),
+    ...priceWordsOf(line),
+  ]
 }
 
 /** Price, Needs, charges, warnings and lock reasons always stay on the element (GD on #424). */
@@ -117,6 +123,12 @@ function factWordsOf(line: UiTextLine): string[] {
   const words = wordCountOf(line.text)
   if (line.holds === undefined || words <= FACT_LINE_WORDS_MAX) return []
   return [`the ${line.holds} line "${line.text}" has ${words} words, over ${FACT_LINE_WORDS_MAX}`]
+}
+
+/** Prices are numbers only (Progression's budget, spec #678 GD lock; ticket 680). */
+function priceWordsOf(line: UiTextLine): string[] {
+  if (line.holds !== 'price' || wordCountOf(line.text) === 0) return []
+  return [`the price line "${line.text}" holds words; a price is a number only`]
 }
 
 /** Sentences end in `.`, `!` or `?` followed by a space and another word. */

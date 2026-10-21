@@ -71,11 +71,12 @@ describe('ui text budget', () => {
     expect(uiTextProblemsOf(FOAM)).toEqual([])
   })
 
-  it('refuses a title over four words and an empty title', () => {
-    const long = { ...FOAM, title: 'The great big stabiliser foam' }
+  it('refuses a title over three words and an empty title', () => {
+    const long = { ...FOAM, title: 'Great stabiliser foam mix' }
     expect(uiTextProblemsOf(long)).toEqual([
-      `demo.foam: the title has 5 words, over ${TITLE_WORDS_MAX}`,
+      `demo.foam: the title has 4 words, over ${TITLE_WORDS_MAX}`,
     ])
+    expect(uiTextProblemsOf({ ...FOAM, title: 'Great stabiliser foam' })).toEqual([])
     expect(uiTextProblemsOf({ ...FOAM, title: ' ' })).toEqual(['demo.foam: the title is empty'])
   })
 
@@ -180,5 +181,12 @@ describe('ui text budget: tags', () => {
   it('counts a compact-Money price line as no words at all', () => {
     const price = foamWith({ text: '1.20e149', tag: 'visible', holds: 'price' })
     expect(uiTextProblemsOf(price)).toEqual([])
+  })
+
+  it('refuses a price line with words in it, since prices are numbers only', () => {
+    const price = foamWith({ text: 'Costs 1.2k', tag: 'visible', holds: 'price' })
+    expect(uiTextTagProblemsOf(price)).toEqual([
+      'demo.foam: the price line "Costs 1.2k" holds words; a price is a number only',
+    ])
   })
 })
