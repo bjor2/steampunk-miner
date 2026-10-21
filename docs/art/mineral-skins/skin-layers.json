@@ -277,6 +277,7 @@
       "wornBy": ["chromite-brassvein"]
     },
     {
+      "kind": "base",
       "id": "slaty-cleavage",
       "cell": "cells/base/slaty-cleavage.png",
       "blend": "blend/base-slaty-cleavage.blend",
@@ -584,6 +585,7 @@
       "wornBy": ["chromite-brassvein"]
     },
     {
+      "kind": "vein",
       "id": "split-slabs",
       "cell": "cells/vein/split-slabs.png",
       "blend": "blend/vein-split-slabs.blend",
@@ -891,6 +893,7 @@
       "wornBy": ["chromite-brassvein"]
     },
     {
+      "kind": "sheen",
       "id": "cleavage-sheen",
       "cell": "cells/sheen/cleavage-sheen.png",
       "blend": "blend/sheen-cleavage-sheen.blend",
