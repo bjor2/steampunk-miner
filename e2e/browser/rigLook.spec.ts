@@ -1,8 +1,9 @@
 /**
  * The rig look ladder in the browser (#577): each upgrade track's look steps up at its first
  * threshold of `rigLook.json` and keeps changing on every purchase above its top step, painted as
- * glows on the car's own parts, so the frame stays inside #38's 150 draw calls. Asserted through
- * `steampunkDebug`, never pixels.
+ * glows on the car's own parts, so the frame stays inside #38's 150 draw calls; the boiler's step
+ * swaps in its twin-drum look part (ticket 583). Asserted through `steampunkDebug`, never pixels;
+ * the boiler's screenshots are attached for review.
  */
 import { expect, test, type Page } from '@playwright/test'
 import type { DebugApi } from '../../src/debug/debugApi'
@@ -98,4 +99,53 @@ test.describe('rig look ladder (#577)', () => {
     expect(await frameDrawCalls(page)).toBeLessThanOrEqual(FRAME_DRAW_CALLS_MAX)
     expect(errors).toEqual([])
   })
+})
+
+/** The boiler's one step (Systems' table on #157) and two tail points above it (ticket 583). */
+const BOILER_COUNTS = [15, 16, 17, 40]
+const BOILER_LOOK_PART = 'vehicle-look-boiler/twin-drum-boiler'
+const VIEWPORTS = [
+  { name: 'desktop', width: 1280, height: 720 },
+  { name: 'phone', width: 360, height: 780 },
+]
+
+interface BoilerReading {
+  lookPartIds: string[]
+  partIds: string[]
+}
+
+function boilerReadingOf(page: Page): Promise<BoilerReading> {
+  return page.evaluate(() => {
+    const parts = window.steampunkDebug!.vehicleParts()
+    if (!parts.ok) throw new Error('no vehicle parts')
+    return { lookPartIds: parts.lookPartIds, partIds: parts.partIds }
+  })
+}
+
+test.describe('boiler rig look (ticket 583)', () => {
+  for (const viewport of VIEWPORTS) {
+    test(`swaps the twin-drum boiler in at 16 on every tail point, ${viewport.name}`, async ({
+      page,
+    }) => {
+      await page.setViewportSize(viewport)
+      const errors = await openGame(page)
+      const readings: BoilerReading[] = []
+      for (const purchases of BOILER_COUNTS) {
+        await setUpgrade(page, 'boiler', purchases)
+        await expect.poll(async () => (await rigLookOf(page, 'boiler')).purchases).toBe(purchases)
+        readings.push(await boilerReadingOf(page))
+        await test.info().attach(`boiler ${purchases}, ${viewport.name}`, {
+          body: await page.screenshot(),
+          contentType: 'image/png',
+        })
+      }
+      expect(readings[0].lookPartIds).not.toContain(BOILER_LOOK_PART)
+      expect(readings[0].partIds.some((id) => id.endsWith('-boiler'))).toBe(true)
+      for (const reading of readings.slice(1)) {
+        expect(reading.lookPartIds).toContain(BOILER_LOOK_PART)
+        expect(reading.partIds.some((id) => /^t\d-boiler$/.test(id))).toBe(false)
+      }
+      expect(errors).toEqual([])
+    })
+  }
 })

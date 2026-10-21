@@ -1,5 +1,5 @@
 {
-  "$comment": "The rig look ladder (#577; G&V spec on #157, GD lock 6300553486; TD shape on #577), one row block per upgrade track, keyed by owned purchase count. `slot` is the track's own vehicle-attach point (the #180 showcase point), never a module or wagon point. Step thresholds are Systems' table (#157 comment 6300543785): the on-curve count on leaving P1, P2, P3, P5 and P8, duplicates dropped; hull's are levels.hull purchases (Systems on #577: 10 per tier, minorsPerMajor 10). drill_power keeps #554's nine rows unchanged (its old drillLook.json). `card` is Progression's step name (#157 comment 6300549964). `part` is the part a step swaps in; null until the wiring tickets (T7-T11) name it, so a step shows as the placeholder glow `colour`/`glows` on the track's `glowSlots`. A step's optional `asset` (ticket 640, TD ruling on #579) names the look asset its part is cut from, one of `lookAssets` (each with its part ids, registered through r.artAssets); absent, `part` is a tiered `vehicle` part. A track's optional `replaces` is the vehicle part slot such a look part stands in place of and hides (boiler: `boiler`); absent, the look lies over the rig (hull). The part and asset are a pure function of (track, owned count), never saved. Above the top step the tail moves one look per `delta` purchases (GD: 1) through the bounded ladders: tint every step, plating each palette lap, glow each palette x plating lap. glowCaps: every glow stays below its track's cap, summed per part slot across tracks; the drill nose (drill-bit) is the brightest part, the rest of the rig stays under rigBody. Starting values for G&V to tune; cosmetic only, never in state, a save or a digest.",
+  "$comment": "The rig look ladder (#577; G&V spec on #157, GD lock 6300553486; TD shape on #577), one row block per upgrade track, keyed by owned purchase count. `slot` is the track's own vehicle-attach point (the #180 showcase point), never a module or wagon point. Step thresholds are Systems' table (#157 comment 6300543785): the on-curve count on leaving P1, P2, P3, P5 and P8, duplicates dropped; hull's are levels.hull purchases (Systems on #577: 10 per tier, minorsPerMajor 10). drill_power keeps #554's nine rows unchanged (its old drillLook.json). `card` is Progression's step name (#157 comment 6300549964). `part` is the part a step swaps in; null until the wiring tickets (T7-T11) name it, so a step shows as the placeholder glow `colour`/`glows` on the track's `glowSlots`. A step's optional `asset` (ticket 640, TD ruling on #579) names the look asset its part is cut from, one of `lookAssets` (each with its part ids, registered through r.artAssets); absent, `part` is a tiered `vehicle` part. A track's optional `replaces` is the vehicle part slot such a look part stands in place of and hides (boiler: `boiler`); absent, the look lies over the rig (hull). A look part's own id joins its track's `glowSlots`, so the tail's tint and glow show on the part that stands in the hidden slot (boiler: `twin-drum-boiler`, ticket 583). The part and asset are a pure function of (track, owned count), never saved. Above the top step the tail moves one look per `delta` purchases (GD: 1) through the bounded ladders: tint every step, plating each palette lap, glow each palette x plating lap. glowCaps: every glow stays below its track's cap, summed per part slot across tracks; the drill nose (drill-bit) is the brightest part, the rest of the rig stays under rigBody. Starting values for G&V to tune; cosmetic only, never in state, a save or a digest.",
   "glowCaps": { "drillNose": 3, "rigBody": 1 },
   "lookAssets": {
     "vehicle-look-boiler": ["kettle-boiler", "twin-drum-boiler"],
@@ -100,12 +100,14 @@
     {
       "track": "boiler",
       "slot": "hull.boiler",
-      "glowSlots": [["boiler", "boiler-2"]],
+      "replaces": "boiler",
+      "glowSlots": [["boiler", "boiler-2", "twin-drum-boiler"]],
       "glowCap": "rigBody",
       "steps": [
         {
           "from": 16,
-          "part": null,
+          "part": "twin-drum-boiler",
+          "asset": "vehicle-look-boiler",
           "card": "Twin-drum boiler",
           "colour": "#ff7a3a",
           "glows": [0.5]

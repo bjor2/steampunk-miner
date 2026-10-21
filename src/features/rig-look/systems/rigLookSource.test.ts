@@ -45,12 +45,13 @@ function pathsReadBy(read: (state: AuthorityState) => unknown, state: AuthorityS
   return [...paths].sort()
 }
 
-/** Part slots drawn by any asset other than the base vehicle. */
+/** Part slots drawn by any asset other than the base vehicle and the rig's own look assets. */
 function partSlotsOfOtherAssets(): Set<string> {
   const sidecars = [...SHIPPED_ART.placeholderSidecars, ...SHIPPED_ART.exportedSidecars]
+  const rigAssetIds = ['vehicle', ...Object.keys(RIG_LOOK_TABLE.lookAssets)]
   return new Set(
     sidecars
-      .filter((sidecar) => sidecar.assetId !== 'vehicle')
+      .filter((sidecar) => !rigAssetIds.includes(sidecar.assetId))
       .flatMap((sidecar) => sidecar.parts.map((part) => slotOfPartId(part.id))),
   )
 }
@@ -166,7 +167,7 @@ describe('rig look on the vehicle', () => {
     ])
   })
 
-  it("never lights a module's or item's part: every glow slot is the base vehicle's own", () => {
+  it("never lights a module's or item's part: every glow slot is the vehicle's or a rig look's own", () => {
     const otherSlots = partSlotsOfOtherAssets()
     const glowSlots = SHIPPED_RIG_LOOKS.tracks.flatMap((frames) => frames.rows.glowSlots.flat())
     expect(glowSlots.filter((slot) => otherSlots.has(slot))).toEqual([])
