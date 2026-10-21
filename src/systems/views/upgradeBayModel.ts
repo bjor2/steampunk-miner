@@ -221,7 +221,7 @@ function quickServiceOf(state: AuthorityState, playerId: string): ScreenButton {
       state,
       playerId,
       UI_IDS.upgradebayQuickService,
-      'Sell, repair and recharge',
+      'Sell, repair, recharge',
       quickServiceCommand(),
     ),
     buttonIconIdOf('quick_service'),

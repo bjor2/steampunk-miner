@@ -4,8 +4,11 @@
  * Presentation only: none of these reaches a rule, a price or a digest.
  */
 
-/** A title is at most this many words (GD ruling 1 on #422). */
-export const TITLE_WORDS_MAX = 4
+/**
+ * A title is at most this many words: 4 by GD ruling 1 on #422, 3 since Progression's budget in
+ * the GD lock on spec #678 (`copy.titleWordsMax` in designTokens.json; lowered by #680).
+ */
+export const TITLE_WORDS_MAX = 3
 /** The one line under a title is one sentence of at most this many words ("about 12"). */
 export const ONE_LINE_WORDS_MAX = 12
 /** A tooltip holds at most this many short lines; never the only copy of what the player acts on. */

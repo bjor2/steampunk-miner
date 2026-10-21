@@ -19,7 +19,7 @@ export const GAME_NAME_TEXT: ElementText = {
 
 export const NEW_GAME_CONFIRM_TEXT: ElementText = {
   id: 'title.confirm-new-game',
-  title: 'Start a new game?',
+  title: 'Start new game?',
   oneLine: 'You start again from planet 1; nothing carries over.',
   tooltipLines: [],
 }

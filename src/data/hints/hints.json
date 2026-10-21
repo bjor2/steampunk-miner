@@ -38,7 +38,7 @@
       "shownWhen": "dockedAtSellBayWithCargo",
       "dismissedWhen": "leftSellBay",
       "lines": [
-        "This is the Sell bay: Sell, repair and recharge ({quick_service}) does all three.",
+        "This is the Sell bay: Sell, repair, recharge ({quick_service}) does all three.",
         "Upgrades are bought at the Upgrade bay, along the pad."
       ]
     },

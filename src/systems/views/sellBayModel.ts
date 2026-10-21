@@ -129,7 +129,7 @@ function quickServiceOf(
   ui: BayUiState,
 ): QuickServiceReading {
   const quote = serviceQuote(state, playerId)
-  const name = 'Sell, repair and recharge'
+  const name = 'Sell, repair, recharge'
   const iconId = buttonIconIdOf('quick_service')
   const button = withIcon(
     commandButton(state, playerId, UI_IDS.platformQuickService, name, quickServiceCommand()),

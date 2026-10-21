@@ -52,7 +52,7 @@ export const REBIND_REFUSED_TEXT: ElementText = {
 
 export const SETTINGS_FOOTER_TEXT: ElementText = {
   id: 'settings.footer',
-  title: 'Back to the game',
+  title: 'Back to game',
   oneLine: '',
   tooltipLines: [],
 }

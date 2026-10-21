@@ -257,7 +257,7 @@ const BUTTON_TITLES: Readonly<Record<ButtonIconId, string>> = {
   sell: 'Sell',
   collect: 'Collect',
   refine: 'Refine',
-  quick_service: 'Sell, repair and recharge',
+  quick_service: 'Sell, repair, recharge',
 }
 
 const SETTING_TITLES: Readonly<Record<PreferenceName, string>> = {

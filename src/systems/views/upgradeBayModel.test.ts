@@ -217,7 +217,7 @@ describe('upgrade bay model', () => {
     const model = upgradeBayOf(session)
     expect(model.quickService).toMatchObject({
       id: UI_IDS.upgradebayQuickService,
-      label: 'Sell, repair and recharge',
+      label: 'Sell, repair, recharge',
       reason: null,
     })
     expect(model.focusStops.map((stop) => stop.id)).not.toContain(UI_IDS.upgradebayQuickService)

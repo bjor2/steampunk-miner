@@ -45,7 +45,7 @@
     },
     {
       "id": "quick_service",
-      "displayName": "Sell, repair and recharge",
+      "displayName": "Sell, repair, recharge",
       "contexts": ["platform"],
       "kind": "press",
       "keyboard": ["KeyQ"],
