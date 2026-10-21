@@ -1,7 +1,7 @@
 """
 The Blender recipes of the mineral skin layers (#576, ticket 592 for P1's slots 1 to 5, ticket 593
-for its slots 6 to 10, ticket 594 for 11 and 12, ticket 599 for P3's slots 6 to 10): one per layer
-id of `mineralSkins.json`. A layer id with no recipe fails, never falls back.
+for its slots 6 to 10, ticket 594 for 11 and 12, ticket 598 for P3's slots 1 to 5, ticket 599 for
+its slots 6 to 10): one per layer id of `mineralSkins.json`. A layer id with no recipe fails, never falls back.
 
 - `base` and `sheen` are seamless textures on the 1 m cell: an emission material on a 1 m quad
   whose value is the ramp coordinate (base, mean about 0.5) or the highlight strength (sheen,
@@ -345,6 +345,95 @@ def base_nacre_sheets(graph):
     return graph.minus(tone, graph.mul(suture, 0.34))
 
 
+def base_pitted_cast(graph):
+    """Pig iron: a cast face of fine mottle, pocked with round blowholes, each dark with a pale lip."""
+    mottle = stretched(graph, graph.noise(6, 6, seed=501, detail=4, roughness=0.55))
+    grain = stretched(graph, graph.noise(80, 80, seed=504, detail=5))
+    # Big, dark and many: smoke calcite shares the pig iron's colour on P3 (hue slots 210 and 232 at
+    # lumas 0.55 and 0.58), so the pocked face has to tell them apart at a phone's 22 px tile.
+    pit = blowholes_of(graph, PIT_RADIUS)
+    lip = graph.math('MAXIMUM', graph.minus(blowholes_of(graph, LIP_RADIUS), pit), 0.0)
+    pinhole = sprinkled(graph, 22, 503, 0.34, 0.6)
+    tone = graph.plus(around_half(graph, mottle, 0.5), graph.mul(graph.minus(grain, 0.5), 0.1))
+    tone = graph.plus(tone, graph.mul(lip, 0.2))
+    tone = graph.minus(tone, graph.plus(graph.mul(pit, 0.56), graph.mul(pinhole, 0.32)))
+    # Lifted only so far that the skin averages its hue slot's luma, a shade under the calcite's.
+    return graph.plus(tone, 0.06)
+
+
+PIT_RADIUS, LIP_RADIUS = 0.4, 0.56
+
+
+def blowholes_of(graph, radius):
+    """The cast face's blowholes, one field shared by the base and the dull sheen's lit lips."""
+    return sprinkled(graph, 9, 502, radius, 0.8)
+
+
+def base_soot_dusted(graph):
+    """Soot zinc: pale zinc under drifts of soot, darker runs where it settled, a dust of fine specks."""
+    drift = stretched(graph, graph.noise(3, 3, seed=511, detail=5, roughness=0.6))
+    soot = graph.smooth(drift, 0.42, 0.7)
+    runs = stretched(graph, graph.noise(12, 2, seed=512, detail=3))
+    dust = sprinkled(graph, 34, 513, 0.4, 0.5)
+    tone = graph.minus(0.7, graph.mul(soot, 0.4))
+    tone = graph.minus(tone, graph.mul(graph.minus(runs, 0.5), 0.18))
+    return graph.minus(tone, graph.mul(dust, 0.2))
+
+
+def base_frosted_face(graph):
+    """Rail quartz: a frosted face, a fine bright frost over a slow cloud, coarse striations across the prism."""
+    cloud = stretched(graph, graph.noise(3, 3, seed=521, detail=3))
+    frost = stretched(graph, graph.noise(110, 110, seed=522, detail=2))
+    # Coarse and level, so a phone's 22 px tile still shows bands: native platinum, P3's other pale
+    # metal-white, is scratched on the diagonal.
+    bands = graph.math('SINE', graph.mul(graph.v, 6.0 * math.tau))
+    striae = graph.smooth(graph.math('ABSOLUTE', graph.periodic(graph.mul(graph.v, 6.0), 1.0)), 0.08, 0.0)
+    tone = around_half(graph, cloud, 0.3)
+    tone = graph.plus(tone, graph.mul(graph.minus(frost, 0.5), 0.3))
+    tone = graph.plus(tone, graph.mul(bands, 0.17))
+    return graph.plus(tone, graph.mul(striae, 0.14))
+
+
+def base_smoke_rhombs(graph):
+    """Smoke calcite: smoky wisps through the stone, crossed by the rhombic cleavage calcite splits along."""
+    smoke = stretched(graph, graph.noise(3, 3, seed=531, detail=6, roughness=0.62))
+    wisp = stretched(graph, graph.noise(8, 4, seed=532, detail=4))
+    first, second = rhomb_axes(graph)
+    cleave = graph.math('MAXIMUM', cleavage_line(graph, first), cleavage_line(graph, second))
+    lip = graph.smooth(graph.math('FRACT', first), 0.88, 0.97)
+    tone = around_half(graph, smoke, 0.75)
+    tone = graph.plus(tone, graph.mul(graph.minus(wisp, 0.5), 0.18))
+    tone = graph.plus(tone, graph.mul(lip, 0.12))
+    return graph.plus(graph.minus(tone, graph.mul(cleave, 0.36)), 0.04)
+
+
+def rhomb_axes(graph):
+    """
+    The two cleavage coordinates of a rhomb lattice: whole numbers of lines along u and v (3 and 2),
+    so the lattice repeats at the cell edge; a line wherever either coordinate is whole.
+    """
+    return graph.mul_add(graph.u, 3.0, graph.mul(graph.v, 2.0)), graph.mul_add(graph.u, 3.0, graph.mul(graph.v, -2.0))
+
+
+def cleavage_line(graph, axis):
+    return graph.smooth(graph.math('ABSOLUTE', graph.periodic(axis, 1.0)), 0.07, 0.0)
+
+
+def base_oxide_film(graph):
+    """Step bismuth: the tarnish of a thin oxide film, fringes following the film's thickness like oil on water."""
+    film = oxide_film_of(graph)
+    fringe = graph.math('SINE', graph.mul(film, 44.0))
+    fine = graph.math('SINE', graph.mul(film, 130.0))
+    tone = graph.plus(graph.mul(fringe, 0.26), 0.5)
+    tone = graph.plus(tone, graph.mul(fine, 0.05))
+    return graph.plus(tone, graph.mul(graph.minus(film, 0.5), 0.2))
+
+
+def oxide_film_of(graph):
+    """The film's thickness, 0..1: the base draws its fringes and the iridescent sheen lights them."""
+    return stretched(graph, graph.noise(2, 2, seed=541, detail=3, roughness=0.5))
+
+
 # --- sheen: the lustre's highlights -----------------------------------------------------------------
 
 
@@ -485,6 +574,49 @@ def sheen_pearly(graph):
     bands = graph.smooth(tiles.strata(graph, 13, warp, 2.6), 0.55, 0.95)
     swell = graph.smooth(stretched(graph, graph.noise(3, 3, seed=442, detail=2)), 0.4, 0.75)
     return graph.mul(graph.mul(bands, graph.mul_add(swell, 0.6, 0.4)), 0.46)
+
+
+def sheen_matte(graph):
+    """Matte: a matte cast face; only the lips of the blowholes and a few burrs catch the lamp."""
+    lip = graph.math('MAXIMUM', graph.minus(blowholes_of(graph, LIP_RADIUS), blowholes_of(graph, PIT_RADIUS)), 0.0)
+    burr = graph.smooth(graph.voronoi(24, 24, seed=551)['Distance'], 0.05, 0.012)
+    return graph.plus(graph.mul(lip, 0.42), graph.mul(burr, 0.3))
+
+
+def sheen_smudged(graph):
+    """Smudged: zinc's shine shows only where the soot was wiped, two broken diagonal swipes and the bare patches."""
+    wobble = graph.mul(graph.minus(graph.noise(3, 3, seed=561, detail=2), 0.5), 0.6)
+    across = graph.plus(graph.mul_add(graph.u, 2.0, graph.mul(graph.v, 2.0)), wobble)
+    swipe = graph.smooth(graph.math('ABSOLUTE', graph.periodic(across, 1.0)), 0.2, 0.06)
+    broken = graph.smooth(stretched(graph, graph.noise(5, 5, seed=562, detail=3)), 0.35, 0.6)
+    bare = graph.minus(1.0, graph.smooth(stretched(graph, graph.noise(3, 3, seed=511, detail=5, roughness=0.6)), 0.42, 0.7))
+    return graph.plus(graph.mul(graph.mul(swipe, broken), 0.55), graph.mul(bare, 0.18))
+
+
+def sheen_silky(graph):
+    """Silky: fine level threads of light along the rods' length, broken and soft, a broad sheen beneath."""
+    across = graph.mul(graph.v, 20.0)
+    jitter = graph.mul(graph.minus(graph.noise(4, 4, seed=571, detail=2), 0.5), 0.2)
+    thread = graph.smooth(graph.math('ABSOLUTE', graph.periodic(graph.plus(across, jitter), 1.0)), 0.12, 0.0)
+    runs = graph.smooth(stretched(graph, graph.noise(6, 14, seed=572, detail=2)), 0.4, 0.62)
+    broad = graph.smooth(stretched(graph, graph.noise(2, 2, seed=573, detail=2)), 0.45, 0.8)
+    return graph.plus(graph.mul(graph.mul(thread, runs), 0.55), graph.mul(broad, 0.14))
+
+
+def sheen_satin(graph):
+    """Satin: a soft layered glow on the cleavage faces, brightest toward one corner of each rhomb, never a glint."""
+    first, second = rhomb_axes(graph)
+    face = graph.mul(graph.smooth(graph.math('FRACT', first), 0.35, 0.95), graph.smooth(graph.math('FRACT', second), 0.15, 0.9))
+    bloom = graph.smooth(stretched(graph, graph.noise(2, 2, seed=581, detail=2)), 0.4, 0.8)
+    return graph.plus(graph.mul(face, 0.36), graph.mul(bloom, 0.12))
+
+
+def sheen_iridescent(graph):
+    """Iridescent: bright bands along the oxide fringes, where the film throws back the lamp, and sharp glints."""
+    film = oxide_film_of(graph)
+    bands = graph.smooth(graph.math('SINE', graph.plus(graph.mul(film, 44.0), 1.2)), 0.6, 0.95)
+    glint = graph.smooth(graph.voronoi(13, 13, seed=591)['Distance'], 0.06, 0.012)
+    return graph.plus(graph.mul(bands, 0.45), graph.mul(glint, 0.6))
 
 
 # --- vein: the crystal or vein shape, by the row's silhouette ----------------------------------------
@@ -764,6 +896,105 @@ def ammonite_coil(name, centre, outer, phase):
 
 
 
+def vein_slag_knots(rng, body):
+    """Pig iron: knots of drawn iron, each a small trefoil tied in a cooling run, lying on the face."""
+    marks = []
+    for i, (x, z) in enumerate(shapes.scatter_positions(rng, 4, 0.2, 0.22)):
+        size, turn = rng.uniform(0.024, 0.03), rng.uniform(0.0, math.tau)
+        path = trefoil_path((x, z), size, turn, 48)
+        marks.append(shapes.add_tube('knot-%d' % i, path, size * 0.5, resolution=3))
+    return assign_all(marks, body)
+
+
+def trefoil_path(centre, size, turn, segments):
+    """A closed trefoil knot about `centre`, `size` a unit of its 3-unit reach, turned by `turn` in the face."""
+    points = []
+    for k in range(segments + 1):
+        t = k / segments * math.tau
+        x, z = math.sin(t) + 2 * math.sin(2 * t), math.cos(t) - 2 * math.cos(2 * t)
+        x, z = x * math.cos(turn) - z * math.sin(turn), x * math.sin(turn) + z * math.cos(turn)
+        points.append((centre[0] + x * size, -0.04 - math.sin(3 * t) * size, centre[1] + z * size))
+    return points
+
+
+def vein_spangle_scales(rng, body):
+    """Soot zinc: round spangle scales lapped in staggered rows, each lower row over the one above, lifted at its foot."""
+    marks = []
+    for row in range(6):
+        z = 0.25 - row * 0.095
+        for column in range(6):
+            x = -0.3 + column * 0.12 + (row % 2) * 0.06 + rng.uniform(-0.012, 0.012)
+            # A rounded patch, so the lapped rows read as scales and not as a block of coins.
+            if math.hypot(x, z) > 0.33:
+                continue
+            radius = rng.uniform(0.062, 0.072)
+            scale = shapes.add_prism('scale-%d-%d' % (row, column), radius, 0.01, (x, -0.02 - row * 0.008, z + rng.uniform(-0.01, 0.01)),
+                                     rotation=(math.pi / 2 - rng.uniform(0.25, 0.4), rng.uniform(-0.15, 0.15), 0.0), sides=20)
+            shapes.bevel(scale, 0.003, segments=1)
+            marks.append(scale)
+    return assign_all(marks, body)
+
+
+def vein_rod_bundle(rng, body):
+    """Rail quartz: a bundle of thin round rods laid level side by side, like rails, each its own length."""
+    marks = []
+    slant = 0.0
+    axis, side = (math.cos(slant), math.sin(slant)), (-math.sin(slant), math.cos(slant))
+    for i in range(8):
+        offset = -0.13 + i * 0.037 + rng.uniform(-0.005, 0.005)
+        along = rng.uniform(-0.05, 0.05)
+        length, radius = rng.uniform(0.3, 0.5), rng.uniform(0.014, 0.019)
+        centre = (axis[0] * along + side[0] * offset, -radius * 0.4, axis[1] * along + side[1] * offset)
+        rod = shapes.add_prism('rod-%d' % i, radius, length, centre, rotation=(0.0, math.radians(90) - slant, 0.0), sides=12)
+        shapes.bevel(rod, radius * 0.3, segments=2)
+        shapes.shade_smooth(rod)
+        marks.append(rod)
+    return assign_all(marks, body)
+
+
+def vein_lens_stack(rng, body):
+    """Smoke calcite: flat biconvex lenses, two stacks of three lapped edge over edge, and one alone."""
+    marks = []
+    for stack, (x, z, count) in enumerate(((-0.12, 0.12, 3), (0.14, -0.08, 3), (-0.16, -0.24, 1))):
+        angle = rng.uniform(-0.5, 0.5)
+        for i in range(count):
+            radius = rng.uniform(0.09, 0.11)
+            at = (x + math.cos(angle) * 0.05 * i, -0.01 - 0.012 * i, z - math.sin(angle) * 0.05 * i + 0.035 * i)
+            lens = shapes.add_icosphere('lens-%d-%d' % (stack, i), radius, at, subdivisions=3,
+                                        scale=(1.0, 0.22, rng.uniform(0.38, 0.46)), rotation=(0.0, angle, 0.0))
+            marks.append(lens)
+    return assign_all(marks, body)
+
+
+def vein_hopper_terraces(rng, body):
+    """Step bismuth: hopper crystals, square frames stepped up and in toward a hollow middle, three of them turned apart."""
+    marks = []
+    for i, (x, z, side) in enumerate(((-0.1, 0.08, 0.3), (0.17, -0.15, 0.22), (-0.22, -0.24, 0.14))):
+        marks += hopper_frames('hopper-%d' % i, (x, z), side, rng.uniform(-0.6, 0.6))
+    return assign_all(marks, body)
+
+
+def hopper_frames(name, centre, side, turn):
+    """
+    Four square frames, each smaller and nearer the lamp than the last, turned by `turn` about the
+    centre. The side bars stop at the top and foot bars, so no two faces lie on one another.
+    """
+    frames = []
+    for step in range(4):
+        size = side * (1 - 0.22 * step)
+        width, depth = side * 0.11, -0.012 * (step + 1)
+        inner = size - 2 * width
+        for edge, (ox, oz, sx, sz) in enumerate(((0, (size - width) / 2, size, width), (0, -(size - width) / 2, size, width),
+                                                  ((size - width) / 2, 0, width, inner), (-(size - width) / 2, 0, width, inner))):
+            x = centre[0] + ox * math.cos(turn) + oz * math.sin(turn)
+            z = centre[1] - ox * math.sin(turn) + oz * math.cos(turn)
+            bar = shapes.add_cube('%s-%d-%d' % (name, step, edge), 1.0, (x, depth, z), scale=(sx, 0.012, sz), rotation=(0.0, turn, 0.0))
+            shapes.bevel(bar, 0.002, segments=1)
+            frames.append(bar)
+    return frames
+
+
+
 def kinked_path(start, end, rng, segments):
     """A wire from start to end, wobbling in the face at every inner point."""
     points = []
@@ -803,6 +1034,11 @@ BASES = {
     'burnished-scratches': base_burnished_scratches,
     'cleaved-clear': base_cleaved_clear,
     'nacre-sheets': base_nacre_sheets,
+    'pitted-cast': base_pitted_cast,
+    'soot-dusted': base_soot_dusted,
+    'frosted-face': base_frosted_face,
+    'smoke-rhombs': base_smoke_rhombs,
+    'oxide-film': base_oxide_film,
 }
 SHEENS = {
     'earthy': sheen_earthy,
@@ -822,6 +1058,11 @@ SHEENS = {
     'polished': sheen_polished,
     'limpid': sheen_limpid,
     'pearly': sheen_pearly,
+    'matte': sheen_matte,
+    'smudged': sheen_smudged,
+    'silky': sheen_silky,
+    'satin': sheen_satin,
+    'iridescent': sheen_iridescent,
 }
 VEINS = {
     'nugget-cluster': vein_nugget_cluster,
@@ -841,6 +1082,11 @@ VEINS = {
     'rolled-pebbles': vein_rolled_pebbles,
     'wedge-blocks': vein_wedge_blocks,
     'ammonite-coils': vein_ammonite_coils,
+    'slag-knots': vein_slag_knots,
+    'spangle-scales': vein_spangle_scales,
+    'rod-bundle': vein_rod_bundle,
+    'lens-stack': vein_lens_stack,
+    'hopper-terraces': vein_hopper_terraces,
 }
 RECIPES = {'base': BASES, 'vein': VEINS, 'sheen': SHEENS}
 

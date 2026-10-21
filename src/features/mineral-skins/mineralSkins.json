@@ -1,5 +1,5 @@
 {
-  "$comment": "The mineral skins of #576 (GD ruling 20 Oct 2026, ticket 591): a species' skin is four layers drawn bottom first, a base texture, a vein or crystal shape, a palette and a sheen, each an id of its layer list below. A skin row names its species (a materials.json id) and one id per layer; no two species of one pool share all four, so no two species on one planet look alike. A palette is a ramp of three display colours, shadow, body and light, darkest first; its body is the hue slot colour of the species wearing it (ticket 450), so the skin keeps the hue guards of materials.json. The base, vein and sheen layers are drawn in Blender, one cell each (docs/art/mineral-skins, skin-layers.json). Look only: no price, gate, income, generation or save reads it. The batch tickets (#592 to #606) add the layers and rows, 15 species per planet on P1 to P5; #592 skins P1's slots 1 to 5, #593 its slots 6 to 10, #594 its slots 11 and 12 (the legacy pool has 12 species); #599 skins P3's slots 6 to 10 (the foothold-p3 pool; its slots 16 and 17, the two fossil commons of #453, are held).",
+  "$comment": "The mineral skins of #576 (GD ruling 20 Oct 2026, ticket 591): a species' skin is four layers drawn bottom first, a base texture, a vein or crystal shape, a palette and a sheen, each an id of its layer list below. A skin row names its species (a materials.json id) and one id per layer; no two species of one pool share all four, so no two species on one planet look alike. A palette is a ramp of three display colours, shadow, body and light, darkest first; its body is the hue slot colour of the species wearing it (ticket 450), so the skin keeps the hue guards of materials.json. The base, vein and sheen layers are drawn in Blender, one cell each (docs/art/mineral-skins, skin-layers.json). Look only: no price, gate, income, generation or save reads it. The batch tickets (#592 to #606) add the layers and rows, 15 species per planet on P1 to P5; #592 skins P1's slots 1 to 5, #593 its slots 6 to 10, #594 its slots 11 and 12 (the legacy pool has 12 species); #598 skins P3's slots 1 to 5 and #599 its slots 6 to 10 (the foothold-p3 pool; its slots 16 and 17, the two fossil commons of #453, are held).",
   "layers": {
     "base": [
       {
@@ -52,6 +52,21 @@
       },
       {
         "id": "nacre-sheets"
+      },
+      {
+        "id": "pitted-cast"
+      },
+      {
+        "id": "soot-dusted"
+      },
+      {
+        "id": "frosted-face"
+      },
+      {
+        "id": "smoke-rhombs"
+      },
+      {
+        "id": "oxide-film"
       }
     ],
     "vein": [
@@ -105,6 +120,21 @@
       },
       {
         "id": "ammonite-coils"
+      },
+      {
+        "id": "slag-knots"
+      },
+      {
+        "id": "spangle-scales"
+      },
+      {
+        "id": "rod-bundle"
+      },
+      {
+        "id": "lens-stack"
+      },
+      {
+        "id": "hopper-terraces"
       }
     ],
     "palette": [
@@ -175,6 +205,26 @@
       {
         "id": "ammonite-rose",
         "ramp": ["#63505a", "#c6a0b3", "#e2d0d9"]
+      },
+      {
+        "id": "pig-iron-grey",
+        "ramp": ["#42474c", "#858e97", "#c2c6cb"]
+      },
+      {
+        "id": "zinc-soot",
+        "ramp": ["#4a5154", "#93a2a7", "#c9d0d3"]
+      },
+      {
+        "id": "rail-quartz-frost",
+        "ramp": ["#646768", "#c7cecf", "#e3e6e7"]
+      },
+      {
+        "id": "calcite-smoke",
+        "ramp": ["#484a52", "#9093a4", "#c8c9d2"]
+      },
+      {
+        "id": "bismuth-oxide",
+        "ramp": ["#624262", "#c484c4", "#e2c2e2"]
       }
     ],
     "sheen": [
@@ -228,6 +278,21 @@
       },
       {
         "id": "pearly"
+      },
+      {
+        "id": "matte"
+      },
+      {
+        "id": "smudged"
+      },
+      {
+        "id": "silky"
+      },
+      {
+        "id": "satin"
+      },
+      {
+        "id": "iridescent"
       }
     ]
   },
@@ -315,6 +380,41 @@
       "vein": "hex-columns",
       "palette": "beryl-red",
       "sheen": "prismatic"
+    },
+    {
+      "species": "pig-iron-brassvein",
+      "base": "pitted-cast",
+      "vein": "slag-knots",
+      "palette": "pig-iron-grey",
+      "sheen": "matte"
+    },
+    {
+      "species": "soot-zinc-brassvein",
+      "base": "soot-dusted",
+      "vein": "spangle-scales",
+      "palette": "zinc-soot",
+      "sheen": "smudged"
+    },
+    {
+      "species": "rail-quartz-quartzine",
+      "base": "frosted-face",
+      "vein": "rod-bundle",
+      "palette": "rail-quartz-frost",
+      "sheen": "silky"
+    },
+    {
+      "species": "smoke-calcite-quartzine",
+      "base": "smoke-rhombs",
+      "vein": "lens-stack",
+      "palette": "calcite-smoke",
+      "sheen": "satin"
+    },
+    {
+      "species": "step-bismuth-brassvein",
+      "base": "oxide-film",
+      "vein": "hopper-terraces",
+      "palette": "bismuth-oxide",
+      "sheen": "iridescent"
     },
     {
       "species": "green-apatite-quartzine",

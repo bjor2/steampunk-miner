@@ -123,6 +123,41 @@
       "wornBy": ["coiled-ammonite-amberbone"]
     },
     {
+      "kind": "base",
+      "id": "pitted-cast",
+      "cell": "cells/base/pitted-cast.png",
+      "blend": "blend/base-pitted-cast.blend",
+      "wornBy": ["pig-iron-brassvein"]
+    },
+    {
+      "kind": "base",
+      "id": "soot-dusted",
+      "cell": "cells/base/soot-dusted.png",
+      "blend": "blend/base-soot-dusted.blend",
+      "wornBy": ["soot-zinc-brassvein"]
+    },
+    {
+      "kind": "base",
+      "id": "frosted-face",
+      "cell": "cells/base/frosted-face.png",
+      "blend": "blend/base-frosted-face.blend",
+      "wornBy": ["rail-quartz-quartzine"]
+    },
+    {
+      "kind": "base",
+      "id": "smoke-rhombs",
+      "cell": "cells/base/smoke-rhombs.png",
+      "blend": "blend/base-smoke-rhombs.blend",
+      "wornBy": ["smoke-calcite-quartzine"]
+    },
+    {
+      "kind": "base",
+      "id": "oxide-film",
+      "cell": "cells/base/oxide-film.png",
+      "blend": "blend/base-oxide-film.blend",
+      "wornBy": ["step-bismuth-brassvein"]
+    },
+    {
       "kind": "vein",
       "id": "nugget-cluster",
       "cell": "cells/vein/nugget-cluster.png",
@@ -242,6 +277,41 @@
       "wornBy": ["coiled-ammonite-amberbone"]
     },
     {
+      "kind": "vein",
+      "id": "slag-knots",
+      "cell": "cells/vein/slag-knots.png",
+      "blend": "blend/vein-slag-knots.blend",
+      "wornBy": ["pig-iron-brassvein"]
+    },
+    {
+      "kind": "vein",
+      "id": "spangle-scales",
+      "cell": "cells/vein/spangle-scales.png",
+      "blend": "blend/vein-spangle-scales.blend",
+      "wornBy": ["soot-zinc-brassvein"]
+    },
+    {
+      "kind": "vein",
+      "id": "rod-bundle",
+      "cell": "cells/vein/rod-bundle.png",
+      "blend": "blend/vein-rod-bundle.blend",
+      "wornBy": ["rail-quartz-quartzine"]
+    },
+    {
+      "kind": "vein",
+      "id": "lens-stack",
+      "cell": "cells/vein/lens-stack.png",
+      "blend": "blend/vein-lens-stack.blend",
+      "wornBy": ["smoke-calcite-quartzine"]
+    },
+    {
+      "kind": "vein",
+      "id": "hopper-terraces",
+      "cell": "cells/vein/hopper-terraces.png",
+      "blend": "blend/vein-hopper-terraces.blend",
+      "wornBy": ["step-bismuth-brassvein"]
+    },
+    {
       "kind": "sheen",
       "id": "earthy",
       "cell": "cells/sheen/earthy.png",
@@ -359,6 +429,41 @@
       "cell": "cells/sheen/pearly.png",
       "blend": "blend/sheen-pearly.blend",
       "wornBy": ["coiled-ammonite-amberbone"]
+    },
+    {
+      "kind": "sheen",
+      "id": "matte",
+      "cell": "cells/sheen/matte.png",
+      "blend": "blend/sheen-matte.blend",
+      "wornBy": ["pig-iron-brassvein"]
+    },
+    {
+      "kind": "sheen",
+      "id": "smudged",
+      "cell": "cells/sheen/smudged.png",
+      "blend": "blend/sheen-smudged.blend",
+      "wornBy": ["soot-zinc-brassvein"]
+    },
+    {
+      "kind": "sheen",
+      "id": "silky",
+      "cell": "cells/sheen/silky.png",
+      "blend": "blend/sheen-silky.blend",
+      "wornBy": ["rail-quartz-quartzine"]
+    },
+    {
+      "kind": "sheen",
+      "id": "satin",
+      "cell": "cells/sheen/satin.png",
+      "blend": "blend/sheen-satin.blend",
+      "wornBy": ["smoke-calcite-quartzine"]
+    },
+    {
+      "kind": "sheen",
+      "id": "iridescent",
+      "cell": "cells/sheen/iridescent.png",
+      "blend": "blend/sheen-iridescent.blend",
+      "wornBy": ["step-bismuth-brassvein"]
     }
   ]
 }

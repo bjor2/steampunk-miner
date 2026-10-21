@@ -38,13 +38,14 @@ PX_PER_M = 256
 SHADOW_LUMA_SHARE = 0.5
 LIGHT_LUMA_SHARE = 0.5
 # The batches of #576: a planet's species by roster slot, five a ticket (#592 is P1 slots 1 to 5,
-# #593 its slots 6 to 10, #594 its last two, 11 and 12: the legacy pool has 12 species; #599 is P3
-# slots 6 to 10 of the foothold-p3 pool), named `p<planet>-b<n>`. Keep a planet's batches in
+# #593 its slots 6 to 10, #594 its last two, 11 and 12: the legacy pool has 12 species; #598 is P3
+# slots 1 to 5 and #599 its slots 6 to 10, of the foothold-p3 pool), named `p<planet>-b<n>`. Keep a planet's batches in
 # slot order: a batch is measured against the ones listed before it (`earlier_batches`).
 BATCHES = {
     'p1-b1': {'pool': 'legacy', 'slots': ('legacy.c1', 'legacy.c2', 'legacy.c3', 'legacy.c4', 'legacy.c5')},
     'p1-b2': {'pool': 'legacy', 'slots': ('legacy.u1', 'legacy.u2', 'legacy.u3', 'legacy.u4', 'legacy.r1')},
     'p1-b3': {'pool': 'legacy', 'slots': ('legacy.r2', 'legacy.r3')},
+    'p3-b1': {'pool': 'foothold-p3', 'slots': ('mixed.c1', 'mixed.c2', 'mixed.c3', 'mixed.c4', 'mixed.u1')},
     'p3-b2': {'pool': 'foothold-p3', 'slots': ('mixed.u2', 'mixed.u3', 'mixed.r1', 'mixed.r2', 'mixed.r3')},
 }
 

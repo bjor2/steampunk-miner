@@ -4,12 +4,14 @@ import { planetSpeciesOf } from '../roster'
 import { planetSkinsOf } from './systems/mineralSkin'
 
 // The P3 batches of #576 (tickets 598 to 600): planet 3's species by roster slot, five a ticket,
-// from the foothold-p3 pool. Ticket 599 skins slots 6 to 10: the crystal and fossil uncommons
+// from the foothold-p3 pool. Ticket 598 skins slots 1 to 5: the four commons (pig iron, soot zinc,
+// rail quartz, smoke calcite) and the metal uncommon (step bismuth). Ticket 599 skins slots 6 to
+// 10: the crystal and fossil uncommons
 // (green apatite, ribbed shell) and the three rares (native platinum, blue topaz, coiled ammonite).
 // Slots 16 and 17 are #453's two fossil commons, held: no ticket skins them.
 
 const PLANET_3 = freshPlanetParamsFor(83921, 3)
-const SKINNED_SLOTS = [6, 7, 8, 9, 10]
+const SKINNED_SLOTS = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
 const HELD_FOSSIL_SLOTS = [16, 17]
 
 describe('mineral skins of planet 3', () => {
