@@ -14,6 +14,9 @@ The PNG bakes go to art/build/<id>/ (gitignored) for scripts/art/encode.sh; the 
 goes to public/assets/<category>/<id>/. The .blend is never saved, and an unchanged .blend writes a
 byte-identical sidecar (#52 acceptance 5). An empty named `attach.<id>` is an attach point (#162
 K5, the shop buildings of #170): its X and Z go into the sidecar's `attach` array, never baked.
+A `ui` asset (ticket 683) is a sheet of flat sprites at one unit per CSS px: each part also
+writes its PNG at 1x and 2x (ui_sprites.py), reads its nine-slice insets from the object's
+`inset` property, and ships a tint mask when a piece wears the `accent` material.
 """
 
 import hashlib
@@ -28,6 +31,7 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import asset_layout  # noqa: E402
 import bake_tile  # noqa: E402
 import render_backdrop  # noqa: E402
+import ui_sprites  # noqa: E402
 
 TIER_COLLECTION_PREFIX = 'tier-'
 ATTACH_PREFIX = 'attach.'
@@ -36,6 +40,8 @@ BAKE_CLEARANCE = 0.01
 FLAT_NORMAL = (0.5, 0.5, 1.0, 1.0)
 EMISSION_THRESHOLD = 1.0 / 255.0
 MAP_COLOUR_SPACES = {'albedo': 'sRGB', 'normal': 'Non-Color', 'emissive': 'sRGB', 'mask': 'Non-Color'}
+TINT_COLOUR_SPACE = {ui_sprites.TINT_MASK_NAME: 'Non-Color'}
+INSET_PROPERTY = 'inset'
 
 
 def main():
@@ -49,10 +55,16 @@ def export_parts(asset_id, rules):
     parts = part_layouts_of(asset_id, rules, part_objects())
     sidecar = asset_layout.build_sidecar(asset_id, parts, rules, source_of(), has_emissive=True,
                                          attach=attach_points_of(attach_empties()))
-    has_emissive = bake_atlas(asset_id, sidecar, rules)
+    has_emissive, images = bake_atlas(asset_id, sidecar, rules)
     if not has_emissive:
         sidecar['maps']['emissive'] = False
+    if is_ui_asset(asset_id):
+        ui_sprites.write_sprites(asset_id, sidecar, images, rules)
     write_outputs(asset_id, sidecar)
+
+
+def is_ui_asset(asset_id):
+    return asset_layout.category_of(asset_id) == asset_layout.UI_CATEGORY
 
 
 def asset_id_from_arguments():
@@ -177,7 +189,26 @@ def part_layout_of(asset_id, rules, obj, depth_rank):
         'atM': [origin.x, origin.z],
         'z': int(obj['z']) if 'z' in obj else depth_rank,
         'problems': [] if inside else ['part "%s" has its origin outside its bounds' % obj.name],
+        **ui_sprite_fields_of(asset_id, obj),
     }
+
+
+def ui_sprite_fields_of(asset_id, obj):
+    """A UI sprite's nine-slice insets (`inset`: one value or `[x, y]`) and whether it wears accent."""
+    if not is_ui_asset(asset_id):
+        return {}
+    fields = {}
+    if INSET_PROPERTY in obj:
+        fields['insetPx'] = inset_pair_of(obj[INSET_PROPERTY])
+    if any(slot.material is not None and slot.material.name == ui_sprites.ACCENT_MATERIAL
+           for slot in obj.material_slots):
+        fields['tintable'] = True
+    return fields
+
+
+def inset_pair_of(value):
+    values = [int(v) for v in value] if hasattr(value, '__len__') else [int(value), int(value)]
+    return values[:2]
 
 
 def bounds_of(obj):
@@ -205,15 +236,21 @@ def source_of():
 
 
 def bake_atlas(asset_id, sidecar, rules):
-    """Bakes every map into art/build/<id>/; answers whether anything on the asset glows."""
+    """Bakes every map into art/build/<id>/; answers whether anything glows, and the baked images."""
     configure_cycles_bake(rules['atlasMarginPx'])
     width, height = sidecar['atlasPx']
-    images = {kind: blank_image(asset_id, kind, width, height) for kind in MAP_COLOUR_SPACES}
+    images = {kind: blank_image(asset_id, kind, space, width, height)
+              for kind, space in map_colour_spaces_of(asset_id).items()}
     for part in sidecar['parts']:
         bake_part(bpy.data.objects[part['id']], part['rect'], (width, height), images)
     has_emissive = finish_maps(images)
     save_maps(asset_id, images, has_emissive)
-    return has_emissive
+    return has_emissive, images
+
+
+def map_colour_spaces_of(asset_id):
+    """The maps every parts asset bakes, plus the tint mask of a UI sprite sheet."""
+    return {**MAP_COLOUR_SPACES, **TINT_COLOUR_SPACE} if is_ui_asset(asset_id) else dict(MAP_COLOUR_SPACES)
 
 
 def configure_cycles_bake(margin):
@@ -229,9 +266,9 @@ def configure_cycles_bake(margin):
     scene.render.bake.normal_space = 'TANGENT'
 
 
-def blank_image(asset_id, kind, width, height):
+def blank_image(asset_id, kind, colour_space, width, height):
     image = bpy.data.images.new('%s.%s' % (asset_id, kind), width, height, alpha=True)
-    image.colorspace_settings.name = MAP_COLOUR_SPACES[kind]
+    image.colorspace_settings.name = colour_space
     image.generated_color = FLAT_NORMAL if kind == 'normal' else (0.0, 0.0, 0.0, 0.0)
     return image
 
@@ -239,14 +276,18 @@ def blank_image(asset_id, kind, width, height):
 def bake_part(obj, rect, atlas, images):
     """Bakes one part from a quad just behind it, its UVs on the part's atlas rectangle."""
     quad = bake_quad_for(obj, rect, atlas)
-    stand_in = mask_stand_in_for(obj)
+    stand_ins = {'mask': mask_stand_in_for(obj)}
+    if ui_sprites.TINT_MASK_NAME in images:
+        stand_ins[ui_sprites.TINT_MASK_NAME] = tint_stand_in_for(obj)
     try:
         bake_onto(quad, obj, images['albedo'], 'DIFFUSE', {'COLOR'})
         bake_onto(quad, obj, images['normal'], 'NORMAL', set())
         bake_onto(quad, obj, images['emissive'], 'EMIT', set())
-        bake_onto(quad, stand_in, images['mask'], 'EMIT', set())
+        for kind, stand_in in stand_ins.items():
+            bake_onto(quad, stand_in, images[kind], 'EMIT', set())
     finally:
-        bpy.data.objects.remove(stand_in)
+        for stand_in in stand_ins.values():
+            bpy.data.objects.remove(stand_in)
         remove_quad(quad)
 
 
@@ -276,28 +317,42 @@ def uv_corners_of(rect, atlas):
 
 def mask_stand_in_for(obj):
     """A copy of the part that glows pure white, so an emission bake of it is the part's mask."""
+    return stand_in_for(obj, lambda material: flat_emission_material('bake-mask', 1.0))
+
+
+def tint_stand_in_for(obj):
+    """A copy whose accent pieces glow white and the rest black: the bake is the tint mask (683)."""
+    def tint_material_of(material):
+        is_accent = material is not None and material.name == ui_sprites.ACCENT_MATERIAL
+        return flat_emission_material('bake-tint-on' if is_accent else 'bake-tint-off', 1.0 if is_accent else 0.0)
+    return stand_in_for(obj, tint_material_of)
+
+
+def stand_in_for(obj, material_for):
+    """A copy of the part with every material slot replaced by `material_for(the slot's material)`."""
     stand_in = obj.copy()
     bpy.context.scene.collection.objects.link(stand_in)
-    white = mask_material()
     for slot in stand_in.material_slots:
+        # Read the mesh's material before the slot switches to the object's (empty) one.
+        original = slot.material
         slot.link = 'OBJECT'
-        slot.material = white
+        slot.material = material_for(original)
     if not stand_in.material_slots:
         stand_in.data = obj.data.copy()
-        stand_in.data.materials.append(white)
+        stand_in.data.materials.append(material_for(None))
     return stand_in
 
 
-def mask_material():
-    existing = bpy.data.materials.get('bake-mask')
+def flat_emission_material(name, brightness):
+    existing = bpy.data.materials.get(name)
     if existing is not None:
         return existing
-    material = bpy.data.materials.new('bake-mask')
+    material = bpy.data.materials.new(name)
     material.use_nodes = True
     nodes = material.node_tree.nodes
     nodes.clear()
     emission = nodes.new('ShaderNodeEmission')
-    emission.inputs['Color'].default_value = (1.0, 1.0, 1.0, 1.0)
+    emission.inputs['Color'].default_value = (brightness, brightness, brightness, 1.0)
     output = nodes.new('ShaderNodeOutputMaterial')
     material.node_tree.links.new(emission.outputs[0], output.inputs['Surface'])
     return material

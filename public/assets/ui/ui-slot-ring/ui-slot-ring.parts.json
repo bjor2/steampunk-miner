@@ -1,0 +1,45 @@
+{
+  "assetId": "ui-slot-ring",
+  "schema": 1,
+  "source": {
+    "blend": "art/blender/ui-slot-ring/ui-slot-ring.blend",
+    "sha256": "9a8c552777ad2b69d8fe4c2b0d6461144a40f32678d99d370a23fdfec118c245",
+    "blender": "4.2.9 LTS"
+  },
+  "pxPerMetre": 4,
+  "atlasPx": [
+    256,
+    256
+  ],
+  "maps": {
+    "albedo": "ui-slot-ring.albedo.ktx2",
+    "normal": "ui-slot-ring.normal.ktx2",
+    "emissive": false
+  },
+  "parts": [
+    {
+      "id": "ui-slot-ring",
+      "tier": 1,
+      "rect": [
+        8,
+        8,
+        192,
+        192
+      ],
+      "sizeM": [
+        48.0,
+        48.0
+      ],
+      "pivotM": [
+        24.0,
+        24.0
+      ],
+      "atM": [
+        0.0,
+        0.0
+      ],
+      "z": 0,
+      "tintable": true
+    }
+  ]
+}

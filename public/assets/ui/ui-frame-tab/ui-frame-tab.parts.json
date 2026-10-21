@@ -1,0 +1,76 @@
+{
+  "assetId": "ui-frame-tab",
+  "schema": 1,
+  "source": {
+    "blend": "art/blender/ui-frame-tab/ui-frame-tab.blend",
+    "sha256": "b873d658c99433f184007133d6d163ef13b5c032ebde5f6cc0ece8d838beca23",
+    "blender": "4.2.9 LTS"
+  },
+  "pxPerMetre": 4,
+  "atlasPx": [
+    512,
+    512
+  ],
+  "maps": {
+    "albedo": "ui-frame-tab.albedo.ktx2",
+    "normal": "ui-frame-tab.normal.ktx2",
+    "emissive": false
+  },
+  "parts": [
+    {
+      "id": "ui-frame-tab",
+      "tier": 1,
+      "rect": [
+        8,
+        8,
+        256,
+        128
+      ],
+      "sizeM": [
+        64.0,
+        32.0
+      ],
+      "pivotM": [
+        32.0,
+        16.0
+      ],
+      "atM": [
+        0.0,
+        0.0
+      ],
+      "z": 0,
+      "insetPx": [
+        8,
+        8
+      ]
+    },
+    {
+      "id": "ui-frame-tab-active",
+      "tier": 1,
+      "rect": [
+        8,
+        152,
+        256,
+        128
+      ],
+      "sizeM": [
+        64.0,
+        32.0
+      ],
+      "pivotM": [
+        32.0,
+        16.0
+      ],
+      "atM": [
+        80.0,
+        0.0
+      ],
+      "z": 0,
+      "insetPx": [
+        8,
+        8
+      ],
+      "tintable": true
+    }
+  ]
+}

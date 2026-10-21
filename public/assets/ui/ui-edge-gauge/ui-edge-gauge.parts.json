@@ -1,0 +1,48 @@
+{
+  "assetId": "ui-edge-gauge",
+  "schema": 1,
+  "source": {
+    "blend": "art/blender/ui-edge-gauge/ui-edge-gauge.blend",
+    "sha256": "6f4ff2b09e3785e2df87aecc6f7f1ff6bb30121d8d01a41872e35dd410bc31be",
+    "blender": "4.2.9 LTS"
+  },
+  "pxPerMetre": 4,
+  "atlasPx": [
+    64,
+    512
+  ],
+  "maps": {
+    "albedo": "ui-edge-gauge.albedo.ktx2",
+    "normal": "ui-edge-gauge.normal.ktx2",
+    "emissive": false
+  },
+  "parts": [
+    {
+      "id": "ui-edge-gauge",
+      "tier": 1,
+      "rect": [
+        8,
+        8,
+        32,
+        256
+      ],
+      "sizeM": [
+        8.0,
+        64.0
+      ],
+      "pivotM": [
+        4.0,
+        32.0
+      ],
+      "atM": [
+        0.0,
+        0.0
+      ],
+      "z": 0,
+      "insetPx": [
+        0,
+        8
+      ]
+    }
+  ]
+}

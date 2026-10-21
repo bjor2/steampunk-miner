@@ -1,7 +1,12 @@
 import { describe, expect, it } from 'vitest'
 import { SHIPPED_ART } from '../../scene/shippedArt'
 import { blenderAssetIds, categoryOfAssetId, registryPartIds } from './artIds'
-import { artCatalogueOf, manifestEntryOf, placeholderSidecarOf } from './artCatalogue'
+import {
+  artCatalogueOf,
+  exportedSidecarOf,
+  manifestEntryOf,
+  placeholderSidecarOf,
+} from './artCatalogue'
 import type { ManifestEntry } from './assetManifest'
 import {
   shippedFilesOf,
@@ -97,6 +102,42 @@ describe('ui art ids', () => {
         expect(part?.insetPx ?? null).toEqual(sprite.insetPx)
       }
     }
+  })
+
+  it('ships every token’s asset final, baked at the brief’s size and insets at the supersample', () => {
+    for (const assetId of uiArtAssetIds()) {
+      const exported = exportedSidecarOf(SHIPPED_ART, assetId)
+      expect({ assetId, status: manifestEntryOf(SHIPPED_ART, assetId)?.status }).toEqual({
+        assetId,
+        status: 'final',
+      })
+      expect(exported?.pxPerMetre).toBe(4)
+      expect(exported?.maps.emissive).toBe(false)
+      for (const sprite of uiSpritesOf(assetId)) {
+        const part = exported?.parts.find((candidate) => candidate.id === sprite.partId)
+        expect({ part: sprite.partId, size: part?.sizeM }).toEqual({
+          part: sprite.partId,
+          size: sprite.sizePx,
+        })
+        expect(part?.insetPx ?? null).toEqual(sprite.insetPx)
+      }
+    }
+  })
+
+  it('tints only the dial face, the active tab’s edge, the slot ring and the gear lamp', () => {
+    const tintable = uiArtAssetIds().flatMap(
+      (assetId) =>
+        exportedSidecarOf(SHIPPED_ART, assetId)
+          ?.parts.filter((part) => part.tintable === true)
+          .map((part) => part.id) ?? [],
+    )
+    expect(tintable).toEqual([
+      'ui-frame-tab-active',
+      'ui-gauge-dial',
+      'ui-gear-button',
+      'ui-gear-button-pressed',
+      'ui-slot-ring',
+    ])
   })
 
   it('keeps every stroke readable at 360 px: no inset reaches half the sprite', () => {
