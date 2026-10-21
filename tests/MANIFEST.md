@@ -380,7 +380,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/ore-visuals/systems/oreGradeChannels.test.ts` | 7 | 7 |
 | `src/features/ore-visuals/systems/render/oreLookProvider.test.ts` | 21 | 10 |
 
-### `ores`: 25 files, 204 tests
+### `ores`: 26 files, 206 tests
 
 | File | Tests | Sites |
 | --- | --- | --- |
@@ -392,6 +392,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/ores/rarityPickupRoutes.test.ts` | 4 | 2 |
 | `src/features/ores/rarityTripRun.test.ts` | 5 | 3 |
 | `src/features/ores/systems/hazardCardSource.test.ts` | 5 | 5 |
+| `src/features/ores/systems/hazardNearDock.test.ts` | 2 | 2 |
 | `src/features/ores/systems/hazardPockets.test.ts` | 7 | 7 |
 | `src/features/ores/systems/kernelOreAliases.test.ts` | 2 | 2 |
 | `src/features/ores/systems/kindRows.test.ts` | 14 | 14 |
@@ -906,6 +907,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | --- | --- | --- |
 | `src/systems/bot/blastTrade.test.ts` | 2 | 2 |
 | `src/systems/bot/boreClock.test.ts` | 5 | 5 |
+| `src/systems/bot/botArrival.test.ts` | 4 | 4 |
 | `src/systems/bot/botBlasting.test.ts` | 4 | 4 |
 | `src/systems/bot/botBoiler.test.ts` | 4 | 4 |
 | `src/systems/bot/botBore.test.ts` | 10 | 10 |
@@ -951,6 +953,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | --- | --- | --- |
 | `src/debug/debugApi.test.ts` | 52 | 51 |
 | `src/debug/debugArtefact.test.ts` | 5 | 5 |
+| `src/debug/debugBot.test.ts` | 2 | 2 |
 | `src/debug/debugDevFlags.test.ts` | 4 | 4 |
 | `src/debug/debugHudCoverage.test.ts` | 5 | 5 |
 | `src/debug/debugHudLayout.test.ts` | 5 | 5 |

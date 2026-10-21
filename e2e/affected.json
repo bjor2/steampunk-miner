@@ -493,6 +493,27 @@
       "specs": ["e2e/browser/planetCard.spec.ts"]
     },
     {
+      "why": "A fresh save reaches each of P1-P5 by the pacing bot's bought travel and lands on its hazard, pool and card line (ticket 656).",
+      "paths": [
+        "src/debug/debugBot.ts",
+        "src/systems/bot/botArrival.ts",
+        "src/systems/bot/botTravel.ts",
+        "src/systems/bot/playSlice.ts",
+        "src/systems/authority/travelRules.ts",
+        "src/systems/economy/travelCharge.ts",
+        "src/systems/registries/hazardPockets.ts",
+        "src/systems/registries/planetCardLines.ts",
+        "src/store/planetCardSlice.ts",
+        "src/features/ores/debug.ts",
+        "src/features/ores/ores.economy.json",
+        "src/features/ores/systems/hazardNearDock.ts",
+        "src/features/ores/systems/hazardPockets.ts",
+        "src/features/ores/systems/hazardCardSource.ts",
+        "src/features/ores/systems/kindRows.ts"
+      ],
+      "specs": ["e2e/browser/freshSavePlanets.spec.ts"]
+    },
+    {
       "why": "The game stage fits every screen cell, either way up (ticket 483).",
       "paths": ["src/ui/stage/**"],
       "specs": [

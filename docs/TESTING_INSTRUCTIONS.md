@@ -139,7 +139,12 @@ programs }` from three's `renderer.info` of the game canvas), read only when cal
   promise: in a browser it downloads the kept runs' saves and screenshots from IndexedDB as one
   uncompressed zip and answers `{ file, bytes, entries }`; Electron refuses, its snapshots are files
   under `logs/<runId>/`); for save slots (ticket 404), the unlogged read `saves.list()` (a promise
-  of the slot index, autosave first, each entry with its exact playtime tick and wall time).
+  of the slot index, autosave first, each entry with its exact playtime tick and wall time); for the
+  pacing bot (ticket 656), `bot.playToPlanet(planetIndex)` (a promise: the bot plays from the
+  session now, harvesting each core and buying each travel, up to 9 planets on, and its commands
+  are replayed through `fastForward`, the only debug line, so `debugApplied` stays false; it
+  answers `{ planetIndex, tick, commands, isReplayExact }`, or refuses with nothing changed when the
+  bot does not land).
   Collapse specs build a weak band-2 tunnel or dig one with `collapse/collapseFixtures.ts`. Bore gun specs (ticket 313) stand the rig in a pocket of band-1 rock with `bore/boreFixtures.ts` and register the gun's numbers through `boreGunSlice` inside `withRegistrations`, as no slice answers `boreGun` yet. Auto mode specs (ticket 317) use `bore/boreAutoFixtures.ts` `searSlice`, which adds the steam sear's numbers and its research, and stand the rig at `AUTO_RIG`, on the east edge of its collapse block, so a level shot east never warns the rig's own block. A slice's self-acting item (ticket 328: the steam shield) is specced with the real press path through `power-up-core`'s `withPowerUpCore([itemSlice, fixture])`, the fixture registering the item's research and a stand-in `autoFire` hook for the combo, in the corridor fight of `combat/combatFixtures.ts`. Collapse brace specs (ticket 331) register the fake `brace-probe` slice of `collapse/braceFixtures.ts` (a section, a command, a clock step and the provider) inside `withRegistrations`, so a brace can end by command, by clock step or by `untilTick`. Hazard strip specs (ticket 341) dig straight down the plain line of `render/hazardStrip/stripFixtures.ts`, fixtures placed in metres below the start, at a steady speed frame by frame; the per-frame cost is the sampler's own cost model (`spentUs`), and the wall clock is `npm run bench:strip`'s. Specs that mine deep (where crawlers live) freeze enemies first
   (`FREEZE_ENEMIES` in `scriptedSession.ts`); combat specs fight in the band-1 corridor of
   `combat/combatFixtures.ts`, where no spawn point is in reach. The `ui` namespace (`ui.setCameraMode('rotating' | 'fixed')`, `ui.setPref(name, value)`,
@@ -344,6 +349,17 @@ programs }` from three's `renderer.info` of the game canvas), read only when cal
   `casingLiningLook.test.ts` reads every planet's shown palette too. `e2e/browser/planetLooks.spec.ts`
   (box Tester) checks the drawn band and the pairwise looks in a 360 px window and attaches each
   planet's review shot.
+- **A fresh save per planet, P1 to P5** (ticket 656, the GD's end check on spec #647):
+  `e2e/browser/freshSavePlanets.spec.ts` (box Tester; several minutes a planet) opens a fresh save
+  for each of planets 1 to 5, has `steampunkDebug.bot.playToPlanet(n)` take it there, and on landing
+  asserts the run is still play (`ui.getHudModel().model.isDebugRun` false, so a planet whose travel
+  needs a debug command fails), the pool id, the row's hazard with a pocket of it round the dock
+  (`features.ores.getPlanetRow()`) and the planet card's arrival line; planet 1 keeps the legacy
+  pool and shows no card. `src/systems/bot/botArrival.test.ts` holds the bot to landing a fresh
+  save (world seed 1, the browser's) on planet 2 by travel, with no debug command and a script that
+  replays to the same digest; `src/debug/debugBot.test.ts` holds the live replay to the bot's digest
+  with `debugApplied` false; `src/features/ores/systems/hazardNearDock.test.ts` holds each of
+  planets 2 to 5 on seed 1 to its own pocket kind within 20 columns of the dock.
 - **Material looks** (ticket 450, TD shape on #450 6226270701 and the Scalers' conditions):
   `src/features/roster/kindLook.test.ts` holds the roster's look provider to its rules: a fresh
   save shows no species (unseen kinds draw the family look), a species shows only once the
