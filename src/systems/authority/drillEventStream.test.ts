@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { DRILL_STAMP_RADIUS_MM } from '../../constants/balance'
+import { drillStampRadiusMm } from '../vehicle/drillBore'
 import { MM_PER_METRE } from '../../constants/physics'
 import type { DomainEvent } from './domainEvent'
 import {
@@ -42,7 +42,7 @@ const TRACKS: readonly StreamTrack[] = ['straight', 'tilted', 'turn']
 const SLOW_MPS = 0.5
 const FAST_MPS = 3
 /** The bit's stamp, the gear's two cells and the cell a stamp edge reaches into. */
-const PAID_REACH_MM = DRILL_STAMP_RADIUS_MM + 3 * MM_PER_METRE
+const PAID_REACH_MM = drillStampRadiusMm() + 3 * MM_PER_METRE
 
 function runOf(track: StreamTrack, speedMps: number, gear = BARE_BIT): StreamRun {
   return { track, speedMps, levels: CLEARING_RIG, gear }
@@ -78,7 +78,7 @@ function isWithinPaidReach(run: StreamRun, key: string): boolean {
 
 /** Whether the cell's centre lies under the bit's stamp at some tick of the track: not a gear cell. */
 function isWithinBitReach(run: StreamRun, key: string): boolean {
-  return isWithinReach(run, key, DRILL_STAMP_RADIUS_MM)
+  return isWithinReach(run, key, drillStampRadiusMm())
 }
 
 function isWithinReach(run: StreamRun, key: string, reachMm: number): boolean {

@@ -48,25 +48,33 @@ export const STEP_BOUND_TOLERANCE_MM = 250
  */
 export const DRILL_REACH_MM = 1600
 
+/** The drill bore's data row (`DRILL_BORE_ROWS`). */
+export interface DrillBoreRows {
+  readonly sideClearanceMm: number
+}
+
 /**
- * The drill's circular stamp (decision #36 Carving, amended by #41): the carved diameter is the
- * vehicle height (0.9 m, #7) plus 1.0 m, so a 0.25 m casing lining (#41) still leaves the vehicle
- * height plus 0.5 m clear. The Gameplay & Vehicle Designer owns the number as data.
+ * The drill's circular stamp (decision #36 Carving, as the GD lock on #661 re-derives it): the cut
+ * is the body's width plus `sideClearanceMm` on each side. 0.5 m is #36's body plus 1.0 m (a 1.9 m
+ * bore); the stamp's radius, its lift and the casing ring's lag derive from this row
+ * (`vehicle/drillBore.ts`). The Gameplay & Vehicle Designer owns it as data. Rules read it at call
+ * time, never at import, so a spec may set it (`withDrillSideClearance`).
  */
-export const DRILL_STAMP_RADIUS_MM = 950
+export const DRILL_BORE_ROWS: DrillBoreRows = { sideClearanceMm: 500 }
+
+/** The range the GD lock on #661 lets the side clearance be tuned in, in mm. */
+export const DRILL_SIDE_CLEARANCE_RANGE_MM = { min: 100, max: 200 } as const
 
 /**
  * Where the stamp sits (#40: the drill axis is the 4-way facing in the local frame): this far
  * ahead of the body's centre along the facing, so it bites just past the 0.9 m body's face.
- * Driving sideways on the ground it is also raised along `localUp` by `DRILL_STAMP_LIFT_MM`, so
- * the tunnel is taller above the body than below and its floor (cut level, see `drillStamp.ts`)
- * lies inside the disc's strong middle. Placeholders, checked by the level-tunnel physics spec and
- * tuned by hand in the vehicle feel test. An offset, not a reach (ticket 570 renamed it from
+ * Driving sideways on the ground it is also raised along `localUp` by the lift
+ * (`vehicle/drillBore.ts`). A placeholder, checked by the level-tunnel physics spec and tuned by
+ * hand in the vehicle feel test. An offset, not a reach (ticket 570 renamed it from
  * `DRILL_STAMP_AHEAD_MM`): a cut riding its face places its stamp by `sweptStampAheadMmOf`, and a
  * travelling one this offset plus the cutting bound (`travelStampAheadMmAt`).
  */
 export const DRILL_STAMP_OFFSET_MM = 500
-export const DRILL_STAMP_LIFT_MM = 250
 
 /** Half the 0.9 m body's side (#7): its face sits this far ahead of its centre. */
 export const BODY_HALF_SIZE_MM = 450
@@ -94,22 +102,15 @@ export const CARRY_RELEASE_MARGIN_SAMPLES = 3
  * stampR + 0.25 m`, one 0.25 m sample thick on the rock side of the wall the drill cut. One ring
  * every 0.5 m the stamp cuts. The Gameplay & Vehicle Designer owns the numbers as data.
  */
-export const CASING_LINING_HALF_WIDTH_MM = 250
+export const CASING_LINING_WIDTH_MM = 250
 export const CASING_RING_SPACING_MM = 500
-/**
- * "The ring sits behind the drill head, so the drill never cuts its own fresh lining" (#41, #56
- * Q2: `2 x stampR + 0.25 m`): a ring is laid at an axis point once the stamp's centre is this far
- * past it, the stamp's radius plus the ring's outer radius, so on a straight cut no later stamp
- * reaches the ring.
- */
-export const CASING_RING_LAG_MM =
-  DRILL_STAMP_RADIUS_MM + DRILL_STAMP_RADIUS_MM + CASING_LINING_HALF_WIDTH_MM
 /**
  * Axis points waiting for their ring, a safety net that keeps the save small (ticket 538, the TD
  * ruling 6228998310 on #538: 6 to 9): waiting points lie at least `CASING_RING_SPACING_MM` apart
- * and within the lag, so a straight cut holds at most `CASING_RING_LAG_MM / 500` of them and a
- * line through the stamp `2 x 2150 / 500 + 1`. Only a tight loop fills it; the newest point past
- * it is dropped, never the oldest laid inside the lag.
+ * and within the ring lag (`casingRingLagMm`), so a straight cut holds at most lag / 500 of them
+ * and a line through the stamp `2 x lag / 500 + 1`, 9 at #36's 1.9 m bore.
+ * Only a tight loop fills it; the newest point past it is dropped, never the oldest laid inside
+ * the lag.
  */
 export const MAX_CASING_TRAIL_POINTS = 9
 

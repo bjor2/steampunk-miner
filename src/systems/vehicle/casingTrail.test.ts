@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
-import { CASING_RING_LAG_MM, CASING_RING_SPACING_MM } from '../../constants/balance'
+import { CASING_RING_SPACING_MM } from '../../constants/balance'
+import { casingRingLagMm } from './drillBore'
 import {
   EMPTY_CASING_TRAIL,
   followCasingTrail,
@@ -211,7 +212,7 @@ describe('casing trail at a report every tick (ticket 514)', () => {
     (strideMm) => {
       const { laid, mostWaiting } = laidAlong(stepsTo(20000, strideMm), true)
       expect(mostWaiting).toBeLessThan(6)
-      expect(laid.every((ring) => ring.stampMm - ring.xMm >= CASING_RING_LAG_MM)).toBe(true)
+      expect(laid.every((ring) => ring.stampMm - ring.xMm >= casingRingLagMm())).toBe(true)
     },
   )
 
@@ -220,6 +221,6 @@ describe('casing trail at a report every tick (ticket 514)', () => {
     const backing = stepsTo(8000, 25).reverse()
     const backedOut = laidAlong(backing, false, cut.trail)
     expect(backedOut.trail.unlined).toEqual([])
-    expect(backedOut.laid.every((ring) => ring.xMm - ring.stampMm >= CASING_RING_LAG_MM)).toBe(true)
+    expect(backedOut.laid.every((ring) => ring.xMm - ring.stampMm >= casingRingLagMm())).toBe(true)
   })
 })

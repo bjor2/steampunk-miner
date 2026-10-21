@@ -68,7 +68,7 @@ export const DEV_FLAGS: DevFlags = { 'drill.sweptCut': true, 'drill.reportEveryT
  *   instead of the bare disc at the pose, counted on the swept cut's sub-step clock
  *   (`authority/reportedCapsule.ts`), its drill gear's cells cut on every tick of the bite, so a
  *   report every tick no longer re-stamps a disc that leaves the rim between poses standing. The
- *   step is capped at one stamp radius (950 mm): a longer step, a fresh bite, a turn, a still rig,
+ *   step is capped at one stamp radius (half the bore): a longer step, a fresh bite, a turn, a still rig,
  *   a 12-tick report and the exact carry off cut today's bare disc on today's clock, byte for
  *   byte, so the flag-off game never carves a capsule. The charge is the report's: the law work
  *   removed with the carry. A kill-switch, on: off, every report cut is protocol 86's.

@@ -10,7 +10,7 @@
  *   more than the step and the margin it may win back, so a body that keeps moving into its
  *   contact margin never drags the front far past the drill's own speed.
  */
-import { CUT_FACE_MARGIN_MM, DRILL_STAMP_RADIUS_MM } from '../../constants/balance'
+import { CUT_FACE_MARGIN_MM } from '../../constants/balance'
 import { UP_VECTOR_SCALE } from '../../constants/physics'
 import { isCutGateOpen, type CutGate } from '../vehicle/cutGate'
 import {
@@ -83,13 +83,13 @@ function placedAt(pose: VehiclePose, stamp: DiscStamp, aheadMm: number): PlacedS
 /**
  * Where a continuing cut carves forward from (ticket 570): the body, so ground the body slid or
  * fell beside is cut, but never further back than the stamp's radius behind the last front, as
- * the casing rings the cut lays (`CASING_RING_LAG_MM`) all lie further back than that and the cut
+ * the casing rings the cut lays (`casingRingLagMm`) all lie further back than that and the cut
  * must never take its own lining (#41, #56).
  */
 function rearOfCut({ stamp, bodyPoint }: PlacedStamp, cursor: SweptCut): StampPoint {
   const line = { from: bodyPoint, to: stamp }
   const lastFront = pointOnLine(frontOfCursor(cursor), line)
-  const ringFree = pointAlongLine(lastFront, line, -DRILL_STAMP_RADIUS_MM)
+  const ringFree = pointAlongLine(lastFront, line, -stamp.radiusMm)
   return alongLineOf(ringFree, line) > alongLineOf(bodyPoint, line) ? ringFree : bodyPoint
 }
 

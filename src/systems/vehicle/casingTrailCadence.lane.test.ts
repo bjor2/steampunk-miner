@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { CASING_RING_LAG_MM } from '../../constants/balance'
+import { casingRingLagMm } from './drillBore'
 import { EMPTY_CASING_TRAIL, followCasingTrail, type CasingTrail } from './casingTrail'
 
 // The VS's casing gate on #514 for a rig that cuts back over its own trail (VS amendment, quoted by
@@ -43,7 +43,7 @@ function reportedCentresOf(strideMm: number, interval: number): number[] {
 function withRing(rings: ReversalRings, distanceMm: number): ReversalRings {
   return {
     closestMm: Math.min(rings.closestMm, distanceMm),
-    overflowRings: rings.overflowRings + (distanceMm < CASING_RING_LAG_MM ? 1 : 0),
+    overflowRings: rings.overflowRings + (distanceMm < casingRingLagMm() ? 1 : 0),
   }
 }
 
@@ -57,8 +57,8 @@ describe('casing rings of a rig cutting back over its own trail (#514, lane)', (
   for (const strideMm of STRIDES_MM) {
     it(`lays no ring inside the lag at either cadence, ${strideMm} mm a tick`, () => {
       const { everyTick, every12 } = ringsAtBothCadences(strideMm)
-      expect(everyTick.closestMm).toBeGreaterThanOrEqual(CASING_RING_LAG_MM)
-      expect(every12.closestMm).toBeGreaterThanOrEqual(CASING_RING_LAG_MM)
+      expect(everyTick.closestMm).toBeGreaterThanOrEqual(casingRingLagMm())
+      expect(every12.closestMm).toBeGreaterThanOrEqual(casingRingLagMm())
     })
 
     it(`lays no more rings inside the lag than 12-tick reports, ${strideMm} mm a tick`, () => {

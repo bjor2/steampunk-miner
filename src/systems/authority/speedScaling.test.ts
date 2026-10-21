@@ -1,9 +1,6 @@
 import { beforeAll, describe, expect, it } from 'vitest'
-import {
-  CASING_RING_LAG_MM,
-  CASING_RING_SPACING_MM,
-  DRILL_STAMP_RADIUS_MM,
-} from '../../constants/balance'
+import { CASING_RING_SPACING_MM } from '../../constants/balance'
+import { casingRingLagMm, drillStampRadiusMm } from '../vehicle/drillBore'
 import { withRegistrations } from '../../registries/registrar'
 import { CUT_ENERGY_DENOMINATOR } from '../vehicle/cutCarry'
 import { cellDensitySum, YIELD_SUM } from '../world/cellYield'
@@ -42,8 +39,8 @@ import { stateDigest } from './stateDigest'
 
 const SPEEDS_M_PER_S = [84, 840, 8400]
 /** The rock round the bore's cells, by distance from the axis: inside its stamp, or within reach. */
-const CROSSED_REACH_MM = DRILL_STAMP_RADIUS_MM - MM_PER_SAMPLE
-const TOUCHED_REACH_MM = DRILL_STAMP_RADIUS_MM + MM_PER_SAMPLE
+const CROSSED_REACH_MM = drillStampRadiusMm() - MM_PER_SAMPLE
+const TOUCHED_REACH_MM = drillStampRadiusMm() + MM_PER_SAMPLE
 const AXIS_X_MM = COLUMN * 1000 + 500
 
 const cutGated = (speed: number) =>
@@ -239,8 +236,8 @@ describe('casing at 84 m/s (ticket 560)', () => {
   it('lays a ring only once the stamp is the full lag past it, and never leaves one overdue', () => {
     trail.slice(1).forEach(({ cursorYMm, waitingYMm }, at) => {
       const laid = trail[at].waitingYMm.filter((yMm) => !waitingYMm.includes(yMm))
-      expect(laid.filter((yMm) => yMm - cursorYMm < CASING_RING_LAG_MM)).toEqual([])
-      expect(waitingYMm.filter((yMm) => yMm - cursorYMm >= CASING_RING_LAG_MM)).toEqual([])
+      expect(laid.filter((yMm) => yMm - cursorYMm < casingRingLagMm())).toEqual([])
+      expect(waitingYMm.filter((yMm) => yMm - cursorYMm >= casingRingLagMm())).toEqual([])
     })
   })
 

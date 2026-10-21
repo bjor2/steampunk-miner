@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { DRILL_STAMP_RADIUS_MM } from '../../constants/balance'
+import { drillStampRadiusMm } from '../vehicle/drillBore'
 import { AUTHORITY_DEV_FLAGS, type AuthorityDevFlags } from '../../constants/devFlags'
 import { MM_PER_METRE, TICKS_PER_SECOND } from '../../constants/physics'
 import { drillStampOf } from '../vehicle/drillStamp'
@@ -145,8 +145,8 @@ describe('report capsule (ticket 537)', () => {
   })
 
   it('caps the step at one stamp radius: 950 mm is a capsule, 951 mm the bare disc', () => {
-    expect(capsuleTailOf(reportAfter(DRILL_STAMP_RADIUS_MM))).toEqual(centreOf(PREVIOUS))
-    expect(capsuleTailOf(reportAfter(DRILL_STAMP_RADIUS_MM + 1))).toBeNull()
+    expect(capsuleTailOf(reportAfter(drillStampRadiusMm()))).toEqual(centreOf(PREVIOUS))
+    expect(capsuleTailOf(reportAfter(drillStampRadiusMm() + 1))).toBeNull()
   })
 
   it('counts the capsule on the sub-step clock, charged on the law work with the carry, its gear’s cells cut every tick', () => {

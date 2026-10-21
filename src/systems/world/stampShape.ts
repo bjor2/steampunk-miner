@@ -61,7 +61,7 @@ const FALLOFF: readonly number[] = Array.from({ length: FALLOFF_STEPS + 1 }, (_,
  * The density a cut that clears its whole bore leaves a sample at, from the falloff weight the
  * stamp gave it (ticket 570, `cutFront.ts`): a ramp of `128 + 255 (d - r) / 250` across the rim,
  * as the level floor ramps, so the wall's contour lies on the stamp's circle and its diameter is
- * the stamp's (decision #36's 1.9 m). `d` is read back from the weight's falloff step, the middle
+ * the stamp's (the body plus its clearance, #661). `d` is read back from the weight's falloff step, the middle
  * of its band; the full-weight core is cleared.
  */
 export function boreWallTargetOf(weight: number, radiusMm: number): number {

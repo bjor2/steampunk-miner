@@ -127,7 +127,7 @@ export const DEV_FLAG_ROWS: readonly DevFlagRow[] = [
     line: 'Each report carves the whole path since the last one.',
     scope: 'authority',
     meaning:
-      'At interval 1 a report carves the capsule from the last reported pose, capped at one stamp radius (950 mm).',
+      'At interval 1 a report carves the capsule from the last reported pose, capped at one stamp radius, half the bore.',
     isOnByDefault: AUTHORITY_DEV_FLAGS['drill.reportCapsule'],
     applyRule: AUTHORITY_APPLY_RULE,
     pairingRule: 'Live only with drill.exactCarry on, at a report every tick.',

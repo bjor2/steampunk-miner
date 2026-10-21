@@ -4,8 +4,8 @@
  * chunk corner, and the rig's top cutting step, its stats-derived bound through its planet's
  * softest rock (ticket 334). Only the lane and specs ask it; the authority never trims a cut by it.
  */
-import { DRILL_STAMP_RADIUS_MM } from '../../constants/balance'
 import { MM_PER_METRE, UP_VECTOR_SCALE } from '../../constants/physics'
+import { drillStampRadiusMm } from '../vehicle/drillBore'
 import { stepBoundsOf } from '../vehicle/stepBound'
 import { CHUNK_SIZE } from '../world/tileGrid'
 import type { DiscStamp } from '../world/stampShape'
@@ -41,7 +41,7 @@ function spanFromCorner(heading: { x: number; y: number }, stepMm: number): Disc
   return {
     xMm: CORNER_MM.xMm + along(heading.x),
     yMm: CORNER_MM.yMm + along(heading.y),
-    radiusMm: DRILL_STAMP_RADIUS_MM,
+    radiusMm: drillStampRadiusMm(),
     floorRadiusMm: null,
     tail: CORNER_MM,
   }

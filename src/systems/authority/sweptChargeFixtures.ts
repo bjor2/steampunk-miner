@@ -12,7 +12,7 @@
  * #466's recorder held the carried-in work: each tick's ledger pays the debt the tick before left,
  * so the ledgers charge the paid prices, the stored carry and the debt still owed.
  */
-import { DRILL_STAMP_RADIUS_MM } from '../../constants/balance'
+import { drillStampRadiusMm } from '../vehicle/drillBore'
 import { MM_PER_METRE, TICKS_PER_SECOND } from '../../constants/physics'
 import type { CarryReach, CarryWalk } from '../vehicle/carryWalk'
 import { NO_DRIVE } from '../vehicle/driveSigns'
@@ -226,7 +226,7 @@ export interface ChargePhase {
 }
 
 /** The TD's 100 m window, with the stamp's reach either side. */
-const WINDOW_MM = 100_000 + 2 * DRILL_STAMP_RADIUS_MM
+const WINDOW_MM = 100_000 + 2 * drillStampRadiusMm()
 const WINDOW_MAX_TICKS = 2_500
 /**
  * A window holds at least this many of the rig's strides: the 3600 m/s rig no longer stops at the
@@ -237,7 +237,7 @@ const WINDOW_MIN_STRIDES = 3
 /** The window a rig cuts: the TD's 100 m, or three of its strides where those are longer. */
 function windowMmOf(rig: SpeedRig): number {
   const strideMm = (rig.speed * MM_PER_METRE) / TICKS_PER_SECOND
-  return Math.max(WINDOW_MM, WINDOW_MIN_STRIDES * strideMm + 2 * DRILL_STAMP_RADIUS_MM)
+  return Math.max(WINDOW_MM, WINDOW_MIN_STRIDES * strideMm + 2 * drillStampRadiusMm())
 }
 
 /** A leg cut through the recorder, and each tick's charge. */

@@ -20,7 +20,8 @@
  * Never refused: a grade too low for the band still lines (#41). The dock pad is never lined, as it
  * is never carved. A player grade above 15 lines at 15, the most a sample holds.
  */
-import { CASING_LINING_HALF_WIDTH_MM, DRILL_STAMP_RADIUS_MM } from '../../constants/balance'
+import { CASING_LINING_WIDTH_MM } from '../../constants/balance'
+import { drillStampRadiusMm } from '../vehicle/drillBore'
 import { cellSampleIndices } from './cellYield'
 import {
   casingValueOf,
@@ -76,8 +77,8 @@ export function casingRingAround(xMm: number, yMm: number): CasingRing {
   return {
     xMm,
     yMm,
-    clearMm: DRILL_STAMP_RADIUS_MM - CASING_LINING_HALF_WIDTH_MM,
-    widthMm: 2 * CASING_LINING_HALF_WIDTH_MM,
+    clearMm: drillStampRadiusMm() - CASING_LINING_WIDTH_MM,
+    widthMm: 2 * CASING_LINING_WIDTH_MM,
   }
 }
 

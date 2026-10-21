@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
-import { DRILL_STAMP_LIFT_MM } from '../../constants/balance'
 import { VEHICLE_COLLIDER_SIZE } from '../../constants/physics'
 import { MM_PER_SAMPLE } from '../world/sampleGrid'
+import { drillStampLiftMm } from './drillBore'
 import { drillStampOf } from './drillStamp'
 import { FACING } from './vehiclePose'
 
@@ -16,6 +16,6 @@ describe('drill stamp', () => {
     const wheelsMm = 1_000_000_004 - (VEHICLE_COLLIDER_SIZE * 1000) / 2
     // 20 mm: the floor's allowance for a body resting a hair into its floor.
     expect(stamp.floorRadiusMm).toBe(Math.floor((wheelsMm + 20) / MM_PER_SAMPLE) * MM_PER_SAMPLE)
-    expect(stamp.yMm).toBe(MILLION_TILES_MM + DRILL_STAMP_LIFT_MM)
+    expect(stamp.yMm).toBe(MILLION_TILES_MM + drillStampLiftMm())
   })
 })

@@ -1,5 +1,5 @@
 import { beforeAll, describe, expect, it } from 'vitest'
-import { DRILL_STAMP_RADIUS_MM } from '../../constants/balance'
+import { drillStampRadiusMm } from '../vehicle/drillBore'
 import { MM_PER_METRE, UP_VECTOR_SCALE, VEHICLE_COLLIDER_SIZE } from '../../constants/physics'
 import type { SliceDefinition } from '../../registries/sliceDefinition'
 import { withRegistrations } from '../../registries/registrar'
@@ -69,12 +69,12 @@ describe('fresh swept stamp (ticket 439)', () => {
   })
 
   it('keeps the bare disc with its reach exactly one stamp radius from the body point', () => {
-    const { stamp, cut } = freshStampAhead(DRILL_STAMP_RADIUS_MM)
+    const { stamp, cut } = freshStampAhead(drillStampRadiusMm())
     expect(cut.tail).toEqual({ xMm: stamp.xMm, yMm: stamp.yMm })
   })
 
   it('cuts the capsule from the body point once its reach is past one stamp radius', () => {
-    const { path, stamp, cut } = freshStampAhead(DRILL_STAMP_RADIUS_MM + 1)
+    const { path, stamp, cut } = freshStampAhead(drillStampRadiusMm() + 1)
     expect(path.from).toEqual({ xMm: POSE.x, yMm: POSE.y })
     expect(cut).toEqual({ ...stamp, tail: path.from })
   })
@@ -150,7 +150,7 @@ function judgedStationsOf(run: LegRun, leg: Leg): Station[] {
     return stationsBetween(from, reachOf(leg, state)).flatMap((point) => {
       const alongMm = alongOf(leg, point)
       const judge = reaches.findIndex(
-        (reach, at) => at > tick && reach >= alongMm + DRILL_STAMP_RADIUS_MM,
+        (reach, at) => at > tick && reach >= alongMm + drillStampRadiusMm(),
       )
       if (judge < 0) return []
       const reader = groundReaderOf(states[judge].world, PARAMS)
@@ -253,7 +253,7 @@ function isInWindow(leg: Leg, { tx, ty }: TilePoint): boolean {
 }
 
 function workPerMetreOf(cut: LegCut): WorkPerMetre {
-  const run = cutLeg({ ...cut, reachMm: WINDOW_MM + 2 * DRILL_STAMP_RADIUS_MM })
+  const run = cutLeg({ ...cut, reachMm: WINDOW_MM + 2 * drillStampRadiusMm() })
   const opened = eventsOfLeg(run).flatMap((event) =>
     event.type === 'TileDestroyed' && event.cause === undefined ? [event] : [],
   )

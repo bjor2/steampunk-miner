@@ -25,7 +25,8 @@
  * path), the cells broken in order, the ground's chunks, and every `CommandRejected`. Test
  * support, never run in play.
  */
-import { DRILL_STAMP_RADIUS_MM, DRILL_SUBSTEPS_PER_TICK } from '../../constants/balance'
+import { DRILL_SUBSTEPS_PER_TICK } from '../../constants/balance'
+import { drillStampRadiusMm } from '../vehicle/drillBore'
 import { blockHardness } from '../economy/oreEconomy'
 import { subStepsPerTile } from '../vehicle/drillRule'
 import { MM_PER_METRE, TICKS_PER_SECOND, UP_VECTOR_SCALE } from '../../constants/physics'
@@ -301,7 +302,7 @@ function sessionAtStart(
 function lineThePockets(session: ScriptedSession, frame: Frame, alongMm: readonly number[]): void {
   for (const along of alongMm) {
     const at = pointOnTrack(frame, along)
-    const radius = DRILL_STAMP_RADIUS_MM
+    const radius = drillStampRadiusMm()
     session.submit(0, carveCircleCommand({ ...at, radius, amount: SOLID_DENSITY }))
     session.submit(0, lineCasingCommand({ ...at, grade: CASING_GRADE }))
   }

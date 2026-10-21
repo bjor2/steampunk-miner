@@ -2,7 +2,7 @@
  * Where casing rings go (decision #41 Placement rule as amended on #56, 5 Oct), integer only: the
  * drill stamp's centre is the tunnel axis, so while the drill is cutting, each time the centre has
  * travelled 0.5 m from the last recorded axis point (squared distance in mm) it is recorded. A
- * recorded point is due for its ring once the stamp's centre is `CASING_RING_LAG_MM` past it, so
+ * recorded point is due for its ring once the stamp's centre is the ring lag past it, so
  * the drill never cuts its own fresh lining and the ring sits on the axis the stamp really took,
  * curves and drift included. Points are recorded only while drilling (#56 Q3: cement behind the
  * dig, never floor paint from idle travel), but a recorded point falls due on any later pose, so
@@ -28,11 +28,8 @@
  * `MAX_CASING_TRAIL_POINTS` the newest waiting points are dropped the same way; nothing is laid
  * before the stamp is the ring lag past it, so no ring is ever laid under or ahead of the stamp.
  */
-import {
-  CASING_RING_LAG_MM,
-  CASING_RING_SPACING_MM,
-  MAX_CASING_TRAIL_POINTS,
-} from '../../constants/balance'
+import { CASING_RING_SPACING_MM, MAX_CASING_TRAIL_POINTS } from '../../constants/balance'
+import { casingRingLagMm } from './drillBore'
 
 /** A point in world mm: where a casing ring is centred. */
 export interface RingPoint {
@@ -89,7 +86,7 @@ export function followCasingTrailAlongCut(
 /** One point per whole spacing from the last point toward the cut's end; a new cut starts as before. */
 function recordAxisPointsAlong(trail: CasingTrail, { from, to }: CutAxis): CasingTrail {
   const last = trail.lastAxisPoint
-  if (last === null || squaredDistance(last, from) > squared(CASING_RING_LAG_MM)) {
+  if (last === null || squaredDistance(last, from) > squared(casingRingLagMm())) {
     return recordAxisPoint(trail, to)
   }
   const points = spacedPointsBetween(last, to)
@@ -159,7 +156,7 @@ function isWithinSpacing(a: RingPoint, b: RingPoint): boolean {
 function stretchSince(last: RingPoint | null, stampCentre: RingPoint): number {
   if (last === null) return CASING_RING_SPACING_MM
   const squaredStretch = squaredDistance(last, stampCentre)
-  if (squaredStretch > squared(CASING_RING_LAG_MM)) return CASING_RING_SPACING_MM
+  if (squaredStretch > squared(casingRingLagMm())) return CASING_RING_SPACING_MM
   return Math.round(Math.sqrt(squaredStretch))
 }
 
@@ -174,7 +171,7 @@ function splitDuePoints(trail: CasingTrail, stampCentre: RingPoint): TrailStep {
 }
 
 function isPastLag(point: RingPoint, stampCentre: RingPoint): boolean {
-  return squaredDistance(point, stampCentre) >= squared(CASING_RING_LAG_MM)
+  return squaredDistance(point, stampCentre) >= squared(casingRingLagMm())
 }
 
 function squaredDistance(a: RingPoint, b: RingPoint): number {

@@ -6,7 +6,7 @@
  * the trail before and after it: the points that left it are the rings laid (`CasingPlaced`
  * carries no position), held against the stamp's centre at that pose.
  */
-import { CASING_RING_LAG_MM } from '../../constants/balance'
+import { casingRingLagMm } from '../vehicle/drillBore'
 import { drillStampOf } from '../vehicle/drillStamp'
 import type { RingPoint } from '../vehicle/casingTrail'
 import { FACING, type Facing } from '../vehicle/vehiclePose'
@@ -119,7 +119,7 @@ function ringsOf(reports: readonly ReportRings[]): WayBackRings {
 function isInsideLag(point: RingPoint, stamp: RingPoint): boolean {
   const dx = point.xMm - stamp.xMm
   const dy = point.yMm - stamp.yMm
-  return dx * dx + dy * dy < CASING_RING_LAG_MM * CASING_RING_LAG_MM
+  return dx * dx + dy * dy < casingRingLagMm() * casingRingLagMm()
 }
 
 function isSamePoint(a: RingPoint, b: RingPoint): boolean {

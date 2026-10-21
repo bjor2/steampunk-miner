@@ -1,5 +1,5 @@
 /**
- * Planet 1's column 30 swept straight down by the 1.9 m stamp at a chosen stride, cut at the world
+ * Planet 1's column 30 swept straight down by the drill stamp at a chosen stride, cut at the world
  * seam by a drill that clears every swept sample in its tick (the #304 law), so the same path
  * opens the same cells whatever the stride (ticket 335) and the world it leaves can be compared
  * across drill speeds (#401 VS2, the chunk diff size). Only specs use it.

@@ -1,10 +1,11 @@
 /**
- * The drill's stamp at a reported pose (decisions #36, #40): a disc of `DRILL_STAMP_RADIUS_MM`
- * centred ahead of the body along its facing in the local frame. Integer millimetres from the
+ * The drill's stamp at a reported pose (decisions #36, #40): a disc of the bore's radius
+ * (`drillBore.ts`, the body's width plus the side clearance) centred ahead of the body along its
+ * facing in the local frame. Integer millimetres from the
  * integer pose, so the authority and a predicting guest carve the same disc.
  *
- * Driving sideways on the ground (head left or right, no lift) the disc is raised by
- * `DRILL_STAMP_LIFT_MM` and given a level floor (`stampShape`) at the wheels' distance from the
+ * Driving sideways on the ground (head left or right, no lift) the disc is raised by the bore's
+ * lift (`drillStampLiftMm`) and given a level floor (`stampShape`) at the wheels' distance from the
  * planet's centre, rounded down to whole samples. A disc that only followed the body would let the
  * tunnel floor creep up or down a little every metre, with nothing to pull it back; the level
  * floor's contour lies exactly on its circle, so the body comes to rest on it, measures the same
@@ -24,13 +25,12 @@ import {
   BODY_HALF_SIZE_MM,
   CUT_FACE_MARGIN_MM,
   DRILL_STAMP_OFFSET_MM,
-  DRILL_STAMP_LIFT_MM,
-  DRILL_STAMP_RADIUS_MM,
 } from '../../constants/balance'
 import { TICKS_PER_SECOND, UP_VECTOR_SCALE, VEHICLE_COLLIDER_SIZE } from '../../constants/physics'
 import { centreDistanceFloorMmOf } from '../world/exactSquares'
 import type { DiscStamp, StampPoint } from '../world/stampShape'
 import { MM_PER_SAMPLE } from '../world/sampleGrid'
+import { drillStampLiftMm, drillStampRadiusMm } from './drillBore'
 import { FACING, facingVectorOf, type VehiclePose } from './vehiclePose'
 
 const HALF_BODY_MM = (VEHICLE_COLLIDER_SIZE * 1000) / 2
@@ -120,11 +120,11 @@ export function stampSweptFrom(stamp: DiscStamp, tail: StampPoint | null): DiscS
 function stampAheadBy(pose: VehiclePose, isLifting: boolean, aheadMm: number): DiscStamp {
   const ahead = facingVectorOf(pose.upx, pose.upy, pose.facing)
   const isLevelCut = isSideways(pose) && !isLifting
-  const lift = isLevelCut ? DRILL_STAMP_LIFT_MM : 0
+  const lift = isLevelCut ? drillStampLiftMm() : 0
   return {
     xMm: pose.x + scaled(ahead.x, aheadMm) + scaled(pose.upx, lift),
     yMm: pose.y + scaled(ahead.y, aheadMm) + scaled(pose.upy, lift),
-    radiusMm: DRILL_STAMP_RADIUS_MM,
+    radiusMm: drillStampRadiusMm(),
     floorRadiusMm: isLevelCut ? wheelFloorRadiusOf(pose, FLOOR_JITTER_MM) : null,
   }
 }

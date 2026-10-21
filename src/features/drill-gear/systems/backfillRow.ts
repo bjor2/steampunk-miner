@@ -1,8 +1,9 @@
 /**
  * Where the spoil auger throws its spoil (#162 section 1, G&V feel pass D): the row of tiles across
  * the tunnel behind the miner, against its facing, far enough back that every tile of it is at
- * least `fillBehindM` from the hull. The bore is about two metres wide (`DRILL_STAMP_RADIUS_MM`
- * 950), so the row is the tile straight behind and one either side of it, enough to plug it.
+ * least `fillBehindM` from the hull. The bore is the body plus a hand's clearance each side
+ * (`drillStampRadiusMm`, 1.2 m), so the row is the tile straight behind and one either side of it,
+ * enough to plug it.
  *
  * Integer millimetres from the integer pose, like the drill's stamp, so every machine names the
  * same tiles. Distances are measured from the vehicle's centre to the nearest point of a tile.

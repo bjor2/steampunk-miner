@@ -6,7 +6,7 @@
  * section 5) for the drill time it took, on the scripted sub-step clock since ticket 559
  * (`boreClock.ts`): a tile's own sub-steps, the part of a tick it left over spent by the next bore,
  * so a fast rig bores past 60 cells/s. The #6 movement-time model the pacing gate measures bores one
- * 1 m tile at a time, where the player's 1.9 m drill stamp (#36, #41) opens more ground per metre.
+ * 1 m tile at a time, where the player's drill stamp (#36, #661) opens more ground per metre.
  * Scripted mining lays and charges casing through the player's placement code (#115), one ring per
  * metre the bot bores, charged per metre as a player's two rings are, onto the lining bill its
  * sales settle. Positions are tile centres, upright (up = (0, 1024)), velocity 0 at each report.

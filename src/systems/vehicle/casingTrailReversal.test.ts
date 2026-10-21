@@ -1,9 +1,6 @@
 import { describe, expect, it } from 'vitest'
-import {
-  CASING_RING_LAG_MM,
-  CASING_RING_SPACING_MM,
-  MAX_CASING_TRAIL_POINTS,
-} from '../../constants/balance'
+import { CASING_RING_SPACING_MM, MAX_CASING_TRAIL_POINTS } from '../../constants/balance'
+import { casingRingLagMm } from './drillBore'
 import {
   EMPTY_CASING_TRAIL,
   followCasingTrail,
@@ -77,7 +74,7 @@ describe('casing trail of a rig cutting back over its own trail (#538)', () => {
         it(`lays no ring under the stamp or inside the lag, ${cadence}`, () => {
           const { ringDistancesMm } = cutForwardAndBack(follow, strideMm, interval)
           expect(ringDistancesMm.length).toBeGreaterThan(0)
-          expect(ringDistancesMm.filter((mm) => mm < CASING_RING_LAG_MM)).toEqual([])
+          expect(ringDistancesMm.filter((mm) => mm < casingRingLagMm())).toEqual([])
         })
 
         it(`holds no more than the cap of waiting points, ${cadence}`, () => {
@@ -91,7 +88,7 @@ describe('casing trail of a rig cutting back over its own trail (#538)', () => {
   it('holds a point every half metre of the 2.15 m lag behind a straight cut, well under the cap', () => {
     let trail: CasingTrail = EMPTY_CASING_TRAIL
     for (let x = 0; x <= FORWARD_MM; x += 25) trail = followCasingTrail(trail, at(x, 0), true).trail
-    expect(trail.unlined).toHaveLength(Math.floor(CASING_RING_LAG_MM / CASING_RING_SPACING_MM) + 1)
+    expect(trail.unlined).toHaveLength(Math.floor(casingRingLagMm() / CASING_RING_SPACING_MM) + 1)
   })
 })
 
@@ -122,7 +119,7 @@ describe('casing trail of a rig looping inside its own lag (#538)', () => {
         from = to
       }
       expect(laid).toEqual([])
-      expect(trail.unlined.length).toBeGreaterThan(CASING_RING_LAG_MM / CASING_RING_SPACING_MM)
+      expect(trail.unlined.length).toBeGreaterThan(casingRingLagMm() / CASING_RING_SPACING_MM)
     })
   }
 

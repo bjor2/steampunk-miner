@@ -14,7 +14,7 @@
  * - **The floor**: a level cut's lowest part is cut a sample further on than the face, so the
  *   corner between floor and face is square where the body's lower front meets it.
  * - **The bore**: behind it the whole stamp is cleared, its wall ramped so the contour lies on the
- *   stamp's circle (`boreWallTargetOf`): the bore is the stamp's 1.9 m whatever the speed.
+ *   stamp's circle (`boreWallTargetOf`): the bore is the stamp's width whatever the speed.
  * - **What the last front crossed**: there a sample falls at most `CROSSED_DROP_MAX` a tick. The
  *   last front's ramp had already lowered it as far as the front takes it, so what lowers it now
  *   is the bore's wall following a body that slid aside: one sample's ramp across, it would drop
