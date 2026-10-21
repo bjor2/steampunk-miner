@@ -1048,7 +1048,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/input/inputRouting.test.ts` | 29 | 29 |
 | `src/systems/input/padCodes.test.ts` | 4 | 4 |
 | `src/systems/input/padFrame.test.ts` | 7 | 7 |
-| `src/systems/input/preferences.test.ts` | 22 | 22 |
+| `src/systems/input/preferences.test.ts` | 24 | 24 |
 | `src/systems/input/promptLabel.test.ts` | 8 | 8 |
 | `src/systems/input/touchBindings.test.ts` | 16 | 16 |
 | `src/systems/input/touchControls.test.ts` | 25 | 18 |
@@ -1416,6 +1416,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/store/gameStore.test.ts` | 26 | 26 |
 | `src/store/hintSlice.test.ts` | 15 | 15 |
 | `src/store/inputRuntime.test.ts` | 51 | 51 |
+| `src/store/ledgerToast.test.ts` | 5 | 5 |
 | `src/store/liveStepSlice.test.ts` | 22 | 22 |
 | `src/store/materialPopSlice.test.ts` | 4 | 4 |
 | `src/store/padRuntime.test.ts` | 16 | 14 |
@@ -1650,6 +1651,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/views/itemCardElement.test.ts` | 7 | 7 |
 | `src/systems/views/itemCardText.test.ts` | 5 | 5 |
 | `src/systems/views/itemCopyBudget.test.ts` | 7 | 7 |
+| `src/systems/views/ledgerToast.test.ts` | 4 | 4 |
 | `src/systems/views/menuFocus.test.ts` | 2 | 2 |
 | `src/systems/views/overlaySeats.test.ts` | 5 | 5 |
 | `src/systems/views/pauseMenuModel.test.ts` | 11 | 11 |

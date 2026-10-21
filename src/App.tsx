@@ -16,6 +16,7 @@ import { DeviceNotices } from './ui/stage/DeviceNotices'
 import { GameStage } from './ui/stage/GameStage'
 import { UnsupportedDeviceCard } from './ui/stage/UnsupportedDeviceCard'
 import { SliceScreen } from './ui/screens/SliceScreen'
+import { LedgerToast } from './ui/save/LedgerToast'
 import { UnsavedChip } from './ui/save/UnsavedChip'
 import { ExactAmountSheet } from './ui/sheets/ExactAmountSheet'
 import { TitleMenu } from './ui/title/TitleMenu'
@@ -41,6 +42,7 @@ export default function App() {
       <ExactAmountSheet />
       <DeviceNotices />
       <UnsavedChip />
+      <LedgerToast />
       <VersionLabel />
       <DevFlagBadge />
       <DevFlagPanel />

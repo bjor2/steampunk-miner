@@ -123,6 +123,8 @@ export const UI_IDS = {
   settingsSaveProblems: 'settings-save-problems',
   unsavedChip: 'unsaved-chip',
   unsavedChipExport: 'unsaved-chip-export',
+  /** The one-time v1 migration toast (ticket 705). */
+  ledgerToast: 'ledger-toast',
   // The pause menu (ticket 404): its first page, the save page's name field, Back and notice.
   pauseMenu: 'pause-menu',
   pauseResume: 'pause-resume',

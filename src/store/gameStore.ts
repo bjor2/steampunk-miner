@@ -416,6 +416,7 @@ export const useGameStore = create<GameState>()((set, get) => ({
     replaceSession(checkpoint.state)
     recordCheckpointLoaded(runEventPlaceOf(get()), checkpoint)
     get().startLoadedSessionDevFlags()
+    get().showLedgerToastOnce(checkpoint.migrations)
   },
 
   startNewGame: () => {

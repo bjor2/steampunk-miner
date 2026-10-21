@@ -6,13 +6,18 @@
  * phone); Import picks a file, which the checkpoint checks through the migration chain, writes into
  * the autosave and resumes. The checkpoint stays the one writer of the save folder; the shell's
  * file hand-over and picker come in through `installSaveTransfer`. As the page hides, the
- * autosave is written again only while docked, never behind the title menu.
+ * autosave is written again only while docked, never behind the title menu. A resumed save brought
+ * up from the v1 single slot shows `Old ledger restored.` once per profile (ticket 705), which
+ * keeps the seen-flag in its preferences file.
  *
  * Nothing here is authority state, a command or part of the digest.
  */
 import type { RunEventPlace } from '../logging/runEvent'
+import type { Preferences } from '../systems/input/preferences'
+import type { SaveMigration } from '../systems/save/saveMigrations'
 import type { SaveFailureCause } from '../systems/save/saveWriteFailure'
 import type { SaveSlotKey } from '../systems/save/saveSlotIndex'
+import { isLedgerToastDue } from '../systems/views/ledgerToast'
 import type { TitleMenu } from '../systems/views/titleMenuModel'
 import { readAuthorityState } from './authorityLink'
 import {
@@ -43,6 +48,8 @@ export interface SaveKeepingValues {
   unsavedProgress: UnsavedProgress | null
   /** Why the last export or import was refused; [] after one that worked. */
   saveTransferProblems: readonly string[]
+  /** `Old ledger restored.` is up (ticket 705); the toast takes itself down after its 2 s. */
+  isLedgerToastShown: boolean
 }
 
 export interface SaveKeepingActions {
@@ -56,6 +63,9 @@ export interface SaveKeepingActions {
   importSaveFromText(text: string): string[]
   /** The page is hiding: the autosave again while docked (#470 P1-8). */
   writeCheckpointOnPageHide(): void
+  /** A save resumed through these steps: the v1 toast goes up if this profile never had it. */
+  showLedgerToastOnce(migrations: readonly SaveMigration[]): void
+  dismissLedgerToast(): void
 }
 
 type SliceHost = SaveKeepingValues &
@@ -64,6 +74,8 @@ type SliceHost = SaveKeepingValues &
     planetTier: number
     depthTiles: number
     titleMenu: TitleMenu | null
+    prefs: Preferences
+    rememberLedgerToastSeen(): void
     resumeCheckpoint(checkpoint: Checkpoint): void
     closeSettings(): void
     closePauseMenu(): void
@@ -74,6 +86,7 @@ type SetSlice = (partial: Partial<SaveKeepingValues>) => void
 export const STARTING_SAVE_KEEPING: SaveKeepingValues = {
   unsavedProgress: null,
   saveTransferProblems: [],
+  isLedgerToastShown: false,
 }
 
 const NOTHING_TO_EXPORT = 'nothing is saved yet: the game saves at the dock'
@@ -103,6 +116,12 @@ export function saveKeepingActionsOf(set: SetSlice, get: () => SliceHost): SaveK
     writeCheckpointOnPageHide: () => {
       if (get().titleMenu === null) writeCheckpointWhileDocked(runEventPlaceOf(get()))
     },
+    showLedgerToastOnce: (migrations) => {
+      if (!isLedgerToastDue(migrations, get().prefs.hasSeenLedgerToast)) return
+      set({ isLedgerToastShown: true })
+      get().rememberLedgerToastSeen()
+    },
+    dismissLedgerToast: () => set({ isLedgerToastShown: false }),
   }
 }
 

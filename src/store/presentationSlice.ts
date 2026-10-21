@@ -115,6 +115,8 @@ export interface PresentationActions {
   adoptPreferences(reading: PreferencesReading): void
   /** The hints and transmissions shown so far (#16), kept in the preferences file. */
   rememberSeenHints(seenHints: readonly string[]): void
+  /** The v1 migration toast has shown (ticket 705), kept in the preferences file. */
+  rememberLedgerToastSeen(): void
   /** Refused whole: returns the problems and changes nothing, or [] and the overrides rule. */
   setBindings(overrides: unknown): string[]
   resetBindings(): void
@@ -265,6 +267,7 @@ export function presentationActionsOf(set: SetSlice, get: () => SliceHost): Pres
         bindingProblems: bindingsReset,
       }),
     rememberSeenHints: (seenHints) => savePrefs({ ...get().prefs, seenHints }),
+    rememberLedgerToastSeen: () => savePrefs({ ...get().prefs, hasSeenLedgerToast: true }),
     setBindings: (overrides) => {
       const outcome = bindingsWithOverrides(ACTION_MAP, overrides)
       set({ bindingProblems: outcome.problems })

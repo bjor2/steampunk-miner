@@ -61,6 +61,7 @@ import { RefineryBayView } from './platform/RefineryBayView'
 import { SellBayView } from './platform/SellBayView'
 import { UpgradeBayView } from './platform/UpgradeBayView'
 import { PlaquesView } from './plaques/PlaquesView'
+import { LedgerToastView } from './save/LedgerToast'
 import { UnsavedChipView } from './save/UnsavedChip'
 import { SettingsView } from './settings/SettingsView'
 import { PauseMenuView } from './pause/PauseMenuView'
@@ -316,6 +317,12 @@ function settingsTexts(model: SettingsModel): Partial<Record<UiId, string | null
 }
 
 /** The chip a save no store took puts up (ticket 479), with its Export. */
+function renderLedgerToast(): string[] {
+  return checkScreen(createElement(LedgerToastView), {
+    [UI_IDS.ledgerToast]: 'Old ledger restored.',
+  })
+}
+
 function renderUnsavedChip(): string[] {
   return checkScreen(createElement(UnsavedChipView, { cause: 'quota' }), {
     [UI_IDS.unsavedChip]: null,
@@ -722,6 +729,7 @@ function expectEveryIdRendered(): void {
   keep(renderSlowDeviceChip())
   keep(renderPauseMenu())
   keep(renderUnsavedChip())
+  keep(renderLedgerToast())
   expect(Object.values(UI_IDS).filter((id) => !found.has(id))).toEqual([])
 }
 
