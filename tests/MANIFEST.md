@@ -1215,7 +1215,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/physics/postCutHalo.test.ts` | 9 | 3 |
 | `src/physics/storedLevelReleaseTrace.lane.test.ts` | 2 | 2 |
 | `src/physics/strutColliders.test.ts` | 4 | 4 |
-| `src/physics/sweptCoreCrossing.lane.test.ts` | 7 | 4 |
+| `src/physics/sweptCoreCrossing.lane.test.ts` | 7 | 5 |
 | `src/physics/sweptCutPace.test.ts` | 5 | 2 |
 | `src/physics/sweptCutPaceWindow.lane.test.ts` | 3 | 3 |
 | `src/physics/sweptFreshCarveLoop.test.ts` | 3 | 3 |
@@ -1645,7 +1645,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/vehicle/cutCarry.test.ts` | 12 | 12 |
 | `src/systems/vehicle/cutFollowMotion.test.ts` | 19 | 19 |
 | `src/systems/vehicle/cutGate.test.ts` | 8 | 8 |
-| `src/systems/vehicle/cutStartBreakdown.test.ts` | 4 | 4 |
+| `src/systems/vehicle/cutStartBreakdown.test.ts` | 6 | 6 |
 | `src/systems/vehicle/downCutRamp.test.ts` | 12 | 12 |
 | `src/systems/vehicle/downCutRampFront.test.ts` | 5 | 5 |
 | `src/systems/vehicle/drillBore.test.ts` | 6 | 6 |
