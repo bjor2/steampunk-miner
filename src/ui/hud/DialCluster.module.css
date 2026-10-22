@@ -163,6 +163,35 @@
   background: linear-gradient(var(--color-danger) 0 34%, transparent 34%);
 }
 
+/*
+ * The per-buy cue (ticket 727): an iron pip ringed in brass on the rim, dark on the light face,
+ * turned like a mark, one notch per upgrade bought on the dial. No transition, so a buy moves it
+ * on the render it reaches.
+ */
+.cue {
+  position: absolute;
+  z-index: 1;
+  bottom: 50%;
+  left: calc(50% - 2px);
+  width: 4px;
+  height: 50%;
+  transform: rotate(var(--turn));
+  transform-origin: 50% 100%;
+  pointer-events: none;
+}
+
+.cue::before {
+  content: '';
+  position: absolute;
+  top: 1px;
+  left: 0;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: var(--material-iron-shadow);
+  box-shadow: 0 0 0 1px var(--material-brass-highlight);
+}
+
 /* The reading's glyph in the face's open foot, under the hub, where a gauge carries its name. */
 .glyph {
   position: absolute;
@@ -226,7 +255,30 @@
 }
 
 .overflow {
+  position: relative;
   flex: none;
+}
+
+/* The folded dials' cue: a pip sliding along a hairline rail under the "+N" (ticket 727). */
+.overflowCue {
+  position: absolute;
+  right: 0;
+  bottom: -3px;
+  left: 0;
+  height: 1px;
+  background: var(--material-iron-shadow);
+  pointer-events: none;
+}
+
+.overflowCue::before {
+  content: '';
+  position: absolute;
+  top: -1.5px;
+  left: calc(var(--cue-at) - 2px);
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: var(--color-parchment);
 }
 
 .overflow > [data-ui-text][data-layout] {
