@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "updated_at": "2026-10-22T11:39:55Z",
+  "updated_at": "2026-10-22T11:39:59Z",
   "entries": {
     "steampunk-loop/1": {
       "loop": "steampunk-loop",
@@ -678,9 +678,9 @@
       "slot": null,
       "state": "working",
       "issue": null,
-      "note": "testing spec #401 (Spec: New Game + save/load (slots, menus)) on d95dcc6",
+      "note": "testing spec #673 (Difficulty curve: bare on-curve rig dies to the P7 collapse cascade on most pacing seeds) on 8ebf365",
       "stale_after_min": 420,
-      "updated_at": "2026-10-22T09:58:19Z",
+      "updated_at": "2026-10-22T11:39:59Z",
       "host": "grok-bot-vm-452660841"
     },
     "steampunk-loop/10": {
