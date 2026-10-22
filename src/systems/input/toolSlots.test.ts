@@ -79,6 +79,18 @@ describe('kernel tool slots', () => {
     expect(plant.faceOf(racked, PLAYER)).toMatchObject({ cooldownPercent: 0, isOn: false })
   })
 
+  it('shows the charge size step only while the rack holds two sizes, as V steps only then', () => {
+    const step = kernelRule('kernel.tool_next_charge_size')
+    const racked = (carriedBySize: Record<number, number>) =>
+      withCharges(start(), PLAYER, {
+        ...vehicleOf(start(), PLAYER).charges,
+        isRackMounted: true,
+        carriedBySize,
+      })
+    expect(step.faceOf(racked({ 4: 2 }), PLAYER)).toBeNull()
+    expect(step.faceOf(racked({ 1: 2, 4: 1 }), PLAYER)).not.toBeNull()
+  })
+
   it('shows the guns toggle only once the guns are mounted, on while they fire on auto', () => {
     const guns = kernelRule('kernel.tool_toggle_guns')
     expect(guns.faceOf(start(), PLAYER)).toBeNull()

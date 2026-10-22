@@ -1,6 +1,6 @@
 /**
- * The bore gun's fire tile on the touch controls (ticket 314, #309 touch input): no tile until the
- * gun is mounted, then a 56 px tile beside the power-up column that fires on a tap, through the
+ * The bore gun's fire tile, a tool slot bar cell since ticket 691 (ticket 314, #309 touch input):
+ * no cell until the gun is mounted, then a 44 px cell that fires on a tap, through the
  * client's own input path, and its brass ring reads the recovery. State through `steampunkDebug`,
  * the run log and the DOM's test ids, never pixels; the tile after a shot is attached for the eye.
  */
@@ -14,8 +14,8 @@ declare global {
 }
 
 const FIRE_TILE = 'ground-gun-fire-tile'
-/** #173's touch target: 56 px on a coarse pointer. */
-const TOUCH_TARGET_PX = 56
+/** The bar's tap target (design-system.md section 9, the GD's done-when on #691): 44 px. */
+const TOUCH_TARGET_PX = 44
 
 interface GunRead {
   levels: { rate: number; penetration: number; energy: number }
@@ -26,7 +26,7 @@ interface GunRead {
 
 test.beforeEach(() => {
   const cell = currentCell()
-  // Either way up since ticket 485: held upright the tile keeps to the free edge above the cluster.
+  // Either way up since ticket 485; on the tool slot bar since ticket 691.
   test.skip(!cell.isTouch, 'the fire tile shows on touch screens')
 })
 

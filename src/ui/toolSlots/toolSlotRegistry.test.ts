@@ -29,13 +29,13 @@ const FACE: ToolFace = {
   isActing: false,
 }
 
-/** Position 1 is Digit1's, which presses `use_slot_1`; positions 11 and up have no key. */
+/** Position 1 is Digit1's, which presses `use_slot_1`; the kernel holds 9-11, so 12 is free. */
 function probeRow(overrides: Partial<ToolSlotRow> = {}): ToolSlotRow {
   return {
     id: 'tool-probe.tool',
     anchor: { row: ITEM_ID },
     touch: { gesture: 'tap', action: 'use_slot_1' },
-    position: 11,
+    position: 12,
     faceOf: () => FACE,
     ...overrides,
   }
@@ -74,7 +74,7 @@ describe('tool slot bar', () => {
     withRegistrations([probeSlice(probeRow())], () => {
       expect(readShownTools()).toEqual([])
       ownProbe()
-      expect(readShownTools()).toEqual([{ rowId: 'tool-probe.tool', position: 11, face: FACE }])
+      expect(readShownTools()).toEqual([{ rowId: 'tool-probe.tool', position: 12, face: FACE }])
     })
   })
 
@@ -104,7 +104,7 @@ describe('tool slot bar', () => {
 
   it('lists the kernel rows and the registered ones by position, as touch bindings too', () => {
     withRegistrations([probeSlice(probeRow())], () => {
-      expect(toolSlotRows().map((row) => row.position)).toEqual([9, 10, 11])
+      expect(toolSlotRows().map((row) => row.position)).toEqual([9, 10, 11, 12])
       expect(touchBindingRows().some((row) => row.id === 'tool-probe.tool')).toBe(true)
     })
   })

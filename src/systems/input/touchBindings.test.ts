@@ -93,10 +93,10 @@ describe('touch binding rules (#474)', () => {
     )
   })
 
-  it('taps next_charge_size from the kernel charge size badge, as V presses it (ticket 473)', () => {
+  it('taps next_charge_size from the kernel charge size cell, as V presses it (ticket 473, 691)', () => {
     const rows = KERNEL_TOUCH_BINDINGS.filter((row) => row.touch.action === 'next_charge_size')
     expect(rows.map((row) => [row.id, row.touch.gesture])).toEqual([
-      ['kernel.charge_size_badge', 'tap'],
+      ['kernel.tool_next_charge_size', 'tap'],
     ])
   })
 })

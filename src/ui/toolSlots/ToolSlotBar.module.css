@@ -30,6 +30,11 @@
   );
 }
 
+/* A tablet held upright: two rows of five, so the bar stays right of the stick's 40%. */
+:global([data-orientation='portrait'][data-hud-density='full']) .bar[data-over-cluster] {
+  grid-template-columns: repeat(5, var(--slot-cell));
+}
+
 :global([data-orientation='portrait'][data-hud-density='compact']) .bar {
   bottom: calc(
     var(--layout-margin) + var(--touch-cluster-height-upright) + var(--tool-bar-over-cluster-gap)
@@ -59,7 +64,7 @@
 
 /*
  * The charge size badge riding Plant charge's upper corner (ticket 473), inside the cell's box:
- * the size it plants, a tap steps it.
+ * the size it plants. It only reads; the charge size cell beside it steps the size.
  */
 .sizeBadge {
   position: absolute;
@@ -67,19 +72,13 @@
   right: 1px;
   display: grid;
   place-items: center;
-  width: 20px;
-  height: 20px;
-  padding: 0;
+  width: 18px;
+  height: 18px;
   border: 1px solid var(--color-brass);
   border-radius: 50%;
   background: var(--color-panel);
   color: var(--color-brass);
   font-size: 0.7rem;
   font-weight: 700;
-  pointer-events: auto;
-  touch-action: none;
-}
-
-.sizeBadge[data-pressed] {
-  color: var(--color-parchment);
+  pointer-events: none;
 }

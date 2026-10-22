@@ -4,7 +4,8 @@
  * stream, the cluster following the situation, the left-handed mirror, and the keyboard hiding
  * them until the next touch. Every screen is reached by taps alone. Driven by real touch events.
  * Ticket 472 (#470 P1-1): the pause button while diving, the hold while the page is hidden, and
- * the controls inside a notched safe area. Ticket 473 (#470 P1-2): the charge size badge. The HUD
+ * the controls inside a notched safe area. Ticket 473 (#470 P1-2): the charge size badge, whose
+ * step is a tool slot cell beside Plant charge since ticket 691. The HUD
  * is the boxes it declares (`data-hud`, #500), so the compact HUD's grid cells count.
  */
 import { expect, test, type Page } from '@playwright/test'
@@ -27,8 +28,8 @@ const CLUSTER_GAP_PX = 8
 const HELD_STEP_WAIT_MS = 1_000
 /** A landscape phone's notch on the stick's side (the TD's 844x390 case on #470). */
 const LEFT_NOTCH_PX = 47
-/** The smallest touch target (#470), the charge size badge's (ticket 473). */
-const TOUCH_TARGET_PX = 48
+/** The smallest tap target (the GD's done-when on #691), the charge size cell's (ticket 473). */
+const TOUCH_TARGET_PX = 44
 
 // The mobile projects run this spec too (ticket 481); WebKit may not be installed.
 skipWhereEngineIsMissing()
@@ -142,7 +143,7 @@ test.describe('screen matrix: touch controls (#173)', () => {
     expect(zone.left).toBeGreaterThanOrEqual(cell.viewport.width * 0.6 - 1)
     expect(zone.right).toBeCloseTo(cell.viewport.width, 0)
     // Nearer the left edge; sideways it fits the left half, but a phone held upright is too
-    // narrow for the 200 px cluster to (ticket 485).
+    // narrow for the 200 px row to (ticket 485; one row since ticket 691).
     expect(cluster.left).toBeLessThan(cell.viewport.width - cluster.right)
     if (!cell.isPortrait) expect(cluster.right).toBeLessThan(cell.viewport.width / 2)
     expect(cluster.bottom).toBeGreaterThan(cell.viewport.height / 2)
@@ -216,20 +217,23 @@ test.describe('screen matrix: touch pause (ticket 472)', () => {
 })
 
 test.describe('screen matrix: charge size badge (ticket 473)', () => {
-  test('steps the charge size on a tap of the badge with the same action stream as V', async ({
+  test('steps the charge size on a tap of its cell with the same action stream as V', async ({
     page,
   }) => {
     const errors = await openGame(page, currentCell())
     await stockOneChargeSize(page)
     await page.getByTestId('touch-plant_charge').waitFor()
     await expect(page.getByTestId('touch-next_charge_size')).toHaveCount(0)
+    await expect(page.getByTestId('charge-size-badge')).toHaveCount(0)
     await stockSecondChargeSize(page)
-    const badge = page.getByTestId('touch-next_charge_size')
+    // The size rides Plant charge's cell (ticket 473); the step is the tool slot cell beside it.
+    const badge = page.getByTestId('charge-size-badge')
+    const step = page.getByTestId('touch-next_charge_size')
     await expect(badge).toHaveText('1')
     const box = await boxOf(page, 'touch-next_charge_size')
     expect(Math.min(box.width, box.height)).toBeGreaterThanOrEqual(TOUCH_TARGET_PX)
     const before = (await actionStream(page)).length
-    await badge.tap()
+    await step.tap()
     await expect(badge).toHaveText('4')
     const middle = (await actionStream(page)).length
     await page.keyboard.press('KeyV')

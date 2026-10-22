@@ -663,6 +663,32 @@
       ]
     },
     {
+      "why": "The tool slot bar (ticket 691): its rows, layout, cells and overflow tray, the slices' slot and fire cells on it, the one-row touch cluster under it and the gear in its last cell.",
+      "paths": [
+        "src/ui/toolSlots/**",
+        "src/ui/registries/toolSlots.ts",
+        "src/systems/input/toolSlots.ts",
+        "src/systems/input/kernelTouchBindings.ts",
+        "src/systems/views/toolSlotBar.ts",
+        "src/features/power-up-core/ui/**",
+        "src/features/ground-gun/ui/FireToolCell.tsx",
+        "src/features/ground-gun/ui/FireToolCell.module.css",
+        "src/features/ground-gun/ui/fireToolSlot.ts",
+        "src/ui/hud/HudGearButton.tsx",
+        "src/ui/hud/HudGearButton.module.css",
+        "src/ui/touch/**"
+      ],
+      "specs": [
+        "e2e/browser/hud/toolSlotBar.spec.ts",
+        "e2e/browser/hud/hudLayout.spec.ts",
+        "e2e/browser/screens/portraitTouch.spec.ts",
+        "e2e/browser/screens/touchControls.spec.ts",
+        "e2e/browser/screens/fireTile.spec.ts",
+        "e2e/browser/screens/slotHoldRing.spec.ts",
+        "e2e/browser/ui/uiShots.spec.ts"
+      ]
+    },
+    {
       "why": "The design system's layout switch and the HUD coverage overlay (ticket 682): data-layout from the density switch, the reserved boxes and middle band, the overlay and its debug reads. tokens.css and designTokens.json stay unmapped: they reach every screen.",
       "paths": [
         "src/systems/views/designTokenCss.ts",

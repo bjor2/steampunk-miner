@@ -3,6 +3,7 @@
  * bar's grid (ticket 691), which places it and mirrors it for the left hand.
  */
 .gear {
+  display: flex;
   line-height: 0;
   pointer-events: auto;
 }

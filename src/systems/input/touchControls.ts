@@ -108,9 +108,9 @@ export function clusterActionsOf(situation: TouchSituation): ClusterActionId[] {
 }
 
 /**
- * The size the badge on the bar's Plant charge cell shows, or null for no badge (ticket 473): a
- * tap on it presses `next_charge_size` as V does, so it is drawn only while driving with the rack
- * on and V would step a size.
+ * The size the badge on the bar's Plant charge cell shows, or null for no badge (ticket 473): it
+ * is drawn only while driving with the rack on and V, or the charge size cell beside it (ticket
+ * 691), would step a size.
  */
 export function chargeSizeBadgeOf(situation: TouchSituation): number | null {
   if (!isChargeSizeSteppable(situation)) return null

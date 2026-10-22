@@ -12,6 +12,8 @@ export const DEVICE_UI_IDS = {
   touchStick: 'touch-stick',
   touchCluster: 'touch-cluster',
   touchPause: 'touch-pause',
+  /** The size Plant charge plants, riding its tool slot cell (ticket 473, ticket 691). */
+  chargeSizeBadge: 'charge-size-badge',
   deviceNotices: 'device-notices',
 } as const
 

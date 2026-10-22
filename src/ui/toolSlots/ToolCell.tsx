@@ -20,17 +20,22 @@ export interface ToolCellPointer {
   onPointerLeave?: PointerEventHandler<HTMLButtonElement>
 }
 
+/** A row's own state on the cell's button, for its CSS and the specs (`data-holding`). */
+export type ToolCellMarks = Readonly<Record<`data-${string}`, true | undefined>>
+
 export function ToolCell({
   face,
   testId,
   pointer,
   isPressed = false,
+  marks = {},
   children,
 }: {
   face: ToolFace
   testId: string
   pointer: ToolCellPointer
   isPressed?: boolean
+  marks?: ToolCellMarks
   /** What rides the cell: a corner control, a hold ring, an item card. */
   children?: ReactNode
 }) {
@@ -51,6 +56,7 @@ export function ToolCell({
         data-pressed={isPressed || undefined}
         aria-label={face.name}
         tabIndex={-1}
+        {...marks}
         {...pointer}
       >
         <VectorIcon iconId={face.iconId} size="menu" />

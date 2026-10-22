@@ -1,21 +1,20 @@
 /**
  * The touch controls held upright (#470 PT-3, ticket 485) in the matrix's portrait cells: the
  * stick zone over the lower 45% of the height from the thumb's lower corner, ending at the bottom
- * inset; a phone's cluster in two rows in the other lower corner; the slot column and the fire
- * tile on the free edge above it; every control inside the safe area, apart, off the HUD and off
- * the vehicle with a stacked loadout; and the left-hand mirror of all of it. The stick's and the
+ * inset; the cluster in one row in the other lower corner (ticket 691) with the tool slot bar
+ * standing on it, a gap above, out of the middle band; every control inside the safe area,
+ * apart, off the HUD and off the vehicle with a stacked loadout; and the left-hand mirror of it. The stick's and the
  * keys' action streams, the pause button and the taps alone run upright in
  * `touchControls.spec.ts`. Geometry through the DOM and `steampunkDebug`, never pixels.
  */
 import { expect, test, type Page } from '@playwright/test'
 import { HUD_COMPACT_COARSE_SHORT_AXIS_PX } from '../../../src/constants/screen'
 import {
-  CLUSTER_BUTTON_PX,
   CLUSTER_GAP_PX,
   INTERACT_BUTTON_PX,
   STICK_ZONE_HEIGHT_PERCENT,
   STICK_ZONE_WIDTH_PERCENT,
-  TOUCH_TILE_LANE_TOP_PERCENT,
+  TOOL_BAR_OVER_CLUSTER_GAP_PX,
 } from '../../../src/constants/touch'
 import type { ScreenCell } from './screenCells'
 import {
@@ -35,8 +34,9 @@ const PERCENT = 100
 const SLACK_PX = 1
 /** An iPhone's home bar held upright: `env(safe-area-inset-bottom)` is 34 px there. */
 const HOME_BAR_PX = 34
-/** The size badge's row on top of Interact's and the middle one, sideways and on a tablet. */
-const BADGE_ROW_PX = 48
+/** The middle band's foot (design-system.md section 9): no HUD box enters the band. */
+const MIDDLE_BAND_BOTTOM_PERCENT = 70
+const TOOL_BAR = 'hud-tool-slots'
 /** Five power-up slots, every cradle owned, so the column is as tall as it gets. */
 const STACKED_SLOTS = {
   'powerup.1': 'power.steam_shield',
@@ -47,7 +47,6 @@ const STACKED_SLOTS = {
 }
 const CRADLE_IDS = ['slot.powerup_3', 'slot.powerup_4', 'slot.powerup_5']
 const SLOT_TEST_ID_PREFIX = 'power-up-slot-'
-const FIRE_TILE = 'ground-gun-fire-tile'
 
 test.beforeEach(() => {
   const cell = currentCell()
@@ -112,7 +111,7 @@ test.describe('screen matrix: touch controls held upright (ticket 485)', () => {
     })
   })
 
-  test('lays the cluster in the other lower corner, in two rows on a phone, a gap clear of the zone', async ({
+  test('lays the cluster in the other lower corner, in one row, a gap clear of the zone', async ({
     page,
   }) => {
     const cell = currentCell()
@@ -121,45 +120,44 @@ test.describe('screen matrix: touch controls held upright (ticket 485)', () => {
     const cluster = await boxOf(page, 'touch-cluster')
     const zone = await boxOf(page, 'touch-stick-zone')
     const safe = await boxOf(page, 'safe-area')
-    expect(Math.abs(cluster.height - clusterHeightOf(cell))).toBeLessThanOrEqual(SLACK_PX)
+    expect(Math.abs(cluster.height - INTERACT_BUTTON_PX)).toBeLessThanOrEqual(SLACK_PX)
     expect(cluster.left - zone.right).toBeGreaterThanOrEqual(CLUSTER_GAP_PX)
     expect(cluster.top).toBeGreaterThanOrEqual(zoneTopOf(cell) - SLACK_PX)
     expect(isInside(cluster, safe)).toBe(true)
     const interact = await boxOf(page, 'touch-interact')
     expect(Math.abs(interact.right - cluster.right)).toBeLessThanOrEqual(SLACK_PX)
     expect(Math.abs(interact.bottom - cluster.bottom)).toBeLessThanOrEqual(SLACK_PX)
-    for (const id of ['touch-plant_charge', 'touch-toggle_guns']) {
-      expect(isInside(await boxOf(page, id), cluster), id).toBe(true)
-    }
+    // Plant charge and the guns toggle are bar cells now (the G&V ruling on #691).
+    const inCluster = page.getByTestId('touch-cluster')
+    await expect(inCluster.getByTestId('touch-plant_charge')).toHaveCount(0)
+    await expect(inCluster.getByTestId('touch-toggle_guns')).toHaveCount(0)
     expect(errors).toEqual([])
   })
 
-  test('keeps the slot column and the fire tile on the free edge above the cluster', async ({
+  test('stands the tool slot bar on the cluster, a gap above it, clear of the zone and the band', async ({
     page,
   }) => {
     const cell = currentCell()
     const errors = await openGame(page, cell)
     await stackLoadout(page)
+    const bar = await boxOf(page, TOOL_BAR)
     const cluster = await boxOf(page, 'touch-cluster')
     const zone = await boxOf(page, 'touch-stick-zone')
-    const slots = await slotBoxes(page)
-    expect(slots).toHaveLength(Object.keys(STACKED_SLOTS).length)
-    const laneTop = (cell.viewport.height * TOUCH_TILE_LANE_TOP_PERCENT.portrait) / PERCENT
-    for (const slot of slots) {
-      expect(Math.abs(slot.right - cluster.right), slot.testId).toBeLessThanOrEqual(SLACK_PX)
-      expect(slot.top, slot.testId).toBeGreaterThanOrEqual(laneTop - SLACK_PX)
+    expect(cluster.top - bar.bottom).toBeGreaterThanOrEqual(CLUSTER_GAP_PX - SLACK_PX)
+    expect(bar.left - zone.right).toBeGreaterThanOrEqual(0)
+    const cells = (await declaredHudBoxes(page)).filter((box) => isBarBox(box))
+    expect(cells.length).toBeGreaterThan(0)
+    for (const each of cells) {
+      expect(Math.min(each.width, each.height), each.testId).toBeGreaterThanOrEqual(44)
     }
-    const [fire] = (await declaredHudBoxes(page)).filter((box) => box.testId === FIRE_TILE)
-    const columnFoot = Math.max(...slots.map((slot) => slot.bottom))
-    expect(Math.abs(fire.bottom - columnFoot)).toBeLessThanOrEqual(SLACK_PX)
-    expect(fire.left - zone.right).toBeGreaterThanOrEqual(CLUSTER_GAP_PX)
-    // Above the cluster's buttons: a tablet's three-row grid keeps the badge's row free beside
-    // them, as sideways.
-    const buttonsTop = Math.min(...(await clusterButtonBoxes(page)).map((button) => button.top))
-    for (const tile of [...slots, fire]) {
-      expect(buttonsTop - tile.bottom, tile.testId).toBeGreaterThanOrEqual(
-        CLUSTER_GAP_PX - SLACK_PX,
+    if (isPhone(cell)) {
+      // The ruled placement: right-aligned on the row, the ruled gap above it, out of the band.
+      expect(Math.abs(bar.right - cluster.right)).toBeLessThanOrEqual(SLACK_PX)
+      expect(Math.abs(cluster.top - bar.bottom - TOOL_BAR_OVER_CLUSTER_GAP_PX)).toBeLessThanOrEqual(
+        SLACK_PX,
       )
+      const bandBottom = (cell.viewport.height * MIDDLE_BAND_BOTTOM_PERCENT) / PERCENT
+      for (const each of cells) expect(each.top, each.testId).toBeGreaterThanOrEqual(bandBottom)
     }
     expect(errors).toEqual([])
   })
@@ -189,10 +187,9 @@ test.describe('screen matrix: touch controls held upright (ticket 485)', () => {
     expect(zone.left - cluster.right).toBeGreaterThanOrEqual(CLUSTER_GAP_PX)
     const interact = await boxOf(page, 'touch-interact')
     expect(Math.abs(interact.left - cluster.left)).toBeLessThanOrEqual(SLACK_PX)
-    for (const slot of await slotBoxes(page)) {
-      expect(Math.abs(slot.left - cluster.left), slot.testId).toBeLessThanOrEqual(SLACK_PX)
-    }
-    expect((await boxOf(page, FIRE_TILE)).right).toBeLessThanOrEqual(zone.left - CLUSTER_GAP_PX)
+    const bar = await boxOf(page, TOOL_BAR)
+    expect(bar.left).toBeLessThan(cell.viewport.width - bar.right)
+    expect(bar.right).toBeLessThanOrEqual(zone.left)
     await expectControlsPlaced(page)
     expect(errors).toEqual([])
   })
@@ -220,13 +217,12 @@ function zoneWidthMaxOf(cell: ScreenCell): number {
   return (cell.viewport.width * STICK_ZONE_WIDTH_PERCENT) / PERCENT + SLACK_PX
 }
 
-/** Two rows on a phone (Plant charge's over Interact's), three on a tablet as sideways. */
-function clusterHeightOf(cell: ScreenCell): number {
-  const twoRows = CLUSTER_BUTTON_PX + CLUSTER_GAP_PX + INTERACT_BUTTON_PX
-  return isPhone(cell) ? twoRows : BADGE_ROW_PX + CLUSTER_GAP_PX + twoRows
-}
-
-/** Guns, a charge rack, five slotted power-ups and the bore gun: every tile and most buttons. */
+/**
+ * Guns, a charge rack, five slotted power-ups and the bore gun: more tools than the thumb cells,
+ * so the overflow cell shows too. A phone draws the first four slots; a tablet, a desktop layout,
+ * keeps cell n at position n (the five slots and the bore gun) and Plant charge and the guns
+ * behind the overflow.
+ */
 async function stackLoadout(page: Page): Promise<void> {
   const problems = await page.evaluate(
     ({ slots, cradles }) => {
@@ -241,29 +237,16 @@ async function stackLoadout(page: Page): Promise<void> {
     { slots: STACKED_SLOTS, cradles: CRADLE_IDS },
   )
   expect(problems).toEqual([])
-  await expect(page.getByTestId('touch-toggle_guns')).toBeVisible()
-  await expect(page.getByTestId('touch-plant_charge')).toBeVisible()
-  await expect(page.getByTestId(FIRE_TILE)).toBeVisible()
+  await expect(page.getByTestId(TOOL_BAR)).toBeVisible()
+  await expect(page.getByTestId('hud-tool-overflow')).toBeVisible()
   await expect(page.locator(`[data-testid^="${SLOT_TEST_ID_PREFIX}"]`)).toHaveCount(
-    Object.keys(STACKED_SLOTS).length,
+    isPhone(currentCell()) ? 4 : Object.keys(STACKED_SLOTS).length,
   )
 }
 
-async function slotBoxes(page: Page): Promise<HudBox[]> {
-  const boxes = await declaredHudBoxes(page)
-  return boxes.filter((box) => box.testId.startsWith(SLOT_TEST_ID_PREFIX))
-}
-
-function clusterButtonBoxes(page: Page): Promise<Box[]> {
-  return page
-    .getByTestId('touch-cluster')
-    .locator('button')
-    .evaluateAll((buttons) =>
-      buttons.map((button) => {
-        const { left, top, right, bottom, width, height } = button.getBoundingClientRect()
-        return { left, top, right, bottom, width, height }
-      }),
-    )
+/** The bar's cells and its gear: the `tool-slot` and `gear` boxes. */
+function isBarBox(box: HudBox): boolean {
+  return box.id === 'tool-slot' || box.id === 'gear'
 }
 
 /** Each control inside the safe area, none on another, on a HUD box or on the vehicle's body. */

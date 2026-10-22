@@ -11,7 +11,8 @@
  */
 import { vehicleOf, type AuthorityState } from '../authority/authorityState'
 import { chargesOf } from '../authority/charges/chargeRules'
-import { hudLabelIconIdOf } from '../art/icons/iconSet'
+import { CHARGE_RACK_ICON_ID, hudLabelIconIdOf } from '../art/icons/iconSet'
+import { carriedSizesOf } from '../vehicle/vehicleCharges'
 import { isGunOnAuto, mountedGunModeOf } from '../vehicle/vehicleGun'
 import { ACTION_MAP, actionDefOf, type ActionId, type ActionMap } from './actionMap'
 import type { TouchBindingRule } from './touchBindings'
@@ -44,11 +45,17 @@ export const HOTKEY_POSITIONS_MAX = 8
 
 /** After the slices' positions (power-up slots 1-7, the bore gun 8): desktop overflow on. */
 const PLANT_CHARGE_POSITION = 9
-const TOGGLE_GUNS_POSITION = 10
+const CHARGE_SIZE_POSITION = 10
+const TOGGLE_GUNS_POSITION = 11
 
 const NO_COOLDOWN = { cooldownPercent: 0, chargesLeft: 0, chargesMax: 0, isActing: false }
 
-/** Plant charge and the guns toggle, moved off the touch cluster (G&V ruling on #691, option 1). */
+/**
+ * Plant charge and the guns toggle, moved off the touch cluster (G&V ruling on #691, option 1),
+ * and the charge size step beside Plant charge: the size it plants rides Plant charge's cell as
+ * a badge (ticket 473), while the tap that steps it, as V does, is a cell of its own, so every
+ * target keeps the bar's 44 px (the GD's done-when on #691).
+ */
 export const KERNEL_TOOL_SLOT_RULES: readonly ToolSlotRule[] = [
   {
     id: 'kernel.tool_plant_charge',
@@ -56,6 +63,13 @@ export const KERNEL_TOOL_SLOT_RULES: readonly ToolSlotRule[] = [
     touch: { gesture: 'tap', action: 'plant_charge' },
     position: PLANT_CHARGE_POSITION,
     faceOf: plantChargeFaceOf,
+  },
+  {
+    id: 'kernel.tool_next_charge_size',
+    anchor: 'kernel',
+    touch: { gesture: 'tap', action: 'next_charge_size' },
+    position: CHARGE_SIZE_POSITION,
+    faceOf: chargeSizeStepFaceOf,
   },
   {
     id: 'kernel.tool_toggle_guns',
@@ -121,6 +135,18 @@ function plantChargeFaceOf(state: AuthorityState, playerId: string): ToolFace | 
   return {
     iconId: hudLabelIconIdOf('charges'),
     name: nameOf('plant_charge'),
+    isOn: false,
+    ...NO_COOLDOWN,
+  }
+}
+
+/** Only while the rack holds two sizes or more, as V steps only then. */
+function chargeSizeStepFaceOf(state: AuthorityState, playerId: string): ToolFace | null {
+  const charges = chargesOf(state, playerId)
+  if (!charges.isRackMounted || carriedSizesOf(charges).length < 2) return null
+  return {
+    iconId: CHARGE_RACK_ICON_ID,
+    name: nameOf('next_charge_size'),
     isOn: false,
     ...NO_COOLDOWN,
   }

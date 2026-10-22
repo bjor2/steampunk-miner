@@ -135,18 +135,14 @@
   left: var(--layout-margin);
 }
 
-/* Held sideways: one column with Interact at the foot, the bar left of it in the bottom row. */
-:global([data-orientation='landscape'][data-hud-density='compact']) .cluster,
-:global([data-orientation='landscape'][data-hud-density='compact'])
-  .controls[data-hand='left']
-  .cluster {
-  grid-template-columns: 72px;
-  grid-template-rows: 56px 56px 72px;
-  grid-template-areas:
-    'quick_service'
-    'request_rescue'
-    'interact';
-  place-items: end center;
+/*
+ * Held sideways: one column with Interact at the foot and the others stacked over it, only as
+ * tall as the buttons shown, so the bar fits in the bottom row left of Interact.
+ */
+:global([data-orientation='landscape'][data-hud-density='compact']) .cluster {
+  display: flex;
+  flex-direction: column-reverse;
+  align-items: center;
 }
 
 /* 35% at rest and 80% pressed, a 2 px brass rim, glyphs only (#173). */

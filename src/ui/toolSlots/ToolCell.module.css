@@ -1,5 +1,6 @@
 /*
- * A tool slot cell (ticket 691; design-system.md sections 9 and 10): the slot cell's size, an iron
+ * A tool slot cell (ticket 691; design-system.md sections 9 and 10): the slot cell's size, under
+ * the kit's coarse `--control-min` as the gear's (the grid fits the thumb zone at 360 x 640), an iron
  * well in a brass bezel, the cooldown ring sweeping inside the rim (`--cooldown` is the share
  * still to run). Brighter while pressed, acting or on; a teal rim while toggled on, so the state
  * reads in grayscale too.
@@ -16,7 +17,9 @@
   place-items: center;
   box-sizing: border-box;
   width: 100%;
+  min-width: var(--slot-cell);
   height: 100%;
+  min-height: var(--slot-cell);
   padding: 0;
   border: var(--frame-bezel) solid var(--color-brass);
   border-radius: var(--radius-panel);

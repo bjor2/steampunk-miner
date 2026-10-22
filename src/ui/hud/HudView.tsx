@@ -65,7 +65,9 @@ export function HudView({
         isFlashing={isFlashing}
         statusIconsMax={statusIconsMaxOf(density)}
       />
-      <SlicePanels slot="gauges" />
+      <div className={styles.gaugePanels} data-over-cluster={isOverTouchSurface || undefined}>
+        <SlicePanels slot="gauges" />
+      </div>
       <SlicePanels slot="banner" />
       <SlicePanels slot="position" />
       <EdgeGauge permille={strip.edgePermille} />

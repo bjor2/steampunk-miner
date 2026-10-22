@@ -23,6 +23,10 @@ export function SlotToolCell({ face: button }: ToolCellProps<SlotButton>) {
     <ToolCell
       face={button}
       testId={`power-up-slot-${button.slot}`}
+      marks={{
+        'data-holding': button.holdPercent > 0 || undefined,
+        'data-link-flash': button.isLinkFlashing || undefined,
+      }}
       pointer={{
         onPointerDown: hold.press,
         onPointerUp: hold.release,
@@ -31,7 +35,7 @@ export function SlotToolCell({ face: button }: ToolCellProps<SlotButton>) {
       }}
     >
       {button.holdPercent > 0 && <HoldRing percent={button.holdPercent} />}
-      {button.isLinkFlashing && <span className={styles.linkFlash} data-link-flash />}
+      {button.isLinkFlashing && <span className={styles.linkFlash} />}
       {hold.isCardShown && <SlotCard button={button} hold={hold} />}
     </ToolCell>
   )
@@ -40,7 +44,7 @@ export function SlotToolCell({ face: button }: ToolCellProps<SlotButton>) {
 /** The hold ring fills clockwise with the share already held; no transition, so a cancel snaps. */
 function HoldRing({ percent }: { percent: number }) {
   const ring = { '--hold': `${percent}%` } as CSSProperties
-  return <span className={styles.holdRing} style={ring} data-holding />
+  return <span className={styles.holdRing} style={ring} />
 }
 
 /** Pinned open after the release, any tap on the card closes it; its switch flips first. */
