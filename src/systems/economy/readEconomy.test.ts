@@ -56,6 +56,15 @@ describe('economy data validation', () => {
     ])
   })
 
+  it('refuses a gnaw drop that is negative or no whole number (#676)', () => {
+    const negative = economyFileCopy()
+    negative.casing.gnawMaxDrop = -1
+    expect(problemsOf(negative)).toEqual(['casing.gnawMaxDrop must be 0 or more'])
+    const fractional = economyFileCopy()
+    fractional.casing.gnawMaxDrop = 0.5
+    expect(problemsOf(fractional)).toEqual(['casing.gnawMaxDrop must be a safe integer'])
+  })
+
   it('reads the two-tier share as a fraction in lowest terms (#180)', () => {
     const reading = readEconomy(economyFile)
     if (!('economy' in reading)) throw new Error(reading.problems.join('\n'))

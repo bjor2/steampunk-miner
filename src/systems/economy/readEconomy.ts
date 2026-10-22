@@ -219,10 +219,18 @@ function readCasing(
     costCurveId,
     casingGradeStart: reader.safeInteger('casing.casingGradeStart', casing.casingGradeStart),
     casingGradeCoreMin: reader.safeInteger('casing.casingGradeCoreMin', casing.casingGradeCoreMin),
+    gnawMaxDrop: readGnawMaxDrop(reader, casing.gnawMaxDrop),
     kCasing: reader.money('casing.kCasing', casing.kCasing),
     collapseCrush: readCollapseCrush(reader, casing.collapseCrush, coreTierBand),
     cementGrades: readCasingCementGrades(reader, casing.cementGrades),
   }
+}
+
+/** A gnaw never raises a wall's grade: the drop is a whole number of grades, 0 or more (#676). */
+function readGnawMaxDrop(reader: FieldReader, value: unknown): number {
+  const drop = reader.safeInteger('casing.gnawMaxDrop', value)
+  if (drop < 0) reader.record('casing.gnawMaxDrop must be 0 or more')
+  return drop
 }
 
 /** Every hazard act's lining is a casing_cement grade, so it has a place and a price (ticket 366). */

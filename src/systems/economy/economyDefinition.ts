@@ -505,11 +505,14 @@ export interface Economy {
    * fraction a collapse takes off a vehicle caught in it (#43), for bands 1 to 5 and then the core.
    * `kCasing` is the fraction of `V(t(p, b))` one metre of first-placed lining costs (#76).
    * `cementGrades` are the hazard linings as casing_cement grades (ticket 366).
+   * `gnawMaxDrop` is how many grades a wrecker gnaw takes off a wall's native band grade against
+   * collapse, never below grade 1 (Systems ruling (C) on #676, GD lock): one global integer >= 0.
    */
   casing: {
     costCurveId: string
     casingGradeStart: number
     casingGradeCoreMin: number
+    gnawMaxDrop: number
     kCasing: BigStat
     collapseCrush: readonly BigStat[]
     cementGrades: CasingCementGrades

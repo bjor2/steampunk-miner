@@ -3,6 +3,9 @@
  *   grade G supports bands 1..G; the core needs casingGradeCoreMin (5)
  *   casingHardness(p, G) = H(t(p, G))      (re-drilling lining is band-G rock on planet p)
  * Casing drops no ore and is not a vehicle track.
+ *
+ * A gnawed wall against collapse (Systems ruling (C) on #676, the TD pin):
+ *   grade = max(1, native - min(gnaws, gnawMaxDrop))     whole grades; native = the band's grade
  */
 import type { BigStat } from '../money'
 import { ECONOMY } from './economy'
@@ -20,6 +23,21 @@ export function casingHardness(planetIndex: number, grade: number): BigStat {
 /** The least grade that holds band `band` (1 to 5), or the core when `band` is the core band. */
 export function requiredCasingGrade(band: number): number {
   return band >= ore.coreTierBand ? casing.casingGradeCoreMin : band
+}
+
+/** The least grade a gnawed wall holds: the first grade lining is laid at. */
+export const GNAWED_GRADE_FLOOR = casing.casingGradeStart
+
+/**
+ * What a wall of native grade `nativeGrade` holds against collapse after `gnaws` wrecker gnaws:
+ * at most `maxDrop` grades less, never below `GNAWED_GRADE_FLOOR`. Worked out on read, never saved.
+ */
+export function gnawedCasingGrade(
+  nativeGrade: number,
+  gnaws: number,
+  maxDrop: number = casing.gnawMaxDrop,
+): number {
+  return Math.max(GNAWED_GRADE_FLOOR, nativeGrade - Math.min(gnaws, maxDrop))
 }
 
 export function isCasingGradeEnough(grade: number, band: number): boolean {
