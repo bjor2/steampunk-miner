@@ -54,13 +54,19 @@ export interface DrillBoreRows {
 }
 
 /**
- * The drill's circular stamp (decision #36 Carving, as the GD lock on #661 re-derives it): the cut
- * is the body's width plus `sideClearanceMm` on each side. 0.5 m is #36's body plus 1.0 m (a 1.9 m
- * bore); the stamp's radius, its lift and the casing ring's lag derive from this row
- * (`vehicle/drillBore.ts`). The Gameplay & Vehicle Designer owns it as data. Rules read it at call
- * time, never at import, so a spec may set it (`withDrillSideClearance`).
+ * The drill's circular stamp (decision #36 Carving, re-ruled by the GD lock on #661 after Bjor's
+ * "we should always have the drilling just about as wide as the vehicle", 21 Oct 2026): the cut is
+ * the body's width plus `sideClearanceMm` on each side, 0.15 m, tunable 0.10 to 0.20 m. It replaces
+ * #36's body plus 1.0 m (a 1.9 m bore, a clearance of 0.5 m), whose oversize made room for a lining
+ * inside the wall; the lining now lies in the rock outside it (`world/casingLining.ts`). The
+ * stamp's radius, its lift and the casing ring's lag derive from this row (`vehicle/drillBore.ts`).
+ * The Gameplay & Vehicle Designer owns it as data. Rules read it at call time, never at import, so
+ * a spec may set it (`withDrillSideClearance`).
  */
-export const DRILL_BORE_ROWS: DrillBoreRows = { sideClearanceMm: 500 }
+export const DRILL_BORE_ROWS: DrillBoreRows = { sideClearanceMm: 150 }
+
+/** The range the GD lock on #661 lets the side clearance be tuned in, in mm. */
+export const DRILL_SIDE_CLEARANCE_RANGE_MM = { min: 100, max: 200 } as const
 
 /**
  * Where the stamp sits (#40: the drill axis is the 4-way facing in the local frame): this far
@@ -72,6 +78,18 @@ export const DRILL_BORE_ROWS: DrillBoreRows = { sideClearanceMm: 500 }
  * travelling one this offset plus the cutting bound (`travelStampAheadMmAt`).
  */
 export const DRILL_STAMP_OFFSET_MM = 500
+
+/**
+ * How far a pose report's cut runs on ahead of its stamp, along the facing (GD lock on #662, the
+ * Gameplay & Vehicle Designer's feel row: the kill-switch path digs straight down at main's pace).
+ * The report cuts the capsule from the stamp to this far past it (`reportCutStampOf`): #36's 1.9 m
+ * disc pre-cut the ground a body drove into a metre past its face, the 1.2 m bore's disc only half
+ * as far, and that path's pace follows how long ground ahead lies under the cut. Measured on the
+ * #662 branch, a straight 5 s dig off planet 1's pad at the starting drill, swept cut off, against
+ * main's 9.04 m: 0 mm cut 4.7 m, 500 mm 8.7 m, 550 mm 9.3 m, 600 mm 9.8 m. A placeholder the
+ * vehicle feel test tunes by hand; the swept cut reads it only for a cut's first bite.
+ */
+export const DRILL_REPORT_STAMP_LENGTH_MM = 550
 
 /** Half the 0.9 m body's side (#7): its face sits this far ahead of its centre. */
 export const BODY_HALF_SIZE_MM = 450
@@ -94,18 +112,27 @@ export const CUT_FACE_MARGIN_MM = 50
 export const CARRY_RELEASE_MARGIN_SAMPLES = 3
 
 /**
- * Casing lining (#41 Placement rule as amended on 5 Oct, #56 Q1): a ring is centred on the tunnel
- * axis, where the drill stamp's centre passed, and lines the annulus `stampR - 0.25 m <= d <
- * stampR + 0.25 m`, one 0.25 m sample thick on the rock side of the wall the drill cut. One ring
- * every 0.5 m the stamp cuts. The Gameplay & Vehicle Designer owns the numbers as data.
+ * Casing lining (#41 Placement rule as amended on 5 Oct, #56 Q1, moved into the wall by the GD lock
+ * on #661): a ring is centred on the tunnel axis, where the drill stamp's centre passed, and lines
+ * the annulus `stampR <= d < stampR + 0.25 m`, one 0.25 m sample thick in the rock just outside the
+ * wall the drill cut, so the lining never narrows the bore. One ring every 0.5 m the stamp cuts.
+ * The Gameplay & Vehicle Designer owns the numbers as data.
  */
 export const CASING_LINING_WIDTH_MM = 250
 export const CASING_RING_SPACING_MM = 500
 /**
+ * A cut continues the casing trail while its sweep starts within this of the trail's last point,
+ * and a point further than this starts a new cut (ticket 335). It was the ring lag, 2.15 m at #36's
+ * 1.9 m bore; ticket 662 keeps it there as the bore narrows, because a 12-tick pose report
+ * re-anchors the trail at its own stamp, a step and 0.125 m behind the swept front, and the 1.2 m
+ * bore's 1.45 m lag split an 84 m/s cut there and left 2.5 m of its rings out.
+ */
+export const CASING_CUT_CONTINUE_MM = 2150
+/**
  * Axis points waiting for their ring, a safety net that keeps the save small (ticket 538, the TD
  * ruling 6228998310 on #538: 6 to 9): waiting points lie at least `CASING_RING_SPACING_MM` apart
  * and within the ring lag (`casingRingLagMm`), so a straight cut holds at most lag / 500 of them
- * and a line through the stamp `2 x lag / 500 + 1`, 9 at #36's 1.9 m bore.
+ * and a line through the stamp `2 x lag / 500 + 1`: 9 at #36's 1.9 m bore, 6 at the 1.2 m one.
  * Only a tight loop fills it; the newest point past it is dropped, never the oldest laid inside
  * the lag.
  */

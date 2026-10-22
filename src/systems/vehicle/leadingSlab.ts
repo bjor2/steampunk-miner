@@ -29,6 +29,21 @@ export function leadingSlabOf(ground: DrillableGround, aim: DrillAim): LeadingSl
   return { uncutBp: shareInBasisPoints(uncut.length, slab.length), uncutTiles: tilesOf(uncut) }
 }
 
+/**
+ * A step's slab (ticket 662) from its front's disc and its whole reach, from the report's stamp at
+ * the face to that disc: uncut by the more uncut of the two, its cells the front's, or the reach's
+ * where the front has none. The 1.2 m bore's disc at a fast step's front starts most of a metre
+ * past the face, so on rock with a cave past it the front alone read nothing to cut; while at an
+ * up cut's start the travelling carve clears the near reach during the gate's hold, so the reach
+ * alone read the rock still ahead of the front as too little to cut. The cells, which set the
+ * cut's speed, stay the front's as #570 reads them wherever it has any: a reach of a whole tick's
+ * step (60 m at 3600 m/s) would slow it to its slowest cell anywhere along the way.
+ */
+export function slabOfStep(front: LeadingSlab, reach: LeadingSlab): LeadingSlab {
+  const uncutTiles = front.uncutTiles.length > 0 ? front.uncutTiles : reach.uncutTiles
+  return { uncutBp: Math.max(front.uncutBp, reach.uncutBp), uncutTiles }
+}
+
 function isInSlab(aim: DrillAim, sample: WeightedSample): boolean {
   if (sample.weight !== FULL_WEIGHT) return false
   return aheadOf(aim, sample) >= HALF_BODY_MM && Math.abs(acrossOf(aim, sample)) <= HALF_BODY_MM

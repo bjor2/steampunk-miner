@@ -13,19 +13,26 @@
  *   whatever the sample grid. A level cut's floor ramp (`stampShape.ts`) is the same idea.
  * - **The floor**: a level cut's lowest part is cut a sample further on than the face, so the
  *   corner between floor and face is square where the body's lower front meets it.
+ * - **The wall**: the face's side within a sample of the bore's wall is cut a sample further on
+ *   too (GD lock on #662), so the narrow bore's corner between wall and face clears the body's.
  * - **The bore**: behind it the whole stamp is cleared, its wall ramped so the contour lies on the
  *   stamp's circle (`boreWallTargetOf`): the bore is the stamp's width whatever the speed.
  * - **What the last front crossed**: there a sample falls at most `CROSSED_DROP_MAX` a tick. The
  *   last front's ramp had already lowered it as far as the front takes it, so what lowers it now
  *   is the bore's wall following a body that slid aside: one sample's ramp across, it would drop
  *   a wall sample by half its range for a slide of a few mm, a cell's edge in one frame (the GD's
- *   pop on #570). Capped, the wall moves with the slide over the ticks after.
+ *   pop on #570). Capped, the wall moves with the slide over the ticks after. An open wall sample
+ *   follows only in steps of at least half the side clearance (`wallFollowMin`): the body drifts
+ *   by fractions of a mm a tick, and a wall that followed every drift fell a density step every
+ *   few ticks long after its cell was carved (ticket 662: at the 0.15 m clearance the wall runs
+ *   through the body's own cells, which the carve-complete hook watches).
  *
  * Integer arithmetic only. The target never rises above a sample's density: the front only lowers.
  */
+import { DRILL_BORE_ROWS } from '../../constants/balance'
 import { circleExcessMm2Of } from './exactSquares'
 import { ISO_DENSITY, MM_PER_SAMPLE, SOLID_DENSITY } from './sampleGrid'
-import { boreWallTargetOf, type StampPoint, type WeightedSample } from './stampShape'
+import { boreWallTargetOf, FULL_WEIGHT, type StampPoint, type WeightedSample } from './stampShape'
 
 /**
  * The front plane: a point on it in mm, the facing it moves along (a 1024-scaled vector), and the
@@ -51,25 +58,42 @@ const AHEAD_SCALE = 1024
 /** The density the front leaves a sample at, whatever it holds now. */
 function frontTargetOf(sample: WeightedSample, front: CutFront): number {
   if (behindPointMm(sample, front.rear, front) > 0) return SOLID_DENSITY
-  const behindFront = behindPointMm(sample, front, front) + floorUndercutMm(sample, front)
-  const wall = boreWallTargetOf(sample.weight, front.radiusMm)
+  const behindFront = behindPointMm(sample, front, front) + undercutMm(sample, front)
+  const wall = boreWallTargetOf(sample.weight)
   return Math.max(sample.floor, wall, rampTargetOf(behindFront))
 }
 
 /** The most a sample the last front crossed falls in a tick: it stays solid (`ISO_DENSITY`). */
 const CROSSED_DROP_MAX = ISO_DENSITY - 1
 
+/**
+ * The least an open crossed wall sample falls once it moves: half the bore's side clearance in
+ * density (255 a sample of distance), so the wall lags a body sliding aside by at most that.
+ */
+function wallFollowMin(): number {
+  return Math.floor((SOLID_DENSITY * DRILL_BORE_ROWS.sideClearanceMm) / (2 * MM_PER_SAMPLE))
+}
+
 /** The density the front lowers a sample holding `density` to this tick; never above it. */
 export function frontLoweredTo(sample: WeightedSample, front: CutFront, density: number): number {
   const target = Math.min(density, frontTargetOf(sample, front))
   if (!isPastCrossedRamp(sample, front)) return target
-  return Math.max(target, density - CROSSED_DROP_MAX)
+  const lowered = Math.max(target, density - CROSSED_DROP_MAX)
+  return isWallDrift(sample, density, density - lowered) ? density : lowered
+}
+
+/**
+ * A crossed sample of the bore's wall band (not its core), already open, asked to fall less than
+ * a step: a solid one is still the wall the body meets, and falls at once.
+ */
+function isWallDrift(sample: WeightedSample, density: number, drop: number): boolean {
+  return sample.weight < FULL_WEIGHT && density < ISO_DENSITY && drop < wallFollowMin()
 }
 
 /** The last front's ramp, its floor undercut counted, had reached the bottom of its fall here. */
 function isPastCrossedRamp(sample: WeightedSample, front: CutFront): boolean {
   if (front.crossed === null) return false
-  const behind = behindPointMm(sample, front.crossed, front) + floorUndercutMm(sample, front)
+  const behind = behindPointMm(sample, front.crossed, front) + undercutMm(sample, front)
   return behind >= MM_PER_SAMPLE
 }
 
@@ -78,6 +102,25 @@ function behindPointMm({ sx, sy }: WeightedSample, point: StampPoint, front: Cut
   const dx = point.xMm - sx * MM_PER_SAMPLE
   const dy = point.yMm - sy * MM_PER_SAMPLE
   return Math.floor((dx * front.aheadX + dy * front.aheadY) / AHEAD_SCALE)
+}
+
+/** How much further on than the face a sample is cut: a sample near the floor or the wall. */
+function undercutMm(sample: WeightedSample, front: CutFront): number {
+  return Math.max(floorUndercutMm(sample, front), wallUndercutMm(sample, front))
+}
+
+/**
+ * The bore's wall side of the face (within a sample of the wall, either side of the path) is cut a
+ * sample further on than the face (GD lock on #662): the contour drawn between the face's ramp and
+ * the wall's rounds the corner across a whole sample, and with the bore only 0.15 m wider than the
+ * body each side that fillet reaches the body's front corner, which rests on it and stops the cut
+ * that waits on it. Cut a sample on, the fillet stands ahead of the corner.
+ */
+function wallUndercutMm({ sx, sy }: WeightedSample, front: CutFront): number {
+  const dx = sx * MM_PER_SAMPLE - front.xMm
+  const dy = sy * MM_PER_SAMPLE - front.yMm
+  const acrossMm = Math.abs(Math.floor((dx * front.aheadY - dy * front.aheadX) / AHEAD_SCALE))
+  return acrossMm >= front.radiusMm - MM_PER_SAMPLE ? MM_PER_SAMPLE : 0
 }
 
 /**

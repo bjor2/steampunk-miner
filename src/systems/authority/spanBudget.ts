@@ -44,6 +44,7 @@ function spanFromCorner(heading: { x: number; y: number }, stepMm: number): Disc
     radiusMm: drillStampRadiusMm(),
     floorRadiusMm: null,
     tail: CORNER_MM,
+    edge: 'boreWall',
   }
 }
 

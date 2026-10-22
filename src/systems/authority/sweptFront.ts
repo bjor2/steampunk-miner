@@ -143,41 +143,69 @@ function isCarriedTowardStop(params: PlanetParams, { reach, request, path }: Fro
 
 /**
  * The furthest point of the path that `work` pays a bite into the crossed cell for, and the work
- * that bite spends: the fall in the cell's price. Searched from the path's start, not the walk's
- * reach: on a tilted path the front square to the facing meets a corner of the next cell before
- * the stamp's centre enters it, and stands short of the reach where the work cannot pay that.
+ * that bite spends: the fall in the price of the cell and of the next along the facing. Searched
+ * from the path's start, not the walk's reach: on a tilted path the front square to the facing
+ * meets a corner of the next cell before the stamp's centre enters it, and stands short of the
+ * reach where the work cannot pay that. The next cell is priced too (ticket 662): a front that has
+ * cut a cell as far as the bore goes lowers the next one's first row as it moves on, and since the
+ * 1.2 m bore's wall runs through the cells on its line, a cell's price stops falling before its
+ * last row is clear, so a bite priced on it alone ran on into the next cell for nothing.
  */
 function biteOf(
   params: PlanetParams,
   sweep: FrontSweep,
-  { tile }: CellCrossing,
+  crossing: CellCrossing,
   work: number,
 ): CellBite {
   const segment = segmentOf(sweep.path.from, sweep.path.to)
-  const before = frontCarryGroundOf(params, sweep.request, sweep.path).cellAt(tile).price
-  const costAt = (mm: number) => before - priceLeftAt(params, sweep, tile, pointAlong(segment, mm))
+  const cells = [crossing.tile, nextCellOf(sweep, crossing)]
+  const before = pricesOf(frontCarryGroundOf(params, sweep.request, sweep.path), cells)
+  const costAt = (mm: number) => before - priceLeftAt(params, sweep, cells, pointAlong(segment, mm))
   const mm = furthestWithin(segment.lengthMm, (along) => costAt(along) <= work)
   return { spent: costAt(mm), front: pointAlong(segment, mm) }
 }
 
-/** What is left of the cell's price once the front at `point` has carved it alone, as the carve does. */
+/**
+ * The cell the stamp's centre crosses next after `crossing` on the path; past the path's end, the
+ * cell after it along the facing.
+ */
+function nextCellOf({ path, pose }: FrontSweep, crossing: CellCrossing): TilePoint {
+  for (let step = crossing.step + 1; step <= path.steps; step++) {
+    const tile = centreTileAtStep(path, step)
+    if (!isSameTile(tile, crossing.tile)) return tile
+  }
+  return nextCellAlongFacing(crossing.tile, pose)
+}
+
+/** The cell after `tile` along the pose's facing, on the grid axis the facing runs nearest to. */
+function nextCellAlongFacing(tile: TilePoint, pose: VehiclePose): TilePoint {
+  const ahead = facingVectorOf(pose.upx, pose.upy, pose.facing)
+  if (Math.abs(ahead.x) >= Math.abs(ahead.y)) return { ...tile, tx: tile.tx + Math.sign(ahead.x) }
+  return { ...tile, ty: tile.ty + Math.sign(ahead.y) }
+}
+
+function pricesOf(ground: CarryGround, cells: readonly TilePoint[]): number {
+  return cells.reduce((sum, cell) => sum + ground.cellAt(cell).price, 0)
+}
+
+/** What is left of the cells' prices once the front at `point` has carved them alone, as the carve does. */
 function priceLeftAt(
   params: PlanetParams,
   { request, stamp, rear, crossed, pose, path }: FrontSweep,
-  cell: TilePoint,
+  cells: readonly TilePoint[],
   point: StampPoint,
 ): number {
   const disc = { ...stamp, ...point, tail: rear }
   const window = windowAtFront(request.window, cutFrontAt({ pose, point, rear, crossed, stamp }))
-  const drillTicksOf = cellAloneOf(request.gates.drillTicksOf, cell)
+  const drillTicksOf = cellsAloneOf(request.gates.drillTicksOf, cells)
   const world = carveDisc(request.world, params, disc, window, drillTicksOf).world
-  return frontCarryGroundOf(params, { ...request, world }, path).cellAt(cell).price
+  return pricesOf(frontCarryGroundOf(params, { ...request, world }, path), cells)
 }
 
-/** `drillTicksOf` for `cell`; null, not drillable, for every other cell. */
-function cellAloneOf(drillTicksOf: CellDrillTicks, cell: TilePoint): CellDrillTicks {
+/** `drillTicksOf` for `cells`; null, not drillable, for every other cell. */
+function cellsAloneOf(drillTicksOf: CellDrillTicks, cells: readonly TilePoint[]): CellDrillTicks {
   return (tile, material, casingGrade) =>
-    tile.tx === cell.tx && tile.ty === cell.ty ? drillTicksOf(tile, material, casingGrade) : null
+    cells.some((cell) => isSameTile(cell, tile)) ? drillTicksOf(tile, material, casingGrade) : null
 }
 
 /** A straight run from one point to another, and its length in whole mm (at least 1). */

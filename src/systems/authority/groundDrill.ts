@@ -38,7 +38,7 @@ import { coreHardness, blockHardness, oreSalePrice, oreTier } from '../economy/o
 import { ZERO_MONEY, toCanonical, type BigStat } from '../money'
 import { pickedUpUnitOf, type PickedUp, type PickupFind } from '../registries/orePickup'
 import { drillDamage, subStepsPerTileAt, ticksPerTile, type DrillStats } from '../vehicle/drillRule'
-import { drillStampOf, stampSweptFrom } from '../vehicle/drillStamp'
+import { drillStampOf, reportCutStampOf, stampSweptFrom } from '../vehicle/drillStamp'
 import { ENERGY_QUANTA_PER_TICK } from '../vehicle/energyQuanta'
 import { payLawWork, payLawWorkEnergy, type LawWorkTally } from '../vehicle/cutCarry'
 import { drillQuantumOfVehicle } from '../vehicle/drillQuantum'
@@ -63,7 +63,7 @@ import { harvestCoreTile } from './coreHarvest'
 import type { DomainEventBody } from './domainEvent'
 import {
   carveCellWithGear,
-  carveStampWithGear,
+  carveRunOnWithGear,
   hasCarveRemoved,
   type DrillCarve,
   type DrillCarveRequest,
@@ -256,9 +256,12 @@ export function drillAtPose(
   clock: DrillClock = WHOLE_TICK_CLOCK,
 ): RuleEffect {
   const { pose, drive, isLifting, tail, cellsBeside } = reported
-  const bit = { pose, disc: stampSweptFrom(drillStampOf(pose, isLifting), tail), drive }
+  const bits = {
+    cut: { pose, disc: stampSweptFrom(reportCutStampOf(pose, isLifting), tail), drive },
+    gear: { pose, disc: stampSweptFrom(drillStampOf(pose, isLifting), tail), drive },
+  }
   const carve: CarveIn = (request) =>
-    carveStampWithGear(state, params, playerId, bit, request, cellsBeside)
+    carveRunOnWithGear(state, params, playerId, bits, request, cellsBeside)
   return drillGroundBy(state, params, playerId, { tile: target, carve }, requestedTicks, clock)
     .effect
 }

@@ -19,6 +19,7 @@ import { frontOfCursor } from '../systems/vehicle/sweptCut'
 import { aimVectorOfPose } from '../systems/vehicle/aim'
 import { tileOfMillimetres } from '../systems/vehicle/vehiclePose'
 import { groundReaderOf, type GroundReader } from '../systems/world/groundReader'
+import type { PlanetParams } from '../systems/world/planetParams'
 import { ISO_DENSITY, MM_PER_SAMPLE } from '../systems/world/sampleGrid'
 import type { StampPoint } from '../systems/world/stampShape'
 import { isSolidCell } from '../systems/world/worldCell'
@@ -58,9 +59,20 @@ const POP_DROP = 128
 /** The samples read around the body, metres either way: the stamp and a step past it. */
 const WINDOW_M = 3
 const HALF_BODY_M = VEHICLE_COLLIDER_SIZE / 2
-/** Across the face, metres from the centre line: the centre and a little inside each corner. */
+/**
+ * Across the face, metres from the centre line: every twentieth of a metre from a little inside
+ * one corner to a little inside the other. Since the 1.2 m bore (GD lock on #662) the cut leaves a
+ * notch a sample deep at both corners of a level cut, the floor's and the ceiling's
+ * (`cutFront.ts`), so the face the body rides lies between them, and the gap is read across it.
+ * Where the sample row nearest the ceiling falls in the wall's notch, the face between the two
+ * notches narrows to about a sample row, about a tenth of a metre, so it is read at half that.
+ */
 const CORNER_INSET_M = 1 / 20
-const ACROSS_M = [-(HALF_BODY_M - CORNER_INSET_M), 0, HALF_BODY_M - CORNER_INSET_M]
+const ACROSS_STEP_M = 1 / 20
+const ACROSS_M = Array.from(
+  { length: Math.round((2 * (HALF_BODY_M - CORNER_INSET_M)) / ACROSS_STEP_M) + 1 },
+  (_, at) => at * ACROSS_STEP_M - (HALF_BODY_M - CORNER_INSET_M),
+)
 const SCAN_STEP_M = 0.005
 const SCAN_REACH_M = 3
 /**
@@ -91,6 +103,14 @@ export function faceReadOf(tick: TickRead, last: FaceRead | null): FaceRead {
   }
 }
 
+/**
+ * The gate open on a face the cut opened, not a cave's: a judge's settle counts these, so a cut
+ * that rides on past a cave settles on its face as a fresh one does.
+ */
+export function isRidingCutFace(read: FaceRead): boolean {
+  return read.tick.authorityGate === 1 && !read.isFacingCave
+}
+
 /** Whether a drop lies outside the stretch the front crossed in its tick. */
 export function isPopIn({ sx, sy }: SampleDrop, read: FaceRead): boolean {
   if (read.front === null || read.lastFront === null) return false
@@ -103,16 +123,30 @@ export function isPopIn({ sx, sy }: SampleDrop, read: FaceRead): boolean {
 }
 
 /**
- * The line ahead of the face, as far as a step and a cell, crosses a cave the planet was generated
- * with: there the face is the cave's, not the cut's, and the cut lets the body go (#433).
+ * A line the face gap reads (`ACROSS_M`), ahead of the face as far as a step and a cell, crosses a
+ * cave the planet was generated with: there the face is the cave's, not the cut's, and the cut
+ * lets the body go (#433). Read on every line the gap reads, so a cave beside the centre line that
+ * a corner's gap meets is the cave's too.
  */
 function isFacingNaturalCave(tick: TickRead, ahead: Vector2): boolean {
   const { params } = readPlanetWorld()
   if (params === null) return false
   const reachM = HALF_BODY_M + (tick.read?.cutSpeed ?? 0) * PHYSICS_TIMESTEP + 1
+  return ACROSS_M.some((across) => isCaveOnLine(params, tick.position, { ahead, across, reachM }))
+}
+
+/** One of the gap's lines ahead of the face: its facing, its offset across it, how far it runs. */
+interface FaceLine {
+  ahead: Vector2
+  across: number
+  reachM: number
+}
+
+function isCaveOnLine(params: PlanetParams, position: Vector2, line: FaceLine): boolean {
+  const { ahead, across, reachM } = line
   for (let past = HALF_BODY_M; past <= reachM; past += CAVE_STRIDE_M) {
-    const xMm = Math.round((tick.position.x + ahead.x * past) * MM_PER_METRE)
-    const yMm = Math.round((tick.position.y + ahead.y * past) * MM_PER_METRE)
+    const xMm = Math.round((position.x + ahead.x * past - ahead.y * across) * MM_PER_METRE)
+    const yMm = Math.round((position.y + ahead.y * past + ahead.x * across) * MM_PER_METRE)
     if (!isSolidCell(cellAt(EMPTY_WORLD, params, tileOfMillimetres(xMm, yMm)))) return true
   }
   return false

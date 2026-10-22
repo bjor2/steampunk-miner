@@ -143,19 +143,21 @@ export function hasCarveRemoved(carved: DrillCarve): boolean {
 }
 
 /**
- * The cut at the bit with its gear, the gear's cells cut with the bit, or on every tick of the
- * window (the report capsule's running bite, ticket 537).
+ * A pose report's cut at the bit with its gear, the gear's cells cut with the bit, or on every tick
+ * of the window (the report capsule's running bite, ticket 537). `cut`'s stamp runs on along the
+ * facing (`reportCutStampOf`, ticket 662) while the gear's cells are read round the stamp's own
+ * centre (`gear`'s disc, `drillStampOf`), half a cell past its rim.
  */
-export function carveStampWithGear(
+export function carveRunOnWithGear(
   state: AuthorityState,
   params: PlanetParams,
   playerId: string,
-  bit: DrillBit,
+  { cut, gear }: { cut: DrillBit; gear: DrillBit },
   request: DrillCarveRequest,
-  cellsCut: CellsBesideCut = 'withBit',
+  cellsCut: CellsBesideCut,
 ): DrillCarve {
-  const read = drillGearReadAt(state, params, playerId, bit, request.gates)
-  return carveStampWithRead(params, bit, read, request, { walk: walkStampInRows, cellsCut })
+  const read = drillGearReadAt(state, params, playerId, gear, request.gates)
+  return carveStampWithRead(params, cut, read, request, { walk: walkStampInRows, cellsCut })
 }
 
 /**

@@ -1,6 +1,14 @@
 import { describe, expect, it } from 'vitest'
 import { ISO_DENSITY, MM_PER_SAMPLE, SOLID_DENSITY } from './sampleGrid'
-import { discSamplesOf, type DiscStamp, type WeightedSample } from './stampShape'
+import {
+  boreWallTargetOf,
+  cellSamplesBesideDisc,
+  discSamplesOf,
+  FULL_WEIGHT,
+  reachMmOf,
+  type DiscStamp,
+  type WeightedSample,
+} from './stampShape'
 
 /** R = 10^6 tiles in mm (ticket 339): every square of a pose there is past 2^53. */
 const MILLION_TILES_MM = 1_000_000_000
@@ -95,5 +103,56 @@ describe('swept capsule stamp (ticket 330)', () => {
     const column = disc.filter((sample) => sample.sx * MM_PER_SAMPLE === footX)
     expect(column.length).toBeGreaterThan(0)
     for (const sample of column) expect(capsule.get(keyOf(sample))).toBe(sample.weight)
+  })
+})
+
+describe('bore-walled disc (GD lock on #662, Q1 b)', () => {
+  // Column-centred at x = 20.5 m: samples sit every 250 mm, at 0, 250 and 500 mm from the axis.
+  const BORE: DiscStamp = {
+    xMm: 20_500,
+    yMm: 280_000,
+    radiusMm: 600,
+    floorRadiusMm: null,
+    edge: 'boreWall',
+  }
+  const AXIS_SX = Math.round(BORE.xMm / MM_PER_SAMPLE)
+  const ROW = BORE.yMm / MM_PER_SAMPLE
+  const weightAcross = (samples: number) =>
+    discSamplesOf(BORE).find(({ sx, sy }) => sx === AXIS_SX + samples && sy === ROW)?.weight
+
+  it('weighs its core in full out to half a sample inside its radius', () => {
+    expect(weightAcross(0)).toBe(FULL_WEIGHT)
+    expect(weightAcross(1)).toBe(FULL_WEIGHT)
+  })
+
+  it('reaches half a sample past its radius, a soft rim never past it', () => {
+    expect(reachMmOf(BORE)).toBe(BORE.radiusMm + MM_PER_SAMPLE / 2)
+    expect(reachMmOf({ ...BORE, edge: 'soft' })).toBe(BORE.radiusMm)
+    expect(weightAcross(2)).toBeGreaterThan(0)
+    expect(weightAcross(2)).toBeLessThan(FULL_WEIGHT)
+    expect(weightAcross(3)).toBeUndefined()
+  })
+
+  it('never cuts a wall sample below the ramp that lays the contour on its circle', () => {
+    const wall = discSamplesOf(BORE).find(({ sx, sy }) => sx === AXIS_SX + 2 && sy === ROW)
+    expect(wall?.floor).toBe(boreWallTargetOf(wall?.weight ?? 0))
+    // 500 mm out, 100 mm inside the 600 mm circle: open, but not to nothing.
+    expect(wall?.floor).toBeGreaterThan(0)
+    expect(wall?.floor).toBeLessThan(ISO_DENSITY)
+  })
+
+  it('ramps the wall across one sample from open to solid round its radius', () => {
+    expect(boreWallTargetOf(FULL_WEIGHT)).toBe(0)
+    expect(boreWallTargetOf(0)).toBe(SOLID_DENSITY)
+    expect(boreWallTargetOf(FULL_WEIGHT / 2)).toBe(ISO_DENSITY - 1)
+  })
+
+  it('leaves a gear cell beside it its wall band to cut, and keeps its full-weight core', () => {
+    const besideTile = { tx: 21, ty: BORE.yMm / 1000 }
+    const keys = cellSamplesBesideDisc(besideTile, BORE).map(keyOf)
+    // Column 21 starts at x = 21.0 m, the wall band's sample 500 mm from the axis.
+    expect(keys).toContain(`${AXIS_SX + 2},${ROW}`)
+    const inner = cellSamplesBesideDisc({ tx: 20, ty: BORE.yMm / 1000 }, BORE).map(keyOf)
+    expect(inner).not.toContain(`${AXIS_SX},${ROW}`)
   })
 })

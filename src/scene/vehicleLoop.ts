@@ -59,11 +59,7 @@ import type { VehicleIntent } from '../systems/vehicle/vehicleIntent'
 import type { Vector2 } from '../systems/vehicle/localFrame'
 import { driveSignsOfIntent } from '../systems/vehicle/driveSigns'
 import { drillStepCommand } from '../systems/vehicle/vehicleCommands'
-import {
-  levelSliverDrillContactOf,
-  sweptDrillContactOf,
-  type DrillContactRule,
-} from '../systems/vehicle/drillContact'
+import { sweptDrillContactOf } from '../systems/vehicle/drillContact'
 import { aimVectorOfPose } from '../systems/vehicle/aim'
 import { noseTileOf } from '../systems/vehicle/vehiclePose'
 import type { VehicleState } from '../systems/vehicle/vehicleState'
@@ -137,7 +133,7 @@ export function createVehicleLoop(fixedFlags?: DevFlags): VehicleLoop {
           canAct: canVehicleAct(vehicle),
           motion: readLocalMotion(),
           tug: readLocalTug(loop),
-          drillContactRule: drillContactRuleOf(flags),
+          drillContactRule: sweptDrillContactOf,
           cutFollowOf: cutFollowRuleOf(flags),
           frontStepOf: frontStepRuleOf(flags),
           stepBounds: stepBoundsOfFlag(flags),
@@ -277,14 +273,6 @@ function showMotion(result: VehicleStepResult): void {
   motionPresence.velocity.x = vx / MM_PER_METRE
   motionPresence.velocity.y = vy / MM_PER_METRE
   motionPresence.isLifting = result.flags.isThrusting
-}
-
-/**
- * The drill also bites on part-cut ground past the face: with the swept cut on (ticket 330), and
- * with it off on a level cut, where a lip there dead-stopped the body (ticket 516).
- */
-function drillContactRuleOf(flags: DevFlags): DrillContactRule {
-  return flags['drill.sweptCut'] ? sweptDrillContactOf : levelSliverDrillContactOf
 }
 
 /** The engine the motor drives on: the authority's read with the swept cut on (ticket 333). */

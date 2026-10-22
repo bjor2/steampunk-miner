@@ -4,7 +4,6 @@ import { CELL_KIND } from '../world/worldCell'
 import {
   drillContactOf,
   inTheWayMmOf,
-  levelSliverDrillContactOf,
   sweptDrillContactOf,
   type DrillableGround,
 } from './drillContact'
@@ -30,8 +29,8 @@ function groundWith(solid: readonly [number, number][]): DrillableGround {
 
 describe('swept drill contact (ticket 330)', () => {
   it('bites on a lip past the face that the per-report rule does not see', () => {
-    // 1.25 m ahead and 0.5 m down: past the face's reach and outside the stamp's full-weight core.
-    const lip = groundWith([[-5, -2]])
+    // 1 m ahead and 0.5 m down: past the face's reach and in the stamp's wall band, not its core.
+    const lip = groundWith([[-4, -2]])
     expect(drillContactOf(lip, AIM)).toBe('none')
     expect(sweptDrillContactOf(lip, AIM)).toBe('ahead')
   })
@@ -47,35 +46,38 @@ describe('swept drill contact (ticket 330)', () => {
   })
 })
 
-describe('level sliver contact, the shipped rule with the swept cut off (ticket 516)', () => {
-  // On a planet's surface 100 m out, so the level cut's floor sits at the wheels.
+describe('swept contact on the narrow bore, both cut paths (GD lock on #662)', () => {
+  // On a planet's surface 100 m out, facing down: the face lies 450 mm under the centre.
   const SURFACE = 100_000
-  const aimOf = (facing: VehiclePose['facing']) => {
-    const pose: VehiclePose = { x: 0, y: SURFACE, vx: 0, vy: 0, upx: 0, upy: 1024, facing }
-    return {
-      centreMm: { x: pose.x, y: pose.y },
-      facing: facingVectorOf(pose.upx, pose.upy, pose.facing),
-      stamp: drillStampOf(pose, false),
-    }
-  }
   const SURFACE_ROW = SURFACE / 250
+  const pose: VehiclePose = {
+    x: 0,
+    y: SURFACE,
+    vx: 0,
+    vy: 0,
+    upx: 0,
+    upy: 1024,
+    facing: FACING.down,
+  }
+  const DOWN_AIM = {
+    centreMm: { x: pose.x, y: pose.y },
+    facing: facingVectorOf(pose.upx, pose.upy, pose.facing),
+    stamp: drillStampOf(pose, false),
+  }
 
-  it('bites on a lip past the face of a level cut that the per-report rule does not see', () => {
-    // 1.25 m ahead at the centre's height: past the face's reach and outside the full-weight core.
-    const lip = groundWith([[-5, SURFACE_ROW]])
-    expect(drillContactOf(lip, aimOf(FACING.left))).toBe('none')
-    expect(levelSliverDrillContactOf(lip, aimOf(FACING.left))).toBe('ahead')
+  it('bites on a rim lip beside the body’s corner, just past its face, that the per-report rule does not see', () => {
+    // 0.5 m down and 0.5 m across: past the face, outside the body's width, in the wall band.
+    const lip = groundWith([[2, SURFACE_ROW - 2]])
+    expect(drillContactOf(lip, DOWN_AIM)).toBe('none')
+    expect(sweptDrillContactOf(lip, DOWN_AIM)).toBe('ahead')
   })
 
-  it('keeps the per-report rule on a cut down, where no level leg rests on a lip', () => {
-    const lip = groundWith([[0, SURFACE_ROW - 5]])
-    expect(sweptDrillContactOf(lip, aimOf(FACING.down))).toBe('ahead')
-    expect(levelSliverDrillContactOf(lip, aimOf(FACING.down))).toBe('none')
-  })
-
-  it('keeps the per-report answer wherever that rule bites', () => {
-    const inTheWay = groundWith([[-2, SURFACE_ROW]])
-    expect(levelSliverDrillContactOf(inTheWay, aimOf(FACING.left))).toBe('inTheWay')
+  it('never bites on a wall sample already down to its ramp', () => {
+    const atRamp: DrillableGround = {
+      densityAt: (sx, sy) => (sx === 2 && sy === SURFACE_ROW - 2 ? 25 : 0),
+      materialAt: () => CELL_KIND.ground,
+    }
+    expect(sweptDrillContactOf(atRamp, DOWN_AIM)).toBe('none')
   })
 })
 
