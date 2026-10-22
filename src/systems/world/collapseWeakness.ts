@@ -7,14 +7,13 @@
  *   the core). Unlined walls (casing 0) are ignored, so the unlined face and the last ~2.15 m behind
  *   the drill never make a block weak, and carving a lined sample clears it from the test.
  *
- * Breached lining (#111) is lined at an effective grade of 0, so it is weak in every band, while
- * never-lined rock stays ignored.
+ * Breached lining (#111) still counts as lined, at its band's native grade less the gnaw and never
+ * below 1 (`wallWeakness.ts`, Systems ruling (C) on #676), while never-lined rock stays ignored.
  *
  * Weakness is a pure function of the ground, so it is cached per block and recomputed only when
  * the ground it reads changed: a new delta of a chunk under the block or its border that holds other
  * density or casing over those samples (`collapseBlockGround`, #120).
  */
-import { requiredCasingGrade } from '../economy/casingGrades'
 import { blockIdOf, firstSampleOfBlock, type CollapseBlock } from './collapseBlock'
 import {
   chunksReadByBlock,
@@ -22,10 +21,8 @@ import {
   isSameGroundReadByBlock,
 } from './collapseBlockGround'
 import { COLLAPSE_BLOCK_SAMPLES } from '../../constants/balance'
-import { effectiveCasingGrade, isLined, type ChunkDelta } from './chunkDelta'
-import { casingBandOfTile } from './casingBand'
+import { isLined, type ChunkDelta } from './chunkDelta'
 import type { PlanetParams } from './planetParams'
-import { SAMPLES_PER_TILE } from './sampleGrid'
 import {
   casingAt,
   isCarvedAirAt,
@@ -33,6 +30,7 @@ import {
   openSampleLayers,
   type SampleLayers,
 } from './sampleLayers'
+import { weakerWall } from './wallWeakness'
 import type { WorldState } from './worldState'
 
 /** What `collapse_warning` reports: the weakest lining's grade and the band it sits in. */
@@ -84,7 +82,7 @@ function findWeakness(
   const layers = openSampleLayers(world, params)
   let weakest: BlockWeakness | null = null
   visitLinedWallsOfBlock(layers, block, (sx, sy) => {
-    weakest = weakerWall(weakest, layers, params, sx, sy)
+    weakest = weakerWall(weakest, casingAt(layers, sx, sy), params, sx, sy)
   })
   return weakest
 }
@@ -117,25 +115,6 @@ function visitLinedNeighbours(
   }
 }
 
-/**
- * `kept`, or the wall when it is weak and lower in grade: the lower grade wins, on a tie the first
- * met stays, so a wall met again never changes the answer. The band is read only when the wall's
- * grade could win.
- */
-function weakerWall(
-  kept: BlockWeakness | null,
-  layers: SampleLayers,
-  params: PlanetParams,
-  sx: number,
-  sy: number,
-): BlockWeakness | null {
-  const grade = effectiveCasingGrade(casingAt(layers, sx, sy))
-  if (kept !== null && grade >= kept.weakestGrade) return kept
-  const band = casingBandOfTile(params, tileOf(sx), tileOf(sy))
-  const required = requiredCasingGrade(band)
-  return grade < required ? { band, weakestGrade: grade, required } : kept
-}
-
 function isLinedWall(layers: SampleLayers, sx: number, sy: number): boolean {
   return isSolidAt(layers, sx, sy) && isLined(casingAt(layers, sx, sy))
 }
@@ -153,10 +132,6 @@ const NEIGHBOUR_OFFSETS: readonly (readonly [number, number])[] = [
 
 export function eightNeighboursOf(sample: SamplePoint): SamplePoint[] {
   return NEIGHBOUR_OFFSETS.map(([dx, dy]) => ({ sx: sample.sx + dx, sy: sample.sy + dy }))
-}
-
-function tileOf(sample: number): number {
-  return Math.floor(sample / SAMPLES_PER_TILE)
 }
 
 interface CachedWeakness {

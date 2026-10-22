@@ -169,7 +169,7 @@ describe('tunnel wrecker: gnawing (#111 Behaviour)', () => {
     expect(gnawed.every(({ ring }) => TO_X - ringX(ring) > reach)).toBe(true)
   })
 
-  it('leaves a breached stretch that warns once the vehicle comes back within 16 m', () => {
+  it('leaves a breached stretch that warns at grade 1 once the vehicle comes back within 16 m (#676)', () => {
     const { session, tick } = digPlanet6Tunnel()
     const parked = parkAt(session, tick, tick + 1800, TO_X, PLANET_6.y, 10)
     const firstRing = ringX(ofType(session.events(), 'RingGnawed')[0].ring)
@@ -180,7 +180,7 @@ describe('tunnel wrecker: gnawing (#111 Behaviour)', () => {
     }
     const warned = ofType(session.events().slice(before), 'CollapseWarned')
     expect(warned.length).toBeGreaterThan(0)
-    expect(warned.every(({ weakestGrade, band }) => weakestGrade === 0 && band === 2)).toBe(true)
+    expect(warned.every(({ weakestGrade, band }) => weakestGrade === 1 && band === 2)).toBe(true)
   })
 })
 
