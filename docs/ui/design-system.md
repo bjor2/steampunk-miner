@@ -227,6 +227,29 @@ is a mode, not a box, with every exact value and word the panels showed, their i
 with the #682 report (debug build, after undocking): **11.58% at 360x640** on the pad with the dock
 prompt up, 8.32% two tiles down, nothing in the band; **4.79% at 1280x800**.
 
+**The gauge cluster as built** (#716). The strip's bars and heat line became one cluster of
+brass dials (`ui/hud/DialCluster.tsx`) in the baked glass frame (`art.glassFrame`, a nine-slice
+drawn at a 6 px border). Its rows are data, the tool slots' pattern: `src/data/hud/gaugeCluster.json`
+lists hull, fuel, the cargo chain, heat and depth in priority order, each with a skin naming its
+baked face and needle (`art.gaugeDial`, `art.gaugeNeedle`); a skin part that is not a shipped
+final sprite fails the load test. The room is per layout and place: a phone's surface strip also
+holds the money and the chip, so it keeps 3 dials and counts the rest as "+N" (their numbers are in
+the detail); a run and desktop keep 5. Each dial is `--strip-height` less 8 px, the needle turned
+over the 240 degrees of the ticks on the needle ease, the reading's glyph in the face's open foot.
+It never prints its number: on desktop a mouse hover or a clean tap reveals it in a tag as wide
+as the widest the formatter can write (tabular numerals), and on a phone the strip stays in the top
+keep-out, so the numbers are behind the gear. The face takes the amber zone at 25% and the red at
+10% of what a reading has left, read on the render that brings the value; the ladder's tiers
+(section 7) still hatch it and pulse its glyph. The heat keeps its slot on a heat planet and draws
+only above 60%. The wagons will share the cargo chain's one dial with a count badge (HS); until a
+wagon ships the chain is the rig's own hold. The depth dial is depth over R(p) from the planet row
+(#707), with a mark at each band's head where the band readout turns on the dock column and one at
+the core's top tile (`systems/views/depthDial.ts`), never placed by hand. Measured headless at
+360x640 with money at 1e15: the strip ends at 352 px. On the compact HUD the slices' gauge panels
+(the rack, the bore gun's gauge and toggle, the item heat) no longer float up the right edge: they
+sit in one `panels` tray of the grid (under the first row upright, under the prompts sideways),
+collapsed to their glyphs and dials, opened to their words by a clean tap (`ui/hud/GaugePanels.tsx`).
+
 **The tool slot bar as built** (#691; the G&V, GD and Producer rulings on #691). The bar is the
 kernel's `ToolSlotBar` (`ui/toolSlots/`), a grid of `--slot-columns` cells of `--slot-cell` whose
 last cell is the gear button. Its tools are **rows** of the `toolSlots` registry
@@ -320,8 +343,8 @@ listed with the ticket that builds them. Every class lives in a CSS Module besid
 
 | Component     | What it is                                                                                                                                                                 | Tokens it uses                                         | Builder |
 | ------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------ | ------- |
-| strip         | the one top HUD box: three gauge bars, the heat line above 60%, depth or money + chip, status icons; read-only                                                             | layout.strip, statusIcons, gaugeFills, type.odometer   | #684    |
-| bar           | a brass gauge bar, fraction only, no number; hatched under a ladder tier                                                                                                   | materials, framePx.bezel, gaugeFills, needle motion    | #684    |
+| strip         | the one top HUD box: the gauge cluster, depth or money + chip, status icons; read-only on a phone                                                                          | layout.strip, statusIcons, type.odometer               | #684    |
+| gauge cluster | the strip's dials from a data table in the brass and glass frame: needle only, number on hover or tap on desktop, amber 25% / red 10%; overflow as "+N"                    | art.gaugeDial, art.gaugeNeedle, art.glassFrame         | #716    |
 | gauge         | the brass dial (`kit/Gauge.tsx`), needle on the spring ease; used in detail views, not the strip                                                                           | motion.needle, materials.brass, colour.dialFace        | exists  |
 | edge gauge    | a 4 px vertical gauge in the right edge lane: surface at the top, core at the foot, the rig's mark between; no number                                                      | layout.edgeGauge, colour.accent                        | #684    |
 | slot gauge    | the edge gauge on its side beside a save slot's depth (`kit/MiniGauge.tsx`): surface at the left, core at the right, the deepest dig's bead between; no number             | layout.edgeGauge, colour.accent                        | #703    |

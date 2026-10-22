@@ -1414,7 +1414,11 @@ incomePerHour}` go to `balance-report/drill-pace.ndjson`, which `pushTestMetrics
   (GD rulings 2 and 3 on #500; #486 closed the stacked gap), and logged as a `clear-view`
   annotation on the sweep. With every control owned, held sideways, the pairs a slot or the fire
   tile makes with a HUD box are logged as a `tile-lane` annotation, not asserted: #485 kept the
-  sideways tile lane where it meets the readouts and the east threat marker. Box Tester only.
+  sideways tile lane where it meets the readouts and the east threat marker. On every cell, phone
+  and full, drilling with every control owned, no `data-hud` box but the touch controls and none of
+  the slices' gauge panels (the children of `[data-panel-slot="gauges"]` on the full HUD; the
+  `panels` tray on a phone) may meet the vehicle's body or the drawn 2 s hazard strip, which must
+  draw in at least one sample (ticket 716). Box Tester only.
 - **Layout tokens and the HUD coverage overlay** (ticket 682, spec #678): `tokens.css` declares
   every token of `src/data/design/designTokens.json` as `systems/views/designTokenCss.ts` names it,
   the phone values on `:root` and the desktop's under `data-layout="desktop"`, which the shell
@@ -1435,7 +1439,17 @@ incomePerHour}` go to `balance-report/drill-pace.ndjson`, which `pushTestMetrics
   tap can reach under 44 px (`MIN_TARGET_PX`; `data-tap-exact` amounts are text), and, on the HUD
   shots, the measured share over 12% / 8% (`ui.getHudCoverage()`'s `isMeasuredWithinBudget`) or a
   `data-hud` box, touch controls included, in the middle band. The measured share is logged as a
-  `hud-coverage` annotation either way. A new sheet joins the table as one row. Box Tester only.
+  `hud-coverage` annotation either way. A new sheet joins the table as one row. The gauge
+  cluster's goldens (ticket 716): on P41 with money at 1e15 and the hull and fuel red, on the
+  surface and at 9000 bp deep, the strip must not spill, the depth dial must carry its five planet
+  marks, and on desktop every hovered dial's number tag must be the same width. Box Tester only.
+- **Gauge cluster** (ticket 716, spec #678): the dials are a data table
+  (`src/data/hud/gaugeCluster.json`, `systems/views/gaugeClusterTable.ts`) read by the pure view
+  `gaugeCluster.ts`; `gaugeCluster.test.ts` holds the table's problems, the load test that every
+  skin part is a shipped final UI sprite, the zones (amber 25%, red 10%), the room and overflow,
+  the held heat slot and the chain badge. `depthDial.test.ts` checks the depth dial on P1-P10, P41
+  and P1e6 against the planet's data: R(p) from the planet row, a band mark where the HUD's band
+  readout turns on the dock column and the core mark at `coreDepthOf`.
 - **Shared sheet** (ticket 686, spec #678): the rules are pure (`systems/views/sheetLayout.ts`:
   placement, shutter, tab bar; `cardReveal.ts`: reveal or act), the open tab and revealed card are
   the store's sheet slice, and the frame, cards and tab bar are server-rendered as views

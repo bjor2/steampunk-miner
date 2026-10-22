@@ -1567,10 +1567,10 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 
 | File | Tests | Sites |
 | --- | --- | --- |
-| `src/ui/hud/hudBoxes.test.ts` | 8 | 5 |
+| `src/ui/hud/hudBoxes.test.ts` | 9 | 6 |
 | `src/ui/hud/hudPanels.test.ts` | 5 | 5 |
 | `src/ui/hud/hudRows.test.ts` | 6 | 6 |
-| `src/ui/hud/hudStripView.test.ts` | 15 | 15 |
+| `src/ui/hud/hudStripView.test.ts` | 18 | 18 |
 | `src/ui/hud/hudText.test.ts` | 6 | 6 |
 | `src/ui/hud/warningGlowView.test.ts` | 4 | 4 |
 | `src/ui/iconCoverage.test.ts` | 9 | 9 |
@@ -1665,12 +1665,14 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/views/chargeViews.test.ts` | 14 | 14 |
 | `src/systems/views/combatStatuses.test.ts` | 8 | 8 |
 | `src/systems/views/compactNumbers.test.ts` | 3 | 3 |
+| `src/systems/views/depthDial.test.ts` | 51 | 7 |
 | `src/systems/views/designSystem.test.ts` | 19 | 19 |
 | `src/systems/views/designSystemDoc.test.ts` | 4 | 4 |
 | `src/systems/views/designTokenCss.test.ts` | 15 | 13 |
 | `src/systems/views/deviceNotices.test.ts` | 6 | 6 |
 | `src/systems/views/driveTrackCard.test.ts` | 5 | 4 |
 | `src/systems/views/gainText.test.ts` | 6 | 6 |
+| `src/systems/views/gaugeCluster.test.ts` | 16 | 16 |
 | `src/systems/views/hazardStripPlace.test.ts` | 6 | 6 |
 | `src/systems/views/hazardStripView.test.ts` | 3 | 3 |
 | `src/systems/views/heatViews.test.ts` | 5 | 5 |
