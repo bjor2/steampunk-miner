@@ -1,16 +1,18 @@
 /**
  * Drill sparks (#13 VFX): while the drill bites, sparks spray back from the tile at its nose,
- * denser and paler while it cuts lining (#41 casing feel).
+ * denser and paler while it cuts lining (#41 casing feel). Frontal drill contact with an enemy's
+ * hit throws a burst of `HIT_SPARK_BURST` from the nose on the next frame (ticket 720).
  * One fixed pool drawn as points; stepping, emitting and uploading never allocate. Presentation
  * only, so the spray steps on the render delta with its own fixed seed. The pool is render-local
  * (ticket 339, `localParticles`): drawn outside the world root, in metres from the render origin.
  */
 import { useFrame } from '@react-three/fiber'
-import { useMemo } from 'react'
+import { useEffect, useMemo } from 'react'
 import { AdditiveBlending, BufferAttribute, BufferGeometry, PointsMaterial } from 'three'
 import {
   CASING_SPARK_COLOUR,
   CASING_SPARKS_PER_SECOND,
+  HIT_SPARK_BURST,
   SCREEN_REFRESH_MS,
   SPARK_CAPACITY,
   SPARK_COLOUR,
@@ -21,7 +23,9 @@ import {
   SPARK_SPREAD_RADIANS,
   SPARKS_PER_SECOND,
 } from '../constants/scene'
+import { listenForFeedback } from '../store/feedbackBroadcast'
 import { readDrillVoice } from '../store/screenReads'
+import type { FeedbackCue } from '../systems/feedback/feedbackCues'
 import type { DrillVoice } from '../systems/audio/drillVoice'
 import { writeHeadlampDirection } from '../systems/render/headlamp'
 import {
@@ -58,6 +62,8 @@ export function Sparks() {
   useDisposeOnRelease(material)
 
   const voice = useMemo<VoiceRead>(() => ({ voice: 'rock', sinceRead: VOICE_REFRESH_SECONDS }), [])
+  const burst = useMemo<OwedBurst>(() => ({ sparks: 0 }), [])
+  useEffect(() => listenForFeedback((cue) => oweBurstOn(burst, cue)), [burst])
 
   useFrame((_, delta) => {
     followRenderOrigin(pool, poolOrigin)
@@ -65,10 +71,31 @@ export function Sparks() {
     refreshVoice(voice, material, delta)
     if (drillPresence.isDrilling)
       sprayFromNose(pool, random, spray, particlesDue(carry, sparkRateOf(voice.voice), delta))
+    sprayOwedBurst(pool, random, spray, burst)
     uploadPositions(pool, geometry)
   })
 
   return <points geometry={geometry} material={material} frustumCulled={false} />
+}
+
+/** Sparks owed by a hit on the drill face, thrown on the next frame. */
+interface OwedBurst {
+  sparks: number
+}
+
+function oweBurstOn(burst: OwedBurst, cue: FeedbackCue): void {
+  if (cue.kind === 'hit' && cue.from.kind === 'drillFace') burst.sparks = HIT_SPARK_BURST
+}
+
+function sprayOwedBurst(
+  pool: ParticlePool,
+  random: SeededRandom,
+  spray: Spray,
+  burst: OwedBurst,
+): void {
+  if (burst.sparks === 0) return
+  sprayFromNose(pool, random, spray, burst.sparks)
+  burst.sparks = 0
 }
 
 /** The drill's voice is re-read as often as the HUD re-reads, not every frame. */

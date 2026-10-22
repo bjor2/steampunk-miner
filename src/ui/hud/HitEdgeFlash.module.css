@@ -1,0 +1,34 @@
+/*
+ * A hit's red edge flash (ticket 720): a gradient from the struck edge, as deep as the warning
+ * glow, in the danger red. Only its opacity changes, so a flash costs the compositor and no layout.
+ */
+.edge {
+  position: absolute;
+  pointer-events: none;
+  opacity: var(--hit-flash, 0);
+  --hit-flash-depth: calc(var(--warn-glow-thickness) * 2);
+}
+
+.edge[data-edge='top'] {
+  inset: 0 0 auto;
+  height: var(--hit-flash-depth);
+  background: linear-gradient(to bottom, var(--color-danger), transparent);
+}
+
+.edge[data-edge='bottom'] {
+  inset: auto 0 0;
+  height: var(--hit-flash-depth);
+  background: linear-gradient(to top, var(--color-danger), transparent);
+}
+
+.edge[data-edge='left'] {
+  inset: 0 auto 0 0;
+  width: var(--hit-flash-depth);
+  background: linear-gradient(to right, var(--color-danger), transparent);
+}
+
+.edge[data-edge='right'] {
+  inset: 0 0 0 auto;
+  width: var(--hit-flash-depth);
+  background: linear-gradient(to left, var(--color-danger), transparent);
+}

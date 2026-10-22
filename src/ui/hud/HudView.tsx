@@ -2,7 +2,8 @@
  * The in-run HUD drawn from its view model (#33 section 5; the strip of ticket 684); markup only.
  * The strip is the one always-on top box, the edge gauge sits in the right edge lane and the tool
  * slot bar (ticket 691) holds the tools and the gear button that opens the strip's detail. The
- * warning glow (ticket 685) lies along the screen's edges under every other part. Each kernel
+ * warning glow (ticket 685) lies along the screen's edges under every other part, with a hit's
+ * red edge flash (ticket 720) just above it. Each kernel
  * slot is followed by its slice panels
  * (feature-slices.md 3.14): `gauges`, `banner` and `position` keep their order after the strip,
  * so a slice's own panel still lays itself out. The overlay layer (#208) comes first, so every
@@ -18,6 +19,7 @@ import { NO_EDGE_GLOW, type EdgeGlow } from '../../systems/views/warningWatch'
 import { DebugRunMark } from './DebugRunMark'
 import { EdgeGauge } from './EdgeGauge'
 import { HazardStrip } from './HazardStrip'
+import { HitEdgeFlash } from './HitEdgeFlash'
 import { HudDetail } from './HudDetail'
 import { HudStrip } from './HudStrip'
 import { OverlayLayer } from '../overlay/OverlayLayer'
@@ -58,6 +60,7 @@ export function HudView({
     <div className={styles.hud} data-density={density}>
       <OverlayLayer />
       <WarningGlow glow={glow} isFlashing={isFlashing} />
+      <HitEdgeFlash />
       <PopBadges />
       <HudStrip
         strip={strip}
