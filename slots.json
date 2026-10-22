@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-10-22T17:51:36+02:00",
+  "updated_at": "2026-10-22T18:00:25+02:00",
   "caps": {
     "grok": 12,
     "claude": 10,
@@ -100,11 +100,11 @@
         {
           "slot": "C9",
           "state": "busy",
-          "ticket": 711,
-          "grok_slot": 2,
-          "kind": "dev",
-          "since": "2026-10-22T17:48:00+02:00",
-          "wave": "647-3A"
+          "ticket": null,
+          "grok_slot": null,
+          "kind": "aux",
+          "since": "2026-10-22T17:59:00+02:00",
+          "label": "wave-plan 678"
         },
         {
           "slot": "C10",
@@ -119,7 +119,7 @@
       "size": 4,
       "used": 4,
       "free": 0,
-      "claims_last_hour": 8,
+      "claims_last_hour": 9,
       "name": "Claude Max 2"
     }
   ],
@@ -153,11 +153,9 @@
     },
     {
       "slot": 2,
-      "state": "dev",
-      "ticket": 711,
-      "since": "2026-10-22T17:48:00+02:00",
-      "claude_slot": 9,
-      "wave": "647-3A"
+      "state": "free",
+      "ticket": null,
+      "since": null
     },
     {
       "slot": 3,
@@ -300,11 +298,12 @@
     {
       "slot": 9,
       "state": "busy",
-      "ticket": 711,
-      "grok_slot": 2,
-      "since": "2026-10-22T17:48:00+02:00",
-      "account": 2,
-      "wave": "647-3A"
+      "ticket": null,
+      "grok_slot": null,
+      "since": "2026-10-22T17:59:00+02:00",
+      "kind": "aux",
+      "label": "wave-plan 678",
+      "account": 2
     },
     {
       "slot": 10,
@@ -317,17 +316,17 @@
     }
   ],
   "last_refill": {
-    "at": "2026-10-22 17:51 CEST",
+    "at": "2026-10-22 18:00 CEST",
     "mode": "refill-dev",
-    "triggers": "claude-run:wave-plan",
-    "started": "#723->C7/A2",
-    "note": "spawned 1 worker(s)"
+    "triggers": "#711",
+    "started": "",
+    "note": "dev slots full"
   },
   "totals": {
     "grok": {
       "size": 12,
-      "used": 4,
-      "dev": 4,
+      "used": 3,
+      "dev": 3,
       "dev_cap": 8,
       "planner": 0,
       "planner_cap": 4
@@ -387,19 +386,6 @@
         ],
         "done": [],
         "live": 0
-      },
-      {
-        "number": 712,
-        "key": "647-3A",
-        "map": 647,
-        "lane": "remote",
-        "mode": "solo",
-        "state": "running",
-        "tickets": [
-          711
-        ],
-        "done": [],
-        "live": 1
       },
       {
         "number": 694,
