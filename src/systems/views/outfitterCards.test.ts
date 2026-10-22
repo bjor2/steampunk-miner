@@ -3,7 +3,10 @@ import { createScriptedSession, dockInBay } from '../authority/scriptedSession'
 import { UPGRADE_IDS } from '../economy/economyDefinition'
 import { vehicleStatsAt } from '../economy/vehicleStats'
 import { fromCanonical } from '../money'
+import { CLICK_CHAIN } from '../authority/purchaseChain'
+import { buyGunCommand } from '../platform/platformCommands'
 import { grantMoneyCommand } from '../startScenarioCommands'
+import { teleportToDockCommand } from '../vehicle/vehicleCommands'
 import { canonicalStatsOf } from '../vehicle/vehicleStatsView'
 import { gainTextOf } from './gainText'
 import { outfitterCardsOf } from './outfitterCards'
@@ -99,3 +102,33 @@ describe('outfitter cards: a track note', () => {
     )
   })
 })
+
+describe('outfitter cards: the new-capability flag', () => {
+  it('marks only the two mounts on a new rig, never a track, Casing or Repair', () => {
+    const { cards } = cardsAtUpgradeBay('1e30')
+    expect(cards.filter((card) => card.isNewCapability).map((card) => card.id)).toEqual([
+      'upgrade-bay.card.guns',
+      'upgrade-bay.card.entry.ground-gun.mount',
+    ])
+  })
+
+  it('marks the Guns card while it offers the mount, and not once the guns are on', () => {
+    const session = createScriptedSession()
+    session.submit(1, { type: 'debug.setPlanet', payload: { planetIndex: 4 } })
+    session.submit(1, grantMoneyCommand('1e30'))
+    session.submit(1, teleportToDockCommand('upgrade'))
+    expect(cardOf(gunsCardsOf(session), 'guns').isNewCapability).toBe(true)
+    session.submit(2, buyGunCommand(CLICK_CHAIN))
+    expect(cardOf(gunsCardsOf(session), 'guns').isNewCapability).toBe(false)
+  })
+})
+
+function gunsCardsOf(session: ReturnType<typeof createScriptedSession>) {
+  const model = selectUpgradeBayModel(session.state(), 'p1', {
+    isTravelArmed: false,
+    isQuickServiceHighlighted: false,
+    focusedId: null,
+    installingUpgradeId: null,
+  })
+  return outfitterCardsOf(model)
+}

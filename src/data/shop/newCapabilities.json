@@ -1,0 +1,8 @@
+{
+  "$comment": "What counts as a new capability (spec #678, Progression 1 and 2; tickets 718 and 719): a buy that gives the rig something it could not do before (a module, a weapon, a wagon or a drill type), as against a stat step (a track level, a casing grade, a gun, rack or Mark level), a refill or a service. The unlock reveal plays on the first buy of one (ticket 718), and the shop's guidance chip puts the cheapest unowned one first (ticket 719); both read this one table through `systems/views/newCapability.ts`. Every vehicle item the tree unlocks is one: the modules, the Armoury's weapon modules and the drill gear (heads, collars, flanks). The rest are listed one by one, each new only while none is owned: the auto-gun turret (its later levels are stat steps) and the bore gun's mount. Left out: lining types, which change the rings laid in the shaft and show nothing on the rig, and the charge rack, which bolts on with the first charges bought, a refill. Wagons ship nothing yet; their item joins this list when they do.",
+  "kinds": ["vehicle-item"],
+  "items": [
+    { "kind": "module", "id": "guns" },
+    { "kind": "bore-gun", "id": "ground-gun.mount" }
+  ]
+}
