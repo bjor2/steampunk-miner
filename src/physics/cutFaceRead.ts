@@ -5,6 +5,7 @@
  * front did not cross (a pop) can be told from the face moving on. Test support only.
  */
 import {
+  GROUND_PROBE_DEPTH,
   MM_PER_METRE,
   PHYSICS_TIMESTEP,
   UP_VECTOR_SCALE,
@@ -43,6 +44,11 @@ export interface FaceRead {
   movedM: number
   /** A cave the planet was generated with lies on the line ahead of the face, within the step. */
   isFacingCave: boolean
+  /**
+   * The ground probe's line under the body is open in the ground the planet was generated with: the
+   * body stands on its corners over a natural hollow, a cave smaller than a cell (#433).
+   */
+  isOverNaturalHollow: boolean
   samples: Map<string, number>
 }
 
@@ -79,6 +85,7 @@ export function faceReadOf(tick: TickRead, last: FaceRead | null): FaceRead {
     ahead,
     movedM: last === null ? 0 : distanceOf(tick.position, last.tick.position),
     isFacingCave: isFacingNaturalCave(tick, ahead),
+    isOverNaturalHollow: isOverNaturalHollow(tick),
     samples,
   }
 }
@@ -112,6 +119,21 @@ function isFacingNaturalCave(tick: TickRead, ahead: Vector2): boolean {
 
 /** The cave line's stride: a quarter cell, so no cell on it is stepped over. */
 const CAVE_STRIDE_M = MM_PER_SAMPLE / MM_PER_METRE
+
+/** Along the ground probe's reach under the body, the generated ground is open somewhere. */
+function isOverNaturalHollow(tick: TickRead): boolean {
+  const { params } = readPlanetWorld()
+  if (params === null) return false
+  const generated = groundReaderOf(EMPTY_WORLD, params)
+  const { upx, upy } = tick.result.pose
+  const down = { x: -upx / UP_VECTOR_SCALE, y: -upy / UP_VECTOR_SCALE }
+  for (let past = HALF_BODY_M; past <= HALF_BODY_M + GROUND_PROBE_DEPTH; past += SCAN_STEP_M) {
+    const x = tick.position.x + down.x * past
+    const y = tick.position.y + down.y * past
+    if (generated.densityAtPoint(x, y) < ISO_DENSITY) return true
+  }
+  return false
+}
 
 function readerNow(): GroundReader {
   const state = readAuthorityState()

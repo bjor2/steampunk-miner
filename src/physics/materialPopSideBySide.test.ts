@@ -158,11 +158,12 @@ function notePopStarts(intake: PopIntake, starts: PopStart[]): void {
 
 const keyOf = ({ tx, ty }: { tx: number; ty: number }) => `${tx},${ty}`
 
+/** #570's judged ticks: open-gate ticks past the settle, a cave face left out and settled after. */
 function judgedOf(reads: readonly FaceRead[]): FaceRead[] {
   let openTicks = 0
   return reads.filter((read) => {
-    openTicks = read.tick.authorityGate === 1 ? openTicks + 1 : 0
-    return openTicks > SETTLE_TICKS && !read.isFacingCave
+    openTicks = read.tick.authorityGate === 1 && !read.isFacingCave ? openTicks + 1 : 0
+    return openTicks > SETTLE_TICKS
   })
 }
 

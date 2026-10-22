@@ -4,6 +4,7 @@ import { BASE_GRAVITY, PHYSICS_TIMESTEP } from '../constants/physics'
 import { createMemorySink } from '../logging/eventSink'
 import { createRunLog, installRunLog, uninstallRunLog } from '../logging/runLog'
 import { resetGameStore } from '../store/gameStore'
+import { withDriveReaching } from '../systems/authority/driveRigFixtures'
 import { buildIntent } from '../systems/input/buildIntent'
 import { createRig, type Rig, type TickRead } from './cutFollowFixtures'
 import { faceReadOf, isPopIn, type FaceRead } from './cutFaceRead'
@@ -21,8 +22,11 @@ import { faceReadOf, isPopIn, type FaceRead } from './cutFaceRead'
 // a tilted column, at 30 and 144 frames a second, and a level leg at purchase 10. A hold these legs
 // never fill keeps #399's full-hold stop out of them (see `cutSmoothness.test.ts`). Ticks whose
 // face is a cave the planet was generated with are left out: the cave is the face there, and the
-// cut lets the body go (#433). The level leg turns out of a down bore and is judged once its body
-// has left the bore it turned in.
+// cut lets the body go (#433); a cut past one settles again, as a fresh one does. So are ticks the
+// ground probe stands over a natural hollow, a cave smaller than a cell: the body stands on its
+// corners there. The level leg turns out of a down bore and is judged once its body has left the
+// bore it turned in; it carries a drive that reaches its drill's 10.7 m/s, since a sideways cut
+// moves at min(drill rate, drive speed) (Bjor's ruling on #723).
 
 /** The settle the GD lock allows after a leg's first open-gate tick. */
 const SETTLE_TICKS = 6
@@ -66,6 +70,8 @@ const LEGS: readonly FaceLeg[] = [
 const DRIVE_TICKS: Record<Start, number> = { column: 50, tilted: 120 }
 /** A level leg's turn out of its down bore: the body's own length and the bore's half width. */
 const LEVEL_APPROACH_TICKS = 30
+/** Purchase 10's cut through planet 1's band-1 rock, m/s: the level leg's drive reaches it. */
+const LEVEL_CUT_MPS = 10.7
 
 beforeAll(async () => {
   await RAPIER.init()
@@ -92,12 +98,17 @@ function judgedTicksOf(leg: FaceLeg): FaceRead[] {
 
 /** Every tick of the leg, each read with the ground around it. */
 function rideLeg(leg: FaceLeg): FaceRead[] {
-  const levels = { drill_power: leg.purchase, cargo_hold: HOLD_NEVER_FULL }
-  const rig = createRig(RAPIER, levels, leg.framesPerSecond)
+  const rig = createRig(RAPIER, levelsOf(leg), leg.framesPerSecond)
   rig.hold(buildIntent(['aim_left']), DRIVE_TICKS[leg.start])
   rig.hold(buildIntent([]), 90)
   if (leg.aim === 'aim_left') turnOutOfDownBore(rig)
   return readTicks(rig, leg.aim)
+}
+
+/** The leg's rig: its drill, and on a level leg a drive that keeps up with it. */
+function levelsOf(leg: FaceLeg): Record<string, number> {
+  const levels = { drill_power: leg.purchase, cargo_hold: HOLD_NEVER_FULL }
+  return leg.aim === 'aim_left' ? withDriveReaching(levels, LEVEL_CUT_MPS) : levels
 }
 
 function turnOutOfDownBore(rig: Rig): void {
@@ -121,9 +132,19 @@ function readTicks(rig: Rig, aim: FaceLeg['aim']): FaceRead[] {
 function judgedOf(reads: readonly FaceRead[]): FaceRead[] {
   let openTicks = 0
   return reads.filter((read) => {
-    openTicks = read.tick.authorityGate === 1 ? openTicks + 1 : 0
-    return openTicks > SETTLE_TICKS && !read.isFacingCave
+    openTicks = isOpenOnTheCut(read) ? openTicks + 1 : 0
+    return openTicks > SETTLE_TICKS
   })
+}
+
+/** The gate is open and the face is the cut's, no cave's. */
+function isOpenOnTheCut(read: FaceRead): boolean {
+  return read.tick.authorityGate === 1 && !read.isFacingCave
+}
+
+/** Off the ground with no natural hollow under the probe: the body itself left the face. */
+function isAirborne(read: FaceRead): boolean {
+  return !read.tick.isOnGround && !read.isOverNaturalHollow
 }
 
 function snapLimitOf(tick: TickRead): number {
@@ -147,7 +168,7 @@ describe('riding the cut face (ticket 570)', () => {
   })
 
   it.each(LEGS)(`stands on ground, ${ROW}`, (leg) => {
-    const airborne = judgedTicksOf(leg).filter((read) => !read.tick.isOnGround)
+    const airborne = judgedTicksOf(leg).filter(isAirborne)
     expect(airborne.length).toBe(0)
   })
 
