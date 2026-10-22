@@ -705,6 +705,23 @@
       "specs": ["e2e/browser/hud/hudCoverage.spec.ts"]
     },
     {
+      "why": "The brass gauge cluster (ticket 716): its table and skins, the dial faces and zones, the depth dial's band and core marks, and the compact tray of the slices' gauge panels, read by the UI shots, the layout spec's drilling check and the warning layer's red dial.",
+      "paths": [
+        "src/data/hud/gaugeCluster.json",
+        "src/systems/views/gaugeCluster.ts",
+        "src/systems/views/gaugeClusterTable.ts",
+        "src/systems/views/depthDial.ts",
+        "src/systems/views/hudReadings.ts",
+        "src/systems/art/uiArt.ts",
+        "public/assets/ui/**"
+      ],
+      "specs": [
+        "e2e/browser/ui/uiShots.spec.ts",
+        "e2e/browser/hud/hudLayout.spec.ts",
+        "e2e/browser/hud/warningLayer.spec.ts"
+      ]
+    },
+    {
       "why": "The UI screenshot suite (ticket 689): the HUD on the surface (with money at 1e15, ticket 684) and drilling, and every sheet, at 360x640, 390x844, 1280x800 and 1440x900, failing on overflow, a target under 44 px, coverage over budget or a box in the middle band. Anything the HUD, the coverage report or a sheet draws reaches it.",
       "paths": [
         "src/ui/hud/**",
@@ -730,8 +747,8 @@
         "src/systems/views/warningLadder.ts",
         "src/systems/views/odometer.ts",
         "src/store/hudDetailSlice.ts",
-        "src/ui/kit/GaugeBar.tsx",
-        "src/ui/kit/GaugeBar.module.css",
+        "src/systems/views/gaugeCluster.ts",
+        "src/systems/views/gaugeClusterTable.ts",
         "src/ui/kit/Odometer.tsx",
         "src/ui/kit/Odometer.module.css",
         "src/features/workshop/ui/**",
@@ -754,8 +771,8 @@
         "src/store/warningBroadcast.ts",
         "src/debug/debugWarnings.ts",
         "src/ui/hud/**",
-        "src/ui/kit/GaugeBar.tsx",
-        "src/ui/kit/GaugeBar.module.css",
+        "src/systems/views/gaugeCluster.ts",
+        "src/systems/views/gaugeClusterTable.ts",
         "src/ui/touch/touchFollowers.ts"
       ],
       "specs": ["e2e/browser/hud/warningLayer.spec.ts"]

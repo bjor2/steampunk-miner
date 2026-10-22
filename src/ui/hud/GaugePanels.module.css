@@ -66,7 +66,7 @@
 /*
  * Closed, each panel collapses to its icons (#500's compact rule: the glyph, the word in the card):
  * its plate goes, every part that neither is nor holds a glyph or a dial is hidden, and the words
- * left beside a glyph shrink to nothing. A panel of words alone (a toggle) waits for the tray to
+ * left beside a glyph shrink to nothing, out of sight. A panel of words alone (a toggle) waits for the tray to
  * open. Open, the panels draw as they are, placed in the tray.
  */
 .gaugePanels[data-hud]:not([data-open]) > * {
@@ -85,8 +85,14 @@
   display: none;
 }
 
+/* A holder of a glyph keeps no words: no size and out of sight, the glyph or dial alone seen. */
 .gaugePanels[data-hud]:not([data-open]) > :has(img, [data-permille]),
 .gaugePanels[data-hud]:not([data-open]) > * :has(img, [data-permille]) {
   gap: var(--space-1);
   font-size: 0;
+  visibility: hidden;
+}
+
+.gaugePanels[data-hud]:not([data-open]) :is(img, [data-permille]) {
+  visibility: visible;
 }

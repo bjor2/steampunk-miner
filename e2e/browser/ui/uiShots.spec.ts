@@ -1,7 +1,8 @@
 /**
  * The UI screenshot suite (spec #678, ticket 689): at 360x640 and 390x844 held upright and at
  * 1280x800 and 1440x900 (desktop is first-class, GD lock 21 Oct), the HUD on the surface, with
- * money at 1e15 (ticket 684) and while drilling, and every sheet of `uiShotSheets.ts`. Each shot is written first, for review by eye
+ * money at 1e15 (ticket 684) and while drilling, the brass gauge cluster at its widest on P41 on
+ * the surface and deep (ticket 716), and every sheet of `uiShotSheets.ts`. Each shot is written first, for review by eye
  * (`npm run ui:screens:update` puts them in `docs/ui/screens/<cell>/`), then the suite fails on
  * text that overflows, a tap target under 44 px, text under 14 px, the HUD over its coverage
  * budget (12% / 8%, the #682 overlay's report) or anything in the middle band. The shots are never
@@ -82,6 +83,28 @@ for (const cell of UI_SHOT_CELLS) {
       expect(errors).toEqual([])
     })
 
+    // Ticket 716: the gauge cluster's goldens with every readout at its widest, at P41 (HS).
+    test('fits the gauge cluster at its widest on P41, on the surface and deep', async ({
+      page,
+    }) => {
+      test.setTimeout(TEST_TIMEOUT_MS)
+      const errors = await openPlainGame(page, cell)
+      await undock(page)
+      await runDebug(page, WIDEST_P41)
+      await expect(page.getByTestId(UI_IDS.hudStripMoney)).toHaveText('1.00Qa')
+      await expect(page.getByTestId('hud-dial-hull')).toHaveAttribute('data-zone', 'red')
+      await shootAndLogCoverage(page, cell, 'hud-dials-surface')
+      await expectStripUnspilled(page)
+      await runDebug(page, [['teleportToDepth', DEEP_BP]])
+      await expect(page.getByTestId(UI_IDS.hudStripDepth)).toBeVisible()
+      await expect(page.locator('[data-testid="hud-dial-depth"] [data-mark]')).toHaveCount(5)
+      await shootAndLogCoverage(page, cell, 'hud-dials-deep')
+      await expectStripUnspilled(page)
+      if (cell.layout === 'desktop') await expectNumbersFixedWidth(page)
+      expect(await hudFindingsOf(page)).toEqual(NO_HUD_FINDINGS)
+      expect(errors).toEqual([])
+    })
+
     for (const sheet of UI_SHEETS) {
       test(`fits the ${sheet.shot} sheet with no overflow, no target under 44 px and no text under 14 px`, async ({
         page,
@@ -95,6 +118,58 @@ for (const cell of UI_SHOT_CELLS) {
       })
     }
   })
+}
+
+/** P41 (past the planet rows), money at 1e15 and the hull and fuel nearly gone: red dials. */
+const WIDEST_P41: readonly DebugCall[] = [
+  ['setPlanet', 41],
+  ['giveMoney', '1e15'],
+  ['setHull', '1'],
+  ['setEnergy', '1'],
+]
+/** Nine tenths of the way to the centre, past every band mark: the depth reads in km. */
+const DEEP_BP = 9000
+
+type DebugCall = readonly [
+  name: 'setPlanet' | 'giveMoney' | 'setHull' | 'setEnergy' | 'teleportToDepth',
+  value: number | string,
+]
+
+async function runDebug(page: Page, calls: readonly DebugCall[]): Promise<void> {
+  await page.evaluate((list) => {
+    const debug = window.steampunkDebug! as unknown as Record<
+      string,
+      (value: unknown) => { ok: boolean; problems?: string[] }
+    >
+    for (const [name, value] of list) {
+      const result = debug[name](value)
+      if (!result.ok) throw new Error(`${name}: ${(result.problems ?? []).join('; ')}`)
+    }
+  }, calls)
+}
+
+/** One line: nothing on the strip runs past its box (VS: the worst case never reflows). */
+async function expectStripUnspilled(page: Page): Promise<void> {
+  const strip = page.locator('[data-hud="strip"]')
+  const { scroll, client } = await strip.evaluate((element) => ({
+    scroll: element.scrollWidth,
+    client: element.clientWidth,
+  }))
+  expect(scroll).toBeLessThanOrEqual(client)
+}
+
+/** A hover reveals each dial's number in a tag as wide as the widest, so no dial's is wider. */
+async function expectNumbersFixedWidth(page: Page): Promise<void> {
+  const widths: number[] = []
+  for (const dial of await page.locator('[data-dial]').all()) {
+    await dial.hover()
+    const id = await dial.getAttribute('data-dial')
+    const number = page.getByTestId(`hud-dial-number-${id}`)
+    await expect(number).toBeVisible()
+    widths.push(await number.evaluate((element) => element.getBoundingClientRect().width))
+  }
+  expect(widths.length).toBeGreaterThan(0)
+  expect(Math.max(...widths) - Math.min(...widths)).toBeLessThanOrEqual(1)
 }
 
 /** The debug build with the opening transmission taken down and, on touch, the controls back. */
