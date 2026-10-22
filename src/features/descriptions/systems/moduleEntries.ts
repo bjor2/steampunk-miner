@@ -1,9 +1,9 @@
 /**
  * The Upgrade bay's one-off and levelled gear beside the tracks, and the refinery's slots (#164
- * side table): casing (#41), lining types (#113, #159 example 2's flavour), guns (#107), blasting
- * charges and their rack (#109), refinery slots (#105). Every figure is a kernel stat function at
- * the level the card is drawn for: the casing grade, the gun level, the rack's slot level, the
- * platform's slot count. Guns and the rack stop at their top level, where the line has no next.
+ * side table): casing (#41), lining types (#113; flavour from `liningFlavours.json`), guns
+ * (#107), blasting charges and their rack (#109), refinery slots (#105). Every figure is a kernel
+ * stat function at the level the card is drawn for: the casing grade, the gun level, the rack's
+ * slot level, the platform's slot count. Guns and the rack stop at their top level, where the line has no next.
  * The guns are two-tier since #181: their step climbs like a track's from the mount, the first
  * major, so their lines show the next major and the step as the bay prints it.
  */
@@ -23,6 +23,7 @@ import { refineSeconds, refinerySlotsMax } from '../../../systems/economy/refine
 import { majorOf, stepOfMajor } from '../../../systems/economy/upgradeSteps'
 import { div, fromSafeInteger, type Money } from '../../../systems/money'
 import { KERNEL_ITEMS, liningItemOf } from '../../../systems/registries/kernelItems'
+import LINING_FLAVOURS_FILE from '../liningFlavours.json'
 import type { DescribedStatLineSpec } from './describedLineSpec'
 import {
   fixedLine,
@@ -38,10 +39,12 @@ import {
 /** The restock card describes the shipped charge: size 1 of the dynamite ladder (K8 #218). */
 const SHIPPED_CHARGE_SIZE = 1
 
-/** One flavour per buyable lining type; a type without one fails the coverage spec. */
-const LINING_FLAVOURS: Readonly<Record<string, string>> = {
-  refractory: 'Firebrick casing that keeps lava out and your tunnel cool.',
-}
+/**
+ * One flavour per buyable lining type, from data (Progression's copy on #676, placed by the GD):
+ * the card's hover line, with no "required" wording, as lining stays a price-only choice. A type
+ * without one fails the coverage spec.
+ */
+const LINING_FLAVOURS: Readonly<Record<string, string>> = LINING_FLAVOURS_FILE
 
 /**
  * Content's line for the casing_cement grades (ruling B on #367): a cement-grade lining cases the
