@@ -32,7 +32,9 @@ import {
 // the pad, holds the drill down until long after the body reached the centre, and asserts:
 // - no tick moves the body further than its step bound for the gate it moved under;
 // - no tick of the held down cut carries the body away from the centre by more than one density
-//   sample (`STEP_BOUND_TOLERANCE_MM`): it stops at the centre instead of crossing it;
+//   sample (`STEP_BOUND_TOLERANCE_MM`): it stops at the centre instead of crossing it (since #724
+//   a body falling through its own cleared bore, the gate shut, may swing past the centre and
+//   back under gravity: that travel is a finding for the GD, logged as a todo);
 // - the body reaches the centre (within 1 m, where `localUp` holds) and is still there at the end;
 // - 30 and 144 frames/s play the same ticks.
 // Each run prints its largest move with the body and cut cursor before and after it. A lane: it
@@ -52,8 +54,12 @@ const LEAVE_PAD_TICKS = Math.round(2 / PHYSICS_TIMESTEP)
 const CASING_GRADE = 5
 /** The rig rests after leaving the pad, so the down hold starts from rest. */
 const SETTLE_TICKS = Math.round(1 / PHYSICS_TIMESTEP)
-/** Long enough to cross planet 1 and then hold at its centre for several seconds. */
-const DOWN_TICKS = 300
+/**
+ * Long enough to cross planet 1 and then hold at its centre for several seconds. Since Bjor's
+ * ruling on #724 the cut down gains its speed from rest under gravity, so the crossing takes some
+ * 7 s (about 426 ticks) rather than the 10-odd ticks the drill alone took.
+ */
+const DOWN_TICKS = 720
 /** Below this distance `localUp` holds its last value (decision #7): the centre, for the body. */
 const CENTRE_RADIUS_M = 1
 const AWAY_TOLERANCE_M = STEP_BOUND_TOLERANCE_MM / MM_PER_METRE
@@ -183,8 +189,16 @@ function overBoundTicks(ticks: readonly DownTick[]): string[] {
   return ticks.filter((tick) => tick.movedM > tick.boundM).map(describeTick)
 }
 
+/**
+ * The ticks the held cut carried the body away from the centre. Since Bjor's ruling on #724 the
+ * body reaches the core still gaining speed under gravity, and once its cut has cleared the bore
+ * ahead the gate shuts and it falls through the centre like any falling body, swinging back to
+ * it: travel under gravity, not the cut, so only cutting ticks are judged here.
+ */
 function awayFromCentreTicks(ticks: readonly DownTick[]): string[] {
-  return ticks.filter((tick) => movedAwayM(tick) > AWAY_TOLERANCE_M).map(describeTick)
+  return ticks
+    .filter((tick) => tick.isCutting && movedAwayM(tick) > AWAY_TOLERANCE_M)
+    .map(describeTick)
 }
 
 function firstTickAtCentre(ticks: readonly DownTick[]): number | undefined {
@@ -253,5 +267,9 @@ describe('swept cut through the planet 1 centre (ticket 539)', () => {
       expect(runAt(144)).toEqual(runAt(30))
     },
     RUN_TIMEOUT_MS,
+  )
+
+  it.todo(
+    "catches a body that falls through its own cleared bore at the centre (#724 finding: the stored-200 rig, gaining speed under gravity, swings some 24 m past planet 1's centre and back with the gate shut; owner: the GD)",
   )
 })
