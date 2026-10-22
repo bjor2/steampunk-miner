@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-10-22T11:39:59+02:00",
+  "updated_at": "2026-10-22T11:52:19+02:00",
   "caps": {
     "grok": 12,
     "claude": 10,
@@ -121,32 +121,23 @@
     }
   ],
   "gate": {
-    "busy": 0,
+    "busy": 1,
     "max": 3
   },
   "tester": {
     "state": "running",
-    "phase": "nightly-balance-charges",
-    "sha": "c42f04783d9d3d0093c9b7d2fc5765e762792bbc",
-    "since": "2026-10-22T08:33:10Z",
+    "phase": "fast",
+    "sha": "7679de12d4985be61765388f8511355c4218d5fa",
+    "since": "2026-10-22T09:52:16Z",
     "holds_gate": true,
     "claude_slot": null,
     "last_run": "2026-10-21T18:23:25Z",
     "last_nightly": "2026-10-15T20:43:15Z",
     "last_nightly_result": "full=FAIL balance-report=ok bench=FAIL balance-planets=ok balance-guns=ok balance-charges=ok balance-refinery=ok balance-heat=ok e2e=FAIL memory-soak=FAIL packaged-smoke=ok ",
     "main_red_sha": null,
-    "feature": null,
-    "feature_title": null,
+    "feature": 668,
+    "feature_title": "Map: Red-main fixes (21 Oct)",
     "queue": [
-      {
-        "feature": 668,
-        "kind": "spec",
-        "title": "Map: Red-main fixes (21 Oct)",
-        "tickets": [
-          664
-        ],
-        "since": "2026-10-21T15:24:05+02:00"
-      },
       {
         "feature": 401,
         "kind": "spec",
