@@ -20,6 +20,7 @@ import { formatNdjsonLine } from '../src/logging/ndjson'
 import { loggedCommandsOf } from '../src/logging/commandLog'
 import { reportRowLines } from '../src/logging/reportRows'
 import { travelClampLines } from '../src/logging/travelClampReport'
+import { driveBoundLines } from '../src/logging/driveBoundReport'
 import { surfaceLayerBandOneLines } from '../src/logging/surfaceLayerReport'
 import {
   formatSeedPacingTable,
@@ -89,6 +90,10 @@ const report = [
     surfaceLayerBandOneLines(),
   ),
   listSection('Travel fee clamp binds (reported only, ticket 648)', travelClampLines(runs)),
+  listSection(
+    'Drive-bound share of level legs (over half from planet 3 fails ticket 723)',
+    driveBoundLines(runs),
+  ),
   spreeSection(runs),
   comparisonSection(summary),
   assaySection(),
