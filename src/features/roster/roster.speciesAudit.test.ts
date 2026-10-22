@@ -15,7 +15,7 @@ import { planetSpeciesOf } from './systems/planetSpecies'
 /** Two of the roster's named seeds; a planet's roster and pool never read the seed. */
 const SEEDS = [83921, 4294967295]
 const SPECIES_FLOOR = 15
-/** P1's legacy pool keeps its 12 species until ticket 713 (Bjor's OK) adds Pyrite Sun and its two. */
+/** P1's legacy pool keeps its 12 species until ticket 713 adds its three core gems (Bjor on #713). */
 const PLANET_1_SPECIES_FLOOR = 12
 const AUDITED_PLANETS: readonly [planetIndex: number, floor: number][] = [
   [1, PLANET_1_SPECIES_FLOOR],
