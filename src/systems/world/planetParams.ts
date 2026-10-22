@@ -27,7 +27,6 @@
  */
 import { hashCell } from '../cellRandom'
 import { ECONOMY } from '../economy/economy'
-import { isHeatPlanet } from '../economy/heatEconomy'
 import { refineryUnlockPlanet } from '../economy/refineryEconomy'
 import { rowRadiusTilesOf } from '../registries/planetRow'
 import { BAY_IDS, SLICE_BAY_IDS, type BayId } from './dockBays'
@@ -41,19 +40,17 @@ import {
   DOCK_CLEARANCE_TILES,
   DEPTH_CURVE_PATCH_SEED_CHANCE_BP,
   DOCK_COUNTER_BUILDING_PLANETS,
-  HEAT_PLANET_ARCHETYPE,
   ORE_DENSITY_BP,
   PATCH_MEAN_CELLS,
   PAD_COLUMNS_PER_COUNTER_BUILDING,
   PAD_FIRST_COLUMN,
   PAD_LAST_COLUMN_BASE,
   PATCH_SEED_CHANCE_BP,
-  PLANET_ARCHETYPES,
   RADIUS_BASE_TILES,
   RADIUS_GROWTH_TILES,
   RADIUS_HALF_GROWTH_PLANETS,
-  type PlanetArchetype,
 } from './planetTable'
+import { planetArchetypeOf } from './planetArchetype'
 
 export interface PlanetParams {
   worldSeed: number
@@ -202,7 +199,7 @@ export function planetParamsFor(
     padLastColumn: padLastColumnOf(planetIndex),
     dockClearanceTiles: DOCK_CLEARANCE_TILES,
     dockBays: dockBaysOf(planetIndex),
-    ...archetypeOf(planetIndex),
+    ...planetArchetypeOf(planetIndex),
     hasStarterVein: planetIndex === FIRST_PLANET,
     artefactCacheBand: artefactCacheBandOf(planetIndex),
     ...(oreRulesVersion === undefined ? {} : { oreRulesVersion }),
@@ -343,13 +340,6 @@ export function bandStartsFor(radiusTiles: number): number[] {
     const squared = scaled * scaled
     return (squared - (squared % 10000)) / 10000
   })
-}
-
-/** A heat planet of the Fire act takes the heat archetype; the others the slice's list (#10). */
-function archetypeOf(planetIndex: number): PlanetArchetype {
-  if (isHeatPlanet(planetIndex)) return HEAT_PLANET_ARCHETYPE
-  const last = PLANET_ARCHETYPES.length - 1
-  return PLANET_ARCHETYPES[Math.min(planetIndex - FIRST_PLANET, last)]
 }
 
 function artefactCacheBandOf(planetIndex: number): number {

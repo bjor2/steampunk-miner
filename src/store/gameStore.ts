@@ -165,6 +165,11 @@ import {
   type TripIncomeActions,
   type TripIncomeValues,
 } from './tripIncomeSlice'
+  digRampActionsOf,
+  STARTING_DIG_RAMP,
+  type DigRampActions,
+  type DigRampValues,
+} from './digRampSlice'
 import {
   STARTING_TAP_SHEET,
   tapSheetActionsOf,
@@ -216,6 +221,8 @@ export interface GameState
     HudDetailActions,
     TripIncomeValues,
     TripIncomeActions,
+    DigRampValues,
+    DigRampActions,
     WarningValues,
     WarningActions,
     SoundUnlockValues,
@@ -327,6 +334,7 @@ type GameValues = Pick<
   | keyof SheetValues
   | keyof HudDetailValues
   | keyof TripIncomeValues
+  | keyof DigRampValues
   | keyof WarningValues
   | keyof SoundUnlockValues
   | keyof TitleMenuValues
@@ -360,6 +368,7 @@ export const STARTING_VALUES: GameValues = {
   ...STARTING_SHEET,
   ...STARTING_HUD_DETAIL,
   ...STARTING_TRIP_INCOME,
+  ...STARTING_DIG_RAMP,
   ...STARTING_WARNINGS,
   ...STARTING_SOUND_UNLOCK,
   ...STARTING_TITLE_MENU,
@@ -389,6 +398,7 @@ export const useGameStore = create<GameState>()((set, get) => ({
   ...sheetActionsOf(set, get),
   ...hudDetailActionsOf(set, get),
   ...tripIncomeActionsOf(set, get),
+  ...digRampActionsOf(set, get),
   ...warningActionsOf(set, get),
   ...soundUnlockActionsOf(set),
   ...titleMenuActionsOf(set, get),

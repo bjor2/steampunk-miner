@@ -1,6 +1,7 @@
 /**
  * The footer's travel fee and fragments as glyph-and-value facts on their #33 ids (spec #422,
- * pass #425): the fee is a price, so it never leaves the element; none on the last planet.
+ * pass #425): the fee is a price, so it never leaves the element; none on the last planet. The next
+ * planet's gravity follows as its trait (#724).
  */
 import { CORE_FRAGMENT_ICON_ID, hudLabelIconIdOf } from '../../systems/art/icons/iconSet'
 import type { TravelReading } from '../../systems/views/bayFrame'
@@ -21,5 +22,11 @@ export function travelFactsOf(travel: TravelReading | null): IconValue[] {
     text: travel.fragmentsText,
     testId: UI_IDS.platformTravelFragments,
   }
-  return [fee, fragments]
+  const gravity: IconValue = {
+    iconId: hudLabelIconIdOf('planet'),
+    text: travel.toPlanetGravity.text,
+    exact: travel.toPlanetGravity.exact,
+    testId: UI_IDS.platformTravelGravity,
+  }
+  return [fee, fragments, gravity]
 }

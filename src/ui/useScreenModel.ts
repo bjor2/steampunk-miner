@@ -45,6 +45,7 @@ function isScreenSourceChanged(state: GameState, previous: GameState): boolean {
     state.transmissionBoard !== previous.transmissionBoard ||
     state.arePlaquesAllowed !== previous.arePlaquesAllowed ||
     state.liveStepHold !== previous.liveStepHold ||
+    state.isDigGravityLimited !== previous.isDigGravityLimited ||
     state.pauseMenu !== previous.pauseMenu ||
     state.titleMenu !== previous.titleMenu ||
     state.clientDevFlags !== previous.clientDevFlags ||

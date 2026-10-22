@@ -26,6 +26,7 @@ import type { BayId } from '../world/dockBays'
 import type { UpgradeId } from '../economy/economyDefinition'
 import type { TripLedger } from './tripIncome'
 import { BAY_ACCENTS, BAY_NAMES, type BayAccent } from './bayNames'
+import { planetGravityTraitOf, type LocalGravityReading } from './localGravityReading'
 import type { GaugeReading } from './hudModel'
 import type { FocusStop } from './menuFocus'
 import { UI_IDS } from './screenIds'
@@ -66,6 +67,8 @@ export interface BayHeader {
   moneyIconId: string
   planet: number
   planetIconId: string
+  /** The planet's gravity as its trait, "1.25 g" (#724, the planet-row registry). */
+  planetGravity: LocalGravityReading
   /** The bay against `coreNeeded` (#8, #33): "17 / 63" and a brass dial. */
   coreBay: GaugeReading
   platformState: PlatformVisualState
@@ -80,6 +83,8 @@ export interface TravelReading {
   button: ScreenButton
   fee: AmountReading
   fragmentsText: string
+  /** The next planet's gravity as its trait (#724), so the jump says how hard it pulls. */
+  toPlanetGravity: LocalGravityReading
   state: TravelState
   isArmed: boolean
 }
@@ -108,6 +113,7 @@ export function bayHeaderOf(state: AuthorityState, playerId: string, bay: BayId)
     moneyIconId: hudLabelIconIdOf('money'),
     planet: state.planet.index,
     planetIconId: hudLabelIconIdOf('planet'),
+    planetGravity: planetGravityTraitOf(state.planet.index),
     coreBay: coreBayGaugeOf(state.platform.coreBay, needed),
     platformState: state.platform.visualState,
     platformStateText: PLATFORM_STATE_TEXT[state.platform.visualState],
@@ -165,6 +171,7 @@ function travelReadingOf(state: AuthorityState, playerId: string, isArmed: boole
     },
     fee: priceReading(travelChargeNow(state, playerId)),
     fragmentsText: `${state.platform.coreBay} / ${coreNeededOf(state.planet) ?? 0}`,
+    toPlanetGravity: planetGravityTraitOf(toPlanet),
     state: reason ?? 'ready',
     isArmed,
   }

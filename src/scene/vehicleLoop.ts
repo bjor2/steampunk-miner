@@ -151,6 +151,7 @@ export function createVehicleLoop(fixedFlags?: DevFlags): VehicleLoop {
       syncGroundToTickWorld(flags, loop, controller)
       showDrill(result)
       showMotion(result)
+      useGameStore.getState().noteDigGravityLimit(result.isGravityLimited)
       stepVehicleParts(result.pose, result.flags)
       renderPresence.groundColliders = controller.colliderCount()
     },

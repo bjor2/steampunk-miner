@@ -6,6 +6,7 @@ import {
   planetRowOf,
   rowRadiusTilesOf,
   type FrozenRadius,
+  type PlanetRowFields,
   type PlanetRowProvider,
 } from './planetRow'
 import { addToRegistry, RegistrationRefusedError, withFreshRegistrySet } from './seal'
@@ -39,6 +40,7 @@ describe('planet row', () => {
       poolId: null,
       look: null,
       radius: null,
+      gravityMultiplier: 1.25,
     })
     expect(readWith([], () => planetDisplayNameOf(3))).toBe('Planet 3')
     expect(readWith([], () => planetLookOf(3))).toBeNull()
@@ -56,8 +58,17 @@ describe('planet row', () => {
       poolId: 'foothold-p2',
       look: null,
       radius: FROZEN_421,
+      gravityMultiplier: 1.25,
     })
     expect(readWith([provider], () => planetDisplayNameOf(12))).toBe('Planet 12')
+  })
+
+  // #724: gravity is the planet's visible trait, from its archetype; no provider row lifts it.
+  it("carries the archetype's gravity, whatever the provider answers", () => {
+    const lifting = providerOf(() => ({ gravityMultiplier: 0.5 }) as PlanetRowFields)
+    expect(readWith([], () => planetRowOf(1).gravityMultiplier)).toBe(1)
+    expect(readWith([], () => planetRowOf(2).gravityMultiplier)).toBe(1.25)
+    expect(readWith([lifting], () => planetRowOf(2).gravityMultiplier)).toBe(1.25)
   })
 
   it('resolves any planet from 1 with no table bound', () => {

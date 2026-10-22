@@ -55,7 +55,8 @@ import {
 import { heatReadingOf, type HeatReading } from './heatReading'
 import { combatStatusStackOf, isCollapseWarnedFor, type CombatStatusStack } from './combatStatuses'
 import { threatMarkersOf, type ThreatMarker } from './threatMarkers'
-import { tileTimeAhead, type TileTime } from './tileTime'
+import { localGravityReadingOf, type LocalGravityReading } from './localGravityReading'
+import { tileTimeAhead, tileTimeUnderRamp, type TileTime } from './tileTime'
 import { amountReading, priceReading, type AmountReading } from './viewParts'
 import { nextUpgradeChipOf, type NextUpgradeChip } from './nextUpgradeChip'
 import type { TripLedger } from './tripIncome'
@@ -73,6 +74,8 @@ export interface HudSources {
   isAwaitingPlay?: boolean
   /** The last trips' income the next-upgrade chip's "{N} trips away" reads (ticket 719); absent: none. */
   tripLedger?: TripLedger
+  /** Client-owned: the gravity ramp holds the cut down this step (#724); absent: no. */
+  isDigGravityLimited?: boolean
 }
 
 /**
@@ -140,6 +143,8 @@ export interface HudModel {
   /** The combat statuses in priority order, at most three shown (#158). */
   statuses: CombatStatusStack
   tileTime: TileTime
+  /** The pull where the vehicle stands, as a multiple of planet 1's (#724); null with no pose. */
+  localGravity: LocalGravityReading | null
   vehicleState: VehicleStateReading
   dockPrompt: DockPrompt
   /** "Space: Ancient cache" (interact's first key) exactly while `interact` would open a live cache (#46). */
@@ -205,7 +210,11 @@ export function selectHudModel(sources: HudSources): HudModel {
       cargo,
       vehicleState,
     }),
-    tileTime: tileTimeAhead(state, playerId),
+    tileTime: tileTimeUnderRamp(
+      tileTimeAhead(state, playerId),
+      sources.isDigGravityLimited === true,
+    ),
+    localGravity: localGravityReadingOf(state, playerId),
     vehicleState,
     dockPrompt: dockPromptOf(state, playerId, sources.prompts),
     cachePrompt: cachePromptOf(state, playerId, sources.prompts),

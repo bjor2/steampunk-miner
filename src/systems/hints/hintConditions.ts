@@ -19,6 +19,11 @@ export interface HintMoment {
   state: AuthorityState
   playerId: string
   events: readonly DomainEvent[]
+  /**
+   * Client-owned: the cut down's speed is held by the gravity ramp this step (Bjor's ruling on
+   * #724, the motion rule's answer); absent reads as not held.
+   */
+  isDigGravityLimited?: boolean
 }
 
 export type HintCondition = (moment: HintMoment) => boolean
@@ -47,6 +52,7 @@ export const HINT_CONDITIONS = {
   coreReached: (moment) => hasPlayerEvent(moment, 'CoreReached'),
   enteredPlanetTwo: (moment) =>
     hasPlayerEvent(moment, 'PlanetEntered') && moment.state.planet.index === SECOND_PLANET,
+  digGravityLimited: (moment) => moment.isDigGravityLimited === true,
 } satisfies Record<string, HintCondition>
 
 export type HintConditionName = keyof typeof HINT_CONDITIONS

@@ -2,8 +2,9 @@
  * The detail's readouts (#33 section 5; behind the strip's gear button since ticket 684): depth
  * (or ALT) and band, the casing grade badge (#41), the guns' mode and their low-steam line (#107),
  * the bore gun's auto lamp once the steam sear is researched (ticket 317), the charges carried
- * with the plant key (#109), the dock arrow with its distance, tiles to the core's edge, and the
- * time per tile in front of the drill. Each line is one shared Title+OneLine row (spec #422, pass
+ * with the plant key (#109), the dock arrow with its distance, tiles to the core's edge, local
+ * gravity as a multiple of planet 1's (#724), and the time per tile in front of the drill, tinted
+ * while the gravity ramp holds a cut down (#724). Each line is one shared Title+OneLine row (spec #422, pass
  * #428): its name as the title, then its value beside the glyph of the icon set (#158).
  */
 import type { ReactNode } from 'react'
@@ -17,7 +18,7 @@ import { CompassArrow } from './CompassArrow'
 import styles from './HudDetail.module.css'
 
 export function DetailReadouts({ model }: { model: HudModel }) {
-  const { depth, casing, guns, boreAuto, charges, dockArrow, coreDistance, tileTime } = model
+  const { depth, casing, guns, boreAuto, charges, dockArrow, coreDistance, localGravity } = model
   return (
     <div className={styles.readouts}>
       <Line id="hud.depth" label="Depth" facts={[factOf('depth', depth.text, UI_IDS.hudDepth)]} />
@@ -95,10 +96,26 @@ export function DetailReadouts({ model }: { model: HudModel }) {
           facts={[factOf('core', `${coreDistance}`, UI_IDS.hudCoreDistance)]}
         />
       )}
+      {localGravity !== null && (
+        <Line
+          id="hud.gravity"
+          label="Gravity"
+          facts={[
+            {
+              ...factOf('planet', localGravity.text, UI_IDS.hudLocalGravity),
+              exact: localGravity.exact,
+            },
+          ]}
+        />
+      )}
       <Line id="hud.tile" label="Tile">
         <Glyph icon="tile_time" />
-        <span data-testid={UI_IDS.hudTileTime} data-state={tileTime.state}>
-          {tileTime.text}
+        <span
+          className={styles.tileTime}
+          data-testid={UI_IDS.hudTileTime}
+          data-state={model.tileTime.state}
+        >
+          {model.tileTime.text}
         </span>
       </Line>
     </div>

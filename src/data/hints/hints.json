@@ -65,6 +65,16 @@
         "The tow brought you home. You lost cargo worth {cargoLost} and paid a {fee} fee, nothing more.",
         "Energy is your clock: get back to the pad before it runs out."
       ]
+    },
+    {
+      "id": "hint_gravity_ramp",
+      "iconId": "icon-track-drill-power",
+      "shownWhen": "digGravityLimited",
+      "dismissedWhen": "docked",
+      "lines": [
+        "Digging down gains speed only as fast as local gravity pulls.",
+        "Near the core it still gains, at a tenth of surface gravity at least."
+      ]
     }
   ],
   "transmissions": [

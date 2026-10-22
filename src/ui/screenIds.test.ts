@@ -166,6 +166,7 @@ function hudTexts(model: HudModel): Partial<Record<UiId, string | null>> {
       ? { [UI_IDS.hudHeatThrottled]: model.heat.throttledText }
       : {}),
     [UI_IDS.hudTileTime]: model.tileTime.text,
+    ...(model.localGravity === null ? {} : { [UI_IDS.hudLocalGravity]: model.localGravity.text }),
     [UI_IDS.hudStatuses]: null,
     [UI_IDS.hudDetailStatuses]: null,
     [UI_IDS.hudHazardStrip]: null,
@@ -226,6 +227,7 @@ function bayFrameTexts(header: BayHeader, footer: BayFooter): Partial<Record<UiI
     [UI_IDS.platformScreen]: null,
     [UI_IDS.platformMoney]: header.money.text,
     [UI_IDS.platformPlanet]: String(header.planet),
+    [UI_IDS.platformPlanetGravity]: header.planetGravity.text,
     [UI_IDS.platformCoreBayGauge]: null,
     [UI_IDS.platformCoreBay]: header.coreBay.text,
     [UI_IDS.platformState]: header.platformStateText,
@@ -237,6 +239,7 @@ function bayFrameTexts(header: BayHeader, footer: BayFooter): Partial<Record<UiI
           [UI_IDS.platformTravel]: footer.travel.button.label,
           [UI_IDS.platformTravelFee]: footer.travel.fee.text,
           [UI_IDS.platformTravelFragments]: footer.travel.fragmentsText,
+          [UI_IDS.platformTravelGravity]: footer.travel.toPlanetGravity.text,
           ...(footer.travel.isArmed ? { [UI_IDS.platformTravelConfirm]: null } : {}),
         }),
   }

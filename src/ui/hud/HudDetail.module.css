@@ -113,6 +113,11 @@
   }
 }
 
+/* #724: the gravity ramp holds the cut down; a subtle cool tint on the same readout, no new slot. */
+.tileTime[data-state='gravity'] {
+  color: var(--color-steel);
+}
+
 /* #107: the guns are on Auto but the rescue floor holds them; the low-energy amber, said in text. */
 .gunsIdle {
   color: var(--color-amber);

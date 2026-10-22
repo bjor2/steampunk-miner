@@ -72,6 +72,7 @@ type SliceHost = HintValues &
     playerId: string
     planetTier: number
     depthTiles: number
+    isDigGravityLimited: boolean
     prefs: Preferences
     rememberSeenHints(seenHints: readonly string[]): void
   }
@@ -95,7 +96,12 @@ export function hintActionsOf(set: SetSlice, get: () => SliceHost): HintActions 
     observePlaques: (events) => {
       const host = get()
       if (!isWatchingPlaques(host)) return
-      const moment = { state: readAuthorityState(), playerId: host.playerId, events }
+      const moment: HintMoment = {
+        state: readAuthorityState(),
+        playerId: host.playerId,
+        events,
+        isDigGravityLimited: host.isDigGravityLimited,
+      }
       const transmissions = observeTransmissions(transmissionStepOf(host), moment)
       const hints = observeShownHints(
         host,

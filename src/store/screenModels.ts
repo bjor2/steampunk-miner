@@ -89,6 +89,8 @@ export interface ScreenSources {
   titleMenu: TitleMenu | null
   /** The base sheet's open tab (ticket 686); the Hold's cards are its focus stops (ticket 688). */
   openSheetTabId: string | null
+  /** The gravity ramp holds the cut down this step (#724): the tile readout's tint. */
+  isDigGravityLimited: boolean
 }
 
 export interface MenuScreen {
@@ -105,6 +107,7 @@ export function hudModelOf(sources: ScreenSources): HudModel {
     prompts: promptSourceOf(sources),
     isAwaitingPlay: sources.liveStepHold === 'awaitingPlay',
     tripLedger: sources.tripLedger,
+    isDigGravityLimited: sources.isDigGravityLimited,
   })
 }
 

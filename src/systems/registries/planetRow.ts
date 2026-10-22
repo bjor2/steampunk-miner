@@ -13,8 +13,12 @@
  *   643), an override with its reason, keyed by the first ore rules that size a planet by it. A
  *   planet stamped earlier, or with no override, keeps #6's ladder (`planetParams.ts`), so no save
  *   regenerates and the game never computes `ln` (TD).
+ * - `gravityMultiplier`: the archetype's radial gravity (#4, #7), the planet's visible trait on the
+ *   planet row and the travel screen (Bjor's ruling on #724: it caps a cut down's gain of speed).
+ *   Formula-driven from the archetype, never a provider's field, so no row lifts the cap.
  */
 import { ECONOMY } from '../economy/economy'
+import { planetArchetypeOf } from '../world/planetArchetype'
 import type { PlanetSkyBandLook } from './planetSkyBand'
 import { defineOneProviderRegistry, entriesOf } from './seal'
 
@@ -48,6 +52,8 @@ export interface PlanetRow {
   look: PlanetLook | null
   /** The frozen radius override; null keeps #6's ladder. */
   radius: FrozenRadius | null
+  /** The archetype's radial gravity multiplier: planet 1 is 1 (#724: a trait the player sees). */
+  gravityMultiplier: number
 }
 
 /** The fields a provider lays over the generated row; one it leaves out keeps the generated one. */
@@ -101,6 +107,7 @@ function generatedRowOf(planetIndex: number): PlanetRow {
     poolId: null,
     look: null,
     radius: null,
+    gravityMultiplier: planetArchetypeOf(planetIndex).gravityMultiplier,
   }
 }
 

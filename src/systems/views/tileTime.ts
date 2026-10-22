@@ -7,6 +7,10 @@
  * A sideways cut never passes the drive's speed (Bjor's ruling on #723): where the drill would cut
  * the tile faster, the readout is the drive's time over it, with the effective m/s through the
  * shared number formatter (#681) beside it (`drive`).
+ *
+ * A cut down whose speed the gravity ramp holds (Bjor's ruling on #724, the client's motion rule)
+ * keeps the drill's time, as `gravity`: the HUD tints the readout while the ramp binds and adds no
+ * slot for it.
  */
 import { TICKS_PER_SECOND } from '../../constants/physics'
 import type { AuthorityState } from '../authority/authorityState'
@@ -26,6 +30,7 @@ export type TileTime =
   | { state: 'blocked'; text: string }
   | { state: 'time'; text: string; ticks: number }
   | { state: 'drive'; text: string; ticks: number }
+  | { state: 'gravity'; text: string; ticks: number }
 
 const NO_TILE: TileTime = { state: 'none', text: '-' }
 const BLOCKED: TileTime = { state: 'blocked', text: 'needs a better tip' }
@@ -49,6 +54,12 @@ export function tileTimeAlong(facing: Facing, drillTicks: number, driveSpeed: nu
     return { state: 'time', text: `${secondsText(drillTicks)} s`, ticks: drillTicks }
   }
   return { state: 'drive', text: driveBoundText(driveTicks, driveSpeed), ticks: driveTicks }
+}
+
+/** The readout as the gravity ramp leaves it (#724): a drill time it holds reads `gravity`. */
+export function tileTimeUnderRamp(tileTime: TileTime, isDigGravityLimited: boolean): TileTime {
+  if (!isDigGravityLimited || tileTime.state !== 'time') return tileTime
+  return { ...tileTime, state: 'gravity' }
 }
 
 /** "0.16 s · 6.3 m/s": the drive's time over the tile and the speed it moves at. */
