@@ -1,5 +1,5 @@
 {
-  "$comment": "The sale receipt (ticket 717, spec #678): the total's roll, at most 1.2 s at 60 Hz (the ticket's done-when), in steps so the panel re-renders per step and never per frame, and the receipt's copy in the ledger voice (docs/ui/design-system.md section 11), held to the #680 budgets by receiptCopy.test.ts. `{tier}` is the held tier of a unit no pickup named.",
+  "$comment": "The sale receipt (ticket 717, spec #678): the total's roll, at most 1.2 s at 60 Hz (the ticket's done-when), in steps so the panel re-renders per step and never per frame, and the receipt's copy in the ledger voice (docs/ui/design-system.md section 11), held to the #680 budgets by receiptCopy.test.ts. `{tier}` is the held tier of a unit no pickup named; `{count}` and `{amount}` take the formatter's text.",
   "roll": {
     "maxTicks": 72,
     "steps": 24
@@ -12,6 +12,8 @@
     "firstTrip": "First trip",
     "unseenRarity": "Unseen",
     "tierOre": "Tier {tier} ore",
+    "count": "×{count}",
+    "deduction": "−{amount}",
     "compare": {
       "up": "▲",
       "down": "▼",

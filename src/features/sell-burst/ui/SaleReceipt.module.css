@@ -1,0 +1,135 @@
+/*
+ * The sale receipt (ticket 717): the #683 baked sheet frame round a panel-glass plate, under the
+ * phone's top keep-out (nothing in the top 15% takes a tap, design-system section 9) and across
+ * the stage less its margins; on desktop a 360 px plate under the strip at the right. The lines
+ * scroll past eight in the shared scroll area. Every figure is in tabular numerals in a column
+ * as wide as the formatter's widest text (6 characters, #681), so a rolling total never reflows.
+ * The plate fades in over `--motion-standard`; nothing slides, so Reduce Motion keeps it.
+ */
+.receipt {
+  --receipt-line: 28px;
+  --receipt-heading: 24px;
+  --receipt-figure: 7ch;
+
+  position: absolute;
+  top: calc(var(--safe-top) + var(--top-keep-out));
+  right: var(--hud-inset-right);
+  left: var(--hud-inset-left);
+  max-width: 420px;
+  margin: 0 auto;
+  padding: var(--space-2) var(--space-3);
+  border: var(--frame-double) solid var(--color-brass);
+  border-radius: var(--radius-panel);
+  border-image: var(--art-sheet-frame) var(--art-sheet-frame-slice) fill /
+    var(--art-sheet-frame-width);
+  background: var(--color-panel);
+  color: var(--color-text);
+  font-family: var(--font-body);
+  font-size: var(--type-body);
+  line-height: var(--line-height);
+  pointer-events: auto;
+  touch-action: manipulation;
+  cursor: pointer;
+  animation: receipt-enter var(--motion-standard) var(--ease-enter);
+}
+
+:global([data-layout='desktop']) .receipt {
+  top: calc(var(--safe-top) + var(--strip-height) + var(--space-3));
+  left: auto;
+  width: 360px;
+  margin: 0;
+}
+
+.title {
+  margin: 0 0 var(--space-1);
+  color: var(--color-brass);
+  font-size: var(--type-title);
+  font-weight: normal;
+}
+
+.rows {
+  max-height: calc(8 * var(--receipt-line) + 2 * var(--receipt-heading));
+}
+
+.group + .group {
+  margin-top: var(--space-1);
+}
+
+.heading {
+  margin: 0;
+  min-height: var(--receipt-heading);
+  font-size: var(--type-label);
+  font-weight: normal;
+  letter-spacing: var(--label-tracking);
+  text-transform: uppercase;
+}
+
+.lines {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.line {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 5ch var(--receipt-figure);
+  gap: var(--space-2);
+  align-items: center;
+  min-height: var(--receipt-line);
+  border-bottom: var(--frame-hairline) solid rgb(201 162 75 / 0.25);
+  font-size: var(--type-label);
+}
+
+.name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.count,
+.amount {
+  font-family: var(--font-numerals);
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+  white-space: nowrap;
+}
+
+.count {
+  color: var(--color-parchment);
+}
+
+.amount {
+  min-width: var(--receipt-figure);
+  color: var(--color-brass);
+}
+
+.figure,
+.total {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--space-2);
+  margin: var(--space-1) 0 0;
+  font-size: var(--type-label);
+}
+
+.total {
+  padding-top: var(--space-1);
+  border-top: var(--frame-hairline) solid var(--color-brass);
+  color: var(--color-brass);
+  font-size: var(--type-body);
+}
+
+.glyph {
+  color: var(--color-parchment);
+}
+
+@keyframes receipt-enter {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}

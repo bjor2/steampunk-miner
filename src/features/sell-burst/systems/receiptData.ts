@@ -17,6 +17,8 @@ export interface ReceiptData {
     firstTrip: string
     unseenRarity: string
     tierOre: string
+    count: string
+    deduction: string
     compare: Record<TripCompare, string>
   }
 }
@@ -26,4 +28,14 @@ export const RECEIPT: ReceiptData = RECEIPT_FILE
 /** The name of a sold unit no pickup named: `Tier 7 ore`, as the Hold's card calls its tier. */
 export function tierOreNameOf(tier: number, data: ReceiptData = RECEIPT): string {
   return data.copy.tierOre.replace('{tier}', String(tier))
+}
+
+/** A line's count, `×12`, around the formatter's text. */
+export function countTextOf(count: string, data: ReceiptData = RECEIPT): string {
+  return data.copy.count.replace('{count}', count)
+}
+
+/** The bill taken off the credits, `−4.5k`, around the formatter's text. */
+export function deductionTextOf(amount: string, data: ReceiptData = RECEIPT): string {
+  return data.copy.deduction.replace('{amount}', amount)
 }

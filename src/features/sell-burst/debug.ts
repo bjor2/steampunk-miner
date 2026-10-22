@@ -1,6 +1,6 @@
 /**
  * Read-only, so no command and no log line (docs/standards/feature-slices.md 3.14): the running
- * burst as a browser spec reads it, never pixels, and a haul script the spec plays itself. `shown` is what the bay's money counter shows
+ * burst and the trip's receipt (ticket 717) as a browser spec reads them, never pixels, and a haul script the spec plays itself. `shown` is what the bay's money counter shows
  * now for the authority wallet, `wallet` that wallet; both canonical.
  */
 import type { DebugAction } from '../../debug/debugActionRegistry'
@@ -8,10 +8,12 @@ import { readAuthorityState } from '../../store/authorityLink'
 import { useGameStore } from '../../store/gameStore'
 import { toCanonical } from '../../systems/money'
 import { haulPlanProblems, haulScriptOf, type HaulPlan } from './debugHaul'
+import { useReceiptStore } from './store/receiptStore'
 import { useSellBurstStore } from './store/sellBurstStore'
 import { landingCoinsOf, type BurstWave } from './systems/burstWave'
 import { landedCoinsAt, shownMoneyOf } from './systems/counterRoll'
 import { liningBilledOf } from './systems/liningTag'
+import { receiptReadingOf } from './systems/receiptReading'
 import type { SellBurst } from './systems/sellBurst'
 
 export const sellBurstDebugActions: Readonly<Record<string, DebugAction>> = {
@@ -38,6 +40,8 @@ export const sellBurstDebugActions: Readonly<Record<string, DebugAction>> = {
       tick: readAuthorityState().tick,
     }
   },
+  /** The trip's receipt: its lines, total, bill and the last trip, canonical; null with none. */
+  getReceipt: () => ({ ok: true, ...receiptReadingOf(useReceiptStore.getState()) }),
 }
 
 /** The burst's waves, coins (peeled and landing) and chunks, summed over its waves. */
