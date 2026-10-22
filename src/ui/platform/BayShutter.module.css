@@ -17,6 +17,11 @@
   pointer-events: none !important;
 }
 
+/* Under a phone's full sheet the screen stays mounted but unseen, so no menu hides behind it. */
+.shutter[data-under-sheet='true'] {
+  visibility: hidden;
+}
+
 .shutter[data-transition='opening'][data-transition-kind='shutter'] {
   animation-name: shutter-in;
 }

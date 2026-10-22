@@ -11,6 +11,10 @@
  *
  * A moment that must show the car (the unlock reveal, ticket 718) steps a full sheet aside and
  * brings it back on the same tab; a docked sheet stays, as the car is in view beside it.
+ *
+ * A sheet a dock opens (the Upgrade bay's Outfitter) is that bay's one menu (ticket 734): its
+ * close, Escape or Close, shuts it and leaves the bay in one step, so a dock never stacks two
+ * menus that take two closes. A sheet the player opens from a bay's button closes back to the bay.
  */
 import {
   cardPressOf,
@@ -31,6 +35,8 @@ export interface SheetValues {
   revealedSheetCardId: string | null
   /** A full sheet is out of the way for a moment, its tab kept for its return. */
   isSheetSteppedAside: boolean
+  /** The sheet opened with the dock, so it is the bay's menu and its close leaves the bay. */
+  isSheetTheBayMenu: boolean
 }
 
 export interface SheetActions {
@@ -39,8 +45,18 @@ export interface SheetActions {
    * The Ledger opens the pause menu's save page instead, and any other tab leaves it.
    */
   openSheet(tabId: unknown): void
-  /** Escape, or the sheet's Close button; on the Ledger, back to the pause menu's first page. */
+  /**
+   * Opens the sheet as the docked bay's own menu (ticket 734), as the bay's screen mounts with
+   * the dock; refused (thrown) for an unknown id, as `openSheet` is.
+   */
+  openSheetAsBayMenu(tabId: unknown): void
+  /**
+   * Escape, or the sheet's Close button; on the Ledger, back to the pause menu's first page. The
+   * bay's menu also leaves the bay (ticket 734).
+   */
   closeSheet(): void
+  /** The dock ended: the bay's menu shuts with it, sending nothing; any other sheet stays. */
+  shutBayMenuSheet(): void
   /**
    * A press on a card: a finger's first tap reveals its line, so the press answers `reveal`; the
    * second tap, a click or a key answers `act`, and the card runs its action.
@@ -61,7 +77,12 @@ interface PauseHost {
   closeSaveSlots(): void
 }
 
-type SliceHost = SheetValues & PauseHost
+/** What the bay's menu reads of the store to leave the bay on its close. */
+interface DockHost {
+  undock(): void
+}
+
+type SliceHost = SheetValues & PauseHost & DockHost
 
 type SetSlice = (partial: Partial<SheetValues>) => void
 
@@ -69,6 +90,7 @@ export const STARTING_SHEET: SheetValues = {
   openSheetTabId: null,
   revealedSheetCardId: null,
   isSheetSteppedAside: false,
+  isSheetTheBayMenu: false,
 }
 
 /** The tab the sheet shows: the Ledger while the pause menu is on its save page, else the open tab. */
@@ -91,14 +113,14 @@ export function sheetTabDrawnAt(
 
 export function sheetActionsOf(set: SetSlice, get: () => SliceHost): SheetActions {
   return {
-    openSheet: (tabId) => {
-      refuseProblems(sheetTabIdProblems(tabId))
-      if (tabId === KERNEL_SHEET_TAB_IDS.ledger) openLedger(set, get())
-      else showTab(set, get(), tabId as string)
+    openSheet: (tabId) => openSheetOn(set, get(), tabId),
+    openSheetAsBayMenu: (tabId) => {
+      openSheetOn(set, get(), tabId)
+      set({ isSheetTheBayMenu: true })
     },
-    closeSheet: () => {
-      if (isLedgerShown(get())) get().closeSaveSlots()
-      else set(STARTING_SHEET)
+    closeSheet: () => closeShownSheet(set, get()),
+    shutBayMenuSheet: () => {
+      if (get().isSheetTheBayMenu) set(STARTING_SHEET)
     },
     pressSheetCard: (cardId, presser) => {
       const press = cardPressOf(get().revealedSheetCardId, cardId, presser)
@@ -126,6 +148,19 @@ function openLedger(set: SetSlice, host: SliceHost): void {
   set(STARTING_SHEET)
   if (host.pauseMenu === null) host.openPauseMenu()
   if (!isLedgerShown(host)) void host.openSaveSlots()
+}
+
+function openSheetOn(set: SetSlice, host: SliceHost, tabId: unknown): void {
+  refuseProblems(sheetTabIdProblems(tabId))
+  if (tabId === KERNEL_SHEET_TAB_IDS.ledger) openLedger(set, host)
+  else showTab(set, host, tabId as string)
+}
+
+/** The Ledger steps back in the pause menu; any other tab shuts, and the bay's menu leaves the bay. */
+function closeShownSheet(set: SetSlice, host: SliceHost): void {
+  if (isLedgerShown(host)) return host.closeSaveSlots()
+  set(STARTING_SHEET)
+  if (host.isSheetTheBayMenu) host.undock()
 }
 
 /** Leaving the Ledger for another tab leaves the pause menu, so the world runs again. */

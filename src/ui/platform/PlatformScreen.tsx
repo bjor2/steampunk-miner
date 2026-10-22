@@ -2,10 +2,13 @@
  * The bay screen, open while docked (#8, #33), for the bay the vehicle is docked at (#37, #105): the
  * store's model and menu focus, behind the brass shutter that slides it in and out (#45). While
  * the shutter closes, the bay it showed stays drawn and takes no input. A slice that registered
- * the bay's screen, once its schedule row is open, draws it instead (`bayScreens`, #180).
+ * the bay's screen, once its schedule row is open, draws it instead (`bayScreens`, #180). Under a
+ * phone's full sheet the screen hides, still mounted, so no menu waits unseen behind the sheet
+ * (ticket 734).
  */
 import { useCallback, type CSSProperties, type ReactNode } from 'react'
 import { useGameStore } from '../../store/gameStore'
+import { sheetTabDrawnAt } from '../../store/sheetSlice'
 import {
   readDockedBay,
   readRefineryBayModel,
@@ -19,6 +22,7 @@ import { focusOnScreen } from '../../systems/views/menuFocus'
 import { SELL_BAY_START_FOCUS } from '../../systems/views/sellBayModel'
 import { upgradeBayStartFocus } from '../../systems/views/upgradeBayModel'
 import { bayScreenById, type SliceBayScreen } from '../registries/bayScreens'
+import { useSheetPlacement } from '../sheet/useSheetPlacement'
 import { useScreenModel } from '../useScreenModel'
 import styles from './BayShutter.module.css'
 import { RefineryBayView } from './RefineryBayView'
@@ -39,17 +43,25 @@ export function PlatformScreen() {
 
 function ShutterFrame({ shutter, children }: { shutter: BayShutter; children: ReactNode }) {
   const duration = { '--bay-transition-seconds': `${shutter.transition.seconds}s` }
+  const isUnderSheet = useIsUnderFullSheet()
   return (
     <div
       className={styles.shutter}
       style={duration as CSSProperties}
       data-transition={shutter.phase}
       data-transition-kind={shutter.transition.kind}
-      aria-hidden={shutter.phase === 'closing' || undefined}
+      data-under-sheet={isUnderSheet || undefined}
+      aria-hidden={shutter.phase === 'closing' || isUnderSheet || undefined}
     >
       {children}
     </div>
   )
+}
+
+/** A full sheet is drawn over the stage, so the bay screen would sit unseen behind it. */
+function useIsUnderFullSheet(): boolean {
+  const isFullSheetDrawn = useGameStore((state) => sheetTabDrawnAt(state, 'full') !== null)
+  return useSheetPlacement() === 'full' && isFullSheetDrawn
 }
 
 function BayScreenOf({ bay }: { bay: BayId }) {
