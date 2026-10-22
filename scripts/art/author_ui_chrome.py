@@ -2,7 +2,8 @@
 Authors the first version of the UI chrome sprites' Blender sources (ticket 683, the art brief of
 docs/ui/design-system.md section 13): the gauge bar and dial, the edge gauge, the odometer drum,
 the sheet, card and tab frames, the scroll rail and thumb, the slot ring, the status plate and the
-gear button, one .blend per `art.*` token.
+gear button, one .blend per `art.*` token; ticket 716 added the gauge cluster's needle and its
+brass and glass frame.
 
     blender -b --factory-startup --python-exit-code 1 -P scripts/art/author_ui_chrome.py [-- <id> ...]
 
@@ -115,6 +116,17 @@ def dial_ticks(material):
     return ticks
 
 
+def author_gauge_needle(m, sprites):
+    """A tapered brass pointer from the dial's hub up to its tip (ticket 716); the origin is the
+    foot, where it turns, so CSS sets it on the dial's centre and rotates it there; the shaded
+    right flank reads as a ridge."""
+    pieces = [
+        face(m.graded('brass'), [(-2, 0), (2, 0), (0.5, 28), (-0.5, 28)], 0),
+        face(m.stop('brass', 'shadow'), [(0.5, 0), (2, 0), (0.5, 28)], -LAYER),
+    ]
+    return [build_part('ui-gauge-needle', pieces, (0, 0), sprites)]
+
+
 def author_edge_gauge(m, sprites):
     """A vertical iron trough between two 1 px brass rails, capped top and bottom; the mark is CSS."""
     pieces = [rect(m.well('iron'), 8, 64, 0, 0, 0)]
@@ -154,6 +166,18 @@ def author_frame_card(m, sprites):
     ]
     pieces += [rivet(m, 1.5, x, z, -LAYER) for x in (-45.5, 45.5) for z in (-29.5, 29.5)]
     return [build_part('ui-frame-card', pieces, (0, 0), sprites)]
+
+
+def author_frame_glass(m, sprites):
+    """The gauge cluster's brass and glass frame (ticket 716): a 3 px bezel, a dark lip, a glint
+    of glass along the top inside it and a stud in each corner; hollow, the glass sheen is CSS."""
+    pieces = [
+        rounded_frame(m.graded('brass'), 48, 48, 8, 3, 0, 0, 0),
+        rounded_frame(m.stop('iron', 'shadow'), 42, 42, 5, 1, 0, 0, 0),
+        rect(m.stop('parchment', 'highlight'), 24, 1, 0, 19.5, -LAYER),
+    ]
+    pieces += [rivet(m, 1.5, x, z, -LAYER) for x in (-20, 20) for z in (-20, 20)]
+    return [build_part('ui-frame-glass', pieces, (0, 0), sprites)]
 
 
 def author_frame_tab(m, sprites):
@@ -237,10 +261,12 @@ def rivet(m, radius, cx, cz, y):
 AUTHORS = {
     'ui-gauge-bar': author_gauge_bar,
     'ui-gauge-dial': author_gauge_dial,
+    'ui-gauge-needle': author_gauge_needle,
     'ui-edge-gauge': author_edge_gauge,
     'ui-odometer-drum': author_odometer_drum,
     'ui-frame-sheet': author_frame_sheet,
     'ui-frame-card': author_frame_card,
+    'ui-frame-glass': author_frame_glass,
     'ui-frame-tab': author_frame_tab,
     'ui-scroll-rail': author_scroll_rail,
     'ui-slot-ring': author_slot_ring,

@@ -99,6 +99,8 @@
         "sizePx": [24, 24]
       }
     },
+    "ui-gauge-needle": { "ui-gauge-needle": { "sizePx": [4, 28] } },
+    "ui-frame-glass": { "ui-frame-glass": { "sizePx": [48, 48], "insetPx": [10, 10] } },
     "ui-gear-button": {
       "ui-gear-button": {
         "sizePx": [48, 48]

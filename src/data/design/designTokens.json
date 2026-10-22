@@ -210,10 +210,12 @@
   "art": {
     "gaugeBar": "ui-gauge-bar",
     "gaugeDial": "ui-gauge-dial",
+    "gaugeNeedle": "ui-gauge-needle",
     "edgeGauge": "ui-edge-gauge",
     "odometerDrum": "ui-odometer-drum",
     "sheetFrame": "ui-frame-sheet",
     "cardFrame": "ui-frame-card",
+    "glassFrame": "ui-frame-glass",
     "tabFrame": "ui-frame-tab",
     "scrollRail": "ui-scroll-rail",
     "slotRing": "ui-slot-ring",

@@ -1,0 +1,27 @@
+{
+  "assetId": "ui-gauge-needle",
+  "schema": 1,
+  "source": {
+    "blend": "art/blender/ui-gauge-needle/ui-gauge-needle.blend",
+    "sha256": null,
+    "blender": null
+  },
+  "pxPerMetre": 4,
+  "atlasPx": [64, 128],
+  "maps": {
+    "albedo": "ui-gauge-needle.albedo.ktx2",
+    "normal": "ui-gauge-needle.normal.ktx2",
+    "emissive": false
+  },
+  "parts": [
+    {
+      "id": "ui-gauge-needle",
+      "tier": 1,
+      "rect": [8, 8, 16, 112],
+      "sizeM": [4.0, 28.0],
+      "pivotM": [2.0, 14.0],
+      "atM": [0.0, 0.0],
+      "z": 0
+    }
+  ]
+}
