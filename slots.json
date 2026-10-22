@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-10-22T19:10:52+02:00",
+  "updated_at": "2026-10-22T19:18:51+02:00",
   "caps": {
     "grok": 12,
     "claude": 10,
@@ -108,17 +108,16 @@
         },
         {
           "slot": "C10",
-          "state": "busy",
-          "ticket": 676,
-          "grok_slot": 4,
-          "kind": "dev",
-          "since": "2026-10-22T19:10:00+02:00",
-          "wave": "673-2A"
+          "state": "free",
+          "ticket": null,
+          "grok_slot": null,
+          "kind": null,
+          "since": null
         }
       ],
       "size": 4,
-      "used": 4,
-      "free": 0,
+      "used": 3,
+      "free": 1,
       "claims_last_hour": 5,
       "name": "Claude Max 2"
     }
@@ -169,11 +168,9 @@
     },
     {
       "slot": 4,
-      "state": "dev",
-      "ticket": 676,
-      "since": "2026-10-22T19:10:00+02:00",
-      "claude_slot": 10,
-      "wave": "673-2A"
+      "state": "free",
+      "ticket": null,
+      "since": null
     },
     {
       "slot": 5,
@@ -308,26 +305,25 @@
     },
     {
       "slot": 10,
-      "state": "busy",
-      "ticket": 676,
-      "grok_slot": 4,
-      "since": "2026-10-22T19:10:00+02:00",
-      "account": 2,
-      "wave": "673-2A"
+      "state": "free",
+      "ticket": null,
+      "grok_slot": null,
+      "since": null,
+      "account": 2
     }
   ],
   "last_refill": {
-    "at": "2026-10-22 19:10 CEST",
+    "at": "2026-10-22 19:18 CEST",
     "mode": "refill-dev",
-    "triggers": "claude-run:wave-plan",
-    "started": "#676->C10/A2",
-    "note": "spawned 1 worker(s)"
+    "triggers": "#676",
+    "started": "",
+    "note": "no pickable build ticket"
   },
   "totals": {
     "grok": {
       "size": 12,
-      "used": 4,
-      "dev": 4,
+      "used": 3,
+      "dev": 3,
       "dev_cap": 8,
       "planner": 0,
       "planner_cap": 4
@@ -335,8 +331,8 @@
     "claude": {
       "size": 10,
       "enabled": 4,
-      "used": 4,
-      "free": 0,
+      "used": 3,
+      "free": 1,
       "external": 0
     }
   },
@@ -350,12 +346,12 @@
         "map": 673,
         "lane": "remote",
         "mode": "solo",
-        "state": "running",
+        "state": "paused",
         "tickets": [
           676
         ],
         "done": [],
-        "live": 1
+        "live": 0
       },
       {
         "number": 729,
