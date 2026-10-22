@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-10-22T03:46:25+02:00",
+  "updated_at": "2026-10-22T03:48:24+02:00",
   "caps": {
     "grok": 12,
     "claude": 10,
@@ -202,13 +202,9 @@
     },
     {
       "slot": 4,
-      "state": "planner",
-      "ticket": 576,
-      "since": "2026-10-20T22:40:07+02:00",
-      "map": 157,
-      "room": "6309acb5-cb8c-4ce1-87ed-f9f09a592517",
-      "adopted": false,
-      "wave": null
+      "state": "free",
+      "ticket": null,
+      "since": null
     },
     {
       "slot": 5,
@@ -350,19 +346,19 @@
     }
   ],
   "last_refill": {
-    "at": "2026-10-22 03:13 CEST",
-    "mode": "recheck",
-    "triggers": "#644",
-    "started": "#645->C1/A1",
-    "note": "spawned 1 worker(s)"
+    "at": "2026-10-22 03:47 CEST",
+    "mode": "pass",
+    "triggers": "#698",
+    "started": "",
+    "note": "no pickable build ticket"
   },
   "totals": {
     "grok": {
       "size": 12,
-      "used": 4,
+      "used": 3,
       "dev": 3,
       "dev_cap": 8,
-      "planner": 1,
+      "planner": 0,
       "planner_cap": 4
     },
     "claude": {
@@ -401,19 +397,6 @@
         "state": "blocked",
         "tickets": [
           707
-        ],
-        "done": [],
-        "live": 0
-      },
-      {
-        "number": 700,
-        "key": "576-1K",
-        "map": 576,
-        "lane": "remote",
-        "mode": "solo",
-        "state": "running",
-        "tickets": [
-          698
         ],
         "done": [],
         "live": 0
