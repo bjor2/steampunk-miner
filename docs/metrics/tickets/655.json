@@ -1,0 +1,33 @@
+{
+  "schema": 1,
+  "ticket": 655,
+  "title": "Golden tests: #625 surface toughness on fresh P2–P5 saves",
+  "tier": "easy",
+  "model": "claude-opus-5-5",
+  "created": "2026-10-21T03:54:18Z",
+  "closed": "2026-10-22T01:52:27Z",
+  "segments": [
+    {"category":"idle","start":"2026-10-21T03:54:18.000Z","end":"2026-10-21T03:55:10.000Z","attempt":0,"tier":null,"model":null,"source":"derived"},
+    {"category":"blocked","start":"2026-10-21T03:55:10.000Z","end":"2026-10-22T01:12:37.000Z","attempt":0,"tier":null,"model":null,"source":"github"},
+    {"category":"idle","start":"2026-10-22T01:12:37.000Z","end":"2026-10-22T01:13:02.000Z","attempt":0,"tier":null,"model":null,"source":"derived"},
+    {"category":"other","start":"2026-10-22T01:13:02.000Z","end":"2026-10-22T01:13:31.503Z","attempt":1,"tier":"easy","model":"claude-opus-5-5","source":"loop-log"},
+    {"category":"context","start":"2026-10-22T01:13:31.503Z","end":"2026-10-22T01:15:14.384Z","attempt":1,"tier":"easy","model":"claude-opus-5-5","source":"transcript"},
+    {"category":"developing","start":"2026-10-22T01:15:14.384Z","end":"2026-10-22T01:15:34.227Z","attempt":1,"tier":"easy","model":"claude-opus-5-5","source":"transcript"},
+    {"category":"testing","start":"2026-10-22T01:15:34.227Z","end":"2026-10-22T01:16:18.867Z","attempt":1,"tier":"easy","model":"claude-opus-5-5","source":"transcript"},
+    {"category":"context","start":"2026-10-22T01:16:18.867Z","end":"2026-10-22T01:16:40.538Z","attempt":1,"tier":"easy","model":"claude-opus-5-5","source":"transcript"},
+    {"category":"testing","start":"2026-10-22T01:16:40.538Z","end":"2026-10-22T01:17:40.016Z","attempt":1,"tier":"easy","model":"claude-opus-5-5","source":"transcript"},
+    {"category":"developing","start":"2026-10-22T01:17:40.016Z","end":"2026-10-22T01:17:44.938Z","attempt":1,"tier":"easy","model":"claude-opus-5-5","source":"transcript"},
+    {"category":"testing","start":"2026-10-22T01:17:44.938Z","end":"2026-10-22T01:47:06.903Z","attempt":1,"tier":"easy","model":"claude-opus-5-5","source":"transcript"},
+    {"category":"planning","start":"2026-10-22T01:47:06.903Z","end":"2026-10-22T01:48:58.349Z","attempt":1,"tier":"easy","model":"claude-opus-5-5","source":"transcript"},
+    {"category":"other","start":"2026-10-22T01:48:58.349Z","end":"2026-10-22T01:48:58.403Z","attempt":1,"tier":"easy","model":"claude-opus-5-5","source":"transcript"},
+    {"category":"planning","start":"2026-10-22T01:48:58.403Z","end":"2026-10-22T01:48:58.481Z","attempt":1,"tier":"easy","model":"claude-opus-5-5","source":"transcript"},
+    {"category":"gates","start":"2026-10-22T01:48:58.481Z","end":"2026-10-22T01:52:19.009Z","attempt":1,"tier":"easy","model":"claude-opus-5-5","source":"loop-log"},
+    {"category":"landing","start":"2026-10-22T01:52:19.009Z","end":"2026-10-22T01:52:27.000Z","attempt":1,"tier":"easy","model":"claude-opus-5-5","source":"loop-log"}
+  ],
+  "totals": {"blocked":76647,"planner_wait":0,"idle":77,"context":125,"planning":112,"developing":25,"testing":1866,"gates":201,"landing":8,"other":30},
+  "lead_time_s": 79089,
+  "cycle_time_s": 2365,
+  "claimed": "2026-10-22T01:13:02.000Z",
+  "claimed_to_done_s": 2365,
+  "backfilled": false
+}
