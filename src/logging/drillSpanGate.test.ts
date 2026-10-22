@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest'
+import { TICKS_PER_SECOND } from '../constants/physics'
 import { withRegistrations } from '../registries/registrar'
 import type { SliceDefinition } from '../registries/sliceDefinition'
 import type { AuthorityCommand, CommandIntent } from '../systems/authority/authorityCommand'
@@ -53,8 +54,11 @@ function sweepOntoTheGate(drillLines: DrillLines) {
     send(0, { type: 'debug.setUpgrade', payload: { upgradeId: 'drill_power', level: 12 } })
     send(0, { type: 'debug.setEnergy', payload: { energy: '100000' } })
     const { payload } = poseAbove({ tx: 0, ty: 0 }, FACING.down)
-    send(0, { type: 'reportPose', payload: { ...payload, ...ABOVE } })
     const stepMm = stepBoundsAt(session.state(), 'p1').cuttingMm
+    // Reported moving down at the step it then takes: a cut down's front ramps from the reported
+    // speed (#724), and this sweep runs at the bound from its first step.
+    const vy = -stepMm * TICKS_PER_SECOND
+    send(0, { type: 'reportPose', payload: { ...payload, ...ABOVE, vy } })
     for (let tick = 1; tick <= 60; tick++) {
       send(tick, {
         type: 'drillStep',

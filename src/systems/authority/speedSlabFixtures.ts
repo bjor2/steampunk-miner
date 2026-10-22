@@ -39,7 +39,7 @@ import {
   type ScriptedSession,
 } from './scriptedSession'
 import { stepBoundsAt } from './stepBoundRead'
-import { openRunAheadOf, type Leg } from './sweptRigFixtures'
+import { movingDownAt, openRunAheadOf, type Leg } from './sweptRigFixtures'
 
 /** A band-1 column east of the pad whose bore is solid rock from the surface to its foot. */
 export const COLUMN = 24
@@ -164,7 +164,7 @@ function armedSession(levels: Record<string, number>): ScriptedSession {
     session.submit(0, { type: 'debug.setUpgrade', payload: { upgradeId, level } }, CUTTING_PLAYER)
   }
   session.submit(0, refillOf(session), CUTTING_PLAYER)
-  session.submit(0, reportAt(START.y, 0), CUTTING_PLAYER)
+  session.submit(0, reportAt(session.state(), START.y, 0), CUTTING_PLAYER)
   return session
 }
 
@@ -271,7 +271,9 @@ const BODY_FACE_WIDTH_MM = 850
 
 function stepAndReport(run: SlabRun, session: ScriptedSession, tick: number, bodyY: number): void {
   run.stepMs.push(submitTallied(run, session, tick, stepAt(bodyY)))
-  if (tick % REPORT_EVERY === 0) submitTallied(run, session, tick, reportAt(bodyY, REPORT_EVERY))
+  if (tick % REPORT_EVERY === 0) {
+    submitTallied(run, session, tick, reportAt(session.state(), bodyY, REPORT_EVERY))
+  }
 }
 
 function noteTick(run: SlabRun, state: AuthorityState, tick: number, bodyY: number): void {
@@ -316,12 +318,23 @@ function stepAt(bodyY: number): CommandIntent<'drillStep'> {
   }
 }
 
-function reportAt(bodyY: number, ticks: number): CommandIntent<'reportPose'> {
+/**
+ * A report of the cutting player at `bodyY`, moving down at its law's cut speed: a rig named by its
+ * speed is at it, where from rest a cut down's front would ramp from the reported speed under
+ * gravity (Bjor's ruling on #724).
+ */
+function reportAt(
+  state: AuthorityState,
+  bodyY: number,
+  ticks: number,
+): CommandIntent<'reportPose'> {
   const { payload } = poseAbove({ tx: 0, ty: 0 }, FACING.down)
   const counts = { driveTicks: ticks, drillTicks: ticks, driving: ticks > 0, drilling: ticks > 0 }
+  const lawStepMm = stepBoundsAt(state, CUTTING_PLAYER).cuttingMm - STEP_BOUND_TOLERANCE_MM
+  const moving = movingDownAt(payload, lawStepMm * TICKS_PER_SECOND)
   return {
     type: 'reportPose',
-    payload: { ...payload, x: START.x, y: bodyY, ...counts, drive: { x: 0, y: -1 } },
+    payload: { ...payload, x: START.x, y: bodyY, ...moving, ...counts, drive: { x: 0, y: -1 } },
   }
 }
 
