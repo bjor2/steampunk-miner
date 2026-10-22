@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-10-22T11:58:28+02:00",
+  "updated_at": "2026-10-22T11:59:25+02:00",
   "caps": {
     "grok": 12,
     "claude": 10,
@@ -37,11 +37,12 @@
         },
         {
           "slot": "C3",
-          "state": "free",
-          "ticket": null,
-          "grok_slot": null,
-          "kind": null,
-          "since": null
+          "state": "busy",
+          "ticket": 644,
+          "grok_slot": 3,
+          "kind": "dev",
+          "since": "2026-10-22T11:59:00+02:00",
+          "wave": null
         },
         {
           "slot": "C4",
@@ -69,9 +70,9 @@
         }
       ],
       "size": 6,
-      "used": 2,
-      "free": 4,
-      "claims_last_hour": 6,
+      "used": 3,
+      "free": 3,
+      "claims_last_hour": 7,
       "name": "Claude Max 1"
     },
     {
@@ -181,9 +182,11 @@
     },
     {
       "slot": 3,
-      "state": "free",
-      "ticket": null,
-      "since": null
+      "state": "dev",
+      "ticket": 644,
+      "since": "2026-10-22T11:59:00+02:00",
+      "claude_slot": 3,
+      "wave": null
     },
     {
       "slot": 4,
@@ -261,11 +264,12 @@
     },
     {
       "slot": 3,
-      "state": "free",
-      "ticket": null,
-      "grok_slot": null,
-      "since": null,
-      "account": 1
+      "state": "busy",
+      "ticket": 644,
+      "grok_slot": 3,
+      "since": "2026-10-22T11:59:00+02:00",
+      "account": 1,
+      "wave": null
     },
     {
       "slot": 4,
@@ -329,17 +333,17 @@
     }
   ],
   "last_refill": {
-    "at": "2026-10-22 11:39 CEST",
+    "at": "2026-10-22 11:59 CEST",
     "mode": "refill-dev",
-    "triggers": "#709",
-    "started": "",
-    "note": "no pickable build ticket"
+    "triggers": "claude-run:tester-triage",
+    "started": "#644->C3/A1",
+    "note": "spawned 1 worker(s)"
   },
   "totals": {
     "grok": {
       "size": 12,
-      "used": 2,
-      "dev": 2,
+      "used": 3,
+      "dev": 3,
       "dev_cap": 8,
       "planner": 0,
       "planner_cap": 4
@@ -347,8 +351,8 @@
     "claude": {
       "size": 10,
       "enabled": 6,
-      "used": 2,
-      "free": 4,
+      "used": 3,
+      "free": 3,
       "external": 0
     }
   },
