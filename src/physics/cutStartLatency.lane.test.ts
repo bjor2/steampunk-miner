@@ -2,7 +2,7 @@ import RAPIER from '@dimforge/rapier3d-compat'
 import { mkdirSync, writeFileSync } from 'node:fs'
 import { afterEach, beforeAll, beforeEach, describe, expect, it } from 'vitest'
 import { POSE_REPORT_INTERVAL_TICKS } from '../constants/balance'
-import { TICKS_PER_SECOND } from '../constants/physics'
+import { BASE_GRAVITY, TICKS_PER_SECOND } from '../constants/physics'
 import { createMemorySink } from '../logging/eventSink'
 import { createRunLog, installRunLog, uninstallRunLog } from '../logging/runLog'
 import { resetGameStore } from '../store/gameStore'
@@ -10,6 +10,7 @@ import { onCurveSteps } from '../systems/economy/vehicleStats'
 import { buildIntent } from '../systems/input/buildIntent'
 import {
   breakDownCutStart,
+  rampStandingTicksOf,
   type CutStartBreakdown,
   type CutStartTick,
 } from '../systems/vehicle/cutStartBreakdown'
@@ -165,6 +166,18 @@ function midShaftStandingOverACell(runs: readonly StartRun[]): Record<string, (n
   )
 }
 
+/**
+ * A rig's mid-shaft standing bar: main's mean, plus the ticks gravity takes to bring a body from
+ * rest past the standing line at its mid-shaft cut speed. Since Bjor's ruling on #724 a cut down
+ * gains its speed under gravity (planet 1's full pull at these depths), which is the time a start
+ * from rest may add, and only that.
+ */
+function midShaftStandingBarOf(runs: readonly StartRun[], rig: string): number {
+  const midShaft = runs.find((run) => run.rig === rig && run.leg === 'mid-shaft')
+  const cutSpeed = midShaft?.breakdown?.cutSpeed ?? 0
+  return MAIN_MID_SHAFT_MEAN_STANDING[rig] + rampStandingTicksOf(cutSpeed, BASE_GRAVITY)
+}
+
 function meanOf(ticks: readonly (number | null)[]): number {
   const known = ticks.filter((tick): tick is number => tick !== null)
   return known.reduce((sum, tick) => sum + tick, 0) / known.length
@@ -216,7 +229,7 @@ function seconds(ticks: number): string {
 
 function formatStartTable(runs: readonly StartRun[]): string {
   const header =
-    'rig | fps | start | vCut m/s | cell ticks | swivel | stale facing | first cell | held | ' +
+    'rig | fps | start | vCut m/s | cell ticks | swivel | stale facing | approach | first cell | held | ' +
     'second stall | standing (s) | first cell open (s) | press to first motion (s)'
   const rows = runs.map(({ rig, framesPerSecond, leg, breakdown: b, pressToFirstMotion }) =>
     b === null
@@ -229,6 +242,7 @@ function formatStartTable(runs: readonly StartRun[]): string {
           b.cellTicks.toFixed(1),
           b.swivelTicks,
           b.staleFacingTicks,
+          b.approachTicks,
           b.firstCellTicks,
           b.heldTicks ?? '-',
           b.secondStallTicks,
@@ -308,10 +322,10 @@ describe('cut start latency from rest (ticket 433)', () => {
     expect(stale).toEqual(stale.map(({ start }) => ({ start, stale: 0 })))
   })
 
-  it('stands no longer mid-shaft than main over a full cell period of face positions (Vertical Scaler, ticket 506)', () => {
+  it('stands no longer mid-shaft than main, bar the gravity ramp from rest, over a full cell period of face positions (Vertical Scaler, ticket 506; #724)', () => {
     for (const [rig, ticks] of Object.entries(midShaftByFace)) {
       expect(ticks.filter((tick) => tick === null)).toEqual([])
-      expect(meanOf(ticks)).toBeLessThanOrEqual(MAIN_MID_SHAFT_MEAN_STANDING[rig])
+      expect(meanOf(ticks)).toBeLessThanOrEqual(midShaftStandingBarOf(runs, rig))
     }
   })
 

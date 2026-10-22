@@ -4,11 +4,14 @@
  * holds it. Read off a rig's ticks in the live loop (`physics/cutStartLatency.lane.test.ts`).
  *
  * - **swivel**: the drill head turns to the new facing (`SWIVEL_TICKS`, #7) before the drill engages;
- * - **stale facing**: the drill is engaged but the cut gate stays shut. Until ticket 506 the
- *   authority read the facing of the last pose report here (reports went out every
+ * - **stale facing**: the drill is engaged, the cut gate stays shut and the body stands. Until ticket
+ *   506 the authority read the facing of the last pose report here (reports went out every
  *   `POSE_REPORT_INTERVAL_TICKS`, #11 amendment, and every tick while the drill bites with the
  *   exact carry on since ticket 514); `drillStep` now carries the head's facing, so this reads 0 unless something else holds
  *   the gate;
+ * - **approach**: the drill is engaged and the gate shut while the body moves, through open ground
+ *   (a cave it falls through) to the face. Since the gravity ramp (#724) a start can begin mid-fall,
+ *   which is no stale facing;
  * - **first cell**: the gate is open and the drill pays the cell before the face, which opens only
  *   once its whole price is paid (#399's carry);
  * - **held**, then **second stall**: between the first and the second cell opening, the ticks the
@@ -39,6 +42,8 @@ export interface CutStartBreakdown {
   cellTicks: number
   swivelTicks: number
   staleFacingTicks: number
+  /** Ticks the engaged drill's gate stayed shut while the body moved to the face (#724). */
+  approachTicks: number
   firstCellTicks: number
   /** The press to the tick the first cell opens. */
   firstCellOpenTick: number
@@ -63,17 +68,27 @@ export function breakDownCutStart(ticks: readonly CutStartTick[]): CutStartBreak
   const cutSpeed = ticks[opened].cutSpeed
   const between = ticksToSecondOpening(ticks, firstOpen)
   const secondStallTicks = countStanding(between, cutSpeed)
+  const staleFacingTicks = countStanding(ticks.slice(engaged, opened), cutSpeed)
   return {
     cutSpeed,
     cellTicks: TICKS_PER_SECOND / cutSpeed,
     swivelTicks: engaged,
-    staleFacingTicks: opened - engaged,
+    staleFacingTicks,
+    approachTicks: opened - engaged - staleFacingTicks,
     firstCellTicks: firstOpen - opened,
     firstCellOpenTick: firstOpen,
     heldTicks: between === null ? null : countHeld(between, cutSpeed),
     secondStallTicks,
-    standingTicks: opened - engaged + (firstOpen - opened) + secondStallTicks,
+    standingTicks: staleFacingTicks + (firstOpen - opened) + secondStallTicks,
   }
+}
+
+/**
+ * The ticks a body from rest needs under `acceleration` m/s² to pass the standing line of a cut at
+ * `cutSpeed` m/s: the time the gravity ramp (#724) adds to a cut's standing from rest.
+ */
+export function rampStandingTicksOf(cutSpeed: number, acceleration: number): number {
+  return Math.ceil((STANDING_SHARE * cutSpeed * TICKS_PER_SECOND) / acceleration)
 }
 
 /** The first tick from `from` on that opens a cell, or -1. */

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { breakDownCutStart, type CutStartTick } from './cutStartBreakdown'
+import { breakDownCutStart, rampStandingTicksOf, type CutStartTick } from './cutStartBreakdown'
 
 const V_CUT = 1.5
 
@@ -29,6 +29,7 @@ describe('cut start breakdown (ticket 433)', () => {
       cellTicks: 40,
       swivelTicks: 8,
       staleFacingTicks: 6,
+      approachTicks: 0,
       firstCellTicks: 26,
       firstCellOpenTick: 40,
       heldTicks: 27,
@@ -50,6 +51,28 @@ describe('cut start breakdown (ticket 433)', () => {
   it('has no held span when no second cell opens in the ticks read', () => {
     const once = [...ticksOf(1, { opensCell: true }), ...ticksOf(30, { speed: V_CUT })]
     expect(breakDownCutStart(once)).toMatchObject({ heldTicks: null, secondStallTicks: 0 })
+  })
+
+  // #724: from rest a cut down gains its speed under gravity, so a start can begin mid-fall
+  // through a cave; the fall to the face is an approach, not a stale facing.
+  it('counts the gate shut while the body falls to the face as an approach, not a stale facing', () => {
+    const midFall = [
+      ...ticksOf(4, { isCutting: false, cutSpeed: 0, speed: 11 }),
+      ...ticksOf(2, { isCutting: false, cutSpeed: 0 }),
+      ...ticksOf(1, { opensCell: true }),
+      ...ticksOf(10, { speed: V_CUT }),
+    ]
+    expect(breakDownCutStart(midFall)).toMatchObject({
+      swivelTicks: 0,
+      staleFacingTicks: 2,
+      approachTicks: 4,
+      standingTicks: 2,
+    })
+  })
+
+  it('takes the gravity ramp ticks from rest past the standing line', () => {
+    expect(rampStandingTicksOf(47.64, 12)).toBe(24)
+    expect(rampStandingTicksOf(1.5, 12)).toBe(1)
   })
 
   it('gives nothing for a start whose first cell never opens', () => {
