@@ -39,7 +39,10 @@ const PLANT_TOOL = {
 const hudBoxesIn = (html: string) => [...html.matchAll(/data-hud="([^"]+)"/g)].map((m) => m[1])
 
 function drawEveryBox(): string {
-  const hud = createElement(HudView, { model: everyReadoutOf(readHudModel()), isFlashing: false })
+  const model = everyReadoutOf(readHudModel())
+  const hud = createElement(HudView, { model, isFlashing: false })
+  // The compact HUD's tray of the slices' gauge panels (ticket 716).
+  const compact = createElement(HudView, { model, isFlashing: false, density: 'compact' })
   const touch = createElement(TouchControlsView, {
     situation: readTouchSituation(),
     isLeftHanded: false,
@@ -52,7 +55,7 @@ function drawEveryBox(): string {
     isRaised: false,
     isOverCluster: false,
   })
-  return [hud, createElement(PlaquesView, { model: PLAQUES }), touch, bar]
+  return [hud, compact, createElement(PlaquesView, { model: PLAQUES }), touch, bar]
     .map((element) => renderToString(element))
     .join('')
 }
@@ -68,6 +71,14 @@ describe('HUD boxes (#500)', () => {
   it('sets data-hud on every HUD box root, the loaded tech tree button included', () => {
     const boxes = new Set(hudBoxesIn(drawEveryBox()))
     expect([...boxes].sort()).toEqual(Object.values(HUD_BOX_IDS).sort())
+  })
+
+  it('makes the slices gauge panels one tray box on the compact HUD and none on the full one', () => {
+    const model = everyReadoutOf(readHudModel())
+    const draw = (density: 'compact' | 'full') =>
+      hudBoxesIn(renderToString(createElement(HudView, { model, isFlashing: false, density })))
+    expect(draw('compact').filter((id) => id === HUD_BOX_IDS.panels)).toHaveLength(1)
+    expect(draw('full')).not.toContain(HUD_BOX_IDS.panels)
   })
 
   it('draws one data-hud box per threat marker, never one for the threats layer', () => {

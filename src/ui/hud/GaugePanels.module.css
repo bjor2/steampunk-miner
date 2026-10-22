@@ -1,0 +1,92 @@
+/*
+ * The slices' `gauges` panels (the rack, the bore gun's gauge and toggle, the item heat) stack up
+ * from the bottom right on the full HUD, where the tool slot bar sits (ticket 691): their layer's
+ * floor is the bar's top, or the top of the bar over the touch cluster. The compact HUD holds them
+ * in its tray instead (below).
+ */
+.gaugePanels {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+:global([data-hud-density='full']) .gaugePanels {
+  bottom: calc(var(--layout-margin) + var(--slot-cell));
+}
+
+:global([data-hud-density='full']) .gaugePanels[data-over-cluster] {
+  bottom: calc(
+    var(--space-3) + var(--touch-cluster-height-upright) + var(--tool-bar-over-cluster-gap) +
+      var(--slot-cell)
+  );
+}
+
+/* A tablet held upright lays the bar in two rows over the cluster. */
+:global([data-orientation='portrait'][data-hud-density='full']) .gaugePanels[data-over-cluster] {
+  bottom: calc(
+    var(--space-3) + var(--touch-cluster-height-upright) + var(--tool-bar-over-cluster-gap) + 2 *
+      var(--slot-cell) + var(--slot-gap)
+  );
+}
+
+/*
+ * The compact HUD's tray (#500 declutter, ticket 716): a `panels` box in the HUD's grid, as wide as
+ * what it holds, so the panels never lie over the drill head or the hazard strip and a touch
+ * beside it stays the gesture surface's. It places each panel itself, as the prompts' row places
+ * the slices' threat and prompt panels (#486), and draws nothing while no panel shows.
+ */
+.gaugePanels[data-hud] {
+  position: relative;
+  inset: auto;
+  display: flex;
+  flex-wrap: wrap;
+  grid-area: panels;
+  align-items: center;
+  justify-self: start;
+  gap: var(--space-2);
+  max-width: 100%;
+  padding: var(--space-1) var(--space-2);
+  border: var(--frame-hairline) solid var(--color-brass);
+  border-radius: var(--radius-panel);
+  background: var(--color-panel);
+  pointer-events: auto;
+}
+
+.gaugePanels[data-hud]:empty {
+  display: none;
+}
+
+.gaugePanels[data-hud] > * {
+  position: static;
+  inset: auto;
+  margin: 0;
+  transform: none;
+}
+
+/*
+ * Closed, each panel collapses to its icons (#500's compact rule: the glyph, the word in the card):
+ * its plate goes, every part that neither is nor holds a glyph or a dial is hidden, and the words
+ * left beside a glyph shrink to nothing. A panel of words alone (a toggle) waits for the tray to
+ * open. Open, the panels draw as they are, placed in the tray.
+ */
+.gaugePanels[data-hud]:not([data-open]) > * {
+  padding: 0;
+  border: 0;
+  background: none;
+}
+
+.gaugePanels[data-hud]:not([data-open]) > :not(:has(img, [data-permille])) {
+  display: none;
+}
+
+.gaugePanels[data-hud]:not([data-open])
+  > *
+  :not(:has(img, [data-permille])):not(img, [data-permille], [data-permille] *) {
+  display: none;
+}
+
+.gaugePanels[data-hud]:not([data-open]) > :has(img, [data-permille]),
+.gaugePanels[data-hud]:not([data-open]) > * :has(img, [data-permille]) {
+  gap: var(--space-1);
+  font-size: 0;
+}

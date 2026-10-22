@@ -3,11 +3,11 @@
  * The strip is the one always-on top box, the edge gauge sits in the right edge lane and the tool
  * slot bar (ticket 691) holds the tools and the gear button that opens the strip's detail. The
  * warning glow (ticket 685) lies along the screen's edges under every other part, with a hit's
- * red edge flash (ticket 720) just above it. Each kernel
- * slot is followed by its slice panels
+ * red edge flash (ticket 720) just above it. Each kernel slot is followed by its slice panels
  * (feature-slices.md 3.14): `gauges`, `banner` and `position` keep their order after the strip,
- * so a slice's own panel still lays itself out. The overlay layer (#208) comes first, so every
- * other slot draws above it, and option B's pop badges (ticket 616) right after it. The density
+ * so a slice's own panel still lays itself out, except on the compact HUD, whose tray holds the
+ * `gauges` panels collapsed to their icons (ticket 716). The overlay layer (#208) comes first,
+ * so every other slot draws above it, and option B's pop badges (ticket 616) right after it. The density
  * (#500) is the layout shell's. Held upright (#486) the threats are chips leading the prompts'
  * row, and the slices' threat and prompt panels join that row instead of floating over the view.
  */
@@ -19,6 +19,7 @@ import type { HudDensity, StageOrientation } from '../../systems/views/screenLay
 import { NO_EDGE_GLOW, type EdgeGlow } from '../../systems/views/warningWatch'
 import { DebugRunMark } from './DebugRunMark'
 import { EdgeGauge } from './EdgeGauge'
+import { GaugePanels } from './GaugePanels'
 import { HazardStrip } from './HazardStrip'
 import { HitEdgeFlash } from './HitEdgeFlash'
 import { HudDetail } from './HudDetail'
@@ -71,9 +72,7 @@ export function HudView({
         isFlashing={isFlashing}
         statusIconsMax={statusIconsMaxOf(density)}
       />
-      <div className={styles.gaugePanels} data-over-cluster={isOverTouchSurface || undefined}>
-        <SlicePanels slot="gauges" />
-      </div>
+      <GaugePanels density={density} isOverCluster={isOverTouchSurface} />
       <SlicePanels slot="banner" />
       <SlicePanels slot="position" />
       <EdgeGauge permille={strip.edgePermille} />

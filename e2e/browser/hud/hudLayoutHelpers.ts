@@ -220,6 +220,36 @@ export function spilledTexts(page: Page): Promise<string[]> {
   })
 }
 
+/**
+ * The slices' `gauges` panels (ticket 716): on the full HUD each places itself and carries no
+ * `data-hud`, so they are measured as the children of their slot's layer; on the compact HUD the
+ * tray is their one `panels` box.
+ */
+export function gaugePanelBoxes(page: Page): Promise<MeasuredBox[]> {
+  return measuredBoxes(page, '[data-panel-slot="gauges"]:not([data-hud]) > *', 'data-testid')
+}
+
+/**
+ * The 2 s hazard strip as drawn (ticket 341): its track and every pip shown on it, as one box, or
+ * null while it is hidden. The strip itself is a zero-size anchor.
+ */
+export function hazardStripBox(page: Page): Promise<ScreenBox | null> {
+  return page.evaluate(() => {
+    const strip = document.querySelector('[data-testid="hud-hazard-strip"]:not([hidden])')
+    if (strip === null) return null
+    const parts = [...strip.querySelectorAll('*')]
+      .map((element) => element.getBoundingClientRect())
+      .filter((rect) => rect.width > 0 && rect.height > 0)
+    if (parts.length === 0) return null
+    return {
+      left: Math.min(...parts.map((rect) => rect.left)),
+      top: Math.min(...parts.map((rect) => rect.top)),
+      right: Math.max(...parts.map((rect) => rect.right)),
+      bottom: Math.max(...parts.map((rect) => rect.bottom)),
+    }
+  })
+}
+
 export async function vehicleBox(page: Page): Promise<ScreenBox> {
   return page.evaluate(() => {
     const result = window.steampunkDebug!.ui.getVehicleScreenBox()

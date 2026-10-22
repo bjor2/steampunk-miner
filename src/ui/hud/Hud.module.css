@@ -6,38 +6,6 @@
   pointer-events: none;
 }
 
-/*
- * The slices' `gauges` panels (the rack, the bore gun's gauge and toggle, the item heat) stack up
- * from the bottom right, where the tool slot bar sits on desktop and held sideways (ticket 691):
- * their layer's floor is the bar's top, or the top of the bar over the touch cluster. A phone
- * held upright keeps the floor at the foot, as the bar stands over the cluster there.
- */
-.gaugePanels {
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-}
-
-:global([data-hud-density='full']) .gaugePanels,
-:global([data-orientation='landscape'][data-hud-density='compact']) .gaugePanels {
-  bottom: calc(var(--layout-margin) + var(--slot-cell));
-}
-
-:global([data-hud-density='full']) .gaugePanels[data-over-cluster] {
-  bottom: calc(
-    var(--space-3) + var(--touch-cluster-height-upright) + var(--tool-bar-over-cluster-gap) +
-      var(--slot-cell)
-  );
-}
-
-/* A tablet held upright lays the bar in two rows over the cluster. */
-:global([data-orientation='portrait'][data-hud-density='full']) .gaugePanels[data-over-cluster] {
-  bottom: calc(
-    var(--space-3) + var(--touch-cluster-height-upright) + var(--tool-bar-over-cluster-gap) + 2 *
-      var(--slot-cell) + var(--slot-gap)
-  );
-}
-
 /* The dock arrow in the strip's detail (`DetailReadouts`), turned to its octant. */
 .arrow {
   display: inline-block;
@@ -143,15 +111,16 @@
  * button's gap (`right: 30%`, ticket 472), which keeps the row at least a control tall; then the
  * prompts across the width. Sideways: a left column of the debug mark over the prompts that stops
  * at the vehicle's keep-clear square (`--vehicle-clear-left`) and the Tech tree past the pause
- * button. The threat markers keep the
- * space under the rows.
+ * button. The slices' gauge panels are a tray row (ticket 716): under the first row upright,
+ * under the prompts sideways. The threat markers keep the space under the rows.
  */
 .hud[data-density='compact'] {
   display: grid;
   grid-template-columns: minmax(0, calc(70% - 61px)) minmax(0, 1fr) auto;
-  grid-template-rows: minmax(var(--control-min), min-content) min-content minmax(0, 1fr);
+  grid-template-rows: minmax(var(--control-min), min-content) min-content min-content minmax(0, 1fr);
   grid-template-areas:
     'debug . tech'
+    'panels panels panels'
     'prompts prompts prompts'
     'threats threats threats';
   align-items: start;
@@ -166,10 +135,11 @@
     minmax(0, 1fr)
     calc(56px + var(--space-2))
     minmax(0, calc(30% - 12px));
-  grid-template-rows: min-content min-content minmax(0, 1fr);
+  grid-template-rows: min-content min-content min-content minmax(0, 1fr);
   grid-template-areas:
     'debug . . tech'
     'prompts . . .'
+    'panels . . .'
     'threats threats threats threats';
 }
 

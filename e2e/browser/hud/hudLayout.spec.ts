@@ -9,14 +9,19 @@
  * sweep, where a one-way ratchet waits for a number. With every control owned every pair is
  * asserted either way up: the slots and the fire tile left #485's tile lane for the tool slot bar
  * (ticket 691), whose cells are HUD boxes in the thumb corner.
- * The desktop, TV and tablet cells keep the full HUD: the strip centred on top (ticket 684). A cell that cannot reach the worst case
- * fails, never skips. Geometry through the DOM and `steampunkDebug` only.
+ * The desktop, TV and tablet cells keep the full HUD: the strip centred on top (ticket 684). On
+ * every cell, drilling with every control owned, no HUD box and none of the slices' gauge panels
+ * lies over the drill head or the 2 s hazard strip (ticket 716; on a phone the panels sit in the
+ * tray, collapsed to their icons). A cell that cannot reach the worst case fails, never skips.
+ * Geometry through the DOM and `steampunkDebug` only.
  */
 import { expect, test, type Page } from '@playwright/test'
-import { clearShareOf } from '../../../src/systems/views/hudClearView'
+import { clearShareOf, type ScreenBox } from '../../../src/systems/views/hudClearView'
 import { hintChipHeightOf } from '../../../src/systems/views/hintRoom'
 import {
   boxOfTestId,
+  gaugePanelBoxes,
+  hazardStripBox,
   hudBoxes,
   isInside,
   openGame,
@@ -244,6 +249,17 @@ for (const cell of PHONE_CELLS) {
         if (cell.floor !== null) expect(share).toBeGreaterThanOrEqual(cell.floor)
       },
     )
+
+    test('keeps every panel off the drill head and the hazard strip while drilling', async ({
+      page,
+    }) => {
+      test.setTimeout(TEST_TIMEOUT_MS)
+      await openGame(page, cell)
+      await reachWorstCase(page, cell)
+      await stackEveryControl(page)
+      await expect(page.locator('[data-hud="panels"]')).toHaveCount(1)
+      await expectPanelsClearWhileDrilling(page)
+    })
   })
 }
 
@@ -274,11 +290,44 @@ for (const cell of FULL_CELLS) {
       expect(byId.get('gear')!.top).toBeGreaterThanOrEqual(strip.bottom)
       expect(errors).toEqual([])
     })
+
+    test('keeps every panel off the drill head and the hazard strip while drilling', async ({
+      page,
+    }) => {
+      test.setTimeout(TEST_TIMEOUT_MS)
+      await openGame(page, cell)
+      await reachWorstCase(page, cell)
+      await stackEveryControl(page)
+      await expectPanelsClearWhileDrilling(page)
+    })
   })
 }
 
 function densityOf(page: Page): Promise<string> {
   return page.evaluate(() => document.documentElement.dataset.hudDensity ?? '')
+}
+
+/**
+ * Ticket 716 (the #500 declutter): over the drilling samples, no HUD box but the touch controls
+ * (#485's, outside the panels) and no gauge panel meets the vehicle's body or the hazard strip,
+ * which must have drawn, so the check is never empty.
+ */
+async function expectPanelsClearWhileDrilling(page: Page): Promise<void> {
+  let stripSamples = 0
+  for (let sample = 0; sample < DRILL_SAMPLES; sample++) {
+    const panels = [...(await hudBoxes(page)), ...(await gaugePanelBoxes(page))].filter(
+      (box) => box.id !== 'control',
+    )
+    const vehicle = await vehicleBox(page)
+    const strip = await hazardStripBox(page)
+    const meeting = (area: ScreenBox) =>
+      panels.filter((box) => overlapsBox(box, area)).map((box) => `${box.id}:${box.testId ?? ''}`)
+    expect(meeting(vehicle), `sample ${sample}: the drill head`).toEqual([])
+    if (strip !== null) expect(meeting(strip), `sample ${sample}: the hazard strip`).toEqual([])
+    stripSamples += strip === null ? 0 : 1
+    await page.waitForTimeout(SAMPLE_GAP_MS)
+  }
+  expect(stripSamples, 'the hazard strip draws while drilling').toBeGreaterThan(0)
 }
 
 async function expectVehicleUncovered(page: Page): Promise<void> {
