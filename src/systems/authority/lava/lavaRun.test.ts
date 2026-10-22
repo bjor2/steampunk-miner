@@ -24,6 +24,7 @@ import {
   onHeatPlanet,
   reportAt,
 } from './lavaFixtures'
+import { drillStampRadiusMm } from '../../vehicle/drillBore'
 
 const lineHole: CommandIntent = {
   type: 'debug.lineCasing',
@@ -155,7 +156,10 @@ describe('lava a breach wakes (#133)', () => {
   it('leaves a pocket lying against a cave where it lay when a wrecker breaches a standard ring beside it', () => {
     const session = onHeatPlanet()
     session.submit(0, reportAt({ x: RING.x, y: RING.y - 30000 }))
-    session.submit(1, { type: 'debug.carveCircle', payload: { ...RING, radius: 950, amount: 255 } })
+    session.submit(1, {
+      type: 'debug.carveCircle',
+      payload: { ...RING, radius: drillStampRadiusMm(), amount: 255 },
+    })
     session.submit(1, { type: 'debug.lineCasing', payload: { ...RING, grade: 5 } })
     const gnawed = session.submit(2, { type: 'debug.gnawCasing', payload: RING })
     session.advanceTo(10 * LAVA_FLOW_STEP_TICKS)

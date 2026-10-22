@@ -18,6 +18,7 @@ import {
   SOLID_SITE,
 } from './charges/liveBlastFixtures'
 import { queueTerrainEdit } from './terrain/terrainEdits'
+import { drillStampRadiusMm } from '../vehicle/drillBore'
 
 function richState(): AuthorityState {
   const start = createAuthorityState({ planetIndex: 1, planetSeed: 83921, playerIds: ['p1'] })
@@ -92,7 +93,10 @@ describe('session snapshot: casing (#41)', () => {
   function linedState(): AuthorityState {
     const start = createAuthorityState({ planetIndex: 1, planetSeed: 83921, playerIds: ['p1'] })
     const commands = [
-      { type: 'debug.carveCircle', payload: { x: 500, y: 284000, radius: 950, amount: 255 } },
+      {
+        type: 'debug.carveCircle',
+        payload: { x: 500, y: 284000, radius: drillStampRadiusMm(), amount: 255 },
+      },
       { type: 'debug.lineCasing', payload: { x: 500, y: 284000, grade: 3 } },
       { type: 'debug.setCasingGrade', payload: { grade: 3 } },
     ] as const

@@ -14,6 +14,7 @@ import {
   WORLD_SEED,
   type ScriptedSession,
 } from '../../../systems/authority/scriptedSession'
+import { drillStampRadiusMm } from '../../../systems/vehicle/drillBore'
 import { FACING, type Facing } from '../../../systems/vehicle/vehiclePose'
 import type { PlanetParams } from '../../../systems/world/planetParams'
 import { SOLID_DENSITY } from '../../../systems/world/sampleGrid'
@@ -28,7 +29,7 @@ import { barometerWarningsOf } from './hazardBarometer'
 const MM = 1000
 const LOOKAHEAD = 4
 /** The drill's bore radius, the ring the lining is laid round (casingBreach.test.ts). */
-const BORE_MM = 950
+const BORE_MM = drillStampRadiusMm()
 
 /** A pose report with the miner upright (local up = +y), centred on `tile`, facing `facing`. */
 function standAt(session: ScriptedSession, tick: number, tile: TilePoint, facing: Facing) {
@@ -86,7 +87,8 @@ describe('hazard barometer', () => {
   it('warns of breached lining ahead, where a collapse can start', () => {
     const session = createScriptedSession()
     const stand = { tx: GROUND.tx, ty: GROUND.ty - 30 }
-    const centre = { x: stand.tx * MM + MM / 2, y: stand.ty * MM + MM / 2 }
+    // The bore and its ring round the cell ahead of the drill, below the stand.
+    const centre = { x: stand.tx * MM + MM / 2, y: stand.ty * MM - MM / 2 }
     session.submit(1, carveCircleCommand({ ...centre, radius: BORE_MM, amount: SOLID_DENSITY }))
     session.submit(1, lineCasingCommand({ ...centre, grade: 3 }))
     session.submit(1, gnawCasingCommand(centre.x, centre.y))

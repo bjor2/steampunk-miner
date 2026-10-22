@@ -12,6 +12,7 @@ import { renderPresence } from '../scene/renderPresence'
 import { fromCanonical, toCanonical } from '../systems/money'
 import { musicStingersOf } from '../systems/audio/musicStingers'
 import { firstDigestMismatch, replayRun } from '../systems/replay/replayRun'
+import { drillStampRadiusMm } from '../systems/vehicle/drillBore'
 import { bayPoseAt } from '../systems/vehicle/vehiclePose'
 import { dockSiteOf } from '../systems/world/dockSite'
 import { planetParamsFor } from '../systems/world/planetParams'
@@ -428,9 +429,12 @@ describe('debug api: the audio model reads the drill voice (#41)', () => {
     expect(audioModel().drillVoice).toBe('rock')
     const pose = readAuthorityState().players[useGameStore.getState().playerId].vehicle.pose
     if (pose === null) throw new Error('the vehicle has no pose')
-    debug.fillCircle(pose.x + 2000, pose.y, 1500)
+    // Rock from the nose tile's near edge (the pose sits on a tile edge), and a ring round a point
+    // a stamp radius back from that edge, so its wall lies in the nose tile.
+    const noseEdgeX = pose.x + 1000
+    debug.fillCircle(noseEdgeX + 1500, pose.y, 1500)
     expect(audioModel().drillVoice).toBe('rock')
-    debug.lineCasing(pose.x, pose.y, 2)
+    debug.lineCasing(noseEdgeX + 125 - drillStampRadiusMm(), pose.y, 2)
     expect(audioModel().drillVoice).toBe('casing')
   })
 })

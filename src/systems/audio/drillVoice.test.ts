@@ -5,6 +5,7 @@ import {
   poseAbove,
   surfaceOreTiles,
 } from '../authority/scriptedSession'
+import { drillStampRadiusMm } from '../vehicle/drillBore'
 import { FACING, type Facing } from '../vehicle/vehiclePose'
 import type { TilePoint } from '../world/tileGrid'
 import { drillVoiceOf } from './drillVoice'
@@ -23,7 +24,7 @@ function facingLinedWall() {
   mineTile(session, 10, hole)
   session.submit(60, {
     type: 'debug.lineCasing',
-    payload: { x: ore.tx * 1000 - 950, y: ore.ty * 1000 + 375, grade: 2 },
+    payload: { x: ore.tx * 1000 - drillStampRadiusMm() - 125, y: ore.ty * 1000 + 375, grade: 2 },
   })
   session.submit(61, poseInside(hole, FACING.right))
   return session

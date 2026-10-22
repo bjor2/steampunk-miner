@@ -12,6 +12,7 @@ import { spawnEnemy } from './combatFixtures'
 import {
   digPlanet6Tunnel,
   onPlanet,
+  parkUntilGnawing,
   PLANET_5,
   PLANET_6,
   TUNNEL_FROM_X,
@@ -242,7 +243,7 @@ describe('tunnel wrecker: determinism and snapshots (#111, #94 acceptance 7)', (
 
   it('restores a session mid-gnaw from its snapshot and gnaws on to the same digest', () => {
     const { session, tick } = digPlanet6Tunnel()
-    parkAt(session, tick, tick + 600, TO_X, PLANET_6.y, 10)
+    parkUntilGnawing(session, tick)
     const reading = readSnapshot(JSON.parse(JSON.stringify(takeSnapshot(session.state()))))
     expect(reading.problems).toEqual([])
     if (!('state' in reading)) return

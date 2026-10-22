@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { COLLAPSE_FILL_TICKS } from '../../constants/balance'
+import { drillStampRadiusMm } from '../vehicle/drillBore'
 import { breachRing, hasIntactLining } from './casingBreach'
 import { casingRingAround, lineRing, ringSamplesOf } from './casingLining'
 import { CASING_BREACHED, isCasingValue } from './chunkDelta'
@@ -28,7 +29,7 @@ function carveTunnel(world: WorldState, y: number, fromX = FROM_X, toX = TO_X): 
     carved = clearDisc(
       carved,
       params,
-      { xMm: x, yMm: y, radiusMm: 950, floorRadiusMm: null },
+      { xMm: x, yMm: y, radiusMm: drillStampRadiusMm(), floorRadiusMm: null },
       255,
     ).world
   }

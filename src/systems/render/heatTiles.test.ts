@@ -14,6 +14,7 @@ import {
 import { buildChunkTileBatch, TILE_STYLE, type ChunkTileBatch } from './chunkTileBatch'
 import { chunkDensityHaloOf } from './densityHalo'
 import { liningCellsOf, refractoryCellsOf } from './liningCells'
+import { drillStampRadiusMm } from '../vehicle/drillBore'
 
 const params = planetParamsFor(83921, 8)
 const REFRACTORY = 1
@@ -56,7 +57,7 @@ describe('heat planet tiles (#113 Visibility)', () => {
     const hole = clearDisc(
       EMPTY_WORLD,
       params,
-      { ...centre, radiusMm: 950, floorRadiusMm: null },
+      { ...centre, radiusMm: drillStampRadiusMm(), floorRadiusMm: null },
       255,
     )
     const ring = casingRingAround(centre.xMm, centre.yMm)

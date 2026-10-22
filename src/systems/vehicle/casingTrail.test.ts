@@ -5,19 +5,24 @@ import {
   EMPTY_CASING_TRAIL,
   followCasingTrail,
   followCasingTrailAlongCut,
+  type AxisPoint,
   type CasingTrail,
 } from './casingTrail'
 
-/** The stamp's centre moved through `xs` (mm, at y 0), collecting the x of each ring due. */
+/**
+ * The stamp's centre moved through `xs` (mm, at y 0), collecting the x of each ring due, and every
+ * point recorded: those laid, then those still waiting.
+ */
 function followAlongX(xs: readonly number[], isCutting = true, start = EMPTY_CASING_TRAIL) {
   let trail: CasingTrail = start
-  const due: number[] = []
+  const duePoints: AxisPoint[] = []
   for (const x of xs) {
     const step = followCasingTrail(trail, { xMm: x, yMm: 0 }, isCutting)
     trail = step.trail
-    due.push(...step.due.map((point) => point.xMm))
+    duePoints.push(...step.due)
   }
-  return { trail, due }
+  const due = duePoints.map((point) => point.xMm)
+  return { trail, due, recorded: [...duePoints, ...trail.unlined] }
 }
 
 /** 0, step, 2 step ... up to `toMm`. */
@@ -27,18 +32,19 @@ function stepsTo(toMm: number, stepMm: number): number[] {
 
 describe('casing trail', () => {
   it('records the stamp centre every half metre it cuts', () => {
-    const { trail } = followAlongX(stepsTo(2000, 100))
-    expect(trail.unlined.map((point) => point.xMm)).toEqual([0, 500, 1000, 1500, 2000])
+    const { recorded } = followAlongX(stepsTo(2000, 100))
+    expect(recorded.map((point) => point.xMm)).toEqual([0, 500, 1000, 1500, 2000])
   })
 
-  it('lays each ring only once the stamp is 2.15 m past it, oldest first', () => {
+  it('lays each ring only once the stamp is the 1.45 m ring lag past it, oldest first', () => {
     const { due, trail } = followAlongX(stepsTo(5000, 100))
-    expect(due).toEqual([0, 500, 1000, 1500, 2000, 2500])
-    expect(trail.unlined.map((point) => point.xMm)).toEqual([3000, 3500, 4000, 4500, 5000])
+    expect(casingRingLagMm()).toBe(1450)
+    expect(due).toEqual([0, 500, 1000, 1500, 2000, 2500, 3000, 3500])
+    expect(trail.unlined.map((point) => point.xMm)).toEqual([4000, 4500, 5000])
   })
 
   it('lays one ring per half metre of a 20 m cut once the stamp is past each', () => {
-    expect(followAlongX(stepsTo(22200, 100)).due.slice(1)).toHaveLength(40)
+    expect(followAlongX(stepsTo(21500, 100)).due.slice(1)).toHaveLength(40)
   })
 
   it('records nothing while the drill is not cutting', () => {
@@ -48,10 +54,10 @@ describe('casing trail', () => {
   })
 
   it('lays the last rings of a cut as the vehicle backs out without drilling', () => {
-    const cut = followAlongX(stepsTo(2000, 100))
-    const backedOut = followAlongX([-200, -2200], false, cut.trail)
+    const cut = followAlongX(stepsTo(1000, 100))
+    const backedOut = followAlongX([-500, -2200], false, cut.trail)
     expect(cut.due).toEqual([])
-    expect(backedOut.due).toEqual([2000, 0, 500, 1000, 1500])
+    expect(backedOut.due).toEqual([1000, 0, 500])
     expect(backedOut.trail.unlined).toEqual([])
   })
 
@@ -62,19 +68,19 @@ describe('casing trail', () => {
   })
 
   it('drops a point within half a metre of one waiting, folding its stretch into no ring', () => {
-    const { trail } = followAlongX([0, 500, 1000, 1500, 1000, 500, 0, -500])
-    expect(trail.unlined.map((point) => [point.xMm, point.lengthMm])).toEqual([
+    const { recorded } = followAlongX([0, 500, 1000, 500, 0, -500])
+    const byX = [...recorded].sort((a, b) => a.xMm - b.xMm)
+    expect(byX.map((point) => [point.xMm, point.lengthMm])).toEqual([
+      [-500, 500],
       [0, 500],
       [500, 500],
       [1000, 500],
-      [1500, 500],
-      [-500, 500],
     ])
   })
 
   it('gives each ring the stretch of axis cut since the previous one', () => {
     const lengthsAt = (stepMm: number) =>
-      followAlongX(stepsTo(2000, stepMm)).trail.unlined.map((point) => point.lengthMm)
+      followAlongX(stepsTo(2000, stepMm)).recorded.map((point) => point.lengthMm)
     expect(lengthsAt(100)).toEqual([500, 500, 500, 500, 500])
     expect(lengthsAt(1000)).toEqual([500, 1000, 1000])
   })
@@ -88,12 +94,16 @@ describe('casing trail', () => {
 })
 
 describe('casing trail along the swept cut (ticket 330)', () => {
-  function followCutAlongX(stepMm: number, toMm: number) {
+  /** Every point the cut recorded along x at `stepMm` a tick to `toMm`: laid, then waiting. */
+  function recordedAlongX(stepMm: number, toMm: number): AxisPoint[] {
     let trail: CasingTrail = EMPTY_CASING_TRAIL
+    const due: AxisPoint[] = []
     for (const x of stepsTo(toMm, stepMm)) {
-      trail = followCasingTrailAlongCut(trail, cutTo(x, stepMm), true).trail
+      const step = followCasingTrailAlongCut(trail, cutTo(x, stepMm), true)
+      trail = step.trail
+      due.push(...step.due)
     }
-    return trail
+    return [...due, ...trail.unlined]
   }
 
   /** A swept cut that ran `stepMm` along x to `x`, its start no further back than 0. */
@@ -115,10 +125,10 @@ describe('casing trail along the swept cut (ticket 330)', () => {
   }
 
   it.each([60, 300, 290])('records a point every half metre at %i mm a step', (stepMm) => {
-    const trail = followCutAlongX(stepMm, 2000)
-    const xs = [...trail.unlined.map((point) => point.xMm)]
+    const recorded = recordedAlongX(stepMm, 2000)
+    const xs = recorded.map((point) => point.xMm)
     expect(xs.slice(0, 4)).toEqual([0, 500, 1000, 1500])
-    for (const point of trail.unlined.slice(1)) expect(point.lengthMm).toBe(500)
+    for (const point of recorded.slice(1)) expect(point.lengthMm).toBe(500)
   })
 
   it('leaves no gap and charges no lag at 18 m/s, 300 mm a tick', () => {
@@ -216,7 +226,7 @@ describe('casing trail at a report every tick (ticket 514)', () => {
     },
   )
 
-  it("lays a reversing rig's waiting rings once it has backed 2.15 m past each, never ahead of it", () => {
+  it("lays a reversing rig's waiting rings once it has backed the lag past each, never ahead of it", () => {
     const cut = laidAlong(stepsTo(8000, 25), true)
     const backing = stepsTo(8000, 25).reverse()
     const backedOut = laidAlong(backing, false, cut.trail)

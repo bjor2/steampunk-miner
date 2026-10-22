@@ -1,6 +1,12 @@
 import { describe, expect, it } from 'vitest'
-import { BODY_HALF_SIZE_MM, DRILL_BORE_ROWS } from '../../constants/balance'
+import {
+  BODY_HALF_SIZE_MM,
+  CASING_LINING_WIDTH_MM,
+  DRILL_BORE_ROWS,
+  DRILL_SIDE_CLEARANCE_RANGE_MM,
+} from '../../constants/balance'
 import { VEHICLE_COLLIDER_SIZE } from '../../constants/physics'
+import { casingRingAround } from '../world/casingLining'
 import { casingRingLagMm, drillStampLiftMm, drillStampRadiusMm } from './drillBore'
 import { WIDE_BORE_CLEARANCE_MM, withDrillSideClearance } from './drillBoreFixtures'
 
@@ -12,9 +18,22 @@ describe('drill bore', () => {
     expect(BODY_HALF_SIZE_MM * 2).toBe(bodyWidthMm)
   })
 
-  it('ships the 950 mm stamp radius protocol 100 cut until ticket 662 narrows the row', () => {
-    expect(DRILL_BORE_ROWS.sideClearanceMm).toBe(WIDE_BORE_CLEARANCE_MM)
-    expect(drillStampRadiusMm()).toBe(950)
+  it('ships a side clearance inside the GD’s 0.10 to 0.20 m', () => {
+    expect(DRILL_BORE_ROWS.sideClearanceMm).toBeGreaterThanOrEqual(
+      DRILL_SIDE_CLEARANCE_RANGE_MM.min,
+    )
+    expect(DRILL_BORE_ROWS.sideClearanceMm).toBeLessThanOrEqual(DRILL_SIDE_CLEARANCE_RANGE_MM.max)
+  })
+
+  it('cuts a 1.2 m bore round the 0.9 m body with nothing lifted above it', () => {
+    expect(2 * drillStampRadiusMm()).toBe(1200)
+    expect(drillStampLiftMm()).toBe(0)
+  })
+
+  it('lines the ring in the rock outside the wall, never inside the bore', () => {
+    const ring = casingRingAround(0, 0)
+    expect(ring.clearMm).toBe(drillStampRadiusMm())
+    expect(ring.widthMm).toBe(CASING_LINING_WIDTH_MM)
   })
 
   it('cuts decision #36’s 1.9 m bore, lift and ring lag at a clearance of 0.5 m', () => {

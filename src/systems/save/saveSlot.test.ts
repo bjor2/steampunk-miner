@@ -22,6 +22,7 @@ import { computeVehicleStats } from '../vehicle/vehicleStats'
 import { dockedPoseAt, FACING } from '../vehicle/vehiclePose'
 import { isCheckpointMoment } from './checkpointMoment'
 import { readSaveSlot, saveSlotOf, type SaveSlotFile } from './saveSlot'
+import { drillStampRadiusMm } from '../vehicle/drillBore'
 
 const dock: CommandIntent = { type: 'dock', payload: { bay: 'sell' } }
 const undock: CommandIntent = { type: 'undock', payload: {} }
@@ -117,7 +118,7 @@ describe('save slot', () => {
     const session = dockedAfterATrip()
     session.submit(210, {
       type: 'debug.carveCircle',
-      payload: { x: 500, y: 284000, radius: 950, amount: 255 },
+      payload: { x: 500, y: 284000, radius: drillStampRadiusMm(), amount: 255 },
     })
     session.submit(210, { type: 'debug.lineCasing', payload: { x: 500, y: 284000, grade: 3 } })
     const gnaw = session.submit(210, { type: 'debug.gnawCasing', payload: { x: 500, y: 284000 } })

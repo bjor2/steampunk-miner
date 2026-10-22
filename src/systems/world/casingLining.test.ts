@@ -1,4 +1,7 @@
 import { describe, expect, it } from 'vitest'
+import { drillStampRadiusMm } from '../vehicle/drillBore'
+import { drillStampOf, stampSweptFrom } from '../vehicle/drillStamp'
+import { FACING, type VehiclePose } from '../vehicle/vehiclePose'
 import { cellDensitySum } from './cellYield'
 import { casingRingAround, cellWallSamplesOf, lineRing } from './casingLining'
 import { carveDisc, clearDisc, type CellDrillTicks } from './groundEdit'
@@ -43,9 +46,25 @@ function samplesNearCentre(): { sx: number; sy: number; distanceSq: number }[] {
   return samples
 }
 
-function isInRing(distanceSq: number): boolean {
+/** The planet's up at the centre, 1024-scaled: (2, 1024) this far out on the y axis. */
+const UP = { x: 2, y: 1024 }
+
+function isInAnnulus(sx: number, sy: number): boolean {
+  const dx = sx * MM_PER_SAMPLE - CENTRE.xMm
+  const dy = sy * MM_PER_SAMPLE - CENTRE.yMm
+  const distanceSq = dx * dx + dy * dy
   const outer = RING.clearMm + RING.widthMm
   return distanceSq >= RING.clearMm * RING.clearMm && distanceSq < outer * outer
+}
+
+/** In the annulus round the centre, or in its floor box: under it, 1.2 m deep, the wheels' width. */
+function isInRing(sx: number, sy: number): boolean {
+  const dx = sx * MM_PER_SAMPLE - CENTRE.xMm
+  const dy = sy * MM_PER_SAMPLE - CENTRE.yMm
+  const depth = -(dx * UP.x + dy * UP.y)
+  const across = Math.abs(dx * UP.y - dy * UP.x)
+  const isInFloorBox = depth > 0 && depth <= 1200 * 1024 && across <= 450 * 1024
+  return isInAnnulus(sx, sy) || isInFloorBox
 }
 
 function touchesAir(world: WorldState, sx: number, sy: number): boolean {
@@ -65,10 +84,60 @@ function keepsDensity(before: WorldState, after: WorldState): boolean {
   )
 }
 
-/** A round hole of 0.95 m radius, the drill's tunnel cross-section. */
+/** A round hole of the stamp's radius, the drill's tunnel cross-section, its wall on the circle. */
 function boredHole(): WorldState {
-  const disc = { ...CENTRE, radiusMm: 950, floorRadiusMm: null }
-  return clearDisc(EMPTY_WORLD, params, disc, 255).world
+  const disc = { ...CENTRE, radiusMm: drillStampRadiusMm(), floorRadiusMm: null }
+  return clearDisc(EMPTY_WORLD, params, { ...disc, edge: 'boreWall' }, 255).world
+}
+
+/**
+ * A level tunnel's axis where its floor lies deepest: the wheels 0.45 m under it round down to a
+ * floor circle 0.68 m under, so its first solid sample is 0.93 m under, past the annulus's 0.85.
+ */
+const LEVEL_AXIS = { xMm: 500, yMm: 284_429 }
+
+/** A level tunnel along the axis as a pose report facing right cuts it (lift 0 at 0.15 m). */
+function levelTunnel(): WorldState {
+  const pose: VehiclePose = {
+    x: LEVEL_AXIS.xMm,
+    y: LEVEL_AXIS.yMm,
+    vx: 0,
+    vy: 0,
+    upx: 2,
+    upy: 1024,
+    facing: FACING.right,
+  }
+  const stamp = drillStampOf(pose, false)
+  const tail = { xMm: LEVEL_AXIS.xMm - 3000, yMm: stamp.yMm }
+  const head = { ...stamp, xMm: LEVEL_AXIS.xMm + 1500 }
+  return clearDisc(EMPTY_WORLD, params, stampSweptFrom(head, tail), 255).world
+}
+
+/** The tunnel floor's wall samples under the axis, within the wheels' half width: rock beside air. */
+function floorSamplesUnder(world: WorldState, axis: { xMm: number; yMm: number }) {
+  const floor = []
+  for (
+    let sy = Math.floor((axis.yMm - 1500) / MM_PER_SAMPLE);
+    sy * MM_PER_SAMPLE < axis.yMm;
+    sy++
+  ) {
+    for (
+      let sx = Math.ceil((axis.xMm - 400) / MM_PER_SAMPLE);
+      sx * MM_PER_SAMPLE <= axis.xMm + 400;
+      sx++
+    ) {
+      if (densityAt(world, sx, sy) > 128 && touchesAir(world, sx, sy)) floor.push({ sx, sy })
+    }
+  }
+  return floor
+}
+
+/** Whether the sample lies in the plain annulus of a ring round `axis`, its floor box aside. */
+function isInAnnulusOf(axis: { xMm: number; yMm: number }, sx: number, sy: number): boolean {
+  const dx = sx * MM_PER_SAMPLE - axis.xMm
+  const dy = sy * MM_PER_SAMPLE - axis.yMm
+  const outer = RING.clearMm + RING.widthMm
+  return dx * dx + dy * dy < outer * outer
 }
 
 describe('casing lining', () => {
@@ -81,9 +150,9 @@ describe('casing lining', () => {
   it('lines every rock sample of the ring that touches air, at the grade, leaving its density', () => {
     const hole = boredHole()
     const lined = lineRing(hole, params, RING, 2)
-    for (const { sx, sy, distanceSq } of samplesNearCentre()) {
+    for (const { sx, sy } of samplesNearCentre()) {
       const shouldLine =
-        isInRing(distanceSq) && densityAt(hole, sx, sy) > 128 && touchesAir(hole, sx, sy)
+        isInRing(sx, sy) && densityAt(hole, sx, sy) > 128 && touchesAir(hole, sx, sy)
       expect(casingAt(lined.world, sx, sy)).toBe(shouldLine ? 2 : 0)
     }
     expect(keepsDensity(hole, lined.world)).toBe(true)
@@ -91,15 +160,30 @@ describe('casing lining', () => {
     expect(lined.relined).toBe(0)
   })
 
-  it('spans the stamp radius less and plus a quarter metre round the tunnel axis', () => {
-    expect(RING).toEqual({ ...CENTRE, clearMm: 700, widthMm: 500 })
+  it('lines a level tunnel’s floor under the axis across the wheels’ width, above the annulus too (GD lock on #662, Q3)', () => {
+    const tunnel = levelTunnel()
+    const ring = casingRingAround(LEVEL_AXIS.xMm, LEVEL_AXIS.yMm)
+    const lined = lineRing(tunnel, params, ring, 2).world
+    const floor = floorSamplesUnder(tunnel, LEVEL_AXIS)
+    expect(floor.length).toBeGreaterThan(0)
+    expect(floor.some(({ sx, sy }) => !isInAnnulusOf(LEVEL_AXIS, sx, sy))).toBe(true)
+    for (const { sx, sy } of floor) expect(casingAt(lined, sx, sy)).toBe(2)
+  })
+
+  it('spans from the stamp radius to a quarter metre past it round the tunnel axis', () => {
+    expect(RING).toEqual({ ...CENTRE, clearMm: 600, widthMm: 250 })
   })
 
   it('never spreads into the rock: rings half a metre apart keep the lining one sample thick', () => {
     const tunnel = clearDisc(
       boredHole(),
       params,
-      { xMm: CENTRE.xMm + 500, yMm: CENTRE.yMm, radiusMm: 950, floorRadiusMm: null },
+      {
+        xMm: CENTRE.xMm + 500,
+        yMm: CENTRE.yMm,
+        radiusMm: drillStampRadiusMm(),
+        floorRadiusMm: null,
+      },
       255,
     ).world
     const first = lineRing(tunnel, params, RING, 2).world

@@ -78,8 +78,9 @@ describe('collapse: a straight dig (#43 acceptance 8, 3)', () => {
   it('warns on the lined blocks behind a band-2 dig at grade 1 and never on the face', () => {
     const session = createScriptedSession()
     prepareDigger(session, 0)
-    // Stops with the body 0.5 m into a block, so the face's block holds only unlined wall.
-    const end = -11500
+    // Stops with the body on a block's edge, its stamp 0.5 m into the face's block: the last ring
+    // laid reaches a stamp radius behind the stamp, so the face's block holds only unlined wall.
+    const end = -12000
     const dug = digAlong(session, 0, BAND_2_Y, -31500, end)
     parkAt(session, dug, dug + 600, end, BAND_2_Y)
     const face = drillStampOf(session.vehicle().pose!, false)

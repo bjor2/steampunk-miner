@@ -17,6 +17,7 @@ import { isCarvedAirAt, openSampleLayers } from './sampleLayers'
 import { cellIndexOfTile, chunkOfTile } from './tileGrid'
 import { currentCasingOfChunk, deltaOfChunk, EMPTY_WORLD, type WorldState } from './worldState'
 import { isCellYielded } from './chunkDelta'
+import { drillStampRadiusMm } from '../vehicle/drillBore'
 
 const params = planetParamsFor(83921, 1)
 /** Cave-free band-2 rock 48 m down, as in the weakness spec. */
@@ -32,7 +33,7 @@ function weakTunnel(): WorldState {
     world = clearDisc(
       world,
       params,
-      { xMm: x, yMm: Y, radiusMm: 950, floorRadiusMm: null },
+      { xMm: x, yMm: Y, radiusMm: drillStampRadiusMm(), floorRadiusMm: null },
       255,
     ).world
   }

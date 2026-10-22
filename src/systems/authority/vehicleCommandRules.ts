@@ -139,7 +139,7 @@ export const VEHICLE_COMMAND_RULES: {
             command.tick,
           ),
         (current) => chargeReportedActions(current, command, vehicleOf(state, command.playerId)),
-        (current) => layReportedCasing(current, command),
+        (current) => layReportedCasing(current, command, vehicleOf(state, command.playerId)),
         (current) => followReportedHeat(current, command, vehicleOf(state, command.playerId)),
         (current) =>
           touchLavaAtPose(current, command.playerId, command.tick, command.payload.drillTicks > 0),
@@ -287,13 +287,21 @@ function chargeReportedActions(
   return { state: markChargedState(moved, playerId, tick), events: drilled.events }
 }
 
-/** Rings behind the drill: the report's own cut records its axis; the steps' cut recorded theirs. */
+/**
+ * Rings behind the drill: the report's own cut records its axis; the steps' cut recorded theirs.
+ * Whose cut it was is read off `before`, the vehicle before this report charged anything (as
+ * `chargeReportedActions` reads it): the charge moves `accountedTick` to this tick, so a step on
+ * the same tick read as no step at all, and the report recorded its own stamp's centre on the
+ * steps' trail, ahead of where their cut had recorded it (ticket 662, found with the 1.2 m bore's
+ * shorter ring lag, which then laid a ring ahead of the swept front).
+ */
 function layReportedCasing(
   state: AuthorityState,
   command: AuthorityCommand<'reportPose'>,
+  before: VehicleState,
 ): RuleEffect {
   const { playerId, payload } = command
-  if (isCutBySteps(vehicleOf(state, playerId))) return layDueCasingAtPose(state, playerId, payload)
+  if (isCutBySteps(before)) return layDueCasingAtPose(state, playerId, payload)
   return layCasingAtPose(state, playerId, payload)
 }
 

@@ -16,6 +16,7 @@ import { isLinedBits } from './cellGateBits'
 import { buildChunkTileBatch, TILE_STYLE, type ChunkTileBatch } from './chunkTileBatch'
 import { chunkDensityHaloOf } from './densityHalo'
 import { liningCellsOf } from './liningCells'
+import { drillStampRadiusMm } from '../vehicle/drillBore'
 
 // The casing lining rides the gate channel's lined bit (ticket 315, #309 GD decision 3): set
 // from the chunk's casing layer, so no provider is registered here.
@@ -50,7 +51,7 @@ function linedBore(typeIndex?: number): WorldState {
   const hole = clearDisc(
     EMPTY_WORLD,
     params,
-    { ...CENTRE, radiusMm: 950, floorRadiusMm: null },
+    { ...CENTRE, radiusMm: drillStampRadiusMm(), floorRadiusMm: null },
     255,
   )
   const ring = casingRingAround(CENTRE.xMm, CENTRE.yMm)
@@ -72,7 +73,7 @@ describe('casing lining in the chunk mesh (ticket 315)', () => {
     const hole = clearDisc(
       EMPTY_WORLD,
       params,
-      { ...CENTRE, radiusMm: 950, floorRadiusMm: null },
+      { ...CENTRE, radiusMm: drillStampRadiusMm(), floorRadiusMm: null },
       255,
     )
     expect(isLinedBits(drawnAt(hole.world, WALL)?.bits ?? 0)).toBe(false)

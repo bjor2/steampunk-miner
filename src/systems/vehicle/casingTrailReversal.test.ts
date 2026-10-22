@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { CASING_RING_SPACING_MM, MAX_CASING_TRAIL_POINTS } from '../../constants/balance'
 import { casingRingLagMm } from './drillBore'
+import { WIDE_BORE_CLEARANCE_MM, withDrillSideClearance } from './drillBoreFixtures'
 import {
   EMPTY_CASING_TRAIL,
   followCasingTrail,
@@ -85,7 +86,7 @@ describe('casing trail of a rig cutting back over its own trail (#538)', () => {
     }
   }
 
-  it('holds a point every half metre of the 2.15 m lag behind a straight cut, well under the cap', () => {
+  it('holds a point every half metre of the ring lag behind a straight cut, well under the cap', () => {
     let trail: CasingTrail = EMPTY_CASING_TRAIL
     for (let x = 0; x <= FORWARD_MM; x += 25) trail = followCasingTrail(trail, at(x, 0), true).trail
     expect(trail.unlined).toHaveLength(Math.floor(casingRingLagMm() / CASING_RING_SPACING_MM) + 1)
@@ -96,39 +97,67 @@ function at(xMm: number, yMm: number): RingPoint {
   return { xMm, yMm }
 }
 
-/** A stamp circling `turns` times round a 1 m circle: every point of it lies within the lag. */
+/**
+ * A stamp circling `turns` times round a circle a little under half the lag across, so every point
+ * of it lies within the lag: 0.9 m at #36's 2.15 m lag, 0.6 m at the 1.2 m bore's 1.45 m.
+ */
 function circleCentres(turns: number): RingPoint[] {
+  const radiusMm = Math.floor((casingRingLagMm() * 0.85) / 2 / 100) * 100
   const steps = 72
   return Array.from({ length: steps * turns + 1 }, (_, index) => {
     const angle = (2 * Math.PI * index) / steps
-    return at(Math.round(1000 * Math.cos(angle)), Math.round(1000 * Math.sin(angle)))
+    return at(Math.round(radiusMm * Math.cos(angle)), Math.round(radiusMm * Math.sin(angle)))
   })
 }
 
+// The cap is a safety net sized for #36's 1.9 m bore, where a tight loop fills it; at the 1.2 m
+// bore's lag a loop holds fewer points than the cap, so the loop runs at both clearances.
+const BORES: [string, number | null][] = [
+  ['as shipped', null],
+  ['at #36’s 1.9 m bore', WIDE_BORE_CLEARANCE_MM],
+]
+
+function atBore<T>(clearanceMm: number | null, play: () => T): T {
+  return clearanceMm === null ? play() : withDrillSideClearance(clearanceMm, play)
+}
+
 describe('casing trail of a rig looping inside its own lag (#538)', () => {
-  for (const [name, follow] of FOLLOWERS) {
-    it(`drops the newest points past the cap and lays nothing inside the lag, ${name}`, () => {
-      let trail: CasingTrail = EMPTY_CASING_TRAIL
-      let from = at(1000, 0)
-      const laid: RingPoint[] = []
-      for (const to of circleCentres(3)) {
-        const step = follow(trail, from, to)
-        laid.push(...step.due)
-        expect(step.trail.unlined.length).toBeLessThanOrEqual(MAX_CASING_TRAIL_POINTS)
-        trail = step.trail
-        from = to
-      }
-      expect(laid).toEqual([])
-      expect(trail.unlined.length).toBeGreaterThan(casingRingLagMm() / CASING_RING_SPACING_MM)
-    })
+  for (const [bore, clearanceMm] of BORES) {
+    for (const [name, follow] of FOLLOWERS) {
+      it(`drops the newest points past the cap and lays nothing inside the lag, ${name}, ${bore}`, () =>
+        atBore(clearanceMm, () => {
+          const centres = circleCentres(3)
+          let trail: CasingTrail = EMPTY_CASING_TRAIL
+          let from = centres[0]
+          const laid: RingPoint[] = []
+          for (const to of centres) {
+            const step = follow(trail, from, to)
+            laid.push(...step.due)
+            expect(step.trail.unlined.length).toBeLessThanOrEqual(MAX_CASING_TRAIL_POINTS)
+            trail = step.trail
+            from = to
+          }
+          expect(laid).toEqual([])
+          expect(trail.unlined.length).toBeGreaterThan(casingRingLagMm() / CASING_RING_SPACING_MM)
+        }))
+    }
+
+    it(`keeps the oldest waiting points when the cap drops, so the trail behind still lines, ${bore}`, () =>
+      atBore(clearanceMm, () => {
+        const centres = circleCentres(3)
+        let trail: CasingTrail = EMPTY_CASING_TRAIL
+        for (const to of centres) trail = followCasingTrail(trail, to, true).trail
+        const oldest = trail.unlined[0]
+        const away = followCasingTrail(trail, at(5000, 0), false)
+        expect(oldest).toMatchObject(centres[0])
+        expect(away.due).toEqual(trail.unlined)
+      }))
   }
 
-  it('keeps the oldest waiting points when the cap drops, so the trail behind still lines', () => {
-    let trail: CasingTrail = EMPTY_CASING_TRAIL
-    for (const to of circleCentres(3)) trail = followCasingTrail(trail, to, true).trail
-    const oldest = trail.unlined[0]
-    const away = followCasingTrail(trail, at(5000, 0), false)
-    expect(oldest).toMatchObject({ xMm: 1000, yMm: 0 })
-    expect(away.due).toEqual(trail.unlined)
-  })
+  it('fills the cap with a loop inside #36’s 2.15 m lag', () =>
+    withDrillSideClearance(WIDE_BORE_CLEARANCE_MM, () => {
+      let trail: CasingTrail = EMPTY_CASING_TRAIL
+      for (const to of circleCentres(3)) trail = followCasingTrail(trail, to, true).trail
+      expect(trail.unlined).toHaveLength(MAX_CASING_TRAIL_POINTS)
+    }))
 })

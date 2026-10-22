@@ -4,6 +4,7 @@
  * every 12 ticks as a client would, and a weak band-2 tunnel built with the ground's debug
  * commands. Enemies are frozen so the specs see only the ground.
  */
+import { drillStampRadiusMm } from '../../vehicle/drillBore'
 import { FACING, type Facing } from '../../vehicle/vehiclePose'
 import type { CommandIntent } from '../authorityCommand'
 import { FREEZE_ENEMIES, GROUND, poseAbove, type ScriptedSession } from '../scriptedSession'
@@ -97,7 +98,8 @@ export function parkAt(
 
 /**
  * A band-2 tunnel carved and lined at grade 1 with the ground's debug commands while the vehicle
- * sits in its middle: its blocks warn as soon as the lining is laid.
+ * sits in its middle: its blocks warn as soon as the lining is laid. It is the drill stamp's width,
+ * so the rings line its wall (ticket 662).
  */
 export function weakTunnelIntents(): CommandIntent[] {
   return tunnelIntents(1)
@@ -110,7 +112,7 @@ export function tunnelIntents(grade: number): CommandIntent[] {
     poseAt((TUNNEL_FROM_X + TUNNEL_TO_X) / 2, BAND_2_Y),
     ...tunnelAxis().map((x): CommandIntent => ({
       type: 'debug.carveCircle',
-      payload: { x, y: BAND_2_Y, radius: 950, amount: 255 },
+      payload: { x, y: BAND_2_Y, radius: drillStampRadiusMm(), amount: 255 },
     })),
     ...liningIntents(grade),
   ]

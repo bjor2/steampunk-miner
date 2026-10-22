@@ -21,11 +21,17 @@ import {
 import { drillStampOf } from '../vehicle/drillStamp'
 import { liningTypeIndexOf } from '../vehicle/liningType'
 import { isVehicleActive, type VehicleState } from '../vehicle/vehicleState'
-import { casingRingAround, lineRing, type Lining } from '../world/casingLining'
-import { STANDARD_CASING_TYPE_INDEX } from '../world/chunkDelta'
+import {
+  casingRingAround,
+  lineRingSamples,
+  ringSamplesOf,
+  type Lining,
+} from '../world/casingLining'
 import type { PlanetParams } from '../world/planetParams'
+import type { WeightedSample } from '../world/stampShape'
 import type { CommandPayloads } from './authorityCommand'
 import { vehicleOf, withVehicle, type AuthorityState } from './authorityState'
+import { casableRingSamplesOf } from './casingGates'
 import { chargeFirstLining } from './casingLiningCharge'
 import { rememberLinedRing } from './combat/wreckerRoute'
 import { chainEffects, unchanged, type RuleEffect } from './commandRule'
@@ -152,10 +158,16 @@ function layPaidCasingRing(
   point: AxisPoint,
   lining: LaidLining,
 ): RuleEffect {
+  const samples = casableRingSamplesOf(
+    state,
+    playerId,
+    params,
+    casingRingAround(point.xMm, point.yMm),
+  )
   const ring = lineCasingRing(
     state,
     params,
-    point,
+    samples,
     lining.grade,
     liningTypeIndexOf(lining.liningType),
   )
@@ -167,7 +179,10 @@ function layPaidCasingRing(
   }
 }
 
-/** One ring round an axis point, logged as `casing_placed`; `debug.lineCasing` lays the same. */
+/**
+ * One ring round an axis point, logged as `casing_placed`: `debug.lineCasing`'s ring, the drill's
+ * without its gates, as no player asks.
+ */
 export function layCasingRing(
   state: AuthorityState,
   params: PlanetParams,
@@ -175,7 +190,8 @@ export function layCasingRing(
   grade: number,
   typeIndex: number,
 ): RuleEffect {
-  const { state: lined, events } = lineCasingRing(state, params, point, grade, typeIndex)
+  const samples = ringSamplesOf(casingRingAround(point.xMm, point.yMm))
+  const { state: lined, events } = lineCasingRing(state, params, samples, grade, typeIndex)
   return { state: lined, events }
 }
 
@@ -187,12 +203,11 @@ interface LinedRing extends RuleEffect {
 function lineCasingRing(
   state: AuthorityState,
   params: PlanetParams,
-  point: RingPoint,
+  samples: readonly WeightedSample[],
   grade: number,
-  typeIndex: number = STANDARD_CASING_TYPE_INDEX,
+  typeIndex: number,
 ): LinedRing {
-  const ring = casingRingAround(point.xMm, point.yMm)
-  const lined = lineRing(state.world, params, ring, grade, typeIndex)
+  const lined = lineRingSamples(state.world, params, samples, grade, typeIndex)
   return {
     state: { ...state, world: lined.world },
     events: [

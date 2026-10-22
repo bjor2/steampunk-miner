@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest'
+import { drillStampRadiusMm } from '../vehicle/drillBore'
 import { FACING } from '../vehicle/vehiclePose'
 import { chunkOfSample, localSampleOf, sampleIndexOf, SAMPLES_PER_TILE } from '../world/sampleGrid'
 import type { TilePoint } from '../world/tileGrid'
@@ -35,10 +36,13 @@ function casingSamplesOf(session: ScriptedSession, tile: TilePoint): number {
 }
 
 const LEFT = { tx: -1, ty: 0 }
+/** The ring's axis this far left of the wall puts the wall in the ring's middle. */
+const RING_REACH_MM = drillStampRadiusMm() + 125
 
 /**
  * An ore cell with its left neighbour mined out, so its left column of samples is a wall; at
- * `grade` a ring round a point 0.95 m left of that column lines the wall (0 leaves it unlined).
+ * `grade` a ring round a point a stamp radius and half a sample left of that column lines the wall
+ * (0 leaves it unlined).
  */
 function oreWall(grade: number): {
   session: ScriptedSession
@@ -51,7 +55,7 @@ function oreWall(grade: number): {
   const events =
     grade === 0
       ? []
-      : session.submit(60, lineCasing(ore.tx * 1000 - 950, ore.ty * 1000 + 375, grade))
+      : session.submit(60, lineCasing(ore.tx * 1000 - RING_REACH_MM, ore.ty * 1000 + 375, grade))
   return { session, ore, events }
 }
 

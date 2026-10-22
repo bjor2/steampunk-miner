@@ -19,6 +19,7 @@ import {
   WORLD_SEED,
   type ScriptedSession,
 } from '../scriptedSession'
+import { drillStampRadiusMm } from '../../vehicle/drillBore'
 
 /** The first heat planet (#113 Fire act). */
 export const HEAT_PLANET = 8
@@ -81,7 +82,7 @@ export function reportAt(at: { x: number; y: number }, drillTicks = 0): CommandI
 
 export const carveHole: CommandIntent = {
   type: 'debug.carveCircle',
-  payload: { x: HOLE.x, y: HOLE.y, radius: 950, amount: 255 },
+  payload: { x: HOLE.x, y: HOLE.y, radius: drillStampRadiusMm(), amount: 255 },
 }
 
 /** The rig the crossing passes drive: a drill far past the floor, so any speed is in its bound. */

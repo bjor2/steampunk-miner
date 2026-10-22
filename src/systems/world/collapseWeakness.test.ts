@@ -8,6 +8,7 @@ import { MM_PER_SAMPLE } from './sampleGrid'
 import { EMPTY_CHUNK_DELTA, NO_CASING, withCasing, withDensity } from './chunkDelta'
 import { generatedChunkOf, EMPTY_WORLD, withChunkDelta, type WorldState } from './worldState'
 import { chunkOfSample, localSampleOf, sampleIndexOf } from './sampleGrid'
+import { drillStampRadiusMm } from '../vehicle/drillBore'
 
 const params = planetParamsFor(83921, 1)
 /** Cave-free band-1 rock 16 m down, and band-2 rock 48 m down (band 2 starts 26 m down). */
@@ -20,7 +21,7 @@ const TO_X = -14000
 function carveTunnel(world: WorldState, y: number): WorldState {
   let carved = world
   for (let x = FROM_X; x <= TO_X; x += MM_PER_SAMPLE) {
-    const disc = { xMm: x, yMm: y, radiusMm: 950, floorRadiusMm: null }
+    const disc = { xMm: x, yMm: y, radiusMm: drillStampRadiusMm(), floorRadiusMm: null }
     carved = clearDisc(carved, params, disc, 255).world
   }
   return carved

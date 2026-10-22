@@ -1,8 +1,9 @@
 /**
- * One ring of casing lining (decision #41 Placement rule "Where", amended twice on #56, 5 Oct),
- * integer arithmetic only: the samples whose position in mm lies in the annulus `clearR <= d <
- * clearR + width` round a centre on the tunnel axis, chosen against the ground as it stood before
- * the ring. Lining marks the **rock side** of the bore's wall, so the bore never narrows:
+ * One ring of casing lining (decision #41 Placement rule "Where", amended twice on #56, 5 Oct, and
+ * moved into the wall by the GD lock on #661), integer arithmetic only: the samples whose position
+ * in mm lies in the annulus `clearR <= d < clearR + width` round a centre on the tunnel axis,
+ * chosen against the ground as it stood before the ring. Lining marks the **rock side** of the
+ * bore's wall, so the bore never narrows:
  *
  * 1. A **native solid** sample (density > 128, the contour iso, and casing 0) with an **air**
  *    4-neighbour (density <= 128) takes the casing `grade`. Its material and density stay as they
@@ -17,12 +18,20 @@
  *    higher of the two grades, so a type change never weakens the wall. It counts as first
  *    placement of the new type: it joins the wall the charge is priced by.
  *
+ * The ring also lines a **floor box** (GD lock on #662, Q3, Systems' row): the samples under its
+ * centre toward the planet's, across the wheels' width and down to where a level tunnel's floor
+ * may lie (`floorBoxDepthMm`), so the floor the stamp's floor band cuts (`floorBand.ts`), up to
+ * 0.93 m under the axis where the annulus ends at 0.85 m, stays lined. In a shaft that box is the
+ * shaft's own air and lines nothing new.
+ *
  * Never refused: a grade too low for the band still lines (#41). The dock pad is never lined, as it
  * is never carved. A player grade above 15 lines at 15, the most a sample holds.
  */
-import { CASING_LINING_WIDTH_MM } from '../../constants/balance'
-import { drillStampRadiusMm } from '../vehicle/drillBore'
+import { BODY_HALF_SIZE_MM, CASING_LINING_WIDTH_MM } from '../../constants/balance'
+import { UP_VECTOR_SCALE } from '../../constants/physics'
+import { drillStampLiftMm, drillStampRadiusMm } from '../vehicle/drillBore'
 import { cellSampleIndices } from './cellYield'
+import { planetUpAt, type PlanetUp } from './planetUp'
 import {
   casingValueOf,
   effectiveCasingGrade,
@@ -72,14 +81,13 @@ interface RingLining {
 
 type RingStep = 'line' | 'retype' | 'reline' | 'skip'
 
-/** The drill's ring round a point of the tunnel axis: `stampR - 0.25 m <= d < stampR + 0.25 m`. */
+/**
+ * The drill's ring round a point of the tunnel axis, read from the live stamp's radius: `stampR <=
+ * d < stampR + 0.25 m`, the rock just outside the wall (GD lock on #661; it was `stampR - 0.25 m`
+ * to `stampR + 0.25 m` inside #36's oversized bore).
+ */
 export function casingRingAround(xMm: number, yMm: number): CasingRing {
-  return {
-    xMm,
-    yMm,
-    clearMm: drillStampRadiusMm() - CASING_LINING_WIDTH_MM,
-    widthMm: 2 * CASING_LINING_WIDTH_MM,
-  }
+  return { xMm, yMm, clearMm: drillStampRadiusMm(), widthMm: CASING_LINING_WIDTH_MM }
 }
 
 /** Lines one ring at the player's `grade`, in the lining type `typeIndex` (the standard one by default). */
@@ -90,7 +98,7 @@ export function lineRing(
   grade: number,
   typeIndex: number = STANDARD_CASING_TYPE_INDEX,
 ): Lining {
-  return lineSamples(world, params, ringSamplesOf(ring), grade, typeIndex)
+  return lineRingSamples(world, params, ringSamplesOf(ring), grade, typeIndex)
 }
 
 /**
@@ -104,7 +112,7 @@ export function lineCellWalls(
   grade: number,
   typeIndex: number,
 ): Lining {
-  return lineSamples(world, params, cellWallSamplesOf(tile), grade, typeIndex)
+  return lineRingSamples(world, params, cellWallSamplesOf(tile), grade, typeIndex)
 }
 
 /** The samples one step outside each side of a cell, as full-weight stamp samples. */
@@ -126,7 +134,8 @@ function wallSample(sx: number, sy: number): WeightedSample {
   return { sx, sy, weight: FULL_WEIGHT, floor: 0 }
 }
 
-function lineSamples(
+/** Lines the samples as a ring lines its own: a ring the gates trimmed (`casingGates.ts`). */
+export function lineRingSamples(
   world: WorldState,
   params: PlanetParams,
   samples: readonly WeightedSample[],
@@ -149,9 +158,10 @@ function lineSamples(
   }
 }
 
-/** The samples of the annulus in row order, as full-weight stamp samples. */
+/** The samples of the annulus and its floor box in row order, as full-weight stamp samples. */
 export function ringSamplesOf(ring: CasingRing): WeightedSample[] {
-  const outer = ring.clearMm + ring.widthMm
+  const outer = Math.max(ring.clearMm + ring.widthMm, floorBoxDepthMm() + MM_PER_SAMPLE)
+  const isInRing = ringTestOf(ring)
   const samples: WeightedSample[] = []
   for (
     let sy = Math.ceil((ring.yMm - outer) / MM_PER_SAMPLE);
@@ -163,10 +173,19 @@ export function ringSamplesOf(ring: CasingRing): WeightedSample[] {
       sx * MM_PER_SAMPLE < ring.xMm + outer;
       sx++
     ) {
-      if (isInAnnulus(ring, sx, sy)) samples.push({ sx, sy, weight: FULL_WEIGHT, floor: 0 })
+      if (isInRing(sx, sy)) samples.push({ sx, sy, weight: FULL_WEIGHT, floor: 0 })
     }
   }
   return samples
+}
+
+/** Upright, for a ring at the planet's centre itself. */
+const UPRIGHT: PlanetUp = { upx: 0, upy: UP_VECTOR_SCALE }
+
+/** Whether a sample is the ring's: in its annulus, or in its floor box. */
+function ringTestOf(ring: CasingRing): (sx: number, sy: number) => boolean {
+  const up = planetUpAt(ring.xMm, ring.yMm, UPRIGHT)
+  return (sx, sy) => isInAnnulus(ring, sx, sy) || isInFloorBox(ring, up, sx, sy)
 }
 
 function isInAnnulus(ring: CasingRing, sx: number, sy: number): boolean {
@@ -175,6 +194,28 @@ function isInAnnulus(ring: CasingRing, sx: number, sy: number): boolean {
   const distanceSq = dx * dx + dy * dy
   const outer = ring.clearMm + ring.widthMm
   return distanceSq >= ring.clearMm * ring.clearMm && distanceSq < outer * outer
+}
+
+/** Under the ring's centre, no deeper than a level floor may lie and within the wheels' half width. */
+function isInFloorBox(ring: CasingRing, up: PlanetUp, sx: number, sy: number): boolean {
+  const dx = sx * MM_PER_SAMPLE - ring.xMm
+  const dy = sy * MM_PER_SAMPLE - ring.yMm
+  const depth = -(dx * up.upx + dy * up.upy)
+  const across = Math.abs(dx * up.upy - dy * up.upx)
+  const isUnder = depth > 0 && depth <= floorBoxDepthMm() * UP_VECTOR_SCALE
+  return isUnder && across <= BODY_HALF_SIZE_MM * UP_VECTOR_SCALE
+}
+
+/**
+ * How far under the axis a level tunnel's floor rock may lie: the stamp's lift, the wheels' line
+ * under the body's centre, the floor rounded down to whole samples (up to one more), its first
+ * solid sample up to one under the floor's circle (`drillStamp.ts`), and one more where the floor
+ * steps up along the planet's curve: the band of the last stamp before the step reaches half the
+ * wheels' width past it at the lower floor, and at a pose report every tick that stamp lies nearer
+ * the step than at 12-tick reports (#514's casing cadence spec).
+ */
+function floorBoxDepthMm(): number {
+  return drillStampLiftMm() + BODY_HALF_SIZE_MM + 3 * MM_PER_SAMPLE
 }
 
 function ringStepOf(session: EditSession, sample: WeightedSample, lining: RingLining): RingStep {

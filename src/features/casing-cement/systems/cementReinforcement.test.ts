@@ -18,18 +18,21 @@ import {
   type ScriptedSession,
 } from '../../../systems/authority/scriptedSession'
 import { isCellReinforced } from '../../../systems/registries/groundReinforcement'
+import { drillStampLiftMm, drillStampRadiusMm } from '../../../systems/vehicle/drillBore'
 import type { TilePoint } from '../../../systems/world/tileGrid'
 
 /**
  * A band-2 tunnel cut and lined at grade 1 (band 2 needs 2) with the ground's debug commands, as
- * wide as the drill's own bore: a band-2 dig with the body at y 252.5 m leaves the seven air
- * samples from 252.0 to 253.5 m (the collapse fixture's 1.9 m carve is wider than any drill cuts).
- * Each ring is its own command, so a block warns while its far rings are still unlaid.
+ * wide as the drill's own bore (ticket 662: the body plus its clearance): a band-2 dig with the
+ * body at y 252.5 m leaves the five air samples from 252.0 to 253.0 m, the last a sample inside the
+ * stamp's radius and the next a sample and a half outside it, so the carve reaches a quarter
+ * sample past the radius (the collapse fixture's 1.9 m carve is wider than any drill cuts). Each
+ * ring is its own command, so a block warns while its far rings are still unlaid.
  */
 const BUILD_TICK = 10
 const DONE_TICK = BUILD_TICK + COLLAPSE_WARN_TICKS + COLLAPSE_FILL_TICKS + 5
-const BORE_Y = BAND_2_Y + 250
-const BORE_RADIUS_MM = 875
+const BORE_Y = BAND_2_Y + drillStampLiftMm()
+const BORE_RADIUS_MM = drillStampRadiusMm() + 25
 const WEAK_GRADE = 1
 
 const setLiningType = (liningType: string): CommandIntent => ({
@@ -70,12 +73,12 @@ function tunnelLinedIn(liningType: string, playerIds: readonly string[] = ['p1']
   return session
 }
 
-/** The tunnel's open tiles: the two rows of the bore, end to end. */
+/** The tunnel's open tiles: the bore's row, end to end. */
 function tunnelTiles(): TilePoint[] {
   const from = Math.ceil(TUNNEL_FROM_X / 1000)
   const to = Math.floor(TUNNEL_TO_X / 1000) - 1
   const columns = Array.from({ length: to - from + 1 }, (_, at) => from + at)
-  return [252, 253].flatMap((ty) => columns.map((tx) => ({ tx, ty })))
+  return [252].flatMap((ty) => columns.map((tx) => ({ tx, ty })))
 }
 
 function reinforcedTunnelTiles(session: ScriptedSession): number {

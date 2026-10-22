@@ -28,8 +28,7 @@ import {
 import { KEYBOARD_PROMPTS } from '../input/promptFixtures'
 import { bandOfTile } from '../world/planetGeometry'
 import { surfaceRowOfColumn } from '../world/tileGrid'
-import { parkAt } from '../authority/collapse/collapseFixtures'
-import { digPlanet6Tunnel, PLANET_6, TUNNEL_TO_X } from '../authority/combat/wreckerFixtures'
+import { digPlanet6Tunnel, parkUntilGnawing } from '../authority/combat/wreckerFixtures'
 import { coreEdgeDistance, localOctantOf } from './compass'
 import { energyWarningLevel } from './energyWarning'
 import { energyWarningMarkers, selectHudModel } from './hudModel'
@@ -297,7 +296,7 @@ describe('HUD model: casing badge (#41)', () => {
 
   it('pulses GNAW in amber while a tunnel wrecker gnaws the route (#111 telegraph)', () => {
     const { session, tick } = digPlanet6Tunnel()
-    parkAt(session, tick, tick + 600, TUNNEL_TO_X, PLANET_6.y, 10)
+    parkUntilGnawing(session, tick)
     expect(session.state().combat.enemies.some(({ phase }) => phase === 'gnaw')).toBe(true)
     expect(hudOf(session).casing).toEqual({ text: 'G2 GNAW', state: 'gnawed' })
   })

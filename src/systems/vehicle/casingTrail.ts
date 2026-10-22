@@ -10,15 +10,16 @@
  *
  * Each recorded point carries the stretch of axis its ring stands for, so the first-place lining
  * charge is per metre of tunnel, not per ring (#76, #115): the distance from the previous point, or
- * one ring spacing when it starts a new cut (no previous point, or one further than the ring lag,
- * whose ring was already due). A dig recorded every 0.5 m and one recorded every 1 m charge the same.
+ * one ring spacing when it starts a new cut (no previous point, or one further than
+ * `CASING_CUT_CONTINUE_MM`). A dig recorded every 0.5 m and one recorded every 1 m charge the same.
  *
  * The swept cut (ticket 330) records along its cut instead (`followCasingTrailAlongCut`): a point
  * every `CASING_RING_SPACING_MM` on the line from the last recorded point to the centre the cut
  * reached, each standing for one spacing, so the rings keep their spacing at any step length. A
- * cut continues the trail when its sweep starts within the ring lag of the last point (ticket 335):
- * measured from the sweep's start, not its end, so a step of any length (16 m at 960 m/s) keeps
- * its rings every 0.5 m instead of starting a new cut at its far end.
+ * cut continues the trail when its sweep starts within `CASING_CUT_CONTINUE_MM` of the last point
+ * (ticket 335, the ring lag until ticket 662 narrowed the bore): measured from the sweep's start,
+ * not its end, so a step of any length (16 m at 960 m/s) keeps its rings every 0.5 m instead of
+ * starting a new cut at its far end.
  *
  * A rig cutting back over its own trail (ticket 538, the TD ruling 6228998310 on #538): a point is
  * kept only if it lies at least one ring spacing from every point still waiting for its ring, so
@@ -28,7 +29,11 @@
  * `MAX_CASING_TRAIL_POINTS` the newest waiting points are dropped the same way; nothing is laid
  * before the stamp is the ring lag past it, so no ring is ever laid under or ahead of the stamp.
  */
-import { CASING_RING_SPACING_MM, MAX_CASING_TRAIL_POINTS } from '../../constants/balance'
+import {
+  CASING_CUT_CONTINUE_MM,
+  CASING_RING_SPACING_MM,
+  MAX_CASING_TRAIL_POINTS,
+} from '../../constants/balance'
 import { casingRingLagMm } from './drillBore'
 
 /** A point in world mm: where a casing ring is centred. */
@@ -86,7 +91,7 @@ export function followCasingTrailAlongCut(
 /** One point per whole spacing from the last point toward the cut's end; a new cut starts as before. */
 function recordAxisPointsAlong(trail: CasingTrail, { from, to }: CutAxis): CasingTrail {
   const last = trail.lastAxisPoint
-  if (last === null || squaredDistance(last, from) > squared(casingRingLagMm())) {
+  if (last === null || squaredDistance(last, from) > squared(CASING_CUT_CONTINUE_MM)) {
     return recordAxisPoint(trail, to)
   }
   const points = spacedPointsBetween(last, to)
@@ -156,7 +161,7 @@ function isWithinSpacing(a: RingPoint, b: RingPoint): boolean {
 function stretchSince(last: RingPoint | null, stampCentre: RingPoint): number {
   if (last === null) return CASING_RING_SPACING_MM
   const squaredStretch = squaredDistance(last, stampCentre)
-  if (squaredStretch > squared(casingRingLagMm())) return CASING_RING_SPACING_MM
+  if (squaredStretch > squared(CASING_CUT_CONTINUE_MM)) return CASING_RING_SPACING_MM
   return Math.round(Math.sqrt(squaredStretch))
 }
 

@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { casingLiningPrice } from '../economy/casingPrices'
 import { add, fromCanonical, toCanonical, ZERO_MONEY, type Money } from '../money'
+import { drillStampRadiusMm } from '../vehicle/drillBore'
 import { casingBandOfWall } from '../world/casingBand'
 import { chunkOfSample, localSampleOf, MM_PER_SAMPLE, sampleIndexOf } from '../world/sampleGrid'
 import { currentCasingOfChunk, currentDensityOfChunk } from '../world/worldState'
@@ -161,14 +162,15 @@ describe('first-place casing lining charge', () => {
   })
 
   it('charges a 10 m bore for 10 m of lining whether its poses step every 0.5 m or every 1 m', () => {
-    // Drilling as long per metre either way, so the bore is as open at both report spacings.
+    // Drilling as long per metre either way, so the bore is as open at both report spacings. The
+    // dig starts one report in, so its first report never claims more drill ticks than have passed.
     const chargedLengthMmAt = (stepMm: number) => {
       const session = createScriptedSession()
       const ticks = (REPORT_TICKS * stepMm) / STEP_MM
       session.submit(0, FREEZE_ENEMIES)
       session.submit(0, { type: 'debug.setMoney', payload: { amount: '1000' } })
       const steps = stepsBetween(START.x, START.x + 10000, stepMm)
-      const dug = driveThrough(session, 0, steps, ticks, ticks)
+      const dug = driveThrough(session, ticks, steps, ticks, ticks)
       driveThrough(session, dug, stepsBetween(START.x + 10000, START.x - 2200), 0)
       const lined = linedOf(session.events())
       return lined.reduce((sum, event) => sum + event.lengthMm, 0)
@@ -235,7 +237,7 @@ describe('first-place casing lining charge', () => {
     session.submit(0, { type: 'debug.setMoney', payload: { amount: '100' } })
     session.submit(0, {
       type: 'debug.carveCircle',
-      payload: { x: START.x, y: START.y, radius: 950, amount: 255 },
+      payload: { x: START.x, y: START.y, radius: drillStampRadiusMm(), amount: 255 },
     })
     session.submit(1, { type: 'debug.lineCasing', payload: { x: START.x, y: START.y, grade: 2 } })
     expect(placedOf(session.events())[0].samples).toBeGreaterThan(0)

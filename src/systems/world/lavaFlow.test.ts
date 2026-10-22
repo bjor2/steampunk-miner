@@ -7,6 +7,7 @@ import { bandOfTile } from './planetGeometry'
 import type { TilePoint } from './tileGrid'
 import { cellAt, EMPTY_WORLD, type WorldState } from './worldState'
 import { CELL_KIND, kindOfCell } from './worldCell'
+import { drillStampRadiusMm } from '../vehicle/drillBore'
 
 const PARAMS = planetParamsFor(83921, 8)
 const REFRACTORY = 1
@@ -43,7 +44,7 @@ function linedHole(typeIndex: number): { world: WorldState; loose: TilePoint[] }
   const carved = clearDisc(
     EMPTY_WORLD,
     PARAMS,
-    { ...HOLE, radiusMm: 950, floorRadiusMm: null },
+    { ...HOLE, radiusMm: drillStampRadiusMm(), floorRadiusMm: null },
     255,
   )
   const lined = lineRing(carved.world, PARAMS, casingRingAround(HOLE.xMm, HOLE.yMm), 5, typeIndex)
@@ -92,7 +93,12 @@ describe('lava flow (#113 numbers acceptance 2)', () => {
 
   it('never flows into ground a collapse refilled, though the cell still reads as yielded', () => {
     const { world, loose } = linedHole(STANDARD)
-    const refilled = fillDisc(world, PARAMS, { ...HOLE, radiusMm: 950, floorRadiusMm: null }, 255)
+    const refilled = fillDisc(
+      world,
+      PARAMS,
+      { ...HOLE, radiusMm: drillStampRadiusMm(), floorRadiusMm: null },
+      255,
+    )
     const after = flowUntilRest(refilled.world, loose, REFRACTORY)
     expect(isLavaAt(after.world, PARAMS, BELOW_FLOOR)).toBe(false)
   })
