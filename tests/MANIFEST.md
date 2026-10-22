@@ -825,6 +825,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/authority/drillGearCut.test.ts` | 30 | 28 |
 | `src/systems/authority/drillStep.test.ts` | 23 | 23 |
 | `src/systems/authority/drillStepFacing.test.ts` | 3 | 2 |
+| `src/systems/authority/driveSpeedPurchase.test.ts` | 5 | 3 |
 | `src/systems/authority/exactMathLint.test.ts` | 11 | 3 |
 | `src/systems/authority/featureSales.test.ts` | 6 | 6 |
 | `src/systems/authority/featureUnlocks.test.ts` | 11 | 11 |
@@ -928,7 +929,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/bot/botRetreat.test.ts` | 9 | 9 |
 | `src/systems/bot/botShopping.test.ts` | 8 | 8 |
 | `src/systems/bot/botSlicePurchases.test.ts` | 11 | 11 |
-| `src/systems/bot/botTravelSpeed.test.ts` | 2 | 2 |
+| `src/systems/bot/botTravelSpeed.test.ts` | 3 | 3 |
 | `src/systems/bot/botWallet.test.ts` | 3 | 3 |
 | `src/systems/bot/chargePayoff.test.ts` | 5 | 5 |
 | `src/systems/bot/chargeSharePayoff.test.ts` | 6 | 6 |
@@ -938,6 +939,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/bot/leadCellHardness.test.ts` | 3 | 3 |
 | `src/systems/bot/noFreeCellRuns.test.ts` | 2 | 2 |
 | `src/systems/bot/paceArrival.test.ts` | 8 | 4 |
+| `src/systems/bot/sidewaysBores.test.ts` | 4 | 4 |
 | `src/systems/bot/spreeTargets.test.ts` | 10 | 10 |
 | `src/systems/bot/tripEstimate.test.ts` | 3 | 3 |
 
@@ -1006,7 +1008,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/economy/oreEconomy.test.ts` | 7 | 7 |
 | `src/systems/economy/perPurchaseRows.test.ts` | 40 | 21 |
 | `src/systems/economy/planetCharges.test.ts` | 17 | 13 |
-| `src/systems/economy/readEconomy.test.ts` | 26 | 26 |
+| `src/systems/economy/readEconomy.test.ts` | 24 | 24 |
 | `src/systems/economy/refineryEconomy.test.ts` | 6 | 6 |
 | `src/systems/economy/trackKind.test.ts` | 1 | 1 |
 | `src/systems/economy/travelCharge.test.ts` | 7 | 7 |
@@ -1089,6 +1091,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/logging/drillPace.lane.test.ts` | 2 | 3 |
 | `src/logging/drillPace.test.ts` | 14 | 14 |
 | `src/logging/drillSpanGate.test.ts` | 2 | 2 |
+| `src/logging/driveBoundReport.test.ts` | 3 | 3 |
 | `src/logging/dynamiteDryRuns.test.ts` | 4 | 4 |
 | `src/logging/eventNames.test.ts` | 6 | 6 |
 | `src/logging/eventSink.test.ts` | 10 | 10 |
@@ -1617,6 +1620,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/vehicle/casingTrailReversal.test.ts` | 36 | 5 |
 | `src/systems/vehicle/chargeSelection.test.ts` | 4 | 4 |
 | `src/systems/vehicle/colliderHalo.test.ts` | 3 | 3 |
+| `src/systems/vehicle/cutCapSpeed.test.ts` | 14 | 14 |
 | `src/systems/vehicle/cutCarry.test.ts` | 12 | 12 |
 | `src/systems/vehicle/cutFollowMotion.test.ts` | 19 | 19 |
 | `src/systems/vehicle/cutGate.test.ts` | 8 | 8 |
@@ -1645,7 +1649,6 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/vehicle/sweepDwell.test.ts` | 13 | 13 |
 | `src/systems/vehicle/sweptCut.test.ts` | 10 | 10 |
 | `src/systems/vehicle/tickPlan.test.ts` | 10 | 6 |
-| `src/systems/vehicle/travelParity.test.ts` | 16 | 16 |
 | `src/systems/vehicle/vehicleCharges.test.ts` | 4 | 4 |
 | `src/systems/vehicle/vehicleControls.test.ts` | 15 | 15 |
 | `src/systems/vehicle/vehicleReadout.test.ts` | 3 | 3 |
@@ -1666,7 +1669,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/views/designSystemDoc.test.ts` | 4 | 4 |
 | `src/systems/views/designTokenCss.test.ts` | 15 | 13 |
 | `src/systems/views/deviceNotices.test.ts` | 6 | 6 |
-| `src/systems/views/engineTrackParity.test.ts` | 7 | 7 |
+| `src/systems/views/driveTrackCard.test.ts` | 5 | 4 |
 | `src/systems/views/gainText.test.ts` | 6 | 6 |
 | `src/systems/views/hazardStripPlace.test.ts` | 6 | 6 |
 | `src/systems/views/hazardStripView.test.ts` | 3 | 3 |
@@ -1701,6 +1704,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/views/settingsModel.test.ts` | 5 | 5 |
 | `src/systems/views/sheetLayout.test.ts` | 11 | 11 |
 | `src/systems/views/slotSummaryLine.test.ts` | 8 | 8 |
+| `src/systems/views/tileTime.test.ts` | 3 | 3 |
 | `src/systems/views/titleMenuModel.test.ts` | 8 | 8 |
 | `src/systems/views/titleOnlyText.test.ts` | 5 | 5 |
 | `src/systems/views/toolSlotBar.test.ts` | 10 | 10 |

@@ -431,8 +431,16 @@ import type { DriveSigns } from '../vehicle/driveSigns'
  *    in the cut's walk order; the bit's cells and the ahead cells pay whole, core cells harvest
  *    whole and gated cells are never credited. The drill-gear slice sells the side cutters' Mark 2
  *    (`sideCells` 2). A run that cuts no side ore cell moves no digest.
+ * 101: travel parity is retired and a sideways cut is held to the drive (ticket 723, Bjor's
+ *    ruling): the drive moves at the engine's `speedMax` alone, so no drill purchase changes it,
+ *    and the travelling step bound is `max(driveStep, cutStep)`, no longer `k` times the cut
+ *    (`drill.travelParityK` is gone from economy.json). A sideways cut's `vCut` and its front's step
+ *    are held to the drive's top speed (`cutCapSpeed.ts`); a cut down or up keeps the drill's, and
+ *    over a cleared slab the drill's nominal cut where that beats the drive. The pacing bot bores a
+ *    sideways tile for at least the drive's time over it. A run whose drill never outruns its
+ *    engine sideways moves no digest.
  */
-export const AUTHORITY_PROTOCOL_VERSION = 100
+export const AUTHORITY_PROTOCOL_VERSION = 101
 
 /** The kernel's own commands: the closed set its rule tables are written against. */
 export interface KernelCommandPayloads {
