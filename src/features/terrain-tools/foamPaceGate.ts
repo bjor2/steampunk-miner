@@ -22,14 +22,17 @@ export const MIN_SURVIVED_PAIRS = 2
 
 /**
  * Cement's pin, measured on d47e5dee1 (ticket 664) on the pacing seeds whose bare rig a P7
- * collapse cascade destroys: the holder rig's ticks from arrival to the core.
+ * collapse cascade destroys: the holder rig's ticks from arrival to the core. Re-pinned on
+ * b5326c785 by ticket 723's "level-leg pacing re-pin (drive-bound)": a sideways cut is held to the
+ * drive and travel no longer grows with the drill, so the bot's legs take longer (31507 and 31784
+ * ticks before, +5.2% and +4.8%); cement and foam are unchanged.
  */
 export const CEMENT_PIN = {
   planet: 7,
-  measuredOn: 'd47e5dee1',
+  measuredOn: 'b5326c785',
   holderCoreTicks: [
-    { seed: 83921, ticks: 31507 },
-    { seed: 31415, ticks: 31784 },
+    { seed: 83921, ticks: 33154 },
+    { seed: 31415, ticks: 33312 },
   ],
 } as const
 /** The fewest pinned seeds whose bare rig must die for the pin to judge anything. */
