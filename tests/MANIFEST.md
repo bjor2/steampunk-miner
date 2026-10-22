@@ -279,23 +279,23 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/ground-gun/turretPace.lane.test.ts` | 1 | 1 |
 | `src/features/ground-gun/ui/fireGauge.test.ts` | 3 | 3 |
 
-### `materials`: 4 files, 67 tests
+### `materials`: 4 files, 73 tests
 
 | File | Tests | Sites |
 | --- | --- | --- |
 | `src/features/materials/systems/materialNames.test.ts` | 14 | 4 |
-| `src/features/materials/systems/materialTable.test.ts` | 42 | 39 |
+| `src/features/materials/systems/materialTable.test.ts` | 48 | 45 |
 | `src/features/materials/systems/render/heroAtlases.test.ts` | 6 | 6 |
 | `src/features/materials/systems/render/rarityLooks.test.ts` | 5 | 5 |
 
-### `mineral-skins`: 10 files, 152 tests
+### `mineral-skins`: 10 files, 156 tests
 
 | File | Tests | Sites |
 | --- | --- | --- |
 | `src/features/mineral-skins/mineralSkins.art.test.ts` | 31 | 3 |
 | `src/features/mineral-skins/mineralSkins.noTwoAlike.test.ts` | 8 | 2 |
 | `src/features/mineral-skins/mineralSkins.planet1.test.ts` | 13 | 2 |
-| `src/features/mineral-skins/mineralSkins.planet2.test.ts` | 20 | 4 |
+| `src/features/mineral-skins/mineralSkins.planet2.test.ts` | 24 | 6 |
 | `src/features/mineral-skins/mineralSkins.planet3.test.ts` | 19 | 4 |
 | `src/features/mineral-skins/mineralSkins.planet4.test.ts` | 8 | 3 |
 | `src/features/mineral-skins/mineralSkins.planet5.test.ts` | 18 | 3 |
@@ -488,7 +488,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/rig-look/systems/rigLookSource.test.ts` | 13 | 13 |
 | `src/features/rig-look/systems/rigLookTable.test.ts` | 25 | 25 |
 
-### `roster`: 16 files, 268 tests
+### `roster`: 16 files, 271 tests
 
 | File | Tests | Sites |
 | --- | --- | --- |
@@ -502,7 +502,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/roster/roster.poolSeam.test.ts` | 7 | 1 |
 | `src/features/roster/roster.speciesAudit.test.ts` | 50 | 5 |
 | `src/features/roster/systems/planetRoster.test.ts` | 12 | 12 |
-| `src/features/roster/systems/planetSpecies.test.ts` | 6 | 6 |
+| `src/features/roster/systems/planetSpecies.test.ts` | 9 | 8 |
 | `src/features/roster/systems/rosterFold.test.ts` | 6 | 6 |
 | `src/features/roster/systems/rosterGuard.test.ts` | 84 | 10 |
 | `src/features/roster/systems/rosterSpecies.test.ts` | 11 | 7 |

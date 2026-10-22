@@ -301,6 +301,16 @@ programs }` from three's `renderer.info` of the game canvas), read only when cal
   `oreRulesOldSaves.test.ts` a generator 13 save of P2 under rules 8 with main's column pin. Ticket
   710 skins the three (batch p2-b4 of `docs/art/mineral-skins`), so `mineralSkins.planet2.test.ts`
   holds every kind slot of a fresh P2 skinned, slots 13 to 15 in layers no other P2 species wears.
+- **P2's swapped species** (ticket 736, GD lock on #736): under ore rules 9 Azurite Nodule, Pyrite
+  Sun and Argentite take P2's kind slots 6, 7 and 12 (`legacy.u1`, `legacy.u2`, `legacy.r3`) from
+  Cobalt Bloom, Bismuth Stair and Smoke Diamond, which a P2 entered under rules 8 keeps. A species
+  row's ore rules span is look only, so no cell moves and P2's band money, trip income and R3 pool
+  value are main's by construction. `materialTable.test.ts` holds the span guards and P2's rows
+  under rules 8 and 9, `planetSpecies.test.ts` the lookup by the planet's stamp, `rosterSpecies.test.ts`
+  one species per slot under each planet's rules, `kindLook.test.ts` every species row shown once
+  across fresh planets and a rules-8 P2, and `mineralSkins.planet2.test.ts` the three skinned
+  (batch p2-b5) in layers no other P2 species wears, the retired three keeping theirs. The R3 step
+  (P2's generated ore value over P1's) is `src/logging/oreValueCensus.lane.test.ts`, a Tester lane.
 - **Species audit P1 to P5** (ticket 711, spec #647): `src/features/roster/roster.speciesAudit.test.ts`
   reads each fresh planet's roster on two seeds and holds it to at least 15 species (P1 at 12 until
   ticket 713 moves it to its v14 pool and raises the floor), no two sharing a name or a stem (the
