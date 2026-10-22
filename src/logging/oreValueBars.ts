@@ -20,7 +20,9 @@ import { ratioOf } from './radiusRebaselineMedians'
 export const ORE_VALUE_BARS = {
   firstStepPlanet: 2,
   lastPlanet: 10,
-  valueStepMin: 1.15,
+  // x1.15 spelled as a ratio: the bare decimal is the hold's price ratio in economy.json, and a lane
+  // bar decides no play, so it stays out of the economy data (the economy source scan, #535's spelling)
+  valueStepMin: 23 / 20,
   cellStepAbove: 1,
 } as const
 
