@@ -1,0 +1,30 @@
+{
+  "schema": 1,
+  "ticket": 645,
+  "title": "R4 · Re-measure #417 (campaignPacingGate P5–P7)",
+  "tier": "easy",
+  "model": "claude-opus-5-5",
+  "created": "2026-10-21T02:55:33Z",
+  "closed": "2026-10-22T01:49:34Z",
+  "segments": [
+    {"category":"idle","start":"2026-10-21T02:55:33.000Z","end":"2026-10-21T02:55:46.000Z","attempt":0,"tier":null,"model":null,"source":"derived"},
+    {"category":"blocked","start":"2026-10-21T02:55:46.000Z","end":"2026-10-22T01:12:37.000Z","attempt":0,"tier":null,"model":null,"source":"github"},
+    {"category":"idle","start":"2026-10-22T01:12:37.000Z","end":"2026-10-22T01:13:44.000Z","attempt":0,"tier":null,"model":null,"source":"derived"},
+    {"category":"other","start":"2026-10-22T01:13:44.000Z","end":"2026-10-22T01:14:16.725Z","attempt":1,"tier":"easy","model":"claude-opus-5-5","source":"loop-log"},
+    {"category":"context","start":"2026-10-22T01:14:16.725Z","end":"2026-10-22T01:14:53.024Z","attempt":1,"tier":"easy","model":"claude-opus-5-5","source":"transcript"},
+    {"category":"developing","start":"2026-10-22T01:14:53.024Z","end":"2026-10-22T01:15:01.478Z","attempt":1,"tier":"easy","model":"claude-opus-5-5","source":"transcript"},
+    {"category":"context","start":"2026-10-22T01:15:01.478Z","end":"2026-10-22T01:15:04.436Z","attempt":1,"tier":"easy","model":"claude-opus-5-5","source":"transcript"},
+    {"category":"testing","start":"2026-10-22T01:15:04.436Z","end":"2026-10-22T01:19:32.352Z","attempt":1,"tier":"easy","model":"claude-opus-5-5","source":"transcript"},
+    {"category":"developing","start":"2026-10-22T01:19:32.352Z","end":"2026-10-22T01:19:36.610Z","attempt":1,"tier":"easy","model":"claude-opus-5-5","source":"transcript"},
+    {"category":"landing","start":"2026-10-22T01:19:36.610Z","end":"2026-10-22T01:19:48.858Z","attempt":1,"tier":"easy","model":"claude-opus-5-5","source":"transcript"},
+    {"category":"planning","start":"2026-10-22T01:19:48.858Z","end":"2026-10-22T01:19:54.904Z","attempt":1,"tier":"easy","model":"claude-opus-5-5","source":"transcript"},
+    {"category":"gates","start":"2026-10-22T01:19:54.904Z","end":"2026-10-22T01:49:27.193Z","attempt":1,"tier":"easy","model":"claude-opus-5-5","source":"loop-log"},
+    {"category":"landing","start":"2026-10-22T01:49:27.193Z","end":"2026-10-22T01:49:34.000Z","attempt":1,"tier":"easy","model":"claude-opus-5-5","source":"loop-log"}
+  ],
+  "totals": {"blocked":80211,"planner_wait":0,"idle":80,"context":39,"planning":6,"developing":13,"testing":268,"gates":1772,"landing":19,"other":33},
+  "lead_time_s": 82441,
+  "cycle_time_s": 2150,
+  "claimed": "2026-10-22T01:13:44.000Z",
+  "claimed_to_done_s": 2150,
+  "backfilled": false
+}
