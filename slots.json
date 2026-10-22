@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-10-22T21:48:16+02:00",
+  "updated_at": "2026-10-22T21:54:49+02:00",
   "caps": {
     "grok": 12,
     "claude": 10,
@@ -85,7 +85,7 @@
           "ticket": 724,
           "grok_slot": 1,
           "kind": "dev",
-          "since": "2026-10-22T21:43:00+02:00",
+          "since": "2026-10-22T21:54:00+02:00",
           "wave": "647-3B"
         },
         {
@@ -122,7 +122,7 @@
     }
   ],
   "gate": {
-    "busy": 1,
+    "busy": 2,
     "max": 3
   },
   "tester": {
@@ -145,7 +145,7 @@
       "slot": 1,
       "state": "dev",
       "ticket": 724,
-      "since": "2026-10-22T21:43:00+02:00",
+      "since": "2026-10-22T21:54:00+02:00",
       "claude_slot": 7,
       "wave": "647-3B"
     },
@@ -278,7 +278,7 @@
       "state": "busy",
       "ticket": 724,
       "grok_slot": 1,
-      "since": "2026-10-22T21:43:00+02:00",
+      "since": "2026-10-22T21:54:00+02:00",
       "account": 2,
       "wave": "647-3B"
     },
@@ -309,11 +309,11 @@
     }
   ],
   "last_refill": {
-    "at": "2026-10-22 21:48 CEST",
+    "at": "2026-10-22 21:54 CEST",
     "mode": "refill-dev",
-    "triggers": "#723",
-    "started": "",
-    "note": "no pickable build ticket"
+    "triggers": "#724",
+    "started": "#724->C7/A2",
+    "note": "spawned 1 worker(s)"
   },
   "totals": {
     "grok": {
