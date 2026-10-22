@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-10-22T06:20:51+02:00",
+  "updated_at": "2026-10-22T06:21:02+02:00",
   "caps": {
     "grok": 12,
     "claude": 10,
@@ -28,11 +28,12 @@
         },
         {
           "slot": "C2",
-          "state": "free",
+          "state": "busy",
           "ticket": null,
           "grok_slot": null,
-          "kind": null,
-          "since": null
+          "kind": "aux",
+          "since": "2026-10-22T06:20:00+02:00",
+          "label": "tester-triage"
         },
         {
           "slot": "C3",
@@ -68,9 +69,9 @@
         }
       ],
       "size": 6,
-      "used": 1,
-      "free": 5,
-      "claims_last_hour": 2,
+      "used": 2,
+      "free": 4,
+      "claims_last_hour": 3,
       "name": "Claude Max 1"
     },
     {
@@ -126,11 +127,11 @@
   },
   "tester": {
     "state": "running",
-    "phase": "full",
+    "phase": "triage-full",
     "sha": "c42f04783d9d3d0093c9b7d2fc5765e762792bbc",
-    "since": "2026-10-22T04:20:32Z",
+    "since": "2026-10-22T04:20:53Z",
     "holds_gate": false,
-    "claude_slot": null,
+    "claude_slot": 2,
     "last_run": "2026-10-21T18:23:25Z",
     "last_nightly": "2026-10-15T20:43:15Z",
     "last_nightly_result": "full=FAIL balance-report=ok bench=FAIL balance-planets=ok balance-guns=ok balance-charges=ok balance-refinery=ok balance-heat=ok e2e=FAIL memory-soak=FAIL packaged-smoke=ok ",
@@ -274,10 +275,12 @@
     },
     {
       "slot": 2,
-      "state": "free",
+      "state": "busy",
       "ticket": null,
       "grok_slot": null,
-      "since": null,
+      "since": "2026-10-22T06:20:00+02:00",
+      "kind": "aux",
+      "label": "tester-triage",
       "account": 1
     },
     {
@@ -368,8 +371,8 @@
     "claude": {
       "size": 10,
       "enabled": 6,
-      "used": 1,
-      "free": 5,
+      "used": 2,
+      "free": 4,
       "external": 0
     }
   },
