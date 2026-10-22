@@ -1,32 +1,8 @@
 {
  "schema": 1,
- "updatedAt": "2026-10-22T22:44:49.330Z",
+ "updatedAt": "2026-10-22T22:52:35.506Z",
  "lastRuns": 50,
  "runs": [
-  {
-   "id": 1792145707814,
-   "url": "https://github.com/bjor2/steampunk-miner/commit/ec5ce8046734571d4f6173f24cfbf5c471169aa8",
-   "event": "pass",
-   "mode": "nightly-only",
-   "sha": "ec5ce8046734571d4f6173f24cfbf5c471169aa8",
-   "branch": "main",
-   "startedAt": "2026-10-16T10:10:42Z",
-   "jobConclusion": "success",
-   "timedOut": false,
-   "jobDurationSec": 265,
-   "source": "box",
-   "phase": "slow",
-   "job": "slow",
-   "feature": 354,
-   "tickets": [
-    354
-   ],
-   "reportFound": true,
-   "files": 3,
-   "tests": 18,
-   "failed": 0,
-   "failedFiles": 0
-  },
   {
    "id": 1792162238863,
    "url": "https://github.com/bjor2/steampunk-miner/commit/f08434d362200e809492969090f2b0ec4080b0d8",
@@ -1569,13 +1545,37 @@
    "tests": 12569,
    "failed": 5,
    "failedFiles": 2
+  },
+  {
+   "id": 1792709553785,
+   "url": "https://github.com/bjor2/steampunk-miner/commit/dca609908e4fa6c361bc34d78442dbbffed4eb4a",
+   "event": "close-#723",
+   "mode": "scoped",
+   "sha": "dca609908e4fa6c361bc34d78442dbbffed4eb4a",
+   "branch": "main",
+   "startedAt": "2026-10-22T22:51:19Z",
+   "jobConclusion": "success",
+   "timedOut": false,
+   "jobDurationSec": 74,
+   "source": "box",
+   "phase": "fast",
+   "job": "fast",
+   "feature": 644,
+   "tickets": [
+    732
+   ],
+   "reportFound": true,
+   "files": 9,
+   "tests": 81,
+   "failed": 0,
+   "failedFiles": 0
   }
  ],
  "pipeline": {
   "modes": {
-   "nightly-only": 7,
    "full": 20,
-   "scoped": 11,
+   "scoped": 12,
+   "nightly-only": 6,
    "nightly": 12
   },
   "timedOut": [],
@@ -1588,23 +1588,6 @@
   "scopingSuspects": []
  },
  "features": {
-  "pacing-bot": {
-   "files": 4,
-   "p50Ms": 2109394,
-   "p95Ms": 5447417,
-   "fileRuns": 45,
-   "failedFileRuns": 2,
-   "lastFailure": {
-    "runId": 1792411206104,
-    "sha": "1648aa523a2afcc3c3bee8b095f11b7b82826c90",
-    "at": "2026-10-19T11:54:43Z",
-    "tests": [
-     "balance regression: the pacing bot on the slice (#29, S11) meets the first-sale, first-upgrade, ten-minute, core and slice targets on the seed median"
-    ],
-    "file": "src/logging/pacingGate.test.ts"
-   },
-   "passRate": 0.9555555555555556
-  },
   "tooling-ci": {
    "files": 5,
    "p50Ms": 31,
@@ -1672,7 +1655,7 @@
    "files": 3,
    "p50Ms": 257,
    "p95Ms": 470,
-   "fileRuns": 88,
+   "fileRuns": 89,
    "failedFileRuns": 1,
    "lastFailure": {
     "runId": 1792355624413,
@@ -1683,7 +1666,7 @@
     ],
     "file": "scripts/tests/manifestDrift.test.mjs"
    },
-   "passRate": 0.9886363636363636
+   "passRate": 0.9887640449438202
   },
   "debug": {
    "files": 16,
@@ -2026,9 +2009,9 @@
   },
   "golden-replay": {
    "files": 3,
-   "p50Ms": 16498,
+   "p50Ms": 19849,
    "p95Ms": 32738,
-   "fileRuns": 90,
+   "fileRuns": 93,
    "failedFileRuns": 0,
    "lastFailure": null,
    "passRate": 1
@@ -2117,9 +2100,9 @@
   },
   "authority": {
    "files": 143,
-   "p50Ms": 402830,
+   "p50Ms": 402940,
    "p95Ms": 1109492,
-   "fileRuns": 3843,
+   "fileRuns": 3846,
    "failedFileRuns": 10,
    "lastFailure": {
     "runId": 1792695291792,
@@ -2130,7 +2113,7 @@
     ],
     "file": "src/systems/authority/sweptLawCharge.test.ts"
    },
-   "passRate": 0.9973978662503252
+   "passRate": 0.9973998959958398
   },
   "bot": {
    "files": 37,
@@ -2162,7 +2145,7 @@
    "files": 32,
    "p50Ms": 1155,
    "p95Ms": 3918,
-   "fileRuns": 831,
+   "fileRuns": 832,
    "failedFileRuns": 8,
    "lastFailure": {
     "runId": 1792669172174,
@@ -2173,7 +2156,7 @@
     ],
     "file": "src/systems/economy/economySourceScan.test.ts"
    },
-   "passRate": 0.9903730445246691
+   "passRate": 0.9903846153846154
   },
   "enemies": {
    "files": 1,
@@ -2268,7 +2251,7 @@
    "files": 46,
    "p50Ms": 683,
    "p95Ms": 1576,
-   "fileRuns": 1100,
+   "fileRuns": 1101,
    "failedFileRuns": 0,
    "lastFailure": null,
    "passRate": 1
@@ -2315,6 +2298,23 @@
     "file": "src/ui/iconCoverage.test.ts"
    },
    "passRate": 0.9986559139784946
+  },
+  "pacing-bot": {
+   "files": 4,
+   "p50Ms": 2097883,
+   "p95Ms": 5447417,
+   "fileRuns": 42,
+   "failedFileRuns": 2,
+   "lastFailure": {
+    "runId": 1792411206104,
+    "sha": "1648aa523a2afcc3c3bee8b095f11b7b82826c90",
+    "at": "2026-10-19T11:54:43Z",
+    "tests": [
+     "balance regression: the pacing bot on the slice (#29, S11) meets the first-sale, first-upgrade, ten-minute, core and slice targets on the seed median"
+    ],
+    "file": "src/logging/pacingGate.test.ts"
+   },
+   "passRate": 0.9523809523809523
   },
   "roster": {
    "files": 14,
@@ -2390,79 +2390,6 @@
   }
  },
  "files": {
-  "src/logging/assayPacingGate.test.ts": {
-   "feature": "pacing-bot",
-   "runs": 13,
-   "lastMs": 69659,
-   "p50Ms": 76763,
-   "p95Ms": 205466,
-   "passRate": 1,
-   "lastStatus": "passed",
-   "lastRunId": 1792642824354,
-   "lastFailure": null,
-   "flaky": false,
-   "slowest": [
-    [
-     "balance regression: the pacing bot holding assay_beacon (#46, S11) passes the first-ten-minutes, planet 1 core and slice gates on the seed median",
-     69656
-    ]
-   ]
-  },
-  "src/logging/pacingGate.test.ts": {
-   "feature": "pacing-bot",
-   "runs": 13,
-   "lastMs": 105977,
-   "p50Ms": 121988,
-   "p95Ms": 1263582,
-   "passRate": 0.8461538461538461,
-   "lastStatus": "passed",
-   "lastRunId": 1792642824354,
-   "lastFailure": {
-    "runId": 1792411206104,
-    "sha": "1648aa523a2afcc3c3bee8b095f11b7b82826c90",
-    "at": "2026-10-19T11:54:43Z",
-    "tests": [
-     "balance regression: the pacing bot on the slice (#29, S11) meets the first-sale, first-upgrade, ten-minute, core and slice targets on the seed median"
-    ]
-   },
-   "flaky": false,
-   "slowest": [
-    [
-     "balance regression: the pacing bot on the slice (#29, S11) meets the first-sale, first-upgrade, ten-minute, core and slice targets on the seed median",
-     81338
-    ],
-    [
-     "balance regression: the pacing bot on the slice (#29, S11) derives the same summary from a second run of the same scenario",
-     24561
-    ]
-   ]
-  },
-  "src/systems/bot/playSlice.test.ts": {
-   "feature": "pacing-bot",
-   "runs": 13,
-   "lastMs": 71397,
-   "p50Ms": 70934,
-   "p95Ms": 900536,
-   "passRate": 1,
-   "lastStatus": "passed",
-   "lastRunId": 1792642824354,
-   "lastFailure": null,
-   "flaky": false,
-   "slowest": [
-    [
-     "pacing bot replays from the world seed and its own commands to the same digests and state",
-     29113
-    ],
-    [
-     "pacing bot plays a fresh planet 1 through to the planet 2 core inside its budget",
-     24373
-    ],
-    [
-     "pacing bot save size (#36 acceptance 4) keeps the save of a 60-minute run under 1 MB",
-     17879
-    ]
-   ]
-  },
   "scripts/ci/drillDownHistory.test.mjs": {
    "feature": "tooling-ci",
    "runs": 26,
@@ -2980,13 +2907,13 @@
   },
   "scripts/tests/manifestDrift.test.mjs": {
    "feature": "tooling-tests",
-   "runs": 36,
-   "lastMs": 140,
+   "runs": 37,
+   "lastMs": 144,
    "p50Ms": 243,
    "p95Ms": 433,
-   "passRate": 0.9722222222222222,
+   "passRate": 0.972972972972973,
    "lastStatus": "passed",
-   "lastRunId": 1792709085936,
+   "lastRunId": 1792709553785,
    "lastFailure": {
     "runId": 1792355624413,
     "sha": "20ef31bc5eb28b2b93cd4e84e1b03914c67d76cc",
@@ -9927,27 +9854,27 @@
   },
   "src/logging/goldenRun.test.ts": {
    "feature": "golden-replay",
-   "runs": 30,
-   "lastMs": 4796,
+   "runs": 31,
+   "lastMs": 4599,
    "p50Ms": 5325,
    "p95Ms": 9215,
    "passRate": 1,
    "lastStatus": "passed",
-   "lastRunId": 1792709085936,
+   "lastRunId": 1792709553785,
    "lastFailure": null,
    "flaky": false,
    "slowest": [
     [
-     "golden runs (committed in tests/golden) replays collapse-band-2-grade-1 to every committed digest and its mined order at the fixed step, 30 and 144 fps",
-     984
+     "golden run gate replays collapse-band-2-grade-1 to its committed digests and mined order whatever drive its reports push (ticket 279)",
+     969
     ],
     [
-     "golden run gate replays collapse-band-2-grade-1 to its committed digests and mined order whatever drive its reports push (ticket 279)",
-     960
+     "golden runs (committed in tests/golden) replays collapse-band-2-grade-1 to every committed digest and its mined order at the fixed step, 30 and 144 fps",
+     957
     ],
     [
      "golden runs (committed in tests/golden) replays casing-lined-band-2 to every committed digest and its mined order at the fixed step, 30 and 144 fps",
-     822
+     811
     ]
    ]
   },
@@ -10238,23 +10165,23 @@
   },
   "src/logging/secondSliceGolden.test.ts": {
    "feature": "golden-replay",
-   "runs": 30,
-   "lastMs": 759,
+   "runs": 31,
+   "lastMs": 747,
    "p50Ms": 817,
    "p95Ms": 2308,
    "passRate": 1,
    "lastStatus": "passed",
-   "lastRunId": 1792709085936,
+   "lastRunId": 1792709553785,
    "lastFailure": null,
    "flaky": false,
    "slowest": [
     [
      "second-slice golden runs (S11) lines a grade-2 bore in band 2 that only collapses where debug forces it",
-     363
+     367
     ],
     [
      "second-slice golden runs (S11) warns and refills the lined blocks behind a grade-1 dig into band 2",
-     349
+     336
     ]
    ]
   },
@@ -13110,13 +13037,13 @@
   },
   "src/systems/authority/moneyRounding.test.ts": {
    "feature": "authority",
-   "runs": 36,
+   "runs": 37,
    "lastMs": 2,
    "p50Ms": 5,
    "p95Ms": 14,
    "passRate": 1,
    "lastStatus": "passed",
-   "lastRunId": 1792709085936,
+   "lastRunId": 1792709553785,
    "lastFailure": null,
    "flaky": false,
    "slowest": []
@@ -14340,13 +14267,13 @@
   },
   "src/systems/economy/economySourceScan.test.ts": {
    "feature": "economy",
-   "runs": 36,
-   "lastMs": 116,
+   "runs": 37,
+   "lastMs": 149,
    "p50Ms": 156,
    "p95Ms": 1342,
-   "passRate": 0.7777777777777778,
+   "passRate": 0.7837837837837838,
    "lastStatus": "passed",
-   "lastRunId": 1792709085936,
+   "lastRunId": 1792709553785,
    "lastFailure": {
     "runId": 1792669172174,
     "sha": "d95dcc66eb0c80f89cc35a6cd672d3af935b955d",
@@ -14356,7 +14283,12 @@
     ]
    },
    "flaky": false,
-   "slowest": []
+   "slowest": [
+    [
+     "economy source scan finds no economy price, ratio or fee number in game code outside economy.json",
+     103
+    ]
+   ]
   },
   "src/systems/economy/economyTables.test.ts": {
    "feature": "economy",
@@ -17207,13 +17139,13 @@
   },
   "src/systems/vehicle/vehicleStats.test.ts": {
    "feature": "vehicle",
-   "runs": 36,
+   "runs": 37,
    "lastMs": 11,
    "p50Ms": 12,
    "p95Ms": 32,
    "passRate": 1,
    "lastStatus": "passed",
-   "lastRunId": 1792709085936,
+   "lastRunId": 1792709553785,
    "lastFailure": null,
    "flaky": false,
    "slowest": []
@@ -17945,27 +17877,27 @@
   },
   "src/systems/world/generatorGolden.test.ts": {
    "feature": "golden-replay",
-   "runs": 30,
-   "lastMs": 16493,
-   "p50Ms": 10356,
+   "runs": 31,
+   "lastMs": 16813,
+   "p50Ms": 13707,
    "p95Ms": 21215,
    "passRate": 1,
    "lastStatus": "passed",
-   "lastRunId": 1792709085936,
+   "lastRunId": 1792709553785,
    "lastFailure": null,
    "flaky": false,
    "slowest": [
     [
      "generator golden digest makes the committed planets 1 and 2 entered under ore rules 2 or 3, the roster (ticket 446)",
-     3110
+     3061
     ],
     [
      "generator golden digest makes the committed planet 2 with its own kinds, ore rules 9 (ticket 709)",
-     2787
+     3016
     ],
     [
      "generator golden digest makes the committed planet 3 entered under ore rules 2 for world seed 83921 (ticket 445)",
-     1804
+     1752
     ]
    ]
   },
@@ -18448,6 +18380,79 @@
    "lastFailure": null,
    "flaky": false,
    "slowest": []
+  },
+  "src/logging/assayPacingGate.test.ts": {
+   "feature": "pacing-bot",
+   "runs": 12,
+   "lastMs": 69659,
+   "p50Ms": 75266,
+   "p95Ms": 205466,
+   "passRate": 1,
+   "lastStatus": "passed",
+   "lastRunId": 1792642824354,
+   "lastFailure": null,
+   "flaky": false,
+   "slowest": [
+    [
+     "balance regression: the pacing bot holding assay_beacon (#46, S11) passes the first-ten-minutes, planet 1 core and slice gates on the seed median",
+     69656
+    ]
+   ]
+  },
+  "src/logging/pacingGate.test.ts": {
+   "feature": "pacing-bot",
+   "runs": 12,
+   "lastMs": 105977,
+   "p50Ms": 116348,
+   "p95Ms": 1263582,
+   "passRate": 0.8333333333333334,
+   "lastStatus": "passed",
+   "lastRunId": 1792642824354,
+   "lastFailure": {
+    "runId": 1792411206104,
+    "sha": "1648aa523a2afcc3c3bee8b095f11b7b82826c90",
+    "at": "2026-10-19T11:54:43Z",
+    "tests": [
+     "balance regression: the pacing bot on the slice (#29, S11) meets the first-sale, first-upgrade, ten-minute, core and slice targets on the seed median"
+    ]
+   },
+   "flaky": false,
+   "slowest": [
+    [
+     "balance regression: the pacing bot on the slice (#29, S11) meets the first-sale, first-upgrade, ten-minute, core and slice targets on the seed median",
+     81338
+    ],
+    [
+     "balance regression: the pacing bot on the slice (#29, S11) derives the same summary from a second run of the same scenario",
+     24561
+    ]
+   ]
+  },
+  "src/systems/bot/playSlice.test.ts": {
+   "feature": "pacing-bot",
+   "runs": 12,
+   "lastMs": 71397,
+   "p50Ms": 66560,
+   "p95Ms": 900536,
+   "passRate": 1,
+   "lastStatus": "passed",
+   "lastRunId": 1792642824354,
+   "lastFailure": null,
+   "flaky": false,
+   "slowest": [
+    [
+     "pacing bot replays from the world seed and its own commands to the same digests and state",
+     29113
+    ],
+    [
+     "pacing bot plays a fresh planet 1 through to the planet 2 core inside its budget",
+     24373
+    ],
+    [
+     "pacing bot save size (#36 acceptance 4) keeps the save of a 60-minute run under 1 MB",
+     17879
+    ]
+   ]
   },
   "src/debug/debugHudLayout.test.ts": {
    "feature": "debug",
@@ -19410,13 +19415,13 @@
   },
   "src/systems/authority/sweptLawCharge.test.ts": {
    "feature": "authority",
-   "runs": 22,
-   "lastMs": 11448,
-   "p50Ms": 11657,
+   "runs": 23,
+   "lastMs": 11789,
+   "p50Ms": 11789,
    "p95Ms": 15376,
-   "passRate": 0.9545454545454546,
+   "passRate": 0.9565217391304348,
    "lastStatus": "passed",
-   "lastRunId": 1792709085936,
+   "lastRunId": 1792709553785,
    "lastFailure": {
     "runId": 1792695291792,
     "sha": "857077186e85f19de173461aeac947125b246388",
@@ -19428,16 +19433,16 @@
    "flaky": false,
    "slowest": [
     [
-     "swept law charge (ticket 540) prices cleared lining inside the law work, neither twice nor under, lined and unlined",
-     3724
+     "swept law charge (ticket 540) cuts and heats byte for byte as the shipped swept charge",
+     3787
     ],
     [
-     "swept law charge (ticket 540) cuts and heats byte for byte as the shipped swept charge",
-     3582
+     "swept law charge (ticket 540) prices cleared lining inside the law work, neither twice nor under, lined and unlined",
+     3786
     ],
     [
      "swept law charge (ticket 540) charges within 1% of the law on down legs, fast and slow, where the per-cell price over-charged",
-     1962
+     2064
     ]
    ]
   },
@@ -20270,13 +20275,13 @@
   },
   "src/systems/authority/collapse/collapseAtSpeed.test.ts": {
    "feature": "authority",
-   "runs": 15,
-   "lastMs": 2240,
-   "p50Ms": 2262,
+   "runs": 16,
+   "lastMs": 2235,
+   "p50Ms": 2240,
    "p95Ms": 4572,
-   "passRate": 0.9333333333333333,
+   "passRate": 0.9375,
    "lastStatus": "passed",
-   "lastRunId": 1792709085936,
+   "lastRunId": 1792709553785,
    "lastFailure": {
     "runId": 1792695291792,
     "sha": "857077186e85f19de173461aeac947125b246388",
@@ -20291,15 +20296,15 @@
    "slowest": [
     [
      "a collapse outrun at 84 m/s (ticket 560) cuts, yields and reports exactly as past a tunnel that never warned",
-     822
+     838
     ],
     [
      "a collapse outrun at 84 m/s (ticket 560) cancels every warning by its refill tick, refilling nothing and crushing no one",
-     561
+     623
     ],
     [
      "a collapse outrun at 84 m/s (ticket 560) carries the rig east at its 84 m/s stride, far past the radius",
-     534
+     446
     ]
    ]
   },
