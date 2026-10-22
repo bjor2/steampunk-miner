@@ -1,6 +1,7 @@
 /**
  * The Outfitter (spec #678, ticket 687; design-system.md section 11): the Upgrade bay's cards
- * (`outfitterCards`), each with its gain text and its price, greyed while the wallet is short. A
+ * (`outfitterCards`), each with its gain text and its price, greyed while the wallet is short, and
+ * under the price "Affordable" or "{N} trips away" once a trip is done (ticket 719). A
  * card is the bay's own button (`MenuSheetCard`): a tap, a click or the pad's A on the focused card
  * presses it through the store, so the bay's ids stay the cards' `data-testid` and the authority
  * answers as before. The kernel's own bay frame draws them while no slice owns the bay; the slice
@@ -31,7 +32,12 @@ export function OutfitterPanelView({
 
 function OutfitterCardView({ card, focusedId }: { card: OutfitterCard; focusedId: string | null }) {
   const text = { id: card.id, title: card.title, line: card.line }
-  const look = { iconId: card.iconId, figure: card.priceText, isMuted: card.isMuted }
+  const look = {
+    iconId: card.iconId,
+    figure: card.priceText,
+    figureNote: card.guidanceText,
+    isMuted: card.isMuted,
+  }
   if (card.buttonId === null) return <SheetCard text={text} {...look} onAct={pressNothing} />
   return <MenuSheetCard text={text} {...look} buttonId={card.buttonId} focusedId={focusedId} />
 }

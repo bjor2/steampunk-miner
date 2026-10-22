@@ -24,6 +24,7 @@ import { travelChargeNow, travelRefusal } from '../authority/travelRules'
 import { travelCommand, undockCommand } from '../platform/platformCommands'
 import type { BayId } from '../world/dockBays'
 import type { UpgradeId } from '../economy/economyDefinition'
+import type { TripLedger } from './tripIncome'
 import { BAY_ACCENTS, BAY_NAMES, type BayAccent } from './bayNames'
 import type { GaugeReading } from './hudModel'
 import type { FocusStop } from './menuFocus'
@@ -47,6 +48,11 @@ export interface BayUiState {
   focusedId: string | null
   /** The track whose part the Upgrade bay preview is installing after a purchase (#44). */
   installingUpgradeId: UpgradeId | null
+  /**
+   * The local player's last trips' income, which the Outfitter's "{N} trips away" reads (ticket
+   * 719); absent where no trip was followed, which reads as no trip done.
+   */
+  tripLedger?: TripLedger
 }
 
 export interface BayHeader {

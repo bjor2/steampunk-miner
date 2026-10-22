@@ -42,11 +42,27 @@
   line-height: var(--line-height);
 }
 
+/* The figure and its note stack at the card's right, as wide as their text and never wrapping. */
+.figures {
+  display: flex;
+  flex: none;
+  flex-direction: column;
+  align-items: flex-end;
+}
+
 .figure {
   flex: none;
   color: var(--color-brass);
   font-family: var(--font-numerals);
   font-size: var(--type-body);
+}
+
+.figureNote {
+  color: var(--color-parchment);
+  font-family: var(--font-numerals);
+  font-size: var(--type-label);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
 }
 
 .card[data-muted] .figure,

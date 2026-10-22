@@ -6,10 +6,12 @@
  * price as its figure, greyed while the wallet is short; never a stat table. Pressing a card
  * presses the bay's own button, so the authority, the ids and the refusals stay the bay model's.
  * The slice that draws the bay may add a note to a track's line (the rig look's owned step,
- * ticket 585), after the gain.
+ * ticket 585), after the gain. Under the price, once a trip is done, the guidance: "Affordable" or
+ * "{N} trips away" (ticket 719, `shopGuidance.ts`).
  */
 import type { UpgradeId } from '../economy/economyDefinition'
 import { fromCanonical } from '../money'
+import { guidanceTextOf, type ShopGuidance } from './shopGuidance'
 import type { ChargeRow, ChargeRows } from './chargeRows'
 import { gainTextOf } from './gainText'
 import { isNewCapabilityBuy, NONE_OWNED } from './newCapability'
@@ -30,6 +32,10 @@ export interface OutfitterCard {
   iconId: string
   /** The price, rounded up; null with nothing left to buy. */
   priceText: string | null
+  /** The exact canonical price behind `priceText`; null with it. */
+  priceExact: string | null
+  /** "Affordable" or "{N} trips away" under the price; null before a trip or with no price. */
+  guidanceText: string | null
   /** The wallet is short of the price: the figure greys (#686 `isMuted`). */
   isMuted: boolean
   /** The bay button the card presses; null where nothing can be bought (a Mastered entry). */
@@ -70,6 +76,10 @@ export function outfitterCardsOf(
   model: UpgradeBayModel,
   trackNoteOf: TrackNote = NO_TRACK_NOTE,
 ): OutfitterCard[] {
+  return pricedCardsOf(model, trackNoteOf).map((card) => withGuidance(card, model.guidance))
+}
+
+function pricedCardsOf(model: UpgradeBayModel, trackNoteOf: TrackNote): OutfitterCard[] {
   return [
     ...model.tracks.map((row) => trackCardOf(row, trackNoteOf(row))),
     casingCardOf(model.casing),
@@ -80,6 +90,11 @@ export function outfitterCardsOf(
     ...model.entries.map(entryCardOf),
     repairCardOf(model.repair),
   ]
+}
+
+function withGuidance(card: OutfitterCard, guidance: ShopGuidance): OutfitterCard {
+  if (card.priceExact === null) return card
+  return { ...card, guidanceText: guidanceTextOf(fromCanonical(card.priceExact), guidance) }
 }
 
 function trackCardOf(row: WorkshopRow, note: string | null): OutfitterCard {
@@ -172,11 +187,14 @@ function buyCardOf(
   cost: AmountReading | null,
   buy: ScreenButton | null,
 ): Omit<OutfitterCard, 'line' | 'isNewCapability'> {
+  const price = buy === null ? null : cost
   return {
     id: `${CARD_ID_PREFIX}${key}`,
     title,
     iconId,
-    priceText: buy === null ? null : (cost?.text ?? null),
+    priceText: price?.text ?? null,
+    priceExact: price?.exact ?? null,
+    guidanceText: null,
     isMuted: buy?.reason === 'money_short',
     buttonId: buy?.id ?? null,
   }

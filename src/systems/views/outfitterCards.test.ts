@@ -2,7 +2,8 @@ import { describe, expect, it } from 'vitest'
 import { createScriptedSession, dockInBay } from '../authority/scriptedSession'
 import { UPGRADE_IDS } from '../economy/economyDefinition'
 import { vehicleStatsAt } from '../economy/vehicleStats'
-import { fromCanonical } from '../money'
+import { ceil, div, fromCanonical, fromSafeInteger, sub } from '../money'
+import { formatPrice } from '../displayAmount'
 import { CLICK_CHAIN } from '../authority/purchaseChain'
 import { buyGunCommand } from '../platform/platformCommands'
 import { grantMoneyCommand } from '../startScenarioCommands'
@@ -13,11 +14,12 @@ import { outfitterCardsOf } from './outfitterCards'
 import { UI_ID_TEMPLATES, UI_IDS } from './screenIds'
 import { selectUpgradeBayModel } from './upgradeBayModel'
 import { wordCountOf } from './uiTextBudget'
+import type { TripLedger } from './tripIncome'
 
 // The Outfitter (spec #678, ticket 687): the Upgrade bay on the shared sheet, one card per thing
 // it sells, with gain text and the price greyed while the wallet is short.
 
-function cardsAtUpgradeBay(money: string) {
+function cardsAtUpgradeBay(money: string, tripLedger?: TripLedger) {
   const session = createScriptedSession()
   session.submit(1, grantMoneyCommand(money))
   dockInBay(session, 2, 'upgrade')
@@ -26,6 +28,7 @@ function cardsAtUpgradeBay(money: string) {
     isQuickServiceHighlighted: false,
     focusedId: null,
     installingUpgradeId: null,
+    tripLedger,
   })
   return {
     model,
@@ -121,7 +124,34 @@ describe('outfitter cards: the new-capability flag', () => {
     session.submit(2, buyGunCommand(CLICK_CHAIN))
     expect(cardOf(gunsCardsOf(session), 'guns').isNewCapability).toBe(false)
   })
+
+  it('shows no trips-away guidance before a trip is done', () => {
+    const { cards } = cardsAtUpgradeBay('0')
+    expect(cards.filter((card) => card.guidanceText !== null)).toEqual([])
+  })
+
+  it('says how many trips of the one trip’s income a short price is away, rounded up', () => {
+    const { cards, model } = cardsAtUpgradeBay('0', ONE_TRIP_OF_40)
+    const card = cardOf(cards, 'track.drill_power')
+    expect(card.isMuted).toBe(true)
+    const rest = sub(fromCanonical(card.priceExact!), model.guidance.balance)
+    const trips = formatPrice(ceil(div(rest, fromSafeInteger(40))))
+    expect(card.guidanceText).toBe(trips === '1' ? '1 trip away' : `${trips} trips away`)
+  })
+
+  it('reads Affordable on exactly the priced cards the wallet does not grey', () => {
+    const priced = cardsAtUpgradeBay('300', ONE_TRIP_OF_40).cards.filter(
+      (card) => card.priceText !== null,
+    )
+    expect(priced.some((card) => card.isMuted)).toBe(true)
+    expect(priced.some((card) => !card.isMuted)).toBe(true)
+    expect(priced.filter((card) => (card.guidanceText === 'Affordable') === card.isMuted)).toEqual(
+      [],
+    )
+  })
 })
+
+const ONE_TRIP_OF_40: TripLedger = { ended: [fromSafeInteger(40)], current: null }
 
 function gunsCardsOf(session: ReturnType<typeof createScriptedSession>) {
   const model = selectUpgradeBayModel(session.state(), 'p1', {

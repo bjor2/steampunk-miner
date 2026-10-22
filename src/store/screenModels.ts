@@ -62,6 +62,7 @@ import {
 import { inputDeviceOf, promptSourceOf } from '../systems/input/promptLabel'
 import { readAuthorityState } from './authorityLink'
 import type { LiveStepHold } from './liveStepSlice'
+import type { TripLedger } from '../systems/views/tripIncome'
 
 /** What the screens read from the store besides the authority. */
 export interface ScreenSources {
@@ -79,6 +80,8 @@ export interface ScreenSources {
   focusedControlId: string | null
   liveStepHold: LiveStepHold
   installingUpgradeId: UpgradeId | null
+  /** The local player's last trips' income (ticket 719). */
+  tripLedger: TripLedger
   hintBoard: HintBoard
   transmissionBoard: TransmissionBoard
   arePlaquesAllowed: boolean
@@ -137,6 +140,7 @@ function bayUiStateOf(sources: ScreenSources): BayUiState {
     isQuickServiceHighlighted: isQuickServiceHighlighted(plaqueSourcesOf(sources)),
     focusedId: sources.focusedControlId,
     installingUpgradeId: sources.installingUpgradeId,
+    tripLedger: sources.tripLedger,
   }
 }
 

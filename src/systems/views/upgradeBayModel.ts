@@ -37,6 +37,8 @@ import { chargeButtonsOf, chargeRowsOf, type ChargeRows } from './chargeRows'
 import { gunRowOf, type GunRow } from './gunRow'
 import { liningRowOf, type LiningRow } from './liningRow'
 import { vehicleItemRowsOf, type VehicleItemRow } from './vehicleItemRows'
+import { shopGuidanceOf, type ShopGuidance } from './shopGuidance'
+import { EMPTY_TRIP_LEDGER } from './tripIncome'
 import { KERNEL_ITEMS } from '../registries/kernelItems'
 import { itemCardOf, serviceCardOf, SHOP_SOURCE, type ItemCardModel } from './itemCardModel'
 import { focusOnScreen, type FocusStop } from './menuFocus'
@@ -98,6 +100,8 @@ export interface UpgradeBayModel {
   /** The slices' bay entries, none before their anchor row opens (ticket 344). */
   entries: BayEntryRow[]
   repair: RepairReading
+  /** The wallet and the trips' income each card's "Affordable" or "{N} trips away" reads. */
+  guidance: ShopGuidance
   visualTier: number
   /** The preview's tier gauge glyph (#158). */
   tierIconId: string
@@ -136,6 +140,7 @@ export function selectUpgradeBayModel(
     items,
     entries,
     repair,
+    guidance: shopGuidanceOf(state.players[playerId].wallet, ui.tripLedger ?? EMPTY_TRIP_LEDGER),
     visualTier: visualTier(levels),
     tierIconId: PREVIEW_TIER_ICON_ID,
     preview: upgradePreviewOf(levels, {

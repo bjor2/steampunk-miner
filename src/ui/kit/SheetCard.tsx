@@ -1,7 +1,8 @@
 /**
  * The sheet's card (spec #678, ticket 686; design-system.md section 10): a title of 3 words or
  * fewer plus one line of 12 or fewer in the card frame, an optional icon and an optional figure
- * beside the title (a price, a count). Where no pointer hovers, the first tap shows the line and
+ * beside the title (a price, a count), with an optional short note under it (the shop's
+ * "Affordable" or "{N} trips away", ticket 719). Where no pointer hovers, the first tap shows the line and
  * the second acts; a mouse shows it on hover and the keyboard on focus, and their press acts at
  * once. The whole card is the one 44 px target. It records its texts in the budget registry like
  * the Title+OneLine element, so the copy budgets read the cards as drawn.
@@ -26,6 +27,8 @@ export interface SheetCardProps {
   iconId?: string | null
   /** A figure beside the title, never a control: a price, a count. */
   figure?: ReactNode
+  /** A few words under the figure, always shown: the shop's guidance (ticket 719). */
+  figureNote?: string | null
   /** Greyed, as a price the wallet cannot pay (#687); the press still reaches the action. */
   isMuted?: boolean
   testId?: string
@@ -48,6 +51,7 @@ export function SheetCardView({
   text,
   iconId = null,
   figure = null,
+  figureNote = null,
   isMuted = false,
   testId,
   isRevealed,
@@ -63,7 +67,13 @@ export function SheetCardView({
   onPress: (event: MouseEvent) => void
   onFocus?: (event: FocusEvent) => void
 }) {
-  recordUiText({ id: text.id, title: text.title, oneLine: text.line, tooltipLines: [], lines: [] })
+  recordUiText({
+    id: text.id,
+    title: text.title,
+    oneLine: text.line,
+    tooltipLines: [],
+    lines: figureNote === null ? [] : [{ text: figureNote, tag: 'visible' }],
+  })
   return (
     <button
       type="button"
@@ -82,7 +92,7 @@ export function SheetCardView({
       <span className={styles.head}>
         {iconId !== null && <VectorIcon iconId={iconId} size="menu" />}
         <span className={styles.title}>{text.title}</span>
-        {figure !== null && <span className={styles.figure}>{figure}</span>}
+        <CardFigure figure={figure} note={figureNote} />
       </span>
       <span className={styles.reveal}>
         <span className={styles.line} data-sheet-card-line>
@@ -90,6 +100,21 @@ export function SheetCardView({
         </span>
       </span>
     </button>
+  )
+}
+
+/** The figure beside the title and its note under it, in one column that keeps its width. */
+function CardFigure({ figure, note }: { figure: ReactNode; note: string | null }) {
+  if (figure === null && note === null) return null
+  return (
+    <span className={styles.figures}>
+      {figure !== null && <span className={styles.figure}>{figure}</span>}
+      {note !== null && (
+        <span className={styles.figureNote} data-sheet-card-note>
+          {note}
+        </span>
+      )}
+    </span>
   )
 }
 
