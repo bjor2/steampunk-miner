@@ -16,6 +16,11 @@
  *   lock (b) on #595), so a planet a save holds under earlier rules keeps the species it was
  *   entered with: P2 entered before rules 6 stays on `legacy`. Optional; a planet it names must be
  *   one the registry gives a pool.
+ * - A slot may belong to one pool from an ore rules version on (`pool` + `fromOreRules`, ticket 709,
+ *   GD ruling (A) on #709): only a planet resolving to that pool and entered under those rules or
+ *   later draws it, so P2's own kinds never reach P1 or a P2 a save holds under older rules. Own
+ *   slots follow every shared slot of their table, so leaving them out never moves the roster index
+ *   a stored cell names.
  *
  * A slot is live only where its tier has weight in its set, so a kind never sits on a band its
  * rarity never paints. Look only: no slot field reaches a price, a hardness or a gate.
@@ -35,6 +40,14 @@ export interface KindSlot {
   rarity: string
   /** The first and last band the kind is live in. */
   window: readonly [number, number]
+  /** Set on a pool's own slot (ticket 709): the one pool that draws it, and from which rules. */
+  owner?: SlotOwner
+}
+
+/** The pool a slot belongs to and the ore rules it joined that pool's rosters under (ticket 709). */
+export interface SlotOwner {
+  pool: string
+  fromOreRules: number
 }
 
 /** The pool a planet resolved to before an ore rules version moved it (ticket 632). */
@@ -60,6 +73,8 @@ export interface KindRowContext {
   familyIds: readonly string[]
   /** The planets the registry gives a pool, as `poolsBeforeOreRules` keys name them. */
   pooledPlanets: readonly string[]
+  /** The pool ids the registry's planet rows name, which a pool's own slot may name. */
+  poolIds: readonly string[]
   /** Per set, per tier id, bands 1 to 5 in basis points; common is never 0. */
   weightBpOf(set: RarityRowSet, rarity: string, band: number): number | undefined
 }
@@ -111,9 +126,27 @@ export function poolOfPlanetUnder(
   return earlier?.pool ?? kinds.poolByPlanet.get(planetIndex) ?? null
 }
 
+/**
+ * The slots of `set` a planet resolving to `pool` under ore rules `oreRulesVersion` draws, in table
+ * order: every shared slot, then the pool's own slots its rules reach.
+ */
+export function slotsOfPoolUnder(
+  kinds: KindRows,
+  set: RarityRowSet,
+  pool: string,
+  oreRulesVersion: number | undefined,
+): KindSlot[] {
+  return kinds.slotsBySet[set].filter((slot) => isSlotDrawnBy(slot, pool, oreRulesVersion ?? 0))
+}
+
 /** Whether band `band` is in the slot's window. */
 export function isSlotLiveInBand(slot: KindSlot, band: number): boolean {
   return band >= slot.window[0] && band <= slot.window[1]
+}
+
+function isSlotDrawnBy(slot: KindSlot, pool: string, oreRulesVersion: number): boolean {
+  if (slot.owner === undefined) return true
+  return slot.owner.pool === pool && oreRulesVersion >= slot.owner.fromOreRules
 }
 
 type EarlierPoolTable = Record<string, Record<string, string>>
@@ -142,12 +175,14 @@ function earlierPoolOf(
 
 function kindSlotOf(row: Raw): KindSlot {
   const [first, last] = row.window as number[]
-  return {
+  const slot: KindSlot = {
     slotId: row.slotId as string,
     family: row.family as string,
     rarity: row.rarity as string,
     window: [first, last],
   }
+  if (row.pool === undefined) return slot
+  return { ...slot, owner: { pool: row.pool as string, fromOreRules: row.fromOreRules as number } }
 }
 
 function slotTableProblems(
@@ -164,7 +199,22 @@ function slotTableProblems(
     ...(isOverCap ? [`ore.kinds.${set} holds ${rows.length} kinds, over rosterMaxKinds`] : []),
     ...rows.flatMap((row, at) => slotRowProblems(row, `ore.kinds.${set}[${at}]`, set, context)),
     ...repeatedIdsOf(ids).map((id) => `kind slot "${id}" twice`),
+    ...sharedAfterOwnProblems(rows, set),
   ]
+}
+
+/** A shared slot after an own slot would sit at another roster index on the planets without it. */
+function sharedAfterOwnProblems(rows: readonly Raw[], set: RarityRowSet): string[] {
+  const firstOwn = rows.findIndex(isOwnSlotRow)
+  if (firstOwn < 0) return []
+  return rows
+    .map((row, at) => ({ row, at }))
+    .filter(({ row, at }) => at > firstOwn && !isOwnSlotRow(row))
+    .map(({ at }) => `ore.kinds.${set}[${at}] is shared but follows a pool's own slot`)
+}
+
+function isOwnSlotRow(row: Raw): boolean {
+  return row.pool !== undefined || row.fromOreRules !== undefined
 }
 
 function slotRowProblems(
@@ -178,9 +228,21 @@ function slotRowProblems(
     ...(isSlotIdOf(row.slotId, set) ? [] : [`${where}.slotId must be "${set}.<name>"`]),
     ...(isFamily ? [] : [`${where}.family must name an ore family`]),
     ...(isBandWindow(row.window) ? [] : [`${where}.window must be [first, last] in 1..5`]),
+    ...ownerProblems(row, where, context.poolIds),
   ]
   if (shapeProblems.length > 0) return shapeProblems
   return deadBandProblems(row, where, set, context)
+}
+
+/** An own slot names a registry pool and an ore rules version this build knows, both or neither. */
+function ownerProblems(row: Raw, where: string, poolIds: readonly string[]): string[] {
+  if (!isOwnSlotRow(row)) return []
+  return [
+    ...(poolIds.includes(row.pool as string) ? [] : [`${where}.pool must name a registry pool`]),
+    ...(isKnownOreRules(row.fromOreRules)
+      ? []
+      : [`${where}.fromOreRules must be an ore rules version from 2 to ${ORE_RULES_VERSION}`]),
+  ]
 }
 
 /** A kind is never live where its tier weighs nothing in the set (Systems, #139 section 5). */
@@ -233,6 +295,12 @@ function unknownTableProblems(raw: Raw): string[] {
   return Object.keys(raw)
     .filter((key) => !known.includes(key))
     .map((key) => `ore.kinds.${key} is not a rarity row set`)
+}
+
+function isKnownOreRules(rules: unknown): boolean {
+  return (
+    Number.isSafeInteger(rules) && (rules as number) > 1 && (rules as number) <= ORE_RULES_VERSION
+  )
 }
 
 function isSlotIdOf(slotId: unknown, set: RarityRowSet): boolean {

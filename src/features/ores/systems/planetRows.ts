@@ -155,6 +155,12 @@ export function pooledPlanetKeysOf(planets: unknown): string[] {
     .map((row) => String(row.planet))
 }
 
+/** The pool ids an unchecked block's rows name, as a pool's own kind slot may name them. */
+export function poolIdsOf(planets: unknown): string[] {
+  const rows = isPlainMap(planets) && Array.isArray(planets.rows) ? (planets.rows as unknown[]) : []
+  return rows.filter(isPlainMap).flatMap((row) => (isPoolId(row.pool) ? [row.pool] : []))
+}
+
 export function isPoolId(pool: unknown): pool is string {
   return typeof pool === 'string' && POOL_ID.test(pool)
 }

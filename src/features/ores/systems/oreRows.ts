@@ -27,6 +27,7 @@ import {
   planetRowsOf,
   poolByPlanetOf,
   pooledPlanetKeysOf,
+  poolIdsOf,
   type PlanetRowContext,
   type PlanetRows,
 } from './planetRows'
@@ -124,6 +125,7 @@ function kindRowContextOf(ore: Raw, families: unknown): KindRowContext {
   return {
     familyIds: rows.map((family) => String(family.id)),
     pooledPlanets: pooledPlanetKeysOf(ore.planets),
+    poolIds: poolIdsOf(ore.planets),
     weightBpOf: (set, rarity, band) =>
       tierWeightBpOf(ore.rarity as Raw | undefined, set, rarity, band),
   }

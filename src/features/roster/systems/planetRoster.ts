@@ -16,12 +16,15 @@
  * The slots are shared, but each planet picks the species pool they resolve to (ticket 542, TD
  * shape on #453, 6236465674): the planet's registry row (`ores` `planets.rows`) names its pool by
  * planet index, never the seed, so a pool changes which species a slot shows and never a stored
- * cell.
+ * cell. A pool may also own slots of its table from an ore rules version on (ticket 709): P2 entered
+ * under rules 9 draws its three own kinds after the 12 shared legacy slots, while P1 and a P2 a save
+ * holds under older rules keep the 12.
  */
 import {
   ORE_ROWS,
   poolOfPlanetUnder,
   rarityRowSetOfPlanet,
+  slotsOfPoolUnder,
   type KindSlot,
   type RarityRowSet,
 } from '../../ores'
@@ -36,11 +39,14 @@ export const MIXED_ROSTER_ORE_RULES = 4
 
 const NO_KINDS: readonly KindSlot[] = Object.freeze([])
 
+/** One roster per set, pool and ore rules, so the per-patch fold allocates none. */
+const rosterByKey = new Map<string, readonly KindSlot[]>()
+
 /** The kinds a planet's patches draw from, in roster order; empty before the roster's rules. */
 export function planetRosterOf(params: PlanetParams): readonly KindSlot[] {
   const set = rarityRowSetOfPlanet(params)
   if (!hasRosterOfSet(params, set)) return NO_KINDS
-  return ORE_ROWS.kinds.slotsBySet[set]
+  return rosterOfPool(set, poolOfPlanet(params) as string, params.oreRulesVersion)
 }
 
 /** The kind a cell wears on its planet, from the slot it stores; null for none. */
@@ -57,6 +63,19 @@ export function rosterKindOf(params: PlanetParams, kindSlot: number): KindSlot |
  */
 export function poolOfPlanet(params: PlanetParams): string | null {
   return poolOfPlanetUnder(ORE_ROWS.kinds, params.planetIndex, params.oreRulesVersion)
+}
+
+function rosterOfPool(
+  set: RarityRowSet,
+  pool: string,
+  oreRulesVersion: number | undefined,
+): readonly KindSlot[] {
+  const key = `${set}|${pool}|${oreRulesVersion ?? 0}`
+  const known = rosterByKey.get(key)
+  if (known !== undefined) return known
+  const roster = Object.freeze(slotsOfPoolUnder(ORE_ROWS.kinds, set, pool, oreRulesVersion))
+  rosterByKey.set(key, roster)
+  return roster
 }
 
 function hasRosterOfSet(params: PlanetParams, set: RarityRowSet): boolean {

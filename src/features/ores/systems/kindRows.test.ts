@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest'
 import { ORE_RULES_VERSION } from '../../../systems/world/planetParams'
 import economyFile from '../ores.economy.json'
 import familiesFile from '../oreFamilies.json'
-import { isSlotLiveInBand, kindRowsOf, poolOfPlanetUnder } from './kindRows'
+import { isSlotLiveInBand, kindRowsOf, poolOfPlanetUnder, slotsOfPoolUnder } from './kindRows'
 import { ORE_ROWS, oreRowProblems } from './oreRows'
 
 // The kind slot tables (TD ruling on ticket 446, addendum 6226264758; Systems' kinds.legacy,
@@ -184,6 +184,54 @@ describe('ore kind pools before an ore rules version', () => {
     ])
     expect(problemsWithEarlierPools(['legacy'])).toEqual([
       'ore.kinds.poolsBeforeOreRules must map ore rules versions to planet pools',
+    ])
+  })
+})
+
+// A pool's own kind slots (ticket 709, GD ruling (A) on #709): a slot naming a pool and an ore rules
+// version is drawn only by planets resolving to that pool under those rules or later, and sits after
+// every shared slot, so leaving it out never moves a shared slot's roster index.
+describe("a pool's own kind slots", () => {
+  const OWN = { ...C1, slotId: 'legacy.u9', pool: 'foothold-p2', fromOreRules: 2 }
+  const shared = economyFile.ore.kinds.legacy.filter((slot) => !('pool' in slot))
+  const kinds = kindRowsOf(
+    { ...economyFile.ore.kinds, legacy: [...shared, OWN] },
+    ORE_ROWS.kinds.poolByPlanet,
+  )
+  const idsOf = (pool: string, rules: number | undefined) =>
+    slotsOfPoolUnder(kinds, 'legacy', pool, rules).map((slot) => slot.slotId)
+  const sharedIds = shared.map((slot) => slot.slotId)
+
+  it('gives the own slot to its pool from its ore rules on, after every shared slot', () => {
+    expect(idsOf('foothold-p2', 2)).toEqual([...sharedIds, 'legacy.u9'])
+    expect(idsOf('foothold-p2', ORE_RULES_VERSION)).toEqual([...sharedIds, 'legacy.u9'])
+  })
+
+  it('keeps the own slot from another pool and from a stamp older than its rules', () => {
+    expect(idsOf('legacy', ORE_RULES_VERSION)).toEqual(sharedIds)
+    expect(idsOf('foothold-p2', 1)).toEqual(sharedIds)
+    expect(idsOf('foothold-p2', undefined)).toEqual(sharedIds)
+  })
+
+  it('refuses an own slot naming no registry pool or an ore rules version this build does not know', () => {
+    expect(
+      problemsWithLegacy([
+        ...shared,
+        { ...OWN, pool: 'foothold-p99' },
+        { ...OWN, slotId: 'legacy.u8', fromOreRules: ORE_RULES_VERSION + 1 },
+        { ...C1, slotId: 'legacy.u7', fromOreRules: 2 },
+      ]),
+    ).toEqual([
+      `ore.kinds.legacy[${shared.length}].pool must name a registry pool`,
+      `ore.kinds.legacy[${shared.length + 1}].fromOreRules must be an ore rules version from 2 to ${ORE_RULES_VERSION}`,
+      `ore.kinds.legacy[${shared.length + 2}].pool must name a registry pool`,
+    ])
+  })
+
+  it('refuses a shared slot after an own slot', () => {
+    const [first, ...rest] = shared
+    expect(problemsWithLegacy([...rest, OWN, { ...first }])).toEqual([
+      `ore.kinds.legacy[${shared.length}] is shared but follows a pool's own slot`,
     ])
   })
 })
