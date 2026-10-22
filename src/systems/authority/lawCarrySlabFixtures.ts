@@ -52,6 +52,7 @@ import {
   withSweptLawCharge,
 } from './cutCarryFixtures'
 import type { DomainEvent } from './domainEvent'
+import { withDriveReaching } from './driveRigFixtures'
 import { carveCircleCommand } from './groundCommands'
 import { settleableHeatTicksOf, uncappedSettleableHeatTicksOf } from './heatCapReadings'
 import { heatThrottledDrill } from './heatRules'
@@ -285,6 +286,18 @@ function settleableOnPath(path: SlabPath, fedTicks: number, elapsedTicks: number
 }
 
 /** A fresh rig of `levels` on planet 1, enemies frozen, the tank bottomless, at the track's start. */
+/**
+ * The rig as a track cuts with it: on a level track with a drive that reaches its stride, as a
+ * sideways cut moves at `min(drill rate, drive speed)` (Bjor's ruling on #723); down, as given.
+ */
+function slabRigLevelsOf(
+  levels: Record<string, number>,
+  { section, strideMm }: SlabTrack,
+): Record<string, number> {
+  if (section !== 'level') return levels
+  return withDriveReaching(levels, (strideMm * TICKS_PER_SECOND) / MM_PER_METRE)
+}
+
 function sessionAtStart(
   levels: Record<string, number>,
   frame: Frame,
@@ -329,7 +342,7 @@ interface RunTally {
 export function cutSlab(track: SlabTrack, path: SlabPath, levels: Record<string, number>): SlabRun {
   return withChargeOf(path, () => {
     const frame = frameOf(track)
-    const session = sessionAtStart(levels, frame, track.casingGrade)
+    const session = sessionAtStart(slabRigLevelsOf(levels, track), frame, track.casingGrade)
     lineThePockets(session, frame, track.linedPocketsAtMm ?? [])
     const start = session.state()
     const tally: RunTally = {
