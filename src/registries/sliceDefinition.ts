@@ -54,10 +54,8 @@ import type { CellGateLookProvider } from '../systems/registries/cellGateLook'
 import type { KindLookProvider } from '../systems/registries/kindLook'
 import type { MagneticGroundProvider } from '../systems/registries/magneticGround'
 import type { PlanetCardLineSource } from '../systems/registries/planetCardLines'
-import type { PlanetNameProvider } from '../systems/registries/planetNames'
-import type { PlanetRadiusProvider } from '../systems/registries/planetRadii'
+import type { PlanetRowProvider } from '../systems/registries/planetRow'
 import type { HazardPocketsProvider } from '../systems/registries/hazardPockets'
-import type { PlanetLookProvider } from '../systems/registries/planetLooks'
 import type { PlanetSkyBandProvider } from '../systems/registries/planetSkyBand'
 import type { ShockShield } from '../systems/registries/shockShields'
 import type { OreDrillClassProvider } from '../systems/registries/oreDrillClasses'
@@ -270,14 +268,13 @@ export interface SliceRegistrar {
   chargeBlastCue(provider: ChargeBlastCueProvider): void
   /** One provider across all slices: a band of light in a planet's sky, the aurora (#293). */
   planetSkyBand(provider: PlanetSkyBandProvider): void
-  /** One provider across all slices: each planet's radius from the planet registry (ticket 643). */
-  planetRadius(provider: PlanetRadiusProvider): void
+  /**
+   * One provider across all slices: each planet's registry row, its name, pool, look and frozen
+   * radius laid over the kernel's generated row (ticket 707).
+   */
+  planetRow(provider: PlanetRowProvider): void
   /** One provider across all slices: each planet's hazard pockets from its row (ticket 652). */
   hazardPockets(provider: HazardPocketsProvider): void
-  /** One provider across all slices: each planet's display name, row or generated (ticket 702). */
-  planetName(provider: PlanetNameProvider): void
-  /** One provider across all slices: each planet's rock, horizon and band from its row (ticket 653). */
-  planetLook(provider: PlanetLookProvider): void
   /**
    * A planet class's tag, arrival line and values on the kernel's planet card (ticket 343): shown
    * once its `featureId` row is open, the hazard and gate kind only, never an unlock id.

@@ -10,7 +10,7 @@
 import type { DebugAction } from '../../debug/debugActionRegistry'
 import { drawnSkyBand } from '../../scene/skyBandPresence'
 import { readPlanetWorld, useGameStore } from '../../store/gameStore'
-import { planetLookOf } from '../../systems/registries/planetLooks'
+import { planetLookOf } from '../../systems/registries/planetRow'
 import { pocketKindsNearDock } from './systems/hazardNearDock'
 import { poolOfPlanetUnder } from './systems/kindRows'
 import { leadWeights, oreFamilies, oreTypeOf } from './systems/oreCatalogue'

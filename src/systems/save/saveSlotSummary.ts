@@ -14,7 +14,7 @@ import { isJsonObject, isWholeNumber } from '../authority/payloadFields'
 import { planetParamsOf } from '../authority/planetOfState'
 import { levelOfStep } from '../economy/upgradeSteps'
 import { isMoneyText } from '../money'
-import { planetDisplayNameOf } from '../registries/planetNames'
+import { planetDisplayNameOf } from '../registries/planetRow'
 import { coreDepthOf, deepestOpenedDepthOf } from '../world/openedDepth'
 
 export interface SaveSlotSummary {

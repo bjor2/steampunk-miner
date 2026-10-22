@@ -17,8 +17,8 @@
  * centre (`orePatches.ts`).
  *
  * From ore rules 7 (ticket 643, GD lock R2 on #302) a planet's radius is its planet registry row's
- * (`registries/planetRadii.ts`, the rows of ticket 642), and the core, the bands and every depth
- * placed by band follow it. A planet with no row, and every planet stamped earlier, keeps #6's
+ * (`registries/planetRow.ts`, the rows of ticket 642, keyed by the ore rules they size from), and
+ * the core, the bands and every depth placed by band follow it. A planet with no row, and every planet stamped earlier, keeps #6's
  * ladder (`radiusForPlanet`), so a save never regenerates and the ladder stays a versioned path.
  *
  * From ore rules 8 (ticket 652, spec #647) planets 2 to 5 hold their registry row's hazard pockets
@@ -29,7 +29,7 @@ import { hashCell } from '../cellRandom'
 import { ECONOMY } from '../economy/economy'
 import { isHeatPlanet } from '../economy/heatEconomy'
 import { refineryUnlockPlanet } from '../economy/refineryEconomy'
-import { rowRadiusTilesOf } from '../registries/planetRadii'
+import { rowRadiusTilesOf } from '../registries/planetRow'
 import { BAY_IDS, SLICE_BAY_IDS, type BayId } from './dockBays'
 import {
   ARTEFACT_CACHE_BANDS,
@@ -123,7 +123,11 @@ const SURFACE_LAYER_FIRST_PLANET = 2
 /** Planet 1 keeps the legacy pool byte-for-byte, so P2's own pool first changes planet 2 (632). */
 const P2_SPECIES_POOL_FIRST_PLANET = 2
 
-/** The ore rules that read the planet's radius from its registry row (ticket 643). */
+/**
+ * The ore rules that read the planet's radius from its registry row (ticket 643): the earliest a
+ * row's frozen radius may key on (`registries/planetRow.ts`), so a planet stamped before keeps the
+ * ladder.
+ */
 export const RADIUS_ROWS_ORE_RULES = 7
 
 /** Planet 1's row is the ladder's 300 tiles, so the registry radius first changes planet 2. */
@@ -294,9 +298,10 @@ export function isRegistrySizedPlanet(params: PlanetParams): boolean {
   return registryRadiusOf(params.planetIndex, params.oreRulesVersion) !== null
 }
 
+/** A planet stamped before rules 7 never asks the registry, so the import-time planet 1 needs no slice. */
 function registryRadiusOf(planetIndex: number, oreRulesVersion: number | undefined) {
   const isRegistryRadius = (oreRulesVersion ?? 0) >= RADIUS_ROWS_ORE_RULES
-  return isRegistryRadius ? rowRadiusTilesOf(planetIndex) : null
+  return isRegistryRadius ? rowRadiusTilesOf(planetIndex, oreRulesVersion) : null
 }
 
 /** The radius of the planet as this build enters it fresh: what a model of a new planet reads. */

@@ -7,6 +7,7 @@ import { coreTileCount } from './planetGeometry'
 import { fnv1a64Hex } from '../authority/stateDigest'
 import { withRegistrations } from '../../registries/registrar'
 import type { SliceDefinition } from '../../registries/sliceDefinition'
+import { frozenRadiusProvider } from '../registries/planetRowFixtures'
 import {
   bandStartsFor,
   coreRadiusFor,
@@ -219,10 +220,7 @@ describe('planet params under the depth density curve (ticket 448)', () => {
 const THREE_ROW_REGISTRY: SliceDefinition = {
   id: 'fake',
   register(r) {
-    r.planetRadius({
-      id: 'fake.radius',
-      radiusTilesOf: (planet) => [300, 450, 520][planet - 1] ?? null,
-    })
+    r.planetRow(frozenRadiusProvider((planet) => [300, 450, 520][planet - 1] ?? null))
   },
 }
 

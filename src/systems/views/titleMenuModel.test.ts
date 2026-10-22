@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { GENERATOR_VERSION } from '../generatorVersion'
-import { planetDisplayNameOf } from '../registries/planetNames'
+import { planetDisplayNameOf } from '../registries/planetRow'
 import type { SaveSlotEntry } from '../save/saveSlotIndex'
 import {
   isNewGameConfirmNeeded,

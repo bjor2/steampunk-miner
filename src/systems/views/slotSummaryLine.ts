@@ -9,7 +9,7 @@
 import { SAVE_MENU_TEXT } from './saveMenuText'
 import { exactAmount, formatAmount } from '../displayAmount'
 import { fromCanonical } from '../money'
-import { planetDisplayNameOf } from '../registries/planetNames'
+import { planetDisplayNameOf } from '../registries/planetRow'
 import type { SaveSlotEntry } from '../save/saveSlotIndex'
 import type { SaveSlotSummary } from '../save/saveSlotSummary'
 import { depthStripTextOf, edgePermilleOf } from './hudStrip'

@@ -110,7 +110,7 @@ describe('per-planet hazards', () => {
   it('is dense enough that the pad view holds several pockets, so one is seen within a minute', () => {
     for (const planet of HAZARD_PLANETS) {
       const hazard = hazardOfPlanet(ORE_ROWS.planets, planet) as PlanetHazard
-      const radius = ORE_ROWS.planets.rows[planet - 1].radiusTiles
+      const radius = ORE_ROWS.planets.rows[planet - 1].radius.tiles
       expect(expectedPocketsInPadView(hazard, radius)).toBeGreaterThanOrEqual(5)
     }
   })

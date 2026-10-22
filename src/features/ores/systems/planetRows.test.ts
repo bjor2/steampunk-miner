@@ -1,5 +1,9 @@
 import { describe, expect, it } from 'vitest'
-import { radiusForPlanet } from '../../../systems/world/planetParams'
+import {
+  ORE_RULES_VERSION,
+  RADIUS_ROWS_ORE_RULES,
+  radiusForPlanet,
+} from '../../../systems/world/planetParams'
 import economyFile from '../ores.economy.json'
 import familiesFile from '../oreFamilies.json'
 import { ORE_ROWS, oreRowProblems } from './oreRows'
@@ -25,6 +29,11 @@ function rowsWith(at: number, change: Row): Row[] {
   return SHIPPED_ROWS.map((row, index) => (index === at ? { ...row, ...change } : row))
 }
 
+/** Planet 1's frozen radius at `tiles`, its ore rules key and reason kept. */
+function frozenAt(tiles: unknown, change: Row = {}): Row {
+  return { ...(SHIPPED_ROWS[0].radius as Row), tiles, ...change }
+}
+
 /** R(p) = round(base + k ln p): the rule the rows were generated from once, never at runtime. */
 function radiusByRule(planet: number): number {
   const { baseTiles, lnCoefficient } = ORE_ROWS.planets.radiusRule
@@ -37,7 +46,7 @@ describe('planet registry', () => {
     expect(ORE_ROWS.planets.rows.map((row) => row.planetIndex)).toEqual([
       1, 2, 3, 4, 5, 6, 7, 8, 9, 10,
     ])
-    expect(ORE_ROWS.planets.rows[3]).toMatchObject({ pool: 'foothold-p4', radiusTiles: 543 })
+    expect(ORE_ROWS.planets.rows[3]).toMatchObject({ pool: 'foothold-p4', radius: { tiles: 543 } })
   })
 
   it('freezes every radius as R(p) = round(300 + 175 ln p) with the one shared k', () => {
@@ -46,7 +55,7 @@ describe('planet registry', () => {
       lnCoefficient: 175,
       lnCoefficientBounds: [150, 200],
     })
-    const frozen = ORE_ROWS.planets.rows.map((row) => row.radiusTiles)
+    const frozen = ORE_ROWS.planets.rows.map((row) => row.radius.tiles)
     expect(frozen).toEqual(ORE_ROWS.planets.rows.map((row) => radiusByRule(row.planetIndex)))
     expect(frozen).toEqual([300, 421, 492, 543, 582, 614, 641, 664, 685, 703])
   })
@@ -69,22 +78,22 @@ describe('planet registry', () => {
   })
 
   it('never shrinks a radius within a solar system', () => {
-    const radii = ORE_ROWS.planets.rows.map((row) => row.radiusTiles)
+    const radii = ORE_ROWS.planets.rows.map((row) => row.radius.tiles)
     expect(radii.every((radius, at) => at === 0 || radius >= radii[at - 1])).toBe(true)
   })
 
   it('refuses a shrink inside a solar system unless the row names why', () => {
-    const shrunk = rowsWith(5, { radiusTiles: 500 })
+    const shrunk = rowsWith(5, { radius: frozenAt(500) })
     expect(problemsWithRows(shrunk)).toEqual([
-      "ore.planets.rows[5].radiusTiles shrinks below planet 5's with no radiusShrinkWhy",
+      "ore.planets.rows[5].radius.tiles shrinks below planet 5's with no radiusShrinkWhy",
     ])
-    const named = rowsWith(5, { radiusTiles: 500, radiusShrinkWhy: 'a small moon planet' })
+    const named = rowsWith(5, { radius: frozenAt(500), radiusShrinkWhy: 'a small moon planet' })
     expect(problemsWithRows(named)).toEqual([])
   })
 
   it('lets a new solar system start smaller with no reason', () => {
-    expect(problemsWithRows(rowsWith(4, { radiusTiles: 400 }), TWO_SYSTEMS)).toEqual([])
-    expect(problemsWithRows(rowsWith(4, { radiusTiles: 400 }), ONE_SYSTEM)).toHaveLength(1)
+    expect(problemsWithRows(rowsWith(4, { radius: frozenAt(400) }), TWO_SYSTEMS)).toEqual([])
+    expect(problemsWithRows(rowsWith(4, { radius: frozenAt(400) }), ONE_SYSTEM)).toHaveLength(1)
   })
 
   it('refuses a shrink reason on a row that does not shrink', () => {
@@ -98,11 +107,37 @@ describe('planet registry', () => {
     expect(problemsWithRows(gap)[0]).toBe(
       'ore.planets.rows[2].planet must be 3: planets 1 to n, no gap',
     )
-    expect(problemsWithRows(rowsWith(0, { radiusTiles: 300.5, speciesPool: 'legacy' }))).toEqual([
-      'ore.planets.rows[0].radiusTiles must be whole, from 1',
+    expect(
+      problemsWithRows(rowsWith(0, { radius: frozenAt(300.5), speciesPool: 'legacy' })),
+    ).toEqual([
+      'ore.planets.rows[0].radius.tiles must be whole, from 1',
       'ore.planets.rows[0].speciesPool is not a planet row field',
     ])
     expect(problemsWithRows([])).toEqual(['ore.planets.rows must list planets from 1'])
+  })
+
+  it('keys every frozen radius on ore rules 7 with its reason, so an older stamp keeps the ladder', () => {
+    for (const { radius } of ORE_ROWS.planets.rows) {
+      expect(radius.fromOreRules).toBe(RADIUS_ROWS_ORE_RULES)
+      expect(radius.reason).toMatch(/R\(p\) = round\(300 \+ 175 ln p\)/)
+    }
+  })
+
+  it('refuses a frozen radius with no reason, an ore rules key outside 7 to now or a stray field', () => {
+    expect(problemsWithRows(rowsWith(0, { radius: frozenAt(300, { reason: ' ' }) }))).toEqual([
+      'ore.planets.rows[0].radius.reason must say why',
+    ])
+    for (const fromOreRules of [RADIUS_ROWS_ORE_RULES - 1, ORE_RULES_VERSION + 1]) {
+      expect(problemsWithRows(rowsWith(0, { radius: frozenAt(300, { fromOreRules }) }))).toEqual([
+        `ore.planets.rows[0].radius.fromOreRules must be ore rules 7 to ${ORE_RULES_VERSION}`,
+      ])
+    }
+    expect(problemsWithRows(rowsWith(0, { radius: frozenAt(300, { k: 175 }) }))).toEqual([
+      'ore.planets.rows[0].radius.k is not a radius field',
+    ])
+    expect(problemsWithRows(rowsWith(0, { radius: 300 }))).toEqual([
+      'ore.planets.rows[0].radius must hold tiles, fromOreRules and a reason',
+    ])
   })
 
   it('refuses a pool id that is not kebab-case and a pool after a planet with none', () => {

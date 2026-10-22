@@ -17,7 +17,7 @@
  *   code in the cell's 4-bit family field, plus one (`metal` 1 and `crystal` 2, as the kernel's
  *   `RESOURCE_FAMILY` already writes them), so the order is append-only.
  */
-import { ECONOMY } from '../../../systems/economy/economy'
+import { solarSystemOf } from '../../../systems/registries/planetRow'
 import { BAND_COUNT } from '../../../systems/world/planetGeometry'
 import economyFile from '../ores.economy.json'
 import familiesFile from '../oreFamilies.json'
@@ -73,12 +73,8 @@ const FAMILY_ID = /^[a-z]+$/
 
 type Raw = Record<string, unknown>
 
-/** A planet's solar system: the last `planets.surfaceLayer.systems` row it has reached (#306). */
-const SOLAR_SYSTEMS: PlanetRowContext = {
-  solarSystemOf: (planetIndex) =>
-    ECONOMY.planets.surfaceLayer.systems.filter((row) => row.firstPlanet <= planetIndex).at(-1)
-      ?.system ?? 0,
-}
+/** A planet's solar system, as the kernel's planet row reads it (#306). */
+const SOLAR_SYSTEMS: PlanetRowContext = { solarSystemOf }
 
 export const ORE_ROWS: OreRows = loadOreRows(economyFile, familiesFile)
 

@@ -1,13 +1,13 @@
 import { describe, expect, it } from 'vitest'
 import { withRegistrations } from '../registries/registrar'
 import type { SliceDefinition } from '../registries/sliceDefinition'
+import { frozenRadiusProvider } from '../systems/registries/planetRowFixtures'
 import { rampsPastBandOneThrough, surfaceLayerBandOneLines } from './surfaceLayerReport'
 
 /** A registry whose planet 10 is 100 tiles: band 1 is 8 whole cells, the 19-cell layer runs past it. */
 const TINY_PLANET_10: SliceDefinition = {
   id: 'fake',
-  register: (r) =>
-    r.planetRadius({ id: 'fake.radius', radiusTilesOf: (planet) => (planet === 10 ? 100 : null) }),
+  register: (r) => r.planetRow(frozenRadiusProvider((planet) => (planet === 10 ? 100 : null))),
 }
 
 // Ticket 625 Done-when (VS on #625, 6301930425) with GD lock R2 on #302 (6306854642, ticket 643):

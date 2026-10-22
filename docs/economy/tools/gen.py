@@ -18,7 +18,7 @@ def Pt(L): return d(C['P0'])*d(C['gP'])**L
 def Hu(L): return d(C['H0'])*d(C['gH'])**L
 # The planet registry rows' frozen radii (ores.economy.json planets.rows, tickets 642, 643), #6's ladder past the last row.
 _rows=json.load(open(__import__('os').path.join(__import__('os').path.dirname(__file__),'../../../src/features/ores/ores.economy.json')))['ore']['planets']['rows']
-def R(p): return _rows[p-1]['radiusTiles'] if p<=len(_rows) else 300+(700*(p-1))//((p-1)+6)
+def R(p): return _rows[p-1]['radius']['tiles'] if p<=len(_rows) else 300+(700*(p-1))//((p-1)+6)
 def coreR(Rr): return min(10,max(4,Rr//40))
 def coreTiles(Rr):
     c=coreR(Rr); return sum(1 for x in range(-c,c+1) for y in range(-c,c+1) if (2*x+1)**2+(2*y+1)**2<=(2*c)**2)

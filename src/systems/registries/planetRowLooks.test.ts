@@ -7,7 +7,7 @@ import { rgbOfHex } from '../render/colour'
 import { chunkDensityHaloOf } from '../render/densityHalo'
 import { planetParamsFor, type PlanetParams } from '../world/planetParams'
 import { currentDensityOfChunk, EMPTY_WORLD, materialCellsOfChunk } from '../world/worldState'
-import { planetLookOf, type PlanetLook } from './planetLooks'
+import { planetLookOf, type PlanetLook } from './planetRow'
 import { planetSkyBandOf, type PlanetSkyBandLook } from './planetSkyBand'
 
 const PLANET_1 = planetParamsFor(83921, 1)
@@ -33,7 +33,10 @@ function lookSliceFor(planet: number): SliceDefinition {
   return {
     id: 'fake',
     register(r) {
-      r.planetLook({ id: 'fake.look', lookOf: (index) => (index === planet ? COAL_LOOK : null) })
+      r.planetRow({
+        id: 'fake.row',
+        rowOf: (index) => (index === planet ? { look: COAL_LOOK } : {}),
+      })
     },
   }
 }

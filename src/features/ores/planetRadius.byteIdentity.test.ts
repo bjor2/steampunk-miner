@@ -75,7 +75,7 @@ function ledgerOf(params: PlanetParams) {
 }
 
 describe('planet radius', () => {
-  it.each(ORE_ROWS.planets.rows.map((row) => [row.planetIndex, row.radiusTiles]))(
+  it.each(ORE_ROWS.planets.rows.map((row) => [row.planetIndex, row.radius.tiles]))(
     'leaves planet %i hardness, value and price byte-identical when its radius %i changes',
     (planetIndex, radiusTiles) => {
       const shipped = ledgerOf(paramsAtRadius(planetIndex, radiusTiles))
@@ -88,7 +88,7 @@ describe('planet radius', () => {
 
   it('keeps the pinned surface layer on the planets that have one, so the check reads it', () => {
     const layered = ORE_ROWS.planets.rows.filter(
-      (row) => surfaceLayerOf(paramsAtRadius(row.planetIndex, row.radiusTiles)) !== null,
+      (row) => surfaceLayerOf(paramsAtRadius(row.planetIndex, row.radius.tiles)) !== null,
     )
     expect(layered.map((row) => row.planetIndex)).toEqual([2, 3, 4, 5, 6, 7, 8, 9, 10])
   })

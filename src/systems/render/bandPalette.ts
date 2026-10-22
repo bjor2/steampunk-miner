@@ -5,7 +5,7 @@
  */
 import { SKY_FADE_DEPTH_TILES } from '../../constants/scene'
 import { cellRandomFloat } from '../cellRandom'
-import { planetLookOf, type PlanetLook } from '../registries/planetLooks'
+import { planetLookOf, type PlanetLook } from '../registries/planetRow'
 import { BAND_COUNT } from '../world/planetGeometry'
 import type { PlanetParams } from '../world/planetParams'
 import { ART_DIRECTION, type BandPalette } from './artDirection'

@@ -7,7 +7,7 @@ import {
   surfaceOreTiles,
 } from '../authority/scriptedSession'
 import { takeSnapshot } from '../authority/sessionSnapshot'
-import { planetDisplayNameOf } from '../registries/planetNames'
+import { planetDisplayNameOf } from '../registries/planetRow'
 import { coreDepthOf } from '../world/openedDepth'
 import { fromCanonical, toCanonical } from '../money'
 import { depthTilesAt } from '../world/planetGeometry'

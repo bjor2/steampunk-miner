@@ -1,15 +1,14 @@
 import { describe, expect, it } from 'vitest'
 import { withRegistrations } from '../../../registries/registrar'
 import type { SliceDefinition } from '../../../registries/sliceDefinition'
-import { planetLookOf } from '../../../systems/registries/planetLooks'
+import { planetLookOf } from '../../../systems/registries/planetRow'
 import { planetSkyBandOf } from '../../../systems/registries/planetSkyBand'
 import { bandColourOf, paletteOf, shownPaletteOf } from '../../../systems/render/bandPalette'
 import { lumaOf, rgbOfHex } from '../../../systems/render/colour'
 import { freshPlanetParamsFor, type PlanetParams } from '../../../systems/world/planetParams'
 import economyFile from '../ores.economy.json'
-import { PLANET_LOOK_PROVIDER } from './planetLookProvider'
 import { areColoursApart, brightestArchetypeRockLuma, planetLookProblems } from './planetLooks'
-import { PLANET_RADIUS_PROVIDER } from './planetRadiusProvider'
+import { PLANET_ROW_PROVIDER } from './planetRowProvider'
 
 // Per-planet looks for P2 to P5 (ticket 653, spec #647): each planet's rock tint, horizon and sky
 // band on its own registry row, pairwise different, the ore hue guards kept and P1 drawn as before.
@@ -40,13 +39,13 @@ function rowsWithBand(planet: number, change: Row): Row[] {
   return rowsWithLook(planet, { skyBand: { ...band, ...change } })
 }
 
-/** The ores slice's radius provider alone, or with its look provider beside it. */
+/** The ores slice's planet rows, or the same rows with every look taken off. */
 function oresRowsSlice(withLook: boolean): SliceDefinition {
+  const rowOf = (planet: number) => ({ ...PLANET_ROW_PROVIDER.rowOf(planet), look: null })
   return {
     id: 'ores',
     register(r) {
-      r.planetRadius(PLANET_RADIUS_PROVIDER)
-      if (withLook) r.planetLook(PLANET_LOOK_PROVIDER)
+      r.planetRow(withLook ? PLANET_ROW_PROVIDER : { id: 'ores.planet-row', rowOf })
     },
   }
 }

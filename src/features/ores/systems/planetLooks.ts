@@ -17,7 +17,7 @@
  * the 255 channel steps apart (`areColoursApart`). The kernel reads a look through the `planetLook` seam
  * (`planetLookProvider.ts`); presentation only, so no stamp, save or digest moves.
  */
-import type { PlanetLook } from '../../../systems/registries/planetLooks'
+import type { PlanetLook } from '../../../systems/registries/planetRow'
 import { MIN_SKY_BAND_THICKNESS_M } from '../../../systems/registries/planetSkyBand'
 import { paletteOf } from '../../../systems/render/bandPalette'
 import { isHexColour, lumaOf, rgbOfHex, type Rgb } from '../../../systems/render/colour'

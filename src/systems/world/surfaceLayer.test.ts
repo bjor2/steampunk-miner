@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { withRegistrations } from '../../registries/registrar'
 import type { SliceDefinition } from '../../registries/sliceDefinition'
+import { frozenRadiusProvider } from '../registries/planetRowFixtures'
 import { hardnessOfTile } from '../authority/groundDrill'
 import { ECONOMY } from '../economy/economy'
 import { blockHardness, oreHardness, oreTier } from '../economy/oreEconomy'
@@ -68,8 +69,7 @@ function largestNeighbourRatio(values: readonly BigStat[]): BigStat {
 /** A registry whose planet 10 is 100 tiles: band 1 is 8 whole cells, too few for its ramp. */
 const TINY_PLANET_10: SliceDefinition = {
   id: 'fake',
-  register: (r) =>
-    r.planetRadius({ id: 'fake.radius', radiusTilesOf: (planet) => (planet === 10 ? 100 : null) }),
+  register: (r) => r.planetRow(frozenRadiusProvider((planet) => (planet === 10 ? 100 : null))),
 }
 
 /** Band-2 rock tiles of the first octant no deeper than `layerCells` below the surface. */

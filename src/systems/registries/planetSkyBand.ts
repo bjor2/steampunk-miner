@@ -2,14 +2,14 @@
  * A band of light in a planet's sky, just above its surface (GD ruling on #293 Q1, from the TD's
  * proposal): the magnetic planet's aurora first, and the frozen and hollow classes may reuse it, so
  * it is a planet-atmosphere seam, not a magnetic special case. One provider at most (`planet-mix`);
- * where it answers null the planet's own row look's band shows (ticket 653, `planetLooks.ts`), and
+ * where it answers null the planet's own row look's band shows (ticket 653, `planetRow.ts`), and
  * with neither the planet draws no band. The kernel's `PlanetSkyBand` draws
  * the look as one ring mesh round the planet, 1 draw call from #38's co-op headroom, outside the
  * slices' `SCENE_LAYER_LINE`. Presentation only: nothing here reaches the authority state, a
  * snapshot or a digest.
  */
 import type { PlanetParams } from '../world/planetParams'
-import { planetLookOf } from './planetLooks'
+import { planetLookOf } from './planetRow'
 import { defineOneProviderRegistry, entriesOf } from './seal'
 
 /** A part of a Blender `parts` asset whose texture the band repeats round the planet. */

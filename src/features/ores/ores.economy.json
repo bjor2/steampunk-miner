@@ -115,14 +115,22 @@
           "planet": 1,
           "name": "Hearthmoor",
           "pool": "legacy",
-          "radiusTiles": 300,
+          "radius": {
+            "tiles": 300,
+            "fromOreRules": 7,
+            "reason": "R(p) = round(300 + 175 ln p), frozen once (ticket 642)"
+          },
           "measuredMinutes": null
         },
         {
           "planet": 2,
           "name": "Gravelholm",
           "pool": "foothold-p2",
-          "radiusTiles": 421,
+          "radius": {
+            "tiles": 421,
+            "fromOreRules": 7,
+            "reason": "R(p) = round(300 + 175 ln p), frozen once (ticket 642)"
+          },
           "measuredMinutes": null,
           "hazard": {
             "kind": "rockfall",
@@ -144,7 +152,11 @@
           "planet": 3,
           "name": "Coalfen",
           "pool": "foothold-p3",
-          "radiusTiles": 492,
+          "radius": {
+            "tiles": 492,
+            "fromOreRules": 7,
+            "reason": "R(p) = round(300 + 175 ln p), frozen once (ticket 642)"
+          },
           "measuredMinutes": null,
           "hazard": {
             "kind": "firedamp",
@@ -166,7 +178,11 @@
           "planet": 4,
           "name": "Spinegarth",
           "pool": "foothold-p4",
-          "radiusTiles": 543,
+          "radius": {
+            "tiles": 543,
+            "fromOreRules": 7,
+            "reason": "R(p) = round(300 + 175 ln p), frozen once (ticket 642)"
+          },
           "measuredMinutes": null,
           "hazard": {
             "kind": "spinecrystal",
@@ -188,7 +204,11 @@
           "planet": 5,
           "name": "Kettlecrag",
           "pool": "foothold-p5",
-          "radiusTiles": 582,
+          "radius": {
+            "tiles": 582,
+            "fromOreRules": 7,
+            "reason": "R(p) = round(300 + 175 ln p), frozen once (ticket 642)"
+          },
           "measuredMinutes": null,
           "hazard": {
             "kind": "steamvent",
@@ -210,19 +230,51 @@
           "planet": 6,
           "name": "Salt Reach",
           "pool": "foothold-p6-p7",
-          "radiusTiles": 614,
+          "radius": {
+            "tiles": 614,
+            "fromOreRules": 7,
+            "reason": "R(p) = round(300 + 175 ln p), frozen once (ticket 642)"
+          },
           "measuredMinutes": null
         },
         {
           "planet": 7,
           "name": "Windmesa",
           "pool": "foothold-p6-p7",
-          "radiusTiles": 641,
+          "radius": {
+            "tiles": 641,
+            "fromOreRules": 7,
+            "reason": "R(p) = round(300 + 175 ln p), frozen once (ticket 642)"
+          },
           "measuredMinutes": null
         },
-        { "planet": 8, "radiusTiles": 664, "measuredMinutes": null },
-        { "planet": 9, "radiusTiles": 685, "measuredMinutes": null },
-        { "planet": 10, "radiusTiles": 703, "measuredMinutes": null }
+        {
+          "planet": 8,
+          "radius": {
+            "tiles": 664,
+            "fromOreRules": 7,
+            "reason": "R(p) = round(300 + 175 ln p), frozen once (ticket 642)"
+          },
+          "measuredMinutes": null
+        },
+        {
+          "planet": 9,
+          "radius": {
+            "tiles": 685,
+            "fromOreRules": 7,
+            "reason": "R(p) = round(300 + 175 ln p), frozen once (ticket 642)"
+          },
+          "measuredMinutes": null
+        },
+        {
+          "planet": 10,
+          "radius": {
+            "tiles": 703,
+            "fromOreRules": 7,
+            "reason": "R(p) = round(300 + 175 ln p), frozen once (ticket 642)"
+          },
+          "measuredMinutes": null
+        }
       ]
     }
   }

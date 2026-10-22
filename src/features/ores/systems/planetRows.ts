@@ -2,20 +2,18 @@
  * The planet registry (GD lock R1 on #302, 6306854642, with its addendum 6306861669; HS on #305,
  * 6306847681): `ores.economy.json` `planets.rows`, one row per planet from planet 1 with no gap.
  * The row that names a planet's species pool (ticket 542) also holds its radius, so a new planet
- * is one data row, never a second table.
+ * is one data row, never a second table. The kernel reads every row through its one `planetRow`
+ * provider (`planetRowProvider.ts`, GD lock on #707): the generated row first, these fields on top.
  *
  * - `pool`: the species pool the planet's kind slots resolve to. Pools run from planet 1 with no
  *   gap; a row past the last pooled planet has none, so a slot there binds no species (#453).
- * - `radiusTiles`: Systems' R(p) = round(baseTiles + k ln p) with `radiusRule`'s k, generated once
- *   and frozen as whole numbers, so the game never computes `ln` (TD). k is one shared value inside
- *   `lnCoefficientBounds`, never set per planet; retuning it rewrites every row, and
- *   `planetRows.test.ts` holds the rows to the rule. Radius changes only how long a planet takes,
- *   never hardness, ore value per cell, the drill law or prices (R1).
+ * - `radius`: the planet's frozen radius override with its ore rules key and reason, held to
+ *   `radiusRule` (`frozenRadii.ts`). Radius changes only how long a planet takes, never hardness,
+ *   ore value per cell, the drill law or prices (R1).
  * - `measuredMinutes`: the minutes the paired 3-seed run measured at the row's radius, null until
  *   the re-baseline (ticket 644) measures it.
- * - `radiusShrinkWhy`: radius never decreases within a solar system (VS on #305, 6306854175). A row
- *   below the planet before it in the same system is a named exception and says why; no other row
- *   may carry a reason.
+ * - `radiusShrinkWhy`: why the radius is below the planet before it in its solar system
+ *   (`frozenRadii.ts`).
  * - `hazard`: the planet's own hazard (ticket 651, `planetHazards.ts`), on planets 2 to 5 and never
  *   on planet 1; its kind is a row of `planets.hazards` (`hazardKinds.ts`).
  * - `name`: the planet's display name (ticket 702, `planetNames.ts`) on every planet before
@@ -25,8 +23,20 @@
  *
  * World generation reads the radius from ticket 643 and the hazard pockets from ticket 652.
  */
+import type {
+  FrozenRadius,
+  PlanetLook,
+  PlanetRowFields,
+} from '../../../systems/registries/planetRow'
+import {
+  frozenRadiusOf,
+  frozenRadiusProblems,
+  isReason,
+  radiusRuleProblems,
+  shrinkProblems,
+  type PlanetRowContext,
+} from './frozenRadii'
 import { hazardCapsOf, hazardKindsOf, type HazardCaps, type HazardKinds } from './hazardKinds'
-import type { PlanetLook } from '../../../systems/registries/planetLooks'
 import { planetHazardOf, planetHazardProblems, type PlanetHazard } from './planetHazards'
 import {
   generatedPlanetNameOf,
@@ -36,13 +46,16 @@ import {
 } from './planetNames'
 import { planetLookOf, planetLookProblems } from './planetLooks'
 
-export interface PlanetRow {
+export type { PlanetRowContext } from './frozenRadii'
+
+/** A planet's row as `ores.economy.json` authors it. */
+export interface AuthoredPlanetRow {
   planetIndex: number
   /** The planet's display name; null on a planet the generator names. */
   name: string | null
   /** The species pool id; null past the last pooled planet. */
   pool: string | null
-  radiusTiles: number
+  radius: FrozenRadius
   /** Null until a paired run measures the planet at this radius. */
   measuredMinutes: number | null
   /** Why the radius is below the previous planet's in its solar system; null when it is not. */
@@ -64,19 +77,13 @@ export interface RadiusRule {
 export interface PlanetRows {
   radiusRule: RadiusRule
   /** Planet 1 first, one row per planet. */
-  rows: readonly PlanetRow[]
+  rows: readonly AuthoredPlanetRow[]
   /** The hazard kinds a row may name, by id (ticket 651). */
   hazards: HazardKinds
   /** The most any one hazard contact, and a whole dive, may cost. */
   hazardCaps: HazardCaps
   /** How a planet with no name on its row, or past the last row, is named (ticket 702). */
   generatedNames: GeneratedPlanetNames
-}
-
-/** What the guards check the rows against. */
-export interface PlanetRowContext {
-  /** The solar system a planet sits in (`planets.surfaceLayer.systems`, by first planet). */
-  solarSystemOf(planetIndex: number): number
 }
 
 type Raw = Record<string, unknown>
@@ -88,7 +95,7 @@ const ROW_FIELDS = [
   'planet',
   'name',
   'pool',
-  'radiusTiles',
+  'radius',
   'measuredMinutes',
   'radiusShrinkWhy',
   'hazard',
@@ -118,16 +125,27 @@ export function planetRowsOf(planets: Raw): PlanetRows {
       lnCoefficient: rule.lnCoefficient as number,
       lnCoefficientBounds: [lowest, highest],
     },
-    rows: (planets.rows as Raw[]).map(planetRowOf),
+    rows: (planets.rows as Raw[]).map(authoredRowOf),
     hazards: hazardKindsOf(planets.hazards as Raw),
     hazardCaps: hazardCapsOf(planets.hazardCaps as Raw),
     generatedNames: generatedPlanetNamesOf(planets.generatedNames as Raw),
   }
 }
 
+/** The fields the planet's row lays over the kernel's generated one; past the last row, its name. */
+export function planetRowFieldsOf(planets: PlanetRows, planetIndex: number): PlanetRowFields {
+  const row = planets.rows[planetIndex - FIRST_PLANET]
+  return {
+    displayName: nameOfPlanet(planets, planetIndex),
+    poolId: row?.pool ?? null,
+    look: row?.look ?? null,
+    radius: row?.radius ?? null,
+  }
+}
+
 /** The planet's frozen radius in tiles, or null past the registry's last row. */
 export function radiusTilesOfPlanet(planets: PlanetRows, planetIndex: number): number | null {
-  return planets.rows[planetIndex - FIRST_PLANET]?.radiusTiles ?? null
+  return planets.rows[planetIndex - FIRST_PLANET]?.radius.tiles ?? null
 }
 
 /** The planet's display name: its row's, or the generated one past the named rows. */
@@ -169,43 +187,17 @@ export function isPlainMap(value: unknown): value is Raw {
   return typeof value === 'object' && value !== null && !Array.isArray(value)
 }
 
-function planetRowOf(row: Raw): PlanetRow {
+function authoredRowOf(row: Raw): AuthoredPlanetRow {
   return {
     planetIndex: row.planet as number,
     name: (row.name as string | undefined) ?? null,
     pool: (row.pool as string | undefined) ?? null,
-    radiusTiles: row.radiusTiles as number,
+    radius: frozenRadiusOf(row.radius as Raw),
     measuredMinutes: row.measuredMinutes as number | null,
     radiusShrinkWhy: (row.radiusShrinkWhy as string | undefined) ?? null,
     hazard: planetHazardOf(row),
     look: planetLookOf(row),
   }
-}
-
-function radiusRuleProblems(rule: unknown): string[] {
-  const raw = isPlainMap(rule) ? rule : {}
-  const where = `${PATH}.radiusRule`
-  const bounds = coefficientBoundsOf(raw.lnCoefficientBounds)
-  return [
-    ...(isWholeFromOne(raw.baseTiles) ? [] : [`${where}.baseTiles must be a whole number from 1`]),
-    ...(bounds === null
-      ? [`${where}.lnCoefficientBounds must be [lowest, highest], whole numbers from 1`]
-      : coefficientProblems(raw.lnCoefficient, bounds, where)),
-  ]
-}
-
-function coefficientBoundsOf(bounds: unknown): readonly [number, number] | null {
-  if (!Array.isArray(bounds) || bounds.length !== 2 || !bounds.every(isWholeFromOne)) return null
-  const [lowest, highest] = bounds as number[]
-  return lowest <= highest ? [lowest, highest] : null
-}
-
-function coefficientProblems(k: unknown, bounds: readonly [number, number], where: string) {
-  const [lowest, highest] = bounds
-  const isWithin = isWholeFromOne(k) && k >= lowest && k <= highest
-  return isWithin
-    ? []
-    : [`${where}.lnCoefficient must be a whole number from ${lowest} to ${highest}`]
 }
 
 function rowListProblems(rows: unknown, context: PlanetRowContext): string[] {
@@ -224,7 +216,7 @@ function rowShapeProblems(row: Raw, at: number): string[] {
   return [
     ...(row.planet === planet ? [] : [`${where}.planet must be ${planet}: planets 1 to n, no gap`]),
     ...(row.pool === undefined || isPoolId(row.pool) ? [] : [`${where}.pool must be a pool id`]),
-    ...(isWholeFromOne(row.radiusTiles) ? [] : [`${where}.radiusTiles must be whole, from 1`]),
+    ...frozenRadiusProblems(row.radius, where),
     ...(isMeasuredMinutes(row.measuredMinutes)
       ? []
       : [`${where}.measuredMinutes must be null or minutes above 0`]),
@@ -247,25 +239,6 @@ function poolRunProblems(rows: readonly Raw[]): string[] {
     )
 }
 
-/** A shrink inside a solar system needs its reason, and a reason needs its shrink. */
-function shrinkProblems(rows: readonly Raw[], context: PlanetRowContext): string[] {
-  return rows.slice(1).flatMap((row, before) => {
-    const isShrink = isShrinkInSystem(rows[before], row, context)
-    const hasReason = row.radiusShrinkWhy !== undefined
-    if (isShrink === hasReason) return []
-    const where = `${PATH}.rows[${before + 1}]`
-    return isShrink
-      ? [`${where}.radiusTiles shrinks below planet ${before + 1}'s with no radiusShrinkWhy`]
-      : [`${where}.radiusShrinkWhy names a shrink the row does not make`]
-  })
-}
-
-function isShrinkInSystem(previous: Raw, row: Raw, context: PlanetRowContext): boolean {
-  const isSameSystem =
-    context.solarSystemOf(previous.planet as number) === context.solarSystemOf(row.planet as number)
-  return isSameSystem && (row.radiusTiles as number) < (previous.radiusTiles as number)
-}
-
 function unknownFieldsOf(row: Raw): string[] {
   return Object.keys(row).filter((field) => !ROW_FIELDS.includes(field))
 }
@@ -274,12 +247,4 @@ function isMeasuredMinutes(minutes: unknown): boolean {
   return (
     minutes === null || (typeof minutes === 'number' && Number.isFinite(minutes) && minutes > 0)
   )
-}
-
-function isReason(reason: unknown): boolean {
-  return typeof reason === 'string' && reason.trim() !== ''
-}
-
-function isWholeFromOne(value: unknown): value is number {
-  return Number.isSafeInteger(value) && (value as number) >= 1
 }

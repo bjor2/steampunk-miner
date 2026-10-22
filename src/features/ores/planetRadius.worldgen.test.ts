@@ -16,7 +16,7 @@ const LAST_ROW = ORE_ROWS.planets.rows.length
 const PLANETS_1_TO_200 = Array.from({ length: 200 }, (_, at) => at + 1)
 
 describe('planet radius in world generation', () => {
-  it.each(ORE_ROWS.planets.rows.map((row) => [row.planetIndex, row.radiusTiles]))(
+  it.each(ORE_ROWS.planets.rows.map((row) => [row.planetIndex, row.radius.tiles]))(
     'generates a fresh planet %i at its row radius %i, its core and band starts from it',
     (planetIndex, radiusTiles) => {
       const params = freshPlanetParamsFor(SEED, planetIndex)
@@ -29,7 +29,7 @@ describe('planet radius in world generation', () => {
   it("keeps #6's ladder past the last row, no smaller than the last row's radius", () => {
     const pastLast = freshPlanetParamsFor(SEED, LAST_ROW + 1).radiusTiles
     expect(pastLast).toBe(radiusForPlanet(LAST_ROW + 1))
-    expect(pastLast).toBeGreaterThanOrEqual(ORE_ROWS.planets.rows[LAST_ROW - 1].radiusTiles)
+    expect(pastLast).toBeGreaterThanOrEqual(ORE_ROWS.planets.rows[LAST_ROW - 1].radius.tiles)
   })
 
   it('never shrinks a fresh planet from the one before, planets 1 to 200', () => {
