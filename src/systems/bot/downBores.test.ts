@@ -14,6 +14,7 @@ import {
   gravityBoundShareOf,
   newDownBoreTally,
   rampedDownBoreOf,
+  rampRestTicksOf,
   tallyDownBore,
 } from './downBores'
 
@@ -61,6 +62,13 @@ describe('bores down under the gravity ramp (#724)', () => {
     expect(lowG).toBeGreaterThan(planet1)
     expect(coreFloor.bore.subSteps).toBe(subStepsOfSeconds(Math.sqrt(2 / (G * 0.1))))
     expect(coreFloor.exitSpeed).toBeGreaterThan(0)
+  })
+
+  it("stands by only for the ramp's ticks past the drill's own, never below none", () => {
+    const ramped = { subSteps: 1500, quantum: QUANTUM }
+    expect(rampRestTicksOf(ramped, 2)).toBe(23)
+    expect(rampRestTicksOf(ramped, 25)).toBe(0)
+    expect(rampRestTicksOf(ramped, 30)).toBe(0)
   })
 
   it('carries the leg speed only into a bore from the tile it opened, on the tick it ended', () => {

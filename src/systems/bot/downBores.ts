@@ -2,7 +2,8 @@
  * The bot's bores down (Bjor's ruling on #724): a cut down gains speed no faster than local
  * gravity, `a = max(g(r), 0.1 g_surface)` (`radialGravity.ts`), up to the drill's speed, and slows
  * at once. On the scripted clock a down tile therefore takes the longer of the drill's time and the
- * time a body entering at the leg's speed needs to ramp across its metre. The speed a bore leaves
+ * time a body entering at the leg's speed needs to ramp across its metre: the drill bores for its
+ * own time, so it heats and draws for its work alone, and the bot stands by for the rest. The speed a bore leaves
  * carries into a bore of the tile below that starts on the tick it ended, as the bore clock's carry
  * does (ticket 559); anything else starts the next leg from rest.
  *
@@ -67,6 +68,15 @@ export function rampedDownBoreOf(
     bore: { ...bore, subSteps: Math.max(bore.subSteps, rampSubSteps) },
     exitSpeed: cell.exitSpeed,
   }
+}
+
+/**
+ * Whole ticks still to stand by once the drill has bored the tile in `elapsedTicks`: what the ramp
+ * takes across it beyond that, never below 0. The drill heats and draws for its work alone; the
+ * body is still gaining speed (#724).
+ */
+export function rampRestTicksOf(rampedBore: TileBore, elapsedTicks: number): number {
+  return Math.max(0, Math.ceil(rampedBore.subSteps / rampedBore.quantum) - elapsedTicks)
 }
 
 /** Counts a bore down on `planet`: its metre, its ticks and the ticks the ramp added. */

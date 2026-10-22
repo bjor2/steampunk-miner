@@ -36,7 +36,13 @@ import {
 } from './botPilot'
 import { facingTowards } from './botPose'
 import type { BotSession } from './botSession'
-import { entrySpeedOf, rampedDownBoreOf, tallyDownBore, type RampedBore } from './downBores'
+import {
+  entrySpeedOf,
+  rampedDownBoreOf,
+  rampRestTicksOf,
+  tallyDownBore,
+  type RampedBore,
+} from './downBores'
 import { drivenBoreOf, tallySidewaysBore } from './sidewaysBores'
 import { boreSubSteps, cellOfTile, isBoreLavaRisk, isLavaRisk, tileKindAt } from './botWorld'
 import type { TileBore } from './boreClock'
@@ -115,25 +121,42 @@ function boreUngated(session: BotSession, planet: BotPlanet, tile: TilePoint): O
   if (isBlastWorthIt(session, planet, tile, ticks) && blastOpen(session, planet, tile)) {
     return isVehicleActive(session.vehicle()) ? 'opened' : 'short'
   }
-  const driven = drivenBoreAt(session, planet, tile, bore)
-  boreTile(session, planet.pilot, tile, driven.bore)
-  planet.pilot.downLeg = { tick: session.tick(), tile, speed: driven.exitSpeed }
+  boreAlongFacing(session, planet, tile, bore)
   return isVehicleActive(session.vehicle()) ? 'opened' : 'short'
 }
 
 /**
- * The bore as the rig cuts it from where it stands, a cut down ramped by gravity and sideways held
- * to the drive, each tallied, with the speed down it leaves the body at (0 off a cut down).
+ * Bores the tile as the rig cuts it from where it stands: a cut down at the drill's work, then
+ * standing by for the rest of the time gravity takes to bring the body across it (#724); sideways
+ * held to the drive (#723); up at the drill's time.
  */
-function drivenBoreAt(
+function boreAlongFacing(
   session: BotSession,
   planet: BotPlanet,
   tile: TilePoint,
   bore: TileBore,
-): RampedBore {
+): void {
   const facing = facingTowards(planet.pilot.position, tile)
-  if (isGravityRampedFacing(facing)) return rampedDownBoreAt(session, planet, tile, bore)
-  return { bore: sidewaysBoreAt(session, planet, facing, bore), exitSpeed: 0 }
+  if (isGravityRampedFacing(facing)) return boreDownUnderRamp(session, planet, tile, bore)
+  boreTile(session, planet.pilot, tile, sidewaysBoreAt(session, planet, facing, bore))
+}
+
+/**
+ * A bore down: the drill's own sub-steps on the clock, so the drill heats and draws for its work
+ * alone, as a player's does; then the ramp's remaining ticks stood by; the speed it leaves carried
+ * for the tile below.
+ */
+function boreDownUnderRamp(
+  session: BotSession,
+  planet: BotPlanet,
+  tile: TilePoint,
+  bore: TileBore,
+): void {
+  const startTick = session.tick()
+  const ramped = rampedDownBoreAt(session, planet, tile, bore)
+  boreTile(session, planet.pilot, tile, bore)
+  standBy(session, planet.pilot, rampRestTicksOf(ramped.bore, session.tick() - startTick))
+  planet.pilot.downLeg = { tick: session.tick(), tile, speed: ramped.exitSpeed }
 }
 
 /** A bore down from the leg's speed, under local gravity at the tile's centre (#724), tallied. */
