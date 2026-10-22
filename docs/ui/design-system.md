@@ -363,6 +363,7 @@ listed with the ticket that builds them. Every class lives in a CSS Module besid
 | overflow tray | the cell after the slots (phone and desktop): turns the cells to the rest of the owned tools, a page at a time, and back                                                   | layout.toolSlots                                       | #691    |
 | gear button   | the one control that opens the strip's detail (exact values, words); in the thumb zone, never the top keep-out                                                             | layout.tapTargetMinPx                                  | #684    |
 | hint chip     | #500's chip, unchanged: one line, 8% of height at most, queued when the clear view would fall                                                                              | existing constants                                     | exists  |
+| sale receipt  | the trip's sold kinds by rarity group (count, coin), the lining bill, the total rolling up in 1.2 s or less (a tap skips), the last trip's total; scrolls past 8 lines     | numbers, type.odometer, art.sheetFrame, copy           | #717    |
 
 **The sheet as built (#686).** One base sheet (`ui/sheet/BaseSheet.tsx`) draws the store's open
 tab (`openSheet(tabId)`, `closeSheet()`, Escape) in the kit frame (`kit/Sheet.tsx`). Its tabs are
@@ -410,6 +411,20 @@ Open opens the Hold. The Ledger is the pause menu's save page as was (#672 copy,
 way, the world stays held, the pause menu's focus stops and Escape still drive it, its Close steps
 back to the pause menu's first page, and picking another tab leaves the pause menu. The title
 menu's Load page is unchanged.
+
+**The sale receipt as built (#717).** The sell-burst slice draws it on the bay's click-through
+`above` layer, beside the burst's coins, after a sale: on a phone under the top keep-out across the
+stage less its margins, on desktop a 360 px plate under the strip at the right, in the baked sheet
+frame. Its lines are the kinds the trip sold, tallied as each unit reached the hold by the pickup
+popup's look-only species and rarity reading (#695), grouped rarest first under the rarity's word
+in its tint (unseen last), each with its count and coin; they scroll past eight in the shared
+scroll area. Every figure is the #681 formatter's text in a tabular column as wide as its widest:
+gains round down, the lining bill rounds up. The total is the money the trip's sales put in the
+wallet (the credits less the bill) and rolls up on the odometer in at most 1.2 s, in steps; a tap
+skips the roll, the next tap or leaving the dock puts the receipt away, and Reduce Motion sets it.
+The last trip's total sits under it with a ▲, ▼ or = glyph; the first trip says so. Every word is a
+row of `features/sell-burst/receipt.json`, held to the #680 budgets. The coin burst and the bay
+header's counter are #176's, unchanged.
 
 ## 11. Copy
 

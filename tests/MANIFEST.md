@@ -509,17 +509,23 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/roster/systems/shareRows.test.ts` | 2 | 2 |
 | `src/features/roster/systems/tripLedger.test.ts` | 4 | 4 |
 
-### `sell-burst`: 7 files, 53 tests
+### `sell-burst`: 13 files, 90 tests
 
 | File | Tests | Sites |
 | --- | --- | --- |
 | `src/features/sell-burst/debugHaul.test.ts` | 4 | 4 |
+| `src/features/sell-burst/store/receiptStore.test.ts` | 7 | 7 |
 | `src/features/sell-burst/store/sellBurstStore.test.ts` | 7 | 7 |
 | `src/features/sell-burst/systems/burstCues.test.ts` | 6 | 6 |
 | `src/features/sell-burst/systems/burstWave.test.ts` | 13 | 13 |
+| `src/features/sell-burst/systems/heldManifest.test.ts` | 6 | 6 |
+| `src/features/sell-burst/systems/receiptBook.test.ts` | 5 | 5 |
+| `src/features/sell-burst/systems/receiptCopy.test.ts` | 4 | 4 |
+| `src/features/sell-burst/systems/receiptView.test.ts` | 7 | 7 |
 | `src/features/sell-burst/systems/render/burstFlight.test.ts` | 8 | 8 |
 | `src/features/sell-burst/systems/salesOfBatch.test.ts` | 3 | 3 |
 | `src/features/sell-burst/systems/sellBurst.test.ts` | 12 | 12 |
+| `src/features/sell-burst/systems/tripReceipt.test.ts` | 8 | 8 |
 
 ### `sensing`: 26 files, 170 tests
 

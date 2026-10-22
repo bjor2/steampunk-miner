@@ -1433,7 +1433,8 @@ incomePerHour}` go to `balance-report/drill-pace.ndjson`, which `pushTestMetrics
 - **UI screenshot suite** (ticket 689, spec #678): `e2e/browser/ui/uiShots.spec.ts` runs the same
   four cells (`ui/uiShotCells.ts`) in the `chromium` project: the HUD on the surface and two tiles
   down, and every sheet in the `ui/uiShotSheets.ts` table (the bays, settings, the pause menu and
-  its save page, the tech tree's map and list, the planet card, the title menu). Each test writes
+  its save page, the tech tree's map and list, the planet card, the title menu, the sale receipt of
+  ticket 717). Each test writes
   its shot first (`npm run ui:screens:update` puts them in `docs/ui/screens/`, never compared),
   then fails on text that runs out of its box or panel or a page that scrolls sideways, a target a
   tap can reach under 44 px (`MIN_TARGET_PX`; `data-tap-exact` amounts are text), and, on the HUD
@@ -1443,6 +1444,20 @@ incomePerHour}` go to `balance-report/drill-pace.ndjson`, which `pushTestMetrics
   cluster's goldens (ticket 716): on P41 with money at 1e15 and the hull and fuel red, on the
   surface and at 9000 bp deep, the strip must not spill, the depth dial must carry its five planet
   marks, and on desktop every hovered dial's number tag must be the same width. Box Tester only.
+- **Sale receipt** (ticket 717, spec #678): the rules are pure in the sell-burst slice. The hold's
+  kinds are tallied as units come in (`systems/heldManifest.ts`, read by `heldUnits.ts` as the pickup
+  popup reads a species and rarity) and cut back to the authority's hold every batch; the trip's
+  receipt (`tripReceipt.ts`) prices each sold kind at the tier's Sell bay unit price and totals the
+  credits less the lining bill; `receiptBook.ts` folds the batches and `receiptView.ts` formats it.
+  `receiptBook.test.ts` plays a scripted session (mine, dock, sell): the total equals the wallet's
+  gain and the lines add up to the logged credits. `tripReceipt.test.ts` and `receiptStore.test.ts`
+  hold the roll (at most 72 ticks, the same steps at 30 and 144 frames a second, a tap skips, Reduce
+  Motion sets it), `receiptView.test.ts` the #681 rounding and widths at P41+ and past 1e300, and
+  `receiptCopy.test.ts` the #680 budgets on `receipt.json`. `e2e/browser/sellReceipt.spec.ts` sells
+  for real through `features['sell-burst'].getReceipt()`: the total against the wallet, a tap
+  skipping the roll, the next trip's compare, and a wide P41+ haul scrolling past eight lines; the
+  UI screenshot suite shoots it at every cell (`sell-receipt`). Box Tester only for the browser
+  specs.
 - **Gauge cluster** (ticket 716, spec #678): the dials are a data table
   (`src/data/hud/gaugeCluster.json`, `systems/views/gaugeClusterTable.ts`) read by the pure view
   `gaugeCluster.ts`; `gaugeCluster.test.ts` holds the table's problems, the load test that every

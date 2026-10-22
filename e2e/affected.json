@@ -155,9 +155,13 @@
       ]
     },
     {
-      "why": "The sell burst on the bay header.",
+      "why": "The sell burst on the bay header and the sale receipt over the Sell bay (ticket 717).",
       "paths": ["src/features/sell-burst/**"],
-      "specs": ["e2e/browser/sellBurst.spec.ts"]
+      "specs": [
+        "e2e/browser/sellBurst.spec.ts",
+        "e2e/browser/sellReceipt.spec.ts",
+        "e2e/browser/ui/uiShots.spec.ts"
+      ]
     },
     {
       "why": "The item cards fill the bays' entries; the Outfitter's cards replaced the workshop plaques (ticket 687).",

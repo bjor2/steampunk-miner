@@ -6,13 +6,15 @@
  * sheet (#687), the settings, the pause menu, the tech tree's Patent Office on the base sheet
  * (#687), the planet card and the title menu; the HUD strip's detail behind the gear button
  * (ticket 684); and the base sheet's Hold and Ledger (ticket 688: the Sell bay's ore and the pause
- * menu's save page as were).
+ * menu's save page as were), and the sale receipt over the Sell bay after a wide P41+ haul, its lines
+ * scrolling past eight (ticket 717).
  */
 import { expect, type Page } from '@playwright/test'
 import { TREE_TEST_IDS } from '../../../src/features/tech-tree/ui/nodeTestIds'
 import { UI_IDS } from '../../../src/ui/ids'
 import { SHEET_UI_IDS } from '../../../src/ui/sheet/sheetIds'
 import { dockAt } from '../screens/screenHelpers'
+import { RECEIPT_ROWS_TEST_ID, RECEIPT_TEST_ID, sellWideHaul } from '../sellReceiptSales'
 import type { FindingsScope } from './uiShotFindings'
 
 export interface UiSheet extends FindingsScope {
@@ -83,6 +85,12 @@ export const UI_SHEETS: readonly UiSheet[] = [
     rootSelector: `[data-testid="${UI_IDS.hudDetail}"]`,
     pannedTestIds: [],
     open: openHudDetail,
+  },
+  {
+    shot: 'sell-receipt',
+    rootSelector: `[data-testid="${RECEIPT_TEST_ID}"]`,
+    pannedTestIds: [],
+    open: openSellReceipt,
   },
   {
     shot: 'title-menu',
@@ -175,6 +183,17 @@ async function openHudDetail(page: Page): Promise<void> {
   await undock(page)
   await page.getByTestId(UI_IDS.hudGear).click()
   await expect(page.getByTestId(UI_IDS.hudDetail)).toBeVisible()
+}
+
+/**
+ * Ticket 717: the receipt of a sale of eight P41+ tiers, its roll skipped by a tap so the shot
+ * holds the total. Its lines scroll inside the receipt, which is the shared scroll area's job, so
+ * nothing in it is panned.
+ */
+async function openSellReceipt(page: Page): Promise<void> {
+  await sellWideHaul(page)
+  await page.getByTestId(RECEIPT_TEST_ID).click()
+  await expect(page.getByTestId(RECEIPT_ROWS_TEST_ID)).toBeVisible()
 }
 
 async function openTitleMenu(page: Page): Promise<void> {

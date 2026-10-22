@@ -80,10 +80,9 @@
   font-size: var(--type-label);
 }
 
+/* A long species name (four words at most, ticket 444) wraps rather than cutting off. */
 .name {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  overflow-wrap: anywhere;
 }
 
 .count,
