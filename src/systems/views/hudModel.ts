@@ -87,6 +87,11 @@ export interface CargoReading extends GaugeReading {
   coreFragments: number
   coreText: string
   isFull: boolean
+  /**
+   * The holds the cargo chain's one dial reads (HS, ticket 716): the rig's own hold, and a link
+   * per wagon once the wagon row (`docs/scaling/horizontal/stats.json` `wagons`) ships.
+   */
+  chainLinks: number
 }
 
 export interface EnergyWarning {
@@ -150,6 +155,9 @@ const WARNING_MARKERS: Readonly<Record<EnergyWarningLevel, { text: string; icon:
 }
 
 const PERMILLE = 1000
+
+/** The cargo chain is the rig's own hold alone until a wagon links on. */
+const RIG_HOLD_LINKS = 1
 
 const READY_PROMPT_LINE = 'Scenario ready — {inputVerb} any {inputNoun}'
 
@@ -242,6 +250,7 @@ function cargoGaugeOf(vehicle: VehicleState): CargoReading {
     coreFragments,
     coreText: coreFragments > 0 ? `(${formatAmount(coreFragments)} core)` : '',
     isFull: units >= capacity,
+    chainLinks: RIG_HOLD_LINKS,
   }
 }
 

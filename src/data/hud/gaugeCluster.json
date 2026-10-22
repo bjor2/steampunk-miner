@@ -1,0 +1,18 @@
+{
+  "dials": [
+    { "id": "hull", "reads": "hull", "skin": "brass" },
+    { "id": "fuel", "reads": "fuel", "skin": "brass" },
+    { "id": "cargo", "reads": "cargo-chain", "skin": "brass" },
+    { "id": "heat", "reads": "heat", "skin": "brass" },
+    { "id": "depth", "reads": "depth", "skin": "brass" }
+  ],
+  "room": {
+    "phone": { "surface": 3, "run": 5 },
+    "desktop": { "surface": 5, "run": 5 }
+  },
+  "zones": { "amberAtPercent": 25, "redAtPercent": 10 },
+  "frame": "ui-frame-glass",
+  "skins": {
+    "brass": { "dial": "ui-gauge-dial", "needle": "ui-gauge-needle" }
+  }
+}

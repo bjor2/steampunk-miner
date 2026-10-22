@@ -65,6 +65,24 @@ export function uiArtPartIds(): string[] {
   return uiArtAssetIds().flatMap((assetId) => uiSpritesOf(assetId).map((sprite) => sprite.partId))
 }
 
+/** The asset a UI part belongs to, or null for a part no art token names. */
+export function uiAssetIdOfPart(partId: string): string | null {
+  const owners = uiArtAssetIds().filter((assetId) =>
+    uiSpritesOf(assetId).some((sprite) => sprite.partId === partId),
+  )
+  return owners[0] ?? null
+}
+
+/**
+ * The CSS variable a UI part draws through (`--art-<token><suffix>`), so data that names a part
+ * (a gauge skin, ticket 716) reaches its sprite; null for a part no art token names.
+ */
+export function uiArtVariableOfPart(partId: string): string | null {
+  const assetId = uiAssetIdOfPart(partId)
+  const token = Object.entries(uiArtTokenAssetIds()).find(([, id]) => id === assetId)?.[0]
+  return assetId === null || token === undefined ? null : variableNameOf(token, assetId, partId)
+}
+
 /** Why the rules table and the tokens disagree; empty when every token has its sprites and no more. */
 export function uiSpriteRuleProblems(): string[] {
   const named = uiArtAssetIds()

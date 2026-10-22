@@ -16,12 +16,15 @@ import { bandOfTile } from '../world/planetGeometry'
 import type { PlanetParams } from '../world/planetParams'
 import { surfaceRowOfColumn } from '../world/tileGrid'
 import { coreEdgeDistance, localOctantOf, tileDistance } from './compass'
+import { depthScaleOf, type DepthScale } from './depthDial'
 
 export interface DepthReading {
   text: string
   depthTiles: number
   altitudeTiles: number
   band: number | null
+  /** The depth dial's scale (ticket 716): R(p) and the band and core marks; null off a planet. */
+  scale: DepthScale | null
 }
 
 /**
@@ -107,6 +110,7 @@ export function depthReadingOf(
     depthTiles,
     altitudeTiles,
     band: params === null ? null : bandAtDepth(params, depthTiles),
+    scale: params === null ? null : depthScaleOf(params),
   }
 }
 

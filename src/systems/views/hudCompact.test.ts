@@ -49,6 +49,7 @@ const CROWDED: CombatStatusSources = {
     coreFragments: 0,
     coreText: '',
     isFull: true,
+    chainLinks: 1,
   },
   vehicleState: UNDER_WAY,
 }

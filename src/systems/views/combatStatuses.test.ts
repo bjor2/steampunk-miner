@@ -34,6 +34,7 @@ const CALM: CombatStatusSources = {
     coreFragments: 0,
     coreText: '',
     isFull: false,
+    chainLinks: 1,
   },
   vehicleState: {
     mode: 'active',
