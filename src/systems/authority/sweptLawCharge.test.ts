@@ -4,6 +4,7 @@ import { AUTHORITY_DEV_FLAGS, DEV_FLAGS } from '../../constants/devFlags'
 import { CUT_ENERGY_DENOMINATOR, LAW_WORK_PER_DRILL_TICK } from '../vehicle/cutCarry'
 import { newVehicleState } from '../vehicle/vehicleState'
 import { energyNumeratorOfLawWork } from './cutCarryFixtures'
+import { withDriveReaching } from './driveRigFixtures'
 import type { DrillCarve } from './drillGearCut'
 import { LAW_SUB_STEP_CLOCK, LAW_WORK_CLOCK } from './groundDrill'
 import {
@@ -26,6 +27,8 @@ import { LADDER_RIGS, SPEED_RIGS } from './lawSlabRigs'
 // rig laid and cut again counts at its grade.
 
 const FAST = SPEED_RIGS['44 m/s'].levels
+/** The fast rig with a drive that reaches its 44 m/s: a level bore moves at min(cut, drive) (#723). */
+const FAST_LEVEL = withDriveReaching(FAST, SPEED_RIGS['44 m/s'].speedMps)
 const SLOW = LADDER_RIGS['stored 1']
 const FAST_STRIDE = strideOfRig(FAST, strideOfSpeedMps(SPEED_RIGS['44 m/s'].speedMps))
 const SLOW_STRIDE = strideOfRig(SLOW)
@@ -60,7 +63,7 @@ describe('swept law charge (ticket 540)', () => {
   })
 
   it('charges a fast rig within 1% of the law on a level bore, where the per-cell price under-charged', () => {
-    expectAtTheLaw(barsOf(trackOf('level', FAST_STRIDE), FAST))
+    expectAtTheLaw(barsOf(trackOf('level', FAST_STRIDE), FAST_LEVEL))
   })
 
   it('charges within 1% of the law on down legs, fast and slow, where the per-cell price over-charged', () => {
@@ -76,7 +79,7 @@ describe('swept law charge (ticket 540)', () => {
 
   it('cuts and heats byte for byte as the shipped swept charge', () => {
     for (const [track, levels] of [
-      [trackOf('level', FAST_STRIDE), FAST],
+      [trackOf('level', FAST_STRIDE), FAST_LEVEL],
       [trackOf('down', SLOW_STRIDE), SLOW],
     ] as const) {
       const shipped = cutSlab(track, 'swept', levels)

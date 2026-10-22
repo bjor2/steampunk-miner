@@ -11,6 +11,7 @@ import { vehicleOf } from '../authorityState'
 import type { CommandIntent } from '../authorityCommand'
 import { ofType } from '../charges/chargeFixtures'
 import type { DomainEvent } from '../domainEvent'
+import { engineStepReaching } from '../driveRigFixtures'
 import { createScriptedSession, type ScriptedSession } from '../scriptedSession'
 import { RIG_TIP, strideOfSpeed, weakestDrillPower } from '../speedSlabFixtures'
 import { stepBoundsAt } from '../stepBoundRead'
@@ -28,7 +29,8 @@ import {
 // warning is not scaled with speed, so a rig leaving a warned block at 84 m/s outruns it. The
 // weak band-2 tunnel warns its blocks at tick 10 with the rig at its middle; the rig then cuts east
 // out of it by `drillStep` a tick and a report every 12, as the live client does, its own lining
-// at grade 2 (band 2's need), so only the tunnel warns. At the refill the rig is far past the 16 m
+// at grade 2 (band 2's need), so only the tunnel warns. It cuts sideways, so its drive reaches the
+// 84 m/s too (Bjor's ruling on #723: a sideways cut moves at min(drill rate, drive speed)). At the refill the rig is far past the 16 m
 // radius: every warning is cancelled, nothing refills and nothing is crushed. The outrun is exact
 // (HS 6254968595): the cut's own events are those of the same run past a tunnel that never warned,
 // and a braced block stays out of the refill. The radius and the 60-tick lead are untouched.
@@ -54,6 +56,7 @@ function armRig(session: ScriptedSession, drillPower: number): void {
   for (const [upgradeId, level] of [
     ['drill_tip', RIG_TIP],
     ['drill_power', drillPower],
+    ['engine', engineStepReaching(SPEED_M_PER_S)],
   ] as const) {
     session.submit(1, { type: 'debug.setUpgrade', payload: { upgradeId, level } })
   }

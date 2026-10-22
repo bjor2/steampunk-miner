@@ -8,7 +8,8 @@
  * column; tilted, the start, the up vector and the heading turn 30 degrees round the centre. The
  * rig's law speed is the track's: the swept cut moves about 60 / D cells a second (60/23 at 23
  * ticks a cell, `sweptCutPace.test.ts`), so a track at v m/s gets the weakest drill (tip 600, the
- * probe's) whose cell in the hardest band it crosses takes at most 60 / v ticks.
+ * probe's) whose cell in the hardest band it crosses takes at most 60 / v ticks, and on a level
+ * track the weakest engine whose drive reaches v (ticket 723).
  *
  * Paths, as the live loop sends them: `every tick` and `every 12` are flag-off pose reports with
  * that many drive and drill ticks, charged on the law work they removed (A6's `drill.exactCarry`)
@@ -51,6 +52,7 @@ import {
   type TrackFrame,
 } from './digSpeedTrackFrame'
 import { lawWorkOfChange, type LawWork } from './lawWorkFixtures'
+import { withDriveReaching } from './driveRigFixtures'
 import { drillQuantumAt } from './stepBoundRead'
 import {
   createScriptedSession,
@@ -121,7 +123,7 @@ function isCapsulePath(path: TrackPath): boolean {
 
 function cutTrackOnPath(track: Track, path: TrackPath, drillPower: number): TrackRun {
   const frame = frameOf(track)
-  const session = sessionAtStart(frame, drillPower)
+  const session = sessionAtStart(frame, track, drillPower)
   const start = session.state()
   let charge: TrackCharge = { drillEnergy: 0, heatTicks: 0 }
   for (let tick = 1; tick <= trackTicksOf(track); tick++) {
@@ -173,22 +175,34 @@ export function hardestCellTicksFor(track: Track, drillPower: number): number {
 }
 
 function subStepsAt(drillPower: number, band: number): number {
-  const vehicle = rigSession(drillPower).vehicle()
+  const vehicle = rigSession(drillLevelsOf(drillPower)).vehicle()
   const drill = heatThrottledDrill(PARAMS.planetIndex, vehicle)
   return subStepsPerTile(drill, blockHardness(PARAMS.planetIndex, band)) ?? Infinity
 }
 
-function rigSession(drillPower: number): ScriptedSession {
+function drillLevelsOf(drillPower: number): Record<string, number> {
+  return { drill_power: drillPower, drill_tip: RIG_TIP }
+}
+
+/**
+ * The track's rig: its drill, and on a level track a drive that reaches the track's speed, as a
+ * sideways cut moves at `min(drill rate, drive speed)` (Bjor's ruling on #723).
+ */
+function trackRigLevelsOf(track: Track, drillPower: number): Record<string, number> {
+  const levels = drillLevelsOf(drillPower)
+  return track.section === 'level' ? withDriveReaching(levels, track.speedMps) : levels
+}
+
+function rigSession(levels: Record<string, number>): ScriptedSession {
   const session = createScriptedSession()
-  const levels = { drill_power: drillPower, drill_tip: RIG_TIP }
   for (const [upgradeId, level] of Object.entries(levels)) {
     session.submit(0, { type: 'debug.setUpgrade', payload: { upgradeId, level } })
   }
   return session
 }
 
-function sessionAtStart(frame: TrackFrame, drillPower: number): ScriptedSession {
-  const session = rigSession(drillPower)
+function sessionAtStart(frame: TrackFrame, track: Track, drillPower: number): ScriptedSession {
+  const session = rigSession(trackRigLevelsOf(track, drillPower))
   session.submit(0, FREEZE_ENEMIES)
   fillDeepTank(session)
   session.submit(0, setCasingGradeCommand(CASING_GRADE))
