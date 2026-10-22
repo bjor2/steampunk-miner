@@ -173,6 +173,23 @@
       "specs": ["e2e/browser/unlockReveal.spec.ts", "e2e/browser/ui/uiShots.spec.ts"]
     },
     {
+      "why": "The shop guidance (ticket 719): the trips' income the store folds, Affordable or N trips away under each Outfitter price, and the next-upgrade chip putting the cheapest new capability first, with its hover line on desktop.",
+      "paths": [
+        "src/systems/views/tripIncome.ts",
+        "src/systems/views/shopGuidance.ts",
+        "src/systems/views/newCapabilityOffers.ts",
+        "src/systems/views/nextUpgradeChip.ts",
+        "src/systems/views/newCapability.ts",
+        "src/systems/views/outfitterCards.ts",
+        "src/data/shop/newCapabilities.json",
+        "src/store/tripIncomeSlice.ts",
+        "src/ui/kit/SheetCard*",
+        "src/ui/platform/OutfitterPanel*",
+        "src/ui/hud/HudStrip*"
+      ],
+      "specs": ["e2e/browser/shopGuidance.spec.ts", "e2e/browser/ui/uiShots.spec.ts"]
+    },
+    {
       "why": "The item cards fill the bays' entries; the Outfitter's cards replaced the workshop plaques (ticket 687).",
       "paths": ["src/features/descriptions/**"],
       "specs": ["e2e/browser/itemCards.spec.ts", "e2e/browser/workshop.spec.ts"]

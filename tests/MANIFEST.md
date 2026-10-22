@@ -1476,6 +1476,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/store/titleMenu.test.ts` | 9 | 9 |
 | `src/store/touchReplay.test.ts` | 2 | 2 |
 | `src/store/touchRuntime.test.ts` | 20 | 19 |
+| `src/store/tripIncomeSlice.test.ts` | 3 | 3 |
 | `src/store/warningSlice.test.ts` | 6 | 6 |
 | `src/store/worldSaveOwnership.test.ts` | 7 | 7 |
 
@@ -1708,7 +1709,8 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/views/ledgerToast.test.ts` | 4 | 4 |
 | `src/systems/views/menuFocus.test.ts` | 2 | 2 |
 | `src/systems/views/newCapability.test.ts` | 4 | 4 |
-| `src/systems/views/outfitterCards.test.ts` | 8 | 8 |
+| `src/systems/views/nextUpgradeChip.test.ts` | 6 | 6 |
+| `src/systems/views/outfitterCards.test.ts` | 11 | 11 |
 | `src/systems/views/overlaySeats.test.ts` | 5 | 5 |
 | `src/systems/views/pauseMenuModel.test.ts` | 11 | 11 |
 | `src/systems/views/planetCardView.test.ts` | 1 | 1 |
@@ -1721,12 +1723,14 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/views/sellBayModel.test.ts` | 15 | 15 |
 | `src/systems/views/settingsModel.test.ts` | 5 | 5 |
 | `src/systems/views/sheetLayout.test.ts` | 11 | 11 |
+| `src/systems/views/shopGuidance.test.ts` | 8 | 8 |
 | `src/systems/views/slotSummaryLine.test.ts` | 8 | 8 |
 | `src/systems/views/tileTime.test.ts` | 3 | 3 |
 | `src/systems/views/titleMenuModel.test.ts` | 8 | 8 |
 | `src/systems/views/titleOnlyText.test.ts` | 5 | 5 |
 | `src/systems/views/toolSlotBar.test.ts` | 10 | 10 |
 | `src/systems/views/tooltipOpening.test.ts` | 9 | 9 |
+| `src/systems/views/tripIncome.test.ts` | 8 | 8 |
 | `src/systems/views/uiBudgetRatchet.test.ts` | 8 | 8 |
 | `src/systems/views/uiBudgetReading.test.ts` | 9 | 9 |
 | `src/systems/views/uiScrollGuard.test.ts` | 7 | 7 |

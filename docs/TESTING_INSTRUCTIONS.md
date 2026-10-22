@@ -1474,6 +1474,17 @@ incomePerHour}` go to `balance-report/drill-pace.ndjson`, which `pushTestMetrics
   level reveals nothing, the guns' mount reveals on the rig and a tap skips it; on a phone the full
   sheet steps aside and comes back on the Outfitter; the plate fits 360x640 and 1280x800. The UI
   screenshot suite shoots it at every cell (`unlock-reveal`). Box Tester only for the browser specs.
+- **Shop guidance** (ticket 719, spec #678): the trips' income is a pure fold
+  (`systems/views/tripIncome.ts`): `tripIncome.test.ts` holds a real trip's wallet gain, the lining
+  bill taken off, two sales before the next unit as one trip, the last 3 kept, and the median of 1,
+  2 and 3 trips. `shopGuidance.test.ts` holds "Affordable" or "{N} trips away" for 0, 1 and 3 trips
+  of history (hidden at 0, rounded up, the median against one lucky haul, exact amounts deciding).
+  `tripIncomeSlice.test.ts` sells for real through the store; `outfitterCards.test.ts` the cards'
+  guidance against their greying; `nextUpgradeChip.test.ts` the cheapest new capability ahead of
+  the drill step, the fallback, and every sold item's title and hover line within 3 and 12 words.
+  `e2e/browser/shopGuidance.spec.ts` sells for real and reads the cards' notes and the chip at
+  360x640 and 1280x800, the chip off underground and its desktop hover line. Box Tester only for
+  the browser spec.
 - **Gauge cluster** (ticket 716, spec #678): the dials are a data table
   (`src/data/hud/gaugeCluster.json`, `systems/views/gaugeClusterTable.ts`) read by the pure view
   `gaugeCluster.ts`; `gaugeCluster.test.ts` holds the table's problems, the load test that every

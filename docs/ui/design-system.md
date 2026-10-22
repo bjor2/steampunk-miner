@@ -444,6 +444,21 @@ hangs at its first slot's point for the reveal. On a phone the full sheet steps 
 tap, or leaving the dock. A combo or a slot cradle has no model, so its reveal is the plate alone.
 Every word is a row of `features/unlock-reveal/reveal.json`, held to the #680 budgets.
 
+**The shop guidance as built (#719).** The next-upgrade chip puts the cheapest new capability the
+rig lacks first (an Outfitter offer the shared flag counts: the guns' mount, a researched vehicle
+item, the bore gun's mount; `systems/views/newCapabilityOffers.ts`), ahead of the next +% step,
+else the cheaper of drill power and drill tip as #684 built it. It stays icon plus price on the
+strip, off underground; its title (`New gear` or `Next upgrade`, out of sight) and its hover line
+(the offer's name and its guidance, 12 words or fewer) show on a desktop hover or tap, as a dial
+reveals its number, never as a tooltip, so a click still reaches the game; on a phone it takes no
+pointer in the keep-out. Every Outfitter card with a price shows under it, in a tabular note that
+never wraps, `Affordable` or `{N} trips away`: N is the rest of the price over the median of the
+last 3 trips' income, rounded up (`systems/views/shopGuidance.ts`). A trip's income is its wallet
+gain at the Sell bay, the lining bill taken off, cut where the next unit reaches the hold
+(`tripIncome.ts`, the receipt's boundary), folded by the store (`tripIncomeSlice.ts`) for the
+session only. Nothing shows until a trip has sold something. The exact amounts decide, so a card
+never reads `Affordable` while the wallet is short.
+
 ## 11. Copy
 
 **Vocabulary** (Progression, GD lock): the places are the **Outfitter** (the upgrade bay's sheet,
