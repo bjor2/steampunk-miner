@@ -60,6 +60,7 @@ import { amountReading, priceReading, type AmountReading } from './viewParts'
 import { nextUpgradeChipOf, type NextUpgradeChip } from './nextUpgradeChip'
 import type { TripLedger } from './tripIncome'
 import { returnReserveUnits } from '../vehicle/returnReserve'
+import { upgradeCountsOf, type UpgradeCounts } from './dialBuyCue'
 
 export interface HudSources {
   state: AuthorityState
@@ -147,6 +148,8 @@ export interface HudModel {
   /** "Scenario ready — press any key" (on touch "tap any control") while play waits (ticket 301). */
   readyPrompt: DockPrompt
   warning: EnergyWarning
+  /** The levels the rig owns that an upgrade buy raises, which the dials' buy cue reads (ticket 727). */
+  upgradeCounts: UpgradeCounts
 }
 
 const LOW_ENERGY_ICON = combatStatusIconIdOf('low_energy')
@@ -209,6 +212,7 @@ export function selectHudModel(sources: HudSources): HudModel {
     isDebugRun: state.debugApplied,
     readyPrompt: readyPromptOf(sources),
     warning,
+    upgradeCounts: upgradeCountsOf(vehicle),
   }
 }
 

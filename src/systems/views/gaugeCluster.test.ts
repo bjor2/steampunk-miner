@@ -64,7 +64,7 @@ describe('gauge cluster table (ticket 716)', () => {
   it('refuses a row that reads nothing known, a missing skin and zones out of order', () => {
     const broken = {
       ...GAUGE_CLUSTER,
-      dials: [{ id: 'wagon', reads: 'wagon', skin: 'copper' }],
+      dials: [...GAUGE_CLUSTER.dials, { id: 'wagon', reads: 'wagon', skin: 'copper' }],
       zones: { amberAtPercent: 10, redAtPercent: 25 },
     } as unknown as GaugeClusterTable
     expect(gaugeClusterProblemsOf(broken)).toEqual([

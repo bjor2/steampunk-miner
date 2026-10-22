@@ -11,6 +11,15 @@
     "desktop": { "surface": 5, "run": 5 }
   },
   "zones": { "amberAtPercent": 25, "redAtPercent": 10 },
+  "buyCue": {
+    "notches": 12,
+    "counts": {
+      "hull": ["hull"],
+      "fuel": ["boiler"],
+      "cargo": ["cargo_hold"],
+      "depth": ["drill_power", "drill_tip", "engine", "casing"]
+    }
+  },
   "frame": "ui-frame-glass",
   "skins": {
     "brass": { "dial": "ui-gauge-dial", "needle": "ui-gauge-needle" }

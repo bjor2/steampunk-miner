@@ -11,13 +11,15 @@
  * (GD lock), so nothing on the strip moves. The wagons share the cargo chain's one dial with a
  * count badge (HS). The depth dial is depth over R(p) with the planet's band and core marks
  * (`depthDial.ts`). Every value is read fresh from the model, so a change shows on the render
- * that brings it.
+ * that brings it. Each dial also carries its per-buy cue (ticket 727, `dialBuyCue.ts`), and the
+ * overflow cell the cue of the dials it folds.
  */
 import { hudLabelIconIdOf } from '../art/icons/iconSet'
 import { uiArtVariableOfPart } from '../art/uiArt'
 import { formatAmount } from '../displayAmount'
 import { DESIGN_TOKENS, type DesignTokens, type LayoutKind } from './designSystem'
 import { depthDialOf, type DepthMarker } from './depthDial'
+import { buyCueOfDials, type BuyCueMark } from './dialBuyCue'
 import {
   GAUGE_CLUSTER,
   type DialReadingKind,
@@ -61,6 +63,8 @@ export interface DialFace {
   art: DialArt
   /** The heat at or under 60%: its slot stays and the dial does not draw. */
   isHeld: boolean
+  /** The notch that steps one place per upgrade bought on this dial (ticket 727); null for none. */
+  cue: BuyCueMark | null
 }
 
 export interface GaugeClusterView {
@@ -69,6 +73,8 @@ export interface GaugeClusterView {
   overflowCount: number
   /** The overflow cell's "+N" through the shared formatter; null with room for every dial. */
   overflowText: string | null
+  /** The folded dials' buy cue, on the "+N" cell (ticket 727); null with nothing folded or cued. */
+  overflowCue: BuyCueMark | null
   /** The brass and glass frame's CSS variable, null for a frame no art token names. */
   frameArt: string | null
 }
@@ -102,6 +108,7 @@ export function gaugeClusterOf(
     dials: faces.slice(0, room),
     overflowCount,
     overflowText: overflowCount > 0 ? `+${formatAmount(overflowCount)}` : null,
+    overflowCue: overflowCueOf(faces.slice(room), model, table),
     frameArt: uiArtVariableOfPart(table.frame),
   }
 }
@@ -153,8 +160,18 @@ function faceOfRow(
       zone: dialZoneOf(reading.leftPermille, table.zones),
       tier: ladderTierOf(reading.leftPermille, tokens),
       art: dialArtOf(table.skins[row.skin]),
+      cue: buyCueOfDials([row.id], model.upgradeCounts, table.buyCue),
     },
   ]
+}
+
+function overflowCueOf(
+  folded: readonly DialFace[],
+  model: HudModel,
+  table: GaugeClusterTable,
+): BuyCueMark | null {
+  const foldedIds = folded.map((face) => face.id)
+  return buyCueOfDials(foldedIds, model.upgradeCounts, table.buyCue)
 }
 
 function readingOf(
