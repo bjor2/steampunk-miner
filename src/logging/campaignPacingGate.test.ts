@@ -1,7 +1,6 @@
-import { existsSync, readFileSync } from 'node:fs'
+import { readFileSync } from 'node:fs'
 import { describe, expect, it } from 'vitest'
 import { SLICE_LAST_PLANET } from '../constants/balance'
-import { CAMPAIGN_PACING_KNOWN_RED } from '../constants/knownRed'
 import { PACING_TARGETS } from '../constants/pacingTargets'
 import { PACING_WORLD_SEEDS } from '../constants/pacingSeeds'
 import { TICKS_PER_SECOND } from '../constants/physics'
@@ -44,12 +43,6 @@ function seededRuns(): SeededSliceRun[] {
   return seeded
 }
 
-/** The finding's metrics file, written by the loop when it closes the ticket (ticket 419). */
-function readFindingTicketFile(finding: number): string | null {
-  const url = new URL(`../../docs/metrics/tickets/${finding}.json`, import.meta.url)
-  return existsSync(url) ? readFileSync(url, 'utf8') : null
-}
-
 function gateRunsOf(runs: readonly SeededSliceRun[]): CampaignGateRun[] {
   return runs.map((run) => ({
     worldSeed: run.worldSeed,
@@ -68,8 +61,8 @@ describe('balance regression: the campaign scaling gate on the pacing seeds (R1 
     )
     console.log(`${formatSawtoothSeedTable(runs)}\n\n${campaignPacingFindings(median).join('\n')}`)
     const problems = campaignScalingProblemsByMarkerReach(runs, LOCKED_SCHEDULE, LAST_PLANET)
-    const verdict = knownRedVerdict(CAMPAIGN_PACING_KNOWN_RED, problems, readFindingTicketFile)
-    console.log(verdict.knownRed.join('\n'))
+    // Ticket 645 deleted #417's marker after R3's radius re-baseline: every problem fails now.
+    const verdict = knownRedVerdict(null, problems, () => null)
     expect(verdict.failures).toEqual([])
   })
 })

@@ -110,9 +110,9 @@ describe('known-red marker (ticket 419)', () => {
     expect(verdict.knownRed).toEqual([`known-red (#417): ${STALL}`])
   })
 
-  it('has CAMPAIGN_PACING_KNOWN_RED as the only exported marker in src', () => {
+  it('has no exported marker in src once campaignPacingGate is off #417 (ticket 645)', () => {
     const markers = sourceFilesUnder(SRC_DIR).flatMap(exportedMarkersIn)
 
-    expect(markers).toEqual(['CAMPAIGN_PACING_KNOWN_RED'])
+    expect(markers).toEqual([])
   })
 })

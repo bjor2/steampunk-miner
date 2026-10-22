@@ -952,17 +952,16 @@ incomePerHour}` go to `balance-report/drill-pace.ndjson`, which `pushTestMetrics
   is the same), every B pop starts 0 or 1 tick after its cell's carve tick, A starts none, and the
   intake's cost per carved batch is printed. 840 and 8400 m/s are `it.todo` until a live rig
   reaches them; `popRows.test.ts` covers those speeds on the intake alone.
-- **Known red** (ticket 419, the TD on #396 section 2): `CAMPAIGN_PACING_KNOWN_RED`
-  (`src/constants/knownRed.ts`) is the one exported known-red marker in the repo (lanes and specs
-  keep local ones with a ruling, as `subStepFloor.test.ts` kept #558's until ticket 558): one gate
-  (`campaignPacingGate`), one finding (#417), no registry. The gate still runs in full;
-  `knownRedVerdict` (`src/logging/knownRed.ts`) prints its stalled-seed and sawtooth problems as
-  `known-red (#417): ...` instead of failing them. The schedule cadence and "judged nothing" always
-  fail, and the marker never covers `pacingGate`, `assayPacingGate`, the schedule, hash or growth
-  asserts. The marker itself fails when it names no finding ticket, when the finding's
-  `docs/metrics/tickets/<n>.json` shows `closed` (it expires with the finding), and when the gate
-  is green (delete the marker in the commit that turns it green). `knownRed.test.ts` fails on a
-  second exported marker: a new one needs a ruling and a code review, not a copy.
+- **Known red** (ticket 419, the TD on #396 section 2; ticket 645): `knownRedVerdict`
+  (`src/logging/knownRed.ts`) lets a marked gate run in full and print its covered problems as
+  `known-red (#<finding>): ...` instead of failing them. The repo exports no marker: ticket 645
+  deleted `CAMPAIGN_PACING_KNOWN_RED` (#417) after R3's radius re-baseline (#644), so
+  `campaignPacingGate`'s stalled seeds and sawtooth misses (P5-P7 included) fail again. Lanes and
+  specs keep local markers with a ruling (`carveGeometryKnownRed.ts`, `noseContactKnownRed.ts`). A
+  marker fails when it names no finding ticket, when the finding's `docs/metrics/tickets/<n>.json`
+  shows `closed` (it expires with the finding), and when the gate is green (delete the marker in the
+  commit that turns it green). `knownRed.test.ts` fails on any exported marker: a new one needs a
+  ruling and a code review, not a copy.
 - **Guns** (#107 acceptance 5): `npm run balance:guns` plays the bot to planet 7's core with
   `auto_guns` (mounted on planet 4) and without, and prints planets 4 to 7 side by side with each
   planet's gun energy and kills from the dive summaries (`deriveDiveSummaries`). Reported, never gated;
