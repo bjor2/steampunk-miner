@@ -439,8 +439,15 @@ import type { DriveSigns } from '../vehicle/driveSigns'
  *    over a cleared slab the drill's nominal cut where that beats the drive. The pacing bot bores a
  *    sideways tile for at least the drive's time over it. A run whose drill never outruns its
  *    engine sideways moves no digest.
+ * 102: down-cut gravity ramp (ticket 724, Bjor's ruling; the #644 re-pin replacing #662's "rest to
+ *    95% speed" bar): a cut down's swept front steps no further in a tick than the last report's
+ *    speed along the facing plus `a dt` for this tick and each since, `a = max(g(r), 0.1 g_surface)`
+ *    (`downCutFront.ts`), never past the drill law's step; the client's body gains its speed down
+ *    no faster. Sideways and up cuts, the law and its top step are unchanged. The pacing bot bores a
+ *    tile down for at least the ramp's time across it. A run with no cut down by `drillStep` moves
+ *    no digest.
  */
-export const AUTHORITY_PROTOCOL_VERSION = 101
+export const AUTHORITY_PROTOCOL_VERSION = 102
 
 /** The kernel's own commands: the closed set its rule tables are written against. */
 export interface KernelCommandPayloads {

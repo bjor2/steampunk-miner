@@ -834,6 +834,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/authority/devFlagReads.test.ts` | 1 | 1 |
 | `src/systems/authority/devFlagRules.test.ts` | 23 | 18 |
 | `src/systems/authority/digSpeedTrack.lane.test.ts` | 69 | 4 |
+| `src/systems/authority/downCutFront.test.ts` | 3 | 3 |
 | `src/systems/authority/drillEventStream.lane.test.ts` | 8 | 1 |
 | `src/systems/authority/drillEventStream.test.ts` | 27 | 5 |
 | `src/systems/authority/drillGates.test.ts` | 11 | 11 |
@@ -949,6 +950,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/bot/chargePayoff.test.ts` | 5 | 5 |
 | `src/systems/bot/chargeSharePayoff.test.ts` | 6 | 6 |
 | `src/systems/bot/chargeSizeTrade.test.ts` | 4 | 4 |
+| `src/systems/bot/downBores.test.ts` | 7 | 7 |
 | `src/systems/bot/endlessPlanning.test.ts` | 6 | 3 |
 | `src/systems/bot/itemHookNoFreeCell.test.ts` | 0 | 1 |
 | `src/systems/bot/leadCellHardness.test.ts` | 3 | 3 |
@@ -1059,6 +1061,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 
 | File | Tests | Sites |
 | --- | --- | --- |
+| `src/systems/hints/gravityRampHint.test.ts` | 2 | 2 |
 | `src/systems/hints/hintAcceptance.test.ts` | 4 | 4 |
 | `src/systems/hints/hintBoard.test.ts` | 23 | 23 |
 | `src/systems/hints/hintTable.test.ts` | 5 | 5 |
@@ -1098,6 +1101,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/logging/diveCasing.test.ts` | 4 | 4 |
 | `src/logging/diveSummaries.test.ts` | 4 | 4 |
 | `src/logging/domainEventLog.test.ts` | 21 | 21 |
+| `src/logging/downSpeedReport.test.ts` | 2 | 2 |
 | `src/logging/drillCutLine.test.ts` | 12 | 12 |
 | `src/logging/drillLadder.test.ts` | 3 | 3 |
 | `src/logging/drillLadderReport.test.ts` | 9 | 9 |
@@ -1189,7 +1193,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/physics/cutFollowBite.test.ts` | 3 | 2 |
 | `src/physics/cutFollowRelease.test.ts` | 13 | 15 |
 | `src/physics/cutFollowStartingRigs.test.ts` | 19 | 5 |
-| `src/physics/cutSmoothness.test.ts` | 13 | 7 |
+| `src/physics/cutSmoothness.test.ts` | 14 | 8 |
 | `src/physics/cutStartLatency.lane.test.ts` | 5 | 5 |
 | `src/physics/digSpeedStop.lane.test.ts` | 10 | 3 |
 | `src/physics/drillEngagement.test.ts` | 6 | 6 |
@@ -1261,7 +1265,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/registries/orePickup.test.ts` | 4 | 4 |
 | `src/systems/registries/oreTypes.test.ts` | 12 | 12 |
 | `src/systems/registries/planetCardLines.test.ts` | 9 | 9 |
-| `src/systems/registries/planetRow.test.ts` | 5 | 5 |
+| `src/systems/registries/planetRow.test.ts` | 6 | 6 |
 | `src/systems/registries/planetRowLooks.test.ts` | 7 | 7 |
 | `src/systems/registries/planetSkyBand.test.ts` | 5 | 5 |
 | `src/systems/registries/saveSections.test.ts` | 3 | 3 |
@@ -1448,6 +1452,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/store/devFlagOverrides.test.ts` | 15 | 15 |
 | `src/store/devFlagPanel.test.ts` | 12 | 12 |
 | `src/store/devFlagSessions.test.ts` | 2 | 2 |
+| `src/store/digRampSlice.test.ts` | 3 | 3 |
 | `src/store/domainEventBroadcast.test.ts` | 3 | 3 |
 | `src/store/gameStore.test.ts` | 26 | 26 |
 | `src/store/hintSlice.test.ts` | 15 | 15 |
@@ -1636,11 +1641,13 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/vehicle/casingTrailReversal.test.ts` | 36 | 5 |
 | `src/systems/vehicle/chargeSelection.test.ts` | 4 | 4 |
 | `src/systems/vehicle/colliderHalo.test.ts` | 3 | 3 |
-| `src/systems/vehicle/cutCapSpeed.test.ts` | 14 | 14 |
+| `src/systems/vehicle/cutCapSpeed.test.ts` | 15 | 15 |
 | `src/systems/vehicle/cutCarry.test.ts` | 12 | 12 |
 | `src/systems/vehicle/cutFollowMotion.test.ts` | 19 | 19 |
 | `src/systems/vehicle/cutGate.test.ts` | 8 | 8 |
 | `src/systems/vehicle/cutStartBreakdown.test.ts` | 4 | 4 |
+| `src/systems/vehicle/downCutRamp.test.ts` | 12 | 12 |
+| `src/systems/vehicle/downCutRampFront.test.ts` | 5 | 5 |
 | `src/systems/vehicle/drillBore.test.ts` | 6 | 6 |
 | `src/systems/vehicle/drillContact.test.ts` | 8 | 8 |
 | `src/systems/vehicle/drillGearCells.test.ts` | 12 | 12 |
@@ -1690,6 +1697,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/views/driveTrackCard.test.ts` | 5 | 4 |
 | `src/systems/views/gainText.test.ts` | 6 | 6 |
 | `src/systems/views/gaugeCluster.test.ts` | 16 | 16 |
+| `src/systems/views/gravityReadings.test.ts` | 4 | 4 |
 | `src/systems/views/hazardStripPlace.test.ts` | 6 | 6 |
 | `src/systems/views/hazardStripView.test.ts` | 3 | 3 |
 | `src/systems/views/heatViews.test.ts` | 5 | 5 |
