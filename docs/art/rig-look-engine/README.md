@@ -10,7 +10,7 @@ dropped), and the linear tail above the top step keeps every later purchase visi
 named the steps Single piston, Triple flywheel and Guild turbine (6300549964); the base rig's hub
 cap is the unnamed default.
 
-**Wired by #587.** The rig-look slice registers and exports the asset and lays each step's part
+**Wired by #587; replaced on the slot by the drive's tracks and wheels** ([#731](https://github.com/bjor2/steampunk-miner/issues/731), `vehicle-look-drive`, [docs/art/rig-look-drive/](../rig-look-drive/README.md)) once [#726](https://github.com/bjor2/steampunk-miner/issues/726) points the engine steps at them (GD on #726: since #723 the engine track is the only drive purchase). The rig-look slice registers and exports the asset and lays each step's part
 on the slot from the registry's rows (`src/features/rig-look/rigLook.json`, #577); below 2
 purchases nothing is drawn, so `hub-cap` ships unused. `engineLooks.json` here is the one table this folder's scripts share;
 the wiring keeps its own rows (#576 "Registry": data, not code). The asset id follows the #52

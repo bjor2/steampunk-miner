@@ -1,0 +1,37 @@
+{
+  "about": "The drive's rig-look parts, tracks and wheels per engine stage (ticket 731, wave 576-3A of the rig look ladder #576): one asset at the engine track's attach slot, one part per look step and the base look beside them. The stages are the engine row's (Systems' table #157 comment 6300543785, the GD rulings on #726: the drive keys on levels.engine, drill-speed buys never move it) and the step names Progression's engine names; the wiring (#726) reads thresholds and names from the rig-look registry (#577), not from here. windowM is the undercarriage box, the rollers' own, that a look may fill beyond the rig's silhouette: between the hubs' outer edges, never below the roller bottoms, where the belt runs over the ground line.",
+  "assetId": "vehicle-look-drive",
+  "track": "engine",
+  "attach": "chassis.drive",
+  "z": 3,
+  "replaces": null,
+  "footprintM": [-0.44, -0.48, 0.44, -0.24],
+  "windowM": [-0.44, -0.48, 0.44, -0.24],
+  "looks": [
+    {
+      "part": "bare-hub",
+      "name": "Bare hub",
+      "step": null,
+      "purchases": 0,
+      "unnamedDefault": true
+    },
+    {
+      "part": "iron-track",
+      "name": "Iron track",
+      "step": "Single piston",
+      "purchases": 2
+    },
+    {
+      "part": "steel-track",
+      "name": "Steel track",
+      "step": "Triple flywheel",
+      "purchases": 18
+    },
+    {
+      "part": "guild-track",
+      "name": "Guild track",
+      "step": "Guild turbine",
+      "purchases": 26
+    }
+  ]
+}

@@ -1,0 +1,50 @@
+{
+  "about": "Ticket 731: silhouette cells of each drive look on chassis.drive, on a 4 mm grid, at tiers 1 and 3: outside the rig at rest but inside the undercarriage window [-0.44, -0.48, 0.44, -0.24] (`outsideRigInWindow`, the belt over the gaps between the rollers, allowed), outside both (`outsideRigAndWindow`, must be all zero), and, for the base look, the cells it adds to the tier-1 rig inside the window (`addsToRig`, must be zero); written by check_outline.py.",
+  "looks": {
+    "bare-hub": {
+      "cells": 208,
+      "outsideRigInWindow": {
+        "tier-1": 0,
+        "tier-3": 0
+      },
+      "outsideRigAndWindow": {
+        "tier-1": 0,
+        "tier-3": 0
+      },
+      "addsToRig": 0
+    },
+    "iron-track": {
+      "cells": 5679,
+      "outsideRigInWindow": {
+        "tier-1": 2021,
+        "tier-3": 1676
+      },
+      "outsideRigAndWindow": {
+        "tier-1": 0,
+        "tier-3": 0
+      }
+    },
+    "steel-track": {
+      "cells": 5599,
+      "outsideRigInWindow": {
+        "tier-1": 2021,
+        "tier-3": 1676
+      },
+      "outsideRigAndWindow": {
+        "tier-1": 0,
+        "tier-3": 0
+      }
+    },
+    "guild-track": {
+      "cells": 5529,
+      "outsideRigInWindow": {
+        "tier-1": 1991,
+        "tier-3": 1661
+      },
+      "outsideRigAndWindow": {
+        "tier-1": 0,
+        "tier-3": 0
+      }
+    }
+  }
+}
