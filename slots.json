@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-10-22T13:10:46+02:00",
+  "updated_at": "2026-10-22T13:24:25+02:00",
   "caps": {
     "grok": 12,
     "claude": 10,
@@ -37,27 +37,30 @@
         },
         {
           "slot": "C3",
-          "state": "free",
-          "ticket": null,
-          "grok_slot": null,
-          "kind": null,
-          "since": null
+          "state": "busy",
+          "ticket": 716,
+          "grok_slot": 3,
+          "kind": "dev",
+          "since": "2026-10-22T13:23:00+02:00",
+          "wave": "678-3A"
         },
         {
           "slot": "C4",
-          "state": "free",
-          "ticket": null,
-          "grok_slot": null,
-          "kind": null,
-          "since": null
+          "state": "busy",
+          "ticket": 720,
+          "grok_slot": 4,
+          "kind": "dev",
+          "since": "2026-10-22T13:23:00+02:00",
+          "wave": "678-3B"
         },
         {
           "slot": "C5",
-          "state": "free",
+          "state": "busy",
           "ticket": null,
           "grok_slot": null,
-          "kind": null,
-          "since": null
+          "kind": "aux",
+          "since": null,
+          "label": "wave-plan 316"
         },
         {
           "slot": "C6",
@@ -69,9 +72,9 @@
         }
       ],
       "size": 6,
-      "used": 2,
-      "free": 4,
-      "claims_last_hour": 1,
+      "used": 5,
+      "free": 1,
+      "claims_last_hour": 6,
       "name": "Claude Max 1"
     },
     {
@@ -181,15 +184,19 @@
     },
     {
       "slot": 3,
-      "state": "free",
-      "ticket": null,
-      "since": null
+      "state": "dev",
+      "ticket": 716,
+      "since": "2026-10-22T13:23:00+02:00",
+      "claude_slot": 3,
+      "wave": "678-3A"
     },
     {
       "slot": 4,
-      "state": "free",
-      "ticket": null,
-      "since": null
+      "state": "dev",
+      "ticket": 720,
+      "since": "2026-10-22T13:23:00+02:00",
+      "claude_slot": 4,
+      "wave": "678-3B"
     },
     {
       "slot": 5,
@@ -261,26 +268,30 @@
     },
     {
       "slot": 3,
-      "state": "free",
-      "ticket": null,
-      "grok_slot": null,
-      "since": null,
-      "account": 1
+      "state": "busy",
+      "ticket": 716,
+      "grok_slot": 3,
+      "since": "2026-10-22T13:23:00+02:00",
+      "account": 1,
+      "wave": "678-3A"
     },
     {
       "slot": 4,
-      "state": "free",
-      "ticket": null,
-      "grok_slot": null,
-      "since": null,
-      "account": 1
+      "state": "busy",
+      "ticket": 720,
+      "grok_slot": 4,
+      "since": "2026-10-22T13:23:00+02:00",
+      "account": 1,
+      "wave": "678-3B"
     },
     {
       "slot": 5,
-      "state": "free",
+      "state": "busy",
       "ticket": null,
       "grok_slot": null,
       "since": null,
+      "kind": "aux",
+      "label": "wave-plan 316",
       "account": 1
     },
     {
@@ -329,17 +340,17 @@
     }
   ],
   "last_refill": {
-    "at": "2026-10-22 13:10 CEST",
-    "mode": "refill-dev",
-    "triggers": "#707",
-    "started": "#710->C2/A1",
-    "note": "spawned 1 worker(s)"
+    "at": "2026-10-22 13:24 CEST",
+    "mode": "recheck",
+    "triggers": "claude-run:wave-plan",
+    "started": "",
+    "note": "no pickable build ticket"
   },
   "totals": {
     "grok": {
       "size": 12,
-      "used": 2,
-      "dev": 2,
+      "used": 4,
+      "dev": 4,
       "dev_cap": 8,
       "planner": 0,
       "planner_cap": 4
@@ -347,8 +358,8 @@
     "claude": {
       "size": 10,
       "enabled": 6,
-      "used": 2,
-      "free": 4,
+      "used": 5,
+      "free": 1,
       "external": 0
     }
   },
@@ -356,6 +367,35 @@
     "mode": "on",
     "parallel": 1,
     "list": [
+      {
+        "number": 722,
+        "key": "678-3B",
+        "map": 678,
+        "lane": "remote",
+        "mode": "solo",
+        "state": "running",
+        "tickets": [
+          720
+        ],
+        "done": [],
+        "live": 1
+      },
+      {
+        "number": 721,
+        "key": "678-3A",
+        "map": 678,
+        "lane": "remote",
+        "mode": "solo",
+        "state": "running",
+        "tickets": [
+          716,
+          717,
+          718,
+          719
+        ],
+        "done": [],
+        "live": 1
+      },
       {
         "number": 715,
         "key": "647-3A",
@@ -389,7 +429,7 @@
       },
       {
         "number": 694,
-        "key": "678-3A",
+        "key": "678-3C",
         "map": 678,
         "lane": "hitl",
         "mode": "bench",
