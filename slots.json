@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-10-22T21:45:17+02:00",
+  "updated_at": "2026-10-22T21:47:34+02:00",
   "caps": {
     "grok": 12,
     "claude": 10,
@@ -107,17 +107,16 @@
         },
         {
           "slot": "C10",
-          "state": "busy",
-          "ticket": 723,
-          "grok_slot": 4,
-          "kind": "dev",
-          "since": "2026-10-22T21:02:00+02:00",
-          "wave": "647-3B"
+          "state": "free",
+          "ticket": null,
+          "grok_slot": null,
+          "kind": null,
+          "since": null
         }
       ],
       "size": 4,
-      "used": 3,
-      "free": 1,
+      "used": 2,
+      "free": 2,
       "claims_last_hour": 6,
       "name": "Claude Max 2"
     }
@@ -127,18 +126,18 @@
     "max": 3
   },
   "tester": {
-    "state": "idle",
-    "phase": null,
-    "sha": "b5326c7853a0fb14b32dd6fce0fe1bf1f6a99964",
-    "since": "2026-10-22T19:02:00Z",
-    "holds_gate": false,
+    "state": "running",
+    "phase": "fast",
+    "sha": "ab20bf9626ac7ccbdaa4134dbcbfbed53c1a6217",
+    "since": "2026-10-22T19:47:13Z",
+    "holds_gate": true,
     "claude_slot": null,
     "last_run": "2026-10-22T19:01:57Z",
     "last_nightly": "2026-10-15T20:43:15Z",
     "last_nightly_result": "full=FAIL balance-report=ok bench=FAIL balance-planets=ok balance-guns=ok balance-charges=ok balance-refinery=ok balance-heat=ok e2e=FAIL memory-soak=FAIL packaged-smoke=ok ",
     "main_red_sha": null,
-    "feature": null,
-    "feature_title": null,
+    "feature": 723,
+    "feature_title": "Sideways cut speed capped by drive speed; drill upgrade never changes drive speed",
     "queue": []
   },
   "grok": [
@@ -166,11 +165,9 @@
     },
     {
       "slot": 4,
-      "state": "dev",
-      "ticket": 723,
-      "since": "2026-10-22T21:02:00+02:00",
-      "claude_slot": 10,
-      "wave": "647-3B"
+      "state": "free",
+      "ticket": null,
+      "since": null
     },
     {
       "slot": 5,
@@ -304,12 +301,11 @@
     },
     {
       "slot": 10,
-      "state": "busy",
-      "ticket": 723,
-      "grok_slot": 4,
-      "since": "2026-10-22T21:02:00+02:00",
-      "account": 2,
-      "wave": "647-3B"
+      "state": "free",
+      "ticket": null,
+      "grok_slot": null,
+      "since": null,
+      "account": 2
     }
   ],
   "last_refill": {
@@ -322,8 +318,8 @@
   "totals": {
     "grok": {
       "size": 12,
-      "used": 3,
-      "dev": 3,
+      "used": 2,
+      "dev": 2,
       "dev_cap": 8,
       "planner": 0,
       "planner_cap": 4
@@ -331,8 +327,8 @@
     "claude": {
       "size": 10,
       "enabled": 4,
-      "used": 3,
-      "free": 1,
+      "used": 2,
+      "free": 2,
       "external": 0
     }
   },
@@ -379,7 +375,7 @@
           724
         ],
         "done": [],
-        "live": 2
+        "live": 1
       },
       {
         "number": 715,
