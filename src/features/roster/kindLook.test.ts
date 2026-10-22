@@ -11,6 +11,8 @@ import {
   kindEntryOf,
   kindLookTableOf,
   LOOK_VECTOR,
+  NO_SEEN_LEAD,
+  rarityLeadOfEntry,
   rgbOfPacked,
   type KindLook,
 } from '../../systems/render/kindLookTable'
@@ -93,19 +95,23 @@ describe('roster kind looks', () => {
     expect(kindLookProvider()?.id).toBe(ROSTER_KIND_LOOK.id)
   })
 
-  it('shows every species of a fresh save in its pre-discovery family look', () => {
+  it('draws every species of a fresh save in its own skin, with no rarity yet (ticket 698)', () => {
     const state = readAuthorityState()
     const { playerId } = useGameStore.getState()
     const params = freshPlanetParamsFor(SEED, 1)
-    const table = kindLookTableOf(planetKindLooksOf(params), rarityLooksByLead(), (look) =>
+    const looks = planetKindLooksOf(params)
+    const table = kindLookTableOf(looks, rarityLooksByLead(), (look) =>
       ROSTER_KIND_LOOK.hasSeenKind(state, playerId, look.speciesId),
     )
-    expect(shownLooks(params).length).toBeGreaterThan(0)
-    expect(table.revealedSlots).toBe(0)
-    expect(new Set(table.kinds)).toEqual(new Set([0]))
+    const drawn = looks.flatMap((look, at) => (look === null ? [] : [at * LOOK_VECTOR]))
+    expect(drawn.length).toBeGreaterThan(0)
+    expect(table.revealedSlots).toBe(drawn.length)
+    expect(drawn.every((at) => table.kinds[at] > 0)).toBe(true)
+    expect(new Set(drawn.map((at) => rarityLeadOfEntry(table.kinds[at + 3])))).toEqual(new Set([0]))
+    expect(new Set(table.seenLeads)).toEqual(new Set([NO_SEEN_LEAD]))
   })
 
-  it('shows a species only once the player has met it', () => {
+  it('shows the rarity of a species only once the player has met it', () => {
     const [met, unmet] = shownLooks()
     const state = readAuthorityState()
     const { playerId } = useGameStore.getState()

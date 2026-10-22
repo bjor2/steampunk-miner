@@ -58,10 +58,11 @@
  * a second, each at its own place, lighting the ore rather than covering it, in their own blue
  * rather than the act tint. With reduce motion one arc holds steady.
  *
- * An ore tile whose kind slot (`aKind`, ticket 450) the player has seen draws its species from the
- * look table (`terrainKindShader.ts`): its own silhouette, pattern and hue, and its rarity's tint,
- * frame and glow, in place of the family decal; its tier glow, sparkles and whisper rim stay. The
- * lite program has no kind slot and always draws the family decal.
+ * An ore tile whose kind slot (`aKind`, ticket 450) binds a species draws it from the look table
+ * (`terrainKindShader.ts`): its own silhouette, pattern and hue from the first frame, and once the
+ * player has met it its rarity's tint, frame and glow (ticket 698), in place of the family decal;
+ * its tier glow, sparkles and whisper rim stay. The lite program has no kind slot and always draws
+ * the family decal.
  */
 import { KIND_LOOK_UNIFORMS, kindLookFunctionsOf } from './terrainKindShader'
 
@@ -652,7 +653,7 @@ void main() {
     // The core: a slow emissive pulse rippling out from the centre.
     emissive += colour * 0.6 * (0.55 + 0.25 * sin(uTime * 1.7 - radius * 0.8));
   } else if (style > 0.5) {
-    // A seen species (ticket 450) draws its own look; anything else today's family decal.
+    // A species (ticket 450) draws its own look; anything else today's family decal.
     vec4 kind = vec4(0.0);
 #ifndef TERRAIN_LITE
     kind = kindLookOf(vKind);

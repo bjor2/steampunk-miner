@@ -27,8 +27,8 @@ export {
   planetSkinProblems,
   planetSkinsOf,
   seenSignatureSkinOf,
-  seenSkinOf,
   signatureSkinOf,
+  skinOfKindSlot,
   skinOfSpecies,
 } from './systems/mineralSkin'
 export type { SignatureMaterial } from './systems/signatureMaterial'

@@ -2,7 +2,7 @@
  * The debug API's read and switch of the ground's material looks (ticket 450): the look table the
  * terrain material was last given, as the shader reads it, and a presentation switch that shows
  * every kind as if the player had met it, for eye checks and the #526 frame A/B (a fresh save
- * shows none). State, never pixels; no command, no log line, not in the digest. It also reads the
+ * draws every skin but no rarity, ticket 698). State, never pixels; no command, no log line, not in the digest. It also reads the
  * per-act hero atlas (ticket 451): whether the probe gave it the 16th unit, the act resident, its
  * cells and how many binds there have been, so a spec sees a swap happen only at a change of act.
  */
@@ -18,7 +18,7 @@ import {
 import type { Rgb } from '../systems/render/colour'
 import type { DebugResult } from './debugScreens'
 
-/** One roster slot as the shader draws it; codes 0 draw the family look. */
+/** One roster slot as the shader draws it; codes 0 draw the family look, lead 0 no rarity. */
 export interface DrawnKindLook {
   slot: number
   silhouetteCode: number

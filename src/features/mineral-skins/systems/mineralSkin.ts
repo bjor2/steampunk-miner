@@ -1,9 +1,9 @@
 /**
  * The layered skin generator (#576, GD ruling 20 Oct 2026, ticket 591): a species' skin is the
  * four layers its skin row chooses, stacked base, vein, palette, sheen. A planet's skins follow its
- * roster slots through the species its pool binds there (ticket 542), and a player sees a skin only
- * once they have met the species under `material:<species id>` (ticket 546); until then the kind
- * keeps the family look, so nothing previews an unseen species. A planet's signature material, the
+ * roster slots through the species its pool binds there (ticket 542), and a species' skin shows
+ * from the first frame, met or not (GD ruling on #698, option 2): only its rarity overlay waits for
+ * the player to meet it, and the skin names no value. A planet's signature material, the
  * slotless 16th material (#453 E1), wears its planet's signature skin (ticket 603), seen once the
  * player has met its ore under `ore:<ore type id>`, so it is never previewed either. Look only: no
  * price, gate, income, generation or save reads it, and it changes no stored cell.
@@ -54,18 +54,6 @@ export function planetSkinsOf(
   return planetRosterOf(params).map((_, index) => skinOfKindSlot(params, index + 1, table))
 }
 
-/** The skin a cell's kind slot shows the player: null until they have met its species. */
-export function seenSkinOf(
-  state: AuthorityState,
-  playerId: string,
-  params: PlanetParams,
-  kindSlot: number,
-  table: SkinTable = MINERAL_SKINS,
-): MineralSkin | null {
-  const skin = skinOfKindSlot(params, kindSlot, table)
-  return skin !== null && hasMetSpecies(state, playerId, skin.speciesId) ? skin : null
-}
-
 /** The skin of the planet's signature material; null while no row skins it. */
 export function signatureSkinOf(
   params: PlanetParams,
@@ -101,17 +89,14 @@ export function planetSkinProblems(
   ])
 }
 
-function skinOfKindSlot(
+/** The skin of the species a cell's kind slot binds; null for no species or no skin row. */
+export function skinOfKindSlot(
   params: PlanetParams,
   kindSlot: number,
-  table: SkinTable,
+  table: SkinTable = MINERAL_SKINS,
 ): MineralSkin | null {
   const species = planetSpeciesOf(params, kindSlot)
   return species === null ? null : skinOfSpecies(species.id, table)
-}
-
-function hasMetSpecies(state: AuthorityState, playerId: string, speciesId: string): boolean {
-  return hasDiscovered(state, playerId, `material:${speciesId}`, NEVER_MET)
 }
 
 function hasMetOre(state: AuthorityState, playerId: string, oreTypeId: string): boolean {

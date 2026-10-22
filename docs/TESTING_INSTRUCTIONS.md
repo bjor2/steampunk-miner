@@ -385,7 +385,7 @@ programs }` from three's `renderer.info` of the game canvas), read only when cal
   `oreValue.test.ts` holds the chunk count and every bar on synthetic pools.
 - **Material looks** (ticket 450, TD shape on #450 6226270701 and the Scalers' conditions):
   `src/features/roster/kindLook.test.ts` holds the roster's look provider to its rules: a fresh
-  save shows no species (unseen kinds draw the family look), a species shows only once the
+  save draws every species' skin with no rarity (ticket 698), a species' rarity shows only once the
   discovery query says the player met it, every two kinds of one family differ in at least two of
   silhouette, pattern and hue, a species keeps one look on every band and planet, the rarity a
   cell draws is its tier offset over its band, each rarity draws a wider frame, a brighter tint and

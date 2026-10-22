@@ -11,15 +11,15 @@ import {
   planetSkinProblems,
   planetSkinsOf,
   seenSignatureSkinOf,
-  seenSkinOf,
   signatureSkinOf,
+  skinOfKindSlot,
   skinOfSpecies,
 } from './mineralSkin'
 import type { SkinTable } from './skinTable'
 
 // The layered skin generator of ticket 591 (#576): a skin stacks the four layers its species' row
-// chooses, a planet's skins follow its roster through its pool (ticket 542), and a player sees a
-// skin only once they have met the species (ticket 546). A planet's signature material wears its
+// chooses, a planet's skins follow its roster through its pool (ticket 542), and a species' skin
+// shows before the player has met it (ticket 698). A planet's signature material wears its
 // planet's signature skin, seen once its ore is met (ticket 603).
 
 const SEED = 83921
@@ -45,11 +45,6 @@ function tableOf(
 
 function signatureRow(planet: number, base = 'granular'): SignatureSkinRow {
   return { planet, base, vein: 'brass-thread', palette: 'umber', sheen: 'dull' }
-}
-
-/** A codex stand-in that has met exactly the listed species. */
-function metSlice(speciesIds: readonly string[]): SliceDefinition {
-  return metKeysSlice(speciesIds.map((id) => `material:${id}`))
 }
 
 /** A codex stand-in that has discovered exactly the listed keys. */
@@ -116,17 +111,12 @@ describe('mineral skin generator', () => {
     expect(planetSkinProblems(params, tableOf([skinRow(a), skinRow(b, 'glassy')]))).toEqual([])
   })
 
-  it('shows a skin only once the player has met its species', () => {
-    const [met, unmet] = [speciesIdAt(1, 1), speciesIdAt(1, 2)]
-    const table = tableOf([skinRow(met), skinRow(unmet, 'glassy')])
+  it("gives a cell's kind slot its species' skin before the player has met it (ticket 698)", () => {
+    const [first, second] = [speciesIdAt(1, 1), speciesIdAt(1, 2)]
+    const table = tableOf([skinRow(first), skinRow(second, 'glassy')])
     const params = freshPlanetParamsFor(SEED, 1)
-    const state = readAuthorityState()
-    const { playerId } = useGameStore.getState()
-    expect(seenSkinOf(state, playerId, params, 1, table)).toBeNull()
-    withRegistrations([metSlice([met])], () => {
-      expect(seenSkinOf(state, playerId, params, 1, table)?.speciesId).toBe(met)
-      expect(seenSkinOf(state, playerId, params, 2, table)).toBeNull()
-    })
+    expect(skinOfKindSlot(params, 1, table)?.speciesId).toBe(first)
+    expect(skinOfKindSlot(params, 2, table)?.speciesId).toBe(second)
   })
 
   it("dresses the planet's signature material in its planet's row", () => {

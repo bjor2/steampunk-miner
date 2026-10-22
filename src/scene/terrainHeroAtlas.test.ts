@@ -15,8 +15,8 @@ import { createTerrainMaterial } from './terrainMaterial'
 import { bindHeroAtlas, releaseHeroAtlas } from './terrainHeroAtlas'
 
 // The hero atlas's one writer (ticket 451): one atlas bound at a time, released before the next,
-// an atlas the GPU would hold as RGBA8 refused, and the look table drawing a seen hero from its
-// cell only while its atlas is bound.
+// an atlas the GPU would hold as RGBA8 refused, and the look table drawing a hero from its cell
+// only while its atlas is bound, seen or not (ticket 698).
 
 const SEED = 83921
 
@@ -110,9 +110,12 @@ describe('terrain hero atlas (ticket 451)', () => {
     expect(drawnHeroCells().filter((cell) => cell !== null)).toEqual([])
   })
 
-  it('draws no sprite for a hero the player has not seen, atlas or not (Horizontal Scaler a)', () => {
+  it('draws a hero the player has not seen from its sprite, with no rarity on it (ticket 698)', () => {
     bindHeroAtlas(material, compressedAtlas(), drawn)
     fitKindLooksToViewer(material, freshPlanetParamsFor(SEED, 1))
-    expect(drawnHeroCells()).toEqual([])
+    const read = readDrawnKindLooks()
+    const heroes = read.ok ? read.looks.shown.filter((look) => look.heroCell !== null) : []
+    expect(heroes.length).toBeGreaterThan(0)
+    expect(new Set(heroes.map((look) => look.rarityLead))).toEqual(new Set([0]))
   })
 })

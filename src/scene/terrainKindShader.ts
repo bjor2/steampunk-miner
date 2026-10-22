@@ -11,7 +11,7 @@
  * with reduce motion (the shake switch, `uGateStill`) the glow holds at its mean and the frame
  * stays still. The lite program (ticket 477) leaves all of it out and draws the family look.
  *
- * A seen hero whose sprite is in the resident act's atlas (ticket 451) draws that sprite instead,
+ * A hero whose sprite is in the resident act's atlas (ticket 451) draws that sprite instead,
  * upright on the planet, with the same rarity tint and glow and a frame just outside its mask.
  * The atlas takes the 16th unit only where the startup probe allows it (`TERRAIN_HERO_ATLAS`,
  * fixed when the material is made, so the program still compiles once); without it, or for a

@@ -6,10 +6,11 @@
  * cell's tier (id to price stays single-valued). Look only: horizontal, no price, gate or income
  * reads it.
  *
- * Seen (Horizontal Scaler's condition a on #450): a species shows once the player has met it,
- * asked through the kernel's discovery query under the key `material:<species id>`, which the
- * codex records the first time the player touches a cell of it (ticket 546); until then the kind
- * draws the family look. The debug API can show every kind for eye checks and the frame A/B.
+ * Seen (Horizontal Scaler's condition a on #450, split by the GD on #698): a species draws its
+ * skin from the first frame, and its rarity shows once the player has met it, asked through the
+ * kernel's discovery query under the key `material:<species id>`, which the codex records the
+ * first time the player touches a cell of it (ticket 546). The debug API can show every kind's
+ * rarity for eye checks and the frame A/B.
  *
  * Heroes (ticket 451): the atlas of the planet's act, from the materials slice, one object per
  * act, so the terrain swaps it only when a planet change crosses into another act.

@@ -1,7 +1,8 @@
 /**
  * The terrain material's look table (ticket 450, `terrainKindShader.ts`): the `kindLook`
- * provider's species looks for the planet's roster slots, with each slot the local player has not
- * seen left at the family look (Horizontal Scaler's condition a on #450), and the rarity tints.
+ * provider's species looks for the planet's roster slots, each drawn in its own skin from the
+ * first frame, with the rarity of a species the local player has not met left off (GD ruling on
+ * #698, option 2, which splits Horizontal Scaler's condition a on #450), and the rarity tints.
  * The ONLY writer of `uKindLooks` and `uRarityLooks`. It rewrites them only when the planet, the
  * player's slice sections (where sightings are kept), `codex.materialContact` (ticket 547), the resident hero atlas (ticket 451: a seen
  * hero with a cell there draws its sprite) or the debug show-all switch change, so a frame
@@ -39,7 +40,7 @@ export function createKindLookUniforms(): Record<string, IUniform> {
 interface FittedLooks {
   params: PlanetParams
   sightings: unknown
-  /** `codex.materialContact` (ticket 547): off, every species shows its family look. */
+  /** `codex.materialContact` (ticket 547): off, no species shows its rarity. */
   isContactShown: boolean
   heroCells: readonly string[]
   isEveryKindShown: boolean
@@ -101,12 +102,12 @@ function kindLookTableFor(
   return kindLookTableOf(
     provider.kindLooksOf(params),
     provider.rarityLooks(),
-    (look) => isShownTo(provider, state, playerId, look),
+    (look) => isRaritySeenBy(provider, state, playerId, look),
     heroCellsOf(heroAtlasPresence.cells),
   )
 }
 
-function isShownTo(
+function isRaritySeenBy(
   provider: KindLookProvider,
   state: AuthorityState,
   playerId: string,

@@ -7,11 +7,14 @@
  * A slot's entry is (silhouette code, pattern code, colour as 0xRRGGBB, rarity lead + 8 × (cell + 1)
  * for a hero drawn from the resident act's atlas, ticket 451). A hero whose sprite is not in the
  * resident atlas, or with no atlas at all, keeps the lead alone and draws the shader look. A slot
- * that binds no species, or one the player has not seen (Horizontal Scaler's
- * condition a), stays all zeros, which the shader draws as today's family look with no rarity
- * tint or frame. Rarity changes only the tint, frame and glow (entry per lead 1 to 4: tint as
- * 0xRRGGBB, glow, frame width in tiles, pulse share of the glow); common draws none. Look only:
- * no price, gate or income reads it.
+ * that binds no species stays all zeros, which the shader draws as today's family look.
+ *
+ * Every species draws its own skin from the first frame (GD ruling on #698, option 2, splitting
+ * Horizontal Scaler's condition a on #450): only its rarity waits for the player to meet it, so a
+ * slot not yet seen carries lead 0, which draws no tint, frame or glow, and the tile art under the
+ * overlay never changes on first contact. Rarity changes only the tint, frame and glow (entry per
+ * lead 1 to 4: tint as 0xRRGGBB, glow, frame width in tiles, pulse share of the glow); common
+ * draws none. Look only: no price, gate or income reads it.
  */
 import type { Rgb } from './colour'
 import { KIND_LOOKS, patternCodeOf, silhouetteCodeOf, type KindLookCatalogue } from './kindLooks'
@@ -61,13 +64,14 @@ export interface KindLookTable {
   /** How many slots draw a species. */
   revealedSlots: number
   /**
-   * By roster index (slot 1 first), the rarity lead of the species the slot shows, or
-   * `NO_SEEN_LEAD` where it shows none: what the hazard strip's scanner may name (ticket 454).
+   * By roster index (slot 1 first), the rarity lead of a species the player has seen, or
+   * `NO_SEEN_LEAD` where the slot binds none or the player has not met it: what the hazard strip's
+   * scanner may name (ticket 454).
    */
   seenLeads: Int8Array
 }
 
-/** A slot that shows no species, so its rarity stays unspecified. */
+/** A slot whose rarity the player may not see yet, so it stays unspecified. */
 export const NO_SEEN_LEAD = -1
 
 const CHANNEL_MAX = 255
@@ -86,23 +90,26 @@ export function emptyKindLookTable(): KindLookTable {
 export const NO_HERO_CELLS: ReadonlyMap<string, number> = new Map()
 
 /**
- * `looks` by roster index (slot 1 first), null where a slot binds no species; `isRevealed` says
- * whether the player may see a species' look yet; `heroCells` is the resident atlas's cell of
+ * `looks` by roster index (slot 1 first), null where a slot binds no species; `isRaritySeen` says
+ * whether the player may see a species' rarity yet; `heroCells` is the resident atlas's cell of
  * each species it holds (`heroAtlas.ts`).
  */
 export function kindLookTableOf(
   looks: readonly (KindLook | null)[],
   rarityLooks: readonly RarityLook[],
-  isRevealed: (look: KindLook) => boolean,
+  isRaritySeen: (look: KindLook) => boolean,
   heroCells: ReadonlyMap<string, number> = NO_HERO_CELLS,
   catalogue: KindLookCatalogue = KIND_LOOKS,
 ): KindLookTable {
   const table = emptyKindLookTable()
   looks.slice(0, KIND_LOOK_SLOTS).forEach((look, at) => {
-    if (look === null || !isRevealed(look)) return
-    const entry = kindEntryOf(look, heroCells.get(look.speciesId) ?? null, catalogue)
-    table.kinds.set(entry, at * LOOK_VECTOR)
-    table.seenLeads[at] = look.rarityLead
+    if (look === null) return
+    const drawn = isRaritySeen(look) ? look : withoutRarity(look)
+    table.kinds.set(
+      kindEntryOf(drawn, heroCells.get(look.speciesId) ?? null, catalogue),
+      at * LOOK_VECTOR,
+    )
+    table.seenLeads[at] = drawn === look ? look.rarityLead : NO_SEEN_LEAD
     table.revealedSlots++
   })
   rarityLooks.slice(0, RARITY_LOOK_LEADS).forEach((look, at) => {
@@ -129,6 +136,11 @@ export function kindEntryOf(
     packedRgbOf(look.colour),
     look.rarityLead + heroShareOf(look, heroCell),
   ]
+}
+
+/** The species' skin as drawn before the player has met it: lead 0, no tint, frame or glow. */
+function withoutRarity(look: KindLook): KindLook {
+  return { ...look, rarityLead: 0 }
 }
 
 function heroShareOf(look: KindLook, heroCell: number | null): number {

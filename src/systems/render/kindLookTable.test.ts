@@ -76,10 +76,11 @@ describe('material look table', () => {
     expect(heroCellOfEntry(rarity)).toBe(null)
   })
 
-  it('draws no sprite for a hero the player has not seen (Horizontal Scaler a, ticket 451)', () => {
+  it('draws a hero the player has not seen from its sprite, with no rarity on it (ticket 698)', () => {
     const cells = new Map([['probe-wires', 0]])
-    const table = kindLookTableOf([WIRES], [], () => false, cells)
-    expect(entryOf(table.kinds, 1)).toEqual([0, 0, 0, 0])
+    const [, , , rarity] = entryOf(kindLookTableOf([WIRES], [], () => false, cells).kinds, 1)
+    expect(heroCellOfEntry(rarity)).toBe(0)
+    expect(rarityLeadOfEntry(rarity)).toBe(0)
   })
 
   it('keeps the last of the 16 atlas cells and every rarity lead exact in one float', () => {
@@ -88,14 +89,30 @@ describe('material look table', () => {
     expect([rarityLeadOfEntry(rarity), heroCellOfEntry(rarity)]).toEqual([4, 15])
   })
 
-  it('leaves a slot with no species and a species not yet seen at zeros, the family look', () => {
+  it('leaves a slot with no species at zeros, the family look', () => {
     const table = kindLookTableOf([NUGGETS, null, WIRES], [RARE], (look) => look === WIRES)
-    expect(entryOf(table.kinds, 1)).toEqual([0, 0, 0, 0])
     expect(entryOf(table.kinds, 2)).toEqual([0, 0, 0, 0])
-    expect(table.revealedSlots).toBe(1)
+    expect(table.revealedSlots).toBe(2)
   })
 
-  it('keeps the rarity lead of each slot it shows, and none for one it hides (ticket 454)', () => {
+  it('draws a species not yet seen with its own skin and no rarity (ticket 698)', () => {
+    const table = kindLookTableOf([WIRES], [RARE], () => false)
+    expect(entryOf(table.kinds, 1)).toEqual([
+      silhouetteCodeOf('wires'),
+      patternCodeOf('veined'),
+      packedRgbOf([0.2, 0.4, 0.6]),
+      0,
+    ])
+  })
+
+  it('changes only the rarity of a slot when the player meets its species (ticket 698)', () => {
+    const unseen = entryOf(kindLookTableOf([WIRES], [RARE], () => false).kinds, 1)
+    const seen = entryOf(kindLookTableOf([WIRES], [RARE], () => true).kinds, 1)
+    expect(seen.slice(0, 3)).toEqual(unseen.slice(0, 3))
+    expect([rarityLeadOfEntry(unseen[3]), rarityLeadOfEntry(seen[3])]).toEqual([0, 2])
+  })
+
+  it('keeps the rarity lead of each seen slot, and none for one not seen (ticket 454)', () => {
     const table = kindLookTableOf([NUGGETS, null, WIRES], [RARE], (look) => look === WIRES)
     expect(Array.from(table.seenLeads.subarray(0, 3))).toEqual([NO_SEEN_LEAD, NO_SEEN_LEAD, 2])
   })
