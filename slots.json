@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-10-22T23:19:39+02:00",
+  "updated_at": "2026-10-22T23:20:25+02:00",
   "caps": {
     "grok": 12,
     "claude": 10,
@@ -85,17 +85,16 @@
           "ticket": null,
           "grok_slot": null,
           "kind": "aux",
-          "since": null,
+          "since": "2026-10-22T23:19:00+02:00",
           "label": "wave-plan 647"
         },
         {
           "slot": "C8",
-          "state": "busy",
+          "state": "free",
           "ticket": null,
           "grok_slot": null,
-          "kind": "aux",
-          "since": "2026-10-22T23:17:00+02:00",
-          "label": "wave-plan 308"
+          "kind": null,
+          "since": null
         },
         {
           "slot": "C9",
@@ -115,8 +114,8 @@
         }
       ],
       "size": 4,
-      "used": 2,
-      "free": 2,
+      "used": 1,
+      "free": 3,
       "claims_last_hour": 6,
       "name": "Claude Max 2"
     }
@@ -293,19 +292,17 @@
       "state": "busy",
       "ticket": null,
       "grok_slot": null,
-      "since": null,
+      "since": "2026-10-22T23:19:00+02:00",
       "kind": "aux",
       "label": "wave-plan 647",
       "account": 2
     },
     {
       "slot": 8,
-      "state": "busy",
+      "state": "free",
       "ticket": null,
       "grok_slot": null,
-      "since": "2026-10-22T23:17:00+02:00",
-      "kind": "aux",
-      "label": "wave-plan 308",
+      "since": null,
       "account": 2
     },
     {
@@ -326,7 +323,7 @@
     }
   ],
   "last_refill": {
-    "at": "2026-10-22 23:19 CEST",
+    "at": "2026-10-22 23:20 CEST",
     "mode": "refill-dev",
     "triggers": "claude-run:wave-plan",
     "started": "",
@@ -344,8 +341,8 @@
     "claude": {
       "size": 10,
       "enabled": 4,
-      "used": 2,
-      "free": 2,
+      "used": 1,
+      "free": 3,
       "external": 0
     }
   },
