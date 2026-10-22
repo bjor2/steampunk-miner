@@ -1054,6 +1054,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/input/padFrame.test.ts` | 7 | 7 |
 | `src/systems/input/preferences.test.ts` | 24 | 24 |
 | `src/systems/input/promptLabel.test.ts` | 8 | 8 |
+| `src/systems/input/toolSlots.test.ts` | 8 | 8 |
 | `src/systems/input/touchBindings.test.ts` | 16 | 16 |
 | `src/systems/input/touchControls.test.ts` | 26 | 19 |
 
@@ -1573,8 +1574,9 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/ui/screens/sliceScreen.test.ts` | 8 | 8 |
 | `src/ui/sheet/baseSheet.test.ts` | 13 | 13 |
 | `src/ui/sheets/exactAmountSheet.test.ts` | 3 | 3 |
+| `src/ui/toolSlots/toolSlotRegistry.test.ts` | 10 | 10 |
 | `src/ui/touch/touchBindingTiles.test.ts` | 11 | 11 |
-| `src/ui/touch/touchCoverage.test.ts` | 10 | 5 |
+| `src/ui/touch/touchCoverage.test.ts` | 10 | 6 |
 | `src/ui/touch/touchFunnel.test.ts` | 1 | 1 |
 | `src/ui/touch/warningHaptics.test.ts` | 2 | 2 |
 | `src/ui/uiBudget.test.ts` | 3 | 3 |
@@ -1688,6 +1690,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/views/slotSummaryLine.test.ts` | 8 | 8 |
 | `src/systems/views/titleMenuModel.test.ts` | 8 | 8 |
 | `src/systems/views/titleOnlyText.test.ts` | 5 | 5 |
+| `src/systems/views/toolSlotBar.test.ts` | 10 | 10 |
 | `src/systems/views/tooltipOpening.test.ts` | 9 | 9 |
 | `src/systems/views/uiBudgetRatchet.test.ts` | 8 | 8 |
 | `src/systems/views/uiBudgetReading.test.ts` | 9 | 9 |

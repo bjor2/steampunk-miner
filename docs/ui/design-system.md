@@ -220,11 +220,43 @@ controls are left out, as above. The reserved layout is the budget the rebuild f
 row, all read from `hudStripOf` (`systems/views/hudStrip.ts`). `EdgeGauge` is the `edge-gauge` box.
 The gear button is the `gear` box at the slot cell's size (44 px on a phone, under the kit's
 coarse 56 px `--control-min`, so it fits between the band's foot and the touch cluster at
-360x640, the cluster's foot moved to the layout margin there); it opens `HudDetail`, a plate that
+360x640, the cluster's foot moved to the layout margin there; the tool slot bar's last cell since
+#691); it opens `HudDetail`, a plate that
 is a mode, not a box, with every exact value and word the panels showed, their ids unchanged. The
 "DEBUG RUN" mark labels a debug run, not the player's HUD, and carries no box. Measured headless
 with the #682 report (debug build, after undocking): **11.58% at 360x640** on the pad with the dock
 prompt up, 8.32% two tiles down, nothing in the band; **4.79% at 1280x800**.
+
+**The tool slot bar as built** (#691; the G&V, GD and Producer rulings on #691). The bar is the
+kernel's `ToolSlotBar` (`ui/toolSlots/`), a grid of `--slot-columns` cells of `--slot-cell` whose
+last cell is the gear button. Its tools are **rows** of the `toolSlots` registry
+(`ui/registries/toolSlots.ts`, rules in `systems/input/toolSlots.ts`): a touch binding (#474) with a
+fixed bar **position**, a pure `faceOf(state, player)` (icon, cooldown share, charges, on, acting;
+null hides the cell) and an optional cell for a press that is more than a tap. Positions: the
+loadout's power-up slots 1-5 at 1-5 and the drill sockets at 6-7 (`power-up-core`, so the Fit order
+is the bar order), the bore gun at 8 (`ground-gun`), and the kernel's Plant charge (9), charge size
+step (10) and guns toggle (11), which left the touch cluster. A new tool adds a row; the seal refuses
+a row at a position up to 8 whose `Digit<n>` does not press its action, and a position two rows
+share. Layout (`toolBarLayoutOf`, `systems/views/toolSlotBar.ts`): on a phone the first 4 shown
+tools by position fill the thumb cells; on desktop cell n always holds position n, so `Digit1-8`
+press cells 1-8 (`Digit6/7/8` are second keys beside F, C and the fire keys). Tools past the cells
+wait behind the **overflow cell**, which turns the cells through the tray a page at a time and back,
+in place, so an open tray never leaves the reserved box. With no tool shown only the gear draws (#173
+acceptance 3). Each cell (`ToolCell`) is an icon and a cooldown ring of `--slot-cooldown-ring`,
+never text, drawn from the face each refresh with no minimum; a tool with more than one charge adds
+the count through the shared formatter (#681). The charge size Plant charge plants rides its cell
+read-only (#473); the tap that steps it is its own cell, so every target keeps 44 px. The bore gun's
+auto lamp (GD 3b on #314) rides its cell's corner. Placement: held upright on a phone the bar stands
+right-aligned on the touch cluster's one row, `--tool-bar-over-cluster-gap` (16 px) above it, so at
+360x640 it is x 212-352, y 452-544 over the row at 560-632; held sideways it is one row left of
+Interact, the cluster stacked into one column; on desktop it is one row at the bottom right, lifted
+over the cluster while the touch controls show (two rows of five on a tablet held upright). The
+slices' bottom-right gauge panels stand on the bar there (`Hud.module.css` `.gaugePanels`). A
+640 px screen under a 34 px home bar has no room for the band, the bar and the cluster's row
+together, so the band rule holds bare at 360x640 and with insets on the taller phones
+(`hudCoverageBudget.test.ts`). Measured headless with every tool owned: the bar's cells and the gear
+are 6 boxes (11,616 px², 5.04% at 360x640), inside the 12,880 px² reserved for them; at 1280x800 the
+5 slots, the bore gun, the overflow cell and the gear add 1.8%.
 
 **In CSS** (#682): every token a style sheet can use is a custom property in
 `src/ui/kit/tokens.css` (named by `designTokenCss.ts`, held to the JSON by
@@ -249,9 +281,9 @@ A planet's skin is written on the root on every arrival (`ui/stage/planetSkin.ts
 |                      v                    ||
 |                                           ||
 |                                            | 448    middle band bottom (70%)
-|  . . . . . . . .                           |
-|  .  stick zone .                 [1][2][3] | 540    slot bar 140x92, 3x2 cells of 44 px
-|  . (draws none).                 [4][+][*] |        4 slots, overflow tray, gear button
+|  . . . . . . . .                 [1][2][3] | 452    slot bar 140x92, 3x2 cells of 44 px
+|  .  stick zone .                 [4][+][*] | 544    4 slots, overflow tray, gear button
+|  . (draws none).          [R]  [Q] [ (I) ] | 560    touch cluster: rescue, quick service, Interact
 |  . . . . . . . .                           | 632    8 px margin, then safe-bottom
 +--------------------------------------------+ 640
 ```
@@ -304,8 +336,8 @@ listed with the ticket that builds them. Every class lives in a CSS Module besid
 | scroll area   | the one steampunk scroll area (`kit/ScrollArea.tsx`): brass rail, riveted thumb, edge fades                                                                                | materials.brass, motion.durationsMs                    | exists  |
 | tooltip       | the brass plate (`kit/Tooltip.tsx`), hover 200 ms, focus, long-press; desktop's hover detail                                                                               | framePx.double, type.body                              | exists  |
 | plaque, panel | `kit/Plaque.tsx`, `kit/Panel.tsx`: riveted double frame and the plain panel; keep their look, take the tokens                                                              | framePx, radiusPx.panel                                | exists  |
-| tool slot     | a 44/48 px cell: icon and a cooldown ring (`cooldownRingPx`), never text; number-key hotkeys on desktop                                                                    | layout.toolSlots, colour.accent                        | #691    |
-| overflow tray | the phone's fifth cell: opens the rest of the owned tools as a row of slots in the thumb zone                                                                              | layout.toolSlots                                       | #691    |
+| tool slot     | a 44/48 px cell: icon and a cooldown ring (`cooldownRingPx`), never text; a charges count past one; number-key hotkeys on desktop                                          | layout.toolSlots, colour.accent                        | #691    |
+| overflow tray | the cell after the slots (phone and desktop): turns the cells to the rest of the owned tools, a page at a time, and back                                                   | layout.toolSlots                                       | #691    |
 | gear button   | the one control that opens the strip's detail (exact values, words); in the thumb zone, never the top keep-out                                                             | layout.tapTargetMinPx                                  | #684    |
 | hint chip     | #500's chip, unchanged: one line, 8% of height at most, queued when the clear view would fall                                                                              | existing constants                                     | exists  |
 
