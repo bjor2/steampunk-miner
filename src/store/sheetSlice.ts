@@ -55,6 +55,11 @@ export interface SheetActions {
    * bay's menu also leaves the bay (ticket 734).
    */
   closeSheet(): void
+  /**
+   * Shuts the sheet where it stands, as `closeSheet` does but never leaving the bay: the debug
+   * API's switch, which sends no command (ticket 734).
+   */
+  shutSheetInPlace(): void
   /** The dock ended: the bay's menu shuts with it, sending nothing; any other sheet stays. */
   shutBayMenuSheet(): void
   /**
@@ -118,7 +123,8 @@ export function sheetActionsOf(set: SetSlice, get: () => SliceHost): SheetAction
       openSheetOn(set, get(), tabId)
       set({ isSheetTheBayMenu: true })
     },
-    closeSheet: () => closeShownSheet(set, get()),
+    closeSheet: () => closeSheetAndBayMenu(set, get()),
+    shutSheetInPlace: () => shutShownSheet(set, get()),
     shutBayMenuSheet: () => {
       if (get().isSheetTheBayMenu) set(STARTING_SHEET)
     },
@@ -156,11 +162,17 @@ function openSheetOn(set: SetSlice, host: SliceHost, tabId: unknown): void {
   else showTab(set, host, tabId as string)
 }
 
-/** The Ledger steps back in the pause menu; any other tab shuts, and the bay's menu leaves the bay. */
-function closeShownSheet(set: SetSlice, host: SliceHost): void {
-  if (isLedgerShown(host)) return host.closeSaveSlots()
-  set(STARTING_SHEET)
-  if (host.isSheetTheBayMenu) host.undock()
+/** The bay's menu leaves the bay with its close; the Ledger over it only steps back. */
+function closeSheetAndBayMenu(set: SetSlice, host: SliceHost): void {
+  const isLeavingTheBay = host.isSheetTheBayMenu && !isLedgerShown(host)
+  shutShownSheet(set, host)
+  if (isLeavingTheBay) host.undock()
+}
+
+/** The Ledger steps back to the pause menu's first page; any other tab shuts. */
+function shutShownSheet(set: SetSlice, host: SliceHost): void {
+  if (isLedgerShown(host)) host.closeSaveSlots()
+  else set(STARTING_SHEET)
 }
 
 /** Leaving the Ledger for another tab leaves the pause menu, so the world runs again. */

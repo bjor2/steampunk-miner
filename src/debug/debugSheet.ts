@@ -22,6 +22,8 @@ export interface SheetReading {
   revealedCardId: string | null
   /** A full sheet is out of the way for the unlock reveal (ticket 718), its tab kept. */
   isSteppedAside: boolean
+  /** The dock opened it as the bay's one menu, so the player's close leaves the bay (ticket 734). */
+  isBayMenu: boolean
 }
 
 export function openSheetUnlessRefused(tabId: unknown): DebugResult {
@@ -32,7 +34,7 @@ export function openSheetUnlessRefused(tabId: unknown): DebugResult {
 }
 
 export function closeSheetNow(): DebugResult {
-  useGameStore.getState().closeSheet()
+  useGameStore.getState().shutSheetInPlace()
   return { ok: true }
 }
 
@@ -46,6 +48,7 @@ export function sheetNow(): DebugResult<{ sheet: SheetReading }> {
       placement: placementNow(),
       revealedCardId: game.revealedSheetCardId,
       isSteppedAside: game.isSheetSteppedAside,
+      isBayMenu: game.isSheetTheBayMenu,
     },
   }
 }

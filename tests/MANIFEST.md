@@ -983,7 +983,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/debug/debugOverlay.test.ts` | 2 | 2 |
 | `src/debug/debugSaves.test.ts` | 5 | 5 |
 | `src/debug/debugScreens.test.ts` | 34 | 33 |
-| `src/debug/debugSheet.test.ts` | 3 | 3 |
+| `src/debug/debugSheet.test.ts` | 4 | 4 |
 | `src/debug/debugWarnings.test.ts` | 3 | 3 |
 | `src/debug/sliceDebugCommands.test.ts` | 3 | 3 |
 
@@ -1447,6 +1447,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/store/artefactChoice.test.ts` | 5 | 5 |
 | `src/store/authorityReads.test.ts` | 3 | 3 |
 | `src/store/bayEntryPress.test.ts` | 2 | 2 |
+| `src/store/bayMenuSheet.test.ts` | 8 | 8 |
 | `src/store/carveCompleteBroadcast.test.ts` | 3 | 3 |
 | `src/store/checkpoint.test.ts` | 23 | 23 |
 | `src/store/devFlagOverrides.test.ts` | 15 | 15 |

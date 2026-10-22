@@ -78,6 +78,13 @@ describe('bay menu sheet', () => {
     expect(readDockedBay()).toBeNull()
   })
 
+  it('shuts in place on the debug switch, the bay still docked', () => {
+    dockAtTheUpgradeBay()
+    game().shutSheetInPlace()
+    expect(game().openSheetTabId).toBeNull()
+    expect(readDockedBay()).toBe('upgrade')
+  })
+
   it('closes a sheet opened from a bay’s button back to that bay', () => {
     game().teleportToDock('sell')
     game().openSheet(KERNEL_SHEET_TAB_IDS.hold)

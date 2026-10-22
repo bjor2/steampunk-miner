@@ -1,7 +1,8 @@
 /**
  * The Workshop showcase (#177, spec #180) with what it sells on the Outfitter (spec #678, ticket
  * 687): read through `steampunkDebug`, the authority snapshot and the bay's #33 buy ids, never
- * pixels. Docking opens the base sheet on the Outfitter, beside the car on desktop; a click on a
+ * pixels. Docking opens the base sheet on the Outfitter, beside the car on desktop, as the bay's
+ * one menu: one Escape shuts it and leaves the bay (ticket 734); a click on a
  * card buys exactly one step; a card the wallet is short for is greyed and buys nothing;
  * `holdBuy` still runs a 10-step chain across a big level-up and a hold stops on can't afford with
  * its cue; and the preview's second WebGL context never mounts. On touch a card's first tap shows
@@ -63,6 +64,14 @@ function openSheetTabOf(page: Page): Promise<string | null> {
   })
 }
 
+function pauseMenuOf(page: Page): Promise<unknown> {
+  return page.evaluate(() => {
+    const result = window.steampunkDebug!.ui.getPauseMenuModel()
+    if (!result.ok) throw new Error(result.problems.join('; '))
+    return result.model
+  })
+}
+
 function previewPanelHeight(page: Page): Promise<number> {
   return page.evaluate(() => {
     const result = window.steampunkDebug!.ui.getBayPresentation()
@@ -118,13 +127,29 @@ test.describe('workshop showcase (#177) and its Outfitter (ticket 687)', () => {
     expect(errors).toEqual([])
   })
 
-  test('Escape shuts the sheet over the dock, and the bay’s button opens it again', async ({
+  test('one Escape shuts the Outfitter and leaves the bay, the sheet being its one menu (ticket 734)', async ({
     page,
   }) => {
     test.setTimeout(180_000)
     const errors = await openAtTheShowcase(page)
     await page.evaluate(() => window.steampunkDebug!.input.tap('ui_cancel'))
     await expect.poll(() => openSheetTabOf(page)).toBeNull()
+    await expect(page.locator(SHOWCASE)).toHaveCount(0, { timeout: 30_000 })
+    expect(errors).toEqual([])
+  })
+
+  test('the bay’s button opens the Outfitter again once the Ledger took the sheet', async ({
+    page,
+  }) => {
+    test.setTimeout(180_000)
+    const errors = await openAtTheShowcase(page)
+    await page.evaluate(() => window.steampunkDebug!.ui.openSheet('ledger'))
+    await expect.poll(() => openSheetTabOf(page)).toBe('ledger')
+    // The save page steps back to the pause menu's first page, which closes (ticket 688).
+    await page.evaluate(() => window.steampunkDebug!.input.tap('ui_cancel'))
+    await page.evaluate(() => window.steampunkDebug!.input.tap('ui_cancel'))
+    await expect.poll(() => pauseMenuOf(page)).toBeNull()
+    expect(await openSheetTabOf(page)).toBeNull()
     await expect(page.locator(SHOWCASE)).toBeVisible()
     await page.getByTestId(WORKSHOP_TEST_IDS.openOutfitter).click()
     await expect.poll(() => openSheetTabOf(page)).toBe(OUTFITTER_TAB_ID)

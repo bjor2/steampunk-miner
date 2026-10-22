@@ -79,7 +79,7 @@ test.describe('bay screens (#62)', () => {
     expect(errors).toEqual([])
   })
 
-  test('opens the Upgrade bay behind the brass shutter, its Outfitter on the sheet, and closes both on Back', async ({
+  test('opens the Upgrade bay behind the brass shutter, its Outfitter on the sheet, and closes both on one Back', async ({
     page,
   }) => {
     const errors = await openAtUpgradeBay(page)
@@ -89,11 +89,9 @@ test.describe('bay screens (#62)', () => {
       transition: { kind: 'shutter', seconds: 0.25 },
     })
     expect(await openSheetTabOf(page)).toBe('workshop.outfitter')
-    // Back shuts the sheet first (ticket 687), then undocks.
+    // The sheet the dock opened is the bay's one menu (ticket 734): one Back shuts it and undocks.
     await page.evaluate(() => window.steampunkDebug!.input.tap('ui_cancel'))
     await expect.poll(() => openSheetTabOf(page)).toBeNull()
-    expect((await presentation(page)).shutter.phase).toBe('open')
-    await page.evaluate(() => window.steampunkDebug!.input.tap('ui_cancel'))
     await expect.poll(async () => (await presentation(page)).shutter.phase).toBe('closed')
     expect(errors).toEqual([])
   })

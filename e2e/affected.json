@@ -843,6 +843,22 @@
       ]
     },
     {
+      "why": "One menu per building (ticket 734): the sheet a dock opens is that bay's one menu, closed once, with no bay frame hidden behind a phone's full sheet. The sheet slice, the bay screen's shutter, the workshop's dock hook and the debug sheet reads reach it.",
+      "paths": [
+        "src/store/sheetSlice.ts",
+        "src/debug/debugSheet.ts",
+        "src/ui/platform/PlatformScreen.tsx",
+        "src/ui/platform/BayShutter.module.css",
+        "src/features/workshop/ui/useOutfitterWhileDocked.ts",
+        "src/systems/input/inputRouting.ts"
+      ],
+      "specs": [
+        "e2e/browser/ui/bayMenu.spec.ts",
+        "e2e/browser/workshop.spec.ts",
+        "e2e/browser/shops.spec.ts"
+      ]
+    },
+    {
       "why": "The Outfitter and the Patent Office on the base sheet (ticket 687): the Upgrade bay's and the tree's cards with gain text and greyed prices, docking opening the sheet, the sheet walking the docked bay's menu, the rig look's fitting on a track card.",
       "paths": [
         "src/systems/views/outfitterCards.ts",

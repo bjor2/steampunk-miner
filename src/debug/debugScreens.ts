@@ -166,7 +166,11 @@ export interface DebugUi {
   getHudCoverage(): DebugResult<{ report: HudCoverageReport }>
   /** Opens the base sheet on a registered tab (ticket 686); refused for an id no slice registered. */
   openSheet(tabId: unknown): DebugResult
-  /** Closes the base sheet, as its Close or `input.tap('ui_cancel')` does. */
+  /**
+   * Shuts the base sheet where it stands, the bay it is open over still docked (ticket 734): the
+   * player's close, the sheet's Close or `input.tap('ui_cancel')`, also leaves a bay whose dock
+   * opened the sheet as its one menu.
+   */
   closeSheet(): DebugResult
   /** The base sheet's open tab, the tabs it shows, its placement and the revealed card. */
   getSheet(): DebugResult<{ sheet: SheetReading }>

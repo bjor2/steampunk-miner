@@ -4,7 +4,7 @@ import { createMemorySink, type MemorySink } from '../logging/eventSink'
 import { createRunLog, installRunLog, uninstallRunLog } from '../logging/runLog'
 import { withRegistrations } from '../registries/registrar'
 import type { SliceDefinition } from '../registries/sliceDefinition'
-import { resetGameStore, takeSessionSnapshot } from '../store/gameStore'
+import { resetGameStore, takeSessionSnapshot, useGameStore } from '../store/gameStore'
 import { createDebugApi } from './debugApi'
 
 // Ticket 686: the base sheet is opened, closed and read through the debug API like any tab opener;
@@ -68,5 +68,18 @@ describe('debug api: base sheet (ticket 686)', () => {
     })
     expect(takeSessionSnapshot()).toEqual(before)
     expect([sink.events.length, sink.commands.length]).toEqual(logged)
+  })
+
+  it('shuts the bay’s menu in place, the bay still docked and nothing sent (ticket 734)', () => {
+    useGameStore.getState().teleportToDock('upgrade')
+    useGameStore.getState().openSheetAsBayMenu('hold')
+    const opened = ui().getSheet()
+    expect(opened.ok && opened.sheet.isBayMenu).toBe(true)
+    const commands = sink.commands.length
+    expect(ui().closeSheet()).toEqual({ ok: true })
+    const shut = ui().getSheet()
+    expect(shut.ok && [shut.sheet.openTabId, shut.sheet.isBayMenu]).toEqual([null, false])
+    expect(useGameStore.getState().vehicle.mode).toBe('docked')
+    expect(sink.commands.length).toBe(commands)
   })
 })
