@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-10-22T23:15:35+02:00",
+  "updated_at": "2026-10-22T23:19:39+02:00",
   "caps": {
     "grok": 12,
     "claude": 10,
@@ -81,19 +81,21 @@
       "slots": [
         {
           "slot": "C7",
-          "state": "free",
+          "state": "busy",
           "ticket": null,
           "grok_slot": null,
-          "kind": null,
-          "since": null
+          "kind": "aux",
+          "since": null,
+          "label": "wave-plan 647"
         },
         {
           "slot": "C8",
-          "state": "free",
+          "state": "busy",
           "ticket": null,
           "grok_slot": null,
-          "kind": null,
-          "since": null
+          "kind": "aux",
+          "since": "2026-10-22T23:17:00+02:00",
+          "label": "wave-plan 308"
         },
         {
           "slot": "C9",
@@ -113,9 +115,9 @@
         }
       ],
       "size": 4,
-      "used": 0,
-      "free": 4,
-      "claims_last_hour": 4,
+      "used": 2,
+      "free": 2,
+      "claims_last_hour": 6,
       "name": "Claude Max 2"
     }
   ],
@@ -288,18 +290,22 @@
     },
     {
       "slot": 7,
-      "state": "free",
+      "state": "busy",
       "ticket": null,
       "grok_slot": null,
       "since": null,
+      "kind": "aux",
+      "label": "wave-plan 647",
       "account": 2
     },
     {
       "slot": 8,
-      "state": "free",
+      "state": "busy",
       "ticket": null,
       "grok_slot": null,
-      "since": null,
+      "since": "2026-10-22T23:17:00+02:00",
+      "kind": "aux",
+      "label": "wave-plan 308",
       "account": 2
     },
     {
@@ -320,9 +326,9 @@
     }
   ],
   "last_refill": {
-    "at": "2026-10-22 23:01 CEST",
+    "at": "2026-10-22 23:19 CEST",
     "mode": "refill-dev",
-    "triggers": "#717",
+    "triggers": "claude-run:wave-plan",
     "started": "",
     "note": "no pickable build ticket"
   },
@@ -338,8 +344,8 @@
     "claude": {
       "size": 10,
       "enabled": 4,
-      "used": 0,
-      "free": 4,
+      "used": 2,
+      "free": 2,
       "external": 0
     }
   },
@@ -453,19 +459,14 @@
       },
       {
         "number": 438,
-        "key": "302-10D",
+        "key": "302-11A",
         "map": 302,
         "lane": "hitl",
         "mode": "bench",
         "state": "bench",
         "tickets": [
-          304,
-          305,
-          306,
-          307,
           308,
           417,
-          470,
           501
         ],
         "done": [],
