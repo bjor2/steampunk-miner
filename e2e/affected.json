@@ -903,6 +903,20 @@
         "e2e/browser/materialLooks.spec.ts",
         "e2e/browser/renderQuality.spec.ts"
       ]
+    },
+    {
+      "why": "The first-contact rarity flourish (ticket 698): the store's reveal broadcast, the terrain's reveal uniform and its shader, the reveal timing, and the debug look read the spec holds across the first cut.",
+      "paths": [
+        "src/store/speciesRevealBroadcast.ts",
+        "src/constants/speciesReveal.ts",
+        "src/scene/terrainRarityReveal.ts",
+        "src/scene/speciesRevealPresence.ts",
+        "src/scene/terrainKindShader.ts",
+        "src/scene/terrainMaterial.ts",
+        "src/scene/PlanetTerrain.tsx",
+        "src/debug/debugKindLooks.ts"
+      ],
+      "specs": ["e2e/browser/firstCutSkins.spec.ts"]
     }
   ]
 }
