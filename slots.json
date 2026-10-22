@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-10-22T21:02:12+02:00",
+  "updated_at": "2026-10-22T21:02:56+02:00",
   "caps": {
     "grok": 12,
     "claude": 10,
@@ -108,17 +108,18 @@
         },
         {
           "slot": "C10",
-          "state": "free",
-          "ticket": null,
-          "grok_slot": null,
-          "kind": null,
-          "since": null
+          "state": "busy",
+          "ticket": 723,
+          "grok_slot": 4,
+          "kind": "dev",
+          "since": "2026-10-22T21:02:00+02:00",
+          "wave": "647-3B"
         }
       ],
       "size": 4,
-      "used": 3,
-      "free": 1,
-      "claims_last_hour": 3,
+      "used": 4,
+      "free": 0,
+      "claims_last_hour": 4,
       "name": "Claude Max 2"
     }
   ],
@@ -168,9 +169,11 @@
     },
     {
       "slot": 4,
-      "state": "free",
-      "ticket": null,
-      "since": null
+      "state": "dev",
+      "ticket": 723,
+      "since": "2026-10-22T21:02:00+02:00",
+      "claude_slot": 10,
+      "wave": "647-3B"
     },
     {
       "slot": 5,
@@ -305,25 +308,26 @@
     },
     {
       "slot": 10,
-      "state": "free",
-      "ticket": null,
-      "grok_slot": null,
-      "since": null,
-      "account": 2
+      "state": "busy",
+      "ticket": 723,
+      "grok_slot": 4,
+      "since": "2026-10-22T21:02:00+02:00",
+      "account": 2,
+      "wave": "647-3B"
     }
   ],
   "last_refill": {
-    "at": "2026-10-22 21:00 CEST",
+    "at": "2026-10-22 21:02 CEST",
     "mode": "refill-dev",
-    "triggers": "#718",
-    "started": "#719->C9/A2",
+    "triggers": "claude-run:tester-triage",
+    "started": "#723->C10/A2",
     "note": "spawned 1 worker(s)"
   },
   "totals": {
     "grok": {
       "size": 12,
-      "used": 3,
-      "dev": 3,
+      "used": 4,
+      "dev": 4,
       "dev_cap": 8,
       "planner": 0,
       "planner_cap": 4
@@ -331,8 +335,8 @@
     "claude": {
       "size": 10,
       "enabled": 4,
-      "used": 3,
-      "free": 1,
+      "used": 4,
+      "free": 0,
       "external": 0
     }
   },
@@ -379,7 +383,7 @@
           724
         ],
         "done": [],
-        "live": 1
+        "live": 2
       },
       {
         "number": 721,
