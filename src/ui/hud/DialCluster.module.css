@@ -43,7 +43,8 @@
   pointer-events: auto;
 }
 
-.cell > * {
+/* The shared element's row gap would sit after the out-of-sight title: none here. */
+.cell > [data-ui-text][data-layout] {
   flex-wrap: nowrap;
   gap: 0;
 }
@@ -228,7 +229,7 @@
   flex: none;
 }
 
-.overflow > * {
+.overflow > [data-ui-text][data-layout] {
   flex-wrap: nowrap;
   gap: 0;
 }
