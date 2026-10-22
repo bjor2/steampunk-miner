@@ -189,8 +189,9 @@ temper colours of its oxide skin into the cyan body, the way alexandrite's runs 
 ## Batch p2-b3: P2's species 10 to 12 (ticket 597)
 
 The foothold-p2 pool's three rares, kind slots 10 to 12 on P2 under ore rules 6. The pool binds the
-12 legacy slots, so P2 has no slots 13 to 15, and this batch closes the planet: every kind slot of P2
-wears a skin of its own. The layers come from the species row, as for p2-b1. No layer is shared
+12 legacy slots, so under ore rules 6 to 8 P2 has no slots 13 to 15, and this batch closed the
+planet: every kind slot of P2 wears a skin of its own (ore rules 9 added the pool's own slots 13
+to 15, which p2-b4 skins). The layers come from the species row, as for p2-b1. No layer is shared
 within the batch or with any other batch.
 
 <!-- p2-b3 -->
@@ -219,6 +220,47 @@ within the batch or with any other batch.
   corner, pinfire between); adamant glints (the trigon rims and hard sparks, the smoke itself dull).
   Colour play and adamant glints read their bases' patches and trigons through the same seeds.
 - **Seeds 901 to 925**, apart from p2-b1's 701 to 792, p2-b2's 801 to 835 and every other batch's.
+
+## Batch p2-b4: P2's species 13 to 15 (ticket 710)
+
+The foothold-p2 pool's own kinds of ticket 709, kind slots 13 to 15 on a P2 under ore rules 9:
+its fifth uncommon on metal and its fourth and fifth rares on crystal, in bands 4 and 5 (P1 and a
+P2 entered under earlier rules never draw them). The layers come from the species row, as for
+p2-b1. No layer is shared within the batch or with any other batch, and a vein and its sheen share
+one layout (`TABLET_CLUMPS`, `CROSSED_PRISMS`, `TEARDROPS` in `layer_art.py`), so the light sits
+on the stone. With this batch every kind slot of a fresh P2, 15 of them, wears a skin of its own.
+
+<!-- p2-b4 -->
+
+| slot | species | base                | vein             | palette (shadow, body, light)                      | sheen           |
+| ---- | ------- | ------------------- | ---------------- | -------------------------------------------------- | --------------- |
+| 13   | `p2-u5` | `vermilion-breccia` | `tablet-clumps`  | `cinnabar-vermilion` `#722f2a` `#e35e54` `#f1aeaa` | `breccia-gleam` |
+| 14   | `p2-r4` | `watered-ripples`   | `crossed-prisms` | `aquamarine-sea` `#546e6a` `#a9dcd5` `#d4eeea`     | `prism-bars`    |
+| 15   | `p2-r5` | `scalloped-jet`     | `teardrop-beads` | `jet-black` `#443b3a` `#877673` `#c3bbb9`          | `mirror-polish` |
+
+<!-- /p2-b4 -->
+
+- **Species:** cinnabar, aquamarine and jet (`p2-u5`, `p2-r4`, `p2-r5`; Progression's names on
+  #709).
+- **Bases:** a dense vermilion ore broken into angular fragments, each its own depth of red, set
+  in a pale net of cement along the breaks (a Voronoi field's distance to its edges, wavered); clear
+  pale beryl watered like silk, two sets of level waves (four and five bands up the cell, so they
+  repeat) each bent by its own slow warp and beating against each other so the bands swell and
+  pinch, over fine striations running up the prism and a faint cloud of depth; a dark even body
+  broken along broad conchoidal scallops, three or so across the cell, each scoop its own shade
+  and lifted toward its middle, a crisp break between, faint woody grain through it. Jet's body
+  sits under its slot's luma (0.24 to 0.5 before the polish), so it stays the planet's black.
+- **Veins:** three clumps of thick six-sided tablets heaped on one another, each tipped its own way,
+  with a few loose tablets off the heaps; three long flat-ended hexagonal prisms lying across one
+  another, each tipped a little so an end face shows; five polished teardrop beads hanging tail
+  down, a round head drawn to a point, three large and two small.
+- **Sheens:** breccia gleam (the cement net glossed where it meets the lamp, a soft adamantine bloom
+  over each clump with hard glints in it, the red mass dull), prism bars (a hard bar of light down
+  the lit face of each prism, stopping short of its ends, a soft vitreous gleam riding the watered
+  crests), mirror polish (one broad glare where the polished face throws the lamp back, a bright
+  lip along the breaks of the scoops that face it, a hard window on every teardrop). Breccia gleam
+  and mirror polish read the cement net and the scallops of their bases through the same seeds.
+- **Seeds 1001 to 1025**, apart from p2-b1's 701 to 792, p2-b2's 801 to 835 and p2-b3's 901 to 925.
 
 ## Batch p3-b1: P3's species 1 to 5 (ticket 598)
 
@@ -897,6 +939,48 @@ Every new skin sits above its rock, with contrast from 1.76 for star garnet to 1
 opal (smoke diamond 1.77). Checked by eye on `p2-b3.phone-x4.png`, `p2-b3.desktop.png`, the
 `p2-b3.scale-x4` copies, and `p2.scale-x4.png` with its `-deutan` and `-gray` copies, now all
 twelve P2 skins side by side.
+
+From `sheets/p2-b4.distinct.json`, at 22 px a tile over P2's band 3 rock (luma 0.29). The first
+three pairs are within the batch; the rest are the closest pairs against p2-b1, p2-b2 and p2-b3's
+skins (the report holds all 39):
+
+<!-- p2-b4-readings -->
+
+| pair                                | colour apart | deuteranopia apart | luma apart | texture apart |
+| ----------------------------------- | ------------ | ------------------ | ---------- | ------------- |
+| cinnabar vs aquamarine              | 0.581        | 0.439              | 0.191      | 0.076         |
+| cinnabar vs jet                     | 0.345        | 0.195              | 0.070      | 0.093         |
+| aquamarine vs jet                   | 0.471        | 0.492              | 0.261      | 0.092         |
+| bismuth vs aquamarine (least apart) | 0.106        | 0.118              | 0.067      | 0.086         |
+| galena vs aquamarine                | 0.129        | 0.090              | 0.039      | 0.085         |
+| tin gravel vs aquamarine            | 0.131        | 0.106              | 0.048      | 0.085         |
+| graphite vs jet                     | 0.131        | 0.127              | 0.052      | 0.103         |
+| star garnet vs cinnabar             | 0.150        | 0.156              | 0.017      | 0.068         |
+| smoke diamond vs jet                | 0.160        | 0.156              | 0.055      | 0.099         |
+| rust ochre vs cinnabar              | 0.165        | 0.141              | 0.071      | 0.074         |
+| slate vs jet                        | 0.190        | 0.185              | 0.077      | 0.103         |
+| moonstone vs aquamarine             | 0.238        | 0.153              | 0.102      | 0.082         |
+
+<!-- /p2-b4-readings -->
+
+The materials table gives P2 a fourth grey in jet (hue 8, saturation 0.08, luma 0.48) beside
+graphite (238, 0.06, 0.52), smoke diamond (262, 0.12, 0.54) and slate (218, 0.14, 0.56), so
+texture has to part it, and it does: jet's scallops are the largest texture distances on the
+planet (0.103 to graphite and slate, 0.099 to smoke diamond), three broad scoops a cell with a
+crisp break between against graphite's level smears, slate's slanted sheets and the smoke's round
+billows. The first jet draft composited to luma 0.56, paler than graphite, because a broad glare
+and a pale lip on every break were screened over a body drawn at the slot's luma; the body now
+sits under the slot (luma 0.494 composited, the darkest skin on P2), the glare is smaller and the
+lip lies only on the scoops that face the lamp. Aquamarine is the pale cyan beside bismuth stair
+(188, 0.45, 0.70), galena and tin gravel, the closest pair of the batch (bismuth, 0.106): the
+bismuth is a lattice of stairs, galena a checker and tin gravel a bed of grains, where aquamarine
+is level watered bands under crossed prisms, the only long straight marks on the planet besides
+slate's level slabs, which are blue-grey. Cinnabar is the planet's only scarlet: star garnet
+(340) is pink and rust ochre (12) is darker and softer, powder and streaks against the breccia's
+pale net, and under deuteranopia both stay apart (0.156 and 0.141). Every new skin sits above its
+rock, with contrast from 1.60 for jet to 2.38 for aquamarine (cinnabar 1.81). Checked by eye on
+`p2-b4.phone-x4.png`, `p2-b4.desktop.png`, the `p2-b4.scale-x4` copies, and `p2.scale-x4.png`
+with its `-deutan` and `-gray` copies, now all fifteen P2 skins side by side.
 
 From `sheets/p3-b1.distinct.json`, at 22 px a tile over P3's band 3 rock (luma 0.29). It is P3's
 first batch, so these are all ten pairs; its pairs against p3-b2 are in `p3-b2.distinct.json`:

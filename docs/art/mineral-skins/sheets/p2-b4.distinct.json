@@ -1,0 +1,340 @@
+{
+  "batch": "p2-b4",
+  "tilePx": 22,
+  "rockLuma": 0.289,
+  "skins": {
+    "p2-u5": {
+      "meanHex": "#de7068",
+      "luma": 0.564,
+      "hueDeg": 4.1,
+      "rockContrast": 1.81
+    },
+    "p2-r4": {
+      "meanHex": "#a2cfc9",
+      "luma": 0.755,
+      "hueDeg": 171.7,
+      "rockContrast": 2.38
+    },
+    "p2-r5": {
+      "meanHex": "#887a78",
+      "luma": 0.494,
+      "hueDeg": 8.8,
+      "rockContrast": 1.6
+    }
+  },
+  "pairs": [
+    {
+      "a": "p2-c1",
+      "b": "p2-u5",
+      "colourDistance": 0.423,
+      "deutanDistance": 0.257,
+      "lumaDifference": 0.007,
+      "textureDifference": 0.085
+    },
+    {
+      "a": "p2-c1",
+      "b": "p2-r4",
+      "colourDistance": 0.297,
+      "deutanDistance": 0.329,
+      "lumaDifference": 0.184,
+      "textureDifference": 0.077
+    },
+    {
+      "a": "p2-c1",
+      "b": "p2-r5",
+      "colourDistance": 0.19,
+      "deutanDistance": 0.185,
+      "lumaDifference": 0.077,
+      "textureDifference": 0.103
+    },
+    {
+      "a": "p2-c2",
+      "b": "p2-u5",
+      "colourDistance": 0.165,
+      "deutanDistance": 0.141,
+      "lumaDifference": 0.071,
+      "textureDifference": 0.074
+    },
+    {
+      "a": "p2-c2",
+      "b": "p2-r4",
+      "colourDistance": 0.628,
+      "deutanDistance": 0.568,
+      "lumaDifference": 0.262,
+      "textureDifference": 0.07
+    },
+    {
+      "a": "p2-c2",
+      "b": "p2-r5",
+      "colourDistance": 0.263,
+      "deutanDistance": 0.171,
+      "lumaDifference": 0.001,
+      "textureDifference": 0.104
+    },
+    {
+      "a": "p2-c3",
+      "b": "p2-u5",
+      "colourDistance": 0.454,
+      "deutanDistance": 0.346,
+      "lumaDifference": 0.143,
+      "textureDifference": 0.079
+    },
+    {
+      "a": "p2-c3",
+      "b": "p2-r4",
+      "colourDistance": 0.131,
+      "deutanDistance": 0.106,
+      "lumaDifference": 0.048,
+      "textureDifference": 0.085
+    },
+    {
+      "a": "p2-c3",
+      "b": "p2-r5",
+      "colourDistance": 0.379,
+      "deutanDistance": 0.387,
+      "lumaDifference": 0.213,
+      "textureDifference": 0.102
+    },
+    {
+      "a": "p2-c4",
+      "b": "p2-u5",
+      "colourDistance": 0.451,
+      "deutanDistance": 0.388,
+      "lumaDifference": 0.216,
+      "textureDifference": 0.064
+    },
+    {
+      "a": "p2-c4",
+      "b": "p2-r4",
+      "colourDistance": 0.617,
+      "deutanDistance": 0.552,
+      "lumaDifference": 0.025,
+      "textureDifference": 0.066
+    },
+    {
+      "a": "p2-c4",
+      "b": "p2-r5",
+      "colourDistance": 0.558,
+      "deutanDistance": 0.582,
+      "lumaDifference": 0.286,
+      "textureDifference": 0.092
+    },
+    {
+      "a": "p2-c5",
+      "b": "p2-u5",
+      "colourDistance": 0.388,
+      "deutanDistance": 0.227,
+      "lumaDifference": 0.018,
+      "textureDifference": 0.093
+    },
+    {
+      "a": "p2-c5",
+      "b": "p2-r4",
+      "colourDistance": 0.35,
+      "deutanDistance": 0.38,
+      "lumaDifference": 0.209,
+      "textureDifference": 0.089
+    },
+    {
+      "a": "p2-c5",
+      "b": "p2-r5",
+      "colourDistance": 0.131,
+      "deutanDistance": 0.127,
+      "lumaDifference": 0.052,
+      "textureDifference": 0.103
+    },
+    {
+      "a": "p2-u1",
+      "b": "p2-u5",
+      "colourDistance": 0.582,
+      "deutanDistance": 0.464,
+      "lumaDifference": 0.079,
+      "textureDifference": 0.069
+    },
+    {
+      "a": "p2-u1",
+      "b": "p2-r4",
+      "colourDistance": 0.41,
+      "deutanDistance": 0.501,
+      "lumaDifference": 0.27,
+      "textureDifference": 0.072
+    },
+    {
+      "a": "p2-u1",
+      "b": "p2-r5",
+      "colourDistance": 0.303,
+      "deutanDistance": 0.304,
+      "lumaDifference": 0.009,
+      "textureDifference": 0.097
+    },
+    {
+      "a": "p2-u2",
+      "b": "p2-u5",
+      "colourDistance": 0.568,
+      "deutanDistance": 0.397,
+      "lumaDifference": 0.124,
+      "textureDifference": 0.085
+    },
+    {
+      "a": "p2-u2",
+      "b": "p2-r4",
+      "colourDistance": 0.106,
+      "deutanDistance": 0.118,
+      "lumaDifference": 0.067,
+      "textureDifference": 0.086
+    },
+    {
+      "a": "p2-u2",
+      "b": "p2-r5",
+      "colourDistance": 0.406,
+      "deutanDistance": 0.407,
+      "lumaDifference": 0.194,
+      "textureDifference": 0.102
+    },
+    {
+      "a": "p2-u3",
+      "b": "p2-u5",
+      "colourDistance": 0.625,
+      "deutanDistance": 0.575,
+      "lumaDifference": 0.293,
+      "textureDifference": 0.081
+    },
+    {
+      "a": "p2-u3",
+      "b": "p2-r4",
+      "colourDistance": 0.238,
+      "deutanDistance": 0.153,
+      "lumaDifference": 0.102,
+      "textureDifference": 0.082
+    },
+    {
+      "a": "p2-u3",
+      "b": "p2-r5",
+      "colourDistance": 0.638,
+      "deutanDistance": 0.644,
+      "lumaDifference": 0.363,
+      "textureDifference": 0.11
+    },
+    {
+      "a": "p2-u4",
+      "b": "p2-u5",
+      "colourDistance": 0.46,
+      "deutanDistance": 0.36,
+      "lumaDifference": 0.152,
+      "textureDifference": 0.087
+    },
+    {
+      "a": "p2-u4",
+      "b": "p2-r4",
+      "colourDistance": 0.129,
+      "deutanDistance": 0.09,
+      "lumaDifference": 0.039,
+      "textureDifference": 0.085
+    },
+    {
+      "a": "p2-u4",
+      "b": "p2-r5",
+      "colourDistance": 0.397,
+      "deutanDistance": 0.403,
+      "lumaDifference": 0.222,
+      "textureDifference": 0.1
+    },
+    {
+      "a": "p2-r1",
+      "b": "p2-u5",
+      "colourDistance": 0.15,
+      "deutanDistance": 0.156,
+      "lumaDifference": 0.017,
+      "textureDifference": 0.068
+    },
+    {
+      "a": "p2-r1",
+      "b": "p2-r4",
+      "colourDistance": 0.511,
+      "deutanDistance": 0.363,
+      "lumaDifference": 0.208,
+      "textureDifference": 0.067
+    },
+    {
+      "a": "p2-r1",
+      "b": "p2-r5",
+      "colourDistance": 0.315,
+      "deutanDistance": 0.132,
+      "lumaDifference": 0.053,
+      "textureDifference": 0.088
+    },
+    {
+      "a": "p2-r2",
+      "b": "p2-u5",
+      "colourDistance": 0.614,
+      "deutanDistance": 0.224,
+      "lumaDifference": 0.059,
+      "textureDifference": 0.077
+    },
+    {
+      "a": "p2-r2",
+      "b": "p2-r4",
+      "colourDistance": 0.323,
+      "deutanDistance": 0.218,
+      "lumaDifference": 0.132,
+      "textureDifference": 0.079
+    },
+    {
+      "a": "p2-r2",
+      "b": "p2-r5",
+      "colourDistance": 0.34,
+      "deutanDistance": 0.289,
+      "lumaDifference": 0.129,
+      "textureDifference": 0.098
+    },
+    {
+      "a": "p2-r3",
+      "b": "p2-u5",
+      "colourDistance": 0.386,
+      "deutanDistance": 0.259,
+      "lumaDifference": 0.015,
+      "textureDifference": 0.075
+    },
+    {
+      "a": "p2-r3",
+      "b": "p2-r4",
+      "colourDistance": 0.335,
+      "deutanDistance": 0.369,
+      "lumaDifference": 0.206,
+      "textureDifference": 0.074
+    },
+    {
+      "a": "p2-r3",
+      "b": "p2-r5",
+      "colourDistance": 0.16,
+      "deutanDistance": 0.156,
+      "lumaDifference": 0.055,
+      "textureDifference": 0.099
+    },
+    {
+      "a": "p2-u5",
+      "b": "p2-r4",
+      "colourDistance": 0.581,
+      "deutanDistance": 0.439,
+      "lumaDifference": 0.191,
+      "textureDifference": 0.076
+    },
+    {
+      "a": "p2-u5",
+      "b": "p2-r5",
+      "colourDistance": 0.345,
+      "deutanDistance": 0.195,
+      "lumaDifference": 0.07,
+      "textureDifference": 0.093
+    },
+    {
+      "a": "p2-r4",
+      "b": "p2-r5",
+      "colourDistance": 0.471,
+      "deutanDistance": 0.492,
+      "lumaDifference": 0.261,
+      "textureDifference": 0.092
+    }
+  ],
+  "leastDifferentPair": ["p2-u2", "p2-r4"]
+}
