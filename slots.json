@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-10-22T17:22:27+02:00",
+  "updated_at": "2026-10-22T17:34:01+02:00",
   "caps": {
     "grok": 12,
     "claude": 10,
@@ -82,10 +82,10 @@
         {
           "slot": "C7",
           "state": "busy",
-          "ticket": 642,
+          "ticket": 643,
           "grok_slot": 1,
           "kind": "dev",
-          "since": "2026-10-22T17:22:00+02:00",
+          "since": "2026-10-22T17:34:00+02:00",
           "wave": null
         },
         {
@@ -116,7 +116,7 @@
       "size": 4,
       "used": 1,
       "free": 3,
-      "claims_last_hour": 2,
+      "claims_last_hour": 3,
       "name": "Claude Max 2"
     }
   ],
@@ -143,8 +143,8 @@
     {
       "slot": 1,
       "state": "dev",
-      "ticket": 642,
-      "since": "2026-10-22T17:22:00+02:00",
+      "ticket": 643,
+      "since": "2026-10-22T17:34:00+02:00",
       "claude_slot": 7,
       "wave": null
     },
@@ -273,9 +273,9 @@
     {
       "slot": 7,
       "state": "busy",
-      "ticket": 642,
+      "ticket": 643,
       "grok_slot": 1,
-      "since": "2026-10-22T17:22:00+02:00",
+      "since": "2026-10-22T17:34:00+02:00",
       "account": 2,
       "wave": null
     },
@@ -305,10 +305,10 @@
     }
   ],
   "last_refill": {
-    "at": "2026-10-22 17:22 CEST",
+    "at": "2026-10-22 17:34 CEST",
     "mode": "refill-dev",
-    "triggers": "claude-run:tester-triage",
-    "started": "#642->C7/A2",
+    "triggers": "#642",
+    "started": "#643->C7/A2",
     "note": "spawned 1 worker(s)"
   },
   "totals": {
@@ -331,6 +331,164 @@
   "waves": {
     "mode": "on",
     "parallel": 1,
-    "list": []
+    "list": [
+      {
+        "number": 721,
+        "key": "678-3A",
+        "map": 678,
+        "lane": "remote",
+        "mode": "solo",
+        "state": "paused",
+        "tickets": [
+          716,
+          717,
+          718,
+          719
+        ],
+        "done": [],
+        "live": 0
+      },
+      {
+        "number": 715,
+        "key": "647-3A",
+        "map": 647,
+        "lane": "hitl",
+        "mode": "bench",
+        "state": "bench",
+        "tickets": [
+          713
+        ],
+        "done": [],
+        "live": 0
+      },
+      {
+        "number": 712,
+        "key": "647-2A",
+        "map": 647,
+        "lane": "remote",
+        "mode": "solo",
+        "state": "paused",
+        "tickets": [
+          709,
+          707,
+          710,
+          711
+        ],
+        "done": [
+          707,
+          710
+        ],
+        "live": 0
+      },
+      {
+        "number": 694,
+        "key": "678-3C",
+        "map": 678,
+        "lane": "hitl",
+        "mode": "bench",
+        "state": "bench",
+        "tickets": [
+          690
+        ],
+        "done": [],
+        "live": 0
+      },
+      {
+        "number": 660,
+        "key": "647-2B",
+        "map": 647,
+        "lane": "hitl",
+        "mode": "bench",
+        "state": "bench",
+        "tickets": [
+          650
+        ],
+        "done": [],
+        "live": 0
+      },
+      {
+        "number": 639,
+        "key": "316-9A",
+        "map": 316,
+        "lane": "remote",
+        "mode": "solo",
+        "state": "paused",
+        "tickets": [
+          630,
+          631,
+          633,
+          634,
+          635,
+          565
+        ],
+        "done": [],
+        "live": 0
+      },
+      {
+        "number": 627,
+        "key": "308-2A",
+        "map": 308,
+        "lane": "remote",
+        "mode": "solo",
+        "state": "paused",
+        "tickets": [
+          661,
+          662,
+          663,
+          623,
+          666
+        ],
+        "done": [
+          661
+        ],
+        "live": 0
+      },
+      {
+        "number": 568,
+        "key": "316-9B",
+        "map": 316,
+        "lane": "hitl",
+        "mode": "bench",
+        "state": "bench",
+        "tickets": [
+          618
+        ],
+        "done": [],
+        "live": 0
+      },
+      {
+        "number": 495,
+        "key": "470-4B",
+        "map": 470,
+        "lane": "hitl",
+        "mode": "bench",
+        "state": "bench",
+        "tickets": [
+          482
+        ],
+        "done": [],
+        "live": 0
+      },
+      {
+        "number": 438,
+        "key": "302-10D",
+        "map": 302,
+        "lane": "hitl",
+        "mode": "bench",
+        "state": "bench",
+        "tickets": [
+          304,
+          305,
+          306,
+          307,
+          308,
+          417,
+          470,
+          501
+        ],
+        "done": [],
+        "live": 0
+      }
+    ]
   }
 }
