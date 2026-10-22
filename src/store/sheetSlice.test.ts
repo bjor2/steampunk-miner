@@ -4,7 +4,7 @@ import { withRegistrations } from '../registries/registrar'
 import type { SliceDefinition } from '../registries/sliceDefinition'
 import { createScriptedSession } from '../systems/authority/scriptedSession'
 import { KERNEL_SHEET_TABS, shownSheetTabsOn, type SheetTab } from '../ui/registries/sheetTabs'
-import { sheetTabShownOf } from './sheetSlice'
+import { sheetTabDrawnAt, sheetTabShownOf } from './sheetSlice'
 import { resetGameStore, useGameStore } from './gameStore'
 
 // The base sheet (spec #678, ticket 686): tabs are registered data, the store holds the open tab
@@ -113,6 +113,30 @@ describe('sheet', () => {
     game().pressSheetCard('sheet-probe.drill', 'touch')
     game().closeSheet()
     expect({ money: game().money, vehicle: game().vehicle }).toEqual(before)
+  })
+})
+
+describe('sheet stepped aside (ticket 718)', () => {
+  it('takes a full sheet out of the way and brings it back on the same tab', () => {
+    withRegistrations([PROBE], () => game().openSheet('sheet-probe.outfitter'))
+    game().stepSheetAside()
+    expect(sheetTabDrawnAt(game(), 'full')).toBeNull()
+    expect(game().openSheetTabId).toBe('sheet-probe.outfitter')
+    game().bringSheetBack()
+    expect(sheetTabDrawnAt(game(), 'full')).toBe('sheet-probe.outfitter')
+  })
+
+  it('leaves a docked sheet where it is, the car in view beside it', () => {
+    withRegistrations([PROBE], () => game().openSheet('sheet-probe.outfitter'))
+    game().stepSheetAside()
+    expect(sheetTabDrawnAt(game(), 'docked')).toBe('sheet-probe.outfitter')
+  })
+
+  it('forgets the step aside once the sheet closes', () => {
+    withRegistrations([PROBE], () => game().openSheet('sheet-probe.outfitter'))
+    game().stepSheetAside()
+    game().closeSheet()
+    expect(game().isSheetSteppedAside).toBe(false)
   })
 })
 

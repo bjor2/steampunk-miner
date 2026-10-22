@@ -4,13 +4,14 @@
  * the tab's own content in the sheet's scroll area. Mounted twice, once over the stage for the
  * phone's full sheet and once in the desktop dock beside it; only the mount whose placement the
  * screen takes ever opens, so one sheet shows. The tab it draws is the store's open one, or the
- * Ledger while the pause menu is on its save page (ticket 688). Presentation only: no command, no
- * log line.
+ * Ledger while the pause menu is on its save page (ticket 688); a full sheet stepped aside for the
+ * unlock reveal (ticket 718) shuts as it would close and opens again on its tab. Presentation
+ * only: no command, no log line.
  */
 import type { ReactNode } from 'react'
 import { useGameStore } from '../../store/gameStore'
 import { readShownSheetTabIds } from '../../store/screenReads'
-import { sheetTabShownOf } from '../../store/sheetSlice'
+import { sheetTabDrawnAt } from '../../store/sheetSlice'
 import { sheetTabBarOf, type SheetPlacement } from '../../systems/views/sheetLayout'
 import { Sheet } from '../kit/Sheet'
 import type { SheetTabLabel } from '../kit/SheetTabBar'
@@ -29,7 +30,7 @@ export function BaseSheet({
   /** What lives only while this mount draws the sheet, closing included (the dock's narrowing). */
   children?: ReactNode
 }) {
-  const openTabId = useGameStore(sheetTabShownOf)
+  const openTabId = useGameStore((state) => sheetTabDrawnAt(state, at))
   const isPlacedHere = useSheetPlacement() === at
   const shutter = useSheetShutter(isPlacedHere ? openTabId : null)
   if (shutter.tabId === null) return null

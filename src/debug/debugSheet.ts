@@ -20,6 +20,8 @@ export interface SheetReading {
   /** Where the sheet sits on this screen; null before the first fit. */
   placement: SheetPlacement | null
   revealedCardId: string | null
+  /** A full sheet is out of the way for the unlock reveal (ticket 718), its tab kept. */
+  isSteppedAside: boolean
 }
 
 export function openSheetUnlessRefused(tabId: unknown): DebugResult {
@@ -43,6 +45,7 @@ export function sheetNow(): DebugResult<{ sheet: SheetReading }> {
       shownTabIds: readShownSheetTabIds(),
       placement: placementNow(),
       revealedCardId: game.revealedSheetCardId,
+      isSteppedAside: game.isSheetSteppedAside,
     },
   }
 }
