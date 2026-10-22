@@ -301,6 +301,10 @@ programs }` from three's `renderer.info` of the game canvas), read only when cal
   `oreRulesOldSaves.test.ts` a generator 13 save of P2 under rules 8 with main's column pin. Ticket
   710 skins the three (batch p2-b4 of `docs/art/mineral-skins`), so `mineralSkins.planet2.test.ts`
   holds every kind slot of a fresh P2 skinned, slots 13 to 15 in layers no other P2 species wears.
+- **Species audit P1 to P5** (ticket 711, spec #647): `src/features/roster/roster.speciesAudit.test.ts`
+  reads each fresh planet's roster on two seeds and holds it to at least 15 species (P1 at 12 until
+  ticket 713 moves it to its v14 pool and raises the floor), no two sharing a name or a stem (the
+  #699 rule, reading C), a sprite (silhouette + pattern) or a skin combination.
 - **Planet registry** (ticket 642, GD lock R1 on #302 6306854642 and its addendum 6306861669):
   `src/features/ores/systems/planetRows.test.ts` holds each planet's row (pool and radius on one
   row, P1 to P10), the frozen radii to R(p) = round(300 + 175 ln p) with the shared k inside 150 to
