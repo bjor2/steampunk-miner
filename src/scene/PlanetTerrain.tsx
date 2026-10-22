@@ -12,6 +12,7 @@ import { useEffect, useMemo, useRef } from 'react'
 import type { Group, OrthographicCamera } from 'three'
 import { writeArtefactLook } from '../store/artefactActions'
 import { readPlanetWorld, useGameStore } from '../store/gameStore'
+import { listenForSpeciesReveals } from '../store/speciesRevealBroadcast'
 import { startChunkWorker } from '../shell/chunkWorkerPort'
 import { viewRadiusOf } from '../systems/render/visibleChunks'
 import { planetParamsFor } from '../systems/world/planetParams'
@@ -34,6 +35,7 @@ import { renderOriginPresence } from './renderOriginPresence'
 import { fitGateTintToPlanet } from './terrainGateTint'
 import { fitGateToViewer } from './terrainGateViewer'
 import { fitKindLooksToViewer } from './terrainKindLooks'
+import { fitRarityRevealToClock, startRevealFlourish } from './terrainRarityReveal'
 import { groundGatePresence, NO_DRAWN_GROUND } from './groundGatePresence'
 import { fitStrataToPlanet } from './terrainStrata'
 import { vehiclePresence } from './vehiclePresence'
@@ -51,6 +53,7 @@ export function PlanetTerrain() {
   const isHeatPlanetNow = useGameStore((state) => isHeatPlanet(state.planetTier))
 
   useEffect(() => noteHeroAtlasUnit(heroAtlas), [heroAtlas])
+  useEffect(() => listenForSpeciesReveals(startRevealFlourish), [])
 
   useEffect(() => {
     if (group.current === null) return
@@ -84,6 +87,7 @@ export function PlanetTerrain() {
     fitGateTintToPlanet(material, params)
     fitGateToViewer(material)
     fitKindLooksToViewer(material, params)
+    fitRarityRevealToClock(material)
   })
 
   return (

@@ -19,6 +19,11 @@ export function listenForFeedback(listener: FeedbackListener): () => void {
   return () => listeners.delete(listener)
 }
 
+/** A cue the store reads off state rather than events: a species met for the first time (#698). */
+export function announceFeedbackCue(cue: FeedbackCue): void {
+  listeners.forEach((listener) => listener(cue))
+}
+
 /** A blast kicks by how far the local vehicle stands from it (#213), so cues read its pose. */
 export function announceFeedback(events: readonly DomainEvent[], playerId: string): void {
   if (listeners.size === 0) return

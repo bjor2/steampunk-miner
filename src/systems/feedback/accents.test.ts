@@ -23,6 +23,7 @@ const CUES: FeedbackCue[] = [
   { kind: 'holdFinished' },
   { kind: 'boreClank' },
   { kind: 'autoValveClick' },
+  { kind: 'speciesReveal', rarityLead: 2 },
 ]
 
 describe('accents', () => {

@@ -400,6 +400,14 @@ programs }` from three's `renderer.info` of the game canvas), read only when cal
   `src/features/materials/systems/render/rarityLooks.test.ts` the rarity data's guard. The browser
   spec `e2e/browser/materialLooks.spec.ts` reads the table through `ui.getKindLooks()`. The look
   itself (each species apart at phone size) is an eye check; real-GPU frame cost is #526's A/B.
+  The first-contact flourish (ticket 698): `src/systems/render/speciesReveal.test.ts` reveals a
+  species once, on its first touch, never across a switch flip or a planet change;
+  `src/store/speciesRevealBroadcast.test.ts` holds the store to one reveal and one chime cue per
+  species and none after a restored save that had met it; `src/scene/terrainRarityReveal.test.ts`
+  starts the rise once on the material's clock. `e2e/browser/firstCutSkins.spec.ts` (box Tester)
+  drills the first surface ore at 360x640 and 1280x800 and holds every slot's skin identical
+  across the cut, only the met species' rarity arriving with one flourish. The rarity tint's
+  readability at 360 px on each band's ground is an eye check on the screen matrix.
   The per-act hero atlas (ticket 451): `src/systems/render/gpuTier.test.ts` gives it the 16th unit
   only with 16 units, the full program and an ETC1S alpha target;
   `src/systems/render/heroAtlas.test.ts` the asset lookup, the 16-cell cap and the 2 MiB resident
@@ -407,7 +415,7 @@ programs }` from three's `renderer.info` of the game canvas), read only when cal
   only, in the #452 cell order) and each shipped KTX2 (1024 px, ETC1S sRGB, four levels);
   `src/features/roster/kindLook.test.ts` one atlas object per act; `src/scene/terrainHeroAtlas.test.ts`
   the binder (one resident, released and disposed before the next, RGBA8 refused) and the table
-  drawing a seen hero from its cell only while bound. The browser spec
+  drawing a hero from its cell only while bound, met or not (ticket 698). The browser spec
   `e2e/browser/heroAtlas.spec.ts` checks through `ui.getKindLooks()` that a change of act binds
   once, a planet change inside an act binds none, and no bind links a program.
 - **Pacing bot** (`src/systems/bot/`, #29): plays `scenarios/bot-slice.scenario.json` through

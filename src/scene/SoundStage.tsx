@@ -12,6 +12,7 @@
  */
 import { useFrame } from '@react-three/fiber'
 import { useEffect, useMemo } from 'react'
+import { SPECIES_REVEAL_CHIME_TIER } from '../constants/audio'
 import { SCREEN_REFRESH_MS } from '../constants/scene'
 import { getSoundOut, type SoundOut } from '../shell/soundOut'
 import { listenForFeedback } from '../store/feedbackBroadcast'
@@ -143,6 +144,12 @@ const CUE_SOUNDS: Readonly<Record<FeedbackCue['kind'], CuePlayer>> = {
   autoValveClick: (sound) => {
     sound.playCueTone(VALVE_CLICK_TONE, VALVE_CLICK_PLAY)
   },
+  // GD on #698: a species met for the first time chimes with its rarity flourish.
+  speciesReveal: (sound, cue) => sound.playChime(chimeFrequencyOf(speciesRevealTierOf(cue))),
+}
+
+function speciesRevealTierOf(cue: FeedbackCue): number {
+  return SPECIES_REVEAL_CHIME_TIER + (cue.kind === 'speciesReveal' ? cue.rarityLead : 0)
 }
 
 /** Ticket 685: the tier's bell, ducked while the drill's voice is cutting. */

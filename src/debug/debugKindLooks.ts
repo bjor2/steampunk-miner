@@ -4,10 +4,12 @@
  * every kind as if the player had met it, for eye checks and the #526 frame A/B (a fresh save
  * draws every skin but no rarity, ticket 698). State, never pixels; no command, no log line, not in the digest. It also reads the
  * per-act hero atlas (ticket 451): whether the probe gave it the 16th unit, the act resident, its
- * cells and how many binds there have been, so a spec sees a swap happen only at a change of act.
+ * cells and how many binds there have been, so a spec sees a swap happen only at a change of act,
+ * and the first-contact flourishes started (ticket 698), so a spec sees one per species met.
  */
 import { heroAtlasPresence } from '../scene/heroAtlasPresence'
 import { kindLookPresence } from '../scene/kindLookPresence'
+import { speciesRevealPresence } from '../scene/speciesRevealPresence'
 import {
   heroCellOfEntry,
   KIND_LOOK_SLOTS,
@@ -34,6 +36,8 @@ export interface DrawnKindLooks {
   /** Slots drawing a species, slot 1 first. */
   shown: DrawnKindLook[]
   heroAtlas: typeof heroAtlasPresence
+  /** First-contact flourishes since the page loaded (ticket 698): one per species met. */
+  reveals: typeof speciesRevealPresence
 }
 
 export function readDrawnKindLooks(): DebugResult<{ looks: DrawnKindLooks }> {
@@ -45,6 +49,7 @@ export function readDrawnKindLooks(): DebugResult<{ looks: DrawnKindLooks }> {
       isEveryKindShown,
       shown: slots.filter((look) => look.silhouetteCode > 0),
       heroAtlas: { ...heroAtlasPresence, cells: [...heroAtlasPresence.cells] },
+      reveals: { ...speciesRevealPresence },
     },
   }
 }

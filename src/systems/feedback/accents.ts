@@ -31,6 +31,8 @@ export const ACCENT_OF_CUE: Readonly<Record<FeedbackCue['kind'], Accent | null>>
   // The tracer's spark is the slice's (#314), drawn from the debris allowance.
   boreClank: null,
   autoValveClick: null,
+  // Its spark and rarity flourish are drawn on the cell itself (#698).
+  speciesReveal: null,
 }
 
 export function accentOf(cue: FeedbackCue): Accent | null {

@@ -63,6 +63,8 @@ const KICKS: Readonly<Record<Exclude<FeedbackCue['kind'], 'chargeBlast'>, Screen
   // The bore's clank at the far end of its line is heard, not felt (#309).
   boreClank: { shake: 0, flash: 0 },
   autoValveClick: { shake: 0, flash: 0 },
+  // The flourish on the ground is the reveal's whole look (#698); the screen stays still.
+  speciesReveal: { shake: 0, flash: 0 },
 }
 
 export function createScreenEffects(): ScreenEffects {

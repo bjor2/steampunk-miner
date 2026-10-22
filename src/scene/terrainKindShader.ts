@@ -9,7 +9,9 @@
  * A grain is one of eight primitives with a signed edge distance in tiles, so the rarity frame is
  * the band just outside it. Rarity changes the tint, frame and glow only, never the silhouette;
  * with reduce motion (the shake switch, `uGateStill`) the glow holds at its mean and the frame
- * stays still. The lite program (ticket 477) leaves all of it out and draws the family look.
+ * stays still. When the player first meets a species (ticket 698) its rarity rises over a fifth of
+ * a second, the glow flaring past its rest on the way unless motion is reduced; the skin under it
+ * never changes. The lite program (ticket 477) leaves all of it out and draws the family look.
  *
  * A hero whose sprite is in the resident act's atlas (ticket 451) draws that sprite instead,
  * upright on the planet, with the same rarity tint and glow and a frame just outside its mask.
@@ -23,6 +25,7 @@ import {
   HERO_ATLAS_GUTTER_PX,
   HERO_ATLAS_SIDE_PX,
 } from '../constants/scene'
+import { RARITY_REVEAL_FLARE } from '../constants/speciesReveal'
 import { HERO_LOOK_FLAG, KIND_LOOK_SLOTS, RARITY_LOOK_LEADS } from '../systems/render/kindLookTable'
 import {
   KIND_LAYOUTS,
@@ -44,6 +47,7 @@ export function kindLookDefines(): Record<string, number> {
     HERO_ATLAS_CELL_PX,
     HERO_ATLAS_GUTTER_PX,
     HERO_ATLAS_CELLS_PER_ROW,
+    RARITY_REVEAL_FLARE,
   }
 }
 
@@ -55,6 +59,8 @@ export const KIND_LOOK_UNIFORMS = /* glsl */ `
 uniform vec4 uKindLooks[KIND_LOOK_SLOTS];
 // Per rarity lead 1 to 4: tint as 0xRRGGBB, glow, frame width in tiles, pulse share of the glow.
 uniform vec4 uRarityLooks[RARITY_LOOK_LEADS];
+// The first-contact flourish (ticket 698): the roster slot met, the uTime it started, its seconds.
+uniform vec4 uRarityReveal;
 #ifdef TERRAIN_HERO_ATLAS
 // The resident act's hero sprites (ticket 451), albedo with the mask in alpha: the 16th unit.
 uniform sampler2D uHeroAtlas;
@@ -196,17 +202,25 @@ int rarityLeadOf(vec4 kind) {
   return int(mod(floor(kind.w + 0.5), float(HERO_LOOK_FLAG)));
 }
 
-// The rarity's tint over its frame and its glow over the frame and what it covers.
-void drawRarity(vec4 rarity, float frame, float inside, vec2 tile, inout vec3 colour, inout vec3 emissive) {
+// How far the slot's rarity has risen: 1 at rest, 0 to 1 over the flourish of the slot just met.
+float rarityRevealOf(float kindSlot) {
+  if (abs(kindSlot - uRarityReveal.x) > 0.5) return 1.0;
+  return clamp((uTime - uRarityReveal.y) / uRarityReveal.z, 0.0, 1.0);
+}
+
+// The rarity's tint over its frame and its glow over the frame and what it covers, risen by
+// reveal; the glow flares past its rest mid-flourish unless motion is reduced.
+void drawRarity(vec4 rarity, float frame, float inside, float reveal, vec2 tile, inout vec3 colour, inout vec3 emissive) {
   vec3 tint = rgbOfPacked(rarity.x);
-  colour = mix(colour, tint, frame);
-  float glow = rarity.y * rarityPulse(rarity.w, uGateStill, tile);
+  colour = mix(colour, tint, frame * reveal);
+  float flare = 1.0 + float(RARITY_REVEAL_FLARE) * sin(3.14159265 * reveal) * (1.0 - uGateStill);
+  float glow = rarity.y * rarityPulse(rarity.w, uGateStill, tile) * reveal * flare;
   emissive += tint * glow * (0.8 * frame + 0.25 * inside);
 }
 
 // Draws the slot's species over the tile and its rarity's frame and glow; answers the share of
 // the tile its grains cover, which the ore's own tier glow lights as today's decal.
-float drawKindGrains(vec4 kind, vec2 local, vec2 tile, float soft, inout vec3 colour, inout vec3 emissive) {
+float drawKindGrains(vec4 kind, float reveal, vec2 local, vec2 tile, float soft, inout vec3 colour, inout vec3 emissive) {
   vec4 grain = kindSilhouette(int(kind.x + 0.5), local, tile);
   float inside = 1.0 - smoothstep(-soft, soft, grain.x);
   float shade = kindPatternShade(int(kind.y + 0.5), local, tile, grain) * grain.y;
@@ -217,7 +231,7 @@ float drawKindGrains(vec4 kind, vec2 local, vec2 tile, float soft, inout vec3 co
   // A small grain gets a thinner frame, so the rarity rims it rather than hiding it.
   float frameWidth = rarity.z * clamp(KIND_SHAPES[int(kind.x + 0.5)].z / 0.1, 0.5, 1.0);
   float frame = rarityFrame(grain.x, frameWidth, soft);
-  drawRarity(rarity, frame, inside, tile, colour, emissive);
+  drawRarity(rarity, frame, inside, reveal, tile, colour, emissive);
   return inside;
 }
 
@@ -244,7 +258,7 @@ float heroMaskOff(float cell, vec2 sprite, vec2 off, vec2 dx, vec2 dy) {
 // Draws the cell's sprite upright on the planet (its image top along up) and the rarity's tint
 // and glow, the frame on the band just outside its mask; answers the share of the tile it covers.
 // Gradients come from the world's, taken outside the ore branch, since the cell differs per tile.
-float drawHeroSprite(vec4 kind, float cell, vec2 local, vec2 up, vec2 worldDx, vec2 worldDy, vec2 tile, inout vec3 colour, inout vec3 emissive) {
+float drawHeroSprite(vec4 kind, float reveal, float cell, vec2 local, vec2 up, vec2 worldDx, vec2 worldDy, vec2 tile, inout vec3 colour, inout vec3 emissive) {
   vec2 right = vec2(up.y, -up.x);
   vec2 fromCentre = local - 0.5;
   vec2 sprite = vec2(dot(fromCentre, right), -dot(fromCentre, up)) + 0.5;
@@ -264,19 +278,20 @@ float drawHeroSprite(vec4 kind, float cell, vec2 local, vec2 up, vec2 worldDx, v
     max(heroMaskOff(cell, sprite, vec2(0.0, spread), dx, dy), heroMaskOff(cell, sprite, vec2(0.0, -spread), dx, dy))
   );
   float frame = clamp(near - texel.a, 0.0, 1.0) * isInCell;
-  drawRarity(rarity, frame, inside, tile, colour, emissive);
+  drawRarity(rarity, frame, inside, reveal, tile, colour, emissive);
   return inside;
 }
 #endif
 
 // The species' look over the tile: its hero sprite where the entry carries an atlas cell, else
-// its grains. up is the planet's up at the tile; the world gradients serve the sprite's sampling.
-float drawKindTile(vec4 kind, vec2 local, vec2 tile, vec2 up, vec2 worldDx, vec2 worldDy, float soft, inout vec3 colour, inout vec3 emissive) {
+// its grains. up is the planet's up at the tile; the world gradients serve the sprite's sampling;
+// reveal is how far the rarity has risen (rarityRevealOf).
+float drawKindTile(vec4 kind, float reveal, vec2 local, vec2 tile, vec2 up, vec2 worldDx, vec2 worldDy, float soft, inout vec3 colour, inout vec3 emissive) {
 #ifdef TERRAIN_HERO_ATLAS
   float cell = heroCellOf(kind);
-  if (cell >= 0.0) return drawHeroSprite(kind, cell, local, up, worldDx, worldDy, tile, colour, emissive);
+  if (cell >= 0.0) return drawHeroSprite(kind, reveal, cell, local, up, worldDx, worldDy, tile, colour, emissive);
 #endif
-  return drawKindGrains(kind, local, tile, soft, colour, emissive);
+  return drawKindGrains(kind, reveal, local, tile, soft, colour, emissive);
 }
 `
 

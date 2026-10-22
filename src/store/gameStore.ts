@@ -93,6 +93,7 @@ import {
   forgetCarveWatch,
 } from './carveCompleteBroadcast'
 import { announceDomainEvents } from './domainEventBroadcast'
+import { followSpeciesReveals, watchSpeciesRevealsFromNow } from './speciesRevealBroadcast'
 import { hintActionsOf, STARTING_HINTS, type HintActions, type HintValues } from './hintSlice'
 import {
   planetCardActionsOf,
@@ -561,6 +562,7 @@ export function resetGameStore(authority: Authority = createStartingAuthority())
   forgetBlastScorches()
   forgetCarveWatch()
   connectAuthority(authority, followAuthority)
+  watchSpeciesRevealsFromNow()
   followSaveWrites((outcome) => useGameStore.getState().noteSaveWrite(outcome))
 }
 
@@ -574,8 +576,9 @@ export function runEventPlaceOf(state: GameValues): RunEventPlace {
 /**
  * The one writer of planet and wallet: copies them from the authority, starts the travel
  * transition when the events travelled, opens or closes the planet card, shows the hints,
- * feedback, part installs, stingers and scorches they trigger, hands them to the slices' stores
- * and the cells they finished carving to the carve listeners (ticket 615), logs the events, then
+ * feedback, part installs, stingers and scorches they trigger, hands them to the slices' stores,
+ * the cells they finished carving to the carve listeners (ticket 615) and the species they let the
+ * player meet to the reveal listeners (ticket 698), logs the events, then
  * writes the checkpoint when due.
  */
 function followAuthority(events: readonly DomainEvent[]): void {
@@ -587,6 +590,7 @@ function followAuthority(events: readonly DomainEvent[]): void {
   announceBatchFeedback(events, useGameStore.getState().playerId)
   announceDomainEvents(events, useGameStore.getState().playerId)
   followCarvedCells(events, useGameStore.getState().playerId)
+  followSpeciesReveals(events, useGameStore.getState().playerId)
   useGameStore.getState().startPartInstall(events)
   recordMusicStingers(events, useGameStore.getState().playerId)
   recordBlastScorches(events)
@@ -598,6 +602,7 @@ function followAuthority(events: readonly DomainEvent[]): void {
 function replaceSession(state: AuthorityState): void {
   forgetCarveWatch()
   connectAuthority(createLoopbackAuthority(state), followAuthority)
+  watchSpeciesRevealsFromNow()
   followAuthority([])
 }
 

@@ -6,6 +6,11 @@
 
 /** Tier 1's pickup chime: A5. The chime climbs the major scale from here, one degree a tier. */
 export const CHIME_BASE_HZ = 880
+/**
+ * A species met for the first time (GD ruling on #698) chimes one octave over tier 1's pickup,
+ * a degree higher per rarity lead, so the reveal rings apart from the unit's own pickup chime.
+ */
+export const SPECIES_REVEAL_CHIME_TIER = 8
 /** The chime stops climbing three octaves up, so endless tiers stay audible (tier 22 and on). */
 export const CHIME_MAX_OCTAVES = 3
 

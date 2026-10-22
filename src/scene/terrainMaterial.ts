@@ -39,6 +39,7 @@ import { TERRAIN_FRAGMENT_SHADER, TERRAIN_VERTEX_SHADER } from './terrainShader'
 import { createGateTintUniforms } from './terrainGateTint'
 import { createGateViewerUniforms } from './terrainGateViewer'
 import { createKindLookUniforms } from './terrainKindLooks'
+import { createRarityRevealUniforms } from './terrainRarityReveal'
 import { kindLookDefines } from './terrainKindShader'
 import { createHeatTileUniforms } from './terrainHeatTiles'
 import { createHeroAtlasUniforms } from './terrainHeroAtlas'
@@ -115,6 +116,7 @@ export function createTerrainMaterial(
       ...createGateTintUniforms(),
       ...createGateViewerUniforms(),
       ...createKindLookUniforms(),
+      ...createRarityRevealUniforms(),
       ...createHeroAtlasUniforms(),
       ...createTerrainOriginUniforms(),
     },
