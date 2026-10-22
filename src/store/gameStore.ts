@@ -160,6 +160,12 @@ import {
   type HudDetailValues,
 } from './hudDetailSlice'
 import {
+  STARTING_TRIP_INCOME,
+  tripIncomeActionsOf,
+  type TripIncomeActions,
+  type TripIncomeValues,
+} from './tripIncomeSlice'
+import {
   STARTING_TAP_SHEET,
   tapSheetActionsOf,
   type TapSheetActions,
@@ -208,6 +214,8 @@ export interface GameState
     SheetActions,
     HudDetailValues,
     HudDetailActions,
+    TripIncomeValues,
+    TripIncomeActions,
     WarningValues,
     WarningActions,
     SoundUnlockValues,
@@ -318,6 +326,7 @@ type GameValues = Pick<
   | keyof TapSheetValues
   | keyof SheetValues
   | keyof HudDetailValues
+  | keyof TripIncomeValues
   | keyof WarningValues
   | keyof SoundUnlockValues
   | keyof TitleMenuValues
@@ -350,6 +359,7 @@ export const STARTING_VALUES: GameValues = {
   ...STARTING_TAP_SHEET,
   ...STARTING_SHEET,
   ...STARTING_HUD_DETAIL,
+  ...STARTING_TRIP_INCOME,
   ...STARTING_WARNINGS,
   ...STARTING_SOUND_UNLOCK,
   ...STARTING_TITLE_MENU,
@@ -378,6 +388,7 @@ export const useGameStore = create<GameState>()((set, get) => ({
   ...tapSheetActionsOf(set, get),
   ...sheetActionsOf(set, get),
   ...hudDetailActionsOf(set, get),
+  ...tripIncomeActionsOf(set, get),
   ...warningActionsOf(set, get),
   ...soundUnlockActionsOf(set),
   ...titleMenuActionsOf(set, get),
@@ -576,7 +587,7 @@ export function runEventPlaceOf(state: GameValues): RunEventPlace {
 /**
  * The one writer of planet and wallet: copies them from the authority, starts the travel
  * transition when the events travelled, opens or closes the planet card, shows the hints,
- * feedback, part installs, stingers and scorches they trigger, hands them to the slices' stores,
+ * feedback, part installs, stingers and scorches they trigger, the trips' income, hands them to the slices' stores,
  * the cells they finished carving to the carve listeners (ticket 615) and the species they let the
  * player meet to the reveal listeners (ticket 698), logs the events, then
  * writes the checkpoint when due.
@@ -587,6 +598,7 @@ function followAuthority(events: readonly DomainEvent[]): void {
   useGameStore.getState().followPlanetCard(events)
   useGameStore.getState().observePlaques(events)
   useGameStore.getState().followArtefactChoice(events)
+  useGameStore.getState().followTripIncome(events)
   announceBatchFeedback(events, useGameStore.getState().playerId)
   announceDomainEvents(events, useGameStore.getState().playerId)
   followCarvedCells(events, useGameStore.getState().playerId)
