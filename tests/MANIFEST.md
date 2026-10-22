@@ -1357,6 +1357,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/save/savedUnlocks.test.ts` | 7 | 7 |
 | `src/systems/save/sizedChargeRacks.test.ts` | 3 | 3 |
 | `src/systems/save/slotFormatMigration.test.ts` | 8 | 8 |
+| `src/systems/save/surfaceToughnessFreshSaves.test.ts` | 8 | 2 |
 | `src/systems/save/worldSaveOwnership.test.ts` | 2 | 2 |
 
 ### `scene`

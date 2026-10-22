@@ -276,6 +276,10 @@ programs }` from three's `renderer.info` of the game canvas), read only when cal
   amber: cut to fit with its step, or uncut with its cells past band 1);
   `generatorGolden.test.ts` checks rules 5 make the cells rules 4 did, and `oreRulesOldSaves.test.ts`
   loads a generator 11 save of P5 under rules 4 with main's column pin and its shipped surface.
+  `src/systems/save/surfaceToughnessFreshSaves.test.ts` (ticket 655, map #647 bar 3) buys travel
+  from a fresh P1 to P2-P5, saves and reloads, and reads every rock cell of the top 3 cells all
+  round the planet at H = 1; the same planets saved by generator 11 under rules 4 keep that stamp,
+  their state digest and band 1's shipped rock.
 - **P2 species pool** (ticket 632, GD lock (b) on #595 6306010182; HS, VS and G&V on #576):
   `src/features/roster/roster.p2Pool.test.ts` enters a fresh P2 under ore rules 6 on its own
   `foothold-p2` species, one per legacy kind slot, loads a P2 saved under rules 5 on the legacy
