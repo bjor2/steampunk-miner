@@ -186,13 +186,15 @@ async function openHudDetail(page: Page): Promise<void> {
 }
 
 /**
- * Ticket 717: the receipt of a sale of eight P41+ tiers, its roll skipped by a tap so the shot
- * holds the total. Its lines scroll inside the receipt, which is the shared scroll area's job, so
- * nothing in it is panned.
+ * Ticket 717: the receipt of a sale of eight P41+ tiers, shot once its total has rolled (a tap on
+ * a rolled receipt would put it away). Its lines scroll inside the receipt, which is the shared
+ * scroll area's job, so nothing in it is panned.
  */
 async function openSellReceipt(page: Page): Promise<void> {
   await sellWideHaul(page)
-  await page.getByTestId(RECEIPT_TEST_ID).click()
+  await expect(page.getByTestId(RECEIPT_TEST_ID)).not.toHaveAttribute('data-rolling', {
+    timeout: OPEN_TIMEOUT_MS,
+  })
   await expect(page.getByTestId(RECEIPT_ROWS_TEST_ID)).toBeVisible()
 }
 

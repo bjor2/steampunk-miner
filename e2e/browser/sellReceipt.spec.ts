@@ -1,11 +1,11 @@
 /**
  * The sale receipt (ticket 717): read through `steampunkDebug.features['sell-burst'].getReceipt()`
  * and the receipt's test ids, never pixels. A real sale shows the receipt with a total equal to
- * the wallet's gain to the coin, through the shared formatter; a tap skips the roll and the next
- * puts it away; the next trip compares with the last; a wide P41+ haul scrolls past eight lines
+ * the wallet's gain to the coin, through the shared formatter, its total ending on that gain, and
+ * taps put it away; the next trip compares with the last; a wide P41+ haul scrolls past eight lines
  * inside a receipt that stays on screen.
  */
-import { expect, test } from '@playwright/test'
+import { expect, test, type Page } from '@playwright/test'
 import { fromCanonical, sub, toCanonical } from '../../src/systems/money'
 import { openGame, sellAtTheExchange } from './sellBurstSales'
 import {
@@ -27,8 +27,19 @@ function gainOf(before: string, after: string): string {
   return toCanonical(sub(fromCanonical(after), fromCanonical(before)))
 }
 
+/**
+ * The first tap skips a total still rolling, the next puts the receipt away; on a slow box the
+ * roll may be over before the first, so tap until it has gone (at most twice). The skip itself is
+ * `receiptStore.test.ts`'s, where the clock is the spec's.
+ */
+async function putReceiptAway(page: Page): Promise<void> {
+  for (let tap = 0; tap < 2 && (await readReceipt(page)).isShown; tap++) {
+    await page.getByTestId(RECEIPT_TEST_ID).click()
+  }
+}
+
 test.describe('sale receipt (ticket 717)', () => {
-  test("a sale's receipt totals the wallet's gain to the coin and a tap skips its roll", async ({
+  test("a sale's receipt totals the wallet's gain to the coin, rolls onto it and taps away", async ({
     page,
   }) => {
     test.setTimeout(TEST_TIMEOUT_MS)
@@ -40,13 +51,12 @@ test.describe('sale receipt (ticket 717)', () => {
     expect(receipt.isShown).toBe(true)
     expect(receipt.net).toBe(gainOf(before, sold.wallet))
     expect(receipt.lines.reduce((total, line) => total + line.count, 0)).toBe(4)
-    await page.getByTestId(RECEIPT_TEST_ID).click()
     await expect(page.getByTestId(RECEIPT_TOTAL_TEST_ID)).toHaveAttribute(
       'data-exact',
       receipt.net ?? '',
+      { timeout: 30_000 },
     )
-    expect((await readReceipt(page)).isRolling).toBe(false)
-    await page.getByTestId(RECEIPT_TEST_ID).click()
+    await putReceiptAway(page)
     await expect(page.getByTestId(RECEIPT_TEST_ID)).toHaveCount(0)
     expect(errors).toEqual([])
   })

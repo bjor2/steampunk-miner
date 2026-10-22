@@ -4,14 +4,19 @@
  * the stage less its margins; on desktop a 360 px plate under the strip at the right. The lines
  * scroll past eight in the shared scroll area. Every figure is in tabular numerals in a column
  * as wide as the formatter's widest text (6 characters, #681), so a rolling total never reflows.
- * The plate fades in over `--motion-standard`; nothing slides, so Reduce Motion keeps it.
+ * The plate fades in over `--motion-standard`; nothing slides, so Reduce Motion keeps it. Its
+ * ground is opaque, not the sheets' 0.85 panel glass: it lies over the bay screen's own words,
+ * which would read through it.
  */
 .receipt {
   --receipt-line: 28px;
   --receipt-heading: 24px;
   --receipt-figure: 7ch;
 
+  /* Over the bay screen's own raised figures (`AmountText` sits at z-index 1 in its row). */
   position: absolute;
+  z-index: 1;
+  box-sizing: border-box;
   top: calc(var(--safe-top) + var(--top-keep-out));
   right: var(--hud-inset-right);
   left: var(--hud-inset-left);
@@ -22,7 +27,7 @@
   border-radius: var(--radius-panel);
   border-image: var(--art-sheet-frame) var(--art-sheet-frame-slice) fill /
     var(--art-sheet-frame-width);
-  background: var(--color-panel);
+  background: var(--color-bg);
   color: var(--color-text);
   font-family: var(--font-body);
   font-size: var(--type-body);
