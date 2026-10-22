@@ -13,6 +13,10 @@
  * A natural cave the column crosses is open ground the body drops through in one tick; the front
  * then crosses the cave's air at its catch-up pace (`sweptStampAt.ts`), a few ticks main's pose past
  * the foot never paid, more on a faster rig. #397's cut-follow adds the vehicle's travel time.
+ *
+ * The rig reports itself already moving down at its law's cut speed: the ladder measures the drill
+ * law at steady state (L20 about 84 m/s on this bench, Bjor's ruling on #724), where from rest the
+ * gravity ramp, not the drill, would set a fast rig's pace down the first cells.
  */
 import { energyMax } from '../economy/vehicleStats'
 import { NO_DRIVE } from '../vehicle/driveSigns'
@@ -27,6 +31,7 @@ import { drillAlongStep } from './drillStepCut'
 import { stepIntoOpenGround, type Point } from './faceHoldFixtures'
 import { planetParamsOf } from './planetOfState'
 import { createScriptedSession, FREEZE_ENEMIES, GROUND, poseAbove } from './scriptedSession'
+import { movingDownAtCutSpeed } from './sweptRigFixtures'
 
 /** One level's cut down the column. */
 export interface DrillLadderRung {
@@ -77,7 +82,9 @@ function rigOnSurfaceAt(drillStep: number): Rig {
     type: 'debug.setEnergy',
     payload: { energy: `${energyMax(DEEP_TANK_PURCHASES)}` },
   })
-  session.submit(0, poseAbove(GROUND, FACING.down))
+  const report = poseAbove(GROUND, FACING.down)
+  const moving = movingDownAtCutSpeed(session.state(), report.payload)
+  session.submit(0, { ...report, payload: { ...report.payload, ...moving } })
   const state = session.state()
   const params = planetParamsOf(state.planet) as PlanetParams
   return { state, params, top: vehicleOf(state, 'p1').pose as VehiclePose }
