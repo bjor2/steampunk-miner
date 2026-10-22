@@ -29,11 +29,16 @@ import {
 // warning is not scaled with speed, so a rig leaving a warned block at 84 m/s outruns it. The
 // weak band-2 tunnel warns its blocks at tick 10 with the rig at its middle; the rig then cuts east
 // out of it by `drillStep` a tick and a report every 12, as the live client does, its own lining
-// at grade 2 (band 2's need), so only the tunnel warns. It cuts sideways, so its drive reaches the
-// 84 m/s too (Bjor's ruling on #723: a sideways cut moves at min(drill rate, drive speed)). At the refill the rig is far past the 16 m
+// at grade 2 (band 2's need), so only the tunnel warns. At the refill the rig is far past the 16 m
 // radius: every warning is cancelled, nothing refills and nothing is crushed. The outrun is exact
 // (HS 6254968595): the cut's own events are those of the same run past a tunnel that never warned,
 // and a braced block stays out of the refill. The radius and the 60-tick lead are untouched.
+//
+// Level-leg pacing re-pin (drive-bound), ticket 732 under #644: since #723 a sideways cut moves
+// at min(drill rate, drive speed), and drill purchases never move the drive (Bjor), so on the
+// bare engine the rig crawled 30.6 m at 6 m/s and never left the radius. The rig now buys the
+// weakest engine whose drive reaches 84 m/s (`engineStepReaching`); the cap is not lifted, and
+// the stride, the drill rule and every bar are those of the pre-#723 row.
 
 const WARN_TICK = 10
 const SPEED_M_PER_S = 84

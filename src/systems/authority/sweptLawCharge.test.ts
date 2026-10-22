@@ -24,6 +24,12 @@ import { LADDER_RIGS, SPEED_RIGS } from './lawSlabRigs'
 // fixed seed (`lawCarrySlabFixtures.ts`); the lane (`sweptLawSlab.lane.test.ts`) cuts every rig
 // and track Systems listed. Law work is read command by command from the ground, so lining the
 // rig laid and cut again counts at its grade.
+//
+// Level-leg pacing re-pin (drive-bound), ticket 732 under #644: since #723 a sideways cut moves
+// at min(drill rate, drive speed), so the 44 m/s level bore on the bare engine crawled at 6 m/s
+// and its charge was no longer measurable. `cutSlab` now gives a level track's rig the weakest
+// engine whose drive reaches the track's stride; the cap is not lifted, down tracks are as they
+// were, and the 1% law share, tank floor and ratchet bars are unchanged.
 
 const FAST = SPEED_RIGS['44 m/s'].levels
 const SLOW = LADDER_RIGS['stored 1']
