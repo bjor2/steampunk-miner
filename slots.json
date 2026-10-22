@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-10-22T03:51:19+02:00",
+  "updated_at": "2026-10-22T03:54:13+02:00",
   "caps": {
     "grok": 12,
     "claude": 10,
@@ -82,12 +82,11 @@
       "slots": [
         {
           "slot": "C7",
-          "state": "busy",
-          "ticket": 655,
-          "grok_slot": 1,
-          "kind": "dev",
-          "since": "2026-10-22T03:13:00+02:00",
-          "wave": "647-1B"
+          "state": "disabled",
+          "ticket": null,
+          "grok_slot": null,
+          "kind": null,
+          "since": null
         },
         {
           "slot": "C8",
@@ -115,14 +114,14 @@
         }
       ],
       "size": 4,
-      "used": 1,
+      "used": 0,
       "free": 0,
       "claims_last_hour": 1,
       "name": "Claude Max 2"
     }
   ],
   "gate": {
-    "busy": 2,
+    "busy": 1,
     "max": 3
   },
   "tester": {
@@ -191,11 +190,9 @@
   "grok": [
     {
       "slot": 1,
-      "state": "dev",
-      "ticket": 655,
-      "since": "2026-10-22T03:13:00+02:00",
-      "claude_slot": 7,
-      "wave": "647-1B"
+      "state": "free",
+      "ticket": null,
+      "since": null
     },
     {
       "slot": 2,
@@ -318,12 +315,12 @@
     },
     {
       "slot": 7,
-      "state": "busy",
-      "ticket": 655,
-      "grok_slot": 1,
-      "since": "2026-10-22T03:13:00+02:00",
-      "account": 2,
-      "wave": "647-1B"
+      "state": "disabled",
+      "ticket": null,
+      "grok_slot": null,
+      "since": null,
+      "reason": "not signed in",
+      "account": 2
     },
     {
       "slot": 8,
@@ -354,17 +351,17 @@
     }
   ],
   "last_refill": {
-    "at": "2026-10-22 03:51 CEST",
+    "at": "2026-10-22 03:54 CEST",
     "mode": "refill-dev",
-    "triggers": "#645",
+    "triggers": "#655",
     "started": "",
     "note": "no pickable build ticket"
   },
   "totals": {
     "grok": {
       "size": 12,
-      "used": 2,
-      "dev": 2,
+      "used": 1,
+      "dev": 1,
       "dev_cap": 8,
       "planner": 0,
       "planner_cap": 4
@@ -372,7 +369,7 @@
     "claude": {
       "size": 10,
       "enabled": 6,
-      "used": 2,
+      "used": 1,
       "free": 5,
       "external": 0
     }
@@ -402,7 +399,7 @@
         "map": 647,
         "lane": "remote",
         "mode": "solo",
-        "state": "blocked",
+        "state": "ready",
         "tickets": [
           707
         ],
@@ -434,28 +431,6 @@
         ],
         "done": [],
         "live": 0
-      },
-      {
-        "number": 658,
-        "key": "647-1B",
-        "map": 647,
-        "lane": "remote",
-        "mode": "solo",
-        "state": "running",
-        "tickets": [
-          651,
-          652,
-          653,
-          654,
-          655
-        ],
-        "done": [
-          651,
-          652,
-          653,
-          654
-        ],
-        "live": 1
       },
       {
         "number": 639,
