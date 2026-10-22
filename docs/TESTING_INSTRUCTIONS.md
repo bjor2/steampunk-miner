@@ -291,8 +291,9 @@ programs }` from three's `renderer.info` of the game canvas), read only when cal
 - **P2's own kinds** (ticket 709, GD ruling (A) on #709; HS and VS input on #709): a fresh P2,
   entered under ore rules 9 (generator 14), draws Cinnabar (metal uncommon), Aquamarine and Jet
   (crystal rare) on its own kind slots 13 to 15 in bands 4 and 5, at their tier's price.
-  `src/features/roster/roster.p2OwnKinds.test.ts` reads the same whole-planet cells with the kind
-  slot masked under rules 9 as under rules 8 (family, tier, ore id and density, so band money,
+  `src/features/roster/roster.p2OwnKinds.test.ts` reads, on five seeds (the #647 lock's 5-seed
+  check), the same whole-planet cells with the kind slot masked under rules 9 as under rules 8
+  (family, tier, ore id and density, so the #448 density, every band's rarity shares, band money,
   income and p* are exactly main's), the own kinds only on metal uncommon and crystal rare patches
   of bands 4 and 5, and every other kind slot as rules 8 drew it. `kindRows.test.ts` holds the own
   slots and their guards, `planetRoster.test.ts` P1 and a rules-8 P2 on the shared 12,
