@@ -10,6 +10,7 @@ import {
   materialGuardContext,
   materialTableProblems,
 } from './materialTable'
+import { isSpeciesBoundUnder } from './materialOreRules'
 import { brightestHostRockLuma } from './render/hostRockLuma'
 
 // The guards of ticket 444 (#139 GD rulings 1, 2 and 5): a fixture table that passes, and one
@@ -298,20 +299,54 @@ describe('legacy materials', () => {
 // legacy kind slot with that slot's family, rarity and window, ids `p2-<slot>`, every one a look no
 // other species wears, and no hero until hero art packs one into P2's atlas. Ticket 709 (GD ruling
 // (A) on #709, Progression's names) adds three on the pool's own slots: Cinnabar, Aquamarine, Jet.
+// Ticket 736 (GD lock on #736) swaps three shared slots like for like under the same ore rules 9:
+// Azurite Nodule, Pyrite Sun and Argentite take the slots of Cobalt Bloom, Bismuth Stair and Smoke
+// Diamond, which a P2 entered under older rules keeps, each a new id `p2-<slot>b`.
 describe('foothold-p2 materials', () => {
   const p2 = MATERIALS.materials.filter((material) => material.pool === 'foothold-p2')
   const legacy = MATERIALS.materials.filter((material) => material.pool === 'legacy')
   const OWN_SLOTS = ['legacy.u5', 'legacy.r4', 'legacy.r5']
-  const onShared = p2.filter((material) => !OWN_SLOTS.includes(material.slot))
+  const SWAPPED_SLOTS = ['legacy.u1', 'legacy.u2', 'legacy.r3']
+  const SWAP_RULES = 9
+  const boundUnder = (rules: number) =>
+    p2.filter((material) => isSpeciesBoundUnder(material, rules))
+  const onShared = boundUnder(SWAP_RULES - 1).filter(
+    (material) => !OWN_SLOTS.includes(material.slot),
+  )
+  const swappedIn = p2.filter((material) => material.fromOreRules === SWAP_RULES)
 
-  it('puts one species on each legacy slot and its own three, 5 common, 5 uncommon and 5 rare, ids p2-<slot>', () => {
-    const slots = p2.map((material) => material.slot).sort()
+  it('puts one species on each legacy slot and its own three, 5 common, 5 uncommon and 5 rare', () => {
+    const fresh = boundUnder(SWAP_RULES)
+    const slots = fresh.map((material) => material.slot).sort()
     expect(slots).toEqual([...legacy.map((material) => material.slot), ...OWN_SLOTS].sort())
-    expect(p2.map((material) => material.id)).toEqual(
-      p2.map((material) => `p2-${material.slot.replace('legacy.', '')}`),
-    )
-    const countOf = (rarity: string) => p2.filter((material) => material.rarity === rarity).length
+    const countOf = (rarity: string) =>
+      fresh.filter((material) => material.rarity === rarity).length
     expect(MATERIAL_RARITIES.map(countOf)).toEqual([5, 5, 5, 0, 0])
+  })
+
+  it("ids each slot's first species p2-<slot> and its swapped-in species p2-<slot>b", () => {
+    const idOf = (material: (typeof p2)[number]) =>
+      `p2-${material.slot.replace('legacy.', '')}${swappedIn.includes(material) ? 'b' : ''}`
+    expect(p2.map((material) => material.id)).toEqual(p2.map(idOf))
+  })
+
+  it('swaps Azurite Nodule, Pyrite Sun and Argentite in from ore rules 9 and keeps the retired three before', () => {
+    const speciesOn = (rules: number) =>
+      SWAPPED_SLOTS.map(
+        (slot) => boundUnder(rules).find((material) => material.slot === slot)?.epithet,
+      )
+    expect(speciesOn(SWAP_RULES - 1)).toEqual(['Cobalt Bloom', 'Bismuth Stair', 'Smoke Diamond'])
+    expect(speciesOn(SWAP_RULES)).toEqual(['Azurite Nodule', 'Pyrite Sun', 'Argentite'])
+  })
+
+  it('keeps the family, rarity and band window of the slot on each swapped-in species', () => {
+    const descriptorOf = ({ slot, family, rarity, gradeBand }: (typeof p2)[number]) =>
+      `${slot} ${family} ${rarity} ${gradeBand.join('-')}`
+    const retiredOf = (slot: string) =>
+      onShared.find((material) => material.slot === slot) as (typeof p2)[number]
+    expect(swappedIn.map(descriptorOf)).toEqual(
+      swappedIn.map((material) => descriptorOf(retiredOf(material.slot))),
+    )
   })
 
   it("keeps the family, rarity and band window of the legacy species on the species' slot", () => {

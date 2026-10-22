@@ -38,6 +38,11 @@ function speciesIdsOf(params: PlanetParams): (string | undefined)[] {
   return planetRosterOf(params).map((_, at) => planetSpeciesOf(params, at + 1)?.id)
 }
 
+/** A fresh P2 also swaps three slots' species under ore rules 9 (ticket 736), all of its own pool. */
+function speciesPoolsOf(params: PlanetParams): (string | undefined)[] {
+  return planetRosterOf(params).map((_, at) => planetSpeciesOf(params, at + 1)?.pool)
+}
+
 describe('planet 2 species pool', () => {
   const fresh = freshPlanetParamsFor(SEED, 2)
   const pooled = planetParamsFor(SEED, 2, P2_POOL_RULES)
@@ -46,8 +51,9 @@ describe('planet 2 species pool', () => {
   it('enters a fresh planet 2 on its own pool, one p2 species per legacy slot', () => {
     expect(fresh.oreRulesVersion).toBeGreaterThanOrEqual(P2_POOL_RULES)
     expect(poolOfPlanet(fresh)).toBe('foothold-p2')
-    expect(speciesIdsOf(fresh)).toEqual(
-      planetRosterOf(fresh).map((slot) => `p2-${slot.slotId.replace('legacy.', '')}`),
+    expect(speciesPoolsOf(fresh)).toEqual(planetRosterOf(fresh).map(() => 'foothold-p2'))
+    expect(speciesIdsOf(pooled)).toEqual(
+      planetRosterOf(pooled).map((slot) => `p2-${slot.slotId.replace('legacy.', '')}`),
     )
   })
 

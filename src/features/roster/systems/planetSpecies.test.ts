@@ -1,5 +1,9 @@
 import { describe, expect, it } from 'vitest'
-import { freshPlanetParamsFor, ORE_RULES_VERSION } from '../../../systems/world/planetParams'
+import {
+  freshPlanetParamsFor,
+  ORE_RULES_VERSION,
+  planetParamsFor,
+} from '../../../systems/world/planetParams'
 import { NO_KIND_SLOT } from '../../../systems/world/worldCell'
 import { MATERIALS, type Material } from '../../materials'
 import type { KindSlot } from '../../ores'
@@ -13,6 +17,8 @@ import { planetSpeciesOf, speciesOfKind } from './planetSpecies'
 
 const SEED = 83921
 const RULES = ORE_RULES_VERSION
+/** The ore rules P2's swap of ticket 736 rides: #709's own kinds came in under the same rules. */
+const SWAP_RULES = 9
 const SLOT: KindSlot = { slotId: 'mixed.c1', family: 'metal', rarity: 'common', window: [1, 5] }
 const [LEGACY_ROW] = MATERIALS.materials
 
@@ -55,6 +61,17 @@ describe('planet species', () => {
     expect(speciesOfKind('foothold-p3', SLOT, 5, swapped)?.id).toBe('p3-old')
     expect(speciesOfKind('foothold-p3', SLOT, 6, swapped)?.id).toBe('p3-new')
     expect(speciesOfKind('foothold-p3', SLOT, undefined, swapped)?.id).toBe('p3-old')
+  })
+
+  it.each([
+    { rules: SWAP_RULES - 1, ids: ['p2-u1', 'p2-u2', 'p2-r3'] },
+    { rules: SWAP_RULES, ids: ['p2-u1b', 'p2-u2b', 'p2-r3b'] },
+  ])("reads P2's swapped slots under ore rules $rules as $ids (ticket 736)", ({ rules, ids }) => {
+    const params = planetParamsFor(SEED, 2, rules)
+    const slotOf = (slotId: string) =>
+      planetRosterOf(params).findIndex((slot) => slot.slotId === slotId) + 1
+    const swapped = ['legacy.u1', 'legacy.u2', 'legacy.r3'].map(slotOf)
+    expect(swapped.map((kindSlot) => planetSpeciesOf(params, kindSlot)?.id)).toEqual(ids)
   })
 
   it('binds no species of a pool the table does not hold', () => {

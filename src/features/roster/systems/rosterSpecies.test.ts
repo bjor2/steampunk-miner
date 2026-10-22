@@ -1,6 +1,10 @@
 import { describe, expect, it } from 'vitest'
-import { freshPlanetParamsFor, planetParamsFor } from '../../../systems/world/planetParams'
-import { MATERIALS, type Material } from '../../materials'
+import {
+  freshPlanetParamsFor,
+  ORE_RULES_VERSION,
+  planetParamsFor,
+} from '../../../systems/world/planetParams'
+import { isSpeciesBoundUnder, MATERIALS, type Material } from '../../materials'
 import { ORE_ROWS, rarityRowSetOfPlanet, type KindSlot } from '../../ores'
 import { planetRosterOf, poolOfPlanet } from './planetRoster'
 
@@ -11,7 +15,8 @@ import { planetRosterOf, poolOfPlanet } from './planetRoster'
 // exactly one species for every slot a planet of it can ask for, and no species row's pool is
 // unmapped. P2's own pool (ticket 632, GD lock (b) on #595) binds the legacy slots, and a P2 a save
 // holds under ore rules 5 or earlier keeps the legacy species. Under ore rules 9 it adds three own
-// slots (ticket 709), so a fresh P2 shows 15 species and an older P2 its 12.
+// slots (ticket 709), so a fresh P2 shows 15 species and an older P2 its 12, and three of its shared
+// slots swap species (ticket 736), so "exactly one" is counted under the planet's ore rules.
 
 const SEED = 83921
 const ALL_SLOTS: readonly KindSlot[] = Object.values(ORE_ROWS.kinds.slotsBySet).flat()
@@ -40,9 +45,17 @@ function matchesItsSlot(material: Material): boolean {
   )
 }
 
-function speciesOfSlot(pool: string, slotId: string): Material[] {
+/** The species of `pool` bound to `slotId` on a planet entered under ore rules `oreRulesVersion`. */
+function speciesOfSlot(
+  pool: string,
+  slotId: string,
+  oreRulesVersion: number | undefined = ORE_RULES_VERSION,
+): Material[] {
   return MATERIALS.materials.filter(
-    (material) => material.pool === pool && material.slot === slotId,
+    (material) =>
+      material.pool === pool &&
+      material.slot === slotId &&
+      isSpeciesBoundUnder(material, oreRulesVersion),
   )
 }
 
@@ -88,7 +101,9 @@ describe('roster species', () => {
     ({ params, pool, kinds }) => {
       expect(rarityRowSetOfPlanet(params)).toBe('legacy')
       expect(poolOfPlanet(params)).toBe(pool)
-      const species = planetRosterOf(params).map((slot) => speciesOfSlot(pool, slot.slotId))
+      const species = planetRosterOf(params).map((slot) =>
+        speciesOfSlot(pool, slot.slotId, params.oreRulesVersion),
+      )
       expect(species.map((found) => found.length)).toEqual(Array(kinds).fill(1))
     },
   )

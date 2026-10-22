@@ -1,5 +1,5 @@
 {
-  "$comment": "The materials look layer of #139 (GD ruling 15 Oct 2026, ticket 444): species under the 12 ore families. A species names its family, never a gate class (#142); family ids, ore ids and prices stay. pool is the species set a row belongs to (legacy = P1, and P2 as a save holds it under ore rules 5 or earlier; a planet's pool is ores.economy.json kinds.pools, ticket 542) and slot the kind slot of ores.economy.json it binds to (TD ruling on ticket 446); a row's family, rarity and gradeBand equal its slot's. Hue slots: hue in degrees, saturation and luma in 0..1 (Rec. 601 display luma); a slot keeps out of the reserved hue bands of oreLooks.json and above the brightest host rock. gradeBand is the species' depth window, first and last band in 1..5. The legacy rows are Content's roster for ticket 447 (names cut to an epithet before the family name, flavour to one ledger sentence). The foothold-p2 rows (ticket 632, GD lock (b) on #595) give P2 its own species on the 12 legacy slots, ids p2-<slot> so a renamed species keeps its id, none a hero until hero art packs one into the foothold.heavy atlas; P2 entered under ore rules 9 adds its own Cinnabar, Aquamarine and Jet on the pool's own slots legacy.u5, legacy.r4 and legacy.r5 (ticket 709, GD ruling (A)). The other foothold rows (#453) fill every slot of kinds.mixed once per pool: foothold-p3, foothold-p4, foothold-p5 and foothold-p6-p7, 17 each, every species its own hue slot and silhouette + pattern pair; hero marks rare, epic and mythic for the follow-up hero art ticket.",
+  "$comment": "The materials look layer of #139 (GD ruling 15 Oct 2026, ticket 444): species under the 12 ore families. A species names its family, never a gate class (#142); family ids, ore ids and prices stay. pool is the species set a row belongs to (legacy = P1, and P2 as a save holds it under ore rules 5 or earlier; a planet's pool is ores.economy.json kinds.pools, ticket 542) and slot the kind slot of ores.economy.json it binds to (TD ruling on ticket 446); a row's family, rarity and gradeBand equal its slot's. Hue slots: hue in degrees, saturation and luma in 0..1 (Rec. 601 display luma); a slot keeps out of the reserved hue bands of oreLooks.json and above the brightest host rock. gradeBand is the species' depth window, first and last band in 1..5. The legacy rows are Content's roster for ticket 447 (names cut to an epithet before the family name, flavour to one ledger sentence). The foothold-p2 rows (ticket 632, GD lock (b) on #595) give P2 its own species on the 12 legacy slots, ids p2-<slot> so a renamed species keeps its id, none a hero until hero art packs one into the foothold.heavy atlas; P2 entered under ore rules 9 adds its own Cinnabar, Aquamarine and Jet on the pool's own slots legacy.u5, legacy.r4 and legacy.r5 (ticket 709, GD ruling (A)). Under the same rules three slots swap species like for like (ticket 736, GD lock on #736): Azurite Nodule (p2-u1b) takes legacy.u1 from Cobalt Bloom, Pyrite Sun (p2-u2b) legacy.u2 from Bismuth Stair and Argentite (p2-r3b) legacy.r3 from Smoke Diamond. fromOreRules and beforeOreRules give the span of ore rules a row binds its slot under, so a P2 a save holds under older rules keeps the retired three, whose ids are never reused; a second species on a slot takes the id p2-<slot>b. The other foothold rows (#453) fill every slot of kinds.mixed once per pool: foothold-p3, foothold-p4, foothold-p5 and foothold-p6-p7, 17 each, every species its own hue slot and silhouette + pattern pair; hero marks rare, epic and mythic for the follow-up hero art ticket.",
   "hueSlots": [
     {
       "id": "ironstone-umber",
@@ -148,6 +148,9 @@
     { "id": "cinnabar-vermilion", "hue": 4, "saturation": 0.72, "luma": 0.52 },
     { "id": "aquamarine-sea", "hue": 172, "saturation": 0.42, "luma": 0.8 },
     { "id": "jet-black", "hue": 8, "saturation": 0.08, "luma": 0.48 },
+    { "id": "azurite-blue", "hue": 222, "saturation": 0.7, "luma": 0.5 },
+    { "id": "pyrite-brass", "hue": 52, "saturation": 0.45, "luma": 0.7 },
+    { "id": "argentite-grey", "hue": 196, "saturation": 0.16, "luma": 0.62 },
     {
       "id": "pig-iron",
       "hue": 210,
@@ -808,7 +811,8 @@
       "gradeBand": [1, 3],
       "rarity": "uncommon",
       "hero": false,
-      "flavour": "Blue flecks the assayers fight over."
+      "flavour": "Blue flecks the assayers fight over.",
+      "beforeOreRules": 9
     },
     {
       "id": "p2-u2",
@@ -822,7 +826,8 @@
       "gradeBand": [3, 5],
       "rarity": "uncommon",
       "hero": false,
-      "flavour": "Grows in little rainbow steps."
+      "flavour": "Grows in little rainbow steps.",
+      "beforeOreRules": 9
     },
     {
       "id": "p2-u3",
@@ -892,7 +897,8 @@
       "gradeBand": [4, 5],
       "rarity": "rare",
       "hero": false,
-      "flavour": "Dark, hard, and worth the whole trip."
+      "flavour": "Dark, hard, and worth the whole trip.",
+      "beforeOreRules": 9
     },
     {
       "id": "p2-u5",
@@ -935,6 +941,51 @@
       "rarity": "rare",
       "hero": false,
       "flavour": "Black stone that takes a polish like a boiler plate."
+    },
+    {
+      "id": "p2-u1b",
+      "pool": "foothold-p2",
+      "slot": "legacy.u1",
+      "family": "metal",
+      "epithet": "Azurite Nodule",
+      "silhouette": "nodules",
+      "pattern": "frosted",
+      "hueSlot": "azurite-blue",
+      "gradeBand": [1, 3],
+      "rarity": "uncommon",
+      "hero": false,
+      "flavour": "A blue fist of copper, found where the seam runs deep.",
+      "fromOreRules": 9
+    },
+    {
+      "id": "p2-u2b",
+      "pool": "foothold-p2",
+      "slot": "legacy.u2",
+      "family": "metal",
+      "epithet": "Pyrite Sun",
+      "silhouette": "discs",
+      "pattern": "glinting",
+      "hueSlot": "pyrite-brass",
+      "gradeBand": [3, 5],
+      "rarity": "uncommon",
+      "hero": false,
+      "flavour": "Fool's gold, but the assayer pays in honest coin.",
+      "fromOreRules": 9
+    },
+    {
+      "id": "p2-r3b",
+      "pool": "foothold-p2",
+      "slot": "legacy.r3",
+      "family": "crystal",
+      "epithet": "Argentite",
+      "silhouette": "blocks",
+      "pattern": "tarnished",
+      "hueSlot": "argentite-grey",
+      "gradeBand": [4, 5],
+      "rarity": "rare",
+      "hero": false,
+      "flavour": "Grey and sullen in the lamp, until the smelter finds its silver.",
+      "fromOreRules": 9
     },
     {
       "id": "pig-iron-brassvein",

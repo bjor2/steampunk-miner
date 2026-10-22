@@ -17,7 +17,11 @@ import {
   type KindLook,
 } from '../../systems/render/kindLookTable'
 import { bandOfTile } from '../../systems/world/planetGeometry'
-import { freshPlanetParamsFor, planetParamsFor } from '../../systems/world/planetParams'
+import {
+  freshPlanetParamsFor,
+  planetParamsFor,
+  type PlanetParams,
+} from '../../systems/world/planetParams'
 import { chunkRangeOfDisc, CHUNK_SIZE, firstTileOfChunk } from '../../systems/world/tileGrid'
 import {
   CELL_KIND,
@@ -48,6 +52,17 @@ const [SEED, SECOND_SEED] = NAMED_SEEDS
 
 /** Every planet a species pool covers, P1 and P2 legacy, P3 to P7 the mixed pools (#453). */
 const POOLED_PLANETS = [...ORE_ROWS.kinds.poolByPlanet.keys()]
+
+/** The ore rules that swap three of P2's species (ticket 736): a P2 entered before shows the old three. */
+const P2_SWAP_ORE_RULES = 9
+
+/** Every pooled planet fresh, and P2 entered before its swap, so every species row is shown once. */
+function everyShownPlanetOf(seed: number): PlanetParams[] {
+  return [
+    ...POOLED_PLANETS.map((planetIndex) => freshPlanetParamsFor(seed, planetIndex)),
+    planetParamsFor(seed, 2, P2_SWAP_ORE_RULES - 1),
+  ]
+}
 
 /** Main's render-state digests at a157e171, before the kind look (renderStateFixtures.ts). */
 const MAIN_DRAWN_DIGESTS: Readonly<Record<string, string>> = {
@@ -142,8 +157,8 @@ describe('roster kind looks', () => {
   it('keeps one look per species across bands and planets', () => {
     const entriesById = new Map<string, number[][]>()
     for (const seed of [SEED, SECOND_SEED]) {
-      for (const planetIndex of POOLED_PLANETS) {
-        for (const look of shownLooks(freshPlanetParamsFor(seed, planetIndex))) {
+      for (const params of everyShownPlanetOf(seed)) {
+        for (const look of shownLooks(params)) {
           entriesById.set(look.speciesId, [
             ...(entriesById.get(look.speciesId) ?? []),
             kindEntryOf(look),

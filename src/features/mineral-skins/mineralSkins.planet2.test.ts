@@ -18,7 +18,8 @@ import type { MineralSkin, SkinLayer, SkinLayerKind } from './systems/skinLayers
 
 const SEED = 83921
 const PLANET_2 = freshPlanetParamsFor(SEED, 2)
-const SKINNED_SLOTS = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15]
+/** Slots 6, 7 and 12 swap species under ore rules 9 (ticket 736) and wait for their skins. */
+const SKINNED_SLOTS = [1, 2, 3, 4, 5, 8, 9, 10, 11, 13, 14, 15]
 /** P2's own kinds of ticket 709, roster slots 13 to 15, skinned by ticket 710. */
 const OWN_SLOTS = [13, 14, 15]
 /** The ore rules a P2 world was entered under before its own pool (ticket 632). */
@@ -46,9 +47,11 @@ describe('mineral skins of planet 2', () => {
     expect(planetSkinsOf(PLANET_2)[kindSlot - 1]?.speciesId).toBe(species?.id)
   })
 
-  it('skins every kind slot of the planet, its own three included', () => {
+  it('skins every kind slot of the planet but the three swapped ones, its own three included', () => {
+    const skinnedOrNull = (kindSlot: number) =>
+      SKINNED_SLOTS.includes(kindSlot) ? planetSpeciesOf(PLANET_2, kindSlot)?.id : null
     expect(skinnedSpeciesOf(PLANET_2)).toEqual(
-      SKINNED_SLOTS.map((kindSlot) => planetSpeciesOf(PLANET_2, kindSlot)?.id),
+      planetSkinsOf(PLANET_2).map((_, at) => skinnedOrNull(at + 1)),
     )
   })
 
