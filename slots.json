@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-10-22T07:46:49+02:00",
+  "updated_at": "2026-10-22T09:41:59+02:00",
   "caps": {
     "grok": 12,
     "claude": 10,
@@ -133,7 +133,7 @@
     "last_run": "2026-10-21T18:23:25Z",
     "last_nightly": "2026-10-15T20:43:15Z",
     "last_nightly_result": "full=FAIL balance-report=ok bench=FAIL balance-planets=ok balance-guns=ok balance-charges=ok balance-refinery=ok balance-heat=ok e2e=FAIL memory-soak=FAIL packaged-smoke=ok ",
-    "main_red_sha": "c42f04783d9d3d0093c9b7d2fc5765e762792bbc",
+    "main_red_sha": null,
     "feature": null,
     "feature_title": null,
     "queue": [
