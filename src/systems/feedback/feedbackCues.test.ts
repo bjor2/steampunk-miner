@@ -50,11 +50,15 @@ describe('feedback cues', () => {
     ])
   })
 
-  it('clanks on docking and shakes on a hit', () => {
+  it('clanks on docking and shakes on a hit, from everywhere with no sight of its enemy', () => {
     expect(feedbackCuesOf([docked, hitByCrawler], 'p1')).toEqual([
       { kind: 'dockClank' },
-      { kind: 'hit' },
+      { kind: 'hit', from: { kind: 'everywhere' } },
     ])
+  })
+
+  it('feels nothing of a hit that took no hull (ticket 720)', () => {
+    expect(feedbackCuesOf([{ ...hitByCrawler, amount: '0e+0' }], 'p1')).toEqual([])
   })
 
   it('hisses as a ring lines the wall and pops as the drill clears lining', () => {
@@ -158,7 +162,7 @@ describe('feedback cues', () => {
     // The charge tile's centre is (3500, 280500) mm; the vehicle stands 3 m right and 4 m up.
     const cues = withFreshRegistrySet(
       () => addToRegistry(CHARGE_BLAST_CUE_REGISTRY, 'fake-blast', byDistance),
-      () => feedbackCuesOf([blast], 'p1', { xMm: 6500, yMm: 284500 }),
+      () => feedbackCuesOf([blast], 'p1', { listener: { xMm: 6500, yMm: 284500 }, hits: null }),
     )
     expect(cues).toEqual([
       { kind: 'chargeBlast', kick: { shake: 1, flash: 0.5, thumpDelayTicks: 5 } },

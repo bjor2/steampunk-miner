@@ -1,6 +1,12 @@
 import { describe, expect, it } from 'vitest'
-import { FLASH_MAX_OPACITY, SHAKE_MAX_METRES } from '../../constants/scene'
+import {
+  DRILL_FACE_HIT_SHAKE_PIXELS,
+  FLASH_MAX_OPACITY,
+  HIT_SHAKE_PIXELS,
+  SHAKE_MAX_METRES,
+} from '../../constants/scene'
 import { SHIPPED_CHARGE_BLAST_KICK } from '../registries/chargeBlastCue'
+import type { FeedbackCue } from './feedbackCues'
 import {
   createScreenEffects,
   kickScreen,
@@ -10,13 +16,35 @@ import {
 
 const ALL_ON: EffectSwitches = { shake: true, flashes: true }
 
+/** 50 px a metre: the default zoom's 13.3 m down a 666 px tall screen, near enough. */
+const METRES_PER_PIXEL = 1 / 50
+
+const RIGHT = Math.PI / 2
+const sideHit: FeedbackCue = { kind: 'hit', from: { kind: 'bearing', radians: RIGHT } }
+const drillFaceHit: FeedbackCue = { kind: 'hit', from: { kind: 'drillFace' } }
+
+/** The largest offset in screen pixels, and the last frame that moved, over `seconds`. */
+function shakeOf(cue: FeedbackCue, fps: number, seconds = 0.5) {
+  const effects = createScreenEffects()
+  kickScreen(effects, cue, ALL_ON)
+  let largestPixels = 0
+  let lastMovedSeconds = 0
+  for (let frame = 1; frame <= Math.round(seconds * fps); frame++) {
+    stepScreenEffects(effects, 1 / fps, ALL_ON, METRES_PER_PIXEL)
+    const pixels = Math.hypot(effects.offsetX, effects.offsetY) / METRES_PER_PIXEL
+    largestPixels = Math.max(largestPixels, pixels)
+    if (pixels > 1e-9) lastMovedSeconds = frame / fps
+  }
+  return { largestPixels, lastMovedSeconds }
+}
+
 function run(seconds: number, fps: number, switches: EffectSwitches = ALL_ON) {
   const effects = createScreenEffects()
-  kickScreen(effects, { kind: 'hit' }, switches)
+  kickScreen(effects, { kind: 'hit', from: { kind: 'everywhere' } }, switches)
   let largestOffset = 0
   let largestFlash = 0
   for (let frame = 0; frame < Math.round(seconds * fps); frame++) {
-    stepScreenEffects(effects, 1 / fps, switches)
+    stepScreenEffects(effects, 1 / fps, switches, METRES_PER_PIXEL)
     largestOffset = Math.max(largestOffset, Math.hypot(effects.offsetX, effects.offsetY))
     largestFlash = Math.max(largestFlash, effects.flash)
   }
@@ -28,7 +56,7 @@ describe('screen shake and flash', () => {
     const effects = createScreenEffects()
     for (let hit = 0; hit < 20; hit++) {
       kickScreen(effects, { kind: 'destroyed' }, ALL_ON)
-      stepScreenEffects(effects, 1 / 144, ALL_ON)
+      stepScreenEffects(effects, 1 / 144, ALL_ON, METRES_PER_PIXEL)
       expect(Math.hypot(effects.offsetX, effects.offsetY)).toBeLessThanOrEqual(
         SHAKE_MAX_METRES * Math.SQRT2,
       )
@@ -45,6 +73,64 @@ describe('screen shake and flash', () => {
       expect(Math.hypot(effects.offsetX, effects.offsetY)).toBeLessThan(0.001)
       expect(effects.flash).toBe(0)
     }
+  })
+
+  it.each([30, 60, 144])(
+    'shakes a side hit at most 4 px for at most 150 ms at %i frames/s (ticket 720)',
+    (fps) => {
+      const { largestPixels, lastMovedSeconds } = shakeOf(sideHit, fps)
+      expect(largestPixels).toBeGreaterThan(0)
+      expect(largestPixels).toBeLessThanOrEqual(HIT_SHAKE_PIXELS + 1e-9)
+      expect(lastMovedSeconds).toBeLessThanOrEqual(0.15)
+    },
+  )
+
+  it('shakes frontal drill contact softer than a side hit', () => {
+    const { largestPixels } = shakeOf(drillFaceHit, 144)
+    expect(largestPixels).toBeGreaterThan(0)
+    expect(largestPixels).toBeLessThanOrEqual(DRILL_FACE_HIT_SHAKE_PIXELS + 1e-9)
+  })
+
+  it('never stacks hit shakes past 4 px, however many hits land', () => {
+    const effects = createScreenEffects()
+    for (let hit = 0; hit < 20; hit++) {
+      kickScreen(effects, sideHit, ALL_ON)
+      stepScreenEffects(effects, 1 / 144, ALL_ON, METRES_PER_PIXEL)
+      const pixels = Math.hypot(effects.offsetX, effects.offsetY) / METRES_PER_PIXEL
+      expect(pixels).toBeLessThanOrEqual(HIT_SHAKE_PIXELS + 1e-9)
+    }
+  })
+
+  it('flashes only the edge a side or rear hit came from, never the veil', () => {
+    const effects = createScreenEffects()
+    kickScreen(effects, sideHit, ALL_ON)
+    expect(effects.edgeFlash).toEqual({ top: 0, right: 1, bottom: 0, left: 0 })
+    expect(effects.flash).toBe(0)
+  })
+
+  it('turns the edge with the camera: local right shows at the top when local up is a quarter turn clockwise', () => {
+    const effects = createScreenEffects()
+    kickScreen(effects, sideHit, ALL_ON, RIGHT)
+    expect(effects.edgeFlash.top).toBe(1)
+  })
+
+  it('fades the edge flash out within half a second at 30 and 144 frames/s', () => {
+    for (const fps of [30, 144]) {
+      const effects = createScreenEffects()
+      kickScreen(effects, sideHit, ALL_ON)
+      for (let frame = 0; frame < fps / 2; frame++) {
+        stepScreenEffects(effects, 1 / fps, ALL_ON, METRES_PER_PIXEL)
+      }
+      expect(effects.edgeFlash.right).toBe(0)
+    }
+  })
+
+  it('keeps a hit still and dark with shake and flashes off', () => {
+    const off = { shake: false, flashes: false }
+    const effects = createScreenEffects()
+    kickScreen(effects, sideHit, off)
+    stepScreenEffects(effects, 1 / 60, off, METRES_PER_PIXEL)
+    expect([effects.offsetX, effects.offsetY, effects.edgeFlash.right]).toEqual([0, 0, 0])
   })
 
   it('decays the shake the same at 30 and 144 frames/s', () => {
@@ -81,8 +167,8 @@ describe('screen shake and flash', () => {
 
   it('clears a running shake and flash the moment the switches go off', () => {
     const effects = createScreenEffects()
-    kickScreen(effects, { kind: 'hit' }, ALL_ON)
-    stepScreenEffects(effects, 1 / 60, { shake: false, flashes: false })
+    kickScreen(effects, { kind: 'hit', from: { kind: 'everywhere' } }, ALL_ON)
+    stepScreenEffects(effects, 1 / 60, { shake: false, flashes: false }, METRES_PER_PIXEL)
     expect([effects.offsetX, effects.offsetY, effects.flash]).toEqual([0, 0, 0])
   })
 })

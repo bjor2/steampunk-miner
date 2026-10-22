@@ -8,7 +8,7 @@ const CUES: FeedbackCue[] = [
   { kind: 'pickup', tier: 3 },
   { kind: 'dockClank' },
   { kind: 'upgradeClank' },
-  { kind: 'hit' },
+  { kind: 'hit', from: { kind: 'everywhere' } },
   { kind: 'destroyed' },
   { kind: 'coreStinger' },
   { kind: 'travelStinger' },

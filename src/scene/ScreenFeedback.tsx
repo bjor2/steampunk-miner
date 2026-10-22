@@ -1,7 +1,8 @@
 /**
  * Screen shake and flashes (#13 VFX, #33 switches): kicks the shared screen effects on each
  * feedback cue, steps them on the render delta through the player's switches, and draws the flash
- * as a warm veil in front of the world. The camera adds the shake offset (`PlanetCamera`).
+ * as a warm veil in front of the world. A hit's red edge flash is drawn by the HUD
+ * (`HitEdgeFlash`, ticket 720) from the same effects. The camera adds the shake offset (`PlanetCamera`).
  * Presentation only: it never writes the store or submits.
  */
 import { useFrame } from '@react-three/fiber'
@@ -10,7 +11,9 @@ import type { Mesh, MeshBasicMaterial } from 'three'
 import { CAMERA_POSITION } from '../constants/scene'
 import { listenForFeedback } from '../store/feedbackBroadcast'
 import { useGameStore } from '../store/gameStore'
+import type { FeedbackCue } from '../systems/feedback/feedbackCues'
 import { kickScreen, stepScreenEffects } from '../systems/feedback/screenEffects'
+import { cameraPresence } from './cameraPresence'
 import { screenEffects } from './screenEffectsPresence'
 
 /** Between the world and the camera; wide enough for any screen at the camera's zoom. */
@@ -20,12 +23,10 @@ const VEIL_COLOUR = '#fff1d6'
 
 export function ScreenFeedback() {
   const veil = useRef<Mesh>(null)
-  useEffect(
-    () => listenForFeedback((cue) => kickScreen(screenEffects, cue, useGameStore.getState().prefs)),
-    [],
-  )
-  useFrame(({ camera }, delta) => {
-    stepScreenEffects(screenEffects, delta, useGameStore.getState().prefs)
+  useEffect(() => listenForFeedback(kickScreenOnCue), [])
+  useFrame(({ camera, size }, delta) => {
+    const metresPerPixel = cameraPresence.viewShortAxisMetres / Math.max(1, size.height)
+    stepScreenEffects(screenEffects, delta, useGameStore.getState().prefs, metresPerPixel)
     if (veil.current !== null) drawVeil(veil.current, camera.position.x, camera.position.y)
   })
   return (
@@ -34,6 +35,12 @@ export function ScreenFeedback() {
       <meshBasicMaterial color={VEIL_COLOUR} transparent depthTest={false} depthWrite={false} />
     </mesh>
   )
+}
+
+/** A hit's edge turns with how the camera shows local up this frame (ticket 720). */
+function kickScreenOnCue(cue: FeedbackCue): void {
+  const { prefs } = useGameStore.getState()
+  kickScreen(screenEffects, cue, prefs, cameraPresence.localUpScreenAngle)
 }
 
 function drawVeil(veil: Mesh, x: number, y: number): void {

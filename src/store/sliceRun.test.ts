@@ -251,7 +251,7 @@ describe('presentation settings and the run', () => {
     const stopListening = listenForFeedback((cue) => {
       heard.push(cue.kind)
       kickScreen(effects, cue, game().prefs)
-      stepScreenEffects(effects, 1 / 60, game().prefs)
+      stepScreenEffects(effects, 1 / 60, game().prefs, 1 / 50)
     })
     mineTripAndDock(PLANET_1, surfaceOreTiles(10, PLANET_1))
     game().sellCargo('all')

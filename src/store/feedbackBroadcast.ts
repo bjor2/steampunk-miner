@@ -6,7 +6,7 @@
  * cues are moments, not something the UI renders.
  */
 import type { DomainEvent } from '../systems/authority/domainEvent'
-import { feedbackCuesOf, listenerPointOf, type FeedbackCue } from '../systems/feedback/feedbackCues'
+import { cueSightOf, feedbackCuesOf, type FeedbackCue } from '../systems/feedback/feedbackCues'
 import { readAuthorityState } from './authorityLink'
 
 export type FeedbackListener = (cue: FeedbackCue) => void
@@ -24,10 +24,13 @@ export function announceFeedbackCue(cue: FeedbackCue): void {
   listeners.forEach((listener) => listener(cue))
 }
 
-/** A blast kicks by how far the local vehicle stands from it (#213), so cues read its pose. */
+/**
+ * A blast kicks by how far the local vehicle stands from it (#213), and a hit flashes the side its
+ * enemy stands on (ticket 720), so cues read the pose and the enemies.
+ */
 export function announceFeedback(events: readonly DomainEvent[], playerId: string): void {
   if (listeners.size === 0) return
-  feedbackCuesOf(events, playerId, listenerPointOf(readAuthorityState(), playerId)).forEach((cue) =>
+  feedbackCuesOf(events, playerId, cueSightOf(readAuthorityState(), playerId)).forEach((cue) =>
     listeners.forEach((listener) => listener(cue)),
   )
 }

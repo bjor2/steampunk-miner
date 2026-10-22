@@ -12,7 +12,8 @@
  * cancelled and chimes when it runs to the end. A bore gun line stopped at a cell the drill cannot
  * dig, the core or lava clanks lightly (ticket 313, #309), and switching an item's auto mode clicks
  * a soft valve, never the clank (ticket 317). A species met for the first time chimes with its
- * rarity flourish (ticket 698), a cue the store reads off state, so no event names it here.
+ * rarity flourish (ticket 698), a cue the store reads off state, so no event names it here. A
+ * hit says where it came from (`hitFrom`, ticket 720), and a hit that took no hull is not felt.
  * Presentation only: cues are read from the events, never written back, so they
  * cannot touch state or the digest (#33).
  *
@@ -29,6 +30,7 @@ import {
 } from '../registries/chargeBlastCue'
 import { slotHoldEndOf } from '../registries/slotHoldCues'
 import { chargeCentreMm } from '../vehicle/vehicleCharges'
+import { didHitHurt, hitFromOf, hitSightOf, type HitFrom, type HitSight } from './hitFrom'
 
 /** Where the local player hears and feels from: its vehicle's last reported pose, in mm. */
 export interface ListenerPoint {
@@ -40,7 +42,7 @@ export type FeedbackCue =
   | { kind: 'pickup'; tier: number }
   | { kind: 'dockClank' }
   | { kind: 'upgradeClank' }
-  | { kind: 'hit' }
+  | { kind: 'hit'; from: HitFrom }
   | { kind: 'destroyed' }
   | { kind: 'coreStinger' }
   | { kind: 'travelStinger' }
@@ -87,19 +89,32 @@ export function listenerPointOf(state: AuthorityState, playerId: string): Listen
   return pose === null ? null : { xMm: pose.x, yMm: pose.y }
 }
 
+/** What the local player stands in when a batch lands: where it hears from and what it sees. */
+export interface CueSight {
+  listener: ListenerPoint | null
+  hits: HitSight | null
+}
+
+export function cueSightOf(state: AuthorityState, playerId: string): CueSight {
+  return { listener: listenerPointOf(state, playerId), hits: hitSightOf(state, playerId) }
+}
+
+const UNSEEN: CueSight = { listener: null, hits: null }
+
 /**
  * The local player's cues in a batch, one per kind, in a fixed order. With no `listener` (no pose
- * reported yet) a blast is felt as if standing on the charge.
+ * reported yet) a blast is felt as if standing on the charge; with no hit sight a side or rear
+ * hit covers the whole screen.
  */
 export function feedbackCuesOf(
   events: readonly DomainEvent[],
   playerId: string,
-  listener: ListenerPoint | null = null,
+  sight: CueSight = UNSEEN,
 ): FeedbackCue[] {
   const strongest = new Map<CueKind, FeedbackCue>()
   events
     .filter((event) => isForPlayer(event, playerId))
-    .forEach((event) => keepStronger(strongest, cueOfEvent(event, listener)))
+    .forEach((event) => keepStronger(strongest, cueOfEvent(event, sight)))
   return CUE_ORDER.flatMap((kind) => strongest.get(kind) ?? [])
 }
 
@@ -107,7 +122,7 @@ function isForPlayer(event: DomainEvent, playerId: string): boolean {
   return event.playerId === undefined || event.playerId === playerId
 }
 
-function cueOfEvent(event: DomainEvent, listener: ListenerPoint | null): FeedbackCue | null {
+function cueOfEvent(event: DomainEvent, sight: CueSight): FeedbackCue | null {
   switch (event.type) {
     case 'CargoAdded':
       return { kind: 'pickup', tier: event.resourceTier }
@@ -116,7 +131,7 @@ function cueOfEvent(event: DomainEvent, listener: ListenerPoint | null): Feedbac
     case 'UpgradePurchased':
       return isHeldStep(event.chain) ? null : { kind: 'upgradeClank' }
     case 'VehicleDamaged':
-      return { kind: 'hit' }
+      return didHitHurt(event) ? { kind: 'hit', from: hitFromOf(event, sight.hits) } : null
     case 'VehicleDestroyed':
       return { kind: 'destroyed' }
     case 'CoreCompleted':
@@ -136,7 +151,7 @@ function cueOfEvent(event: DomainEvent, listener: ListenerPoint | null): Feedbac
     case 'ChargeDetonated':
       return {
         kind: 'chargeBlast',
-        kick: chargeBlastKickOf(event, distanceToChargeMm(event, listener)),
+        kick: chargeBlastKickOf(event, distanceToChargeMm(event, sight.listener)),
       }
     case 'DrillDamageDealt':
       return { kind: 'drillContact' }

@@ -441,6 +441,19 @@ export const FLASH_MAX_OPACITY = 0.3
 export const FLASH_SECONDS = 0.28
 
 /**
+ * A hull hit's own shake (spec #678 G&V 2, ticket 720): at most 4 px for at most 150 ms, in screen
+ * pixels so every zoom and screen feels the same kick; frontal drill contact is softer. A side or
+ * rear hit's red edge flash fades over `HIT_EDGE_FLASH_SECONDS`; frontal contact throws
+ * `HIT_SPARK_BURST` sparks from the nose instead. The 2 px, 0.35 s and 24 are placeholders, tuned
+ * by eye.
+ */
+export const HIT_SHAKE_PIXELS = 4
+export const DRILL_FACE_HIT_SHAKE_PIXELS = 2
+export const HIT_SHAKE_SECONDS = 0.15
+export const HIT_EDGE_FLASH_SECONDS = 0.35
+export const HIT_SPARK_BURST = 24
+
+/**
  * `ore_whisper` (#46): while undocked, ore within 16 m of the vehicle glows at its rim even
  * behind up to 1 m of rock. Renderer only: no ore density, log or authority state changes.
  */
