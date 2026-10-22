@@ -1,30 +1,8 @@
 {
  "schema": 1,
- "updatedAt": "2026-10-22T08:33:05.155Z",
+ "updatedAt": "2026-10-22T09:57:22.661Z",
  "lastRuns": 50,
  "runs": [
-  {
-   "id": 1792096855542,
-   "url": "https://github.com/bjor2/steampunk-miner/commit/57ab1562b46e40d477457a3b4b5fa99a54bb89ff",
-   "event": "nightly",
-   "mode": "nightly",
-   "sha": "57ab1562b46e40d477457a3b4b5fa99a54bb89ff",
-   "branch": "main",
-   "startedAt": "2026-10-15T20:29:08Z",
-   "jobConclusion": "failure",
-   "timedOut": false,
-   "jobDurationSec": 707,
-   "source": "box",
-   "phase": "nightly",
-   "job": "memory-soak",
-   "feature": null,
-   "tickets": [],
-   "reportFound": false,
-   "files": 0,
-   "tests": 0,
-   "failed": 0,
-   "failedFiles": 0
-  },
   {
    "id": 1792096981215,
    "url": "https://github.com/bjor2/steampunk-miner/commit/57ab1562b46e40d477457a3b4b5fa99a54bb89ff",
@@ -1554,18 +1532,41 @@
    "tests": 0,
    "failed": 0,
    "failedFiles": 0
+  },
+  {
+   "id": 1792663040354,
+   "url": "https://github.com/bjor2/steampunk-miner/commit/7679de12d4985be61765388f8511355c4218d5fa",
+   "event": "close-#709",
+   "mode": "scoped",
+   "sha": "7679de12d4985be61765388f8511355c4218d5fa",
+   "branch": "main",
+   "startedAt": "2026-10-22T09:52:16Z",
+   "jobConclusion": "failure",
+   "timedOut": false,
+   "jobDurationSec": 304,
+   "source": "box",
+   "phase": "fast",
+   "job": "fast",
+   "feature": 668,
+   "tickets": [
+    664
+   ],
+   "reportFound": true,
+   "files": 30,
+   "tests": 345,
+   "failed": 1,
+   "failedFiles": 1
   }
  ],
  "pipeline": {
   "modes": {
-   "nightly": 14,
-   "scoped": 12,
+   "nightly": 13,
+   "scoped": 13,
    "full": 16,
    "nightly-only": 8
   },
   "timedOut": [],
   "withoutReport": [
-   1792096855542,
    1792133126544,
    1792565321088,
    1792600048377,
@@ -1579,7 +1580,7 @@
    "files": 3,
    "p50Ms": 275,
    "p95Ms": 470,
-   "fileRuns": 76,
+   "fileRuns": 77,
    "failedFileRuns": 1,
    "lastFailure": {
     "runId": 1792355624413,
@@ -1590,7 +1591,7 @@
     ],
     "file": "scripts/tests/manifestDrift.test.mjs"
    },
-   "passRate": 0.9868421052631579
+   "passRate": 0.987012987012987
   },
   "debug": {
    "files": 15,
@@ -1674,9 +1675,9 @@
   },
   "drill-gear": {
    "files": 30,
-   "p50Ms": 1487988,
+   "p50Ms": 1460468,
    "p95Ms": 6764749,
-   "fileRuns": 729,
+   "fileRuns": 744,
    "failedFileRuns": 10,
    "lastFailure": {
     "runId": 1792405438366,
@@ -1687,7 +1688,7 @@
     ],
     "file": "src/features/drill-gear/twinBitPace.test.ts"
    },
-   "passRate": 0.9862825788751715
+   "passRate": 0.9865591397849462
   },
   "dynamite-visuals": {
    "files": 11,
@@ -1737,7 +1738,7 @@
    "files": 4,
    "p50Ms": 2916,
    "p95Ms": 7657,
-   "fileRuns": 98,
+   "fileRuns": 99,
    "failedFileRuns": 0,
    "lastFailure": null,
    "passRate": 1
@@ -1855,7 +1856,7 @@
    "files": 61,
    "p50Ms": 89450,
    "p95Ms": 173895,
-   "fileRuns": 1641,
+   "fileRuns": 1642,
    "failedFileRuns": 3,
    "lastFailure": {
     "runId": 1792590572281,
@@ -1866,13 +1867,13 @@
     ],
     "file": "src/features/tech-tree/ui/techTreeScreen.test.ts"
    },
-   "passRate": 0.9981718464351006
+   "passRate": 0.9981729598051157
   },
   "terrain-tools": {
    "files": 47,
    "p50Ms": 991420,
-   "p95Ms": 3400852,
-   "fileRuns": 1324,
+   "p95Ms": 3400854,
+   "fileRuns": 1333,
    "failedFileRuns": 6,
    "lastFailure": {
     "runId": 1792590572281,
@@ -1883,7 +1884,7 @@
     ],
     "file": "src/features/terrain-tools/foamPace.test.ts"
    },
-   "passRate": 0.9954682779456193
+   "passRate": 0.9954988747186797
   },
   "workshop": {
    "files": 14,
@@ -1978,7 +1979,7 @@
    "files": 141,
    "p50Ms": 413885,
    "p95Ms": 1043022,
-   "fileRuns": 3072,
+   "fileRuns": 3073,
    "failedFileRuns": 8,
    "lastFailure": {
     "runId": 1792642824354,
@@ -1989,7 +1990,7 @@
     ],
     "file": "src/systems/authority/combat/hitArc.test.ts"
    },
-   "passRate": 0.9973958333333334
+   "passRate": 0.9973966807679792
   },
   "bot": {
    "files": 35,
@@ -2012,18 +2013,18 @@
    "files": 32,
    "p50Ms": 1237,
    "p95Ms": 3889,
-   "fileRuns": 667,
-   "failedFileRuns": 8,
+   "fileRuns": 668,
+   "failedFileRuns": 9,
    "lastFailure": {
-    "runId": 1792319779169,
-    "sha": "46fdb0d0611037d2f1b7a5a3d11a6d8d5717c9f2",
-    "at": "2026-10-18T06:48:10Z",
+    "runId": 1792663040354,
+    "sha": "7679de12d4985be61765388f8511355c4218d5fa",
+    "at": "2026-10-22T09:52:16Z",
     "tests": [
      "economy source scan finds no economy price, ratio or fee number in game code outside economy.json"
     ],
     "file": "src/systems/economy/economySourceScan.test.ts"
    },
-   "passRate": 0.9880059970014993
+   "passRate": 0.9865269461077845
   },
   "feedback": {
    "files": 4,
@@ -2100,7 +2101,7 @@
    "files": 42,
    "p50Ms": 585,
    "p95Ms": 1401,
-   "fileRuns": 896,
+   "fileRuns": 897,
    "failedFileRuns": 0,
    "lastFailure": null,
    "passRate": 1
@@ -2357,13 +2358,13 @@
  "files": {
   "scripts/tests/manifestDrift.test.mjs": {
    "feature": "tooling-tests",
-   "runs": 32,
-   "lastMs": 294,
+   "runs": 33,
+   "lastMs": 138,
    "p50Ms": 260,
    "p95Ms": 433,
-   "passRate": 0.96875,
+   "passRate": 0.9696969696969697,
    "lastStatus": "passed",
-   "lastRunId": 1792642824354,
+   "lastRunId": 1792663040354,
    "lastFailure": {
     "runId": 1792355624413,
     "sha": "20ef31bc5eb28b2b93cd4e84e1b03914c67d76cc",
@@ -2373,12 +2374,7 @@
     ]
    },
    "flaky": false,
-   "slowest": [
-    [
-     "test manifest on main lists every test file on disk with its current test sites",
-     227
-    ]
-   ]
+   "slowest": []
   },
   "src/debug/debugApi.test.ts": {
    "feature": "debug",
@@ -3450,19 +3446,19 @@
   },
   "src/features/drill-gear/drillGearInPlay.test.ts": {
    "feature": "drill-gear",
-   "runs": 27,
-   "lastMs": 490,
-   "p50Ms": 361,
+   "runs": 28,
+   "lastMs": 298,
+   "p50Ms": 348,
    "p95Ms": 777,
    "passRate": 1,
    "lastStatus": "passed",
-   "lastRunId": 1792642824354,
+   "lastRunId": 1792663040354,
    "lastFailure": null,
    "flaky": false,
    "slowest": [
     [
      "drill-gear spoil auger draws 0.3% of the tank a second while on, beside a session with it off",
-     159
+     107
     ]
    ]
   },
@@ -3510,13 +3506,13 @@
   },
   "src/features/drill-gear/forkDeep.pace.test.ts": {
    "feature": "drill-gear",
-   "runs": 29,
-   "lastMs": 165740,
-   "p50Ms": 713516,
+   "runs": 30,
+   "lastMs": 166651,
+   "p50Ms": 686041,
    "p95Ms": 2617668,
-   "passRate": 0.8620689655172413,
+   "passRate": 0.8666666666666667,
    "lastStatus": "passed",
-   "lastRunId": 1792642824354,
+   "lastRunId": 1792663040354,
    "lastFailure": {
     "runId": 1792396127843,
     "sha": "40f7723968bf215d9793d5d016db379ef02df8d6",
@@ -3529,11 +3525,11 @@
    "slowest": [
     [
      "drill-gear fork: Deep pace (GD lock on #255, GD ruling on #392) reaches planet 20 core measurably faster with Deep, never pushing travel past a quarter",
-     91768
+     89127
     ],
     [
      "drill-gear fork: Deep pace (GD lock on #255, GD ruling on #392) reaches planet 16 core measurably faster with Deep, never pushing travel past a quarter",
-     73934
+     77484
     ]
    ]
   },
@@ -3552,26 +3548,26 @@
   },
   "src/features/drill-gear/shippedRows.test.ts": {
    "feature": "drill-gear",
-   "runs": 26,
-   "lastMs": 50,
-   "p50Ms": 53,
+   "runs": 27,
+   "lastMs": 71,
+   "p50Ms": 54,
    "p95Ms": 139,
    "passRate": 1,
    "lastStatus": "passed",
-   "lastRunId": 1792642824354,
+   "lastRunId": 1792663040354,
    "lastFailure": null,
    "flaky": false,
    "slowest": []
   },
   "src/features/drill-gear/systems/aheadCutNotes.test.ts": {
    "feature": "drill-gear",
-   "runs": 27,
-   "lastMs": 4,
+   "runs": 28,
+   "lastMs": 8,
    "p50Ms": 5,
    "p95Ms": 8,
    "passRate": 1,
    "lastStatus": "passed",
-   "lastRunId": 1792642824354,
+   "lastRunId": 1792663040354,
    "lastFailure": null,
    "flaky": false,
    "slowest": []
@@ -3591,34 +3587,29 @@
   },
   "src/features/drill-gear/systems/cuttersAndBoom.test.ts": {
    "feature": "drill-gear",
-   "runs": 27,
-   "lastMs": 57,
+   "runs": 28,
+   "lastMs": 45,
    "p50Ms": 57,
    "p95Ms": 84,
    "passRate": 1,
    "lastStatus": "passed",
-   "lastRunId": 1792642824354,
+   "lastRunId": 1792663040354,
    "lastFailure": null,
    "flaky": false,
    "slowest": []
   },
   "src/features/drill-gear/systems/deepParity.test.ts": {
    "feature": "drill-gear",
-   "runs": 27,
-   "lastMs": 1632,
-   "p50Ms": 958,
+   "runs": 28,
+   "lastMs": 787,
+   "p50Ms": 950,
    "p95Ms": 1632,
    "passRate": 1,
    "lastStatus": "passed",
-   "lastRunId": 1792642824354,
+   "lastRunId": 1792663040354,
    "lastFailure": null,
    "flaky": false,
-   "slowest": [
-    [
-     "drill-gear fork: Deep from the bot and the player (GD ruling on #392) charges the cell past the bit its own drill ticks on planet 1, cut with drill.exactCarry off",
-     168
-    ]
-   ]
+   "slowest": []
   },
   "src/features/drill-gear/systems/dielectricBit.test.ts": {
    "feature": "drill-gear",
@@ -3651,25 +3642,16 @@
   },
   "src/features/drill-gear/systems/drillGearFork.test.ts": {
    "feature": "drill-gear",
-   "runs": 27,
-   "lastMs": 529,
-   "p50Ms": 223,
+   "runs": 28,
+   "lastMs": 206,
+   "p50Ms": 219,
    "p95Ms": 650,
    "passRate": 1,
    "lastStatus": "passed",
-   "lastRunId": 1792642824354,
+   "lastRunId": 1792663040354,
    "lastFailure": null,
    "flaky": false,
-   "slowest": [
-    [
-     "drill-gear fork: Wide and Deep a Wide cut takes more of both flanks than the bare bore, a Deep cut only the cell below",
-     158
-    ],
-    [
-     "drill-gear fork: Wide and Deep asks nothing of the drill before the lane chooses",
-     151
-    ]
-   ]
+   "slowest": []
   },
   "src/features/drill-gear/systems/drillGearItems.test.ts": {
    "feature": "drill-gear",
@@ -3686,39 +3668,39 @@
   },
   "src/features/drill-gear/systems/drillGearPowerUps.test.ts": {
    "feature": "drill-gear",
-   "runs": 27,
+   "runs": 28,
    "lastMs": 3,
    "p50Ms": 3,
    "p95Ms": 5,
    "passRate": 1,
    "lastStatus": "passed",
-   "lastRunId": 1792642824354,
+   "lastRunId": 1792663040354,
    "lastFailure": null,
    "flaky": false,
    "slowest": []
   },
   "src/features/drill-gear/systems/drillGearSales.test.ts": {
    "feature": "drill-gear",
-   "runs": 26,
-   "lastMs": 30,
+   "runs": 27,
+   "lastMs": 22,
    "p50Ms": 27,
    "p95Ms": 44,
    "passRate": 1,
    "lastStatus": "passed",
-   "lastRunId": 1792642824354,
+   "lastRunId": 1792663040354,
    "lastFailure": null,
    "flaky": false,
    "slowest": []
   },
   "src/features/drill-gear/systems/gatesFixture.test.ts": {
    "feature": "drill-gear",
-   "runs": 27,
-   "lastMs": 123,
+   "runs": 28,
+   "lastMs": 67,
    "p50Ms": 75,
    "p95Ms": 188,
    "passRate": 1,
    "lastStatus": "passed",
-   "lastRunId": 1792642824354,
+   "lastRunId": 1792663040354,
    "lastFailure": null,
    "flaky": false,
    "slowest": []
@@ -3777,23 +3759,23 @@
   },
   "src/features/drill-gear/systems/twinBit.test.ts": {
    "feature": "drill-gear",
-   "runs": 27,
-   "lastMs": 514,
+   "runs": 28,
+   "lastMs": 453,
    "p50Ms": 514,
    "p95Ms": 2191,
    "passRate": 1,
    "lastStatus": "passed",
-   "lastRunId": 1792642824354,
+   "lastRunId": 1792663040354,
    "lastFailure": null,
    "flaky": false,
    "slowest": [
     [
      "twin-bit head a diagonal step drops one row per cell at 30 and 144 steps/s",
-     228
+     194
     ],
     [
      "twin-bit head driving straight down with the head mounted cuts as without it",
-     121
+     110
     ]
    ]
   },
@@ -3812,27 +3794,27 @@
   },
   "src/features/drill-gear/systems/useResolution.test.ts": {
    "feature": "drill-gear",
-   "runs": 27,
-   "lastMs": 1176,
-   "p50Ms": 1158,
+   "runs": 28,
+   "lastMs": 1034,
+   "p50Ms": 1140,
    "p95Ms": 1939,
    "passRate": 1,
    "lastStatus": "passed",
-   "lastRunId": 1792642824354,
+   "lastRunId": 1792663040354,
    "lastFailure": null,
    "flaky": false,
    "slowest": [
     [
      "drill-gear Mark milestones (#256): the spoil auger, a toggle at M3 the hold packs a plug three rows deep at once and at M2 it is refused, at 30 and 144 steps/s",
-     589
-    ],
-    [
-     "drill-gear Mark milestones (#256): the sampling corer, a charged part at M3 the second tap cores beside the bit and at M2 it waits out the cooldown, at 30 and 144 steps/s",
-     145
+     523
     ],
     [
      "drill-gear Mark milestones (#256): the spoil auger, a toggle at M6 the second tap packs a row instead of switching off, and at M5 it switches off",
-     144
+     131
+    ],
+    [
+     "drill-gear Mark milestones (#256): the sampling corer, a charged part at M3 the second tap cores beside the bit and at M2 it waits out the cooldown, at 30 and 144 steps/s",
+     117
     ]
    ]
   },
@@ -4730,13 +4712,13 @@
   },
   "src/features/loadFeatures.test.ts": {
    "feature": "slice-loader",
-   "runs": 31,
-   "lastMs": 5,
+   "runs": 32,
+   "lastMs": 3,
    "p50Ms": 3,
    "p95Ms": 7,
    "passRate": 1,
    "lastStatus": "passed",
-   "lastRunId": 1792642824354,
+   "lastRunId": 1792663040354,
    "lastFailure": null,
    "flaky": false,
    "slowest": []
@@ -6927,13 +6909,13 @@
   },
   "src/features/tech-tree/systems/treeScreenModel.test.ts": {
    "feature": "tech-tree",
-   "runs": 31,
-   "lastMs": 428,
+   "runs": 32,
+   "lastMs": 144,
    "p50Ms": 161,
    "p95Ms": 428,
    "passRate": 1,
    "lastStatus": "passed",
-   "lastRunId": 1792642824354,
+   "lastRunId": 1792663040354,
    "lastFailure": null,
    "flaky": false,
    "slowest": []
@@ -7021,13 +7003,13 @@
   },
   "src/features/terrain-tools/foamPace.test.ts": {
    "feature": "terrain-tools",
-   "runs": 30,
-   "lastMs": 258407,
+   "runs": 31,
+   "lastMs": 225829,
    "p50Ms": 503571,
    "p95Ms": 1707558,
-   "passRate": 0.8,
+   "passRate": 0.8064516129032258,
    "lastStatus": "passed",
-   "lastRunId": 1792642824354,
+   "lastRunId": 1792663040354,
    "lastFailure": {
     "runId": 1792590572281,
     "sha": "d47e5dee1b35518d4e30c92d91d73779605f72fd",
@@ -7040,15 +7022,15 @@
    "slowest": [
     [
      "stabiliser foam pace (VS pin on #381, Systems ruling on #664) keeps time to core at least 0.98x the bare time where both rigs survive on planet 7",
-     107062
+     89687
     ],
     [
      "stabiliser foam pace (VS pin on #381, Systems ruling on #664) keeps time to core at least 0.98x the bare time where both rigs survive on planet 10",
-     78113
+     70382
     ],
     [
      "stabiliser foam pace (VS pin on #381, Systems ruling on #664) keeps time to core at least 0.98x the bare time where both rigs survive on planet 3",
-     73105
+     65678
     ]
    ]
   },
@@ -7177,13 +7159,13 @@
   },
   "src/features/terrain-tools/sceneBudget.test.ts": {
    "feature": "terrain-tools",
-   "runs": 30,
-   "lastMs": 3,
+   "runs": 31,
+   "lastMs": 4,
    "p50Ms": 3,
    "p95Ms": 5,
    "passRate": 1,
    "lastStatus": "passed",
-   "lastRunId": 1792642824354,
+   "lastRunId": 1792663040354,
    "lastFailure": null,
    "flaky": false,
    "slowest": []
@@ -7282,21 +7264,16 @@
   },
   "src/features/terrain-tools/systems/dragHooks.test.ts": {
    "feature": "terrain-tools",
-   "runs": 30,
-   "lastMs": 551,
+   "runs": 31,
+   "lastMs": 327,
    "p50Ms": 360,
    "p95Ms": 717,
    "passRate": 1,
    "lastStatus": "passed",
-   "lastRunId": 1792642824354,
+   "lastRunId": 1792663040354,
    "lastFailure": null,
    "flaky": false,
-   "slowest": [
-    [
-     "terrain-tools item hooks changes which nodules the drag takes",
-     171
-    ]
-   ]
+   "slowest": []
   },
   "src/features/terrain-tools/systems/foamCards.test.ts": {
    "feature": "terrain-tools",
@@ -7365,13 +7342,13 @@
   },
   "src/features/terrain-tools/systems/gatesFixture.test.ts": {
    "feature": "terrain-tools",
-   "runs": 30,
-   "lastMs": 288,
+   "runs": 31,
+   "lastMs": 169,
    "p50Ms": 210,
    "p95Ms": 666,
    "passRate": 1,
    "lastStatus": "passed",
-   "lastRunId": 1792642824354,
+   "lastRunId": 1792663040354,
    "lastFailure": null,
    "flaky": false,
    "slowest": []
@@ -7417,23 +7394,19 @@
   },
   "src/features/terrain-tools/systems/magnetFeel.test.ts": {
    "feature": "terrain-tools",
-   "runs": 30,
-   "lastMs": 565,
+   "runs": 31,
+   "lastMs": 484,
    "p50Ms": 542,
    "p95Ms": 1089,
    "passRate": 1,
    "lastStatus": "passed",
-   "lastRunId": 1792642824354,
+   "lastRunId": 1792663040354,
    "lastFailure": null,
    "flaky": false,
    "slowest": [
     [
      "magnet fields: feel anchor: an affected object starts moving within 6 ticks, at 30 steps/s",
-     123
-    ],
-    [
-     "magnet fields: feel anchor: vehicle speed under the field never exceeds the #233 cap",
-     116
+     105
     ]
    ]
   },
@@ -7584,13 +7557,13 @@
   },
   "src/features/terrain-tools/systems/repulsorCoil.test.ts": {
    "feature": "terrain-tools",
-   "runs": 30,
-   "lastMs": 193,
+   "runs": 31,
+   "lastMs": 149,
    "p50Ms": 177,
    "p95Ms": 431,
    "passRate": 1,
    "lastStatus": "passed",
-   "lastRunId": 1792642824354,
+   "lastRunId": 1792663040354,
    "lastFailure": null,
    "flaky": false,
    "slowest": []
@@ -7610,27 +7583,27 @@
   },
   "src/features/terrain-tools/systems/stabiliserFoam.test.ts": {
    "feature": "terrain-tools",
-   "runs": 30,
-   "lastMs": 2157,
+   "runs": 31,
+   "lastMs": 1572,
    "p50Ms": 1804,
    "p95Ms": 3367,
    "passRate": 1,
    "lastStatus": "passed",
-   "lastRunId": 1792642824354,
+   "lastRunId": 1792663040354,
    "lastFailure": null,
    "flaky": false,
    "slowest": [
     [
      "stabiliser foam: replay and save ends in the same state with the same events at 30 and 144 steps/s",
-     385
+     253
     ],
     [
      "stabiliser foam: the cone sets foam on the cone ahead of the rig, uses one unit and logs foam_set",
-     250
+     175
     ],
     [
-     "stabiliser foam: replay and save keeps the foam and its braces across a save taken mid-brace",
-     200
+     "stabiliser foam: the timed brace never stacks with a lode clamp over the same block: it ends at the later end",
+     133
     ]
    ]
   },
@@ -10293,13 +10266,13 @@
   },
   "src/systems/authority/moneyRounding.test.ts": {
    "feature": "authority",
-   "runs": 32,
-   "lastMs": 5,
+   "runs": 33,
+   "lastMs": 2,
    "p50Ms": 5,
    "p95Ms": 14,
    "passRate": 1,
    "lastStatus": "passed",
-   "lastRunId": 1792642824354,
+   "lastRunId": 1792663040354,
    "lastFailure": null,
    "flaky": false,
    "slowest": []
@@ -11189,17 +11162,17 @@
   },
   "src/systems/economy/economySourceScan.test.ts": {
    "feature": "economy",
-   "runs": 32,
-   "lastMs": 237,
+   "runs": 33,
+   "lastMs": 155,
    "p50Ms": 194,
    "p95Ms": 1342,
-   "passRate": 0.75,
-   "lastStatus": "passed",
-   "lastRunId": 1792642824354,
+   "passRate": 0.7272727272727273,
+   "lastStatus": "failed",
+   "lastRunId": 1792663040354,
    "lastFailure": {
-    "runId": 1792319779169,
-    "sha": "46fdb0d0611037d2f1b7a5a3d11a6d8d5717c9f2",
-    "at": "2026-10-18T06:48:10Z",
+    "runId": 1792663040354,
+    "sha": "7679de12d4985be61765388f8511355c4218d5fa",
+    "at": "2026-10-22T09:52:16Z",
     "tests": [
      "economy source scan finds no economy price, ratio or fee number in game code outside economy.json"
     ]
@@ -11208,7 +11181,7 @@
    "slowest": [
     [
      "economy source scan finds no economy price, ratio or fee number in game code outside economy.json",
-     168
+     106
     ]
    ]
   },
@@ -12121,13 +12094,13 @@
   },
   "src/systems/vehicle/vehicleStats.test.ts": {
    "feature": "vehicle",
-   "runs": 32,
+   "runs": 33,
    "lastMs": 15,
    "p50Ms": 13,
    "p95Ms": 32,
    "passRate": 1,
    "lastStatus": "passed",
-   "lastRunId": 1792642824354,
+   "lastRunId": 1792663040354,
    "lastFailure": null,
    "flaky": false,
    "slowest": []
@@ -21054,13 +21027,13 @@
   },
   "src/features/drill-gear/systems/moneyOnlyGates.test.ts": {
    "feature": "drill-gear",
-   "runs": 7,
-   "lastMs": 101,
-   "p50Ms": 85,
+   "runs": 8,
+   "lastMs": 68,
+   "p50Ms": 79,
    "p95Ms": 101,
    "passRate": 1,
    "lastStatus": "passed",
-   "lastRunId": 1792642824354,
+   "lastRunId": 1792663040354,
    "lastFailure": null,
    "flaky": false,
    "slowest": []
@@ -21609,34 +21582,29 @@
   },
   "src/features/drill-gear/systems/boreWidthCopy.test.ts": {
    "feature": "drill-gear",
-   "runs": 6,
-   "lastMs": 13,
+   "runs": 7,
+   "lastMs": 10,
    "p50Ms": 11,
    "p95Ms": 13,
    "passRate": 1,
    "lastStatus": "passed",
-   "lastRunId": 1792642824354,
+   "lastRunId": 1792663040354,
    "lastFailure": null,
    "flaky": false,
    "slowest": []
   },
   "src/features/drill-gear/systems/sideCutterMarks.test.ts": {
    "feature": "drill-gear",
-   "runs": 6,
-   "lastMs": 246,
-   "p50Ms": 96,
+   "runs": 7,
+   "lastMs": 99,
+   "p50Ms": 99,
    "p95Ms": 246,
    "passRate": 1,
    "lastStatus": "passed",
-   "lastRunId": 1792642824354,
+   "lastRunId": 1792663040354,
    "lastFailure": null,
    "flaky": false,
-   "slowest": [
-    [
-     "side cutters width Marks cuts three side cells a side with Wide's reamers on top of Mark 2",
-     128
-    ]
-   ]
+   "slowest": []
   },
   "src/features/mineral-skins/mineralSkins.planet2.test.ts": {
    "feature": "mineral-skins",
@@ -22066,26 +22034,26 @@
   },
   "src/features/terrain-tools/collapseDeathReportRows.test.ts": {
    "feature": "terrain-tools",
-   "runs": 3,
-   "lastMs": 5,
+   "runs": 4,
+   "lastMs": 7,
    "p50Ms": 4,
-   "p95Ms": 5,
+   "p95Ms": 7,
    "passRate": 1,
    "lastStatus": "passed",
-   "lastRunId": 1792642824354,
+   "lastRunId": 1792663040354,
    "lastFailure": null,
    "flaky": false,
    "slowest": []
   },
   "src/features/terrain-tools/foamPaceGate.test.ts": {
    "feature": "terrain-tools",
-   "runs": 3,
+   "runs": 4,
    "lastMs": 3,
    "p50Ms": 3,
    "p95Ms": 5,
    "passRate": 1,
    "lastStatus": "passed",
-   "lastRunId": 1792642824354,
+   "lastRunId": 1792663040354,
    "lastFailure": null,
    "flaky": false,
    "slowest": []
