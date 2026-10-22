@@ -529,6 +529,27 @@
       "wornBy": ["p2-r5"]
     },
     {
+      "kind": "base",
+      "id": "azure-frost",
+      "cell": "cells/base/azure-frost.png",
+      "blend": "blend/base-azure-frost.blend",
+      "wornBy": ["p2-u1b"]
+    },
+    {
+      "kind": "base",
+      "id": "brass-striae",
+      "cell": "cells/base/brass-striae.png",
+      "blend": "blend/base-brass-striae.blend",
+      "wornBy": ["p2-u2b"]
+    },
+    {
+      "kind": "base",
+      "id": "sooty-tarnish",
+      "cell": "cells/base/sooty-tarnish.png",
+      "blend": "blend/base-sooty-tarnish.blend",
+      "wornBy": ["p2-r3b"]
+    },
+    {
       "kind": "vein",
       "id": "nugget-cluster",
       "cell": "cells/vein/nugget-cluster.png",
@@ -1054,6 +1075,27 @@
       "wornBy": ["p2-r5"]
     },
     {
+      "kind": "vein",
+      "id": "azurite-nodules",
+      "cell": "cells/vein/azurite-nodules.png",
+      "blend": "blend/vein-azurite-nodules.blend",
+      "wornBy": ["p2-u1b"]
+    },
+    {
+      "kind": "vein",
+      "id": "pyrite-suns",
+      "cell": "cells/vein/pyrite-suns.png",
+      "blend": "blend/vein-pyrite-suns.blend",
+      "wornBy": ["p2-u2b"]
+    },
+    {
+      "kind": "vein",
+      "id": "sectile-blocks",
+      "cell": "cells/vein/sectile-blocks.png",
+      "blend": "blend/vein-sectile-blocks.blend",
+      "wornBy": ["p2-r3b"]
+    },
+    {
       "kind": "sheen",
       "id": "earthy",
       "cell": "cells/sheen/earthy.png",
@@ -1577,6 +1619,27 @@
       "cell": "cells/sheen/mirror-polish.png",
       "blend": "blend/sheen-mirror-polish.blend",
       "wornBy": ["p2-r5"]
+    },
+    {
+      "kind": "sheen",
+      "id": "velvet-frost",
+      "cell": "cells/sheen/velvet-frost.png",
+      "blend": "blend/sheen-velvet-frost.blend",
+      "wornBy": ["p2-u1b"]
+    },
+    {
+      "kind": "sheen",
+      "id": "sun-rays",
+      "cell": "cells/sheen/sun-rays.png",
+      "blend": "blend/sheen-sun-rays.blend",
+      "wornBy": ["p2-u2b"]
+    },
+    {
+      "kind": "sheen",
+      "id": "smelter-silver",
+      "cell": "cells/sheen/smelter-silver.png",
+      "blend": "blend/sheen-smelter-silver.blend",
+      "wornBy": ["p2-r3b"]
     }
   ]
 }

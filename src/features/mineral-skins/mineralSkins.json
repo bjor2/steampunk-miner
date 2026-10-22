@@ -1,5 +1,5 @@
 {
-  "$comment": "The mineral skins of #576 (GD ruling 20 Oct 2026, ticket 591): a species' skin is four layers drawn bottom first, a base texture, a vein or crystal shape, a palette and a sheen, each an id of its layer list below. A skin row names its species (a materials.json id) and one id per layer; no two species of one pool share all four, so no two species on one planet look alike. A palette is a ramp of three display colours, shadow, body and light, darkest first; its body is the hue slot colour of the species wearing it (ticket 450), so the skin keeps the hue guards of materials.json. The base, vein and sheen layers are drawn in Blender, one cell each (docs/art/mineral-skins, skin-layers.json). Look only: no price, gate, income, generation or save reads it. The batch tickets (#592 to #606) add the layers and rows, 15 species per planet on P1 to P5; #592 skins P1's slots 1 to 5, #593 its slots 6 to 10, #594 its slots 11 and 12 (the legacy pool has 12 species); #598 skins P3's slots 1 to 5, #599 its slots 6 to 10 and #600 its slots 11 to 15 (the foothold-p3 pool; its slots 16 and 17, the two fossil commons of #453, are held); #601 P4's slots 1 to 5, #602 its slots 6 to 10 and #603 its slots 11 to 15 (the foothold-p4 pool; its slots 16 and 17, #453's fossil commons, are held); #604 P5's slots 1 to 5, #605 its slots 6 to 10 and #606 its slots 11 to 15 (the foothold-p5 pool; its slots 16 and 17, #453's fossil commons, are held); #595 P2's slots 1 to 5, #596 its slots 6 to 9 and #597 its slots 10 to 12 (the foothold-p2 pool of #632, on the legacy slots); #710 its slots 13 to 15, the pool's own kinds of ticket 709. A signature row dresses the signature material of its planet, the slotless 16th material (#453 E1), keyed by the planet: one per planet, apart from every species of the planet's pool, its palette's body inside the hue and luma bands of the family's look (ore-visuals, #151) since it has no hue slot; #600 adds P3's, #603 P4's and #606 P5's.",
+  "$comment": "The mineral skins of #576 (GD ruling 20 Oct 2026, ticket 591): a species' skin is four layers drawn bottom first, a base texture, a vein or crystal shape, a palette and a sheen, each an id of its layer list below. A skin row names its species (a materials.json id) and one id per layer; no two species of one pool share all four, so no two species on one planet look alike. A palette is a ramp of three display colours, shadow, body and light, darkest first; its body is the hue slot colour of the species wearing it (ticket 450), so the skin keeps the hue guards of materials.json. The base, vein and sheen layers are drawn in Blender, one cell each (docs/art/mineral-skins, skin-layers.json). Look only: no price, gate, income, generation or save reads it. The batch tickets (#592 to #606) add the layers and rows, 15 species per planet on P1 to P5; #592 skins P1's slots 1 to 5, #593 its slots 6 to 10, #594 its slots 11 and 12 (the legacy pool has 12 species); #598 skins P3's slots 1 to 5, #599 its slots 6 to 10 and #600 its slots 11 to 15 (the foothold-p3 pool; its slots 16 and 17, the two fossil commons of #453, are held); #601 P4's slots 1 to 5, #602 its slots 6 to 10 and #603 its slots 11 to 15 (the foothold-p4 pool; its slots 16 and 17, #453's fossil commons, are held); #604 P5's slots 1 to 5, #605 its slots 6 to 10 and #606 its slots 11 to 15 (the foothold-p5 pool; its slots 16 and 17, #453's fossil commons, are held); #595 P2's slots 1 to 5, #596 its slots 6 to 9 and #597 its slots 10 to 12 (the foothold-p2 pool of #632, on the legacy slots); #710 its slots 13 to 15, the pool's own kinds of ticket 709. #736 dresses the three species P2 swaps in on its slots 6, 7 and 12 under ore rules 9 (Azurite Nodule, Pyrite Sun, Argentite); the retired three keep their skins for the P2 a save holds under older rules. A signature row dresses the signature material of its planet, the slotless 16th material (#453 E1), keyed by the planet: one per planet, apart from every species of the planet's pool, its palette's body inside the hue and luma bands of the family's look (ore-visuals, #151) since it has no hue slot; #600 adds P3's, #603 P4's and #606 P5's.",
   "layers": {
     "base": [
       {
@@ -226,6 +226,15 @@
       },
       {
         "id": "scalloped-jet"
+      },
+      {
+        "id": "azure-frost"
+      },
+      {
+        "id": "brass-striae"
+      },
+      {
+        "id": "sooty-tarnish"
       }
     ],
     "vein": [
@@ -453,6 +462,15 @@
       },
       {
         "id": "teardrop-beads"
+      },
+      {
+        "id": "azurite-nodules"
+      },
+      {
+        "id": "pyrite-suns"
+      },
+      {
+        "id": "sectile-blocks"
       }
     ],
     "palette": [
@@ -755,6 +773,18 @@
       {
         "id": "jet-black",
         "ramp": ["#443b3a", "#877673", "#c3bbb9"]
+      },
+      {
+        "id": "azurite-blue",
+        "ramp": ["#2c4070", "#5781e1", "#abc0f0"]
+      },
+      {
+        "id": "pyrite-brass",
+        "ramp": ["#625c33", "#c5b866", "#e2dcb3"]
+      },
+      {
+        "id": "argentite-grey",
+        "ramp": ["#46525a", "#8ba3b5", "#c5d1da"]
       }
     ],
     "sheen": [
@@ -982,6 +1012,15 @@
       },
       {
         "id": "mirror-polish"
+      },
+      {
+        "id": "velvet-frost"
+      },
+      {
+        "id": "sun-rays"
+      },
+      {
+        "id": "smelter-silver"
       }
     ]
   },
@@ -1489,6 +1528,27 @@
       "vein": "teardrop-beads",
       "palette": "jet-black",
       "sheen": "mirror-polish"
+    },
+    {
+      "species": "p2-u1b",
+      "base": "azure-frost",
+      "vein": "azurite-nodules",
+      "palette": "azurite-blue",
+      "sheen": "velvet-frost"
+    },
+    {
+      "species": "p2-u2b",
+      "base": "brass-striae",
+      "vein": "pyrite-suns",
+      "palette": "pyrite-brass",
+      "sheen": "sun-rays"
+    },
+    {
+      "species": "p2-r3b",
+      "base": "sooty-tarnish",
+      "vein": "sectile-blocks",
+      "palette": "argentite-grey",
+      "sheen": "smelter-silver"
     }
   ],
   "signatures": [

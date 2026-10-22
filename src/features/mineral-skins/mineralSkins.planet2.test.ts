@@ -1,7 +1,11 @@
 import { describe, expect, it } from 'vitest'
 import { createAuthorityState } from '../../systems/authority/authorityState'
 import { planetParamsOf } from '../../systems/authority/planetOfState'
-import { freshPlanetParamsFor, type PlanetParams } from '../../systems/world/planetParams'
+import {
+  freshPlanetParamsFor,
+  planetParamsFor,
+  type PlanetParams,
+} from '../../systems/world/planetParams'
 import { planetSpeciesOf } from '../roster'
 import { planetSkinsOf } from './systems/mineralSkin'
 import type { MineralSkin, SkinLayer, SkinLayerKind } from './systems/skinLayers'
@@ -13,15 +17,20 @@ import type { MineralSkin, SkinLayer, SkinLayerKind } from './systems/skinLayers
 // bismuth stair, moonstone lens, galena cube); ticket 597 slots 10 to 12, its three rares (star
 // garnet, verdigris opal, smoke diamond). Under ore rules 9 the pool adds its own slots 13 to 15
 // (ticket 709: cinnabar, aquamarine, jet), which ticket 710 skins, so every kind slot of a fresh P2
-// wears a skin of its own. A P2 entered before that pool, under ore rules 5, keeps the legacy
+// wears a skin of its own. Under the same rules slots 6, 7 and 12 swap species (ticket 736: azurite
+// nodule, pyrite sun, argentite), which that ticket skins, while a P2 entered under rules 8 keeps the
+// retired three in their own skins. A P2 entered before that pool, under ore rules 5, keeps the legacy
 // species, so it keeps the skins planet 1 shows.
 
 const SEED = 83921
 const PLANET_2 = freshPlanetParamsFor(SEED, 2)
-/** Slots 6, 7 and 12 swap species under ore rules 9 (ticket 736) and wait for their skins. */
-const SKINNED_SLOTS = [1, 2, 3, 4, 5, 8, 9, 10, 11, 13, 14, 15]
+const SKINNED_SLOTS = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15]
 /** P2's own kinds of ticket 709, roster slots 13 to 15, skinned by ticket 710. */
 const OWN_SLOTS = [13, 14, 15]
+/** The slots whose species swap under ore rules 9 (ticket 736), skinned by the same ticket. */
+const SWAPPED_SLOTS = [6, 7, 12]
+/** The ore rules of the swap: a P2 entered under rules 8 keeps the retired three and their skins. */
+const RULES_BEFORE_SWAP = 8
 /** The ore rules a P2 world was entered under before its own pool (ticket 632). */
 const RULES_BEFORE_P2_POOL = 5
 
@@ -47,12 +56,30 @@ describe('mineral skins of planet 2', () => {
     expect(planetSkinsOf(PLANET_2)[kindSlot - 1]?.speciesId).toBe(species?.id)
   })
 
-  it('skins every kind slot of the planet but the three swapped ones, its own three included', () => {
-    const skinnedOrNull = (kindSlot: number) =>
-      SKINNED_SLOTS.includes(kindSlot) ? planetSpeciesOf(PLANET_2, kindSlot)?.id : null
+  it('skins every kind slot of the planet, its own three and the three swapped in included', () => {
     expect(skinnedSpeciesOf(PLANET_2)).toEqual(
-      planetSkinsOf(PLANET_2).map((_, at) => skinnedOrNull(at + 1)),
+      SKINNED_SLOTS.map((kindSlot) => planetSpeciesOf(PLANET_2, kindSlot)?.id),
     )
+  })
+
+  it.each(SWAPPED_SLOTS)(
+    'gives the species swapped into slot %i layers no other P2 species wears',
+    (kindSlot) => {
+      const skins = planetSkinsOf(PLANET_2)
+      const swapped = skins[kindSlot - 1]
+      const wornByOthers = skins
+        .filter((skin) => skin !== null && skin.speciesId !== swapped?.speciesId)
+        .flatMap((skin) => skin?.layers ?? [])
+      for (const kind of ['base', 'vein', 'palette', 'sheen'] as const) {
+        expect(wornByOthers).not.toContainEqual(expect.objectContaining(layerOf(swapped, kind)))
+      }
+    },
+  )
+
+  it('keeps the retired species and their skins on a planet 2 entered before the swap', () => {
+    const older = planetParamsFor(SEED, 2, RULES_BEFORE_SWAP)
+    const retired = SWAPPED_SLOTS.map((kindSlot) => planetSkinsOf(older)[kindSlot - 1]?.speciesId)
+    expect(retired).toEqual(['p2-u1', 'p2-u2', 'p2-r3'])
   })
 
   it.each(OWN_SLOTS)(

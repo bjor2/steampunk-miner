@@ -262,6 +262,42 @@ on the stone. With this batch every kind slot of a fresh P2, 15 of them, wears a
   and mirror polish read the cement net and the scallops of their bases through the same seeds.
 - **Seeds 1001 to 1025**, apart from p2-b1's 701 to 792, p2-b2's 801 to 835 and p2-b3's 901 to 925.
 
+## Batch p2-b5: the species P2 swaps in on slots 6, 7 and 12 (ticket 736)
+
+Under ore rules 9 three of P2's shared slots swap species like for like (GD lock on #736): Azurite
+Nodule takes kind slot 6 (`legacy.u1`) from cobalt bloom, Pyrite Sun slot 7 (`legacy.u2`) from
+bismuth stair and Argentite slot 12 (`legacy.r3`) from smoke diamond. A P2 entered under older
+rules keeps the retired three, in p2-b2 and p2-b3's skins. The batch reads its slots under rules 9
+(`oreRules` in `BATCHES`), and its report and planet strip leave out the retired skins of those
+slots, which never share a planet with it (`mate_skins`). The layers come from the species row, as
+for p2-b1, none shared with another batch, and each vein and its sheen share one layout
+(`AZURITE_NODULES`, `PYRITE_SUNS`, `ARGENTITE_BLOCKS` in `layer_art.py`).
+
+<!-- p2-b5 -->
+
+| slot | species  | base            | vein              | palette (shadow, body, light)                  | sheen            |
+| ---- | -------- | --------------- | ----------------- | ---------------------------------------------- | ---------------- |
+| 6    | `p2-u1b` | `azure-frost`   | `azurite-nodules` | `azurite-blue` `#2c4070` `#5781e1` `#abc0f0`   | `velvet-frost`   |
+| 7    | `p2-u2b` | `brass-striae`  | `pyrite-suns`     | `pyrite-brass` `#625c33` `#c5b866` `#e2dcb3`   | `sun-rays`       |
+| 12   | `p2-r3b` | `sooty-tarnish` | `sectile-blocks`  | `argentite-grey` `#46525a` `#8ba3b5` `#c5d1da` | `smelter-silver` |
+
+<!-- /p2-b5 -->
+
+- **Species:** azurite nodule, pyrite sun and argentite (`p2-u1b`, `p2-u2b`, `p2-r3b`; Progression's
+  names on #709, moved from P1 by Bjor on #713).
+- **Bases:** a deep blue crust frosted with fine velvety crystals, darker where it thickens in slow
+  clouds, pricked with bright grains; pale brass faces finely striated, the striae turning a quarter
+  from face to face as on a pyrite cube, a dark seam between faces; a lead-grey body dulled by a
+  sooty tarnish in soft dark blotches, with a fine dull grain.
+- **Veins:** five rounded nodules sat low in the rock, the three large ones knuckled with smaller
+  lobes; two flat pyrite suns, each a thin disc with eighteen ridged rays running out from a raised
+  boss, a few loose cubelets beside them; five soft blocky crystals worn round at every edge.
+- **Sheens:** velvet frost (no glare, a soft bloom on the lamp side of each nodule and a fine
+  sparkle over the crust), sun rays (the ridges of each sun flashing where they turn to the lamp, a
+  hard glint on the boss, bright grains over the striae), smelter silver (the tarnish dull, thin
+  bright knife scratches showing the silver, and a lip on the lamp-side edges of each block).
+- **Seeds 1101 to 1124**, apart from p2-b1 to p2-b4's 701 to 1025.
+
 ## Batch p3-b1: P3's species 1 to 5 (ticket 598)
 
 The foothold-p3 pool's four commons and its metal uncommon, kind slots 1 to 5 on P3. The layers
@@ -981,6 +1017,42 @@ pale net, and under deuteranopia both stay apart (0.156 and 0.141). Every new sk
 rock, with contrast from 1.60 for jet to 2.38 for aquamarine (cinnabar 1.81). Checked by eye on
 `p2-b4.phone-x4.png`, `p2-b4.desktop.png`, the `p2-b4.scale-x4` copies, and `p2.scale-x4.png`
 with its `-deutan` and `-gray` copies, now all fifteen P2 skins side by side.
+
+From `sheets/p2-b5.distinct.json`, at 22 px a tile over P2's band 3 rock (luma 0.29). The first
+three pairs are within the batch; the rest are the closest pairs against the twelve P2 skins a
+P2 under ore rules 9 shows beside them (the report holds all 39):
+
+<!-- p2-b5-readings -->
+
+| pair                             | colour apart | deuteranopia apart | luma apart | texture apart |
+| -------------------------------- | ------------ | ------------------ | ---------- | ------------- |
+| azurite vs pyrite                | 0.624        | 0.679              | 0.211      | 0.042         |
+| azurite vs argentite             | 0.299        | 0.380              | 0.145      | 0.053         |
+| pyrite vs argentite              | 0.349        | 0.333              | 0.066      | 0.052         |
+| slate vs argentite (least apart) | 0.116        | 0.120              | 0.064      | 0.079         |
+| tin gravel vs argentite          | 0.136        | 0.119              | 0.072      | 0.071         |
+| galena vs argentite              | 0.153        | 0.132              | 0.081      | 0.078         |
+| graphite vs argentite            | 0.173        | 0.176              | 0.089      | 0.083         |
+| aquamarine vs argentite          | 0.186        | 0.214              | 0.121      | 0.064         |
+| verdigris opal vs argentite      | 0.245        | 0.133              | 0.012      | 0.074         |
+| sulphur crust vs pyrite          | 0.270        | 0.253              | 0.079      | 0.049         |
+| slate vs azurite                 | 0.291        | 0.344              | 0.081      | 0.083         |
+
+<!-- /p2-b5-readings -->
+
+Argentite is the batch's grey on a planet that already holds five (slate, tin gravel, galena,
+graphite, jet). Its hue slot was tried at four places before it was fixed: a lead grey at 196,
+0.16, 0.62 left it 0.102 from slate; an olive grey at 95, 0.18, 0.64 pushed every colour pair past
+0.15 but fell to 0.037 from verdigris opal under deuteranopia; a teal at 185, 0.30, 0.60 held both
+past 0.10 but no longer read as a sullen grey ore. The slot is a blue lead grey at 205, 0.22, 0.62,
+whose worst pairs (0.116 colour to slate, 0.119 deuteranopia to tin gravel) sit above p2-b4's
+least apart pair (0.106, 0.090); its rounded blocks and dark tarnish blotches part it from slate's
+level slabs and tin's bed of grains. Azurite is the planet's only strong blue (cobalt bloom is
+retired on this planet), and pyrite's pale brass sits apart from sulphur crust's saturated yellow,
+its suns and striated faces against the crust's crumbs. Every new skin sits above its rock, with
+contrast from 1.59 for azurite to 2.22 for pyrite (argentite 2.02). Checked by eye on
+`p2-b5.layers.jpg`, `p2-b5.phone-x4.png` and `p2.scale-x4.png`, all fifteen skins of a P2 under
+ore rules 9 side by side.
 
 From `sheets/p3-b1.distinct.json`, at 22 px a tile over P3's band 3 rock (luma 0.29). It is P3's
 first batch, so these are all ten pairs; its pairs against p3-b2 are in `p3-b2.distinct.json`:

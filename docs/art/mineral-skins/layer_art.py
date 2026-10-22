@@ -6,8 +6,8 @@ slots 1 to 5, ticket 602 for its slots 6 to 10, ticket 603 for its slots 11 to 1
 material, ticket 604 for P5's slots 1 to 5, ticket 605 for its slots 6 to 10, ticket 606 for its slots
 11 to 15 and its signature material, ticket 595 for P2's slots 1 to 5, ticket 596 for its slots 6 to
 9, ticket 597 for its slots 10 to 12, ticket 710 for its slots 13 to 15, the pool's own kinds of
-ticket 709): one per layer id of `mineralSkins.json`. A layer id with no recipe fails, never falls
-back.
+ticket 709, ticket 736 for the three species its slots 6, 7 and 12 swap in under ore rules 9): one
+per layer id of `mineralSkins.json`. A layer id with no recipe fails, never falls back.
 
 - `base` and `sheen` are seamless textures on the 1 m cell: an emission material on a 1 m quad
   whose value is the ramp coordinate (base, mean about 0.5) or the highlight strength (sheen,
@@ -63,6 +63,16 @@ CROSSED_PRISMS = (((-0.04, 0.02), 1.15, 0.56, 0.05), ((0.08, -0.03), -0.5, 0.48,
                   ((-0.16, -0.14), 0.25, 0.3, 0.035))
 TEARDROPS = (((-0.2, 0.12), 0.065), ((0.06, 0.16), 0.055), ((0.22, -0.04), 0.06), ((-0.08, -0.14), 0.045),
              ((0.12, -0.2), 0.04))
+# P2 batch 5 (ticket 736): the layouts a vein and its sheen share. Azurite's nodules: centre and
+# radius. Pyrite's suns: centre and radius. Argentite's blocks: centre, edge and the turn in the face.
+AZURITE_NODULES = (((-0.15, 0.13), 0.1), ((0.11, 0.15), 0.075), ((0.04, -0.07), 0.11), ((-0.2, -0.17), 0.06),
+                   ((0.23, -0.19), 0.055))
+PYRITE_SUNS = (((-0.1, 0.07), 0.17), ((0.18, -0.17), 0.1))
+SUN_RAYS = 18
+ARGENTITE_BLOCKS = (((-0.13, 0.11), 0.15, 0.15), ((0.1, 0.09), 0.12, -0.2), ((-0.03, -0.12), 0.13, 0.35),
+                    ((0.21, -0.17), 0.07, 0.6), ((-0.23, -0.23), 0.06, -0.4))
+# Pyrite's striae: whole numbers of lines across the cell, so they repeat at its edge.
+PYRITE_STRIAE = 28
 # Centre, radius, teeth, phase: each wheel meshes with the one before it.
 GEAR_TRAIN = (((-0.1, 0.08), 0.19, 16, 0.0), ((0.118, -0.103), 0.12, 10, 0.2), ((0.236, 0.037), 0.08, 7, 0.1))
 TRELLIS_RODS = 2
@@ -1555,6 +1565,39 @@ def jet_scallops_of(graph):
     return {'tone': colour[0], 'pick': colour[1], 'scoop': graph.smooth(edge, 0.0, 0.5), 'break': graph.smooth(edge, 0.02, 0.0)}
 
 
+def base_azure_frost(graph):
+    """Azurite: a deep blue crust frosted with fine velvety crystals, darker where it thickens in slow clouds, pricked with bright grains."""
+    frost = stretched(graph, graph.noise(22, 22, seed=1101, detail=3))
+    cloud = stretched(graph, graph.noise(3, 3, seed=1102, detail=2))
+    grains = sprinkled(graph, 40, 1103, 0.35, 0.3)
+    tone = graph.mul_add(cloud, 0.3, 0.33)
+    tone = graph.plus(tone, graph.mul(graph.minus(frost, 0.5), 0.24))
+    return graph.plus(tone, graph.mul(grains, 0.14))
+
+
+def base_brass_striae(graph):
+    """Pyrite: pale brass faces finely striated, the striae turning a quarter from face to face as on a pyrite cube, a dark seam between faces."""
+    faces = lattice_of(graph, 4, 4, stagger=0.5)
+    turn = graph.smooth(block_random(graph, faces, 1111), 0.48, 0.52)
+    across = graph.math('SINE', graph.mul(graph.u, PYRITE_STRIAE * math.tau))
+    up = graph.math('SINE', graph.mul(graph.v, PYRITE_STRIAE * math.tau))
+    striae = graph.plus(up, graph.mul(graph.minus(across, up), turn))
+    seam = graph.smooth(graph.math('MINIMUM', faces['x'], faces['y']), 0.04, 0.0)
+    shade = graph.mul_add(block_random(graph, faces, 1112), 0.16, 0.44)
+    tone = graph.plus(shade, graph.mul(striae, 0.07))
+    tone = graph.plus(tone, graph.mul(graph.minus(stretched(graph, graph.noise(5, 5, seed=1113, detail=2)), 0.5), 0.12))
+    return graph.minus(tone, graph.mul(seam, 0.22))
+
+
+def base_sooty_tarnish(graph):
+    """Argentite: a lead-grey body dulled by a sooty tarnish in soft dark blotches, paler where the tarnish thins, with a fine dull grain."""
+    blotches = stretched(graph, graph.noise(7, 7, seed=1121, detail=3, roughness=0.55))
+    soot = graph.smooth(blotches, 0.45, 0.75)
+    grain = stretched(graph, graph.noise(40, 40, seed=1122, detail=2))
+    tone = graph.minus(0.64, graph.mul(soot, 0.3))
+    return graph.plus(tone, graph.mul(graph.minus(grain, 0.5), 0.1))
+
+
 # --- sheen: the lustre's highlights -----------------------------------------------------------------
 
 
@@ -2221,6 +2264,57 @@ def sheen_mirror_polish(graph):
         x, y = graph.minus(graph.u, cx + 0.5 - radius * 0.3), graph.minus(graph.v, cz + 0.5 + radius * 0.3)
         reach = graph.math('SQRT', graph.plus(graph.mul(x, x), graph.mul(y, y)))
         light = graph.math('MAXIMUM', light, graph.mul(graph.smooth(reach, radius * 0.42, radius * 0.18), 0.9))
+    return light
+
+
+def sheen_velvet_frost(graph):
+    """Velvet frost (azurite): no glare, only a soft bloom on the lamp side of each nodule and a fine sparkle of tiny crystal faces over the crust."""
+    sparkle = sprinkled(graph, 60, 1104, 0.3, 0.12)
+    light = graph.mul(sparkle, 0.35)
+    for (cx, cz), radius in AZURITE_NODULES:
+        # The bloom sits up and to the left of the nodule's middle, where the lamp strikes it.
+        x, y = graph.minus(graph.u, cx + 0.5 - radius * 0.3), graph.minus(graph.v, cz + 0.5 + radius * 0.3)
+        reach = graph.math('SQRT', graph.plus(graph.mul(x, x), graph.mul(y, y)))
+        bloom = graph.smooth(reach, radius * 0.75, radius * 0.1)
+        light = graph.math('MAXIMUM', light, graph.mul(bloom, graph.mul_add(sparkle, 0.5, 0.3)))
+    return light
+
+
+def sheen_sun_rays(graph):
+    """Sun rays (pyrite): the rays of each sun flashing brass where they turn to the lamp, a hard glint on its boss, and bright grains strewn over the striated faces."""
+    glints = sprinkled(graph, 30, 1114, 0.3, 0.25)
+    light = graph.mul(glints, 0.5)
+    for (cx, cz), radius in PYRITE_SUNS:
+        x, y = graph.minus(graph.u, cx + 0.5), graph.minus(graph.v, cz + 0.5)
+        reach = graph.math('SQRT', graph.plus(graph.mul(x, x), graph.mul(y, y)))
+        angle = graph.math('ARCTAN2', y, x)
+        # |cos(n a / 2)| peaks on the n ridges the vein lays at whole turns of 2 pi / n.
+        ray = graph.smooth(graph.math('ABSOLUTE', graph.math('COSINE', graph.mul(angle, SUN_RAYS / 2))), 0.7, 0.95)
+        # The rays pointing up and to the left face the lamp: 1 there, 0 on the far side.
+        lit = graph.smooth(graph.math('COSINE', graph.minus(angle, math.radians(135))), 0.0, 0.9)
+        within = graph.mul(graph.smooth(reach, radius * 0.95, radius * 0.85), graph.smooth(reach, radius * 0.15, radius * 0.25))
+        boss = graph.smooth(reach, radius * 0.16, radius * 0.06)
+        light = graph.math('MAXIMUM', light, graph.mul(graph.mul(ray, within), graph.mul_add(lit, 0.7, 0.15)))
+        light = graph.math('MAXIMUM', light, graph.mul(boss, 0.85))
+    return light
+
+
+def sheen_smelter_silver(graph):
+    """Smelter silver (argentite): the tarnish itself dull, but thin bright scratches where a knife cut the soft ore show its silver, and the lamp-side edge of each block catches."""
+    contour = graph.math('ABSOLUTE', graph.minus(stretched(graph, graph.noise(4, 4, seed=1123, detail=2)), 0.5))
+    sparse = graph.smooth(stretched(graph, graph.noise(3, 3, seed=1124, detail=1)), 0.55, 0.7)
+    light = graph.mul(graph.mul(graph.smooth(contour, 0.014, 0.004), sparse), 0.8)
+    for (cx, cz), edge, angle in ARGENTITE_BLOCKS:
+        x, y = graph.minus(graph.u, cx + 0.5), graph.minus(graph.v, cz + 0.5)
+        across = graph.minus(graph.mul(x, math.cos(angle)), graph.mul(y, math.sin(angle)))
+        along = graph.plus(graph.mul(x, math.sin(angle)), graph.mul(y, math.cos(angle)))
+        half = edge * 0.45
+        # The top and left edges of the block face the lamp: a thin bright lip inside them.
+        top = graph.mul(graph.smooth(graph.math('ABSOLUTE', graph.minus(along, half * 0.85)), half * 0.12, half * 0.03),
+                        graph.smooth(graph.math('ABSOLUTE', across), half * 0.9, half * 0.7))
+        left = graph.mul(graph.smooth(graph.math('ABSOLUTE', graph.plus(across, half * 0.85)), half * 0.12, half * 0.03),
+                         graph.smooth(graph.math('ABSOLUTE', along), half * 0.9, half * 0.7))
+        light = graph.math('MAXIMUM', light, graph.mul(graph.math('MAXIMUM', top, left), 0.6))
     return light
 
 
@@ -3715,6 +3809,57 @@ def vein_teardrop_beads(rng, body):
     return assign_all(marks, body)
 
 
+def vein_azurite_nodules(rng, body):
+    """Azurite: rounded nodules sat low in the rock, each a blue fist knuckled with smaller lobes, two small ones apart."""
+    marks = []
+    for i, ((x, z), radius) in enumerate(AZURITE_NODULES):
+        nodule = shapes.add_icosphere('nodule-%d' % i, radius, (x, -radius * 0.3, z), subdivisions=3,
+                                      scale=(1.0, 0.6, rng.uniform(0.85, 1.0)), rotation=(0.0, rng.uniform(0, math.tau), 0.0))
+        marks.append(roughened(nodule, rng, radius * 0.04))
+        for k in range(3 if radius > 0.07 else 0):
+            angle = rng.uniform(0, math.tau)
+            lobe = radius * rng.uniform(0.35, 0.45)
+            at = (x + math.cos(angle) * radius * 0.72, -radius * 0.35, z + math.sin(angle) * radius * 0.72)
+            marks.append(shapes.add_icosphere('lobe-%d-%d' % (i, k), lobe, at, subdivisions=2, scale=(1.0, 0.6, 1.0)))
+    return assign_all(marks, body)
+
+
+def vein_pyrite_suns(rng, body):
+    """Pyrite: flat pyrite suns lying on the face, each a thin disc of brass with ridged rays running out from a raised boss, a few loose cubelets by them."""
+    marks = []
+    for i, ((x, z), radius) in enumerate(PYRITE_SUNS):
+        # Euler XYZ: the quarter turn about X lays the disc on the face.
+        disc = shapes.add_prism('sun-%d' % i, radius, radius * 0.12, (x, -radius * 0.06, z), rotation=(math.pi / 2, 0.0, 0.0), sides=48)
+        shapes.bevel(disc, radius * 0.03, segments=1)
+        marks.append(disc)
+        marks.append(shapes.add_icosphere('boss-%d' % i, radius * 0.16, (x, -radius * 0.12, z), subdivisions=2, scale=(1.0, 0.6, 1.0)))
+        for k in range(SUN_RAYS):
+            angle = k * math.tau / SUN_RAYS + rng.uniform(-0.04, 0.04)
+            reach = radius * rng.uniform(0.82, 0.95)
+            mid = radius * 0.2 + reach / 2
+            at = (x + math.cos(angle) * mid, -radius * 0.12, z + math.sin(angle) * mid)
+            ray = shapes.add_cube('ray-%d-%d' % (i, k), 1.0, at, scale=(reach - radius * 0.2, radius * 0.05, radius * 0.045), rotation=(0.0, -angle, 0.0))
+            marks.append(ray)
+    for i, (x, z) in enumerate(shapes.scatter_positions(rng, 6, 0.3, 0.1)):
+        if any(math.dist((x, z), centre) < radius * 1.2 for centre, radius in PYRITE_SUNS):
+            continue
+        size = rng.uniform(0.025, 0.04)
+        cube = shapes.add_cube('cubelet-%d' % i, size, (x, -size * 0.3, z), rotation=(0.0, rng.uniform(0, math.pi / 2), 0.0))
+        shapes.bevel(cube, size * 0.05, segments=1)
+        marks.append(cube)
+    return assign_all(marks, body)
+
+
+def vein_sectile_blocks(rng, body):
+    """Argentite: soft blocky crystals worn round at every edge, as a knife-soft ore is, two of them grown into one another, two small ones apart."""
+    marks = []
+    for i, ((x, z), edge, angle) in enumerate(ARGENTITE_BLOCKS):
+        block = shapes.add_cube('block-%d' % i, edge, (x, -edge * 0.3, z), scale=(1.0, 0.7, rng.uniform(0.85, 1.0)), rotation=(0.0, angle, 0.0))
+        shapes.bevel(block, edge * 0.14, segments=3)
+        marks.append(block)
+    return assign_all(marks, body)
+
+
 def assign_all(marks, material):
     for mark in marks:
         shapes.assign(mark, material)
@@ -3797,6 +3942,9 @@ BASES = {
     'vermilion-breccia': base_vermilion_breccia,
     'watered-ripples': base_watered_ripples,
     'scalloped-jet': base_scalloped_jet,
+    'azure-frost': base_azure_frost,
+    'brass-striae': base_brass_striae,
+    'sooty-tarnish': base_sooty_tarnish,
 }
 SHEENS = {
     'earthy': sheen_earthy,
@@ -3874,6 +4022,9 @@ SHEENS = {
     'breccia-gleam': sheen_breccia_gleam,
     'prism-bars': sheen_prism_bars,
     'mirror-polish': sheen_mirror_polish,
+    'velvet-frost': sheen_velvet_frost,
+    'sun-rays': sheen_sun_rays,
+    'smelter-silver': sheen_smelter_silver,
 }
 VEINS = {
     'nugget-cluster': vein_nugget_cluster,
@@ -3951,6 +4102,9 @@ VEINS = {
     'tablet-clumps': vein_tablet_clumps,
     'crossed-prisms': vein_crossed_prisms,
     'teardrop-beads': vein_teardrop_beads,
+    'azurite-nodules': vein_azurite_nodules,
+    'pyrite-suns': vein_pyrite_suns,
+    'sectile-blocks': vein_sectile_blocks,
 }
 RECIPES = {'base': BASES, 'vein': VEINS, 'sheen': SHEENS}
 

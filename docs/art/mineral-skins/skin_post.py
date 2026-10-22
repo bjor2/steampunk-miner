@@ -73,7 +73,7 @@ def main():
     cells = write_cells()
     skins = layers.batch_skins(batch)
     ramps = {entry['id']: entry['ramp'] for entry in layers.load_skins()['layers']['palette']}
-    mates = [skin for mate in layers.planet_mates(batch) for skin in layers.batch_skins(mate)]
+    mates = layers.mate_skins(batch)
     composites = {skin['species']: composite_of(skin, cells, ramps) for skin in skins + mates}
     write_layer_sheet(batch, skins, cells, ramps, composites)
     write_skin_sheet(batch, skins, composites)

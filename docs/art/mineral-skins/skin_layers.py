@@ -12,6 +12,7 @@ compositing rule in README.md, which the render seam follows).
 """
 
 import json
+import math
 import os
 import sys
 
@@ -44,9 +45,13 @@ LIGHT_LUMA_SHARE = 0.5
 # slots 11 to 15 and the planet's signature material; #604 is P5 slots 1 to 5, #605 its slots 6 to 10
 # and #606 its slots 11 to 15 and the planet's signature material, of the foothold-p5 pool; #595 is
 # P2 slots 1 to 5, of the foothold-p2 pool, which binds the legacy slots, #596 its slots 6 to 9,
-# the four uncommons, #597 its slots 10 to 12, the three rares, and #710 its slots 13 to 15, the
-# pool's own kinds of ticket 709), named `p<planet>-b<n>`, in slot order. A batch is measured against all of its planet's other batches (`planet_mates`). A
-# batch's `signature` is the planet whose signature skin row it adds.
+# the four uncommons, #597 its slots 10 to 12, the three rares, #710 its slots 13 to 15, the pool's
+# own kinds of ticket 709, and #736 the species its slots 6, 7 and 12 swap in under ore rules 9),
+# named `p<planet>-b<n>`, in slot order. A batch is measured against all of its planet's other
+# batches (`planet_mates`), less the skins on the slots it dresses itself (`mate_skins`). A batch's
+# `signature` is the planet whose signature skin row it adds. A batch's `oreRules` picks, on a slot
+# that swaps species (a row's `fromOreRules`/`beforeOreRules`, ticket 736), the species bound under
+# those rules; a batch without it reads the slot's first species.
 BATCHES = {
     'p1-b1': {'pool': 'legacy', 'slots': ('legacy.c1', 'legacy.c2', 'legacy.c3', 'legacy.c4', 'legacy.c5')},
     'p1-b2': {'pool': 'legacy', 'slots': ('legacy.u1', 'legacy.u2', 'legacy.u3', 'legacy.u4', 'legacy.r1')},
@@ -55,6 +60,7 @@ BATCHES = {
     'p2-b2': {'pool': 'foothold-p2', 'slots': ('legacy.u1', 'legacy.u2', 'legacy.u3', 'legacy.u4')},
     'p2-b3': {'pool': 'foothold-p2', 'slots': ('legacy.r1', 'legacy.r2', 'legacy.r3')},
     'p2-b4': {'pool': 'foothold-p2', 'slots': ('legacy.u5', 'legacy.r4', 'legacy.r5')},
+    'p2-b5': {'pool': 'foothold-p2', 'slots': ('legacy.u1', 'legacy.u2', 'legacy.r3'), 'oreRules': 9},
     'p3-b1': {'pool': 'foothold-p3', 'slots': ('mixed.c1', 'mixed.c2', 'mixed.c3', 'mixed.c4', 'mixed.u1')},
     'p3-b2': {'pool': 'foothold-p3', 'slots': ('mixed.u2', 'mixed.u3', 'mixed.r1', 'mixed.r2', 'mixed.r3')},
     'p3-b3': {'pool': 'foothold-p3', 'slots': ('mixed.e1', 'mixed.e2', 'mixed.e3', 'mixed.m1', 'mixed.m2'),
@@ -108,13 +114,34 @@ def batch_skins(batch, skins=None, materials=None):
     """
     skins = skins or load_skins()
     rows = species_by_id(materials)
-    pool = BATCHES[batch]['pool']
+    pool, rules = BATCHES[batch]['pool'], BATCHES[batch].get('oreRules')
     by_slot = {rows[skin['species']]['slot']: dict(skin, row=rows[skin['species']])
-               for skin in skins['skins'] if rows[skin['species']]['pool'] == pool}
+               for skin in skins['skins']
+               if rows[skin['species']]['pool'] == pool and is_bound_under(rows[skin['species']], rules)}
     missing = [slot for slot in BATCHES[batch]['slots'] if slot not in by_slot]
     if missing:
         raise SystemExit('batch %s has no skin row for slot(s) %s' % (batch, ', '.join(missing)))
     return [by_slot[slot] for slot in BATCHES[batch]['slots']] + batch_signature_skins(batch, skins)
+
+
+def is_bound_under(row, rules):
+    """
+    Whether a species row binds its slot under ore rules `rules` (the materials slice's span, ticket
+    736); `None` reads the slot's first species, the one bound before any swap.
+    """
+    if rules is None:
+        return 'fromOreRules' not in row
+    return row.get('fromOreRules', 0) <= rules < row.get('beforeOreRules', math.inf)
+
+
+def mate_skins(batch):
+    """
+    The skins of the planet's other batches the batch shares a planet with: every one but those on a
+    slot of its pool it dresses itself, which a swap (ticket 736) never shows beside it.
+    """
+    own = {(BATCHES[batch]['pool'], slot) for slot in BATCHES[batch]['slots']}
+    return [skin for mate in planet_mates(batch) for skin in batch_skins(mate)
+            if (skin['row'].get('pool'), skin['row'].get('slot')) not in own]
 
 
 def batch_signature_skins(batch, skins):

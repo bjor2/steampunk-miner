@@ -150,7 +150,7 @@
     { "id": "jet-black", "hue": 8, "saturation": 0.08, "luma": 0.48 },
     { "id": "azurite-blue", "hue": 222, "saturation": 0.7, "luma": 0.5 },
     { "id": "pyrite-brass", "hue": 52, "saturation": 0.45, "luma": 0.7 },
-    { "id": "argentite-grey", "hue": 196, "saturation": 0.16, "luma": 0.62 },
+    { "id": "argentite-grey", "hue": 205, "saturation": 0.22, "luma": 0.62 },
     {
       "id": "pig-iron",
       "hue": 210,
