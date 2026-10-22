@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-10-22T11:57:46+02:00",
+  "updated_at": "2026-10-22T11:58:28+02:00",
   "caps": {
     "grok": 12,
     "claude": 10,
@@ -37,12 +37,11 @@
         },
         {
           "slot": "C3",
-          "state": "busy",
+          "state": "free",
           "ticket": null,
           "grok_slot": null,
-          "kind": "aux",
-          "since": "2026-10-22T11:57:00+02:00",
-          "label": "tester-triage"
+          "kind": null,
+          "since": null
         },
         {
           "slot": "C4",
@@ -70,8 +69,8 @@
         }
       ],
       "size": 6,
-      "used": 3,
-      "free": 3,
+      "used": 2,
+      "free": 4,
       "claims_last_hour": 6,
       "name": "Claude Max 1"
     },
@@ -123,40 +122,23 @@
     }
   ],
   "gate": {
-    "busy": 0,
+    "busy": 1,
     "max": 3
   },
   "tester": {
     "state": "running",
-    "phase": "triage-fast",
-    "sha": "7679de12d4985be61765388f8511355c4218d5fa",
-    "since": "2026-10-22T09:57:40Z",
-    "holds_gate": false,
-    "claude_slot": 3,
-    "last_run": "2026-10-21T18:23:25Z",
+    "phase": "fast",
+    "sha": "d95dcc66eb0c80f89cc35a6cd672d3af935b955d",
+    "since": "2026-10-22T09:58:21Z",
+    "holds_gate": true,
+    "claude_slot": null,
+    "last_run": "2026-10-22T09:58:17Z",
     "last_nightly": "2026-10-15T20:43:15Z",
     "last_nightly_result": "full=FAIL balance-report=ok bench=FAIL balance-planets=ok balance-guns=ok balance-charges=ok balance-refinery=ok balance-heat=ok e2e=FAIL memory-soak=FAIL packaged-smoke=ok ",
     "main_red_sha": null,
-    "feature": 668,
-    "feature_title": "Map: Red-main fixes (21 Oct)",
+    "feature": 401,
+    "feature_title": "Spec: New Game + save/load (slots, menus)",
     "queue": [
-      {
-        "feature": 401,
-        "kind": "spec",
-        "title": "Spec: New Game + save/load (slots, menus)",
-        "tickets": [
-          402,
-          403,
-          404,
-          405,
-          406,
-          407,
-          670,
-          671,
-          672
-        ],
-        "since": "2026-10-22T02:41:27+02:00"
-      },
       {
         "feature": 673,
         "kind": "spec",
@@ -279,12 +261,10 @@
     },
     {
       "slot": 3,
-      "state": "busy",
+      "state": "free",
       "ticket": null,
       "grok_slot": null,
-      "since": "2026-10-22T11:57:00+02:00",
-      "kind": "aux",
-      "label": "tester-triage",
+      "since": null,
       "account": 1
     },
     {
@@ -367,8 +347,8 @@
     "claude": {
       "size": 10,
       "enabled": 6,
-      "used": 3,
-      "free": 3,
+      "used": 2,
+      "free": 4,
       "external": 0
     }
   },
