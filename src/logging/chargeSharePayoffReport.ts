@@ -4,7 +4,7 @@
  * frees, their value, the charge's price and the payoff. Reported only, never gated.
  */
 import type { ChargeSharePayoff } from '../systems/bot/chargeSharePayoff'
-import { formatAmount } from '../systems/displayAmount'
+import { formatAmount, formatPrice } from '../systems/displayAmount'
 import { mul, roundToWhole, toSafeInteger, fromSafeInteger, type Money } from '../systems/money'
 
 /** Ticket 247 expected dynamite-gated cells only above band 3; the note names any below. */
@@ -30,7 +30,7 @@ export function lowBandsWithDynamiteCells(rows: readonly ChargeSharePayoff[]): s
 }
 
 function chargeSharePayoffLine(row: ChargeSharePayoff): string {
-  return `| ${row.planetIndex} | ${row.band} | ${row.size} | ${fixedOf(row.gatedCells, TENTHS)} | ${formatAmount(roundToWhole(row.valueFreed))} | ${formatAmount(roundToWhole(row.price))} | ${fixedOf(row.payoff, HUNDREDTHS)}x | ${row.isCapped ? 'yes' : 'no'} |`
+  return `| ${row.planetIndex} | ${row.band} | ${row.size} | ${fixedOf(row.gatedCells, TENTHS)} | ${formatAmount(roundToWhole(row.valueFreed))} | ${formatPrice(roundToWhole(row.price))} | ${fixedOf(row.payoff, HUNDREDTHS)}x | ${row.isCapped ? 'yes' : 'no'} |`
 }
 
 /** A small non-negative amount to one or two places: `2.05`. */

@@ -134,7 +134,7 @@ describe('ground-gun: the armoury.bore_gun lane (ticket 318, Content on #310)', 
   it("cards the cementing round's rounds a dock, its wait and its extra energy", () => {
     expect(cardLines(CEMENTING_ROUND_ITEM_ID, 0).slice(0, 3)).toEqual([
       { label: 'Rounds a dock', now: '3', next: '3' },
-      { label: 'Waits between rounds (s)', now: '2', next: '1.833' },
+      { label: 'Waits between rounds (s)', now: '2', next: '1.83' },
       { label: "Extra energy a cell (the drill's)", now: '1', next: '1' },
     ])
   })

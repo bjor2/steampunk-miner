@@ -148,7 +148,7 @@ describe('ground-gun: the armoury.auto_guns lane (ticket 319, Content on #310)',
     const lines = cardLines(CONCUSSION_SHELLS_ITEM_ID, 0)
     expect(lines.slice(0, 2)).toEqual([
       { label: 'Knock-back (cells)', now: '2', next: '2' },
-      { label: 'Knocks one enemy at most every (s)', now: '3', next: '2.766' },
+      { label: 'Knocks one enemy at most every (s)', now: '3', next: '2.76' },
     ])
     expect(lines.at(-1)?.label).toBe('Price')
   })
