@@ -32,6 +32,7 @@
  */
 import type { SliceDefinition } from '../../registries/sliceDefinition'
 import { collapseDeathReportRows } from './collapseDeathReportRows'
+import { gnawCollapseReportRows } from './gnawCollapseReportRows'
 import { terrainToolsDebugActions } from './debug'
 import { TERRAIN_PROJECTIONS, TERRAIN_RUN_EVENTS } from './logging'
 import { MAGNET_FIELD_LAYER_ID, MagnetFieldLayer } from './scene/MagnetFieldLayer'
@@ -91,6 +92,7 @@ export const slice: SliceDefinition = {
     r.eventProjections(TERRAIN_PROJECTIONS)
     r.runEvents(TERRAIN_RUN_EVENTS)
     r.reportRows(collapseDeathReportRows)
+    r.reportRows(gnawCollapseReportRows)
     // steampunkDebug.features['terrain-tools'].getBeacon() / .getClampLattice() / .getFoam()
     //   / .statPreview(itemId, mark, planet) / .getMagnetFields()
     r.debugActions(terrainToolsDebugActions)
