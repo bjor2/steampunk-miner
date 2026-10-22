@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-10-22T15:21:15+02:00",
+  "updated_at": "2026-10-22T15:21:32+02:00",
   "caps": {
     "grok": 12,
     "claude": 10,
@@ -19,12 +19,11 @@
       "slots": [
         {
           "slot": "C1",
-          "state": "busy",
+          "state": "free",
           "ticket": null,
           "grok_slot": null,
-          "kind": "aux",
-          "since": "2026-10-22T15:21:00+02:00",
-          "label": "tester-triage"
+          "kind": null,
+          "since": null
         },
         {
           "slot": "C2",
@@ -68,8 +67,8 @@
         }
       ],
       "size": 6,
-      "used": 1,
-      "free": 5,
+      "used": 0,
+      "free": 6,
       "claims_last_hour": 1,
       "name": "Claude Max 1"
     },
@@ -121,36 +120,23 @@
     }
   ],
   "gate": {
-    "busy": 0,
+    "busy": 1,
     "max": 3
   },
   "tester": {
     "state": "running",
-    "phase": "triage-fast",
-    "sha": "8ebf3659db1e0fb762f78f246a2e56a2c670a40b",
-    "since": "2026-10-22T13:21:09Z",
-    "holds_gate": false,
-    "claude_slot": 1,
-    "last_run": "2026-10-22T11:39:56Z",
+    "phase": "fast",
+    "sha": "99eadef6647a12e19fccdd329c4991826ae6cf39",
+    "since": "2026-10-22T13:21:31Z",
+    "holds_gate": true,
+    "claude_slot": null,
+    "last_run": "2026-10-22T13:21:27Z",
     "last_nightly": "2026-10-15T20:43:15Z",
     "last_nightly_result": "full=FAIL balance-report=ok bench=FAIL balance-planets=ok balance-guns=ok balance-charges=ok balance-refinery=ok balance-heat=ok e2e=FAIL memory-soak=FAIL packaged-smoke=ok ",
     "main_red_sha": null,
-    "feature": 673,
-    "feature_title": "Difficulty curve: bare on-curve rig dies to the P7 collapse cascade on most pacing seeds",
-    "queue": [
-      {
-        "feature": 305,
-        "kind": "spec",
-        "title": "Grilling: Half-length planets controlled by planet size",
-        "tickets": [
-          642,
-          643,
-          644,
-          645
-        ],
-        "since": "2026-10-22T12:23:07+02:00"
-      }
-    ]
+    "feature": 305,
+    "feature_title": "Grilling: Half-length planets controlled by planet size",
+    "queue": []
   },
   "grok": [
     {
@@ -229,12 +215,10 @@
   "claude": [
     {
       "slot": 1,
-      "state": "busy",
+      "state": "free",
       "ticket": null,
       "grok_slot": null,
-      "since": "2026-10-22T15:21:00+02:00",
-      "kind": "aux",
-      "label": "tester-triage",
+      "since": null,
       "account": 1
     },
     {
@@ -333,8 +317,8 @@
     "claude": {
       "size": 10,
       "enabled": 6,
-      "used": 1,
-      "free": 5,
+      "used": 0,
+      "free": 6,
       "external": 0
     }
   },
