@@ -94,7 +94,10 @@ for (const cell of CELLS) {
       const glow = page.getByTestId('hud-edge-glow')
       await expect(glow).toHaveAttribute('data-readout', 'hull')
       expect(await glow.getAttribute('data-hud')).toBeNull()
-      await expect(page.getByTestId('hud-bar-hull')).toHaveAttribute('data-tier', 'critical')
+      const hullDial = page.getByTestId('hud-dial-hull')
+      await expect(hullDial).toHaveAttribute('data-tier', 'critical')
+      // Ticket 716: at 10% of the hull left the dial's face is in its red zone.
+      await expect(hullDial).toHaveAttribute('data-zone', 'red')
       const report = await coverageOf(page)
       expect(report.bandIntruderIds).toEqual([])
       expect(report.measuredPercent).toBeLessThanOrEqual(cell.budgetPercent)

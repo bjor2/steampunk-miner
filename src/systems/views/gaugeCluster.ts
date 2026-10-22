@@ -67,6 +67,8 @@ export interface GaugeClusterView {
   dials: DialFace[]
   /** How many dials the strip had no room for; their numbers are in the detail. */
   overflowCount: number
+  /** The overflow cell's "+N" through the shared formatter; null with room for every dial. */
+  overflowText: string | null
   /** The brass and glass frame's CSS variable, null for a frame no art token names. */
   frameArt: string | null
 }
@@ -78,6 +80,8 @@ type FaceReading = Pick<
 
 const PERMILLE = 1000
 const PERMILLE_PER_PERCENT = 10
+/** The needle sweeps 240 degrees, -120 empty to +120 full, over the baked dial's ticks (#683). */
+const SWEEP_DEGREES = 240
 const NO_MARKERS: readonly DepthMarker[] = []
 const DEPTH_ICON_ID = hudLabelIconIdOf('depth')
 /** " / " between a reading's value and its whole. */
@@ -93,11 +97,18 @@ export function gaugeClusterOf(
 ): GaugeClusterView {
   const faces = table.dials.flatMap((row) => faceOfRow(row, model, table, tokens))
   const room = table.room[kind][stripPlaceOf(model)]
+  const overflowCount = Math.max(0, faces.length - room)
   return {
     dials: faces.slice(0, room),
-    overflowCount: Math.max(0, faces.length - room),
+    overflowCount,
+    overflowText: overflowCount > 0 ? `+${formatAmount(overflowCount)}` : null,
     frameArt: uiArtVariableOfPart(table.frame),
   }
+}
+
+/** Where a needle or a mark at `permille` points, in degrees clockwise from straight up. */
+export function dialTurnDegreesOf(permille: number): number {
+  return (permille * SWEEP_DEGREES) / PERMILLE - SWEEP_DEGREES / 2
 }
 
 /** The surface while the depth is 0 (#684's money side of the strip), a run below it. */

@@ -48,7 +48,8 @@ export const UI_IDS = {
   hudStripDepth: 'hud-strip-depth',
   hudMoneyFloat: 'hud-money-float',
   hudNextUpgrade: 'hud-next-upgrade',
-  hudHeatLine: 'hud-heat-line',
+  hudDials: 'hud-dials',
+  hudDialOverflow: 'hud-dial-overflow',
   hudEdgeGauge: 'hud-edge-gauge',
   hudEdgeGlow: 'hud-edge-glow',
   hudGear: 'hud-gear',
@@ -137,7 +138,9 @@ export const UI_ID_TEMPLATES = {
   hudThreat: (index: number) => `hud-threat-${index}`,
   hudStripPip: (index: number) => `hud-strip-pip-${index}`,
   hudStatus: (status: string) => `hud-status-${status}`,
-  hudBar: (gauge: string) => `hud-bar-${gauge}`,
+  /** One dial of the strip's gauge cluster (ticket 716) and the number a hover or tap reveals. */
+  hudDial: (dial: string) => `hud-dial-${dial}`,
+  hudDialNumber: (dial: string) => `hud-dial-number-${dial}`,
   hudDetailStatus: (status: string) => `hud-detail-status-${status}`,
   /** One held tier's Sell card on the Hold tab (ticket 688). */
   holdSell: (tier: number) => `hold-sell-${tier}`,

@@ -9,24 +9,28 @@ import {
   COMPACT_LABEL_WORDS_MAX,
   shownLabelWordsOf,
 } from '../../systems/views/hudCompact'
+import type { LayoutKind } from '../../systems/views/designSystem'
+import { gaugeClusterOf } from '../../systems/views/gaugeCluster'
 import type { HudModel } from '../../systems/views/hudModel'
 import { hudStripOf } from '../../systems/views/hudStrip'
 import { amountReading } from '../../systems/views/viewParts'
 import { forgetUiTexts, registeredUiTexts, type UiText } from '../../systems/views/uiText'
 import { uiTextProblemsOf, wordCountOf } from '../../systems/views/uiTextBudget'
 import { unregisteredTextsOf } from '../../systems/views/unregisteredText'
-import { UI_IDS } from '../ids'
+import { UI_ID_TEMPLATES, UI_IDS } from '../ids'
 import { everyReadoutOf } from './hudFixtures'
 import { HudStrip } from './HudStrip'
 import { HudView } from './HudView'
 
 // Ticket 684 (spec #678, GD lock 21 Oct): the stacked panels are gone. The always-on HUD is one
-// strip of fraction-only bars, one number and the status icons, at most 6 label words (#500 GD
-// ruling 4); every exact value and word sits in the detail behind the gear button.
+// strip of the brass gauge cluster's needle-only dials (ticket 716), one number and the status
+// icons, at most 6 label words (#500 GD ruling 4); every exact value and word sits in the detail
+// behind the gear button.
 
-function drawStrip(model: HudModel): string {
+function drawStrip(model: HudModel, kind: LayoutKind = 'desktop'): string {
+  const cluster = gaugeClusterOf(model, kind)
   return renderToString(
-    createElement(HudStrip, { strip: hudStripOf(model), model, isFlashing: false }),
+    createElement(HudStrip, { strip: hudStripOf(model), cluster, model, isFlashing: false }),
   )
 }
 
@@ -59,17 +63,38 @@ describe('HUD strip view (ticket 684)', () => {
     expect(labelWordsOf(hudTexts())).toBeLessThanOrEqual(COMPACT_LABEL_WORDS_MAX)
   })
 
-  it('draws hull, fuel and cargo as bars and none of their numbers', () => {
+  it('draws hull, fuel and cargo as dials and none of their numbers', () => {
     const model = worstModel()
     const html = drawStrip(model)
     for (const gauge of ['hull', 'fuel', 'cargo'])
-      expect(testIdIn(html, `hud-bar-${gauge}`)).toBe(true)
+      expect(testIdIn(html, UI_ID_TEMPLATES.hudDial(gauge))).toBe(true)
     expect(html).not.toContain(model.hull.text)
     expect(html).not.toContain(model.energy.text)
     expect(html).not.toContain(model.cargo.text)
   })
 
-  it('names every bar and number for assistive tech, out of sight', () => {
+  it('reveals no dial number until a hover or a tap asks for it', () => {
+    const html = drawStrip(underground(worstModel(), 116))
+    for (const dial of ['hull', 'fuel', 'cargo', 'heat', 'depth'])
+      expect(testIdIn(html, UI_ID_TEMPLATES.hudDialNumber(dial))).toBe(false)
+  })
+
+  it('draws the depth dial with the band and core marks of the planet underground', () => {
+    const html = drawStrip(underground(readHudModel(), 40))
+    expect(testIdIn(html, UI_ID_TEMPLATES.hudDial('depth'))).toBe(true)
+    expect(html.match(/data-mark="band"/g)).toHaveLength(4)
+    expect(html.match(/data-mark="core"/g)).toHaveLength(1)
+  })
+
+  it('folds the dials past a phone surface strip into one count', () => {
+    const html = drawStrip(worstModel(), 'phone')
+    expect(testIdIn(html, UI_ID_TEMPLATES.hudDial('cargo'))).toBe(true)
+    expect(testIdIn(html, UI_ID_TEMPLATES.hudDial('depth'))).toBe(false)
+    expect(testIdIn(html, UI_IDS.hudDialOverflow)).toBe(true)
+    expect(testIdIn(drawStrip(worstModel()), UI_IDS.hudDialOverflow)).toBe(false)
+  })
+
+  it('names every dial and number for assistive tech, out of sight', () => {
     drawStrip(worstModel())
     const strip = hudTexts().filter((text) => text.id.startsWith('hud.strip.'))
     expect(strip.length).toBeGreaterThanOrEqual(5)
@@ -98,9 +123,9 @@ describe('HUD strip view (ticket 684)', () => {
     expect(html.replace(/<[^>]*>/g, '')).toContain('1.00Qa')
   })
 
-  it('draws the heat line in the worst state and none off a heat planet', () => {
-    expect(testIdIn(drawStrip(worstModel()), UI_IDS.hudHeatLine)).toBe(true)
-    expect(testIdIn(drawStrip(readHudModel()), UI_IDS.hudHeatLine)).toBe(false)
+  it('draws the heat dial in the worst state and none off a heat planet', () => {
+    expect(testIdIn(drawStrip(worstModel()), UI_ID_TEMPLATES.hudDial('heat'))).toBe(true)
+    expect(testIdIn(drawStrip(readHudModel()), UI_ID_TEMPLATES.hudDial('heat'))).toBe(false)
   })
 
   it('shows at most three status chips of at most two words, the rest as a count', () => {

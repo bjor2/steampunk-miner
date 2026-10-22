@@ -1,33 +1,27 @@
 /**
  * The strip (spec #678, ticket 684; docs/ui/design-system.md sections 9 and 10): the one
- * always-on top box, right under the top inset, read-only. Hull, fuel and cargo as brass bars,
- * the heat as an ember line along its foot above 60%, one number (the money on the brass odometer
- * on the surface with the next-upgrade chip beside it, the depth underground), the money's
- * float-up, and the status icons. Every exact value and word is in the detail behind the gear
- * button. Drawn from `hudStripOf`'s reading of the HUD model; markup only.
+ * always-on top box, right under the top inset. The brass gauge cluster (ticket 716: hull, fuel,
+ * cargo chain, the heat above 60% and the depth and core), one number (the money on the brass
+ * odometer on the surface with the next-upgrade chip beside it, the depth underground), the
+ * money's float-up, and the status icons. Every exact value and word is in the detail behind the
+ * gear button; on desktop a dial also shows its number on a hover or a tap. Drawn from
+ * `hudStripOf` and `gaugeClusterOf`; markup only.
  */
-import type { CSSProperties } from 'react'
 import { hudLabelIconIdOf } from '../../systems/art/icons/iconSet'
 import { readoutTextOf } from '../../systems/views/hudCallouts'
 import type { HudModel } from '../../systems/views/hudModel'
-import type { HudStrip as Strip, StripBar, StripNumber } from '../../systems/views/hudStrip'
+import type { GaugeClusterView } from '../../systems/views/gaugeCluster'
+import type { HudStrip as Strip, StripNumber } from '../../systems/views/hudStrip'
 import type { NextUpgradeChip } from '../../systems/views/nextUpgradeChip'
 import type { AmountReading } from '../../systems/views/viewParts'
-import { UI_ID_TEMPLATES, UI_IDS } from '../ids'
-import { GaugeBar } from '../kit/GaugeBar'
+import { UI_IDS } from '../ids'
 import { Odometer } from '../kit/Odometer'
 import { TitleOneLine } from '../kit/TitleOneLine'
+import { DialCluster } from './DialCluster'
 import { hudBoxOf } from './hudBoxes'
 import { MoneyFloatUp } from './MoneyFloatUp'
 import { StripStatuses } from './StripStatuses'
 import styles from './HudStrip.module.css'
-
-const BAR_TEXTS = {
-  hull: readoutTextOf('hud.strip.hull', 'Hull'),
-  fuel: readoutTextOf('hud.strip.fuel', 'Fuel'),
-  cargo: readoutTextOf('hud.strip.cargo', 'Cargo'),
-  heat: readoutTextOf('hud.strip.heat', 'Heat'),
-}
 
 const NUMBER_TEXTS = {
   money: readoutTextOf('hud.strip.money', 'Money'),
@@ -40,11 +34,13 @@ const CHIP_TEXT = readoutTextOf('hud.strip.next-upgrade', 'Next upgrade')
 
 export function HudStrip({
   strip,
+  cluster,
   model,
   isFlashing,
   statusIconsMax,
 }: {
   strip: Strip
+  cluster: GaugeClusterView
   model: HudModel
   isFlashing: boolean
   /** The status row's room; a phone's three when not given. */
@@ -57,30 +53,11 @@ export function HudStrip({
       data-number={strip.number.kind}
       {...hudBoxOf('strip')}
     >
-      <div className={styles.bars}>
-        {strip.bars.map((bar) => (
-          <StripGauge key={bar.id} bar={bar} isFlashing={isFlashing} />
-        ))}
-      </div>
+      <DialCluster cluster={cluster} isFlashing={isFlashing} />
       <StripNumberReadout number={strip.number} money={model.money} />
       {strip.nextUpgrade !== null && <UpgradeChip chip={strip.nextUpgrade} />}
       <StripStatuses model={model} isFlashing={isFlashing} chipsMax={statusIconsMax} />
-      {strip.heat !== null && <HeatLine heat={strip.heat} isFlashing={isFlashing} />}
     </div>
-  )
-}
-
-function StripGauge({ bar, isFlashing }: { bar: StripBar; isFlashing: boolean }) {
-  return (
-    <GaugeBar
-      text={BAR_TEXTS[bar.id]}
-      iconId={bar.iconId}
-      fill={bar.id}
-      fillPermille={bar.fillPermille}
-      tier={bar.tier}
-      testId={UI_ID_TEMPLATES.hudBar(bar.id)}
-      isPulsing={isFlashing}
-    />
   )
 }
 
@@ -136,34 +113,4 @@ function UpgradeChip({ chip }: { chip: NextUpgradeChip }) {
       />
     </div>
   )
-}
-
-/**
- * Design section 9: heat is a 4 px ember line along the strip's foot, so it adds no box; hatched
- * under a ladder tier like a bar, and pulsing then as a bar's glyph does (ticket 685).
- */
-function HeatLine({ heat, isFlashing }: { heat: StripBar; isFlashing: boolean }) {
-  return (
-    <div className={styles.heat} data-tier={heat.tier} data-pulsing={isFlashing || undefined}>
-      <TitleOneLine text={BAR_TEXTS.heat} level="span" titlePlace="card">
-        <span
-          className={styles.heatFill}
-          data-testid={UI_IDS.hudHeatLine}
-          data-permille={heat.fillPermille}
-          data-tier={heat.tier}
-          role="meter"
-          aria-valuemin={0}
-          aria-valuemax={PERMILLE}
-          aria-valuenow={heat.fillPermille}
-          style={fillStyleOf(heat.fillPermille)}
-        />
-      </TitleOneLine>
-    </div>
-  )
-}
-
-const PERMILLE = 1000
-
-function fillStyleOf(permille: number): CSSProperties {
-  return { '--fill': permille / PERMILLE } as CSSProperties
 }

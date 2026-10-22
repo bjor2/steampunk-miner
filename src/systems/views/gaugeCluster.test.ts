@@ -7,6 +7,7 @@ import { DESIGN_TOKENS } from './designSystem'
 import {
   chainBadgeTextOf,
   dialNumberCharsMaxOf,
+  dialTurnDegreesOf,
   dialZoneOf,
   gaugeClusterOf,
   type DialFace,
@@ -86,6 +87,7 @@ describe('gauge cluster dials (ticket 716)', () => {
     const phone = gaugeClusterOf(model, 'phone')
     expect(idsOf(phone.dials)).toEqual(['hull', 'fuel', 'cargo'])
     expect(phone.overflowCount).toBe(2)
+    expect(phone.overflowText).toBe('+2')
     expect(gaugeClusterOf(model, 'desktop').overflowCount).toBe(0)
   })
 
@@ -146,6 +148,10 @@ describe('gauge cluster dials (ticket 716)', () => {
     expect(view.frameArt).toBe('--art-glass-frame')
     expect(view.dials.every((dial) => dial.art.face === '--art-gauge-dial')).toBe(true)
     expect(view.dials.every((dial) => dial.art.needle === '--art-gauge-needle')).toBe(true)
+  })
+
+  it('turns a needle over the 240 degrees of the baked ticks, empty on the left', () => {
+    expect([0, 500, 1000].map(dialTurnDegreesOf)).toEqual([-120, 0, 120])
   })
 
   it('keeps room for the widest number a dial reveals', () => {

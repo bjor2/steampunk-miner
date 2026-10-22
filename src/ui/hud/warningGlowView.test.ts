@@ -63,10 +63,10 @@ describe('warning glow on the HUD (ticket 685)', () => {
 
   it('marks the warning readout on the strip with its tier to pulse by, the others clear', () => {
     const html = drawHud(withHullAt(readHudModel(), 100), { tier: 'critical', readoutId: 'hull' })
-    const hull = html.slice(html.lastIndexOf('<div', html.indexOf('data-gauge="hull"')))
+    const hull = html.slice(html.lastIndexOf('<div', html.indexOf('data-dial="hull"')))
     expect(hull.slice(0, hull.indexOf('>'))).toContain('data-pulsing="true"')
     expect(hull.slice(0, hull.indexOf('>'))).toContain('data-tier="critical"')
-    const fuel = html.slice(html.lastIndexOf('<div', html.indexOf('data-gauge="fuel"')))
+    const fuel = html.slice(html.lastIndexOf('<div', html.indexOf('data-dial="fuel"')))
     expect(fuel.slice(0, fuel.indexOf('>'))).toContain('data-tier="ok"')
   })
 })

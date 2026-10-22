@@ -1,10 +1,11 @@
 /**
  * The HUD strip (spec #678, ticket 684; docs/ui/design-system.md sections 9 and 12) as a pure
- * view of the HUD model: one thin top box of three fraction-only gauge bars (hull, fuel, cargo),
- * the heat line along its foot only above 60%, and one number: the money on the surface, with the next-upgrade
- * chip beside it, and the depth underground, where it is the only number. Speed is never on the
- * strip. The edge gauge beside it is the way from the surface to the core, with no number. Every
- * exact value and word sits in the detail behind the gear button.
+ * view of the HUD model: the bounded readings (hull, fuel, cargo room, and the heat only above
+ * 60%) with their ladder tiers, which the warning watch reads and the brass gauge cluster draws
+ * as dials (`gaugeCluster.ts`, ticket 716), and one number: the money on the surface, with the
+ * next-upgrade chip beside it, and the depth underground, where it is the only number. Speed is
+ * never on the strip. The edge gauge beside it is the way from the surface to the core, with no
+ * number. Every exact value and word sits in the detail behind the gear button.
  */
 import { formatAmount, formatPrice } from '../displayAmount'
 import { cmp, fromCanonical, sub } from '../money'

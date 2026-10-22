@@ -198,8 +198,9 @@ function hudTexts(model: HudModel): Partial<Record<UiId, string | null>> {
 }
 
 /**
- * The strip (ticket 684): its bars and the edge gauge draw no number; its one number is the money
- * on the surface with the next-upgrade chip, the depth underground; the heat line shows above 60%.
+ * The strip (ticket 684): its gauge cluster's dials (ticket 716) and the edge gauge draw no
+ * number; its one number is the money on the surface with the next-upgrade chip, the depth
+ * underground. The full-density HUD has room for every dial, so no overflow count shows.
  */
 function stripTexts(model: HudModel): Partial<Record<UiId, string | null>> {
   const strip = hudStripOf(model)
@@ -216,7 +217,7 @@ function stripTexts(model: HudModel): Partial<Record<UiId, string | null>> {
     ...(strip.nextUpgrade === null
       ? {}
       : { [UI_IDS.hudNextUpgrade]: strip.nextUpgrade.price.text }),
-    ...(strip.heat === null ? {} : { [UI_IDS.hudHeatLine]: null }),
+    [UI_IDS.hudDials]: null,
   }
 }
 
@@ -556,6 +557,9 @@ function renderFullHoldHud(): string[] {
     ...checkScreen(hudWithDetail(model, false), hudTexts(model)),
     ...checkScreen(hudWithDetail(withCoreInHold(model), false), {
       [UI_IDS.hudCargoCore]: CORE_TEXT,
+    }),
+    ...checkScreen(createElement(HudView, { model, isFlashing: false, density: 'compact' }), {
+      [UI_IDS.hudDialOverflow]: '+1',
     }),
   ]
 }

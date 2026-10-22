@@ -11,6 +11,7 @@
  * (#500) is the layout shell's. Held upright (#486) the threats are chips leading the prompts'
  * row, and the slices' threat and prompt panels join that row instead of floating over the view.
  */
+import { gaugeClusterOf } from '../../systems/views/gaugeCluster'
 import { isUprightCompactHud, statusIconsMaxOf } from '../../systems/views/hudCompact'
 import type { HudModel } from '../../systems/views/hudModel'
 import { hudStripOf } from '../../systems/views/hudStrip'
@@ -56,6 +57,7 @@ export function HudView({
 }) {
   const isUpright = isUprightCompactHud(density, orientation)
   const strip = hudStripOf(model)
+  const cluster = gaugeClusterOf(model, layoutKindOf(density))
   return (
     <div className={styles.hud} data-density={density}>
       <OverlayLayer />
@@ -64,6 +66,7 @@ export function HudView({
       <PopBadges />
       <HudStrip
         strip={strip}
+        cluster={cluster}
         model={model}
         isFlashing={isFlashing}
         statusIconsMax={statusIconsMaxOf(density)}

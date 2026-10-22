@@ -1,0 +1,251 @@
+/*
+ * The gauge cluster (ticket 716; design-system.md sections 3 and 9): the dials sit in the baked
+ * brass and glass frame (`--art-glass-frame`, a nine-slice drawn at a 6 px border here), a plain
+ * brass bezel behind it while the art is missing, and a glass sheen over the top third. Each dial
+ * is `--dial-size`, the strip's height less its frame, so the strip never grows; the needle is the
+ * baked 4 x 28 sprite on the 64 px dial's proportions, turned about its foot at the dial's centre.
+ */
+.cluster {
+  --dial-size: calc(var(--strip-height) - 8px);
+
+  position: relative;
+  display: flex;
+  flex: none;
+  align-items: center;
+  gap: var(--space-1);
+  box-sizing: border-box;
+  height: calc(var(--dial-size) + 4px);
+  padding: 0 var(--space-1);
+  border: var(--frame-bezel) solid var(--color-brass);
+  border-radius: var(--radius-panel);
+  border-image: var(--cluster-frame-art) var(--cluster-frame-slice) fill / 6px;
+}
+
+.cluster::after {
+  content: '';
+  position: absolute;
+  inset: 0 0 66%;
+  background: linear-gradient(rgb(255 255 255 / var(--glass-sheen-opacity)), transparent);
+  pointer-events: none;
+}
+
+/*
+ * A cell takes no pointer on a phone, where the strip is in the top keep-out; on desktop a hover
+ * or a tap reveals its number.
+ */
+.cell {
+  position: relative;
+  flex: none;
+  pointer-events: none;
+}
+
+:global([data-layout='desktop']) .cell {
+  pointer-events: auto;
+}
+
+.cell > * {
+  flex-wrap: nowrap;
+  gap: 0;
+}
+
+/* The heat at or under 60% keeps its slot and draws nothing there (GD lock). */
+.cell[data-held] .dial {
+  visibility: hidden;
+}
+
+.dial {
+  position: relative;
+  display: block;
+  width: var(--dial-size);
+  height: var(--dial-size);
+  border-radius: 50%;
+  background: var(
+      --dial-face-art,
+      repeating-conic-gradient(
+        from -120deg,
+        var(--color-brass) 0deg 1.5deg,
+        var(--material-iron-shadow) 1.5deg 30deg
+      )
+    )
+    center / 100% 100% no-repeat;
+}
+
+/* The face is skinnable (`dialFace`): the planet's colour through the sprite's tint mask. */
+.dial::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: var(--color-dial-face);
+  mask: var(--dial-face-tint, linear-gradient(transparent, transparent)) center / 100% 100%
+    no-repeat;
+  -webkit-mask: var(--dial-face-tint, linear-gradient(transparent, transparent)) center / 100% 100%
+    no-repeat;
+}
+
+/* Amber at 25% and red at 10% of what is left: the face takes the zone's colour and a rim. */
+.dial[data-zone='amber'] {
+  box-shadow: 0 0 0 var(--frame-bezel) var(--color-amber);
+}
+
+.dial[data-zone='amber']::before {
+  background: color-mix(in srgb, var(--color-dial-face), var(--color-amber) 45%);
+}
+
+.dial[data-zone='red'] {
+  box-shadow: 0 0 0 var(--frame-bezel) var(--color-danger);
+}
+
+.dial[data-zone='red']::before {
+  background: color-mix(in srgb, var(--color-dial-face), var(--color-danger) 55%);
+}
+
+/* A ladder tier hatches the face: a shape, so the warning never rests on colour alone. */
+.dial:not([data-tier='ok'])::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: repeating-linear-gradient(45deg, rgb(27 22 19 / 0.45) 0 2px, transparent 2px 5px);
+}
+
+.needle {
+  position: absolute;
+  z-index: 2;
+  bottom: 50%;
+  left: calc(50% - var(--dial-size) * 2 / 64);
+  width: calc(var(--dial-size) * 4 / 64);
+  height: calc(var(--dial-size) * 28 / 64);
+  background: var(
+      --dial-needle-art,
+      linear-gradient(90deg, var(--material-brass-highlight), var(--material-brass-shadow))
+    )
+    center / 100% 100% no-repeat;
+  transform: rotate(var(--turn));
+  transform-origin: 50% 100%;
+  transition: transform var(--needle-ease-max) var(--ease-needle);
+}
+
+/* The brass cap over the needle's foot. */
+.needle::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  width: calc(var(--dial-size) * 8 / 64);
+  height: calc(var(--dial-size) * 8 / 64);
+  border-radius: 50%;
+  background: radial-gradient(
+    circle at 35% 35%,
+    var(--material-brass-highlight),
+    var(--material-brass-shadow)
+  );
+  transform: translate(-50%, 50%);
+}
+
+/* A depth mark on the rim, turned like a needle: brass at a band's head, the danger red at the core. */
+.mark {
+  position: absolute;
+  z-index: 1;
+  bottom: 50%;
+  left: calc(50% - 1px);
+  width: 2px;
+  height: 46%;
+  background: linear-gradient(var(--material-brass-highlight) 0 28%, transparent 28%);
+  transform: rotate(var(--turn));
+  transform-origin: 50% 100%;
+}
+
+.mark[data-mark='core'] {
+  left: calc(50% - 1.5px);
+  width: 3px;
+  background: linear-gradient(var(--color-danger) 0 34%, transparent 34%);
+}
+
+/* The reading's glyph in the face's open foot, under the hub, where a gauge carries its name. */
+.glyph {
+  position: absolute;
+  z-index: 1;
+  bottom: 4%;
+  left: 50%;
+  display: flex;
+  font-size: calc(var(--dial-size) * 0.32);
+  transform: translateX(-50%);
+}
+
+.cell[data-pulsing]:not([data-tier='ok']) .glyph {
+  animation: glyph-pulse var(--glow-pulse) ease-in-out infinite;
+}
+
+@keyframes glyph-pulse {
+  50% {
+    opacity: 0.35;
+  }
+}
+
+/* The cargo chain's link count past the rig's own hold (HS: the wagons share this dial). */
+.badge {
+  position: absolute;
+  z-index: 3;
+  top: -4px;
+  right: -6px;
+  padding: 0 2px;
+  border-radius: var(--radius-chip);
+  background: var(--color-panel);
+  color: var(--color-parchment);
+  font-family: var(--font-numerals);
+  font-size: var(--type-min);
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+
+/*
+ * The revealed number hangs under the dial over the view, a tag as wide as the widest number it
+ * can show (VS: tabular numerals, the worst case never reflows), so it moves nothing on the strip.
+ */
+.number {
+  position: absolute;
+  z-index: 4;
+  top: calc(100% + var(--space-1));
+  left: 50%;
+  box-sizing: content-box;
+  min-width: calc(var(--dial-number-chars) * 1ch);
+  padding: 0 var(--space-1);
+  border: var(--frame-hairline) solid var(--color-brass);
+  border-radius: var(--radius-card);
+  background: var(--color-panel);
+  color: var(--color-parchment);
+  font-family: var(--font-numerals);
+  font-size: var(--type-label);
+  font-variant-numeric: tabular-nums;
+  text-align: center;
+  white-space: nowrap;
+  transform: translateX(-50%);
+  pointer-events: none;
+}
+
+.overflow {
+  flex: none;
+}
+
+.overflow > * {
+  flex-wrap: nowrap;
+  gap: 0;
+}
+
+.overflowCount {
+  color: var(--color-brass);
+  font-family: var(--font-numerals);
+  font-size: var(--type-label);
+  font-variant-numeric: tabular-nums;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .needle {
+    transition: none;
+  }
+
+  .cell[data-pulsing]:not([data-tier='ok']) .glyph {
+    animation: none;
+  }
+}

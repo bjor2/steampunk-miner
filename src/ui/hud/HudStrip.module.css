@@ -1,8 +1,9 @@
 /*
  * The strip (ticket 684; design-system.md section 9): full width up to `--strip-max-width`,
  * `--strip-height` tall, right under the top inset (the HUD is the safe area), opaque enamel so
- * the bars read on any ground, a brass rule at its foot. One line, nothing wraps; the bars give
- * up width first, so money at 1e15 and its chip fit a 360 px phone.
+ * the dials read on any ground, a brass rule at its foot. One line, nothing wraps: the gauge
+ * cluster (ticket 716) keeps the dials its table gives the place room for, so money at 1e15 and
+ * its chip fit a 360 px phone, and the number sits at the far end.
  */
 .strip {
   position: absolute;
@@ -34,17 +35,10 @@
   border-radius: 0 0 var(--radius-panel) var(--radius-panel);
 }
 
-.bars {
-  display: flex;
-  flex: 1 1 auto;
-  align-items: center;
-  gap: var(--space-1);
-  min-width: 0;
-}
-
 .number {
   position: relative;
   flex: none;
+  margin-left: auto;
 }
 
 .number > * {
@@ -120,53 +114,7 @@
   }
 }
 
-/* The heat line: 4 px of ember along the strip's foot, its length the heat. */
-.heat {
-  position: absolute;
-  right: 0;
-  bottom: calc(-1 * var(--frame-bezel));
-  left: 0;
-  height: 4px;
-  pointer-events: none;
-}
-
-.heatFill {
-  position: absolute;
-  inset: 0;
-  background: var(--gauge-fill-heat);
-  transform: scaleX(var(--fill));
-  transform-origin: left center;
-  transition: transform var(--needle-ease-max) var(--ease-needle);
-}
-
-.heat:not([data-tier='ok']) .heatFill {
-  background-image: repeating-linear-gradient(
-    45deg,
-    rgb(27 22 19 / 0.55) 0 3px,
-    transparent 3px 6px
-  );
-}
-
-/* Ticket 685: it has no glyph on the strip, so the line itself pulses while a tier holds. */
-.heat[data-pulsing]:not([data-tier='ok']) .heatFill {
-  animation: heat-pulse var(--glow-pulse) ease-in-out infinite;
-}
-
-@keyframes heat-pulse {
-  50% {
-    opacity: 0.35;
-  }
-}
-
 @media (prefers-reduced-motion: reduce) {
-  .heatFill {
-    transition: none;
-  }
-
-  .heat[data-pulsing]:not([data-tier='ok']) .heatFill {
-    animation: none;
-  }
-
   .floatUp {
     animation-name: float-fade;
   }
