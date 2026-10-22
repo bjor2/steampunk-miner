@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-10-22T22:50:53+02:00",
+  "updated_at": "2026-10-22T22:51:17+02:00",
   "caps": {
     "grok": 12,
     "claude": 10,
@@ -90,12 +90,11 @@
         },
         {
           "slot": "C8",
-          "state": "busy",
+          "state": "free",
           "ticket": null,
           "grok_slot": null,
-          "kind": "aux",
-          "since": "2026-10-22T22:50:00+02:00",
-          "label": "tester-triage"
+          "kind": null,
+          "since": null
         },
         {
           "slot": "C9",
@@ -115,40 +114,30 @@
         }
       ],
       "size": 4,
-      "used": 2,
-      "free": 2,
+      "used": 1,
+      "free": 3,
       "claims_last_hour": 5,
       "name": "Claude Max 2"
     }
   ],
   "gate": {
-    "busy": 1,
+    "busy": 2,
     "max": 3
   },
   "tester": {
     "state": "running",
-    "phase": "triage-fast",
-    "sha": "ab20bf9626ac7ccbdaa4134dbcbfbed53c1a6217",
-    "since": "2026-10-22T20:50:45Z",
-    "holds_gate": false,
-    "claude_slot": 8,
-    "last_run": "2026-10-22T19:01:57Z",
+    "phase": "fast",
+    "sha": "b5c0415a7245d37b035788c09bce3ad65af52778",
+    "since": "2026-10-22T20:51:12Z",
+    "holds_gate": true,
+    "claude_slot": null,
+    "last_run": "2026-10-22T20:51:08Z",
     "last_nightly": "2026-10-15T20:43:15Z",
     "last_nightly_result": "full=FAIL balance-report=ok bench=FAIL balance-planets=ok balance-guns=ok balance-charges=ok balance-refinery=ok balance-heat=ok e2e=FAIL memory-soak=FAIL packaged-smoke=ok ",
     "main_red_sha": null,
-    "feature": 723,
-    "feature_title": "Sideways cut speed capped by drive speed; drill upgrade never changes drive speed",
-    "queue": [
-      {
-        "feature": 724,
-        "kind": "ticket",
-        "title": "Down-cut acceleration capped by local gravity (0.1 g core floor)",
-        "tickets": [
-          724
-        ],
-        "since": "2026-10-22T22:03:38+02:00"
-      }
-    ]
+    "feature": 724,
+    "feature_title": "Down-cut acceleration capped by local gravity (0.1 g core floor)",
+    "queue": []
   },
   "grok": [
     {
@@ -292,12 +281,10 @@
     },
     {
       "slot": 8,
-      "state": "busy",
+      "state": "free",
       "ticket": null,
       "grok_slot": null,
-      "since": "2026-10-22T22:50:00+02:00",
-      "kind": "aux",
-      "label": "tester-triage",
+      "since": null,
       "account": 2
     },
     {
@@ -336,8 +323,8 @@
     "claude": {
       "size": 10,
       "enabled": 4,
-      "used": 2,
-      "free": 2,
+      "used": 1,
+      "free": 3,
       "external": 0
     }
   },
