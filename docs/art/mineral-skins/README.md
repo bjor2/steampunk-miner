@@ -111,7 +111,7 @@ as before. No layer is shared with p1-b1, p1-b2 or within the batch.
 P2's own pool, foothold-p2 (ticket 632, GD lock (b) on #595), binds a species of its own to each of
 the 12 legacy kind slots under ore rules 6. This batch skins its five commons, kind slots 1 to 5. The
 layers come from the species row, as on P1. No layer is shared within the batch or with any other
-planet's batches. P2's slots 6 to 9 come with ticket 596 (p2-b2), and 10 to 12 with ticket 597.
+planet's batches. P2's slots 6 to 9 come with ticket 596 (p2-b2), and 10 to 12 with ticket 597 (p2-b3).
 
 <!-- p2-b1 -->
 
@@ -185,6 +185,40 @@ temper colours of its oxide skin into the cyan body, the way alexandrite's runs 
   cleavage faces flashing). Each sheen reads its base's field (blooms, stairs, band, weave) through
   the same seeds, so the light sits on the stone's own shapes.
 - **Seeds 801 to 835**, apart from p2-b1's 701 to 792 and from every other batch's.
+
+## Batch p2-b3: P2's species 10 to 12 (ticket 597)
+
+The foothold-p2 pool's three rares, kind slots 10 to 12 on P2 under ore rules 6. The pool binds the
+12 legacy slots, so P2 has no slots 13 to 15, and this batch closes the planet: every kind slot of P2
+wears a skin of its own. The layers come from the species row, as for p2-b1. No layer is shared
+within the batch or with any other batch.
+
+<!-- p2-b3 -->
+
+| slot | species | base                | vein                 | palette (shadow, body, light)                  | sheen            |
+| ---- | ------- | ------------------- | -------------------- | ---------------------------------------------- | ---------------- |
+| 10   | `p2-r1` | `starred-wine`      | `rayed-garnets`      | `star-garnet` `#6b2e42` `#d65b84` `#eaadc2`    | `six-ray-sparks` |
+| 11   | `p2-r2` | `harlequin-patches` | `framed-ovals`       | `verdigris-opal` `#2a634b` `#53c696` `#a9e2cb` | `colour-play`    |
+| 12   | `p2-r3` | `trigon-smoke`      | `point-on-octahedra` | `smoke-diamond` `#46424f` `#8d849e` `#c6c2ce`  | `adamant-glints` |
+
+<!-- /p2-b3 -->
+
+- **Species:** star garnet, verdigris opal and smoke diamond (`p2-r1` to `p2-r3`).
+- **Bases:** a deep wine body clouded by depth, with darker pockets where the stone is thick and fine
+  silk needles in three sets 60 degrees apart (whole lines along u and v, so it repeats); milky
+  green opal broken into harlequin patches, squares stood on their corners, each its own depth,
+  with a soft dark seam between; grey-violet smoke in round billows, pitted with point-down
+  triangular trigons on a staggered four-by-four lattice, each pit dark with a bright rim.
+- **Veins:** five garnets seen down their threefold axis, six rhomb faces meeting in a low point, so
+  each throws six rays of light and shade; four oval opal domes, each in a raised frame of the
+  matrix it grew in; five octahedra stood point-on to the face, four faces meeting in the point
+  inside a diamond outline (P3's heart diamond lies tipped on its side).
+- **Sheens:** six-ray sparks (a small sharp six-rayed star with a hot point on each garnet, faint
+  silk light between; the vein and the sheen share one layout, `STAR_GARNETS`, so each star sits on
+  its stone); colour play (whole harlequin patches flaring at once, each brightest toward one
+  corner, pinfire between); adamant glints (the trigon rims and hard sparks, the smoke itself dull).
+  Colour play and adamant glints read their bases' patches and trigons through the same seeds.
+- **Seeds 901 to 925**, apart from p2-b1's 701 to 792, p2-b2's 801 to 835 and every other batch's.
 
 ## Batch p3-b1: P3's species 1 to 5 (ticket 598)
 
@@ -826,6 +860,43 @@ they hardly showed (the trap p2-b1's grain caps met). The blooms are now wider, 
 sprinkled. Every skin sits above its rock, with contrast from 1.58 for cobalt bloom to 2.68 for
 moonstone lens. Checked by eye on `p2-b2.phone-x4.png`, `p2-b2.desktop.png`, the `p2-b2.scale-x4`
 copies, and `p2.scale-x4.png` with its `-deutan` and `-gray` copies (P2's nine skins side by side).
+
+From `sheets/p2-b3.distinct.json`, at 22 px a tile over P2's band 3 rock (luma 0.29). The first three
+pairs are within the batch; the rest are the closest pairs against p2-b1's and p2-b2's skins (the
+report holds all 30):
+
+<!-- p2-b3-readings -->
+
+| pair                                    | colour apart | deuteranopia apart | luma apart | texture apart |
+| --------------------------------------- | ------------ | ------------------ | ---------- | ------------- |
+| garnet vs opal                          | 0.572        | 0.157              | 0.076      | 0.074         |
+| garnet vs smoke diamond                 | 0.305        | 0.104              | 0.002      | 0.070         |
+| opal vs smoke diamond                   | 0.287        | 0.206              | 0.074      | 0.087         |
+| graphite vs smoke diamond (least apart) | 0.040        | 0.034              | 0.003      | 0.091         |
+| slate vs smoke diamond                  | 0.051        | 0.041              | 0.022      | 0.087         |
+| graphite vs garnet                      | 0.321        | 0.076              | 0.001      | 0.084         |
+| slate vs garnet                         | 0.347        | 0.102              | 0.024      | 0.078         |
+| cobalt vs smoke diamond                 | 0.211        | 0.215              | 0.064      | 0.070         |
+| slate vs opal                           | 0.242        | 0.171              | 0.052      | 0.084         |
+
+<!-- /p2-b3-readings -->
+
+The materials table gives smoke diamond (hue 262, saturation 0.12, luma 0.54) and graphite seam
+(238, 0.06, 0.52) one grey to the eye, and slate shale (218, 0.14, 0.56) sits just beside them, so the closest pair on the planet is smoke diamond
+against graphite, and texture has to part them. Graphite is drawn in level smears with polished
+lenses, slate in fine slanted cleavage. The first smoke diamond draft drew its smoke in level
+wisps, too, with small sparse trigons, and at 22 px it read as a paler graphite (texture 0.082).
+The smoke now billows round, never level, the trigons are larger, on most blocks of a coarser
+lattice, and the body has more contrast, so the pits and rims still show on the phone. The
+texture distance is now 0.091, as far apart as galena and tin gravel. Under deuteranopia the star
+garnet's pink falls toward the greys (0.08 to graphite, 0.10 to smoke diamond). Its six-rayed
+stones and bright stars still part it, and it stays the warmest skin on the planet to the
+trichromat eye. Verdigris opal is the planet's only green, and its harlequin diamonds are the only
+large straight-edged checker on P2 besides galena's level and upright blocks, which are grey.
+Every new skin sits above its rock, with contrast from 1.76 for star garnet to 1.99 for verdigris
+opal (smoke diamond 1.77). Checked by eye on `p2-b3.phone-x4.png`, `p2-b3.desktop.png`, the
+`p2-b3.scale-x4` copies, and `p2.scale-x4.png` with its `-deutan` and `-gray` copies, now all
+twelve P2 skins side by side.
 
 From `sheets/p3-b1.distinct.json`, at 22 px a tile over P3's band 3 rock (luma 0.29). It is P3's
 first batch, so these are all ten pairs; its pairs against p3-b2 are in `p3-b2.distinct.json`:
