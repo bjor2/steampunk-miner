@@ -10,7 +10,8 @@
  *   rides its front up to such a cell, and the body with it). A slab with nothing left to cut
  *   leaves travel to set the speed, and says so (`isSlabClear`), so a motor mid-cut may keep its
  *   last `vCut` instead (ticket 430); one with no uncut cell the drill may cut gives 0, so the body
- *   waits;
+ *   waits; a sideways cut, and its front, never pass the drive's top speed (Bjor's ruling on #723,
+ *   `vehicle/cutCapSpeed.ts`), while a cut down or up keeps the drill's alone;
  * - while it is shut, whether the slab the drill bites holds such a cell (`isSpanStopped`), so a
  *   body coasting on its last `vCut` stops at once there (ticket 430).
  *
@@ -21,6 +22,8 @@
  * client's gate is the authority's on every tick. A tick with no step counts as one under the off
  * line on both sides.
  */
+import { STEP_BOUND_TOLERANCE_MM } from '../../constants/balance'
+import { cappedCutSpeedOf, cappedCutStepMmOf, driveSpeedOf } from '../vehicle/cutCapSpeed'
 import { metresPerSecondOfStep, cutStepMmOf } from '../vehicle/cutSpeed'
 import {
   CLOSED_CUT_GATE,
@@ -32,7 +35,6 @@ import {
 import { sweptDrillStampOf } from '../vehicle/drillStamp'
 import { leadingSlabOf, type LeadingSlab } from '../vehicle/leadingSlab'
 import type { SweptCut } from '../vehicle/sweptCut'
-import { travelSpeedOf } from '../vehicle/travelParity'
 import { facingVectorOf, type Facing, type VehiclePose } from '../vehicle/vehiclePose'
 import { groundReaderOf } from '../world/groundReader'
 import type { PlanetParams } from '../world/planetParams'
@@ -69,10 +71,11 @@ export interface CutFollow {
   isSpanStopped?: true
 }
 
-/** The slab a step drives into, with what reading its cells needs. */
+/** The slab a step drives into, with what reading its cells needs and the facing it cuts along. */
 interface SlabRead {
   params: PlanetParams
   slab: LeadingSlab
+  facing: Facing
 }
 
 export function cutFollowAt(
@@ -102,7 +105,11 @@ function slabReadOf(state: AuthorityState, playerId: string, step: CutFollowStep
     facing: facingVectorOf(pose.upx, pose.upy, pose.facing),
     stamp: sweptDrillStampOf(pose, step.isLifting, travelStampAheadMmAt(state, playerId)),
   }
-  return { params, slab: leadingSlabOf(groundReaderOf(state.world, params), aim) }
+  return {
+    params,
+    slab: leadingSlabOf(groundReaderOf(state.world, params), aim),
+    facing: step.facing,
+  }
 }
 
 /**
@@ -110,8 +117,9 @@ function slabReadOf(state: AuthorityState, playerId: string, step: CutFollowStep
  * #570 point 1 and the Vertical Scaler's condition 1): the drill law's step through the slowest
  * uncut cell of the leading slab it can cut, the `vCut` the body follows, never past the cutting
  * bound; the bound itself over a slab with nothing left to cut; 0 when it can cut none there. A
- * cell it cannot cut stops the walk where the front meets it. It reads the drill, never the body's
- * speed, so physics jitter cannot shrink the front.
+ * cell it cannot cut stops the walk where the front meets it. Sideways, never past the drive's top
+ * speed either (ticket 723). It reads the drill and the engine, never the body's speed, so physics
+ * jitter cannot shrink the front.
  */
 export function frontStepMmAt(
   state: AuthorityState,
@@ -120,6 +128,15 @@ export function frontStepMmAt(
 ): number {
   const read = slabReadOf(state, playerId, step)
   if (read === null) return 0
+  return cappedCutStepMmOf(
+    read.facing,
+    uncappedFrontStepMmOf(state, playerId, read),
+    driveSpeedOf(vehicleOf(state, playerId)),
+  )
+}
+
+/** The front's step the drill alone allows, before the drive's sideways cap. */
+function uncappedFrontStepMmOf(state: AuthorityState, playerId: string, read: SlabRead): number {
   const { cuttingMm } = stepBoundsAt(state, playerId)
   if (isSlabClear(read.slab)) return cuttingMm
   const leadSubSteps = slowestCuttableSubStepsOf(state, playerId, read.params, read.slab.uncutTiles)
@@ -139,19 +156,42 @@ function idleTicksBefore(cursor: SweptCut | undefined, tick: number): number {
   return cursor === undefined ? 0 : Math.max(0, tick - cursor.tick - 1)
 }
 
-/** Open: `vCut`, or travel's speed over a slab with nothing left to cut, saying so. */
+/**
+ * Open: `vCut`, held to the drive's speed sideways, or over a slab with nothing left to cut, saying
+ * so, the speed `clearSlabSpeedOf` gives.
+ */
 function openFollowOf(
   state: AuthorityState,
   playerId: string,
   read: SlabRead,
   gate: CutGate,
 ): CutFollow {
-  if (!isSlabClear(read.slab)) return { gate, cutSpeed: cutSpeedOf(state, playerId, read) }
-  return {
-    gate,
-    cutSpeed: travelSpeedOf(vehicleOf(state, playerId), read.params),
-    isSlabClear: true,
+  const driveSpeed = driveSpeedOf(vehicleOf(state, playerId))
+  if (isSlabClear(read.slab)) {
+    return {
+      gate,
+      cutSpeed: clearSlabSpeedOf(state, playerId, read, driveSpeed),
+      isSlabClear: true,
+    }
   }
+  const cutSpeed = cappedCutSpeedOf(read.facing, cutSpeedOf(state, playerId, read), driveSpeed)
+  return { gate, cutSpeed }
+}
+
+/**
+ * Over a cleared slab: the drive's speed sideways (ticket 723); along a cut down or up, the drill's
+ * cut through the nominal ground where that is faster, so a cut breaking into open ground keeps
+ * the drill's pace there, never the drive's.
+ */
+function clearSlabSpeedOf(
+  state: AuthorityState,
+  playerId: string,
+  read: SlabRead,
+  driveSpeed: number,
+): number {
+  const nominalCutMm = stepBoundsAt(state, playerId).cuttingMm - STEP_BOUND_TOLERANCE_MM
+  const drillSpeed = Math.max(driveSpeed, metresPerSecondOfStep(nominalCutMm))
+  return cappedCutSpeedOf(read.facing, drillSpeed, driveSpeed)
 }
 
 /** Shut: no speed, and whether a span stop stands in the slab the drill bites. */

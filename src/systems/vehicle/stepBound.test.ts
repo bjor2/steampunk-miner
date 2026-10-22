@@ -16,7 +16,8 @@ import { guestPoseToleranceMm, speedOfStepBound, stepBoundMmOf, stepBoundsOf } f
 import { FACING } from './vehiclePose'
 import { newVehicleState, type VehicleState } from './vehicleState'
 
-// The pose bound from stats (ticket 334): (cutting ? cutStep : travelStep) + one 250 mm sample.
+// The pose bound from stats (ticket 334): (cutting ? cutStep : max(driveStep, cutStep)) + one
+// 250 mm sample (ticket 723).
 
 const PARAMS = planetParamsFor(83921, 1)
 const SURFACE_Y = (surfaceRowOfColumn(20, PARAMS.radiusTiles) + 1) * 1000 + 450
@@ -62,11 +63,14 @@ describe('step bound (ticket 334)', () => {
     }
   })
 
-  it('bounds a travelling step by k times the cut once it passes the engine', () => {
+  // Ticket 723: the drill never sets the drive's speed, but a cut down is the drill's alone, so the
+  // bound with the gate shut still holds a body a cut down left moving: the cut step, no `k`.
+  it('bounds a travelling step by the cut step once it passes the engine', () => {
     // Engine purchase 13 (11.3 m/s) stands for the old saturating step 400 (10.9 m/s, ticket 553).
     const rig = rigWith({ ...FAST_DRILL, engine: 13 })
     const bounds = stepBoundsOf(rig, PARAMS)
-    expect(bounds.travellingMm).toBe(Math.floor(lawCutStepOf(rig) * 1.5) + STEP_BOUND_TOLERANCE_MM)
+    expect(bounds.travellingMm).toBe(lawCutStepOf(rig) + STEP_BOUND_TOLERANCE_MM)
+    expect(bounds.travellingMm).toBe(bounds.cuttingMm)
   })
 
   it('picks the cutting bound with the cut gate open and the travelling one with it shut', () => {

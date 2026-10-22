@@ -6,15 +6,15 @@
  * it returns reaches the authority. The ore price grows without bound and stays Money: as a double
  * it is Infinity past planet 582 (#196). A bored tile takes its time on the scripted sub-step
  * clock the bot bores on (ticket 559), a fraction of a tick past 60 cells/s, so a drill purchase
- * that shortens a tile by less than a tick plans its gain.
+ * that shortens a tile by less than a tick plans its gain. A gallery tile is cut sideways, so it
+ * takes at least the drive's time over it (Bjor's ruling on #723); the shaft down is the drill's.
  */
 import { oreSalePrice, oreTier } from '../economy/oreEconomy'
 import { vehicleStatsAt, type UpgradeLevels, type VehicleStats } from '../economy/vehicleStats'
 import { cmp, fromFiniteNumber, mul, type BigStat, type Money } from '../money'
-import { metresPerSecondOfStep } from '../vehicle/cutSpeed'
+import { sidewaysSubStepsOf } from '../vehicle/cutCapSpeed'
 import { subStepsPerTileAt, ticksPerTile, type DrillStats } from '../vehicle/drillRule'
 import { drillQuantumOnPlanet } from '../vehicle/drillQuantum'
-import { bandRockHardnessAt, drillTravelOnPlanet } from '../vehicle/travelParity'
 import { quantaOfUnits } from '../vehicle/energyQuanta'
 import { statsOfVehicle, type VehicleState } from '../vehicle/vehicleState'
 import { blockHardness, coreHardness } from '../economy/oreEconomy'
@@ -98,7 +98,7 @@ export function canReachCore(layout: MineLayout, { stats, tankQuanta }: TripMean
   const deepest = groundHardnessAt(layout.params, shaftTileAt(layout, row + 1))
   const boreTicksThere = tileTicksOf(stats, deepest, layout.params.planetIndex)
   if (boreTicksThere === null) return false
-  const travel = travelOf(layout, travelSpeedThrough(stats, layout, row), row, boreTicksThere)
+  const travel = travelOf(layout, stats.engine.speedMax, row, boreTicksThere)
   return travel.quanta * CORE_TRAVEL_SHARE_DENOMINATOR <= tankQuanta
 }
 
@@ -159,8 +159,11 @@ function galleryTripOf(
   if (boreTicksHere === null) return null
   const oreTicks = oreTileTicksOf(stats, layout, band)
   if (oreTicks === null) return null
-  const travel = travelOf(layout, travelSpeedThrough(stats, layout, row), row, boreTicksHere)
-  const gallery = galleryYield(layout, band, { rock: boreTicksHere, ore: oreTicks })
+  const travel = travelOf(layout, stats.engine.speedMax, row, boreTicksHere)
+  const gallery = galleryYield(layout, band, {
+    rock: sidewaysTileTicksOf(stats, boreTicksHere, layout.params.planetIndex),
+    ore: sidewaysTileTicksOf(stats, oreTicks, layout.params.planetIndex),
+  })
   const tankLeft = tankQuanta * PLANNED_TANK_SHARE - travel.quanta
   return {
     travel,
@@ -192,15 +195,12 @@ interface TravelCost {
 }
 
 /**
- * Travel parity on the way to `row` (ticket 553): `max(speedMax, k * cutSpeed)` through the
- * band rock at that row, so an engine purchase below the drill's pace plans no gain, as it buys
- * none in the bot's world (`botTravelSpeedOf`). The band's rock, not the cell's: the game's parity
- * ignores the softer surface layer (ticket 625), and so must the plan.
+ * A gallery tile's ticks cut sideways: the drill's `drillTicks`, or the drive's over the tile where
+ * the drive is slower (ticket 723), on the same scripted clock the bot bores on.
  */
-function travelSpeedThrough(stats: VehicleStats, layout: MineLayout, row: number): number {
-  const ground = bandRockHardnessAt(layout.params, shaftTileAt(layout, row))
-  const drillTravel = metresPerSecondOfStep(drillTravelOnPlanet(stats, ground, layout.params))
-  return Math.max(stats.engine.speedMax, drillTravel)
+function sidewaysTileTicksOf(stats: VehicleStats, drillTicks: number, planetIndex: number): number {
+  const quantum = drillQuantumOnPlanet(stats, planetIndex)
+  return sidewaysSubStepsOf(drillTicks * quantum, stats.engine.speedMax, quantum) / quantum
 }
 
 /** There and back at `speed` m/s: the surface, the open shaft, bore the rest, walk the gallery. */

@@ -1,7 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { createAuthorityState } from '../authority/authorityState'
 import { dockSiteOfPlanet } from '../authority/planetOfState'
-import { isEngineStepWorthZero } from '../authority/travelSpeed'
 import { UPGRADE_IDS } from '../economy/economyDefinition'
 import { stepOfMajor } from '../economy/upgradeSteps'
 import { onCurveLevel, onCurveStep, onCurveSteps } from '../economy/vehicleStats'
@@ -25,9 +24,8 @@ const TIP_CAP_PLANET = 40
 /** More money than planet 40's tracks can absorb. */
 const TIP_CAP_WALLET = '1e40'
 /**
- * The first planet where the one-purchase lead's k times cut passes the on-curve engine in band 1
- * (25.98 m/s) but not in the hardest band (10.50 against 11.01). On planets 1 to 6 the drill sets
- * travel in every band at the lead cap since #552, so the engine card reads maxed there (#418).
+ * #418's planet, where the one-purchase lead's drill once set travel in band 1 but not in the
+ * hardest band. Since ticket 723 the drill sets travel nowhere, so every engine step speeds it.
  */
 const ENGINE_STILL_SPEEDS_PLANET = 7
 
@@ -51,10 +49,11 @@ function botArrivedOnCurveAt(planetIndex: number, wallet = DEEP_WALLET): BotSess
 }
 
 /**
- * Steps that cut every band at the tile floor, so k times the cut passes the engine everywhere.
- * Drill power's purchase 106 is the first at or past the old stored 2000 since #552.
+ * Steps that cut every band at the tile floor, far past the engine everywhere: the drill that set
+ * travel everywhere under travel parity (retired by ticket 723). Drill power's purchase 106 is the
+ * first at or past the old stored 2000 since #552.
  */
-function withDrillSettingTravelEverywhere(session: BotSession): void {
+function withDrillFarPastTheEngine(session: BotSession): void {
   session.submit({ type: 'debug.setUpgrade', payload: { upgradeId: 'drill_power', level: 106 } })
   session.submit({ type: 'debug.setUpgrade', payload: { upgradeId: 'drill_tip', level: 600 } })
 }
@@ -111,21 +110,19 @@ describe('bot: shopping at the Upgrade bay', () => {
     expect(stepsBought).toBeGreaterThan(stepOfMajor(1))
   })
 
-  // Ticket 553: no max level, so a worth-zero engine purchase is sold; the bot plans no gain from it.
-  it('sends no track buy the Upgrade bay refuses with a drill that sets travel everywhere', () => {
+  // Ticket 553: no max level; since ticket 723 the drill never sets travel, however strong.
+  it('sends no track buy the Upgrade bay refuses with a drill far past the engine', () => {
     const session = botAtUpgradeBayOn(2)
-    withDrillSettingTravelEverywhere(session)
+    withDrillFarPastTheEngine(session)
     shopForTheCore(session)
-    expect(isEngineStepWorthZero(session.state(), session.playerId)).toBe(true)
     expect(session.events().filter((event) => event.type === 'CommandRejected')).toEqual([])
   })
 
-  // #418: the lead-capped planet 7 drill passes the on-curve engine in band 1 but not in the
-  // hardest band (planet 2 before #552's per-purchase drill).
-  it('buys the engine at the dock while a step still speeds travel in the deeper bands (#418)', () => {
+  // #418: the lead-capped planet 7 drill once set travel in band 1; since ticket 723 every engine
+  // step speeds travel everywhere.
+  it('buys the engine at the dock past its on-curve step (#418)', () => {
     const session = botArrivedOnCurveAt(ENGINE_STILL_SPEEDS_PLANET)
     shopForTheCore(session, mineWithBandOneBoredOut(session))
-    expect(isEngineStepWorthZero(session.state(), session.playerId)).toBe(false)
     expect(session.vehicle().levels.engine).toBeGreaterThan(
       onCurveStep('engine', ENGINE_STILL_SPEEDS_PLANET),
     )

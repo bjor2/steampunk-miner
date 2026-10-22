@@ -13,7 +13,7 @@
  * With the dev flag `drill.sweptCut` on (ticket 330) every step the drill is engaged also sends a
  * `drillStep`, before the step's report, so the authority cuts every tick, and (ticket 333) the
  * motor reads the cut gate and the drill's speed from the authority before the step's cut and
- * drives on an engine whose top speed is travel parity's, and (ticket 334) clamps the body to the
+ * drives on the engine's own top speed (travel parity retired by ticket 723), and (ticket 334) clamps the body to the
  * rig's stats-derived step bound and widens the wheels' wait-for-cut window to it; off, nothing
  * changes. With it on, the motor's substeps then collide with the world that step's cut and report
  * left, not the one the step read (ticket 459). The bore struts standing in the authority's state
@@ -285,7 +285,7 @@ function drillContactRuleOf(flags: DevFlags): DrillContactRule {
   return flags['drill.sweptCut'] ? sweptDrillContactOf : levelSliverDrillContactOf
 }
 
-/** With the swept cut on, travel parity's top speed (ticket 333); else the engine's own. */
+/** The engine the motor drives on: the authority's read with the swept cut on (ticket 333). */
 function engineOf(flags: DevFlags, vehicle: VehicleState): EngineStats {
   if (!flags['drill.sweptCut']) return engineStatsAtStep(vehicle.levels.engine)
   return travelEngineAt(readAuthorityState(), useGameStore.getState().playerId)

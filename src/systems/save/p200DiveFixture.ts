@@ -23,7 +23,7 @@ import { continueScriptedSession, FREEZE_ENEMIES, poseAbove } from '../authority
 import { stateDigest } from '../authority/stateDigest'
 import { cutStepMmOf } from '../vehicle/cutSpeed'
 import { subStepsPerTile } from '../vehicle/drillRule'
-import { bandRockHardnessOf } from '../vehicle/travelParity'
+import { bandRockHardnessOf } from '../vehicle/nominalGround'
 import { statsOfVehicle } from '../vehicle/vehicleState'
 import { paceArrivalOn } from '../bot/paceArrival'
 import { onCurveStep } from '../economy/vehicleStats'

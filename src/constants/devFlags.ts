@@ -11,8 +11,8 @@
  *   its drill is engaged, so the authority cuts every tick instead of once per pose report. On since
  *   18 Oct 2026 (it waited on the combined #304/#307 re-baseline); with it off the cut and the goldens are as before.
  *   With it on the motor also follows the drill (TD scope 0, ticket 333): while the cut gate is
- *   open the drill law's speed sets the speed along the facing, and otherwise the engine drives at
- *   travel parity's top speed. The cut gate rides on the swept cut's cursor, so it is saved and
+ *   open the drill law's speed sets the speed along the facing (sideways never past the drive's,
+ *   ticket 723), and otherwise the engine drives at its own top speed. The cut gate rides on the swept cut's cursor, so it is saved and
  *   digested only once a step has been sent. With it on the body is also clamped to the rig's
  *   stats-derived step bound and its wait-for-cut window widens to it (TD scope a, ticket 334);
  *   the authority checks steps and reports against that bound whatever the flag, and the world

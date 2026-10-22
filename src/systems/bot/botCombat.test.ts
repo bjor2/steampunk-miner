@@ -9,7 +9,6 @@ import {
   spawnEnemy,
 } from '../authority/combat/combatFixtures'
 import { coreNeededOf } from '../authority/coreBay'
-import { isEngineStepWorthZero } from '../authority/travelSpeed'
 import { WORLD_SEED } from '../authority/scriptedSession'
 import { FACING } from '../vehicle/vehiclePose'
 import { faceThreats } from './botCombat'
@@ -88,7 +87,6 @@ const hitArcsOf = (session: BotSession, fromEvent: number) =>
 describe('bot: combat reflex on the move (#29 Gameplay note 3, #130)', () => {
   it('drives on with its back to a crawler on a planet where it has not been destroyed', () => {
     const { session, planet } = botInCorridor()
-    expect(isEngineStepWorthZero(session.state(), session.playerId)).toBe(false)
     const fromEvent = session.events().length
     driveWithCrawlerBehind(session, planet)
     expect(hitArcsOf(session, fromEvent)).toContain('rear')

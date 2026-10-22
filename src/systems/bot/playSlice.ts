@@ -41,6 +41,7 @@ import { driveToUpgradeBay, runTrip } from './botTrip'
 import { widenShallowestBand } from './mineLayout'
 import { botPlanetOf, travelWhenReady } from './botTravel'
 import type { GateRouteBlock } from './gateRouteBlocks'
+import { newSidewaysBoreTally, type SidewaysBoreTally } from './sidewaysBores'
 import type { ShopSpend } from './shopSpend'
 import type { TripGoal } from './tripGoal'
 import {
@@ -63,6 +64,8 @@ export interface SliceRun {
   spreeVisits: readonly SpreeVisit[]
   /** Gated walls that stopped the way down with no means to open them (ticket 237): wanted none. */
   gateRouteBlocks: readonly GateRouteBlock[]
+  /** Sideways bore ticks per planet and the share the drive held (ticket 723): reported. */
+  sidewaysBores: SidewaysBoreTally
 }
 
 export interface SliceRunOptions {
@@ -178,6 +181,7 @@ function sliceRunOf(session: BotSession, run: BotRun, planet: BotPlanet): SliceR
     shopSpend: run.shopSpend,
     spreeVisits: run.spreeVisits,
     gateRouteBlocks: planet.gateRouteBlocks,
+    sidewaysBores: planet.sidewaysBores ?? newSidewaysBoreTally(),
   }
 }
 

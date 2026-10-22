@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { CUT_GATE_HOLD_TICKS } from '../../constants/balance'
+import { CUT_GATE_HOLD_TICKS, STEP_BOUND_TOLERANCE_MM } from '../../constants/balance'
 import { withRegistrations } from '../../registries/registrar'
 import type { SliceDefinition } from '../../registries/sliceDefinition'
 import { blockHardness } from '../economy/oreEconomy'
@@ -18,7 +18,7 @@ import {
   type ScriptedSession,
 } from './scriptedSession'
 import { stepBoundsAt } from './stepBoundRead'
-import { travelSpeedOf } from '../vehicle/travelParity'
+import { driveSpeedOf } from '../vehicle/cutCapSpeed'
 import { vehicleOf } from './authorityState'
 
 // The cut-follow's reads (ticket 333): the gate a drill step leaves on the cursor, and `vCut`.
@@ -205,7 +205,8 @@ describe('held cut reads (ticket 430)', () => {
     expect(idle.isSpanStopped).toBeUndefined()
   })
 
-  it("says when the open gate has nothing left to cut, its speed then travel's", () => {
+  // A cut down breaking into open ground keeps the drill's nominal pace, never less than the drive's.
+  it('says when the open gate has nothing left to cut, its speed then the drill or the drive', () => {
     const session = sessionFacingDown()
     session.submit(1, { type: 'drillStep', payload: { ...DOWN_AT_REST, drive: NO_DRIVE } })
     const carve = { x: REST.x, y: REST.y - 1500, radius: 1500, amount: 255 }
@@ -214,7 +215,10 @@ describe('held cut reads (ticket 430)', () => {
     const read = cutFollowAt(session.state(), 'p1', drillingAt(REST.y))
     expect(read.gate.cutGate).toBe(1)
     expect(read.isSlabClear).toBe(true)
-    expect(read.cutSpeed).toBe(travelSpeedOf(vehicleOf(session.state(), 'p1'), PARAMS))
+    const vehicle = vehicleOf(session.state(), 'p1')
+    const nominalCutMm = stepBoundsAt(session.state(), 'p1').cuttingMm - STEP_BOUND_TOLERANCE_MM
+    const drillSpeed = metresPerSecondOfStep(nominalCutMm)
+    expect(read.cutSpeed).toBe(Math.max(driveSpeedOf(vehicle), drillSpeed))
   })
 
   it('never says the slab is clear while it holds ground to cut', () => {

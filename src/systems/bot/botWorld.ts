@@ -3,8 +3,7 @@
  * movement-time model of the #6 simulation, not physics): driving and falling along a bored tunnel
  * at the travel speed for `drive` energy, climbing at the same speed for `thrust` energy, and
  * boring a tile in exactly the ticks the #7 drill rule gives. Tiles are 1 m. The travel speed is
- * the rig's effective one (travel parity, ticket 333): the engine's top speed until k times the
- * drill's cut speed passes it.
+ * the drive's, the engine's top speed alone (ticket 723 retired travel parity).
  */
 import { TICKS_PER_SECOND } from '../../constants/physics'
 import { planetParamsOf } from '../authority/planetOfState'
@@ -139,10 +138,9 @@ export function moveTicks(tiles: number, speedMax: number): number {
 }
 
 /**
- * m/s the bot moves at where its rig stands: the effective travel speed. No longer held to the
- * fixed 18 m/s pose bound: #334 derives the bound from the rig's stats, and with no tile floor
- * (ticket 397) the drill's cut, and so travel, has no cap (HS on #397: rows read effective travel
- * speed, never speedMax or the floor).
+ * m/s the bot moves at where its rig stands: the effective travel speed, the drive's. No longer
+ * held to the fixed 18 m/s pose bound: #334 derives the bound from the rig's stats (HS on #397:
+ * rows read effective travel speed, never the floor).
  */
 export function botTravelSpeedOf(state: AuthorityState, playerId: string): number {
   return effectiveTravelSpeedOf(state, playerId)

@@ -28,7 +28,8 @@ import {
 // The cut-follow in the real fixed-step loop (ticket 333, TD acceptance on #316 scope 0), with
 // `drill.sweptCut` on: the motor's cut gate is the one the authority keeps on every tick a drill
 // step lands, the rig stops within 6 ticks of letting go of the drive, and back through the tunnel
-// it carved it never beats travel parity's cap. Three rigs, three replays of the same script.
+// it carved it never beats the drive's speed (travel parity's cap until ticket 723 retired it).
+// Three rigs, three replays of the same script.
 
 // The third rig cuts at about 15 m/s, the old 4-tick tile floor's pace: with no floor (ticket 397)
 // #400's rig 2 cuts at 3600 m/s and jams on planet 1 (#439).
@@ -50,7 +51,7 @@ interface TickRead {
   result: VehicleStepResult
   /** The cut gate the tick's drill step left on the cursor, or null when no step landed. */
   authorityGate: 0 | 1 | null
-  /** Travel parity's cap in m/s as the step started. */
+  /** The drive's speed in m/s as the step started (ticket 723). */
   travelCap: number
 }
 
@@ -167,7 +168,7 @@ describe('cut-follow in the live loop (ticket 333)', () => {
     expect(after.every(({ result }) => !result.isCutting)).toBe(true)
   }, 120_000)
 
-  it('never drives back through its own tunnel faster than travel parity allows', () => {
+  it('never drives back through its own tunnel faster than the drive allows', () => {
     const run = playScript(RIGS[2], HOLDING_CASING_GRADE)
     // The level leg's held-out carry cells left a floor lip the drill met on the way back until
     // ticket 421 let the stamp carve them (#439 had made this a todo naming #421).

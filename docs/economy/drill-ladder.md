@@ -158,7 +158,7 @@ step 0 (tip 1), so `eff` is 1 and the drill law's speed is `D` cells/s, one purc
   doubled quantum (100 to 199 sub-steps a cell here), so from stored 16 the read is within 1% of
   the law and every purchase to 30 is in its band; the test now reads `floor(1000 Q / n)`.
 - **What else uses the same step.** The authority's cutting step bound (`stepBound.ts`,
-  `cutStepMmOf` plus one 250 mm sample of tolerance), travel parity (`travelParity.ts`) and the P200
-  dive fixture, each in the rig's drill quantum since ticket 558. The authority's cut itself counts
+  `cutStepMmOf` plus one 250 mm sample of tolerance), the bot's trip estimate and the P200 dive
+  fixture (travel parity, which also read it, was retired by ticket 723), each in the rig's drill quantum since ticket 558. The authority's cut itself counts
   sub-steps and never rounds to mm, so it runs at the law; only the body's commanded follow speed
   and those bounds see the mm rounding, under 1% at any speed.

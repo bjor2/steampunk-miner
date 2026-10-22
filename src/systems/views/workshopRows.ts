@@ -3,8 +3,8 @@
  * stored step and its major and pip as text (#180), the next step's cost (`stepPrice`, the same
  * value `upgrade_purchased.cost` logs) and an effect preview "before -> after" from
  * `vehicleStatsAt` at this step and the next (the same function as `upgrade_purchased.statsAfter`). `drill_tip` also says to which band of this planet
- * it drills at full speed (`P >= H`, #7). No track has a max level (ticket 553): the engine's and
- * the hold's level text and muted note say what a purchase buys (`trackNotes.ts`).
+ * it drills at full speed (`P >= H`, #7). No track has a max level (ticket 553): the hold's level
+ * text and the drill's and the hold's muted notes say what a purchase buys (`trackNotes.ts`).
  */
 import type { AuthorityState } from '../authority/authorityState'
 import { nextUpgradePrice } from '../authority/workshopRules'
@@ -134,8 +134,8 @@ function workshopRowOf(
     iconId,
     label,
     level: levels[upgradeId],
-    levelText: trackLevelTextOf(state, playerId, levels, upgradeId),
-    note: trackNoteOf(state, playerId, levels, upgradeId),
+    levelText: trackLevelTextOf(levels, upgradeId),
+    note: trackNoteOf(state, levels, upgradeId),
     cost,
     effectBefore: previewOf(levels, upgradeId),
     effectAfter: previewOf(next, upgradeId),

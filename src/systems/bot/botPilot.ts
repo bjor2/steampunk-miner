@@ -30,6 +30,7 @@ import { setGunsForEnergy } from './botGuns'
 import { facingTowards, NO_TICKS, reportPoseIntent } from './botPose'
 import type { BotSession } from './botSession'
 import type { GateRouteBlock } from './gateRouteBlocks'
+import type { SidewaysBoreTally } from './sidewaysBores'
 import { botTravelSpeedOf, moveTicks, tileKindAt } from './botWorld'
 import type { MineLayout } from './mineLayout'
 
@@ -69,6 +70,11 @@ export interface BotPlanet {
    * `gateRouteBlocks.ts`): one record for the whole run, carried from planet to planet.
    */
   gateRouteBlocks: GateRouteBlock[]
+  /**
+   * The run's sideways bores per planet (ticket 723, `sidewaysBores.ts`), carried the same way;
+   * absent in a spec's hand-built planet, which tallies none.
+   */
+  sidewaysBores?: SidewaysBoreTally
 }
 
 /**

@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest'
 import { MM_PER_METRE, TICKS_PER_SECOND } from '../../constants/physics'
 import { engineStatsAtStep } from '../economy/vehicleStats'
 import { speedOfStepBound } from '../vehicle/stepBound'
-import { travelSpeedOf } from '../vehicle/travelParity'
+import { driveSpeedOf } from '../vehicle/cutCapSpeed'
 import { FACING } from '../vehicle/vehiclePose'
 import { surfaceRowOfColumn } from '../world/tileGrid'
 import { vehicleOf } from './authorityState'
@@ -61,8 +61,8 @@ describe.each(TRAVEL_ROWS_M_PER_S)('travel at %i m/s (ticket 560)', (speed) => {
     const session = rigInTheSky(speed)
     const vehicle = vehicleOf(session.state(), 'p1')
     const bound = speedOfStepBound(stepBoundsAt(session.state(), 'p1').travellingMm)
-    expect(travelSpeedOf(vehicle, PARAMS)).toBeGreaterThanOrEqual(speed)
-    expect(travelSpeedOf(vehicle, PARAMS)).toBeLessThanOrEqual(bound)
+    expect(driveSpeedOf(vehicle)).toBeGreaterThanOrEqual(speed)
+    expect(driveSpeedOf(vehicle)).toBeLessThanOrEqual(bound)
   })
 
   it('refuses a step one mm past the travel bound', () => {

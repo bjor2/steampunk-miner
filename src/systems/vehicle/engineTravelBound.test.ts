@@ -4,7 +4,7 @@ import { engineStatsAtStep } from '../economy/vehicleStats'
 import { planetParamsFor } from '../world/planetParams'
 import { surfaceRowOfColumn } from '../world/tileGrid'
 import { speedOfStepBound, stepBoundsOf } from './stepBound'
-import { travelSpeedOf } from './travelParity'
+import { driveSpeedOf } from './cutCapSpeed'
 import { FACING } from './vehiclePose'
 import { newVehicleState, type VehicleState } from './vehicleState'
 
@@ -33,7 +33,7 @@ function firstPurchaseReaching(speed: number): number {
 }
 
 function travelMmPerTickOf(rig: VehicleState): number {
-  return (travelSpeedOf(rig, PARAMS) * MM_PER_METRE) / TICKS_PER_SECOND
+  return (driveSpeedOf(rig) * MM_PER_METRE) / TICKS_PER_SECOND
 }
 
 describe('engine travel inside the step bound (ticket 553)', () => {
@@ -49,8 +49,8 @@ describe('engine travel inside the step bound (ticket 553)', () => {
     (speed) => {
       const rig = rigWithEngine(firstPurchaseReaching(speed))
       const bound = speedOfStepBound(stepBoundsOf(rig, PARAMS).travellingMm)
-      expect(travelSpeedOf(rig, PARAMS)).toBeGreaterThanOrEqual(speed)
-      expect(bound).toBeGreaterThanOrEqual(travelSpeedOf(rig, PARAMS))
+      expect(driveSpeedOf(rig)).toBeGreaterThanOrEqual(speed)
+      expect(bound).toBeGreaterThanOrEqual(driveSpeedOf(rig))
     },
   )
 

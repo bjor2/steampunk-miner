@@ -25,7 +25,7 @@ import { readSurfaceLayer } from './surfaceLayerRules'
 import { readUpgradeTiers } from './readUpgradeTiers'
 import { readCostCurve, readRefinery } from './readRefineryEconomy'
 import type { CostCurve, Economy, VisualTierThreshold } from './economyDefinition'
-import { cmp, type BigStat } from '../money'
+import type { BigStat } from '../money'
 
 export type EconomyReading = { economy: Economy; problems: [] } | { problems: string[] }
 
@@ -166,43 +166,11 @@ function readDrill(reader: FieldReader, drill: Record<string, unknown>): Economy
     scratchFloor: reader.money('drill.scratchFloor', drill.scratchFloor),
     denseScratchFloor: reader.money('drill.denseScratchFloor', drill.denseScratchFloor),
     gateScratchFloor: reader.money('drill.gateScratchFloor', drill.gateScratchFloor),
-    ...readTravelParity(reader, drill),
     boreRecoveryMinTicks: reader.safeInteger(
       'drill.boreRecoveryMinTicks',
       drill.boreRecoveryMinTicks,
     ),
   }
-}
-
-/** Travel parity's k, tunable only inside its bounds (VS on the #397 TD lock, ticket 400). */
-function readTravelParity(
-  reader: FieldReader,
-  drill: Record<string, unknown>,
-): Pick<Economy['drill'], 'travelParityK' | 'travelParityKBounds'> {
-  const travelParityKBounds = readTravelParityKBounds(reader, drill.travelParityKBounds)
-  const travelParityK = reader.money('drill.travelParityK', drill.travelParityK)
-  checkTravelParityKInBounds(reader, travelParityK, travelParityKBounds)
-  return { travelParityK, travelParityKBounds }
-}
-
-function readTravelParityKBounds(
-  reader: FieldReader,
-  value: unknown,
-): Economy['drill']['travelParityKBounds'] {
-  const bounds = reader.object('drill.travelParityKBounds', value)
-  return {
-    lowest: reader.money('drill.travelParityKBounds.lowest', bounds.lowest),
-    highest: reader.money('drill.travelParityKBounds.highest', bounds.highest),
-  }
-}
-
-function checkTravelParityKInBounds(
-  reader: FieldReader,
-  k: BigStat,
-  bounds: Economy['drill']['travelParityKBounds'],
-): void {
-  const isInRange = cmp(k, bounds.lowest) >= 0 && cmp(k, bounds.highest) <= 0
-  if (!isInRange) reader.record('drill.travelParityK must be inside drill.travelParityKBounds')
 }
 
 function readCasing(

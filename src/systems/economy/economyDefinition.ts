@@ -483,14 +483,6 @@ export interface Economy {
      */
     gateScratchFloor: BigStat
     /**
-     * Travel parity's k (GD lock on #316 scope 0, ticket 333): away from fresh ground the rig moves
-     * at up to `max(speedMax, k * cutSpeed)` of its drill in the band's nominal rock. Systems may
-     * tune it from 1 to 2.
-     */
-    travelParityK: BigStat
-    /** The range Systems may tune `travelParityK` in (VS on the #397 TD lock, ticket 400). */
-    travelParityKBounds: { lowest: BigStat; highest: BigStat }
-    /**
      * The least wait after a bore gun shot (GD ruling, 14 Oct, on the #397 TD lock): with no tile
      * floor a shot's dig ticks can reach 1, so `ceil(digTicks × 100 / kGunPct)` alone could wait 3
      * ticks or less. It bounds the recovery, never the drill's speed.

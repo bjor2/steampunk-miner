@@ -14,9 +14,9 @@
  *
  * While the rig actively cuts (ticket 333, `cutFollowMotion.ts`) the drill sets the speed along its
  * facing instead: the wheels' target on a level cut, or the speed along `localUp` with no gravity
- * on a cut down or up, which stops at the planet's centre (ticket 539). Otherwise the engine passed
- * in drives as above; the live loop passes one whose `speedMax` is travel parity's cap
- * (`travelParity.ts`).
+ * on a cut down or up, which stops at the planet's centre (ticket 539); a sideways cut's speed comes
+ * in already held to the drive's (`cutCapSpeed.ts`, ticket 723). Otherwise the engine passed in
+ * drives as above, at its own `speedMax`.
  */
 import { MAX_SPEED_MM_PER_SECOND } from '../../constants/balance'
 import {

@@ -164,31 +164,6 @@ describe('economy data validation', () => {
     expect(problemsOf(broken)).toContain('costCurves[0].ratio must be a decimal string >= 0')
   })
 
-  it('refuses a travel parity k outside 1 to 2 (TD lock on #397, ticket 400)', () => {
-    for (const travelParityK of ['0.99', '2.01']) {
-      const broken = economyFileCopy()
-      Object.assign(broken.drill, { travelParityK })
-      expect(problemsOf(broken)).toEqual([
-        'drill.travelParityK must be inside drill.travelParityKBounds',
-      ])
-    }
-    for (const travelParityK of ['1', '2']) {
-      const edge = economyFileCopy()
-      Object.assign(edge.drill, { travelParityK })
-      expect(problemsOf(edge)).toEqual([])
-    }
-  })
-
-  it('reads the travel parity k bounds from the data, locked at 1 to 2 (ticket 400)', () => {
-    expect(economyFile.drill.travelParityKBounds).toEqual({ lowest: '1', highest: '2' })
-    const widened = economyFileCopy()
-    Object.assign(widened.drill, {
-      travelParityK: '2.5',
-      travelParityKBounds: { lowest: '1', highest: '3' },
-    })
-    expect(problemsOf(widened)).toEqual([])
-  })
-
   it('refuses pace scale steps that do not climb by planet (#131)', () => {
     const broken = economyFileCopy()
     Object.assign(broken.planets.paceScale, {

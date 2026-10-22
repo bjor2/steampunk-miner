@@ -10,9 +10,12 @@
  * shell is blasted open with a charge that frees it, or `blocked` until it carries one (#142
  * acceptance 9, `botCharges.ts`). A wall its own extractor opens is touched and waited out, then
  * bored or entered (ticket 237: the tune, the etch, the pull).
+ * A sideways bore waits at least the drive's time over the tile (Bjor's ruling on #723,
+ * `sidewaysBores.ts`); what it can afford and whether a charge pays still read the drill's time.
  */
 import { heatThrottledDrill } from '../authority/heatRules'
 import { drillQuantumAt } from '../authority/stepBoundRead'
+import { driveSpeedOf } from '../vehicle/cutCapSpeed'
 import { isVehicleActive } from '../vehicle/vehicleState'
 import type { TilePoint } from '../world/tileGrid'
 import { blastOpen, blastShellOpen, isBlastWorthIt, noteTileWorthACharge } from './botCharges'
@@ -26,7 +29,9 @@ import {
   touchTile,
   type BotPlanet,
 } from './botPilot'
+import { facingTowards } from './botPose'
 import type { BotSession } from './botSession'
+import { drivenBoreOf, tallySidewaysBore } from './sidewaysBores'
 import { boreSubSteps, cellOfTile, isBoreLavaRisk, isLavaRisk, tileKindAt } from './botWorld'
 import type { TileBore } from './boreClock'
 
@@ -104,8 +109,22 @@ function boreUngated(session: BotSession, planet: BotPlanet, tile: TilePoint): O
   if (isBlastWorthIt(session, planet, tile, ticks) && blastOpen(session, planet, tile)) {
     return isVehicleActive(session.vehicle()) ? 'opened' : 'short'
   }
-  boreTile(session, planet.pilot, tile, bore)
+  boreTile(session, planet.pilot, tile, drivenBoreAt(session, planet, tile, bore))
   return isVehicleActive(session.vehicle()) ? 'opened' : 'short'
+}
+
+/** The bore as the rig cuts it from where it stands, sideways held to the drive, and tallied. */
+function drivenBoreAt(
+  session: BotSession,
+  planet: BotPlanet,
+  tile: TilePoint,
+  bore: TileBore,
+): TileBore {
+  const facing = facingTowards(planet.pilot.position, tile)
+  const driven = drivenBoreOf(bore, facing, driveSpeedOf(session.vehicle()))
+  if (driven === bore || planet.sidewaysBores === undefined) return driven
+  tallySidewaysBore(planet.sidewaysBores, session.state().planet.index, bore, driven)
+  return driven
 }
 
 /**
