@@ -12,7 +12,7 @@ import { readoutTextOf } from '../../systems/views/hudCallouts'
 import type { HudModel } from '../../systems/views/hudModel'
 import type { GaugeClusterView } from '../../systems/views/gaugeCluster'
 import type { HudStrip as Strip, StripNumber } from '../../systems/views/hudStrip'
-import type { NextUpgradeChip } from '../../systems/views/nextUpgradeChip'
+import { chipWordsOf, type NextUpgradeChip } from '../../systems/views/nextUpgradeChip'
 import type { AmountReading } from '../../systems/views/viewParts'
 import { UI_IDS } from '../ids'
 import { Odometer } from '../kit/Odometer'
@@ -21,6 +21,7 @@ import { DialCluster } from './DialCluster'
 import { hudBoxOf } from './hudBoxes'
 import { MoneyFloatUp } from './MoneyFloatUp'
 import { StripStatuses } from './StripStatuses'
+import { useDialReveal } from './useDialReveal'
 import styles from './HudStrip.module.css'
 
 const NUMBER_TEXTS = {
@@ -29,8 +30,6 @@ const NUMBER_TEXTS = {
 }
 
 const NUMBER_ICON_IDS = { money: hudLabelIconIdOf('money'), depth: hudLabelIconIdOf('depth') }
-
-const CHIP_TEXT = readoutTextOf('hud.strip.next-upgrade', 'Next upgrade')
 
 export function HudStrip({
   strip,
@@ -92,12 +91,23 @@ function DepthText({ number }: { number: StripNumber }) {
   )
 }
 
-/** GD ruling 21 Oct 18:33: the cheapest drill or tip, its icon and price, no label. */
+/**
+ * GD ruling 21 Oct 18:33: an icon and a price, no label; the cheapest new capability first, else
+ * the cheaper drill step (ticket 719). A desktop hover or tap reveals its name and "{N} trips
+ * away" under it, as a dial reveals its number.
+ */
 function UpgradeChip({ chip }: { chip: NextUpgradeChip }) {
+  const { isRevealed, handlers } = useDialReveal()
+  const words = chipWordsOf(chip)
   return (
-    <div className={styles.chip} data-upgrade={chip.upgradeId}>
+    <div
+      className={styles.chip}
+      data-offer={chip.offerKey}
+      data-offer-kind={chip.kind}
+      {...handlers}
+    >
       <TitleOneLine
-        text={CHIP_TEXT}
+        text={words.text}
         facts={[
           {
             iconId: chip.iconId,
@@ -111,6 +121,11 @@ function UpgradeChip({ chip }: { chip: NextUpgradeChip }) {
         glyphSize="menu"
         titlePlace="card"
       />
+      {isRevealed && (
+        <span className={styles.chipHover} data-chip-hover>
+          {words.hoverLine}
+        </span>
+      )}
     </div>
   )
 }

@@ -88,6 +88,11 @@ const TRACK_LABELS: Readonly<Record<UpgradeId, string>> = {
   hull: 'Hull',
 }
 
+/** A track's name as its card and the next-upgrade chip's hover line say it. */
+export function trackLabelOf(upgradeId: UpgradeId): string {
+  return TRACK_LABELS[upgradeId]
+}
+
 const STATS_OF_TRACK: Readonly<Record<UpgradeId, readonly string[]>> = {
   drill_power: ['drillPower'],
   drill_tip: ['drillTip'],

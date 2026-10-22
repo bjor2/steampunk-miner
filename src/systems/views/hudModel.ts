@@ -58,6 +58,7 @@ import { threatMarkersOf, type ThreatMarker } from './threatMarkers'
 import { tileTimeAhead, type TileTime } from './tileTime'
 import { amountReading, priceReading, type AmountReading } from './viewParts'
 import { nextUpgradeChipOf, type NextUpgradeChip } from './nextUpgradeChip'
+import type { TripLedger } from './tripIncome'
 import { returnReserveUnits } from '../vehicle/returnReserve'
 
 export interface HudSources {
@@ -69,6 +70,8 @@ export interface HudSources {
   prompts: PromptSource
   /** A scenario or a restore stands at its tick until play starts it (ticket 301); absent: no. */
   isAwaitingPlay?: boolean
+  /** The last trips' income the next-upgrade chip's "{N} trips away" reads (ticket 719); absent: none. */
+  tripLedger?: TripLedger
 }
 
 /**
@@ -177,7 +180,7 @@ export function selectHudModel(sources: HudSources): HudModel {
     cargo,
     cargoValue: amountReading(serviceQuote(state, playerId).saleValue),
     money: amountReading(state.players[playerId].wallet),
-    nextUpgrade: nextUpgradeChipOf(state, playerId),
+    nextUpgrade: nextUpgradeChipOf(state, playerId, sources.tripLedger),
     liningBill: liningBillOf(vehicle),
     depth: depthReadingOf(state, playerId, sources.depthTiles),
     casing: casingBadgeOf(state, playerId),

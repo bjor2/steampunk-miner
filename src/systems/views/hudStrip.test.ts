@@ -5,7 +5,13 @@ import { trackIconIdOf } from '../art/icons/iconSet'
 import { cmp } from '../money'
 import { KEYBOARD_PROMPTS } from '../input/promptFixtures'
 import { grantMoneyCommand } from '../startScenarioCommands'
-import { setEnergyCommand, setHullCommand, setUpgradeCommand } from '../vehicle/vehicleCommands'
+import {
+  setEnergyCommand,
+  setGunLevelCommand,
+  setHullCommand,
+  setUpgradeCommand,
+} from '../vehicle/vehicleCommands'
+import { withRegistrations } from '../../registries/registrar'
 import { DESIGN_TOKENS } from './designSystem'
 import { selectHudModel, type HudModel } from './hudModel'
 import {
@@ -18,6 +24,9 @@ import {
 import { odometerCellsOf } from './odometer'
 import { priceReading } from './viewParts'
 import { ladderTierOf } from './warningLadder'
+
+/** The guns' mount, their first level (`debug.setGunLevel` takes 0 or 10 to 160). */
+const GUN_MOUNTED = 10
 
 type Session = ReturnType<typeof createScriptedSession>
 
@@ -139,28 +148,42 @@ describe('HUD strip number (ticket 684)', () => {
   })
 })
 
-describe('HUD next-upgrade chip (ticket 684)', () => {
-  it('offers the cheaper of drill power and drill tip, its icon and its price rounded up', () => {
-    const session = createScriptedSession()
-    session.submit(0, setUpgradeCommand('drill_power', 6))
-    const state = session.state()
-    const power = nextUpgradePrice(state, 'p1', 'drill_power')
-    const tip = nextUpgradePrice(state, 'p1', 'drill_tip')
-    const cheaper = cmp(tip, power) < 0 ? 'drill_tip' : 'drill_power'
-    expect(hudOf(session).nextUpgrade).toEqual({
-      upgradeId: cheaper,
-      iconId: trackIconIdOf(cheaper),
-      price: priceReading(cheaper === 'drill_tip' ? tip : power),
-    })
-  })
+/**
+ * The guns on and no slice selling anything: the chip has no new capability to put first
+ * (ticket 719), so it offers a drill step.
+ */
+function sessionOwningEveryCapability(): Session {
+  const session = createScriptedSession()
+  session.submit(0, setGunLevelCommand(GUN_MOUNTED))
+  return session
+}
 
-  it('keeps drill power on a tie', () => {
-    const state = createScriptedSession().state()
-    const power = nextUpgradePrice(state, 'p1', 'drill_power')
-    const tip = nextUpgradePrice(state, 'p1', 'drill_tip')
-    const chip = hudOf(createScriptedSession()).nextUpgrade
-    expect(chip.upgradeId).toBe(cmp(tip, power) < 0 ? 'drill_tip' : 'drill_power')
-  })
+describe('HUD next-upgrade chip (ticket 684)', () => {
+  it('offers the cheaper of drill power and drill tip while no new capability is on sale', () =>
+    withRegistrations([], () => {
+      const session = sessionOwningEveryCapability()
+      session.submit(0, setUpgradeCommand('drill_power', 6))
+      const state = session.state()
+      const power = nextUpgradePrice(state, 'p1', 'drill_power')
+      const tip = nextUpgradePrice(state, 'p1', 'drill_tip')
+      const cheaper = cmp(tip, power) < 0 ? 'drill_tip' : 'drill_power'
+      expect(hudOf(session).nextUpgrade).toMatchObject({
+        kind: 'track',
+        offerKey: `track.${cheaper}`,
+        iconId: trackIconIdOf(cheaper),
+        price: priceReading(cheaper === 'drill_tip' ? tip : power),
+      })
+    }))
+
+  it('keeps drill power on a tie', () =>
+    withRegistrations([], () => {
+      const session = sessionOwningEveryCapability()
+      const state = session.state()
+      const power = nextUpgradePrice(state, 'p1', 'drill_power')
+      const tip = nextUpgradePrice(state, 'p1', 'drill_tip')
+      const chip = hudOf(session).nextUpgrade
+      expect(chip.offerKey).toBe(`track.${cmp(tip, power) < 0 ? 'drill_tip' : 'drill_power'}`)
+    }))
 })
 
 describe('HUD edge gauge (ticket 684)', () => {

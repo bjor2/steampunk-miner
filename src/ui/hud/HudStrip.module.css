@@ -53,13 +53,38 @@
   font-variant-numeric: tabular-nums;
 }
 
-/* The next-upgrade chip: a pill (`--radius-chip`) of its icon and price, no label. */
+/*
+ * The next-upgrade chip: a pill (`--radius-chip`) of its icon and price, no label. It takes no pointer on a phone, where the strip is in the top keep-out; on desktop a hover
+ * or a tap reveals its hover line, as a dial reveals its number (ticket 719).
+ */
 .chip {
+  position: relative;
+  pointer-events: none;
   flex: none;
   padding: 0 var(--space-1);
   border: var(--frame-hairline) solid var(--color-brass);
   border-radius: var(--radius-chip);
   background: var(--color-panel);
+}
+
+:global([data-layout='desktop']) .chip {
+  pointer-events: auto;
+}
+
+.chipHover {
+  position: absolute;
+  z-index: 4;
+  top: calc(100% + var(--space-1));
+  right: 0;
+  width: max-content;
+  max-width: 20rem;
+  padding: 0 var(--space-1);
+  border: var(--frame-hairline) solid var(--color-brass);
+  border-radius: var(--radius-card);
+  background: var(--color-panel);
+  color: var(--color-parchment);
+  font-size: var(--type-label);
+  font-variant-numeric: tabular-nums;
 }
 
 .chip > * {

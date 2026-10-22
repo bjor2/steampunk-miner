@@ -104,6 +104,7 @@ export function hudModelOf(sources: ScreenSources): HudModel {
     depthTiles: sources.depthTiles,
     prompts: promptSourceOf(sources),
     isAwaitingPlay: sources.liveStepHold === 'awaitingPlay',
+    tripLedger: sources.tripLedger,
   })
 }
 
