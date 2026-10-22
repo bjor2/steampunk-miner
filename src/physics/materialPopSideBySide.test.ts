@@ -15,7 +15,7 @@ import { downCutAccelerationAtPoint } from '../systems/vehicle/radialGravity'
 import type { MaterialPopMode } from '../systems/materialPop/materialPopMode'
 import type { PopIntake } from '../systems/materialPop/popIntake'
 import { createSprayPool } from '../systems/render/sprayPool'
-import { faceReadOf, isPopIn, type FaceRead } from './cutFaceRead'
+import { faceReadOf, isPopIn, isRidingCutFace, type FaceRead } from './cutFaceRead'
 import { createRig } from './cutFollowFixtures'
 
 // Option A beside option B on #570's probe row (ticket 617, G&V's "both modes" bars on #442): the
@@ -171,7 +171,7 @@ const keyOf = ({ tx, ty }: { tx: number; ty: number }) => `${tx},${ty}`
 function judgedIndicesOf(reads: readonly FaceRead[]): number[] {
   let openTicks = 0
   return reads.flatMap((read, at) => {
-    openTicks = read.tick.authorityGate === 1 && !read.isFacingCave ? openTicks + 1 : 0
+    openTicks = isRidingCutFace(read) ? openTicks + 1 : 0
     return openTicks > SETTLE_TICKS ? [at] : []
   })
 }

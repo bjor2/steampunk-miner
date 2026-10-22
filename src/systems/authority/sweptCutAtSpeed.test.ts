@@ -223,14 +223,15 @@ describe('heat from the steps summed dig time (ticket 335, TD lock on #374)', ()
   })
 })
 
-/** Cells of the 1.9 m stamp swept straight down 30 m, `strideMm` a tick, by a #304-law drill. */
+/** Cells of the drill stamp swept straight down 30 m, `strideMm` a tick, by a #304-law drill. */
 const cellsOpenedWorldAt = (strideMm: number) => sweptColumnAt(strideMm, PATH_METRES).opened
 
 describe('cells per metre along the same path at any speed (ticket 335)', () => {
   it('opens the same cells at 1, 4 and 16 m a tick when the drill clears each tick', () => {
     const [slow, ...faster] = [1_000, 4_000, 16_000].map(cellsOpenedWorldAt)
-    // The bare 1.9 m bore opens about 2 cells a metre (#316).
-    expect(slow.length).toBeGreaterThanOrEqual(PATH_METRES + PATH_METRES / 2)
+    // #36's bare 1.9 m bore opened about 2 cells a metre (#316); the 1.2 m bore down the column's
+    // middle opens its own cell a metre and only nicks the next column (ticket 662).
+    expect(slow.length).toBeGreaterThanOrEqual(PATH_METRES)
     for (const opened of faster) expect(opened).toEqual(slow)
   })
 })

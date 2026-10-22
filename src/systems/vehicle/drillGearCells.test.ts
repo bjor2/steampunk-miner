@@ -58,11 +58,14 @@ describe('drill gear cells', () => {
     ])
   })
 
-  it('turns with the facing: a level cut facing right widens above and below its raised stamp', () => {
+  // Ticket 662: the 1.2 m bore's level stamp sits on the body's centre (y 286.5 m, no lift), so a
+  // cell half a cell past its 0.6 m rim lands at 287.6 m above and 285.4 m below; #36's raised
+  // 0.95 m disc put the upper one a row higher.
+  it('turns with the facing: a level cut facing right widens above and below its stamp', () => {
     const cells = cellsAt(FACING.right, 1, 1)
     expect(cells.ahead).toEqual([{ tx: 32, ty: 286 }])
     expect(cells.side).toEqual([
-      { tx: 31, ty: 288 },
+      { tx: 31, ty: 287 },
       { tx: 31, ty: 285 },
     ])
   })

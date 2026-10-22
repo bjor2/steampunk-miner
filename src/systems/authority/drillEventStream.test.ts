@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { drillStampRadiusMm } from '../vehicle/drillBore'
-import { MM_PER_METRE } from '../../constants/physics'
+import { MM_PER_METRE, TICKS_PER_SECOND } from '../../constants/physics'
 import type { DomainEvent } from './domainEvent'
 import {
   BARE_BIT,
@@ -41,6 +41,17 @@ import { drillGatedOf, refusingGateAt } from './gatedBiteFixtures'
 const TRACKS: readonly StreamTrack[] = ['straight', 'tilted', 'turn']
 const SLOW_MPS = 0.5
 const FAST_MPS = 3
+/**
+ * The slow track's length in whole metres, the fewest cells its 12-tick reports may cut (ticket
+ * 662): the 1.2 m bore cuts one row along a level track, 4 or 5 cells over its 4 m where #36's
+ * 1.9 m disc cut 9 to 11 (run on the #662 branch), so the floor is a cell a metre, not #36's 5.
+ */
+const SLOW_TRACK_CELLS = Math.floor((SLOW_MPS * STREAM_TICKS) / TICKS_PER_SECOND)
+/**
+ * The straight track a cell earlier (ticket 662): the only ore cell near it, (20, 280), lies west
+ * of the start, which #36's 1.9 m disc reached back into and the 1.2 m bore does not.
+ */
+const ORE_LEAD_IN_MM = MM_PER_METRE
 /** The bit's stamp, the gear's two cells and the cell a stamp edge reaches into. */
 const PAID_REACH_MM = drillStampRadiusMm() + 3 * MM_PER_METRE
 
@@ -115,7 +126,7 @@ describe('the drill event stream at a report every tick and every 12 ticks (#514
       it(`cuts every 12-tick cell once in the same order, extras inside the paid reach, no new event kind, slow ${track} track, ${gear.name}`, () => {
         const run = runOf(track, SLOW_MPS, gear)
         const { everyTick, every12 } = cutAtBothCadences(run)
-        expect(every12.cells.length).toBeGreaterThan(5)
+        expect(every12.cells.length).toBeGreaterThanOrEqual(SLOW_TRACK_CELLS)
         expectEveryTickWithinBar(run, everyTick, every12)
         expect(commonCellsOf(everyTick, every12)).toEqual(every12.cells)
         expect(
@@ -132,7 +143,7 @@ describe('the drill event stream at a report every tick and every 12 ticks (#514
   }
 
   it('answers DrillGated once for a gated ore cell on the track at either cadence', () => {
-    const run = runOf('straight', SLOW_MPS)
+    const run = { ...runOf('straight', SLOW_MPS), leadInMm: ORE_LEAD_IN_MM }
     const gatedCell = firstOreCellOf(cutAtBothCadences(run).every12.events)
     const [tx, ty] = gatedCell.split(',').map((part) => Number.parseInt(part, 10))
     const gated = cutAtBothCadences({ ...run, slices: [refusingGateAt([{ tx, ty }])] })
@@ -154,7 +165,7 @@ describe('the drill event stream at a report every tick and every 12 ticks (#514
   })
 
   it('credits the cut, the cargo and the ore-first lines to the cutting player in the same order', () => {
-    const run = runOf('straight', SLOW_MPS)
+    const run = { ...runOf('straight', SLOW_MPS), leadInMm: ORE_LEAD_IN_MM }
     // Both cadences pinned the way cutAtBothCadences pins them: every tick on the exact carry,
     // where interval 1 is live and the capsule cuts (the exact carry ships on, so a bare
     // `cutStream(run, 1)` is the capsule too; it used to be the bare disc while the flag was off).

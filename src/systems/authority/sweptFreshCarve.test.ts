@@ -5,7 +5,7 @@ import type { SliceDefinition } from '../../registries/sliceDefinition'
 import { withRegistrations } from '../../registries/registrar'
 import type { GateVerdict } from '../registries/gateChecks'
 import { sweptDrillStampOf } from '../vehicle/drillStamp'
-import { sweepPathOf, sweptStampOf } from '../vehicle/sweptCut'
+import { sweepPathOf, sweptStampOf, SWEEP_STEP_MM } from '../vehicle/sweptCut'
 import { FACING, type VehiclePose } from '../vehicle/vehiclePose'
 import { cellDensitySum } from '../world/cellYield'
 import { groundReaderOf, type GroundReader } from '../world/groundReader'
@@ -63,8 +63,9 @@ describe('fresh swept stamp (ticket 439)', () => {
     return { path, stamp, cut: sweptStampOf(path, stamp, path.steps) }
   }
 
+  // Half a radius ahead: #36's 800 mm lay inside its 950 mm radius, past the 1.2 m bore's 600 mm.
   it('cuts the bare disc at its reach while that disc covers the body point', () => {
-    const { stamp, cut } = freshStampAhead(800)
+    const { stamp, cut } = freshStampAhead(drillStampRadiusMm() / 2)
     expect(cut).toEqual({ ...stamp, tail: { xMm: stamp.xMm, yMm: stamp.yMm } })
   })
 
@@ -79,11 +80,14 @@ describe('fresh swept stamp (ticket 439)', () => {
     expect(cut).toEqual({ ...stamp, tail: path.from })
   })
 
+  // 6 m walks 48 sub-steps of exactly `SWEEP_STEP_MM`, so the last bare one is the radius's whole
+  // sub-steps: 7 of #36's 950 mm, 4 of the 1.2 m bore's 600 mm (ticket 662).
   it('switches to the capsule part way along a long fresh path, where the reach leaves the body', () => {
     const { path, stamp } = freshStampAhead(6_000)
-    const near = sweptStampOf(path, stamp, 7)
+    const lastBare = Math.floor(drillStampRadiusMm() / SWEEP_STEP_MM)
+    const near = sweptStampOf(path, stamp, lastBare)
     expect(near.tail).toEqual({ xMm: near.xMm, yMm: near.yMm })
-    expect(sweptStampOf(path, stamp, 8).tail).toEqual(path.from)
+    expect(sweptStampOf(path, stamp, lastBare + 1).tail).toEqual(path.from)
   })
 })
 
@@ -372,8 +376,15 @@ function firstTickCutting(run: LegRun, tile: TilePoint): number {
   return run.ticks.findIndex(({ state }) => cellDensitySum(state.world, PARAMS, tile) < before)
 }
 
-/** Planet 1's column 33, with ore beside its centre line in column 32, 4 and 18 m down. */
-const RIM_LEG = columnLeg(33)
+/**
+ * Planet 1's column 33, its axis 100 mm off the middle toward column 32, with ore beside its centre
+ * line in column 32, 4 and 18 m down. #36's 1.9 m bore down the column's middle met column 32; the
+ * 1.2 m bore there reaches 725 mm to the side and meets no sample of it (ticket 662). Moved 100 mm,
+ * the reach meets column 32's nearest samples, 650 mm off, while their contour stays 525 mm off,
+ * clear of the body's 450 mm half width, so the refused rim cell leaves the body's path open.
+ */
+const COLUMN_33 = columnLeg(33)
+const RIM_LEG: Leg = { ...COLUMN_33, start: { ...COLUMN_33.start, xMm: COLUMN_33.start.xMm - 100 } }
 const RIM_GATES: readonly TilePoint[] = [
   { tx: 32, ty: 291 },
   { tx: 32, ty: 277 },

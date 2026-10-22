@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { drillStampRadiusMm } from '../vehicle/drillBore'
+import { WIDE_BORE_CLEARANCE_MM, withDrillSideClearance } from '../vehicle/drillBoreFixtures'
 import { AUTHORITY_DEV_FLAGS, type AuthorityDevFlags } from '../../constants/devFlags'
 import { MM_PER_METRE, TICKS_PER_SECOND } from '../../constants/physics'
 import { drillStampOf } from '../vehicle/drillStamp'
@@ -117,12 +118,14 @@ describe('report capsule (ticket 537)', () => {
     expect(capsuleTailOf(reportAfter(50))).toEqual(centreOf(PREVIOUS))
   })
 
-  it('keeps the tail at the stamp’s own lift and floor: a lifting report’s tail is the lifted centre', () => {
-    const report = reportAfter(50, { isLifting: true })
-    const tail = capsuleTailOf(report)
-    expect(tail).toEqual(centreOf(PREVIOUS, true))
-    expect(tail).not.toEqual(centreOf(PREVIOUS, false))
-  })
+  // At #36's 1.9 m bore, where a level cut lifts its disc; the 1.2 m bore's level cut lifts none.
+  it('keeps the tail at the stamp’s own lift and floor: a lifting report’s tail is the lifted centre', () =>
+    withDrillSideClearance(WIDE_BORE_CLEARANCE_MM, () => {
+      const report = reportAfter(50, { isLifting: true })
+      const tail = capsuleTailOf(report)
+      expect(tail).toEqual(centreOf(PREVIOUS, true))
+      expect(tail).not.toEqual(centreOf(PREVIOUS, false))
+    }))
 
   it('cuts the bare disc for a 12-tick report, even one within the cap whose drill ran all 12 ticks', () => {
     expect(capsuleTailOf(reportAfter(600, { tick: 22, drillTicks: 12 }))).toBeNull()

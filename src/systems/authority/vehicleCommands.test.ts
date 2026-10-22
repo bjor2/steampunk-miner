@@ -1,12 +1,15 @@
 import { describe, expect, it } from 'vitest'
+import { MM_PER_METRE } from '../../constants/physics'
 import { blockHardness } from '../economy/oreEconomy'
 import { drillPower, drillTip } from '../economy/vehicleStats'
 import { add, div, fromCanonical, fromSafeInteger, mul, toCanonical, ZERO_MONEY } from '../money'
+import { drillStampRadiusMm } from '../vehicle/drillBore'
 import { drillDamage } from '../vehicle/drillRule'
 import { FACING } from '../vehicle/vehiclePose'
 import { cargoUnitsOf } from '../vehicle/vehicleState'
 import { CELL_KIND, kindOfCell } from '../world/worldCell'
 import { cellDensitySum } from '../world/cellYield'
+import { MM_PER_SAMPLE } from '../world/sampleGrid'
 import { cellAt, EMPTY_WORLD } from '../world/worldState'
 import type { CommandIntent } from './authorityCommand'
 import {
@@ -34,6 +37,26 @@ import {
 const FULL_TANK = 150 * 240
 
 const createSession = () => createScriptedSession()
+
+/**
+ * A stamp drilled down from over `GROUND` cut into that cell and the one east of it, and left the
+ * cell west of it whole (ticket 662). A cell's samples sit on its west edge and every quarter metre
+ * after, so from the stamp's centre over the cell's middle the east cell's first column lies half a
+ * metre off, inside the 1.2 m bore's circle, and the west cell's last a sample further, past the
+ * half sample its ramp reaches beyond the circle. #36's 1.9 m disc cut into both neighbours, as this
+ * spec pinned until then.
+ */
+function expectStampOverItsCell(session: ScriptedSession): void {
+  const eastMm = MM_PER_METRE / 2
+  expect(drillStampRadiusMm()).toBeGreaterThan(eastMm)
+  expect(drillStampRadiusMm() + MM_PER_SAMPLE / 2).toBeLessThan(eastMm + MM_PER_SAMPLE)
+  const world = session.state().world
+  const west = { tx: GROUND.tx - 1, ty: GROUND.ty }
+  for (const tx of [GROUND.tx, GROUND.tx + 1]) {
+    expect(cellDensitySum(world, PARAMS, { tx, ty: GROUND.ty })).toBeLessThan(16 * 255)
+  }
+  expect(cellDensitySum(world, PARAMS, west)).toBe(cellDensitySum(EMPTY_WORLD, PARAMS, west))
+}
 
 type Session = ScriptedSession
 
@@ -93,17 +116,14 @@ describe('vehicle drilling', () => {
     expect(FULL_TANK - session.vehicle().energy).toBe(40 * 4)
   })
 
-  it('carves the 1.9 m drill stamp under a reported pose, charging only the ticks it cut, with drill.exactCarry off', () =>
+  it('carves the drill stamp under a reported pose, charging only the ticks it cut, with drill.exactCarry off', () =>
     withDrillExactCarry(false, () => {
       const session = createSession()
       session.submit(10, poseAbove(GROUND, FACING.down))
       const events = session.submit(30, poseAbove(GROUND, FACING.down, { drillTicks: 20 }))
       expect(typesOf(events)).toContain('GroundChanged')
       expect(FULL_TANK - session.vehicle().energy).toBe(20 * 4)
-      for (const tx of [GROUND.tx - 1, GROUND.tx, GROUND.tx + 1]) {
-        const tile = { tx, ty: GROUND.ty }
-        expect(cellDensitySum(session.state().world, PARAMS, tile)).toBeLessThan(16 * 255)
-      }
+      expectStampOverItsCell(session)
     }))
 
   it('carves the same stamp with drill.exactCarry on, charging the law work it removed (ticket 535)', () =>
@@ -119,10 +139,7 @@ describe('vehicle drilling', () => {
         energyNumeratorOfLawWork(lawWork),
       )
       expect(FULL_TANK - session.vehicle().energy).toBeGreaterThan(0)
-      for (const tx of [GROUND.tx - 1, GROUND.tx, GROUND.tx + 1]) {
-        const tile = { tx, ty: GROUND.ty }
-        expect(cellDensitySum(session.state().world, PARAMS, tile)).toBeLessThan(16 * 255)
-      }
+      expectStampOverItsCell(session)
     }))
 
   it('charges nothing for a reported drill into open ground', () => {

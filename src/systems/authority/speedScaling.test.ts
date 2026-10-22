@@ -38,8 +38,13 @@ import { stateDigest } from './stateDigest'
 // which ticket 558 lifted. The tick-time bar is the lane's (`speedScaling.lane.test.ts`).
 
 const SPEEDS_M_PER_S = [84, 840, 8400]
-/** The rock round the bore's cells, by distance from the axis: inside its stamp, or within reach. */
-const CROSSED_REACH_MM = drillStampRadiusMm() - MM_PER_SAMPLE
+/**
+ * The rock round the bore's cells, by distance from the axis: inside its stamp, or within reach.
+ * Since ticket 662 the drill's bore wall lays the cut's contour on the stamp's circle
+ * (`stampShape.ts`), so a cell inside the radius is crossed; #36's soft rim left it up to half a
+ * sample inside, hence a sample's margin, which on the 1.2 m bore left no cell of a 1 m column.
+ */
+const CROSSED_REACH_MM = drillStampRadiusMm()
 const TOUCHED_REACH_MM = drillStampRadiusMm() + MM_PER_SAMPLE
 const AXIS_X_MM = COLUMN * 1000 + 500
 

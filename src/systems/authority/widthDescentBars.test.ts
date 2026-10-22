@@ -4,6 +4,7 @@ import type { SliceDefinition } from '../../registries/sliceDefinition'
 import { NO_DRIVE } from '../vehicle/driveSigns'
 import { FACING } from '../vehicle/vehiclePose'
 import { cellDensitySum } from '../world/cellYield'
+import { ISO_DENSITY } from '../world/sampleGrid'
 import { surfaceRowOfColumn } from '../world/tileGrid'
 import { createScriptedSession, PARAMS, poseAbove } from './scriptedSession'
 
@@ -57,12 +58,19 @@ function descend(sideCells: number) {
   })
 }
 
+/**
+ * A bore cell cut as far as the bore goes. Since ticket 662 the 1.2 m bore's wall runs through the
+ * column's own cells and keeps its ramp in their edge samples (4 of 25 each), so a cleared cell
+ * holds less than one solid sample's density, where #36's 1.9 m bore left it at 0.
+ */
+const isClearedToTheWall = (density: number) => density < ISO_DENSITY
+
 describe('drill width bars (VS on #308, ticket 620)', () => {
   const runs = WIDTHS.map(descend)
   const [bare] = runs
 
   it('cuts the bore column to the same densities at every width: width never takes its work', () => {
-    expect(bare.boreColumn.filter((density) => density === 0).length).toBeGreaterThan(5)
+    expect(bare.boreColumn.filter(isClearedToTheWall).length).toBeGreaterThan(5)
     expect(runs.map((run) => run.boreColumn)).toEqual(WIDTHS.map(() => bare.boreColumn))
   })
 

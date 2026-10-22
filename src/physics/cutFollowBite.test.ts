@@ -46,15 +46,23 @@ afterEach(() => uninstallRunLog())
 const ticks = (seconds: number) => Math.round(seconds / PHYSICS_TIMESTEP)
 
 /**
- * Off the pad for long enough that the shaft's stamp meets the metal cluster round (-29, 288).
+ * Off the pad for long enough that the shaft's stamp meets the metal cluster round (-24, 290).
  * The level drive off the pad cuts too, so where the shaft starts moves with the carve: since
- * ticket 421 the stamp carves the carry's cell there, and a 2 s drive puts the shaft a column west
- * of the cluster.
+ * ticket 421 the stamp carves the carry's cell there, and since ticket 662's 1.2 m bore a 1.5 s
+ * drive puts the shaft into the cluster (1.9 s did at #36's 1.9 m bore).
  */
-const OFF_PAD_TO_CLUSTER_SECONDS = 1.9
+const OFF_PAD_TO_CLUSTER_SECONDS = 1.5
+
+/**
+ * Off the pad and still on the surface, so the down leg starts a fresh cut: since ticket 662's
+ * 1.2 m bore the level drive bites into the rising ground about 1.35 s out and rides a level cut
+ * from there (#36's 1.9 m bore bounced over it), and a leg turned down out of a level cut spends
+ * the head's turn coasting on the level cut's speed with no bite, as main does after a level cut.
+ */
+const OFF_PAD_ON_SURFACE_SECONDS = 1.1
 
 /** Off the pad for `offPadSeconds`, then down for `DOWN_SECONDS`; the down leg's ticks. */
-function cutDown(framesPerSecond: number, offPadSeconds = 2): TickRead[] {
+function cutDown(framesPerSecond: number, offPadSeconds = OFF_PAD_ON_SURFACE_SECONDS): TickRead[] {
   const rig = createRig(RAPIER, RIG_44, framesPerSecond)
   // The Sell bay is the pad's west end (#170), so off the pad is to the left.
   rig.hold(buildIntent(['aim_left']), ticks(offPadSeconds))

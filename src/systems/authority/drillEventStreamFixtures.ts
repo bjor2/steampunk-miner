@@ -36,6 +36,12 @@ export interface StreamRun {
   gear: StreamGear
   /** Extra fakes, such as a gate on a cell of the track. */
   slices?: readonly SliceDefinition[]
+  /**
+   * How far behind the shared start a straight or turning track begins, mm (ticket 662): the
+   * 1.2 m bore no longer reaches back into the ore cell west of the start that #36's 1.9 m disc
+   * cut, so a spec that needs ore on its track starts it a cell earlier.
+   */
+  leadInMm?: number
 }
 
 /**
@@ -143,7 +149,8 @@ function facingAt(track: StreamTrack, tick: number): Facing {
 export function positionAt(run: StreamRun, tick: number): { x: number; y: number } {
   const strideMm = (run.speedMps * MM_PER_METRE) / TICKS_PER_SECOND
   const up = run.track === 'tilted' ? TILTED_UP : LEVEL_UP
-  const start = run.track === 'tilted' ? startOnUp(up) : START_MM
+  const start =
+    run.track === 'tilted' ? startOnUp(up) : { ...START_MM, x: START_MM.x - (run.leadInMm ?? 0) }
   const level = facingVectorOf(up.x, up.y, FACING.right)
   const down = facingVectorOf(up.x, up.y, FACING.down)
   const levelTicks = run.track === 'turn' ? Math.min(tick, TURN_TICK) : tick

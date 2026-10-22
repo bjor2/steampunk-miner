@@ -53,9 +53,16 @@ beforeEach(() => {
 
 afterEach(() => uninstallRunLog())
 
-/** Off the pad to the left (the Sell bay is its west end, #170) for 2 s and `phase` ticks. */
+/**
+ * Off the pad and still on the surface: since ticket 662's 1.2 m bore a drive held off the pad for
+ * 2 s bites into the rising ground and rides a level cut by its end, so pressing down there turns
+ * one cut into another and waits out the gate's hold, which the cut-to-cut rows below judge.
+ */
+const DRIVE_OFF_PAD_TICKS = Math.round(1.1 * TICKS_PER_SECOND)
+
+/** Off the pad to the left (the Sell bay is its west end, #170) on the surface and `phase` ticks. */
 function driveOffThePad(rig: Rig, phase: number): void {
-  rig.hold(buildIntent(['aim_left']), 2 * TICKS_PER_SECOND + phase)
+  rig.hold(buildIntent(['aim_left']), DRIVE_OFF_PAD_TICKS + phase)
 }
 
 /** Off the pad, a second at rest, then down from the surface for 4 s and `phase` ticks. */

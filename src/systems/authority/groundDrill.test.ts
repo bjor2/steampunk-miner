@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { oreSalePrice, oreTier } from '../economy/oreEconomy'
-import { add, fromCanonical, ZERO_MONEY } from '../money'
+import { hullMax } from '../economy/vehicleStats'
+import { add, fromCanonical, toCanonical, ZERO_MONEY } from '../money'
 import { FACING } from '../vehicle/vehiclePose'
 import { cellDensitySum } from '../world/cellYield'
 import { CELL_KIND, kindOfCell, tierOffsetOfCell } from '../world/worldCell'
@@ -22,14 +23,21 @@ function scriptedRegion(): TilePoint[] {
   return tiles
 }
 
-/** Mines each cell clear from above, refilling the tank as a dock would. */
+/**
+ * Mines each cell clear from above, refilling the tank and the hull as a dock would. The hull
+ * refill is ticket 662's: on the 1.2 m bore the cavern's collapses land 13 hits of 8 on the rig by
+ * tick 74,260 (#36's 1.9 m bore took 9 over the whole run, measured on the #662 branch), and the
+ * rescue that follows docks it with 50 ore cells still unmined.
+ */
 function mineRegion(tiles: readonly TilePoint[]): DomainEvent[] {
+  const fullHull = toCanonical(hullMax(0))
   const session = createScriptedSession()
   // Hold purchase 30 carries 174 units, the old step 400's 170 (ticket 553).
   session.submit(0, { type: 'debug.setUpgrade', payload: { upgradeId: 'cargo_hold', level: 30 } })
   let tick = 0
   for (const tile of tiles) {
     session.submit(tick, { type: 'debug.setEnergy', payload: { energy: '150' } })
+    session.submit(tick, { type: 'debug.setHull', payload: { hull: fullHull } })
     session.submit(tick, poseAbove(tile, FACING.down))
     tick += 100
     session.submit(tick, drill(tile, 100))

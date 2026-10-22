@@ -225,7 +225,10 @@ describe('platform: core bay', () => {
     session.submit(tick, { type: 'debug.setEnergy', payload: { energy: '0.05' } })
     session.submit(tick + 12, poseAbove(GROUND, FACING.right, { driveTicks: 12 }))
     expect(session.vehicle().mode).toBe('stranded')
-    const towed = session.advanceTo(tick + 12 + 180)
+    // The core dig's grade-1 casing collapses meanwhile (#43), as in the tow above: on the 1.2 m
+    // bore (ticket 662) it refills from tick 270 into 273, past the strand at 272, where #36's
+    // 1.9 m bore's ran at 220-221 (both measured on the #662 branch).
+    const towed = session.advanceTo(tick + 12 + 180).filter((event) => !isCollapseEvent(event))
     expect(towed[0]).toMatchObject({ type: 'RescueTriggered', cause: 'stranded', fee: '0e+0' })
     expect(towed.at(-1)).toMatchObject({ type: 'CoreBayDeposited', fragments: 5, source: 'rescue' })
     expect(session.state().platform.coreBay).toBe(5)

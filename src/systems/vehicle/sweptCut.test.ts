@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest'
+import { DRILL_STAMP_OFFSET_MM } from '../../constants/balance'
 import { discSamplesOf } from '../world/stampShape'
 import { CLOSED_CUT_GATE } from './cutGate'
 import { sweptDrillStampOf } from './drillStamp'
@@ -59,10 +60,14 @@ describe('swept cut path (ticket 330)', () => {
     }
   })
 
+  // At the report's offset: 800 mm ahead lay inside #36's 950 mm radius, but past the 1.2 m bore's
+  // 600 mm (ticket 662), where a fresh path cuts the capsule from the body instead.
   it('cuts the bare stamp a report cuts when a fresh path is clear', () => {
-    const path = sweepPathOf(undefined, POSE, STEP_STAMP, 10)
-    const stamp = sweptStampOf(path, STAMP, path.steps)
-    expect(discSamplesOf(stamp)).toEqual(discSamplesOf(STAMP))
+    const reportStamp = sweptDrillStampOf(POSE, false, DRILL_STAMP_OFFSET_MM)
+    const reportStep = { stamp: reportStamp, aheadMm: DRILL_STAMP_OFFSET_MM }
+    const path = sweepPathOf(undefined, POSE, reportStep, 10)
+    const stamp = sweptStampOf(path, reportStamp, path.steps)
+    expect(discSamplesOf(stamp)).toEqual(discSamplesOf(reportStamp))
   })
 
   it('walks the centre at most 125 mm a sub-step', () => {

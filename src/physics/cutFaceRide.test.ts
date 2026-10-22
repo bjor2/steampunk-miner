@@ -7,7 +7,7 @@ import { resetGameStore } from '../store/gameStore'
 import { withDriveReaching } from '../systems/authority/driveRigFixtures'
 import { buildIntent } from '../systems/input/buildIntent'
 import { createRig, type Rig, type TickRead } from './cutFollowFixtures'
-import { faceReadOf, isPopIn, type FaceRead } from './cutFaceRead'
+import { faceReadOf, isPopIn, isRidingCutFace, type FaceRead } from './cutFaceRead'
 
 // Riding the cut face (ticket 570, the GD lock's rows 1 and 2 and the G&V rows): while the drill
 // cuts, the body stands on the face its cut opens, never above it, and the ground falls away at
@@ -127,19 +127,15 @@ function readTicks(rig: Rig, aim: FaceLeg['aim']): FaceRead[] {
 
 /**
  * The open-gate ticks at least the settle past the gate's last opening, a cave face left out: a
- * cut that starts again past a cave lands on its face as a fresh one does.
+ * cut that starts again past a cave lands on its face as a fresh one does, so the settle counts
+ * from the cave's last tick too, whether or not the gate shut over it.
  */
 function judgedOf(reads: readonly FaceRead[]): FaceRead[] {
   let openTicks = 0
   return reads.filter((read) => {
-    openTicks = isOpenOnTheCut(read) ? openTicks + 1 : 0
+    openTicks = isRidingCutFace(read) ? openTicks + 1 : 0
     return openTicks > SETTLE_TICKS
   })
-}
-
-/** The gate is open and the face is the cut's, no cave's. */
-function isOpenOnTheCut(read: FaceRead): boolean {
-  return read.tick.authorityGate === 1 && !read.isFacingCave
 }
 
 /** Off the ground with no natural hollow under the probe: the body itself left the face. */

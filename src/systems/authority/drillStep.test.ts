@@ -367,6 +367,18 @@ describe('drill step yield per metre (ticket 330, Vertical Scaler)', () => {
   const REACH_GAIN_MM = PRE_570_SWEPT_REACH_MM - DRILL_STAMP_OFFSET_MM
 
   /**
+   * Whether a cell lies above the last report's stamp centre, the ground both cuts reach with their
+   * stamps' centres. Past it only a report cuts: since ticket 662 it runs its stamp
+   * `DRILL_REPORT_STAMP_LENGTH_MM` on (`reportCutStampOf`), so the reports alone open a cell past
+   * the descent's end that #36's disc never reached, and a step's swept stamp does not run on.
+   */
+  function isWithinDescent({ ty }: TilePoint, mmPerTick: number): boolean {
+    const lastReportTick = Math.floor((METRES * 1000) / mmPerTick / 12) * 12
+    const lastStampYMm = top.y - mmPerTick * lastReportTick - DRILL_STAMP_OFFSET_MM
+    return (ty + 1) * 1000 > lastStampYMm
+  }
+
+  /**
    * The same scripted descent of the stamp cut by 5 Hz reports alone, or by a step every tick
    * beside them, each step's body held back by the swept stamp's longer reach.
    */
@@ -388,7 +400,9 @@ describe('drill step yield per metre (ticket 330, Vertical Scaler)', () => {
       (sum, event) => sum + (event.type === 'DrillDamageDealt' ? event.ticks : 0),
       0,
     )
-    const opened = tilesDestroyed(events).map((event) => `${event.tx},${event.ty}`)
+    const opened = tilesDestroyed(events)
+      .filter((event) => isWithinDescent(event, mmPerTick))
+      .map((event) => `${event.tx},${event.ty}`)
     return { opened: opened.sort(), drillTicks }
   }
 

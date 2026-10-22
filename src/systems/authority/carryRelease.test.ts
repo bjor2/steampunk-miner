@@ -10,6 +10,7 @@ import {
   FACING,
   facingVectorOf,
   noseTileOf,
+  tileOfMillimetres,
   type Facing,
   type VehiclePose,
 } from '../vehicle/vehiclePose'
@@ -332,12 +333,21 @@ function brokenCellsOf({ effect }: LegTick): string[] {
   )
 }
 
-/** The paid cells, then a released cell, as far as each broke this tick. */
+/**
+ * The body's own cell, the paid cells, then a released cell, each once, as far as each broke this
+ * tick. The front yields the cells on the body's line nearest the pose first
+ * (`yieldedInFrontOrder`), and the sweep starts in the body's cell, which the walk never prices.
+ * On the softened leg's fresh first tick both bores break that cell, and since ticket 662 the
+ * 1.2 m bore's bite breaks the next one with it, a bitten cell being both the last paid and the
+ * carry's target.
+ */
 function crossedBrokenOf(tick: LegTick): string[] {
   const broken = new Set(brokenCellsOf(tick))
   const { paid, carryTarget } = tick.carved
-  const crossed = isReleasedOn(tick) && carryTarget !== null ? [...paid, carryTarget] : paid
-  return crossed.map(({ tx, ty }) => `${tx},${ty}`).filter((key) => broken.has(key))
+  const walked = isReleasedOn(tick) && carryTarget !== null ? [...paid, carryTarget] : paid
+  const crossed = [tileOfMillimetres(tick.pose.x, tick.pose.y), ...walked]
+  const keys = [...new Set(crossed.map(({ tx, ty }) => `${tx},${ty}`))]
+  return keys.filter((key) => broken.has(key))
 }
 
 /**

@@ -7,12 +7,12 @@ import type { DomainEvent } from './domainEvent'
 import { createScriptedSession, poseAbove } from './scriptedSession'
 
 // The #316 width bench as a spec (G&V amendment 2 on #308, ticket 620's acceptance): a planet-1
-// level run of 30 m with `s` side cells a side opens a mean of 2 + s cells a metre, within 0.25,
+// level run of 30 m with `s` side cells a side opens a mean of b + s cells a metre, within 0.25,
 // over 12 start phases a twelfth of a metre apart, and no two neighbouring metres of one run
 // differ by more than one cell (an edge alternating by two reads as broken gear). The cut is the
 // shipped swept cut (`drillStep`) on `benchDrillStep`'s line, with a drill whose work outruns the
-// body, so the count is the stamp's and the gear's geometry, not the drill's pace. 2 to 5 cells a metre is today's content
-// range, never a cap.
+// body, so the count is the stamp's and the gear's geometry, not the drill's pace. b + 0 to b + 3
+// cells a metre is today's content range, never a cap.
 
 const RUN_METRES = 30
 const PHASES = 12
@@ -27,6 +27,12 @@ const STRIDE_MM = 100
 const RUN_TIMEOUT_MS = 120_000
 /** The metres the stamp enters and leaves the run on, left out of the count. */
 const EDGE_METRES = 2
+/**
+ * The bare bore's cells a metre, b. #316 measured 2 at #36's 1.9 m bore, raised a quarter metre;
+ * ticket 662's 1.2 m bore on the body's centre opens the body's row alone, measured 1 at every
+ * phase, each side cell still adding its one roof cell. Ticket #663 re-baselines the bench rows.
+ */
+const BARE_BORE_CELLS = 1
 
 /** A spec-only drill-gear source: `sideCells` cells on each side of the bore. */
 function sideCellsSlice(sideCells: number): SliceDefinition {
@@ -81,13 +87,13 @@ const phaseOffsetsMm = Array.from({ length: PHASES }, (_, phase) =>
 
 describe('side cells per metre (#316 bench, ticket 620)', () => {
   it.each([0, 1, 2, 3])(
-    'opens 2 + %i cells a metre within 0.25 over 12 start phases, neighbours at most 1 apart',
+    `opens ${BARE_BORE_CELLS} + %i cells a metre within 0.25 over 12 start phases, neighbours at most 1 apart`,
     (sideCells) => {
       const runs = phaseOffsetsMm.map((offsetMm) =>
         cellsPerMetreOf(openedOnLevelRun(sideCells, offsetMm)),
       )
       const mean = meanOf(runs.map(meanOf))
-      expect(Math.abs(mean - (2 + sideCells))).toBeLessThanOrEqual(0.25)
+      expect(Math.abs(mean - (BARE_BORE_CELLS + sideCells))).toBeLessThanOrEqual(0.25)
       expect(Math.max(...runs.map(largestNeighbourGapOf))).toBeLessThanOrEqual(1)
     },
     RUN_TIMEOUT_MS,

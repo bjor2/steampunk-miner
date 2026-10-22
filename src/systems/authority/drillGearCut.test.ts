@@ -453,11 +453,16 @@ describe('drill gear cut', () => {
     for (const crossed of [offsets.diagonal, offsets.ceiling]) {
       const { cell: ore, target } = groundTargetCrossing(crossed)
       const diagonal = shiftedBy(offsets.diagonal, target)
+      // Ticket 662: the report's cut runs 550 mm past the 1.2 m bore's stamp and nicks the
+      // diagonal's near corner, so a refused turn leaves the diagonal as the bare drill does
+      // under the same gate.
+      const shell = shellSlice(ore, 'refused')
       const open = drillWith([UP_TWIN_BIT], target, FACING.up, [], lifting(1))
-      expect(densityOf(open.world, diagonal)).toBeLessThan(densityOf(EMPTY_WORLD, diagonal))
-      const slices = [UP_TWIN_BIT, shellSlice(ore, 'refused')]
-      const cut = drillWith(slices, target, FACING.up, [], lifting(1))
-      expect(densityOf(cut.world, diagonal)).toBe(densityOf(EMPTY_WORLD, diagonal))
+      const bareOpen = drillWith([], target, FACING.up, [], lifting(1)).world
+      expect(densityOf(open.world, diagonal)).toBeLessThan(densityOf(bareOpen, diagonal))
+      const cut = drillWith([UP_TWIN_BIT, shell], target, FACING.up, [], lifting(1))
+      const bareGated = drillWith([shell], target, FACING.up, [], lifting(1)).world
+      expect(densityOf(cut.world, diagonal)).toBe(densityOf(bareGated, diagonal))
       expect(kindOfCell(cellAt(cut.world, PARAMS, ore))).toBe(CELL_KIND.ore)
     }
   })
@@ -485,7 +490,7 @@ describe('drill gear cut', () => {
       expect(session.vehicle().aheadLatch).toEqual({ bearing: 'right', tile: diagonal })
       isAnchored = false
       report(9)
-      expect(densityOf(session.state().world, diagonal)).toBe(started)
+      expect(densityOf(session.state().world, diagonal)).toBe(started - bareUpNickOf(diagonal))
       expect(session.vehicle().aheadLatch?.bearing).toBe('facing')
     })
   })
@@ -559,6 +564,25 @@ describe('drill gear cut', () => {
     expect(latchAfter(gearSlice({ sideCells: 1 }))).toBeUndefined()
   })
 })
+
+/**
+ * What the bare drill's second 4-tick report facing up over `TARGET`, lifting right, removes from
+ * `tile`. Ticket 662: the report's cut runs 550 mm past the 1.2 m bore's stamp and nicks the
+ * up-diagonal's near corner, samples the gear never cuts (`cellSamplesBesideDisc`), so once up
+ * drops a report may still remove that from the diagonal, and nothing more.
+ */
+function bareUpNickOf(tile: TilePoint): number {
+  return withRegistrations([], () => {
+    const session = createScriptedSession()
+    const report = (tick: number) =>
+      session.submit(tick, poseAbove(TARGET, FACING.up, { drillTicks: 4, drive: lifting(1) }))
+    session.submit(1, poseAbove(TARGET, FACING.up))
+    report(5)
+    const before = densityOf(session.state().world, tile)
+    report(9)
+    return before - densityOf(session.state().world, tile)
+  })
+}
 
 /** The side cutters' Mark 3 hold (TD lock on #276): one side cell, on the side the drive faces. */
 const SIDE_HOLD_ASK: DrillGearAsk = { sideCells: 1, sideAim: 'drive' }

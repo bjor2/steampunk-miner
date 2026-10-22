@@ -129,6 +129,13 @@ beforeEach(() => {
 afterEach(() => uninstallRunLog())
 
 /**
+ * Off the pad and still on the surface: since ticket 662's 1.2 m bore a drive held off the pad for
+ * 2 s bites into the rising ground and rides a level cut by its end, and the 44 m/s rig's shaft
+ * from there fell into a cave in place of cutting its legs.
+ */
+const OFF_PAD_ON_SURFACE_SECONDS = 1.1
+
+/**
  * Off the pad, down a shaft, a level tunnel west, then up out of it, at `framesPerSecond` render
  * frames.
  */
@@ -139,7 +146,7 @@ function playScript(
   const rig = createRig(RAPIER, levels, framesPerSecond)
   const ticks = (seconds: number) => Math.round(seconds / PHYSICS_TIMESTEP)
   // The Sell bay is the pad's west end (#170), so off the pad is to the left.
-  rig.hold(buildIntent(['aim_left']), ticks(2))
+  rig.hold(buildIntent(['aim_left']), ticks(OFF_PAD_ON_SURFACE_SECONDS))
   const down = rig.hold(buildIntent(['aim_down']), ticks(downSeconds))
   const level = rig.hold(buildIntent(['aim_left']), ticks(3))
   return { down, level, up: rig.hold(buildIntent(['lift']), ticks(2)) }

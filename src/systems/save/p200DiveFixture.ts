@@ -44,6 +44,12 @@ export const DIVE_CREW = ['p1', 'p2', 'p3', 'p4', 'p5', 'p6', 'p7', 'p8'] as con
 const DRILL_PURCHASES_OVER_CURVE = 20
 /** A band-1 column east of the pad; the body starts on its surface. */
 const DIVE_COLUMN = 20
+/**
+ * Where in the column the body dives, mm from its west edge: a hair west of its middle, so the
+ * 1.2 m bore's wall (ticket 662) reaches a sample of the column either side, and each step
+ * touches three columns of cells, over `p1`'s share. Down the middle it reaches only the east one.
+ */
+const DIVE_X_IN_COLUMN_MM = 450
 const ARRIVAL_TICK = 1
 /** The first tick the dive steps on. */
 export const DIVE_START_TICK = 2
@@ -92,7 +98,7 @@ export function divePathOf(state: AuthorityState): DivePath {
   const params = paramsOf(state)
   const surfaceRow = surfaceRowOfColumn(DIVE_COLUMN, params.radiusTiles)
   return {
-    x: DIVE_COLUMN * 1000 + 500,
+    x: DIVE_COLUMN * 1000 + DIVE_X_IN_COLUMN_MM,
     topY: (surfaceRow + 1) * 1000 + 400,
     stepMm: cutStepMmOf(cellSubStepsOf(state, params)),
   }
