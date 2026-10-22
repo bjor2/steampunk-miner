@@ -1,0 +1,54 @@
+{
+  "assetId": "vehicle-look-drive",
+  "schema": 1,
+  "source": {
+    "blend": "art/blender/vehicle-look-drive/vehicle-look-drive.blend",
+    "sha256": null,
+    "blender": null
+  },
+  "pxPerMetre": 512,
+  "atlasPx": [512, 512],
+  "maps": {
+    "albedo": "vehicle-look-drive.albedo.ktx2",
+    "normal": "vehicle-look-drive.normal.ktx2",
+    "emissive": "vehicle-look-drive.emissive.ktx2"
+  },
+  "parts": [
+    {
+      "id": "bare-hub",
+      "tier": 1,
+      "rect": [8, 422, 33, 33],
+      "sizeM": [0.064, 0.064],
+      "pivotM": [0.032, 0.032],
+      "atM": [0.0, 0.0],
+      "z": 3
+    },
+    {
+      "id": "guild-track",
+      "tier": 1,
+      "rect": [8, 8, 450, 122],
+      "sizeM": [0.8778, 0.2377],
+      "pivotM": [0.4389, 0.1189],
+      "atM": [0.0, 0.0],
+      "z": 3
+    },
+    {
+      "id": "iron-track",
+      "tier": 1,
+      "rect": [8, 146, 450, 122],
+      "sizeM": [0.8786, 0.2382],
+      "pivotM": [0.4393, 0.1191],
+      "atM": [0.0, 0.0],
+      "z": 3
+    },
+    {
+      "id": "steel-track",
+      "tier": 1,
+      "rect": [8, 284, 450, 122],
+      "sizeM": [0.8786, 0.2382],
+      "pivotM": [0.4393, 0.1191],
+      "atM": [0.0, 0.0],
+      "z": 3
+    }
+  ]
+}

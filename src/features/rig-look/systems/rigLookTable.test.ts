@@ -211,6 +211,7 @@ describe('rig look table', () => {
         'steel-cone',
         'toothed-crown',
       ],
+      'vehicle-look-drive': ['bare-hub', 'guild-track', 'iron-track', 'steel-track'],
       'vehicle-look-engine': ['guild-turbine', 'hub-cap', 'single-piston', 'triple-flywheel'],
       'vehicle-look-hull': [
         'banded-iron',

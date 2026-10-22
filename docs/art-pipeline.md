@@ -695,6 +695,35 @@ of the `.blend`; from then on it is the source. The part table, the outline chec
 and the review renders, at desktop and at a 360 px phone's size, are in
 [docs/art/rig-look-engine/](art/rig-look-engine/README.md).
 
+## Rig-look parts: the drive
+
+The art half of the drive look of the rig look ladder
+([#576](https://github.com/bjor2/steampunk-miner/issues/576), built by
+[#731](https://github.com/bjor2/steampunk-miner/issues/731) for the wiring
+[#726](https://github.com/bjor2/steampunk-miner/issues/726)): a Blender source for tracks and
+wheels per engine stage, `art/blender/vehicle-look-drive/`, with the base look beside them. Since
+#723 the `engine` track is the only drive purchase, so the GD keyed the drive look on
+`levels.engine` with the engine row's own thresholds (2, 18 and 26 purchases; drill-speed buys
+never move it) and had the tracks and wheels replace the engine's drive units on `chassis.drive`.
+Each part is authored with that slot, the middle roller's hub, at the origin, as the engine looks
+are, and is the whole undercarriage: a belt of links running over the three rollers inside their
+own radius, side frames in the gaps between them, a hub boss on each axle and the stage's drive
+unit on the middle one (`bare-hub` is the leg's own hub cap piece for piece, then `iron-track`,
+`steel-track` and `guild-track` for Progression's Single piston, Triple flywheel and Guild turbine
+steps). The belt keeps inside the rollers' radius, so the rig's silhouette grows only in the gaps
+between the rollers, inside the undercarriage box and never below the ground line the rollers
+stand on; every roller's face inside the belt stays open, so the rig's own rollers keep turning
+under the look. The rig-look seam ([#640](https://github.com/bjor2/steampunk-miner/issues/640))
+registers it through `r.artAssets` from `rigLook.json`'s `lookAssets` and this ticket exports it
+to `public/assets/vehicle/` (4 parts, 512x512) at `z` 3, over the chassis's 2 and under the
+thrusters' 4; the wiring (#726) points the engine steps' parts at it, retires the drive units and
+adds the parts to the track's glow slots so the tail above the top step paints them. The guild
+track's lit core is the one glow, at the engine turbine's 0.3, so the nose stays the brightest
+part. `docs/art/rig-look-drive/author_drive_looks.py` wrote the first version of the `.blend`;
+from then on it is the source. The part table, the outline check at tiers 1 and 3 and the review
+renders, at desktop and at a 360 px phone's size, are in
+[docs/art/rig-look-drive/](art/rig-look-drive/README.md).
+
 ## Rig-look parts: the drill types
 
 The art half of the drill-type looks of

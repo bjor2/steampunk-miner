@@ -10,11 +10,12 @@ import { RIG_LOOK_TABLE } from './rigLookTable'
 const LOOK_ASSET_IDS = Object.keys(RIG_LOOK_TABLE.lookAssets)
 
 describe('rig look art (ticket 640)', () => {
-  it('ships the boiler, cargo hold, drill tip, engine and hull look assets through r.artAssets', () => {
+  it('ships the boiler, cargo hold, drill tip, drive, engine and hull look assets through r.artAssets', () => {
     expect(LOOK_ASSET_IDS).toEqual([
       'vehicle-look-boiler',
       'vehicle-look-cargo-hold',
       'vehicle-look-drill-tip',
+      'vehicle-look-drive',
       'vehicle-look-engine',
       'vehicle-look-hull',
     ])
