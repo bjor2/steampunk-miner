@@ -1,0 +1,116 @@
+/*
+ * The unlock reveal's plate (ticket 718): a riveted brass plaque in the #683 baked sheet frame,
+ * under the phone's top keep-out (nothing in the top 15% takes a tap, design-system section 9)
+ * and across the stage less its margins, at most 360 px wide; on desktop under the strip, over the
+ * middle of the view, so the car under it stays clear. The whole plate is the one 44 px-plus
+ * target that skips. It drops in over `--motion-standard`; a gleam crosses the brass once, over
+ * the money float-up's 600 ms (`motion.floatUpMs`), while motion is allowed (`data-gleam`, and the
+ * media rule), so Reduce Motion keeps a still plate. Its ground is opaque: it lies over the bay
+ * screen's own words.
+ */
+.plate {
+  position: absolute;
+  z-index: 1;
+  top: calc(var(--safe-top) + var(--top-keep-out));
+  right: var(--hud-inset-right);
+  left: var(--hud-inset-left);
+  display: flex;
+  overflow: hidden;
+  gap: var(--space-3);
+  align-items: center;
+  box-sizing: border-box;
+  max-width: 360px;
+  min-height: 64px;
+  margin: 0 auto;
+  padding: var(--space-2) var(--space-3);
+  border: var(--frame-double) solid var(--color-brass);
+  border-radius: var(--radius-panel);
+  border-image: var(--art-sheet-frame) var(--art-sheet-frame-slice) fill /
+    var(--art-sheet-frame-width);
+  background: var(--color-bg);
+  color: var(--color-text);
+  font-family: var(--font-body);
+  font-size: var(--type-body);
+  line-height: var(--line-height);
+  text-align: left;
+  pointer-events: auto;
+  touch-action: manipulation;
+  cursor: pointer;
+  animation: plate-enter var(--motion-standard) var(--ease-enter);
+}
+
+:global([data-layout='desktop']) .plate {
+  top: calc(var(--safe-top) + var(--strip-height) + var(--space-3));
+}
+
+.words {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.title {
+  color: var(--color-brass);
+  font-size: var(--type-label);
+  letter-spacing: var(--label-tracking);
+  text-transform: uppercase;
+}
+
+/* An item name is three words at most (#680); a long one wraps rather than cutting off. */
+.name {
+  font-size: var(--type-title);
+  overflow-wrap: anywhere;
+}
+
+.plate[data-gleam]::after {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    100deg,
+    transparent 30%,
+    rgb(239 210 122 / 0.45) 50%,
+    transparent 70%
+  );
+  content: '';
+  pointer-events: none;
+  transform: translateX(-100%);
+  animation: plate-gleam 600ms var(--ease-enter) var(--motion-standard) 1 forwards;
+}
+
+@keyframes plate-enter {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes plate-gleam {
+  to {
+    transform: translateX(100%);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .plate {
+    animation-name: plate-fade;
+  }
+
+  .plate[data-gleam]::after {
+    display: none;
+  }
+}
+
+@keyframes plate-fade {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}

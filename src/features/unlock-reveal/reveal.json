@@ -1,0 +1,35 @@
+{
+  "$comment": "The unlock reveal (ticket 718, spec #678 Progression 1): the first buy of a new capability plays a short brass reveal on the dock while the bought part glows where it is fitted on the car. `events` names the buys that can reveal and the item each buys: the item id read from the event's `idField`, or a fixed `id`; a buy reveals only if the kernel's shared table (`data/shop/newCapabilities.json`, read by the shop's guidance chip too) counts the item as a new capability, so a stat step never does. `items` is the reveal of each capability that is not a vehicle item: its name, icon and the asset whose parts glow; a vehicle item reveals with its own data (the seller's name, its icon, its `vehicle-item-*` model). `revealTicks` is the reveal's length at 60 Hz, the Workshop's full moment (G&V: 72-90 ticks, `showcase.json`); a tap skips it. The glow pulses between `low` and `high` every `pulseTicks` in the brass highlight, and holds at `high` under Reduce Motion. Every word is held to the #680 budgets by revealCopy.test.ts.",
+  "revealTicks": 90,
+  "glow": {
+    "colour": "#efd27a",
+    "low": 0.4,
+    "high": 1.6,
+    "pulseTicks": 30
+  },
+  "events": [
+    { "type": "VehicleItemPurchased", "kind": "vehicle-item", "idField": "itemId" },
+    { "type": "GunMounted", "kind": "module", "id": "guns" },
+    { "type": "ground-gun.GunMounted", "kind": "bore-gun", "id": "ground-gun.mount" }
+  ],
+  "items": [
+    {
+      "kind": "module",
+      "id": "guns",
+      "name": "Guns",
+      "iconId": "icon-track-gun",
+      "assetId": "vehicle-auto-guns"
+    },
+    {
+      "kind": "bore-gun",
+      "id": "ground-gun.mount",
+      "name": "Bore gun",
+      "iconId": "bore-gun-mount",
+      "assetId": "vehicle-bore-gun"
+    }
+  ],
+  "copy": {
+    "title": "Gear fitted",
+    "skip": "Skip"
+  }
+}
