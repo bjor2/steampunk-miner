@@ -60,13 +60,20 @@ export async function holdNextReveal(page: Page): Promise<void> {
   })
 }
 
-/** Presses a card until it acts: once for a click, twice for a finger (#686 card reveal). */
+/**
+ * Presses a card until it acts: one click with a mouse; with a finger the first tap shows the
+ * card's line and the second acts (#686 card reveal), as `vehicleItemShop.spec.ts` taps.
+ */
 export async function buyFromCard(page: Page, testId: string): Promise<void> {
   const card = page.getByTestId(testId)
-  await card.click()
-  if ((await card.count()) > 0 && (await card.getAttribute('data-revealed')) === 'true') {
-    await card.click()
-  }
+  if (!(await isTouchScreen(page))) return card.click()
+  await card.tap()
+  await expect(card).toHaveAttribute('data-revealed', 'true')
+  await card.tap()
+}
+
+function isTouchScreen(page: Page): Promise<boolean> {
+  return page.evaluate(() => navigator.maxTouchPoints > 0)
 }
 
 export function readReveal(page: Page): Promise<RevealReading> {

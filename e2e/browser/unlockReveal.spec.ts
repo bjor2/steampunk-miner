@@ -118,7 +118,11 @@ for (const size of [
   { width: 1280, height: 800, isPhone: false },
 ]) {
   test.describe(`unlock reveal plate at ${size.width}x${size.height} (ticket 718)`, () => {
-    test.use({ viewport: { width: size.width, height: size.height }, hasTouch: size.isPhone })
+    test.use({
+      viewport: { width: size.width, height: size.height },
+      hasTouch: size.isPhone,
+      isMobile: size.isPhone,
+    })
 
     test('sits on screen as one tap target, under the phone’s top keep-out', async ({ page }) => {
       test.setTimeout(TEST_TIMEOUT_MS)
