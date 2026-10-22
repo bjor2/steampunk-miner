@@ -105,14 +105,14 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/combos/systems/combosEconomy.test.ts` | 4 | 4 |
 | `src/features/combos/systems/render/anchorTilt.test.ts` | 7 | 7 |
 
-### `descriptions`: 4 files, 49 tests
+### `descriptions`: 4 files, 50 tests
 
 | File | Tests | Sites |
 | --- | --- | --- |
 | `src/features/descriptions/systems/descriptionCoverage.test.ts` | 6 | 6 |
 | `src/features/descriptions/systems/flavourRules.test.ts` | 8 | 8 |
 | `src/features/descriptions/systems/kernelEntries.test.ts` | 32 | 19 |
-| `src/features/descriptions/systems/liningCards.test.ts` | 3 | 3 |
+| `src/features/descriptions/systems/liningCards.test.ts` | 4 | 4 |
 
 ### `dock-buildings`: 10 files, 46 tests
 
@@ -614,7 +614,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/tech-tree/treeSpendGuard.lane.test.ts` | 8 | 8 |
 | `src/features/tech-tree/ui/patentOfficePanel.test.ts` | 2 | 2 |
 
-### `terrain-tools`: 49 files, 395 tests
+### `terrain-tools`: 50 files, 400 tests
 
 | File | Tests | Sites |
 | --- | --- | --- |
@@ -623,6 +623,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/terrain-tools/foamPace.test.ts` | 5 | 3 |
 | `src/features/terrain-tools/foamPaceGate.test.ts` | 7 | 7 |
 | `src/features/terrain-tools/foamRestockPace.lane.test.ts` | 11 | 1 |
+| `src/features/terrain-tools/gnawCollapseReportRows.test.ts` | 5 | 5 |
 | `src/features/terrain-tools/logging.test.ts` | 2 | 2 |
 | `src/features/terrain-tools/magnetFieldsBench.test.ts` | 2 | 2 |
 | `src/features/terrain-tools/magnetGuard.test.ts` | 6 | 6 |
@@ -769,7 +770,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/authority/carveGeometryKnownRed.test.ts` | 5 | 5 |
 | `src/systems/authority/casingCadence.test.ts` | 7 | 3 |
 | `src/systems/authority/casingDrill.test.ts` | 5 | 5 |
-| `src/systems/authority/casingGnaw.test.ts` | 4 | 4 |
+| `src/systems/authority/casingGnaw.test.ts` | 5 | 5 |
 | `src/systems/authority/casingPlacement.test.ts` | 15 | 15 |
 | `src/systems/authority/casingReversal.test.ts` | 5 | 5 |
 | `src/systems/authority/casingRules.test.ts` | 6 | 6 |
@@ -982,7 +983,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/economy/blastingCharges.test.ts` | 12 | 12 |
 | `src/systems/economy/brassSteps.test.ts` | 5 | 2 |
 | `src/systems/economy/casingCementGrades.test.ts` | 7 | 7 |
-| `src/systems/economy/casingGrades.test.ts` | 5 | 5 |
+| `src/systems/economy/casingGrades.test.ts` | 10 | 10 |
 | `src/systems/economy/casingPrices.test.ts` | 8 | 8 |
 | `src/systems/economy/chargeSizes.test.ts` | 23 | 23 |
 | `src/systems/economy/collapseCrush.test.ts` | 2 | 2 |
@@ -1002,7 +1003,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/economy/oreEconomy.test.ts` | 7 | 7 |
 | `src/systems/economy/perPurchaseRows.test.ts` | 40 | 21 |
 | `src/systems/economy/planetCharges.test.ts` | 17 | 13 |
-| `src/systems/economy/readEconomy.test.ts` | 25 | 25 |
+| `src/systems/economy/readEconomy.test.ts` | 26 | 26 |
 | `src/systems/economy/refineryEconomy.test.ts` | 6 | 6 |
 | `src/systems/economy/trackKind.test.ts` | 1 | 1 |
 | `src/systems/economy/travelCharge.test.ts` | 7 | 7 |
@@ -1710,7 +1711,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/world/artefactCache.test.ts` | 4 | 4 |
 | `src/systems/world/carvePhase.test.ts` | 3 | 3 |
 | `src/systems/world/casingBand.test.ts` | 2 | 2 |
-| `src/systems/world/casingBreach.test.ts` | 13 | 13 |
+| `src/systems/world/casingBreach.test.ts` | 15 | 15 |
 | `src/systems/world/casingLining.test.ts` | 15 | 15 |
 | `src/systems/world/chunkCache.test.ts` | 8 | 6 |
 | `src/systems/world/chunkDelta.test.ts` | 9 | 9 |
@@ -1735,6 +1736,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/world/stampShape.test.ts` | 8 | 5 |
 | `src/systems/world/surfaceLayer.test.ts` | 13 | 13 |
 | `src/systems/world/sweptSpan.test.ts` | 6 | 6 |
+| `src/systems/world/wallWeakness.test.ts` | 3 | 3 |
 | `src/systems/world/worldCell.test.ts` | 8 | 8 |
 | `src/systems/world/worldExactMathLint.test.ts` | 15 | 3 |
 | `src/systems/world/worldState.test.ts` | 2 | 2 |
