@@ -1,7 +1,12 @@
 import { describe, expect, it } from 'vitest'
 import { DRILL_SUBSTEPS_PER_TICK } from '../../constants/balance'
 import { engineStatsAtStep, vehicleStatsAt } from '../economy/vehicleStats'
-import { CUT_AXIS_CAPS, cutCapLines, isDriveCappedFacing } from './cutAxisCaps'
+import {
+  CUT_AXIS_CAPS,
+  cutCapLines,
+  isDriveCappedFacing,
+  isGravityRampedFacing,
+} from './cutAxisCaps'
 import {
   cappedCutSpeedOf,
   cappedCutStepMmOf,
@@ -37,8 +42,16 @@ describe('cut axis caps (ticket 723)', () => {
     expect([...facings].sort()).toEqual(Object.values(FACING).sort())
   })
 
-  it('writes the card line from the table: sideways capped by drive speed', () => {
-    expect(cutCapLines()).toEqual(['Sideways capped by drive speed'])
+  it('writes the card lines from the table: sideways capped by drive speed, the ramp down by gravity', () => {
+    expect(cutCapLines()).toEqual([
+      'Sideways capped by drive speed',
+      'Downward ramp follows local gravity',
+    ])
+  })
+
+  it('ramps only a cut down by local gravity (#724)', () => {
+    expect(isGravityRampedFacing(FACING.down)).toBe(true)
+    expect([...SIDEWAYS, FACING.up].some(isGravityRampedFacing)).toBe(false)
   })
 })
 

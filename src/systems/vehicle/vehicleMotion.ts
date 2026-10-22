@@ -15,8 +15,10 @@
  * While the rig actively cuts (ticket 333, `cutFollowMotion.ts`) the drill sets the speed along its
  * facing instead: the wheels' target on a level cut, or the speed along `localUp` with no gravity
  * on a cut down or up, which stops at the planet's centre (ticket 539); a sideways cut's speed comes
- * in already held to the drive's (`cutCapSpeed.ts`, ticket 723). Otherwise the engine passed in
- * drives as above, at its own `speedMax`.
+ * in already held to the drive's (`cutCapSpeed.ts`, ticket 723). A cut down gains that speed no
+ * faster than `downCutAcceleration` (Bjor's ruling on #724: local gravity with a 0.1 g core floor,
+ * `radialGravity.ts`); it slows at once, and its top speed stays the drill's. Otherwise the engine
+ * passed in drives as above, at its own `speedMax`.
  */
 import { MAX_SPEED_MM_PER_SECOND } from '../../constants/balance'
 import {
@@ -27,6 +29,7 @@ import {
   VEHICLE_COLLIDER_SIZE,
 } from '../../constants/physics'
 import type { EngineStats } from '../economy/vehicleStats'
+import { isGravityRampedFacing } from './cutAxisCaps'
 import { cutFollowSpeedOf, isCutFollowAlongGround, type CutFollowMotion } from './cutFollowMotion'
 import { dot, fromLocalFrame, tangentOf, type Vector2 } from './localFrame'
 import {
@@ -77,6 +80,11 @@ export interface MotionStepInput {
    * when absent.
    */
   depthToCentre?: number
+  /**
+   * m/s² a cut down may gain speed at (Bjor's ruling on #724, `downCutAccelerationAt`): local
+   * gravity, never under a tenth of the surface's. No limit but the drill's own ramp when absent.
+   */
+  downCutAcceleration?: number
 }
 
 export interface MotionEffectInput {
@@ -91,6 +99,8 @@ export interface MotionStep {
   velocity: Vector2
   isDriving: boolean
   isThrusting: boolean
+  /** The gravity ramp holds the cut down below the speed the drill gives it this step (#724). */
+  isGravityLimited: boolean
 }
 
 const MAX_SPEED = MAX_SPEED_MM_PER_SECOND / MM_PER_METRE
@@ -133,15 +143,39 @@ function drivenStep(input: MotionStepInput, frame: DriveFrame): MotionStep {
     velocity: withinSpeedBound(pulledByGravity(input, frame, local), input.maxSpeed),
     isDriving: input.canAct && input.intent.moveX !== 0 && input.isGrounded,
     isThrusting,
+    isGravityLimited: isHeldByGravityRamp(input, frame.upward),
   }
 }
 
 /** The lift pushes along `localUp`; a cut down or up follows the drill there instead. */
 function nextUpwardSpeed(input: MotionStepInput, frame: DriveFrame, isThrusting: boolean): number {
   if (isCutFollowUpward(input.cutFollow)) {
-    return stoppedAtCentre(cutFollowSpeedOf(frame.upward, input.cutFollow, false), input)
+    const followed = cutFollowSpeedOf(frame.upward, input.cutFollow, false)
+    return stoppedAtCentre(rampedByGravity(followed, frame.upward, input.cutFollow, input), input)
   }
   return frame.upward + (isThrusting ? liftAcceleration(frame.engine.thrustToWeight) : 0) * input.dt
+}
+
+/**
+ * A cut down's speed gains at most `downCutAcceleration * dt` on the downward speed the body has
+ * (#724); slowing is never held back, and a cut up keeps the drill's ramp alone.
+ */
+function rampedByGravity(
+  followed: number,
+  current: number,
+  cut: CutFollowMotion,
+  input: MotionStepInput,
+): number {
+  const { downCutAcceleration } = input
+  if (downCutAcceleration === undefined || !isGravityRampedFacing(cut.facing)) return followed
+  return Math.max(followed, Math.min(0, current) - downCutAcceleration * input.dt)
+}
+
+/** Whether the ramp, not the drill, sets a cut down's speed this step (#724). */
+function isHeldByGravityRamp(input: MotionStepInput, current: number): boolean {
+  if (!isCutFollowUpward(input.cutFollow)) return false
+  const followed = cutFollowSpeedOf(current, input.cutFollow, false)
+  return rampedByGravity(followed, current, input.cutFollow, input) !== followed
 }
 
 /** A cut down moves the body no further in a tick than the planet's centre (ticket 539). */
@@ -166,7 +200,12 @@ function isCutFollowAlong(cut: CutFollowMotion | undefined): cut is CutFollowMot
 
 /** A glide, burst or reel is the item's own motion: no wheels, no thrust billed. */
 function steeredStep(velocity: Vector2, maxSpeed: number | undefined): MotionStep {
-  return { velocity: withinSpeedBound(velocity, maxSpeed), isDriving: false, isThrusting: false }
+  return {
+    velocity: withinSpeedBound(velocity, maxSpeed),
+    isDriving: false,
+    isThrusting: false,
+    isGravityLimited: false,
+  }
 }
 
 function plainFrameOf(input: MotionStepInput): DriveFrame {

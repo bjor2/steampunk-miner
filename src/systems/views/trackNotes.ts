@@ -3,8 +3,8 @@
  * a muted note under it. No track has a max level (HS and VS on #551), so a purchase that buys
  * nothing yet is still sold, and the card says why instead of hiding it:
  *   - the drill power card says which cuts something other than the drill caps, generated from the
- *     same table the motion rule reads (`cutAxisCaps.ts`, Bjor's ruling on #723): "Sideways capped
- *     by drive speed.";
+ *     same table the motion rule reads (`cutAxisCaps.ts`, Bjor's rulings on #723 and #724):
+ *     "Sideways capped by drive speed. Downward ramp follows local gravity.";
  *   - the hold always shows its real number, "Hold: N ore (+X%)", and the Game Director's muted
  *     line once it carries more than the planet's largest band (Systems: about 0.326 R units).
  * The engine is a plain price-only line again: with travel parity retired (#723) the drill never
@@ -24,7 +24,7 @@ import { stepLevelText } from './stepLevelText'
 export const HOLD_PAST_LARGEST_BAND_TEXT =
   'More than this planet holds. Pays off on deeper planets.'
 
-/** The drill card's line from the cut caps: "Sideways capped by drive speed." (ticket 723). */
+/** The drill card's line from the cut caps and ramps (tickets 723, 724). */
 export function drillCutCapNote(): string {
   return cutCapLines()
     .map((line) => `${line}.`)

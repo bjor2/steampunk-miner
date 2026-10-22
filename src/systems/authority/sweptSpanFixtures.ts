@@ -30,6 +30,7 @@ import {
   type ScriptedSession,
 } from './scriptedSession'
 import type { SweptStep } from './sweptDrill'
+import { movingDownAtCutSpeed } from './sweptRigFixtures'
 
 /** One tick of a swept cut, as `drillAlongSweep` and `drillAlongSpan` take it. */
 export type SweepCut<T> = (
@@ -138,7 +139,9 @@ const SOFTENED_RADIUS_MM = 16_000
 
 /**
  * Player `p1` on `session` reported at `at`, its enemies frozen, with a drill that scratches any
- * rock here and the ground within about 11 m of `softAt` carved to just over its yield.
+ * rock here and the ground within about 11 m of `softAt` carved to just over its yield. A sweep
+ * down reports the body already moving at the law's cut speed: from rest a cut down gains its
+ * speed only as fast as gravity lets the body (Bjor's ruling on #724), and these sweeps cut at it.
  */
 function armed(
   session: ScriptedSession,
@@ -155,7 +158,8 @@ function armed(
     payload: { ...softAt, radius: SOFTENED_RADIUS_MM, amount: SOFTENED_BY },
   })
   const { payload } = poseAbove({ tx: 0, ty: 0 }, facing)
-  session.submit(tick, { type: 'reportPose', payload: { ...payload, ...at } })
+  const moving = facing === FACING.down ? movingDownAtCutSpeed(session.state(), payload) : {}
+  session.submit(tick, { type: 'reportPose', payload: { ...payload, ...at, ...moving } })
   return session.state()
 }
 

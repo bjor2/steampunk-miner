@@ -1,4 +1,5 @@
 import RAPIER from '@dimforge/rapier3d-compat'
+import { PHYSICS_TIMESTEP } from '../constants/physics'
 import { afterEach, beforeAll, beforeEach, describe, expect, it } from 'vitest'
 import { createMemorySink } from '../logging/eventSink'
 import { createRunLog, installRunLog, uninstallRunLog } from '../logging/runLog'
@@ -6,10 +7,11 @@ import { createScenePops, popCarvedCellsInModeB } from '../scene/materialPops'
 import { sprayPresence } from '../scene/sprayPresence'
 import { readAuthorityState } from '../store/authorityLink'
 import { listenForCarvedCells } from '../store/carveCompleteBroadcast'
-import { resetGameStore, useGameStore } from '../store/gameStore'
+import { readPlanetWorld, resetGameStore, useGameStore } from '../store/gameStore'
 import { SPEED_RIGS } from '../systems/authority/lawSlabRigs'
 import { stateDigest } from '../systems/authority/stateDigest'
 import { buildIntent } from '../systems/input/buildIntent'
+import { downCutAccelerationAtPoint } from '../systems/vehicle/radialGravity'
 import type { MaterialPopMode } from '../systems/materialPop/materialPopMode'
 import type { PopIntake } from '../systems/materialPop/popIntake'
 import { createSprayPool } from '../systems/render/sprayPool'
@@ -21,7 +23,9 @@ import { createRig } from './cutFollowFixtures'
 // pop mode on A and once on B, B's pops taken into a spray pool as the scene takes them. Pops are
 // client-only, so both rides must read alike: on every open-gate tick after #570's 6-tick settle the
 // gap at the face is at most 0.10 m and no cell drops at once; L20 delivers its cells/s at a
-// descent/cut ratio of at least 0.891 (GD on #570), the same in both modes; the body moves the
+// descent/cut ratio of at least 0.891 (GD on #570), the same in both modes, its cut speed since
+// Bjor's ruling on #724 the one the gravity ramp allows from the speed the body had (from rest,
+// a 2 s leg never reaches L20's own); the body moves the
 // same tick for tick and the authority ends on the same digest, so #514's authority cost per tick
 // is A's in B too, and B's only added work, the pop intake on each carved batch, is printed. In B
 // every pop starts 0 or 1 tick after its cell's carve-complete tick. Rows: drill purchase 1, purchase 20 and the 84 m/s rig, at
@@ -67,6 +71,8 @@ interface PopStart {
 
 interface Ride {
   judged: FaceRead[]
+  /** m/s the drill and the gravity ramp let the body descend at on each judged tick (#724). */
+  allowed: number[]
   /** The body's centre after every drilling tick, and the digest after the leg. */
   positions: string[]
   digest: string
@@ -133,8 +139,11 @@ function rideDown({ row, framesPerSecond }: Leg, mode: MaterialPopMode): Ride {
   const startLagTicksMost = sprayPresence.pops.startLagTicksMost
   sprayPresence.pops.startLagTicksMost = lagBefore
   const digest = stateDigest(readAuthorityState())
+  const allowed = rampAllowedSpeedsOf(reads)
+  const judgedAt = judgedIndicesOf(reads)
   return {
-    judged: judgedOf(reads),
+    judged: judgedAt.map((at) => reads[at]),
+    allowed: judgedAt.map((at) => allowed[at]),
     positions,
     digest,
     carvedTicks,
@@ -159,19 +168,39 @@ function notePopStarts(intake: PopIntake, starts: PopStart[]): void {
 const keyOf = ({ tx, ty }: { tx: number; ty: number }) => `${tx},${ty}`
 
 /** #570's judged ticks: open-gate ticks past the settle, a cave face left out and settled after. */
-function judgedOf(reads: readonly FaceRead[]): FaceRead[] {
+function judgedIndicesOf(reads: readonly FaceRead[]): number[] {
   let openTicks = 0
-  return reads.filter((read) => {
+  return reads.flatMap((read, at) => {
     openTicks = read.tick.authorityGate === 1 && !read.isFacingCave ? openTicks + 1 : 0
-    return openTicks > SETTLE_TICKS
+    return openTicks > SETTLE_TICKS ? [at] : []
+  })
+}
+
+/**
+ * The cut's speed as the gravity ramp lets the body have it on each tick (#724): `vCut`, or the
+ * speed the body had the tick before plus `a dt` at its centre, whichever is less.
+ */
+function rampAllowedSpeedsOf(reads: readonly FaceRead[]): number[] {
+  const { params } = readPlanetWorld()
+  if (params === null) throw new Error('the probe rides a generated planet')
+  return reads.map(({ tick }, at) => {
+    const before = at === 0 ? null : reads[at - 1].tick
+    const acceleration = downCutAccelerationAtPoint(
+      (before ?? tick).position,
+      params.radiusTiles,
+      params.gravityMultiplier,
+    )
+    return Math.min(
+      tick.read?.cutSpeed ?? 0,
+      (before?.speed ?? 0) + acceleration * PHYSICS_TIMESTEP,
+    )
   })
 }
 
 /** Cells/s the body delivered along its facing over the judged ticks, and that over the cut's. */
-function deliveredOf(judged: readonly FaceRead[]): { cellsPerSecond: number; perCut: number } {
-  const delivered = meanOf(judged.map((read) => read.tick.speed))
-  const cut = meanOf(judged.map((read) => read.tick.read?.cutSpeed ?? 0))
-  return { cellsPerSecond: delivered, perCut: delivered / cut }
+function deliveredOf(ride: Ride): { cellsPerSecond: number; perCut: number } {
+  const delivered = meanOf(ride.judged.map((read) => read.tick.speed))
+  return { cellsPerSecond: delivered, perCut: delivered / meanOf(ride.allowed) }
 }
 
 function meanOf(values: readonly number[]): number {
@@ -213,7 +242,7 @@ describe('material pop A beside B on the cut-face probe (ticket 617)', () => {
   it.each(LEGS.filter((leg) => leg.row.name === 'L20'))(
     `descends at least 0.891 of its cut speed in both modes, delivering the same cells/s, ${ROW}`,
     (leg) => {
-      const [a, b] = MODES.map((mode) => deliveredOf(rideOf(leg, mode).judged))
+      const [a, b] = MODES.map((mode) => deliveredOf(rideOf(leg, mode)))
       console.info(
         `L20 at ${leg.framesPerSecond} frames/s: ${a.cellsPerSecond.toFixed(2)} cells/s, descent/cut ${a.perCut.toFixed(3)}`,
       )

@@ -28,7 +28,12 @@ function runMotion(
   maxSpeed?: number,
 ): MotionStep {
   const up = localUpOf(position, { x: 0, y: 1 })
-  let step: MotionStep = { velocity: { x: 0, y: 0 }, isDriving: false, isThrusting: false }
+  let step: MotionStep = {
+    velocity: { x: 0, y: 0 },
+    isDriving: false,
+    isThrusting: false,
+    isGravityLimited: false,
+  }
   for (let index = 0; index < steps; index++) {
     step = stepVehicleMotion({
       velocity: step.velocity,

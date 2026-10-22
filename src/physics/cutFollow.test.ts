@@ -97,10 +97,12 @@ function playScript(
       loop.step(stepped, intent)
       stepped.stepWorld()
     })
-  // The Sell bay is the pad's west end (#170), so off the pad is to the left.
+  // The Sell bay is the pad's west end (#170), so off the pad is to the left. The shaft takes
+  // 3.7 s since the gravity ramp (#724) slowed its start: about the depth 3 s reached before, so
+  // the level leg still runs through the same ground.
   return {
     offPad: hold(buildIntent(['aim_left']), 2),
-    down: hold(buildIntent(['aim_down']), 3),
+    down: hold(buildIntent(['aim_down']), 3.7),
     level: hold(buildIntent(['aim_left']), 3),
     release: hold(IDLE_INTENT, 0.5),
     back: hold(buildIntent(['aim_right']), 0.4),

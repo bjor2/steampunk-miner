@@ -41,7 +41,17 @@ type Leg = 'down' | 'level' | 'up'
 interface HeldRig {
   levels: Record<string, number>
   legs: readonly Leg[]
+  /** Seconds its shaft takes; 3 by default. */
+  downSeconds?: number
 }
+
+/**
+ * Since Bjor's ruling on #724 a cut down gains its speed only as fast as gravity pulls: from rest on
+ * planet 1, rig 1's 75.7 m/s takes some 6.3 s and 239 m, so its shaft never holds the drill's speed
+ * there, and is not judged. It is dug for about as deep as the 3 s shaft went before the ramp
+ * (some 227 m), so its level and up legs cut the same ground as they did.
+ */
+const RIG_1_DOWN_SECONDS = 6.1
 
 /**
  * Since the per-purchase drill of #552 the rigs hold purchases: 11 (13.3 m/s, the nearest to the old
@@ -71,7 +81,8 @@ const RIGS: Readonly<Record<string, HeldRig>> = {
   },
   '44 m/s (rig 1, #400)': {
     levels: { drill_power: 19, drill_tip: 200, cargo_hold: HOLD_NEVER_FULL },
-    legs: ['down', 'up'],
+    legs: ['up'],
+    downSeconds: RIG_1_DOWN_SECONDS,
   },
 }
 const FRAME_RATES = [30, 144]
@@ -122,24 +133,30 @@ afterEach(() => uninstallRunLog())
  * frames.
  */
 function playScript(
-  levels: Record<string, number>,
+  { levels, downSeconds = 3 }: HeldRig,
   framesPerSecond: number,
 ): Record<Leg, TickRead[]> {
   const rig = createRig(RAPIER, levels, framesPerSecond)
   const ticks = (seconds: number) => Math.round(seconds / PHYSICS_TIMESTEP)
   // The Sell bay is the pad's west end (#170), so off the pad is to the left.
   rig.hold(buildIntent(['aim_left']), ticks(2))
-  const down = rig.hold(buildIntent(['aim_down']), ticks(3))
+  const down = rig.hold(buildIntent(['aim_down']), ticks(downSeconds))
   const level = rig.hold(buildIntent(['aim_left']), ticks(3))
   return { down, level, up: rig.hold(buildIntent(['lift']), ticks(2)) }
 }
 
-/** The ramp long done: cutting at one drill speed from `CUT_FOLLOW_TICKS` + 2 before to the next. */
+/**
+ * The ramp long done: cutting at one drill speed from `CUT_FOLLOW_TICKS` + 2 before to the next,
+ * and down a cut no longer gaining it under gravity (Bjor's ruling on #724), so the body is judged
+ * against the drill's speed only once it may hold it.
+ */
 function isRampedCut(ticks: readonly TickRead[], at: number): boolean {
   if (at < CUT_FOLLOW_TICKS + 2 || at + 1 >= ticks.length) return false
   const around = ticks.slice(at - CUT_FOLLOW_TICKS - 2, at + 2)
   const speed = ticks[at].read?.cutSpeed
-  return around.every(({ result, read }) => result.isCutting && read?.cutSpeed === speed)
+  return around.every(
+    ({ result, read }) => result.isCutting && !result.isGravityLimited && read?.cutSpeed === speed,
+  )
 }
 
 /** The tick crossed into another cell, the ramp long done and the drill's speed unchanged round it. */
@@ -221,12 +238,10 @@ function judgeLegAcrossBoundaries(leg: string, ticks: readonly TickRead[]): void
 }
 
 /** Plays the rig at both frame rates and judges each leg it holds. */
-function judgeRig(
-  { levels, legs }: HeldRig,
-  judge: (leg: string, ticks: readonly TickRead[]) => void,
-): void {
+function judgeRig(rig: HeldRig, judge: (leg: string, ticks: readonly TickRead[]) => void): void {
   for (const framesPerSecond of FRAME_RATES) {
-    const run = playScript(levels, framesPerSecond)
+    const run = playScript(rig, framesPerSecond)
+    const { legs } = rig
     for (const leg of legs) judge(`${framesPerSecond} frames/s ${leg}`, run[leg])
   }
 }
@@ -259,6 +274,10 @@ describe('continuous cut-follow (tickets 400, 397, 421, 432)', () => {
   )
 
   it.todo(
+    "rig 1 (75.7 m/s) holds the drill's speed down its shaft on a planet deep enough for the gravity ramp (#724: from rest on planet 1 it reaches it only some 239 m down)",
+  )
+
+  it.todo(
     'the 78 m/s and 3600 m/s rigs and a 300 m/s rig on a large planet vary their speed by at most 5% across cell boundaries, and never end a tick inside solid ground (#439: the swept carve clears a body-wide bore at any cells a tick)',
   )
 
@@ -266,7 +285,7 @@ describe('continuous cut-follow (tickets 400, 397, 421, 432)', () => {
     '%s rig: never ends a tick inside solid ground, and steps alike at 30 and 144 frames/s',
     (rig) => {
       const paths = FRAME_RATES.map((framesPerSecond) => {
-        const run = playScript(RIGS[rig].levels, framesPerSecond)
+        const run = playScript(RIGS[rig], framesPerSecond)
         const ticks = [...run.down, ...run.level, ...run.up]
         expect(ticks.filter((tick) => tick.isInsideGround)).toEqual([])
         return ticks.map(({ position }) => position)

@@ -148,6 +148,11 @@ interface Frame {
   up: { x: number; y: number }
   facing: Facing
   heading: { x: number; y: number }
+  /**
+   * The velocity its reports give, mm/s: the stride's down a down track, so a cut down's front
+   * ramps from the speed the rig moves at (#724), and none on a level one, as before.
+   */
+  velocity: { vx: number; vy: number }
 }
 
 function frameOf(track: SlabTrack): Frame {
@@ -159,7 +164,21 @@ function frameOf(track: SlabTrack): Frame {
     y: Math.round((up.y * at.up + right.y * at.right) / UP_VECTOR_SCALE),
   }
   const facing = track.section === 'level' ? FACING.right : FACING.down
-  return { start, up, facing, heading: facingVectorOf(up.x, up.y, facing) }
+  const heading = facingVectorOf(up.x, up.y, facing)
+  return { start, up, facing, heading, velocity: reportedVelocityOf(track, facing, heading) }
+}
+
+function reportedVelocityOf(
+  track: SlabTrack,
+  facing: Facing,
+  heading: { x: number; y: number },
+): { vx: number; vy: number } {
+  if (facing !== FACING.down) return { vx: 0, vy: 0 }
+  const mmPerSecond = track.strideMm * TICKS_PER_SECOND
+  return {
+    vx: Math.round((heading.x * mmPerSecond) / UP_VECTOR_SCALE),
+    vy: Math.round((heading.y * mmPerSecond) / UP_VECTOR_SCALE),
+  }
 }
 
 /** The ticks the track lasts at its stride: at least 1. */
@@ -228,8 +247,7 @@ function reportOf(
     payload: {
       x: at.x,
       y: at.y,
-      vx: 0,
-      vy: 0,
+      ...frame.velocity,
       upx: frame.up.x,
       upy: frame.up.y,
       facing: frame.facing,

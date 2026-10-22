@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest'
+import { TICKS_PER_SECOND } from '../../constants/physics'
 import {
   CUT_FACE_MARGIN_MM,
   DRILL_STAMP_OFFSET_MM,
@@ -375,7 +376,10 @@ describe('drill step yield per metre (ticket 330, Vertical Scaler)', () => {
       const y = top.y - mmPerTick * tick
       if (isStepped) session.submit(tick, stepTo(top.x, y + REACH_GAIN_MM))
       if (tick % 12 !== 0) continue
-      session.submit(tick, { type: 'reportPose', payload: { ...payload, x: top.x, y } })
+      // The report says how fast the body descends, as the client's does: a cut down's front
+      // ramps from the reported speed (#724).
+      const vy = -mmPerTick * TICKS_PER_SECOND
+      session.submit(tick, { type: 'reportPose', payload: { ...payload, x: top.x, y, vy } })
       session.submit(tick, { type: 'debug.setEnergy', payload: { energy: '150' } })
     }
     const events = session.events()

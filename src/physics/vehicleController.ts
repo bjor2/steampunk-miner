@@ -45,7 +45,7 @@ import { cutMemoryAfter, FRESH_CUT_MEMORY, type CutMemory } from '../systems/veh
 import { dot, localUpOf, type Vector2 } from '../systems/vehicle/localFrame'
 import type { ActionFlags } from '../systems/vehicle/poseReport'
 import { quantisePose } from '../systems/vehicle/poseReport'
-import { gravityAt } from '../systems/vehicle/radialGravity'
+import { downCutAccelerationAtPoint, gravityAt } from '../systems/vehicle/radialGravity'
 import { IDLE_INTENT, type VehicleIntent } from '../systems/vehicle/vehicleIntent'
 import {
   isInputLocked,
@@ -130,6 +130,8 @@ export interface VehicleStepResult {
   isWaitingForCut: boolean
   /** The cut gate was open: the drill set the speed along the facing (ticket 333). */
   isCutting: boolean
+  /** The gravity ramp held the cut down below the drill's speed this step (#724). */
+  isGravityLimited: boolean
 }
 
 export interface VehicleController {
@@ -269,6 +271,11 @@ export function createVehicleController(
         cutFollow,
         maxSpeed: maxSpeedFor(input, cutRead),
         depthToCentre: dot(position, up),
+        downCutAcceleration: downCutAccelerationAtPoint(
+          position,
+          planet.radiusTiles,
+          planet.gravityMultiplier,
+        ),
       })
       const sweep = sweepGroundOf(planet.ground, position, isGateOpen ? pose : null)
       const planned = plannedTickOf(motion.velocity, PHYSICS_TIMESTEP, sweep)
@@ -279,6 +286,7 @@ export function createVehicleController(
         pose,
         isWaitingForCut,
         isCutting: isGateOpen,
+        isGravityLimited: motion.isGravityLimited,
       }
     },
     syncGround: holdPlanet,

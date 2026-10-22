@@ -41,6 +41,13 @@ export const BASE_GRAVITY = 12
 /** Gravity grows linearly from the centre up to this share of the radius (#4: `min(1, r/0.1R)`). */
 export const GRAVITY_FULL_FROM_RADIUS_SHARE = 0.1
 
+/**
+ * A cut down gains speed no faster than local gravity, and near the core no slower than this share
+ * of the planet's surface gravity (Bjor's ruling on #724: "a 0.1 g core floor"), so the core never
+ * stalls a dig.
+ */
+export const DOWN_CUT_GRAVITY_FLOOR_SHARE = 0.1
+
 /** Below 1 m from the centre `localUp` keeps its last value (#7). */
 export const LOCAL_UP_MIN_RADIUS = 1
 

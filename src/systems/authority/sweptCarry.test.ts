@@ -24,6 +24,7 @@ import { coreTiles, createScriptedSession, FREEZE_ENEMIES, poseAbove } from './s
 import { drillAlongSweep, type SweptStep } from './sweptDrill'
 import { coreSweep, ELECTRIFIED, fullHoldSweep, PREFILLED, sweepWith } from './sweptSpanFixtures'
 import { drillAlongSpan } from './sweptSpanDrill'
+import { movingDownAtCutSpeed } from './sweptRigFixtures'
 
 // The exact drill carry through the authority (ticket 399, the TD ruling on #399): a tick's work
 // and the cursor's carry pay the cells the stamp's centre crosses, so over a column the cut takes
@@ -47,7 +48,12 @@ function rigInColumn(levels: Record<string, number>, energy: string, planetIndex
   const params = planetParamsOf(session.state().planet) as PlanetParams
   const y = (surfaceRowOfColumn(COLUMN, params.radiusTiles) - 40) * 1000 + 500
   const { payload } = poseAbove({ tx: 0, ty: 0 }, FACING.down)
-  session.submit(0, { type: 'reportPose', payload: { ...payload, x: COLUMN * 1000 + 500, y } })
+  // Already cutting down at the law's speed (#724: from rest the ramp would set the pace).
+  const moving = movingDownAtCutSpeed(session.state(), payload)
+  session.submit(0, {
+    type: 'reportPose',
+    payload: { ...payload, x: COLUMN * 1000 + 500, y, ...moving },
+  })
   const state = session.state()
   return { state, params, top: vehicleOf(state, 'p1').pose as VehiclePose }
 }

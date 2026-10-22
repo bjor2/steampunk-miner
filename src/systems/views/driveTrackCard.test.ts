@@ -55,8 +55,10 @@ describe('drive track card (ticket 723)', () => {
     expect(typesOf(events)).toContain('UpgradePurchased')
   })
 
-  it('says under the drill power card that a sideways cut is capped by drive speed', () => {
-    expect(drillCutCapNote()).toBe('Sideways capped by drive speed.')
+  it('says under the drill power card that a sideways cut is capped by drive speed and a cut down ramps with gravity', () => {
+    expect(drillCutCapNote()).toBe(
+      'Sideways capped by drive speed. Downward ramp follows local gravity.',
+    )
     expect(rowOf({}, 'drill_power').note).toBe(drillCutCapNote())
   })
 })

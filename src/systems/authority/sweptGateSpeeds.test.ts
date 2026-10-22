@@ -11,6 +11,7 @@ import { EMPTY_WORLD } from '../world/worldState'
 import type { AuthorityState } from './authorityState'
 import { vehicleOf } from './authorityState'
 import { createScriptedSession, PARAMS, poseAbove, surfaceOreTiles } from './scriptedSession'
+import { movingDownAtCutSpeed } from './sweptRigFixtures'
 import type { RuleEffect } from './commandRule'
 import { drillAlongSweep, type SweptStep } from './sweptDrill'
 import { drillAlongSpan } from './sweptSpanDrill'
@@ -82,7 +83,9 @@ function sweepDownAt(cut: SweepCut, speed: number): AuthorityState {
   })
   session.submit(0, { type: 'debug.setEnergy', payload: { energy: '100000' } })
   const { payload } = poseAbove({ tx: 0, ty: 0 }, FACING.down)
-  session.submit(0, { type: 'reportPose', payload: { ...payload, ...ABOVE } })
+  // Already cutting down at the law's speed (#724: from rest the gravity ramp would set the pace).
+  const moving = movingDownAtCutSpeed(session.state(), payload)
+  session.submit(0, { type: 'reportPose', payload: { ...payload, ...ABOVE, ...moving } })
   const stepMm = Math.round((speed * MM_PER_METRE) / TICKS_PER_SECOND)
   // The first step rests at the start, so every later one continues its cursor's sweep.
   let state = sweepOneTick(cut, { ...session.state(), tick: 1 }, ABOVE.y)

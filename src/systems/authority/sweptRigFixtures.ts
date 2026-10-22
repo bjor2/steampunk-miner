@@ -9,7 +9,12 @@
  * planet 1 in about 5 ticks).
  */
 import { DRILL_SUBSTEPS_PER_TICK, STEP_BOUND_TOLERANCE_MM } from '../../constants/balance'
-import { MM_PER_METRE, UP_VECTOR_SCALE, VEHICLE_COLLIDER_SIZE } from '../../constants/physics'
+import {
+  MM_PER_METRE,
+  TICKS_PER_SECOND,
+  UP_VECTOR_SCALE,
+  VEHICLE_COLLIDER_SIZE,
+} from '../../constants/physics'
 import { blockHardness } from '../economy/oreEconomy'
 import { startLevels, vehicleStatsAt } from '../economy/vehicleStats'
 import { NO_DRIVE } from '../vehicle/driveSigns'
@@ -200,7 +205,11 @@ export function cutLeg(cut: LegCut): LegRun {
   return { start, ticks, bodyAlongMm }
 }
 
-/** Player `p1` reported at the leg's start with the rig's drill, a deep hold and a full tank. */
+/**
+ * Player `p1` reported at the leg's start with the rig's drill, a deep hold and a full tank, already
+ * moving down the leg at the law's cut speed: a rig named by its speed is at it, where from rest the
+ * cut down gains its speed only as fast as gravity lets the body (Bjor's ruling on #724).
+ */
 function armedRigStart(
   drillStep: number,
   { leg, startTick: tick = 1, upgrades: over, prepare = [] }: LegCut,
@@ -214,10 +223,35 @@ function armedRigStart(
   }
   session.submit(tick, { type: 'debug.setEnergy', payload: { energy: '1000000000' } })
   const { payload } = poseAbove({ tx: 0, ty: 0 }, FACING.down)
-  const pose = { ...payload, x: leg.start.xMm, y: leg.start.yMm, upx: leg.upx, upy: leg.upy }
-  session.submit(tick, { type: 'reportPose', payload: pose })
+  const at = { x: leg.start.xMm, y: leg.start.yMm, upx: leg.upx, upy: leg.upy }
+  const moving = movingDownAtCutSpeed(session.state(), leg)
+  session.submit(tick, { type: 'reportPose', payload: { ...payload, ...at, ...moving } })
   for (const intent of prepare) session.submit(tick, intent)
   return session.state()
+}
+
+/**
+ * A reported velocity down `up` at the law's cut speed where `p1` stands, whole mm/s: the running
+ * start a spec's rig cutting down at its speed reports (Bjor's ruling on #724), since from rest a
+ * cut down gains its speed only as fast as gravity lets the body.
+ */
+export function movingDownAtCutSpeed(
+  state: AuthorityState,
+  up: { upx: number; upy: number },
+): { vx: number; vy: number } {
+  return movingDownAt(up, cutStepMmAt(state) * TICKS_PER_SECOND)
+}
+
+/** A velocity down `up`, `mmPerSecond` along it, in whole mm/s. */
+export function movingDownAt(
+  { upx, upy }: { upx: number; upy: number },
+  mmPerSecond: number,
+): { vx: number; vy: number } {
+  const down = facingVectorOf(upx, upy, FACING.down)
+  return {
+    vx: Math.round((down.x * mmPerSecond) / UP_VECTOR_SCALE),
+    vy: Math.round((down.y * mmPerSecond) / UP_VECTOR_SCALE),
+  }
 }
 
 /**

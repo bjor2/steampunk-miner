@@ -36,7 +36,12 @@ interface RunOptions {
 /** The motion rule for `steps` fixed steps from rest, the effects folded at tick 0. */
 function run(steps: number, options: RunOptions = {}): MotionStep {
   const { intent = IDLE_INTENT, effects = null, canAct = true, gravity = GRAVITY } = options
-  let step: MotionStep = { velocity: { x: 0, y: 0 }, isDriving: false, isThrusting: false }
+  let step: MotionStep = {
+    velocity: { x: 0, y: 0 },
+    isDriving: false,
+    isThrusting: false,
+    isGravityLimited: false,
+  }
   for (let index = 0; index < steps; index++) {
     const input: MotionStepInput = {
       velocity: step.velocity,

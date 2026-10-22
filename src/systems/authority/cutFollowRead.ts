@@ -11,7 +11,8 @@
  *   leaves travel to set the speed, and says so (`isSlabClear`), so a motor mid-cut may keep its
  *   last `vCut` instead (ticket 430); one with no uncut cell the drill may cut gives 0, so the body
  *   waits; a sideways cut, and its front, never pass the drive's top speed (Bjor's ruling on #723,
- *   `vehicle/cutCapSpeed.ts`), while a cut down or up keeps the drill's alone;
+ *   `vehicle/cutCapSpeed.ts`), while a cut down or up keeps the drill's alone, a cut down's front
+ *   gaining it no faster than local gravity lets the body (Bjor's ruling on #724);
  * - while it is shut, whether the slab the drill bites holds such a cell (`isSpanStopped`), so a
  *   body coasting on its last `vCut` stops at once there (ticket 430).
  *
@@ -41,6 +42,7 @@ import type { PlanetParams } from '../world/planetParams'
 import type { TilePoint } from '../world/tileGrid'
 import { materialCellAt } from '../world/worldState'
 import { vehicleOf, type AuthorityState } from './authorityState'
+import { gravityRampedFrontStepMmAt } from './downCutFront'
 import { openDrillGates } from './drillGates'
 import { subStepClockOf } from './groundDrill'
 import { heatThrottledDrill } from './heatRules'
@@ -119,7 +121,9 @@ function slabReadOf(state: AuthorityState, playerId: string, step: CutFollowStep
  * bound; the bound itself over a slab with nothing left to cut; 0 when it can cut none there. A
  * cell it cannot cut stops the walk where the front meets it. Sideways, never past the drive's top
  * speed either (ticket 723). It reads the drill and the engine, never the body's speed, so physics
- * jitter cannot shrink the front.
+ * jitter cannot shrink the front; only a cut down reads the body's last step, as gravity holds the
+ * body's gain of speed there and the front may lead it by one tick of that gain (#724,
+ * `downCutFront.ts`).
  */
 export function frontStepMmAt(
   state: AuthorityState,
@@ -128,11 +132,12 @@ export function frontStepMmAt(
 ): number {
   const read = slabReadOf(state, playerId, step)
   if (read === null) return 0
-  return cappedCutStepMmOf(
+  const cappedMm = cappedCutStepMmOf(
     read.facing,
     uncappedFrontStepMmOf(state, playerId, read),
     driveSpeedOf(vehicleOf(state, playerId)),
   )
+  return gravityRampedFrontStepMmAt(state, playerId, read.params, step, cappedMm)
 }
 
 /** The front's step the drill alone allows, before the drive's sideways cap. */
