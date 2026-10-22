@@ -19,6 +19,7 @@
 import { COLLAPSE_ACTIVE_RADIUS_MM } from '../../../constants/balance'
 import { requiredCasingGrade } from '../../economy/casingGrades'
 import { tileOfMillimetres } from '../../vehicle/vehiclePose'
+import type { VehicleState } from '../../vehicle/vehicleState'
 import {
   blockCentreMm,
   blockIdOf,
@@ -139,14 +140,28 @@ export function forcedWeaknessOf(
   return { band, weakestGrade: 0, required: requiredCasingGrade(band) }
 }
 
-/** Every vehicle with a pose, in player id order. */
+/** Every vehicle with a pose, in player id order, where it last stood. */
 export function vehicleBodiesOf(state: AuthorityState): VehicleBody[] {
   return Object.keys(state.players)
     .sort()
     .flatMap((playerId) => {
-      const { pose } = state.players[playerId].vehicle
-      return pose === null ? [] : [{ playerId, centre: { xMm: pose.x, yMm: pose.y } }]
+      const centre = latestBodyCentreOf(state.players[playerId].vehicle)
+      return centre === null ? [] : [{ playerId, centre }]
     })
+}
+
+/**
+ * Where the body last stood: at its last drill step when one came after its last pose report
+ * (`sweptCut.ts` keeps the step's pose), else at the report. A report lags a moving body by up to
+ * twelve ticks, 1.2 m at a 6 m/s level cut, past the refill's clearance round it (ticket 662: the
+ * 1.2 m bore's narrow tunnel refilled round a body cutting on from its last report).
+ */
+function latestBodyCentreOf({ pose, sweptCut, accountedTick }: VehicleState): BodyCentre | null {
+  if (pose === null) return null
+  if (sweptCut !== undefined && sweptCut.tick > accountedTick) {
+    return { xMm: sweptCut.poseXMm, yMm: sweptCut.poseYMm }
+  }
+  return { xMm: pose.x, yMm: pose.y }
 }
 
 /** Sequence 1: every warning whose block no longer holds is cancelled. */
