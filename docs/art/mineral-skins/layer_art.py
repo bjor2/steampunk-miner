@@ -5,8 +5,9 @@ its slots 6 to 10, ticket 600 for its slots 11 to 15 and its relic signature, ti
 slots 1 to 5, ticket 602 for its slots 6 to 10, ticket 603 for its slots 11 to 15 and its signature
 material, ticket 604 for P5's slots 1 to 5, ticket 605 for its slots 6 to 10, ticket 606 for its slots
 11 to 15 and its signature material, ticket 595 for P2's slots 1 to 5, ticket 596 for its slots 6 to
-9, ticket 597 for its slots 10 to 12): one per layer id of `mineralSkins.json`. A layer id with no
-recipe fails, never falls back.
+9, ticket 597 for its slots 10 to 12, ticket 710 for its slots 13 to 15, the pool's own kinds of
+ticket 709): one per layer id of `mineralSkins.json`. A layer id with no recipe fails, never falls
+back.
 
 - `base` and `sheen` are seamless textures on the 1 m cell: an emission material on a 1 m quad
   whose value is the ramp coordinate (base, mean about 0.5) or the highlight strength (sheen,
@@ -53,6 +54,15 @@ STAR_DOMES = (((-0.15, 0.13), 0.11), ((0.16, -0.02), 0.12), ((-0.07, -0.2), 0.08
 # P2 batch 3 (ticket 597): the star garnets' centres and radii, shared by the vein and its sheen.
 STAR_GARNETS = (((-0.17, 0.15), 0.1), ((0.13, 0.17), 0.085), ((0.03, -0.05), 0.115), ((-0.2, -0.19), 0.08),
                 ((0.22, -0.2), 0.07))
+# P2 batch 4 (ticket 710): the layouts a vein and its sheen share, so the light sits on the stone.
+# Cinnabar's clumps of tablets: centre and reach. Aquamarine's crossed prisms: centre, the turn of
+# the prism's axis from up (about the depth axis), length and radius. Jet's teardrops: the head's
+# centre and radius, each hanging tail down.
+TABLET_CLUMPS = (((-0.17, 0.14), 0.13), ((0.15, 0.1), 0.11), ((-0.02, -0.17), 0.14))
+CROSSED_PRISMS = (((-0.04, 0.02), 1.15, 0.56, 0.05), ((0.08, -0.03), -0.5, 0.48, 0.042),
+                  ((-0.16, -0.14), 0.25, 0.3, 0.035))
+TEARDROPS = (((-0.2, 0.12), 0.065), ((0.06, 0.16), 0.055), ((0.22, -0.04), 0.06), ((-0.08, -0.14), 0.045),
+             ((0.12, -0.2), 0.04))
 # Centre, radius, teeth, phase: each wheel meshes with the one before it.
 GEAR_TRAIN = (((-0.1, 0.08), 0.19, 16, 0.0), ((0.118, -0.103), 0.12, 10, 0.2), ((0.236, 0.037), 0.08, 7, 0.1))
 TRELLIS_RODS = 2
@@ -1481,6 +1491,70 @@ def dial_of(graph):
     return {'radius': radius, 'x': x, 'y': y, 'marks': graph.math('MAXIMUM', ticks, circles)}
 
 
+def base_vermilion_breccia(graph):
+    """Cinnabar: a dense vermilion ore broken into angular fragments, each its own depth of red, set in a pale net of cement along the breaks."""
+    fragments = graph.voronoi(5, 5, seed=1001, randomness=0.9)
+    tone = graph.mul_add(graph.add('ShaderNodeSeparateColor', [(0, fragments['Color'])]).outputs[0], 0.34, 0.28)
+    grain = stretched(graph, graph.noise(60, 60, seed=1003, detail=4))
+    tone = graph.plus(tone, graph.mul(cement_net_of(graph), 0.38))
+    return graph.plus(tone, graph.mul(graph.minus(grain, 0.5), 0.12))
+
+
+def cement_net_of(graph):
+    """1 on the pale cement between the breccia's fragments, 0 inside them: the net the breccia gleam glosses."""
+    edge = graph.voronoi(5, 5, seed=1001, randomness=0.9, feature='DISTANCE_TO_EDGE')['Distance']
+    waver = graph.mul(graph.minus(graph.noise(12, 12, seed=1002, detail=2), 0.5), 0.03)
+    return graph.smooth(graph.plus(edge, waver), 0.05, 0.015)
+
+
+def base_watered_ripples(graph):
+    """Aquamarine: clear pale beryl watered like silk, slow level ripples swelling and pinching across fine striations that run up the prism, a faint cloud of depth."""
+    striae = stretched(graph, graph.noise(36, 3, seed=1013, detail=3))
+    cloud = stretched(graph, graph.noise(3, 3, seed=1014, detail=3, roughness=0.45))
+    tone = graph.mul_add(watered_ripples_of(graph), 0.36, 0.3)
+    tone = graph.plus(tone, graph.mul(graph.minus(striae, 0.5), 0.14))
+    return graph.plus(tone, graph.mul(graph.minus(cloud, 0.5), 0.12))
+
+
+WATERED_BANDS = 4
+
+
+def watered_ripples_of(graph):
+    """
+    The watered bands: two sets of level waves, whole numbers of bands up the cell so they repeat,
+    each bent by its own slow warp, beating against each other so the bands swell and pinch like
+    watered silk. 1 on a crest, 0 in a trough.
+    """
+    first_warp = graph.mul(graph.minus(graph.noise(2, 2, seed=1011, detail=2), 0.5), 0.5)
+    second_warp = graph.mul(graph.minus(graph.noise(2, 2, seed=1012, detail=2), 0.5), 0.3)
+    first = graph.math('SINE', graph.mul(graph.plus(graph.v, first_warp), WATERED_BANDS * math.tau))
+    second = graph.math('SINE', graph.mul(graph.plus(graph.v, second_warp), (WATERED_BANDS + 1) * math.tau))
+    return graph.mul_add(graph.plus(first, second), 0.25, 0.5)
+
+
+def base_scalloped_jet(graph):
+    """Jet: a dark even body broken along broad conchoidal scallops, each scoop its own shade and lifted toward its middle, a crisp break between, faint woody grain through it."""
+    scallops = jet_scallops_of(graph)
+    grain = stretched(graph, graph.noise(2, 24, seed=1024, detail=2))
+    # Jet is the planet's black: the body sits under the slot's luma, so the polish alone lifts it.
+    tone = graph.mul_add(scallops['tone'], 0.26, 0.24)
+    tone = graph.plus(tone, graph.mul(scallops['scoop'], 0.14))
+    tone = graph.minus(tone, graph.mul(scallops['break'], 0.2))
+    return graph.plus(tone, graph.mul(graph.minus(grain, 0.5), 0.07))
+
+
+def jet_scallops_of(graph):
+    """
+    Per pixel of jet's scallops, three or so across the cell: its scoop's `tone` and `pick` (one
+    each per scoop), how far into the scoop it sits (`scoop`, 1 at the middle) and the `break`
+    line between scoops.
+    """
+    cells = graph.voronoi(3, 3, seed=1021)
+    edge = graph.voronoi(3, 3, seed=1021, feature='DISTANCE_TO_EDGE')['Distance']
+    colour = graph.add('ShaderNodeSeparateColor', [(0, cells['Color'])]).outputs
+    return {'tone': colour[0], 'pick': colour[1], 'scoop': graph.smooth(edge, 0.0, 0.5), 'break': graph.smooth(edge, 0.02, 0.0)}
+
+
 # --- sheen: the lustre's highlights -----------------------------------------------------------------
 
 
@@ -2107,6 +2181,47 @@ def sheen_dial_glaze(graph):
     sweep = graph.smooth(graph.math('ABSOLUTE', graph.plus(graph.minus(dial['x'], dial['y']), 0.1)), 0.14, 0.04)
     crazing = graph.smooth(graph.voronoi(9, 9, seed=851, feature='DISTANCE_TO_EDGE')['Distance'], 0.02, 0.005)
     return graph.mul(face, graph.plus(graph.mul(sweep, 0.5), graph.mul(crazing, 0.25)))
+
+
+def sheen_breccia_gleam(graph):
+    """Breccia gleam (cinnabar): the pale cement net glossed where it meets the lamp, a soft adamantine bloom over each clump of tablets with hard glints in it, the red mass itself dull."""
+    gloss = graph.mul(cement_net_of(graph), graph.smooth(stretched(graph, graph.noise(3, 3, seed=1004, detail=2)), 0.4, 0.75))
+    glints = sprinkled(graph, 24, 1005, 0.3, 0.45)
+    light = graph.mul(gloss, 0.3)
+    for (cx, cz), reach in TABLET_CLUMPS:
+        x, y = graph.minus(graph.u, cx + 0.5), graph.minus(graph.v, cz + 0.5)
+        inside = graph.smooth(graph.math('SQRT', graph.plus(graph.mul(x, x), graph.mul(y, y))), reach * 1.15, reach * 0.5)
+        light = graph.math('MAXIMUM', light, graph.mul(inside, graph.mul_add(glints, 0.7, 0.22)))
+    return light
+
+
+def sheen_prism_bars(graph):
+    """Prism bars (aquamarine): a hard bar of light down the lit face of each prism, stopping short of its ends, and a soft vitreous gleam riding the watered crests between."""
+    light = graph.mul(graph.smooth(watered_ripples_of(graph), 0.7, 0.95), 0.16)
+    for (cx, cz), angle, length, radius in CROSSED_PRISMS:
+        x, y = graph.minus(graph.u, cx + 0.5), graph.minus(graph.v, cz + 0.5)
+        along = graph.plus(graph.mul(x, math.sin(angle)), graph.mul(y, math.cos(angle)))
+        across = graph.minus(graph.mul(x, math.cos(angle)), graph.mul(y, math.sin(angle)))
+        # The bar sits a little off the axis, on the face turned to the lamp, a third of the prism wide.
+        bar = graph.smooth(graph.math('ABSOLUTE', graph.plus(across, radius * 0.35)), radius * 0.3, radius * 0.1)
+        within = graph.smooth(graph.math('ABSOLUTE', along), length * 0.47, length * 0.42)
+        light = graph.math('MAXIMUM', light, graph.mul(graph.mul(bar, within), 0.75))
+    return light
+
+
+def sheen_mirror_polish(graph):
+    """Mirror polish (jet): one broad glare where the polished face throws the lamp back, a bright lip along the breaks of the scoops that face it, and a hard window on every teardrop."""
+    scallops = jet_scallops_of(graph)
+    glare = graph.smooth(stretched(graph, graph.noise(3, 3, seed=1025, detail=2)), 0.68, 0.92)
+    edge = graph.voronoi(3, 3, seed=1021, feature='DISTANCE_TO_EDGE')['Distance']
+    lip = graph.mul(graph.smooth(edge, 0.05, 0.02), graph.smooth(scallops['pick'], 0.6, 0.66))
+    light = graph.plus(graph.mul(glare, 0.5), graph.mul(lip, 0.3))
+    for (cx, cz), radius in TEARDROPS:
+        # The window sits up and to the left of the head's middle, where the lamp strikes a bead.
+        x, y = graph.minus(graph.u, cx + 0.5 - radius * 0.3), graph.minus(graph.v, cz + 0.5 + radius * 0.3)
+        reach = graph.math('SQRT', graph.plus(graph.mul(x, x), graph.mul(y, y)))
+        light = graph.math('MAXIMUM', light, graph.mul(graph.smooth(reach, radius * 0.42, radius * 0.18), 0.9))
+    return light
 
 
 # --- vein: the crystal or vein shape, by the row's silhouette ----------------------------------------
@@ -3553,6 +3668,53 @@ def gold_bead(name, at, radius):
     return shapes.add_icosphere(name, radius, (at[0], at[1] - radius * 0.3, at[2]), subdivisions=2, scale=(1.0, 0.7, 1.0))
 
 
+def vein_tablet_clumps(rng, body):
+    """Cinnabar: three clumps of thick six-sided tablets heaped on one another, each tablet tipped its own way, a few loose tablets lying off the heaps."""
+    marks = []
+    for i, ((cx, cz), reach) in enumerate(TABLET_CLUMPS):
+        for k, (dx, dz) in enumerate(shapes.scatter_positions(rng, 5, reach * 0.55, reach * 0.3)):
+            radius = rng.uniform(0.035, 0.055)
+            # Euler XYZ: the quarter turn about X lays the tablet on the face, Y spins it, X and Z tip it.
+            tilt = (math.pi / 2 + rng.uniform(-0.45, 0.45), rng.uniform(0, math.tau), rng.uniform(-0.45, 0.45))
+            tablet = shapes.add_prism('tablet-%d-%d' % (i, k), radius, radius * 0.5, (cx + dx, -0.008 - 0.012 * k, cz + dz), rotation=tilt)
+            shapes.bevel(tablet, radius * 0.08, segments=1)
+            marks.append(tablet)
+    for i, (x, z) in enumerate(shapes.scatter_positions(rng, 4, 0.3, 0.12)):
+        if any(math.dist((x, z), centre) < reach * 1.3 for centre, reach in TABLET_CLUMPS):
+            continue
+        radius = rng.uniform(0.02, 0.03)
+        tilt = (math.pi / 2 + rng.uniform(-0.3, 0.3), rng.uniform(0, math.tau), rng.uniform(-0.3, 0.3))
+        marks.append(shapes.add_prism('loose-%d' % i, radius, radius * 0.5, (x, -0.006, z), rotation=tilt))
+    return assign_all(marks, body)
+
+
+def vein_crossed_prisms(rng, body):
+    """Aquamarine: three long six-sided prisms lying across one another on the face, flat-ended, each tipped a little so an end face shows."""
+    marks = []
+    for i, ((cx, cz), angle, length, radius) in enumerate(CROSSED_PRISMS):
+        # Euler XYZ: the small turn about X tips the end toward the camera, the turn about Y lays the axis along `angle`.
+        prism = shapes.add_prism('prism-%d' % i, radius, length, (cx, -radius * 0.45 - 0.02 * i, cz),
+                                 rotation=(0.3 + rng.uniform(-0.05, 0.05), angle, 0.0))
+        shapes.bevel(prism, radius * 0.08, segments=1)
+        marks.append(prism)
+    return assign_all(marks, body)
+
+
+def vein_teardrop_beads(rng, body):
+    """Jet: polished teardrop beads hanging on the face, each a round head drawn down to a point, three large and two small."""
+    marks = []
+    for i, ((x, z), size) in enumerate(TEARDROPS):
+        angle = -math.pi / 2 + rng.uniform(-0.25, 0.25)
+        head = shapes.add_icosphere('head-%d' % i, size, (x, -size * 0.45, z), subdivisions=3, scale=(1.0, 0.7, 1.0))
+        reach = size * 1.1
+        tip_at = (x + math.cos(angle) * reach, -size * 0.4, z + math.sin(angle) * reach)
+        tail = shapes.add_cone('tail-%d' % i, size * 0.88, size * 2.0, tip_at, rotation=(0.0, math.pi / 2 - angle, 0.0), sides=16)
+        tail.scale = (1.0, 0.7, 1.0)
+        shapes.shade_smooth(tail)
+        marks += [head, tail]
+    return assign_all(marks, body)
+
+
 def assign_all(marks, material):
     for mark in marks:
         shapes.assign(mark, material)
@@ -3632,6 +3794,9 @@ BASES = {
     'molten-pour': base_molten_pour,
     'hearth-zones': base_hearth_zones,
     'enamel-dial': base_enamel_dial,
+    'vermilion-breccia': base_vermilion_breccia,
+    'watered-ripples': base_watered_ripples,
+    'scalloped-jet': base_scalloped_jet,
 }
 SHEENS = {
     'earthy': sheen_earthy,
@@ -3706,6 +3871,9 @@ SHEENS = {
     'molten-sheen': sheen_molten_sheen,
     'ruby-fire': sheen_ruby_fire,
     'dial-glaze': sheen_dial_glaze,
+    'breccia-gleam': sheen_breccia_gleam,
+    'prism-bars': sheen_prism_bars,
+    'mirror-polish': sheen_mirror_polish,
 }
 VEINS = {
     'nugget-cluster': vein_nugget_cluster,
@@ -3780,6 +3948,9 @@ VEINS = {
     'gold-blooms': vein_gold_blooms,
     'heart-crystals': vein_heart_crystals,
     'escapement': vein_escapement,
+    'tablet-clumps': vein_tablet_clumps,
+    'crossed-prisms': vein_crossed_prisms,
+    'teardrop-beads': vein_teardrop_beads,
 }
 RECIPES = {'base': BASES, 'vein': VEINS, 'sheen': SHEENS}
 

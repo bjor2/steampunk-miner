@@ -508,6 +508,27 @@
       "wornBy": ["p5-signature"]
     },
     {
+      "kind": "base",
+      "id": "vermilion-breccia",
+      "cell": "cells/base/vermilion-breccia.png",
+      "blend": "blend/base-vermilion-breccia.blend",
+      "wornBy": ["p2-u5"]
+    },
+    {
+      "kind": "base",
+      "id": "watered-ripples",
+      "cell": "cells/base/watered-ripples.png",
+      "blend": "blend/base-watered-ripples.blend",
+      "wornBy": ["p2-r4"]
+    },
+    {
+      "kind": "base",
+      "id": "scalloped-jet",
+      "cell": "cells/base/scalloped-jet.png",
+      "blend": "blend/base-scalloped-jet.blend",
+      "wornBy": ["p2-r5"]
+    },
+    {
       "kind": "vein",
       "id": "nugget-cluster",
       "cell": "cells/vein/nugget-cluster.png",
@@ -1012,6 +1033,27 @@
       "wornBy": ["p5-signature"]
     },
     {
+      "kind": "vein",
+      "id": "tablet-clumps",
+      "cell": "cells/vein/tablet-clumps.png",
+      "blend": "blend/vein-tablet-clumps.blend",
+      "wornBy": ["p2-u5"]
+    },
+    {
+      "kind": "vein",
+      "id": "crossed-prisms",
+      "cell": "cells/vein/crossed-prisms.png",
+      "blend": "blend/vein-crossed-prisms.blend",
+      "wornBy": ["p2-r4"]
+    },
+    {
+      "kind": "vein",
+      "id": "teardrop-beads",
+      "cell": "cells/vein/teardrop-beads.png",
+      "blend": "blend/vein-teardrop-beads.blend",
+      "wornBy": ["p2-r5"]
+    },
+    {
       "kind": "sheen",
       "id": "earthy",
       "cell": "cells/sheen/earthy.png",
@@ -1514,6 +1556,27 @@
       "cell": "cells/sheen/dial-glaze.png",
       "blend": "blend/sheen-dial-glaze.blend",
       "wornBy": ["p5-signature"]
+    },
+    {
+      "kind": "sheen",
+      "id": "breccia-gleam",
+      "cell": "cells/sheen/breccia-gleam.png",
+      "blend": "blend/sheen-breccia-gleam.blend",
+      "wornBy": ["p2-u5"]
+    },
+    {
+      "kind": "sheen",
+      "id": "prism-bars",
+      "cell": "cells/sheen/prism-bars.png",
+      "blend": "blend/sheen-prism-bars.blend",
+      "wornBy": ["p2-r4"]
+    },
+    {
+      "kind": "sheen",
+      "id": "mirror-polish",
+      "cell": "cells/sheen/mirror-polish.png",
+      "blend": "blend/sheen-mirror-polish.blend",
+      "wornBy": ["p2-r5"]
     }
   ]
 }
