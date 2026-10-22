@@ -305,7 +305,8 @@ programs }` from three's `renderer.info` of the game canvas), read only when cal
   row, P1 to P10), the frozen radii to R(p) = round(300 + 175 ln p) with the shared k inside 150 to
   200, P1 at today's 300, measured minutes null until ticket 644 writes them, and the loader refusing
   a shrink inside a solar system without `radiusShrinkWhy`, a stray reason, a gap, a pool after a
-  pool-less planet and an unknown field. `src/features/ores/planetRadius.byteIdentity.test.ts`
+  pool-less planet and an unknown field, and every frozen radius keyed on ore rules 7 with its
+  reason (a missing reason, a key before 7 or past the current rules and a stray field refused). `src/features/ores/planetRadius.byteIdentity.test.ts`
   changes each planet's radius (to 300, one tile more and twice it) and holds every band's hardness,
   ore value and price, the surface rock by depth, core hardness, `paceScale` and upgrade prices
   byte-identical.
@@ -314,8 +315,17 @@ programs }` from three's `renderer.info` of the game canvas), read only when cal
   the 64 distinct generated names before the lap numbers, the longest name within 16 characters
   with a four-digit lap, the 16-character budget at the 24 px display size on 360x640 and 1280x800
   (`uiScaleOf`), and the loader refusing a missing, stray, shared, digit-bearing or overlong name.
-  `src/systems/registries/planetNames.test.ts` checks the `planetName` seam (`Planet {n}` with no
+  The kernel's `src/systems/registries/planetRow.test.ts` checks the seam (`Planet {n}` with no
   provider, one provider at most).
+- **The planet-row registry** (ticket 707, GD lock 6326252575): `src/systems/registries/planetRow.test.ts`
+  resolves the generated row with no provider (`Planet {n}`, no pool, look or frozen radius), lays a
+  provider's fields over it and keeps the ones it leaves out, resolves any planet up to the largest
+  safe integer, sizes a planet by its frozen radius only under the ore rules it keys on, and refuses
+  a second provider. `src/features/ores/planetRow.golden.test.ts` pins P1 to P10's names, looks and
+  planet params as one digest under the current ore rules and under rules 6 (the ladder), the ores
+  rows on the kernel row, and resolves planets 1, 40, 41, 1000 and 1e6 with a name, a radius no
+  smaller than P10's past the rows and the ramp inside band 1. Kernel specs size a planet through
+  `planetRowFixtures.ts` (`frozenRadiusProvider`), never the ores rows.
 - **World generation reads the radius** (ticket 643, GD lock R2 on #302 6306854642 and its
   addendum 6306861669): `src/features/ores/planetRadius.worldgen.test.ts` generates each fresh P1
   to P10 at its registry row's radius with its core and band starts, keeps #6's ladder past the last
@@ -359,7 +369,7 @@ programs }` from three's `renderer.info` of the game canvas), read only when cal
   and every planet's params to the same with and without the look (existing worlds keep their stamp).
   The loader refuses a look on planet 1, a missing one on planets 2 to 5, a bad colour, a rock too
   bright, a band out of bounds, two planets sharing a look and stray fields. The kernel's
-  `planetLooks.test.ts` holds the seam: the shown palette takes rock and horizon from a look and keeps
+  `planetRowLooks.test.ts` holds the seam: the shown palette takes rock and horizon from a look and keeps
   the archetype's pad, core and underground, a planet class's band wins over the look's, and a look
   recolours a chunk's rock with every ore colour unchanged (inside #151's tint caps).
   `casingLiningLook.test.ts` reads every planet's shown palette too. `e2e/browser/planetLooks.spec.ts`

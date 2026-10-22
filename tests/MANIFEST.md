@@ -380,7 +380,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/ore-visuals/systems/oreGradeChannels.test.ts` | 7 | 7 |
 | `src/features/ore-visuals/systems/render/oreLookProvider.test.ts` | 21 | 10 |
 
-### `ores`: 26 files, 211 tests
+### `ores`: 27 files, 221 tests
 
 | File | Tests | Sites |
 | --- | --- | --- |
@@ -388,6 +388,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/ores/oresSourceHash.test.ts` | 1 | 1 |
 | `src/features/ores/planetRadius.byteIdentity.test.ts` | 11 | 2 |
 | `src/features/ores/planetRadius.worldgen.test.ts` | 13 | 4 |
+| `src/features/ores/planetRow.golden.test.ts` | 8 | 4 |
 | `src/features/ores/rarityPickup.test.ts` | 11 | 11 |
 | `src/features/ores/rarityPickupRoutes.test.ts` | 4 | 2 |
 | `src/features/ores/rarityTripRun.test.ts` | 5 | 3 |
@@ -404,7 +405,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/ores/systems/planetHazards.test.ts` | 14 | 14 |
 | `src/features/ores/systems/planetLooks.test.ts` | 12 | 12 |
 | `src/features/ores/systems/planetNames.test.ts` | 10 | 10 |
-| `src/features/ores/systems/planetRows.test.ts` | 12 | 12 |
+| `src/features/ores/systems/planetRows.test.ts` | 14 | 14 |
 | `src/features/ores/systems/rarityRows.test.ts` | 7 | 7 |
 | `src/features/ores/systems/raritySolve.test.ts` | 5 | 5 |
 | `src/features/ores/systems/rarityTiers.test.ts` | 12 | 12 |
@@ -1240,8 +1241,8 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/registries/orePickup.test.ts` | 4 | 4 |
 | `src/systems/registries/oreTypes.test.ts` | 12 | 12 |
 | `src/systems/registries/planetCardLines.test.ts` | 9 | 9 |
-| `src/systems/registries/planetLooks.test.ts` | 7 | 7 |
-| `src/systems/registries/planetNames.test.ts` | 3 | 3 |
+| `src/systems/registries/planetRow.test.ts` | 5 | 5 |
+| `src/systems/registries/planetRowLooks.test.ts` | 7 | 7 |
 | `src/systems/registries/planetSkyBand.test.ts` | 5 | 5 |
 | `src/systems/registries/saveSections.test.ts` | 3 | 3 |
 | `src/systems/registries/scheduleRows.test.ts` | 4 | 4 |

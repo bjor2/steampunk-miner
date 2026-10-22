@@ -14,8 +14,8 @@
  *   procedural curtains until a ribbon is drawn for it; a planet class's own band wins over it.
  *
  * Planets 2 to 5 differ pairwise: rock surface, horizon and band colour each lie at least 32 of
- * the 255 channel steps apart (`areColoursApart`). The kernel reads a look through the `planetLook` seam
- * (`planetLookProvider.ts`); presentation only, so no stamp, save or digest moves.
+ * the 255 channel steps apart (`areColoursApart`). The kernel reads a look through the `planetRow` seam
+ * (`planetRowProvider.ts`); presentation only, so no stamp, save or digest moves.
  */
 import type { PlanetLook } from '../../../systems/registries/planetRow'
 import { MIN_SKY_BAND_THICKNESS_M } from '../../../systems/registries/planetSkyBand'
