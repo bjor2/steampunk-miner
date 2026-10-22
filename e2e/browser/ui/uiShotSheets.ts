@@ -7,7 +7,8 @@
  * (#687), the planet card and the title menu; the HUD strip's detail behind the gear button
  * (ticket 684); and the base sheet's Hold and Ledger (ticket 688: the Sell bay's ore and the pause
  * menu's save page as were), and the sale receipt over the Sell bay after a wide P41+ haul, its lines
- * scrolling past eight (ticket 717).
+ * scrolling past eight (ticket 717), and the unlock reveal's plate over the Upgrade bay after the
+ * guns are mounted from the Outfitter, held so the shot finds it (ticket 718).
  */
 import { expect, type Page } from '@playwright/test'
 import { TREE_TEST_IDS } from '../../../src/features/tech-tree/ui/nodeTestIds'
@@ -15,6 +16,7 @@ import { UI_IDS } from '../../../src/ui/ids'
 import { SHEET_UI_IDS } from '../../../src/ui/sheet/sheetIds'
 import { dockAt } from '../screens/screenHelpers'
 import { RECEIPT_ROWS_TEST_ID, RECEIPT_TEST_ID, sellWideHaul } from '../sellReceiptSales'
+import { REVEAL_PLATE_TEST_ID, revealTurretMount } from '../unlockRevealBuys'
 import type { FindingsScope } from './uiShotFindings'
 
 export interface UiSheet extends FindingsScope {
@@ -91,6 +93,12 @@ export const UI_SHEETS: readonly UiSheet[] = [
     rootSelector: `[data-testid="${RECEIPT_TEST_ID}"]`,
     pannedTestIds: [],
     open: openSellReceipt,
+  },
+  {
+    shot: 'unlock-reveal',
+    rootSelector: `[data-testid="${REVEAL_PLATE_TEST_ID}"]`,
+    pannedTestIds: [],
+    open: revealTurretMount,
   },
   {
     shot: 'title-menu',

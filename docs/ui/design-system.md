@@ -364,6 +364,7 @@ listed with the ticket that builds them. Every class lives in a CSS Module besid
 | gear button   | the one control that opens the strip's detail (exact values, words); in the thumb zone, never the top keep-out                                                             | layout.tapTargetMinPx                                  | #684    |
 | hint chip     | #500's chip, unchanged: one line, 8% of height at most, queued when the clear view would fall                                                                              | existing constants                                     | exists  |
 | sale receipt  | the trip's sold kinds by rarity group (count, coin), the lining bill, the total rolling up in 1.2 s or less (a tap skips), the last trip's total; scrolls past 8 lines     | numbers, type.odometer, art.sheetFrame, copy           | #717    |
+| unlock reveal | the first buy of a new capability (the shared flag): a brass plate over the dock, the bought part glowing on the car; a tap skips it                                       | art.sheetFrame, motion.durationsMs, copy               | #718    |
 
 **The sheet as built (#686).** One base sheet (`ui/sheet/BaseSheet.tsx`) draws the store's open
 tab (`openSheet(tabId)`, `closeSheet()`, Escape) in the kit frame (`kit/Sheet.tsx`). Its tabs are
@@ -425,6 +426,23 @@ skips the roll, the next tap or leaving the dock puts the receipt away, and Redu
 The last trip's total sits under it with a ▲, ▼ or = glyph; the first trip says so. Every word is a
 row of `features/sell-burst/receipt.json`, held to the #680 budgets. The coin burst and the bay
 header's counter are #176's, unchanged.
+
+**The unlock reveal as built (#718).** What counts as a new capability is one data table,
+`data/shop/newCapabilities.json` (`systems/views/newCapability.ts`), which the Outfitter's cards
+carry as `isNewCapability` for the shop's guidance chip (#719) and the reveal reads too: every
+vehicle item the tree unlocks (modules, the Armoury's weapon modules, drill gear), the auto-gun
+turret's mount and the bore gun's mount, each new only while none is owned; a track, casing, gun
+or rack level, a lining type, a refill or a service never is. The `unlock-reveal` slice hears the
+local player's buys: the first buy of a capability plays for 90 ticks (1.5 s, the Workshop's full
+moment) from the buy's tick. A brass plate on the bay's `above` layer says `Gear fitted` with the
+item's icon and name, under the phone's top keep-out across the stage (at most 360 px), under the
+strip on desktop; the whole plate is one tap target that skips. The bought part glows brass on the
+car through `vehicleLooks` (pulsing, steady under Reduce Motion), on the item's own parts (a gauge
+lights its dial, not the whole cab cluster); a power-up or drill gear the rig draws only from a slot
+hangs at its first slot's point for the reveal. On a phone the full sheet steps aside
+(`stepSheetAside`) so the car shows, and comes back on its tab when the reveal ends: on time, on a
+tap, or leaving the dock. A combo or a slot cradle has no model, so its reveal is the plate alone.
+Every word is a row of `features/unlock-reveal/reveal.json`, held to the #680 budgets.
 
 ## 11. Copy
 

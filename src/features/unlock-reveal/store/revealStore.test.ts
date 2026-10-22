@@ -105,3 +105,22 @@ function framesUntilEnded(startTick: number, framesPerSecond: number): number[] 
   }
   return shown
 }
+
+describe('unlock reveal store: the debug hold', () => {
+  it('keeps a held reveal past its time until a tap', () => {
+    hearTurretMount()
+    reveal().holdReveal()
+    reveal().advanceRevealTo(reveal().reveal!.endTick + 600)
+    expect(reveal().reveal).not.toBeNull()
+    reveal().skipReveal()
+    expect(reveal().reveal).toBeNull()
+  })
+
+  it('lets time end it again once let run', () => {
+    hearTurretMount()
+    reveal().holdReveal()
+    reveal().letRevealRun()
+    reveal().advanceRevealTo(reveal().reveal!.endTick)
+    expect(reveal().reveal).toBeNull()
+  })
+})

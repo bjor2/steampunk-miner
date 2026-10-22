@@ -22,7 +22,7 @@ import {
   revealLookAt,
   revealModelOf,
 } from '../systems/render/revealOnRig'
-import { isRevealPlayingAt, type UnlockReveal } from '../systems/unlockReveal'
+import type { UnlockReveal } from '../systems/unlockReveal'
 
 const NO_REQUESTS: readonly PartMotionRequest[] = []
 
@@ -55,10 +55,13 @@ export const REVEAL_HANG: PartMotionRequestSource = {
   },
 }
 
-/** The playing reveal's glow and hang, or null while none plays at `tick`; the debug read too. */
+/**
+ * The playing reveal's glow and hang, or null while none plays; the debug read too. The store
+ * alone says when a reveal ends (on time, a tap, leaving the dock, or held by a spec).
+ */
 export function revealOnRigAt(tick: number): RevealOnRig | null {
   const { reveal } = useRevealStore.getState()
-  if (reveal === null || !isRevealPlayingAt(reveal, tick)) return null
+  if (reveal === null || tick < reveal.startTick) return null
   if (shown?.reveal !== reveal) shown = revealOnRigOf(reveal)
   return shown
 }

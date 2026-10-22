@@ -164,6 +164,15 @@
       ]
     },
     {
+      "why": "The unlock reveal (ticket 718): the first buy of a new capability (the shared table also read by the shop chip) plays a brass plate over the Upgrade bay and glows the part on the car; a phone's full sheet steps aside for it.",
+      "paths": [
+        "src/features/unlock-reveal/**",
+        "src/data/shop/newCapabilities.json",
+        "src/systems/views/newCapability.ts"
+      ],
+      "specs": ["e2e/browser/unlockReveal.spec.ts", "e2e/browser/ui/uiShots.spec.ts"]
+    },
+    {
       "why": "The item cards fill the bays' entries; the Outfitter's cards replaced the workshop plaques (ticket 687).",
       "paths": ["src/features/descriptions/**"],
       "specs": ["e2e/browser/itemCards.spec.ts", "e2e/browser/workshop.spec.ts"]
@@ -798,7 +807,11 @@
         "src/features/example/ui/ExampleSheetTabs*",
         "src/features/example/store/sheetProbeStore.ts"
       ],
-      "specs": ["e2e/browser/ui/sheet.spec.ts", "e2e/browser/ui/uiShots.spec.ts"]
+      "specs": [
+        "e2e/browser/ui/sheet.spec.ts",
+        "e2e/browser/unlockReveal.spec.ts",
+        "e2e/browser/ui/uiShots.spec.ts"
+      ]
     },
     {
       "why": "The Outfitter and the Patent Office on the base sheet (ticket 687): the Upgrade bay's and the tree's cards with gain text and greyed prices, docking opening the sheet, the sheet walking the docked bay's menu, the rig look's fitting on a track card.",

@@ -678,6 +678,15 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/terrain-tools/systems/vehicleAnchors.test.ts` | 20 | 2 |
 | `src/features/terrain-tools/terrainReplay.test.ts` | 2 | 1 |
 
+### `unlock-reveal`: 4 files, 32 tests
+
+| File | Tests | Sites |
+| --- | --- | --- |
+| `src/features/unlock-reveal/store/revealStore.test.ts` | 10 | 9 |
+| `src/features/unlock-reveal/systems/render/revealOnRig.test.ts` | 9 | 9 |
+| `src/features/unlock-reveal/systems/revealCopy.test.ts` | 5 | 5 |
+| `src/features/unlock-reveal/systems/unlockReveal.test.ts` | 8 | 8 |
+
 ### `workshop`: 12 files, 89 tests
 
 | File | Tests | Sites |
@@ -1458,7 +1467,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/store/runSnapshots.test.ts` | 10 | 10 |
 | `src/store/saveKeeping.test.ts` | 15 | 15 |
 | `src/store/saveResumeLog.test.ts` | 2 | 2 |
-| `src/store/sheetSlice.test.ts` | 19 | 19 |
+| `src/store/sheetSlice.test.ts` | 22 | 22 |
 | `src/store/sliceRun.test.ts` | 7 | 7 |
 | `src/store/slowDeviceChip.test.ts` | 2 | 2 |
 | `src/store/soundUnlockSlice.test.ts` | 4 | 4 |
@@ -1698,7 +1707,8 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/views/itemCopyBudget.test.ts` | 7 | 7 |
 | `src/systems/views/ledgerToast.test.ts` | 4 | 4 |
 | `src/systems/views/menuFocus.test.ts` | 2 | 2 |
-| `src/systems/views/outfitterCards.test.ts` | 6 | 6 |
+| `src/systems/views/newCapability.test.ts` | 4 | 4 |
+| `src/systems/views/outfitterCards.test.ts` | 8 | 8 |
 | `src/systems/views/overlaySeats.test.ts` | 5 | 5 |
 | `src/systems/views/pauseMenuModel.test.ts` | 11 | 11 |
 | `src/systems/views/planetCardView.test.ts` | 1 | 1 |

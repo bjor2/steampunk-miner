@@ -46,6 +46,7 @@ The phones are Chromium emulation (`isMobile`, `hasTouch`) at DPR 1, not shots f
 | `planet-card`   | the planet card on arrival at planet 25         |
 | `base-sheet`    | the shared sheet on the example's probe tabs    |
 | `sell-receipt`  | the sale receipt after a wide P41+ haul         |
+| `unlock-reveal` | the reveal plate after the guns are mounted     |
 | `title-menu`    | the title menu                                  |
 
 The sheets are a table, `e2e/browser/ui/uiShotSheets.ts`: a sheet the shared sheet component (#686)

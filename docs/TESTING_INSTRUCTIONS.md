@@ -1458,6 +1458,22 @@ incomePerHour}` go to `balance-report/drill-pace.ndjson`, which `pushTestMetrics
   skipping the roll, the next trip's compare, and a wide P41+ haul scrolling past eight lines; the
   UI screenshot suite shoots it at every cell (`sell-receipt`). Box Tester only for the browser
   specs.
+- **Unlock reveal** (ticket 718, spec #678): what counts as a new capability is one data table
+  (`src/data/shop/newCapabilities.json`, `systems/views/newCapability.ts`), held by
+  `newCapability.test.ts` (every vehicle item, the turret's mount and not its levels, no stat step,
+  refill or service, only items the game sells) and by `outfitterCards.test.ts` (the cards' flag).
+  The `unlock-reveal` slice's rules are pure: `unlockReveal.test.ts` buys for real in a scripted
+  session (the turret's mount reveals, a gun or track level does not, another player's buy does not)
+  and checks every listed capability has a reveal; `revealOnRig.test.ts` the model that glows (a
+  gauge's own dial), that every model named ships, the pulse and Reduce Motion, and the slot part
+  hung for the reveal; `revealStore.test.ts` the sheet stepping aside and back, a tap, time, leaving
+  the dock, a restore and the same ticks at 30 and 144 frames a second; `revealCopy.test.ts` the
+  #680 budgets on `reveal.json`. `sheetSlice.test.ts` holds the kernel's step aside.
+  `e2e/browser/unlockReveal.spec.ts` buys from the Outfitter through
+  `features['unlock-reveal'].getReveal()` (`holdReveal()` keeps the plate for a slow box): a track
+  level reveals nothing, the guns' mount reveals on the rig and a tap skips it; on a phone the full
+  sheet steps aside and comes back on the Outfitter; the plate fits 360x640 and 1280x800. The UI
+  screenshot suite shoots it at every cell (`unlock-reveal`). Box Tester only for the browser specs.
 - **Gauge cluster** (ticket 716, spec #678): the dials are a data table
   (`src/data/hud/gaugeCluster.json`, `systems/views/gaugeClusterTable.ts`) read by the pure view
   `gaugeCluster.ts`; `gaugeCluster.test.ts` holds the table's problems, the load test that every
