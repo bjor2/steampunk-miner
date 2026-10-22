@@ -38,6 +38,9 @@ Bjor's order of 18 Oct (level 20 about 50x today's) as the GD ruled it on #551: 
 
 The tables below were measured at ticket 552 with this law and re-measured at ticket 570, when the
 swept cut began riding its face.
+Since ticket 724 a cut down gains its speed no faster than local gravity (0.1 g core floor), so
+the bench's rig reports itself already moving down at its law's cut speed: the ladder measures the
+law at steady state, and its table is unchanged.
 
 ## Table (ticket 570)
 

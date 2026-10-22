@@ -693,6 +693,19 @@ incomePerHour}` go to `balance-report/drill-pace.ndjson`, which `pushTestMetrics
   reach the centre and stay there, and both rates play the same ticks. Each run prints its largest
   move with the body and cut cursor before and after it. A lane (about 5 s), so it runs only when
   named. The motion rule's stop is unit-tested in `src/systems/vehicle/cutFollowMotion.test.ts`.
+- **Down-cut gravity ramp** (ticket 724, Bjor's ruling): a cut down gains speed by at most
+  `a dt` a tick, `a = max(g(r), 0.1 g_surface)`. `src/systems/vehicle/downCutRamp.test.ts` holds the
+  motion rule (the cap at planet 1, planet 2 and a low-g planet, 95% of the top speed from rest at
+  0.02 R inside the core floor's time, the same at 60 and 144 steps/s, braking at once, the top
+  speed byte-identical to the rule without the ramp, at most the drill's step between cells);
+  `downCutRampFront.test.ts` and `src/systems/authority/downCutFront.test.ts` the swept front's
+  ramp from the last report's speed; `src/systems/bot/downBores.test.ts` the bot's shaft clock and
+  `src/logging/downSpeedReport.test.ts` the report row. A fixture that models a rig at its cut
+  speed (`sweptRigFixtures.ts`, `sweptSpanFixtures.ts`, `speedSlabFixtures.ts`,
+  `lawCarrySlabFixtures.ts`, `drillLadder.ts`) reports the body already moving down at that speed
+  (`movingDownAtCutSpeed`), or at the speed its scripted body really moves; one reported at rest
+  gets the ramp from rest. Live-loop probes judge a cut down against the speed the drill and
+  gravity allow, read from `VehicleStepResult.isGravityLimited` or recomputed from the tick before.
 - **Swept ledger charges the work it spends** (ticket 466, dark until #441's ring re-run):
   `src/systems/authority/clampedCharge.test.ts` checks fix A's driver with fakes (one carve when
   the release clamp keeps the carry, a second charging exactly the clamped carry when it lowers it,
