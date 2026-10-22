@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-10-22T03:10:25+02:00",
+  "updated_at": "2026-10-22T03:10:29+02:00",
   "caps": {
     "grok": 12,
     "claude": 10,
@@ -19,12 +19,11 @@
       "slots": [
         {
           "slot": "C1",
-          "state": "busy",
-          "ticket": 676,
-          "grok_slot": 1,
-          "kind": "dev",
-          "since": "2026-10-22T01:57:00+02:00",
-          "wave": "673-1A"
+          "state": "free",
+          "ticket": null,
+          "grok_slot": null,
+          "kind": null,
+          "since": null
         },
         {
           "slot": "C2",
@@ -70,8 +69,8 @@
         }
       ],
       "size": 6,
-      "used": 3,
-      "free": 3,
+      "used": 2,
+      "free": 4,
       "claims_last_hour": 2,
       "name": "Claude Max 1"
     },
@@ -166,17 +165,24 @@
           672
         ],
         "since": "2026-10-22T02:41:27+02:00"
+      },
+      {
+        "feature": 673,
+        "kind": "spec",
+        "title": "Difficulty curve: bare on-curve rig dies to the P7 collapse cascade on most pacing seeds",
+        "tickets": [
+          676
+        ],
+        "since": "2026-10-22T03:10:28+02:00"
       }
     ]
   },
   "grok": [
     {
       "slot": 1,
-      "state": "dev",
-      "ticket": 676,
-      "since": "2026-10-22T01:57:00+02:00",
-      "claude_slot": 1,
-      "wave": "673-1A"
+      "state": "free",
+      "ticket": null,
+      "since": null
     },
     {
       "slot": 2,
@@ -258,12 +264,11 @@
   "claude": [
     {
       "slot": 1,
-      "state": "busy",
-      "ticket": 676,
-      "grok_slot": 1,
-      "since": "2026-10-22T01:57:00+02:00",
-      "account": 1,
-      "wave": "673-1A"
+      "state": "free",
+      "ticket": null,
+      "grok_slot": null,
+      "since": null,
+      "account": 1
     },
     {
       "slot": 2,
@@ -351,8 +356,8 @@
   "totals": {
     "grok": {
       "size": 12,
-      "used": 5,
-      "dev": 4,
+      "used": 4,
+      "dev": 3,
       "dev_cap": 8,
       "planner": 1,
       "planner_cap": 4
@@ -360,8 +365,8 @@
     "claude": {
       "size": 10,
       "enabled": 10,
-      "used": 4,
-      "free": 6,
+      "used": 3,
+      "free": 7,
       "external": 0
     }
   },
