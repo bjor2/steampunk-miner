@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "updated_at": "2026-10-22T15:21:01Z",
+  "updated_at": "2026-10-22T15:21:51Z",
   "entries": {
     "steampunk-loop/1": {
       "loop": "steampunk-loop",
@@ -679,11 +679,11 @@
     "tester": {
       "loop": "tester",
       "slot": null,
-      "state": "working",
+      "state": "blocked",
       "issue": null,
-      "note": "testing spec #305 (Grilling: Half-length planets controlled by planet size) on 99eadef",
+      "note": "red on 99eadef (queue): see the Tests tab",
       "stale_after_min": 420,
-      "updated_at": "2026-10-22T13:21:29Z",
+      "updated_at": "2026-10-22T15:21:51Z",
       "host": "grok-bot-vm-452660841"
     },
     "steampunk-loop/10": {
@@ -724,6 +724,13 @@
     }
   },
   "events": [
+    {
+      "at": "2026-10-22T15:21:51Z",
+      "key": "tester",
+      "state": "blocked",
+      "issue": null,
+      "note": "red on 99eadef (queue): see the Tests tab"
+    },
     {
       "at": "2026-10-22T15:20:47Z",
       "key": "steampunk-loop",
@@ -1136,13 +1143,6 @@
       "state": "idle",
       "issue": null,
       "note": "status check; 0/4 planner slots"
-    },
-    {
-      "at": "2026-10-22T04:24:30Z",
-      "key": "steampunk-loop/1",
-      "state": "idle",
-      "issue": null,
-      "note": "free"
     }
   ]
 }
