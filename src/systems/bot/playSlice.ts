@@ -41,6 +41,7 @@ import { driveToUpgradeBay, runTrip } from './botTrip'
 import { widenShallowestBand } from './mineLayout'
 import { botPlanetOf, travelWhenReady } from './botTravel'
 import type { GateRouteBlock } from './gateRouteBlocks'
+import { newDownBoreTally, type DownBoreTally } from './downBores'
 import { newSidewaysBoreTally, type SidewaysBoreTally } from './sidewaysBores'
 import type { ShopSpend } from './shopSpend'
 import type { TripGoal } from './tripGoal'
@@ -66,6 +67,8 @@ export interface SliceRun {
   gateRouteBlocks: readonly GateRouteBlock[]
   /** Sideways bore ticks per planet and the share the drive held (ticket 723): reported. */
   sidewaysBores: SidewaysBoreTally
+  /** Down-bore metres and ticks per planet, the effective down speed (#724): reported. */
+  downBores: DownBoreTally
 }
 
 export interface SliceRunOptions {
@@ -182,6 +185,7 @@ function sliceRunOf(session: BotSession, run: BotRun, planet: BotPlanet): SliceR
     spreeVisits: run.spreeVisits,
     gateRouteBlocks: planet.gateRouteBlocks,
     sidewaysBores: planet.sidewaysBores ?? newSidewaysBoreTally(),
+    downBores: planet.downBores ?? newDownBoreTally(),
   }
 }
 

@@ -12,6 +12,7 @@ import { noRouteDeaths } from './botDeathReplay'
 import type { BotPlanet } from './botPilot'
 import type { BotSession } from './botSession'
 import type { GateRouteBlock } from './gateRouteBlocks'
+import { newDownBoreTally, type DownBoreTally } from './downBores'
 import { newSidewaysBoreTally, type SidewaysBoreTally } from './sidewaysBores'
 import { paramsOfSession } from './botWorld'
 import { newMineLayout } from './mineLayout'
@@ -26,6 +27,7 @@ export function botPlanetOf(
   gateRouteBlocks: GateRouteBlock[] = [],
   borePolicy: BorePolicy = DEFAULT_BORE_POLICY,
   sidewaysBores: SidewaysBoreTally = newSidewaysBoreTally(),
+  downBores: DownBoreTally = newDownBoreTally(),
 ): BotPlanet {
   const site = dockSiteOfPlanet(session.state().planet)
   if (site === null) throw new Error('the bot plays only on a generated planet')
@@ -39,6 +41,7 @@ export function botPlanetOf(
     routeDeaths: noRouteDeaths(),
     gateRouteBlocks,
     sidewaysBores,
+    downBores,
   }
 }
 
@@ -53,5 +56,6 @@ export function travelWhenReady(session: BotSession, planet: BotPlanet): BotPlan
     planet.gateRouteBlocks,
     planet.pilot.borePolicy,
     planet.sidewaysBores,
+    planet.downBores,
   )
 }

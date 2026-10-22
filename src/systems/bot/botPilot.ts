@@ -30,6 +30,7 @@ import { setGunsForEnergy } from './botGuns'
 import { facingTowards, NO_TICKS, reportPoseIntent } from './botPose'
 import type { BotSession } from './botSession'
 import type { GateRouteBlock } from './gateRouteBlocks'
+import type { DownBoreTally, DownLeg } from './downBores'
 import type { SidewaysBoreTally } from './sidewaysBores'
 import { botTravelSpeedOf, moveTicks, tileKindAt } from './botWorld'
 import type { MineLayout } from './mineLayout'
@@ -47,6 +48,8 @@ export interface BotPilot {
   heldTicksByEnemy?: Map<string, number>
   /** What its last bore left of the tick it ended on (ticket 559); absent is none. */
   boreCarry?: BoreCarry
+  /** The speed down its last bore left (#724, `downBores.ts`); absent is none. */
+  downLeg?: DownLeg
 }
 
 /** The bot on one planet: its mine, where its vehicle is, and whether it blasts (#109). */
@@ -75,6 +78,8 @@ export interface BotPlanet {
    * absent in a spec's hand-built planet, which tallies none.
    */
   sidewaysBores?: SidewaysBoreTally
+  /** The run's bores down per planet (#724, `downBores.ts`), carried the same way. */
+  downBores?: DownBoreTally
 }
 
 /**

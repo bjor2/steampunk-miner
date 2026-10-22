@@ -21,6 +21,7 @@ import { loggedCommandsOf } from '../src/logging/commandLog'
 import { reportRowLines } from '../src/logging/reportRows'
 import { travelClampLines } from '../src/logging/travelClampReport'
 import { driveBoundLines } from '../src/logging/driveBoundReport'
+import { downSpeedLines } from '../src/logging/downSpeedReport'
 import { surfaceLayerBandOneLines } from '../src/logging/surfaceLayerReport'
 import {
   formatSeedPacingTable,
@@ -94,6 +95,7 @@ const report = [
     'Drive-bound share of level legs (over half from planet 3 fails ticket 723)',
     driveBoundLines(runs),
   ),
+  listSection('Effective down speed per planet (reported only, ticket 724)', downSpeedLines(runs)),
   spreeSection(runs),
   comparisonSection(summary),
   assaySection(),

@@ -11,11 +11,16 @@
  * acceptance 9, `botCharges.ts`). A wall its own extractor opens is touched and waited out, then
  * bored or entered (ticket 237: the tune, the etch, the pull).
  * A sideways bore waits at least the drive's time over the tile (Bjor's ruling on #723,
- * `sidewaysBores.ts`); what it can afford and whether a charge pays still read the drill's time.
+ * `sidewaysBores.ts`), and a bore down at least the time local gravity lets the body gain the
+ * drill's speed across it (Bjor's ruling on #724, `downBores.ts`); what it can afford and whether
+ * a charge pays still read the drill's time.
  */
 import { heatThrottledDrill } from '../authority/heatRules'
 import { drillQuantumAt } from '../authority/stepBoundRead'
+import { isGravityRampedFacing } from '../vehicle/cutAxisCaps'
 import { driveSpeedOf } from '../vehicle/cutCapSpeed'
+import { downCutAccelerationAt } from '../vehicle/radialGravity'
+import type { Facing } from '../vehicle/vehiclePose'
 import { isVehicleActive } from '../vehicle/vehicleState'
 import type { TilePoint } from '../world/tileGrid'
 import { blastOpen, blastShellOpen, isBlastWorthIt, noteTileWorthACharge } from './botCharges'
@@ -31,6 +36,7 @@ import {
 } from './botPilot'
 import { facingTowards } from './botPose'
 import type { BotSession } from './botSession'
+import { entrySpeedOf, rampedDownBoreOf, tallyDownBore, type RampedBore } from './downBores'
 import { drivenBoreOf, tallySidewaysBore } from './sidewaysBores'
 import { boreSubSteps, cellOfTile, isBoreLavaRisk, isLavaRisk, tileKindAt } from './botWorld'
 import type { TileBore } from './boreClock'
@@ -109,18 +115,55 @@ function boreUngated(session: BotSession, planet: BotPlanet, tile: TilePoint): O
   if (isBlastWorthIt(session, planet, tile, ticks) && blastOpen(session, planet, tile)) {
     return isVehicleActive(session.vehicle()) ? 'opened' : 'short'
   }
-  boreTile(session, planet.pilot, tile, drivenBoreAt(session, planet, tile, bore))
+  const driven = drivenBoreAt(session, planet, tile, bore)
+  boreTile(session, planet.pilot, tile, driven.bore)
+  planet.pilot.downLeg = { tick: session.tick(), tile, speed: driven.exitSpeed }
   return isVehicleActive(session.vehicle()) ? 'opened' : 'short'
 }
 
-/** The bore as the rig cuts it from where it stands, sideways held to the drive, and tallied. */
+/**
+ * The bore as the rig cuts it from where it stands, a cut down ramped by gravity and sideways held
+ * to the drive, each tallied, with the speed down it leaves the body at (0 off a cut down).
+ */
 function drivenBoreAt(
   session: BotSession,
   planet: BotPlanet,
   tile: TilePoint,
   bore: TileBore,
-): TileBore {
+): RampedBore {
   const facing = facingTowards(planet.pilot.position, tile)
+  if (isGravityRampedFacing(facing)) return rampedDownBoreAt(session, planet, tile, bore)
+  return { bore: sidewaysBoreAt(session, planet, facing, bore), exitSpeed: 0 }
+}
+
+/** A bore down from the leg's speed, under local gravity at the tile's centre (#724), tallied. */
+function rampedDownBoreAt(
+  session: BotSession,
+  planet: BotPlanet,
+  tile: TilePoint,
+  bore: TileBore,
+): RampedBore {
+  const { pilot, layout } = planet
+  const entrySpeed = entrySpeedOf(pilot.downLeg, pilot.position, session.tick())
+  const acceleration = downCutAccelerationAt(
+    Math.hypot(tile.tx + 0.5, tile.ty + 0.5),
+    layout.params.radiusTiles,
+    layout.params.gravityMultiplier,
+  )
+  const ramped = rampedDownBoreOf(bore, entrySpeed, acceleration)
+  if (planet.downBores !== undefined) {
+    tallyDownBore(planet.downBores, session.state().planet.index, bore, ramped.bore)
+  }
+  return ramped
+}
+
+/** A sideways bore held to the drive, and tallied; the drill's bore up. */
+function sidewaysBoreAt(
+  session: BotSession,
+  planet: BotPlanet,
+  facing: Facing,
+  bore: TileBore,
+): TileBore {
   const driven = drivenBoreOf(bore, facing, driveSpeedOf(session.vehicle()))
   if (driven === bore || planet.sidewaysBores === undefined) return driven
   tallySidewaysBore(planet.sidewaysBores, session.state().planet.index, bore, driven)

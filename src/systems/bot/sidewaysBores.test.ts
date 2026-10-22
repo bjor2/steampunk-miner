@@ -19,7 +19,7 @@ import {
 } from './sidewaysBores'
 
 // Bjor's ruling on #723 in the pacing bot: a sideways bore takes at least the drive's time over
-// the tile, a bore down the drill's alone, and each planet tallies the share of its level-leg
+// the tile, a bore down or up no drive time, and each planet tallies the share of its level-leg
 // bore ticks the drive held.
 
 const QUANTUM = DRILL_SUBSTEPS_PER_TICK
@@ -85,16 +85,17 @@ function openAll(
 }
 
 describe('the bot boring a level leg (ticket 723)', () => {
-  it("bores down at the drill's pace and sideways at the drive's, tallying the level leg", () => {
+  // The shaft down is ramped by gravity since #724 (`downBores.test.ts`), so only the level leg
+  // is timed here.
+  it("bores sideways at the drive's pace, tallying the level leg", () => {
     const session = botWithFastDrill()
     const planet = botPlanetOf(session, 'never')
     planet.pilot.position = { tx: GROUND.tx, ty: GROUND.ty + 1 }
-    const downTicks = openAll(session, planet, SHAFT)
+    openAll(session, planet, SHAFT)
     const levelTicks = openAll(session, planet, LEVEL_LEG)
     expect(LEVEL_LEG.every((tile) => tileKindAt(session.state(), tile) === 'open')).toBe(true)
     const driveTicksPerTile = TICKS_PER_SECOND / driveSpeedOf(session.vehicle())
     expect(levelTicks).toBeGreaterThanOrEqual(Math.floor(LEVEL_LEG.length * driveTicksPerTile))
-    expect(downTicks).toBeLessThan(levelTicks)
     const record = planet.sidewaysBores?.get(1)
     expect(record === undefined ? 0 : driveBoundShareOf(record)).toBe(1)
   })
