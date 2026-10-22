@@ -105,11 +105,11 @@ export interface PlanetParams {
  * per ore patch (ticket 446), 3 the depth density curve from planet 3 (ticket 448), 4 the mixed
  * kinds table's roster from planet 3 (#453), 5 the pinned surface layer from planet 2 (ticket 625),
  * 6 planet 2's own species pool on the legacy kind slots (ticket 632), 7 the planet registry's radius
- * from planet 2 (ticket 643), 8 the planet registry's hazard pockets from planet 2 (ticket 652). The
- * stamp records the ground rules a planet was entered under, its
+ * from planet 2 (ticket 643), 8 the planet registry's hazard pockets from planet 2 (ticket 652), 9
+ * P2's own three kinds after the legacy slots (ticket 709). The stamp records the ground rules a planet was entered under, its
  * rock's hardness, its species pool and its size with them.
  */
-export const ORE_RULES_VERSION = 8
+export const ORE_RULES_VERSION = 9
 
 /** The ore rules that add the depth density curve (ticket 448). */
 export const DEPTH_CURVE_ORE_RULES = 3
@@ -135,6 +135,12 @@ export const HAZARD_POCKET_ORE_RULES = 8
 /** Planet 1 holds no hazard and stays byte-identical, so the pockets first change planet 2 (651). */
 const HAZARD_POCKET_FIRST_PLANET = 2
 
+/** The ore rules that add P2's own kinds, Cinnabar, Aquamarine and Jet (ticket 709). */
+export const P2_OWN_KINDS_ORE_RULES = 9
+
+/** Only P2's pool owns kinds, so P1 stays byte-identical and P3 on draw as before (ticket 709). */
+const P2_OWN_KINDS_FIRST_PLANET = 2
+
 /**
  * The first planet each ore rules version changes, version 1 first: the rarity rows from P3 (the
  * `ores` slice's `mixedRowsFromPlanet`), the roster from P1 (TD ruling on ticket 446, section 4),
@@ -143,7 +149,8 @@ const HAZARD_POCKET_FIRST_PLANET = 2
  * layer from planet 2 (ticket 625: P1 stays byte-identical), P2's species pool (ticket 632, the
  * `ores` slice's `poolsBeforeOreRules`: an older P2 keeps the legacy species), the registry radius
  * from planet 2 (ticket 643: P1's row is its ladder radius), the hazard pockets from planet 2
- * (ticket 652: P1 holds no hazard).
+ * (ticket 652: P1 holds no hazard), P2's own kinds (ticket 709: the `ores` slice's own slots name
+ * P2's pool alone, so P3 on draw the kinds they drew).
  */
 const ORE_RULES_FIRST_PLANETS: readonly number[] = [
   3,
@@ -154,6 +161,7 @@ const ORE_RULES_FIRST_PLANETS: readonly number[] = [
   P2_SPECIES_POOL_FIRST_PLANET,
   RADIUS_ROWS_FIRST_PLANET,
   HAZARD_POCKET_FIRST_PLANET,
+  P2_OWN_KINDS_FIRST_PLANET,
 ]
 
 /** The first planet any ore rules change, so the first a fresh session stamps: planet 1. */
@@ -203,8 +211,8 @@ export function planetParamsFor(
 /**
  * The ore rules a planet entered now is stamped with: the newest version that changes it, none
  * before `ORE_RULES_FROM_PLANET`. Planet 1 stays on rules 2, which the curve, the surface layer,
- * P2's pool, the registry radius and the hazard pockets leave as they were, so its sessions and
- * digests do not move with tickets 448, 625, 632, 643, 652.
+ * P2's pool, the registry radius, the hazard pockets and P2's own kinds leave as they were, so its
+ * sessions and digests do not move with tickets 448, 625, 632, 643, 652, 709.
  */
 export function oreRulesVersionOnEntry(planetIndex: number): number | undefined {
   const changing = ORE_RULES_FIRST_PLANETS.map((first, at) => (planetIndex >= first ? at + 1 : 0))

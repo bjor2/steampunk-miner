@@ -55,10 +55,12 @@ const MAIN_MASKED_DIGESTS: Readonly<Record<number, string>> = {
 
 /**
  * The roster golden: every roster of P1 to P5, and the kinds P1 and P2 patches drew. The rosters
- * moved when the mixed table landed on P3 to P5 (#453); the P1 and P2 draws did not.
+ * moved when the mixed table landed on P3 to P5 (#453); the P1 and P2 draws did not. They moved
+ * again when a fresh P2 took its own three kinds (ticket 709); the draws are read at ore rules 6,
+ * before them, so they stay.
  */
 const ROSTER_GOLDEN = {
-  rosters: '81835f3f737e5264',
+  rosters: 'bf67c3f50c3e9a6e',
   draws: { 1: '45eef63f1b02d27f', 2: '06187be540d8ba5c' } as Readonly<Record<number, string>>,
 }
 

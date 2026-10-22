@@ -10,7 +10,8 @@ import { planetRosterOf, poolOfPlanet } from './planetRoster'
 // The pool guard of ticket 542 (TD shape on #453, 6236465674): every pool of `planets.rows` holds
 // exactly one species for every slot a planet of it can ask for, and no species row's pool is
 // unmapped. P2's own pool (ticket 632, GD lock (b) on #595) binds the legacy slots, and a P2 a save
-// holds under ore rules 5 or earlier keeps the legacy species.
+// holds under ore rules 5 or earlier keeps the legacy species. Under ore rules 9 it adds three own
+// slots (ticket 709), so a fresh P2 shows 15 species and an older P2 its 12.
 
 const SEED = 83921
 const ALL_SLOTS: readonly KindSlot[] = Object.values(ORE_ROWS.kinds.slotsBySet).flat()
@@ -56,24 +57,39 @@ describe('roster species', () => {
     expect(mismatched.map((material) => material.id)).toEqual([])
   })
 
-  it('holds exactly one legacy species in every slot of the legacy table', () => {
-    const counts = ORE_ROWS.kinds.slotsBySet.legacy.map(
-      (slot) => speciesOfSlot('legacy', slot.slotId).length,
-    )
-    expect(counts).toEqual(ORE_ROWS.kinds.slotsBySet.legacy.map(() => 1))
+  it('holds exactly one legacy species in every shared slot of the legacy table', () => {
+    const shared = ORE_ROWS.kinds.slotsBySet.legacy.filter((slot) => slot.owner === undefined)
+    const counts = shared.map((slot) => speciesOfSlot('legacy', slot.slotId).length)
+    expect(counts).toEqual(shared.map(() => 1))
   })
 
   it.each([
-    { planet: 'planet 1', params: freshPlanetParamsFor(SEED, 1), pool: 'legacy' },
-    { planet: 'a fresh planet 2', params: freshPlanetParamsFor(SEED, 2), pool: 'foothold-p2' },
-    { planet: 'planet 2 under ore rules 5', params: planetParamsFor(SEED, 2, 5), pool: 'legacy' },
+    { planet: 'planet 1', params: freshPlanetParamsFor(SEED, 1), pool: 'legacy', kinds: 12 },
+    {
+      planet: 'a fresh planet 2',
+      params: freshPlanetParamsFor(SEED, 2),
+      pool: 'foothold-p2',
+      kinds: 15,
+    },
+    {
+      planet: 'planet 2 under ore rules 8',
+      params: planetParamsFor(SEED, 2, 8),
+      pool: 'foothold-p2',
+      kinds: 12,
+    },
+    {
+      planet: 'planet 2 under ore rules 5',
+      params: planetParamsFor(SEED, 2, 5),
+      pool: 'legacy',
+      kinds: 12,
+    },
   ])(
-    'draws $planet from the legacy rows and the $pool pool, every kind its species',
-    ({ params, pool }) => {
+    'draws $planet from the legacy rows and the $pool pool, $kinds kinds each its species',
+    ({ params, pool, kinds }) => {
       expect(rarityRowSetOfPlanet(params)).toBe('legacy')
       expect(poolOfPlanet(params)).toBe(pool)
       const species = planetRosterOf(params).map((slot) => speciesOfSlot(pool, slot.slotId))
-      expect(species.map((found) => found.length)).toEqual(Array(12).fill(1))
+      expect(species.map((found) => found.length)).toEqual(Array(kinds).fill(1))
     },
   )
 

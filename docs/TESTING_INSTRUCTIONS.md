@@ -288,6 +288,17 @@ programs }` from three's `renderer.info` of the game canvas), read only when cal
   and a rules-5 P2 to one species of its pool, and `materialTable.test.ts` the 12 rows to their
   slot's family, rarity and window with looks no other species wears. Income, p* and P2's time do
   not move because the cells and kind slots do not: the Tester's `balance:report` confirms them.
+- **P2's own kinds** (ticket 709, GD ruling (A) on #709; HS and VS input on #709): a fresh P2,
+  entered under ore rules 9 (generator 14), draws Cinnabar (metal uncommon), Aquamarine and Jet
+  (crystal rare) on its own kind slots 13 to 15 in bands 4 and 5, at their tier's price.
+  `src/features/roster/roster.p2OwnKinds.test.ts` reads the same whole-planet cells with the kind
+  slot masked under rules 9 as under rules 8 (family, tier, ore id and density, so band money,
+  income and p* are exactly main's), the own kinds only on metal uncommon and crystal rare patches
+  of bands 4 and 5, and every other kind slot as rules 8 drew it. `kindRows.test.ts` holds the own
+  slots and their guards, `planetRoster.test.ts` P1 and a rules-8 P2 on the shared 12,
+  `generatorGolden.test.ts` the rules-9 P2 digest and P1 and P3 on under rules 9 as rules 8, and
+  `oreRulesOldSaves.test.ts` a generator 13 save of P2 under rules 8 with main's column pin. The
+  sprites are ticket 710's, so `mineralSkins.planet2.test.ts` holds slots 13 to 15 unskinned.
 - **Planet registry** (ticket 642, GD lock R1 on #302 6306854642 and its addendum 6306861669):
   `src/features/ores/systems/planetRows.test.ts` holds each planet's row (pool and radius on one
   row, P1 to P10), the frozen radii to R(p) = round(300 + 175 ln p) with the shared k inside 150 to

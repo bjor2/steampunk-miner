@@ -23,6 +23,9 @@
  * ramp to fit band 1, while planet 1 (whose row is its ladder radius), every planet past the last
  * row and every planet a save holds keep #6's ladder. Ore rules 8 (ticket 652) lays each planet's
  * hazard pockets from planet 2 as a read of the cells, which it never repaints, so it moves no
- * generated cell and needs no bump.
+ * generated cell and needs no bump. Version 14 draws P2's three own kinds, Cinnabar, Aquamarine and
+ * Jet, on its uncommon and rare patches of bands 4 and 5 on a planet 2 entered under ore rules 9
+ * (ticket 709, TD ruling: v13 kept as the versioned path), which rewrites the kind slot of those
+ * patches alone, while planet 1, planets 3 on and every planet a save holds keep the cells of 13.
  */
-export const GENERATOR_VERSION = 13
+export const GENERATOR_VERSION = 14

@@ -5,6 +5,8 @@ import { chunkDigest } from './chunkDigest'
 import { generateChunk } from './generateChunk'
 import {
   DEPTH_CURVE_ORE_RULES,
+  HAZARD_POCKET_ORE_RULES,
+  P2_OWN_KINDS_ORE_RULES,
   planetParamsFor,
   RADIUS_ROWS_ORE_RULES,
   radiusForPlanet,
@@ -34,14 +36,16 @@ import { chunkRangeOfDisc } from './tileGrid'
  * it was, and the surface layer of a planet from 2 entered under ore rules 5 under 12, ticket 625,
  * which changes rock hardness only and so no cell, and the planet registry's radius of a planet from
  * 2 entered under ore rules 7 under 13, ticket 643, pinned by the registry digests and leaving
- * planet 1 and every planet past the registry's last row as rules 6 made them, with the features
- * loaded as the game loads them): a committed
+ * planet 1 and every planet past the registry's last row as rules 6 made them, and P2's own kinds
+ * of a planet 2 entered under ore rules 9 under 14, ticket 709, pinned by the own kinds digest and
+ * leaving planet 1 and planets 3 on as rules 8 made them, with the features loaded as the game
+ * loads them): a committed
  * digest of the generator's cells and density. If this fails, the
  * generator changed what a seed makes: bump GENERATOR_VERSION (saves and replays of the old
  * world are then refused) and update the version and digests below in the same commit.
  */
 const GOLDEN = {
-  generatorVersion: 13,
+  generatorVersion: 14,
   wholePlanet1: '4219af3346401cb7',
   wholePlanet2: 'ff1572afae8b0e0f',
   farPlanetChunks: 'c602124184c77617',
@@ -59,6 +63,7 @@ const GOLDEN = {
   registryWholePlanet2: '6ca889f56379795a',
   registryHeatPlanetChunks: 'd568c7407fa2f81b',
   registryPlanet10Chunks: 'cda25bf497309628',
+  ownKindsWholePlanet2: '5a736035f5f215bb',
 }
 
 /** One digest over every chunk's digest in a fixed order. */
@@ -188,6 +193,26 @@ describe('generator golden digest', () => {
       const before = planetParamsFor(83921, planet, P2_POOL_ORE_RULES)
       const sized = planetParamsFor(83921, planet, RADIUS_ROWS_ORE_RULES)
       expect(digestOfChunks(sized, HEAT_PLANET_CHUNKS), `planet ${planet}`).toBe(
+        digestOfChunks(before, HEAT_PLANET_CHUNKS),
+      )
+    }
+  })
+
+  it('makes the committed planet 2 with its own kinds, ore rules 9 (ticket 709)', () => {
+    const planet2 = planetParamsFor(4_000_000_000, 2, P2_OWN_KINDS_ORE_RULES)
+    const before = planetParamsFor(4_000_000_000, 2, HAZARD_POCKET_ORE_RULES)
+    const digest = digestOfChunks(planet2, everyChunkOf(planet2))
+    expect(digest).toBe(GOLDEN.ownKindsWholePlanet2)
+    expect(digest).not.toBe(digestOfChunks(before, everyChunkOf(before)))
+  })
+
+  it('makes planet 1 and the planets from 3 under ore rules 9 as rules 8 did', () => {
+    const planet1 = planetParamsFor(83921, 1, P2_OWN_KINDS_ORE_RULES)
+    expect(digestOfChunks(planet1, everyChunkOf(planet1))).toBe(GOLDEN.stampedWholePlanet1)
+    for (const planet of [3, 8, 10, 60]) {
+      const before = planetParamsFor(83921, planet, HAZARD_POCKET_ORE_RULES)
+      const owned = planetParamsFor(83921, planet, P2_OWN_KINDS_ORE_RULES)
+      expect(digestOfChunks(owned, HEAT_PLANET_CHUNKS), `planet ${planet}`).toBe(
         digestOfChunks(before, HEAT_PLANET_CHUNKS),
       )
     }

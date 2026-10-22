@@ -279,23 +279,23 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/ground-gun/turretPace.lane.test.ts` | 1 | 1 |
 | `src/features/ground-gun/ui/fireGauge.test.ts` | 3 | 3 |
 
-### `materials`: 4 files, 66 tests
+### `materials`: 4 files, 67 tests
 
 | File | Tests | Sites |
 | --- | --- | --- |
 | `src/features/materials/systems/materialNames.test.ts` | 14 | 4 |
-| `src/features/materials/systems/materialTable.test.ts` | 41 | 38 |
+| `src/features/materials/systems/materialTable.test.ts` | 42 | 39 |
 | `src/features/materials/systems/render/heroAtlases.test.ts` | 6 | 6 |
 | `src/features/materials/systems/render/rarityLooks.test.ts` | 5 | 5 |
 
-### `mineral-skins`: 10 files, 146 tests
+### `mineral-skins`: 10 files, 149 tests
 
 | File | Tests | Sites |
 | --- | --- | --- |
 | `src/features/mineral-skins/mineralSkins.art.test.ts` | 31 | 3 |
 | `src/features/mineral-skins/mineralSkins.noTwoAlike.test.ts` | 8 | 2 |
 | `src/features/mineral-skins/mineralSkins.planet1.test.ts` | 13 | 2 |
-| `src/features/mineral-skins/mineralSkins.planet2.test.ts` | 14 | 3 |
+| `src/features/mineral-skins/mineralSkins.planet2.test.ts` | 17 | 4 |
 | `src/features/mineral-skins/mineralSkins.planet3.test.ts` | 19 | 4 |
 | `src/features/mineral-skins/mineralSkins.planet4.test.ts` | 8 | 3 |
 | `src/features/mineral-skins/mineralSkins.planet5.test.ts` | 18 | 3 |
@@ -380,7 +380,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/ore-visuals/systems/oreGradeChannels.test.ts` | 7 | 7 |
 | `src/features/ore-visuals/systems/render/oreLookProvider.test.ts` | 21 | 10 |
 
-### `ores`: 26 files, 206 tests
+### `ores`: 26 files, 211 tests
 
 | File | Tests | Sites |
 | --- | --- | --- |
@@ -395,7 +395,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/ores/systems/hazardNearDock.test.ts` | 2 | 2 |
 | `src/features/ores/systems/hazardPockets.test.ts` | 7 | 7 |
 | `src/features/ores/systems/kernelOreAliases.test.ts` | 2 | 2 |
-| `src/features/ores/systems/kindRows.test.ts` | 14 | 14 |
+| `src/features/ores/systems/kindRows.test.ts` | 19 | 19 |
 | `src/features/ores/systems/leadRoll.test.ts` | 20 | 12 |
 | `src/features/ores/systems/oreCatalogue.test.ts` | 10 | 10 |
 | `src/features/ores/systems/oreCensus.test.ts` | 4 | 4 |
@@ -487,7 +487,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/rig-look/systems/rigLookSource.test.ts` | 13 | 13 |
 | `src/features/rig-look/systems/rigLookTable.test.ts` | 25 | 25 |
 
-### `roster`: 14 files, 211 tests
+### `roster`: 15 files, 218 tests
 
 | File | Tests | Sites |
 | --- | --- | --- |
@@ -495,10 +495,11 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/roster/rarityShares.test.ts` | 18 | 18 |
 | `src/features/roster/roster.byteIdentity.lane.test.ts` | 5 | 1 |
 | `src/features/roster/roster.byteIdentity.test.ts` | 29 | 15 |
+| `src/features/roster/roster.p2OwnKinds.test.ts` | 5 | 5 |
 | `src/features/roster/roster.p2Pool.test.ts` | 3 | 3 |
 | `src/features/roster/roster.pacing.lane.test.ts` | 1 | 1 |
 | `src/features/roster/roster.poolSeam.test.ts` | 7 | 1 |
-| `src/features/roster/systems/planetRoster.test.ts` | 10 | 10 |
+| `src/features/roster/systems/planetRoster.test.ts` | 12 | 12 |
 | `src/features/roster/systems/planetSpecies.test.ts` | 6 | 6 |
 | `src/features/roster/systems/rosterFold.test.ts` | 6 | 6 |
 | `src/features/roster/systems/rosterGuard.test.ts` | 84 | 10 |
@@ -1032,7 +1033,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | --- | --- | --- |
 | `src/logging/goldenRun.test.ts` | 26 | 10 |
 | `src/logging/secondSliceGolden.test.ts` | 6 | 6 |
-| `src/systems/world/generatorGolden.test.ts` | 13 | 13 |
+| `src/systems/world/generatorGolden.test.ts` | 15 | 15 |
 
 ### `hints`
 
@@ -1342,7 +1343,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/save/cutFrontSave.test.ts` | 2 | 2 |
 | `src/systems/save/loadedSaveDigest.test.ts` | 4 | 4 |
 | `src/systems/save/newerSaveText.test.ts` | 5 | 5 |
-| `src/systems/save/oreRulesOldSaves.test.ts` | 13 | 7 |
+| `src/systems/save/oreRulesOldSaves.test.ts` | 14 | 8 |
 | `src/systems/save/playerProfile.test.ts` | 4 | 4 |
 | `src/systems/save/saveBytesWatch.test.ts` | 2 | 2 |
 | `src/systems/save/saveDeterminism.test.ts` | 7 | 7 |

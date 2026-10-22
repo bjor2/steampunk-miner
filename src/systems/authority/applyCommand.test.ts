@@ -64,10 +64,11 @@ describe('authority: determinism', () => {
   // 5 m left of the dock point, #175), snapshot 20 (the charge rack holds its charges by size,
   // none here, K8 #218), generator 10 (planets are entered under ore rules 2, ticket 446),
   // generator 12 (planet 2 is entered under ore rules 5, the surface layer, ticket 625) and
-  // generator 13 (planet 2 is entered under ore rules 7, the registry radius, ticket 643) and ore
-  // rules 8 (planet 2 is entered under the hazard pockets, ticket 652).
+  // generator 13 (planet 2 is entered under ore rules 7, the registry radius, ticket 643), ore
+  // rules 8 (planet 2 is entered under the hazard pockets, ticket 652) and generator 14 (planet 2 is
+  // entered under ore rules 9, its own kinds, ticket 709; the stamp alone moves the digest).
   it('pins the digest of a known session, so a rule change shows up as a decision', () => {
-    expect(stateDigest(replay(SESSION).state)).toBe('e953af8119ad0f57')
+    expect(stateDigest(replay(SESSION).state)).toBe('172feb46ef88ff9a')
   })
 
   it('gives a different digest when one command differs', () => {
@@ -84,7 +85,7 @@ describe('authority: determinism', () => {
 describe('authority: debug commands', () => {
   it('moves the session to another planet and seed', () => {
     const { state } = replay(SESSION.slice(0, 2))
-    expect(state.planet).toEqual({ index: 2, seed: 83921, oreRulesVersion: 8 })
+    expect(state.planet).toEqual({ index: 2, seed: 83921, oreRulesVersion: 9 })
   })
 
   it('adds granted money exactly to all 40 digits', () => {

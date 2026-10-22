@@ -50,7 +50,31 @@
         { "slotId": "legacy.u4", "family": "crystal", "rarity": "uncommon", "window": [2, 5] },
         { "slotId": "legacy.r1", "family": "metal", "rarity": "rare", "window": [3, 5] },
         { "slotId": "legacy.r2", "family": "crystal", "rarity": "rare", "window": [3, 4] },
-        { "slotId": "legacy.r3", "family": "crystal", "rarity": "rare", "window": [4, 5] }
+        { "slotId": "legacy.r3", "family": "crystal", "rarity": "rare", "window": [4, 5] },
+        {
+          "slotId": "legacy.u5",
+          "family": "metal",
+          "rarity": "uncommon",
+          "window": [4, 5],
+          "pool": "foothold-p2",
+          "fromOreRules": 9
+        },
+        {
+          "slotId": "legacy.r4",
+          "family": "crystal",
+          "rarity": "rare",
+          "window": [4, 5],
+          "pool": "foothold-p2",
+          "fromOreRules": 9
+        },
+        {
+          "slotId": "legacy.r5",
+          "family": "crystal",
+          "rarity": "rare",
+          "window": [4, 5],
+          "pool": "foothold-p2",
+          "fromOreRules": 9
+        }
       ],
       "mixed": [
         { "slotId": "mixed.c1", "family": "metal", "rarity": "common", "window": [1, 5] },

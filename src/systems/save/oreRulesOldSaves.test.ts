@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import type { AuthorityState } from '../authority/authorityState'
+import { createAuthorityState, type AuthorityState } from '../authority/authorityState'
 import { hardnessOfTile } from '../authority/groundDrill'
 import { resourceTierOf } from '../authority/minedOre'
 import { planetParamsOf } from '../authority/planetOfState'
@@ -100,6 +100,17 @@ const RULES_SIX_PLANET_5_PIN: ColumnPin = {
 }
 const LADDER_RADIUS_PLANET_5 = 580
 
+/**
+ * Ticket 709: a generator 13 save holding planet 2 under ore rules 8, the last before P2's own
+ * kinds, pinned on main at 02d6763f2 (generator 13) over the column through the planet's centre.
+ */
+const RULES_EIGHT_PLANET_2_PIN: ColumnPin = {
+  chunks: 'aa09d00e7cb9d0fa',
+  ores: '3b666d1343748659',
+  oreCells: 3974,
+  value: '3.72134821e+5',
+}
+
 const FIXTURES = [
   ['pre-175 planet 1', PLANET_1_SAVE],
   ['pre-181 planet 5', PLANET_5_SAVE],
@@ -134,6 +145,12 @@ function rulesFourPlanet5(): AuthorityState {
 function rulesSixPlanet5(): AuthorityState {
   const state = loaded(PLANET_5_SAVE)
   return { ...state, planet: { ...state.planet, oreRulesVersion: 6 } }
+}
+
+/** A fresh planet 2 session as if entered under ore rules 8, the last before P2's own kinds. */
+function rulesEightPlanet2(): AuthorityState {
+  const state = createAuthorityState({ planetIndex: 2, planetSeed: 83921, playerIds: ['p1'] })
+  return { ...state, planet: { ...state.planet, oreRulesVersion: 8 } }
 }
 
 /** That state saved as generator `generatorVersion` wrote it. */
@@ -188,6 +205,7 @@ describe('saves written before the ore rules', () => {
       { version: 'generatorVersion', from: 10, to: 11 },
       { version: 'generatorVersion', from: 11, to: 12 },
       { version: 'generatorVersion', from: 12, to: 13 },
+      { version: 'generatorVersion', from: 13, to: 14 },
     ])
     expect('state' in reading && stateDigest(reading.state)).toBe(stateDigest(loaded(file)))
   })
@@ -200,6 +218,7 @@ describe('saves written before the ore rules', () => {
       { version: 'generatorVersion', from: 10, to: 11 },
       { version: 'generatorVersion', from: 11, to: 12 },
       { version: 'generatorVersion', from: 12, to: 13 },
+      { version: 'generatorVersion', from: 13, to: 14 },
     ])
     expect(reading.state.planet.oreRulesVersion).toBe(1)
     expect(stateDigest(reading.state)).toBe(stateDigest(rulesOnePlanet5()))
@@ -215,6 +234,7 @@ describe('saves written before the ore rules', () => {
       { version: 'generatorVersion', from: 10, to: 11 },
       { version: 'generatorVersion', from: 11, to: 12 },
       { version: 'generatorVersion', from: 12, to: 13 },
+      { version: 'generatorVersion', from: 13, to: 14 },
     ])
     expect(reading.state.planet.oreRulesVersion).toBe(2)
     expect(stateDigest(reading.state)).toBe(stateDigest(rulesTwoPlanet5()))
@@ -229,6 +249,7 @@ describe('saves written before the ore rules', () => {
     expect(reading.migrations.filter((step) => 'version' in step)).toEqual([
       { version: 'generatorVersion', from: 11, to: 12 },
       { version: 'generatorVersion', from: 12, to: 13 },
+      { version: 'generatorVersion', from: 13, to: 14 },
     ])
     expect(reading.state.planet.oreRulesVersion).toBe(4)
     expect(stateDigest(reading.state)).toBe(stateDigest(rulesFourPlanet5()))
@@ -245,11 +266,24 @@ describe('saves written before the ore rules', () => {
     if (!('state' in reading)) throw new Error(reading.problems.join('; '))
     expect(reading.migrations.filter((step) => 'version' in step)).toEqual([
       { version: 'generatorVersion', from: 12, to: 13 },
+      { version: 'generatorVersion', from: 13, to: 14 },
     ])
     expect(reading.state.planet.oreRulesVersion).toBe(6)
     expect(stateDigest(reading.state)).toBe(stateDigest(rulesSixPlanet5()))
     const params = planetParamsOf(reading.state.planet) as PlanetParams
     expect(params.radiusTiles).toBe(LADDER_RADIUS_PLANET_5)
     expect(columnPinOf(params)).toEqual(RULES_SIX_PLANET_5_PIN)
+  })
+
+  it('load a generator 13 save of planet 2 under ore rules 8 with its 12 species, every cell as main made it (ticket 709)', () => {
+    const reading = readMigratedSaveSlot(generatorSaveOf(rulesEightPlanet2(), 13))
+    if (!('state' in reading)) throw new Error(reading.problems.join('; '))
+    expect(reading.migrations.filter((step) => 'version' in step)).toEqual([
+      { version: 'generatorVersion', from: 13, to: 14 },
+    ])
+    expect(reading.state.planet.oreRulesVersion).toBe(8)
+    expect(stateDigest(reading.state)).toBe(stateDigest(rulesEightPlanet2()))
+    const params = planetParamsOf(reading.state.planet) as PlanetParams
+    expect(columnPinOf(params)).toEqual(RULES_EIGHT_PLANET_2_PIN)
   })
 })

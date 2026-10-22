@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { ORE_RULES_VERSION } from '../../../systems/world/planetParams'
+import { ORE_RULES_VERSION, P2_OWN_KINDS_ORE_RULES } from '../../../systems/world/planetParams'
 import economyFile from '../ores.economy.json'
 import familiesFile from '../oreFamilies.json'
 import { isSlotLiveInBand, kindRowsOf, poolOfPlanetUnder, slotsOfPoolUnder } from './kindRows'
@@ -29,15 +29,32 @@ function problemsWithEarlierPools(poolsBeforeOreRules: unknown): string[] {
 const C1: Slot = economyFile.ore.kinds.legacy[0]
 
 describe('ore kind slots', () => {
-  it('ships Systems twelve legacy slots, 5 common, 4 uncommon and 3 rare', () => {
-    const legacy = ORE_ROWS.kinds.slotsBySet.legacy
-    const count = (rarity: string) => legacy.filter((slot) => slot.rarity === rarity).length
-    expect(legacy.map((slot) => slot.slotId)).toEqual([
+  it('ships Systems twelve shared legacy slots, 5 common, 4 uncommon and 3 rare', () => {
+    const shared = ORE_ROWS.kinds.slotsBySet.legacy.filter((slot) => slot.owner === undefined)
+    const count = (rarity: string) => shared.filter((slot) => slot.rarity === rarity).length
+    expect(shared.map((slot) => slot.slotId)).toEqual([
       ...['c1', 'c2', 'c3', 'c4', 'c5', 'u1', 'u2', 'u3', 'u4', 'r1', 'r2', 'r3'].map(
         (name) => `legacy.${name}`,
       ),
     ])
     expect([count('common'), count('uncommon'), count('rare')]).toEqual([5, 4, 3])
+  })
+
+  it("appends P2's own three slots, a metal uncommon and two crystal rares in bands 4-5, from ore rules 9 (ticket 709)", () => {
+    const own = ORE_ROWS.kinds.slotsBySet.legacy.slice(12)
+    expect(own).toEqual(
+      [
+        ['legacy.u5', 'metal', 'uncommon'],
+        ['legacy.r4', 'crystal', 'rare'],
+        ['legacy.r5', 'crystal', 'rare'],
+      ].map(([slotId, family, rarity]) => ({
+        slotId,
+        family,
+        rarity,
+        window: [4, 5],
+        owner: { pool: 'foothold-p2', fromOreRules: P2_OWN_KINDS_ORE_RULES },
+      })),
+    )
   })
 
   it("ships Systems' mixed slots 4/3/3/3/2, then Option B's two fossil commons appended", () => {
@@ -81,8 +98,8 @@ describe('ore kind slots', () => {
   })
 
   it('refuses a table with more kinds than rosterMaxKinds', () => {
-    expect(problemsWithLegacy(economyFile.ore.kinds.legacy, 11)).toEqual([
-      'ore.kinds.legacy holds 12 kinds, over rosterMaxKinds',
+    expect(problemsWithLegacy(economyFile.ore.kinds.legacy, 14)).toEqual([
+      'ore.kinds.legacy holds 15 kinds, over rosterMaxKinds',
       'ore.kinds.mixed holds 17 kinds, over rosterMaxKinds',
     ])
     expect(problemsWithLegacy(economyFile.ore.kinds.legacy, 15)).toEqual([

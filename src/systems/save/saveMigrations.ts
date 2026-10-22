@@ -59,6 +59,12 @@
  * radius and never regenerates mid-run; every cell, edit and the whole state are kept, and the next
  * planet from planet 2 is stamped with rules 7.
  *
+ * Generator 13 -> 14 (ticket 709): planet 2 entered under ore rules 9 draws its three own kinds on
+ * the uncommon and rare patches of bands 4 and 5. A save written before it holds its planet under
+ * rules 8 or earlier, so that planet keeps the 12 species it was entered with and never regenerates
+ * mid-run; every cell, edit and the whole state are kept, and the next planet from planet 2 is
+ * stamped with rules 9.
+ *
  * Format 1 -> 2 (#401): the slot layout. A v1 file was the checkpoint of the single slot, so it
  * becomes the autosave with no wall time, and its header gains the ids of the rows its state opens
  * (`savedUnlocks.ts`). Its sections are kept byte for byte: money, levels and everything else.
@@ -157,6 +163,7 @@ const SAVE_MIGRATION_STEPS: readonly SaveMigrationStep[] = [
   { version: 'generatorVersion', from: 10, to: 11, migrate: keepStepBandDensity },
   { version: 'generatorVersion', from: 11, to: 12, migrate: keepShippedSurface },
   { version: 'generatorVersion', from: 12, to: 13, migrate: keepLadderRadius },
+  { version: 'generatorVersion', from: 13, to: 14, migrate: keepTwelveSpecies },
   { version: 'formatVersion', from: 1, to: 2, migrate: addSlotHeader },
   { version: 'formatVersion', from: 2, to: 3, migrate: packChunkTable },
 ]
@@ -295,6 +302,10 @@ function keepShippedSurface(file: MigratingFile): MigratingFile | null {
 
 function keepLadderRadius(file: MigratingFile): MigratingFile | null {
   return keptUnderGenerator(file, 13)
+}
+
+function keepTwelveSpecies(file: MigratingFile): MigratingFile | null {
+  return keptUnderGenerator(file, 14)
 }
 
 function keptUnderGenerator(file: MigratingFile, generatorVersion: number): MigratingFile | null {

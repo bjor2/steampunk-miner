@@ -271,25 +271,44 @@ describe('legacy materials', () => {
 
 // Ticket 632 (GD lock (b) on #595, Progression's species list): P2's own 12 species, one on each
 // legacy kind slot with that slot's family, rarity and window, ids `p2-<slot>`, every one a look no
-// other species wears, and no hero until hero art packs one into P2's atlas.
+// other species wears, and no hero until hero art packs one into P2's atlas. Ticket 709 (GD ruling
+// (A) on #709, Progression's names) adds three on the pool's own slots: Cinnabar, Aquamarine, Jet.
 describe('foothold-p2 materials', () => {
   const p2 = MATERIALS.materials.filter((material) => material.pool === 'foothold-p2')
   const legacy = MATERIALS.materials.filter((material) => material.pool === 'legacy')
+  const OWN_SLOTS = ['legacy.u5', 'legacy.r4', 'legacy.r5']
+  const onShared = p2.filter((material) => !OWN_SLOTS.includes(material.slot))
 
-  it('puts one species on each legacy slot, 5 common, 4 uncommon and 3 rare, ids p2-<slot>', () => {
+  it('puts one species on each legacy slot and its own three, 5 common, 5 uncommon and 5 rare, ids p2-<slot>', () => {
     const slots = p2.map((material) => material.slot).sort()
-    expect(slots).toEqual(legacy.map((material) => material.slot).sort())
+    expect(slots).toEqual([...legacy.map((material) => material.slot), ...OWN_SLOTS].sort())
     expect(p2.map((material) => material.id)).toEqual(
       p2.map((material) => `p2-${material.slot.replace('legacy.', '')}`),
     )
     const countOf = (rarity: string) => p2.filter((material) => material.rarity === rarity).length
-    expect(MATERIAL_RARITIES.map(countOf)).toEqual([5, 4, 3, 0, 0])
+    expect(MATERIAL_RARITIES.map(countOf)).toEqual([5, 5, 5, 0, 0])
   })
 
   it("keeps the family, rarity and band window of the legacy species on the species' slot", () => {
     const descriptorOf = ({ slot, family, rarity, gradeBand }: (typeof p2)[number]) =>
       `${slot} ${family} ${rarity} ${gradeBand.join('-')}`
-    expect(p2.map(descriptorOf).sort()).toEqual(legacy.map(descriptorOf).sort())
+    expect(onShared.map(descriptorOf).sort()).toEqual(legacy.map(descriptorOf).sort())
+  })
+
+  it('names the own three as Progression posted them, a metal uncommon and two crystal rares in bands 4-5', () => {
+    const ownOf = (slot: string) => p2.find((material) => material.slot === slot)
+    expect(
+      OWN_SLOTS.map(ownOf).map((material) => [
+        material?.epithet,
+        material?.family,
+        material?.rarity,
+        material?.gradeBand.join('-'),
+      ]),
+    ).toEqual([
+      ['Cinnabar', 'metal', 'uncommon', '4-5'],
+      ['Aquamarine', 'crystal', 'rare', '4-5'],
+      ['Jet', 'crystal', 'rare', '4-5'],
+    ])
   })
 
   it('gives every species its own hue slot and a silhouette and pattern pair no other wears', () => {

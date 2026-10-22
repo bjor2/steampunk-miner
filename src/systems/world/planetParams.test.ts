@@ -14,6 +14,7 @@ import {
   freshPlanetParamsFor,
   freshRadiusTilesOf,
   HAZARD_POCKET_ORE_RULES,
+  P2_OWN_KINDS_ORE_RULES,
   isDepthCurvePlanet,
   isHazardPocketPlanet,
   ORE_RULES_FROM_PLANET,
@@ -158,15 +159,16 @@ describe('planet params ore rules (ticket 445)', () => {
     expect(Object.keys(stamped).at(-1)).toBe('oreRulesVersion')
   })
 
-  it('stamps fresh planet 1 with ore rules 2 and planet 2 on with rules 8 (446, 448, #453, 625, 632, 643, 652)', () => {
+  it('stamps fresh planet 1 with ore rules 2 and planet 2 on with rules 9 (446, 448, #453, 625, 632, 643, 652, 709)', () => {
     const stamps = [1, 2, 3, 4, 60].map((index) => freshPlanetParamsFor(1, index).oreRulesVersion)
     expect(ORE_RULES_FROM_PLANET).toBe(1)
-    expect(ORE_RULES_VERSION).toBe(8)
-    expect(stamps).toEqual([2, 8, 8, 8, 8])
+    expect(ORE_RULES_VERSION).toBe(9)
+    expect(P2_OWN_KINDS_ORE_RULES).toBe(ORE_RULES_VERSION)
+    expect(stamps).toEqual([2, 9, 9, 9, 9])
   })
 
   it('holds hazard pockets only on a planet from 2 entered under ore rules 8 (ticket 652)', () => {
-    expect(HAZARD_POCKET_ORE_RULES).toBe(ORE_RULES_VERSION)
+    expect(HAZARD_POCKET_ORE_RULES).toBe(8)
     const isPocketPlanet = (planet: number, rules?: number) =>
       isHazardPocketPlanet(planetParamsFor(83921, planet, rules))
     expect([2, 3, 5, 60].map((planet) => isPocketPlanet(planet, 8))).toEqual([
