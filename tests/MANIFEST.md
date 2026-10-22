@@ -1024,9 +1024,10 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | File | Tests | Sites |
 | --- | --- | --- |
 | `src/systems/feedback/accents.test.ts` | 18 | 2 |
-| `src/systems/feedback/feedbackCues.test.ts` | 16 | 16 |
+| `src/systems/feedback/feedbackCues.test.ts` | 17 | 17 |
 | `src/systems/feedback/haptics.test.ts` | 2 | 2 |
-| `src/systems/feedback/screenEffects.test.ts` | 9 | 9 |
+| `src/systems/feedback/hitFeedback.test.ts` | 10 | 3 |
+| `src/systems/feedback/screenEffects.test.ts` | 18 | 16 |
 
 ### `golden-replay`
 
