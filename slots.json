@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-10-22T06:25:42+02:00",
+  "updated_at": "2026-10-22T06:27:07+02:00",
   "caps": {
     "grok": 12,
     "claude": 10,
@@ -19,19 +19,21 @@
       "slots": [
         {
           "slot": "C1",
-          "state": "free",
-          "ticket": null,
-          "grok_slot": null,
-          "kind": null,
-          "since": null
+          "state": "busy",
+          "ticket": 681,
+          "grok_slot": 1,
+          "kind": "dev",
+          "since": "2026-10-22T06:27:00+02:00",
+          "wave": null
         },
         {
           "slot": "C2",
-          "state": "free",
+          "state": "busy",
           "ticket": null,
           "grok_slot": null,
-          "kind": null,
-          "since": null
+          "kind": "aux",
+          "since": null,
+          "label": "wave-plan 316"
         },
         {
           "slot": "C3",
@@ -67,9 +69,9 @@
         }
       ],
       "size": 6,
-      "used": 0,
-      "free": 6,
-      "claims_last_hour": 3,
+      "used": 2,
+      "free": 4,
+      "claims_last_hour": 5,
       "name": "Claude Max 1"
     },
     {
@@ -189,9 +191,11 @@
   "grok": [
     {
       "slot": 1,
-      "state": "free",
-      "ticket": null,
-      "since": null
+      "state": "dev",
+      "ticket": 681,
+      "since": "2026-10-22T06:27:00+02:00",
+      "claude_slot": 1,
+      "wave": null
     },
     {
       "slot": 2,
@@ -263,18 +267,21 @@
   "claude": [
     {
       "slot": 1,
-      "state": "free",
-      "ticket": null,
-      "grok_slot": null,
-      "since": null,
-      "account": 1
+      "state": "busy",
+      "ticket": 681,
+      "grok_slot": 1,
+      "since": "2026-10-22T06:27:00+02:00",
+      "account": 1,
+      "wave": null
     },
     {
       "slot": 2,
-      "state": "free",
+      "state": "busy",
       "ticket": null,
       "grok_slot": null,
       "since": null,
+      "kind": "aux",
+      "label": "wave-plan 316",
       "account": 1
     },
     {
@@ -347,17 +354,17 @@
     }
   ],
   "last_refill": {
-    "at": "2026-10-22 06:24 CEST",
-    "mode": "refill-dev",
-    "triggers": "#662",
-    "started": "",
-    "note": "no pickable build ticket"
+    "at": "2026-10-22 06:27 CEST",
+    "mode": "recheck",
+    "triggers": "claude-run:tester-triage claude-run:wave-plan",
+    "started": "#681->C1/A1",
+    "note": "spawned 1 worker(s)"
   },
   "totals": {
     "grok": {
       "size": 12,
-      "used": 0,
-      "dev": 0,
+      "used": 1,
+      "dev": 1,
       "dev_cap": 8,
       "planner": 0,
       "planner_cap": 4
@@ -365,8 +372,8 @@
     "claude": {
       "size": 10,
       "enabled": 6,
-      "used": 0,
-      "free": 6,
+      "used": 2,
+      "free": 4,
       "external": 0
     }
   },
