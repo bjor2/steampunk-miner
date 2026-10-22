@@ -57,6 +57,8 @@ describe('e2e: affected-spec map', () => {
   it("runs a slice's specs when only that slice changes", () => {
     expect(select('src/features/sell-burst/burst.ts').specs).toEqual([
       'e2e/browser/sellBurst.spec.ts',
+      'e2e/browser/sellReceipt.spec.ts',
+      'e2e/browser/ui/uiShots.spec.ts',
     ])
   })
 
@@ -88,8 +90,10 @@ describe('e2e: affected-spec map', () => {
     const choice = select('src/features/sell-burst/burst.ts', 'src/features/example/register.ts')
     expect(choice.specs).toEqual([
       'e2e/browser/sellBurst.spec.ts',
+      'e2e/browser/sellReceipt.spec.ts',
       'e2e/browser/sliceScreen.spec.ts',
       'e2e/browser/smoke.spec.ts',
+      'e2e/browser/ui/uiShots.spec.ts',
       'e2e/browser/uiParts.spec.ts',
       'e2e/browser/vehiclePieces.spec.ts',
     ])
