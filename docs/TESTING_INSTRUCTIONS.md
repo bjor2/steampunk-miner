@@ -1514,6 +1514,13 @@ incomePerHour}` go to `balance-report/drill-pace.ndjson`, which `pushTestMetrics
   ladder, the staged full hold, a collapse under the rig, each tier exactly once; the glow has no
   `data-hud` box, no box enters the middle band, and the status row holds 3 icons on the phone and
   6 on desktop. Box Tester only.
+- **Per-buy gauge cue** (ticket 727, spec #678): the cue is pure (`systems/views/dialBuyCue.ts`,
+  table `buyCue` in `data/hud/gaugeCluster.json`); `dialBuyCue.test.ts` buys each track and the
+  casing grade in a scripted session and sees only that dial's notch step one place, the phone's
+  folded depth dial hand its cue to the "+N" cell, a refused buy move nothing and no cued buy count
+  as a new capability. `e2e/browser/hud/buyCue.spec.ts` runs 360x640 and 1440x900: every single
+  Outfitter buy changes its dial's `data-cue` and the cluster's shot by at least a pixel (the
+  ticket asks for the pixel difference), and the #718 reveal never plays. Box Tester only.
 - **Touch controls held upright** (ticket 485, spec #470): `e2e/browser/screens/portraitTouch.spec.ts`
   runs in the matrix's portrait touch cells (390x844, 412x915, 820x1180) and skips elsewhere. It
   measures the stick zone (the lower 45% of the height from the thumb's lower corner, ending at a

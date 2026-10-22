@@ -250,6 +250,17 @@ the core's top tile (`systems/views/depthDial.ts`), never placed by hand. Measur
 sit in one `panels` tray of the grid (under the first row upright, under the prompts sideways),
 collapsed to their glyphs and dials, opened to their words by a clean tap (`ui/hud/GaugePanels.tsx`).
 
+**The per-buy cue as built** (#727). A +1 track step barely turns a needle, so each dial carries a
+small iron pip ringed in brass on its rim that steps one of 12 notch places for every upgrade
+bought on the counts the table's `buyCue` lists under it: hull on the hull, the boiler on the
+fuel, the hold on the cargo chain, and the drill power, drill tip, engine and casing grade on the
+depth dial. Every track and the casing grade sit on exactly one dial (a load check). It has no
+ease, so it moves on the render the buy reaches, and past the twelfth place it starts again. A dial
+the strip folds into the "+N" count hands its cue to a pip sliding along a hairline under the
+count, so a drill buy shows on a phone's surface strip too. It reads only the levels owned, so it
+previews nothing, emits no event (stat buys never start the #718 reveal) and changes no economy
+number (`systems/views/dialBuyCue.ts`).
+
 **The tool slot bar as built** (#691; the G&V, GD and Producer rulings on #691). The bar is the
 kernel's `ToolSlotBar` (`ui/toolSlots/`), a grid of `--slot-columns` cells of `--slot-cell` whose
 last cell is the gear button. Its tools are **rows** of the `toolSlots` registry

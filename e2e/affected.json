@@ -752,6 +752,18 @@
       ]
     },
     {
+      "why": "The per-buy cue on the gauge cluster (ticket 727): the cue table, its notch maths and the pip on each dial and the +N cell, which every single buy from the Outfitter must move, read through data-cue and a shot pair at 360x640 and 1440x900.",
+      "paths": [
+        "src/data/hud/gaugeCluster.json",
+        "src/systems/views/dialBuyCue.ts",
+        "src/systems/views/gaugeCluster.ts",
+        "src/systems/views/gaugeClusterTable.ts",
+        "src/ui/hud/DialCluster.tsx",
+        "src/ui/hud/DialCluster.module.css"
+      ],
+      "specs": ["e2e/browser/hud/buyCue.spec.ts"]
+    },
+    {
       "why": "The UI screenshot suite (ticket 689): the HUD on the surface (with money at 1e15, ticket 684) and drilling, and every sheet, at 360x640, 390x844, 1280x800 and 1440x900, failing on overflow, a target under 44 px, coverage over budget or a box in the middle band. Anything the HUD, the coverage report or a sheet draws reaches it.",
       "paths": [
         "src/ui/hud/**",
