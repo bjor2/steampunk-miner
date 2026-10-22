@@ -1,30 +1,8 @@
 {
  "schema": 1,
- "updatedAt": "2026-10-22T04:20:27.212Z",
+ "updatedAt": "2026-10-22T04:24:16.169Z",
  "lastRuns": 50,
  "runs": [
-  {
-   "id": 1792088109354,
-   "url": "https://github.com/bjor2/steampunk-miner/commit/57ab1562b46e40d477457a3b4b5fa99a54bb89ff",
-   "event": "nightly",
-   "mode": "nightly",
-   "sha": "57ab1562b46e40d477457a3b4b5fa99a54bb89ff",
-   "branch": "main",
-   "startedAt": "2026-10-15T13:45:47Z",
-   "jobConclusion": "success",
-   "timedOut": false,
-   "jobDurationSec": 16162,
-   "source": "box",
-   "phase": "nightly",
-   "job": "balance-charges",
-   "feature": null,
-   "tickets": [],
-   "reportFound": false,
-   "files": 0,
-   "tests": 0,
-   "failed": 0,
-   "failedFiles": 0
-  },
   {
    "id": 1792089253414,
    "url": "https://github.com/bjor2/steampunk-miner/commit/57ab1562b46e40d477457a3b4b5fa99a54bb89ff",
@@ -1554,6 +1532,28 @@
    "tests": 12010,
    "failed": 3,
    "failedFiles": 6
+  },
+  {
+   "id": 1792643053888,
+   "url": "https://github.com/bjor2/steampunk-miner/commit/c42f04783d9d3d0093c9b7d2fc5765e762792bbc",
+   "event": "nightly",
+   "mode": "nightly",
+   "sha": "c42f04783d9d3d0093c9b7d2fc5765e762792bbc",
+   "branch": "main",
+   "startedAt": "2026-10-22T04:21:33Z",
+   "jobConclusion": "success",
+   "timedOut": false,
+   "jobDurationSec": 160,
+   "source": "box",
+   "phase": "nightly",
+   "job": "balance-report",
+   "feature": null,
+   "tickets": [],
+   "reportFound": false,
+   "files": 0,
+   "tests": 0,
+   "failed": 0,
+   "failedFiles": 0
   }
  ],
  "pipeline": {
@@ -1571,38 +1571,7 @@
    1792565321088,
    1792600048377
   ],
-  "scopingSuspects": [
-   {
-    "file": "src/features/ground-gun/systems/autoGunsLane.test.ts",
-    "nightlyRunId": 1792642824354,
-    "lastPerPushStatus": "passed"
-   },
-   {
-    "file": "src/features/ground-gun/systems/boreGunLane.test.ts",
-    "nightlyRunId": 1792642824354,
-    "lastPerPushStatus": "passed"
-   },
-   {
-    "file": "src/features/mobility/systems/mobilityCatalogue.test.ts",
-    "nightlyRunId": 1792642824354,
-    "lastPerPushStatus": "passed"
-   },
-   {
-    "file": "src/logging/chargeSharePayoffReport.test.ts",
-    "nightlyRunId": 1792642824354,
-    "lastPerPushStatus": "passed"
-   },
-   {
-    "file": "src/systems/authority/combat/hitArc.test.ts",
-    "nightlyRunId": 1792642824354,
-    "lastPerPushStatus": "passed"
-   },
-   {
-    "file": "src/systems/render/stationIdleMotion.test.ts",
-    "nightlyRunId": 1792642824354,
-    "lastPerPushStatus": "passed"
-   }
-  ]
+  "scopingSuspects": []
  },
  "features": {
   "tooling-tests": {
