@@ -1,0 +1,66 @@
+import { describe, expect, it } from 'vitest'
+import { PLANET_NAME_CHARACTERS_MAX } from '../../constants/uiParts'
+import { fnv1a64Hex } from '../../systems/authority/stateDigest'
+import { planetLookOf } from '../../systems/registries/planetLooks'
+import { planetDisplayNameOf } from '../../systems/registries/planetNames'
+import { surfaceLayerOf } from '../../systems/world/surfaceLayer'
+import {
+  freshPlanetParamsFor,
+  planetParamsFor,
+  radiusForPlanet,
+} from '../../systems/world/planetParams'
+
+// The planet-row registry (GD lock on #707, 6326252575): P1 to P10 keep their names, looks and
+// radii byte-identical under the current ore rules and under rules 6, the last before the
+// registry radius (ticket 643), and a planet far past the rows still resolves.
+
+const SEED = 20261021
+const PLANETS_1_TO_10 = Array.from({ length: 10 }, (_, at) => at + 1)
+/** The ore rules of P2's own species pool (ticket 632), the last before the registry radius. */
+const LADDER_ORE_RULES = 6
+const FAR_PLANETS = [1, 40, 41, 1000, 1_000_000]
+
+const GOLDEN = {
+  currentRows: '6741ad4703724077',
+  ladderRows: '64311e1adaba9536',
+}
+
+/** Each planet's name, look and generator params under `paramsOf`, as one digest. */
+function digestOfRows(paramsOf: (planet: number) => unknown): string {
+  const rows = PLANETS_1_TO_10.map((planet) => ({
+    planet,
+    name: planetDisplayNameOf(planet),
+    look: planetLookOf(planet),
+    params: paramsOf(planet),
+  }))
+  return fnv1a64Hex(JSON.stringify(rows))
+}
+
+describe('planet row golden', () => {
+  it('keeps planets 1 to 10 byte-identical under the current ore rules', () => {
+    const radii = PLANETS_1_TO_10.map((planet) => freshPlanetParamsFor(SEED, planet).radiusTiles)
+    expect(radii).toEqual([300, 421, 492, 543, 582, 614, 641, 664, 685, 703])
+    expect(digestOfRows((planet) => freshPlanetParamsFor(SEED, planet))).toBe(GOLDEN.currentRows)
+  })
+
+  it("keeps planets 1 to 10 byte-identical on #6's ladder under ore rules 6", () => {
+    const ladder = (planet: number) => planetParamsFor(SEED, planet, LADDER_ORE_RULES)
+    const radii = PLANETS_1_TO_10.map((planet) => ladder(planet).radiusTiles)
+    expect(radii).toEqual(PLANETS_1_TO_10.map(radiusForPlanet))
+    expect(digestOfRows(ladder)).toBe(GOLDEN.ladderRows)
+  })
+
+  it.each(FAR_PLANETS)(
+    'resolves planet %i with a name, a radius and a ramp inside band 1',
+    (planet) => {
+      const name = planetDisplayNameOf(planet)
+      expect(name.length).toBeGreaterThan(0)
+      expect(name.length).toBeLessThanOrEqual(PLANET_NAME_CHARACTERS_MAX)
+      const params = freshPlanetParamsFor(SEED, planet)
+      expect(params.radiusTiles).toBeGreaterThanOrEqual(planet > 10 ? 703 : 300)
+      const layer = surfaceLayerOf(params)
+      if (layer !== null)
+        expect(layer.pinnedCells + layer.rampCells).toBeLessThanOrEqual(layer.bandOneCells)
+    },
+  )
+})
