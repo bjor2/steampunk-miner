@@ -1,14 +1,14 @@
 {
   "schema": 1,
-  "updated_at": "2026-10-22T11:40:02Z",
+  "updated_at": "2026-10-22T11:40:07Z",
   "entries": {
     "steampunk-loop/1": {
       "loop": "steampunk-loop",
       "slot": "1",
-      "state": "blocked",
-      "issue": 711,
-      "note": "#711 not accepted, attempts 2/2 exhausted (slot free)",
-      "updated_at": "2026-10-22T11:40:02Z",
+      "state": "idle",
+      "issue": null,
+      "note": "free",
+      "updated_at": "2026-10-22T11:40:07Z",
       "host": "grok-bot-vm-452660841"
     },
     "steampunk-loop/2": {
@@ -16,8 +16,8 @@
       "slot": "2",
       "state": "idle",
       "issue": null,
-      "note": "free; #719 not accepted (needs-fix), will retry",
-      "updated_at": "2026-10-22T11:39:55Z",
+      "note": "free",
+      "updated_at": "2026-10-22T11:40:07Z",
       "host": "grok-bot-vm-452660841"
     },
     "steampunk-loop/3": {
@@ -26,7 +26,7 @@
       "state": "idle",
       "issue": null,
       "note": "free",
-      "updated_at": "2026-10-22T11:39:52Z",
+      "updated_at": "2026-10-22T11:40:07Z",
       "host": "grok-bot-vm-452660841"
     },
     "steampunk-loop/4": {
@@ -35,7 +35,7 @@
       "state": "working",
       "issue": 720,
       "note": "started 2026-10-22 13:23 CEST",
-      "updated_at": "2026-10-22T11:39:52Z",
+      "updated_at": "2026-10-22T11:40:07Z",
       "host": "grok-bot-vm-452660841"
     },
     "steampunk-loop": {
@@ -43,9 +43,9 @@
       "slot": null,
       "state": "working",
       "issue": null,
-      "note": "3/10 Claude slots busy, 0/4 planner slots; status check",
+      "note": "1/10 Claude slots busy, 0/4 planner slots; status check",
       "extra": {
-        "active": 3,
+        "active": 1,
         "max": 10,
         "max_attempts": 2,
         "attempts": {
@@ -625,7 +625,7 @@
         "planner": [],
         "push_pending": null
       },
-      "updated_at": "2026-10-22T11:39:52Z",
+      "updated_at": "2026-10-22T11:40:07Z",
       "host": "grok-bot-vm-452660841"
     },
     "perf-loop": {
@@ -643,7 +643,7 @@
       "state": "idle",
       "issue": null,
       "note": "free",
-      "updated_at": "2026-10-22T11:39:52Z",
+      "updated_at": "2026-10-22T11:40:07Z",
       "host": "grok-bot-vm-452660841"
     },
     "steampunk-loop/6": {
@@ -652,7 +652,7 @@
       "state": "idle",
       "issue": null,
       "note": "free",
-      "updated_at": "2026-10-22T11:39:52Z",
+      "updated_at": "2026-10-22T11:40:07Z",
       "host": "grok-bot-vm-452660841"
     },
     "steampunk-loop/7": {
@@ -661,7 +661,7 @@
       "state": "idle",
       "issue": null,
       "note": "disabled (account 2 not signed in)",
-      "updated_at": "2026-10-22T11:39:52Z",
+      "updated_at": "2026-10-22T11:40:07Z",
       "host": "grok-bot-vm-452660841"
     },
     "steampunk-loop/8": {
@@ -670,7 +670,7 @@
       "state": "idle",
       "issue": null,
       "note": "disabled (account 2 not signed in)",
-      "updated_at": "2026-10-22T11:39:52Z",
+      "updated_at": "2026-10-22T11:40:07Z",
       "host": "grok-bot-vm-452660841"
     },
     "tester": {
@@ -689,7 +689,7 @@
       "state": "idle",
       "issue": null,
       "note": "disabled (account 2 not signed in)",
-      "updated_at": "2026-10-22T11:39:52Z",
+      "updated_at": "2026-10-22T11:40:07Z",
       "host": "grok-bot-vm-452660841"
     },
     "steampunk-loop/11": {
@@ -716,11 +716,18 @@
       "state": "idle",
       "issue": null,
       "note": "disabled (account 2 not signed in)",
-      "updated_at": "2026-10-22T11:39:52Z",
+      "updated_at": "2026-10-22T11:40:07Z",
       "host": "grok-bot-vm-452660841"
     }
   },
   "events": [
+    {
+      "at": "2026-10-22T11:40:07Z",
+      "key": "steampunk-loop/1",
+      "state": "idle",
+      "issue": null,
+      "note": "free"
+    },
     {
       "at": "2026-10-22T11:40:02Z",
       "key": "steampunk-loop/1",
@@ -1133,13 +1140,6 @@
       "state": "working",
       "issue": 644,
       "note": "tier hard, attempt 1/2"
-    },
-    {
-      "at": "2026-10-22T00:41:29Z",
-      "key": "steampunk-loop/7",
-      "state": "idle",
-      "issue": null,
-      "note": "free; #672 landed on main and closed"
     }
   ]
 }
