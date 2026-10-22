@@ -18,6 +18,8 @@ export {
   materialGuardContext,
   materialTableProblems,
 } from './systems/materialTable'
+export type { OreRulesSpan } from './systems/materialOreRules'
+export { isSpeciesBoundUnder } from './systems/materialOreRules'
 export type { MaterialRarity } from './systems/materialRowShape'
 export { MATERIAL_RARITIES } from './systems/materialRowShape'
 export {

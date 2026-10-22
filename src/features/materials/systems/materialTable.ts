@@ -17,6 +17,7 @@ import {
   unknownHueSlotProblems,
   type HueBand,
 } from './materialLookRules'
+import { sharedSlotProblems, type OreRulesSpan } from './materialOreRules'
 import { materialRowShapeProblems, type MaterialRarity } from './materialRowShape'
 import { brightestHostRockLuma } from './render/hostRockLuma'
 
@@ -29,7 +30,7 @@ export interface HueSlot {
   luma: number
 }
 
-export interface Material {
+export interface Material extends OreRulesSpan {
   id: string
   /** The species set the row belongs to (`legacy` for P1 and P2); a data tag only. */
   pool: string
@@ -157,21 +158,6 @@ function duplicateIdProblems(entries: readonly Raw[], list: string): string[] {
   return ids
     .filter((id, at) => ids.indexOf(id) !== at)
     .map((id) => `${list} share the id ${String(id)}; each needs its own`)
-}
-
-/** A kind slot holds one species, so the roster's `(pool, slot)` lookup is never ambiguous. */
-function sharedSlotProblems(rows: readonly Raw[]): string[] {
-  const keys = rows.map(slotKeyOf)
-  return rows
-    .filter((_, at) => keys.indexOf(keys[at]) !== at)
-    .map(
-      (row) =>
-        `${String(row.id)} binds the kind slot ${String(row.slot)} that ${String(rows[keys.indexOf(slotKeyOf(row))].id)} already holds`,
-    )
-}
-
-function slotKeyOf(row: Raw): string {
-  return `${String(row.pool)}|${String(row.slot)}`
 }
 
 function tableOf(file: Raw, context: MaterialGuardContext): MaterialTable {

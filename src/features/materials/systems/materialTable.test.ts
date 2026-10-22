@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest'
+import { ORE_RULES_VERSION } from '../../../systems/world/planetParams'
 import { gateClassOf } from '../../planet-mix'
 import materialsFile from '../materials.json'
 import { MATERIAL_RARITIES } from './materialRowShape'
@@ -113,6 +114,30 @@ describe('materials table', () => {
   it('refuses two species bound to the same kind slot of a pool', () => {
     expect(problemsOf([GILDED, { ...CLEAR, slot: GILDED.slot }])).toEqual([
       'clear-quartzine binds the kind slot legacy.c1 that gilded-brassvein already holds',
+    ])
+  })
+
+  it('lets two species share a kind slot of a pool under ore rules apart (ticket 736)', () => {
+    const retired = { ...GILDED, beforeOreRules: 9 }
+    const swapped = { ...CLEAR, slot: GILDED.slot, fromOreRules: 9 }
+    expect(problemsOf([retired, swapped])).toEqual([])
+  })
+
+  it('refuses two species of one slot whose ore rules spans overlap', () => {
+    const retired = { ...GILDED, beforeOreRules: 9 }
+    const swapped = { ...CLEAR, slot: GILDED.slot, fromOreRules: 8 }
+    expect(problemsOf([retired, swapped])).toEqual([
+      'clear-quartzine binds the kind slot legacy.c1 that gilded-brassvein already holds',
+    ])
+  })
+
+  it('refuses an ore rules span this build does not know or that binds under none', () => {
+    expect(problemsOf([{ ...GILDED, fromOreRules: 1, beforeOreRules: 99 }])).toEqual([
+      `materials[0].fromOreRules must be an ore rules version from 2 to ${ORE_RULES_VERSION}`,
+      `materials[0].beforeOreRules must be an ore rules version from 2 to ${ORE_RULES_VERSION}`,
+    ])
+    expect(problemsOf([{ ...GILDED, fromOreRules: 6, beforeOreRules: 6 }])).toEqual([
+      'materials[0] binds under no ore rules: fromOreRules is not before beforeOreRules',
     ])
   })
 

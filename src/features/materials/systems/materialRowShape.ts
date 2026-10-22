@@ -1,14 +1,18 @@
 /**
  * The schema of one `materials.json` row (ticket 444): `id, pool, slot, family, epithet,
- * silhouette, pattern, hueSlot, gradeBand, rarity, hero, flavour` and nothing else. A row never
- * carries a gate class: the gate comes from the family only (#142), so rarity can never open or
- * close one (#139 GD ruling 2).
+ * silhouette, pattern, hueSlot, gradeBand, rarity, hero, flavour`, the optional ore rules span,
+ * and nothing else. A row never carries a gate class: the gate comes from the family only (#142),
+ * so rarity can never open or close one (#139 GD ruling 2).
  *
  * `pool` and `slot` are data tags only (TD ruling on ticket 446, 6226236698 and addendum
  * 6226264758; landed in ticket 447): the species set a row belongs to (`legacy` for P1 and P2) and
  * the stable kind slot id it binds to (`legacy.c1`), so a roster finds its species by `(pool, slot)`,
  * never by position. The kinds table that owns the slots lives in the ores slice.
+ *
+ * `fromOreRules` and `beforeOreRules` are optional (ticket 736): the ore rules span a row binds its
+ * slot under (`materialOreRules.ts`), so a pool can swap one slot's species at a rules version.
  */
+import { oreRulesSpanProblems } from './materialOreRules'
 
 export const MATERIAL_RARITIES = ['common', 'uncommon', 'rare', 'epic', 'mythic'] as const
 
@@ -27,6 +31,8 @@ export const MATERIAL_ROW_FIELDS: readonly string[] = [
   'rarity',
   'hero',
   'flavour',
+  'fromOreRules',
+  'beforeOreRules',
 ]
 
 /** Kebab-case only, so a species id can never read as an ore id (`<family>_t<tier>`). */
@@ -61,6 +67,7 @@ export function materialRowShapeProblems(row: Raw, where: string): string[] {
       ? []
       : [`${where}.rarity must be one of ${MATERIAL_RARITIES.join(', ')}`]),
     ...(typeof row.hero === 'boolean' ? [] : [`${where}.hero must be true or false`]),
+    ...oreRulesSpanProblems(row, where),
     ...gateFieldProblems(row, where),
     ...unknownFieldProblems(row, where),
   ]
