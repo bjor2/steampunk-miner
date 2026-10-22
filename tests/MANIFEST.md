@@ -887,6 +887,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/authority/carveGeometryKnownRed.test.ts` | 5 | 5 |
 | `src/systems/authority/casingCadence.test.ts` | 7 | 3 |
 | `src/systems/authority/casingDrill.test.ts` | 5 | 5 |
+| `src/systems/authority/casingGates.test.ts` | 3 | 3 |
 | `src/systems/authority/casingGnaw.test.ts` | 5 | 5 |
 | `src/systems/authority/casingPlacement.test.ts` | 15 | 15 |
 | `src/systems/authority/casingReversal.test.ts` | 5 | 5 |
@@ -908,6 +909,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/authority/charges/chargeSizeRules.test.ts` | 14 | 14 |
 | `src/systems/authority/clampedCharge.test.ts` | 6 | 6 |
 | `src/systems/authority/collapse/collapseAtSpeed.test.ts` | 5 | 5 |
+| `src/systems/authority/collapse/collapseBodies.test.ts` | 2 | 2 |
 | `src/systems/authority/collapse/collapseBraces.test.ts` | 23 | 22 |
 | `src/systems/authority/collapse/collapseReinforcement.test.ts` | 7 | 7 |
 | `src/systems/authority/collapse/collapseRun.test.ts` | 19 | 19 |
@@ -1301,6 +1303,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/logging/travelClampReport.test.ts` | 4 | 4 |
 | `src/logging/tripCellEnergy.lane.test.ts` | 1 | 1 |
 | `src/logging/tripCellEnergy.test.ts` | 2 | 2 |
+| `src/logging/wideBoreGolden.test.ts` | 11 | 3 |
 | `src/logging/wreckerDiveReport.test.ts` | 6 | 6 |
 
 ### `materialPop`
@@ -1823,7 +1826,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/vehicle/carryWalk.test.ts` | 52 | 22 |
 | `src/systems/vehicle/casingTrail.test.ts` | 25 | 17 |
 | `src/systems/vehicle/casingTrailCadence.lane.test.ts` | 8 | 2 |
-| `src/systems/vehicle/casingTrailReversal.test.ts` | 36 | 5 |
+| `src/systems/vehicle/casingTrailReversal.test.ts` | 40 | 6 |
 | `src/systems/vehicle/chargeSelection.test.ts` | 4 | 4 |
 | `src/systems/vehicle/colliderHalo.test.ts` | 3 | 3 |
 | `src/systems/vehicle/cutCapSpeed.test.ts` | 21 | 21 |
@@ -1833,12 +1836,12 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/vehicle/cutStartBreakdown.test.ts` | 6 | 6 |
 | `src/systems/vehicle/downCutRamp.test.ts` | 12 | 12 |
 | `src/systems/vehicle/downCutRampFront.test.ts` | 5 | 5 |
-| `src/systems/vehicle/drillBore.test.ts` | 6 | 6 |
-| `src/systems/vehicle/drillContact.test.ts` | 8 | 8 |
+| `src/systems/vehicle/drillBore.test.ts` | 8 | 8 |
+| `src/systems/vehicle/drillContact.test.ts` | 7 | 7 |
 | `src/systems/vehicle/drillGearCells.test.ts` | 12 | 12 |
 | `src/systems/vehicle/drillQuantum.test.ts` | 6 | 6 |
 | `src/systems/vehicle/drillRule.test.ts` | 22 | 23 |
-| `src/systems/vehicle/drillStamp.test.ts` | 1 | 1 |
+| `src/systems/vehicle/drillStamp.test.ts` | 6 | 6 |
 | `src/systems/vehicle/drillToe.test.ts` | 6 | 6 |
 | `src/systems/vehicle/driveSigns.test.ts` | 5 | 5 |
 | `src/systems/vehicle/engineTravelBound.test.ts` | 7 | 3 |
@@ -1847,7 +1850,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/vehicle/heatPauseSteps.test.ts` | 7 | 7 |
 | `src/systems/vehicle/heldCut.test.ts` | 13 | 13 |
 | `src/systems/vehicle/kinematicSweep.test.ts` | 6 | 6 |
-| `src/systems/vehicle/leadingSlab.test.ts` | 5 | 5 |
+| `src/systems/vehicle/leadingSlab.test.ts` | 8 | 8 |
 | `src/systems/vehicle/motionEffects.test.ts` | 13 | 13 |
 | `src/systems/vehicle/motionGlide.test.ts` | 8 | 7 |
 | `src/systems/vehicle/poseReport.test.ts` | 19 | 19 |
@@ -1956,18 +1959,20 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/world/carvePhase.test.ts` | 3 | 3 |
 | `src/systems/world/casingBand.test.ts` | 2 | 2 |
 | `src/systems/world/casingBreach.test.ts` | 15 | 15 |
-| `src/systems/world/casingLining.test.ts` | 15 | 15 |
+| `src/systems/world/casingLining.test.ts` | 16 | 16 |
 | `src/systems/world/chunkCache.test.ts` | 8 | 6 |
 | `src/systems/world/chunkDelta.test.ts` | 9 | 9 |
 | `src/systems/world/chunkRepair.test.ts` | 4 | 4 |
 | `src/systems/world/collapseBlock.test.ts` | 5 | 5 |
 | `src/systems/world/collapseRefill.test.ts` | 8 | 8 |
 | `src/systems/world/collapseWeakness.test.ts` | 14 | 14 |
+| `src/systems/world/cutFront.test.ts` | 5 | 5 |
 | `src/systems/world/deepRareWindow.report.lane.test.ts` | 4 | 4 |
 | `src/systems/world/depthDensityPaint.lane.test.ts` | 4 | 1 |
 | `src/systems/world/dockBays.test.ts` | 9 | 9 |
 | `src/systems/world/dockSite.test.ts` | 6 | 6 |
 | `src/systems/world/exactSquares.test.ts` | 5 | 5 |
+| `src/systems/world/floorBand.test.ts` | 4 | 4 |
 | `src/systems/world/generateChunk.test.ts` | 26 | 14 |
 | `src/systems/world/generateChunkHooks.test.ts` | 4 | 4 |
 | `src/systems/world/generateDensity.test.ts` | 7 | 5 |
@@ -1980,7 +1985,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/world/rareClusters.report.lane.test.ts` | 6 | 6 |
 | `src/systems/world/rareClusters.test.ts` | 10 | 10 |
 | `src/systems/world/rimDwell.test.ts` | 6 | 6 |
-| `src/systems/world/stampShape.test.ts` | 8 | 5 |
+| `src/systems/world/stampShape.test.ts` | 13 | 10 |
 | `src/systems/world/surfaceLayer.test.ts` | 13 | 13 |
 | `src/systems/world/sweptSpan.test.ts` | 6 | 6 |
 | `src/systems/world/wallWeakness.test.ts` | 3 | 3 |
