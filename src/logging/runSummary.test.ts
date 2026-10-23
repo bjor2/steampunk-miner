@@ -139,6 +139,14 @@ describe('run summary', () => {
     })
   })
 
+  it('counts the fuel and the fuel tank a star-map jump needs as travel spending (ticket 756)', () => {
+    const fuel = line(990, 'fuel_bought', { units: 5, cost: '2.5e+2', tank: '5e+0' })
+    const tank = line(991, 'fuel_tank_bought', { level: 2, cost: '2.5e+2', capacity: '1.3e+1' })
+    const fuelled = deriveSummary([...PLAYED_RUN.slice(0, -1), fuel, tank, PLAYED_RUN.at(-1)!])
+    expect(fuelled.travelSpending).toBe('5.608e+2')
+    expect(fuelled.moneySpent).toBe('6.5905e+2')
+  })
+
   it('counts time in ticks with a seconds view', () => {
     expect(deriveSummary(PLAYED_RUN)).toMatchObject({
       durationTicks: 9100,

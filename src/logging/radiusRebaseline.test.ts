@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest'
 import { TICKS_PER_SECOND } from '../constants/physics'
 import { createAuthorityState, type AuthorityState } from '../systems/authority/authorityState'
 import type { DomainEvent, DomainEventBody } from '../systems/authority/domainEvent'
+import { fuelPriceOf } from '../systems/economy/jumpFuel'
 import { travelFee } from '../systems/economy/planetCharges'
 import {
   fromCanonical,
@@ -9,6 +10,7 @@ import {
   fromSafeInteger,
   mul,
   sub,
+  toCanonical,
   toFixedText,
   ZERO_MONEY,
 } from '../systems/money'
@@ -28,6 +30,7 @@ import {
 } from './radiusRebaselineBars'
 import {
   equilibriumRateStepOf,
+  isHopClamped,
   pStarOfRateStep,
   type RadiusRebaselineRun,
 } from './radiusRebaselineMedians'
@@ -72,6 +75,28 @@ describe('radius re-baseline tally (ticket 644)', () => {
     expect(tally.hops[0].fromPlanet).toBe(1)
     expect(toFixedText(tally.hops[0].walletBefore, 0)).toBe('500')
     expect(tally.planets.get(2)?.arrivalTick).toBe(50)
+  })
+
+  it("charges a star-map jump the fuel bought for it, against that fuel's shop price (ticket 756)", () => {
+    const tally = emptyRadiusRebaselineTally()
+    step(tally, stateAt(0, 1, 0, '500'), [])
+    step(tally, stateAt(40, 1, 0, '400'), [boughtFuel(5, '100')])
+    step(tally, stateAt(50, 2, 0, '400'), [jumped(1, 5)])
+
+    expect(tally.hops).toHaveLength(1)
+    expect(toFixedText(tally.hops[0].cost, 0)).toBe('100')
+    expect(toCanonical(tally.hops[0].listFee)).toBe(toCanonical(fuelPriceOf(1, 5)))
+    expect(toFixedText(tally.hops[0].walletBefore, 0)).toBe('500')
+    expect(isHopClamped(tally.hops[0])).toBe(true)
+  })
+
+  it('counts a jump on fuel already in the tank as paid in full', () => {
+    const tally = emptyRadiusRebaselineTally()
+    step(tally, stateAt(0, 1, 0, '500'), [boughtFuel(5, toCanonical(fuelPriceOf(1, 5)))])
+    step(tally, stateAt(50, 2, 0, '500'), [jumped(1, 5)])
+    step(tally, stateAt(60, 1, 0, '500'), [jumped(2, 5)])
+
+    expect(tally.hops.map(isHopClamped)).toEqual([false, false])
   })
 })
 
@@ -198,6 +223,21 @@ function docked(): DomainEventBody {
   return { type: 'DockEntered', bay: 'sell', cargoUnits: 0, energy: 0, hull: '0' }
 }
 
+function boughtFuel(units: number, cost: string): DomainEventBody {
+  return { type: 'FuelBought', units, cost, tank: toCanonical(fromSafeInteger(units)) }
+}
+
+function jumped(fromPlanet: number, units: number): DomainEventBody {
+  return {
+    type: 'TravelStarted',
+    fromPlanet,
+    toPlanet: fromPlanet === 1 ? 2 : 1,
+    cost: '0e+0',
+    coreSpent: 0,
+    fuelSpent: toCanonical(fromSafeInteger(units)),
+  }
+}
+
 function travelled(fromPlanet: number, cost: string): DomainEventBody {
   return { type: 'TravelStarted', fromPlanet, toPlanet: fromPlanet + 1, cost, coreSpent: 0 }
 }
@@ -231,7 +271,8 @@ function runOf(worldSeed: number, play: (planet: number) => PlanetPlay): RadiusR
     const coreTick = arrivalTick + plan.minutes * TICKS_PER_MINUTE
     drill.planets.set(planet, drillPaceOf(planet, arrivalTick, coreTick))
     radius.planets.set(planet, radiusPaceOf(planet, arrivalTick, coreTick, rate, plan))
-    radius.hops.push({ fromPlanet: planet, cost: travelFee(planet), walletBefore: ZERO_MONEY })
+    const fee = travelFee(planet)
+    radius.hops.push({ fromPlanet: planet, cost: fee, listFee: fee, walletBefore: ZERO_MONEY })
     arrivalTick = coreTick + TICKS_PER_MINUTE
   }
   return { worldSeed, drill, radius }

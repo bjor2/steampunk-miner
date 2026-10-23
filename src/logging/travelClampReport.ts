@@ -3,9 +3,14 @@
  * clamped when its logged `travel_started` cost is below the row fee of the planet it left. The
  * on-curve bot may see it bind on at most 1 of the 4 P1→P5 hops; more says the base fee formula
  * needs fixing, never the clamp. Derived from the log, never written into it (#11 section 3).
+ *
+ * Since the star map (ticket 756) a jump is paid in fuel and the clamp sits on the fuel shop: a
+ * jump's hop is clamped when the `fuel_bought` lines on its planet since the last hop cost less
+ * than that fuel's price at the shop.
  */
+import { fuelPriceOf } from '../systems/economy/jumpFuel'
 import { travelFee } from '../systems/economy/planetCharges'
-import { cmp, fromCanonical } from '../systems/money'
+import { add, cmp, fromCanonical, ZERO_MONEY, type Money } from '../systems/money'
 import type { RunEvent } from './runEvent'
 
 /** The hops judged against the condition: leaving planets 1 to 4. */
@@ -25,13 +30,13 @@ interface SeededEvents {
 }
 
 export function travelClampCountOf(events: readonly RunEvent[]): TravelClampCount {
-  const hops = events.filter(isTravelStarted)
-  const opening = hops.filter((hop) => hop.data.fromPlanet <= OPENING_HOP_LAST_FROM)
+  const hops = clampedHopsOf(events)
+  const opening = hops.filter((hop) => hop.fromPlanet <= OPENING_HOP_LAST_FROM)
   return {
     hops: hops.length,
-    clamped: hops.filter(isHopClamped).length,
+    clamped: hops.filter((hop) => hop.isClamped).length,
     openingHops: opening.length,
-    openingClamped: opening.filter(isHopClamped).length,
+    openingClamped: opening.filter((hop) => hop.isClamped).length,
   }
 }
 
@@ -48,10 +53,50 @@ function travelClampLine(worldSeed: number, count: TravelClampCount): string {
   )
 }
 
+interface JudgedHop {
+  fromPlanet: number
+  isClamped: boolean
+}
+
+/** The fuel bought since the last hop: what it cost and its price at the shop. */
+interface FuelSinceHop {
+  cost: Money
+  price: Money
+}
+
+/** Each hop in order, judged on its own charge, or on the fuel bought for it on a jump. */
+function clampedHopsOf(events: readonly RunEvent[]): JudgedHop[] {
+  const hops: JudgedHop[] = []
+  let fuel = noFuelBought()
+  for (const event of events) {
+    if (isFuelBought(event)) fuel = withFuelBought(fuel, event)
+    if (!isTravelStarted(event)) continue
+    hops.push({ fromPlanet: event.data.fromPlanet, isClamped: isHopClamped(event, fuel) })
+    fuel = noFuelBought()
+  }
+  return hops
+}
+
+function noFuelBought(): FuelSinceHop {
+  return { cost: ZERO_MONEY, price: ZERO_MONEY }
+}
+
+function withFuelBought(fuel: FuelSinceHop, line: RunEvent<'fuel_bought'>): FuelSinceHop {
+  return {
+    cost: add(fuel.cost, fromCanonical(line.data.cost)),
+    price: add(fuel.price, fuelPriceOf(line.planet, line.data.units)),
+  }
+}
+
 function isTravelStarted(event: RunEvent): event is RunEvent<'travel_started'> {
   return event.event === 'travel_started'
 }
 
-function isHopClamped(hop: RunEvent<'travel_started'>): boolean {
+function isFuelBought(event: RunEvent): event is RunEvent<'fuel_bought'> {
+  return event.event === 'fuel_bought'
+}
+
+function isHopClamped(hop: RunEvent<'travel_started'>, fuel: FuelSinceHop): boolean {
+  if (hop.data.fuelSpent !== undefined) return cmp(fuel.cost, fuel.price) < 0
   return cmp(fromCanonical(hop.data.cost), travelFee(hop.data.fromPlanet)) < 0
 }

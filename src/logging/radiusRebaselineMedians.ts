@@ -8,7 +8,6 @@
  */
 import { TICKS_PER_SECOND } from '../constants/physics'
 import { blockHardness } from '../systems/economy/oreEconomy'
-import { travelFee } from '../systems/economy/planetCharges'
 import { drillPower } from '../systems/economy/vehicleStats'
 import {
   cmp,
@@ -119,11 +118,12 @@ export function feeShareBpOf(hop: TravelHop, pace: PlanetRadiusPace | null): num
 }
 
 /**
- * Whether the #648 clamp bound: the charge fell below the row fee of the planet left, so the
- * wallet could not pay the full fee and keep the next on-curve drill or tip (`travelCharge.ts`).
+ * Whether the #648 clamp bound: the charge fell below the hop's list fee (the row fee of the
+ * planet left, or a jump's fuel at the shop price), so the wallet could not pay the full fee and
+ * keep the next on-curve drill or tip (`travelCharge.ts`).
  */
 export function isHopClamped(hop: TravelHop): boolean {
-  return cmp(hop.cost, travelFee(hop.fromPlanet)) < 0
+  return cmp(hop.cost, hop.listFee) < 0
 }
 
 /**

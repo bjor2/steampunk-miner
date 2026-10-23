@@ -30,11 +30,15 @@ function replayedState(start: AuthorityState, arrival: BotArrival): AuthoritySta
 }
 
 describe('bot arrival', () => {
-  it('lands a fresh save on planet 2 by travel after harvesting the core of planet 1', () => {
+  it('lands a fresh save on planet 2 by a star-map jump after harvesting the core of planet 1', () => {
     const arrival = arrivalOnPlanet2()
     expect(arrival.isArrived).toBe(true)
     expect(arrival.planetIndex).toBe(2)
-    expect(arrival.script.at(-1)).toMatchObject({ type: 'travel', payload: { toPlanet: 2 } })
+    expect(arrival.script.at(-2)).toMatchObject({ type: 'buyFuel', payload: { units: 5 } })
+    expect(arrival.script.at(-1)).toMatchObject({
+      type: 'jumpToPlanet',
+      payload: { system: '1', planet: '2' },
+    })
   })
 
   it('sends no debug command on the way', () => {

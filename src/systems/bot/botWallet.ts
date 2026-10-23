@@ -1,6 +1,7 @@
 /**
  * What the pacing bot may spend at a bay (#29 Systems & Economy note 3): a purchase must leave the
- * next service paid for, and the travel fee too once the core is done. From the attrition planets
+ * next service paid for, and the next hop's fuel too once the core is done (the travel fee before
+ * the star map, ticket 756). From the attrition planets
  * on (#198) a brass step (a track level) must also leave #180's service reserve and one rescue
  * fee, so two deaths after a spree still leave the bot a tow and a service: on T9's 0.85 run it
  * bought boiler 47 to 54, died twice and had nothing left to play on. A slice purchase that is not
@@ -8,15 +9,16 @@
  */
 import type { AuthorityState } from '../authority/authorityState'
 import { serviceReserveOf } from '../authority/serviceReserve'
+import { fuelPriceHere, nextHopShortfallOf } from '../authority/starMap/fuelShopRules'
 import type { UpgradeId } from '../economy/economyDefinition'
-import { rechargePrice, repairPrice, rescueFee, travelFee } from '../economy/planetCharges'
+import { rechargePrice, repairPrice, rescueFee } from '../economy/planetCharges'
 import type { VehicleStats } from '../economy/vehicleStats'
 import { add, cmp, fromSafeInteger, sub, type Money } from '../money'
 import { statsOfVehicle } from '../vehicle/vehicleState'
 import { isAttritionPlanet } from './botAttrition'
 import type { BotSession } from './botSession'
 
-/** A purchase must leave the next service (and the travel fee, once the core is done) paid for. */
+/** A purchase must leave the next service (and the next hop's fuel, once the core is done) paid for. */
 export function canPay(session: BotSession, price: Money): boolean {
   return cmp(walletOf(session), add(price, moneyKeptBack(session))) >= 0
 }
@@ -64,9 +66,14 @@ function withTrackStepsBought(
 
 function moneyKeptBack(session: BotSession): Money {
   const state = session.state()
-  const planetIndex = state.planet.index
-  const service = fullServiceOf(planetIndex, statsOfVehicle(session.vehicle()))
-  return state.core.isCompleted ? add(service, travelFee(planetIndex)) : service
+  const service = fullServiceOf(state.planet.index, statsOfVehicle(session.vehicle()))
+  return state.core.isCompleted ? add(service, nextHopFuelPriceOf(session)) : service
+}
+
+/** The fuel the tank lacks for the jump to the next planet, at full price (ticket 756). */
+function nextHopFuelPriceOf(session: BotSession): Money {
+  const state = session.state()
+  return fuelPriceHere(state, nextHopShortfallOf(state, session.playerId))
 }
 
 /** A full repair and a full recharge of a vehicle with these stats. */

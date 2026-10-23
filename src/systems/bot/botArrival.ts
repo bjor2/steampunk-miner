@@ -2,7 +2,7 @@
  * The pacing bot played from a session under way to its landing on a later planet (ticket 656,
  * spec #647; the GD's bar that a planet is open only when a fresh save reaches it by buying
  * travel): it harvests every core on the way as `playSlice` does, then travels on from the last
- * one. The bot sends only play commands, never a `debug.*` one, so a planet that a fresh save
+ * one, since ticket 756 by buying the hop's fuel and jumping on the star map. The bot sends only play commands, never a `debug.*` one, so a planet that a fresh save
  * reaches only with a debug command is never reached here. Its commands come back as a
  * `fastForward` script (#11 section 5), so the live game replays the same trip to the same state.
  */

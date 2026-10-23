@@ -1154,7 +1154,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/logging/planetOneDrillPace.test.ts` | 6 | 6 |
 | `src/logging/purchaseChains.test.ts` | 7 | 7 |
 | `src/logging/radiusRebaseline.lane.test.ts` | 2 | 2 |
-| `src/logging/radiusRebaseline.test.ts` | 13 | 13 |
+| `src/logging/radiusRebaseline.test.ts` | 15 | 15 |
 | `src/logging/refineryReport.test.ts` | 5 | 5 |
 | `src/logging/registries/runEvents.test.ts` | 4 | 4 |
 | `src/logging/reportCapsuleOffGolden.test.ts` | 19 | 3 |
@@ -1164,7 +1164,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/logging/runLog.test.ts` | 3 | 3 |
 | `src/logging/runMetadata.test.ts` | 2 | 2 |
 | `src/logging/runProgress.test.ts` | 3 | 3 |
-| `src/logging/runSummary.test.ts` | 20 | 20 |
+| `src/logging/runSummary.test.ts` | 21 | 21 |
 | `src/logging/sawtoothMedian.test.ts` | 9 | 9 |
 | `src/logging/sessionAnalysis/benchTrend.test.ts` | 5 | 5 |
 | `src/logging/sessionAnalysis/fixtureSessions.test.ts` | 8 | 8 |
@@ -1174,7 +1174,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/logging/sessionAnalysis/summaryComparison.test.ts` | 3 | 3 |
 | `src/logging/subStepFloor.test.ts` | 4 | 4 |
 | `src/logging/surfaceLayerReport.test.ts` | 4 | 4 |
-| `src/logging/travelClampReport.test.ts` | 2 | 2 |
+| `src/logging/travelClampReport.test.ts` | 4 | 4 |
 | `src/logging/tripCellEnergy.lane.test.ts` | 1 | 1 |
 | `src/logging/tripCellEnergy.test.ts` | 2 | 2 |
 | `src/logging/wreckerDiveReport.test.ts` | 6 | 6 |

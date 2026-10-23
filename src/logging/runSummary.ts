@@ -257,6 +257,14 @@ const EVENT_FOLDS: { readonly [N in RunEventName]?: EventFold<N> } = {
     tally.travelSpending = add(tally.travelSpending, fromCanonical(data.cost))
     tally.planetLevels.departure[String(data.fromPlanet)] = { ...tally.upgradeLevels }
   },
+  // Since the star map a hop is paid in fuel (ticket 756): the fuel and the tank that carries it
+  // are travel spending, so the spend total still holds every coin.
+  fuel_bought: (tally, { data }) => {
+    tally.travelSpending = add(tally.travelSpending, fromCanonical(data.cost))
+  },
+  fuel_tank_bought: (tally, { data }) => {
+    tally.travelSpending = add(tally.travelSpending, fromCanonical(data.cost))
+  },
   rescue_triggered: (tally, { data }) => {
     tally.rescueFees = add(tally.rescueFees, fromCanonical(data.fee))
   },

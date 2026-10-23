@@ -5,11 +5,15 @@
  * minutes, the felt speed and the drill + tip majors. Per planet: the sales from arrival to the
  * core (money per minute, the basis of p*), the wallet at core harvest (the travel fee share), and
  * the trip and climb ticks (G&V: the climb from a trip's deepest point back to the dock). Per hop:
- * the charge `travel_started` logged and the wallet it was paid from (the #648 clamp's rows).
+ * the charge `travel_started` logged and the wallet it was paid from (the #648 clamp's rows); since
+ * the star map (ticket 756) a jump's charge is the fuel bought for it on the planet it left, and
+ * its list fee that fuel's price at the shop, which the clamp judges it against.
  */
 import type { AuthorityState } from '../systems/authority/authorityState'
 import type { DomainEvent } from '../systems/authority/domainEvent'
 import { planetParamsOf } from '../systems/authority/planetOfState'
+import { fuelPriceOf } from '../systems/economy/jumpFuel'
+import { travelFee } from '../systems/economy/planetCharges'
 import { add, fromCanonical, ZERO_MONEY, type Money } from '../systems/money'
 import { depthTilesOfPose } from '../systems/vehicle/vehiclePose'
 
@@ -28,11 +32,18 @@ export interface PlanetRadiusPace {
   climbTicks: number
 }
 
-/** One hop: what `travel_started` charged and the wallet it was charged from. */
+/** One hop: what it charged, its fee before the #648 clamp and the wallet it was charged from. */
 export interface TravelHop {
   fromPlanet: number
   cost: Money
+  listFee: Money
   walletBefore: Money
+}
+
+/** The fuel bought since the last hop: what it was charged and its price at the shop. */
+export interface FuelBoughtForHop {
+  cost: Money
+  listPrice: Money
 }
 
 interface OpenTrip {
@@ -45,10 +56,15 @@ export interface RadiusRebaselineTally {
   planets: Map<number, PlanetRadiusPace>
   hops: TravelHop[]
   trip: OpenTrip | null
+  fuelForHop: FuelBoughtForHop
 }
 
 export function emptyRadiusRebaselineTally(): RadiusRebaselineTally {
-  return { planets: new Map(), hops: [], trip: null }
+  return { planets: new Map(), hops: [], trip: null, fuelForHop: noFuelBought() }
+}
+
+function noFuelBought(): FuelBoughtForHop {
+  return { cost: ZERO_MONEY, listPrice: ZERO_MONEY }
 }
 
 /** One bot step: the state after it and the events it answered, folded in place. */
@@ -107,7 +123,21 @@ function tallyEvent(
   if (event.type === 'ResourceSold') tallySale(planet, event.value)
   if (event.type === 'CoreCompleted') completeCore(planet, state, playerId)
   if (event.type === 'DockEntered') closeTrip(tally, planet, state.tick)
+  if (event.type === 'FuelBought') tallyFuelForHop(tally, state.planet.index, event)
   if (event.type === 'TravelStarted') tallyHop(tally, state, playerId, event)
+}
+
+type FuelBoughtEvent = Extract<DomainEvent, { type: 'FuelBought' }>
+
+function tallyFuelForHop(
+  tally: RadiusRebaselineTally,
+  planet: number,
+  event: FuelBoughtEvent,
+): void {
+  tally.fuelForHop = {
+    cost: add(tally.fuelForHop.cost, fromCanonical(event.cost)),
+    listPrice: add(tally.fuelForHop.listPrice, fuelPriceOf(planet, event.units)),
+  }
 }
 
 function tallySale(planet: PlanetRadiusPace, value: string): void {
@@ -138,8 +168,17 @@ function tallyHop(
   playerId: string,
   event: TravelStartedEvent,
 ): void {
-  const cost = fromCanonical(event.cost)
+  const { cost, listFee } = hopChargeOf(tally, event)
   const walletBefore = add(state.players[playerId].wallet, cost)
-  tally.hops.push({ fromPlanet: event.fromPlanet, cost, walletBefore })
+  tally.hops.push({ fromPlanet: event.fromPlanet, cost, listFee, walletBefore })
   tally.trip = null
+  tally.fuelForHop = noFuelBought()
+}
+
+/** `Travel` pays its own charge against the row fee; a jump, the fuel bought for it (ticket 756). */
+function hopChargeOf(tally: RadiusRebaselineTally, event: TravelStartedEvent) {
+  if (event.fuelSpent === undefined) {
+    return { cost: fromCanonical(event.cost), listFee: travelFee(event.fromPlanet) }
+  }
+  return { cost: tally.fuelForHop.cost, listFee: tally.fuelForHop.listPrice }
 }
