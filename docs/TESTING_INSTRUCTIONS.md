@@ -311,6 +311,24 @@ programs }` from three's `renderer.info` of the game canvas), read only when cal
   across fresh planets and a rules-8 P2, and `mineralSkins.planet2.test.ts` the three skinned
   (batch p2-b5) in layers no other P2 species wears, the retired three keeping theirs. The R3 step
   (P2's generated ore value over P1's) is `src/logging/oreValueCensus.lane.test.ts`, a Tester lane.
+- **Rare-ore clusters** (ticket 737, Bjor's deep-rares rule, GD lock 22 Oct; HS and VS input on
+  #737): every planet entered under ore rules 10 (generator 15, P1 included) paints each rare, epic
+  and mythic patch as a seeded cluster of 1 to 3 orthogonally connected cells, growing only at
+  `d >= 0.35`, and holds one guaranteed cluster of each rare kind its roster names.
+  `src/systems/world/rareClusters.test.ts` holds the 50/35/15 size draw from the seed cell, the same
+  sizes for the same planet seed, a whole P1 with no cluster over 3 and every patch cluster
+  connected and painted, no growth past a seed at `d < 0.35`, a guaranteed cluster of every rare kind
+  at `d >= 0.35` on P1 to P3, every common and uncommon cell rules 9 painted kept on P2 and P3, the
+  same chunks in any order, and a rules-9 planet keeping its whole patches. The lane
+  `src/systems/world/rareClusters.report.lane.test.ts` is the 5-seed report: fresh P1 to P5 on five
+  seeds, no cluster over 3, every grown cluster painted as one run of exactly its cells, the pooled
+  sizes at `d >= 0.35` within 5 points of 50/35/15 (49.9/34.0/16.1 over 694 clusters), every rare kind
+  held, and the same bytes from the same seed (about a minute and a half). `generatorGolden.test.ts`
+  pins the rules-10 P1 to P3, `oreRulesOldSaves.test.ts` loads a generator 14 save of P2 under rules
+  9 with its whole patches, and `seededStripGround.test.ts` reads every cluster as `generateChunk`
+  paints it. The rarity trip clamp's seeded run reads its four epics in band 3 now (`CAP_RUN`), and
+  the pickup spec prices the rules-9 planet's whole epic patches (`wholePatchParamsOf`). Money,
+  pacing and R3 are the Tester's: `npm run balance:report`, `oreValueCensus.lane.test.ts`.
 - **Species audit P1 to P5** (ticket 711, spec #647): `src/features/roster/roster.speciesAudit.test.ts`
   reads each fresh planet's roster on two seeds and holds it to at least 15 species (P1 at 12 until
   ticket 713 moves it to its v14 pool and raises the floor), no two sharing a name or a stem (the
