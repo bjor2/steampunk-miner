@@ -1036,7 +1036,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/economy/heatEconomy.test.ts` | 11 | 11 |
 | `src/systems/economy/itemEffectCaps.test.ts` | 6 | 6 |
 | `src/systems/economy/itemHookCaps.test.ts` | 8 | 8 |
-| `src/systems/economy/jumpFuel.test.ts` | 8 | 8 |
+| `src/systems/economy/jumpFuel.test.ts` | 9 | 9 |
 | `src/systems/economy/magnetCaps.test.ts` | 5 | 5 |
 | `src/systems/economy/oreEconomy.test.ts` | 7 | 7 |
 | `src/systems/economy/perPurchaseRows.test.ts` | 40 | 21 |
@@ -1172,6 +1172,8 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/logging/sessionAnalysis/memoryTrend.test.ts` | 7 | 7 |
 | `src/logging/sessionAnalysis/sessionTable.test.ts` | 12 | 12 |
 | `src/logging/sessionAnalysis/summaryComparison.test.ts` | 3 | 3 |
+| `src/logging/starMapTravel.lane.test.ts` | 2 | 2 |
+| `src/logging/starMapTravel.test.ts` | 11 | 11 |
 | `src/logging/subStepFloor.test.ts` | 4 | 4 |
 | `src/logging/surfaceLayerReport.test.ts` | 4 | 4 |
 | `src/logging/travelClampReport.test.ts` | 4 | 4 |

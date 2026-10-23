@@ -49,6 +49,11 @@ export function fuelPriceOf(planetIndex: number, units: number): Money {
   return ceilMilli(mul(fuelUnitPriceOf(planetIndex), fromSafeInteger(units)))
 }
 
+/** R(p): the median run sell value the curve stands in for planet `planetIndex` (506.25 on P1). */
+export function runValueOf(planetIndex: number): Money {
+  return runValueBefore(planetIndex + 1)
+}
+
 /**
  * R(g - 1), the run value of the planet before `planetIndex`: its top band is three tiers under
  * this planet's (#6 section 1), so planet 1's is tier 2 and the first hop's price stays defined.

@@ -476,7 +476,7 @@ balance:report`, `oreValueCensus.lane.test.ts`.
   needs a debug command fails), the pool id, the row's hazard with a pocket of it round the dock
   (`features.ores.getPlanetRow()`) and the planet card's arrival line; planet 1 keeps the legacy
   pool and shows no card. `src/systems/bot/botArrival.test.ts` holds the bot to landing a fresh
-  save (world seed 1, the browser's) on planet 2 by travel, with no debug command and a script that
+  save (world seed 1, the browser's) on planet 2 by a fuel jump (ticket 756), with no debug command and a script that
   replays to the same digest; `src/debug/debugBot.test.ts` holds the live replay to the bot's digest
   with `debugApplied` false; `src/features/ores/systems/hazardNearDock.test.ts` holds each of
   planets 2 to 5 on seed 1 to its own pocket kind within 20 columns of the dock.
@@ -503,6 +503,22 @@ balance:report`, `oreValueCensus.lane.test.ts`.
   part (R_p / R_p-1)^2 and the mix and price part, and writes
   `balance-report/ore-value-census.ndjson` with R(p) and the steps. About 20 s a seed;
   `oreValue.test.ts` holds the chunk count and every bar on synthetic pools.
+- **Star map travel** (ticket 756, the Systems ruling on #756, the GD lock on #650 and its VS bars):
+  the pacing bot reaches each next planet by buying the hop's fuel at the Sell bay and jumping
+  (`botTravel.ts`, the "star map travel" re-baseline). The lane `src/logging/starMapTravel.lane.test.ts`
+  plays `bot-slice` to planet 5's core on the three pacing seeds and judges the medians
+  (`starMapTravelBars.ts`): each P1->P5 hop's fee 8-12% of the wallet at core harvest and its charge
+  at most 15%, the #648 clamp (now on the fuel that tops the tank up to the next hop) binding on at
+  most 1 of the 4 hops of any seed, a hop at most one run of the planet it leaves, P1->P2 paid by
+  the first haul, fuel 3-8% of the money spent and the tank track at most 6%, and felt speed at
+  least 0.9x the planet before. It then sets the bot on each of planets 2 to 5 with that planet's
+  on-curve gear (`paceArrival.ts`) and plays to the core there, or jumps back a planet first: going
+  back must earn less a minute than the frontier. It prints each planet's median run beside the R
+  the fuel curve stands in (`starMap.fuel.runValue`, the row a miss retunes first) and the felt
+  speed on arrival for p -> p+1 and the skip p -> p+2. Planet minutes and money per minute against
+  #551 stay the R3 lane's, which plays the same bot. `starMapTravel.test.ts` holds the fold and
+  every bar on synthetic seeds; `travelClampReport.test.ts` and `radiusRebaseline.test.ts` hold a
+  jump judged on the fuel bought for it. Hours of play, so it runs only when named.
 - **Material looks** (ticket 450, TD shape on #450 6226270701 and the Scalers' conditions):
   `src/features/roster/kindLook.test.ts` holds the roster's look provider to its rules: a fresh
   save draws every species' skin with no rarity (ticket 698), a species' rarity shows only once the

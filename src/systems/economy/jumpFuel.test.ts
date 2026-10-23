@@ -7,6 +7,7 @@ import {
   fuelUnitPriceOf,
   jumpFeeOf,
   jumpFuelUnitsOf,
+  runValueOf,
 } from './jumpFuel'
 
 function expectAmount(amount: Money, text: string): void {
@@ -32,6 +33,11 @@ describe('star map fuel curve (ticket 756)', () => {
   it('charges the hop to the next planet half a run of the planet it leaves', () => {
     expectAmount(jumpFeeOf(1, 2), '253.125')
     expectAmount(jumpFeeOf(2, 3), '854.297')
+  })
+
+  it('stands R in as ten top-band ore units of the planet, and charges the next hop half of it', () => {
+    expectAmount(runValueOf(1), '506.25')
+    expect(toCanonical(jumpFeeOf(1, 2))).toBe(toCanonical(div(runValueOf(1), fromCanonical('2'))))
   })
 
   it('grows the unit price, and with it the hop to the next planet, by 3.375 a planet', () => {
