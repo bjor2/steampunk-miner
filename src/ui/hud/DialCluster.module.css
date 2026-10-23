@@ -1,8 +1,9 @@
 /*
  * The gauge cluster (ticket 716; design-system.md sections 3 and 9): the dials sit in the baked
- * brass and glass frame (`--art-glass-frame`, a nine-slice drawn at a 6 px border here), a plain
- * brass bezel behind it while the art is missing, and a glass sheen over the top third. Each dial
- * is `--dial-size`, the strip's height less its frame, so the strip never grows; the needle is the
+ * frame the cluster table names for the layout (the phone's brass and glass frame, a nine-slice
+ * drawn at a 6 px border here; desktop's rail frame at its own width, ticket 770), a plain brass
+ * bezel behind it while the art is missing, and a glass sheen over the top third. Each dial is
+ * `--dial-size`, the strip's height less its frame, so the strip never grows; the needle is the
  * baked 4 x 28 sprite on the 64 px dial's proportions, turned about its foot at the dial's centre.
  */
 .cluster {
@@ -19,6 +20,15 @@
   border: var(--frame-bezel) solid var(--color-brass);
   border-radius: var(--radius-panel);
   border-image: var(--cluster-frame-art) var(--cluster-frame-slice) fill / 6px;
+}
+
+/*
+ * Desktop (ticket 770): the rail frame was baked at this cluster's height, so it draws at its own
+ * insets, 1:1 on the end caps, and its rails repeat a rivet per tile instead of stretching one.
+ */
+:global([data-layout='desktop']) .cluster {
+  border-image-width: var(--cluster-frame-width);
+  border-image-repeat: round;
 }
 
 .cluster::after {

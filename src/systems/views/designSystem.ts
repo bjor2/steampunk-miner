@@ -14,6 +14,7 @@ export type DesignTokens = typeof tokensFile
 export type ColourName = keyof DesignTokens['colour']
 export type MaterialName = keyof DesignTokens['materials']
 export type LayoutKind = 'phone' | 'desktop'
+export const LAYOUT_KINDS: readonly LayoutKind[] = ['phone', 'desktop']
 /** A planet's UI re-skin: only the `skinnable` colours, each a hex colour. */
 export type PlanetSkin = Partial<Record<ColourName, string>>
 

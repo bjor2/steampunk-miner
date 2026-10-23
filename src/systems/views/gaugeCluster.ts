@@ -80,7 +80,7 @@ export interface GaugeClusterView {
   overflowText: string | null
   /** The folded dials' buy cue, on the "+N" cell (ticket 727); null with nothing folded or cued. */
   overflowCue: BuyCueMark | null
-  /** The brass and glass frame's CSS variable, null for a frame no art token names. */
+  /** The layout's frame as a CSS variable (ticket 770), null for a frame no art token names. */
   frameArt: string | null
   /** The page the strip shows; null where the layout folds, or every dial fits (ticket 767). */
   paging: DialPaging | null
@@ -143,7 +143,7 @@ export function gaugeClusterPageOf(
     overflowCount: folded.length,
     overflowText: folded.length > 0 ? `+${formatAmount(folded.length)}` : null,
     overflowCue: overflowCueOf(folded, model, table),
-    frameArt: uiArtVariableOfPart(table.frame),
+    frameArt: uiArtVariableOfPart(table.frame[kind]),
     paging,
   }
 }

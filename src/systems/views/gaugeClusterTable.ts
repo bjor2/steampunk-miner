@@ -12,13 +12,14 @@
  * tracks and the casing grade) each dial's notch sums, so every upgrade buy has one dial to move
  * (`buyCueProblemsOf`). HS on ticket 767: the room is a starting point, not a cap, so where the
  * layout lets the strip take a click (`paged`, desktop) the dials past the room page through the
- * strip rather than fold away. Pure; the file is read here once.
+ * strip rather than fold away. The frame is per layout too (ticket 770): a phone keeps the glass
+ * frame, desktop its own rail frame at the cluster's height. Pure; the file is read here once.
  */
 import TABLE_FILE from '../../data/hud/gaugeCluster.json'
 import { exportedSidecarOf, manifestEntryOf, type ArtCatalogue } from '../art/artCatalogue'
 import { uiArtPartIds, uiAssetIdOfPart } from '../art/uiArt'
 import { UPGRADE_IDS } from '../economy/economyDefinition'
-import type { LayoutKind } from './designSystem'
+import { LAYOUT_KINDS, type LayoutKind } from './designSystem'
 
 /** What a dial reads: the hull, the fuel, the cargo chain, the heat or the depth and core. */
 export const DIAL_READINGS = ['hull', 'fuel', 'cargo-chain', 'heat', 'depth'] as const
@@ -71,8 +72,8 @@ export interface GaugeClusterTable {
   paged: Readonly<Record<LayoutKind, boolean>>
   zones: DialZones
   buyCue: DialBuyCue
-  /** The nine-slice brass and glass frame the cluster sits in. */
-  frame: string
+  /** The nine-slice frame the cluster sits in, per layout: the phone's glass, desktop's rail. */
+  frame: Readonly<Record<LayoutKind, string>>
   skins: Readonly<Record<string, DialSkin>>
 }
 
@@ -86,6 +87,7 @@ export function gaugeClusterProblemsOf(table: GaugeClusterTable): string[] {
     ...roomProblems(table.room),
     ...zoneProblems(table.zones),
     ...buyCueProblemsOf(table),
+    ...frameProblems(table.frame),
     ...drawnPartIdsOf(table).flatMap(unnamedPartProblems),
   ]
 }
@@ -97,10 +99,10 @@ export function gaugeSkinArtProblemsOf(table: GaugeClusterTable, art: ArtCatalog
     .map((partId) => `"${partId}" is not a shipped UI sprite`)
 }
 
-/** The part ids the table draws: the frame and each skin's dial and needle, once each. */
+/** The part ids the table draws: each layout's frame and each skin's dial and needle, once each. */
 export function drawnPartIdsOf(table: GaugeClusterTable): string[] {
   const skinParts = Object.values(table.skins).flatMap((skin) => [skin.dial, skin.needle])
-  return [...new Set([table.frame, ...skinParts])]
+  return [...new Set([...Object.values(table.frame), ...skinParts])]
 }
 
 /** Every buy count on exactly one listed dial, and room for at least two notch places. */
@@ -161,6 +163,13 @@ function roomProblems(room: GaugeClusterTable['room']): string[] {
     Object.entries(places)
       .filter(([, count]) => !Number.isInteger(count) || count < 1)
       .map(([place, count]) => `room.${kind}.${place} is ${count}, not a whole number from 1`),
+  )
+}
+
+/** Every layout names its frame, so neither the phone nor desktop falls back to the other's. */
+function frameProblems(frame: GaugeClusterTable['frame']): string[] {
+  return LAYOUT_KINDS.filter((kind) => typeof frame[kind] !== 'string').map(
+    (kind) => `frame.${kind} names no UI sprite`,
   )
 }
 

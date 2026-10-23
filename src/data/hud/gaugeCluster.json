@@ -21,7 +21,7 @@
       "depth": ["drill_power", "drill_tip", "engine", "casing"]
     }
   },
-  "frame": "ui-frame-glass",
+  "frame": { "phone": "ui-frame-glass", "desktop": "ui-frame-cluster" },
   "skins": {
     "brass": { "dial": "ui-gauge-dial", "needle": "ui-gauge-needle" }
   }

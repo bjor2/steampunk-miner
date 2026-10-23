@@ -63,6 +63,21 @@ describe('gauge cluster table (ticket 716)', () => {
     ])
   })
 
+  it('refuses a layout whose frame is missing or unshipped, so desktop never wears a stretched phone frame', () => {
+    const unshipped: GaugeClusterTable = {
+      ...GAUGE_CLUSTER,
+      frame: { phone: 'ui-frame-glass', desktop: 'ui-frame-rail' },
+    }
+    expect(gaugeClusterProblemsOf(unshipped)).toEqual([
+      '"ui-frame-rail" is no art token\'s UI sprite',
+    ])
+    expect(gaugeSkinArtProblemsOf(unshipped, SHIPPED_ART)).toEqual([
+      '"ui-frame-rail" is not a shipped UI sprite',
+    ])
+    const phoneOnly = { ...GAUGE_CLUSTER, frame: { phone: 'ui-frame-glass' } } as GaugeClusterTable
+    expect(gaugeClusterProblemsOf(phoneOnly)).toEqual(['frame.desktop names no UI sprite'])
+  })
+
   it('refuses a row that reads nothing known, a missing skin and zones out of order', () => {
     const broken = {
       ...GAUGE_CLUSTER,
@@ -153,9 +168,11 @@ describe('gauge cluster dials (ticket 716)', () => {
     expect(dialOf(gaugeClusterOf(model, 'phone').dials, 'cargo')?.badge).toBeNull()
   })
 
-  it('draws every dial through its skin art and the cluster in the glass frame', () => {
-    const view = gaugeClusterOf(hudOf(createScriptedSession(), RUN_DEPTH), 'desktop')
-    expect(view.frameArt).toBe('--art-glass-frame')
+  it('draws every dial through its skin art, a phone in the glass frame and desktop in its rail frame', () => {
+    const model = hudOf(createScriptedSession(), RUN_DEPTH)
+    const view = gaugeClusterOf(model, 'desktop')
+    expect(view.frameArt).toBe('--art-cluster-frame')
+    expect(gaugeClusterOf(model, 'phone').frameArt).toBe('--art-glass-frame')
     expect(view.dials.every((dial) => dial.art.face === '--art-gauge-dial')).toBe(true)
     expect(view.dials.every((dial) => dial.art.needle === '--art-gauge-needle')).toBe(true)
   })
