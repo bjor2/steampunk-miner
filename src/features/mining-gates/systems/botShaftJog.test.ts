@@ -28,8 +28,11 @@ const MAX_CORE_TRIPS = 60
 
 /** Pacing seed 27182's planet 8: a `rig.resonance` wall at rows 51 to 56 of column -10. */
 const RESONANCE_WALL = { seed: 27182, planet: 8, tile: { tx: -10, ty: 56 } }
-/** Pacing seed 83921's planet 4: a drill-gated signature at rows 77 to 80, above the tip. */
-const SIGNATURE_WALL = { seed: 83921, planet: 4, tile: { tx: -10, ty: 80 } }
+/**
+ * Pacing seed 31415's planet 4: a drill-gated signature at rows 186 to 188, above the tip. Seed
+ * 83921's wall at rows 77 to 80 is plain metal since the deep rare window of ore rules 11 (ticket 738).
+ */
+const SIGNATURE_WALL = { seed: 31415, planet: 4, tile: { tx: -10, ty: 188 } }
 
 function arrivedOn(planetIndex: number, seed: number): CommandIntent[] {
   return [
