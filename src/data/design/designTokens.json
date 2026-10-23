@@ -221,7 +221,9 @@
     "scrollRail": "ui-scroll-rail",
     "slotRing": "ui-slot-ring",
     "statusPlate": "ui-status-plate",
-    "gearButton": "ui-gear-button"
+    "gearButton": "ui-gear-button",
+    "dockFrame": "ui-frame-dock",
+    "clusterFrame": "ui-frame-cluster"
   },
   "skinnable": ["accent", "accentSoft", "glow", "dialFace"],
   "planetSkins": {

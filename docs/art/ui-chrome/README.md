@@ -5,8 +5,10 @@ The review sheets of
 built to the art brief in [docs/ui/design-system.md](../../ui/design-system.md) section 13 for
 [Spec: UI redesign, phone first (#678)](https://github.com/bjor2/steampunk-miner/issues/678).
 Authored in Blender 4.2.9 on the shared box headlessly (`scripts/art/author_ui_chrome.py` wrote
-the first version, and the needle and glass frame of
-[Brass gauge cluster (#716)](https://github.com/bjor2/steampunk-miner/issues/716); the `.blend`
+the first version, the needle and glass frame of
+[Brass gauge cluster (#716)](https://github.com/bjor2/steampunk-miner/issues/716) and the desktop
+rail frames of
+[Desktop D4: desktop brass art pass (#770)](https://github.com/bjor2/steampunk-miner/issues/770); the `.blend`
 files under `art/blender/ui-*/` are the sources from now on, Git LFS) and exported with `npm run art:export -- <id>` into `public/assets/ui/<id>/`. The pipeline
 rules are in [docs/art-pipeline.md](../../art-pipeline.md), "UI chrome sprites".
 
@@ -29,21 +31,23 @@ one Blender unit per CSS px. Materials are the design tokens' three stops (`desi
 highlight over a shadow dot offset down and right, and `accent` is the flat colour a planet skin
 replaces. Every stroke is at least 1 px at 1x; frames are hollow.
 
-| Asset              | Parts                                                                 | Look                                                                                                                                               |
-| ------------------ | --------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `ui-gauge-bar`     | `ui-gauge-bar` 96 x 16, insets 6 x 6                                  | an iron well in a 2 px brass bezel, rounded 5 px                                                                                                   |
-| `ui-gauge-dial`    | `ui-gauge-dial` 64 x 64, tintable                                     | brass rim, dark gap, parchment face (the tint), 9 major and 16 minor ticks over 240 degrees, brass hub                                             |
-| `ui-gauge-needle`  | `ui-gauge-needle` 4 x 28                                              | a brass pointer tapering from 4 px at its foot to 1 px at the tip, its right flank in shadow; the origin is the foot, where it turns (#716)        |
-| `ui-edge-gauge`    | `ui-edge-gauge` 8 x 64, insets 0 x 8                                  | a vertical iron trough between two 1 px brass rails, 2 px caps                                                                                     |
-| `ui-odometer-drum` | `ui-odometer-drum` 16 x 240                                           | ten parchment digits (Blender's built-in font) down an iron drum, each 24 px cell shaded on its own                                                |
-| `ui-frame-sheet`   | `ui-frame-sheet` 128 x 128, insets 24 x 24                            | a 2 px brass edge, a 4 px iron band with a rivet in each corner, a brass hairline                                                                  |
-| `ui-frame-card`    | `ui-frame-card` 96 x 64, insets 12 x 12                               | a 2 px bezel over a dark hairline, a stud in each corner                                                                                           |
-| `ui-frame-glass`   | `ui-frame-glass` 48 x 48, insets 10 x 10                              | the gauge cluster's frame (#716): a 3 px bezel, a dark lip, a glint of glass along the top, a stud in each corner                                  |
-| `ui-frame-tab`     | `ui-frame-tab`, `ui-frame-tab-active` 64 x 32, insets 8 x 8           | a 3 px brass top edge and 1 px sides, open at the foot; the active edge is the accent (tintable)                                                   |
-| `ui-scroll-rail`   | `ui-scroll-rail` 8 x 64, `ui-scroll-rail-thumb` 12 x 24, insets 0 x 8 | the dim trough with brass caps; the brass thumb plate with two dark studs in its caps                                                              |
-| `ui-slot-ring`     | `ui-slot-ring` 48 x 48, tintable                                      | a 4 px brass ring over an iron well, a 1 px accent ring inside it                                                                                  |
-| `ui-status-plate`  | `ui-status-plate` 24 x 24                                             | the #158 triangle plate: a brass triangle round an iron face, pointing up                                                                          |
-| `ui-gear-button`   | `ui-gear-button`, `ui-gear-button-pressed` 48 x 48, tintable          | an eight-tooth brass gear on a riveted iron plate with an accent lamp at the hub; pressed, the plate shades as a well and the gear sits 1 px lower |
+| Asset              | Parts                                                                 | Look                                                                                                                                                     |
+| ------------------ | --------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `ui-gauge-bar`     | `ui-gauge-bar` 96 x 16, insets 6 x 6                                  | an iron well in a 2 px brass bezel, rounded 5 px                                                                                                         |
+| `ui-gauge-dial`    | `ui-gauge-dial` 64 x 64, tintable                                     | brass rim, dark gap, parchment face (the tint), 9 major and 16 minor ticks over 240 degrees, brass hub                                                   |
+| `ui-gauge-needle`  | `ui-gauge-needle` 4 x 28                                              | a brass pointer tapering from 4 px at its foot to 1 px at the tip, its right flank in shadow; the origin is the foot, where it turns (#716)              |
+| `ui-edge-gauge`    | `ui-edge-gauge` 8 x 64, insets 0 x 8                                  | a vertical iron trough between two 1 px brass rails, 2 px caps                                                                                           |
+| `ui-odometer-drum` | `ui-odometer-drum` 16 x 240                                           | ten parchment digits (Blender's built-in font) down an iron drum, each 24 px cell shaded on its own                                                      |
+| `ui-frame-sheet`   | `ui-frame-sheet` 128 x 128, insets 24 x 24                            | a 2 px brass edge, a 4 px iron band with a rivet in each corner, a brass hairline                                                                        |
+| `ui-frame-card`    | `ui-frame-card` 96 x 64, insets 12 x 12                               | a 2 px bezel over a dark hairline, a stud in each corner                                                                                                 |
+| `ui-frame-glass`   | `ui-frame-glass` 48 x 48, insets 10 x 10                              | the gauge cluster's frame (#716): a 3 px bezel, a dark lip, a glint of glass along the top, a stud in each corner                                        |
+| `ui-frame-tab`     | `ui-frame-tab`, `ui-frame-tab-active` 64 x 32, insets 8 x 8           | a 3 px brass top edge and 1 px sides, open at the foot; the active edge is the accent (tintable)                                                         |
+| `ui-scroll-rail`   | `ui-scroll-rail` 8 x 64, `ui-scroll-rail-thumb` 12 x 24, insets 0 x 8 | the dim trough with brass caps; the brass thumb plate with two dark studs in its caps                                                                    |
+| `ui-slot-ring`     | `ui-slot-ring` 48 x 48, tintable                                      | a 4 px brass ring over an iron well, a 1 px accent ring inside it                                                                                        |
+| `ui-status-plate`  | `ui-status-plate` 24 x 24                                             | the #158 triangle plate: a brass triangle round an iron face, pointing up                                                                                |
+| `ui-gear-button`   | `ui-gear-button`, `ui-gear-button-pressed` 48 x 48, tintable          | an eight-tooth brass gear on a riveted iron plate with an accent lamp at the hub; pressed, the plate shades as a well and the gear sits 1 px lower       |
+| `ui-frame-dock`    | `ui-frame-dock` 80 x 80, insets 24 x 24                               | the desktop dock's rail frame (#770): a 2 px brass edge, a 6 px iron band with a rivet per 32 px edge tile, a brass hinge rail down the left, a hairline |
+| `ui-frame-cluster` | `ui-frame-cluster` 80 x 40, insets 24 x 10                            | the desktop gauge cluster's rail frame (#770): the glass frame's bezel, lip and glint at the cluster's 40 px height, corner studs and one per 32 px tile |
 
 ## How they are drawn
 
@@ -51,4 +55,5 @@ replaces. Every stroke is at least 1 px at 1x; frames are hollow.
 catalogue (see the design system, section 13). The kit's dial (`kit/Gauge.module.css`) and scroll
 area (`kit/ScrollArea.module.css`) use theirs; the HUD strip, the status icons, the sheet and the
 tool slots are the later tickets of #678; the strip's gauge cluster (#716) draws the dial, the
-needle and the glass frame.
+needle and the glass frame, and on desktop the cluster rail frame; the docked sheet draws the dock
+rail frame (#770), both with `border-image-repeat: round` so a rivet repeats at its pitch.

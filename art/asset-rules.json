@@ -108,6 +108,18 @@
       "ui-gear-button-pressed": {
         "sizePx": [48, 48]
       }
+    },
+    "ui-frame-dock": {
+      "ui-frame-dock": {
+        "sizePx": [80, 80],
+        "insetPx": [24, 24]
+      }
+    },
+    "ui-frame-cluster": {
+      "ui-frame-cluster": {
+        "sizePx": [80, 40],
+        "insetPx": [24, 10]
+      }
     }
   }
 }

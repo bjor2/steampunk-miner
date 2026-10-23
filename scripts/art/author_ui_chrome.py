@@ -3,7 +3,8 @@ Authors the first version of the UI chrome sprites' Blender sources (ticket 683,
 docs/ui/design-system.md section 13): the gauge bar and dial, the edge gauge, the odometer drum,
 the sheet, card and tab frames, the scroll rail and thumb, the slot ring, the status plate and the
 gear button, one .blend per `art.*` token; ticket 716 added the gauge cluster's needle and its
-brass and glass frame.
+brass and glass frame; ticket 770 the desktop rail frames of the docked sheet and the wide gauge
+cluster, whose edge tile is one rivet pitch so `border-image-repeat: round` keeps it at any size.
 
     blender -b --factory-startup --python-exit-code 1 -P scripts/art/author_ui_chrome.py [-- <id> ...]
 
@@ -46,6 +47,9 @@ DRUM_CELL_PX = 24
 DRUM_DIGITS = 10
 # The dial's ticks sweep 240 degrees, like the CSS needle (kit/Gauge.tsx).
 DIAL_SWEEP_DEGREES = 240
+# The desktop rail frames (ticket 770): one rivet per edge tile, which is this many CSS px long, so
+# a rail drawn with `border-image-repeat: round` keeps the pitch instead of stretching the rivets.
+RAIL_PITCH_PX = 32
 
 
 def main():
@@ -180,6 +184,43 @@ def author_frame_glass(m, sprites):
     return [build_part('ui-frame-glass', pieces, (0, 0), sprites)]
 
 
+def author_frame_dock(m, sprites):
+    """The desktop dock's rail frame (ticket 770), 80 x 80 with 24 px insets, so each edge tile is
+    one RAIL_PITCH_PX with a rivet at its middle: a 2 px brass edge, a 6 px iron band, a brass hinge
+    rail down the band on the left, the edge that meets the play view, and a hairline inside."""
+    pieces = [
+        rounded_frame(m.graded('brass'), 80, 80, 6, 2, 0, 0, 0),
+        rounded_frame(m.stop('iron', 'base'), 76, 76, 4, 6, 0, 0, 0),
+        rounded_frame(m.graded('brass'), 64, 64, 2, 1, 0, 0, 0),
+        rect(m.graded('brass'), 6, 68, -35, 0, -LAYER),
+        rect(m.stop('iron', 'shadow'), 1, 68, -32.5, 0, -2 * LAYER),
+    ]
+    pieces += [rivet(m, 2, x, z, -3 * LAYER) for x, z in corner_places(35, 35)]
+    pieces += [rivet(m, 2, 0, z, -3 * LAYER) for z in (-35, 35)]
+    pieces += [rivet(m, 2, x, 0, -3 * LAYER) for x in (-35, 35)]
+    return [build_part('ui-frame-dock', pieces, (0, 0), sprites)]
+
+
+def author_frame_cluster(m, sprites):
+    """The desktop gauge cluster's rail frame (ticket 770), 80 x 40 at the desktop cluster's own
+    height with 24 x 10 insets: the glass frame's 3 px bezel, dark lip and glint, a stud at each
+    corner and one per RAIL_PITCH_PX along the top and bottom rails, one on each end cap."""
+    pieces = [
+        rounded_frame(m.graded('brass'), 80, 40, 8, 3, 0, 0, 0),
+        rounded_frame(m.stop('iron', 'shadow'), 74, 34, 5, 1, 0, 0, 0),
+        rect(m.stop('parchment', 'highlight'), 56, 1, 0, 15.5, -LAYER),
+    ]
+    pieces += [rivet(m, 1.5, x, z, -2 * LAYER) for x, z in corner_places(36, 16)]
+    pieces += [rivet(m, 1.5, 0, z, -2 * LAYER) for z in (-17, 17)]
+    pieces += [rivet(m, 1.5, x, 0, -2 * LAYER) for x in (-37, 37)]
+    return [build_part('ui-frame-cluster', pieces, (0, 0), sprites)]
+
+
+def corner_places(x, z):
+    """The four corners at (+-x, +-z)."""
+    return [(sx, sz) for sx in (-x, x) for sz in (-z, z)]
+
+
 def author_frame_tab(m, sprites):
     """A brass top edge and 1 px sides, open at the foot; the active tab's edge is the accent."""
     parts = []
@@ -267,6 +308,8 @@ AUTHORS = {
     'ui-frame-sheet': author_frame_sheet,
     'ui-frame-card': author_frame_card,
     'ui-frame-glass': author_frame_glass,
+    'ui-frame-dock': author_frame_dock,
+    'ui-frame-cluster': author_frame_cluster,
     'ui-frame-tab': author_frame_tab,
     'ui-scroll-rail': author_scroll_rail,
     'ui-slot-ring': author_slot_ring,

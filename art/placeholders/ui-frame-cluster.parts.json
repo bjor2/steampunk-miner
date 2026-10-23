@@ -1,0 +1,28 @@
+{
+  "assetId": "ui-frame-cluster",
+  "schema": 1,
+  "source": {
+    "blend": "art/blender/ui-frame-cluster/ui-frame-cluster.blend",
+    "sha256": null,
+    "blender": null
+  },
+  "pxPerMetre": 4,
+  "atlasPx": [512, 256],
+  "maps": {
+    "albedo": "ui-frame-cluster.albedo.ktx2",
+    "normal": "ui-frame-cluster.normal.ktx2",
+    "emissive": false
+  },
+  "parts": [
+    {
+      "id": "ui-frame-cluster",
+      "tier": 1,
+      "rect": [8, 8, 320, 160],
+      "sizeM": [80.0, 40.0],
+      "pivotM": [40.0, 20.0],
+      "atM": [0.0, 0.0],
+      "z": 0,
+      "insetPx": [24, 10]
+    }
+  ]
+}

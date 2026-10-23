@@ -772,6 +772,10 @@ differ from world art in three ways:
   `accent` material is `tintable` and also writes `<part>.tint.png` and `<part>.tint@2x.png`, a
   white image whose alpha is the accent bake, which CSS uses as a mask for a planet skin's colour.
 
+A **rail frame** (ticket 770: `ui-frame-dock`, `ui-frame-cluster`) is a nine-slice whose edge tile
+is one rivet pitch with the rivet at its middle, so CSS repeats it (`border-image-repeat: round`)
+instead of stretching it across a desktop dock or strip.
+
 `scripts/art/author_ui_chrome.py` wrote the first version of the eleven files: every sprite is a
 set of flat faces (no lights, no bevels; the albedo bake reads the base colour) in a material of
 the design tokens' three stops, a vertical gradient along the part, upside down for a well, or one

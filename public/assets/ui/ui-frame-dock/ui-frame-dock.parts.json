@@ -1,0 +1,48 @@
+{
+  "assetId": "ui-frame-dock",
+  "schema": 1,
+  "source": {
+    "blend": "art/blender/ui-frame-dock/ui-frame-dock.blend",
+    "sha256": "78a41e2aec07ef53c4d936b4f8415618f2ec3c9ef710831b21087e4a40ff20cf",
+    "blender": "4.2.9 LTS"
+  },
+  "pxPerMetre": 4,
+  "atlasPx": [
+    512,
+    512
+  ],
+  "maps": {
+    "albedo": "ui-frame-dock.albedo.ktx2",
+    "normal": "ui-frame-dock.normal.ktx2",
+    "emissive": false
+  },
+  "parts": [
+    {
+      "id": "ui-frame-dock",
+      "tier": 1,
+      "rect": [
+        8,
+        8,
+        320,
+        320
+      ],
+      "sizeM": [
+        80.0,
+        80.0
+      ],
+      "pivotM": [
+        40.0,
+        40.0
+      ],
+      "atM": [
+        0.0,
+        0.0
+      ],
+      "z": 0,
+      "insetPx": [
+        24,
+        24
+      ]
+    }
+  ]
+}
