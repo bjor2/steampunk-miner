@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-10-23T11:31:45+02:00",
+  "updated_at": "2026-10-23T11:42:55+02:00",
   "caps": {
     "grok": 12,
     "claude": 10,
@@ -125,9 +125,9 @@
   },
   "tester": {
     "state": "running",
-    "phase": "nightly-balance-guns",
+    "phase": "nightly-balance-charges",
     "sha": "dca609908e4fa6c361bc34d78442dbbffed4eb4a",
-    "since": "2026-10-23T09:31:35Z",
+    "since": "2026-10-23T09:42:46Z",
     "holds_gate": true,
     "claude_slot": null,
     "last_run": "2026-10-22T22:52:38Z",
