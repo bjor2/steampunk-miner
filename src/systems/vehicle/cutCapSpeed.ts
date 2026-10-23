@@ -17,6 +17,11 @@ export function driveSpeedOf(vehicle: VehicleState): number {
   return statsOfVehicle(vehicle).engine.speedMax
 }
 
+/** Ticks the drive takes over one metre at its top speed: the felt time of a drive-bound metre. */
+export function driveTicksPerMetreOf(speedMax: number): number {
+  return TICKS_PER_SECOND / speedMax
+}
+
 /** A top speed in whole mm a tick, rounded up so a body at that speed always fits the step. */
 export function driveStepMmOf(speedMax: number): number {
   return Math.ceil((speedMax * MM_PER_METRE) / TICKS_PER_SECOND)

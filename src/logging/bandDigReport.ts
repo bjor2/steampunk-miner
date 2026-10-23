@@ -4,13 +4,15 @@
  * `travel_started`, or the run's last levels on the planet it ended on). Derived from the logged
  * levels by the pure drill rule, never written into the log (#11 section 3). The summary keeps
  * band 1 (the first probe) and band 5, the band the sawtooth is judged on (Game Director on #86):
- * departure at most 0.7x arrival, on the median of the pacing seeds (`sawtoothMedian.ts`).
+ * departure at most 0.7x arrival, on the median of the pacing seeds (`sawtoothMedian.ts`). Band 5
+ * is kept for each leg through the upgrade that binds it (#723's drive-bound law, Game Director on
+ * #762): down through the drill, sideways through the slower of the drill and the drive.
  */
 import { TICKS_PER_SECOND } from '../constants/physics'
 import { PACING_TARGETS } from '../constants/pacingTargets'
 import { UPGRADE_IDS } from '../systems/economy/economyDefinition'
 import type { UpgradeLevels } from '../systems/economy/vehicleStats'
-import { bandDigTicks } from '../systems/vehicle/bandDig'
+import { bandDigTicks, bandSidewaysTicks } from '../systems/vehicle/bandDig'
 
 /** A band's drill ticks per metre; null where the tip only skids on it. */
 export interface BandDig {
@@ -28,28 +30,43 @@ export interface PlanetLevels {
   departure: Record<string, LoggedLevels>
 }
 
+/** Ticks per metre of a band at a set of levels, or null where the tip only skids. */
+type BandTicksAt = (planetIndex: number, levels: UpgradeLevels, band: number) => number | null
+
+/** The drill's time per metre of the band down, on arrival and at departure of each planet. */
 export function bandDigOf(
   levels: PlanetLevels,
   lastLevels: LoggedLevels,
   band: number,
 ): Record<string, BandDig> {
-  const entries = Object.entries(levels.arrival).map(([planet, arrival]) => {
-    const departure = levels.departure[planet] ?? lastLevels
-    return [planet, digOnPlanet(Number.parseInt(planet), band, arrival, departure)] as const
-  })
-  return Object.fromEntries(entries)
+  return bandTicksOnEachPlanet(levels, lastLevels, band, bandDigTicks)
 }
 
-function digOnPlanet(
-  planetIndex: number,
+/** The same for a sideways cut: the drill's time, held to the drive's (#723). */
+export function bandSidewaysDigOf(
+  levels: PlanetLevels,
+  lastLevels: LoggedLevels,
   band: number,
-  arrival: LoggedLevels,
-  departure: LoggedLevels,
-): BandDig {
-  return {
-    arrival: bandDigTicks(planetIndex, upgradeLevelsOf(arrival), band),
-    departure: bandDigTicks(planetIndex, upgradeLevelsOf(departure), band),
-  }
+): Record<string, BandDig> {
+  return bandTicksOnEachPlanet(levels, lastLevels, band, bandSidewaysTicks)
+}
+
+function bandTicksOnEachPlanet(
+  levels: PlanetLevels,
+  lastLevels: LoggedLevels,
+  band: number,
+  ticksAt: BandTicksAt,
+): Record<string, BandDig> {
+  const entries = Object.entries(levels.arrival).map(([planet, arrival]) => {
+    const departure = levels.departure[planet] ?? lastLevels
+    const planetIndex = Number.parseInt(planet)
+    const dig = {
+      arrival: ticksAt(planetIndex, upgradeLevelsOf(arrival), band),
+      departure: ticksAt(planetIndex, upgradeLevelsOf(departure), band),
+    }
+    return [planet, dig] as const
+  })
+  return Object.fromEntries(entries)
 }
 
 function upgradeLevelsOf(logged: LoggedLevels): UpgradeLevels {

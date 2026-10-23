@@ -7,6 +7,7 @@ import type { BandDig } from './bandDigReport'
 import {
   campaignPacingFindings,
   campaignScalingProblems,
+  campaignScalingProblemsBesideSawtooth,
   campaignScalingProblemsByMarkerReach,
   type CampaignGateRun,
 } from './campaignScalingGate'
@@ -101,7 +102,7 @@ describe('campaign scaling gate (R1 #89)', () => {
     ]
     const problems = campaignScalingProblems(runs, LOCKED_SCHEDULE, LAST_PLANET)
     expect(problems).toHaveLength(LAST_PLANET - 1)
-    expect(problems[0]).toBe('planet 1 band 5 median 0.75x, target at most 0.7x')
+    expect(problems[0]).toBe('planet 1 band 5 down median 0.75x, target at most 0.7x')
   })
 
   it('fails a test double of the schedule that leaves 3 campaign planets without a horizontal', () => {
@@ -131,6 +132,19 @@ describe('campaign scaling gate (R1 #89)', () => {
     expect(campaignScalingProblems(healthyRuns(), heldBack, LAST_PLANET)).toEqual([])
   })
 
+  it('leaves the sawtooth misses out of the problems beside the sawtooth, and keeps the rest', () => {
+    const runs = [
+      seedRun(1, digsAtRatio(0.6)),
+      seedRun(2, digsAtRatio(0.8), 6),
+      seedRun(3, digsAtRatio(0.75)),
+    ]
+    const schedule = withoutRowsOn(LOCKED_SCHEDULE, [15, 17])
+    expect(campaignScalingProblemsBesideSawtooth(runs, schedule, LAST_PLANET)).toEqual([
+      'seed 2 stalled on planet 6 before the core of planet 8',
+      'the schedule leaves 3 campaign planets in a row without a horizontal row, at most 2',
+    ])
+  })
+
   it('lets the known-red marker reach only stalled seeds and sawtooth misses (ticket 419)', () => {
     const runs = [
       seedRun(1, digsAtRatio(0.6)),
@@ -142,7 +156,7 @@ describe('campaign scaling gate (R1 #89)', () => {
     const problems = campaignScalingProblemsByMarkerReach(runs, schedule, LAST_PLANET)
 
     expect(problems.covered).toContain('seed 2 stalled on planet 6 before the core of planet 8')
-    expect(problems.covered).toContain('planet 1 band 5 median 0.75x, target at most 0.7x')
+    expect(problems.covered).toContain('planet 1 band 5 down median 0.75x, target at most 0.7x')
     expect(problems.uncovered).toEqual([
       'the schedule leaves 3 campaign planets in a row without a horizontal row, at most 2',
     ])

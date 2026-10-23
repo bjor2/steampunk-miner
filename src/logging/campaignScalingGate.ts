@@ -15,7 +15,7 @@ import type { UnlockSchedule } from '../systems/unlocks/readUnlockSchedule'
 import { longestRunWithoutHorizontal } from '../systems/unlocks/scheduleCadence'
 import type { KnownRedProblems } from './knownRed'
 import { campaignPlanetAlerts, type PacingReport } from './pacingReport'
-import { medianSawtoothScores, sawtoothMisses, type SeededSawtooth } from './sawtoothMedian'
+import { sawtoothJudgedPlanets, sawtoothMisses, type SeededSawtooth } from './sawtoothMedian'
 
 /** One seed's run as the gate judges it. */
 export interface CampaignGateRun extends SeededSawtooth {
@@ -40,6 +40,22 @@ export function campaignScalingProblems(
     ...stalledSeedProblems(runs, lastPlanet),
     ...nothingJudgedProblems(runs),
     ...sawtoothMisses(runs),
+    ...cadenceProblems(schedule),
+  ]
+}
+
+/**
+ * Everything but the sawtooth's misses, for a gate that judges each planet's legs as rows of their
+ * own (Game Director on #762): stalled seeds, a sawtooth that judged nothing, and the cadence.
+ */
+export function campaignScalingProblemsBesideSawtooth(
+  runs: readonly CampaignGateRun[],
+  schedule: UnlockSchedule,
+  lastPlanet: number,
+): string[] {
+  return [
+    ...stalledSeedProblems(runs, lastPlanet),
+    ...nothingJudgedProblems(runs),
     ...cadenceProblems(schedule),
   ]
 }
@@ -82,7 +98,7 @@ function furthestPlanetOf(run: CampaignGateRun): number {
 }
 
 function nothingJudgedProblems(runs: readonly CampaignGateRun[]): string[] {
-  const judged = Object.keys(medianSawtoothScores(runs))
+  const judged = sawtoothJudgedPlanets(runs)
   return judged.length === 0 ? ['no seed left a planet, so the band 5 sawtooth judged nothing'] : []
 }
 

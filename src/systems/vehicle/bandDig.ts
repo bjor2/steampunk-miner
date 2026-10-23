@@ -4,9 +4,14 @@
  * with. Tiles are 1 m (#6), so ticks per tile are ticks per metre; a band has one hardness for the
  * whole band (#6 section 2), so every tile of it digs in the same time and this is also its median.
  * The heat throttle (#113) is left out: it is a gauge, not a level.
+ *
+ * Each leg is read through the upgrade that binds it (#723's drive-bound law, Game Director on
+ * #762): a cut down is the drill's alone, a sideways cut moves at `min(vCut, speedMax)`, so its
+ * metre takes the slower of the drill's time and the drive's.
  */
 import { blockHardness } from '../economy/oreEconomy'
 import { vehicleStatsAt, type UpgradeLevels } from '../economy/vehicleStats'
+import { driveTicksPerMetreOf } from './cutCapSpeed'
 import { ticksPerTile } from './drillRule'
 
 /**
@@ -22,4 +27,15 @@ export function bandDigTicks(
   band: number = SAWTOOTH_BAND,
 ): number | null {
   return ticksPerTile(vehicleStatsAt(levels), blockHardness(planetIndex, band))
+}
+
+/** Ticks per metre of a sideways cut through the band: the drill's, held to the drive's time. */
+export function bandSidewaysTicks(
+  planetIndex: number,
+  levels: UpgradeLevels,
+  band: number = SAWTOOTH_BAND,
+): number | null {
+  const drillTicks = bandDigTicks(planetIndex, levels, band)
+  if (drillTicks === null) return null
+  return Math.max(drillTicks, driveTicksPerMetreOf(vehicleStatsAt(levels).engine.speedMax))
 }

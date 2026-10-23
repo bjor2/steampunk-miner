@@ -12,7 +12,7 @@ import { TICKS_PER_SECOND } from '../constants/physics'
 import { add, fromCanonical, toCanonical, ZERO_MONEY, type Money } from '../systems/money'
 import { SAWTOOTH_BAND } from '../systems/vehicle/bandDig'
 import type { RunEventName } from './eventNames'
-import { bandDigOf, type BandDig, type PlanetLevels } from './bandDigReport'
+import { bandDigOf, bandSidewaysDigOf, type BandDig, type PlanetLevels } from './bandDigReport'
 import {
   addMinedOre,
   copyMinedOrder,
@@ -78,6 +78,11 @@ export interface RunSummary {
    * at most 0.7x arrival on the median of the pacing seeds.
    */
   sawtoothBandDigTicks: Record<string, BandDig>
+  /**
+   * Band 5 cut sideways, the sawtooth's other leg (#723's drive-bound law, Game Director on #762):
+   * the drill's time per metre held to the drive's, on arrival and at departure.
+   */
+  sawtoothSidewaysDigTicks: Record<string, BandDig>
   /**
    * Planet index (as a string key) to the track levels it was entered and left with, for the
    * drill and tip leads printed beside the sawtooth (#86); the planet the run ends on has no
@@ -353,6 +358,11 @@ function summaryOf(tally: Tally): RunSummary {
     coreCompletedTicks: { ...tally.coreCompletedTicks },
     firstBandDigTicks: bandDigOf(tally.planetLevels, tally.upgradeLevels, FIRST_BAND),
     sawtoothBandDigTicks: bandDigOf(tally.planetLevels, tally.upgradeLevels, SAWTOOTH_BAND),
+    sawtoothSidewaysDigTicks: bandSidewaysDigOf(
+      tally.planetLevels,
+      tally.upgradeLevels,
+      SAWTOOTH_BAND,
+    ),
     planetLevels: {
       arrival: { ...tally.planetLevels.arrival },
       departure: { ...tally.planetLevels.departure },

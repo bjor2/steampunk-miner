@@ -62,7 +62,7 @@ const text = [
     ? ''
     : `The bot did not reach planet ${LAST_PLANET}'s core inside its budget; on world seed ${scenario.worldSeed} it stopped on planet ${run.state.planet.index}.`,
   ['| planet | core (from arrival) | trips |', '| --- | --- | --- |', ...rows].join('\n'),
-  `### Band ${SAWTOOTH_BAND} dig time, departure over arrival, per seed (#81, #86)\n\n${formatSawtoothSeedTable(seededSummaries)}`,
+  `### Band ${SAWTOOTH_BAND} dig time, departure over arrival, per seed and leg (#81, #86, #762)\n\n${formatSawtoothSeedTable(seededSummaries)}`,
   `### Band ${SAWTOOTH_BAND} dig time, world seed ${scenario.worldSeed}\n\n${formatBandDigTable(summary.sawtoothBandDigTicks, SAWTOOTH_BAND)}`,
   `### Band ${FIRST_BAND} dig time, world seed ${scenario.worldSeed} (reported, not judged)\n\n${formatBandDigTable(summary.firstBandDigTicks, FIRST_BAND)}`,
   `### Warnings\n\n${alerts.length === 0 ? 'none' : alerts.map((line) => `- ${line}`).join('\n')}`,

@@ -212,6 +212,20 @@ describe('run summary', () => {
     })
   })
 
+  // #723's drive-bound law (Game Director on #762): the sideways leg is the drill held to the drive.
+  it('keeps band 5 cut sideways too, the drill time held to the drive time of the same levels', () => {
+    const run = [
+      ...PLAYED_RUN.slice(0, 7),
+      bought(985, 'drill_power', 8),
+      bought(986, 'drill_tip', 70),
+      ...PLAYED_RUN.slice(7),
+    ]
+    expect(deriveSummary(run).sawtoothSidewaysDigTicks).toEqual({
+      '1': { arrival: 608, departure: 22 },
+      '2': { arrival: 43, departure: 43 },
+    })
+  })
+
   it('enters the planet with the start levels a scenario sets on the tick it is entered', () => {
     const setDrill = line(0, 'debug_command_applied', {
       command: 'debug.setUpgrade',

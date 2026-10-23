@@ -8,13 +8,17 @@ import type { Scenario } from '../systems/scenario'
 import { LOCKED_SCHEDULE } from '../systems/unlocks/unlockSchedule'
 import {
   campaignPacingFindings,
-  campaignScalingProblemsByMarkerReach,
+  campaignScalingProblemsBesideSawtooth,
   type CampaignGateRun,
 } from './campaignScalingGate'
-import { knownRedVerdict } from './knownRed'
 import { medianPacingReport, seededPacingReportsOf } from './pacingMedian'
 import { deriveSummary } from './runSummary'
-import { formatSawtoothSeedTable } from './sawtoothMedian'
+import {
+  formatSawtoothSeedTable,
+  SAWTOOTH_LEGS,
+  sawtoothMissesOn,
+  type SawtoothLeg,
+} from './sawtoothMedian'
 import { BOT_RUN_BUDGET_TICKS, playLoggedSliceOnSeeds, type SeededSliceRun } from './sliceRunLog'
 
 const SCENARIO = JSON.parse(
@@ -32,7 +36,11 @@ const BUDGET_TICKS =
   BOT_RUN_BUDGET_TICKS +
   (LAST_PLANET - SLICE_LAST_PLANET) * PACING_TARGETS.laterPlanetCoreMinutes.max * TICKS_PER_MINUTE
 
+/** Every planet the bot leaves before the gate's last core: the planets the sawtooth judges. */
+const JUDGED_PLANETS = Array.from({ length: LAST_PLANET - 1 }, (_, index) => index + 1)
+
 let seeded: SeededSliceRun[] | null = null
+let gateRuns: CampaignGateRun[] | null = null
 
 /** The bot scenario on each pacing seed (#84) to planet 8's core, as `balance:planets` plays it. */
 function seededRuns(): SeededSliceRun[] {
@@ -43,6 +51,12 @@ function seededRuns(): SeededSliceRun[] {
   return seeded
 }
 
+/** The seeded runs as the gate judges them, derived once for every row. */
+function seededGateRuns(): CampaignGateRun[] {
+  gateRuns ??= gateRunsOf(seededRuns())
+  return gateRuns
+}
+
 function gateRunsOf(runs: readonly SeededSliceRun[]): CampaignGateRun[] {
   return runs.map((run) => ({
     worldSeed: run.worldSeed,
@@ -51,18 +65,33 @@ function gateRunsOf(runs: readonly SeededSliceRun[]): CampaignGateRun[] {
   }))
 }
 
+function legRowName(planet: number, leg: SawtoothLeg): string {
+  return `digs band 5 ${leg} at departure in at most 0.7x its arrival time on planet ${planet}, on the seed median`
+}
+
 // R1 (#89): the curve tickets (C1-C4) and the schedule runtime (H1-H2) held together. A miss is a
-// balance finding for Systems & Economy, never a reason to retune the bot or a constant.
+// balance finding for Systems & Economy, never a reason to retune the bot or a constant. Ticket 645
+// deleted #417's known-red marker after R3's radius re-baseline: every problem fails.
+//
+// #723's drive-bound law (Game Director on #762, recorded as the "level-leg pacing re-pin
+// (drive-bound)" under #644): every planet's band 5 is judged per leg through the upgrade that
+// binds it, down through the drill and sideways through the slower of the drill and the drive,
+// each leg a row of its own at the same 0.7x bar.
 describe('balance regression: the campaign scaling gate on the pacing seeds (R1 #89)', () => {
-  it('digs band 5 at departure in at most 0.7x its arrival time on planets 1 to 7, on the seed median, with no seed stalled before planet 8', () => {
-    const runs = gateRunsOf(seededRuns())
+  it('leaves no seed stalled before planet 8, judges a planet, and keeps the schedule cadence', () => {
+    const runs = seededGateRuns()
     const median = medianPacingReport(
       seededPacingReportsOf(seededRuns()).map((seed) => seed.report),
     )
     console.log(`${formatSawtoothSeedTable(runs)}\n\n${campaignPacingFindings(median).join('\n')}`)
-    const problems = campaignScalingProblemsByMarkerReach(runs, LOCKED_SCHEDULE, LAST_PLANET)
-    // Ticket 645 deleted #417's marker after R3's radius re-baseline: every problem fails now.
-    const verdict = knownRedVerdict(null, problems, () => null)
-    expect(verdict.failures).toEqual([])
+    expect(campaignScalingProblemsBesideSawtooth(runs, LOCKED_SCHEDULE, LAST_PLANET)).toEqual([])
   })
+
+  for (const planet of JUDGED_PLANETS) {
+    for (const leg of SAWTOOTH_LEGS) {
+      it(legRowName(planet, leg), () => {
+        expect(sawtoothMissesOn(seededGateRuns(), planet, leg)).toEqual([])
+      })
+    }
+  }
 })
