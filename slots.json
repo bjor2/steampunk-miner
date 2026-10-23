@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-10-23T18:18:18+02:00",
+  "updated_at": "2026-10-23T19:11:35+02:00",
   "caps": {
     "grok": 12,
     "claude": 10,
@@ -120,20 +120,20 @@
     }
   ],
   "gate": {
-    "busy": 1,
+    "busy": 0,
     "max": 3
   },
   "tester": {
-    "state": "running",
-    "phase": "full",
+    "state": "idle",
+    "phase": null,
     "sha": "af7addf40142a852553e2416da9d0ca0e160dcc5",
-    "since": "2026-10-23T15:16:22Z",
-    "holds_gate": true,
+    "since": "2026-10-23T17:11:20Z",
+    "holds_gate": false,
     "claude_slot": null,
     "last_run": "2026-10-22T22:52:38Z",
     "last_nightly": "2026-10-15T20:43:15Z",
     "last_nightly_result": "full=FAIL balance-report=ok bench=FAIL balance-planets=ok balance-guns=ok balance-charges=ok balance-refinery=ok balance-heat=ok e2e=FAIL memory-soak=FAIL packaged-smoke=ok ",
-    "main_red_sha": "dca609908e4fa6c361bc34d78442dbbffed4eb4a",
+    "main_red_sha": null,
     "feature": null,
     "feature_title": null,
     "queue": [
