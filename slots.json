@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-10-23T04:17:24+02:00",
+  "updated_at": "2026-10-23T04:17:50+02:00",
   "caps": {
     "grok": 12,
     "claude": 10,
@@ -319,9 +319,9 @@
     }
   ],
   "last_refill": {
-    "at": "2026-10-23 03:56 CEST",
+    "at": "2026-10-23 04:17 CEST",
     "mode": "refill-dev",
-    "triggers": "claude-run:wave-plan",
+    "triggers": "#726",
     "started": "",
     "note": "no pickable build ticket"
   },
@@ -390,22 +390,6 @@
           736
         ],
         "live": 1
-      },
-      {
-        "number": 729,
-        "key": "576-3A",
-        "map": 576,
-        "lane": "remote",
-        "mode": "solo",
-        "state": "running",
-        "tickets": [
-          731,
-          726
-        ],
-        "done": [
-          731
-        ],
-        "live": 0
       },
       {
         "number": 715,
