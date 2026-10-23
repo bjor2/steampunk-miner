@@ -3,7 +3,7 @@ import { fromCanonical, toCanonical } from '../../money'
 import { fuelOf } from '../../vehicle/vehicleFuel'
 import { dockedPoseAt } from '../../vehicle/vehiclePose'
 import { dockSiteOf } from '../../world/dockSite'
-import { freshPlanetParamsFor } from '../../world/planetParams'
+import { freshPlanetParamsFor, oreRulesVersionOnEntry } from '../../world/planetParams'
 import type { DomainEvent } from '../domainEvent'
 import { createScriptedSession, typesOf, WORLD_SEED } from '../scriptedSession'
 import { stateDigest } from '../stateDigest'
@@ -31,7 +31,11 @@ describe('star map jump (ticket 755)', () => {
     const session = fuelledWith(1)
     const wallet = session.state().players.p1.wallet
     const events = session.submit(10, jumpTo('2'))
-    expect(session.state().planet).toEqual({ index: 2, seed: WORLD_SEED, oreRulesVersion: 10 })
+    expect(session.state().planet).toEqual({
+      index: 2,
+      seed: WORLD_SEED,
+      oreRulesVersion: oreRulesVersionOnEntry(2),
+    })
     expect('fuel' in session.vehicle()).toBe(false)
     expect(session.state().players.p1.wallet).toBe(wallet)
     expect(events[0]).toMatchObject({
