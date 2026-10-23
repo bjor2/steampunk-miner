@@ -23,7 +23,7 @@ describe('run metadata', () => {
     expect(metadata.patchDockGuaranteed).toBe(dockGuaranteeCount(planetParamsFor(83921, 1)))
   })
 
-  it('records generator version 15 (#36, #105, #175, #146, #147, tickets 445, 446, 448, 625, 643, 709 and 737)', () => {
-    expect(createRunMetadata(FACTS).generatorVersion).toBe(16)
+  it('records generator version 17 (#36, #105, #175, #146, #147, tickets 445, 446, 448, 625, 643, 709, 737, 738 and 713)', () => {
+    expect(createRunMetadata(FACTS).generatorVersion).toBe(17)
   })
 })

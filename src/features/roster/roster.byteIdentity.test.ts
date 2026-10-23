@@ -37,7 +37,7 @@ import {
   type PlanetCensus,
 } from './rosterFixtures'
 import { planetRosterOf } from './systems/planetRoster'
-import { liveRosterIndicesOf } from './systems/rosterFold'
+import { drawWeightsOf, liveRosterIndicesOf } from './systems/rosterFold'
 
 // `roster.byteIdentity.test` (TD ruling on ticket 446, 6226236698 section 5, addendum 6226264758
 // amendment 4). A: the roster fold off against on changes no masked cell, density, band count or
@@ -45,7 +45,8 @@ import { liveRosterIndicesOf } from './systems/rosterFold'
 // masked P1 and P2 cells and their per-band, per-family and per-tier counts are main's at f49323ba,
 // read at the ladder size main had (ore rules 6; ticket 643 resizes a fresh P2).
 // C: the properties of the drawn roster, on P1 and P2 and, since the mixed table (#453), on P3 to
-// P5 over the pacing seeds. D, the pacing line, is `roster.pacing.lane.test.ts`.
+// P5 over the pacing seeds, each kind drawn at its weight (P1's gems 4:3:2, ticket 713). D, the
+// pacing line, is `roster.pacing.lane.test.ts`.
 
 /** Main's masked digests at f49323ba (generator 9), over the 8 named seeds, P1 then P2. */
 const MAIN_MASKED_DIGESTS: Readonly<Record<number, string>> = {
@@ -56,11 +57,11 @@ const MAIN_MASKED_DIGESTS: Readonly<Record<number, string>> = {
 /**
  * The roster golden: every roster of P1 to P5, and the kinds P1 and P2 patches drew. The rosters
  * moved when the mixed table landed on P3 to P5 (#453); the P1 and P2 draws did not. They moved
- * again when a fresh P2 took its own three kinds (ticket 709); the draws are read at ore rules 6,
- * before them, so they stay.
+ * again when a fresh P2 took its own three kinds (ticket 709), and when a fresh P1 took its three
+ * gems (ticket 713); the draws are read at ore rules 6, before them, so they stay.
  */
 const ROSTER_GOLDEN = {
-  rosters: 'bf67c3f50c3e9a6e',
+  rosters: 'eb6cd5ca47804c2a',
   draws: { 1: '45eef63f1b02d27f', 2: '06187be540d8ba5c' } as Readonly<Record<number, string>>,
 }
 
@@ -272,7 +273,7 @@ describe('roster byte identity: C, the drawn roster', () => {
   )
 
   it.each([1, 2])(
-    'draws the live kinds of planet %i within 4 sigma of an equal split, over the named seeds',
+    'draws the live kinds of planet %i within 4 sigma of their weighted split, over the named seeds',
     (planetIndex) => {
       const draws = NAMED_SEEDS.flatMap((seed) =>
         patchDrawsOf(freshPlanetParamsFor(seed, planetIndex)),
@@ -282,9 +283,11 @@ describe('roster byte identity: C, the drawn roster', () => {
         const [{ band, lead, family }] = group
         const content = { family: family as ResourceFamily, tierOffset: band - 1 + lead }
         const live = liveRosterIndicesOf(params, band, content)
-        const share = 1 / live.length
-        const sigma = Math.sqrt(group.length * share * (1 - share))
-        for (const index of live) {
+        const weights = drawWeightsOf(params, live)
+        const totalWeight = weights.reduce((sum, weight) => sum + weight, 0)
+        for (const [at, index] of live.entries()) {
+          const share = weights[at] / totalWeight
+          const sigma = Math.sqrt(group.length * share * (1 - share))
           const drawn = group.filter((draw) => draw.kindSlot === index + 1).length
           expect(Math.abs(drawn - group.length * share)).toBeLessThanOrEqual(
             SIGMA_TOLERANCE * sigma,

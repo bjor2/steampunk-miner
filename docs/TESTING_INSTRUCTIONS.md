@@ -345,10 +345,28 @@ programs }` from three's `renderer.info` of the game canvas), read only when cal
   held, and the rare cells per band printed. `generatorGolden.test.ts` pins the rules-11 P3 to P7 and
   `oreRulesOldSaves.test.ts` loads a generator 15 save of P3 under rules 10 with its band-2 rares.
   Money, pacing and R3 are the Tester's: `npm run balance:report`, `oreValueCensus.lane.test.ts`.
+- **P1's gems** (ticket 713, GD lock on #713, Bjor's OK of 22 and 23 Oct; Systems' rows, HS and VS
+  input on #713): a fresh P1, entered under ore rules 12 (generator 17), draws Diamond, Emerald and
+  Ruby on its own kind slots 13 to 15, crystal rares of bands 3 to 5, 4:3:2 by draw weight
+  (`slotDraws.ts`; equal weights still draw `roll % nLive`), with one guaranteed cluster of each, and
+  each sells at its own integer tier, `t_top + 5, 6 and 8` (12, 13 and 15 on P1), through the kernel's
+  gem tag (`oreGems`, feature-slices 3.85). `src/features/roster/systems/rosterGems.test.ts` holds the
+  P1 goldens (864.975, 1297.463 and 2919.292, the 865, 1297 and 2919 Bjor accepted), no other P1 kind
+  at a gem's sale tier (HS), a gem cell keeping its own tier, and no gem on P2 or a rules-11 P1.
+  `src/features/roster/roster.p1Gems.test.ts` reads three seeds: the gems only on crystal rare cells
+  of bands 3 to 5, a cluster of each on every seed, every cell of bands 1 and 2 and every other tier as
+  rules 11 made it, the gems at most 15% of P1's ore pool value (Systems' binding cap) and at most
+  0.5% of its ore cells (HS). `slotDraws.test.ts` holds the weighted draw and its guards,
+  `kindRows.test.ts` the gem slots and the cap counted per roster, `roster.byteIdentity.test.ts` the
+  weighted split within 4 sigma, `generatorGolden.test.ts` the rules-12 P1 and P2 to P7 as rules 11,
+  and `oreRulesOldSaves.test.ts` a generator 16 save of P1 under rules 10 with its column pin. The
+  core-layer band money moves by design: the named #644 re-baseline "P1 core gems". Money, pacing,
+  the fee clamp and R3 (P2 at least 1.15x P1 with the gems) are the Tester's: `npm run
+balance:report`, `oreValueCensus.lane.test.ts`.
 - **Species audit P1 to P5** (ticket 711, spec #647): `src/features/roster/roster.speciesAudit.test.ts`
-  reads each fresh planet's roster on two seeds and holds it to at least 15 species (P1 at 12 until
-  ticket 713 moves it to its v14 pool and raises the floor), no two sharing a name or a stem (the
-  #699 rule, reading C), a sprite (silhouette + pattern) or a skin combination.
+  reads each fresh planet's roster on two seeds and holds it to at least 15 species (P1 since ticket
+  713's gems), no two sharing a name or a stem (the #699 rule, reading C), a sprite (silhouette +
+  pattern) or a skin combination.
 - **Planet registry** (ticket 642, GD lock R1 on #302 6306854642 and its addendum 6306861669):
   `src/features/ores/systems/planetRows.test.ts` holds each planet's row (pool and radius on one
   row, P1 to P10), the frozen radii to R(p) = round(300 + 175 ln p) with the shared k inside 150 to

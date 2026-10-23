@@ -20,8 +20,12 @@ const PLANETS_1_TO_10 = Array.from({ length: 10 }, (_, at) => at + 1)
 const LADDER_ORE_RULES = 6
 const FAR_PLANETS = [1, 40, 41, 1000, 1_000_000]
 
+/**
+ * Re-pinned for ore rules 12 (ticket 713): every fresh planet is stamped 12, and the stamp alone
+ * moves the rows: set back to 10 on P1 and P2 and 11 from P3 they digest to 778b863a379eedc2.
+ */
 const GOLDEN = {
-  currentRows: '778b863a379eedc2',
+  currentRows: 'bd0a32dcd80f73d4',
   ladderRows: '64311e1adaba9536',
 }
 

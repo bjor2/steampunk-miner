@@ -73,10 +73,12 @@ describe('state digest', () => {
   // for snapshot 20: the empty charge rack holds its charges by size (K8 #218), and for generator
   // 10: planet 1 is entered under ore rules 2, the roster (ticket 446), and for generator 15:
   // planet 1 is entered under ore rules 10, the rare clusters (ticket 737). The stamp alone moves
-  // it: set back to 2 the digest is 0786d51f73354770 (re-pinned by ticket 752).
+  // it: set back to 2 the digest is 0786d51f73354770 (re-pinned by ticket 752). And for generator
+  // 17: planet 1 is entered under ore rules 12, its gems (ticket 713); set back to 10 the digest is
+  // 0d0a7b05d96aa6f1.
   it('keeps the digest of a fresh authority state, as the golden runs do', () => {
     const state = createAuthorityState({ planetIndex: 1, planetSeed: 7, playerIds: ['p1'] })
-    expect(stateDigest(state)).toBe('0d0a7b05d96aa6f1')
+    expect(stateDigest(state)).toBe('360d7f2092b8ccdf')
   })
 
   it('changes when any value changes', () => {

@@ -81,7 +81,7 @@ describe('planet species', () => {
   it('reads every stored kind slot of planet 1 back as the legacy species of that slot', () => {
     const params = freshPlanetParamsFor(SEED, 1)
     const species = planetRosterOf(params).map((_, at) => planetSpeciesOf(params, at + 1))
-    expect(species.map((found) => found?.pool)).toEqual(Array(12).fill('legacy'))
+    expect(species.map((found) => found?.pool)).toEqual(Array(15).fill('legacy'))
     expect(species.map((found) => found?.slot)).toEqual(
       planetRosterOf(params).map((slot) => slot.slotId),
     )

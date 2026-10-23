@@ -81,6 +81,12 @@
  * earlier, so that planet keeps its band-2 rares and never regenerates mid-run; every cell, edit and
  * the whole state are kept, and the next planet from P3 is stamped with rules 11.
  *
+ * Generator 16 -> 17 (ticket 713): planet 1 entered under ore rules 12 draws its three gems, Diamond,
+ * Emerald and Ruby, on its crystal rare patches of bands 3 to 5 and holds a guaranteed cluster of
+ * each. A save written before it holds its planet under rules 11 or earlier, so that planet keeps
+ * its 12 species and never regenerates mid-run; every cell, edit and the whole state are kept, and
+ * the next planet is stamped with rules 12.
+ *
  * Format 1 -> 2 (#401): the slot layout. A v1 file was the checkpoint of the single slot, so it
  * becomes the autosave with no wall time, and its header gains the ids of the rows its state opens
  * (`savedUnlocks.ts`). Its sections are kept byte for byte: money, levels and everything else.
@@ -183,6 +189,7 @@ const SAVE_MIGRATION_STEPS: readonly SaveMigrationStep[] = [
   { version: 'generatorVersion', from: 13, to: 14, migrate: keepTwelveSpecies },
   { version: 'generatorVersion', from: 14, to: 15, migrate: keepRarePatches },
   { version: 'generatorVersion', from: 15, to: 16, migrate: keepBandTwoRares },
+  { version: 'generatorVersion', from: 16, to: 17, migrate: keepPlanetOneWithoutGems },
   { version: 'formatVersion', from: 1, to: 2, migrate: addSlotHeader },
   { version: 'formatVersion', from: 2, to: 3, migrate: packChunkTable },
 ]
@@ -338,6 +345,10 @@ function keepRarePatches(file: MigratingFile): MigratingFile | null {
 
 function keepBandTwoRares(file: MigratingFile): MigratingFile | null {
   return keptUnderGenerator(file, 16)
+}
+
+function keepPlanetOneWithoutGems(file: MigratingFile): MigratingFile | null {
+  return keptUnderGenerator(file, 17)
 }
 
 function keptUnderGenerator(file: MigratingFile, generatorVersion: number): MigratingFile | null {

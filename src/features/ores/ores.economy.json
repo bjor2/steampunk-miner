@@ -81,6 +81,36 @@
           "window": [4, 5],
           "pool": "foothold-p2",
           "fromOreRules": 9
+        },
+        {
+          "slotId": "legacy.g1",
+          "family": "crystal",
+          "rarity": "rare",
+          "window": [3, 5],
+          "pool": "legacy",
+          "fromOreRules": 12,
+          "drawWeight": 4,
+          "gemTierLead": 5
+        },
+        {
+          "slotId": "legacy.g2",
+          "family": "crystal",
+          "rarity": "rare",
+          "window": [3, 5],
+          "pool": "legacy",
+          "fromOreRules": 12,
+          "drawWeight": 3,
+          "gemTierLead": 6
+        },
+        {
+          "slotId": "legacy.g3",
+          "family": "crystal",
+          "rarity": "rare",
+          "window": [3, 5],
+          "pool": "legacy",
+          "fromOreRules": 12,
+          "drawWeight": 2,
+          "gemTierLead": 8
         }
       ],
       "mixed": [

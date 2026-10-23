@@ -9,16 +9,14 @@ import { planetSpeciesOf } from './systems/planetSpecies'
 // least 15 species, every one with a name of its own under the #699 rule (no two on the planet share
 // a name or a stem, the stem being the whole first word split at hyphens: GD ruling on #699, reading
 // C) and a sprite of its own (silhouette + pattern, the #699 sprite key), and no two of its skins
-// alike. P1 is held at 12 until ticket 713 moves it to its v14 pool (Producer on #711; that ticket
-// switches this floor to 15).
+// alike. P1 reached 15 with its three core gems, Diamond, Emerald and Ruby (ticket 713, which
+// switched its floor from 12 as the Producer had it on #711).
 
 /** Two of the roster's named seeds; a planet's roster and pool never read the seed. */
 const SEEDS = [83921, 4294967295]
 const SPECIES_FLOOR = 15
-/** P1's legacy pool keeps its 12 species until ticket 713 adds its three core gems (Bjor on #713). */
-const PLANET_1_SPECIES_FLOOR = 12
 const AUDITED_PLANETS: readonly [planetIndex: number, floor: number][] = [
-  [1, PLANET_1_SPECIES_FLOOR],
+  [1, SPECIES_FLOOR],
   [2, SPECIES_FLOOR],
   [3, SPECIES_FLOOR],
   [4, SPECIES_FLOOR],

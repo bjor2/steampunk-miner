@@ -3,6 +3,7 @@ import { createAuthorityState } from '../../systems/authority/authorityState'
 import { planetParamsOf } from '../../systems/authority/planetOfState'
 import {
   freshPlanetParamsFor,
+  P1_GEMS_ORE_RULES,
   planetParamsFor,
   type PlanetParams,
 } from '../../systems/world/planetParams'
@@ -20,7 +21,7 @@ import type { MineralSkin, SkinLayer, SkinLayerKind } from './systems/skinLayers
 // wears a skin of its own. Under the same rules slots 6, 7 and 12 swap species (ticket 736: azurite
 // nodule, pyrite sun, argentite), which that ticket skins, while a P2 entered under rules 8 keeps the
 // retired three in their own skins. A P2 entered before that pool, under ore rules 5, keeps the legacy
-// species, so it keeps the skins planet 1 shows.
+// species, so it keeps the skins planet 1 shows without its own gems (ticket 713).
 
 const SEED = 83921
 const PLANET_2 = freshPlanetParamsFor(SEED, 2)
@@ -100,7 +101,7 @@ describe('mineral skins of planet 2', () => {
 
   it('keeps the skins planet 1 shows on a planet 2 entered before its own pool', () => {
     expect(skinnedSpeciesOf(planet2EnteredUnderRules5())).toEqual(
-      skinnedSpeciesOf(freshPlanetParamsFor(SEED, 1)),
+      skinnedSpeciesOf(planetParamsFor(SEED, 1, P1_GEMS_ORE_RULES - 1)),
     )
   })
 })

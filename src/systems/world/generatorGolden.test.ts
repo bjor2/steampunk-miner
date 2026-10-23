@@ -13,6 +13,7 @@ import {
   RARE_CLUSTER_ORE_RULES,
   radiusForPlanet,
   SURFACE_LAYER_ORE_RULES,
+  P1_GEMS_ORE_RULES,
   type PlanetParams,
 } from './planetParams'
 
@@ -43,14 +44,16 @@ import { chunkRangeOfDisc } from './tileGrid'
  * leaving planet 1 and planets 3 on as rules 8 made them, and the rare-ore clusters of every planet
  * entered under ore rules 10 under 15, ticket 737, pinned by the cluster digests of planets 1 to 3,
  * and the deep rare window of every planet from 3 entered under ore rules 11 under 16, ticket 738,
- * pinned by the deep digests of planets 3 to 7, with the features loaded as the game loads them):
+ * pinned by the deep digests of planets 3 to 7, and planet 1's gems of a planet 1 entered under ore
+ * rules 12 under 17, ticket 713, pinned by the gem digest and leaving planets 2 on as rules 11 made
+ * them, with the features loaded as the game loads them):
  * a committed
  * digest of the generator's cells and density. If this fails, the
  * generator changed what a seed makes: bump GENERATOR_VERSION (saves and replays of the old
  * world are then refused) and update the version and digests below in the same commit.
  */
 const GOLDEN = {
-  generatorVersion: 16,
+  generatorVersion: 17,
   wholePlanet1: '4219af3346401cb7',
   wholePlanet2: 'ff1572afae8b0e0f',
   farPlanetChunks: 'c602124184c77617',
@@ -79,6 +82,7 @@ const GOLDEN = {
     'e47e864288ee6acf',
     '21c74c40bdd1a43e',
   ],
+  gemsWholePlanet1: '64c25a9a2cd73db0',
 }
 
 /** One digest over every chunk's digest in a fixed order. */
@@ -254,5 +258,21 @@ describe('generator golden digest', () => {
       GOLDEN.deepWholePlanets3To7,
     )
     expect(GOLDEN.deepWholePlanets3To7[0]).not.toBe(GOLDEN.clusterWholePlanet3)
+  })
+
+  it('makes the committed planet 1 with its gems, ore rules 12 (ticket 713)', () => {
+    const planet1 = planetParamsFor(83921, 1, P1_GEMS_ORE_RULES)
+    expect(digestOfChunks(planet1, everyChunkOf(planet1))).toBe(GOLDEN.gemsWholePlanet1)
+    expect(GOLDEN.gemsWholePlanet1).not.toBe(GOLDEN.clusterWholePlanet1)
+  })
+
+  it('makes planets 2 to 7 under ore rules 12 as rules 11 did', () => {
+    const gems = (seed: number, planet: number) => planetParamsFor(seed, planet, P1_GEMS_ORE_RULES)
+    const planet2 = gems(4_000_000_000, 2)
+    expect(digestOfChunks(planet2, everyChunkOf(planet2))).toBe(GOLDEN.clusterWholePlanet2)
+    const deep = [3, 4, 5, 6, 7].map((planet) => gems(83921, planet))
+    expect(deep.map((params) => digestOfChunks(params, everyChunkOf(params)))).toEqual(
+      GOLDEN.deepWholePlanets3To7,
+    )
   })
 })

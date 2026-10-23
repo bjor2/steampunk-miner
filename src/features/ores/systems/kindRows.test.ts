@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest'
 import {
   DEEP_RARE_WINDOW_ORE_RULES,
   ORE_RULES_VERSION,
+  P1_GEMS_ORE_RULES,
   P2_OWN_KINDS_ORE_RULES,
 } from '../../../systems/world/planetParams'
 import economyFile from '../ores.economy.json'
@@ -46,7 +47,7 @@ describe('ore kind slots', () => {
   })
 
   it("appends P2's own three slots, a metal uncommon and two crystal rares in bands 4-5, from ore rules 9 (ticket 709)", () => {
-    const own = ORE_ROWS.kinds.slotsByTable.legacy.slice(12)
+    const own = ORE_ROWS.kinds.slotsByTable.legacy.slice(12, 15)
     expect(own).toEqual(
       [
         ['legacy.u5', 'metal', 'uncommon'],
@@ -60,6 +61,26 @@ describe('ore kind slots', () => {
         owner: { pool: 'foothold-p2', fromOreRules: P2_OWN_KINDS_ORE_RULES },
       })),
     )
+  })
+
+  it("appends P1's three gems, crystal rares of bands 3-5 drawn 4:3:2 and sold at t_top + 5, 6 and 8, from ore rules 12 (ticket 713)", () => {
+    const gems = ORE_ROWS.kinds.slotsByTable.legacy.slice(15)
+    expect(gems).toEqual(
+      [
+        ['legacy.g1', 4, 5],
+        ['legacy.g2', 3, 6],
+        ['legacy.g3', 2, 8],
+      ].map(([slotId, drawWeight, gemTierLead]) => ({
+        slotId,
+        family: 'crystal',
+        rarity: 'rare',
+        window: [3, 5],
+        drawWeight,
+        gemTierLead,
+        owner: { pool: 'legacy', fromOreRules: P1_GEMS_ORE_RULES },
+      })),
+    )
+    expect(ORE_ROWS.kinds.drawWeightDefault).toBe(3)
   })
 
   it("ships Systems' mixed slots 4/3/3/3/2, then Option B's two fossil commons appended", () => {

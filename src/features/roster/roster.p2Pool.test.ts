@@ -6,6 +6,7 @@ import { readMigratedSaveSlot } from '../../systems/save/saveMigrations'
 import { saveSlotOf } from '../../systems/save/saveSlot'
 import {
   freshPlanetParamsFor,
+  P1_GEMS_ORE_RULES,
   planetParamsFor,
   type PlanetParams,
 } from '../../systems/world/planetParams'
@@ -57,10 +58,12 @@ describe('planet 2 species pool', () => {
     )
   })
 
-  it('loads a planet 2 saved under ore rules 5 on the legacy species planet 1 shows', () => {
+  it('loads a planet 2 saved under ore rules 5 on the legacy species planet 1 shows without its gems', () => {
     expect(saved.oreRulesVersion).toBe(RULES_BEFORE_P2_POOL)
     expect(poolOfPlanet(saved)).toBe('legacy')
-    expect(speciesIdsOf(saved)).toEqual(speciesIdsOf(freshPlanetParamsFor(SEED, 1)))
+    // A P1 entered before its own gems (ticket 713) shows the 12 the legacy pool shares.
+    const planet1 = planetParamsFor(SEED, 1, P1_GEMS_ORE_RULES - 1)
+    expect(speciesIdsOf(saved)).toEqual(speciesIdsOf(planet1))
   })
 
   it(

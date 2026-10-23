@@ -104,8 +104,8 @@ function depthCellsOf(params: PlanetParams, tile: TilePoint): number {
 }
 
 describe('hazard pockets', () => {
-  it('lays no pocket on planet 1, stamped with the rare clusters, rules 10, since ticket 737', () => {
-    expect(oreRulesVersionOnEntry(1)).toBe(10)
+  it("lays no pocket on planet 1, stamped with its gems' rules 12 since ticket 713", () => {
+    expect(oreRulesVersionOnEntry(1)).toBe(12)
     expect(hazardPocketTestOf(freshPlanetParamsFor(WORLD_SEED, 1))).toBeNull()
   })
 

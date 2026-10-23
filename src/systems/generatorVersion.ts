@@ -33,5 +33,9 @@
  * Version 16 draws the rare, epic and mythic ore of a planet from P3 entered under ore rules 11 only
  * from band 3 (`d >= 0.35`), weighted 0.25, 0.5 and 1 toward the core (ticket 738, the same rule),
  * while planets 1 and 2 and every planet a save holds keep the cells of 15.
+ * Version 17 draws planet 1's three gems, Diamond, Emerald and Ruby, 4:3:2 on its crystal rare
+ * patches of bands 3 to 5, with a guaranteed cluster of each, on a planet 1 entered under ore rules
+ * 12 (ticket 713), which rewrites the kind slot of those patches and adds the gems' guaranteed
+ * clusters, while planets 2 on and every planet a save holds keep the cells of 16.
  */
-export const GENERATOR_VERSION = 16
+export const GENERATOR_VERSION = 17

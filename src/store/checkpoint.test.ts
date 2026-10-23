@@ -167,6 +167,7 @@ describe('checkpoint', () => {
       { version: 'generatorVersion', from: 13, to: 14 },
       { version: 'generatorVersion', from: 14, to: 15 },
       { version: 'generatorVersion', from: 15, to: 16 },
+      { version: 'generatorVersion', from: 16, to: 17 },
       { version: 'formatVersion', from: 1, to: 2 },
       { version: 'formatVersion', from: 2, to: 3 },
       ...restoredSectionLines(),
@@ -194,7 +195,7 @@ describe('checkpoint', () => {
     disk.items.set('saves/autosave.json', refused)
     startProcess()
     expect(await loadCheckpoint()).toEqual({
-      problems: ['save.generatorVersion is 99, this build reads 16'],
+      problems: ['save.generatorVersion is 99, this build reads 17'],
     })
     expect(disk.items.get('saves/autosave.refused.json')).toBe(refused)
     expect(disk.items.has('saves/autosave.json')).toBe(false)

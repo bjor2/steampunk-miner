@@ -77,7 +77,7 @@ describe('roster species', () => {
   })
 
   it.each([
-    { planet: 'planet 1', params: freshPlanetParamsFor(SEED, 1), pool: 'legacy', kinds: 12 },
+    { planet: 'planet 1', params: freshPlanetParamsFor(SEED, 1), pool: 'legacy', kinds: 15 },
     {
       planet: 'a fresh planet 2',
       params: freshPlanetParamsFor(SEED, 2),

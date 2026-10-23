@@ -267,16 +267,35 @@ describe('host rock luma', () => {
 
 // Ticket 447 (#139, Systems' split on #446): the 12 species P1 and P2 share, 5 common, 4 uncommon
 // and 3 rare, metal and crystal only, every one its own look and none in a reserved hue band.
+// Ticket 713 (GD lock on #713, Bjor's approval of 22 Oct) adds P1's three gems on the pool's own
+// slots: Diamond, Emerald and Ruby, crystal rares of bands 3 to 5.
 describe('legacy materials', () => {
   const legacy = MATERIALS.materials.filter((material) => material.pool === 'legacy')
+  const GEM_SLOTS = ['legacy.g1', 'legacy.g2', 'legacy.g3']
 
   function countOf(rarity: string): number {
     return legacy.filter((material) => material.rarity === rarity).length
   }
 
-  it('holds 12 species split 5 common, 4 uncommon and 3 rare, with no epic or mythic', () => {
-    expect(legacy).toHaveLength(12)
-    expect(MATERIAL_RARITIES.map(countOf)).toEqual([5, 4, 3, 0, 0])
+  it('holds 15 species split 5 common, 4 uncommon and 6 rare, with no epic or mythic', () => {
+    expect(legacy).toHaveLength(15)
+    expect(MATERIAL_RARITIES.map(countOf)).toEqual([5, 4, 6, 0, 0])
+  })
+
+  it("names P1's three gems as Bjor named them, crystal rares of bands 3 to 5", () => {
+    const gemOf = (slot: string) => legacy.find((material) => material.slot === slot)
+    expect(
+      GEM_SLOTS.map(gemOf).map((material) => [
+        material?.epithet,
+        material?.family,
+        material?.rarity,
+        material?.gradeBand.join('-'),
+      ]),
+    ).toEqual([
+      ['Diamond', 'crystal', 'rare', '3-5'],
+      ['Emerald', 'crystal', 'rare', '3-5'],
+      ['Ruby', 'crystal', 'rare', '3-5'],
+    ])
   })
 
   it('draws only on the metal and crystal families', () => {
@@ -305,7 +324,9 @@ describe('legacy materials', () => {
 // Diamond, which a P2 entered under older rules keeps, each a new id `p2-<slot>b`.
 describe('foothold-p2 materials', () => {
   const p2 = MATERIALS.materials.filter((material) => material.pool === 'foothold-p2')
-  const legacy = MATERIALS.materials.filter((material) => material.pool === 'legacy')
+  const legacy = MATERIALS.materials.filter(
+    (material) => material.pool === 'legacy' && !material.slot.startsWith('legacy.g'),
+  )
   const OWN_SLOTS = ['legacy.u5', 'legacy.r4', 'legacy.r5']
   const SWAPPED_SLOTS = ['legacy.u1', 'legacy.u2', 'legacy.r3']
   const SWAP_RULES = 9

@@ -151,6 +151,9 @@
     { "id": "azurite-blue", "hue": 222, "saturation": 0.7, "luma": 0.5 },
     { "id": "pyrite-brass", "hue": 52, "saturation": 0.45, "luma": 0.7 },
     { "id": "argentite-grey", "hue": 205, "saturation": 0.22, "luma": 0.62 },
+    { "id": "diamond-white", "hue": 195, "saturation": 0.06, "luma": 0.92 },
+    { "id": "emerald-green", "hue": 145, "saturation": 0.78, "luma": 0.55 },
+    { "id": "ruby-crimson", "hue": 345, "saturation": 0.85, "luma": 0.46 },
     {
       "id": "pig-iron",
       "hue": 210,
@@ -728,6 +731,48 @@
       "rarity": "rare",
       "hero": true,
       "flavour": "Rarer than the Guild admits; wrapped in felt, entered in red ink."
+    },
+    {
+      "id": "diamond-quartzine",
+      "pool": "legacy",
+      "slot": "legacy.g1",
+      "family": "crystal",
+      "epithet": "Diamond",
+      "silhouette": "octahedra",
+      "pattern": "lustrous",
+      "hueSlot": "diamond-white",
+      "gradeBand": [3, 5],
+      "rarity": "rare",
+      "hero": false,
+      "flavour": "Clear as gauge glass, and harder than the bit that found it."
+    },
+    {
+      "id": "emerald-quartzine",
+      "pool": "legacy",
+      "slot": "legacy.g2",
+      "family": "crystal",
+      "epithet": "Emerald",
+      "silhouette": "prisms",
+      "pattern": "faceted",
+      "hueSlot": "emerald-green",
+      "gradeBand": [3, 5],
+      "rarity": "rare",
+      "hero": false,
+      "flavour": "Deep green; the assayer weighs it with the office door shut."
+    },
+    {
+      "id": "ruby-quartzine",
+      "pool": "legacy",
+      "slot": "legacy.g3",
+      "family": "crystal",
+      "epithet": "Ruby",
+      "silhouette": "drops",
+      "pattern": "faceted",
+      "hueSlot": "ruby-crimson",
+      "gradeBand": [3, 5],
+      "rarity": "rare",
+      "hero": false,
+      "flavour": "A coal that never cools, paid for in sealed envelopes."
     },
     {
       "id": "p2-c1",

@@ -1,7 +1,7 @@
 {
   "name": "destroyed-and-towed",
   "description": "Hull set to 1 in the band-1 corridor, a crawler hits the rear, destroyed, towed (#9).",
-  "generatorVersion": 16,
+  "generatorVersion": 17,
   "authorityProtocolVersion": 103,
   "logSchemaVersion": 7,
   "numberFormatVersion": 1,
@@ -257,7 +257,7 @@
     {
       "tick": 704,
       "scope": "end",
-      "digest": "33b2bd8df5b56608"
+      "digest": "edb79d362293946a"
     }
   ],
   "minedOrder": []

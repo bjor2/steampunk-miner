@@ -49,6 +49,8 @@ const OWN_KINDS_STEP = { version: 'generatorVersion', from: 13, to: 14 }
 const RARE_CLUSTER_STEP = { version: 'generatorVersion', from: 14, to: 15 }
 /** Ticket 738: a planet from P3 entered under ore rules 11 draws its rares from band 3 on. */
 const DEEP_WINDOW_STEP = { version: 'generatorVersion', from: 15, to: 16 }
+/** Ticket 713: planet 1 entered under ore rules 12 draws its three gems. */
+const GEMS_STEP = { version: 'generatorVersion', from: 16, to: 17 }
 /** K8 #218: every fixture was written before the charge racks went by size. */
 const CHARGE_RACK_STEP = { version: 'snapshotVersion', from: 19, to: 20 }
 /** Ticket 399: every fixture was written before the swept cut's cursor carried work. */
@@ -100,7 +102,7 @@ describe('save migration chain', () => {
     ])
   })
 
-  it('loads a pre-#175 save through the snapshot 18 -> 19, 19 -> 20, 20 -> 21 and 21 -> 22 steps, then the generator 5 -> 6, 6 -> 7, 7 -> 8, 8 -> 9, 9 -> 10, 10 -> 11, 11 -> 12, 12 -> 13, 13 -> 14, 14 -> 15 and 15 -> 16 steps', () => {
+  it('loads a pre-#175 save through the snapshot 18 -> 19, 19 -> 20, 20 -> 21 and 21 -> 22 steps, then the generator 5 -> 6, 6 -> 7, 7 -> 8, 8 -> 9, 9 -> 10, 10 -> 11, 11 -> 12, 12 -> 13, 13 -> 14, 14 -> 15, 15 -> 16 and 16 -> 17 steps', () => {
     const reading = withRegistrations([], () => restored(PLANET_1_SAVE))
     expect(reading.migrations).toEqual([
       SNAPSHOT_STEP,
@@ -118,6 +120,7 @@ describe('save migration chain', () => {
       OWN_KINDS_STEP,
       RARE_CLUSTER_STEP,
       DEEP_WINDOW_STEP,
+      GEMS_STEP,
       SLOT_FORMAT_STEP,
       PACKED_CHUNKS_STEP,
     ])
@@ -145,6 +148,7 @@ describe('save migration chain', () => {
       OWN_KINDS_STEP,
       RARE_CLUSTER_STEP,
       DEEP_WINDOW_STEP,
+      GEMS_STEP,
       SLOT_FORMAT_STEP,
       PACKED_CHUNKS_STEP,
       { restoredSections: [{ section: 'save-probe.notes' }] },
@@ -193,10 +197,10 @@ describe('save migration chain', () => {
     )
   })
 
-  it('writes the params this build generates and generator version 16', () => {
+  it('writes the params this build generates and generator version 17', () => {
     const { migrated } = migrateSaveSlot(PLANET_10_SAVE)
     expect(migrated).toMatchObject({
-      generatorVersion: 16,
+      generatorVersion: 17,
       world: { params: planetParamsFor(83921, 10) },
     })
   })
@@ -216,6 +220,7 @@ describe('save migration chain', () => {
         OWN_KINDS_STEP,
         RARE_CLUSTER_STEP,
         DEEP_WINDOW_STEP,
+        GEMS_STEP,
       ],
     ],
     [
@@ -231,6 +236,7 @@ describe('save migration chain', () => {
         OWN_KINDS_STEP,
         RARE_CLUSTER_STEP,
         DEEP_WINDOW_STEP,
+        GEMS_STEP,
       ],
     ],
     [
@@ -245,6 +251,7 @@ describe('save migration chain', () => {
         OWN_KINDS_STEP,
         RARE_CLUSTER_STEP,
         DEEP_WINDOW_STEP,
+        GEMS_STEP,
       ],
     ],
     [
@@ -258,6 +265,7 @@ describe('save migration chain', () => {
         OWN_KINDS_STEP,
         RARE_CLUSTER_STEP,
         DEEP_WINDOW_STEP,
+        GEMS_STEP,
       ],
     ],
     [
@@ -270,6 +278,7 @@ describe('save migration chain', () => {
         OWN_KINDS_STEP,
         RARE_CLUSTER_STEP,
         DEEP_WINDOW_STEP,
+        GEMS_STEP,
       ],
     ],
     [
@@ -281,12 +290,18 @@ describe('save migration chain', () => {
         OWN_KINDS_STEP,
         RARE_CLUSTER_STEP,
         DEEP_WINDOW_STEP,
+        GEMS_STEP,
       ],
     ],
-    [12, 'ticket 643', [REGISTRY_RADIUS_STEP, OWN_KINDS_STEP, RARE_CLUSTER_STEP, DEEP_WINDOW_STEP]],
-    [13, 'ticket 709', [OWN_KINDS_STEP, RARE_CLUSTER_STEP, DEEP_WINDOW_STEP]],
-    [14, 'ticket 737', [RARE_CLUSTER_STEP, DEEP_WINDOW_STEP]],
-    [15, 'ticket 738', [DEEP_WINDOW_STEP]],
+    [
+      12,
+      'ticket 643',
+      [REGISTRY_RADIUS_STEP, OWN_KINDS_STEP, RARE_CLUSTER_STEP, DEEP_WINDOW_STEP, GEMS_STEP],
+    ],
+    [13, 'ticket 709', [OWN_KINDS_STEP, RARE_CLUSTER_STEP, DEEP_WINDOW_STEP, GEMS_STEP]],
+    [14, 'ticket 737', [RARE_CLUSTER_STEP, DEEP_WINDOW_STEP, GEMS_STEP]],
+    [15, 'ticket 738', [DEEP_WINDOW_STEP, GEMS_STEP]],
+    [16, 'ticket 713', [GEMS_STEP]],
   ])(
     'keeps every chunk edit, the wallet and the levels of a generator %i save (%s)',
     (generatorVersion, _, steps) => {
@@ -332,7 +347,7 @@ describe('save migration chain', () => {
 describe('save migration chain: levels to steps (#181)', () => {
   const saved = PLANET_5_SAVE.profile.players.p1
 
-  it('loads a pre-#181 save through the snapshot 18 -> 19, 19 -> 20, 20 -> 21 and 21 -> 22 steps, then the generator 6 -> 7, 7 -> 8, 8 -> 9, 9 -> 10, 10 -> 11, 11 -> 12, 12 -> 13, 13 -> 14, 14 -> 15 and 15 -> 16 steps', () => {
+  it('loads a pre-#181 save through the snapshot 18 -> 19, 19 -> 20, 20 -> 21 and 21 -> 22 steps, then the generator 6 -> 7, 7 -> 8, 8 -> 9, 9 -> 10, 10 -> 11, 11 -> 12, 12 -> 13, 13 -> 14, 14 -> 15, 15 -> 16 and 16 -> 17 steps', () => {
     expect(versionStepsOf(restored(PLANET_5_SAVE))).toEqual([
       SNAPSHOT_STEP,
       CHARGE_RACK_STEP,
@@ -348,6 +363,7 @@ describe('save migration chain: levels to steps (#181)', () => {
       OWN_KINDS_STEP,
       RARE_CLUSTER_STEP,
       DEEP_WINDOW_STEP,
+      GEMS_STEP,
       SLOT_FORMAT_STEP,
       PACKED_CHUNKS_STEP,
     ])
