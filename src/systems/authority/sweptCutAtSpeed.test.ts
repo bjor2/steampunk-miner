@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { BASIS_POINTS, STEP_BOUND_TOLERANCE_MM } from '../../constants/balance'
+import { TICKS_PER_SECOND } from '../../constants/physics'
 import { NO_DRIVE } from '../vehicle/driveSigns'
 import { SWEEP_STEP_MM } from '../vehicle/sweptCut'
 import { FACING, noseTileOf, type VehiclePose } from '../vehicle/vehiclePose'
@@ -262,7 +263,11 @@ describe('authority prefetch along the drive (ticket 335)', () => {
   })
 })
 
-/** A strong rig on planet 40 over column 20, facing down, its enemies frozen. */
+/**
+ * A strong rig on planet 40 over column 20, facing down at its stride's speed, its enemies frozen:
+ * from rest a cut down's front ramps under gravity (#724), and since ticket 662's gate opens on a
+ * step's reach the one stride cut in front mode, so a rig reported at rest broke one cell.
+ */
 function onPlanet40(): { state: AuthorityState; params: PlanetParams; top: VehiclePose } {
   const session = createScriptedSession()
   session.submit(0, { type: 'debug.setPlanet', payload: { planetIndex: 40 } })
@@ -274,12 +279,18 @@ function onPlanet40(): { state: AuthorityState; params: PlanetParams; top: Vehic
   const params = planetParamsOf(session.state().planet) as PlanetParams
   const { payload } = poseAbove({ tx: 0, ty: 0 }, FACING.down)
   const y = (surfaceRowOfColumn(20, params.radiusTiles) - 2) * 1000 + 500
-  session.submit(0, { type: 'reportPose', payload: { ...payload, x: 20_500, y } })
+  const vy = -strideMmOf(session.state()) * TICKS_PER_SECOND
+  session.submit(0, { type: 'reportPose', payload: { ...payload, x: 20_500, y, vy } })
   return {
     state: session.state(),
     params,
     top: vehicleOf(session.state(), 'p1').pose as VehiclePose,
   }
+}
+
+/** The rig's stride a tick: its cutting bound, less the bound's tolerance. */
+function strideMmOf(state: AuthorityState): number {
+  return stepBoundsAt(state, 'p1').cuttingMm - STEP_BOUND_TOLERANCE_MM
 }
 
 /**
@@ -299,7 +310,7 @@ describe('energy per cell on planet 40 at the rig cut speed (ticket 335, Vertica
 
   function chargesWithinOnePercent() {
     const start = onPlanet40()
-    const stepMm = stepBoundsAt(start.state, 'p1').cuttingMm - STEP_BOUND_TOLERANCE_MM
+    const stepMm = strideMmOf(start.state)
     let state = start.state
     const broken: { tx: number; ty: number }[] = []
     for (let tick = 1; tick <= ticksAboveTheCoreOf(start, stepMm); tick++) {
