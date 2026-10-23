@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { ECONOMY } from '../economy/economy'
+import { destinationUnitPriceOf, jumpFuelUnitsOf } from '../economy/jumpFuel'
 import { oreTier, oreValue } from '../economy/oreEconomy'
 import { div, fromCanonical, toCanonical } from '../money'
 import { gemSaleTiersOfPlanet } from '../registries/planetRow'
@@ -73,5 +74,18 @@ describe('star map system jump value step', () => {
     const lastTiers = gemSaleTiersOfPlanet(lastOfSystem1)
     expect(lastTiers.length).toBeGreaterThan(0)
     expect(gemSaleTiersOfPlanet(firstOfSystem2)).toEqual(lastTiers.map((tier) => tier + 3))
+  })
+
+  it('burns one planet step of fuel on the hop into system 2, as on P1 to P2', () => {
+    const intoSystem2 = toCanonical(jumpFuelUnitsOf(lastOfSystem1, firstOfSystem2))
+    expect(intoSystem2).toBe(toCanonical(jumpFuelUnitsOf(1, 2)))
+  })
+
+  it("prices that hop's fuel x3.375 over the hop into system 1's last planet", () => {
+    const priceStep = div(
+      destinationUnitPriceOf(firstOfSystem2),
+      destinationUnitPriceOf(lastOfSystem1),
+    )
+    expect(toCanonical(priceStep)).toBe(toCanonical(fromCanonical('3.375')))
   })
 })

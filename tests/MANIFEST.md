@@ -1466,7 +1466,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 
 | File | Tests | Sites |
 | --- | --- | --- |
-| `src/systems/starMap/campaignIndex.test.ts` | 11 | 11 |
+| `src/systems/starMap/campaignIndex.test.ts` | 13 | 13 |
 | `src/systems/starMap/planetAddress.test.ts` | 2 | 2 |
 | `src/systems/starMap/planetAddressSeed.test.ts` | 6 | 6 |
 
