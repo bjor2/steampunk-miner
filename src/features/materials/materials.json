@@ -1624,7 +1624,7 @@
       "family": "crystal",
       "epithet": "Heat Spinel",
       "silhouette": "octahedra",
-      "pattern": "glowing",
+      "pattern": "faceted",
       "hueSlot": "heat-spinel",
       "gradeBand": [4, 5],
       "rarity": "epic",

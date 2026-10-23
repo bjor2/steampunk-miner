@@ -1,5 +1,5 @@
 {
-  "$comment": "The material silhouettes and patterns the terrain shader draws (ticket 450 under #139; TD shape 6226270701, GD ruling 6226278574: procedural, zero new samplers, chosen by uniform, never by #define). A species row of the materials slice names one silhouette and one pattern by id; the shader draws it by its position here plus one. Silhouette: `count` grains of `primitive` (box, diamond, disc, hexagon, rod, ring, star, triangle) of half-size `size` tiles, `aspect` the height over the width (a rod's thickness over its half-length, a ring's band over its radius, a star's inner radius over its outer), turned up to `turn` of a half turn, laid out by `layout` (scatter, row along the tile's x, stack up its y). Pattern: the shade over the grain, `primitive` (flat, mottle, crust, bands, cloud, gloss, speckle, core, rings, veins, fibres) at `scale` (repeats per tile, or a crust's width in tiles), `contrast` the shade's swing either side of 1 (below 0 it flips: pits for speckles, a bright rim for a crust), `angle` in degrees for the directed ones. Append rows; a new id never renumbers an old one. The rows after `flecks` and `clear` are the P3-P7 species' looks (ticket 453's materials rows).",
+  "$comment": "The material silhouettes and patterns the terrain shader draws (ticket 450 under #139; TD shape 6226270701, GD ruling 6226278574: procedural, zero new samplers, chosen by uniform, never by #define). A species row of the materials slice names one silhouette and one pattern by id; the shader draws it by its position here plus one. Silhouette: `count` grains of `primitive` (box, diamond, disc, hexagon, rod, ring, star, triangle) of half-size `size` tiles, `aspect` the height over the width (a rod's thickness over its half-length, a ring's band over its radius, a star's inner radius over its outer), turned up to `turn` of a half turn, laid out by `layout` (scatter, row along the tile's x, stack up its y). Pattern: the shade over the grain, `primitive` (flat, mottle, crust, bands, cloud, gloss, speckle, core, rings, veins, fibres) at `scale` (repeats per tile, or a crust's width in tiles), `contrast` the shade's swing either side of 1 (below 0 it flips: pits for speckles, a bright rim for a crust), `angle` in degrees for the directed ones. Append rows; a new id never renumbers an old one. The rows after `flecks` and `clear` are the P3-P7 species' looks (ticket 453's materials rows). `faceted` is Heat Spinel's own split, a lit face and a shadowed one, so P5's two pink crystals no longer share `glowing` (ticket 745).",
   "silhouettes": [
     {
       "id": "nuggets",
@@ -1245,6 +1245,13 @@
       "scale": 0.025,
       "contrast": -0.5,
       "angle": 0
+    },
+    {
+      "id": "faceted",
+      "primitive": "bands",
+      "scale": 2.5,
+      "contrast": 0.5,
+      "angle": 45
     }
   ]
 }
