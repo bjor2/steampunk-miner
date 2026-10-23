@@ -35,7 +35,7 @@ function buyEngineStep(session: BotSession): void {
   session.submit(setUpgradeCommand('engine', session.vehicle().levels.engine + 1))
 }
 
-describe('bot: the death-replay breaker (#198)', () => {
+describe('bot: the death-replay breaker (#198, ticket 753)', () => {
   it('retreats above the core on planet 9 after the second death on a core trip', () => {
     const { session, planet } = botOn(9)
     dieOn(session, planet, CORE, 1)
@@ -87,9 +87,9 @@ describe('bot: the death-replay breaker (#198)', () => {
     expect(openBandOf(session, planet)).toBeNull()
   })
 
-  it('leaves every route open on planet 7 whatever kills it, as before', () => {
-    const { session, planet } = botOn(7)
-    dieOn(session, planet, CORE, 5)
-    expect(openBandOf(session, planet)).toBeNull()
+  it('retreats above band 5 on planet 3 after its second death there, as on the attrition planets', () => {
+    const { session, planet } = botOn(3)
+    dieOn(session, planet, { kind: 'ore', band: 5 }, 2)
+    expect(openBandOf(session, planet)).toBe(4)
   })
 })

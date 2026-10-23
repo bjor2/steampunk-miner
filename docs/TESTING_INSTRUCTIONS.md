@@ -1346,9 +1346,11 @@ incomePerHour}` go to `balance-report/drill-pace.ndjson`, which `pushTestMetrics
   death plays as before, and a fatal dive no longer replays after every tow (`bot/botCombat.test.ts`,
   in the band-1 corridor).
 - **Bot attrition** (#198): from planet 8 on, a track step must leave #180's service reserve plus
-  one rescue fee (`bot/botWallet.test.ts`), and the second death on one route (a goal: an ore band or
-  the core) closes it and every deeper one until the vehicle has a level it did not die with; the
-  bot mines the bands above meanwhile (`bot/botDeathReplay.test.ts`). Planets 1 to 7 play as before.
+  one rescue fee (`bot/botWallet.test.ts`); planets 1 to 7 buy as before. On every planet (ticket
+  753, where P3's band 5 replayed one death until the campaign budget ran out), the second death on
+  one route (a goal: an ore band or the core) closes it and every deeper one until the vehicle has a
+  level it did not die with; the bot mines the bands above meanwhile (`bot/botDeathReplay.test.ts`).
+  A run with no second death on a route plays as before.
 - **Bot retreat** (#216): when no band the casing holds pays a trip, the bot widens the shallowest
   held band whose galleries ended at their reach by another reach; broke with a tank below what a
   tow leaves (#8), it strands itself off the pad for the tow. A run that never meets the dead end

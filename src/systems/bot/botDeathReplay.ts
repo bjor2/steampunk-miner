@@ -9,12 +9,16 @@
  * A route is the trip's goal: one ore band, or the core below them all. The other way out the
  * ticket names, a new shaft column, was probed on P8–P10 at on-curve levels: a fresh shaft and core
  * take about 30 minutes, and from some columns lava ends every core gallery, which would stall the
- * run. Only on the attrition planets (`botAttrition.ts`).
+ * run.
+ *
+ * On every planet (ticket 753): #198 started it at planet 8 to keep P1–P7 byte-identical, and the
+ * campaign gate's stalls on P3 and P5 were the same replay. A seed reached P3 with P2's hull and an
+ * empty wallet, and died on band 5 at the same tile on every trip until the budget ran out. A run
+ * with no second death on a route plays as before.
  */
 import type { DomainEvent } from '../authority/domainEvent'
 import { UPGRADE_IDS } from '../economy/economyDefinition'
 import type { UpgradeLevels } from '../economy/vehicleStats'
-import { isAttritionPlanet } from './botAttrition'
 import type { BotPlanet } from './botPilot'
 import type { BotSession } from './botSession'
 import type { TripGoal } from './tripGoal'
@@ -48,7 +52,7 @@ export function breakDeathReplay(
   goal: TripGoal,
   tripEvents: readonly DomainEvent[],
 ): void {
-  if (!isCountedDeath(session, tripEvents)) return
+  if (!hasDied(tripEvents)) return
   recordRouteDeath(planet.routeDeaths, depthOf(goal))
   closeWhenReplaying(session, planet.routeDeaths, depthOf(goal))
 }
@@ -61,10 +65,6 @@ export function deepestOpenBand(planet: BotPlanet, levels: UpgradeLevels): numbe
   const { closed } = planet.routeDeaths
   if (closed === null || !isSameVehicle(closed.levels, levels)) return null
   return closed.depth - 1
-}
-
-function isCountedDeath(session: BotSession, tripEvents: readonly DomainEvent[]): boolean {
-  return isAttritionPlanet(session.state().planet.index) && hasDied(tripEvents)
 }
 
 function hasDied(tripEvents: readonly DomainEvent[]): boolean {

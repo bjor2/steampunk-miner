@@ -1,7 +1,7 @@
 /**
- * Where the pacing bot's attrition habits apply (#198, Systems' call on T9 #137): the brass reserve
- * of `botWallet.ts` and the death-replay breaker of `botDeathReplay.ts`. They answer P8–P10's deaths
- * per trip, so they start at planet 8, and planets 1 to 7 play byte for byte as before.
+ * Where the pacing bot's attrition habit applies (#198, Systems' call on T9 #137): the brass reserve
+ * of `botWallet.ts`. It answers P8–P10's deaths per trip, so it starts at planet 8. The death-replay
+ * breaker it once shared this start with runs on every planet since ticket 753.
  */
 
 /** #198 acceptance: P8–P10 deaths per trip are judged, P1–P7 stay byte-identical to main. */
