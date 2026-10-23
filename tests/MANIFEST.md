@@ -623,14 +623,14 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/tech-tree/treeSpendGuard.lane.test.ts` | 8 | 8 |
 | `src/features/tech-tree/ui/patentOfficePanel.test.ts` | 2 | 2 |
 
-### `terrain-tools`: 50 files, 403 tests
+### `terrain-tools`: 50 files, 400 tests
 
 | File | Tests | Sites |
 | --- | --- | --- |
 | `src/features/terrain-tools/collapseDeathReportRows.test.ts` | 3 | 3 |
 | `src/features/terrain-tools/foamCurePace.lane.test.ts` | 11 | 1 |
-| `src/features/terrain-tools/foamPace.test.ts` | 6 | 6 |
-| `src/features/terrain-tools/foamPaceGate.test.ts` | 9 | 9 |
+| `src/features/terrain-tools/foamPace.test.ts` | 5 | 3 |
+| `src/features/terrain-tools/foamPaceGate.test.ts` | 7 | 7 |
 | `src/features/terrain-tools/foamRestockPace.lane.test.ts` | 11 | 1 |
 | `src/features/terrain-tools/gnawCollapseReportRows.test.ts` | 5 | 5 |
 | `src/features/terrain-tools/logging.test.ts` | 2 | 2 |
@@ -932,7 +932,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/bot/botChains.test.ts` | 4 | 4 |
 | `src/systems/bot/botChargeNeed.test.ts` | 2 | 2 |
 | `src/systems/bot/botCharges.test.ts` | 9 | 9 |
-| `src/systems/bot/botCombat.test.ts` | 4 | 4 |
+| `src/systems/bot/botCombat.test.ts` | 8 | 8 |
 | `src/systems/bot/botCoreGalleries.test.ts` | 3 | 2 |
 | `src/systems/bot/botCoreRule.test.ts` | 7 | 7 |
 | `src/systems/bot/botDeathReplay.test.ts` | 8 | 8 |

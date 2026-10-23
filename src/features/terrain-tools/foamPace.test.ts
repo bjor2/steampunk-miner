@@ -1,16 +1,11 @@
-import { mkdirSync, writeFileSync } from 'node:fs'
 import { describe, expect, it } from 'vitest'
 import { TICKS_PER_SECOND } from '../../constants/physics'
-import { formatNdjsonLine } from '../../logging/ndjson'
 import type { SliceRun } from '../../systems/bot/playSlice'
 import {
   cementPinDriftBpOf,
   cementPinRunsOf,
   CEMENT_PIN,
   CEMENT_PIN_TOLERANCE_BP,
-  COMBAT_HOLD_HELD,
-  heldSeedReportOf,
-  isHeldForCombatHold,
   isSurvivedPair,
   medianBpOf,
   MIN_CEMENT_PIN_RUNS,
@@ -36,16 +31,13 @@ import { coreTicksOf, MIN_TIME_BP, timeRatioBp } from './magnetPaceRuns'
 // bare time, judged on the median of the seed pairs where neither rig is destroyed, at least two
 // of them (`foamPaceGate.ts`), on foam's planet 3 and the magnet gate's 7 and 10. Where the bare
 // rig dies on planet 7 the lining's survival is cement's, pinned on its own. Foam's stack is never
-// restocked, so a run sprays it at most four times and the holders buy nothing but lining. A seed
-// held for ticket 742 (`COMBAT_HOLD_HELD`) keeps its planet 7 pin and lining rows as `it.todo` and
-// is written to balance-report/foam-pace-held-seeds.ndjson instead. Long: eighteen or more bot
-// runs, for the box Tester.
+// restocked, so a run sprays it at most four times and the holders buy nothing but lining. Long:
+// eighteen or more bot runs, for the box Tester.
 
 const TIMEOUT_MS = 60 * 60 * 1000
 const TICKS_PER_MINUTE = 60 * TICKS_PER_SECOND
 /** The off-curve spend bar on lining's share of a planet's income (Systems ruling on #664). */
 const MAX_LINING_SHARE_BP = 600
-const REPORT_FOLDER = new URL('../../../balance-report/', import.meta.url)
 
 /** Each pair is played once per planet and seed, however many checks read it. */
 const playedPairs = new Map<string, FoamPaceRuns>()
@@ -57,17 +49,6 @@ function runsOnPlanet(planet: number): (seed: number) => FoamPaceRuns {
     playedPairs.set(key, runs)
     return runs
   }
-}
-
-function isJudgedSeed(runs: FoamPaceRuns): boolean {
-  return !isHeldForCombatHold(runs.seed)
-}
-
-function writeHeldSeedReport(rows: readonly object[]): void {
-  const text = rows.map(formatNdjsonLine).join('')
-  console.log(text)
-  mkdirSync(REPORT_FOLDER, { recursive: true })
-  writeFileSync(new URL('foam-pace-held-seeds.ndjson', REPORT_FOLDER), text)
 }
 
 function logGateRuns(planet: number, { played, survived }: FoamGateRuns): void {
@@ -118,42 +99,21 @@ describe('stabiliser foam pace (VS pin on #381, Systems ruling on #664)', () => 
       for (const runs of pinRuns)
         console.log(`${describePair(runs)}: ${cementPinDriftBpOf(runs)} bp off the pin`)
       expect(pinRuns.length).toBeGreaterThanOrEqual(MIN_CEMENT_PIN_RUNS)
-      for (const runs of pinRuns.filter(isJudgedSeed))
+      for (const runs of pinRuns)
         expect(cementPinDriftBpOf(runs)).toBeLessThanOrEqual(CEMENT_PIN_TOLERANCE_BP)
     },
     TIMEOUT_MS,
   )
 
-  for (const seed of COMBAT_HOLD_HELD.seeds)
-    it.todo(
-      `keeps the holders' time to core within 5% of cement's pin on seed ${seed} (waits on #${COMBAT_HOLD_HELD.ticket})`,
-    )
-
   it(
     `keeps the holders' lining under 6% of their income on planet ${CEMENT_PIN.planet}`,
     () => {
-      const pairs = FOAM_PACE_SEEDS.map(runsOnPlanet(CEMENT_PIN.planet))
-      const shareOf = (runs: FoamPaceRuns) => liningShareBpOf(runs.withHolders)
-      console.log(
-        `P${CEMENT_PIN.planet} holders' lining share of income: ${pairs.map(shareOf).join(' / ')} bp`,
+      const holderRuns = FOAM_PACE_SEEDS.map(runsOnPlanet(CEMENT_PIN.planet)).map(
+        (runs) => runs.withHolders,
       )
-      for (const runs of pairs.filter(isJudgedSeed))
-        expect(shareOf(runs)).toBeLessThanOrEqual(MAX_LINING_SHARE_BP)
-    },
-    TIMEOUT_MS,
-  )
-
-  for (const seed of COMBAT_HOLD_HELD.seeds)
-    it.todo(
-      `keeps the holders' lining under 6% of their income on seed ${seed} (waits on #${COMBAT_HOLD_HELD.ticket})`,
-    )
-
-  it(
-    `reports the held seeds' pin drift and lining share on planet ${CEMENT_PIN.planet} beside the gate`,
-    () => {
-      const rows = COMBAT_HOLD_HELD.seeds.map(runsOnPlanet(CEMENT_PIN.planet)).map(heldSeedReportOf)
-      writeHeldSeedReport(rows)
-      expect(rows.map((row) => row.seed)).toEqual([...COMBAT_HOLD_HELD.seeds])
+      const shares = holderRuns.map(liningShareBpOf)
+      console.log(`P${CEMENT_PIN.planet} holders' lining share of income: ${shares.join(' / ')} bp`)
+      for (const share of shares) expect(share).toBeLessThanOrEqual(MAX_LINING_SHARE_BP)
     },
     TIMEOUT_MS,
   )

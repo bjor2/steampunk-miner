@@ -13,7 +13,7 @@
  * Only specs use it.
  */
 import { BASIS_POINTS, coreTicksOf } from './magnetPaceRuns'
-import { FOAM_PACE_SEEDS, hasRigDied, liningShareBpOf, type FoamPaceRuns } from './foamPaceRuns'
+import { FOAM_PACE_SEEDS, hasRigDied, type FoamPaceRuns } from './foamPaceRuns'
 
 /** Played after the pacing seeds, in this order, only while too few pairs survive. */
 export const FOAM_PACE_EXTRA_SEEDS = [16180, 14142, 17320, 11235, 57721, 66743] as const
@@ -39,27 +39,6 @@ export const CEMENT_PIN = {
 export const MIN_CEMENT_PIN_RUNS = 2
 /** How far the holder's time may stray from its pinned ticks, in basis points (+-5%). */
 export const CEMENT_PIN_TOLERANCE_BP = 500
-
-/**
- * The seeds whose planet 7 cement-pin and lining-share rows wait as `it.todo` on ticket 742 (TD
- * and GD rulings on #724). The down-cut ramp moves a crawler's meeting, and the test bot's combat
- * hold under a warned, unlined block then kills seed 83921's holder rig. That is a bot bug, so the
- * gate is not bent around it: no survivor filter, no seed swap, every other seed judged at full
- * strength, and the held seed's numbers still reported. Ticket 742 empties this list.
- */
-export const COMBAT_HOLD_HELD = { ticket: 742, seeds: [83921] } as const
-
-/** One held seed's planet 7 numbers, written beside the gate so the gap stays visible. */
-export interface HeldSeedReport {
-  row: 'foam_pace_held_seed'
-  planet: number
-  seed: number
-  heldBy: number
-  isBareRigDestroyed: boolean
-  isHolderRigDestroyed: boolean
-  cementPinDriftBp: number
-  liningShareBp: number
-}
 
 export interface FoamGateRuns {
   /** Every pair played, pacing seeds first. */
@@ -99,23 +78,6 @@ export function cementPinRunsOf(runsOn: (seed: number) => FoamPaceRuns): FoamPac
 export function cementPinDriftBpOf(runs: FoamPaceRuns): number {
   const pinned = pinnedTicksOf(runs.seed)
   return Math.floor((Math.abs(coreTicksOf(runs.withHolders) - pinned) * BASIS_POINTS) / pinned)
-}
-
-export function isHeldForCombatHold(seed: number): boolean {
-  return COMBAT_HOLD_HELD.seeds.some((held) => held === seed)
-}
-
-export function heldSeedReportOf(runs: FoamPaceRuns): HeldSeedReport {
-  return {
-    row: 'foam_pace_held_seed',
-    planet: runs.planet,
-    seed: runs.seed,
-    heldBy: COMBAT_HOLD_HELD.ticket,
-    isBareRigDestroyed: hasRigDied(runs.bare),
-    isHolderRigDestroyed: hasRigDied(runs.withHolders),
-    cementPinDriftBp: cementPinDriftBpOf(runs),
-    liningShareBp: liningShareBpOf(runs.withHolders),
-  }
 }
 
 function survivedPairsOf(played: readonly FoamPaceRuns[]): FoamPaceRuns[] {

@@ -5,10 +5,7 @@ import {
   cementPinDriftBpOf,
   cementPinRunsOf,
   CEMENT_PIN,
-  COMBAT_HOLD_HELD,
   FOAM_PACE_EXTRA_SEEDS,
-  heldSeedReportOf,
-  isHeldForCombatHold,
   medianBpOf,
   playFoamGateRuns,
 } from './foamPaceGate'
@@ -99,32 +96,5 @@ describe('stabiliser foam pace gate (Systems ruling on #664)', () => {
     expect(cementPinDriftBpOf(runsOf(ticks))).toBe(0)
     expect(cementPinDriftBpOf(runsOf(ticks * 2))).toBe(10000)
     expect(cementPinDriftBpOf(runsOf(ticks / 2))).toBe(5000)
-  })
-
-  it('holds only the seeds ticket 742 names, judging every other pacing and pinned seed', () => {
-    const pinnedSeeds = CEMENT_PIN.holderCoreTicks.map(({ seed }) => seed)
-    const held = [...FOAM_PACE_SEEDS, ...pinnedSeeds].filter(isHeldForCombatHold)
-    expect(new Set(held)).toEqual(new Set(COMBAT_HOLD_HELD.seeds))
-  })
-
-  it("reports a held seed's deaths, pin drift and lining share without judging them", () => {
-    const [seed] = COMBAT_HOLD_HELD.seeds
-    const pinned = CEMENT_PIN.holderCoreTicks.find((entry) => entry.seed === seed)?.ticks ?? 0
-    const income = [
-      { type: 'ResourceSold', value: '1000' },
-      { type: 'LiningSettled', billed: '64' },
-    ] as unknown as DomainEvent[]
-    const holders = runOf(pinned * 2, true)
-    const withHolders = { ...holders, events: [...holders.events, ...income] }
-    const runs = { planet: 7, seed, bare: runOf(40000, true), withHolders }
-    expect(heldSeedReportOf(runs)).toMatchObject({
-      row: 'foam_pace_held_seed',
-      seed,
-      heldBy: 742,
-      isBareRigDestroyed: true,
-      isHolderRigDestroyed: true,
-      cementPinDriftBp: 10000,
-      liningShareBp: 640,
-    })
   })
 })
