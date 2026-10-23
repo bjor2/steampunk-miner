@@ -127,6 +127,16 @@ describe('debug api: ui reads the HUD and the platform screen (#33 acceptance 4)
     })
     expect(header.money.text).not.toContain('NaN')
   })
+
+  it("reads the star map's planets, dimming the ones the wallet cannot fuel (ticket 757)", () => {
+    const result = createDebugApi().ui.getStarMapModel()
+    if (!result.ok) throw new Error(result.problems.join('; '))
+    const { planets, tank } = result.model
+    expect(planets.map((planet) => planet.isHere)).toEqual([true, false, false, false, false])
+    expect(tank.held.text).toBe('0')
+    expect(planets[1].isDimmed).toBe(false)
+    expect(planets[4].isDimmed).toBe(true)
+  })
 })
 
 describe('debug api: input acts like play (#33 acceptance 3 and 11)', () => {

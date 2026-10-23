@@ -29,6 +29,7 @@ import {
   readPauseMenuModel,
   readRefineryBayModel,
   readSellBayModel,
+  readStarMapModel,
   readTitleMenuModel,
   readUpgradeBayModel,
 } from '../store/screenReads'
@@ -57,6 +58,7 @@ import type { PauseMenuModel } from '../systems/views/pauseMenuModel'
 import { planetCardViewOf, type PlanetCardView } from '../systems/views/planetCardView'
 import type { RefineryBayModel } from '../systems/views/refineryBayModel'
 import type { SellBayModel } from '../systems/views/sellBayModel'
+import type { StarMapView } from '../systems/views/starMapView'
 import type { TitleMenuModel } from '../systems/views/titleMenuModel'
 import type { UpgradeBayModel } from '../systems/views/upgradeBayModel'
 import { readOverlayStats, type OverlayStats } from '../ui/overlay/overlaySeatTable'
@@ -116,6 +118,8 @@ export interface DebugUi {
   getSellBayModel(): DebugResult<{ model: SellBayModel }>
   getUpgradeBayModel(): DebugResult<{ model: UpgradeBayModel }>
   getRefineryBayModel(): DebugResult<{ model: RefineryBayModel }>
+  /** The star map's rows (ticket 757): each planet's fuel cost, the tank, any shortfall, dimming. */
+  getStarMapModel(): DebugResult<{ model: StarMapView }>
   /** The pause menu (ticket 404) as it draws now; null while it is closed. */
   getPauseMenuModel(): DebugResult<{ model: PauseMenuModel | null }>
   /** The name the pause menu's next save takes, as if typed into its field; refused when closed. */
@@ -243,6 +247,7 @@ export function createDebugUi(): DebugUi {
     getSellBayModel: () => ({ ok: true, model: readSellBayModel() }),
     getUpgradeBayModel: () => ({ ok: true, model: readUpgradeBayModel() }),
     getRefineryBayModel: () => ({ ok: true, model: readRefineryBayModel() }),
+    getStarMapModel: () => ({ ok: true, model: readStarMapModel() }),
     getPauseMenuModel: () => ({ ok: true, model: readPauseMenuModel() }),
     setPauseSaveName: setPauseSaveNameUnlessRefused,
     getBayPresentation: () => ({ ok: true, presentation: bayPresentationNow() }),

@@ -13,6 +13,7 @@ import type { HudModel } from '../systems/views/hudModel'
 import type { PlaqueModel } from '../systems/views/plaqueModel'
 import type { SellBayModel } from '../systems/views/sellBayModel'
 import type { HoldSheet } from '../systems/views/holdSheet'
+import { starMapViewOf, type StarMapView } from '../systems/views/starMapView'
 import type { UpgradeBayModel } from '../systems/views/upgradeBayModel'
 import type { RefineryBayModel } from '../systems/views/refineryBayModel'
 import type { SettingsModel } from '../systems/views/settingsModel'
@@ -83,6 +84,11 @@ export function readSellBayModel(): SellBayModel {
 /** The Hold tab (ticket 688), as it would draw now, docked or not. */
 export function readHoldSheetModel(): HoldSheet {
   return holdSheetModelOf(useGameStore.getState())
+}
+
+/** The star map (ticket 757), as it would draw now, open or not. */
+export function readStarMapModel(): StarMapView {
+  return starMapViewOf(readAuthorityState(), useGameStore.getState().playerId)
 }
 
 /** The Upgrade bay's model, as it would draw now, docked there or not. */
