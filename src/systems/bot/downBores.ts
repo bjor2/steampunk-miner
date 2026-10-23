@@ -72,11 +72,18 @@ export function rampedDownBoreOf(
 
 /**
  * Whole ticks still to stand by once the drill has bored the tile in `elapsedTicks`: what the ramp
- * takes across it beyond that, never below 0. The drill heats and draws for its work alone; the
- * body is still gaining speed (#724).
+ * takes across it beyond the drill's own time or the time spent, whichever is longer, never below
+ * 0. The drill heats and draws for its work alone; the body is still gaining speed (#724). A cell
+ * an earlier cut took some of opens before the drill's ticks are spent, and owes the ramp's ticks
+ * over the drill's, not the drill's unspent ones.
  */
-export function rampRestTicksOf(rampedBore: TileBore, elapsedTicks: number): number {
-  return Math.max(0, Math.ceil(rampedBore.subSteps / rampedBore.quantum) - elapsedTicks)
+export function rampRestTicksOf(
+  rampedBore: TileBore,
+  drillBore: TileBore,
+  elapsedTicks: number,
+): number {
+  const spentTicks = Math.max(elapsedTicks, wholeTicksOf(drillBore))
+  return Math.max(0, wholeTicksOf(rampedBore) - spentTicks)
 }
 
 /** Counts a bore down on `planet`: its metre, its ticks and the ticks the ramp added. */
@@ -100,6 +107,10 @@ export function effectiveDownSpeedOf(record: DownBorePlanet): number {
 /** The share of the planet's down-bore ticks the ramp added, 0 to 1; 0 with none. */
 export function gravityBoundShareOf(record: DownBorePlanet): number {
   return record.boreTicks === 0 ? 0 : record.gravityBoundTicks / record.boreTicks
+}
+
+function wholeTicksOf(bore: TileBore): number {
+  return Math.ceil(bore.subSteps / bore.quantum)
 }
 
 /** m/s the drill alone cuts the tile's metre at. */

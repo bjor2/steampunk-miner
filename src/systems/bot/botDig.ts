@@ -155,7 +155,7 @@ function boreDownUnderRamp(
   const startTick = session.tick()
   const ramped = rampedDownBoreAt(session, planet, tile, bore)
   boreTile(session, planet.pilot, tile, bore)
-  standBy(session, planet.pilot, rampRestTicksOf(ramped.bore, session.tick() - startTick))
+  standBy(session, planet.pilot, rampRestTicksOf(ramped.bore, bore, session.tick() - startTick))
   planet.pilot.downLeg = { tick: session.tick(), tile, speed: ramped.exitSpeed }
 }
 
