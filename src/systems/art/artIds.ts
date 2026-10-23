@@ -11,6 +11,7 @@ import { BAND_COUNT } from '../world/planetGeometry'
 import { ENEMY_IDS, PLATFORM_BAY_IDS, PLATFORM_VISUAL_STATES } from '../registeredIds'
 import { LOCKED_SCHEDULE } from '../unlocks/unlockSchedule'
 import { kebabOf } from './artNaming'
+import { FUEL_TENDER_ASSET_ID, fuelTenderArtPartIds } from './fuelTenderArt'
 import { iconFileIds } from './icons/iconSet'
 import { HEAT_LAVA_ROW_ID, REFRACTORY_LINING_TYPE } from './moduleRowIds'
 import {
@@ -118,6 +119,8 @@ export function kernelBlenderAssetIds(): string[] {
     ...refractoryCasingTileIds(),
     // The UI chrome sprites the `art.*` design tokens name (ticket 683).
     ...uiArtAssetIds(),
+    // The fuel tank track's coal tender at the wagon hitch (ticket 758, GD lock on #650).
+    FUEL_TENDER_ASSET_ID,
   ]
 }
 
@@ -220,13 +223,14 @@ function numbered(prefix: string, count: number): string[] {
  * (#8 `outpost`, `core_drive`), which are its collections in Blender (#52), the refinery
  * bay's three looks drawn over its frame (#105), the charge rack's slots, the planted
  * charge's fuse lamp, the shop buildings' moving parts (#170), the Workshop showcase's rig
- * and reaction pieces (#180), the UI sprites' variants (ticket 683) and the parts each slice
- * asset names (#214).
+ * and reaction pieces (#180), the UI sprites' variants (ticket 683), the coal tender's wagons
+ * (ticket 758) and the parts each slice asset names (#214).
  */
 export function registryPartIds(): string[] {
   return [
     ...blenderAssetIds(),
     ...uiArtPartIds(),
+    ...fuelTenderArtPartIds(),
     ...PLATFORM_VISUAL_STATES.map(kebabOf),
     ...REFINERY_BAY_LOOKS.map(refineryLookPartIdOf),
     ...shopBuildingMovingPartIds(),

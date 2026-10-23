@@ -1,0 +1,13 @@
+{
+  "id": "vehicle-fuel-tank",
+  "source": "blender",
+  "form": "parts",
+  "status": "final",
+  "color": "#2a2624",
+  "partColors": {
+    "coal-cart": "#5a3e22",
+    "bunker-tender": "#3a3632",
+    "riveted-tender": "#8a94a0",
+    "guild-tender": "#1a3832"
+  }
+}

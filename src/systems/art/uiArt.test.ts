@@ -124,7 +124,7 @@ describe('ui art ids', () => {
     }
   })
 
-  it('tints only the dial face, the active tab’s edge, the slot ring and the gear lamp', () => {
+  it('tints only the dial face, the active tab’s edge, the slot ring, the gear lamp and the star map’s planet disc', () => {
     const tintable = uiArtAssetIds().flatMap(
       (assetId) =>
         exportedSidecarOf(SHIPPED_ART, assetId)
@@ -137,6 +137,7 @@ describe('ui art ids', () => {
       'ui-gear-button',
       'ui-gear-button-pressed',
       'ui-slot-ring',
+      'ui-star-map-planet',
     ])
   })
 

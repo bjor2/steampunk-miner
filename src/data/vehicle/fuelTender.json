@@ -1,0 +1,17 @@
+{
+  "$comment": "The coal tender on the rig (ticket 758; the GD lock on #650, comment 6361556890: the fuel tank 'shows on the rig as a coal tender wagon on the #576 ladder'). The tank track (ticket 756) is its own price-only, uncapped track outside UPGRADE_IDS, so its look lives here rather than in the rig-look slice's rigLook.json, keyed by the tank's level (vehicleFuel.ts fuelTankLevelOf, 1 before the first purchase) the way a rig look keys by owned count (HS on #576: a pure function of the level, never saved). The wagon hangs at the wagon hitch, hull.hitch (TD after the Horizontal Scaler review on #162), the point a rig-look part never takes, so a wagon's own visual wins it (HS on #577). Steps are tank levels: the starting tank is the coal cart, and the first purchase already changes the wagon (VS on #576: no step before the first purchase, each step visibly different at 360 px). Systems' per-planet thresholds table (#157 comment 6300543785) has no tank column, since the on-curve bot buys no tank level (the starting tank holds the next hop, #756), so the levels here are the art pass's own choice: 2, 3 and 5, one step per purchase at first, then one past the third. Above the top step the linear tail (GD lock on #576: delta 1, a bounded palette) tints the wagon through the kernel's vehicle look, one colour per purchase, cycling; its glow stays under the rig body's cap (rigLook.json glowCaps.rigBody 1) so the drill nose stays the brightest part. assetId and attach repeat the code's derivations (fuelTenderArt.ts) for the Blender scripts under docs/art/fuel-tender/, which read this file; a spec pins them equal. Cosmetic only: never in state, a save or a digest.",
+  "assetId": "vehicle-fuel-tank",
+  "attach": "hull.hitch",
+  "z": 0,
+  "steps": [
+    { "fromLevel": 1, "part": "coal-cart", "card": "Coal cart" },
+    { "fromLevel": 2, "part": "bunker-tender", "card": "Bunker tender" },
+    { "fromLevel": 3, "part": "riveted-tender", "card": "Riveted tender" },
+    { "fromLevel": 5, "part": "guild-tender", "card": "Guild tender" }
+  ],
+  "tail": {
+    "delta": 1,
+    "palette": ["#ffb070", "#7ad0ff", "#ff7ab8", "#c8ff7a", "#b08aff", "#7affd0"],
+    "glow": 0.35
+  }
+}

@@ -223,7 +223,8 @@
     "statusPlate": "ui-status-plate",
     "gearButton": "ui-gear-button",
     "dockFrame": "ui-frame-dock",
-    "clusterFrame": "ui-frame-cluster"
+    "clusterFrame": "ui-frame-cluster",
+    "starMap": "ui-star-map"
   },
   "skinnable": ["accent", "accentSoft", "glow", "dialFace"],
   "planetSkins": {

@@ -592,23 +592,24 @@ well); a part with accent areas is `tintable` and ships a separate **tint mask**
 planet skin colours those areas in CSS and the brass stays brass. Readable at 360 px means every
 stroke is at least 1 px at 1x; the review sheets are in `docs/art/ui-chrome/`.
 
-| Token            | Asset id           | Parts and 1x size (px)                                                            | Insets, tint                |
-| ---------------- | ------------------ | --------------------------------------------------------------------------------- | --------------------------- |
-| art.gaugeBar     | `ui-gauge-bar`     | 96 x 16: iron well in a 2 px brass bezel; fill is CSS                             | 6 x 6                       |
-| art.gaugeDial    | `ui-gauge-dial`    | 64 x 64: brass rim, face, 240-degree ticks, hub                                   | face tintable (`dialFace`)  |
-| art.gaugeNeedle  | `ui-gauge-needle`  | 4 x 28: tapered brass pointer, origin at its foot, where it turns (#716)          |                             |
-| art.edgeGauge    | `ui-edge-gauge`    | 8 x 64: vertical trough, brass rails and caps; mark CSS                           | 0 x 8                       |
-| art.odometerDrum | `ui-odometer-drum` | 16 x 240: ten parchment digits, 24 px cells, 0 on top                             |                             |
-| art.sheetFrame   | `ui-frame-sheet`   | 128 x 128: double brass frame, iron band, 4 rivets                                | 24 x 24                     |
-| art.cardFrame    | `ui-frame-card`    | 96 x 64: single bezel over a hairline, corner studs                               | 12 x 12                     |
-| art.glassFrame   | `ui-frame-glass`   | 48 x 48: 3 px brass bezel, dark lip, glass glint, corner studs (#716)             | 10 x 10                     |
-| art.tabFrame     | `ui-frame-tab`     | 64 x 32 `ui-frame-tab` and `-active`: brass top edge, 1 px sides, open foot       | 8 x 8; active edge tintable |
-| art.scrollRail   | `ui-scroll-rail`   | 8 x 64 `ui-scroll-rail` and 12 x 24 `-thumb` (riveted)                            | 0 x 8 each                  |
-| art.slotRing     | `ui-slot-ring`     | 48 x 48: brass ring over an iron well; cooldown is a CSS mask                     | inner ring tintable         |
-| art.statusPlate  | `ui-status-plate`  | 24 x 24: the triangle plate behind a status icon (#158)                           |                             |
-| art.gearButton   | `ui-gear-button`   | 48 x 48 `ui-gear-button` and `-pressed`: gear on a riveted plate                  | hub lamp tintable           |
-| art.dockFrame    | `ui-frame-dock`    | 80 x 80: brass edge, riveted iron band, hinge rail on the view side (#770)        | 24 x 24; rail, pitch 32     |
-| art.clusterFrame | `ui-frame-cluster` | 80 x 40: the glass frame's bezel, lip and glint with studs, desktop height (#770) | 24 x 10; rail, pitch 32     |
+| Token            | Asset id           | Parts and 1x size (px)                                                                     | Insets, tint                |
+| ---------------- | ------------------ | ------------------------------------------------------------------------------------------ | --------------------------- |
+| art.gaugeBar     | `ui-gauge-bar`     | 96 x 16: iron well in a 2 px brass bezel; fill is CSS                                      | 6 x 6                       |
+| art.gaugeDial    | `ui-gauge-dial`    | 64 x 64: brass rim, face, 240-degree ticks, hub                                            | face tintable (`dialFace`)  |
+| art.gaugeNeedle  | `ui-gauge-needle`  | 4 x 28: tapered brass pointer, origin at its foot, where it turns (#716)                   |                             |
+| art.edgeGauge    | `ui-edge-gauge`    | 8 x 64: vertical trough, brass rails and caps; mark CSS                                    | 0 x 8                       |
+| art.odometerDrum | `ui-odometer-drum` | 16 x 240: ten parchment digits, 24 px cells, 0 on top                                      |                             |
+| art.sheetFrame   | `ui-frame-sheet`   | 128 x 128: double brass frame, iron band, 4 rivets                                         | 24 x 24                     |
+| art.cardFrame    | `ui-frame-card`    | 96 x 64: single bezel over a hairline, corner studs                                        | 12 x 12                     |
+| art.glassFrame   | `ui-frame-glass`   | 48 x 48: 3 px brass bezel, dark lip, glass glint, corner studs (#716)                      | 10 x 10                     |
+| art.tabFrame     | `ui-frame-tab`     | 64 x 32 `ui-frame-tab` and `-active`: brass top edge, 1 px sides, open foot                | 8 x 8; active edge tintable |
+| art.scrollRail   | `ui-scroll-rail`   | 8 x 64 `ui-scroll-rail` and 12 x 24 `-thumb` (riveted)                                     | 0 x 8 each                  |
+| art.slotRing     | `ui-slot-ring`     | 48 x 48: brass ring over an iron well; cooldown is a CSS mask                              | inner ring tintable         |
+| art.statusPlate  | `ui-status-plate`  | 24 x 24: the triangle plate behind a status icon (#158)                                    |                             |
+| art.gearButton   | `ui-gear-button`   | 48 x 48 `ui-gear-button` and `-pressed`: gear on a riveted plate                           | hub lamp tintable           |
+| art.dockFrame    | `ui-frame-dock`    | 80 x 80: brass edge, riveted iron band, hinge rail on the view side (#770)                 | 24 x 24; rail, pitch 32     |
+| art.clusterFrame | `ui-frame-cluster` | 80 x 40: the glass frame's bezel, lip and glint with studs, desktop height (#770)          | 24 x 10; rail, pitch 32     |
+| art.starMap      | `ui-star-map`      | 48 x 48 `-planet` (banded disc, core), 64 x 64 `-sun` (rayed), 56 x 56 `-here` ring (#758) | planet disc tintable        |
 
 **Drawing one.** `kit/UiArtTokens.tsx` writes one `:root` rule from the shipped catalogue: for a
 token `gaugeBar`, `--art-gauge-bar` is the `image-set()` of its two files, `--art-gauge-bar-size`
@@ -912,6 +913,7 @@ Generated from `designTokens.json`; a row is the token's path and its value. The
 | `art.gearButton`                          | ui-gear-button                     |
 | `art.dockFrame`                           | ui-frame-dock                      |
 | `art.clusterFrame`                        | ui-frame-cluster                   |
+| `art.starMap`                             | ui-star-map                        |
 | `skinnable`                               | accent, accentSoft, glow, dialFace |
 | `planetSkins.palette.planet_1.accent`     | #c9a24b                            |
 | `planetSkins.palette.planet_1.accentSoft` | #e0a040                            |

@@ -1,0 +1,54 @@
+{
+  "assetId": "vehicle-fuel-tank",
+  "schema": 1,
+  "source": {
+    "blend": "art/blender/vehicle-fuel-tank/vehicle-fuel-tank.blend",
+    "sha256": null,
+    "blender": null
+  },
+  "pxPerMetre": 512,
+  "atlasPx": [512, 1024],
+  "maps": {
+    "albedo": "vehicle-fuel-tank.albedo.ktx2",
+    "normal": "vehicle-fuel-tank.normal.ktx2",
+    "emissive": false
+  },
+  "parts": [
+    {
+      "id": "bunker-tender",
+      "tier": 1,
+      "rect": [8, 8, 308, 236],
+      "sizeM": [0.6, 0.46],
+      "pivotM": [0.58, 0.22],
+      "atM": [0.0, 0.0],
+      "z": 0
+    },
+    {
+      "id": "coal-cart",
+      "tier": 1,
+      "rect": [8, 260, 308, 236],
+      "sizeM": [0.6, 0.46],
+      "pivotM": [0.58, 0.22],
+      "atM": [0.0, 0.0],
+      "z": 0
+    },
+    {
+      "id": "guild-tender",
+      "tier": 1,
+      "rect": [8, 512, 308, 236],
+      "sizeM": [0.6, 0.46],
+      "pivotM": [0.58, 0.22],
+      "atM": [0.0, 0.0],
+      "z": 0
+    },
+    {
+      "id": "riveted-tender",
+      "tier": 1,
+      "rect": [8, 764, 308, 236],
+      "sizeM": [0.6, 0.46],
+      "pivotM": [0.58, 0.22],
+      "atM": [0.0, 0.0],
+      "z": 0
+    }
+  ]
+}
