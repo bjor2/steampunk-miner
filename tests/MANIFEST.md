@@ -623,14 +623,14 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/tech-tree/treeSpendGuard.lane.test.ts` | 8 | 8 |
 | `src/features/tech-tree/ui/patentOfficePanel.test.ts` | 2 | 2 |
 
-### `terrain-tools`: 50 files, 400 tests
+### `terrain-tools`: 50 files, 403 tests
 
 | File | Tests | Sites |
 | --- | --- | --- |
 | `src/features/terrain-tools/collapseDeathReportRows.test.ts` | 3 | 3 |
 | `src/features/terrain-tools/foamCurePace.lane.test.ts` | 11 | 1 |
-| `src/features/terrain-tools/foamPace.test.ts` | 5 | 3 |
-| `src/features/terrain-tools/foamPaceGate.test.ts` | 7 | 7 |
+| `src/features/terrain-tools/foamPace.test.ts` | 6 | 6 |
+| `src/features/terrain-tools/foamPaceGate.test.ts` | 9 | 9 |
 | `src/features/terrain-tools/foamRestockPace.lane.test.ts` | 11 | 1 |
 | `src/features/terrain-tools/gnawCollapseReportRows.test.ts` | 5 | 5 |
 | `src/features/terrain-tools/logging.test.ts` | 2 | 2 |
@@ -950,7 +950,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/bot/chargePayoff.test.ts` | 5 | 5 |
 | `src/systems/bot/chargeSharePayoff.test.ts` | 6 | 6 |
 | `src/systems/bot/chargeSizeTrade.test.ts` | 4 | 4 |
-| `src/systems/bot/downBores.test.ts` | 8 | 8 |
+| `src/systems/bot/downBores.test.ts` | 9 | 9 |
 | `src/systems/bot/endlessPlanning.test.ts` | 6 | 3 |
 | `src/systems/bot/itemHookNoFreeCell.test.ts` | 0 | 1 |
 | `src/systems/bot/leadCellHardness.test.ts` | 3 | 3 |
