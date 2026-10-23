@@ -1,0 +1,66 @@
+{
+  "footprintM": [
+    -1.0917,
+    -0.4787,
+    -0.49129999999999985,
+    0.010000000000000009
+  ],
+  "phonePxPerM": 30.0,
+  "changedThreshold": 24,
+  "tiers": {
+    "tier-1": {
+      "footprintPhonePx": 304,
+      "changedPhonePx": {
+        "coal-cart": 100,
+        "bunker-tender": 86,
+        "riveted-tender": 101,
+        "guild-tender": 102
+      },
+      "brightest": {
+        "coal-cart": {
+          "nose": 255,
+          "wagon": 255
+        },
+        "bunker-tender": {
+          "nose": 255,
+          "wagon": 255
+        },
+        "riveted-tender": {
+          "nose": 255,
+          "wagon": 255
+        },
+        "guild-tender": {
+          "nose": 255,
+          "wagon": 255
+        }
+      }
+    },
+    "tier-3": {
+      "footprintPhonePx": 304,
+      "changedPhonePx": {
+        "coal-cart": 100,
+        "bunker-tender": 86,
+        "riveted-tender": 101,
+        "guild-tender": 102
+      },
+      "brightest": {
+        "coal-cart": {
+          "nose": 255,
+          "wagon": 255
+        },
+        "bunker-tender": {
+          "nose": 255,
+          "wagon": 255
+        },
+        "riveted-tender": {
+          "nose": 255,
+          "wagon": 255
+        },
+        "guild-tender": {
+          "nose": 255,
+          "wagon": 255
+        }
+      }
+    }
+  }
+}

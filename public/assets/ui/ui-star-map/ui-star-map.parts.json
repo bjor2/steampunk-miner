@@ -1,0 +1,91 @@
+{
+  "assetId": "ui-star-map",
+  "schema": 1,
+  "source": {
+    "blend": "art/blender/ui-star-map/ui-star-map.blend",
+    "sha256": "ab68721ea0c1abe67130fe41329054f3ec6b836188e027acd52f8cd37dbba75c",
+    "blender": "4.2.9 LTS"
+  },
+  "pxPerMetre": 4,
+  "atlasPx": [
+    512,
+    512
+  ],
+  "maps": {
+    "albedo": "ui-star-map.albedo.ktx2",
+    "normal": "ui-star-map.normal.ktx2",
+    "emissive": false
+  },
+  "parts": [
+    {
+      "id": "ui-star-map-here",
+      "tier": 1,
+      "rect": [
+        280,
+        8,
+        224,
+        224
+      ],
+      "sizeM": [
+        56.0,
+        56.0
+      ],
+      "pivotM": [
+        28.0,
+        28.0
+      ],
+      "atM": [
+        0.0,
+        0.0
+      ],
+      "z": 0
+    },
+    {
+      "id": "ui-star-map-planet",
+      "tier": 1,
+      "rect": [
+        8,
+        280,
+        192,
+        192
+      ],
+      "sizeM": [
+        48.0,
+        48.0
+      ],
+      "pivotM": [
+        24.0,
+        24.0
+      ],
+      "atM": [
+        64.0,
+        0.0
+      ],
+      "z": 0,
+      "tintable": true
+    },
+    {
+      "id": "ui-star-map-sun",
+      "tier": 1,
+      "rect": [
+        8,
+        8,
+        256,
+        256
+      ],
+      "sizeM": [
+        64.0,
+        64.0
+      ],
+      "pivotM": [
+        32.0,
+        32.0
+      ],
+      "atM": [
+        160.0,
+        0.0
+      ],
+      "z": 0
+    }
+  ]
+}
