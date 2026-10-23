@@ -2,8 +2,9 @@ import { describe, expect, it } from 'vitest'
 import { ORE_RULES_VERSION, P2_OWN_KINDS_ORE_RULES } from '../../../systems/world/planetParams'
 import economyFile from '../ores.economy.json'
 import familiesFile from '../oreFamilies.json'
-import { isSlotLiveInBand, kindRowsOf, poolOfPlanetUnder, slotsOfPoolUnder } from './kindRows'
+import { kindRowsOf, poolOfPlanetUnder, slotsOfPoolUnder } from './kindRows'
 import { ORE_ROWS, oreRowProblems } from './oreRows'
+import { isSlotLiveInBand, liveWindowOf } from './slotWindows'
 
 // The kind slot tables (TD ruling on ticket 446, addendum 6226264758; Systems' kinds.legacy,
 // 6226282340, and kinds.mixed on #453, 6235087481 with Option B): the economy side of a material
@@ -88,7 +89,7 @@ describe('ore kind slots', () => {
 
   it('reads a slot live in the bands of its window only', () => {
     const [c3] = ORE_ROWS.kinds.slotsBySet.legacy.filter((slot) => slot.slotId === 'legacy.c3')
-    expect([1, 2, 3, 4, 5].map((band) => isSlotLiveInBand(c3, band))).toEqual([
+    expect([1, 2, 3, 4, 5].map((band) => isSlotLiveInBand(c3, band, ORE_RULES_VERSION))).toEqual([
       false,
       false,
       true,
@@ -249,6 +250,69 @@ describe("a pool's own kind slots", () => {
     const [first, ...rest] = shared
     expect(problemsWithLegacy([...rest, OWN, { ...first }])).toEqual([
       `ore.kinds.legacy[${shared.length}] is shared but follows a pool's own slot`,
+    ])
+  })
+})
+
+// A slot's window by ore rules (ticket 738): a window may narrow at an ore rules version, and a
+// planet stamped before it keeps the window it was entered with, so its chunks never seam.
+describe('a kind slot window narrowed at an ore rules version', () => {
+  const R1 = economyFile.ore.kinds.legacy.find((slot) => slot.slotId === 'legacy.r1') as Slot
+  const NARROWED = {
+    ...R1,
+    slotId: 'legacy.r8',
+    window: [4, 5],
+    windowsBeforeOreRules: { 5: [3, 5] },
+  }
+  const shared = economyFile.ore.kinds.legacy.filter((slot) => !('pool' in slot))
+  const kinds = kindRowsOf(
+    { ...economyFile.ore.kinds, legacy: [...shared, NARROWED] },
+    ORE_ROWS.kinds.poolByPlanet,
+  )
+  const narrowed = kinds.slotsBySet.legacy[shared.length]
+
+  it('keeps the earlier window on a planet stamped before the version, and the newest from it on', () => {
+    const windows = [undefined, 2, 4, 5, ORE_RULES_VERSION].map((rules) =>
+      liveWindowOf(narrowed, rules),
+    )
+    expect(windows).toEqual([
+      [3, 5],
+      [3, 5],
+      [3, 5],
+      [4, 5],
+      [4, 5],
+    ])
+    expect(isSlotLiveInBand(narrowed, 3, 4)).toBe(true)
+    expect(isSlotLiveInBand(narrowed, 3, 5)).toBe(false)
+  })
+
+  it('reads a slot whose window never moved the same under every stamp', () => {
+    const [c3] = ORE_ROWS.kinds.slotsBySet.legacy.filter((slot) => slot.slotId === 'legacy.c3')
+    expect([undefined, 2, ORE_RULES_VERSION].map((rules) => liveWindowOf(c3, rules))).toEqual([
+      [3, 5],
+      [3, 5],
+      [3, 5],
+    ])
+  })
+
+  it('refuses an earlier window live where its tier weighs nothing, as the newest is refused', () => {
+    expect(
+      problemsWithLegacy([...shared, { ...NARROWED, windowsBeforeOreRules: { 5: [2, 5] } }]),
+    ).toEqual([
+      `ore.kinds.legacy[${shared.length}] is live in band 2, where legacy rare weighs nothing`,
+    ])
+  })
+
+  it('refuses an ore rules version this build does not know and a window outside the bands', () => {
+    const broken = { ...NARROWED, windowsBeforeOreRules: { 1: [3, 5], 4: [0, 5] } }
+    expect(problemsWithLegacy([...shared, broken])).toEqual([
+      `ore.kinds.legacy[${shared.length}].windowsBeforeOreRules.1 must be an ore rules version from 2 to ${ORE_RULES_VERSION}`,
+      `ore.kinds.legacy[${shared.length}].windowsBeforeOreRules.4 must be [first, last] in 1..5`,
+    ])
+    expect(
+      problemsWithLegacy([...shared, { ...NARROWED, windowsBeforeOreRules: [[3, 5]] }]),
+    ).toEqual([
+      `ore.kinds.legacy[${shared.length}].windowsBeforeOreRules must map ore rules versions to band windows`,
     ])
   })
 })

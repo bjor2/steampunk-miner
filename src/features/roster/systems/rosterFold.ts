@@ -2,7 +2,8 @@
  * The roster fold (TD ruling on ticket 446, 6226236698 section 2; Systems' family-first rule,
  * 6226198316, GD option A, 6226210993): each ore patch draws one material kind from its planet's
  * roster, uniform over the kinds live on the patch's own family and rarity tier in its band
- * (`roll % nLive`), and none when no kind is live there. Horizontal: a look layer only.
+ * (`roll % nLive`; the kind's window under the planet's ore rules, ticket 738), and none when no
+ * kind is live there. Horizontal: a look layer only.
  *
  * It is a `patchContent` fold sorted after `ores.lead` and `planet-mix.mix`, so it reads the final
  * family and tier, and it writes the kind slot alone: family, tier, ore id, quantity and gate stay as
@@ -57,18 +58,14 @@ export function liveRosterIndicesOf(
 ): number[] {
   const familyId = familyOfCellCode(content.family)?.id
   const rarityId = rarityTiers()[content.tierOffset - (band - 1)]?.id
+  const isLiveInBand = (slot: KindSlot) => isSlotLiveInBand(slot, band, params.oreRulesVersion)
   return planetRosterOf(params).flatMap((slot, index) =>
-    isKindOf(slot, familyId, rarityId, band) ? [index] : [],
+    isKindOf(slot, familyId, rarityId) && isLiveInBand(slot) ? [index] : [],
   )
 }
 
-function isKindOf(
-  slot: KindSlot,
-  familyId: string | undefined,
-  rarityId: string | undefined,
-  band: number,
-): boolean {
-  return slot.family === familyId && slot.rarity === rarityId && isSlotLiveInBand(slot, band)
+function isKindOf(slot: KindSlot, familyId: string | undefined, rarityId: string | undefined) {
+  return slot.family === familyId && slot.rarity === rarityId
 }
 
 function rollOfPatch(seed: number, { band, centre }: OrePatch): number {

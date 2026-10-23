@@ -21,15 +21,24 @@
  *   later draws it, so P2's own kinds never reach P1 or a P2 a save holds under older rules. Own
  *   slots follow every shared slot of their table, so leaving them out never moves the roster index
  *   a stored cell names.
+ * - A slot's window may narrow at an ore rules version (`windowsBeforeOreRules`, ticket 738,
+ *   `slotWindows.ts`): a planet stamped before it keeps the window it was entered with.
  *
  * A slot is live only where its tier has weight in its set, so a kind never sits on a band its
  * rarity never paints. Look only: no slot field reaches a price, a hardness or a gate.
  */
-import { BAND_COUNT } from '../../../systems/world/planetGeometry'
 import { ORE_RULES_VERSION } from '../../../systems/world/planetParams'
 import { MAX_KIND_SLOT } from '../../../systems/world/worldCell'
 import { isPlainMap, isPoolId } from './planetRows'
 import { RARITY_ROW_SETS, type RarityRowSet } from './rarityRows'
+import {
+  earlierWindowsOf,
+  earlierWindowTableProblems,
+  isBandWindow,
+  windowSpansOf,
+  type BandWindow,
+  type EarlierWindow,
+} from './slotWindows'
 
 export interface KindSlot {
   /** `<set>.<name>`, such as `legacy.c1`: the binding key a species row names. */
@@ -38,8 +47,10 @@ export interface KindSlot {
   family: string
   /** The rarity tier id: the kind is drawn on patches of that tier's lead. */
   rarity: string
-  /** The first and last band the kind is live in. */
-  window: readonly [number, number]
+  /** The first and last band the kind is live in under the newest ore rules. */
+  window: BandWindow
+  /** The windows planets stamped before an ore rules version keep (ticket 738); earliest first. */
+  earlierWindows?: readonly EarlierWindow[]
   /** Set on a pool's own slot (ticket 709): the one pool that draws it, and from which rules. */
   owner?: SlotOwner
 }
@@ -139,11 +150,6 @@ export function slotsOfPoolUnder(
   return kinds.slotsBySet[set].filter((slot) => isSlotDrawnBy(slot, pool, oreRulesVersion ?? 0))
 }
 
-/** Whether band `band` is in the slot's window. */
-export function isSlotLiveInBand(slot: KindSlot, band: number): boolean {
-  return band >= slot.window[0] && band <= slot.window[1]
-}
-
 function isSlotDrawnBy(slot: KindSlot, pool: string, oreRulesVersion: number): boolean {
   if (slot.owner === undefined) return true
   return slot.owner.pool === pool && oreRulesVersion >= slot.owner.fromOreRules
@@ -175,11 +181,13 @@ function earlierPoolOf(
 
 function kindSlotOf(row: Raw): KindSlot {
   const [first, last] = row.window as number[]
+  const earlierWindows = earlierWindowsOf(row.windowsBeforeOreRules)
   const slot: KindSlot = {
     slotId: row.slotId as string,
     family: row.family as string,
     rarity: row.rarity as string,
     window: [first, last],
+    ...(earlierWindows === undefined ? {} : { earlierWindows }),
   }
   if (row.pool === undefined) return slot
   return { ...slot, owner: { pool: row.pool as string, fromOreRules: row.fromOreRules as number } }
@@ -228,6 +236,7 @@ function slotRowProblems(
     ...(isSlotIdOf(row.slotId, set) ? [] : [`${where}.slotId must be "${set}.<name>"`]),
     ...(isFamily ? [] : [`${where}.family must name an ore family`]),
     ...(isBandWindow(row.window) ? [] : [`${where}.window must be [first, last] in 1..5`]),
+    ...earlierWindowTableProblems(row.windowsBeforeOreRules, where),
     ...ownerProblems(row, where, context.poolIds),
   ]
   if (shapeProblems.length > 0) return shapeProblems
@@ -245,10 +254,23 @@ function ownerProblems(row: Raw, where: string, poolIds: readonly string[]): str
   ]
 }
 
-/** A kind is never live where its tier weighs nothing in the set (Systems, #139 section 5). */
+/**
+ * A kind is never live where its tier weighs nothing in the set (Systems, #139 section 5), under
+ * any ore rules it holds a window for.
+ */
 function deadBandProblems(row: Raw, where: string, set: RarityRowSet, context: KindRowContext) {
-  const [first, last] = row.window as number[]
-  const rarity = String(row.rarity)
+  return windowSpansOf(kindSlotOf(row)).flatMap(({ window }) =>
+    deadWindowProblems(window, String(row.rarity), where, set, context),
+  )
+}
+
+function deadWindowProblems(
+  [first, last]: BandWindow,
+  rarity: string,
+  where: string,
+  set: RarityRowSet,
+  context: KindRowContext,
+): string[] {
   const bands = Array.from({ length: last - first + 1 }, (_, at) => first + at)
   const weights = bands.map((band) => context.weightBpOf(set, rarity, band))
   if (weights.some((weight) => weight === undefined)) {
@@ -306,14 +328,4 @@ function isKnownOreRules(rules: unknown): boolean {
 function isSlotIdOf(slotId: unknown, set: RarityRowSet): boolean {
   if (typeof slotId !== 'string' || !slotId.startsWith(`${set}.`)) return false
   return SLOT_NAME.test(slotId.slice(set.length + 1))
-}
-
-function isBandWindow(window: unknown): boolean {
-  if (!Array.isArray(window) || window.length !== 2) return false
-  const [first, last] = window as unknown[]
-  return isBand(first) && isBand(last) && (first as number) <= (last as number)
-}
-
-function isBand(band: unknown): boolean {
-  return Number.isSafeInteger(band) && (band as number) >= 1 && (band as number) <= BAND_COUNT
 }

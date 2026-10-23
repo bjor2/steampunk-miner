@@ -42,7 +42,9 @@ function clusterKindsOfSlot(params: PlanetParams, slot: KindSlot, index: number)
 
 function liveBandsOf(params: PlanetParams, slot: KindSlot, tier: RarityTier): number[] {
   return BANDS.filter(
-    (band) => isSlotLiveInBand(slot, band) && isTierLiveIn(tier, params.planetIndex, band),
+    (band) =>
+      isSlotLiveInBand(slot, band, params.oreRulesVersion) &&
+      isTierLiveIn(tier, params.planetIndex, band),
   )
 }
 
