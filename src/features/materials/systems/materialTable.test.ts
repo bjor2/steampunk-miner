@@ -297,7 +297,8 @@ describe('legacy materials', () => {
 
 // Ticket 632 (GD lock (b) on #595, Progression's species list): P2's own 12 species, one on each
 // legacy kind slot with that slot's family, rarity and window, ids `p2-<slot>`, every one a look no
-// other species wears, and no hero until hero art packs one into P2's atlas. Ticket 709 (GD ruling
+// other species wears, and no hero until hero art packs one into P2's atlas, which ticket 744 did
+// for the three gem rows (Star Garnet, Verdigris Opal, Aquamarine). Ticket 709 (GD ruling
 // (A) on #709, Progression's names) adds three on the pool's own slots: Cinnabar, Aquamarine, Jet.
 // Ticket 736 (GD lock on #736) swaps three shared slots like for like under the same ore rules 9:
 // Azurite Nodule, Pyrite Sun and Argentite take the slots of Cobalt Bloom, Bismuth Stair and Smoke
@@ -382,8 +383,12 @@ describe('foothold-p2 materials', () => {
     expect(new Set(own).size).toBe(own.length)
   })
 
-  it('marks no hero, so every species draws its procedural look', () => {
-    expect(p2.filter((material) => material.hero).map((material) => material.id)).toEqual([])
+  it('marks the three gem rows heroes (ticket 744); every other species draws its procedural look', () => {
+    expect(p2.filter((material) => material.hero).map((material) => material.id)).toEqual([
+      'p2-r1',
+      'p2-r2',
+      'p2-r4',
+    ])
   })
 })
 

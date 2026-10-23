@@ -1,0 +1,28 @@
+{
+  "pxPerMetre": 256,
+  "cells": [
+    {
+      "id": "p2-r1",
+      "oreLuma": 0.1157,
+      "rockLuma": 0.0148,
+      "orePeakLuma": 1.0,
+      "contrast": 2.56
+    },
+    {
+      "id": "p2-r2",
+      "oreLuma": 0.0952,
+      "rockLuma": 0.018,
+      "orePeakLuma": 1.0,
+      "contrast": 2.14
+    },
+    {
+      "id": "p2-r4",
+      "oreLuma": 0.109,
+      "rockLuma": 0.0132,
+      "orePeakLuma": 0.646,
+      "contrast": 2.52
+    }
+  ],
+  "oreLumaRisesAlongEveryRow": false,
+  "bodyLumaRisesAlongEveryRow": null
+}

@@ -1,10 +1,13 @@
 """
-The python3 post step of the hero ore looks (#452), after author_ore_heroes.py has rendered:
-the 256 px atlas cells (the 248 px sprite with its edge pixels extended into the 4 px gutter), a
-preview of each act's hero atlas, the game-scale strip (every hero over its rock at 85, 40 and
-22 px a tile: the default zoom on a 1080p screen, the 20 m zoom and a phone), the greyscale and
-deuteranopia copies, the distinctness report between every pair of heroes, and the JPEG shrink
-of the big colour sheets. Pillow and numpy; Blender's Python has neither.
+The python3 post step of the hero ore looks (#452, ticket 744), after author_ore_heroes.py has
+rendered one pool: its 256 px atlas cells (the 248 px sprite with its edge pixels extended into
+the 4 px gutter), a preview of each act's hero atlas from the committed cells, the game-scale
+strip (every hero of the acts the pool paints over its rock at 85, 67, 40, 30 and 22 px a tile:
+the default 12 m zoom on a 1080p screen, on 1280x800, the 20 m zoom, the default zoom on a
+360x640 phone, and that phone at the 20 m zoom), the greyscale and deuteranopia copies, the
+distinctness report between every pair of those heroes at 40 px and at the two screens of the
+gem-read test (360x640 and 1280x800, ticket 744), and the JPEG shrink of the big colour sheets.
+Pillow and numpy; Blender's Python has neither.
 """
 
 import itertools
@@ -26,8 +29,12 @@ CELL_DIR = os.path.join(HERE, 'cells')
 SHEET_DIR = os.path.join(HERE, 'sheets')
 BUILD_DIR = os.path.join(species.REPO_ROOT, 'art', 'build', 'ore-heroes')
 ART_DIRECTION_PATH = os.path.join(species.REPO_ROOT, 'src', 'systems', 'render', 'artDirection.json')
-# A tile on screen: the default 12 m zoom on 1080p, the 20 m zoom, and a phone at that zoom.
-TILE_PX = (85, 40, 22)
+# A tile on screen: the default 12 m zoom on 1080p, on 1280x800 and on a 360x640 phone, the 20 m
+# zoom, and the phone at that zoom (VIEW_SHORT_AXIS_DEFAULT_M 12 in src/constants/scene.ts).
+TILE_PX = (85, 67, 40, 30, 22)
+# The two screens of the gem-read test (#647 done-when 9, ticket 744): a tile at the default zoom.
+SCREEN_TILE_PX = {'360x640': 30, '1280x800': 67}
+REPORT_TILE_PX = 40
 STRIP_MAGNIFY = 4
 STRIP_GAP_PX = 6
 IN_GAME_DOWNSAMPLE = 3
@@ -42,15 +49,19 @@ DEUTERANOPIA = np.array([
 
 def main():
     pool = sys.argv[1] if len(sys.argv) > 1 else 'legacy'
-    table = species.cell_table_of(pool)
-    cells = {cell['speciesId']: write_cell(cell) for cell in table['cells']}
-    for act in table['acts']:
-        write_atlas_preview(act, table, cells)
-    strip = write_scale_strip(pool, table, cells)
+    table = species.cell_table_of()
+    for hero in species.heroes_of_table(table, pool):
+        write_cell(hero)
+    beside = species.heroes_sharing_acts(table, pool)
+    cells = {hero['speciesId']: read_rgba(os.path.join(HERE, hero['cell'])) for hero in beside}
+    for atlas in table['atlases']:
+        write_atlas_preview(atlas, table['atlas'], cells)
+    strip = write_scale_strip(pool, beside, cells)
     write_blind_copies(strip)
-    report = write_distinctness(pool, table, cells)
+    report = write_distinctness(pool, beside, cells)
     post_sheets(pool)
-    print('post done: %d cells, %d acts, least different pair %s' % (len(cells), len(table['acts']), report['leastDifferentPair']))
+    print('post done: %d cells of %s beside %d heroes, least different pair %s'
+          % (len(species.heroes_of_table(table, pool)), pool, len(beside), report['leastDifferentPair']))
 
 
 # --- cells and the atlas preview -----------------------------------------------------------------------
@@ -68,23 +79,23 @@ def write_cell(cell):
     return padded
 
 
-def write_atlas_preview(act, table, cells):
-    side = table['atlas']['sidePx']
+def write_atlas_preview(atlas_entry, shape, cells):
+    """The act's atlas as #451 packs it, every cell read from the committed `cells/`."""
+    side, size, gutter = shape['sidePx'], shape['cellPx'], shape['gutterPx']
     atlas = np.zeros((side, side, 4), dtype=np.float32)
-    size = table['atlas']['cellPx']
-    for cell in table['cells']:
+    for cell in atlas_entry['cells']:
         rect = cell['rect']
-        x, y = rect['x'] - table['atlas']['gutterPx'], rect['y'] - table['atlas']['gutterPx']
-        atlas[y:y + size, x:x + size] = cells[cell['speciesId']]
-    return write_rgba(os.path.join(SHEET_DIR, 'atlas-preview.%s.png' % act), atlas)
+        x, y = rect['x'] - gutter, rect['y'] - gutter
+        atlas[y:y + size, x:x + size] = cells.get(cell['speciesId'], read_rgba(os.path.join(CELL_DIR, '%s.png' % cell['speciesId'])))
+    return write_rgba(os.path.join(SHEET_DIR, 'atlas-preview.%s.png' % atlas_entry['act']), atlas)
 
 
 # --- the game-scale strip --------------------------------------------------------------------------------
 
 
-def write_scale_strip(pool, table, cells):
+def write_scale_strip(pool, heroes, cells):
     """One row per tile size, every hero over its band's rock, then magnified so the eye can read it."""
-    rows = [strip_row(table, cells, px) for px in TILE_PX]
+    rows = [strip_row(heroes, cells, px) for px in TILE_PX]
     width = max(row.shape[1] for row in rows)
     rows = [np.pad(row, ((0, STRIP_GAP_PX), (0, width - row.shape[1]), (0, 0)), constant_values=0.0) for row in rows]
     strip = np.concatenate(rows, axis=0)
@@ -93,8 +104,8 @@ def write_scale_strip(pool, table, cells):
     return write_rgb(path, magnified(strip, STRIP_MAGNIFY))
 
 
-def strip_row(table, cells, tile_px):
-    tiles = [tile_at(cells[cell['speciesId']], rock_rgb_of(cell), tile_px) for cell in table['cells']]
+def strip_row(heroes, cells, tile_px):
+    tiles = [tile_at(cells[hero['speciesId']], rock_rgb_of(hero), tile_px) for hero in heroes]
     gap = np.zeros((tile_px, STRIP_GAP_PX, 3), dtype=np.float32)
     return np.concatenate(list(itertools.chain.from_iterable((tile, gap) for tile in tiles))[:-1], axis=1)
 
@@ -173,20 +184,27 @@ def deuteranopia_of(rgb):
 # --- distinctness -----------------------------------------------------------------------------------------
 
 
-def write_distinctness(pool, table, cells):
+def write_distinctness(pool, heroes, cells):
     """
     Per hero at the 40 px tile: coverage, mean hue, luma and contrast against its rock. Per pair:
     how far apart the silhouettes (1 - mask IoU), the hues (degrees), the lumas and the colours
-    seen with deuteranopia are. The least different pair is named so the README can say it.
+    seen with deuteranopia are. The least different pair is named so the README can say it. The
+    pairs are measured again at the two screens of the gem-read test (ticket 744).
     """
-    measures = {cell['speciesId']: hero_measures(cells[cell['speciesId']], rock_rgb_of(cell)) for cell in table['cells']}
-    pairs = [pair_measures(a, b, measures) for a, b in itertools.combinations(measures, 2)]
-    least = min(pairs, key=lambda pair: pair['hueDifferenceDeg'] / 180 + pair['silhouetteDifference'] + pair['lumaDifference'])
-    report = {'pool': pool, 'tilePx': 40, 'heroes': {hero_id: printable(measure) for hero_id, measure in measures.items()},
-              'pairs': pairs, 'leastDifferentPair': [least['a'], least['b']]}
+    report = {'pool': pool, 'tilePx': REPORT_TILE_PX, **pairs_at(heroes, cells, REPORT_TILE_PX),
+              'screens': [{'screen': screen, 'tilePx': tile_px, **pairs_at(heroes, cells, tile_px)}
+                          for screen, tile_px in SCREEN_TILE_PX.items()]}
     with open(os.path.join(SHEET_DIR, 'heroes-%s.distinct.json' % pool), 'w', encoding='utf-8', newline='\n') as file:
         file.write(json_text_of(report))
     return report
+
+
+def pairs_at(heroes, cells, tile_px):
+    measures = {hero['speciesId']: hero_measures(cells[hero['speciesId']], rock_rgb_of(hero), tile_px) for hero in heroes}
+    pairs = [pair_measures(a, b, measures) for a, b in itertools.combinations(measures, 2)]
+    least = min(pairs, key=lambda pair: pair['hueDifferenceDeg'] / 180 + pair['silhouetteDifference'] + pair['lumaDifference'])
+    return {'heroes': {hero_id: printable(measure) for hero_id, measure in measures.items()},
+            'pairs': pairs, 'leastDifferentPair': [least['a'], least['b']]}
 
 
 def printable(measure):
@@ -194,7 +212,7 @@ def printable(measure):
     return {key: value for key, value in measure.items() if key not in ('mask', 'deutanRgb')}
 
 
-def hero_measures(cell, rock_rgb, tile_px=40):
+def hero_measures(cell, rock_rgb, tile_px=REPORT_TILE_PX):
     rgba = resampled_rgba(content_of(cell), tile_px)
     mask = rgba[:, :, 3] > MASK_THRESHOLD
     body = rgba[:, :, :3][mask]

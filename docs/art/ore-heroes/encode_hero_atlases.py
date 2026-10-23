@@ -1,7 +1,7 @@
 """
 Packs and encodes the per-act hero atlases the game ships (#451), from the committed 256 px cells
-of #452 (`cells/<species>.png`) in the order the committed `hero-cells.json` gives them (cell i at column
-i mod 4, row i div 4). Each act becomes `public/assets/ground/ground-hero-atlas-<act>/
+of #452 and ticket 744 (`cells/<species>.png`) in the order the committed `hero-cells.json` packs
+them per act (`atlases`: cell i at column i mod 4, row i div 4). Each act becomes `public/assets/ground/ground-hero-atlas-<act>/
 ground-hero-atlas-<act>.albedo.ktx2`: Basis ETC1S, sRGB, as every albedo map (#52 "Formats"),
 with four mip levels so the last keeps half a texel of gutter and a cell never samples its
 neighbour (toktx 4.4.2 builds only full chains, so the levels are written here, each a 2 x 2
@@ -33,10 +33,10 @@ BLEED_PASSES = 16
 def main():
     with open(CELLS_PATH, encoding='utf-8') as file:
         table = json.load(file)
-    for act in table['acts']:
-        asset_id = asset_id_of(act)
-        encode(asset_id, write_level_pngs(asset_id, table))
-    print('encoded %d hero atlases for the %s pool' % (len(table['acts']), table['pool']))
+    for atlas in table['atlases']:
+        asset_id = asset_id_of(atlas['act'])
+        encode(asset_id, write_level_pngs(asset_id, table['atlas'], atlas['cells']))
+    print('encoded %d hero atlases for the %s pools' % (len(table['atlases']), ', '.join(table['pools'])))
 
 
 def asset_id_of(act):
@@ -44,10 +44,10 @@ def asset_id_of(act):
     return 'ground-hero-atlas-%s' % act.replace('_', '-').replace('.', '-')
 
 
-def write_level_pngs(asset_id, table):
+def write_level_pngs(asset_id, shape, cells):
     folder = os.path.join(BUILD_ROOT, asset_id)
     os.makedirs(folder, exist_ok=True)
-    level = packed_atlas(table)
+    level = packed_atlas(shape, cells)
     paths = []
     for at in range(LEVELS):
         path = os.path.join(folder, '%s.albedo.%d.png' % (asset_id, at))
@@ -70,14 +70,13 @@ def halved(rgba):
     return out
 
 
-def packed_atlas(table):
-    shape = table['atlas']
+def packed_atlas(shape, cells):
     side, size, gutter = shape['sidePx'], shape['cellPx'], shape['gutterPx']
     atlas = np.zeros((side, side, 4), dtype=np.float32)
-    for cell in table['cells']:
+    for cell in cells:
         rect = cell['rect']
         x, y = rect['x'] - gutter, rect['y'] - gutter
-        atlas[y:y + size, x:x + size] = read_rgba(os.path.join(HERE, cell['cell']))
+        atlas[y:y + size, x:x + size] = read_rgba(os.path.join(HERE, 'cells', '%s.png' % cell['speciesId']))
     return atlas
 
 

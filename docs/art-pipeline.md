@@ -481,14 +481,16 @@ since the source is twelve family files. Nothing draws it yet; the kernel ore re
 
 ## Hero ore sprites
 
-The hero materials of [#452](https://github.com/bjor2/steampunk-miner/issues/452) (the `hero: true`
-rows of `src/features/materials/materials.json`, four for the P1 and P2 acts) are authored one
-species per file in `docs/art/ore-heroes/blend/hero-<species>.blend` on the same ore stage, and
+The hero materials of [#452](https://github.com/bjor2/steampunk-miner/issues/452) and
+[#744](https://github.com/bjor2/steampunk-miner/issues/744) (the `hero: true` rows of
+`src/features/materials/materials.json` with art: the legacy pool's four for the P1 and P2 acts,
+and the three gems of P2's own pool for the P2 act) are authored one species per file in
+`docs/art/ore-heroes/blend/hero-<species>.blend` on the same ore stage, a pool at a time, and
 rendered lit with the rock held out into 256 px albedo cells (`docs/art/ore-heroes/cells/`, the
 mask in alpha) that the per-act hero atlas of
 [#451](https://github.com/bjor2/steampunk-miner/issues/451) packs on its 16th sampler. The cell
-table is `docs/art/ore-heroes/hero-cells.json`; the rarity tint, frame and glow are the shader's,
-never the sprite's. See [docs/art/ore-heroes/README.md](art/ore-heroes/README.md).
+table is `docs/art/ore-heroes/hero-cells.json`, per act the cells of every authored pool that
+paints one of its planets; the rarity tint, frame and glow are the shader's, never the sprite's. See [docs/art/ore-heroes/README.md](art/ore-heroes/README.md).
 `python3 docs/art/ore-heroes/encode_hero_atlases.py` packs the cells into one `atlas` asset per
 act (`ground-hero-atlas-<act>`, an albedo map alone: ETC1S sRGB like every albedo map, but four
 mip levels it writes itself, since `toktx` 4.4.2 makes only full chains and a full chain would

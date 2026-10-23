@@ -1,10 +1,12 @@
 """
-The hero silhouettes of #452 as Blender builders, one per `silhouette` word of the hero rows in
-materials.json (#447): `cubes` (zoned fluorite), `wires` (dendritic gold on a quartz vein),
-`barrels` (silky corundum) and `columns` (clear beryl). Each builder fills one 1 m cell at a
-centre with marks standing proud of the face at y = 0 (the #52 frame: game right +X, game up +Z,
-the camera at -Y), in the species' hue slot. The ore stage's shapes and materials are reused;
-the rarity frame and glow are the shader's (#450), so no builder adds a glow layer.
+The hero silhouettes of #452 and ticket 744 as Blender builders, one per `silhouette` word of the
+hero rows in materials.json (#447, ticket 632): `cubes` (zoned fluorite), `wires` (dendritic gold
+on a quartz vein), `barrels` (silky corundum), `columns` (clear beryl), and P2's three gems,
+`stars` (star garnet), `ovals` (verdigris opal) and `prisms` (aquamarine), which share the
+facet-glint treatment the Horizontal Scaler asked of every gem (#741). Each builder fills one 1 m
+cell at a centre with marks standing proud of the face at y = 0 (the #52 frame: game right +X,
+game up +Z, the camera at -Y), in the species' hue slot. The ore stage's shapes and materials are
+reused; the rarity frame and glow are the shader's (#450), so no builder adds a glow layer.
 """
 
 import math
@@ -266,6 +268,267 @@ def clear_glass(hero):
     return material
 
 
+# --- stars: faceted star garnets, each with its six-rayed spark (ticket 744) ----------------------
+
+
+def build_stars(hero, centre, rng):
+    body = garnet_glass(hero)
+    spark = spark_material(hero)
+    stones = []
+    for i, (px, pz, radius) in enumerate(star_layout(rng)):
+        stones += garnet(hero, i, (centre[0] + px, centre[1] + pz), radius, rng, body, spark)
+    return stones
+
+
+def star_layout(rng):
+    """One large stone off centre and three smaller ones round it, none touching."""
+    phase = rng.uniform(0, math.tau)
+    stones = [(rng.uniform(-0.05, 0.05), rng.uniform(-0.05, 0.05), 0.2)]
+    for k, radius in enumerate((0.12, 0.1, 0.13)):
+        angle = phase + k / 3 * math.tau + rng.uniform(-0.2, 0.2)
+        stones.append((math.cos(angle) * 0.34, math.sin(angle) * 0.34, radius))
+    return stones
+
+
+def garnet(hero, i, at, radius, rng, body, spark):
+    """A twenty-faced stone sunk to its waist, flat-shaded so every facet catches the lamp whole."""
+    stone = shapes.add_icosphere('%s-mark-%d' % (hero['id'], i), radius, (at[0], radius * 0.15, at[1]), subdivisions=1,
+                                 rotation=(rng.uniform(0, math.tau), rng.uniform(0, math.tau), rng.uniform(0, math.tau)))
+    made = [shapes.assign(faceted(stone), body)]
+    return made + six_rayed_spark(hero, i, at, -radius * 0.85 - 0.01, radius, rng, spark)
+
+
+def six_rayed_spark(hero, i, at, y, radius, rng, spark):
+    """The asterism: three thin rays crossing at the stone's crown, 60 degrees apart."""
+    phase = rng.uniform(0, math.pi / 3)
+    rays = []
+    for k in range(3):
+        points = shapes.shard_points(at, radius * 0.8, radius * 0.07, phase + k * math.pi / 3)
+        rays.append(shapes.assign(shapes.add_polygon('%s-ray-%d-%d' % (hero['id'], i, k), points, y, 0.004), spark))
+    return rays
+
+
+def garnet_glass(hero):
+    body = species.slot_hex(hero['hue'])
+    material = surface_gem(hero, body, roughness=0.06, transmission=0.1, ior=1.8)
+    drive_rim(material, 0.25, floor=0.08)
+    return facet_glint(material, strength=0.9, sharpness=30.0)
+
+
+def spark_material(hero):
+    """The rays' light: the hue slot near white, emission alone so the lamp never dims it."""
+    pale = species.slot_hex(hero['hue'], luma=0.9)
+    material = materials.flat_material('hero-%s-spark' % hero['id'], pale, strength=1.3)
+    material['albedo_hex'] = pale
+    return material
+
+
+# --- ovals: verdigris opal domes in matrix frames, flashing play-of-colour (ticket 744) -----------
+
+
+def build_ovals(hero, centre, rng):
+    body = play_of_colour_glass(hero)
+    frame = matrix_material(hero)
+    marks = []
+    for i, (px, pz) in enumerate(oval_layout(rng)):
+        angle = rng.uniform(0, math.pi)
+        marks += opal_dome(hero, i, (centre[0] + px, centre[1] + pz), rng.uniform(0.13, 0.165), angle, body, frame)
+    return marks
+
+
+def oval_layout(rng):
+    """Four domes on a loose ring, each nudged off it."""
+    phase = rng.uniform(0, math.tau)
+    return [(math.cos(phase + k / 4 * math.tau) * 0.26 + rng.uniform(-0.03, 0.03),
+             math.sin(phase + k / 4 * math.tau) * 0.26 + rng.uniform(-0.03, 0.03)) for k in range(4)]
+
+
+def opal_dome(hero, i, at, radius, angle, body, frame):
+    """
+    A cabochon: a flattened sphere bulging toward the camera, sunk past its waist, in a thin raised
+    frame of the matrix it grew in. The local ring plane turns onto the face, then spins on it.
+    """
+    rotation = Euler((math.pi / 2, angle, 0.0))
+    dome = shapes.add_icosphere('%s-mark-%d' % (hero['id'], i), radius, (at[0], 0.03, at[1]), subdivisions=3,
+                                scale=(1.0, 0.7, 0.55), rotation=rotation)
+    rim = shapes.add_torus('%s-frame-%d' % (hero['id'], i), radius * 1.04, 0.016, (at[0], 0.0, at[1]), rotation=rotation,
+                           scale=(1.0, 0.7, 1.0))
+    return [shapes.assign(dome, body), shapes.assign(rim, frame)]
+
+
+def play_of_colour_glass(hero):
+    """
+    Milky green opal broken into patches, each flashing its own colour a little either side of the
+    hue slot, with a dark seam between: the harlequin play-of-colour of the skin, on a dome.
+    """
+    body = species.slot_hex(hero['hue'])
+    material = surface_gem(hero, body, roughness=0.12, transmission=0.05, ior=1.45)
+    tree = material.node_tree
+    bsdf = materials.principled_of(material)
+    coords = tree.nodes.new('ShaderNodeTexCoord')
+    patches = tree.nodes.new('ShaderNodeTexVoronoi')
+    patches.inputs['Scale'].default_value = 9.0
+    patches.inputs['Randomness'].default_value = 0.8
+    pick = tree.nodes.new('ShaderNodeSeparateColor')
+    flash = tree.nodes.new('ShaderNodeValToRGB')
+    flash.color_ramp.interpolation = 'CONSTANT'
+    stops = ((0.0, species.slot_hex(shifted_hue(hero['hue'], 22), luma=0.5)),
+             (0.3, body),
+             (0.6, species.slot_hex(hero['hue'], luma=0.78)),
+             (0.82, species.slot_hex(shifted_hue(hero['hue'], -28), luma=0.7)))
+    flash.color_ramp.elements[0].position, flash.color_ramp.elements[0].color = stops[0][0], materials.rgba(materials.linear_of_hex(stops[0][1]))
+    flash.color_ramp.elements[1].position, flash.color_ramp.elements[1].color = stops[1][0], materials.rgba(materials.linear_of_hex(stops[1][1]))
+    for position, hex_colour in stops[2:]:
+        element = flash.color_ramp.elements.new(position)
+        element.color = materials.rgba(materials.linear_of_hex(hex_colour))
+    seams = tree.nodes.new('ShaderNodeTexVoronoi')
+    seams.feature = 'DISTANCE_TO_EDGE'
+    seams.inputs['Scale'].default_value = 9.0
+    seams.inputs['Randomness'].default_value = 0.8
+    seam_depth = tree.nodes.new('ShaderNodeMapRange')
+    seam_depth.inputs['From Max'].default_value = 0.035
+    seam_depth.inputs['To Min'].default_value = 0.45
+    seam_depth.inputs['To Max'].default_value = 1.0
+    darken = tree.nodes.new('ShaderNodeMix')
+    darken.data_type = 'RGBA'
+    darken.blend_type = 'MULTIPLY'
+    darken.inputs['Factor'].default_value = 1.0
+    tree.links.new(coords.outputs['Object'], patches.inputs['Vector'])
+    tree.links.new(coords.outputs['Object'], seams.inputs['Vector'])
+    tree.links.new(patches.outputs['Color'], pick.inputs['Color'])
+    tree.links.new(pick.outputs['Red'], flash.inputs['Fac'])
+    tree.links.new(seams.outputs['Distance'], seam_depth.inputs['Value'])
+    tree.links.new(flash.outputs['Color'], darken.inputs[6])
+    tree.links.new(seam_depth.outputs['Result'], darken.inputs[7])
+    tree.links.new(darken.outputs[2], bsdf.inputs['Base Color'])
+    drive_rim(material, 0.35, floor=0.12)
+    return facet_glint(material, strength=1.2, sharpness=40.0)
+
+
+def matrix_material(hero):
+    """The dull ironstone the opal grew in, raised as a thin frame round each dome."""
+    matrix = '#6b6457'
+    material = materials.surface_material('hero-%s-matrix' % hero['id'], matrix, roughness=0.65, coat=0.1)
+    material['albedo_hex'] = matrix
+    return material
+
+
+def shifted_hue(slot, degrees):
+    return dict(slot, hue=(slot['hue'] + degrees) % 360)
+
+
+# --- prisms: crossed aquamarine prisms, watered along their length (ticket 744) -------------------
+
+
+def build_prisms(hero, centre, rng):
+    body = watered_glass(hero)
+    return [sea_prism(hero, i, centre, *bar, rng=rng, body=body) for i, bar in enumerate(prism_layout(rng))]
+
+
+def prism_layout(rng):
+    """Three long prisms crossing at shallow angles, one short one beside them."""
+    return [(rng.uniform(-0.35, -0.15), 0.64, 0.074, 0.0),
+            (rng.uniform(0.95, 1.2), 0.5, 0.064, rng.choice((-1, 1)) * 0.07),
+            (rng.uniform(2.0, 2.3), 0.42, 0.055, rng.choice((-1, 1)) * 0.1),
+            (rng.uniform(0.3, 0.6), 0.24, 0.044, rng.choice((-1, 1)) * 0.3)]
+
+
+def sea_prism(hero, i, centre, angle, length, radius, offset, rng, body):
+    """A flat-ended hexagonal prism lying along the face, sunk past its axis, leaning a little out."""
+    tilt = rng.uniform(0.08, 0.2)
+    rotation = Vector((math.cos(angle), -tilt, math.sin(angle))).to_track_quat('Z', 'Y').to_euler()
+    across = (-math.sin(angle), math.cos(angle))
+    at = (centre[0] + across[0] * offset, -0.02 - radius * 0.15, centre[1] + across[1] * offset)
+    prism = shapes.add_prism('%s-mark-%d' % (hero['id'], i), radius, length, at, rotation=rotation)
+    return shapes.assign(prism, body)
+
+
+def watered_glass(hero):
+    """Pale sea glass, with soft rippled bands of a deeper sea along the length: the watered pattern."""
+    body = species.slot_hex(hero['hue'])
+    deep = species.slot_hex(hero['hue'], luma=0.64)
+    material = surface_gem(hero, body, roughness=0.05, transmission=0.3, ior=1.58)
+    tree = material.node_tree
+    bsdf = materials.principled_of(material)
+    coords = tree.nodes.new('ShaderNodeTexCoord')
+    wave = tree.nodes.new('ShaderNodeTexWave')
+    wave.wave_type = 'BANDS'
+    wave.bands_direction = 'X'
+    wave.inputs['Scale'].default_value = 9.0
+    wave.inputs['Distortion'].default_value = 2.5
+    wave.inputs['Detail'].default_value = 2.0
+    ramp = tree.nodes.new('ShaderNodeValToRGB')
+    ramp.color_ramp.interpolation = 'EASE'
+    ramp.color_ramp.elements[0].position = 0.35
+    ramp.color_ramp.elements[0].color = materials.rgba(materials.linear_of_hex(deep))
+    ramp.color_ramp.elements[1].position = 0.7
+    ramp.color_ramp.elements[1].color = materials.rgba(materials.linear_of_hex(body))
+    tree.links.new(coords.outputs['Object'], wave.inputs['Vector'])
+    tree.links.new(wave.outputs['Fac'], ramp.inputs['Fac'])
+    tree.links.new(ramp.outputs['Color'], bsdf.inputs['Base Color'])
+    drive_rim(material, 0.4, floor=0.1)
+    return facet_glint(material)
+
+
+# --- the gems' shared treatment (ticket 744) ------------------------------------------------------
+
+# The ore stage's key lamp travels along (0.35, 0.8, -0.45) (ladder_scene.add_lamp_rig); a facet
+# whose normal looks back along it catches the lamp whole.
+LAMP_FACING = Vector((-0.35, -0.8, 0.45)).normalized()
+
+
+def surface_gem(hero, body, roughness, transmission, ior):
+    """A gem body in the hue slot, its emission colour the slot near white for the rim and glints."""
+    pale = species.slot_hex(hero['hue'], luma=0.9)
+    material = materials.surface_material('hero-' + hero['id'], body, roughness=roughness, transmission=transmission,
+                                          ior=ior, coat=0.5, emission_hex=pale, emission_strength=0.0)
+    material['albedo_hex'] = body
+    return material
+
+
+def facet_glint(material, strength=1.6, sharpness=24.0):
+    """
+    The gems' shared facet-glint treatment (Horizontal Scaler on #741, ticket 744): a hard clear
+    coat, and a facet whose normal looks back along the key lamp lights up whole, in the pale
+    emission colour, on top of the rim the material already drives. Flat-shaded stones glint a
+    facet at a time; a smooth dome a soft crown.
+    """
+    tree = material.node_tree
+    bsdf = materials.principled_of(material)
+    bsdf.inputs['Coat Weight'].default_value = 1.0
+    bsdf.inputs['Coat Roughness'].default_value = 0.03
+    rim = next(link for link in tree.links if link.to_socket == bsdf.inputs['Emission Strength'])
+    geometry = tree.nodes.new('ShaderNodeNewGeometry')
+    toward_lamp = tree.nodes.new('ShaderNodeVectorMath')
+    toward_lamp.operation = 'DOT_PRODUCT'
+    toward_lamp.inputs[1].default_value = LAMP_FACING
+    lit = math_node(tree, 'MAXIMUM', 0.0)
+    narrowed = math_node(tree, 'POWER', sharpness)
+    scaled = math_node(tree, 'MULTIPLY', strength)
+    glint_and_rim = math_node(tree, 'ADD', 0.0)
+    tree.links.new(geometry.outputs['Normal'], toward_lamp.inputs[0])
+    tree.links.new(toward_lamp.outputs['Value'], lit.inputs[0])
+    tree.links.new(lit.outputs['Value'], narrowed.inputs[0])
+    tree.links.new(narrowed.outputs['Value'], scaled.inputs[0])
+    tree.links.new(rim.from_socket, glint_and_rim.inputs[0])
+    tree.links.new(scaled.outputs['Value'], glint_and_rim.inputs[1])
+    tree.links.new(glint_and_rim.outputs['Value'], bsdf.inputs['Emission Strength'])
+    return material
+
+
+def math_node(tree, operation, second):
+    node = tree.nodes.new('ShaderNodeMath')
+    node.operation = operation
+    node.inputs[1].default_value = second
+    return node
+
+
+def faceted(obj):
+    for polygon in obj.data.polygons:
+        polygon.use_smooth = False
+    return obj
+
+
 # --- shared ----------------------------------------------------------------------------------------
 
 
@@ -289,4 +552,7 @@ BUILDERS = {
     'wires': build_wires,
     'barrels': build_barrels,
     'columns': build_columns,
+    'stars': build_stars,
+    'ovals': build_ovals,
+    'prisms': build_prisms,
 }

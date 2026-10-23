@@ -1,9 +1,9 @@
 """
-Authors the hero ore looks of one materials pool (#452) on the ore stage (docs/art/ores): one
-.blend per hero species (its 1 m cell on its band's rock, the lamp rig and the game's orthographic
-camera), the 248 px lit albedo sprite of each (the rock held out, so the alpha is the mask) into
-art/build/ore-heroes/ for hero_post.py, and the review sheets of the pool's heroes side by side
-under the shallow and the deep rig. Run headless:
+Authors the hero ore looks of one materials pool (#452, ticket 744) on the ore stage (docs/art/ores):
+one .blend per hero species (its 1 m cell on its band's rock, the lamp rig and the game's
+orthographic camera), the 248 px lit albedo sprite of each (the rock held out, so the alpha is the
+mask) into art/build/ore-heroes/ for hero_post.py, the cell table of every authored pool, and the
+review sheets of the pool's heroes side by side under the shallow and the deep rig. Run headless:
 
   BLENDER_USER_SCRIPTS=/tmp/empty blender -b --factory-startup --python-exit-code 1 \
     -P docs/art/ore-heroes/author_ore_heroes.py -- [pool] [--no-sheets]
@@ -50,7 +50,7 @@ def author(pool, sheets=True):
         os.makedirs(folder, exist_ok=True)
     for hero in heroes:
         author_hero(hero)
-    species.write_cell_table(pool)
+    species.write_cell_table()
     if sheets:
         render_sheets(pool, heroes)
     print('authored %d heroes of %s' % (len(heroes), pool))
