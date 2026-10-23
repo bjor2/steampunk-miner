@@ -1672,6 +1672,15 @@ incomePerHour}` go to `balance-report/drill-pace.ndjson`, which `pushTestMetrics
   runs a 360x640 phone (one tap, full screen) and a 1280x800 desktop (one M, docked), judging each
   row against `ui.getStarMapModel()`, and a dimmed planet that lights once money arrives. Box
   Tester only.
+- **Desktop brass art** (ticket 770, spec #678): the cluster table's frame is per layout, pinned in
+  `gaugeCluster.test.ts` (a phone in the glass frame, desktop in the cluster rail frame; a layout
+  with no frame or an unshipped one fails the load), and the two rail sprites are held to the brief
+  by `uiArt.test.ts` like every token. `e2e/browser/ui/desktopBrass.spec.ts` runs 1280x800 and
+  1920x1080 plus a 360x640 phone: the docked sheet's and the cluster's computed border image name
+  the dock and cluster rail frames with `round` edges, the phone's name the sheet and glass frames
+  stretched as before, and the strip and the docked sheet hold (same box, nothing spilled, no
+  finding) through the NEW MATERIAL plaque cycle of the planet 1 start scenario and on P40. Box
+  Tester only; the sweeps are ticket 767's and 768's specs.
 - **Warning layer** (ticket 685, spec #678): the ladder is pure (`systems/views/warningWatch.ts`:
   each tier fires once on the way in and re-arms 5% above it, the deepest of several at once rings
   alone, the glow holds the deepest tier now), fed from the HUD's readings through the store's

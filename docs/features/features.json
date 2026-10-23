@@ -2252,6 +2252,13 @@
               "status": "built",
               "issues": [768],
               "doc": "docs/ui/design-system.md"
+            },
+            {
+              "title": "Desktop brass frames",
+              "description": "The docked side panel and the wide gauge cluster wear brass rail frames baked for them in Blender, their rivets repeating a tile at a time, instead of the phone's frames stretched across them. The phone's look is unchanged.",
+              "status": "built",
+              "issues": [770],
+              "doc": "docs/ui/design-system.md"
             }
           ]
         },

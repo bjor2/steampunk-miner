@@ -920,6 +920,21 @@
       "specs": ["e2e/browser/ui/starMap.spec.ts", "e2e/browser/screens/touchControls.spec.ts"]
     },
     {
+      "why": "The desktop brass art pass (ticket 770): the docked sheet in the dock rail frame and the gauge cluster in its rail frame on desktop, the phone's glass and sheet frames as before, and the strip and the docked sheet held through the NEW MATERIAL plaque cycle and on P40.",
+      "paths": [
+        "src/ui/kit/Sheet.module.css",
+        "src/ui/hud/DialCluster.module.css",
+        "src/systems/views/gaugeCluster.ts",
+        "src/systems/views/gaugeClusterTable.ts",
+        "src/data/hud/gaugeCluster.json",
+        "src/systems/art/uiArt.ts",
+        "src/ui/kit/UiArtTokens.tsx",
+        "art/asset-rules.json",
+        "public/assets/ui/**"
+      ],
+      "specs": ["e2e/browser/ui/desktopBrass.spec.ts", "e2e/browser/ui/uiShots.spec.ts"]
+    },
+    {
       "why": "One menu per building (ticket 734): the sheet a dock opens is that bay's one menu, closed once, with no bay frame hidden behind a phone's full sheet. The sheet slice, the bay screen's shutter, the workshop's dock hook and the debug sheet reads reach it.",
       "paths": [
         "src/store/sheetSlice.ts",

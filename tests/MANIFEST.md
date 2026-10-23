@@ -1734,7 +1734,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/views/dialBuyCue.test.ts` | 8 | 8 |
 | `src/systems/views/driveTrackCard.test.ts` | 5 | 4 |
 | `src/systems/views/gainText.test.ts` | 6 | 6 |
-| `src/systems/views/gaugeCluster.test.ts` | 22 | 22 |
+| `src/systems/views/gaugeCluster.test.ts` | 23 | 23 |
 | `src/systems/views/gravityReadings.test.ts` | 4 | 4 |
 | `src/systems/views/hazardStripFit.test.ts` | 5 | 5 |
 | `src/systems/views/hazardStripPlace.test.ts` | 6 | 6 |
