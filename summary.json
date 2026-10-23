@@ -1,32 +1,8 @@
 {
  "schema": 1,
- "updatedAt": "2026-10-23T06:08:59.689Z",
+ "updatedAt": "2026-10-23T06:37:05.341Z",
  "lastRuns": 50,
  "runs": [
-  {
-   "id": 1792177647834,
-   "url": "https://github.com/bjor2/steampunk-miner/commit/3f9512e8683d97df819402d82000f08c9dde1da4",
-   "event": "close-#491",
-   "mode": "scoped",
-   "sha": "3f9512e8683d97df819402d82000f08c9dde1da4",
-   "branch": "main",
-   "startedAt": "2026-10-16T17:17:42Z",
-   "jobConclusion": "success",
-   "timedOut": false,
-   "jobDurationSec": 6585,
-   "source": "box",
-   "phase": "fast",
-   "job": "fast",
-   "feature": 356,
-   "tickets": [
-    356
-   ],
-   "reportFound": true,
-   "files": 163,
-   "tests": 1134,
-   "failed": 0,
-   "failedFiles": 0
-  },
   {
    "id": 1792179161163,
    "url": "https://github.com/bjor2/steampunk-miner/commit/3f9512e8683d97df819402d82000f08c9dde1da4",
@@ -1542,14 +1518,36 @@
    "tests": 12624,
    "failed": 5,
    "failedFiles": 3
+  },
+  {
+   "id": 1792737424666,
+   "url": "https://github.com/bjor2/steampunk-miner/commit/dca609908e4fa6c361bc34d78442dbbffed4eb4a",
+   "event": "nightly",
+   "mode": "nightly",
+   "sha": "dca609908e4fa6c361bc34d78442dbbffed4eb4a",
+   "branch": "main",
+   "startedAt": "2026-10-23T06:34:32Z",
+   "jobConclusion": "success",
+   "timedOut": false,
+   "jobDurationSec": 152,
+   "source": "box",
+   "phase": "nightly",
+   "job": "balance-report",
+   "feature": null,
+   "tickets": [],
+   "reportFound": false,
+   "files": 0,
+   "tests": 0,
+   "failed": 0,
+   "failedFiles": 0
   }
  ],
  "pipeline": {
   "modes": {
-   "scoped": 12,
    "nightly-only": 7,
    "full": 18,
-   "nightly": 13
+   "scoped": 11,
+   "nightly": 14
   },
   "timedOut": [],
   "withoutReport": [
@@ -1558,272 +1556,9 @@
    1792643131129,
    1792656764509
   ],
-  "scopingSuspects": [
-   {
-    "file": "src/logging/campaignPacingGate.test.ts",
-    "nightlyRunId": 1792735738681,
-    "lastPerPushStatus": null
-   }
-  ]
+  "scopingSuspects": []
  },
  "features": {
-  "tooling-tests": {
-   "files": 3,
-   "p50Ms": 257,
-   "p95Ms": 475,
-   "fileRuns": 86,
-   "failedFileRuns": 1,
-   "lastFailure": {
-    "runId": 1792355624413,
-    "sha": "20ef31bc5eb28b2b93cd4e84e1b03914c67d76cc",
-    "at": "2026-10-18T18:18:05Z",
-    "tests": [
-     "test manifest on main lists every test file on disk with its current test sites"
-    ],
-    "file": "scripts/tests/manifestDrift.test.mjs"
-   },
-   "passRate": 0.9883720930232558
-  },
-  "aetheric": {
-   "files": 20,
-   "p50Ms": 199351,
-   "p95Ms": 1925166,
-   "fileRuns": 603,
-   "failedFileRuns": 0,
-   "lastFailure": null,
-   "passRate": 1
-  },
-  "artefact": {
-   "files": 4,
-   "p50Ms": 2407292,
-   "p95Ms": 8285137,
-   "fileRuns": 119,
-   "failedFileRuns": 0,
-   "lastFailure": null,
-   "passRate": 1
-  },
-  "combos": {
-   "files": 17,
-   "p50Ms": 3509639,
-   "p95Ms": 15923955,
-   "fileRuns": 507,
-   "failedFileRuns": 0,
-   "lastFailure": null,
-   "passRate": 1
-  },
-  "drill-gear": {
-   "files": 30,
-   "p50Ms": 620335,
-   "p95Ms": 6459125,
-   "fileRuns": 870,
-   "failedFileRuns": 6,
-   "lastFailure": {
-    "runId": 1792405438366,
-    "sha": "a47edaf9872878eaf90da1a47553db53e3a7e078",
-    "at": "2026-10-19T07:52:23Z",
-    "tests": [
-     "twin-bit pace (balance:twin-bit, GD lock on #257) mines exactly the bare cell sequence on planet 10 with the head mounted and drive 0"
-    ],
-    "file": "src/features/drill-gear/twinBitPace.test.ts"
-   },
-   "passRate": 0.993103448275862
-  },
-  "extraction": {
-   "files": 19,
-   "p50Ms": 1823,
-   "p95Ms": 3675,
-   "fileRuns": 575,
-   "failedFileRuns": 0,
-   "lastFailure": null,
-   "passRate": 1
-  },
-  "ground-gun": {
-   "files": 42,
-   "p50Ms": 3470,
-   "p95Ms": 7150,
-   "fileRuns": 1239,
-   "failedFileRuns": 2,
-   "lastFailure": {
-    "runId": 1792642824354,
-    "sha": "c42f04783d9d3d0093c9b7d2fc5765e762792bbc",
-    "at": "2026-10-21T23:46:09Z",
-    "tests": [
-     "ground-gun: the armoury.auto_guns lane (ticket 319, Content on #310) cards the concussion shells' knock-back and its wait, with the price last"
-    ],
-    "file": "src/features/ground-gun/systems/autoGunsLane.test.ts"
-   },
-   "passRate": 0.9983857949959645
-  },
-  "slice-loader": {
-   "files": 4,
-   "p50Ms": 3031,
-   "p95Ms": 7657,
-   "fileRuns": 111,
-   "failedFileRuns": 0,
-   "lastFailure": null,
-   "passRate": 1
-  },
-  "materials": {
-   "files": 4,
-   "p50Ms": 26,
-   "p95Ms": 44,
-   "fileRuns": 80,
-   "failedFileRuns": 0,
-   "lastFailure": null,
-   "passRate": 1
-  },
-  "mining-gates": {
-   "files": 25,
-   "p50Ms": 23083,
-   "p95Ms": 40221,
-   "fileRuns": 712,
-   "failedFileRuns": 13,
-   "lastFailure": {
-    "runId": 1792573711044,
-    "sha": "35beab70853ee558e5d86707af9f6a7cadb48f07",
-    "at": "2026-10-21T07:16:35Z",
-    "tests": [
-     "bot: extractor buys (ticket 296, #142 acceptance 7) researches the node and buys the extractor on its planet before any track level"
-    ],
-    "file": "src/features/mining-gates/systems/botExtractorBuys.test.ts"
-   },
-   "passRate": 0.9817415730337079
-  },
-  "planet-mix": {
-   "files": 24,
-   "p50Ms": 677566,
-   "p95Ms": 2247615,
-   "fileRuns": 708,
-   "failedFileRuns": 5,
-   "lastFailure": {
-    "runId": 1792573711044,
-    "sha": "35beab70853ee558e5d86707af9f6a7cadb48f07",
-    "at": "2026-10-21T07:16:35Z",
-    "tests": [
-     "magnetic planet pace (balance:magnetic-planet, GD lock on #258) takes planet 25 at most 10% longer without the bit than with the class off, never faster",
-     "magnetic planet pace (balance:magnetic-planet, GD lock on #258) takes planet 28 at most 10% longer without the bit than with the class off, never faster",
-     "magnetic planet pace (balance:magnetic-planet, GD lock on #258) takes planet 32 at most 10% longer without the bit than with the class off, never faster",
-     "magnetic planet pace (balance:magnetic-planet, GD lock on #258) takes planet 28 with the dielectric bit at least 0.98x the class-off time",
-     "magnetic planet pace (balance:magnetic-planet, GD lock on #258) earns at most 15% more per minute on magnetic planet 28 than with the class off"
-    ],
-    "file": "src/features/planet-mix/magneticPlanetPace.test.ts"
-   },
-   "passRate": 0.9929378531073446
-  },
-  "sensing": {
-   "files": 26,
-   "p50Ms": 5291,
-   "p95Ms": 11278,
-   "fileRuns": 780,
-   "failedFileRuns": 0,
-   "lastFailure": null,
-   "passRate": 1
-  },
-  "tech-tree": {
-   "files": 61,
-   "p50Ms": 35154,
-   "p95Ms": 158923,
-   "fileRuns": 1794,
-   "failedFileRuns": 3,
-   "lastFailure": {
-    "runId": 1792590572281,
-    "sha": "d47e5dee1b35518d4e30c92d91d73779605f72fd",
-    "at": "2026-10-21T12:18:58Z",
-    "tests": [
-     "tech tree text budget (spec #422, pass #426) keeps every lane list and node card within budget, with no text outside an element"
-    ],
-    "file": "src/features/tech-tree/ui/techTreeScreen.test.ts"
-   },
-   "passRate": 0.9983277591973244
-  },
-  "terrain-tools": {
-   "files": 48,
-   "p50Ms": 568939,
-   "p95Ms": 3961665,
-   "fileRuns": 1463,
-   "failedFileRuns": 10,
-   "lastFailure": {
-    "runId": 1792735738681,
-    "sha": "dca609908e4fa6c361bc34d78442dbbffed4eb4a",
-    "at": "2026-10-22T23:45:39Z",
-    "tests": [
-     "stabiliser foam pace (VS pin on #381, Systems ruling on #664) keeps time to core at least 0.98x the bare time where both rigs survive on planet 7",
-     "stabiliser foam pace (VS pin on #381, Systems ruling on #664) keeps the holders' time to core within 5% of cement's pin where the bare rig dies on planet 7",
-     "stabiliser foam pace (VS pin on #381, Systems ruling on #664) keeps the holders' lining under 6% of their income on planet 7"
-    ],
-    "file": "src/features/terrain-tools/foamPace.test.ts"
-   },
-   "passRate": 0.9931647300068353
-  },
-  "authority": {
-   "files": 143,
-   "p50Ms": 419889,
-   "p95Ms": 1100229,
-   "fileRuns": 3774,
-   "failedFileRuns": 10,
-   "lastFailure": {
-    "runId": 1792695291792,
-    "sha": "857077186e85f19de173461aeac947125b246388",
-    "at": "2026-10-22T16:28:39Z",
-    "tests": [
-     "swept law charge (ticket 540) charges a fast rig within 1% of the law on a level bore, where the per-cell price under-charged"
-    ],
-    "file": "src/systems/authority/sweptLawCharge.test.ts"
-   },
-   "passRate": 0.9973502914679385
-  },
-  "bot": {
-   "files": 37,
-   "p50Ms": 370164,
-   "p95Ms": 1757885,
-   "fileRuns": 907,
-   "failedFileRuns": 2,
-   "lastFailure": {
-    "runId": 1792573711044,
-    "sha": "35beab70853ee558e5d86707af9f6a7cadb48f07",
-    "at": "2026-10-21T07:16:35Z",
-    "tests": [
-     "bot: shopping at the Upgrade bay buys the engine at the dock while a step still speeds travel in the deeper bands (#418)"
-    ],
-    "file": "src/systems/bot/botShopping.test.ts"
-   },
-   "passRate": 0.9977949283351709
-  },
-  "economy": {
-   "files": 32,
-   "p50Ms": 1139,
-   "p95Ms": 3236,
-   "fileRuns": 808,
-   "failedFileRuns": 6,
-   "lastFailure": {
-    "runId": 1792669172174,
-    "sha": "d95dcc66eb0c80f89cc35a6cd672d3af935b955d",
-    "at": "2026-10-22T09:58:21Z",
-    "tests": [
-     "economy source scan finds no economy price, ratio or fee number in game code outside economy.json"
-    ],
-    "file": "src/systems/economy/economySourceScan.test.ts"
-   },
-   "passRate": 0.9925742574257426
-  },
-  "save": {
-   "files": 23,
-   "p50Ms": 22818,
-   "p95Ms": 40963,
-   "fileRuns": 573,
-   "failedFileRuns": 0,
-   "lastFailure": null,
-   "passRate": 1
-  },
-  "vehicle": {
-   "files": 46,
-   "p50Ms": 672,
-   "p95Ms": 1403,
-   "fileRuns": 1071,
-   "failedFileRuns": 0,
-   "lastFailure": null,
-   "passRate": 1
-  },
   "pacing-bot": {
    "files": 4,
    "p50Ms": 2083329,
@@ -1904,6 +1639,23 @@
    "lastFailure": null,
    "passRate": 1
   },
+  "tooling-tests": {
+   "files": 3,
+   "p50Ms": 264,
+   "p95Ms": 475,
+   "fileRuns": 85,
+   "failedFileRuns": 1,
+   "lastFailure": {
+    "runId": 1792355624413,
+    "sha": "20ef31bc5eb28b2b93cd4e84e1b03914c67d76cc",
+    "at": "2026-10-18T18:18:05Z",
+    "tests": [
+     "test manifest on main lists every test file on disk with its current test sites"
+    ],
+    "file": "scripts/tests/manifestDrift.test.mjs"
+   },
+   "passRate": 0.9882352941176471
+  },
   "debug": {
    "files": 16,
    "p50Ms": 23355,
@@ -1921,6 +1673,24 @@
    },
    "passRate": 0.9871794871794872
   },
+  "aetheric": {
+   "files": 20,
+   "p50Ms": 199351,
+   "p95Ms": 1925166,
+   "fileRuns": 602,
+   "failedFileRuns": 0,
+   "lastFailure": null,
+   "passRate": 1
+  },
+  "artefact": {
+   "files": 4,
+   "p50Ms": 2337816,
+   "p95Ms": 8285137,
+   "fileRuns": 117,
+   "failedFileRuns": 0,
+   "lastFailure": null,
+   "passRate": 1
+  },
   "casing-cement": {
    "files": 2,
    "p50Ms": 580,
@@ -1935,6 +1705,15 @@
    "p50Ms": 7324,
    "p95Ms": 12636,
    "fileRuns": 288,
+   "failedFileRuns": 0,
+   "lastFailure": null,
+   "passRate": 1
+  },
+  "combos": {
+   "files": 17,
+   "p50Ms": 3509639,
+   "p95Ms": 15923955,
+   "fileRuns": 506,
    "failedFileRuns": 0,
    "lastFailure": null,
    "passRate": 1
@@ -1956,6 +1735,32 @@
    "failedFileRuns": 0,
    "lastFailure": null,
    "passRate": 1
+  },
+  "slice-loader": {
+   "files": 4,
+   "p50Ms": 3031,
+   "p95Ms": 7657,
+   "fileRuns": 110,
+   "failedFileRuns": 0,
+   "lastFailure": null,
+   "passRate": 1
+  },
+  "drill-gear": {
+   "files": 30,
+   "p50Ms": 612494,
+   "p95Ms": 6459125,
+   "fileRuns": 867,
+   "failedFileRuns": 6,
+   "lastFailure": {
+    "runId": 1792405438366,
+    "sha": "a47edaf9872878eaf90da1a47553db53e3a7e078",
+    "at": "2026-10-19T07:52:23Z",
+    "tests": [
+     "twin-bit pace (balance:twin-bit, GD lock on #257) mines exactly the bare cell sequence on planet 10 with the head mounted and drive 0"
+    ],
+    "file": "src/features/drill-gear/twinBitPace.test.ts"
+   },
+   "passRate": 0.9930795847750865
   },
   "dynamite-visuals": {
    "files": 11,
@@ -1983,6 +1788,58 @@
    "failedFileRuns": 0,
    "lastFailure": null,
    "passRate": 1
+  },
+  "extraction": {
+   "files": 19,
+   "p50Ms": 1823,
+   "p95Ms": 3675,
+   "fileRuns": 566,
+   "failedFileRuns": 0,
+   "lastFailure": null,
+   "passRate": 1
+  },
+  "ground-gun": {
+   "files": 42,
+   "p50Ms": 3467,
+   "p95Ms": 7117,
+   "fileRuns": 1221,
+   "failedFileRuns": 2,
+   "lastFailure": {
+    "runId": 1792642824354,
+    "sha": "c42f04783d9d3d0093c9b7d2fc5765e762792bbc",
+    "at": "2026-10-21T23:46:09Z",
+    "tests": [
+     "ground-gun: the armoury.auto_guns lane (ticket 319, Content on #310) cards the concussion shells' knock-back and its wait, with the price last"
+    ],
+    "file": "src/features/ground-gun/systems/autoGunsLane.test.ts"
+   },
+   "passRate": 0.9983619983619983
+  },
+  "materials": {
+   "files": 4,
+   "p50Ms": 26,
+   "p95Ms": 44,
+   "fileRuns": 79,
+   "failedFileRuns": 0,
+   "lastFailure": null,
+   "passRate": 1
+  },
+  "mining-gates": {
+   "files": 25,
+   "p50Ms": 22998,
+   "p95Ms": 39665,
+   "fileRuns": 696,
+   "failedFileRuns": 13,
+   "lastFailure": {
+    "runId": 1792573711044,
+    "sha": "35beab70853ee558e5d86707af9f6a7cadb48f07",
+    "at": "2026-10-21T07:16:35Z",
+    "tests": [
+     "bot: extractor buys (ticket 296, #142 acceptance 7) researches the node and buys the extractor on its planet before any track level"
+    ],
+    "file": "src/features/mining-gates/systems/botExtractorBuys.test.ts"
+   },
+   "passRate": 0.9813218390804598
   },
   "mining-popup": {
    "files": 9,
@@ -2028,6 +1885,27 @@
    "lastFailure": null,
    "passRate": 1
   },
+  "planet-mix": {
+   "files": 24,
+   "p50Ms": 660088,
+   "p95Ms": 2247364,
+   "fileRuns": 687,
+   "failedFileRuns": 5,
+   "lastFailure": {
+    "runId": 1792573711044,
+    "sha": "35beab70853ee558e5d86707af9f6a7cadb48f07",
+    "at": "2026-10-21T07:16:35Z",
+    "tests": [
+     "magnetic planet pace (balance:magnetic-planet, GD lock on #258) takes planet 25 at most 10% longer without the bit than with the class off, never faster",
+     "magnetic planet pace (balance:magnetic-planet, GD lock on #258) takes planet 28 at most 10% longer without the bit than with the class off, never faster",
+     "magnetic planet pace (balance:magnetic-planet, GD lock on #258) takes planet 32 at most 10% longer without the bit than with the class off, never faster",
+     "magnetic planet pace (balance:magnetic-planet, GD lock on #258) takes planet 28 with the dielectric bit at least 0.98x the class-off time",
+     "magnetic planet pace (balance:magnetic-planet, GD lock on #258) earns at most 15% more per minute on magnetic planet 28 than with the class off"
+    ],
+    "file": "src/features/planet-mix/magneticPlanetPace.test.ts"
+   },
+   "passRate": 0.992721979621543
+  },
   "power-up-core": {
    "files": 21,
    "p50Ms": 2767,
@@ -2045,6 +1923,51 @@
    "failedFileRuns": 0,
    "lastFailure": null,
    "passRate": 1
+  },
+  "sensing": {
+   "files": 26,
+   "p50Ms": 5292,
+   "p95Ms": 11269,
+   "fileRuns": 768,
+   "failedFileRuns": 0,
+   "lastFailure": null,
+   "passRate": 1
+  },
+  "tech-tree": {
+   "files": 61,
+   "p50Ms": 33373,
+   "p95Ms": 158921,
+   "fileRuns": 1761,
+   "failedFileRuns": 3,
+   "lastFailure": {
+    "runId": 1792590572281,
+    "sha": "d47e5dee1b35518d4e30c92d91d73779605f72fd",
+    "at": "2026-10-21T12:18:58Z",
+    "tests": [
+     "tech tree text budget (spec #422, pass #426) keeps every lane list and node card within budget, with no text outside an element"
+    ],
+    "file": "src/features/tech-tree/ui/techTreeScreen.test.ts"
+   },
+   "passRate": 0.9982964224872232
+  },
+  "terrain-tools": {
+   "files": 48,
+   "p50Ms": 506309,
+   "p95Ms": 3961223,
+   "fileRuns": 1427,
+   "failedFileRuns": 10,
+   "lastFailure": {
+    "runId": 1792735738681,
+    "sha": "dca609908e4fa6c361bc34d78442dbbffed4eb4a",
+    "at": "2026-10-22T23:45:39Z",
+    "tests": [
+     "stabiliser foam pace (VS pin on #381, Systems ruling on #664) keeps time to core at least 0.98x the bare time where both rigs survive on planet 7",
+     "stabiliser foam pace (VS pin on #381, Systems ruling on #664) keeps the holders' time to core within 5% of cement's pin where the bare rig dies on planet 7",
+     "stabiliser foam pace (VS pin on #381, Systems ruling on #664) keeps the holders' lining under 6% of their income on planet 7"
+    ],
+    "file": "src/features/terrain-tools/foamPace.test.ts"
+   },
+   "passRate": 0.9929922915206727
   },
   "workshop": {
    "files": 14,
@@ -2163,6 +2086,40 @@
    "lastFailure": null,
    "passRate": 1
   },
+  "authority": {
+   "files": 143,
+   "p50Ms": 419889,
+   "p95Ms": 1100229,
+   "fileRuns": 3773,
+   "failedFileRuns": 10,
+   "lastFailure": {
+    "runId": 1792695291792,
+    "sha": "857077186e85f19de173461aeac947125b246388",
+    "at": "2026-10-22T16:28:39Z",
+    "tests": [
+     "swept law charge (ticket 540) charges a fast rig within 1% of the law on a level bore, where the per-cell price under-charged"
+    ],
+    "file": "src/systems/authority/sweptLawCharge.test.ts"
+   },
+   "passRate": 0.9973495891863239
+  },
+  "bot": {
+   "files": 37,
+   "p50Ms": 344682,
+   "p95Ms": 1757871,
+   "fileRuns": 904,
+   "failedFileRuns": 2,
+   "lastFailure": {
+    "runId": 1792573711044,
+    "sha": "35beab70853ee558e5d86707af9f6a7cadb48f07",
+    "at": "2026-10-21T07:16:35Z",
+    "tests": [
+     "bot: shopping at the Upgrade bay buys the engine at the dock while a step still speeds travel in the deeper bands (#418)"
+    ],
+    "file": "src/systems/bot/botShopping.test.ts"
+   },
+   "passRate": 0.9977876106194691
+  },
   "systems-core": {
    "files": 14,
    "p50Ms": 1644,
@@ -2171,6 +2128,23 @@
    "failedFileRuns": 0,
    "lastFailure": null,
    "passRate": 1
+  },
+  "economy": {
+   "files": 32,
+   "p50Ms": 1139,
+   "p95Ms": 3236,
+   "fileRuns": 807,
+   "failedFileRuns": 6,
+   "lastFailure": {
+    "runId": 1792669172174,
+    "sha": "d95dcc66eb0c80f89cc35a6cd672d3af935b955d",
+    "at": "2026-10-22T09:58:21Z",
+    "tests": [
+     "economy source scan finds no economy price, ratio or fee number in game code outside economy.json"
+    ],
+    "file": "src/systems/economy/economySourceScan.test.ts"
+   },
+   "passRate": 0.9925650557620818
   },
   "enemies": {
    "files": 1,
@@ -2234,6 +2208,15 @@
    "lastFailure": null,
    "passRate": 1
   },
+  "save": {
+   "files": 23,
+   "p50Ms": 22818,
+   "p95Ms": 40963,
+   "fileRuns": 571,
+   "failedFileRuns": 0,
+   "lastFailure": null,
+   "passRate": 1
+  },
   "snapshots": {
    "files": 4,
    "p50Ms": 15,
@@ -2248,6 +2231,15 @@
    "p50Ms": 146,
    "p95Ms": 295,
    "fileRuns": 106,
+   "failedFileRuns": 0,
+   "lastFailure": null,
+   "passRate": 1
+  },
+  "vehicle": {
+   "files": 46,
+   "p50Ms": 672,
+   "p95Ms": 1403,
+   "fileRuns": 1070,
    "failedFileRuns": 0,
    "lastFailure": null,
    "passRate": 1
@@ -2361,2791 +2353,6 @@
   }
  },
  "files": {
-  "scripts/tests/manifestDrift.test.mjs": {
-   "feature": "tooling-tests",
-   "runs": 36,
-   "lastMs": 443,
-   "p50Ms": 243,
-   "p95Ms": 443,
-   "passRate": 0.9722222222222222,
-   "lastStatus": "passed",
-   "lastRunId": 1792735738681,
-   "lastFailure": {
-    "runId": 1792355624413,
-    "sha": "20ef31bc5eb28b2b93cd4e84e1b03914c67d76cc",
-    "at": "2026-10-18T18:18:05Z",
-    "tests": [
-     "test manifest on main lists every test file on disk with its current test sites"
-    ]
-   },
-   "flaky": false,
-   "slowest": [
-    [
-     "test manifest on main lists every test file on disk with its current test sites",
-     368
-    ]
-   ]
-  },
-  "src/features/aetheric/phaseLantern.pace.test.ts": {
-   "feature": "aetheric",
-   "runs": 32,
-   "lastMs": 155241,
-   "p50Ms": 193454,
-   "p95Ms": 1912945,
-   "passRate": 1,
-   "lastStatus": "passed",
-   "lastRunId": 1792735738681,
-   "lastFailure": null,
-   "flaky": false,
-   "slowest": [
-    [
-     "phase lantern pace (the #205 assert, #261) reaches planet 7 core no faster than 0.98x the bare time with the lantern slotted",
-     89178
-    ],
-    [
-     "phase lantern pace (the #205 assert, #261) reaches planet 10 core no faster than 0.98x the bare time with the lantern slotted",
-     66063
-    ]
-   ]
-  },
-  "src/features/artefact/twistNoFreeCell.test.ts": {
-   "feature": "artefact",
-   "runs": 29,
-   "lastMs": 373795,
-   "p50Ms": 1287858,
-   "p95Ms": 4224087,
-   "passRate": 1,
-   "lastStatus": "passed",
-   "lastRunId": 1792735738681,
-   "lastFailure": null,
-   "flaky": false,
-   "slowest": [
-    [
-     "artefact twists leave the dig alone (no free cell, #281 check) mines exactly the bare cells with Deep Striker held on planet 10 and no slot pressed",
-     66590
-    ],
-    [
-     "artefact twists leave the dig alone (no free cell, #281 check) mines exactly the bare cells with Belay Line held on planet 10 and no slot pressed",
-     66139
-    ],
-    [
-     "artefact twists leave the dig alone (no free cell, #281 check) mines exactly the bare cells with Ore Lure held on planet 10 and no slot pressed",
-     65673
-    ]
-   ]
-  },
-  "src/features/artefact/twistPace.test.ts": {
-   "feature": "artefact",
-   "runs": 32,
-   "lastMs": 1520136,
-   "p50Ms": 1119258,
-   "p95Ms": 4060686,
-   "passRate": 1,
-   "lastStatus": "passed",
-   "lastRunId": 1792735738681,
-   "lastFailure": null,
-   "flaky": false,
-   "slowest": [
-    [
-     "artefact twists pace (pin 6, GD lock on #206) presses the base items on planet 7 on every seed",
-     192784
-    ],
-    [
-     "artefact twists pace (pin 6, GD lock on #206) presses the base items on planet 10 on every seed",
-     191160
-    ],
-    [
-     "artefact twists pace (pin 6, GD lock on #206) earns at most 15% more per minute on planet 7 with each twist and its base item",
-     191
-    ]
-   ]
-  },
-  "src/features/combos/comboPace.test.ts": {
-   "feature": "combos",
-   "runs": 32,
-   "lastMs": 3514572,
-   "p50Ms": 3507313,
-   "p95Ms": 15918255,
-   "passRate": 1,
-   "lastStatus": "passed",
-   "lastRunId": 1792735738681,
-   "lastFailure": null,
-   "flaky": false,
-   "slowest": [
-    [
-     "alarm shield pace (GD lock on #206, decision 6) reaches planet 10 core no slower than 0.98x with the shield acting on its own",
-     549622
-    ],
-    [
-     "alarm shield pace (GD lock on #206, decision 6) reaches planet 7 core no slower than 0.98x with the shield acting on its own",
-     402888
-    ],
-    [
-     "combos pace (pin 6, GD lock on #206) presses the partner items on planet 7 on every seed",
-     127936
-    ]
-   ]
-  },
-  "src/features/drill-gear/drillGearPace.test.ts": {
-   "feature": "drill-gear",
-   "runs": 32,
-   "lastMs": 197406,
-   "p50Ms": 197406,
-   "p95Ms": 1005885,
-   "passRate": 1,
-   "lastStatus": "passed",
-   "lastRunId": 1792735738681,
-   "lastFailure": null,
-   "flaky": false,
-   "slowest": [
-    [
-     "drill-gear pace (Vertical Scaler on #205) reaches planet 10 core at no less than 0.98x the bare pace with the gear on",
-     125212
-    ],
-    [
-     "drill-gear pace (Vertical Scaler on #205) reaches planet 7 core at no less than 0.98x the bare pace with the gear on",
-     72195
-    ]
-   ]
-  },
-  "src/features/drill-gear/forkDeep.pace.test.ts": {
-   "feature": "drill-gear",
-   "runs": 33,
-   "lastMs": 1463944,
-   "p50Ms": 214790,
-   "p95Ms": 2312741,
-   "passRate": 0.9393939393939394,
-   "lastStatus": "passed",
-   "lastRunId": 1792735738681,
-   "lastFailure": {
-    "runId": 1792396127843,
-    "sha": "40f7723968bf215d9793d5d016db379ef02df8d6",
-    "at": "2026-10-19T06:16:47Z",
-    "tests": [
-     "drill-gear fork: Deep pace (GD lock on #255, GD ruling on #392) reaches planet 20 core measurably faster with Deep, never pushing travel past a quarter"
-    ]
-   },
-   "flaky": false,
-   "slowest": [
-    [
-     "drill-gear fork: Deep pace (GD lock on #255, GD ruling on #392) reaches planet 16 core measurably faster with Deep, never pushing travel past a quarter",
-     110137
-    ],
-    [
-     "drill-gear fork: Deep pace (GD lock on #255, GD ruling on #392) reaches planet 20 core measurably faster with Deep, never pushing travel past a quarter",
-     87942
-    ]
-   ]
-  },
-  "src/features/drill-gear/twinBitPace.test.ts": {
-   "feature": "drill-gear",
-   "runs": 31,
-   "lastMs": 155365,
-   "p50Ms": 203278,
-   "p95Ms": 3130160,
-   "passRate": 0.9354838709677419,
-   "lastStatus": "passed",
-   "lastRunId": 1792735738681,
-   "lastFailure": {
-    "runId": 1792405438366,
-    "sha": "a47edaf9872878eaf90da1a47553db53e3a7e078",
-    "at": "2026-10-19T07:52:23Z",
-    "tests": [
-     "twin-bit pace (balance:twin-bit, GD lock on #257) mines exactly the bare cell sequence on planet 10 with the head mounted and drive 0"
-    ]
-   },
-   "flaky": false,
-   "slowest": [
-    [
-     "twin-bit pace (balance:twin-bit, GD lock on #257) reaches planet 7 core no faster than 0.98x the bare time with the twin bit mounted",
-     86325
-    ],
-    [
-     "twin-bit pace (balance:twin-bit, GD lock on #257) reaches planet 10 core no faster than 0.98x the bare time with the twin bit mounted",
-     68894
-    ]
-   ]
-  },
-  "src/features/extraction/drainIncomeRate.test.ts": {
-   "feature": "extraction",
-   "runs": 32,
-   "lastMs": 69,
-   "p50Ms": 79,
-   "p95Ms": 163,
-   "passRate": 1,
-   "lastStatus": "passed",
-   "lastRunId": 1792735738681,
-   "lastFailure": null,
-   "flaky": false,
-   "slowest": []
-  },
-  "src/features/extraction/gatesFixture.test.ts": {
-   "feature": "extraction",
-   "runs": 32,
-   "lastMs": 84,
-   "p50Ms": 99,
-   "p95Ms": 150,
-   "passRate": 1,
-   "lastStatus": "passed",
-   "lastRunId": 1792735738681,
-   "lastFailure": null,
-   "flaky": false,
-   "slowest": []
-  },
-  "src/features/extraction/incomeRateClamp.test.ts": {
-   "feature": "extraction",
-   "runs": 32,
-   "lastMs": 3,
-   "p50Ms": 3,
-   "p95Ms": 3,
-   "passRate": 1,
-   "lastStatus": "passed",
-   "lastRunId": 1792735738681,
-   "lastFailure": null,
-   "flaky": false,
-   "slowest": []
-  },
-  "src/features/extraction/laneRows.test.ts": {
-   "feature": "extraction",
-   "runs": 32,
-   "lastMs": 36,
-   "p50Ms": 39,
-   "p95Ms": 114,
-   "passRate": 1,
-   "lastStatus": "passed",
-   "lastRunId": 1792735738681,
-   "lastFailure": null,
-   "flaky": false,
-   "slowest": []
-  },
-  "src/features/extraction/mineralDrain.test.ts": {
-   "feature": "extraction",
-   "runs": 32,
-   "lastMs": 134,
-   "p50Ms": 146,
-   "p95Ms": 320,
-   "passRate": 1,
-   "lastStatus": "passed",
-   "lastRunId": 1792735738681,
-   "lastFailure": null,
-   "flaky": false,
-   "slowest": []
-  },
-  "src/features/extraction/systems/drainPerMinute.test.ts": {
-   "feature": "extraction",
-   "runs": 32,
-   "lastMs": 658,
-   "p50Ms": 333,
-   "p95Ms": 770,
-   "passRate": 1,
-   "lastStatus": "passed",
-   "lastRunId": 1792735738681,
-   "lastFailure": null,
-   "flaky": false,
-   "slowest": [
-    [
-     "mineral drain per minute moves at most 15% of a full hold of the band ore in a minute at every Mark, P1 to P40",
-     657
-    ]
-   ]
-  },
-  "src/features/extraction/systems/extractionSales.test.ts": {
-   "feature": "extraction",
-   "runs": 32,
-   "lastMs": 69,
-   "p50Ms": 71,
-   "p95Ms": 166,
-   "passRate": 1,
-   "lastStatus": "passed",
-   "lastRunId": 1792735738681,
-   "lastFailure": null,
-   "flaky": false,
-   "slowest": []
-  },
-  "src/features/extraction/systems/nonYieldVerbs.test.ts": {
-   "feature": "extraction",
-   "runs": 32,
-   "lastMs": 253,
-   "p50Ms": 274,
-   "p95Ms": 492,
-   "passRate": 1,
-   "lastStatus": "passed",
-   "lastRunId": 1792735738681,
-   "lastFailure": null,
-   "flaky": false,
-   "slowest": [
-    [
-     "mineral drain Mark milestones never yield (#256, ticket 278) seed 83921: a second tap takes the same cells and pays the same ore as a plain use at the last Mark",
-     124
-    ]
-   ]
-  },
-  "src/features/extraction/systems/useResolution.test.ts": {
-   "feature": "extraction",
-   "runs": 32,
-   "lastMs": 391,
-   "p50Ms": 447,
-   "p95Ms": 906,
-   "passRate": 1,
-   "lastStatus": "passed",
-   "lastRunId": 1792735738681,
-   "lastFailure": null,
-   "flaky": false,
-   "slowest": [
-    [
-     "mineral drain Mark milestones (#256) at M3 the second press is a second tap and at M2 the same press waits out the cooldown, at 30 and 144 steps/s",
-     220
-    ],
-    [
-     "mineral drain Mark milestones (#256) a refused second tap costs nothing",
-     159
-    ]
-   ]
-  },
-  "src/features/ground-gun/debug.test.ts": {
-   "feature": "ground-gun",
-   "runs": 32,
-   "lastMs": 40,
-   "p50Ms": 35,
-   "p95Ms": 96,
-   "passRate": 1,
-   "lastStatus": "passed",
-   "lastRunId": 1792735738681,
-   "lastFailure": null,
-   "flaky": false,
-   "slowest": []
-  },
-  "src/features/ground-gun/store/fireKey.test.ts": {
-   "feature": "ground-gun",
-   "runs": 32,
-   "lastMs": 338,
-   "p50Ms": 314,
-   "p95Ms": 542,
-   "passRate": 1,
-   "lastStatus": "passed",
-   "lastRunId": 1792735738681,
-   "lastFailure": null,
-   "flaky": false,
-   "slowest": []
-  },
-  "src/features/ground-gun/store/fireLamp.test.ts": {
-   "feature": "ground-gun",
-   "runs": 32,
-   "lastMs": 142,
-   "p50Ms": 138,
-   "p95Ms": 310,
-   "passRate": 1,
-   "lastStatus": "passed",
-   "lastRunId": 1792735738681,
-   "lastFailure": null,
-   "flaky": false,
-   "slowest": []
-  },
-  "src/features/ground-gun/systems/boreGunLaw.test.ts": {
-   "feature": "ground-gun",
-   "runs": 32,
-   "lastMs": 90,
-   "p50Ms": 101,
-   "p95Ms": 230,
-   "passRate": 1,
-   "lastStatus": "passed",
-   "lastRunId": 1792735738681,
-   "lastFailure": null,
-   "flaky": false,
-   "slowest": []
-  },
-  "src/features/ground-gun/systems/boreGunModules.test.ts": {
-   "feature": "ground-gun",
-   "runs": 32,
-   "lastMs": 240,
-   "p50Ms": 267,
-   "p95Ms": 389,
-   "passRate": 1,
-   "lastStatus": "passed",
-   "lastRunId": 1792735738681,
-   "lastFailure": null,
-   "flaky": false,
-   "slowest": [
-    [
-     "ground-gun: the long barrel on the gun (ticket 318, #310 range ladder) still warns an uncased bore at Mastered, the hold cap later than with no hold",
-     160
-    ]
-   ]
-  },
-  "src/features/ground-gun/systems/boreGunProvider.test.ts": {
-   "feature": "ground-gun",
-   "runs": 32,
-   "lastMs": 13,
-   "p50Ms": 15,
-   "p95Ms": 37,
-   "passRate": 1,
-   "lastStatus": "passed",
-   "lastRunId": 1792735738681,
-   "lastFailure": null,
-   "flaky": false,
-   "slowest": []
-  },
-  "src/features/ground-gun/systems/borePickup.test.ts": {
-   "feature": "ground-gun",
-   "runs": 32,
-   "lastMs": 88,
-   "p50Ms": 98,
-   "p95Ms": 158,
-   "passRate": 1,
-   "lastStatus": "passed",
-   "lastRunId": 1792735738681,
-   "lastFailure": null,
-   "flaky": false,
-   "slowest": []
-  },
-  "src/features/ground-gun/systems/boughtModules.test.ts": {
-   "feature": "ground-gun",
-   "runs": 32,
-   "lastMs": 57,
-   "p50Ms": 53,
-   "p95Ms": 82,
-   "passRate": 1,
-   "lastStatus": "passed",
-   "lastRunId": 1792735738681,
-   "lastFailure": null,
-   "flaky": false,
-   "slowest": []
-  },
-  "src/features/ground-gun/systems/burstToggle.test.ts": {
-   "feature": "ground-gun",
-   "runs": 32,
-   "lastMs": 39,
-   "p50Ms": 38,
-   "p95Ms": 73,
-   "passRate": 1,
-   "lastStatus": "passed",
-   "lastRunId": 1792735738681,
-   "lastFailure": null,
-   "flaky": false,
-   "slowest": []
-  },
-  "src/features/ground-gun/systems/flushingShell.test.ts": {
-   "feature": "ground-gun",
-   "runs": 32,
-   "lastMs": 469,
-   "p50Ms": 461,
-   "p95Ms": 646,
-   "passRate": 1,
-   "lastStatus": "passed",
-   "lastRunId": 1792735738681,
-   "lastFailure": null,
-   "flaky": false,
-   "slowest": [
-    [
-     "ground-gun: the flushing shell (ticket 388 through the K-flush registry) gives nothing without the shell, to a burrower out of range, or with the guns off Auto",
-     176
-    ],
-    [
-     "ground-gun: the flushing shell (ticket 388 through the K-flush registry) gives a burrower in the turret's range the shiver's ticks, cut to its walk of flushRange",
-     125
-    ],
-    [
-     "ground-gun: the flushing shell (ticket 388 through the K-flush registry) drives the burrower out into the corridor within flushTicks of a thump, cutting no cell",
-     118
-    ]
-   ]
-  },
-  "src/features/ground-gun/systems/render/armouryMounts.test.ts": {
-   "feature": "ground-gun",
-   "runs": 33,
-   "lastMs": 9,
-   "p50Ms": 11,
-   "p95Ms": 16,
-   "passRate": 1,
-   "lastStatus": "passed",
-   "lastRunId": 1792735738681,
-   "lastFailure": null,
-   "flaky": false,
-   "slowest": []
-  },
-  "src/features/ground-gun/systems/render/boreGunLook.test.ts": {
-   "feature": "ground-gun",
-   "runs": 33,
-   "lastMs": 7,
-   "p50Ms": 8,
-   "p95Ms": 14,
-   "passRate": 1,
-   "lastStatus": "passed",
-   "lastRunId": 1792735738681,
-   "lastFailure": null,
-   "flaky": false,
-   "slowest": []
-  },
-  "src/features/ground-gun/systems/shoringShot.test.ts": {
-   "feature": "ground-gun",
-   "runs": 33,
-   "lastMs": 190,
-   "p50Ms": 159,
-   "p95Ms": 457,
-   "passRate": 1,
-   "lastStatus": "passed",
-   "lastRunId": 1792735738681,
-   "lastFailure": null,
-   "flaky": false,
-   "slowest": []
-  },
-  "src/features/ground-gun/systems/signatureGround.test.ts": {
-   "feature": "ground-gun",
-   "runs": 33,
-   "lastMs": 143,
-   "p50Ms": 167,
-   "p95Ms": 690,
-   "passRate": 1,
-   "lastStatus": "passed",
-   "lastRunId": 1792735738681,
-   "lastFailure": null,
-   "flaky": false,
-   "slowest": []
-  },
-  "src/features/ground-gun/systems/signatureShapes.test.ts": {
-   "feature": "ground-gun",
-   "runs": 32,
-   "lastMs": 287,
-   "p50Ms": 319,
-   "p95Ms": 862,
-   "passRate": 1,
-   "lastStatus": "passed",
-   "lastRunId": 1792735738681,
-   "lastFailure": null,
-   "flaky": false,
-   "slowest": []
-  },
-  "src/features/ground-gun/systems/turretModules.test.ts": {
-   "feature": "ground-gun",
-   "runs": 33,
-   "lastMs": 233,
-   "p50Ms": 254,
-   "p95Ms": 353,
-   "passRate": 1,
-   "lastStatus": "passed",
-   "lastRunId": 1792735738681,
-   "lastFailure": null,
-   "flaky": false,
-   "slowest": [
-    [
-     "ground-gun: an unattached auto_guns module never acts (ticket 388, #319 GD Q4) acts only while the guns are mounted and the module is owned and attached",
-     133
-    ]
-   ]
-  },
-  "src/features/ground-gun/systems/turretShapes.test.ts": {
-   "feature": "ground-gun",
-   "runs": 32,
-   "lastMs": 103,
-   "p50Ms": 125,
-   "p95Ms": 356,
-   "passRate": 1,
-   "lastStatus": "passed",
-   "lastRunId": 1792735738681,
-   "lastFailure": null,
-   "flaky": false,
-   "slowest": []
-  },
-  "src/features/ground-gun/ui/fireGauge.test.ts": {
-   "feature": "ground-gun",
-   "runs": 32,
-   "lastMs": 6,
-   "p50Ms": 8,
-   "p95Ms": 25,
-   "passRate": 1,
-   "lastStatus": "passed",
-   "lastRunId": 1792735738681,
-   "lastFailure": null,
-   "flaky": false,
-   "slowest": []
-  },
-  "src/features/loadFeatures.test.ts": {
-   "feature": "slice-loader",
-   "runs": 34,
-   "lastMs": 3,
-   "p50Ms": 3,
-   "p95Ms": 7,
-   "passRate": 1,
-   "lastStatus": "passed",
-   "lastRunId": 1792735738681,
-   "lastFailure": null,
-   "flaky": false,
-   "slowest": []
-  },
-  "src/features/materials/systems/materialTable.test.ts": {
-   "feature": "materials",
-   "runs": 31,
-   "lastMs": 19,
-   "p50Ms": 13,
-   "p95Ms": 26,
-   "passRate": 1,
-   "lastStatus": "passed",
-   "lastRunId": 1792735738681,
-   "lastFailure": null,
-   "flaky": false,
-   "slowest": []
-  },
-  "src/features/mining-gates/debug.test.ts": {
-   "feature": "mining-gates",
-   "runs": 32,
-   "lastMs": 1517,
-   "p50Ms": 1617,
-   "p95Ms": 2691,
-   "passRate": 1,
-   "lastStatus": "passed",
-   "lastRunId": 1792735738681,
-   "lastFailure": null,
-   "flaky": false,
-   "slowest": [
-    [
-     "mining gates: debug actions counts each seed's dynamite-gated tiles and says whether the act has a dynamite family",
-     1480
-    ]
-   ]
-  },
-  "src/features/mining-gates/systems/botExtractorBuys.test.ts": {
-   "feature": "mining-gates",
-   "runs": 29,
-   "lastMs": 6765,
-   "p50Ms": 8092,
-   "p95Ms": 15241,
-   "passRate": 0.9655172413793104,
-   "lastStatus": "passed",
-   "lastRunId": 1792735738681,
-   "lastFailure": {
-    "runId": 1792573711044,
-    "sha": "35beab70853ee558e5d86707af9f6a7cadb48f07",
-    "at": "2026-10-21T07:16:35Z",
-    "tests": [
-     "bot: extractor buys (ticket 296, #142 acceptance 7) researches the node and buys the extractor on its planet before any track level"
-    ]
-   },
-   "flaky": false,
-   "slowest": [
-    [
-     "bot: extractor buys (ticket 296, #142 acceptance 7) researches the node and buys the extractor on its planet before any track level",
-     6745
-    ]
-   ]
-  },
-  "src/features/mining-gates/systems/botExtractors.test.ts": {
-   "feature": "mining-gates",
-   "runs": 29,
-   "lastMs": 176,
-   "p50Ms": 212,
-   "p95Ms": 330,
-   "passRate": 0.9310344827586207,
-   "lastStatus": "passed",
-   "lastRunId": 1792735738681,
-   "lastFailure": {
-    "runId": 1792210844435,
-    "sha": "8c31e735e996cd2dd15a15acfefa40bd8496ccf5",
-    "at": "2026-10-16T23:37:54Z",
-    "tests": [
-     "bot: extractor walls opens a planet 7 cell with its own rig.resonance and logs it cleared by the extractor",
-     "bot: extractor walls opens a planet 19 cell with its own rig.acid_etcher and logs it cleared by the extractor"
-    ]
-   },
-   "flaky": false,
-   "slowest": []
-  },
-  "src/features/mining-gates/systems/botGates.test.ts": {
-   "feature": "mining-gates",
-   "runs": 29,
-   "lastMs": 333,
-   "p50Ms": 306,
-   "p95Ms": 403,
-   "passRate": 0.9310344827586207,
-   "lastStatus": "passed",
-   "lastRunId": 1792735738681,
-   "lastFailure": {
-    "runId": 1792210844435,
-    "sha": "8c31e735e996cd2dd15a15acfefa40bd8496ccf5",
-    "at": "2026-10-16T23:37:54Z",
-    "tests": [
-     "bot: dynamite-gated shells and gate walls blasts a shell open with a charge that frees it, logged as cleared by dynamite",
-     "bot: dynamite-gated shells and gate walls wants the size a shell needs when it carries none, and leaves the shell standing",
-     "bot: dynamite-gated shells and gate walls never blasts a shell under the comparison policy",
-     "bot: gate_blocked_no_route (GD ruling on ticket 237) notes no stall for a shell that waits for a restock"
-    ]
-   },
-   "flaky": false,
-   "slowest": [
-    [
-     "bot: dynamite-gated shells and gate walls blasts a shell open with a charge that frees it, logged as cleared by dynamite",
-     196
-    ]
-   ]
-  },
-  "src/features/mining-gates/systems/canMine.test.ts": {
-   "feature": "mining-gates",
-   "runs": 29,
-   "lastMs": 154,
-   "p50Ms": 136,
-   "p95Ms": 267,
-   "passRate": 1,
-   "lastStatus": "passed",
-   "lastRunId": 1792735738681,
-   "lastFailure": null,
-   "flaky": false,
-   "slowest": []
-  },
-  "src/features/mining-gates/systems/dynamiteCells.test.ts": {
-   "feature": "mining-gates",
-   "runs": 28,
-   "lastMs": 2,
-   "p50Ms": 3,
-   "p95Ms": 5,
-   "passRate": 1,
-   "lastStatus": "passed",
-   "lastRunId": 1792735738681,
-   "lastFailure": null,
-   "flaky": false,
-   "slowest": []
-  },
-  "src/features/mining-gates/systems/extractorRules.test.ts": {
-   "feature": "mining-gates",
-   "runs": 29,
-   "lastMs": 274,
-   "p50Ms": 311,
-   "p95Ms": 463,
-   "passRate": 1,
-   "lastStatus": "passed",
-   "lastRunId": 1792735738681,
-   "lastFailure": null,
-   "flaky": false,
-   "slowest": [
-    [
-     "extractor refills and resets refills the canisters with the recharge at the dock, and says how many",
-     121
-    ]
-   ]
-  },
-  "src/features/mining-gates/systems/extractorVerbs.test.ts": {
-   "feature": "mining-gates",
-   "runs": 29,
-   "lastMs": 479,
-   "p50Ms": 561,
-   "p95Ms": 1827,
-   "passRate": 1,
-   "lastStatus": "passed",
-   "lastRunId": 1792735738681,
-   "lastFailure": null,
-   "flaky": false,
-   "slowest": [
-    [
-     "extractor verbs: tune rings a touched resonance cell after the tune, then lets the drill cut it",
-     122
-    ]
-   ]
-  },
-  "src/features/mining-gates/systems/gateLedger.test.ts": {
-   "feature": "mining-gates",
-   "runs": 29,
-   "lastMs": 340,
-   "p50Ms": 306,
-   "p95Ms": 404,
-   "passRate": 0.9310344827586207,
-   "lastStatus": "passed",
-   "lastRunId": 1792735738681,
-   "lastFailure": {
-    "runId": 1792210844435,
-    "sha": "8c31e735e996cd2dd15a15acfefa40bd8496ccf5",
-    "at": "2026-10-16T23:37:54Z",
-    "tests": [
-     "gate ledger records a shell a charge broke as cleared by dynamite"
-    ]
-   },
-   "flaky": false,
-   "slowest": [
-    [
-     "gate ledger records a dense cell the drill broke as cleared by the drill, at its sale price",
-     100
-    ]
-   ]
-  },
-  "src/features/mining-gates/systems/gatesNearDock.test.ts": {
-   "feature": "mining-gates",
-   "runs": 31,
-   "lastMs": 34,
-   "p50Ms": 27,
-   "p95Ms": 52,
-   "passRate": 1,
-   "lastStatus": "passed",
-   "lastRunId": 1792735738681,
-   "lastFailure": null,
-   "flaky": false,
-   "slowest": []
-  },
-  "src/features/mining-gates/systems/gateTable.test.ts": {
-   "feature": "mining-gates",
-   "runs": 29,
-   "lastMs": 515,
-   "p50Ms": 546,
-   "p95Ms": 705,
-   "passRate": 1,
-   "lastStatus": "passed",
-   "lastRunId": 1792735738681,
-   "lastFailure": null,
-   "flaky": false,
-   "slowest": [
-    [
-     "gate table holds every item to 15% of a band's ore value on planets 1 to 200 (the guard)",
-     493
-    ]
-   ]
-  },
-  "src/features/mining-gates/systems/render/cellGateLooks.test.ts": {
-   "feature": "mining-gates",
-   "runs": 31,
-   "lastMs": 313,
-   "p50Ms": 368,
-   "p95Ms": 1665,
-   "passRate": 0.9354838709677419,
-   "lastStatus": "passed",
-   "lastRunId": 1792735738681,
-   "lastFailure": {
-    "runId": 1792210844435,
-    "sha": "8c31e735e996cd2dd15a15acfefa40bd8496ccf5",
-    "at": "2026-10-16T23:37:54Z",
-    "tests": [
-     "gate looks in the ground shows a dynamite cell as the cracked shell, locked, which no tip opens",
-     "gate looks at the chunk mesh draws a gated cell's look into its tile's bits"
-    ]
-   },
-   "flaky": false,
-   "slowest": [
-    [
-     "gate looks in the ground shows a dynamite cell as the cracked shell, locked, which no tip opens",
-     120
-    ],
-    [
-     "gate looks at the chunk mesh draws a gated cell's look into its tile's bits",
-     103
-    ]
-   ]
-  },
-  "src/features/mining-gates/systems/render/lockMarkers.test.ts": {
-   "feature": "mining-gates",
-   "runs": 31,
-   "lastMs": 912,
-   "p50Ms": 346,
-   "p95Ms": 912,
-   "passRate": 0.9354838709677419,
-   "lastStatus": "passed",
-   "lastRunId": 1792735738681,
-   "lastFailure": {
-    "runId": 1792210844435,
-    "sha": "8c31e735e996cd2dd15a15acfefa40bd8496ccf5",
-    "at": "2026-10-16T23:37:54Z",
-    "tests": [
-     "lock markers seals a dynamite cell in a cracked shell"
-    ]
-   },
-   "flaky": false,
-   "slowest": [
-    [
-     "lock markers seals a dynamite cell in a cracked shell",
-     612
-    ],
-    [
-     "lock markers tints a signature cell's marker with its act, and an ordinary one not at all",
-     106
-    ],
-    [
-     "lock markers rims a dense cell, and opens the rim once the last major cuts it",
-     103
-    ]
-   ]
-  },
-  "src/features/mining-gates/systems/rigs.test.ts": {
-   "feature": "mining-gates",
-   "runs": 28,
-   "lastMs": 6,
-   "p50Ms": 7,
-   "p95Ms": 8,
-   "passRate": 1,
-   "lastStatus": "passed",
-   "lastRunId": 1792735738681,
-   "lastFailure": null,
-   "flaky": false,
-   "slowest": []
-  },
-  "src/features/mining-gates/systems/rigSales.test.ts": {
-   "feature": "mining-gates",
-   "runs": 32,
-   "lastMs": 10,
-   "p50Ms": 12,
-   "p95Ms": 26,
-   "passRate": 1,
-   "lastStatus": "passed",
-   "lastRunId": 1792735738681,
-   "lastFailure": null,
-   "flaky": false,
-   "slowest": []
-  },
-  "src/features/mining-gates/systems/toolsAndGear.test.ts": {
-   "feature": "mining-gates",
-   "runs": 29,
-   "lastMs": 197,
-   "p50Ms": 227,
-   "p95Ms": 417,
-   "passRate": 0.9310344827586207,
-   "lastStatus": "passed",
-   "lastRunId": 1792735738681,
-   "lastFailure": {
-    "runId": 1792210844435,
-    "sha": "8c31e735e996cd2dd15a15acfefa40bd8496ccf5",
-    "at": "2026-10-16T23:37:54Z",
-    "tests": [
-     "gated cells against power-ups and drill gear leaves rig-gated, dynamite-gated and dense cells whole under a power-up edit, extractor or not",
-     "gated cells against power-ups and drill gear lets drill gear take no rig-gated or dynamite-gated cell the drill has no means for",
-     "gated cells against power-ups and drill gear reports each gated cell the gear met as gate_hit, as the drill does"
-    ]
-   },
-   "flaky": false,
-   "slowest": [
-    [
-     "gated cells against power-ups and drill gear leaves rig-gated, dynamite-gated and dense cells whole under a power-up edit, extractor or not",
-     156
-    ]
-   ]
-  },
-  "src/features/planet-mix/fieldArcsBench.test.ts": {
-   "feature": "planet-mix",
-   "runs": 30,
-   "lastMs": 110,
-   "p50Ms": 140,
-   "p95Ms": 312,
-   "passRate": 1,
-   "lastStatus": "passed",
-   "lastRunId": 1792735738681,
-   "lastFailure": null,
-   "flaky": false,
-   "slowest": [
-    [
-     "field arcs bench times a P43 descent at top speed on one buffer, re-picking only at chunk crossings",
-     109
-    ]
-   ]
-  },
-  "src/features/planet-mix/histogramCheck.test.ts": {
-   "feature": "planet-mix",
-   "runs": 28,
-   "lastMs": 16,
-   "p50Ms": 11,
-   "p95Ms": 16,
-   "passRate": 1,
-   "lastStatus": "passed",
-   "lastRunId": 1792735738681,
-   "lastFailure": null,
-   "flaky": false,
-   "slowest": []
-  },
-  "src/features/planet-mix/magneticBandValue.test.ts": {
-   "feature": "planet-mix",
-   "runs": 31,
-   "lastMs": 60657,
-   "p50Ms": 73814,
-   "p95Ms": 242967,
-   "passRate": 1,
-   "lastStatus": "passed",
-   "lastRunId": 1792735738681,
-   "lastFailure": null,
-   "flaky": false,
-   "slowest": [
-    [
-     "magnetic planet band value (balance:magnetic-planet) keeps each band of planet 32 within 4% of the class-off planet's value on every seed",
-     23068
-    ],
-    [
-     "magnetic planet band value (balance:magnetic-planet) keeps each band of planet 28 within 4% of the class-off planet's value on every seed",
-     19303
-    ],
-    [
-     "magnetic planet band value (balance:magnetic-planet) keeps each band of planet 25 within 4% of the class-off planet's value on every seed",
-     18285
-    ]
-   ]
-  },
-  "src/features/planet-mix/magneticClassOff.test.ts": {
-   "feature": "planet-mix",
-   "runs": 28,
-   "lastMs": 45,
-   "p50Ms": 48,
-   "p95Ms": 80,
-   "passRate": 1,
-   "lastStatus": "passed",
-   "lastRunId": 1792735738681,
-   "lastFailure": null,
-   "flaky": false,
-   "slowest": []
-  },
-  "src/features/planet-mix/magneticPlanetPace.test.ts": {
-   "feature": "planet-mix",
-   "runs": 31,
-   "lastMs": 2224663,
-   "p50Ms": 501622,
-   "p95Ms": 1861152,
-   "passRate": 0.9354838709677419,
-   "lastStatus": "passed",
-   "lastRunId": 1792735738681,
-   "lastFailure": {
-    "runId": 1792573711044,
-    "sha": "35beab70853ee558e5d86707af9f6a7cadb48f07",
-    "at": "2026-10-21T07:16:35Z",
-    "tests": [
-     "magnetic planet pace (balance:magnetic-planet, GD lock on #258) takes planet 25 at most 10% longer without the bit than with the class off, never faster",
-     "magnetic planet pace (balance:magnetic-planet, GD lock on #258) takes planet 28 at most 10% longer without the bit than with the class off, never faster",
-     "magnetic planet pace (balance:magnetic-planet, GD lock on #258) takes planet 32 at most 10% longer without the bit than with the class off, never faster",
-     "magnetic planet pace (balance:magnetic-planet, GD lock on #258) takes planet 28 with the dielectric bit at least 0.98x the class-off time",
-     "magnetic planet pace (balance:magnetic-planet, GD lock on #258) earns at most 15% more per minute on magnetic planet 28 than with the class off"
-    ]
-   },
-   "flaky": false,
-   "slowest": [
-    [
-     "magnetic planet pace (balance:magnetic-planet, GD lock on #258) takes planet 32 at most 10% longer without the bit than with the class off, never faster",
-     178413
-    ],
-    [
-     "magnetic planet pace (balance:magnetic-planet, GD lock on #258) takes planet 28 at most 10% longer without the bit than with the class off, never faster",
-     141213
-    ],
-    [
-     "magnetic planet pace (balance:magnetic-planet, GD lock on #258) takes planet 25 at most 10% longer without the bit than with the class off, never faster",
-     138605
-    ]
-   ]
-  },
-  "src/features/planet-mix/magneticPlanetRuns.test.ts": {
-   "feature": "planet-mix",
-   "runs": 31,
-   "lastMs": 35,
-   "p50Ms": 49,
-   "p95Ms": 92,
-   "passRate": 1,
-   "lastStatus": "passed",
-   "lastRunId": 1792735738681,
-   "lastFailure": null,
-   "flaky": false,
-   "slowest": []
-  },
-  "src/features/planet-mix/mixHistogram.test.ts": {
-   "feature": "planet-mix",
-   "runs": 31,
-   "lastMs": 94008,
-   "p50Ms": 97971,
-   "p95Ms": 135288,
-   "passRate": 0.9032258064516129,
-   "lastStatus": "passed",
-   "lastRunId": 1792735738681,
-   "lastFailure": {
-    "runId": 1792250237910,
-    "sha": "0a05199e7073d5d4c1baa4432eb2555cb7a13984",
-    "at": "2026-10-17T13:12:54Z",
-    "tests": [
-     "planet ore histogram matches the mix on a fresh P3, pooled over the pacing seeds",
-     "planet ore histogram matches the mix on a fresh P9, pooled over the pacing seeds",
-     "planet ore histogram matches the mix on a fresh P41, pooled over the pacing seeds"
-    ]
-   },
-   "flaky": false,
-   "slowest": [
-    [
-     "planet ore histogram matches the mix on a fresh story planet, pooled over 16 seeds",
-     43166
-    ],
-    [
-     "planet ore histogram matches the mix on a fresh P41, pooled over the pacing seeds",
-     9755
-    ],
-    [
-     "planet ore histogram matches the mix on P41 on the legacy rows, pooled over the pacing seeds",
-     8416
-    ]
-   ]
-  },
-  "src/features/planet-mix/mixReportRows.test.ts": {
-   "feature": "planet-mix",
-   "runs": 28,
-   "lastMs": 6,
-   "p50Ms": 5,
-   "p95Ms": 8,
-   "passRate": 1,
-   "lastStatus": "passed",
-   "lastRunId": 1792735738681,
-   "lastFailure": null,
-   "flaky": false,
-   "slowest": []
-  },
-  "src/features/planet-mix/sceneBudget.test.ts": {
-   "feature": "planet-mix",
-   "runs": 33,
-   "lastMs": 3,
-   "p50Ms": 4,
-   "p95Ms": 9,
-   "passRate": 1,
-   "lastStatus": "passed",
-   "lastRunId": 1792735738681,
-   "lastFailure": null,
-   "flaky": false,
-   "slowest": []
-  },
-  "src/features/planet-mix/systems/electrifiedCells.test.ts": {
-   "feature": "planet-mix",
-   "runs": 31,
-   "lastMs": 630,
-   "p50Ms": 725,
-   "p95Ms": 1492,
-   "passRate": 1,
-   "lastStatus": "passed",
-   "lastRunId": 1792735738681,
-   "lastFailure": null,
-   "flaky": false,
-   "slowest": [
-    [
-     "electrified cells canMine never refuses an electrified cell",
-     431
-    ]
-   ]
-  },
-  "src/features/planet-mix/systems/magneticFields.test.ts": {
-   "feature": "planet-mix",
-   "runs": 28,
-   "lastMs": 504,
-   "p50Ms": 530,
-   "p95Ms": 897,
-   "passRate": 1,
-   "lastStatus": "passed",
-   "lastRunId": 1792735738681,
-   "lastFailure": null,
-   "flaky": false,
-   "slowest": [
-    [
-     "magnetic fields throws no field and electrifies no cell off the magnetic planets, P30 included",
-     273
-    ],
-    [
-     "magnetic fields two sessions on one planet seed get byte-identical fields and electrified cells",
-     106
-    ]
-   ]
-  },
-  "src/features/planet-mix/systems/mixRoll.test.ts": {
-   "feature": "planet-mix",
-   "runs": 31,
-   "lastMs": 1471,
-   "p50Ms": 1477,
-   "p95Ms": 2780,
-   "passRate": 1,
-   "lastStatus": "passed",
-   "lastRunId": 1792735738681,
-   "lastFailure": null,
-   "flaky": false,
-   "slowest": [
-    [
-     "planet mix fold paints only the mix's types, band by band, on a Fire and a Hollow planet",
-     499
-    ],
-    [
-     "planet mix fold on the rarity rows (ticket 445) paints only the mix's types, band by band, on a stamped Fire and Hollow planet",
-     475
-    ],
-    [
-     "planet mix fold leaves P1 and P2 byte-identical to the lead roll alone",
-     217
-    ]
-   ]
-  },
-  "src/features/planet-mix/systems/oreMix.test.ts": {
-   "feature": "planet-mix",
-   "runs": 28,
-   "lastMs": 301,
-   "p50Ms": 363,
-   "p95Ms": 806,
-   "passRate": 1,
-   "lastStatus": "passed",
-   "lastRunId": 1792735738681,
-   "lastFailure": null,
-   "flaky": false,
-   "slowest": []
-  },
-  "src/features/planet-mix/systems/planetActs.test.ts": {
-   "feature": "planet-mix",
-   "runs": 28,
-   "lastMs": 222,
-   "p50Ms": 201,
-   "p95Ms": 540,
-   "passRate": 1,
-   "lastStatus": "passed",
-   "lastRunId": 1792735738681,
-   "lastFailure": null,
-   "flaky": false,
-   "slowest": []
-  },
-  "src/features/planet-mix/systems/planetCard.test.ts": {
-   "feature": "planet-mix",
-   "runs": 28,
-   "lastMs": 2,
-   "p50Ms": 3,
-   "p95Ms": 6,
-   "passRate": 1,
-   "lastStatus": "passed",
-   "lastRunId": 1792735738681,
-   "lastFailure": null,
-   "flaky": false,
-   "slowest": []
-  },
-  "src/features/planet-mix/systems/planetClass.test.ts": {
-   "feature": "planet-mix",
-   "runs": 28,
-   "lastMs": 4,
-   "p50Ms": 4,
-   "p95Ms": 8,
-   "passRate": 1,
-   "lastStatus": "passed",
-   "lastRunId": 1792735738681,
-   "lastFailure": null,
-   "flaky": false,
-   "slowest": []
-  },
-  "src/features/planet-mix/systems/render/auroraBand.test.ts": {
-   "feature": "planet-mix",
-   "runs": 33,
-   "lastMs": 24,
-   "p50Ms": 4,
-   "p95Ms": 11,
-   "passRate": 1,
-   "lastStatus": "passed",
-   "lastRunId": 1792735738681,
-   "lastFailure": null,
-   "flaky": false,
-   "slowest": []
-  },
-  "src/features/planet-mix/systems/render/fieldArcBuffer.test.ts": {
-   "feature": "planet-mix",
-   "runs": 30,
-   "lastMs": 323,
-   "p50Ms": 289,
-   "p95Ms": 494,
-   "passRate": 1,
-   "lastStatus": "passed",
-   "lastRunId": 1792735738681,
-   "lastFailure": null,
-   "flaky": false,
-   "slowest": [
-    [
-     "field arc buffer rewrites as often at 30 and at 144 frames a second",
-     112
-    ]
-   ]
-  },
-  "src/features/planet-mix/systems/render/magneticArt.test.ts": {
-   "feature": "planet-mix",
-   "runs": 33,
-   "lastMs": 3,
-   "p50Ms": 4,
-   "p95Ms": 10,
-   "passRate": 1,
-   "lastStatus": "passed",
-   "lastRunId": 1792735738681,
-   "lastFailure": null,
-   "flaky": false,
-   "slowest": []
-  },
-  "src/features/planet-mix/systems/signatureTag.test.ts": {
-   "feature": "planet-mix",
-   "runs": 31,
-   "lastMs": 160,
-   "p50Ms": 157,
-   "p95Ms": 409,
-   "passRate": 1,
-   "lastStatus": "passed",
-   "lastRunId": 1792735738681,
-   "lastFailure": null,
-   "flaky": false,
-   "slowest": [
-    [
-     "planet mix signature tag claims every signature entry of the mix and no other entry, P1 to P200",
-     157
-    ]
-   ]
-  },
-  "src/features/planet-mix/systems/themeRows.test.ts": {
-   "feature": "planet-mix",
-   "runs": 28,
-   "lastMs": 5,
-   "p50Ms": 4,
-   "p95Ms": 8,
-   "passRate": 1,
-   "lastStatus": "passed",
-   "lastRunId": 1792735738681,
-   "lastFailure": null,
-   "flaky": false,
-   "slowest": []
-  },
-  "src/features/sensing/debug.test.ts": {
-   "feature": "sensing",
-   "runs": 32,
-   "lastMs": 3,
-   "p50Ms": 4,
-   "p95Ms": 7,
-   "passRate": 1,
-   "lastStatus": "passed",
-   "lastRunId": 1792735738681,
-   "lastFailure": null,
-   "flaky": false,
-   "slowest": []
-  },
-  "src/features/sensing/sceneBudget.test.ts": {
-   "feature": "sensing",
-   "runs": 32,
-   "lastMs": 3,
-   "p50Ms": 3,
-   "p95Ms": 6,
-   "passRate": 1,
-   "lastStatus": "passed",
-   "lastRunId": 1792735738681,
-   "lastFailure": null,
-   "flaky": false,
-   "slowest": []
-  },
-  "src/features/sensing/systems/assayLens.test.ts": {
-   "feature": "sensing",
-   "runs": 31,
-   "lastMs": 130,
-   "p50Ms": 124,
-   "p95Ms": 296,
-   "passRate": 1,
-   "lastStatus": "passed",
-   "lastRunId": 1792735738681,
-   "lastFailure": null,
-   "flaky": false,
-   "slowest": []
-  },
-  "src/features/sensing/systems/deepStriker.test.ts": {
-   "feature": "sensing",
-   "runs": 32,
-   "lastMs": 81,
-   "p50Ms": 88,
-   "p95Ms": 138,
-   "passRate": 1,
-   "lastStatus": "passed",
-   "lastRunId": 1792735738681,
-   "lastFailure": null,
-   "flaky": false,
-   "slowest": []
-  },
-  "src/features/sensing/systems/echoPing.test.ts": {
-   "feature": "sensing",
-   "runs": 31,
-   "lastMs": 1693,
-   "p50Ms": 595,
-   "p95Ms": 1415,
-   "passRate": 1,
-   "lastStatus": "passed",
-   "lastRunId": 1792735738681,
-   "lastFailure": null,
-   "flaky": false,
-   "slowest": [
-    [
-     "echo sounder ping badges exactly the ore cells a gate holds on a gated planet, with that gate",
-     1000
-    ],
-    [
-     "echo sounder ping marks the lava pockets of a heat planet as lava",
-     445
-    ],
-    [
-     "echo sounder ping marks the open cells of a cave inside its radius as cave",
-     162
-    ]
-   ]
-  },
-  "src/features/sensing/systems/gatesFixture.test.ts": {
-   "feature": "sensing",
-   "runs": 32,
-   "lastMs": 179,
-   "p50Ms": 179,
-   "p95Ms": 225,
-   "passRate": 1,
-   "lastStatus": "passed",
-   "lastRunId": 1792735738681,
-   "lastFailure": null,
-   "flaky": false,
-   "slowest": []
-  },
-  "src/features/sensing/systems/passiveReads.test.ts": {
-   "feature": "sensing",
-   "runs": 32,
-   "lastMs": 275,
-   "p50Ms": 304,
-   "p95Ms": 576,
-   "passRate": 1,
-   "lastStatus": "passed",
-   "lastRunId": 1792735738681,
-   "lastFailure": null,
-   "flaky": false,
-   "slowest": []
-  },
-  "src/features/sensing/systems/revealBoard.test.ts": {
-   "feature": "sensing",
-   "runs": 32,
-   "lastMs": 329,
-   "p50Ms": 197,
-   "p95Ms": 593,
-   "passRate": 1,
-   "lastStatus": "passed",
-   "lastRunId": 1792735738681,
-   "lastFailure": null,
-   "flaky": false,
-   "slowest": [
-    [
-     "sensing reveal board marks the open cells round the miner when the local player pings",
-     100
-    ]
-   ]
-  },
-  "src/features/sensing/systems/sensingFork.test.ts": {
-   "feature": "sensing",
-   "runs": 32,
-   "lastMs": 115,
-   "p50Ms": 135,
-   "p95Ms": 389,
-   "passRate": 1,
-   "lastStatus": "passed",
-   "lastRunId": 1792735738681,
-   "lastFailure": null,
-   "flaky": false,
-   "slowest": []
-  },
-  "src/features/sensing/systems/sensingView.test.ts": {
-   "feature": "sensing",
-   "runs": 32,
-   "lastMs": 130,
-   "p50Ms": 91,
-   "p95Ms": 142,
-   "passRate": 1,
-   "lastStatus": "passed",
-   "lastRunId": 1792735738681,
-   "lastFailure": null,
-   "flaky": false,
-   "slowest": []
-  },
-  "src/features/sensing/systems/soundingPing.test.ts": {
-   "feature": "sensing",
-   "runs": 32,
-   "lastMs": 144,
-   "p50Ms": 161,
-   "p95Ms": 286,
-   "passRate": 1,
-   "lastStatus": "passed",
-   "lastRunId": 1792735738681,
-   "lastFailure": null,
-   "flaky": false,
-   "slowest": []
-  },
-  "src/features/sensing/systems/useResolution.test.ts": {
-   "feature": "sensing",
-   "runs": 32,
-   "lastMs": 2374,
-   "p50Ms": 2723,
-   "p95Ms": 5169,
-   "passRate": 1,
-   "lastStatus": "passed",
-   "lastRunId": 1792735738681,
-   "lastFailure": null,
-   "flaky": false,
-   "slowest": [
-    [
-     "sensing Mark milestones (#256): Mark 6 hold signal buoy: facing down, the tap and the hold drop the buoy on different tiles",
-     378
-    ],
-    [
-     "sensing Mark milestones (#256): Mark 3 second tap, at 30 and 144 steps/s signal buoy: at M3 the second tap drops the buoy one ring ahead and at M2 where it stands",
-     276
-    ],
-    [
-     "sensing Mark milestones (#256): Mark 9 sibling-link the signal buoy's drop lobs a slotted flare that maps half as wide",
-     240
-    ]
-   ]
-  },
-  "src/features/tech-tree/debug.test.ts": {
-   "feature": "tech-tree",
-   "runs": 33,
-   "lastMs": 97,
-   "p50Ms": 99,
-   "p95Ms": 180,
-   "passRate": 1,
-   "lastStatus": "passed",
-   "lastRunId": 1792735738681,
-   "lastFailure": null,
-   "flaky": false,
-   "slowest": []
-  },
-  "src/features/tech-tree/forkBranches.vision.test.ts": {
-   "feature": "tech-tree",
-   "runs": 33,
-   "lastMs": 214,
-   "p50Ms": 220,
-   "p95Ms": 429,
-   "passRate": 1,
-   "lastStatus": "passed",
-   "lastRunId": 1792735738681,
-   "lastFailure": null,
-   "flaky": false,
-   "slowest": []
-  },
-  "src/features/tech-tree/forkMixRuns.test.ts": {
-   "feature": "tech-tree",
-   "runs": 33,
-   "lastMs": 6559,
-   "p50Ms": 8615,
-   "p95Ms": 28617,
-   "passRate": 1,
-   "lastStatus": "passed",
-   "lastRunId": 1792735738681,
-   "lastFailure": null,
-   "flaky": false,
-   "slowest": [
-    [
-     "tech tree: a run forced onto a whole lane plays the bot on the forced lane and keeps its pace from the start",
-     2896
-    ],
-    [
-     "tech tree: a forced fork run reads the same numbers from a second run on the same branch and seed",
-     2257
-    ],
-    [
-     "tech tree: a forced fork run plays the bot on the forced branch and keeps its pace and action mix",
-     1392
-    ]
-   ]
-  },
-  "src/features/tech-tree/rigPieces.test.ts": {
-   "feature": "tech-tree",
-   "runs": 33,
-   "lastMs": 25,
-   "p50Ms": 16,
-   "p95Ms": 27,
-   "passRate": 1,
-   "lastStatus": "passed",
-   "lastRunId": 1792735738681,
-   "lastFailure": null,
-   "flaky": false,
-   "slowest": []
-  },
-  "src/features/tech-tree/rushHand.test.ts": {
-   "feature": "tech-tree",
-   "runs": 33,
-   "lastMs": 144,
-   "p50Ms": 169,
-   "p95Ms": 1492,
-   "passRate": 1,
-   "lastStatus": "passed",
-   "lastRunId": 1792735738681,
-   "lastFailure": null,
-   "flaky": false,
-   "slowest": []
-  },
-  "src/features/tech-tree/store/treeScreenStore.test.ts": {
-   "feature": "tech-tree",
-   "runs": 33,
-   "lastMs": 19,
-   "p50Ms": 21,
-   "p95Ms": 215,
-   "passRate": 1,
-   "lastStatus": "passed",
-   "lastRunId": 1792735738681,
-   "lastFailure": null,
-   "flaky": false,
-   "slowest": []
-  },
-  "src/features/tech-tree/systems/aethericCards.vision.test.ts": {
-   "feature": "tech-tree",
-   "runs": 33,
-   "lastMs": 45,
-   "p50Ms": 42,
-   "p95Ms": 223,
-   "passRate": 1,
-   "lastStatus": "passed",
-   "lastRunId": 1792735738681,
-   "lastFailure": null,
-   "flaky": false,
-   "slowest": []
-  },
-  "src/features/tech-tree/systems/aethericLane.test.ts": {
-   "feature": "tech-tree",
-   "runs": 33,
-   "lastMs": 31,
-   "p50Ms": 31,
-   "p95Ms": 53,
-   "passRate": 1,
-   "lastStatus": "passed",
-   "lastRunId": 1792735738681,
-   "lastFailure": null,
-   "flaky": false,
-   "slowest": []
-  },
-  "src/features/tech-tree/systems/anchorAffordability.test.ts": {
-   "feature": "tech-tree",
-   "runs": 33,
-   "lastMs": 13,
-   "p50Ms": 12,
-   "p95Ms": 34,
-   "passRate": 1,
-   "lastStatus": "passed",
-   "lastRunId": 1792735738681,
-   "lastFailure": null,
-   "flaky": false,
-   "slowest": []
-  },
-  "src/features/tech-tree/systems/forkBotPick.test.ts": {
-   "feature": "tech-tree",
-   "runs": 33,
-   "lastMs": 9317,
-   "p50Ms": 9442,
-   "p95Ms": 14170,
-   "passRate": 1,
-   "lastStatus": "passed",
-   "lastRunId": 1792735738681,
-   "lastFailure": null,
-   "flaky": false,
-   "slowest": [
-    [
-     "tech tree: the pacing bot's fork pick chooses Deep at the fork planet when the wallet pays",
-     9308
-    ]
-   ]
-  },
-  "src/features/tech-tree/systems/forkBranchCards.vision.test.ts": {
-   "feature": "tech-tree",
-   "runs": 33,
-   "lastMs": 59,
-   "p50Ms": 59,
-   "p95Ms": 118,
-   "passRate": 1,
-   "lastStatus": "passed",
-   "lastRunId": 1792735738681,
-   "lastFailure": null,
-   "flaky": false,
-   "slowest": []
-  },
-  "src/features/tech-tree/systems/forkChoice.test.ts": {
-   "feature": "tech-tree",
-   "runs": 33,
-   "lastMs": 126,
-   "p50Ms": 105,
-   "p95Ms": 347,
-   "passRate": 1,
-   "lastStatus": "passed",
-   "lastRunId": 1792735738681,
-   "lastFailure": null,
-   "flaky": false,
-   "slowest": []
-  },
-  "src/features/tech-tree/systems/forkCost.test.ts": {
-   "feature": "tech-tree",
-   "runs": 33,
-   "lastMs": 34,
-   "p50Ms": 41,
-   "p95Ms": 96,
-   "passRate": 1,
-   "lastStatus": "passed",
-   "lastRunId": 1792735738681,
-   "lastFailure": null,
-   "flaky": false,
-   "slowest": []
-  },
-  "src/features/tech-tree/systems/forkForce.test.ts": {
-   "feature": "tech-tree",
-   "runs": 33,
-   "lastMs": 27,
-   "p50Ms": 26,
-   "p95Ms": 111,
-   "passRate": 1,
-   "lastStatus": "passed",
-   "lastRunId": 1792735738681,
-   "lastFailure": null,
-   "flaky": false,
-   "slowest": []
-  },
-  "src/features/tech-tree/systems/forkMixMetrics.test.ts": {
-   "feature": "tech-tree",
-   "runs": 33,
-   "lastMs": 13,
-   "p50Ms": 18,
-   "p95Ms": 46,
-   "passRate": 1,
-   "lastStatus": "passed",
-   "lastRunId": 1792735738681,
-   "lastFailure": null,
-   "flaky": false,
-   "slowest": []
-  },
-  "src/features/tech-tree/systems/forkRechoice.spend.test.ts": {
-   "feature": "tech-tree",
-   "runs": 33,
-   "lastMs": 36,
-   "p50Ms": 40,
-   "p95Ms": 224,
-   "passRate": 1,
-   "lastStatus": "passed",
-   "lastRunId": 1792735738681,
-   "lastFailure": null,
-   "flaky": false,
-   "slowest": []
-  },
-  "src/features/tech-tree/systems/generatedCombos.test.ts": {
-   "feature": "tech-tree",
-   "runs": 32,
-   "lastMs": 49,
-   "p50Ms": 50,
-   "p95Ms": 144,
-   "passRate": 1,
-   "lastStatus": "passed",
-   "lastRunId": 1792735738681,
-   "lastFailure": null,
-   "flaky": false,
-   "slowest": []
-  },
-  "src/features/tech-tree/systems/itemMarks.test.ts": {
-   "feature": "tech-tree",
-   "runs": 33,
-   "lastMs": 61,
-   "p50Ms": 28,
-   "p95Ms": 59,
-   "passRate": 1,
-   "lastStatus": "passed",
-   "lastRunId": 1792735738681,
-   "lastFailure": null,
-   "flaky": false,
-   "slowest": []
-  },
-  "src/features/tech-tree/systems/itemShop.test.ts": {
-   "feature": "tech-tree",
-   "runs": 33,
-   "lastMs": 264,
-   "p50Ms": 185,
-   "p95Ms": 285,
-   "passRate": 1,
-   "lastStatus": "passed",
-   "lastRunId": 1792735738681,
-   "lastFailure": null,
-   "flaky": false,
-   "slowest": [
-    [
-     "tech tree: the bot buys what it researched (ticket 248) buys the item of every capability it researched, logging each purchase",
-     102
-    ]
-   ]
-  },
-  "src/features/tech-tree/systems/loadoutYieldCap.test.ts": {
-   "feature": "tech-tree",
-   "runs": 33,
-   "lastMs": 31,
-   "p50Ms": 26,
-   "p95Ms": 38,
-   "passRate": 1,
-   "lastStatus": "passed",
-   "lastRunId": 1792735738681,
-   "lastFailure": null,
-   "flaky": false,
-   "slowest": []
-  },
-  "src/features/tech-tree/systems/nodeCost.test.ts": {
-   "feature": "tech-tree",
-   "runs": 32,
-   "lastMs": 16,
-   "p50Ms": 15,
-   "p95Ms": 25,
-   "passRate": 1,
-   "lastStatus": "passed",
-   "lastRunId": 1792735738681,
-   "lastFailure": null,
-   "flaky": false,
-   "slowest": []
-  },
-  "src/features/tech-tree/systems/nodeSpendShare.diagnostic.test.ts": {
-   "feature": "tech-tree",
-   "runs": 33,
-   "lastMs": 0,
-   "p50Ms": 0,
-   "p95Ms": 0,
-   "passRate": 1,
-   "lastStatus": "passed",
-   "lastRunId": 1792735738681,
-   "lastFailure": null,
-   "flaky": false,
-   "slowest": []
-  },
-  "src/features/tech-tree/systems/priceOnly.test.ts": {
-   "feature": "tech-tree",
-   "runs": 33,
-   "lastMs": 275,
-   "p50Ms": 185,
-   "p95Ms": 333,
-   "passRate": 1,
-   "lastStatus": "passed",
-   "lastRunId": 1792735738681,
-   "lastFailure": null,
-   "flaky": false,
-   "slowest": []
-  },
-  "src/features/tech-tree/systems/render/forkPieces.test.ts": {
-   "feature": "tech-tree",
-   "runs": 33,
-   "lastMs": 46,
-   "p50Ms": 33,
-   "p95Ms": 93,
-   "passRate": 1,
-   "lastStatus": "passed",
-   "lastRunId": 1792735738681,
-   "lastFailure": null,
-   "flaky": false,
-   "slowest": []
-  },
-  "src/features/tech-tree/systems/render/techGear.test.ts": {
-   "feature": "tech-tree",
-   "runs": 33,
-   "lastMs": 30,
-   "p50Ms": 30,
-   "p95Ms": 61,
-   "passRate": 1,
-   "lastStatus": "passed",
-   "lastRunId": 1792735738681,
-   "lastFailure": null,
-   "flaky": false,
-   "slowest": []
-  },
-  "src/features/tech-tree/systems/researchBotPurchase.test.ts": {
-   "feature": "tech-tree",
-   "runs": 33,
-   "lastMs": 9230,
-   "p50Ms": 13682,
-   "p95Ms": 107587,
-   "passRate": 1,
-   "lastStatus": "passed",
-   "lastRunId": 1792735738681,
-   "lastFailure": null,
-   "flaky": false,
-   "slowest": [
-    [
-     "tech tree: the pacing bot researches sends only nodes the tree accepts: no refusal on the log",
-     2774
-    ],
-    [
-     "tech tree: the pacing bot researches researches nodes through the purchase seam after its own Upgrade bay purchases",
-     1743
-    ],
-    [
-     "tech tree: the pacing bot researches puts the tree's spend in the spend-share diagnostic",
-     1724
-    ]
-   ]
-  },
-  "src/features/tech-tree/systems/techTree.test.ts": {
-   "feature": "tech-tree",
-   "runs": 32,
-   "lastMs": 19,
-   "p50Ms": 17,
-   "p95Ms": 37,
-   "passRate": 1,
-   "lastStatus": "passed",
-   "lastRunId": 1792735738681,
-   "lastFailure": null,
-   "flaky": false,
-   "slowest": []
-  },
-  "src/features/tech-tree/systems/techTreeCommands.test.ts": {
-   "feature": "tech-tree",
-   "runs": 33,
-   "lastMs": 101,
-   "p50Ms": 95,
-   "p95Ms": 152,
-   "passRate": 1,
-   "lastStatus": "passed",
-   "lastRunId": 1792735738681,
-   "lastFailure": null,
-   "flaky": false,
-   "slowest": []
-  },
-  "src/features/tech-tree/systems/treeScreenModel.test.ts": {
-   "feature": "tech-tree",
-   "runs": 34,
-   "lastMs": 140,
-   "p50Ms": 148,
-   "p95Ms": 428,
-   "passRate": 1,
-   "lastStatus": "passed",
-   "lastRunId": 1792735738681,
-   "lastFailure": null,
-   "flaky": false,
-   "slowest": []
-  },
-  "src/features/tech-tree/systems/treeShape.test.ts": {
-   "feature": "tech-tree",
-   "runs": 32,
-   "lastMs": 31,
-   "p50Ms": 31,
-   "p95Ms": 107,
-   "passRate": 1,
-   "lastStatus": "passed",
-   "lastRunId": 1792735738681,
-   "lastFailure": null,
-   "flaky": false,
-   "slowest": []
-  },
-  "src/features/tech-tree/systems/unlockRules.test.ts": {
-   "feature": "tech-tree",
-   "runs": 33,
-   "lastMs": 89,
-   "p50Ms": 95,
-   "p95Ms": 263,
-   "passRate": 1,
-   "lastStatus": "passed",
-   "lastRunId": 1792735738681,
-   "lastFailure": null,
-   "flaky": false,
-   "slowest": []
-  },
-  "src/features/tech-tree/ui/nodeCardHold.test.ts": {
-   "feature": "tech-tree",
-   "runs": 24,
-   "lastMs": 52,
-   "p50Ms": 27,
-   "p95Ms": 52,
-   "passRate": 1,
-   "lastStatus": "passed",
-   "lastRunId": 1792606995036,
-   "lastFailure": null,
-   "flaky": false,
-   "slowest": []
-  },
-  "src/features/tech-tree/ui/techTreeScreen.test.ts": {
-   "feature": "tech-tree",
-   "runs": 24,
-   "lastMs": 777,
-   "p50Ms": 840,
-   "p95Ms": 1418,
-   "passRate": 0.875,
-   "lastStatus": "passed",
-   "lastRunId": 1792606995036,
-   "lastFailure": {
-    "runId": 1792590572281,
-    "sha": "d47e5dee1b35518d4e30c92d91d73779605f72fd",
-    "at": "2026-10-21T12:18:58Z",
-    "tests": [
-     "tech tree text budget (spec #422, pass #426) keeps every lane list and node card within budget, with no text outside an element"
-    ]
-   },
-   "flaky": false,
-   "slowest": [
-    [
-     "tech tree text budget (spec #422, pass #426) keeps every lane list and node card within budget, with no text outside an element",
-     222
-    ],
-    [
-     "tech tree text budget (spec #422, pass #426) keeps a locked node's reason and its price on the element, never in the tooltip",
-     201
-    ]
-   ]
-  },
-  "src/features/terrain-tools/foamPace.test.ts": {
-   "feature": "terrain-tools",
-   "runs": 33,
-   "lastMs": 364599,
-   "p50Ms": 333846,
-   "p95Ms": 1707558,
-   "passRate": 0.696969696969697,
-   "lastStatus": "failed",
-   "lastRunId": 1792735738681,
-   "lastFailure": {
-    "runId": 1792735738681,
-    "sha": "dca609908e4fa6c361bc34d78442dbbffed4eb4a",
-    "at": "2026-10-22T23:45:39Z",
-    "tests": [
-     "stabiliser foam pace (VS pin on #381, Systems ruling on #664) keeps time to core at least 0.98x the bare time where both rigs survive on planet 7",
-     "stabiliser foam pace (VS pin on #381, Systems ruling on #664) keeps the holders' time to core within 5% of cement's pin where the bare rig dies on planet 7",
-     "stabiliser foam pace (VS pin on #381, Systems ruling on #664) keeps the holders' lining under 6% of their income on planet 7"
-    ]
-   },
-   "flaky": false,
-   "slowest": [
-    [
-     "stabiliser foam pace (VS pin on #381, Systems ruling on #664) keeps time to core at least 0.98x the bare time where both rigs survive on planet 7",
-     229854
-    ],
-    [
-     "stabiliser foam pace (VS pin on #381, Systems ruling on #664) keeps time to core at least 0.98x the bare time where both rigs survive on planet 10",
-     76137
-    ],
-    [
-     "stabiliser foam pace (VS pin on #381, Systems ruling on #664) keeps time to core at least 0.98x the bare time where both rigs survive on planet 3",
-     58481
-    ]
-   ]
-  },
-  "src/features/terrain-tools/logging.test.ts": {
-   "feature": "terrain-tools",
-   "runs": 32,
-   "lastMs": 130,
-   "p50Ms": 143,
-   "p95Ms": 285,
-   "passRate": 1,
-   "lastStatus": "passed",
-   "lastRunId": 1792735738681,
-   "lastFailure": null,
-   "flaky": false,
-   "slowest": []
-  },
-  "src/features/terrain-tools/magnetFieldsBench.test.ts": {
-   "feature": "terrain-tools",
-   "runs": 32,
-   "lastMs": 147,
-   "p50Ms": 191,
-   "p95Ms": 965,
-   "passRate": 1,
-   "lastStatus": "passed",
-   "lastRunId": 1792735738681,
-   "lastFailure": null,
-   "flaky": false,
-   "slowest": [
-    [
-     "magnet fields bench times a P43 descent with three players’ fields on one buffer, rebuilding only on change",
-     146
-    ]
-   ]
-  },
-  "src/features/terrain-tools/magnetHand.test.ts": {
-   "feature": "terrain-tools",
-   "runs": 32,
-   "lastMs": 128,
-   "p50Ms": 140,
-   "p95Ms": 298,
-   "passRate": 1,
-   "lastStatus": "passed",
-   "lastRunId": 1792735738681,
-   "lastFailure": null,
-   "flaky": false,
-   "slowest": []
-  },
-  "src/features/terrain-tools/magnetPace.test.ts": {
-   "feature": "terrain-tools",
-   "runs": 32,
-   "lastMs": 2208093,
-   "p50Ms": 212086,
-   "p95Ms": 2208093,
-   "passRate": 1,
-   "lastStatus": "passed",
-   "lastRunId": 1792735738681,
-   "lastFailure": null,
-   "flaky": false,
-   "slowest": [
-    [
-     "terrain magnets pace (balance:magnets, GD lock on #246) uses both the coil and the clamp on planet 7 on every seed",
-     186941
-    ],
-    [
-     "terrain magnets pace (balance:magnets, GD lock on #246) uses both the coil and the clamp on planet 10 on every seed",
-     75883
-    ]
-   ]
-  },
-  "src/features/terrain-tools/moverIncomeRates.test.ts": {
-   "feature": "terrain-tools",
-   "runs": 32,
-   "lastMs": 23,
-   "p50Ms": 21,
-   "p95Ms": 38,
-   "passRate": 1,
-   "lastStatus": "passed",
-   "lastRunId": 1792735738681,
-   "lastFailure": null,
-   "flaky": false,
-   "slowest": []
-  },
-  "src/features/terrain-tools/moverLedger.test.ts": {
-   "feature": "terrain-tools",
-   "runs": 32,
-   "lastMs": 390,
-   "p50Ms": 448,
-   "p95Ms": 982,
-   "passRate": 1,
-   "lastStatus": "passed",
-   "lastRunId": 1792735738681,
-   "lastFailure": null,
-   "flaky": false,
-   "slowest": [
-    [
-     "mover trip ledger banks at most tripCapAt of mover value on a trip of heavy mover use, at any frame rate",
-     228
-    ]
-   ]
-  },
-  "src/features/terrain-tools/sceneBudget.test.ts": {
-   "feature": "terrain-tools",
-   "runs": 33,
-   "lastMs": 3,
-   "p50Ms": 3,
-   "p95Ms": 23,
-   "passRate": 1,
-   "lastStatus": "passed",
-   "lastRunId": 1792735738681,
-   "lastFailure": null,
-   "flaky": false,
-   "slowest": []
-  },
-  "src/features/terrain-tools/store/clampRelease.test.ts": {
-   "feature": "terrain-tools",
-   "runs": 32,
-   "lastMs": 401,
-   "p50Ms": 353,
-   "p95Ms": 590,
-   "passRate": 1,
-   "lastStatus": "passed",
-   "lastRunId": 1792735738681,
-   "lastFailure": null,
-   "flaky": false,
-   "slowest": [
-    [
-     "lode clamp release on the keys sends one release_power_up on the key-up tick and warns every braced block afresh",
-     247
-    ],
-    [
-     "lode clamp release on touch keeps the card closed and the brace on past 400 ms, then releases on the lift",
-     154
-    ]
-   ]
-  },
-  "src/features/terrain-tools/systems/clampCountdown.test.ts": {
-   "feature": "terrain-tools",
-   "runs": 32,
-   "lastMs": 650,
-   "p50Ms": 681,
-   "p95Ms": 1166,
-   "passRate": 1,
-   "lastStatus": "passed",
-   "lastRunId": 1792735738681,
-   "lastFailure": null,
-   "flaky": false,
-   "slowest": [
-    [
-     "lode clamp: the drawn crack countdown (ticket 357) stands at what each block had left when the brace caught it, on every tick of the hold",
-     236
-    ],
-    [
-     "lode clamp: the drawn crack countdown (ticket 357) shows the full countdown on the tick the brace ends, then counts down",
-     150
-    ],
-    [
-     "lode clamp: the drawn crack countdown (ticket 357) draws the same countdown at 30 frames a second",
-     135
-    ]
-   ]
-  },
-  "src/features/terrain-tools/systems/clampLattice.test.ts": {
-   "feature": "terrain-tools",
-   "runs": 32,
-   "lastMs": 551,
-   "p50Ms": 582,
-   "p95Ms": 1383,
-   "passRate": 1,
-   "lastStatus": "passed",
-   "lastRunId": 1792735738681,
-   "lastFailure": null,
-   "flaky": false,
-   "slowest": [
-    [
-     "lode clamp lattice lays the struts over exactly the blocks the field braces",
-     179
-    ],
-    [
-     "lode clamp lattice takes the struts away and shows the full countdown on the tick the brace ends",
-     140
-    ],
-    [
-     "lode clamp lattice freezes each braced countdown at what it had left when the brace caught it",
-     124
-    ]
-   ]
-  },
-  "src/features/terrain-tools/systems/dragHooks.test.ts": {
-   "feature": "terrain-tools",
-   "runs": 33,
-   "lastMs": 410,
-   "p50Ms": 341,
-   "p95Ms": 847,
-   "passRate": 1,
-   "lastStatus": "passed",
-   "lastRunId": 1792735738681,
-   "lastFailure": null,
-   "flaky": false,
-   "slowest": []
-  },
-  "src/features/terrain-tools/systems/foamCards.test.ts": {
-   "feature": "terrain-tools",
-   "runs": 32,
-   "lastMs": 47,
-   "p50Ms": 46,
-   "p95Ms": 81,
-   "passRate": 1,
-   "lastStatus": "passed",
-   "lastRunId": 1792735738681,
-   "lastFailure": null,
-   "flaky": false,
-   "slowest": []
-  },
-  "src/features/terrain-tools/systems/foamCure.test.ts": {
-   "feature": "terrain-tools",
-   "runs": 32,
-   "lastMs": 6883,
-   "p50Ms": 3943,
-   "p95Ms": 8956,
-   "passRate": 1,
-   "lastStatus": "passed",
-   "lastRunId": 1792735738681,
-   "lastFailure": null,
-   "flaky": false,
-   "slowest": [
-    [
-     "stabiliser foam cure: collapse never refills a cured cell, where timed foam lets it refill after the lapse",
-     1143
-    ],
-    [
-     "stabiliser foam cure: collapse never warns again a block whose open cells are all cured, where timed foam warns it afresh",
-     1005
-    ],
-    [
-     "stabiliser foam cure: save keeps the cured cells across a save, and digests the same",
-     848
-    ]
-   ]
-  },
-  "src/features/terrain-tools/systems/foamResearch.test.ts": {
-   "feature": "terrain-tools",
-   "runs": 32,
-   "lastMs": 40,
-   "p50Ms": 43,
-   "p95Ms": 102,
-   "passRate": 1,
-   "lastStatus": "passed",
-   "lastRunId": 1792735738681,
-   "lastFailure": null,
-   "flaky": false,
-   "slowest": []
-  },
-  "src/features/terrain-tools/systems/foamRestock.test.ts": {
-   "feature": "terrain-tools",
-   "runs": 32,
-   "lastMs": 71,
-   "p50Ms": 81,
-   "p95Ms": 161,
-   "passRate": 1,
-   "lastStatus": "passed",
-   "lastRunId": 1792735738681,
-   "lastFailure": null,
-   "flaky": false,
-   "slowest": []
-  },
-  "src/features/terrain-tools/systems/gatesFixture.test.ts": {
-   "feature": "terrain-tools",
-   "runs": 33,
-   "lastMs": 154,
-   "p50Ms": 184,
-   "p95Ms": 666,
-   "passRate": 1,
-   "lastStatus": "passed",
-   "lastRunId": 1792735738681,
-   "lastFailure": null,
-   "flaky": false,
-   "slowest": []
-  },
-  "src/features/terrain-tools/systems/lodeClamp.test.ts": {
-   "feature": "terrain-tools",
-   "runs": 32,
-   "lastMs": 2799,
-   "p50Ms": 2530,
-   "p95Ms": 4267,
-   "passRate": 1,
-   "lastStatus": "passed",
-   "lastRunId": 1792735738681,
-   "lastFailure": null,
-   "flaky": false,
-   "slowest": [
-    [
-     "lode clamp: every way the field ends behaves the same ends on the release tick, at its length, or on the tick the tank runs dry",
-     480
-    ],
-    [
-     "lode clamp: the pinned set pins at most 8 diggable cells nearest the rig, and moves none of them",
-     283
-    ],
-    [
-     "lode clamp: draw and log ends in the same state with the same events at 30 and 144 steps/s",
-     248
-    ]
-   ]
-  },
-  "src/features/terrain-tools/systems/lodestoneBeacon.test.ts": {
-   "feature": "terrain-tools",
-   "runs": 32,
-   "lastMs": 160,
-   "p50Ms": 145,
-   "p95Ms": 369,
-   "passRate": 1,
-   "lastStatus": "passed",
-   "lastRunId": 1792735738681,
-   "lastFailure": null,
-   "flaky": false,
-   "slowest": []
-  },
-  "src/features/terrain-tools/systems/magnetFeel.test.ts": {
-   "feature": "terrain-tools",
-   "runs": 33,
-   "lastMs": 513,
-   "p50Ms": 543,
-   "p95Ms": 675,
-   "passRate": 1,
-   "lastStatus": "passed",
-   "lastRunId": 1792735738681,
-   "lastFailure": null,
-   "flaky": false,
-   "slowest": [
-    [
-     "magnet fields: feel anchor: vehicle speed under the field never exceeds the #233 cap",
-     110
-    ],
-    [
-     "magnet fields: feel anchor: an affected object starts moving within 6 ticks, at 144 steps/s",
-     109
-    ],
-    [
-     "magnet fields: feel anchor: an affected object starts moving within 6 ticks, at 30 steps/s",
-     102
-    ]
-   ]
-  },
-  "src/features/terrain-tools/systems/marksInPlay.test.ts": {
-   "feature": "terrain-tools",
-   "runs": 32,
-   "lastMs": 169,
-   "p50Ms": 190,
-   "p95Ms": 448,
-   "passRate": 1,
-   "lastStatus": "passed",
-   "lastRunId": 1792735738681,
-   "lastFailure": null,
-   "flaky": false,
-   "slowest": [
-    [
-     "terrain-tools marks in play splits up to a longer fissure at a researched Mark 2 than as bought, and logs the Mark",
-     169
-    ]
-   ]
-  },
-  "src/features/terrain-tools/systems/nonYieldVerbs.test.ts": {
-   "feature": "terrain-tools",
-   "runs": 32,
-   "lastMs": 1339,
-   "p50Ms": 1047,
-   "p95Ms": 3410,
-   "passRate": 1,
-   "lastStatus": "passed",
-   "lastRunId": 1792735738681,
-   "lastFailure": null,
-   "flaky": false,
-   "slowest": [
-    [
-     "terrain-tools Mark milestones never yield (#256, ticket 278) power.ore_shifter: a second tap and a hold move no more ore and edit no more cells in a use than a plain use may, on the three pacing seeds",
-     441
-    ],
-    [
-     "terrain-tools Mark milestones never yield (#256, ticket 278) consumable.lodestone_beacon: a second tap and a hold move no more ore and edit no more cells in a use than a plain use may, on the three pacing seeds",
-     374
-    ],
-    [
-     "terrain-tools Mark milestones never yield (#256, ticket 278) power.pressure_pocket: a second tap and a hold move no more ore and edit no more cells in a use than a plain use may, on the three pacing seeds",
-     282
-    ]
-   ]
-  },
-  "src/features/terrain-tools/systems/oreLure.test.ts": {
-   "feature": "terrain-tools",
-   "runs": 32,
-   "lastMs": 131,
-   "p50Ms": 137,
-   "p95Ms": 210,
-   "passRate": 1,
-   "lastStatus": "passed",
-   "lastRunId": 1792735738681,
-   "lastFailure": null,
-   "flaky": false,
-   "slowest": []
-  },
-  "src/features/terrain-tools/systems/oreShifter.test.ts": {
-   "feature": "terrain-tools",
-   "runs": 32,
-   "lastMs": 86,
-   "p50Ms": 90,
-   "p95Ms": 162,
-   "passRate": 1,
-   "lastStatus": "passed",
-   "lastRunId": 1792735738681,
-   "lastFailure": null,
-   "flaky": false,
-   "slowest": []
-  },
-  "src/features/terrain-tools/systems/pressurePocket.test.ts": {
-   "feature": "terrain-tools",
-   "runs": 32,
-   "lastMs": 116,
-   "p50Ms": 131,
-   "p95Ms": 261,
-   "passRate": 1,
-   "lastStatus": "passed",
-   "lastRunId": 1792735738681,
-   "lastFailure": null,
-   "flaky": false,
-   "slowest": []
-  },
-  "src/features/terrain-tools/systems/render/magnetFieldBuffer.test.ts": {
-   "feature": "terrain-tools",
-   "runs": 32,
-   "lastMs": 222,
-   "p50Ms": 256,
-   "p95Ms": 823,
-   "passRate": 1,
-   "lastStatus": "passed",
-   "lastRunId": 1792735738681,
-   "lastFailure": null,
-   "flaky": false,
-   "slowest": [
-    [
-     "magnet field refresh holds a clamp field without rebuilding while its tank draws each tick",
-     119
-    ]
-   ]
-  },
-  "src/features/terrain-tools/systems/render/magnetFields.test.ts": {
-   "feature": "terrain-tools",
-   "runs": 32,
-   "lastMs": 196,
-   "p50Ms": 219,
-   "p95Ms": 499,
-   "passRate": 1,
-   "lastStatus": "passed",
-   "lastRunId": 1792735738681,
-   "lastFailure": null,
-   "flaky": false,
-   "slowest": [
-    [
-     "magnet fields: what draws lays a lattice over each pinned cell and a strut on each block the clamp braces",
-     108
-    ]
-   ]
-  },
-  "src/features/terrain-tools/systems/repulsorCoil.test.ts": {
-   "feature": "terrain-tools",
-   "runs": 33,
-   "lastMs": 127,
-   "p50Ms": 165,
-   "p95Ms": 431,
-   "passRate": 1,
-   "lastStatus": "passed",
-   "lastRunId": 1792735738681,
-   "lastFailure": null,
-   "flaky": false,
-   "slowest": []
-  },
-  "src/features/terrain-tools/systems/seamSplitter.test.ts": {
-   "feature": "terrain-tools",
-   "runs": 32,
-   "lastMs": 151,
-   "p50Ms": 161,
-   "p95Ms": 306,
-   "passRate": 1,
-   "lastStatus": "passed",
-   "lastRunId": 1792735738681,
-   "lastFailure": null,
-   "flaky": false,
-   "slowest": []
-  },
-  "src/features/terrain-tools/systems/stabiliserFoam.test.ts": {
-   "feature": "terrain-tools",
-   "runs": 33,
-   "lastMs": 2292,
-   "p50Ms": 1749,
-   "p95Ms": 3367,
-   "passRate": 1,
-   "lastStatus": "passed",
-   "lastRunId": 1792735738681,
-   "lastFailure": null,
-   "flaky": false,
-   "slowest": [
-    [
-     "stabiliser foam: replay and save ends in the same state with the same events at 30 and 144 steps/s",
-     524
-    ],
-    [
-     "stabiliser foam: the timed brace moves the end on when sprayed again, never adding the times",
-     267
-    ],
-    [
-     "stabiliser foam: the timed brace holds its blocks past their refill for 600 ticks, then warns them afresh for 60",
-     205
-    ]
-   ]
-  },
-  "src/features/terrain-tools/systems/terrainEditCaps.test.ts": {
-   "feature": "terrain-tools",
-   "runs": 32,
-   "lastMs": 2135,
-   "p50Ms": 2330,
-   "p95Ms": 3830,
-   "passRate": 1,
-   "lastStatus": "passed",
-   "lastRunId": 1792735738681,
-   "lastFailure": null,
-   "flaky": false,
-   "slowest": [
-    [
-     "terrain edit caps power.ore_shifter on P1 (Mark 1) edits at most 32 density cells or 64 swaps per activation",
-     426
-    ],
-    [
-     "terrain edit caps power.ore_shifter on P60 (Mark 19) edits at most 32 density cells or 64 swaps per activation",
-     245
-    ],
-    [
-     "terrain edit caps power.ore_shifter on P100 (Mark 32) edits at most 32 density cells or 64 swaps per activation",
-     237
-    ]
-   ]
-  },
-  "src/features/terrain-tools/systems/terrainFork.test.ts": {
-   "feature": "terrain-tools",
-   "runs": 32,
-   "lastMs": 126,
-   "p50Ms": 143,
-   "p95Ms": 244,
-   "passRate": 1,
-   "lastStatus": "passed",
-   "lastRunId": 1792735738681,
-   "lastFailure": null,
-   "flaky": false,
-   "slowest": []
-  },
-  "src/features/terrain-tools/systems/terrainSection.test.ts": {
-   "feature": "terrain-tools",
-   "runs": 32,
-   "lastMs": 71,
-   "p50Ms": 81,
-   "p95Ms": 141,
-   "passRate": 1,
-   "lastStatus": "passed",
-   "lastRunId": 1792735738681,
-   "lastFailure": null,
-   "flaky": false,
-   "slowest": []
-  },
-  "src/features/terrain-tools/systems/useResolution.test.ts": {
-   "feature": "terrain-tools",
-   "runs": 32,
-   "lastMs": 2869,
-   "p50Ms": 2779,
-   "p95Ms": 5120,
-   "passRate": 1,
-   "lastStatus": "passed",
-   "lastRunId": 1792735738681,
-   "lastFailure": null,
-   "flaky": false,
-   "slowest": [
-    [
-     "terrain-tools Mark milestones (#256): Mark 6 hold facing down, the pocket and the beacon each land the tap and the hold on different tiles",
-     622
-    ],
-    [
-     "terrain-tools Mark milestones (#256): Mark 3 second tap, at 30 and 144 steps/s lodestone beacon: at M3 the second tap throws the beacon ahead and at M2 it is refused",
-     309
-    ],
-    [
-     "terrain-tools Mark milestones (#256): Mark 3 second tap, at 30 and 144 steps/s ore-shifter: at M3 the second tap pushes the nodules out and at M2 it waits out the cooldown",
-     287
-    ]
-   ]
-  },
-  "src/features/terrain-tools/systems/vehicleAnchors.test.ts": {
-   "feature": "terrain-tools",
-   "runs": 32,
-   "lastMs": 2655,
-   "p50Ms": 2705,
-   "p95Ms": 4010,
-   "passRate": 1,
-   "lastStatus": "passed",
-   "lastRunId": 1792735738681,
-   "lastFailure": null,
-   "flaky": false,
-   "slowest": [
-    [
-     "vehicle anchors seed 83921, 7 tiles down: no planned cell lies within 1 m of either miner",
-     260
-    ],
-    [
-     "vehicle anchors seed 31415, 19 tiles down: no planned cell lies within 1 m of either miner",
-     174
-    ],
-    [
-     "vehicle anchors seed 99991, 12 tiles down: no planned cell lies within 1 m of either miner",
-     170
-    ]
-   ]
-  },
-  "src/features/terrain-tools/terrainReplay.test.ts": {
-   "feature": "terrain-tools",
-   "runs": 32,
-   "lastMs": 196,
-   "p50Ms": 186,
-   "p95Ms": 266,
-   "passRate": 1,
-   "lastStatus": "passed",
-   "lastRunId": 1792735738681,
-   "lastFailure": null,
-   "flaky": false,
-   "slowest": [
-    [
-     "terrain-tools replay replays power.ore_shifter and consumable.seam_splitter to the same edit hashes at any frame rate",
-     143
-    ]
-   ]
-  },
-  "src/systems/authority/moneyRounding.test.ts": {
-   "feature": "authority",
-   "runs": 36,
-   "lastMs": 5,
-   "p50Ms": 5,
-   "p95Ms": 14,
-   "passRate": 1,
-   "lastStatus": "passed",
-   "lastRunId": 1792735738681,
-   "lastFailure": null,
-   "flaky": false,
-   "slowest": []
-  },
-  "src/systems/bot/itemHookNoFreeCell.test.ts": {
-   "feature": "bot",
-   "runs": 29,
-   "lastMs": 146936,
-   "p50Ms": 187328,
-   "p95Ms": 1129217,
-   "passRate": 1,
-   "lastStatus": "passed",
-   "lastRunId": 1792735738681,
-   "lastFailure": null,
-   "flaky": false,
-   "slowest": [
-    [
-     "item hooks leave the dig alone (no free cell, #281 check) mines exactly the bare cells on planet 7 with every combo owned and no slot pressed",
-     80202
-    ],
-    [
-     "item hooks leave the dig alone (no free cell, #281 check) mines exactly the bare cells on planet 10 with every combo owned and no slot pressed",
-     66733
-    ]
-   ]
-  },
-  "src/systems/bot/noFreeCellRuns.test.ts": {
-   "feature": "bot",
-   "runs": 29,
-   "lastMs": 52,
-   "p50Ms": 64,
-   "p95Ms": 105,
-   "passRate": 1,
-   "lastStatus": "passed",
-   "lastRunId": 1792735738681,
-   "lastFailure": null,
-   "flaky": false,
-   "slowest": []
-  },
-  "src/systems/bot/paceArrival.test.ts": {
-   "feature": "bot",
-   "runs": 29,
-   "lastMs": 59,
-   "p50Ms": 73,
-   "p95Ms": 189,
-   "passRate": 1,
-   "lastStatus": "passed",
-   "lastRunId": 1792735738681,
-   "lastFailure": null,
-   "flaky": false,
-   "slowest": []
-  },
-  "src/systems/economy/economySourceScan.test.ts": {
-   "feature": "economy",
-   "runs": 36,
-   "lastMs": 129,
-   "p50Ms": 155,
-   "p95Ms": 1021,
-   "passRate": 0.8333333333333334,
-   "lastStatus": "passed",
-   "lastRunId": 1792735738681,
-   "lastFailure": {
-    "runId": 1792669172174,
-    "sha": "d95dcc66eb0c80f89cc35a6cd672d3af935b955d",
-    "at": "2026-10-22T09:58:21Z",
-    "tests": [
-     "economy source scan finds no economy price, ratio or fee number in game code outside economy.json"
-    ]
-   },
-   "flaky": false,
-   "slowest": []
-  },
-  "src/systems/save/saveDeterminism.test.ts": {
-   "feature": "save",
-   "runs": 29,
-   "lastMs": 22,
-   "p50Ms": 23,
-   "p95Ms": 41,
-   "passRate": 1,
-   "lastStatus": "passed",
-   "lastRunId": 1792735738681,
-   "lastFailure": null,
-   "flaky": false,
-   "slowest": []
-  },
-  "src/systems/save/saveExactRoundTrip.test.ts": {
-   "feature": "save",
-   "runs": 31,
-   "lastMs": 671,
-   "p50Ms": 682,
-   "p95Ms": 1136,
-   "passRate": 1,
-   "lastStatus": "passed",
-   "lastRunId": 1792735738681,
-   "lastFailure": null,
-   "flaky": false,
-   "slowest": [
-    [
-     "save slot: the exact-carry state (ticket 405) restores the cut cursor, the part-cut ground and the drill, tip, tank and cargo",
-     553
-    ]
-   ]
-  },
-  "src/systems/vehicle/vehicleStats.test.ts": {
-   "feature": "vehicle",
-   "runs": 36,
-   "lastMs": 12,
-   "p50Ms": 12,
-   "p95Ms": 26,
-   "passRate": 1,
-   "lastStatus": "passed",
-   "lastRunId": 1792735738681,
-   "lastFailure": null,
-   "flaky": false,
-   "slowest": []
-  },
   "src/logging/assayPacingGate.test.ts": {
    "feature": "pacing-bot",
    "runs": 14,
@@ -5734,6 +2941,31 @@
    "flaky": false,
    "slowest": []
   },
+  "scripts/tests/manifestDrift.test.mjs": {
+   "feature": "tooling-tests",
+   "runs": 35,
+   "lastMs": 443,
+   "p50Ms": 250,
+   "p95Ms": 443,
+   "passRate": 0.9714285714285714,
+   "lastStatus": "passed",
+   "lastRunId": 1792735738681,
+   "lastFailure": {
+    "runId": 1792355624413,
+    "sha": "20ef31bc5eb28b2b93cd4e84e1b03914c67d76cc",
+    "at": "2026-10-18T18:18:05Z",
+    "tests": [
+     "test manifest on main lists every test file on disk with its current test sites"
+    ]
+   },
+   "flaky": false,
+   "slowest": [
+    [
+     "test manifest on main lists every test file on disk with its current test sites",
+     368
+    ]
+   ]
+  },
   "scripts/tests/movePrGuard.test.mjs": {
    "feature": "tooling-tests",
    "runs": 25,
@@ -6071,6 +3303,28 @@
     ]
    ]
   },
+  "src/features/aetheric/phaseLantern.pace.test.ts": {
+   "feature": "aetheric",
+   "runs": 31,
+   "lastMs": 155241,
+   "p50Ms": 193454,
+   "p95Ms": 1912945,
+   "passRate": 1,
+   "lastStatus": "passed",
+   "lastRunId": 1792735738681,
+   "lastFailure": null,
+   "flaky": false,
+   "slowest": [
+    [
+     "phase lantern pace (the #205 assert, #261) reaches planet 7 core no faster than 0.98x the bare time with the lantern slotted",
+     89178
+    ],
+    [
+     "phase lantern pace (the #205 assert, #261) reaches planet 10 core no faster than 0.98x the bare time with the lantern slotted",
+     66063
+    ]
+   ]
+  },
   "src/features/aetheric/phaseLantern.test.ts": {
    "feature": "aetheric",
    "runs": 31,
@@ -6244,6 +3498,58 @@
    "lastFailure": null,
    "flaky": false,
    "slowest": []
+  },
+  "src/features/artefact/twistNoFreeCell.test.ts": {
+   "feature": "artefact",
+   "runs": 28,
+   "lastMs": 373795,
+   "p50Ms": 1218382,
+   "p95Ms": 4224087,
+   "passRate": 1,
+   "lastStatus": "passed",
+   "lastRunId": 1792735738681,
+   "lastFailure": null,
+   "flaky": false,
+   "slowest": [
+    [
+     "artefact twists leave the dig alone (no free cell, #281 check) mines exactly the bare cells with Deep Striker held on planet 10 and no slot pressed",
+     66590
+    ],
+    [
+     "artefact twists leave the dig alone (no free cell, #281 check) mines exactly the bare cells with Belay Line held on planet 10 and no slot pressed",
+     66139
+    ],
+    [
+     "artefact twists leave the dig alone (no free cell, #281 check) mines exactly the bare cells with Ore Lure held on planet 10 and no slot pressed",
+     65673
+    ]
+   ]
+  },
+  "src/features/artefact/twistPace.test.ts": {
+   "feature": "artefact",
+   "runs": 31,
+   "lastMs": 1520136,
+   "p50Ms": 1119258,
+   "p95Ms": 4060686,
+   "passRate": 1,
+   "lastStatus": "passed",
+   "lastRunId": 1792735738681,
+   "lastFailure": null,
+   "flaky": false,
+   "slowest": [
+    [
+     "artefact twists pace (pin 6, GD lock on #206) presses the base items on planet 7 on every seed",
+     192784
+    ],
+    [
+     "artefact twists pace (pin 6, GD lock on #206) presses the base items on planet 10 on every seed",
+     191160
+    ],
+    [
+     "artefact twists pace (pin 6, GD lock on #206) earns at most 15% more per minute on planet 7 with each twist and its base item",
+     191
+    ]
+   ]
   },
   "src/features/casing-cement/systems/casedTiles.test.ts": {
    "feature": "casing-cement",
@@ -6446,6 +3752,32 @@
    "lastFailure": null,
    "flaky": false,
    "slowest": []
+  },
+  "src/features/combos/comboPace.test.ts": {
+   "feature": "combos",
+   "runs": 31,
+   "lastMs": 3514572,
+   "p50Ms": 3507313,
+   "p95Ms": 15918255,
+   "passRate": 1,
+   "lastStatus": "passed",
+   "lastRunId": 1792735738681,
+   "lastFailure": null,
+   "flaky": false,
+   "slowest": [
+    [
+     "alarm shield pace (GD lock on #206, decision 6) reaches planet 10 core no slower than 0.98x with the shield acting on its own",
+     549622
+    ],
+    [
+     "alarm shield pace (GD lock on #206, decision 6) reaches planet 7 core no slower than 0.98x with the shield acting on its own",
+     402888
+    ],
+    [
+     "combos pace (pin 6, GD lock on #206) presses the partner items on planet 7 on every seed",
+     127936
+    ]
+   ]
   },
   "src/features/combos/combosInPlay.test.ts": {
    "feature": "combos",
@@ -6853,6 +4185,28 @@
     ]
    ]
   },
+  "src/features/drill-gear/drillGearPace.test.ts": {
+   "feature": "drill-gear",
+   "runs": 31,
+   "lastMs": 197406,
+   "p50Ms": 197406,
+   "p95Ms": 1005885,
+   "passRate": 1,
+   "lastStatus": "passed",
+   "lastRunId": 1792735738681,
+   "lastFailure": null,
+   "flaky": false,
+   "slowest": [
+    [
+     "drill-gear pace (Vertical Scaler on #205) reaches planet 10 core at no less than 0.98x the bare pace with the gear on",
+     125212
+    ],
+    [
+     "drill-gear pace (Vertical Scaler on #205) reaches planet 7 core at no less than 0.98x the bare pace with the gear on",
+     72195
+    ]
+   ]
+  },
   "src/features/drill-gear/drillGearTouch.test.ts": {
    "feature": "drill-gear",
    "runs": 31,
@@ -6865,6 +4219,35 @@
    "lastFailure": null,
    "flaky": false,
    "slowest": []
+  },
+  "src/features/drill-gear/forkDeep.pace.test.ts": {
+   "feature": "drill-gear",
+   "runs": 32,
+   "lastMs": 1463944,
+   "p50Ms": 210941,
+   "p95Ms": 2312741,
+   "passRate": 0.9375,
+   "lastStatus": "passed",
+   "lastRunId": 1792735738681,
+   "lastFailure": {
+    "runId": 1792396127843,
+    "sha": "40f7723968bf215d9793d5d016db379ef02df8d6",
+    "at": "2026-10-19T06:16:47Z",
+    "tests": [
+     "drill-gear fork: Deep pace (GD lock on #255, GD ruling on #392) reaches planet 20 core measurably faster with Deep, never pushing travel past a quarter"
+    ]
+   },
+   "flaky": false,
+   "slowest": [
+    [
+     "drill-gear fork: Deep pace (GD lock on #255, GD ruling on #392) reaches planet 16 core measurably faster with Deep, never pushing travel past a quarter",
+     110137
+    ],
+    [
+     "drill-gear fork: Deep pace (GD lock on #255, GD ruling on #392) reaches planet 20 core measurably faster with Deep, never pushing travel past a quarter",
+     87942
+    ]
+   ]
   },
   "src/features/drill-gear/logging.test.ts": {
    "feature": "drill-gear",
@@ -7199,6 +4582,35 @@
    "flaky": false,
    "slowest": []
   },
+  "src/features/drill-gear/twinBitPace.test.ts": {
+   "feature": "drill-gear",
+   "runs": 30,
+   "lastMs": 155365,
+   "p50Ms": 199286,
+   "p95Ms": 3130160,
+   "passRate": 0.9333333333333333,
+   "lastStatus": "passed",
+   "lastRunId": 1792735738681,
+   "lastFailure": {
+    "runId": 1792405438366,
+    "sha": "a47edaf9872878eaf90da1a47553db53e3a7e078",
+    "at": "2026-10-19T07:52:23Z",
+    "tests": [
+     "twin-bit pace (balance:twin-bit, GD lock on #257) mines exactly the bare cell sequence on planet 10 with the head mounted and drive 0"
+    ]
+   },
+   "flaky": false,
+   "slowest": [
+    [
+     "twin-bit pace (balance:twin-bit, GD lock on #257) reaches planet 7 core no faster than 0.98x the bare time with the twin bit mounted",
+     86325
+    ],
+    [
+     "twin-bit pace (balance:twin-bit, GD lock on #257) reaches planet 10 core no faster than 0.98x the bare time with the twin bit mounted",
+     68894
+    ]
+   ]
+  },
   "src/features/dynamite-visuals/debug.test.ts": {
    "feature": "dynamite-visuals",
    "runs": 31,
@@ -7455,12 +4867,77 @@
    "flaky": false,
    "slowest": []
   },
+  "src/features/extraction/drainIncomeRate.test.ts": {
+   "feature": "extraction",
+   "runs": 31,
+   "lastMs": 69,
+   "p50Ms": 79,
+   "p95Ms": 163,
+   "passRate": 1,
+   "lastStatus": "passed",
+   "lastRunId": 1792735738681,
+   "lastFailure": null,
+   "flaky": false,
+   "slowest": []
+  },
+  "src/features/extraction/gatesFixture.test.ts": {
+   "feature": "extraction",
+   "runs": 31,
+   "lastMs": 84,
+   "p50Ms": 99,
+   "p95Ms": 150,
+   "passRate": 1,
+   "lastStatus": "passed",
+   "lastRunId": 1792735738681,
+   "lastFailure": null,
+   "flaky": false,
+   "slowest": []
+  },
   "src/features/extraction/incomeLines.test.ts": {
    "feature": "extraction",
    "runs": 31,
    "lastMs": 92,
    "p50Ms": 101,
    "p95Ms": 207,
+   "passRate": 1,
+   "lastStatus": "passed",
+   "lastRunId": 1792735738681,
+   "lastFailure": null,
+   "flaky": false,
+   "slowest": []
+  },
+  "src/features/extraction/incomeRateClamp.test.ts": {
+   "feature": "extraction",
+   "runs": 31,
+   "lastMs": 3,
+   "p50Ms": 3,
+   "p95Ms": 3,
+   "passRate": 1,
+   "lastStatus": "passed",
+   "lastRunId": 1792735738681,
+   "lastFailure": null,
+   "flaky": false,
+   "slowest": []
+  },
+  "src/features/extraction/laneRows.test.ts": {
+   "feature": "extraction",
+   "runs": 31,
+   "lastMs": 36,
+   "p50Ms": 39,
+   "p95Ms": 114,
+   "passRate": 1,
+   "lastStatus": "passed",
+   "lastRunId": 1792735738681,
+   "lastFailure": null,
+   "flaky": false,
+   "slowest": []
+  },
+  "src/features/extraction/mineralDrain.test.ts": {
+   "feature": "extraction",
+   "runs": 31,
+   "lastMs": 134,
+   "p50Ms": 146,
+   "p95Ms": 320,
    "passRate": 1,
    "lastStatus": "passed",
    "lastRunId": 1792735738681,
@@ -7480,6 +4957,24 @@
    "lastFailure": null,
    "flaky": false,
    "slowest": []
+  },
+  "src/features/extraction/systems/drainPerMinute.test.ts": {
+   "feature": "extraction",
+   "runs": 31,
+   "lastMs": 658,
+   "p50Ms": 333,
+   "p95Ms": 770,
+   "passRate": 1,
+   "lastStatus": "passed",
+   "lastRunId": 1792735738681,
+   "lastFailure": null,
+   "flaky": false,
+   "slowest": [
+    [
+     "mineral drain per minute moves at most 15% of a full hold of the band ore in a minute at every Mark, P1 to P40",
+     657
+    ]
+   ]
   },
   "src/features/extraction/systems/drainTake.test.ts": {
    "feature": "extraction",
@@ -7533,6 +5028,37 @@
    "flaky": false,
    "slowest": []
   },
+  "src/features/extraction/systems/extractionSales.test.ts": {
+   "feature": "extraction",
+   "runs": 31,
+   "lastMs": 69,
+   "p50Ms": 71,
+   "p95Ms": 166,
+   "passRate": 1,
+   "lastStatus": "passed",
+   "lastRunId": 1792735738681,
+   "lastFailure": null,
+   "flaky": false,
+   "slowest": []
+  },
+  "src/features/extraction/systems/nonYieldVerbs.test.ts": {
+   "feature": "extraction",
+   "runs": 31,
+   "lastMs": 253,
+   "p50Ms": 274,
+   "p95Ms": 492,
+   "passRate": 1,
+   "lastStatus": "passed",
+   "lastRunId": 1792735738681,
+   "lastFailure": null,
+   "flaky": false,
+   "slowest": [
+    [
+     "mineral drain Mark milestones never yield (#256, ticket 278) seed 83921: a second tap takes the same cells and pays the same ore as a plain use at the last Mark",
+     124
+    ]
+   ]
+  },
   "src/features/extraction/systems/statPreview.test.ts": {
    "feature": "extraction",
    "runs": 31,
@@ -7559,12 +5085,73 @@
    "flaky": false,
    "slowest": []
   },
+  "src/features/extraction/systems/useResolution.test.ts": {
+   "feature": "extraction",
+   "runs": 31,
+   "lastMs": 391,
+   "p50Ms": 447,
+   "p95Ms": 906,
+   "passRate": 1,
+   "lastStatus": "passed",
+   "lastRunId": 1792735738681,
+   "lastFailure": null,
+   "flaky": false,
+   "slowest": [
+    [
+     "mineral drain Mark milestones (#256) at M3 the second press is a second tap and at M2 the same press waits out the cooldown, at 30 and 144 steps/s",
+     220
+    ],
+    [
+     "mineral drain Mark milestones (#256) a refused second tap costs nothing",
+     159
+    ]
+   ]
+  },
+  "src/features/ground-gun/debug.test.ts": {
+   "feature": "ground-gun",
+   "runs": 31,
+   "lastMs": 40,
+   "p50Ms": 35,
+   "p95Ms": 96,
+   "passRate": 1,
+   "lastStatus": "passed",
+   "lastRunId": 1792735738681,
+   "lastFailure": null,
+   "flaky": false,
+   "slowest": []
+  },
   "src/features/ground-gun/scene/boreTracer.test.ts": {
    "feature": "ground-gun",
    "runs": 25,
    "lastMs": 2,
    "p50Ms": 2,
    "p95Ms": 4,
+   "passRate": 1,
+   "lastStatus": "passed",
+   "lastRunId": 1792735738681,
+   "lastFailure": null,
+   "flaky": false,
+   "slowest": []
+  },
+  "src/features/ground-gun/store/fireKey.test.ts": {
+   "feature": "ground-gun",
+   "runs": 31,
+   "lastMs": 338,
+   "p50Ms": 314,
+   "p95Ms": 542,
+   "passRate": 1,
+   "lastStatus": "passed",
+   "lastRunId": 1792735738681,
+   "lastFailure": null,
+   "flaky": false,
+   "slowest": []
+  },
+  "src/features/ground-gun/store/fireLamp.test.ts": {
+   "feature": "ground-gun",
+   "runs": 31,
+   "lastMs": 142,
+   "p50Ms": 138,
+   "p95Ms": 310,
    "passRate": 1,
    "lastStatus": "passed",
    "lastRunId": 1792735738681,
@@ -7664,12 +5251,95 @@
    "flaky": false,
    "slowest": []
   },
+  "src/features/ground-gun/systems/boreGunLaw.test.ts": {
+   "feature": "ground-gun",
+   "runs": 31,
+   "lastMs": 90,
+   "p50Ms": 101,
+   "p95Ms": 230,
+   "passRate": 1,
+   "lastStatus": "passed",
+   "lastRunId": 1792735738681,
+   "lastFailure": null,
+   "flaky": false,
+   "slowest": []
+  },
+  "src/features/ground-gun/systems/boreGunModules.test.ts": {
+   "feature": "ground-gun",
+   "runs": 31,
+   "lastMs": 240,
+   "p50Ms": 267,
+   "p95Ms": 375,
+   "passRate": 1,
+   "lastStatus": "passed",
+   "lastRunId": 1792735738681,
+   "lastFailure": null,
+   "flaky": false,
+   "slowest": [
+    [
+     "ground-gun: the long barrel on the gun (ticket 318, #310 range ladder) still warns an uncased bore at Mastered, the hold cap later than with no hold",
+     160
+    ]
+   ]
+  },
+  "src/features/ground-gun/systems/boreGunProvider.test.ts": {
+   "feature": "ground-gun",
+   "runs": 31,
+   "lastMs": 13,
+   "p50Ms": 15,
+   "p95Ms": 37,
+   "passRate": 1,
+   "lastStatus": "passed",
+   "lastRunId": 1792735738681,
+   "lastFailure": null,
+   "flaky": false,
+   "slowest": []
+  },
   "src/features/ground-gun/systems/boreLadders.test.ts": {
    "feature": "ground-gun",
    "runs": 30,
    "lastMs": 5,
    "p50Ms": 6,
    "p95Ms": 11,
+   "passRate": 1,
+   "lastStatus": "passed",
+   "lastRunId": 1792735738681,
+   "lastFailure": null,
+   "flaky": false,
+   "slowest": []
+  },
+  "src/features/ground-gun/systems/borePickup.test.ts": {
+   "feature": "ground-gun",
+   "runs": 31,
+   "lastMs": 88,
+   "p50Ms": 98,
+   "p95Ms": 158,
+   "passRate": 1,
+   "lastStatus": "passed",
+   "lastRunId": 1792735738681,
+   "lastFailure": null,
+   "flaky": false,
+   "slowest": []
+  },
+  "src/features/ground-gun/systems/boughtModules.test.ts": {
+   "feature": "ground-gun",
+   "runs": 31,
+   "lastMs": 57,
+   "p50Ms": 53,
+   "p95Ms": 82,
+   "passRate": 1,
+   "lastStatus": "passed",
+   "lastRunId": 1792735738681,
+   "lastFailure": null,
+   "flaky": false,
+   "slowest": []
+  },
+  "src/features/ground-gun/systems/burstToggle.test.ts": {
+   "feature": "ground-gun",
+   "runs": 31,
+   "lastMs": 39,
+   "p50Ms": 38,
+   "p95Ms": 66,
    "passRate": 1,
    "lastStatus": "passed",
    "lastRunId": 1792735738681,
@@ -7718,6 +5388,32 @@
     [
      "ground-gun: the fire tile ring fills with the share of the wait already run, and is full once the gun may fire",
      125
+    ]
+   ]
+  },
+  "src/features/ground-gun/systems/flushingShell.test.ts": {
+   "feature": "ground-gun",
+   "runs": 31,
+   "lastMs": 469,
+   "p50Ms": 461,
+   "p95Ms": 646,
+   "passRate": 1,
+   "lastStatus": "passed",
+   "lastRunId": 1792735738681,
+   "lastFailure": null,
+   "flaky": false,
+   "slowest": [
+    [
+     "ground-gun: the flushing shell (ticket 388 through the K-flush registry) gives nothing without the shell, to a burrower out of range, or with the guns off Auto",
+     176
+    ],
+    [
+     "ground-gun: the flushing shell (ticket 388 through the K-flush registry) gives a burrower in the turret's range the shiver's ticks, cut to its walk of flushRange",
+     125
+    ],
+    [
+     "ground-gun: the flushing shell (ticket 388 through the K-flush registry) drives the burrower out into the corridor within flushTicks of a thump, cutting no cell",
+     118
     ]
    ]
   },
@@ -7825,12 +5521,51 @@
    "flaky": false,
    "slowest": []
   },
+  "src/features/ground-gun/systems/render/armouryMounts.test.ts": {
+   "feature": "ground-gun",
+   "runs": 32,
+   "lastMs": 9,
+   "p50Ms": 11,
+   "p95Ms": 16,
+   "passRate": 1,
+   "lastStatus": "passed",
+   "lastRunId": 1792735738681,
+   "lastFailure": null,
+   "flaky": false,
+   "slowest": []
+  },
+  "src/features/ground-gun/systems/render/boreGunLook.test.ts": {
+   "feature": "ground-gun",
+   "runs": 32,
+   "lastMs": 7,
+   "p50Ms": 8,
+   "p95Ms": 14,
+   "passRate": 1,
+   "lastStatus": "passed",
+   "lastRunId": 1792735738681,
+   "lastFailure": null,
+   "flaky": false,
+   "slowest": []
+  },
   "src/features/ground-gun/systems/render/boreSpray.test.ts": {
    "feature": "ground-gun",
    "runs": 25,
    "lastMs": 3,
    "p50Ms": 3,
    "p95Ms": 7,
+   "passRate": 1,
+   "lastStatus": "passed",
+   "lastRunId": 1792735738681,
+   "lastFailure": null,
+   "flaky": false,
+   "slowest": []
+  },
+  "src/features/ground-gun/systems/shoringShot.test.ts": {
+   "feature": "ground-gun",
+   "runs": 32,
+   "lastMs": 190,
+   "p50Ms": 159,
+   "p95Ms": 457,
    "passRate": 1,
    "lastStatus": "passed",
    "lastRunId": 1792735738681,
@@ -7864,6 +5599,32 @@
    "flaky": false,
    "slowest": []
   },
+  "src/features/ground-gun/systems/signatureGround.test.ts": {
+   "feature": "ground-gun",
+   "runs": 32,
+   "lastMs": 143,
+   "p50Ms": 166,
+   "p95Ms": 690,
+   "passRate": 1,
+   "lastStatus": "passed",
+   "lastRunId": 1792735738681,
+   "lastFailure": null,
+   "flaky": false,
+   "slowest": []
+  },
+  "src/features/ground-gun/systems/signatureShapes.test.ts": {
+   "feature": "ground-gun",
+   "runs": 31,
+   "lastMs": 287,
+   "p50Ms": 319,
+   "p95Ms": 862,
+   "passRate": 1,
+   "lastStatus": "passed",
+   "lastRunId": 1792735738681,
+   "lastFailure": null,
+   "flaky": false,
+   "slowest": []
+  },
   "src/features/ground-gun/systems/tilePress.test.ts": {
    "feature": "ground-gun",
    "runs": 25,
@@ -7876,6 +5637,94 @@
    "lastFailure": null,
    "flaky": false,
    "slowest": []
+  },
+  "src/features/ground-gun/systems/turretModules.test.ts": {
+   "feature": "ground-gun",
+   "runs": 32,
+   "lastMs": 233,
+   "p50Ms": 252,
+   "p95Ms": 353,
+   "passRate": 1,
+   "lastStatus": "passed",
+   "lastRunId": 1792735738681,
+   "lastFailure": null,
+   "flaky": false,
+   "slowest": [
+    [
+     "ground-gun: an unattached auto_guns module never acts (ticket 388, #319 GD Q4) acts only while the guns are mounted and the module is owned and attached",
+     133
+    ]
+   ]
+  },
+  "src/features/ground-gun/systems/turretShapes.test.ts": {
+   "feature": "ground-gun",
+   "runs": 31,
+   "lastMs": 103,
+   "p50Ms": 125,
+   "p95Ms": 356,
+   "passRate": 1,
+   "lastStatus": "passed",
+   "lastRunId": 1792735738681,
+   "lastFailure": null,
+   "flaky": false,
+   "slowest": []
+  },
+  "src/features/ground-gun/ui/fireGauge.test.ts": {
+   "feature": "ground-gun",
+   "runs": 31,
+   "lastMs": 6,
+   "p50Ms": 8,
+   "p95Ms": 13,
+   "passRate": 1,
+   "lastStatus": "passed",
+   "lastRunId": 1792735738681,
+   "lastFailure": null,
+   "flaky": false,
+   "slowest": []
+  },
+  "src/features/loadFeatures.test.ts": {
+   "feature": "slice-loader",
+   "runs": 33,
+   "lastMs": 3,
+   "p50Ms": 3,
+   "p95Ms": 7,
+   "passRate": 1,
+   "lastStatus": "passed",
+   "lastRunId": 1792735738681,
+   "lastFailure": null,
+   "flaky": false,
+   "slowest": []
+  },
+  "src/features/materials/systems/materialTable.test.ts": {
+   "feature": "materials",
+   "runs": 30,
+   "lastMs": 19,
+   "p50Ms": 13,
+   "p95Ms": 26,
+   "passRate": 1,
+   "lastStatus": "passed",
+   "lastRunId": 1792735738681,
+   "lastFailure": null,
+   "flaky": false,
+   "slowest": []
+  },
+  "src/features/mining-gates/debug.test.ts": {
+   "feature": "mining-gates",
+   "runs": 31,
+   "lastMs": 1517,
+   "p50Ms": 1617,
+   "p95Ms": 2691,
+   "passRate": 1,
+   "lastStatus": "passed",
+   "lastRunId": 1792735738681,
+   "lastFailure": null,
+   "flaky": false,
+   "slowest": [
+    [
+     "mining gates: debug actions counts each seed's dynamite-gated tiles and says whether the act has a dynamite family",
+     1480
+    ]
+   ]
   },
   "src/features/mining-gates/gateReportRows.test.ts": {
    "feature": "mining-gates",
@@ -7903,6 +5752,80 @@
    "flaky": false,
    "slowest": []
   },
+  "src/features/mining-gates/systems/botExtractorBuys.test.ts": {
+   "feature": "mining-gates",
+   "runs": 28,
+   "lastMs": 6765,
+   "p50Ms": 8041,
+   "p95Ms": 14724,
+   "passRate": 0.9642857142857143,
+   "lastStatus": "passed",
+   "lastRunId": 1792735738681,
+   "lastFailure": {
+    "runId": 1792573711044,
+    "sha": "35beab70853ee558e5d86707af9f6a7cadb48f07",
+    "at": "2026-10-21T07:16:35Z",
+    "tests": [
+     "bot: extractor buys (ticket 296, #142 acceptance 7) researches the node and buys the extractor on its planet before any track level"
+    ]
+   },
+   "flaky": false,
+   "slowest": [
+    [
+     "bot: extractor buys (ticket 296, #142 acceptance 7) researches the node and buys the extractor on its planet before any track level",
+     6745
+    ]
+   ]
+  },
+  "src/features/mining-gates/systems/botExtractors.test.ts": {
+   "feature": "mining-gates",
+   "runs": 28,
+   "lastMs": 176,
+   "p50Ms": 211,
+   "p95Ms": 330,
+   "passRate": 0.9285714285714286,
+   "lastStatus": "passed",
+   "lastRunId": 1792735738681,
+   "lastFailure": {
+    "runId": 1792210844435,
+    "sha": "8c31e735e996cd2dd15a15acfefa40bd8496ccf5",
+    "at": "2026-10-16T23:37:54Z",
+    "tests": [
+     "bot: extractor walls opens a planet 7 cell with its own rig.resonance and logs it cleared by the extractor",
+     "bot: extractor walls opens a planet 19 cell with its own rig.acid_etcher and logs it cleared by the extractor"
+    ]
+   },
+   "flaky": false,
+   "slowest": []
+  },
+  "src/features/mining-gates/systems/botGates.test.ts": {
+   "feature": "mining-gates",
+   "runs": 28,
+   "lastMs": 333,
+   "p50Ms": 306,
+   "p95Ms": 403,
+   "passRate": 0.9285714285714286,
+   "lastStatus": "passed",
+   "lastRunId": 1792735738681,
+   "lastFailure": {
+    "runId": 1792210844435,
+    "sha": "8c31e735e996cd2dd15a15acfefa40bd8496ccf5",
+    "at": "2026-10-16T23:37:54Z",
+    "tests": [
+     "bot: dynamite-gated shells and gate walls blasts a shell open with a charge that frees it, logged as cleared by dynamite",
+     "bot: dynamite-gated shells and gate walls wants the size a shell needs when it carries none, and leaves the shell standing",
+     "bot: dynamite-gated shells and gate walls never blasts a shell under the comparison policy",
+     "bot: gate_blocked_no_route (GD ruling on ticket 237) notes no stall for a shell that waits for a restock"
+    ]
+   },
+   "flaky": false,
+   "slowest": [
+    [
+     "bot: dynamite-gated shells and gate walls blasts a shell open with a charge that frees it, logged as cleared by dynamite",
+     196
+    ]
+   ]
+  },
   "src/features/mining-gates/systems/botShaftJog.test.ts": {
    "feature": "mining-gates",
    "runs": 28,
@@ -7925,6 +5848,19 @@
     ]
    ]
   },
+  "src/features/mining-gates/systems/canMine.test.ts": {
+   "feature": "mining-gates",
+   "runs": 28,
+   "lastMs": 154,
+   "p50Ms": 136,
+   "p95Ms": 267,
+   "passRate": 1,
+   "lastStatus": "passed",
+   "lastRunId": 1792735738681,
+   "lastFailure": null,
+   "flaky": false,
+   "slowest": []
+  },
   "src/features/mining-gates/systems/cellGates.test.ts": {
    "feature": "mining-gates",
    "runs": 28,
@@ -7937,6 +5873,55 @@
    "lastFailure": null,
    "flaky": false,
    "slowest": []
+  },
+  "src/features/mining-gates/systems/dynamiteCells.test.ts": {
+   "feature": "mining-gates",
+   "runs": 27,
+   "lastMs": 2,
+   "p50Ms": 3,
+   "p95Ms": 5,
+   "passRate": 1,
+   "lastStatus": "passed",
+   "lastRunId": 1792735738681,
+   "lastFailure": null,
+   "flaky": false,
+   "slowest": []
+  },
+  "src/features/mining-gates/systems/extractorRules.test.ts": {
+   "feature": "mining-gates",
+   "runs": 28,
+   "lastMs": 274,
+   "p50Ms": 308,
+   "p95Ms": 428,
+   "passRate": 1,
+   "lastStatus": "passed",
+   "lastRunId": 1792735738681,
+   "lastFailure": null,
+   "flaky": false,
+   "slowest": [
+    [
+     "extractor refills and resets refills the canisters with the recharge at the dock, and says how many",
+     121
+    ]
+   ]
+  },
+  "src/features/mining-gates/systems/extractorVerbs.test.ts": {
+   "feature": "mining-gates",
+   "runs": 28,
+   "lastMs": 479,
+   "p50Ms": 544,
+   "p95Ms": 1827,
+   "passRate": 1,
+   "lastStatus": "passed",
+   "lastRunId": 1792735738681,
+   "lastFailure": null,
+   "flaky": false,
+   "slowest": [
+    [
+     "extractor verbs: tune rings a touched resonance cell after the tune, then lets the drill cut it",
+     122
+    ]
+   ]
   },
   "src/features/mining-gates/systems/gateChipBoard.test.ts": {
    "feature": "mining-gates",
@@ -7951,6 +5936,62 @@
    "flaky": false,
    "slowest": []
   },
+  "src/features/mining-gates/systems/gateLedger.test.ts": {
+   "feature": "mining-gates",
+   "runs": 28,
+   "lastMs": 340,
+   "p50Ms": 304,
+   "p95Ms": 400,
+   "passRate": 0.9285714285714286,
+   "lastStatus": "passed",
+   "lastRunId": 1792735738681,
+   "lastFailure": {
+    "runId": 1792210844435,
+    "sha": "8c31e735e996cd2dd15a15acfefa40bd8496ccf5",
+    "at": "2026-10-16T23:37:54Z",
+    "tests": [
+     "gate ledger records a shell a charge broke as cleared by dynamite"
+    ]
+   },
+   "flaky": false,
+   "slowest": [
+    [
+     "gate ledger records a dense cell the drill broke as cleared by the drill, at its sale price",
+     100
+    ]
+   ]
+  },
+  "src/features/mining-gates/systems/gatesNearDock.test.ts": {
+   "feature": "mining-gates",
+   "runs": 30,
+   "lastMs": 34,
+   "p50Ms": 27,
+   "p95Ms": 52,
+   "passRate": 1,
+   "lastStatus": "passed",
+   "lastRunId": 1792735738681,
+   "lastFailure": null,
+   "flaky": false,
+   "slowest": []
+  },
+  "src/features/mining-gates/systems/gateTable.test.ts": {
+   "feature": "mining-gates",
+   "runs": 28,
+   "lastMs": 515,
+   "p50Ms": 546,
+   "p95Ms": 705,
+   "passRate": 1,
+   "lastStatus": "passed",
+   "lastRunId": 1792735738681,
+   "lastFailure": null,
+   "flaky": false,
+   "slowest": [
+    [
+     "gate table holds every item to 15% of a band's ore value on planets 1 to 200 (the guard)",
+     493
+    ]
+   ]
+  },
   "src/features/mining-gates/systems/ledgerLines.test.ts": {
    "feature": "mining-gates",
    "runs": 26,
@@ -7963,6 +6004,36 @@
    "lastFailure": null,
    "flaky": false,
    "slowest": []
+  },
+  "src/features/mining-gates/systems/render/cellGateLooks.test.ts": {
+   "feature": "mining-gates",
+   "runs": 30,
+   "lastMs": 313,
+   "p50Ms": 368,
+   "p95Ms": 1665,
+   "passRate": 0.9333333333333333,
+   "lastStatus": "passed",
+   "lastRunId": 1792735738681,
+   "lastFailure": {
+    "runId": 1792210844435,
+    "sha": "8c31e735e996cd2dd15a15acfefa40bd8496ccf5",
+    "at": "2026-10-16T23:37:54Z",
+    "tests": [
+     "gate looks in the ground shows a dynamite cell as the cracked shell, locked, which no tip opens",
+     "gate looks at the chunk mesh draws a gated cell's look into its tile's bits"
+    ]
+   },
+   "flaky": false,
+   "slowest": [
+    [
+     "gate looks in the ground shows a dynamite cell as the cracked shell, locked, which no tip opens",
+     120
+    ],
+    [
+     "gate looks at the chunk mesh draws a gated cell's look into its tile's bits",
+     103
+    ]
+   ]
   },
   "src/features/mining-gates/systems/render/drawnMarkers.test.ts": {
    "feature": "mining-gates",
@@ -7989,6 +6060,92 @@
    "lastFailure": null,
    "flaky": false,
    "slowest": []
+  },
+  "src/features/mining-gates/systems/render/lockMarkers.test.ts": {
+   "feature": "mining-gates",
+   "runs": 30,
+   "lastMs": 912,
+   "p50Ms": 335,
+   "p95Ms": 912,
+   "passRate": 0.9333333333333333,
+   "lastStatus": "passed",
+   "lastRunId": 1792735738681,
+   "lastFailure": {
+    "runId": 1792210844435,
+    "sha": "8c31e735e996cd2dd15a15acfefa40bd8496ccf5",
+    "at": "2026-10-16T23:37:54Z",
+    "tests": [
+     "lock markers seals a dynamite cell in a cracked shell"
+    ]
+   },
+   "flaky": false,
+   "slowest": [
+    [
+     "lock markers seals a dynamite cell in a cracked shell",
+     612
+    ],
+    [
+     "lock markers tints a signature cell's marker with its act, and an ordinary one not at all",
+     106
+    ],
+    [
+     "lock markers rims a dense cell, and opens the rim once the last major cuts it",
+     103
+    ]
+   ]
+  },
+  "src/features/mining-gates/systems/rigs.test.ts": {
+   "feature": "mining-gates",
+   "runs": 27,
+   "lastMs": 6,
+   "p50Ms": 7,
+   "p95Ms": 8,
+   "passRate": 1,
+   "lastStatus": "passed",
+   "lastRunId": 1792735738681,
+   "lastFailure": null,
+   "flaky": false,
+   "slowest": []
+  },
+  "src/features/mining-gates/systems/rigSales.test.ts": {
+   "feature": "mining-gates",
+   "runs": 31,
+   "lastMs": 10,
+   "p50Ms": 12,
+   "p95Ms": 26,
+   "passRate": 1,
+   "lastStatus": "passed",
+   "lastRunId": 1792735738681,
+   "lastFailure": null,
+   "flaky": false,
+   "slowest": []
+  },
+  "src/features/mining-gates/systems/toolsAndGear.test.ts": {
+   "feature": "mining-gates",
+   "runs": 28,
+   "lastMs": 197,
+   "p50Ms": 227,
+   "p95Ms": 417,
+   "passRate": 0.9285714285714286,
+   "lastStatus": "passed",
+   "lastRunId": 1792735738681,
+   "lastFailure": {
+    "runId": 1792210844435,
+    "sha": "8c31e735e996cd2dd15a15acfefa40bd8496ccf5",
+    "at": "2026-10-16T23:37:54Z",
+    "tests": [
+     "gated cells against power-ups and drill gear leaves rig-gated, dynamite-gated and dense cells whole under a power-up edit, extractor or not",
+     "gated cells against power-ups and drill gear lets drill gear take no rig-gated or dynamite-gated cell the drill has no means for",
+     "gated cells against power-ups and drill gear reports each gated cell the gear met as gate_hit, as the drill does"
+    ]
+   },
+   "flaky": false,
+   "slowest": [
+    [
+     "gated cells against power-ups and drill gear leaves rig-gated, dynamite-gated and dense cells whole under a power-up edit, extractor or not",
+     156
+    ]
+   ]
   },
   "src/features/mining-popup/noDoubleConversion.test.ts": {
    "feature": "mining-popup",
@@ -8595,12 +6752,311 @@
    "flaky": false,
    "slowest": []
   },
+  "src/features/planet-mix/fieldArcsBench.test.ts": {
+   "feature": "planet-mix",
+   "runs": 29,
+   "lastMs": 110,
+   "p50Ms": 140,
+   "p95Ms": 312,
+   "passRate": 1,
+   "lastStatus": "passed",
+   "lastRunId": 1792735738681,
+   "lastFailure": null,
+   "flaky": false,
+   "slowest": [
+    [
+     "field arcs bench times a P43 descent at top speed on one buffer, re-picking only at chunk crossings",
+     109
+    ]
+   ]
+  },
+  "src/features/planet-mix/histogramCheck.test.ts": {
+   "feature": "planet-mix",
+   "runs": 27,
+   "lastMs": 16,
+   "p50Ms": 11,
+   "p95Ms": 16,
+   "passRate": 1,
+   "lastStatus": "passed",
+   "lastRunId": 1792735738681,
+   "lastFailure": null,
+   "flaky": false,
+   "slowest": []
+  },
+  "src/features/planet-mix/magneticBandValue.test.ts": {
+   "feature": "planet-mix",
+   "runs": 30,
+   "lastMs": 60657,
+   "p50Ms": 73814,
+   "p95Ms": 242967,
+   "passRate": 1,
+   "lastStatus": "passed",
+   "lastRunId": 1792735738681,
+   "lastFailure": null,
+   "flaky": false,
+   "slowest": [
+    [
+     "magnetic planet band value (balance:magnetic-planet) keeps each band of planet 32 within 4% of the class-off planet's value on every seed",
+     23068
+    ],
+    [
+     "magnetic planet band value (balance:magnetic-planet) keeps each band of planet 28 within 4% of the class-off planet's value on every seed",
+     19303
+    ],
+    [
+     "magnetic planet band value (balance:magnetic-planet) keeps each band of planet 25 within 4% of the class-off planet's value on every seed",
+     18285
+    ]
+   ]
+  },
+  "src/features/planet-mix/magneticClassOff.test.ts": {
+   "feature": "planet-mix",
+   "runs": 27,
+   "lastMs": 45,
+   "p50Ms": 48,
+   "p95Ms": 80,
+   "passRate": 1,
+   "lastStatus": "passed",
+   "lastRunId": 1792735738681,
+   "lastFailure": null,
+   "flaky": false,
+   "slowest": []
+  },
+  "src/features/planet-mix/magneticPlanetPace.test.ts": {
+   "feature": "planet-mix",
+   "runs": 30,
+   "lastMs": 2224663,
+   "p50Ms": 484151,
+   "p95Ms": 1861152,
+   "passRate": 0.9333333333333333,
+   "lastStatus": "passed",
+   "lastRunId": 1792735738681,
+   "lastFailure": {
+    "runId": 1792573711044,
+    "sha": "35beab70853ee558e5d86707af9f6a7cadb48f07",
+    "at": "2026-10-21T07:16:35Z",
+    "tests": [
+     "magnetic planet pace (balance:magnetic-planet, GD lock on #258) takes planet 25 at most 10% longer without the bit than with the class off, never faster",
+     "magnetic planet pace (balance:magnetic-planet, GD lock on #258) takes planet 28 at most 10% longer without the bit than with the class off, never faster",
+     "magnetic planet pace (balance:magnetic-planet, GD lock on #258) takes planet 32 at most 10% longer without the bit than with the class off, never faster",
+     "magnetic planet pace (balance:magnetic-planet, GD lock on #258) takes planet 28 with the dielectric bit at least 0.98x the class-off time",
+     "magnetic planet pace (balance:magnetic-planet, GD lock on #258) earns at most 15% more per minute on magnetic planet 28 than with the class off"
+    ]
+   },
+   "flaky": false,
+   "slowest": [
+    [
+     "magnetic planet pace (balance:magnetic-planet, GD lock on #258) takes planet 32 at most 10% longer without the bit than with the class off, never faster",
+     178413
+    ],
+    [
+     "magnetic planet pace (balance:magnetic-planet, GD lock on #258) takes planet 28 at most 10% longer without the bit than with the class off, never faster",
+     141213
+    ],
+    [
+     "magnetic planet pace (balance:magnetic-planet, GD lock on #258) takes planet 25 at most 10% longer without the bit than with the class off, never faster",
+     138605
+    ]
+   ]
+  },
+  "src/features/planet-mix/magneticPlanetRuns.test.ts": {
+   "feature": "planet-mix",
+   "runs": 30,
+   "lastMs": 35,
+   "p50Ms": 49,
+   "p95Ms": 83,
+   "passRate": 1,
+   "lastStatus": "passed",
+   "lastRunId": 1792735738681,
+   "lastFailure": null,
+   "flaky": false,
+   "slowest": []
+  },
+  "src/features/planet-mix/mixHistogram.test.ts": {
+   "feature": "planet-mix",
+   "runs": 30,
+   "lastMs": 94008,
+   "p50Ms": 97971,
+   "p95Ms": 135288,
+   "passRate": 0.9,
+   "lastStatus": "passed",
+   "lastRunId": 1792735738681,
+   "lastFailure": {
+    "runId": 1792250237910,
+    "sha": "0a05199e7073d5d4c1baa4432eb2555cb7a13984",
+    "at": "2026-10-17T13:12:54Z",
+    "tests": [
+     "planet ore histogram matches the mix on a fresh P3, pooled over the pacing seeds",
+     "planet ore histogram matches the mix on a fresh P9, pooled over the pacing seeds",
+     "planet ore histogram matches the mix on a fresh P41, pooled over the pacing seeds"
+    ]
+   },
+   "flaky": false,
+   "slowest": [
+    [
+     "planet ore histogram matches the mix on a fresh story planet, pooled over 16 seeds",
+     43166
+    ],
+    [
+     "planet ore histogram matches the mix on a fresh P41, pooled over the pacing seeds",
+     9755
+    ],
+    [
+     "planet ore histogram matches the mix on P41 on the legacy rows, pooled over the pacing seeds",
+     8416
+    ]
+   ]
+  },
+  "src/features/planet-mix/mixReportRows.test.ts": {
+   "feature": "planet-mix",
+   "runs": 27,
+   "lastMs": 6,
+   "p50Ms": 5,
+   "p95Ms": 7,
+   "passRate": 1,
+   "lastStatus": "passed",
+   "lastRunId": 1792735738681,
+   "lastFailure": null,
+   "flaky": false,
+   "slowest": []
+  },
+  "src/features/planet-mix/sceneBudget.test.ts": {
+   "feature": "planet-mix",
+   "runs": 32,
+   "lastMs": 3,
+   "p50Ms": 4,
+   "p95Ms": 9,
+   "passRate": 1,
+   "lastStatus": "passed",
+   "lastRunId": 1792735738681,
+   "lastFailure": null,
+   "flaky": false,
+   "slowest": []
+  },
+  "src/features/planet-mix/systems/electrifiedCells.test.ts": {
+   "feature": "planet-mix",
+   "runs": 30,
+   "lastMs": 630,
+   "p50Ms": 715,
+   "p95Ms": 1252,
+   "passRate": 1,
+   "lastStatus": "passed",
+   "lastRunId": 1792735738681,
+   "lastFailure": null,
+   "flaky": false,
+   "slowest": [
+    [
+     "electrified cells canMine never refuses an electrified cell",
+     431
+    ]
+   ]
+  },
+  "src/features/planet-mix/systems/magneticFields.test.ts": {
+   "feature": "planet-mix",
+   "runs": 27,
+   "lastMs": 504,
+   "p50Ms": 530,
+   "p95Ms": 897,
+   "passRate": 1,
+   "lastStatus": "passed",
+   "lastRunId": 1792735738681,
+   "lastFailure": null,
+   "flaky": false,
+   "slowest": [
+    [
+     "magnetic fields throws no field and electrifies no cell off the magnetic planets, P30 included",
+     273
+    ],
+    [
+     "magnetic fields two sessions on one planet seed get byte-identical fields and electrified cells",
+     106
+    ]
+   ]
+  },
+  "src/features/planet-mix/systems/mixRoll.test.ts": {
+   "feature": "planet-mix",
+   "runs": 30,
+   "lastMs": 1471,
+   "p50Ms": 1476,
+   "p95Ms": 2780,
+   "passRate": 1,
+   "lastStatus": "passed",
+   "lastRunId": 1792735738681,
+   "lastFailure": null,
+   "flaky": false,
+   "slowest": [
+    [
+     "planet mix fold paints only the mix's types, band by band, on a Fire and a Hollow planet",
+     499
+    ],
+    [
+     "planet mix fold on the rarity rows (ticket 445) paints only the mix's types, band by band, on a stamped Fire and Hollow planet",
+     475
+    ],
+    [
+     "planet mix fold leaves P1 and P2 byte-identical to the lead roll alone",
+     217
+    ]
+   ]
+  },
+  "src/features/planet-mix/systems/oreMix.test.ts": {
+   "feature": "planet-mix",
+   "runs": 27,
+   "lastMs": 301,
+   "p50Ms": 367,
+   "p95Ms": 806,
+   "passRate": 1,
+   "lastStatus": "passed",
+   "lastRunId": 1792735738681,
+   "lastFailure": null,
+   "flaky": false,
+   "slowest": []
+  },
+  "src/features/planet-mix/systems/planetActs.test.ts": {
+   "feature": "planet-mix",
+   "runs": 27,
+   "lastMs": 222,
+   "p50Ms": 201,
+   "p95Ms": 540,
+   "passRate": 1,
+   "lastStatus": "passed",
+   "lastRunId": 1792735738681,
+   "lastFailure": null,
+   "flaky": false,
+   "slowest": []
+  },
+  "src/features/planet-mix/systems/planetCard.test.ts": {
+   "feature": "planet-mix",
+   "runs": 27,
+   "lastMs": 2,
+   "p50Ms": 3,
+   "p95Ms": 6,
+   "passRate": 1,
+   "lastStatus": "passed",
+   "lastRunId": 1792735738681,
+   "lastFailure": null,
+   "flaky": false,
+   "slowest": []
+  },
   "src/features/planet-mix/systems/planetCardSources.test.ts": {
    "feature": "planet-mix",
    "runs": 28,
    "lastMs": 8,
    "p50Ms": 6,
    "p95Ms": 10,
+   "passRate": 1,
+   "lastStatus": "passed",
+   "lastRunId": 1792735738681,
+   "lastFailure": null,
+   "flaky": false,
+   "slowest": []
+  },
+  "src/features/planet-mix/systems/planetClass.test.ts": {
+   "feature": "planet-mix",
+   "runs": 27,
+   "lastMs": 4,
+   "p50Ms": 4,
+   "p95Ms": 7,
    "passRate": 1,
    "lastStatus": "passed",
    "lastRunId": 1792735738681,
@@ -8621,12 +7077,87 @@
    "flaky": false,
    "slowest": []
   },
+  "src/features/planet-mix/systems/render/auroraBand.test.ts": {
+   "feature": "planet-mix",
+   "runs": 32,
+   "lastMs": 24,
+   "p50Ms": 4,
+   "p95Ms": 11,
+   "passRate": 1,
+   "lastStatus": "passed",
+   "lastRunId": 1792735738681,
+   "lastFailure": null,
+   "flaky": false,
+   "slowest": []
+  },
+  "src/features/planet-mix/systems/render/fieldArcBuffer.test.ts": {
+   "feature": "planet-mix",
+   "runs": 29,
+   "lastMs": 323,
+   "p50Ms": 289,
+   "p95Ms": 494,
+   "passRate": 1,
+   "lastStatus": "passed",
+   "lastRunId": 1792735738681,
+   "lastFailure": null,
+   "flaky": false,
+   "slowest": [
+    [
+     "field arc buffer rewrites as often at 30 and at 144 frames a second",
+     112
+    ]
+   ]
+  },
   "src/features/planet-mix/systems/render/fieldArcs.test.ts": {
    "feature": "planet-mix",
    "runs": 25,
    "lastMs": 8,
    "p50Ms": 6,
    "p95Ms": 21,
+   "passRate": 1,
+   "lastStatus": "passed",
+   "lastRunId": 1792735738681,
+   "lastFailure": null,
+   "flaky": false,
+   "slowest": []
+  },
+  "src/features/planet-mix/systems/render/magneticArt.test.ts": {
+   "feature": "planet-mix",
+   "runs": 32,
+   "lastMs": 3,
+   "p50Ms": 4,
+   "p95Ms": 10,
+   "passRate": 1,
+   "lastStatus": "passed",
+   "lastRunId": 1792735738681,
+   "lastFailure": null,
+   "flaky": false,
+   "slowest": []
+  },
+  "src/features/planet-mix/systems/signatureTag.test.ts": {
+   "feature": "planet-mix",
+   "runs": 30,
+   "lastMs": 160,
+   "p50Ms": 157,
+   "p95Ms": 409,
+   "passRate": 1,
+   "lastStatus": "passed",
+   "lastRunId": 1792735738681,
+   "lastFailure": null,
+   "flaky": false,
+   "slowest": [
+    [
+     "planet mix signature tag claims every signature entry of the mix and no other entry, P1 to P200",
+     157
+    ]
+   ]
+  },
+  "src/features/planet-mix/systems/themeRows.test.ts": {
+   "feature": "planet-mix",
+   "runs": 27,
+   "lastMs": 5,
+   "p50Ms": 4,
+   "p95Ms": 8,
    "passRate": 1,
    "lastStatus": "passed",
    "lastRunId": 1792735738681,
@@ -9008,12 +7539,38 @@
    "flaky": false,
    "slowest": []
   },
+  "src/features/sensing/debug.test.ts": {
+   "feature": "sensing",
+   "runs": 31,
+   "lastMs": 3,
+   "p50Ms": 4,
+   "p95Ms": 5,
+   "passRate": 1,
+   "lastStatus": "passed",
+   "lastRunId": 1792735738681,
+   "lastFailure": null,
+   "flaky": false,
+   "slowest": []
+  },
   "src/features/sensing/renderOnly.test.ts": {
    "feature": "sensing",
    "runs": 31,
    "lastMs": 63,
    "p50Ms": 73,
    "p95Ms": 117,
+   "passRate": 1,
+   "lastStatus": "passed",
+   "lastRunId": 1792735738681,
+   "lastFailure": null,
+   "flaky": false,
+   "slowest": []
+  },
+  "src/features/sensing/sceneBudget.test.ts": {
+   "feature": "sensing",
+   "runs": 31,
+   "lastMs": 3,
+   "p50Ms": 3,
+   "p95Ms": 5,
    "passRate": 1,
    "lastStatus": "passed",
    "lastRunId": 1792735738681,
@@ -9034,12 +7591,77 @@
    "flaky": false,
    "slowest": []
   },
+  "src/features/sensing/systems/assayLens.test.ts": {
+   "feature": "sensing",
+   "runs": 30,
+   "lastMs": 130,
+   "p50Ms": 124,
+   "p95Ms": 296,
+   "passRate": 1,
+   "lastStatus": "passed",
+   "lastRunId": 1792735738681,
+   "lastFailure": null,
+   "flaky": false,
+   "slowest": []
+  },
+  "src/features/sensing/systems/deepStriker.test.ts": {
+   "feature": "sensing",
+   "runs": 31,
+   "lastMs": 81,
+   "p50Ms": 88,
+   "p95Ms": 132,
+   "passRate": 1,
+   "lastStatus": "passed",
+   "lastRunId": 1792735738681,
+   "lastFailure": null,
+   "flaky": false,
+   "slowest": []
+  },
+  "src/features/sensing/systems/echoPing.test.ts": {
+   "feature": "sensing",
+   "runs": 30,
+   "lastMs": 1693,
+   "p50Ms": 595,
+   "p95Ms": 1415,
+   "passRate": 1,
+   "lastStatus": "passed",
+   "lastRunId": 1792735738681,
+   "lastFailure": null,
+   "flaky": false,
+   "slowest": [
+    [
+     "echo sounder ping badges exactly the ore cells a gate holds on a gated planet, with that gate",
+     1000
+    ],
+    [
+     "echo sounder ping marks the lava pockets of a heat planet as lava",
+     445
+    ],
+    [
+     "echo sounder ping marks the open cells of a cave inside its radius as cave",
+     162
+    ]
+   ]
+  },
   "src/features/sensing/systems/forkItemCards.test.ts": {
    "feature": "sensing",
    "runs": 30,
    "lastMs": 10,
    "p50Ms": 11,
    "p95Ms": 27,
+   "passRate": 1,
+   "lastStatus": "passed",
+   "lastRunId": 1792735738681,
+   "lastFailure": null,
+   "flaky": false,
+   "slowest": []
+  },
+  "src/features/sensing/systems/gatesFixture.test.ts": {
+   "feature": "sensing",
+   "runs": 31,
+   "lastMs": 179,
+   "p50Ms": 179,
+   "p95Ms": 225,
    "passRate": 1,
    "lastStatus": "passed",
    "lastRunId": 1792735738681,
@@ -9086,6 +7708,19 @@
    "flaky": false,
    "slowest": []
   },
+  "src/features/sensing/systems/passiveReads.test.ts": {
+   "feature": "sensing",
+   "runs": 31,
+   "lastMs": 275,
+   "p50Ms": 304,
+   "p95Ms": 576,
+   "passRate": 1,
+   "lastStatus": "passed",
+   "lastRunId": 1792735738681,
+   "lastFailure": null,
+   "flaky": false,
+   "slowest": []
+  },
   "src/features/sensing/systems/render/revealLook.test.ts": {
    "feature": "sensing",
    "runs": 25,
@@ -9098,6 +7733,24 @@
    "lastFailure": null,
    "flaky": false,
    "slowest": []
+  },
+  "src/features/sensing/systems/revealBoard.test.ts": {
+   "feature": "sensing",
+   "runs": 31,
+   "lastMs": 329,
+   "p50Ms": 197,
+   "p95Ms": 593,
+   "passRate": 1,
+   "lastStatus": "passed",
+   "lastRunId": 1792735738681,
+   "lastFailure": null,
+   "flaky": false,
+   "slowest": [
+    [
+     "sensing reveal board marks the open cells round the miner when the local player pings",
+     100
+    ]
+   ]
   },
   "src/features/sensing/systems/revealPing.test.ts": {
    "feature": "sensing",
@@ -9125,6 +7778,19 @@
    "flaky": false,
    "slowest": []
   },
+  "src/features/sensing/systems/sensingFork.test.ts": {
+   "feature": "sensing",
+   "runs": 31,
+   "lastMs": 115,
+   "p50Ms": 135,
+   "p95Ms": 389,
+   "passRate": 1,
+   "lastStatus": "passed",
+   "lastRunId": 1792735738681,
+   "lastFailure": null,
+   "flaky": false,
+   "slowest": []
+  },
   "src/features/sensing/systems/sensingItems.test.ts": {
    "feature": "sensing",
    "runs": 31,
@@ -9144,6 +7810,32 @@
    "lastMs": 24,
    "p50Ms": 26,
    "p95Ms": 109,
+   "passRate": 1,
+   "lastStatus": "passed",
+   "lastRunId": 1792735738681,
+   "lastFailure": null,
+   "flaky": false,
+   "slowest": []
+  },
+  "src/features/sensing/systems/sensingView.test.ts": {
+   "feature": "sensing",
+   "runs": 31,
+   "lastMs": 130,
+   "p50Ms": 92,
+   "p95Ms": 142,
+   "passRate": 1,
+   "lastStatus": "passed",
+   "lastRunId": 1792735738681,
+   "lastFailure": null,
+   "flaky": false,
+   "slowest": []
+  },
+  "src/features/sensing/systems/soundingPing.test.ts": {
+   "feature": "sensing",
+   "runs": 31,
+   "lastMs": 144,
+   "p50Ms": 161,
+   "p95Ms": 286,
    "passRate": 1,
    "lastStatus": "passed",
    "lastRunId": 1792735738681,
@@ -9182,6 +7874,32 @@
     ]
    ]
   },
+  "src/features/sensing/systems/useResolution.test.ts": {
+   "feature": "sensing",
+   "runs": 31,
+   "lastMs": 2374,
+   "p50Ms": 2723,
+   "p95Ms": 5169,
+   "passRate": 1,
+   "lastStatus": "passed",
+   "lastRunId": 1792735738681,
+   "lastFailure": null,
+   "flaky": false,
+   "slowest": [
+    [
+     "sensing Mark milestones (#256): Mark 6 hold signal buoy: facing down, the tap and the hold drop the buoy on different tiles",
+     378
+    ],
+    [
+     "sensing Mark milestones (#256): Mark 3 second tap, at 30 and 144 steps/s signal buoy: at M3 the second tap drops the buoy one ring ahead and at M2 where it stands",
+     276
+    ],
+    [
+     "sensing Mark milestones (#256): Mark 9 sibling-link the signal buoy's drop lobs a slotted flare that maps half as wide",
+     240
+    ]
+   ]
+  },
   "src/features/sliceBoundaries.test.ts": {
    "feature": "slice-loader",
    "runs": 25,
@@ -9213,6 +7931,58 @@
    "flaky": false,
    "slowest": []
   },
+  "src/features/tech-tree/debug.test.ts": {
+   "feature": "tech-tree",
+   "runs": 32,
+   "lastMs": 97,
+   "p50Ms": 97,
+   "p95Ms": 180,
+   "passRate": 1,
+   "lastStatus": "passed",
+   "lastRunId": 1792735738681,
+   "lastFailure": null,
+   "flaky": false,
+   "slowest": []
+  },
+  "src/features/tech-tree/forkBranches.vision.test.ts": {
+   "feature": "tech-tree",
+   "runs": 32,
+   "lastMs": 214,
+   "p50Ms": 219,
+   "p95Ms": 429,
+   "passRate": 1,
+   "lastStatus": "passed",
+   "lastRunId": 1792735738681,
+   "lastFailure": null,
+   "flaky": false,
+   "slowest": []
+  },
+  "src/features/tech-tree/forkMixRuns.test.ts": {
+   "feature": "tech-tree",
+   "runs": 32,
+   "lastMs": 6559,
+   "p50Ms": 8418,
+   "p95Ms": 28617,
+   "passRate": 1,
+   "lastStatus": "passed",
+   "lastRunId": 1792735738681,
+   "lastFailure": null,
+   "flaky": false,
+   "slowest": [
+    [
+     "tech tree: a run forced onto a whole lane plays the bot on the forced lane and keeps its pace from the start",
+     2896
+    ],
+    [
+     "tech tree: a forced fork run reads the same numbers from a second run on the same branch and seed",
+     2257
+    ],
+    [
+     "tech tree: a forced fork run plays the bot on the forced branch and keeps its pace and action mix",
+     1392
+    ]
+   ]
+  },
   "src/features/tech-tree/incomeCapGolden.test.ts": {
    "feature": "tech-tree",
    "runs": 28,
@@ -9226,12 +7996,90 @@
    "flaky": false,
    "slowest": []
   },
+  "src/features/tech-tree/rigPieces.test.ts": {
+   "feature": "tech-tree",
+   "runs": 32,
+   "lastMs": 25,
+   "p50Ms": 16,
+   "p95Ms": 27,
+   "passRate": 1,
+   "lastStatus": "passed",
+   "lastRunId": 1792735738681,
+   "lastFailure": null,
+   "flaky": false,
+   "slowest": []
+  },
+  "src/features/tech-tree/rushHand.test.ts": {
+   "feature": "tech-tree",
+   "runs": 32,
+   "lastMs": 144,
+   "p50Ms": 168,
+   "p95Ms": 1492,
+   "passRate": 1,
+   "lastStatus": "passed",
+   "lastRunId": 1792735738681,
+   "lastFailure": null,
+   "flaky": false,
+   "slowest": []
+  },
   "src/features/tech-tree/scene/extractorDeploy.test.ts": {
    "feature": "tech-tree",
    "runs": 30,
    "lastMs": 5,
    "p50Ms": 5,
    "p95Ms": 9,
+   "passRate": 1,
+   "lastStatus": "passed",
+   "lastRunId": 1792735738681,
+   "lastFailure": null,
+   "flaky": false,
+   "slowest": []
+  },
+  "src/features/tech-tree/store/treeScreenStore.test.ts": {
+   "feature": "tech-tree",
+   "runs": 32,
+   "lastMs": 19,
+   "p50Ms": 20,
+   "p95Ms": 215,
+   "passRate": 1,
+   "lastStatus": "passed",
+   "lastRunId": 1792735738681,
+   "lastFailure": null,
+   "flaky": false,
+   "slowest": []
+  },
+  "src/features/tech-tree/systems/aethericCards.vision.test.ts": {
+   "feature": "tech-tree",
+   "runs": 32,
+   "lastMs": 45,
+   "p50Ms": 42,
+   "p95Ms": 223,
+   "passRate": 1,
+   "lastStatus": "passed",
+   "lastRunId": 1792735738681,
+   "lastFailure": null,
+   "flaky": false,
+   "slowest": []
+  },
+  "src/features/tech-tree/systems/aethericLane.test.ts": {
+   "feature": "tech-tree",
+   "runs": 32,
+   "lastMs": 31,
+   "p50Ms": 31,
+   "p95Ms": 53,
+   "passRate": 1,
+   "lastStatus": "passed",
+   "lastRunId": 1792735738681,
+   "lastFailure": null,
+   "flaky": false,
+   "slowest": []
+  },
+  "src/features/tech-tree/systems/anchorAffordability.test.ts": {
+   "feature": "tech-tree",
+   "runs": 32,
+   "lastMs": 13,
+   "p50Ms": 12,
+   "p95Ms": 34,
    "passRate": 1,
    "lastStatus": "passed",
    "lastRunId": 1792735738681,
@@ -9278,6 +8126,89 @@
    "flaky": false,
    "slowest": []
   },
+  "src/features/tech-tree/systems/forkBotPick.test.ts": {
+   "feature": "tech-tree",
+   "runs": 32,
+   "lastMs": 9317,
+   "p50Ms": 9440,
+   "p95Ms": 14170,
+   "passRate": 1,
+   "lastStatus": "passed",
+   "lastRunId": 1792735738681,
+   "lastFailure": null,
+   "flaky": false,
+   "slowest": [
+    [
+     "tech tree: the pacing bot's fork pick chooses Deep at the fork planet when the wallet pays",
+     9308
+    ]
+   ]
+  },
+  "src/features/tech-tree/systems/forkBranchCards.vision.test.ts": {
+   "feature": "tech-tree",
+   "runs": 32,
+   "lastMs": 59,
+   "p50Ms": 59,
+   "p95Ms": 118,
+   "passRate": 1,
+   "lastStatus": "passed",
+   "lastRunId": 1792735738681,
+   "lastFailure": null,
+   "flaky": false,
+   "slowest": []
+  },
+  "src/features/tech-tree/systems/forkChoice.test.ts": {
+   "feature": "tech-tree",
+   "runs": 32,
+   "lastMs": 126,
+   "p50Ms": 105,
+   "p95Ms": 347,
+   "passRate": 1,
+   "lastStatus": "passed",
+   "lastRunId": 1792735738681,
+   "lastFailure": null,
+   "flaky": false,
+   "slowest": []
+  },
+  "src/features/tech-tree/systems/forkCost.test.ts": {
+   "feature": "tech-tree",
+   "runs": 32,
+   "lastMs": 34,
+   "p50Ms": 40,
+   "p95Ms": 94,
+   "passRate": 1,
+   "lastStatus": "passed",
+   "lastRunId": 1792735738681,
+   "lastFailure": null,
+   "flaky": false,
+   "slowest": []
+  },
+  "src/features/tech-tree/systems/forkForce.test.ts": {
+   "feature": "tech-tree",
+   "runs": 32,
+   "lastMs": 27,
+   "p50Ms": 26,
+   "p95Ms": 111,
+   "passRate": 1,
+   "lastStatus": "passed",
+   "lastRunId": 1792735738681,
+   "lastFailure": null,
+   "flaky": false,
+   "slowest": []
+  },
+  "src/features/tech-tree/systems/forkMixMetrics.test.ts": {
+   "feature": "tech-tree",
+   "runs": 32,
+   "lastMs": 13,
+   "p50Ms": 17,
+   "p95Ms": 46,
+   "passRate": 1,
+   "lastStatus": "passed",
+   "lastRunId": 1792735738681,
+   "lastFailure": null,
+   "flaky": false,
+   "slowest": []
+  },
   "src/features/tech-tree/systems/forkMixReport.test.ts": {
    "feature": "tech-tree",
    "runs": 25,
@@ -9317,6 +8248,32 @@
    "flaky": false,
    "slowest": []
   },
+  "src/features/tech-tree/systems/forkRechoice.spend.test.ts": {
+   "feature": "tech-tree",
+   "runs": 32,
+   "lastMs": 36,
+   "p50Ms": 38,
+   "p95Ms": 224,
+   "passRate": 1,
+   "lastStatus": "passed",
+   "lastRunId": 1792735738681,
+   "lastFailure": null,
+   "flaky": false,
+   "slowest": []
+  },
+  "src/features/tech-tree/systems/generatedCombos.test.ts": {
+   "feature": "tech-tree",
+   "runs": 31,
+   "lastMs": 49,
+   "p50Ms": 50,
+   "p95Ms": 144,
+   "passRate": 1,
+   "lastStatus": "passed",
+   "lastRunId": 1792735738681,
+   "lastFailure": null,
+   "flaky": false,
+   "slowest": []
+  },
   "src/features/tech-tree/systems/incomeCapCheck.test.ts": {
    "feature": "tech-tree",
    "runs": 30,
@@ -9343,12 +8300,56 @@
    "flaky": false,
    "slowest": []
   },
+  "src/features/tech-tree/systems/itemMarks.test.ts": {
+   "feature": "tech-tree",
+   "runs": 32,
+   "lastMs": 61,
+   "p50Ms": 27,
+   "p95Ms": 59,
+   "passRate": 1,
+   "lastStatus": "passed",
+   "lastRunId": 1792735738681,
+   "lastFailure": null,
+   "flaky": false,
+   "slowest": []
+  },
+  "src/features/tech-tree/systems/itemShop.test.ts": {
+   "feature": "tech-tree",
+   "runs": 32,
+   "lastMs": 264,
+   "p50Ms": 176,
+   "p95Ms": 285,
+   "passRate": 1,
+   "lastStatus": "passed",
+   "lastRunId": 1792735738681,
+   "lastFailure": null,
+   "flaky": false,
+   "slowest": [
+    [
+     "tech tree: the bot buys what it researched (ticket 248) buys the item of every capability it researched, logging each purchase",
+     102
+    ]
+   ]
+  },
   "src/features/tech-tree/systems/lanePace.test.ts": {
    "feature": "tech-tree",
    "runs": 25,
    "lastMs": 3,
    "p50Ms": 3,
    "p95Ms": 13,
+   "passRate": 1,
+   "lastStatus": "passed",
+   "lastRunId": 1792735738681,
+   "lastFailure": null,
+   "flaky": false,
+   "slowest": []
+  },
+  "src/features/tech-tree/systems/loadoutYieldCap.test.ts": {
+   "feature": "tech-tree",
+   "runs": 32,
+   "lastMs": 31,
+   "p50Ms": 26,
+   "p95Ms": 38,
    "passRate": 1,
    "lastStatus": "passed",
    "lastRunId": 1792735738681,
@@ -9369,6 +8370,19 @@
    "flaky": false,
    "slowest": []
   },
+  "src/features/tech-tree/systems/nodeCost.test.ts": {
+   "feature": "tech-tree",
+   "runs": 31,
+   "lastMs": 16,
+   "p50Ms": 15,
+   "p95Ms": 25,
+   "passRate": 1,
+   "lastStatus": "passed",
+   "lastRunId": 1792735738681,
+   "lastFailure": null,
+   "flaky": false,
+   "slowest": []
+  },
   "src/features/tech-tree/systems/nodePress.test.ts": {
    "feature": "tech-tree",
    "runs": 18,
@@ -9378,6 +8392,19 @@
    "passRate": 1,
    "lastStatus": "passed",
    "lastRunId": 1792606995036,
+   "lastFailure": null,
+   "flaky": false,
+   "slowest": []
+  },
+  "src/features/tech-tree/systems/nodeSpendShare.diagnostic.test.ts": {
+   "feature": "tech-tree",
+   "runs": 32,
+   "lastMs": 0,
+   "p50Ms": 0,
+   "p95Ms": 0,
+   "passRate": 1,
+   "lastStatus": "passed",
+   "lastRunId": 1792735738681,
    "lastFailure": null,
    "flaky": false,
    "slowest": []
@@ -9395,12 +8422,38 @@
    "flaky": false,
    "slowest": []
   },
+  "src/features/tech-tree/systems/priceOnly.test.ts": {
+   "feature": "tech-tree",
+   "runs": 32,
+   "lastMs": 275,
+   "p50Ms": 181,
+   "p95Ms": 333,
+   "passRate": 1,
+   "lastStatus": "passed",
+   "lastRunId": 1792735738681,
+   "lastFailure": null,
+   "flaky": false,
+   "slowest": []
+  },
   "src/features/tech-tree/systems/render/extractorPose.test.ts": {
    "feature": "tech-tree",
    "runs": 30,
    "lastMs": 9,
    "p50Ms": 3,
    "p95Ms": 28,
+   "passRate": 1,
+   "lastStatus": "passed",
+   "lastRunId": 1792735738681,
+   "lastFailure": null,
+   "flaky": false,
+   "slowest": []
+  },
+  "src/features/tech-tree/systems/render/forkPieces.test.ts": {
+   "feature": "tech-tree",
+   "runs": 32,
+   "lastMs": 46,
+   "p50Ms": 33,
+   "p95Ms": 93,
    "passRate": 1,
    "lastStatus": "passed",
    "lastRunId": 1792735738681,
@@ -9473,6 +8526,19 @@
    "flaky": false,
    "slowest": []
   },
+  "src/features/tech-tree/systems/render/techGear.test.ts": {
+   "feature": "tech-tree",
+   "runs": 32,
+   "lastMs": 30,
+   "p50Ms": 30,
+   "p95Ms": 61,
+   "passRate": 1,
+   "lastStatus": "passed",
+   "lastRunId": 1792735738681,
+   "lastFailure": null,
+   "flaky": false,
+   "slowest": []
+  },
   "src/features/tech-tree/systems/render/techGearQuads.test.ts": {
    "feature": "tech-tree",
    "runs": 30,
@@ -9486,12 +8552,90 @@
    "flaky": false,
    "slowest": []
   },
+  "src/features/tech-tree/systems/researchBotPurchase.test.ts": {
+   "feature": "tech-tree",
+   "runs": 32,
+   "lastMs": 9230,
+   "p50Ms": 12118,
+   "p95Ms": 107587,
+   "passRate": 1,
+   "lastStatus": "passed",
+   "lastRunId": 1792735738681,
+   "lastFailure": null,
+   "flaky": false,
+   "slowest": [
+    [
+     "tech tree: the pacing bot researches sends only nodes the tree accepts: no refusal on the log",
+     2774
+    ],
+    [
+     "tech tree: the pacing bot researches researches nodes through the purchase seam after its own Upgrade bay purchases",
+     1743
+    ],
+    [
+     "tech tree: the pacing bot researches puts the tree's spend in the spend-share diagnostic",
+     1724
+    ]
+   ]
+  },
   "src/features/tech-tree/systems/rushPace.test.ts": {
    "feature": "tech-tree",
    "runs": 25,
    "lastMs": 2,
    "p50Ms": 3,
    "p95Ms": 6,
+   "passRate": 1,
+   "lastStatus": "passed",
+   "lastRunId": 1792735738681,
+   "lastFailure": null,
+   "flaky": false,
+   "slowest": []
+  },
+  "src/features/tech-tree/systems/techTree.test.ts": {
+   "feature": "tech-tree",
+   "runs": 31,
+   "lastMs": 19,
+   "p50Ms": 17,
+   "p95Ms": 37,
+   "passRate": 1,
+   "lastStatus": "passed",
+   "lastRunId": 1792735738681,
+   "lastFailure": null,
+   "flaky": false,
+   "slowest": []
+  },
+  "src/features/tech-tree/systems/techTreeCommands.test.ts": {
+   "feature": "tech-tree",
+   "runs": 32,
+   "lastMs": 101,
+   "p50Ms": 94,
+   "p95Ms": 152,
+   "passRate": 1,
+   "lastStatus": "passed",
+   "lastRunId": 1792735738681,
+   "lastFailure": null,
+   "flaky": false,
+   "slowest": []
+  },
+  "src/features/tech-tree/systems/treeScreenModel.test.ts": {
+   "feature": "tech-tree",
+   "runs": 33,
+   "lastMs": 140,
+   "p50Ms": 154,
+   "p95Ms": 428,
+   "passRate": 1,
+   "lastStatus": "passed",
+   "lastRunId": 1792735738681,
+   "lastFailure": null,
+   "flaky": false,
+   "slowest": []
+  },
+  "src/features/tech-tree/systems/treeShape.test.ts": {
+   "feature": "tech-tree",
+   "runs": 31,
+   "lastMs": 31,
+   "p50Ms": 31,
+   "p95Ms": 107,
    "passRate": 1,
    "lastStatus": "passed",
    "lastRunId": 1792735738681,
@@ -9512,6 +8656,32 @@
    "flaky": false,
    "slowest": []
   },
+  "src/features/tech-tree/systems/unlockRules.test.ts": {
+   "feature": "tech-tree",
+   "runs": 32,
+   "lastMs": 89,
+   "p50Ms": 93,
+   "p95Ms": 263,
+   "passRate": 1,
+   "lastStatus": "passed",
+   "lastRunId": 1792735738681,
+   "lastFailure": null,
+   "flaky": false,
+   "slowest": []
+  },
+  "src/features/tech-tree/ui/nodeCardHold.test.ts": {
+   "feature": "tech-tree",
+   "runs": 23,
+   "lastMs": 52,
+   "p50Ms": 27,
+   "p95Ms": 52,
+   "passRate": 1,
+   "lastStatus": "passed",
+   "lastRunId": 1792606995036,
+   "lastFailure": null,
+   "flaky": false,
+   "slowest": []
+  },
   "src/features/tech-tree/ui/nodeElement.test.ts": {
    "feature": "tech-tree",
    "runs": 22,
@@ -9525,12 +8695,186 @@
    "flaky": false,
    "slowest": []
   },
+  "src/features/tech-tree/ui/techTreeScreen.test.ts": {
+   "feature": "tech-tree",
+   "runs": 23,
+   "lastMs": 777,
+   "p50Ms": 842,
+   "p95Ms": 1418,
+   "passRate": 0.8695652173913043,
+   "lastStatus": "passed",
+   "lastRunId": 1792606995036,
+   "lastFailure": {
+    "runId": 1792590572281,
+    "sha": "d47e5dee1b35518d4e30c92d91d73779605f72fd",
+    "at": "2026-10-21T12:18:58Z",
+    "tests": [
+     "tech tree text budget (spec #422, pass #426) keeps every lane list and node card within budget, with no text outside an element"
+    ]
+   },
+   "flaky": false,
+   "slowest": [
+    [
+     "tech tree text budget (spec #422, pass #426) keeps every lane list and node card within budget, with no text outside an element",
+     222
+    ],
+    [
+     "tech tree text budget (spec #422, pass #426) keeps a locked node's reason and its price on the element, never in the tooltip",
+     201
+    ]
+   ]
+  },
+  "src/features/terrain-tools/foamPace.test.ts": {
+   "feature": "terrain-tools",
+   "runs": 32,
+   "lastMs": 364599,
+   "p50Ms": 271240,
+   "p95Ms": 1707558,
+   "passRate": 0.6875,
+   "lastStatus": "failed",
+   "lastRunId": 1792735738681,
+   "lastFailure": {
+    "runId": 1792735738681,
+    "sha": "dca609908e4fa6c361bc34d78442dbbffed4eb4a",
+    "at": "2026-10-22T23:45:39Z",
+    "tests": [
+     "stabiliser foam pace (VS pin on #381, Systems ruling on #664) keeps time to core at least 0.98x the bare time where both rigs survive on planet 7",
+     "stabiliser foam pace (VS pin on #381, Systems ruling on #664) keeps the holders' time to core within 5% of cement's pin where the bare rig dies on planet 7",
+     "stabiliser foam pace (VS pin on #381, Systems ruling on #664) keeps the holders' lining under 6% of their income on planet 7"
+    ]
+   },
+   "flaky": false,
+   "slowest": [
+    [
+     "stabiliser foam pace (VS pin on #381, Systems ruling on #664) keeps time to core at least 0.98x the bare time where both rigs survive on planet 7",
+     229854
+    ],
+    [
+     "stabiliser foam pace (VS pin on #381, Systems ruling on #664) keeps time to core at least 0.98x the bare time where both rigs survive on planet 10",
+     76137
+    ],
+    [
+     "stabiliser foam pace (VS pin on #381, Systems ruling on #664) keeps time to core at least 0.98x the bare time where both rigs survive on planet 3",
+     58481
+    ]
+   ]
+  },
+  "src/features/terrain-tools/logging.test.ts": {
+   "feature": "terrain-tools",
+   "runs": 31,
+   "lastMs": 130,
+   "p50Ms": 143,
+   "p95Ms": 285,
+   "passRate": 1,
+   "lastStatus": "passed",
+   "lastRunId": 1792735738681,
+   "lastFailure": null,
+   "flaky": false,
+   "slowest": []
+  },
+  "src/features/terrain-tools/magnetFieldsBench.test.ts": {
+   "feature": "terrain-tools",
+   "runs": 31,
+   "lastMs": 147,
+   "p50Ms": 191,
+   "p95Ms": 965,
+   "passRate": 1,
+   "lastStatus": "passed",
+   "lastRunId": 1792735738681,
+   "lastFailure": null,
+   "flaky": false,
+   "slowest": [
+    [
+     "magnet fields bench times a P43 descent with three players’ fields on one buffer, rebuilding only on change",
+     146
+    ]
+   ]
+  },
   "src/features/terrain-tools/magnetGuard.test.ts": {
    "feature": "terrain-tools",
    "runs": 31,
    "lastMs": 34,
    "p50Ms": 39,
    "p95Ms": 76,
+   "passRate": 1,
+   "lastStatus": "passed",
+   "lastRunId": 1792735738681,
+   "lastFailure": null,
+   "flaky": false,
+   "slowest": []
+  },
+  "src/features/terrain-tools/magnetHand.test.ts": {
+   "feature": "terrain-tools",
+   "runs": 31,
+   "lastMs": 128,
+   "p50Ms": 144,
+   "p95Ms": 298,
+   "passRate": 1,
+   "lastStatus": "passed",
+   "lastRunId": 1792735738681,
+   "lastFailure": null,
+   "flaky": false,
+   "slowest": []
+  },
+  "src/features/terrain-tools/magnetPace.test.ts": {
+   "feature": "terrain-tools",
+   "runs": 31,
+   "lastMs": 2208093,
+   "p50Ms": 212086,
+   "p95Ms": 2208093,
+   "passRate": 1,
+   "lastStatus": "passed",
+   "lastRunId": 1792735738681,
+   "lastFailure": null,
+   "flaky": false,
+   "slowest": [
+    [
+     "terrain magnets pace (balance:magnets, GD lock on #246) uses both the coil and the clamp on planet 7 on every seed",
+     186941
+    ],
+    [
+     "terrain magnets pace (balance:magnets, GD lock on #246) uses both the coil and the clamp on planet 10 on every seed",
+     75883
+    ]
+   ]
+  },
+  "src/features/terrain-tools/moverIncomeRates.test.ts": {
+   "feature": "terrain-tools",
+   "runs": 31,
+   "lastMs": 23,
+   "p50Ms": 22,
+   "p95Ms": 38,
+   "passRate": 1,
+   "lastStatus": "passed",
+   "lastRunId": 1792735738681,
+   "lastFailure": null,
+   "flaky": false,
+   "slowest": []
+  },
+  "src/features/terrain-tools/moverLedger.test.ts": {
+   "feature": "terrain-tools",
+   "runs": 31,
+   "lastMs": 390,
+   "p50Ms": 448,
+   "p95Ms": 982,
+   "passRate": 1,
+   "lastStatus": "passed",
+   "lastRunId": 1792735738681,
+   "lastFailure": null,
+   "flaky": false,
+   "slowest": [
+    [
+     "mover trip ledger banks at most tripCapAt of mover value on a trip of heavy mover use, at any frame rate",
+     228
+    ]
+   ]
+  },
+  "src/features/terrain-tools/sceneBudget.test.ts": {
+   "feature": "terrain-tools",
+   "runs": 32,
+   "lastMs": 3,
+   "p50Ms": 3,
+   "p95Ms": 5,
    "passRate": 1,
    "lastStatus": "passed",
    "lastRunId": 1792735738681,
@@ -9550,6 +8894,236 @@
    "lastFailure": null,
    "flaky": false,
    "slowest": []
+  },
+  "src/features/terrain-tools/store/clampRelease.test.ts": {
+   "feature": "terrain-tools",
+   "runs": 31,
+   "lastMs": 401,
+   "p50Ms": 353,
+   "p95Ms": 590,
+   "passRate": 1,
+   "lastStatus": "passed",
+   "lastRunId": 1792735738681,
+   "lastFailure": null,
+   "flaky": false,
+   "slowest": [
+    [
+     "lode clamp release on the keys sends one release_power_up on the key-up tick and warns every braced block afresh",
+     247
+    ],
+    [
+     "lode clamp release on touch keeps the card closed and the brace on past 400 ms, then releases on the lift",
+     154
+    ]
+   ]
+  },
+  "src/features/terrain-tools/systems/clampCountdown.test.ts": {
+   "feature": "terrain-tools",
+   "runs": 31,
+   "lastMs": 650,
+   "p50Ms": 681,
+   "p95Ms": 1076,
+   "passRate": 1,
+   "lastStatus": "passed",
+   "lastRunId": 1792735738681,
+   "lastFailure": null,
+   "flaky": false,
+   "slowest": [
+    [
+     "lode clamp: the drawn crack countdown (ticket 357) stands at what each block had left when the brace caught it, on every tick of the hold",
+     236
+    ],
+    [
+     "lode clamp: the drawn crack countdown (ticket 357) shows the full countdown on the tick the brace ends, then counts down",
+     150
+    ],
+    [
+     "lode clamp: the drawn crack countdown (ticket 357) draws the same countdown at 30 frames a second",
+     135
+    ]
+   ]
+  },
+  "src/features/terrain-tools/systems/clampLattice.test.ts": {
+   "feature": "terrain-tools",
+   "runs": 31,
+   "lastMs": 551,
+   "p50Ms": 582,
+   "p95Ms": 1383,
+   "passRate": 1,
+   "lastStatus": "passed",
+   "lastRunId": 1792735738681,
+   "lastFailure": null,
+   "flaky": false,
+   "slowest": [
+    [
+     "lode clamp lattice lays the struts over exactly the blocks the field braces",
+     179
+    ],
+    [
+     "lode clamp lattice takes the struts away and shows the full countdown on the tick the brace ends",
+     140
+    ],
+    [
+     "lode clamp lattice freezes each braced countdown at what it had left when the brace caught it",
+     124
+    ]
+   ]
+  },
+  "src/features/terrain-tools/systems/dragHooks.test.ts": {
+   "feature": "terrain-tools",
+   "runs": 32,
+   "lastMs": 410,
+   "p50Ms": 341,
+   "p95Ms": 847,
+   "passRate": 1,
+   "lastStatus": "passed",
+   "lastRunId": 1792735738681,
+   "lastFailure": null,
+   "flaky": false,
+   "slowest": []
+  },
+  "src/features/terrain-tools/systems/foamCards.test.ts": {
+   "feature": "terrain-tools",
+   "runs": 31,
+   "lastMs": 47,
+   "p50Ms": 46,
+   "p95Ms": 81,
+   "passRate": 1,
+   "lastStatus": "passed",
+   "lastRunId": 1792735738681,
+   "lastFailure": null,
+   "flaky": false,
+   "slowest": []
+  },
+  "src/features/terrain-tools/systems/foamCure.test.ts": {
+   "feature": "terrain-tools",
+   "runs": 31,
+   "lastMs": 6883,
+   "p50Ms": 3943,
+   "p95Ms": 8956,
+   "passRate": 1,
+   "lastStatus": "passed",
+   "lastRunId": 1792735738681,
+   "lastFailure": null,
+   "flaky": false,
+   "slowest": [
+    [
+     "stabiliser foam cure: collapse never refills a cured cell, where timed foam lets it refill after the lapse",
+     1143
+    ],
+    [
+     "stabiliser foam cure: collapse never warns again a block whose open cells are all cured, where timed foam warns it afresh",
+     1005
+    ],
+    [
+     "stabiliser foam cure: save keeps the cured cells across a save, and digests the same",
+     848
+    ]
+   ]
+  },
+  "src/features/terrain-tools/systems/foamResearch.test.ts": {
+   "feature": "terrain-tools",
+   "runs": 31,
+   "lastMs": 40,
+   "p50Ms": 43,
+   "p95Ms": 86,
+   "passRate": 1,
+   "lastStatus": "passed",
+   "lastRunId": 1792735738681,
+   "lastFailure": null,
+   "flaky": false,
+   "slowest": []
+  },
+  "src/features/terrain-tools/systems/foamRestock.test.ts": {
+   "feature": "terrain-tools",
+   "runs": 31,
+   "lastMs": 71,
+   "p50Ms": 81,
+   "p95Ms": 161,
+   "passRate": 1,
+   "lastStatus": "passed",
+   "lastRunId": 1792735738681,
+   "lastFailure": null,
+   "flaky": false,
+   "slowest": []
+  },
+  "src/features/terrain-tools/systems/gatesFixture.test.ts": {
+   "feature": "terrain-tools",
+   "runs": 32,
+   "lastMs": 154,
+   "p50Ms": 184,
+   "p95Ms": 666,
+   "passRate": 1,
+   "lastStatus": "passed",
+   "lastRunId": 1792735738681,
+   "lastFailure": null,
+   "flaky": false,
+   "slowest": []
+  },
+  "src/features/terrain-tools/systems/lodeClamp.test.ts": {
+   "feature": "terrain-tools",
+   "runs": 31,
+   "lastMs": 2799,
+   "p50Ms": 2542,
+   "p95Ms": 4267,
+   "passRate": 1,
+   "lastStatus": "passed",
+   "lastRunId": 1792735738681,
+   "lastFailure": null,
+   "flaky": false,
+   "slowest": [
+    [
+     "lode clamp: every way the field ends behaves the same ends on the release tick, at its length, or on the tick the tank runs dry",
+     480
+    ],
+    [
+     "lode clamp: the pinned set pins at most 8 diggable cells nearest the rig, and moves none of them",
+     283
+    ],
+    [
+     "lode clamp: draw and log ends in the same state with the same events at 30 and 144 steps/s",
+     248
+    ]
+   ]
+  },
+  "src/features/terrain-tools/systems/lodestoneBeacon.test.ts": {
+   "feature": "terrain-tools",
+   "runs": 31,
+   "lastMs": 160,
+   "p50Ms": 146,
+   "p95Ms": 369,
+   "passRate": 1,
+   "lastStatus": "passed",
+   "lastRunId": 1792735738681,
+   "lastFailure": null,
+   "flaky": false,
+   "slowest": []
+  },
+  "src/features/terrain-tools/systems/magnetFeel.test.ts": {
+   "feature": "terrain-tools",
+   "runs": 32,
+   "lastMs": 513,
+   "p50Ms": 542,
+   "p95Ms": 675,
+   "passRate": 1,
+   "lastStatus": "passed",
+   "lastRunId": 1792735738681,
+   "lastFailure": null,
+   "flaky": false,
+   "slowest": [
+    [
+     "magnet fields: feel anchor: vehicle speed under the field never exceeds the #233 cap",
+     110
+    ],
+    [
+     "magnet fields: feel anchor: an affected object starts moving within 6 ticks, at 144 steps/s",
+     109
+    ],
+    [
+     "magnet fields: feel anchor: an affected object starts moving within 6 ticks, at 30 steps/s",
+     102
+    ]
+   ]
   },
   "src/features/terrain-tools/systems/magnetItems.test.ts": {
    "feature": "terrain-tools",
@@ -9577,6 +9151,177 @@
    "flaky": false,
    "slowest": []
   },
+  "src/features/terrain-tools/systems/marksInPlay.test.ts": {
+   "feature": "terrain-tools",
+   "runs": 31,
+   "lastMs": 169,
+   "p50Ms": 190,
+   "p95Ms": 448,
+   "passRate": 1,
+   "lastStatus": "passed",
+   "lastRunId": 1792735738681,
+   "lastFailure": null,
+   "flaky": false,
+   "slowest": [
+    [
+     "terrain-tools marks in play splits up to a longer fissure at a researched Mark 2 than as bought, and logs the Mark",
+     169
+    ]
+   ]
+  },
+  "src/features/terrain-tools/systems/nonYieldVerbs.test.ts": {
+   "feature": "terrain-tools",
+   "runs": 31,
+   "lastMs": 1339,
+   "p50Ms": 1047,
+   "p95Ms": 3410,
+   "passRate": 1,
+   "lastStatus": "passed",
+   "lastRunId": 1792735738681,
+   "lastFailure": null,
+   "flaky": false,
+   "slowest": [
+    [
+     "terrain-tools Mark milestones never yield (#256, ticket 278) power.ore_shifter: a second tap and a hold move no more ore and edit no more cells in a use than a plain use may, on the three pacing seeds",
+     441
+    ],
+    [
+     "terrain-tools Mark milestones never yield (#256, ticket 278) consumable.lodestone_beacon: a second tap and a hold move no more ore and edit no more cells in a use than a plain use may, on the three pacing seeds",
+     374
+    ],
+    [
+     "terrain-tools Mark milestones never yield (#256, ticket 278) power.pressure_pocket: a second tap and a hold move no more ore and edit no more cells in a use than a plain use may, on the three pacing seeds",
+     282
+    ]
+   ]
+  },
+  "src/features/terrain-tools/systems/oreLure.test.ts": {
+   "feature": "terrain-tools",
+   "runs": 31,
+   "lastMs": 131,
+   "p50Ms": 137,
+   "p95Ms": 183,
+   "passRate": 1,
+   "lastStatus": "passed",
+   "lastRunId": 1792735738681,
+   "lastFailure": null,
+   "flaky": false,
+   "slowest": []
+  },
+  "src/features/terrain-tools/systems/oreShifter.test.ts": {
+   "feature": "terrain-tools",
+   "runs": 31,
+   "lastMs": 86,
+   "p50Ms": 90,
+   "p95Ms": 162,
+   "passRate": 1,
+   "lastStatus": "passed",
+   "lastRunId": 1792735738681,
+   "lastFailure": null,
+   "flaky": false,
+   "slowest": []
+  },
+  "src/features/terrain-tools/systems/pressurePocket.test.ts": {
+   "feature": "terrain-tools",
+   "runs": 31,
+   "lastMs": 116,
+   "p50Ms": 131,
+   "p95Ms": 261,
+   "passRate": 1,
+   "lastStatus": "passed",
+   "lastRunId": 1792735738681,
+   "lastFailure": null,
+   "flaky": false,
+   "slowest": []
+  },
+  "src/features/terrain-tools/systems/render/magnetFieldBuffer.test.ts": {
+   "feature": "terrain-tools",
+   "runs": 31,
+   "lastMs": 222,
+   "p50Ms": 256,
+   "p95Ms": 823,
+   "passRate": 1,
+   "lastStatus": "passed",
+   "lastRunId": 1792735738681,
+   "lastFailure": null,
+   "flaky": false,
+   "slowest": [
+    [
+     "magnet field refresh holds a clamp field without rebuilding while its tank draws each tick",
+     119
+    ]
+   ]
+  },
+  "src/features/terrain-tools/systems/render/magnetFields.test.ts": {
+   "feature": "terrain-tools",
+   "runs": 31,
+   "lastMs": 196,
+   "p50Ms": 219,
+   "p95Ms": 499,
+   "passRate": 1,
+   "lastStatus": "passed",
+   "lastRunId": 1792735738681,
+   "lastFailure": null,
+   "flaky": false,
+   "slowest": [
+    [
+     "magnet fields: what draws lays a lattice over each pinned cell and a strut on each block the clamp braces",
+     108
+    ]
+   ]
+  },
+  "src/features/terrain-tools/systems/repulsorCoil.test.ts": {
+   "feature": "terrain-tools",
+   "runs": 32,
+   "lastMs": 127,
+   "p50Ms": 164,
+   "p95Ms": 431,
+   "passRate": 1,
+   "lastStatus": "passed",
+   "lastRunId": 1792735738681,
+   "lastFailure": null,
+   "flaky": false,
+   "slowest": []
+  },
+  "src/features/terrain-tools/systems/seamSplitter.test.ts": {
+   "feature": "terrain-tools",
+   "runs": 31,
+   "lastMs": 151,
+   "p50Ms": 163,
+   "p95Ms": 306,
+   "passRate": 1,
+   "lastStatus": "passed",
+   "lastRunId": 1792735738681,
+   "lastFailure": null,
+   "flaky": false,
+   "slowest": []
+  },
+  "src/features/terrain-tools/systems/stabiliserFoam.test.ts": {
+   "feature": "terrain-tools",
+   "runs": 32,
+   "lastMs": 2292,
+   "p50Ms": 1707,
+   "p95Ms": 3367,
+   "passRate": 1,
+   "lastStatus": "passed",
+   "lastRunId": 1792735738681,
+   "lastFailure": null,
+   "flaky": false,
+   "slowest": [
+    [
+     "stabiliser foam: replay and save ends in the same state with the same events at 30 and 144 steps/s",
+     524
+    ],
+    [
+     "stabiliser foam: the timed brace moves the end on when sprayed again, never adding the times",
+     267
+    ],
+    [
+     "stabiliser foam: the timed brace holds its blocks past their refill for 600 ticks, then warns them afresh for 60",
+     205
+    ]
+   ]
+  },
   "src/features/terrain-tools/systems/statPreview.test.ts": {
    "feature": "terrain-tools",
    "runs": 31,
@@ -9596,6 +9341,45 @@
    "lastMs": 3,
    "p50Ms": 2,
    "p95Ms": 4,
+   "passRate": 1,
+   "lastStatus": "passed",
+   "lastRunId": 1792735738681,
+   "lastFailure": null,
+   "flaky": false,
+   "slowest": []
+  },
+  "src/features/terrain-tools/systems/terrainEditCaps.test.ts": {
+   "feature": "terrain-tools",
+   "runs": 31,
+   "lastMs": 2135,
+   "p50Ms": 2330,
+   "p95Ms": 3830,
+   "passRate": 1,
+   "lastStatus": "passed",
+   "lastRunId": 1792735738681,
+   "lastFailure": null,
+   "flaky": false,
+   "slowest": [
+    [
+     "terrain edit caps power.ore_shifter on P1 (Mark 1) edits at most 32 density cells or 64 swaps per activation",
+     426
+    ],
+    [
+     "terrain edit caps power.ore_shifter on P60 (Mark 19) edits at most 32 density cells or 64 swaps per activation",
+     245
+    ],
+    [
+     "terrain edit caps power.ore_shifter on P100 (Mark 32) edits at most 32 density cells or 64 swaps per activation",
+     237
+    ]
+   ]
+  },
+  "src/features/terrain-tools/systems/terrainFork.test.ts": {
+   "feature": "terrain-tools",
+   "runs": 31,
+   "lastMs": 126,
+   "p50Ms": 143,
+   "p95Ms": 244,
    "passRate": 1,
    "lastStatus": "passed",
    "lastRunId": 1792735738681,
@@ -9629,6 +9413,19 @@
    "flaky": false,
    "slowest": []
   },
+  "src/features/terrain-tools/systems/terrainSection.test.ts": {
+   "feature": "terrain-tools",
+   "runs": 31,
+   "lastMs": 71,
+   "p50Ms": 81,
+   "p95Ms": 141,
+   "passRate": 1,
+   "lastStatus": "passed",
+   "lastRunId": 1792735738681,
+   "lastFailure": null,
+   "flaky": false,
+   "slowest": []
+  },
   "src/features/terrain-tools/systems/toolVerb.test.ts": {
    "feature": "terrain-tools",
    "runs": 31,
@@ -9641,6 +9438,76 @@
    "lastFailure": null,
    "flaky": false,
    "slowest": []
+  },
+  "src/features/terrain-tools/systems/useResolution.test.ts": {
+   "feature": "terrain-tools",
+   "runs": 31,
+   "lastMs": 2869,
+   "p50Ms": 2779,
+   "p95Ms": 5120,
+   "passRate": 1,
+   "lastStatus": "passed",
+   "lastRunId": 1792735738681,
+   "lastFailure": null,
+   "flaky": false,
+   "slowest": [
+    [
+     "terrain-tools Mark milestones (#256): Mark 6 hold facing down, the pocket and the beacon each land the tap and the hold on different tiles",
+     622
+    ],
+    [
+     "terrain-tools Mark milestones (#256): Mark 3 second tap, at 30 and 144 steps/s lodestone beacon: at M3 the second tap throws the beacon ahead and at M2 it is refused",
+     309
+    ],
+    [
+     "terrain-tools Mark milestones (#256): Mark 3 second tap, at 30 and 144 steps/s ore-shifter: at M3 the second tap pushes the nodules out and at M2 it waits out the cooldown",
+     287
+    ]
+   ]
+  },
+  "src/features/terrain-tools/systems/vehicleAnchors.test.ts": {
+   "feature": "terrain-tools",
+   "runs": 31,
+   "lastMs": 2655,
+   "p50Ms": 2705,
+   "p95Ms": 3719,
+   "passRate": 1,
+   "lastStatus": "passed",
+   "lastRunId": 1792735738681,
+   "lastFailure": null,
+   "flaky": false,
+   "slowest": [
+    [
+     "vehicle anchors seed 83921, 7 tiles down: no planned cell lies within 1 m of either miner",
+     260
+    ],
+    [
+     "vehicle anchors seed 31415, 19 tiles down: no planned cell lies within 1 m of either miner",
+     174
+    ],
+    [
+     "vehicle anchors seed 99991, 12 tiles down: no planned cell lies within 1 m of either miner",
+     170
+    ]
+   ]
+  },
+  "src/features/terrain-tools/terrainReplay.test.ts": {
+   "feature": "terrain-tools",
+   "runs": 31,
+   "lastMs": 196,
+   "p50Ms": 186,
+   "p95Ms": 266,
+   "passRate": 1,
+   "lastStatus": "passed",
+   "lastRunId": 1792735738681,
+   "lastFailure": null,
+   "flaky": false,
+   "slowest": [
+    [
+     "terrain-tools replay replays power.ore_shifter and consumable.seam_splitter to the same edit hashes at any frame rate",
+     143
+    ]
+   ]
   },
   "src/features/workshop/debug.test.ts": {
    "feature": "workshop",
@@ -13476,6 +13343,19 @@
     ]
    ]
   },
+  "src/systems/authority/moneyRounding.test.ts": {
+   "feature": "authority",
+   "runs": 35,
+   "lastMs": 5,
+   "p50Ms": 5,
+   "p95Ms": 14,
+   "passRate": 1,
+   "lastStatus": "passed",
+   "lastRunId": 1792735738681,
+   "lastFailure": null,
+   "flaky": false,
+   "slowest": []
+  },
   "src/systems/authority/oreRulesStamp.test.ts": {
    "feature": "authority",
    "runs": 28,
@@ -14521,12 +14401,60 @@
     ]
    ]
   },
+  "src/systems/bot/itemHookNoFreeCell.test.ts": {
+   "feature": "bot",
+   "runs": 28,
+   "lastMs": 146936,
+   "p50Ms": 161848,
+   "p95Ms": 1129217,
+   "passRate": 1,
+   "lastStatus": "passed",
+   "lastRunId": 1792735738681,
+   "lastFailure": null,
+   "flaky": false,
+   "slowest": [
+    [
+     "item hooks leave the dig alone (no free cell, #281 check) mines exactly the bare cells on planet 7 with every combo owned and no slot pressed",
+     80202
+    ],
+    [
+     "item hooks leave the dig alone (no free cell, #281 check) mines exactly the bare cells on planet 10 with every combo owned and no slot pressed",
+     66733
+    ]
+   ]
+  },
   "src/systems/bot/leadCellHardness.test.ts": {
    "feature": "bot",
    "runs": 28,
    "lastMs": 5,
    "p50Ms": 6,
    "p95Ms": 14,
+   "passRate": 1,
+   "lastStatus": "passed",
+   "lastRunId": 1792735738681,
+   "lastFailure": null,
+   "flaky": false,
+   "slowest": []
+  },
+  "src/systems/bot/noFreeCellRuns.test.ts": {
+   "feature": "bot",
+   "runs": 28,
+   "lastMs": 52,
+   "p50Ms": 62,
+   "p95Ms": 91,
+   "passRate": 1,
+   "lastStatus": "passed",
+   "lastRunId": 1792735738681,
+   "lastFailure": null,
+   "flaky": false,
+   "slowest": []
+  },
+  "src/systems/bot/paceArrival.test.ts": {
+   "feature": "bot",
+   "runs": 28,
+   "lastMs": 59,
+   "p50Ms": 73,
+   "p95Ms": 189,
    "passRate": 1,
    "lastStatus": "passed",
    "lastRunId": 1792735738681,
@@ -14733,6 +14661,26 @@
      114
     ]
    ]
+  },
+  "src/systems/economy/economySourceScan.test.ts": {
+   "feature": "economy",
+   "runs": 35,
+   "lastMs": 129,
+   "p50Ms": 155,
+   "p95Ms": 1021,
+   "passRate": 0.8285714285714286,
+   "lastStatus": "passed",
+   "lastRunId": 1792735738681,
+   "lastFailure": {
+    "runId": 1792669172174,
+    "sha": "d95dcc66eb0c80f89cc35a6cd672d3af935b955d",
+    "at": "2026-10-22T09:58:21Z",
+    "tests": [
+     "economy source scan finds no economy price, ratio or fee number in game code outside economy.json"
+    ]
+   },
+   "flaky": false,
+   "slowest": []
   },
   "src/systems/economy/economyTables.test.ts": {
    "feature": "economy",
@@ -16838,6 +16786,19 @@
    "flaky": false,
    "slowest": []
   },
+  "src/systems/save/saveDeterminism.test.ts": {
+   "feature": "save",
+   "runs": 28,
+   "lastMs": 22,
+   "p50Ms": 23,
+   "p95Ms": 41,
+   "passRate": 1,
+   "lastStatus": "passed",
+   "lastRunId": 1792735738681,
+   "lastFailure": null,
+   "flaky": false,
+   "slowest": []
+  },
   "src/systems/save/savedUnlocks.test.ts": {
    "feature": "save",
    "runs": 28,
@@ -16850,6 +16811,24 @@
    "lastFailure": null,
    "flaky": false,
    "slowest": []
+  },
+  "src/systems/save/saveExactRoundTrip.test.ts": {
+   "feature": "save",
+   "runs": 30,
+   "lastMs": 671,
+   "p50Ms": 682,
+   "p95Ms": 1136,
+   "passRate": 1,
+   "lastStatus": "passed",
+   "lastRunId": 1792735738681,
+   "lastFailure": null,
+   "flaky": false,
+   "slowest": [
+    [
+     "save slot: the exact-carry state (ticket 405) restores the cut cursor, the part-cut ground and the drill, tip, tank and cargo",
+     553
+    ]
+   ]
   },
   "src/systems/save/saveMigrations.test.ts": {
    "feature": "save",
@@ -17621,6 +17600,19 @@
    "lastMs": 1,
    "p50Ms": 2,
    "p95Ms": 3,
+   "passRate": 1,
+   "lastStatus": "passed",
+   "lastRunId": 1792735738681,
+   "lastFailure": null,
+   "flaky": false,
+   "slowest": []
+  },
+  "src/systems/vehicle/vehicleStats.test.ts": {
+   "feature": "vehicle",
+   "runs": 35,
+   "lastMs": 12,
+   "p50Ms": 12,
+   "p95Ms": 26,
    "passRate": 1,
    "lastStatus": "passed",
    "lastRunId": 1792735738681,
