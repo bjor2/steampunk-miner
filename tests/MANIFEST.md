@@ -467,14 +467,14 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/power-up-core/systems/useRefusals.test.ts` | 3 | 3 |
 | `src/features/power-up-core/systems/useResolution.test.ts` | 12 | 12 |
 
-### `rig-look`: 16 files, 196 tests
+### `rig-look`: 16 files, 218 tests
 
 | File | Tests | Sites |
 | --- | --- | --- |
 | `src/features/rig-look/rigLookPlanets.lane.test.ts` | 1 | 1 |
 | `src/features/rig-look/systems/cargoHoldLooks.test.ts` | 12 | 8 |
 | `src/features/rig-look/systems/drillTipLooks.test.ts` | 14 | 8 |
-| `src/features/rig-look/systems/engineLooks.test.ts` | 12 | 8 |
+| `src/features/rig-look/systems/engineLooks.test.ts` | 34 | 14 |
 | `src/features/rig-look/systems/groundGunItemParts.test.ts` | 7 | 7 |
 | `src/features/rig-look/systems/render/rigLookFrames.test.ts` | 10 | 10 |
 | `src/features/rig-look/systems/render/rigLookIndex.test.ts` | 8 | 8 |

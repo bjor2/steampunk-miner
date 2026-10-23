@@ -1,11 +1,12 @@
 /**
- * The engine's rig looks in the browser (ticket 587): from 2 purchases each step of `rigLook.json`
- * lays its part of `vehicle-look-engine` on `chassis.drive`, the middle roller's hub, over the
- * chassis and hiding no rig part; the tail keeps the top part, and the look leaves the physics world
- * as it was; the engine card names the owned step and grades the tail (#585's template). Asserted
- * through `steampunkDebug`, never pixels; the shots at every step and two tail points, desktop and
- * 360 px, by the rig's tier 1 and tier 3 shape, are written to the test's output folder for review,
- * never compared.
+ * The engine's rig looks in the browser (ticket 587; tracks and wheels since ticket 726): from 2
+ * purchases each step of `rigLook.json` lays its tracks and wheels of `vehicle-look-drive` on
+ * `chassis.drive`, the middle roller's hub, over the chassis and hiding no rig part; the tail keeps
+ * the top part, a drill purchase never moves it (GD ruling on #726: since #723 the engine is the
+ * only drive purchase), and the look leaves the physics world as it was; the engine card names the
+ * owned step and grades the tail (#585's template). Asserted through `steampunkDebug`, never
+ * pixels; the shots at every step and two tail points, at 1280, 1440 and 360 px, by the rig's tier 1
+ * and tier 3 shape, are written to the test's output folder for review, never compared.
  */
 import { expect, test, type Page } from '@playwright/test'
 import { VIEW_SHORT_AXIS_MIN_M } from '../../src/constants/scene'
@@ -18,15 +19,15 @@ declare global {
   }
 }
 
-const ASSET_ID = 'vehicle-look-engine'
+const ASSET_ID = 'vehicle-look-drive'
 /** The bare rig, Systems' three steps (#157 comment 6300543785), then two tail points. */
 const LOOKS = [
   { purchases: 1, part: null, fitting: null },
-  { purchases: 2, part: 'single-piston', fitting: 'Fitting: Single piston' },
-  { purchases: 18, part: 'triple-flywheel', fitting: 'Fitting: Triple flywheel' },
-  { purchases: 26, part: 'guild-turbine', fitting: 'Fitting: Guild turbine' },
-  { purchases: 27, part: 'guild-turbine', fitting: 'Fitting: Guild turbine · Grade 1' },
-  { purchases: 28, part: 'guild-turbine', fitting: 'Fitting: Guild turbine · Grade 2' },
+  { purchases: 2, part: 'iron-track', fitting: 'Fitting: Single piston' },
+  { purchases: 18, part: 'steel-track', fitting: 'Fitting: Triple flywheel' },
+  { purchases: 26, part: 'guild-track', fitting: 'Fitting: Guild turbine' },
+  { purchases: 27, part: 'guild-track', fitting: 'Fitting: Guild turbine · Grade 1' },
+  { purchases: 28, part: 'guild-track', fitting: 'Fitting: Guild turbine · Grade 2' },
 ]
 /**
  * Tail grades the card must fit at 360 px, kept to the range the cargo hold's spec owns (ticket
@@ -38,6 +39,7 @@ const CARD = `[data-testid="${UI_ID_TEMPLATES.workshopUpgradeBuy('engine')}"]`
 const FITTING = `${CARD} [data-sheet-card-line]`
 const VIEWPORTS = [
   { name: 'desktop', size: { width: 1280, height: 720 } },
+  { name: 'wide', size: { width: 1440, height: 900 } },
   { name: 'phone', size: { width: 360, height: 640 } },
 ]
 /**
@@ -148,8 +150,25 @@ test.describe('engine look (ticket 587)', () => {
     await expectLook(page, null, bare)
     const lowest = await physicsCounts(page)
     await setUpgrade(page, 'engine', 28)
-    await expectLook(page, 'guild-turbine', bare)
+    await expectLook(page, 'guild-track', bare)
     await expect.poll(() => physicsCounts(page)).toEqual(lowest)
+    expect(errors).toEqual([])
+  })
+
+  test('keeps the tracks and wheels as they are when the drill is bought', async ({ page }) => {
+    const errors = await openGame(page)
+    const bare = await bareRigParts(page)
+    await setUpgrade(page, 'engine', 18)
+    await expectLook(page, 'steel-track', bare)
+    for (const [track, purchases] of [
+      ['drill_power', 30],
+      ['drill_tip', 300],
+    ] as const) {
+      await setUpgrade(page, track, purchases)
+      await expect
+        .poll(async () => (await engineParts(page)).lookPartIds)
+        .toContain(`${ASSET_ID}/steel-track`)
+    }
     expect(errors).toEqual([])
   })
 
