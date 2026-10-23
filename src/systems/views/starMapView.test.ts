@@ -1,11 +1,15 @@
 import { describe, expect, it } from 'vitest'
 import { createScriptedSession } from '../authority/scriptedSession'
+import { fuelTankCapacityOf } from '../economy/fuelTank'
 import { fuelPriceOf, jumpFeeOf, jumpFuelUnitsOf } from '../economy/jumpFuel'
 import { ECONOMY } from '../economy/economy'
 import { formatAmount, formatPrice } from '../displayAmount'
 import { toSafeInteger } from '../money'
-import { planetDisplayNameOf } from '../registries/planetRow'
-import { starMapViewOf, type StarMapPlanet } from './starMapView'
+import { hexOfRgb } from '../render/colour'
+import { paletteOf } from '../render/bandPalette'
+import { planetDisplayNameOf, planetLookOf } from '../registries/planetRow'
+import { planetArchetypeOf } from '../world/planetArchetype'
+import { planetMapColourOf, starMapViewOf, type StarMapPlanet } from './starMapView'
 
 const setMoney = (amount: string) => ({ type: 'debug.setMoney', payload: { amount } }) as const
 const setPlanet = (planetIndex: number) =>
@@ -60,6 +64,25 @@ describe('star map view (ticket 757)', () => {
     const { tank } = mapOf(sessionWith({ fuel: 3 }))
     expect(tank.held.text).toBe('3')
     expect(tank.capacity.text).toBe(formatAmount(ECONOMY.starMap.fuel.tank.capacityAtLevel1))
+  })
+
+  it("gives the tank's fill in whole permille for its bar (ticket 758)", () => {
+    expect(mapOf(sessionWith({})).tank.fillPermille).toBe(0)
+    expect(mapOf(sessionWith({ fuel: 3 })).tank.fillPermille).toBe(
+      Math.floor((3 * 1000) / toSafeInteger(fuelTankCapacityOf(1))),
+    )
+    expect(mapOf(sessionWith({ fuel: 10 })).tank.fillPermille).toBe(1000)
+  })
+
+  it("colours each planet's sprite with its own ground: the row look's rock, else the archetype palette's (ticket 758)", () => {
+    const { planets } = mapOf(sessionWith({}))
+    for (const planet of planets) {
+      const look = planetLookOf(planet.place)
+      const archetype = hexOfRgb(paletteOf(planetArchetypeOf(planet.place).paletteId).surface)
+      expect(planet.colour).toBe(look === null ? archetype : look.rockSurface)
+      expect(planet.colour).toMatch(/^#[0-9a-f]{6}$/)
+    }
+    expect(planetMapColourOf(1)).toBe(planets[0].colour)
   })
 
   it('shows the fuel the tank lacks for a jump and what buying it here charges', () => {

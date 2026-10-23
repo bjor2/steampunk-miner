@@ -1,7 +1,8 @@
 /**
- * The look the local vehicle wears this frame (ticket 389, `vehicleLooks`): every source's answer
- * for the player at the tick, then each flash still playing, folded into one kept look written in
- * place, so a frame allocates nothing. The first tint and outline win (sources by id, then
+ * The look the local vehicle wears this frame (ticket 389, `vehicleLooks`): the kernel's own
+ * sources' answers (the coal tender's tail, ticket 758), then every registered source's for the
+ * player at the tick, then each flash still playing, folded into one kept look written in place,
+ * so a frame allocates nothing. The first tint and outline win (sources by id, then
  * flashes), the most see-through opacity wins, and every glow is kept. A flash plays from the tick
  * its event is heard for its own ticks; a source's next flash replaces the one it is playing.
  *
@@ -16,7 +17,12 @@ import {
   type PartGlow,
   type VehicleLook,
   type VehicleLookFlash,
+  type VehicleLookSource,
 } from '../registries/vehicleLooks'
+import { FUEL_TENDER_LOOK_SOURCE } from './fuelTenderLookSource'
+
+/** The kernel's own sources, before the slices' by id: the coal tender's tail (ticket 758). */
+export const KERNEL_VEHICLE_LOOK_SOURCES: readonly VehicleLookSource[] = [FUEL_TENDER_LOOK_SOURCE]
 
 export interface DrawnVehicleLook {
   tint: string | null
@@ -106,6 +112,9 @@ function clearLook(drawn: DrawnVehicleLook): void {
 }
 
 function addSourceLooks(drawn: DrawnVehicleLook, { state, playerId, tick }: VehicleLookMoment) {
+  for (const source of KERNEL_VEHICLE_LOOK_SOURCES) {
+    addLook(drawn, source.lookOf(state, playerId, tick))
+  }
   for (const source of vehicleLookSources()) addLook(drawn, source.lookOf(state, playerId, tick))
 }
 

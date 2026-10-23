@@ -1,8 +1,9 @@
 /**
  * The local vehicle: the input intent in, the fixed-step loop, the placeholder art, the drill head
- * the guns' turret once mounted (#107), the slices' pieces at their attach points (#235; the
- * dynamite rack among them since #215), and the heat shimmer above the throttle line (#113), all
- * painted with the looks the slices ask of the vehicle (ticket 389).
+ * the guns' turret once mounted (#107), the fuel tank's coal tender at the hitch (ticket 758), the
+ * slices' pieces at their attach points (#235; the dynamite rack among them since #215), and the
+ * heat shimmer above the throttle line (#113), all painted with the looks the slices ask of the
+ * vehicle (ticket 389).
  */
 import { useMemo } from 'react'
 import { VehicleBody } from '../physics/VehicleBody'
@@ -10,6 +11,7 @@ import type { VehicleController } from '../physics/vehicleController'
 import { readLocalVehicle } from '../store/gameStore'
 import { readVehicleIntent } from '../store/inputRuntime'
 import { DrillHeadView } from './DrillHeadView'
+import { FuelTenderPiece } from './FuelTenderPiece'
 import { HeatShimmer } from './HeatShimmer'
 import { VehicleGuns } from './VehicleGuns'
 import { VehicleLook } from './VehicleLook'
@@ -39,6 +41,7 @@ export function Vehicle() {
           <VehiclePlaceholder />
           <DrillHeadView controller={controller} />
           <VehicleGuns />
+          <FuelTenderPiece />
           <VehiclePieces />
           <HeatShimmer />
         </VehicleLook>

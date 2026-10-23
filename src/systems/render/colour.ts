@@ -19,6 +19,17 @@ export function rgbOfHex(hex: string): Rgb {
   return [channel(1), channel(3), channel(5)]
 }
 
+/** Channels in 0..1 to `#rrggbb`, the form a CSS custom property takes. */
+export function hexOfRgb(colour: Rgb): string {
+  return `#${colour.map((channel) => channelHexOf(channel)).join('')}`
+}
+
+function channelHexOf(channel: number): string {
+  return Math.round(clampUnit(channel) * CHANNEL_MAX)
+    .toString(16)
+    .padStart(2, '0')
+}
+
 export function lumaOf([r, g, b]: Rgb): number {
   return 0.299 * r + 0.587 * g + 0.114 * b
 }

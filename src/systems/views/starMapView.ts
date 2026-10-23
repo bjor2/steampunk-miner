@@ -9,18 +9,36 @@
  *
  * A system holds `starMap.planetsPerSystem` planets (ticket 781); system 1's line runs on past them
  * (#781), so a session there past its last one sees the planets up to the hop after its own.
+ *
+ * The map art (ticket 758) draws each planet as the tinted planet sprite in the planet's own ground
+ * colour (its row look's surface rock, else its archetype palette's, #13), and the tank as a bar,
+ * so the view carries the colour and the tank's fill as well as the numbers.
  */
 import { vehicleOf, type AuthorityState } from '../authority/authorityState'
 import { systemOfPlanet, type SessionPlanet } from '../authority/planetOfState'
 import { fuelChargeOf } from '../authority/starMap/fuelShopRules'
 import { ECONOMY } from '../economy/economy'
 import { jumpFeeOf, jumpFuelUnitsOf } from '../economy/jumpFuel'
-import { cmp, sub, toSafeInteger, ZERO_MONEY, type BigStat, type Money } from '../money'
-import { planetDisplayNameOf } from '../registries/planetRow'
+import {
+  cmp,
+  div,
+  floor,
+  fromSafeInteger,
+  mul,
+  sub,
+  toSafeInteger,
+  ZERO_MONEY,
+  type BigStat,
+  type Money,
+} from '../money'
+import { paletteOf } from '../render/bandPalette'
+import { hexOfRgb } from '../render/colour'
+import { planetDisplayNameOf, planetLookOf } from '../registries/planetRow'
 import { planetIndexAt, planetsBefore } from '../starMap/campaignIndex'
 import { toIndexText } from '../starMap/planetAddress'
 import { fuelCapacityOf, fuelOf, hasRoomFor } from '../vehicle/vehicleFuel'
 import type { VehicleState } from '../vehicle/vehicleState'
+import { planetArchetypeOf } from '../world/planetArchetype'
 import { amountReading, priceReading, type AmountReading } from './viewParts'
 
 export interface StarMapTank {
@@ -28,6 +46,8 @@ export interface StarMapTank {
   held: AmountReading
   /** Fuel units the tank's level holds at most. */
   capacity: AmountReading
+  /** How full the tank is, 0 to 1000, for the bar beside the numbers. */
+  fillPermille: number
 }
 
 /** The fuel a jump needs past what the tank holds. */
@@ -41,6 +61,8 @@ export interface StarMapPlanet {
   /** The planet's place in its system, from 1. */
   place: number
   name: string
+  /** The planet's ground colour, `#rrggbb`: the tint of its sprite on the map (ticket 758). */
+  colour: string
   isHere: boolean
   /** The player cannot afford the jump now: drawn dimmed, still listed with its numbers. */
   isDimmed: boolean
@@ -62,6 +84,7 @@ export interface StarMapView {
 }
 
 const HERE_LINE = 'The planet you are on.'
+const PERMILLE = fromSafeInteger(1000)
 
 /** The shortfall as the rules count it: whole units and their charge, null past the tank. */
 interface ShortfallQuote {
@@ -78,7 +101,20 @@ export function starMapViewOf(state: AuthorityState, playerId: string): StarMapV
 }
 
 function tankOf(vehicle: VehicleState): StarMapTank {
-  return { held: amountReading(fuelOf(vehicle)), capacity: amountReading(fuelCapacityOf(vehicle)) }
+  const held = fuelOf(vehicle)
+  const capacity = fuelCapacityOf(vehicle)
+  return {
+    held: amountReading(held),
+    capacity: amountReading(capacity),
+    fillPermille: fillPermilleOf(held, capacity),
+  }
+}
+
+/** Whole permille of the tank filled, held to 1000 for a tank over its capacity from an older save. */
+function fillPermilleOf(held: BigStat, capacity: BigStat): number {
+  if (cmp(capacity, ZERO_MONEY) <= 0) return 0
+  const permille = floor(div(mul(held, PERMILLE), capacity))
+  return Math.min(1000, toSafeInteger(permille))
 }
 
 /** Places 1 to the system's last planet, or to the hop after the session's own past it. */
@@ -94,14 +130,23 @@ function placeOf(planet: SessionPlanet): number {
 function planetOnMapOf(state: AuthorityState, playerId: string, place: number): StarMapPlanet {
   const planetIndex = planetIndexAt(systemOfPlanet(state.planet), BigInt(place)) ?? 0
   const name = planetDisplayNameOf(planetIndex)
-  if (planetIndex === state.planet.index) return herePlanetOf(place, name)
-  return { place, name, ...jumpReadingsOf(state, playerId, planetIndex) }
+  const colour = planetMapColourOf(planetIndex)
+  if (planetIndex === state.planet.index) return herePlanetOf(place, name, colour)
+  return { place, name, colour, ...jumpReadingsOf(state, playerId, planetIndex) }
 }
 
-function herePlanetOf(place: number, name: string): StarMapPlanet {
+/** The planet's surface rock: its own row look's, else its archetype palette's (#13). */
+export function planetMapColourOf(planetIndex: number): string {
+  const look = planetLookOf(planetIndex)
+  if (look !== null) return look.rockSurface
+  return hexOfRgb(paletteOf(planetArchetypeOf(planetIndex).paletteId).surface)
+}
+
+function herePlanetOf(place: number, name: string, colour: string): StarMapPlanet {
   return {
     place,
     name,
+    colour,
     isHere: true,
     isDimmed: false,
     fuel: null,

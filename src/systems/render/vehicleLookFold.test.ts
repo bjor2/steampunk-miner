@@ -18,8 +18,8 @@ import {
 // state lasts, flashes for their ticks after an event, and the reduced-effects outline.
 
 const PLAYER = 'p1'
-/** The probes never read the state. */
-const STATE = {} as AuthorityState
+/** The probes never read the state; the kernel's coal tender source (ticket 758) reads its players. */
+const STATE = { players: {} } as unknown as AuthorityState
 const BLUE = '#7fd4ff'
 const RED = '#ff3b2f'
 

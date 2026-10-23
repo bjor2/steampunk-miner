@@ -7,7 +7,7 @@ import { uiTextProblemsOf } from '../../systems/views/uiTextBudget'
 import { unregisteredTextsOf } from '../../systems/views/unregisteredText'
 import { starMapViewOf } from '../../systems/views/starMapView'
 import { StarMapChartView } from './StarMapChart'
-import { starMapPlanetIdOf, STAR_MAP_UI_IDS } from './starMapIds'
+import { starMapGlyphIdOf, starMapPlanetIdOf, STAR_MAP_UI_IDS } from './starMapIds'
 
 // Ticket 757 (#650 Map UX): the chart draws every planet of the system with its numbers, the one
 // the session is on marked and the ones the player cannot afford dimmed, never dropped.
@@ -45,6 +45,18 @@ describe('star map chart (ticket 757)', () => {
     expect(tagOf(html, starMapPlanetIdOf(1))).toContain('data-here')
     expect(tagOf(html, starMapPlanetIdOf(2))).not.toContain('data-dimmed')
     expect(tagOf(html, starMapPlanetIdOf(5))).toContain('data-dimmed')
+  })
+
+  it("draws the system view: the sun, the tank's bar and each planet's glyph in its own colour (ticket 758)", () => {
+    const html = drawChartOn(1)
+    const map = starMapViewOf(createScriptedSession().state(), 'p1')
+    expect(html).toContain(`data-testid="${STAR_MAP_UI_IDS.starMapSun}"`)
+    expect(tagOf(html, STAR_MAP_UI_IDS.starMapTankBar)).toContain('aria-valuenow="0"')
+    for (const planet of map.planets) {
+      expect(tagOf(html, starMapGlyphIdOf(planet.place))).toContain(
+        `--planet-colour:${planet.colour}`,
+      )
+    }
   })
 
   it('draws every word on a shared element within the text budget', () => {

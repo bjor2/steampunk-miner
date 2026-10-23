@@ -1,8 +1,12 @@
 /*
- * The star map's chart (ticket 757): the tank over a column of planet rows, one framed row each.
- * The planet the session is on wears the brass edge; a planet the player cannot afford dims to
- * steel, as a muted sheet card does, and keeps every number. Placeholder look until the map art
- * pass (#758), tuned by eye in `npm run dev`.
+ * The star map's chart (ticket 757; the art pass of ticket 758): the tank with its bar over the
+ * system view, a brass rail from the sun at the head down through one framed row per planet. Each
+ * row's glyph is the `art.starMap` planet sprite with its disc tinted the planet's ground colour
+ * through the sprite's mask (as the dial's face is skinned, kit/Gauge.module.css); the planet the
+ * session is on wears the here ring; a planet the player cannot afford dims to steel and drains
+ * its glyph's colour, as a muted sheet card does, and keeps every number. While the asset is a
+ * placeholder the CSS discs behind the `var()`s stand in, so nothing waits on art. Sizes are the
+ * sprites' 1x sizes (design-system.md section 13); the rail and the gaps are spacing tokens.
  */
 .chart {
   display: flex;
@@ -12,10 +16,36 @@
 }
 
 .tank {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
   padding: var(--space-2);
 }
 
-.planets {
+/* The tank's bar: the brass-bezelled iron well, its fill the fuel's share of the capacity. */
+.tankBar {
+  position: relative;
+  display: block;
+  height: 16px;
+  border: var(--frame-bezel) solid var(--color-brass);
+  border-radius: 8px;
+  background: var(--color-iron);
+  border-image: var(--art-gauge-bar, none) var(--art-gauge-bar-slice, 0) fill /
+    var(--art-gauge-bar-width, 0);
+}
+
+.tankFill {
+  position: absolute;
+  inset: 6px;
+  width: calc((100% - 12px) * var(--fill, 0));
+  border-radius: 2px;
+  background: var(--color-amber);
+  transition: width var(--duration-fast, 160ms) ease-out;
+}
+
+/* The system view: the rail runs down behind the glyphs, from the sun to the last planet. */
+.system {
+  position: relative;
   display: flex;
   flex-direction: column;
   gap: var(--space-2);
@@ -24,7 +54,34 @@
   list-style: none;
 }
 
+.system::before {
+  content: '';
+  position: absolute;
+  top: 32px;
+  bottom: 32px;
+  left: calc(var(--space-2) + 24px - 1px);
+  width: 2px;
+  background: linear-gradient(var(--color-brass), var(--color-steel));
+  opacity: 0.6;
+}
+
+.sun {
+  position: relative;
+  width: 64px;
+  height: 64px;
+  margin-left: calc(var(--space-2) + 24px - 32px);
+  background: var(
+      --art-star-map-sun,
+      radial-gradient(circle, var(--color-ember) 30%, var(--color-amber) 31% 60%, transparent 62%)
+    )
+    center / 100% 100% no-repeat;
+}
+
 .planet {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
   padding: var(--space-2);
   border: var(--frame-hairline) solid var(--color-steel);
   border-radius: var(--radius-panel);
@@ -37,4 +94,43 @@
 .planet[data-dimmed] h3,
 .planet[data-dimmed] p {
   color: var(--color-steel);
+}
+
+/* The glyph: the planet sprite over the tinted disc, 48 px, centred on the rail. */
+.glyph {
+  position: relative;
+  flex: none;
+  width: 48px;
+  height: 48px;
+  background: var(
+      --art-star-map-planet,
+      radial-gradient(circle, transparent 44%, var(--color-brass) 46% 50%, transparent 52%)
+    )
+    center / 100% 100% no-repeat;
+}
+
+/* The disc is the planet's own colour through the sprite's tint mask, under the rim and rings. */
+.disc {
+  position: absolute;
+  inset: 0;
+  background: var(--planet-colour, var(--color-brass));
+  mask: var(--art-star-map-planet-tint, radial-gradient(circle, black 44%, transparent 46%))
+    center / 100% 100% no-repeat;
+  -webkit-mask: var(--art-star-map-planet-tint, radial-gradient(circle, black 44%, transparent 46%))
+    center / 100% 100% no-repeat;
+}
+
+/* The here ring, 56 px round the 48 px glyph. */
+.here {
+  position: absolute;
+  inset: -4px;
+  background: var(
+      --art-star-map-here,
+      radial-gradient(circle, transparent 46%, var(--color-brass) 47% 50%, transparent 51%)
+    )
+    center / 100% 100% no-repeat;
+}
+
+.planet[data-dimmed] .glyph {
+  filter: saturate(0.25) brightness(0.7);
 }
