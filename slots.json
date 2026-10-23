@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-10-23T06:55:11+02:00",
+  "updated_at": "2026-10-23T07:35:23+02:00",
   "caps": {
     "grok": 12,
     "claude": 10,
@@ -90,12 +90,11 @@
         },
         {
           "slot": "C8",
-          "state": "busy",
-          "ticket": 742,
-          "grok_slot": 2,
-          "kind": "dev",
-          "since": "2026-10-23T05:15:00+02:00",
-          "wave": "647-4B"
+          "state": "free",
+          "ticket": null,
+          "grok_slot": null,
+          "kind": null,
+          "since": null
         },
         {
           "slot": "C9",
@@ -116,8 +115,8 @@
         }
       ],
       "size": 4,
-      "used": 3,
-      "free": 1,
+      "used": 2,
+      "free": 2,
       "claims_last_hour": 3,
       "name": "Claude Max 2"
     }
@@ -151,12 +150,12 @@
       },
       {
         "feature": 724,
-        "kind": "ticket",
+        "kind": "spec",
         "title": "Down-cut acceleration capped by local gravity (0.1 g core floor)",
         "tickets": [
-          724
+          742
         ],
-        "since": "2026-10-23T05:14:31+02:00"
+        "since": "2026-10-23T07:34:27+02:00"
       }
     ]
   },
@@ -171,11 +170,9 @@
     },
     {
       "slot": 2,
-      "state": "dev",
-      "ticket": 742,
-      "since": "2026-10-23T05:15:00+02:00",
-      "claude_slot": 8,
-      "wave": "647-4B"
+      "state": "free",
+      "ticket": null,
+      "since": null
     },
     {
       "slot": 3,
@@ -306,12 +303,11 @@
     },
     {
       "slot": 8,
-      "state": "busy",
-      "ticket": 742,
-      "grok_slot": 2,
-      "since": "2026-10-23T05:15:00+02:00",
-      "account": 2,
-      "wave": "647-4B"
+      "state": "free",
+      "ticket": null,
+      "grok_slot": null,
+      "since": null,
+      "account": 2
     },
     {
       "slot": 9,
@@ -332,17 +328,17 @@
     }
   ],
   "last_refill": {
-    "at": "2026-10-23 06:55 CEST",
+    "at": "2026-10-23 07:35 CEST",
     "mode": "refill-dev",
-    "triggers": "claude-run:wave-plan",
-    "started": "#662->C7/A2 #744->C9/A2",
-    "note": "spawned 2 worker(s)"
+    "triggers": "#742",
+    "started": "",
+    "note": "no pickable build ticket"
   },
   "totals": {
     "grok": {
       "size": 12,
-      "used": 3,
-      "dev": 3,
+      "used": 2,
+      "dev": 2,
       "dev_cap": 8,
       "planner": 0,
       "planner_cap": 4
@@ -350,8 +346,8 @@
     "claude": {
       "size": 10,
       "enabled": 4,
-      "used": 3,
-      "free": 1,
+      "used": 2,
+      "free": 2,
       "external": 0
     }
   },
@@ -359,22 +355,6 @@
     "mode": "on",
     "parallel": 1,
     "list": [
-      {
-        "number": 743,
-        "key": "647-4B",
-        "map": 647,
-        "lane": "remote",
-        "mode": "solo",
-        "state": "running",
-        "tickets": [
-          724,
-          742
-        ],
-        "done": [
-          724
-        ],
-        "live": 1
-      },
       {
         "number": 740,
         "key": "647-4A",
