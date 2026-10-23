@@ -1,11 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { DESIGN_TOKENS } from './designSystem'
-import {
-  sheetDockWidthOf,
-  sheetPlacementOf,
-  sheetTabBarOf,
-  sheetTransitionOf,
-} from './sheetLayout'
+import { sheetDockWidthOf, sheetPlacementOf, sheetTabBarOf, sheetTransitionOf } from './sheetLayout'
 
 // The shared sheet (spec #678, ticket 686): full screen on a phone, docked beside the view on
 // desktop (GD lock, 21 Oct), a 200 ms shutter that fades under Reduce Motion, about 8 tabs before
