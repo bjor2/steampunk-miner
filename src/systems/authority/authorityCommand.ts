@@ -557,7 +557,8 @@ import type { JsonCount } from '../wholeCount'
  *    disc carries a floor band across the wheels' width; a pose report cuts its stamp run on 0.55 m
  *    along the facing. The casing ring lines `stampR <= d < stampR + 0.25 m`, the rock outside the
  *    wall, and the floor box under a level tunnel, never a cell a gate keeps standing against the
- *    rig's drill. Ground already cut stays as it is.
+ *    rig's drill. A level floor's ramp lays its contour on its circle (`stampShape.ts`), where the
+ *    straight ramp left it up to 21 mm off. Ground already cut stays as it is.
  */
 export const AUTHORITY_PROTOCOL_VERSION = 118
 

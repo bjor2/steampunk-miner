@@ -56,9 +56,11 @@ afterEach(() => uninstallRunLog())
 /**
  * Off the pad and still on the surface: since ticket 662's 1.2 m bore a drive held off the pad for
  * 2 s bites into the rising ground and rides a level cut by its end, so pressing down there turns
- * one cut into another and waits out the gate's hold, which the cut-to-cut rows below judge.
+ * one cut into another and waits out the gate's hold, which the cut-to-cut rows below judge. Held
+ * 1.1 s, stored 10 met that ground on its last phases once the level floor lay on its circle, slid
+ * on through the swivel and pressed down where a pose report's run-on had already cut the bore.
  */
-const DRIVE_OFF_PAD_TICKS = Math.round(1.1 * TICKS_PER_SECOND)
+const DRIVE_OFF_PAD_TICKS = Math.round(1.0 * TICKS_PER_SECOND)
 
 /** Off the pad to the left (the Sell bay is its west end, #170) on the surface and `phase` ticks. */
 function driveOffThePad(rig: Rig, phase: number): void {

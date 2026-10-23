@@ -290,11 +290,30 @@ function isCarvedAwayByDiscAt(disc: DiscStamp, sx: number, sy: number): boolean 
   return disc.edge !== 'boreWall' || weight === FULL_WEIGHT
 }
 
-/** The level floor's ramp at a sample: 128 on the floor circle, 255 a sample below it. */
+/**
+ * The level floor's ramp at a sample: 128 on the floor circle, 0 from half a sample above it and
+ * 255 from half a sample below (ticket 662). Between, a sample holds the density that puts the
+ * contour, read linearly between it and the sample a row away at its bound (0 or 255), on the
+ * circle: `128 * 250 / (250 - s)` at a depth `s` under it, `(128 * 250 + 255 s) / (250 + s)` at a
+ * height `-s` over it. The straight `128 + 255 s / 250` held one sample of each pair at its bound
+ * too, so its contour ran up to 21 mm off the circle and back every row the floor crossed, a wave
+ * of +-1.4 degrees under the wheels that the 1.2 m bore's 10 m/s level rig hopped off.
+ */
 function levelFloorAt(floorRadiusMm: number | null, sx: number, sy: number): number {
   if (floorRadiusMm === null) return 0
   const excess = circleExcessMm2Of(floorRadiusMm, sx * MM_PER_SAMPLE, sy * MM_PER_SAMPLE)
-  const ramp =
-    ISO_DENSITY + Math.floor((excess * SOLID_DENSITY) / (2 * floorRadiusMm * MM_PER_SAMPLE))
-  return Math.max(0, Math.min(SOLID_DENSITY, ramp))
+  return floorRampOf(excess, 2 * floorRadiusMm)
+}
+
+/**
+ * The ramp at the depth `excess / scale` mm under the circle, `excess` being `R^2 - r^2` and
+ * `scale` 2R: whole numbers, each division floored.
+ */
+function floorRampOf(excess: number, scale: number): number {
+  const sampleScale = MM_PER_SAMPLE * scale
+  if (2 * excess >= sampleScale) return SOLID_DENSITY
+  if (2 * excess <= -sampleScale) return 0
+  const isoScale = ISO_DENSITY * sampleScale
+  if (excess >= 0) return Math.min(SOLID_DENSITY, Math.floor(isoScale / (sampleScale - excess)))
+  return Math.max(0, Math.floor((isoScale + SOLID_DENSITY * excess) / (sampleScale + excess)))
 }
