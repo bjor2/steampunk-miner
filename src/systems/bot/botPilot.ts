@@ -12,6 +12,7 @@
  * sales settle. Positions are tile centres, upright (up = (0, 1024)), velocity 0 at each report.
  */
 import { POSE_REPORT_INTERVAL_TICKS } from '../../constants/balance'
+import type { UpgradeLevels } from '../economy/vehicleStats'
 import { isVehicleActive } from '../vehicle/vehicleState'
 import type { Facing } from '../vehicle/vehiclePose'
 import type { TilePoint } from '../world/tileGrid'
@@ -80,6 +81,11 @@ export interface BotPlanet {
   sidewaysBores?: SidewaysBoreTally
   /** The run's bores down per planet (#724, `downBores.ts`), carried the same way. */
   downBores?: DownBoreTally
+  /**
+   * The track levels the vehicle arrived here with, for the down-cut drill rule (ticket 763,
+   * `botDownCutRule.ts`); absent in a spec's hand-built planet, which shops without that rule.
+   */
+  arrivalLevels?: UpgradeLevels
 }
 
 /**

@@ -1,9 +1,16 @@
 import { describe, expect, it } from 'vitest'
+import { PACING_TARGETS } from '../../constants/pacingTargets'
 import { createAuthorityState } from '../authority/authorityState'
 import { dockSiteOfPlanet } from '../authority/planetOfState'
 import { UPGRADE_IDS } from '../economy/economyDefinition'
 import { stepOfMajor } from '../economy/upgradeSteps'
-import { onCurveLevel, onCurveStep, onCurveSteps } from '../economy/vehicleStats'
+import {
+  onCurveLevel,
+  onCurveStep,
+  onCurveSteps,
+  type UpgradeLevels,
+} from '../economy/vehicleStats'
+import { bandDigTicks } from '../vehicle/bandDig'
 import { leadCeiling } from './botCoreRule'
 import { buyUpgrades } from './botShopping'
 import { createBotSession, type BotSession } from './botSession'
@@ -68,8 +75,15 @@ function shoppedForTheCoreAtTipCapPlanet(): BotSession {
   return tipCapShop
 }
 
-/** Shops with the core as the goal, so the forced core rule leads. */
-function shopForTheCore(session: BotSession, layout = freshMineOf(session)): void {
+/**
+ * Shops with the core as the goal, so the forced core rule leads; with the planet's arrival levels
+ * the down-cut drill rule (ticket 763) comes before the on-curve tip.
+ */
+function shopForTheCore(
+  session: BotSession,
+  layout = freshMineOf(session),
+  arrivalLevels?: UpgradeLevels,
+): void {
   buyUpgrades(session, {
     layout,
     isCoreTheGoal: true,
@@ -77,6 +91,7 @@ function shopForTheCore(session: BotSession, layout = freshMineOf(session)): voi
     hasMetBlastTile: false,
     restockSize: 1,
     chainPolicy: 'click',
+    arrivalLevels,
   })
 }
 
@@ -160,5 +175,48 @@ describe('bot: shopping at the Upgrade bay', () => {
       stepOfMajor(onCurveLevel('drill_tip', TIP_CAP_PLANET) + 2),
     )
     expect(session.vehicle().levels.drill_tip).toBe(leadCeiling('drill_tip', TIP_CAP_PLANET))
+  })
+})
+
+/**
+ * Planet 3 as seed 27182 reached it, at the dock of its one big sale (ticket 763): planet 1's
+ * drill power, planet 2's tip, and 30.5k, of which the tip's 30 steps to on-curve cost about 27k.
+ */
+const PLANET_THREE_ARRIVAL = {
+  drill_power: 12,
+  drill_tip: 100,
+  hull: 80,
+  engine: 8,
+  cargo_hold: 31,
+  boiler: 22,
+}
+const PLANET_THREE_BIG_SALE = '30531'
+
+function arrivedOnPlanetThreeAtTheBigSale(): BotSession {
+  const session = botAtUpgradeBayOn(3, PLANET_THREE_BIG_SALE)
+  for (const [upgradeId, level] of Object.entries(PLANET_THREE_ARRIVAL)) {
+    session.submit({ type: 'debug.setUpgrade', payload: { upgradeId, level } })
+  }
+  return session
+}
+
+describe('bot: the down-cut drill rule at the Upgrade bay (ticket 763)', () => {
+  it('buys drill power ahead of the on-curve tip until band 5 down is cut in 0.7x its arrival time', () => {
+    const session = arrivedOnPlanetThreeAtTheBigSale()
+    const arrival = session.vehicle().levels
+    shopForTheCore(session, freshMineOf(session), arrival)
+    const departure = session.vehicle().levels
+    expect(departure.drill_power).toBeGreaterThan(arrival.drill_power)
+    expect(bandDigTicks(3, departure)! / bandDigTicks(3, arrival)!).toBeLessThanOrEqual(
+      PACING_TARGETS.sawtoothDepartureRatioMax,
+    )
+  })
+
+  it('spends what the drill leaves on the tip, toward its on-curve level', () => {
+    const session = arrivedOnPlanetThreeAtTheBigSale()
+    const arrival = session.vehicle().levels
+    shopForTheCore(session, freshMineOf(session), arrival)
+    expect(session.vehicle().levels.drill_tip).toBeGreaterThan(arrival.drill_tip)
+    expect(session.events().filter((event) => event.type === 'CommandRejected')).toEqual([])
   })
 })

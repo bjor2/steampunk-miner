@@ -6,7 +6,9 @@
  * offered (#107, `botGuns.ts`); then a full charge rack once charges are and the bot has met a
  * tile it would blast (#109, #129, `botCharges.ts`); then a boiler step while the tank cuts the
  * average full-hold load by more than 20% and the step is affordable (ticket 553, `botBoiler.ts`);
- * then `drill_tip` and `hull` go to their on-curve level for the planet (#6 section 3);
+ * then a drill power purchase while the tip's on-curve majors would leave band 5's cut down slower
+ * than 0.7x its arrival time (ticket 763, `botDownCutRule.ts`); then `drill_tip` and `hull` go to
+ * their on-curve level for the planet (#6 section 3);
  * a drill level is forced while the core is the goal and digs slow (`botCoreRule.ts`: `drill_power`,
  * then `drill_tip` at the drill cap, #86); otherwise the bot buys the upgrade with the best gain in
  * planned money per tick per price, while one pays, never `drill_power` past its lead cap. The #6
@@ -41,6 +43,7 @@ import { isCasingGradeShort } from './botCasing'
 import { startBotHold, stepOfHold, type ChainPolicy } from './botChains'
 import { isBoilerStepDue } from './botBoiler'
 import { forcedCoreTrack } from './botCoreRule'
+import { downCutDrillTrack } from './botDownCutRule'
 import { bestMarginalPurchase } from './botMarginalOffers'
 import { chargeRestockOf } from './botCharges'
 import { gunMountPriceFor, type GunPolicy } from './botGuns'
@@ -82,6 +85,11 @@ export interface ShoppingSituation {
   /** The charge size a restock buys: what the shells met here need, else the stuck rule's. */
   restockSize: number
   chainPolicy: ChainPolicy
+  /**
+   * The levels the vehicle arrived on the planet with, which the down-cut rule measures band 5
+   * against (ticket 763); absent in a spec's hand-built visit, which shops without that rule.
+   */
+  arrivalLevels?: UpgradeLevels
 }
 
 export function serviceAtDock(session: BotSession): void {
@@ -172,6 +180,8 @@ function nextPurchase(session: BotSession, situation: ShoppingSituation): Purcha
 
 function nextTrackPurchase(session: BotSession, situation: ShoppingSituation): UpgradeId | null {
   if (isBoilerStepAffordable(session, situation.layout)) return 'boiler'
+  const downCut = downCutTrackAffordable(session, situation)
+  if (downCut !== null) return downCut
   const onCurve = belowCurveAffordable(session)
   if (onCurve !== null) return onCurve
   const forced = forcedTrack(session, situation)
@@ -209,6 +219,17 @@ function chargeRestockDue(session: BotSession, situation: ShoppingSituation): Pu
   if (!situation.hasMetBlastTile) return null
   const restock = chargeRestockOf(session, situation.restockSize)
   return restock !== null && canPay(session, restock.price) ? restock.intent : null
+}
+
+/** The down-cut rule's drill purchase, when it is due and paid for; when not, the tip leads. */
+function downCutTrackAffordable(
+  session: BotSession,
+  situation: ShoppingSituation,
+): UpgradeId | null {
+  if (situation.arrivalLevels === undefined) return null
+  const { levels } = session.vehicle()
+  const track = downCutDrillTrack(levels, situation.arrivalLevels, session.state().planet.index)
+  return track !== null && canAfford(session, track) ? track : null
 }
 
 /**

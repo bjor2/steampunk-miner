@@ -239,6 +239,7 @@ function shopAtUpgradeBay(session: BotSession, planet: BotPlanet, run: BotRun): 
     hasMetBlastTile: planet.hasMetBlastTile,
     restockSize: restockSizeOf(planet),
     chainPolicy: run.chainPolicy,
+    arrivalLevels: planet.arrivalLevels,
   }
   if (!hasPurchase(session, situation)) return
   driveToUpgradeBay(session, planet)

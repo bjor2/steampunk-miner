@@ -938,6 +938,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/bot/botCoreGalleries.test.ts` | 3 | 2 |
 | `src/systems/bot/botCoreRule.test.ts` | 7 | 7 |
 | `src/systems/bot/botDeathReplay.test.ts` | 8 | 8 |
+| `src/systems/bot/botDownCutRule.test.ts` | 5 | 5 |
 | `src/systems/bot/botGearLava.test.ts` | 3 | 3 |
 | `src/systems/bot/botGuns.test.ts` | 4 | 4 |
 | `src/systems/bot/botHeat.test.ts` | 10 | 10 |
@@ -945,7 +946,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/bot/botMoneyLint.test.ts` | 6 | 3 |
 | `src/systems/bot/botRefining.test.ts` | 4 | 4 |
 | `src/systems/bot/botRetreat.test.ts` | 10 | 10 |
-| `src/systems/bot/botShopping.test.ts` | 8 | 8 |
+| `src/systems/bot/botShopping.test.ts` | 10 | 10 |
 | `src/systems/bot/botSlicePurchases.test.ts` | 11 | 11 |
 | `src/systems/bot/botTravelSpeed.test.ts` | 3 | 3 |
 | `src/systems/bot/botWallet.test.ts` | 3 | 3 |

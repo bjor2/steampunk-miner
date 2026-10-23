@@ -42,6 +42,7 @@ export function botPlanetOf(
     gateRouteBlocks,
     sidewaysBores,
     downBores,
+    arrivalLevels: { ...session.vehicle().levels },
   }
 }
 
