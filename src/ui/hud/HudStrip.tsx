@@ -6,8 +6,8 @@
  * money's float-up, and the status icons. Every exact value and word is in the detail behind the
  * gear button; on desktop a dial also shows its number on a hover or a tap, and a resting mouse
  * shows a dial's, the money's or the chip's full value in the long mode (ticket 768). Desktop keeps
- * the star map's fuel wells beside the dials and tints the depth while gravity limits the descent
- * (ticket 767). Drawn from `hudStripOf`, `gaugeClusterOf` and `desktopStripSlotsOf`; markup only.
+ * the star map's fuel wells beside the dials, in the button that opens the star map (ticket 769),
+ * and tints the depth while gravity limits the descent (ticket 767). Drawn from `hudStripOf`, `gaugeClusterOf` and `desktopStripSlotsOf`; markup only.
  */
 import { hudLabelIconIdOf } from '../../systems/art/icons/iconSet'
 import { longPriceOfExact, stripNumberLongTextOf } from '../../systems/views/hoverValues'
@@ -24,9 +24,9 @@ import { HoverPlate } from '../kit/HoverPlate'
 import { TitleOneLine } from '../kit/TitleOneLine'
 import { useMouseHover } from '../kit/useMouseHover'
 import { DialCluster } from './DialCluster'
-import { FuelWells } from './FuelWells'
 import { hudBoxOf } from './hudBoxes'
 import { MoneyFloatUp } from './MoneyFloatUp'
+import { StarMapButton } from './StarMapButton'
 import { StripStatuses } from './StripStatuses'
 import { useDialReveal } from './useDialReveal'
 import styles from './HudStrip.module.css'
@@ -66,7 +66,7 @@ export function HudStrip({
       {...hudBoxOf('strip')}
     >
       <DialCluster cluster={cluster} isFlashing={isFlashing} onTurnPage={onTurnDials} />
-      {slots !== null && <FuelWells fuelCostChars={slots.fuelCostChars} />}
+      {slots !== null && <StarMapButton fuelCostChars={slots.fuelCostChars} />}
       <StripNumberReadout
         number={strip.number}
         money={model.money}

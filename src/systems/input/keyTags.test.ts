@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { ACTION_MAP, bindingsWithOverrides, defaultBindings } from './actionMap'
-import { sheetTabKeyLabelsOf, toolCellKeyLabelOf } from './keyTags'
+import { sheetTabKeyLabelsOf, starMapKeyLabelOf, toolCellKeyLabelOf } from './keyTags'
 
 // Desktop's brass key tags (spec #678, ticket 768): the key that presses a tool cell or jumps to
 // a sheet tab, read from the bindings in force.
@@ -37,5 +37,13 @@ describe('sheet tab key tags', () => {
   it('shows a rebound jump key on its tab', () => {
     const { bindings } = bindingsWithOverrides(ACTION_MAP, { open_hold: { keyboard: ['KeyY'] } })
     expect(sheetTabKeyLabelsOf(tabs, bindings).hold).toBe('Y')
+  })
+})
+
+describe('star map key tag (ticket 769)', () => {
+  it('tags the star map button with M, and with the new key once rebound', () => {
+    expect(starMapKeyLabelOf(DEFAULTS)).toBe('M')
+    const rebound = bindingsWithOverrides(ACTION_MAP, { open_star_map: { keyboard: ['KeyN'] } })
+    expect(starMapKeyLabelOf(rebound.bindings)).toBe('N')
   })
 })

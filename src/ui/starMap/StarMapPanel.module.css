@@ -1,0 +1,7 @@
+/*
+ * The star map's chart (ticket 769): the sheet's scroll area holds it and scrolls both ways, so a
+ * chart wider or taller than the panel pans. Empty until the map (#757) draws in it.
+ */
+.chart {
+  min-height: 100%;
+}

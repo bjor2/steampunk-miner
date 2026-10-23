@@ -1,0 +1,29 @@
+/*
+ * The star map button (ticket 769): the compass, its key tag and the fuel wells in one row on the
+ * strip, as tall as the strip's own controls. Placeholder look, tuned by eye in `npm run dev`.
+ */
+.button {
+  display: flex;
+  flex: none;
+  align-items: center;
+  gap: var(--space-1);
+  height: 100%;
+  padding: 0 var(--space-1);
+  border: var(--frame-hairline) solid transparent;
+  border-radius: var(--radius-panel);
+  background: transparent;
+  color: var(--color-brass);
+  font: inherit;
+  cursor: pointer;
+  pointer-events: auto;
+}
+
+.button:hover,
+.button[aria-pressed='true'] {
+  border-color: var(--color-brass);
+}
+
+.button:focus-visible {
+  outline: var(--focus-ring);
+  outline-offset: var(--focus-ring-offset);
+}

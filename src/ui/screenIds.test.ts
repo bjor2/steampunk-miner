@@ -571,6 +571,7 @@ function renderFullHoldHud(): string[] {
     ...checkScreen(createElement(HudView, { model, isFlashing: false }), {
       [UI_IDS.hudFuelTankWell]: '',
       [UI_IDS.hudFuelCostWell]: '',
+      [UI_IDS.hudStarMapButton]: null,
     }),
   ]
 }

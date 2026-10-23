@@ -105,6 +105,16 @@ describe('HUD strip view (ticket 684)', () => {
     expect(phone).not.toContain('data-gravity')
   })
 
+  it('wraps the desktop fuel wells in the star map button, tagged M, and draws none on a phone (ticket 769)', () => {
+    const desktop = drawHud(worstModel())
+    expect(testIdIn(desktop, UI_IDS.hudStarMapButton)).toBe(true)
+    expect(desktop).toContain('data-key-tag="M"')
+    const phone = renderToString(
+      createElement(HudView, { model: worstModel(), isFlashing: false, density: 'compact' }),
+    )
+    expect(testIdIn(phone, UI_IDS.hudStarMapButton)).toBe(false)
+  })
+
   it('tints the desktop depth while gravity holds the descent (ticket 767)', () => {
     const model = underground(worstModel(), 40)
     const limited = { ...model, tileTime: { state: 'gravity', text: '0.16 s', ticks: 10 } as const }
