@@ -10,7 +10,8 @@
  * run on the render delta, which is presentation only. It sits relative to the render origin, like
  * the world root (ticket 339). The zoom is metres down the screen's height in either orientation,
  * so a portrait screen shows desktop's vertical metres and narrows across, and the lean across it
- * is scaled by its half width (ticket 484).
+ * is scaled by its half width (ticket 484), as it is across a desktop screen, whose spare width
+ * goes to the look-ahead (ticket 767).
  */
 import { useFrame, type Size } from '@react-three/fiber'
 import { useMemo } from 'react'
@@ -27,10 +28,14 @@ import {
   createSpeedFraming,
   framedShortAxisOf,
   leadOffsetInto,
+  leanReachOf,
   stepSpeedFraming,
   type FramedView,
+  type LeanReach,
   type SpeedFraming,
 } from '../systems/render/speedFraming'
+import { layoutKindOf } from '../systems/views/designSystem'
+import { readFittedScreen } from '../ui/stage/screenFit'
 import type { Vector2 } from '../systems/vehicle/localFrame'
 import {
   easeViewShortAxis,
@@ -62,7 +67,7 @@ interface LeanScratch {
 
 function createLeanScratch(): LeanScratch {
   return {
-    view: { verticalMetres: 0, horizontalMetres: 0, turnRadians: 0 },
+    view: { verticalMetres: 0, horizontalMetres: 0, turnRadians: 0, leanReach: 'height' },
     lead: { x: 0, y: 0 },
   }
 }
@@ -90,6 +95,7 @@ function leanOffsetOf(lean: LeanScratch, turn: CameraTurn, framing: SpeedFraming
   view.verticalMetres = cameraPresence.viewShortAxisMetres
   view.horizontalMetres = cameraPresence.viewHorizontalMetres
   view.turnRadians = turn.angle
+  view.leanReach = cameraPresence.leanReach
   return leadOffsetInto(lean.lead, framing, view)
 }
 
@@ -145,6 +151,7 @@ function showFraming(size: Size, zoom: PlayerZoom, framing: SpeedFraming): void 
   cameraPresence.feltSpeedCellsPerSecond = framing.feltSpeed
   cameraPresence.leadShare = framing.leadShare
   cameraPresence.sideLeadShare = framing.sideLeadShare
+  cameraPresence.leanReach = leanReachOfScreen()
   cameraPresence.widthPixels = size.width
   cameraPresence.heightPixels = size.height
 }
@@ -154,4 +161,10 @@ function fitCameraZoom(camera: OrthographicCamera, size: Size): void {
   if (camera.zoom === zoom) return
   camera.zoom = zoom
   camera.updateProjectionMatrix()
+}
+
+/** The layout the shell last fitted decides the reach; before the first fit, a phone's. */
+function leanReachOfScreen(): LeanReach {
+  const fitted = readFittedScreen()
+  return fitted === null ? 'height' : leanReachOf(layoutKindOf(fitted.hudDensity))
 }

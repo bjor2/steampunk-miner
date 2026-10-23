@@ -1,5 +1,9 @@
 import { describe, expect, it } from 'vitest'
-import { VIEW_SHORT_AXIS_DEFAULT_M, VIEW_SHORT_AXIS_MIN_M } from '../../constants/scene'
+import {
+  SPEED_FRAMING,
+  VIEW_SHORT_AXIS_DEFAULT_M,
+  VIEW_SHORT_AXIS_MIN_M,
+} from '../../constants/scene'
 import type { Vector2 } from '../vehicle/localFrame'
 import {
   createSpeedFraming,
@@ -7,11 +11,13 @@ import {
   groundAheadOf,
   horizontalGroundAheadOf,
   leadOffsetInto,
+  leanReachOf,
   leadShareOf,
   sideLeadShareOf,
   speedViewOf,
   stepSpeedFraming,
   type FramedView,
+  type LeanReach,
   type SpeedFraming,
 } from './speedFraming'
 import { maxViewVerticalOf, viewHorizontalMetresOf } from './viewZoom'
@@ -58,6 +64,11 @@ function viewOn(
 ): FramedView {
   const horizontalMetres = viewHorizontalMetresOf(width, height, verticalMetres)
   return { verticalMetres, horizontalMetres, turnRadians }
+}
+
+/** The same view with the lean reaching as `leanReach` says (ticket 767). */
+function reachingOn(view: FramedView, leanReach: LeanReach): FramedView {
+  return { ...view, leanReach }
 }
 
 function leadOf(framing: SpeedFraming, view: FramedView): Vector2 {
@@ -248,3 +259,85 @@ function horizontalAheadAt(framing: SpeedFraming, width: number, height: number)
   const vertical = framedShortAxisOf(framing, shown, maxViewVerticalOf(width, height))
   return horizontalGroundAheadOf(viewOn(width, height, vertical), framing)
 }
+
+/** Ticket 767's desktop cells, and the widest stage before the pillarbox (64:27, #173). */
+const DESKTOP_CELLS = [
+  [1280, 720],
+  [1280, 800],
+  [1920, 1080],
+  [2560, 1440],
+  [2560, 1080],
+]
+
+describe('desktop spare width carries the lean (ticket 767)', () => {
+  it('reaches the half width on desktop and keeps the half height on a phone', () => {
+    expect(leanReachOf('desktop')).toBe('width')
+    expect(leanReachOf('phone')).toBe('height')
+  })
+
+  it('leans a drive down the screen exactly as the ticket 338 lean, at every roll', () => {
+    for (const [width, height] of DESKTOP_CELLS) {
+      for (const turnRadians of [0, 0.4, 2.5]) {
+        const downTheScreen = { x: Math.sin(turnRadians), y: -Math.cos(turnRadians) }
+        const framing = steadyAlong(downTheScreen, 12)
+        const view = viewOn(width, height, 14, turnRadians)
+        const wide = leadOf(framing, reachingOn(view, 'width'))
+        const phone = leadOf(framing, view)
+        expect(wide.x).toBeCloseTo(phone.x, 9)
+        expect(wide.y).toBeCloseTo(phone.y, 9)
+      }
+    }
+  })
+
+  it('leans a drive across the screen by f of the half width', () => {
+    for (const [width, height] of DESKTOP_CELLS) {
+      const framing = steadyAlong(RIGHT, 12)
+      const view = reachingOn(viewOn(width, height, 12), 'width')
+      expect(leadOf(framing, view).x).toBeCloseTo(
+        framing.leadShare * (view.horizontalMetres / 2),
+        9,
+      )
+    }
+  })
+
+  it('keeps the rig at least 0.4 of each half extent from the trailing edge at full lean', () => {
+    for (const [width, height] of DESKTOP_CELLS) {
+      for (const turnRadians of [0, 0.4, Math.PI / 2, 2.5, -1]) {
+        for (const ahead of [RIGHT, DOWN, DIAGONAL, { x: -0.6, y: 0.8 }]) {
+          const view = reachingOn(viewOn(width, height, 12, turnRadians), 'width')
+          const lead = onScreen(leadOf(steadyAlong(ahead, 30), view), turnRadians)
+          const halfWidth = view.horizontalMetres / 2
+          expect(halfWidth - Math.abs(lead.across)).toBeGreaterThanOrEqual(0.4 * halfWidth - 1e-9)
+          expect(6 - Math.abs(lead.up)).toBeGreaterThanOrEqual(0.4 * 6 - 1e-9)
+        }
+      }
+    }
+  })
+
+  it('shows more ground ahead across the screen than the phone lean, never less', () => {
+    for (const [width, height] of DESKTOP_CELLS) {
+      const framing = steadyAlong(RIGHT, 10)
+      const view = viewOn(width, height, 12)
+      const wide = horizontalGroundAheadOf(reachingOn(view, 'width'), framing)
+      expect(wide).toBeCloseTo((view.horizontalMetres / 2) * (1 + framing.leadShare), 9)
+      expect(wide).toBeGreaterThan(horizontalGroundAheadOf(view, framing))
+    }
+  })
+
+  it('holds the 1 s warning across the screen wherever it holds down it, at both frame rates', () => {
+    for (const framesPerSecond of [30, 144]) {
+      for (const [width, height] of DESKTOP_CELLS) {
+        for (const speed of [3, 6, 10, 15, 16]) {
+          const framing = driveDown(createSpeedFraming(), 10, framesPerSecond, () => speed)
+          const cap = maxViewVerticalOf(width, height)
+          const vertical = framedShortAxisOf(framing, VIEW_SHORT_AXIS_DEFAULT_M, cap)
+          const view = reachingOn(viewOn(width, height, vertical), 'width')
+          const warned = speed * SPEED_FRAMING.warnSeconds
+          const across = horizontalGroundAheadOf(view, framing)
+          expect(across).toBeGreaterThanOrEqual(groundAheadOf(vertical, framing.leadShare) - 1e-9)
+          expect(across).toBeGreaterThanOrEqual(warned)
+        }
+      }
+    }
+  })
+})

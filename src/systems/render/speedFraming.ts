@@ -8,11 +8,17 @@
  * the lean is laid in the camera's frame: `f` of the half height down the screen, and its own
  * ramp `f_h` of the half width across it, so the rig never leaves the narrow width.
  *
+ * On a desktop screen (ticket 767, GD lock 23 Oct: spare width goes to look-ahead in the direction
+ * of travel) the lean across a landscape screen reaches `f` of the half width instead of the half
+ * height, laid in the camera's frame like the portrait one; a drive down the screen leans exactly
+ * as before, and a phone keeps the ticket 338 lean.
+ *
  * Presentation only: the felt speed comes from the client pose, every ease runs on the render
  * delta, and nothing here reaches the authority, a command, the digest or a replay. The state is
  * updated in place because it runs every frame and must not allocate (CLAUDE.md frame rules).
  */
 import { CAMERA_TURN_SECONDS, SPEED_FRAMING } from '../../constants/scene'
+import type { LayoutKind } from '../views/designSystem'
 import type { Vector2 } from '../vehicle/localFrame'
 
 /** The share of the gap an ease has closed after its stated seconds, as the zoom ease (#39). */
@@ -96,6 +102,12 @@ export function groundAheadOf(shortAxis: number, leadShare: number): number {
   return (shortAxis / 2) * (1 + leadShare)
 }
 
+/**
+ * How far the lean across a landscape screen reaches: `height`, the half height (ticket 338, a
+ * phone), or `width`, the half width (ticket 767, desktop's spare width).
+ */
+export type LeanReach = 'height' | 'width'
+
 /** The framed view's two extents in metres, and the camera's roll (ticket 484). */
 export interface FramedView {
   /** Down the screen's height: the zoom, pulled back for speed. */
@@ -104,21 +116,29 @@ export interface FramedView {
   horizontalMetres: number
   /** The camera's roll, counter-clockwise. */
   turnRadians: number
+  /** Absent: `height`, the ticket 338 lean. */
+  leanReach?: LeanReach
 }
 
-export type ViewExtent = Pick<FramedView, 'verticalMetres' | 'horizontalMetres'>
+export type ViewExtent = Pick<FramedView, 'verticalMetres' | 'horizontalMetres' | 'leanReach'>
 
 export function isPortraitView(view: ViewExtent): boolean {
   return view.horizontalMetres < view.verticalMetres
 }
 
+/** Desktop spends its spare width on the lean (ticket 767); a phone keeps the half height. */
+export function leanReachOf(kind: LayoutKind): LeanReach {
+  return kind === 'desktop' ? 'width' : 'height'
+}
+
 /**
  * Where the camera sits ahead of the rig, world metres, written into `out`. On a landscape screen
- * `f h` along the eased drive direction (ticket 338, unchanged); on a portrait one, laid in the
- * camera's frame (ticket 484).
+ * `f h` along the eased drive direction (ticket 338, unchanged), or with desktop's reach `f` of the
+ * half width across it (ticket 767); on a portrait one, laid in the camera's frame (ticket 484).
  */
 export function leadOffsetInto(out: Vector2, framing: SpeedFraming, view: FramedView): Vector2 {
   if (isPortraitView(view)) return leadAcrossPortraitInto(out, framing, view)
+  if (view.leanReach === 'width') return leadAcrossWideInto(out, framing, view)
   return leadAlongDriveInto(out, framing, view.verticalMetres)
 }
 
@@ -128,15 +148,30 @@ function leadAlongDriveInto(out: Vector2, framing: SpeedFraming, shortAxis: numb
   return out
 }
 
-/**
- * The drive direction turned onto the screen, its across part scaled by `f_h` of the half width
- * and its up part by `f` of the half height, then turned back into the world.
- */
+/** A portrait screen's lean: `f_h` of the half width across it, `f` of the half height up it. */
 function leadAcrossPortraitInto(out: Vector2, framing: SpeedFraming, view: FramedView): Vector2 {
+  return leadOnScreenInto(out, framing, view, framing.sideLeadShare)
+}
+
+/** Desktop's landscape lean (ticket 767): `f` of the half width across, `f` of the half height up. */
+function leadAcrossWideInto(out: Vector2, framing: SpeedFraming, view: FramedView): Vector2 {
+  return leadOnScreenInto(out, framing, view, framing.leadShare)
+}
+
+/**
+ * The drive direction turned onto the screen, its across part scaled by `acrossShare` of the half
+ * width and its up part by `f` of the half height, then turned back into the world.
+ */
+function leadOnScreenInto(
+  out: Vector2,
+  framing: SpeedFraming,
+  view: FramedView,
+  acrossShare: number,
+): Vector2 {
   const cos = Math.cos(view.turnRadians)
   const sin = Math.sin(view.turnRadians)
   const { x, y } = framing.leadDirection
-  const across = (x * cos + y * sin) * framing.sideLeadShare * (view.horizontalMetres / 2)
+  const across = (x * cos + y * sin) * acrossShare * (view.horizontalMetres / 2)
   const up = (y * cos - x * sin) * framing.leadShare * (view.verticalMetres / 2)
   out.x = across * cos - up * sin
   out.y = across * sin + up * cos
@@ -145,8 +180,9 @@ function leadAcrossPortraitInto(out: Vector2, framing: SpeedFraming, view: Frame
 
 /**
  * Metres of ground visible ahead of the rig on a drive across the screen: half the width plus the
- * lean across it, `(W / 2)(1 + f_h)` on a portrait screen (ticket 484) and `W / 2 + f h` on a
- * landscape one, where the lean is scaled by the half height.
+ * lean across it, `(W / 2)(1 + f_h)` on a portrait screen (ticket 484), `W / 2 + f h` on a
+ * landscape one, where the lean is scaled by the half height, and `(W / 2)(1 + f)` with desktop's
+ * reach (ticket 767).
  */
 export function horizontalGroundAheadOf(
   view: ViewExtent,
@@ -154,7 +190,14 @@ export function horizontalGroundAheadOf(
 ): number {
   const halfWidth = view.horizontalMetres / 2
   const share = isPortraitView(view) ? lean.sideLeadShare : lean.leadShare
-  return halfWidth + share * Math.min(halfWidth, view.verticalMetres / 2)
+  return halfWidth + share * acrossLeanReachOf(view)
+}
+
+/** The half extent the across lean is a share of: the half width, or at most the half height. */
+function acrossLeanReachOf(view: ViewExtent): number {
+  const halfWidth = view.horizontalMetres / 2
+  if (view.leanReach === 'width') return halfWidth
+  return Math.min(halfWidth, view.verticalMetres / 2)
 }
 
 function feelSpeed(framing: SpeedFraming, speed: number, dt: number): void {
@@ -221,6 +264,8 @@ export interface SpeedView {
   groundAheadMetres: number
   /** Metres of ground visible ahead of the rig on a drive across the screen (ticket 484). */
   groundAheadHorizontalMetres: number
+  /** How far the lean across a landscape screen reaches (ticket 767). */
+  leanReach: LeanReach
 }
 
 export function speedViewOf(
@@ -234,5 +279,6 @@ export function speedViewOf(
     sideLeadShare: lean.sideLeadShare,
     groundAheadMetres: groundAheadOf(view.verticalMetres, lean.leadShare),
     groundAheadHorizontalMetres: horizontalGroundAheadOf(view, lean),
+    leanReach: view.leanReach ?? 'height',
   }
 }

@@ -382,6 +382,7 @@ function cameraViewOnScreen(): CameraView & SpeedView & FollowView {
   const extent = {
     verticalMetres: viewShortAxisMetres,
     horizontalMetres: view.viewHorizontalMetres,
+    leanReach: cameraPresence.leanReach,
   }
   return {
     ...view,

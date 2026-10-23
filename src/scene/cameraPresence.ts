@@ -13,8 +13,11 @@
  * (world metres from the point the camera looks at to the vehicle) and `turnRadians` (the camera's
  * roll) let the debug API say where the vehicle is on screen (#500's layout specs).
  * `followLagMetres` is how far the slow-speed ease trails the drawn body (ticket 515).
+ * `leanReach` is how far the lean across a landscape screen reaches: desktop's half width
+ * (ticket 767) or a phone's half height.
  */
 import { VIEW_SHORT_AXIS_DEFAULT_M } from '../constants/scene'
+import type { LeanReach } from '../systems/render/speedFraming'
 
 export const cameraPresence = {
   localUpScreenAngle: 0,
@@ -25,6 +28,7 @@ export const cameraPresence = {
   feltSpeedCellsPerSecond: 0,
   leadShare: 0,
   sideLeadShare: 0,
+  leanReach: 'height' as LeanReach,
   vehicleFromCentreX: 0,
   vehicleFromCentreY: 0,
   turnRadians: 0,
