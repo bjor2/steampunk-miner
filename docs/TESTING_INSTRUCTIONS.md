@@ -329,6 +329,22 @@ programs }` from three's `renderer.info` of the game canvas), read only when cal
   paints it. The rarity trip clamp's seeded run reads its four epics in band 3 now (`CAP_RUN`), and
   the pickup spec prices the rules-9 planet's whole epic patches (`wholePatchParamsOf`). Money,
   pacing and R3 are the Tester's: `npm run balance:report`, `oreValueCensus.lane.test.ts`.
+- **Deep rare window** (ticket 738, Bjor's deep-rares rule, GD lock on #737): a planet from P3
+  entered under ore rules 11 (generator 16) draws the `ores` slice's `deep` rows, rare, epic and
+  mythic only from band 3 (`d >= 0.35`) at 0.25/0.5/1 of their band-5 weight, and P3 to P7's metal
+  and crystal rare kinds narrow from `[2, 5]` to `[3, 5]` (`windowsBeforeOreRules` keeps an older
+  stamp's window). `src/features/ores/systems/deepRareRows.test.ts` holds the shape, no rare above
+  band 3, the mixed uncommon weights kept, and each tier's band-5 weight as the one that keeps its
+  value on seed 83921's P5 census. The per-band mean is the named #644 re-baseline "deep rares":
+  `rarityShares.test.ts` judges a deep planet's mean on the whole planet (`deepRares` in
+  `roster.economy.json`), and `rarityMean.test.ts` and `oreMix.test.ts` hold per-band neutrality on
+  the mixed rows of rules 10. On a cluster planet the ore-mix histogram judges rare roles per patch
+  roll and the rest on the tiles the clusters leave (`histogramCheck.ts`). The lane
+  `src/systems/world/deepRareWindow.report.lane.test.ts` is the 5-seed report: fresh P3 to P7 on five
+  seeds, no rare, epic or mythic cell at `d < 0.35`, a non-common kind in band 1, every rare kind
+  held, and the rare cells per band printed. `generatorGolden.test.ts` pins the rules-11 P3 to P7 and
+  `oreRulesOldSaves.test.ts` loads a generator 15 save of P3 under rules 10 with its band-2 rares.
+  Money, pacing and R3 are the Tester's: `npm run balance:report`, `oreValueCensus.lane.test.ts`.
 - **Species audit P1 to P5** (ticket 711, spec #647): `src/features/roster/roster.speciesAudit.test.ts`
   reads each fresh planet's roster on two seeds and holds it to at least 15 species (P1 at 12 until
   ticket 713 moves it to its v14 pool and raises the floor), no two sharing a name or a stem (the
