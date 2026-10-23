@@ -1,12 +1,15 @@
 /**
- * The star map's rules (tickets 754 to 756), the `starMap` block of economy.json: the GD lock on
- * #650 (comment 6361556890, TD architecture), the VS input (6361573401) and the Systems ruling on
- * #756 that reconciled them. A planet is addressed by its solar system `s` and its place `p` in it;
- * the economy reads the campaign index `g = campaignIndex(s, p)` (`starMap/campaignIndex.ts`),
- * which advances by `systemAdvance` a system, so system 1 is today's planet line.
+ * The star map's rules (tickets 754 to 756 and 781), the `starMap` block of economy.json: the GD
+ * lock on #650 (comment 6361556890, TD architecture), the VS input (6361573401) and the Systems
+ * ruling on #756 that reconciled them. A planet is addressed by its solar system `s` and its place
+ * `p` in it; the economy reads the campaign index `g = campaignIndex(s, p)`
+ * (`starMap/campaignIndex.ts`), which counts every planet of the systems before `s` (the TD ruling
+ * on ticket 781: g is gap-free), so system 1 is today's planet line.
  *
- * `systemAdvance` is provisional: ticket 781 replaces it with a contiguous count and ticket 759
- * (the jump between systems) carries the J row. System 1 never reads it.
+ * `planetsPerSystem` is the per-system planet count; every system holds the same count today, so
+ * the planets before system `s` are `(s - 1) * planetsPerSystem`. It is not J: J is the jump fuel
+ * multiplier between systems (ticket 759). System 1 never reads it, so P1 onward stay
+ * byte-identical whatever it holds.
  *
  * `fuel` is the Systems ruling's fuel curve and tank (ticket 756, `economy/jumpFuel.ts` and
  * `economy/fuelTank.ts`):
@@ -24,8 +27,8 @@ import { add, cmp, fromSafeInteger, mul, type BigStat, type Money } from '../mon
 import type { FieldReader } from './economyFieldReader'
 
 export interface StarMapRules {
-  /** How far the campaign index moves from one solar system to the next (provisional). */
-  systemAdvance: number
+  /** The planets each solar system holds; the campaign index counts them system by system. */
+  planetsPerSystem: number
   fuel: JumpFuelRules
 }
 
@@ -58,10 +61,10 @@ const PATH = 'starMap'
 export function readStarMap(reader: FieldReader, value: unknown): StarMapRules {
   const starMap = reader.object(PATH, value)
   const read = {
-    systemAdvance: reader.safeInteger(`${PATH}.systemAdvance`, starMap.systemAdvance),
+    planetsPerSystem: reader.safeInteger(`${PATH}.planetsPerSystem`, starMap.planetsPerSystem),
     fuel: readJumpFuel(reader, starMap.fuel),
   }
-  if (read.systemAdvance < 1) reader.record(`${PATH}.systemAdvance must be 1 or more`)
+  if (read.planetsPerSystem < 1) reader.record(`${PATH}.planetsPerSystem must be 1 or more`)
   return read
 }
 

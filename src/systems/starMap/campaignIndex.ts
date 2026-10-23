@@ -1,13 +1,17 @@
 /**
  * `g = campaignIndex(s, p)` (ticket 754): the campaign index the economy and the generator read for
  * the planet at system `s`, place `p`. The GD lock on #650 (comment 6361556890, TD) has it come
- * from data and equal today's planet index in system 1, so P1 onward stay byte-identical; the VS
- * input (6361573401) has `g` advance by the data's J from one system to the next:
+ * from data and equal today's planet index in system 1, so P1 onward stay byte-identical. The TD
+ * ruling on ticket 781 makes it gap-free: a system's first planet follows the last planet of the
+ * system before, one planet's value step on, as any p to p + 1 is (VS: no value step at the jump).
  *
- *   g(s, p) = p + (s - 1) * J        J = `starMap.systemAdvance` (`economy/starMapRules.ts`)
+ *   g(s, p) = planetsBefore(s) + p      planetsBefore(s) = (s - 1) * N
  *
- * Two addresses may share a `g` (planet 1 of system 2 and planet J + 1 of system 1 price alike);
- * their worlds differ, since seeds hash the address itself (`planetAddressSeed.ts`).
+ * N = `starMap.planetsPerSystem` (`economy/starMapRules.ts`), equal for every system, so the prefix
+ * sum is closed-form and O(1) in bigint at any `s`. System 1's line keeps every planet from 1, so
+ * an address past N there may share a `g` with a later system's planet (planet 6 of system 1 and
+ * planet 1 of system 2 price alike); their worlds differ, since seeds hash the address itself
+ * (`planetAddressSeed.ts`).
  */
 import { ECONOMY } from '../economy/economy'
 import { assertValidAddress, FIRST_SYSTEM } from './planetAddress'
@@ -16,7 +20,12 @@ const MAX_PLANET_INDEX = BigInt(Number.MAX_SAFE_INTEGER)
 
 export function campaignIndex(system: bigint, planet: bigint): bigint {
   assertValidAddress(system, planet)
-  return planet + (system - FIRST_SYSTEM) * BigInt(ECONOMY.starMap.systemAdvance)
+  return planetsBefore(system) + planet
+}
+
+/** The planets of every system before `system`: the per-system count's prefix sum. */
+export function planetsBefore(system: bigint): bigint {
+  return (system - FIRST_SYSTEM) * BigInt(ECONOMY.starMap.planetsPerSystem)
 }
 
 /**

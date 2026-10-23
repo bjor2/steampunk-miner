@@ -7,8 +7,9 @@ const WORLD_SEED = 83921
 
 /**
  * Ticket 754's goldens (the VS bars on #650: s = 1, 2, 10, 1e6 and p = 1, 2, 5, 10, 40, 1000):
- * `[s, p, g, planet seed]` under world seed 83921 and today's provisional system advance. A row
- * changes only with the address law or `starMap.systemAdvance`, and system 1's never.
+ * `[s, p, g, planet seed]` under world seed 83921 and five planets a system. A row's `g` changes
+ * only with the address law or `starMap.planetsPerSystem`, its seed only with the address law, and
+ * system 1's never (ticket 781 moved the `g` of s >= 2 to the gap-free index; no seed moved).
  */
 const ADDRESS_GOLDENS: readonly (readonly [bigint, bigint, bigint, number])[] = [
   [1n, 1n, 1n, 3997541145],
@@ -17,24 +18,24 @@ const ADDRESS_GOLDENS: readonly (readonly [bigint, bigint, bigint, number])[] = 
   [1n, 10n, 10n, 3604396040],
   [1n, 40n, 40n, 54922117],
   [1n, 1000n, 1000n, 166274059],
-  [2n, 1n, 11n, 4289805408],
-  [2n, 2n, 12n, 21352925],
-  [2n, 5n, 15n, 827604736],
-  [2n, 10n, 20n, 3381520899],
-  [2n, 40n, 50n, 2934193739],
-  [2n, 1000n, 1010n, 3177984871],
-  [10n, 1n, 91n, 2992252446],
-  [10n, 2n, 92n, 934048516],
-  [10n, 5n, 95n, 1971536815],
-  [10n, 10n, 100n, 1964902730],
-  [10n, 40n, 130n, 647502709],
-  [10n, 1000n, 1090n, 72193512],
-  [1000000n, 1n, 9999991n, 579943453],
-  [1000000n, 2n, 9999992n, 2969238610],
-  [1000000n, 5n, 9999995n, 269685393],
-  [1000000n, 10n, 10000000n, 2562376693],
-  [1000000n, 40n, 10000030n, 3518064234],
-  [1000000n, 1000n, 10000990n, 2975366194],
+  [2n, 1n, 6n, 4289805408],
+  [2n, 2n, 7n, 21352925],
+  [2n, 5n, 10n, 827604736],
+  [2n, 10n, 15n, 3381520899],
+  [2n, 40n, 45n, 2934193739],
+  [2n, 1000n, 1005n, 3177984871],
+  [10n, 1n, 46n, 2992252446],
+  [10n, 2n, 47n, 934048516],
+  [10n, 5n, 50n, 1971536815],
+  [10n, 10n, 55n, 1964902730],
+  [10n, 40n, 85n, 647502709],
+  [10n, 1000n, 1045n, 72193512],
+  [1000000n, 1n, 4999996n, 579943453],
+  [1000000n, 2n, 4999997n, 2969238610],
+  [1000000n, 5n, 5000000n, 269685393],
+  [1000000n, 10n, 5000005n, 2562376693],
+  [1000000n, 40n, 5000035n, 3518064234],
+  [1000000n, 1000n, 5000995n, 2975366194],
 ]
 
 describe('star map planet seeds', () => {

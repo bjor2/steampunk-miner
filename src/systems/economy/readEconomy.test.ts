@@ -38,10 +38,10 @@ describe('economy data validation', () => {
     ])
   })
 
-  it('refuses a star map system advance that would not move the campaign index (ticket 754)', () => {
+  it('refuses a star map system that would hold no planet (ticket 781)', () => {
     const broken = economyFileCopy()
-    broken.starMap.systemAdvance = 0
-    expect(problemsOf(broken)).toEqual(['starMap.systemAdvance must be 1 or more'])
+    broken.starMap.planetsPerSystem = 0
+    expect(problemsOf(broken)).toEqual(['starMap.planetsPerSystem must be 1 or more'])
   })
 
   it('refuses a jump that would burn less than one fuel unit (ticket 756)', () => {
