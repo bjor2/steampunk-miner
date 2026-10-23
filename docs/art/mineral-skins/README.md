@@ -83,8 +83,8 @@ batch.
 
 ## Batch p1-b3: P1's species 11 and 12 (ticket 594)
 
-The legacy pool's last two rares, kind slots 11 and 12 on P1 (and a P2 under ore rules 5). The pool has 12 species,
-so P1 has no slots 13 to 15 and this batch closes the planet. The layers come from the species row,
+The legacy pool's last two rares, kind slots 11 and 12 on P1 (and a P2 under ore rules 5). The pool
+shared 12 species, and this batch closed them; P1's own three gems are p1-b4. The layers come from the species row,
 as before. No layer is shared with p1-b1, p1-b2 or within the batch.
 
 <!-- p1-b3 -->
@@ -105,6 +105,45 @@ as before. No layer is shared with p1-b1, p1-b2 or within the batch.
 - **Sheens:** adamantine (a hard bloom, strong glints, and the six-rayed star silky corundum throws,
   one centred on each tile, fading out before the cell edge); prismatic (long bars of light down
   the prism faces that meet the lamp, a column of the cell each, and sharp glints).
+
+## Batch p1-b4: P1's three gems, slots 13 to 15 (ticket 713)
+
+The legacy pool's own kinds of ticket 713 (GD lock on #713, Bjor's approval of 22 Oct): Diamond,
+Emerald and Ruby, crystal rares of bands 3 to 5 on a P1 entered under ore rules 12 (a P1 or a P2 a
+save holds under older rules never draws them). The layers come from the species row, as for p1-b1,
+none shared with another batch, and each vein and its sheen share one layout (`DIAMOND_OCTAHEDRA`,
+`EMERALD_PRISMS`, `RUBY_PEARS` in `layer_art.py`), so the light sits on the stone. Every gem sheen
+carries the facet glint the hero gems of ticket 744 wear (`facet_glint`): the facet turned to the key
+lamp, up and to the left, lit whole with a hard edge. With this batch every kind slot of a fresh P1,
+15 of them, wears a skin of its own.
+
+<!-- p1-b4 -->
+
+| slot | species             | base             | vein                 | palette (shadow, body, light)                 | sheen          |
+| ---- | ------------------- | ---------------- | -------------------- | --------------------------------------------- | -------------- |
+| 13   | `diamond-quartzine` | `adamant-clear`  | `lustrous-octahedra` | `diamond-white` `#7b7c7c` `#f6f8f9` `#fbfcfc` | `fire-sparks`  |
+| 14   | `emerald-quartzine` | `calcite-jardin` | `emerald-prisms`     | `emerald-green` `#0d6732` `#1ace65` `#8ce6b2` | `step-facets`  |
+| 15   | `ruby-quartzine`    | `pigeon-blood`   | `faceted-pears`      | `ruby-crimson` `#78204f` `#f0419e` `#f8a0ce`  | `ember-facets` |
+
+<!-- /p1-b4 -->
+
+- **Species:** diamond, emerald and ruby (Bjor's names on #713).
+- **Bases:** a clear, near-colourless body with faint flats of reflection from the facets inside it,
+  a fine cloud and a few black carbon specks; a deep green body full of mossy wisps (the garden
+  cutters call it), crossed by fine healed fractures and thinning to pale calcite in places; a red
+  body glowing from inside in soft round pools, faint growth zones between.
+- **Veins:** five sharp octahedra stood on a corner up the face, a ridge turned to the lamp, three
+  large and two small; three six-sided prisms lying side by side the same way up the face,
+  flat-ended and tipped so the end shows; five faceted pears, each a cut body drawn up to a point
+  with flat facets catching the lamp.
+- **Sheens:** fire sparks (many hard pinpoint sparks over the clear stone, and each octahedron's lit
+  facet); step facets (two long bars of light down each prism, as on a step-cut stone, a soft gleam
+  on the calcite, and the lit end facet); ember facets (a soft glow welling over each pear, a few
+  hard sparks, and the lit facet). Step facets reads the base's calcite through the same seed.
+- **Hue slots.** Diamond is a blue-white at luma 0.97 and Ruby a crimson at hue 328: at their first
+  readings (luma 0.92, and hue 345 at luma 0.46) the diamond sat 0.12 from clouded quartz and the
+  ruby 0.04 from ironstone under deuteranopia.
+- **Seeds 1301 to 1326**, apart from every other batch's.
 
 ## Batch p2-b1: P2's species 1 to 5 (ticket 595)
 
@@ -864,6 +903,31 @@ where ironstone has dark blotches and nuggets. Every new skin sits above its roc
 for corundum, 1.63 for beryl). Checked by eye on `p1-b3.phone-x4.png`, `p1-b3.desktop.png`, the
 `p1-b3.scale-x4` copies and `p1.scale-x4.png` with its `-deutan` and `-gray` copies, now all
 twelve P1 skins side by side.
+
+From `sheets/p1-b4.distinct.json`, at 22 px a tile over P1's band 3 rock (luma 0.31), the gems
+against each other and against the twelve:
+
+<!-- p1-b4-readings -->
+
+| pair                        | colour apart | deuteranopia apart | luma apart | texture apart |
+| --------------------------- | ------------ | ------------------ | ---------- | ------------- |
+| beryl vs ruby (least apart) | 0.178        | 0.154              | 0.062      | 0.071         |
+| beryl vs emerald            | 0.784        | 0.160              | 0.036      | 0.052         |
+| copper vs emerald           | 0.251        | 0.169              | 0.026      | 0.061         |
+| ironstone vs ruby           | 0.456        | 0.190              | 0.009      | 0.083         |
+| emerald vs ruby             | 0.862        | 0.269              | 0.098      | 0.071         |
+| diamond vs ruby             | 0.755        | 0.670              | 0.451      | 0.070         |
+
+<!-- /p1-b4-readings -->
+
+The diamond is the planet's palest skin (luma 0.93), the emerald its only saturated green and the
+ruby its only crimson. The closest pair is ruby against red beryl, the other red: the ruby leans to
+crimson and carries faceted pears and a lit facet where the beryl has upright columns and a bar,
+and the pair stays apart under deuteranopia (0.15). The emerald is the planet's second green beside
+shallow copper, apart by 0.25 in colour, and its prisms and step bars against the copper's flakes.
+Every gem sits above its rock (contrast 2.71 for diamond, 1.73 for emerald, 1.46 for ruby). Checked
+by eye on `p1-b4.layers.jpg`, `p1-b4.phone-x4.png` and `p1.scale-x4.png` with its `-deutan` and
+`-gray` copies, now all fifteen P1 skins side by side.
 
 From `sheets/p2-b1.distinct.json`, at 22 px a tile over P2's band 3 rock (luma 0.29). It is P2's
 first batch, so these are all ten pairs:

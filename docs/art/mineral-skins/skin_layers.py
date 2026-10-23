@@ -46,7 +46,8 @@ LIGHT_LUMA_SHARE = 0.5
 # and #606 its slots 11 to 15 and the planet's signature material, of the foothold-p5 pool; #595 is
 # P2 slots 1 to 5, of the foothold-p2 pool, which binds the legacy slots, #596 its slots 6 to 9,
 # the four uncommons, #597 its slots 10 to 12, the three rares, #710 its slots 13 to 15, the pool's
-# own kinds of ticket 709, and #736 the species its slots 6, 7 and 12 swap in under ore rules 9),
+# own kinds of ticket 709, and #736 the species its slots 6, 7 and 12 swap in under ore rules 9; #713
+# is P1 slots 13 to 15, the legacy pool's own three gems under ore rules 12),
 # named `p<planet>-b<n>`, in slot order. A batch is measured against all of its planet's other
 # batches (`planet_mates`), less the skins on the slots it dresses itself (`mate_skins`). A batch's
 # `signature` is the planet whose signature skin row it adds. A batch's `oreRules` picks, on a slot
@@ -56,6 +57,7 @@ BATCHES = {
     'p1-b1': {'pool': 'legacy', 'slots': ('legacy.c1', 'legacy.c2', 'legacy.c3', 'legacy.c4', 'legacy.c5')},
     'p1-b2': {'pool': 'legacy', 'slots': ('legacy.u1', 'legacy.u2', 'legacy.u3', 'legacy.u4', 'legacy.r1')},
     'p1-b3': {'pool': 'legacy', 'slots': ('legacy.r2', 'legacy.r3')},
+    'p1-b4': {'pool': 'legacy', 'slots': ('legacy.g1', 'legacy.g2', 'legacy.g3')},
     'p2-b1': {'pool': 'foothold-p2', 'slots': ('legacy.c1', 'legacy.c2', 'legacy.c3', 'legacy.c4', 'legacy.c5')},
     'p2-b2': {'pool': 'foothold-p2', 'slots': ('legacy.u1', 'legacy.u2', 'legacy.u3', 'legacy.u4')},
     'p2-b3': {'pool': 'foothold-p2', 'slots': ('legacy.r1', 'legacy.r2', 'legacy.r3')},

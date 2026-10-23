@@ -360,6 +360,8 @@ programs }` from three's `renderer.info` of the game canvas), read only when cal
   `kindRows.test.ts` the gem slots and the cap counted per roster, `roster.byteIdentity.test.ts` the
   weighted split within 4 sigma, `generatorGolden.test.ts` the rules-12 P1 and P2 to P7 as rules 11,
   and `oreRulesOldSaves.test.ts` a generator 16 save of P1 under rules 10 with its column pin. The
+  three wear skins of their own (batch p1-b4 of `docs/art/mineral-skins`), which
+  `mineralSkins.planet1.test.ts` holds in layers no other P1 species wears. The
   core-layer band money moves by design: the named #644 re-baseline "P1 core gems". Money, pacing,
   the fee clamp and R3 (P2 at least 1.15x P1 with the gems) are the Tester's: `npm run
 balance:report`, `oreValueCensus.lane.test.ts`.

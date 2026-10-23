@@ -151,9 +151,9 @@
     { "id": "azurite-blue", "hue": 222, "saturation": 0.7, "luma": 0.5 },
     { "id": "pyrite-brass", "hue": 52, "saturation": 0.45, "luma": 0.7 },
     { "id": "argentite-grey", "hue": 205, "saturation": 0.22, "luma": 0.62 },
-    { "id": "diamond-white", "hue": 195, "saturation": 0.06, "luma": 0.92 },
+    { "id": "diamond-white", "hue": 205, "saturation": 0.14, "luma": 0.97 },
     { "id": "emerald-green", "hue": 145, "saturation": 0.78, "luma": 0.55 },
-    { "id": "ruby-crimson", "hue": 345, "saturation": 0.85, "luma": 0.46 },
+    { "id": "ruby-crimson", "hue": 328, "saturation": 0.85, "luma": 0.5 },
     {
       "id": "pig-iron",
       "hue": 210,

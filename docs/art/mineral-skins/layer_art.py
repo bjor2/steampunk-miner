@@ -6,8 +6,9 @@ slots 1 to 5, ticket 602 for its slots 6 to 10, ticket 603 for its slots 11 to 1
 material, ticket 604 for P5's slots 1 to 5, ticket 605 for its slots 6 to 10, ticket 606 for its slots
 11 to 15 and its signature material, ticket 595 for P2's slots 1 to 5, ticket 596 for its slots 6 to
 9, ticket 597 for its slots 10 to 12, ticket 710 for its slots 13 to 15, the pool's own kinds of
-ticket 709, ticket 736 for the three species its slots 6, 7 and 12 swap in under ore rules 9): one
-per layer id of `mineralSkins.json`. A layer id with no recipe fails, never falls back.
+ticket 709, ticket 736 for the three species its slots 6, 7 and 12 swap in under ore rules 9, ticket
+713 for P1's three gems, its slots 13 to 15 under ore rules 12): one per layer id of
+`mineralSkins.json`. A layer id with no recipe fails, never falls back.
 
 - `base` and `sheen` are seamless textures on the 1 m cell: an emission material on a 1 m quad
   whose value is the ramp coordinate (base, mean about 0.5) or the highlight strength (sheen,
@@ -73,6 +74,19 @@ ARGENTITE_BLOCKS = (((-0.13, 0.11), 0.15, 0.15), ((0.1, 0.09), 0.12, -0.2), ((-0
                     ((0.21, -0.17), 0.07, 0.6), ((-0.23, -0.23), 0.06, -0.4))
 # Pyrite's striae: whole numbers of lines across the cell, so they repeat at its edge.
 PYRITE_STRIAE = 28
+# P1 batch 4 (ticket 713): the layouts a gem's vein and its sheen share, so each facet glint sits on
+# its stone. Diamond's octahedra: centre and radius. Emerald's prisms: centre, the turn of the axis
+# from up (about the depth axis), length and radius, all three lying the same way. Ruby's pears: the
+# body's centre and radius, each drawn up to a point.
+DIAMOND_OCTAHEDRA = (((-0.15, 0.12), 0.1), ((0.14, 0.14), 0.075), ((0.03, -0.07), 0.11), ((-0.2, -0.2), 0.055),
+                     ((0.22, -0.19), 0.06))
+EMERALD_PRISMS = (((-0.03, 0.05), 0.62, 0.5, 0.075), ((0.18, -0.13), 0.62, 0.3, 0.05),
+                  ((-0.25, 0.1), 0.62, 0.22, 0.04))
+RUBY_PEARS = (((-0.17, 0.1), 0.075), ((0.12, 0.14), 0.06), ((0.04, -0.1), 0.085), ((-0.18, -0.22), 0.05),
+              ((0.22, -0.17), 0.045))
+# The facet glint every gem shares (HS on #741, as the hero gems of ticket 744 wear it): the facet
+# turned to the key lamp, up and to the left, lights up whole.
+FACET_GLINT_TURN = math.radians(135)
 # Centre, radius, teeth, phase: each wheel meshes with the one before it.
 GEAR_TRAIN = (((-0.1, 0.08), 0.19, 16, 0.0), ((0.118, -0.103), 0.12, 10, 0.2), ((0.236, 0.037), 0.08, 7, 0.1))
 TRELLIS_RODS = 2
@@ -1598,6 +1612,36 @@ def base_sooty_tarnish(graph):
     return graph.plus(tone, graph.mul(graph.minus(grain, 0.5), 0.1))
 
 
+def base_adamant_clear(graph):
+    """Diamond: a clear, near-colourless body, faint flats of reflection from the facets inside it, a fine cloud and a few black carbon specks."""
+    flats = graph.voronoi(6, 6, seed=1301, randomness=0.8)
+    tone = graph.mul_add(graph.add('ShaderNodeSeparateColor', [(0, flats['Color'])]).outputs[0], 0.2, 0.4)
+    cloud = stretched(graph, graph.noise(4, 4, seed=1302, detail=3, roughness=0.45))
+    tone = graph.plus(tone, graph.mul(graph.minus(cloud, 0.5), 0.14))
+    specks = sprinkled(graph, 14, 1303, 0.22, 0.3)
+    return graph.minus(tone, graph.mul(specks, 0.45))
+
+
+def base_calcite_jardin(graph):
+    """Emerald: a deep green body full of the mossy wisps cutters call its garden, crossed by fine healed fractures, in pale calcite where it thins."""
+    moss = stretched(graph, graph.noise(18, 7, seed=1311, detail=5, roughness=0.6))
+    calcite = graph.smooth(stretched(graph, graph.noise(2, 2, seed=1312, detail=2)), 0.62, 0.8)
+    tone = graph.mul_add(graph.minus(1.0, graph.smooth(moss, 0.55, 0.75)), 0.28, 0.32)
+    fractures = graph.smooth(graph.voronoi(5, 5, seed=1313, feature='DISTANCE_TO_EDGE')['Distance'], 0.012, 0.0)
+    tone = graph.plus(tone, graph.mul(fractures, 0.18))
+    return graph.plus(tone, graph.mul(calcite, 0.3))
+
+
+def base_pigeon_blood(graph):
+    """Ruby: a deep red body that glows from inside in soft round pools, as ruby does under the lamp, over a fine even grain."""
+    pools = graph.smooth(stretched(graph, graph.noise(3, 3, seed=1321, detail=2)), 0.45, 0.75)
+    grain = stretched(graph, graph.noise(48, 48, seed=1322, detail=3))
+    zoning = graph.smooth(graph.voronoi(4, 4, seed=1323, feature='DISTANCE_TO_EDGE')['Distance'], 0.03, 0.0)
+    tone = graph.mul_add(pools, 0.34, 0.3)
+    tone = graph.minus(tone, graph.mul(zoning, 0.1))
+    return graph.plus(tone, graph.mul(graph.minus(grain, 0.5), 0.08))
+
+
 # --- sheen: the lustre's highlights -----------------------------------------------------------------
 
 
@@ -2315,6 +2359,61 @@ def sheen_smelter_silver(graph):
         left = graph.mul(graph.smooth(graph.math('ABSOLUTE', graph.plus(across, half * 0.85)), half * 0.12, half * 0.03),
                          graph.smooth(graph.math('ABSOLUTE', along), half * 0.9, half * 0.7))
         light = graph.math('MAXIMUM', light, graph.mul(graph.math('MAXIMUM', top, left), 0.6))
+    return light
+
+
+def facet_glint(graph, x, y, radius):
+    """
+    The gem's shared facet glint: the facet of a stone of `radius` at offset (x, y) that turns to the
+    key lamp, a wedge out from the stone's middle toward the upper left, lit whole with a hard edge.
+    """
+    along = graph.plus(graph.mul(x, math.cos(FACET_GLINT_TURN)), graph.mul(y, math.sin(FACET_GLINT_TURN)))
+    across = graph.math('ABSOLUTE', graph.minus(graph.mul(y, math.cos(FACET_GLINT_TURN)), graph.mul(x, math.sin(FACET_GLINT_TURN))))
+    wedge = graph.smooth(graph.minus(across, graph.mul(along, 0.55)), 0.004, -0.004)
+    reach = graph.mul(graph.smooth(along, radius * 0.12, radius * 0.2), graph.smooth(along, radius * 0.78, radius * 0.7))
+    return graph.mul(wedge, reach)
+
+
+def stone_offset(graph, centre):
+    """The cell coordinates of a stone laid out at `centre` (vein coordinates, the cell's middle at 0)."""
+    return graph.minus(graph.u, centre[0] + 0.5), graph.minus(graph.v, centre[1] + 0.5)
+
+
+def sheen_fire_sparks(graph):
+    """Fire sparks (diamond): many hard pinpoint sparks of fire all over the clear stone, and on each octahedron the facet facing the lamp lit whole."""
+    light = graph.mul(sprinkled(graph, 26, 1306, 0.3, 0.55), 0.85)
+    for centre, radius in DIAMOND_OCTAHEDRA:
+        x, y = stone_offset(graph, centre)
+        light = graph.math('MAXIMUM', light, graph.mul(facet_glint(graph, x, y, radius), 0.95))
+    return light
+
+
+def sheen_step_facets(graph):
+    """Step facets (emerald): two long bars of light down each prism, as on a step-cut stone, a soft gleam on the calcite, and the end facet facing the lamp lit whole."""
+    calcite = graph.smooth(stretched(graph, graph.noise(2, 2, seed=1312, detail=2)), 0.62, 0.8)
+    light = graph.mul(calcite, 0.16)
+    for centre, angle, length, radius in EMERALD_PRISMS:
+        x, y = stone_offset(graph, centre)
+        along = graph.plus(graph.mul(x, math.sin(angle)), graph.mul(y, math.cos(angle)))
+        across = graph.minus(graph.mul(x, math.cos(angle)), graph.mul(y, math.sin(angle)))
+        within = graph.smooth(graph.math('ABSOLUTE', along), length * 0.46, length * 0.4)
+        for offset, strength in ((-0.45, 0.7), (0.15, 0.45)):
+            bar = graph.smooth(graph.math('ABSOLUTE', graph.minus(across, radius * offset)), radius * 0.16, radius * 0.06)
+            light = graph.math('MAXIMUM', light, graph.mul(graph.mul(bar, within), strength))
+        end_x = graph.minus(x, math.sin(angle) * length / 2)
+        end_y = graph.minus(y, math.cos(angle) * length / 2)
+        light = graph.math('MAXIMUM', light, graph.mul(facet_glint(graph, end_x, end_y, radius * 1.6), 0.9))
+    return light
+
+
+def sheen_ember_facets(graph):
+    """Ember facets (ruby): a soft red glow welling over each pear, a few hard sparks, and the facet facing the lamp lit whole."""
+    light = graph.mul(sprinkled(graph, 14, 1326, 0.24, 0.35), 0.7)
+    for centre, radius in RUBY_PEARS:
+        x, y = stone_offset(graph, centre)
+        reach = graph.math('SQRT', graph.plus(graph.mul(x, x), graph.mul(y, y)))
+        glow = graph.mul(graph.smooth(reach, radius * 1.3, radius * 0.3), 0.32)
+        light = graph.math('MAXIMUM', light, graph.math('MAXIMUM', glow, graph.mul(facet_glint(graph, x, y, radius), 0.95)))
     return light
 
 
@@ -3860,6 +3959,47 @@ def vein_sectile_blocks(rng, body):
     return assign_all(marks, body)
 
 
+def vein_lustrous_octahedra(rng, body):
+    """Diamond: sharp octahedra stood on a corner up the face, turned so a ridge faces the lamp, three large and two small."""
+    marks = []
+    for i, ((x, z), radius) in enumerate(DIAMOND_OCTAHEDRA):
+        turn = math.pi / 4 + rng.uniform(-0.15, 0.15)
+        tip = rng.uniform(-0.12, 0.12)
+        for half, flip in (('top', 0.0), ('foot', math.pi)):
+            pyramid = shapes.add_cone('octahedron-%d-%s' % (i, half), radius, radius, (x, -radius * 0.45, z),
+                                      rotation=(flip + tip, 0.0, turn), sides=4)
+            pyramid.data.transform(Matrix.Translation((0.0, 0.0, radius / 2)))
+            marks.append(pyramid)
+    return assign_all(marks, body)
+
+
+def vein_emerald_prisms(rng, body):
+    """Emerald: three six-sided prisms lying side by side the same way up the face, flat-ended, each tipped a little so its end face shows."""
+    marks = []
+    for i, ((cx, cz), angle, length, radius) in enumerate(EMERALD_PRISMS):
+        prism = shapes.add_prism('prism-%d' % i, radius, length, (cx, -radius * 0.5, cz),
+                                 rotation=(0.28 + rng.uniform(-0.04, 0.04), angle, 0.0))
+        shapes.bevel(prism, radius * 0.05, segments=1)
+        marks.append(prism)
+    return assign_all(marks, body)
+
+
+def vein_faceted_pears(rng, body):
+    """Ruby: faceted pear-shaped stones, each a cut body drawn up to a point, flat facets catching the lamp, three large and two small."""
+    marks = []
+    for i, ((x, z), size) in enumerate(RUBY_PEARS):
+        angle = math.pi / 2 + rng.uniform(-0.3, 0.3)
+        pear = shapes.add_icosphere('pear-%d' % i, size, (x, -size * 0.45, z), subdivisions=1, scale=(1.0, 0.65, 1.0))
+        reach = size * 1.0
+        tip_at = (x + math.cos(angle) * reach, -size * 0.4, z + math.sin(angle) * reach)
+        point = shapes.add_cone('point-%d' % i, size * 0.9, size * 1.7, tip_at, rotation=(0.0, math.pi / 2 - angle, 0.0), sides=8)
+        point.scale = (1.0, 0.65, 1.0)
+        for facet in pear.data.polygons:
+            facet.use_smooth = False
+        marks += [pear, point]
+    return assign_all(marks, body)
+
+
 def assign_all(marks, material):
     for mark in marks:
         shapes.assign(mark, material)
@@ -3867,6 +4007,9 @@ def assign_all(marks, material):
 
 
 BASES = {
+    'adamant-clear': base_adamant_clear,
+    'calcite-jardin': base_calcite_jardin,
+    'pigeon-blood': base_pigeon_blood,
     'mottled-grain': base_mottled_grain,
     'crusted-scale': base_crusted_scale,
     'banded-seam': base_banded_seam,
@@ -3947,6 +4090,9 @@ BASES = {
     'sooty-tarnish': base_sooty_tarnish,
 }
 SHEENS = {
+    'fire-sparks': sheen_fire_sparks,
+    'step-facets': sheen_step_facets,
+    'ember-facets': sheen_ember_facets,
     'earthy': sheen_earthy,
     'submetallic': sheen_submetallic,
     'metallic': sheen_metallic,
@@ -4105,6 +4251,9 @@ VEINS = {
     'azurite-nodules': vein_azurite_nodules,
     'pyrite-suns': vein_pyrite_suns,
     'sectile-blocks': vein_sectile_blocks,
+    'lustrous-octahedra': vein_lustrous_octahedra,
+    'emerald-prisms': vein_emerald_prisms,
+    'faceted-pears': vein_faceted_pears,
 }
 RECIPES = {'base': BASES, 'vein': VEINS, 'sheen': SHEENS}
 

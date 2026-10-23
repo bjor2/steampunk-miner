@@ -550,6 +550,27 @@
       "wornBy": ["p2-r3b"]
     },
     {
+      "kind": "base",
+      "id": "adamant-clear",
+      "cell": "cells/base/adamant-clear.png",
+      "blend": "blend/base-adamant-clear.blend",
+      "wornBy": ["diamond-quartzine"]
+    },
+    {
+      "kind": "base",
+      "id": "calcite-jardin",
+      "cell": "cells/base/calcite-jardin.png",
+      "blend": "blend/base-calcite-jardin.blend",
+      "wornBy": ["emerald-quartzine"]
+    },
+    {
+      "kind": "base",
+      "id": "pigeon-blood",
+      "cell": "cells/base/pigeon-blood.png",
+      "blend": "blend/base-pigeon-blood.blend",
+      "wornBy": ["ruby-quartzine"]
+    },
+    {
       "kind": "vein",
       "id": "nugget-cluster",
       "cell": "cells/vein/nugget-cluster.png",
@@ -1096,6 +1117,27 @@
       "wornBy": ["p2-r3b"]
     },
     {
+      "kind": "vein",
+      "id": "lustrous-octahedra",
+      "cell": "cells/vein/lustrous-octahedra.png",
+      "blend": "blend/vein-lustrous-octahedra.blend",
+      "wornBy": ["diamond-quartzine"]
+    },
+    {
+      "kind": "vein",
+      "id": "emerald-prisms",
+      "cell": "cells/vein/emerald-prisms.png",
+      "blend": "blend/vein-emerald-prisms.blend",
+      "wornBy": ["emerald-quartzine"]
+    },
+    {
+      "kind": "vein",
+      "id": "faceted-pears",
+      "cell": "cells/vein/faceted-pears.png",
+      "blend": "blend/vein-faceted-pears.blend",
+      "wornBy": ["ruby-quartzine"]
+    },
+    {
       "kind": "sheen",
       "id": "earthy",
       "cell": "cells/sheen/earthy.png",
@@ -1640,6 +1682,27 @@
       "cell": "cells/sheen/smelter-silver.png",
       "blend": "blend/sheen-smelter-silver.blend",
       "wornBy": ["p2-r3b"]
+    },
+    {
+      "kind": "sheen",
+      "id": "fire-sparks",
+      "cell": "cells/sheen/fire-sparks.png",
+      "blend": "blend/sheen-fire-sparks.blend",
+      "wornBy": ["diamond-quartzine"]
+    },
+    {
+      "kind": "sheen",
+      "id": "step-facets",
+      "cell": "cells/sheen/step-facets.png",
+      "blend": "blend/sheen-step-facets.blend",
+      "wornBy": ["emerald-quartzine"]
+    },
+    {
+      "kind": "sheen",
+      "id": "ember-facets",
+      "cell": "cells/sheen/ember-facets.png",
+      "blend": "blend/sheen-ember-facets.blend",
+      "wornBy": ["ruby-quartzine"]
     }
   ]
 }

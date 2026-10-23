@@ -235,6 +235,15 @@
       },
       {
         "id": "sooty-tarnish"
+      },
+      {
+        "id": "adamant-clear"
+      },
+      {
+        "id": "calcite-jardin"
+      },
+      {
+        "id": "pigeon-blood"
       }
     ],
     "vein": [
@@ -471,6 +480,15 @@
       },
       {
         "id": "sectile-blocks"
+      },
+      {
+        "id": "lustrous-octahedra"
+      },
+      {
+        "id": "emerald-prisms"
+      },
+      {
+        "id": "faceted-pears"
       }
     ],
     "palette": [
@@ -785,6 +803,18 @@
       {
         "id": "argentite-grey",
         "ramp": ["#46525a", "#8ba3b5", "#c5d1da"]
+      },
+      {
+        "id": "diamond-white",
+        "ramp": ["#7b7c7c", "#f6f8f9", "#fbfcfc"]
+      },
+      {
+        "id": "emerald-green",
+        "ramp": ["#0d6732", "#1ace65", "#8ce6b2"]
+      },
+      {
+        "id": "ruby-crimson",
+        "ramp": ["#78204f", "#f0419e", "#f8a0ce"]
       }
     ],
     "sheen": [
@@ -1021,6 +1051,15 @@
       },
       {
         "id": "smelter-silver"
+      },
+      {
+        "id": "fire-sparks"
+      },
+      {
+        "id": "step-facets"
+      },
+      {
+        "id": "ember-facets"
       }
     ]
   },
@@ -1549,6 +1588,27 @@
       "vein": "sectile-blocks",
       "palette": "argentite-grey",
       "sheen": "smelter-silver"
+    },
+    {
+      "species": "diamond-quartzine",
+      "base": "adamant-clear",
+      "vein": "lustrous-octahedra",
+      "palette": "diamond-white",
+      "sheen": "fire-sparks"
+    },
+    {
+      "species": "emerald-quartzine",
+      "base": "calcite-jardin",
+      "vein": "emerald-prisms",
+      "palette": "emerald-green",
+      "sheen": "step-facets"
+    },
+    {
+      "species": "ruby-quartzine",
+      "base": "pigeon-blood",
+      "vein": "faceted-pears",
+      "palette": "ruby-crimson",
+      "sheen": "ember-facets"
     }
   ],
   "signatures": [
