@@ -16,6 +16,10 @@
  * - `gravityMultiplier`: the archetype's radial gravity (#4, #7), the planet's visible trait on the
  *   planet row and the travel screen (Bjor's ruling on #724: it caps a cut down's gain of speed).
  *   Formula-driven from the archetype, never a provider's field, so no row lifts the cap.
+ * - `gemSaleTiers`: the integer tiers the planet's gems sell at, cheapest first (tickets 713 and
+ *   741, Systems' final spec on #741): `t_g(p, k) = t_top(p) + Δ_k`, so a gem is worth
+ *   `G = V(t_g)`. The provider answers the formula for every planet from 1, whether or not a species
+ *   pool binds gems to it; none with no provider. Never stored: no row authors a gem price.
  */
 import { ECONOMY } from '../economy/economy'
 import { planetArchetypeOf } from '../world/planetArchetype'
@@ -54,10 +58,14 @@ export interface PlanetRow {
   radius: FrozenRadius | null
   /** The archetype's radial gravity multiplier: planet 1 is 1 (#724: a trait the player sees). */
   gravityMultiplier: number
+  /** The tiers the planet's gems sell at, cheapest first; empty with no provider. */
+  gemSaleTiers: readonly number[]
 }
 
 /** The fields a provider lays over the generated row; one it leaves out keeps the generated one. */
-export type PlanetRowFields = Partial<Pick<PlanetRow, 'displayName' | 'poolId' | 'look' | 'radius'>>
+export type PlanetRowFields = Partial<
+  Pick<PlanetRow, 'displayName' | 'poolId' | 'look' | 'radius' | 'gemSaleTiers'>
+>
 
 export interface PlanetRowProvider {
   id: string
@@ -66,6 +74,8 @@ export interface PlanetRowProvider {
 }
 
 export const PLANET_ROW_REGISTRY = defineOneProviderRegistry<PlanetRowProvider>('planetRow')
+
+const NO_GEMS: readonly number[] = Object.freeze([])
 
 /** The planet's row: the generated one with the provider's fields on top. */
 export function planetRowOf(planetIndex: number): PlanetRow {
@@ -91,6 +101,11 @@ export function rowRadiusTilesOf(planetIndex: number, oreRulesVersion: number | 
   return isFrozenUnder ? radius.tiles : null
 }
 
+/** The tiers the planet's gems sell at, cheapest first; empty with no provider. */
+export function gemSaleTiersOfPlanet(planetIndex: number): readonly number[] {
+  return planetRowOf(planetIndex).gemSaleTiers
+}
+
 /** The solar system a planet sits in: the last `planets.surfaceLayer.systems` row it reached (#306). */
 export function solarSystemOf(planetIndex: number): number {
   const reached = ECONOMY.planets.surfaceLayer.systems.filter(
@@ -108,6 +123,7 @@ function generatedRowOf(planetIndex: number): PlanetRow {
     look: null,
     radius: null,
     gravityMultiplier: planetArchetypeOf(planetIndex).gravityMultiplier,
+    gemSaleTiers: NO_GEMS,
   }
 }
 
@@ -118,5 +134,6 @@ function withFields(row: PlanetRow, fields: PlanetRowFields): PlanetRow {
     poolId: fields.poolId ?? row.poolId,
     look: fields.look ?? row.look,
     radius: fields.radius ?? row.radius,
+    gemSaleTiers: fields.gemSaleTiers ?? row.gemSaleTiers,
   }
 }

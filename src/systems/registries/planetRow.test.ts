@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import {
+  gemSaleTiersOfPlanet,
   PLANET_ROW_REGISTRY,
   planetDisplayNameOf,
   planetLookOf,
@@ -32,7 +33,7 @@ function readWith<T>(providers: readonly PlanetRowProvider[], read: () => T): T 
 }
 
 describe('planet row', () => {
-  it('names a planet by its number, with no pool, look or frozen radius, with no provider', () => {
+  it('names a planet by its number, with no pool, look, frozen radius or gems, with no provider', () => {
     expect(readWith([], () => planetRowOf(3))).toEqual({
       planetIndex: 3,
       displayName: 'Planet 3',
@@ -41,7 +42,9 @@ describe('planet row', () => {
       look: null,
       radius: null,
       gravityMultiplier: 1.25,
+      gemSaleTiers: [],
     })
+    expect(readWith([], () => gemSaleTiersOfPlanet(3))).toEqual([])
     expect(readWith([], () => planetDisplayNameOf(3))).toBe('Planet 3')
     expect(readWith([], () => planetLookOf(3))).toBeNull()
     expect(readWith([], () => rowRadiusTilesOf(3, 9))).toBeNull()
@@ -59,8 +62,17 @@ describe('planet row', () => {
       look: null,
       radius: FROZEN_421,
       gravityMultiplier: 1.25,
+      gemSaleTiers: [],
     })
     expect(readWith([provider], () => planetDisplayNameOf(12))).toBe('Planet 12')
+  })
+
+  it("answers the provider's gem sale tiers for any planet (ticket 741)", () => {
+    const provider = providerOf((planet) => ({
+      gemSaleTiers: [5, 6, 8].map((lead) => 3 * planet + lead),
+    }))
+    expect(readWith([provider], () => gemSaleTiersOfPlanet(2))).toEqual([11, 12, 14])
+    expect(readWith([provider], () => planetRowOf(1000).gemSaleTiers)).toEqual([3005, 3006, 3008])
   })
 
   // #724: gravity is the planet's visible trait, from its archetype; no provider row lifts it.
