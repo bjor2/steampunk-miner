@@ -352,7 +352,7 @@ programs }` from three's `renderer.info` of the game canvas), read only when cal
   each sells at its own integer tier, `t_top + 5, 6 and 8` (12, 13 and 15 on P1), through the kernel's
   gem tag (`oreGems`, feature-slices 3.85). `src/features/roster/systems/rosterGems.test.ts` holds the
   P1 goldens (864.975, 1297.463 and 2919.292, the 865, 1297 and 2919 Bjor accepted), no other P1 kind
-  at a gem's sale tier (HS), a gem cell keeping its own tier, and no gem on P2 or a rules-11 P1.
+  at a gem's sale tier (HS), a gem cell keeping its own tier, and no gem on a rules-11 P1.
   `src/features/roster/roster.p1Gems.test.ts` reads three seeds: the gems only on crystal rare cells
   of bands 3 to 5, a cluster of each on every seed, every cell of bands 1 and 2 and every other tier as
   rules 11 made it, the gems at most 15% of P1's ore pool value (Systems' binding cap) and at most
@@ -366,6 +366,26 @@ programs }` from three's `renderer.info` of the game canvas), read only when cal
   core-layer band money moves by design: the named #644 re-baseline "P1 core gems". Money, pacing,
   the fee clamp and R3 (P2 at least 1.15x P1 with the gems) are the Tester's: `npm run
 balance:report`, `oreValueCensus.lane.test.ts`.
+- **The gem tier of P2 to P5** (ticket 741, GD lock with Systems' final spec on #741, under the
+  integer tiers of Systems' decision on #713): under ore rules 13 (no generator bump: no cell moves)
+  three existing rare or mythic kinds of each of P2 to P5 sell at `t_top + 5, 6 and 8`, P&N's picks
+  cheapest first (P2 Star Garnet, Aquamarine, Verdigris Opal; P3 Heart Diamond, Orichalcum, Blue
+  Topaz; P4 Painite, Starsteel, Watermelon Tourmaline; P5 Kiln Ruby, Core Gold, Fire Garnet), and a
+  gem's unit is never held by the epic and mythic trip clamp. `src/features/ores/systems/gemTiers.test.ts`
+  holds G(p) through `planetRow` at p = 1, 2, 5, 10, 40 and 1000 on Money (checked against Python's
+  Decimal) and through the shared formatter, the guard G(p) >= 1.5 G(p - 1) from P2 to P200 and at
+  1e6, each planet's cheapest gem above every other ore of its planet, and never below the previous
+  planet's dearest (a tie on every three-tier step: the ladder spans three tiers).
+  `rosterGems.test.ts` holds the names, ranks and tiers per planet, no non-gem kind at a gem's tier
+  (HS), a mythic gem's cell tier and its unit's gem mark, plain prices under rules 12 and none on
+  the P6-P7 pool. `rarityTripClamp.test.ts` pays a mythic gem in full past the cap.
+  `src/features/roster/roster.gemTier.test.ts` (about a minute) reads whole P1 to P5 on the three
+  pacing seeds: gems only in bands 3 to 5, a cluster of each gem on every seed, the gem tier at most
+  15% of each planet's ore pool value, every hop at least 1.15 with the gems in (R3), and P3's step
+  from P2 inside the other hops' range, under its gems' 7.6. `generatorGolden.test.ts` holds P1 to
+  P5 under rules 13 as rules 12 made them. Pacing, income, the first two upgrades, the P3 purchase
+  cadence, the fee clamp and sold value are the Tester's: `npm run balance:report`,
+  `oreValueCensus.lane.test.ts` (the named #644 re-baseline "per-planet gem tier").
 - **Species audit P1 to P5** (ticket 711, spec #647): `src/features/roster/roster.speciesAudit.test.ts`
   reads each fresh planet's roster on two seeds and holds it to at least 15 species (P1 since ticket
   713's gems), no two sharing a name or a stem (the #699 rule, reading C), a sprite (silhouette +

@@ -99,7 +99,7 @@ function signatureFinds(planetIndex: number) {
       const cell = cellAt(EMPTY_WORLD, params, { tx, ty })
       if (kindOfCell(cell) !== CELL_KIND.ore) continue
       const ore = minedOreOf(params, { tx, ty }, cell)
-      if (ore.saleTier > ore.resourceTier) finds.push(pickupFindAt(params, { tx, ty }))
+      if (ore.signature === true) finds.push(pickupFindAt(params, { tx, ty }))
     }
   }
   return finds

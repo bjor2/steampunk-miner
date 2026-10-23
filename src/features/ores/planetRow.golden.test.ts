@@ -23,9 +23,11 @@ const FAR_PLANETS = [1, 40, 41, 1000, 1_000_000]
 /**
  * Re-pinned for ore rules 12 (ticket 713): every fresh planet is stamped 12, and the stamp alone
  * moves the rows: set back to 10 on P1 and P2 and 11 from P3 they digest to 778b863a379eedc2.
+ * Re-pinned for ore rules 13 (ticket 741): planets from 2 are stamped 13, and the stamp alone moves
+ * the rows: set back to 12 they digest to bd0a32dcd80f73d4.
  */
 const GOLDEN = {
-  currentRows: 'bd0a32dcd80f73d4',
+  currentRows: '380cb4421218e25f',
   ladderRows: '64311e1adaba9536',
 }
 

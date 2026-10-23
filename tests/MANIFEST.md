@@ -381,7 +381,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/ore-visuals/systems/oreGradeChannels.test.ts` | 7 | 7 |
 | `src/features/ore-visuals/systems/render/oreLookProvider.test.ts` | 21 | 10 |
 
-### `ores`: 29 files, 240 tests
+### `ores`: 31 files, 254 tests
 
 | File | Tests | Sites |
 | --- | --- | --- |
@@ -394,6 +394,8 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/ores/rarityPickupRoutes.test.ts` | 4 | 2 |
 | `src/features/ores/rarityTripRun.test.ts` | 5 | 3 |
 | `src/features/ores/systems/deepRareRows.test.ts` | 5 | 5 |
+| `src/features/ores/systems/gemRows.test.ts` | 7 | 7 |
+| `src/features/ores/systems/gemTiers.test.ts` | 6 | 6 |
 | `src/features/ores/systems/hazardCardSource.test.ts` | 5 | 5 |
 | `src/features/ores/systems/hazardNearDock.test.ts` | 2 | 2 |
 | `src/features/ores/systems/hazardPockets.test.ts` | 7 | 7 |
@@ -411,7 +413,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/ores/systems/rarityRows.test.ts` | 8 | 8 |
 | `src/features/ores/systems/raritySolve.test.ts` | 5 | 5 |
 | `src/features/ores/systems/rarityTiers.test.ts` | 12 | 12 |
-| `src/features/ores/systems/rarityTripClamp.test.ts` | 7 | 7 |
+| `src/features/ores/systems/rarityTripClamp.test.ts` | 8 | 8 |
 | `src/features/ores/systems/rarityTripShare.test.ts` | 3 | 3 |
 | `src/features/ores/systems/slotDraws.test.ts` | 4 | 4 |
 
@@ -491,7 +493,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/rig-look/systems/rigLookSource.test.ts` | 13 | 13 |
 | `src/features/rig-look/systems/rigLookTable.test.ts` | 25 | 25 |
 
-### `roster`: 18 files, 285 tests
+### `roster`: 19 files, 295 tests
 
 | File | Tests | Sites |
 | --- | --- | --- |
@@ -499,6 +501,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/roster/rarityShares.test.ts` | 20 | 20 |
 | `src/features/roster/roster.byteIdentity.lane.test.ts` | 5 | 1 |
 | `src/features/roster/roster.byteIdentity.test.ts` | 29 | 15 |
+| `src/features/roster/roster.gemTier.test.ts` | 5 | 5 |
 | `src/features/roster/roster.p1Gems.test.ts` | 6 | 6 |
 | `src/features/roster/roster.p2OwnKinds.test.ts` | 5 | 5 |
 | `src/features/roster/roster.p2Pool.test.ts` | 3 | 3 |
@@ -508,7 +511,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/roster/systems/planetRoster.test.ts` | 13 | 13 |
 | `src/features/roster/systems/planetSpecies.test.ts` | 9 | 8 |
 | `src/features/roster/systems/rosterFold.test.ts` | 6 | 6 |
-| `src/features/roster/systems/rosterGems.test.ts` | 5 | 5 |
+| `src/features/roster/systems/rosterGems.test.ts` | 10 | 10 |
 | `src/features/roster/systems/rosterGuard.test.ts` | 84 | 10 |
 | `src/features/roster/systems/rosterSpecies.test.ts` | 11 | 7 |
 | `src/features/roster/systems/shareRows.test.ts` | 2 | 2 |
@@ -1066,7 +1069,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | --- | --- | --- |
 | `src/logging/goldenRun.test.ts` | 26 | 10 |
 | `src/logging/secondSliceGolden.test.ts` | 6 | 6 |
-| `src/systems/world/generatorGolden.test.ts` | 19 | 19 |
+| `src/systems/world/generatorGolden.test.ts` | 20 | 20 |
 
 ### `hints`
 
@@ -1276,7 +1279,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/registries/orePickup.test.ts` | 4 | 4 |
 | `src/systems/registries/oreTypes.test.ts` | 15 | 15 |
 | `src/systems/registries/planetCardLines.test.ts` | 9 | 9 |
-| `src/systems/registries/planetRow.test.ts` | 6 | 6 |
+| `src/systems/registries/planetRow.test.ts` | 7 | 7 |
 | `src/systems/registries/planetRowLooks.test.ts` | 7 | 7 |
 | `src/systems/registries/planetSkyBand.test.ts` | 5 | 5 |
 | `src/systems/registries/saveSections.test.ts` | 3 | 3 |

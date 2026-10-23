@@ -36,6 +36,8 @@
  * Version 17 draws planet 1's three gems, Diamond, Emerald and Ruby, 4:3:2 on its crystal rare
  * patches of bands 3 to 5, with a guaranteed cluster of each, on a planet 1 entered under ore rules
  * 12 (ticket 713), which rewrites the kind slot of those patches and adds the gems' guaranteed
- * clusters, while planets 2 on and every planet a save holds keep the cells of 16.
+ * clusters, while planets 2 on and every planet a save holds keep the cells of 16. Ore rules 13
+ * (ticket 741) sells three rare or mythic kinds of planets 2 to 5 as gems, a sale tier that moves no
+ * generated cell, so it needs no bump.
  */
 export const GENERATOR_VERSION = 17

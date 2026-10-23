@@ -145,7 +145,23 @@
     "gems": {
       "tierLeads": [5, 6, 8],
       "pools": [
-        { "pool": "legacy", "fromOreRules": 12, "slots": ["legacy.g1", "legacy.g2", "legacy.g3"] }
+        { "pool": "legacy", "fromOreRules": 12, "slots": ["legacy.g1", "legacy.g2", "legacy.g3"] },
+        {
+          "pool": "foothold-p2",
+          "fromOreRules": 13,
+          "slots": ["legacy.r1", "legacy.r4", "legacy.r2"]
+        },
+        {
+          "pool": "foothold-p3",
+          "fromOreRules": 13,
+          "slots": ["mixed.m2", "mixed.m1", "mixed.r2"]
+        },
+        {
+          "pool": "foothold-p4",
+          "fromOreRules": 13,
+          "slots": ["mixed.m2", "mixed.m1", "mixed.r2"]
+        },
+        { "pool": "foothold-p5", "fromOreRules": 13, "slots": ["mixed.m2", "mixed.m1", "mixed.r2"] }
       ]
     },
     "planets": {

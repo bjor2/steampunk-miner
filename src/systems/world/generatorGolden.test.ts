@@ -14,6 +14,7 @@ import {
   radiusForPlanet,
   SURFACE_LAYER_ORE_RULES,
   P1_GEMS_ORE_RULES,
+  P2_TO_P5_GEMS_ORE_RULES,
   type PlanetParams,
 } from './planetParams'
 
@@ -46,7 +47,8 @@ import { chunkRangeOfDisc } from './tileGrid'
  * and the deep rare window of every planet from 3 entered under ore rules 11 under 16, ticket 738,
  * pinned by the deep digests of planets 3 to 7, and planet 1's gems of a planet 1 entered under ore
  * rules 12 under 17, ticket 713, pinned by the gem digest and leaving planets 2 on as rules 11 made
- * them, with the features loaded as the game loads them):
+ * them, and the gem tier of planets 2 to 5 under ore rules 13, ticket 741, a sale tier that moves no
+ * cell and so needs no bump, with the features loaded as the game loads them):
  * a committed
  * digest of the generator's cells and density. If this fails, the
  * generator changed what a seed makes: bump GENERATOR_VERSION (saves and replays of the old
@@ -273,6 +275,18 @@ describe('generator golden digest', () => {
     const deep = [3, 4, 5, 6, 7].map((planet) => gems(83921, planet))
     expect(deep.map((params) => digestOfChunks(params, everyChunkOf(params)))).toEqual(
       GOLDEN.deepWholePlanets3To7,
+    )
+  })
+
+  it('makes planets 1 to 5 under ore rules 13, the gem tier of P2 to P5, as rules 12 did (ticket 741)', () => {
+    const tier = (seed: number, planet: number) =>
+      planetParamsFor(seed, planet, P2_TO_P5_GEMS_ORE_RULES)
+    const [planet1, planet2] = [tier(83921, 1), tier(4_000_000_000, 2)]
+    expect(digestOfChunks(planet1, everyChunkOf(planet1))).toBe(GOLDEN.gemsWholePlanet1)
+    expect(digestOfChunks(planet2, everyChunkOf(planet2))).toBe(GOLDEN.clusterWholePlanet2)
+    const deep = [3, 4, 5].map((planet) => tier(83921, planet))
+    expect(deep.map((params) => digestOfChunks(params, everyChunkOf(params)))).toEqual(
+      GOLDEN.deepWholePlanets3To7.slice(0, 3),
     )
   })
 })

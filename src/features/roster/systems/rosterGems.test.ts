@@ -6,6 +6,7 @@ import { saleTierOf } from '../../../systems/registries/oreTypes'
 import {
   freshPlanetParamsFor,
   P1_GEMS_ORE_RULES,
+  P2_TO_P5_GEMS_ORE_RULES,
   planetParamsFor,
   type PlanetParams,
 } from '../../../systems/world/planetParams'
@@ -25,11 +26,13 @@ const SEED = 83921
 const BAND_FIVE_OFFSET = 4
 const RARE_LEAD = 2
 
+/** The planet's gems, cheapest first. */
 function gemsOf(params: PlanetParams) {
-  return planetRosterOf(params).flatMap((kind, index) => {
+  const gems = planetRosterOf(params).flatMap((kind, index) => {
     const saleTier = gemSaleTierOfKind(params, kind)
     return saleTier === null ? [] : [{ kindSlot: index + 1, slotId: kind.slotId, saleTier }]
   })
+  return gems.sort((a, b) => a.saleTier - b.saleTier)
 }
 
 function nonGemSaleTiersOf(params: PlanetParams): number[] {
@@ -81,10 +84,77 @@ describe('roster gems', () => {
     expect([mined.resourceTier, mined.saleTier]).toEqual([7, 13])
   })
 
-  it('names no gem on P2, nor on a P1 a save holds under ore rules older than the gems', () => {
-    expect(gemsOf(freshPlanetParamsFor(SEED, 2))).toEqual([])
+  it('names no gem on a P1 a save holds under ore rules older than the gems', () => {
     expect(gemsOf(planetParamsFor(SEED, 1, P1_GEMS_ORE_RULES - 1))).toEqual([])
     const plainRare = oreCell(RESOURCE_FAMILY.crystal, BAND_FIVE_OFFSET + RARE_LEAD, 12)
     expect(oreTypeOfCell(p1, plainRare)).not.toHaveProperty('gem')
+  })
+})
+
+// The gem tier of P2 to P5 (ticket 741, GD lock with Systems' final spec on #741): each planet's
+// three existing rare or mythic rows that P&N picked become its gems, cheapest first as the lock
+// lists them, and sell at t_top + 5, 6 and 8 under ore rules 13. The fossils stay plain rares.
+// A planet a save holds under older rules sells them as plain rares and mythics.
+
+const GEM_EPITHETS_P2_TO_P5 = [
+  ['Star Garnet', 'Aquamarine', 'Verdigris Opal'],
+  ['Heart Diamond', 'Orichalcum', 'Blue Topaz'],
+  ['Painite', 'Starsteel', 'Watermelon Tourmaline'],
+  ['Kiln Ruby', 'Core Gold', 'Fire Garnet'],
+]
+const P2_TO_P5 = [2, 3, 4, 5]
+const MYTHIC_LEAD = 4
+
+describe('the gem tier of P2 to P5', () => {
+  const fresh = P2_TO_P5.map((planet) => freshPlanetParamsFor(SEED, planet))
+
+  it("names P&N's three gems of each planet, cheapest first, at t_top + 5, 6 and 8", () => {
+    expect(fresh.map((params) => params.oreRulesVersion)).toEqual([13, 13, 13, 13])
+    expect(
+      fresh.map((params) =>
+        gemsOf(params).map(({ kindSlot }) => planetSpeciesOf(params, kindSlot)?.epithet),
+      ),
+    ).toEqual(GEM_EPITHETS_P2_TO_P5)
+    expect(fresh.map((params) => gemsOf(params).map((gem) => gem.saleTier))).toEqual([
+      [15, 16, 18],
+      [20, 21, 23],
+      [23, 24, 26],
+      [26, 27, 29],
+    ])
+  })
+
+  it('gives no other kind of P2 to P5 a sale tier a gem sells at, and every gem tops the rest', () => {
+    for (const params of fresh) {
+      const gemTiers = gemsOf(params).map((gem) => gem.saleTier)
+      expect(nonGemSaleTiersOf(params).filter((tier) => gemTiers.includes(tier))).toEqual([])
+      expect(Math.min(...gemTiers)).toBeGreaterThan(Math.max(...nonGemSaleTiersOf(params)))
+    }
+  })
+
+  it("keeps a mythic gem cell's own tier and marks its unit a gem for the trip clamp", () => {
+    const p3 = fresh[1]
+    const [heartDiamond] = gemsOf(p3)
+    const cell = oreCell(
+      RESOURCE_FAMILY.crystal,
+      BAND_FIVE_OFFSET + MYTHIC_LEAD,
+      heartDiamond.kindSlot,
+    )
+    const mined = minedOreOf(p3, { tx: 0, ty: 0 }, cell)
+    expect([mined.resourceTier, mined.saleTier, mined.gem]).toEqual([
+      oreTier(3, 5) + MYTHIC_LEAD,
+      20,
+      true,
+    ])
+  })
+
+  it('sells the same kinds as plain rares and mythics on a planet held under older rules', () => {
+    const older = P2_TO_P5.map((planet) =>
+      planetParamsFor(SEED, planet, P2_TO_P5_GEMS_ORE_RULES - 1),
+    )
+    expect(older.map(gemsOf)).toEqual([[], [], [], []])
+  })
+
+  it('names no gem on the P6 and P7 pool, whose rows the lock leaves plain', () => {
+    expect([6, 7].map((planet) => gemsOf(freshPlanetParamsFor(SEED, planet)))).toEqual([[], []])
   })
 })
