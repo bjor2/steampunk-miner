@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "updated_at": "2026-10-23T17:46:10Z",
+  "updated_at": "2026-10-23T17:46:24Z",
   "entries": {
     "steampunk-loop/1": {
       "loop": "steampunk-loop",
@@ -721,9 +721,9 @@
       "slot": null,
       "state": "working",
       "issue": null,
-      "note": "testing spec #741 (P2–P5 per-planet gem tier (deep rares value chain)) on 082f343",
+      "note": "queue run on 37f63e0 (pass)",
       "stale_after_min": 420,
-      "updated_at": "2026-10-23T17:32:24Z",
+      "updated_at": "2026-10-23T17:46:24Z",
       "host": "grok-bot-vm-452660841"
     },
     "steampunk-loop/10": {
