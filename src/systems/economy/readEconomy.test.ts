@@ -44,6 +44,12 @@ describe('economy data validation', () => {
     expect(problemsOf(broken)).toEqual(['starMap.systemAdvance must be 1 or more'])
   })
 
+  it('refuses a jump that would burn no fuel per planet crossed (ticket 755)', () => {
+    const broken = economyFileCopy()
+    broken.starMap.fuel.unitsPerPlanetStep = 0
+    expect(problemsOf(broken)).toEqual(['starMap.fuel.unitsPerPlanetStep must be 1 or more'])
+  })
+
   it('refuses a heat archetype whose bands or throttle line do not fit the gauge (#113)', () => {
     const broken = economyFileCopy()
     broken.archetypes[0].bandHeatPerSecond = ['0', '0.100']
