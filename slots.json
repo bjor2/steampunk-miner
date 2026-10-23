@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-10-24T01:50:33+02:00",
+  "updated_at": "2026-10-24T01:52:29+02:00",
   "caps": {
     "grok": 12,
     "claude": 10,
@@ -29,11 +29,11 @@
         {
           "slot": "C2",
           "state": "busy",
-          "ticket": 770,
+          "ticket": 772,
           "grok_slot": 2,
           "kind": "dev",
-          "since": "2026-10-24T01:18:00+02:00",
-          "wave": "678-6A"
+          "since": "2026-10-24T01:52:00+02:00",
+          "wave": "678-7A"
         },
         {
           "slot": "C3",
@@ -71,7 +71,7 @@
       "size": 6,
       "used": 2,
       "free": 4,
-      "claims_last_hour": 1,
+      "claims_last_hour": 2,
       "name": "Claude Max 1"
     },
     {
@@ -123,7 +123,7 @@
     }
   ],
   "gate": {
-    "busy": 2,
+    "busy": 1,
     "max": 3
   },
   "tester": {
@@ -163,10 +163,10 @@
     {
       "slot": 2,
       "state": "dev",
-      "ticket": 770,
-      "since": "2026-10-24T01:18:00+02:00",
+      "ticket": 772,
+      "since": "2026-10-24T01:52:00+02:00",
       "claude_slot": 2,
-      "wave": "678-6A"
+      "wave": "678-7A"
     },
     {
       "slot": 3,
@@ -244,11 +244,11 @@
     {
       "slot": 2,
       "state": "busy",
-      "ticket": 770,
+      "ticket": 772,
       "grok_slot": 2,
-      "since": "2026-10-24T01:18:00+02:00",
+      "since": "2026-10-24T01:52:00+02:00",
       "account": 1,
-      "wave": "678-6A"
+      "wave": "678-7A"
     },
     {
       "slot": 3,
@@ -317,10 +317,10 @@
     }
   ],
   "last_refill": {
-    "at": "2026-10-24 01:18 CEST",
+    "at": "2026-10-24 01:52 CEST",
     "mode": "refill-dev",
     "triggers": "#770",
-    "started": "#770->C2/A1",
+    "started": "#772->C2/A1",
     "note": "spawned 1 worker(s)"
   },
   "totals": {
@@ -393,31 +393,11 @@
         "map": 678,
         "lane": "remote",
         "mode": "solo",
-        "state": "blocked",
+        "state": "running",
         "tickets": [
           772
         ],
         "done": [],
-        "live": 0
-      },
-      {
-        "number": 771,
-        "key": "678-6A",
-        "map": 678,
-        "lane": "remote",
-        "mode": "solo",
-        "state": "running",
-        "tickets": [
-          767,
-          768,
-          769,
-          770
-        ],
-        "done": [
-          767,
-          768,
-          769
-        ],
         "live": 1
       },
       {
