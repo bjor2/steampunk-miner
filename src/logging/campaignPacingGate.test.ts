@@ -39,17 +39,6 @@ const BUDGET_TICKS =
 /** Every planet the bot leaves before the gate's last core: the planets the sawtooth judges. */
 const JUDGED_PLANETS = Array.from({ length: LAST_PLANET - 1 }, (_, index) => index + 1)
 
-/**
- * Rows held as todo, never as a pass (Game Director's addendum on #762): on seeds 31415 and 27182
- * the bot buys no drill level on planet 3, so band 5 leaves as slow as it came on both legs. They
- * come back when the bot's drill buy choice is fixed (#763).
- */
-const HELD_FOR_BOT_DRILL_BUYS: readonly (readonly [number, SawtoothLeg])[] = [
-  [3, 'down'],
-  [3, 'sideways'],
-]
-const BOT_BUY_CHOICE_TICKET = 763
-
 let seeded: SeededSliceRun[] | null = null
 let gateRuns: CampaignGateRun[] | null = null
 
@@ -76,10 +65,6 @@ function gateRunsOf(runs: readonly SeededSliceRun[]): CampaignGateRun[] {
   }))
 }
 
-function isHeldForBotDrillBuys(planet: number, leg: SawtoothLeg): boolean {
-  return HELD_FOR_BOT_DRILL_BUYS.some(([held, heldLeg]) => held === planet && heldLeg === leg)
-}
-
 function legRowName(planet: number, leg: SawtoothLeg): string {
   return `digs band 5 ${leg} at departure in at most 0.7x its arrival time on planet ${planet}, on the seed median`
 }
@@ -91,7 +76,8 @@ function legRowName(planet: number, leg: SawtoothLeg): string {
 // #723's drive-bound law (Game Director on #762, recorded as the "level-leg pacing re-pin
 // (drive-bound)" under #644): every planet's band 5 is judged per leg through the upgrade that
 // binds it, down through the drill and sideways through the slower of the drill and the drive,
-// each leg a row of its own at the same 0.7x bar.
+// each leg a row of its own at the same 0.7x bar. Planet 3's two rows were held as todo until the
+// bot bought drill there (ticket 763's down-cut drill rule, `botDownCutRule.ts`).
 describe('balance regression: the campaign scaling gate on the pacing seeds (R1 #89)', () => {
   it('leaves no seed stalled before planet 8, judges a planet, and keeps the schedule cadence', () => {
     const runs = seededGateRuns()
@@ -104,10 +90,6 @@ describe('balance regression: the campaign scaling gate on the pacing seeds (R1 
 
   for (const planet of JUDGED_PLANETS) {
     for (const leg of SAWTOOTH_LEGS) {
-      if (isHeldForBotDrillBuys(planet, leg)) {
-        it.todo(`${legRowName(planet, leg)} (held for #${BOT_BUY_CHOICE_TICKET})`)
-        continue
-      }
       it(legRowName(planet, leg), () => {
         expect(sawtoothMissesOn(seededGateRuns(), planet, leg)).toEqual([])
       })
