@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "updated_at": "2026-10-23T15:14:13Z",
+  "updated_at": "2026-10-23T15:14:15Z",
   "entries": {
     "steampunk-loop/1": {
       "loop": "steampunk-loop",
@@ -715,11 +715,11 @@
     "tester": {
       "loop": "tester",
       "slot": null,
-      "state": "working",
+      "state": "paused",
       "issue": null,
-      "note": "full run on 663d15e (pass)",
+      "note": "main red at dca6099: no new dev workers until tester.sh --full is green",
       "stale_after_min": 420,
-      "updated_at": "2026-10-23T12:45:44Z",
+      "updated_at": "2026-10-23T15:14:15Z",
       "host": "grok-bot-vm-452660841"
     },
     "steampunk-loop/10": {
@@ -760,6 +760,13 @@
     }
   },
   "events": [
+    {
+      "at": "2026-10-23T15:14:15Z",
+      "key": "tester",
+      "state": "paused",
+      "issue": null,
+      "note": "main red at dca6099: no new dev workers until tester.sh --full is green"
+    },
     {
       "at": "2026-10-23T14:51:22Z",
       "key": "steampunk-loop",
@@ -1172,13 +1179,6 @@
       "state": "working",
       "issue": 731,
       "note": "tier fable, attempt 1/2"
-    },
-    {
-      "at": "2026-10-22T21:48:12Z",
-      "key": "steampunk-loop",
-      "state": "working",
-      "issue": null,
-      "note": "1/10 Claude slots busy, 0/4 planner slots; status check"
     }
   ]
 }
