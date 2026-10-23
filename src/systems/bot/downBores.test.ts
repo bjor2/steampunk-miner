@@ -6,9 +6,11 @@ import { FREEZE_ENEMIES, GROUND } from '../authority/scriptedSession'
 import { setUpgradeCommand } from '../vehicle/vehicleCommands'
 import type { TilePoint } from '../world/tileGrid'
 import { openTile } from './botDig'
+import { moveStraight } from './botPilot'
 import { createBotSession, type BotSession } from './botSession'
 import { botPlanetOf } from './botTravel'
 import {
+  descentLegOf,
   effectiveDownSpeedOf,
   entrySpeedOf,
   gravityBoundShareOf,
@@ -87,6 +89,15 @@ describe('bores down under the gravity ramp (#724)', () => {
     expect(entrySpeedOf(undefined, { tx: 3, ty: 9 }, 40)).toBe(0)
   })
 
+  it('leaves a move down at its travel speed in the tile it reached, and any other move at none', () => {
+    const top = { tx: 3, ty: 9 }
+    const below = { tx: 3, ty: 5 }
+    expect(descentLegOf(top, below, 40, 8)).toEqual({ tick: 40, tile: below, speed: 8 })
+    expect(descentLegOf(below, top, 40, 8)).toBeUndefined()
+    expect(descentLegOf(top, { tx: 6, ty: 9 }, 40, 8)).toBeUndefined()
+    expect(descentLegOf(top, top, 40, 8)).toBeUndefined()
+  })
+
   it('tallies metres, ticks and the ramp share, and reads the effective down speed', () => {
     const tally = newDownBoreTally()
     tallyDownBore(tally, 2, SLOW, SLOW)
@@ -127,5 +138,19 @@ describe('the bot boring a shaft down (#724)', () => {
     const record = planet.downBores?.get(1)
     expect(record?.metres).toBe(SHAFT.length)
     expect(record === undefined ? 0 : gravityBoundShareOf(record)).toBeGreaterThan(0.5)
+  })
+
+  it('bores on below an open shaft at the speed it came down, not from rest', () => {
+    const session = botWithFastDrill()
+    const planet = botPlanetOf(session, 'never')
+    planet.pilot.position = { tx: GROUND.tx, ty: GROUND.ty + 1 }
+    for (const tile of SHAFT) openTile(session, planet, tile)
+    moveStraight(session, planet, SHAFT[0])
+    moveStraight(session, planet, SHAFT[SHAFT.length - 1])
+    const startTick = session.tick()
+    const below = { tx: GROUND.tx, ty: GROUND.ty - SHAFT.length }
+    expect(openTile(session, planet, below)).toBe('opened')
+    const fromRestTicks = Math.sqrt(2 / G) * TICKS_PER_SECOND
+    expect(session.tick() - startTick).toBeLessThan(Math.floor(fromRestTicks))
   })
 })

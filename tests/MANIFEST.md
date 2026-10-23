@@ -952,7 +952,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/bot/chargePayoff.test.ts` | 5 | 5 |
 | `src/systems/bot/chargeSharePayoff.test.ts` | 6 | 6 |
 | `src/systems/bot/chargeSizeTrade.test.ts` | 4 | 4 |
-| `src/systems/bot/downBores.test.ts` | 9 | 9 |
+| `src/systems/bot/downBores.test.ts` | 11 | 11 |
 | `src/systems/bot/endlessPlanning.test.ts` | 6 | 3 |
 | `src/systems/bot/itemHookNoFreeCell.test.ts` | 0 | 1 |
 | `src/systems/bot/leadCellHardness.test.ts` | 3 | 3 |

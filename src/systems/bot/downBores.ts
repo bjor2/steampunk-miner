@@ -5,7 +5,9 @@
  * time a body entering at the leg's speed needs to ramp across its metre: the drill bores for its
  * own time, so it heats and draws for its work alone, and the bot stands by for the rest. The speed a bore leaves
  * carries into a bore of the tile below that starts on the tick it ended, as the bore clock's carry
- * does (ticket 559); anything else starts the next leg from rest.
+ * does (ticket 559). So does the speed of a move down open tiles (the shaft, a cave): the ramp
+ * gains on the downward speed the body has (`vehicleMotion.ts`), so a rig that comes down the shaft
+ * meets the face at its travel speed. Anything else starts the next leg from rest.
  *
  * Each planet keeps its down-bore metres, ticks and the ticks the ramp added, so `balance:report`
  * prints the effective down speed (leg distance over leg time) per planet
@@ -50,6 +52,16 @@ export function newDownBoreTally(): DownBoreTally {
 export function entrySpeedOf(leg: DownLeg | undefined, from: TilePoint, tick: number): number {
   if (leg === undefined || leg.tick !== tick) return 0
   return leg.tile.tx === from.tx && leg.tile.ty === from.ty ? leg.speed : 0
+}
+
+/** The leg a move from `from` to `to` ends on at `tick`: one down, at `speed` m/s; else none. */
+export function descentLegOf(
+  from: TilePoint,
+  to: TilePoint,
+  tick: number,
+  speed: number,
+): DownLeg | undefined {
+  return to.ty < from.ty ? { tick, tile: to, speed } : undefined
 }
 
 /**

@@ -30,7 +30,7 @@ import { setGunsForEnergy } from './botGuns'
 import { facingTowards, NO_TICKS, reportPoseIntent } from './botPose'
 import type { BotSession } from './botSession'
 import type { GateRouteBlock } from './gateRouteBlocks'
-import type { DownBoreTally, DownLeg } from './downBores'
+import { descentLegOf, type DownBoreTally, type DownLeg } from './downBores'
 import type { SidewaysBoreTally } from './sidewaysBores'
 import { botTravelSpeedOf, moveTicks, tileKindAt } from './botWorld'
 import type { MineLayout } from './mineLayout'
@@ -158,10 +158,11 @@ export function enterBoredTile(pilot: BotPilot, tile: TilePoint): void {
  */
 export function moveStraight(session: BotSession, planet: BotPlanet, to: TilePoint): void {
   const { pilot } = planet
-  const tiles = straightPath(pilot.position, to)
+  const from = pilot.position
+  const tiles = straightPath(from, to)
   const speed = botTravelSpeedOf(session.state(), session.playerId)
-  const facing = facingTowards(pilot.position, to)
-  const isClimb = to.ty > pilot.position.ty
+  const facing = facingTowards(from, to)
+  const isClimb = to.ty > from.ty
   let reportedTicks = 0
   tiles.forEach((tile, index) => {
     const ticks = moveTicks(index + 1, speed)
@@ -169,6 +170,8 @@ export function moveStraight(session: BotSession, planet: BotPlanet, to: TilePoi
     if (!isLast && ticks - reportedTicks < POSE_REPORT_INTERVAL_TICKS) return
     reportMove(session, tile, facing, ticks - reportedTicks, isClimb)
     reportedTicks = ticks
+    // #724: the move's speed carries into a bore below only if nothing holds the rig first.
+    if (isLast) pilot.downLeg = descentLegOf(from, to, session.tick(), speed)
     faceThreatsOnTheMove(session, planet, tile)
   })
   if (tiles.length > 0) pilot.facing = facing
