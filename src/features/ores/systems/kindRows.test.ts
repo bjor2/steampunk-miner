@@ -17,13 +17,16 @@ import { isSlotLiveInBand, liveWindowOf } from './slotWindows'
 
 type Slot = (typeof economyFile.ore.kinds.legacy)[number]
 
+/** The gem table without pools: they name slots of the shipped tables, which a spec replaces. */
+const NO_GEM_POOLS = { ...economyFile.ore.gems, pools: [] }
+
 /** The shipped files with the legacy table and the cap replaced. */
 function problemsWithLegacy(
   legacy: readonly unknown[],
   rosterMaxKinds = economyFile.ore.kinds.rosterMaxKinds,
 ): string[] {
   const kinds = { ...economyFile.ore.kinds, rosterMaxKinds, legacy }
-  return oreRowProblems({ ore: { ...economyFile.ore, kinds } }, familiesFile)
+  return oreRowProblems({ ore: { ...economyFile.ore, kinds, gems: NO_GEM_POOLS } }, familiesFile)
 }
 
 /** The shipped files with the earlier pools table replaced. */
@@ -63,20 +66,19 @@ describe('ore kind slots', () => {
     )
   })
 
-  it("appends P1's three gems, crystal rares of bands 3-5 drawn 4:3:2 and sold at t_top + 5, 6 and 8, from ore rules 12 (ticket 713)", () => {
+  it("appends P1's three gems, crystal rares of bands 3-5 drawn 4:3:2, from ore rules 12 (ticket 713)", () => {
     const gems = ORE_ROWS.kinds.slotsByTable.legacy.slice(15)
     expect(gems).toEqual(
       [
-        ['legacy.g1', 4, 5],
-        ['legacy.g2', 3, 6],
-        ['legacy.g3', 2, 8],
-      ].map(([slotId, drawWeight, gemTierLead]) => ({
+        ['legacy.g1', 4],
+        ['legacy.g2', 3],
+        ['legacy.g3', 2],
+      ].map(([slotId, drawWeight]) => ({
         slotId,
         family: 'crystal',
         rarity: 'rare',
         window: [3, 5],
         drawWeight,
-        gemTierLead,
         owner: { pool: 'legacy', fromOreRules: P1_GEMS_ORE_RULES },
       })),
     )
@@ -374,9 +376,9 @@ describe('a kind slot window narrowed at an ore rules version', () => {
         : slot,
     )
     const kinds = { ...economyFile.ore.kinds, mixed }
-    expect(oreRowProblems({ ore: { ...economyFile.ore, kinds } }, familiesFile)).toEqual([
-      'ore.kinds.mixed[7] is live in band 2, where deep rare weighs nothing',
-    ])
+    expect(
+      oreRowProblems({ ore: { ...economyFile.ore, kinds, gems: NO_GEM_POOLS } }, familiesFile),
+    ).toEqual(['ore.kinds.mixed[7] is live in band 2, where deep rare weighs nothing'])
   })
 
   it('refuses an ore rules version this build does not know and a window outside the bands', () => {

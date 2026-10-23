@@ -89,8 +89,7 @@
           "window": [3, 5],
           "pool": "legacy",
           "fromOreRules": 12,
-          "drawWeight": 4,
-          "gemTierLead": 5
+          "drawWeight": 4
         },
         {
           "slotId": "legacy.g2",
@@ -99,8 +98,7 @@
           "window": [3, 5],
           "pool": "legacy",
           "fromOreRules": 12,
-          "drawWeight": 3,
-          "gemTierLead": 6
+          "drawWeight": 3
         },
         {
           "slotId": "legacy.g3",
@@ -109,8 +107,7 @@
           "window": [3, 5],
           "pool": "legacy",
           "fromOreRules": 12,
-          "drawWeight": 2,
-          "gemTierLead": 8
+          "drawWeight": 2
         }
       ],
       "mixed": [
@@ -143,6 +140,12 @@
         { "slotId": "mixed.m2", "family": "crystal", "rarity": "mythic", "window": [4, 5] },
         { "slotId": "mixed.c5", "family": "fossil", "rarity": "common", "window": [3, 3] },
         { "slotId": "mixed.c6", "family": "fossil", "rarity": "common", "window": [3, 3] }
+      ]
+    },
+    "gems": {
+      "tierLeads": [5, 6, 8],
+      "pools": [
+        { "pool": "legacy", "fromOreRules": 12, "slots": ["legacy.g1", "legacy.g2", "legacy.g3"] }
       ]
     },
     "planets": {

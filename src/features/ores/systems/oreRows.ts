@@ -11,6 +11,8 @@
  *   (`rarityRows.ts`, ticket 445). The lead rows above stay byte-identical beside it.
  * - `ores.economy.json` `kinds`: the material kind slots per kind table and the roster cap
  *   (`kindRows.ts`, ticket 446), checked against the families and the rarity weights.
+ * - `ores.economy.json` `gems`: each pool's gem kind slots and the one Δ ladder they sell at above
+ *   the planet's top ore tier (`gemRows.ts`, tickets 713 and 741), checked against the kind slots.
  * - `ores.economy.json` `planets`: the planet registry, one row per planet with its species pool
  *   and its frozen radius (`planetRows.ts`, ticket 642), checked against the solar systems.
  * - `oreFamilies.json`: #141's 12 families in its table order. A family's place in the list is its
@@ -18,9 +20,11 @@
  *   `RESOURCE_FAMILY` already writes them), so the order is append-only.
  */
 import { solarSystemOf } from '../../../systems/registries/planetRow'
+import { RARE_CLUSTER_FIRST_LEAD } from '../../../systems/world/planetTable'
 import { BAND_COUNT } from '../../../systems/world/planetGeometry'
 import economyFile from '../ores.economy.json'
 import familiesFile from '../oreFamilies.json'
+import { gemRowProblems, gemRowsOf, type GemRowContext, type GemRows } from './gemRows'
 import { kindRowProblems, kindRowsOf, type KindRowContext, type KindRows } from './kindRows'
 import {
   planetRowProblems,
@@ -31,6 +35,7 @@ import {
   type PlanetRowContext,
   type PlanetRows,
 } from './planetRows'
+import { KIND_TABLES } from './rarityRowSets'
 import { rarityRowProblems, rarityRowsOf, type RarityRowSet, type RarityRows } from './rarityRows'
 
 export interface OreFamily {
@@ -61,6 +66,7 @@ export interface OreRows {
   catalogue: CatalogueKnobs
   rarity: RarityRows
   kinds: KindRows
+  gems: GemRows
   planets: PlanetRows
 }
 
@@ -89,6 +95,7 @@ export function oreRowProblems(economy: unknown, families: unknown): string[] {
     ...catalogueProblems(ore.catalogue as Raw | undefined),
     ...rarityRowProblems(ore.rarity),
     ...kindRowProblems(ore.kinds, kindRowContextOf(ore, families)),
+    ...gemRowProblems(ore.gems, gemRowContextOf(ore)),
     ...planetRowProblems(ore.planets, SOLAR_SYSTEMS),
   ]
 }
@@ -110,6 +117,7 @@ function loadOreRows(economy: typeof economyFile, families: typeof familiesFile)
     catalogue: ore.catalogue,
     rarity: rarityRowsOf(ore.rarity),
     kinds: kindRowsOf(ore.kinds, poolByPlanetOf(planets)),
+    gems: gemRowsOf(ore.gems),
     planets,
   }
 }
@@ -125,6 +133,22 @@ function kindRowContextOf(ore: Raw, families: unknown): KindRowContext {
     tierIds: tiersOf(ore.rarity as Raw | undefined).map((tier) => String(tier.id)),
     weightBpOf: (set, rarity, band) =>
       tierWeightBpOf(ore.rarity as Raw | undefined, set, rarity, band),
+  }
+}
+
+/** The pools and every kind slot of both tables, as the gem guards read them. */
+function gemRowContextOf(ore: Raw): GemRowContext {
+  const kinds = (ore.kinds ?? {}) as Raw
+  const slots = KIND_TABLES.flatMap((table) => (Array.isArray(kinds[table]) ? kinds[table] : []))
+  const tierIds = tiersOf(ore.rarity as Raw | undefined).map((tier) => String(tier.id))
+  return {
+    poolIds: poolIdsOf(ore.planets),
+    slots: (slots as Raw[]).map((slot) => ({
+      slotId: String(slot.slotId),
+      rarity: String(slot.rarity),
+      ...(slot.pool === undefined ? {} : { pool: String(slot.pool) }),
+    })),
+    gemTierIds: tierIds.slice(RARE_CLUSTER_FIRST_LEAD),
   }
 }
 

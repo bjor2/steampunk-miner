@@ -25,12 +25,11 @@
  *   a stored cell names.
  * - A slot's window may narrow at an ore rules version (`windowsBeforeOreRules`, ticket 738,
  *   `slotWindows.ts`): a planet stamped before it keeps the window it was entered with.
- * - A slot may weigh more or less in the draw (`drawWeight`, else `drawWeightDefault`) and may be a
- *   gem that sells at a tier of its own (`gemTierLead`, ticket 713, `slotDraws.ts`).
+ * - A slot may weigh more or less in the draw (`drawWeight`, else `drawWeightDefault`, ticket 713,
+ *   `slotDraws.ts`). Which slots a pool sells as gems is the `gems` block's (`gemRows.ts`).
  *
  * A slot is live only where its tier has weight in every set that draws its window, so a kind never
- * sits on a band its rarity never paints. No slot field reaches a hardness or a gate, and only a
- * gem's `gemTierLead` reaches a price (ticket 713, through the roster's gem tag).
+ * sits on a band its rarity never paints. No slot field reaches a hardness, a gate or a price.
  */
 import { ORE_RULES_VERSION } from '../../../systems/world/planetParams'
 import { MAX_KIND_SLOT } from '../../../systems/world/worldCell'

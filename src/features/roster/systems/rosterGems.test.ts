@@ -10,10 +10,10 @@ import {
   type PlanetParams,
 } from '../../../systems/world/planetParams'
 import { oreCell, RESOURCE_FAMILY } from '../../../systems/world/worldCell'
-import { ORE_ROWS, rarityRowSetOfPlanet, topLeadOf } from '../../ores'
+import { ORE_ROWS, rarityRowSetOfPlanet, topLeadOf, topOreTierOf } from '../../ores'
 import { planetSpeciesOf } from './planetSpecies'
 import { planetRosterOf } from './planetRoster'
-import { gemSaleTierOfKind, topOreTierOf } from './rosterGems'
+import { gemSaleTierOfKind } from './rosterGems'
 
 // P1's gems (ticket 713, Systems' decision on #713 with Bjor's OK of 23 Oct): Diamond, Emerald and
 // Ruby sell at integer tiers of their own, t_top + 5, 6 and 8 (12, 13 and 15 on P1: V(t) floored to
@@ -46,7 +46,7 @@ describe('roster gems', () => {
   const p1 = freshPlanetParamsFor(SEED, 1)
 
   it("sells P1's Diamond, Emerald and Ruby at tiers 12, 13 and 15: about 865, 1297 and 2919", () => {
-    expect(topOreTierOf(p1)).toBe(7)
+    expect(topOreTierOf(p1.planetIndex, p1.oreRulesVersion)).toBe(7)
     expect(
       gemsOf(p1).map(({ kindSlot, saleTier }) => [
         planetSpeciesOf(p1, kindSlot)?.epithet,

@@ -357,6 +357,7 @@ programs }` from three's `renderer.info` of the game canvas), read only when cal
   of bands 3 to 5, a cluster of each on every seed, every cell of bands 1 and 2 and every other tier as
   rules 11 made it, the gems at most 15% of P1's ore pool value (Systems' binding cap) and at most
   0.5% of its ore cells (HS). `slotDraws.test.ts` holds the weighted draw and its guards,
+  `gemRows.test.ts` the gem table (the one Δ ladder, each pool's gem slots) and its guards,
   `kindRows.test.ts` the gem slots and the cap counted per roster, `roster.byteIdentity.test.ts` the
   weighted split within 4 sigma, `generatorGolden.test.ts` the rules-12 P1 and P2 to P7 as rules 11,
   and `oreRulesOldSaves.test.ts` a generator 16 save of P1 under rules 10 with its column pin. The

@@ -21,4 +21,4 @@ export {
   liveRosterIndicesOf,
   ROSTER_HOOK_ID,
 } from './systems/rosterFold'
-export { gemSaleTierOfKind, ROSTER_GEMS, topOreTierOf } from './systems/rosterGems'
+export { gemSaleTierOfKind, ROSTER_GEMS } from './systems/rosterGems'
