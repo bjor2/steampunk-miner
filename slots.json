@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-10-23T06:51:18+02:00",
+  "updated_at": "2026-10-23T06:55:11+02:00",
   "caps": {
     "grok": 12,
     "claude": 10,
@@ -81,11 +81,12 @@
       "slots": [
         {
           "slot": "C7",
-          "state": "free",
-          "ticket": null,
-          "grok_slot": null,
-          "kind": null,
-          "since": null
+          "state": "busy",
+          "ticket": 662,
+          "grok_slot": 1,
+          "kind": "dev",
+          "since": "2026-10-23T06:55:00+02:00",
+          "wave": "308-3A"
         },
         {
           "slot": "C8",
@@ -98,11 +99,12 @@
         },
         {
           "slot": "C9",
-          "state": "free",
-          "ticket": null,
-          "grok_slot": null,
-          "kind": null,
-          "since": null
+          "state": "busy",
+          "ticket": 744,
+          "grok_slot": 3,
+          "kind": "dev",
+          "since": "2026-10-23T06:55:00+02:00",
+          "wave": "647-4A"
         },
         {
           "slot": "C10",
@@ -114,9 +116,9 @@
         }
       ],
       "size": 4,
-      "used": 1,
-      "free": 3,
-      "claims_last_hour": 0,
+      "used": 3,
+      "free": 1,
+      "claims_last_hour": 3,
       "name": "Claude Max 2"
     }
   ],
@@ -161,9 +163,11 @@
   "grok": [
     {
       "slot": 1,
-      "state": "free",
-      "ticket": null,
-      "since": null
+      "state": "dev",
+      "ticket": 662,
+      "since": "2026-10-23T06:55:00+02:00",
+      "claude_slot": 7,
+      "wave": "308-3A"
     },
     {
       "slot": 2,
@@ -175,9 +179,11 @@
     },
     {
       "slot": 3,
-      "state": "free",
-      "ticket": null,
-      "since": null
+      "state": "dev",
+      "ticket": 744,
+      "since": "2026-10-23T06:55:00+02:00",
+      "claude_slot": 9,
+      "wave": "647-4A"
     },
     {
       "slot": 4,
@@ -291,11 +297,12 @@
     },
     {
       "slot": 7,
-      "state": "free",
-      "ticket": null,
-      "grok_slot": null,
-      "since": null,
-      "account": 2
+      "state": "busy",
+      "ticket": 662,
+      "grok_slot": 1,
+      "since": "2026-10-23T06:55:00+02:00",
+      "account": 2,
+      "wave": "308-3A"
     },
     {
       "slot": 8,
@@ -308,11 +315,12 @@
     },
     {
       "slot": 9,
-      "state": "free",
-      "ticket": null,
-      "grok_slot": null,
-      "since": null,
-      "account": 2
+      "state": "busy",
+      "ticket": 744,
+      "grok_slot": 3,
+      "since": "2026-10-23T06:55:00+02:00",
+      "account": 2,
+      "wave": "647-4A"
     },
     {
       "slot": 10,
@@ -324,17 +332,17 @@
     }
   ],
   "last_refill": {
-    "at": "2026-10-23 05:50 CEST",
+    "at": "2026-10-23 06:55 CEST",
     "mode": "refill-dev",
-    "triggers": "#737",
-    "started": "",
-    "note": "no pickable build ticket"
+    "triggers": "claude-run:wave-plan",
+    "started": "#662->C7/A2 #744->C9/A2",
+    "note": "spawned 2 worker(s)"
   },
   "totals": {
     "grok": {
       "size": 12,
-      "used": 1,
-      "dev": 1,
+      "used": 3,
+      "dev": 3,
       "dev_cap": 8,
       "planner": 0,
       "planner_cap": 4
@@ -342,8 +350,8 @@
     "claude": {
       "size": 10,
       "enabled": 4,
-      "used": 1,
-      "free": 3,
+      "used": 3,
+      "free": 1,
       "external": 0
     }
   },
@@ -369,35 +377,19 @@
       },
       {
         "number": 740,
-        "key": "647-5A",
-        "map": 647,
-        "lane": "remote",
-        "mode": "solo",
-        "state": "blocked",
-        "tickets": [
-          713,
-          741
-        ],
-        "done": [],
-        "live": 0
-      },
-      {
-        "number": 739,
         "key": "647-4A",
         "map": 647,
         "lane": "remote",
         "mode": "solo",
-        "state": "ready",
+        "state": "running",
         "tickets": [
-          736,
-          737,
-          738
+          744,
+          713,
+          738,
+          741
         ],
-        "done": [
-          736,
-          737
-        ],
-        "live": 0
+        "done": [],
+        "live": 1
       },
       {
         "number": 715,
@@ -449,7 +441,7 @@
         "map": 308,
         "lane": "remote",
         "mode": "solo",
-        "state": "ready",
+        "state": "running",
         "tickets": [
           662,
           663,
@@ -458,7 +450,7 @@
           733
         ],
         "done": [],
-        "live": 0
+        "live": 1
       },
       {
         "number": 568,
