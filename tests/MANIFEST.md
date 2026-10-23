@@ -731,6 +731,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/art/assetManifest.test.ts` | 13 | 13 |
 | `src/systems/art/autoGunsArt.test.ts` | 5 | 5 |
 | `src/systems/art/blastingChargesArt.test.ts` | 2 | 2 |
+| `src/systems/art/fuelTenderArt.test.ts` | 4 | 4 |
 | `src/systems/art/heatLavaArt.test.ts` | 6 | 6 |
 | `src/systems/art/icons/iconCoverage.test.ts` | 9 | 9 |
 | `src/systems/art/icons/iconFiles.test.ts` | 3 | 3 |
@@ -1325,6 +1326,8 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/render/enemyPlaceholder.test.ts` | 7 | 3 |
 | `src/systems/render/enemyTint.test.ts` | 5 | 5 |
 | `src/systems/render/frameWindow.test.ts` | 4 | 4 |
+| `src/systems/render/fuelTenderLook.test.ts` | 10 | 10 |
+| `src/systems/render/fuelTenderLookSource.test.ts` | 4 | 4 |
 | `src/systems/render/gatePatterns.test.ts` | 10 | 10 |
 | `src/systems/render/gpuTier.test.ts` | 19 | 3 |
 | `src/systems/render/groundBlocks.test.ts` | 7 | 7 |
@@ -1647,7 +1650,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/ui/screens/sliceScreen.test.ts` | 8 | 8 |
 | `src/ui/sheet/baseSheet.test.ts` | 15 | 15 |
 | `src/ui/sheets/exactAmountSheet.test.ts` | 3 | 3 |
-| `src/ui/starMap/starMapChart.test.ts` | 3 | 3 |
+| `src/ui/starMap/starMapChart.test.ts` | 4 | 4 |
 | `src/ui/toolSlots/desktopToolCell.test.ts` | 3 | 3 |
 | `src/ui/toolSlots/toolSlotRegistry.test.ts` | 10 | 10 |
 | `src/ui/touch/touchBindingTiles.test.ts` | 11 | 11 |
@@ -1775,7 +1778,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/views/sheetLayout.test.ts` | 14 | 14 |
 | `src/systems/views/shopGuidance.test.ts` | 8 | 8 |
 | `src/systems/views/slotSummaryLine.test.ts` | 8 | 8 |
-| `src/systems/views/starMapView.test.ts` | 11 | 11 |
+| `src/systems/views/starMapView.test.ts` | 13 | 13 |
 | `src/systems/views/tileTime.test.ts` | 3 | 3 |
 | `src/systems/views/titleMenuModel.test.ts` | 8 | 8 |
 | `src/systems/views/titleOnlyText.test.ts` | 5 | 5 |

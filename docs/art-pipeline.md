@@ -752,6 +752,31 @@ the looks from owned state through the rig-look registry (#577).
 from then on it is the source. The look table, the reach check and the review renders, at desktop
 and at a 360 px phone's size, are in [docs/art/rig-look-drill-type/](art/rig-look-drill-type/README.md).
 
+## The coal tender
+
+The fuel tank track's wagon ([#758](https://github.com/bjor2/steampunk-miner/issues/758), the
+rig half of the star map art pass; the GD lock on
+[#650](https://github.com/bjor2/steampunk-miner/issues/650) shows the tank "as a coal tender wagon
+on the #576 ladder"). The tank track ([#756](https://github.com/bjor2/steampunk-miner/issues/756))
+is its own track outside `UPGRADE_IDS`, so its ladder is the kernel's
+(`src/data/vehicle/fuelTender.json`, read by `systems/render/fuelTenderLook.ts`: a pure function of
+the tank level, the starting tank's coal cart, then a wagon swap at levels 2, 3 and 5 and a tint
+per purchase above the top step) and the wagon is a kernel vehicle piece, `scene/FuelTenderPiece.tsx`,
+hung at the wagon hitch `hull.hitch`, the point a rig-look part never takes (HS on #577). The tail's
+tint is a glow on the wagon's slot through the vehicle look fold (`fuelTenderLookSource.ts`, the
+kernel's own source before the slices'), under the rig body's cap.
+
+| Id                  | Source         | What the build draws                                                                              |
+| ------------------- | -------------- | ------------------------------------------------------------------------------------------------- |
+| `vehicle-fuel-tank` | Blender, parts | the level's wagon at `hull.hitch`: `coal-cart`, `bunker-tender`, `riveted-tender`, `guild-tender` |
+
+- The id is the #52 kebab form of the kernel item `service:fuel_tank` (`systems/art/fuelTenderArt.ts`).
+  Each wagon is one part with the hitch ring at the origin, drawn at `z` 0 behind every rig part, its
+  wheels on the rollers' ground line; no emissive map.
+- `docs/art/fuel-tender/author_fuel_tender.py` wrote the first version of the `.blend`; from then on it
+  is the source. The part table, the review renders at desktop and phone size and the readability
+  numbers are in [docs/art/fuel-tender/](art/fuel-tender/README.md).
+
 ## UI chrome sprites
 
 The HUD's gauges, frames and sheet chrome (ticket 683; the brief is
@@ -782,6 +807,16 @@ the design tokens' three stops, a vertical gradient along the part, upside down 
 flat stop. Frames are hollow so the CSS behind them sets the body colour. `kit/UiArtTokens.tsx`
 turns the shipped catalogue into `--art-<token>` custom properties; the review sheets and the
 full file list are in [docs/art/ui-chrome/](art/ui-chrome/README.md).
+
+### The star map's sprites
+
+The map half of [#758](https://github.com/bjor2/steampunk-miner/issues/758): the `art.starMap` token
+names `ui-star-map`, a chrome asset like the gauges above, with the planet (48 px, its disc the
+tintable `accent` so the chart colours one sprite per planet with the planet's own ground, the
+view's `colour`), the sun (64 px) and the here ring (56 px). `StarMapChart` draws the system view
+with them through `--art-star-map-planet`, `-planet-tint`, `-sun` and `-here`, the CSS discs behind
+the `var()`s standing in while the asset is a placeholder. `docs/art/star-map/author_star_map.py`
+wrote the first version of the `.blend`; the sheets are in [docs/art/star-map/](art/star-map/README.md).
 
 ## The `parts.json` sidecar, schema 1
 

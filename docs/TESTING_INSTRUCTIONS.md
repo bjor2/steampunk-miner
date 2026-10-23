@@ -1693,6 +1693,19 @@ incomePerHour}` go to `balance-report/drill-pace.ndjson`, which `pushTestMetrics
   menu); while drilling the HUD stays in its budget and the docked sheet covers at most a quarter
   of the play area. A 360x640 phone cell holds the strip through the sweep with no dock, no key tag
   and no plate. Steps in `desktopGoldenSteps.ts`. Box Tester only.
+- **Star map art pass** (ticket 758, spec #650): the coal tender's ladder is pure
+  (`systems/render/fuelTenderLook.test.ts`: the coal cart on the starting tank, a wagon swap at each
+  step level, a pure function of the level from 1 to 10,000 with no two neighbours alike above the
+  top step, the tail's palette cycling, the table refused with every problem listed), its tail
+  reaches the kernel vehicle look through a scripted session's tank purchases
+  (`fuelTenderLookSource.test.ts`), and its ids derive from the fuel tank item with one part per
+  step (`systems/art/fuelTenderArt.test.ts`). The star map's planet colour and tank fill are on the
+  view (`starMapView.test.ts`), the server-rendered chart draws the sun, the tank's bar and a glyph
+  per planet in its colour (`starMapChart.test.ts`), and `uiArt.test.ts` pins the `art.starMap`
+  sprites' sizes and the planet disc as the one new tintable part. The look of the wagons on the
+  rig and of the sprites on the chart is checked on the review sheets under `docs/art/fuel-tender/`
+  and `docs/art/star-map/`; the running game's screenshots are the Tester's
+  (`e2e/browser/ui/starMap.spec.ts`).
 - **Warning layer** (ticket 685, spec #678): the ladder is pure (`systems/views/warningWatch.ts`:
   each tier fires once on the way in and re-arms 5% above it, the deepest of several at once rings
   alone, the glow holds the deepest tier now), fed from the HUD's readings through the store's

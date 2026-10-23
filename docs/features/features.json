@@ -137,6 +137,12 @@
               "issues": [576, 577, 589]
             },
             {
+              "title": "Coal tender wagon",
+              "description": "The fuel tank trails the rig as a coal tender at the hitch: a timber coal cart to start, then a riveted bunker, a steel tender with a copper water tank and a guild tender as the tank's level rises, every later purchase tinting it on.",
+              "status": "built",
+              "issues": [650, 756, 758]
+            },
+            {
               "title": "Mounted modules on the rig",
               "description": "Bought modules show on the vehicle: the gun turret swings its barrel toward targets and the charge rack sits on the hull.",
               "status": "built",
@@ -577,6 +583,12 @@
               "description": "Planets keep coming by formula past the authored campaign; nothing stops travel.",
               "status": "built",
               "issues": [10, 14]
+            },
+            {
+              "title": "Star map",
+              "description": "One tap on a phone or M on desktop opens the system's star map: the sun heads a brass rail of planet glyphs, each in its own ground colour, with the fuel its jump burns, the price and any shortfall against your tank; planets you cannot afford dim, never lock. Read-only: the jump itself still goes through the Sell bay.",
+              "status": "built",
+              "issues": [650, 757, 758, 769]
             }
           ]
         }
