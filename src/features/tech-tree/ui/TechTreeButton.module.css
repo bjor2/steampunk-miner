@@ -17,6 +17,19 @@
   pointer-events: auto;
 }
 
+/*
+ * While the touch gesture surface lies over the HUD (the vehicle has the input on a touch
+ * screen), the button rises over it, as the strip's gear does (ticket 684); under a menu it sits
+ * back, so the menu covers it.
+ */
+.slot[data-raised] {
+  z-index: 1;
+}
+
+:global([data-hud-density='compact']) .slot[data-raised] {
+  position: relative;
+}
+
 .glyphButton {
   display: grid;
   place-items: center;

@@ -6,6 +6,8 @@
  * opens says its name.
  */
 import { useGameStore } from '../../../store/gameStore'
+import { inputLayerOf } from '../../../store/presentationSlice'
+import { isGestureSurfaceShown } from '../../../systems/input/touchControls'
 import { panelIconIdOf } from '../../../systems/art/icons/iconSet'
 import type { HudDensity } from '../../../systems/views/screenLayout'
 import type { ElementText } from '../../../systems/views/uiText'
@@ -30,19 +32,37 @@ const TECH_TREE_ICON_ID = panelIconIdOf('upgrades')
 export function TechTreeButton() {
   const openSheet = useGameStore((state) => state.openSheet)
   const density = useHudDensity()
-  return <TechTreeButtonView density={density} onOpen={() => openSheet(PATENT_OFFICE_TAB_ID)} />
+  // The touch gesture surface lies over the whole HUD while driving; the button rises over it,
+  // as the strip's gear does (ticket 684), or a phone tap never reaches it.
+  const isRaised = useGameStore((state) =>
+    isGestureSurfaceShown(state.isTouchControlsShown, inputLayerOf(state)),
+  )
+  return (
+    <TechTreeButtonView
+      density={density}
+      isRaised={isRaised}
+      onOpen={() => openSheet(PATENT_OFFICE_TAB_ID)}
+    />
+  )
 }
 
 /** The button for one HUD density; a server render draws it from props alone. */
 export function TechTreeButtonView({
   density,
+  isRaised = false,
   onOpen,
 }: {
   density: HudDensity
+  isRaised?: boolean
   onOpen: () => void
 }) {
   return (
-    <div className={styles.slot} data-testid="tech-tree-open" {...hudBoxOf('tech-tree')}>
+    <div
+      className={styles.slot}
+      data-testid="tech-tree-open"
+      data-raised={isRaised || undefined}
+      {...hudBoxOf('tech-tree')}
+    >
       {density === 'compact' ? <CompactOpener onOpen={onOpen} /> : <FullOpener onOpen={onOpen} />}
     </div>
   )
