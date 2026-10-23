@@ -1,6 +1,7 @@
 /**
  * Desktop warnings and the star map's hook (spec #678, ticket 769, GD lock 23 Oct) at 1280x800 and
- * 1920x1080, with a 360x640 phone for what a phone must not draw: M or a click on the strip's fuel
+ * 1920x1080, with a 360x640 phone for what a phone must not draw (since ticket 757 it opens the
+ * map full screen instead of docked): M or a click on the strip's fuel
  * wells opens the star map's panel in the dock beside the view, at most a quarter of the screen,
  * and M, Escape or its Close shuts it; while it is open the hazard strip of a dive lies along the
  * drive inside the narrowed view, under the HUD strip and left of the panel. State and geometry
@@ -106,13 +107,14 @@ for (const cell of CELLS) {
 test.describe('star map hook on a phone (ticket 769)', () => {
   test.use({ viewport: PHONE.viewport, isMobile: true, hasTouch: true, deviceScaleFactor: 1 })
 
-  test('draws no star map button and no docked panel on a phone', async ({ page }) => {
+  // Ticket 757: a phone opens the map full screen (its own one-tap button is in starMap.spec.ts).
+  test('draws no strip star map button and never docks the panel on a phone', async ({ page }) => {
     test.setTimeout(TEST_TIMEOUT_MS)
     const errors = await openPlainGame(page, PHONE)
     await undock(page)
     await page.keyboard.press('KeyM')
     await expect(page.getByTestId(UI_IDS.hudStarMapButton)).toHaveCount(0)
-    await expect(page.getByTestId(PANEL)).toHaveCount(0)
+    await expect(page.getByTestId(PANEL)).toHaveAttribute('data-placement', 'full')
     expect(errors).toEqual([])
   })
 })

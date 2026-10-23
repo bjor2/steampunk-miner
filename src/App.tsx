@@ -19,6 +19,7 @@ import { UiArtTokens } from './ui/kit/UiArtTokens'
 import { SliceScreen } from './ui/screens/SliceScreen'
 import { BaseSheet } from './ui/sheet/BaseSheet'
 import { SheetDock } from './ui/sheet/SheetDock'
+import { StarMapPanel } from './ui/starMap/StarMapPanel'
 import { LedgerToast } from './ui/save/LedgerToast'
 import { UnsavedChip } from './ui/save/UnsavedChip'
 import { ExactAmountSheet } from './ui/sheets/ExactAmountSheet'
@@ -39,6 +40,7 @@ export default function App() {
       <PlanetCard />
       <EndOfSliceCard />
       <BaseSheet at="full" />
+      <StarMapPanel at="full" />
       <SliceScreen />
       <ArtefactChoice />
       <PauseMenu />

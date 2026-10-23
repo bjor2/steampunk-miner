@@ -384,7 +384,21 @@ map's panel in the desktop dock, a one-page sheet whose chart scrolls both ways 
 pans for any number of systems. It takes the dock only while no docked sheet holds it; a sheet
 opened over it takes the dock and the map comes back when the sheet shuts. The dock narrows the
 view while either panel is drawn, so no panel ever covers the strip. M again, Esc or its Close
-shuts it, and Esc shuts it before it would open the pause menu or undock. A phone draws neither.
+shuts it, and Esc shuts it before it would open the pause menu or undock. A phone draws no strip
+button and never docks the panel.
+
+**The star map (#757, GD lock on #650).** One tap on a phone, the touch cluster's **star map
+button** (the compass, shown wherever M works: driving and every bay, in a cell of its own while
+Rescue and Quick service share one), or one M on desktop opens it: full screen on a phone, rising
+from the foot like the base sheet and stepping aside for it, docked on desktop. Its chart
+(`StarMapChart`, drawn from `starMapViewOf`) heads with the fuel tank, held of capacity, then one
+framed row per planet of the session's system on the shared Title+OneLine element: the name, a
+line of the tank against that jump with any shortfall and what buying it here charges after the
+#648 clamp, and the jump's fuel and price as facts. The planet the session is on wears the brass
+edge; a planet the player cannot afford, whose shortfall the wallet cannot buy or the tank cannot
+hold, dims to steel and keeps every number, never locked or hidden. The map only reads state: no
+row acts. System 1 runs past `planetsPerSystem` (#781), so there it lists up to the hop after the
+session's planet.
 
 ## 10. Component inventory
 
@@ -416,6 +430,7 @@ listed with the ticket that builds them. Every class lives in a CSS Module besid
 | hint chip     | #500's chip, unchanged: one line, 8% of height at most, queued when the clear view would fall                                                                              | existing constants                                     | exists  |
 | sale receipt  | the trip's sold kinds by rarity group (count, coin), the lining bill, the total rolling up in 1.2 s or less (a tap skips), the last trip's total; scrolls past 8 lines     | numbers, type.odometer, art.sheetFrame, copy           | #717    |
 | unlock reveal | the first buy of a new capability (the shared flag): a brass plate over the dock, the bought part glowing on the car; a tap skips it                                       | art.sheetFrame, motion.durationsMs, copy               | #718    |
+| star map      | the system's planets on one read-only chart: the tank, then a row per planet with its jump's fuel, price and shortfall; unaffordable rows dim, never lock                  | art.sheetFrame, numbers, copy                          | #757    |
 
 **The sheet as built (#686).** One base sheet (`ui/sheet/BaseSheet.tsx`) draws the store's open
 tab (`openSheet(tabId)`, `closeSheet()`, Escape) in the kit frame (`kit/Sheet.tsx`). Its tabs are

@@ -28,7 +28,7 @@ export function SheetDock() {
       <BaseSheet at="docked">
         <StageNarrowing />
       </BaseSheet>
-      <StarMapPanel>
+      <StarMapPanel at="docked">
         <StageNarrowing />
       </StarMapPanel>
     </aside>

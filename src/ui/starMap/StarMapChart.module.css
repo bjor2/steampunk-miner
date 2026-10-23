@@ -1,0 +1,40 @@
+/*
+ * The star map's chart (ticket 757): the tank over a column of planet rows, one framed row each.
+ * The planet the session is on wears the brass edge; a planet the player cannot afford dims to
+ * steel, as a muted sheet card does, and keeps every number. Placeholder look until the map art
+ * pass (#758), tuned by eye in `npm run dev`.
+ */
+.chart {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  min-height: 100%;
+}
+
+.tank {
+  padding: var(--space-2);
+}
+
+.planets {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.planet {
+  padding: var(--space-2);
+  border: var(--frame-hairline) solid var(--color-steel);
+  border-radius: var(--radius-panel);
+}
+
+.planet[data-here] {
+  border-color: var(--color-brass);
+}
+
+.planet[data-dimmed] h3,
+.planet[data-dimmed] p {
+  color: var(--color-steel);
+}

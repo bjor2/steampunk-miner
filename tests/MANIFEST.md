@@ -996,7 +996,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/debug/debugMemory.test.ts` | 4 | 4 |
 | `src/debug/debugOverlay.test.ts` | 2 | 2 |
 | `src/debug/debugSaves.test.ts` | 5 | 5 |
-| `src/debug/debugScreens.test.ts` | 34 | 33 |
+| `src/debug/debugScreens.test.ts` | 35 | 34 |
 | `src/debug/debugSheet.test.ts` | 4 | 4 |
 | `src/debug/debugWarnings.test.ts` | 3 | 3 |
 | `src/debug/sliceDebugCommands.test.ts` | 3 | 3 |
@@ -1098,7 +1098,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/input/promptLabel.test.ts` | 8 | 8 |
 | `src/systems/input/toolSlots.test.ts` | 9 | 9 |
 | `src/systems/input/touchBindings.test.ts` | 16 | 16 |
-| `src/systems/input/touchControls.test.ts` | 26 | 19 |
+| `src/systems/input/touchControls.test.ts` | 27 | 20 |
 
 ### `logging`
 
@@ -1646,6 +1646,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/ui/screens/sliceScreen.test.ts` | 8 | 8 |
 | `src/ui/sheet/baseSheet.test.ts` | 15 | 15 |
 | `src/ui/sheets/exactAmountSheet.test.ts` | 3 | 3 |
+| `src/ui/starMap/starMapChart.test.ts` | 3 | 3 |
 | `src/ui/toolSlots/desktopToolCell.test.ts` | 3 | 3 |
 | `src/ui/toolSlots/toolSlotRegistry.test.ts` | 10 | 10 |
 | `src/ui/touch/touchBindingTiles.test.ts` | 11 | 11 |
@@ -1773,6 +1774,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/views/sheetLayout.test.ts` | 14 | 14 |
 | `src/systems/views/shopGuidance.test.ts` | 8 | 8 |
 | `src/systems/views/slotSummaryLine.test.ts` | 8 | 8 |
+| `src/systems/views/starMapView.test.ts` | 11 | 11 |
 | `src/systems/views/tileTime.test.ts` | 3 | 3 |
 | `src/systems/views/titleMenuModel.test.ts` | 8 | 8 |
 | `src/systems/views/titleOnlyText.test.ts` | 5 | 5 |

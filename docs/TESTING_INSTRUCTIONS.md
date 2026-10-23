@@ -1660,8 +1660,18 @@ incomePerHour}` go to `balance-report/drill-pace.ndjson`, which `pushTestMetrics
   `keyTags.test.ts`, and the server-rendered button in `hudStripView.test.ts` (none on a phone).
   `e2e/browser/ui/desktopStarMap.spec.ts` runs 1280x800 and 1920x1080 plus a 360x640 phone: M, a
   click, Escape and Close on the docked panel at most a quarter wide, the HUD strip left of it, and a
-  dive's hazard strip inside the narrowed view; the phone draws no button and no panel. Box Tester
-  only.
+  dive's hazard strip inside the narrowed view; the phone draws no strip button and never docks the
+  panel. Box Tester only.
+- **Star map UI** (ticket 757, spec #650): the rows are pure (`starMapView.test.ts`: every planet of
+  the system by name and the one the session is on, each jump's fuel and fee, the tank, the
+  shortfall and its price here, the #648 clamp keeping the next planet lit on an empty wallet, the
+  dimming for a wallet or a tank too small, and system 1's line one hop past the session), the
+  phone's one tap on the cluster's button in `touchControls.test.ts`, the debug read in
+  `debugScreens.test.ts`, and the server-rendered chart in `starMapChart.test.ts` (here and dimmed
+  marks, every word on the shared element within the budget). `e2e/browser/ui/starMap.spec.ts`
+  runs a 360x640 phone (one tap, full screen) and a 1280x800 desktop (one M, docked), judging each
+  row against `ui.getStarMapModel()`, and a dimmed planet that lights once money arrives. Box
+  Tester only.
 - **Warning layer** (ticket 685, spec #678): the ladder is pure (`systems/views/warningWatch.ts`:
   each tier fires once on the way in and re-arms 5% above it, the deepest of several at once rings
   alone, the glow holds the deepest tier now), fed from the HUD's readings through the store's

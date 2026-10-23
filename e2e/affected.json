@@ -888,7 +888,7 @@
       "specs": ["e2e/browser/ui/desktopInput.spec.ts", "e2e/browser/hud/toolSlotBar.spec.ts"]
     },
     {
-      "why": "Desktop warnings and the star map hook (ticket 769): M or a click on the fuel wells opens the star map's panel in the desktop dock and M, Escape or Close shuts it; the hazard strip stays inside the narrowed view; a phone draws neither.",
+      "why": "Desktop warnings and the star map hook (ticket 769): M or a click on the fuel wells opens the star map's panel in the desktop dock and M, Escape or Close shuts it; the hazard strip stays inside the narrowed view; a phone draws no strip button and opens the map full screen (ticket 757).",
       "paths": [
         "src/store/starMapSlice.ts",
         "src/store/inputRuntime.ts",
@@ -904,7 +904,20 @@
         "src/ui/sheet/SheetDock*",
         "src/ui/starMap/**"
       ],
-      "specs": ["e2e/browser/ui/desktopStarMap.spec.ts"]
+      "specs": ["e2e/browser/ui/desktopStarMap.spec.ts", "e2e/browser/ui/starMap.spec.ts"]
+    },
+    {
+      "why": "The star map UI (ticket 757): its rows from the star map view, the phone's one-tap button in the touch cluster, and the store and debug reads the spec judges the rows by.",
+      "paths": [
+        "src/systems/views/starMapView.ts",
+        "src/systems/input/touchControls.ts",
+        "src/systems/input/kernelTouchBindings.ts",
+        "src/ui/touch/**",
+        "src/store/screenReads.ts",
+        "src/debug/debugScreens.ts",
+        "src/App.tsx"
+      ],
+      "specs": ["e2e/browser/ui/starMap.spec.ts", "e2e/browser/screens/touchControls.spec.ts"]
     },
     {
       "why": "One menu per building (ticket 734): the sheet a dock opens is that bay's one menu, closed once, with no bay frame hidden behind a phone's full sheet. The sheet slice, the bay screen's shutter, the workshop's dock hook and the debug sheet reads reach it.",
