@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "updated_at": "2026-10-23T17:32:19Z",
+  "updated_at": "2026-10-23T17:32:22Z",
   "entries": {
     "steampunk-loop/1": {
       "loop": "steampunk-loop",
@@ -720,9 +720,9 @@
       "slot": null,
       "state": "working",
       "issue": null,
-      "note": "testing spec #641 (Planet radius rule (#305/#306 → #417)) on af7addf",
+      "note": "queue run on 082f343 (close-#754)",
       "stale_after_min": 420,
-      "updated_at": "2026-10-23T17:14:58Z",
+      "updated_at": "2026-10-23T17:32:22Z",
       "host": "grok-bot-vm-452660841"
     },
     "steampunk-loop/10": {
