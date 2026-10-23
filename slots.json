@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-10-23T08:45:45+02:00",
+  "updated_at": "2026-10-23T08:47:26+02:00",
   "caps": {
     "grok": 12,
     "claude": 10,
@@ -90,12 +90,11 @@
         },
         {
           "slot": "C8",
-          "state": "busy",
-          "ticket": 753,
-          "grok_slot": 2,
-          "kind": "dev",
-          "since": "2026-10-23T08:45:00+02:00",
-          "wave": null
+          "state": "free",
+          "ticket": null,
+          "grok_slot": null,
+          "kind": null,
+          "since": null
         },
         {
           "slot": "C9",
@@ -116,9 +115,9 @@
         }
       ],
       "size": 4,
-      "used": 3,
-      "free": 1,
-      "claims_last_hour": 8,
+      "used": 2,
+      "free": 2,
+      "claims_last_hour": 7,
       "name": "Claude Max 2"
     }
   ],
@@ -180,11 +179,9 @@
     },
     {
       "slot": 2,
-      "state": "dev",
-      "ticket": 753,
-      "since": "2026-10-23T08:45:00+02:00",
-      "claude_slot": 8,
-      "wave": null
+      "state": "free",
+      "ticket": null,
+      "since": null
     },
     {
       "slot": 3,
@@ -315,12 +312,11 @@
     },
     {
       "slot": 8,
-      "state": "busy",
-      "ticket": 753,
-      "grok_slot": 2,
-      "since": "2026-10-23T08:45:00+02:00",
-      "account": 2,
-      "wave": null
+      "state": "free",
+      "ticket": null,
+      "grok_slot": null,
+      "since": null,
+      "account": 2
     },
     {
       "slot": 9,
@@ -341,17 +337,17 @@
     }
   ],
   "last_refill": {
-    "at": "2026-10-23 08:35 CEST",
+    "at": "2026-10-23 08:47 CEST",
     "mode": "refill-dev",
-    "triggers": "claude-run:tester-triage",
-    "started": "#724->C7/A2",
-    "note": "spawned 1 worker(s)"
+    "triggers": "#753",
+    "started": "",
+    "note": "load guard (MemAvailable 3060 MB < 3072 MB)"
   },
   "totals": {
     "grok": {
       "size": 12,
-      "used": 3,
-      "dev": 3,
+      "used": 2,
+      "dev": 2,
       "dev_cap": 8,
       "planner": 0,
       "planner_cap": 4
@@ -359,8 +355,8 @@
     "claude": {
       "size": 10,
       "enabled": 4,
-      "used": 3,
-      "free": 1,
+      "used": 2,
+      "free": 2,
       "external": 0
     }
   },
