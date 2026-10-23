@@ -31,7 +31,7 @@ export function trackEntries(): readonly DescribedEntry[] {
     trackEntry('drill_tip', 'A harder-tempered bit that bites rock the old one only scratched.', [
       trackLine('drill_tip', 'Drill tip', drillTipAtStep),
     ]),
-    trackEntry('engine', 'Bigger pistons and a lighter flywheel push the miner along faster.', [
+    trackEntry('engine', 'Drives faster, and fits heavier tracks and wheels.', [
       engineLine('speedMax', 'Top speed'),
       engineLine('accel', 'Acceleration'),
       engineLine('thrustToWeight', 'Thrust to weight'),
