@@ -42,13 +42,13 @@ test.beforeEach(() => {
 })
 
 test.describe('screen matrix: touch controls (#173)', () => {
-  test('shows only the stick and Interact on a fresh planet 1 rig, each clear of the HUD', async ({
+  test('shows only the stick, Interact and the star map on a fresh planet 1 rig, each clear of the HUD', async ({
     page,
   }) => {
     const errors = await openGame(page, currentCell())
     await expect(page.getByTestId('touch-controls')).toBeVisible()
     await expect(page.getByTestId('touch-stick-zone')).toBeVisible()
-    expect(await clusterIds(page)).toEqual(['touch-interact'])
+    expect(await clusterIds(page)).toEqual(['touch-interact', 'touch-open_star_map'])
     const interact = await boxOf(page, 'touch-interact')
     expect(interact.width).toBeGreaterThanOrEqual(INTERACT_PX)
     expect(interact.height).toBeGreaterThanOrEqual(INTERACT_PX)
@@ -67,7 +67,9 @@ test.describe('screen matrix: touch controls (#173)', () => {
   }) => {
     const errors = await openGame(page, currentCell())
     await page.getByTestId('touch-interact').tap()
-    await expect.poll(() => clusterIds(page)).toEqual(['touch-quick_service'])
+    await expect
+      .poll(() => clusterIds(page))
+      .toEqual(['touch-quick_service', 'touch-open_star_map'])
     await expect(page.getByTestId('platform-screen')).toBeVisible()
     const quick = await boxOf(page, 'touch-quick_service')
     expect(Math.min(quick.width, quick.height)).toBeGreaterThanOrEqual(CLUSTER_PX)
@@ -76,7 +78,7 @@ test.describe('screen matrix: touch controls (#173)', () => {
     await page.getByTestId('settings-close').tap()
     await expect(page.getByTestId('settings-panel')).toHaveCount(0)
     await page.getByTestId('platform-undock').tap()
-    await expect.poll(() => clusterIds(page)).toEqual(['touch-interact'])
+    await expect.poll(() => clusterIds(page)).toEqual(['touch-interact', 'touch-open_star_map'])
     expect(errors).toEqual([])
   })
 

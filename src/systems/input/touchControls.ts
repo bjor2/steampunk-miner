@@ -16,22 +16,25 @@ import { ZOOM_STEP_FACTOR } from '../../constants/scene'
 import {
   buttonIconIdOf,
   combatStatusIconIdOf,
+  hudLabelIconIdOf,
   panelIconIdOf,
   vehicleStateIconIdOf,
 } from '../art/icons/iconSet'
 import type { VehicleMode } from '../vehicle/vehicleState'
 import type { BayId } from '../world/dockBays'
-import type { ActionId, InputContext } from './actionMap'
+import { ACTION_MAP, actionDefOf, type ActionId, type InputContext } from './actionMap'
 
 /**
  * The cluster's buttons in a fixed order; each presses the action of the same id. Plant charge and
  * the guns toggle are tool slot bar cells since ticket 691 (the G&V ruling, option 1), so the
- * cluster keeps one row in the corner.
+ * cluster keeps one row in the corner. The star map's button (ticket 757; #650 Map UX: one tap on a
+ * phone) shows wherever M opens the map.
  */
 export const CLUSTER_ACTION_IDS = [
   'interact',
   'request_rescue',
   'quick_service',
+  'open_star_map',
 ] as const satisfies readonly ActionId[]
 
 export type ClusterActionId = (typeof CLUSTER_ACTION_IDS)[number]
@@ -194,12 +197,19 @@ const CLUSTER_ICON_IDS: Readonly<Record<ClusterActionId, string>> = {
   interact: vehicleStateIconIdOf('docked'),
   request_rescue: combatStatusIconIdOf('tow'),
   quick_service: buttonIconIdOf('quick_service'),
+  open_star_map: hudLabelIconIdOf('compass'),
 }
 
 const CLUSTER_RULES: Readonly<Record<ClusterActionId, (situation: TouchSituation) => boolean>> = {
   interact: ({ layer }) => layer === 'vehicle',
   request_rescue: ({ layer, vehicleMode }) => layer === 'vehicle' && isWaitingForTow(vehicleMode),
   quick_service: ({ layer, dockedBay }) => layer === 'platform' && dockedBay === 'sell',
+  open_star_map: ({ layer }) => isActionInLayer('open_star_map', layer),
+}
+
+/** The action's own contexts in the key map, so a button shows wherever its key works. */
+function isActionInLayer(action: ActionId, layer: InputContext): boolean {
+  return actionDefOf(ACTION_MAP, action).contexts.includes(layer)
 }
 
 function isChargeSizeSteppable({ layer, hasChargeRack, nextChargeSize }: TouchSituation): boolean {

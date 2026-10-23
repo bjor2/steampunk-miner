@@ -107,7 +107,11 @@
   display: grid;
   grid-template-columns: 56px 56px 72px;
   grid-template-rows: 72px;
-  grid-template-areas: 'request_rescue quick_service interact';
+  /*
+   * Rescue shows only while driving and Quick service only at the Sell bay, so they share a cell
+   * and the star map's button (ticket 757) keeps one of its own: the row stays three wide.
+   */
+  grid-template-areas: 'open_star_map side interact';
   gap: 8px;
   place-items: end;
   pointer-events: none;
@@ -117,7 +121,7 @@
   right: auto;
   left: var(--space-3);
   grid-template-columns: 72px 56px 56px;
-  grid-template-areas: 'interact quick_service request_rescue';
+  grid-template-areas: 'interact side open_star_map';
   place-items: end start;
 }
 
@@ -173,10 +177,11 @@
   font-size: 2rem;
 }
 
-.button[data-action='request_rescue'] {
-  grid-area: request_rescue;
+.button[data-action='request_rescue'],
+.button[data-action='quick_service'] {
+  grid-area: side;
 }
 
-.button[data-action='quick_service'] {
-  grid-area: quick_service;
+.button[data-action='open_star_map'] {
+  grid-area: open_star_map;
 }

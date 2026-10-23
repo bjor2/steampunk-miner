@@ -1,6 +1,7 @@
 /**
  * The kernel's own touch controls as binding rows (#474), read before the slices' rows: the
- * floating stick's four drive actions, the cluster's buttons (`touchControls.ts`, #173), the tool
+ * floating stick's four drive actions, the cluster's buttons (`touchControls.ts`, #173; the star
+ * map's since ticket 757), the tool
  * slot bar's kernel cells, Plant charge, its size step (ticket 473) and the guns toggle (ticket
  * 691), the pause button (ticket 472), the stage's double tap, and the
  * actions the kernel leaves with no touch control, each with its reason (the desktop keys of
@@ -38,7 +39,6 @@ export const KERNEL_TOUCH_BINDINGS: readonly TouchBindingRule[] = [
   ...Object.values(SHEET_PLACE_ACTIONS).map((action) =>
     noControlRow(action, "a finger taps the place's tab on the sheet's bar itself"),
   ),
-  noControlRow('open_star_map', "the star map's own button opens it (#757)"),
 ]
 
 function rowOf(control: string, touch: TouchBindingRule['touch']): TouchBindingRule {
