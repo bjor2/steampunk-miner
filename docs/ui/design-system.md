@@ -614,7 +614,9 @@ stroke is at least 1 px at 1x; the review sheets are in `docs/art/ui-chrome/`.
 token `gaugeBar`, `--art-gauge-bar` is the `image-set()` of its two files, `--art-gauge-bar-size`
 its 1x size, and on a nine-slice `--art-gauge-bar-slice` and `--art-gauge-bar-width` are the
 `border-image` slice percentages and width; a variant adds its suffix (`--art-tab-frame-active`),
-a tintable part `-tint`. So a frame is
+a tintable part `-tint`; the files are named by the page's absolute URL (`Shell.resolvePageUrl`,
+ticket 770), since a browser resolves a `url()` inside a variable against the sheet that consumes
+it, the bundled CSS in a build. So a frame is
 `border-image: var(--art-sheet-frame) var(--art-sheet-frame-slice) fill / var(--art-sheet-frame-width)`,
 and a skin colour shows through `mask: var(--art-gauge-dial-tint)` over a `background` of the
 skinnable token. A token whose asset is a placeholder writes no variable, and the CSS frame behind

@@ -1677,8 +1677,10 @@ incomePerHour}` go to `balance-report/drill-pace.ndjson`, which `pushTestMetrics
   with no frame or an unshipped one fails the load), and the two rail sprites are held to the brief
   by `uiArt.test.ts` like every token. `e2e/browser/ui/desktopBrass.spec.ts` runs 1280x800 and
   1920x1080 plus a 360x640 phone: the docked sheet's and the cluster's computed border image name
-  the dock and cluster rail frames with `round` edges, the phone's name the sheet and glass frames
-  stretched as before, and the strip and the docked sheet hold (same box, nothing spilled, no
+  the dock and cluster rail frames with `round` edges and their files are served as PNG (a
+  `url()` in a variable resolves against the consuming sheet, so a wrong base fetches the SPA's
+  HTML and draws nothing), the phone's name the sheet and glass frames stretched as before, and
+  the strip and the docked sheet hold (same box, nothing spilled, no
   finding) through the NEW MATERIAL plaque cycle of the planet 1 start scenario and on P40. Box
   Tester only; the sweeps are ticket 767's and 768's specs.
 - **Warning layer** (ticket 685, spec #678): the ladder is pure (`systems/views/warningWatch.ts`:

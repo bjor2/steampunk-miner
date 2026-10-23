@@ -115,6 +115,12 @@ export interface Shell {
   pickSaveFile(): Promise<string | null>
   /** Puts a handle on `window` for bots and the dev console (Playwright, design doc section 20). */
   exposeGlobalHandle(name: string, handle: unknown): void
+  /**
+   * The absolute URL of a path relative to the page (ticket 770): a browser resolves a `url()`
+   * inside a custom property against the style sheet that consumes it, not the one that declares
+   * it, so a sheet of art variables writes absolute URLs and the bundled CSS finds the files.
+   */
+  resolvePageUrl(path: string): string
   /** The local preferences file's text (#33), or null when none was written yet. */
   readPreferences(): Promise<string | null>
   /** Replaces the local preferences file; a debug run writes its own (`preferencesFileOf`). */

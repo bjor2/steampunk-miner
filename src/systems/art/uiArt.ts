@@ -16,8 +16,13 @@ import type { Pair, PartsSidecar, SidecarPart } from './partsSidecar'
 
 export const UI_ART_CATEGORY = 'ui'
 
-/** The `public/assets/ui/` folder as the page sees it, like `AtlasMaps` URLs. */
-const UI_ASSETS_URL = 'assets/ui/'
+/**
+ * The `public/assets/ui/` folder as the page sees it, like `AtlasMaps` URLs. A CSS `url()` inside
+ * a custom property is resolved by the browser against the style sheet that consumes it (the
+ * bundled CSS under `assets/`, in a build), not the `:root` sheet that declares it, so the
+ * composition root hands the sheet this path resolved against the page (ticket 770).
+ */
+export const UI_ASSETS_URL = 'assets/ui/'
 
 const CSS_VARIABLE_PREFIX = '--art-'
 
@@ -122,17 +127,25 @@ function spriteFileName(partId: string, mask: string, scale: number): string {
  * `-tint` the mask's `image-set()`. A token whose asset is still a placeholder writes nothing, so
  * the CSS frame behind `var()` stays.
  */
-export function uiArtCssVariablesOf(art: ArtCatalogue): Record<string, string> {
+export function uiArtCssVariablesOf(
+  art: ArtCatalogue,
+  assetsUrl: string = UI_ASSETS_URL,
+): Record<string, string> {
   return Object.fromEntries(
     Object.entries(uiArtTokenAssetIds()).flatMap(([token, assetId]) =>
-      finalPartsOf(art, assetId).flatMap((part) => variablesOfPart(token, assetId, part)),
+      finalPartsOf(art, assetId).flatMap((part) =>
+        variablesOfPart(token, assetId, part, assetsUrl),
+      ),
     ),
   )
 }
 
-/** The variables as one `:root` rule, the sheet a composition root mounts. */
-export function uiArtStyleSheetOf(art: ArtCatalogue): string {
-  const declarations = Object.entries(uiArtCssVariablesOf(art)).map(
+/**
+ * The variables as one `:root` rule, the sheet a composition root mounts, its files under
+ * `assetsUrl` (the page's absolute URL of `UI_ASSETS_URL`, so a bundled sheet resolves them).
+ */
+export function uiArtStyleSheetOf(art: ArtCatalogue, assetsUrl: string = UI_ASSETS_URL): string {
+  const declarations = Object.entries(uiArtCssVariablesOf(art, assetsUrl)).map(
     ([name, value]) => `${name}:${value};`,
   )
   return `:root{${declarations.join('')}}`
@@ -144,14 +157,20 @@ function finalPartsOf(art: ArtCatalogue, assetId: string): readonly SidecarPart[
   return entry?.status === 'final' && sidecar !== null ? sidecar.parts : []
 }
 
-function variablesOfPart(token: string, assetId: string, part: SidecarPart): [string, string][] {
+function variablesOfPart(
+  token: string,
+  assetId: string,
+  part: SidecarPart,
+  assetsUrl: string,
+): [string, string][] {
   const name = variableNameOf(token, assetId, part.id)
   const [width, height] = part.sizeM
+  const tint = imageSetOf(assetId, part.id, '.tint', assetsUrl)
   return [
-    [name, imageSetOf(assetId, part.id, '')],
+    [name, imageSetOf(assetId, part.id, '', assetsUrl)],
     [`${name}-size`, `${width}px ${height}px`],
     ...sliceVariablesOf(name, part),
-    ...(part.tintable === true ? [[`${name}-tint`, imageSetOf(assetId, part.id, '.tint')]] : []),
+    ...(part.tintable === true ? [[`${name}-tint`, tint]] : []),
   ] as [string, string][]
 }
 
@@ -175,9 +194,9 @@ function percentOf(part: number, whole: number): string {
   return `${Number(((part / whole) * 100).toFixed(4))}%`
 }
 
-function imageSetOf(assetId: string, partId: string, mask: string): string {
+function imageSetOf(assetId: string, partId: string, mask: string, assetsUrl: string): string {
   const files = UI_PNG_SCALES.map(
-    (scale) => `url("${UI_ASSETS_URL}${assetId}/${spriteFileName(partId, mask, scale)}") ${scale}x`,
+    (scale) => `url("${assetsUrl}${assetId}/${spriteFileName(partId, mask, scale)}") ${scale}x`,
   )
   return `image-set(${files.join(', ')})`
 }

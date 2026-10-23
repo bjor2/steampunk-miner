@@ -8,6 +8,11 @@ const PIXELS_PER_NOTCH = 100
 const PIXELS_PER_LINE = 33
 const DOM_DELTA_LINE = 1
 
+/** A path relative to the page's base URL as the absolute URL the page would fetch it from. */
+export function resolveAgainstPage(path: string): string {
+  return new URL(path, document.baseURI).href
+}
+
 export function exposeOnWindow(name: string, handle: unknown): void {
   Object.defineProperty(window, name, { value: handle, configurable: true })
 }

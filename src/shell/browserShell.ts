@@ -26,6 +26,7 @@ import {
   exposeOnWindow,
   listenForKeyChanges,
   listenForScrollNotches,
+  resolveAgainstPage,
   runOnPageHide,
 } from './sharedBrowserHooks'
 import {
@@ -89,6 +90,7 @@ export function createBrowserShell(): Shell {
     readBufferedRunEvents: (runId) => eventLinesByRun.get(runId) ?? '',
     readBufferedRunCommands: (runId) => commandLinesByRun.get(runId) ?? '',
     exposeGlobalHandle: exposeOnWindow,
+    resolvePageUrl: resolveAgainstPage,
     onPageHide: runOnPageHide,
     onKeyChange: listenForKeyChanges,
     readPointer: trackCanvasPointer(),

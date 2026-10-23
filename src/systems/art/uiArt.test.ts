@@ -238,6 +238,19 @@ describe('ui art css variables', () => {
     expect(variables['--art-tab-frame-active-slice']).toBe('25% 12.5%')
   })
 
+  it('names the files under the URL the page serves them from, so a bundled sheet that consumes a variable still finds them', () => {
+    const variables = uiArtCssVariablesOf(art, 'https://play.test/game/assets/ui/')
+    expect(variables['--art-gauge-bar']).toBe(
+      'image-set(url("https://play.test/game/assets/ui/ui-gauge-bar/ui-gauge-bar.png") 1x, url("https://play.test/game/assets/ui/ui-gauge-bar/ui-gauge-bar@2x.png") 2x)',
+    )
+    expect(variables['--art-tab-frame-active-tint']).toContain(
+      'url("https://play.test/game/assets/ui/ui-frame-tab/ui-frame-tab-active.tint.png") 1x',
+    )
+    expect(uiArtStyleSheetOf(art, 'https://play.test/game/assets/ui/')).toContain(
+      '--art-gauge-bar:image-set(url("https://play.test/game/',
+    )
+  })
+
   it('writes nothing for a token whose asset is still a placeholder, so the CSS frame stays', () => {
     const variables = uiArtCssVariablesOf(art)
     expect(Object.keys(variables).filter((name) => name.startsWith('--art-gauge-dial'))).toEqual([])

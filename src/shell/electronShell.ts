@@ -10,6 +10,7 @@ import {
   exposeOnWindow,
   listenForKeyChanges,
   listenForScrollNotches,
+  resolveAgainstPage,
   runOnPageHide,
 } from './sharedBrowserHooks'
 import {
@@ -49,6 +50,7 @@ export function createElectronShell(bridge: ShellBridge): Shell {
     readBufferedRunEvents: () => '',
     readBufferedRunCommands: () => '',
     exposeGlobalHandle: exposeOnWindow,
+    resolvePageUrl: resolveAgainstPage,
     onPageHide: runOnPageHide,
     onKeyChange: listenForKeyChanges,
     readPointer: trackCanvasPointer(),
