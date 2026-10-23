@@ -1,4 +1,6 @@
 import { describe, expect, it } from 'vitest'
+import { COLLAPSE_FILL_TICKS } from '../../constants/balance'
+import { MM_PER_METRE } from '../../constants/physics'
 import { createAuthorityState } from '../authority/authorityState'
 import {
   corridorCommands,
@@ -11,6 +13,9 @@ import {
 import { coreNeededOf } from '../authority/coreBay'
 import { WORLD_SEED } from '../authority/scriptedSession'
 import { FACING } from '../vehicle/vehiclePose'
+import { botPoseAt } from './botPose'
+import { blockContaining, blockIdOf } from '../world/collapseBlock'
+import type { TilePoint } from '../world/tileGrid'
 import { faceThreats } from './botCombat'
 import { moveStraight, type BotPlanet } from './botPilot'
 import { createBotSession, type BotSession } from './botSession'
@@ -141,5 +146,93 @@ describe('bot: combat reflex between bores (ticket 418)', () => {
       expect.objectContaining({ kind: 'crawler', phase: expect.not.stringMatching(/^idle$/) }),
     )
     expect(ticksHeldFacing(session, planet)).toBe(0)
+  })
+})
+
+/** The id of the collapse block holding a tile's centre. */
+function blockIdAt(tile: TilePoint): string {
+  const { x, y } = botPoseAt(tile, FACING.right)
+  return blockIdOf(blockContaining({ xMm: x, yMm: y }))
+}
+
+/** A crawler walled off in the rock under the corridor holds the bot its full 600 ticks. */
+function holdWithWarnedBlockOverhead(session: BotSession, planet: BotPlanet): number {
+  session.submit(spawnEnemy('crawler', 1, 0, -2))
+  session.wait(NOTICE_TICKS)
+  session.submit({
+    type: 'debug.forceCollapse',
+    payload: { block: blockIdAt(planet.pilot.position) },
+  })
+  return ticksHeldFacing(session, planet)
+}
+
+/** The tiles of the pose reports sent since `fromCommand`. */
+const reportedTilesOf = (session: BotSession, fromCommand: number): TilePoint[] =>
+  session
+    .commands()
+    .slice(fromCommand)
+    .flatMap((command) =>
+      command.type === 'reportPose'
+        ? [{ tx: tileOfMm(command.payload.x), ty: tileOfMm(command.payload.y) }]
+        : [],
+    )
+
+const tileOfMm = (mm: number): number => Math.floor(mm / MM_PER_METRE)
+
+const collapseEventsOf = (session: BotSession, fromEvent: number) =>
+  session
+    .events()
+    .slice(fromEvent)
+    .filter(
+      (event) =>
+        event.type === 'CollapseStarted' ||
+        (event.type === 'VehicleDamaged' && event.source === 'collapse'),
+    )
+
+describe('bot: combat hold under a warned block (ticket 742)', () => {
+  it('steps out from under a warned block before it refills, so the refill catches nothing', () => {
+    // #724 seed 83921: a 600-tick hold under a warned, unlined block took four crushes.
+    const { session, planet } = botInCorridor()
+    const fromEvent = session.events().length
+    holdWithWarnedBlockOverhead(session, planet)
+    expect(collapseEventsOf(session, fromEvent)).toEqual([
+      expect.objectContaining({ type: 'CollapseStarted', vehiclesHit: 0 }),
+    ])
+  })
+
+  it('holds against the threat from the tile it stepped out to, for the same 600 ticks', () => {
+    const { session, planet } = botInCorridor()
+    const fromCommand = session.commands().length
+    holdWithWarnedBlockOverhead(session, planet)
+    expect([...(planet.pilot.heldTicksByEnemy?.values() ?? [])]).toEqual([600])
+    expect(reportedTilesOf(session, fromCommand)).toContainEqual(
+      expect.not.objectContaining(CORRIDOR_MIDDLE),
+    )
+  })
+
+  it('comes back to the tile it held from once the block has settled', () => {
+    const { session, planet } = botInCorridor()
+    const fromEvent = session.events().length
+    holdWithWarnedBlockOverhead(session, planet)
+    const [refill] = collapseEventsOf(session, fromEvent)
+    const lastReport = session
+      .commands()
+      .filter((command) => command.type === 'reportPose')
+      .at(-1)
+    expect(lastReport?.tick).toBeGreaterThanOrEqual(refill.tick + COLLAPSE_FILL_TICKS)
+    expect(planet.pilot.position).toEqual(CORRIDOR_MIDDLE)
+    expect(session.vehicle().pose).toMatchObject(botPoseAt(CORRIDOR_MIDDLE, planet.pilot.facing))
+  })
+
+  it('stays where it stands when no refill threatens it', () => {
+    const { session, planet } = botInCorridor()
+    session.submit(spawnEnemy('crawler', 1, 0, -2))
+    session.wait(NOTICE_TICKS)
+    const [fromCommand, fromEvent] = [session.commands().length, session.events().length]
+    expect(ticksHeldFacing(session, planet)).toBe(600)
+    expect(
+      new Set(reportedTilesOf(session, fromCommand).map((tile) => `${tile.tx},${tile.ty}`)),
+    ).toEqual(new Set([`${CORRIDOR_MIDDLE.tx},${CORRIDOR_MIDDLE.ty}`]))
+    expect(collapseEventsOf(session, fromEvent)).toEqual([])
   })
 })

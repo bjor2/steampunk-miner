@@ -7,10 +7,15 @@
  * Each enemy holds the bot for `HOLD_LIMIT_TICKS` in all (ticket 418): a crawler hunting from a
  * cave behind solid rock never reaches the drill, and with the limit counted per call it held the
  * bot 10 s on every tile cut beside it, 10 of planet 1's 34 minutes.
+ *
+ * A hold never stands under a warned block whose refill would catch the rig (ticket 742): the bot
+ * steps out within the warning, holds from there, and steps back once the block has settled
+ * (`botCollapseEscape.ts`).
  */
 import type { Enemy } from '../authority/combat/combatState'
 import { FACING, type Facing } from '../vehicle/vehiclePose'
 import { isVehicleActive } from '../vehicle/vehicleState'
+import { escapeWarnedBlocks, returnFromEscape } from './botCollapseEscape'
 import type { BotPilot } from './botPilot'
 import { reportPoseIntent } from './botPose'
 import type { BotSession } from './botSession'
@@ -23,9 +28,16 @@ const HOLD_TICKS = 12
 const HOLD_LIMIT_TICKS = 600
 
 export function faceThreats(session: BotSession, pilot: BotPilot): void {
+  const home = pilot.position
+  holdAgainstThreats(session, pilot)
+  returnFromEscape(session, pilot, home)
+}
+
+function holdAgainstThreats(session: BotSession, pilot: BotPilot): void {
   for (let held = 0; held < HOLD_LIMIT_TICKS; held += HOLD_TICKS) {
     const threat = nearestThreat(session, pilot)
     if (threat === null || !isVehicleActive(session.vehicle())) return
+    escapeWarnedBlocks(session, pilot)
     holdFacing(session, pilot, threat)
   }
 }
