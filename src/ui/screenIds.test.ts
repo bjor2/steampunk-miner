@@ -58,6 +58,9 @@ import type { PlaqueModel } from '../systems/views/plaqueModel'
 import type { SettingsModel } from '../systems/views/settingsModel'
 import { FACING } from '../systems/vehicle/vehiclePose'
 import { HudView } from './hud/HudView'
+import { DialCluster } from './hud/DialCluster'
+import { gaugeClusterPageOf } from '../systems/views/gaugeCluster'
+import { GAUGE_CLUSTER } from '../systems/views/gaugeClusterTable'
 import { ToolSlotBarView } from './toolSlots/ToolSlotBar'
 import { SlowDeviceChipView } from './hud/SlowDeviceChip'
 import { UI_IDS, type UiId } from './ids'
@@ -564,7 +567,20 @@ function renderFullHoldHud(): string[] {
     ...checkScreen(createElement(HudView, { model, isFlashing: false, density: 'compact' }), {
       [UI_IDS.hudDialOverflow]: '+1',
     }),
+    ...checkScreen(pagedDialCluster(model), { [UI_IDS.hudDialPage]: null }),
   ]
+}
+
+/** Desktop's cluster with more dials than its room, so the "+N" turns the page (ticket 767). */
+function pagedDialCluster(model: HudModel): ReactElement {
+  const probes = ['ids-probe.a', 'ids-probe.b'].map((id) => ({
+    id,
+    reads: 'hull' as const,
+    skin: 'brass',
+  }))
+  const table = { ...GAUGE_CLUSTER, dials: [...GAUGE_CLUSTER.dials, ...probes] }
+  const cluster = gaugeClusterPageOf(model, 'desktop', 0, table)
+  return createElement(DialCluster, { cluster, isFlashing: false, onTurnPage: () => undefined })
 }
 
 const CORE_TEXT = '(3 core)'

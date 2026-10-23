@@ -10,6 +10,8 @@ import {
   dialTurnDegreesOf,
   dialZoneOf,
   gaugeClusterOf,
+  gaugeClusterPageOf,
+  nextDialPageOf,
   type DialFace,
 } from './gaugeCluster'
 import {
@@ -185,5 +187,54 @@ describe('gauge cluster zones (ticket 716)', () => {
   it('never zones the depth dial, which has nothing to run out of', () => {
     const model = hudOf(createScriptedSession(), RUN_DEPTH)
     expect(dialOf(gaugeClusterOf(model, 'phone').dials, 'depth')?.zone).toBe('ok')
+  })
+})
+
+/** The table with three more dials, as a later reading kind or wagon gauge would add (HS, #767). */
+const LONG_TABLE: GaugeClusterTable = {
+  ...GAUGE_CLUSTER,
+  dials: [
+    ...GAUGE_CLUSTER.dials,
+    { id: 'hull-spare', reads: 'hull', skin: 'brass' },
+    { id: 'fuel-spare', reads: 'fuel', skin: 'brass' },
+    { id: 'cargo-spare', reads: 'cargo-chain', skin: 'brass' },
+  ],
+}
+
+describe('gauge cluster pages on desktop (ticket 767)', () => {
+  const run = () => hudOf(createScriptedSession(), RUN_DEPTH)
+
+  it('needs no page while every dial fits the strip', () => {
+    expect(gaugeClusterOf(run(), 'desktop').paging).toBeNull()
+  })
+
+  it('pages the dials past the room on desktop instead of folding them for good', () => {
+    const first = gaugeClusterPageOf(run(), 'desktop', 0, LONG_TABLE)
+    expect(idsOf(first.dials)).toEqual(['hull', 'fuel', 'cargo', 'depth', 'hull-spare'])
+    expect(first.paging).toEqual({ page: 0, pages: 1 })
+    expect(first.overflowText).toBe('+2')
+    const second = gaugeClusterPageOf(run(), 'desktop', 1, LONG_TABLE)
+    expect(idsOf(second.dials)).toEqual(['fuel-spare', 'cargo-spare'])
+    expect(second.overflowText).toBe('+5')
+  })
+
+  it('turns from the last page back to the first, and shows the first for a page gone', () => {
+    expect(nextDialPageOf({ page: 0, pages: 1 })).toBe(1)
+    expect(nextDialPageOf({ page: 1, pages: 1 })).toBe(0)
+    const gone = gaugeClusterPageOf(run(), 'desktop', 4, LONG_TABLE)
+    expect(gone.paging).toEqual({ page: 0, pages: 1 })
+    expect(idsOf(gone.dials)).toEqual(idsOf(gaugeClusterOf(run(), 'desktop', LONG_TABLE).dials))
+  })
+
+  it('keeps the phone strip as it was: no page, the rest folded into the count', () => {
+    const phone = gaugeClusterPageOf(run(), 'phone', 1, LONG_TABLE)
+    expect(phone.paging).toBeNull()
+    expect(idsOf(phone.dials)).toEqual(['hull', 'fuel', 'cargo', 'depth', 'hull-spare'])
+    expect(phone.overflowText).toBe('+2')
+  })
+
+  it('carries the buy cue of the dials off the page on the overflow cell', () => {
+    const second = gaugeClusterPageOf(run(), 'desktop', 1, LONG_TABLE)
+    expect(second.overflowCue).not.toBeNull()
   })
 })

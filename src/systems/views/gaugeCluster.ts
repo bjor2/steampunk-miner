@@ -12,7 +12,9 @@
  * count badge (HS). The depth dial is depth over R(p) with the planet's band and core marks
  * (`depthDial.ts`). Every value is read fresh from the model, so a change shows on the render
  * that brings it. Each dial also carries its per-buy cue (ticket 727, `dialBuyCue.ts`), and the
- * overflow cell the cue of the dials it folds.
+ * overflow cell the cue of the dials it folds. Where the table pages the layout (desktop, ticket
+ * 767) the overflow cell turns the strip to the next page of dials past the room and back, as the
+ * tool slot bar's tray does, so a growing list never needs a wider strip; a phone folds them.
  */
 import { hudLabelIconIdOf } from '../art/icons/iconSet'
 import { uiArtVariableOfPart } from '../art/uiArt'
@@ -77,6 +79,14 @@ export interface GaugeClusterView {
   overflowCue: BuyCueMark | null
   /** The brass and glass frame's CSS variable, null for a frame no art token names. */
   frameArt: string | null
+  /** The page the strip shows; null where the layout folds, or every dial fits (ticket 767). */
+  paging: DialPaging | null
+}
+
+/** The strip's page of dials: 0 is the first room's worth, `pages` how many pages follow it. */
+export interface DialPaging {
+  page: number
+  pages: number
 }
 
 type FaceReading = Pick<
@@ -95,22 +105,41 @@ const OF_WHOLE_CHARS = 3
 /** The depth's " km" or " m" after its digits. */
 const DEPTH_UNIT_CHARS = 3
 
+/** The strip's first page of dials. */
 export function gaugeClusterOf(
   model: HudModel,
   kind: LayoutKind,
   table: GaugeClusterTable = GAUGE_CLUSTER,
   tokens: DesignTokens = DESIGN_TOKENS,
 ): GaugeClusterView {
+  return gaugeClusterPageOf(model, kind, 0, table, tokens)
+}
+
+/** The strip turned to `page`; a page past the last one shows the first (ticket 767). */
+export function gaugeClusterPageOf(
+  model: HudModel,
+  kind: LayoutKind,
+  page: number,
+  table: GaugeClusterTable = GAUGE_CLUSTER,
+  tokens: DesignTokens = DESIGN_TOKENS,
+): GaugeClusterView {
   const faces = table.dials.flatMap((row) => faceOfRow(row, model, table, tokens))
   const room = table.room[kind][stripPlaceOf(model)]
-  const overflowCount = Math.max(0, faces.length - room)
+  const paging = dialPagingOf(faces.length, room, table.paged[kind], page)
+  const { shown, folded } = splitAtPage(faces, room, paging?.page ?? 0)
   return {
-    dials: faces.slice(0, room),
-    overflowCount,
-    overflowText: overflowCount > 0 ? `+${formatAmount(overflowCount)}` : null,
-    overflowCue: overflowCueOf(faces.slice(room), model, table),
+    dials: shown,
+    overflowCount: folded.length,
+    overflowText: folded.length > 0 ? `+${formatAmount(folded.length)}` : null,
+    overflowCue: overflowCueOf(folded, model, table),
     frameArt: uiArtVariableOfPart(table.frame),
+    paging,
   }
+}
+
+/** The page the overflow cell turns to: the next page of dials, then back to the first. */
+export function nextDialPageOf({ page, pages }: DialPaging): number {
+  return page >= pages ? 0 : page + 1
 }
 
 /** Where a needle or a mark at `permille` points, in degrees clockwise from straight up. */
@@ -163,6 +192,26 @@ function faceOfRow(
       cue: buyCueOfDials([row.id], model.upgradeCounts, table.buyCue),
     },
   ]
+}
+
+function dialPagingOf(
+  faceCount: number,
+  room: number,
+  isPaged: boolean,
+  page: number,
+): DialPaging | null {
+  const pages = Math.ceil(faceCount / room) - 1
+  if (!isPaged || pages <= 0) return null
+  return { page: page <= pages ? page : 0, pages }
+}
+
+/** The page's room of dials, and every other dial, which the overflow cell stands for. */
+function splitAtPage(faces: readonly DialFace[], room: number, page: number) {
+  const start = page * room
+  return {
+    shown: faces.slice(start, start + room),
+    folded: [...faces.slice(0, start), ...faces.slice(start + room)],
+  }
 }
 
 function overflowCueOf(

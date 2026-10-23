@@ -10,6 +10,7 @@
     "phone": { "surface": 3, "run": 5 },
     "desktop": { "surface": 5, "run": 5 }
   },
+  "paged": { "phone": false, "desktop": true },
   "zones": { "amberAtPercent": 25, "redAtPercent": 10 },
   "buyCue": {
     "notches": 12,

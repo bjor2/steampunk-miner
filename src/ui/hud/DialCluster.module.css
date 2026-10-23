@@ -281,6 +281,26 @@
   background: var(--color-parchment);
 }
 
+/* Desktop's page turner (ticket 767): the "+N" as a bare button, a hover lit like a card's. */
+.pageTurner {
+  display: flex;
+  flex: none;
+  align-items: center;
+  height: var(--dial-size);
+  padding: 0 var(--space-1);
+  border: 0;
+  border-radius: var(--radius-chip);
+  background: none;
+  font: inherit;
+  cursor: pointer;
+}
+
+@media (hover: hover) {
+  .pageTurner:hover {
+    background-color: rgb(201 162 75 / 0.12);
+  }
+}
+
 .overflow > [data-ui-text][data-layout] {
   flex-wrap: nowrap;
   gap: 0;

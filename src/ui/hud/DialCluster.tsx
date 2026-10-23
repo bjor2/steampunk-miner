@@ -6,15 +6,18 @@
  * cargo chain's badge; never a number until a hover or a tap reveals it (`useDialReveal`). Its name
  * is the shared element's title, out of sight, so assistive tech reads it. A pip on the rim, and
  * one under the "+N" for the dials it folds, steps one notch per upgrade bought (ticket 727), with
- * no ease, so it moves on the render the buy reaches. Markup only.
+ * no ease, so it moves on the render the buy reaches. On desktop, where the dials outgrow the
+ * strip, the "+N" is a button that turns it to the next page of them (ticket 767). Markup only.
  */
-import type { CSSProperties } from 'react'
+import type { CSSProperties, ReactNode } from 'react'
 import { readoutTextOf } from '../../systems/views/hudCallouts'
 import {
   dialNumberCharsMaxOf,
   dialTurnDegreesOf,
+  nextDialPageOf,
   type DialArt,
   type DialFace,
+  type DialPaging,
   type GaugeClusterView,
 } from '../../systems/views/gaugeCluster'
 import type { DialReadingKind } from '../../systems/views/gaugeClusterTable'
@@ -43,9 +46,12 @@ const NUMBER_STYLE = { '--dial-number-chars': dialNumberCharsMaxOf() } as CSSPro
 export function DialCluster({
   cluster,
   isFlashing,
+  onTurnPage,
 }: {
   cluster: GaugeClusterView
   isFlashing: boolean
+  /** Turns the strip to a page of dials (ticket 767); absent, the "+N" only counts. */
+  onTurnPage?: (page: number) => void
 }) {
   return (
     <div
@@ -57,7 +63,12 @@ export function DialCluster({
         <StripDial key={face.id} face={face} isPulsing={isFlashing} />
       ))}
       {cluster.overflowText !== null && (
-        <OverflowCount text={cluster.overflowText} cue={cluster.overflowCue} />
+        <OverflowCount
+          text={cluster.overflowText}
+          cue={cluster.overflowCue}
+          paging={cluster.paging}
+          onTurnPage={onTurnPage}
+        />
       )}
     </div>
   )
@@ -137,7 +148,24 @@ function BuyCuePip({ cue }: { cue: BuyCueMark }) {
   return <span className={styles.cue} style={turnStyleOf(cue.permille)} />
 }
 
-function OverflowCount({ text, cue }: { text: string; cue: BuyCueMark | null }) {
+function OverflowCount({
+  text,
+  cue,
+  paging,
+  onTurnPage,
+}: {
+  text: string
+  cue: BuyCueMark | null
+  paging: DialPaging | null
+  onTurnPage?: (page: number) => void
+}) {
+  if (paging !== null && onTurnPage !== undefined) {
+    return (
+      <PageTurner paging={paging} onTurn={() => onTurnPage(nextDialPageOf(paging))}>
+        <OverflowCount text={text} cue={cue} paging={null} />
+      </PageTurner>
+    )
+  }
   return (
     <span className={styles.overflow}>
       <TitleOneLine text={OVERFLOW_TEXT} level="span" layout="row" titlePlace="card">
@@ -151,6 +179,30 @@ function OverflowCount({ text, cue }: { text: string; cue: BuyCueMark | null }) 
       </TitleOneLine>
       {cue !== null && <span className={styles.overflowCue} style={slideStyleOf(cue.permille)} />}
     </span>
+  )
+}
+
+/** The "+N" as the button that turns the strip's page of dials (ticket 767). */
+function PageTurner({
+  paging,
+  onTurn,
+  children,
+}: {
+  paging: DialPaging
+  onTurn: () => void
+  children: ReactNode
+}) {
+  return (
+    <button
+      type="button"
+      className={styles.pageTurner}
+      data-testid={UI_IDS.hudDialPage}
+      data-page={paging.page}
+      data-pages={paging.pages}
+      onClick={onTurn}
+    >
+      {children}
+    </button>
   )
 }
 

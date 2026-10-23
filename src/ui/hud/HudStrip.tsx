@@ -37,6 +37,7 @@ export function HudStrip({
   model,
   isFlashing,
   statusIconsMax,
+  onTurnDials,
 }: {
   strip: Strip
   cluster: GaugeClusterView
@@ -44,6 +45,8 @@ export function HudStrip({
   isFlashing: boolean
   /** The status row's room; a phone's three when not given. */
   statusIconsMax?: number
+  /** Turns the gauge cluster's page on desktop (ticket 767). */
+  onTurnDials?: (page: number) => void
 }) {
   return (
     <div
@@ -52,7 +55,7 @@ export function HudStrip({
       data-number={strip.number.kind}
       {...hudBoxOf('strip')}
     >
-      <DialCluster cluster={cluster} isFlashing={isFlashing} />
+      <DialCluster cluster={cluster} isFlashing={isFlashing} onTurnPage={onTurnDials} />
       <StripNumberReadout number={strip.number} money={model.money} />
       {strip.nextUpgrade !== null && <UpgradeChip chip={strip.nextUpgrade} />}
       <StripStatuses model={model} isFlashing={isFlashing} chipsMax={statusIconsMax} />

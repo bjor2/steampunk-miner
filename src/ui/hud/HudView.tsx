@@ -10,8 +10,10 @@
  * so every other slot draws above it, and option B's pop badges (ticket 616) right after it. The density
  * (#500) is the layout shell's. Held upright (#486) the threats are chips leading the prompts'
  * row, and the slices' threat and prompt panels join that row instead of floating over the view.
+ * The page the gauge cluster shows is UI state here (ticket 767), as the tool tray's page is.
  */
-import { gaugeClusterOf } from '../../systems/views/gaugeCluster'
+import { useState } from 'react'
+import { gaugeClusterPageOf } from '../../systems/views/gaugeCluster'
 import { isUprightCompactHud, statusIconsMaxOf } from '../../systems/views/hudCompact'
 import type { HudModel } from '../../systems/views/hudModel'
 import { hudStripOf } from '../../systems/views/hudStrip'
@@ -58,7 +60,8 @@ export function HudView({
 }) {
   const isUpright = isUprightCompactHud(density, orientation)
   const strip = hudStripOf(model)
-  const cluster = gaugeClusterOf(model, layoutKindOf(density))
+  const [dialPage, turnDialPage] = useState(0)
+  const cluster = gaugeClusterPageOf(model, layoutKindOf(density), dialPage)
   return (
     <div className={styles.hud} data-density={density}>
       <OverlayLayer />
@@ -71,6 +74,7 @@ export function HudView({
         model={model}
         isFlashing={isFlashing}
         statusIconsMax={statusIconsMaxOf(density)}
+        onTurnDials={turnDialPage}
       />
       <GaugePanels density={density} isOverCluster={isOverTouchSurface} />
       <SlicePanels slot="banner" />

@@ -10,7 +10,9 @@
  * UI art by part id, and a part with no final, exported asset fails the load
  * (`gaugeSkinArtProblemsOf`). The per-buy cue (ticket 727) is data too: which owned counts (the six
  * tracks and the casing grade) each dial's notch sums, so every upgrade buy has one dial to move
- * (`buyCueProblemsOf`). Pure; the file is read here once.
+ * (`buyCueProblemsOf`). HS on ticket 767: the room is a starting point, not a cap, so where the
+ * layout lets the strip take a click (`paged`, desktop) the dials past the room page through the
+ * strip rather than fold away. Pure; the file is read here once.
  */
 import TABLE_FILE from '../../data/hud/gaugeCluster.json'
 import { exportedSidecarOf, manifestEntryOf, type ArtCatalogue } from '../art/artCatalogue'
@@ -65,6 +67,8 @@ export interface GaugeClusterTable {
   dials: readonly DialRow[]
   /** How many dials a strip draws before the rest fold into the overflow count. */
   room: Readonly<Record<LayoutKind, Readonly<Record<StripPlace, number>>>>
+  /** Whether the overflow cell pages the strip through the dials past the room (ticket 767). */
+  paged: Readonly<Record<LayoutKind, boolean>>
   zones: DialZones
   buyCue: DialBuyCue
   /** The nine-slice brass and glass frame the cluster sits in. */
