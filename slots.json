@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-10-23T16:48:34+02:00",
+  "updated_at": "2026-10-23T16:51:40+02:00",
   "caps": {
     "grok": 12,
     "claude": 10,
@@ -81,12 +81,11 @@
       "slots": [
         {
           "slot": "C7",
-          "state": "busy",
-          "ticket": 762,
-          "grok_slot": 1,
-          "kind": "dev",
-          "since": "2026-10-23T16:22:00+02:00",
-          "wave": null
+          "state": "free",
+          "ticket": null,
+          "grok_slot": null,
+          "kind": null,
+          "since": null
         },
         {
           "slot": "C8",
@@ -114,14 +113,14 @@
         }
       ],
       "size": 4,
-      "used": 1,
-      "free": 3,
+      "used": 0,
+      "free": 4,
       "claims_last_hour": 1,
       "name": "Claude Max 2"
     }
   ],
   "gate": {
-    "busy": 2,
+    "busy": 1,
     "max": 3
   },
   "tester": {
@@ -173,17 +172,24 @@
           753
         ],
         "since": "2026-10-23T11:22:05+02:00"
+      },
+      {
+        "feature": 762,
+        "kind": "ticket",
+        "title": "Fix red main: full suite red on 663d15e92 (src/logging/campaignPacingGate.test.ts src/logging/exactCarryOnGolden.test.ts src/logging/heatWorkUncappedGolden.test.ts src/logging/reportCapsuleOffGolden.test.ts src/features/codex/materialContactOffGolden.test.ts src/features/mining-gates/systems/botShaftJog.test.ts scripts/e2e/affectedSpecs.test.mjs)",
+        "tickets": [
+          762
+        ],
+        "since": "2026-10-23T16:49:04+02:00"
       }
     ]
   },
   "grok": [
     {
       "slot": 1,
-      "state": "dev",
-      "ticket": 762,
-      "since": "2026-10-23T16:22:00+02:00",
-      "claude_slot": 7,
-      "wave": null
+      "state": "free",
+      "ticket": null,
+      "since": null
     },
     {
       "slot": 2,
@@ -309,12 +315,11 @@
     },
     {
       "slot": 7,
-      "state": "busy",
-      "ticket": 762,
-      "grok_slot": 1,
-      "since": "2026-10-23T16:22:00+02:00",
-      "account": 2,
-      "wave": null
+      "state": "free",
+      "ticket": null,
+      "grok_slot": null,
+      "since": null,
+      "account": 2
     },
     {
       "slot": 8,
@@ -342,8 +347,8 @@
     }
   ],
   "last_refill": {
-    "at": "2026-10-23 15:29 CEST",
-    "mode": "refill-dev",
+    "at": "2026-10-23 16:51 CEST",
+    "mode": "recheck",
     "triggers": "#762",
     "started": "",
     "note": "no pickable build ticket"
@@ -351,8 +356,8 @@
   "totals": {
     "grok": {
       "size": 12,
-      "used": 1,
-      "dev": 1,
+      "used": 0,
+      "dev": 0,
       "dev_cap": 8,
       "planner": 0,
       "planner_cap": 4
@@ -360,8 +365,8 @@
     "claude": {
       "size": 10,
       "enabled": 4,
-      "used": 1,
-      "free": 3,
+      "used": 0,
+      "free": 4,
       "external": 0
     }
   },
