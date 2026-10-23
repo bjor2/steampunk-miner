@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "updated_at": "2026-10-23T10:14:55Z",
+  "updated_at": "2026-10-23T10:15:26Z",
   "entries": {
     "steampunk-loop/1": {
       "loop": "steampunk-loop",
@@ -716,9 +716,9 @@
       "slot": null,
       "state": "working",
       "issue": null,
-      "note": "nightly run on dca6099 (nightly)",
+      "note": "full run on 663d15e (pass)",
       "stale_after_min": 420,
-      "updated_at": "2026-10-22T23:45:38Z",
+      "updated_at": "2026-10-23T10:15:26Z",
       "host": "grok-bot-vm-452660841"
     },
     "steampunk-loop/10": {
