@@ -3,13 +3,15 @@
  * beside the view instead of covering it): while the docked sheet is drawn, closing included, the
  * stage narrows by the dock's width (`--sheet-docked-width` on the root, which the stage
  * subtracts) and the sheet fills the column that frees, so the canvas, the HUD and the camera
- * re-fit to the narrower view and nothing covers it. The one writer of `--sheet-docked-width`.
+ * re-fit to the narrower view and nothing covers it. The width is at most a quarter of the stage
+ * (ticket 767), refitted on a resize. The one writer of `--sheet-docked-width`.
  */
 import { useEffect } from 'react'
 import { getShell } from '../../shell/shell'
 import { BaseSheet } from './BaseSheet'
 import styles from './SheetDock.module.css'
 import { SHEET_UI_IDS } from './sheetIds'
+import { useSheetDockWidth } from './useSheetPlacement'
 
 const DOCKED_WIDTH = '--sheet-docked-width'
 
@@ -24,12 +26,13 @@ export function SheetDock() {
 }
 
 function StageNarrowing() {
-  useEffect(narrowStageWhileDrawn, [])
+  const widthPx = useSheetDockWidth()
+  useEffect(() => narrowStageWhileDrawn(widthPx), [widthPx])
   return null
 }
 
 /** Narrows the stage now; returns the call that gives the view its width back. */
-function narrowStageWhileDrawn(): () => void {
-  getShell().setScreenStyle({ [DOCKED_WIDTH]: 'var(--sheet-dock-width)' })
+function narrowStageWhileDrawn(widthPx: number): () => void {
+  getShell().setScreenStyle({ [DOCKED_WIDTH]: `${widthPx}px` })
   return () => getShell().setScreenStyle({ [DOCKED_WIDTH]: '0px' })
 }

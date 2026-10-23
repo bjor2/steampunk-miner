@@ -1,8 +1,8 @@
 /*
  * The sheet's card (ticket 686, design-system.md section 10): the baked card frame (#683) over a
  * brass hairline, the whole card one 44 px target with 14 px text at least. The line folds away
- * until a tap reveals it (`data-revealed`), a resting mouse hovers it or the keyboard focuses it;
- * the fold takes the quick duration, or none under Reduce Motion (`--sheet-fold`, the sheet's).
+ * until a tap reveals it (`data-revealed`), a resting mouse hovers it or the keyboard focuses it,
+ * and stays open in the desktop dock (ticket 767); the fold takes the quick duration, or none under Reduce Motion (`--sheet-fold`, the sheet's).
  */
 .card {
   display: block;
@@ -87,8 +87,13 @@
   line-height: var(--line-height);
 }
 
+/*
+ * Docked beside the view at 1280 px and up (ticket 767), every card shows its line: the column has
+ * the room, and a hover then moves nothing.
+ */
 .card[data-revealed] .reveal,
-.card:focus-visible .reveal {
+.card:focus-visible .reveal,
+:global([data-placement='docked']) .reveal {
   grid-template-rows: 1fr;
   opacity: 1;
   transition-timing-function: var(--ease-enter);

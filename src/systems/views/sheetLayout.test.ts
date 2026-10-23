@@ -1,6 +1,11 @@
 import { describe, expect, it } from 'vitest'
 import { DESIGN_TOKENS } from './designSystem'
-import { sheetPlacementOf, sheetTabBarOf, sheetTransitionOf } from './sheetLayout'
+import {
+  sheetDockWidthOf,
+  sheetPlacementOf,
+  sheetTabBarOf,
+  sheetTransitionOf,
+} from './sheetLayout'
 
 // The shared sheet (spec #678, ticket 686): full screen on a phone, docked beside the view on
 // desktop (GD lock, 21 Oct), a 200 ms shutter that fades under Reduce Motion, about 8 tabs before
@@ -19,10 +24,31 @@ describe('sheet placement', () => {
     expect(sheetPlacementOf('desktop', 1440)).toBe('docked')
   })
 
-  it('covers a desktop window too narrow to keep the view beside the dock', () => {
-    const { widthPx, minViewPx } = DESIGN_TOKENS.layout.sheetDock
-    expect(sheetPlacementOf('desktop', widthPx + minViewPx)).toBe('docked')
-    expect(sheetPlacementOf('desktop', widthPx + minViewPx - 1)).toBe('full')
+  it('docks from 1280 px up and covers a narrower desktop window (ticket 767)', () => {
+    const { minScreenPx } = DESIGN_TOKENS.layout.sheetDock
+    expect(minScreenPx).toBe(1280)
+    expect(sheetPlacementOf('desktop', 1920)).toBe('docked')
+    expect(sheetPlacementOf('desktop', 2560)).toBe('docked')
+    expect(sheetPlacementOf('desktop', minScreenPx - 1)).toBe('full')
+    expect(sheetPlacementOf('desktop', 1040)).toBe('full')
+  })
+})
+
+describe('sheet dock width (ticket 767)', () => {
+  it('takes at most a quarter of the play area at every desktop width', () => {
+    for (const width of [1280, 1366, 1440, 1600, 1920, 2560, 3840]) {
+      expect(sheetDockWidthOf(width)).toBeLessThanOrEqual(width / 4)
+    }
+  })
+
+  it('narrows to a quarter where the full dock would cover more', () => {
+    expect(sheetDockWidthOf(1280)).toBe(320)
+    expect(sheetDockWidthOf(1440)).toBe(360)
+  })
+
+  it('keeps the full dock width on wide screens, spending the rest on the view', () => {
+    expect(sheetDockWidthOf(1920)).toBe(DESIGN_TOKENS.layout.sheetDock.widthPx)
+    expect(sheetDockWidthOf(2560)).toBe(DESIGN_TOKENS.layout.sheetDock.widthPx)
   })
 })
 

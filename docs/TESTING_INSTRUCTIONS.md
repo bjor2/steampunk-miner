@@ -1564,7 +1564,8 @@ incomePerHour}` go to `balance-report/drill-pace.ndjson`, which `pushTestMetrics
   `ui.getSheet()` reads the tab, placement and revealed card and `features.example.getActedCard()`
   the card whose act ran. `e2e/browser/ui/sheet.spec.ts` runs the four cells: a phone's first tap
   reveals and the second acts with Close and the tabs out of the top 15%; desktop docks, narrowing
-  the stage by `layout.sheetDock.widthPx`, and widens it again on Close; Escape closes it
+  the stage by `ui.getSheet().dockWidthPx` (at most a quarter of it, ticket 767), and widens it
+  again on Close; Escape closes it
   everywhere. The screenshot suite shoots it as `base-sheet`. Box Tester only.
 - **Warning layer** (ticket 685, spec #678): the ladder is pure (`systems/views/warningWatch.ts`:
   each tier fires once on the way in and re-arms 5% above it, the deepest of several at once rings

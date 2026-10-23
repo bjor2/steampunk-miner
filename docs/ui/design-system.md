@@ -383,9 +383,11 @@ data: a slice registers a `sheetTab` (`ui/registries/sheetTabs.ts`: id, a title 
 fewer, refused at the seal past `copy.titleWordsMax`, an order, `isShownOn(state)` and its
 content), named from the vocabulary below where it has a place. On a phone (`sheetPlacementOf`) it
 fills the stage and rises from the foot, its tab bar and Close at the foot in the thumb zone, so
-nothing in the top keep-out takes a tap. On desktop it docks in a `layout.sheetDock.widthPx` (400)
-column at the right and the stage narrows by it, as long as the view keeps
-`layout.sheetDock.minViewPx` (640) beside it; a narrower desktop window takes the full sheet. A
+nothing in the top keep-out takes a tap. On desktop from `layout.sheetDock.minScreenPx` (1280) up
+it docks in a column at the right and the stage narrows by it; the column is
+`layout.sheetDock.widthPx` (400) held to `maxSharePercent` (25%) of the stage (`sheetDockWidthOf`:
+320 px at 1280, 360 at 1440, 400 from 1600), and every docked card shows its line (ticket 767). A
+narrower desktop window takes the full sheet. A
 lone tab hides the bar; past what fits, the bar scrolls sideways in the shared scroll area
 (`axis="x"`). The card (`kit/SheetCard.tsx`) is one 44 px button: the title (`type.title`), an
 optional icon and figure, and the line (`type.body`) folded until a finger's first tap reveals it
@@ -779,7 +781,8 @@ Generated from `designTokens.json`; a row is the token's path and its value. The
 | `layout.toolSlots.cooldownRingPx`                     | 3                       |
 | `layout.tabsMax`                                      | 8                       |
 | `layout.sheetDock.widthPx`                            | 400                     |
-| `layout.sheetDock.minViewPx`                          | 640                     |
+| `layout.sheetDock.minScreenPx`                        | 1280                    |
+| `layout.sheetDock.maxSharePercent`                    | 25                      |
 | `layout.coverageMaxPercent.phone`                     | 12                      |
 | `layout.coverageMaxPercent.desktop`                   | 8                       |
 | `layout.mockups.phone`                                | width 360 · height 640  |

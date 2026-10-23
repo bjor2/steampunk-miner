@@ -7,7 +7,11 @@ import { readShownSheetTabIds } from '../store/screenReads'
 import { useGameStore } from '../store/gameStore'
 import { sheetTabShownOf } from '../store/sheetSlice'
 import { layoutKindOf } from '../systems/views/designSystem'
-import { sheetPlacementOf, type SheetPlacement } from '../systems/views/sheetLayout'
+import {
+  sheetDockWidthOf,
+  sheetPlacementOf,
+  type SheetPlacement,
+} from '../systems/views/sheetLayout'
 import { sheetTabIdProblems } from '../ui/registries/sheetTabs'
 import { readFittedScreen } from '../ui/stage/screenFit'
 import type { DebugResult } from './debugScreens'
@@ -19,6 +23,8 @@ export interface SheetReading {
   shownTabIds: string[]
   /** Where the sheet sits on this screen; null before the first fit. */
   placement: SheetPlacement | null
+  /** The dock's width in CSS px while the sheet docks (ticket 767); null when it does not. */
+  dockWidthPx: number | null
   revealedCardId: string | null
   /** A full sheet is out of the way for the unlock reveal (ticket 718), its tab kept. */
   isSteppedAside: boolean
@@ -46,6 +52,7 @@ export function sheetNow(): DebugResult<{ sheet: SheetReading }> {
       openTabId: sheetTabShownOf(game),
       shownTabIds: readShownSheetTabIds(),
       placement: placementNow(),
+      dockWidthPx: dockWidthNow(),
       revealedCardId: game.revealedSheetCardId,
       isSteppedAside: game.isSheetSteppedAside,
       isBayMenu: game.isSheetTheBayMenu,
@@ -57,4 +64,10 @@ function placementNow(): SheetPlacement | null {
   const fitted = readFittedScreen()
   if (fitted === null) return null
   return sheetPlacementOf(layoutKindOf(fitted.hudDensity), fitted.stage.width)
+}
+
+function dockWidthNow(): number | null {
+  const fitted = readFittedScreen()
+  if (fitted === null || placementNow() !== 'docked') return null
+  return sheetDockWidthOf(fitted.stage.width)
 }

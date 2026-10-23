@@ -178,7 +178,7 @@
       "cooldownRingPx": 3
     },
     "tabsMax": 8,
-    "sheetDock": { "widthPx": 400, "minViewPx": 640 },
+    "sheetDock": { "widthPx": 400, "minScreenPx": 1280, "maxSharePercent": 25 },
     "coverageMaxPercent": { "phone": 12, "desktop": 8 },
     "mockups": [
       { "name": "phone", "width": 360, "height": 640 },

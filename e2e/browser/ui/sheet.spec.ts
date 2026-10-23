@@ -72,7 +72,8 @@ for (const cell of UI_SHOT_CELLS) {
         const wide = await boxOf(page, `[data-testid="${DEVICE_UI_IDS.gameStage}"]`)
         await openBaseSheet(page)
         const narrow = await boxOf(page, `[data-testid="${DEVICE_UI_IDS.gameStage}"]`)
-        const dockWidth = DESIGN_TOKENS.layout.sheetDock.widthPx
+        const dockWidth = (await readSheet(page)).dockWidthPx!
+        expect(dockWidth).toBeLessThanOrEqual(wide.width / 4)
         expect(Math.abs(wide.width - narrow.width - dockWidth)).toBeLessThanOrEqual(SLACK_PX)
         const sheet = await boxOf(page, `[data-testid="${SHEET_UI_IDS.baseSheet}"]`)
         expect(sheet.x).toBeGreaterThanOrEqual(narrow.x + narrow.width - SLACK_PX)

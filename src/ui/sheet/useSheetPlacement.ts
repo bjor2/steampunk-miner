@@ -1,15 +1,25 @@
 /**
  * Where the base sheet sits on this screen (ticket 686): full on the phone layout, docked on a
- * desktop stage wide enough to keep the view beside it (`sheetPlacementOf`). Read from the layout
- * the shell last fitted, so the sheet switches with the same breakpoint as the HUD and the tokens.
+ * desktop stage wide enough to keep the view beside it (`sheetPlacementOf`), and how wide the dock
+ * is there (`sheetDockWidthOf`, ticket 767). Read from the layout the shell last fitted, so the
+ * sheet switches with the same breakpoint as the HUD and the tokens.
  */
 import { useSyncExternalStore } from 'react'
 import { layoutKindOf } from '../../systems/views/designSystem'
-import { sheetPlacementOf, type SheetPlacement } from '../../systems/views/sheetLayout'
+import {
+  sheetDockWidthOf,
+  sheetPlacementOf,
+  type SheetPlacement,
+} from '../../systems/views/sheetLayout'
 import { readFittedScreen, subscribeFittedScreen } from '../stage/screenFit'
 
 export function useSheetPlacement(): SheetPlacement {
   return useSyncExternalStore(subscribeFittedScreen, readSheetPlacement, readFullPlacement)
+}
+
+/** The docked sheet's width in CSS px on the stage last fitted; 0 before the first fit. */
+export function useSheetDockWidth(): number {
+  return useSyncExternalStore(subscribeFittedScreen, readSheetDockWidth, readNoDockWidth)
 }
 
 /** Before the first fit, and on a server render, the sheet covers the stage. */
@@ -21,4 +31,13 @@ function readSheetPlacement(): SheetPlacement {
 
 function readFullPlacement(): SheetPlacement {
   return 'full'
+}
+
+function readSheetDockWidth(): number {
+  const fitted = readFittedScreen()
+  return fitted === null ? 0 : sheetDockWidthOf(fitted.stage.width)
+}
+
+function readNoDockWidth(): number {
+  return 0
 }
