@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-10-23T22:41:21+02:00",
+  "updated_at": "2026-10-23T22:41:39+02:00",
   "caps": {
     "grok": 12,
     "claude": 10,
@@ -326,11 +326,11 @@
     }
   ],
   "last_refill": {
-    "at": "2026-10-23 22:23 CEST",
+    "at": "2026-10-23 22:41 CEST",
     "mode": "refill-dev",
-    "triggers": "#756",
+    "triggers": "#746",
     "started": "",
-    "note": "no pickable build ticket"
+    "note": "load guard (MemAvailable 2161 MB < 3072 MB)"
   },
   "totals": {
     "grok": {
@@ -467,7 +467,7 @@
         "map": 647,
         "lane": "remote",
         "mode": "solo",
-        "state": "running",
+        "state": "paused",
         "tickets": [
           713,
           741,
