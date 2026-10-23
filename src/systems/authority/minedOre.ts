@@ -9,14 +9,27 @@
  *
  * `saleTier` is the tier the unit is kept and sold at (#232): a signature's is one up. It stays off
  * `CargoAdded`, whose `resourceTier` is the cell's own. So does `band`, the band of the cell's tile,
- * which the ore pickup seam reads (ticket 509).
+ * which the ore pickup seam reads (ticket 509). A gem kind's unit is kept at the gem's own tier
+ * (ticket 713), read from the cell's kind slot by `oreTypeOfCell`.
  */
 import { oreTier } from '../economy/oreEconomy'
 import { bandOfTile, depthTilesAt } from '../world/planetGeometry'
 import type { PlanetParams } from '../world/planetParams'
-import { oreCargoTagsOf, oreTypeOf, saleTierOf, type OreCargoTags } from '../registries/oreTypes'
+import {
+  oreCargoTagsOf,
+  oreTypeOf,
+  saleTierOf,
+  withGemTag,
+  type OreCargoTags,
+  type OreType,
+} from '../registries/oreTypes'
 import { chunkKey, chunkOfTile, type TilePoint } from '../world/tileGrid'
-import { familyOfCell, MAX_ORE_TIER_OFFSET, tierOffsetOfCell } from '../world/worldCell'
+import {
+  familyOfCell,
+  kindSlotOfCell,
+  MAX_ORE_TIER_OFFSET,
+  tierOffsetOfCell,
+} from '../world/worldCell'
 
 const BAND_ONE = 1
 
@@ -33,10 +46,9 @@ export interface MinedOre extends OreCargoTags {
 }
 
 export function minedOreOf(params: PlanetParams, tile: TilePoint, cell: number): MinedOre {
-  const resourceTier = resourceTierOf(params, cell)
-  const ore = oreTypeOf({ tier: resourceTier, cellFamily: familyOfCell(cell) })
+  const ore = oreTypeOfCell(params, cell)
   return {
-    resourceTier,
+    resourceTier: ore.tier,
     saleTier: saleTierOf(ore),
     band: bandOfTile(params, tile.tx, tile.ty),
     oreId: ore.id,
@@ -44,6 +56,15 @@ export function minedOreOf(params: PlanetParams, tile: TilePoint, cell: number):
     depthTiles: depthTilesAt(params, tile.tx, tile.ty),
     chunk: chunkKey(chunkOfTile(tile.tx), chunkOfTile(tile.ty)),
   }
+}
+
+/**
+ * The ore an ore cell holds, as it is kept and sold: `oreTypeOf` its tier and family, with the gem
+ * tags folded over its kind slot (ticket 713).
+ */
+export function oreTypeOfCell(params: PlanetParams, cell: number): OreType {
+  const ore = oreTypeOf({ tier: resourceTierOf(params, cell), cellFamily: familyOfCell(cell) })
+  return withGemTag(ore, params, kindSlotOfCell(cell))
 }
 
 /**

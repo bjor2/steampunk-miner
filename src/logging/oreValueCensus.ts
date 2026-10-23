@@ -4,12 +4,13 @@
  * band the solid non-core cells beside the ore in them. It reads the seed and the version only,
  * never a bot run, so one seed and build always count the same pool. Base price is the list price
  * a unit of the cell's ore sells at (`oreSalePrice` of its sale tier, a signature one tier up),
- * before any assay lift; a cell mines one unit.
+ * before any assay lift; a cell mines one unit. A gem kind's cell sells at the gem's own tier
+ * (ticket 713), so the census values the gems the 15% cap on #713 judges.
  */
-import { resourceTierOf } from '../systems/authority/minedOre'
+import { oreTypeOfCell } from '../systems/authority/minedOre'
 import { oreSalePrice } from '../systems/economy/oreEconomy'
 import { add, fromSafeInteger, mul, ZERO_MONEY, type Money } from '../systems/money'
-import { oreTypeOf, saleTierOf } from '../systems/registries/oreTypes'
+import { saleTierOf } from '../systems/registries/oreTypes'
 import { generateChunkCells } from '../systems/world/generateChunk'
 import { bandOfTile } from '../systems/world/planetGeometry'
 import type { PlanetParams } from '../systems/world/planetParams'
@@ -19,7 +20,7 @@ import {
   chunkRangeOfDisc,
   firstTileOfChunk,
 } from '../systems/world/tileGrid'
-import { CELL_KIND, familyOfCell, isSolidCell, kindOfCell } from '../systems/world/worldCell'
+import { CELL_KIND, isSolidCell, kindOfCell } from '../systems/world/worldCell'
 
 /** Bands 1 to 5 hold ore (#6 section 1). */
 export const ORE_BANDS = [1, 2, 3, 4, 5] as const
@@ -106,9 +107,7 @@ function countBandCell(band: BandCount | undefined, params: PlanetParams, cell: 
 }
 
 function saleTierOfCell(params: PlanetParams, cell: number): number {
-  return saleTierOf(
-    oreTypeOf({ tier: resourceTierOf(params, cell), cellFamily: familyOfCell(cell) }),
-  )
+  return saleTierOf(oreTypeOfCell(params, cell))
 }
 
 export function censusOfCounts(count: OreCount): PlanetOreCensus {

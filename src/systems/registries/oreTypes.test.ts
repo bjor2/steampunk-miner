@@ -1,7 +1,9 @@
 import { describe, expect, it } from 'vitest'
+import { planetParamsFor, type PlanetParams } from '../world/planetParams'
 import { RESOURCE_FAMILY } from '../world/worldCell'
 import {
   KERNEL_ORE_INDEX_TAG,
+  ORE_GEM_REGISTRY,
   ORE_SIGNATURE_REGISTRY,
   ORE_TYPE_REGISTRY,
   oreBitIndexOf,
@@ -9,6 +11,7 @@ import {
   oreTypeCatalogue,
   oreTypeOf,
   saleTierOf,
+  withGemTag,
   type OreType,
 } from './oreTypes'
 import { addToRegistry, withFreshRegistrySet } from './seal'
@@ -144,5 +147,42 @@ describe('signature tags (#232)', () => {
     expect(withFreshRegistrySet(registerCopperAsSignature, oreTypeCatalogue)).toEqual([
       { ...copperOre, signature: true, saleTier: 4 },
     ])
+  })
+})
+
+function registerGemTag(
+  id: string,
+  gemSaleTierOf: (_: PlanetParams, kindSlot: number) => number | null,
+) {
+  addToRegistry(ORE_GEM_REGISTRY, 'roster', { id, gemSaleTierOf })
+}
+
+function registerKindThirteenAsGem(): void {
+  registerGemTag('roster.none', () => null)
+  registerGemTag('roster.gems', (_, kindSlot) => (kindSlot === 13 ? 12 : null))
+}
+
+describe('gem tags (ticket 713)', () => {
+  const params = planetParamsFor(83921, 1)
+
+  it('leaves the ore untouched when no tag is registered', () => {
+    const ore = withFreshRegistrySet(nothing, () => withGemTag(copperOre, params, 13))
+    expect(ore).toBe(copperOre)
+    expect(saleTierOf(ore)).toBe(3)
+  })
+
+  it("makes a gem kind's ore sell at the gem's tier, keeping its own tier, id and look", () => {
+    const ore = withFreshRegistrySet(registerKindThirteenAsGem, () =>
+      withGemTag(copperOre, params, 13),
+    )
+    expect(ore).toEqual({ ...copperOre, gem: true, saleTier: 12 })
+    expect(saleTierOf(ore)).toBe(12)
+  })
+
+  it('leaves an ore of a kind no tag names as it is', () => {
+    const ore = withFreshRegistrySet(registerKindThirteenAsGem, () =>
+      withGemTag(copperOre, params, 12),
+    )
+    expect(ore).toBe(copperOre)
   })
 })

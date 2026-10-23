@@ -59,7 +59,7 @@ import type { HazardPocketsProvider } from '../systems/registries/hazardPockets'
 import type { PlanetSkyBandProvider } from '../systems/registries/planetSkyBand'
 import type { ShockShield } from '../systems/registries/shockShields'
 import type { OreDrillClassProvider } from '../systems/registries/oreDrillClasses'
-import type { OreSignatureTag, OreTypeProvider } from '../systems/registries/oreTypes'
+import type { OreGemTag, OreSignatureTag, OreTypeProvider } from '../systems/registries/oreTypes'
 import type { PartMotionRequestSource } from '../systems/registries/partMotionRequests'
 import type { VehicleLookSource } from '../systems/registries/vehicleLooks'
 import type { SaveSection } from '../systems/registries/saveSections'
@@ -98,6 +98,8 @@ export interface SliceRegistrar {
   oreTypes(provider: OreTypeProvider): void
   /** Folded over every ore the provider answers: a yes makes it a signature (#232). */
   oreSignature(tag: OreSignatureTag): void
+  /** Folded over a cell's ore by its kind slot: a sale tier makes it a gem (ticket 713). */
+  oreGem(tag: OreGemTag): void
   /** One provider across all slices: the drill class of an ore cell (#236, dense or signature). */
   oreDrillClass(provider: OreDrillClassProvider): void
   gateCheck(check: GateCheck): void

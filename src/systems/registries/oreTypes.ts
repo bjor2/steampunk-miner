@@ -15,6 +15,12 @@
  * (#141) is a pure function of an ore's family and tier that only the planet mix knows, so the one
  * provider never has to. A tagged ore is `signature` and sells `signatureValueLead` tiers up
  * (`saleTier`); its tier, and so its id, bit and look, stay the provider's.
+ *
+ * Gem tags fold over a cell's ore (ticket 713, Systems' decision on #713 with the TD's
+ * signature-tier pattern): a gem is a material kind, so only the planet and the kind slot a cell
+ * stores can say which one it is. A tagged ore is `gem` and sells at the gem's own integer tier
+ * (`saleTier`); its tier, and so its hardness, id, bit and look, stay the cell's. Cargo stays keyed by
+ * sale tier, so the hold, the Sell bay and every save keep their shapes.
  */
 import { signatureSaleTier } from '../economy/oreEconomy'
 import type { PlanetParams } from '../world/planetParams'
@@ -46,12 +52,24 @@ export interface OreType {
    * absent, the ore sells at `tier`. Hardness and dig time never read it.
    */
   saleTier?: number
+  /** A gem kind's ore (ticket 713); set only by a gem tag, with the gem's own `saleTier`. */
+  gem?: boolean
 }
 
 /** Folded over every provider answer in id order; any tag that answers yes makes it a signature. */
 export interface OreSignatureTag {
   id: string
   isSignature(ore: OreType): boolean
+}
+
+/**
+ * Folded over a cell's ore in id order (ticket 713): the first tag that names a sale tier for the
+ * cell's kind slot makes the ore a gem.
+ */
+export interface OreGemTag {
+  id: string
+  /** The tier a unit of the kind sells at when the kind is a gem on the planet; null otherwise. */
+  gemSaleTierOf(params: PlanetParams, kindSlot: number): number | null
 }
 
 /** What `CargoAdded` names beside the ore id (#223). */
@@ -77,6 +95,8 @@ export const ORE_TYPE_REGISTRY = defineOneProviderRegistry<OreTypeProvider>('ore
 
 export const ORE_SIGNATURE_REGISTRY = defineRegistry<OreSignatureTag>('oreSignatures')
 
+export const ORE_GEM_REGISTRY = defineRegistry<OreGemTag>('oreGems')
+
 /** #140's largest rarity lead, the kernel default's answer for the top lead of any planet. */
 export const KERNEL_TOP_LEAD = 2
 
@@ -98,6 +118,15 @@ export function oreTypeOf(query: OreQuery): OreType {
 /** Whether any slice registered a signature tag: with none, no ore is a signature. */
 export function hasOreSignatureTags(): boolean {
   return entriesOf(ORE_SIGNATURE_REGISTRY).length > 0
+}
+
+/**
+ * The ore with the gem tags folded over it for a cell of the planet holding `kindSlot`: the ore
+ * itself when no tag names a gem, so a run with no gem tag sees what it saw before.
+ */
+export function withGemTag(ore: OreType, params: PlanetParams, kindSlot: number): OreType {
+  const saleTier = gemSaleTierOf(params, kindSlot)
+  return saleTier === null ? ore : { ...ore, gem: true, saleTier }
 }
 
 /** The tier the ore's cargo is kept and sold at: its `saleTier`, else its own (#232). */
@@ -148,6 +177,14 @@ function providedOreTypeOf(query: OreQuery): OreType {
 function withSignatureTag(ore: OreType): OreType {
   if (!isClaimedAsSignature(ore)) return ore
   return { ...ore, signature: true, saleTier: signatureSaleTier(ore.tier) }
+}
+
+function gemSaleTierOf(params: PlanetParams, kindSlot: number): number | null {
+  for (const tag of entriesOf(ORE_GEM_REGISTRY)) {
+    const saleTier = tag.gemSaleTierOf(params, kindSlot)
+    if (saleTier !== null) return saleTier
+  }
+  return null
 }
 
 function isClaimedAsSignature(ore: OreType): boolean {

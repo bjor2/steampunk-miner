@@ -83,7 +83,11 @@ import { ITEM_DESCRIPTION_ENTRY_REGISTRY } from '../systems/registries/itemDescr
 import { ORE_LOOK_REGISTRY } from '../systems/registries/oreLook'
 import { ORE_PICKUP_REGISTRY } from '../systems/registries/orePickup'
 import { ORE_DRILL_CLASS_REGISTRY } from '../systems/registries/oreDrillClasses'
-import { ORE_SIGNATURE_REGISTRY, ORE_TYPE_REGISTRY } from '../systems/registries/oreTypes'
+import {
+  ORE_GEM_REGISTRY,
+  ORE_SIGNATURE_REGISTRY,
+  ORE_TYPE_REGISTRY,
+} from '../systems/registries/oreTypes'
 import { PART_MOTION_REQUEST_REGISTRY } from '../systems/registries/partMotionRequests'
 import { VEHICLE_LOOK_REGISTRY } from '../systems/registries/vehicleLooks'
 import { SAVE_SECTION_REGISTRY, type SaveSection } from '../systems/registries/saveSections'
@@ -129,6 +133,7 @@ export function registrarFor(sliceId: string): SliceRegistrar {
       entries.forEach((entry) => addContent(sliceId, contentRegistrationOf(kind, entry))),
     oreTypes: (provider) => add(ORE_TYPE_REGISTRY, provider),
     oreSignature: (tag) => add(ORE_SIGNATURE_REGISTRY, tag),
+    oreGem: (tag) => add(ORE_GEM_REGISTRY, tag),
     oreDrillClass: (provider) => add(ORE_DRILL_CLASS_REGISTRY, provider),
     gateCheck: (check) => add(GATE_CHECK_REGISTRY, check),
     blastEffect: (effect) => add(BLAST_EFFECT_REGISTRY, effect),

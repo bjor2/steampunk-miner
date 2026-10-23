@@ -24,18 +24,18 @@ import type { EnemyKind } from '../economy/economyDefinition'
 import { oreSalePrice } from '../economy/oreEconomy'
 import { cmp, type Money } from '../money'
 import { gateVerdictOf, type GateQuery } from '../registries/gateChecks'
-import { oreTypeOf, saleTierOf } from '../registries/oreTypes'
+import { saleTierOf } from '../registries/oreTypes'
 import type { VehiclePose } from '../vehicle/vehiclePose'
 import { isCellLined } from '../world/casingLining'
 import { cellDensitySum } from '../world/cellYield'
 import type { PlanetParams } from '../world/planetParams'
 import { tilesWithin } from '../world/tileDisc'
 import type { TilePoint } from '../world/tileGrid'
-import { CELL_KIND, familyOfCell, kindOfCell } from '../world/worldCell'
+import { CELL_KIND, kindOfCell } from '../world/worldCell'
 import { cellAt } from '../world/worldState'
 import type { AuthorityState } from './authorityState'
 import type { Enemy } from './combat/combatState'
-import { resourceTierOf } from './minedOre'
+import { oreTypeOfCell } from './minedOre'
 import { planetParamsOf } from './planetOfState'
 
 export { dustTrailWarningsOf, type DustTrailWarning } from './combat/dustTrail'
@@ -198,7 +198,7 @@ function draggableOreOf(
 ): DraggableOre | null {
   const cell = cellAt(state.world, params, tile)
   if (!isLooseOreCell(state, params, tile, cell)) return null
-  const ore = oreTypeOf({ tier: resourceTierOf(params, cell), cellFamily: familyOfCell(cell) })
+  const ore = oreTypeOfCell(params, cell)
   const { playerId, tool } = asker
   if (isHeldByGate({ state, playerId, tile, cell, ore, blast: null, tool })) return null
   return { saleValue: oreSalePrice(saleTierOf(ore)) }
