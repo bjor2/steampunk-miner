@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-10-23T23:21:34+02:00",
+  "updated_at": "2026-10-23T23:22:19+02:00",
   "caps": {
     "grok": 12,
     "claude": 10,
@@ -322,11 +322,11 @@
     }
   ],
   "last_refill": {
-    "at": "2026-10-23 23:19 CEST",
+    "at": "2026-10-23 23:22 CEST",
     "mode": "refill-dev",
-    "triggers": "#662 #769",
-    "started": "#733->C7/A2",
-    "note": "spawned 1 worker(s)"
+    "triggers": "#733",
+    "started": "",
+    "note": "no pickable build ticket"
   },
   "totals": {
     "grok": {
@@ -511,7 +511,7 @@
         "map": 308,
         "lane": "remote",
         "mode": "solo",
-        "state": "running",
+        "state": "paused",
         "tickets": [
           662,
           663,
