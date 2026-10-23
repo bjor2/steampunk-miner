@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-10-24T01:18:56+02:00",
+  "updated_at": "2026-10-24T01:49:26+02:00",
   "caps": {
     "grok": 12,
     "claude": 10,
@@ -122,7 +122,7 @@
     }
   ],
   "gate": {
-    "busy": 1,
+    "busy": 2,
     "max": 3
   },
   "tester": {
@@ -341,6 +341,19 @@
     "parallel": 1,
     "list": [
       {
+        "number": 788,
+        "key": "647-6F",
+        "map": 647,
+        "lane": "remote",
+        "mode": "solo",
+        "state": "ready",
+        "tickets": [
+          787
+        ],
+        "done": [],
+        "live": 0
+      },
+      {
         "number": 784,
         "key": "774-2B",
         "map": 774,
@@ -405,7 +418,7 @@
       },
       {
         "number": 766,
-        "key": "647-6D",
+        "key": "647-6G",
         "map": 647,
         "lane": "hitl",
         "mode": "bench",
