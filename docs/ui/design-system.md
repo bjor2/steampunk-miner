@@ -346,6 +346,20 @@ share and is not a HUD box.
 A docked sheet on desktop (#686) narrows the stage instead of covering it, so it is outside the
 coverage budget; its hover detail replaces the phone's tap-to-reveal.
 
+**The desktop shell (#767, GD lock 23 Oct).** From 1280 px up the sheet docks in at most 25% of
+the play area (`sheetDockWidthOf`, section 10) with every card's line shown. The camera spends the
+spare width on the look-ahead: across a desktop screen the lean reaches `f` of the half width
+instead of the half height (`leanReachOf`, `systems/render/speedFraming.ts`), a drive down the
+screen leans as before, and the 1 s warning across it holds wherever it holds down it. Lists that
+grow page or scroll, never a fixed grid: the tool slots page through the tray (#691), the gauge
+cluster's "+N" turns the strip to the next page of dials where the cluster table pages the layout
+(`paged.desktop`; a phone folds them), and the sheets, the receipt and the tab bar scroll in the
+shared scroll area. The strip keeps two wells, out of sight until the star map's fuel state (#755)
+fills them: the fuel tank's dial and the fuel cost's figure at the formatter's widest
+(`desktopStripSlotsOf`). The depth takes the tile readout's cool #724 tint while gravity holds the
+descent. A wide HUD adds space, not digits (VS): no readout rule changes, and the phone layout is
+untouched.
+
 ## 10. Component inventory
 
 Existing parts keep their contracts (texts and `data-*` hooks, never markup, #423). New parts are

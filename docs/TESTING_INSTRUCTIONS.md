@@ -1567,6 +1567,17 @@ incomePerHour}` go to `balance-report/drill-pace.ndjson`, which `pushTestMetrics
   the stage by `ui.getSheet().dockWidthPx` (at most a quarter of it, ticket 767), and widens it
   again on Close; Escape closes it
   everywhere. The screenshot suite shoots it as `base-sheet`. Box Tester only.
+- **Desktop layout shell** (ticket 767, spec #678): the rules are pure and unit-tested:
+  `sheetLayout.test.ts` (docks from 1280 px, at most a quarter of the stage), `speedFraming.test.ts`
+  (desktop's lean reach, the 1 s warning across 1280x720 to 2560x1440 at 30 and 144 frames a
+  second), `gaugeCluster.test.ts` (desktop pages the dials, a phone folds them) and
+  `desktopStripSlots.test.ts` (the fuel wells and the gravity tint; none on a phone), with the
+  views in `hudStripView.test.ts`. `e2e/browser/ui/desktopShell.spec.ts` runs 1280x720, 1280x800,
+  1920x1080 and 2560x1440: the dock's share and its unhovered card lines, `ui.getCameraView()`'s
+  `leanReach`, the fuel wells, and the strip held (same box, nothing spilled, money at 6 characters
+  at most) through the 0 to 1e300 money sweep, every track at levels 1, 99, 9999 and 1e6 with the
+  Outfitter docked and clean, and P40. The UI screenshot suite gained a 1920x1080 cell. Box Tester
+  only.
 - **Warning layer** (ticket 685, spec #678): the ladder is pure (`systems/views/warningWatch.ts`:
   each tier fires once on the way in and re-arms 5% above it, the deepest of several at once rings
   alone, the glow holds the deepest tier now), fed from the HUD's readings through the store's

@@ -844,6 +844,25 @@
       ]
     },
     {
+      "why": "The desktop layout shell (ticket 767): the sheet docked in at most a quarter of the play area with every card line shown, the camera's lean reaching the half width on desktop, the gauge cluster paging, the strip's fuel wells and gravity tint, held through the money sweep, the level sweep and P40.",
+      "paths": [
+        "src/ui/sheet/**",
+        "src/ui/kit/SheetCard*",
+        "src/debug/debugSheet.ts",
+        "src/debug/debugScreens.ts",
+        "src/systems/views/sheetLayout.ts",
+        "src/systems/views/desktopStripSlots.ts",
+        "src/systems/views/gaugeCluster.ts",
+        "src/systems/views/gaugeClusterTable.ts",
+        "src/data/hud/gaugeCluster.json",
+        "src/systems/render/speedFraming.ts",
+        "src/scene/PlanetCamera.tsx",
+        "src/scene/cameraPresence.ts",
+        "src/ui/hud/**"
+      ],
+      "specs": ["e2e/browser/ui/desktopShell.spec.ts", "e2e/browser/ui/uiShots.spec.ts"]
+    },
+    {
       "why": "One menu per building (ticket 734): the sheet a dock opens is that bay's one menu, closed once, with no bay frame hidden behind a phone's full sheet. The sheet slice, the bay screen's shutter, the workshop's dock hook and the debug sheet reads reach it.",
       "paths": [
         "src/store/sheetSlice.ts",

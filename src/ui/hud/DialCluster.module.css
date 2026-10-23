@@ -281,12 +281,17 @@
   background: var(--color-parchment);
 }
 
-/* Desktop's page turner (ticket 767): the "+N" as a bare button, a hover lit like a card's. */
+/*
+ * Desktop's page turner (ticket 767): the "+N" as a bare button, a hover lit like a card's, the
+ * control minimum square so it stays a full target over the cluster's frame.
+ */
 .pageTurner {
   display: flex;
   flex: none;
   align-items: center;
-  height: var(--dial-size);
+  justify-content: center;
+  min-width: var(--control-min);
+  min-height: var(--control-min);
   padding: 0 var(--space-1);
   border: 0;
   border-radius: var(--radius-chip);

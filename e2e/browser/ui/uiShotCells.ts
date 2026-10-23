@@ -1,6 +1,7 @@
 /**
- * The four screens of the UI screenshot suite (spec #678, ticket 689): two phones held upright and
- * two desktops, which the GD lock (21 Oct) made first-class. Each cell carries the layout the
+ * The screens of the UI screenshot suite (spec #678, ticket 689): two phones held upright and
+ * three desktops, which the GD lock (21 Oct) made first-class; 1920x1080 is ticket 767's second
+ * golden size. Each cell carries the layout the
  * design system gives it and that layout's HUD coverage budget (docs/ui/design-system.md
  * section 9), so a spec reading the overlay's report checks it against the decision's number.
  */
@@ -22,4 +23,5 @@ export const UI_SHOT_CELLS: readonly UiShotCell[] = [
   { name: 'phone-390x844', viewport: { width: 390, height: 844 }, ...PHONE, ...PLAIN },
   { name: 'desktop-1280x800', viewport: { width: 1280, height: 800 }, ...DESKTOP, ...PLAIN },
   { name: 'desktop-1440x900', viewport: { width: 1440, height: 900 }, ...DESKTOP, ...PLAIN },
+  { name: 'desktop-1920x1080', viewport: { width: 1920, height: 1080 }, ...DESKTOP, ...PLAIN },
 ]

@@ -114,7 +114,7 @@ async function openSellBay(page: Page): Promise<void> {
 }
 
 /** Docking at the Upgrade bay opens the base sheet on the Outfitter (ticket 687). */
-async function openUpgradeBay(page: Page): Promise<void> {
+export async function openUpgradeBay(page: Page): Promise<void> {
   await giveMoney(page, '1e9')
   await dockAt(page, 'upgrade')
   await expect(page.getByTestId(SHEET_UI_IDS.outfitterCards)).toBeVisible({
