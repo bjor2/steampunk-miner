@@ -944,7 +944,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/bot/botMarginalOffers.test.ts` | 2 | 2 |
 | `src/systems/bot/botMoneyLint.test.ts` | 6 | 3 |
 | `src/systems/bot/botRefining.test.ts` | 4 | 4 |
-| `src/systems/bot/botRetreat.test.ts` | 9 | 9 |
+| `src/systems/bot/botRetreat.test.ts` | 10 | 10 |
 | `src/systems/bot/botShopping.test.ts` | 8 | 8 |
 | `src/systems/bot/botSlicePurchases.test.ts` | 11 | 11 |
 | `src/systems/bot/botTravelSpeed.test.ts` | 3 | 3 |
