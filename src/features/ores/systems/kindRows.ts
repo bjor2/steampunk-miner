@@ -6,7 +6,8 @@
  * species: a `materials.json` row binds to a slot by its `(pool, slot)` key (ticket 447).
  *
  * - `rosterMaxKinds`: the most kinds a planet's roster holds, every live kind counted (Horizontal
- *   Scaler). Raising it is a new `ORE_RULES_VERSION` that changes data only, never existing cells.
+ *   Scaler): a table's shared slots and the most own slots one pool adds. Raising it is a new
+ *   `ORE_RULES_VERSION` that changes data only, never existing cells.
  * - Two kind tables, `legacy` and `mixed`: a planet draws the kinds of the table its rarity row set
  *   names (`legacy` on P1 and P2, `mixed` from P3, under the `mixed` and the `deep` rows alike,
  *   `rarityRowSets.ts`). A slot id is `<table>.<name>`, stable, never renumbered.
@@ -24,16 +25,19 @@
  *   a stored cell names.
  * - A slot's window may narrow at an ore rules version (`windowsBeforeOreRules`, ticket 738,
  *   `slotWindows.ts`): a planet stamped before it keeps the window it was entered with.
+ * - A slot may weigh more or less in the draw (`drawWeight`, else `drawWeightDefault`) and may be a
+ *   gem that sells at a tier of its own (`gemTierLead`, ticket 713, `slotDraws.ts`).
  *
  * A slot is live only where its tier has weight in every set that draws its window, so a kind never
- * sits on a band its rarity never paints. Look only: no slot field reaches a price, a hardness or a
- * gate.
+ * sits on a band its rarity never paints. No slot field reaches a hardness or a gate, and only a
+ * gem's `gemTierLead` reaches a price (ticket 713, through the roster's gem tag).
  */
 import { ORE_RULES_VERSION } from '../../../systems/world/planetParams'
 import { MAX_KIND_SLOT } from '../../../systems/world/worldCell'
 import { isPlainMap, isPoolId } from './planetRows'
 import { KIND_TABLES, kindTableOf, rowSetsDrawingTableUnder, type KindTable } from './rarityRowSets'
 import type { RarityRowSet } from './rarityRows'
+import { drawWeightDefaultProblems, slotDrawOf, slotDrawProblems, type SlotDraw } from './slotDraws'
 import {
   earlierWindowsOf,
   earlierWindowTableProblems,
@@ -43,7 +47,7 @@ import {
   type EarlierWindow,
 } from './slotWindows'
 
-export interface KindSlot {
+export interface KindSlot extends SlotDraw {
   /** `<table>.<name>`, such as `legacy.c1`: the binding key a species row names. */
   slotId: string
   /** The ore family id the kind sits under; it is only ever drawn on cells of this family. */
@@ -74,6 +78,8 @@ export interface EarlierPool {
 
 export interface KindRows {
   rosterMaxKinds: number
+  /** What a slot without its own `drawWeight` weighs in the draw (ticket 713). */
+  drawWeightDefault: number
   /** Per kind table, the slots in table order: a planet's roster keeps this order. */
   slotsByTable: Readonly<Record<KindTable, readonly KindSlot[]>>
   /** Planet index to species pool id under the newest ore rules; a planet missing here binds none. */
@@ -109,6 +115,7 @@ export function kindRowProblems(kinds: unknown, context: KindRowContext): string
   const isCap = Number.isSafeInteger(cap) && (cap as number) >= 1 && (cap as number) <= MOST_KINDS
   return [
     ...(isCap ? [] : [`ore.kinds.rosterMaxKinds must be a whole number from 1 to ${MOST_KINDS}`]),
+    ...drawWeightDefaultProblems(raw.drawWeightDefault),
     ...KIND_TABLES.flatMap((table) => slotTableProblems(raw[table], table, cap, context)),
     ...earlierPoolTableProblems(raw.poolsBeforeOreRules, context.pooledPlanets),
     ...unknownTableProblems(raw),
@@ -123,6 +130,7 @@ export function kindRowsOf(kinds: Raw, poolByPlanet: ReadonlyMap<number, string>
   const tableOf = (table: KindTable) => (kinds[table] as Raw[]).map(kindSlotOf)
   return {
     rosterMaxKinds: kinds.rosterMaxKinds as number,
+    drawWeightDefault: kinds.drawWeightDefault as number,
     slotsByTable: { legacy: tableOf('legacy'), mixed: tableOf('mixed') },
     poolByPlanet,
     earlierPools: earlierPoolsOf((kinds.poolsBeforeOreRules ?? {}) as EarlierPoolTable),
@@ -196,6 +204,7 @@ function kindSlotOf(row: Raw): KindSlot {
     rarity: row.rarity as string,
     window: [first, last],
     ...(earlierWindows === undefined ? {} : { earlierWindows }),
+    ...slotDrawOf(row),
   }
   if (row.pool === undefined) return slot
   return { ...slot, owner: { pool: row.pool as string, fromOreRules: row.fromOreRules as number } }
@@ -210,13 +219,23 @@ function slotTableProblems(
   if (!Array.isArray(slots)) return [`ore.kinds.${table} must be a list of kind slots`]
   const rows = slots as Raw[]
   const ids = rows.map((row) => String(row.slotId))
-  const isOverCap = typeof cap === 'number' && rows.length > cap
+  const most = largestRosterOf(rows)
+  const isOverCap = typeof cap === 'number' && most > cap
   return [
-    ...(isOverCap ? [`ore.kinds.${table} holds ${rows.length} kinds, over rosterMaxKinds`] : []),
+    ...(isOverCap ? [`ore.kinds.${table} holds ${most} kinds, over rosterMaxKinds`] : []),
     ...rows.flatMap((row, at) => slotRowProblems(row, `ore.kinds.${table}[${at}]`, table, context)),
     ...repeatedIdsOf(ids).map((id) => `kind slot "${id}" twice`),
     ...sharedAfterOwnProblems(rows, table),
   ]
+}
+
+/** The most kinds one roster draws from the table: every shared slot and one pool's own slots. */
+function largestRosterOf(rows: readonly Raw[]): number {
+  const ownByPool = new Map<unknown, number>()
+  for (const row of rows.filter(isOwnSlotRow))
+    ownByPool.set(row.pool, (ownByPool.get(row.pool) ?? 0) + 1)
+  const shared = rows.length - rows.filter(isOwnSlotRow).length
+  return shared + Math.max(0, ...ownByPool.values())
 }
 
 /** A shared slot after an own slot would sit at another roster index on the planets without it. */
@@ -245,6 +264,7 @@ function slotRowProblems(
     ...(isFamily ? [] : [`${where}.family must name an ore family`]),
     ...(isBandWindow(row.window) ? [] : [`${where}.window must be [first, last] in 1..5`]),
     ...earlierWindowTableProblems(row.windowsBeforeOreRules, where),
+    ...slotDrawProblems(row, where),
     ...ownerProblems(row, where, context.poolIds),
   ]
   if (shapeProblems.length > 0) return shapeProblems
@@ -321,7 +341,7 @@ function earlierPoolRowProblems(
 }
 
 function unknownTableProblems(raw: Raw): string[] {
-  const known = ['rosterMaxKinds', 'poolsBeforeOreRules', ...KIND_TABLES]
+  const known = ['rosterMaxKinds', 'drawWeightDefault', 'poolsBeforeOreRules', ...KIND_TABLES]
   return Object.keys(raw)
     .filter((key) => !known.includes(key))
     .map((key) => `ore.kinds.${key} is not a kind table`)

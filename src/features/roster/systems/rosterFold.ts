@@ -1,9 +1,11 @@
 /**
  * The roster fold (TD ruling on ticket 446, 6226236698 section 2; Systems' family-first rule,
  * 6226198316, GD option A, 6226210993): each ore patch draws one material kind from its planet's
- * roster, uniform over the kinds live on the patch's own family and rarity tier in its band
- * (`roll % nLive`; the kind's window under the planet's ore rules, ticket 738), and none when no
- * kind is live there. Horizontal: a look layer only.
+ * roster among the kinds live on the patch's own family and rarity tier in its band (the kind's
+ * window under the planet's ore rules, ticket 738), and none when no kind is live there. The draw is
+ * uniform (`roll % nLive`) wherever the live kinds weigh the same, and by weight where they do not:
+ * P1's gems draw 4:3:2 (ticket 713, `slotDraws.ts`). Horizontal: a look layer only; a gem's price
+ * is the gem tag's (`rosterGems.ts`).
  *
  * It is a `patchContent` fold sorted after `ores.lead` and `planet-mix.mix`, so it reads the final
  * family and tier, and it writes the kind slot alone: family, tier, ore id, quantity and gate stay as
@@ -16,7 +18,14 @@ import type { GenerationHook, PatchContent } from '../../../systems/registries/g
 import type { OrePatch } from '../../../systems/world/orePatches'
 import type { PlanetParams } from '../../../systems/world/planetParams'
 import { NO_KIND_SLOT } from '../../../systems/world/worldCell'
-import { familyOfCellCode, isSlotLiveInBand, rarityTiers, type KindSlot } from '../../ores'
+import {
+  drawnPositionOf,
+  familyOfCellCode,
+  isSlotLiveInBand,
+  ORE_ROWS,
+  rarityTiers,
+  type KindSlot,
+} from '../../ores'
 import { planetRosterOf } from './planetRoster'
 import { rareClusterKindsOf } from './rosterClusterKinds'
 
@@ -44,7 +53,13 @@ export function kindSlotOfPatch(
 ): number {
   const live = liveRosterIndicesOf(params, patch.band, content)
   if (live.length === 0) return NO_KIND_SLOT
-  return live[rollOfPatch(seed, patch) % live.length] + 1
+  return live[drawnPositionOf(drawWeightsOf(params, live), rollOfPatch(seed, patch))] + 1
+}
+
+/** Each live kind's weight in the draw: its own, else the table's default (ticket 713). */
+export function drawWeightsOf(params: PlanetParams, live: readonly number[]): number[] {
+  const roster = planetRosterOf(params)
+  return live.map((index) => roster[index].drawWeight ?? ORE_ROWS.kinds.drawWeightDefault)
 }
 
 /**

@@ -134,6 +134,23 @@ describe('ore kind slots', () => {
     ])
   })
 
+  it("counts a roster as the shared slots and one pool's own, not the whole table", () => {
+    const shared = economyFile.ore.kinds.legacy.filter((slot) => !('pool' in slot))
+    const ownOf = (pool: string, names: readonly string[]) =>
+      names.map((name) => ({ ...C1, slotId: `legacy.${name}`, pool, fromOreRules: 2 }))
+    const legacy = [
+      ...shared,
+      ...ownOf('foothold-p2', ['o1', 'o2', 'o3']),
+      ...ownOf('legacy', ['o4', 'o5', 'o6']),
+    ]
+    expect(legacy).toHaveLength(18)
+    expect(problemsWithLegacy(legacy, 17)).toEqual([])
+    expect(problemsWithLegacy(legacy, 14)).toEqual([
+      'ore.kinds.legacy holds 15 kinds, over rosterMaxKinds',
+      'ore.kinds.mixed holds 17 kinds, over rosterMaxKinds',
+    ])
+  })
+
   it('refuses a kind live in a band where its tier weighs nothing', () => {
     const early = { ...C1, slotId: 'legacy.r9', rarity: 'rare', window: [2, 3] }
     expect(problemsWithLegacy([early])).toEqual([

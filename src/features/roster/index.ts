@@ -15,4 +15,10 @@ export {
   rosterKindOf,
 } from './systems/planetRoster'
 export { planetSpeciesOf, speciesOfKind } from './systems/planetSpecies'
-export { kindSlotOfPatch, liveRosterIndicesOf, ROSTER_HOOK_ID } from './systems/rosterFold'
+export {
+  drawWeightsOf,
+  kindSlotOfPatch,
+  liveRosterIndicesOf,
+  ROSTER_HOOK_ID,
+} from './systems/rosterFold'
+export { gemSaleTierOfKind, ROSTER_GEMS, topOreTierOf } from './systems/rosterGems'

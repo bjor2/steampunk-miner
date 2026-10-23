@@ -43,6 +43,7 @@
     },
     "kinds": {
       "rosterMaxKinds": 17,
+      "drawWeightDefault": 3,
       "poolsBeforeOreRules": { "6": { "2": "legacy" } },
       "legacy": [
         { "slotId": "legacy.c1", "family": "metal", "rarity": "common", "window": [1, 5] },

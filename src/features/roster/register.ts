@@ -6,11 +6,13 @@
  * `planet-mix.mix`, so it reads the final family and tier and changes neither; it also names the
  * rare kinds each planet under ore rules 10 holds one guaranteed cluster of (ticket 737). Its
  * debug action reads ticket 449's share table for `npm run rarity:shares`. Its `kindLook` provider
- * (ticket 450) hands the terrain shader each roster slot's species look and the rarity tints.
+ * (ticket 450) hands the terrain shader each roster slot's species look and the rarity tints. Its
+ * gem tag (ticket 713) sells a gem kind's cell at the gem's own tier.
  */
 import type { SliceDefinition } from '../../registries/sliceDefinition'
 import { rosterDebugActions } from './debug'
 import { ROSTER_KIND_LOOK } from './systems/render/kindLookProvider'
+import { ROSTER_GEMS } from './systems/rosterGems'
 import { rosterMaterialsHook } from './systems/rosterFold'
 
 export const slice: SliceDefinition = {
@@ -19,5 +21,6 @@ export const slice: SliceDefinition = {
     r.generationHook(rosterMaterialsHook)
     r.debugActions(rosterDebugActions)
     r.kindLook(ROSTER_KIND_LOOK)
+    r.oreGem(ROSTER_GEMS)
   },
 }

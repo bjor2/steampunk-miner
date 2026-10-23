@@ -2,9 +2,13 @@
  * The nominal shares of one band trip (ticket 449): a hold filled in the band, each ore unit drawn
  * at the painted weights, so a cell's share of the trip is its part of the band's value. Systems'
  * family-first rule (6226198316 on ticket 446) splits a painted (tier, family) cell equally among
- * the roster kinds live on it:
+ * the roster kinds live on it, by their draw weights where these differ (ticket 713: P1's gems draw
+ * 4:3:2 against the default 3, `slotDraws.ts`):
  *
- *   share(kind) = tierShare x familyShare x valueRatio^k / mean / nLive(band, tier, family)
+ *   share(kind) = tierShare x familyShare x valueRatio^k / mean x weight(kind) / sum of live weights
+ *
+ * A gem kind's share is valued at its cell's rarity tier here, as every kind is; what the gems are
+ * worth at their own tiers is the ore value census's (the 15% pool cap on #713).
  *
  * and its constructive guard asks every painted cell for `max(1, ceil(weightBp / boundBp))` live
  * kinds, so no cell is bare and no kind can pass its bound. A signature shares its cell with the
@@ -13,7 +17,7 @@
  * alone (the relic signature from P3) is the slotless 16th material, so the guard asks it for no
  * kind (E1, Systems and TD on #453). Whole basis points, rounded up.
  */
-import { isTripClamped, rarityTiers } from '../../ores'
+import { isTripClamped, ORE_ROWS, rarityTiers } from '../../ores'
 import { cellValueOf, type PaintedBand, type PaintedCell } from './paintedPlanet'
 import type { RarityShareBounds } from './shareRows'
 
@@ -132,13 +136,24 @@ function kindCellsOf(cells: readonly PaintedCell[]): KindCell[] {
 }
 
 function kindSharesOf(cell: KindCell, bandValue: number): KindShare[] {
-  const tripShare = cell.value / bandValue / cell.liveKinds.length
-  return cell.liveKinds.map((slotId) => ({
-    slotId,
-    isCommon: isCommonCell(cell),
-    tripShare,
-    bandTripBp: wholeBasisPointsUp(tripShare),
-  }))
+  const weights = cell.liveKinds.map(drawWeightOfSlot)
+  const totalWeight = weights.reduce((sum, weight) => sum + weight, 0)
+  return cell.liveKinds.map((slotId, at) => {
+    const tripShare = cell.value / bandValue / (totalWeight / weights[at])
+    return {
+      slotId,
+      isCommon: isCommonCell(cell),
+      tripShare,
+      bandTripBp: wholeBasisPointsUp(tripShare),
+    }
+  })
+}
+
+/** The slot's weight in the roster draw: its own, else the default (ticket 713). */
+function drawWeightOfSlot(slotId: string): number {
+  const tables = Object.values(ORE_ROWS.kinds.slotsByTable)
+  const slot = tables.flat().find((each) => each.slotId === slotId)
+  return slot?.drawWeight ?? ORE_ROWS.kinds.drawWeightDefault
 }
 
 function shortCellsOf(cell: KindCell, bounds: RarityShareBounds): ShortCell[] {
