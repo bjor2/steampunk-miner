@@ -205,7 +205,8 @@
     "suffixes": ["k", "M", "B", "T", "Qa", "Qi", "Sx", "Sp", "Oc", "No", "Dc"],
     "depthKmFromMetres": 10000,
     "depthKmDecimals": 1,
-    "speedSignificantFigures": 3
+    "speedSignificantFigures": 3,
+    "longSignificantFigures": 12
   },
   "art": {
     "gaugeBar": "ui-gauge-bar",

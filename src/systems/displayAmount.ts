@@ -12,6 +12,13 @@
  * Balances, income and counts round toward zero and prices round away from it, so a shown balance
  * at least the shown price means the real balance covers the real price.
  *
+ * The long mode (`formatAmountLong`, `formatPriceLong`; the VS input of 23 Oct on ticket 768) is a
+ * desktop hover's full value: at most 12 significant figures (`numbers.longSignificantFigures`),
+ *   below 1e12                   whole digits grouped, decimals up to 12 figures, at most 3
+ *   from 1e12                    e-notation with the figures the amount has, up to 12
+ * rounded the way the short text of the same amount is, so a hover's balance lies between the
+ * chip and the real balance and a hover's price between the real price and the chip.
+ *
  * `formatPercent` shows a share of a whole (Vertical Scaler on #164, K7 #199):
  *   below 1e-6 of the whole      3 significant digits, lowercase e        1.00e-7%
  *   below 0.01%                  a floor, not a number                     <0.01%
@@ -23,6 +30,9 @@ import { DESIGN_TOKENS } from './views/designSystem'
 
 const NUMBERS = DESIGN_TOKENS.numbers
 const SIGNIFICANT_FIGURES = NUMBERS.significantFigures
+const LONG_SIGNIFICANT_FIGURES = NUMBERS.longSignificantFigures
+/** The long mode turns to e-notation where the whole digits would pass its figures. */
+const LONG_SCIENTIFIC_FROM_EXPONENT = LONG_SIGNIFICANT_FIGURES
 const MAX_CHARS = NUMBERS.maxChars
 const SUFFIXES: readonly string[] = NUMBERS.suffixes
 /** Each suffix stands for the next power of a thousand: k is 1e3, Dc is 1e33. */
@@ -60,6 +70,16 @@ export function formatPrice(amount: Money | number): string {
   return formatParts(splitCanonical(exactAmount(amount)), 'up')
 }
 
+/** A desktop hover's full balance, income or count: up to 12 figures, rounded toward zero. */
+export function formatAmountLong(amount: Money | number): string {
+  return formatLongParts(splitCanonical(exactAmount(amount)), 'down')
+}
+
+/** A desktop hover's full price: up to 12 figures, rounded up, as the price chip is. */
+export function formatPriceLong(amount: Money | number): string {
+  return formatLongParts(splitCanonical(exactAmount(amount)), 'up')
+}
+
 /** The exact canonical `Money` string, for tooltips, detail views and logs. */
 export function exactAmount(amount: Money | number): string {
   return toCanonical(typeof amount === 'number' ? fromSafeInteger(amount) : amount)
@@ -95,6 +115,34 @@ function formatMagnitude(parts: DecimalParts, way: RoundingWay): string {
   const shown = roundToDigits(parts, shownDigitCountOf(parts), way)
   if (shown.exponent !== parts.exponent) return formatMagnitude(shown, way)
   return textOfShownParts(shown)
+}
+
+function formatLongParts(parts: DecimalParts, way: RoundingWay): string {
+  return `${parts.sign}${formatLongMagnitude(parts, way)}`
+}
+
+/** The long mode's rounding; a carry into a wider range formats again, as the short one does. */
+function formatLongMagnitude(parts: DecimalParts, way: RoundingWay): string {
+  const shown = roundToDigits(parts, longShownDigitCountOf(parts.exponent), way)
+  if (shown.exponent !== parts.exponent) return formatLongMagnitude(shown, way)
+  if (isZeroParts(shown)) return '0'
+  return shown.exponent >= LONG_SCIENTIFIC_FROM_EXPONENT
+    ? longScientificText(shown)
+    : wholeText(shown)
+}
+
+/** 12 figures from 1e12; below it every whole digit and the decimals the 12 leave, at most 3. */
+function longShownDigitCountOf(exponent: number): number {
+  if (exponent >= LONG_SCIENTIFIC_FROM_EXPONENT) return LONG_SIGNIFICANT_FIGURES
+  const decimals = Math.max(0, LONG_SIGNIFICANT_FIGURES - 1 - exponent)
+  return exponent + 1 + Math.min(MAX_SHOWN_DECIMALS, decimals)
+}
+
+/** `1.23456789012e15`, `1e300`: the figures the amount has, no trailing zeros. */
+function longScientificText(parts: DecimalParts): string {
+  const { digits } = parts
+  const mantissa = digits.length === 1 ? digits : `${digits[0]}.${digits.slice(1)}`
+  return `${mantissa}e${parts.exponent}`
 }
 
 function textOfShownParts(parts: DecimalParts): string {

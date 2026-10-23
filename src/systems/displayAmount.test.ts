@@ -2,8 +2,10 @@ import { describe, expect, it } from 'vitest'
 import {
   exactAmount,
   formatAmount,
+  formatAmountLong,
   formatPercent,
   formatPrice,
+  formatPriceLong,
   isAmountShortened,
   isExactTextShortened,
 } from './displayAmount'
@@ -189,6 +191,97 @@ describe('shortened amount', () => {
     expect(isAmountShortened(9_999)).toBe(false)
   })
 })
+
+const showLong = (text: string) => formatAmountLong(fromCanonical(text))
+const priceLong = (text: string) => formatPriceLong(fromCanonical(text))
+const LONG_FIGURES = DESIGN_TOKENS.numbers.longSignificantFigures
+
+// The long mode (the VS input of 23 Oct on ticket 768): a desktop hover's full value, at most 12
+// significant figures plus an exponent, rounded as the short text of the same amount is.
+const LONG_BALANCE_GOLDEN: ReadonlyArray<readonly [string, string]> = [
+  ['0', '0'],
+  ['0.045', '0.045'],
+  ['0.0459', '0.045'],
+  ['75.937', '75.937'],
+  ['1234.5678', '1,234.567'],
+  ['12345678.9', '12,345,678.9'],
+  ['999999999999.9', '999,999,999,999'],
+  ['1e12', '1e12'],
+  ['2159000000000', '2.159e12'],
+  ['1.234567890129e15', '1.23456789012e15'],
+  ['9.9999999999999e35', '9.99999999999e35'],
+  ['1e300', '1e300'],
+  ['-1234.5678', '-1,234.567'],
+]
+
+const LONG_PRICE_GOLDEN: ReadonlyArray<readonly [string, string]> = [
+  ['0', '0'],
+  ['0.0451', '0.046'],
+  ['1234.5671', '1,234.568'],
+  ['999999999999.9', '1e12'],
+  ['1.234567890121e15', '1.23456789013e15'],
+  ['9.9999999999991e299', '1e300'],
+]
+
+describe('long display amount', () => {
+  it.each(LONG_BALANCE_GOLDEN)('shows the balance %s on hover as %s', (amount, text) => {
+    expect(showLong(amount)).toBe(text)
+  })
+
+  it.each(LONG_PRICE_GOLDEN)('shows the price %s on hover as %s, rounded up', (amount, text) => {
+    expect(priceLong(amount)).toBe(text)
+  })
+
+  it('keeps every hover text from 0 to 1e300 at 12 significant figures or fewer', () => {
+    const amounts = ['0', '0.001', '0.045', '1.23456789012345e5', ...amountsUpTo1e300()]
+    const texts = amounts.flatMap((amount) => [showLong(amount), priceLong(amount)])
+    expect(texts.filter((text) => significantFiguresOf(text) > LONG_FIGURES)).toEqual([])
+    expect(texts.filter((text) => /NaN|Infinity|MAX/i.test(text))).toEqual([])
+  })
+
+  it('puts a hover balance between the chip and the real balance, and a hover price between the real price and the chip', () => {
+    const amounts = [
+      '0.0451',
+      '1234.5678',
+      '12345678.9',
+      '1.23456789012345e15',
+      ...amountsUpTo1e300(),
+    ]
+    const outOfOrder = amounts.filter(
+      (amount) =>
+        cmp(shownAmountOf(show(amount)), longAmountOf(showLong(amount))) > 0 ||
+        cmp(longAmountOf(showLong(amount)), m(amount)) > 0 ||
+        cmp(m(amount), longAmountOf(priceLong(amount))) > 0 ||
+        cmp(longAmountOf(priceLong(amount)), shownAmountOf(price(amount))) > 0,
+    )
+    expect(outOfOrder).toEqual([])
+  })
+
+  it('reads a hover balance at or above a hover price only when the real balance covers it', () => {
+    const amounts = amountsForRoundTrip()
+    const misleading = amounts.flatMap((balance) =>
+      amounts
+        .filter(
+          (cost) =>
+            cmp(longAmountOf(showLong(balance)), longAmountOf(priceLong(cost))) >= 0 &&
+            cmp(m(balance), m(cost)) < 0,
+        )
+        .map((cost) => `${balance} against ${cost}`),
+    )
+    expect(misleading).toEqual([])
+  })
+})
+
+/** The amount a long text stands for: commas dropped, its e-notation read as written. */
+function longAmountOf(text: string): ReturnType<typeof m> {
+  return m(text.replaceAll(',', ''))
+}
+
+/** The digits a text shows from its first non-zero one, its exponent aside. */
+function significantFiguresOf(text: string): number {
+  const [mantissa] = text.replace('-', '').split('e')
+  return mantissa.replace(/[,.]/g, '').replace(/^0+/, '').length
+}
 
 const percentOf = (ratio: string) => formatPercent(fromCanonical(ratio))
 

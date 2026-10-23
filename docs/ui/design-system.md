@@ -517,6 +517,12 @@ strip at 360 px and 1e300 prints (`1e300`). Prices round **up** and balances **d
 km with 1 decimal (`numbers.depthKmFromMetres`); speed is m/s at 3 significant figures, shown on
 desktop detail only. Raw cells/s and hardness stay debug-only.
 
+A desktop hover shows a figure's **long mode** (#768, VS input of 23 Oct): at most **12
+significant figures** (`numbers.longSignificantFigures`), whole digits grouped below 1e12, then
+e-notation, rounded the same way as the chip (prices up, balances down). A hover's balance lies
+between the chip and the real balance, and a hover's price between the real price and the chip.
+The chips themselves stay at 6 characters; a wide HUD adds space, never digits.
+
 Gauges on the strip are **fraction-only**: hull, fuel, cargo and heat show a fill, never a number
 (Systems); the exact values sit behind the gear button, `data-exact` carrying the canonical string
 as today. The odometer is the only rolling number.
@@ -822,6 +828,7 @@ Generated from `designTokens.json`; a row is the token's path and its value. The
 | `numbers.depthKmFromMetres`       | 10000                                  |
 | `numbers.depthKmDecimals`         | 1                                      |
 | `numbers.speedSignificantFigures` | 3                                      |
+| `numbers.longSignificantFigures`  | 12                                     |
 
 ### art and planet skins
 
