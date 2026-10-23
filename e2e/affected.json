@@ -687,7 +687,8 @@
         "e2e/browser/screens/screenLayout.spec.ts",
         "e2e/browser/screens/rotation.spec.ts",
         "e2e/browser/screens/portraitMatrix.spec.ts",
-        "e2e/browser/screens/tapAffordances.spec.ts"
+        "e2e/browser/screens/tapAffordances.spec.ts",
+        "e2e/browser/ui/techTreePhoneReach.spec.ts"
       ]
     },
     {
@@ -980,7 +981,8 @@
       "specs": [
         "e2e/browser/heroAtlas.spec.ts",
         "e2e/browser/materialLooks.spec.ts",
-        "e2e/browser/renderQuality.spec.ts"
+        "e2e/browser/renderQuality.spec.ts",
+        "e2e/browser/p2GemSkins.spec.ts"
       ]
     },
     {
