@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-10-23T19:54:10+02:00",
+  "updated_at": "2026-10-23T20:05:51+02:00",
   "caps": {
     "grok": 12,
     "claude": 10,
@@ -109,17 +109,16 @@
         },
         {
           "slot": "C10",
-          "state": "busy",
-          "ticket": 763,
-          "grok_slot": 4,
-          "kind": "dev",
-          "since": "2026-10-23T19:14:00+02:00",
-          "wave": "647-6E"
+          "state": "free",
+          "ticket": null,
+          "grok_slot": null,
+          "kind": null,
+          "since": null
         }
       ],
       "size": 4,
-      "used": 4,
-      "free": 0,
+      "used": 3,
+      "free": 1,
       "claims_last_hour": 5,
       "name": "Claude Max 2"
     }
@@ -153,12 +152,12 @@
       },
       {
         "feature": 762,
-        "kind": "ticket",
+        "kind": "spec",
         "title": "Fix red main: full suite red on 663d15e92 (src/logging/campaignPacingGate.test.ts src/logging/exactCarryOnGolden.test.ts src/logging/heatWorkUncappedGolden.test.ts src/logging/reportCapsuleOffGolden.test.ts src/features/codex/materialContactOffGolden.test.ts src/features/mining-gates/systems/botShaftJog.test.ts scripts/e2e/affectedSpecs.test.mjs)",
         "tickets": [
-          762
+          763
         ],
-        "since": "2026-10-23T16:49:04+02:00"
+        "since": "2026-10-23T20:04:48+02:00"
       }
     ]
   },
@@ -189,11 +188,9 @@
     },
     {
       "slot": 4,
-      "state": "dev",
-      "ticket": 763,
-      "since": "2026-10-23T19:14:00+02:00",
-      "claude_slot": 10,
-      "wave": "647-6E"
+      "state": "free",
+      "ticket": null,
+      "since": null
     },
     {
       "slot": 5,
@@ -325,26 +322,25 @@
     },
     {
       "slot": 10,
-      "state": "busy",
-      "ticket": 763,
-      "grok_slot": 4,
-      "since": "2026-10-23T19:14:00+02:00",
-      "account": 2,
-      "wave": "647-6E"
+      "state": "free",
+      "ticket": null,
+      "grok_slot": null,
+      "since": null,
+      "account": 2
     }
   ],
   "last_refill": {
-    "at": "2026-10-23 19:54 CEST",
+    "at": "2026-10-23 20:05 CEST",
     "mode": "refill-dev",
-    "triggers": "claude-run:wave-plan",
+    "triggers": "#763",
     "started": "",
     "note": "no pickable build ticket"
   },
   "totals": {
     "grok": {
       "size": 12,
-      "used": 5,
-      "dev": 5,
+      "used": 4,
+      "dev": 4,
       "dev_cap": 8,
       "planner": 0,
       "planner_cap": 4
@@ -352,8 +348,8 @@
     "claude": {
       "size": 10,
       "enabled": 10,
-      "used": 5,
-      "free": 5,
+      "used": 4,
+      "free": 6,
       "external": 0
     }
   },
@@ -361,6 +357,19 @@
     "mode": "on",
     "parallel": 1,
     "list": [
+      {
+        "number": 773,
+        "key": "678-7A",
+        "map": 678,
+        "lane": "remote",
+        "mode": "solo",
+        "state": "blocked",
+        "tickets": [
+          772
+        ],
+        "done": [],
+        "live": 0
+      },
       {
         "number": 771,
         "key": "678-6A",
@@ -389,19 +398,6 @@
         ],
         "done": [],
         "live": 0
-      },
-      {
-        "number": 765,
-        "key": "647-6E",
-        "map": 647,
-        "lane": "remote",
-        "mode": "solo",
-        "state": "running",
-        "tickets": [
-          763
-        ],
-        "done": [],
-        "live": 1
       },
       {
         "number": 761,
