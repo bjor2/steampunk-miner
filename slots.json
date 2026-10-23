@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-10-23T08:37:17+02:00",
+  "updated_at": "2026-10-23T08:44:24+02:00",
   "caps": {
     "grok": 12,
     "claude": 10,
@@ -117,7 +117,7 @@
       "size": 4,
       "used": 2,
       "free": 2,
-      "claims_last_hour": 8,
+      "claims_last_hour": 7,
       "name": "Claude Max 2"
     }
   ],
@@ -127,9 +127,9 @@
   },
   "tester": {
     "state": "running",
-    "phase": "nightly-bench",
+    "phase": "nightly-balance-planets",
     "sha": "dca609908e4fa6c361bc34d78442dbbffed4eb4a",
-    "since": "2026-10-23T06:37:07Z",
+    "since": "2026-10-23T06:44:19Z",
     "holds_gate": true,
     "claude_slot": null,
     "last_run": "2026-10-22T22:52:38Z",
