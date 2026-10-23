@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { oreSalePrice, oreTier } from '../../../systems/economy/oreEconomy'
 import { fromCanonical, toCanonical } from '../../../systems/money'
-import { oreTypeOfCell } from '../../../systems/authority/minedOre'
+import { minedOreOf, oreTypeOfCell } from '../../../systems/authority/minedOre'
 import { saleTierOf } from '../../../systems/registries/oreTypes'
 import {
   freshPlanetParamsFor,
@@ -72,6 +72,13 @@ describe('roster gems', () => {
     const cell = oreCell(RESOURCE_FAMILY.crystal, BAND_FIVE_OFFSET + RARE_LEAD, diamond.kindSlot)
     const ore = oreTypeOfCell(p1, cell)
     expect([ore.tier, ore.gem, saleTierOf(ore)]).toEqual([7, true, 12])
+  })
+
+  it('keeps a mined gem unit in the hold at its gem tier, its cell tier on the log', () => {
+    const [, emerald] = gemsOf(p1)
+    const cell = oreCell(RESOURCE_FAMILY.crystal, BAND_FIVE_OFFSET + RARE_LEAD, emerald.kindSlot)
+    const mined = minedOreOf(p1, { tx: 0, ty: 0 }, cell)
+    expect([mined.resourceTier, mined.saleTier]).toEqual([7, 13])
   })
 
   it('names no gem on P2, nor on a P1 a save holds under ore rules older than the gems', () => {
