@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "updated_at": "2026-10-23T21:47:00Z",
+  "updated_at": "2026-10-23T21:47:01Z",
   "entries": {
     "steampunk-loop/1": {
       "loop": "steampunk-loop",
@@ -731,9 +731,9 @@
       "slot": null,
       "state": "working",
       "issue": null,
-      "note": "queue run on c45e112 (pass)",
+      "note": "testing spec #753 (Fix red main: full suite red on dca609908 (src/logging/campaignPacingGate.test.ts src/logging/pacingGate.test.ts src/features/terrain-tools/foamPace.test.ts)) on c45e112",
       "stale_after_min": 420,
-      "updated_at": "2026-10-23T21:47:00Z",
+      "updated_at": "2026-10-23T21:47:01Z",
       "host": "grok-bot-vm-452660841"
     },
     "steampunk-loop/10": {
