@@ -4,6 +4,7 @@
  * trimmed, with every problem listed.
  */
 import { isNonNegativeMoneyText } from '../money'
+import { readIndexText } from '../starMap/planetAddress'
 import { isDriveSigns } from '../vehicle/driveSigns'
 import { isBayId } from '../world/dockBays'
 
@@ -27,6 +28,8 @@ export type FieldKind =
   | 'driveSigns'
   /** An object of booleans, as `debug.setFlags` names each flag it sets (ticket 547). */
   | 'flagMap'
+  /** An index from 1 as canonical decimal text, as a star-map address crosses JSON (ticket 755). */
+  | 'indexText'
 
 export type PayloadFields = Readonly<Record<string, FieldKind>>
 
@@ -64,6 +67,10 @@ const FIELD_CHECKS: Record<FieldKind, { isValid: (value: unknown) => boolean; ex
     textList: { isValid: isTextList, expected: 'a list of strings' },
     driveSigns: { isValid: isDriveSigns, expected: 'an x and a y, each -1, 0 or 1' },
     flagMap: { isValid: isFlagMap, expected: 'an object of booleans' },
+    indexText: {
+      isValid: (value) => readIndexText(value) !== null,
+      expected: 'an index from 1 as decimal text',
+    },
   }
 
 function fieldKindProblems(name: string, value: unknown, kind: FieldKind): string[] {

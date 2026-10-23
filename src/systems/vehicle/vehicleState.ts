@@ -145,6 +145,11 @@ export interface VehicleState {
    * report's heat. Absent at 0; dropped where `cutEnergyCarry` is.
    */
   cutHeatCarry?: number
+  /**
+   * The fuel tank in whole units (ticket 755, `vehicleFuel.ts`): bought at the shop, burnt only by
+   * a star-map jump. Absent while empty, so a vehicle that never bought fuel digests as before.
+   */
+  fuel?: BigStat
 }
 
 export const EMPTY_CARGO: Cargo = { ore: {}, coreFragments: 0 }

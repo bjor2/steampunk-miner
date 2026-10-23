@@ -15,6 +15,7 @@ export const KERNEL_ITEMS = {
   quickService: itemRefOf('service', 'quick_service'),
   refine: itemRefOf('service', 'refine'),
   travel: itemRefOf('service', 'travel'),
+  fuel: itemRefOf('service', 'fuel'),
   casing: itemRefOf('module', 'casing'),
   guns: itemRefOf('module', 'guns'),
   charges: itemRefOf('module', 'charges'),

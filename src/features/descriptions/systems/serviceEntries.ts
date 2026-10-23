@@ -6,6 +6,7 @@
  * refinery takes, the planet the lift goes to. The price stays the kernel's line (#159 line 3).
  */
 import { UPGRADE_IDS } from '../../../systems/economy/economyDefinition'
+import { fuelUnitPriceOf } from '../../../systems/economy/jumpFuel'
 import { energyUnitPrice } from '../../../systems/economy/planetCharges'
 import {
   refineBatchCap,
@@ -58,6 +59,15 @@ export function serviceEntries(): readonly DescribedEntry[] {
       KERNEL_ITEMS.travel,
       'The Guild ferries the miner and its gear to the next planet.',
       [fixedLine('Travel to planet', 'linearInt', nextPlanetOf)],
+    ),
+    kernelEntryOf(
+      KERNEL_ITEMS.fuel,
+      'Coal by the unit for the tender; a jump on the star map burns it.',
+      [
+        fixedLine('Fuel price per unit', 'geometric', ({ planetIndex }) =>
+          fuelUnitPriceOf(planetIndex),
+        ),
+      ],
     ),
   ]
 }

@@ -29,7 +29,7 @@ import { featureUnlocksOfTravel } from './featureUnlocks'
 import type { DomainEventBody } from './domainEvent'
 import { notDockedRejection } from './dockRules'
 import { artefactCacheSpawnOf, planetEntryOf, withSessionOnPlanet } from './planetEntry'
-import { noPlanetRejection, planetParamsOf } from './planetOfState'
+import { noPlanetRejection, planetParamsOf, type SessionPlanet } from './planetOfState'
 import { stateDigest } from './stateDigest'
 
 export const TRAVEL_RULES: { readonly travel: CommandRule<'travel'> } = {
@@ -39,7 +39,7 @@ export const TRAVEL_RULES: { readonly travel: CommandRule<'travel'> } = {
     apply: (state, { playerId, payload }) =>
       chainEffects(state, [
         (current) => payForTravel(current, playerId, payload.toPlanet),
-        (current) => arriveAtPlanet(current, payload.toPlanet),
+        (current) => arriveAtPlanet(current, nextPlanetOf(current, payload.toPlanet)),
         (current) => digestAtTravel(current),
       ]),
   },
@@ -104,18 +104,36 @@ function payForTravel(state: AuthorityState, playerId: string, toPlanet: number)
   }
 }
 
+/** The planet `toPlanet` of the session's system, on the session's world seed. */
+function nextPlanetOf(state: AuthorityState, toPlanet: number): SessionPlanet {
+  return { ...state.planet, index: toPlanet }
+}
+
 /**
  * The slice has no separate unlock step: reaching a planet unlocks it (#2 log sequence), and with
  * it the schedule's `planet_gate` rows listed on that planet (#88).
  */
-function arriveAtPlanet(state: AuthorityState, toPlanet: number): RuleEffect {
-  const arrived = withSessionOnPlanet(state, { ...state.planet, index: toPlanet })
+function arriveAtPlanet(state: AuthorityState, to: SessionPlanet): RuleEffect {
+  return enterPlanetByTravel(state, to, [{ type: 'PlanetUnlocked', planetIndex: to.index }])
+}
+
+/**
+ * The session moved to `to` and the arrival said: `unlocked` first, then the schedule rows the
+ * move opens (#88), `planet_entered` and `artefact_cache_spawned`. `Travel` and the star map's
+ * jump (ticket 755) both arrive through here.
+ */
+export function enterPlanetByTravel(
+  state: AuthorityState,
+  to: SessionPlanet,
+  unlocked: readonly DomainEventBody[],
+): RuleEffect {
+  const arrived = withSessionOnPlanet(state, to)
   const params = planetParamsOf(arrived.planet)
   return {
     state: arrived,
     events: [
-      { type: 'PlanetUnlocked', planetIndex: toPlanet },
-      ...featureUnlocksOfTravel(state.planet.index, toPlanet),
+      ...unlocked,
+      ...featureUnlocksOfTravel(state.planet.index, to.index),
       ...(params === null ? [] : arrivalEventsOf(params)),
     ],
   }
@@ -128,6 +146,6 @@ function arrivalEventsOf(params: PlanetParams): DomainEventBody[] {
   ]
 }
 
-function digestAtTravel(state: AuthorityState): RuleEffect {
+export function digestAtTravel(state: AuthorityState): RuleEffect {
   return { state, events: [{ type: 'StateDigested', digest: stateDigest(state), scope: 'travel' }] }
 }

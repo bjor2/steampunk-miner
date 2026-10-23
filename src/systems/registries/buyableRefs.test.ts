@@ -50,6 +50,7 @@ describe('buyable refs', () => {
       'module:guns',
       'module:refinery_slot',
       'module:refractory_lining',
+      'service:fuel',
       'service:quick_service',
       'service:recharge',
       'service:refine',

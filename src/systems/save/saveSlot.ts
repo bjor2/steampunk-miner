@@ -42,6 +42,7 @@ import {
   boreFieldsOf,
   oreRulesFieldOf,
   planetOfWorld,
+  systemFieldOf,
   type WorldSectionPlanet,
 } from './worldSectionFields'
 import {
@@ -186,6 +187,7 @@ function worldSectionOf(state: PortableState, saveEpoch: number): SaveWorldSecti
     worldSeed: state.planet.seed,
     planetIndex: state.planet.index,
     ...oreRulesFieldOf(state.planet),
+    ...systemFieldOf(state.planet),
     params: planetParamsOf(state.planet),
     chunks: state.world.chunks,
     platform: state.platform,

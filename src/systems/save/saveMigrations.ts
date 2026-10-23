@@ -18,6 +18,11 @@
  * Snapshot 20 -> 21 (ticket 399): the swept cut's cursor gains its carried work at 0
  * (`carriedCursors.ts`), as 19 -> 20 checks and digests; a save with no cursor keeps its state.
  *
+ * Snapshot 21 -> 22 (ticket 755, the star map): a save from before it is in system 1, the planet
+ * line it was played on, with every fuel tank empty. Both are the absent keys of this build, so the
+ * old digest is checked and the state is kept as saved; only the header moves, and a build from
+ * before the star map refuses a save that holds a system or fuel it would drop.
+ *
  * Generator 5 -> 6 (#175): the pad grew to -8..+12 under the two shop buildings, so the chunk edits
  * of every chunk the old or new pad and its cleared air touch are dropped and regenerate under the
  * new stamp, every vehicle is put on the Sell bay's rest pose, and the params are recomputed from
@@ -166,6 +171,7 @@ const SAVE_MIGRATION_STEPS: readonly SaveMigrationStep[] = [
   { version: 'snapshotVersion', from: 18, to: 19, migrate: levelsToSteps },
   { version: 'snapshotVersion', from: 19, to: 20, migrate: sizeChargeRacks },
   { version: 'snapshotVersion', from: 20, to: 21, migrate: carryOnCursors },
+  { version: 'snapshotVersion', from: 21, to: 22, migrate: placeInFirstSystem },
   { version: 'generatorVersion', from: 5, to: 6, migrate: regeneratePadArea },
   { version: 'generatorVersion', from: 6, to: 7, migrate: keepEditsUnderOreLeads },
   { version: 'generatorVersion', from: 7, to: 8, migrate: keepEditsUnderOreMix },
@@ -275,6 +281,11 @@ function sizeChargeRacks(file: MigratingFile): MigratingFile | null {
 /** Snapshot 20 -> 21: the cursors' carried work at 0; the generator version is kept. */
 function carryOnCursors(file: MigratingFile): MigratingFile | null {
   return reshapedFile(file, 21, withCarriedCursors)
+}
+
+/** Snapshot 21 -> 22: system 1 and empty tanks are the absent keys, so the state is kept. */
+function placeInFirstSystem(file: MigratingFile): MigratingFile | null {
+  return reshapedFile(file, 22, (state) => state)
 }
 
 /** Generator 5 -> 6: the state is read as saved (the digest must hold), then moved off the pad. */

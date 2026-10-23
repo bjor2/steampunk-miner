@@ -29,3 +29,9 @@ export function planetIndexOfCampaign(index: bigint): number {
   }
   return Number(index)
 }
+
+/** The safe-integer planet index of the address, or null where it would pass the safe range. */
+export function planetIndexAt(system: bigint, planet: bigint): number | null {
+  const index = campaignIndex(system, planet)
+  return index > MAX_PLANET_INDEX ? null : planetIndexOfCampaign(index)
+}

@@ -6,7 +6,14 @@
  *
  * A planet entered from this build carries the ore rules it was entered under (TD ruling on ticket
  * 445); one a save holds without them stays on the legacy rows until the player travels on.
+ *
+ * The planet's star-map system (ticket 755) is a canonical index text under `system`, absent in
+ * system 1: system 1 is today's planet line, where `index` is the planet's place `p`, so every
+ * save from before the star map is in system 1 and digests as before. The generator learns the
+ * seeds of later systems with the jump between them (ticket 759); until then a planet there has no
+ * generated world.
  */
+import { FIRST_SYSTEM, readIndexText, toIndexText } from '../starMap/planetAddress'
 import { dockSiteOf, type DockSite } from '../world/dockSite'
 import { rejectionOf, type Rejection } from './commandRule'
 import {
@@ -22,6 +29,8 @@ export interface SessionPlanet {
   seed: number
   /** The ore rules the planet was entered under; the key is absent on the legacy rows. */
   oreRulesVersion?: number
+  /** The star-map system from 2 as canonical index text (ticket 755); absent in system 1. */
+  system?: string
 }
 
 /** A planet as this build enters it: stamped with its ore rules from their first planet. */
@@ -36,6 +45,24 @@ export function withOreRulesVersion(
 ): SessionPlanet {
   const { index, seed } = planet
   return oreRulesVersion === undefined ? { index, seed } : { index, seed, oreRulesVersion }
+}
+
+/** The planet's star-map system; a planet with no `system` key is in system 1. */
+export function systemOfPlanet(planet: SessionPlanet): bigint {
+  return planet.system === undefined ? FIRST_SYSTEM : (readIndexText(planet.system) ?? FIRST_SYSTEM)
+}
+
+/** The planet with `system` under its key, or no key at all in system 1. */
+export function withSystem(planet: SessionPlanet, system: bigint): SessionPlanet {
+  const inFirstSystem = withOreRulesVersion(planet, planet.oreRulesVersion)
+  return system === FIRST_SYSTEM ? inFirstSystem : { ...inFirstSystem, system: toIndexText(system) }
+}
+
+/** Whether a snapshot's `system` field is one a planet may hold: absent, or a system from 2. */
+export function isPortableSystem(system: unknown): boolean {
+  if (system === undefined) return true
+  const index = readIndexText(system)
+  return index !== null && index > FIRST_SYSTEM
 }
 
 const TWO_TO_32 = 0x100000000
@@ -64,7 +91,13 @@ export function dockSiteOfPlanet(planet: SessionPlanet): DockSite | null {
 function isGeneratablePlanet(planet: SessionPlanet): boolean {
   const isUint32Seed = Number.isInteger(planet.seed) && planet.seed >= 0 && planet.seed < TWO_TO_32
   const isIndex = Number.isSafeInteger(planet.index) && planet.index >= 1
-  return isUint32Seed && isIndex && isKnownOreRulesVersion(planet.oreRulesVersion)
+  const isRules = isKnownOreRulesVersion(planet.oreRulesVersion)
+  return isUint32Seed && isIndex && isRules && isInGeneratedSystem(planet)
+}
+
+/** Only system 1 is generated until the jump between systems (ticket 759) seeds the others. */
+function isInGeneratedSystem(planet: SessionPlanet): boolean {
+  return planet.system === undefined
 }
 
 /** Vehicle commands need a world to act in. */

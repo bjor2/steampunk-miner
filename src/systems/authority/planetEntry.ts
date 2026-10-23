@@ -3,7 +3,8 @@
  * Its deltas start empty, its core progress, enemies, collapses, lava, bores, struts and grounded lines start fresh, and every vehicle stands on its dock
  * site, its drill's gated bite over (ticket 519) and its report cut's carry dropped (ticket 535). An item on auto stays on, its preview dropped (ticket 317). The vehicles keep their levels, energy, hull and cargo; the platform keeps its bay and look.
  * A charge still on a wall stays on the old planet's wall: it is gone, and the rack keeps the rest.
- * `Travel` and `debug.setPlanet` both go through here.
+ * `Travel`, the star map's jump (ticket 755) and `debug.setPlanet` all go through here; the planet
+ * keeps the star-map system it is moved to.
  *
  * The planet is entered under this build's ore rules (ticket 445): the stamp is set here from the
  * index, never carried over, so a legacy planet loaded from a save never passes its missing stamp on
@@ -31,10 +32,16 @@ import { playerOnNewPlanet } from './autoMode/autoModeState'
 import { combatOnNewPlanet } from './combat/enemyRoster'
 import { NEW_CORE_PROGRESS } from './coreProgress'
 import type { DomainEventBodies } from './domainEvent'
-import { dockSiteOfPlanet, enteredPlanetOf, type SessionPlanet } from './planetOfState'
+import {
+  dockSiteOfPlanet,
+  enteredPlanetOf,
+  systemOfPlanet,
+  withSystem,
+  type SessionPlanet,
+} from './planetOfState'
 
 export function withSessionOnPlanet(state: AuthorityState, to: SessionPlanet): AuthorityState {
-  const planet = enteredPlanetOf(to.index, to.seed)
+  const planet = withSystem(enteredPlanetOf(to.index, to.seed), systemOfPlanet(to))
   const site = dockSiteOfPlanet(planet)
   const pose = site === null ? null : dockedPoseAt(site)
   const players = Object.fromEntries(

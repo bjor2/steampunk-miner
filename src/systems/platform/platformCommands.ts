@@ -4,10 +4,11 @@
  * `QuickService`, `BuyUpgrade {upgradeId}`, `BuyCasingGrade`, `BuyGun` (#107), `BuyLiningType` and
  * `SelectLiningType` (#113), `Travel {toPlanet}`
  * (#10), and the Refinery bay's `QueueRefine`, `BuyRefinerySlot` and the Sell bay's
- * `CollectRefined` (#105), and the Upgrade bay's `RestockCharges` and `BuyChargeRackSlot` (#109).
- * The authority checks and prices each one.
+ * `CollectRefined` (#105), the Upgrade bay's `RestockCharges` and `BuyChargeRackSlot` (#109), and
+ * the star map's `BuyFuel` and `JumpToPlanet` (ticket 755). The authority checks and prices each one.
  */
 import type { CommandIntent } from '../authority/authorityCommand'
+import { toIndexText } from '../starMap/planetAddress'
 import type { OreSelection } from '../authority/platformServices'
 import type { BayId } from '../world/dockBays'
 
@@ -85,4 +86,16 @@ export function collectRefinedCommand(): CommandIntent<'collectRefined'> {
 
 export function travelCommand(toPlanet: number): CommandIntent<'travel'> {
   return { type: 'travel', payload: { toPlanet } }
+}
+
+export function buyFuelCommand(units: number): CommandIntent<'buyFuel'> {
+  return { type: 'buyFuel', payload: { units } }
+}
+
+/** The star map's jump (ticket 755) to planet `planet` of system `system`. */
+export function jumpToPlanetCommand(system: bigint, planet: bigint): CommandIntent<'jumpToPlanet'> {
+  return {
+    type: 'jumpToPlanet',
+    payload: { system: toIndexText(system), planet: toIndexText(planet) },
+  }
 }

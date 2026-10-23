@@ -109,6 +109,11 @@ export interface RejectionReasons {
   energy_short: true
   // Registered by Overpressure's toggle (ticket 383): the turret's shape has no burst.
   no_burst: true
+  // Registered by the star map's jump (ticket 755): the tank holds less than the jump burns, the
+  // session is on that planet already, or the planet is in another system (the jump drive's).
+  fuel_short: true
+  same_planet: true
+  other_system: true
 }
 
 export type RejectionReason = keyof RejectionReasons
@@ -425,12 +430,16 @@ export interface KernelDomainEventBodies {
   /** The bay first held `coreNeeded` on this planet, `durationTicks` after `core_reached`. */
   CoreCompleted: { durationTicks: number }
   PlatformConfigurationChanged: { visualState: PlatformVisualState }
+  /** `fuelSpent` (whole units as a canonical string) only on the star map's jump (ticket 755). */
   TravelStarted: {
     fromPlanet: number
     toPlanet: number
     cost: string
     coreSpent: number
+    fuelSpent?: string
   }
+  /** Fuel bought at the shop (ticket 755): whole units, their price and the tank after it. */
+  FuelBought: { units: number; cost: string; tank: string }
   PlanetUnlocked: { planetIndex: number }
   /** A locked-schedule row opened by arriving at its planet (#88), keyed by its #79 row id. */
   FeatureUnlocked: { featureId: string }

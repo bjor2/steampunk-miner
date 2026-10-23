@@ -446,8 +446,15 @@ import type { DriveSigns } from '../vehicle/driveSigns'
  *    no faster. Sideways and up cuts, the law and its top step are unchanged. The pacing bot bores a
  *    tile down for at least the ramp's time across it. A run with no cut down by `drillStep` moves
  *    no digest.
+ * 103: the star map's host-decided jump and fuel (ticket 755, the GD lock on #650): `buyFuel {units}`
+ *    at the Sell bay fills the vehicle's fuel tank (`vehicle.fuel`, a BigStat absent while empty)
+ *    at the planet's unit price, and `jumpToPlanet {system, planet}` moves the session to any
+ *    planet of its system for the fuel the hop burns (`economy/jumpFuel.ts`, provisional until
+ *    ticket 756), with no fee and no core fragments; `travel_started` names the `fuelSpent`. The
+ *    planet carries its star-map `system` outside system 1. `Travel` is unchanged, so a run that
+ *    buys no fuel moves no digest.
  */
-export const AUTHORITY_PROTOCOL_VERSION = 102
+export const AUTHORITY_PROTOCOL_VERSION = 103
 
 /** The kernel's own commands: the closed set its rule tables are written against. */
 export interface KernelCommandPayloads {
@@ -522,6 +529,13 @@ export interface KernelCommandPayloads {
   collectRefined: Record<string, never>
   /** Moves the docked platform to the next planet, paying the fee and the core (#10). */
   travel: { toPlanet: number }
+  /** The shop's fuel (ticket 755): whole units into the tank at this planet's price. */
+  buyFuel: { units: number }
+  /**
+   * The star map's jump (ticket 755): the host moves the session to planet `planet` of system
+   * `system`, both canonical index text, burning the requesting vehicle's fuel.
+   */
+  jumpToPlanet: { system: string; planet: string }
   /** `interact` while overlapping the planet's live artefact cache opens its choice (#46). */
   openArtefactCache: Record<string, never>
   /** Takes one of the three options for good; the other two are gone (#46). */

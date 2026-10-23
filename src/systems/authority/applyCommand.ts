@@ -59,6 +59,8 @@ import { REFINERY_RULES } from './refinery/refineryRules'
 import { VEHICLE_COMMAND_RULES } from './vehicleCommandRules'
 import { VEHICLE_ITEM_RULES } from './vehicleItemRules'
 import { TRAVEL_RULES } from './travelRules'
+import { FUEL_SHOP_RULES } from './starMap/fuelShopRules'
+import { JUMP_RULES } from './starMap/jumpRules'
 import { WORKSHOP_RULES } from './workshopRules'
 
 export interface CommandOutcome {
@@ -100,6 +102,8 @@ const COMMAND_RULES: Readonly<Record<string, CommandRule<CommandType>>> = {
   ...GUN_RULES,
   ...LINING_RULES,
   ...TRAVEL_RULES,
+  ...FUEL_SHOP_RULES,
+  ...JUMP_RULES,
   ...ARTEFACT_RULES,
   ...REFINERY_RULES,
   ...REFINERY_COLLECTION_RULES,

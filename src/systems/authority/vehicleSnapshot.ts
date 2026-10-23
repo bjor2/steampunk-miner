@@ -14,6 +14,7 @@ import { BORE_SIDES } from '../vehicle/facedSide'
 import { isFacing, type VehiclePose } from '../vehicle/vehiclePose'
 import { isGunMode } from '../vehicle/vehicleGun'
 import { isLiningType } from '../vehicle/liningType'
+import { fuelFieldOfPortable, isPortableFuel, portableFuelField } from '../vehicle/vehicleFuel'
 import { upgradeLevelsProblems } from '../vehicle/vehicleStats'
 import type { Cargo, VehicleMode, VehicleState } from '../vehicle/vehicleState'
 import { isCasingValue, type ChunkDelta } from '../world/chunkDelta'
@@ -30,12 +31,14 @@ import { isJsonObject, isWholeNumber } from './payloadFields'
 
 export type PortableVehicle = Omit<
   VehicleState,
-  'hull' | 'liningBill' | 'liningPaidThisVisit' | 'loadout'
+  'hull' | 'liningBill' | 'liningPaidThisVisit' | 'loadout' | 'fuel'
 > & {
   hull: string
   liningBill: string
   liningPaidThisVisit: string | null
   loadout: PortableSection
+  /** The fuel tank in whole units (ticket 755); omitted while empty. */
+  fuel?: string
 }
 
 export interface PortableWorld {
@@ -52,23 +55,27 @@ function isByte(value: number): boolean {
 }
 
 export function portableVehicleOf(vehicle: VehicleState): PortableVehicle {
+  const { fuel, ...rest } = vehicle
   return {
-    ...vehicle,
+    ...rest,
     hull: toCanonical(vehicle.hull),
     liningBill: toCanonical(vehicle.liningBill),
     liningPaidThisVisit: canonicalOrNull(vehicle.liningPaidThisVisit),
     loadout: portableLoadoutOf(vehicle.loadout),
+    ...portableFuelField(fuel),
   }
 }
 
 export function vehicleOfPortable(vehicle: PortableVehicle): VehicleState {
+  const { fuel, ...rest } = vehicle
   return {
-    ...vehicle,
+    ...rest,
     hull: fromCanonical(vehicle.hull),
     liningBill: fromCanonical(vehicle.liningBill),
     liningPaidThisVisit:
       vehicle.liningPaidThisVisit === null ? null : fromCanonical(vehicle.liningPaidThisVisit),
     loadout: loadoutOfPortable(vehicle.loadout),
+    ...fuelFieldOfPortable(fuel),
   }
 }
 
@@ -163,6 +170,9 @@ export function portableVehicleProblems(vehicle: unknown, path: string): string[
       : [
           `${path}.sweptCut must hold safe-integer mm points, a facing, a tick and the cut gate, or be left out`,
         ]),
+    ...(isPortableFuel(vehicle.fuel)
+      ? []
+      : [`${path}.fuel must be whole fuel units above 0 as a decimal string, or be left out`]),
   ]
 }
 

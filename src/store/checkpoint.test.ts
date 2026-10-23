@@ -155,6 +155,7 @@ describe('checkpoint', () => {
       { version: 'snapshotVersion', from: 18, to: 19 },
       { version: 'snapshotVersion', from: 19, to: 20 },
       { version: 'snapshotVersion', from: 20, to: 21 },
+      { version: 'snapshotVersion', from: 21, to: 22 },
       { version: 'generatorVersion', from: 5, to: 6 },
       { version: 'generatorVersion', from: 6, to: 7 },
       { version: 'generatorVersion', from: 7, to: 8 },

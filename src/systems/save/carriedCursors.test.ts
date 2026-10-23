@@ -65,7 +65,10 @@ describe('save migration chain: snapshot 20 -> 21 (ticket 399)', () => {
     const file = saveSlotOf({ ...takeSnapshot(old), snapshotVersion: 20 }, 1)
     const reading = readMigratedSaveSlot(file)
     if (!('state' in reading)) throw new Error(reading.problems.join('; '))
-    expect(reading.migrations).toEqual([{ version: 'snapshotVersion', from: 20, to: 21 }])
+    expect(reading.migrations).toEqual([
+      { version: 'snapshotVersion', from: 20, to: 21 },
+      { version: 'snapshotVersion', from: 21, to: 22 },
+    ])
     expect(vehicleOf(reading.state, 'p1').sweptCut).toEqual({
       ...vehicleOf(old, 'p1').sweptCut,
       carrySubSteps: 0,

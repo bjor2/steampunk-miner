@@ -12,6 +12,8 @@ export interface WorldSectionPlanet {
   planetIndex: number
   /** The ore rules the planet was entered under (ticket 445); omitted on the legacy rows. */
   oreRulesVersion?: number
+  /** The star-map system from 2 (ticket 755); omitted in system 1, so older saves read there. */
+  system?: string
 }
 
 /** The planet's ore rules under their key, or no key on the legacy rows. */
@@ -22,10 +24,18 @@ export function oreRulesFieldOf(
   return oreRulesVersion === undefined ? {} : { oreRulesVersion }
 }
 
-/** The planet the world section is on, its ore rules included. */
+/** The planet's star-map system under its key, or no key in system 1. */
+export function systemFieldOf(
+  planet: Pick<SessionPlanet, 'system'>,
+): Pick<SessionPlanet, 'system'> {
+  const { system } = planet
+  return system === undefined ? {} : { system }
+}
+
+/** The planet the world section is on, its ore rules and system included. */
 export function planetOfWorld(world: WorldSectionPlanet): SessionPlanet {
   const planet = { index: world.planetIndex, seed: world.worldSeed }
-  return withOreRulesVersion(planet, world.oreRulesVersion)
+  return { ...withOreRulesVersion(planet, world.oreRulesVersion), ...systemFieldOf(world) }
 }
 
 /** The bore gun's optional state (tickets 313, 378, 379). */

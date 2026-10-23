@@ -52,7 +52,7 @@ import { coreProgressProblems, type CoreProgress } from './coreProgress'
 import { devFlagFieldsOf, portableDevFlagProblems, type DevFlagDelta } from './devFlagState'
 import { heldArtefactProblems, type HeldArtefact } from './heldArtefact'
 import { isJsonObject, isWholeNumber } from './payloadFields'
-import { withOreRulesVersion, type SessionPlanet } from './planetOfState'
+import { isPortableSystem, systemOfPlanet, withSystem, type SessionPlanet } from './planetOfState'
 import { isKnownOreRulesVersion } from '../world/planetParams'
 import { isPlatformVisualState, type PlatformState } from './platformState'
 import { copyRefinerySlots, refinerySlotsProblems } from './refinery/refineryBatch'
@@ -76,6 +76,8 @@ import {
 } from './vehicleSnapshot'
 
 /**
+ * 22: the star map (ticket 755): the planet's system outside system 1 and each vehicle's fuel tank
+ * while it holds fuel (older saves are in system 1 with an empty tank, `saveMigrations.ts`);
  * 21: the swept cut's cursor carries its work toward the next cell, `carrySubSteps` (ticket 399;
  * older saves reach it at 0 through `saveMigrations.ts`); 20: the charge rack carries charges by size and a planted charge its size, planting tick and a
  * fuse tick or null (K8 #218; older saves reach it through `saveMigrations.ts`); 19: each track's
@@ -94,7 +96,7 @@ import {
  * vehicle's casing grade (#41, #58); 5: combat joined the state (#25); 4 the planet's core
  * progress (#24); 3 the platform (#23).
  */
-export const SNAPSHOT_VERSION = 21
+export const SNAPSHOT_VERSION = 22
 
 export interface SessionSnapshot {
   snapshotVersion: number
@@ -108,7 +110,10 @@ export interface SessionSnapshot {
 /** AuthorityState with each Money written as its canonical string. */
 export interface PortableState {
   tick: number
-  /** `oreRulesVersion` only on a planet entered under the ore rules (ticket 445). */
+  /**
+   * `oreRulesVersion` only on a planet entered under the ore rules (ticket 445), `system` only
+   * outside system 1 (ticket 755).
+   */
   planet: SessionPlanet
   players: Record<string, PortablePlayer>
   world: PortableWorld
@@ -236,7 +241,7 @@ function verifiedRestore(snapshot: SessionSnapshot): SnapshotRestore {
 function authorityStateOf(portable: PortableState): AuthorityState {
   return {
     tick: portable.tick,
-    planet: withOreRulesVersion(portable.planet, portable.planet.oreRulesVersion),
+    planet: withSystem(portable.planet, systemOfPlanet(portable.planet)),
     players: Object.fromEntries(
       Object.entries(portable.players).map(([id, player]) => [id, playerStateOf(player)]),
     ),
@@ -340,9 +345,14 @@ function planetProblems(planet: unknown): string[] {
   const isValid =
     isJsonObject(planet) && isWholeNumber(planet.index) && Number.isSafeInteger(planet.seed)
   if (!isValid) return ['snapshot.state.planet must hold a whole index and a safe-integer seed']
-  return isKnownOreRulesVersion(planet.oreRulesVersion)
-    ? []
-    : ['snapshot.state.planet.oreRulesVersion is not ore rules this build knows']
+  return [
+    ...(isKnownOreRulesVersion(planet.oreRulesVersion)
+      ? []
+      : ['snapshot.state.planet.oreRulesVersion is not ore rules this build knows']),
+    ...(isPortableSystem(planet.system)
+      ? []
+      : ['snapshot.state.planet.system must be a system index from "2", or be left out']),
+  ]
 }
 
 function platformProblems(platform: unknown): string[] {

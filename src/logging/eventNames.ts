@@ -247,7 +247,14 @@ export const RUN_EVENT_REGISTRY = {
   travel_started: {
     group: 'progression',
     level: 'core',
-    payload: { fromPlanet: 'integer', toPlanet: 'integer', cost: 'money', coreSpent: 'integer' },
+    payload: {
+      fromPlanet: 'integer',
+      toPlanet: 'integer',
+      cost: 'money',
+      coreSpent: 'integer',
+      // The fuel a star-map jump burnt (ticket 755); optional, so a `Travel` line reads as before.
+      fuelSpent: { optional: 'money' },
+    },
   },
   // A locked-schedule row (#79 id) that opened on this travel (#88); the envelope's `planet` is
   // the planet arrived at.
@@ -286,6 +293,12 @@ export const RUN_EVENT_REGISTRY = {
     group: 'platform',
     level: 'core',
     payload: { billed: 'money', paid: 'money', forgiven: 'money' },
+  },
+  // Fuel bought at the shop for the star map (ticket 755): whole units, their price, the tank after.
+  fuel_bought: {
+    group: 'platform',
+    level: 'core',
+    payload: { units: 'integer', cost: 'money', tank: 'money' },
   },
   energy_recharged: {
     group: 'platform',

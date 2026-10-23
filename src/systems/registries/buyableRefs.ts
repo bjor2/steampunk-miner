@@ -59,6 +59,8 @@ export function kernelCommandBuys(): {
     buyRefinerySlot: [KERNEL_ITEMS.refinerySlot],
     collectRefined: NOT_A_BUY,
     travel: [KERNEL_ITEMS.travel],
+    buyFuel: [KERNEL_ITEMS.fuel],
+    jumpToPlanet: NOT_A_BUY,
     openArtefactCache: NOT_A_BUY,
     chooseArtefact: everyArtefactOption().map((option) => artefactItemOf(option.id)),
     plantCharge: NOT_A_BUY,

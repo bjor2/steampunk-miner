@@ -896,6 +896,9 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/authority/spanBudget.test.ts` | 5 | 5 |
 | `src/systems/authority/speedScaling.lane.test.ts` | 3 | 1 |
 | `src/systems/authority/speedScaling.test.ts` | 28 | 12 |
+| `src/systems/authority/starMap/fuelShopRules.test.ts` | 6 | 6 |
+| `src/systems/authority/starMap/jumpRules.test.ts` | 12 | 12 |
+| `src/systems/authority/starMap/starMapSnapshot.test.ts` | 6 | 6 |
 | `src/systems/authority/startingRigCutSpeed.test.ts` | 4 | 4 |
 | `src/systems/authority/stateDigest.test.ts` | 17 | 12 |
 | `src/systems/authority/sweptCarry.test.ts` | 8 | 6 |
@@ -1024,11 +1027,12 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/economy/heatEconomy.test.ts` | 11 | 11 |
 | `src/systems/economy/itemEffectCaps.test.ts` | 6 | 6 |
 | `src/systems/economy/itemHookCaps.test.ts` | 8 | 8 |
+| `src/systems/economy/jumpFuel.test.ts` | 3 | 3 |
 | `src/systems/economy/magnetCaps.test.ts` | 5 | 5 |
 | `src/systems/economy/oreEconomy.test.ts` | 7 | 7 |
 | `src/systems/economy/perPurchaseRows.test.ts` | 40 | 21 |
 | `src/systems/economy/planetCharges.test.ts` | 17 | 13 |
-| `src/systems/economy/readEconomy.test.ts` | 25 | 25 |
+| `src/systems/economy/readEconomy.test.ts` | 26 | 26 |
 | `src/systems/economy/refineryEconomy.test.ts` | 6 | 6 |
 | `src/systems/economy/trackKind.test.ts` | 1 | 1 |
 | `src/systems/economy/travelCharge.test.ts` | 7 | 7 |
@@ -1386,6 +1390,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/save/savedUnlocks.test.ts` | 7 | 7 |
 | `src/systems/save/sizedChargeRacks.test.ts` | 3 | 3 |
 | `src/systems/save/slotFormatMigration.test.ts` | 8 | 8 |
+| `src/systems/save/starMapOldSaves.test.ts` | 6 | 4 |
 | `src/systems/save/surfaceToughnessFreshSaves.test.ts` | 8 | 2 |
 | `src/systems/save/worldSaveOwnership.test.ts` | 2 | 2 |
 
