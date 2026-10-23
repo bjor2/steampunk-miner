@@ -35,6 +35,7 @@ import { MATERIAL_RARITIES, MATERIALS } from '../materials'
 import { ORE_ROWS, rarityTiers } from '../ores'
 import { NAMED_SEEDS } from './rosterFixtures'
 import { renderStateDigestOf } from './renderStateFixtures'
+import { ROSTER_ORE_RULES } from './systems/planetRoster'
 import { actOf } from '../planet-mix'
 import {
   heroAtlasOfPlanet,
@@ -245,7 +246,8 @@ describe('roster kind looks', () => {
   )
 
   it('keeps every array main drew on a roster planet and adds only the kind slots', () => {
-    const digest = renderStateDigestOf(freshPlanetParamsFor(SEED, 1))
+    // The roster's own rules: a fresh planet 1 also grows its rare ore in clusters (ticket 737).
+    const digest = renderStateDigestOf(planetParamsFor(SEED, 1, ROSTER_ORE_RULES))
     expect(digest.drawn).toBe(MAIN_DRAWN_DIGESTS[`${SEED} 1`])
     expect(digest.kindSlots.some((slot) => slot !== NO_KIND_SLOT)).toBe(true)
   })

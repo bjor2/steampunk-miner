@@ -18,6 +18,18 @@ export interface PatchContent {
   kindSlot?: number
 }
 
+/**
+ * A rare kind every planet under the rare-cluster rules holds at least one cluster of (ticket 737):
+ * the cell it paints and the bands it may sit in. The kernel keeps only bands from 3 (`d >= 0.35`).
+ */
+export interface ClusterKind {
+  family: ResourceFamily
+  /** Tiers above its band's own ore: 2 rare, 3 epic, 4 mythic (the rarity rows, ticket 445). */
+  lead: number
+  kindSlot: number
+  bands: readonly number[]
+}
+
 export interface GenerationHook {
   id: string
   /**
@@ -32,6 +44,8 @@ export interface GenerationHook {
   ): PatchContent
   /** Fold over each painted ore cell. */
   oreCell?(params: PlanetParams, tile: TilePoint, cell: number, seed: number): number
+  /** The rare kinds the planet holds one guaranteed cluster of each, in the hook's own order. */
+  clusterKinds?(params: PlanetParams): readonly ClusterKind[]
   /** Paint after lava pockets, before the dock, starter-vein and cache stamps. */
   paint?(params: PlanetParams, cells: Uint32Array, cx: number, cy: number, seed: number): void
 }
@@ -62,6 +76,11 @@ export function foldOreCell(params: PlanetParams, tile: TilePoint, cell: number)
       hook.oreCell?.(params, tile, folded, subSeedForHook(params, hook.id)) ?? folded,
     cell,
   )
+}
+
+/** Every hook's guaranteed cluster kinds, hooks in id order. */
+export function clusterKindsOfHooks(params: PlanetParams): ClusterKind[] {
+  return generationHooks().flatMap((hook) => hook.clusterKinds?.(params) ?? [])
 }
 
 /** Every `paint` hook over the chunk's cells, in id order. */

@@ -32,7 +32,8 @@ interface SeedCensus {
 function censusOfSeed(seed: number): SeedCensus {
   return {
     seed,
-    fresh: planetCensusOf(freshPlanetParamsFor(seed, 2)),
+    // Rules 9 by name: a fresh planet 2 is stamped with the rare clusters' rules 10 (ticket 737).
+    fresh: planetCensusOf(planetParamsFor(seed, 2, P2_OWN_KINDS_ORE_RULES)),
     before: planetCensusOf(planetParamsFor(seed, 2, P2_OWN_KINDS_ORE_RULES - 1)),
   }
 }
@@ -74,7 +75,7 @@ describe("planet 2's own kinds", () => {
   it('enters a fresh planet 2 under the own kinds rules, its slots 13 to 15 Cinnabar, Aquamarine and Jet', () => {
     const fresh = freshPlanetParamsFor(FIVE_SEEDS[0], 2)
     const before = planetParamsFor(FIVE_SEEDS[0], 2, P2_OWN_KINDS_ORE_RULES - 1)
-    expect(fresh.oreRulesVersion).toBe(P2_OWN_KINDS_ORE_RULES)
+    expect(fresh.oreRulesVersion).toBeGreaterThanOrEqual(P2_OWN_KINDS_ORE_RULES)
     expect(OWN_KIND_SLOTS.map((slot) => planetSpeciesOf(fresh, slot)?.epithet)).toEqual([
       'Cinnabar',
       'Aquamarine',

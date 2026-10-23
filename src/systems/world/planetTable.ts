@@ -130,3 +130,19 @@ export const ARTEFACT_CACHE_BANDS: readonly number[] = [3, 2]
 
 /** The starter vein is placed on planet 1 within this many tiles of the dock (#16). */
 export const STARTER_ZONE_RADIUS_TILES = 15
+
+/**
+ * Bjor's deep-rares rule (GD lock on ticket 737, 22 Oct): rare, epic and mythic ore grows in
+ * seeded clusters of 1, 2 or 3 orthogonally connected cells, at these percent shares (Planet &
+ * Narrative's rule, Materials room), never as whole patches.
+ */
+export const RARE_CLUSTER_SIZE_SHARES_PERCENT: readonly number[] = [50, 35, 15]
+
+/** The lead from which a patch is a rare cluster: rare's tier offset in the rarity rows (445). */
+export const RARE_CLUSTER_FIRST_LEAD = 2
+
+/**
+ * Rare clusters grow, and guaranteed ones sit, only at `d >= 0.35` of the radius from the surface
+ * (GD lock on ticket 737): band 3 starts at 35% of the depth (`BAND_START_DEPTH_PERCENT`).
+ */
+export const DEEP_RARE_FIRST_BAND = 3

@@ -137,7 +137,7 @@ describe('surface layer', () => {
 
   it('leaves planet 1 with no layer and its rock at the band value at every depth', () => {
     const params = freshPlanetParamsFor(WORLD_SEED, 1)
-    expect(params.oreRulesVersion).toBe(2)
+    expect(params.oreRulesVersion).toBe(10)
     expect(surfaceLayerOf(params)).toBeNull()
     expect(surfaceLayerOf(planetParamsFor(WORLD_SEED, 1, 5))).toBeNull()
     expect(new Set(rockColumn(params).map(toCanonical))).toEqual(new Set([CANONICAL_ONE]))

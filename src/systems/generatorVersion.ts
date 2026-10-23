@@ -27,5 +27,8 @@
  * Jet, on its uncommon and rare patches of bands 4 and 5 on a planet 2 entered under ore rules 9
  * (ticket 709, TD ruling: v13 kept as the versioned path), which rewrites the kind slot of those
  * patches alone, while planet 1, planets 3 on and every planet a save holds keep the cells of 13.
+ * Version 15 grows the rare, epic and mythic ore of every planet entered under ore rules 10 as
+ * seeded clusters of 1 to 3 cells, with one guaranteed cluster of each rare kind at `d >= 0.35`
+ * (ticket 737, Bjor's deep-rares rule), while every planet a save holds keeps the cells of 14.
  */
-export const GENERATOR_VERSION = 14
+export const GENERATOR_VERSION = 15

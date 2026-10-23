@@ -9,6 +9,7 @@ import {
   P2_OWN_KINDS_ORE_RULES,
   planetParamsFor,
   RADIUS_ROWS_ORE_RULES,
+  RARE_CLUSTER_ORE_RULES,
   radiusForPlanet,
   SURFACE_LAYER_ORE_RULES,
   type PlanetParams,
@@ -38,14 +39,15 @@ import { chunkRangeOfDisc } from './tileGrid'
  * 2 entered under ore rules 7 under 13, ticket 643, pinned by the registry digests and leaving
  * planet 1 and every planet past the registry's last row as rules 6 made them, and P2's own kinds
  * of a planet 2 entered under ore rules 9 under 14, ticket 709, pinned by the own kinds digest and
- * leaving planet 1 and planets 3 on as rules 8 made them, with the features loaded as the game
- * loads them): a committed
+ * leaving planet 1 and planets 3 on as rules 8 made them, and the rare-ore clusters of every planet
+ * entered under ore rules 10 under 15, ticket 737, pinned by the cluster digests of planets 1 to 3,
+ * with the features loaded as the game loads them): a committed
  * digest of the generator's cells and density. If this fails, the
  * generator changed what a seed makes: bump GENERATOR_VERSION (saves and replays of the old
  * world are then refused) and update the version and digests below in the same commit.
  */
 const GOLDEN = {
-  generatorVersion: 14,
+  generatorVersion: 15,
   wholePlanet1: '4219af3346401cb7',
   wholePlanet2: 'ff1572afae8b0e0f',
   farPlanetChunks: 'c602124184c77617',
@@ -64,6 +66,9 @@ const GOLDEN = {
   registryHeatPlanetChunks: 'd568c7407fa2f81b',
   registryPlanet10Chunks: 'cda25bf497309628',
   ownKindsWholePlanet2: '5a736035f5f215bb',
+  clusterWholePlanet1: '85334ac5b813348f',
+  clusterWholePlanet2: '7b60bdfb68a5d5ee',
+  clusterWholePlanet3: 'bdceeb5729e0b1f6',
 }
 
 /** One digest over every chunk's digest in a fixed order. */
@@ -216,5 +221,18 @@ describe('generator golden digest', () => {
         digestOfChunks(before, HEAT_PLANET_CHUNKS),
       )
     }
+  })
+
+  it('makes the committed planets 1 to 3 with rare-ore clusters, ore rules 10 (ticket 737)', () => {
+    const clustered = (seed: number, planet: number) =>
+      planetParamsFor(seed, planet, RARE_CLUSTER_ORE_RULES)
+    const planet1 = clustered(83921, 1)
+    const planet2 = clustered(4_000_000_000, 2)
+    const planet3 = clustered(83921, 3)
+    expect(digestOfChunks(planet1, everyChunkOf(planet1))).toBe(GOLDEN.clusterWholePlanet1)
+    expect(digestOfChunks(planet2, everyChunkOf(planet2))).toBe(GOLDEN.clusterWholePlanet2)
+    expect(digestOfChunks(planet3, everyChunkOf(planet3))).toBe(GOLDEN.clusterWholePlanet3)
+    expect(GOLDEN.clusterWholePlanet1).not.toBe(GOLDEN.stampedWholePlanet1)
+    expect(GOLDEN.clusterWholePlanet2).not.toBe(GOLDEN.ownKindsWholePlanet2)
   })
 })

@@ -18,6 +18,7 @@ import { bandOfTile } from '../../systems/world/planetGeometry'
 import {
   ORE_RULES_VERSION,
   planetParamsFor,
+  RARE_CLUSTER_ORE_RULES,
   type PlanetParams,
 } from '../../systems/world/planetParams'
 import type { TilePoint } from '../../systems/world/tileGrid'
@@ -36,8 +37,12 @@ export const RARITY_RUN_PLANET = 3
  * on (`rarityTripClamp.test.ts`) before ticket 553 bought the hold per purchase (P3 on curve: 119).
  */
 export const RARITY_RUN_HOLD_STEP = 23
-/** Band 5, Systems' binding case; of the pinned seeds only 27182's P3 band 5 holds an epic patch. */
-export const BAND_5_RUN = { seed: 27182, bands: [5] } as const
+/**
+ * Band 3 of seed 27182's P3, the band of the pinned seeds that holds the most epic cells since they
+ * grow in clusters (ticket 737): ten. Band 5 was Systems' binding case, but holds at most six now.
+ * The cap binds the same way in both: 0.15 x 90 x V(t_b) is four epics' V(t_b + 3) exactly.
+ */
+export const CAP_RUN = { seed: 27182, bands: [3] } as const
 /** Every band epic and mythic are live in on P3 (`firstBand` 3 and 4). */
 export const CLAMPED_BANDS = [3, 4, 5] as const
 /** Enough epic and mythic cells to pass the cap of a 90-unit hold (four epics reach it). */
@@ -49,6 +54,15 @@ const DRILL_TICKS = 40
 /** A planet as this build enters it from P3: on the mixed rows of the ore rules. */
 export function stampedRunParamsOf(seed: number, planetIndex = RARITY_RUN_PLANET): PlanetParams {
   return planetParamsFor(seed, planetIndex, ORE_RULES_VERSION)
+}
+
+/**
+ * The same planet under the last ore rules that paint whole epic and mythic patches: from rules 10
+ * they grow as clusters of 1 to 3 cells (ticket 737), so a spec that prices finds without mining
+ * them reads its many epic cells here; the clamp prices a find the same wherever it was placed.
+ */
+export function wholePatchParamsOf(seed: number, planetIndex = RARITY_RUN_PLANET): PlanetParams {
+  return planetParamsFor(seed, planetIndex, RARE_CLUSTER_ORE_RULES - 1)
 }
 
 /** The find the kernel hands the pickup seam for the cell a tile generated. */

@@ -35,6 +35,7 @@ import {
   RARITY_RUN_HOLD_STEP,
   RARITY_RUN_PLANET,
   stampedRunParamsOf,
+  wholePatchParamsOf,
 } from './rarityTripFixtures'
 import { isTripClamped, rarityTripCapAt } from './systems/rarityTripClamp'
 import { RARITY_TRIP_SECTION, rarityTripOf, withRarityTrip } from './systems/rarityTripSection'
@@ -45,7 +46,7 @@ import { RARITY_TRIP_SECTION, rarityTripOf, withRarityTrip } from './systems/rar
 // end it.
 
 const SEED = 83921
-const PARAMS = stampedRunParamsOf(SEED)
+const PARAMS = wholePatchParamsOf(SEED)
 const [EPIC_TILE] = clampedTilesOf(PARAMS, 1, CLAMPED_BANDS)
 
 /** Planet 3 under the ore rules with the 90-unit hold the trip-cap rows are pinned on. */

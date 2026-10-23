@@ -23,6 +23,8 @@ export const SEED_PURPOSE = {
    * hash in `subSeedForHook`; it moves no output until a hook uses it.
    */
   sliceHook: 10,
+  /** Rare-ore cluster sizes, growth and the guaranteed cluster of each rare kind (ticket 737). */
+  rareCluster: 11,
 } as const
 
 export type SeedPurpose = (typeof SEED_PURPOSE)[keyof typeof SEED_PURPOSE]

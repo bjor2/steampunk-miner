@@ -1,7 +1,8 @@
 /**
  * The planet's ground read from its seed and edit log, a tile at a time and without generating a
  * chunk (TD scope g 2-3 on #316, ticket 341): `baseCellOfTile` for space, core and caves, the
- * chunk's ore patches (each patch's content after the slices' patch hooks), the lava pockets on the
+ * chunk's ore patches (each patch's content after the slices' patch hooks, a rare patch's cluster
+ * alone under ore rules 10) and the guaranteed rare clusters (ticket 737), the lava pockets on the
  * plain ground left, then the dock, starter-vein and cache stamps, as `generateChunk` paints them;
  * then the chunk's delta (lava flows, overrides, yielded cells). Slices that paint whole chunks
  * (`paint` hooks, none registered yet) are left to a full-chunk read.
@@ -23,7 +24,9 @@ import {
 } from '../../world/chunkDelta'
 import { dockSiteTiles } from '../../world/dockSite'
 import { patchCellOf, patchesForChunk } from '../../world/generateChunk'
+import { guaranteedClusterTiles } from '../../world/guaranteedClusters'
 import type { PlanetParams } from '../../world/planetParams'
+import { oreTilesOfPatch } from '../../world/rareClusters'
 import { starterVeinTiles } from '../../world/starterVein'
 import {
   CHUNK_SIZE,
@@ -221,19 +224,37 @@ function chunkBlockKindsOf(lattice: LatticeKinds, cx: number, cy: number): numbe
 
 /**
  * The chunk's patch ore by cell index. A patch's tiles are plain ground of its band, so a tile is
- * painted unless an earlier patch took it, as `generateChunk` paints.
+ * painted unless an earlier patch took it, as `generateChunk` paints; the guaranteed clusters sit
+ * where no patch reaches.
  */
 function oreCellsOfChunk(params: PlanetParams, cx: number, cy: number): Map<number, number> {
   const cells = new Map<number, number>()
+  readPatchOre(params, cells, cx, cy)
+  readGuaranteedClusters(params, cells, cx, cy)
+  return cells
+}
+
+function readPatchOre(params: PlanetParams, cells: Map<number, number>, cx: number, cy: number) {
   for (const patch of patchesForChunk(params, cx, cy)) {
     const cell = patchCellOf(params, patch)
-    for (const tile of patch.tiles) {
+    for (const tile of oreTilesOfPatch(params, patch, cell)) {
       const index = cellIndexOfTile(tile.tx, tile.ty)
       if (isTileInChunk(tile, cx, cy) && !cells.has(index))
         cells.set(index, foldOreCell(params, tile, cell))
     }
   }
-  return cells
+}
+
+function readGuaranteedClusters(
+  params: PlanetParams,
+  cells: Map<number, number>,
+  cx: number,
+  cy: number,
+) {
+  for (const placed of guaranteedClusterTiles(params)) {
+    const index = cellIndexOfTile(placed.tx, placed.ty)
+    if (isTileInChunk(placed, cx, cy) && !cells.has(index)) cells.set(index, placed.cell)
+  }
 }
 
 /** The placed tiles in stamping order, the later winning: dock site, starter vein, cache. */

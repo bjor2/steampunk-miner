@@ -17,16 +17,21 @@ import type { PlanetParams } from '../../../systems/world/planetParams'
 import { NO_KIND_SLOT } from '../../../systems/world/worldCell'
 import { familyOfCellCode, isSlotLiveInBand, rarityTiers, type KindSlot } from '../../ores'
 import { planetRosterOf } from './planetRoster'
+import { rareClusterKindsOf } from './rosterClusterKinds'
 
 export const ROSTER_HOOK_ID = 'roster.materials'
 
-/** Writes each patch's drawn kind into its content's kind slot. */
+/**
+ * Writes each patch's drawn kind into its content's kind slot, and names the rare kinds the planet
+ * holds a guaranteed cluster of (ticket 737).
+ */
 export const rosterMaterialsHook: GenerationHook = {
   id: ROSTER_HOOK_ID,
   patchContent: (params, patch, content, seed) => ({
     ...content,
     kindSlot: kindSlotOfPatch(params, patch, content, seed),
   }),
+  clusterKinds: rareClusterKindsOf,
 }
 
 /** The roster index plus one of the kind the patch draws, `NO_KIND_SLOT` when none is live. */

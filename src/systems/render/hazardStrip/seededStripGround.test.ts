@@ -4,7 +4,9 @@ import type { SliceDefinition } from '../../../registries/sliceDefinition'
 import { artefactCacheTile } from '../../world/artefactCache'
 import { withCellsYielded, withLavaFlipped } from '../../world/chunkDelta'
 import { generateChunkCells } from '../../world/generateChunk'
-import { planetParamsFor, type PlanetParams } from '../../world/planetParams'
+import { guaranteedClusterTiles } from '../../world/guaranteedClusters'
+import { grownClustersOf } from '../../world/rareClusterCensus'
+import { freshPlanetParamsFor, planetParamsFor, type PlanetParams } from '../../world/planetParams'
 import {
   CHUNK_SIZE,
   cellIndexOfTile,
@@ -70,6 +72,27 @@ function firstSurfaceOre(params: PlanetParams): TilePoint {
 }
 
 describe('seeded strip ground', () => {
+  it.each([1, 3])(
+    'reads a fresh planet %i, its rare clusters and guaranteed clusters (ticket 737), as generateChunk paints it',
+    (planetIndex) => {
+      const params = freshPlanetParamsFor(SEED, planetIndex)
+      const guaranteed = guaranteedClusterTiles(params)
+      const ground = createSeededStripGround(params, EMPTY_WORLD)
+      expect(guaranteed.length).toBeGreaterThan(0)
+      const clusterTiles = grownClustersOf(params).flat()
+      expect(clusterTiles.length).toBeGreaterThan(guaranteed.length)
+      const chunks = [
+        ...chunksDownTheMiddle(params),
+        ...clusterTiles.map((tile) => ({ cx: chunkOfTile(tile.tx), cy: chunkOfTile(tile.ty) })),
+      ]
+      for (const { cx, cy } of chunks) {
+        const cells = generateChunkCells(params, cx, cy)
+        const read = tilesOfChunk(cx, cy).map((tile) => ground.generatedCellAt(tile))
+        expect(read).toEqual([...cells])
+      }
+    },
+  )
+
   it('shows ore under a gate as the gate kind alone, even with the scanner open', () => {
     withRegistrations([GATE_EVERY_ORE], () => {
       const params = planetParamsFor(SEED, 1)

@@ -95,7 +95,7 @@ describe('save slot', () => {
     expect(restored).toEqual(state)
     expect(toCanonical(restored.players.p1.wallet)).toBe(toCanonical(state.players.p1.wallet))
     expect(restored.players.p1.vehicle.levels.drill_power).toBe(1)
-    expect(restored.planet).toEqual({ index: 1, seed: 83921, oreRulesVersion: 2 })
+    expect(restored.planet).toEqual({ index: 1, seed: 83921, oreRulesVersion: 10 })
     expect(restored.platform.coreBay).toBe(12)
   })
 
@@ -106,7 +106,7 @@ describe('save slot', () => {
 
   it('holds the world as seed, params and touched-chunk deltas under the shared epoch', () => {
     const file = JSON.parse(savedText(dockedAfterATrip().state(), 3)) as SaveSlotFile
-    expect(file).toMatchObject({ formatVersion: 3, generatorVersion: 14, saveEpoch: 3 })
+    expect(file).toMatchObject({ formatVersion: 3, generatorVersion: 15, saveEpoch: 3 })
     expect(file.world).toMatchObject({ saveEpoch: 3, worldSeed: 83921, planetIndex: 1 })
     expect(file.world.params).toMatchObject({ worldSeed: 83921, planetIndex: 1, radiusTiles: 300 })
     expect(file.world.chunks.chunks).toBeGreaterThan(0)
@@ -217,7 +217,7 @@ describe('save slot: refusals', () => {
 
   it('refuses a save from another generator or format version instead of migrating it', () => {
     expect(readSaveSlot({ ...file(), generatorVersion: 1 }).problems).toEqual([
-      'save.generatorVersion is 1, this build reads 14',
+      'save.generatorVersion is 1, this build reads 15',
     ])
     expect(readSaveSlot({ ...file(), formatVersion: 9, snapshotVersion: 4 }).problems).toEqual([
       'save.formatVersion is 9, this build reads 3',
