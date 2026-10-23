@@ -20,12 +20,12 @@ function restoredState(file: unknown): AuthorityState {
   return reading.state
 }
 
-/** A session docked on planet 1 that bought 4 fuel and jumped to planet 3, keeping 2. */
+/** A session docked on planet 1 that bought 8 fuel and jumped to planet 3, keeping 2. */
 function jumpedSession(): AuthorityState {
   const session = createScriptedSession()
   session.submit(0, { type: 'debug.setMoney', payload: { amount: '1e6' } })
   session.submit(5, { type: 'dock', payload: { bay: 'sell' } })
-  session.submit(6, { type: 'buyFuel', payload: { units: 4 } })
+  session.submit(6, { type: 'buyFuel', payload: { units: 8 } })
   session.submit(10, { type: 'jumpToPlanet', payload: { system: '1', planet: '3' } })
   return session.state()
 }

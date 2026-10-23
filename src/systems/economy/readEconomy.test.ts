@@ -44,10 +44,18 @@ describe('economy data validation', () => {
     expect(problemsOf(broken)).toEqual(['starMap.systemAdvance must be 1 or more'])
   })
 
-  it('refuses a jump that would burn no fuel per planet crossed (ticket 755)', () => {
+  it('refuses a jump that would burn less than one fuel unit (ticket 756)', () => {
     const broken = economyFileCopy()
-    broken.starMap.fuel.unitsPerPlanetStep = 0
-    expect(problemsOf(broken)).toEqual(['starMap.fuel.unitsPerPlanetStep must be 1 or more'])
+    broken.starMap.fuel.baseUnits = '0.5'
+    expect(problemsOf(broken)).toEqual(['starMap.fuel.baseUnits must be 1 or more'])
+  })
+
+  it('refuses a first fuel tank too small for the next hop and the trip back (ticket 756)', () => {
+    const broken = economyFileCopy()
+    broken.starMap.fuel.tank.capacityAtLevel1 = '9'
+    expect(problemsOf(broken)).toEqual([
+      'starMap.fuel.tank.capacityAtLevel1 must hold the next hop and the trip back',
+    ])
   })
 
   it('refuses a heat archetype whose bands or throttle line do not fit the gauge (#113)', () => {

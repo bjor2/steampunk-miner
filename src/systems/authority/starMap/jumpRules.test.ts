@@ -27,8 +27,8 @@ function fuelledWith(units: number) {
 }
 
 describe('star map jump (ticket 755)', () => {
-  it('jumps to the next planet for one unit of fuel, with no core fragment and no fee', () => {
-    const session = fuelledWith(1)
+  it('jumps to the next planet for five units of fuel, with no core fragment and no fee', () => {
+    const session = fuelledWith(5)
     const wallet = session.state().players.p1.wallet
     const events = session.submit(10, jumpTo('2'))
     expect(session.state().planet).toEqual({
@@ -44,12 +44,12 @@ describe('star map jump (ticket 755)', () => {
       toPlanet: 2,
       cost: '0e+0',
       coreSpent: 0,
-      fuelSpent: '1e+0',
+      fuelSpent: '5e+0',
     })
   })
 
   it('logs travel_started, planet_unlocked, feature_unlocked, planet_entered, the cache and a travel digest, in order', () => {
-    const session = fuelledWith(1)
+    const session = fuelledWith(5)
     const events = session.submit(10, jumpTo('2'))
     expect(typesOf(events)).toEqual([
       'TravelStarted',
@@ -62,23 +62,23 @@ describe('star map jump (ticket 755)', () => {
     expect(events[5]).toMatchObject({ scope: 'travel', digest: stateDigest(session.state()) })
   })
 
-  it('skips ahead to any planet of the system, burning one unit per planet crossed', () => {
-    const session = fuelledWith(5)
+  it('skips ahead to any planet of the system, burning a quarter of U0 more per planet crossed', () => {
+    const session = fuelledWith(9)
     const events = session.submit(10, jumpTo('4'))
     expect(session.state().planet.index).toBe(4)
     expect(toCanonical(fuelOf(session.vehicle()))).toBe(toCanonical(fromCanonical('2')))
-    expect(events[0]).toMatchObject({ fromPlanet: 1, toPlanet: 4, fuelSpent: '3e+0' })
+    expect(events[0]).toMatchObject({ fromPlanet: 1, toPlanet: 4, fuelSpent: '7e+0' })
     const site = dockSiteOf(freshPlanetParamsFor(WORLD_SEED, 4))
     expect(session.vehicle()).toMatchObject({ mode: 'docked', pose: dockedPoseAt(site) })
   })
 
   it('jumps back to an earlier planet without unlocking it again', () => {
-    const session = fuelledWith(4)
-    session.submit(10, jumpTo('3'))
+    const session = fuelledWith(10)
+    session.submit(10, jumpTo('2'))
     const events = session.submit(20, jumpTo('1'))
     expect(session.state().planet.index).toBe(1)
     expect(typesOf(events)).not.toContain('PlanetUnlocked')
-    expect(events[0]).toMatchObject({ fromPlanet: 3, toPlanet: 1, fuelSpent: '2e+0' })
+    expect(events[0]).toMatchObject({ fromPlanet: 2, toPlanet: 1, fuelSpent: '5e+0' })
   })
 
   it('refuses a jump the tank cannot burn with fuel_short, and changes nothing', () => {
@@ -118,7 +118,7 @@ describe('star map jump (ticket 755)', () => {
 
   it('gives the same planet, dock site and digest for the same seed and commands', () => {
     const jumped = () => {
-      const session = fuelledWith(3)
+      const session = fuelledWith(6)
       session.submit(10, jumpTo('3'))
       return stateDigest(session.state())
     }

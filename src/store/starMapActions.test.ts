@@ -33,13 +33,13 @@ describe('star map actions (ticket 755)', () => {
   })
 
   it('jumps on the request alone and plays a 2 s transition, so control returns within 2 s', () => {
-    game().buyFuel(2)
+    game().buyFuel(6)
     game().jumpToPlanet(3)
     expect(game().planetTier).toBe(3)
     expect(game().travelTransition).toEqual({ fromPlanet: 1, toPlanet: 3, seconds: 2 })
     expect(toCanonical(game().vehicle.fuel)).toBe(toCanonical(fromCanonical('0')))
     expect(linesNamed('travel_started').map((line) => line.data)).toEqual([
-      { fromPlanet: 1, toPlanet: 3, cost: '0e+0', coreSpent: 0, fuelSpent: '2e+0' },
+      { fromPlanet: 1, toPlanet: 3, cost: '0e+0', coreSpent: 0, fuelSpent: '6e+0' },
     ])
     expect(sink.events.flatMap(runEventProblems)).toEqual([])
   })

@@ -70,7 +70,7 @@ describe('star map jump with two clients (ticket 755)', () => {
   it.each([30, 144])(
     "decides a guest's jump on the host and gives both clients control within 2 s at %i steps/s",
     (stepsPerSecond) => {
-      const { hostClient, guestClient } = twoClientSession(1)
+      const { hostClient, guestClient } = twoClientSession(5)
       expect(isSessionHost(guestClient.state(), GUEST)).toBe(false)
       guestClient.request(10, jumpToPlanetCommand(1n, 2n))
       for (const client of [hostClient, guestClient]) {
@@ -84,7 +84,7 @@ describe('star map jump with two clients (ticket 755)', () => {
   )
 
   it('moves both vehicles to the new dock site and burns only the requesting tank', () => {
-    const { host, guestClient } = twoClientSession(3)
+    const { host, guestClient } = twoClientSession(8)
     guestClient.request(10, jumpToPlanetCommand(1n, 3n))
     const site = dockSiteOf(freshPlanetParamsFor(WORLD_SEED, 3))
     const { players } = host.readState()
