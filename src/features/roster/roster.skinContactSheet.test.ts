@@ -1,11 +1,15 @@
+import { existsSync } from 'node:fs'
 import { beforeEach, describe, expect, it } from 'vitest'
+import { SHIPPED_ART } from '../../scene/shippedArt'
 import { readAuthorityState } from '../../store/authorityLink'
 import { resetGameStore, useGameStore } from '../../store/gameStore'
 import { kindLookTableOf, LOOK_VECTOR, rarityLeadOfEntry } from '../../systems/render/kindLookTable'
+import { drawnHeroAtlasOf } from '../../systems/render/heroAtlas'
 import { freshPlanetParamsFor } from '../../systems/world/planetParams'
 import { ORE_ROWS } from '../ores'
 import { NAMED_SEEDS } from './rosterFixtures'
 import {
+  heroAtlasOfPlanet,
   planetKindLooksOf,
   rarityLooksByLead,
   ROSTER_KIND_LOOK,
@@ -21,6 +25,7 @@ const SHEET_PLANETS = [1, 2, 3, 4, 5]
 const [SEED, SECOND_SEED] = NAMED_SEEDS
 /** P2's incoming kinds under ore rules 9 (ticket 736): Azurite Nodule, Pyrite Sun, Argentite. */
 const P2_INCOMING = ['p2-u1b', 'p2-u2b', 'p2-r3b']
+const PUBLIC = new URL('../../../public/', import.meta.url)
 const GEM_RANKS = ORE_ROWS.gems.tierLeads.map((_, rank) => rank)
 
 function sheetOf(planetIndex: number, seed = SEED) {
@@ -86,6 +91,17 @@ describe('skin contact sheet of P1 to P5 (ticket 746)', () => {
       `P1 ${first.speciesId} vs ${second.speciesId}`,
       `P1 ${third.speciesId} vs hero-twin`,
     ])
+  })
+
+  it('draws every hero cell of the sheet from an atlas map that ships, so a missing one fails', () => {
+    const planetsDrawingCells = SHEET_PLANETS.filter((planetIndex) =>
+      sheetOf(planetIndex).rows.some((row) => row.heroCell !== null),
+    )
+    const maps = planetsDrawingCells.map(
+      (planetIndex) => drawnHeroAtlasOf(heroAtlasOfPlanet(planetIndex), SHIPPED_ART)?.albedo,
+    )
+    expect(planetsDrawingCells).toEqual([1, 2])
+    expect(maps.filter((map) => map === undefined || !existsSync(new URL(map, PUBLIC)))).toEqual([])
   })
 
   it("holds P2's incoming Pyrite Sun, Azurite Nodule and Argentite on the sheet", () => {
