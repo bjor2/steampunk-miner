@@ -1027,7 +1027,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/authority/sweptChargeExact.lane.test.ts` | 168 | 1 |
 | `src/systems/authority/sweptChargeExact.test.ts` | 39 | 8 |
 | `src/systems/authority/sweptCutAtSpeed.test.ts` | 8 | 8 |
-| `src/systems/authority/sweptFreshCarve.test.ts` | 46 | 15 |
+| `src/systems/authority/sweptFreshCarve.test.ts` | 46 | 16 |
 | `src/systems/authority/sweptGateSpeeds.test.ts` | 24 | 2 |
 | `src/systems/authority/sweptLawCharge.test.ts` | 8 | 8 |
 | `src/systems/authority/sweptLawSlab.lane.test.ts` | 170 | 5 |
@@ -1985,7 +1985,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/world/rareClusters.report.lane.test.ts` | 6 | 6 |
 | `src/systems/world/rareClusters.test.ts` | 10 | 10 |
 | `src/systems/world/rimDwell.test.ts` | 6 | 6 |
-| `src/systems/world/stampShape.test.ts` | 13 | 10 |
+| `src/systems/world/stampShape.test.ts` | 14 | 11 |
 | `src/systems/world/surfaceLayer.test.ts` | 13 | 13 |
 | `src/systems/world/sweptSpan.test.ts` | 6 | 6 |
 | `src/systems/world/wallWeakness.test.ts` | 3 | 3 |
