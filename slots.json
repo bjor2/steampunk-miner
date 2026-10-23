@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-10-23T08:35:49+02:00",
+  "updated_at": "2026-10-23T08:37:17+02:00",
   "caps": {
     "grok": 12,
     "claude": 10,
@@ -127,9 +127,9 @@
   },
   "tester": {
     "state": "running",
-    "phase": "nightly-balance-report",
+    "phase": "nightly-bench",
     "sha": "dca609908e4fa6c361bc34d78442dbbffed4eb4a",
-    "since": "2026-10-23T06:34:32Z",
+    "since": "2026-10-23T06:37:07Z",
     "holds_gate": true,
     "claude_slot": null,
     "last_run": "2026-10-22T22:52:38Z",
