@@ -453,8 +453,14 @@ import type { DriveSigns } from '../vehicle/driveSigns'
  *    ticket 756), with no fee and no core fragments; `travel_started` names the `fuelSpent`. The
  *    planet carries its star-map `system` outside system 1. `Travel` is unchanged, so a run that
  *    buys no fuel moves no digest.
+ * 104: the fuel curve and the tank track (ticket 756, the Systems ruling on #756): a jump burns
+ *    `U0 (1 + 0.25 |dg|)` units and the shop sells a unit at the next planet's price
+ *    `kappa R(g)` (`economy/jumpFuel.ts`); `buyFuelTank` raises the vehicle's tank level
+ *    (`vehicle.fuelTankLevel`, absent at level 1), `buyFuel` is refused `out_of_range` past the
+ *    level's capacity, and the fuel that tops the tank up to the next hop takes the #648 clamp.
+ *    A run that buys no fuel and no tank moves no digest.
  */
-export const AUTHORITY_PROTOCOL_VERSION = 103
+export const AUTHORITY_PROTOCOL_VERSION = 104
 
 /** The kernel's own commands: the closed set its rule tables are written against. */
 export interface KernelCommandPayloads {
@@ -536,6 +542,8 @@ export interface KernelCommandPayloads {
    * `system`, both canonical index text, burning the requesting vehicle's fuel.
    */
   jumpToPlanet: { system: string; planet: string }
+  /** The fuel tank track (ticket 756): the tank goes up one level at this planet's Sell bay. */
+  buyFuelTank: Record<string, never>
   /** `interact` while overlapping the planet's live artefact cache opens its choice (#46). */
   openArtefactCache: Record<string, never>
   /** Takes one of the three options for good; the other two are gone (#46). */

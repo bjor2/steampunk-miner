@@ -51,6 +51,7 @@ describe('buyable refs', () => {
       'module:refinery_slot',
       'module:refractory_lining',
       'service:fuel',
+      'service:fuel_tank',
       'service:quick_service',
       'service:recharge',
       'service:refine',

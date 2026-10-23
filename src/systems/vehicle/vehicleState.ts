@@ -150,6 +150,11 @@ export interface VehicleState {
    * a star-map jump. Absent while empty, so a vehicle that never bought fuel digests as before.
    */
   fuel?: BigStat
+  /**
+   * The fuel tank track's level (ticket 756, `vehicleFuel.ts`): how much fuel the tank may hold.
+   * Absent at the starting level 1, so a vehicle that never bought a tank digests as before.
+   */
+  fuelTankLevel?: number
 }
 
 export const EMPTY_CARGO: Cargo = { ore: {}, coreFragments: 0 }

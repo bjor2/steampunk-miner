@@ -12,9 +12,20 @@ import type { PlanetPriceRow } from './economyTables'
 
 export type TravelPriceRow = Pick<PlanetPriceRow, 'travelFee' | 'drillPowerNext' | 'drillTipNext'>
 
+/** The row's next on-curve purchases, all the clamp reads besides the fee. */
+export type OnCurvePriceRow = Pick<PlanetPriceRow, 'drillPowerNext' | 'drillTipNext'>
+
 export function travelChargeOf(row: TravelPriceRow, money: Money): Money {
+  return hopChargeOf(row.travelFee, row, money)
+}
+
+/**
+ * The clamp on any hop's `fee`: since the star map (ticket 756) also the fuel a player buys for
+ * the hop to the next planet, which is what a jump there costs.
+ */
+export function hopChargeOf(fee: Money, row: OnCurvePriceRow, money: Money): Money {
   const spare = sub(money, nextOnCurvePriceOf(row))
-  return higherOf(ZERO_MONEY, lowerOf(row.travelFee, spare))
+  return higherOf(ZERO_MONEY, lowerOf(fee, spare))
 }
 
 /** True when the clamp lowers the hop below the row fee (the #644 report counts these). */
@@ -22,7 +33,7 @@ export function isTravelFeeClamped(row: TravelPriceRow, money: Money): boolean {
   return cmp(travelChargeOf(row, money), row.travelFee) < 0
 }
 
-export function nextOnCurvePriceOf(row: TravelPriceRow): Money {
+export function nextOnCurvePriceOf(row: OnCurvePriceRow): Money {
   return lowerOf(row.drillPowerNext, row.drillTipNext)
 }
 

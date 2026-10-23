@@ -2,6 +2,7 @@ import { afterEach, beforeEach, describe, expect, it } from 'vitest'
 import { createMemorySink, type MemorySink } from '../logging/eventSink'
 import { runEventProblems } from '../logging/runEventSchema'
 import { createRunLog, installRunLog, uninstallRunLog } from '../logging/runLog'
+import { fuelTankPriceOf } from '../systems/economy/fuelTank'
 import { fuelPriceOf } from '../systems/economy/jumpFuel'
 import { fromCanonical, sub, toCanonical } from '../systems/money'
 import { resetGameStore, useGameStore } from './gameStore'
@@ -15,7 +16,7 @@ beforeEach(() => {
   sink = createMemorySink()
   installRunLog(createRunLog({ runId: 'run_test', sink, secondsSinceStart: () => 0 }))
   resetGameStore()
-  game().giveMoney('1000')
+  game().giveMoney('1e6')
   game().dock('sell')
 })
 
@@ -52,5 +53,19 @@ describe('star map actions (ticket 755)', () => {
       event: 'command_rejected',
       data: { type: 'jumpToPlanet', reason: 'fuel_short' },
     })
+  })
+})
+
+describe('star map tank action (ticket 756)', () => {
+  it('raises the tank the HUD reads, paid from the wallet, and logs fuel_tank_bought', () => {
+    const money = game().money
+    game().buyFuelTank()
+    expect(game().vehicle.fuelTankLevel).toBe(2)
+    expect(toCanonical(game().vehicle.fuelCapacity)).toBe('1.3e+1')
+    expect(toCanonical(game().money)).toBe(toCanonical(sub(money, fuelTankPriceOf(1))))
+    expect(linesNamed('fuel_tank_bought').map((line) => line.data)).toEqual([
+      { level: 2, cost: toCanonical(fuelTankPriceOf(1)), capacity: '1.3e+1' },
+    ])
+    expect(sink.events.flatMap(runEventProblems)).toEqual([])
   })
 })

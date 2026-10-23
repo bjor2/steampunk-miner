@@ -13,7 +13,7 @@ import {
   type VehicleState,
 } from '../systems/vehicle/vehicleState'
 import type { BigStat, Money } from '../systems/money'
-import { fuelOf } from '../systems/vehicle/vehicleFuel'
+import { fuelCapacityOf, fuelOf, fuelTankLevelOf } from '../systems/vehicle/vehicleFuel'
 
 export interface VehicleReplica {
   mode: VehicleMode
@@ -32,6 +32,10 @@ export interface VehicleReplica {
   rackCharges: number | null
   /** Whole fuel units in the tank (ticket 755), 0 while empty: the star map reads its tank level. */
   fuel: BigStat
+  /** The tank track's level (ticket 756): the coal tender the rig draws and the map's range. */
+  fuelTankLevel: number
+  /** Whole fuel units the tank holds at most at that level. */
+  fuelCapacity: BigStat
 }
 
 let lastSource: VehicleState | null = null
@@ -53,6 +57,8 @@ export function vehicleReplicaOf(vehicle: VehicleState): VehicleReplica {
     gunLevel: vehicle.gun.level,
     rackCharges: vehicle.charges.isRackMounted ? rackSlotsUsedOf(vehicle.charges) : null,
     fuel: fuelOf(vehicle),
+    fuelTankLevel: fuelTankLevelOf(vehicle),
+    fuelCapacity: fuelCapacityOf(vehicle),
   }
   return lastReplica
 }

@@ -14,7 +14,12 @@ import { BORE_SIDES } from '../vehicle/facedSide'
 import { isFacing, type VehiclePose } from '../vehicle/vehiclePose'
 import { isGunMode } from '../vehicle/vehicleGun'
 import { isLiningType } from '../vehicle/liningType'
-import { fuelFieldOfPortable, isPortableFuel, portableFuelField } from '../vehicle/vehicleFuel'
+import {
+  fuelFieldOfPortable,
+  isPortableFuel,
+  isPortableFuelTankLevel,
+  portableFuelField,
+} from '../vehicle/vehicleFuel'
 import { upgradeLevelsProblems } from '../vehicle/vehicleStats'
 import type { Cargo, VehicleMode, VehicleState } from '../vehicle/vehicleState'
 import { isCasingValue, type ChunkDelta } from '../world/chunkDelta'
@@ -173,6 +178,9 @@ export function portableVehicleProblems(vehicle: unknown, path: string): string[
     ...(isPortableFuel(vehicle.fuel)
       ? []
       : [`${path}.fuel must be whole fuel units above 0 as a decimal string, or be left out`]),
+    ...(isPortableFuelTankLevel(vehicle.fuelTankLevel)
+      ? []
+      : [`${path}.fuelTankLevel must be a whole level from 2, or be left out`]),
   ]
 }
 

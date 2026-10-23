@@ -300,6 +300,12 @@ export const RUN_EVENT_REGISTRY = {
     level: 'core',
     payload: { units: 'integer', cost: 'money', tank: 'money' },
   },
+  // The fuel tank track's next level (ticket 756): the level reached, its price and the capacity.
+  fuel_tank_bought: {
+    group: 'platform',
+    level: 'core',
+    payload: { level: 'integer', cost: 'money', capacity: 'money' },
+  },
   energy_recharged: {
     group: 'platform',
     level: 'core',

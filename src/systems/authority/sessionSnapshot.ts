@@ -76,6 +76,8 @@ import {
 } from './vehicleSnapshot'
 
 /**
+ * 23: the fuel tank track (ticket 756): each vehicle's tank level from level 2 (older saves hold
+ * the starting tank, level 1, which is the absent key, `saveMigrations.ts`);
  * 22: the star map (ticket 755): the planet's system outside system 1 and each vehicle's fuel tank
  * while it holds fuel (older saves are in system 1 with an empty tank, `saveMigrations.ts`);
  * 21: the swept cut's cursor carries its work toward the next cell, `carrySubSteps` (ticket 399;
@@ -96,7 +98,7 @@ import {
  * vehicle's casing grade (#41, #58); 5: combat joined the state (#25); 4 the planet's core
  * progress (#24); 3 the platform (#23).
  */
-export const SNAPSHOT_VERSION = 22
+export const SNAPSHOT_VERSION = 23
 
 export interface SessionSnapshot {
   snapshotVersion: number

@@ -6,6 +6,7 @@
  * refinery takes, the planet the lift goes to. The price stays the kernel's line (#159 line 3).
  */
 import { UPGRADE_IDS } from '../../../systems/economy/economyDefinition'
+import { FIRST_FUEL_TANK_LEVEL, fuelTankCapacityOf } from '../../../systems/economy/fuelTank'
 import { fuelUnitPriceOf } from '../../../systems/economy/jumpFuel'
 import { energyUnitPrice } from '../../../systems/economy/planetCharges'
 import {
@@ -66,6 +67,15 @@ export function serviceEntries(): readonly DescribedEntry[] {
       [
         fixedLine('Fuel price per unit', 'geometric', ({ planetIndex }) =>
           fuelUnitPriceOf(planetIndex),
+        ),
+      ],
+    ),
+    kernelEntryOf(
+      KERNEL_ITEMS.fuelTank,
+      'A bigger coal tender: more fuel a level, so a jump reaches further.',
+      [
+        fixedLine('Starting tank in fuel units', 'geometric', () =>
+          fuelTankCapacityOf(FIRST_FUEL_TANK_LEVEL),
         ),
       ],
     ),

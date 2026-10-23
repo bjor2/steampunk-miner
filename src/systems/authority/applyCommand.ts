@@ -60,6 +60,7 @@ import { VEHICLE_COMMAND_RULES } from './vehicleCommandRules'
 import { VEHICLE_ITEM_RULES } from './vehicleItemRules'
 import { TRAVEL_RULES } from './travelRules'
 import { FUEL_SHOP_RULES } from './starMap/fuelShopRules'
+import { FUEL_TANK_RULES } from './starMap/fuelTankRules'
 import { JUMP_RULES } from './starMap/jumpRules'
 import { WORKSHOP_RULES } from './workshopRules'
 
@@ -103,6 +104,7 @@ const COMMAND_RULES: Readonly<Record<string, CommandRule<CommandType>>> = {
   ...LINING_RULES,
   ...TRAVEL_RULES,
   ...FUEL_SHOP_RULES,
+  ...FUEL_TANK_RULES,
   ...JUMP_RULES,
   ...ARTEFACT_RULES,
   ...REFINERY_RULES,

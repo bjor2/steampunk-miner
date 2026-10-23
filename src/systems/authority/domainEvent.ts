@@ -440,6 +440,8 @@ export interface KernelDomainEventBodies {
   }
   /** Fuel bought at the shop (ticket 755): whole units, their price and the tank after it. */
   FuelBought: { units: number; cost: string; tank: string }
+  /** The tank track's next level bought (ticket 756): the level reached, its price and capacity. */
+  FuelTankBought: { level: number; cost: string; capacity: string }
   PlanetUnlocked: { planetIndex: number }
   /** A locked-schedule row opened by arriving at its planet (#88), keyed by its #79 row id. */
   FeatureUnlocked: { featureId: string }

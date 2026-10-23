@@ -1,15 +1,31 @@
 /**
  * `BuyFuel {units}` (ticket 755, the GD lock on #650: fuel is bought with money at the shop and
  * never mined): at the Sell bay, where the station also recharges the energy tank, `units` whole
- * fuel units go into the vehicle's tank at this planet's unit price (`economy/jumpFuel.ts`). A buy
- * of no units is refused `out_of_range` and one the wallet cannot pay `money_short`, never trimmed
- * (#8); a refused command changes nothing. Logs `fuel_bought` and `money_changed`.
+ * fuel units go into the vehicle's tank at this planet's unit price (`economy/jumpFuel.ts`). Logs
+ * `fuel_bought` and `money_changed`.
  *
- * The tank has no cap until its own track (ticket 756) gives it one.
+ * Since the tank track (ticket 756) the tank holds at most its level's capacity, and the #648 clamp
+ * moved here with the fee: a jump costs fuel, not money, so the fuel that tops the tank up to the
+ * hop to the next planet is charged `max(0, min(price, money - next on-curve price))`, and a player
+ * who sold everything still gets to the next planet. Fuel past that hop pays full price.
+ *
+ * Refused, never trimmed (#8), with `out_of_range` for no units or units the tank cannot take, and
+ * `money_short` for a charge the wallet cannot pay; a refused command changes nothing.
  */
-import { fuelPriceOf } from '../../economy/jumpFuel'
-import { add, fromSafeInteger, sub, toCanonical, type Money } from '../../money'
-import { fuelOf, withFuel } from '../../vehicle/vehicleFuel'
+import { planetPriceRow } from '../../economy/economyTables'
+import { fuelPriceOf, jumpFuelUnitsOf } from '../../economy/jumpFuel'
+import { hopChargeOf } from '../../economy/travelCharge'
+import {
+  add,
+  cmp,
+  fromSafeInteger,
+  sub,
+  toCanonical,
+  toSafeInteger,
+  ZERO_MONEY,
+  type Money,
+} from '../../money'
+import { fuelCapacityOf, fuelOf, hasRoomFor, withFuel } from '../../vehicle/vehicleFuel'
 import { vehicleOf, withVehicle, withWallet, type AuthorityState } from '../authorityState'
 import {
   firstRejection,
@@ -38,13 +54,35 @@ export function buyFuelRefusal(
   return firstRejection([
     () => atBayRejection(state, playerId, 'sell'),
     () => noUnitsRejection(units),
-    () => moneyShortRejection(state.players[playerId].wallet, fuelPriceHere(state, units)),
+    () => tankFullRejection(state, playerId, units),
+    () => moneyShortRejection(state.players[playerId].wallet, fuelChargeOf(state, playerId, units)),
   ])
 }
 
-/** What `units` fuel costs at this planet's shop. */
+/** What `units` fuel costs at this planet's shop before the clamp (the star map's list price). */
 export function fuelPriceHere(state: AuthorityState, units: number): Money {
   return fuelPriceOf(state.planet.index, units)
+}
+
+/** What buying `units` fuel would charge this player now: the list price less the clamp's cut. */
+export function fuelChargeOf(state: AuthorityState, playerId: string, units: number): Money {
+  return sub(fuelPriceHere(state, units), hopClampCutOf(state, playerId, units))
+}
+
+/** The fuel the tank lacks for the hop to the next planet, in whole units (0 when it has it). */
+export function nextHopShortfallOf(state: AuthorityState, playerId: string): number {
+  const planet = state.planet.index
+  const lacking = sub(jumpFuelUnitsOf(planet, planet + 1), fuelOf(vehicleOf(state, playerId)))
+  return cmp(lacking, ZERO_MONEY) > 0 ? toSafeInteger(lacking) : 0
+}
+
+/** How much the #648 clamp takes off the units of this buy that make up the next hop's fuel. */
+function hopClampCutOf(state: AuthorityState, playerId: string, units: number): Money {
+  const hopUnits = Math.min(units, nextHopShortfallOf(state, playerId))
+  if (hopUnits === 0) return ZERO_MONEY
+  const price = fuelPriceHere(state, hopUnits)
+  const wallet = state.players[playerId].wallet
+  return sub(price, hopChargeOf(price, planetPriceRow(state.planet.index), wallet))
 }
 
 function noUnitsRejection(units: number): Rejection | null {
@@ -52,9 +90,23 @@ function noUnitsRejection(units: number): Rejection | null {
   return rejectionOf('out_of_range', 'buys at least 1 fuel unit')
 }
 
+function tankFullRejection(
+  state: AuthorityState,
+  playerId: string,
+  units: number,
+): Rejection | null {
+  const vehicle = vehicleOf(state, playerId)
+  if (hasRoomFor(vehicle, fromSafeInteger(units))) return null
+  const capacity = toCanonical(fuelCapacityOf(vehicle))
+  return rejectionOf(
+    'out_of_range',
+    `the tank holds ${toCanonical(fuelOf(vehicle))} of ${capacity} fuel units`,
+  )
+}
+
 function buyFuel(state: AuthorityState, playerId: string, units: number): RuleEffect {
   const wallet = state.players[playerId].wallet
-  const cost = fuelPriceHere(state, units)
+  const cost = fuelChargeOf(state, playerId, units)
   const vehicle = vehicleOf(state, playerId)
   const tank = add(fuelOf(vehicle), fromSafeInteger(units))
   const fuelled = withVehicle(state, playerId, withFuel(vehicle, tank))

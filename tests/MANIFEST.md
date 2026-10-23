@@ -902,7 +902,8 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/authority/spanBudget.test.ts` | 5 | 5 |
 | `src/systems/authority/speedScaling.lane.test.ts` | 3 | 1 |
 | `src/systems/authority/speedScaling.test.ts` | 28 | 12 |
-| `src/systems/authority/starMap/fuelShopRules.test.ts` | 6 | 6 |
+| `src/systems/authority/starMap/fuelShopRules.test.ts` | 11 | 11 |
+| `src/systems/authority/starMap/fuelTankRules.test.ts` | 6 | 6 |
 | `src/systems/authority/starMap/jumpRules.test.ts` | 12 | 12 |
 | `src/systems/authority/starMap/jumpTwoClients.test.ts` | 4 | 3 |
 | `src/systems/authority/starMap/starMapSnapshot.test.ts` | 6 | 6 |
@@ -1030,16 +1031,17 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/economy/economySourceScan.test.ts` | 6 | 6 |
 | `src/systems/economy/economyTables.test.ts` | 10 | 5 |
 | `src/systems/economy/enemyStats.test.ts` | 30 | 28 |
+| `src/systems/economy/fuelTank.test.ts` | 4 | 4 |
 | `src/systems/economy/gunStats.test.ts` | 9 | 9 |
 | `src/systems/economy/heatEconomy.test.ts` | 11 | 11 |
 | `src/systems/economy/itemEffectCaps.test.ts` | 6 | 6 |
 | `src/systems/economy/itemHookCaps.test.ts` | 8 | 8 |
-| `src/systems/economy/jumpFuel.test.ts` | 3 | 3 |
+| `src/systems/economy/jumpFuel.test.ts` | 8 | 8 |
 | `src/systems/economy/magnetCaps.test.ts` | 5 | 5 |
 | `src/systems/economy/oreEconomy.test.ts` | 7 | 7 |
 | `src/systems/economy/perPurchaseRows.test.ts` | 40 | 21 |
 | `src/systems/economy/planetCharges.test.ts` | 17 | 13 |
-| `src/systems/economy/readEconomy.test.ts` | 26 | 26 |
+| `src/systems/economy/readEconomy.test.ts` | 27 | 27 |
 | `src/systems/economy/refineryEconomy.test.ts` | 6 | 6 |
 | `src/systems/economy/trackKind.test.ts` | 1 | 1 |
 | `src/systems/economy/travelCharge.test.ts` | 7 | 7 |
@@ -1382,6 +1384,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/save/carriedCursors.test.ts` | 3 | 3 |
 | `src/systems/save/chunkDiffSave.test.ts` | 11 | 11 |
 | `src/systems/save/cutFrontSave.test.ts` | 2 | 2 |
+| `src/systems/save/fuelTankSaves.test.ts` | 3 | 3 |
 | `src/systems/save/loadedSaveDigest.test.ts` | 4 | 4 |
 | `src/systems/save/newerSaveText.test.ts` | 5 | 5 |
 | `src/systems/save/oreRulesOldSaves.test.ts` | 17 | 11 |
@@ -1504,7 +1507,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/store/slowDeviceChip.test.ts` | 2 | 2 |
 | `src/store/soundUnlockSlice.test.ts` | 4 | 4 |
 | `src/store/speciesRevealBroadcast.test.ts` | 2 | 2 |
-| `src/store/starMapActions.test.ts` | 3 | 3 |
+| `src/store/starMapActions.test.ts` | 4 | 4 |
 | `src/store/tapSheetSlice.test.ts` | 6 | 6 |
 | `src/store/titleMenu.test.ts` | 9 | 9 |
 | `src/store/toolPageKeys.test.ts` | 4 | 4 |

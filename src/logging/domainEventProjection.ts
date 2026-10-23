@@ -271,6 +271,10 @@ const PROJECTIONS: { readonly [K in KernelDomainEventType]: Projection<K> } = {
     },
   }),
   FuelBought: ({ units, cost, tank }) => ({ event: 'fuel_bought', data: { units, cost, tank } }),
+  FuelTankBought: ({ level, cost, capacity }) => ({
+    event: 'fuel_tank_bought',
+    data: { level, cost, capacity },
+  }),
   PlanetUnlocked: ({ planetIndex }) => ({ event: 'planet_unlocked', data: { planetIndex } }),
   FeatureUnlocked: ({ featureId }) => ({ event: 'feature_unlocked', data: { featureId } }),
   PlanetEntered: ({ planetSeed, generatorVersion, radius, oreRulesVersion }) => ({

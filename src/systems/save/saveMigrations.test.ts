@@ -57,6 +57,8 @@ const CHARGE_RACK_STEP = { version: 'snapshotVersion', from: 19, to: 20 }
 const CARRIED_CURSOR_STEP = { version: 'snapshotVersion', from: 20, to: 21 }
 /** Ticket 755: every fixture was written before the star map, so in system 1 with empty tanks. */
 const STAR_MAP_STEP = { version: 'snapshotVersion', from: 21, to: 22 }
+/** Ticket 756: every fixture was written before the tank track, so with the starting tank. */
+const FUEL_TANK_STEP = { version: 'snapshotVersion', from: 22, to: 23 }
 /** #401: every fixture was written in the one-slot layout, format 1. */
 const SLOT_FORMAT_STEP = { version: 'formatVersion', from: 1, to: 2 }
 const PACKED_CHUNKS_STEP = { version: 'formatVersion', from: 2, to: 3 }
@@ -102,13 +104,14 @@ describe('save migration chain', () => {
     ])
   })
 
-  it('loads a pre-#175 save through the snapshot 18 -> 19, 19 -> 20, 20 -> 21 and 21 -> 22 steps, then the generator 5 -> 6, 6 -> 7, 7 -> 8, 8 -> 9, 9 -> 10, 10 -> 11, 11 -> 12, 12 -> 13, 13 -> 14, 14 -> 15, 15 -> 16 and 16 -> 17 steps', () => {
+  it('loads a pre-#175 save through the snapshot 18 -> 19, 19 -> 20, 20 -> 21, 21 -> 22 and 22 -> 23 steps, then the generator 5 -> 6, 6 -> 7, 7 -> 8, 8 -> 9, 9 -> 10, 10 -> 11, 11 -> 12, 12 -> 13, 13 -> 14, 14 -> 15, 15 -> 16 and 16 -> 17 steps', () => {
     const reading = withRegistrations([], () => restored(PLANET_1_SAVE))
     expect(reading.migrations).toEqual([
       SNAPSHOT_STEP,
       CHARGE_RACK_STEP,
       CARRIED_CURSOR_STEP,
       STAR_MAP_STEP,
+      FUEL_TANK_STEP,
       GENERATOR_STEP,
       ORE_LEAD_STEP,
       ORE_MIX_STEP,
@@ -137,6 +140,7 @@ describe('save migration chain', () => {
       CHARGE_RACK_STEP,
       CARRIED_CURSOR_STEP,
       STAR_MAP_STEP,
+      FUEL_TANK_STEP,
       GENERATOR_STEP,
       ORE_LEAD_STEP,
       ORE_MIX_STEP,
@@ -347,12 +351,13 @@ describe('save migration chain', () => {
 describe('save migration chain: levels to steps (#181)', () => {
   const saved = PLANET_5_SAVE.profile.players.p1
 
-  it('loads a pre-#181 save through the snapshot 18 -> 19, 19 -> 20, 20 -> 21 and 21 -> 22 steps, then the generator 6 -> 7, 7 -> 8, 8 -> 9, 9 -> 10, 10 -> 11, 11 -> 12, 12 -> 13, 13 -> 14, 14 -> 15, 15 -> 16 and 16 -> 17 steps', () => {
+  it('loads a pre-#181 save through the snapshot 18 -> 19, 19 -> 20, 20 -> 21, 21 -> 22 and 22 -> 23 steps, then the generator 6 -> 7, 7 -> 8, 8 -> 9, 9 -> 10, 10 -> 11, 11 -> 12, 12 -> 13, 13 -> 14, 14 -> 15, 15 -> 16 and 16 -> 17 steps', () => {
     expect(versionStepsOf(restored(PLANET_5_SAVE))).toEqual([
       SNAPSHOT_STEP,
       CHARGE_RACK_STEP,
       CARRIED_CURSOR_STEP,
       STAR_MAP_STEP,
+      FUEL_TANK_STEP,
       ORE_LEAD_STEP,
       ORE_MIX_STEP,
       ORE_RULES_STEP,
