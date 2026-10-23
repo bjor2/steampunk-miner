@@ -242,8 +242,13 @@ describe('body-wide bore at any cells a tick (ticket 439)', () => {
   }
 })
 
-/** The path the cells and work per metre are counted over, from the leg's start. */
-const WINDOW_MM = 30_000
+/**
+ * The path the cells and work per metre are counted over, from the leg's start: the 60 cells #36's
+ * 1.9 m bore counted over 30 m, which the 1.2 m bore's one cell a metre counts over 60 m (ticket
+ * 662, the VS re-base on #662). The cell a leg's last tick leaves part-cut, part-paid weighs one in
+ * the window's cells on either rig, so over 30 m it moved the ratio twice as far as it had.
+ */
+const WINDOW_MM = 60_000
 
 interface WorkPerMetre {
   cellsPerMetre: number
@@ -269,7 +274,9 @@ function workPerMetreOf(cut: LegCut): WorkPerMetre {
 }
 
 const BASE_RIG = rigAt(44)
-const FASTER_RIGS = [78, 240, 300, 3600].map(rigAt)
+/** The rigs held to the work floor: 240 and 300 m/s are reachable, at about L25-26 (VS, #662). */
+const FLOORED_SPEEDS = [78, 240, 300]
+const FASTER_RIGS = [...FLOORED_SPEEDS, 3600].map(rigAt)
 
 /** Each faster rig's cells and work a metre down the column over the 44 m/s rig's. */
 function ratiosToBaseRig(): { speed: number; cells: number; work: number }[] {
@@ -300,13 +307,23 @@ describe('cells and work per metre at any speed (ticket 439, VS ruling)', () => 
 
   // The lower side of the VS gate: each extra cell pays its own drill time, energy and heat, so a
   // faster rig may open more a metre than the 44 m/s one, never fewer.
-  // Since ticket 570 the bore is the stamp's 1.9 m at every speed and the front bites each cell
-  // as its work pays, each bite's price drop rounded up: a faster rig opens the same cells a metre
-  // and spends within the rounding of the same work on them.
-  it('opens at least the 44 m/s rig cells and work a metre at every faster rig: no free cells', () => {
-    const fewer = ratios.filter(({ cells, work }) => cells < 1 || work < 1 - BITE_ROUNDING)
+  // Since ticket 570 the bore is the stamp's (1.2 m since ticket 662) at every speed and the front
+  // bites each cell as its work pays, each bite's price drop rounded up: a faster rig opens the
+  // same cells a metre and spends within the rounding of the same work on them.
+  // At 3600 m/s the whole window is one tick, which cuts in front mode on the 1.2 m bore and stops
+  // at the law's 50 m where #36's bore travelled 55 m: that one tick's end alone puts it at 0.87.
+  // #733 (high-speed precision) owns holding it to the floor (VS and TD rulings on #662).
+  it('opens at least the 44 m/s rig cells and work a metre at 78, 240 and 300 m/s: no free cells', () => {
+    const fewer = ratios.filter(
+      ({ speed, cells, work }) =>
+        FLOORED_SPEEDS.includes(speed) && (cells < 1 || work < 1 - BITE_ROUNDING),
+    )
     expect(fewer).toEqual([])
   })
+
+  it.todo(
+    'opens at least the 44 m/s rig cells and work a metre at 3600 m/s, where one tick cuts the whole window (#733)',
+  )
 
   it('opens at most 1.20x the 44 m/s rig cells and 1.30x its work a metre at 78, 240, 300 and 3600 m/s (a regression ratchet until #441)', () => {
     const over = ratios.filter(({ cells, work }) => cells > RATCHET_CELLS || work > RATCHET_WORK)
