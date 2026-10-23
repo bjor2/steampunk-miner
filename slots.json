@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-10-23T11:23:38+02:00",
+  "updated_at": "2026-10-23T11:31:45+02:00",
   "caps": {
     "grok": 12,
     "claude": 10,
@@ -125,9 +125,9 @@
   },
   "tester": {
     "state": "running",
-    "phase": "nightly-balance-planets",
+    "phase": "nightly-balance-guns",
     "sha": "dca609908e4fa6c361bc34d78442dbbffed4eb4a",
-    "since": "2026-10-23T06:44:19Z",
+    "since": "2026-10-23T09:31:35Z",
     "holds_gate": true,
     "claude_slot": null,
     "last_run": "2026-10-22T22:52:38Z",
@@ -420,19 +420,6 @@
           713,
           741,
           746
-        ],
-        "done": [],
-        "live": 0
-      },
-      {
-        "number": 715,
-        "key": "647-5E",
-        "map": 647,
-        "lane": "hitl",
-        "mode": "bench",
-        "state": "bench",
-        "tickets": [
-          650
         ],
         "done": [],
         "live": 0
