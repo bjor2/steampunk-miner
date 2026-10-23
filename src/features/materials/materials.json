@@ -1094,7 +1094,7 @@
       "silhouette": "pebbles",
       "pattern": "burnished",
       "hueSlot": "native-platinum",
-      "gradeBand": [2, 5],
+      "gradeBand": [3, 5],
       "rarity": "rare",
       "hero": true,
       "flavour": "Heavy pale pebbles, weighed before two witnesses and a guard."
@@ -1108,7 +1108,7 @@
       "silhouette": "blocks",
       "pattern": "clear",
       "hueSlot": "blue-topaz",
-      "gradeBand": [2, 5],
+      "gradeBand": [3, 5],
       "rarity": "rare",
       "hero": true,
       "flavour": "Cool blue blocks, logged in the clean ledger, never the sooty one."
@@ -1332,7 +1332,7 @@
       "silhouette": "curls",
       "pattern": "tarnished",
       "hueSlot": "wire-silver",
-      "gradeBand": [2, 5],
+      "gradeBand": [3, 5],
       "rarity": "rare",
       "hero": true,
       "flavour": "Curls of silver straight from the rock, kept in a locked box."
@@ -1346,7 +1346,7 @@
       "silhouette": "pencils",
       "pattern": "two-tone",
       "hueSlot": "watermelon-tourmaline",
-      "gradeBand": [2, 5],
+      "gradeBand": [3, 5],
       "rarity": "rare",
       "hero": true,
       "flavour": "Pink at heart and green at the rind; entered with some delight."
@@ -1570,7 +1570,7 @@
       "silhouette": "bars",
       "pattern": "satin",
       "hueSlot": "wolfram",
-      "gradeBand": [2, 5],
+      "gradeBand": [3, 5],
       "rarity": "rare",
       "hero": true,
       "flavour": "Dense and dour; no furnace on the planet will melt it."
@@ -1584,7 +1584,7 @@
       "silhouette": "spheres",
       "pattern": "glowing",
       "hueSlot": "fire-garnet",
-      "gradeBand": [2, 5],
+      "gradeBand": [3, 5],
       "rarity": "rare",
       "hero": true,
       "flavour": "Deep red spheres the furnace crews carry as charms."
@@ -1808,7 +1808,7 @@
       "silhouette": "leaves",
       "pattern": "two-metal",
       "hueSlot": "electrum",
-      "gradeBand": [2, 5],
+      "gradeBand": [3, 5],
       "rarity": "rare",
       "hero": true,
       "flavour": "Gold and silver in one leaf; the assay takes all afternoon."
@@ -1822,7 +1822,7 @@
       "silhouette": "ovals",
       "pattern": "adularescent",
       "hueSlot": "moonstone",
-      "gradeBand": [2, 5],
+      "gradeBand": [3, 5],
       "rarity": "rare",
       "hero": true,
       "flavour": "A blue glow drifts beneath the skin; logged by lamplight at night."

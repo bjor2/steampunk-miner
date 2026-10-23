@@ -8,10 +8,13 @@ import {
 import { cargoCapacity, onCurveLevel } from '../../../systems/economy/vehicleStats'
 import { cmp, fromSafeInteger, mul, toCanonical } from '../../../systems/money'
 import { BAND_COUNT } from '../../../systems/world/planetGeometry'
-import { ORE_RULES_FROM_PLANET } from '../../../systems/world/planetParams'
+import {
+  DEEP_RARE_WINDOW_ORE_RULES,
+  ORE_RULES_FROM_PLANET,
+} from '../../../systems/world/planetParams'
 import { oreTierOf } from './oreCatalogue'
 import { ORE_ROWS } from './oreRows'
-import { RARITY_ROW_SETS } from './rarityRows'
+import { RARITY_ROW_SETS, type RarityRowSet } from './rarityRows'
 import {
   isTierLiveIn,
   mixedRowsFromPlanet,
@@ -28,7 +31,7 @@ const RATED_OFFSETS = [1, 2, 3, 4]
 /** #141: commons are at least 82% of a band. */
 const COMMONS_FLOOR_BP = 8200
 
-function drawnBp(set: 'legacy' | 'mixed', band: number): number {
+function drawnBp(set: RarityRowSet, band: number): number {
   return RATED_OFFSETS.reduce((sum, offset) => sum + rarityWeightBpOf(set, offset, band), 0)
 }
 
@@ -44,16 +47,18 @@ describe('rarity tiers', () => {
     expect(ORE_RULES_FROM_PLANET).toBeLessThan(mixedRowsFromPlanet())
   })
 
-  it('draws the same rows under ore rules 1 as under this build, so an older stamp keeps its rows', () => {
+  it('draws the same rows under ore rules 1 as under rules 10, so an older stamp keeps its rows', () => {
     expect([2, 3, 60].map((planetIndex) => rarityRowSetOf(planetIndex, 1))).toEqual(
-      [2, 3, 60].map((planetIndex) => rarityRowSetOf(planetIndex, ORE_RULES_VERSION)),
+      [2, 3, 60].map((planetIndex) => rarityRowSetOf(planetIndex, DEEP_RARE_WINDOW_ORE_RULES - 1)),
     )
   })
 
-  it('draws the mixed weights on new planets from P3, where epic and mythic start', () => {
+  it('draws the mixed weights on planets from P3, where epic and mythic start, and the deep ones from ore rules 11', () => {
     expect(mixedRowsFromPlanet()).toBe(3)
-    expect(rarityRowSetOf(3, ORE_RULES_VERSION)).toBe('mixed')
-    expect(rarityRowSetOf(200, ORE_RULES_VERSION)).toBe('mixed')
+    expect(rarityRowSetOf(3, DEEP_RARE_WINDOW_ORE_RULES - 1)).toBe('mixed')
+    expect(rarityRowSetOf(200, DEEP_RARE_WINDOW_ORE_RULES - 1)).toBe('mixed')
+    expect(rarityRowSetOf(3, ORE_RULES_VERSION)).toBe('deep')
+    expect(rarityRowSetOf(200, ORE_RULES_VERSION)).toBe('deep')
   })
 
   it('multiplies value by 1, 1.5, 2.25, 3.375 and 5.0625 from common to mythic', () => {

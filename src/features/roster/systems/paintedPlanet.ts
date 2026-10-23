@@ -18,7 +18,12 @@ import { oreTier, signatureSaleTier } from '../../../systems/economy/oreEconomy'
 import { fromSafeInteger, mul, toSafeInteger } from '../../../systems/money'
 import type { PlanetParams } from '../../../systems/world/planetParams'
 import type { ResourceFamily } from '../../../systems/world/worldCell'
-import { oreFamilies, rarityMultiplierOf } from '../../ores'
+import {
+  oreFamilies,
+  rarityMultiplierOf,
+  rarityRowSetOfPlanet,
+  type RarityRowSet,
+} from '../../ores'
 import type { OreMix, OreMixEntry } from '../../planet-mix'
 import { planetRosterOf } from './planetRoster'
 import { liveRosterIndicesOf } from './rosterFold'
@@ -48,6 +53,8 @@ export interface PaintedPlanet {
   worldSeed: number
   /** Whether the planet draws material kinds at all (ore rules 2 and a kinds table with rows). */
   hasRoster: boolean
+  /** The rarity rows the planet draws: legacy, mixed, or deep from ore rules 11 (ticket 738). */
+  rowSet: RarityRowSet
   /** Bands 1 to 5. */
   bands: readonly PaintedBand[]
   /** Each band's share of the planet's ore value, relative (bands 1 to 5). */
@@ -61,6 +68,7 @@ export function paintedPlanetOf(params: PlanetParams, mix: OreMix): PaintedPlane
     planetIndex: params.planetIndex,
     worldSeed: params.worldSeed,
     hasRoster: planetRosterOf(params).length > 0,
+    rowSet: rarityRowSetOfPlanet(params),
     bands,
     bandOreWeights: bandOreWeightsOf(params, bands),
   }

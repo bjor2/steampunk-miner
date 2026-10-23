@@ -24,6 +24,7 @@ function histogramOf(bands: [string, number][][]): PlanetHistogram {
       oreTiles: types.reduce((sum, [, tiles]) => sum + tiles, 0),
       patches: 1,
       types: types.map(([typeId, tiles]) => ({ typeId, role: '+0', tiles })),
+      rareRolls: [],
     })),
   }
 }

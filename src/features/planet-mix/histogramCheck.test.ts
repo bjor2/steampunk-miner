@@ -8,20 +8,31 @@ const WORLD_SEED = 83921
 const PLANET = 20
 const BAND_TILES = 100000
 
-/** A histogram whose every band holds each role at `shareOf(role, lowBp)` of its tiles. */
+/**
+ * A histogram whose every band holds each role at `shareOf(role, lowBp)` of its rolls: as tiles of
+ * `BAND_TILES`, or as patch rolls for a rare role judged per roll (ticket 738), whose clusters
+ * paint no tile here.
+ */
 function histogramWith(
   patches: number,
   shareOf: (role: string, band: number, lowBp: number) => number = (_, __, lowBp) => lowBp,
 ): PlanetHistogram {
   const expected = expectedSharesOf(planetParamsFor(WORLD_SEED, PLANET, ORE_RULES_VERSION))
   const bands: BandHistogram[] = expected.map((shares, at) => {
-    const types = [...shares].map(([role, { lowBp }]) => ({
+    const share = (role: string, lowBp: number) => shareOf(role, at + 1, lowBp) / 10000
+    const byTiles = [...shares].filter(([, { isPerRoll }]) => !isPerRoll)
+    const byRolls = [...shares].filter(([, { isPerRoll }]) => isPerRoll)
+    const rareRolls = byRolls.map(([role, { lowBp }]) => ({
+      role,
+      rolls: share(role, lowBp) * patches,
+    }))
+    const types = byTiles.map(([role, { lowBp }]) => ({
       typeId: `type_${role}`,
       role,
-      tiles: (shareOf(role, at + 1, lowBp) * BAND_TILES) / 10000,
+      tiles: share(role, lowBp) * BAND_TILES,
     }))
     const oreTiles = types.reduce((sum, type) => sum + type.tiles, 0)
-    return { band: at + 1, oreTiles, patches, types }
+    return { band: at + 1, oreTiles, patches, types, rareRolls }
   })
   return { planetIndex: PLANET, worldSeed: WORLD_SEED, oreRulesVersion: ORE_RULES_VERSION, bands }
 }
@@ -45,8 +56,22 @@ describe('ore mix histogram check', () => {
     const problemsOf = (patches: number) =>
       histogramProblems([histogramWith(patches, shifted)]).filter((line) => line.includes('+2'))
     expect(problemsOf(40)).toEqual([])
-    // 200 bp more of the mixed rows' +2 (97 bp, ticket 445) over 102% of the tiles: 2970 / 102000.
-    expect(problemsOf(5000)).toEqual(['P20 band 5: +2 291 bp, expected 97 bp'])
+    // 200 bp more of the deep rows' +2 rolls (223 bp, ticket 738), judged per roll.
+    expect(problemsOf(5000)).toEqual(['P20 band 5: +2 423 bp, expected 223 bp'])
+  })
+
+  it('judges a rare role of a cluster planet on its patch rolls, the rest on the tiles it leaves', () => {
+    const [bandFive] = expectedSharesOf(
+      planetParamsFor(WORLD_SEED, PLANET, ORE_RULES_VERSION),
+    ).slice(4)
+    expect(bandFive.get('+2')).toEqual({ lowBp: 223, highBp: 223, isPerRoll: true })
+    expect(bandFive.get('+1')?.isPerRoll).toBe(false)
+    const perRoll = [...bandFive.values()].filter((share) => share.isPerRoll)
+    expect(perRoll.reduce((sum, share) => sum + share.lowBp, 0)).toBe(223 + 70 + 17)
+    const cellsOnly = histogramWith(5000, (role, band, lowBp) =>
+      band === 5 && role === '+2' ? 0 : lowBp,
+    )
+    expect(histogramProblems([cellsOnly])).toContain('P20 band 5: +2 0 bp, expected 223 bp')
   })
 
   it('names a role the mix does not have', () => {
@@ -61,7 +86,9 @@ describe('ore mix histogram check', () => {
 
   it('prints one line per band with each type, its role, share and the expected share', () => {
     const [bandFive] = histogramLines(histogramWith(40)).slice(4)
-    expect(bandFive).toMatch(/^P20 seed 83921 b5 100000 tiles in 40 patches: /)
+    // The deep rows' rare, epic and mythic rolls (310 bp, ticket 738) paint no tile here.
+    expect(bandFive).toMatch(/^P20 seed 83921 b5 96900 tiles in 40 patches: /)
     expect(bandFive).toContain('type_signature [signature] 300 bp (300 bp);')
+    expect(bandFive).toContain('rolls [+2] 223 bp (223 bp of rolls);')
   })
 })

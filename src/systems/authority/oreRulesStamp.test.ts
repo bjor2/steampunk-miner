@@ -30,10 +30,10 @@ function onPlanet(state: AuthorityState, planetIndex: number): AuthorityState {
 }
 
 describe('ore rules stamp', () => {
-  it('stamps a session on any planet with the rare clusters, rules 10, planet 1 included', () => {
+  it('stamps a session on planets 1 and 2 with the rare clusters, rules 10, and from planet 3 with the deep rare window, 11', () => {
     const planets = [1, 2, 3, 10].map((index) => sessionOn(index).planet)
-    expect(planets.map((planet) => planet.oreRulesVersion)).toEqual([10, 10, 10, 10])
-    expect(ORE_RULES_VERSION).toBe(10)
+    expect(planets.map((planet) => planet.oreRulesVersion)).toEqual([10, 10, 11, 11])
+    expect(ORE_RULES_VERSION).toBe(11)
   })
 
   it('keeps a planet a save holds without the stamp on the legacy rows', () => {

@@ -10,13 +10,15 @@
  * Row sets (Horizontal Scaler, comment 6203133480 section 5): a planet entered under the ore rules
  * carries `oreRulesVersion` and draws the `mixed` weights once every tier is live there (P3, where
  * epic and mythic start); P1, P2 and any planet a save holds without the version keep the `legacy`
- * weights, today's lead rows, so a visited planet never seams against its own chunks. Every ore
- * rules version draws the same rows: version 2 (ticket 446) adds the roster, not new weights.
+ * weights, today's lead rows, so a visited planet never seams against its own chunks. Ore rules 2
+ * to 10 draw the same rows (version 2, ticket 446, adds the roster, not new weights); from ore rules
+ * 11 a planet from P3 draws the `deep` rows instead (ticket 738, `rarityRowSets.ts`).
  */
 import { ECONOMY } from '../../../systems/economy/economy'
 import { powInt, type Money } from '../../../systems/money'
 import { ORE_RULES_VERSION } from '../../../systems/world/planetParams'
 import { ORE_ROWS, type OreRows } from './oreRows'
+import { mixedTableSetUnder } from './rarityRowSets'
 import type { RarityRowSet, RarityTier } from './rarityRows'
 
 /** The ore rules a planet entered from this build carries: the kernel's, so it can stamp them. */
@@ -48,14 +50,14 @@ export function mixedRowsFromPlanet(rows: OreRows = ORE_ROWS): number {
   return Math.max(...rows.rarity.tiers.map((tier) => tier.firstPlanet))
 }
 
-/** The weights a planet draws: `mixed` only under the ore rules and from P3. */
+/** The weights a planet draws: `mixed`, or `deep` from ore rules 11, only under the ore rules and from P3. */
 export function rarityRowSetOf(
   planetIndex: number,
   oreRulesVersion: number | undefined,
   rows: OreRows = ORE_ROWS,
 ): RarityRowSet {
-  const isUnderOreRules = oreRulesVersion !== undefined
-  return isUnderOreRules && planetIndex >= mixedRowsFromPlanet(rows) ? 'mixed' : 'legacy'
+  if (oreRulesVersion === undefined || planetIndex < mixedRowsFromPlanet(rows)) return 'legacy'
+  return mixedTableSetUnder(oreRulesVersion)
 }
 
 /** Basis points of band `band`'s ore cells that hold tier offset `k`, for `k` from 1. */

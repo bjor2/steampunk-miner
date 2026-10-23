@@ -8,16 +8,25 @@
  * On a heat planet a patch near lava doubles its signature share, so a role's expected share is the
  * range between the plain mix and the near-lava mix. A histogram names the ore rules its planet was
  * generated under (ticket 445), so the check rebuilds the same mix.
+ *
+ * On a planet whose rare ore grows in clusters (ore rules 10, ticket 737), a rare patch paints 1 to
+ * 3 cells of its patch and leaves the rest plain ground: rarity counts one roll per cluster and
+ * money counts the cells. Its rare roles are then judged per roll, the band's patches that rolled
+ * them, and every other role's share of the tiles the rare clusters leave, over what the rare rolls
+ * leave of the mix (ticket 738, when the deep rows made the rare share big enough to tell).
  */
 import { resourceTierOf } from '../../systems/authority/minedOre'
 import { generateChunkCells } from '../../systems/world/generateChunk'
-import { orePatchesNearChunk } from '../../systems/world/orePatches'
+import { orePatchesNearChunk, type OrePatch } from '../../systems/world/orePatches'
+import { patchCellOf } from '../../systems/world/patchCell'
 import { bandOfTile, BAND_COUNT } from '../../systems/world/planetGeometry'
 import {
   freshPlanetParamsFor,
+  isRareClusterPlanet,
   planetParamsFor,
   type PlanetParams,
 } from '../../systems/world/planetParams'
+import { RARE_CLUSTER_FIRST_LEAD } from '../../systems/world/planetTable'
 import {
   CHUNK_CELLS,
   CHUNK_SIZE,
@@ -36,12 +45,20 @@ export interface ObservedType {
   tiles: number
 }
 
+/** The band's patches that rolled a rare role on a cluster planet (ticket 737): judged per roll. */
+export interface RoleRolls {
+  role: string
+  rolls: number
+}
+
 export interface BandHistogram {
   band: number
   oreTiles: number
   /** Patches centred in the band that grew over at least one tile: the rolls behind the shares. */
   patches: number
   types: readonly ObservedType[]
+  /** On a cluster planet, the rare roles' rolls; empty elsewhere. */
+  rareRolls: readonly RoleRolls[]
 }
 
 export interface PlanetHistogram {
@@ -52,10 +69,15 @@ export interface PlanetHistogram {
   bands: readonly BandHistogram[]
 }
 
-/** A role's expected share of its band's ore tiles, in basis points: plain mix to near lava. */
+/**
+ * A role's expected share of its band's ore tiles, in basis points: plain mix to near lava. A rare
+ * role of a cluster planet is a share of the band's patch rolls instead (`isPerRoll`); the check
+ * reads every other role on the tiles the rare clusters leave, over what the rare rolls leave.
+ */
 export interface ExpectedShare {
   lowBp: number
   highBp: number
+  isPerRoll: boolean
 }
 
 export const SIGNATURE_ROLE = 'signature'
@@ -68,7 +90,7 @@ export function planetHistogramOf(planetIndex: number, worldSeed: number): Plane
 /** The planet's ore tiles per band, generated under the registrations in force. */
 export function planetHistogramOfParams(params: PlanetParams): PlanetHistogram {
   const counts = Array.from({ length: BAND_COUNT }, () => new Map<string, ObservedType>())
-  const patches = Array.from({ length: BAND_COUNT }, () => new Set<string>())
+  const patches = Array.from({ length: BAND_COUNT }, () => new Map<string, string | null>())
   for (const [cx, cy] of chunksOfDisc(params)) {
     countChunkOre(params, counts, cx, cy)
     notePatchesNearChunk(params, patches, cx, cy)
@@ -77,7 +99,7 @@ export function planetHistogramOfParams(params: PlanetParams): PlanetHistogram {
     planetIndex: params.planetIndex,
     worldSeed: params.worldSeed,
     ...(params.oreRulesVersion === undefined ? {} : { oreRulesVersion: params.oreRulesVersion }),
-    bands: counts.map((count, at) => bandHistogramOf(count, patches[at].size, at)),
+    bands: counts.map((count, at) => bandHistogramOf(count, patches[at], at)),
   }
 }
 
@@ -93,6 +115,11 @@ export function expectedSharesOf(params: PlanetParams): Map<string, ExpectedShar
   return plain.bands.map((entries, at) =>
     sharesBetween(params, entries, nearLava.bands[at] ?? entries),
   )
+}
+
+/** Whether a role is judged per roll: a rare lead on a planet whose rare ore grows in clusters. */
+function isPerRollRole(params: PlanetParams, lead: number, isSignature: boolean): boolean {
+  return isRareClusterPlanet(params) && !isSignature && lead >= RARE_CLUSTER_FIRST_LEAD
 }
 
 function chunksOfDisc(params: PlanetParams): [number, number][] {
@@ -117,15 +144,32 @@ function countChunkOre(
   }
 }
 
-/** A patch shows up near every chunk it can touch, so it is kept once by its band and centre. */
+/**
+ * A patch shows up near every chunk it can touch, so it is kept once by its band and centre, with
+ * the rare role it rolled on a cluster planet (null for any other).
+ */
 function notePatchesNearChunk(
   params: PlanetParams,
-  patches: Set<string>[],
+  patches: Map<string, string | null>[],
   cx: number,
   cy: number,
 ): void {
-  for (const { band, centre, tiles } of orePatchesNearChunk(params, cx, cy))
-    if (tiles.length > 0) patches[band - 1].add(`${centre.tx},${centre.ty}`)
+  for (const patch of orePatchesNearChunk(params, cx, cy)) {
+    const key = `${patch.centre.tx},${patch.centre.ty}`
+    const known = patches[patch.band - 1]
+    if (patch.tiles.length > 0 && !known.has(key)) known.set(key, perRollRoleOf(params, patch))
+  }
+}
+
+/** The rare role a patch rolled, as its cell reads; null where its role is judged by tiles. */
+function perRollRoleOf(params: PlanetParams, patch: OrePatch): string | null {
+  const cell = patchCellOf(params, patch)
+  const tier = resourceTierOf(params, cell)
+  const lead = tier - oreTierOf(params.planetIndex, patch.band, 0)
+  const family = familyOfCellCode(familyOfCell(cell))?.id ?? 'unknown'
+  const isSignature = isSignatureOre(family, tier)
+  if (!isPerRollRole(params, lead, isSignature)) return null
+  return leadRoleOf(params, family, lead)
 }
 
 function countOreTile(
@@ -162,12 +206,19 @@ function entryRoleOf(params: PlanetParams, entry: OreMixEntry): string {
 
 function bandHistogramOf(
   counts: Map<string, ObservedType>,
-  patches: number,
+  patches: ReadonlyMap<string, string | null>,
   at: number,
 ): BandHistogram {
   const types = [...counts.values()].sort((a, b) => b.tiles - a.tiles)
   const oreTiles = types.reduce((sum, type) => sum + type.tiles, 0)
-  return { band: at + 1, oreTiles, patches, types }
+  return { band: at + 1, oreTiles, patches: patches.size, types, rareRolls: rollsOf(patches) }
+}
+
+function rollsOf(patches: ReadonlyMap<string, string | null>): RoleRolls[] {
+  const rolls = new Map<string, number>()
+  for (const role of patches.values())
+    if (role !== null) rolls.set(role, (rolls.get(role) ?? 0) + 1)
+  return [...rolls].map(([role, count]) => ({ role, rolls: count }))
 }
 
 function sharesBetween(
@@ -176,11 +227,12 @@ function sharesBetween(
   nearLava: readonly OreMixEntry[],
 ): Map<string, ExpectedShare> {
   const [low, high] = [roleWeightsOf(params, plain), roleWeightsOf(params, nearLava)]
+  const perRoll = perRollRolesOf(params, [...plain, ...nearLava])
   const roles = new Set([...low.keys(), ...high.keys()])
   return new Map(
     [...roles].map((role) => {
       const [a, b] = [low.get(role) ?? 0, high.get(role) ?? 0]
-      return [role, { lowBp: Math.min(a, b), highBp: Math.max(a, b) }]
+      return [role, { lowBp: Math.min(a, b), highBp: Math.max(a, b), isPerRoll: perRoll.has(role) }]
     }),
   )
 }
@@ -192,4 +244,9 @@ function roleWeightsOf(params: PlanetParams, entries: readonly OreMixEntry[]): M
     weights.set(role, (weights.get(role) ?? 0) + entry.weightBp)
   }
   return weights
+}
+
+function perRollRolesOf(params: PlanetParams, entries: readonly OreMixEntry[]): Set<string> {
+  const perRoll = entries.filter((entry) => isPerRollRole(params, entry.lead, entry.signature))
+  return new Set(perRoll.map((entry) => entryRoleOf(params, entry)))
 }

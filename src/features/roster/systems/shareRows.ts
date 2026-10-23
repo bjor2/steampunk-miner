@@ -3,7 +3,8 @@
  * (Systems' asserts on #139: comment 6203159815 as amended to 650 bp per tier by 6203640346, and
  * the trip asserts of 6202970624 section 7.5). Every bound is integer basis points except the two
  * trip ones Systems wrote in fractions of a basis point (a mean shift under 0.5 bp is "1.0000 to 4
- * decimals"; the clamp may cost at most 1 bp of mean income).
+ * decimals"; the clamp may cost at most 1 bp of mean income). A planet on the deep rows (ticket 738)
+ * is held to its whole-planet mean instead of each band's (`deepRares`).
  */
 import { createFieldReader, type FieldReader } from '../../../systems/economy/economyFieldReader'
 import economyFile from '../roster.economy.json'
@@ -28,11 +29,18 @@ export interface TripBounds {
   clampLossMaxBp: number
 }
 
+/** The named #644 re-baseline "deep rares" (ticket 738): the deep rows' mean, judged per planet. */
+export interface DeepRareBounds {
+  /** The planet's mean value per ore unit against today's, in basis points either way (VS 5%). */
+  planetMeanShiftMaxBp: number
+}
+
 export interface ShareRows {
   bounds: RarityShareBounds
   /** Distinct common kinds live in every band of a planet with a roster. */
   liveCommonsPerBandMin: number
   trip: TripBounds
+  deepRares: DeepRareBounds
   /** The planets the bounds are asserted on and the status page's table prints. */
   judgedPlanets: readonly number[]
   /** Ore units the trip ledger draws per seed, band and planet: the sample, not a bound. */
@@ -52,6 +60,7 @@ export function readShareRows(raw: unknown): { rows: ShareRows } | { problems: s
       shares.liveCommonsPerBandMin,
     ),
     trip: tripBoundsOf(reader, reader.object('shares.trip', shares.trip)),
+    deepRares: deepRareBoundsOf(reader, reader.object('shares.deepRares', shares.deepRares)),
     judgedPlanets: planetsOf(reader, shares.judgedPlanets),
     tripFindsPerSeed: reader.safeInteger('tripFindsPerSeed', shares.tripFindsPerSeed),
   }
@@ -83,6 +92,15 @@ function tripBoundsOf(reader: FieldReader, raw: Record<string, unknown>): TripBo
     cvMaxBp: reader.safeInteger('trip.cvMaxBp', raw.cvMaxBp),
     p999MaxOfNominalBp: reader.safeInteger('trip.p999MaxOfNominalBp', raw.p999MaxOfNominalBp),
     clampLossMaxBp: reader.boundedNumber('trip.clampLossMaxBp', raw.clampLossMaxBp),
+  }
+}
+
+function deepRareBoundsOf(reader: FieldReader, raw: Record<string, unknown>): DeepRareBounds {
+  return {
+    planetMeanShiftMaxBp: reader.safeInteger(
+      'deepRares.planetMeanShiftMaxBp',
+      raw.planetMeanShiftMaxBp,
+    ),
   }
 }
 

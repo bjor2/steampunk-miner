@@ -11,6 +11,7 @@ import { frozenRadiusProvider } from '../registries/planetRowFixtures'
 import {
   bandStartsFor,
   coreRadiusFor,
+  DEEP_RARE_WINDOW_ORE_RULES,
   DEPTH_CURVE_ORE_RULES,
   freshPlanetParamsFor,
   freshRadiusTilesOf,
@@ -22,6 +23,7 @@ import {
   ORE_RULES_VERSION,
   planetParamsFor,
   RADIUS_ROWS_ORE_RULES,
+  RARE_CLUSTER_ORE_RULES,
   radiusForPlanet,
 } from './planetParams'
 import {
@@ -160,12 +162,13 @@ describe('planet params ore rules (ticket 445)', () => {
     expect(Object.keys(stamped).at(-1)).toBe('oreRulesVersion')
   })
 
-  it('stamps fresh planet 1 with ore rules 2 and planet 2 on with rules 9 (446, 448, #453, 625, 632, 643, 652, 709)', () => {
+  it('stamps fresh planets 1 and 2 with the rare clusters, rules 10, and planet 3 on with the deep rare window, 11 (737, 738)', () => {
     const stamps = [1, 2, 3, 4, 60].map((index) => freshPlanetParamsFor(1, index).oreRulesVersion)
     expect(ORE_RULES_FROM_PLANET).toBe(1)
-    expect(ORE_RULES_VERSION).toBe(9)
-    expect(P2_OWN_KINDS_ORE_RULES).toBe(ORE_RULES_VERSION)
-    expect(stamps).toEqual([2, 9, 9, 9, 9])
+    expect(ORE_RULES_VERSION).toBe(11)
+    expect(DEEP_RARE_WINDOW_ORE_RULES).toBe(ORE_RULES_VERSION)
+    expect(P2_OWN_KINDS_ORE_RULES).toBe(9)
+    expect(stamps).toEqual([10, 10, 11, 11, 11])
   })
 
   it('holds hazard pockets only on a planet from 2 entered under ore rules 8 (ticket 652)', () => {
@@ -266,9 +269,12 @@ describe('planet params radius from the planet registry (ticket 643)', () => {
     expect(underThreeRows(() => freshPlanetParamsFor(83921, 3).radiusTiles)).toBe(520)
   })
 
-  it('reads planet 1 at its ladder radius on rules 2, so its params stay byte-identical', () => {
+  it('reads planet 1 at its ladder radius, so its params differ from rules 2 by the stamp alone', () => {
     const fresh = underThreeRows(() => freshPlanetParamsFor(83921, 1))
-    expect(fresh).toEqual(planetParamsFor(83921, 1, 2))
+    expect(fresh).toEqual({
+      ...planetParamsFor(83921, 1, 2),
+      oreRulesVersion: RARE_CLUSTER_ORE_RULES,
+    })
     expect(fresh.radiusTiles).toBe(300)
   })
 })

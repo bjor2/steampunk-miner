@@ -38,20 +38,21 @@ export const RARITY_RUN_PLANET = 3
  */
 export const RARITY_RUN_HOLD_STEP = 23
 /**
- * Band 3 of seed 27182's P3, the band of the pinned seeds that holds the most epic cells since they
- * grow in clusters (ticket 737): ten. Band 5 was Systems' binding case, but holds at most six now.
+ * Band 3 of seed 83921's P3, the band of the pinned seeds that holds the most epic cells alone since
+ * they grow in clusters (ticket 737) and the deep rows weigh band 3's epics at a quarter of band 5's
+ * (ticket 738): seven. Band 5 was Systems' binding case, but holds at most six and mixes mythics in.
  * The cap binds the same way in both: 0.15 x 90 x V(t_b) is four epics' V(t_b + 3) exactly.
  */
-export const CAP_RUN = { seed: 27182, bands: [3] } as const
+export const CAP_RUN = { seed: 83921, bands: [3] } as const
 /** Every band epic and mythic are live in on P3 (`firstBand` 3 and 4). */
 export const CLAMPED_BANDS = [3, 4, 5] as const
-/** Enough epic and mythic cells to pass the cap of a 90-unit hold (four epics reach it). */
-export const RARITY_RUN_CELLS = 8
+/** Enough epic and mythic cells to pass the cap of a 90-unit hold: four epics reach it, three pass. */
+export const RARITY_RUN_CELLS = 7
 /** A drill on the curve of planet 10 breaks a P3 mythic in a tick or two. */
 const STRONG_DRILL_PLANET = 10
 const DRILL_TICKS = 40
 
-/** A planet as this build enters it from P3: on the mixed rows of the ore rules. */
+/** A planet as this build enters it from P3: on the deep rows of the ore rules (ticket 738). */
 export function stampedRunParamsOf(seed: number, planetIndex = RARITY_RUN_PLANET): PlanetParams {
   return planetParamsFor(seed, planetIndex, ORE_RULES_VERSION)
 }

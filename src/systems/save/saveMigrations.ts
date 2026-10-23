@@ -71,6 +71,11 @@
  * patches and never regenerates mid-run; every cell, edit and the whole state are kept, and the
  * next planet is stamped with rules 10.
  *
+ * Generator 15 -> 16 (ticket 738): a planet from P3 entered under ore rules 11 draws its rare, epic
+ * and mythic ore only from band 3. A save written before it holds its planet under rules 10 or
+ * earlier, so that planet keeps its band-2 rares and never regenerates mid-run; every cell, edit and
+ * the whole state are kept, and the next planet from P3 is stamped with rules 11.
+ *
  * Format 1 -> 2 (#401): the slot layout. A v1 file was the checkpoint of the single slot, so it
  * becomes the autosave with no wall time, and its header gains the ids of the rows its state opens
  * (`savedUnlocks.ts`). Its sections are kept byte for byte: money, levels and everything else.
@@ -171,6 +176,7 @@ const SAVE_MIGRATION_STEPS: readonly SaveMigrationStep[] = [
   { version: 'generatorVersion', from: 12, to: 13, migrate: keepLadderRadius },
   { version: 'generatorVersion', from: 13, to: 14, migrate: keepTwelveSpecies },
   { version: 'generatorVersion', from: 14, to: 15, migrate: keepRarePatches },
+  { version: 'generatorVersion', from: 15, to: 16, migrate: keepBandTwoRares },
   { version: 'formatVersion', from: 1, to: 2, migrate: addSlotHeader },
   { version: 'formatVersion', from: 2, to: 3, migrate: packChunkTable },
 ]
@@ -317,6 +323,10 @@ function keepTwelveSpecies(file: MigratingFile): MigratingFile | null {
 
 function keepRarePatches(file: MigratingFile): MigratingFile | null {
   return keptUnderGenerator(file, 15)
+}
+
+function keepBandTwoRares(file: MigratingFile): MigratingFile | null {
+  return keptUnderGenerator(file, 16)
 }
 
 function keptUnderGenerator(file: MigratingFile, generatorVersion: number): MigratingFile | null {

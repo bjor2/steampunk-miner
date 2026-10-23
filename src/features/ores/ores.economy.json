@@ -29,6 +29,12 @@
           "rare": [0, 63, 69, 41, 97],
           "epic": [0, 0, 31, 18, 43],
           "mythic": [0, 0, 0, 8, 19]
+        },
+        "deep": {
+          "uncommon": [250, 142, 155, 97, 224],
+          "rare": [0, 0, 56, 111, 223],
+          "epic": [0, 0, 17, 35, 70],
+          "mythic": [0, 0, 0, 8, 17]
         }
       },
       "meanToleranceBp": "0.5",
@@ -84,8 +90,20 @@
         { "slotId": "mixed.u1", "family": "metal", "rarity": "uncommon", "window": [1, 4] },
         { "slotId": "mixed.u2", "family": "crystal", "rarity": "uncommon", "window": [1, 4] },
         { "slotId": "mixed.u3", "family": "fossil", "rarity": "uncommon", "window": [2, 5] },
-        { "slotId": "mixed.r1", "family": "metal", "rarity": "rare", "window": [2, 5] },
-        { "slotId": "mixed.r2", "family": "crystal", "rarity": "rare", "window": [2, 5] },
+        {
+          "slotId": "mixed.r1",
+          "family": "metal",
+          "rarity": "rare",
+          "window": [3, 5],
+          "windowsBeforeOreRules": { "11": [2, 5] }
+        },
+        {
+          "slotId": "mixed.r2",
+          "family": "crystal",
+          "rarity": "rare",
+          "window": [3, 5],
+          "windowsBeforeOreRules": { "11": [2, 5] }
+        },
         { "slotId": "mixed.r3", "family": "fossil", "rarity": "rare", "window": [4, 4] },
         { "slotId": "mixed.e1", "family": "metal", "rarity": "epic", "window": [4, 5] },
         { "slotId": "mixed.e2", "family": "crystal", "rarity": "epic", "window": [4, 5] },

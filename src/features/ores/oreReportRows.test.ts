@@ -119,8 +119,8 @@ describe('ore report rows', () => {
       ...minedUnit(10, B4_FIRST, 4, 0, 30),
       ...minedUnit(20, B4_SECOND, 4, 2, 30),
     ])
-    // Band 4's mixed rows (ticket 445): 9836 + 97 x 1.5 + 41 x 2.25 + 18 x 3.375 + 8 x 5.0625 bp.
-    expect(rows['mean value per unit over V(t_b) by band (expected)']).toBe('b4 x1.625 (x1.018)')
+    // Band 4's deep rows (ticket 738): 9749 + 97 x 1.5 + 111 x 2.25 + 35 x 3.375 + 8 x 5.0625 bp.
+    expect(rows['mean value per unit over V(t_b) by band (expected)']).toBe('b4 x1.625 (x1.030)')
   })
 
   it("prints band 5's median drill ticks per tile by lead, blasted tiles left out", () => {

@@ -11,10 +11,14 @@ import {
   planetParamsFor,
   type PlanetParams,
 } from '../../../systems/world/planetParams'
+import { bandOfTile } from '../../../systems/world/planetGeometry'
 import {
   cellIndexOfTile,
+  CHUNK_CELLS,
+  CHUNK_SIZE,
   chunkKey,
   chunkOfTile,
+  firstTileOfChunk,
   halfTileDistanceSq,
   halfTileRadiusSq,
   type TilePoint,
@@ -77,6 +81,21 @@ function hazardWindowOf(params: PlanetParams) {
 }
 
 /** The tile's radial depth in whole cells below the surface, counted as the surface layer counts. */
+/** The tiles of the six chunks under the dock point: two columns, from the pad down. */
+function tilesUnderDockOf(params: PlanetParams): TilePoint[] {
+  const { padRow } = dockSiteOf(params)
+  const cys = [chunkOfTile(padRow), chunkOfTile(padRow) - 1, chunkOfTile(padRow) - 2]
+  return [-1, 0].flatMap((cx) => cys.flatMap((cy) => tilesOfChunk(cx, cy)))
+}
+
+function tilesOfChunk(cx: number, cy: number): TilePoint[] {
+  const [x0, y0] = [firstTileOfChunk(cx), firstTileOfChunk(cy)]
+  return Array.from({ length: CHUNK_CELLS }, (_, at) => ({
+    tx: x0 + (at % CHUNK_SIZE),
+    ty: y0 + Math.floor(at / CHUNK_SIZE),
+  }))
+}
+
 function depthCellsOf(params: PlanetParams, tile: TilePoint): number {
   const distanceSq = halfTileDistanceSq(tile.tx, tile.ty)
   let depth = 0
@@ -134,16 +153,16 @@ describe('hazard pockets', () => {
     }
   })
 
-  it('leaves the generated cells of planets 2 to 5 as ore rules 7 made them', () => {
+  it('leaves the generated cells under the dock of planets 2 to 5 as ore rules 7 made them, where no later rules moved them', () => {
+    // The deep rare window (ore rules 11, ticket 738) re-rolls the leads of P3 to P5's band 2, and
+    // leaves band 1, where every pocket window starts, as it was.
     for (const planet of HAZARD_PLANETS) {
       const fresh = freshPlanetParamsFor(WORLD_SEED, planet)
       const before = planetParamsFor(WORLD_SEED, planet, RULES_BEFORE_POCKETS)
-      const { padRow } = dockSiteOf(fresh)
-      for (const cx of [-1, 0]) {
-        for (const cy of [chunkOfTile(padRow), chunkOfTile(padRow) - 1, chunkOfTile(padRow) - 2]) {
-          expect(generateChunkCells(fresh, cx, cy)).toEqual(generateChunkCells(before, cx, cy))
-        }
-      }
+      const isKept = (tile: TilePoint) => planet === 2 || bandOfTile(fresh, tile.tx, tile.ty) === 1
+      const kept = tilesUnderDockOf(fresh).filter(isKept)
+      expect(kept.length).toBeGreaterThan(0)
+      expect(kept.map(cellReaderOf(fresh))).toEqual(kept.map(cellReaderOf(before)))
     }
   })
 })

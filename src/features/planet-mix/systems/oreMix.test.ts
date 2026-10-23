@@ -9,6 +9,7 @@ import {
   type Money,
 } from '../../../systems/money'
 import {
+  DEEP_RARE_WINDOW_ORE_RULES,
   freshPlanetParamsFor,
   ORE_RULES_VERSION,
   planetParamsFor,
@@ -231,19 +232,25 @@ describe('planet ore mix on the rarity rows (ticket 445)', () => {
     }
   })
 
-  it("weighs a fresh planet's rarity leads at the mixed rows, the signature carved from common", () => {
-    for (const planet of [3, 12, 77]) {
-      const mix = oreMixFor(planet, 31415)
-      for (const band of BANDS) {
-        const entries = mix.bands[band - 1]
-        const signatureBp = totalBp(entries.filter((entry) => entry.signature))
-        const leadBp = (lead: number) =>
-          totalBp(entries.filter((entry) => entry.lead === lead && !entry.signature))
-        const rows = rarityLeadBucketsBpOf('mixed', band)
-        expect([0, 1, 2, 3, 4].map(leadBp)).toEqual([rows[0] - signatureBp, ...rows.slice(1)])
+  it.each([
+    ['the deep rows (ticket 738)', ORE_RULES_VERSION, 'deep'],
+    ['the mixed rows under ore rules 10', DEEP_RARE_WINDOW_ORE_RULES - 1, 'mixed'],
+  ] as const)(
+    "weighs a stamped planet's rarity leads at %s, the signature carved from common",
+    (_, rules, set) => {
+      for (const planet of [3, 12, 77]) {
+        const mix = oreMixOf(planetParamsFor(31415, planet, rules))
+        for (const band of BANDS) {
+          const entries = mix.bands[band - 1]
+          const signatureBp = totalBp(entries.filter((entry) => entry.signature))
+          const leadBp = (lead: number) =>
+            totalBp(entries.filter((entry) => entry.lead === lead && !entry.signature))
+          const rows = rarityLeadBucketsBpOf(set, band)
+          expect([0, 1, 2, 3, 4].map(leadBp)).toEqual([rows[0] - signatureBp, ...rows.slice(1)])
+        }
       }
-    }
-  })
+    },
+  )
 
   it('keeps the signature at 3% of bands 4 and 5 and at the tier of band 5', () => {
     const mix = oreMixFor(12, 83921)
@@ -254,9 +261,11 @@ describe('planet ore mix on the rarity rows (ticket 445)', () => {
     }
   })
 
-  it("keeps each band's mean value per ore unit within half a basis point of today's", () => {
+  it("keeps each band's mean value per ore unit within half a basis point of today's on the mixed rows", () => {
+    // The deep rows (ticket 738) move rare value between bands by design: the named #644
+    // re-baseline "deep rares", judged on the planet (`deepRareRows.test.ts`).
     for (const planet of [3, 9, 12, 77, 200]) {
-      const mix = oreMixFor(planet, 27182)
+      const mix = oreMixOf(planetParamsFor(27182, planet, DEEP_RARE_WINDOW_ORE_RULES - 1))
       for (const band of BANDS) {
         const multiplier = bandValueMultiplierOf(mix.bands[band - 1], planet, band)
         const meanBp = mul(multiplier, fromSafeInteger(10000))

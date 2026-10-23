@@ -52,6 +52,13 @@ export interface PlanetReading {
   hasRoster: boolean
   /** Whether a story planet's boost moves a signature off its base share. */
   isSignatureBoosted: boolean
+  /**
+   * Whether the planet draws the deep rows (ticket 738): they move rare value between bands by
+   * design, the named #644 re-baseline "deep rares", so its mean is judged on the whole planet.
+   */
+  isDeepRares: boolean
+  /** The base mix's mean over the whole planet against today's, each band at its ore value. */
+  planetMeanShiftBp: number
   bands: readonly BandReading[]
   planetKinds: readonly PlanetKindShare[]
 }
@@ -96,6 +103,8 @@ export function readingOf(
     hold,
     hasRoster: real.hasRoster,
     isSignatureBoosted: bands.some((band) => band.meanShiftBp !== band.realMeanShiftBp),
+    isDeepRares: real.rowSet === 'deep',
+    planetMeanShiftBp: planetMeanShiftBpOf(paintings.base, paintings.today),
     bands,
     planetKinds: planetKindSharesOf(real, bands),
   }
@@ -122,6 +131,20 @@ function bandReadingOf(
 function meanShiftBpOf(planet: PaintedPlanet, today: PaintedPlanet, at: number): number {
   const before = meanValueUnitsOf(today.bands[at])
   return ((meanValueUnitsOf(planet.bands[at]) - before) / before) * BASIS_POINTS
+}
+
+/**
+ * The planet's mean value per ore unit against today's: each band at its part of the planet's ore
+ * value on `planet`, its geometry and density, so only the rarity rows tell the two apart.
+ */
+function planetMeanShiftBpOf(planet: PaintedPlanet, today: PaintedPlanet): number {
+  const now = planet.bandOreWeights.reduce((sum, weight) => sum + weight, 0)
+  const before = planet.bandOreWeights.reduce(
+    (sum, weight, at) =>
+      sum + (weight * meanValueUnitsOf(today.bands[at])) / meanValueUnitsOf(planet.bands[at]),
+    0,
+  )
+  return ((now - before) / before) * BASIS_POINTS
 }
 
 /** Each kind's band-trip shares weighed by the bands' parts of the planet's ore value. */

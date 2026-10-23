@@ -28,6 +28,9 @@
  * From ore rules 10 (ticket 737, Bjor's deep-rares rule) every planet grows its rare, epic and
  * mythic ore as seeded clusters of 1 to 3 cells instead of whole patches, and holds one guaranteed
  * cluster of each rare kind its roster names (`rareClusters.ts`, `guaranteedClusters.ts`).
+ *
+ * From ore rules 11 (ticket 738, the same rule) a planet from P3 draws its rare, epic and mythic ore
+ * only from band 3 (`d >= 0.35`), weighted toward the core: the `ores` slice's deep rarity rows.
  */
 import { hashCell } from '../cellRandom'
 import { ECONOMY } from '../economy/economy'
@@ -108,10 +111,11 @@ export interface PlanetParams {
  * 6 planet 2's own species pool on the legacy kind slots (ticket 632), 7 the planet registry's radius
  * from planet 2 (ticket 643), 8 the planet registry's hazard pockets from planet 2 (ticket 652), 9
  * P2's own three kinds after the legacy slots (ticket 709), 10 the rare-ore clusters on every
- * planet (ticket 737). The stamp records the ground rules a planet was entered under, its
- * rock's hardness, its species pool and its size with them.
+ * planet (ticket 737), 11 the rare windows from band 3 on from planet 3 (ticket 738). The stamp
+ * records the ground rules a planet was entered under, its rock's hardness, its species pool and
+ * its size with them.
  */
-export const ORE_RULES_VERSION = 10
+export const ORE_RULES_VERSION = 11
 
 /** The ore rules that add the depth density curve (ticket 448). */
 export const DEPTH_CURVE_ORE_RULES = 3
@@ -153,6 +157,15 @@ export const RARE_CLUSTER_ORE_RULES = 10
 /** Bjor's deep-rares rule holds on every planet (GD lock on ticket 737), so it starts at planet 1. */
 const RARE_CLUSTER_FIRST_PLANET = 1
 
+/** The ore rules that draw rare, epic and mythic ore only from band 3 on (ticket 738). */
+export const DEEP_RARE_WINDOW_ORE_RULES = 11
+
+/**
+ * P1 and P2's legacy rows already start rare at band 3, so the deep window first changes planet 3,
+ * where the `ores` slice's mixed rows start (ticket 738).
+ */
+const DEEP_RARE_WINDOW_FIRST_PLANET = 3
+
 /**
  * The first planet each ore rules version changes, version 1 first: the rarity rows from P3 (the
  * `ores` slice's `mixedRowsFromPlanet`), the roster from P1 (TD ruling on ticket 446, section 4),
@@ -162,7 +175,8 @@ const RARE_CLUSTER_FIRST_PLANET = 1
  * `ores` slice's `poolsBeforeOreRules`: an older P2 keeps the legacy species), the registry radius
  * from planet 2 (ticket 643: P1's row is its ladder radius), the hazard pockets from planet 2
  * (ticket 652: P1 holds no hazard), P2's own kinds (ticket 709: the `ores` slice's own slots name
- * P2's pool alone, so P3 on draw the kinds they drew), the rare clusters from planet 1 (ticket 737).
+ * P2's pool alone, so P3 on draw the kinds they drew), the rare clusters from planet 1 (ticket 737),
+ * the deep rare window from planet 3 (ticket 738: P1 and P2 draw rare from band 3 already).
  */
 const ORE_RULES_FIRST_PLANETS: readonly number[] = [
   3,
@@ -175,6 +189,7 @@ const ORE_RULES_FIRST_PLANETS: readonly number[] = [
   HAZARD_POCKET_FIRST_PLANET,
   P2_OWN_KINDS_FIRST_PLANET,
   RARE_CLUSTER_FIRST_PLANET,
+  DEEP_RARE_WINDOW_FIRST_PLANET,
 ]
 
 /** The first planet any ore rules change, so the first a fresh session stamps: planet 1. */
@@ -226,6 +241,7 @@ export function planetParamsFor(
  * before `ORE_RULES_FROM_PLANET`. Planet 1 stayed on rules 2, which the curve, the surface layer,
  * P2's pool, the registry radius, the hazard pockets and P2's own kinds leave as they were (tickets
  * 448, 625, 632, 643, 652, 709); the rare clusters change it, so it is stamped 10 (ticket 737).
+ * Planet 2 is stamped 10 too, and planet 3 on 11 (ticket 738).
  */
 export function oreRulesVersionOnEntry(planetIndex: number): number | undefined {
   const changing = ORE_RULES_FIRST_PLANETS.map((first, at) => (planetIndex >= first ? at + 1 : 0))

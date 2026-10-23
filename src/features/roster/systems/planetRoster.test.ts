@@ -22,7 +22,7 @@ import {
 const SEED = 83921
 const PLANETS_1_TO_200 = Array.from({ length: 200 }, (_, at) => at + 1)
 /** The legacy slots P1 and P2 share, before the slots P2's pool owns (ticket 709). */
-const SHARED_LEGACY = ORE_ROWS.kinds.slotsBySet.legacy.filter((slot) => slot.owner === undefined)
+const SHARED_LEGACY = ORE_ROWS.kinds.slotsByTable.legacy.filter((slot) => slot.owner === undefined)
 
 describe('planet roster', () => {
   it('gives planets 1 and 2 Systems legacy table in its order, whatever the seed', () => {
@@ -35,7 +35,9 @@ describe('planet roster', () => {
       .slice(12)
       .map((slot) => slot.slotId)
     expect(ownIds).toEqual(['legacy.u5', 'legacy.r4', 'legacy.r5'])
-    expect(planetRosterOf(freshPlanetParamsFor(SEED, 2))).toEqual(ORE_ROWS.kinds.slotsBySet.legacy)
+    expect(planetRosterOf(freshPlanetParamsFor(SEED, 2))).toEqual(
+      ORE_ROWS.kinds.slotsByTable.legacy,
+    )
   })
 
   it('keeps the shared twelve on a planet 2 a save holds under ore rules 8 (ticket 709)', () => {
@@ -46,7 +48,7 @@ describe('planet roster', () => {
   })
 
   it('gives planets from 3 the mixed table', () => {
-    expect(planetRosterOf(freshPlanetParamsFor(SEED, 3))).toEqual(ORE_ROWS.kinds.slotsBySet.mixed)
+    expect(planetRosterOf(freshPlanetParamsFor(SEED, 3))).toEqual(ORE_ROWS.kinds.slotsByTable.mixed)
   })
 
   it('gives no roster to a planet a save holds unstamped or under ore rules 1', () => {
@@ -66,7 +68,7 @@ describe('planet roster', () => {
       planetRosterOf(freshPlanetParamsFor(SEED, index)),
     )
     expect(rosters.map((roster) => roster.length > 0)).toEqual([
-      ORE_ROWS.kinds.slotsBySet.mixed.length > 0,
+      ORE_ROWS.kinds.slotsByTable.mixed.length > 0,
       false,
       false,
       false,

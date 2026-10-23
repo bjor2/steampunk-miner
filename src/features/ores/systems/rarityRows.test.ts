@@ -58,6 +58,7 @@ describe('rarity block', () => {
       weightsBpByBand: {
         legacy: { uncommon: [250, 300, 350, 400, 450], epic: [0, 0, 0, 0, 5] },
         mixed: { uncommon: [9000, 142, 155, 97, 224], epic: [2000, 0, 31, 18, 43] },
+        deep: { uncommon: [250, 142, 155, 97, 224], epic: [0, 0, 17, 35, 70] },
       },
       meanToleranceBp: 'half',
       tripClampShareBp: 10001,
@@ -78,6 +79,15 @@ describe('rarity block', () => {
       'ore.rarity.tripClampShareBp must be basis points',
       'ore.rarity.tripClampTierIds must name rarity tiers',
     ])
+  })
+
+  it('refuses deep rows that draw rare or above before band 3, d >= 0.35 (ticket 738)', () => {
+    const rarity = structuredClone(economyFile.ore.rarity)
+    rarity.weightsBpByBand.deep.rare = [0, 63, 56, 111, 223]
+    rarity.weightsBpByBand.deep.uncommon = [250, 142, 155, 97, 224]
+    expect(rarityRowProblems(rarity)).toEqual(['the deep rare weight is drawn above band 3'])
+    rarity.weightsBpByBand.deep.rare = [0, 0, 56, 111, 223]
+    expect(rarityRowProblems(rarity)).toEqual([])
   })
 
   it('refuses a weight set that leaves out a tier', () => {

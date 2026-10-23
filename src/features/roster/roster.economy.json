@@ -1,6 +1,6 @@
 {
   "shares": {
-    "source": "Systems' exact asserts for the materials on #139 (comment 6203159815; the per-tier bound is 650 bp on every planet since 6203640346) with the trip asserts of 6202970624 section 7.5 and the family-first share of ticket 446 (6226198316): ticket 449. Shares are whole basis points, rounded up, from the trip ledger over the pacing seeds. A missed bound is a balance finding; no bound moves to pass.",
+    "source": "Systems' exact asserts for the materials on #139 (comment 6203159815; the per-tier bound is 650 bp on every planet since 6203640346) with the trip asserts of 6202970624 section 7.5 and the family-first share of ticket 446 (6226198316): ticket 449. Shares are whole basis points, rounded up, from the trip ledger over the pacing seeds. A missed bound is a balance finding; no bound moves to pass. The deep rows (ticket 738, Bjor's deep-rares rule) move rare value out of band 2 into bands 3 to 5 by design: the named #644 re-baseline 'deep rares' waives the per-band mean on them (Systems' guard on #738), and their mean is held on the whole planet instead, within the VS's 5% of main (VS on #737/#738).",
     "rarityShareBp": {
       "perNonCommonKindMax": 1500,
       "perNonCommonTierMax": 650,
@@ -14,6 +14,9 @@
       "cvMaxBp": 300,
       "p999MaxOfNominalBp": 11200,
       "clampLossMaxBp": 1
+    },
+    "deepRares": {
+      "planetMeanShiftMaxBp": 500
     },
     "judgedPlanets": [1, 2, 3, 4, 5, 6, 7, 10, 20, 40, 60],
     "tripFindsPerSeed": 400000

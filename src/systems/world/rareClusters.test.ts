@@ -83,9 +83,11 @@ describe('rare-ore clusters', () => {
     planet1 = rareClusterCensusOf(freshPlanetParamsFor(SEED, 1))
   }, PLANET_TIMEOUT_MS)
 
-  it('stamps every planet entered from this build with the cluster rules, planet 1 included', () => {
+  it('stamps every planet entered from this build with the cluster rules or later, planet 1 included', () => {
     for (const planet of [1, 2, 3, 8, 60]) {
-      expect(oreRulesVersionOnEntry(planet), `planet ${planet}`).toBe(RARE_CLUSTER_ORE_RULES)
+      expect(oreRulesVersionOnEntry(planet), `planet ${planet}`).toBeGreaterThanOrEqual(
+        RARE_CLUSTER_ORE_RULES,
+      )
     }
   })
 
@@ -136,7 +138,8 @@ describe('rare-ore clusters', () => {
   it('grows no cluster past its seed at d < 0.35, so every shallow cluster is one cell', () => {
     const shallow = planet1.clusters.filter((cluster) => cluster.band < DEEP_RARE_FIRST_BAND)
     expect(shallow.filter((cluster) => cluster.tiles.length > 1)).toEqual([])
-    const planet3 = freshPlanetParamsFor(SEED, 3)
+    // Rules 10's P3 still rolls rare in band 2; the deep window of rules 11 (ticket 738) does not.
+    const planet3 = planetParamsFor(SEED, 3, RARE_CLUSTER_ORE_RULES)
     const r = planet3.radiusTiles
     const band2 = bandPatchesInBox(planet3, 2, { x0: -r, y0: -r, x1: r, y1: r })
     const rare = band2.filter((patch) => isRareOreCell(2, patchCellOf(planet3, patch)))
@@ -168,7 +171,7 @@ describe('rare-ore clusters', () => {
     () => {
       for (const planet of [2, 3]) {
         const before = planetParamsFor(SEED, planet, P2_OWN_KINDS_ORE_RULES)
-        const after = freshPlanetParamsFor(SEED, planet)
+        const after = planetParamsFor(SEED, planet, RARE_CLUSTER_ORE_RULES)
         const r = after.radiusTiles
         const { min, max } = chunkRangeOfDisc(r)
         const chunks: [number, number][] = []

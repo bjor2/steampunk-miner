@@ -2,7 +2,8 @@
  * The rarity leads a planet's ore patches roll (TD ruling on ticket 445, sections 1 and 3): the
  * share of a band's patches at each tier offset, common first, under the planet's row set. The
  * `legacy` set is today's lead rows (+0, +1, +2); the `mixed` set adds epic (+3) and mythic (+4) on
- * planets entered under the ore rules from P3. Vertical. Integer basis points only.
+ * planets entered under the ore rules from P3, and the `deep` set draws rare and up only from band 3
+ * (ticket 738). Vertical. Integer basis points only.
  */
 import type { PlanetParams } from '../../../systems/world/planetParams'
 import { BAND_COUNT } from '../../../systems/world/planetGeometry'
@@ -30,7 +31,7 @@ export function rarityLeadBucketsBpOf(set: RarityRowSet, band: number): readonly
   return bucket
 }
 
-/** The largest lead the set draws anywhere: +2 on the legacy rows, mythic's +4 on the mixed. */
+/** The largest lead the set draws anywhere: +2 on the legacy rows, mythic's +4 on the mixed and deep. */
 export function topLeadOf(set: RarityRowSet): number {
   const drawn = rarityLeads().filter((lead) => BANDS.some((band) => isDrawn(set, lead, band)))
   return Math.max(...drawn)
@@ -48,10 +49,15 @@ let buckets: LeadBuckets | null = null
 
 function bucketsBySet(): LeadBuckets {
   buckets ??= {
-    legacy: BANDS.map((band) => bucketsOf('legacy', band)),
-    mixed: BANDS.map((band) => bucketsOf('mixed', band)),
+    legacy: bandBucketsOf('legacy'),
+    mixed: bandBucketsOf('mixed'),
+    deep: bandBucketsOf('deep'),
   }
   return buckets
+}
+
+function bandBucketsOf(set: RarityRowSet): readonly (readonly number[])[] {
+  return BANDS.map((band) => bucketsOf(set, band))
 }
 
 function bucketsOf(set: RarityRowSet, band: number): readonly number[] {

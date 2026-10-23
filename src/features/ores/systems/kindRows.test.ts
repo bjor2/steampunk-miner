@@ -1,5 +1,9 @@
 import { describe, expect, it } from 'vitest'
-import { ORE_RULES_VERSION, P2_OWN_KINDS_ORE_RULES } from '../../../systems/world/planetParams'
+import {
+  DEEP_RARE_WINDOW_ORE_RULES,
+  ORE_RULES_VERSION,
+  P2_OWN_KINDS_ORE_RULES,
+} from '../../../systems/world/planetParams'
 import economyFile from '../ores.economy.json'
 import familiesFile from '../oreFamilies.json'
 import { kindRowsOf, poolOfPlanetUnder, slotsOfPoolUnder } from './kindRows'
@@ -31,7 +35,7 @@ const C1: Slot = economyFile.ore.kinds.legacy[0]
 
 describe('ore kind slots', () => {
   it('ships Systems twelve shared legacy slots, 5 common, 4 uncommon and 3 rare', () => {
-    const shared = ORE_ROWS.kinds.slotsBySet.legacy.filter((slot) => slot.owner === undefined)
+    const shared = ORE_ROWS.kinds.slotsByTable.legacy.filter((slot) => slot.owner === undefined)
     const count = (rarity: string) => shared.filter((slot) => slot.rarity === rarity).length
     expect(shared.map((slot) => slot.slotId)).toEqual([
       ...['c1', 'c2', 'c3', 'c4', 'c5', 'u1', 'u2', 'u3', 'u4', 'r1', 'r2', 'r3'].map(
@@ -42,7 +46,7 @@ describe('ore kind slots', () => {
   })
 
   it("appends P2's own three slots, a metal uncommon and two crystal rares in bands 4-5, from ore rules 9 (ticket 709)", () => {
-    const own = ORE_ROWS.kinds.slotsBySet.legacy.slice(12)
+    const own = ORE_ROWS.kinds.slotsByTable.legacy.slice(12)
     expect(own).toEqual(
       [
         ['legacy.u5', 'metal', 'uncommon'],
@@ -59,7 +63,7 @@ describe('ore kind slots', () => {
   })
 
   it("ships Systems' mixed slots 4/3/3/3/2, then Option B's two fossil commons appended", () => {
-    const mixed = ORE_ROWS.kinds.slotsBySet.mixed
+    const mixed = ORE_ROWS.kinds.slotsByTable.mixed
     const names = ['c1', 'c2', 'c3', 'c4', 'u1', 'u2', 'u3', 'r1', 'r2', 'r3', 'e1', 'e2', 'e3']
     expect(mixed.map((slot) => slot.slotId)).toEqual(
       [...names, 'm1', 'm2', 'c5', 'c6'].map((name) => `mixed.${name}`),
@@ -74,21 +78,43 @@ describe('ore kind slots', () => {
 
   it('caps a roster at the mixed table with its appended rows, 17, inside the 8-bit slot', () => {
     expect(ORE_ROWS.kinds.rosterMaxKinds).toBe(17)
-    expect(ORE_ROWS.kinds.rosterMaxKinds).toBe(ORE_ROWS.kinds.slotsBySet.mixed.length)
+    expect(ORE_ROWS.kinds.rosterMaxKinds).toBe(ORE_ROWS.kinds.slotsByTable.mixed.length)
   })
 
   it('keeps epic live from band 3 and mythic from band 4, the surface sparse (HS on #453)', () => {
-    const firstBandOf = (rarity: string) =>
+    const firstBandOf = (rarity: string, rules: number) =>
       Math.min(
-        ...ORE_ROWS.kinds.slotsBySet.mixed
+        ...ORE_ROWS.kinds.slotsByTable.mixed
           .filter((slot) => slot.rarity === rarity)
-          .map((slot) => slot.window[0]),
+          .map((slot) => liveWindowOf(slot, rules)[0]),
       )
-    expect(['rare', 'epic', 'mythic'].map(firstBandOf)).toEqual([2, 3, 4])
+    const before = DEEP_RARE_WINDOW_ORE_RULES - 1
+    expect(['rare', 'epic', 'mythic'].map((rarity) => firstBandOf(rarity, before))).toEqual([
+      2, 3, 4,
+    ])
+  })
+
+  it('moves the metal and crystal rares to band 3 from ore rules 11, d >= 0.35 (ticket 738)', () => {
+    const rares = ORE_ROWS.kinds.slotsByTable.mixed.filter((slot) => slot.rarity === 'rare')
+    const windowsUnder = (rules: number) => rares.map((slot) => liveWindowOf(slot, rules))
+    expect(windowsUnder(DEEP_RARE_WINDOW_ORE_RULES - 1)).toEqual([
+      [2, 5],
+      [2, 5],
+      [4, 4],
+    ])
+    expect(windowsUnder(DEEP_RARE_WINDOW_ORE_RULES)).toEqual([
+      [3, 5],
+      [3, 5],
+      [4, 4],
+    ])
+    const deepFirstBands = ORE_ROWS.kinds.slotsByTable.mixed
+      .filter((slot) => ['rare', 'epic', 'mythic'].includes(slot.rarity))
+      .map((slot) => slot.window[0])
+    expect(Math.min(...deepFirstBands)).toBe(3)
   })
 
   it('reads a slot live in the bands of its window only', () => {
-    const [c3] = ORE_ROWS.kinds.slotsBySet.legacy.filter((slot) => slot.slotId === 'legacy.c3')
+    const [c3] = ORE_ROWS.kinds.slotsByTable.legacy.filter((slot) => slot.slotId === 'legacy.c3')
     expect([1, 2, 3, 4, 5].map((band) => isSlotLiveInBand(c3, band, ORE_RULES_VERSION))).toEqual([
       false,
       false,
@@ -269,7 +295,7 @@ describe('a kind slot window narrowed at an ore rules version', () => {
     { ...economyFile.ore.kinds, legacy: [...shared, NARROWED] },
     ORE_ROWS.kinds.poolByPlanet,
   )
-  const narrowed = kinds.slotsBySet.legacy[shared.length]
+  const narrowed = kinds.slotsByTable.legacy[shared.length]
 
   it('keeps the earlier window on a planet stamped before the version, and the newest from it on', () => {
     const windows = [undefined, 2, 4, 5, ORE_RULES_VERSION].map((rules) =>
@@ -287,7 +313,7 @@ describe('a kind slot window narrowed at an ore rules version', () => {
   })
 
   it('reads a slot whose window never moved the same under every stamp', () => {
-    const [c3] = ORE_ROWS.kinds.slotsBySet.legacy.filter((slot) => slot.slotId === 'legacy.c3')
+    const [c3] = ORE_ROWS.kinds.slotsByTable.legacy.filter((slot) => slot.slotId === 'legacy.c3')
     expect([undefined, 2, ORE_RULES_VERSION].map((rules) => liveWindowOf(c3, rules))).toEqual([
       [3, 5],
       [3, 5],
@@ -300,6 +326,18 @@ describe('a kind slot window narrowed at an ore rules version', () => {
       problemsWithLegacy([...shared, { ...NARROWED, windowsBeforeOreRules: { 5: [2, 5] } }]),
     ).toEqual([
       `ore.kinds.legacy[${shared.length}] is live in band 2, where legacy rare weighs nothing`,
+    ])
+  })
+
+  it('refuses a mixed rare left live in band 2 for the deep rows, which draw it from band 3', () => {
+    const mixed = economyFile.ore.kinds.mixed.map((slot) =>
+      slot.slotId === 'mixed.r1'
+        ? { ...slot, window: [2, 5], windowsBeforeOreRules: undefined }
+        : slot,
+    )
+    const kinds = { ...economyFile.ore.kinds, mixed }
+    expect(oreRowProblems({ ore: { ...economyFile.ore, kinds } }, familiesFile)).toEqual([
+      'ore.kinds.mixed[7] is live in band 2, where deep rare weighs nothing',
     ])
   })
 

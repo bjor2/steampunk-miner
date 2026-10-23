@@ -44,6 +44,11 @@ export interface ShareTablePlanet {
   hold: number
   hasRoster: boolean
   isSignatureBoosted: boolean
+  /**
+   * On the deep rows only (ticket 738): the whole-planet mean against today's, largest either way,
+   * which the named #644 re-baseline "deep rares" judges instead of each band's `meanShiftBp`.
+   */
+  planetMeanShiftBp?: string
   bands: readonly ShareTableBand[]
   worstCommonKindOfPlanetBp: number | null
   worstOtherKindOfPlanetBp: number | null
@@ -65,7 +70,9 @@ export interface ShareTable {
   schema: number
   ticket: number
   seeds: readonly number[]
-  bounds: ShareRows['bounds'] & ShareRows['trip'] & { liveCommonsPerBandMin: number }
+  bounds: ShareRows['bounds'] &
+    ShareRows['trip'] &
+    ShareRows['deepRares'] & { liveCommonsPerBandMin: number }
   planets: readonly ShareTablePlanet[]
   /** Band 5 on arrival, the on-curve vehicle with every income item owned. */
   incomeCap: readonly IncomeCapTableRow[]
@@ -102,7 +109,12 @@ export function shareTableOf(
     schema: SHARE_TABLE_SCHEMA,
     ticket: TICKET,
     seeds: [...new Set(readings.map((reading) => reading.worldSeed))],
-    bounds: { ...rows.bounds, ...rows.trip, liveCommonsPerBandMin: rows.liveCommonsPerBandMin },
+    bounds: {
+      ...rows.bounds,
+      ...rows.trip,
+      ...rows.deepRares,
+      liveCommonsPerBandMin: rows.liveCommonsPerBandMin,
+    },
     planets: rows.judgedPlanets.map((planet) =>
       planetRowOf(
         readings.filter((reading) => reading.planetIndex === planet),
@@ -121,6 +133,7 @@ function planetRowOf(readings: readonly PlanetReading[], rows: ShareRows): Share
     hold: first.hold,
     hasRoster: first.hasRoster,
     isSignatureBoosted: first.isSignatureBoosted,
+    ...planetMeanOf(readings),
     bands: first.bands.map((_, at) =>
       bandRowOf(
         readings.map((reading) => reading.bands[at]),
@@ -133,6 +146,14 @@ function planetRowOf(readings: readonly PlanetReading[], rows: ShareRows): Share
       shareViolationsOf(reading, rows).map(violationTextOf),
     ),
   }
+}
+
+/** The deep rows' whole-planet mean, worst over the seeds; nothing on any other planet. */
+function planetMeanOf(
+  readings: readonly PlanetReading[],
+): Pick<ShareTablePlanet, 'planetMeanShiftBp'> {
+  if (!readings[0].isDeepRares) return {}
+  return { planetMeanShiftBp: furthestText(readings.map((reading) => reading.planetMeanShiftBp)) }
 }
 
 function bandRowOf(bands: readonly BandReading[], isSignatureBoosted: boolean): ShareTableBand {

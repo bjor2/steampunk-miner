@@ -4,6 +4,7 @@ import { GENERATOR_VERSION } from '../generatorVersion'
 import { chunkDigest } from './chunkDigest'
 import { generateChunk } from './generateChunk'
 import {
+  DEEP_RARE_WINDOW_ORE_RULES,
   DEPTH_CURVE_ORE_RULES,
   HAZARD_POCKET_ORE_RULES,
   P2_OWN_KINDS_ORE_RULES,
@@ -41,13 +42,15 @@ import { chunkRangeOfDisc } from './tileGrid'
  * of a planet 2 entered under ore rules 9 under 14, ticket 709, pinned by the own kinds digest and
  * leaving planet 1 and planets 3 on as rules 8 made them, and the rare-ore clusters of every planet
  * entered under ore rules 10 under 15, ticket 737, pinned by the cluster digests of planets 1 to 3,
- * with the features loaded as the game loads them): a committed
+ * and the deep rare window of every planet from 3 entered under ore rules 11 under 16, ticket 738,
+ * pinned by the deep digests of planets 3 to 7, with the features loaded as the game loads them):
+ * a committed
  * digest of the generator's cells and density. If this fails, the
  * generator changed what a seed makes: bump GENERATOR_VERSION (saves and replays of the old
  * world are then refused) and update the version and digests below in the same commit.
  */
 const GOLDEN = {
-  generatorVersion: 15,
+  generatorVersion: 16,
   wholePlanet1: '4219af3346401cb7',
   wholePlanet2: 'ff1572afae8b0e0f',
   farPlanetChunks: 'c602124184c77617',
@@ -69,6 +72,13 @@ const GOLDEN = {
   clusterWholePlanet1: '85334ac5b813348f',
   clusterWholePlanet2: '7b60bdfb68a5d5ee',
   clusterWholePlanet3: 'bdceeb5729e0b1f6',
+  deepWholePlanets3To7: [
+    '0780ac530f483944',
+    'f81880bf3d62dad2',
+    '1ea3567ebedf56a4',
+    'e47e864288ee6acf',
+    '21c74c40bdd1a43e',
+  ],
 }
 
 /** One digest over every chunk's digest in a fixed order. */
@@ -234,5 +244,15 @@ describe('generator golden digest', () => {
     expect(digestOfChunks(planet3, everyChunkOf(planet3))).toBe(GOLDEN.clusterWholePlanet3)
     expect(GOLDEN.clusterWholePlanet1).not.toBe(GOLDEN.stampedWholePlanet1)
     expect(GOLDEN.clusterWholePlanet2).not.toBe(GOLDEN.ownKindsWholePlanet2)
+  })
+
+  it('makes the committed planets 3 to 7 with the deep rare window, ore rules 11 (ticket 738)', () => {
+    const deep = [3, 4, 5, 6, 7].map((planet) =>
+      planetParamsFor(83921, planet, DEEP_RARE_WINDOW_ORE_RULES),
+    )
+    expect(deep.map((params) => digestOfChunks(params, everyChunkOf(params)))).toEqual(
+      GOLDEN.deepWholePlanets3To7,
+    )
+    expect(GOLDEN.deepWholePlanets3To7[0]).not.toBe(GOLDEN.clusterWholePlanet3)
   })
 })

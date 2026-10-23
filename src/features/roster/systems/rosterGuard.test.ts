@@ -5,6 +5,7 @@ import type { ResourceFamily } from '../../../systems/world/worldCell'
 import { oreFamilies, ORE_ROWS, rarityTiers } from '../../ores'
 import { oreMixOf } from '../../planet-mix'
 import { planetRosterOf } from './planetRoster'
+import { rareClusterKindsOf } from './rosterClusterKinds'
 import { liveRosterIndicesOf } from './rosterFold'
 
 // Systems' family-first rule on ticket 446 (6226198316), with the Vertical Scaler's bounds
@@ -140,9 +141,18 @@ function liveSlotIdsOf(params: PlanetParams, cell: PaintedCell): string[] {
   return liveRosterIndicesOf(params, cell.band, content).map((index) => roster[index].slotId)
 }
 
-/** Every kind the planet's painted cells can draw, the slotless signature apart. */
+/**
+ * Every kind the planet's painted cells can draw, the slotless signature apart, and every rare kind
+ * it holds a guaranteed cluster of (ticket 737): since the deep rows (ticket 738) an act whose
+ * family ladder paints a rare family only on band 2's rare tier shows that kind by its guarantee.
+ */
 function drawnSlotIdsOf(params: PlanetParams): Set<string> {
-  return new Set(kindedCellsOf(params).flatMap((cell) => liveSlotIdsOf(params, cell)))
+  const roster = planetRosterOf(params)
+  const guaranteed = rareClusterKindsOf(params).map((kind) => roster[kind.kindSlot - 1].slotId)
+  return new Set([
+    ...kindedCellsOf(params).flatMap((cell) => liveSlotIdsOf(params, cell)),
+    ...guaranteed,
+  ])
 }
 
 /** The cells the guard finds short on a roster without Option B's appended rows. */
@@ -252,6 +262,8 @@ describe('roster guard (Systems, ticket 446)', () => {
 
   it('never lets a kind sit on a family the planet does not paint', () => {
     const painted = new Set(['metal', 'crystal'])
-    expect(ORE_ROWS.kinds.slotsBySet.legacy.filter((slot) => !painted.has(slot.family))).toEqual([])
+    expect(ORE_ROWS.kinds.slotsByTable.legacy.filter((slot) => !painted.has(slot.family))).toEqual(
+      [],
+    )
   })
 })

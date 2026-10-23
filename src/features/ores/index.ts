@@ -36,6 +36,8 @@ export {
 } from './systems/planetHazards'
 export { leadOfCell, leadOfPatch, ORE_LEAD_HOOK_ID, oreLeadHook } from './systems/leadRoll'
 export type { RarityRowSet, RarityRows, RarityTier } from './systems/rarityRows'
+export type { KindTable } from './systems/rarityRowSets'
+export { KIND_TABLES, kindTableOf } from './systems/rarityRowSets'
 export {
   isTierLiveIn,
   mixedRowsFromPlanet,

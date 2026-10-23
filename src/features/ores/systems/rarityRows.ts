@@ -10,7 +10,9 @@
  *   signature included. The `mixed` weights are solved against it (`raritySolve.ts`).
  * - `weightsBpByBand`: basis points of a band's ore cells per non-common tier. `legacy` is today's
  *   `leadWeightsBpByBand` verbatim (P1, P2 and every planet a save holds without `oreRulesVersion`);
- *   `mixed` is Systems' solved table for new planets from P3. The common share is derived.
+ *   `mixed` is Systems' solved table for new planets from P3. `deep` is the mixed table with rare,
+ *   epic and mythic moved to band 3 on (ticket 738, `rarityRowSets.ts`): it never draws them above
+ *   band 3. The common share is derived.
  * - `tripClampShareBp` and `tripClampTierIds`: epic and mythic finds pay in full only while their
  *   value in the trip stays within 15% of a full hold of the band's ore (`rarityTripClamp.ts`).
  *
@@ -19,8 +21,9 @@
  */
 import { fromCanonical, isMoneyText, type Money } from '../../../systems/money'
 import { BAND_COUNT } from '../../../systems/world/planetGeometry'
+import { DEEP_RARE_FIRST_BAND, RARE_CLUSTER_FIRST_LEAD } from '../../../systems/world/planetTable'
 
-export type RarityRowSet = 'legacy' | 'mixed'
+export type RarityRowSet = 'legacy' | 'mixed' | 'deep'
 
 export interface RarityTier {
   id: string
@@ -48,7 +51,7 @@ export interface RarityRows {
   tripClampTierIds: readonly string[]
 }
 
-export const RARITY_ROW_SETS: readonly RarityRowSet[] = ['legacy', 'mixed']
+export const RARITY_ROW_SETS: readonly RarityRowSet[] = ['legacy', 'mixed', 'deep']
 
 const BASIS_POINTS = 10000
 const PPM = 1000000
@@ -137,6 +140,9 @@ function weightSetProblems(sets: unknown, set: RarityRowSet, tiers: readonly Raw
     ...overfullBandProblems(set, known),
     ...rated.flatMap((tier, at) => earlyWeightProblems(set, tier, known[at])),
     ...(set === 'legacy' ? rated.flatMap((tier, at) => lateTierProblems(tier, known[at])) : []),
+    ...(set === 'deep'
+      ? rated.flatMap((tier, at) => shallowRareProblems(tier, at + 1, known[at]))
+      : []),
   ]
 }
 
@@ -155,6 +161,18 @@ function earlyWeightProblems(set: RarityRowSet, tier: Raw, row: readonly number[
 function lateTierProblems(tier: Raw, row: readonly number[]): string[] {
   const isLate = (tier.firstPlanet as number) > 1 && row.some((weight) => weight > 0)
   return isLate ? [`the legacy ${String(tier.id)} weight must be 0: the tier starts later`] : []
+}
+
+/**
+ * The deep rows draw rare, epic and mythic only from band 3, `d >= 0.35` (ticket 738); a tier's
+ * offset is its place in the list.
+ */
+function shallowRareProblems(tier: Raw, tierOffset: number, row: readonly number[]): string[] {
+  if (tierOffset < RARE_CLUSTER_FIRST_LEAD) return []
+  const isShallow = row.some((weight, at) => weight > 0 && at + 1 < DEEP_RARE_FIRST_BAND)
+  return isShallow
+    ? [`the deep ${String(tier.id)} weight is drawn above band ${DEEP_RARE_FIRST_BAND}`]
+    : []
 }
 
 function clampProblems(raw: Raw, tiers: readonly Raw[]): string[] {

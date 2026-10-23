@@ -4,10 +4,10 @@
  * index plus one (`kindSlotOfCell`), and a species is found from the slot's descriptor, never from
  * the stored number, so adding rows never renumbers a cell.
  *
- * A planet draws the kinds of the rarity row set it draws its rarity from (`legacy` on P1 and P2,
- * `mixed` from P3; Systems' table order, not seed dependent). Only a planet entered under ore rules
- * 2 or later has a roster: a planet a save holds without them, or under rules 1, keeps the cells it
- * was generated with (HS condition c). The mixed table joined under ore rules 4 (#453), so a P3+
+ * A planet draws the kinds of the table its rarity row set names (`legacy` on P1 and P2, `mixed`
+ * from P3 under the mixed and the deep rows alike, ticket 738; Systems' table order, not seed
+ * dependent). Only a planet entered under ore rules 2 or later has a roster: a planet a save holds
+ * without them, or under rules 1, keeps the cells it was generated with (HS condition c). The mixed table joined under ore rules 4 (#453), so a P3+
  * planet a save holds under rules 2 or 3 keeps its kindless cells, and it holds only on a planet
  * with a species pool: its slots fix a family the acts from P8 no longer paint (Systems on #453),
  * so P8+ draws no kind until its own rows land. Look only: horizontal, no price, gate or income
@@ -21,6 +21,7 @@
  * holds under older rules keep the 12.
  */
 import {
+  kindTableOf,
   ORE_ROWS,
   poolOfPlanetUnder,
   rarityRowSetOfPlanet,
@@ -79,6 +80,6 @@ function rosterOfPool(
 }
 
 function hasRosterOfSet(params: PlanetParams, set: RarityRowSet): boolean {
-  const rules = set === 'mixed' ? MIXED_ROSTER_ORE_RULES : ROSTER_ORE_RULES
+  const rules = kindTableOf(set) === 'mixed' ? MIXED_ROSTER_ORE_RULES : ROSTER_ORE_RULES
   return (params.oreRulesVersion ?? 0) >= rules && poolOfPlanet(params) !== null
 }

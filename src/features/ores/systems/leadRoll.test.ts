@@ -5,6 +5,7 @@ import { subSeedForHook } from '../../../systems/registries/hookSeed'
 import { generateChunkCells } from '../../../systems/world/generateChunk'
 import type { OrePatch } from '../../../systems/world/orePatches'
 import {
+  DEEP_RARE_WINDOW_ORE_RULES,
   ORE_RULES_VERSION,
   planetParamsFor,
   type PlanetParams,
@@ -160,10 +161,19 @@ describe('ore rarity lead on the rarity rows (ticket 445)', () => {
     shares.forEach((share, lead) => expect(Math.abs(share - weights[lead])).toBeLessThan(20))
   })
 
-  it('rolls the mixed rows only on a planet entered under the ore rules from P3', () => {
-    expect(rarityRowSetOfPlanet(planetParamsFor(PACING_SEED, 3, ORE_RULES_VERSION))).toBe('mixed')
+  it('rolls the mixed rows on a planet entered from P3 under ore rules 10, the deep rows from 11', () => {
+    const before = DEEP_RARE_WINDOW_ORE_RULES - 1
+    expect(rarityRowSetOfPlanet(planetParamsFor(PACING_SEED, 3, before))).toBe('mixed')
+    expect(rarityRowSetOfPlanet(planetParamsFor(PACING_SEED, 3, ORE_RULES_VERSION))).toBe('deep')
     expect(rarityRowSetOfPlanet(planetParamsFor(PACING_SEED, 3))).toBe('legacy')
     expect(rarityRowSetOfPlanet(planetParamsFor(PACING_SEED, 2, ORE_RULES_VERSION))).toBe('legacy')
+  })
+
+  it('rolls no rare, epic or mythic in bands 1 and 2 on the deep rows (ticket 738)', () => {
+    const rolls = Array.from({ length: 10000 }, (_, roll) => roll)
+    for (const band of [1, 2])
+      expect(Math.max(...rolls.map((roll) => leadOfRoll('deep', band, roll)))).toBe(1)
+    expect(leadOfRoll('deep', 3, 0)).toBe(3)
   })
 
   it('never lifts ore past +2 on a legacy planet, nor past +4 on a stamped one', () => {
@@ -173,8 +183,9 @@ describe('ore rarity lead on the rarity rows (ticket 445)', () => {
     ).toBeLessThanOrEqual(4)
   })
 
-  it('draws +2 at most on the legacy rows and +4 on the mixed rows', () => {
+  it('draws +2 at most on the legacy rows and +4 on the mixed and deep rows', () => {
     expect(topLeadOf('legacy')).toBe(2)
     expect(topLeadOf('mixed')).toBe(4)
+    expect(topLeadOf('deep')).toBe(4)
   })
 })

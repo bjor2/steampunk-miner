@@ -3,7 +3,9 @@
  * 6203159815 as amended by 6203640346, the trip asserts of 6202970624 section 7.5 and the
  * family-first guard of 6226198316), each a named violation with what it read and its limit, so a
  * spec and the status table say the same thing. The kind bounds, the guard and the live commons
- * apply only where the planet has a roster; a planet without one has no kind to bound.
+ * apply only where the planet has a roster; a planet without one has no kind to bound. A planet on
+ * the deep rows (ticket 738) is held to its whole-planet mean, each band's being the named #644
+ * re-baseline "deep rares" (Systems' guard on #738).
  */
 import { kindBoundBpOf } from './bandShares'
 import type { BandReading, PlanetReading } from './planetShares'
@@ -19,6 +21,7 @@ export type ShareBoundId =
   | 'liveCommonsPerBandMin'
   | 'kindGuard'
   | 'meanShiftMaxBp'
+  | 'planetMeanShiftMaxBp'
   | 'cvMaxBp'
   | 'p999MaxOfNominalBp'
   | 'clampLossMaxBp'
@@ -40,23 +43,45 @@ type BandCheck = (
   rows: ShareRows,
 ) => Omit<ShareViolation, 'planetIndex' | 'worldSeed'>[]
 
+type PlanetCheck = (
+  reading: PlanetReading,
+  rows: ShareRows,
+) => Omit<ShareViolation, 'planetIndex' | 'worldSeed'>[]
+
 const ROSTER_BAND_CHECKS: readonly BandCheck[] = [
   kindViolationsOf,
   guardViolationsOf,
   liveCommonViolationsOf,
 ]
-const BAND_CHECKS: readonly BandCheck[] = [tierViolationsOf, meanViolationsOf, tripViolationsOf]
+const BAND_CHECKS: readonly BandCheck[] = [tierViolationsOf, tripViolationsOf]
 
 /** Every bound the reading misses; empty when it holds them all. */
 export function shareViolationsOf(
   reading: PlanetReading,
   rows: ShareRows = SHARE_ROWS,
 ): ShareViolation[] {
-  const checks = reading.hasRoster ? [...BAND_CHECKS, ...ROSTER_BAND_CHECKS] : BAND_CHECKS
+  const checks = bandChecksOf(reading)
   const inBands = reading.bands.flatMap((band) => checks.flatMap((check) => check(band, rows)))
-  const onPlanet = reading.hasRoster ? planetKindViolationsOf(reading, rows) : []
+  const onPlanet = planetChecksOf(reading).flatMap((check) => check(reading, rows))
   const { planetIndex, worldSeed } = reading
   return [...inBands, ...onPlanet].map((violation) => ({ planetIndex, worldSeed, ...violation }))
+}
+
+/** Each band's mean, but on the deep rows; the kinds where the planet has a roster. */
+function bandChecksOf(reading: PlanetReading): BandCheck[] {
+  return [
+    ...BAND_CHECKS,
+    ...(reading.isDeepRares ? [] : [meanViolationsOf]),
+    ...(reading.hasRoster ? ROSTER_BAND_CHECKS : []),
+  ]
+}
+
+/** The kinds' planet shares where it has a roster; the whole-planet mean on the deep rows. */
+function planetChecksOf(reading: PlanetReading): PlanetCheck[] {
+  return [
+    ...(reading.hasRoster ? [planetKindViolationsOf] : []),
+    ...(reading.isDeepRares ? [planetMeanViolationsOf] : []),
+  ]
 }
 
 /** A violation in one line: what the spec prints when a bound fails. */
@@ -143,6 +168,21 @@ function meanViolationsOf(band: BandReading, rows: ShareRows) {
       band: band.band,
       subject: 'mean',
       value: band.meanShiftBp,
+      limit,
+    },
+  ]
+}
+
+/** The deep rows' mean over the whole planet against today's (ticket 738, VS 5% of main). */
+function planetMeanViolationsOf(reading: PlanetReading, rows: ShareRows) {
+  const limit = rows.deepRares.planetMeanShiftMaxBp
+  if (Math.abs(reading.planetMeanShiftBp) <= limit) return []
+  return [
+    {
+      bound: 'planetMeanShiftMaxBp' as const,
+      band: null,
+      subject: 'mean',
+      value: reading.planetMeanShiftBp,
       limit,
     },
   ]

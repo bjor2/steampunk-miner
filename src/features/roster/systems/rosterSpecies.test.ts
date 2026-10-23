@@ -19,7 +19,7 @@ import { planetRosterOf, poolOfPlanet } from './planetRoster'
 // slots swap species (ticket 736), so "exactly one" is counted under the planet's ore rules.
 
 const SEED = 83921
-const ALL_SLOTS: readonly KindSlot[] = Object.values(ORE_ROWS.kinds.slotsBySet).flat()
+const ALL_SLOTS: readonly KindSlot[] = Object.values(ORE_ROWS.kinds.slotsByTable).flat()
 const POOL_BY_PLANET = ORE_ROWS.kinds.poolByPlanet
 const MAPPED_POOLS = [...new Set(POOL_BY_PLANET.values())]
 
@@ -71,7 +71,7 @@ describe('roster species', () => {
   })
 
   it('holds exactly one legacy species in every shared slot of the legacy table', () => {
-    const shared = ORE_ROWS.kinds.slotsBySet.legacy.filter((slot) => slot.owner === undefined)
+    const shared = ORE_ROWS.kinds.slotsByTable.legacy.filter((slot) => slot.owner === undefined)
     const counts = shared.map((slot) => speciesOfSlot('legacy', slot.slotId).length)
     expect(counts).toEqual(shared.map(() => 1))
   })

@@ -9,7 +9,7 @@
  *   weight the slice ran under 100 minutes on the seed median (#146 re-baseline).
  * - `ores.economy.json` `rarity`: the five rarity tiers, their weights and the trip clamp
  *   (`rarityRows.ts`, ticket 445). The lead rows above stay byte-identical beside it.
- * - `ores.economy.json` `kinds`: the material kind slots per rarity row set and the roster cap
+ * - `ores.economy.json` `kinds`: the material kind slots per kind table and the roster cap
  *   (`kindRows.ts`, ticket 446), checked against the families and the rarity weights.
  * - `ores.economy.json` `planets`: the planet registry, one row per planet with its species pool
  *   and its frozen radius (`planetRows.ts`, ticket 642), checked against the solar systems.
@@ -122,6 +122,7 @@ function kindRowContextOf(ore: Raw, families: unknown): KindRowContext {
     familyIds: rows.map((family) => String(family.id)),
     pooledPlanets: pooledPlanetKeysOf(ore.planets),
     poolIds: poolIdsOf(ore.planets),
+    tierIds: tiersOf(ore.rarity as Raw | undefined).map((tier) => String(tier.id)),
     weightBpOf: (set, rarity, band) =>
       tierWeightBpOf(ore.rarity as Raw | undefined, set, rarity, band),
   }
@@ -129,11 +130,15 @@ function kindRowContextOf(ore: Raw, families: unknown): KindRowContext {
 
 /** A rated tier's weight as stored; common's is what the rated tiers leave of the band. */
 function tierWeightBpOf(rarity: Raw | undefined, set: RarityRowSet, id: string, band: number) {
-  const tiers = Array.isArray(rarity?.tiers) ? (rarity.tiers as Raw[]) : []
+  const tiers = tiersOf(rarity)
   const weights = ((rarity?.weightsBpByBand ?? {}) as Raw)[set] as Raw | undefined
   if (tiers[0]?.id === id) return BASIS_POINTS - ratedWeightBpOf(weights, band)
   if (!tiers.some((tier) => tier.id === id)) return undefined
   return (weights?.[id] as number[] | undefined)?.[band - 1]
+}
+
+function tiersOf(rarity: Raw | undefined): Raw[] {
+  return Array.isArray(rarity?.tiers) ? (rarity.tiers as Raw[]) : []
 }
 
 function ratedWeightBpOf(weights: Raw | undefined, band: number): number {

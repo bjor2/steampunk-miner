@@ -30,5 +30,8 @@
  * Version 15 grows the rare, epic and mythic ore of every planet entered under ore rules 10 as
  * seeded clusters of 1 to 3 cells, with one guaranteed cluster of each rare kind at `d >= 0.35`
  * (ticket 737, Bjor's deep-rares rule), while every planet a save holds keeps the cells of 14.
+ * Version 16 draws the rare, epic and mythic ore of a planet from P3 entered under ore rules 11 only
+ * from band 3 (`d >= 0.35`), weighted 0.25, 0.5 and 1 toward the core (ticket 738, the same rule),
+ * while planets 1 and 2 and every planet a save holds keep the cells of 15.
  */
-export const GENERATOR_VERSION = 15
+export const GENERATOR_VERSION = 16

@@ -21,7 +21,7 @@ const LADDER_ORE_RULES = 6
 const FAR_PLANETS = [1, 40, 41, 1000, 1_000_000]
 
 const GOLDEN = {
-  currentRows: '6741ad4703724077',
+  currentRows: '778b863a379eedc2',
   ladderRows: '64311e1adaba9536',
 }
 

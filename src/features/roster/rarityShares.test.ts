@@ -106,21 +106,35 @@ describe('rarity share bounds (ticket 449)', () => {
     expect(uncommon?.bandTripBp).toBe(649)
   })
 
-  it('reads every band mean within half a basis point of today, 1.0000 to four decimals', () => {
-    for (const reading of READINGS) {
+  it('reads every band mean off the deep rows within half a basis point of today, 1.0000 to four decimals', () => {
+    for (const reading of READINGS.filter((each) => !each.isDeepRares)) {
       for (const band of reading.bands) expect(Math.abs(band.meanShiftBp)).toBeLessThan(0.5)
     }
   })
 
-  it('costs P3 band 5 about 0.38 bp of mean income to the clamp, exactly, and P10 band 5 next to none', () => {
+  it('reads the deep rows from P3 moving band 2 value deeper, and the whole planet within 3 bp of today (ticket 738)', () => {
+    const deep = READINGS.filter((reading) => reading.isDeepRares)
+    expect(deep.map((reading) => reading.planetIndex)).toEqual(
+      READINGS.filter((reading) => reading.planetIndex >= 3).map((reading) => reading.planetIndex),
+    )
+    for (const reading of deep) {
+      expect(reading.bands[1].meanShiftBp).toBeLessThan(-0.5)
+      expect(reading.bands[4].meanShiftBp).toBeGreaterThan(0.5)
+      expect(Math.abs(reading.planetMeanShiftBp)).toBeLessThan(3)
+    }
+  })
+
+  it('costs P3 band 5 about 0.89 bp of mean income to the clamp, exactly, and P10 band 5 next to none', () => {
     // Systems measured 0.87 bp, the TD 0.98 bp, both by sample (6202970624 section 4; #445), on
     // the old on-curve hold of 90 units. Ticket 553's hold row puts the on-curve P3 hold at 119
-    // units, and a bigger trip spreads the clamp thinner: 0.378 bp, read exactly.
+    // units, and a bigger trip spreads the clamp thinner: 0.378 bp on the mixed rows. The deep
+    // rows (ticket 738) weigh band 5's epic and mythic at 70 and 17 bp, up from 43 and 19, so the
+    // clamp binds more often: 0.886 bp, read exactly, inside the 1 bp bound.
     const clampLossOf = (planet: number) =>
       (READINGS.find((reading) => reading.planetIndex === planet) as PlanetReading).bands[4].trip
         .clampLossBp
-    expect(clampLossOf(3)).toBeGreaterThan(0.37)
-    expect(clampLossOf(3)).toBeLessThan(0.39)
+    expect(clampLossOf(3)).toBeGreaterThan(0.88)
+    expect(clampLossOf(3)).toBeLessThan(0.89)
     expect(clampLossOf(10)).toBeLessThan(0.01)
   })
 
@@ -130,8 +144,9 @@ describe('rarity share bounds (ticket 449)', () => {
     expect(p40.isSignatureBoosted).toBe(true)
     const signatureOf = (tiers: PlanetReading['bands'][number]['realTiers']) =>
       tiers.find((tier) => tier.tierId === 'signature')?.bandTripBp
-    expect(signatureOf(p40.bands[3].shares.tiers)).toBe(640)
-    expect(signatureOf(p40.bands[3].realTiers)).toBeGreaterThan(640)
+    // 633 since the deep rows (ticket 738) lift band 4's mean: 640 on the mixed rows.
+    expect(signatureOf(p40.bands[3].shares.tiers)).toBe(633)
+    expect(signatureOf(p40.bands[3].realTiers)).toBeGreaterThan(633)
     const p10 = READINGS.find((reading) => reading.planetIndex === 10) as PlanetReading
     expect(p10.isSignatureBoosted).toBe(false)
   })
@@ -177,6 +192,15 @@ describe('rarity share bounds can fail', () => {
     const missed = boundsMissedBy(readingOf(withUncommonRaisedBy(P1, 5, 20), 42))
     expect(missed).toEqual(expect.arrayContaining(['perNonCommonTierMax', 'meanShiftMaxBp']))
     expect(missed).not.toContain('perNonCommonKindMax')
+  })
+
+  it("fails a deep-rows planet whose whole mean moves past 5% of today's, and never on one band's", () => {
+    const reading = readingOf(P3, 90)
+    expect(reading.isDeepRares).toBe(true)
+    expect(boundsMissedBy(reading)).not.toContain('meanShiftMaxBp')
+    const moved = { ...reading, planetMeanShiftBp: 501 }
+    expect(boundsMissedBy(moved)).toContain('planetMeanShiftMaxBp')
+    expect(boundsMissedBy({ ...moved, isDeepRares: false })).not.toContain('planetMeanShiftMaxBp')
   })
 
   it('fails trips that spread past 3% and a 99.9th percentile past 1.12 of the expected trip', () => {

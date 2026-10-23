@@ -23,16 +23,22 @@ import {
   solvedRarityWeightsBp,
   type RarityRowSet,
 } from '../../ores'
+import { DEEP_RARE_WINDOW_ORE_RULES } from '../../../systems/world/planetParams'
 import { isMixedPlanet, signatureLeadOf } from './oreMix'
 import { THEME_ROWS } from './themeRows'
 
 // Ticket 445 acceptance, Systems on #139 (comment 6202970624 sections 2 and 7.1): rarity is
 // mean-neutral. The mean value of one ore unit of every band is today's on every planet, within
 // `meanToleranceBp`, with the planet's base signature share (story and lava boosts were not
-// mean-preserved before either, and Systems left them alone).
+// mean-preserved before either, and Systems left them alone). That holds on the mixed rows, which a
+// planet from P3 draws under ore rules up to 10; the deep rows of ore rules 11 move rare value from
+// band 2 into bands 3 to 5 by design (ticket 738, the named #644 re-baseline "deep rares"), and are
+// held to the planet's value instead (`ores` `deepRareRows.test.ts`). The share bounds hold on both.
 
 const BANDS = [1, 2, 3, 4, 5]
 const PLANETS = Array.from({ length: 200 }, (_, at) => at + 1)
+/** The newest ore rules a planet from P3 drew the mean-neutral mixed rows under (ticket 738). */
+const MIXED_ORE_RULES = DEEP_RARE_WINDOW_ORE_RULES - 1
 const RATED_OFFSETS = [1, 2, 3, 4]
 
 function signatureBpOf(planetIndex: number, band: number): number {
@@ -58,10 +64,10 @@ function todayMeanBpOf(planetIndex: number, band: number): Money {
   return bandMeanValueBpOf(weights, signatureBp, signatureOffsetOf(band))
 }
 
-/** The new rows: the planet's set, the signature carved from common. */
+/** The new rows: the planet's set under ore rules 10, the signature carved from common. */
 function newMeanBpOf(planetIndex: number, band: number): Money {
   const signatureBp = signatureBpOf(planetIndex, band)
-  const set = rarityRowSetOf(planetIndex, ORE_RULES_VERSION)
+  const set = rarityRowSetOf(planetIndex, MIXED_ORE_RULES)
   const weights = weightsBpOf(set, band, signatureBp)
   return bandMeanValueBpOf(weights, signatureBp, signatureOffsetOf(band))
 }
@@ -109,29 +115,32 @@ describe('rarity mean value', () => {
     }
   })
 
-  it('keeps every non-common tier within 650 bp of a band trip, and epic with mythic within 1500', () => {
-    // Vertical Scaler's share bounds (TD ruling on #445, section 6): nominal, a hold filled in one band.
-    for (const planetIndex of PLANETS) {
-      for (const band of BANDS) {
-        const signatureBp = signatureBpOf(planetIndex, band)
-        const set = rarityRowSetOf(planetIndex, ORE_RULES_VERSION)
-        const weights = weightsBpOf(set, band, signatureBp)
-        const total = bandMeanValueBpOf(weights, signatureBp, signatureOffsetOf(band))
-        const shareBpOf = (valueBp: Money) => div(mul(valueBp, fromSafeInteger(10000)), total)
-        const tierValues = RATED_OFFSETS.map((offset) =>
-          mul(fromSafeInteger(weights[offset]), rarityMultiplierOf(offset)),
-        )
-        const signature = mul(
-          fromSafeInteger(signatureBp),
-          rarityMultiplierOf(signatureOffsetOf(band)),
-        )
-        for (const value of [...tierValues, signature])
-          expect(cmp(shareBpOf(value), fromSafeInteger(650))).toBeLessThanOrEqual(0)
-        const epicAndMythic = add(tierValues[2], tierValues[3])
-        expect(cmp(shareBpOf(epicAndMythic), fromSafeInteger(1500))).toBeLessThanOrEqual(0)
+  it.each([MIXED_ORE_RULES, ORE_RULES_VERSION])(
+    'keeps every non-common tier within 650 bp of a band trip, and epic with mythic within 1500, under ore rules %i',
+    (rules) => {
+      // Vertical Scaler's share bounds (TD ruling on #445, section 6): nominal, a hold filled in one band.
+      for (const planetIndex of PLANETS) {
+        for (const band of BANDS) {
+          const signatureBp = signatureBpOf(planetIndex, band)
+          const set = rarityRowSetOf(planetIndex, rules)
+          const weights = weightsBpOf(set, band, signatureBp)
+          const total = bandMeanValueBpOf(weights, signatureBp, signatureOffsetOf(band))
+          const shareBpOf = (valueBp: Money) => div(mul(valueBp, fromSafeInteger(10000)), total)
+          const tierValues = RATED_OFFSETS.map((offset) =>
+            mul(fromSafeInteger(weights[offset]), rarityMultiplierOf(offset)),
+          )
+          const signature = mul(
+            fromSafeInteger(signatureBp),
+            rarityMultiplierOf(signatureOffsetOf(band)),
+          )
+          for (const value of [...tierValues, signature])
+            expect(cmp(shareBpOf(value), fromSafeInteger(650))).toBeLessThanOrEqual(0)
+          const epicAndMythic = add(tierValues[2], tierValues[3])
+          expect(cmp(shareBpOf(epicAndMythic), fromSafeInteger(1500))).toBeLessThanOrEqual(0)
+        }
       }
-    }
-  })
+    },
+  )
 
   it('keeps P1 and P2 on the lead rows exactly', () => {
     for (const planetIndex of [1, 2]) {
