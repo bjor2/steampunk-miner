@@ -898,6 +898,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/authority/speedScaling.test.ts` | 28 | 12 |
 | `src/systems/authority/starMap/fuelShopRules.test.ts` | 6 | 6 |
 | `src/systems/authority/starMap/jumpRules.test.ts` | 12 | 12 |
+| `src/systems/authority/starMap/jumpTwoClients.test.ts` | 4 | 3 |
 | `src/systems/authority/starMap/starMapSnapshot.test.ts` | 6 | 6 |
 | `src/systems/authority/startingRigCutSpeed.test.ts` | 4 | 4 |
 | `src/systems/authority/stateDigest.test.ts` | 17 | 12 |
@@ -1494,6 +1495,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/store/slowDeviceChip.test.ts` | 2 | 2 |
 | `src/store/soundUnlockSlice.test.ts` | 4 | 4 |
 | `src/store/speciesRevealBroadcast.test.ts` | 2 | 2 |
+| `src/store/starMapActions.test.ts` | 3 | 3 |
 | `src/store/tapSheetSlice.test.ts` | 6 | 6 |
 | `src/store/titleMenu.test.ts` | 9 | 9 |
 | `src/store/touchReplay.test.ts` | 2 | 2 |
@@ -1515,7 +1517,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/moneyAsDoubleLint.test.ts` | 6 | 3 |
 | `src/systems/scenario.test.ts` | 19 | 19 |
 | `src/systems/seededRandom.test.ts` | 6 | 6 |
-| `src/systems/sliceProgress.test.ts` | 3 | 3 |
+| `src/systems/sliceProgress.test.ts` | 4 | 4 |
 | `src/systems/startScenario.test.ts` | 7 | 7 |
 | `src/systems/startScenarioCommands.test.ts` | 6 | 6 |
 | `src/systems/tickDilation.test.ts` | 7 | 7 |

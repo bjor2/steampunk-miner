@@ -1,10 +1,9 @@
 /**
- * The travel transition (#8, #10): at most 10 s, skippable. The authority moved the session to
- * the next planet before this shows, so skipping only ends the picture early. It names the new
- * planet's gravity, its trait (#724).
+ * The travel transition (#8, #10): at most 10 s, a star-map jump's at most 2 s (ticket 755),
+ * skippable. The authority moved the session to the new planet before this shows, so skipping
+ * only ends the picture early. It names the new planet's gravity, its trait (#724).
  */
 import { useEffect } from 'react'
-import { TRAVEL_TRANSITION_SECONDS } from '../constants/scene'
 import { useGameStore } from '../store/gameStore'
 import type { TravelTransition } from '../systems/sliceProgress'
 import { planetGravityTraitOf } from '../systems/views/localGravityReading'
@@ -44,6 +43,6 @@ function endTransitionAfterItsTime(
   finish: () => void,
 ): () => void {
   if (transition === null) return () => {}
-  const timer = setTimeout(finish, TRAVEL_TRANSITION_SECONDS * MS_PER_SECOND)
+  const timer = setTimeout(finish, transition.seconds * MS_PER_SECOND)
   return () => clearTimeout(timer)
 }

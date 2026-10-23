@@ -417,6 +417,12 @@ export const SPARK_SEED = 0x5a7c
 export const TRAVEL_TRANSITION_SECONDS = 10
 
 /**
+ * A star-map jump takes at most 2 s from confirming to control (G&V in the GD lock on #650,
+ * ticket 755): its transition is this long, skippable, and presentation only like the travel's.
+ */
+export const JUMP_TRANSITION_SECONDS = 2
+
+/**
  * The planet card closes on its own this long after it shows (TD lock on #293 Q2: "dismissed by
  * undocking or a timeout"; the length is ticket 343's pick, two readings of the arrival line).
  */

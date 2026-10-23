@@ -79,6 +79,7 @@ import {
   type Checkpoint,
 } from './checkpoint'
 import { artefactActionsOf, type ArtefactActions } from './artefactActions'
+import { starMapActionsOf, type StarMapActions } from './starMapActions'
 import { combatDebugActionsOf, type CombatDebugActions } from './combatDebugActions'
 import { casingDebugActionsOf, type CasingDebugActions } from './casingDebugActions'
 import { gunDebugActionsOf, type GunDebugActions } from './gunDebugActions'
@@ -204,6 +205,7 @@ type DebugActions = CombatDebugActions &
 export interface GameState
   extends
     DebugActions,
+    StarMapActions,
     PresentationValues,
     PresentationActions,
     HintValues,
@@ -252,7 +254,10 @@ export interface GameState
   platform: PlatformReplica
   /** Copied from the authority: the bay has reached `coreNeeded` on this planet (#10). */
   isCoreCompleted: boolean
-  /** The travel transition on screen (#8: at most 10 s, skippable); the state already changed. */
+  /**
+   * The travel transition on screen (#8: at most 10 s, a star-map jump's 2 s, skippable); the state
+   * already changed.
+   */
   travelTransition: TravelTransition | null
 
   setPlanet(planetTier: number): void
@@ -390,6 +395,7 @@ export const useGameStore = create<GameState>()((set, get) => ({
   ...heatDebugActionsOf(() => get().playerId),
   ...collapseDebugActionsOf(() => get().playerId),
   ...artefactActionsOf(() => get().playerId),
+  ...starMapActionsOf(() => get().playerId),
   ...presentationActionsOf(set, get),
   ...hintActionsOf(set, get),
   ...planetCardActionsOf(set, get),

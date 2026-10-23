@@ -12,7 +12,8 @@ import {
   type VehicleMode,
   type VehicleState,
 } from '../systems/vehicle/vehicleState'
-import type { Money } from '../systems/money'
+import type { BigStat, Money } from '../systems/money'
+import { fuelOf } from '../systems/vehicle/vehicleFuel'
 
 export interface VehicleReplica {
   mode: VehicleMode
@@ -29,6 +30,8 @@ export interface VehicleReplica {
   gunLevel: number
   /** The rack slots charges fill, or null with no rack bolted on; the rack shows them (#109, #218). */
   rackCharges: number | null
+  /** Whole fuel units in the tank (ticket 755), 0 while empty: the star map reads its tank level. */
+  fuel: BigStat
 }
 
 let lastSource: VehicleState | null = null
@@ -49,6 +52,7 @@ export function vehicleReplicaOf(vehicle: VehicleState): VehicleReplica {
     visualTier: visualTier(vehicle.levels),
     gunLevel: vehicle.gun.level,
     rackCharges: vehicle.charges.isRackMounted ? rackSlotsUsedOf(vehicle.charges) : null,
+    fuel: fuelOf(vehicle),
   }
   return lastReplica
 }

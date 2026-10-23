@@ -17,7 +17,22 @@ describe('slice progress', () => {
       },
       { ...stamp, type: 'PlanetUnlocked', planetIndex: 2 },
     ]
-    expect(travelTransitionOf(events)).toEqual({ fromPlanet: 1, toPlanet: 2 })
+    expect(travelTransitionOf(events)).toEqual({ fromPlanet: 1, toPlanet: 2, seconds: 10 })
+  })
+
+  it('plays a star-map jump for 2 s, so control returns within 2 s of confirming (ticket 755)', () => {
+    const events: DomainEvent[] = [
+      {
+        ...stamp,
+        type: 'TravelStarted',
+        fromPlanet: 1,
+        toPlanet: 3,
+        cost: '0e+0',
+        coreSpent: 0,
+        fuelSpent: '2e+0',
+      },
+    ]
+    expect(travelTransitionOf(events)).toEqual({ fromPlanet: 1, toPlanet: 3, seconds: 2 })
   })
 
   it('plays no transition for events without a travel', () => {

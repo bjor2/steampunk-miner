@@ -31,7 +31,7 @@ describe('planet card', () => {
   it('opens on arrival at a magnetic planet with its tag and arrival line, behind the travel card', () => {
     travelFrom(24)
     expect(game().planetTier).toBe(25)
-    expect(game().travelTransition).toEqual({ fromPlanet: 24, toPlanet: 25 })
+    expect(game().travelTransition).toEqual({ fromPlanet: 24, toPlanet: 25, seconds: 10 })
     expect(game().planetCard?.lines).toMatchObject([
       { tag: 'Magnetic', arrivalLine: MAGNETIC_LINE },
     ])

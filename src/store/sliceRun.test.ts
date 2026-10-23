@@ -201,7 +201,7 @@ describe('slice run on both planets', () => {
     game().dock('sell')
     game().travel()
     expect(game().planetTier).toBe(2)
-    expect(game().travelTransition).toEqual({ fromPlanet: 1, toPlanet: 2 })
+    expect(game().travelTransition).toEqual({ fromPlanet: 1, toPlanet: 2, seconds: 10 })
     game().finishTravelTransition()
     expect(game().travelTransition).toBeNull()
     expect(game().planetTier).toBe(2)
