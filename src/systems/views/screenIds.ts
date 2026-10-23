@@ -52,6 +52,8 @@ export const UI_IDS = {
   hudDials: 'hud-dials',
   hudDialOverflow: 'hud-dial-overflow',
   hudDialPage: 'hud-dial-page',
+  hudFuelTankWell: 'hud-fuel-tank-well',
+  hudFuelCostWell: 'hud-fuel-cost-well',
   hudEdgeGauge: 'hud-edge-gauge',
   hudEdgeGlow: 'hud-edge-glow',
   hudGear: 'hud-gear',

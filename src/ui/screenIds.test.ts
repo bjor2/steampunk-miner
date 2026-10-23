@@ -568,6 +568,10 @@ function renderFullHoldHud(): string[] {
       [UI_IDS.hudDialOverflow]: '+1',
     }),
     ...checkScreen(pagedDialCluster(model), { [UI_IDS.hudDialPage]: null }),
+    ...checkScreen(createElement(HudView, { model, isFlashing: false }), {
+      [UI_IDS.hudFuelTankWell]: '',
+      [UI_IDS.hudFuelCostWell]: '',
+    }),
   ]
 }
 

@@ -13,6 +13,7 @@
  * The page the gauge cluster shows is UI state here (ticket 767), as the tool tray's page is.
  */
 import { useState } from 'react'
+import { desktopStripSlotsOf } from '../../systems/views/desktopStripSlots'
 import { gaugeClusterPageOf } from '../../systems/views/gaugeCluster'
 import { isUprightCompactHud, statusIconsMaxOf } from '../../systems/views/hudCompact'
 import type { HudModel } from '../../systems/views/hudModel'
@@ -75,6 +76,7 @@ export function HudView({
         isFlashing={isFlashing}
         statusIconsMax={statusIconsMaxOf(density)}
         onTurnDials={turnDialPage}
+        slots={desktopStripSlotsOf(model, layoutKindOf(density))}
       />
       <GaugePanels density={density} isOverCluster={isOverTouchSurface} />
       <SlicePanels slot="banner" />

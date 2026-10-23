@@ -94,6 +94,25 @@ describe('HUD strip view (ticket 684)', () => {
     expect(testIdIn(drawStrip(worstModel()), UI_IDS.hudDialOverflow)).toBe(false)
   })
 
+  it('keeps the fuel wells on the desktop strip and none on a phone (ticket 767)', () => {
+    const desktop = drawHud(worstModel())
+    expect(testIdIn(desktop, UI_IDS.hudFuelTankWell)).toBe(true)
+    expect(testIdIn(desktop, UI_IDS.hudFuelCostWell)).toBe(true)
+    const phone = renderToString(
+      createElement(HudView, { model: worstModel(), isFlashing: false, density: 'compact' }),
+    )
+    expect(testIdIn(phone, UI_IDS.hudFuelTankWell)).toBe(false)
+    expect(phone).not.toContain('data-gravity')
+  })
+
+  it('tints the desktop depth while gravity holds the descent (ticket 767)', () => {
+    const model = underground(worstModel(), 40)
+    const limited = { ...model, tileTime: { state: 'gravity', text: '0.16 s', ticks: 10 } as const }
+    expect(drawHud(limited)).toContain('data-gravity="true"')
+    const drilling = { ...model, tileTime: { state: 'time', text: '0.16 s', ticks: 10 } as const }
+    expect(drawHud(drilling)).not.toContain('data-gravity')
+  })
+
   it('names every dial and number for assistive tech, out of sight', () => {
     drawStrip(worstModel())
     const strip = hudTexts().filter((text) => text.id.startsWith('hud.strip.'))

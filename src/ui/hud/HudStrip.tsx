@@ -4,11 +4,13 @@
  * cargo chain, the heat above 60% and the depth and core), one number (the money on the brass
  * odometer on the surface with the next-upgrade chip beside it, the depth underground), the
  * money's float-up, and the status icons. Every exact value and word is in the detail behind the
- * gear button; on desktop a dial also shows its number on a hover or a tap. Drawn from
- * `hudStripOf` and `gaugeClusterOf`; markup only.
+ * gear button; on desktop a dial also shows its number on a hover or a tap. Desktop also keeps
+ * the star map's fuel wells beside the dials and tints the depth while gravity limits the descent
+ * (ticket 767). Drawn from `hudStripOf`, `gaugeClusterOf` and `desktopStripSlotsOf`; markup only.
  */
 import { hudLabelIconIdOf } from '../../systems/art/icons/iconSet'
 import { readoutTextOf } from '../../systems/views/hudCallouts'
+import type { DesktopStripSlots } from '../../systems/views/desktopStripSlots'
 import type { HudModel } from '../../systems/views/hudModel'
 import type { GaugeClusterView } from '../../systems/views/gaugeCluster'
 import type { HudStrip as Strip, StripNumber } from '../../systems/views/hudStrip'
@@ -18,6 +20,7 @@ import { UI_IDS } from '../ids'
 import { Odometer } from '../kit/Odometer'
 import { TitleOneLine } from '../kit/TitleOneLine'
 import { DialCluster } from './DialCluster'
+import { FuelWells } from './FuelWells'
 import { hudBoxOf } from './hudBoxes'
 import { MoneyFloatUp } from './MoneyFloatUp'
 import { StripStatuses } from './StripStatuses'
@@ -38,6 +41,7 @@ export function HudStrip({
   isFlashing,
   statusIconsMax,
   onTurnDials,
+  slots = null,
 }: {
   strip: Strip
   cluster: GaugeClusterView
@@ -47,6 +51,8 @@ export function HudStrip({
   statusIconsMax?: number
   /** Turns the gauge cluster's page on desktop (ticket 767). */
   onTurnDials?: (page: number) => void
+  /** Desktop's fuel wells and gravity tint (ticket 767); none on a phone. */
+  slots?: DesktopStripSlots | null
 }) {
   return (
     <div
@@ -56,7 +62,12 @@ export function HudStrip({
       {...hudBoxOf('strip')}
     >
       <DialCluster cluster={cluster} isFlashing={isFlashing} onTurnPage={onTurnDials} />
-      <StripNumberReadout number={strip.number} money={model.money} />
+      {slots !== null && <FuelWells fuelCostChars={slots.fuelCostChars} />}
+      <StripNumberReadout
+        number={strip.number}
+        money={model.money}
+        isGravityLimited={slots?.isDescentGravityLimited === true}
+      />
       {strip.nextUpgrade !== null && <UpgradeChip chip={strip.nextUpgrade} />}
       <StripStatuses model={model} isFlashing={isFlashing} chipsMax={statusIconsMax} />
     </div>
@@ -64,7 +75,15 @@ export function HudStrip({
 }
 
 /** The one number, and the money's float-up under it whichever number shows. */
-function StripNumberReadout({ number, money }: { number: StripNumber; money: AmountReading }) {
+function StripNumberReadout({
+  number,
+  money,
+  isGravityLimited,
+}: {
+  number: StripNumber
+  money: AmountReading
+  isGravityLimited: boolean
+}) {
   return (
     <div className={styles.number}>
       <TitleOneLine
@@ -78,7 +97,7 @@ function StripNumberReadout({ number, money }: { number: StripNumber; money: Amo
         {number.kind === 'money' ? (
           <Odometer text={number.text} exact={number.exact} testId={UI_IDS.hudStripMoney} />
         ) : (
-          <DepthText number={number} />
+          <DepthText number={number} isGravityLimited={isGravityLimited} />
         )}
         <MoneyFloatUp exact={money.exact} />
       </TitleOneLine>
@@ -86,9 +105,20 @@ function StripNumberReadout({ number, money }: { number: StripNumber; money: Amo
   )
 }
 
-function DepthText({ number }: { number: StripNumber }) {
+function DepthText({
+  number,
+  isGravityLimited,
+}: {
+  number: StripNumber
+  isGravityLimited: boolean
+}) {
   return (
-    <span className={styles.depth} data-testid={UI_IDS.hudStripDepth} data-exact={number.exact}>
+    <span
+      className={styles.depth}
+      data-testid={UI_IDS.hudStripDepth}
+      data-exact={number.exact}
+      data-gravity={isGravityLimited || undefined}
+    >
       {number.text}
     </span>
   )

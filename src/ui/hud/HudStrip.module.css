@@ -53,6 +53,35 @@
   font-variant-numeric: tabular-nums;
 }
 
+/* #724 on desktop (ticket 767): gravity holds the descent; the tile readout's cool tint. */
+.depth[data-gravity] {
+  color: var(--color-steel);
+}
+
+/*
+ * Desktop's wells for the star map's fuel (ticket 767): the tank's dial and the fuel cost's figure,
+ * out of sight until the fuel state fills them, their width kept so filling them moves nothing.
+ */
+.fuelWells {
+  display: flex;
+  flex: none;
+  align-items: center;
+  gap: var(--space-1);
+  visibility: hidden;
+}
+
+.tankWell {
+  width: calc(var(--strip-height) - 8px);
+  height: calc(var(--strip-height) - 8px);
+}
+
+.costWell {
+  min-width: calc(var(--fuel-cost-chars) * 1ch);
+  font-family: var(--font-numerals);
+  font-size: var(--type-label);
+  font-variant-numeric: tabular-nums;
+}
+
 /*
  * The next-upgrade chip: a pill (`--radius-chip`) of its icon and price, no label. It takes no pointer on a phone, where the strip is in the top keep-out; on desktop a hover
  * or a tap reveals its hover line, as a dial reveals its number (ticket 719).
