@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-10-23T08:22:11+02:00",
+  "updated_at": "2026-10-23T08:28:08+02:00",
   "caps": {
     "grok": 12,
     "claude": 10,
@@ -116,7 +116,7 @@
       "size": 4,
       "used": 1,
       "free": 3,
-      "claims_last_hour": 5,
+      "claims_last_hour": 6,
       "name": "Claude Max 2"
     }
   ],
@@ -333,9 +333,9 @@
     }
   ],
   "last_refill": {
-    "at": "2026-10-23 08:22 CEST",
+    "at": "2026-10-23 08:28 CEST",
     "mode": "refill-dev",
-    "triggers": "#745",
+    "triggers": "claude-run:wave-plan",
     "started": "",
     "note": "no pickable build ticket"
   },
@@ -361,12 +361,26 @@
     "parallel": 1,
     "list": [
       {
-        "number": 748,
-        "key": "647-5A",
+        "number": 751,
+        "key": "647-4E",
         "map": 647,
         "lane": "remote",
         "mode": "solo",
-        "state": "blocked",
+        "state": "ready",
+        "tickets": [
+          749,
+          750
+        ],
+        "done": [],
+        "live": 0
+      },
+      {
+        "number": 748,
+        "key": "647-4D",
+        "map": 647,
+        "lane": "remote",
+        "mode": "solo",
+        "state": "ready",
         "tickets": [
           746
         ],
@@ -393,7 +407,7 @@
       },
       {
         "number": 715,
-        "key": "647-4D",
+        "key": "647-4F",
         "map": 647,
         "lane": "hitl",
         "mode": "bench",
