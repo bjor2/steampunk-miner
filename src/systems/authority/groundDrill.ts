@@ -559,16 +559,17 @@ export function collectOreUnit(state: AuthorityState, playerId: string, ore: Min
 
 function pickupFindOf(
   state: AuthorityState,
-  { band, resourceTier, saleTier }: MinedOre,
+  { band, resourceTier, saleTier, gem }: MinedOre,
 ): PickupFind {
   const planetIndex = state.planet.index
-  return { planetIndex, band, tierAboveBand: resourceTier - oreTier(planetIndex, band), saleTier }
+  const tierAboveBand = resourceTier - oreTier(planetIndex, band)
+  return { planetIndex, band, tierAboveBand, saleTier, ...(gem === true ? { gem } : {}) }
 }
 
-/** The unit into the hold at the picked tier; `band` and `saleTier` stay off `CargoAdded`. */
+/** The unit into the hold at the picked tier; `band`, `saleTier` and `gem` stay off `CargoAdded`. */
 function storeOreUnit(picked: PickedUp, playerId: string, ore: MinedOre): RuleEffect {
   const vehicle = vehicleOf(picked.state, playerId)
-  const { saleTier: _ownSaleTier, band: _band, ...named } = ore
+  const { saleTier: _ownSaleTier, band: _band, gem: _gem, ...named } = ore
   return {
     state: withVehicle(picked.state, playerId, {
       ...vehicle,

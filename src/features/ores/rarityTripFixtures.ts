@@ -70,7 +70,14 @@ export function wholePatchParamsOf(seed: number, planetIndex = RARITY_RUN_PLANET
 export function pickupFindAt(params: PlanetParams, tile: TilePoint): PickupFind {
   const ore = minedOreOf(params, tile, cellAt(EMPTY_WORLD, params, tile))
   const tierAboveBand = ore.resourceTier - oreTier(params.planetIndex, ore.band)
-  return { planetIndex: params.planetIndex, band: ore.band, tierAboveBand, saleTier: ore.saleTier }
+  const { planetIndex } = params
+  return {
+    planetIndex,
+    band: ore.band,
+    tierAboveBand,
+    saleTier: ore.saleTier,
+    ...(ore.gem === true ? { gem: ore.gem } : {}),
+  }
 }
 
 /** The first `count` ore cells in `bands`, from the north pole down, whose lead is epic or mythic. */

@@ -54,6 +54,23 @@ describe('rarity trip clamp', () => {
     }
   })
 
+  it("pays a mythic gem's unit at its gem tier past the cap and leaves the trip as it is (ticket 741)", () => {
+    // P3's Heart Diamond: a mythic cell of band 5 sold at t_top + 5 = 20, V(20) far over the cap.
+    const heartDiamond: RarityFind = { ...findOf(4), saleTier: 20, gem: true }
+    let trip = NEW_RARITY_TRIP
+    const saleTiers: number[] = []
+    for (let found = 0; found < 5; found++) {
+      const paid = paidRarityFind(trip, heartDiamond)
+      saleTiers.push(paid.saleTier)
+      trip = paid.trip
+    }
+    expect(saleTiers).toEqual([20, 20, 20, 20, 20])
+    expect(trip).toBe(NEW_RARITY_TRIP)
+    expect(paidRarityFind(NEW_RARITY_TRIP, { ...heartDiamond, gem: undefined }).saleTier).toBe(
+      oreTier(3, 5),
+    )
+  })
+
   it('pays epic finds in full while the trip stays within the cap, the last landing on it', () => {
     // Four epics at floorMilli(V(14)) = 1946.195 make exactly 7784.780.
     const { saleTiers, trip } = tripOf(EPIC, 4)

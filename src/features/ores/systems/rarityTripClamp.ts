@@ -12,7 +12,9 @@
  *
  * The running value sums across bands within a trip; each find is held to its own band's cap
  * (ticket 509). A tier the clamp does not hold keeps the sale tier it came with, so a signature
- * still sells one up (#232). A cell an ore mover carried out of its band reads its lead against the
+ * still sells one up (#232). A gem's unit is never clamped and never counts toward the trip (ticket
+ * 741): the gem tier is its own price tier, not the epic or mythic tier its cell wears, and its
+ * share of a planet's value is held by frequency alone (Systems' final spec on #741, done-when 1). A cell an ore mover carried out of its band reads its lead against the
  * band it was picked up in: below it, never clamped; past mythic, clamped as mythic.
  */
 import { oreSalePrice, oreTier, oreValue } from '../../../systems/economy/oreEconomy'
@@ -41,6 +43,8 @@ export interface RarityFind {
   tierAboveBand: number
   /** The tier the unit sells at in full. */
   saleTier: number
+  /** Set on a gem's unit (ticket 741): the gem tier is not a clamped tier. */
+  gem?: true
   cargoCapacity: number
 }
 
@@ -72,7 +76,9 @@ export function paidRarityFind(
   find: RarityFind,
   rows: OreRows = ORE_ROWS,
 ): PaidRarityFind {
-  if (!isTripClamped(find.tierAboveBand, rows)) return { saleTier: find.saleTier, trip }
+  if (find.gem === true || !isTripClamped(find.tierAboveBand, rows)) {
+    return { saleTier: find.saleTier, trip }
+  }
   return paidClampedFind(trip, find, rows)
 }
 

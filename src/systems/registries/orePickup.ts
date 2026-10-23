@@ -19,6 +19,8 @@ export interface PickupFind {
   tierAboveBand: number
   /** The tier the unit sells at before the provider is asked (#232: a signature's is one up). */
   saleTier: number
+  /** Set on a gem's unit (ticket 741): the gem tier, apart from the cell's rarity tier. */
+  gem?: true
 }
 
 export interface PickedUp {

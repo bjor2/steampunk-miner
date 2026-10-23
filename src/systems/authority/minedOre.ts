@@ -36,6 +36,8 @@ const BAND_ONE = 1
 export interface MinedOre extends OreCargoTags {
   resourceTier: number
   saleTier: number
+  /** Set on a gem's unit (ticket 741): it sells at its own tier, which no rarity clamp holds. */
+  gem?: true
   /** The band of the tile the cell lay in. */
   band: number
   oreId: string
@@ -50,6 +52,7 @@ export function minedOreOf(params: PlanetParams, tile: TilePoint, cell: number):
   return {
     resourceTier: ore.tier,
     saleTier: saleTierOf(ore),
+    ...(ore.gem === true ? { gem: true } : {}),
     band: bandOfTile(params, tile.tx, tile.ty),
     oreId: ore.id,
     ...oreCargoTagsOf(ore),
