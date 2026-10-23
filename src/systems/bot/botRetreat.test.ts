@@ -10,6 +10,7 @@ import { dockSiteOf } from '../world/dockSite'
 import { bandOfTile } from '../world/planetGeometry'
 import { planetParamsFor } from '../world/planetParams'
 import { deepestHeldBand } from './botCasing'
+import { breakDeathReplay } from './botDeathReplay'
 import type { BotPlanet } from './botPilot'
 import { createBotSession, type BotSession } from './botSession'
 import { serviceAtDock } from './botShopping'
@@ -33,6 +34,10 @@ import type { TripGoal } from './tripGoal'
 /** The seed whose run #195 saw end at 5.4 minutes, docked after a rescue with no ore plan. */
 const WORLD_SEED = 31415
 const BAND_1: TripGoal = { kind: 'ore', band: 1 }
+const BAND_2: TripGoal = { kind: 'ore', band: 2 }
+const DIED: readonly DomainEvent[] = [
+  { tick: 0, type: 'VehicleDestroyed', cause: 'enemy', attacker: null },
+]
 /** Band 1's near galleries bore out in fewer trips than this. */
 const MAX_FIXTURE_TRIPS = 80
 /** Twenty minutes of play after the rescue: long enough to sell and buy the next grade. */
@@ -112,6 +117,19 @@ function drainedBranchOfDeadEnd(): DeadEnd {
 function drainedBranchHoldingBand2(): DeadEnd {
   const branch = drainedBranchOfDeadEnd()
   branch.session.submit({ type: 'debug.setCasingGrade', payload: { grade: 2 } })
+  return branch
+}
+
+/**
+ * The dead end with grade 2 bought and band 2 closed by two deaths there (#198, ticket 753): the
+ * only band above the closed route is band 1, bored out to its reach.
+ */
+function branchWithBand2Closed(): DeadEnd {
+  const branch = branchOfDeadEnd()
+  branch.session.submit({ type: 'debug.setCasingGrade', payload: { grade: 2 } })
+  for (let death = 0; death < 2; death++) {
+    breakDeathReplay(branch.session, branch.planet, BAND_2, DIED)
+  }
   return branch
 }
 
@@ -219,6 +237,17 @@ describe('pacing bot tow for a broke bot (#216, #8 soft-lock rule)', () => {
     expect(run.state.tick).toBeGreaterThanOrEqual(maxTicks)
     expect(typesOf(run.events)).not.toContain('CommandRejected')
     expect(typesOf(run.events)).toContain('ResourceSold')
+  })
+})
+
+describe('pacing bot retreat above a closed route (#216, #198, ticket 762)', () => {
+  it('widens the bored-out band above a closed route instead of going back down it', () => {
+    const { session, planet } = branchWithBand2Closed()
+    const { run } = playOn({ session, planet }, 1)
+    const digs = digsWithGrade(run.events)
+    expect(digs.length).toBeGreaterThan(0)
+    expect(digs.filter((dig) => dig.band > 1)).toEqual([])
+    expect(oreReachOf(planet.layout, 1)).toBeGreaterThan(ORE_GALLERY_REACH)
   })
 })
 

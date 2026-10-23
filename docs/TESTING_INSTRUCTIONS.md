@@ -1349,13 +1349,16 @@ incomePerHour}` go to `balance-report/drill-pace.ndjson`, which `pushTestMetrics
   one rescue fee (`bot/botWallet.test.ts`); planets 1 to 7 buy as before. On every planet (ticket
   753, where P3's band 5 replayed one death until the campaign budget ran out), the second death on
   one route (a goal: an ore band or the core) closes it and every deeper one until the vehicle has a
-  level it did not die with; the bot mines the bands above meanwhile (`bot/botDeathReplay.test.ts`).
-  A run with no second death on a route plays as before.
+  level it did not die with; the bot mines the bands above meanwhile (`bot/botDeathReplay.test.ts`),
+  widening them as the retreat below does once they are bored out, and goes back down a closed
+  route only when none of them widens (ticket 762: P5 and P7 replayed one death 760 and 834 times
+  once the bands above ran dry). A run with no second death on a route plays as before.
 - **Bot retreat** (#216): when no band the casing holds pays a trip, the bot widens the shallowest
   held band whose galleries ended at their reach by another reach; broke with a tank below what a
   tow leaves (#8), it strands itself off the pad for the tow. A run that never meets the dead end
   plays as before. `bot/botRetreat.test.ts` bores band 1 out at grade 1, wrecks the vehicle and
-  empties the wallet, then plays on from there with `playSliceFrom`.
+  empties the wallet, then plays on from there with `playSliceFrom`; with band 2 held and closed by
+  two deaths, the same dead end widens band 1 instead of going down to band 2.
 - **Comparison** (`compareRuns`): `npm run balance:report` prints each seed's row and the median,
   writes the first seed's run to `balance-report/` and compares it with
   `tests/balance/bot-slice.summary.json`; differences are numbers, never failures. After a

@@ -12,9 +12,10 @@
  * When no band the casing holds pays a trip, as after a rescue that took the last of the wallet
  * with those bands bored out and the next grade unaffordable (#216), the bot retreats to the
  * shallowest of them, widens its galleries and plays on; broke with a tank too low even for that,
- * it strands itself for the tow that leaves a quarter of the tank (#8). From planet 8 on, the
- * second death on one route closes it, and every deeper one, until the vehicle has changed; the
- * bot mines the bands above meanwhile (#198, `botDeathReplay.ts`).
+ * it strands itself for the tow that leaves a quarter of the tank (#8). On every planet (ticket
+ * 753), the second death on one route closes it, and every deeper one, until the vehicle has
+ * changed; the bot mines the bands above meanwhile, widening them as it would the held bands once
+ * they are bored out (#198, `botDeathReplay.ts`, ticket 762).
  */
 import { SLICE_LAST_PLANET } from '../../constants/balance'
 import { TICKS_PER_SECOND } from '../../constants/physics'
@@ -254,10 +255,15 @@ function chooseAnyGoal(session: BotSession, planet: BotPlanet): TripGoal | null 
   return chooseOreGoal(session, planet) ?? chooseRetreatGoal(session, planet)
 }
 
-/** Null when no route is closed, or no band above the closed ones pays a trip. */
+/**
+ * Null when no route is closed, or no band above the closed ones pays a trip even widened. Bands
+ * above bored out to their reach widen first (#216), as the held bands do, so the bot goes back
+ * down a closed route only when nothing above it is left to mine.
+ */
 function chooseGoalAboveClosedRoutes(session: BotSession, planet: BotPlanet): TripGoal | null {
   const deepest = deepestOpenBand(planet, session.vehicle().levels)
-  return deepest === null ? null : chooseOreGoal(session, planet, deepest)
+  if (deepest === null) return null
+  return chooseOreGoal(session, planet, deepest) ?? chooseRetreatGoal(session, planet, deepest)
 }
 
 function chooseOreGoal(
@@ -272,19 +278,24 @@ function chooseOreGoal(
 }
 
 /**
- * No held band pays (#216): when not even a full tank would find a gallery, the shallowest held
- * band with galleries bored out to their reach reaches further, and the bot plans again; null
- * when only the tank is short, or no held band can widen.
+ * No held band down to `deepestBand` pays (#216): when not even a full tank would find a gallery,
+ * the shallowest of them with galleries bored out to their reach reaches further, and the bot
+ * plans again; null when only the tank is short, or none of them can widen.
  */
-function chooseRetreatGoal(session: BotSession, planet: BotPlanet): TripGoal | null {
-  if (!areHeldBandsBoredOut(session, planet)) return null
-  const hasWidened = widenShallowestBand(planet.layout, deepestHeldBand(session))
-  return hasWidened ? chooseOreGoal(session, planet) : null
+function chooseRetreatGoal(
+  session: BotSession,
+  planet: BotPlanet,
+  deepestBand = deepestHeldBand(session),
+): TripGoal | null {
+  const deepest = Math.min(deepestBand, deepestHeldBand(session))
+  if (!areBandsBoredOut(session, planet, deepest)) return null
+  const hasWidened = widenShallowestBand(planet.layout, deepest)
+  return hasWidened ? chooseOreGoal(session, planet, deepest) : null
 }
 
-function areHeldBandsBoredOut(session: BotSession, planet: BotPlanet): boolean {
+function areBandsBoredOut(session: BotSession, planet: BotPlanet, deepestBand: number): boolean {
   const means = fullTankMeans(session.vehicle().levels)
-  return bestOrePlan(planet.layout, means, deepestHeldBand(session)) === null
+  return bestOrePlan(planet.layout, means, deepestBand) === null
 }
 
 /**
