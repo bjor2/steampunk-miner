@@ -11,23 +11,25 @@ import { withMaterialContact } from './systems/materialFixtures'
 // the switch off every golden replays to protocol 88's digests: those below, as committed before
 // the record, with the exact carry off (it ships on since 18 Oct 2026), and with it on, A6's
 // charged digests. The two digs that buy drill power past stored step 1 replay to protocol 91's
-// (the per-purchase drill of ticket 552) with the record off.
+// (the per-purchase drill of ticket 552) with the record off. Ticket 762 re-pinned all of them to
+// planet 1's ore rules 10 stamp (ticket 737's rare clusters), which alone moved them: with planet 1
+// stamped 2 again each replays to the pin it replaced.
 
 type MovedDigests = Readonly<Record<string, Readonly<Record<number, string>>>>
 
 /** Protocol 88's digests of the goldens the record moves, by tick (91's for the two digs). */
 const PROTOCOL_88_DIGESTS: MovedDigests = {
-  'casing-lined-band-2': { 2137: '6a716de4327581ee' },
-  'collapse-band-2-grade-1': { 2125: '0f4f8cb9b015775c' },
-  'dig-and-return': { 247: '1e33c58bae0ccc65', 3600: 'fe80393ecc5f6472', 4000: 'd7583f1a4c4bb62f' },
-  'mined-order-mixed': { 307: '4ebff3e7eb9d8cde' },
+  'casing-lined-band-2': { 2137: 'c2c74edb2065b6db' },
+  'collapse-band-2-grade-1': { 2125: '247894ae56252cf7' },
+  'dig-and-return': { 247: '089b68d73b2eebfc', 3600: '462c13aff7d429b9', 4000: '394e1a1c1372f9a8' },
+  'mined-order-mixed': { 307: '74c4e95deda04f73' },
 }
 
 /** Protocol 88's charged digests (A6, `drill.exactCarry` on) of the same goldens. */
 const PROTOCOL_88_CHARGED_DIGESTS: MovedDigests = {
   ...PROTOCOL_88_DIGESTS,
-  'casing-lined-band-2': { 2137: '30c3f2483846f7fa' },
-  'collapse-band-2-grade-1': { 2125: '210371f1101afbb9' },
+  'casing-lined-band-2': { 2137: 'c16e068f0f91a70b' },
+  'collapse-band-2-grade-1': { 2125: 'c1529e40c34b22dc' },
 }
 
 const goldens = committedGoldenRuns().map((golden) => [golden.name, golden] as const)

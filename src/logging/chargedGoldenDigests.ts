@@ -9,7 +9,10 @@
  * off (the codex's species record, ticket 546, and the per-purchase drill of ticket 552 moved
  * them with the rest), what those two goldens replay to with it off: the kill-switch's parity
  * proof. The goldens' reports are 12-tick, so the report capsule of ticket 537 (interval 1 only)
- * never moves them, switch on or off. Spec support for the kill-switch pins; it reads, never writes.
+ * never moves them, switch on or off. Re-pinned for ticket 762 to planet 1's ore rules 10 stamp
+ * (ticket 737's rare clusters): the stamp alone moved them, as with planet 1 stamped 2 again they
+ * replay to the old pins, 0bb6c4e93bdba1e5 and fca832a15047704b. Spec support for the kill-switch
+ * pins; it reads, never writes.
  */
 import { readdirSync, readFileSync } from 'node:fs'
 import type { GoldenRun } from './goldenRun'
@@ -18,8 +21,8 @@ const GOLDEN_FOLDER = new URL('../../tests/golden/', import.meta.url)
 
 /** The end digest of each golden the charge moves, with the exact carry off, by tick. */
 export const UNCHARGED_DIGESTS: Readonly<Record<string, Readonly<Record<number, string>>>> = {
-  'casing-lined-band-2': { 2137: '0bb6c4e93bdba1e5' },
-  'collapse-band-2-grade-1': { 2125: 'fca832a15047704b' },
+  'casing-lined-band-2': { 2137: '6fc430d094a4b3e6' },
+  'collapse-band-2-grade-1': { 2125: '48aad988d5ddd282' },
 }
 
 export function committedGoldenRuns(): GoldenRun[] {
