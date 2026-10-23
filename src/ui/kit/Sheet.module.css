@@ -85,6 +85,19 @@
   }
 }
 
+/*
+ * Docked beside the view (ticket 770): the dock's own rail frame, baked for a tall column with its
+ * hinge rail on the side that meets the play view, in place of the phone's sheet frame stretched
+ * down it; `round` repeats a rivet per tile, so nothing stretches. The sheet frame stays the
+ * fallback while the rail frame is a placeholder.
+ */
+.sheet[data-placement='docked'] {
+  border-image: var(--art-dock-frame, var(--art-sheet-frame))
+    var(--art-dock-frame-slice, var(--art-sheet-frame-slice)) fill /
+    var(--art-dock-frame-width, var(--art-sheet-frame-width));
+  border-image-repeat: round;
+}
+
 /* Docked beside the view: the controls under the title, as a desktop panel reads. */
 .sheet[data-placement='docked'] .controls {
   order: -1;
