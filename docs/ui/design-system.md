@@ -374,6 +374,18 @@ tags** (`KeyTag`) read from the bindings in force. A resting mouse shows a **hov
 full; a dial's, the money's or the next upgrade's full value in the long mode (section 12). A hover
 only shows. A tool fires on its click, never on a hover.
 
+**Desktop warnings and the star map hook (#769, GD lock 23 Oct).** The hazard strip lies on the
+side nearest the danger: from the rig along the drive toward the leading edge, inside the play
+area. On desktop the track ends inside the HUD's own box, under the strip's top box and over the
+tool tray's row, and is shortened where the full track would run past them
+(`hazardStripDesktopReachInto`); a phone keeps its edge shift (#685). M, or a click on the strip's
+fuel wells (they sit in the **star map button**, the compass with M's key tag), opens the star
+map's panel in the desktop dock, a one-page sheet whose chart scrolls both ways so the #757 map
+pans for any number of systems. It takes the dock only while no docked sheet holds it; a sheet
+opened over it takes the dock and the map comes back when the sheet shuts. The dock narrows the
+view while either panel is drawn, so no panel ever covers the strip. M again, Esc or its Close
+shuts it, and Esc shuts it before it would open the pause menu or undock. A phone draws neither.
+
 ## 10. Component inventory
 
 Existing parts keep their contracts (texts and `data-*` hooks, never markup, #423). New parts are

@@ -888,6 +888,25 @@
       "specs": ["e2e/browser/ui/desktopInput.spec.ts", "e2e/browser/hud/toolSlotBar.spec.ts"]
     },
     {
+      "why": "Desktop warnings and the star map hook (ticket 769): M or a click on the fuel wells opens the star map's panel in the desktop dock and M, Escape or Close shuts it; the hazard strip stays inside the narrowed view; a phone draws neither.",
+      "paths": [
+        "src/store/starMapSlice.ts",
+        "src/store/inputRuntime.ts",
+        "src/systems/input/inputRouting.ts",
+        "src/systems/input/keyTags.ts",
+        "src/systems/views/hazardStripFit.ts",
+        "src/systems/views/hazardStripPlace.ts",
+        "src/ui/hud/hazardStripDraw.ts",
+        "src/ui/hud/HazardStrip*",
+        "src/ui/hud/StarMapButton*",
+        "src/ui/hud/FuelWells.tsx",
+        "src/ui/hud/HudStrip*",
+        "src/ui/sheet/SheetDock*",
+        "src/ui/starMap/**"
+      ],
+      "specs": ["e2e/browser/ui/desktopStarMap.spec.ts"]
+    },
+    {
       "why": "One menu per building (ticket 734): the sheet a dock opens is that bay's one menu, closed once, with no bay frame hidden behind a phone's full sheet. The sheet slice, the bay screen's shutter, the workshop's dock hook and the debug sheet reads reach it.",
       "paths": [
         "src/store/sheetSlice.ts",

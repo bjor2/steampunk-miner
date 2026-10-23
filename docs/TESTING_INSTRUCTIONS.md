@@ -1652,6 +1652,16 @@ incomePerHour}` go to `balance-report/drill-pace.ndjson`, which `pushTestMetrics
   number key, a hover that never fires and a click that does, and the long-mode hover inside the
   screen with the strip held through the 0 to 1e300 money sweep, the next upgrade at levels 1, 99,
   9999 and 1e6, and a dial on P40; the phone draws no tag and no plate. Box Tester only.
+- **Desktop warnings and the star map hook** (ticket 769, spec #678): the desktop strip's fit is
+  pure (`hazardStripFit.test.ts`: the far end inside the play area for 16 drives on six desktop
+  views, docked ones included, the near end unmoved, the full track where there is room), M and
+  Escape on the store seam in `starMapKeys.test.ts` (M from driving and a bay, Escape shuts the map
+  before the pause menu or the undock, nothing over the pause menu), the button's tag in
+  `keyTags.test.ts`, and the server-rendered button in `hudStripView.test.ts` (none on a phone).
+  `e2e/browser/ui/desktopStarMap.spec.ts` runs 1280x800 and 1920x1080 plus a 360x640 phone: M, a
+  click, Escape and Close on the docked panel at most a quarter wide, the HUD strip left of it, and a
+  dive's hazard strip inside the narrowed view; the phone draws no button and no panel. Box Tester
+  only.
 - **Warning layer** (ticket 685, spec #678): the ladder is pure (`systems/views/warningWatch.ts`:
   each tier fires once on the way in and re-arms 5% above it, the deepest of several at once rings
   alone, the glow holds the deepest tier now), fed from the HUD's readings through the store's

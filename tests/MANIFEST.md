@@ -1091,7 +1091,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/input/buildIntent.test.ts` | 11 | 11 |
 | `src/systems/input/cleanTap.test.ts` | 5 | 5 |
 | `src/systems/input/inputRouting.test.ts` | 32 | 32 |
-| `src/systems/input/keyTags.test.ts` | 5 | 5 |
+| `src/systems/input/keyTags.test.ts` | 6 | 6 |
 | `src/systems/input/padCodes.test.ts` | 4 | 4 |
 | `src/systems/input/padFrame.test.ts` | 7 | 7 |
 | `src/systems/input/preferences.test.ts` | 24 | 24 |
@@ -1510,6 +1510,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/store/soundUnlockSlice.test.ts` | 4 | 4 |
 | `src/store/speciesRevealBroadcast.test.ts` | 2 | 2 |
 | `src/store/starMapActions.test.ts` | 4 | 4 |
+| `src/store/starMapKeys.test.ts` | 5 | 5 |
 | `src/store/tapSheetSlice.test.ts` | 6 | 6 |
 | `src/store/titleMenu.test.ts` | 9 | 9 |
 | `src/store/toolPageKeys.test.ts` | 4 | 4 |
@@ -1625,7 +1626,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/ui/hud/hudBoxes.test.ts` | 9 | 6 |
 | `src/ui/hud/hudPanels.test.ts` | 5 | 5 |
 | `src/ui/hud/hudRows.test.ts` | 6 | 6 |
-| `src/ui/hud/hudStripView.test.ts` | 20 | 20 |
+| `src/ui/hud/hudStripView.test.ts` | 21 | 21 |
 | `src/ui/hud/hudText.test.ts` | 6 | 6 |
 | `src/ui/hud/warningGlowView.test.ts` | 4 | 4 |
 | `src/ui/iconCoverage.test.ts` | 9 | 9 |
@@ -1734,6 +1735,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/views/gainText.test.ts` | 6 | 6 |
 | `src/systems/views/gaugeCluster.test.ts` | 22 | 22 |
 | `src/systems/views/gravityReadings.test.ts` | 4 | 4 |
+| `src/systems/views/hazardStripFit.test.ts` | 5 | 5 |
 | `src/systems/views/hazardStripPlace.test.ts` | 6 | 6 |
 | `src/systems/views/hazardStripView.test.ts` | 3 | 3 |
 | `src/systems/views/heatViews.test.ts` | 5 | 5 |
