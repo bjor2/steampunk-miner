@@ -1068,9 +1068,10 @@
       "specs": ["e2e/browser/materialLooks.spec.ts", "e2e/browser/render.spec.ts"]
     },
     {
-      "why": "The per-act hero atlas (ticket 451): the materials' atlas rows and art, the roster's act lookup, the probe's 16th-unit gate, the terrain's swap and binder, and its debug read.",
+      "why": "The per-act hero atlas (ticket 451): the materials' atlas rows and art, the roster's act lookup, the probe's 16th-unit gate, the terrain's swap and binder, and its debug read; the P1-P5 skin contact sheet (ticket 746).",
       "paths": [
         "src/features/roster/systems/render/**",
+        "src/features/roster/skinContactSheet.golden.json",
         "src/features/materials/**",
         "src/systems/registries/kindLook.ts",
         "src/systems/render/heroAtlas.ts",
@@ -1089,7 +1090,8 @@
         "e2e/browser/heroAtlas.spec.ts",
         "e2e/browser/materialLooks.spec.ts",
         "e2e/browser/renderQuality.spec.ts",
-        "e2e/browser/p2GemSkins.spec.ts"
+        "e2e/browser/p2GemSkins.spec.ts",
+        "e2e/browser/skinContactSheet.spec.ts"
       ]
     },
     {
