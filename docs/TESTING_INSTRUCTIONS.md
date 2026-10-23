@@ -1623,6 +1623,19 @@ incomePerHour}` go to `balance-report/drill-pace.ndjson`, which `pushTestMetrics
   at most) through the 0 to 1e300 money sweep, every track at levels 1, 99, 9999 and 1e6 with the
   Outfitter docked and clean, and P40. The UI screenshot suite gained a 1920x1080 cell. Box Tester
   only.
+- **Desktop keys and mouse** (ticket 768, spec #678): the rules are pure and unit-tested:
+  `displayAmount.test.ts` (the long mode: at most 12 figures to 1e300, a hover's balance between the
+  chip and the real one, a hover's price between the real one and the chip), `actionMap.test.ts`
+  (a pad-less desktop key says why), `keyTags.test.ts`, `hoverValues.test.ts`,
+  `vehicleItemHoverLine.test.ts` (the hover line is the long-press card's), `toolSlotBar.test.ts`
+  (`toolInCellOf`), with the store seams in `sheetKeys.test.ts` (Tab, the place letters, Escape,
+  nothing over the pause menu's first page, Tab left to a bay screen) and `toolPageKeys.test.ts`
+  (a number key presses the turned page's cell), and the server-rendered tags in
+  `desktopToolCell.test.ts` and `baseSheet.test.ts` (none on a phone). `e2e/browser/ui/desktopInput.spec.ts`
+  runs 1280x800 and 1920x1080 plus a 360x640 phone: the sheet keys, the key tags, the turned page's
+  number key, a hover that never fires and a click that does, and the long-mode hover inside the
+  screen with the strip held through the 0 to 1e300 money sweep, the next upgrade at levels 1, 99,
+  9999 and 1e6, and a dial on P40; the phone draws no tag and no plate. Box Tester only.
 - **Warning layer** (ticket 685, spec #678): the ladder is pure (`systems/views/warningWatch.ts`:
   each tier fires once on the way in and re-arms 5% above it, the deepest of several at once rings
   alone, the glow holds the deepest tier now), fed from the HUD's readings through the store's

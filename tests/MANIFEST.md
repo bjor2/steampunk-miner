@@ -1085,15 +1085,16 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 
 | File | Tests | Sites |
 | --- | --- | --- |
-| `src/systems/input/actionMap.test.ts` | 28 | 28 |
+| `src/systems/input/actionMap.test.ts` | 29 | 29 |
 | `src/systems/input/buildIntent.test.ts` | 11 | 11 |
 | `src/systems/input/cleanTap.test.ts` | 5 | 5 |
 | `src/systems/input/inputRouting.test.ts` | 32 | 32 |
+| `src/systems/input/keyTags.test.ts` | 5 | 5 |
 | `src/systems/input/padCodes.test.ts` | 4 | 4 |
 | `src/systems/input/padFrame.test.ts` | 7 | 7 |
 | `src/systems/input/preferences.test.ts` | 24 | 24 |
 | `src/systems/input/promptLabel.test.ts` | 8 | 8 |
-| `src/systems/input/toolSlots.test.ts` | 8 | 8 |
+| `src/systems/input/toolSlots.test.ts` | 9 | 9 |
 | `src/systems/input/touchBindings.test.ts` | 16 | 16 |
 | `src/systems/input/touchControls.test.ts` | 26 | 19 |
 
@@ -1497,6 +1498,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/store/runSnapshots.test.ts` | 10 | 10 |
 | `src/store/saveKeeping.test.ts` | 15 | 15 |
 | `src/store/saveResumeLog.test.ts` | 2 | 2 |
+| `src/store/sheetKeys.test.ts` | 9 | 9 |
 | `src/store/sheetSlice.test.ts` | 22 | 22 |
 | `src/store/sliceRun.test.ts` | 7 | 7 |
 | `src/store/slowDeviceChip.test.ts` | 2 | 2 |
@@ -1505,6 +1507,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/store/starMapActions.test.ts` | 3 | 3 |
 | `src/store/tapSheetSlice.test.ts` | 6 | 6 |
 | `src/store/titleMenu.test.ts` | 9 | 9 |
+| `src/store/toolPageKeys.test.ts` | 4 | 4 |
 | `src/store/touchReplay.test.ts` | 2 | 2 |
 | `src/store/touchRuntime.test.ts` | 20 | 19 |
 | `src/store/tripIncomeSlice.test.ts` | 3 | 3 |
@@ -1516,7 +1519,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | File | Tests | Sites |
 | --- | --- | --- |
 | `src/systems/cellRandom.test.ts` | 6 | 6 |
-| `src/systems/displayAmount.test.ts` | 74 | 18 |
+| `src/systems/displayAmount.test.ts` | 96 | 23 |
 | `src/systems/fastForward.test.ts` | 4 | 4 |
 | `src/systems/fixedStepClock.test.ts` | 10 | 6 |
 | `src/systems/globalSheetGuard.test.ts` | 5 | 5 |
@@ -1635,8 +1638,9 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/ui/saveMenuText.test.ts` | 4 | 4 |
 | `src/ui/screenIds.test.ts` | 3 | 3 |
 | `src/ui/screens/sliceScreen.test.ts` | 8 | 8 |
-| `src/ui/sheet/baseSheet.test.ts` | 13 | 13 |
+| `src/ui/sheet/baseSheet.test.ts` | 15 | 15 |
 | `src/ui/sheets/exactAmountSheet.test.ts` | 3 | 3 |
+| `src/ui/toolSlots/desktopToolCell.test.ts` | 3 | 3 |
 | `src/ui/toolSlots/toolSlotRegistry.test.ts` | 10 | 10 |
 | `src/ui/touch/touchBindingTiles.test.ts` | 11 | 11 |
 | `src/ui/touch/touchCoverage.test.ts` | 10 | 6 |
@@ -1723,7 +1727,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/views/dialBuyCue.test.ts` | 8 | 8 |
 | `src/systems/views/driveTrackCard.test.ts` | 5 | 4 |
 | `src/systems/views/gainText.test.ts` | 6 | 6 |
-| `src/systems/views/gaugeCluster.test.ts` | 21 | 21 |
+| `src/systems/views/gaugeCluster.test.ts` | 22 | 22 |
 | `src/systems/views/gravityReadings.test.ts` | 4 | 4 |
 | `src/systems/views/hazardStripPlace.test.ts` | 6 | 6 |
 | `src/systems/views/hazardStripView.test.ts` | 3 | 3 |
@@ -1731,6 +1735,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/views/hintRoom.test.ts` | 7 | 7 |
 | `src/systems/views/holdSheet.test.ts` | 7 | 7 |
 | `src/systems/views/holdTrackNote.test.ts` | 5 | 5 |
+| `src/systems/views/hoverValues.test.ts` | 6 | 6 |
 | `src/systems/views/hudCallouts.test.ts` | 8 | 8 |
 | `src/systems/views/hudClearView.test.ts` | 18 | 15 |
 | `src/systems/views/hudCompact.test.ts` | 6 | 6 |
@@ -1764,7 +1769,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/views/tileTime.test.ts` | 3 | 3 |
 | `src/systems/views/titleMenuModel.test.ts` | 8 | 8 |
 | `src/systems/views/titleOnlyText.test.ts` | 5 | 5 |
-| `src/systems/views/toolSlotBar.test.ts` | 10 | 10 |
+| `src/systems/views/toolSlotBar.test.ts` | 13 | 13 |
 | `src/systems/views/tooltipOpening.test.ts` | 9 | 9 |
 | `src/systems/views/tripIncome.test.ts` | 8 | 8 |
 | `src/systems/views/uiBudgetRatchet.test.ts` | 8 | 8 |
@@ -1775,6 +1780,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/views/unsavedChipText.test.ts` | 2 | 2 |
 | `src/systems/views/upgradeBayModel.test.ts` | 18 | 18 |
 | `src/systems/views/upgradePreview.test.ts` | 15 | 15 |
+| `src/systems/views/vehicleItemHoverLine.test.ts` | 1 | 1 |
 | `src/systems/views/vehicleItemRows.test.ts` | 5 | 5 |
 | `src/systems/views/warningWatch.test.ts` | 16 | 16 |
 

@@ -2244,7 +2244,16 @@
           "title": "Browser",
           "description": "Plays in a desktop browser and is published on GitHub Pages; saves go to browser storage.",
           "status": "built",
-          "doc": "README.md"
+          "doc": "README.md",
+          "children": [
+            {
+              "title": "Desktop keys and mouse",
+              "description": "One rebindable key map: Tab opens and shuts the sheet, O, P, H, L and G jump to the Outfitter, Patent Office, Hold, Ledger and Gearbox tabs, the number keys press the tool slots of the page shown and Esc closes what is open. Brass key tags show on desktop only. Resting the mouse on a tool shows its line, and on a gauge, the money or the next upgrade, the full value. Tools fire on a click, never on a hover.",
+              "status": "built",
+              "issues": [768],
+              "doc": "docs/ui/design-system.md"
+            }
+          ]
         },
         {
           "title": "Phones, tablets and TVs",

@@ -863,6 +863,31 @@
       "specs": ["e2e/browser/ui/desktopShell.spec.ts", "e2e/browser/ui/uiShots.spec.ts"]
     },
     {
+      "why": "Desktop keys and mouse (ticket 768): Tab, the place letters and Escape on the sheet, the brass key tags on the tool cells and tabs (none on a phone), the number keys on a turned tray page, a hover that shows and never fires, and the long-mode full values on hover through the money sweep, the level sweep and P40.",
+      "paths": [
+        "src/data/input/actions.json",
+        "src/systems/input/**",
+        "src/store/inputRuntime.ts",
+        "src/store/sheetSlice.ts",
+        "src/store/toolPageKeys.ts",
+        "src/store/toolTraySlice.ts",
+        "src/shell/sharedBrowserHooks.ts",
+        "src/systems/displayAmount.ts",
+        "src/systems/views/hoverValues.ts",
+        "src/systems/views/sheetPlaces.ts",
+        "src/systems/views/toolSlotBar.ts",
+        "src/systems/views/gaugeCluster.ts",
+        "src/ui/kit/KeyTag*",
+        "src/ui/kit/HoverPlate*",
+        "src/ui/kit/useMouseHover.ts",
+        "src/ui/kit/SheetTabBar*",
+        "src/ui/sheet/BaseSheet.tsx",
+        "src/ui/toolSlots/**",
+        "src/ui/hud/**"
+      ],
+      "specs": ["e2e/browser/ui/desktopInput.spec.ts", "e2e/browser/hud/toolSlotBar.spec.ts"]
+    },
+    {
       "why": "One menu per building (ticket 734): the sheet a dock opens is that bay's one menu, closed once, with no bay frame hidden behind a phone's full sheet. The sheet slice, the bay screen's shutter, the workshop's dock hook and the debug sheet reads reach it.",
       "paths": [
         "src/store/sheetSlice.ts",

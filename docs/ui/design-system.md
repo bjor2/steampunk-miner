@@ -362,6 +362,18 @@ fills them: the fuel tank's dial and the fuel cost's figure at the formatter's w
 descent. A wide HUD adds space, not digits (VS): no readout rule changes, and the phone layout is
 untouched.
 
+**Desktop keys and mouse (#768, GD lock 23 Oct).** One key map in data (`actions.json`),
+rebindable in Settings: WASD and the arrows drive and drill, the number keys press the tool slots
+of the page shown (section 9's bar), Tab opens the sheet on its first shown tab and shuts it,
+O/P/H/L/G open the tab bearing the Outfitter, Patent Office, Hold, Ledger or Gearbox word
+(`copy.places`; G stays the guns while driving), M is the star map's (#757, #769), and Esc closes
+what is open. A bay screen keeps Tab for its focus walk. These keys have no pad button, and each
+action names why (`noPadReason`). On desktop only, the tool cells and the tabs wear **brass key
+tags** (`KeyTag`) read from the bindings in force. A resting mouse shows a **hover plate**
+(`HoverPlate`): a tool's name, the #680 line its item's long-press card prints and its charges in
+full; a dial's, the money's or the next upgrade's full value in the long mode (section 12). A hover
+only shows. A tool fires on its click, never on a hover.
+
 ## 10. Component inventory
 
 Existing parts keep their contracts (texts and `data-*` hooks, never markup, #423). New parts are
