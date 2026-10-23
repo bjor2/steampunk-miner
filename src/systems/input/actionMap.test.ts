@@ -194,9 +194,28 @@ describe('rebinding', () => {
 })
 
 describe('pad bindings', () => {
-  it('reaches every action from the pad (ticket 346)', () => {
+  it('reaches every action from the pad (ticket 346), but a desktop key that says why not', () => {
     const padBindings = defaultPadBindings(ACTION_MAP)
-    for (const id of ACTION_IDS) expect(padBindings[id].length, id).toBeGreaterThan(0)
+    const padless = ACTION_MAP.actions.filter((action) => action.noPadReason !== undefined)
+    for (const action of ACTION_MAP.actions.filter((each) => !padless.includes(each)))
+      expect(padBindings[action.id].length, action.id).toBeGreaterThan(0)
+    for (const action of padless) expect(action.keyboard.length, action.id).toBeGreaterThan(0)
+  })
+
+  it('refuses an action with no pad button and no reason, and a blank reason (ticket 768)', () => {
+    const withActions = (edit: (action: Record<string, unknown>) => Record<string, unknown>) => ({
+      ...SHIPPED_ACTION_MAP,
+      actions: SHIPPED_ACTION_MAP.actions.map((action) =>
+        action.id === 'toggle_sheet' ? edit({ ...action }) : action,
+      ),
+    })
+    const noReason = withActions(({ noPadReason: _dropped, ...action }) => action)
+    const blankReason = withActions((action) => ({ ...action, noPadReason: '' }))
+    expect(actionMapProblems(noReason)).toEqual(['toggle_sheet has no pad button bound'])
+    const index = SHIPPED_ACTION_MAP.actions.findIndex((action) => action.id === 'toggle_sheet')
+    expect(actionMapProblems(blankReason)).toEqual([
+      `actions[${index}].noPadReason must be a non-empty string`,
+    ])
   })
 
   it("toggles the bore gun's auto mode with the right-stick click (#317)", () => {

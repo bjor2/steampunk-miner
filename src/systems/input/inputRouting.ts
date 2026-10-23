@@ -11,7 +11,9 @@
  * is open exactly then), else `vehicle`. Escape closes the top layer: settings, the pause menu (its
  * save page steps back to the first page), the cards (no pick, the cache stays live), the slice
  * screen, the sheet, then the platform screen (that is
- * `Undock`), and in `vehicle` it opens the pause menu. `interact` opens a live cache the
+ * `Undock`), and in `vehicle` it opens the pause menu. On desktop Tab opens and shuts the sheet
+ * from driving, the sheet or the Ledger (a bay's screen keeps Tab for its focus walk), and a
+ * place's letter jumps to its tab from any of those or a bay (ticket 768). `interact` opens a live cache the
  * vehicle is over, else docks. An action outside its context, a dock or open the authority would
  * refuse, the quick action away from the shops (#37, #40, #170), a tow call while the vehicle can
  * still move, the guns' toggle with no guns mounted (#107), the bore gun's auto toggle before the
@@ -40,6 +42,7 @@ import { sliceIntentOfPress } from '../registries/inputReactions'
 import { boreAutoToggleIntentOf } from '../authority/bore/boreAuto'
 import type { ZoomChange } from '../render/viewZoom'
 import type { VehicleMode } from '../vehicle/vehicleState'
+import type { SheetPlace } from '../views/sheetPlaces'
 import type { TitleMenu, TitleMenuPage } from '../views/titleMenuModel'
 import type { BayId } from '../world/dockBays'
 import type { ActionId, InputContext } from './actionMap'
@@ -61,6 +64,10 @@ export type InputReaction =
   | { kind: 'chooseChargeSize'; size: number }
   /** Escape on the title menu (ticket 403): back to its main page. */
   | { kind: 'showTitlePage'; page: TitleMenuPage }
+  /** Tab (ticket 768): the base sheet opens on its first tab, or shuts. */
+  | { kind: 'toggleSheet' }
+  /** A desktop letter (ticket 768): the base sheet opens on the tab of a place, if one is shown. */
+  | { kind: 'openSheetAtPlace'; place: SheetPlace }
   | { kind: 'none' }
 
 /** What the routing needs to know about the session; read from the authority replica. */
@@ -110,10 +117,24 @@ const MENU_REACTIONS: Readonly<Partial<Record<ActionId, ReactionRule>>> = {
   ui_confirm: () => ({ kind: 'activateFocused' }),
 }
 
+/**
+ * The desktop sheet keys (ticket 768), the same in every layer that has them: the store decides
+ * whether the sheet can open there (never over the pause menu's first page, only from its Ledger).
+ */
+const SHEET_KEY_REACTIONS: Readonly<Partial<Record<ActionId, ReactionRule>>> = {
+  toggle_sheet: () => ({ kind: 'toggleSheet' }),
+  open_outfitter: () => openSheetAt('outfitter'),
+  open_patent_office: () => openSheetAt('patentOffice'),
+  open_hold: () => openSheetAt('hold'),
+  open_ledger: () => openSheetAt('ledger'),
+  open_gearbox: () => openSheetAt('gearbox'),
+}
+
 const REACTIONS_BY_LAYER: Readonly<
   Record<InputContext, Readonly<Partial<Record<ActionId, ReactionRule>>>>
 > = {
   vehicle: {
+    ...SHEET_KEY_REACTIONS,
     interact: interactReaction,
     request_rescue: ({ vehicleMode }) =>
       isWaitingForTow(vehicleMode) ? submit(requestRescueCommand()) : NONE,
@@ -134,6 +155,7 @@ const REACTIONS_BY_LAYER: Readonly<
   },
   platform: {
     ...MENU_REACTIONS,
+    ...SHEET_KEY_REACTIONS,
     quick_service: ({ dockedBay }) => (isShopBay(dockedBay) ? submit(quickServiceCommand()) : NONE),
     ui_cancel: () => submit(undockCommand()),
   },
@@ -147,6 +169,7 @@ const REACTIONS_BY_LAYER: Readonly<
   },
   pause: {
     ...MENU_REACTIONS,
+    ...SHEET_KEY_REACTIONS,
     ui_cancel: () => ({ kind: 'stepBackInPauseMenu' }),
   },
   screen: {
@@ -154,6 +177,7 @@ const REACTIONS_BY_LAYER: Readonly<
   },
   sheet: {
     ...MENU_REACTIONS,
+    ...SHEET_KEY_REACTIONS,
     ui_cancel: () => ({ kind: 'closeSheet' }),
   },
   title: {
@@ -198,6 +222,10 @@ function interactReaction(situation: InputSituation): InputReaction {
 /** `request_rescue` is live only for a vehicle that cannot move on its own (#7). */
 function isWaitingForTow(mode: VehicleMode): boolean {
   return mode === 'stranded' || mode === 'destroyed'
+}
+
+function openSheetAt(place: SheetPlace): InputReaction {
+  return { kind: 'openSheetAtPlace', place }
 }
 
 function submit(intent: CommandIntent): InputReaction {

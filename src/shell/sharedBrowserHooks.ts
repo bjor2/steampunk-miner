@@ -1,6 +1,6 @@
 /** Window plumbing both shells share; neither holds game rules. */
 import { listenForMouseButtons } from './mouseHooks'
-import type { KeyChange, ScrollNotch } from './shell'
+import type { KeyChange, KeyListener, ScrollNotch } from './shell'
 
 /** About one mouse-wheel notch in pixels, so a trackpad's small deltas add up to notches. */
 const PIXELS_PER_NOTCH = 100
@@ -20,7 +20,7 @@ export function runOnPageHide(callback: () => void): void {
 }
 
 /** Keys and the game canvas's mouse buttons, as one stream of key changes (ticket 345). */
-export function listenForKeyChanges(listener: (key: KeyChange) => void): () => void {
+export function listenForKeyChanges(listener: KeyListener): () => void {
   const stopKeys = listenForKeys(listener)
   const stopMouseButtons = listenForMouseButtons(listener)
   return () => {
@@ -32,9 +32,18 @@ export function listenForKeyChanges(listener: (key: KeyChange) => void): () => v
 /** Typing a save's name (ticket 404) must not drive the menu; Escape still steps back. */
 const KEYS_PASSED_FROM_TEXT_FIELDS: readonly string[] = ['Escape']
 
-function listenForKeys(listener: (key: KeyChange) => void): () => void {
+/**
+ * Keys whose browser default would fight the game's own binding: Tab opens and shuts the sheet
+ * (ticket 768), so the page's focus walk must not also jump and scroll it, nor leave a HUD button
+ * focused for Space to press. Where no binding takes Tab (a bay's screen), it walks focus as ever.
+ */
+const KEYS_KEPT_FROM_THE_BROWSER: readonly string[] = ['Tab']
+
+function listenForKeys(listener: KeyListener): () => void {
   const onDown = (event: KeyboardEvent) => {
-    if (!isTypedIntoTextField(event)) listener(keyChangeOf(event, true))
+    if (isTypedIntoTextField(event)) return
+    const isTaken = listener(keyChangeOf(event, true))
+    if (isTaken) keepKeyFromBrowser(event)
   }
   const onUp = (event: KeyboardEvent) => listener(keyChangeOf(event, false))
   window.addEventListener('keydown', onDown)
@@ -43,6 +52,10 @@ function listenForKeys(listener: (key: KeyChange) => void): () => void {
     window.removeEventListener('keydown', onDown)
     window.removeEventListener('keyup', onUp)
   }
+}
+
+function keepKeyFromBrowser(event: KeyboardEvent): void {
+  if (KEYS_KEPT_FROM_THE_BROWSER.includes(event.code)) event.preventDefault()
 }
 
 /** Only key-downs are dropped, so no action stays held from a press made before the field. */

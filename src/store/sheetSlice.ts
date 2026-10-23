@@ -15,6 +15,10 @@
  * A sheet a dock opens (the Upgrade bay's Outfitter) is that bay's one menu (ticket 734): its
  * close, Escape or Close, shuts it and leaves the bay in one step, so a dock never stacks two
  * menus that take two closes. A sheet the player opens from a bay's button closes back to the bay.
+ *
+ * On desktop (ticket 768) Tab opens the sheet on its first shown tab and shuts it as Close does,
+ * and a place's letter opens the tab bearing that place's word. Neither opens the sheet over the
+ * pause menu's first page; from the Ledger both work, as picking a tab there does.
  */
 import {
   cardPressOf,
@@ -25,8 +29,9 @@ import {
 import { KERNEL_SHEET_TAB_IDS } from '../systems/views/kernelSheetTabIds'
 import type { PauseMenuState } from '../systems/views/pauseMenuModel'
 import type { SheetPlacement } from '../systems/views/sheetLayout'
-import { sheetTabIdProblems } from '../ui/registries/sheetTabs'
-import { refuseProblems } from './authorityLink'
+import { tabAtPlace, type SheetPlace } from '../systems/views/sheetPlaces'
+import { sheetTabIdProblems, shownSheetTabsOn, type SheetTabHead } from '../ui/registries/sheetTabs'
+import { readAuthorityState, refuseProblems } from './authorityLink'
 
 export interface SheetValues {
   /** The base sheet's tab while the sheet is open; null while it is shut. */
@@ -71,6 +76,10 @@ export interface SheetActions {
   stepSheetAside(): void
   /** Slides the stepped-aside sheet back in on its tab. */
   bringSheetBack(): void
+  /** Tab (ticket 768): shuts a shown sheet as Close does, else opens it on its first shown tab. */
+  toggleSheet(): void
+  /** A place's key (ticket 768): opens the shown tab bearing the place's word; none, nothing. */
+  openSheetAtPlace(place: SheetPlace): void
 }
 
 /** What the sheet reads of the pause slice, the Ledger's owner. */
@@ -87,7 +96,7 @@ interface DockHost {
   undock(): void
 }
 
-type SliceHost = SheetValues & PauseHost & DockHost
+type SliceHost = SheetValues & PauseHost & DockHost & { playerId: string }
 
 type SetSlice = (partial: Partial<SheetValues>) => void
 
@@ -135,7 +144,30 @@ export function sheetActionsOf(set: SetSlice, get: () => SliceHost): SheetAction
     },
     stepSheetAside: () => set({ isSheetSteppedAside: true }),
     bringSheetBack: () => set({ isSheetSteppedAside: false }),
+    toggleSheet: () => toggleSheetOn(set, get()),
+    openSheetAtPlace: (place) => openSheetAtPlaceOn(set, get(), place),
   }
+}
+
+function toggleSheetOn(set: SetSlice, host: SliceHost): void {
+  if (sheetTabShownOf(host) !== null) return closeSheetAndBayMenu(set, host)
+  if (host.pauseMenu !== null) return
+  const [first] = shownTabsOf(host)
+  if (first !== undefined) openSheetOn(set, host, first.id)
+}
+
+function openSheetAtPlaceOn(set: SetSlice, host: SliceHost, place: SheetPlace): void {
+  if (isPauseMenuFirstPage(host)) return
+  const tab = tabAtPlace(shownTabsOf(host), place)
+  if (tab !== null) openSheetOn(set, host, tab.id)
+}
+
+function shownTabsOf(host: SliceHost): readonly SheetTabHead[] {
+  return shownSheetTabsOn(readAuthorityState(), host.playerId)
+}
+
+function isPauseMenuFirstPage(host: { pauseMenu: PauseMenuState | null }): boolean {
+  return host.pauseMenu !== null && !isLedgerShown(host)
 }
 
 function isSteppedAsideAt(

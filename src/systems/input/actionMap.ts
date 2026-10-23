@@ -72,6 +72,15 @@ export const ACTION_IDS = [
   // The drill sockets' gear (#205 GD lock Q1 a): drill-gear's input reactions answer them.
   'use_drill_flank',
   'use_drill_collar',
+  // The desktop keys of ticket 768 (spec #678, GD lock of 23 Oct): Tab opens and shuts the base
+  // sheet, a letter jumps to a place's tab, M is the star map's (#757, wired by #769).
+  'toggle_sheet',
+  'open_outfitter',
+  'open_patent_office',
+  'open_hold',
+  'open_ledger',
+  'open_gearbox',
+  'open_star_map',
 ] as const
 
 export type ActionId = (typeof ACTION_IDS)[number]
@@ -87,6 +96,11 @@ export interface ActionDef {
   keyboard: readonly string[]
   /** Pad codes and `PadLB+` chords (`padCodes.ts`), ticket 346. */
   gamepad: readonly string[]
+  /**
+   * Why the action ships with no pad button (ticket 768: a desktop key the pad reaches another
+   * way); only with a reason may `gamepad` be empty, as a touch row says why it has no control.
+   */
+  noPadReason?: string
 }
 
 export interface ActionMap {
@@ -273,6 +287,9 @@ function actionDefProblems(action: unknown, path: string): string[] {
       : [`${path}.kind must be hold or press`]),
     ...(isStringList(action.keyboard) ? [] : [`${path}.keyboard must be a list of key codes`]),
     ...(isStringList(action.gamepad) ? [] : [`${path}.gamepad must be a list of pad codes`]),
+    ...(action.noPadReason === undefined || isFilledString(action.noPadReason)
+      ? []
+      : [`${path}.noPadReason must be a non-empty string`]),
   ]
 }
 
@@ -293,6 +310,10 @@ function isActionDefShape(action: unknown): boolean {
 function isContextList(value: unknown): boolean {
   const contexts: readonly unknown[] = INPUT_CONTEXTS
   return Array.isArray(value) && value.length > 0 && value.every((item) => contexts.includes(item))
+}
+
+function isFilledString(value: unknown): boolean {
+  return typeof value === 'string' && value !== ''
 }
 
 function isStringList(value: unknown): value is string[] {

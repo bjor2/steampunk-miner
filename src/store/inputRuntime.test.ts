@@ -411,13 +411,13 @@ describe('preferences: settings and rebinding stay local', () => {
       },
     })
     game().setPreference('flashes', false)
-    game().setBindings({ lift: { keyboard: ['KeyL'] } })
+    game().setBindings({ lift: { keyboard: ['KeyJ'] } })
     tap('zoom_out')
     await preferencesWrites()
     expect(readPreferences(file).prefs).toMatchObject({
       flashes: false,
       viewShortAxisMetres: 15,
-      bindings: { lift: { keyboard: ['KeyL'] } },
+      bindings: { lift: { keyboard: ['KeyJ'] } },
     })
   })
 
@@ -433,7 +433,7 @@ describe('preferences: settings and rebinding stay local', () => {
   it('never logs a settings change or sends it to the authority', () => {
     game().setCameraMode('fixed')
     game().togglePreference('shake')
-    game().setBindings({ lift: { keyboard: ['KeyL'] } })
+    game().setBindings({ lift: { keyboard: ['KeyJ'] } })
     expect(sink.events).toEqual([])
     expect(submitted).toEqual([])
   })

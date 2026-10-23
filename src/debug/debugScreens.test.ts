@@ -352,7 +352,7 @@ describe('debug api: presentation never reaches the session (#33 acceptance 10)'
   it('keeps settings out of the log and the commands', () => {
     const debug = createDebugApi()
     debug.ui.setPref('hintsEnabled', false)
-    debug.input.setBindings({ lift: { keyboard: ['KeyL'] } })
+    debug.input.setBindings({ lift: { keyboard: ['KeyJ'] } })
     expect(sink.events).toEqual([])
     expect(sink.commands).toEqual([])
     expect(debug.ui.getPrefs()).toMatchObject({ ok: true, prefs: { hintsEnabled: false } })

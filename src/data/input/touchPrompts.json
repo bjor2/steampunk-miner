@@ -29,7 +29,14 @@
     "use_slot_4": "slot 4",
     "use_slot_5": "slot 5",
     "use_drill_flank": "flank tile",
-    "use_drill_collar": "collar tile"
+    "use_drill_collar": "collar tile",
+    "toggle_sheet": "Close button",
+    "open_outfitter": "Outfitter tab",
+    "open_patent_office": "Patent Office tab",
+    "open_hold": "Hold tab",
+    "open_ledger": "Ledger tab",
+    "open_gearbox": "Gearbox tab",
+    "open_star_map": "star map button"
   },
   "deviceWords": {
     "keyboard": {

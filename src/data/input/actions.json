@@ -234,6 +234,69 @@
       "kind": "press",
       "keyboard": ["KeyC", "Digit7"],
       "gamepad": ["PadLT"]
+    },
+    {
+      "id": "toggle_sheet",
+      "displayName": "Sheet on/off",
+      "contexts": ["vehicle", "sheet", "pause"],
+      "kind": "press",
+      "keyboard": ["Tab"],
+      "gamepad": [],
+      "noPadReason": "a desktop key (ticket 768): a pad reaches the sheet's places through the bays and the pause menu"
+    },
+    {
+      "id": "open_outfitter",
+      "displayName": "Outfitter",
+      "contexts": ["vehicle", "platform", "sheet", "pause"],
+      "kind": "press",
+      "keyboard": ["KeyO"],
+      "gamepad": [],
+      "noPadReason": "a desktop key (ticket 768): a pad reaches the sheet's places through the bays and the pause menu"
+    },
+    {
+      "id": "open_patent_office",
+      "displayName": "Patent Office",
+      "contexts": ["vehicle", "platform", "sheet", "pause"],
+      "kind": "press",
+      "keyboard": ["KeyP"],
+      "gamepad": [],
+      "noPadReason": "a desktop key (ticket 768): a pad reaches the sheet's places through the bays and the pause menu"
+    },
+    {
+      "id": "open_hold",
+      "displayName": "Hold",
+      "contexts": ["vehicle", "platform", "sheet", "pause"],
+      "kind": "press",
+      "keyboard": ["KeyH"],
+      "gamepad": [],
+      "noPadReason": "a desktop key (ticket 768): a pad reaches the sheet's places through the bays and the pause menu"
+    },
+    {
+      "id": "open_ledger",
+      "displayName": "Ledger",
+      "contexts": ["vehicle", "platform", "sheet", "pause"],
+      "kind": "press",
+      "keyboard": ["KeyL"],
+      "gamepad": [],
+      "noPadReason": "a desktop key (ticket 768): a pad reaches the sheet's places through the bays and the pause menu"
+    },
+    {
+      "id": "open_gearbox",
+      "displayName": "Gearbox",
+      "contexts": ["platform", "sheet", "pause"],
+      "kind": "press",
+      "keyboard": ["KeyG"],
+      "gamepad": [],
+      "noPadReason": "a desktop key (ticket 768): a pad reaches the sheet's places through the bays and the pause menu"
+    },
+    {
+      "id": "open_star_map",
+      "displayName": "Star map",
+      "contexts": ["vehicle", "platform"],
+      "kind": "press",
+      "keyboard": ["KeyM"],
+      "gamepad": [],
+      "noPadReason": "a desktop key (ticket 768): a pad opens the star map from its own button (#757)"
     }
   ]
 }

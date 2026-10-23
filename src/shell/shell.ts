@@ -54,6 +54,12 @@ export interface KeyChange {
   isShiftHeld: boolean
 }
 
+/**
+ * Hears one key change and answers whether the game took it (a binding pressed in the top layer,
+ * or a rebinding capture), so the shell keeps that key's browser default from it (ticket 768).
+ */
+export type KeyListener = (key: KeyChange) => boolean
+
 /** The mouse over the game canvas, in the canvas's CSS pixels from its top-left corner. */
 export interface CanvasPointer {
   x: number
@@ -117,7 +123,7 @@ export interface Shell {
    * Reports key presses and releases, and the mouse buttons pressed on the game canvas as the
    * codes `MouseLeft`/`MouseRight` (ticket 345); returns an unsubscribe.
    */
-  onKeyChange(listener: (key: KeyChange) => void): () => void
+  onKeyChange(listener: KeyListener): () => void
   /** The mouse cursor over the game canvas; null off it, before any mouse move, or on touch. */
   readPointer(): CanvasPointer | null
   /** Reports mouse-wheel notches; returns an unsubscribe. */

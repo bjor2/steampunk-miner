@@ -3,7 +3,8 @@
  * floating stick's four drive actions, the cluster's buttons (`touchControls.ts`, #173), the tool
  * slot bar's kernel cells, Plant charge, its size step (ticket 473) and the guns toggle (ticket
  * 691), the pause button (ticket 472), the stage's double tap, and the
- * actions the kernel leaves with no touch control, each with its reason.
+ * actions the kernel leaves with no touch control, each with its reason (the desktop keys of
+ * ticket 768 among them).
  */
 import type { ActionId } from './actionMap'
 import { KERNEL_TOOL_SLOT_RULES } from './toolSlots'
@@ -14,6 +15,15 @@ const STICK_ACTION_IDS = ['lift', 'aim_down', 'aim_left', 'aim_right'] as const
 
 /** Focus moves for keys and pads; a finger taps the control itself. */
 const MENU_FOCUS_ACTION_IDS = ['ui_up', 'ui_down', 'ui_left', 'ui_right'] as const
+
+/** The desktop keys that jump to a place on the base sheet (ticket 768). */
+const SHEET_JUMP_ACTION_IDS = [
+  'open_outfitter',
+  'open_patent_office',
+  'open_hold',
+  'open_ledger',
+  'open_gearbox',
+] as const
 
 export const KERNEL_TOUCH_BINDINGS: readonly TouchBindingRule[] = [
   ...STICK_ACTION_IDS.map((action) => rowOf(`stick_${action}`, { gesture: 'drag', action })),
@@ -29,6 +39,14 @@ export const KERNEL_TOUCH_BINDINGS: readonly TouchBindingRule[] = [
     'ui_cancel',
     'every layer draws its own Back, Close, Leave, Resume or Undock button for a tap',
   ),
+  noControlRow(
+    'toggle_sheet',
+    "the sheet's Close button shuts it, and the button of the place it holds opens it",
+  ),
+  ...SHEET_JUMP_ACTION_IDS.map((action) =>
+    noControlRow(action, "a finger taps the place's tab on the sheet's bar itself"),
+  ),
+  noControlRow('open_star_map', "the star map's own button opens it (#757)"),
 ]
 
 function rowOf(control: string, touch: TouchBindingRule['touch']): TouchBindingRule {

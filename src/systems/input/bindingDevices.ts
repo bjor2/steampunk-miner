@@ -1,8 +1,8 @@
 /**
  * The devices a binding names (#33 section 2; ticket 346 adds the pad): each action lists its
  * chords per device in its own field, `keyboard` or `gamepad`, and the same rules hold for every
- * device. A chord must be one the device knows, an action needs at least one, and two actions live
- * in one context never share one. Device-agnostic on purpose, so a key and a pad button are
+ * device. A chord must be one the device knows, an action needs at least one (or, for the pad, a
+ * `noPadReason`, ticket 768), and two actions live in one context never share one. Device-agnostic on purpose, so a key and a pad button are
  * checked, rebound and refused alike.
  */
 import { isKnownKeyChord } from './keyCodes'
@@ -29,10 +29,12 @@ export const BINDING_DEVICES: readonly BindingDevice[] = [
   },
 ]
 
-/** What the checks read of an action: its id, its layers and its chords per device. */
-export type BoundAction = { id: string; contexts: readonly string[] } & Readonly<
-  Record<BindingField, readonly string[]>
->
+/** What the checks read of an action: its id, its layers, its chords per device and why it has no pad. */
+export type BoundAction = {
+  id: string
+  contexts: readonly string[]
+  noPadReason?: string
+} & Readonly<Record<BindingField, readonly string[]>>
 
 /** Unknown chords, an empty action, and one chord on two actions live in one context. */
 export function deviceBindingProblems(
@@ -43,10 +45,16 @@ export function deviceBindingProblems(
   return [
     ...actions.flatMap((action) => unknownChordProblems(action, device)),
     ...actions
-      .filter((action) => action[device.field].length === 0)
+      .filter((action) => isUnboundWithoutReason(action, device.field))
       .map((action) => `${action.id} has no ${device.boundNoun} bound`),
     ...contexts.flatMap((context) => duplicateChordProblems(actions, context, device.field)),
   ]
+}
+
+/** An empty chord list, unless it is the pad's and the action says why (ticket 768). */
+function isUnboundWithoutReason(action: BoundAction, field: BindingField): boolean {
+  if (action[field].length > 0) return false
+  return field !== 'gamepad' || action.noPadReason === undefined
 }
 
 function unknownChordProblems(action: BoundAction, device: BindingDevice): string[] {

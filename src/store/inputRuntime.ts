@@ -75,21 +75,25 @@ const actionStream: ActionEdge[] = []
  * One key from the shell: a rebinding capture, or the actions its chord has in the top layer.
  * Any key also takes a shown transmission down (#16), hides the touch controls until the next
  * touch (#173) and starts a scenario waiting for play (ticket 301), and still does what it is
- * bound to.
+ * bound to. Answers whether the game took the key (ticket 768), a held key's repeats too, so the
+ * shell keeps the browser's default of a key the game uses.
  */
-export function routeKeyChange(key: KeyChange): void {
+export function routeKeyChange(key: KeyChange): boolean {
   rememberCode(key.code, key.isDown)
   if (!key.isDown) return releaseKey(key.code)
   noticePlayFromDevice()
   if (useGameStore.getState().rebindingActionId !== null) return captureRebinding(key)
-  if (key.isRepeat) return
-  pressKey(key.code, actionsOfKeyNow(key))
+  if (key.isRepeat) return actionsOfKeyNow(key).length > 0
+  return pressKey(key.code, actionsOfKeyNow(key))
 }
 
 /** One pad input from `padRuntime`, as a key: a rebinding capture, or the actions its chord has. */
 export function routePadChange(pad: PadChange): void {
   rememberCode(pad.code, pad.isDown)
-  if (!pad.isDown) return releaseKey(pad.code)
+  if (!pad.isDown) {
+    releaseKey(pad.code)
+    return
+  }
   noticePlayFromDevice()
   if (useGameStore.getState().rebindingActionId !== null) return capturePadRebinding(pad)
   pressKey(pad.code, actionsOfPadNow(pad))
@@ -205,15 +209,19 @@ function recordEdge(actionId: ActionId, isDown: boolean): void {
   if (actionStream.length > KEPT_ACTION_EDGES) actionStream.shift()
 }
 
-function pressKey(code: string, actions: readonly ActionId[]): void {
+/** Presses the key's actions; whether it had any. */
+function pressKey(code: string, actions: readonly ActionId[]): boolean {
   actionsOfKey.set(code, [...actions])
   actions.forEach(pressAction)
+  return actions.length > 0
 }
 
-function releaseKey(code: string): void {
+/** Releases what the key pressed; a key coming up is never the game's to keep. */
+function releaseKey(code: string): false {
   const pressed = actionsOfKey.get(code) ?? []
   actionsOfKey.delete(code)
   pressed.forEach(releaseAction)
+  return false
 }
 
 /** Shift+Tab when bound, else the plain key, so Shift never blocks a driving key. */
@@ -240,10 +248,12 @@ function actionsOfPadNow(pad: PadChange): ActionId[] {
     : actionsOfChord(ACTION_MAP, game.padBindings, layer, pad.code)
 }
 
-function captureRebinding(key: KeyChange): void {
+/** The key becomes the binding, or Escape cancels; the game takes it either way. */
+function captureRebinding(key: KeyChange): true {
   const game = useGameStore.getState()
-  if (key.code === CANCEL_REBINDING_KEY) return game.cancelRebinding()
-  game.rebindToChord(chordOf(key.code, key.isShiftHeld))
+  if (key.code === CANCEL_REBINDING_KEY) game.cancelRebinding()
+  else game.rebindToChord(chordOf(key.code, key.isShiftHeld))
+  return true
 }
 
 function capturePadRebinding(pad: PadChange): void {
@@ -287,4 +297,6 @@ function applyReaction(reaction: InputReaction): void {
   else if (reaction.kind === 'zoom') game.zoom(reaction.change)
   else if (reaction.kind === 'chooseChargeSize') game.chooseChargeSize(reaction.size)
   else if (reaction.kind === 'showTitlePage') game.showTitlePage(reaction.page)
+  else if (reaction.kind === 'toggleSheet') game.toggleSheet()
+  else if (reaction.kind === 'openSheetAtPlace') game.openSheetAtPlace(reaction.place)
 }
