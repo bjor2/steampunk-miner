@@ -4,11 +4,13 @@
  * cargo chain, the heat above 60% and the depth and core), one number (the money on the brass
  * odometer on the surface with the next-upgrade chip beside it, the depth underground), the
  * money's float-up, and the status icons. Every exact value and word is in the detail behind the
- * gear button; on desktop a dial also shows its number on a hover or a tap. Desktop also keeps
+ * gear button; on desktop a dial also shows its number on a hover or a tap, and a resting mouse
+ * shows a dial's, the money's or the chip's full value in the long mode (ticket 768). Desktop keeps
  * the star map's fuel wells beside the dials and tints the depth while gravity limits the descent
  * (ticket 767). Drawn from `hudStripOf`, `gaugeClusterOf` and `desktopStripSlotsOf`; markup only.
  */
 import { hudLabelIconIdOf } from '../../systems/art/icons/iconSet'
+import { longPriceOfExact, stripNumberLongTextOf } from '../../systems/views/hoverValues'
 import { readoutTextOf } from '../../systems/views/hudCallouts'
 import type { DesktopStripSlots } from '../../systems/views/desktopStripSlots'
 import type { HudModel } from '../../systems/views/hudModel'
@@ -18,7 +20,9 @@ import { chipWordsOf, type NextUpgradeChip } from '../../systems/views/nextUpgra
 import type { AmountReading } from '../../systems/views/viewParts'
 import { UI_IDS } from '../ids'
 import { Odometer } from '../kit/Odometer'
+import { HoverPlate } from '../kit/HoverPlate'
 import { TitleOneLine } from '../kit/TitleOneLine'
+import { useMouseHover } from '../kit/useMouseHover'
 import { DialCluster } from './DialCluster'
 import { FuelWells } from './FuelWells'
 import { hudBoxOf } from './hudBoxes'
@@ -84,8 +88,9 @@ function StripNumberReadout({
   money: AmountReading
   isGravityLimited: boolean
 }) {
+  const hover = useMouseHover()
   return (
-    <div className={styles.number}>
+    <div className={styles.number} {...hover.handlers}>
       <TitleOneLine
         text={NUMBER_TEXTS[number.kind]}
         iconId={NUMBER_ICON_IDS[number.kind]}
@@ -101,6 +106,13 @@ function StripNumberReadout({
         )}
         <MoneyFloatUp exact={money.exact} />
       </TitleOneLine>
+      {hover.isHovered && (
+        <HoverPlate
+          id={`strip:${number.kind}`}
+          lines={[stripNumberLongTextOf(number)]}
+          side="below"
+        />
+      )}
     </div>
   )
 }
@@ -130,7 +142,7 @@ function DepthText({
  * away" under it, as a dial reveals its number.
  */
 function UpgradeChip({ chip }: { chip: NextUpgradeChip }) {
-  const { isRevealed, handlers } = useDialReveal()
+  const { isRevealed, isHovered, handlers } = useDialReveal()
   const words = chipWordsOf(chip)
   return (
     <div
@@ -158,6 +170,14 @@ function UpgradeChip({ chip }: { chip: NextUpgradeChip }) {
         <span className={styles.chipHover} data-chip-hover>
           {words.hoverLine}
         </span>
+      )}
+      {isHovered && (
+        <HoverPlate
+          id="strip:next-upgrade"
+          lines={[longPriceOfExact(chip.price.exact)]}
+          side="below"
+          align="end"
+        />
       )}
     </div>
   )

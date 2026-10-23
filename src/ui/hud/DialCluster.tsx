@@ -4,7 +4,8 @@
  * glass frame, then the overflow count. Each dial is the baked face with its needle turned over
  * it, the depth dial's band and core marks, the reading's glyph in the face's open foot and the
  * cargo chain's badge; never a number until a hover or a tap reveals it (`useDialReveal`). Its name
- * is the shared element's title, out of sight, so assistive tech reads it. A pip on the rim, and
+ * is the shared element's title, out of sight, so assistive tech reads it. A resting mouse also
+ * shows the full value under the dial in the formatter's long mode (ticket 768). A pip on the rim, and
  * one under the "+N" for the dials it folds, steps one notch per upgrade bought (ticket 727), with
  * no ease, so it moves on the render the buy reaches. On desktop, where the dials outgrow the
  * strip, the "+N" is a button that turns it to the next page of them (ticket 767). Markup only.
@@ -24,6 +25,7 @@ import type { DialReadingKind } from '../../systems/views/gaugeClusterTable'
 import type { DepthMarker } from '../../systems/views/depthDial'
 import type { BuyCueMark } from '../../systems/views/dialBuyCue'
 import { UI_ID_TEMPLATES, UI_IDS } from '../ids'
+import { HoverPlate } from '../kit/HoverPlate'
 import { TitleOneLine } from '../kit/TitleOneLine'
 import { VectorIcon } from '../VectorIcon'
 import { useDialReveal } from './useDialReveal'
@@ -75,7 +77,7 @@ export function DialCluster({
 }
 
 function StripDial({ face, isPulsing }: { face: DialFace; isPulsing: boolean }) {
-  const { isRevealed, handlers } = useDialReveal()
+  const { isRevealed, isHovered, handlers } = useDialReveal()
   return (
     <div
       className={styles.cell}
@@ -90,6 +92,7 @@ function StripDial({ face, isPulsing }: { face: DialFace; isPulsing: boolean }) 
         <DialMeter face={face} />
         {isRevealed && <DialNumber face={face} />}
       </TitleOneLine>
+      {isHovered && <HoverPlate id={`dial:${face.id}`} lines={[face.longText]} side="below" />}
     </div>
   )
 }

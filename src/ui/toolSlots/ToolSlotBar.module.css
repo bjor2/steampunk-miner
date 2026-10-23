@@ -56,6 +56,16 @@
   z-index: 1;
 }
 
+/*
+ * A desktop cell with its key tag and hover plate (ticket 768): the cell's own size, so the grid and
+ * the boxes stay put; the tag lies inside the corner and the plate floats over the view.
+ */
+.keyedCell {
+  position: relative;
+  width: var(--slot-cell);
+  height: var(--slot-cell);
+}
+
 /* An empty cell: nothing drawn, no box, so the next cells and the gear keep their places. */
 .well {
   width: var(--slot-cell);

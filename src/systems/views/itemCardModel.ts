@@ -81,6 +81,24 @@ export function serviceCardOf(
   return itemCardOf(state, playerId, subject)
 }
 
+/**
+ * A vehicle item's hover line as the slot's long-press card prints it (#680; ticket 768's desktop
+ * hover): the describer's flavour at the level the card asks, null with no describer or line.
+ */
+export function vehicleItemHoverLineOf(
+  state: AuthorityState,
+  playerId: string,
+  itemId: string,
+): string | null {
+  if (!isItemDescriberRegistered()) return null
+  const view = itemSnapshotViewOf(state, playerId)
+  const description = describeItem(
+    { kind: 'vehicle-item', id: itemId },
+    { playerId, planetIndex: view.planetIndex, level: 0, view },
+  )
+  return description?.flavour ?? null
+}
+
 function describeSubject(
   state: AuthorityState,
   playerId: string,

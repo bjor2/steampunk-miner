@@ -6,7 +6,8 @@
  * the bottom right, lifted over the cluster while the touch controls show. Every cell is drawn by
  * the kernel (`ToolCell`); a row's own cell adds what rides it. The overflow cell turns the cells
  * through the tray in place; the page is the store's, since the number keys follow it (ticket
- * 768). With no tool shown only the gear is drawn. Mirrored for the left hand.
+ * 768). On desktop each cell also wears its key's brass tag and shows its hover plate (ticket 768).
+ * With no tool shown only the gear is drawn. Mirrored for the left hand.
  */
 import { useGameStore } from '../../store/gameStore'
 import { DESIGN_TOKENS, type LayoutKind } from '../../systems/views/designSystem'
@@ -19,6 +20,7 @@ import {
 import { HudGearButton } from '../hud/HudGearButton'
 import { UI_IDS } from '../ids'
 import { useScreenModel } from '../useScreenModel'
+import { DesktopToolCell } from './DesktopToolCell'
 import { OverflowCell } from './OverflowCell'
 import { ShownToolCell } from './ShownToolCell'
 import { readShownTools } from './toolSlotReads'
@@ -57,7 +59,12 @@ export function ToolSlotBarView({
       data-raised={isRaised || undefined}
       data-over-cluster={isOverCluster || undefined}
     >
-      <ToolCells layout={layout} kind={kind} onTurnTray={turnToolTray} />
+      <ToolCells
+        layout={layout}
+        kind={kind}
+        align={isLeftHanded ? 'start' : 'end'}
+        onTurnTray={turnToolTray}
+      />
       <HudGearButton isOpen={isDetailOpen} />
     </div>
   )
@@ -67,10 +74,12 @@ export function ToolSlotBarView({
 function ToolCells({
   layout,
   kind,
+  align,
   onTurnTray,
 }: {
   layout: ToolBarLayout | null
   kind: LayoutKind
+  align: 'start' | 'end'
   onTurnTray: (page: number) => void
 }) {
   const cells = layout?.cells ?? emptyCellsOf(kind)
@@ -81,7 +90,7 @@ function ToolCells({
         tool === null ? (
           <span key={`well-${index}`} className={styles.well} />
         ) : (
-          <ShownToolCell key={tool.rowId} tool={tool} />
+          <ToolCellOf key={tool.rowId} tool={tool} kind={kind} cell={index + 1} align={align} />
         ),
       )}
       {tray === null ? (
@@ -91,6 +100,22 @@ function ToolCells({
       )}
     </>
   )
+}
+
+/** Desktop adds the key tag and the hover plate (ticket 768); a phone draws the cell alone. */
+function ToolCellOf({
+  tool,
+  kind,
+  cell,
+  align,
+}: {
+  tool: ShownTool
+  kind: LayoutKind
+  cell: number
+  align: 'start' | 'end'
+}) {
+  if (kind === 'phone') return <ShownToolCell tool={tool} />
+  return <DesktopToolCell tool={tool} cell={cell} align={align} />
 }
 
 function turnToolTray(page: number): void {

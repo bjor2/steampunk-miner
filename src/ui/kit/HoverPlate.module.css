@@ -1,0 +1,23 @@
+/*
+ * The hover plate (ticket 768): the brass tooltip's plate, placed above or below its control and
+ * held to its start or end edge, so a plate on the bottom-right bar opens up and inwards. Figures
+ * are tabular, so a full value lines up as it changes; a long line wraps inside the plate's width.
+ */
+.plate {
+  composes: plate from './Tooltip.module.css';
+  font-variant-numeric: tabular-nums;
+}
+
+.plate[data-side='above'] {
+  top: auto;
+  bottom: calc(100% + var(--space-1));
+}
+
+.plate[data-align='end'] {
+  right: 0;
+  left: auto;
+}
+
+.line {
+  display: block;
+}

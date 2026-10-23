@@ -33,6 +33,8 @@ export interface ToolFace {
   isOn: boolean
   /** Winding up or channelling now. */
   isActing: boolean
+  /** The vehicle item the cell uses, whose hover line a desktop hover shows (ticket 768). */
+  itemId?: string
 }
 
 export interface ToolSlotRule<F extends ToolFace = ToolFace> extends TouchBindingRule {

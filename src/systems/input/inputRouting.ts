@@ -46,6 +46,7 @@ import type { SheetPlace } from '../views/sheetPlaces'
 import type { TitleMenu, TitleMenuPage } from '../views/titleMenuModel'
 import type { BayId } from '../world/dockBays'
 import type { ActionId, InputContext } from './actionMap'
+import { SHEET_PLACE_ACTIONS } from './sheetPlaceKeys'
 
 export type InputReaction =
   | { kind: 'submit'; intent: CommandIntent }
@@ -123,11 +124,12 @@ const MENU_REACTIONS: Readonly<Partial<Record<ActionId, ReactionRule>>> = {
  */
 const SHEET_KEY_REACTIONS: Readonly<Partial<Record<ActionId, ReactionRule>>> = {
   toggle_sheet: () => ({ kind: 'toggleSheet' }),
-  open_outfitter: () => openSheetAt('outfitter'),
-  open_patent_office: () => openSheetAt('patentOffice'),
-  open_hold: () => openSheetAt('hold'),
-  open_ledger: () => openSheetAt('ledger'),
-  open_gearbox: () => openSheetAt('gearbox'),
+  ...Object.fromEntries(
+    Object.entries(SHEET_PLACE_ACTIONS).map(([place, action]) => [
+      action,
+      () => openSheetAt(place as SheetPlace),
+    ]),
+  ),
 }
 
 const REACTIONS_BY_LAYER: Readonly<

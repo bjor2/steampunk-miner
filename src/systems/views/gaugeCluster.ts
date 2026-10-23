@@ -32,6 +32,7 @@ import {
   type StripPlace,
 } from './gaugeClusterTable'
 import type { CargoReading, GaugeReading, HudModel } from './hudModel'
+import { longAmountOfExact } from './hoverValues'
 import { depthStripTextOf, isOnSurfaceOf } from './hudStrip'
 import { ladderTierOf, type LadderTier } from './warningLadder'
 
@@ -58,6 +59,8 @@ export interface DialFace {
   /** The number a hover or a tap reveals. */
   text: string
   exact: string
+  /** The full value a desktop hover shows beside it, in the formatter's long mode (ticket 768). */
+  longText: string
   /** The cargo chain's link count past the rig's own hold; null with one link. */
   badge: string | null
   /** The depth dial's band and core marks; none on the others. */
@@ -91,7 +94,15 @@ export interface DialPaging {
 
 type FaceReading = Pick<
   DialFace,
-  'iconId' | 'needlePermille' | 'leftPermille' | 'text' | 'exact' | 'badge' | 'markers' | 'isHeld'
+  | 'iconId'
+  | 'needlePermille'
+  | 'leftPermille'
+  | 'text'
+  | 'exact'
+  | 'longText'
+  | 'badge'
+  | 'markers'
+  | 'isHeld'
 >
 
 const PERMILLE = 1000
@@ -274,6 +285,7 @@ function depthReadingOf(model: HudModel, tokens: DesignTokens): FaceReading {
     leftPermille: PERMILLE,
     text: depthStripTextOf(depthTiles, tokens),
     exact: String(depthTiles),
+    longText: `${longAmountOfExact(String(depthTiles))} m`,
     badge: null,
     markers: dial.markers,
     isHeld: false,
@@ -286,6 +298,7 @@ function plainFaceOf(gauge: GaugeReading, fill: number): Omit<FaceReading, 'left
     needlePermille: fill,
     text: gauge.text,
     exact: gauge.exact,
+    longText: longAmountOfExact(gauge.exact),
     badge: null,
     markers: NO_MARKERS,
     isHeld: false,

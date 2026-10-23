@@ -62,13 +62,19 @@ const openingOn = (tabId: string): SheetShutter => ({
 })
 
 /** The base sheet as the store would draw it at `placement` with `tabId` open. */
-function sheetHtml(slice: SliceDefinition, tabId: string, shownTabIds: readonly string[]) {
+function sheetHtml(
+  slice: SliceDefinition,
+  tabId: string,
+  shownTabIds: readonly string[],
+  keyLabels?: Readonly<Record<string, string>>,
+) {
   return withRegistrations([slice], () =>
     renderToString(
       createElement(BaseSheetView, {
         placement: 'full',
         shutter: openingOn(tabId),
         shownTabIds,
+        keyLabels,
         onSelectTab: () => undefined,
         onClose: () => undefined,
       }),
@@ -119,6 +125,21 @@ describe('base sheet', () => {
     expect(html).toContain('data-sheet-close')
     expect(html).toContain('data-sheet-card="sheet-probe.drill"')
     expect(html).toContain('data-scroll-area')
+  })
+
+  it('tags a tab with the brass key that jumps to it on desktop (ticket 768)', () => {
+    const html = sheetHtml(PROBE, 'sheet-probe.ledger', PROBE_TABS, {
+      'sheet-probe.outfitter': 'O',
+      'sheet-probe.ledger': 'L',
+    })
+    expect(html).toMatch(
+      /data-sheet-tab="sheet-probe.outfitter"[^>]*>Outfitter<kbd[^>]*data-key-tag="O"/,
+    )
+    expect(html).toContain('data-key-tag="L"')
+  })
+
+  it('draws no key tag where none is given, as on a phone (ticket 768)', () => {
+    expect(sheetHtml(PROBE, 'sheet-probe.ledger', PROBE_TABS)).not.toContain('data-key-tag')
   })
 
   it('lays the tab bar in the shared scroll area sideways, the one place a row may scroll', () => {
@@ -202,6 +223,7 @@ describe('sheet styles', () => {
     sheetOf('../kit/Sheet.module.css'),
     sheetOf('../kit/SheetCard.module.css'),
     sheetOf('../kit/SheetTabBar.module.css'),
+    sheetOf('../kit/KeyTag.module.css'),
   ]
 
   it('keeps every text at a type token, none under the 14 px floor', () => {

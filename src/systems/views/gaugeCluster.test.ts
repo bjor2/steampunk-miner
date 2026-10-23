@@ -102,6 +102,14 @@ describe('gauge cluster dials (ticket 716)', () => {
     expect(hull?.exact).toBe(model.hull.exact)
   })
 
+  it('carries the full value a desktop hover shows, in the long mode, the depth in metres (ticket 768)', () => {
+    const session = createScriptedSession()
+    session.submit(0, setHullCommand('56.7891'))
+    const dials = gaugeClusterOf(hudOf(session, 12_345), 'desktop').dials
+    expect(dialOf(dials, 'hull')?.longText).toBe('56.789')
+    expect(dialOf(dials, 'depth')?.longText).toBe('12,345 m')
+  })
+
   it('reads the cargo chain by the room left, so a full hold is red', () => {
     const model = hudOf(createScriptedSession(), RUN_DEPTH)
     const full = { ...model, cargo: { ...model.cargo, permille: 1000, isFull: true } }
