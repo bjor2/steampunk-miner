@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-10-23T11:13:34+02:00",
+  "updated_at": "2026-10-23T11:19:25+02:00",
   "caps": {
     "grok": 12,
     "claude": 10,
@@ -90,11 +90,12 @@
         },
         {
           "slot": "C8",
-          "state": "free",
+          "state": "busy",
           "ticket": null,
           "grok_slot": null,
-          "kind": null,
-          "since": null
+          "kind": "aux",
+          "since": "2026-10-23T11:18:00+02:00",
+          "label": "wave-plan 647"
         },
         {
           "slot": "C9",
@@ -114,14 +115,14 @@
         }
       ],
       "size": 4,
-      "used": 1,
-      "free": 3,
-      "claims_last_hour": 1,
+      "used": 2,
+      "free": 2,
+      "claims_last_hour": 3,
       "name": "Claude Max 2"
     }
   ],
   "gate": {
-    "busy": 1,
+    "busy": 2,
     "max": 3
   },
   "tester": {
@@ -309,10 +310,12 @@
     },
     {
       "slot": 8,
-      "state": "free",
+      "state": "busy",
       "ticket": null,
       "grok_slot": null,
-      "since": null,
+      "since": "2026-10-23T11:18:00+02:00",
+      "kind": "aux",
+      "label": "wave-plan 647",
       "account": 2
     },
     {
@@ -333,11 +336,11 @@
     }
   ],
   "last_refill": {
-    "at": "2026-10-23 10:42 CEST",
+    "at": "2026-10-23 11:19 CEST",
     "mode": "refill-dev",
-    "triggers": "#752",
+    "triggers": "claude-run:wave-plan",
     "started": "",
-    "note": "load guard (MemAvailable 2611 MB < 3072 MB)"
+    "note": "no pickable build ticket"
   },
   "totals": {
     "grok": {
@@ -351,8 +354,8 @@
     "claude": {
       "size": 10,
       "enabled": 4,
-      "used": 1,
-      "free": 3,
+      "used": 2,
+      "free": 2,
       "external": 0
     }
   },
@@ -361,54 +364,55 @@
     "parallel": 1,
     "list": [
       {
-        "number": 751,
-        "key": "647-4E",
+        "number": 760,
+        "key": "647-5C",
         "map": 647,
         "lane": "remote",
         "mode": "solo",
         "state": "ready",
         "tickets": [
-          749,
-          750
+          754,
+          755,
+          756,
+          757
         ],
         "done": [],
         "live": 0
       },
       {
-        "number": 748,
-        "key": "647-4D",
+        "number": 751,
+        "key": "647-5B",
         "map": 647,
         "lane": "remote",
         "mode": "solo",
-        "state": "ready",
+        "state": "blocked",
         "tickets": [
-          746
+          749,
+          750,
+          758,
+          759
         ],
         "done": [],
         "live": 0
       },
       {
         "number": 740,
-        "key": "647-4A",
+        "key": "647-5A",
         "map": 647,
         "lane": "remote",
         "mode": "solo",
         "state": "paused",
         "tickets": [
-          744,
           713,
-          738,
-          741
+          741,
+          746
         ],
-        "done": [
-          744,
-          738
-        ],
+        "done": [],
         "live": 0
       },
       {
         "number": 715,
-        "key": "647-4F",
+        "key": "647-5D",
         "map": 647,
         "lane": "hitl",
         "mode": "bench",
