@@ -1027,7 +1027,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/economy/oreEconomy.test.ts` | 7 | 7 |
 | `src/systems/economy/perPurchaseRows.test.ts` | 40 | 21 |
 | `src/systems/economy/planetCharges.test.ts` | 17 | 13 |
-| `src/systems/economy/readEconomy.test.ts` | 24 | 24 |
+| `src/systems/economy/readEconomy.test.ts` | 25 | 25 |
 | `src/systems/economy/refineryEconomy.test.ts` | 6 | 6 |
 | `src/systems/economy/trackKind.test.ts` | 1 | 1 |
 | `src/systems/economy/travelCharge.test.ts` | 7 | 7 |
@@ -1441,6 +1441,14 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/snapshots/heapThreshold.test.ts` | 7 | 7 |
 | `src/systems/snapshots/planetChange.test.ts` | 3 | 3 |
 | `src/systems/snapshots/saveSnapshotCadence.test.ts` | 1 | 1 |
+
+### `starMap`
+
+| File | Tests | Sites |
+| --- | --- | --- |
+| `src/systems/starMap/campaignIndex.test.ts` | 6 | 6 |
+| `src/systems/starMap/planetAddress.test.ts` | 2 | 2 |
+| `src/systems/starMap/planetAddressSeed.test.ts` | 6 | 6 |
 
 ### `store`
 
