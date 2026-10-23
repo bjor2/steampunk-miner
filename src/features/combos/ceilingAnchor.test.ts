@@ -49,20 +49,35 @@ function upCellAfterDrill(
   return densityOf(session.state().world, cell)
 }
 
+/**
+ * A rig with no gear and no anchor: what the bore alone leaves of a cell. Since ticket 662 a pose
+ * report's 1.2 m bore runs on 0.55 m along its facing and takes a few density steps from the
+ * corner of the up-diagonal cell, the bore's cut and never the anchor's, so "nothing upward" is
+ * read against it rather than the untouched cell.
+ */
+function bareSession() {
+  return anchorSession({ slots: {}, owned: [], isAnchored: false })
+}
+
+/** The up-diagonal cell after the same drill on a rig with no gear and no anchor. */
+function boreAloneAfterDrill(x: -1 | 0 | 1, cell: TilePoint) {
+  return upCellAfterDrill(bareSession(), x, cell)
+}
+
 describe('ceiling anchor: the up-cut', () => {
   it('cuts the up-diagonal cell on the side pushed at least halfway while anchored', () => {
     expect(signOfPush(0.5)).toBe(1)
     expect(upCellAfterDrill(anchorSession(), signOfPush(0.5), UP_RIGHT)).toBeLessThan(
-      freshDensityOf(UP_RIGHT),
+      boreAloneAfterDrill(signOfPush(0.5), UP_RIGHT),
     )
     expect(upCellAfterDrill(anchorSession(), signOfPush(-0.5), UP_LEFT)).toBeLessThan(
-      freshDensityOf(UP_LEFT),
+      boreAloneAfterDrill(signOfPush(-0.5), UP_LEFT),
     )
   })
 
   it('cuts nothing upward with the same input while not anchored', () => {
     const session = anchorSession({ isAnchored: false })
-    expect(upCellAfterDrill(session, 1, UP_RIGHT)).toBe(freshDensityOf(UP_RIGHT))
+    expect(upCellAfterDrill(session, 1, UP_RIGHT)).toBe(boreAloneAfterDrill(1, UP_RIGHT))
   })
 
   it('cuts nothing upward lifting with no side pushed: no straight-up turn', () => {
@@ -70,16 +85,16 @@ describe('ceiling anchor: the up-cut', () => {
     const session = anchorSession()
     drillAt(session, 3 + DRILL_TICKS, { x: signOfPush(0.4), y: 1 }, { drillTicks: DRILL_TICKS })
     const world = session.state().world
-    expect(densityOf(world, UP_RIGHT)).toBe(freshDensityOf(UP_RIGHT))
-    expect(densityOf(world, UP_LEFT)).toBe(freshDensityOf(UP_LEFT))
+    expect(densityOf(world, UP_RIGHT)).toBe(boreAloneAfterDrill(signOfPush(0.4), UP_RIGHT))
+    expect(densityOf(world, UP_LEFT)).toBe(boreAloneAfterDrill(signOfPush(0.4), UP_LEFT))
     expect(session.vehicle().aheadLatch?.bearing).toBe('facing')
   })
 
   it('cuts nothing upward for a player without the combo or without the twin bit', () => {
     const unowned = anchorSession({ owned: [] })
-    expect(upCellAfterDrill(unowned, 1, UP_RIGHT)).toBe(freshDensityOf(UP_RIGHT))
+    expect(upCellAfterDrill(unowned, 1, UP_RIGHT)).toBe(boreAloneAfterDrill(1, UP_RIGHT))
     const noBit = anchorSession({ slots: { 'powerup.1': GRAV_ANCHOR }, owned: [CEILING_ANCHOR_ID] })
-    expect(upCellAfterDrill(noBit, 1, UP_RIGHT)).toBe(freshDensityOf(UP_RIGHT))
+    expect(upCellAfterDrill(noBit, 1, UP_RIGHT)).toBe(boreAloneAfterDrill(1, UP_RIGHT))
   })
 
   it("never grants the up-cut through another player's anchor", () => {
@@ -89,7 +104,7 @@ describe('ceiling anchor: the up-cut', () => {
     setUpAnchorRig(session, { playerId: 'p1', isAnchored: false })
     expect(vehicleMotionAt(session.state(), 'p2', 2).isClinging).toBe(true)
     drillAt(session, 3 + DRILL_TICKS, lifting(1), { drillTicks: DRILL_TICKS })
-    expect(densityOf(session.state().world, UP_RIGHT)).toBe(freshDensityOf(UP_RIGHT))
+    expect(densityOf(session.state().world, UP_RIGHT)).toBe(boreAloneAfterDrill(1, UP_RIGHT))
     const theirs = aheadCellOf(beside, FACING.up, 'right')
     drillAt(session, 3 + DRILL_TICKS, lifting(1), {
       drillTicks: DRILL_TICKS,
@@ -99,6 +114,7 @@ describe('ceiling anchor: the up-cut', () => {
     expect(densityOf(session.state().world, theirs)).toBeLessThan(freshDensityOf(theirs))
   })
 
+  // After the anchor lets go the cell loses only what the bore alone takes from it on that report.
   it('stops the up-cut on the tick the anchor lets go, the cell keeping its progress', () => {
     const session = anchorSession()
     drillAt(session, 7, lifting(1), { drillTicks: 4 })
@@ -108,10 +124,19 @@ describe('ceiling anchor: the up-cut', () => {
     session.submit(8, toggleAnchor())
     expect(vehicleMotionAt(session.state(), 'p1', 8).isClinging).toBe(false)
     drillAt(session, 12, lifting(1), { drillTicks: 4 })
-    expect(densityOf(session.state().world, UP_RIGHT)).toBe(started)
+    expect(densityOf(session.state().world, UP_RIGHT)).toBe(started - boreAloneSecondCutOf())
     expect(session.vehicle().aheadLatch?.bearing).toBe('facing')
   })
 })
+
+/** What the bore alone takes from the up-right cell on the second of the release spec's drills. */
+function boreAloneSecondCutOf(): number {
+  const bare = bareSession()
+  drillAt(bare, 7, lifting(1), { drillTicks: 4 })
+  const first = densityOf(bare.state().world, UP_RIGHT)
+  drillAt(bare, 12, lifting(1), { drillTicks: 4 })
+  return first - densityOf(bare.state().world, UP_RIGHT)
+}
 
 /** Only what the combo's source reads: the two items, the twin bit's ask and a clinging rig. */
 const ANCHOR_PROBES: readonly SliceDefinition[] = [
