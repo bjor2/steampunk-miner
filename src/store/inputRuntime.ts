@@ -289,6 +289,7 @@ function situationNow(): InputSituation {
     plantableChargeSize:
       plantRefusal(state, game.playerId, sizeToPlant) === null ? sizeToPlant : null,
     nextChargeSize: nextChargeSizeOf(charges, game.chosenChargeSize),
+    isStarMapOpen: game.isStarMapOpen,
     state,
     playerId: game.playerId,
   }
@@ -311,4 +312,6 @@ function applyReaction(reaction: InputReaction): void {
   else if (reaction.kind === 'showTitlePage') game.showTitlePage(reaction.page)
   else if (reaction.kind === 'toggleSheet') game.toggleSheet()
   else if (reaction.kind === 'openSheetAtPlace') game.openSheetAtPlace(reaction.place)
+  else if (reaction.kind === 'toggleStarMap') game.toggleStarMap()
+  else if (reaction.kind === 'closeStarMap') game.closeStarMap()
 }

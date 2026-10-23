@@ -44,6 +44,7 @@ export function drivingIn(state: AuthorityState): InputSituation {
     gunMode: null,
     plantableChargeSize: null,
     nextChargeSize: null,
+    isStarMapOpen: false,
     state,
     playerId: 'p1',
   }

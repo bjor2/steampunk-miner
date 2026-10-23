@@ -17,6 +17,7 @@ const DRIVING: InputSituation = {
   gunMode: null,
   plantableChargeSize: null,
   nextChargeSize: null,
+  isStarMapOpen: false,
   state: START,
   playerId: 'p1',
 }
@@ -30,6 +31,7 @@ const DOCKED: InputSituation = {
   gunMode: null,
   plantableChargeSize: null,
   nextChargeSize: null,
+  isStarMapOpen: false,
   state: START,
   playerId: 'p1',
 }

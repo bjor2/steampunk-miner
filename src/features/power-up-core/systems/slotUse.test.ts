@@ -20,6 +20,7 @@ function drivingIn(session: ScriptedSession): InputSituation {
     gunMode: null,
     plantableChargeSize: null,
     nextChargeSize: null,
+    isStarMapOpen: false,
     state: session.state(),
     playerId: 'p1',
   }

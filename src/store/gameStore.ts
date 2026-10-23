@@ -155,6 +155,12 @@ import {
   type SoundUnlockValues,
 } from './soundUnlockSlice'
 import {
+  starMapPanelActionsOf,
+  STARTING_STAR_MAP,
+  type StarMapPanelActions,
+  type StarMapValues,
+} from './starMapSlice'
+import {
   STARTING_TOOL_TRAY,
   toolTrayActionsOf,
   type ToolTrayActions,
@@ -230,6 +236,8 @@ export interface GameState
     HudDetailActions,
     ToolTrayValues,
     ToolTrayActions,
+    StarMapValues,
+    StarMapPanelActions,
     TripIncomeValues,
     TripIncomeActions,
     DigRampValues,
@@ -348,6 +356,7 @@ type GameValues = Pick<
   | keyof SheetValues
   | keyof HudDetailValues
   | keyof ToolTrayValues
+  | keyof StarMapValues
   | keyof TripIncomeValues
   | keyof DigRampValues
   | keyof WarningValues
@@ -383,6 +392,7 @@ export const STARTING_VALUES: GameValues = {
   ...STARTING_SHEET,
   ...STARTING_HUD_DETAIL,
   ...STARTING_TOOL_TRAY,
+  ...STARTING_STAR_MAP,
   ...STARTING_TRIP_INCOME,
   ...STARTING_DIG_RAMP,
   ...STARTING_WARNINGS,
@@ -415,6 +425,7 @@ export const useGameStore = create<GameState>()((set, get) => ({
   ...sheetActionsOf(set, get),
   ...hudDetailActionsOf(set, get),
   ...toolTrayActionsOf(set),
+  ...starMapPanelActionsOf(set, get),
   ...tripIncomeActionsOf(set, get),
   ...digRampActionsOf(set, get),
   ...warningActionsOf(set, get),

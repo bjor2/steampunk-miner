@@ -13,7 +13,8 @@
  * screen, the sheet, then the platform screen (that is
  * `Undock`), and in `vehicle` it opens the pause menu. On desktop Tab opens and shuts the sheet
  * from driving, the sheet or the Ledger (a bay's screen keeps Tab for its focus walk), and a
- * place's letter jumps to its tab from any of those or a bay (ticket 768). `interact` opens a live cache the
+ * place's letter jumps to its tab from any of those or a bay (ticket 768). M opens and shuts the
+ * star map's panel from driving or a bay, and while it is open Escape shuts it first (ticket 769). `interact` opens a live cache the
  * vehicle is over, else docks. An action outside its context, a dock or open the authority would
  * refuse, the quick action away from the shops (#37, #40, #170), a tow call while the vehicle can
  * still move, the guns' toggle with no guns mounted (#107), the bore gun's auto toggle before the
@@ -69,6 +70,10 @@ export type InputReaction =
   | { kind: 'toggleSheet' }
   /** A desktop letter (ticket 768): the base sheet opens on the tab of a place, if one is shown. */
   | { kind: 'openSheetAtPlace'; place: SheetPlace }
+  /** M (ticket 769): the star map's panel opens, or shuts. */
+  | { kind: 'toggleStarMap' }
+  /** Escape while the star map's panel is open (ticket 769): it shuts, and nothing else happens. */
+  | { kind: 'closeStarMap' }
   | { kind: 'none' }
 
 /** What the routing needs to know about the session; read from the authority replica. */
@@ -87,6 +92,8 @@ export interface InputSituation {
   plantableChargeSize: number | null
   /** The size `next_charge_size` steps to; null while the rack holds fewer than two sizes. */
   nextChargeSize: number | null
+  /** The star map's panel is open (ticket 769): Escape shuts it before anything else. */
+  isStarMapOpen: boolean
   /** The authority replica and the local player, for the slices' input reactions (#217). */
   state: AuthorityState
   playerId: string
@@ -109,6 +116,8 @@ export interface OpenOverlays {
 type ReactionRule = (situation: InputSituation) => InputReaction
 
 const NONE: InputReaction = { kind: 'none' }
+const TOGGLE_STAR_MAP: InputReaction = { kind: 'toggleStarMap' }
+const CLOSE_STAR_MAP: InputReaction = { kind: 'closeStarMap' }
 
 const MENU_REACTIONS: Readonly<Partial<Record<ActionId, ReactionRule>>> = {
   ui_up: () => ({ kind: 'moveFocus', step: -1 }),
@@ -150,7 +159,9 @@ const REACTIONS_BY_LAYER: Readonly<
         : submit(plantChargeCommand(situation.plantableChargeSize)),
     next_charge_size: ({ nextChargeSize }) =>
       nextChargeSize === null ? NONE : { kind: 'chooseChargeSize', size: nextChargeSize },
-    open_pause_menu: () => ({ kind: 'openPauseMenu' }),
+    open_star_map: () => TOGGLE_STAR_MAP,
+    open_pause_menu: ({ isStarMapOpen }) =>
+      isStarMapOpen ? CLOSE_STAR_MAP : { kind: 'openPauseMenu' },
     zoom_in: () => ({ kind: 'zoom', change: 'in' }),
     zoom_out: () => ({ kind: 'zoom', change: 'out' }),
     zoom_reset: () => ({ kind: 'zoom', change: 'reset' }),
@@ -159,7 +170,8 @@ const REACTIONS_BY_LAYER: Readonly<
     ...MENU_REACTIONS,
     ...SHEET_KEY_REACTIONS,
     quick_service: ({ dockedBay }) => (isShopBay(dockedBay) ? submit(quickServiceCommand()) : NONE),
-    ui_cancel: () => submit(undockCommand()),
+    open_star_map: () => TOGGLE_STAR_MAP,
+    ui_cancel: ({ isStarMapOpen }) => (isStarMapOpen ? CLOSE_STAR_MAP : submit(undockCommand())),
   },
   artefact: {
     ...MENU_REACTIONS,
