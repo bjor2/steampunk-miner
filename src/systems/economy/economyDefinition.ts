@@ -10,6 +10,7 @@ import type { CasingCementGrades } from './casingCementGrades'
 import type { MagnetCaps } from './magnetCaps'
 import type { TurretCaps } from './turretCaps'
 import type { MagneticHazardCaps } from './magneticHazardCaps'
+import type { StarMapRules } from './starMapRules'
 import type { DepthDensityCurve } from './depthDensityCurve'
 import type { SurfaceLayerRules } from './surfaceLayerRules'
 import type { BigStat, Money } from '../money'
@@ -551,4 +552,6 @@ export interface Economy {
   magnets: MagnetCaps
   /** What a magnetic planet's fields and electrified cells cost at most (#258, ticket 290). */
   magneticHazard: MagneticHazardCaps
+  /** The star map's addressing: how the campaign index advances a system (ticket 754). */
+  starMap: StarMapRules
 }

@@ -389,5 +389,8 @@
     "shockTicks": 30,
     "shockHullShareBp": 200,
     "diveHullCapBp": 2500
+  },
+  "starMap": {
+    "systemAdvance": 10
   }
 }

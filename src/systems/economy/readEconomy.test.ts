@@ -38,6 +38,12 @@ describe('economy data validation', () => {
     ])
   })
 
+  it('refuses a star map system advance that would not move the campaign index (ticket 754)', () => {
+    const broken = economyFileCopy()
+    broken.starMap.systemAdvance = 0
+    expect(problemsOf(broken)).toEqual(['starMap.systemAdvance must be 1 or more'])
+  })
+
   it('refuses a heat archetype whose bands or throttle line do not fit the gauge (#113)', () => {
     const broken = economyFileCopy()
     broken.archetypes[0].bandHeatPerSecond = ['0', '0.100']

@@ -22,6 +22,7 @@ import { readTurretCaps } from './turretCaps'
 import { readPaceScale } from './readPaceScale'
 import { readDepthDensity } from './depthDensityCurve'
 import { readSurfaceLayer } from './surfaceLayerRules'
+import { readStarMap } from './starMapRules'
 import { readUpgradeTiers } from './readUpgradeTiers'
 import { readCostCurve, readRefinery } from './readRefineryEconomy'
 import type { CostCurve, Economy, VisualTierThreshold } from './economyDefinition'
@@ -73,6 +74,7 @@ function readEconomyFields(reader: FieldReader, file: Record<string, unknown>): 
     itemHookCaps: readItemHookCaps(reader, file.itemHookCaps),
     magnets: readMagnetCaps(reader, file.magnets),
     magneticHazard: readMagneticHazardCaps(reader, file.magneticHazard),
+    starMap: readStarMap(reader, file.starMap),
   }
 }
 
