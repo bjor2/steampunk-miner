@@ -185,7 +185,7 @@ for (const cell of CELLS) {
 /** The game open, the opening transmission down by a key and, on touch, the controls up. */
 async function openBar(page: Page, cell: BarCell): Promise<string[]> {
   const errors = await openGame(page, cell)
-  await page.keyboard.press('KeyH')
+  await page.keyboard.press('KeyK')
   if (cell.isTouch) {
     await page.touchscreen.tap(cell.viewport.width / 2, cell.viewport.height * 0.2)
     await expect(page.getByTestId('touch-controls')).toBeVisible()

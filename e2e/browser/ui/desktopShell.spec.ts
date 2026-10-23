@@ -174,7 +174,7 @@ async function expectStripHeld(
 /** The debug build with the opening transmission taken down. */
 async function openPlainGame(page: Page, cell: HudLayoutCell): Promise<string[]> {
   const errors = await openGame(page, cell)
-  await page.keyboard.press('KeyH')
+  await page.keyboard.press('KeyK')
   return errors
 }
 

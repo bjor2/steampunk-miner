@@ -57,7 +57,7 @@ export async function openGame(page: Page, cell: HudLayoutCell): Promise<string[
  * get there fails here.
  */
 export async function reachWorstCase(page: Page, cell: HudLayoutCell): Promise<void> {
-  await page.keyboard.press('KeyH')
+  await page.keyboard.press('KeyK')
   if (cell.isTouch) await page.touchscreen.tap(cell.viewport.width / 2, cell.viewport.height / 2)
   await pressAction(page, 'aim_right', DRIVE_OFF_PAD_MS)
   await page.evaluate(() => {

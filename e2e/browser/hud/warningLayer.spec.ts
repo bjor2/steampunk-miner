@@ -53,7 +53,7 @@ for (const cell of CELLS) {
     }) => {
       test.setTimeout(TEST_TIMEOUT_MS)
       const errors = await openGame(page, cell)
-      await page.keyboard.press('KeyH')
+      await page.keyboard.press('KeyK')
       const stats = await vehicleStatsOf(page)
       for (const step of LADDER_STEPS) {
         await setHullShare(page, stats.hullMax, step.share)
@@ -87,7 +87,7 @@ for (const cell of CELLS) {
     }) => {
       test.setTimeout(TEST_TIMEOUT_MS)
       await openGame(page, cell)
-      await page.keyboard.press('KeyH')
+      await page.keyboard.press('KeyK')
       const stats = await vehicleStatsOf(page)
       await setHullShare(page, stats.hullMax, 0.1)
       await expectGlow(page, 'critical')
@@ -106,7 +106,7 @@ for (const cell of CELLS) {
     test('shows the status icons the layout has room for, in priority order', async ({ page }) => {
       test.setTimeout(TEST_TIMEOUT_MS)
       await openGame(page, cell)
-      await page.keyboard.press('KeyH')
+      await page.keyboard.press('KeyK')
       const stats = await vehicleStatsOf(page)
       await setHullShare(page, stats.hullMax, 0.1)
       await setEnergyShare(page, stats.energyMax, 0)

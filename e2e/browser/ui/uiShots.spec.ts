@@ -175,7 +175,7 @@ async function expectNumbersFixedWidth(page: Page): Promise<void> {
 /** The debug build with the opening transmission taken down and, on touch, the controls back. */
 async function openPlainGame(page: Page, cell: UiShotCell): Promise<string[]> {
   const errors = await openGame(page, cell)
-  await page.keyboard.press('KeyH')
+  await page.keyboard.press('KeyK')
   if (cell.isTouch) await page.touchscreen.tap(cell.viewport.width / 2, cell.viewport.height / 2)
   return errors
 }
