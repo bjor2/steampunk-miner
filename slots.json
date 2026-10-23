@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-10-23T07:46:35+02:00",
+  "updated_at": "2026-10-23T07:53:50+02:00",
   "caps": {
     "grok": 12,
     "claude": 10,
@@ -100,10 +100,10 @@
         {
           "slot": "C9",
           "state": "busy",
-          "ticket": 744,
+          "ticket": 713,
           "grok_slot": 3,
           "kind": "dev",
-          "since": "2026-10-23T06:55:00+02:00",
+          "since": "2026-10-23T07:53:00+02:00",
           "wave": "647-4A"
         },
         {
@@ -157,6 +157,15 @@
           742
         ],
         "since": "2026-10-23T07:34:27+02:00"
+      },
+      {
+        "feature": 741,
+        "kind": "spec",
+        "title": "P2–P5 per-planet gem tier (deep rares value chain)",
+        "tickets": [
+          744
+        ],
+        "since": "2026-10-23T07:53:04+02:00"
       }
     ]
   },
@@ -180,8 +189,8 @@
     {
       "slot": 3,
       "state": "dev",
-      "ticket": 744,
-      "since": "2026-10-23T06:55:00+02:00",
+      "ticket": 713,
+      "since": "2026-10-23T07:53:00+02:00",
       "claude_slot": 9,
       "wave": "647-4A"
     },
@@ -316,9 +325,9 @@
     {
       "slot": 9,
       "state": "busy",
-      "ticket": 744,
+      "ticket": 713,
       "grok_slot": 3,
-      "since": "2026-10-23T06:55:00+02:00",
+      "since": "2026-10-23T07:53:00+02:00",
       "account": 2,
       "wave": "647-4A"
     },
@@ -332,10 +341,10 @@
     }
   ],
   "last_refill": {
-    "at": "2026-10-23 07:46 CEST",
+    "at": "2026-10-23 07:53 CEST",
     "mode": "refill-dev",
-    "triggers": "claude-run:wave-plan",
-    "started": "#745->C8/A2",
+    "triggers": "#744",
+    "started": "#713->C9/A2",
     "note": "spawned 1 worker(s)"
   },
   "totals": {
@@ -398,7 +407,9 @@
           738,
           741
         ],
-        "done": [],
+        "done": [
+          744
+        ],
         "live": 1
       },
       {
