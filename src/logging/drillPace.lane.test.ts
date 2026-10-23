@@ -23,6 +23,12 @@ import {
   printedDrillPaceFindingsOf,
   type DrillPaceRun,
 } from './drillPaceBars'
+import {
+  emptyGemHaulTally,
+  gemHaulLinesOf,
+  tallyGemHaulStep,
+  type GemHaulTally,
+} from './gemHaulPace'
 import { formatNdjsonLine } from './ndjson'
 import { toFixedText } from '../systems/money'
 
@@ -48,15 +54,20 @@ const SCENARIO_FILE = new URL('../../scenarios/bot-slice.scenario.json', import.
 const REPORT_FOLDER = new URL('../../balance-report/', import.meta.url)
 const SEEDS = PACING_WORLD_SEEDS['bot-slice']
 const PLAYER_ID = 'p1'
+/** The planet whose purchases after its first gem haul the HS asked to see (ticket 741). */
+const GEM_HAUL_CHECK_PLANET = 3
 /** The schema of a drill pace history row (scripts/ci/drillPaceHistory.mjs checks it). */
 const DRILL_PACE_ROW_SCHEMA = 1
 
 describe('drill speed per purchase: the per-planet bars on the bot lane to planet 10 (#551)', () => {
   let runs: DrillPaceRun[] = []
+  let gemHauls: { worldSeed: number; gemHaul: GemHaulTally }[] = []
 
   beforeAll(() => {
     const scenario = JSON.parse(readFileSync(SCENARIO_FILE, 'utf8')) as Scenario
-    runs = SEEDS.map((worldSeed) => ({ worldSeed, tally: paceOfRun(scenario, worldSeed) }))
+    const seedRuns = SEEDS.map((worldSeed) => ({ worldSeed, ...paceOfRun(scenario, worldSeed) }))
+    runs = seedRuns.map(({ worldSeed, tally }) => ({ worldSeed, tally }))
+    gemHauls = seedRuns.map(({ worldSeed, gemHaul }) => ({ worldSeed, gemHaul }))
     console.log(reportOf(runs))
     writeRows(runs)
   }, RUN_TIMEOUT_MS)
@@ -73,7 +84,19 @@ describe('drill speed per purchase: the per-planet bars on the bot lane to plane
       ),
     )
     const findings = printedDrillPaceFindingsOf(runs)
-    console.log(['income gain per drill purchase:', ...gains, 'printed:', ...findings].join('\n'))
+    // Ticket 741 (HS on #741, done-when 5): P3's purchases after its first gem haul, beside the gated
+    // drill + tip bar, so an upgrade run that turns trivially cheap shows.
+    const afterGems = gemHaulLinesOf(gemHauls, GEM_HAUL_CHECK_PLANET)
+    console.log(
+      [
+        'income gain per drill purchase:',
+        ...gains,
+        'printed:',
+        ...findings,
+        'P3 after the first gem haul (ticket 741):',
+        ...afterGems,
+      ].join('\n'),
+    )
     expect(runs.every((run) => run.tally.purchases.length > 0)).toBe(true)
   })
 
@@ -82,9 +105,10 @@ describe('drill speed per purchase: the per-planet bars on the bot lane to plane
   it.todo('adds at most 30% drill speed for a doubled stay on any planet from P2 (grind <= 30%)')
 })
 
-/** One seed's run of the plain pacing bot, folded into its drill pace. */
+/** One seed's run of the plain pacing bot, folded into its drill pace and its gem hauls. */
 function paceOfRun(scenario: Scenario, worldSeed: number) {
   const tally = emptyDrillPaceTally()
+  const gemHaul = emptyGemHaulTally()
   const start = createAuthorityState({
     planetIndex: 1,
     planetSeed: worldSeed,
@@ -92,14 +116,17 @@ function paceOfRun(scenario: Scenario, worldSeed: number) {
   })
   const session = createBotSession(start, PLAYER_ID, {
     onCommand: () => undefined,
-    onEvents: (state, events) => tallyDrillPaceStep(tally, state, PLAYER_ID, events),
+    onEvents: (state, events) => {
+      tallyDrillPaceStep(tally, state, PLAYER_ID, events)
+      tallyGemHaulStep(gemHaul, state, events)
+    },
   })
   scenarioStartOf(scenario).forEach((intent) => session.submit(intent))
   playSliceFrom(session, botPlanetOf(session, 'blast'), {
     lastPlanet: DRILL_PACE_BARS.lastPlanet,
     maxTicks: BUDGET_TICKS,
   })
-  return tally
+  return { tally, gemHaul }
 }
 
 /** Refused, never trimmed: a broken scenario file. */

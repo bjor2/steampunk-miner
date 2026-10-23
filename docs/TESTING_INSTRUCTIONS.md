@@ -383,9 +383,13 @@ balance:report`, `oreValueCensus.lane.test.ts`.
   pacing seeds: gems only in bands 3 to 5, a cluster of each gem on every seed, the gem tier at most
   15% of each planet's ore pool value, every hop at least 1.15 with the gems in (R3), and P3's step
   from P2 inside the other hops' range, under its gems' 7.6. `generatorGolden.test.ts` holds P1 to
-  P5 under rules 13 as rules 12 made them. Pacing, income, the first two upgrades, the P3 purchase
-  cadence, the fee clamp and sold value are the Tester's: `npm run balance:report`,
-  `oreValueCensus.lane.test.ts` (the named #644 re-baseline "per-planet gem tier").
+  P5 under rules 13 as rules 12 made them. The HS's P3 purchase check: the lane
+  `drillPace.lane.test.ts` gates P3's drill + tip majors (3.5 to 7.0) and the catch-up burst with
+  the gems' income in, and prints, per seed, P3's first gem unit and the drill + tip majors and
+  purchases from it to the core (`src/logging/gemHaulPace.ts`, its fold held by
+  `gemHaulPace.test.ts`). Pacing, income, the first two upgrades, the fee clamp and sold value are
+  the Tester's: `npm run balance:report`, `drillPace.lane.test.ts`, `radiusRebaseline.lane.test.ts`
+  and `oreValueCensus.lane.test.ts` (the named #644 re-baseline "per-planet gem tier").
 - **Species audit P1 to P5** (ticket 711, spec #647): `src/features/roster/roster.speciesAudit.test.ts`
   reads each fresh planet's roster on two seeds and holds it to at least 15 species (P1 since ticket
   713's gems), no two sharing a name or a stem (the #699 rule, reading C), a sprite (silhouette +

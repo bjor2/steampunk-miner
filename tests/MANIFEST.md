@@ -1133,6 +1133,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/logging/gateClearTables.test.ts` | 7 | 7 |
 | `src/logging/gateClearTally.test.ts` | 3 | 3 |
 | `src/logging/gateRouteStalls.test.ts` | 2 | 2 |
+| `src/logging/gemHaulPace.test.ts` | 2 | 2 |
 | `src/logging/goldenSliceSections.test.ts` | 4 | 4 |
 | `src/logging/heatReport.test.ts` | 2 | 2 |
 | `src/logging/heatWorkUncappedGolden.test.ts` | 27 | 3 |
