@@ -5,6 +5,7 @@ import { WORLD_SEED } from '../authority/scriptedSession'
 import { gunMountStep } from '../economy/gunStats'
 import { ACTION_MAP } from './actionMap'
 import {
+  cellOfHotkey,
   hotkeyOfPosition,
   KERNEL_TOOL_SLOT_RULES,
   sharedPositionProblemsOf,
@@ -36,6 +37,16 @@ describe('tool slot rows', () => {
     expect(hotkeyOfPosition(1)).toBe('Digit1')
     expect(hotkeyOfPosition(8)).toBe('Digit8')
     expect(hotkeyOfPosition(9)).toBeNull()
+  })
+
+  it('reads the cell a number key reaches, and none for any other key (ticket 768)', () => {
+    expect(['Digit1', 'Digit8', 'Digit9', 'Numpad1', 'KeyX'].map(cellOfHotkey)).toEqual([
+      1,
+      8,
+      null,
+      null,
+      null,
+    ])
   })
 
   it('refuses a row at a hotkey position whose action that number key does not press', () => {

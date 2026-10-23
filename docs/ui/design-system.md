@@ -275,7 +275,9 @@ share. Layout (`toolBarLayoutOf`, `systems/views/toolSlotBar.ts`): on a phone th
 tools by position fill the thumb cells; on desktop cell n always holds position n, so `Digit1-8`
 press cells 1-8 (`Digit6/7/8` are second keys beside F, C and the fire keys). Tools past the cells
 wait behind the **overflow cell**, which turns the cells through the tray a page at a time and back,
-in place, so an open tray never leaves the reserved box. With no tool shown only the gear draws (#173
+in place, so an open tray never leaves the reserved box. Once the tray is turned the number keys
+follow the page (#768, HS on the GD lock of 23 Oct): `Digit<n>` presses the tool the page shows in
+cell n, or nothing over an empty well; the page lives in the store (`toolTrayPage`). With no tool shown only the gear draws (#173
 acceptance 3). Each cell (`ToolCell`) is an icon and a cooldown ring of `--slot-cooldown-ring`,
 never text, drawn from the face each refresh with no minimum; a tool with more than one charge adds
 the count through the shared formatter (#681). The charge size Plant charge plants rides its cell

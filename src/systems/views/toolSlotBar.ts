@@ -56,6 +56,20 @@ export function chargeBadgeTextOf({ chargesLeft, chargesMax }: ToolFace): string
   return chargesMax > 1 ? formatAmount(chargesLeft) : null
 }
 
+/**
+ * The tool in cell `cell` (1 first) of the bar as `page` lays it out, or null for an empty well or
+ * a cell past the page: what a number key presses once the tray is turned (ticket 768).
+ */
+export function toolInCellOf(
+  tools: readonly ShownTool[],
+  kind: LayoutKind,
+  page: number,
+  cell: number,
+  tokens: DesignTokens = DESIGN_TOKENS,
+): ShownTool | null {
+  return toolBarLayoutOf(tools, kind, page, tokens)?.cells[cell - 1] ?? null
+}
+
 /** The page the overflow cell turns to: the next tray page, then back to the thumb cells. */
 export function nextTrayPageOf({ page, pages }: TrayPaging): number {
   return page >= pages ? 0 : page + 1

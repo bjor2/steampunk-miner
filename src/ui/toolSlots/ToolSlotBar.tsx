@@ -5,9 +5,9 @@
  * Interact; on desktop 8 cells pressed by Digit1-8, the overflow cell and the gear in one row at
  * the bottom right, lifted over the cluster while the touch controls show. Every cell is drawn by
  * the kernel (`ToolCell`); a row's own cell adds what rides it. The overflow cell turns the cells
- * through the tray in place. With no tool shown only the gear is drawn. Mirrored for the left hand.
+ * through the tray in place; the page is the store's, since the number keys follow it (ticket
+ * 768). With no tool shown only the gear is drawn. Mirrored for the left hand.
  */
-import { useState } from 'react'
 import { useGameStore } from '../../store/gameStore'
 import { DESIGN_TOKENS, type LayoutKind } from '../../systems/views/designSystem'
 import {
@@ -47,7 +47,7 @@ export function ToolSlotBarView({
   isRaised,
   isOverCluster,
 }: ToolSlotBarProps & { tools: readonly ShownTool[]; isOverCluster: boolean }) {
-  const [page, setPage] = useState(0)
+  const page = useGameStore((state) => state.toolTrayPage)
   const layout = toolBarLayoutOf(tools, kind, page)
   return (
     <div
@@ -57,7 +57,7 @@ export function ToolSlotBarView({
       data-raised={isRaised || undefined}
       data-over-cluster={isOverCluster || undefined}
     >
-      <ToolCells layout={layout} kind={kind} onTurnTray={setPage} />
+      <ToolCells layout={layout} kind={kind} onTurnTray={turnToolTray} />
       <HudGearButton isOpen={isDetailOpen} />
     </div>
   )
@@ -91,6 +91,10 @@ function ToolCells({
       )}
     </>
   )
+}
+
+function turnToolTray(page: number): void {
+  useGameStore.getState().turnToolTray(page)
 }
 
 function emptyCellsOf(kind: LayoutKind): null[] {

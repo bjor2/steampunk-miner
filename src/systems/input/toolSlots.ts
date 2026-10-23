@@ -7,7 +7,9 @@
  * power-up slots and drill sockets, the bore gun). A new tool adds a row, never a layout.
  *
  * Positions are fixed: on desktop cell n is pressed by Digit n, so a row at a hotkey position
- * must carry that key. Nothing here touches the DOM or the store.
+ * must carry that key. Once the overflow tray is turned, the number keys follow the page shown
+ * (the HS on the GD lock of 23 Oct, ticket 768): Digit n presses whatever cell n holds there
+ * (`toolInCellOf`). Nothing here touches the DOM or the store.
  */
 import { vehicleOf, type AuthorityState } from '../authority/authorityState'
 import { chargesOf } from '../authority/charges/chargeRules'
@@ -91,6 +93,14 @@ export function actionOfToolRule(rule: ToolSlotRule): ActionId {
 export function hotkeyOfPosition(position: number): string | null {
   const isHotkeyed = position >= 1 && position <= HOTKEY_POSITIONS_MAX
   return isHotkeyed ? `Digit${position}` : null
+}
+
+/** The cell a number key reaches (`Digit3` is cell 3), or null for any other key. */
+export function cellOfHotkey(code: string): number | null {
+  const cell = Array.from({ length: HOTKEY_POSITIONS_MAX }, (_, index) => index + 1).find(
+    (position) => hotkeyOfPosition(position) === code,
+  )
+  return cell ?? null
 }
 
 /** Why one row breaks the bar's rules; empty when it keeps them. */

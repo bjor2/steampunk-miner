@@ -40,6 +40,7 @@ import { mountedGunModeOf } from '../systems/vehicle/vehicleGun'
 import { readAuthorityState } from './authorityLink'
 import { useGameStore } from './gameStore'
 import { inputLayerOf } from './presentationSlice'
+import { toolActionsOnTurnedTray } from './toolPageKeys'
 
 const CANCEL_REBINDING_KEY = 'Escape'
 const CANCEL_REBINDING_PAD_CODE = 'PadStart'
@@ -224,8 +225,19 @@ function releaseKey(code: string): false {
   return false
 }
 
-/** Shift+Tab when bound, else the plain key, so Shift never blocks a driving key. */
+/** A number key on a turned tool tray presses its cell's tool; any other key its binding. */
 function actionsOfKeyNow(key: KeyChange): ActionId[] {
+  return trayActionsOfKey(key) ?? boundActionsOfKey(key)
+}
+
+/** Only while driving, where the bar is drawn (ticket 768); null leaves the key to its binding. */
+function trayActionsOfKey(key: KeyChange): ActionId[] | null {
+  const isDriving = inputLayerOf(useGameStore.getState()) === 'vehicle'
+  return isDriving ? toolActionsOnTurnedTray(key.code) : null
+}
+
+/** Shift+Tab when bound, else the plain key, so Shift never blocks a driving key. */
+function boundActionsOfKey(key: KeyChange): ActionId[] {
   const game = useGameStore.getState()
   const layer = inputLayerOf(game)
   const chorded = actionsOfChord(

@@ -1,6 +1,12 @@
 import { describe, expect, it } from 'vitest'
 import type { ToolFace } from '../input/toolSlots'
-import { chargeBadgeTextOf, nextTrayPageOf, toolBarLayoutOf, type ShownTool } from './toolSlotBar'
+import {
+  chargeBadgeTextOf,
+  nextTrayPageOf,
+  toolBarLayoutOf,
+  toolInCellOf,
+  type ShownTool,
+} from './toolSlotBar'
 
 // The tool slot bar's layout (ticket 691, the HS kinds of #678): 4 thumb cells and an overflow
 // tray on a phone, cell n at position n with Digit n on desktop and the tray past 8.
@@ -72,6 +78,29 @@ describe('tool slot bar layout', () => {
     const layout = toolBarLayoutOf([1, 2].map(toolAt), 'phone', 2)
     expect(positionsOf(layout!.cells)).toEqual([1, 2, null, null])
     expect(layout!.tray).toBeNull()
+  })
+})
+
+describe('tool slot cell keys (ticket 768)', () => {
+  const tools = [1, 3, 9, 11, 12].map(toolAt)
+
+  it('finds the tool at position n in desktop cell n on the thumb cells', () => {
+    expect(toolInCellOf(tools, 'desktop', 0, 3)?.position).toBe(3)
+    expect(toolInCellOf(tools, 'desktop', 0, 2)).toBeNull()
+  })
+
+  it('finds the tray page’s tools in its cells once the tray is turned', () => {
+    expect([1, 2, 3, 4].map((cell) => toolInCellOf(tools, 'desktop', 1, cell)?.position)).toEqual([
+      9,
+      11,
+      12,
+      undefined,
+    ])
+  })
+
+  it('finds nothing past the cells a page has', () => {
+    expect(toolInCellOf(tools, 'phone', 1, 5)).toBeNull()
+    expect(toolInCellOf([], 'desktop', 0, 1)).toBeNull()
   })
 })
 
