@@ -36,9 +36,16 @@ const SLOW = LADDER_RIGS['stored 1']
 const FAST_STRIDE = strideOfRig(FAST, strideOfSpeedMps(SPEED_RIGS['44 m/s'].speedMps))
 const SLOW_STRIDE = strideOfRig(SLOW)
 const SHORT_MM = 20_000
+/**
+ * A level track as long as removes the law work #36's 1.9 m bore removed over `SHORT_MM` (111
+ * quanta): over 20 m the 1.2 m bore of ticket 662 removed 76, under `MIN_QUANTA`, where one
+ * quantum is past the 1% bar and the row is logged, never gated. Down tracks still pass it at 20 m.
+ */
+const LEVEL_MM = 32_000
 
 function trackOf(section: SlabTrack['section'], strideMm: number): SlabTrack {
-  return { tilt: 'flat', section, strideMm, lengthMm: SHORT_MM }
+  const lengthMm = section === 'level' ? LEVEL_MM : SHORT_MM
+  return { tilt: 'flat', section, strideMm, lengthMm }
 }
 
 /** The swept law run's bars against the law work it removed, command by command. */
