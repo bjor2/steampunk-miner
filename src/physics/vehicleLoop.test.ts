@@ -37,10 +37,13 @@ let sink: MemorySink
 /**
  * The ticket-339 dig's end at every-tick reports, with the render origin still and moved each tick,
  * as the report capsule cuts it (ticket 537, protocol 87; the bare disc read 19 and 20 tiles), on
- * ticket 662's 1.2 m bore (protocol 103; #36's 1.9 m bore read 16 tiles each).
+ * ticket 662's 1.2 m bore (protocol 108; #36's 1.9 m bore read 16 tiles each). With the level floor
+ * laid on its circle the 2 s drive off the pad, reporting every tick with the swept cut off, slows
+ * where its level cut meets the hillside at x -10.9 m and ends 2.7 m short of where it did (15
+ * tiles each); the dig down and the tunnel after keep their pace.
  */
-const STEADY_ORIGIN_RUN = { tiles: 15, xMm: -19951, yMm: 289793 }
-const MOVING_ORIGIN_RUN = { tiles: 15, xMm: -19832, yMm: 289807 }
+const STEADY_ORIGIN_RUN = { tiles: 14, xMm: -16866, yMm: 289461 }
+const MOVING_ORIGIN_RUN = { tiles: 13, xMm: -16847, yMm: 289710 }
 /** The known f32 noise between the two (TD v2 Q4 on #514), and since ticket 662 the 12-tick bar. */
 const ORIGIN_NOISE = { mm: 500, tiles: 1 }
 

@@ -10,6 +10,8 @@ import { drillStampOf } from '../vehicle/drillStamp'
 import { NO_DRIVE, signOfPush, type DriveSign, type DriveSigns } from '../vehicle/driveSigns'
 import { FACING, type Facing, type VehiclePose } from '../vehicle/vehiclePose'
 import { cellDensitySum } from '../world/cellYield'
+import { groundReaderOf } from '../world/groundReader'
+import { SAMPLES_PER_TILE, SOLID_DENSITY } from '../world/sampleGrid'
 import type { TilePoint } from '../world/tileGrid'
 import { CELL_KIND, kindOfCell } from '../world/worldCell'
 import { cellAt, EMPTY_WORLD, type WorldState } from '../world/worldState'
@@ -152,6 +154,20 @@ function densityOf(world: WorldState, tile: TilePoint): number {
   return cellDensitySum(world, PARAMS, tile)
 }
 
+/** The densities of a cell's samples under its top row. */
+function lowerRowsOf(world: WorldState, tile: TilePoint): number[] {
+  const ground = groundReaderOf(world, PARAMS)
+  const rows = Array.from(
+    { length: SAMPLES_PER_TILE - 1 },
+    (_, row) => tile.ty * SAMPLES_PER_TILE + row,
+  )
+  const columns = Array.from(
+    { length: SAMPLES_PER_TILE },
+    (_, column) => tile.tx * SAMPLES_PER_TILE + column,
+  )
+  return rows.flatMap((sy) => columns.map((sx) => ground.densityAt(sx, sy)))
+}
+
 function cargoAddedOf(events: readonly DomainEvent[]) {
   return events.filter((event) => event.type === 'CargoAdded')
 }
@@ -270,7 +286,10 @@ describe('drill gear cut', () => {
   })
 
   // The floor circle follows the planet's curve, so the floor cell's top edge may be trimmed to
-  // the same ramp the disc leaves; the cell itself never comes out from under the wheels.
+  // the same ramp the disc leaves; the cell itself never comes out from under the wheels. Only its
+  // top row of samples meets the ramp: the rows under it stay whole, and the top row keeps at least
+  // half its density, so the contour the wheels ride lies in the cell. (Since ticket 662 the ramp
+  // lays that contour on the circle; the row reads 181, 157, 138 and 123 here.)
   it('keeps a widened level tunnel floor where the wheels run', () => {
     const [roof, floor] = gearCellsOver(TARGET, FACING.right, {
       aheadCells: 0,
@@ -279,7 +298,10 @@ describe('drill gear cut', () => {
     const widened = drillWith([gearSlice({ sideCells: 1 })], TARGET, FACING.right)
     expect(roof.ty).toBeGreaterThan(floor.ty)
     expect(densityOf(widened.world, roof)).toBe(0)
-    expect(densityOf(widened.world, floor)).toBeGreaterThan((FULL_CELL * 9) / 10)
+    expect(lowerRowsOf(widened.world, floor).every((density) => density === SOLID_DENSITY)).toBe(
+      true,
+    )
+    expect(densityOf(widened.world, floor)).toBeGreaterThan((FULL_CELL * 7) / 8)
     expect(kindOfCell(cellAt(widened.world, PARAMS, floor))).toBe(CELL_KIND.ground)
   })
 
