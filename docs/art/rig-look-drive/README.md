@@ -12,7 +12,7 @@ buys never move it). The stages are Systems' engine steps at 2, 18 and 26 purcha
 Progression Single piston, Triple flywheel and Guild turbine (6300549964); the linear tail above
 the top step keeps every later purchase visible. The base rig's hub is the unnamed default.
 
-**Wired by #726.** This ticket ships the asset: `rigLook.json`'s `lookAssets` names
+**Wired by #726**: the engine's three step rows name `iron-track`, `steel-track` and `guild-track` with `asset: "vehicle-look-drive"`, the parts join the track's glow slots so the tail paints them, and `vehicle-look-engine` is retired (its `.blend` kept as source). Below 2 purchases nothing is drawn, so `bare-hub` ships unused. #731 shipped the asset: `rigLook.json`'s `lookAssets` names
 `vehicle-look-drive` with its four parts (registered through `r.artAssets`, ticket 640), the
 manifest entry and placeholder sidecar are in, and `npm run art:export -- vehicle-look-drive` wrote
 `public/assets/vehicle/vehicle-look-drive/` (4 parts, 512x512), so the load test

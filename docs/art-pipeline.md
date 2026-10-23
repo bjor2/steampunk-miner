@@ -674,6 +674,11 @@ review renders, at desktop and at a 360 px phone's size, are in
 
 ## Rig-look parts: the engine
 
+Retired by [#726](https://github.com/bjor2/steampunk-miner/issues/726): the drive's tracks and wheels
+(next section) replaced these drive units on `chassis.drive`. `vehicle-look-engine` left
+`lookAssets` and its manifest entry, placeholder sidecar and export were deleted; the `.blend` and
+the review folder stay as the retired source. As #587 wired it:
+
 The art half of the `engine` line of the rig look ladder
 ([#576](https://github.com/bjor2/steampunk-miner/issues/576), built by
 [#586](https://github.com/bjor2/steampunk-miner/issues/586)): a Blender source for the three look
@@ -716,8 +721,8 @@ stand on; every roller's face inside the belt stays open, so the rig's own rolle
 under the look. The rig-look seam ([#640](https://github.com/bjor2/steampunk-miner/issues/640))
 registers it through `r.artAssets` from `rigLook.json`'s `lookAssets` and this ticket exports it
 to `public/assets/vehicle/` (4 parts, 512x512) at `z` 3, over the chassis's 2 and under the
-thrusters' 4; the wiring (#726) points the engine steps' parts at it, retires the drive units and
-adds the parts to the track's glow slots so the tail above the top step paints them. The guild
+thrusters' 4; the wiring (#726) pointed the engine steps' parts at it, retired the drive units and
+added the parts to the track's glow slots so the tail above the top step paints them. The guild
 track's lit core is the one glow, at the engine turbine's 0.3, so the nose stays the brightest
 part. `docs/art/rig-look-drive/author_drive_looks.py` wrote the first version of the `.blend`;
 from then on it is the source. The part table, the outline check at tiers 1 and 3 and the review
