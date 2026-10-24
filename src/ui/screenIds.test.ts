@@ -59,6 +59,7 @@ import type { SettingsModel } from '../systems/views/settingsModel'
 import { FACING } from '../systems/vehicle/vehiclePose'
 import { HudView } from './hud/HudView'
 import { DialCluster } from './hud/DialCluster'
+import { PhoneStarMapButtonView } from './hud/PhoneStarMapButton'
 import { gaugeClusterPageOf } from '../systems/views/gaugeCluster'
 import { GAUGE_CLUSTER } from '../systems/views/gaugeClusterTable'
 import { ToolSlotBarView } from './toolSlots/ToolSlotBar'
@@ -568,6 +569,9 @@ function renderFullHoldHud(): string[] {
       [UI_IDS.hudDialOverflow]: '+1',
     }),
     ...checkScreen(pagedDialCluster(model), { [UI_IDS.hudDialPage]: null }),
+    ...checkScreen(createElement(PhoneStarMapButtonView, { onOpen: () => undefined }), {
+      [UI_IDS.hudPhoneStarMapButton]: null,
+    }),
     ...checkScreen(createElement(HudView, { model, isFlashing: false }), {
       [UI_IDS.hudFuelTankWell]: '',
       [UI_IDS.hudFuelCostWell]: '',

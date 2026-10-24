@@ -1,27 +1,25 @@
 /**
- * Desktop's star map button on the strip (spec #678, ticket 769): the compass, the brass tag of the
- * key that opens the map, and the star map's fuel wells (ticket 767) inside it, so a click on the
- * wells opens the map as M does. Desktop only, as the wells are; it reads the bindings in force,
- * so a rebinding shows at once.
+ * Desktop's star map button on the strip (spec #678, ticket 769): the star map glyph with its title
+ * in words and the brass tag of the key that opens the map, then the star map's fuel wells (ticket
+ * 767) inside it, so a click on the wells opens the map as M does. Ticket 792 made the title show
+ * (it was out of sight, and the compass glyph read as a star) and rings the button while the star
+ * map's first-time hint is up. Desktop only, as the wells are; a phone has `PhoneStarMapButton`.
+ * It reads the bindings in force, so a rebinding shows at once.
  */
-import { hudLabelIconIdOf } from '../../systems/art/icons/iconSet'
-import { actionDefOf, ACTION_MAP } from '../../systems/input/actionMap'
-import { starMapKeyLabelOf } from '../../systems/input/keyTags'
-import { readoutTextOf } from '../../systems/views/hudCallouts'
 import { useGameStore } from '../../store/gameStore'
+import { isStarMapHintedIn } from '../../store/screenModels'
+import { starMapKeyLabelOf } from '../../systems/input/keyTags'
 import { UI_IDS } from '../ids'
 import { KeyTag } from '../kit/KeyTag'
 import { TitleOneLine } from '../kit/TitleOneLine'
 import { FuelWells } from './FuelWells'
+import { STAR_MAP_ICON_ID, STAR_MAP_TEXT, STAR_MAP_TITLE } from './starMapButtonText'
 import styles from './StarMapButton.module.css'
-
-const STAR_MAP_TITLE = actionDefOf(ACTION_MAP, 'open_star_map').displayName
-const STAR_MAP_TEXT = readoutTextOf('hud.strip.star-map', STAR_MAP_TITLE)
-const COMPASS_ICON_ID = hudLabelIconIdOf('compass')
 
 export function StarMapButton({ fuelCostChars }: { fuelCostChars: number }) {
   const keyLabel = useGameStore((state) => starMapKeyLabelOf(state.bindings))
   const isOpen = useGameStore((state) => state.isStarMapOpen)
+  const isHinted = useGameStore(isStarMapHintedIn)
   const toggleStarMap = useGameStore((state) => state.toggleStarMap)
   return (
     <button
@@ -30,15 +28,15 @@ export function StarMapButton({ fuelCostChars }: { fuelCostChars: number }) {
       aria-label={STAR_MAP_TITLE}
       aria-pressed={isOpen}
       data-testid={UI_IDS.hudStarMapButton}
+      data-hinted={isHinted || undefined}
       onClick={toggleStarMap}
     >
       <TitleOneLine
         text={STAR_MAP_TEXT}
-        iconId={COMPASS_ICON_ID}
+        iconId={STAR_MAP_ICON_ID}
         level="span"
         layout="row"
         glyphSize="menu"
-        titlePlace="card"
       >
         {keyLabel !== null && <KeyTag label={keyLabel} place="inline" />}
         <FuelWells fuelCostChars={fuelCostChars} />

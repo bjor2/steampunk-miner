@@ -10,7 +10,9 @@
  * so every other slot draws above it, and option B's pop badges (ticket 616) right after it. The density
  * (#500) is the layout shell's. Held upright (#486) the threats are chips leading the prompts'
  * row, and the slices' threat and prompt panels join that row instead of floating over the view.
- * The page the gauge cluster shows is UI state here (ticket 767), as the tool tray's page is.
+ * The page the gauge cluster shows is UI state here (ticket 767), as the tool tray's page is. The
+ * compact HUD's first cell leads with the star map's labelled button (ticket 792), the debug mark
+ * after it; desktop keeps its star map button on the strip.
  */
 import { useState } from 'react'
 import { desktopStripSlotsOf } from '../../systems/views/desktopStripSlots'
@@ -28,6 +30,7 @@ import { HitEdgeFlash } from './HitEdgeFlash'
 import { HudDetail } from './HudDetail'
 import { HudStrip } from './HudStrip'
 import { OverlayLayer } from '../overlay/OverlayLayer'
+import { PhoneStarMapButton } from './PhoneStarMapButton'
 import { ToolSlotBar } from '../toolSlots/ToolSlotBar'
 import { layoutKindOf } from '../../systems/views/designSystem'
 import { HudPrompts } from './HudPrompts'
@@ -59,6 +62,7 @@ export function HudView({
   /** The warning layer's edge glow (ticket 685). */
   glow?: EdgeGlow
 }) {
+  const isCompact = density === 'compact'
   const isUpright = isUprightCompactHud(density, orientation)
   const strip = hudStripOf(model)
   const [dialPage, turnDialPage] = useState(0)
@@ -84,7 +88,11 @@ export function HudView({
       <EdgeGauge permille={strip.edgePermille} />
       {isUpright ? <UprightAlerts model={model} /> : <EdgeAlerts model={model} />}
       <HazardStrip />
-      {model.isDebugRun && <DebugRunMark />}
+      {isCompact ? (
+        <CompactLead isDebugRun={model.isDebugRun} />
+      ) : (
+        model.isDebugRun && <DebugRunMark />
+      )}
       <ToolSlotBar
         kind={layoutKindOf(density)}
         isDetailOpen={isDetailOpen}
@@ -123,5 +131,15 @@ function UprightAlerts({ model }: { model: HudModel }) {
       <SlicePanels slot="threats" />
       <SlicePanels slot="prompts" />
     </HudPrompts>
+  )
+}
+
+/** The compact HUD's first cell (ticket 792): the star map's button, then the debug run's mark. */
+function CompactLead({ isDebugRun }: { isDebugRun: boolean }) {
+  return (
+    <div className={styles.lead}>
+      <PhoneStarMapButton />
+      {isDebugRun && <DebugRunMark />}
+    </div>
   )
 }

@@ -1,0 +1,57 @@
+/*
+ * A phone's star map button (ticket 792): the compact HUD's first row, leading it under the strip's
+ * left end, out of the thumbs' bottom corners, the tool slot bar, the cluster and the pause button.
+ * Full strength (the touch cluster's 35% hid it), a brass frame, the glyph and the words, at least
+ * a control tall. Tuned by eye in `npm run dev`.
+ */
+.button {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  gap: var(--space-1);
+  box-sizing: border-box;
+  height: var(--control-min);
+  padding: 0 var(--space-2);
+  border: 2px solid var(--color-brass);
+  border-radius: var(--radius-panel);
+  background: var(--color-panel);
+  color: var(--color-brass);
+  font: inherit;
+  white-space: nowrap;
+  pointer-events: auto;
+  touch-action: manipulation;
+}
+
+.button > * {
+  flex-wrap: nowrap;
+}
+
+/* Over the gesture surface while it lies over the HUD, as the Tech tree button rises (#684). */
+.button[data-raised] {
+  position: relative;
+  z-index: 1;
+}
+
+.button:focus-visible {
+  outline: var(--focus-ring);
+  outline-offset: var(--focus-ring-offset);
+}
+
+/* The first-time hint points here: a brass ring that breathes, not a colour. */
+.button[data-hinted] {
+  outline: 2px solid var(--color-brass);
+  outline-offset: 0;
+  animation: hint-ring 1.2s ease-in-out infinite alternate;
+}
+
+@keyframes hint-ring {
+  to {
+    outline-offset: 3px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .button[data-hinted] {
+    animation: none;
+  }
+}

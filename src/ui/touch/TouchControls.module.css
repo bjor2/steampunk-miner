@@ -105,13 +105,13 @@
   right: var(--space-3);
   bottom: var(--space-3);
   display: grid;
-  grid-template-columns: 56px 56px 72px;
+  grid-template-columns: 56px 72px;
   grid-template-rows: 72px;
   /*
-   * Rescue shows only while driving and Quick service only at the Sell bay, so they share a cell
-   * and the star map's button (ticket 757) keeps one of its own: the row stays three wide.
+   * Rescue shows only while driving and Quick service only at the Sell bay, so they share a cell.
+   * The star map's button moved to the HUD's top row with its label (ticket 792).
    */
-  grid-template-areas: 'open_star_map side interact';
+  grid-template-areas: 'side interact';
   gap: 8px;
   place-items: end;
   pointer-events: none;
@@ -120,8 +120,8 @@
 .controls[data-hand='left'] .cluster {
   right: auto;
   left: var(--space-3);
-  grid-template-columns: 72px 56px 56px;
-  grid-template-areas: 'interact side open_star_map';
+  grid-template-columns: 72px 56px;
+  grid-template-areas: 'interact side';
   place-items: end start;
 }
 
@@ -180,8 +180,4 @@
 .button[data-action='request_rescue'],
 .button[data-action='quick_service'] {
   grid-area: side;
-}
-
-.button[data-action='open_star_map'] {
-  grid-area: open_star_map;
 }

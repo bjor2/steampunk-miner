@@ -1103,6 +1103,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/hints/hintAcceptance.test.ts` | 4 | 4 |
 | `src/systems/hints/hintBoard.test.ts` | 23 | 23 |
 | `src/systems/hints/hintTable.test.ts` | 5 | 5 |
+| `src/systems/hints/starMapHint.test.ts` | 4 | 4 |
 | `src/systems/hints/transmissionBoard.test.ts` | 6 | 6 |
 
 ### `input`
@@ -1540,6 +1541,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/store/soundUnlockSlice.test.ts` | 4 | 4 |
 | `src/store/speciesRevealBroadcast.test.ts` | 2 | 2 |
 | `src/store/starMapActions.test.ts` | 6 | 6 |
+| `src/store/starMapHint.test.ts` | 2 | 2 |
 | `src/store/starMapKeys.test.ts` | 5 | 5 |
 | `src/store/tapSheetSlice.test.ts` | 6 | 6 |
 | `src/store/titleMenu.test.ts` | 9 | 9 |
@@ -1656,7 +1658,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/ui/hud/hudBoxes.test.ts` | 9 | 6 |
 | `src/ui/hud/hudPanels.test.ts` | 5 | 5 |
 | `src/ui/hud/hudRows.test.ts` | 6 | 6 |
-| `src/ui/hud/hudStripView.test.ts` | 21 | 21 |
+| `src/ui/hud/hudStripView.test.ts` | 23 | 23 |
 | `src/ui/hud/hudText.test.ts` | 6 | 6 |
 | `src/ui/hud/warningGlowView.test.ts` | 4 | 4 |
 | `src/ui/iconCoverage.test.ts` | 9 | 9 |
@@ -1793,7 +1795,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/views/overlaySeats.test.ts` | 5 | 5 |
 | `src/systems/views/pauseMenuModel.test.ts` | 11 | 11 |
 | `src/systems/views/planetCardView.test.ts` | 1 | 1 |
-| `src/systems/views/plaqueModel.test.ts` | 6 | 6 |
+| `src/systems/views/plaqueModel.test.ts` | 8 | 8 |
 | `src/systems/views/promptDevice.test.ts` | 8 | 8 |
 | `src/systems/views/rarityName.test.ts` | 5 | 5 |
 | `src/systems/views/refineryBayModel.test.ts` | 4 | 4 |
@@ -1804,6 +1806,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/views/sheetLayout.test.ts` | 14 | 14 |
 | `src/systems/views/shopGuidance.test.ts` | 8 | 8 |
 | `src/systems/views/slotSummaryLine.test.ts` | 8 | 8 |
+| `src/systems/views/starMapEntry.test.ts` | 2 | 2 |
 | `src/systems/views/starMapView.test.ts` | 13 | 13 |
 | `src/systems/views/tileTime.test.ts` | 3 | 3 |
 | `src/systems/views/titleMenuModel.test.ts` | 8 | 8 |

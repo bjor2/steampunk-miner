@@ -16,6 +16,7 @@ import { holdSheetOf, type HoldSheet } from '../systems/views/holdSheet'
 import { KERNEL_SHEET_TAB_IDS } from '../systems/views/kernelSheetTabIds'
 import {
   isQuickServiceHighlighted,
+  isStarMapButtonHinted,
   selectPlaqueModel,
   type PlaqueModel,
   type PlaqueSources,
@@ -150,6 +151,11 @@ function bayUiStateOf(sources: ScreenSources): BayUiState {
 
 export function plaqueModelOf(sources: ScreenSources): PlaqueModel {
   return selectPlaqueModel(plaqueSourcesOf(sources))
+}
+
+/** The star map's button rings while its first-time hint is up (ticket 792). */
+export function isStarMapHintedIn(sources: ScreenSources): boolean {
+  return isStarMapButtonHinted(plaqueSourcesOf(sources))
 }
 
 /** Hints need both the "Show hints" setting and the scenario's leave; transmissions the latter. */

@@ -12,6 +12,14 @@
   transform: translateX(-50%);
 }
 
+/*
+ * On a phone the transmission starts under the compact HUD's first row, the star map button's and
+ * the Tech tree's (ticket 792), so the opening card never lies over the button a new player needs.
+ */
+:global([data-hud-density='compact']) .transmission {
+  top: calc(var(--strip-height) + 2 * var(--space-2) + var(--control-min));
+}
+
 /* Above the bottom-centre prompts (#33 section 5). */
 .hint {
   position: absolute;

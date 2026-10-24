@@ -82,35 +82,24 @@ describe('touch pause button (ticket 472)', () => {
 })
 
 describe('touch cluster (#173)', () => {
-  it('shows just Interact and the star map on a fresh planet 1 rig', () => {
-    expect(clusterActionsOf(AT_REST_P1)).toEqual(['interact', 'open_star_map'])
+  it('shows just Interact on a fresh planet 1 rig', () => {
+    expect(clusterActionsOf(AT_REST_P1)).toEqual(['interact'])
   })
 
   it('adds Quick service docked at the Sell bay and drops the driving buttons', () => {
     expect(clusterActionsOf({ ...AT_REST_P1, layer: 'platform', dockedBay: 'sell' })).toEqual([
       'quick_service',
-      'open_star_map',
     ])
-    expect(clusterActionsOf({ ...AT_REST_P1, layer: 'platform', dockedBay: 'upgrade' })).toEqual([
-      'open_star_map',
-    ])
+    expect(clusterActionsOf({ ...AT_REST_P1, layer: 'platform', dockedBay: 'upgrade' })).toEqual([])
   })
 
-  it('opens the star map in one tap while driving and at every bay (ticket 757)', () => {
-    expect(clusterActionsOf(AT_REST_P1)).toContain('open_star_map')
-    for (const dockedBay of ['sell', 'upgrade', 'refinery'] as const)
-      expect(clusterActionsOf({ ...AT_REST_P1, layer: 'platform', dockedBay })).toContain(
-        'open_star_map',
-      )
-    for (const layer of ['pause', 'sheet', 'artefact', 'title'] as const)
+  it('leaves the star map to its labelled HUD button, off the cluster (ticket 792)', () => {
+    for (const layer of ['vehicle', 'platform'] as const)
       expect(clusterActionsOf({ ...AT_REST_P1, layer })).not.toContain('open_star_map')
   })
 
   it('keeps Plant charge and the guns toggle off the cluster, on the tool slot bar (ticket 691)', () => {
-    expect(clusterActionsOf({ ...AT_REST_P1, hasChargeRack: true })).toEqual([
-      'interact',
-      'open_star_map',
-    ])
+    expect(clusterActionsOf({ ...AT_REST_P1, hasChargeRack: true })).toEqual(['interact'])
   })
 
   it('shows Rescue only while the vehicle waits for the tow', () => {

@@ -1,6 +1,6 @@
 /**
  * The star map UI (ticket 757; the GD lock on #650, Map UX) on a 360x640 phone and a 1280x800
- * desktop, both first-class: one tap on the touch cluster's star map button or one M opens it,
+ * desktop, both first-class: one tap on the HUD's star map button (ticket 792) or one M opens it,
  * full screen on the phone and docked beside the view on desktop. Every planet of the system shows
  * its fuel cost, the tank's level and any shortfall, and a planet the player cannot afford is
  * dimmed, never dropped. The rows are judged against `ui.getStarMapModel()`; state through the DOM
@@ -9,7 +9,7 @@
 import { expect, test, type Page } from '@playwright/test'
 import type { StarMapView } from '../../../src/systems/views/starMapView'
 import { starMapPlanetIdOf, STAR_MAP_UI_IDS } from '../../../src/ui/starMap/starMapIds'
-import { touchButtonIdOf } from '../../../src/ui/stage/deviceIds'
+import { UI_IDS } from '../../../src/ui/ids'
 import { openGame, type HudLayoutCell } from '../hud/hudLayoutHelpers'
 import { undock } from './uiShotSheets'
 
@@ -42,7 +42,7 @@ test.describe(`star map (ticket 757): ${PHONE.name}`, () => {
     test.setTimeout(TEST_TIMEOUT_MS)
     const errors = await openGame(page, PHONE)
     await undock(page)
-    await page.getByTestId(touchButtonIdOf('open_star_map')).tap()
+    await page.getByTestId(UI_IDS.hudPhoneStarMapButton).tap()
     await expect(page.getByTestId(PANEL)).toBeVisible()
     await expect(page.getByTestId(PANEL)).toHaveAttribute('data-placement', 'full')
     await expectRowsOfModel(page)

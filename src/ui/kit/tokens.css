@@ -127,12 +127,12 @@
   --slot-columns: 3;
   --warn-glow-thickness: 24px;
   /*
-   * The touch cluster's size (#173, ticket 485): three tracks wide, one row since ticket 691. The
-   * touch controls lay their stick zone and tile lane by it, and the HUD's tool slot bar stands on
-   * it a gap above (the G&V ruling on #691: y 452-544 over the row at 560-632 on 360 x 640), so
+   * The touch cluster's size (#173, ticket 485): one row since ticket 691, two tracks wide since
+   * ticket 792 moved the star map's button to the HUD. The touch controls lay their stick zone and
+   * tile lane by it, and the HUD's tool slot bar stands on it a gap above (the G&V ruling on #691: y 452-544 over the row at 560-632 on 360 x 640), so
    * both read one copy.
    */
-  --touch-cluster-width: calc(56px + 8px + 56px + 8px + 72px);
+  --touch-cluster-width: calc(56px + 8px + 72px);
   --touch-cluster-height-upright: 72px;
   --tool-bar-over-cluster-gap: 16px;
 

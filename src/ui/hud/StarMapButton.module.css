@@ -1,21 +1,34 @@
 /*
- * The star map button (ticket 769): the compass, its key tag and the fuel wells in one row on the
- * strip, as tall as the strip's own controls. Placeholder look, tuned by eye in `npm run dev`.
+ * The star map button (ticket 769): the glyph, the words "Star map", its key tag and the fuel
+ * wells in one row on the strip, as tall as the strip's own controls. Ticket 792: the title shows,
+ * the row never wraps, the button sits inside the screen, and a brass ring marks it while its first-time hint is up. Tuned by eye in `npm run dev`.
  */
 .button {
   display: flex;
   flex: none;
   align-items: center;
   gap: var(--space-1);
-  height: 100%;
+  /*
+   * The control minimum (44 px, #173) is the desktop strip's whole height, bezel included, so the
+   * button hangs from the strip's top instead of centring in the space above the bezel, which put
+   * its top a pixel past the screen's edge (ticket 792).
+   */
+  align-self: flex-start;
+  box-sizing: border-box;
+  min-height: var(--control-min);
   padding: 0 var(--space-1);
   border: var(--frame-hairline) solid transparent;
   border-radius: var(--radius-panel);
   background: transparent;
   color: var(--color-brass);
   font: inherit;
+  white-space: nowrap;
   cursor: pointer;
   pointer-events: auto;
+}
+
+.button > * {
+  flex-wrap: nowrap;
 }
 
 .button:hover,
@@ -26,4 +39,24 @@
 .button:focus-visible {
   outline: var(--focus-ring);
   outline-offset: var(--focus-ring-offset);
+}
+
+/* The first-time hint points here (ticket 792): a thicker brass frame that breathes, not a colour. */
+.button[data-hinted] {
+  border-color: var(--color-brass);
+  outline: 2px solid var(--color-brass);
+  outline-offset: 0;
+  animation: hint-ring 1.2s ease-in-out infinite alternate;
+}
+
+@keyframes hint-ring {
+  to {
+    outline-offset: 2px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .button[data-hinted] {
+    animation: none;
+  }
 }

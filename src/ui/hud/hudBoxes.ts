@@ -5,7 +5,8 @@
  * transparent stick zone carries `data-hud-zone="stick"`, a keep-out that covers nothing. The
  * strip, the edge gauge and the gear button are the design's reserved boxes (ticket 684), and so
  * is each drawn cell of the tool slot bar (ticket 691); the strip's detail is a mode the gear
- * opens, not a box. The compact HUD's tray of the slices' gauge panels is one too (ticket 716).
+ * opens, not a box. The compact HUD's tray of the slices' gauge panels is one too (ticket 716), and
+ * so is a phone's star map button in its top row (ticket 792).
  * This table is the one list the components and the specs read.
  */
 export const HUD_BOX_IDS = {
@@ -15,6 +16,7 @@ export const HUD_BOX_IDS = {
   toolSlot: 'tool-slot',
   panels: 'panels',
   techTree: 'tech-tree',
+  starMap: 'star-map',
   hint: 'hint',
   transmission: 'transmission',
   prompts: 'prompts',

@@ -44,7 +44,19 @@
 
 .hud[data-density='compact'] .debugMark {
   position: static;
+}
+
+/*
+ * The compact HUD's first cell (ticket 792): the star map's labelled button, then the debug mark,
+ * wrapping under it when the cell is narrow, so neither reaches the pause button's gap.
+ */
+.lead {
+  display: flex;
+  flex-wrap: wrap;
   grid-area: debug;
+  align-items: center;
+  gap: var(--space-1) var(--space-2);
+  min-width: 0;
 }
 
 /* Ticket 480: the frame cap keeps dropping ticks; amber like the other "the rig is held" lines. */
@@ -107,9 +119,10 @@
 /*
  * The compact HUD (#500 TD shape 4.2; GD rulings 2, 4 and 7; the strip of ticket 684): on a phone
  * the strip spans the top edge and the rest are grid cells under it, so no two can overlap. Held
- * upright: the debug mark and the Tech tree button on the first row, either side of the pause
+ * upright: the star map button and the debug mark (ticket 792) and the Tech tree button on the
+ * first row, either side of the pause
  * button's gap (`right: 30%`, ticket 472), which keeps the row at least a control tall; then the
- * prompts across the width. Sideways: a left column of the debug mark over the prompts that stops
+ * prompts across the width. Sideways: a left column of the star map button and the debug mark over the prompts that stops
  * at the vehicle's keep-clear square (`--vehicle-clear-left`) and the Tech tree past the pause
  * button. The slices' gauge panels are a tray row (ticket 716): under the first row upright,
  * under the prompts sideways. The threat markers keep the space under the rows.

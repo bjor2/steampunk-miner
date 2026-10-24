@@ -20,6 +20,7 @@ import type { HintChipPlace } from './HintChip'
 const ROW_IDS: ReadonlySet<string> = new Set([
   HUD_BOX_IDS.strip,
   HUD_BOX_IDS.techTree,
+  HUD_BOX_IDS.starMap,
   HUD_BOX_IDS.prompts,
 ])
 

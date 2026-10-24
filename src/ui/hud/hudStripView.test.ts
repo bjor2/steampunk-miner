@@ -115,6 +115,23 @@ describe('HUD strip view (ticket 684)', () => {
     expect(testIdIn(phone, UI_IDS.hudStarMapButton)).toBe(false)
   })
 
+  it('shows the desktop star map button with its title in words, not only in the markup (ticket 792)', () => {
+    drawHud(worstModel())
+    const title = hudTexts().find((text) => text.id === 'hud.star-map')
+    expect(title?.title).toBe('Star map')
+    expect(title?.titlePlace).toBeUndefined()
+  })
+
+  it('leads a phone HUD with a labelled star map button and none on desktop (ticket 792)', () => {
+    const phone = renderToString(
+      createElement(HudView, { model: worstModel(), isFlashing: false, density: 'compact' }),
+    )
+    expect(testIdIn(phone, UI_IDS.hudPhoneStarMapButton)).toBe(true)
+    expect(phone).toContain('Star map')
+    expect(phone).toContain('icon-hud-star-map')
+    expect(testIdIn(drawHud(worstModel()), UI_IDS.hudPhoneStarMapButton)).toBe(false)
+  })
+
   it('tints the desktop depth while gravity holds the descent (ticket 767)', () => {
     const model = underground(worstModel(), 40)
     const limited = { ...model, tileTime: { state: 'gravity', text: '0.16 s', ticks: 10 } as const }
