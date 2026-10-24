@@ -61,15 +61,11 @@ export function serviceEntries(): readonly DescribedEntry[] {
       'The Guild ferries the miner and its gear to the next planet.',
       [fixedLine('Travel to planet', 'linearInt', nextPlanetOf)],
     ),
-    kernelEntryOf(
-      KERNEL_ITEMS.fuel,
-      'Coal for the tender by the unit; each star jump burns it.',
-      [
-        fixedLine('Fuel price per unit', 'geometric', ({ planetIndex }) =>
-          fuelUnitPriceOf(planetIndex),
-        ),
-      ],
-    ),
+    kernelEntryOf(KERNEL_ITEMS.fuel, 'Coal for the tender by the unit; each star jump burns it.', [
+      fixedLine('Fuel price per unit', 'geometric', ({ planetIndex }) =>
+        fuelUnitPriceOf(planetIndex),
+      ),
+    ]),
     kernelEntryOf(
       KERNEL_ITEMS.fuelTank,
       'A bigger coal tender: more fuel per level, longer jumps.',
