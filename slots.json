@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-10-24T15:18:52+02:00",
+  "updated_at": "2026-10-24T15:28:20+02:00",
   "caps": {
     "grok": 12,
     "claude": 10,
@@ -72,7 +72,7 @@
       "size": 6,
       "used": 3,
       "free": 3,
-      "claims_last_hour": 4,
+      "claims_last_hour": 3,
       "name": "Claude Max 1"
     },
     {
@@ -85,11 +85,11 @@
         {
           "slot": "C7",
           "state": "busy",
-          "ticket": 790,
+          "ticket": 756,
           "grok_slot": 2,
           "kind": "dev",
-          "since": "2026-10-24T15:09:00+02:00",
-          "wave": "647-7I"
+          "since": "2026-10-24T15:28:00+02:00",
+          "wave": "647-7H"
         },
         {
           "slot": "C8",
@@ -169,10 +169,10 @@
     {
       "slot": 2,
       "state": "dev",
-      "ticket": 790,
-      "since": "2026-10-24T15:09:00+02:00",
+      "ticket": 756,
+      "since": "2026-10-24T15:28:00+02:00",
       "claude_slot": 7,
-      "wave": "647-7I"
+      "wave": "647-7H"
     },
     {
       "slot": 3,
@@ -294,11 +294,11 @@
     {
       "slot": 7,
       "state": "busy",
-      "ticket": 790,
+      "ticket": 756,
       "grok_slot": 2,
-      "since": "2026-10-24T15:09:00+02:00",
+      "since": "2026-10-24T15:28:00+02:00",
       "account": 2,
-      "wave": "647-7I"
+      "wave": "647-7H"
     },
     {
       "slot": 8,
@@ -326,10 +326,10 @@
     }
   ],
   "last_refill": {
-    "at": "2026-10-24 15:09 CEST",
+    "at": "2026-10-24 15:28 CEST",
     "mode": "refill-dev",
-    "triggers": "#755",
-    "started": "#790->C7/A2",
+    "triggers": "#790",
+    "started": "#756->C7/A2",
     "note": "spawned 1 worker(s)"
   },
   "totals": {
@@ -354,8 +354,23 @@
     "parallel": 1,
     "list": [
       {
-        "number": 819,
+        "number": 827,
         "key": "647-7K",
+        "map": 647,
+        "lane": "remote",
+        "mode": "solo",
+        "state": "blocked",
+        "tickets": [
+          822,
+          823,
+          826
+        ],
+        "done": [],
+        "live": 0
+      },
+      {
+        "number": 819,
+        "key": "647-8A",
         "map": 647,
         "lane": "remote",
         "mode": "solo",
@@ -370,19 +385,6 @@
         "live": 0
       },
       {
-        "number": 818,
-        "key": "647-7I",
-        "map": 647,
-        "lane": "remote",
-        "mode": "solo",
-        "state": "running",
-        "tickets": [
-          790
-        ],
-        "done": [],
-        "live": 1
-      },
-      {
         "number": 817,
         "key": "647-7H",
         "map": 647,
@@ -390,12 +392,15 @@
         "mode": "solo",
         "state": "paused",
         "tickets": [
-          755,
           756,
-          757
+          757,
+          820,
+          821,
+          824,
+          825
         ],
         "done": [],
-        "live": 0
+        "live": 1
       },
       {
         "number": 814,
