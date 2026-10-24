@@ -48,7 +48,8 @@ export function casingLookBitsOf(
 export function casingLookBitsOfLook(look: CasingGradeLook, typeIndex: number): number {
   refuseOutOfChannel(look, typeIndex)
   const pips = Math.min(look.drawnPips, CASING_LOOK_PIPS_MOST)
-  const code = look.plateIndex + CASING_PLATE_SLOTS * (look.finishIndex + CASING_FINISH_SLOTS * pips)
+  const code =
+    look.plateIndex + CASING_PLATE_SLOTS * (look.finishIndex + CASING_FINISH_SLOTS * pips)
   return typeIndex * CASING_TYPE_UNIT + 1 + code
 }
 

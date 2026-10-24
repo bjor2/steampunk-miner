@@ -157,9 +157,18 @@ function plateProblemsOf(plates: unknown): string[] {
       : [`plates holds ${plates.length} rows, the shader draws ${CASING_PLATE_SLOTS}`]),
     ...(rows.length === plates.length ? [] : ['a plate is not an object']),
     ...rows.flatMap((row, at) => plateRowProblemsOf(row, at)),
-    ...duplicateProblemsOf(rows.map((row) => row.id), 'plate id'),
-    ...duplicateProblemsOf(rows.map((row) => row.pattern), 'plate pattern'),
-    ...duplicateProblemsOf(rows.map((row) => row.colour), 'plate colour'),
+    ...duplicateProblemsOf(
+      rows.map((row) => row.id),
+      'plate id',
+    ),
+    ...duplicateProblemsOf(
+      rows.map((row) => row.pattern),
+      'plate pattern',
+    ),
+    ...duplicateProblemsOf(
+      rows.map((row) => row.colour),
+      'plate colour',
+    ),
   ]
 }
 
@@ -185,7 +194,10 @@ function finishProblemsOf(finishes: unknown): string[] {
       : [`finishes holds ${finishes.length} rows, the cycle takes 2 to ${CASING_FINISH_SLOTS}`]),
     ...(rows.length === finishes.length ? [] : ['a finish is not an object']),
     ...rows.flatMap((row, at) => finishRowProblemsOf(row, at)),
-    ...duplicateProblemsOf(rows.map((row) => row.id), 'finish id'),
+    ...duplicateProblemsOf(
+      rows.map((row) => row.id),
+      'finish id',
+    ),
     ...duplicateProblemsOf(rows.map(finishMarksOf), 'finish look'),
   ]
 }
@@ -208,7 +220,9 @@ function finishMarksOf(row: Record<string, unknown>): string {
 function pipsProblemsOf(pips: unknown): string[] {
   if (!isRecord(pips)) return ['pips is not an object']
   return [
-    ...(Number.isInteger(pips.most) && (pips.most as number) >= 1 ? [] : ['pips.most is not 1 or more']),
+    ...(Number.isInteger(pips.most) && (pips.most as number) >= 1
+      ? []
+      : ['pips.most is not 1 or more']),
     ...(isPositive(pips.depthTiles) ? [] : ['pips.depthTiles is not above 0']),
     ...(isPositive(pips.radiusTiles) ? [] : ['pips.radiusTiles is not above 0']),
   ]

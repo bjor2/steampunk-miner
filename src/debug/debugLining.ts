@@ -11,7 +11,7 @@ import {
   isLiningReadable,
   liningContrastAt,
   type LiningContrast,
-} from '../systems/render/casingLiningLook'
+} from '../systems/render/casingLiningCrop'
 import { isLinedBits } from '../systems/render/cellGateBits'
 import { bandOfTile } from '../systems/world/planetGeometry'
 import type { DebugResult } from './debugScreens'

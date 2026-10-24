@@ -542,19 +542,16 @@ export const HEAT_SHIMMER_Z = 0.2
 export const GATE_MARKER_UNTINTED = '#d8d2c4'
 
 /**
- * The casing lining in the ground (#309 GD decision 3, ticket 315): a cased cell shows a brass
- * plate ribbed across its open face, with a rivet line along it, drawn by the terrain shader on
- * bit 22 of the gate channel (`casingLiningLook.ts` is the same rule in TS). Depths are tiles in
- * from the open face; ribs and rivets repeat along it. Polished brass a step brighter than the
- * hull's, so it parts from the light surface rock of band 1; the grooves are near-black for the
- * ribs to read at phone size. My picks, checked by `casingLiningLook.test.ts`.
+ * The casing lining in the ground (#309 GD decision 3, ticket 315): a cased cell shows a metal
+ * plate ribbed across its open face, with a rivet line along it, drawn by the terrain shader from
+ * the casing look channel (`casingLiningLook.ts` is the same rule in TS). Depths are tiles in
+ * from the open face; ribs and rivets repeat along it. The metals and their colours are the grade
+ * rows of `casingGradeLooks.json` (CG2, ticket 830): grade 1 keeps ticket 315's polished brass, a
+ * step brighter than the hull's, so it parts from the light surface rock of band 1; the grooves
+ * are near-black for the ribs to read at phone size. My picks, checked by `casingLiningLook.test.ts`.
  */
 export const CASING_LINING_LOOK = {
-  brass: '#dcb35a',
-  groove: '#3e2c14',
-  rivet: '#fff0c4',
   plateDepthTiles: 0.42,
-  seamTiles: 0.07,
   ribsPerTile: 4,
   /** Half a groove's width, as a share of one rib. */
   grooveHalfShare: 0.13,
@@ -562,6 +559,35 @@ export const CASING_LINING_LOOK = {
   rivetRadiusTiles: 0.06,
   /** The rivets' faint glint, so the line still reads in the dark of band 5. */
   rivetGlow: 0.14,
+} as const
+
+/**
+ * The grade and lining-type marks on the plate (CG2, ticket 830; `casingGradeLooks.json` holds the
+ * colours and which plate wears which pattern, `casingLiningLook.ts` is the shader's rule in TS).
+ * Depths are tiles in from the open face. The copper pairs set their rivets on two rows and groove
+ * only every other rib; the verdigris stagger zigzags larger rivets between the same two rows; the iron strap is a dark band with square bolts at the rib centres; the steel
+ * lattice is grooves both diagonals, a rib apart; a burnished finish lights a lip along the face
+ * and a chased one cuts a dark band across the plate. The seam the standard lining keeps (ticket
+ * 315's 0.07) is the `standard` trim's width in the table. My picks, checked at phone size.
+ */
+export const CASING_GRADE_MARKS = {
+  pairRowsTiles: [0.09, 0.27],
+  pairRivetRadiusTiles: 0.055,
+  /** The copper pairs groove only every this many ribs, so the plate reads apart from brass in grey. */
+  pairGrooveRibs: 2,
+  staggerRivetRadiusTiles: 0.07,
+  strapTiles: [0.16, 0.26],
+  boltHalfTiles: 0.055,
+  /** Half a lattice groove's width, as a share of one rib. */
+  latticeHalfShare: 0.08,
+  lipTiles: 0.04,
+  chasedTiles: [0.3, 0.34],
+  /** Half a trim joint's width, in tiles: about a pixel at phone size. */
+  jointHalfTiles: 0.015,
+  /** Joints along a firebrick trim this often, in tiles. */
+  brickTiles: 0.5,
+  /** The bright lip and the pips glint like the rivets, so a grade reads in band 5's dark. */
+  pipGlow: 0.14,
 } as const
 
 /**
@@ -573,6 +599,16 @@ export const CASING_LINING_LOOK = {
 export const CASING_LINING_PHONE_CELL_PX = 24
 export const CASING_LINING_MIN_PLATE_LUMA_STEP = 0.15
 export const CASING_LINING_MIN_DETAIL_LUMA_STEP = 0.3
+
+/**
+ * Neighbouring casing grades must read apart at phone size without colour (CG2, ticket 830; the GD
+ * lock's "readable for colour-blind players at 360 px"): between the 24 px crops of grades q and
+ * q + 1, drawn in grey, at least this share of the pixels moves by at least this much luma. The
+ * crop diff fails the pair otherwise. My picks: a plate pattern that differs on one rib in four
+ * moves about a fifth of the plate's pixels.
+ */
+export const CASING_GRADE_CROP_MIN_GREY_STEP = 0.11
+export const CASING_GRADE_CROP_MIN_CHANGED_SHARE = 0.08
 
 /**
  * The planet sky band (GD ruling on #293 Q1, `PlanetSkyBand`): one ring mesh round the planet, cut
