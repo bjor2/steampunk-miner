@@ -279,9 +279,15 @@
             },
             {
               "title": "Visible lining",
-              "description": "Lined tunnel walls show a brass plate on their open face, ribbed across with a line of rivets, readable even on a phone; refractory lining keeps its firebrick.",
+              "description": "Lined tunnel walls show a metal plate on their open face, ribbed across with a line of rivets, readable even on a phone; refractory lining keeps its firebrick behind the plate.",
               "status": "built",
-              "issues": [309, 315]
+              "issues": [309, 315, 830]
+            },
+            {
+              "title": "Casing grade looks",
+              "description": "Each casing grade wears its own plate metal and rivet pattern (brass, copper, iron, steel, verdigris), then a finish cycle and pips for the grades past them, so a wall shows the grade it was lined at without colour alone; hazard linings lay their trim over the plate's seam, and the depth dial takes a faint tint of the plate its band needs.",
+              "status": "built",
+              "issues": [830]
             },
             {
               "title": "Lining bill",
@@ -333,6 +339,12 @@
               "description": "About a second of growing cracks, falling dust and a rising rumble before the walls refill.",
               "status": "built",
               "issues": [43, 57]
+            },
+            {
+              "title": "Casing blink and burst",
+              "description": "The lining of a warned stretch blinks red over the cracks (steady red with reduce motion), then bursts into sparks, a cement puff and debris as the walls refill.",
+              "status": "built",
+              "issues": [830]
             },
             {
               "title": "Crush damage",

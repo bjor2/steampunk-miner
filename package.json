@@ -58,6 +58,7 @@
     "balance:money-p200": "vitest run src/logging/moneyPastP200.lane.test.ts",
     "ore:mix": "vite-node scripts/oreMix.ts",
     "rarity:shares": "vite-node scripts/rarityShares.ts",
+    "casing:sheet": "vite-node scripts/casingGradeSheet.ts",
     "art:export": "scripts/art/export.sh",
     "art:merge-check": "scripts/art/merge_check.sh",
     "lint": "eslint .",

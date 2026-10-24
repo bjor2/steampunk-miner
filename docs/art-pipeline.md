@@ -573,7 +573,7 @@ would fire along: the finger's aim, else the cursor's, else the facing.
 
 ## The casing lining
 
-A cased cell shows a brass plate on its open face, ribbed across by dark grooves every 0.25 m, with
+A cased cell shows a metal plate on its open face, ribbed across by dark grooves every 0.25 m, with
 a rivet in the middle of each rib 0.2 m in and a dark seam where the plate meets the rock, 0.42 m
 deep ([#315](https://github.com/bjor2/steampunk-miner/issues/315), #309 GD decision 3). It is
 drawn by the terrain shader, not baked: the mesher sets bit 22 of the gate channel (`LINED_BIT`,
@@ -582,6 +582,16 @@ finds the open face from the density's slope, so the plate follows the bore's cu
 draws. The numbers are `CASING_LINING_LOOK` in `src/constants/scene.ts`;
 `src/systems/render/casingLiningLook.ts` is the same rule in TS, which the phone-size check reads.
 
+Since [CG2 (#830)](https://github.com/bjor2/steampunk-miner/issues/830) the plate is the grade's:
+every lined cell's casing slot (`aCasing`, `src/systems/render/casingLookBits.ts`) carries what the
+shader draws for its strongest intact lining sample, and the rows of
+`src/systems/render/casingGradeLooks.json` say which metal, rivet pattern, finish and pip count a
+grade wears (`plates[(q - 1) mod 5]`, a finish cycle once a lap, pips for the tail) and which trim
+each lining type lays over the seam. The geometry of the marks is `CASING_GRADE_MARKS`. A warned
+ring blinks red through the shader's blink uniforms (`src/scene/terrainCasingBlink.ts`) and bursts
+through the spray pool (`src/scene/casingBurst.ts`). The contact sheet and its script are in
+[docs/art/casing-grades/](art/casing-grades/README.md) (`npm run casing:sheet`).
+
 | Id                    | Source         | What the build draws                                              |
 | --------------------- | -------------- | ----------------------------------------------------------------- |
 | `casing-lining` (ref) | Blender, shots | nothing: the reference the shader matches, and its review renders |
@@ -589,7 +599,8 @@ draws. The numbers are `CASING_LINING_LOOK` in `src/constants/scene.ts`;
 - `art/blender/casing-lining/casing-lining.blend` is a reference scene built from the same numbers,
   not an asset: it has no manifest entry and is never exported. The review renders and the script
   that wrote it are in [docs/art/casing-lining/](art/casing-lining/README.md).
-- The `casing-grade-1` to `-5` tiles (above) are still not drawn: the grade does not show in the
+- The `casing-grade-1` to `-5` tiles (above) are still not drawn as tiles: since #830 the grade shows
+  through the shader's plate rows instead, so the tiles stay a reference. The grade does not show in the
   ground yet. A refractory ring keeps its firebrick (#113) and takes no brass plate.
 
 ## Armoury module mounts

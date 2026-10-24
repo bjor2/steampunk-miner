@@ -554,7 +554,14 @@ balance:report`, `oreValueCensus.lane.test.ts`.
   `planetRowLooks.test.ts` holds the seam: the shown palette takes rock and horizon from a look and keeps
   the archetype's pad, core and underground, a planet class's band wins over the look's, and a look
   recolours a chunk's rock with every ore colour unchanged (inside #151's tint caps).
-  `casingLiningLook.test.ts` reads every planet's shown palette too. `e2e/browser/planetLooks.spec.ts`
+  `casingLiningLook.test.ts` reads every planet's shown palette too, for every casing plate (ticket
+  830: each plate at every finish keeps the plate and detail steps over every band of every planet,
+  and the grey 24 px crops of grades q and q + 1 never match, 8% of pixels by 0.11 luma, over the
+  light and the dark rock; `casingGradeLook.test.ts` pins the rows, the cycle and the pips;
+  `casingLookBits.test.ts` the casing slot; `chunkTileBatchLining.test.ts` the slot the mesher
+  writes; `casingBlink.test.ts` the red blink's ticks; `casingBurst.test.ts` the burst's sprays;
+  `depthBandTint.test.ts` the depth dial's tint; `npm run casing:sheet` draws the contact sheet in
+  `docs/art/casing-grades/`). `e2e/browser/planetLooks.spec.ts`
   (box Tester) checks the drawn band and the pairwise looks in a 360 px window and attaches each
   planet's review shot.
 - **A fresh save per planet, P1 to P5** (ticket 656, the GD's end check on spec #647):
@@ -1611,7 +1618,9 @@ incomePerHour}` go to `balance-report/drill-pace.ndjson`, which `pushTestMetrics
   bay-screen text at least its 1280 x 800 size times the UI scale, TV mode's 2.22%/2.78% text,
   5.9% controls and 5% safe area, 44 px targets (56 on touch), a focus ring on each control Tab
   reaches, no art upscaled at the 12 m default, a lined casing cell reading at the widest zoom and
-  the render-scale floor (`ui.getDrawnLiningAt`, ticket 315: about 24 px a cell on a phone), and
+  the render-scale floor (`ui.getDrawnLiningAt`, ticket 315: about 24 px a cell on a phone) in its
+  grade's plate with no blink (ticket 830: the read names the plate, finish, pips, lining type and
+  the red blink share the casing slot and the blink uniforms carry), and
   the touch controls either way up (ticket 485): their sizes and clearances against the HUD's
   `data-hud` boxes, taps alone reaching every screen, the cluster following the dock, the
   left-handed mirror, and the stick at its rim giving the intent its key gives while pressing no
