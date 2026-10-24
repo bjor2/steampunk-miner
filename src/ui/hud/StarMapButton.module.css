@@ -31,9 +31,15 @@
   flex-wrap: nowrap;
 }
 
-.button:hover,
 .button[aria-pressed='true'] {
   border-color: var(--color-brass);
+}
+
+/* Only a pointer that can rest hovers; on touch a tapped control would keep the style (#476). */
+@media (hover: hover) {
+  .button:hover {
+    border-color: var(--color-brass);
+  }
 }
 
 .button:focus-visible {
