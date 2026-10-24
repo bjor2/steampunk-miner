@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "updated_at": "2026-10-24T12:57:15Z",
+  "updated_at": "2026-10-24T12:59:28Z",
   "entries": {
     "steampunk-loop/1": {
       "loop": "steampunk-loop",
@@ -757,9 +757,9 @@
       "slot": null,
       "state": "working",
       "issue": null,
-      "note": "testing spec #650 (Travel gate: keep the 127-fragment core gate, or make it a price surcharge (Bjor's call)) on 6a92e11",
+      "note": "testing spec #789 (Bug: drill tip misaligned after upgrades, cuts behind casing instead of through it) on 968c786",
       "stale_after_min": 420,
-      "updated_at": "2026-10-24T09:14:43Z",
+      "updated_at": "2026-10-24T12:59:28Z",
       "host": "grok-bot-vm-452660841"
     },
     "steampunk-loop/10": {
