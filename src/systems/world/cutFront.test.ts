@@ -20,11 +20,11 @@ const FRONT: CutFront = {
 }
 
 /**
- * The bore wall's weight `insideMm` inside its circle: full a sample inside, 0 half a sample past
- * (`stampShape.ts`), so 70 mm inside opens to about 55 and 120 mm inside to about 5.
+ * The bore wall's weight `insideMm` inside its circle: full half a sample inside, 0 half a sample
+ * past (`stampShape.ts`), so 70 mm inside opens to about 55 and 120 mm inside to about 5.
  */
 function wallWeightInside(insideMm: number): number {
-  return Math.floor((FULL_WEIGHT * (MM_PER_SAMPLE / 2 + insideMm)) / (1.5 * MM_PER_SAMPLE))
+  return Math.floor((FULL_WEIGHT * (MM_PER_SAMPLE / 2 + insideMm)) / MM_PER_SAMPLE)
 }
 
 /** A sample at (x, y) mm with the bore's weight there, its floor the wall's ramp as stamps give it. */

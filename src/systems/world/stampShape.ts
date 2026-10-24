@@ -18,12 +18,15 @@
  *   exact. A tail on the centre is the disc.
  * - The drill's disc has a **bore wall** edge (GD lock on #662, Q1 b): its radius is the bore's,
  *   where the cut's contour lies, and it reaches half a density sample past it, full weight out to
- *   its radius minus one sample (G&V on #662, 24 Oct), then falling linearly in `d` to 0 at the
- *   reach. The band straddles the circle, so a cut that takes each sample down to the ramp its
+ *   its radius minus half a sample, then falling linearly in `d` to 0 at the reach. The full weight
+ *   covers the body's corners (0.45 m of the 0.6 m radius), which #661's finding 4 chose (b) for:
+ *   moved in to a sample inside (0.35 m, as G&V confirmed the lock's text on 24 Oct), the band they
+ *   drive into carved at two thirds pace and the kill-switch dig fell to 90-93% of main's (the
+ *   question on #662). The band straddles the circle, so a cut that takes each sample down to the ramp its
  *   weight names (`boreWallTargetOf`) leaves its contour on the circle however the sample grid
  *   meets it, as the level floor's does. #36's soft rim, falling over the outer 29% of the radius
  *   and never past it, left the contour up to half a sample inside the circle, more than a 0.15 m
- *   clearance holds. The casing ring starts at the same inner edge (`casingLining.ts`).
+ *   clearance holds. The casing ring starts a sample inside the circle (`casingLining.ts`).
  * - A level cut's disc may carry a **floor band** (`floorBand.ts`, the same lock's Q2): the ground
  *   under its path, across the wheels' width, at full weight down to its level floor.
  */
@@ -77,9 +80,9 @@ const FALLOFF: readonly number[] = Array.from({ length: FALLOFF_STEPS + 1 }, (_,
 
 /** How far past its radius a bore-walled disc reaches: half a density sample. */
 const BORE_WALL_REACH_PAST_MM = MM_PER_SAMPLE / 2
-/** How far inside its radius a bore-walled disc's full weight ends: one sample (GD lock on #662). */
-const BORE_WALL_FULL_INSIDE_MM = MM_PER_SAMPLE
-/** The band its weight falls across, from full at its radius less one sample to 0 at its reach. */
+/** How far inside its radius a bore-walled disc's full weight ends: half a sample. */
+const BORE_WALL_FULL_INSIDE_MM = MM_PER_SAMPLE / 2
+/** The band its weight falls across, from its full-weight edge to 0 at its reach: one sample. */
 const BORE_WALL_BAND_MM = BORE_WALL_FULL_INSIDE_MM + BORE_WALL_REACH_PAST_MM
 
 /**
@@ -87,8 +90,8 @@ const BORE_WALL_BAND_MM = BORE_WALL_FULL_INSIDE_MM + BORE_WALL_REACH_PAST_MM
  * stamp gave it (ticket 570, `cutFront.ts`; the edge of the GD lock on #662): a ramp of
  * `128 + 255 (d - r) / 250` round the radius, as the level floor ramps, so the wall's contour lies
  * on the stamp's circle and its diameter is the stamp's (the body plus its clearance, #661). `d` is
- * read back from the weight, the middle of its band; the full-weight core is cleared, and so is
- * the band's inner part, more than half a sample inside the circle.
+ * read back from the weight, the middle of its band; the full-weight core is cleared, as is any
+ * of the band more than half a sample inside the circle.
  */
 export function boreWallTargetOf(weight: number): number {
   if (weight >= FULL_WEIGHT) return 0
@@ -102,10 +105,9 @@ export function boreWallTargetOf(weight: number): number {
 
 /**
  * Whether the stamp clears the sample to nothing, given the time: a soft rim's full-weight samples,
- * a bore wall's whose ramp is 0, more than half a sample inside its circle. A bore wall's full
- * weight ends a sample inside its circle (G&V on #662), so its weight alone no longer marks that
- * core; the drill's contact, the leading slab, the cut front and a gear cell beside the bore read
- * the core this names, as #570 read them, and only the carve's pace reads the weight.
+ * a bore wall's whose ramp is 0, more than half a sample inside its circle. The drill's contact,
+ * the leading slab, the cut front and a gear cell beside the bore read this core, as #570 read
+ * them, whatever the full-weight edge, which sets only the carve's pace.
  */
 export function isInClearedCore(disc: Pick<DiscStamp, 'edge'>, weight: number): boolean {
   return disc.edge === 'boreWall' ? isInBoreWallCore(weight) : weight === FULL_WEIGHT
@@ -254,7 +256,7 @@ function weightOfRatio(disc: DiscStamp, distanceSq: number, scale: number): numb
 }
 
 /**
- * A bore wall's weight at `d^2 = distanceSq / scale`: full out to its radius minus one sample, then
+ * A bore wall's weight at `d^2 = distanceSq / scale`: full out to its full-weight edge, then
  * `floor(256 (reach - d) / band)`, the one square root a sample in the band takes.
  */
 function boreWallWeightOf(radiusMm: number, distanceSq: number, scale: number): number {
