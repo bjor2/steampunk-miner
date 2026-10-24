@@ -423,6 +423,16 @@ balance:report`, `oreValueCensus.lane.test.ts`.
   and none of system 1's, looks of the act at `g` walked before a repeat, the last planet hard and P1
   standard, XL on a standard start only, each new family drawn once in the campaign and a null slot
   past the set, the ledger hook by slot kind, and system 1 or a missing place refused.
+- **The SS2 biome look art** (ticket 778, spec #774): `src/features/solar-systems/systems/render/lookArt.test.ts`
+  holds one art row per palette look with no problem, the tiles named `ground-look-<look>` under the
+  ground category and registered for the export, rocks under the brightest archetype host rock, every
+  pair 32 channel steps apart in rock, horizon and band, and the loader refusing a missing or stray
+  row, a bad colour, a bright rock, a stray field, a band out of bounds and a twin rock.
+  `lookContactSheet.test.ts` reads the eight shipped tiles apart in hue and motif at 360x640 and
+  1280x800 from `docs/art/ss2-looks/look-reads.json` (refusing a read whose SHA-256 no longer matches
+  the albedo map on disk), every tile final with both maps shipped, each tile's mean within an eighth
+  of its look's rock, the sheet equal to `lookContactSheet.golden.json`, and a synthetic twin named.
+  Re-exporting a tile re-runs `python3 docs/art/ss2-looks/look_post.py` and re-pins the golden.
   `newContentSlots.test.ts` is the fail-on-recolour check at the id and name level against every
   enemy kind, hazard kind, ore family, species and schedule row of the first system (it refuses
   Progression's Void glass: the exotic family is Voidglass). `systemRoster.golden.test.ts` pins seed

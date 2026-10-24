@@ -1,0 +1,293 @@
+{
+  "$comment": "The SS2 look contact sheet (ticket 778): every palette look with its act, hue pair, motif, art colours, tile and the reads of the shipped tile at 360x640 and 1280x800. Rewritten with the reads when a tile is re-exported (python3 docs/art/ss2-looks/look_post.py, then this sheet).",
+  "rows": [
+    {
+      "lookId": "cinder-basalt",
+      "act": "fire",
+      "hue": "black/orange glow",
+      "groundMotif": "hex basalt columns",
+      "tileAssetId": "ground-look-cinder-basalt",
+      "rockSurface": "#3a3236",
+      "horizon": "#d8622a",
+      "skyBandColour": "#ff8a3a",
+      "reads": {
+        "360x640": {
+          "meanHex": "#493532",
+          "luma": 0.23,
+          "hueDeg": 8.3,
+          "saturation": 0.249,
+          "edgeShare": 0.207,
+          "anisotropy": 0.043,
+          "diagonalAnisotropy": -0.001,
+          "lumaSpread": 0.081,
+          "highShare": 0.115,
+          "lowShare": 0
+        },
+        "1280x800": {
+          "meanHex": "#493532",
+          "luma": 0.23,
+          "hueDeg": 8.2,
+          "saturation": 0.243,
+          "edgeShare": 0.181,
+          "anisotropy": 0.055,
+          "diagonalAnisotropy": -0.001,
+          "lumaSpread": 0.09,
+          "highShare": 0.092,
+          "lowShare": 0
+        }
+      }
+    },
+    {
+      "lookId": "ash-plain",
+      "act": "fire",
+      "hue": "grey/ember red",
+      "groundMotif": "layered ash strata",
+      "tileAssetId": "ground-look-ash-plain",
+      "rockSurface": "#726860",
+      "horizon": "#9a5a52",
+      "skyBandColour": "#e05a3a",
+      "reads": {
+        "360x640": {
+          "meanHex": "#75645c",
+          "luma": 0.409,
+          "hueDeg": 21,
+          "saturation": 0.198,
+          "edgeShare": 0,
+          "anisotropy": -0.723,
+          "diagonalAnisotropy": 0,
+          "lumaSpread": 0.029,
+          "highShare": 0.213,
+          "lowShare": 0.248
+        },
+        "1280x800": {
+          "meanHex": "#75655c",
+          "luma": 0.41,
+          "hueDeg": 21,
+          "saturation": 0.197,
+          "edgeShare": 0,
+          "anisotropy": -0.692,
+          "diagonalAnisotropy": 0,
+          "lumaSpread": 0.03,
+          "highShare": 0.205,
+          "lowShare": 0.245
+        }
+      }
+    },
+    {
+      "lookId": "rime-shelf",
+      "act": "frost",
+      "hue": "white/cyan",
+      "groundMotif": "cracked ice plates",
+      "tileAssetId": "ground-look-rime-shelf",
+      "rockSurface": "#4a7484",
+      "horizon": "#cfeef6",
+      "skyBandColour": "#9ff0ff",
+      "reads": {
+        "360x640": {
+          "meanHex": "#486d7c",
+          "luma": 0.392,
+          "hueDeg": 196.7,
+          "saturation": 0.426,
+          "edgeShare": 0.197,
+          "anisotropy": 0.008,
+          "diagonalAnisotropy": -0.007,
+          "lumaSpread": 0.075,
+          "highShare": 0.109,
+          "lowShare": 0.158
+        },
+        "1280x800": {
+          "meanHex": "#486e7c",
+          "luma": 0.392,
+          "hueDeg": 196.7,
+          "saturation": 0.426,
+          "edgeShare": 0.192,
+          "anisotropy": 0.01,
+          "diagonalAnisotropy": -0.008,
+          "lumaSpread": 0.078,
+          "highShare": 0.106,
+          "lowShare": 0.149
+        }
+      }
+    },
+    {
+      "lookId": "hoarfrost-vein",
+      "act": "frost",
+      "hue": "slate/pale violet",
+      "groundMotif": "needle crystal veins",
+      "tileAssetId": "ground-look-hoarfrost-vein",
+      "rockSurface": "#5c5878",
+      "horizon": "#b8a8d8",
+      "skyBandColour": "#d2b8ff",
+      "reads": {
+        "360x640": {
+          "meanHex": "#6c6687",
+          "luma": 0.422,
+          "hueDeg": 250.4,
+          "saturation": 0.252,
+          "edgeShare": 0.324,
+          "anisotropy": -0.006,
+          "diagonalAnisotropy": 0.525,
+          "lumaSpread": 0.106,
+          "highShare": 0.164,
+          "lowShare": 0
+        },
+        "1280x800": {
+          "meanHex": "#6c6688",
+          "luma": 0.422,
+          "hueDeg": 250.4,
+          "saturation": 0.253,
+          "edgeShare": 0.327,
+          "anisotropy": -0.005,
+          "diagonalAnisotropy": 0.527,
+          "lumaSpread": 0.118,
+          "highShare": 0.164,
+          "lowShare": 0
+        }
+      }
+    },
+    {
+      "lookId": "lode-banded",
+      "act": "lodestone",
+      "hue": "rust/steel blue",
+      "groundMotif": "banded iron stripes",
+      "tileAssetId": "ground-look-lode-banded",
+      "rockSurface": "#6c5048",
+      "horizon": "#6a86a6",
+      "skyBandColour": "#78a8d8",
+      "reads": {
+        "360x640": {
+          "meanHex": "#614145",
+          "luma": 0.295,
+          "hueDeg": 354.6,
+          "saturation": 0.593,
+          "edgeShare": 0.058,
+          "anisotropy": -0.469,
+          "diagonalAnisotropy": 0.009,
+          "lumaSpread": 0.041,
+          "highShare": 0.219,
+          "lowShare": 0.225
+        },
+        "1280x800": {
+          "meanHex": "#614145",
+          "luma": 0.295,
+          "hueDeg": 354.7,
+          "saturation": 0.621,
+          "edgeShare": 0.099,
+          "anisotropy": -0.51,
+          "diagonalAnisotropy": 0.004,
+          "lumaSpread": 0.044,
+          "highShare": 0.268,
+          "lowShare": 0.186
+        }
+      }
+    },
+    {
+      "lookId": "gauss-field",
+      "act": "lodestone",
+      "hue": "gunmetal/teal",
+      "groundMotif": "curled filings",
+      "tileAssetId": "ground-look-gauss-field",
+      "rockSurface": "#4a5256",
+      "horizon": "#3a8c84",
+      "skyBandColour": "#40e0c8",
+      "reads": {
+        "360x640": {
+          "meanHex": "#435859",
+          "luma": 0.32,
+          "hueDeg": 183,
+          "saturation": 0.241,
+          "edgeShare": 0.092,
+          "anisotropy": 0.007,
+          "diagonalAnisotropy": 0.001,
+          "lumaSpread": 0.032,
+          "highShare": 0.139,
+          "lowShare": 0.072
+        },
+        "1280x800": {
+          "meanHex": "#435859",
+          "luma": 0.321,
+          "hueDeg": 182.9,
+          "saturation": 0.234,
+          "edgeShare": 0.284,
+          "anisotropy": 0.006,
+          "diagonalAnisotropy": 0.004,
+          "lumaSpread": 0.046,
+          "highShare": 0.152,
+          "lowShare": 0
+        }
+      }
+    },
+    {
+      "lookId": "hollow-honeycomb",
+      "act": "hollow",
+      "hue": "umber/amber",
+      "groundMotif": "void honeycomb",
+      "tileAssetId": "ground-look-hollow-honeycomb",
+      "rockSurface": "#644020",
+      "horizon": "#c88a3a",
+      "skyBandColour": "#ffc050",
+      "reads": {
+        "360x640": {
+          "meanHex": "#66481e",
+          "luma": 0.299,
+          "hueDeg": 34.9,
+          "saturation": 0.715,
+          "edgeShare": 0.687,
+          "anisotropy": 0.028,
+          "diagonalAnisotropy": 0,
+          "lumaSpread": 0.187,
+          "highShare": 0.242,
+          "lowShare": 0.22
+        },
+        "1280x800": {
+          "meanHex": "#67481e",
+          "luma": 0.301,
+          "hueDeg": 34.9,
+          "saturation": 0.714,
+          "edgeShare": 0.654,
+          "anisotropy": 0.044,
+          "diagonalAnisotropy": 0,
+          "lumaSpread": 0.199,
+          "highShare": 0.244,
+          "lowShare": 0.19
+        }
+      }
+    },
+    {
+      "lookId": "brass-verdigris",
+      "act": "foothold.heavy",
+      "hue": "brass/green patina",
+      "groundMotif": "riveted plate shale",
+      "tileAssetId": "ground-look-brass-verdigris",
+      "rockSurface": "#70703a",
+      "horizon": "#8aa878",
+      "skyBandColour": "#a8d890",
+      "reads": {
+        "360x640": {
+          "meanHex": "#7d7f42",
+          "luma": 0.47,
+          "hueDeg": 61,
+          "saturation": 0.509,
+          "edgeShare": 0.395,
+          "anisotropy": -0.023,
+          "diagonalAnisotropy": -0.018,
+          "lumaSpread": 0.093,
+          "highShare": 0.123,
+          "lowShare": 0.182
+        },
+        "1280x800": {
+          "meanHex": "#7d7f42",
+          "luma": 0.47,
+          "hueDeg": 60.9,
+          "saturation": 0.508,
+          "edgeShare": 0.372,
+          "anisotropy": -0.02,
+          "diagonalAnisotropy": -0.006,
+          "lumaSpread": 0.108,
+          "highShare": 0.106,
+          "lowShare": 0.123
+        }
+      }
+    }
+  ]
+}

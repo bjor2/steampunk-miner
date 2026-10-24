@@ -513,6 +513,24 @@ sizes. A palette is three colours in the table. The compositing rule the rendere
 [docs/art/mineral-skins/README.md](art/mineral-skins/README.md). Nothing packs, registers or draws
 the cells yet; the kernel seam that draws a skin in the ground will.
 
+## SS2 biome look tiles
+
+The ground motif tiles of the eight biome looks of
+[SS2-1 archetype palette + naming rules (#775)](https://github.com/bjor2/steampunk-miner/issues/775)
+(ticket [#778](https://github.com/bjor2/steampunk-miner/issues/778), spec
+[#774](https://github.com/bjor2/steampunk-miner/issues/774)): `ground-look-<look>` for each look of
+`src/features/solar-systems/palette.json`, registered by the `solar-systems` slice through
+`r.artAssets` (#214) and exported like the strata tiles (`npm run art:export -- ground-look-<look>`,
+"Ground and casing tiles" above: one 4 x 4 m quad, a seamless procedural material, 1024 px albedo
+and normal, no emissive). `docs/art/ss2-looks/author_look_tiles.py` wrote the first version of the
+eight sources on the S7d node graph; each tile is the lock's ground motif in its hue pair, and its
+mean colour is the look's surface rock from the slice's `lookArt.json`, the colour row (rock,
+horizon, sky band, ticket 653's shape) a planet wearing the look is drawn in. The post step
+`look_post.py` measures every shipped map at the two contact-sheet screens into `look-reads.json`
+(with the map's SHA-256) and writes the review sheets; the slice's `lookContactSheet.test.ts`
+reads every pair apart in hue and motif from those measures. See
+[docs/art/ss2-looks/README.md](art/ss2-looks/README.md). Nothing draws a later system's look yet.
+
 ## Magnetic planets
 
 The art of the magnetic planet class ([#293](https://github.com/bjor2/steampunk-miner/issues/293),
