@@ -85,13 +85,13 @@ describe('star map jump drive actions (ticket 759)', () => {
   it('jumps into system 2 on the request alone, logging the system it went to', () => {
     game().buyJumpDrive()
     game().buyFuelTank()
-    game().buyFuel(11)
+    game().buyFuel(13)
     game().jumpToSystemPlanet(2, 1)
     expect(game().planetTier).toBe(6)
     expect(linesNamed('travel_started').at(-1)?.data).toMatchObject({
       fromPlanet: 1,
       toPlanet: 6,
-      fuelSpent: '1.1e+1',
+      fuelSpent: '1.3e+1',
       toSystem: '2',
     })
     expect(sink.events.flatMap(runEventProblems)).toEqual([])

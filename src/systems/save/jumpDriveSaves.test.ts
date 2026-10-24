@@ -23,7 +23,7 @@ function jumpedSession(): AuthorityState {
   session.submit(1, { type: 'debug.setMoney', payload: { amount: '1e9' } })
   session.submit(5, { type: 'dock', payload: { bay: 'sell' } })
   session.submit(6, { type: 'buyJumpDrive', payload: {} })
-  session.submit(7, { type: 'buyFuel', payload: { units: 6 } })
+  session.submit(7, { type: 'buyFuel', payload: { units: 7 } })
   session.submit(8, { type: 'jumpToPlanet', payload: { system: '2', planet: '1' } })
   return session.state()
 }

@@ -405,7 +405,7 @@
       }
     },
     "systemJump": {
-      "fuelMultiplier": "1.2",
+      "fuelMultiplier": "1.4",
       "hardnessStep": "1.1",
       "driveRunValues": "1"
     }

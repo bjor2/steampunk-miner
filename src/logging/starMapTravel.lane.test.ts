@@ -55,7 +55,8 @@ import { gatedSystemJumpProblemsOf, printedSystemJumpLinesOf } from './systemJum
 // same bot. Prints each planet's median run against the R the curve stands in, and the felt speed
 // on arrival for p -> p+1 and the skip p -> p+2. Since ticket 759 the bot then buys the jump drive
 // and jumps out of system 1, and the arrival felt speed in system 2 is gated at 0.9x planet 5's
-// (`systemJumpBars.ts`, the Producer's k_jump lock on #759). Hours of play, so it runs only when named:
+// (`systemJumpBars.ts`, the Producer's k_jump lock on #759), with the jump's fee at 12-15% of the
+// wallet at planet 5's core (ticket 776, J). Hours of play, so it runs only when named:
 //   npx vitest run src/logging/starMapTravel.lane.test.ts
 const RUN_TIMEOUT_MS = 6 * 60 * 60 * 1000
 /** Two hours a planet, as the drill pace lane allows: a slow planet shows as a number. */
@@ -87,7 +88,7 @@ describe('star map travel: P1 to P5 on fuel jumps, three seeds (ticket 756)', ()
     expect(gatedStarMapTravelProblemsOf(runs, backtracks)).toEqual([])
   })
 
-  it('arrives in system 2 at 0.9x the felt speed of planet 5 or more, after the fee (ticket 759)', () => {
+  it('jumps to system 2 for 12-15% of the core wallet and arrives at 0.9x planet 5 or more (tickets 759, 776)', () => {
     expect(gatedSystemJumpProblemsOf(runs)).toEqual([])
   })
 

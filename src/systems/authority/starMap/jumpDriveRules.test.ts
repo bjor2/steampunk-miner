@@ -36,7 +36,7 @@ function dockedOn(planet: number, money: string) {
 function readyToLeaveSystemOne() {
   const session = dockedOn(5, '1e9')
   session.submit(10, buyJumpDrive)
-  session.submit(11, buyFuel(6))
+  session.submit(11, buyFuel(7))
   return session
 }
 
@@ -68,7 +68,7 @@ describe('jump drive (ticket 759)', () => {
 describe('jump between solar systems (ticket 759)', () => {
   it('refuses a jump into another system without the drive, and changes nothing', () => {
     const session = dockedOn(5, '1e9')
-    session.submit(10, buyFuel(6))
+    session.submit(10, buyFuel(7))
     const before = session.state()
     expect(rejectionOf(session.submit(11, jumpTo('2', '1')))).toBe('no_jump_drive')
     expect(session.state()).toBe(before)
@@ -101,7 +101,7 @@ describe('jump between solar systems (ticket 759)', () => {
   it("tells system 2's first planet from system 1's sixth, the same campaign index", () => {
     const session = dockedOn(6, '1e9')
     session.submit(10, buyJumpDrive)
-    session.submit(11, buyFuel(6))
+    session.submit(11, buyFuel(7))
     expect(rejectionOf(session.submit(12, jumpTo('2', '1')))).toBeNull()
     expect(session.state().planet).toMatchObject({ index: 6, system: '2' })
   })
@@ -110,19 +110,19 @@ describe('jump between solar systems (ticket 759)', () => {
     const session = readyToLeaveSystemOne()
     session.submit(20, jumpTo('2', '1'))
     session.submit(25, dockAtSell)
-    session.submit(26, buyFuel(6))
+    session.submit(26, buyFuel(7))
     const events = session.submit(27, jumpTo('1', '5'))
     expect(session.state().planet).toEqual(
       expect.not.objectContaining({ system: expect.anything() }),
     )
     expect(session.state().planet.index).toBe(5)
-    expect(events[0]).toMatchObject({ fuelSpent: '6e+0', toSystem: '1' })
+    expect(events[0]).toMatchObject({ fuelSpent: '7e+0', toSystem: '1' })
   })
 
   it('refuses a jump the tank cannot burn with fuel_short, J included', () => {
     const session = dockedOn(5, '1e9')
     session.submit(10, buyJumpDrive)
-    session.submit(11, buyFuel(5))
+    session.submit(11, buyFuel(6))
     expect(rejectionOf(session.submit(12, jumpTo('2', '1')))).toBe('fuel_short')
   })
 
@@ -130,9 +130,9 @@ describe('jump between solar systems (ticket 759)', () => {
     const session = dockedOn(1, '1e12')
     session.submit(10, buyJumpDrive)
     session.submit(11, buyFuelTank)
-    session.submit(12, buyFuel(11))
+    session.submit(12, buyFuel(13))
     const events = session.submit(13, jumpTo('2', '1'))
-    expect(events[0]).toMatchObject({ fromPlanet: 1, toPlanet: 6, fuelSpent: '1.1e+1' })
+    expect(events[0]).toMatchObject({ fromPlanet: 1, toPlanet: 6, fuelSpent: '1.3e+1' })
     expect(toCanonical(fuelOf(session.vehicle()))).toBe('0e+0')
   })
 
@@ -140,8 +140,8 @@ describe('jump between solar systems (ticket 759)', () => {
     const session = dockedOn(5, '1e9')
     session.submit(10, buyJumpDrive)
     session.submit(11, setMoney('0'))
-    const events = session.submit(12, buyFuel(6))
-    expect(events[0]).toMatchObject({ type: 'FuelBought', units: 6, cost: '0e+0' })
+    const events = session.submit(12, buyFuel(7))
+    expect(events[0]).toMatchObject({ type: 'FuelBought', units: 7, cost: '0e+0' })
     expect(rejectionOf(session.submit(13, jumpTo('2', '1')))).toBeNull()
   })
 

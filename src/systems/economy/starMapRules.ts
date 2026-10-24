@@ -30,8 +30,13 @@
  *   fuelUnits(a -> b) = baseUnits * (1 + distanceStep * |g_b - g_a|) * fuelMultiplier   between systems
  *   rock hardness     = H * hardnessStep^(s - 1)                                         in system s
  *   jump drive        = driveRunValues * R(planetsPerSystem)
- * J and the drive's price are provisional (ticket 759): no decision gives them, and the Tester's
- * bot run of the jump judges them. k_jump is the GD's; if the felt speed misses, only it moves.
+ * J is the Systems row of ticket 776 (spec #774, the VS input: "J tuned to 12-15% of money held at
+ * SS1's last core", inside the #648 15% clamp; it replaces ticket 759's provisional 1.2). A hop
+ * inside a system is 8-12% of the wallet at core harvest (ticket 756's bar), 10% at its middle, so
+ * 13.5%, the middle of J's band, asks J = 1.35; the jump burns whole units, ceil(5 * J), so J is
+ * written as the 1.4 the 7 units it buys pay: 14% at the hop bar's middle. The bot run judges the
+ * share (`logging/systemJumpBars.ts`); a miss moves only J. The drive's price stays provisional
+ * (ticket 759). k_jump is the GD's; if the felt speed misses, only it moves.
  */
 import { add, cmp, fromSafeInteger, mul, type BigStat, type Money } from '../money'
 import type { FieldReader } from './economyFieldReader'
