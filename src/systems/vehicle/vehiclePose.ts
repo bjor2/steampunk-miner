@@ -3,6 +3,11 @@
  * millimetres and mm/s, the body-up vector scaled to 1024, and `facing` 0 left, 1 right, 2 down,
  * 3 up (#33, frozen under `logSchemaVersion` 1). Everything here is integer arithmetic, so a
  * replayed `commands.ndjson` gives the same tiles and zones on every machine.
+ *
+ * Since ticket 791 (protocol 107) the drill may aim between the facings: `aim`, in 1/64 turns
+ * (`aim.ts`), rides along only when it is not one of the four, with `facing` the one nearest it.
+ * A pose with no `aim`, every pose before, aims at its facing, so old saves and replays aim as
+ * they did.
  */
 import {
   DOCK_STATIONARY_MM_PER_SECOND,
@@ -15,6 +20,7 @@ import type { DockSite } from '../world/dockSite'
 import { depthTilesAt } from '../world/planetGeometry'
 import type { PlanetParams } from '../world/planetParams'
 import type { TilePoint } from '../world/tileGrid'
+import { aimOfFacing, aimVectorOfPose, facingOfAim, isAim, type Aim } from './aim'
 
 export interface VehiclePose {
   x: number
@@ -24,6 +30,8 @@ export interface VehiclePose {
   upx: number
   upy: number
   facing: Facing
+  /** The drill's aim where it is not `facing`'s (ticket 791); absent for the four facings. */
+  aim?: Aim
 }
 
 export const FACING = { left: 0, right: 1, down: 2, up: 3 } as const
@@ -75,9 +83,9 @@ export function tileOfPose(pose: VehiclePose): TilePoint {
   return tileOfMillimetres(pose.x, pose.y)
 }
 
-/** The tile at the drill's nose: one tile from the centre along the facing vector (#7). */
+/** The tile at the drill's nose: one tile from the centre along the aim (#7, ticket 791). */
 export function noseTileOf(pose: VehiclePose): TilePoint {
-  const facing = facingVectorOf(pose.upx, pose.upy, pose.facing)
+  const facing = aimVectorOfPose(pose)
   return tileOfMillimetres(
     pose.x + Math.floor((facing.x * MM_PER_METRE) / UP_VECTOR_SCALE),
     pose.y + Math.floor((facing.y * MM_PER_METRE) / UP_VECTOR_SCALE),
@@ -141,11 +149,38 @@ export function bayPoseAt(site: DockSite, bay: BayId): VehiclePose {
 export function poseProblems(pose: VehiclePose, maxSpeed: number): string[] {
   return [
     ...(isFacing(pose.facing) ? [] : [`facing must be 0 to 3, got ${pose.facing}`]),
+    ...aimProblemsOf(pose.facing, pose.aim),
     ...(isWithinSpeedBound(pose.vx, pose.vy, maxSpeed)
       ? []
       : [`speed must be at most ${maxSpeed} mm/s`]),
     ...(isUnitUpVector(pose.upx, pose.upy) ? [] : [`up vector must be ${UP_VECTOR_SCALE} long`]),
   ]
+}
+
+/**
+ * Why a pose's aim cannot be (ticket 791): an aim rides along only off the four facings, with the
+ * facing nearest it, so one pose has one shape. Never rounded, refused.
+ */
+export function aimProblemsOf(facing: number, aim: unknown): string[] {
+  if (aim === undefined) return []
+  if (!isAim(aim)) return [`aim must be a whole step from 0 to 63, got ${JSON.stringify(aim)}`]
+  if (!isFacing(facing) || aimOfFacing(facing) === aim) {
+    return ['aim rides along only off the four facings']
+  }
+  return facingOfAim(aim) === facing ? [] : ['facing must be the one nearest the aim']
+}
+
+/**
+ * A pose moved to a step's position and aimed as the step is (tickets 506, 791): the pose's own
+ * aim gives way to the step's, which is absent at the four facings.
+ */
+export function steppedPoseOf(
+  pose: VehiclePose,
+  step: { x: number; y: number; facing: Facing; aim?: Aim },
+): VehiclePose {
+  const { vx, vy, upx, upy } = pose
+  const moved = { x: step.x, y: step.y, vx, vy, upx, upy, facing: step.facing }
+  return step.aim === undefined ? moved : { ...moved, aim: step.aim }
 }
 
 function isWithinSpeedBound(vx: number, vy: number, maxSpeed: number): boolean {

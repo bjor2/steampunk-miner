@@ -2,7 +2,7 @@
  * Multi-touch on the Pixel 7 project (ticket 481, the TD's section 5 on #470): two real fingers
  * through CDP spread on the open screen and press `zoom_in` into the action stream, as the Equal key
  * does, and a double tap presses `zoom_reset` and widens the view again. WebKit has no CDP, so the
- * iPhone 13 project skips these; the stick's stream equality runs on both phones from the screen
+ * iPhone 13 project skips these; the stick's intent equality runs on both phones from the screen
  * matrix's `touchControls.spec.ts`. State through `steampunkDebug`, never pixels.
  */
 import { expect, test, type CDPSession, type Page } from '@playwright/test'

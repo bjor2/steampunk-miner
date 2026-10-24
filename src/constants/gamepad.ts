@@ -1,6 +1,7 @@
 /**
- * The gamepad adapter's feel numbers (ticket 346). Input only: a pad press travels the key path, so
- * none of these reach the authority, the replay or the digest.
+ * The gamepad adapter's feel numbers (ticket 346). Input only: a pad press travels the key path,
+ * and the left stick drives as the touch stick does (ticket 791), so none of these reach the
+ * authority, the replay or the digest.
  */
 
 /** A button, trigger or stick direction goes down at half its travel. */
@@ -12,3 +13,9 @@ export const PAD_PRESS_VALUE = 0.5
 export const PAD_RELEASE_VALUE = 0.35
 /** Inside this share of its travel the right stick is idle and the gun fires along the facing. */
 export const PAD_AIM_DEADZONE = 1 / 4
+
+/**
+ * Inside this share of its travel the left stick does not drive (ticket 791), the touch stick's
+ * 20% (`STICK_DEADZONE_SHARE`), which also clears a worn stick's drift.
+ */
+export const PAD_DRIVE_DEADZONE = 0.2

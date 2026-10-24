@@ -1,9 +1,10 @@
 import RAPIER from '@dimforge/rapier3d-compat'
 import { beforeAll, describe, expect, it } from 'vitest'
-import { PHYSICS_TIMESTEP, VEHICLE_COLLIDER_SIZE } from '../constants/physics'
+import { DRIVE_PUSH_STEPS, PHYSICS_TIMESTEP, VEHICLE_COLLIDER_SIZE } from '../constants/physics'
 import type { BoreStrut, StandingStruts } from '../systems/authority/bore/strutState'
 import { engineStats } from '../systems/economy/vehicleStats'
 import { IDLE_INTENT, type VehicleIntent } from '../systems/vehicle/vehicleIntent'
+import { AIM } from '../systems/vehicle/aim'
 import { FACING } from '../systems/vehicle/vehiclePose'
 import { strutPlankOf } from '../systems/vehicle/strutPlank'
 import { clearDisc } from '../systems/world/groundEdit'
@@ -36,7 +37,7 @@ const PLANK_TOP = radiusOf({
   x: PLANK.centre.x + PLANK.up.x * PLANK.halfThickness,
   y: PLANK.centre.y + PLANK.up.y * PLANK.halfThickness,
 })
-const DRIVE_RIGHT: VehicleIntent = { ...IDLE_INTENT, moveX: 1, facing: FACING.right }
+const DRIVE_RIGHT: VehicleIntent = { ...IDLE_INTENT, moveX: DRIVE_PUSH_STEPS, aim: AIM.right }
 
 beforeAll(async () => {
   await RAPIER.init()

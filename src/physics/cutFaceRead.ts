@@ -16,7 +16,8 @@ import { readAuthorityTick, readLocalVehicle, readPlanetWorld } from '../store/g
 import { planetParamsOf } from '../systems/authority/planetOfState'
 import type { Vector2 } from '../systems/vehicle/localFrame'
 import { frontOfCursor } from '../systems/vehicle/sweptCut'
-import { facingVectorOf, tileOfMillimetres } from '../systems/vehicle/vehiclePose'
+import { aimVectorOfPose } from '../systems/vehicle/aim'
+import { tileOfMillimetres } from '../systems/vehicle/vehiclePose'
 import { groundReaderOf, type GroundReader } from '../systems/world/groundReader'
 import { ISO_DENSITY, MM_PER_SAMPLE } from '../systems/world/sampleGrid'
 import type { StampPoint } from '../systems/world/stampShape'
@@ -73,7 +74,7 @@ const CROSSING_PAST_FRONT_MM = MM_PER_SAMPLE
 export function faceReadOf(tick: TickRead, last: FaceRead | null): FaceRead {
   const reader = readerNow()
   const { pose } = tick.result
-  const facing = facingVectorOf(pose.upx, pose.upy, pose.facing)
+  const facing = aimVectorOfPose(pose)
   const ahead = { x: facing.x / UP_VECTOR_SCALE, y: facing.y / UP_VECTOR_SCALE }
   const samples = samplesAround(reader, tick.position)
   return {

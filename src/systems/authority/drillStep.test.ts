@@ -5,6 +5,7 @@ import {
   DRILL_STAMP_OFFSET_MM,
   STEP_BOUND_TOLERANCE_MM,
 } from '../../constants/balance'
+import { AIM } from '../vehicle/aim'
 import { sweptStampAheadMmOf } from '../vehicle/drillStamp'
 import { withRegistrations } from '../../registries/registrar'
 import type { SliceDefinition } from '../../registries/sliceDefinition'
@@ -91,7 +92,7 @@ const CUT_STEP_MM = BOUNDS.cuttingMm
 /** The swept stamp's centre sat this far ahead of the pose before ticket 570: a report's, plus the cutting bound. */
 const PRE_570_SWEPT_REACH_MM = DRILL_STAMP_OFFSET_MM + CUT_STEP_MM
 /** The furthest a resting body's front stands ahead of it (ticket 570): its step, margin and ramp, and the margin it may win back. */
-const SWEPT_REACH_MAX_MM = sweptStampAheadMmOf(CUT_STEP_MM) + CUT_FACE_MARGIN_MM + 125
+const SWEPT_REACH_MAX_MM = sweptStampAheadMmOf(CUT_STEP_MM, AIM.down) + CUT_FACE_MARGIN_MM + 125
 
 function frontOfCursorOf(cursor: SweptCut | undefined) {
   if (cursor === undefined) throw new Error('no cut was made')

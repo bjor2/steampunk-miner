@@ -482,6 +482,8 @@ export interface KernelCommandPayloads {
    * scaled to 1024, `facing` 0 to 3, the action flags at the moment of the report, and how many
    * fixed steps since the previous report each action was active, which the authority charges.
    * `drive` is the push at the report as signs (TD lock on #279); drill gear reads its `x`.
+   * `aim` (ticket 791) is the drill's aim in 1/64 turns where it is not `facing`'s, absent at the
+   * four facings, `facing` then the one nearest it.
    */
   reportPose: {
     x: number
@@ -498,15 +500,17 @@ export interface KernelCommandPayloads {
     driveTicks: number
     drillTicks: number
     drive: DriveSigns
+    aim?: number
   }
   /** Scripted mining (#3, #11 section 5): `ticks` fixed steps of drilling on one tile. */
   drillTile: { tx: number; ty: number; ticks: number }
   /**
    * The swept cut (ticket 330, dev flag `drill.sweptCut`): the body's position in mm at a fixed
    * step its drill is engaged, the head's settled `facing` 0 to 3 (ticket 506), and the push as
-   * signs (`drive.y` 1 lifting), sent every such step.
+   * signs (`drive.y` 1 lifting), sent every such step; `aim` the head's settled aim where it is
+   * not the facing's, as a pose report carries it (ticket 791).
    */
-  drillStep: { x: number; y: number; facing: number; drive: DriveSigns }
+  drillStep: { x: number; y: number; facing: number; drive: DriveSigns; aim?: number }
   /** Calls the tow for a stranded or destroyed vehicle (#7, #8). */
   requestRescue: Record<string, never>
   /** The platform (#8, #23, #37): dock when stationary in that bay's pad zone, and leave again. */

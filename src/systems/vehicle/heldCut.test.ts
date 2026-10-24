@@ -10,7 +10,7 @@ import {
   type CutMemory,
   type ShutGateStep,
 } from './heldCut'
-import { FACING } from './vehiclePose'
+import { AIM } from './aim'
 
 // The held cut (ticket 430, TD shape and addendum on #430): through the gate's shut dwell the body
 // coasts on the last `vCut` it followed, and once the drive lets go the stop ramp runs to zero
@@ -20,12 +20,12 @@ const VCUT = 1.5
 
 const FOLLOWED: CutFollowMotion = {
   speed: VCUT,
-  facing: FACING.down,
+  aim: AIM.down,
   isPushing: true,
   followedTicks: CUT_FOLLOW_TICKS,
 }
 
-const PUSHING: ShutGateStep = { facing: FACING.down, isPushing: true, canCoast: true }
+const PUSHING: ShutGateStep = { aim: AIM.down, isPushing: true, canCoast: true }
 const RELEASED: ShutGateStep = { ...PUSHING, isPushing: false }
 
 /** The memory after `ticks` ticks of the open gate following `cut`. */
@@ -77,8 +77,8 @@ describe('held cut through the gate dwell (ticket 430)', () => {
     expect(heldCutOf(memory, { ...PUSHING, canCoast: false })).toBeUndefined()
   })
 
-  it('never coasts another facing than the one it cut', () => {
-    expect(heldCutOf(followedFor(FOLLOWED), { ...PUSHING, facing: FACING.left })).toBeUndefined()
+  it('never coasts another aim than the one it cut', () => {
+    expect(heldCutOf(followedFor(FOLLOWED), { ...PUSHING, aim: AIM.left })).toBeUndefined()
   })
 
   it('forgets the cut once travel drives, so a later shut gate never coasts', () => {
@@ -107,9 +107,9 @@ describe('held cut through the gate dwell (ticket 430)', () => {
   })
 
   it('keeps the last vCut over a slab the open gate has cleared', () => {
-    expect(clearedSlabSpeedOf(followedFor(FOLLOWED), FACING.down)).toBe(VCUT)
-    expect(clearedSlabSpeedOf(followedFor(FOLLOWED), FACING.up)).toBeUndefined()
-    expect(clearedSlabSpeedOf(FRESH_CUT_MEMORY, FACING.down)).toBeUndefined()
+    expect(clearedSlabSpeedOf(followedFor(FOLLOWED), AIM.down)).toBe(VCUT)
+    expect(clearedSlabSpeedOf(followedFor(FOLLOWED), AIM.up)).toBeUndefined()
+    expect(clearedSlabSpeedOf(FRESH_CUT_MEMORY, AIM.down)).toBeUndefined()
   })
 })
 
@@ -128,7 +128,7 @@ describe('stop ramp follows the drive (ticket 430 addendum)', () => {
     for (let ticks = 0; ticks < CUT_FOLLOW_TICKS; ticks++) {
       expect(heldCutOf(releasedFor(ticks), RELEASED)).toEqual({
         speed: VCUT,
-        facing: FACING.down,
+        aim: AIM.down,
         isPushing: false,
         followedTicks: 0,
         releasedTicks: ticks,

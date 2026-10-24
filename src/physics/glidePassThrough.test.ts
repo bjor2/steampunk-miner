@@ -6,6 +6,7 @@ import { engineStats } from '../systems/economy/vehicleStats'
 import { foldMotionEffects } from '../systems/vehicle/motionEffects'
 import type { MotionGlide } from '../systems/vehicle/motionGlide'
 import { IDLE_INTENT, type VehicleIntent } from '../systems/vehicle/vehicleIntent'
+import { AIM } from '../systems/vehicle/aim'
 import { FACING } from '../systems/vehicle/vehiclePose'
 import { clearDisc, fillDisc } from '../systems/world/groundEdit'
 import { groundReaderOf } from '../systems/world/groundReader'
@@ -32,7 +33,7 @@ const LANDING: TilePoint = { tx: PHASED.tx, ty: PHASED.ty - 1 }
 const GLIDE_TICKS = 24
 const AFTER_TICKS = 30
 const CAP_BP = ECONOMY.itemEffectCaps.motionBoostCapBp
-const DRILL_DOWN: VehicleIntent = { ...IDLE_INTENT, facing: FACING.down }
+const DRILL_DOWN: VehicleIntent = { ...IDLE_INTENT, aim: AIM.down }
 /** A fill this small raises only the sample it is centred on. */
 const ONE_SAMPLE_MM = 100
 

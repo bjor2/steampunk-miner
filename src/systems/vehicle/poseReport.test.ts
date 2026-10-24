@@ -6,6 +6,7 @@ import {
   type DevFlags,
 } from '../../constants/devFlags'
 import { NO_DRIVE, type DriveSigns } from './driveSigns'
+import { AIM } from './aim'
 import { FACING, isWithinZoneTestRange } from './vehiclePose'
 import {
   countActionStep,
@@ -49,7 +50,7 @@ function reportAlong(
     const flags = flagsAt(tick)
     reporter = countActionStep(reporter, flags)
     const x = flags.isDriving ? (3 * tick) / 60 : 0
-    const pose = quantisePose({ x, y: 300.5 }, { x: 3, y: 0 }, { x: 0, y: 1 }, FACING.right)
+    const pose = quantisePose({ x, y: 300.5 }, { x: 3, y: 0 }, { x: 0, y: 1 }, AIM.right)
     const report = takePoseReport(reporter, pose, { flags, drive }, tick)
     reporter = report.reporter
     if (report.payload !== null) sent.push({ tick, payload: report.payload })
@@ -75,9 +76,15 @@ describe('pose reports', () => {
       { x: 1.23456, y: -2.5 },
       { x: 0.0004, y: -15.9996 },
       { x: 0.6, y: 0.8 },
-      2,
+      AIM.down,
     )
     expect(pose).toEqual({ x: 1235, y: -2500, vx: 0, vy: -16000, upx: 614, upy: 819, facing: 2 })
+  })
+
+  it('carry the aim off the four facings with the facing nearest it, and none at a facing (ticket 791)', () => {
+    const at = (aim: number) => quantisePose({ x: 0, y: 0 }, { x: 0, y: 0 }, { x: 0, y: 1 }, aim)
+    expect(at(56)).toMatchObject({ facing: FACING.right, aim: 56 })
+    expect(at(AIM.left)).not.toHaveProperty('aim')
   })
 
   it('go out at most 5 times a second while moving', () => {

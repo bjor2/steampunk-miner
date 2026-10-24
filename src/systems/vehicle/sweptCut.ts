@@ -26,7 +26,8 @@ import type { DiscStamp, StampPoint } from '../world/stampShape'
 import type { CutGate } from './cutGate'
 import { subStepsInQuantum } from './drillQuantum'
 import type { TilePoint } from '../world/tileGrid'
-import { facingVectorOf, tileOfMillimetres, type Facing, type VehiclePose } from './vehiclePose'
+import { aimOfPose, aimVectorOfPose, type Aim } from './aim'
+import { tileOfMillimetres, type Facing, type VehiclePose } from './vehiclePose'
 
 /** The sub-step the sweep's front is walked in: half a density sample. */
 export const SWEEP_STEP_MM = 125
@@ -59,6 +60,11 @@ export interface SweptCut extends StampPoint, CutGate {
    * at the reach, so a cursor with no bite saves and digests as before.
    */
   front?: StampPoint
+  /**
+   * The aim the step cut along where it is off the four facings (ticket 791), `facing` then the one
+   * nearest it. Absent at the four facings, so a cursor cut along one saves and digests as before.
+   */
+  aim?: Aim
 }
 
 /** Where the cursor's step left its front: its bite's, or its reach. */
@@ -132,7 +138,12 @@ export function sweepPathOf(
 }
 
 function isContinuing(cursor: SweptCut | undefined, pose: VehiclePose, tick: number): boolean {
-  return cursor !== undefined && cursor.tick === tick - 1 && cursor.facing === pose.facing
+  return cursor !== undefined && cursor.tick === tick - 1 && isSameAim(cursor, pose)
+}
+
+/** The cursor was cut along the pose's aim, its facing's where neither carries one (ticket 791). */
+export function isSameAim(cursor: SweptCut, pose: VehiclePose): boolean {
+  return aimOfPose(cursor) === aimOfPose(pose)
 }
 
 /**
@@ -140,7 +151,7 @@ function isContinuing(cursor: SweptCut | undefined, pose: VehiclePose, tick: num
  * a cutting step's carve runs from (ticket 570).
  */
 export function stampBodyPointOf({ stamp, aheadMm }: StepStamp, pose: VehiclePose): StampPoint {
-  const ahead = facingVectorOf(pose.upx, pose.upy, pose.facing)
+  const ahead = aimVectorOfPose(pose)
   return {
     xMm: stamp.xMm - scaled(ahead.x, aheadMm),
     yMm: stamp.yMm - scaled(ahead.y, aheadMm),

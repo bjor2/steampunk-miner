@@ -15,10 +15,12 @@ export function reportPoseCommand(payload: PosePayload): CommandIntent<'reportPo
 
 /**
  * The swept cut's step (ticket 330): where the body is at a fixed step its drill is engaged, and
- * the head's settled facing then (ticket 506), so the cut never waits for the next pose report.
+ * the head's settled facing then (ticket 506), so the cut never waits for the next pose report;
+ * its aim too where it is off the four facings (ticket 791).
  */
 export function drillStepCommand(pose: VehiclePose, drive: DriveSigns): CommandIntent<'drillStep'> {
-  return { type: 'drillStep', payload: { x: pose.x, y: pose.y, facing: pose.facing, drive } }
+  const step = { x: pose.x, y: pose.y, facing: pose.facing, drive }
+  return { type: 'drillStep', payload: pose.aim === undefined ? step : { ...step, aim: pose.aim } }
 }
 
 export function requestRescueCommand(): CommandIntent<'requestRescue'> {

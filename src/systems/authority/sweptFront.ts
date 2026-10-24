@@ -22,7 +22,8 @@
  */
 import type { CarryGround, CarryReach, CellBite, CellCrossing } from '../vehicle/carryWalk'
 import { centreTileAtStep, pointAtStep, type SweepPath } from '../vehicle/sweptCut'
-import { facingVectorOf, type VehiclePose } from '../vehicle/vehiclePose'
+import { aimVectorOfPose } from '../vehicle/aim'
+import { type VehiclePose } from '../vehicle/vehiclePose'
 import type { YieldedCell } from '../world/cellYield'
 import type { CutFront } from '../world/cutFront'
 import { carveDisc, type CarveWindow, type CellDrillTicks } from '../world/groundEdit'
@@ -111,7 +112,7 @@ export interface FrontPlace {
 
 /** The front plane at a point of the path, square to the pose's facing, cutting from `rear`. */
 export function cutFrontAt({ pose, point, rear, crossed, stamp }: FrontPlace): CutFront {
-  const ahead = facingVectorOf(pose.upx, pose.upy, pose.facing)
+  const ahead = aimVectorOfPose(pose)
   const { radiusMm, floorRadiusMm } = stamp
   return {
     xMm: point.xMm,
@@ -224,7 +225,7 @@ export function yieldedInFrontOrder(
   paid: readonly TilePoint[],
   pose: VehiclePose,
 ): YieldedCell[] {
-  const ahead = facingVectorOf(pose.upx, pose.upy, pose.facing)
+  const ahead = aimVectorOfPose(pose)
   const keyOf = ({ tile }: YieldedCell, at: number) => {
     const dx = tile.tx * MM_PER_METRE + MM_PER_METRE / 2 - pose.x
     const dy = tile.ty * MM_PER_METRE + MM_PER_METRE / 2 - pose.y

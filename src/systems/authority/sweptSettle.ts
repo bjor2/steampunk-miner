@@ -136,6 +136,7 @@ function withCursorAt(
     carrySubSteps,
     ...quantumKeyOf(quantum),
     ...(front === undefined ? {} : { front }),
+    ...(step.pose.aim === undefined ? {} : { aim: step.pose.aim }),
   }
   return withVehicle(state, playerId, { ...vehicle, sweptCut: cursor })
 }

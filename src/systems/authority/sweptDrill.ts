@@ -50,7 +50,7 @@ import { walkStampInRows, type StampWalk } from '../world/groundEdit'
 import type { TilePoint } from '../world/tileGrid'
 import { vehicleOf, type AuthorityState } from './authorityState'
 import type { RuleEffect } from './commandRule'
-import { cutGateAt, type CutFollowStep } from './cutFollowRead'
+import { cutFollowStepOfPose, cutGateAt, type CutFollowStep } from './cutFollowRead'
 import { perCellShareAt } from './cutShare'
 import { digSubStepsOfCells } from './drillCutTally'
 import type { DrillCarve, DrillCarveRequest } from './drillGearCut'
@@ -224,7 +224,7 @@ function sweepOf(state: AuthorityState, playerId: string, step: SweptStep): Swee
 
 /** The step as the cut-follow reads it: at the step's position, drilling. */
 function cutFollowStepOf({ pose, isLifting }: SweptStep): CutFollowStep {
-  return { x: pose.x, y: pose.y, facing: pose.facing, isLifting, isDrilling: true }
+  return cutFollowStepOfPose(pose, isLifting, true)
 }
 
 /**

@@ -35,9 +35,10 @@ import type { DrillContactRule } from '../systems/vehicle/drillContact'
 import type { StepBounds } from '../systems/vehicle/stepBound'
 import { plannedTickOf, tickPlanOf, type TickPlan } from '../systems/vehicle/tickPlan'
 import type { EngineStats } from '../systems/economy/vehicleStats'
+import { AIM, aimOfPose, isAlongUpAim, isSidewaysAim } from '../systems/vehicle/aim'
 import {
   newDrillHead,
-  settledFacingOf,
+  settledAimOf,
   stepDrillHead,
   type DrillHead,
 } from '../systems/vehicle/drillHead'
@@ -60,7 +61,7 @@ import {
   surfaceProbesOf,
   type MotionEffectInput,
 } from '../systems/vehicle/vehicleMotion'
-import { FACING, type Facing, type VehiclePose } from '../systems/vehicle/vehiclePose'
+import type { VehiclePose } from '../systems/vehicle/vehiclePose'
 import type { GroundReader } from '../systems/world/groundReader'
 import type { TilePoint } from '../systems/world/tileGrid'
 import { ISO_DENSITY } from '../systems/world/sampleGrid'
@@ -207,7 +208,7 @@ export function createVehicleController(
   const halo = createGroundHalo(rapier, world, HALO_RADIUS_BLOCKS, frame.origin)
   const struts = createStrutColliders(rapier, world, frame.origin)
   const colliders = followersOf(halo, struts)
-  let head = newDrillHead(FACING.right)
+  let head = newDrillHead(AIM.right)
   let up: Vector2 = { x: 0, y: 1 }
   let plan: TickPlan = tickPlanOf(0)
   // The hold's count (ticket 400) and the last `vCut`, held through the gate's shut dwell (430).
@@ -239,15 +240,15 @@ export function createVehicleController(
       passThrough = passThroughOf(input.motion)
       syncHaloAt(position)
       struts.sync(input.struts ?? NO_STRUTS)
-      head = stepDrillHead(head, input.intent.facing)
+      head = stepDrillHead(head, input.intent.aim)
       // The velocity the body actually had, after contacts, so a resting vehicle reports 0.
-      const pose = quantisePose(position, velocity, up, settledFacingOf(head))
+      const pose = quantisePose(position, velocity, up, settledAimOf(head))
       const isLifting = input.canAct && input.intent.lift
       const contact = input.canAct
         ? drillContactFor(input, head, { pose, isLifting }, planet.ground, cutMemory.followedTicks)
         : 'none'
       const isDrilling = contact !== 'none'
-      const isCuttingLevel = isDrilling && !isLifting && isSidewaysFacing(pose.facing)
+      const isCuttingLevel = isDrilling && !isLifting && isSidewaysAim(aimOfPose(pose))
       const cutRead = cutFollowReadFor(input, { pose, isLifting }, isDrilling)
       const isGrounded = isGroundedAt(planet.ground, struts, groundProbeOf(position, up))
       const cutStart = { read: cutRead, memory: cutMemory, contact, isCuttingLevel, isGrounded }
@@ -294,7 +295,7 @@ export function createVehicleController(
     placeAt(pose) {
       placeBodyAt(body, colliders, frame, pose)
       body.setLinvel({ x: 0, y: 0, z: 0 }, true)
-      head = newDrillHead(pose.facing)
+      head = newDrillHead(aimOfPose(pose))
       cutMemory = FRESH_CUT_MEMORY
     },
     planetPosition: () => planetPositionOf(body, frame.origin),
@@ -354,12 +355,9 @@ function isSolidAt(ground: GroundReader, point: Vector2): boolean {
   return ground.densityAtPoint(point.x, point.y) >= ISO_DENSITY
 }
 
-function isSidewaysFacing(facing: Facing): boolean {
-  return facing === FACING.left || facing === FACING.right
-}
-
+/** Straight down or up: a diagonal bore has no column to centre in. */
 function isAimingAlongUp(intent: VehicleIntent): boolean {
-  return intent.facing === FACING.down || intent.facing === FACING.up
+  return intent.aim !== null && isAlongUpAim(intent.aim)
 }
 
 /** Motion by velocity; the spin turns the body toward `localUp` (the righting torque of #7). */

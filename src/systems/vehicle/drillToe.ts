@@ -16,13 +16,8 @@
 import { UP_VECTOR_SCALE } from '../../constants/physics'
 import { ISO_DENSITY, MM_PER_SAMPLE } from '../world/sampleGrid'
 import { HALF_BODY_MM } from './drillContact'
-import {
-  FACING,
-  facingVectorOf,
-  type Facing,
-  type IntegerVector,
-  type VehiclePose,
-} from './vehiclePose'
+import { aimOfPose, aimVectorOfPose, isSidewaysAim } from './aim'
+import type { IntegerVector, VehiclePose } from './vehiclePose'
 
 /** The box's grid, mm: a tenth of a sample. */
 const TOE_STEP_MM = MM_PER_SAMPLE / 10
@@ -46,19 +41,15 @@ interface BodyFrame {
  * (the in-the-way reach, `inTheWayMmOf`), from just over the floor to the body's top.
  */
 export function solidToeAheadOf(ground: ToeGround, pose: VehiclePose, reachMm: number): boolean {
-  if (!isLevelFacing(pose.facing)) return false
+  if (!isSidewaysAim(aimOfPose(pose))) return false
   const frame = bodyFrameOf(pose)
   return isSolidInToeBox(ground, frame, lowestToeRowOf(ground, frame), reachMm)
-}
-
-function isLevelFacing(facing: Facing): boolean {
-  return facing === FACING.left || facing === FACING.right
 }
 
 function bodyFrameOf(pose: VehiclePose): BodyFrame {
   return {
     centre: { x: pose.x, y: pose.y },
-    facing: facingVectorOf(pose.upx, pose.upy, pose.facing),
+    facing: aimVectorOfPose(pose),
     up: { x: pose.upx, y: pose.upy },
   }
 }

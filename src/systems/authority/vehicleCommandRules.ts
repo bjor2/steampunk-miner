@@ -98,6 +98,7 @@ export const VEHICLE_COMMAND_RULES: {
       driveTicks: 'wholeNumber',
       drillTicks: 'wholeNumber',
       drive: 'driveSigns',
+      aim: 'optionalAim',
     },
     reject: (state, command) =>
       firstRejection([
@@ -216,9 +217,11 @@ function tickBudgetRejection(
   return rejectionOf('too_many_ticks', `action ticks must be at most ${budget}`)
 }
 
+/** The reported pose, its aim only where the report carries one (ticket 791). */
 function poseOf(payload: PosePayload): VehiclePose {
-  const { x, y, vx, vy, upx, upy, facing } = payload
-  return { x, y, vx, vy, upx, upy, facing: (isFacing(facing) ? facing : -1) as Facing }
+  const { x, y, vx, vy, upx, upy, facing, aim } = payload
+  const pose = { x, y, vx, vy, upx, upy, facing: (isFacing(facing) ? facing : -1) as Facing }
+  return aim === undefined ? pose : { ...pose, aim }
 }
 
 function recordPose(state: AuthorityState, command: AuthorityCommand<'reportPose'>): RuleEffect {

@@ -4,7 +4,12 @@
  * speed no faster than local gravity (Bjor's ruling on #724, `radialGravity.ts`); its top speed
  * stays the drill's. One table feeds both the motion rule (`cutCapSpeed.ts`, `vehicleMotion.ts`)
  * and the drill card's wording, so the card can never say something the rig does not do.
+ *
+ * A diagonal aim (ticket 791) has a part on two axes, and each part keeps its axis's rule: the
+ * sideways part of the cut stays under the drive (Bjor's rule), and a cut with a downward part
+ * gains its speed under local gravity.
  */
+import { isAlongUpAim, isDownwardAim, type Aim } from './aim'
 import { FACING, type Facing } from './vehiclePose'
 
 /** The stat that caps a cut: only the drive so far. */
@@ -46,6 +51,16 @@ export function isDriveCappedFacing(facing: Facing): boolean {
 /** Whether a cut along `facing` gains its speed no faster than local gravity (#724). */
 export function isGravityRampedFacing(facing: Facing): boolean {
   return capOfFacing(facing)?.rampedBy === 'localGravity'
+}
+
+/** Whether a cut along `aim` has a sideways part, which the drive holds (#723, ticket 791). */
+export function isDriveCappedAim(aim: Aim): boolean {
+  return !isAlongUpAim(aim) && isDriveCappedFacing(FACING.right)
+}
+
+/** Whether a cut along `aim` has a downward part, which gains no faster than gravity (#724). */
+export function isGravityRampedAim(aim: Aim): boolean {
+  return isDownwardAim(aim) && isGravityRampedFacing(FACING.down)
 }
 
 /**

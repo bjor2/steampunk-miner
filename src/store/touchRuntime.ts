@@ -1,23 +1,23 @@
 /**
- * Touch in, actions out (#173): the floating stick, the cluster's buttons, the power-up slot
- * buttons (#217; a hold-to-use item's held from finger-down to lift, ticket 332), a pinch and a
- * double tap press actions through `pressAction` and
- * `releaseAction`, the path the keys take, so a touch run submits exactly the commands of the
- * matching key run and replays alike. Which pointer does what lives here, in module state, never
- * in React or the store; the stick's drawing reads it.
+ * Touch in, actions out (#173): the cluster's buttons, the power-up slot buttons (#217; a
+ * hold-to-use item's held from finger-down to lift, ticket 332), a pinch and a double tap press
+ * actions through `pressAction` and `releaseAction`, the path the keys take, so they submit
+ * exactly the commands of the matching keys. The floating stick is analog (ticket 791): its push
+ * is the drive and the drill's aim (`driveWithStick`), from the deadzone's edge to the rim, never
+ * four held actions. Which pointer does what lives here, in module state, never in React or the
+ * store; the stick's drawing reads it.
  */
 import type { ActionId } from '../systems/input/actionMap'
 import {
-  heldChangesOf,
   isDoubleTap,
   isSlotHeldForCard,
   pinchZoomStepsOf,
-  stickActionsOf,
+  stickDriveAt,
   type SlotTileActionId,
   type StickOffset,
   type TapPoint,
 } from '../systems/input/touchControls'
-import { pressAction, releaseAction } from './inputRuntime'
+import { driveWithStick, pressAction, readStickDrive, releaseAction } from './inputRuntime'
 
 /** Where the stick landed and how far the thumb has pushed it, for the stick's drawing. */
 export interface StickPresence {
@@ -34,7 +34,6 @@ export const stickPresence: StickPresence = {
   offset: { dx: 0, dy: 0 },
 }
 
-let stickHeld: ActionId[] = []
 const pinchPoints = new Map<number, { x: number; y: number }>()
 let pinchStartDistance = 0
 let pinchStepsTaken = 0
@@ -50,18 +49,18 @@ export function landStick(pointerId: number, x: number, y: number): void {
   placeStick(pointerId, x, y)
 }
 
-/** The thumb moves: the held move actions follow the stick's direction. */
+/** The thumb moves: the drive and the aim follow the stick's push. */
 export function pushStick(pointerId: number, x: number, y: number): void {
   if (stickPresence.pointerId !== pointerId) return
   stickPresence.offset.dx = x - stickPresence.originX
   stickPresence.offset.dy = y - stickPresence.originY
-  holdOnly(stickActionsOf(stickPresence.offset))
+  driveWithStick('touch', stickDriveAt(stickPresence.offset, readStickDrive('touch')?.aim ?? null))
 }
 
-/** The thumb lifts: every move action it held is released that same moment. */
+/** The thumb lifts: the stick stops driving that same moment. */
 export function liftStick(pointerId: number): void {
   if (stickPresence.pointerId !== pointerId) return
-  holdOnly([])
+  driveWithStick('touch', null)
   placeStick(null, stickPresence.originX, stickPresence.originY)
 }
 
@@ -134,7 +133,7 @@ export function leaveScreen(pointerId: number): void {
 
 /** Nothing held, no stick, no pinch; specs and a fresh store start here. */
 export function resetTouch(): void {
-  stickHeld = []
+  driveWithStick('touch', null)
   pinchPoints.clear()
   lastTap = null
   slotPressedAtMs.clear()
@@ -162,13 +161,6 @@ function placeStick(pointerId: number | null, x: number, y: number): void {
   stickPresence.originY = y
   stickPresence.offset.dx = 0
   stickPresence.offset.dy = 0
-}
-
-function holdOnly(next: readonly ActionId[]): void {
-  const { released, pressed } = heldChangesOf(stickHeld, next)
-  released.forEach(releaseAction)
-  pressed.forEach(pressAction)
-  stickHeld = [...next]
 }
 
 function startPinch(): void {

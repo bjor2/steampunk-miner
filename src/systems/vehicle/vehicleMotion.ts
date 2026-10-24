@@ -19,18 +19,32 @@
  * faster than `downCutAcceleration` (Bjor's ruling on #724: local gravity with a 0.1 g core floor,
  * `radialGravity.ts`); it slows at once, and its top speed stays the drill's. Otherwise the engine
  * passed in drives as above, at its own `speedMax`.
+ *
+ * Ticket 791: the drive is analog, `moveX` in 64ths of a full push, so a half push drives the
+ * wheels toward half the top speed; a key's full push drives exactly as before. A cut along a
+ * diagonal aim sets the speed along the aim itself, both axes at once and no gravity, as a cut
+ * down or up does along `localUp`: its sideways part comes in held to the drive's
+ * (`cutCapSpeed.ts`), and one with a downward part gains along the aim no faster than
+ * `downCutAcceleration`.
  */
 import { MAX_SPEED_MM_PER_SECOND } from '../../constants/balance'
 import {
   BASE_DRIVE_ACCELERATION,
   BORE_ALIGN_SECONDS,
+  DRIVE_PUSH_STEPS,
   GROUND_PROBE_DEPTH,
   MM_PER_METRE,
   VEHICLE_COLLIDER_SIZE,
 } from '../../constants/physics'
 import type { EngineStats } from '../economy/vehicleStats'
-import { isGravityRampedFacing } from './cutAxisCaps'
-import { cutFollowSpeedOf, isCutFollowAlongGround, type CutFollowMotion } from './cutFollowMotion'
+import { aimDirectionOf } from './aim'
+import { isGravityRampedAim } from './cutAxisCaps'
+import {
+  cutFollowSpeedOf,
+  isCutFollowAlongGround,
+  isCutFollowAlongUp,
+  type CutFollowMotion,
+} from './cutFollowMotion'
 import { dot, fromLocalFrame, tangentOf, type Vector2 } from './localFrame'
 import {
   boostedEngineOf,
@@ -135,6 +149,7 @@ function effectStep(input: MotionStepInput, effect: MotionEffectInput): MotionSt
 }
 
 function drivenStep(input: MotionStepInput, frame: DriveFrame): MotionStep {
+  if (isCutFollowDiagonal(input.cutFollow)) return diagonalCutStep(input, input.cutFollow)
   const isThrusting = input.canAct && input.intent.lift
   const along = nextAlongSpeed(input, frame.engine)
   const upward = nextUpwardSpeed(input, frame, isThrusting)
@@ -167,7 +182,7 @@ function rampedByGravity(
   input: MotionStepInput,
 ): number {
   const { downCutAcceleration } = input
-  if (downCutAcceleration === undefined || !isGravityRampedFacing(cut.facing)) return followed
+  if (downCutAcceleration === undefined || !isGravityRampedAim(cut.aim)) return followed
   return Math.max(followed, Math.min(0, current) - downCutAcceleration * input.dt)
 }
 
@@ -191,7 +206,51 @@ function pulledByGravity(input: MotionStepInput, frame: DriveFrame, local: Vecto
 }
 
 function isCutFollowUpward(cut: CutFollowMotion | undefined): cut is CutFollowMotion {
-  return cut !== undefined && !isCutFollowAlongGround(cut)
+  return cut !== undefined && isCutFollowAlongUp(cut)
+}
+
+function isCutFollowDiagonal(cut: CutFollowMotion | undefined): cut is CutFollowMotion {
+  return cut !== undefined && !isCutFollowAlongGround(cut) && !isCutFollowAlongUp(cut)
+}
+
+/**
+ * A cut along a diagonal aim (ticket 791): the drill sets the speed along the aim, ramped as a cut
+ * down's where it has a downward part, and gravity does not pull, as along a bore.
+ */
+function diagonalCutStep(input: MotionStepInput, cut: CutFollowMotion): MotionStep {
+  const ahead = aimUnitOf(input.up, cut)
+  const current = dot(input.velocity, ahead)
+  const followed = cutFollowSpeedOf(current, cut, false)
+  const speed = rampedAlongAim(followed, current, cut, input)
+  return {
+    velocity: withinSpeedBound({ x: ahead.x * speed, y: ahead.y * speed }, input.maxSpeed),
+    isDriving: input.canAct && input.intent.moveX !== 0 && input.isGrounded,
+    isThrusting: input.canAct && input.intent.lift,
+    isGravityLimited: speed !== followed,
+  }
+}
+
+/**
+ * A diagonal cut with a downward part gains speed along its aim at most `downCutAcceleration * dt`
+ * on the speed it has into the cut (#724 along the aim, as `downCutRamp.ts` steps its front).
+ */
+function rampedAlongAim(
+  followed: number,
+  current: number,
+  cut: CutFollowMotion,
+  input: MotionStepInput,
+): number {
+  const { downCutAcceleration } = input
+  if (downCutAcceleration === undefined || !isGravityRampedAim(cut.aim)) return followed
+  return Math.min(followed, Math.max(0, current) + downCutAcceleration * input.dt)
+}
+
+/** The cut's aim as a world unit vector. */
+function aimUnitOf(up: Vector2, cut: CutFollowMotion): Vector2 {
+  const direction = aimDirectionOf(cut.aim)
+  const local = fromLocalFrame(up, direction.along, direction.up)
+  const length = Math.sqrt(local.x * local.x + local.y * local.y)
+  return length === 0 ? local : { x: local.x / length, y: local.y / length }
 }
 
 function isCutFollowAlong(cut: CutFollowMotion | undefined): cut is CutFollowMotion {
@@ -264,9 +323,14 @@ function tugAlongOf(input: MotionStepInput): number {
 function targetAlongSpeed(input: MotionStepInput, engine: EngineStats): number {
   const { intent, boreOffset } = input
   if (input.isWaitingForCut) return 0
-  if (intent.moveX !== 0 || boreOffset === null) return intent.moveX * engine.speedMax
+  if (intent.moveX !== 0 || boreOffset === null) return pushShareOf(intent) * engine.speedMax
   const centring = boreOffset / BORE_ALIGN_SECONDS
   return Math.max(-engine.speedMax, Math.min(engine.speedMax, centring))
+}
+
+/** The drive's share of a full push, -1 to 1 (64ths are exact, so a key's is exactly 1). */
+function pushShareOf(intent: VehicleIntent): number {
+  return intent.moveX / DRIVE_PUSH_STEPS
 }
 
 /** Metres along the tangent from `position` to the centre of the tile it is in. */

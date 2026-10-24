@@ -27,9 +27,10 @@ export function isCutHeld(state: AuthorityState, playerId: string): boolean {
 /** A held step: the cursor kept where it reached, at the step's position and tick, nothing cut. */
 export function holdTheCut(state: AuthorityState, playerId: string, pose: VehiclePose): RuleEffect {
   const vehicle = vehicleOf(state, playerId)
-  const cursor = vehicle.sweptCut as SweptCut
+  const { aim: _cursorAim, ...cursor } = vehicle.sweptCut as SweptCut
   const held: SweptCut = {
     ...cursor,
+    ...(pose.aim === undefined ? {} : { aim: pose.aim }),
     poseXMm: pose.x,
     poseYMm: pose.y,
     facing: pose.facing,

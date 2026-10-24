@@ -9,7 +9,8 @@ import type RAPIER from '@dimforge/rapier3d-compat'
 import { PHYSICS_TIMESTEP } from '../constants/physics'
 import type { Vector2 } from '../systems/vehicle/localFrame'
 import type { SweepGround, TickPlan } from '../systems/vehicle/tickPlan'
-import { facingVectorOf, type VehiclePose } from '../systems/vehicle/vehiclePose'
+import { aimVectorOfPose } from '../systems/vehicle/aim'
+import { type VehiclePose } from '../systems/vehicle/vehiclePose'
 import type { GroundReader } from '../systems/world/groundReader'
 import { ISO_DENSITY } from '../systems/world/sampleGrid'
 
@@ -57,7 +58,7 @@ export function sweepGroundOf(
 }
 
 function unitFacingOf(pose: VehiclePose): Vector2 {
-  const facing = facingVectorOf(pose.upx, pose.upy, pose.facing)
+  const facing = aimVectorOfPose(pose)
   const length = Math.sqrt(facing.x * facing.x + facing.y * facing.y)
   return { x: facing.x / length, y: facing.y / length }
 }

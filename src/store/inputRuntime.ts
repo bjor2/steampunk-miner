@@ -19,9 +19,14 @@
  * (ticket 345, the #314 TD lock section 2): the ground gun repeats its fire while its press is
  * held, and a press count catches a tap shorter than a frame. Release clears it on any layer, as
  * it sends a release, so a key let go after docking never leaves the gun firing.
+ *
+ * The analog sticks (ticket 791) drive past the actions: the touch stick and the pad's left stick
+ * each hand their push here (`driveWithStick`), and while one pushes it is the intent itself, its
+ * drive and aim analog; the four held move actions take over again once it rests.
  */
 import type { KeyChange, ScrollNotch } from '../shell/shell'
 import { ACTION_MAP, actionDefOf, actionsOfChord, type ActionId } from '../systems/input/actionMap'
+import { intentOfStick, type StickDrive } from '../systems/input/analogStick'
 import { buildIntent } from '../systems/input/buildIntent'
 import {
   reactionToPress,
@@ -55,6 +60,13 @@ const actionsDown = new Set<ActionId>()
 const pressCounts = new Map<ActionId, number>()
 /** The vehicle's held drive actions (#170: holding one leaves the Workshop showcase). */
 const DRIVE_ACTIONS: readonly ActionId[] = ['aim_left', 'aim_right', 'aim_down', 'lift']
+
+/** The analog sticks that drive (ticket 791); the touch stick wins while both push. */
+export type StickSource = 'touch' | 'pad'
+
+const STICK_SOURCES: readonly StickSource[] = ['touch', 'pad']
+/** Each analog stick's drive while it pushes; a source at rest has none. */
+const stickDrives = new Map<StickSource, StickDrive>()
 
 /** One pad input going down or up, with whether the pad modifier (LB) was held as it went. */
 export interface PadChange {
@@ -145,10 +157,32 @@ export function pressCountOf(action: ActionId): number {
   return pressCounts.get(action) ?? 0
 }
 
-/** What the fixed step drives with: idle whenever a menu layer is on top. */
+/**
+ * An analog stick's drive now, or null once it rests (ticket 791). A push that starts is play, so
+ * it starts a scenario waiting for play, as a key does.
+ */
+export function driveWithStick(source: StickSource, drive: StickDrive | null): void {
+  if (drive === null) {
+    stickDrives.delete(source)
+    return
+  }
+  if (!stickDrives.has(source)) useGameStore.getState().releaseHoldUntilPlay()
+  stickDrives.set(source, drive)
+}
+
+/** The drive the stick pushes with now, or null while it rests; a push near its aim keeps it. */
+export function readStickDrive(source: StickSource): Readonly<StickDrive> | null {
+  return stickDrives.get(source) ?? null
+}
+
+/**
+ * What the fixed step drives with: idle whenever a menu layer is on top, a pushing analog stick's
+ * drive, else the held actions'.
+ */
 export function readVehicleIntent(): VehicleIntent {
   if (inputLayerOf(useGameStore.getState()) !== 'vehicle') return IDLE_INTENT
-  return buildIntent(heldActions)
+  const stick = pushingStickDrive()
+  return stick === null ? buildIntent(heldActions) : intentOfStick(stick)
 }
 
 /** Whether a key bound to a drive action is down, on any layer (the Workshop's leave, #170). */
@@ -167,6 +201,12 @@ export function resetInput(): void {
   keysDown.clear()
   actionsDown.clear()
   pressCounts.clear()
+  stickDrives.clear()
+}
+
+function pushingStickDrive(): StickDrive | null {
+  const source = STICK_SOURCES.find((stick) => stickDrives.has(stick))
+  return source === undefined ? null : (stickDrives.get(source) ?? null)
 }
 
 function rememberCode(code: string, isDown: boolean): void {

@@ -10,7 +10,6 @@ import { ACTION_MAP, defaultBindings, defaultPadBindings } from '../systems/inpu
 import { PAD_INPUTS } from '../systems/input/padCodes'
 import type { PadReading } from '../systems/input/padFrame'
 import { readPreferences } from '../systems/input/preferences'
-import { FACING } from '../systems/vehicle/vehiclePose'
 import { createStartingAuthority, resetGameStore, useGameStore } from './gameStore'
 import {
   readActionStream,
@@ -92,10 +91,30 @@ describe('gamepad adapter: the key path under pad codes (ticket 346)', () => {
 
   it('drives with the left stick while it is pushed and stops when it rests', () => {
     routePadFrame(padHolding(['PadLStickRight']))
-    expect(readVehicleIntent()).toEqual({ moveX: 1, facing: FACING.right, lift: false })
+    expect(readVehicleIntent()).toEqual({ moveX: 64, aim: 0, lift: false })
     routePadFrame(IDLE_PAD)
     expect(readVehicleIntent().moveX).toBe(0)
     expect(edgesOf()).toEqual(['aim_right+', 'aim_right-'])
+  })
+
+  it('drives the left stick analog: half a push at about half speed, a diagonal aimed between (ticket 791)', () => {
+    routePadFrame({ buttons: [], axes: [0.6, 0, 0, 0] })
+    expect(readVehicleIntent()).toEqual({ moveX: 32, aim: 0, lift: false })
+    routePadFrame({ buttons: [], axes: [0.7, 0.7, 0, 0] })
+    expect(readVehicleIntent()).toMatchObject({ aim: 56, lift: false })
+    routePadFrame({ buttons: [], axes: [-0.5, -0.5, 0, 0] })
+    expect(readVehicleIntent()).toMatchObject({ aim: 24, lift: true })
+    routePadFrame({ buttons: [], axes: [0.1, 0.1, 0, 0] })
+    expect(readVehicleIntent()).toEqual({ moveX: 0, aim: null, lift: false })
+  })
+
+  it('sweeps the drill aim smoothly as the left stick turns a circle', () => {
+    const aims = Array.from({ length: 16 }, (_, step) => {
+      const angle = (step / 16) * 2 * Math.PI
+      routePadFrame({ buttons: [], axes: [Math.cos(angle) * 0.9, -Math.sin(angle) * 0.9, 0, 0] })
+      return readVehicleIntent().aim
+    })
+    expect(aims).toEqual(Array.from({ length: 16 }, (_, step) => step * 4))
   })
 
   it('lets go of a stick held while docking, so nothing sticks on the way out', () => {

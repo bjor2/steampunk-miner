@@ -18,7 +18,8 @@ import { BODY_HALF_SIZE_MM, CARRY_RELEASE_MARGIN_SAMPLES } from '../../constants
 import { UP_VECTOR_SCALE } from '../../constants/physics'
 import type { CarryGround, CarryReach } from '../vehicle/carryWalk'
 import { sweptStampOf, type SweepPath } from '../vehicle/sweptCut'
-import { facingVectorOf, type IntegerVector, type VehiclePose } from '../vehicle/vehiclePose'
+import { aimVectorOfPose } from '../vehicle/aim'
+import { type IntegerVector, type VehiclePose } from '../vehicle/vehiclePose'
 import { carveDisc, type CellDrillTicks } from '../world/groundEdit'
 import type { PlanetParams } from '../world/planetParams'
 import { MM_PER_SAMPLE, SAMPLES_PER_TILE } from '../world/sampleGrid'
@@ -57,7 +58,7 @@ function nextStepSlabOf(pose: VehiclePose, cuttingMm: number): NextStepSlab {
   const margin = CARRY_RELEASE_MARGIN_SAMPLES * MM_PER_SAMPLE
   return {
     pose,
-    facing: facingVectorOf(pose.upx, pose.upy, pose.facing),
+    facing: aimVectorOfPose(pose),
     nearest: BODY_HALF_SIZE_MM * UP_VECTOR_SCALE,
     furthest: (BODY_HALF_SIZE_MM + cuttingMm + margin) * UP_VECTOR_SCALE,
     halfWidth: (BODY_HALF_SIZE_MM + margin) * UP_VECTOR_SCALE,

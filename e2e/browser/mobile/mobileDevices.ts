@@ -29,12 +29,13 @@ export const MOBILE_DEVICES: readonly MobileDevice[] = [
 export const PERF_PHONE_PROJECT = 'mobile-chromium-pixel7'
 
 /**
- * The specs the mobile projects run: this folder, and the screen matrix's touch specs (the stick's
- * action stream, the pause button, the charge size badge, slot holds, taps for cards and money).
+ * The specs the mobile projects run: this folder, and the screen matrix's touch specs (the stick
+ * driving as the keys do, the analog stick of ticket 791, the pause button, the charge size badge, slot holds, taps for cards and money).
  */
 export const MOBILE_SPECS = [
   '**/browser/mobile/*.spec.ts',
   '**/browser/screens/touchControls.spec.ts',
+  '**/browser/screens/touchStickAnalog.spec.ts',
   '**/browser/screens/tapAffordances.spec.ts',
   '**/browser/screens/slotHoldRing.spec.ts',
 ]

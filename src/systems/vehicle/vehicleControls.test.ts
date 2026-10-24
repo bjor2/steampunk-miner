@@ -2,13 +2,14 @@ import { describe, expect, it } from 'vitest'
 import { MAX_SPEED_MM_PER_SECOND, SWIVEL_TICKS } from '../../constants/balance'
 import { MM_PER_METRE, PHYSICS_TIMESTEP } from '../../constants/physics'
 import { engineStats } from '../economy/vehicleStats'
-import { newDrillHead, settledFacingOf, stepDrillHead, type DrillHead } from './drillHead'
+import { AIM, type Aim } from './aim'
+import { newDrillHead, settledAimOf, stepDrillHead, type DrillHead } from './drillHead'
 import { dot, localUpOf, tangentOf, type Vector2 } from './localFrame'
 import { gravityAt, gravityStrengthAt, liftAcceleration } from './radialGravity'
 import { buildIntent } from '../input/buildIntent'
 import { IDLE_INTENT, type VehicleIntent } from './vehicleIntent'
 import { offsetToTileCentre, stepVehicleMotion, type MotionStep } from './vehicleMotion'
-import { FACING, facingVectorOf, type Facing } from './vehiclePose'
+import { FACING, facingVectorOf } from './vehiclePose'
 
 const RADIUS = 300
 const PLANET_ANGLES: readonly Vector2[] = [
@@ -72,7 +73,7 @@ describe('vehicle local frame', () => {
 
   it('reads "right" from held actions alone, so no camera angle or mode can change it', () => {
     expect(buildIntent.length).toBe(1)
-    expect(buildIntent(['aim_right'])).toEqual({ moveX: 1, facing: FACING.right, lift: false })
+    expect(buildIntent(['aim_right'])).toEqual({ moveX: 64, aim: AIM.right, lift: false })
   })
 
   it('gives "right" the same tangential velocity relative to localUp at every planet angle', () => {
@@ -87,6 +88,25 @@ describe('vehicle local frame', () => {
       expect(frame.upward).toBeCloseTo(local[0].upward, 9)
     })
     expect(local[0].along).toBeGreaterThan(0)
+  })
+})
+
+describe('vehicle analog drive (ticket 791)', () => {
+  const alongAfter = (moveX: number) => {
+    const intent: VehicleIntent = { moveX, aim: moveX < 0 ? 32 : 0, lift: false }
+    return dot(runMotion(PLANET_ANGLES[0], intent, 120).velocity, tangentOf({ x: 0, y: 1 }))
+  }
+
+  it('drives a half push at about half the top speed, a full push at the top speed', () => {
+    const full = alongAfter(64)
+    expect(full).toBeCloseTo(engineStats(0).speedMax, 0)
+    expect(alongAfter(32) / full).toBeCloseTo(0.5, 2)
+    expect(alongAfter(-16) / full).toBeCloseTo(-0.25, 2)
+  })
+
+  it('drives faster the further the push goes', () => {
+    const speeds = [8, 16, 24, 32, 40, 48, 56, 64].map(alongAfter)
+    speeds.slice(1).forEach((speed, at) => expect(speed).toBeGreaterThan(speeds[at]))
   })
 })
 
@@ -147,7 +167,7 @@ describe('vehicle gravity', () => {
   it('never lets the speed exceed the pose bound, however long the fall or the lift', () => {
     const bound = MAX_SPEED_MM_PER_SECOND / MM_PER_METRE
     expect(speedOf(runMotion(PLANET_ANGLES[2], IDLE_INTENT, 600, 1.4, false).velocity)).toBe(bound)
-    const lift = { moveX: 1, facing: null, lift: true } as const
+    const lift = { moveX: 64, aim: null, lift: true } as const
     expect(speedOf(runMotion(PLANET_ANGLES[0], lift, 600, 1, false).velocity)).toBeLessThanOrEqual(
       bound,
     )
@@ -160,24 +180,43 @@ describe('vehicle gravity', () => {
 })
 
 describe('drill head', () => {
-  function stepHead(head: DrillHead, pushes: readonly (Facing | null)[]): DrillHead {
+  function stepHead(head: DrillHead, pushes: readonly (Aim | null)[]): DrillHead {
     return pushes.reduce(stepDrillHead, head)
   }
 
   it('takes the latest pushed direction as the facing', () => {
-    expect(buildIntent(['aim_down', 'aim_right']).facing).toBe(FACING.right)
-    expect(buildIntent(['aim_right', 'aim_down']).facing).toBe(FACING.down)
-    expect(buildIntent([]).facing).toBeNull()
+    expect(buildIntent(['aim_down', 'aim_right']).aim).toBe(AIM.right)
+    expect(buildIntent(['aim_right', 'aim_down']).aim).toBe(AIM.down)
+    expect(buildIntent([]).aim).toBeNull()
   })
 
   it('reaches the pushed facing within SWIVEL_TICKS steps and keeps it on release', () => {
-    const turning = stepHead(newDrillHead(FACING.right), [FACING.down])
-    expect(settledFacingOf(stepHead(turning, Array(SWIVEL_TICKS - 2).fill(null)))).toBe(
-      FACING.right,
-    )
+    const turning = stepHead(newDrillHead(AIM.right), [AIM.down])
+    expect(settledAimOf(stepHead(turning, Array(SWIVEL_TICKS - 2).fill(null)))).toBe(AIM.right)
     const turned = stepHead(turning, Array(SWIVEL_TICKS).fill(null))
-    expect(settledFacingOf(turned)).toBe(FACING.down)
+    expect(settledAimOf(turned)).toBe(AIM.down)
     expect(SWIVEL_TICKS).toBe(8)
+  })
+
+  it('tracks a stick nudge of a step or two at once, and turns to anything further (ticket 791)', () => {
+    expect(settledAimOf(stepHead(newDrillHead(56), [57]))).toBe(57)
+    expect(settledAimOf(stepHead(newDrillHead(56), [58, 60, 62]))).toBe(62)
+    expect(settledAimOf(stepHead(newDrillHead(56), [60]))).toBe(56)
+  })
+
+  it('follows a sweeping stick a step a tick without ever falling behind', () => {
+    const sweep = Array.from({ length: 64 }, (_, step) => step)
+    let head = newDrillHead(0)
+    for (const aim of sweep) {
+      head = stepDrillHead(head, aim)
+      expect(settledAimOf(head)).toBe(aim)
+    }
+  })
+
+  it('lets a nudge during a turn change where it ends, not when', () => {
+    const turning = stepHead(newDrillHead(AIM.right), [AIM.down, 49])
+    const turned = stepHead(turning, Array(SWIVEL_TICKS - 1).fill(null))
+    expect(settledAimOf(turned)).toBe(49)
   })
 
   it('builds the world facing from a * tangent + b * localUp with a, b in {-1, 0, 1}', () => {

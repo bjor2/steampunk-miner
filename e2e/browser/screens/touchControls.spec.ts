@@ -1,7 +1,7 @@
 /**
  * The touch controls in the touch cells (#173: the TD amendment and Gameplay & Vehicle's five
- * acceptance points): sizes and clearances, the stick and the keys pressing the same action
- * stream, the cluster following the situation, the left-handed mirror, and the keyboard hiding
+ * acceptance points): sizes and clearances, the stick at its rim driving as the keys do (the
+ * stick analog since ticket 791, `touchStickAnalog.spec.ts`), the cluster following the situation, the left-handed mirror, and the keyboard hiding
  * them until the next touch. Every screen is reached by taps alone. Driven by real touch events.
  * Ticket 472 (#470 P1-1): the pause button while diving, the hold while the page is hidden, and
  * the controls inside a notched safe area. Ticket 473 (#470 P1-2): the charge size badge, whose
@@ -10,6 +10,7 @@
  */
 import { expect, test, type Page } from '@playwright/test'
 import type { ActionEdge } from '../../../src/store/inputRuntime'
+import type { VehicleIntent } from '../../../src/systems/vehicle/vehicleIntent'
 import { skipWhereEngineIsMissing, skipWithoutCdp } from '../mobile/mobileHelpers'
 import {
   boxOf,
@@ -35,7 +36,7 @@ const TOUCH_TARGET_PX = 44
 skipWhereEngineIsMissing()
 
 // Either way up since ticket 485 (#470 PT-3): the portrait cells run every test here too, so the
-// stick's and the keys' action streams are held equal upright; `portraitTouch.spec.ts` adds
+// stick's and the keys' intents are held equal upright; `portraitTouch.spec.ts` adds
 // the upright layout's own checks.
 test.beforeEach(() => {
   test.skip(!currentCell().isTouch, 'touch controls play on touch screens')
@@ -82,7 +83,7 @@ test.describe('screen matrix: touch controls (#173)', () => {
     expect(errors).toEqual([])
   })
 
-  test('presses the same action stream with the stick as with the keys', async ({
+  test('drives with the stick at its rim exactly as with the keys, pressing no move action (ticket 791)', async ({
     page,
     browserName,
   }) => {
@@ -98,29 +99,20 @@ test.describe('screen matrix: touch controls (#173)', () => {
       })
     const before = (await actionStream(page)).length
     await touchAt('touchStart', start.x, start.y)
-    await touchAt('touchMove', start.x + 40, start.y)
-    await touchAt('touchMove', start.x + 30, start.y - 30)
-    await touchAt('touchMove', start.x + 40, start.y)
+    await touchAt('touchMove', start.x + 56, start.y)
+    const onStickRight = await vehicleIntent(page)
+    await touchAt('touchMove', start.x, start.y - 56)
+    const onStickUp = await vehicleIntent(page)
     await touchAt('touchEnd', 0, 0)
-    const middle = (await actionStream(page)).length
-    for (const [code, isDown] of [
-      ['KeyD', true],
-      ['KeyW', true],
-      ['KeyW', false],
-      ['KeyD', false],
-    ] as const) {
-      if (isDown) await page.keyboard.down(code)
-      else await page.keyboard.up(code)
-    }
-    const stream = await actionStream(page)
-    const onTouch = stream.slice(before, middle)
-    expect(onTouch).toEqual([
-      { actionId: 'aim_right', isDown: true },
-      { actionId: 'lift', isDown: true },
-      { actionId: 'lift', isDown: false },
-      { actionId: 'aim_right', isDown: false },
-    ])
-    expect(stream.slice(middle)).toEqual(onTouch)
+    expect((await actionStream(page)).slice(before)).toEqual([])
+    await page.keyboard.down('KeyD')
+    const onKeyRight = await vehicleIntent(page)
+    await page.keyboard.up('KeyD')
+    await page.keyboard.down('KeyW')
+    const onKeyUp = await vehicleIntent(page)
+    await page.keyboard.up('KeyW')
+    expect(onStickRight).toEqual(onKeyRight)
+    expect(onStickUp).toEqual(onKeyUp)
     expect(errors).toEqual([])
   })
 
@@ -302,6 +294,14 @@ function clusterIds(page: Page): Promise<string[]> {
     .getByTestId('touch-cluster')
     .locator('button')
     .evaluateAll((buttons) => buttons.map((button) => button.getAttribute('data-testid') ?? ''))
+}
+
+function vehicleIntent(page: Page): Promise<VehicleIntent> {
+  return page.evaluate(() => {
+    const result = window.steampunkDebug!.input.getVehicleIntent()
+    if (!result.ok) throw new Error(result.problems.join('; '))
+    return result.intent
+  })
 }
 
 function actionStream(page: Page): Promise<ActionEdge[]> {

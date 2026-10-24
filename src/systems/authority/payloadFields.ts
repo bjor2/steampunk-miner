@@ -5,6 +5,7 @@
  */
 import { isNonNegativeMoneyText } from '../money'
 import { readIndexText } from '../starMap/planetAddress'
+import { isAim } from '../vehicle/aim'
 import { isDriveSigns } from '../vehicle/driveSigns'
 import { isBayId } from '../world/dockBays'
 
@@ -30,6 +31,11 @@ export type FieldKind =
   | 'flagMap'
   /** An index from 1 as canonical decimal text, as a star-map address crosses JSON (ticket 755). */
   | 'indexText'
+  /**
+   * The drill's aim in 1/64 turns, 0 to 63, or no field at all: a pose aims at its facing without
+   * one (ticket 791), so every command before protocol 107 still reads.
+   */
+  | 'optionalAim'
 
 export type PayloadFields = Readonly<Record<string, FieldKind>>
 
@@ -70,6 +76,10 @@ const FIELD_CHECKS: Record<FieldKind, { isValid: (value: unknown) => boolean; ex
     indexText: {
       isValid: (value) => readIndexText(value) !== null,
       expected: 'an index from 1 as decimal text',
+    },
+    optionalAim: {
+      isValid: (value) => value === undefined || isAim(value),
+      expected: 'a whole step from 0 to 63, or no aim',
     },
   }
 

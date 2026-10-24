@@ -19,6 +19,7 @@ import { shownPlanetCardOf } from '../store/planetCardSlice'
 import {
   pressAction,
   readActionStream,
+  readVehicleIntent,
   releaseAction,
   type ActionEdge,
 } from '../store/inputRuntime'
@@ -41,6 +42,7 @@ import {
   type Bindings,
 } from '../systems/input/actionMap'
 import { padReadingProblems, type PadAim, type PadReading } from '../systems/input/padFrame'
+import type { VehicleIntent } from '../systems/vehicle/vehicleIntent'
 import {
   preferenceProblems,
   type PreferenceName,
@@ -227,6 +229,12 @@ export interface DebugInput {
   padFrame(pad: unknown): DebugResult
   /** The right stick's aim the bore gun reads, or null while it rests (ticket 346). */
   getPadAim(): DebugResult<{ aim: PadAim | null }>
+  /**
+   * What the fixed step drives with now (ticket 791): `moveX` in 64ths of a full push, the drill's
+   * `aim` in 1/64 turns (null for none) and `lift`, from the keys or a pushing analog stick. An
+   * unlogged read.
+   */
+  getVehicleIntent(): DebugResult<{ intent: VehicleIntent }>
 }
 
 const game = () => useGameStore.getState()
@@ -288,6 +296,7 @@ export function createDebugInput(): DebugInput {
     getActionStream: () => ({ ok: true, stream: [...readActionStream()] }),
     padFrame: routePadFrameUnlessRefused,
     getPadAim: () => ({ ok: true, aim: copyOfPadAim() }),
+    getVehicleIntent: () => ({ ok: true, intent: { ...readVehicleIntent() } }),
   }
 }
 

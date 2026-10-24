@@ -1,9 +1,10 @@
 import RAPIER from '@dimforge/rapier3d-compat'
 import { beforeAll, describe, expect, it } from 'vitest'
 import { MAX_SPEED_MM_PER_SECOND } from '../constants/balance'
-import { MM_PER_METRE, PHYSICS_TIMESTEP } from '../constants/physics'
+import { DRIVE_PUSH_STEPS, MM_PER_METRE, PHYSICS_TIMESTEP } from '../constants/physics'
 import { engineStats } from '../systems/economy/vehicleStats'
 import { IDLE_INTENT, type VehicleIntent } from '../systems/vehicle/vehicleIntent'
+import { AIM } from '../systems/vehicle/aim'
 import { FACING } from '../systems/vehicle/vehiclePose'
 import { planetParamsFor } from '../systems/world/planetParams'
 import { clearDisc } from '../systems/world/groundEdit'
@@ -151,10 +152,10 @@ describe('vehicle physics', () => {
       harness.run(IDLE_INTENT, 240)
       expect(harness.tile()).toEqual(localTile(turns, 0, 7))
 
-      harness.run({ moveX: 1, facing: FACING.right, lift: false }, 120)
+      harness.run({ moveX: DRIVE_PUSH_STEPS, aim: AIM.right, lift: false }, 120)
       expect(harness.tile()).toEqual(localTile(turns, 5, 7))
 
-      harness.run({ moveX: -1, facing: FACING.left, lift: false }, 120)
+      harness.run({ moveX: -DRIVE_PUSH_STEPS, aim: AIM.left, lift: false }, 120)
       // Held against the shaft's round far wall the wheels ride up it; let go, the body settles.
       harness.run(IDLE_INTENT, 120)
       expect(harness.tile()).toEqual(localTile(turns, 0, 7))

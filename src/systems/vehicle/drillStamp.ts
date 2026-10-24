@@ -31,7 +31,8 @@ import { centreDistanceFloorMmOf } from '../world/exactSquares'
 import type { DiscStamp, StampPoint } from '../world/stampShape'
 import { MM_PER_SAMPLE } from '../world/sampleGrid'
 import { drillStampLiftMm, drillStampRadiusMm } from './drillBore'
-import { FACING, facingVectorOf, type VehiclePose } from './vehiclePose'
+import { AIM, aimDirectionOf, aimOfPose, aimVectorOfPose, isSidewaysAim, type Aim } from './aim'
+import type { VehiclePose } from './vehiclePose'
 
 const HALF_BODY_MM = (VEHICLE_COLLIDER_SIZE * 1000) / 2
 /** Contacts let a resting body sink a few mm into its floor; that must not drop the floor. */
@@ -52,21 +53,31 @@ export function drillStampOf(pose: VehiclePose, isLifting: boolean): DiscStamp {
 
 /**
  * How far ahead of the pose the swept stamp's centre sits for a tick whose step is `stepMm` along
- * the facing (ticket 570): the body's face after that step, the contact margin, and the half
- * sample between the front and the face it leaves. The authority's cut and the client's bite both
- * read it, so they never disagree on where the stamp is.
+ * the aim (ticket 570): the body's face after that step, the contact margin, and the half sample
+ * between the front and the face it leaves. The authority's cut and the client's bite both read
+ * it, so they never disagree on where the stamp is.
  */
-export function sweptStampAheadMmOf(stepMm: number): number {
-  return BODY_HALF_SIZE_MM + stepMm + CUT_FACE_MARGIN_MM + MM_PER_SAMPLE / 2
+export function sweptStampAheadMmOf(stepMm: number, aim: Aim): number {
+  return bodyFaceMmAlong(aim) + stepMm + CUT_FACE_MARGIN_MM + MM_PER_SAMPLE / 2
+}
+
+/**
+ * How far the body's square reaches from its centre along an aim, whole mm rounded up: half its
+ * side along one of the four facings, its corner's reach between them (ticket 791), so a diagonal
+ * cut's face clears the corner that leads it instead of holding the body on it.
+ */
+export function bodyFaceMmAlong(aim: Aim): number {
+  const { along, up } = aimDirectionOf(aim)
+  return Math.ceil((BODY_HALF_SIZE_MM * (Math.abs(along) + Math.abs(up))) / UP_VECTOR_SCALE)
 }
 
 /**
  * Where the cut's front sits ahead of the centre of a body riding its face (ticket 789): the
  * swept stamp's, its step taken, so the face's contour lies half a sample behind it. The drawn
- * drill tip sits here, so the bit is drawn where the ground opens.
+ * drill tip sits here, so the bit is drawn where the ground opens; the art draws a facing's.
  */
 export function ridingCutFrontAheadMmOf(): number {
-  return sweptStampAheadMmOf(0)
+  return sweptStampAheadMmOf(0, AIM.right)
 }
 
 /**
@@ -93,7 +104,7 @@ export function landingFrontStepMmOf(
 
 /** The pose's speed along its facing, as whole mm a fixed step. */
 function bodyStepAlongFacingMm(pose: VehiclePose): number {
-  const ahead = facingVectorOf(pose.upx, pose.upy, pose.facing)
+  const ahead = aimVectorOfPose(pose)
   const alongMmPerSecond = Math.floor((pose.vx * ahead.x + pose.vy * ahead.y) / UP_VECTOR_SCALE)
   return Math.floor(alongMmPerSecond / TICKS_PER_SECOND)
 }
@@ -127,7 +138,7 @@ export function stampSweptFrom(stamp: DiscStamp, tail: StampPoint | null): DiscS
 }
 
 function stampAheadBy(pose: VehiclePose, isLifting: boolean, aheadMm: number): DiscStamp {
-  const ahead = facingVectorOf(pose.upx, pose.upy, pose.facing)
+  const ahead = aimVectorOfPose(pose)
   const isLevelCut = isSideways(pose) && !isLifting
   const lift = isLevelCut ? drillStampLiftMm() : 0
   return {
@@ -138,8 +149,9 @@ function stampAheadBy(pose: VehiclePose, isLifting: boolean, aheadMm: number): D
   }
 }
 
+/** Straight left or right: a diagonal cut follows its path, as a lifting one does (ticket 791). */
 function isSideways(pose: VehiclePose): boolean {
-  return pose.facing === FACING.left || pose.facing === FACING.right
+  return isSidewaysAim(aimOfPose(pose))
 }
 
 /**

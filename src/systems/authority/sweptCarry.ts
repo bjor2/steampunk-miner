@@ -36,7 +36,8 @@ import type {
 } from '../vehicle/carryWalk'
 import { chordMmThroughCell } from '../vehicle/cellChord'
 import { carrySubStepsIn, SWEEP_STEP_MM, type SweepPath } from '../vehicle/sweptCut'
-import { facingVectorOf, tileOfMillimetres, type VehiclePose } from '../vehicle/vehiclePose'
+import { aimVectorOfPose } from '../vehicle/aim'
+import { tileOfMillimetres, type VehiclePose } from '../vehicle/vehiclePose'
 import { cargoUnitsOf, statsOfVehicle } from '../vehicle/vehicleState'
 import { ENERGY_QUANTA_PER_TICK } from '../vehicle/energyQuanta'
 import { cellDensitySum, type YieldedCell } from '../world/cellYield'
@@ -213,7 +214,7 @@ export function carrySweepOf(
 
 /** The tile the stamp's centre would enter next, walked on along the facing from the path's end. */
 function cellPastEndOf(path: SweepPath, pose: VehiclePose): TilePoint | null {
-  const ahead = facingVectorOf(pose.upx, pose.upy, pose.facing)
+  const ahead = aimVectorOfPose(pose)
   const end = tileOfMillimetres(path.to.xMm, path.to.yMm)
   for (let walked = SWEEP_STEP_MM; walked <= MM_PER_CELL_DIAGONAL; walked += SWEEP_STEP_MM) {
     const tile = tileOfMillimetres(

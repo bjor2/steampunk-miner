@@ -6,14 +6,13 @@ import {
   clusterActionsOf,
   clusterIconIdOf,
   knobOffsetOf,
-  heldChangesOf,
   isDoubleTap,
   isSlotHeldForCard,
   isGestureSurfaceShown,
   isPauseButtonShown,
   isStickShown,
   pinchZoomStepsOf,
-  stickActionsOf,
+  stickDriveAt,
   type TouchSituation,
 } from './touchControls'
 
@@ -34,28 +33,70 @@ const RACKED_TWO_SIZES: TouchSituation = {
   nextChargeSize: 1,
 }
 
-describe('touch stick (#173)', () => {
+/** Where a push at `turn` (a share of a full turn from the right, counter-clockwise) lands. */
+function offsetAt(turn: number, lengthPx: number): { dx: number; dy: number } {
+  const angle = turn * 2 * Math.PI
+  return { dx: Math.cos(angle) * lengthPx, dy: -Math.sin(angle) * lengthPx }
+}
+
+describe('touch stick (ticket 791, overriding #173 section 3)', () => {
   it.each([
-    ['up', 0, -40, ['lift']],
-    ['down', 0, 40, ['aim_down']],
-    ['left', -40, 0, ['aim_left']],
-    ['right', 40, 0, ['aim_right']],
-    ['up-left', -30, -30, ['lift', 'aim_left']],
-    ['up-right', 30, -30, ['lift', 'aim_right']],
-    ['down-left', -30, 30, ['aim_down', 'aim_left']],
-    ['down-right', 30, 30, ['aim_down', 'aim_right']],
-  ])('holds the keys of %s, as W, S, A and D would', (_, dx, dy, actions) => {
-    expect(stickActionsOf({ dx, dy })).toEqual(actions)
+    ['right', 56, 0, { moveX: 64, aim: 0, lift: false }],
+    ['left', -56, 0, { moveX: -64, aim: 32, lift: false }],
+    ['up', 0, -56, { moveX: 0, aim: 16, lift: true }],
+    ['down', 0, 56, { moveX: 0, aim: 48, lift: false }],
+  ])('drives a full push %s exactly as its key does', (_, dx, dy, drive) => {
+    expect(stickDriveAt({ dx, dy }, null)).toEqual(drive)
   })
 
-  it('holds nothing inside the 20% deadzone of its 56 px travel', () => {
-    expect(stickActionsOf({ dx: 11, dy: 0 })).toEqual([])
-    expect(stickActionsOf({ dx: 12, dy: 0 })).toEqual(['aim_right'])
+  it('drives nothing inside the 20% deadzone of its 56 px travel', () => {
+    expect(stickDriveAt({ dx: 11, dy: 0 }, null)).toBeNull()
+    expect(stickDriveAt({ dx: 12, dy: 0 }, null)).toEqual({ moveX: 1, aim: 0, lift: false })
   })
 
-  it('reads a push within 22.5 degrees of an axis as that axis alone', () => {
-    expect(stickActionsOf({ dx: 40, dy: -16 })).toEqual(['aim_right'])
-    expect(stickActionsOf({ dx: 40, dy: -17 })).toEqual(['lift', 'aim_right'])
+  it('turns the aim a step at a time through the whole circle, diagonals included', () => {
+    const aims = Array.from({ length: 64 }, (_, step) =>
+      stickDriveAt(offsetAt(step / 64, 50), null),
+    )
+    expect(aims.map((drive) => drive?.aim)).toEqual(Array.from({ length: 64 }, (_, step) => step))
+  })
+
+  it('aims down-right between the facings and drives right without lifting', () => {
+    expect(stickDriveAt({ dx: 40, dy: 40 }, null)).toMatchObject({ aim: 56, lift: false })
+    expect(stickDriveAt({ dx: 40, dy: 40 }, null)?.moveX).toBeGreaterThan(0)
+  })
+
+  it('drives a full push anywhere from straight sideways to the diagonal flat out', () => {
+    for (const step of [0, 4, 8, 56, 60]) {
+      expect(stickDriveAt(offsetAt(step / 64, 56), null)?.moveX).toBe(64)
+    }
+    expect(stickDriveAt(offsetAt(12 / 64, 56), null)?.moveX).toBeLessThan(64)
+  })
+
+  it('drives about half as fast on a push halfway from the deadzone to the rim', () => {
+    const halfway = 11.2 + (56 - 11.2) / 2
+    expect(stickDriveAt({ dx: halfway, dy: 0 }, null)?.moveX).toBe(32)
+  })
+
+  it('drives faster the further the push goes, from the deadzone to the rim', () => {
+    const drives = [12, 20, 28, 36, 44, 52, 56].map(
+      (dx) => stickDriveAt({ dx, dy: 0 }, null)!.moveX,
+    )
+    drives.slice(1).forEach((drive, index) => expect(drive).toBeGreaterThan(drives[index]))
+  })
+
+  it('lifts only while the push points more than an eighth of a turn above the horizontal', () => {
+    expect(stickDriveAt(offsetAt(4 / 64, 50), null)?.lift).toBe(false)
+    expect(stickDriveAt(offsetAt(5 / 64, 50), null)?.lift).toBe(true)
+    expect(stickDriveAt(offsetAt(27 / 64, 50), null)?.lift).toBe(true)
+    expect(stickDriveAt(offsetAt(28 / 64, 50), null)?.lift).toBe(false)
+  })
+
+  it('keeps the aim it gave while a push rests near the edge of its step', () => {
+    const nearEdge = offsetAt(8.6 / 64, 50)
+    expect(stickDriveAt(nearEdge, null)?.aim).toBe(9)
+    expect(stickDriveAt(nearEdge, 8)?.aim).toBe(8)
+    expect(stickDriveAt(offsetAt(8.8 / 64, 50), 8)?.aim).toBe(9)
   })
 
   it('shows only while the vehicle has the input', () => {
@@ -167,19 +208,6 @@ describe('touch zoom (#173)', () => {
     expect(isDoubleTap(first, { x: 110, y: 105, atMs: 1250 })).toBe(true)
     expect(isDoubleTap(first, { x: 110, y: 105, atMs: 1400 })).toBe(false)
     expect(isDoubleTap(first, { x: 160, y: 100, atMs: 1100 })).toBe(false)
-  })
-})
-
-describe('touch held actions', () => {
-  it('releases what the stick left and presses what it reached', () => {
-    expect(heldChangesOf(['lift', 'aim_left'], ['aim_left'])).toEqual({
-      released: ['lift'],
-      pressed: [],
-    })
-    expect(heldChangesOf(['aim_left'], ['aim_down', 'aim_right'])).toEqual({
-      released: ['aim_left'],
-      pressed: ['aim_down', 'aim_right'],
-    })
   })
 })
 

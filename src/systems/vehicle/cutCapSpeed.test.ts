@@ -16,6 +16,9 @@ import {
   isCutDriveBound,
   sidewaysSubStepsOf,
 } from './cutCapSpeed'
+import { AIM_STEPS_PER_TURN, UP_VECTOR_SCALE } from '../../constants/physics'
+import { AIM, aimDirectionOf, isAlongUpAim, type Aim } from './aim'
+import { isDriveCappedAim, isGravityRampedAim } from './cutAxisCaps'
 import { FACING, type Facing } from './vehiclePose'
 import { newVehicleState, type VehicleState } from './vehicleState'
 
@@ -24,7 +27,16 @@ import { newVehicleState, type VehicleState } from './vehicleState'
 
 const SIDEWAYS: readonly Facing[] = [FACING.left, FACING.right]
 const ALONG_UP: readonly Facing[] = [FACING.down, FACING.up]
+const SIDEWAYS_AIMS: readonly Aim[] = [AIM.left, AIM.right]
+const ALONG_UP_AIMS: readonly Aim[] = [AIM.down, AIM.up]
+const ALL_AIMS: readonly Aim[] = Array.from({ length: AIM_STEPS_PER_TURN }, (_, aim) => aim)
+const DIAGONAL_AIMS = ALL_AIMS.filter((aim) => !isAlongUpAim(aim))
 const DRIVE = 6
+
+/** The sideways part of a speed along `aim`. */
+function sidewaysPartOf(aim: Aim, speed: number): number {
+  return (speed * Math.abs(aimDirectionOf(aim).along)) / UP_VECTOR_SCALE
+}
 
 function rigWith(levels: Partial<VehicleState['levels']> = {}): VehicleState {
   const fresh = newVehicleState(null, 0)
@@ -57,29 +69,29 @@ describe('cut axis caps (ticket 723)', () => {
 
 describe('cut speed under the drive cap (ticket 723)', () => {
   it('cuts sideways at the drive speed where the drill is faster', () => {
-    for (const facing of SIDEWAYS) expect(cappedCutSpeedOf(facing, 84, DRIVE)).toBe(DRIVE)
+    for (const aim of SIDEWAYS_AIMS) expect(cappedCutSpeedOf(aim, 84, DRIVE)).toBe(DRIVE)
   })
 
   it('cuts sideways at the drill rate where the drill is slower', () => {
-    for (const facing of SIDEWAYS) expect(cappedCutSpeedOf(facing, 4.2, DRIVE)).toBe(4.2)
+    for (const aim of SIDEWAYS_AIMS) expect(cappedCutSpeedOf(aim, 4.2, DRIVE)).toBe(4.2)
   })
 
   it('cuts down and up at the drill rate alone, however slow the drive', () => {
-    for (const facing of ALONG_UP) expect(cappedCutSpeedOf(facing, 84, DRIVE)).toBe(84)
+    for (const aim of ALONG_UP_AIMS) expect(cappedCutSpeedOf(aim, 84, DRIVE)).toBe(84)
   })
 
   it('steps the sideways front no further than the drive, in whole mm rounded up', () => {
     const speedMax = engineStatsAtStep(3).speedMax
     expect(driveStepMmOf(speedMax)).toBe(Math.ceil((speedMax * 1000) / 60))
-    expect(cappedCutStepMmOf(FACING.right, 1400, speedMax)).toBe(driveStepMmOf(speedMax))
-    expect(cappedCutStepMmOf(FACING.right, 70, speedMax)).toBe(70)
-    expect(cappedCutStepMmOf(FACING.down, 1400, speedMax)).toBe(1400)
+    expect(cappedCutStepMmOf(AIM.right, 1400, speedMax)).toBe(driveStepMmOf(speedMax))
+    expect(cappedCutStepMmOf(AIM.right, 70, speedMax)).toBe(70)
+    expect(cappedCutStepMmOf(AIM.down, 1400, speedMax)).toBe(1400)
   })
 
   it('says a sideways cut is drive-bound only while the drill is faster than the drive', () => {
-    expect(isCutDriveBound(FACING.left, 84, DRIVE)).toBe(true)
-    expect(isCutDriveBound(FACING.left, DRIVE, DRIVE)).toBe(false)
-    expect(isCutDriveBound(FACING.down, 84, DRIVE)).toBe(false)
+    expect(isCutDriveBound(AIM.left, 84, DRIVE)).toBe(true)
+    expect(isCutDriveBound(AIM.left, DRIVE, DRIVE)).toBe(false)
+    expect(isCutDriveBound(AIM.down, 84, DRIVE)).toBe(false)
   })
 
   // #625: felt speed changes at most 1.5x a cell. The cap is a min, so it never widens the step
@@ -89,7 +101,7 @@ describe('cut speed under the drive cap (ticket 723)', () => {
     for (const before of speeds) {
       for (const after of speeds) {
         const drillRatio = Math.max(after / before, before / after)
-        const capped = [before, after].map((speed) => cappedCutSpeedOf(FACING.right, speed, DRIVE))
+        const capped = [before, after].map((speed) => cappedCutSpeedOf(AIM.right, speed, DRIVE))
         expect(Math.max(capped[1] / capped[0], capped[0] / capped[1])).toBeLessThanOrEqual(
           drillRatio,
         )
@@ -130,5 +142,46 @@ describe('sideways cell time on the scripted clock (ticket 723)', () => {
     const quantum = DRILL_SUBSTEPS_PER_TICK
     expect(sidewaysSubStepsOf(900, 6, quantum)).toBe(900)
     expect(sidewaysSubStepsOf(60, 6, quantum)).toBe(600)
+  })
+})
+
+// Ticket 791, Bjor's rule: sideways drilling, the sideways part of a diagonal cut included, is
+// capped by drive speed.
+describe('diagonal cut speed under the drive cap (ticket 791)', () => {
+  it('holds every aim with a sideways part to the drive, and only those', () => {
+    expect(ALL_AIMS.filter(isDriveCappedAim)).toEqual(DIAGONAL_AIMS)
+  })
+
+  it('never lets the sideways part of a cut pass the drive speed, at any aim', () => {
+    for (const aim of DIAGONAL_AIMS) {
+      for (const cutSpeed of [0.5, 4.2, 6, 12, 84]) {
+        const sideways = sidewaysPartOf(aim, cappedCutSpeedOf(aim, cutSpeed, DRIVE))
+        expect(sideways).toBeLessThanOrEqual(DRIVE * (1 + 1e-12))
+      }
+    }
+  })
+
+  it('cuts a diagonal at the drill rate while its sideways part is under the drive', () => {
+    expect(cappedCutSpeedOf(56, 4.2, DRIVE)).toBe(4.2)
+    expect(isCutDriveBound(56, 4.2, DRIVE)).toBe(false)
+  })
+
+  it('cuts a fast diagonal down-right with its sideways part at exactly the drive speed', () => {
+    const speed = cappedCutSpeedOf(56, 84, DRIVE)
+    expect(sidewaysPartOf(56, speed)).toBeCloseTo(DRIVE, 9)
+    expect(speed).toBeGreaterThan(DRIVE)
+    expect(isCutDriveBound(56, 84, DRIVE)).toBe(true)
+  })
+
+  it('steps a diagonal front no further sideways than the drive step, rounded up to the mm', () => {
+    const speedMax = engineStatsAtStep(3).speedMax
+    for (const aim of DIAGONAL_AIMS) {
+      const stepMm = cappedCutStepMmOf(aim, 5000, speedMax)
+      expect(sidewaysPartOf(aim, stepMm)).toBeLessThan(driveStepMmOf(speedMax) + 1)
+    }
+  })
+
+  it('ramps every aim with a downward part by local gravity, and only those (#724)', () => {
+    expect(ALL_AIMS.filter(isGravityRampedAim)).toEqual(ALL_AIMS.filter((aim) => aim > AIM.left))
   })
 })

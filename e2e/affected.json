@@ -468,6 +468,7 @@
       "paths": ["src/ui/touch/**"],
       "specs": [
         "e2e/browser/screens/touchControls.spec.ts",
+        "e2e/browser/screens/touchStickAnalog.spec.ts",
         "e2e/browser/screens/screenLayout.spec.ts",
         "e2e/browser/screens/reviewShots.spec.ts",
         "e2e/browser/itemCards.spec.ts",
@@ -629,6 +630,7 @@
       "paths": [
         "src/store/touchRuntime.ts",
         "src/systems/input/touchControls.ts",
+        "src/systems/input/analogStick.ts",
         "src/constants/touch.ts",
         "src/features/power-up-core/ui/**",
         "src/systems/views/titleOnlyText.ts"
@@ -636,7 +638,8 @@
       "specs": [
         "e2e/browser/mobile/touchGestures.spec.ts",
         "e2e/browser/mobile/touchTaps.spec.ts",
-        "e2e/browser/screens/touchControls.spec.ts"
+        "e2e/browser/screens/touchControls.spec.ts",
+        "e2e/browser/screens/touchStickAnalog.spec.ts"
       ]
     },
     {

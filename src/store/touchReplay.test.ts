@@ -28,11 +28,17 @@ const key = (code: string, isDown: boolean) => ({
   isShiftHeld: false,
 })
 
-/** Drive right, climb, level out and stop; dock; sell at the dock. On the keys. */
+/** Drive right, climb, drive right again and stop; dock; sell at the dock. On the keys. */
 const KEY_STEPS: readonly (() => void)[] = [
   () => routeKeyChange(key('KeyD', true)),
-  () => routeKeyChange(key('KeyW', true)),
-  () => routeKeyChange(key('KeyW', false)),
+  () => {
+    routeKeyChange(key('KeyD', false))
+    routeKeyChange(key('KeyW', true))
+  },
+  () => {
+    routeKeyChange(key('KeyW', false))
+    routeKeyChange(key('KeyD', true))
+  },
   () => routeKeyChange(key('KeyD', false)),
   () => {
     routeKeyChange(key('KeyE', true))
@@ -44,18 +50,26 @@ const KEY_STEPS: readonly (() => void)[] = [
   },
 ]
 
-/** The same play with the stick and the cluster's Interact and quick service buttons. */
+/**
+ * The same play with the stick pushed to its rim, where it drives as the keys do (ticket 791), and
+ * the cluster's Interact and quick service buttons.
+ */
 const TOUCH_STEPS: readonly (() => void)[] = [
   () => {
     landStick(1, 100, 300)
-    pushStick(1, 140, 300)
+    pushStick(1, 156, 300)
   },
-  () => pushStick(1, 130, 270),
-  () => pushStick(1, 140, 300),
+  () => pushStick(1, 100, 244),
+  () => pushStick(1, 156, 300),
   () => liftStick(1),
   () => tapButton('interact'),
   () => tapButton('quick_service'),
 ]
+
+/** The four held move actions, which the analog stick drives past (ticket 791). */
+function isMoveAction(action: string): boolean {
+  return ['aim_left', 'aim_right', 'aim_down', 'lift'].includes(action)
+}
 
 let sink: MemorySink
 
@@ -97,10 +111,10 @@ beforeEach(() => resetGameStore())
 afterEach(() => uninstallRunLog())
 
 describe('touch replay (#474)', () => {
-  it('logs the same action stream and commands from the touch controls as from the keys', () => {
+  it('logs the same commands from the touch controls as from the keys, the stick pressing no move action', () => {
     const onKeys = playLive(KEY_STEPS)
     const onTouch = playLive(TOUCH_STEPS)
-    expect(onTouch.stream).toEqual(onKeys.stream)
+    expect(onTouch.stream).toEqual(onKeys.stream.filter((edge) => !isMoveAction(edge.actionId)))
     expect(onTouch.commands).toEqual(onKeys.commands)
     expect(onTouch.commands.map((command) => command.type)).toEqual(['dock', 'quickService'])
   })

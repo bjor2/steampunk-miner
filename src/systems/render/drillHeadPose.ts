@@ -1,12 +1,14 @@
 /**
- * Where the drill head is drawn (#7 "Facing", #13: the head shows 4 facing states and swivels):
- * on a circle round the body's centre, at the angle of its facing in the body's frame. While it
+ * Where the drill head is drawn (#7 "Facing", #13: the head shows 4 facing states and swivels;
+ * any aim since ticket 791, the #308 drill-head art turning with it): on a circle round the body's
+ * centre, at the angle of its aim in the body's frame. While it
  * turns it sweeps the short way from the old facing to the new one over the same `SWIVEL_TICKS`
  * the logic uses, so what the eye sees and what the drill bites never disagree for long.
  * Written into a scratch pose, because it runs every frame (CLAUDE.md frame rules).
  */
+import { AIM_STEPS_PER_TURN } from '../../constants/physics'
+import { aimTurnOf, AIM, type Aim } from '../vehicle/aim'
 import { swivelProgressOf, type DrillHead } from '../vehicle/drillHead'
-import { FACING, type Facing } from '../vehicle/vehiclePose'
 
 export interface DrillHeadPose {
   x: number
@@ -15,12 +17,8 @@ export interface DrillHeadPose {
   angle: number
 }
 
-const ANGLE_OF_FACING: Readonly<Record<Facing, number>> = {
-  [FACING.right]: 0,
-  [FACING.up]: Math.PI / 2,
-  [FACING.left]: Math.PI,
-  [FACING.down]: -Math.PI / 2,
-}
+/** Radians an aim step turns. */
+const RADIANS_PER_AIM_STEP = (2 * Math.PI) / AIM_STEPS_PER_TURN
 
 export function createDrillHeadPose(): DrillHeadPose {
   return { x: 0, y: 0, angle: 0 }
@@ -34,8 +32,13 @@ export function writeDrillHeadPose(head: DrillHead, reach: number, pose: DrillHe
 }
 
 function sweptAngleOf(head: DrillHead): number {
-  const from = ANGLE_OF_FACING[head.from]
-  return from + shortTurnOf(from, ANGLE_OF_FACING[head.to]) * swivelProgressOf(head)
+  const from = angleOfAim(head.from)
+  return from + shortTurnOf(from, angleOfAim(head.to)) * swivelProgressOf(head)
+}
+
+/** Right 0, up a quarter turn, left a half, down a quarter clockwise, as the facings drew. */
+function angleOfAim(aim: Aim): number {
+  return aimTurnOf(AIM.right, aim) * RADIANS_PER_AIM_STEP
 }
 
 /** The signed turn from `from` to `to`, at most half a circle; a half turn goes counter-clockwise. */

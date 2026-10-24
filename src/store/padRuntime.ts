@@ -6,6 +6,9 @@
  * release) and a held button presses once, whatever the frame rate. A pad that disconnects lets go
  * of everything it held.
  *
+ * The left stick drives analog (ticket 791): each frame its push goes to `driveWithStick`, so its
+ * drive and aim are the intent while it pushes, as the touch stick's are.
+ *
  * The right stick is the bore gun's aim: `readPadAim` is the kernel read the ground-gun slice turns
  * into a bearing (its `bearingOfAim`), so no slice ever polls the device. With no pad connected
  * nothing here runs and the key, mouse and touch streams are what they were.
@@ -14,24 +17,29 @@
  * gun's frame loop read it (CLAUDE.md, frame loop rules). Nothing allocates per frame.
  */
 import { PAD_INPUTS, PAD_MODIFIER, type PadInput } from '../systems/input/padCodes'
+import type { StickDrive } from '../systems/input/analogStick'
 import {
   isPadInputHeld,
   padInputValueOf,
   readPadAimInto,
+  readPadDriveInto,
   type PadAim,
   type PadReading,
 } from '../systems/input/padFrame'
-import { routePadChange } from './inputRuntime'
+import { driveWithStick, readStickDrive, routePadChange } from './inputRuntime'
 
 const heldCodes = new Set<string>()
 const aim: PadAim = { x: 0, y: 0 }
 let isAiming = false
+/** The left stick's drive, rewritten every frame it pushes. */
+const drive: StickDrive = { moveX: 0, aim: 0, lift: false }
 
 /** One polled pad frame from the shell, or null once the pad is gone. */
 export function routePadFrame(pad: PadReading | null): void {
   if (pad === null) return letGoOfPad()
   PAD_INPUTS.forEach((input) => routePadInput(pad, input))
   isAiming = readPadAimInto(pad, aim)
+  routePadDrive(pad)
 }
 
 /**
@@ -47,6 +55,13 @@ export function readPadAim(): Readonly<PadAim> | null {
 export function resetPad(): void {
   heldCodes.clear()
   isAiming = false
+  driveWithStick('pad', null)
+}
+
+/** The left stick's push to the input runtime, or its rest. */
+function routePadDrive(pad: PadReading): void {
+  const heldAim = readStickDrive('pad')?.aim ?? null
+  driveWithStick('pad', readPadDriveInto(pad, heldAim, drive) ? drive : null)
 }
 
 /** Inputs go in index order, so LB (index 4) is held before a d-pad press in the same frame. */
@@ -63,6 +78,7 @@ function letGoOfPad(): void {
   heldCodes.forEach(releasePadCode)
   heldCodes.clear()
   isAiming = false
+  driveWithStick('pad', null)
 }
 
 function releasePadCode(code: string): void {

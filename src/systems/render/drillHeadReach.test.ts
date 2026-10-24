@@ -8,6 +8,7 @@ import { onCurveSteps, startLevels, visualTier } from '../economy/vehicleStats'
 import { newDrillHead } from '../vehicle/drillHead'
 import { withDrillSideClearance } from '../vehicle/drillBoreFixtures'
 import { ridingCutFrontAheadMmOf, sweptDrillStampOf } from '../vehicle/drillStamp'
+import { aimOfFacing } from '../vehicle/aim'
 import { FACING, facingVectorOf, type Facing, type VehiclePose } from '../vehicle/vehiclePose'
 import { MM_PER_SAMPLE } from '../world/sampleGrid'
 import { drillHeadReachOf, drillTipAheadOf } from './drillHeadReach'
@@ -36,7 +37,11 @@ function cutFrontAheadMm(facing: Facing): number {
 /** How far along its facing the drawn tip lies ahead of the body's centre, mm. */
 function drawnTipAheadMm(facing: Facing, tier: number, swaps: readonly string[]): number {
   const head = createDrillHeadPose()
-  writeDrillHeadPose(newDrillHead(facing), drillHeadReachOf(SHIPPED_ART, tier, swaps), head)
+  writeDrillHeadPose(
+    newDrillHead(aimOfFacing(facing)),
+    drillHeadReachOf(SHIPPED_ART, tier, swaps),
+    head,
+  )
   const tip = drillTipAheadOf(SHIPPED_ART, tier, swaps)
   const x = head.x + Math.cos(head.angle) * tip
   const y = head.y + Math.sin(head.angle) * tip

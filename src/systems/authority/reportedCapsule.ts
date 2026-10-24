@@ -33,7 +33,8 @@
 import { DRILL_POSE_REPORT_INTERVAL_TICKS } from '../../constants/balance'
 import type { AuthorityDevFlags } from '../../constants/devFlags'
 import { drillStampOf } from '../vehicle/drillStamp'
-import type { Facing, VehiclePose } from '../vehicle/vehiclePose'
+import { aimOfPose, type Aim } from '../vehicle/aim'
+import type { VehiclePose } from '../vehicle/vehiclePose'
 import type { VehicleState } from '../vehicle/vehicleState'
 import type { CellsBesideCut } from '../world/groundEdit'
 import type { DiscStamp, StampPoint } from '../world/stampShape'
@@ -86,7 +87,7 @@ function isCapsuleOn(flags: AuthorityDevFlags): boolean {
  */
 export function capsuleTailOf(report: CapsuleReport): StampPoint | null {
   const previous = report.before.pose
-  if (previous === null || !isBiteRunningOn(report, previous.facing)) return null
+  if (previous === null || !isBiteRunningOn(report, aimOfPose(previous))) return null
   const stamp = drillStampOf(report.pose, report.isLifting)
   const tail = stampCentreAt(stamp, report.pose, previous)
   return isStepWithinCap(stamp, tail) ? tail : null
@@ -94,17 +95,18 @@ export function capsuleTailOf(report: CapsuleReport): StampPoint | null {
 
 /**
  * Written at the last charged report one interval ago, the drill ran that one tick, and the
- * facing held: a 12-tick report or any other interval is never a running bite here.
+ * aim held (its facing's, off the four facings its own, ticket 791): a 12-tick report or any other
+ * interval is never a running bite here.
  */
 function isBiteRunningOn(
   { before, pose, tick, drillTicks }: CapsuleReport,
-  previousFacing: Facing,
+  previousAim: Aim,
 ): boolean {
   const interval = tick - before.accountedTick
   return (
     interval === DRILL_POSE_REPORT_INTERVAL_TICKS &&
     drillTicks === interval &&
-    pose.facing === previousFacing
+    aimOfPose(pose) === previousAim
   )
 }
 

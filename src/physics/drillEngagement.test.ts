@@ -12,6 +12,7 @@ import { CLOSED_CUT_GATE, type CutGate } from '../systems/vehicle/cutGate'
 import { createSeededRandom, type SeededRandom } from '../systems/seededRandom'
 import { IDLE_INTENT } from '../systems/vehicle/vehicleIntent'
 import type { CutFollowMotion } from '../systems/vehicle/cutFollowMotion'
+import { AIM } from '../systems/vehicle/aim'
 import { FACING } from '../systems/vehicle/vehiclePose'
 import { planetParamsFor } from '../systems/world/planetParams'
 import { surfaceRowOfColumn } from '../systems/world/tileGrid'
@@ -68,7 +69,7 @@ describe('step bound parity (ticket 334)', () => {
 describe('wait for the cut (ticket 400)', () => {
   const following: CutFollowMotion = {
     speed: 4,
-    facing: FACING.left,
+    aim: AIM.left,
     isPushing: true,
     followedTicks: 6,
   }

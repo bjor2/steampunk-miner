@@ -2,8 +2,9 @@
  * The gamepad inputs a binding may name (ticket 346, the #314 TD lock section 2): the W3C
  * "standard" mapping's buttons by index, less Home (the platform and Steam keep it), plus the left
  * stick's four directions as buttons, so a pad press travels the key path (#217 press, #332
- * release) under its own code. The right stick is the bore gun's aim (`padAimOf`) and binds nothing
- * but its click.
+ * release) under its own code. The left stick also drives analog (ticket 791, `padFrame.ts`):
+ * while it pushes, its push is the intent and its four codes only press what else they are bound
+ * to. The right stick is the bore gun's aim (`padAimOf`) and binds nothing but its click.
  *
  * A binding may hold the pad modifier: `PadLB+PadUp` is Up pressed while LB is held, as `Shift+Tab`
  * is for keys, and the plain code answers when the chord is unbound.
@@ -43,6 +44,9 @@ const LEFT_STICK_DIRECTIONS: readonly StickDirection[] = [
   { code: 'PadLStickUp', axis: 1, sign: -1 },
   { code: 'PadLStickDown', axis: 1, sign: 1 },
 ]
+
+/** Axes 0 and 1: the left stick, the vehicle's analog drive (ticket 791). */
+export const LEFT_STICK_AXES = { x: 0, y: 1 } as const
 
 /** Axes 2 and 3: the right stick, the bore gun's aim. */
 export const RIGHT_STICK_AXES = { x: 2, y: 3 } as const

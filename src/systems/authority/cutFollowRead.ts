@@ -36,7 +36,8 @@ import {
 import { sweptDrillStampOf } from '../vehicle/drillStamp'
 import { leadingSlabOf, type LeadingSlab } from '../vehicle/leadingSlab'
 import type { SweptCut } from '../vehicle/sweptCut'
-import { facingVectorOf, type Facing, type VehiclePose } from '../vehicle/vehiclePose'
+import { aimOfPose, aimVectorOfPose, type Aim } from '../vehicle/aim'
+import { steppedPoseOf, type Facing, type VehiclePose } from '../vehicle/vehiclePose'
 import { groundReaderOf } from '../world/groundReader'
 import type { PlanetParams } from '../world/planetParams'
 import type { TilePoint } from '../world/tileGrid'
@@ -58,6 +59,8 @@ export interface CutFollowStep {
   x: number
   y: number
   facing: Facing
+  /** The head's settled aim where it is off the four facings (ticket 791). */
+  aim?: Aim
   isLifting: boolean
   /** The drill is engaged, so a `drillStep` goes out this tick; otherwise the tick idles. */
   isDrilling: boolean
@@ -73,11 +76,21 @@ export interface CutFollow {
   isSpanStopped?: true
 }
 
-/** The slab a step drives into, with what reading its cells needs and the facing it cuts along. */
+/** The slab a step drives into, with what reading its cells needs and the aim it cuts along. */
 interface SlabRead {
   params: PlanetParams
   slab: LeadingSlab
-  facing: Facing
+  aim: Aim
+}
+
+/** A pose's step as the cut-follow reads it: its position, facing and aim, lift and bite. */
+export function cutFollowStepOfPose(
+  pose: VehiclePose,
+  isLifting: boolean,
+  isDrilling: boolean,
+): CutFollowStep {
+  const step = { x: pose.x, y: pose.y, facing: pose.facing, isLifting, isDrilling }
+  return pose.aim === undefined ? step : { ...step, aim: pose.aim }
 }
 
 export function cutFollowAt(
@@ -101,16 +114,16 @@ function slabReadOf(state: AuthorityState, playerId: string, step: CutFollowStep
   const params = planetParamsOf(state.planet)
   const reported = vehicleOf(state, playerId).pose
   if (params === null || reported === null) return null
-  const pose: VehiclePose = { ...reported, x: step.x, y: step.y, facing: step.facing }
+  const pose = steppedPoseOf(reported, step)
   const aim = {
     centreMm: pose,
-    facing: facingVectorOf(pose.upx, pose.upy, pose.facing),
+    facing: aimVectorOfPose(pose),
     stamp: sweptDrillStampOf(pose, step.isLifting, travelStampAheadMmAt(state, playerId)),
   }
   return {
     params,
     slab: leadingSlabOf(groundReaderOf(state.world, params), aim),
-    facing: step.facing,
+    aim: aimOfPose(pose),
   }
 }
 
@@ -133,7 +146,7 @@ export function frontStepMmAt(
   const read = slabReadOf(state, playerId, step)
   if (read === null) return 0
   const cappedMm = cappedCutStepMmOf(
-    read.facing,
+    read.aim,
     uncappedFrontStepMmOf(state, playerId, read),
     driveSpeedOf(vehicleOf(state, playerId)),
   )
@@ -179,7 +192,7 @@ function openFollowOf(
       isSlabClear: true,
     }
   }
-  const cutSpeed = cappedCutSpeedOf(read.facing, cutSpeedOf(state, playerId, read), driveSpeed)
+  const cutSpeed = cappedCutSpeedOf(read.aim, cutSpeedOf(state, playerId, read), driveSpeed)
   return { gate, cutSpeed }
 }
 
@@ -196,7 +209,7 @@ function clearSlabSpeedOf(
 ): number {
   const nominalCutMm = stepBoundsAt(state, playerId).cuttingMm - STEP_BOUND_TOLERANCE_MM
   const drillSpeed = Math.max(driveSpeed, metresPerSecondOfStep(nominalCutMm))
-  return cappedCutSpeedOf(read.facing, drillSpeed, driveSpeed)
+  return cappedCutSpeedOf(read.aim, drillSpeed, driveSpeed)
 }
 
 /** Shut: no speed, and whether a span stop stands in the slab the drill bites. */

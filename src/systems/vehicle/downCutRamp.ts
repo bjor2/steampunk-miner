@@ -4,13 +4,14 @@
  * the velocity its last report gave, so on the `n`-th tick after that report it moves at most
  * `v + a dt n` a tick, and the swept cut's front steps no further than that, in whole mm rounded
  * up, so the front never lags the body it cuts for. Its top step stays the drill law's; a cut
- * sideways or up never ramps.
+ * sideways or up never ramps. A diagonal cut with a downward share (ticket 791) ramps along its
+ * aim at the same `a`, the body's gain along the aim, as the motion rule holds it.
  */
 import { MM_PER_METRE, TICKS_PER_SECOND } from '../../constants/physics'
-import { isGravityRampedFacing } from './cutAxisCaps'
-import type { Facing } from './vehiclePose'
+import type { Aim } from './aim'
+import { isGravityRampedAim } from './cutAxisCaps'
 
-/** What the ramp reads: the last report's speed along the facing, the ticks since, local gravity. */
+/** What the ramp reads: the last report's speed along the aim, the ticks since, local gravity. */
 export interface RampFromReport {
   reportedMmPerSecond: number
   ticksSinceReport: number
@@ -18,9 +19,9 @@ export interface RampFromReport {
   acceleration: number
 }
 
-/** The front's step along `facing`: on a cut down, `stepMm` held to the ramp; else as it is. */
-export function rampedFrontStepMmOf(facing: Facing, stepMm: number, ramp: RampFromReport): number {
-  if (!isGravityRampedFacing(facing)) return stepMm
+/** The front's step along `aim`: on a cut down, `stepMm` held to the ramp; else as it is. */
+export function rampedFrontStepMmOf(aim: Aim, stepMm: number, ramp: RampFromReport): number {
+  if (!isGravityRampedAim(aim)) return stepMm
   return Math.min(stepMm, rampAllowedStepMmOf(ramp))
 }
 

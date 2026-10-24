@@ -5,7 +5,11 @@
  * step bounds (ticket 334) widen the wait-for-cut window and pick the speed the body is clamped to. Pure reads of the ground and the authority, no
  * Rapier.
  */
-import type { CutFollow, CutFollowStep } from '../systems/authority/cutFollowRead'
+import {
+  cutFollowStepOfPose,
+  type CutFollow,
+  type CutFollowStep,
+} from '../systems/authority/cutFollowRead'
 import type { CutFollowMotion } from '../systems/vehicle/cutFollowMotion'
 import { isCutGateOpen } from '../systems/vehicle/cutGate'
 import {
@@ -30,7 +34,8 @@ import {
 } from '../systems/vehicle/drillStamp'
 import { speedOfStepBound, stepBoundMmOf, type StepBounds } from '../systems/vehicle/stepBound'
 import type { VehicleIntent } from '../systems/vehicle/vehicleIntent'
-import { facingVectorOf, type VehiclePose } from '../systems/vehicle/vehiclePose'
+import { aimOfPose, aimVectorOfPose } from '../systems/vehicle/aim'
+import { type VehiclePose } from '../systems/vehicle/vehiclePose'
 import type { GroundReader } from '../systems/world/groundReader'
 import type { DiscStamp } from '../systems/world/stampShape'
 
@@ -64,7 +69,7 @@ export function drillContactFor(
   ground: GroundReader,
   followedTicks: number,
 ): DrillContact {
-  if (input.intent.facing !== pose.facing || !isHeadSettled(head)) return 'none'
+  if (!isPushingAim(input, pose) || !isHeadSettled(head)) return 'none'
   return contactOf(input, pose, ground, bitingStampOf(input, pose, isLifting, followedTicks))
 }
 
@@ -84,7 +89,7 @@ function bitingStampOf(
 ): DiscStamp {
   if (input.stepBounds === undefined || followedTicks === 0) return drillStampOf(pose, isLifting)
   const stepMm = frontStepAt(input, input.stepBounds, { pose, isLifting })
-  return cuttingDrillStampOf(pose, isLifting, sweptStampAheadMmOf(stepMm))
+  return cuttingDrillStampOf(pose, isLifting, sweptStampAheadMmOf(stepMm, aimOfPose(pose)))
 }
 
 /** The front's step at the pose as the authority reads it; the cutting bound with no read. */
@@ -93,7 +98,7 @@ function frontStepAt(
   bounds: StepBounds,
   { pose, isLifting }: DrillPose,
 ): number {
-  const step = { x: pose.x, y: pose.y, facing: pose.facing, isLifting, isDrilling: true }
+  const step = cutFollowStepOfPose(pose, isLifting, true)
   const lawStepMm = input.frontStepOf?.(step) ?? bounds.cuttingMm
   return cutFrontStepMmOf(lawStepMm, bounds.cuttingMm)
 }
@@ -117,7 +122,7 @@ function contactOf(
   const contactRule = input.drillContactRule ?? drillContactOf
   return contactRule(ground, {
     centreMm: pose,
-    facing: facingVectorOf(pose.upx, pose.upy, pose.facing),
+    facing: aimVectorOfPose(pose),
     stamp,
     inTheWayMm: input.stepBounds && inTheWayMmOf(input.stepBounds.cuttingMm),
   })
@@ -174,7 +179,7 @@ export function cutFollowReadFor(
   { pose, isLifting }: DrillPose,
   isDrilling: boolean,
 ): CutFollow | undefined {
-  return input.cutFollowOf?.({ x: pose.x, y: pose.y, facing: pose.facing, isLifting, isDrilling })
+  return input.cutFollowOf?.(cutFollowStepOfPose(pose, isLifting, isDrilling))
 }
 
 /**
@@ -235,8 +240,8 @@ function cutFollowFor(
   if (read === undefined || !input.canAct || !isCutGateOpen(read.gate)) return undefined
   const cut = {
     speed: openCutSpeedOf(read, memory, pose, isDrilling),
-    facing: pose.facing,
-    isPushing: input.intent.facing === pose.facing,
+    aim: aimOfPose(pose),
+    isPushing: isPushingAim(input, pose),
     followedTicks: memory.followedTicks,
   }
   return cut.isPushing ? cut : { ...cut, releasedTicks: memory.releasedTicks }
@@ -249,7 +254,7 @@ function openCutSpeedOf(
   isDrilling: boolean,
 ): number {
   if (!read.isSlabClear || !isDrilling) return read.cutSpeed
-  return clearedSlabSpeedOf(memory, pose.facing) ?? read.cutSpeed
+  return clearedSlabSpeedOf(memory, aimOfPose(pose)) ?? read.cutSpeed
 }
 
 /**
@@ -266,10 +271,15 @@ function heldCutFor(
 ): CutFollowMotion | undefined {
   if (read === undefined || !input.canAct) return undefined
   return heldCutOf(memory, {
-    facing: pose.facing,
-    isPushing: input.intent.facing === pose.facing,
+    aim: aimOfPose(pose),
+    isPushing: isPushingAim(input, pose),
     canCoast: canCoastOn(read, bite),
   })
+}
+
+/** The held aim is the pose's: the drive pushes into the cut (ticket 791: aims, not facings). */
+function isPushingAim(input: DrillEngagementInput, pose: VehiclePose): boolean {
+  return input.intent.aim === aimOfPose(pose)
 }
 
 /** The drill bites with the wheels free and no span stop in its slab. */

@@ -11,7 +11,7 @@ import { STANDARD_LINING_TYPE } from '../economy/heatEconomy'
 import { fromCanonical, isNonNegativeMoneyText, toCanonical, type Money } from '../money'
 import { isLiftedDrillQuantum } from '../vehicle/drillQuantum'
 import { BORE_SIDES } from '../vehicle/facedSide'
-import { isFacing, type VehiclePose } from '../vehicle/vehiclePose'
+import { aimProblemsOf, isFacing, type VehiclePose } from '../vehicle/vehiclePose'
 import { isGunMode } from '../vehicle/vehicleGun'
 import { isLiningType } from '../vehicle/liningType'
 import {
@@ -294,8 +294,8 @@ function isPortableHeat(heat: unknown): boolean {
 
 /**
  * The swept cut's cursor (tickets 330, 333, 335, 399): reach, step, cut gate, share, dig time, carry,
- * the drill quantum those count in when above the base (ticket 558), and the front a bite left
- * past the reach (ticket 570).
+ * the drill quantum those count in when above the base (ticket 558), the front a bite left past
+ * the reach (ticket 570), and the aim off the four facings (ticket 791).
  */
 function isPortableSweptCut(cursor: unknown): boolean {
   return (
@@ -304,6 +304,7 @@ function isPortableSweptCut(cursor: unknown): boolean {
     Number.isSafeInteger(cursor.poseXMm) &&
     Number.isSafeInteger(cursor.poseYMm) &&
     isFacing(cursor.facing as number) &&
+    aimProblemsOf(cursor.facing as number, cursor.aim).length === 0 &&
     isWholeNumber(cursor.tick) &&
     (cursor.cutGate === 0 || cursor.cutGate === 1) &&
     isWholeNumber(cursor.cutGateLowTicks) &&
@@ -393,7 +394,8 @@ function isPortablePose(pose: unknown): pose is VehiclePose {
   return (
     isJsonObject(pose) &&
     POSE_FIELDS.every((name) => Number.isSafeInteger(pose[name])) &&
-    isFacing(pose.facing)
+    isFacing(pose.facing) &&
+    aimProblemsOf(pose.facing, pose.aim).length === 0
   )
 }
 

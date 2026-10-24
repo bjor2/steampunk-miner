@@ -1,10 +1,18 @@
 /**
  * One polled gamepad frame, read (ticket 346): how far each bindable input is pushed, whether that
- * holds it down, and where the right stick aims. Pure: the shell hands over the pad as the browser
- * reports it, and nothing here allocates, so the store can poll every frame.
+ * holds it down, where the right stick aims and what the left stick drives with (ticket 791).
+ * Pure: the shell hands over the pad as the browser reports it, and nothing here allocates, so the
+ * store can poll every frame.
  */
-import { PAD_AIM_DEADZONE, PAD_PRESS_VALUE, PAD_RELEASE_VALUE } from '../../constants/gamepad'
-import { RIGHT_STICK_AXES, type PadSource } from './padCodes'
+import {
+  PAD_AIM_DEADZONE,
+  PAD_DRIVE_DEADZONE,
+  PAD_PRESS_VALUE,
+  PAD_RELEASE_VALUE,
+} from '../../constants/gamepad'
+import type { Aim } from '../vehicle/aim'
+import { stickDriveInto, type StickDrive, type StickPush } from './analogStick'
+import { LEFT_STICK_AXES, RIGHT_STICK_AXES, type PadSource } from './padCodes'
 
 /** The part of a `GamepadButton` read here: how far it is pressed, 0 to 1. */
 export interface PadButtonReading {
@@ -39,6 +47,19 @@ export function readPadAimInto(pad: PadReading, aim: PadAim): boolean {
   aim.x = pad.axes[RIGHT_STICK_AXES.x] ?? 0
   aim.y = pad.axes[RIGHT_STICK_AXES.y] ?? 0
   return aim.x * aim.x + aim.y * aim.y >= PAD_AIM_DEADZONE * PAD_AIM_DEADZONE
+}
+
+/** The left stick's push, y turned up: the pad's down is the vehicle's down. */
+const leftPush: StickPush = { x: 0, y: 0 }
+
+/**
+ * Writes what the left stick drives with into `drive`, analog as the touch stick (ticket 791), and
+ * says whether it pushes past its deadzone; `heldAim` is the aim it gave last frame, or null.
+ */
+export function readPadDriveInto(pad: PadReading, heldAim: Aim | null, drive: StickDrive): boolean {
+  leftPush.x = pad.axes[LEFT_STICK_AXES.x] ?? 0
+  leftPush.y = 0 - (pad.axes[LEFT_STICK_AXES.y] ?? 0)
+  return stickDriveInto(leftPush, PAD_DRIVE_DEADZONE, heldAim, drive)
 }
 
 /** Why a value cannot be a pad frame (the debug API's `input.padFrame`); empty when it can. */

@@ -64,7 +64,8 @@ import {
   sweptDrillContactOf,
   type DrillContactRule,
 } from '../systems/vehicle/drillContact'
-import { facingVectorOf, noseTileOf } from '../systems/vehicle/vehiclePose'
+import { aimVectorOfPose } from '../systems/vehicle/aim'
+import { noseTileOf } from '../systems/vehicle/vehiclePose'
 import type { VehicleState } from '../systems/vehicle/vehicleState'
 import type { PlanetParams } from '../systems/world/planetParams'
 import { groundReaderOf } from '../systems/world/groundReader'
@@ -262,7 +263,7 @@ function showDrill(result: VehicleStepResult): void {
   drillPresence.isDrilling = flags.isDrilling
   drillPresence.up.x = pose.upx / UP_VECTOR_SCALE
   drillPresence.up.y = pose.upy / UP_VECTOR_SCALE
-  const ahead = facingVectorOf(pose.upx, pose.upy, pose.facing)
+  const ahead = aimVectorOfPose(pose)
   drillPresence.ahead.x = ahead.x / UP_VECTOR_SCALE
   drillPresence.ahead.y = ahead.y / UP_VECTOR_SCALE
   drillPresence.nose.x = nose.tx + HALF_TILE

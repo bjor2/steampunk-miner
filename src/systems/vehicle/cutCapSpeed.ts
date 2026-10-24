@@ -6,10 +6,14 @@
  *
  * The body follows the capped speed in m/s; the swept cut's front steps the drive's top speed in
  * whole mm a tick rounded up, so the front never lags the body it cuts for.
+ *
+ * A diagonal cut (ticket 791) is held so its sideways part never passes the drive (Bjor's rule
+ * holds on the sideways part of a diagonal): its speed along the aim is at most the drive's over
+ * the aim's sideways share. Straight sideways that share is 1 and the cap is the drive's exactly.
  */
-import { MM_PER_METRE, TICKS_PER_SECOND } from '../../constants/physics'
-import { isDriveCappedFacing } from './cutAxisCaps'
-import type { Facing } from './vehiclePose'
+import { MM_PER_METRE, TICKS_PER_SECOND, UP_VECTOR_SCALE } from '../../constants/physics'
+import { aimDirectionOf, type Aim } from './aim'
+import { isDriveCappedAim } from './cutAxisCaps'
 import { statsOfVehicle, type VehicleState } from './vehicleState'
 
 /** m/s the drive moves the rig at: the engine's top speed, whatever the drill. */
@@ -27,19 +31,28 @@ export function driveStepMmOf(speedMax: number): number {
   return Math.ceil((speedMax * MM_PER_METRE) / TICKS_PER_SECOND)
 }
 
-/** m/s a cut along `facing` moves at: the drill's `vCut`, held to the drive's sideways. */
-export function cappedCutSpeedOf(facing: Facing, cutSpeed: number, driveSpeed: number): number {
-  return isDriveCappedFacing(facing) ? Math.min(cutSpeed, driveSpeed) : cutSpeed
+/** m/s a cut along `aim` moves at: the drill's `vCut`, its sideways part held to the drive's. */
+export function cappedCutSpeedOf(aim: Aim, cutSpeed: number, driveSpeed: number): number {
+  return isDriveCappedAim(aim) ? Math.min(cutSpeed, alongAimOfSideways(aim, driveSpeed)) : cutSpeed
 }
 
-/** mm a tick a cut's front steps along `facing`: the drill's, held to the drive's sideways. */
-export function cappedCutStepMmOf(facing: Facing, cutStepMm: number, driveSpeed: number): number {
-  return isDriveCappedFacing(facing) ? Math.min(cutStepMm, driveStepMmOf(driveSpeed)) : cutStepMm
+/** mm a tick a cut's front steps along `aim`: the drill's, its sideways part held to the drive's. */
+export function cappedCutStepMmOf(aim: Aim, cutStepMm: number, driveSpeed: number): number {
+  if (!isDriveCappedAim(aim)) return cutStepMm
+  return Math.min(cutStepMm, Math.ceil(alongAimOfSideways(aim, driveStepMmOf(driveSpeed))))
 }
 
-/** Whether the drive, not the drill, sets a cut's speed along `facing`. */
-export function isCutDriveBound(facing: Facing, cutSpeed: number, driveSpeed: number): boolean {
-  return isDriveCappedFacing(facing) && cutSpeed > driveSpeed
+/** Whether the drive, not the drill, sets a cut's speed along `aim`. */
+export function isCutDriveBound(aim: Aim, cutSpeed: number, driveSpeed: number): boolean {
+  return isDriveCappedAim(aim) && cutSpeed > alongAimOfSideways(aim, driveSpeed)
+}
+
+/**
+ * How fast along the aim a cut goes whose sideways part goes at `sideways`: that over the aim's
+ * sideways share, at the 1024 scale; `sideways` itself straight sideways.
+ */
+function alongAimOfSideways(aim: Aim, sideways: number): number {
+  return (sideways * UP_VECTOR_SCALE) / Math.abs(aimDirectionOf(aim).along)
 }
 
 /**

@@ -25,7 +25,8 @@
 import { MM_PER_METRE, UP_VECTOR_SCALE } from '../../../constants/physics'
 import { enemyRockHardness, isRigHolderKind, noseDwellTicks } from '../../economy/enemyStats'
 import { canScratch } from '../../vehicle/drillRule'
-import { facingVectorOf, type VehiclePose } from '../../vehicle/vehiclePose'
+import { aimVectorOfPose } from '../../vehicle/aim'
+import { type VehiclePose } from '../../vehicle/vehiclePose'
 import { statsOfVehicle } from '../../vehicle/vehicleState'
 import { vehicleOf, withCombat, type AuthorityState } from '../authorityState'
 import { chainEffects, unchanged, type RuleEffect } from '../commandRule'
@@ -146,7 +147,7 @@ function latestPoseOf(state: AuthorityState, playerId: string, tick: number): Ve
 
 /** The drill's nose: a metre ahead of the body along its facing, as `noseTileOf` reads it. */
 function nosePointOf(pose: VehiclePose): MillimetrePoint {
-  const facing = facingVectorOf(pose.upx, pose.upy, pose.facing)
+  const facing = aimVectorOfPose(pose)
   return {
     x: pose.x + Math.trunc((facing.x * MM_PER_METRE) / UP_VECTOR_SCALE),
     y: pose.y + Math.trunc((facing.y * MM_PER_METRE) / UP_VECTOR_SCALE),

@@ -15,8 +15,9 @@ import type { AuthorityDevFlags, DevFlags } from '../../constants/devFlags'
 import { MM_PER_METRE, UP_VECTOR_SCALE } from '../../constants/physics'
 import type { CommandPayloads } from '../authority/authorityCommand'
 import type { Vector2 } from './localFrame'
+import { aimFieldsOf, type Aim } from './aim'
 import type { DriveSigns } from './driveSigns'
-import type { Facing, VehiclePose } from './vehiclePose'
+import type { VehiclePose } from './vehiclePose'
 
 export interface ActionFlags {
   isDriving: boolean
@@ -86,7 +87,7 @@ export function quantisePose(
   position: Vector2,
   velocity: Vector2,
   up: Vector2,
-  facing: Facing,
+  aim: Aim,
 ): VehiclePose {
   return {
     x: Math.round(position.x * MM_PER_METRE),
@@ -95,7 +96,7 @@ export function quantisePose(
     vy: Math.round(velocity.y * MM_PER_METRE),
     upx: Math.round(up.x * UP_VECTOR_SCALE),
     upy: Math.round(up.y * UP_VECTOR_SCALE),
-    facing,
+    ...aimFieldsOf(aim),
   }
 }
 
@@ -166,6 +167,7 @@ function isSamePose(a: VehiclePose | null, b: VehiclePose): boolean {
     a.vy === b.vy &&
     a.upx === b.upx &&
     a.upy === b.upy &&
-    a.facing === b.facing
+    a.facing === b.facing &&
+    a.aim === b.aim
   )
 }

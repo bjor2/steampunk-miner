@@ -10,7 +10,8 @@
  * only fills the planet's chunk cache: no state, no digest, no answer changes.
  */
 import { MM_PER_METRE, UP_VECTOR_SCALE } from '../../constants/physics'
-import { facingVectorOf, tileOfMillimetres, type VehiclePose } from '../vehicle/vehiclePose'
+import { aimVectorOfPose } from '../vehicle/aim'
+import { tileOfMillimetres, type VehiclePose } from '../vehicle/vehiclePose'
 import { walkStampInRows } from '../world/groundEdit'
 import type { PlanetParams } from '../world/planetParams'
 import type { StampPoint } from '../world/stampShape'
@@ -54,7 +55,7 @@ function prefetchChunkAhead(
   reached: StampPoint | undefined,
 ): void {
   const from = reached ?? { xMm: pose.x, yMm: pose.y }
-  const ahead = facingVectorOf(pose.upx, pose.upy, pose.facing)
+  const ahead = aimVectorOfPose(pose)
   const tile = tileOfMillimetres(
     from.xMm + chunkLengthOf(ahead.x),
     from.yMm + chunkLengthOf(ahead.y),

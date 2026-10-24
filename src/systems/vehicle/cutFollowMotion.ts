@@ -11,15 +11,21 @@
  * level cut waits for the drill only on a real span stop (`isWaitingForCut`), which ends the hold.
  * What carries it through the gate's shut dwell, and the stop through a lost contact, is
  * `heldCut.ts` (ticket 430).
+ *
+ * A diagonal aim (ticket 791) is neither: its speed runs along the aim itself, positive into the
+ * cut, and the motion rule turns it into both axes (`vehicleMotion.ts`).
  */
 import { CUT_FOLLOW_TICKS } from '../../constants/balance'
-import { FACING, type Facing } from './vehiclePose'
+import { AIM, isAlongUpAim, isSidewaysAim, type Aim } from './aim'
 
 export interface CutFollowMotion {
-  /** m/s the drill cuts along the facing (`vCut`). */
+  /** m/s the drill cuts along the aim (`vCut`). */
   speed: number
-  /** The facing in the local frame: along the ground (left, right) or along `localUp` (down, up). */
-  facing: Facing
+  /**
+   * The aim in the local frame: along the ground (left, right), along `localUp` (down, up), or a
+   * diagonal between them (ticket 791).
+   */
+  aim: Aim
   /** The drive pushes into the facing; with it let go the body stops. */
   isPushing: boolean
   /** Ticks this cut has followed the drill with no stop, up to `CUT_FOLLOW_TICKS` (ticket 400). */
@@ -33,9 +39,14 @@ export interface CutFollowMotion {
   releasedTicks?: number
 }
 
-/** Whether the cut-follow drives the speed along the ground, else along `localUp`. */
+/** Whether the cut-follow drives the speed along the ground. */
 export function isCutFollowAlongGround(cut: CutFollowMotion): boolean {
-  return cut.facing === FACING.left || cut.facing === FACING.right
+  return isSidewaysAim(cut.aim)
+}
+
+/** Whether the cut-follow drives the speed along `localUp`. */
+export function isCutFollowAlongUp(cut: CutFollowMotion): boolean {
+  return isAlongUpAim(cut.aim)
 }
 
 /** The next speed along the cut's axis (signed as the local frame's) from `current`. */
@@ -45,7 +56,7 @@ export function cutFollowSpeedOf(
   isWaitingForCut: boolean,
 ): number {
   if (cut.isAtFace === true) return 0
-  const target = isFollowingDrill(cut, isWaitingForCut) ? signOfFacing(cut.facing) * cut.speed : 0
+  const target = isFollowingDrill(cut, isWaitingForCut) ? signOfAxis(cut.aim) * cut.speed : 0
   if (target !== 0 && cut.followedTicks >= CUT_FOLLOW_TICKS) return target
   return rampedToward(current, target, rampStepOf(current, cut))
 }
@@ -81,7 +92,7 @@ function rampedToward(current: number, target: number, maxChange: number): numbe
   return current + Math.sign(gap) * maxChange
 }
 
-/** +1 along the tangent or `localUp`, -1 against it. */
-function signOfFacing(facing: Facing): number {
-  return facing === FACING.right || facing === FACING.up ? 1 : -1
+/** +1 along the tangent or `localUp`, -1 against it; a diagonal's own axis is its aim, +1. */
+function signOfAxis(aim: Aim): number {
+  return aim === AIM.left || aim === AIM.down ? -1 : 1
 }

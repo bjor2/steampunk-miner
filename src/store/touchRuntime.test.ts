@@ -47,22 +47,24 @@ const key = (code: string, isDown: boolean) => ({
   isShiftHeld: false,
 })
 
-/** Drive right, climb to the right, level out, stop, then dock: on the keys. */
+/** Drive right, climb, drive right again, stop, then dock: on the keys. */
 function playOnKeys(): void {
   routeKeyChange(key('KeyD', true))
+  routeKeyChange(key('KeyD', false))
   routeKeyChange(key('KeyW', true))
   routeKeyChange(key('KeyW', false))
+  routeKeyChange(key('KeyD', true))
   routeKeyChange(key('KeyD', false))
   routeKeyChange(key('KeyE', true))
   routeKeyChange(key('KeyE', false))
 }
 
-/** The same run with the stick and the Interact button. */
+/** The same run with the stick, pushed to its rim, and the Interact button. */
 function playOnTouch(): void {
   landStick(1, 100, 300)
-  pushStick(1, 140, 300)
-  pushStick(1, 130, 270)
-  pushStick(1, 140, 300)
+  pushStick(1, 156, 300)
+  pushStick(1, 100, 244)
+  pushStick(1, 156, 300)
   liftStick(1)
   pressTouchButton('interact')
   releaseTouchButton('interact')
@@ -100,54 +102,81 @@ beforeEach(() => {
 
 afterEach(() => uninstallRunLog())
 
-describe('touch controls (#173)', () => {
-  it('press the same action stream and submit the same commands as the matching keys', () => {
+describe('touch controls (#173, the stick analog since ticket 791)', () => {
+  it('submit the same commands as the matching keys, the stick pressing no move action', () => {
     const onKeys = runFresh(playOnKeys)
     const onTouch = runFresh(playOnTouch)
-    expect(onTouch).toEqual(onKeys)
+    expect(onTouch.commands).toEqual(onKeys.commands)
+    expect(onTouch.mode).toBe(onKeys.mode)
     expect(onTouch.stream.map((edge) => `${edge.actionId}${edge.isDown ? '+' : '-'}`)).toEqual([
-      'aim_right+',
-      'lift+',
-      'lift-',
-      'aim_right-',
       'interact+',
     ])
     expect(onTouch.mode).toBe('docked')
   })
 
-  it('give the vehicle the same intent after every step as the matching keys (#474)', () => {
+  it('give the vehicle the same intent after every step as the matching keys at the rim (#474)', () => {
     const onKeys = intentsAfterEach([
       () => routeKeyChange(key('KeyD', true)),
-      () => routeKeyChange(key('KeyW', true)),
-      () => routeKeyChange(key('KeyW', false)),
+      () => {
+        routeKeyChange(key('KeyD', false))
+        routeKeyChange(key('KeyW', true))
+      },
+      () => {
+        routeKeyChange(key('KeyW', false))
+        routeKeyChange(key('KeyD', true))
+      },
       () => routeKeyChange(key('KeyD', false)),
     ])
     const onTouch = intentsAfterEach([
       () => {
         landStick(1, 100, 300)
-        pushStick(1, 140, 300)
+        pushStick(1, 156, 300)
       },
-      () => pushStick(1, 130, 270),
-      () => pushStick(1, 140, 300),
+      () => pushStick(1, 100, 244),
+      () => pushStick(1, 156, 300),
       () => liftStick(1),
     ])
     expect(onTouch).toEqual(onKeys)
-    expect(onTouch.map(({ moveX, lift }) => [moveX, lift])).toEqual([
-      [1, false],
-      [1, true],
-      [1, false],
-      [0, false],
+    expect(onTouch.map(({ moveX, aim, lift }) => [moveX, aim, lift])).toEqual([
+      [64, 0, false],
+      [0, 16, true],
+      [64, 0, false],
+      [0, null, false],
     ])
   })
 
-  it('hold a diagonal as W then A would, and let go of everything when the thumb lifts', () => {
+  it('drive a diagonal push analog, aimed between the facings, and stop when the thumb lifts', () => {
     runFresh(() => {
       landStick(1, 100, 300)
       pushStick(1, 70, 270)
     })
-    expect(readVehicleIntent()).toMatchObject({ moveX: -1, lift: true })
+    const intent = readVehicleIntent()
+    expect(intent).toMatchObject({ aim: 24, lift: true })
+    expect(intent.moveX).toBeLessThan(0)
+    expect(intent.moveX).toBeGreaterThan(-64)
     liftStick(1)
-    expect(readVehicleIntent()).toMatchObject({ moveX: 0, lift: false })
+    expect(readVehicleIntent()).toEqual({ moveX: 0, aim: null, lift: false })
+  })
+
+  it('drive faster the further the thumb pushes, and at about half speed halfway', () => {
+    runFresh(() => landStick(1, 100, 300))
+    const drives = [12, 20, 34, 44, 56].map((dx) => {
+      pushStick(1, 100 + dx, 300)
+      return readVehicleIntent().moveX
+    })
+    drives.slice(1).forEach((drive, index) => expect(drive).toBeGreaterThan(drives[index]))
+    pushStick(1, 100 + 11.2 + 22.4, 300)
+    expect(readVehicleIntent().moveX).toBe(32)
+  })
+
+  it('turn the aim smoothly as the thumb sweeps a circle, never in four or eight steps', () => {
+    runFresh(() => landStick(1, 100, 300))
+    const aims = Array.from({ length: 32 }, (_, step) => {
+      const angle = (step / 32) * 2 * Math.PI
+      pushStick(1, 100 + Math.cos(angle) * 50, 300 - Math.sin(angle) * 50)
+      return readVehicleIntent().aim
+    })
+    expect(aims).toEqual(Array.from({ length: 32 }, (_, step) => step * 2))
   })
 
   it('ignore a second thumb while the stick is held', () => {

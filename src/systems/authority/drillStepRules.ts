@@ -23,7 +23,14 @@
  *   lags a step by at most one report interval, well inside a block's 60-tick warning.
  */
 import type { SweptCut } from '../vehicle/sweptCut'
-import { isFacing, noseTileOf, type Facing, type VehiclePose } from '../vehicle/vehiclePose'
+import {
+  aimProblemsOf,
+  isFacing,
+  noseTileOf,
+  steppedPoseOf,
+  type Facing,
+  type VehiclePose,
+} from '../vehicle/vehiclePose'
 import { isVehicleActive, type VehicleState } from '../vehicle/vehicleState'
 import type { AuthorityCommand } from './authorityCommand'
 import { vehicleOf, type AuthorityState } from './authorityState'
@@ -52,7 +59,13 @@ type StepCommand = AuthorityCommand<'drillStep'>
 
 export const DRILL_STEP_RULES: { readonly drillStep: CommandRule<'drillStep'> } = {
   drillStep: {
-    fields: { x: 'safeInteger', y: 'safeInteger', facing: 'wholeNumber', drive: 'driveSigns' },
+    fields: {
+      x: 'safeInteger',
+      y: 'safeInteger',
+      facing: 'wholeNumber',
+      drive: 'driveSigns',
+      aim: 'optionalAim',
+    },
     reject: (state, command) =>
       firstRejection([
         () => noPlanetRejection(state.planet),
@@ -75,9 +88,12 @@ function steppingVehicleRejection(vehicle: VehicleState): Rejection | null {
   return rejectionOf('vehicle_not_active', `the vehicle is ${vehicle.mode} or has no pose`)
 }
 
+/** A facing 0 to 3, and an aim only off the four facings, with the facing nearest it (ticket 791). */
 function facingRejection(command: StepCommand): Rejection | null {
-  if (isFacing(command.payload.facing)) return null
-  return rejectionOf('invalid_pose', `facing must be 0 to 3, got ${command.payload.facing}`)
+  const { facing, aim } = command.payload
+  if (!isFacing(facing)) return rejectionOf('invalid_pose', `facing must be 0 to 3, got ${facing}`)
+  const problems = aimProblemsOf(facing, aim)
+  return problems.length === 0 ? null : { reason: 'invalid_pose', problems }
 }
 
 function repeatedStepRejection(vehicle: VehicleState, tick: number): Rejection | null {
@@ -115,8 +131,8 @@ function cutStep(state: AuthorityState, { playerId, payload }: StepCommand): Rul
   const params = planetParamsOf(state.planet)
   const reported = vehicleOf(state, playerId).pose
   if (params === null || reported === null) return unchanged(state)
-  // `facingRejection` refused any facing outside 0 to 3.
-  const pose = { ...reported, x: payload.x, y: payload.y, facing: payload.facing as Facing }
+  // `facingRejection` refused any facing outside 0 to 3, and an aim that does not go with it.
+  const pose = steppedPoseOf(reported, { ...payload, facing: payload.facing as Facing })
   const nose = noseTileOf(pose)
   const step = { pose, drive: payload.drive, isLifting: payload.drive.y === 1 }
   const walked = { from: lastAcceptedPositionOf(vehicleOf(state, playerId)), pose }

@@ -184,6 +184,13 @@ export const DRILL_POSE_REPORT_INTERVAL_TICKS = 1
 export const SWIVEL_TICKS = 8
 
 /**
+ * An analog stick's push this close to the drill head's target, in 1/64 turns (11.25 degrees), is
+ * tracked, not turned to (ticket 791): a thumb sweeping the stick moves the aim a step or two a
+ * tick, and the head follows it there and then. A key's aims lie 16 apart, so keys never nudge.
+ */
+export const AIM_TRACK_STEPS = 2
+
+/**
  * #9 / #11 pose addition: the integer front/side/rear zone test runs only for offsets up to this
  * many mm (contact range), so every intermediate stays below 2^53.
  */

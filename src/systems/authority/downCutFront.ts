@@ -10,15 +10,17 @@
 import { MM_PER_METRE, UP_VECTOR_SCALE } from '../../constants/physics'
 import { rampedFrontStepMmOf } from '../vehicle/downCutRamp'
 import { downCutAccelerationAt } from '../vehicle/radialGravity'
-import { facingVectorOf, type Facing, type VehiclePose } from '../vehicle/vehiclePose'
+import { aimOfPose, aimVectorOf, type Aim } from '../vehicle/aim'
+import type { Facing, VehiclePose } from '../vehicle/vehiclePose'
 import type { PlanetParams } from '../world/planetParams'
 import { vehicleOf, type AuthorityState } from './authorityState'
 
-/** A step's position in mm and its facing. */
+/** A step's position in mm, its facing and its aim off the four facings (ticket 791). */
 interface FrontStep {
   x: number
   y: number
   facing: Facing
+  aim?: Aim
 }
 
 /** The front's step at `step`, `stepMm` held to the gravity ramp on a cut down. */
@@ -31,16 +33,17 @@ export function gravityRampedFrontStepMmAt(
 ): number {
   const vehicle = vehicleOf(state, playerId)
   if (vehicle.pose === null) return stepMm
-  return rampedFrontStepMmOf(step.facing, stepMm, {
-    reportedMmPerSecond: reportedAlongFacingOf(vehicle.pose, step.facing),
+  const aim = aimOfPose(step)
+  return rampedFrontStepMmOf(aim, stepMm, {
+    reportedMmPerSecond: reportedAlongAimOf(vehicle.pose, aim),
     ticksSinceReport: Math.max(0, state.tick - vehicle.accountedTick),
     acceleration: accelerationAt(params, step),
   })
 }
 
-/** The reported velocity along the facing, mm/s; 0 when it points the other way. */
-function reportedAlongFacingOf(pose: VehiclePose, facing: Facing): number {
-  const ahead = facingVectorOf(pose.upx, pose.upy, facing)
+/** The reported velocity along the aim, mm/s; 0 when it points the other way. */
+function reportedAlongAimOf(pose: VehiclePose, aim: Aim): number {
+  const ahead = aimVectorOf(pose.upx, pose.upy, aim)
   return Math.max(0, Math.floor((pose.vx * ahead.x + pose.vy * ahead.y) / UP_VECTOR_SCALE))
 }
 

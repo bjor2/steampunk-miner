@@ -5,9 +5,11 @@
  * the items that read drive intent later (#255, #246, #204), so they need no second bump.
  *
  * A push counts only at least halfway to its side (Gameplay's rule on #279), so stick noise never
- * tilts the bit. The keys and today's stick push all the way; the rule holds for any analog source.
+ * tilts the bit. The keys push all the way; the analog sticks (ticket 791) cross it halfway, and
+ * a diagonal aim reads down while it points at least halfway down, by the same rule.
  */
-import { DRIVE_PUSH_SHARE_MIN } from '../../constants/physics'
+import { DRIVE_PUSH_SHARE_MIN, DRIVE_PUSH_STEPS, UP_VECTOR_SCALE } from '../../constants/physics'
+import { aimDirectionOf } from './aim'
 import type { VehicleIntent } from './vehicleIntent'
 import { FACING, type Facing } from './vehiclePose'
 
@@ -54,10 +56,11 @@ export function signOfPush(push: number): DriveSign {
 
 /** The drive of an intent: the side it drives to, and up while lifting or down while drilling down. */
 export function driveSignsOfIntent(intent: VehicleIntent): DriveSigns {
-  return { x: signOfPush(intent.moveX), y: verticalSignOf(intent) }
+  return { x: signOfPush(intent.moveX / DRIVE_PUSH_STEPS), y: verticalSignOf(intent) }
 }
 
 function verticalSignOf(intent: VehicleIntent): DriveSign {
   if (intent.lift) return 1
-  return intent.facing === FACING.down ? -1 : 0
+  if (intent.aim === null) return 0
+  return signOfPush(aimDirectionOf(intent.aim).up / UP_VECTOR_SCALE) === -1 ? -1 : 0
 }

@@ -8,6 +8,7 @@ import type { AuthorityCommand } from '../systems/authority/authorityCommand'
 import type { Authority } from '../systems/authority/loopbackAuthority'
 import { ACTION_MAP, defaultBindings, type ActionId } from '../systems/input/actionMap'
 import { DEFAULT_PREFERENCES, readPreferences } from '../systems/input/preferences'
+import { AIM } from '../systems/vehicle/aim'
 import { FACING } from '../systems/vehicle/vehiclePose'
 import {
   createStartingAuthority,
@@ -256,7 +257,7 @@ describe('input: travel confirmation', () => {
 describe('input: keys, layers and the vehicle intent', () => {
   it('drives with the held key and stops on release', () => {
     routeKeyChange(key('KeyD', true))
-    expect(readVehicleIntent()).toEqual({ moveX: 1, facing: FACING.right, lift: false })
+    expect(readVehicleIntent()).toEqual({ moveX: 64, aim: AIM.right, lift: false })
     routeKeyChange(key('KeyD', false))
     expect(readVehicleIntent().moveX).toBe(0)
   })
@@ -312,7 +313,7 @@ describe('input: keys, layers and the vehicle intent', () => {
 
   it('still drives when Shift is held with D', () => {
     routeKeyChange(key('KeyD', true, { isShiftHeld: true }))
-    expect(readVehicleIntent().moveX).toBe(1)
+    expect(readVehicleIntent().moveX).toBe(64)
   })
 
   it('moves focus with the menu keys from the quick action, and Tab does nothing (#40)', () => {
@@ -342,11 +343,11 @@ describe('input: keys, layers and the vehicle intent', () => {
 describe('input: W lifts, Space docks (#40)', () => {
   it('lifts and faces up while W is held, and S pressed after it drops the lift', () => {
     routeKeyChange(key('KeyW', true))
-    expect(readVehicleIntent()).toEqual({ moveX: 0, facing: FACING.up, lift: true })
+    expect(readVehicleIntent()).toEqual({ moveX: 0, aim: AIM.up, lift: true })
     routeKeyChange(key('KeyS', true))
-    expect(readVehicleIntent()).toEqual({ moveX: 0, facing: FACING.down, lift: false })
+    expect(readVehicleIntent()).toEqual({ moveX: 0, aim: AIM.down, lift: false })
     routeKeyChange(key('KeyS', false))
-    expect(readVehicleIntent()).toEqual({ moveX: 0, facing: FACING.up, lift: true })
+    expect(readVehicleIntent()).toEqual({ moveX: 0, aim: AIM.up, lift: true })
   })
 
   it('never lifts on Space and submits nothing for it away from a pad', () => {

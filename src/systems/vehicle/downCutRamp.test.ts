@@ -6,7 +6,7 @@ import { followedTicksAfter, type CutFollowMotion } from './cutFollowMotion'
 import { dot, type Vector2 } from './localFrame'
 import { downCutAccelerationAt, gravityAt, gravityStrengthAt } from './radialGravity'
 import { stepVehicleMotion, type MotionStepInput } from './vehicleMotion'
-import { FACING, type Facing } from './vehiclePose'
+import { AIM, type Aim } from './aim'
 
 // Bjor's ruling on #724: along a cut down the speed rises by at most a*dt a tick, with
 // a = max(g(r), 0.1 g_surface); braking stays instant and the top speed stays the drill's.
@@ -23,7 +23,7 @@ interface DownRun {
   /** Metres from the centre the run starts at, straight above it. */
   startRadius: number
   dt?: number
-  facing?: Facing
+  aim?: Aim
   /** Without the ramp: the motion rule as it stood before #724. */
   isUnramped?: boolean
   isPushing?: boolean
@@ -35,8 +35,8 @@ interface DownRun {
 /** The downward speed (m/s, positive down) after each tick, the body moved along as it goes. */
 function downSpeedsOf(run: DownRun): number[] {
   const dt = run.dt ?? PHYSICS_TIMESTEP
-  const facing = run.facing ?? FACING.down
-  const sign = facing === FACING.down ? -1 : 1
+  const aim = run.aim ?? AIM.down
+  const sign = aim === AIM.down ? -1 : 1
   let velocity: Vector2 = { x: 0, y: sign * (run.startSpeed ?? 0) }
   let position: Vector2 = { x: 0, y: run.startRadius }
   let followedTicks = run.followedTicks ?? 0
@@ -44,7 +44,7 @@ function downSpeedsOf(run: DownRun): number[] {
   for (const speed of run.speeds) {
     const cut: CutFollowMotion = {
       speed,
-      facing,
+      aim,
       isPushing: run.isPushing ?? true,
       followedTicks,
     }
@@ -68,7 +68,7 @@ function stepInput(
     velocity,
     up: UP,
     gravity: gravityAt(position, RADIUS, run.multiplier),
-    intent: { moveX: 0, facing: cut.facing, lift: false },
+    intent: { moveX: 0, aim: cut.aim, lift: false },
     engine: engineStats(0),
     canAct: true,
     isGrounded: false,
@@ -203,7 +203,7 @@ describe('down-cut gravity ramp: the motion (#724)', () => {
   })
 
   it('leaves a cut up to the drill alone', () => {
-    const run = { speeds: held(30, 20), multiplier: 1, startRadius: RADIUS - 2, facing: FACING.up }
+    const run = { speeds: held(30, 20), multiplier: 1, startRadius: RADIUS - 2, aim: AIM.up }
     expect(downSpeedsOf(run)).toEqual(downSpeedsOf({ ...run, isUnramped: true }))
   })
 

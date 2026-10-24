@@ -1,6 +1,7 @@
 /**
  * The on-screen driving controls (#173, Gameplay & Vehicle's touch layout). Input only: every
- * control presses an existing action through the action map, so replay and protocol are unchanged.
+ * button presses an existing action through the action map, and the stick drives the analog
+ * intent (ticket 791); the authority hears only the pose, so none of these reach a replay.
  */
 
 /** The floating stick lands anywhere in this share of the screen's width, from the thumb's side. */
@@ -20,10 +21,12 @@ export const STICK_RADIUS_PX = 56
 /** Inside this share of the travel the stick holds nothing. */
 export const STICK_DEADZONE_SHARE = 0.2
 /**
- * tan(22.5 degrees): the stick resolves to 8 directions of 45 degrees each, so a push within 22.5
- * degrees of an axis is that axis alone and anything further is the diagonal.
+ * The stick is analog (ticket 791): its angle is the drill's aim in 1/64 turns. A push keeps the
+ * aim it gave until its angle is this many steps from it, three quarters of a step, so a thumb
+ * resting on a step's edge never flickers the head between two aims. The pad's left stick reads
+ * the same.
  */
-export const STICK_OCTANT_SLOPE = Math.SQRT2 - 1
+export const STICK_AIM_HOLD_STEPS = 0.75
 
 /**
  * The cluster's primary button (Interact) and the others, in CSS px (G&V layout): three rows

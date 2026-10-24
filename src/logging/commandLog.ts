@@ -6,7 +6,9 @@
  * - A `reportPose` line leaves out every payload field equal to the same player's previous logged
  *   report, and reading the log carries the last value forward. Most 5 Hz pose lines are idle, so
  *   they shrink to their stamp. A player's first report, and the first after a rescue (respawn),
- *   is written in full, so a reader never needs a value from before that point.
+ *   is written in full, so a reader never needs a value from before that point. The optional
+ *   `aim` (ticket 791) is carried the same way, and a report whose aim went back to a facing
+ *   writes `aim: null`, so the reader drops it again.
  * - Consecutive `drillTile` commands of one player with equal `ticks` and a constant tile step,
  *   or `drillStep` commands with a constant `x, y` step and equal `drive`, are written as their
  *   first command with a `run` of the count and the step of the tick and those fields; its
@@ -38,8 +40,14 @@ import { isNextTickPose, poseResidualOf, unrolledPoseRunOf, type PoseResidual } 
 type PosePayload = CommandPayloads['reportPose']
 type PoseCommand = AuthorityCommand<'reportPose'>
 
-/** A pose line as logged: an absent field means "as this player's previous logged report". */
-export type LoggedPosePayload = Partial<PosePayload>
+/**
+ * A pose line as logged: an absent field means "as this player's previous logged report", and an
+ * `aim` of null "no aim now" (ticket 791).
+ */
+export type LoggedPosePayload = Partial<Omit<PosePayload, 'aim'>> & { aim?: number | null }
+
+/** The fields every report carries; `aim` rides along only off the four facings. */
+type RequiredPoseField = Exclude<keyof PosePayload, 'aim'>
 
 /** A pose line as logged; a `poseRun` holds the reports on the ticks after it (ticket 522). */
 type LoggedPoseCommand = Omit<PoseCommand, 'payload'> & {
@@ -50,7 +58,7 @@ type LoggedPoseCommand = Omit<PoseCommand, 'payload'> & {
 /** One line of `commands.ndjson`. */
 export type LoggedCommand = AuthorityCommand | LoggedPoseCommand | LoggedRunCommand
 
-/** Every pose field, so a full line can be told from one that leans on an earlier report. */
+/** Every required pose field, so a full line can be told from one leaning on an earlier report. */
 const POSE_FIELDS = Object.keys({
   x: true,
   y: true,
@@ -66,7 +74,7 @@ const POSE_FIELDS = Object.keys({
   driveTicks: true,
   drillTicks: true,
   drive: true,
-} satisfies Record<keyof PosePayload, true>) as (keyof PosePayload)[]
+} satisfies Record<RequiredPoseField, true>) as RequiredPoseField[]
 
 /** The last pose each player logged; a rescue forgets it so the next report is written in full. */
 type LastPoses = Map<string, PosePayload>
@@ -179,7 +187,14 @@ function loggedCommandOf(command: AuthorityCommand, lastPoses: LastPoses): Logge
 function changedPoseFieldsOf(last: PosePayload | undefined, pose: PosePayload): LoggedPosePayload {
   if (last === undefined) return pose
   const changed = POSE_FIELDS.filter((field) => !isSamePoseField(last[field], pose[field]))
-  return Object.fromEntries(changed.map((field) => [field, pose[field]])) as LoggedPosePayload
+  const fields = Object.fromEntries(changed.map((field) => [field, pose[field]]))
+  return { ...fields, ...aimChangeOf(last, pose) } as LoggedPosePayload
+}
+
+/** The aim when it changed, null when it went back to a facing; nothing when it stayed. */
+function aimChangeOf(last: PosePayload, pose: PosePayload): { aim?: number | null } {
+  if (last.aim === pose.aim) return {}
+  return { aim: pose.aim ?? null }
 }
 
 function isSamePoseField(last: PosePayload[keyof PosePayload], value: typeof last): boolean {
@@ -240,7 +255,13 @@ function expandedPosesOf(
 function expandedPoseOf(command: LoggedPoseCommand, lastPoses: LastPoses): PoseCommand {
   const payload = { ...lastPoses.get(command.playerId), ...command.payload }
   refuseIncompletePose(command, payload)
-  return { ...command, payload: payload as PosePayload }
+  return { ...command, payload: withoutClearedAim(payload) }
+}
+
+/** The report as sent: an aim the line cleared (null) is no aim at all. */
+function withoutClearedAim({ aim, ...fields }: LoggedPosePayload): PosePayload {
+  const pose = fields as Omit<PosePayload, 'aim'>
+  return aim === null || aim === undefined ? pose : { ...pose, aim }
 }
 
 /** A line missing a field with nothing to carry is a broken log: refused, never guessed. */

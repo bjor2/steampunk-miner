@@ -1,7 +1,8 @@
 import { describe, expect, it } from 'vitest'
+import { DRIVE_PUSH_STEPS } from '../../constants/physics'
 import { driveSignsOfIntent, isDriveSigns, signOfPush } from './driveSigns'
 import { IDLE_INTENT } from './vehicleIntent'
-import { FACING } from './vehiclePose'
+import { AIM } from './aim'
 
 describe('drive signs', () => {
   it('counts a side push only from halfway, so 0.4 drives straight and 0.6 to that side', () => {
@@ -13,18 +14,18 @@ describe('drive signs', () => {
   })
 
   it('reads the side and the drill-down push of a held intent', () => {
-    expect(driveSignsOfIntent({ moveX: -1, facing: FACING.down, lift: false })).toEqual({
+    expect(driveSignsOfIntent({ moveX: -DRIVE_PUSH_STEPS, aim: AIM.down, lift: false })).toEqual({
       x: -1,
       y: -1,
     })
-    expect(driveSignsOfIntent({ moveX: 1, facing: FACING.right, lift: false })).toEqual({
+    expect(driveSignsOfIntent({ moveX: DRIVE_PUSH_STEPS, aim: AIM.right, lift: false })).toEqual({
       x: 1,
       y: 0,
     })
   })
 
-  it('reads lifting as up, whatever the facing', () => {
-    expect(driveSignsOfIntent({ moveX: 0, facing: FACING.up, lift: true })).toEqual({ x: 0, y: 1 })
+  it('reads lifting as up, whatever the aim', () => {
+    expect(driveSignsOfIntent({ moveX: 0, aim: AIM.up, lift: true })).toEqual({ x: 0, y: 1 })
   })
 
   it('reports no drive for the idle intent', () => {

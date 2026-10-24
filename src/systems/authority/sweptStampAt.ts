@@ -20,8 +20,9 @@ import {
   sweptDrillStampOf,
   sweptStampAheadMmOf,
 } from '../vehicle/drillStamp'
-import { frontOfCursor, stampBodyPointOf, type SweptCut } from '../vehicle/sweptCut'
-import { facingVectorOf, type VehiclePose } from '../vehicle/vehiclePose'
+import { frontOfCursor, isSameAim, stampBodyPointOf, type SweptCut } from '../vehicle/sweptCut'
+import { aimOfPose, aimVectorOfPose } from '../vehicle/aim'
+import type { VehiclePose } from '../vehicle/vehiclePose'
 import { MM_PER_SAMPLE } from '../world/sampleGrid'
 import type { DiscStamp, StampPoint } from '../world/stampShape'
 import { vehicleOf, type AuthorityState } from './authorityState'
@@ -57,7 +58,7 @@ export function sweptStampAt(
   const { pose, isLifting, gate } = step
   if (!isCutGateOpen(gate)) return placedTravellingAt(pose, isLifting, state, playerId)
   const stepMm = cutFrontStepMmAt(state, playerId, step)
-  const aheadMm = sweptStampAheadMmOf(stepMm)
+  const aheadMm = sweptStampAheadMmOf(stepMm, aimOfPose(pose))
   const placed = placedAt(pose, cuttingDrillStampOf(pose, isLifting, aheadMm), aheadMm)
   const cursor = continuedCursorOf(state, playerId, pose)
   if (cursor === null) return placed
@@ -151,7 +152,7 @@ function continuedCursorOf(
 ): SweptCut | null {
   const cursor = vehicleOf(state, playerId).sweptCut
   if (cursor === undefined || cursor.tick !== state.tick - 1) return null
-  return cursor.facing === pose.facing ? cursor : null
+  return isSameAim(cursor, pose) ? cursor : null
 }
 
 /**
@@ -173,7 +174,7 @@ interface CursorReach {
  * its last front plus the step.
  */
 function withinCursorReach(stamp: DiscStamp, { cursor, pose, stepMm }: CursorReach): DiscStamp {
-  const ahead = facingVectorOf(pose.upx, pose.upy, pose.facing)
+  const ahead = aimVectorOfPose(pose)
   const alongOf = (point: StampPoint) =>
     (point.xMm - cursor.xMm) * ahead.x + (point.yMm - cursor.yMm) * ahead.y
   const along = alongOf(stamp)

@@ -9,6 +9,8 @@ import type { CutFollow } from '../systems/authority/cutFollowRead'
 import type { CutTick } from '../systems/vehicle/heldCut'
 import type { StepBounds } from '../systems/vehicle/stepBound'
 import { IDLE_INTENT, type VehicleIntent } from '../systems/vehicle/vehicleIntent'
+import { DRIVE_PUSH_STEPS } from '../constants/physics'
+import { AIM } from '../systems/vehicle/aim'
 import { FACING, type VehiclePose } from '../systems/vehicle/vehiclePose'
 import type { GroundReader } from '../systems/world/groundReader'
 import { CELL_KIND } from '../systems/world/worldCell'
@@ -23,11 +25,11 @@ const TOE_POSE: VehiclePose = {
   upy: 1024,
   facing: FACING.right,
 }
-const PUSHING: VehicleIntent = { moveX: 1, facing: FACING.right, lift: false }
+const PUSHING: VehicleIntent = { moveX: DRIVE_PUSH_STEPS, aim: AIM.right, lift: false }
 /** A slow rig's bounds: the in-the-way reach stays 250 mm. */
 const STEP_BOUNDS: StepBounds = { cuttingMm: 100, travellingMm: 300 }
 /** The last cut followed: 10 m/s to the right. */
-const LAST_CUT = { speed: 10, facing: FACING.right }
+const LAST_CUT = { speed: 10, aim: AIM.right }
 const TOE_SAMPLES: Readonly<Record<string, number>> = { '42,41': 100, '42,42': 100, '43,42': 255 }
 
 /** How the step is set up. */

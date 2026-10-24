@@ -226,3 +226,36 @@ describe('command log: compact lines (ticket 420)', () => {
     expect(expandCommandLog(read)).toEqual(commands)
   })
 })
+
+describe('command log: pose aim (ticket 791)', () => {
+  /** A report aimed off the four facings at `aim`, or at its facing alone with none. */
+  function aimedPoseOf(tick: number, aim: number | undefined): AuthorityCommand {
+    const pose = poseOf('p1', tick, RIGHT) as AuthorityCommand<'reportPose'>
+    if (aim === undefined) return pose
+    return { ...pose, payload: { ...pose.payload, aim } }
+  }
+
+  const loggedAimsOf = (commands: readonly AuthorityCommand[]) =>
+    loggedCommandsOf(commands).map((command) =>
+      'aim' in command.payload ? command.payload.aim : 'carried',
+    )
+
+  it('writes the aim only when it changed, and null when it went back to a facing', () => {
+    const commands = [
+      aimedPoseOf(12, undefined),
+      aimedPoseOf(24, 60),
+      aimedPoseOf(36, 60),
+      aimedPoseOf(48, 61),
+      aimedPoseOf(60, undefined),
+      aimedPoseOf(72, undefined),
+    ]
+    expect(loggedAimsOf(commands)).toEqual(['carried', 60, 'carried', 61, null, 'carried'])
+  })
+
+  it('expands an aimed run back to exactly the submitted reports, an aim never left over', () => {
+    const commands = [aimedPoseOf(12, 60), aimedPoseOf(24, undefined), aimedPoseOf(36, 2)]
+    const expanded = expandCommandLog(loggedCommandsOf(commands))
+    expect(expanded).toEqual(commands)
+    expect(expanded[1].payload).not.toHaveProperty('aim')
+  })
+})

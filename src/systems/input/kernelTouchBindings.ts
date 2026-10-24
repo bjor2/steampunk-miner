@@ -1,6 +1,7 @@
 /**
  * The kernel's own touch controls as binding rows (#474), read before the slices' rows: the
- * floating stick's four drive actions, the cluster's buttons (`touchControls.ts`, #173; the star
+ * floating stick standing for the four drive actions (analog since ticket 791, so a drag drives
+ * what they drive without pressing them), the cluster's buttons (`touchControls.ts`, #173; the star
  * map's since ticket 757), the tool
  * slot bar's kernel cells, Plant charge, its size step (ticket 473) and the guns toggle (ticket
  * 691), the pause button (ticket 472), the stage's double tap, and the

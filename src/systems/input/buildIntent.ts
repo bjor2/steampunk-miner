@@ -8,7 +8,14 @@
  * keeps the last facing in the controller). `aim_left` and `aim_right` also drive, the one pressed
  * last winning. `lift` fires the steam-lift thruster and turns the head up, unless `aim_down` was
  * pressed after it: the newest of the two wins, and `aim_down` never thrusts. No drill button.
+ *
+ * The intent is analog since ticket 791, and a key gives its extremes: a side key drives at the
+ * full push (`DRIVE_PUSH_STEPS`) and the facing is one of the four cardinal aims, so #40's moves
+ * (W then D climbs with the head on the wall) and every key run stay exactly what they were. Only
+ * an analog stick aims between them (`analogStick.ts`).
  */
+import { DRIVE_PUSH_STEPS } from '../../constants/physics'
+import { aimOfFacing, type Aim } from '../vehicle/aim'
 import type { VehicleIntent } from '../vehicle/vehicleIntent'
 import { FACING, type Facing } from '../vehicle/vehiclePose'
 import type { ActionId } from './actionMap'
@@ -25,15 +32,20 @@ export function buildIntent(held: readonly ActionId[]): VehicleIntent {
   const facings = held.flatMap((action) => FACING_OF_SOURCE[action] ?? [])
   return {
     moveX: moveOf(facings),
-    facing: facings.at(-1) ?? null,
+    aim: aimOfLatest(facings),
     lift: isLifting(held),
   }
 }
 
-function moveOf(facings: readonly Facing[]): -1 | 0 | 1 {
+function moveOf(facings: readonly Facing[]): number {
   const sideways = facings.filter((facing) => facing === FACING.left || facing === FACING.right)
   if (sideways.length === 0) return 0
-  return sideways.at(-1) === FACING.right ? 1 : -1
+  return sideways.at(-1) === FACING.right ? DRIVE_PUSH_STEPS : -DRIVE_PUSH_STEPS
+}
+
+function aimOfLatest(facings: readonly Facing[]): Aim | null {
+  const latest = facings.at(-1)
+  return latest === undefined ? null : aimOfFacing(latest)
 }
 
 /** Lift is held and drill down is not held after it (#40: the later of W and S wins). */

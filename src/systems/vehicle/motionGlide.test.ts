@@ -1,10 +1,11 @@
 import { describe, expect, it } from 'vitest'
+import { DRIVE_PUSH_STEPS } from '../../constants/physics'
 import { ECONOMY } from '../economy/economy'
 import { engineStats } from '../economy/vehicleStats'
 import { dot, type Vector2 } from './localFrame'
 import { foldMotionEffects, isInputLocked, type VehicleMotionEffect } from './motionEffects'
 import type { MotionGlide } from './motionGlide'
-import { FACING } from './vehiclePose'
+import { AIM } from './aim'
 import { IDLE_INTENT, type VehicleIntent } from './vehicleIntent'
 import { stepVehicleMotion, type MotionStep } from './vehicleMotion'
 
@@ -16,7 +17,7 @@ const CAP_BP = ECONOMY.itemEffectCaps.motionBoostCapBp
 const ENGINE = engineStats(0)
 const UP: Vector2 = { x: 0, y: 1 }
 const GRAVITY: Vector2 = { x: 0, y: -9.81 }
-const HELD: VehicleIntent = { moveX: 1, facing: FACING.down, lift: true }
+const HELD: VehicleIntent = { moveX: DRIVE_PUSH_STEPS, aim: AIM.down, lift: true }
 const START: Vector2 = { x: 3.5, y: 9.5 }
 /** Two tiles down from `START`'s tile, through the one between. */
 const GLIDE: MotionGlide = { to: { tx: 3, ty: 7 }, untilTick: 24, passThrough: { tx: 3, ty: 8 } }

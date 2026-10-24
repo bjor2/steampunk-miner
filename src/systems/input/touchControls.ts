@@ -1,14 +1,14 @@
 /**
- * The touch controls as rules (#173, Gameplay & Vehicle's layout): which move actions a stick
- * push holds, which cluster buttons the situation shows, how many zoom steps a pinch has made and
- * what counts as a double tap. The controls only press existing actions, the same way the keys
- * do, so a touch run and a key run replay alike. Nothing here touches the DOM or the store.
+ * The touch controls as rules (#173, Gameplay & Vehicle's layout): what a stick push drives with,
+ * which cluster buttons the situation shows, how many zoom steps a pinch has made and what counts
+ * as a double tap. The stick is analog (ticket 791, overriding #173 section 3's 8 directions on
+ * the move actions): its push is the drive and the drill's aim (`analogStick.ts`). The buttons
+ * only press existing actions, the same way the keys do. Nothing here touches the DOM or the store.
  */
 import {
   DOUBLE_TAP_MS,
   DOUBLE_TAP_SLOP_PX,
   STICK_DEADZONE_SHARE,
-  STICK_OCTANT_SLOPE,
   STICK_RADIUS_PX,
 } from '../../constants/touch'
 import { ITEM_CARD_LONG_PRESS_MS } from '../../constants/itemCard'
@@ -19,9 +19,11 @@ import {
   panelIconIdOf,
   vehicleStateIconIdOf,
 } from '../art/icons/iconSet'
+import type { Aim } from '../vehicle/aim'
 import type { VehicleMode } from '../vehicle/vehicleState'
 import type { BayId } from '../world/dockBays'
 import type { ActionId, InputContext } from './actionMap'
+import { stickDriveOf, type StickDrive, type StickPush } from './analogStick'
 
 /**
  * The cluster's buttons in a fixed order; each presses the action of the same id. Plant charge and
@@ -91,18 +93,13 @@ export interface StickOffset {
   dy: number
 }
 
-type Vertical = 'lift' | 'aim_down' | null
-type Horizontal = 'aim_left' | 'aim_right' | null
-
 /**
- * The move actions a push holds, vertical first: up lifts, down drills down, left and right
- * drive, and a diagonal holds both, exactly the keys W, S, A and D held in that order.
+ * What a push drives with (ticket 791), or null inside the 20% deadzone of the 56 px travel:
+ * the drive grows from the deadzone's edge to the rim and the aim follows the push's angle.
+ * `heldAim` is the aim the stick gave last (null for none), which a push near it keeps.
  */
-export function stickActionsOf(offset: StickOffset): ActionId[] {
-  if (isInDeadzone(offset)) return []
-  return [verticalOf(offset), horizontalOf(offset)].filter(
-    (action): action is NonNullable<Vertical | Horizontal> => action !== null,
-  )
+export function stickDriveAt(offset: StickOffset, heldAim: Aim | null): StickDrive | null {
+  return stickDriveOf(stickPushOf(offset), STICK_DEADZONE_SHARE, heldAim)
 }
 
 /** The cluster buttons to show now, in the cluster's order (#173: only valid and owned ones). */
@@ -182,17 +179,6 @@ export function isSlotHeldForCard(pressedAtMs: number, nowMs: number): boolean {
   return nowMs - pressedAtMs >= ITEM_CARD_LONG_PRESS_MS
 }
 
-/** What changes between two sets of held move actions: releases first, then presses. */
-export function heldChangesOf(
-  held: readonly ActionId[],
-  next: readonly ActionId[],
-): { released: ActionId[]; pressed: ActionId[] } {
-  return {
-    released: held.filter((action) => !next.includes(action)),
-    pressed: next.filter((action) => !held.includes(action)),
-  }
-}
-
 const CLUSTER_ICON_IDS: Readonly<Record<ClusterActionId, string>> = {
   interact: vehicleStateIconIdOf('docked'),
   undock: vehicleStateIconIdOf('docked'),
@@ -221,16 +207,7 @@ function isWaitingForTow(mode: VehicleMode): boolean {
   return mode === 'stranded' || mode === 'destroyed'
 }
 
-function isInDeadzone({ dx, dy }: StickOffset): boolean {
-  return Math.hypot(dx, dy) < STICK_RADIUS_PX * STICK_DEADZONE_SHARE
-}
-
-function verticalOf({ dx, dy }: StickOffset): Vertical {
-  if (Math.abs(dy) <= Math.abs(dx) * STICK_OCTANT_SLOPE) return null
-  return dy < 0 ? 'lift' : 'aim_down'
-}
-
-function horizontalOf({ dx, dy }: StickOffset): Horizontal {
-  if (Math.abs(dx) <= Math.abs(dy) * STICK_OCTANT_SLOPE) return null
-  return dx < 0 ? 'aim_left' : 'aim_right'
+/** The push as shares of the travel, y turned up: the screen's down is the vehicle's down. */
+function stickPushOf({ dx, dy }: StickOffset): StickPush {
+  return { x: dx / STICK_RADIUS_PX, y: 0 - dy / STICK_RADIUS_PX }
 }

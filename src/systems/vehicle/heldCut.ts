@@ -17,14 +17,14 @@
  */
 import { CUT_COAST_METRES, CUT_FOLLOW_TICKS } from '../../constants/balance'
 import { PHYSICS_TIMESTEP } from '../../constants/physics'
+import type { Aim } from './aim'
 import { followedTicksAfter, isFollowingDrill, type CutFollowMotion } from './cutFollowMotion'
-import type { Facing } from './vehiclePose'
 
-/** The last `vCut` the drive followed, along its facing. */
+/** The last `vCut` the drive followed, along its aim (ticket 791: a facing's, or a diagonal). */
 export interface FollowedCut {
-  /** m/s along the facing. */
+  /** m/s along the aim. */
   speed: number
-  facing: Facing
+  aim: Aim
 }
 
 export interface CutMemory {
@@ -47,8 +47,8 @@ export const FRESH_CUT_MEMORY: CutMemory = Object.freeze({
 
 /** What a step with the gate shut says about the drive and the drill. */
 export interface ShutGateStep {
-  /** The pose's facing this step. */
-  facing: Facing
+  /** The pose's aim this step. */
+  aim: Aim
   /** The drive pushes along the facing, with energy to act. */
   isPushing: boolean
   /** The drill still bites with no span stop in its slab and the wheels not held. */
@@ -69,14 +69,14 @@ export interface CutTick {
  */
 export function heldCutOf(memory: CutMemory, step: ShutGateStep): CutFollowMotion | undefined {
   const { last } = memory
-  if (last === null || last.facing !== step.facing) return undefined
+  if (last === null || last.aim !== step.aim) return undefined
   if (step.isPushing) return isCoastLeft(memory, step) ? coastOf(last, memory) : undefined
   return memory.releasedTicks < CUT_FOLLOW_TICKS ? stopRampOf(last, memory) : undefined
 }
 
 /** The open gate's speed over a slab it has already cleared: the last `vCut`, not travel's. */
-export function clearedSlabSpeedOf(memory: CutMemory, facing: Facing): number | undefined {
-  return memory.last?.facing === facing ? memory.last.speed : undefined
+export function clearedSlabSpeedOf(memory: CutMemory, aim: Aim): number | undefined {
+  return memory.last?.aim === aim ? memory.last.speed : undefined
 }
 
 /** The memory after `tick`; a tick travel drove forgets the cut. */
@@ -116,6 +116,6 @@ function lastFollowedOf(
 ): FollowedCut | null {
   if (!cut.isPushing) return last
   if (!isFollowingDrill(cut, isWaitingForCut)) return null
-  if (last?.speed === cut.speed && last.facing === cut.facing) return last
-  return { speed: cut.speed, facing: cut.facing }
+  if (last?.speed === cut.speed && last.aim === cut.aim) return last
+  return { speed: cut.speed, aim: cut.aim }
 }
