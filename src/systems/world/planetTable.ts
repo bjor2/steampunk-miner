@@ -90,6 +90,8 @@ export const DOCK_CLEARANCE_TILES = 8
  * each counter building the planet holds (#170 amendment, TD 6 Oct) adds 6 columns east, at the
  * planet of its locked schedule row (`docs/scaling/horizontal/stats.json`): merchants P10, quest
  * office P28, core forge P38. The pad belongs to the planet, never to the player's unlocks.
+ * Ticket 823 moved the merchants row to P1 (the kit merchants stand in the existing shops, #821);
+ * the pads keep the span they were cut with, so P1 ground stays byte-identical.
  */
 export const PAD_FIRST_COLUMN = -8
 export const PAD_LAST_COLUMN_BASE = 12

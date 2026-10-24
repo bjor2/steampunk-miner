@@ -55,11 +55,12 @@ describe('star map jump (ticket 755)', () => {
       'TravelStarted',
       'PlanetUnlocked',
       'FeatureUnlocked',
+      'FeatureUnlocked',
       'PlanetEntered',
       'ArtefactCacheSpawned',
       'StateDigested',
     ])
-    expect(events[5]).toMatchObject({ scope: 'travel', digest: stateDigest(session.state()) })
+    expect(events[6]).toMatchObject({ scope: 'travel', digest: stateDigest(session.state()) })
   })
 
   it('skips ahead to any planet of the system, burning a quarter of U0 more per planet crossed', () => {

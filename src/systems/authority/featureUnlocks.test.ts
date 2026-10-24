@@ -24,7 +24,7 @@ describe('feature unlocks on travel', () => {
     const session = dockedOnPlanet(1)
     expect(isFeatureUnlocked(session.state(), 'planet_2')).toBe(false)
     const events = session.submit(10, travelTo(2))
-    expect(unlockedIdsOf(events)).toEqual(['planet_2'])
+    expect(unlockedIdsOf(events)).toEqual(['planet_2', 'scree_plough'])
     const types = events.map((event) => event.type)
     expect(types.indexOf('FeatureUnlocked')).toBe(types.indexOf('PlanetUnlocked') + 1)
     expect(isFeatureUnlocked(session.state(), 'planet_2')).toBe(true)
@@ -69,14 +69,14 @@ describe('feature unlocks on travel', () => {
   it('unlocks auto_guns on arriving at planet 4, its module being built (#93)', () => {
     const session = dockedOnPlanet(3)
     expect(isFeatureUnlocked(session.state(), 'auto_guns')).toBe(false)
-    expect(unlockedIdsOf(session.submit(10, travelTo(4)))).toEqual(['auto_guns'])
+    expect(unlockedIdsOf(session.submit(10, travelTo(4)))).toEqual(['auto_guns', 'shard_tongs'])
     expect(isFeatureUnlocked(session.state(), 'auto_guns')).toBe(true)
   })
 
   it('unlocks refinery_bay on arriving at planet 3, where the platform gets its Refinery bay', () => {
     const session = dockedOnPlanet(2)
     expect(isFeatureUnlocked(session.state(), 'refinery_bay')).toBe(false)
-    expect(unlockedIdsOf(session.submit(10, travelTo(3)))).toEqual(['refinery_bay'])
+    expect(unlockedIdsOf(session.submit(10, travelTo(3)))).toEqual(['refinery_bay', 'damp_flask'])
     expect(isFeatureUnlocked(session.state(), 'refinery_bay')).toBe(true)
   })
 

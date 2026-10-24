@@ -58,6 +58,7 @@ describe('travel', () => {
       'MoneyChanged',
       'PlanetUnlocked',
       'FeatureUnlocked',
+      'FeatureUnlocked',
       'PlanetEntered',
       'ArtefactCacheSpawned',
       'StateDigested',
@@ -65,13 +66,14 @@ describe('travel', () => {
     const planet2 = freshPlanetParamsFor(WORLD_SEED, 2)
     expect(events[2]).toMatchObject({ planetIndex: 2 })
     expect(events[3]).toMatchObject({ featureId: 'planet_2' })
-    expect(events[4]).toMatchObject({
+    expect(events[4]).toMatchObject({ featureId: 'scree_plough' })
+    expect(events[5]).toMatchObject({
       planetSeed: planet2.planetSeed,
       generatorVersion: GENERATOR_VERSION,
       radius: 421,
     })
-    expect(events[5]).toMatchObject({ band: 2 })
-    expect(events[6]).toMatchObject({ scope: 'travel', digest: stateDigest(session.state()) })
+    expect(events[6]).toMatchObject({ band: 2 })
+    expect(events[7]).toMatchObject({ scope: 'travel', digest: stateDigest(session.state()) })
   })
 
   it('travels from the Upgrade bay as from the Sell bay (#37), landing in the Sell bay', () => {

@@ -12,6 +12,13 @@ function padSpanOf(planetIndex: number): [number, number] {
   return [site.firstColumn, site.lastColumn]
 }
 
+/**
+ * Ticket 823 moved the `merchants` row from planet 10 to 1 (GD lock of 24 Oct on #647): the kit
+ * merchants live in the existing shops (#821), not in a counter building, and P1 ground stays
+ * byte-identical, so every pad keeps the span it was cut with (#170).
+ */
+const MERCHANTS_PLANET_WHEN_PAD_WAS_CUT = 10
+
 describe('dock site', () => {
   it('spans -8..+12 on planets 1 to 9, Refinery or not', () => {
     for (let planet = 1; planet <= 9; planet++) expect(padSpanOf(planet)).toEqual([-8, 12])
@@ -30,10 +37,10 @@ describe('dock site', () => {
     expect(dockSiteOf(planetParamsFor(SEED, 12))).toEqual(dockSiteOf(planetParamsFor(SEED, 12)))
   })
 
-  it('takes the counter planets from the locked schedule rows', () => {
+  it('takes the counter planets from the locked schedule rows, the first where merchants stood when the pad was cut', () => {
     const planetOf = (id: string) => LOCKED_SCHEDULE.rows.find((row) => row.id === id)?.planetIndex
     expect(DOCK_COUNTER_BUILDING_PLANETS).toEqual([
-      planetOf('merchants'),
+      MERCHANTS_PLANET_WHEN_PAD_WAS_CUT,
       planetOf('quest_office'),
       planetOf('core_forge'),
     ])

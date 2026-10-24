@@ -20,8 +20,8 @@ const idsOf = (rows: readonly UnlockRow[]) => rows.map((row) => row.id)
 const travelledPlanets = Array.from({ length: CAMPAIGN_LAST_PLANET + 1 }, (_, index) => index + 1)
 
 describe('travel unlocks', () => {
-  it('opens planet_2 on arriving at planet 2', () => {
-    expect(idsOf(rowsUnlockedByTravel(LOCKED_SCHEDULE, 1, 2))).toEqual(['planet_2'])
+  it('opens planet_2 and the Scree Yard kit row on arriving at planet 2', () => {
+    expect(idsOf(rowsUnlockedByTravel(LOCKED_SCHEDULE, 1, 2))).toEqual(['planet_2', 'scree_plough'])
   })
 
   it('opens every built planet_gate row exactly on arriving at its listed planet', () => {

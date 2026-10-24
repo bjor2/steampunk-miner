@@ -18,7 +18,80 @@ import {
  * The bytes of the locked file. Any edit to the schedule, even one that keeps its `source_hash`,
  * fails here until this pin is updated on purpose with the Horizontal Scaler's refresh.
  */
-const LOCKED_FILE_SHA256 = 'aab8622fb7249f3fd8a9a3511c4fd00a1dc8a04b10001d9ae0108b798a8cf873'
+const LOCKED_FILE_SHA256 = '0395075f762c362be7abe0aac9d3fa2db8949c2a08b8f67111b2eca66e704211'
+
+/**
+ * The pin before ticket 823 re-pinned the schedule for the planet kits (GD lock of 24 Oct on #647):
+ * `merchants` moved from planet 10 to 1 as a planned row, and the five kit item rows came in.
+ */
+const PIN_BEFORE_KIT_ROWS = 'aab8622fb7249f3fd8a9a3511c4fd00a1dc8a04b10001d9ae0108b798a8cf873'
+
+/** The kit item rows of ticket 823, each with the planet it opens on. */
+const KIT_ROW_PLANETS: readonly (readonly [string, number])[] = [
+  ['cache_crate', 1],
+  ['scree_plough', 2],
+  ['damp_flask', 3],
+  ['shard_tongs', 4],
+  ['vent_vane', 5],
+]
+
+/** What ticket 823 wrote into the file besides its rows and the counts, each as `[before, after]`. */
+const KIT_ROWS_EDIT: readonly (readonly [string, string])[] = [
+  ['    "issues/650"\n  ],', '    "issues/650",\n    "issues/823"\n  ],'],
+  [
+    'sha256:688b54bad914719bc6fedddf95a84b9114f7b4f8eab9d510e404d775ac251121',
+    'sha256:e1d74cdc56bc1b9f23a4177e5d6d11666f6186e857e57fe5f55c1bfbd7ed2b97',
+  ],
+  [
+    ' source_hash recomputed',
+    ' #823 (GD lock 24 Oct, planet kits P1\\u2013P5): merchants moved P10->P1 (vision->planned) and five kit items added (cache_crate P1, scree_plough P2, damp_flask P3, shard_tongs P4, vent_vane P5; Merchant, planet_gate, planned); P1\\u2013P9 cumulative +2..+6, P10\\u2013P40 +5 (P40 68). source_hash recomputed',
+  ],
+  [
+    '  "gap_justifications": {\n',
+    '  "gap_justifications": {\n    "10": "Freed when merchants moved to P1 (#823 GD lock, 24 Oct: final, keeps the schedule); P10 gets its content from #824\'s generated kit rows.",\n',
+  ],
+]
+
+/**
+ * The file's text as it stood before ticket 823: the kit rows out, `merchants` back at planet 10
+ * as a vision row in its old place, and each planet's count lowered by the rows it had gained.
+ */
+function textBeforeKitRows(text: string): string {
+  const merchants = rowTextOf(text, 'merchants')
+    .replace('"planetIndex": 1,', '"planetIndex": 10,')
+    .replace('"status": "planned",', '"status": "vision",')
+  const withoutRows = ['merchants', ...KIT_ROW_PLANETS.map(([id]) => id)].reduce(withoutRowOf, text)
+  const reinserted = withRowBefore(withoutRows, 'artefact_set_2', merchants)
+  const counts = reinserted.indexOf('"cumulative_by_planet"')
+  const lowered =
+    reinserted.slice(0, counts) +
+    reinserted
+      .slice(counts)
+      .replace(/("planet": (\d+),\n\s+"cumulative": )(\d+)/g, lowerFromKitRows)
+  return KIT_ROWS_EDIT.reduce((current, [before, after]) => current.replace(after, before), lowered)
+}
+
+/** The rows a planet's count gained in ticket 823: the kit rows to it, and merchants before 10. */
+function lowerFromKitRows(_: string, prefix: string, planet: string, count: string): string {
+  const kitRows = KIT_ROW_PLANETS.filter(([, opensOn]) => opensOn <= +planet).length
+  const merchants = +planet < 10 ? 1 : 0
+  return `${prefix}${+count - kitRows - merchants}`
+}
+
+function rowTextOf(text: string, rowId: string): string {
+  const row = text.indexOf(`    {\n      "id": "${rowId}"`)
+  return text.slice(row, text.indexOf('    },\n', row) + '    },\n'.length)
+}
+
+function withRowBefore(text: string, rowId: string, rowText: string): string {
+  const row = text.indexOf(`    {\n      "id": "${rowId}"`)
+  return text.slice(0, row) + rowText + text.slice(row)
+}
+
+/** The file's text before the newest edit with an undo here, ticket 823's. */
+function fileTextBeforeKitRows(): string {
+  return textBeforeKitRows(lockedFileText())
+}
 
 /** The pin before ticket 759 added the `jump_drive` row, the star map's one new row (#650 GD lock). */
 const PIN_BEFORE_JUMP_DRIVE_ROW = '99a6771ed1a264a3065c55b47927399638df41c4c8cfbc7286cafa7c13024876'
@@ -211,13 +284,13 @@ function progressWithEveryBindMet(rows: readonly UnlockRow[]): UnlockProgress {
 }
 
 describe('locked unlock schedule', () => {
-  it('loads the 58 locked Schedule C rows', () => {
-    expect(LOCKED_SCHEDULE.rows).toHaveLength(58)
+  it('loads the 63 locked Schedule C rows', () => {
+    expect(LOCKED_SCHEDULE.rows).toHaveLength(63)
   })
 
   it('carries the Horizontal Scaler source hash pin', () => {
     expect(LOCKED_SCHEDULE.sourceHash).toBe(
-      'sha256:688b54bad914719bc6fedddf95a84b9114f7b4f8eab9d510e404d775ac251121',
+      'sha256:e1d74cdc56bc1b9f23a4177e5d6d11666f6186e857e57fe5f55c1bfbd7ed2b97',
     )
     expect(LOCKED_SCHEDULE_SOURCE_HASH).toBe(LOCKED_SCHEDULE.sourceHash)
   })
@@ -239,8 +312,8 @@ describe('locked unlock schedule', () => {
     expect(createHash('sha256').update(bytes).digest('hex')).toBe(LOCKED_FILE_SHA256)
   })
 
-  it('schedules 63 unlocks cumulatively by planet 40, the jump_drive row of ticket 759 its re-pin', () => {
-    expect(unlockCountThrough(LOCKED_SCHEDULE, 40)).toBe(63)
+  it('schedules 68 unlocks cumulatively by planet 40, the five kit rows of ticket 823 its re-pin', () => {
+    expect(unlockCountThrough(LOCKED_SCHEDULE, 40)).toBe(68)
   })
 
   it('matches the cumulative count the scaler recorded for every campaign planet', () => {
@@ -251,11 +324,11 @@ describe('locked unlock schedule', () => {
     expect(counted).toEqual(scheduleFile.cumulative_by_planet)
   })
 
-  it('leaves only the intentional gaps at planets 16, 24 and 29 without a new row', () => {
+  it('leaves only the intentional gaps at planets 10, 16, 24 and 29 without a new row', () => {
     const emptyPlanets = CAMPAIGN_PLANETS.filter(
       (planet) => rowsAt(LOCKED_SCHEDULE, planet).length === 0,
     )
-    expect(emptyPlanets).toEqual([16, 24, 29])
+    expect(emptyPlanets).toEqual([10, 16, 24, 29])
   })
 
   it('unlocks the same rows on every campaign planet as before the six rows were marked shipped', () => {
@@ -274,7 +347,7 @@ describe('locked unlock schedule', () => {
   it('unlocks no vision row whose module is not built, even when every bind is met', () => {
     const visionRows = LOCKED_SCHEDULE.rows.filter((row) => row.status === 'vision')
     const progress = progressWithEveryBindMet(visionRows)
-    expect(visionRows).toHaveLength(25)
+    expect(visionRows).toHaveLength(24)
     expect(visionRows.filter((row) => isUnlocked(row, progress))).toEqual([])
   })
 
@@ -368,7 +441,7 @@ describe('locked unlock schedule', () => {
 
   it('changed only magnetic_planets.status in the flip, leaving grounded_lining a vision row', () => {
     const text = textBeforeBoreGunRow(
-      textBeforeCementScopeNote(textBeforeJumpDriveRow(lockedFileText())),
+      textBeforeCementScopeNote(textBeforeJumpDriveRow(fileTextBeforeKitRows())),
     )
     const row = text.indexOf('"id": "magnetic_planets"')
     const rowEnd = text.indexOf('}', row)
@@ -385,16 +458,43 @@ describe('locked unlock schedule', () => {
 
   it('added only the bore_gun row, the counts it moves and its provenance in ticket 313 (#309)', () => {
     const before = textBeforeBoreGunRow(
-      textBeforeCementScopeNote(textBeforeJumpDriveRow(lockedFileText())),
+      textBeforeCementScopeNote(textBeforeJumpDriveRow(fileTextBeforeKitRows())),
     )
     expect(createHash('sha256').update(before, 'utf8').digest('hex')).toBe(PIN_BEFORE_BORE_GUN_ROW)
   })
 
   it('added only the jump_drive row, the counts it moves and its provenance in ticket 759 (#650)', () => {
-    const before = textBeforeJumpDriveRow(lockedFileText())
+    const before = textBeforeJumpDriveRow(fileTextBeforeKitRows())
     expect(createHash('sha256').update(before, 'utf8').digest('hex')).toBe(
       PIN_BEFORE_JUMP_DRIVE_ROW,
     )
+  })
+
+  it('moved only merchants to planet 1 and added the five kit rows, their counts and provenance in ticket 823', () => {
+    const before = fileTextBeforeKitRows()
+    expect(createHash('sha256').update(before, 'utf8').digest('hex')).toBe(PIN_BEFORE_KIT_ROWS)
+  })
+
+  it('opens each planned kit row on arriving at its home planet in the Merchant lane (ticket 823)', () => {
+    for (const [id, planetIndex] of KIT_ROW_PLANETS) {
+      const row = LOCKED_SCHEDULE.rows.find((candidate) => candidate.id === id)!
+      expect(row).toMatchObject({
+        planetIndex,
+        lane: 'Merchant',
+        bind: 'planet_gate',
+        status: 'planned',
+        progressionAxis: 'horizontal',
+      })
+      expect(isUnlocked(row, { ...NO_PROGRESS, highestPlanetIndex: planetIndex - 1 })).toBe(false)
+      expect(isUnlocked(row, { ...NO_PROGRESS, highestPlanetIndex: planetIndex })).toBe(true)
+    }
+  })
+
+  it('opens the planned merchants row on planet 1 only once a dock facility builds it (ticket 823)', () => {
+    const row = LOCKED_SCHEDULE.rows.find((candidate) => candidate.id === 'merchants')!
+    expect(row).toMatchObject({ planetIndex: 1, bind: 'facility', status: 'planned' })
+    expect(isUnlocked(row, NO_PROGRESS)).toBe(false)
+    expect(isUnlocked(row, { ...NO_PROGRESS, builtFacilityRowIds: new Set([row.id]) })).toBe(true)
   })
 
   it("opens the shipped jump_drive row at planet 5, the first system's last planet (#650)", () => {
@@ -411,7 +511,7 @@ describe('locked unlock schedule', () => {
   })
 
   it('added only the casing_cement scopeNote in ticket 367 (#367 ruling B)', () => {
-    const text = textBeforeJumpDriveRow(lockedFileText())
+    const text = textBeforeJumpDriveRow(fileTextBeforeKitRows())
     expect(text).toContain(CEMENT_SCOPE_NOTE_EDIT[1])
     const before = textBeforeCementScopeNote(text)
     expect(createHash('sha256').update(before, 'utf8').digest('hex')).toBe(
@@ -428,7 +528,10 @@ describe('locked unlock schedule', () => {
       status: 'planned',
     })
     expect(isUnlocked(row, NO_PROGRESS)).toBe(true)
-    expect(rowsAt(LOCKED_SCHEDULE, 1)).toHaveLength(15)
+    const rowsBeforeKits = rowsAt(LOCKED_SCHEDULE, 1).filter(
+      (candidate) => candidate.id !== 'merchants' && candidate.id !== 'cache_crate',
+    )
+    expect(rowsBeforeKits).toHaveLength(15)
   })
 
   it('opens the side_drills row at planet 13 now the drill-gear slice ships its node (ticket 205)', () => {

@@ -16,10 +16,10 @@ import { deriveSummary, type RunSummary } from './runSummary'
 
 /**
  * The Horizontal Scaler's pin (#89 acceptance 4). The ticket names the #80 lock `sha256:419ca56d…`;
- * the schedule refreshes of #162 and #153, then the `bore_gun` row of ticket 313 (#309) and the
- * `jump_drive` row of ticket 759 (#650), re-pinned it to this one.
+ * the schedule refreshes of #162 and #153, then the `bore_gun` row of ticket 313 (#309), the
+ * `jump_drive` row of ticket 759 (#650) and the planet kit rows of ticket 823, re-pinned it to this one.
  */
-const SCALER_PIN = 'sha256:688b54bad914719bc6fedddf95a84b9114f7b4f8eab9d510e404d775ac251121'
+const SCALER_PIN = 'sha256:e1d74cdc56bc1b9f23a4177e5d6d11666f6186e857e57fe5f55c1bfbd7ed2b97'
 
 /** The rows of M1-M5 (#92-#96), which the gate must not hold to anything (#90 scope review). */
 const CONTENT_MODULE_ROW_IDS = [
