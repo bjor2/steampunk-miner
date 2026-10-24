@@ -29,6 +29,26 @@ next, 15 cells. After grade 61 (the first with every pip) come grade 3's plate i
 standard, refractory, insulated, grounded. The first four rows lie over planet 1's band 1 rock, the
 next four over its band 5 rock.
 
+## The Blender reference
+
+`author_casing_grades.py` builds a reference scene from the same numbers (headless Blender, as
+ticket 315's lining reference) and renders a strip of one cell per look: the five plates plain,
+burnished and chased, grade 61 with its pips, then grade 3 in each trim, on a level tunnel floor in
+planet-1 band-1 rock. It is never exported and has no manifest entry.
+
+```text
+blender -b --python-exit-code 1 -P docs/art/casing-grades/author_casing_grades.py
+python3 docs/art/casing-grades/sheet_casing_grades.py
+```
+
+| File                        | What it shows                                                   |
+| --------------------------- | --------------------------------------------------------------- |
+| `strip.review.png`, `-gray` | the strip at 96 px/m                                            |
+| `strip.phone-raw.png`       | the strip at 24 px/m, one cell about a phone at the widest zoom |
+| `strip.phone.png`, `-gray`  | that render enlarged 8x with no smoothing, so each pixel shows  |
+
+The scene is `art/blender/casing-grades/casing-grades.blend` (Git LFS).
+
 ## The look
 
 - **Plates** (`plates[(q - 1) mod 5]`): brass (ticket 315's ribbed plate and rivet line), copper
