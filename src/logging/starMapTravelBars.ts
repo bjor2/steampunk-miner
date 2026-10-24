@@ -32,6 +32,7 @@ import { planetMediansOf, type PlanetMedians } from './drillPaceBars'
 import type { RadiusRebaselineTally, TravelHop } from './radiusRebaseline'
 import { isHopClamped } from './radiusRebaselineMedians'
 import type { StarMapTravelTally } from './starMapTravel'
+import type { UpgradeLevels } from '../systems/economy/vehicleStats'
 
 export const STAR_MAP_TRAVEL_BARS = {
   lastPlanet: 5,
@@ -51,6 +52,12 @@ export interface StarMapTravelRun {
   drill: DrillPaceTally
   radius: RadiusRebaselineTally
   starMap: StarMapTravelTally
+  /**
+   * The levels the bot arrived in system 2 with after its jump out of planet 5, the drive and the
+   * fuel paid (ticket 759, `systemJumpBars.ts`); null when the jump was refused. Absent in a run
+   * that never tries it.
+   */
+  systemJumpLevels?: UpgradeLevels | null
 }
 
 /** One seed's money per minute on `planet` with the gear of the planet after it, and there. */

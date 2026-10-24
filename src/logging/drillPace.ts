@@ -17,6 +17,7 @@ import { TICKS_PER_SECOND } from '../constants/physics'
 import type { AuthorityState } from '../systems/authority/authorityState'
 import type { DomainEvent } from '../systems/authority/domainEvent'
 import { blockHardness } from '../systems/economy/oreEconomy'
+import { systemHardnessStepOf } from '../systems/economy/systemJump'
 import { drillPower, vehicleStatsAt, type UpgradeLevels } from '../systems/economy/vehicleStats'
 import {
   add,
@@ -28,6 +29,7 @@ import {
   sub,
   toFixedText,
   ZERO_MONEY,
+  type BigStat,
   type Money,
 } from '../systems/money'
 import { cutCellsPerSecondOf } from '../systems/vehicle/cutSpeed'
@@ -241,9 +243,26 @@ function retakeFelt(tally: DrillPaceTally, state: AuthorityState, playerId: stri
 
 /** The law's band-1 cut of planet `planet` at these levels, in cells/s; 0 where it skids. */
 export function feltCellsPerSecond(levels: UpgradeLevels, planet: number): number {
+  return feltCellsPerSecondOnRock(levels, planet, blockHardness(planet, 1))
+}
+
+/**
+ * The same cut on band 1 of planet index `planet` in solar system `system` (ticket 759), whose rock
+ * takes the system jump's step `k_jump^(s - 1)` (`economy/systemJump.ts`).
+ */
+export function feltCellsPerSecondInSystem(
+  levels: UpgradeLevels,
+  planet: number,
+  system: bigint,
+): number {
+  const rock = mul(blockHardness(planet, 1), systemHardnessStepOf(system))
+  return feltCellsPerSecondOnRock(levels, planet, rock)
+}
+
+function feltCellsPerSecondOnRock(levels: UpgradeLevels, planet: number, rock: BigStat): number {
   const drill = vehicleStatsAt(levels)
   const quantum = drillQuantumOnPlanet(drill, planet)
-  const subSteps = subStepsPerTileAt(quantum, drill, blockHardness(planet, 1))
+  const subSteps = subStepsPerTileAt(quantum, drill, rock)
   return subSteps === null ? 0 : cutCellsPerSecondOf(subSteps, quantum)
 }
 

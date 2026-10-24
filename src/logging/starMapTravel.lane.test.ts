@@ -4,8 +4,11 @@ import { PACING_WORLD_SEEDS } from '../constants/pacingSeeds'
 import { TICKS_PER_SECOND } from '../constants/physics'
 import type { CommandIntent } from '../systems/authority/authorityCommand'
 import { createAuthorityState } from '../systems/authority/authorityState'
+import { dockedBayOf } from '../systems/authority/dockRules'
+import { nextHopShortfallOf } from '../systems/authority/starMap/fuelShopRules'
 import type { DomainEvent } from '../systems/authority/domainEvent'
 import { jumpFuelUnitsOf } from '../systems/economy/jumpFuel'
+import type { UpgradeLevels } from '../systems/economy/vehicleStats'
 import { createBotSession, type BotSession } from '../systems/bot/botSession'
 import { botPlanetOf } from '../systems/bot/botTravel'
 import { arrivedPaceSessionOn, playToCoreFrom } from '../systems/bot/paceArrival'
@@ -21,6 +24,7 @@ import {
 } from '../systems/money'
 import {
   buyFuelCommand,
+  buyJumpDriveCommand,
   dockCommand,
   jumpToPlanetCommand,
 } from '../systems/platform/platformCommands'
@@ -36,6 +40,7 @@ import {
   type BacktrackRun,
   type StarMapTravelRun,
 } from './starMapTravelBars'
+import { gatedSystemJumpProblemsOf, printedSystemJumpLinesOf } from './systemJumpBars'
 
 // "Star map travel" (ticket 756; the Systems ruling on #756, the GD lock on #650 and its VS bars):
 // the paired P1-P5 run. Each pacing seed (83921, 31415, 27182) plays the bot scenario to planet 5's
@@ -48,7 +53,9 @@ import {
 // left behind: going back must earn less a minute than the frontier (VS). Planet minutes and money
 // per minute against #551 stay the R3 lane's (`radiusRebaseline.lane.test.ts`), which plays the
 // same bot. Prints each planet's median run against the R the curve stands in, and the felt speed
-// on arrival for p -> p+1 and the skip p -> p+2. Hours of play, so it runs only when named:
+// on arrival for p -> p+1 and the skip p -> p+2. Since ticket 759 the bot then buys the jump drive
+// and jumps out of system 1, and the arrival felt speed in system 2 is gated at 0.9x planet 5's
+// (`systemJumpBars.ts`, the Producer's k_jump lock on #759). Hours of play, so it runs only when named:
 //   npx vitest run src/logging/starMapTravel.lane.test.ts
 const RUN_TIMEOUT_MS = 6 * 60 * 60 * 1000
 /** Two hours a planet, as the drill pace lane allows: a slow planet shows as a number. */
@@ -80,8 +87,16 @@ describe('star map travel: P1 to P5 on fuel jumps, three seeds (ticket 756)', ()
     expect(gatedStarMapTravelProblemsOf(runs, backtracks)).toEqual([])
   })
 
+  it('arrives in system 2 at 0.9x the felt speed of planet 5 or more, after the fee (ticket 759)', () => {
+    expect(gatedSystemJumpProblemsOf(runs)).toEqual([])
+  })
+
   it('prints the measured runs, the arrival felt speeds and the backtrack rates', () => {
-    console.log(['Star map travel:', ...printedStarMapTravelLinesOf(runs, backtracks)].join('\n'))
+    const lines = [
+      ...printedStarMapTravelLinesOf(runs, backtracks),
+      ...printedSystemJumpLinesOf(runs),
+    ]
+    console.log(['Star map travel:', ...lines].join('\n'))
     expect(runs.every((run) => run.radius.hops.length > 0)).toBe(true)
   })
 })
@@ -96,9 +111,11 @@ function runOf(scenario: Scenario, worldSeed: number): StarMapTravelRun {
     planetSeed: worldSeed,
     playerIds: [PLAYER_ID],
   })
+  const tallying = { isOn: true }
   const session = createBotSession(start, PLAYER_ID, {
     onCommand: () => undefined,
     onEvents: (state, events) => {
+      if (!tallying.isOn) return
       tallyDrillPaceStep(drill, state, PLAYER_ID, events)
       tallyRadiusRebaselineStep(radius, state, PLAYER_ID, events)
       tallyStarMapTravelStep(starMap, state, PLAYER_ID, events)
@@ -109,7 +126,24 @@ function runOf(scenario: Scenario, worldSeed: number): StarMapTravelRun {
     lastPlanet: STAR_MAP_TRAVEL_BARS.lastPlanet,
     maxTicks: BUDGET_TICKS,
   })
-  return { worldSeed, drill, radius, starMap }
+  // The P1-P5 bars judge the run to planet 5's core; the jump out of system 1 is judged apart.
+  tallying.isOn = false
+  return { worldSeed, drill, radius, starMap, systemJumpLevels: jumpOutOfSystemOne(session) }
+}
+
+/**
+ * Ticket 759: from planet 5's core the bot buys the jump drive and the jump's fuel at the Sell bay
+ * and jumps to system 2's first planet; the levels it arrives with, after the fee, are what the
+ * system-jump bar reads. Null when a step is refused and the run stays in system 1.
+ */
+function jumpOutOfSystemOne(session: BotSession): UpgradeLevels | null {
+  if (!session.state().core.isCompleted) return null
+  if (dockedBayOf(session.state(), PLAYER_ID) !== 'sell') session.submit(dockCommand('sell'))
+  session.submit(buyJumpDriveCommand())
+  const shortfall = nextHopShortfallOf(session.state(), PLAYER_ID)
+  if (shortfall > 0) session.submit(buyFuelCommand(shortfall))
+  session.submit(jumpToPlanetCommand(2n, 1n))
+  return session.state().planet.system === '2' ? { ...session.vehicle().levels } : null
 }
 
 /** Refused, never trimmed: a broken scenario file. */
