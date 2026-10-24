@@ -1,0 +1,75 @@
+{
+  "$comment": "The casing grade looks (CG2, ticket 830; GD lock of 24 Oct 16:28 on casing grades by depth, Progression's row): one plate metal per grade, keyed on the grade q alone. The plate is plates[(q - 1) mod 5], five authored metals each with its own tint, groove, rivet colour and rivet pattern, so neighbouring grades never match and a grade reads without colour (#48 acceptance 5, #51's casing row). The finish is finishes[floor((q - 1) / 5) mod F], cycled as #577's tail cycles its finishes, and the pips count the laps of that cycle, floor((q - 1) / (5 F)), drawn up to pips.most as bright dots in the seam: the uncapped tail. Every length is in tiles (one tile is one metre); the plate depth, ribs, seam and rivet geometry stay CASING_LINING_LOOK's (constants/scene.ts, ticket 315). Hazard lining trims (casing_cement types, #366) layer on the plate's seam by lining type id, so a ring shows its strength grade and its lining type at once. Plate colours sit above 0.62 luma so every plate stands a step from every band rock at phone size (casingLiningLook.test.ts); the colours and patterns are Progression's rows to retune, the rule never changes for a colour. Data rows only: no economy number lives here.",
+  "plates": [
+    {
+      "id": "brass",
+      "name": "Brass",
+      "colour": "#dcb35a",
+      "groove": "#3e2c14",
+      "rivet": "#fff0c4",
+      "pattern": "rivet-line"
+    },
+    {
+      "id": "copper",
+      "name": "Copper",
+      "colour": "#e8925c",
+      "groove": "#3a1a10",
+      "rivet": "#ffdcc4",
+      "pattern": "rivet-pairs"
+    },
+    {
+      "id": "iron",
+      "name": "Iron",
+      "colour": "#c5c9cf",
+      "groove": "#15161a",
+      "rivet": "#ffffff",
+      "pattern": "bolt-strap"
+    },
+    {
+      "id": "steel",
+      "name": "Steel",
+      "colour": "#9fb6d2",
+      "groove": "#1a2432",
+      "rivet": "#f2f8ff",
+      "pattern": "lattice"
+    },
+    {
+      "id": "verdigris",
+      "name": "Verdigris",
+      "colour": "#8fc9a6",
+      "groove": "#12301f",
+      "rivet": "#eefff2",
+      "pattern": "stagger"
+    }
+  ],
+  "finishes": [
+    { "id": "plain", "name": "Plain", "plateScale": 1, "lip": false, "chased": false },
+    { "id": "burnished", "name": "Burnished", "plateScale": 1.1, "lip": true, "chased": false },
+    { "id": "chased", "name": "Chased", "plateScale": 1, "lip": false, "chased": true }
+  ],
+  "pips": { "most": 4, "depthTiles": 0.385, "radiusTiles": 0.03 },
+  "trims": {
+    "standard": { "name": "Cement seam", "style": "seam", "widthTiles": 0.07, "colour": null, "joint": null },
+    "refractory": {
+      "name": "Firebrick",
+      "style": "firebrick",
+      "widthTiles": 0.12,
+      "colour": "#b8452a",
+      "joint": "#ffb347"
+    },
+    "insulated": {
+      "name": "Frost wrap",
+      "style": "stitched",
+      "widthTiles": 0.12,
+      "colour": "#e8f4ff",
+      "joint": "#4a6a8a"
+    },
+    "grounded": {
+      "name": "Earth strap",
+      "style": "zigzag",
+      "widthTiles": 0.12,
+      "colour": "#c97a3c",
+      "joint": "#2a2a2a"
+    }
+  }
+}
