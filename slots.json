@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-10-24T06:23:45+02:00",
+  "updated_at": "2026-10-24T06:42:05+02:00",
   "caps": {
     "grok": 12,
     "claude": 10,
@@ -147,6 +147,21 @@
           789
         ],
         "since": "2026-10-24T04:43:49+02:00"
+      },
+      {
+        "feature": 650,
+        "kind": "spec",
+        "title": "Travel gate: keep the 127-fragment core gate, or make it a price surcharge (Bjor's call)",
+        "tickets": [
+          754,
+          755,
+          756,
+          757,
+          758,
+          759,
+          781
+        ],
+        "since": "2026-10-24T06:26:50+02:00"
       }
     ]
   },
