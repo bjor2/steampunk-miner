@@ -1828,6 +1828,18 @@ incomePerHour}` go to `balance-report/drill-pace.ndjson`, which `pushTestMetrics
   `npm run ui:screens:update` and hold every control to 48 px. `e2e/browser/mobile/starMapJump.spec.ts`
   taps the same three hops on the iPhone 13 and Pixel 7 projects. Shared steps in
   `e2e/browser/starMapJumps.ts`. Box Tester only.
+- **Star map carousel art** (ticket 795, spec #647): the ids and the brief are pure
+  (`systems/art/starMapCarouselArt.test.ts`: a preview per first-system place and the system strip
+  under the ui category, a look's preview keyed by its id and read back, the hero and dot parts, the
+  strip's parts, placeholders at the brief sizes, one orbit per place inside the strip, a planet on
+  the middle line at its orbit and a missing place refused, the hero at least 512 px at 2x, the pan
+  within 400 ms); the slice names each look's preview (`solar-systems/.../lookArt.test.ts`). The
+  contact sheet (`starMapCarouselSheet.test.ts`) lists every registered preview, ships each and the
+  strip final with every sprite file, bakes every part at the brief size, reads every hero at the
+  phone and desktop hero sizes from the 2x file that ships (refusing a read whose SHA-256 no longer
+  matches `docs/art/star-map-carousel/preview-reads.json`), reads every pair apart in hue or in
+  motif, equals `starMapCarouselSheet.golden.json`, and names a synthetic twin. Re-exporting a
+  preview re-runs `python3 docs/art/star-map-carousel/preview_post.py` and re-pins the golden.
 - **Desktop brass art** (ticket 770, spec #678): the cluster table's frame is per layout, pinned in
   `gaugeCluster.test.ts` (a phone in the glass frame, desktop in the cluster rail frame; a layout
   with no frame or an unshipped one fails the load), and the two rail sprites are held to the brief

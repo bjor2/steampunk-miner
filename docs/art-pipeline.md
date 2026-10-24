@@ -842,6 +842,30 @@ with them through `--art-star-map-planet`, `-planet-tint`, `-sun` and `-here`, t
 the `var()`s standing in while the asset is a placeholder. `docs/art/star-map/author_star_map.py`
 wrote the first version of the `.blend`; the sheets are in [docs/art/star-map/](art/star-map/README.md).
 
+### The star map carousel's previews and system strip
+
+The art of the star map carousel ([#795](https://github.com/bjor2/steampunk-miner/issues/795), spec
+#647; the build is #796): one `ui` asset per planet look, `ui-star-map-planet-<key>`, holding the
+hero preview (256 px, 512 at 2x) and its orbit dot (24 px), and the system strip `ui-star-map-system`
+(the backdrop with the sun and five orbits at 1008 x 252, the orrery frame, a 64 px rail nine-slice
+with 20 px insets, the here ring and the selected marker). The first system's five previews are
+keyed by place and named by the kernel (`systems/art/starMapCarouselArt.ts`, which also reads the
+orbit layout and the build's motion notes from `src/data/design/starMapCarouselArt.json`); the eight
+SS2 looks' previews are the `solar-systems` slice's, named with the same rule from its look ids and
+registered through `r.artAssets` (#214), so a later system needs no new hand art. No art token names
+them: the build draws the hero and the dots as images from the catalogue, not through `--art-*`
+variables, since a preview is content keyed by planet, not chrome.
+
+A preview is a real UV sphere whose crust material shades itself from the surface normal (the
+albedo bake reads base colour only), with a brass armillary ring and a haze behind it; the haze and
+the strip's field fade through the export's **`mask_alpha`** material property (a material carrying
+it bakes into the mask at that brightness, so its pieces ship with that alpha), and a hairline
+outline with alpha 0 keeps every sprite its brief size. `docs/art/star-map-carousel/author_carousel.py`
+wrote the first version of the fourteen sources, `write_placeholders.py` their placeholders and
+entries, and `preview_post.py` measures every shipped hero into `preview-reads.json` (the kernel's
+`starMapCarouselSheet.test.ts` reads every pair apart in hue or motif from it), writes the contact
+sheets and the three mock frames. See [docs/art/star-map-carousel/](art/star-map-carousel/README.md).
+
 ## The `parts.json` sidecar, schema 1
 
 ```json

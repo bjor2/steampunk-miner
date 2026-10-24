@@ -1,0 +1,464 @@
+{
+  "$comment": "The hue and motif reads of every shipped star map planet preview at the two carousel screens (ticket 795, preview_post.py): the alpha-weighted mean colour, luma, hue and saturation of the whole sprite; the edge share, edge anisotropy across the disc and its diagonals, luma spread and the high and low shares of the planet disc on luma; with the SHA-256 of the 2x hero PNG they were measured from. Written by preview_post.py; look only.",
+  "screens": {
+    "360x640": 160,
+    "1440x900": 256
+  },
+  "looks": [
+    {
+      "lookKey": "1",
+      "name": "Hearthmoor",
+      "motif": "pitted sandstone",
+      "previewAssetId": "ui-star-map-planet-1",
+      "rockSurface": "#8a6a48",
+      "horizon": "#c98f5c",
+      "heroSha256": "93886bc325252a60149ad67b7a4c8fcf08e9d33264e91f2537003d9a0e2d933e",
+      "screens": {
+        "360x640": {
+          "meanHex": "#8a6945",
+          "luma": 0.436,
+          "hueDeg": 31.4,
+          "saturation": 0.497,
+          "edgeShare": 0.312,
+          "anisotropy": -0.066,
+          "diagonalAnisotropy": 0.011,
+          "lumaSpread": 0.084,
+          "highShare": 0.193,
+          "lowShare": 0.113
+        },
+        "1440x900": {
+          "meanHex": "#8b6a46",
+          "luma": 0.437,
+          "hueDeg": 31.4,
+          "saturation": 0.495,
+          "edgeShare": 0.188,
+          "anisotropy": -0.085,
+          "diagonalAnisotropy": 0.008,
+          "lumaSpread": 0.089,
+          "highShare": 0.199,
+          "lowShare": 0.11
+        }
+      }
+    },
+    {
+      "lookKey": "2",
+      "name": "Gravelholm",
+      "motif": "rockfall scree",
+      "previewAssetId": "ui-star-map-planet-2",
+      "rockSurface": "#5f6e7a",
+      "horizon": "#8a7aa8",
+      "heroSha256": "c4c442cfa69472da2f3ba4c73ae956c8ea5bdb526e1b578f169e7b9f16252869",
+      "screens": {
+        "360x640": {
+          "meanHex": "#566077",
+          "luma": 0.376,
+          "hueDeg": 222.0,
+          "saturation": 0.344,
+          "edgeShare": 0.129,
+          "anisotropy": -0.1,
+          "diagonalAnisotropy": 0.001,
+          "lumaSpread": 0.058,
+          "highShare": 0.124,
+          "lowShare": 0.126
+        },
+        "1440x900": {
+          "meanHex": "#576177",
+          "luma": 0.377,
+          "hueDeg": 221.9,
+          "saturation": 0.345,
+          "edgeShare": 0.16,
+          "anisotropy": -0.094,
+          "diagonalAnisotropy": -0.002,
+          "lumaSpread": 0.064,
+          "highShare": 0.127,
+          "lowShare": 0.126
+        }
+      }
+    },
+    {
+      "lookKey": "3",
+      "name": "Coalfen",
+      "motif": "coal seams",
+      "previewAssetId": "ui-star-map-planet-3",
+      "rockSurface": "#4f4b40",
+      "horizon": "#7f8f5e",
+      "heroSha256": "6ec28e4b176d10666126c7eaded018ea52c4616688bff07f0f2970f3013aa564",
+      "screens": {
+        "360x640": {
+          "meanHex": "#464734",
+          "luma": 0.268,
+          "hueDeg": 62.3,
+          "saturation": 0.263,
+          "edgeShare": 0.113,
+          "anisotropy": -0.424,
+          "diagonalAnisotropy": 0.003,
+          "lumaSpread": 0.072,
+          "highShare": 0.038,
+          "lowShare": 0.148
+        },
+        "1440x900": {
+          "meanHex": "#464734",
+          "luma": 0.27,
+          "hueDeg": 62.3,
+          "saturation": 0.261,
+          "edgeShare": 0.067,
+          "anisotropy": -0.446,
+          "diagonalAnisotropy": 0.001,
+          "lumaSpread": 0.075,
+          "highShare": 0.033,
+          "lowShare": 0.148
+        }
+      }
+    },
+    {
+      "lookKey": "4",
+      "name": "Spinegarth",
+      "motif": "spine crystals",
+      "previewAssetId": "ui-star-map-planet-4",
+      "rockSurface": "#41736a",
+      "horizon": "#8fb6c4",
+      "heroSha256": "b55b8bf2f990b31e47d7c3207f72a8cdea34c6fe7503ce91a8799ad142f843e9",
+      "screens": {
+        "360x640": {
+          "meanHex": "#497b73",
+          "luma": 0.421,
+          "hueDeg": 169.8,
+          "saturation": 0.487,
+          "edgeShare": 0.258,
+          "anisotropy": 0.044,
+          "diagonalAnisotropy": -0.012,
+          "lumaSpread": 0.115,
+          "highShare": 0.13,
+          "lowShare": 0.035
+        },
+        "1440x900": {
+          "meanHex": "#497c73",
+          "luma": 0.422,
+          "hueDeg": 169.8,
+          "saturation": 0.489,
+          "edgeShare": 0.201,
+          "anisotropy": 0.02,
+          "diagonalAnisotropy": -0.01,
+          "lumaSpread": 0.12,
+          "highShare": 0.133,
+          "lowShare": 0.029
+        }
+      }
+    },
+    {
+      "lookKey": "5",
+      "name": "Kettlecrag",
+      "motif": "steam vents",
+      "previewAssetId": "ui-star-map-planet-5",
+      "rockSurface": "#6a5254",
+      "horizon": "#b4aca2",
+      "heroSha256": "4f2c68a1f43dad69a18ca3aa9329c912633cc0d50746edae68bd4f656240e50d",
+      "screens": {
+        "360x640": {
+          "meanHex": "#675a5a",
+          "luma": 0.368,
+          "hueDeg": 0.2,
+          "saturation": 0.175,
+          "edgeShare": 0.189,
+          "anisotropy": -0.086,
+          "diagonalAnisotropy": -0.006,
+          "lumaSpread": 0.114,
+          "highShare": 0.12,
+          "lowShare": 0.054
+        },
+        "1440x900": {
+          "meanHex": "#675a5a",
+          "luma": 0.37,
+          "hueDeg": 0.2,
+          "saturation": 0.174,
+          "edgeShare": 0.122,
+          "anisotropy": -0.114,
+          "diagonalAnisotropy": -0.008,
+          "lumaSpread": 0.117,
+          "highShare": 0.12,
+          "lowShare": 0.052
+        }
+      }
+    },
+    {
+      "lookKey": "cinder-basalt",
+      "name": "Cinder Basalt",
+      "motif": "hex basalt columns",
+      "previewAssetId": "ui-star-map-planet-cinder-basalt",
+      "rockSurface": "#3a3236",
+      "horizon": "#d8622a",
+      "heroSha256": "1afa3833adfd2d3a6e15c5619791ae795cfd80309fecc3c92da7cb05f37162ff",
+      "screens": {
+        "360x640": {
+          "meanHex": "#6b3c28",
+          "luma": 0.282,
+          "hueDeg": 17.6,
+          "saturation": 0.53,
+          "edgeShare": 0.442,
+          "anisotropy": -0.075,
+          "diagonalAnisotropy": -0.024,
+          "lumaSpread": 0.097,
+          "highShare": 0.145,
+          "lowShare": 0.057
+        },
+        "1440x900": {
+          "meanHex": "#6b3c29",
+          "luma": 0.283,
+          "hueDeg": 17.6,
+          "saturation": 0.515,
+          "edgeShare": 0.402,
+          "anisotropy": -0.088,
+          "diagonalAnisotropy": -0.025,
+          "lumaSpread": 0.108,
+          "highShare": 0.159,
+          "lowShare": 0.029
+        }
+      }
+    },
+    {
+      "lookKey": "ash-plain",
+      "name": "Ash Plain",
+      "motif": "layered ash strata",
+      "previewAssetId": "ui-star-map-planet-ash-plain",
+      "rockSurface": "#726860",
+      "horizon": "#9a5a52",
+      "heroSha256": "222fefd76e92e0116c312f5ef6902381afe83100cf3facea8a285373cbf6d28d",
+      "screens": {
+        "360x640": {
+          "meanHex": "#7a6257",
+          "luma": 0.409,
+          "hueDeg": 19.3,
+          "saturation": 0.269,
+          "edgeShare": 0.064,
+          "anisotropy": -0.466,
+          "diagonalAnisotropy": 0.008,
+          "lumaSpread": 0.045,
+          "highShare": 0.106,
+          "lowShare": 0.115
+        },
+        "1440x900": {
+          "meanHex": "#7b6358",
+          "luma": 0.41,
+          "hueDeg": 19.3,
+          "saturation": 0.266,
+          "edgeShare": 0.053,
+          "anisotropy": -0.463,
+          "diagonalAnisotropy": 0.007,
+          "lumaSpread": 0.05,
+          "highShare": 0.096,
+          "lowShare": 0.101
+        }
+      }
+    },
+    {
+      "lookKey": "rime-shelf",
+      "name": "Rime Shelf",
+      "motif": "cracked ice plates",
+      "previewAssetId": "ui-star-map-planet-rime-shelf",
+      "rockSurface": "#4a7484",
+      "horizon": "#cfeef6",
+      "heroSha256": "2b25d2477a65f4b0c393771a217072fc5c258ee62084d7b2fd117902ee6582f0",
+      "screens": {
+        "360x640": {
+          "meanHex": "#778f95",
+          "luma": 0.536,
+          "hueDeg": 191.7,
+          "saturation": 0.244,
+          "edgeShare": 0.38,
+          "anisotropy": -0.025,
+          "diagonalAnisotropy": 0.008,
+          "lumaSpread": 0.091,
+          "highShare": 0.073,
+          "lowShare": 0.2
+        },
+        "1440x900": {
+          "meanHex": "#788f95",
+          "luma": 0.537,
+          "hueDeg": 191.7,
+          "saturation": 0.245,
+          "edgeShare": 0.315,
+          "anisotropy": -0.031,
+          "diagonalAnisotropy": 0.006,
+          "lumaSpread": 0.1,
+          "highShare": 0.057,
+          "lowShare": 0.188
+        }
+      }
+    },
+    {
+      "lookKey": "hoarfrost-vein",
+      "name": "Hoarfrost Vein",
+      "motif": "needle crystal veins",
+      "previewAssetId": "ui-star-map-planet-hoarfrost-vein",
+      "rockSurface": "#5c5878",
+      "horizon": "#b8a8d8",
+      "heroSha256": "f3cf71bd79e06b195bdb8be11ee9db3153d7484dd441aa7c762cf04e8d40d689",
+      "screens": {
+        "360x640": {
+          "meanHex": "#706784",
+          "luma": 0.428,
+          "hueDeg": 257.7,
+          "saturation": 0.261,
+          "edgeShare": 0.274,
+          "anisotropy": -0.271,
+          "diagonalAnisotropy": -0.001,
+          "lumaSpread": 0.116,
+          "highShare": 0.16,
+          "lowShare": 0.049
+        },
+        "1440x900": {
+          "meanHex": "#706885",
+          "luma": 0.429,
+          "hueDeg": 257.7,
+          "saturation": 0.262,
+          "edgeShare": 0.2,
+          "anisotropy": -0.294,
+          "diagonalAnisotropy": -0.006,
+          "lumaSpread": 0.121,
+          "highShare": 0.165,
+          "lowShare": 0.046
+        }
+      }
+    },
+    {
+      "lookKey": "lode-banded",
+      "name": "Lode Banded",
+      "motif": "banded iron stripes",
+      "previewAssetId": "ui-star-map-planet-lode-banded",
+      "rockSurface": "#6c5048",
+      "horizon": "#6a86a6",
+      "heroSha256": "4ebb78332067d3ab3ba019cd39bd8e0cde6c39112dd60f90eb7ae35ea57657d1",
+      "screens": {
+        "360x640": {
+          "meanHex": "#675057",
+          "luma": 0.345,
+          "hueDeg": 345.2,
+          "saturation": 0.564,
+          "edgeShare": 0.2,
+          "anisotropy": -0.296,
+          "diagonalAnisotropy": -0.003,
+          "lumaSpread": 0.081,
+          "highShare": 0.183,
+          "lowShare": 0.166
+        },
+        "1440x900": {
+          "meanHex": "#685157",
+          "luma": 0.346,
+          "hueDeg": 345.4,
+          "saturation": 0.58,
+          "edgeShare": 0.118,
+          "anisotropy": -0.313,
+          "diagonalAnisotropy": 0.004,
+          "lumaSpread": 0.085,
+          "highShare": 0.18,
+          "lowShare": 0.163
+        }
+      }
+    },
+    {
+      "lookKey": "gauss-field",
+      "name": "Gauss Field",
+      "motif": "curled filings",
+      "previewAssetId": "ui-star-map-planet-gauss-field",
+      "rockSurface": "#4a5256",
+      "horizon": "#3a8c84",
+      "heroSha256": "eecf0ab65d7f50b8b755bd5f93f2c8b9bf5d8daac8a794e3d0ac422852c854b2",
+      "screens": {
+        "360x640": {
+          "meanHex": "#3c5955",
+          "luma": 0.313,
+          "hueDeg": 172.6,
+          "saturation": 0.341,
+          "edgeShare": 0.135,
+          "anisotropy": -0.118,
+          "diagonalAnisotropy": -0.008,
+          "lumaSpread": 0.059,
+          "highShare": 0.093,
+          "lowShare": 0.076
+        },
+        "1440x900": {
+          "meanHex": "#3c5955",
+          "luma": 0.314,
+          "hueDeg": 172.6,
+          "saturation": 0.337,
+          "edgeShare": 0.173,
+          "anisotropy": -0.11,
+          "diagonalAnisotropy": -0.013,
+          "lumaSpread": 0.066,
+          "highShare": 0.106,
+          "lowShare": 0.066
+        }
+      }
+    },
+    {
+      "lookKey": "hollow-honeycomb",
+      "name": "Hollow Honeycomb",
+      "motif": "void honeycomb",
+      "previewAssetId": "ui-star-map-planet-hollow-honeycomb",
+      "rockSurface": "#644020",
+      "horizon": "#c88a3a",
+      "heroSha256": "f7c3b8cc444e2d48d96e892d324ed22a49ac8b1f10c7e4454de672876092389c",
+      "screens": {
+        "360x640": {
+          "meanHex": "#845d27",
+          "luma": 0.386,
+          "hueDeg": 34.8,
+          "saturation": 0.706,
+          "edgeShare": 0.642,
+          "anisotropy": -0.03,
+          "diagonalAnisotropy": -0.001,
+          "lumaSpread": 0.101,
+          "highShare": 0.172,
+          "lowShare": 0.178
+        },
+        "1440x900": {
+          "meanHex": "#845d28",
+          "luma": 0.388,
+          "hueDeg": 34.8,
+          "saturation": 0.704,
+          "edgeShare": 0.576,
+          "anisotropy": -0.049,
+          "diagonalAnisotropy": -0.004,
+          "lumaSpread": 0.118,
+          "highShare": 0.209,
+          "lowShare": 0.122
+        }
+      }
+    },
+    {
+      "lookKey": "brass-verdigris",
+      "name": "Brass Verdigris",
+      "motif": "riveted plate shale",
+      "previewAssetId": "ui-star-map-planet-brass-verdigris",
+      "rockSurface": "#70703a",
+      "horizon": "#8aa878",
+      "heroSha256": "48cfa452e04a2fbcfc57a4fea2577d0e3f21c551c761bf09eb4d9a69932264da",
+      "screens": {
+        "360x640": {
+          "meanHex": "#5a7e4e",
+          "luma": 0.429,
+          "hueDeg": 107.3,
+          "saturation": 0.449,
+          "edgeShare": 0.039,
+          "anisotropy": -0.237,
+          "diagonalAnisotropy": 0.01,
+          "lumaSpread": 0.048,
+          "highShare": 0.029,
+          "lowShare": 0.135
+        },
+        "1440x900": {
+          "meanHex": "#5a7e4f",
+          "luma": 0.431,
+          "hueDeg": 107.2,
+          "saturation": 0.448,
+          "edgeShare": 0.065,
+          "anisotropy": -0.247,
+          "diagonalAnisotropy": 0.007,
+          "lumaSpread": 0.053,
+          "highShare": 0.027,
+          "lowShare": 0.162
+        }
+      }
+    }
+  ]
+}

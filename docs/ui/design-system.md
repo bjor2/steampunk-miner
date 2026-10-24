@@ -414,6 +414,14 @@ row's glyph, the planet sprite with its disc tinted the planet's own ground colo
 `colour`) through the sprite's mask, sits on it; the planet the session is on wears the here ring,
 a dimmed row drains its glyph's colour, and the tank's bar is the `art.gaugeBar` sprite with a CSS
 fill. The tank's level shows on the rig as the coal tender at the hitch (docs/art-pipeline.md).
+**Carousel art (#795, build #796):** the carousel to come shows one planet at a time as a hero
+preview, `ui-star-map-planet-<key>` (256 px; a lit sphere in the planet's own crust motif and hue
+pair, a brass armillary ring, a haze of its horizon colour), stepped by swipe, Previous and Next or
+←/→, over the system strip `ui-star-map-system` (the sun and five brass orbits in an orrery rail
+frame) that pans to the selected planet's orbit dot in at most 400 ms, a cut under reduced motion;
+the here ring and the selected marker sit on the dots. Sizes, orbit positions and the swipe
+threshold are `starMapCarouselArt.json`; the look and motion notes and the mock frames are in
+docs/art/star-map-carousel/.
 
 **Desktop brass (#770, GD lock 23 Oct).** The wide panels wear frames of their own instead of the
 phone's stretched: the docked sheet draws `art.dockFrame` (`kit/Sheet.module.css`, on
@@ -625,6 +633,11 @@ stroke is at least 1 px at 1x; the review sheets are in `docs/art/ui-chrome/`.
 | art.dockFrame    | `ui-frame-dock`    | 80 x 80: brass edge, riveted iron band, hinge rail on the view side (#770)                 | 24 x 24; rail, pitch 32     |
 | art.clusterFrame | `ui-frame-cluster` | 80 x 40: the glass frame's bezel, lip and glint with studs, desktop height (#770)          | 24 x 10; rail, pitch 32     |
 | art.starMap      | `ui-star-map`      | 48 x 48 `-planet` (banded disc, core), 64 x 64 `-sun` (rayed), 56 x 56 `-here` ring (#758) | planet disc tintable        |
+
+The star map carousel's previews and system strip (#795) are `ui` assets of the same pipeline but
+named by planet look, not by a token (`systems/art/starMapCarouselArt.ts`): `ui-star-map-planet-<key>`
+(256 x 256 hero, 24 x 24 `-dot`) and `ui-star-map-system` (1008 x 252 backdrop, 64 x 64 `-frame` with
+20 px insets, 36 `-here`, 44 `-selected`); the build draws them as images from the catalogue.
 
 **Drawing one.** `kit/UiArtTokens.tsx` writes one `:root` rule from the shipped catalogue: for a
 token `gaugeBar`, `--art-gauge-bar` is the `image-set()` of its two files, `--art-gauge-bar-size`

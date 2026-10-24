@@ -1,0 +1,447 @@
+{
+  "$comment": "The star map carousel's contact sheet (ticket 795): every planet preview with its look key, name, motif, art colours and the reads of the shipped hero at the phone (160 px) and desktop (256 px) hero sizes. Rewritten with the reads when a preview is re-exported (python3 docs/art/star-map-carousel/preview_post.py, then this sheet).",
+  "rows": [
+    {
+      "lookKey": "1",
+      "name": "Hearthmoor",
+      "motif": "pitted sandstone",
+      "previewAssetId": "ui-star-map-planet-1",
+      "rockSurface": "#8a6a48",
+      "horizon": "#c98f5c",
+      "reads": {
+        "360x640": {
+          "meanHex": "#8a6945",
+          "luma": 0.436,
+          "hueDeg": 31.4,
+          "saturation": 0.497,
+          "edgeShare": 0.312,
+          "anisotropy": -0.066,
+          "diagonalAnisotropy": 0.011,
+          "lumaSpread": 0.084,
+          "highShare": 0.193,
+          "lowShare": 0.113
+        },
+        "1440x900": {
+          "meanHex": "#8b6a46",
+          "luma": 0.437,
+          "hueDeg": 31.4,
+          "saturation": 0.495,
+          "edgeShare": 0.188,
+          "anisotropy": -0.085,
+          "diagonalAnisotropy": 0.008,
+          "lumaSpread": 0.089,
+          "highShare": 0.199,
+          "lowShare": 0.11
+        }
+      }
+    },
+    {
+      "lookKey": "2",
+      "name": "Gravelholm",
+      "motif": "rockfall scree",
+      "previewAssetId": "ui-star-map-planet-2",
+      "rockSurface": "#5f6e7a",
+      "horizon": "#8a7aa8",
+      "reads": {
+        "360x640": {
+          "meanHex": "#566077",
+          "luma": 0.376,
+          "hueDeg": 222.0,
+          "saturation": 0.344,
+          "edgeShare": 0.129,
+          "anisotropy": -0.1,
+          "diagonalAnisotropy": 0.001,
+          "lumaSpread": 0.058,
+          "highShare": 0.124,
+          "lowShare": 0.126
+        },
+        "1440x900": {
+          "meanHex": "#576177",
+          "luma": 0.377,
+          "hueDeg": 221.9,
+          "saturation": 0.345,
+          "edgeShare": 0.16,
+          "anisotropy": -0.094,
+          "diagonalAnisotropy": -0.002,
+          "lumaSpread": 0.064,
+          "highShare": 0.127,
+          "lowShare": 0.126
+        }
+      }
+    },
+    {
+      "lookKey": "3",
+      "name": "Coalfen",
+      "motif": "coal seams",
+      "previewAssetId": "ui-star-map-planet-3",
+      "rockSurface": "#4f4b40",
+      "horizon": "#7f8f5e",
+      "reads": {
+        "360x640": {
+          "meanHex": "#464734",
+          "luma": 0.268,
+          "hueDeg": 62.3,
+          "saturation": 0.263,
+          "edgeShare": 0.113,
+          "anisotropy": -0.424,
+          "diagonalAnisotropy": 0.003,
+          "lumaSpread": 0.072,
+          "highShare": 0.038,
+          "lowShare": 0.148
+        },
+        "1440x900": {
+          "meanHex": "#464734",
+          "luma": 0.27,
+          "hueDeg": 62.3,
+          "saturation": 0.261,
+          "edgeShare": 0.067,
+          "anisotropy": -0.446,
+          "diagonalAnisotropy": 0.001,
+          "lumaSpread": 0.075,
+          "highShare": 0.033,
+          "lowShare": 0.148
+        }
+      }
+    },
+    {
+      "lookKey": "4",
+      "name": "Spinegarth",
+      "motif": "spine crystals",
+      "previewAssetId": "ui-star-map-planet-4",
+      "rockSurface": "#41736a",
+      "horizon": "#8fb6c4",
+      "reads": {
+        "360x640": {
+          "meanHex": "#497b73",
+          "luma": 0.421,
+          "hueDeg": 169.8,
+          "saturation": 0.487,
+          "edgeShare": 0.258,
+          "anisotropy": 0.044,
+          "diagonalAnisotropy": -0.012,
+          "lumaSpread": 0.115,
+          "highShare": 0.13,
+          "lowShare": 0.035
+        },
+        "1440x900": {
+          "meanHex": "#497c73",
+          "luma": 0.422,
+          "hueDeg": 169.8,
+          "saturation": 0.489,
+          "edgeShare": 0.201,
+          "anisotropy": 0.02,
+          "diagonalAnisotropy": -0.01,
+          "lumaSpread": 0.12,
+          "highShare": 0.133,
+          "lowShare": 0.029
+        }
+      }
+    },
+    {
+      "lookKey": "5",
+      "name": "Kettlecrag",
+      "motif": "steam vents",
+      "previewAssetId": "ui-star-map-planet-5",
+      "rockSurface": "#6a5254",
+      "horizon": "#b4aca2",
+      "reads": {
+        "360x640": {
+          "meanHex": "#675a5a",
+          "luma": 0.368,
+          "hueDeg": 0.2,
+          "saturation": 0.175,
+          "edgeShare": 0.189,
+          "anisotropy": -0.086,
+          "diagonalAnisotropy": -0.006,
+          "lumaSpread": 0.114,
+          "highShare": 0.12,
+          "lowShare": 0.054
+        },
+        "1440x900": {
+          "meanHex": "#675a5a",
+          "luma": 0.37,
+          "hueDeg": 0.2,
+          "saturation": 0.174,
+          "edgeShare": 0.122,
+          "anisotropy": -0.114,
+          "diagonalAnisotropy": -0.008,
+          "lumaSpread": 0.117,
+          "highShare": 0.12,
+          "lowShare": 0.052
+        }
+      }
+    },
+    {
+      "lookKey": "cinder-basalt",
+      "name": "Cinder Basalt",
+      "motif": "hex basalt columns",
+      "previewAssetId": "ui-star-map-planet-cinder-basalt",
+      "rockSurface": "#3a3236",
+      "horizon": "#d8622a",
+      "reads": {
+        "360x640": {
+          "meanHex": "#6b3c28",
+          "luma": 0.282,
+          "hueDeg": 17.6,
+          "saturation": 0.53,
+          "edgeShare": 0.442,
+          "anisotropy": -0.075,
+          "diagonalAnisotropy": -0.024,
+          "lumaSpread": 0.097,
+          "highShare": 0.145,
+          "lowShare": 0.057
+        },
+        "1440x900": {
+          "meanHex": "#6b3c29",
+          "luma": 0.283,
+          "hueDeg": 17.6,
+          "saturation": 0.515,
+          "edgeShare": 0.402,
+          "anisotropy": -0.088,
+          "diagonalAnisotropy": -0.025,
+          "lumaSpread": 0.108,
+          "highShare": 0.159,
+          "lowShare": 0.029
+        }
+      }
+    },
+    {
+      "lookKey": "ash-plain",
+      "name": "Ash Plain",
+      "motif": "layered ash strata",
+      "previewAssetId": "ui-star-map-planet-ash-plain",
+      "rockSurface": "#726860",
+      "horizon": "#9a5a52",
+      "reads": {
+        "360x640": {
+          "meanHex": "#7a6257",
+          "luma": 0.409,
+          "hueDeg": 19.3,
+          "saturation": 0.269,
+          "edgeShare": 0.064,
+          "anisotropy": -0.466,
+          "diagonalAnisotropy": 0.008,
+          "lumaSpread": 0.045,
+          "highShare": 0.106,
+          "lowShare": 0.115
+        },
+        "1440x900": {
+          "meanHex": "#7b6358",
+          "luma": 0.41,
+          "hueDeg": 19.3,
+          "saturation": 0.266,
+          "edgeShare": 0.053,
+          "anisotropy": -0.463,
+          "diagonalAnisotropy": 0.007,
+          "lumaSpread": 0.05,
+          "highShare": 0.096,
+          "lowShare": 0.101
+        }
+      }
+    },
+    {
+      "lookKey": "rime-shelf",
+      "name": "Rime Shelf",
+      "motif": "cracked ice plates",
+      "previewAssetId": "ui-star-map-planet-rime-shelf",
+      "rockSurface": "#4a7484",
+      "horizon": "#cfeef6",
+      "reads": {
+        "360x640": {
+          "meanHex": "#778f95",
+          "luma": 0.536,
+          "hueDeg": 191.7,
+          "saturation": 0.244,
+          "edgeShare": 0.38,
+          "anisotropy": -0.025,
+          "diagonalAnisotropy": 0.008,
+          "lumaSpread": 0.091,
+          "highShare": 0.073,
+          "lowShare": 0.2
+        },
+        "1440x900": {
+          "meanHex": "#788f95",
+          "luma": 0.537,
+          "hueDeg": 191.7,
+          "saturation": 0.245,
+          "edgeShare": 0.315,
+          "anisotropy": -0.031,
+          "diagonalAnisotropy": 0.006,
+          "lumaSpread": 0.1,
+          "highShare": 0.057,
+          "lowShare": 0.188
+        }
+      }
+    },
+    {
+      "lookKey": "hoarfrost-vein",
+      "name": "Hoarfrost Vein",
+      "motif": "needle crystal veins",
+      "previewAssetId": "ui-star-map-planet-hoarfrost-vein",
+      "rockSurface": "#5c5878",
+      "horizon": "#b8a8d8",
+      "reads": {
+        "360x640": {
+          "meanHex": "#706784",
+          "luma": 0.428,
+          "hueDeg": 257.7,
+          "saturation": 0.261,
+          "edgeShare": 0.274,
+          "anisotropy": -0.271,
+          "diagonalAnisotropy": -0.001,
+          "lumaSpread": 0.116,
+          "highShare": 0.16,
+          "lowShare": 0.049
+        },
+        "1440x900": {
+          "meanHex": "#706885",
+          "luma": 0.429,
+          "hueDeg": 257.7,
+          "saturation": 0.262,
+          "edgeShare": 0.2,
+          "anisotropy": -0.294,
+          "diagonalAnisotropy": -0.006,
+          "lumaSpread": 0.121,
+          "highShare": 0.165,
+          "lowShare": 0.046
+        }
+      }
+    },
+    {
+      "lookKey": "lode-banded",
+      "name": "Lode Banded",
+      "motif": "banded iron stripes",
+      "previewAssetId": "ui-star-map-planet-lode-banded",
+      "rockSurface": "#6c5048",
+      "horizon": "#6a86a6",
+      "reads": {
+        "360x640": {
+          "meanHex": "#675057",
+          "luma": 0.345,
+          "hueDeg": 345.2,
+          "saturation": 0.564,
+          "edgeShare": 0.2,
+          "anisotropy": -0.296,
+          "diagonalAnisotropy": -0.003,
+          "lumaSpread": 0.081,
+          "highShare": 0.183,
+          "lowShare": 0.166
+        },
+        "1440x900": {
+          "meanHex": "#685157",
+          "luma": 0.346,
+          "hueDeg": 345.4,
+          "saturation": 0.58,
+          "edgeShare": 0.118,
+          "anisotropy": -0.313,
+          "diagonalAnisotropy": 0.004,
+          "lumaSpread": 0.085,
+          "highShare": 0.18,
+          "lowShare": 0.163
+        }
+      }
+    },
+    {
+      "lookKey": "gauss-field",
+      "name": "Gauss Field",
+      "motif": "curled filings",
+      "previewAssetId": "ui-star-map-planet-gauss-field",
+      "rockSurface": "#4a5256",
+      "horizon": "#3a8c84",
+      "reads": {
+        "360x640": {
+          "meanHex": "#3c5955",
+          "luma": 0.313,
+          "hueDeg": 172.6,
+          "saturation": 0.341,
+          "edgeShare": 0.135,
+          "anisotropy": -0.118,
+          "diagonalAnisotropy": -0.008,
+          "lumaSpread": 0.059,
+          "highShare": 0.093,
+          "lowShare": 0.076
+        },
+        "1440x900": {
+          "meanHex": "#3c5955",
+          "luma": 0.314,
+          "hueDeg": 172.6,
+          "saturation": 0.337,
+          "edgeShare": 0.173,
+          "anisotropy": -0.11,
+          "diagonalAnisotropy": -0.013,
+          "lumaSpread": 0.066,
+          "highShare": 0.106,
+          "lowShare": 0.066
+        }
+      }
+    },
+    {
+      "lookKey": "hollow-honeycomb",
+      "name": "Hollow Honeycomb",
+      "motif": "void honeycomb",
+      "previewAssetId": "ui-star-map-planet-hollow-honeycomb",
+      "rockSurface": "#644020",
+      "horizon": "#c88a3a",
+      "reads": {
+        "360x640": {
+          "meanHex": "#845d27",
+          "luma": 0.386,
+          "hueDeg": 34.8,
+          "saturation": 0.706,
+          "edgeShare": 0.642,
+          "anisotropy": -0.03,
+          "diagonalAnisotropy": -0.001,
+          "lumaSpread": 0.101,
+          "highShare": 0.172,
+          "lowShare": 0.178
+        },
+        "1440x900": {
+          "meanHex": "#845d28",
+          "luma": 0.388,
+          "hueDeg": 34.8,
+          "saturation": 0.704,
+          "edgeShare": 0.576,
+          "anisotropy": -0.049,
+          "diagonalAnisotropy": -0.004,
+          "lumaSpread": 0.118,
+          "highShare": 0.209,
+          "lowShare": 0.122
+        }
+      }
+    },
+    {
+      "lookKey": "brass-verdigris",
+      "name": "Brass Verdigris",
+      "motif": "riveted plate shale",
+      "previewAssetId": "ui-star-map-planet-brass-verdigris",
+      "rockSurface": "#70703a",
+      "horizon": "#8aa878",
+      "reads": {
+        "360x640": {
+          "meanHex": "#5a7e4e",
+          "luma": 0.429,
+          "hueDeg": 107.3,
+          "saturation": 0.449,
+          "edgeShare": 0.039,
+          "anisotropy": -0.237,
+          "diagonalAnisotropy": 0.01,
+          "lumaSpread": 0.048,
+          "highShare": 0.029,
+          "lowShare": 0.135
+        },
+        "1440x900": {
+          "meanHex": "#5a7e4f",
+          "luma": 0.431,
+          "hueDeg": 107.2,
+          "saturation": 0.448,
+          "edgeShare": 0.065,
+          "anisotropy": -0.247,
+          "diagonalAnisotropy": 0.007,
+          "lumaSpread": 0.053,
+          "highShare": 0.027,
+          "lowShare": 0.162
+        }
+      }
+    }
+  ]
+}

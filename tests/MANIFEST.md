@@ -573,7 +573,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/sensing/systems/threatPeriscope.test.ts` | 6 | 6 |
 | `src/features/sensing/systems/useResolution.test.ts` | 16 | 16 |
 
-### `solar-systems`: 20 files, 134 tests
+### `solar-systems`: 20 files, 135 tests
 
 | File | Tests | Sites |
 | --- | --- | --- |
@@ -592,7 +592,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/solar-systems/systems/planetRecolour.test.ts` | 4 | 4 |
 | `src/features/solar-systems/systems/poolRecolour.test.ts` | 3 | 3 |
 | `src/features/solar-systems/systems/poolRuns.test.ts` | 4 | 4 |
-| `src/features/solar-systems/systems/render/lookArt.test.ts` | 8 | 8 |
+| `src/features/solar-systems/systems/render/lookArt.test.ts` | 9 | 9 |
 | `src/features/solar-systems/systems/render/lookContactSheet.test.ts` | 7 | 7 |
 | `src/features/solar-systems/systems/systemMoneyTexts.golden.test.ts` | 5 | 3 |
 | `src/features/solar-systems/systems/systemRoster.golden.test.ts` | 2 | 2 |
@@ -776,6 +776,8 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/art/placeholderLook.test.ts` | 10 | 9 |
 | `src/systems/art/refineryBayArt.test.ts` | 2 | 2 |
 | `src/systems/art/shopBuildingArt.test.ts` | 6 | 6 |
+| `src/systems/art/starMapCarouselArt.test.ts` | 8 | 8 |
+| `src/systems/art/starMapCarouselSheet.test.ts` | 7 | 7 |
 | `src/systems/art/texelDensity.test.ts` | 7 | 2 |
 | `src/systems/art/tileLook.test.ts` | 5 | 5 |
 | `src/systems/art/tunnelWreckerArt.test.ts` | 3 | 3 |
