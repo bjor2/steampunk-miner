@@ -14,6 +14,7 @@ import type { PlaqueModel } from '../systems/views/plaqueModel'
 import type { SellBayModel } from '../systems/views/sellBayModel'
 import type { HoldSheet } from '../systems/views/holdSheet'
 import { starMapViewOf, type StarMapView } from '../systems/views/starMapView'
+import type { StarMapControls } from '../systems/views/starMapControls'
 import type { UpgradeBayModel } from '../systems/views/upgradeBayModel'
 import type { RefineryBayModel } from '../systems/views/refineryBayModel'
 import type { SettingsModel } from '../systems/views/settingsModel'
@@ -41,6 +42,7 @@ import {
   refineryBayModelOf,
   sellBayModelOf,
   settingsModelOf,
+  starMapControlsModelOf,
   titleMenuModelOf,
   upgradeBayModelOf,
   type BayScreen,
@@ -89,6 +91,11 @@ export function readHoldSheetModel(): HoldSheet {
 /** The star map (ticket 757), as it would draw now, open or not. */
 export function readStarMapModel(): StarMapView {
   return starMapViewOf(readAuthorityState(), useGameStore.getState().playerId)
+}
+
+/** The star map's Jumps and purchases (ticket 793), as they would act now, open or not. */
+export function readStarMapControls(): StarMapControls {
+  return starMapControlsModelOf(useGameStore.getState())
 }
 
 /** The Upgrade bay's model, as it would draw now, docked there or not. */

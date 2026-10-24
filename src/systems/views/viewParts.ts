@@ -22,7 +22,10 @@ export interface AmountReading {
 /** What activating a button does: one authority command, or a UI step that changes no state. */
 export type ButtonAction =
   | { kind: 'submit'; intent: CommandIntent }
-  | { kind: 'armTravel' }
+  /** A star map Jump's first press (ticket 793): arms it, and only the armed one submits. */
+  | { kind: 'armJump' }
+  /** The bay footer's Star map (ticket 793): opens the star map, or shuts it while open. */
+  | { kind: 'toggleStarMap' }
   | { kind: 'openSettings' }
   | { kind: 'closeSettings' }
   | { kind: 'closeArtefactChoice' }

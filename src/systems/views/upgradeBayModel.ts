@@ -127,7 +127,7 @@ export function selectUpgradeBayModel(
   const items = vehicleItemRowsOf(state, playerId)
   const entries = bayEntryRowsOf(state, playerId)
   const repair = repairReadingOf(state, playerId)
-  const footer = bayFooterOf(state, playerId, ui)
+  const footer = bayFooterOf(state, playerId)
   const rows: ShopRows = { tracks, casing, lining, guns, charges, items, entries, repair }
   const focusStops = upgradeBayFocusStops(rows, footer)
   return {

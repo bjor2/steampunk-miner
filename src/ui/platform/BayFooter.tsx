@@ -1,23 +1,20 @@
 /**
- * Travel with its fee, fragments and inline confirmation (or the end-of-slice card on the last
- * planet), undock and settings, the same at both bays (#33 section 6, #37), on one shared
- * Title+OneLine element (spec #422, pass #425): the fee and the fragments are glyph-and-value
- * facts, the controls its actions. On desktop Undock wears the brass tag of the Dock key that
- * presses it from the bay (ticket 794).
+ * The star map, undock and settings, the same at every bay (#33 section 6, #37), on one shared
+ * Title+OneLine element (spec #422, pass #425). The Star map opens the map, where the jumps and
+ * their fuel are (ticket 793); it replaced the fragment Travel and the end-of-slice card. On
+ * desktop Undock wears the brass tag of the Dock key that presses it from the bay (ticket 794).
  */
 import { useGameStore } from '../../store/gameStore'
 import { undockKeyLabelOf } from '../../systems/input/keyTags'
-import type { BayFooter as Footer, TravelReading } from '../../systems/views/bayFrame'
+import type { BayFooter as Footer } from '../../systems/views/bayFrame'
 import { layoutKindOf } from '../../systems/views/designSystem'
 import type { ScreenButton } from '../../systems/views/viewParts'
 import type { BayId } from '../../systems/world/dockBays'
 import { useHudDensity } from '../hud/useHudDensity'
-import { UI_IDS } from '../ids'
 import { KeyTag } from '../kit/KeyTag'
 import { TitleOneLine } from '../kit/TitleOneLine'
 import { ScreenButtonView } from '../ScreenButtonView'
 import { bayFrameTextIdOf } from './bayTextIds'
-import { travelFactsOf } from './travelFacts'
 import styles from './Platform.module.css'
 
 /** The footer's title: where its controls take the vehicle. */
@@ -35,17 +32,8 @@ export function BayFooter({
   const text = { id: bayFrameTextIdOf(bay, 'footer'), title: FOOTER_TITLE }
   return (
     <footer className={styles.footer}>
-      <TitleOneLine
-        text={{ ...text, oneLine: '', tooltipLines: [] }}
-        facts={travelFactsOf(footer.travel)}
-        level="span"
-      >
-        {footer.travel !== null && <TravelControl travel={footer.travel} focusedId={focusedId} />}
-        {footer.hasEndCard && (
-          <span data-testid={UI_IDS.platformEndCard}>
-            End of the slice: the last planet of this build.
-          </span>
-        )}
+      <TitleOneLine text={{ ...text, oneLine: '', tooltipLines: [] }} level="span">
+        <ScreenButtonView button={footer.starMap} focusedId={focusedId} />
         <UndockControl button={footer.undock} focusedId={focusedId} />
         <ScreenButtonView button={footer.settings} focusedId={focusedId} />
       </TitleOneLine>
@@ -70,15 +58,3 @@ function useUndockKeyLabel(): string | null {
   return isDesktop ? keyLabel : null
 }
 
-function TravelControl({ travel, focusedId }: { travel: TravelReading; focusedId: string }) {
-  return (
-    <span className={styles.action}>
-      <ScreenButtonView button={travel.button} focusedId={focusedId} state={travel.state} />
-      {travel.isArmed && (
-        <strong data-testid={UI_IDS.platformTravelConfirm}>
-          Spends the fragments for good: press again to travel
-        </strong>
-      )}
-    </span>
-  )
-}

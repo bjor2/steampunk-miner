@@ -236,21 +236,51 @@ describe('input: no direct mutation (#33 acceptance 3)', () => {
   })
 })
 
-describe('input: travel confirmation', () => {
-  it('submits one Travel on the second press and none on the first', () => {
+describe('input: the star map from the bay (ticket 793)', () => {
+  it("opens the star map from the bay footer's Star map and sends nothing", () => {
     dockAtStart()
-    game().setCoreFragments(63)
-    game().giveMoney('60.8')
-    expect(submittedDuring(() => game().pressScreenButton('platform-travel'))).toEqual([])
-    expect(game().isTravelArmed).toBe(true)
-    expect(submittedDuring(() => game().pressScreenButton('platform-travel'))).toEqual(['travel'])
-    expect(game().planetTier).toBe(2)
+    expect(submittedDuring(() => game().pressScreenButton('platform-star-map'))).toEqual([])
+    expect(game().isStarMapOpen).toBe(true)
   })
 
-  it('does not arm a travel the authority would refuse', () => {
+  it("buys a planet's fuel shortfall and jumps there on the Jump's second press only", () => {
     dockAtStart()
-    expect(game().pressScreenButton('platform-travel')).toBe(false)
-    expect(game().isTravelArmed).toBe(false)
+    game().giveMoney('1e9')
+    game().pressScreenButton('platform-star-map')
+    expect(submittedDuring(() => game().pressScreenButton('star-map-buy-fuel-3'))).toEqual([
+      'buyFuel',
+    ])
+    expect(submittedDuring(() => game().pressScreenButton('star-map-jump-3'))).toEqual([])
+    expect(game().armedJumpId).toBe('star-map-jump-3')
+    expect(submittedDuring(() => game().pressScreenButton('star-map-jump-3'))).toEqual([
+      'jumpToPlanet',
+    ])
+    expect(game()).toMatchObject({ planetTier: 3, armedJumpId: null, isStarMapOpen: false })
+  })
+
+  it('disarms a Jump when another control is pressed', () => {
+    dockAtStart()
+    game().giveMoney('1e9')
+    game().pressScreenButton('platform-star-map')
+    game().pressScreenButton('star-map-buy-fuel-2')
+    game().pressScreenButton('star-map-jump-2')
+    game().pressScreenButton('star-map-buy-fuel-3')
+    expect(game().armedJumpId).toBeNull()
+    expect(submittedDuring(() => game().pressScreenButton('star-map-jump-2'))).toEqual([])
+  })
+
+  it('refuses a jump the tank cannot fuel on the screen, sending nothing and arming nothing', () => {
+    dockAtStart()
+    game().pressScreenButton('platform-star-map')
+    expect(submittedDuring(() => game().pressScreenButton('star-map-jump-5'))).toEqual([])
+    expect(game().armedJumpId).toBeNull()
+    expect(game().planetTier).toBe(1)
+  })
+
+  it("never presses the map's controls while the map is shut", () => {
+    dockAtStart()
+    game().giveMoney('1e9')
+    expect(game().pressScreenButton('star-map-buy-fuel-2')).toBe(false)
   })
 })
 

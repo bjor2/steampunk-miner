@@ -1,6 +1,5 @@
 import { GameScene } from './scene/GameScene'
 import { ArtefactChoice } from './ui/artefact/ArtefactChoice'
-import { EndOfSliceCard } from './ui/EndOfSliceCard'
 import { Hud } from './ui/hud/Hud'
 import { AboveBayLayer } from './ui/platform/AboveBayLayer'
 import { PlanetCard } from './ui/planet/PlanetCard'
@@ -38,7 +37,6 @@ export default function App() {
       <TouchControls />
       <TravelTransitionCard />
       <PlanetCard />
-      <EndOfSliceCard />
       <BaseSheet at="full" />
       <StarMapPanel at="full" />
       <SliceScreen />

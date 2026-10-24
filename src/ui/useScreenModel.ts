@@ -35,7 +35,7 @@ function isScreenSourceChanged(state: GameState, previous: GameState): boolean {
     state.platform !== previous.platform ||
     state.planetTier !== previous.planetTier ||
     state.focusedControlId !== previous.focusedControlId ||
-    state.isTravelArmed !== previous.isTravelArmed ||
+    state.armedJumpId !== previous.armedJumpId ||
     state.installingUpgradeId !== previous.installingUpgradeId ||
     state.prefs !== previous.prefs ||
     state.bindings !== previous.bindings ||

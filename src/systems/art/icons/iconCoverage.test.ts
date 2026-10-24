@@ -34,7 +34,6 @@ import { oreIconIdOf } from './oreIcon'
 const BINDINGS = defaultBindings(ACTION_MAP)
 
 const UI: BayUiState = {
-  isTravelArmed: false,
   isQuickServiceHighlighted: false,
   focusedId: null,
   installingUpgradeId: null,
@@ -119,7 +118,7 @@ function sellBayWithOreAndRefined(): { model: SellBayModel; hold: HoldSheet } {
   dockAtBayOf(session, tick, REFINERY_SITE, 'refinery')
   const tier = Number.parseInt(Object.keys(session.vehicle().cargo.ore)[0], 10)
   session.submit(tick + 1, { type: 'queueRefine', payload: { resourceTier: tier, units: 2 } })
-  const refinery = selectRefineryBayModel(session.state(), 'p1', UI)
+  const refinery = selectRefineryBayModel(session.state(), 'p1')
   expect(refinery.ore.length).toBeGreaterThan(0)
   expect(unresolvedIconIds(refineryIconsOf(refinery), SHIPPED_ART)).toEqual([])
   dockAtBayOf(session, tick + 2 + 180 * 60, REFINERY_SITE, 'sell')

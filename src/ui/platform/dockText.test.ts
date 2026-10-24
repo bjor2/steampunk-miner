@@ -27,7 +27,6 @@ import { SellBayView } from './SellBayView'
 // batch and every slot built. Every text sits on a shared element, and prices stay visible.
 
 const UI: BayUiState = {
-  isTravelArmed: false,
   isQuickServiceHighlighted: false,
   focusedId: null,
   installingUpgradeId: null,
@@ -114,7 +113,7 @@ function sellBayMarkupOf(session: ScriptedSession): string {
 }
 
 function refineryBayMarkupOf(session: ScriptedSession): string {
-  const model = selectRefineryBayModel(session.state(), 'p1', UI)
+  const model = selectRefineryBayModel(session.state(), 'p1')
   return renderToString(createElement(RefineryBayView, { model, focusedId: '' }))
 }
 

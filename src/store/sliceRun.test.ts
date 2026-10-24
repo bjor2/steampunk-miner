@@ -4,7 +4,6 @@ import { createRunLog, getRunLog, installRunLog, uninstallRunLog } from '../logg
 import { runEventProblems } from '../logging/runEventSchema'
 import { coreTiles, surfaceOreTiles } from '../systems/authority/scriptedSession'
 import type { ScriptedCommand } from '../systems/fastForward'
-import { isSliceEndReached } from '../systems/sliceProgress'
 import { FACING, bayPoseAt, dockedPoseAt } from '../systems/vehicle/vehiclePose'
 import { dockSiteOf } from '../systems/world/dockSite'
 import { freshPlanetParamsFor, type PlanetParams } from '../systems/world/planetParams'
@@ -163,7 +162,7 @@ function isSubsequence(names: readonly string[], log: readonly string[]): boolea
 }
 
 describe('slice run on both planets', () => {
-  it('logs the #2 acceptance sequence and ends at the end-of-slice card', () => {
+  it("logs the #2 acceptance sequence and ends with planet 2's core completed", () => {
     startRun()
     earnAndBuyEveryTrack()
     equipForCore(7, HOLD_90_UNITS)
@@ -179,7 +178,7 @@ describe('slice run on both planets', () => {
         .filter((event) => event.event === 'upgrade_purchased')
         .map((event) => (event.data as { upgradeId: string }).upgradeId),
     ).toEqual(SIX_TRACKS)
-    expect(isSliceEndReached(game().planetTier, game().isCoreCompleted)).toBe(true)
+    expect(game()).toMatchObject({ planetTier: 2, isCoreCompleted: true })
     expect(sink.events.flatMap(runEventProblems)).toEqual([])
   })
 
@@ -224,12 +223,6 @@ describe('slice run on both planets', () => {
       vehicle: before.vehicle,
       travelTransition: null,
     })
-  })
-
-  it('does not show the end-of-slice card for the planet-1 core', () => {
-    game().setCoreFragments(63)
-    expect(game().isCoreCompleted).toBe(true)
-    expect(isSliceEndReached(game().planetTier, game().isCoreCompleted)).toBe(false)
   })
 })
 

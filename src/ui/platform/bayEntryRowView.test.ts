@@ -16,7 +16,6 @@ function drawnOutfitter(): string {
   const session = createScriptedSession()
   session.submit(0, { type: 'debug.teleportToDock', payload: { bay: 'upgrade' } })
   const model = selectUpgradeBayModel(session.state(), 'p1', {
-    isTravelArmed: false,
     isQuickServiceHighlighted: false,
     focusedId: null,
     installingUpgradeId: null,

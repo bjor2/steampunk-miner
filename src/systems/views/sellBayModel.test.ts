@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest'
+import { coreNeededOf } from '../authority/coreBay'
 import { repairCostOf } from '../authority/platformServices'
 import { withVehicle, type AuthorityState } from '../authority/authorityState'
 import { digTenMetresUntil } from '../authority/casingDigFixtures'
@@ -11,9 +12,10 @@ import {
 } from '../authority/scriptedSession'
 import { formatAmount } from '../displayAmount'
 import { add, fromCanonical, toCanonical } from '../money'
-import { dockCommand, sellCargoCommand, travelCommand } from '../platform/platformCommands'
+import { dockCommand, sellCargoCommand } from '../platform/platformCommands'
 import { grantMoneyCommand, setCoreFragmentsCommand } from '../startScenarioCommands'
 import { setEnergyCommand, setHullCommand, teleportToDockCommand } from '../vehicle/vehicleCommands'
+import { UI_IDS } from './screenIds'
 import { SELL_BAY_START_FOCUS, selectSellBayModel } from './sellBayModel'
 
 type Session = ReturnType<typeof createScriptedSession>
@@ -26,9 +28,8 @@ function dockedSession(): Session {
   return session
 }
 
-function sellBayOf(session: Session, isTravelArmed = false) {
+function sellBayOf(session: Session) {
   return selectSellBayModel(session.state(), 'p1', {
-    isTravelArmed,
     isQuickServiceHighlighted: false,
     focusedId: null,
     installingUpgradeId: null,
@@ -93,49 +94,21 @@ describe('sell bay model', () => {
     expect(sellBayOf(session).quickService.button.reason).toBeNull()
   })
 
-  it('says core_short at 62 fragments and ready at 63 with 60.8 money', () => {
-    const session = dockedSession()
-    session.submit(2, setCoreFragmentsCommand(62))
-    session.submit(2, grantMoneyCommand('60.8'))
-    expect(sellBayOf(session).footer.travel).toMatchObject({
-      state: 'core_short',
-      fragmentsText: '62 / 63',
-    })
-    session.submit(3, setCoreFragmentsCommand(63))
-    const travel = sellBayOf(session).footer.travel!
-    expect(travel).toMatchObject({ state: 'ready', fee: { text: '0' } })
-  })
-
-  it('shows the fee the hop would charge: 60.75 up to 60.8 with money to spare, less when short', () => {
-    const session = dockedSession()
-    session.submit(2, setCoreFragmentsCommand(63))
-    session.submit(2, grantMoneyCommand('1e4'))
-    expect(sellBayOf(session).footer.travel).toMatchObject({
-      fee: { text: '60.8', exact: '6.075e+1' },
-    })
-    const short = dockedSession()
-    short.submit(2, setCoreFragmentsCommand(63))
-    short.submit(2, grantMoneyCommand('1470'))
-    expect(sellBayOf(short).footer.travel).toMatchObject({ fee: { text: '47' } })
-  })
-
-  it('submits Travel only from the armed button', () => {
-    const session = dockedSession()
-    expect(sellBayOf(session, false).footer.travel?.button.action).toEqual({ kind: 'armTravel' })
-    expect(sellBayOf(session, true).footer.travel?.button.action).toEqual({
-      kind: 'submit',
-      intent: travelCommand(2),
-    })
-  })
-
-  it('puts the end-of-slice card in place of travel on planet 2', () => {
-    const session = dockedSession()
-    session.submit(2, setCoreFragmentsCommand(63))
-    session.submit(2, grantMoneyCommand('60.8'))
-    session.submit(3, travelCommand(2))
-    const footer = sellBayOf(session).footer
-    expect(footer.travel).toBeNull()
-    expect(footer.hasEndCard).toBe(true)
+  it('offers the star map where the fragment Travel and the end-of-slice card stood (ticket 793)', () => {
+    for (const planet of [1, 2, 3, 5]) {
+      const session = createScriptedSession()
+      session.submit(0, { type: 'debug.setPlanet', payload: { planetIndex: planet } })
+      session.submit(1, dockCommand('sell'))
+      session.submit(2, setCoreFragmentsCommand(coreNeededOf(session.state().planet) ?? 0))
+      const footer = sellBayOf(session).footer
+      expect(footer.starMap).toMatchObject({
+        id: UI_IDS.platformStarMap,
+        label: 'Star map',
+        action: { kind: 'toggleStarMap' },
+        reason: null,
+      })
+      expect(Object.keys(footer)).toEqual(['starMap', 'undock', 'settings'])
+    }
   })
 
   it('shows huge money through the formatter with its exact value beside it', () => {

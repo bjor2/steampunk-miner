@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import type { DomainEvent } from './authority/domainEvent'
-import { isSliceEndReached, travelTransitionOf } from './sliceProgress'
+import { travelTransitionOf } from './sliceProgress'
 
 const stamp = { playerId: 'p1', tick: 10, seq: 3 }
 
@@ -37,11 +37,5 @@ describe('slice progress', () => {
 
   it('plays no transition for events without a travel', () => {
     expect(travelTransitionOf([{ ...stamp, type: 'CoreReached' }])).toBeNull()
-  })
-
-  it('reaches the end of the slice only with the core of planet 2 completed', () => {
-    expect(isSliceEndReached(1, true)).toBe(false)
-    expect(isSliceEndReached(2, false)).toBe(false)
-    expect(isSliceEndReached(2, true)).toBe(true)
   })
 })

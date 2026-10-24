@@ -3,7 +3,6 @@
  * from the authority's events and state. Presentation only: the authority has already changed
  * the state when any of this shows.
  */
-import { SLICE_LAST_PLANET } from '../constants/balance'
 import { JUMP_TRANSITION_SECONDS, TRAVEL_TRANSITION_SECONDS } from '../constants/scene'
 import type { DomainEvent, DomainEventBodies } from './authority/domainEvent'
 
@@ -25,9 +24,4 @@ export function travelTransitionOf(events: readonly DomainEvent[]): TravelTransi
 /** A jump names the fuel it burnt (ticket 755); a `Travel` does not. */
 function transitionSecondsOf(started: DomainEventBodies['TravelStarted']): number {
   return started.fuelSpent === undefined ? TRAVEL_TRANSITION_SECONDS : JUMP_TRANSITION_SECONDS
-}
-
-/** The end-of-slice card follows the completed core of the slice's last planet (#2 item 5). */
-export function isSliceEndReached(planetIndex: number, isCoreCompleted: boolean): boolean {
-  return isCoreCompleted && planetIndex >= SLICE_LAST_PLANET
 }

@@ -1,13 +1,14 @@
 /**
  * What both bay screens share (#33 section 6, split into two bays by #37): the header with money,
- * planet, the core bay gauge and the platform state, and the footer with travel (or the
- * end-of-slice card on the last planet), undock and settings. Every button carries the command it
- * submits and the reason the authority would refuse it now.
+ * planet, the core bay gauge and the platform state, and the footer with the star map, undock and
+ * settings. Every button carries the command it submits and the reason the authority would refuse
+ * it now.
  *
- * Travel needs a second activation because it spends fragments and cannot be undone; that is UI
- * state, and the authority still sees one `Travel`. It is offered at both bays (#37).
+ * The footer's way off the planet is the star map (ticket 793): its Star map opens the map, where
+ * every planet's Jump and the fuel it needs are (`starMapControls.ts`). It replaced the slice's
+ * fragment-spending Travel and its end-of-slice card, which the #650 star map had outdated; the
+ * host's `Travel` rule stays, so old replays still replay.
  */
-import { SLICE_LAST_PLANET } from '../../constants/balance'
 import {
   bayEmblemIdOf,
   buttonIconIdOf,
@@ -18,10 +19,9 @@ import {
 } from '../art/icons/iconSet'
 import type { AuthorityState } from '../authority/authorityState'
 import { coreNeededOf } from '../authority/coreBay'
-import type { RejectionReason } from '../authority/domainEvent'
 import type { PlatformVisualState } from '../authority/platformState'
-import { travelChargeNow, travelRefusal } from '../authority/travelRules'
-import { travelCommand, undockCommand } from '../platform/platformCommands'
+import { actionDefOf, ACTION_MAP } from '../input/actionMap'
+import { undockCommand } from '../platform/platformCommands'
 import type { BayId } from '../world/dockBays'
 import type { UpgradeId } from '../economy/economyDefinition'
 import type { TripLedger } from './tripIncome'
@@ -32,7 +32,6 @@ import type { FocusStop } from './menuFocus'
 import { UI_IDS } from './screenIds'
 import {
   amountReading,
-  priceReading,
   commandButton,
   uiButton,
   withIcon,
@@ -42,7 +41,6 @@ import {
 
 /** The UI state a bay screen reads besides the authority: none of it is ever submitted. */
 export interface BayUiState {
-  isTravelArmed: boolean
   /** While the dock hint is up, its first visit (#16); the Sell bay highlights its quick action. */
   isQuickServiceHighlighted: boolean
   /** The control with menu focus; the Upgrade bay's preview follows it. */
@@ -76,26 +74,15 @@ export interface BayHeader {
   platformStateIconId: string
 }
 
-/** `ready`, or the reason the authority refuses `Travel` now (`core_short`, `not_docked`, ...). */
-export type TravelState = 'ready' | RejectionReason
-
-export interface TravelReading {
-  button: ScreenButton
-  fee: AmountReading
-  fragmentsText: string
-  /** The next planet's gravity as its trait (#724), so the jump says how hard it pulls. */
-  toPlanetGravity: LocalGravityReading
-  state: TravelState
-  isArmed: boolean
-}
-
 export interface BayFooter {
-  /** Null on the slice's last planet, where the end-of-slice card stands instead. */
-  travel: TravelReading | null
-  hasEndCard: boolean
+  /** Opens the star map (ticket 793), where the jumps to the other planets are. */
+  starMap: ScreenButton
   undock: ScreenButton
   settings: ScreenButton
 }
+
+/** The footer's Star map is named as the key that opens the map is. */
+const STAR_MAP_LABEL = actionDefOf(ACTION_MAP, 'open_star_map').displayName
 
 const PLATFORM_STATE_TEXT: Readonly<Record<PlatformVisualState, string>> = {
   outpost: 'Outpost',
@@ -121,11 +108,12 @@ export function bayHeaderOf(state: AuthorityState, playerId: string, bay: BayId)
   }
 }
 
-export function bayFooterOf(state: AuthorityState, playerId: string, ui: BayUiState): BayFooter {
-  const hasEndCard = state.planet.index >= SLICE_LAST_PLANET
+export function bayFooterOf(state: AuthorityState, playerId: string): BayFooter {
   return {
-    travel: hasEndCard ? null : travelReadingOf(state, playerId, ui.isTravelArmed),
-    hasEndCard,
+    starMap: withIcon(
+      uiButton(UI_IDS.platformStarMap, STAR_MAP_LABEL, { kind: 'toggleStarMap' }),
+      hudLabelIconIdOf('compass'),
+    ),
     undock: withIcon(
       commandButton(state, playerId, UI_IDS.platformUndock, 'Undock', undockCommand()),
       buttonIconIdOf('undock'),
@@ -139,8 +127,7 @@ export function bayFooterOf(state: AuthorityState, playerId: string, ui: BayUiSt
 
 /** The footer's buttons in reading order. */
 export function footerButtonsOf(footer: BayFooter): ScreenButton[] {
-  const travel = footer.travel === null ? [] : [footer.travel.button]
-  return [...travel, footer.undock, footer.settings]
+  return [footer.starMap, footer.undock, footer.settings]
 }
 
 export function stopIn(panel: string): (button: ScreenButton) => FocusStop {
@@ -154,25 +141,5 @@ function coreBayGaugeOf(coreBay: number, needed: number): GaugeReading {
     exact: String(coreBay),
     permille,
     iconId: gaugeIconIdOf('core_bay'),
-  }
-}
-
-/** The first activation arms the confirmation; only an armed button submits `Travel`. */
-function travelReadingOf(state: AuthorityState, playerId: string, isArmed: boolean): TravelReading {
-  const toPlanet = state.planet.index + 1
-  const reason = travelRefusal(state, playerId, toPlanet)?.reason ?? null
-  return {
-    button: {
-      id: UI_IDS.platformTravel,
-      label: isArmed ? `Confirm travel to planet ${toPlanet}` : `Travel to planet ${toPlanet}`,
-      action: isArmed ? { kind: 'submit', intent: travelCommand(toPlanet) } : { kind: 'armTravel' },
-      reason,
-      iconId: buttonIconIdOf('travel'),
-    },
-    fee: priceReading(travelChargeNow(state, playerId)),
-    fragmentsText: `${state.platform.coreBay} / ${coreNeededOf(state.planet) ?? 0}`,
-    toPlanetGravity: planetGravityTraitOf(toPlanet),
-    state: reason ?? 'ready',
-    isArmed,
   }
 }

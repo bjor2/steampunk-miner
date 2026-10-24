@@ -24,7 +24,6 @@ function cardsAtUpgradeBay(money: string, tripLedger?: TripLedger) {
   session.submit(1, grantMoneyCommand(money))
   dockInBay(session, 2, 'upgrade')
   const model = selectUpgradeBayModel(session.state(), 'p1', {
-    isTravelArmed: false,
     isQuickServiceHighlighted: false,
     focusedId: null,
     installingUpgradeId: null,
@@ -155,7 +154,6 @@ const ONE_TRIP_OF_40: TripLedger = { ended: [fromSafeInteger(40)], current: null
 
 function gunsCardsOf(session: ReturnType<typeof createScriptedSession>) {
   const model = selectUpgradeBayModel(session.state(), 'p1', {
-    isTravelArmed: false,
     isQuickServiceHighlighted: false,
     focusedId: null,
     installingUpgradeId: null,

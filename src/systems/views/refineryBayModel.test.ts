@@ -11,7 +11,6 @@ import { refineryBayStartFocus, selectRefineryBayModel } from './refineryBayMode
 import { selectSellBayModel } from './sellBayModel'
 
 const UI: BayUiState = {
-  isTravelArmed: false,
   isQuickServiceHighlighted: false,
   focusedId: null,
   installingUpgradeId: null,
@@ -30,7 +29,7 @@ function atRefineryWithOre() {
 describe('refinery bay screen', () => {
   it('offers each held tier as a batch of at most half the hold, focused first', () => {
     const { session } = atRefineryWithOre()
-    const model = selectRefineryBayModel(session.state(), 'p1', UI)
+    const model = selectRefineryBayModel(session.state(), 'p1')
     expect(model.ore.map((row) => [row.held, row.batchUnits])).toEqual([[6, 5]])
     expect(model.ore[0].queue).toMatchObject({ label: 'Refine 5', reason: null })
     expect(refineryBayStartFocus(model)).toBe(model.ore[0].queue.id)
@@ -43,7 +42,7 @@ describe('refinery bay screen', () => {
     const resourceTier = Number.parseInt(Object.keys(tier)[0], 10)
     session.submit(tick + 1, { type: 'queueRefine', payload: { resourceTier, units: 2 } })
     session.advanceTo(tick + 1 + 60 * 60)
-    const model = selectRefineryBayModel(session.state(), 'p1', UI)
+    const model = selectRefineryBayModel(session.state(), 'p1')
     expect(model.slots[0]).toMatchObject({ look: 'refining', isYours: true })
     expect(model.slots[0].text).toContain('120 s')
     expect(model.ore[0].queue.reason).toBe('slots_busy')
@@ -51,10 +50,10 @@ describe('refinery bay screen', () => {
 
   it('prices the next slot, and says so when every slot is built', () => {
     const { session, tick } = atRefineryWithOre()
-    expect(selectRefineryBayModel(session.state(), 'p1', UI).slotPrice?.exact).toBe('1.383961e+4')
+    expect(selectRefineryBayModel(session.state(), 'p1').slotPrice?.exact).toBe('1.383961e+4')
     session.submit(tick + 1, { type: 'buyRefinerySlot', payload: {} })
     session.submit(tick + 2, { type: 'buyRefinerySlot', payload: {} })
-    const model = selectRefineryBayModel(session.state(), 'p1', UI)
+    const model = selectRefineryBayModel(session.state(), 'p1')
     expect(model.slotPrice).toBeNull()
     expect(model.buySlot.reason).toBe('slots_max')
   })

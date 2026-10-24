@@ -21,7 +21,6 @@ import {
   stopIn,
   type BayFooter,
   type BayHeader,
-  type BayUiState,
 } from './bayFrame'
 import { KERNEL_ITEMS } from '../registries/kernelItems'
 import { itemCardOf, SHOP_SOURCE, type ItemCardModel } from './itemCardModel'
@@ -74,17 +73,13 @@ export interface RefineryBayModel {
   buttons: ScreenButton[]
 }
 
-export function selectRefineryBayModel(
-  state: AuthorityState,
-  playerId: string,
-  ui: BayUiState,
-): RefineryBayModel {
+export function selectRefineryBayModel(state: AuthorityState, playerId: string): RefineryBayModel {
   const ore = oreRowsOf(state, playerId)
   const buySlot = withIcon(
     commandButton(state, playerId, UI_IDS.refinerybaySlotBuy, 'Buy slot', buyRefinerySlotCommand()),
     REFINERY_SLOT_ICON_ID,
   )
-  const footer = bayFooterOf(state, playerId, ui)
+  const footer = bayFooterOf(state, playerId)
   const price = nextRefinerySlotPrice(state)
   const slotPrice = price === null ? null : priceReading(price)
   return {

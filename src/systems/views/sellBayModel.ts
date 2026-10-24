@@ -96,7 +96,7 @@ export function selectSellBayModel(
   const refined = refinedPanelOf(state, playerId)
   const charging = chargingPanelOf(state, playerId)
   const quickService = quickServiceOf(state, playerId, ui)
-  const footer = bayFooterOf(state, playerId, ui)
+  const footer = bayFooterOf(state, playerId)
   return {
     header: bayHeaderOf(state, playerId, 'sell'),
     hold,

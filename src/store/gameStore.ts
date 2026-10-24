@@ -657,8 +657,11 @@ function replaceSession(state: AuthorityState): void {
   followAuthority([])
 }
 
+/** A jump shuts the star map it was sent from, so control is back once the 2 s pass (ticket 793). */
 function startTravelTransition(transition: TravelTransition | null): void {
-  if (transition !== null) useGameStore.setState({ travelTransition: transition })
+  if (transition === null) return
+  useGameStore.setState({ travelTransition: transition })
+  useGameStore.getState().closeStarMap()
 }
 
 function replicaOf(state: AuthorityState, playerId: string): Partial<GameValues> {

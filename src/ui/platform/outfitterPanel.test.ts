@@ -16,7 +16,6 @@ function drawnOutfitter(money: string, focusedId: string | null): string {
   session.submit(1, grantMoneyCommand(money))
   dockInBay(session, 2, 'upgrade')
   const model = selectUpgradeBayModel(session.state(), 'p1', {
-    isTravelArmed: false,
     isQuickServiceHighlighted: false,
     focusedId: null,
     installingUpgradeId: null,

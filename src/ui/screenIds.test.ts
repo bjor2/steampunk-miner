@@ -237,15 +237,7 @@ function bayFrameTexts(header: BayHeader, footer: BayFooter): Partial<Record<UiI
     [UI_IDS.platformState]: header.platformStateText,
     [UI_IDS.platformUndock]: footer.undock.label,
     [UI_IDS.platformSettings]: footer.settings.label,
-    ...(footer.travel === null
-      ? { [UI_IDS.platformEndCard]: null }
-      : {
-          [UI_IDS.platformTravel]: footer.travel.button.label,
-          [UI_IDS.platformTravelFee]: footer.travel.fee.text,
-          [UI_IDS.platformTravelFragments]: footer.travel.fragmentsText,
-          [UI_IDS.platformTravelGravity]: footer.travel.toPlanetGravity.text,
-          ...(footer.travel.isArmed ? { [UI_IDS.platformTravelConfirm]: null } : {}),
-        }),
+    [UI_IDS.platformStarMap]: footer.starMap.label,
   }
 }
 
@@ -478,12 +470,11 @@ function renderRefineryScreens(): string[] {
   const tier = Number.parseInt(Object.keys(session.vehicle().cargo.ore)[0], 10)
   session.submit(tick + 1, { type: 'queueRefine', payload: { resourceTier: tier, units: 2 } })
   const ui = {
-    isTravelArmed: false,
     isQuickServiceHighlighted: false,
     focusedId: null,
     installingUpgradeId: null,
   }
-  const refinery = selectRefineryBayModel(session.state(), 'p1', ui)
+  const refinery = selectRefineryBayModel(session.state(), 'p1')
   expect(refinery.ore.length).toBeGreaterThan(0)
   dockAtBayOf(session, tick + 2 + 180 * 60, site, 'sell')
   const sell = selectSellBayModel(session.state(), 'p1', ui)
@@ -504,7 +495,6 @@ function renderLiningVisit(): string[] {
   dockInBay(session, end + 200, 'sell')
   session.submit(end + 200, { type: 'sellCargo', payload: { resourceTier: 'all' } })
   const model = selectSellBayModel(session.state(), 'p1', {
-    isTravelArmed: false,
     isQuickServiceHighlighted: false,
     focusedId: null,
     installingUpgradeId: null,
@@ -640,7 +630,6 @@ function renderWithGuns(): string[] {
   session.submit(2, { type: 'debug.setPlanet', payload: { planetIndex: 4 } })
   session.submit(2, teleportToDockCommand('upgrade'))
   const bay = selectUpgradeBayModel(session.state(), 'p1', {
-    isTravelArmed: false,
     isQuickServiceHighlighted: false,
     focusedId: null,
     installingUpgradeId: null,
@@ -695,7 +684,6 @@ function renderWithHeat(): string[] {
   expect(hud.heat?.isThrottled).toBe(true)
   session.submit(2, teleportToDockCommand('upgrade'))
   const bay = selectUpgradeBayModel(session.state(), 'p1', {
-    isTravelArmed: false,
     isQuickServiceHighlighted: false,
     focusedId: null,
     installingUpgradeId: null,
@@ -743,7 +731,6 @@ function upgradeBayOn(planetIndex: number): UpgradeBayModel {
   session.submit(1, { type: 'debug.setPlanet', payload: { planetIndex } })
   session.submit(1, teleportToDockCommand('upgrade'))
   return selectUpgradeBayModel(session.state(), 'p1', {
-    isTravelArmed: false,
     isQuickServiceHighlighted: false,
     focusedId: null,
     installingUpgradeId: null,

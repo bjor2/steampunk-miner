@@ -34,7 +34,6 @@ function atUpgradeBay(money = '0'): Session {
 
 function upgradeBayOf(session: Session, focusedId: string | null = null) {
   return selectUpgradeBayModel(session.state(), 'p1', {
-    isTravelArmed: false,
     isQuickServiceHighlighted: false,
     focusedId,
     installingUpgradeId: null,

@@ -35,7 +35,6 @@ function researchDrain(session: ScriptedSession): void {
 
 function bayOf(session: ScriptedSession): UpgradeBayModel {
   return selectUpgradeBayModel(session.state(), 'p1', {
-    isTravelArmed: false,
     isQuickServiceHighlighted: false,
     focusedId: null,
     installingUpgradeId: null,

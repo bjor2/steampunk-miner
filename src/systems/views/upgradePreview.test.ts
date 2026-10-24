@@ -40,7 +40,6 @@ function previewOf(
   installingUpgradeId: UpgradeId | null = null,
 ) {
   return selectUpgradeBayModel(session.state(), 'p1', {
-    isTravelArmed: false,
     isQuickServiceHighlighted: false,
     focusedId,
     installingUpgradeId,
@@ -80,7 +79,6 @@ describe('upgrade bay preview', () => {
     const session = atUpgradeBay({}, { cargo_hold: BEFORE_MAJOR })
     const preview = previewOf(session, buyIdOf('cargo_hold'))
     const row = selectUpgradeBayModel(session.state(), 'p1', {
-      isTravelArmed: false,
       isQuickServiceHighlighted: false,
       focusedId: null,
       installingUpgradeId: null,
@@ -145,7 +143,6 @@ describe('upgrade bay preview', () => {
     const session = atUpgradeBay({ boiler: 7 })
     const before = stateDigest(session.state())
     const stops = selectUpgradeBayModel(session.state(), 'p1', {
-      isTravelArmed: false,
       isQuickServiceHighlighted: false,
       focusedId: null,
       installingUpgradeId: null,

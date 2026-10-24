@@ -23,7 +23,6 @@ import { selectUpgradeBayModel } from './upgradeBayModel'
 type Session = ReturnType<typeof createScriptedSession>
 
 const NO_UI = {
-  isTravelArmed: false,
   isQuickServiceHighlighted: false,
   focusedId: null,
   installingUpgradeId: null,

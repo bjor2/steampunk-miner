@@ -44,6 +44,7 @@ import {
   type SettingsModel,
 } from '../systems/views/settingsModel'
 import type { ScreenButton } from '../systems/views/viewParts'
+import { starMapControlsOf, type StarMapControls } from '../systems/views/starMapControls'
 import {
   pauseMenuButtonsOf,
   selectPauseMenuModel,
@@ -77,7 +78,10 @@ export interface ScreenSources {
   bindingProblems: readonly string[]
   rebindingActionId: ActionId | null
   saveTransferProblems: readonly string[]
-  isTravelArmed: boolean
+  /** The star map Jump a first press armed (ticket 793). */
+  armedJumpId: string | null
+  /** The star map's panel is open: its controls join the bay's menu (ticket 793). */
+  isStarMapOpen: boolean
   focusedControlId: string | null
   liveStepHold: LiveStepHold
   installingUpgradeId: UpgradeId | null
@@ -136,12 +140,11 @@ export function upgradeBayModelOf(sources: ScreenSources): UpgradeBayModel {
 }
 
 export function refineryBayModelOf(sources: ScreenSources): RefineryBayModel {
-  return selectRefineryBayModel(readAuthorityState(), sources.playerId, bayUiStateOf(sources))
+  return selectRefineryBayModel(readAuthorityState(), sources.playerId)
 }
 
 function bayUiStateOf(sources: ScreenSources): BayUiState {
   return {
-    isTravelArmed: sources.isTravelArmed,
     isQuickServiceHighlighted: isQuickServiceHighlighted(plaqueSourcesOf(sources)),
     focusedId: sources.focusedControlId,
     installingUpgradeId: sources.installingUpgradeId,
@@ -187,6 +190,11 @@ export function artefactChoiceModelOf(sources: ScreenSources): ArtefactChoiceMod
   return selectArtefactChoiceModel(readAuthorityState(), sources.playerId)
 }
 
+/** The star map's Jumps and purchases (ticket 793), as they would act now, open or not. */
+export function starMapControlsModelOf(sources: ScreenSources): StarMapControls {
+  return starMapControlsOf(readAuthorityState(), sources.playerId, sources)
+}
+
 /** The title menu as it draws now; null once play started. */
 export function titleMenuModelOf(sources: ScreenSources): TitleMenuModel | null {
   if (sources.titleMenu === null) return null
@@ -205,7 +213,7 @@ function utcOffsetMinutesAt(savedAtMs: number): number {
  */
 export function menuScreenOf(layer: InputContext, sources: ScreenSources): MenuScreen {
   if (layer === 'title') return titleMenu(titleMenuModelOf(sources))
-  if (layer === 'platform') return bayMenu(bayScreenOf(sources))
+  if (layer === 'platform') return withStarMap(bayMenu(bayScreenOf(sources)), sources)
   if (layer === 'settings') return settingsMenu(settingsModelOf(sources))
   if (layer === 'pause') return pauseMenu(pauseMenuModelOf(sources))
   if (layer === 'artefact') return artefactMenu(artefactChoiceModelOf(sources))
@@ -219,6 +227,20 @@ function bayMenu(screen: BayScreen): MenuScreen {
   if (screen === null) return NO_MENU
   const { focusStops, buttons } = screen.model
   return { focusStops, startFocus: bayStartFocus(screen), buttons }
+}
+
+/**
+ * The open star map's controls after the bay's (ticket 793): docked, its Jumps and fuel act, so
+ * keys and a pad reach them as they reach the bay's buttons.
+ */
+function withStarMap(menu: MenuScreen, sources: ScreenSources): MenuScreen {
+  if (!sources.isStarMapOpen || menu === NO_MENU) return menu
+  const controls = starMapControlsModelOf(sources)
+  return {
+    focusStops: [...menu.focusStops, ...controls.focusStops],
+    startFocus: menu.startFocus,
+    buttons: [...menu.buttons, ...controls.buttons],
+  }
 }
 
 function bayStartFocus(screen: NonNullable<BayScreen>): string {

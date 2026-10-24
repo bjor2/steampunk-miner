@@ -53,13 +53,13 @@ function upgradeBayModel() {
   return result.model
 }
 
-/** Leaves the Sell bay and drives 8 m onto the Upgrade bay's pad, as the pose reports say (#37). */
-function driveToUpgradeBay(): void {
+/** Leaves the bay it is docked at and drives onto `bay`'s pad, as the pose reports say (#37). */
+function driveToBay(bay: 'sell' | 'upgrade'): void {
   const debug = createDebugApi()
   debug.input.tap('ui_cancel')
   const site = dockSiteOf(planetParamsFor(1, 1))
   const tick = takeSessionSnapshot().tick + 2
-  const payload = { ...bayPoseAt(site, 'upgrade'), ...IDLE, driveTicks: 2 }
+  const payload = { ...bayPoseAt(site, bay), ...IDLE, driveTicks: 2 }
   debug.fastForward(2, [{ tick, type: 'reportPose', payload }])
 }
 
@@ -75,22 +75,26 @@ const IDLE = {
 
 /**
  * A UI-driven trip over both bays: dock with interact and run the quick action at the Sell bay,
- * drive to the Upgrade bay, dock, buy a track and a casing grade with buttons, travel with two
- * presses.
+ * drive to the Upgrade bay, dock, buy a track and a casing grade with buttons, then back at the
+ * Sell bay open the star map from the footer, buy the hop's fuel and jump with two presses
+ * (ticket 793).
  */
 function playThroughTheScreens(): void {
   const debug = createDebugApi()
   debug.giveMoney('1000')
-  debug.setCoreFragments(63)
   debug.setEnergy('100')
   debug.input.tap('interact')
   debug.input.tap('quick_service')
-  driveToUpgradeBay()
+  driveToBay('upgrade')
   debug.input.tap('interact')
   game().pressScreenButton('workshop-upgrade-cargo_hold-buy')
   game().pressScreenButton('upgradebay-casing-buy')
-  game().pressScreenButton('platform-travel')
-  game().pressScreenButton('platform-travel')
+  driveToBay('sell')
+  debug.input.tap('interact')
+  game().pressScreenButton('platform-star-map')
+  game().pressScreenButton('star-map-buy-fuel-2')
+  game().pressScreenButton('star-map-jump-2')
+  game().pressScreenButton('star-map-jump-2')
   debug.input.tap('ui_cancel')
   debug.fastForward(120)
 }
@@ -170,12 +174,23 @@ describe('debug api: input acts like play (#33 acceptance 3 and 11)', () => {
     expect(game().bindings.aim_left).toEqual(['KeyJ'])
   })
 
-  it('docks at each bay with interact and buys at the Upgrade bay through its buttons', () => {
+  it('docks at each bay with interact, buys at the Upgrade bay and jumps from the star map through their buttons', () => {
     playThroughTheScreens()
     const docks = sink.events.filter((event) => event.event === 'dock_entered')
-    expect(docks.map((event) => (event.data as { bay: string }).bay)).toEqual(['sell', 'upgrade'])
+    expect(docks.map((event) => (event.data as { bay: string }).bay)).toEqual([
+      'sell',
+      'upgrade',
+      'sell',
+    ])
     const names = sink.events.map((event) => event.event)
-    expect(names).toEqual(expect.arrayContaining(['upgrade_purchased', 'casing_upgraded']))
+    expect(names).toEqual(
+      expect.arrayContaining([
+        'upgrade_purchased',
+        'casing_upgraded',
+        'fuel_bought',
+        'travel_started',
+      ]),
+    )
     expect(names).not.toContain('command_rejected')
   })
 

@@ -96,7 +96,7 @@ export function starMapViewOf(state: AuthorityState, playerId: string): StarMapV
   return {
     system: toIndexText(systemOfPlanet(state.planet)),
     tank: tankOf(vehicleOf(state, playerId)),
-    planets: placesShownOf(state.planet).map((place) => planetOnMapOf(state, playerId, place)),
+    planets: starMapPlacesOf(state.planet).map((place) => planetOnMapOf(state, playerId, place)),
   }
 }
 
@@ -118,7 +118,7 @@ function fillPermilleOf(held: BigStat, capacity: BigStat): number {
 }
 
 /** Places 1 to the system's last planet, or to the hop after the session's own past it. */
-function placesShownOf(planet: SessionPlanet): number[] {
+export function starMapPlacesOf(planet: SessionPlanet): number[] {
   const count = Math.max(ECONOMY.starMap.planetsPerSystem, placeOf(planet) + 1)
   return Array.from({ length: count }, (_, index) => index + 1)
 }

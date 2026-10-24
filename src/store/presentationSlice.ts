@@ -55,6 +55,7 @@ import { screenIdProblems, winningScreenId } from '../ui/registries/screens'
 import type { TitleMenuActions } from './titleMenuSlice'
 import type { SaveKeepingActions } from './saveKeepingSlice'
 import type { SheetActions, SheetValues } from './sheetSlice'
+import type { StarMapPanelActions } from './starMapSlice'
 import type { VehicleReplica } from './vehicleReplica'
 
 export interface PresentationValues {
@@ -74,8 +75,8 @@ export interface PresentationValues {
   /** The slice full screen drawn over the game (ticket 211); null while none is. */
   openScreenId: string | null
   focusedControlId: string | null
-  /** The first press of Travel arms it; only the second submits (#33 section 6). */
-  isTravelArmed: boolean
+  /** The star map Jump a first press armed (ticket 793); only its second press submits. */
+  armedJumpId: string | null
   /** The action waiting for "press a key to rebind". */
   rebindingActionId: ActionId | null
   /** A render scale held by the debug API (#38 "a toggle can pin it"); null adapts to the GPU. */
@@ -154,7 +155,7 @@ export interface PresentationActions {
    * which opens its full card in place and buys nothing; a tap on the focused entry presses its buy.
    */
   tapItemCard(buyButtonId: string): void
-  /** A player command from a key or a button; it ends any armed travel. */
+  /** A player command from a key or a button; it ends any armed jump. */
   submitPlayerIntent(intent: CommandIntent): void
   /** Starts the preview's install animation for a purchase in these events (none with reduce motion). */
   startPartInstall(events: readonly DomainEvent[]): void
@@ -179,7 +180,8 @@ type SliceHost = PresentationValues &
   TitleMenuActions &
   Pick<SaveKeepingActions, 'exportSave' | 'importSave'> &
   ScreenSources & { vehicle: VehicleReplica } & Pick<SheetValues, 'openSheetTabId'> &
-  Pick<SheetActions, 'openSheet'>
+  Pick<SheetActions, 'openSheet'> &
+  Pick<StarMapPanelActions, 'toggleStarMap'>
 
 type SetSlice = (partial: Partial<PresentationValues>) => void
 
@@ -192,7 +194,7 @@ export const STARTING_PRESENTATION: PresentationValues = {
   isArtefactChoiceOpen: false,
   openScreenId: null,
   focusedControlId: null,
-  isTravelArmed: false,
+  armedJumpId: null,
   rebindingActionId: null,
   renderScalePin: null,
   isUnsupportedDeviceCardShown: false,
@@ -283,7 +285,7 @@ export function presentationActionsOf(set: SetSlice, get: () => SliceHost): Pres
     rebindToChord: (chord) => rebindWaitingAction(set, get, 'keyboard', chord),
     rebindToPadChord: (chord) => rebindWaitingAction(set, get, 'gamepad', chord),
     cancelRebinding: () => set({ rebindingActionId: null }),
-    openSettings: () => set({ isSettingsOpen: true, focusedControlId: null, isTravelArmed: false }),
+    openSettings: () => set({ isSettingsOpen: true, focusedControlId: null, armedJumpId: null }),
     closeSettings: () =>
       set({ isSettingsOpen: false, focusedControlId: null, rebindingActionId: null }),
     closeArtefactChoice: () => set({ isArtefactChoiceOpen: false, focusedControlId: null }),
@@ -306,7 +308,7 @@ export function presentationActionsOf(set: SetSlice, get: () => SliceHost): Pres
     pressScreenButton: (buttonId) => {
       const button = menuButtonOf(get(), buttonId)
       if (button === null || button.reason !== null) return false
-      set({ focusedControlId: buttonId, isTravelArmed: button.action.kind === 'armTravel' })
+      set({ focusedControlId: buttonId, armedJumpId: armedJumpIdAfter(button) })
       runButtonAction(get(), button.action)
       return true
     },
@@ -315,7 +317,7 @@ export function presentationActionsOf(set: SetSlice, get: () => SliceHost): Pres
       else get().focusControl(buyButtonId)
     },
     submitPlayerIntent: (intent) => {
-      set({ isTravelArmed: false })
+      set({ armedJumpId: null })
       submitCommand(get().playerId, intent)
     },
     startPartInstall: (events) => {
@@ -348,7 +350,13 @@ function runButtonAction(state: SliceHost, action: ButtonAction): void {
   else if (action.kind === 'exportSave') state.exportSave()
   else if (action.kind === 'importSave') void state.importSave()
   else if (action.kind === 'openSheet') state.openSheet(action.tabId)
+  else if (action.kind === 'toggleStarMap') state.toggleStarMap()
   else runMenuAction(state, action)
+}
+
+/** A star map Jump's first press arms it; any other press leaves no jump armed. */
+function armedJumpIdAfter(button: ScreenButton): string | null {
+  return button.action.kind === 'armJump' ? button.id : null
 }
 
 /** The pause and title menus' buttons; each answers only its own kinds. */
