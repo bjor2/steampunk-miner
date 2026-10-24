@@ -1,46 +1,8 @@
 {
  "schema": 1,
- "updatedAt": "2026-10-24T00:47:39.056Z",
+ "updatedAt": "2026-10-24T01:18:51.750Z",
  "lastRuns": 50,
  "runs": [
-  {
-   "id": 1792346510899,
-   "url": "https://github.com/bjor2/steampunk-miner/commit/7b25481985191a0153c25cee55fc521929cf841c",
-   "event": "close-#541",
-   "mode": "nightly-only",
-   "sha": "7b25481985191a0153c25cee55fc521929cf841c",
-   "branch": "main",
-   "startedAt": "2026-10-18T17:57:38Z",
-   "jobConclusion": "success",
-   "timedOut": false,
-   "jobDurationSec": 252,
-   "source": "box",
-   "phase": "slow",
-   "job": "slow",
-   "feature": 245,
-   "tickets": [
-    260,
-    261,
-    262,
-    263,
-    264,
-    265,
-    266,
-    360,
-    361,
-    363,
-    373,
-    375,
-    376,
-    389,
-    390
-   ],
-   "reportFound": true,
-   "files": 3,
-   "tests": 18,
-   "failed": 0,
-   "failedFiles": 0
-  },
   {
    "id": 1792355624413,
    "url": "https://github.com/bjor2/steampunk-miner/commit/20ef31bc5eb28b2b93cd4e84e1b03914c67d76cc",
@@ -1443,13 +1405,37 @@
    "tests": 444,
    "failed": 1,
    "failedFiles": 1
+  },
+  {
+   "id": 1792804730218,
+   "url": "https://github.com/bjor2/steampunk-miner/commit/c45e1121b526075a3774c5fc21927eadabdcaa7d",
+   "event": "pass",
+   "mode": "scoped",
+   "sha": "c45e1121b526075a3774c5fc21927eadabdcaa7d",
+   "branch": "main",
+   "startedAt": "2026-10-23T21:47:01Z",
+   "jobConclusion": "failure",
+   "timedOut": false,
+   "jobDurationSec": 12709,
+   "source": "box",
+   "phase": "fast",
+   "job": "fast",
+   "feature": 753,
+   "tickets": [
+    753
+   ],
+   "reportFound": true,
+   "files": 73,
+   "tests": 444,
+   "failed": 1,
+   "failedFiles": 1
   }
  ],
  "pipeline": {
   "modes": {
-   "nightly-only": 8,
    "full": 12,
-   "scoped": 10,
+   "scoped": 11,
+   "nightly-only": 7,
    "nightly": 20
   },
   "timedOut": [],
@@ -1464,23 +1450,6 @@
   "scopingSuspects": []
  },
  "features": {
-  "pacing-bot": {
-   "files": 4,
-   "p50Ms": 1724096,
-   "p95Ms": 4402263,
-   "fileRuns": 64,
-   "failedFileRuns": 7,
-   "lastFailure": {
-    "runId": 1792768448845,
-    "sha": "663d15e92d3c3f0815f7099e78b5b026e7c6699d",
-    "at": "2026-10-23T12:45:45Z",
-    "tests": [
-     "balance regression: the campaign scaling gate on the pacing seeds (R1 #89) digs band 5 at departure in at most 0.7x its arrival time on planets 1 to 7, on the seed median, with no seed stalled before planet 8"
-    ],
-    "file": "src/logging/campaignPacingGate.test.ts"
-   },
-   "passRate": 0.890625
-  },
   "tooling-ci": {
    "files": 5,
    "p50Ms": 30,
@@ -1547,7 +1516,7 @@
    "files": 3,
    "p50Ms": 276,
    "p95Ms": 942,
-   "fileRuns": 75,
+   "fileRuns": 76,
    "failedFileRuns": 1,
    "lastFailure": {
     "runId": 1792355624413,
@@ -1558,16 +1527,16 @@
     ],
     "file": "scripts/tests/manifestDrift.test.mjs"
    },
-   "passRate": 0.9866666666666667
+   "passRate": 0.9868421052631579
   },
   "debug": {
    "files": 16,
-   "p50Ms": 25531,
+   "p50Ms": 26149,
    "p95Ms": 35936,
-   "fileRuns": 360,
-   "failedFileRuns": 6,
+   "fileRuns": 375,
+   "failedFileRuns": 7,
    "lastFailure": {
-    "runId": 1792802858083,
+    "runId": 1792804730218,
     "sha": "c45e1121b526075a3774c5fc21927eadabdcaa7d",
     "at": "2026-10-23T21:47:01Z",
     "tests": [
@@ -1575,22 +1544,22 @@
     ],
     "file": "src/debug/debugScreens.test.ts"
    },
-   "passRate": 0.9833333333333333
+   "passRate": 0.9813333333333333
   },
   "aetheric": {
    "files": 20,
-   "p50Ms": 170806,
+   "p50Ms": 174826,
    "p95Ms": 1180696,
-   "fileRuns": 492,
+   "fileRuns": 493,
    "failedFileRuns": 0,
    "lastFailure": null,
    "passRate": 1
   },
   "artefact": {
    "files": 4,
-   "p50Ms": 1291111,
+   "p50Ms": 1422688,
    "p95Ms": 6235463,
-   "fileRuns": 99,
+   "fileRuns": 101,
    "failedFileRuns": 0,
    "lastFailure": null,
    "passRate": 1
@@ -1630,9 +1599,9 @@
   },
   "combos": {
    "files": 17,
-   "p50Ms": 1934592,
-   "p95Ms": 8703791,
-   "fileRuns": 414,
+   "p50Ms": 2825131,
+   "p95Ms": 9360014,
+   "fileRuns": 416,
    "failedFileRuns": 0,
    "lastFailure": null,
    "passRate": 1
@@ -1659,16 +1628,16 @@
    "files": 4,
    "p50Ms": 3067,
    "p95Ms": 7823,
-   "fileRuns": 95,
+   "fileRuns": 96,
    "failedFileRuns": 0,
    "lastFailure": null,
    "passRate": 1
   },
   "drill-gear": {
    "files": 30,
-   "p50Ms": 480306,
+   "p50Ms": 478473,
    "p95Ms": 1630836,
-   "fileRuns": 729,
+   "fileRuns": 732,
    "failedFileRuns": 4,
    "lastFailure": {
     "runId": 1792405438366,
@@ -1679,7 +1648,7 @@
     ],
     "file": "src/features/drill-gear/twinBitPace.test.ts"
    },
-   "passRate": 0.9945130315500685
+   "passRate": 0.994535519125683
   },
   "dynamite-visuals": {
    "files": 11,
@@ -1745,9 +1714,9 @@
   },
   "mining-gates": {
    "files": 25,
-   "p50Ms": 21210,
+   "p50Ms": 21024,
    "p95Ms": 35140,
-   "fileRuns": 599,
+   "fileRuns": 603,
    "failedFileRuns": 3,
    "lastFailure": {
     "runId": 1792768448845,
@@ -1758,7 +1727,7 @@
     ],
     "file": "src/features/mining-gates/systems/botShaftJog.test.ts"
    },
-   "passRate": 0.994991652754591
+   "passRate": 0.9950248756218906
   },
   "mining-popup": {
    "files": 9,
@@ -1806,9 +1775,9 @@
   },
   "planet-mix": {
    "files": 24,
-   "p50Ms": 590338,
+   "p50Ms": 585240,
    "p95Ms": 1967403,
-   "fileRuns": 580,
+   "fileRuns": 583,
    "failedFileRuns": 2,
    "lastFailure": {
     "runId": 1792573711044,
@@ -1823,7 +1792,7 @@
     ],
     "file": "src/features/planet-mix/magneticPlanetPace.test.ts"
    },
-   "passRate": 0.996551724137931
+   "passRate": 0.9965694682675815
   },
   "power-up-core": {
    "files": 21,
@@ -1871,9 +1840,9 @@
   },
   "tech-tree": {
    "files": 61,
-   "p50Ms": 30335,
+   "p50Ms": 30521,
    "p95Ms": 97344,
-   "fileRuns": 1407,
+   "fileRuns": 1413,
    "failedFileRuns": 3,
    "lastFailure": {
     "runId": 1792590572281,
@@ -1884,13 +1853,13 @@
     ],
     "file": "src/features/tech-tree/ui/techTreeScreen.test.ts"
    },
-   "passRate": 0.997867803837953
+   "passRate": 0.9978768577494692
   },
   "terrain-tools": {
    "files": 48,
-   "p50Ms": 458366,
+   "p50Ms": 472978,
    "p95Ms": 2868489,
-   "fileRuns": 1175,
+   "fileRuns": 1178,
    "failedFileRuns": 10,
    "lastFailure": {
     "runId": 1792735738681,
@@ -1903,7 +1872,7 @@
     ],
     "file": "src/features/terrain-tools/foamPace.test.ts"
    },
-   "passRate": 0.9914893617021276
+   "passRate": 0.9915110356536503
   },
   "workshop": {
    "files": 14,
@@ -1943,9 +1912,9 @@
   },
   "physics": {
    "files": 23,
-   "p50Ms": 574127,
+   "p50Ms": 574128,
    "p95Ms": 1843326,
-   "fileRuns": 542,
+   "fileRuns": 543,
    "failedFileRuns": 2,
    "lastFailure": {
     "runId": 1792695291792,
@@ -1958,7 +1927,7 @@
     ],
     "file": "src/physics/cutFaceRide.test.ts"
    },
-   "passRate": 0.996309963099631
+   "passRate": 0.996316758747698
   },
   "registries": {
    "files": 49,
@@ -1973,7 +1942,7 @@
    "files": 19,
    "p50Ms": 981,
    "p95Ms": 1711,
-   "fileRuns": 442,
+   "fileRuns": 443,
    "failedFileRuns": 0,
    "lastFailure": null,
    "passRate": 1
@@ -2027,7 +1996,7 @@
    "files": 143,
    "p50Ms": 420939,
    "p95Ms": 1060520,
-   "fileRuns": 3324,
+   "fileRuns": 3325,
    "failedFileRuns": 7,
    "lastFailure": {
     "runId": 1792695291792,
@@ -2038,13 +2007,13 @@
     ],
     "file": "src/systems/authority/sweptLawCharge.test.ts"
    },
-   "passRate": 0.9978941034897714
+   "passRate": 0.9978947368421053
   },
   "bot": {
    "files": 37,
-   "p50Ms": 337290,
-   "p95Ms": 1844264,
-   "fileRuns": 840,
+   "p50Ms": 337076,
+   "p95Ms": 3546810,
+   "fileRuns": 863,
    "failedFileRuns": 2,
    "lastFailure": {
     "runId": 1792573711044,
@@ -2055,7 +2024,7 @@
     ],
     "file": "src/systems/bot/botShopping.test.ts"
    },
-   "passRate": 0.9976190476190476
+   "passRate": 0.9976825028968713
   },
   "systems-core": {
    "files": 14,
@@ -2070,7 +2039,7 @@
    "files": 32,
    "p50Ms": 1089,
    "p95Ms": 2201,
-   "fileRuns": 735,
+   "fileRuns": 736,
    "failedFileRuns": 2,
    "lastFailure": {
     "runId": 1792669172174,
@@ -2081,7 +2050,7 @@
     ],
     "file": "src/systems/economy/economySourceScan.test.ts"
    },
-   "passRate": 0.9972789115646259
+   "passRate": 0.9972826086956522
   },
   "enemies": {
    "files": 1,
@@ -2103,9 +2072,9 @@
   },
   "hints": {
    "files": 5,
-   "p50Ms": 5422,
+   "p50Ms": 5269,
    "p95Ms": 9190,
-   "fileRuns": 104,
+   "fileRuns": 105,
    "failedFileRuns": 0,
    "lastFailure": null,
    "passRate": 1
@@ -2147,9 +2116,9 @@
   },
   "save": {
    "files": 23,
-   "p50Ms": 22911,
+   "p50Ms": 22904,
    "p95Ms": 41967,
-   "fileRuns": 509,
+   "fileRuns": 512,
    "failedFileRuns": 0,
    "lastFailure": null,
    "passRate": 1
@@ -2176,7 +2145,7 @@
    "files": 46,
    "p50Ms": 676,
    "p95Ms": 1495,
-   "fileRuns": 971,
+   "fileRuns": 972,
    "failedFileRuns": 0,
    "lastFailure": null,
    "passRate": 1
@@ -2234,6 +2203,23 @@
    "lastFailure": null,
    "passRate": 1
   },
+  "pacing-bot": {
+   "files": 4,
+   "p50Ms": 1724096,
+   "p95Ms": 4402263,
+   "fileRuns": 61,
+   "failedFileRuns": 7,
+   "lastFailure": {
+    "runId": 1792768448845,
+    "sha": "663d15e92d3c3f0815f7099e78b5b026e7c6699d",
+    "at": "2026-10-23T12:45:45Z",
+    "tests": [
+     "balance regression: the campaign scaling gate on the pacing seeds (R1 #89) digs band 5 at departure in at most 0.7x its arrival time on planets 1 to 7, on the seed median, with no seed stalled before planet 8"
+    ],
+    "file": "src/logging/campaignPacingGate.test.ts"
+   },
+   "passRate": 0.8852459016393442
+  },
   "drill-look": {
    "files": 2,
    "p50Ms": 45,
@@ -2290,79 +2276,6 @@
   }
  },
  "files": {
-  "src/logging/assayPacingGate.test.ts": {
-   "feature": "pacing-bot",
-   "runs": 18,
-   "lastMs": 60054,
-   "p50Ms": 69707,
-   "p95Ms": 240241,
-   "passRate": 1,
-   "lastStatus": "passed",
-   "lastRunId": 1792790652375,
-   "lastFailure": null,
-   "flaky": false,
-   "slowest": [
-    [
-     "balance regression: the pacing bot holding assay_beacon (#46, S11) passes the first-ten-minutes, planet 1 core and slice gates on the seed median",
-     60052
-    ]
-   ]
-  },
-  "src/logging/pacingGate.test.ts": {
-   "feature": "pacing-bot",
-   "runs": 18,
-   "lastMs": 93545,
-   "p50Ms": 103659,
-   "p95Ms": 183653,
-   "passRate": 0.7777777777777778,
-   "lastStatus": "passed",
-   "lastRunId": 1792790652375,
-   "lastFailure": {
-    "runId": 1792735738681,
-    "sha": "dca609908e4fa6c361bc34d78442dbbffed4eb4a",
-    "at": "2026-10-22T23:45:39Z",
-    "tests": [
-     "balance regression: the pacing bot on the slice (#29, S11) meets the first-sale, first-upgrade, ten-minute, core and slice targets on the seed median"
-    ]
-   },
-   "flaky": false,
-   "slowest": [
-    [
-     "balance regression: the pacing bot on the slice (#29, S11) meets the first-sale, first-upgrade, ten-minute, core and slice targets on the seed median",
-     73741
-    ],
-    [
-     "balance regression: the pacing bot on the slice (#29, S11) derives the same summary from a second run of the same scenario",
-     19739
-    ]
-   ]
-  },
-  "src/systems/bot/playSlice.test.ts": {
-   "feature": "pacing-bot",
-   "runs": 18,
-   "lastMs": 47923,
-   "p50Ms": 57118,
-   "p95Ms": 900536,
-   "passRate": 1,
-   "lastStatus": "passed",
-   "lastRunId": 1792790652375,
-   "lastFailure": null,
-   "flaky": false,
-   "slowest": [
-    [
-     "pacing bot plays a fresh planet 1 through to the planet 2 core inside its budget",
-     19905
-    ],
-    [
-     "pacing bot replays from the world seed and its own commands to the same digests and state",
-     16385
-    ],
-    [
-     "pacing bot save size (#36 acceptance 4) keeps the save of a 60-minute run under 1 MB",
-     11611
-    ]
-   ]
-  },
   "scripts/ci/drillDownHistory.test.mjs": {
    "feature": "tooling-ci",
    "runs": 22,
@@ -2905,13 +2818,13 @@
   },
   "scripts/tests/manifestDrift.test.mjs": {
    "feature": "tooling-tests",
-   "runs": 31,
+   "runs": 32,
    "lastMs": 361,
    "p50Ms": 262,
    "p95Ms": 920,
-   "passRate": 0.967741935483871,
+   "passRate": 0.96875,
    "lastStatus": "passed",
-   "lastRunId": 1792802858083,
+   "lastRunId": 1792804730218,
    "lastFailure": {
     "runId": 1792355624413,
     "sha": "20ef31bc5eb28b2b93cd4e84e1b03914c67d76cc",
@@ -2956,13 +2869,13 @@
   },
   "src/debug/debugApi.test.ts": {
    "feature": "debug",
-   "runs": 27,
+   "runs": 28,
    "lastMs": 352,
    "p50Ms": 315,
    "p95Ms": 776,
-   "passRate": 0.8888888888888888,
+   "passRate": 0.8928571428571429,
    "lastStatus": "passed",
-   "lastRunId": 1792802858083,
+   "lastRunId": 1792804730218,
    "lastFailure": {
     "runId": 1792682424201,
     "sha": "99eadef6647a12e19fccdd329c4991826ae6cf39",
@@ -2976,78 +2889,78 @@
   },
   "src/debug/debugArtefact.test.ts": {
    "feature": "debug",
-   "runs": 26,
+   "runs": 27,
    "lastMs": 105,
-   "p50Ms": 34,
+   "p50Ms": 35,
    "p95Ms": 105,
    "passRate": 1,
    "lastStatus": "passed",
-   "lastRunId": 1792802858083,
+   "lastRunId": 1792804730218,
    "lastFailure": null,
    "flaky": false,
    "slowest": []
   },
   "src/debug/debugHudLayout.test.ts": {
    "feature": "debug",
-   "runs": 26,
+   "runs": 27,
    "lastMs": 82,
-   "p50Ms": 46,
+   "p50Ms": 48,
    "p95Ms": 82,
    "passRate": 1,
    "lastStatus": "passed",
-   "lastRunId": 1792802858083,
+   "lastRunId": 1792804730218,
    "lastFailure": null,
    "flaky": false,
    "slowest": []
   },
   "src/debug/debugLining.test.ts": {
    "feature": "debug",
-   "runs": 26,
+   "runs": 27,
    "lastMs": 9,
    "p50Ms": 9,
    "p95Ms": 25,
    "passRate": 1,
    "lastStatus": "passed",
-   "lastRunId": 1792802858083,
+   "lastRunId": 1792804730218,
    "lastFailure": null,
    "flaky": false,
    "slowest": []
   },
   "src/debug/debugLiveTime.test.ts": {
    "feature": "debug",
-   "runs": 26,
+   "runs": 27,
    "lastMs": 47,
-   "p50Ms": 40,
+   "p50Ms": 41,
    "p95Ms": 71,
    "passRate": 1,
    "lastStatus": "passed",
-   "lastRunId": 1792802858083,
+   "lastRunId": 1792804730218,
    "lastFailure": null,
    "flaky": false,
    "slowest": []
   },
   "src/debug/debugMemory.test.ts": {
    "feature": "debug",
-   "runs": 26,
+   "runs": 27,
    "lastMs": 3,
    "p50Ms": 3,
    "p95Ms": 6,
    "passRate": 1,
    "lastStatus": "passed",
-   "lastRunId": 1792802858083,
+   "lastRunId": 1792804730218,
    "lastFailure": null,
    "flaky": false,
    "slowest": []
   },
   "src/debug/debugOverlay.test.ts": {
    "feature": "debug",
-   "runs": 26,
+   "runs": 27,
    "lastMs": 4,
    "p50Ms": 4,
    "p95Ms": 5,
    "passRate": 1,
    "lastStatus": "passed",
-   "lastRunId": 1792802858083,
+   "lastRunId": 1792804730218,
    "lastFailure": null,
    "flaky": false,
    "slowest": []
@@ -3067,15 +2980,15 @@
   },
   "src/debug/debugScreens.test.ts": {
    "feature": "debug",
-   "runs": 26,
+   "runs": 27,
    "lastMs": 1033,
-   "p50Ms": 969,
+   "p50Ms": 986,
    "p95Ms": 1387,
-   "passRate": 0.8846153846153846,
+   "passRate": 0.8518518518518519,
    "lastStatus": "failed",
-   "lastRunId": 1792802858083,
+   "lastRunId": 1792804730218,
    "lastFailure": {
-    "runId": 1792802858083,
+    "runId": 1792804730218,
     "sha": "c45e1121b526075a3774c5fc21927eadabdcaa7d",
     "at": "2026-10-23T21:47:01Z",
     "tests": [
@@ -3100,13 +3013,13 @@
   },
   "src/debug/sliceDebugCommands.test.ts": {
    "feature": "debug",
-   "runs": 26,
+   "runs": 27,
    "lastMs": 12,
    "p50Ms": 11,
    "p95Ms": 15,
    "passRate": 1,
    "lastStatus": "passed",
-   "lastRunId": 1792802858083,
+   "lastRunId": 1792804730218,
    "lastFailure": null,
    "flaky": false,
    "slowest": []
@@ -3279,13 +3192,13 @@
   },
   "src/features/aetheric/phaseLantern.pace.test.ts": {
    "feature": "aetheric",
-   "runs": 26,
+   "runs": 27,
    "lastMs": 448554,
-   "p50Ms": 164801,
+   "p50Ms": 168821,
    "p95Ms": 1170049,
    "passRate": 1,
    "lastStatus": "passed",
-   "lastRunId": 1792802858083,
+   "lastRunId": 1792804730218,
    "lastFailure": null,
    "flaky": false,
    "slowest": [
@@ -3476,13 +3389,13 @@
   },
   "src/features/artefact/twistNoFreeCell.test.ts": {
    "feature": "artefact",
-   "runs": 25,
+   "runs": 26,
    "lastMs": 983790,
    "p50Ms": 721082,
    "p95Ms": 3633933,
    "passRate": 1,
    "lastStatus": "passed",
-   "lastRunId": 1792802858083,
+   "lastRunId": 1792804730218,
    "lastFailure": null,
    "flaky": false,
    "slowest": [
@@ -3502,13 +3415,13 @@
   },
   "src/features/artefact/twistPace.test.ts": {
    "feature": "artefact",
-   "runs": 26,
+   "runs": 27,
    "lastMs": 2258251,
-   "p50Ms": 569848,
+   "p50Ms": 701425,
    "p95Ms": 2601259,
    "passRate": 1,
    "lastStatus": "passed",
-   "lastRunId": 1792802858083,
+   "lastRunId": 1792804730218,
    "lastFailure": null,
    "flaky": false,
    "slowest": [
@@ -3813,13 +3726,13 @@
   },
   "src/features/combos/comboPace.test.ts": {
    "feature": "combos",
-   "runs": 26,
+   "runs": 27,
    "lastMs": 9356051,
-   "p50Ms": 1932417,
-   "p95Ms": 8699828,
+   "p50Ms": 2822956,
+   "p95Ms": 9356051,
    "passRate": 1,
    "lastStatus": "passed",
-   "lastRunId": 1792802858083,
+   "lastRunId": 1792804730218,
    "lastFailure": null,
    "flaky": false,
    "slowest": [
@@ -3839,13 +3752,13 @@
   },
   "src/features/combos/combosInPlay.test.ts": {
    "feature": "combos",
-   "runs": 25,
+   "runs": 26,
    "lastMs": 745,
    "p50Ms": 624,
    "p95Ms": 1046,
    "passRate": 1,
    "lastStatus": "passed",
-   "lastRunId": 1792802858083,
+   "lastRunId": 1792804730218,
    "lastFailure": null,
    "flaky": false,
    "slowest": [
@@ -4250,13 +4163,13 @@
   },
   "src/features/drill-gear/drillGearPace.test.ts": {
    "feature": "drill-gear",
-   "runs": 26,
+   "runs": 27,
    "lastMs": 206029,
-   "p50Ms": 132992,
+   "p50Ms": 133213,
    "p95Ms": 429000,
    "passRate": 1,
    "lastStatus": "passed",
-   "lastRunId": 1792802858083,
+   "lastRunId": 1792804730218,
    "lastFailure": null,
    "flaky": false,
    "slowest": [
@@ -4285,13 +4198,13 @@
   },
   "src/features/drill-gear/forkDeep.pace.test.ts": {
    "feature": "drill-gear",
-   "runs": 27,
+   "runs": 28,
    "lastMs": 134911,
-   "p50Ms": 168705,
+   "p50Ms": 166651,
    "p95Ms": 681277,
-   "passRate": 0.9259259259259259,
+   "passRate": 0.9285714285714286,
    "lastStatus": "passed",
-   "lastRunId": 1792802858083,
+   "lastRunId": 1792804730218,
    "lastFailure": {
     "runId": 1792396127843,
     "sha": "40f7723968bf215d9793d5d016db379ef02df8d6",
@@ -4675,13 +4588,13 @@
   },
   "src/features/drill-gear/twinBitPace.test.ts": {
    "feature": "drill-gear",
-   "runs": 25,
+   "runs": 26,
    "lastMs": 259015,
    "p50Ms": 173686,
    "p95Ms": 509582,
-   "passRate": 0.92,
+   "passRate": 0.9230769230769231,
    "lastStatus": "passed",
-   "lastRunId": 1792802858083,
+   "lastRunId": 1792804730218,
    "lastFailure": {
     "runId": 1792405438366,
     "sha": "a47edaf9872878eaf90da1a47553db53e3a7e078",
@@ -5885,13 +5798,13 @@
   },
   "src/features/loadFeatures.test.ts": {
    "feature": "slice-loader",
-   "runs": 28,
+   "runs": 29,
    "lastMs": 6,
    "p50Ms": 3,
    "p95Ms": 7,
    "passRate": 1,
    "lastStatus": "passed",
-   "lastRunId": 1792802858083,
+   "lastRunId": 1792804730218,
    "lastFailure": null,
    "flaky": false,
    "slowest": []
@@ -5981,13 +5894,13 @@
   },
   "src/features/mining-gates/systems/botExtractorBuys.test.ts": {
    "feature": "mining-gates",
-   "runs": 25,
+   "runs": 26,
    "lastMs": 6301,
-   "p50Ms": 7228,
+   "p50Ms": 7064,
    "p95Ms": 13011,
-   "passRate": 0.96,
+   "passRate": 0.9615384615384616,
    "lastStatus": "passed",
-   "lastRunId": 1792802858083,
+   "lastRunId": 1792804730218,
    "lastFailure": {
     "runId": 1792573711044,
     "sha": "35beab70853ee558e5d86707af9f6a7cadb48f07",
@@ -6006,13 +5919,13 @@
   },
   "src/features/mining-gates/systems/botExtractors.test.ts": {
    "feature": "mining-gates",
-   "runs": 25,
+   "runs": 26,
    "lastMs": 474,
    "p50Ms": 236,
    "p95Ms": 474,
    "passRate": 1,
    "lastStatus": "passed",
-   "lastRunId": 1792802858083,
+   "lastRunId": 1792804730218,
    "lastFailure": null,
    "flaky": false,
    "slowest": [
@@ -6032,13 +5945,13 @@
   },
   "src/features/mining-gates/systems/botGates.test.ts": {
    "feature": "mining-gates",
-   "runs": 25,
+   "runs": 26,
    "lastMs": 355,
    "p50Ms": 315,
    "p95Ms": 403,
    "passRate": 1,
    "lastStatus": "passed",
-   "lastRunId": 1792802858083,
+   "lastRunId": 1792804730218,
    "lastFailure": null,
    "flaky": false,
    "slowest": [
@@ -6054,13 +5967,13 @@
   },
   "src/features/mining-gates/systems/botShaftJog.test.ts": {
    "feature": "mining-gates",
-   "runs": 25,
+   "runs": 26,
    "lastMs": 8808,
-   "p50Ms": 8900,
+   "p50Ms": 8878,
    "p95Ms": 11191,
-   "passRate": 0.92,
+   "passRate": 0.9230769230769231,
    "lastStatus": "passed",
-   "lastRunId": 1792802858083,
+   "lastRunId": 1792804730218,
    "lastFailure": {
     "runId": 1792768448845,
     "sha": "663d15e92d3c3f0815f7099e78b5b026e7c6699d",
@@ -7167,13 +7080,13 @@
   },
   "src/features/planet-mix/magneticBandValue.test.ts": {
    "feature": "planet-mix",
-   "runs": 25,
+   "runs": 26,
    "lastMs": 66957,
-   "p50Ms": 73814,
+   "p50Ms": 68719,
    "p95Ms": 94318,
    "passRate": 1,
    "lastStatus": "passed",
-   "lastRunId": 1792802858083,
+   "lastRunId": 1792804730218,
    "lastFailure": null,
    "flaky": false,
    "slowest": [
@@ -7206,13 +7119,13 @@
   },
   "src/features/planet-mix/magneticPlanetPace.test.ts": {
    "feature": "planet-mix",
-   "runs": 25,
+   "runs": 26,
    "lastMs": 1035437,
    "p50Ms": 414430,
    "p95Ms": 1656401,
-   "passRate": 0.92,
+   "passRate": 0.9230769230769231,
    "lastStatus": "passed",
-   "lastRunId": 1792802858083,
+   "lastRunId": 1792804730218,
    "lastFailure": {
     "runId": 1792573711044,
     "sha": "35beab70853ee558e5d86707af9f6a7cadb48f07",
@@ -7243,13 +7156,13 @@
   },
   "src/features/planet-mix/magneticPlanetRuns.test.ts": {
    "feature": "planet-mix",
-   "runs": 25,
+   "runs": 26,
    "lastMs": 39,
-   "p50Ms": 49,
+   "p50Ms": 46,
    "p95Ms": 83,
    "passRate": 1,
    "lastStatus": "passed",
-   "lastRunId": 1792802858083,
+   "lastRunId": 1792804730218,
    "lastFailure": null,
    "flaky": false,
    "slowest": []
@@ -8623,13 +8536,13 @@
   },
   "src/features/tech-tree/forkMixRuns.test.ts": {
    "feature": "tech-tree",
-   "runs": 26,
+   "runs": 27,
    "lastMs": 7822,
-   "p50Ms": 7160,
+   "p50Ms": 7236,
    "p95Ms": 11662,
    "passRate": 1,
    "lastStatus": "passed",
-   "lastRunId": 1792802858083,
+   "lastRunId": 1792804730218,
    "lastFailure": null,
    "flaky": false,
    "slowest": [
@@ -8675,13 +8588,13 @@
   },
   "src/features/tech-tree/rushHand.test.ts": {
    "feature": "tech-tree",
-   "runs": 26,
+   "runs": 27,
    "lastMs": 191,
-   "p50Ms": 175,
+   "p50Ms": 177,
    "p95Ms": 1492,
    "passRate": 1,
    "lastStatus": "passed",
-   "lastRunId": 1792802858083,
+   "lastRunId": 1792804730218,
    "lastFailure": null,
    "flaky": false,
    "slowest": [
@@ -8797,13 +8710,13 @@
   },
   "src/features/tech-tree/systems/forkBotPick.test.ts": {
    "feature": "tech-tree",
-   "runs": 26,
+   "runs": 27,
    "lastMs": 15795,
-   "p50Ms": 9566,
+   "p50Ms": 9670,
    "p95Ms": 15795,
    "passRate": 1,
    "lastStatus": "passed",
-   "lastRunId": 1792802858083,
+   "lastRunId": 1792804730218,
    "lastFailure": null,
    "flaky": false,
    "slowest": [
@@ -8984,13 +8897,13 @@
   },
   "src/features/tech-tree/systems/itemShop.test.ts": {
    "feature": "tech-tree",
-   "runs": 26,
+   "runs": 27,
    "lastMs": 197,
-   "p50Ms": 185,
+   "p50Ms": 189,
    "p95Ms": 222,
    "passRate": 1,
    "lastStatus": "passed",
-   "lastRunId": 1792802858083,
+   "lastRunId": 1792804730218,
    "lastFailure": null,
    "flaky": false,
    "slowest": []
@@ -9075,13 +8988,13 @@
   },
   "src/features/tech-tree/systems/nodeSpendShare.diagnostic.test.ts": {
    "feature": "tech-tree",
-   "runs": 26,
+   "runs": 27,
    "lastMs": 0,
    "p50Ms": 0,
    "p95Ms": 0,
    "passRate": 1,
    "lastStatus": "passed",
-   "lastRunId": 1792802858083,
+   "lastRunId": 1792804730218,
    "lastFailure": null,
    "flaky": false,
    "slowest": []
@@ -9244,13 +9157,13 @@
   },
   "src/features/tech-tree/systems/researchBotPurchase.test.ts": {
    "feature": "tech-tree",
-   "runs": 26,
+   "runs": 27,
    "lastMs": 9969,
    "p50Ms": 10147,
    "p95Ms": 59912,
    "passRate": 1,
    "lastStatus": "passed",
-   "lastRunId": 1792802858083,
+   "lastRunId": 1792804730218,
    "lastFailure": null,
    "flaky": false,
    "slowest": [
@@ -9444,13 +9357,13 @@
   },
   "src/features/terrain-tools/foamPace.test.ts": {
    "feature": "terrain-tools",
-   "runs": 27,
+   "runs": 28,
    "lastMs": 1182975,
    "p50Ms": 255884,
    "p95Ms": 1182975,
-   "passRate": 0.6296296296296297,
+   "passRate": 0.6428571428571429,
    "lastStatus": "passed",
-   "lastRunId": 1792802858083,
+   "lastRunId": 1792804730218,
    "lastFailure": {
     "runId": 1792735738681,
     "sha": "dca609908e4fa6c361bc34d78442dbbffed4eb4a",
@@ -9541,13 +9454,13 @@
   },
   "src/features/terrain-tools/magnetPace.test.ts": {
    "feature": "terrain-tools",
-   "runs": 26,
+   "runs": 27,
    "lastMs": 276179,
-   "p50Ms": 179147,
+   "p50Ms": 193759,
    "p95Ms": 1642410,
    "passRate": 1,
    "lastStatus": "passed",
-   "lastRunId": 1792802858083,
+   "lastRunId": 1792804730218,
    "lastFailure": null,
    "flaky": false,
    "slowest": [
@@ -11645,13 +11558,13 @@
   },
   "src/physics/physicsStats.test.ts": {
    "feature": "physics",
-   "runs": 26,
+   "runs": 27,
    "lastMs": 145,
-   "p50Ms": 117,
+   "p50Ms": 118,
    "p95Ms": 219,
    "passRate": 1,
    "lastStatus": "passed",
-   "lastRunId": 1792802858083,
+   "lastRunId": 1792804730218,
    "lastFailure": null,
    "flaky": false,
    "slowest": []
@@ -11993,13 +11906,13 @@
   },
   "src/scene/sprayIntake.test.ts": {
    "feature": "scene",
-   "runs": 26,
+   "runs": 27,
    "lastMs": 4,
    "p50Ms": 4,
    "p95Ms": 7,
    "passRate": 1,
    "lastStatus": "passed",
-   "lastRunId": 1792802858083,
+   "lastRunId": 1792804730218,
    "lastFailure": null,
    "flaky": false,
    "slowest": []
@@ -14601,13 +14514,13 @@
   },
   "src/systems/authority/moneyRounding.test.ts": {
    "feature": "authority",
-   "runs": 31,
+   "runs": 32,
    "lastMs": 12,
    "p50Ms": 5,
    "p95Ms": 29,
    "passRate": 1,
    "lastStatus": "passed",
-   "lastRunId": 1792802858083,
+   "lastRunId": 1792804730218,
    "lastFailure": null,
    "flaky": false,
    "slowest": []
@@ -15356,13 +15269,13 @@
   },
   "src/systems/bot/botBlasting.test.ts": {
    "feature": "bot",
-   "runs": 25,
+   "runs": 26,
    "lastMs": 9198,
-   "p50Ms": 9850,
+   "p50Ms": 9733,
    "p95Ms": 15830,
    "passRate": 1,
    "lastStatus": "passed",
-   "lastRunId": 1792802858083,
+   "lastRunId": 1792804730218,
    "lastFailure": null,
    "flaky": false,
    "slowest": [
@@ -15382,13 +15295,13 @@
   },
   "src/systems/bot/botBore.test.ts": {
    "feature": "bot",
-   "runs": 25,
+   "runs": 26,
    "lastMs": 3967,
-   "p50Ms": 4585,
+   "p50Ms": 4473,
    "p95Ms": 6757,
    "passRate": 1,
    "lastStatus": "passed",
-   "lastRunId": 1792802858083,
+   "lastRunId": 1792804730218,
    "lastFailure": null,
    "flaky": false,
    "slowest": [
@@ -15408,13 +15321,13 @@
   },
   "src/systems/bot/botChains.test.ts": {
    "feature": "bot",
-   "runs": 25,
+   "runs": 26,
    "lastMs": 616316,
    "p50Ms": 10585,
-   "p95Ms": 17351,
+   "p95Ms": 616316,
    "passRate": 1,
    "lastStatus": "passed",
-   "lastRunId": 1792802858083,
+   "lastRunId": 1792804730218,
    "lastFailure": null,
    "flaky": false,
    "slowest": [
@@ -15434,13 +15347,13 @@
   },
   "src/systems/bot/botChargeNeed.test.ts": {
    "feature": "bot",
-   "runs": 25,
+   "runs": 26,
    "lastMs": 23603,
-   "p50Ms": 25018,
+   "p50Ms": 24986,
    "p95Ms": 31223,
    "passRate": 1,
    "lastStatus": "passed",
-   "lastRunId": 1792802858083,
+   "lastRunId": 1792804730218,
    "lastFailure": null,
    "flaky": false,
    "slowest": [
@@ -15456,26 +15369,26 @@
   },
   "src/systems/bot/botCharges.test.ts": {
    "feature": "bot",
-   "runs": 25,
+   "runs": 26,
    "lastMs": 273,
    "p50Ms": 222,
    "p95Ms": 693,
    "passRate": 1,
    "lastStatus": "passed",
-   "lastRunId": 1792802858083,
+   "lastRunId": 1792804730218,
    "lastFailure": null,
    "flaky": false,
    "slowest": []
   },
   "src/systems/bot/botCombat.test.ts": {
    "feature": "bot",
-   "runs": 25,
+   "runs": 26,
    "lastMs": 977,
    "p50Ms": 530,
    "p95Ms": 1777,
    "passRate": 1,
    "lastStatus": "passed",
-   "lastRunId": 1792802858083,
+   "lastRunId": 1792804730218,
    "lastFailure": null,
    "flaky": false,
    "slowest": [
@@ -15495,13 +15408,13 @@
   },
   "src/systems/bot/botCoreGalleries.test.ts": {
    "feature": "bot",
-   "runs": 25,
+   "runs": 26,
    "lastMs": 4670,
-   "p50Ms": 5294,
+   "p50Ms": 5174,
    "p95Ms": 7364,
    "passRate": 1,
    "lastStatus": "passed",
-   "lastRunId": 1792802858083,
+   "lastRunId": 1792804730218,
    "lastFailure": null,
    "flaky": false,
    "slowest": [
@@ -15526,26 +15439,26 @@
   },
   "src/systems/bot/botDeathReplay.test.ts": {
    "feature": "bot",
-   "runs": 25,
+   "runs": 26,
    "lastMs": 30,
    "p50Ms": 28,
    "p95Ms": 89,
    "passRate": 1,
    "lastStatus": "passed",
-   "lastRunId": 1792802858083,
+   "lastRunId": 1792804730218,
    "lastFailure": null,
    "flaky": false,
    "slowest": []
   },
   "src/systems/bot/botGearLava.test.ts": {
    "feature": "bot",
-   "runs": 25,
+   "runs": 26,
    "lastMs": 161,
-   "p50Ms": 173,
+   "p50Ms": 170,
    "p95Ms": 263,
    "passRate": 1,
    "lastStatus": "passed",
-   "lastRunId": 1792802858083,
+   "lastRunId": 1792804730218,
    "lastFailure": null,
    "flaky": false,
    "slowest": [
@@ -15570,13 +15483,13 @@
   },
   "src/systems/bot/botHeat.test.ts": {
    "feature": "bot",
-   "runs": 25,
+   "runs": 26,
    "lastMs": 6356,
-   "p50Ms": 6969,
+   "p50Ms": 6895,
    "p95Ms": 9616,
    "passRate": 1,
    "lastStatus": "passed",
-   "lastRunId": 1792802858083,
+   "lastRunId": 1792804730218,
    "lastFailure": null,
    "flaky": false,
    "slowest": [
@@ -15614,13 +15527,13 @@
   },
   "src/systems/bot/botRefining.test.ts": {
    "feature": "bot",
-   "runs": 25,
+   "runs": 26,
    "lastMs": 1416617,
    "p50Ms": 49775,
-   "p95Ms": 313036,
+   "p95Ms": 1416617,
    "passRate": 1,
    "lastStatus": "passed",
-   "lastRunId": 1792802858083,
+   "lastRunId": 1792804730218,
    "lastFailure": null,
    "flaky": false,
    "slowest": [
@@ -15640,13 +15553,13 @@
   },
   "src/systems/bot/botRetreat.test.ts": {
    "feature": "bot",
-   "runs": 25,
+   "runs": 26,
    "lastMs": 13078,
-   "p50Ms": 14773,
+   "p50Ms": 14762,
    "p95Ms": 29564,
    "passRate": 1,
    "lastStatus": "passed",
-   "lastRunId": 1792802858083,
+   "lastRunId": 1792804730218,
    "lastFailure": null,
    "flaky": false,
    "slowest": [
@@ -15666,13 +15579,13 @@
   },
   "src/systems/bot/botShopping.test.ts": {
    "feature": "bot",
-   "runs": 25,
+   "runs": 26,
    "lastMs": 11907,
-   "p50Ms": 12912,
+   "p50Ms": 12672,
    "p95Ms": 152257,
-   "passRate": 0.92,
+   "passRate": 0.9230769230769231,
    "lastStatus": "passed",
-   "lastRunId": 1792802858083,
+   "lastRunId": 1792804730218,
    "lastFailure": {
     "runId": 1792573711044,
     "sha": "35beab70853ee558e5d86707af9f6a7cadb48f07",
@@ -15699,13 +15612,13 @@
   },
   "src/systems/bot/botSlicePurchases.test.ts": {
    "feature": "bot",
-   "runs": 25,
+   "runs": 26,
    "lastMs": 4721,
-   "p50Ms": 5903,
+   "p50Ms": 5779,
    "p95Ms": 57351,
    "passRate": 1,
    "lastStatus": "passed",
-   "lastRunId": 1792802858083,
+   "lastRunId": 1792804730218,
    "lastFailure": null,
    "flaky": false,
    "slowest": [
@@ -15738,13 +15651,13 @@
   },
   "src/systems/bot/botWallet.test.ts": {
    "feature": "bot",
-   "runs": 25,
+   "runs": 26,
    "lastMs": 1683,
    "p50Ms": 1651,
    "p95Ms": 5576,
    "passRate": 1,
    "lastStatus": "passed",
-   "lastRunId": 1792802858083,
+   "lastRunId": 1792804730218,
    "lastFailure": null,
    "flaky": false,
    "slowest": [
@@ -15795,13 +15708,13 @@
   },
   "src/systems/bot/endlessPlanning.test.ts": {
    "feature": "bot",
-   "runs": 25,
+   "runs": 26,
    "lastMs": 2539,
-   "p50Ms": 3753,
+   "p50Ms": 3653,
    "p95Ms": 5942,
    "passRate": 1,
    "lastStatus": "passed",
-   "lastRunId": 1792802858083,
+   "lastRunId": 1792804730218,
    "lastFailure": null,
    "flaky": false,
    "slowest": [
@@ -15817,13 +15730,13 @@
   },
   "src/systems/bot/itemHookNoFreeCell.test.ts": {
    "feature": "bot",
-   "runs": 25,
+   "runs": 26,
    "lastMs": 282197,
    "p50Ms": 161220,
    "p95Ms": 1129217,
    "passRate": 1,
    "lastStatus": "passed",
-   "lastRunId": 1792802858083,
+   "lastRunId": 1792804730218,
    "lastFailure": null,
    "flaky": false,
    "slowest": [
@@ -15852,26 +15765,26 @@
   },
   "src/systems/bot/noFreeCellRuns.test.ts": {
    "feature": "bot",
-   "runs": 25,
+   "runs": 26,
    "lastMs": 90,
    "p50Ms": 69,
    "p95Ms": 97,
    "passRate": 1,
    "lastStatus": "passed",
-   "lastRunId": 1792802858083,
+   "lastRunId": 1792804730218,
    "lastFailure": null,
    "flaky": false,
    "slowest": []
   },
   "src/systems/bot/paceArrival.test.ts": {
    "feature": "bot",
-   "runs": 25,
+   "runs": 26,
    "lastMs": 216,
    "p50Ms": 74,
    "p95Ms": 555,
    "passRate": 1,
    "lastStatus": "passed",
-   "lastRunId": 1792802858083,
+   "lastRunId": 1792804730218,
    "lastFailure": null,
    "flaky": false,
    "slowest": []
@@ -16091,13 +16004,13 @@
   },
   "src/systems/economy/economySourceScan.test.ts": {
    "feature": "economy",
-   "runs": 31,
+   "runs": 32,
    "lastMs": 290,
    "p50Ms": 148,
    "p95Ms": 346,
-   "passRate": 0.9354838709677419,
+   "passRate": 0.9375,
    "lastStatus": "passed",
-   "lastRunId": 1792802858083,
+   "lastRunId": 1792804730218,
    "lastFailure": {
     "runId": 1792669172174,
     "sha": "d95dcc66eb0c80f89cc35a6cd672d3af935b955d",
@@ -16420,13 +16333,13 @@
   },
   "src/systems/hints/hintAcceptance.test.ts": {
    "feature": "hints",
-   "runs": 25,
+   "runs": 26,
    "lastMs": 4612,
-   "p50Ms": 5114,
+   "p50Ms": 4961,
    "p95Ms": 8709,
    "passRate": 1,
    "lastStatus": "passed",
-   "lastRunId": 1792802858083,
+   "lastRunId": 1792804730218,
    "lastFailure": null,
    "flaky": false,
    "slowest": [
@@ -18313,13 +18226,13 @@
   },
   "src/systems/save/saveDeterminism.test.ts": {
    "feature": "save",
-   "runs": 25,
+   "runs": 26,
    "lastMs": 24,
-   "p50Ms": 25,
+   "p50Ms": 24,
    "p95Ms": 33,
    "passRate": 1,
    "lastStatus": "passed",
-   "lastRunId": 1792802858083,
+   "lastRunId": 1792804730218,
    "lastFailure": null,
    "flaky": false,
    "slowest": []
@@ -18339,13 +18252,13 @@
   },
   "src/systems/save/saveExactRoundTrip.test.ts": {
    "feature": "save",
-   "runs": 25,
+   "runs": 26,
    "lastMs": 666,
-   "p50Ms": 694,
+   "p50Ms": 688,
    "p95Ms": 1136,
    "passRate": 1,
    "lastStatus": "passed",
-   "lastRunId": 1792802858083,
+   "lastRunId": 1792804730218,
    "lastFailure": null,
    "flaky": false,
    "slowest": [
@@ -19169,13 +19082,13 @@
   },
   "src/systems/vehicle/vehicleStats.test.ts": {
    "feature": "vehicle",
-   "runs": 31,
+   "runs": 32,
    "lastMs": 11,
    "p50Ms": 12,
    "p95Ms": 20,
    "passRate": 1,
    "lastStatus": "passed",
-   "lastRunId": 1792802858083,
+   "lastRunId": 1792804730218,
    "lastFailure": null,
    "flaky": false,
    "slowest": []
@@ -20584,13 +20497,13 @@
   },
   "src/debug/debugDevFlags.test.ts": {
    "feature": "debug",
-   "runs": 25,
+   "runs": 26,
    "lastMs": 24,
    "p50Ms": 23,
    "p95Ms": 54,
    "passRate": 1,
    "lastStatus": "passed",
-   "lastRunId": 1792802858083,
+   "lastRunId": 1792804730218,
    "lastFailure": null,
    "flaky": false,
    "slowest": []
@@ -20867,6 +20780,79 @@
    "flaky": false,
    "slowest": []
   },
+  "src/logging/assayPacingGate.test.ts": {
+   "feature": "pacing-bot",
+   "runs": 17,
+   "lastMs": 60054,
+   "p50Ms": 69707,
+   "p95Ms": 240241,
+   "passRate": 1,
+   "lastStatus": "passed",
+   "lastRunId": 1792790652375,
+   "lastFailure": null,
+   "flaky": false,
+   "slowest": [
+    [
+     "balance regression: the pacing bot holding assay_beacon (#46, S11) passes the first-ten-minutes, planet 1 core and slice gates on the seed median",
+     60052
+    ]
+   ]
+  },
+  "src/logging/pacingGate.test.ts": {
+   "feature": "pacing-bot",
+   "runs": 17,
+   "lastMs": 93545,
+   "p50Ms": 103659,
+   "p95Ms": 183653,
+   "passRate": 0.7647058823529411,
+   "lastStatus": "passed",
+   "lastRunId": 1792790652375,
+   "lastFailure": {
+    "runId": 1792735738681,
+    "sha": "dca609908e4fa6c361bc34d78442dbbffed4eb4a",
+    "at": "2026-10-22T23:45:39Z",
+    "tests": [
+     "balance regression: the pacing bot on the slice (#29, S11) meets the first-sale, first-upgrade, ten-minute, core and slice targets on the seed median"
+    ]
+   },
+   "flaky": false,
+   "slowest": [
+    [
+     "balance regression: the pacing bot on the slice (#29, S11) meets the first-sale, first-upgrade, ten-minute, core and slice targets on the seed median",
+     73741
+    ],
+    [
+     "balance regression: the pacing bot on the slice (#29, S11) derives the same summary from a second run of the same scenario",
+     19739
+    ]
+   ]
+  },
+  "src/systems/bot/playSlice.test.ts": {
+   "feature": "pacing-bot",
+   "runs": 17,
+   "lastMs": 47923,
+   "p50Ms": 57118,
+   "p95Ms": 900536,
+   "passRate": 1,
+   "lastStatus": "passed",
+   "lastRunId": 1792790652375,
+   "lastFailure": null,
+   "flaky": false,
+   "slowest": [
+    [
+     "pacing bot plays a fresh planet 1 through to the planet 2 core inside its budget",
+     19905
+    ],
+    [
+     "pacing bot replays from the world seed and its own commands to the same digests and state",
+     16385
+    ],
+    [
+     "pacing bot save size (#36 acceptance 4) keeps the save of a 60-minute run under 1 MB",
+     11611
+    ]
+   ]
+  },
   "src/features/drill-look/drillLook.test.ts": {
    "feature": "drill-look",
    "runs": 21,
@@ -21093,13 +21079,13 @@
   },
   "src/debug/debugMaterialPop.test.ts": {
    "feature": "debug",
-   "runs": 20,
+   "runs": 21,
    "lastMs": 9,
    "p50Ms": 8,
    "p95Ms": 21,
    "passRate": 1,
    "lastStatus": "passed",
-   "lastRunId": 1792802858083,
+   "lastRunId": 1792804730218,
    "lastFailure": null,
    "flaky": false,
    "slowest": []
@@ -21561,13 +21547,13 @@
   },
   "src/systems/bot/botMarginalOffers.test.ts": {
    "feature": "bot",
-   "runs": 20,
+   "runs": 21,
    "lastMs": 35,
-   "p50Ms": 33,
+   "p50Ms": 34,
    "p95Ms": 53,
    "passRate": 1,
    "lastStatus": "passed",
-   "lastRunId": 1792802858083,
+   "lastRunId": 1792804730218,
    "lastFailure": null,
    "flaky": false,
    "slowest": []
@@ -22167,26 +22153,26 @@
   },
   "src/features/terrain-tools/foamPaceGate.test.ts": {
    "feature": "terrain-tools",
-   "runs": 17,
+   "runs": 18,
    "lastMs": 5,
    "p50Ms": 3,
    "p95Ms": 5,
    "passRate": 1,
    "lastStatus": "passed",
-   "lastRunId": 1792802858083,
+   "lastRunId": 1792804730218,
    "lastFailure": null,
    "flaky": false,
    "slowest": []
   },
   "src/debug/debugBot.test.ts": {
    "feature": "debug",
-   "runs": 14,
+   "runs": 15,
    "lastMs": 30528,
-   "p50Ms": 23920,
+   "p50Ms": 24515,
    "p95Ms": 33161,
    "passRate": 1,
    "lastStatus": "passed",
-   "lastRunId": 1792802858083,
+   "lastRunId": 1792804730218,
    "lastFailure": null,
    "flaky": false,
    "slowest": [
@@ -22198,26 +22184,26 @@
   },
   "src/debug/debugHudCoverage.test.ts": {
    "feature": "debug",
-   "runs": 14,
+   "runs": 15,
    "lastMs": 10,
-   "p50Ms": 8,
+   "p50Ms": 9,
    "p95Ms": 12,
    "passRate": 1,
    "lastStatus": "passed",
-   "lastRunId": 1792802858083,
+   "lastRunId": 1792804730218,
    "lastFailure": null,
    "flaky": false,
    "slowest": []
   },
   "src/debug/debugSheet.test.ts": {
    "feature": "debug",
-   "runs": 14,
+   "runs": 15,
    "lastMs": 42,
-   "p50Ms": 24,
+   "p50Ms": 25,
    "p95Ms": 42,
    "passRate": 1,
    "lastStatus": "passed",
-   "lastRunId": 1792802858083,
+   "lastRunId": 1792804730218,
    "lastFailure": null,
    "flaky": false,
    "slowest": []
@@ -22511,13 +22497,13 @@
   },
   "src/systems/bot/botArrival.test.ts": {
    "feature": "bot",
-   "runs": 14,
+   "runs": 15,
    "lastMs": 35702,
-   "p50Ms": 22002,
+   "p50Ms": 22667,
    "p95Ms": 56419,
    "passRate": 1,
    "lastStatus": "passed",
-   "lastRunId": 1792802858083,
+   "lastRunId": 1792804730218,
    "lastFailure": null,
    "flaky": false,
    "slowest": [
@@ -22572,13 +22558,13 @@
   },
   "src/systems/save/saveTextRoundTrip.test.ts": {
    "feature": "save",
-   "runs": 14,
+   "runs": 15,
    "lastMs": 785,
    "p50Ms": 785,
    "p95Ms": 3109,
    "passRate": 1,
    "lastStatus": "passed",
-   "lastRunId": 1792802858083,
+   "lastRunId": 1792804730218,
    "lastFailure": null,
    "flaky": false,
    "slowest": [
@@ -22868,13 +22854,13 @@
   },
   "src/debug/debugWarnings.test.ts": {
    "feature": "debug",
-   "runs": 13,
+   "runs": 14,
    "lastMs": 101,
    "p50Ms": 68,
    "p95Ms": 101,
    "passRate": 1,
    "lastStatus": "passed",
-   "lastRunId": 1792802858083,
+   "lastRunId": 1792804730218,
    "lastFailure": null,
    "flaky": false,
    "slowest": []
@@ -23291,13 +23277,13 @@
   },
   "src/systems/bot/sidewaysBores.test.ts": {
    "feature": "bot",
-   "runs": 10,
+   "runs": 11,
    "lastMs": 120,
-   "p50Ms": 95,
+   "p50Ms": 120,
    "p95Ms": 128,
    "passRate": 1,
    "lastStatus": "passed",
-   "lastRunId": 1792802858083,
+   "lastRunId": 1792804730218,
    "lastFailure": null,
    "flaky": false,
    "slowest": [
@@ -23653,13 +23639,13 @@
   },
   "src/systems/bot/downBores.test.ts": {
    "feature": "bot",
-   "runs": 8,
+   "runs": 9,
    "lastMs": 171,
-   "p50Ms": 136,
+   "p50Ms": 164,
    "p95Ms": 350,
    "passRate": 1,
    "lastStatus": "passed",
-   "lastRunId": 1792802858083,
+   "lastRunId": 1792804730218,
    "lastFailure": null,
    "flaky": false,
    "slowest": [
