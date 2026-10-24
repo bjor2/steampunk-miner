@@ -170,11 +170,24 @@
   opacity: 0.8;
 }
 
-.button[data-action='interact'] {
+.button[data-action='interact'],
+.button[data-action='undock'] {
   grid-area: interact;
   width: 72px;
   height: 72px;
   font-size: 2rem;
+}
+
+/*
+ * Docked, the Dock button stays in its slot as Undock (ticket 794), drawn held down: lit, with a
+ * sunk brass ring. It rides above the full sheet, which draws after the controls, so a tap from
+ * the sheet still reaches it.
+ */
+.button[data-action='undock'] {
+  position: relative;
+  z-index: 1;
+  opacity: 0.8;
+  box-shadow: inset 0 0 0 3px var(--color-brass);
 }
 
 .button[data-action='request_rescue'],

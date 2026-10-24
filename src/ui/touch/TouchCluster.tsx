@@ -1,7 +1,8 @@
 /**
- * The right thumb's cluster (#173): Interact at 72 px and the other buttons at 56, each shown only
- * while its action is valid, each a glyph with no text. One row in the corner since ticket 691:
- * Plant charge, its size badge (ticket 473) and the guns toggle are tool slot bar cells.
+ * The right thumb's cluster (#173): Interact at 72 px (Undock in its slot while docked, ticket 794)
+ * and the other buttons at 56, each shown only while its action is valid, each a glyph with no
+ * text. One row in the corner since ticket 691: Plant charge, its size badge (ticket 473) and the
+ * guns toggle are tool slot bar cells.
  */
 import { clusterIconIdOf, type ClusterActionId } from '../../systems/input/touchControls'
 import { DEVICE_UI_IDS } from '../stage/deviceIds'

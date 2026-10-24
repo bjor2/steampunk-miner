@@ -28,9 +28,11 @@ import type { ActionId, InputContext } from './actionMap'
  * the guns toggle are tool slot bar cells since ticket 691 (the G&V ruling, option 1), so the
  * cluster keeps one row in the corner. The star map's button left it for the HUD's top row in
  * ticket 792 (`starMapEntry.ts`): a faint glyph that showed only after a touch was not findable.
+ * Undock takes Interact's slot and glyph while docked (ticket 794), so the Dock button toggles.
  */
 export const CLUSTER_ACTION_IDS = [
   'interact',
+  'undock',
   'request_rescue',
   'quick_service',
 ] as const satisfies readonly ActionId[]
@@ -193,14 +195,21 @@ export function heldChangesOf(
 
 const CLUSTER_ICON_IDS: Readonly<Record<ClusterActionId, string>> = {
   interact: vehicleStateIconIdOf('docked'),
+  undock: vehicleStateIconIdOf('docked'),
   request_rescue: combatStatusIconIdOf('tow'),
   quick_service: buttonIconIdOf('quick_service'),
 }
 
 const CLUSTER_RULES: Readonly<Record<ClusterActionId, (situation: TouchSituation) => boolean>> = {
   interact: ({ layer }) => layer === 'vehicle',
+  undock: isDockedUnderStationScreen,
   request_rescue: ({ layer, vehicleMode }) => layer === 'vehicle' && isWaitingForTow(vehicleMode),
   quick_service: ({ layer, dockedBay }) => layer === 'platform' && dockedBay === 'sell',
+}
+
+/** The bay screen, or the sheet over it, while docked: `undock`'s layers (ticket 794). */
+function isDockedUnderStationScreen({ layer, dockedBay }: TouchSituation): boolean {
+  return dockedBay !== null && (layer === 'platform' || layer === 'sheet')
 }
 
 function isChargeSizeSteppable({ layer, hasChargeRack, nextChargeSize }: TouchSituation): boolean {

@@ -86,11 +86,25 @@ describe('touch cluster (#173)', () => {
     expect(clusterActionsOf(AT_REST_P1)).toEqual(['interact'])
   })
 
+  it('keeps the Dock button on screen as Undock while docked, over the bay or the sheet (794)', () => {
+    expect(clusterActionsOf({ ...AT_REST_P1, layer: 'platform', dockedBay: 'upgrade' })).toEqual([
+      'undock',
+    ])
+    expect(clusterActionsOf({ ...AT_REST_P1, layer: 'sheet', dockedBay: 'refinery' })).toEqual([
+      'undock',
+    ])
+    expect(clusterActionsOf({ ...AT_REST_P1, layer: 'sheet' })).toEqual([])
+    expect(clusterIconIdOf('undock')).toBe(clusterIconIdOf('interact'))
+  })
+
   it('adds Quick service docked at the Sell bay and drops the driving buttons', () => {
     expect(clusterActionsOf({ ...AT_REST_P1, layer: 'platform', dockedBay: 'sell' })).toEqual([
+      'undock',
       'quick_service',
     ])
-    expect(clusterActionsOf({ ...AT_REST_P1, layer: 'platform', dockedBay: 'upgrade' })).toEqual([])
+    expect(clusterActionsOf({ ...AT_REST_P1, layer: 'platform', dockedBay: 'upgrade' })).toEqual([
+      'undock',
+    ])
   })
 
   it('leaves the star map to its labelled HUD button, off the cluster (ticket 792)', () => {

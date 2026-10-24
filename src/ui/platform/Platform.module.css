@@ -127,6 +127,12 @@
   align-items: center;
 }
 
+/* Undock and its desktop key tag (ticket 794) stay on one line, as one footer control. */
+.undock {
+  display: inline-flex;
+  align-items: center;
+}
+
 .action {
   display: inline-flex;
   gap: var(--space-2);

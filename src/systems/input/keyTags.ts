@@ -2,7 +2,8 @@
  * The brass key tags desktop draws (spec #678, ticket 768; Progression's key tags in the GD lock
  * of 23 Oct): the key that presses a tool slot cell, jumps to a sheet tab or opens the star map
  * (ticket 769), as the player reads
- * it from the bindings in force, so a rebinding shows at once. A phone draws none. Pure.
+ * it from the bindings in force, so a rebinding shows at once. A phone draws none. Pure. The bay's
+ * Undock button carries the Dock key that undocks (ticket 794).
  */
 import { tabAtPlace, type SheetPlace } from '../views/sheetPlaces'
 import { boundLabel, type ActionId, type Bindings } from './actionMap'
@@ -38,6 +39,11 @@ export function sheetTabKeyLabelsOf(
 /** The star map button's key (ticket 769): `open_star_map`'s first key; null with none bound. */
 export function starMapKeyLabelOf(bindings: Bindings): string | null {
   return bindings.open_star_map.length > 0 ? boundLabel(bindings, 'open_star_map') : null
+}
+
+/** The Undock button's key (ticket 794): `undock`'s first key; null with none bound. */
+export function undockKeyLabelOf(bindings: Bindings): string | null {
+  return bindings.undock.length > 0 ? boundLabel(bindings, 'undock') : null
 }
 
 function placeKeyEntryOf(
