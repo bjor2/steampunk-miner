@@ -1,0 +1,137 @@
+/*
+ * The star map carousel's hero (ticket 796, ticket 795's look notes): the preview at 160 px on a
+ * phone and 256 px in the desktop dock, never past 256 CSS px, between the 48 px Previous and Next
+ * chevrons; it sits on the sheet's own colour, its haze carrying alpha. A step crossfades the new
+ * picture in over the tokens' standard 160 ms, a cut under reduced motion. A drag across it is the
+ * carousel's (`touch-action: pan-y`), so the chart still scrolls up and down under a finger. A
+ * dimmed planet drains its picture as the old rows drained their glyph, and keeps its numbers.
+ */
+.hero {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: var(--hero-size, 160px);
+  touch-action: pan-y;
+  user-select: none;
+}
+
+:global([data-placement='docked']) .hero {
+  --hero-size: 256px;
+}
+
+.picture,
+.glyph {
+  width: min(var(--hero-size, 160px), 100%);
+  height: auto;
+  aspect-ratio: 1;
+  animation: hero-in var(--motion-standard) var(--ease-enter);
+}
+
+.hero[data-motion='cut'] .picture,
+.hero[data-motion='cut'] .glyph {
+  animation: none;
+}
+
+@keyframes hero-in {
+  from {
+    opacity: 0;
+  }
+}
+
+.picture[data-dimmed],
+.glyph[data-dimmed] {
+  filter: saturate(0.25) brightness(0.7);
+}
+
+/* The glyph stand-in: the map's planet sprite over its tinted disc (ticket 758). */
+.glyph {
+  position: relative;
+  display: block;
+  background: var(
+      --art-star-map-planet,
+      radial-gradient(circle, transparent 44%, var(--color-brass) 46% 50%, transparent 52%)
+    )
+    center / 100% 100% no-repeat;
+}
+
+.disc {
+  position: absolute;
+  inset: 0;
+  background: var(--planet-colour, var(--color-brass));
+  mask: var(--art-star-map-planet-tint, radial-gradient(circle, black 44%, transparent 46%))
+    center / 100% 100% no-repeat;
+  -webkit-mask: var(--art-star-map-planet-tint, radial-gradient(circle, black 44%, transparent 46%))
+    center / 100% 100% no-repeat;
+}
+
+/* Previous and Next: 48 px brass-framed chevrons at the hero's sides, over its haze. */
+.step {
+  position: absolute;
+  top: 50%;
+  z-index: 1;
+  width: 48px;
+  height: 48px;
+  margin-top: -24px;
+  padding: 0;
+  border: 1px solid var(--color-brass);
+  border-radius: var(--radius-panel);
+  background: rgb(0 0 0 / 0.35);
+  cursor: pointer;
+  pointer-events: auto;
+}
+
+.step:first-child {
+  left: 0;
+}
+
+.step:last-child {
+  right: 0;
+}
+
+.step::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 12px;
+  height: 12px;
+  border-top: var(--frame-double) solid var(--color-parchment);
+  border-left: var(--frame-double) solid var(--color-parchment);
+  transform: translate(-30%, -50%) rotate(-45deg);
+}
+
+.step:last-child::before {
+  transform: translate(-70%, -50%) rotate(135deg);
+}
+
+.step:disabled {
+  border-color: var(--color-steel);
+  cursor: default;
+  opacity: 0.4;
+}
+
+.step:focus-visible {
+  outline: var(--frame-bezel) solid var(--color-amber);
+}
+
+@media (hover: hover) {
+  .step:not(:disabled):hover {
+    background: rgb(201 162 75 / 0.15);
+  }
+}
+
+.card {
+  padding: var(--space-2);
+  border: var(--frame-hairline) solid var(--color-steel);
+  border-radius: var(--radius-panel);
+}
+
+.card[data-here] {
+  border-color: var(--color-brass);
+}
+
+.card[data-dimmed] h3,
+.card[data-dimmed] p {
+  color: var(--color-steel);
+}

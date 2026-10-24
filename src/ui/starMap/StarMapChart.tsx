@@ -1,77 +1,120 @@
 /**
- * The star map's chart (ticket 757; the GD lock on #650, Map UX): the fuel tank, then the system
- * view (ticket 758, the map art pass): the sun at the head of a brass rail and one row per planet
- * of the session's system strung along it, each a planet glyph in the planet's own ground colour
- * (the `art.starMap` sprites, the planet's disc tinted through its mask) with the fuel its jump
- * burns, what that fuel costs and a line of the tank against it with any shortfall. The planet the
- * session is on wears the here ring; a planet the player cannot afford is dimmed, never locked or
- * hidden. Since ticket 793 each other planet carries its Jump (two presses) and, at the Sell bay,
- * a Buy fuel for its shortfall; the tank its next level and the drive its offer there, and the
- * system's last planet the jump on to the next system once the drive is fitted (`StarMapActions`).
- * The same chart fills the phone's full panel and desktop's docked one. Drawn from `starMapViewOf`
- * and `starMapControlsOf`; markup only.
+ * The star map's chart (ticket 757; the GD lock on #650, Map UX), drawn since ticket 796 as a
+ * carousel (Bjor, 24 Oct: the planets visualised, swiped or stepped through, moving on the solar
+ * map between them): the shown planet as the hero with its card (name, the tank's line, the jump's
+ * fuel and price, its gravity, and ticket 793's Buy fuel and Jump), then the system strip panned
+ * toward it, the fuel tank with its next level at the Sell bay, the jump drive's offer and, on the
+ * system's last planet, the way on. A planet the player cannot afford is dimmed, never locked or
+ * hidden. Opening the map shows the planet the session is on.
+ *
+ * Both layouts are first-class: a narrow panel (a phone upright, the desktop dock) stacks the hero
+ * over the strip; a wide one (a phone on its side) sets the strip and the tank left of the hero
+ * and its controls. Drawn from `starMapViewOf`, `starMapCarouselOf` and `starMapControlsOf`;
+ * markup only.
  */
-import type { CSSProperties } from 'react'
+import { useMemo, type CSSProperties } from 'react'
+import { SHIPPED_ART } from '../../scene/shippedArt'
+import { getShell } from '../../shell/shell'
 import { useGameStore } from '../../store/gameStore'
-import { readStarMapControls, readStarMapModel } from '../../store/screenReads'
-import { buttonIconIdOf, hudLabelIconIdOf } from '../../systems/art/icons/iconSet'
-import type { ElementText } from '../../systems/views/uiText'
+import { readStarMapCarousel, readStarMapControls, readStarMapModel } from '../../store/screenReads'
+import { buttonIconIdOf } from '../../systems/art/icons/iconSet'
+import {
+  previewImagesAt,
+  starMapCarouselImagesOf,
+  type StarMapCarouselImages,
+} from '../../systems/art/starMapCarouselImages'
+import { UI_ASSETS_URL } from '../../systems/art/uiArt'
+import type { StarMapCarousel } from '../../systems/views/starMapCarousel'
 import type { JumpControls, StarMapControls } from '../../systems/views/starMapControls'
-import type { StarMapPlanet, StarMapTank, StarMapView } from '../../systems/views/starMapView'
+import type { StarMapTank, StarMapView } from '../../systems/views/starMapView'
+import type { ElementText } from '../../systems/views/uiText'
 import { TitleOneLine, type IconValue } from '../kit/TitleOneLine'
 import { useScreenModel } from '../useScreenModel'
-import {
-  JumpActions,
-  JumpDriveOffer,
-  JumpOutOffer,
-  PurchaseAction,
-  purchaseFactOf,
-} from './StarMapActions'
-import { starMapGlyphIdOf, starMapPlanetIdOf, STAR_MAP_UI_IDS } from './starMapIds'
+import { JumpDriveOffer, JumpOutOffer, PurchaseAction, purchaseFactOf } from './StarMapActions'
+import { StarMapHero, StarMapPlanetCard } from './StarMapHero'
+import { STAR_MAP_UI_IDS } from './starMapIds'
+import { StarMapSystemStrip } from './StarMapSystemStrip'
+import { useCarouselSwipe } from './useCarouselSwipe'
 import styles from './StarMapChart.module.css'
 
 const FUEL_ICON_ID = buttonIconIdOf('travel')
-const MONEY_ICON_ID = hudLabelIconIdOf('money')
 const PERMILLE = 1000
 
 export function StarMapChart() {
   const map = useScreenModel(readStarMapModel)
+  const carousel = useScreenModel(readStarMapCarousel)
   const controls = useScreenModel(readStarMapControls)
   const focusedId = useGameStore((state) => state.focusedControlId)
-  return <StarMapChartView map={map} controls={controls} focusedId={focusedId} />
+  const isMotionReduced = useGameStore((state) => !state.prefs.shake)
+  const images = useMemo(shippedCarouselImages, [])
+  return (
+    <StarMapChartView
+      map={map}
+      carousel={carousel}
+      controls={controls}
+      focusedId={focusedId}
+      isMotionReduced={isMotionReduced}
+      images={images}
+    />
+  )
 }
 
 export function StarMapChartView({
   map,
+  carousel,
   controls,
   focusedId,
+  isMotionReduced,
+  images,
 }: {
   map: StarMapView
+  carousel: StarMapCarousel
   controls: StarMapControls
   focusedId: string | null
+  isMotionReduced: boolean
+  images: StarMapCarouselImages
 }) {
+  const swipe = useCarouselSwipe()
+  const picture = previewImagesAt(images, carousel.planet.previewAssetId).hero
   return (
     <div className={styles.chart} data-testid={STAR_MAP_UI_IDS.starMapChart}>
-      <FuelTank tank={map.tank} controls={controls} focusedId={focusedId} />
-      {controls.buyDrive !== null && (
-        <JumpDriveOffer purchase={controls.buyDrive} focusedId={focusedId} />
-      )}
-      <ol className={styles.system}>
-        <li className={styles.sun} data-testid={STAR_MAP_UI_IDS.starMapSun} aria-hidden />
-        {map.planets.map((planet) => (
-          <PlanetOnMap
-            key={planet.place}
-            planet={planet}
-            jump={jumpAt(controls, planet.place)}
+      <div className={styles.layout}>
+        <section className={styles.showcase}>
+          <StarMapHero
+            carousel={carousel}
+            picture={picture}
+            isMotionReduced={isMotionReduced}
+            swipe={swipe}
+          />
+          <StarMapPlanetCard
+            planet={carousel.planet}
+            jump={jumpAt(controls, carousel.planet.place)}
             focusedId={focusedId}
           />
-        ))}
-      </ol>
-      {controls.jumpOut !== null && (
-        <JumpOutOffer controls={controls.jumpOut} focusedId={focusedId} />
-      )}
+        </section>
+        <section className={styles.system}>
+          <StarMapSystemStrip
+            strip={carousel.strip}
+            images={images}
+            isMotionReduced={isMotionReduced}
+            swipe={swipe}
+          />
+          <FuelTank tank={map.tank} controls={controls} focusedId={focusedId} />
+          {controls.buyDrive !== null && (
+            <JumpDriveOffer purchase={controls.buyDrive} focusedId={focusedId} />
+          )}
+          {controls.jumpOut !== null && (
+            <JumpOutOffer controls={controls.jumpOut} focusedId={focusedId} />
+          )}
+        </section>
+      </div>
     </div>
   )
+}
+
+/** The shipped sprites under the page's URL, as `UiArtTokens` names them (ticket 770). */
+function shippedCarouselImages(): StarMapCarouselImages {
+  return starMapCarouselImagesOf(SHIPPED_ART, getShell().resolvePageUrl(UI_ASSETS_URL))
 }
 
 /** The tank's level and bar, with its next level's price and button at the Sell bay. */
@@ -96,6 +139,7 @@ function FuelTank({
   )
 }
 
+/** The shown planet's Jump and Buy fuel; null on the planet the session is on. */
 function jumpAt(controls: StarMapControls, place: number): JumpControls | null {
   return controls.planets.find((planet) => planet.place === place) ?? null
 }
@@ -118,46 +162,6 @@ function TankBar({ fillPermille }: { fillPermille: number }) {
   )
 }
 
-function PlanetOnMap({
-  planet,
-  jump,
-  focusedId,
-}: {
-  planet: StarMapPlanet
-  /** Null on the planet the session is on. */
-  jump: JumpControls | null
-  focusedId: string | null
-}) {
-  return (
-    <li
-      className={styles.planet}
-      data-testid={starMapPlanetIdOf(planet.place)}
-      data-here={planet.isHere || undefined}
-      data-dimmed={planet.isDimmed || undefined}
-    >
-      <PlanetGlyph planet={planet} />
-      <TitleOneLine text={planetTextOf(planet)} facts={planetFactsOf(planet)}>
-        {jump !== null && <JumpActions controls={jump} focusedId={focusedId} />}
-      </TitleOneLine>
-    </li>
-  )
-}
-
-/** The planet sprite in the planet's ground colour, ringed when the session is on it. */
-function PlanetGlyph({ planet }: { planet: StarMapPlanet }) {
-  return (
-    <span
-      className={styles.glyph}
-      data-testid={starMapGlyphIdOf(planet.place)}
-      style={colourStyleOf(planet.colour)}
-      aria-hidden
-    >
-      <span className={styles.disc} />
-      {planet.isHere && <span className={styles.here} />}
-    </span>
-  )
-}
-
 const TANK_TEXT: ElementText = {
   id: 'star-map.tank',
   title: 'Fuel tank',
@@ -171,22 +175,4 @@ function tankFactsOf({ held, capacity }: StarMapTank): IconValue[] {
 
 function fillStyleOf(fillPermille: number): CSSProperties {
   return { '--fill': fillPermille / PERMILLE } as CSSProperties
-}
-
-function colourStyleOf(colour: string): CSSProperties {
-  return { '--planet-colour': colour } as CSSProperties
-}
-
-function planetTextOf(planet: StarMapPlanet): ElementText {
-  const id = `star-map.planet.${planet.place}`
-  return { id, title: planet.name, oneLine: planet.line, tooltipLines: [] }
-}
-
-/** The jump's fuel and its price; the planet the session is on has neither. */
-function planetFactsOf({ fuel, fee, isDimmed }: StarMapPlanet): IconValue[] {
-  if (fuel === null || fee === null) return []
-  return [
-    { iconId: FUEL_ICON_ID, text: fuel.text, exact: fuel.exact, holds: 'needs' },
-    { iconId: MONEY_ICON_ID, ...fee, holds: 'price', isMoneyShort: isDimmed },
-  ]
 }

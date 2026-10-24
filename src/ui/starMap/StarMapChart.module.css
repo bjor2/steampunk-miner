@@ -1,18 +1,47 @@
 /*
- * The star map's chart (ticket 757; the art pass of ticket 758): the tank with its bar over the
- * system view, a brass rail from the sun at the head down through one framed row per planet. Each
- * row's glyph is the `art.starMap` planet sprite with its disc tinted the planet's ground colour
- * through the sprite's mask (as the dial's face is skinned, kit/Gauge.module.css); the planet the
- * session is on wears the here ring; a planet the player cannot afford dims to steel and drains
- * its glyph's colour, as a muted sheet card does, and keeps every number. While the asset is a
- * placeholder the CSS discs behind the `var()`s stand in, so nothing waits on art. Sizes are the
- * sprites' 1x sizes (design-system.md section 13); the rail and the gaps are spacing tokens.
+ * The star map's chart (ticket 757; the art pass of ticket 758; the carousel of ticket 796): the
+ * showcase (the shown planet's hero and card) and the system column (the panned strip, the tank
+ * with its bar, the drive's and the next system's offers). The chart is an inline-size container:
+ * under 560 px (a phone upright, the desktop dock) the showcase stacks over the system column, as
+ * #795's portrait and desktop mocks draw it; wider (a phone on its side) the system column sits
+ * left of the showcase, so the hero, its numbers and its Jump stay in sight without a scroll.
+ * Sizes are the sprites' 1x sizes (design-system.md section 13); the gaps are spacing tokens.
  */
 .chart {
+  min-height: 100%;
+  container: star-map / inline-size;
+}
+
+.layout {
+  display: grid;
+  grid-template-areas:
+    'showcase'
+    'system';
+  gap: var(--space-2);
+}
+
+@container star-map (min-width: 560px) {
+  .layout {
+    grid-template-areas: 'system showcase';
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    align-items: start;
+  }
+}
+
+.showcase,
+.system {
   display: flex;
   flex-direction: column;
   gap: var(--space-2);
-  min-height: 100%;
+  min-width: 0;
+}
+
+.showcase {
+  grid-area: showcase;
+}
+
+.system {
+  grid-area: system;
 }
 
 .tank {
@@ -41,96 +70,4 @@
   border-radius: 2px;
   background: var(--color-amber);
   transition: width var(--duration-fast, 160ms) ease-out;
-}
-
-/* The system view: the rail runs down behind the glyphs, from the sun to the last planet. */
-.system {
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-2);
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
-
-.system::before {
-  content: '';
-  position: absolute;
-  top: 32px;
-  bottom: 32px;
-  left: calc(var(--space-2) + 24px - 1px);
-  width: 2px;
-  background: linear-gradient(var(--color-brass), var(--color-steel));
-  opacity: 0.6;
-}
-
-.sun {
-  position: relative;
-  width: 64px;
-  height: 64px;
-  margin-left: calc(var(--space-2) + 24px - 32px);
-  background: var(
-      --art-star-map-sun,
-      radial-gradient(circle, var(--color-ember) 30%, var(--color-amber) 31% 60%, transparent 62%)
-    )
-    center / 100% 100% no-repeat;
-}
-
-.planet {
-  position: relative;
-  display: flex;
-  align-items: center;
-  gap: var(--space-2);
-  padding: var(--space-2);
-  border: var(--frame-hairline) solid var(--color-steel);
-  border-radius: var(--radius-panel);
-}
-
-.planet[data-here] {
-  border-color: var(--color-brass);
-}
-
-.planet[data-dimmed] h3,
-.planet[data-dimmed] p {
-  color: var(--color-steel);
-}
-
-/* The glyph: the planet sprite over the tinted disc, 48 px, centred on the rail. */
-.glyph {
-  position: relative;
-  flex: none;
-  width: 48px;
-  height: 48px;
-  background: var(
-      --art-star-map-planet,
-      radial-gradient(circle, transparent 44%, var(--color-brass) 46% 50%, transparent 52%)
-    )
-    center / 100% 100% no-repeat;
-}
-
-/* The disc is the planet's own colour through the sprite's tint mask, under the rim and rings. */
-.disc {
-  position: absolute;
-  inset: 0;
-  background: var(--planet-colour, var(--color-brass));
-  mask: var(--art-star-map-planet-tint, radial-gradient(circle, black 44%, transparent 46%))
-    center / 100% 100% no-repeat;
-  -webkit-mask: var(--art-star-map-planet-tint, radial-gradient(circle, black 44%, transparent 46%))
-    center / 100% 100% no-repeat;
-}
-
-/* The here ring, 56 px round the 48 px glyph. */
-.here {
-  position: absolute;
-  inset: -4px;
-  background: var(
-      --art-star-map-here,
-      radial-gradient(circle, transparent 46%, var(--color-brass) 47% 50%, transparent 51%)
-    )
-    center / 100% 100% no-repeat;
-}
-
-.planet[data-dimmed] .glyph {
-  filter: saturate(0.25) brightness(0.7);
 }

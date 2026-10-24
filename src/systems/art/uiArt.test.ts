@@ -18,6 +18,7 @@ import { vehicleSidecar, WHEEL_PART } from './sidecarFixtures'
 import {
   uiArtAssetIds,
   uiArtCssVariablesOf,
+  uiPartImageOf,
   uiArtStyleSheetOf,
   uiArtTokenAssetIds,
   uiSpriteFilesOf,
@@ -251,6 +252,22 @@ describe('ui art css variables', () => {
       '--art-gauge-bar:image-set(url("https://play.test/game/',
     )
   })
+
+  it('draws a final part as an image by its 1x and 2x files, and nothing for a placeholder (ticket 796)', () => {
+    expect(uiPartImageOf(art, 'ui-gauge-bar', 'ui-gauge-bar')).toEqual({
+      src: 'assets/ui/ui-gauge-bar/ui-gauge-bar.png',
+      srcSet:
+        'assets/ui/ui-gauge-bar/ui-gauge-bar.png 1x, assets/ui/ui-gauge-bar/ui-gauge-bar@2x.png 2x',
+      imageSet: variablesOfBar(),
+      sizePx: [96, 16],
+    })
+    expect(uiPartImageOf(art, 'ui-gauge-dial', 'ui-gauge-dial')).toBeNull()
+    expect(uiPartImageOf(art, 'ui-gauge-bar', 'ui-gauge-bar-missing')).toBeNull()
+  })
+
+  function variablesOfBar(): string {
+    return uiArtCssVariablesOf(art)['--art-gauge-bar']
+  }
 
   it('writes nothing for a token whose asset is still a placeholder, so the CSS frame stays', () => {
     const variables = uiArtCssVariablesOf(art)

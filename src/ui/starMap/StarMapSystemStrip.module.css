@@ -1,0 +1,99 @@
+/*
+ * The star map's system strip (ticket 796, ticket 795's art and motion notes): the orrery frame (a
+ * nine-slice rail) round a window onto the system backdrop, drawn at the build's scale and panned
+ * so the shown planet's socket is centred, held at the strip's ends. The window is an inline-size
+ * container, so the pan is `clamp(window - strip, window / 2 - target, 0)` in `cqw` with no
+ * measuring; it eases over the brief's time and curve and cuts under reduced motion. Each dot is
+ * a 48 px target round the 24 px orbit dot, the here ring and the selected marker centred on it.
+ * While a sprite is a placeholder the CSS behind the `var()`s stands in.
+ */
+.frame {
+  border: 12px solid var(--color-brass);
+  border-radius: var(--radius-panel);
+  border-image: var(--strip-frame, none) var(--strip-frame-slice, 0) / 12px round;
+  touch-action: pan-y;
+}
+
+.window {
+  position: relative;
+  height: var(--strip-window);
+  overflow: hidden;
+  container-type: inline-size;
+}
+
+.track {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: var(--strip-width);
+  height: var(--strip-height);
+  background: var(
+      --strip-backdrop,
+      radial-gradient(circle at 12.5% 50%, var(--color-amber) 0 6%, transparent 6.5%)
+    )
+    0 0 / 100% 100% no-repeat;
+  transform: translate(
+    clamp(calc(100cqw - var(--strip-width)), calc(50cqw - var(--pan-target)), 0px),
+    calc(-1 * var(--strip-lift))
+  );
+  transition: transform var(--pan-ms) var(--pan-easing);
+}
+
+.window[data-motion='cut'] .track {
+  transition: none;
+}
+
+.dot {
+  position: absolute;
+  left: calc(var(--dot-x) - 24px);
+  top: calc(var(--dot-y) - 24px);
+  width: 48px;
+  height: 48px;
+  padding: 0;
+  border: none;
+  background: none;
+  cursor: pointer;
+  pointer-events: auto;
+}
+
+.disc {
+  position: absolute;
+  inset: 12px;
+  border-radius: 50%;
+  background: var(--dot-sprite, var(--planet-colour)) center / 100% 100% no-repeat;
+}
+
+.dot[data-dimmed] .disc {
+  filter: saturate(0.25) brightness(0.7);
+}
+
+.here,
+.selected {
+  position: absolute;
+  pointer-events: none;
+}
+
+/* The here ring, 36 px round the 24 px dot. */
+.here {
+  inset: 6px;
+  background: var(
+      --marker-sprite,
+      radial-gradient(circle, transparent 62%, var(--color-brass) 64% 70%, transparent 72%)
+    )
+    center / 100% 100% no-repeat;
+}
+
+/* The selected marker, 44 px round the dot, in amber. */
+.selected {
+  inset: 2px;
+  background: var(
+      --marker-sprite,
+      radial-gradient(circle, transparent 64%, var(--color-amber) 66% 72%, transparent 74%)
+    )
+    center / 100% 100% no-repeat;
+}
+
+.dot:focus-visible {
+  outline: var(--frame-bezel) solid var(--color-amber);
+  outline-offset: -4px;
+}

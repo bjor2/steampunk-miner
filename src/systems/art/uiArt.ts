@@ -151,6 +151,43 @@ export function uiArtStyleSheetOf(art: ArtCatalogue, assetsUrl: string = UI_ASSE
   return `:root{${declarations.join('')}}`
 }
 
+/** A UI part drawn as an image rather than through a token: its files and its 1x size. */
+export interface UiPartImage {
+  /** The 1x file. */
+  src: string
+  /** The 1x and 2x files, for an `<img srcSet>`. */
+  srcSet: string
+  /** The same pair as a CSS `image-set()`, for a background or a border image. */
+  imageSet: string
+  sizePx: Pair
+}
+
+/**
+ * A part of a final, exported `ui` asset as an image (ticket 796: the star map carousel's previews
+ * are content keyed by planet, drawn from the catalogue rather than through `--art-*`); null while
+ * the asset is a placeholder, so the caller keeps its CSS stand-in.
+ */
+export function uiPartImageOf(
+  art: ArtCatalogue,
+  assetId: string,
+  partId: string,
+  assetsUrl: string = UI_ASSETS_URL,
+): UiPartImage | null {
+  const part = finalPartsOf(art, assetId).find((shipped) => shipped.id === partId)
+  if (part === undefined) return null
+  const [oneX, twoX] = UI_PNG_SCALES.map((scale) => spriteUrlOf(assetId, part.id, scale, assetsUrl))
+  return {
+    src: oneX,
+    srcSet: `${oneX} 1x, ${twoX} 2x`,
+    imageSet: imageSetOf(assetId, part.id, '', assetsUrl),
+    sizePx: pairOf(part.sizeM),
+  }
+}
+
+function spriteUrlOf(assetId: string, partId: string, scale: number, assetsUrl: string): string {
+  return `${assetsUrl}${assetId}/${spriteFileName(partId, '', scale)}`
+}
+
 function finalPartsOf(art: ArtCatalogue, assetId: string): readonly SidecarPart[] {
   const entry = manifestEntryOf(art, assetId)
   const sidecar = exportedSidecarOf(art, assetId)
