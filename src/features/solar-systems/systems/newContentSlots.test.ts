@@ -6,9 +6,10 @@ import { ORE_ROWS, oreFamilies } from '../../ores'
 import { planetsPerSystem } from './newContentSlots'
 import { ARCHETYPE_PALETTE } from './paletteRows'
 
-// The SS2-B new-content set (HS-1 on ticket 775): a family the first solar system never had, by id
-// and by name, against every enemy kind, hazard kind, ore family, species and schedule row the
-// campaign already names. Ticket 780 adds the behaviour test of each row's "Never" column.
+// The SS2-B new-content set (HS-1 on ticket 775; completed by ticket 780): a family the first solar
+// system never had, by id and by name, against every enemy kind, hazard kind, ore family, species
+// and schedule row the campaign already names. The behaviour level of the same check, with each
+// row's "Never" column, is familyBehaviours.test.ts.
 
 const FAMILIES = ARCHETYPE_PALETTE.newContent.families
 
@@ -30,8 +31,9 @@ function firstSystemWords(): Set<string> {
 }
 
 describe('new-content slots', () => {
-  it('holds one family short of a planet each in system 2, the fifth being ticket 780s', () => {
-    expect(FAMILIES.length).toBe(planetsPerSystem() - 1)
+  it('holds a family for every planet of system 2, of all three kinds', () => {
+    expect(FAMILIES.length).toBeGreaterThanOrEqual(5)
+    expect(FAMILIES.length).toBe(planetsPerSystem())
     expect(new Set(FAMILIES.map((family) => family.kind))).toEqual(
       new Set(['enemy', 'hazard', 'ore_family']),
     )
@@ -46,18 +48,30 @@ describe('new-content slots', () => {
     expect(taken.has(normalised('emp_mite'))).toBe(true)
   })
 
-  it('pins the SS2-B rows that pass as Progression wrote them, each with its rig part', () => {
-    expect(FAMILIES.map((family) => [family.id, family.kind, family.rigPart])).toEqual([
-      ['vent_flare', 'hazard', null],
-      ['cinder_salt', 'ore_family', 'Quench tank'],
-      ['brine_leech', 'enemy', 'Scraper skirt'],
-      ['ferro_sand_sink', 'hazard', 'Auger guard'],
+  it('pins the SS2-B rows as Progression wrote them, each with its one rig part on an attach point', () => {
+    expect(
+      FAMILIES.map((family) => [
+        family.id,
+        family.kind,
+        family.rigPart.name,
+        family.rigPart.attach,
+      ]),
+    ).toEqual([
+      ['vent_flare', 'hazard', 'Flare shroud', 'drill.housing'],
+      ['cinder_salt', 'ore_family', 'Quench tank', 'hull.cargo'],
+      ['brine_leech', 'enemy', 'Scraper skirt', 'hull.plates'],
+      ['ferro_sand_sink', 'hazard', 'Auger guard', 'drill.hood'],
+      ['spall_glass', 'ore_family', 'Cutting collar', 'drill.collar'],
     ])
   })
 
-  it("refuses Progression's fifth row: Void glass recolours the exotic family, Voidglass", () => {
+  it("refuses Progression's Void glass, a recolour of the exotic family Voidglass; spall glass replaces it", () => {
     const taken = firstSystemWords()
     expect(taken.has(normalised('Void glass'))).toBe(true)
     expect(oreFamilies().find((family) => family.id === 'exotic')?.name).toBe('Voidglass')
+    expect(taken.has(normalised('Spall glass'))).toBe(false)
+    expect(FAMILIES.find((family) => family.id === 'spall_glass')?.behaviour.effect).toBe(
+      'shatter_on_side_cut',
+    )
   })
 })

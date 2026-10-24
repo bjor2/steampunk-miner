@@ -3,17 +3,17 @@
  * rule of the lock: name parts are capitalised words, no two alike, and the longest name with the
  * reserved digits keeps the budget; every act a later system can hold has prefixes and looks and
  * names no other act; looks differ pairwise in hue and in motif; the new-content families carry
- * stable snake_case ids and distinct names; the size classes hold the ×1.0 class and one a hard
- * start may draw; the hard-start ceiling is a ratio.
+ * stable snake_case ids and distinct names, each with its behaviour, copy and rig part
+ * (`familyGuards.ts`, ticket 780); the size classes hold the ×1.0 class and one a hard start may
+ * draw; the hard-start ceiling is a ratio.
  */
 import { isMoneyText } from '../../../systems/money'
+import { familyRowProblems, type CopyFillBudget } from './familyGuards'
 
 type Raw = Record<string, unknown>
 
 const CAPITALISED_WORD = /^[A-Z][a-z]+$/
 const KEBAB_ID = /^[a-z][a-z0-9]*(-[a-z0-9]+)*$/
-const SNAKE_ID = /^[a-z][a-z0-9]*(_[a-z0-9]+)*$/
-const NEW_CONTENT_KINDS = ['enemy', 'hazard', 'ore_family']
 const HOOK_FIELDS = {
   mindful: ['{g}', '{ground}', '{pays}', '{mind}'],
   paying: ['{g}', '{ground}', '{pays}'],
@@ -27,7 +27,7 @@ export function paletteProblems(palette: unknown, economy: unknown, actIds: read
     ...namePartProblems(names, actIds),
     ...hookTemplateProblems(asMap(names.hookTemplates)),
     ...lookProblems(raw.looks, actIds),
-    ...newContentProblems(asMap(raw.newContentSlots)),
+    ...newContentProblems(asMap(raw.newContentSlots), copyFillBudgetOf(names)),
     ...sizeClassProblems(asMap(asMap(economy).sizeClasses)),
     ...hardStartProblems(asMap(asMap(economy).hardStart)),
   ]
@@ -109,13 +109,25 @@ function lookRowProblems(look: Raw, where: string): string[] {
   ]
 }
 
-function newContentProblems(slots: Raw): string[] {
+/** The longest `<Prefix> <Noun> <g>` the names can draw, the folio at its reserved digits. */
+function copyFillBudgetOf(names: Raw): CopyFillBudget {
+  const prefixes = Object.values(asMap(names.prefixesByAct)).flat()
+  const nouns = Array.isArray(names.nouns) ? names.nouns : []
+  const digits = isWhole(names.numberDigitsReserved) ? names.numberDigitsReserved : 1
+  const longestFolio = '9'.repeat(digits)
+  const longestName = `${'W'.repeat(longestOf(prefixes))} ${'W'.repeat(longestOf(nouns))} ${longestFolio}`
+  return { longestName, longestFolio }
+}
+
+function newContentProblems(slots: Raw, budget: CopyFillBudget): string[] {
   if (!isText(slots.set)) return ['newContentSlots.set must name the set']
   if (!Array.isArray(slots.families) || slots.families.length === 0)
     return ['newContentSlots.families must list the new families']
   const rows = slots.families.map(asMap)
   return [
-    ...rows.flatMap((family, at) => familyRowProblems(family, `newContentSlots.families[${at}]`)),
+    ...rows.flatMap((family, at) =>
+      familyRowProblems(family, `newContentSlots.families[${at}]`, budget),
+    ),
     ...duplicateProblems(
       rows.map((family) => family.id),
       'newContentSlots.families',
@@ -126,19 +138,6 @@ function newContentProblems(slots: Raw): string[] {
       'newContentSlots.families',
       'name',
     ),
-  ]
-}
-
-function familyRowProblems(family: Raw, where: string): string[] {
-  const isKind = typeof family.kind === 'string' && NEW_CONTENT_KINDS.includes(family.kind)
-  const isRigPart = family.rigPart === null || isText(family.rigPart)
-  return [
-    ...(typeof family.id === 'string' && SNAKE_ID.test(family.id)
-      ? []
-      : [`${where}.id must be snake_case`]),
-    ...(isKind ? [] : [`${where}.kind must be one of ${NEW_CONTENT_KINDS.join(', ')}`]),
-    ...(isText(family.name) ? [] : [`${where}.name must be the display name`]),
-    ...(isRigPart ? [] : [`${where}.rigPart must name the rig part or be null`]),
   ]
 }
 

@@ -1,5 +1,5 @@
 {
-  "source": "Planet & Narrative's SS2 archetype palette, locked 23 Oct 2026 on ticket 775 (spec #774, GD lock on Campaign Scaling 23 Oct 20:20): name parts in the ledger voice keyed to the act colour, the eight biome looks (hue and ground motif, each pair distinct), and Progression's SS2-B new-content set (23 Oct; ticket 780 writes the behaviours and completes the set). Progression's fifth row, the 'Void glass' ore family of planet 2.5, is not here: the fail-on-recolour check refuses it, as the first system's exotic family (Hollow's signature from planet 33) is already named Voidglass; ticket 780 names its replacement, and planet 2.5's slot stays empty until it does. Written once; every system from the second draws from it by seed and nothing is authored per planet. Prefixes are keyed to the #141 act at the planet's campaign index; the Foothold+ prefixes serve the foothold.heavy act, since no system past the first ever holds planet 1's act.",
+  "source": "Planet & Narrative's SS2 archetype palette, locked 23 Oct 2026 on ticket 775 (spec #774, GD lock on Campaign Scaling 23 Oct 20:20): name parts in the ledger voice keyed to the act colour, the eight biome looks (hue and ground motif, each pair distinct), and Progression's SS2-B new-content set (23 Oct on #775; ticket 780 writes each family's behaviour with its Never column, its copy templates and its rig part). Progression's fifth row, the 'Void glass' ore family, is refused by the fail-on-recolour check (the first system's exotic family, Hollow's signature from planet 33, is already Voidglass); ticket 780 names its replacement, spall glass, which keeps the behaviour (a side cut shatters it) under a name no earlier content carries. Written once; every system from the second draws from it by seed and nothing is authored per planet. Prefixes are keyed to the #141 act at the planet's campaign index; the Foothold+ prefixes serve the foothold.heavy act, since no system past the first ever holds planet 1's act.",
   "names": {
     "prefixesByAct": {
       "fire": ["Cinder", "Ember", "Soot"],
@@ -82,19 +82,139 @@
   "newContentSlots": {
     "set": "SS2-B",
     "families": [
-      { "id": "vent_flare", "kind": "hazard", "name": "Vent flares", "rigPart": null },
+      {
+        "id": "vent_flare",
+        "kind": "hazard",
+        "name": "Vent flares",
+        "rigPart": {
+          "name": "Flare shroud",
+          "attach": "drill.housing"
+        },
+        "behaviour": {
+          "effect": "stall_drill",
+          "telegraphed": true,
+          "summary": "Timed gas jets from vents you can see before they fire; a rig caught in the jet has its drill stalled while it burns, hull and energy untouched. The telegraph lasts at least the reaction window (#676).",
+          "never": [
+            {
+              "effect": "contact_damage",
+              "of": "magma_tick"
+            }
+          ]
+        },
+        "copy": {
+          "tag": "Vent flares",
+          "arrivalLine": "Vent flares. The vents breathe before they burn; wait the beat.",
+          "hoverLines": [
+            "The vents of {planet} breathe before they fire.",
+            "A jet stalls the drill, nothing more."
+          ]
+        }
+      },
       {
         "id": "cinder_salt",
         "kind": "ore_family",
         "name": "Cinder salts",
-        "rigPart": "Quench tank"
+        "rigPart": {
+          "name": "Quench tank",
+          "attach": "hull.cargo"
+        },
+        "behaviour": {
+          "effect": "decay_value",
+          "telegraphed": false,
+          "summary": "Cargo of this family loses value every minute until it is sold, so a quick trip home beats a full hold.",
+          "never": []
+        },
+        "copy": {
+          "tag": "Cinder salts",
+          "arrivalLine": "Cinder salts. They fade in the hold by the minute; sell quick.",
+          "hoverLines": [
+            "Loses value every minute until sold.",
+            "On {planet} a quick trip home beats a full hold."
+          ]
+        }
       },
-      { "id": "brine_leech", "kind": "enemy", "name": "Brine leeches", "rigPart": "Scraper skirt" },
+      {
+        "id": "brine_leech",
+        "kind": "enemy",
+        "name": "Brine leeches",
+        "rigPart": {
+          "name": "Scraper skirt",
+          "attach": "hull.plates"
+        },
+        "behaviour": {
+          "effect": "drain_cargo",
+          "telegraphed": false,
+          "summary": "Latch onto the hull and drain cargo value over time until you drill or ram them off; no tool is disabled and nothing is shot.",
+          "never": [
+            {
+              "effect": "disable_tools",
+              "of": "emp_mite"
+            },
+            {
+              "effect": "shoot",
+              "of": "frost_spitter"
+            }
+          ]
+        },
+        "copy": {
+          "tag": "Brine leech",
+          "arrivalLine": "Brine leech. They cling and sup the hold; drill or ram them off.",
+          "hoverLines": [
+            "Latch on and drain cargo value over time.",
+            "Below {planet}, drill or ram them off."
+          ]
+        }
+      },
       {
         "id": "ferro_sand_sink",
         "kind": "hazard",
         "name": "Ferro-sand sinks",
-        "rigPart": "Auger guard"
+        "rigPart": {
+          "name": "Auger guard",
+          "attach": "drill.hood"
+        },
+        "behaviour": {
+          "effect": "clog_drill",
+          "telegraphed": false,
+          "summary": "Loose sand flows down into the shaft and clogs the drill, cutting its speed until cleared; nothing pulls the rig and the compass holds true.",
+          "never": [
+            {
+              "effect": "magnetic_pull",
+              "of": "magnetic_planets"
+            }
+          ]
+        },
+        "copy": {
+          "tag": "Sand sinks",
+          "arrivalLine": "Sand sinks. Loose sand runs into the cut; clear it or crawl.",
+          "hoverLines": [
+            "Sand flows into the shaft and clogs the drill.",
+            "On {planet} it cuts drill speed until cleared."
+          ]
+        }
+      },
+      {
+        "id": "spall_glass",
+        "kind": "ore_family",
+        "name": "Spall glass",
+        "rigPart": {
+          "name": "Cutting collar",
+          "attach": "drill.collar"
+        },
+        "behaviour": {
+          "effect": "shatter_on_side_cut",
+          "telegraphed": false,
+          "summary": "Drilling it from the side shatters it and its value is lost; only a cut straight down keeps it whole.",
+          "never": []
+        },
+        "copy": {
+          "tag": "Spall glass",
+          "arrivalLine": "Spall glass. A side cut spalls it to dust; bore straight down.",
+          "hoverLines": [
+            "Shatters when cut from the side.",
+            "A straight-down cut keeps it whole on {planet}."
+          ]
+        }
       }
     ]
   }

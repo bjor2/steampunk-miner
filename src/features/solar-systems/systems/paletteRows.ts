@@ -11,8 +11,11 @@
  * - Looks: an id, its act, a hue and a ground motif; every pair differs in both hue and motif so
  *   they read at 360 px and 1280+. Each look's art is ticket 778's.
  * - New-content slots: Progression's SS2-B families (one new enemy, hazard or ore family per
- *   planet), each with its visible rig part; their behaviour and the fail-on-recolour test of it
- *   are ticket 780's. No family ever repeats across the campaign (`newContentSlots.ts`).
+ *   planet; ticket 780 completes the set). Each carries its behaviour with the "Never" column it
+ *   must keep apart from the first system's content (`familyBehaviours.ts`), its copy templates
+ *   (tag, arrival line, hover lines; `familyCopy.ts`) and the one rig part the player sees once the
+ *   family is met, on a vehicle attach point. No family ever repeats across the campaign
+ *   (`newContentSlots.ts`).
  * - Size classes: S/M/L/XL as basis points of an SS1 planet's radius; XL only on a standard start.
  */
 import { fromCanonical, type BigStat } from '../../../systems/money'
@@ -50,13 +53,52 @@ export interface BiomeLook {
 
 export type NewContentKind = 'enemy' | 'hazard' | 'ore_family'
 
+/** One thing the first system's content does, as "shoot" or "refill"; a family's effect is never one. */
+export type BehaviourEffect = string
+
+/** A line of Progression's "Never" column: an effect the family never has, and whose it is. */
+export interface NeverBehaviour {
+  effect: BehaviourEffect
+  /** The first-system id (enemy kind, hazard kind or schedule row) that owns the effect. */
+  of: string
+}
+
+export interface FamilyBehaviour {
+  /** The family's own effect, as "drain_cargo"; no first-system content has it. */
+  effect: BehaviourEffect
+  /** What the family does, in a sentence or two; design copy, never shown. */
+  summary: string
+  /** Whether the hazard shows itself before it acts; its telegraph is then the reaction window. */
+  telegraphed: boolean
+  never: readonly NeverBehaviour[]
+}
+
+/** The family's copy as the generator reuses it for any planet that draws the family. */
+export interface FamilyCopy {
+  /** The planet card's tag, as "Brine leech": one or two words. */
+  tag: string
+  /** The card's arrival line in the ledger voice; opens with the tag. */
+  arrivalLine: string
+  /** The hover's lines, each a sentence; `{planet}` and `{g}` are filled per planet. */
+  hoverLines: readonly string[]
+}
+
+export interface RigPart {
+  /** The part's name, as "Scraper skirt". */
+  name: string
+  /** The vehicle attach point it sits on (`vehicleAttach.ts`), as "hull.plates". */
+  attach: string
+}
+
 export interface NewContentFamily {
   /** The stable id codex, receipt and saves key on; never reused, never a display name. */
   id: string
   kind: NewContentKind
   name: string
-  /** The rig part the player sees once the family is met; null for a family with none. */
-  rigPart: string | null
+  /** The one rig part the player sees once the family is met. */
+  rigPart: RigPart
+  behaviour: FamilyBehaviour
+  copy: FamilyCopy
 }
 
 export interface NewContentSet {

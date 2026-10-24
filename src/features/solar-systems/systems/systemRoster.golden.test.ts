@@ -5,12 +5,13 @@ import { systemRosterOf } from './systemRoster'
 // The roster goldens (ticket 775, done-when 1 and 8): under one world seed the rosters of systems 2,
 // 10 and 1e6 are byte-identical on every run and client. System 2 is spelled out, so a change to a
 // draw reads as a change of planet; the other two are digests. A new stream, a new palette row or a
-// moved one re-pins them with its ticket; the seed is the lock's date.
+// moved one re-pins them with its ticket; the seed is the lock's date. Ticket 780's fifth family
+// (spall glass) re-pinned system 2: planet 2.2's slot was null while the set was one short.
 
 const SEED = 20261024
 
 const GOLDEN = {
-  system2: 'de7505c374082b47',
+  system2: '8acc0655fa319274',
   system10: '3654fb2d1671391a',
   system1e6: 'fd4101e5d37e5af5',
 }
@@ -32,13 +33,16 @@ describe('system roster golden', () => {
       ]),
     ).toEqual([
       ['Verdigris Ledger 6', 'brass-verdigris', 'XL', 'std', 'vent_flare'],
-      ['Tallow Warrant 7', 'brass-verdigris', 'L', 'std', null],
+      ['Tallow Warrant 7', 'brass-verdigris', 'L', 'std', 'spall_glass'],
       ['Ember Reach 8', 'ash-plain', 'XL', 'std', 'ferro_sand_sink'],
       ['Soot Drift 9', 'cinder-basalt', 'S', 'std', 'brine_leech'],
       ['Cinder Shoal 10', 'ash-plain', 'M', 'hard', 'cinder_salt'],
     ])
     expect(roster[0].hook).toBe(
       'Entered at folio 6. Ground: riveted plate shale. Pays in cogwork; mind the vent flares.',
+    )
+    expect(roster[1].hook).toBe(
+      'Entered at folio 7. Ground: riveted plate shale. Pays in spall glass.',
     )
     expect(roster[4].hook).toBe(
       'Entered at folio 10. Ground: layered ash strata. Pays in cinder salts.',

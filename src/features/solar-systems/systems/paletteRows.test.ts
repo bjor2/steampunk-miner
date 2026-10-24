@@ -101,9 +101,9 @@ describe('archetype palette', () => {
     expect(problemsWith(namesWith({ nouns: ['reach'] }))).toEqual([
       'names.nouns must list capitalised words',
     ])
-    expect(problemsWith(namesWith({ nouns: ['Counterweighting'] }))).toEqual([
+    expect(problemsWith(namesWith({ nouns: ['Counterweighting'] }))[0]).toBe(
       'names: the longest name with 3 digits takes 30 characters, over 22',
-    ])
+    )
   })
 
   it('refuses a hook template without its slots or with a slot it has no answer for', () => {
