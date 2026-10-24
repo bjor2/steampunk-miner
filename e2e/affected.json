@@ -44,6 +44,23 @@
       ]
     },
     {
+      "why": "The Sell bay's panel slot (ticket 845): the slice rows and kinds, the order and pages, the list on the bay, and the example's sample merchants that drive it at 1 and 5.",
+      "paths": [
+        "src/ui/registries/bayPanels.ts",
+        "src/systems/views/bayPanelPages.ts",
+        "src/ui/platform/BayPanelList*",
+        "src/ui/platform/bayPanelIds.ts",
+        "src/ui/platform/SellBayView.tsx",
+        "src/store/screenReads.ts",
+        "src/data/design/designTokens.json",
+        "src/features/example/ui/SampleMerchantPanel*",
+        "src/features/example/store/bayPanelProbeStore.ts",
+        "src/features/example/debug.ts",
+        "src/features/example/register.ts"
+      ],
+      "specs": ["e2e/browser/ui/bayPanels.spec.ts", "e2e/browser/ui/uiShots.spec.ts"]
+    },
+    {
       "why": "The mining popup's chips and plaque, and the dig in the look set.",
       "paths": ["src/features/mining-popup/**"],
       "specs": ["e2e/browser/miningPopup.spec.ts", "e2e/browser/screens/reviewShots.spec.ts"]

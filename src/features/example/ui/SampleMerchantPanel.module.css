@@ -1,0 +1,5 @@
+/* Ticket 845: a sample merchant's stock, one row an item, as PK2's stock list will stack. */
+.stock {
+  display: grid;
+  gap: var(--space-1);
+}

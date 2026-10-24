@@ -198,10 +198,11 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/dynamite-visuals/systems/render/plantedDynamiteLook.test.ts` | 4 | 4 |
 | `src/features/dynamite-visuals/systems/render/rackLook.test.ts` | 6 | 6 |
 
-### `example`: 3 files, 5 tests
+### `example`: 4 files, 10 tests
 
 | File | Tests | Sites |
 | --- | --- | --- |
+| `src/features/example/bayPanelProbe.test.ts` | 5 | 5 |
 | `src/features/example/debug.test.ts` | 2 | 2 |
 | `src/features/example/systems/describeExample.test.ts` | 1 | 1 |
 | `src/features/example/ui/exampleSheetTabs.test.ts` | 2 | 2 |
@@ -1707,6 +1708,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/ui/menuText.test.ts` | 5 | 5 |
 | `src/ui/plaques/hintChip.test.ts` | 3 | 3 |
 | `src/ui/platform/bayEntryRowView.test.ts` | 2 | 2 |
+| `src/ui/platform/bayPanelRows.test.ts` | 10 | 10 |
 | `src/ui/platform/bayPanels.test.ts` | 8 | 8 |
 | `src/ui/platform/bayScreens.test.ts` | 6 | 6 |
 | `src/ui/platform/dockText.test.ts` | 4 | 4 |
@@ -1792,6 +1794,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | File | Tests | Sites |
 | --- | --- | --- |
 | `src/systems/views/bayEntryRows.test.ts` | 8 | 8 |
+| `src/systems/views/bayPanelPages.test.ts` | 8 | 8 |
 | `src/systems/views/bayPresentation.test.ts` | 6 | 6 |
 | `src/systems/views/cardReveal.test.ts` | 6 | 6 |
 | `src/systems/views/chargeViews.test.ts` | 14 | 14 |

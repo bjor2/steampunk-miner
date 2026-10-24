@@ -4,6 +4,7 @@ import { exampleDebugActions } from './debug'
 import { EXAMPLE_VEHICLE_PIECE_ID, ExampleVehiclePiece } from './scene/ExampleVehiclePiece'
 import { EXAMPLE_SCREEN_ID, ExampleScreen } from './ui/ExampleScreen'
 import { EXAMPLE_SHEET_TABS } from './ui/ExampleSheetTabs'
+import { SAMPLE_MERCHANT_PANEL_KIND, SAMPLE_MERCHANT_ROWS } from './ui/SampleMerchantPanel'
 import { UI_PARTS_SCREEN_ID, UiPartsScreen } from './ui/UiPartsScreen'
 
 export const slice: SliceDefinition = {
@@ -19,6 +20,9 @@ export const slice: SliceDefinition = {
     EXAMPLE_SHEET_TABS.forEach((tab) => r.sheetTab(tab))
     // steampunkDebug.features.example.mountTestPiece(); the kernel's vehicle draws it on the car.
     r.vehiclePiece({ id: EXAMPLE_VEHICLE_PIECE_ID, Piece: ExampleVehiclePiece })
+    // steampunkDebug.features.example.showBayPanels(5): sample merchants on the Sell bay (845).
+    r.bayPanelKind(SAMPLE_MERCHANT_PANEL_KIND)
+    SAMPLE_MERCHANT_ROWS.forEach((row) => r.bayPanelRow(row))
     // A real slice adds e.g. r.content('vehicle-item', [...]),
     // r.gateCheck({ id: 'example.x', check }) or r.saveSection({ id: 'example', version: 1, ... }).
   },

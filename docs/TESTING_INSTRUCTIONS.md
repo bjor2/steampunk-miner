@@ -1706,6 +1706,20 @@ incomePerHour}` go to `balance-report/drill-pace.ndjson`, which `pushTestMetrics
   cluster's goldens (ticket 716): on P41 with money at 1e15 and the hull and fuel red, on the
   surface and at 9000 bp deep, the strip must not spill, the depth dial must carry its five planet
   marks, and on desktop every hovered dial's number tag must be the same width. Box Tester only.
+- **Sell bay panel slot** (ticket 845, spec #647; the TD ruling on #821 Q3, HS 3): the order and the
+  pages are pure (`systems/views/bayPanelPages.test.ts`: by order then panel id, every row on a
+  phone, `layout.bayPanels.desktopPerPage` (2) a desktop page turning round, a 1001-row list drawn
+  once each). `ui/platform/bayPanelRows.test.ts` renders the bay with fake slice rows: with no row
+  shown (none registered, or `visibleWhen` false) the markup equals the bay's markup with no slice,
+  so the bay is unchanged; one merchant draws after the charging station on one page; five page on
+  desktop with Previous and Next and all draw on a phone; the seal refuses a row on another bay or
+  unprefixed; every loaded row names a registered kind. `features/example/bayPanelProbe.test.ts`
+  holds the example's five sample merchants hidden until `showBayPanels(count)`, refuses a bad
+  count, and keeps their text on registered elements within the budget.
+  `e2e/browser/ui/bayPanels.spec.ts` runs 360x640 and 1280x800 with 1 merchant and with 5: no list
+  with none shown, the phone's bay scrolling to the last merchant in one column, the desktop's three
+  pages turning round, every merchant reached inside the bay and no sideways scroll; the screenshot
+  suite shoots `sell-bay-panels-1` and `sell-bay-panels-5` in every cell. Box Tester only.
 - **Sale receipt** (ticket 717, spec #678): the rules are pure in the sell-burst slice. The hold's
   kinds are tallied as units come in (`systems/heldManifest.ts`, read by `heldUnits.ts` as the pickup
   popup reads a species and rarity) and cut back to the authority's hold every batch; the trip's

@@ -8,11 +8,13 @@
  * (ticket 684); and the base sheet's Hold and Ledger (ticket 688: the Sell bay's ore and the pause
  * menu's save page as were), and the sale receipt over the Sell bay after a wide P41+ haul, its lines
  * scrolling past eight (ticket 717), and the unlock reveal's plate over the Upgrade bay after the
- * guns are mounted from the Outfitter, held so the shot finds it (ticket 718).
+ * guns are mounted from the Outfitter, held so the shot finds it (ticket 718); and the Sell bay
+ * with 1 and with 5 sample merchants in its panel slot (ticket 845).
  */
 import { expect, type Page } from '@playwright/test'
 import { TREE_TEST_IDS } from '../../../src/features/tech-tree/ui/nodeTestIds'
 import { UI_IDS } from '../../../src/ui/ids'
+import { BAY_PANEL_UI_IDS } from '../../../src/ui/platform/bayPanelIds'
 import { SHEET_UI_IDS } from '../../../src/ui/sheet/sheetIds'
 import { dockAt } from '../screens/screenHelpers'
 import { RECEIPT_ROWS_TEST_ID, RECEIPT_TEST_ID, sellWideHaul } from '../sellReceiptSales'
@@ -34,6 +36,18 @@ const OPEN_TIMEOUT_MS = 30_000
 
 export const UI_SHEETS: readonly UiSheet[] = [
   { shot: 'sell-bay', rootSelector: PLATFORM, pannedTestIds: [], open: openSellBay },
+  {
+    shot: 'sell-bay-panels-1',
+    rootSelector: PLATFORM,
+    pannedTestIds: [],
+    open: (page) => openSellBayWithMerchants(page, 1),
+  },
+  {
+    shot: 'sell-bay-panels-5',
+    rootSelector: PLATFORM,
+    pannedTestIds: [],
+    open: (page) => openSellBayWithMerchants(page, 5),
+  },
   {
     shot: 'upgrade-bay',
     rootSelector: `[data-testid="${SHEET_UI_IDS.baseSheet}"]`,
@@ -111,6 +125,19 @@ export const UI_SHEETS: readonly UiSheet[] = [
 async function openSellBay(page: Page): Promise<void> {
   await giveMoney(page, '1e9')
   await dockAt(page, 'sell')
+}
+
+/**
+ * Ticket 845: the Sell bay with the example slice's sample merchants in its panel slot, 1 or 5 of
+ * them; a phone scrolls them with the bay, desktop pages them.
+ */
+export async function openSellBayWithMerchants(page: Page, count: number): Promise<void> {
+  await page.evaluate((shown) => {
+    const result = window.steampunkDebug!.features.example!.showBayPanels!(shown)
+    if (!result.ok) throw new Error(result.problems.join('; '))
+  }, count)
+  await openSellBay(page)
+  await expect(page.getByTestId(BAY_PANEL_UI_IDS.list)).toBeVisible({ timeout: OPEN_TIMEOUT_MS })
 }
 
 /** Docking at the Upgrade bay opens the base sheet on the Outfitter (ticket 687). */

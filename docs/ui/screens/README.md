@@ -32,22 +32,24 @@ shot first, so the picture of a broken layout is there to look at.
 
 The phones are Chromium emulation (`isMobile`, `hasTouch`) at DPR 1, not shots from a device.
 
-| Shot            | What it shows                                   |
-| --------------- | ----------------------------------------------- |
-| `hud-surface`   | the HUD on the pad, the bay shut                |
-| `hud-dig`       | the HUD two tiles down, drilling                |
-| `sell-bay`      | the Sell bay                                    |
-| `upgrade-bay`   | the Outfitter, opened on the sheet by docking   |
-| `settings`      | the settings, opened from the bay               |
-| `pause-menu`    | the pause menu                                  |
-| `hold`          | the Hold on the sheet, from the Sell bay        |
-| `ledger`        | the Ledger on the sheet, from the pause menu    |
-| `patent-office` | the tech tree as the Patent Office on the sheet |
-| `planet-card`   | the planet card on arrival at planet 25         |
-| `base-sheet`    | the shared sheet on the example's probe tabs    |
-| `sell-receipt`  | the sale receipt after a wide P41+ haul         |
-| `unlock-reveal` | the reveal plate after the guns are mounted     |
-| `title-menu`    | the title menu                                  |
+| Shot                | What it shows                                   |
+| ------------------- | ----------------------------------------------- |
+| `hud-surface`       | the HUD on the pad, the bay shut                |
+| `hud-dig`           | the HUD two tiles down, drilling                |
+| `sell-bay`          | the Sell bay                                    |
+| `sell-bay-panels-1` | the Sell bay with one sample merchant (845)     |
+| `sell-bay-panels-5` | the Sell bay with five sample merchants (845)   |
+| `upgrade-bay`       | the Outfitter, opened on the sheet by docking   |
+| `settings`          | the settings, opened from the bay               |
+| `pause-menu`        | the pause menu                                  |
+| `hold`              | the Hold on the sheet, from the Sell bay        |
+| `ledger`            | the Ledger on the sheet, from the pause menu    |
+| `patent-office`     | the tech tree as the Patent Office on the sheet |
+| `planet-card`       | the planet card on arrival at planet 25         |
+| `base-sheet`        | the shared sheet on the example's probe tabs    |
+| `sell-receipt`      | the sale receipt after a wide P41+ haul         |
+| `unlock-reveal`     | the reveal plate after the guns are mounted     |
+| `title-menu`        | the title menu                                  |
 
 The sheets are a table, `e2e/browser/ui/uiShotSheets.ts`: a sheet the shared sheet component (#686)
 or a later ticket adds joins as one row.
