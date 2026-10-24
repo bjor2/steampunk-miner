@@ -1,71 +1,40 @@
 /**
- * The upgrade plaque's fitting fact (TD ruling on #579, folded into ticket 585; GD lock 6306384872;
- * Content on #157, comment 6300549964): a track whose look rows carry a plaque template names the
- * step the player owns, `Fitting: {stepName}`, and above the top step adds the tail grade,
- * ` · Grade N`, so the copy never runs out. The step itself never shows a grade, and a count below
- * the first step names nothing: the plaque never names a step the player does not own. Grade N is
- * the tail step reached (Grade 1 on the first purchase past the top step), from the owned purchase
- * count the save holds, uncapped as the look laps; shown in full up to 9999, then cut with integer
- * maths to one decimal and a unit (12.3k), never a float format, so it fits a 360 px plaque.
+ * The upgrade plaque's fitting fact, the Outfitter card's hover line (TD ruling on #579, folded
+ * into ticket 585; Progression on #647 for ticket 809): a track whose look rows carry a plaque
+ * template names the band the player owns, `Fitting: {bandName}`, from data of 3 words at most:
+ * the authored step's card, or past the art the finish the band wears. Past the art it adds the
+ * exact owned level through the shared formatter's long mode (#681), ` · L1,000,000`, so the copy
+ * never runs out and two bands of one finish still read apart. A count below the first edge names
+ * nothing: the plaque never names a band the player does not own.
  */
-import {
-  rigLookIndexOf,
-  type RigLookIndex,
-  type RigLookPlaque,
-  type TrackLookRows,
-} from './render/rigLookIndex'
+import { formatAmountLong } from '../../../systems/displayAmount'
+import { lookFrameAt, type TrackLookFrames } from './render/rigLookFrames'
+import { lookPurchasesOf, rigLookIndexOf, type TrackLookRows } from './render/rigLookIndex'
 
-const STEP_NAME = '{stepName}'
-const GRADE = '{grade}'
+const BAND_NAME = '{bandName}'
+const LEVEL = '{level}'
 
-/** The largest grade shown in full (VS on #579). */
-const FULL_GRADE_MAX = 9999
-
-/** The units a larger grade is cut to, largest first. */
-const GRADE_UNITS: readonly { size: number; suffix: string }[] = [
-  { size: 1_000_000_000, suffix: 'B' },
-  { size: 1_000_000, suffix: 'M' },
-  { size: 1_000, suffix: 'k' },
-]
-
-/** The fitting fact `n` owned purchases show on the plaque; null with no template or no step. */
-export function plaqueFactOf(rows: TrackLookRows, n: number): string | null {
-  if (rows.plaque === undefined) return null
-  return fittingFactAt(rows, rows.plaque, rigLookIndexOf(rows, n))
-}
-
-function fittingFactAt(
-  rows: TrackLookRows,
-  plaque: RigLookPlaque,
-  { step, tail }: RigLookIndex,
-): string | null {
-  if (step === 0) return null
+/** The fitting fact `n` owned purchases show on the plaque; null with no template or no band. */
+export function plaqueFactOf(frames: TrackLookFrames, n: number): string | null {
+  const { plaque } = frames.rows
+  const bandName = lookFrameAt(frames, n).bandName
+  if (plaque === undefined || bandName === null) return null
+  const { tail } = rigLookIndexOf(frames.rows, n)
   const template = tail === 0 ? plaque.step : plaque.tail
-  const stepName = rows.steps[step - 1].card ?? ''
-  return template.replace(STEP_NAME, stepName).replace(GRADE, tailGradeTextOf(tail))
+  return template.replace(BAND_NAME, bandName).replace(LEVEL, levelTextOf(n))
 }
 
-/** A whole grade as the plaque shows it: `9999`, then `10k`, `12.3k`, `1M`, `2.1B`. */
-export function tailGradeTextOf(grade: number): string {
-  if (grade <= FULL_GRADE_MAX) return `${grade}`
-  const { size, suffix } = GRADE_UNITS.find((unit) => grade >= unit.size)!
-  return cutGradeTextOf(grade, size, suffix)
-}
-
-/** `grade` in tenths of `size`, truncated: integer division only. */
-function cutGradeTextOf(grade: number, size: number, suffix: string): string {
-  const tenths = Math.floor(grade / (size / 10))
-  const whole = Math.floor(tenths / 10)
-  const tenth = tenths % 10
-  return tenth === 0 ? `${whole}${suffix}` : `${whole}.${tenth}${suffix}`
+/** The owned level in full, grouped (`1,000,000`), as the hover's long mode prints a count. */
+export function levelTextOf(n: number): string {
+  return formatAmountLong(lookPurchasesOf(n))
 }
 
 /** Why a plaque template cannot load: its placeholders each once, and every step named. */
 export function plaqueProblemsOf(rows: TrackLookRows): string[] {
   if (rows.plaque === undefined) return []
   return [
-    ...placeholderProblemsOf('plaque step', rows.plaque.step, [STEP_NAME], [GRADE]),
-    ...placeholderProblemsOf('plaque tail', rows.plaque.tail, [STEP_NAME, GRADE], []),
+    ...placeholderProblemsOf('plaque step', rows.plaque.step, [BAND_NAME], [LEVEL]),
+    ...placeholderProblemsOf('plaque tail', rows.plaque.tail, [BAND_NAME, LEVEL], []),
     ...unnamedStepProblemsOf(rows),
   ]
 }

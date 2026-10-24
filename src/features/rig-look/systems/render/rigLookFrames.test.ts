@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { SHIPPED_RIG_LOOKS } from '../rigLooks'
-import { LARGEST_LOOK_PURCHASES, topStepOf } from './rigLookIndex'
+import { RIG_LOOK_TABLE } from '../rigLookTable'
+import { LARGEST_LOOK_PURCHASES, rigLookIndexOf, topStepOf } from './rigLookIndex'
 import {
   createTrackLookFrames,
   everyLookFrameOf,
@@ -11,20 +12,18 @@ import {
 
 const SWEEP = Array.from({ length: 10_001 }, (_, n) => n)
 
-/** What the eye gets from a frame: the part, its colour, its glows and its plating. */
-function shownOf(frame: RigLookFrame): string {
-  return JSON.stringify([frame.partId, frame.tint, frame.glows, frame.plating])
+/** What the eye gets from a frame: the part, its colour, its glows, its finish and its pips. */
+function shownOf(frames: TrackLookFrames, n: number): string {
+  const frame: RigLookFrame = lookFrameAt(frames, n)
+  const { pips } = rigLookIndexOf(frames.rows, n)
+  return JSON.stringify([frame.partId, frame.tint, frame.glows, frame.finish, pips])
 }
 
-/** Counts n (from 1 to 10,000) whose look the eye cannot tell from n - 1's, where it must. */
-function unchangedNeighbours(frames: TrackLookFrames): number[] {
-  const steps = frames.rows.steps.map((step) => step.from)
-  const top = topStepOf(frames.rows).from
-  return SWEEP.slice(1).filter(
-    (n) =>
-      (n >= top || steps.includes(n)) &&
-      shownOf(lookFrameAt(frames, n)) === shownOf(lookFrameAt(frames, n - 1)),
-  )
+/** Band edges (from 1 to 10,000) whose look the eye cannot tell from the count before's. */
+function unchangedEdges(frames: TrackLookFrames): number[] {
+  const { step } = frames.rows.band
+  const edges = SWEEP.slice(1).filter((n) => n % step === 0)
+  return edges.filter((n) => shownOf(frames, n) === shownOf(frames, n - 1))
 }
 
 describe('rig look frames', () => {
@@ -36,38 +35,52 @@ describe('rig look frames', () => {
     }
   })
 
-  it('shows the base look below the first step', () => {
+  it('shows the base look below the first edge', () => {
     for (const frames of SHIPPED_RIG_LOOKS.tracks) {
-      const below = SWEEP.filter((n) => n < frames.rows.steps[0].from)
+      const below = SWEEP.filter((n) => n < frames.rows.band.edges[0])
       expect(new Set(below.map((n) => lookFrameAt(frames, n)))).toEqual(new Set([frames.base]))
-      expect(frames.base).toMatchObject({ partId: null, tint: null, plating: null })
+      expect(frames.base).toMatchObject({ partId: null, tint: null, finish: null, bandName: null })
     }
   })
 
-  it('changes the look at every step and at every purchase from the top step on', () => {
+  it('changes the look at every band edge and nowhere inside a band', () => {
     for (const frames of SHIPPED_RIG_LOOKS.tracks) {
-      expect({ track: frames.rows.track, unchanged: unchangedNeighbours(frames) }).toEqual({
+      expect({ track: frames.rows.track, unchanged: unchangedEdges(frames) }).toEqual({
         track: frames.rows.track,
         unchanged: [],
       })
+      const inside = SWEEP.slice(1).filter((n) => n % frames.rows.band.step !== 0)
+      expect(inside.filter((n) => shownOf(frames, n) !== shownOf(frames, n - 1))).toEqual([])
     }
   })
 
-  it('changes the look where the palette, plating and glow laps all wrap at once', () => {
+  it('changes the finish, a material, at every band past the art, its wrap included', () => {
     for (const frames of SHIPPED_RIG_LOOKS.tracks) {
       const top = topStepOf(frames.rows).from
-      for (const lap of [1, 2, 1000]) {
-        const wrap = top + lap * frames.lap.length
-        expect(shownOf(lookFrameAt(frames, wrap + 1))).not.toBe(shownOf(lookFrameAt(frames, wrap)))
+      const { step } = frames.rows.band
+      for (const lap of [0, 1, 2, 1000]) {
+        const wrap = top + (lap * frames.lap.length + 1) * step
+        expect(lookFrameAt(frames, wrap).finish).not.toBe(lookFrameAt(frames, wrap - step).finish)
       }
     }
   })
 
-  it('keeps the top step exactly at the top count, the tail starting one purchase later', () => {
+  it('keeps the top step on its edge, the first finish one band later', () => {
     for (const frames of SHIPPED_RIG_LOOKS.tracks) {
       const top = topStepOf(frames.rows).from
       expect(lookFrameAt(frames, top)).toBe(frames.steps.at(-1))
-      expect(lookFrameAt(frames, top + 1)).toBe(frames.lap[0])
+      expect(lookFrameAt(frames, top + frames.rows.band.step)).toBe(frames.lap[0])
+    }
+  })
+
+  it('wears each finish over the top step’s part and glows, named for the hover', () => {
+    for (const frames of SHIPPED_RIG_LOOKS.tracks) {
+      const top = frames.steps.at(-1)!
+      for (const frame of frames.lap) {
+        expect(frame).toMatchObject({ partId: top.partId, glows: top.glows })
+        expect(frame.bandName).toBe(RIG_LOOK_TABLE.finishes[frame.finish!].name)
+        expect(frame.tint).toBe(RIG_LOOK_TABLE.finishes[frame.finish!].colour)
+      }
     }
   })
 
@@ -88,55 +101,34 @@ describe('rig look frames', () => {
     }
   })
 
-  it('walks the tint every tail step, the plating every palette lap, the glow every plating lap', () => {
-    const frames = createTrackLookFrames({
-      track: 'engine',
-      slot: 'chassis.drive',
-      glowSlots: [['piston']],
-      glowCap: 'rigBody',
-      steps: [{ from: 1, part: 'piston.2', card: null, colour: '#000000', glows: [0] }],
-      tail: { delta: 1, palette: ['#000001', '#000002'], plating: ['a', 'b'], glow: [[1], [2]] },
-    })
-    const tail = [2, 3, 4, 5, 6].map((n) => lookFrameAt(frames, n))
-    expect(tail.map((frame) => [frame.tint, frame.plating, frame.glows[0]])).toEqual([
-      ['#000001', 'a', 1],
-      ['#000002', 'a', 1],
-      ['#000001', 'b', 1],
-      ['#000002', 'b', 1],
-      ['#000001', 'a', 2],
-    ])
-    expect(new Set(tail.map((frame) => frame.partId))).toEqual(new Set(['piston.2']))
-  })
-
-  it("carries a step's asset and hidden slot as a pure function of (track, n), tail included", () => {
-    const steps = SHIPPED_RIG_LOOKS.tracks[0].rows.steps.map((step) => ({
+  it("carries a step's asset and hidden slot as a pure function of (track, n), finishes included", () => {
+    const shipped = SHIPPED_RIG_LOOKS.tracks[0].rows
+    const steps = shipped.steps.map((step) => ({
       ...step,
       part: 'twin-drum-boiler',
       asset: 'vehicle-look-boiler',
     }))
-    const rows = { ...SHIPPED_RIG_LOOKS.tracks[0].rows, replaces: 'boiler', steps }
-    const frames = createTrackLookFrames(rows)
+    const rows = { ...shipped, replaces: 'boiler', steps }
+    const frames = createTrackLookFrames(rows, RIG_LOOK_TABLE.finishes)
     const first = steps[0].from
     for (const n of SWEEP) {
       const frame = lookFrameAt(frames, n)
       expect(frame.assetId).toBe(n < first ? null : 'vehicle-look-boiler')
       expect(frame.replacesSlot).toBe(n < first ? null : 'boiler')
-      expect(lookFrameAt(createTrackLookFrames(rows), n)).toEqual(frame)
+      expect(lookFrameAt(createTrackLookFrames(rows, RIG_LOOK_TABLE.finishes), n)).toEqual(frame)
     }
-    expect(unchangedNeighbours(frames)).toEqual([])
+    expect(unchangedEdges(frames)).toEqual([])
   })
 
   it('leaves a vehicle step its own slot: no asset of its own, nothing hidden', () => {
-    const steps = SHIPPED_RIG_LOOKS.tracks[0].rows.steps.map((step) => ({
-      ...step,
-      part: 't3-drill-bit',
-    }))
-    const frames = createTrackLookFrames({
-      ...SHIPPED_RIG_LOOKS.tracks[0].rows,
-      replaces: 'drill-bit',
-      steps,
-    })
-    expect(lookFrameAt(frames, 101)).toMatchObject({ assetId: 'vehicle', replacesSlot: null })
-    expect(shownOf(lookFrameAt(frames, 101))).not.toBe(shownOf(lookFrameAt(frames, 100)))
+    const shipped = SHIPPED_RIG_LOOKS.tracks[0].rows
+    const steps = shipped.steps.map((step) => ({ ...step, part: 't3-drill-bit' }))
+    const frames = createTrackLookFrames(
+      { ...shipped, replaces: 'drill-bit', steps },
+      RIG_LOOK_TABLE.finishes,
+    )
+    const past = topStepOf(frames.rows).from + frames.rows.band.step
+    expect(lookFrameAt(frames, past)).toMatchObject({ assetId: 'vehicle', replacesSlot: null })
+    expect(shownOf(frames, past)).not.toBe(shownOf(frames, past - 1))
   })
 })

@@ -11,6 +11,7 @@ import { createRigLooks, SHIPPED_RIG_LOOKS } from './rigLooks'
 import { createRigLookSources, rigLookSourceIdOf } from './rigLookSource'
 import { readRigLookTable } from './rigLookTable'
 import { RIG_LOOK_TABLE } from './rigLookTable'
+import { bandEvery, FIXTURE_FINISHES } from './render/rigLookFixtures'
 
 const setUpgrade = (upgradeId: string, level: number) => ({
   type: 'debug.setUpgrade' as const,
@@ -58,6 +59,9 @@ function partSlotsOfOtherAssets(): Set<string> {
 
 type DrillLook554 = (typeof DRILL_LOOK_554.looks)[number]
 
+/** drill_power's band since ticket 809: #554's rows sit on its first nine edges. */
+const DRILL_POWER_BAND = 6
+
 /**
  * #554's look with its bit glow on `nose`: the drill tip's crowns stand in the bit's place
  * (ticket 579), so the bit's glow lights them too and the nose stays the brightest part (ticket
@@ -77,23 +81,24 @@ describe('rig look on the vehicle', () => {
     for (const rows of RIG_LOOK_TABLE.tracks) expect(ids).toContain(rigLookSourceIdOf(rows.track))
   })
 
-  it("paints drill_power as #554 did for every count up to 100, its bit glow on the tip's crowns too", () => {
+  it("paints #554's nine drill_power looks in order on its bands of 6, the bit glow on the tip's crowns too", () => {
     const state = createScriptedSession().state()
-    const looks = Array.from({ length: 101 }, (_, n) =>
+    const looks = Array.from({ length: 60 }, (_, n) =>
       sourceOf('drill_power').lookOf(withLevel(state, 'p1', 'drill_power', n), 'p1', 0),
     )
     const crowns = SHIPPED_RIG_LOOKS.tracks.find((frames) => frames.rows.track === 'drill_tip')!
     const nose = ['drill-bit', ...crowns.rows.steps.flatMap((step) => step.part ?? [])]
+    const stageOf = (n: number) => Math.min(Math.floor(n / DRILL_POWER_BAND), 9)
     expect(looks).toEqual(
-      DRILL_LOOK_554.stageOf.map((stage) => withNoseSlots(DRILL_LOOK_554.looks[stage], nose)),
+      looks.map((_, n) => withNoseSlots(DRILL_LOOK_554.looks[stageOf(n)], nose)),
     )
   })
 
-  it('paints a new look at drill_power 101, where #554 held its last row', () => {
+  it("paints a new finish at drill_power 60, the band past #554's last row", () => {
     const state = createScriptedSession().state()
     const lookAt = (n: number) =>
       sourceOf('drill_power').lookOf(withLevel(state, 'p1', 'drill_power', n), 'p1', 0)
-    expect(lookAt(101)).not.toEqual(lookAt(100))
+    expect(lookAt(60)).not.toEqual(lookAt(59))
   })
 
   it('wears no look on a new vehicle, nor for a player not in the state', () => {
@@ -106,7 +111,7 @@ describe('rig look on the vehicle', () => {
 
   it('steps up when a track is bought past its first step', () => {
     const session = createScriptedSession()
-    session.submit(1, setUpgrade('engine', 2))
+    session.submit(1, setUpgrade('engine', 5))
     expect(sourceOf('engine').lookOf(session.state(), 'p1', 1)?.glows[0].slots).toEqual([
       'piston',
       'iron-track',
@@ -165,6 +170,8 @@ describe('rig look on the vehicle', () => {
       {
         glowCaps: { rigBody: 1 },
         lookAssets: {},
+        finishes: FIXTURE_FINISHES,
+        glint: { ticks: 24, colour: '#fff2c8', glow: 0.25 },
         tracks: [
           {
             track: 'combat',
@@ -172,12 +179,7 @@ describe('rig look on the vehicle', () => {
             glowSlots: [['turret']],
             glowCap: 'rigBody',
             steps: [{ from: 6, part: null, card: 'Pintle mount', colour: '#a0b0c0', glows: [0.4] }],
-            tail: {
-              delta: 1,
-              palette: ['#000001', '#000002'],
-              plating: ['a', 'b'],
-              glow: [[0.1], [0.2]],
-            },
+            band: bandEvery(6, 1),
           },
         ],
       },

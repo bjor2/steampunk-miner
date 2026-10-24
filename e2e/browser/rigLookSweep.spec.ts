@@ -1,21 +1,22 @@
 /**
- * The rig look sweep (ticket 590; G&V spec v2 on #157, GD lock 6300553486): every track of
- * `rigLook.json` at every step and two tail points, shot at 360 px and at desktop size and
- * attached for review; at 360 px the rig differs between n and n + 1 at every step and for the
- * first 200 tail purchases; and with every track at its brightest look the threat markers, the
- * strip's pips and the collapse warning are still drawn as at the bare rig.
+ * The rig look sweep (ticket 590; re-keyed onto the power-decade bands by ticket 809, LK1; GD lock
+ * of 24 Oct on #647): every track of `rigLook.json` shot at the golden counts 0, 1, 10, 99, 9999
+ * and 1e6, at each authored edge and one either side, and on its first finish band, at 360 px and
+ * at desktop size and attached for review; at 360 px and at 1280 px the slot's crop differs across
+ * every band edge to the last authored one and the first 20 finish bands past it (Progression: two
+ * neighbouring bands never match); and with every line maxed (a million purchases, pips and all)
+ * the threat markers, the strip's pips and the collapse warning are still drawn as at the bare rig
+ * at 360 px, 1280 x 800 and 1920 x 1080, and zoomed out on the desktop.
  *
  * The diff is the spec's own acceptance (#157 "Done when": a pixel-diff test with a fixed
  * threshold), so this spec reads pixels where the rulebook's section 5 otherwise asks for state:
  * it only compares two shots of one run, never a committed image. The game's clock is held
  * (`page.clock`) and each look gets the same frames, and a control pair of one count shot twice
- * must stay under the threshold, so a pass is the look and not the rig's idle motion. Below a
- * track's first step and between its steps the look does not change by design (VS on #157: steps
- * only at Systems' thresholds); every purchase from the top step on moves one tail step (GD: the
- * linear tail), which is what n = 1..200 counts.
+ * must stay under the threshold, so a pass is the look and not the rig's idle motion. Inside a
+ * band the look does not change by design (the VS step rule on #809: one look a band).
  */
 import { expect, test, type Page } from '@playwright/test'
-import { VIEW_SHORT_AXIS_MIN_M } from '../../src/constants/scene'
+import { VIEW_SHORT_AXIS_MAX_M, VIEW_SHORT_AXIS_MIN_M } from '../../src/constants/scene'
 import type { DebugApi } from '../../src/debug/debugApi'
 import RIG_LOOK_FILE from '../../src/features/rig-look/rigLook.json'
 import { UI_ID_TEMPLATES } from '../../src/systems/views/screenIds'
@@ -29,13 +30,8 @@ declare global {
 
 interface TrackRows {
   track: string
-  steps: readonly { from: number; glows: readonly number[] }[]
-  tail: {
-    delta: number
-    palette: readonly string[]
-    plating: readonly string[]
-    glow: readonly (readonly number[])[]
-  }
+  steps: readonly { from: number }[]
+  band: { step: number; edges: readonly number[] }
 }
 
 interface ScreenRegion {
@@ -47,9 +43,25 @@ interface ScreenRegion {
 
 const TRACKS: readonly TrackRows[] = RIG_LOOK_FILE.tracks
 const PHONE = { name: 'phone', size: { width: 360, height: 640 } }
-const VIEWPORTS = [{ name: 'desktop', size: { width: 1280, height: 720 } }, PHONE]
-/** The GD's n = 1..200: tail steps past the top step each track must show apart. */
-const TAIL_PURCHASES = 200
+const DESKTOP = { name: 'desktop', size: { width: 1280, height: 720 } }
+const VIEWPORTS = [DESKTOP, PHONE]
+/** The all-lines-maxed sweep's sizes (#809): phone, laptop and full HD, the last zoomed out too. */
+const MAXED_VIEWS = [
+  { name: 'phone', size: PHONE.size, zoom: VIEW_SHORT_AXIS_MIN_M },
+  { name: '1280x800', size: { width: 1280, height: 800 }, zoom: VIEW_SHORT_AXIS_MIN_M },
+  { name: '1920x1080', size: { width: 1920, height: 1080 }, zoom: VIEW_SHORT_AXIS_MIN_M },
+  {
+    name: '1920x1080 zoomed out',
+    size: { width: 1920, height: 1080 },
+    zoom: VIEW_SHORT_AXIS_MAX_M,
+  },
+]
+/** The golden counts every line is shot at (#809). */
+const GOLDEN_COUNTS = [0, 1, 10, 99, 9_999, 1_000_000]
+/** Finish bands past the last authored edge each crop must tell apart. */
+const FINISH_BANDS = 20
+/** Every line maxed: a million purchases, far past any authored edge. */
+const MAXED_PURCHASES = 1_000_000
 /**
  * One visible step at 360 px (#157: Δ is one visible step): at least 16 pixels, a 4 x 4 patch,
  * each moved by at least 24 of 255 on some channel. Fixed here, never tuned to pass.
@@ -73,44 +85,28 @@ function topOf(rows: TrackRows): number {
   return rows.steps[rows.steps.length - 1].from
 }
 
-/** Every step's first count, then two tail points. */
+/** The golden counts, each authored edge and one either side, and the first finish band. */
 function shotCountsOf(rows: TrackRows): number[] {
-  const top = topOf(rows)
-  return [...rows.steps.map((step) => step.from), top + rows.tail.delta, top + 2 * rows.tail.delta]
+  const edges = rows.steps.flatMap((step) => [step.from - 1, step.from, step.from + 1])
+  const counts = [...GOLDEN_COUNTS, ...edges, topOf(rows) + rows.band.step]
+  return [...new Set(counts)].sort((a, b) => a - b)
 }
 
-/** `[n, n + 1]` across every step's threshold, then the first 200 tail steps. */
+/** `[n - 1, n]` across every band edge to the last authored one, then 20 finish bands on. */
 function neighbourPairsOf(rows: TrackRows): [number, number][] {
-  const top = topOf(rows)
-  const steps = rows.steps.map((step): [number, number] => [step.from - 1, step.from])
-  const tail = Array.from({ length: TAIL_PURCHASES }, (_, at): [number, number] => [
-    top + at * rows.tail.delta,
-    top + (at + 1) * rows.tail.delta,
-  ])
-  return [...steps, ...tail]
+  const { step, edges } = rows.band
+  const last = edges[edges.length - 1]
+  const onward = Array.from({ length: FINISH_BANDS }, (_, at) => last + (at + 1) * step)
+  return [...edges, ...onward].map((edge): [number, number] => [edge - 1, edge])
 }
 
-/** The count of the track's brightest look: its top step, or the tail's brightest glow rung. */
-function brightestCountOf(rows: TrackRows): number {
-  const { palette, plating, glow, delta } = rows.tail
-  const rung = glow.reduce((best, glows, at) => (sumOf(glows) > sumOf(glow[best]) ? at : best), 0)
-  const isTopBrighter = sumOf(rows.steps[rows.steps.length - 1].glows) > sumOf(glow[rung])
-  return isTopBrighter
-    ? topOf(rows)
-    : topOf(rows) + delta * (1 + rung * palette.length * plating.length)
-}
-
-function sumOf(values: readonly number[]): number {
-  return values.reduce((sum, value) => sum + value, 0)
-}
-
-async function openGame(page: Page): Promise<string[]> {
+async function openGame(page: Page, zoom = VIEW_SHORT_AXIS_MIN_M): Promise<string[]> {
   const errors: string[] = []
   page.on('pageerror', (error) => errors.push(String(error)))
   await page.clock.install()
   await page.goto('/?debug')
   await page.waitForFunction(() => window.steampunkDebug !== undefined)
-  await page.evaluate((zoom) => window.steampunkDebug!.ui.setZoom(zoom), VIEW_SHORT_AXIS_MIN_M)
+  await page.evaluate((shortAxis) => window.steampunkDebug!.ui.setZoom(shortAxis), zoom)
   return errors
 }
 
@@ -208,9 +204,9 @@ function changedPixelsBetween(page: Page, before: Buffer, after: Buffer): Promis
   )
 }
 
-/** Visits every step with the clock running, so each look's atlas is in before the hold. */
+/** Visits every authored step with the clock running, so each atlas is in before the hold. */
 async function loadEveryStepArt(page: Page, rows: TrackRows): Promise<void> {
-  for (const purchases of shotCountsOf(rows)) await showSettledLook(page, rows.track, purchases)
+  for (const { from } of rows.steps) await showSettledLook(page, rows.track, from)
 }
 
 /** One count shot twice under the held clock: what the rig's own motion changes. */
@@ -315,20 +311,20 @@ async function redrawnWarningsOf(page: Page, bare: readonly WarningShot[]): Prom
   return redrawn
 }
 
-/** Every track at once, then one held run: the collapse warning lasts only 60 ticks. */
-async function showBrightestLooks(page: Page): Promise<void> {
-  for (const rows of TRACKS) await setUpgrade(page, rows.track, brightestCountOf(rows))
+/** Every line maxed at once, then one held run: the collapse warning lasts only 60 ticks. */
+async function showMaxedLooks(page: Page): Promise<void> {
+  for (const rows of TRACKS) await setUpgrade(page, rows.track, MAXED_PURCHASES)
   await expect
     .poll(async () => {
       await page.clock.runFor(FRAME_RUN_MS)
       return Promise.all(TRACKS.map((rows) => lookPurchasesOf(page, rows.track)))
     })
-    .toEqual(TRACKS.map(brightestCountOf))
+    .toEqual(TRACKS.map(() => MAXED_PURCHASES))
 }
 
-test.describe('rig look sweep (ticket 590)', () => {
+test.describe('rig look sweep (tickets 590, 809)', () => {
   for (const viewport of VIEWPORTS) {
-    test(`shoots every track at every step and two tail points, ${viewport.name}`, async ({
+    test(`shoots every track at the golden counts and each authored edge, ${viewport.name}`, async ({
       page,
     }) => {
       test.setTimeout(SWEEP_TIMEOUT_MS)
@@ -346,29 +342,33 @@ test.describe('rig look sweep (ticket 590)', () => {
   }
 
   for (const rows of TRACKS) {
-    test(`tells n from n + 1 at 360 px at every step and 200 tail purchases, ${rows.track}`, async ({
-      page,
-    }) => {
-      test.setTimeout(SWEEP_TIMEOUT_MS)
-      await page.setViewportSize(PHONE.size)
-      const errors = await openGame(page)
-      await showBareRig(page)
-      await loadEveryStepArt(page, rows)
-      await holdClock(page)
-      const region = await rigRegionOf(page)
-      expect(await idleChangeOf(page, rows, region), 'idle motion').toBeLessThan(CHANGED_PIXELS_MIN)
-      expect(await unchangedPairsOf(page, rows, region)).toEqual([])
-      expect(errors).toEqual([])
-    })
+    for (const viewport of VIEWPORTS) {
+      test(`tells neighbouring bands apart in the slot's crop, ${rows.track}, ${viewport.name}`, async ({
+        page,
+      }) => {
+        test.setTimeout(SWEEP_TIMEOUT_MS)
+        await page.setViewportSize(viewport.size)
+        const errors = await openGame(page)
+        await showBareRig(page)
+        await loadEveryStepArt(page, rows)
+        await holdClock(page)
+        const region = await rigRegionOf(page)
+        expect(await idleChangeOf(page, rows, region), 'idle motion').toBeLessThan(
+          CHANGED_PIXELS_MIN,
+        )
+        expect(await unchangedPairsOf(page, rows, region)).toEqual([])
+        expect(errors).toEqual([])
+      })
+    }
   }
 
-  for (const viewport of VIEWPORTS) {
-    test(`draws the warnings as at the bare rig with every track at its brightest, ${viewport.name}`, async ({
+  for (const viewport of MAXED_VIEWS) {
+    test(`draws the warnings as at the bare rig with every line maxed, ${viewport.name}`, async ({
       page,
     }) => {
       test.setTimeout(SWEEP_TIMEOUT_MS)
       await page.setViewportSize(viewport.size)
-      const errors = await openGame(page)
+      const errors = await openGame(page, viewport.zoom)
       await showBareRig(page)
       for (const rows of TRACKS) await loadEveryStepArt(page, rows)
       await showBareRig(page)
@@ -376,9 +376,9 @@ test.describe('rig look sweep (ticket 590)', () => {
       await stageWarnings(page)
       const bare = await shootWarnings(page)
       await attachShot(page, `warnings, bare rig, ${viewport.name}`)
-      await showBrightestLooks(page)
+      await showMaxedLooks(page)
       await expect(page.getByTestId(COLLAPSE_CHIP)).toBeVisible()
-      await attachShot(page, `warnings, brightest looks, ${viewport.name}`)
+      await attachShot(page, `warnings, every line maxed, ${viewport.name}`)
       expect(await redrawnWarningsOf(page, bare)).toEqual([])
       expect(errors).toEqual([])
     })

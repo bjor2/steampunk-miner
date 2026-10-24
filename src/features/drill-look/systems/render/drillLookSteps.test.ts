@@ -10,13 +10,13 @@ describe('drill look steps', () => {
   it('shows no look at purchase 0 and 1, nor anywhere below the first threshold', () => {
     expect(drillLookStageOf(0)).toBe(0)
     expect(drillLookStageOf(1)).toBe(0)
-    expect(drillLookStageOf(4)).toBe(0)
+    expect(drillLookStageOf(5)).toBe(0)
     expect(coloursOf([0])).toEqual([null])
   })
 
-  it('takes its first step at purchase 5', () => {
-    expect(DRILL_LOOK_STEPS[0].fromPurchase).toBe(5)
-    expect(drillLookStageOf(5)).toBe(1)
+  it('takes its first step at purchase 6, its band edge since ticket 809', () => {
+    expect(DRILL_LOOK_STEPS[0].fromPurchase).toBe(6)
+    expect(drillLookStageOf(6)).toBe(1)
   })
 
   it('steps exactly on each threshold and holds until the next', () => {
@@ -38,10 +38,10 @@ describe('drill look steps', () => {
     expect(new Set(coloursOf(range).filter((colour) => colour !== null)).size).toBeGreaterThan(2)
   })
 
-  it('still shows distinct looks at purchases 20, 50 and 100, and a new tail look past it', () => {
-    const [at20, at50, at100, at101, at1000] = coloursOf([20, 50, 100, 101, 1000])
-    expect(new Set([at20, at50, at100]).size).toBe(3)
-    expect(at101).not.toBe(at100)
+  it('still shows distinct looks at purchases 20, 40 and 54, and a new finish band past it', () => {
+    const [at20, at40, at54, at60, at1000] = coloursOf([20, 40, 54, 60, 1000])
+    expect(new Set([at20, at40, at54]).size).toBe(3)
+    expect(at60).not.toBe(at54)
     expect(at1000).not.toBeNull()
   })
 
@@ -51,7 +51,7 @@ describe('drill look steps', () => {
   })
 
   it('reads a retuned table the same way', () => {
-    const table = [{ fromPurchase: 3, colour: '#000001', bitGlow: 1, headGlow: 0 }]
-    expect([2, 3, 99].map((n) => drillLookStageOf(n, table))).toEqual([0, 1, 1])
+    const table = [{ fromPurchase: 6, colour: '#000001', bitGlow: 1, headGlow: 0 }]
+    expect([5, 6, 99].map((n) => drillLookStageOf(n, table))).toEqual([0, 1, 1])
   })
 })

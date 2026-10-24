@@ -47,14 +47,14 @@ const ITEMS: readonly ItemOnRig[] = [
   { itemId: 'weapon.overpressure_burst', attachId: 'hull.turret', partIds: ['overpressure-tank'] },
   { itemId: 'weapon.ricochet_shot', attachId: 'hull.turret', partIds: ['ricochet-hopper'] },
 ]
-/** One purchase past each track's top step (rigLook.json), so every look shows its top part. */
+/** One band past each track's top step (rigLook.json, ticket 809): every look's top part. */
 const HIGHEST_LOOK: Readonly<Record<string, number>> = {
-  drill_power: 101,
-  drill_tip: 281,
-  engine: 27,
-  boiler: 17,
-  cargo_hold: 34,
-  hull: 441,
+  drill_power: 60,
+  drill_tip: 360,
+  engine: 20,
+  boiler: 10,
+  cargo_hold: 44,
+  hull: 720,
 }
 /** The turret's first major level is ten minor steps (#180): `setGunLevel` takes steps. */
 const TURRET_FIRST_LEVEL_STEPS = 10

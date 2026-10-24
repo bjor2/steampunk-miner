@@ -1,94 +1,61 @@
 import { describe, expect, it } from 'vitest'
+import { bandEvery } from './render/rigLookFixtures'
 import type { TrackLookRows } from './render/rigLookIndex'
-import { stepPlanetMissesOf, stepPlanetProblemsOf, type TrackPurchase } from './rigLookPlanets'
-import { RIG_LOOK_TABLE } from './rigLookTable'
+import {
+  cadenceWarningOf,
+  edgesFirstReachedOf,
+  planetsPerBandOf,
+  purchasesPerPlanetOf,
+  type TrackPurchase,
+} from './rigLookPlanets'
 
+/** Bands of 5 engine purchases, four edges. */
 const ENGINE: TrackLookRows = {
   track: 'engine',
   slot: 'chassis.drive',
   glowSlots: [['piston']],
   glowCap: 'rigBody',
-  steps: [
-    { from: 2, planet: 1, part: null, card: null, colour: '#d9a066', glows: [0.3] },
-    { from: 18, planet: 5, part: null, card: null, colour: '#ff8c42', glows: [0.5] },
-  ],
-  tail: { delta: 1, palette: ['#ffd27a', '#8fffb0'], plating: ['bright', 'blued'], glow: [[0.6]] },
+  steps: [{ from: 5, part: null, card: null, colour: '#d9a066', glows: [0.3] }],
+  band: bandEvery(5, 4),
 }
 
-function planetsOf(track: string): (number | undefined)[] | undefined {
-  return RIG_LOOK_TABLE.tracks
-    .find((rows) => rows.track === track)
-    ?.steps.map((step) => step.planet)
+/** One engine purchase per level from `from + 1` to `to` on `planet`. */
+function buys(planet: number, from: number, to: number): TrackPurchase[] {
+  return Array.from({ length: to - from }, (_, at) => ({
+    track: 'engine',
+    planet,
+    toLevel: from + at + 1,
+  }))
 }
 
-/** One engine purchase per entry: `[planet, toLevel]`. */
-function enginePurchases(...made: [number, number][]): TrackPurchase[] {
-  return made.map(([planet, toLevel]) => ({ track: 'engine', planet, toLevel }))
-}
-
-function withPlanets(...planets: (number | undefined)[]): TrackLookRows {
-  return { ...ENGINE, steps: ENGINE.steps.map((step, at) => ({ ...step, planet: planets[at] })) }
-}
-
-describe('rig look step planets', () => {
-  it("takes each step's planet from Systems' table, the planet left at its count", () => {
-    expect(planetsOf('drill_tip')).toEqual([1, 2, 3, 5, 8])
-    expect(planetsOf('cargo_hold')).toEqual([1, 5, 8])
-    expect(planetsOf('engine')).toEqual([1, 5, 8])
-    expect(planetsOf('boiler')).toEqual([1])
-    expect(planetsOf('hull')).toEqual([1, 2, 3, 5, 8])
-  })
-
-  it("leaves #554's drill_power rows without planets", () => {
-    expect(new Set(planetsOf('drill_power'))).toEqual(new Set([undefined]))
-  })
-
-  it('refuses planets that do not rise, so a track never steps twice on one planet', () => {
-    expect(stepPlanetProblemsOf(withPlanets(1, 5))).toEqual([])
-    expect(stepPlanetProblemsOf(withPlanets(5, 5))).toEqual(['step from 18: planet does not rise'])
-    expect(stepPlanetProblemsOf(withPlanets(0, 5))).toEqual(['step from 2: planet is not from 1'])
-  })
-
-  it('refuses a planet on some steps but not all', () => {
-    expect(stepPlanetProblemsOf(withPlanets(1, undefined))).toEqual([
-      'names a planet on some steps, not all',
-    ])
-    expect(stepPlanetProblemsOf(withPlanets(undefined, undefined))).toEqual([])
-  })
-
-  it('passes a run that first shows each step on its planet or one either side', () => {
-    expect(stepPlanetMissesOf(ENGINE, enginePurchases([1, 1], [1, 2], [4, 18]), 6)).toEqual([])
-    expect(stepPlanetMissesOf(ENGINE, enginePurchases([2, 2], [6, 18]), 6)).toEqual([])
-  })
-
-  it('names a step that first shows more than one planet from its row', () => {
-    expect(stepPlanetMissesOf(ENGINE, enginePurchases([1, 2], [3, 18]), 6)).toEqual([
-      'engine: step from 18 (P5) first shows on P3',
+describe('rig look band cadence (ticket 809)', () => {
+  it('finds the planet each edge was first reached on, null for one never reached', () => {
+    const run = [...buys(1, 0, 6), ...buys(3, 6, 12), { track: 'hull', planet: 4, toLevel: 99 }]
+    expect(edgesFirstReachedOf(ENGINE, run)).toEqual([
+      { edge: 5, planet: 1 },
+      { edge: 10, planet: 3 },
+      { edge: 15, planet: null },
+      { edge: 20, planet: null },
     ])
   })
 
-  it('reads where a step first shows from the first purchase that reaches its count', () => {
-    const jumped = enginePurchases([1, 3], [5, 20], [9, 40])
-    expect(stepPlanetMissesOf(ENGINE, jumped, 9)).toEqual([])
+  it("counts a line's purchases on every planet, 0 where it bought none", () => {
+    const run = [...buys(1, 0, 3), ...buys(3, 3, 4)]
+    expect(purchasesPerPlanetOf('engine', run, 4)).toEqual([3, 0, 1, 0])
+    expect(purchasesPerPlanetOf('fuel_tank', run, 2)).toEqual([0, 0])
   })
 
-  it('names a step never shown once the run finished the last planet it could show on', () => {
-    const early = enginePurchases([1, 2])
-    expect(stepPlanetMissesOf(ENGINE, early, 5)).toEqual([])
-    expect(stepPlanetMissesOf(ENGINE, early, 6)).toEqual([
-      "engine: step from 18 (P5) never shows by P6's core",
-    ])
+  it('reads the planets finished per band reached as the cadence', () => {
+    const run = [...buys(1, 0, 5), ...buys(3, 5, 10), ...buys(5, 10, 15)]
+    expect(planetsPerBandOf(ENGINE, run, 6)).toBe(2)
+    expect(planetsPerBandOf(ENGINE, [], 6)).toBe(Infinity)
   })
 
-  it('names a planet a track steps on twice', () => {
-    const rows = withPlanets(1, 2)
-    expect(stepPlanetMissesOf(rows, enginePurchases([2, 18]), 3)).toEqual([
-      'engine: steps twice on P2',
-    ])
-  })
-
-  it("counts only the track's own purchases", () => {
-    const others: TrackPurchase[] = [{ track: 'hull', planet: 1, toLevel: 18 }]
-    expect(stepPlanetMissesOf(ENGINE, [...others, ...enginePurchases([1, 2])], 5)).toEqual([])
+  it('warns, never fails, when a line falls outside 1 to 3 planets a band', () => {
+    const steady = [...buys(1, 0, 5), ...buys(3, 5, 10), ...buys(5, 10, 15)]
+    expect(cadenceWarningOf(ENGINE, steady, 6)).toBeNull()
+    expect(cadenceWarningOf(ENGINE, buys(1, 0, 20), 2)).toBe('engine: 0.50 planets a band by P2')
+    expect(cadenceWarningOf(ENGINE, buys(1, 0, 5), 8)).toBe('engine: 8.00 planets a band by P8')
+    expect(cadenceWarningOf(ENGINE, [], 8)).toBe('engine: no band reached by P8')
   })
 })

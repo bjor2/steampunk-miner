@@ -15,13 +15,14 @@ import { rigLookOf, SHIPPED_RIG_LOOKS, trackLookFramesOf } from './rigLooks'
 const ASSET_ID = 'vehicle-look-cargo-hold'
 const HOLD = trackLookFramesOf(SHIPPED_RIG_LOOKS, 'cargo_hold')!
 
-/** Systems' thresholds (#157 comment 6300543785), Progression's names (6300549964), #580's parts. */
+/** The first band edges of 11 (ticket 809), Progression's names (6300549964), #580's parts. */
 const STEPS = [
-  { from: 23, card: 'Plank crate', part: 'plank-crate' },
-  { from: 31, card: 'Ore hopper', part: 'ore-hopper' },
+  { from: 11, card: 'Plank crate', part: 'plank-crate' },
+  { from: 22, card: 'Ore hopper', part: 'ore-hopper' },
   { from: 33, card: 'Riveted bin', part: 'riveted-bin' },
 ]
 const TOP = 33
+const BAND = 11
 const VISUAL_TIERS = [1, 2, 3]
 
 const holdAt = (n: number): RigLookFrame => rigLookOf('cargo_hold', n)!
@@ -33,19 +34,19 @@ function withHoldLevel(state: AuthorityState, level: number): AuthorityState {
   return { ...state, players: { ...state.players, p1: { ...player, vehicle } } }
 }
 
-/** What a frame draws: its part, asset, tint, glow and plating. */
+/** What a frame draws: its part, asset, tint, glow and finish. */
 const shownOf = (frame: RigLookFrame): string =>
-  JSON.stringify([frame.partId, frame.assetId, frame.tint, frame.glows, frame.plating])
+  JSON.stringify([frame.partId, frame.assetId, frame.tint, frame.glows, frame.finish])
 
 describe('cargo hold look (ticket 581)', () => {
-  it('reads its three steps from the table at 23, 31 and 33 purchases', () => {
+  it('reads its three steps from the table at 11, 22 and 33 purchases', () => {
     expect(HOLD.rows.steps.map(({ from, card, part }) => ({ from, card, part }))).toEqual(STEPS)
     expect(HOLD.rows.steps.every((step) => step.asset === ASSET_ID)).toBe(true)
   })
 
-  it('swaps no part below 23 purchases, so the rig keeps its own ore hatch', () => {
-    expect(holdAt(22).partId).toBeNull()
-    expect(partSwapsOf([holdAt(22)], [])).toEqual([])
+  it('swaps no part below 11 purchases, so the rig keeps its own ore hatch', () => {
+    expect(holdAt(10).partId).toBeNull()
+    expect(partSwapsOf([holdAt(10)], [])).toEqual([])
   })
 
   it.each(STEPS)('swaps in the $card from $from purchases, in place of the hopper', (step) => {
@@ -81,24 +82,24 @@ describe('cargo hold look (ticket 581)', () => {
     },
   )
 
-  it('keeps the Riveted bin on the tail and shows a new look on every purchase', () => {
-    for (let n = TOP; n < TOP + 50; n++) {
-      expect(holdAt(n + 1).partId).toBe('riveted-bin')
-      expect(shownOf(holdAt(n + 1))).not.toBe(shownOf(holdAt(n)))
+  it('keeps the Riveted bin past the art and shows a new finish every band', () => {
+    for (let n = TOP; n < TOP + 50 * BAND; n += BAND) {
+      expect(holdAt(n + BAND).partId).toBe('riveted-bin')
+      expect(shownOf(holdAt(n + BAND))).not.toBe(shownOf(holdAt(n)))
     }
   })
 
   it('changes the look at every step, from the bare rig on', () => {
-    const counts = [22, ...STEPS.map((step) => step.from)]
+    const counts = [10, ...STEPS.map((step) => step.from)]
     const shown = counts.map((n) => shownOf(holdAt(n)))
     expect(new Set(shown).size).toBe(counts.length)
   })
 
-  it('lights the swapped-in part, so the step tint and the tail show on it', () => {
+  it('lights the swapped-in part, so the step tint and the finishes show on it', () => {
     const state = createScriptedSession().state()
     const source = createRigLookSources().find((each) => each.id === 'rig-look.cargo_hold')!
     const player = state.players.p1
-    for (const n of [23, TOP + 1, TOP + 2]) {
+    for (const n of [11, TOP + BAND, TOP + 2 * BAND]) {
       const levels = { ...player.vehicle.levels, cargo_hold: n }
       const players = {
         ...state.players,
@@ -110,7 +111,7 @@ describe('cargo hold look (ticket 581)', () => {
   })
 
   it('leaves the state digest as it was at the lowest and the highest look', () => {
-    for (const n of [0, 22, TOP, 10_000]) {
+    for (const n of [0, 10, TOP, 10_000]) {
       const state = withHoldLevel(createScriptedSession().state(), n)
       const digest = stateDigest(state)
       const looks = partSwapsOf([lookFrameAt(HOLD, n)], [])

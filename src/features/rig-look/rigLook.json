@@ -1,6 +1,9 @@
 {
-  "$comment": "The rig look ladder (#577; G&V spec on #157, GD lock 6300553486; TD shape on #577), one row block per upgrade track, keyed by owned purchase count. `slot` is the track's own vehicle-attach point (the #180 showcase point), never a module or wagon point. Step thresholds are Systems' table (#157 comment 6300543785): the on-curve count on leaving P1, P2, P3, P5 and P8, duplicates dropped; hull's are levels.hull purchases (Systems on #577: 10 per tier, minorsPerMajor 10). drill_power keeps #554's nine rows unchanged (its old drillLook.json). `card` is Progression's step name (#157 comment 6300549964). `part` is the part a step swaps in; null until the wiring tickets (T7-T11) name it, so a step shows as the placeholder glow `colour`/`glows` on the track's `glowSlots`. A step's optional `asset` (ticket 640, TD ruling on #579) names the look asset its part is cut from, one of `lookAssets` (each with its part ids, registered through r.artAssets); absent, `part` is a tiered `vehicle` part. A track's optional `replaces` is the vehicle part slot such a look part stands in place of and hides (boiler: `boiler`); absent, the look lies over the rig (hull). A look part's own id joins its track's `glowSlots`, so the tail's tint and glow show on the part that stands in the hidden slot (drill_tip: its five crowns, ticket 579, which drill_power's nose glow lights too, so the nose stays the brightest part once a crown stands in the bit's place, ticket 590; cargo_hold: its three holds, ticket 581; boiler: `twin-drum-boiler`, ticket 583; hull: its five armours, laid over the pod, ticket 585; engine: its three tracks and wheels, `vehicle-look-drive` (ticket 731), laid over the rollers on `chassis.drive`; since #723 the engine is the only drive purchase, so the drive look keys on levels.engine with the engine thresholds and the tracks replaced #587's drive units, ticket 726, GD ruling on #726; a separate drive upgrade would move these rows to its track in one named re-pin, the art unchanged). A track's optional `plaque` holds the upgrade plaque's fitting fact templates (TD ruling on #579, ticket 585; Content on #157 comment 6300549964): `step` names the owned step's `card` as `{stepName}`, `tail` adds `{grade}` above the top step, the tail step reached from 1; a track without one keeps the plaque's own facts. The part and asset are a pure function of (track, owned count), never saved. Above the top step the tail moves one look per `delta` purchases (GD: 1) through the bounded ladders: tint every step, plating each palette lap, glow each palette x plating lap. glowCaps: every glow stays below its track's cap, summed per part slot across tracks; the drill nose (drill-bit) is the brightest part, the rest of the rig stays under rigBody. A step's optional `planet` is the planet Systems took its count from, the one the player leaves at that count (P1, P2, P3, P5 or P8, same table): a track's planets rise, so it steps at most once a planet, and the pacing bot must first show each step within one planet of it (ticket 590); #554's drill_power rows carry none. Starting values for G&V to tune; cosmetic only, never in state, a save or a digest.",
-  "glowCaps": { "drillNose": 3, "rigBody": 1 },
+  "$comment": "The rig look ladder (#577; G&V spec on #157, GD lock 6300553486; TD shape on #577), one row block per upgrade track, keyed by owned purchase count. Since ticket 809 (LK1; GD lock of 24 Oct 14:54 and the VS ruling of 24 Oct 14:58 via Systems on #809) every track steps on the power-decade band rule: `band.step` = max(1, min(`band.decadeStep`, `band.twoPlanetBuys`)) purchases a band. `decadeStep` is the purchases that raise the line's power tenfold, ceil(ln 10 / ln r) levels of its economy.json ratio (engine: its own speed term, 1.05, never thrust-to-weight), times 10 on the two-tier drill_tip and hull: drill_power 11, drill_tip 110 (11 levels), engine 48, boiler 25, cargo_hold 25, hull 210 (21 levels); a spec finds them again from economy.json with bigints. `twoPlanetBuys` is the median, over every two neighbouring planets of three seeds' bot runs, of the line's purchases on them: frozen from the P1-P8 bot traces on the pacing seeds 27182, 31415 and 83921 (the ticket 762 runs of 23 Oct, the box's newest; the bot lane rigLookPlanets.lane.test.ts measures main again and warns). `band.edges` are the bands' first counts, step, 2 step, ..., to about P40 on the median path (P8's median level plus 32 planets at half the two-planet buys; drill_tip and hull on their on-curve levels, 1240 and 2360): the ladder the art fills. The look depends on the count alone. `steps` are the authored steps, one on each of the first edges, in the order #554, #579-#590 and #640 drew them; `part` is the part a step swaps in, null for #554's glow-only drill_power rows. A step's optional `asset` names the look asset its part is cut from, one of `lookAssets`; absent, `part` is a tiered `vehicle` part. A track's optional `replaces` is the vehicle part slot such a look part stands in place of and hides; absent, the look lies over the rig. Past the authored steps each band wears the next finish of `band.finishes` (ids into `finishes`: a material, its name the hover's band name) over the top step's part, and pips counting decades of power, floor(band start / decadeStep), drawn on a badge at the track's slot; the cycle is long enough (at least ceil(decadeStep / step)) that no finish and pip count repeat. A band crossed by a purchase plays `glint` on the track's glow slots once. A track's optional `plaque` holds the Outfitter hover line: `step` names an authored band's `card` as `{bandName}`, `tail` the finish band's name and the exact level (`{level}`, #681 long mode). Band names are 3 words at most. glowCaps: every glow stays below its track's cap, summed per part slot across tracks, and a glint over a track's brightest look under its own; the drill nose (drill-bit) is the brightest part, the rest of the rig stays under rigBody. Cosmetic only, never in state, a save or a digest; `slot` is the track's own vehicle-attach point (the #180 showcase point), never a module or wagon point.",
+  "glowCaps": {
+    "drillNose": 3,
+    "rigBody": 1
+  },
   "lookAssets": {
     "vehicle-look-boiler": ["kettle-boiler", "twin-drum-boiler"],
     "vehicle-look-cargo-hold": ["ore-hatch", "ore-hopper", "plank-crate", "riveted-bin"],
@@ -22,6 +25,85 @@
       "riveted-plate"
     ]
   },
+  "finishes": {
+    "bright-brass": {
+      "name": "Bright brass",
+      "colour": "#d8b45a",
+      "metalness": 0.9,
+      "roughness": 0.3
+    },
+    "blued-steel": {
+      "name": "Blued steel",
+      "colour": "#4a6fa5",
+      "metalness": 0.85,
+      "roughness": 0.35
+    },
+    "aged-copper": {
+      "name": "Aged copper",
+      "colour": "#b06a3c",
+      "metalness": 0.8,
+      "roughness": 0.55
+    },
+    "nickel-plate": {
+      "name": "Nickel plate",
+      "colour": "#c8ccd0",
+      "metalness": 0.95,
+      "roughness": 0.2
+    },
+    "gunmetal": {
+      "name": "Gunmetal",
+      "colour": "#4c5258",
+      "metalness": 0.8,
+      "roughness": 0.45
+    },
+    "verdigris": {
+      "name": "Verdigris",
+      "colour": "#5fae94",
+      "metalness": 0.4,
+      "roughness": 0.7
+    },
+    "gilt": {
+      "name": "Gilt",
+      "colour": "#f0c840",
+      "metalness": 1,
+      "roughness": 0.15
+    },
+    "black-oxide": {
+      "name": "Black oxide",
+      "colour": "#2a2c30",
+      "metalness": 0.7,
+      "roughness": 0.5
+    },
+    "case-hardened": {
+      "name": "Case-hardened",
+      "colour": "#8a7ab8",
+      "metalness": 0.85,
+      "roughness": 0.35
+    },
+    "rose-bronze": {
+      "name": "Rose bronze",
+      "colour": "#c98a7a",
+      "metalness": 0.85,
+      "roughness": 0.4
+    },
+    "polished-chrome": {
+      "name": "Polished chrome",
+      "colour": "#e8eef4",
+      "metalness": 1,
+      "roughness": 0.08
+    },
+    "burnished-iron": {
+      "name": "Burnished iron",
+      "colour": "#6e5a48",
+      "metalness": 0.75,
+      "roughness": 0.5
+    }
+  },
+  "glint": {
+    "ticks": 24,
+    "colour": "#fff2c8",
+    "glow": 0.25
+  },
   "tracks": [
     {
       "track": "drill_power",
@@ -39,41 +121,88 @@
       ],
       "glowCap": "drillNose",
       "steps": [
-        { "from": 5, "part": null, "card": null, "colour": "#c8873a", "glows": [0.3, 0] },
-        { "from": 10, "part": null, "card": null, "colour": "#e8742a", "glows": [0.6, 0] },
-        { "from": 15, "part": null, "card": null, "colour": "#ff5a1f", "glows": [0.9, 0.3] },
-        { "from": 20, "part": null, "card": null, "colour": "#ffd27a", "glows": [1.2, 0.5] },
-        { "from": 30, "part": null, "card": null, "colour": "#5fd6c4", "glows": [1.4, 0.7] },
-        { "from": 40, "part": null, "card": null, "colour": "#b07aff", "glows": [1.6, 0.9] },
-        { "from": 50, "part": null, "card": null, "colour": "#ff7ae0", "glows": [1.8, 1.1] },
-        { "from": 75, "part": null, "card": null, "colour": "#f4f4ff", "glows": [2, 1.3] },
-        { "from": 100, "part": null, "card": null, "colour": "#ffe14a", "glows": [2.4, 1.6] }
+        {
+          "from": 6,
+          "part": null,
+          "card": null,
+          "colour": "#c8873a",
+          "glows": [0.3, 0]
+        },
+        {
+          "from": 12,
+          "part": null,
+          "card": null,
+          "colour": "#e8742a",
+          "glows": [0.6, 0]
+        },
+        {
+          "from": 18,
+          "part": null,
+          "card": null,
+          "colour": "#ff5a1f",
+          "glows": [0.9, 0.3]
+        },
+        {
+          "from": 24,
+          "part": null,
+          "card": null,
+          "colour": "#ffd27a",
+          "glows": [1.2, 0.5]
+        },
+        {
+          "from": 30,
+          "part": null,
+          "card": null,
+          "colour": "#5fd6c4",
+          "glows": [1.4, 0.7]
+        },
+        {
+          "from": 36,
+          "part": null,
+          "card": null,
+          "colour": "#b07aff",
+          "glows": [1.6, 0.9]
+        },
+        {
+          "from": 42,
+          "part": null,
+          "card": null,
+          "colour": "#ff7ae0",
+          "glows": [1.8, 1.1]
+        },
+        {
+          "from": 48,
+          "part": null,
+          "card": null,
+          "colour": "#f4f4ff",
+          "glows": [2, 1.3]
+        },
+        {
+          "from": 54,
+          "part": null,
+          "card": null,
+          "colour": "#ffe14a",
+          "glows": [2.4, 1.6]
+        }
       ],
-      "tail": {
-        "delta": 1,
-        "palette": [
-          "#ff9a3c",
-          "#7ae0ff",
-          "#ff6a9a",
-          "#c6ff7a",
-          "#ffb0f0",
-          "#7a9cff",
-          "#ffd0a0",
-          "#a0fff0"
+      "band": {
+        "decadeStep": 11,
+        "twoPlanetBuys": 6,
+        "step": 6,
+        "edges": [
+          6, 12, 18, 24, 30, 36, 42, 48, 54, 60, 66, 72, 78, 84, 90, 96, 102, 108, 114, 120, 126
         ],
-        "plating": ["bright", "blued", "aged"],
-        "glow": [
-          [2.4, 1.6],
-          [2, 1.2],
-          [2.2, 1.4]
-        ]
+        "finishes": ["gilt", "blued-steel", "polished-chrome", "rose-bronze"]
       }
     },
     {
       "track": "drill_tip",
       "slot": "drill.head",
       "replaces": "drill-bit",
-      "plaque": { "step": "Fitting: {stepName}", "tail": "Fitting: {stepName} · Grade {grade}" },
+      "plaque": {
+        "step": "Fitting: {bandName}",
+        "tail": "Fitting: {bandName} · L{level}"
+      },
       "glowSlots": [
         [
           "drill-bit",
@@ -87,8 +216,7 @@
       "glowCap": "drillNose",
       "steps": [
         {
-          "from": 70,
-          "planet": 1,
+          "from": 60,
           "part": "steel-cone",
           "asset": "vehicle-look-drill-tip",
           "card": "Steel cone",
@@ -96,8 +224,7 @@
           "glows": [0.1]
         },
         {
-          "from": 100,
-          "planet": 2,
+          "from": 120,
           "part": "fluted-bit",
           "asset": "vehicle-look-drill-tip",
           "card": "Fluted bit",
@@ -105,8 +232,7 @@
           "glows": [0.2]
         },
         {
-          "from": 130,
-          "planet": 3,
+          "from": 180,
           "part": "toothed-crown",
           "asset": "vehicle-look-drill-tip",
           "card": "Toothed crown",
@@ -114,8 +240,7 @@
           "glows": [0.3]
         },
         {
-          "from": 190,
-          "planet": 5,
+          "from": 240,
           "part": "gem-set-crown",
           "asset": "vehicle-look-drill-tip",
           "card": "Gem-set crown",
@@ -123,8 +248,7 @@
           "glows": [0.4]
         },
         {
-          "from": 280,
-          "planet": 8,
+          "from": 300,
           "part": "aether-cut-crown",
           "asset": "vehicle-look-drill-tip",
           "card": "Aether-cut crown",
@@ -132,23 +256,29 @@
           "glows": [0.5]
         }
       ],
-      "tail": {
-        "delta": 1,
-        "palette": ["#c0f0ff", "#ffc0a0", "#a0c8ff", "#f0a0ff"],
-        "plating": ["bright", "blued"],
-        "glow": [[0.4], [0.5]]
+      "band": {
+        "decadeStep": 110,
+        "twoPlanetBuys": 60,
+        "step": 60,
+        "edges": [
+          60, 120, 180, 240, 300, 360, 420, 480, 540, 600, 660, 720, 780, 840, 900, 960, 1020, 1080,
+          1140, 1200
+        ],
+        "finishes": ["nickel-plate", "case-hardened", "bright-brass", "black-oxide"]
       }
     },
     {
       "track": "engine",
       "slot": "chassis.drive",
-      "plaque": { "step": "Fitting: {stepName}", "tail": "Fitting: {stepName} · Grade {grade}" },
+      "plaque": {
+        "step": "Fitting: {bandName}",
+        "tail": "Fitting: {bandName} · L{level}"
+      },
       "glowSlots": [["piston", "iron-track", "steel-track", "guild-track"]],
       "glowCap": "rigBody",
       "steps": [
         {
-          "from": 2,
-          "planet": 1,
+          "from": 5,
           "part": "iron-track",
           "asset": "vehicle-look-drive",
           "card": "Single piston",
@@ -156,8 +286,7 @@
           "glows": [0.3]
         },
         {
-          "from": 18,
-          "planet": 5,
+          "from": 10,
           "part": "steel-track",
           "asset": "vehicle-look-drive",
           "card": "Triple flywheel",
@@ -165,8 +294,7 @@
           "glows": [0.5]
         },
         {
-          "from": 26,
-          "planet": 8,
+          "from": 15,
           "part": "guild-track",
           "asset": "vehicle-look-drive",
           "card": "Guild turbine",
@@ -174,24 +302,38 @@
           "glows": [0.7]
         }
       ],
-      "tail": {
-        "delta": 1,
-        "palette": ["#ffd27a", "#8fffb0", "#ff9ad5", "#9ab8ff"],
-        "plating": ["bright", "blued", "aged"],
-        "glow": [[0.6], [0.8]]
+      "band": {
+        "decadeStep": 48,
+        "twoPlanetBuys": 5,
+        "step": 5,
+        "edges": [5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60, 65, 70, 75, 80, 85, 90, 95, 100],
+        "finishes": [
+          "bright-brass",
+          "blued-steel",
+          "aged-copper",
+          "nickel-plate",
+          "gunmetal",
+          "verdigris",
+          "gilt",
+          "black-oxide",
+          "case-hardened",
+          "rose-bronze"
+        ]
       }
     },
     {
       "track": "boiler",
       "slot": "hull.boiler",
       "replaces": "boiler",
-      "plaque": { "step": "Fitting: {stepName}", "tail": "Fitting: {stepName} · Grade {grade}" },
+      "plaque": {
+        "step": "Fitting: {bandName}",
+        "tail": "Fitting: {bandName} · L{level}"
+      },
       "glowSlots": [["boiler", "boiler-2", "twin-drum-boiler"]],
       "glowCap": "rigBody",
       "steps": [
         {
-          "from": 16,
-          "planet": 1,
+          "from": 5,
           "part": "twin-drum-boiler",
           "asset": "vehicle-look-boiler",
           "card": "Twin-drum boiler",
@@ -199,24 +341,37 @@
           "glows": [0.5]
         }
       ],
-      "tail": {
-        "delta": 1,
-        "palette": ["#ffb070", "#7ad0ff", "#ff7ab8", "#c8ff7a", "#b08aff", "#7affd0"],
-        "plating": ["bright", "blued", "aged"],
-        "glow": [[0.4], [0.6], [0.8]]
+      "band": {
+        "decadeStep": 25,
+        "twoPlanetBuys": 5,
+        "step": 5,
+        "edges": [
+          5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60, 65, 70, 75, 80, 85, 90, 95, 100, 105, 110,
+          115
+        ],
+        "finishes": [
+          "aged-copper",
+          "gunmetal",
+          "bright-brass",
+          "verdigris",
+          "black-oxide",
+          "polished-chrome"
+        ]
       }
     },
     {
       "track": "cargo_hold",
       "slot": "hull.cargo",
       "replaces": "hopper",
-      "plaque": { "step": "Fitting: {stepName}", "tail": "Fitting: {stepName} · Grade {grade}" },
+      "plaque": {
+        "step": "Fitting: {bandName}",
+        "tail": "Fitting: {bandName} · L{level}"
+      },
       "glowSlots": [["hopper", "plank-crate", "ore-hopper", "riveted-bin"]],
       "glowCap": "rigBody",
       "steps": [
         {
-          "from": 23,
-          "planet": 1,
+          "from": 11,
           "part": "plank-crate",
           "asset": "vehicle-look-cargo-hold",
           "card": "Plank crate",
@@ -224,8 +379,7 @@
           "glows": [0.3]
         },
         {
-          "from": 31,
-          "planet": 5,
+          "from": 22,
           "part": "ore-hopper",
           "asset": "vehicle-look-cargo-hold",
           "card": "Ore hopper",
@@ -234,7 +388,6 @@
         },
         {
           "from": 33,
-          "planet": 8,
           "part": "riveted-bin",
           "asset": "vehicle-look-cargo-hold",
           "card": "Riveted bin",
@@ -242,17 +395,24 @@
           "glows": [0.7]
         }
       ],
-      "tail": {
-        "delta": 1,
-        "palette": ["#ffe0a0", "#a0ffd0", "#ffa0c0", "#c0c0ff"],
-        "plating": ["bright", "blued"],
-        "glow": [[0.6], [0.8]]
+      "band": {
+        "decadeStep": 25,
+        "twoPlanetBuys": 11,
+        "step": 11,
+        "edges": [
+          11, 22, 33, 44, 55, 66, 77, 88, 99, 110, 121, 132, 143, 154, 165, 176, 187, 198, 209, 220,
+          231
+        ],
+        "finishes": ["burnished-iron", "bright-brass", "blued-steel", "verdigris"]
       }
     },
     {
       "track": "hull",
       "slot": "hull.plates",
-      "plaque": { "step": "Fitting: {stepName}", "tail": "Fitting: {stepName} · Grade {grade}" },
+      "plaque": {
+        "step": "Fitting: {bandName}",
+        "tail": "Fitting: {bandName} · L{level}"
+      },
       "glowSlots": [
         [
           "armour-plate",
@@ -269,8 +429,7 @@
       "glowCap": "rigBody",
       "steps": [
         {
-          "from": 20,
-          "planet": 1,
+          "from": 120,
           "part": "riveted-plate",
           "asset": "vehicle-look-hull",
           "card": "Riveted plate",
@@ -278,8 +437,7 @@
           "glows": [0.2]
         },
         {
-          "from": 80,
-          "planet": 2,
+          "from": 240,
           "part": "banded-iron",
           "asset": "vehicle-look-hull",
           "card": "Banded iron",
@@ -287,8 +445,7 @@
           "glows": [0.3]
         },
         {
-          "from": 140,
-          "planet": 3,
+          "from": 360,
           "part": "brass-trimmed-armour",
           "asset": "vehicle-look-hull",
           "card": "Brass-trimmed armour",
@@ -296,8 +453,7 @@
           "glows": [0.4]
         },
         {
-          "from": 260,
-          "planet": 5,
+          "from": 480,
           "part": "layered-armour",
           "asset": "vehicle-look-hull",
           "card": "Layered armour",
@@ -305,8 +461,7 @@
           "glows": [0.5]
         },
         {
-          "from": 440,
-          "planet": 8,
+          "from": 600,
           "part": "filigree-armour",
           "asset": "vehicle-look-hull",
           "card": "Filigree armour",
@@ -314,11 +469,15 @@
           "glows": [0.6]
         }
       ],
-      "tail": {
-        "delta": 1,
-        "palette": ["#d0e8ff", "#ffc8a0", "#c0ffc8", "#ffb0d8"],
-        "plating": ["bright", "blued", "aged"],
-        "glow": [[0.5], [0.7]]
+      "band": {
+        "decadeStep": 210,
+        "twoPlanetBuys": 120,
+        "step": 120,
+        "edges": [
+          120, 240, 360, 480, 600, 720, 840, 960, 1080, 1200, 1320, 1440, 1560, 1680, 1800, 1920,
+          2040, 2160, 2280
+        ],
+        "finishes": ["gunmetal", "bright-brass", "nickel-plate", "aged-copper"]
       }
     }
   ]

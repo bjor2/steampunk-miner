@@ -8,13 +8,26 @@
  * A step's part is a `vehicle` part or a part of one of the table's look assets (the rig-look seam,
  * ticket 640: TD ruling on #579), and the `vehicle` slot a look part hides has one owner. A plaque
  * template shows its placeholders once each and names only steps that carry a card (ticket 585).
- * Step planets rise, one step a planet (ticket 590).
+ * Since ticket 809 a track's bands follow the VS step rule: its step is the decade step or the
+ * bot's two-planet buys, whichever is fewer; its edges are the step's multiples, at least 2
+ * purchases apart, with the authored steps on the first of them; and its finish cycle is long
+ * enough that no finish and pip count repeat, no two neighbours alike. Every band name (a step's
+ * card, a finish's name) is 3 words at most, and a band's glint over its brightest look stays
+ * under the track's cap.
  */
 import { isVehiclePartId } from '../../../systems/art/artIds'
 import { isAttachId } from '../../../systems/registries/vehicleAttach'
-import type { RigLookStepRow, RigLookTail, TrackLookRows } from './render/rigLookIndex'
+import type { RigLookFinish, RigLookStepRow, TrackLookRows } from './render/rigLookIndex'
 import { VEHICLE_LOOK_ASSET_ID } from './render/rigLookFrames'
-import { stepPlanetProblemsOf } from './rigLookPlanets'
+import {
+  bandProblemsOf,
+  finishCatalogueProblemsOf,
+  finishCycleProblemsOf,
+  glintCapProblemsOf,
+  glintProblemsOf,
+  isBandName,
+  type RigLookGlint,
+} from './rigLookBandChecks'
 import { plaqueProblemsOf } from './rigLookPlaque'
 
 export interface RigLookTable {
@@ -22,6 +35,10 @@ export interface RigLookTable {
   glowCaps: Readonly<Record<string, number>>
   /** The look assets a step may cut its part from, each with its part ids (`r.artAssets`). */
   lookAssets: Readonly<Record<string, readonly string[]>>
+  /** The finishes a band past the art may wear, by id (ticket 809). */
+  finishes: Readonly<Record<string, RigLookFinish>>
+  /** The glint a purchase that crosses a band plays on that track's glow slots. */
+  glint: RigLookGlint
   tracks: readonly TrackLookRows[]
 }
 
@@ -43,8 +60,6 @@ export const MODULE_ATTACH_POINTS: readonly string[] = [
   'hull.front',
 ]
 
-const LADDER_MIN = 2
-const LADDER_MAX = 8
 const HEX_COLOUR = /^#[0-9a-f]{6}$/
 
 /** Every problem with `table`, given the upgrade track ids it may name. */
@@ -54,6 +69,8 @@ export function rigLookTableProblemsOf(
 ): string[] {
   return [
     ...lookAssetProblemsOf(table),
+    ...finishCatalogueProblemsOf(table.finishes),
+    ...glintProblemsOf(table.glint),
     ...table.tracks.flatMap((rows) => trackProblemsOf(rows, table, knownTracks)),
     ...sharedPointProblemsOf(table.tracks),
     ...sharedHiddenSlotProblemsOf(table.tracks),
@@ -71,9 +88,10 @@ function trackProblemsOf(
     ...slotProblemsOf(rows),
     ...replacedSlotProblemsOf(rows),
     ...stepProblemsOf(rows),
-    ...stepPlanetProblemsOf(rows),
     ...stepPartProblemsOf(rows, table),
-    ...tailProblemsOf(rows),
+    ...bandProblemsOf(rows),
+    ...finishCycleProblemsOf(rows, table.finishes),
+    ...glintCapProblemsOf(rows, table.glint, capOf(table, rows)),
     ...plaqueProblemsOf(rows),
   ].map((problem) => `${rows.track}: ${problem}`)
 }
@@ -147,44 +165,10 @@ function stepProblemsOf(rows: TrackLookRows): string[] {
     if (before !== null && step.from <= before.from) problems.push('from does not rise')
     if (before !== null && step.colour === before.colour) problems.push('repeats the step before')
     if (!HEX_COLOUR.test(step.colour)) problems.push(`colour ${step.colour} is not #rrggbb`)
+    if (step.card !== null && !isBandName(step.card)) problems.push(`card ${step.card} is long`)
     problems.push(...glowProblemsOf(step.glows, rows))
     return problems.map((problem) => `step from ${step.from}: ${problem}`)
   })
-}
-
-function tailProblemsOf(rows: TrackLookRows): string[] {
-  const { tail } = rows
-  const problems = [
-    ...ladderProblemsOf('palette', tail.palette, (a, b) => a === b),
-    ...ladderProblemsOf('plating', tail.plating, (a, b) => a === b),
-    ...ladderProblemsOf('glow', tail.glow, isSameGlow),
-    ...tail.palette.filter((colour) => !HEX_COLOUR.test(colour)).map(notHexProblem),
-    ...tail.glow.flatMap((glows) => glowProblemsOf(glows, rows)),
-    ...deltaProblemsOf(tail),
-  ]
-  if (tail.palette[0] === rows.steps.at(-1)?.colour) problems.push('palette starts on the top step')
-  return problems.map((problem) => `tail: ${problem}`)
-}
-
-function deltaProblemsOf(tail: RigLookTail): string[] {
-  return Number.isInteger(tail.delta) && tail.delta >= 1 ? [] : ['delta is not a count from 1']
-}
-
-/** 2 to 8 entries, no neighbours alike, the last and the first included. */
-function ladderProblemsOf<T>(
-  name: string,
-  ladder: readonly T[],
-  isSame: (a: T, b: T) => boolean,
-): string[] {
-  if (ladder.length < LADDER_MIN || ladder.length > LADDER_MAX) {
-    return [`${name} has ${ladder.length} entries, not ${LADDER_MIN} to ${LADDER_MAX}`]
-  }
-  const repeats = ladder.filter((entry, at) => isSame(entry, ladder[(at + 1) % ladder.length]))
-  return repeats.length === 0 ? [] : [`${name} repeats a neighbour`]
-}
-
-function isSameGlow(a: readonly number[], b: readonly number[]): boolean {
-  return a.length === b.length && a.every((glow, at) => glow === b[at])
 }
 
 function glowProblemsOf(glows: readonly number[], rows: TrackLookRows): string[] {
@@ -192,10 +176,6 @@ function glowProblemsOf(glows: readonly number[], rows: TrackLookRows): string[]
   if (glows.length !== rows.glowSlots.length) problems.push('needs one glow per glow slot group')
   if (glows.some((glow) => !(glow >= 0))) problems.push('has a negative glow')
   return problems
-}
-
-function notHexProblem(colour: string): string {
-  return `colour ${colour} is not #rrggbb`
 }
 
 /** One attach point per track. */
@@ -256,6 +236,6 @@ function tracksLighting(tracks: readonly TrackLookRows[], slot: string): TrackLo
 
 function brightestGlowOn(rows: TrackLookRows, slot: string): number {
   const groups = rows.glowSlots.flatMap((group, at) => (group.includes(slot) ? [at] : []))
-  const glows = [...rows.steps.map((step) => step.glows), ...rows.tail.glow]
+  const glows = rows.steps.map((step) => step.glows)
   return Math.max(0, ...glows.flatMap((each) => groups.map((at) => each[at] ?? 0)))
 }

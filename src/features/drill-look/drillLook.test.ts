@@ -22,9 +22,9 @@ describe('drill look on the vehicle', () => {
 
   it('steps up when the drill_power purchases reach a threshold', () => {
     const session = createScriptedSession()
-    session.submit(1, setDrillPower(4))
+    session.submit(1, setDrillPower(5))
     const before = drillLookSource().lookOf(session.state(), 'p1', 1)
-    session.submit(2, setDrillPower(5))
+    session.submit(2, setDrillPower(6))
     const after = drillLookSource().lookOf(session.state(), 'p1', 2)
     expect(before).toBeNull()
     expect(after?.glows.map((glow) => glow.slots[0])).toEqual(['drill-bit', 'drill-head'])
@@ -52,7 +52,7 @@ describe('drill look on the vehicle', () => {
 
   it('plays no flash for any event', () => {
     const session = createScriptedSession()
-    const events = session.submit(1, setDrillPower(5))
+    const events = session.submit(1, setDrillPower(6))
     expect(events.map((event) => drillLookSource().flashOf(event))).toEqual(events.map(() => null))
   })
 })

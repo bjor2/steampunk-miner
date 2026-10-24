@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { UPGRADE_IDS } from '../../../systems/economy/economyDefinition'
-import type { TrackLookRows } from './render/rigLookIndex'
+import { bandEvery, FIXTURE_FINISHES } from './render/rigLookFixtures'
+import type { RigLookFinish, TrackLookRows } from './render/rigLookIndex'
 import { RIG_LOOK_TABLE, readRigLookTable, RigLookTableError } from './rigLookTable'
 import {
   MODULE_ATTACH_POINTS,
@@ -20,15 +21,10 @@ const GOOD_TRACK: TrackLookRows = {
   glowSlots: [['piston']],
   glowCap: 'rigBody',
   steps: [
-    { from: 2, part: null, card: 'Single piston', colour: '#d9a066', glows: [0.3] },
-    { from: 18, part: null, card: 'Triple flywheel', colour: '#ff8c42', glows: [0.5] },
+    { from: 5, part: null, card: 'Single piston', colour: '#d9a066', glows: [0.3] },
+    { from: 10, part: null, card: 'Triple flywheel', colour: '#ff8c42', glows: [0.5] },
   ],
-  tail: {
-    delta: 1,
-    palette: ['#ffd27a', '#8fffb0'],
-    plating: ['bright', 'blued'],
-    glow: [[0.6], [0.8]],
-  },
+  band: bandEvery(5, 3, 10),
 }
 
 const LOOK_ASSETS: RigLookTable['lookAssets'] = {
@@ -50,33 +46,83 @@ function lookStepProblemsOf(step: Partial<TrackLookRows['steps'][number]>): stri
   return problemsOf({ ...LOOK_TRACK, steps: [{ ...first, ...step }, second] })
 }
 
+const GLINT: RigLookTable['glint'] = { ticks: 24, colour: '#fff2c8', glow: 0.25 }
+
 function tableWith(...tracks: TrackLookRows[]): RigLookTable {
-  return { glowCaps: { drillNose: 3, rigBody: 1 }, lookAssets: LOOK_ASSETS, tracks }
+  return {
+    glowCaps: { drillNose: 3, rigBody: 1 },
+    lookAssets: LOOK_ASSETS,
+    finishes: FIXTURE_FINISHES,
+    glint: GLINT,
+    tracks,
+  }
 }
 
 function problemsOf(rows: Partial<TrackLookRows>, ...others: TrackLookRows[]): string[] {
   return rigLookTableProblemsOf(tableWith({ ...GOOD_TRACK, ...rows }, ...others), UPGRADE_IDS)
 }
 
-function tailProblemsOf(tail: Partial<TrackLookRows['tail']>): string[] {
-  return problemsOf({ tail: { ...GOOD_TRACK.tail, ...tail } })
+function bandProblemsOf(band: Partial<TrackLookRows['band']>): string[] {
+  return problemsOf({ band: { ...GOOD_TRACK.band, ...band } })
 }
+
+function finishProblemsOf(finish: Partial<RigLookFinish>): string[] {
+  const finishes = {
+    ...FIXTURE_FINISHES,
+    'spec-brass': { ...FIXTURE_FINISHES['spec-brass'], ...finish },
+  }
+  return rigLookTableProblemsOf({ ...tableWith(GOOD_TRACK), finishes }, UPGRADE_IDS)
+}
+
+/** Each shipped track's band block, by track. */
+const bandOf = (track: string) => RIG_LOOK_TABLE.tracks.find((rows) => rows.track === track)!.band
 
 describe('rig look table', () => {
   it('loads the shipped table with no problem', () => {
     expect(rigLookTableProblemsOf(RIG_LOOK_TABLE, UPGRADE_IDS)).toEqual([])
   })
 
-  it("keeps #554's drill_power thresholds unchanged", () => {
-    expect(fromsOf('drill_power')).toEqual([5, 10, 15, 20, 30, 40, 50, 75, 100])
+  it("keeps #554's drill_power looks in order, re-keyed onto the bands of 6 (ticket 809)", () => {
+    expect(fromsOf('drill_power')).toEqual([6, 12, 18, 24, 30, 36, 42, 48, 54])
   })
 
-  it("takes the other tracks' thresholds from Systems' table, hull counted in levels.hull", () => {
-    expect(fromsOf('drill_tip')).toEqual([70, 100, 130, 190, 280])
-    expect(fromsOf('cargo_hold')).toEqual([23, 31, 33])
-    expect(fromsOf('engine')).toEqual([2, 18, 26])
-    expect(fromsOf('boiler')).toEqual([16])
-    expect(fromsOf('hull')).toEqual([20, 80, 140, 260, 440])
+  it('puts every authored step on its band edge, the art kept in order', () => {
+    expect(fromsOf('drill_tip')).toEqual([60, 120, 180, 240, 300])
+    expect(fromsOf('cargo_hold')).toEqual([11, 22, 33])
+    expect(fromsOf('engine')).toEqual([5, 10, 15])
+    expect(fromsOf('boiler')).toEqual([5])
+    expect(fromsOf('hull')).toEqual([120, 240, 360, 480, 600])
+  })
+
+  it("freezes each line's step from its decade and the bot's two-planet buys (VS rule)", () => {
+    const shown = Object.fromEntries(
+      RIG_LOOK_TABLE.tracks.map(({ track, band }) => [
+        track,
+        [band.decadeStep, band.twoPlanetBuys, band.step],
+      ]),
+    )
+    expect(shown).toEqual({
+      drill_power: [11, 6, 6],
+      drill_tip: [110, 60, 60],
+      engine: [48, 5, 5],
+      boiler: [25, 5, 5],
+      cargo_hold: [25, 11, 11],
+      hull: [210, 120, 120],
+    })
+  })
+
+  it('authors the edges to about P40 on the median path', () => {
+    const lastEdges = RIG_LOOK_TABLE.tracks.map(({ track, band }) => [track, band.edges.at(-1)])
+    expect(Object.fromEntries(lastEdges)).toEqual({
+      drill_power: 126,
+      drill_tip: 1200,
+      engine: 100,
+      boiler: 115,
+      cargo_hold: 231,
+      hull: 2280,
+    })
+    expect(bandOf('hull').edges).toHaveLength(19)
+    expect(bandOf('boiler').edges).toHaveLength(23)
   })
 
   it('names each step as Progression listed them', () => {
@@ -143,48 +189,93 @@ describe('rig look table', () => {
     const [first, second] = GOOD_TRACK.steps
     expect(problemsOf({ steps: [{ ...first, from: 0 }, second] })).toEqual([
       'engine: step from 0: from is not a count from 1',
+      'engine: band: step from 0 is not on its edge',
     ])
     expect(problemsOf({ steps: [first, { ...second, from: 2 }] })).toEqual([
       'engine: step from 2: from does not rise',
+      'engine: band: step from 2 is not on its edge',
     ])
     expect(problemsOf({ steps: [first, { ...second, colour: first.colour }] })).toEqual([
-      'engine: step from 18: repeats the step before',
+      'engine: step from 10: repeats the step before',
     ])
   })
 
-  it('refuses a ladder of fewer than 2 or more than 8 entries', () => {
-    expect(tailProblemsOf({ palette: ['#000001'] })).toEqual([
-      'engine: tail: palette has 1 entries, not 2 to 8',
-    ])
-    expect(tailProblemsOf({ plating: 'abcdefghi'.split('') })).toEqual([
-      'engine: tail: plating has 9 entries, not 2 to 8',
+  it('refuses a step that breaks the VS rule, or edges under 2 apart', () => {
+    expect(bandProblemsOf({ step: 4 })).toContain('engine: band: step 4 breaks the rule')
+    expect(bandProblemsOf({ decadeStep: 1, twoPlanetBuys: 1, step: 1, edges: [1, 2] })).toContain(
+      'engine: band: step 1 puts edges under 2 apart',
+    )
+  })
+
+  it('refuses edges that are not the multiples of the step', () => {
+    expect(bandProblemsOf({ edges: [5, 10, 16] })).toEqual([
+      'engine: band: edges are not the steps',
     ])
   })
 
-  it('refuses neighbours alike in a ladder, the wrap from last to first included', () => {
-    expect(tailProblemsOf({ palette: ['#000001', '#000002', '#000001'] })).toEqual([
-      'engine: tail: palette repeats a neighbour',
+  it('refuses an authored step off its edge, or more steps than edges', () => {
+    const [first, second] = GOOD_TRACK.steps
+    expect(problemsOf({ steps: [first, { ...second, from: 11 }] })).toEqual([
+      'engine: band: step from 11 is not on its edge',
     ])
-    expect(tailProblemsOf({ plating: ['a', 'a', 'b'] })).toEqual([
-      'engine: tail: plating repeats a neighbour',
-    ])
-    expect(tailProblemsOf({ glow: [[0.5], [0.6], [0.5]] })).toEqual([
-      'engine: tail: glow repeats a neighbour',
-    ])
-  })
-
-  it('refuses a palette that starts on the top step, so the first tail purchase shows', () => {
-    expect(tailProblemsOf({ palette: ['#ff8c42', '#000001'] })).toEqual([
-      'engine: tail: palette starts on the top step',
+    expect(bandProblemsOf({ edges: [5] })).toEqual([
+      'engine: band: has more steps than edges',
+      'engine: band: step from 10 is not on its edge',
     ])
   })
 
-  it('refuses a delta that is not a whole count from 1', () => {
-    expect(tailProblemsOf({ delta: 0 })).toEqual(['engine: tail: delta is not a count from 1'])
+  it('refuses a finish cycle too short to keep finish and pips apart, or unknown finishes', () => {
+    expect(bandProblemsOf({ decadeStep: 48, twoPlanetBuys: 5 })).toEqual([
+      'engine: finishes: has 2 finishes, not 10 to 12',
+    ])
+    expect(bandProblemsOf({ finishes: ['spec-brass', 'spec-gone'] })).toEqual([
+      'engine: finishes: spec-gone is not a finish',
+    ])
+  })
+
+  it('refuses neighbours alike in the finish cycle, the wrap from last to first included', () => {
+    expect(bandProblemsOf({ finishes: ['spec-brass', 'spec-steel', 'spec-brass'] })).toEqual([
+      'engine: finishes: repeats a neighbour',
+    ])
+  })
+
+  it('refuses a finish cycle that starts on the top step, so the first finish band shows', () => {
+    const [first, second] = GOOD_TRACK.steps
+    const top = { ...second, colour: FIXTURE_FINISHES['spec-brass'].colour }
+    expect(problemsOf({ steps: [first, top] })).toEqual([
+      'engine: finishes: starts on the top step',
+    ])
+  })
+
+  it('refuses a finish named in more than 3 words, or not a material', () => {
+    expect(finishProblemsOf({ name: 'Very bright brass plate' })).toEqual([
+      'finish spec-brass: name Very bright brass plate is not 1 to 3 words',
+    ])
+    expect(finishProblemsOf({ colour: 'brass', metalness: 2, roughness: -1 })).toEqual([
+      'finish spec-brass: colour brass is not #rrggbb',
+      'finish spec-brass: metalness is not 0 to 1',
+      'finish spec-brass: roughness is not 0 to 1',
+    ])
+  })
+
+  it('refuses a step card of more than 3 words, the hover line’s band name', () => {
+    const [first, second] = GOOD_TRACK.steps
+    expect(problemsOf({ steps: [{ ...first, card: 'A very long piston' }, second] })).toEqual([
+      'engine: step from 5: card A very long piston is long',
+    ])
+  })
+
+  it("refuses a glint that reaches its track's cap over the brightest look", () => {
+    const [first, second] = GOOD_TRACK.steps
+    expect(problemsOf({ steps: [first, { ...second, glows: [0.8] }] })).toEqual([
+      'engine: glint reaches its cap',
+    ])
   })
 
   it('refuses glows that reach their cap, summed over every track lighting the part', () => {
-    expect(tailProblemsOf({ glow: [[0.6], [1]] })).toEqual([
+    const [first, second] = GOOD_TRACK.steps
+    expect(problemsOf({ steps: [first, { ...second, glows: [1] }] })).toEqual([
+      'engine: glint reaches its cap',
       'part slot piston: glows reach the rigBody cap',
     ])
     const sharing = { ...GOOD_TRACK, track: 'boiler', slot: 'hull.boiler' }
@@ -230,23 +321,23 @@ describe('rig look table', () => {
 
   it('refuses an asset that is not one of the look assets', () => {
     expect(lookStepProblemsOf({ asset: 'vehicle-look-gone' })).toEqual([
-      'engine: step from 2: asset vehicle-look-gone is not a look asset',
+      'engine: step from 5: asset vehicle-look-gone is not a look asset',
     ])
   })
 
   it('refuses a part its look asset does not have', () => {
     expect(lookStepProblemsOf({ part: 'kettle-drum' })).toEqual([
-      'engine: step from 2: part kettle-drum is not a part of vehicle-look-boiler',
+      'engine: step from 5: part kettle-drum is not a part of vehicle-look-boiler',
     ])
   })
 
   it('refuses a vehicle step whose part is not a vehicle part, and an asset with no part', () => {
     expect(lookStepProblemsOf({ asset: undefined })).toEqual([
-      'engine: step from 2: part twin-drum-boiler is not a vehicle part',
+      'engine: step from 5: part twin-drum-boiler is not a vehicle part',
     ])
     expect(lookStepProblemsOf({ asset: undefined, part: 't3-drill-bit' })).toEqual([])
     expect(lookStepProblemsOf({ part: null })).toEqual([
-      'engine: step from 2: names vehicle-look-boiler but no part',
+      'engine: step from 5: names vehicle-look-boiler but no part',
     ])
   })
 

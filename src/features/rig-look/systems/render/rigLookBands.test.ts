@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { ECONOMY } from '../../../../systems/economy/economy'
+import ECONOMY_FILE from '../../../../systems/economy/economy.json'
 import { UPGRADE_IDS } from '../../../../systems/economy/economyDefinition'
 import {
   bandAt,
@@ -21,9 +21,9 @@ const DECADE_LEVELS: Readonly<Record<string, number>> = {
   hull: 21,
 }
 
+/** The ratio as economy.json writes it, the decimal text the bigints read. */
 function ratioOf(track: string): string {
-  const row = ECONOMY.upgrades.find((upgrade) => upgrade.id === track)!
-  return (row.effect as { ratio: string }).ratio
+  return ECONOMY_FILE.upgrades.find((upgrade) => upgrade.id === track)!.effect.ratio
 }
 
 describe('rig look bands', () => {
@@ -57,7 +57,12 @@ describe('rig look bands', () => {
 
   it('takes the median over every two neighbouring planets of every run', () => {
     // Windows 3+1, 1+5, 5+0 and 2+2, 2+2: 4, 6, 5, 4, 4.
-    expect(medianTwoPlanetBuysOf([[3, 1, 5, 0], [2, 2, 2]])).toBe(4)
+    expect(
+      medianTwoPlanetBuysOf([
+        [3, 1, 5, 0],
+        [2, 2, 2],
+      ]),
+    ).toBe(4)
     expect(medianTwoPlanetBuysOf([[1, 2, 4]])).toBe(4)
     expect(medianTwoPlanetBuysOf([])).toBe(0)
   })

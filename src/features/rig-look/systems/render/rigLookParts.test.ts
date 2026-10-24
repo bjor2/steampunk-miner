@@ -6,14 +6,12 @@ import {
   type RequestedParts,
 } from '../../../../systems/render/requestedParts'
 import type { TrackLookRows } from './rigLookIndex'
-import { createTrackLookFrames, lookFrameAt } from './rigLookFrames'
+import { createTrackLookFrames as createFramesOf, lookFrameAt } from './rigLookFrames'
+import { bandEvery, FIXTURE_FINISHES } from './rigLookFixtures'
 import { isSwappingParts, partSwapsOf } from './rigLookParts'
 
-const TAIL: TrackLookRows['tail'] = {
-  delta: 1,
-  palette: ['#000001', '#000002'],
-  plating: ['a', 'b'],
-  glow: [[0.1], [0.2]],
+function createTrackLookFrames(rows: TrackLookRows) {
+  return createFramesOf(rows, FIXTURE_FINISHES)
 }
 
 function rowsOf(track: string, slot: string, parts: readonly (string | null)[]): TrackLookRows {
@@ -29,7 +27,7 @@ function rowsOf(track: string, slot: string, parts: readonly (string | null)[]):
       colour: `#00000${at + 3}`,
       glows: [0],
     })),
-    tail: TAIL,
+    band: bandEvery(10, parts.length),
   }
 }
 

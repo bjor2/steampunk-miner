@@ -1,14 +1,15 @@
 /**
- * The looks a track's ladder can show (#577), each made once and kept: the base look, one per named
- * step, and one lap of the tail. The tail is a mixed-radix walk over its bounded ladders (TD shape):
- * the tint moves every tail step, the plating once per lap of the palette, the glow once per lap of
- * both, so neighbouring counts always differ and a track holds at most K + 1 + P x L x G looks,
- * whatever the count. Tail step 0 is the top step itself, so #554's rows paint exactly as before up
- * to their last threshold. Asked every frame: `lookFrameAt` allocates nothing. A frame's part and
- * asset are a pure function of (track, n), never saved (ticket 640).
+ * The looks a track's ladder can show (#577), each made once and kept: the base look, one per
+ * authored step, and one lap of finishes. Past the authored art every band wears the next finish of
+ * the track's cycle (ticket 809: the tint-only linear tail replaced by a finish cycle on the band
+ * period), over the top step's part, so neighbouring bands always differ in material and a track
+ * holds at most K + 1 + F looks, whatever the count; its pips (`RigLookIndex.pips`) count the
+ * decades of power and are drawn beside it. Asked every frame: `lookFrameAt` allocates nothing. A
+ * frame's part and asset are a pure function of (track, n), never saved (ticket 640).
  */
 import {
   lookPurchasesOf,
+  type RigLookFinish,
   rigLookStepAt,
   rigLookTailAt,
   topStepOf,
@@ -35,8 +36,10 @@ export interface RigLookFrame {
   tint: string | null
   /** One glow per glow slot group; zeros on the base look. */
   glows: readonly number[]
-  /** The plating finish id, null below the tail. */
-  plating: string | null
+  /** The finish id (the table's `finishes`) past the authored steps, null on them. */
+  finish: string | null
+  /** The band's name for the hover line: the step's card or the finish's name; null for none. */
+  bandName: string | null
 }
 
 export interface TrackLookFrames {
@@ -48,12 +51,18 @@ export interface TrackLookFrames {
   lap: readonly RigLookFrame[]
 }
 
-export function createTrackLookFrames(rows: TrackLookRows): TrackLookFrames {
+/** The finishes a table names, by id. */
+export type RigLookFinishes = Readonly<Record<string, RigLookFinish>>
+
+export function createTrackLookFrames(
+  rows: TrackLookRows,
+  finishes: RigLookFinishes,
+): TrackLookFrames {
   return {
     rows,
     base: baseFrameOf(rows),
     steps: rows.steps.map((row, at) => stepFrameOf(rows, row, at + 1)),
-    lap: tailLapOf(rows),
+    lap: rows.band.finishes.map((id) => finishFrameOf(rows, id, finishes[id])),
   }
 }
 
@@ -82,7 +91,8 @@ function baseFrameOf(rows: TrackLookRows): RigLookFrame {
     replacesSlot: null,
     tint: null,
     glows: rows.glowSlots.map(() => 0),
-    plating: null,
+    finish: null,
+    bandName: null,
   }
 }
 
@@ -96,25 +106,20 @@ function stepFrameOf(rows: TrackLookRows, row: RigLookStepRow, step: number): Ri
     replacesSlot: replacesSlotOf(rows, row),
     tint: row.colour,
     glows: row.glows,
-    plating: null,
+    finish: null,
+    bandName: row.card,
   }
 }
 
-/** Lap entry i: tint i mod P, plating floor(i / P) mod L, glow floor(i / (P x L)) mod G. */
-function tailLapOf(rows: TrackLookRows): RigLookFrame[] {
-  const { palette, plating, glow } = rows.tail
-  const lapLength = palette.length * plating.length * glow.length
-  return Array.from({ length: lapLength }, (_, at) => ({
-    track: rows.track,
-    step: rows.steps.length,
-    partId: topStepOf(rows).part,
-    assetId: assetIdOf(topStepOf(rows)),
-    slot: rows.slot,
-    replacesSlot: replacesSlotOf(rows, topStepOf(rows)),
-    tint: palette[at % palette.length],
-    glows: glow[Math.floor(at / (palette.length * plating.length)) % glow.length],
-    plating: plating[Math.floor(at / palette.length) % plating.length],
-  }))
+/** A finish band: the top step's part and glows in the finish's colour. */
+function finishFrameOf(rows: TrackLookRows, id: string, finish: RigLookFinish): RigLookFrame {
+  const top = topStepOf(rows)
+  return {
+    ...stepFrameOf(rows, top, rows.steps.length),
+    tint: finish.colour,
+    finish: id,
+    bandName: finish.name,
+  }
 }
 
 function assetIdOf(row: RigLookStepRow): string | null {

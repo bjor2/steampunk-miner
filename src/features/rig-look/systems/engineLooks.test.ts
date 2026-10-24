@@ -28,15 +28,16 @@ const ASSET_ID = 'vehicle-look-drive'
 const ENGINE = trackLookFramesOf(SHIPPED_RIG_LOOKS, 'engine')!
 
 /**
- * Systems' thresholds (#157 comment 6300543785), Progression's names (6300549964), #731's tracks
- * and wheels, which replaced #586's drive units (GD ruling on #726).
+ * The first band edges of 5 (ticket 809), Progression's names (6300549964), #731's tracks and
+ * wheels, which replaced #586's drive units (GD ruling on #726).
  */
 const STEPS = [
-  { from: 2, card: 'Single piston', part: 'iron-track' },
-  { from: 18, card: 'Triple flywheel', part: 'steel-track' },
-  { from: 26, card: 'Guild turbine', part: 'guild-track' },
+  { from: 5, card: 'Single piston', part: 'iron-track' },
+  { from: 10, card: 'Triple flywheel', part: 'steel-track' },
+  { from: 15, card: 'Guild turbine', part: 'guild-track' },
 ]
-const TOP = 26
+const TOP = 15
+const BAND = 5
 const VISUAL_TIERS = [1, 2, 3]
 
 const engineAt = (n: number): RigLookFrame => rigLookOf('engine', n)!
@@ -47,22 +48,22 @@ function withEngineLevel(state: AuthorityState, level: number): AuthorityState {
   return { ...state, players: { ...state.players, p1: { ...player, vehicle } } }
 }
 
-/** What a frame draws: its part, asset, tint, glow and plating. */
+/** What a frame draws: its part, asset, tint, glow and finish. */
 const shownOf = (frame: RigLookFrame): string =>
-  JSON.stringify([frame.partId, frame.assetId, frame.tint, frame.glows, frame.plating])
+  JSON.stringify([frame.partId, frame.assetId, frame.tint, frame.glows, frame.finish])
 
 const bodyPartIdsAt = (tier: number, looks: ReturnType<typeof partSwapsOf>): string[] =>
   vehicleBodyQuadsOf(SHIPPED_ART, tier, [], looks).map((quad) => quad.partId)
 
 describe('engine look (ticket 587)', () => {
-  it('reads its three steps from the table at 2, 18 and 26 purchases', () => {
+  it('reads its three steps from the table at 5, 10 and 15 purchases', () => {
     expect(ENGINE.rows.steps.map(({ from, card, part }) => ({ from, card, part }))).toEqual(STEPS)
     expect(ENGINE.rows.steps.every((step) => step.asset === ASSET_ID)).toBe(true)
   })
 
-  it('swaps no part below 2 purchases, so the rig keeps its own rollers and hub cap', () => {
-    expect(engineAt(1).partId).toBeNull()
-    expect(partSwapsOf([engineAt(1)], [])).toEqual([])
+  it('swaps no part below 5 purchases, so the rig keeps its own rollers and hub cap', () => {
+    expect(engineAt(4).partId).toBeNull()
+    expect(partSwapsOf([engineAt(4)], [])).toEqual([])
   })
 
   it.each(STEPS)('lays the $card on chassis.drive from $from purchases', (step) => {
@@ -99,22 +100,22 @@ describe('engine look (ticket 587)', () => {
     },
   )
 
-  it('keeps the guild track on the tail and shows a new look on every purchase', () => {
-    for (let n = TOP; n < TOP + 200; n++) {
-      expect(engineAt(n + 1).partId).toBe('guild-track')
-      expect(shownOf(engineAt(n + 1))).not.toBe(shownOf(engineAt(n)))
+  it('keeps the guild track past the art and shows a new finish every band', () => {
+    for (let n = TOP; n < TOP + 200 * BAND; n += BAND) {
+      expect(engineAt(n + BAND).partId).toBe('guild-track')
+      expect(shownOf(engineAt(n + BAND))).not.toBe(shownOf(engineAt(n)))
     }
   })
 
   it('changes the look at every step, from the bare rig on', () => {
-    const counts = [1, ...STEPS.map((step) => step.from)]
+    const counts = [4, ...STEPS.map((step) => step.from)]
     const shown = counts.map((n) => shownOf(engineAt(n)))
     expect(new Set(shown).size).toBe(counts.length)
   })
 
   it('lights the laid-on part, so the step tint and the tail show on it', () => {
     const source = createRigLookSources().find((each) => each.id === 'rig-look.engine')!
-    for (const n of [2, 18, TOP + 1, TOP + 2]) {
+    for (const n of [5, 10, TOP + BAND, TOP + 2 * BAND]) {
       const state = withEngineLevel(createScriptedSession().state(), n)
       const look = source.lookOf(state, 'p1', 0)!
       expect(look.glows[0].slots).toContain(engineAt(n).partId)
@@ -141,23 +142,20 @@ describe('engine look (ticket 587)', () => {
  * never moves them; the look is a pure function of (track, n), so a planet's pace row never does.
  */
 describe('drive look (ticket 726)', () => {
-  /** n, then the part, tint, glow and plating drawn and the plaque's fitting fact. */
+  /** n, then the part, tint, glow and finish drawn and the plaque's fitting fact. */
   const GOLDENS: readonly (readonly [number, string])[] = [
     [0, '[null,null,null,[0],null,null]'],
     [1, '[null,null,null,[0],null,null]'],
     [6, '["iron-track","vehicle-look-drive","#d9a066",[0.3],null,"Fitting: Single piston"]'],
     [7, '["iron-track","vehicle-look-drive","#d9a066",[0.3],null,"Fitting: Single piston"]'],
-    [
-      101,
-      '["guild-track","vehicle-look-drive","#ff9ad5",[0.6],"bright","Fitting: Guild turbine · Grade 75"]',
-    ],
+    [101, '["guild-track","vehicle-look-drive","#f0c840",[0.7],"gilt","Fitting: Gilt · L101"]'],
     [
       9_999,
-      '["guild-track","vehicle-look-drive","#ffd27a",[0.8],"bright","Fitting: Guild turbine · Grade 9973"]',
+      '["guild-track","vehicle-look-drive","#5fae94",[0.7],"verdigris","Fitting: Verdigris · L9,999"]',
     ],
     [
       1_000_000,
-      '["guild-track","vehicle-look-drive","#8fffb0",[0.8],"bright","Fitting: Guild turbine · Grade 999.9k"]',
+      '["guild-track","vehicle-look-drive","#f0c840",[0.7],"gilt","Fitting: Gilt · L1,000,000"]',
     ],
   ]
   /** Planet 1 runs at pace 1, planet 8 at 1.7 (`planets.paceScale`). */
@@ -205,7 +203,7 @@ describe('drive look (ticket 726)', () => {
 
   it.each([
     ['a bare rig', {}],
-    ['a rig on the iron track', { engine: 17 }],
+    ['a rig on the iron track', { engine: 7 }],
     ['a rig on the guild track tail', { engine: 40, drill_power: 17, drill_tip: 200 }],
   ])(
     'leaves the drive look byte-identical when %s buys drill power or a drill tip',
@@ -221,9 +219,9 @@ describe('drive look (ticket 726)', () => {
   )
 
   it.each([
-    ['onto the iron track', 1],
-    ['onto the steel track', 17],
-    ['along the tail', 30],
+    ['onto the iron track', 4],
+    ['onto the steel track', 9],
+    ['onto its first finish', 19],
   ])('changes the drive look when an engine buy steps it %s', (_name, engine) => {
     const session = dockedSessionWith({ engine })
     const before = driveLookBytesOf(session.state())
@@ -251,11 +249,11 @@ describe('drive look (ticket 726)', () => {
     }
   })
 
-  it('names each stage on the plaque with no grade, counting grades only past the top stage', () => {
+  it('names each stage on the plaque with no level, naming the finish and level past the art', () => {
     for (const step of STEPS) {
       expect(rigLookPlaqueFactOf('engine', step.from)).toBe(`Fitting: ${step.card}`)
       expect(rigLookPlaqueFactOf('engine', step.from - 1) ?? '').not.toContain(step.card)
     }
-    expect(rigLookPlaqueFactOf('engine', TOP + 1)).toBe('Fitting: Guild turbine · Grade 1')
+    expect(rigLookPlaqueFactOf('engine', TOP + BAND)).toBe('Fitting: Bright brass · L20')
   })
 })

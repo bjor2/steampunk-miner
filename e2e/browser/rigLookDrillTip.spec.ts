@@ -1,9 +1,10 @@
 /**
- * The drill tip's rig looks in the browser (ticket 579): from 70 purchases each step of
+ * The drill tip's rig looks in the browser (ticket 579): from 60 purchases each step of
  * `rigLook.json` swaps its part of `vehicle-look-drill-tip` onto the drill head in place of the
  * rig's bit, the tail keeps the top part, and the look leaves the physics world as it was; the
- * drill tip card names the owned step and grades the tail (#585's template).
- * Asserted through `steampunkDebug`, never pixels; the shots at every step and two tail points,
+ * drill tip card names the owned band, past the art its finish and the exact level (#585's
+ * template, ticket 809). Asserted through `steampunkDebug`, never pixels; the shots at every step
+ * and two finish bands,
  * desktop and 360 px, by the rig's tier 1 and tier 3 shape, are written to the test's output
  * folder for review, never compared.
  */
@@ -19,20 +20,19 @@ declare global {
 }
 
 const ASSET_ID = 'vehicle-look-drill-tip'
-/** The bare rig, Systems' five steps (#157 comment 6300543785), then two tail points. */
+/** The bare rig, the five steps on the band edges of 60 (ticket 809), then two finish bands. */
 const LOOKS = [
-  { purchases: 69, part: null, fitting: null },
-  { purchases: 70, part: 'steel-cone', fitting: 'Fitting: Steel cone' },
-  { purchases: 100, part: 'fluted-bit', fitting: 'Fitting: Fluted bit' },
-  { purchases: 130, part: 'toothed-crown', fitting: 'Fitting: Toothed crown' },
-  { purchases: 190, part: 'gem-set-crown', fitting: 'Fitting: Gem-set crown' },
-  { purchases: 280, part: 'aether-cut-crown', fitting: 'Fitting: Aether-cut crown' },
-  { purchases: 281, part: 'aether-cut-crown', fitting: 'Fitting: Aether-cut crown · Grade 1' },
-  { purchases: 282, part: 'aether-cut-crown', fitting: 'Fitting: Aether-cut crown · Grade 2' },
+  { purchases: 59, part: null, fitting: null },
+  { purchases: 60, part: 'steel-cone', fitting: 'Fitting: Steel cone' },
+  { purchases: 120, part: 'fluted-bit', fitting: 'Fitting: Fluted bit' },
+  { purchases: 180, part: 'toothed-crown', fitting: 'Fitting: Toothed crown' },
+  { purchases: 240, part: 'gem-set-crown', fitting: 'Fitting: Gem-set crown' },
+  { purchases: 300, part: 'aether-cut-crown', fitting: 'Fitting: Aether-cut crown' },
+  { purchases: 360, part: 'aether-cut-crown', fitting: 'Fitting: Nickel plate · L360' },
+  { purchases: 420, part: 'aether-cut-crown', fitting: 'Fitting: Case-hardened · L420' },
 ]
-/** The tail grades the card must fit at 360 px (VS on #579): in full to 9999, then cut. */
-const TAIL_GRADES = [1, 101, 9_999, 1_000_000]
-const TOP_STEP = 280
+/** The levels the card must fit at 360 px past the art (#809's goldens, the #681 long mode). */
+const TAIL_LEVELS = [360, 9_999, 1_000_000]
 const CARD = `[data-testid="${UI_ID_TEMPLATES.workshopUpgradeBuy('drill_tip')}"]`
 const FITTING = `${CARD} [data-sheet-card-line]`
 const VIEWPORTS = [
@@ -122,7 +122,7 @@ async function expectLook(page: Page, part: string | null): Promise<void> {
 }
 
 test.describe('drill tip look (ticket 579)', () => {
-  test('swaps each step onto the head in place of the bit, the top part on the tail', async ({
+  test('swaps each step onto the head in place of the bit, the top part past the art', async ({
     page,
   }) => {
     const errors = await openGame(page)
@@ -137,17 +137,17 @@ test.describe('drill tip look (ticket 579)', () => {
     page,
   }) => {
     const errors = await openGame(page)
-    await setUpgrade(page, 'drill_tip', 69)
+    await setUpgrade(page, 'drill_tip', 59)
     await expectLook(page, null)
     const lowest = await physicsCounts(page)
-    await setUpgrade(page, 'drill_tip', 282)
+    await setUpgrade(page, 'drill_tip', 420)
     await expectLook(page, 'aether-cut-crown')
     await expect.poll(() => physicsCounts(page)).toEqual(lowest)
     expect(errors).toEqual([])
   })
 
   for (const viewport of VIEWPORTS) {
-    test(`names the owned step on the card and grades the tail, ${viewport.name}`, async ({
+    test(`names the owned band on the card, the level past the art, ${viewport.name}`, async ({
       page,
     }) => {
       await page.setViewportSize(viewport.size)
@@ -157,12 +157,12 @@ test.describe('drill tip look (ticket 579)', () => {
         if (fitting === null) await expect(page.locator(FITTING)).not.toContainText('Fitting:')
         else await expect(page.locator(FITTING)).toContainText(fitting)
       }
-      for (const grade of TAIL_GRADES) {
-        await setUpgrade(page, 'drill_tip', TOP_STEP + grade)
-        await expect(page.locator(FITTING)).toContainText('· Grade ')
+      for (const level of TAIL_LEVELS) {
+        await setUpgrade(page, 'drill_tip', level)
+        await expect(page.locator(FITTING)).toContainText(` · L${level.toLocaleString('en-US')}`)
         await page.locator(CARD).scrollIntoViewIfNeeded()
-        expect(await fittingOverflowOf(page), `grade ${grade}`).toBeLessThanOrEqual(1)
-        await test.info().attach(`drill tip grade ${grade}, ${viewport.name}`, {
+        expect(await fittingOverflowOf(page), `level ${level}`).toBeLessThanOrEqual(1)
+        await test.info().attach(`drill tip level ${level}, ${viewport.name}`, {
           body: await page.screenshot(),
           contentType: 'image/png',
         })
@@ -170,7 +170,7 @@ test.describe('drill tip look (ticket 579)', () => {
       expect(errors).toEqual([])
     })
 
-    test(`shoots every step and two tail points at ${viewport.name} size`, async ({ page }) => {
+    test(`shoots every step and two finish bands at ${viewport.name} size`, async ({ page }) => {
       await page.setViewportSize(viewport.size)
       const errors = await openGame(page)
       for (const shape of RIG_SHAPES) {

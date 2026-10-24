@@ -1,15 +1,17 @@
 /**
- * Where a track's look steps land in play (ticket 590; Systems' table on #157, comment
- * 6300543785): each step row names the planet its count was taken from, the one the on-curve player
- * leaves at that count. The rows' planets rise, so a track steps at most once a planet (VS on #157),
- * and in a pacing bot run each step must first show within one planet of its row, and no two steps
- * of a track may first show on the same planet. A miss is Systems' to retune in the row, never the
- * economy's or the bot's.
+ * Where a track's look bands land in play (ticket 809, replacing ticket 590's per-step planets;
+ * Systems on #647: the per-planet arrival levels are the cadence check). From a bot run's
+ * purchases this finds the planet each band edge was first reached on, the purchases each planet
+ * made (the fuel tank's too, which the VS asked logged), and the line's cadence: the planets the
+ * run finished per band it reached. The VS aims at one new look every 1 to 3 planets on the median
+ * path; outside that the check warns and never fails (VS via Systems, 24 Oct 14:58), since a miss
+ * goes back to the VS, never to the bot, the economy or the edges.
  */
-import type { RigLookStepRow, TrackLookRows } from './render/rigLookIndex'
+import type { TrackLookRows } from './render/rigLookIndex'
 
-/** Systems on #157: a step first shows at most this many planets from its row's. */
-export const STEP_PLANET_SLACK = 1
+/** The VS cadence band: one new look every 1 to 3 planets. */
+export const PLANETS_PER_BAND_MIN = 1
+export const PLANETS_PER_BAND_MAX = 3
 
 /** One upgrade purchase of a run, in run order: the planet it was made on, the count after it. */
 export interface TrackPurchase {
@@ -18,76 +20,63 @@ export interface TrackPurchase {
   toLevel: number
 }
 
-/** A step with a planet, and the planet the run first showed it on (null: never). */
-export interface StepFirstShown {
-  from: number
-  rowPlanet: number
-  shownOn: number | null
+/** A band edge and the planet the run first reached it on (null: never). */
+export interface EdgeFirstReached {
+  edge: number
+  planet: number | null
 }
 
-/** A track's planets: on every step or none, whole planets from 1, rising step by step. */
-export function stepPlanetProblemsOf(rows: TrackLookRows): string[] {
-  const planned = rows.steps.filter(hasPlanet)
-  if (planned.length === 0) return []
-  if (planned.length < rows.steps.length) return ['names a planet on some steps, not all']
-  return planned.flatMap((step, at) => planetProblemsOf(step, planned[at - 1]))
-}
-
-/** Each step of `rows` that names a planet, and where `purchases` first reached its count. */
-export function stepsFirstShownOf(
+/** Each edge of `rows` and where `purchases` first reached it. */
+export function edgesFirstReachedOf(
   rows: TrackLookRows,
   purchases: readonly TrackPurchase[],
-): StepFirstShown[] {
+): EdgeFirstReached[] {
   const own = purchases.filter((purchase) => purchase.track === rows.track)
-  return rows.steps.filter(hasPlanet).map((step) => ({
-    from: step.from,
-    rowPlanet: step.planet,
-    shownOn: own.find((purchase) => purchase.toLevel >= step.from)?.planet ?? null,
+  return rows.band.edges.map((edge) => ({
+    edge,
+    planet: own.find((purchase) => purchase.toLevel >= edge)?.planet ?? null,
   }))
 }
 
+/** The purchases of `track` on each planet 1 to `lastPlanet`, 0 where it bought none. */
+export function purchasesPerPlanetOf(
+  track: string,
+  purchases: readonly TrackPurchase[],
+  lastPlanet: number,
+): number[] {
+  const own = purchases.filter((purchase) => purchase.track === track)
+  return Array.from(
+    { length: lastPlanet },
+    (_, at) => own.filter((purchase) => purchase.planet === at + 1).length,
+  )
+}
+
 /**
- * Every way a run misses `rows`: a step first shown more than one planet from its row, a step
- * never shown though the run finished the last planet it could show on, and two steps first shown
- * on one planet. `lastFinishedPlanet` is the highest planet whose core the run completed.
+ * Planets finished per band reached by the end of `lastFinishedPlanet`: Infinity when the run
+ * reached no band.
  */
-export function stepPlanetMissesOf(
+export function planetsPerBandOf(
   rows: TrackLookRows,
   purchases: readonly TrackPurchase[],
   lastFinishedPlanet: number,
-): string[] {
-  const shown = stepsFirstShownOf(rows, purchases)
-  return [
-    ...shown.flatMap((step) => stepMissesOf(step, lastFinishedPlanet)),
-    ...sharedPlanetMissesOf(shown),
-  ].map((miss) => `${rows.track}: ${miss}`)
+): number {
+  const reached = edgesFirstReachedOf(rows, purchases).filter(
+    (edge) => edge.planet !== null && edge.planet <= lastFinishedPlanet,
+  ).length
+  return reached === 0 ? Infinity : lastFinishedPlanet / reached
 }
 
-function hasPlanet(step: RigLookStepRow): step is RigLookStepRow & { planet: number } {
-  return step.planet !== undefined
+/** The warning a run's cadence on `rows` earns, null inside 1 to 3 planets a band. */
+export function cadenceWarningOf(
+  rows: TrackLookRows,
+  purchases: readonly TrackPurchase[],
+  lastFinishedPlanet: number,
+): string | null {
+  const cadence = planetsPerBandOf(rows, purchases, lastFinishedPlanet)
+  if (cadence >= PLANETS_PER_BAND_MIN && cadence <= PLANETS_PER_BAND_MAX) return null
+  return `${rows.track}: ${cadenceTextOf(cadence)} by P${lastFinishedPlanet}`
 }
 
-function planetProblemsOf(step: RigLookStepRow & { planet: number }, before?: RigLookStepRow) {
-  const problems: string[] = []
-  if (!Number.isInteger(step.planet) || step.planet < 1) problems.push('planet is not from 1')
-  if (before?.planet !== undefined && step.planet <= before.planet) {
-    problems.push('planet does not rise')
-  }
-  return problems.map((problem) => `step from ${step.from}: ${problem}`)
-}
-
-function stepMissesOf(step: StepFirstShown, lastFinishedPlanet: number): string[] {
-  const place = `step from ${step.from} (P${step.rowPlanet})`
-  if (step.shownOn === null) {
-    const isOverdue = lastFinishedPlanet >= step.rowPlanet + STEP_PLANET_SLACK
-    return isOverdue ? [`${place} never shows by P${lastFinishedPlanet}'s core`] : []
-  }
-  const isTooFar = Math.abs(step.shownOn - step.rowPlanet) > STEP_PLANET_SLACK
-  return isTooFar ? [`${place} first shows on P${step.shownOn}`] : []
-}
-
-function sharedPlanetMissesOf(shown: readonly StepFirstShown[]): string[] {
-  const planets = shown.flatMap((step) => (step.shownOn === null ? [] : [step.shownOn]))
-  const twice = [...new Set(planets.filter((planet, at) => planets.indexOf(planet) !== at))]
-  return twice.map((planet) => `steps twice on P${planet}`)
+function cadenceTextOf(cadence: number): string {
+  return Number.isFinite(cadence) ? `${cadence.toFixed(2)} planets a band` : 'no band reached'
 }

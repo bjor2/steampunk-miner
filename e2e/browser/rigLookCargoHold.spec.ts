@@ -1,9 +1,10 @@
 /**
- * The cargo hold's rig looks in the browser (ticket 581): from 23 purchases each step of
+ * The cargo hold's rig looks in the browser (ticket 581): from 11 purchases each step of
  * `rigLook.json` swaps its part of `vehicle-look-cargo-hold` onto `hull.cargo` in place of the
  * rig's ore hatch (`t1-hopper`), the tail keeps the top part, and the look leaves the physics world
- * as it was; the cargo hold card names the owned step and grades the tail (#585's template).
- * Asserted through `steampunkDebug`, never pixels; the shots at every step and two tail points,
+ * as it was; the cargo hold card names the owned band, past the art its finish and the exact
+ * level (#585's template, ticket 809). Asserted through `steampunkDebug`, never pixels; the shots
+ * at every step and two finish bands,
  * desktop and 360 px, by the rig's tier 1 and tier 3 shape, are written to the test's output
  * folder for review, never compared.
  */
@@ -19,22 +20,21 @@ declare global {
 }
 
 const ASSET_ID = 'vehicle-look-cargo-hold'
-/** The bare rig, Systems' three steps (#157 comment 6300543785), then two tail points. */
+/** The bare rig, the three steps on the band edges of 11 (ticket 809), then two finish bands. */
 const LOOKS = [
-  { purchases: 22, part: null, fitting: null },
-  { purchases: 23, part: 'plank-crate', fitting: 'Fitting: Plank crate' },
-  { purchases: 31, part: 'ore-hopper', fitting: 'Fitting: Ore hopper' },
+  { purchases: 10, part: null, fitting: null },
+  { purchases: 11, part: 'plank-crate', fitting: 'Fitting: Plank crate' },
+  { purchases: 22, part: 'ore-hopper', fitting: 'Fitting: Ore hopper' },
   { purchases: 33, part: 'riveted-bin', fitting: 'Fitting: Riveted bin' },
-  { purchases: 34, part: 'riveted-bin', fitting: 'Fitting: Riveted bin · Grade 1' },
-  { purchases: 35, part: 'riveted-bin', fitting: 'Fitting: Riveted bin · Grade 2' },
+  { purchases: 44, part: 'riveted-bin', fitting: 'Fitting: Burnished iron · L44' },
+  { purchases: 55, part: 'riveted-bin', fitting: 'Fitting: Bright brass · L55' },
 ]
 /**
- * Tail grades the card must fit at 360 px. The hold's units stay safe integers only to about
- * purchase 250 (1.15 a purchase, ticket 553), so the game cannot own grade 9999; the unit spec
- * measures that text's width instead (rigLookCard.test.ts).
+ * Levels the card must fit at 360 px past the art. The hold's units stay safe integers only to
+ * about purchase 250 (1.15 a purchase, ticket 553), so the game cannot own level 9999; the unit
+ * spec measures the widest text instead (rigLookPlaque.test.ts).
  */
-const TAIL_GRADES = [1, 101, 200]
-const TOP_STEP = 33
+const TAIL_LEVELS = [44, 101, 200]
 const CARD = `[data-testid="${UI_ID_TEMPLATES.workshopUpgradeBuy('cargo_hold')}"]`
 const FITTING = `${CARD} [data-sheet-card-line]`
 const VIEWPORTS = [
@@ -125,7 +125,7 @@ async function expectLook(page: Page, part: string | null): Promise<void> {
 }
 
 test.describe('cargo hold look (ticket 581)', () => {
-  test('swaps each step onto the hold in place of the hatch, the top part on the tail', async ({
+  test('swaps each step onto the hold in place of the hatch, the top part past the art', async ({
     page,
   }) => {
     const errors = await openGame(page)
@@ -140,17 +140,17 @@ test.describe('cargo hold look (ticket 581)', () => {
     page,
   }) => {
     const errors = await openGame(page)
-    await setUpgrade(page, 'cargo_hold', 22)
+    await setUpgrade(page, 'cargo_hold', 10)
     await expectLook(page, null)
     const lowest = await physicsCounts(page)
-    await setUpgrade(page, 'cargo_hold', 35)
+    await setUpgrade(page, 'cargo_hold', 55)
     await expectLook(page, 'riveted-bin')
     await expect.poll(() => physicsCounts(page)).toEqual(lowest)
     expect(errors).toEqual([])
   })
 
   for (const viewport of VIEWPORTS) {
-    test(`names the owned step on the card and grades the tail, ${viewport.name}`, async ({
+    test(`names the owned band on the card, the level past the art, ${viewport.name}`, async ({
       page,
     }) => {
       await page.setViewportSize(viewport.size)
@@ -160,12 +160,12 @@ test.describe('cargo hold look (ticket 581)', () => {
         if (fitting === null) await expect(page.locator(FITTING)).not.toContainText('Fitting:')
         else await expect(page.locator(FITTING)).toContainText(fitting)
       }
-      for (const grade of TAIL_GRADES) {
-        await setUpgrade(page, 'cargo_hold', TOP_STEP + grade)
-        await expect(page.locator(FITTING)).toContainText('· Grade ')
+      for (const level of TAIL_LEVELS) {
+        await setUpgrade(page, 'cargo_hold', level)
+        await expect(page.locator(FITTING)).toContainText(` · L${level}`)
         await page.locator(CARD).scrollIntoViewIfNeeded()
-        expect(await fittingOverflowOf(page), `grade ${grade}`).toBeLessThanOrEqual(1)
-        await test.info().attach(`cargo hold grade ${grade}, ${viewport.name}`, {
+        expect(await fittingOverflowOf(page), `level ${level}`).toBeLessThanOrEqual(1)
+        await test.info().attach(`cargo hold level ${level}, ${viewport.name}`, {
           body: await page.screenshot(),
           contentType: 'image/png',
         })
@@ -173,7 +173,7 @@ test.describe('cargo hold look (ticket 581)', () => {
       expect(errors).toEqual([])
     })
 
-    test(`shoots every step and two tail points at ${viewport.name} size`, async ({ page }) => {
+    test(`shoots every step and two finish bands at ${viewport.name} size`, async ({ page }) => {
       await page.setViewportSize(viewport.size)
       const errors = await openGame(page)
       for (const shape of RIG_SHAPES) {

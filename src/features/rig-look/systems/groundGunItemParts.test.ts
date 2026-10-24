@@ -6,6 +6,7 @@ import type { SliceRegistrar } from '../../../registries/sliceDefinition'
 import { contentOf } from '../../../systems/registries/content'
 import { isArmouryLane } from '../../tech-tree'
 import { slice } from '../register'
+import { bandEvery, FIXTURE_FINISHES } from './render/rigLookFixtures'
 import { createTrackLookFrames, lookFrameAt } from './render/rigLookFrames'
 import type { TrackLookRows } from './render/rigLookIndex'
 import { partSwapsOf } from './render/rigLookParts'
@@ -66,17 +67,17 @@ function itemPartDrawOrders(): number[] {
   )
 }
 
-/** A look track on `slot` whose first purchase swaps a part in. */
+/** A look track on `slot` whose first band swaps a part in. */
 function lookOn(slot: string) {
   const rows: TrackLookRows = {
     track: 'combat',
     slot,
     glowSlots: [['turret']],
     glowCap: 'rigBody',
-    steps: [{ from: 1, part: 'pintle-mount', card: null, colour: '#000003', glows: [0] }],
-    tail: { delta: 1, palette: ['#000001', '#000002'], plating: ['a', 'b'], glow: [[0], [0]] },
+    steps: [{ from: 2, part: 'pintle-mount', card: null, colour: '#000003', glows: [0] }],
+    band: bandEvery(2, 1),
   }
-  return lookFrameAt(createTrackLookFrames(rows), 1)
+  return lookFrameAt(createTrackLookFrames(rows, FIXTURE_FINISHES), 2)
 }
 
 /** The names of every registration the rig look slice makes. */

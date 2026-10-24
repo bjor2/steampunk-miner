@@ -5,10 +5,11 @@
  */
 export const RIG_LOOK_SLICE_ID = 'rig-look'
 export type {
+  RigLookBand,
+  RigLookFinish,
   RigLookIndex,
   RigLookPlaque,
   RigLookStepRow,
-  RigLookTail,
   TrackLookRows,
 } from './systems/render/rigLookIndex'
 export { lookPurchasesOf, rigLookIndexOf } from './systems/render/rigLookIndex'

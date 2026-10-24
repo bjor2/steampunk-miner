@@ -11,9 +11,10 @@ import { rigLookOf, SHIPPED_RIG_LOOKS, trackLookFramesOf } from './rigLooks'
 import { partSwapsOf } from './render/rigLookParts'
 import { everyLookFrameOf } from './render/rigLookFrames'
 
-/** Systems' boiler threshold (#157 comment 6300543785): the one step, Twin-drum boiler. */
-const TOP_STEP = 16
-const TAIL_POINTS = [17, 18, 1_000, 10_000]
+/** The boiler's first band edge of 5 (ticket 809): the one authored step, Twin-drum boiler. */
+const TOP_STEP = 5
+const BAND = 5
+const TAIL_POINTS = [10, 15, 1_000, 10_000]
 
 function swapsAt(n: number) {
   const frame = rigLookOf('boiler', n)
@@ -31,12 +32,12 @@ function withBoilerLevel(state: AuthorityState, level: number): AuthorityState {
 }
 
 describe('boiler rig look (ticket 583)', () => {
-  it('keeps the rig boiler below 16 purchases', () => {
+  it('keeps the rig boiler below 5 purchases', () => {
     expect(swapsAt(TOP_STEP - 1)).toEqual([])
     expect(drawnSlotsAt(TOP_STEP - 1, 1)).toContain('boiler')
   })
 
-  it('swaps the twin-drum boiler in at 16, in place of the rig boiler', () => {
+  it('swaps the twin-drum boiler in at 5, in place of the rig boiler', () => {
     expect(rigLookOf('boiler', TOP_STEP)?.step).toBe(1)
     expect(lookPartIdsOf(SHIPPED_ART, swapsAt(TOP_STEP))).toEqual([
       'vehicle-look-boiler/twin-drum-boiler',
@@ -50,7 +51,7 @@ describe('boiler rig look (ticket 583)', () => {
     expect(drawnSlotsAt(TOP_STEP, tier)).not.toContain('boiler')
   })
 
-  it('keeps the twin-drum boiler on every tail purchase above the top step', () => {
+  it('keeps the twin-drum boiler on every finish band above the top step', () => {
     for (const n of TAIL_POINTS) {
       expect(lookPartIdsOf(SHIPPED_ART, swapsAt(n))).toEqual([
         'vehicle-look-boiler/twin-drum-boiler',
@@ -58,13 +59,13 @@ describe('boiler rig look (ticket 583)', () => {
     }
   })
 
-  it('shows a different look on each neighbouring purchase from the step on', () => {
-    for (let n = TOP_STEP - 1; n < TOP_STEP + 60; n += 1) {
-      expect(rigLookOf('boiler', n + 1)).not.toEqual(rigLookOf('boiler', n))
+  it('shows a different look on each neighbouring band from the step on', () => {
+    for (let n = TOP_STEP - 1; n < TOP_STEP + 60 * BAND; n += BAND) {
+      expect(rigLookOf('boiler', n + BAND)).not.toEqual(rigLookOf('boiler', n))
     }
   })
 
-  it('lights the twin-drum boiler itself, so a tail tint shows on the look part', () => {
+  it('lights the twin-drum boiler itself, so a finish shows on the look part', () => {
     const frames = trackLookFramesOf(SHIPPED_RIG_LOOKS, 'boiler')!
     expect(frames.rows.glowSlots.flat()).toContain(slotOfPartId('twin-drum-boiler'))
     expect(everyLookFrameOf(frames).every((frame) => frame.glows.every((g) => g < 1))).toBe(true)

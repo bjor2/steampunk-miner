@@ -13,32 +13,33 @@ import { rigLookOf, SHIPPED_RIG_LOOKS, trackLookFramesOf } from './rigLooks'
 const ASSET_ID = 'vehicle-look-drill-tip'
 const TIP = trackLookFramesOf(SHIPPED_RIG_LOOKS, 'drill_tip')!
 
-/** Systems' thresholds (#157 comment 6300543785), Progression's names (6300549964), #578's parts. */
+/** The first band edges of 60 (ticket 809), Progression's names (6300549964), #578's parts. */
 const STEPS = [
-  { from: 70, card: 'Steel cone', part: 'steel-cone' },
-  { from: 100, card: 'Fluted bit', part: 'fluted-bit' },
-  { from: 130, card: 'Toothed crown', part: 'toothed-crown' },
-  { from: 190, card: 'Gem-set crown', part: 'gem-set-crown' },
-  { from: 280, card: 'Aether-cut crown', part: 'aether-cut-crown' },
+  { from: 60, card: 'Steel cone', part: 'steel-cone' },
+  { from: 120, card: 'Fluted bit', part: 'fluted-bit' },
+  { from: 180, card: 'Toothed crown', part: 'toothed-crown' },
+  { from: 240, card: 'Gem-set crown', part: 'gem-set-crown' },
+  { from: 300, card: 'Aether-cut crown', part: 'aether-cut-crown' },
 ]
-const TOP = 280
+const TOP = 300
+const BAND = 60
 const VISUAL_TIERS = [1, 2, 3]
 
 const tipAt = (n: number): RigLookFrame => rigLookOf('drill_tip', n)!
 
-/** What a frame draws: its part, asset, tint, glow and plating. */
+/** What a frame draws: its part, asset, tint, glow and finish. */
 const shownOf = (frame: RigLookFrame): string =>
-  JSON.stringify([frame.partId, frame.assetId, frame.tint, frame.glows, frame.plating])
+  JSON.stringify([frame.partId, frame.assetId, frame.tint, frame.glows, frame.finish])
 
 describe('drill tip look (ticket 579)', () => {
-  it('reads its five steps from the table at 70, 100, 130, 190 and 280 purchases', () => {
+  it('reads its five steps from the table at 60, 120, 180, 240 and 300 purchases', () => {
     expect(TIP.rows.steps.map(({ from, card, part }) => ({ from, card, part }))).toEqual(STEPS)
     expect(TIP.rows.steps.every((step) => step.asset === ASSET_ID)).toBe(true)
   })
 
-  it('swaps no part below 70 purchases, so the rig keeps its own crown', () => {
-    expect(tipAt(69).partId).toBeNull()
-    expect(partSwapsOf([tipAt(69)], [])).toEqual([])
+  it('swaps no part below 60 purchases, so the rig keeps its own crown', () => {
+    expect(tipAt(59).partId).toBeNull()
+    expect(partSwapsOf([tipAt(59)], [])).toEqual([])
   })
 
   it.each(STEPS)('swaps in the $card from $from purchases, in place of the drill bit', (step) => {
@@ -74,15 +75,15 @@ describe('drill tip look (ticket 579)', () => {
     },
   )
 
-  it('keeps the Aether-cut crown on the tail and shows a new look on every purchase', () => {
-    for (let n = TOP; n < TOP + 50; n++) {
-      expect(tipAt(n + 1).partId).toBe('aether-cut-crown')
-      expect(shownOf(tipAt(n + 1))).not.toBe(shownOf(tipAt(n)))
+  it('keeps the Aether-cut crown past the art and shows a new finish every band', () => {
+    for (let n = TOP; n < TOP + 50 * BAND; n += BAND) {
+      expect(tipAt(n + BAND).partId).toBe('aether-cut-crown')
+      expect(shownOf(tipAt(n + BAND))).not.toBe(shownOf(tipAt(n)))
     }
   })
 
   it('changes the look at every step, from the bare rig on', () => {
-    const counts = [69, ...STEPS.map((step) => step.from)]
+    const counts = [59, ...STEPS.map((step) => step.from)]
     const shown = counts.map((n) => shownOf(tipAt(n)))
     expect(new Set(shown).size).toBe(counts.length)
   })
@@ -91,7 +92,7 @@ describe('drill tip look (ticket 579)', () => {
     const state = createScriptedSession().state()
     const source = createRigLookSources().find((each) => each.id === 'rig-look.drill_tip')!
     const player = state.players.p1
-    for (const n of [70, TOP + 1, TOP + 2]) {
+    for (const n of [60, TOP + BAND, TOP + 2 * BAND]) {
       const levels = { ...player.vehicle.levels, drill_tip: n }
       const players = {
         ...state.players,
@@ -103,7 +104,7 @@ describe('drill tip look (ticket 579)', () => {
   })
 
   it('leaves the state digest as it was at the lowest and the highest look', () => {
-    for (const n of [0, 69, TOP, 10_000]) {
+    for (const n of [0, 59, TOP, 10_000]) {
       const session = createScriptedSession()
       session.submit(1, { type: 'debug.setUpgrade', payload: { upgradeId: 'drill_tip', level: n } })
       const state = session.state()

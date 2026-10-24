@@ -19,7 +19,7 @@ export interface RigLooks {
 }
 
 export function createRigLooks(table: RigLookTable): RigLooks {
-  return { tracks: table.tracks.map(createTrackLookFrames) }
+  return { tracks: table.tracks.map((rows) => createTrackLookFrames(rows, table.finishes)) }
 }
 
 export const SHIPPED_RIG_LOOKS: RigLooks = createRigLooks(RIG_LOOK_TABLE)
@@ -38,5 +38,5 @@ export function rigLookOf(track: string, n: number): RigLookFrame | null {
 /** The plaque's fitting fact for `n` owned purchases on `track` (ticket 585); null for none. */
 export function rigLookPlaqueFactOf(track: string, n: number): string | null {
   const frames = trackLookFramesOf(SHIPPED_RIG_LOOKS, track)
-  return frames === null ? null : plaqueFactOf(frames.rows, n)
+  return frames === null ? null : plaqueFactOf(frames, n)
 }

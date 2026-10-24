@@ -12,18 +12,19 @@ import { partSwapsOf } from './render/rigLookParts'
 import { everyLookFrameOf } from './render/rigLookFrames'
 
 /**
- * Systems' hull thresholds (#157 comment 6300543785) in `levels.hull` purchases, each with the
- * #584 part Progression's name is cut from (#157 comment 6300549964).
+ * The hull's first band edges of 120 `levels.hull` purchases (ticket 809), each with the #584
+ * part Progression's name is cut from (#157 comment 6300549964).
  */
 const HULL_STEPS = [
-  { from: 20, part: 'riveted-plate', card: 'Riveted plate' },
-  { from: 80, part: 'banded-iron', card: 'Banded iron' },
-  { from: 140, part: 'brass-trimmed-armour', card: 'Brass-trimmed armour' },
-  { from: 260, part: 'layered-armour', card: 'Layered armour' },
-  { from: 440, part: 'filigree-armour', card: 'Filigree armour' },
+  { from: 120, part: 'riveted-plate', card: 'Riveted plate' },
+  { from: 240, part: 'banded-iron', card: 'Banded iron' },
+  { from: 360, part: 'brass-trimmed-armour', card: 'Brass-trimmed armour' },
+  { from: 480, part: 'layered-armour', card: 'Layered armour' },
+  { from: 600, part: 'filigree-armour', card: 'Filigree armour' },
 ] as const
-const TOP_STEP = 440
-const TAIL_POINTS = [441, 442, 1_000, 10_000]
+const TOP_STEP = 600
+const BAND = 120
+const TAIL_POINTS = [720, 840, 1_000, 10_000]
 
 function swapsAt(n: number) {
   const frame = rigLookOf('hull', n)
@@ -41,9 +42,9 @@ function withHullLevel(state: AuthorityState, level: number): AuthorityState {
 }
 
 describe('hull rig look (ticket 585)', () => {
-  it('keeps the bare rig below 20 purchases', () => {
-    expect(swapsAt(19)).toEqual([])
-    expect(lookPartIdsOf(SHIPPED_ART, swapsAt(19))).toEqual([])
+  it('keeps the bare rig below 120 purchases', () => {
+    expect(swapsAt(119)).toEqual([])
+    expect(lookPartIdsOf(SHIPPED_ART, swapsAt(119))).toEqual([])
   })
 
   it.each(HULL_STEPS)('lays $part over the pod from $from purchases', ({ from, part }) => {
@@ -59,18 +60,18 @@ describe('hull rig look (ticket 585)', () => {
   it.each([1, 2, 3])('hides no rig part under the armour at visual tier %i', (tier) => {
     const [drawn] = lookBodyQuadsOf(SHIPPED_ART, swapsAt(TOP_STEP))
     expect(drawn.quad.partId).toBe('filigree-armour')
-    expect(drawnPartIdsAt(TOP_STEP, tier)).toEqual(drawnPartIdsAt(19, tier))
+    expect(drawnPartIdsAt(TOP_STEP, tier)).toEqual(drawnPartIdsAt(119, tier))
   })
 
-  it('keeps the filigree armour on every tail purchase above the top step', () => {
+  it('keeps the filigree armour on every finish band above the top step', () => {
     for (const n of TAIL_POINTS) {
       expect(lookPartIdsOf(SHIPPED_ART, swapsAt(n))).toEqual(['vehicle-look-hull/filigree-armour'])
     }
   })
 
-  it('shows a different look on each neighbouring purchase from the top step on', () => {
-    for (let n = TOP_STEP - 1; n < TOP_STEP + 60; n += 1) {
-      expect(rigLookOf('hull', n + 1)).not.toEqual(rigLookOf('hull', n))
+  it('shows a different look on each neighbouring band from the top step on', () => {
+    for (let n = TOP_STEP - 1; n < TOP_STEP + 60 * BAND; n += BAND) {
+      expect(rigLookOf('hull', n + BAND)).not.toEqual(rigLookOf('hull', n))
     }
   })
 
@@ -80,7 +81,7 @@ describe('hull rig look (ticket 585)', () => {
     }
   })
 
-  it('lights every armour part itself, so a tail tint shows on the plating over the pod', () => {
+  it('lights every armour part itself, so a finish shows on the plating over the pod', () => {
     const frames = trackLookFramesOf(SHIPPED_RIG_LOOKS, 'hull')!
     for (const { part } of HULL_STEPS) {
       expect(frames.rows.glowSlots.flat()).toContain(slotOfPartId(part))

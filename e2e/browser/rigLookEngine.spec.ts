@@ -1,11 +1,12 @@
 /**
- * The engine's rig looks in the browser (ticket 587; tracks and wheels since ticket 726): from 2
+ * The engine's rig looks in the browser (ticket 587; tracks and wheels since ticket 726): from 5
  * purchases each step of `rigLook.json` lays its tracks and wheels of `vehicle-look-drive` on
  * `chassis.drive`, the middle roller's hub, over the chassis and hiding no rig part; the tail keeps
  * the top part, a drill purchase never moves it (GD ruling on #726: since #723 the engine is the
  * only drive purchase), and the look leaves the physics world as it was; the engine card names the
- * owned step and grades the tail (#585's template). Asserted through `steampunkDebug`, never
- * pixels; the shots at every step and two tail points, at 1280, 1440 and 360 px, by the rig's tier 1
+ * owned band, past the art its finish and the exact level (#585's template, ticket 809). Asserted
+ * through `steampunkDebug`, never pixels; the shots at every step and two finish bands, at 1280,
+ * 1440 and 360 px, by the rig's tier 1
  * and tier 3 shape, are written to the test's output folder for review, never compared.
  */
 import { expect, test, type Page } from '@playwright/test'
@@ -20,21 +21,20 @@ declare global {
 }
 
 const ASSET_ID = 'vehicle-look-drive'
-/** The bare rig, Systems' three steps (#157 comment 6300543785), then two tail points. */
+/** The bare rig, the three steps on the band edges of 5 (ticket 809), then two finish bands. */
 const LOOKS = [
-  { purchases: 1, part: null, fitting: null },
-  { purchases: 2, part: 'iron-track', fitting: 'Fitting: Single piston' },
-  { purchases: 18, part: 'steel-track', fitting: 'Fitting: Triple flywheel' },
-  { purchases: 26, part: 'guild-track', fitting: 'Fitting: Guild turbine' },
-  { purchases: 27, part: 'guild-track', fitting: 'Fitting: Guild turbine · Grade 1' },
-  { purchases: 28, part: 'guild-track', fitting: 'Fitting: Guild turbine · Grade 2' },
+  { purchases: 4, part: null, fitting: null },
+  { purchases: 5, part: 'iron-track', fitting: 'Fitting: Single piston' },
+  { purchases: 10, part: 'steel-track', fitting: 'Fitting: Triple flywheel' },
+  { purchases: 15, part: 'guild-track', fitting: 'Fitting: Guild turbine' },
+  { purchases: 20, part: 'guild-track', fitting: 'Fitting: Bright brass · L20' },
+  { purchases: 25, part: 'guild-track', fitting: 'Fitting: Blued steel · L25' },
 ]
 /**
- * Tail grades the card must fit at 360 px, kept to the range the cargo hold's spec owns (ticket
- * 581); the unit spec measures the grade 9999 and 1M texts' width (rigLookCard.test.ts).
+ * Levels the card must fit at 360 px past the art, kept to the range the cargo hold's spec owns
+ * (ticket 581); the unit spec measures the widest text (rigLookPlaque.test.ts).
  */
-const TAIL_GRADES = [1, 101, 200]
-const TOP_STEP = 26
+const TAIL_LEVELS = [20, 101, 200]
 const CARD = `[data-testid="${UI_ID_TEMPLATES.workshopUpgradeBuy('engine')}"]`
 const FITTING = `${CARD} [data-sheet-card-line]`
 const VIEWPORTS = [
@@ -129,7 +129,7 @@ async function bareRigParts(page: Page): Promise<string[]> {
 }
 
 test.describe('engine look (ticket 587)', () => {
-  test('lays each step on the roller hub, hiding no rig part, the top part on the tail', async ({
+  test('lays each step on the roller hub, hiding no rig part, the top part past the art', async ({
     page,
   }) => {
     const errors = await openGame(page)
@@ -146,10 +146,10 @@ test.describe('engine look (ticket 587)', () => {
   }) => {
     const errors = await openGame(page)
     const bare = await bareRigParts(page)
-    await setUpgrade(page, 'engine', 1)
+    await setUpgrade(page, 'engine', 4)
     await expectLook(page, null, bare)
     const lowest = await physicsCounts(page)
-    await setUpgrade(page, 'engine', 28)
+    await setUpgrade(page, 'engine', 25)
     await expectLook(page, 'guild-track', bare)
     await expect.poll(() => physicsCounts(page)).toEqual(lowest)
     expect(errors).toEqual([])
@@ -158,7 +158,7 @@ test.describe('engine look (ticket 587)', () => {
   test('keeps the tracks and wheels as they are when the drill is bought', async ({ page }) => {
     const errors = await openGame(page)
     const bare = await bareRigParts(page)
-    await setUpgrade(page, 'engine', 18)
+    await setUpgrade(page, 'engine', 10)
     await expectLook(page, 'steel-track', bare)
     for (const [track, purchases] of [
       ['drill_power', 30],
@@ -173,7 +173,7 @@ test.describe('engine look (ticket 587)', () => {
   })
 
   for (const viewport of VIEWPORTS) {
-    test(`names the owned step on the card and grades the tail, ${viewport.name}`, async ({
+    test(`names the owned band on the card, the level past the art, ${viewport.name}`, async ({
       page,
     }) => {
       await page.setViewportSize(viewport.size)
@@ -183,12 +183,12 @@ test.describe('engine look (ticket 587)', () => {
         if (fitting === null) await expect(page.locator(FITTING)).not.toContainText('Fitting:')
         else await expect(page.locator(FITTING)).toContainText(fitting)
       }
-      for (const grade of TAIL_GRADES) {
-        await setUpgrade(page, 'engine', TOP_STEP + grade)
-        await expect(page.locator(FITTING)).toContainText('· Grade ')
+      for (const level of TAIL_LEVELS) {
+        await setUpgrade(page, 'engine', level)
+        await expect(page.locator(FITTING)).toContainText(` · L${level}`)
         await page.locator(CARD).scrollIntoViewIfNeeded()
-        expect(await fittingOverflowOf(page), `grade ${grade}`).toBeLessThanOrEqual(1)
-        await test.info().attach(`engine grade ${grade}, ${viewport.name}`, {
+        expect(await fittingOverflowOf(page), `level ${level}`).toBeLessThanOrEqual(1)
+        await test.info().attach(`engine level ${level}, ${viewport.name}`, {
           body: await page.screenshot(),
           contentType: 'image/png',
         })
@@ -196,7 +196,7 @@ test.describe('engine look (ticket 587)', () => {
       expect(errors).toEqual([])
     })
 
-    test(`shoots every step and two tail points at ${viewport.name} size`, async ({ page }) => {
+    test(`shoots every step and two finish bands at ${viewport.name} size`, async ({ page }) => {
       await page.setViewportSize(viewport.size)
       const errors = await openGame(page)
       for (const shape of RIG_SHAPES) {
