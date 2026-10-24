@@ -47,7 +47,7 @@ function hintsOfFirstTenMinutes(seen: readonly string[] = []) {
 describe('hints over the first ten minutes (#16 acceptance)', () => {
   const firstRun = hintsOfFirstTenMinutes()
 
-  it('shows the move, drill, cargo, dock and Upgrade bay hints in that order', () => {
+  it('shows the move, drill, cargo, dock, Upgrade bay and star map hints in that order', () => {
     const onboarding = firstRun.shown.filter((hint) => hint.id !== 'hint_energy')
     expect(onboarding.map((hint) => hint.id)).toEqual([
       'hint_move',
@@ -55,6 +55,7 @@ describe('hints over the first ten minutes (#16 acceptance)', () => {
       'hint_cargo',
       'hint_dock',
       'hint_upgrade_bay',
+      'hint_star_map',
     ])
   })
 

@@ -75,6 +75,16 @@
         "Digging down gains speed only as fast as local gravity pulls.",
         "Near the core it still gains, at a tenth of surface gravity at least."
       ]
+    },
+    {
+      "id": "hint_star_map",
+      "iconId": "icon-hud-star-map",
+      "shownWhen": "upgradeBought",
+      "dismissedWhen": "starMapOpenedOrLeftPad",
+      "lines": [
+        "Star map: plan your jumps. Each world shows its fuel cost.",
+        "Open it with {open_star_map}."
+      ]
     }
   ],
   "transmissions": [

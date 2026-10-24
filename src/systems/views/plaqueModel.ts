@@ -3,12 +3,13 @@
  * of the one hint and the one transmission up, with every `{actionId}` printed as the key bound to
  * it now (#33), or on touch the control's word (P1-4 of #470), so rebinding changes the text at once, and the energy hint's tow cost printed by
  * the one display formatter (#32). Also whether the platform highlights "Sell, repair and
- * recharge", which it does while `hint_dock` is up (#16: the first visit).
+ * recharge", which it does while `hint_dock` is up (#16: the first visit), and whether the star map's
+ * button wears its ring, which it does while `hint_star_map` is up (ticket 792).
  */
 import { TRANSMISSION_ICON_ID } from '../art/icons/iconSet'
 import { formatAmount, formatPrice } from '../displayAmount'
 import { isHintShown, hintDefOf, type HintBoard, type ShownHint } from '../hints/hintBoard'
-import { DOCK_HINT_ID, HINT_TABLE, type HintTable } from '../hints/hintTable'
+import { DOCK_HINT_ID, HINT_TABLE, STAR_MAP_HINT_ID, type HintTable } from '../hints/hintTable'
 import type { TransmissionBoard } from '../hints/transmissionBoard'
 import { promptWordOf, type PromptSource } from '../input/promptLabel'
 import { fromCanonical } from '../money'
@@ -52,6 +53,13 @@ export function isQuickServiceHighlighted(
   sources: Pick<PlaqueSources, 'hintBoard' | 'isShowingHints'>,
 ): boolean {
   return sources.isShowingHints && isHintShown(sources.hintBoard, DOCK_HINT_ID)
+}
+
+/** The star map's button rings while its hint is up, so the plaque points at it (ticket 792). */
+export function isStarMapButtonHinted(
+  sources: Pick<PlaqueSources, 'hintBoard' | 'isShowingHints'>,
+): boolean {
+  return sources.isShowingHints && isHintShown(sources.hintBoard, STAR_MAP_HINT_ID)
 }
 
 function hintReadingOf(sources: PlaqueSources, table: HintTable): PlaqueReading | null {

@@ -40,6 +40,9 @@ export const HINTS_VERSION = 1
 /** The hint whose plaque also highlights "Sell, repair and recharge" on the platform (#16). */
 export const DOCK_HINT_ID = 'hint_dock'
 
+/** The hint whose plaque also rings the star map's button (ticket 792). */
+export const STAR_MAP_HINT_ID = 'hint_star_map'
+
 /** Placeholders that are not action ids: the tow's cost. */
 const COST_PLACEHOLDERS = ['fee', 'cargoLost']
 const MAX_LINES = 2

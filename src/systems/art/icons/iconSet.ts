@@ -79,6 +79,7 @@ export const HUD_LABEL_IDS = [
   'lining_bill',
   'money',
   'planet',
+  'star_map',
 ] as const
 
 export type HudLabelId = (typeof HUD_LABEL_IDS)[number]
@@ -235,6 +236,7 @@ const HUD_LABEL_TITLES: Readonly<Record<HudLabelId, string>> = {
   lining_bill: 'Lining bill',
   money: 'Money',
   planet: 'Planet',
+  star_map: 'Star map',
 }
 
 const PANEL_TITLES: Readonly<Record<PanelId, string>> = {

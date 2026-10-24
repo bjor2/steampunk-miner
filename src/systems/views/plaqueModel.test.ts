@@ -3,7 +3,12 @@ import { EMPTY_HINT_BOARD, type HintBoard } from '../hints/hintBoard'
 import { EMPTY_TRANSMISSION_BOARD } from '../hints/transmissionBoard'
 import { ACTION_MAP, bindingsWithOverrides } from '../input/actionMap'
 import { KEYBOARD_PROMPTS } from '../input/promptFixtures'
-import { isQuickServiceHighlighted, selectPlaqueModel, type PlaqueSources } from './plaqueModel'
+import {
+  isQuickServiceHighlighted,
+  isStarMapButtonHinted,
+  selectPlaqueModel,
+  type PlaqueSources,
+} from './plaqueModel'
 
 const boardShowing = (id: string, rescueCost: HintBoard['queued'][0]['rescueCost'] = null) => ({
   ...EMPTY_HINT_BOARD,
@@ -69,5 +74,19 @@ describe('plaque model', () => {
     expect(isQuickServiceHighlighted(sources({ hintBoard: boardShowing('hint_cargo') }))).toBe(
       false,
     )
+  })
+
+  it('rings the star map button while its hint is up, and only while hints show (ticket 792)', () => {
+    const showing = boardShowing('hint_star_map')
+    expect(isStarMapButtonHinted(sources({ hintBoard: showing }))).toBe(true)
+    expect(isStarMapButtonHinted(sources({ hintBoard: boardShowing('hint_dock') }))).toBe(false)
+    expect(isStarMapButtonHinted(sources({ hintBoard: showing, isShowingHints: false }))).toBe(
+      false,
+    )
+  })
+
+  it('names the key that opens the star map in its hint', () => {
+    const plaque = selectPlaqueModel(sources({ hintBoard: boardShowing('hint_star_map') }))
+    expect(plaque.hint?.lines.at(-1)).toBe('Open it with M.')
   })
 })

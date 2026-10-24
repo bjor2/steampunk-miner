@@ -24,6 +24,8 @@ export interface HintMoment {
    * #724, the motion rule's answer); absent reads as not held.
    */
   isDigGravityLimited?: boolean
+  /** Client-owned: the star map's panel is open (ticket 792); absent reads as shut. */
+  isStarMapOpen?: boolean
 }
 
 export type HintCondition = (moment: HintMoment) => boolean
@@ -53,6 +55,8 @@ export const HINT_CONDITIONS = {
   enteredPlanetTwo: (moment) =>
     hasPlayerEvent(moment, 'PlanetEntered') && moment.state.planet.index === SECOND_PLANET,
   digGravityLimited: (moment) => moment.isDigGravityLimited === true,
+  /** Ticket 792: the map's hint goes when the map opens, or on the next dive, so it never blocks. */
+  starMapOpenedOrLeftPad: (moment) => moment.isStarMapOpen === true || isOutsidePadZone(moment),
 } satisfies Record<string, HintCondition>
 
 export type HintConditionName = keyof typeof HINT_CONDITIONS

@@ -199,6 +199,15 @@ const GLYPHS: Readonly<Record<string, IconGlyph>> = {
   'hud-lining-bill': { body: 'M5 3h14v18H5z', lines: 'M8 8h8M8 12h8M8 16h5' },
   'hud-money': { body: COIN, lines: 'M12 6a6 6 0 1 1 0 12a6 6 0 1 1 0-12zM12 9v6' },
   'hud-planet': { body: 'M12 5a7 7 0 1 1 0 14a7 7 0 1 1 0-14z', lines: 'M2 14c4 4 16 4 20 0' },
+  // The star map's way in (ticket 792): a folded chart with a route between two worlds, not a star.
+  'hud-star-map': {
+    body: 'M2 5l6-2 8 2 6-2v16l-6 2-8-2-6 2z',
+    lines: 'M8 3v16M16 5v16M5 15l6-5 8-3',
+    dots: [
+      [5, 15, 1.5],
+      [19, 7, 1.5],
+    ],
+  },
   // The platform's two looks (#8), the preview's tier, the plaques.
   'platform-outpost': { body: 'M4 21V11l8-7 8 7v10z', lines: 'M10 21v-6h4v6' },
   'platform-core-drive': {

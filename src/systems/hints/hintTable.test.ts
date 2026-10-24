@@ -8,7 +8,7 @@ const withHint = (patch: Record<string, unknown>) => ({
 })
 
 describe('hint table', () => {
-  it('ships the five #16 hints, #58 hint_upgrade_bay, #724 hint_gravity_ramp and the three #2 transmissions', () => {
+  it('ships the five #16 hints, #58 hint_upgrade_bay, #724 hint_gravity_ramp, ticket 792 hint_star_map and the three #2 transmissions', () => {
     expect(HINT_TABLE.hints.map((hint) => hint.id)).toEqual([
       'hint_move',
       'hint_drill',
@@ -17,6 +17,7 @@ describe('hint table', () => {
       'hint_upgrade_bay',
       'hint_energy',
       'hint_gravity_ramp',
+      'hint_star_map',
     ])
     expect(HINT_TABLE.transmissions).toHaveLength(3)
     expect(HINT_TABLE.minTicksBetweenHints).toBe(1200)
