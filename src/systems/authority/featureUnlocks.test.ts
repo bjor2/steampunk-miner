@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { startScenarioCommands } from '../startScenarioCommands'
+import { setCoreFragmentsCommand, startScenarioCommands } from '../startScenarioCommands'
 import type { DomainEvent } from './domainEvent'
 import { isFeatureUnlocked } from './featureUnlocks'
 import { createScriptedSession, WORLD_SEED } from './scriptedSession'
@@ -89,6 +89,8 @@ describe('feature unlocks on travel', () => {
   it('does not unlock endless on arriving at planet 40 or travelling past it', () => {
     const session = dockedOnPlanet(39)
     const toFinale = session.submit(10, travelTo(40))
+    // Each planet keeps its own core bay (#790): P40 lands empty, so its Travel fee is banked here.
+    session.submit(12, setCoreFragmentsCommand(100000))
     session.submit(15, dock)
     const pastFinale = session.submit(20, travelTo(41))
     expect(session.state().planet.index).toBe(41)
