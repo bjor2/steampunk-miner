@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-10-24T17:19:57+02:00",
+  "updated_at": "2026-10-24T17:20:48+02:00",
   "caps": {
     "grok": 12,
     "claude": 10,
@@ -37,12 +37,11 @@
         },
         {
           "slot": "C3",
-          "state": "busy",
+          "state": "free",
           "ticket": null,
           "grok_slot": null,
-          "kind": "aux",
-          "since": "2026-10-24T17:19:00+02:00",
-          "label": "tester-triage"
+          "kind": null,
+          "since": null
         },
         {
           "slot": "C4",
@@ -70,8 +69,8 @@
         }
       ],
       "size": 6,
-      "used": 3,
-      "free": 3,
+      "used": 2,
+      "free": 4,
       "claims_last_hour": 3,
       "name": "Claude Max 1"
     },
@@ -124,38 +123,23 @@
     }
   ],
   "gate": {
-    "busy": 0,
+    "busy": 1,
     "max": 3
   },
   "tester": {
     "state": "running",
-    "phase": "triage-fast",
-    "sha": "968c7860a922f8dbbd18fed88ed65bed5e3f0e67",
-    "since": "2026-10-24T15:19:54Z",
-    "holds_gate": false,
-    "claude_slot": 3,
-    "last_run": "2026-10-24T12:59:24Z",
+    "phase": "fast",
+    "sha": "f530c87ad74a1739f1b692ad08896b8c06be8b19",
+    "since": "2026-10-24T15:20:38Z",
+    "holds_gate": true,
+    "claude_slot": null,
+    "last_run": "2026-10-24T15:20:32Z",
     "last_nightly": "2026-10-15T20:43:15Z",
     "last_nightly_result": "full=FAIL balance-report=ok bench=FAIL balance-planets=ok balance-guns=ok balance-charges=ok balance-refinery=ok balance-heat=ok e2e=FAIL memory-soak=FAIL packaged-smoke=ok ",
     "main_red_sha": null,
-    "feature": 789,
-    "feature_title": "Bug: drill tip misaligned after upgrades, cuts behind casing instead of through it",
-    "queue": [
-      {
-        "feature": 774,
-        "kind": "spec",
-        "title": "SS2 map: solar system 2 (generated)",
-        "tickets": [
-          775,
-          776,
-          777,
-          778,
-          779,
-          780
-        ],
-        "since": "2026-10-24T14:55:00+02:00"
-      }
-    ]
+    "feature": 774,
+    "feature_title": "SS2 map: solar system 2 (generated)",
+    "queue": []
   },
   "grok": [
     {
@@ -258,12 +242,10 @@
     },
     {
       "slot": 3,
-      "state": "busy",
+      "state": "free",
       "ticket": null,
       "grok_slot": null,
-      "since": "2026-10-24T17:19:00+02:00",
-      "kind": "aux",
-      "label": "tester-triage",
+      "since": null,
       "account": 1
     },
     {
@@ -343,8 +325,8 @@
     "claude": {
       "size": 10,
       "enabled": 10,
-      "used": 4,
-      "free": 6,
+      "used": 3,
+      "free": 7,
       "external": 0
     }
   },
