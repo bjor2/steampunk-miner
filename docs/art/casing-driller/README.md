@@ -18,22 +18,23 @@ The part ids and tiers are the S7a ones, so the Workshop milestones (`swap.part`
 part requests and the debug API keep working; each slot is re-cast on the new hull. Two part
 names are new (`art/asset-rules.json`), with their motion in `src/systems/render/partMotion.ts`.
 
-| Slot            | Tiers | The casing driller's piece                                                         | Motion (partMotion)                      |
-| --------------- | ----- | ---------------------------------------------------------------------------------- | ---------------------------------------- |
-| `chassis`       | 1, 3  | the riveted bronze pod, its steel keel and the three articulated legs              | squashes on landing, recoils on a hit    |
-| `wheel` (×3)    | 1, 3  | a tracked roller at each leg's foot (0.24 m, 0.26 m at tier 3)                     | rolls with the ground speed              |
-| `boiler`        | 1     | the brass pressure dome: gauges, the driver's viewport, a valve                    | breathes; bobs with the load             |
-| `boiler-2`      | 3     | a second pressure tank on the fore deck                                            | as the boiler                            |
-| `stack` (×2)    | 1-3   | the exhaust stacks behind the dome                                                 | none                                     |
-| `hopper`        | 1     | the ore hatch on the fore deck                                                     | none                                     |
-| `motor-housing` | 1     | the gimbal's drive rings on the bow                                                | none                                     |
-| `piston`        | 1     | the steam ram beside the hatch                                                     | pumps with thrust                        |
-| `headlamp`      | 1-3   | the warm lamps (a rear one at tier 3)                                              | flickers                                 |
-| `armour-plate`  | 2, 3  | bow and stern shields; tier 3's belly skirt over the hips                          | none                                     |
-| `drill-head`    | 1-3   | the gimbal collar and the stepped drill cone, its seams glowing                    | swivels (DrillHeadView); glows with load |
-| `drill-bit`     | 1, 3  | the cutter crown at the tip; tier 3's reamer ring round the cone (the bore collar) | turns per drilling tick; glows with load |
-| `thruster` (×2) | 1     | **new:** the brass vectored thrusters under the belly                              | **new:** glows while thrusting           |
-| `casing-arm`    | 1     | **new:** the two rear arms, one holding a casing ring, one the cement gun          | **new:** swings once as a ring is laid   |
+| Slot            | Tiers | The casing driller's piece                                                | Motion (partMotion)                      |
+| --------------- | ----- | ------------------------------------------------------------------------- | ---------------------------------------- |
+| `chassis`       | 1, 3  | the riveted bronze pod, its steel keel and the three articulated legs     | squashes on landing, recoils on a hit    |
+| `wheel` (×3)    | 1, 3  | a tracked roller at each leg's foot (0.24 m, 0.26 m at tier 3)            | rolls with the ground speed              |
+| `boiler`        | 1     | the brass pressure dome: gauges, the driver's viewport, a valve           | breathes; bobs with the load             |
+| `boiler-2`      | 3     | a second pressure tank on the fore deck                                   | as the boiler                            |
+| `stack` (×2)    | 1-3   | the exhaust stacks behind the dome                                        | none                                     |
+| `hopper`        | 1     | the ore hatch on the fore deck                                            | none                                     |
+| `motor-housing` | 1     | the gimbal's drive rings on the bow                                       | none                                     |
+| `piston`        | 1     | the steam ram beside the hatch                                            | pumps with thrust                        |
+| `headlamp`      | 1-3   | the warm lamps (a rear one at tier 3)                                     | flickers                                 |
+| `armour-plate`  | 2, 3  | bow and stern shields; tier 3's belly skirt over the hips                 | none                                     |
+| `drill-head`    | 1-3   | the gimbal collar and the stepped drill cone, its seams glowing           | swivels (DrillHeadView); glows with load |
+| `drill-bit`     | 1, 3  | the cutter crown at the tip (a heavier, 10-tooth one at tier 3)           | turns per drilling tick; glows with load |
+| `drill-bit-2`   | 3     | tier 3's reamer ring round the cone (the bore collar)                     | turns per drilling tick; glows with load |
+| `thruster` (×2) | 1     | **new:** the brass vectored thrusters under the belly                     | **new:** glows while thrusting           |
+| `casing-arm`    | 1     | **new:** the two rear arms, one holding a casing ring, one the cement gun | **new:** swings once as a ring is laid   |
 
 - **Frame.** The #52 conventions: 1 unit = 1 m, the chassis centre at the origin, the drill
   towards +X, the camera along +Y. The body keeps the S7a envelope (about 0.92 × 0.51 m, rollers
@@ -41,9 +42,12 @@ names are new (`art/asset-rules.json`), with their motion in `src/systems/render
 - **The nose.** The head's origin is its bounds' centre, authored at (collider + head width) / 2
   ahead; it swivels round the body to all four facings. The head grows with the tier (0.33, 0.35,
   0.43 m). In game the head is drawn further back than authored (ticket 789,
-  `systems/render/drillHeadReach.ts`): its frontmost part, the crown at tiers 1-2 and the cone's
-  point at tier 3, sits on the swept cut's front, 0.625 m ahead of the body's centre, so the nose
+  `systems/render/drillHeadReach.ts`): its frontmost part, the cutter crown at every tier, sits on the swept cut's front, 0.625 m ahead of the body's centre, so the nose
   overlaps the pod's front by 0.2-0.25 m. The review sheets here are posed at the authored reach.
+- **The bit leads (ticket 789).** Tier 3 first carried only the reamer in its `drill-bit` slot, so
+  its tip was the bare cone and the Workshop's drill_tip swap (`t3-drill-bit`) put a ring behind
+  the head instead of a bit on it. `retip_tier_3.py` edited the shipped `.blend` in place: the
+  reamer became `t3-drill-bit-2`, and `t3-drill-bit` is a heavier crown at the cone's point.
 - **Glow.** The emissive map carries the nose seams and crown core (orange), the thruster plugs
   (blue-white) inside their orange lips, and the lamp lenses. At rest the thruster plug and lip
   are dark steel in the albedo; partMotion turns the emission up while thrusting and drilling.
@@ -53,7 +57,7 @@ names are new (`art/asset-rules.json`), with their motion in `src/systems/render
   (-0.38, -0.14). The `casingHiss` cue, the one the cement spray and the hiss play on, swings
   both down to the bore wall and home over `CASING_ARM_SECONDS`.
 - **Draw order.** Rollers, stacks and arms 1; the pod 2; dome, hatch, drive rings, tank 3; lamps,
-  ram and thrusters 4; armour 5; the tier-3 reamer 7; the head 8; the crown 9. The modules
+  ram and thrusters 4; armour 5; the tier-3 reamer 7; the head 8; the crown 9 (tier 3's too). The modules
   (auto guns 10-12 and the slices' gear) draw over all of it.
 
 ## Mounts
@@ -75,6 +79,7 @@ points that did not move either.
 | `turnaround.png`           | the drill swivelling from right to left through up, the short way a half turn takes       |
 | `fitted.png`               | tier 3 with every module mounted at its attach point                                      |
 | `author_casing_driller.py` | wrote the first version of the parts into `vehicle.blend`                                 |
+| `retip_tier_3.py`          | moved tier 3's bit to the cone's tip in `vehicle.blend` (ticket 789)                      |
 | `render_casing_driller.py` | the review renders (Blender), posed as the code poses the parts                           |
 | `sheet_casing_driller.py`  | lays the renders out into the sheets (Pillow)                                             |
 

@@ -3,7 +3,7 @@
   "schema": 1,
   "source": {
     "blend": "art/blender/vehicle/vehicle.blend",
-    "sha256": "90b4a126a1e0d34625122b08612a4bd8bf44945bd239658586929e7063eb64bc",
+    "sha256": "40df810e47611d750f0b0b5083e048565c0f1d4b0a8b2c28571c673922b5950c",
     "blender": "4.2.9 LTS"
   },
   "pxPerMetre": 512,
@@ -617,6 +617,29 @@
     },
     {
       "id": "t3-drill-bit",
+      "tier": 3,
+      "rect": [
+        377,
+        1598,
+        79,
+        77
+      ],
+      "sizeM": [
+        0.153,
+        0.1499
+      ],
+      "pivotM": [
+        0.0765,
+        0.075
+      ],
+      "atM": [
+        0.868,
+        0.0
+      ],
+      "z": 9
+    },
+    {
+      "id": "t3-drill-bit-2",
       "tier": 3,
       "rect": [
         8,

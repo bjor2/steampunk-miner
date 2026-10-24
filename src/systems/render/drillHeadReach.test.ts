@@ -20,7 +20,7 @@ const FACINGS: readonly Facing[] = [FACING.left, FACING.right, FACING.down, FACI
 /** A fresh run, the end of planet 1 on the curve, and far past the last tier (P200). */
 const LEVELS = [startLevels(), onCurveSteps(1), onCurveSteps(200)]
 
-/** The Workshop's drill_tip milestone swaps the tier-3 bit onto a tier-1 head. */
+/** The Workshop's drill_tip milestone swaps tier 3's crown onto a tier-1 or tier-2 head. */
 const SWAPS: readonly (readonly string[])[] = [NO_SWAPS, ['t3-drill-bit']]
 
 function uprightPoseFacing(facing: Facing): VehiclePose {
@@ -49,9 +49,9 @@ function drawnTipAheadMm(facing: Facing, tier: number, swaps: readonly string[])
 }
 
 /** The head part whose front edge leads, facing right. */
-function leadingHeadPartOf(tier: number) {
-  const quads = drillHeadQuadsOf(SHIPPED_ART, tier)
-  const tip = drillTipAheadOf(SHIPPED_ART, tier)
+function leadingHeadPartOf(tier: number, swaps: readonly string[] = NO_SWAPS) {
+  const quads = drillHeadQuadsOf(SHIPPED_ART, tier, swaps)
+  const tip = drillTipAheadOf(SHIPPED_ART, tier, swaps)
   return quads.find((quad) => quad.centre[0] + quad.size[0] / 2 === tip)
 }
 
@@ -94,15 +94,21 @@ describe('drill head reach', () => {
     }
   })
 
-  it('leads with the cutter crown, drawn over the head plate, at tiers 1 and 2', () => {
-    for (const tier of [1, 2]) {
-      const lead = leadingHeadPartOf(tier)
-      expect(slotOfPartId(lead?.partId ?? '')).toBe('drill-bit')
-      expect(lead?.z).toBeGreaterThan(0)
+  it('leads with the cutter crown, drawn over the head plate, at every tier and swap', () => {
+    for (const tier of [1, 2, 3]) {
+      for (const swaps of SWAPS) {
+        const lead = leadingHeadPartOf(tier, swaps)
+        expect(slotOfPartId(lead?.partId ?? '')).toBe('drill-bit')
+        expect(lead?.z).toBeGreaterThan(0)
+      }
     }
   })
 
-  it('leads with the cone’s point at tier 3, its reamer ring round the gimbal behind it (#393)', () => {
-    expect(leadingHeadPartOf(3)?.partId).toBe('t3-drill-head')
+  it('keeps tier 3’s reamer ring round the gimbal, behind the head plate (#7 bore collar)', () => {
+    const reamer = drillHeadQuadsOf(SHIPPED_ART, 3).find(
+      (quad) => slotOfPartId(quad.partId) === 'drill-bit-2',
+    )
+    expect(reamer?.centre[0]).toBeLessThan(0)
+    expect(reamer?.z).toBeLessThan(0)
   })
 })

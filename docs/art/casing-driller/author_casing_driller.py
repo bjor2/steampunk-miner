@@ -31,7 +31,8 @@ S7a ones (the lint keeps them, and the Workshop milestones swap them), each re-c
 | `headlamp`      | the warm lamps                                                              |
 | `armour-plate`  | the bow and stern shields (tier 2), the belly skirt (tier 3)                |
 | `drill-head`    | the gimbal ball and the stepped drill cone, its seams glowing with the load |
-| `drill-bit`     | the cutter crown at the tip (tier 1), the reamer ring round the gimbal (3)  |
+| `drill-bit`     | the cutter crown at the tip (tier 1, a heavier one at tier 3)               |
+| `drill-bit-2`   | tier 3's reamer ring round the gimbal                                       |
 | `thruster`      | the two vectored brass thrusters, glowing blue-orange while thrusting       |
 | `casing-arm`    | the two rear arms: one holds a casing ring, one the cement nozzle           |
 """
@@ -83,6 +84,8 @@ HUB_Z = -0.36
 COLLIDER_M = 0.9
 # Draw order (#52 `z`): rollers and arms behind the pod, the pod, its fittings, armour, the nose.
 Z_BEHIND, Z_POD, Z_FITTING, Z_FRONT_FITTING, Z_ARMOUR, Z_BIT_COLLAR, Z_HEAD, Z_BIT = 1, 2, 3, 4, 5, 7, 8, 9
+# Tier 3's crown grows with its cone (base radius 0.16 m against tier 1's 0.1 m).
+TIER_3_CROWN_RADIUS_M = 0.075
 
 
 def main():
@@ -156,7 +159,9 @@ def author_tier_3():
     part('t3-armour-plate-3', 3, skirt_pieces(), (0.0, -0.16, -0.22), Z_ARMOUR)
     part('t3-boiler-2', 3, tank_pieces(), (0.23, -0.02, 0.27), Z_FITTING)
     head = head_part('t3-drill-head', 3, nose_pieces(0.42, steps=4, glow_bands=3, fixed_tip=True))
-    reamer_collar('t3-drill-bit', 3, head)
+    # The bit leads at every tier (ticket 789): the crown keeps the tip, the reamer rides behind it.
+    tip_crown('t3-drill-bit', 3, head, radius=TIER_3_CROWN_RADIUS_M, teeth=10)
+    reamer_collar('t3-drill-bit-2', 3, head)
     part('t3-headlamp-2', 3, lamp_pieces(0.045), (-0.42, -0.09, 0.07), Z_FRONT_FITTING)
     part('t3-stack', 3, stack_pieces(0.045, 0.28), (-0.38, 0.03, 0.17), Z_BEHIND)
     part('t3-stack-2', 3, stack_pieces(0.04, 0.26), (-0.24, 0.05, 0.32), Z_BEHIND)
@@ -191,10 +196,10 @@ def head_part(part_id, tier, pieces):
     return head
 
 
-def tip_crown(part_id, tier, head):
+def tip_crown(part_id, tier, head, radius=0.055, teeth=8):
     """The cutter crown spins at the cone's tip (the bit turns per drilling tick, #48)."""
     (_, _), (max_x, _) = view_bounds_of(head)
-    return part(part_id, tier, crown_pieces(0.055, teeth=8), (max_x - 0.01, -0.16, 0.0), Z_BIT)
+    return part(part_id, tier, crown_pieces(radius, teeth=teeth), (max_x - 0.01, -0.16, 0.0), Z_BIT)
 
 
 def reamer_collar(part_id, tier, head):
