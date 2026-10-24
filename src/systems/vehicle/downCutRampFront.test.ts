@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { BASE_GRAVITY } from '../../constants/physics'
 import { rampAllowedStepMmOf, rampedFrontStepMmOf } from './downCutRamp'
-import { FACING } from './vehiclePose'
+import { AIM } from './aim'
 
 // Bjor's ruling on #724 on the swept cut's front: a cut down's front steps no further than the
 // body can move, the last report's speed plus a dt for each tick since, a tick's worth rounded up.
@@ -29,13 +29,13 @@ describe('gravity ramp on the front of a cut down (#724)', () => {
   })
 
   it("holds a cut down's front to the ramp, never past the drill's step", () => {
-    expect(rampedFrontStepMmOf(FACING.down, 1400, fromRest(0))).toBe(4)
-    expect(rampedFrontStepMmOf(FACING.down, 100, fromRest(59))).toBe(100)
+    expect(rampedFrontStepMmOf(AIM.down, 1400, fromRest(0))).toBe(4)
+    expect(rampedFrontStepMmOf(AIM.down, 100, fromRest(59))).toBe(100)
   })
 
   it('leaves a sideways or upward front to the drill and the drive', () => {
-    for (const facing of [FACING.left, FACING.right, FACING.up]) {
-      expect(rampedFrontStepMmOf(facing, 1400, fromRest(0))).toBe(1400)
+    for (const aim of [AIM.left, AIM.right, AIM.up]) {
+      expect(rampedFrontStepMmOf(aim, 1400, fromRest(0))).toBe(1400)
     }
   })
 })
