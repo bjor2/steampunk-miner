@@ -1322,6 +1322,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/render/collapseTelegraph.test.ts` | 8 | 8 |
 | `src/systems/render/densityHalo.test.ts` | 8 | 8 |
 | `src/systems/render/drillHeadPose.test.ts` | 7 | 4 |
+| `src/systems/render/drillHeadReach.test.ts` | 6 | 6 |
 | `src/systems/render/enemyArt.test.ts` | 3 | 3 |
 | `src/systems/render/enemyPlaceholder.test.ts` | 7 | 3 |
 | `src/systems/render/enemyTint.test.ts` | 5 | 5 |

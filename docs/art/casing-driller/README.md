@@ -38,9 +38,12 @@ names are new (`art/asset-rules.json`), with their motion in `src/systems/render
 - **Frame.** The #52 conventions: 1 unit = 1 m, the chassis centre at the origin, the drill
   towards +X, the camera along +Y. The body keeps the S7a envelope (about 0.92 × 0.51 m, rollers
   at z -0.36), so the 0.9 m collider, the preview framing and every attach point still fit it.
-- **The nose.** The head's origin is its bounds' centre, at (collider + head width) / 2 ahead,
-  where `DrillHeadView` draws it facing right; it swivels round the body to all four facings. The
-  head grows with the tier (0.33, 0.35, 0.43 m).
+- **The nose.** The head's origin is its bounds' centre, authored at (collider + head width) / 2
+  ahead; it swivels round the body to all four facings. The head grows with the tier (0.33, 0.35,
+  0.43 m). In game the head is drawn further back than authored (ticket 789,
+  `systems/render/drillHeadReach.ts`): its frontmost part, the crown at tiers 1-2 and the cone's
+  point at tier 3, sits on the swept cut's front, 0.625 m ahead of the body's centre, so the nose
+  overlaps the pod's front by 0.2-0.25 m. The review sheets here are posed at the authored reach.
 - **Glow.** The emissive map carries the nose seams and crown core (orange), the thruster plugs
   (blue-white) inside their orange lips, and the lamp lenses. At rest the thruster plug and lip
   are dark steel in the albedo; partMotion turns the emission up while thrusting and drilling.

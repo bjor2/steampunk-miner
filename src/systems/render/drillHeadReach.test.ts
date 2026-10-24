@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest'
 import { BODY_HALF_SIZE_MM, CUT_FACE_MARGIN_MM } from '../../constants/balance'
 import { MM_PER_METRE, UP_VECTOR_SCALE } from '../../constants/physics'
 import { SHIPPED_ART } from '../../scene/shippedArt'
+import { slotOfPartId } from '../art/artIds'
 import { NO_SWAPS } from '../art/placeholderLook'
 import { onCurveSteps, startLevels, visualTier } from '../economy/vehicleStats'
 import { newDrillHead } from '../vehicle/drillHead'
@@ -11,6 +12,7 @@ import { FACING, facingVectorOf, type Facing, type VehiclePose } from '../vehicl
 import { MM_PER_SAMPLE } from '../world/sampleGrid'
 import { drillHeadReachOf, drillTipAheadOf } from './drillHeadReach'
 import { createDrillHeadPose, writeDrillHeadPose } from './drillHeadPose'
+import { drillHeadQuadsOf } from './vehicleLook'
 
 const FACINGS: readonly Facing[] = [FACING.left, FACING.right, FACING.down, FACING.up]
 
@@ -39,6 +41,13 @@ function drawnTipAheadMm(facing: Facing, tier: number, swaps: readonly string[])
   const x = head.x + Math.cos(head.angle) * tip
   const y = head.y + Math.sin(head.angle) * tip
   return alongFacingMm(facing, x * MM_PER_METRE, y * MM_PER_METRE)
+}
+
+/** The head part whose front edge leads, facing right. */
+function leadingHeadPartOf(tier: number) {
+  const quads = drillHeadQuadsOf(SHIPPED_ART, tier)
+  const tip = drillTipAheadOf(SHIPPED_ART, tier)
+  return quads.find((quad) => quad.centre[0] + quad.size[0] / 2 === tip)
 }
 
 function alongFacingMm(facing: Facing, xMm: number, yMm: number): number {
@@ -78,5 +87,17 @@ describe('drill head reach', () => {
       expect(pastFaceMm).toBeGreaterThan(0)
       expect(pastFaceMm).toBeLessThanOrEqual(CUT_FACE_MARGIN_MM + MM_PER_SAMPLE / 2 + 1e-6)
     }
+  })
+
+  it('leads with the cutter crown, drawn over the head plate, at tiers 1 and 2', () => {
+    for (const tier of [1, 2]) {
+      const lead = leadingHeadPartOf(tier)
+      expect(slotOfPartId(lead?.partId ?? '')).toBe('drill-bit')
+      expect(lead?.z).toBeGreaterThan(0)
+    }
+  })
+
+  it('leads with the cone’s point at tier 3, its reamer ring round the gimbal behind it (#393)', () => {
+    expect(leadingHeadPartOf(3)?.partId).toBe('t3-drill-head')
   })
 })
