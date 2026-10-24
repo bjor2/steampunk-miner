@@ -2,8 +2,9 @@
  * The archetype palette (ticket 775, spec #774; Planet & Narrative's lock of 23 Oct 2026 under the
  * GD's Campaign Scaling lock): what every solar system past the first is drawn from. Written once,
  * in `palette.json` (P&N: name parts, biome looks, the SS2-B new-content set) and
- * `solar-systems.economy.json` (Systems: size classes, the hard start's ceiling); read once here and
- * refused whole when broken, so a bad row fails at load with every problem listed.
+ * `solar-systems.economy.json` (Systems: size classes; the economy rows' block is
+ * `economyRules.ts`'s); read once here and refused whole when broken, so a bad row fails at load
+ * with every problem listed.
  *
  * - Name parts: `<Prefix> <Noun> <g>` in the ledger voice, the prefix keyed to the #141 act at the
  *   planet's campaign index `g`, the number `g` itself (so no two planets of the systems past the
@@ -18,7 +19,6 @@
  *   (`newContentSlots.ts`).
  * - Size classes: S/M/L/XL as basis points of an SS1 planet's radius; XL only on a standard start.
  */
-import { fromCanonical, type BigStat } from '../../../systems/money'
 import { familyRows } from '../../planet-mix'
 import economyFile from '../solar-systems.economy.json'
 import paletteFile from '../palette.json'
@@ -127,8 +127,6 @@ export interface ArchetypePalette {
   looks: readonly BiomeLook[]
   newContent: NewContentSet
   sizeClasses: SizeClasses
-  /** The VS's ceiling on the hard start's hardness step k_s; the step itself is ticket 776's row. */
-  hardStartStepCeiling: BigStat
 }
 
 export const ARCHETYPE_PALETTE: ArchetypePalette = loadPalette(paletteFile, economyFile)
@@ -147,6 +145,5 @@ function loadPalette(palette: typeof paletteFile, economy: typeof economyFile): 
     looks: palette.looks,
     newContent: palette.newContentSlots as NewContentSet,
     sizeClasses: economy.sizeClasses,
-    hardStartStepCeiling: fromCanonical(economy.hardStart.stepCeiling),
   }
 }

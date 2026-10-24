@@ -5,9 +5,8 @@
  * names no other act; looks differ pairwise in hue and in motif; the new-content families carry
  * stable snake_case ids and distinct names, each with its behaviour, copy and rig part
  * (`familyGuards.ts`, ticket 780); the size classes hold the ×1.0 class and one a hard start may
- * draw; the hard-start ceiling is a ratio.
+ * draw. The hard start's step and its ceiling are the economy rows' (`economyRules.ts`, ticket 776).
  */
-import { isMoneyText } from '../../../systems/money'
 import { familyRowProblems, type CopyFillBudget } from './familyGuards'
 
 type Raw = Record<string, unknown>
@@ -29,7 +28,6 @@ export function paletteProblems(palette: unknown, economy: unknown, actIds: read
     ...lookProblems(raw.looks, actIds),
     ...newContentProblems(asMap(raw.newContentSlots), copyFillBudgetOf(names)),
     ...sizeClassProblems(asMap(asMap(economy).sizeClasses)),
-    ...hardStartProblems(asMap(asMap(economy).hardStart)),
   ]
 }
 
@@ -168,10 +166,6 @@ function sizeRowProblems(row: Raw, where: string): string[] {
       ? []
       : [`${where}.standardOnly must be true or false`]),
   ]
-}
-
-function hardStartProblems(hardStart: Raw): string[] {
-  return isMoneyText(hardStart.stepCeiling) ? [] : ['hardStart.stepCeiling must be a ratio']
 }
 
 /** Every act a later system can hold is named once, and nothing else is named. */

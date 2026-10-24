@@ -149,8 +149,5 @@ describe('archetype palette', () => {
       'sizeClasses.classes must hold the x1.0 class (10000 bp)',
       'sizeClasses.classes must hold a class a hard start may draw',
     ])
-    expect(problemsWith({}, { ...economyFile, hardStart: { stepCeiling: 1.243 } })).toEqual([
-      'hardStart.stepCeiling must be a ratio',
-    ])
   })
 })

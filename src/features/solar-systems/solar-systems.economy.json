@@ -1,5 +1,5 @@
 {
-  "source": "Ticket 775 (spec #774), the GD lock of 23 Oct 2026 on Campaign Scaling: the four size classes S/M/L/XL at x0.9/1.0/1.1/1.2 of an SS1 planet's radius at the same time target, on a base of about 25 minutes, so the targets are 22.5/25/27.5/30 (VS and Systems, 23 Oct). Resources go with R squared; price is never retuned per class, and XL is drawn only on standard-surface planets. The hard start's hardness step k_s (one planet per system, never P1, never stacked with the jump step) is the Systems row of ticket 776; only its ceiling, the VS's 1.243, is written here.",
+  "source": "Ticket 775 (spec #774), the GD lock of 23 Oct 2026 on Campaign Scaling: the four size classes S/M/L/XL at x0.9/1.0/1.1/1.2 of an SS1 planet's radius at the same time target, on a base of about 25 minutes, so the targets are 22.5/25/27.5/30 (VS and Systems, 23 Oct). Resources go with R squared; price is never retuned per class, and XL is drawn only on standard-surface planets.",
   "sizeClasses": {
     "baseTargetSeconds": 1500,
     "classes": [
@@ -9,7 +9,12 @@
       { "id": "XL", "radiusBp": 12000, "standardOnly": true }
     ]
   },
-  "hardStart": {
-    "stepCeiling": "1.243"
+  "economyRows": {
+    "source": "Ticket 776 (spec #774), the Systems rows under the GD lock of 23 Oct 2026 on Campaign Scaling and its VS input. hardnessStepCeiling: the VS's 1.243, the most any planet's ground may step over the planet before at arrival (the system jump's k_jump, kernel economy.json starMap.systemJump.hardnessStep, and the hard start's k_s alike). hardStartStep: k_s, the hard start's step over its system's standard ground; one planet per system, never P1, never stacked with the jump step. Systems recorded only k_jump = 1.10 under the same gate (felt speed about 1/k at least 0.9x after the fee), so k_s takes the same 1.10. feltSpeedFloor: that gate, 0.9x the planet before. poolStepFloor: R3, each planet's ore pool value at least 1.15x the planet before's (#644, #741), gems included. gemShareCapBp: the gem tier at most 15% of a planet's pool value (#741). A gate miss cuts k first, then paceScale, then radius; never a price or the drill law.",
+    "hardnessStepCeiling": "1.243",
+    "hardStartStep": "1.1",
+    "feltSpeedFloor": "0.9",
+    "poolStepFloor": "1.15",
+    "gemShareCapBp": 1500
   }
 }
