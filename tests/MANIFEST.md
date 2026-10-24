@@ -569,11 +569,13 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/sensing/systems/threatPeriscope.test.ts` | 6 | 6 |
 | `src/features/sensing/systems/useResolution.test.ts` | 16 | 16 |
 
-### `solar-systems`: 7 files, 47 tests
+### `solar-systems`: 9 files, 61 tests
 
 | File | Tests | Sites |
 | --- | --- | --- |
-| `src/features/solar-systems/debug.test.ts` | 4 | 4 |
+| `src/features/solar-systems/debug.test.ts` | 5 | 5 |
+| `src/features/solar-systems/systems/familyBehaviours.test.ts` | 6 | 6 |
+| `src/features/solar-systems/systems/familyCopy.test.ts` | 7 | 7 |
 | `src/features/solar-systems/systems/newContentSlots.test.ts` | 4 | 4 |
 | `src/features/solar-systems/systems/paletteRows.test.ts` | 11 | 11 |
 | `src/features/solar-systems/systems/render/lookArt.test.ts` | 8 | 8 |

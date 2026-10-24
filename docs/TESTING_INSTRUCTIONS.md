@@ -438,6 +438,21 @@ balance:report`, `oreValueCensus.lane.test.ts`.
   Progression's Void glass: the exotic family is Voidglass). `systemRoster.golden.test.ts` pins seed
   20261024 at s = 2, 10 and 1e6. `debug.test.ts` re-prints a roster through
   `steampunkDebug.features['solar-systems'].rosterOf(system, worldSeed)`.
+- **The SS2-B new-family set and copy templates** (ticket 780, spec #774): `src/features/solar-systems/systems/familyBehaviours.test.ts`
+  is the behaviour level of fail-on-recolour: the ledger names only first-system ids and covers
+  every enemy kind and hazard kind, reads each hazard's effect from the ores table, every family's
+  effect is one no first-system content has, each row's "Never" column is pinned as Progression
+  wrote it (leeches neither disable tools nor shoot, sinks never pull, flares never bite) and
+  contradicts no ledger line, a recoloured or lying synthetic family is named, and the vent flares
+  telegraph for the collapse reaction window at least. `familyCopy.test.ts` holds names and rig
+  parts of four words or fewer inside the display budget with each part on a vehicle attach point,
+  a one- or two-word tag opening a digit-free arrival line that fits two 360 px card lines, hover
+  lines inside the tooltip budget, both measured with the longest planet name filled in, a planet's
+  slot copy filled with its name (null for an empty slot), and the guards refusing a long name or
+  tag, a line that outgrows the card when filled, a stray field, a rig part off the vehicle and a
+  behaviour without its column. `newContentSlots.test.ts` now pins five families with their rig
+  parts and attach points and spall glass as Void glass's replacement. `debug.test.ts` prints a
+  planet's copy through `steampunkDebug.features['solar-systems'].slotCopyOf(system, planet, worldSeed)`.
 - **The planet-row registry** (ticket 707, GD lock 6326252575): `src/systems/registries/planetRow.test.ts`
   resolves the generated row with no provider (`Planet {n}`, no pool, look or frozen radius), lays a
   provider's fields over it and keeps the ones it leaves out, resolves any planet up to the largest
