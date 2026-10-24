@@ -7,13 +7,15 @@
  * Since the tank track (ticket 756) the tank holds at most its level's capacity, and the #648 clamp
  * moved here with the fee: a jump costs fuel, not money, so the fuel that tops the tank up to the
  * hop to the next planet is charged `max(0, min(price, money - next on-curve price))`, and a player
- * who sold everything still gets to the next planet. Fuel past that hop pays full price.
+ * who sold everything still gets to the next planet. Fuel past that hop pays full price. On a
+ * system's last planet the next planet is the next system's first for a vehicle with the jump drive
+ * (ticket 759), so the clamp holds for the jump between systems too.
  *
  * Refused, never trimmed (#8), with `out_of_range` for no units or units the tank cannot take, and
  * `money_short` for a charge the wallet cannot pay; a refused command changes nothing.
  */
 import { planetPriceRow } from '../../economy/economyTables'
-import { fuelPriceOf, jumpFuelUnitsOf } from '../../economy/jumpFuel'
+import { fuelPriceOf } from '../../economy/jumpFuel'
 import { hopChargeOf } from '../../economy/travelCharge'
 import {
   add,
@@ -35,6 +37,7 @@ import {
   type RuleEffect,
 } from '../commandRule'
 import { atBayRejection } from '../dockRules'
+import { jumpFuelTo, nextHopTargetOf } from './jumpRules'
 import { moneyShortRejection } from '../platformServices'
 
 export const FUEL_SHOP_RULES: { readonly buyFuel: CommandRule<'buyFuel'> } = {
@@ -69,10 +72,13 @@ export function fuelChargeOf(state: AuthorityState, playerId: string, units: num
   return sub(fuelPriceHere(state, units), hopClampCutOf(state, playerId, units))
 }
 
-/** The fuel the tank lacks for the hop to the next planet, in whole units (0 when it has it). */
+/**
+ * The fuel the tank lacks for the hop to the next planet, in whole units (0 when it has it): since
+ * ticket 759 the jump out of a system's last planet for a vehicle with the jump drive.
+ */
 export function nextHopShortfallOf(state: AuthorityState, playerId: string): number {
-  const planet = state.planet.index
-  const lacking = sub(jumpFuelUnitsOf(planet, planet + 1), fuelOf(vehicleOf(state, playerId)))
+  const hop = jumpFuelTo(state, nextHopTargetOf(state, playerId))
+  const lacking = sub(hop, fuelOf(vehicleOf(state, playerId)))
   return cmp(lacking, ZERO_MONEY) > 0 ? toSafeInteger(lacking) : 0
 }
 

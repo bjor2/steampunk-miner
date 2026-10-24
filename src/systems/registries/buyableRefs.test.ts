@@ -48,6 +48,7 @@ describe('buyable refs', () => {
       'module:charge_rack',
       'module:charges',
       'module:guns',
+      'module:jump_drive',
       'module:refinery_slot',
       'module:refractory_lining',
       'service:fuel',

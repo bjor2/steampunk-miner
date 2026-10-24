@@ -28,6 +28,11 @@ export function planetsBefore(system: bigint): bigint {
   return (system - FIRST_SYSTEM) * BigInt(ECONOMY.starMap.planetsPerSystem)
 }
 
+/** The place `p` of campaign index `index` in system `system`: the inverse of `campaignIndex`. */
+export function placeOfCampaign(system: bigint, index: bigint): bigint {
+  return index - planetsBefore(system)
+}
+
 /**
  * The campaign index as the safe-integer `planetIndex` today's economy and generator take (#5:
  * bounded indices are numbers); throws past the safe range rather than rounding to a neighbour.

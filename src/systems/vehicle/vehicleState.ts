@@ -155,6 +155,11 @@ export interface VehicleState {
    * Absent at the starting level 1, so a vehicle that never bought a tank digests as before.
    */
   fuelTankLevel?: number
+  /**
+   * The jump drive (ticket 759, `vehicleJumpDrive.ts`): `true` once bought, so the vehicle's jump
+   * may cross into another solar system. Absent until then, so older vehicles digest as before.
+   */
+  jumpDrive?: true
 }
 
 export const EMPTY_CARGO: Cargo = { ore: {}, coreFragments: 0 }

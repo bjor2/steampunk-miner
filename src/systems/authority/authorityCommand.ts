@@ -459,8 +459,15 @@ import type { DriveSigns } from '../vehicle/driveSigns'
  *    (`vehicle.fuelTankLevel`, absent at level 1), `buyFuel` is refused `out_of_range` past the
  *    level's capacity, and the fuel that tops the tank up to the next hop takes the #648 clamp.
  *    A run that buys no fuel and no tank moves no digest.
+ * 105: the jump between solar systems (ticket 759, the GD lock on #650): `buyJumpDrive` at the Sell
+ *    bay fits the vehicle's jump drive (`vehicle.jumpDrive`, absent until bought), and with it
+ *    `jumpToPlanet` crosses into another system for J times the fuel (`economy/jumpFuel.ts`),
+ *    refused `no_jump_drive` without it (was `other_system`); a later system's planet is generated
+ *    from its address, its ground `k_jump^(s - 1)` harder (`starMap/systemPlanetParams.ts`). On a
+ *    system's last planet the clamped next hop is the jump out of it for a vehicle with the drive.
+ *    A run that buys no drive moves no digest.
  */
-export const AUTHORITY_PROTOCOL_VERSION = 104
+export const AUTHORITY_PROTOCOL_VERSION = 105
 
 /** The kernel's own commands: the closed set its rule tables are written against. */
 export interface KernelCommandPayloads {
@@ -544,6 +551,8 @@ export interface KernelCommandPayloads {
   jumpToPlanet: { system: string; planet: string }
   /** The fuel tank track (ticket 756): the tank goes up one level at this planet's Sell bay. */
   buyFuelTank: Record<string, never>
+  /** The jump drive (ticket 759): fitted once at this planet's Sell bay, for jumps between systems. */
+  buyJumpDrive: Record<string, never>
   /** `interact` while overlapping the planet's live artefact cache opens its choice (#46). */
   openArtefactCache: Record<string, never>
   /** Takes one of the three options for good; the other two are gone (#46). */

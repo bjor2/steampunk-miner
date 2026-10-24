@@ -1,7 +1,7 @@
 /**
  * The Upgrade bay's one-off and levelled gear beside the tracks, and the refinery's slots (#164
  * side table): casing (#41), lining types (#113; flavour from `liningFlavours.json`), guns
- * (#107), blasting charges and their rack (#109), refinery slots (#105). Every figure is a kernel
+ * (#107), blasting charges and their rack (#109), the jump drive (ticket 759), refinery slots (#105). Every figure is a kernel
  * stat function at the level the card is drawn for: the casing grade, the gun level, the rack's
  * slot level, the platform's slot count. Guns and the rack stop at their top level, where the line has no next.
  * The guns are two-tier since #181: their step climbs like a track's from the mount, the first
@@ -20,6 +20,10 @@ import {
 } from '../../../systems/economy/gunStats'
 import { liningTypePriceMultiplier } from '../../../systems/economy/heatEconomy'
 import { refineSeconds, refinerySlotsMax } from '../../../systems/economy/refineryEconomy'
+import {
+  systemJumpFuelMultiplier,
+  systemJumpHardnessStep,
+} from '../../../systems/economy/systemJump'
 import { majorOf, stepOfMajor } from '../../../systems/economy/upgradeSteps'
 import { div, fromSafeInteger, type Money } from '../../../systems/money'
 import { KERNEL_ITEMS, liningItemOf } from '../../../systems/registries/kernelItems'
@@ -104,6 +108,14 @@ export function moduleEntries(): readonly DescribedEntry[] {
           (slotLevel) => rackCapacity(slotLevel),
           rackMaxSlotLevel,
         ),
+      ],
+    ),
+    kernelEntryOf(
+      KERNEL_ITEMS.jumpDrive,
+      'A brass drive whose jumps cross into the next solar system.',
+      [
+        fixedLine('Fuel per jump between systems', 'geometric', systemJumpFuelMultiplier),
+        fixedLine('Ground hardness per system', 'geometric', systemJumpHardnessStep),
       ],
     ),
     kernelEntryOf(

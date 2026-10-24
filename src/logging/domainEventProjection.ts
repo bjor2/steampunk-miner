@@ -260,7 +260,7 @@ const PROJECTIONS: { readonly [K in KernelDomainEventType]: Projection<K> } = {
     event: 'platform_configuration_changed',
     data: { visualState },
   }),
-  TravelStarted: ({ fromPlanet, toPlanet, cost, coreSpent, fuelSpent }) => ({
+  TravelStarted: ({ fromPlanet, toPlanet, cost, coreSpent, fuelSpent, toSystem }) => ({
     event: 'travel_started',
     data: {
       fromPlanet,
@@ -268,6 +268,7 @@ const PROJECTIONS: { readonly [K in KernelDomainEventType]: Projection<K> } = {
       cost,
       coreSpent,
       ...(fuelSpent === undefined ? {} : { fuelSpent }),
+      ...(toSystem === undefined ? {} : { toSystem }),
     },
   }),
   FuelBought: ({ units, cost, tank }) => ({ event: 'fuel_bought', data: { units, cost, tank } }),
@@ -275,6 +276,7 @@ const PROJECTIONS: { readonly [K in KernelDomainEventType]: Projection<K> } = {
     event: 'fuel_tank_bought',
     data: { level, cost, capacity },
   }),
+  JumpDriveBought: ({ cost }) => ({ event: 'jump_drive_bought', data: { cost } }),
   PlanetUnlocked: ({ planetIndex }) => ({ event: 'planet_unlocked', data: { planetIndex } }),
   FeatureUnlocked: ({ featureId }) => ({ event: 'feature_unlocked', data: { featureId } }),
   PlanetEntered: ({ planetSeed, generatorVersion, radius, oreRulesVersion }) => ({

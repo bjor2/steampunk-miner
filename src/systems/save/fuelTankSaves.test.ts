@@ -33,12 +33,15 @@ describe('save migration: snapshot 22 -> 23, the fuel tank track (ticket 756)', 
     }
   })
 
-  it('loads a snapshot 22 save through the one step with its state and digest as saved', () => {
+  it('loads a snapshot 22 save through its step and the jump drive step, state and digest kept', () => {
     const state = createScriptedSession().state()
     const file = saveSlotOf({ ...takeSnapshot(state), snapshotVersion: 22 }, 1)
     const reading = readMigratedSaveSlot(file)
     if (!('state' in reading)) throw new Error(reading.problems.join('; '))
-    expect(reading.migrations).toEqual([{ version: 'snapshotVersion', from: 22, to: 23 }])
+    expect(reading.migrations).toEqual([
+      { version: 'snapshotVersion', from: 22, to: 23 },
+      { version: 'snapshotVersion', from: 23, to: 24 },
+    ])
     expect(reading.state).toEqual(state)
     expect(stateDigest(reading.state)).toBe(stateDigest(state))
   })

@@ -31,6 +31,16 @@ export function systemHardnessStepOf(system: bigint): BigStat {
   return lastStep.step
 }
 
+/** J: the fuel a jump between systems burns over the same distance inside one. */
+export function systemJumpFuelMultiplier(): BigStat {
+  return systemJump.fuelMultiplier
+}
+
+/** k_jump: each system's ground over the system before's at the same campaign index. */
+export function systemJumpHardnessStep(): BigStat {
+  return systemJump.hardnessStep
+}
+
 /** What the jump drive costs: `driveRunValues` runs of a system's last planet. */
 export function jumpDrivePrice(): Money {
   return mul(systemJump.driveRunValues, runValueOf(planetsPerSystem))

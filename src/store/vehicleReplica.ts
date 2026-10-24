@@ -14,6 +14,7 @@ import {
 } from '../systems/vehicle/vehicleState'
 import type { BigStat, Money } from '../systems/money'
 import { fuelCapacityOf, fuelOf, fuelTankLevelOf } from '../systems/vehicle/vehicleFuel'
+import { hasJumpDrive } from '../systems/vehicle/vehicleJumpDrive'
 
 export interface VehicleReplica {
   mode: VehicleMode
@@ -36,6 +37,8 @@ export interface VehicleReplica {
   fuelTankLevel: number
   /** Whole fuel units the tank holds at most at that level. */
   fuelCapacity: BigStat
+  /** Whether the jump drive is fitted (ticket 759): the rig draws it and the map may cross systems. */
+  hasJumpDrive: boolean
 }
 
 let lastSource: VehicleState | null = null
@@ -59,6 +62,7 @@ export function vehicleReplicaOf(vehicle: VehicleState): VehicleReplica {
     fuel: fuelOf(vehicle),
     fuelTankLevel: fuelTankLevelOf(vehicle),
     fuelCapacity: fuelCapacityOf(vehicle),
+    hasJumpDrive: hasJumpDrive(vehicle),
   }
   return lastReplica
 }

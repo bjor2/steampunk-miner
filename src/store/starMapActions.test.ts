@@ -4,6 +4,7 @@ import { runEventProblems } from '../logging/runEventSchema'
 import { createRunLog, installRunLog, uninstallRunLog } from '../logging/runLog'
 import { fuelTankPriceOf } from '../systems/economy/fuelTank'
 import { fuelPriceOf } from '../systems/economy/jumpFuel'
+import { jumpDrivePrice } from '../systems/economy/systemJump'
 import { fromCanonical, sub, toCanonical } from '../systems/money'
 import { resetGameStore, useGameStore } from './gameStore'
 
@@ -66,6 +67,33 @@ describe('star map tank action (ticket 756)', () => {
     expect(linesNamed('fuel_tank_bought').map((line) => line.data)).toEqual([
       { level: 2, cost: toCanonical(fuelTankPriceOf(1)), capacity: '1.3e+1' },
     ])
+    expect(sink.events.flatMap(runEventProblems)).toEqual([])
+  })
+})
+
+describe('star map jump drive actions (ticket 759)', () => {
+  it('fits the jump drive the rig reads, paid from the wallet, and logs jump_drive_bought', () => {
+    const money = game().money
+    game().buyJumpDrive()
+    expect(game().vehicle.hasJumpDrive).toBe(true)
+    expect(toCanonical(game().money)).toBe(toCanonical(sub(money, jumpDrivePrice())))
+    expect(linesNamed('jump_drive_bought').map((line) => line.data)).toEqual([
+      { cost: toCanonical(jumpDrivePrice()) },
+    ])
+  })
+
+  it('jumps into system 2 on the request alone, logging the system it went to', () => {
+    game().buyJumpDrive()
+    game().buyFuelTank()
+    game().buyFuel(11)
+    game().jumpToSystemPlanet(2, 1)
+    expect(game().planetTier).toBe(6)
+    expect(linesNamed('travel_started').at(-1)?.data).toMatchObject({
+      fromPlanet: 1,
+      toPlanet: 6,
+      fuelSpent: '1.1e+1',
+      toSystem: '2',
+    })
     expect(sink.events.flatMap(runEventProblems)).toEqual([])
   })
 })

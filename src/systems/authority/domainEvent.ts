@@ -109,11 +109,13 @@ export interface RejectionReasons {
   energy_short: true
   // Registered by Overpressure's toggle (ticket 383): the turret's shape has no burst.
   no_burst: true
-  // Registered by the star map's jump (ticket 755): the tank holds less than the jump burns, the
-  // session is on that planet already, or the planet is in another system (the jump drive's).
+  // Registered by the star map's jump (ticket 755): the tank holds less than the jump burns, or the
+  // session is on that planet already; since ticket 759 a jump into another system without the
+  // jump drive, and a second jump drive.
   fuel_short: true
   same_planet: true
-  other_system: true
+  no_jump_drive: true
+  jump_drive_owned: true
 }
 
 export type RejectionReason = keyof RejectionReasons
@@ -430,18 +432,24 @@ export interface KernelDomainEventBodies {
   /** The bay first held `coreNeeded` on this planet, `durationTicks` after `core_reached`. */
   CoreCompleted: { durationTicks: number }
   PlatformConfigurationChanged: { visualState: PlatformVisualState }
-  /** `fuelSpent` (whole units as a canonical string) only on the star map's jump (ticket 755). */
+  /**
+   * `fuelSpent` (whole units as a canonical string) only on the star map's jump (ticket 755), and
+   * `toSystem` (canonical index text) only on a jump into another solar system (ticket 759).
+   */
   TravelStarted: {
     fromPlanet: number
     toPlanet: number
     cost: string
     coreSpent: number
     fuelSpent?: string
+    toSystem?: string
   }
   /** Fuel bought at the shop (ticket 755): whole units, their price and the tank after it. */
   FuelBought: { units: number; cost: string; tank: string }
   /** The tank track's next level bought (ticket 756): the level reached, its price and capacity. */
   FuelTankBought: { level: number; cost: string; capacity: string }
+  /** The jump drive fitted (ticket 759): its price. */
+  JumpDriveBought: { cost: string }
   PlanetUnlocked: { planetIndex: number }
   /** A locked-schedule row opened by arriving at its planet (#88), keyed by its #79 row id. */
   FeatureUnlocked: { featureId: string }

@@ -20,6 +20,7 @@ import {
   isPortableFuelTankLevel,
   portableFuelField,
 } from '../vehicle/vehicleFuel'
+import { isPortableJumpDrive } from '../vehicle/vehicleJumpDrive'
 import { upgradeLevelsProblems } from '../vehicle/vehicleStats'
 import type { Cargo, VehicleMode, VehicleState } from '../vehicle/vehicleState'
 import { isCasingValue, type ChunkDelta } from '../world/chunkDelta'
@@ -181,6 +182,9 @@ export function portableVehicleProblems(vehicle: unknown, path: string): string[
     ...(isPortableFuelTankLevel(vehicle.fuelTankLevel)
       ? []
       : [`${path}.fuelTankLevel must be a whole level from 2, or be left out`]),
+    ...(isPortableJumpDrive(vehicle.jumpDrive)
+      ? []
+      : [`${path}.jumpDrive must be true once bought, or be left out`]),
   ]
 }
 

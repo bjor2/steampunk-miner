@@ -61,6 +61,7 @@ export function kernelCommandBuys(): {
     travel: [KERNEL_ITEMS.travel],
     buyFuel: [KERNEL_ITEMS.fuel],
     buyFuelTank: [KERNEL_ITEMS.fuelTank],
+    buyJumpDrive: [KERNEL_ITEMS.jumpDrive],
     jumpToPlanet: NOT_A_BUY,
     openArtefactCache: NOT_A_BUY,
     chooseArtefact: everyArtefactOption().map((option) => artefactItemOf(option.id)),

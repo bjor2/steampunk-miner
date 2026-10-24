@@ -102,8 +102,8 @@ describe('star map jump (ticket 755)', () => {
     expect(rejectionOf(fuelledWith(1).submit(10, jumpTo('1')))).toBe('same_planet')
   })
 
-  it('refuses a jump into another system until the jump drive (ticket 759)', () => {
-    expect(rejectionOf(fuelledWith(1).submit(10, jumpTo('1', '2')))).toBe('other_system')
+  it('refuses a jump into another system without the jump drive (ticket 759)', () => {
+    expect(rejectionOf(fuelledWith(1).submit(10, jumpTo('1', '2')))).toBe('no_jump_drive')
   })
 
   it('refuses a destination past the safe planet indexes', () => {

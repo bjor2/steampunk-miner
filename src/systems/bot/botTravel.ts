@@ -9,6 +9,7 @@ import { dockSiteOfPlanet, systemOfPlanet } from '../authority/planetOfState'
 import { nextHopShortfallOf } from '../authority/starMap/fuelShopRules'
 import { jumpRefusal, type JumpTarget } from '../authority/starMap/jumpRules'
 import { buyFuelCommand, jumpToPlanetCommand } from '../platform/platformCommands'
+import { placeOfCampaign } from '../starMap/campaignIndex'
 import { bayRestTileOf } from '../world/dockBays'
 import { DEFAULT_BORE_POLICY, type BorePolicy } from './botBore'
 import type { ChargePolicy } from './botCharges'
@@ -86,6 +87,8 @@ function hasJumpedToNextPlanet(session: BotSession): boolean {
   return true
 }
 
+/** The next place of the session's system: its planet index is the campaign index (#781). */
 function nextPlanetTargetOf(state: AuthorityState): JumpTarget {
-  return { system: systemOfPlanet(state.planet), planet: BigInt(state.planet.index + 1) }
+  const system = systemOfPlanet(state.planet)
+  return { system, planet: placeOfCampaign(system, BigInt(state.planet.index)) + 1n }
 }

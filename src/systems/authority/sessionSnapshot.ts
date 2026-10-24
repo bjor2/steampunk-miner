@@ -76,6 +76,8 @@ import {
 } from './vehicleSnapshot'
 
 /**
+ * 24: the jump drive (ticket 759): each vehicle's `jumpDrive` once bought (older saves hold none,
+ * the absent key, `saveMigrations.ts`), and planets of later systems with a generated world;
  * 23: the fuel tank track (ticket 756): each vehicle's tank level from level 2 (older saves hold
  * the starting tank, level 1, which is the absent key, `saveMigrations.ts`);
  * 22: the star map (ticket 755): the planet's system outside system 1 and each vehicle's fuel tank
@@ -98,7 +100,7 @@ import {
  * vehicle's casing grade (#41, #58); 5: combat joined the state (#25); 4 the planet's core
  * progress (#24); 3 the platform (#23).
  */
-export const SNAPSHOT_VERSION = 23
+export const SNAPSHOT_VERSION = 24
 
 export interface SessionSnapshot {
   snapshotVersion: number

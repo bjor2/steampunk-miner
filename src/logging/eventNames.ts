@@ -254,6 +254,8 @@ export const RUN_EVENT_REGISTRY = {
       coreSpent: 'integer',
       // The fuel a star-map jump burnt (ticket 755); optional, so a `Travel` line reads as before.
       fuelSpent: { optional: 'money' },
+      // The solar system a jump between systems went to (ticket 759); optional, absent inside one.
+      toSystem: { optional: 'text' },
     },
   },
   // A locked-schedule row (#79 id) that opened on this travel (#88); the envelope's `planet` is
@@ -305,6 +307,12 @@ export const RUN_EVENT_REGISTRY = {
     group: 'platform',
     level: 'core',
     payload: { level: 'integer', cost: 'money', capacity: 'money' },
+  },
+  // The jump drive fitted at the Sell bay (ticket 759), for jumps between solar systems: its price.
+  jump_drive_bought: {
+    group: 'platform',
+    level: 'core',
+    payload: { cost: 'money' },
   },
   energy_recharged: {
     group: 'platform',

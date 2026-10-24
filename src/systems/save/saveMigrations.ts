@@ -27,6 +27,10 @@
  * tank, level 1, the absent key of this build, so the old digest is checked and the state is kept as
  * saved; a build from before the tank refuses a save that holds a level it would drop.
  *
+ * Snapshot 23 -> 24 (ticket 759, the jump drive): a save from before it holds no drive, the absent
+ * key of this build, so the old digest is checked and the state is kept as saved; a build from
+ * before the drive refuses a save that holds one it would drop.
+ *
  * Generator 5 -> 6 (#175): the pad grew to -8..+12 under the two shop buildings, so the chunk edits
  * of every chunk the old or new pad and its cleared air touch are dropped and regenerate under the
  * new stamp, every vehicle is put on the Sell bay's rest pose, and the params are recomputed from
@@ -183,6 +187,7 @@ const SAVE_MIGRATION_STEPS: readonly SaveMigrationStep[] = [
   { version: 'snapshotVersion', from: 20, to: 21, migrate: carryOnCursors },
   { version: 'snapshotVersion', from: 21, to: 22, migrate: placeInFirstSystem },
   { version: 'snapshotVersion', from: 22, to: 23, migrate: keepStartingTanks },
+  { version: 'snapshotVersion', from: 23, to: 24, migrate: keepVehiclesWithoutDrive },
   { version: 'generatorVersion', from: 5, to: 6, migrate: regeneratePadArea },
   { version: 'generatorVersion', from: 6, to: 7, migrate: keepEditsUnderOreLeads },
   { version: 'generatorVersion', from: 7, to: 8, migrate: keepEditsUnderOreMix },
@@ -303,6 +308,11 @@ function placeInFirstSystem(file: MigratingFile): MigratingFile | null {
 /** Snapshot 22 -> 23: the starting tank is the absent key, so the state is kept. */
 function keepStartingTanks(file: MigratingFile): MigratingFile | null {
   return reshapedFile(file, 23, (state) => state)
+}
+
+/** Snapshot 23 -> 24: no jump drive is the absent key, so the state is kept. */
+function keepVehiclesWithoutDrive(file: MigratingFile): MigratingFile | null {
+  return reshapedFile(file, 24, (state) => state)
 }
 
 /** Generator 5 -> 6: the state is read as saved (the digest must hold), then moved off the pad. */

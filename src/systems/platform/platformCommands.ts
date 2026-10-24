@@ -5,7 +5,8 @@
  * `SelectLiningType` (#113), `Travel {toPlanet}`
  * (#10), and the Refinery bay's `QueueRefine`, `BuyRefinerySlot` and the Sell bay's
  * `CollectRefined` (#105), the Upgrade bay's `RestockCharges` and `BuyChargeRackSlot` (#109), and
- * the star map's `BuyFuel` and `JumpToPlanet` (ticket 755) and `BuyFuelTank` (ticket 756). The authority checks and prices each one.
+ * the star map's `BuyFuel` and `JumpToPlanet` (ticket 755), `BuyFuelTank` (ticket 756) and
+ * `BuyJumpDrive` (ticket 759). The authority checks and prices each one.
  */
 import type { CommandIntent } from '../authority/authorityCommand'
 import { toIndexText } from '../starMap/planetAddress'
@@ -94,6 +95,10 @@ export function buyFuelCommand(units: number): CommandIntent<'buyFuel'> {
 
 export function buyFuelTankCommand(): CommandIntent<'buyFuelTank'> {
   return { type: 'buyFuelTank', payload: {} }
+}
+
+export function buyJumpDriveCommand(): CommandIntent<'buyJumpDrive'> {
+  return { type: 'buyJumpDrive', payload: {} }
 }
 
 /** The star map's jump (ticket 755) to planet `planet` of system `system`. */
