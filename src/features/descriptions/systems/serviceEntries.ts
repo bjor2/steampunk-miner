@@ -63,7 +63,7 @@ export function serviceEntries(): readonly DescribedEntry[] {
     ),
     kernelEntryOf(
       KERNEL_ITEMS.fuel,
-      'Coal by the unit for the tender; a jump on the star map burns it.',
+      'Coal for the tender by the unit; each star jump burns it.',
       [
         fixedLine('Fuel price per unit', 'geometric', ({ planetIndex }) =>
           fuelUnitPriceOf(planetIndex),
@@ -72,7 +72,7 @@ export function serviceEntries(): readonly DescribedEntry[] {
     ),
     kernelEntryOf(
       KERNEL_ITEMS.fuelTank,
-      'A bigger coal tender: more fuel a level, so a jump reaches further.',
+      'A bigger coal tender: more fuel per level, longer jumps.',
       [
         fixedLine('Starting tank in fuel units', 'geometric', () =>
           fuelTankCapacityOf(FIRST_FUEL_TANK_LEVEL),
