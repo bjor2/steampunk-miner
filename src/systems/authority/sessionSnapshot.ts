@@ -77,6 +77,8 @@ import {
 } from './vehicleSnapshot'
 
 /**
+ * 26: the drill's aim (ticket 791): a vehicle's pose and its swept cut's cursor hold `aim` off the
+ * four facings (older saves hold none, each pose aiming at its facing, `saveMigrations.ts`);
  * 25: the core bay of each planet (ticket 790): the bays of the planets the session has left, by
  * `s:p`, under `platform.awayCoreBays` (older saves hold one bay, the current planet's, and no
  * other, the absent key, `saveMigrations.ts`);
@@ -104,7 +106,7 @@ import {
  * vehicle's casing grade (#41, #58); 5: combat joined the state (#25); 4 the planet's core
  * progress (#24); 3 the platform (#23).
  */
-export const SNAPSHOT_VERSION = 25
+export const SNAPSHOT_VERSION = 26
 
 export interface SessionSnapshot {
   snapshotVersion: number

@@ -472,8 +472,14 @@ import type { DriveSigns } from '../vehicle/driveSigns'
  *    out, empty on a planet never banked on; a core completed on an earlier visit lands completed,
  *    so `core_completed` is said once per planet. The jump still spends no fragment; `Travel`'s
  *    surplus stays in the left planet's bay. A run that never leaves its planet moves no digest.
+ * 107: the drill aims between the four facings (ticket 791, the analog touch stick and pad
+ *    stick): `reportPose` and `drillStep` take an optional `aim` in 1/64 turns, sent only off the
+ *    four facings, with `facing` the one nearest it; the pose and the swept cut's cursor keep it
+ *    the same way. The swept cut cuts along the aim, a cut's speed along it held so its sideways
+ *    part never passes the drive, and the face sits at the body's reach along the aim. A command
+ *    with no aim aims at its facing, so every older log replays as it did and moves no digest.
  */
-export const AUTHORITY_PROTOCOL_VERSION = 106
+export const AUTHORITY_PROTOCOL_VERSION = 107
 
 /** The kernel's own commands: the closed set its rule tables are written against. */
 export interface KernelCommandPayloads {

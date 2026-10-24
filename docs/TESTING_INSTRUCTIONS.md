@@ -1596,17 +1596,26 @@ incomePerHour}` go to `balance-report/drill-pace.ndjson`, which `pushTestMetrics
   the render-scale floor (`ui.getDrawnLiningAt`, ticket 315: about 24 px a cell on a phone), and
   the touch controls either way up (ticket 485): their sizes and clearances against the HUD's
   `data-hud` boxes, taps alone reaching every screen, the cluster following the dock, the
-  left-handed mirror, and a stick run pressing the same action stream as its key run
-  (`input.getActionStream()`, real touches through CDP). Each cell also writes the #173 look set;
+  left-handed mirror, and the stick at its rim giving the intent its key gives while pressing no
+  move action (`input.getVehicleIntent()`, `input.getActionStream()`, real touches through CDP).
+  The stick is analog since ticket 791: `touchStickAnalog.spec.ts` sweeps it through 33 angles and
+  holds the drill's aim to a rising run with the diagonals in it, the drive to a rising run from
+  the deadzone to the rim (about 32 of 64 halfway), the rig slower on half a push than a full one,
+  and a push down-left digging a diagonal shaft; touches through CDP on Chromium and the mouse on
+  the same pointer handlers on WebKit, so it runs on both phone projects. In node the stick and
+  the pad quantisers are `touchControls.test.ts` and `padRuntime.test.ts`, the cut caps at every
+  aim `cutCapSpeed.test.ts`, the diagonal shaft's pinned cells `drillStepAim.test.ts` and the live
+  loop's `diagonalCut.test.ts` (30 and 144 frames a second), and an old save's facings as aims
+  `aimOldSaves.test.ts`. Each cell also writes the #173 look set;
   `npm run screens:update` puts it in `docs/screens/` for review, never compared
   ([docs/screens/README.md](screens/README.md)). Software WebGL at 4K is slow, so these projects
   allow 5 minutes a test and 30 s a wait.
 - **Mobile projects** (#470 P1-10, ticket 481): `mobile-chromium-pixel7` (Playwright's `Pixel 7`
   on Chromium) and `mobile-webkit-iphone13` (`iPhone 13` on WebKit), both turned to the landscape
   screen of their matrix cell (`e2e/browser/mobile/mobileDevices.ts`), run `e2e/browser/mobile/` and
-  the matrix's touch specs (`touchControls`, `tapAffordances`, `slotHoldRing`) with the cell's
+  the matrix's touch specs (`touchControls`, `touchStickAnalog`, `tapAffordances`, `slotHoldRing`) with the cell's
   expectations. WebKit has no CDP: its touches are `locator.tap()` and `page.touchscreen.tap`, and
-  the multi-touch specs (the stick's action stream, the pinch) skip there and run on the Pixel 7
+  the multi-touch specs (the stick's intent against the keys, the pinch) skip there and run on the Pixel 7
   duplicate. Install the engine once with `npx playwright install webkit`; without it the iPhone
   project's tests skip with that hint before a browser launches, so `test:e2e:affected` stays green.
   `deviceSaveDigest.spec.ts` loads the committed device fixture through Continue on each engine and
@@ -1845,7 +1854,7 @@ incomePerHour}` go to `balance-report/drill-pace.ndjson`, which `pushTestMetrics
   inside the safe area, apart, off every other `data-hud` box and off the vehicle's body, for
   either hand. On a phone no HUD box meets the zone; on the tablet, whose full HUD keeps its
   bottom plaques, the boxes the zone meets are logged as a `stick-zone` annotation. The stick's
-  and the keys' action streams, the pause button, the badge, the fire tile and the slot hold ring
+  and the keys' intents, the pause button, the badge, the fire tile and the slot hold ring
   run upright too (`touchControls`, `fireTile`, `slotHoldRing`). Box Tester only.
 - **Upright HUD rows** (#486, spec #470): `e2e/browser/hud/portraitHud.spec.ts` runs the upright
   cells (390x844, 412x915, 360x640, 320x568) in the worst case above with a threat at each of the

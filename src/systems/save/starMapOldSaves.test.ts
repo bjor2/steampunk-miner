@@ -16,6 +16,7 @@ const STAR_MAP_STEP = { version: 'snapshotVersion', from: 21, to: 22 }
 const FUEL_TANK_STEP = { version: 'snapshotVersion', from: 22, to: 23 }
 const JUMP_DRIVE_STEP = { version: 'snapshotVersion', from: 23, to: 24 }
 const CORE_BAY_STEP = { version: 'snapshotVersion', from: 24, to: 25 }
+const AIM_STEP = { version: 'snapshotVersion', from: 25, to: 26 }
 
 function restoredState(file: unknown): AuthorityState {
   const reading = readMigratedSaveSlot(file)
@@ -57,6 +58,7 @@ describe('save migration: snapshot 21 -> 22, the star map (ticket 755)', () => {
       FUEL_TANK_STEP,
       JUMP_DRIVE_STEP,
       CORE_BAY_STEP,
+      AIM_STEP,
     ])
     expect(reading.state).toEqual(state)
     expect(stateDigest(reading.state)).toBe(stateDigest(state))

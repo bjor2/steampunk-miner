@@ -37,7 +37,7 @@ describe('save migration: snapshot 23 -> 24, the jump drive (ticket 759)', () =>
     }
   })
 
-  it('loads a snapshot 23 save through its step and the core bay step, state and digest as saved', () => {
+  it('loads a snapshot 23 save through its step and the later steps, state and digest as saved', () => {
     const state = createScriptedSession().state()
     const file = saveSlotOf({ ...takeSnapshot(state), snapshotVersion: 23 }, 1)
     const reading = readMigratedSaveSlot(file)
@@ -45,6 +45,7 @@ describe('save migration: snapshot 23 -> 24, the jump drive (ticket 759)', () =>
     expect(reading.migrations).toEqual([
       { version: 'snapshotVersion', from: 23, to: 24 },
       { version: 'snapshotVersion', from: 24, to: 25 },
+      { version: 'snapshotVersion', from: 25, to: 26 },
     ])
     expect(reading.state).toEqual(state)
     expect(stateDigest(reading.state)).toBe(stateDigest(state))
