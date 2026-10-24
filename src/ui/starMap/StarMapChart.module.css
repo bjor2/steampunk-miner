@@ -4,11 +4,14 @@
  * with its bar, the drive's and the next system's offers). The chart is an inline-size container:
  * under 560 px (a phone upright, the desktop dock) the showcase stacks over the system column, as
  * #795's portrait and desktop mocks draw it; wider (a phone on its side) the system column sits
- * left of the showcase, so the hero, its numbers and its Jump stay in sight without a scroll.
+ * left of the showcase with a smaller hero, so on a phone's 390 px height the hero, its numbers and
+ * its Jump stay in sight without a scroll.
  * Sizes are the sprites' 1x sizes (design-system.md section 13); the gaps are spacing tokens.
  */
 .chart {
   min-height: 100%;
+  /* The scroll area's 8 px rail lies over its right edge: Next and the strip's frame clear it. */
+  padding-inline-end: var(--space-2);
   container: star-map / inline-size;
 }
 
@@ -17,6 +20,7 @@
   grid-template-areas:
     'showcase'
     'system';
+  grid-template-columns: minmax(0, 1fr);
   gap: var(--space-2);
 }
 

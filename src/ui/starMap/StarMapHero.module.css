@@ -20,6 +20,13 @@
   --hero-size: 256px;
 }
 
+/* A phone on its side: the hero gives its height to the card, so the Jump stays above the fold. */
+@container star-map (min-width: 560px) {
+  .hero {
+    --hero-size: 112px;
+  }
+}
+
 .picture,
 .glyph {
   width: min(var(--hero-size, 160px), 100%);
