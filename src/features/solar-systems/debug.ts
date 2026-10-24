@@ -8,7 +8,8 @@
  * `economyRowsOf(system, worldSeed)` is the system's economy rows, amounts as canonical text, with
  * the problems the lock's guards find (none on a sound build; ticket 776).
  * `materialPoolsOf(system, worldSeed)` is the system's generated material pools with the problems
- * the pool guards find (ticket 777).
+ * the pool guards find (ticket 777). `moneyTextsOf(system, worldSeed)` is the money a player reads
+ * on each of the system's planets through the #681 formatter, the goldens of ticket 779.
  */
 import type { DebugAction } from '../../debug/debugActionRegistry'
 import type { DebugResult } from '../../debug/debugScreens'
@@ -18,6 +19,7 @@ import { economyRowTextOf, systemEconomyRowsOf, type EconomyRowText } from './sy
 import { slotCopyOf, type SlotCopy } from './systems/familyCopy'
 import { systemMaterialPoolsOf, type MaterialPool } from './systems/materialPool'
 import { materialPoolProblemsOf } from './systems/materialPoolGuards'
+import { systemMoneyTextsOf, type PlanetMoneyTexts } from './systems/systemMoneyTexts'
 import { ARCHETYPE_PALETTE } from './systems/paletteRows'
 import { lookArtOf, LOOK_ART, type LookArt } from './systems/render/lookArt'
 import { rosterPlanetOf, systemRosterOf, type RosterPlanet } from './systems/systemRoster'
@@ -29,6 +31,7 @@ export const solarSystemsDebugActions: Readonly<Record<string, DebugAction>> = {
   slotCopyOf: (system, planet, worldSeed) => slotCopyResultOf(system, planet, worldSeed),
   economyRowsOf: (system, worldSeed) => economyRowsResultOf(system, worldSeed),
   materialPoolsOf: (system, worldSeed) => materialPoolsResultOf(system, worldSeed),
+  moneyTextsOf: (system, worldSeed) => moneyTextsResultOf(system, worldSeed),
 }
 
 function describePalette() {
@@ -92,6 +95,19 @@ function materialPoolsResultOf(
 function materialPoolsAnswerOf(worldSeed: number, system: bigint) {
   const pools = systemMaterialPoolsOf(worldSeed, system)
   return { pools, lockProblems: materialPoolProblemsOf(pools) }
+}
+
+function moneyTextsResultOf(
+  system: unknown,
+  worldSeed: unknown,
+): DebugResult<{ planets: PlanetMoneyTexts[] }> {
+  const index = indexOf(system)
+  const problems = [
+    ...(index === null ? ['system must be a whole index from 1'] : []),
+    ...(Number.isSafeInteger(worldSeed) ? [] : ['worldSeed must be a safe integer']),
+  ]
+  if (index === null || problems.length > 0) return { ok: false, problems }
+  return answerOrProblem(() => ({ planets: systemMoneyTextsOf(worldSeed as number, index) }))
 }
 
 /** A planet's filled family copy; `copy` is null where the planet's slot is empty. */

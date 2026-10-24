@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest'
 import { solarSystemsDebugActions } from './debug'
 import { economyRowTextOf, systemEconomyRowsOf } from './systems/economyRows'
 import { systemMaterialPoolsOf } from './systems/materialPool'
+import { systemMoneyTextsOf } from './systems/systemMoneyTexts'
 import { systemRosterOf } from './systems/systemRoster'
 
 describe('solar-systems debug actions (ticket 775)', () => {
@@ -95,6 +96,20 @@ describe('solar-systems debug actions (ticket 775)', () => {
     })
     expect(pools[0]).toMatchObject({ id: 'system2-p1', campaignIndex: '6' })
     expect(solarSystemsDebugActions.materialPoolsOf!('1', 7)).toEqual({
+      ok: false,
+      problems: ['system 1 keeps its own rows: the palette draws from system 2'],
+    })
+  })
+  it("prints a system's money as the player reads it through the #681 formatter, and refuses system 1 (ticket 779)", () => {
+    expect(solarSystemsDebugActions.moneyTextsOf!(2, 20261024)).toEqual({
+      ok: true,
+      planets: systemMoneyTextsOf(20261024, 2n),
+    })
+    expect(systemMoneyTextsOf(20261024, 2n)[0]).toMatchObject({
+      address: '2·1',
+      arrivalFee: '46.0k',
+    })
+    expect(solarSystemsDebugActions.moneyTextsOf!('1', 7)).toEqual({
       ok: false,
       problems: ['system 1 keeps its own rows: the palette draws from system 2'],
     })
