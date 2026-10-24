@@ -6,7 +6,9 @@
  * horizon, the sky band), so the kernel seam that one day hands a later system's planet its look
  * can take a row as it is. The motif is a Blender-authored `tile` asset, `ground-look-<look>`,
  * 4 x 4 m like the strata tiles, authored at the look's surface rock (`docs/art/ss2-looks`); the
- * slice registers the eight ids so the manifest lint and the export know them (#214).
+ * slice registers the eight ids so the manifest lint and the export know them (#214). The star
+ * map carousel's preview of a look (ticket 795), `ui-star-map-planet-<look>`, is named the same
+ * way from the kernel's rule, so a planet of any later system has its hero and orbit dot.
  *
  * Read once, refused whole with every problem listed (`lookArtGuards.ts`). Look only: no price,
  * gate or income reads it, and nothing here reaches the authority state, a save or a digest.
@@ -14,6 +16,10 @@
  */
 import type { ArtAsset } from '../../../../systems/registries/artAssets'
 import type { PlanetLook } from '../../../../systems/registries/planetRow'
+import {
+  starMapDotPartIdOf,
+  starMapPreviewAssetIdOf,
+} from '../../../../systems/art/starMapCarouselArt'
 import lookArtFile from '../../lookArt.json'
 import { ARCHETYPE_PALETTE, type BiomeLook } from '../paletteRows'
 import { lookArtProblems } from './lookArtGuards'
@@ -23,6 +29,8 @@ export interface LookArt {
   lookId: string
   /** The `tile` asset carrying the look's ground motif, under `public/assets/ground/`. */
   tileAssetId: string
+  /** The star map carousel's hero and orbit dot of the look, under `public/assets/ui/` (795). */
+  previewAssetId: string
   /** The colours a planet wearing the look is drawn in, as a planet row's look. */
   look: PlanetLook
 }
@@ -60,6 +68,7 @@ function lookArtFrom(lookId: string, row: PlanetLookRow): LookArt {
   return {
     lookId,
     tileAssetId: lookTileAssetIdOf(lookId),
+    previewAssetId: starMapPreviewAssetIdOf(lookId),
     look: {
       rockSurface: row.rockSurface,
       rockDeep: row.rockDeep,
@@ -80,4 +89,13 @@ export function lookArtOf(lookId: string): LookArt | null {
 /** The eight tiles' art, joining the kernel's #51 inventory (#214). */
 export function lookTileArtAssets(): ArtAsset[] {
   return LOOK_ART.map((art) => ({ id: art.tileAssetId, category: 'ground' }))
+}
+
+/** The eight looks' star map previews (ticket 795), each with its orbit dot part. */
+export function lookPreviewArtAssets(): ArtAsset[] {
+  return LOOK_ART.map((art) => ({
+    id: art.previewAssetId,
+    category: 'ui',
+    parts: [starMapDotPartIdOf(art.previewAssetId)],
+  }))
 }

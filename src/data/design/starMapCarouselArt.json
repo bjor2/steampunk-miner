@@ -1,0 +1,26 @@
+{
+  "source": "Ticket 795 (spec #647, the star map plan #650; Bjor's request of 24 Oct: planets visualised on the map, swiped or stepped, moving on the solar map between them). The sizes of the star map carousel's art in CSS px at 1x, read by systems/art/starMapCarouselArt.ts and by the Blender author and placeholder scripts under docs/art/star-map-carousel/. A `ui` asset is one Blender unit per CSS px (ticket 683), so the hero ships 256 px at 1x and 512 px at 2x, the size the ticket asks for. The system strip is as wide as the atlas allows at the 4x supersample (4032 of 4096 px), about three docked-panel widths on desktop and nearly three phone widths, so the camera pans across it. Orbit radii are measured from the sun's centre; a planet sits on the strip's middle line at the sun's x plus its orbit's radius. The motion notes are the build ticket's (#796): the pan toward the selected planet, cut under reduced motion, and the swipe that steps the carousel.",
+  "hero": {
+    "sizePx": 256,
+    "discRadiusPx": 96,
+    "hazeOuterRadiusPx": 120,
+    "ringSemiAxesPx": [124, 34]
+  },
+  "dot": { "sizePx": 24, "discRadiusPx": 10 },
+  "system": {
+    "sizePx": [1008, 252],
+    "sunCentrePx": [126, 126],
+    "sunRadiusPx": 60,
+    "orbitRadiiPx": [176, 340, 504, 668, 832],
+    "frame": { "sizePx": 64, "insetPx": 20 },
+    "herePx": 36,
+    "selectedPx": 44
+  },
+  "motion": {
+    "panMaxMs": 400,
+    "panEasing": "cubic-bezier(0.2, 0.8, 0.2, 1)",
+    "swipeThresholdPx": 48,
+    "swipeMaxOffAxisPx": 32,
+    "swipeMaxMs": 600
+  }
+}

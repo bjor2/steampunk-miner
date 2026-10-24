@@ -6,7 +6,7 @@
  */
 import type { SliceDefinition } from '../../registries/sliceDefinition'
 import { solarSystemsDebugActions } from './debug'
-import { lookTileArtAssets } from './systems/render/lookArt'
+import { lookPreviewArtAssets, lookTileArtAssets } from './systems/render/lookArt'
 
 export const slice: SliceDefinition = {
   id: 'solar-systems',
@@ -15,5 +15,7 @@ export const slice: SliceDefinition = {
     r.debugActions(solarSystemsDebugActions)
     // The eight looks' ground motif tiles under public/assets/ground/ (ticket 778, #214).
     r.artAssets(lookTileArtAssets())
+    // The looks' star map carousel previews under public/assets/ui/ (ticket 795).
+    r.artAssets(lookPreviewArtAssets())
   },
 }

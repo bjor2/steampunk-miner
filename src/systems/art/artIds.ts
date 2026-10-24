@@ -20,6 +20,7 @@ import {
   shopBuildingAssetIds,
   shopBuildingMovingPartIds,
 } from './shopBuildingArt'
+import { starMapCarouselKernelAssetIds, starMapCarouselKernelPartIds } from './starMapCarouselArt'
 import { UI_ART_CATEGORY, uiArtAssetIds, uiArtPartIds } from './uiArt'
 import { workshopShowcaseAssetIds, workshopShowcasePartIds } from './workshopShowcaseArt'
 
@@ -124,6 +125,9 @@ export function kernelBlenderAssetIds(): string[] {
     FUEL_TENDER_ASSET_ID,
     // The jump drive's mast on the tender's frame, at the same hitch (ticket 759).
     JUMP_DRIVE_ASSET_ID,
+    // The star map carousel's previews of the first system's planets and its system strip
+    // (ticket 795); a later system's previews are the solar-systems slice's, one per look.
+    ...starMapCarouselKernelAssetIds(),
   ]
 }
 
@@ -233,6 +237,7 @@ export function registryPartIds(): string[] {
   return [
     ...blenderAssetIds(),
     ...uiArtPartIds(),
+    ...starMapCarouselKernelPartIds(),
     ...fuelTenderArtPartIds(),
     JUMP_DRIVE_PART_ID,
     ...PLATFORM_VISUAL_STATES.map(kebabOf),

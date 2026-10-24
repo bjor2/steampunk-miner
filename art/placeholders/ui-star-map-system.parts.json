@@ -1,0 +1,55 @@
+{
+  "assetId": "ui-star-map-system",
+  "schema": 1,
+  "source": {
+    "blend": "art/blender/ui-star-map-system/ui-star-map-system.blend",
+    "sha256": null,
+    "blender": null
+  },
+  "pxPerMetre": 4,
+  "atlasPx": [4096, 2048],
+  "maps": {
+    "albedo": "ui-star-map-system.albedo.ktx2",
+    "normal": "ui-star-map-system.normal.ktx2",
+    "emissive": false
+  },
+  "parts": [
+    {
+      "id": "ui-star-map-system",
+      "tier": 1,
+      "rect": [8, 8, 4032, 1008],
+      "sizeM": [1008.0, 252.0],
+      "pivotM": [504.0, 126.0],
+      "atM": [0.0, 0.0],
+      "z": 0
+    },
+    {
+      "id": "ui-star-map-system-frame",
+      "tier": 1,
+      "rect": [8, 1032, 256, 256],
+      "sizeM": [64.0, 64.0],
+      "pivotM": [32.0, 32.0],
+      "atM": [-472.0, -174.0],
+      "z": 0,
+      "insetPx": [20, 20]
+    },
+    {
+      "id": "ui-star-map-system-here",
+      "tier": 1,
+      "rect": [472, 1032, 144, 144],
+      "sizeM": [36.0, 36.0],
+      "pivotM": [18.0, 18.0],
+      "atM": [-374.0, -174.0],
+      "z": 0
+    },
+    {
+      "id": "ui-star-map-system-selected",
+      "tier": 1,
+      "rect": [280, 1032, 176, 176],
+      "sizeM": [44.0, 44.0],
+      "pivotM": [22.0, 22.0],
+      "atM": [-318.0, -174.0],
+      "z": 0
+    }
+  ]
+}

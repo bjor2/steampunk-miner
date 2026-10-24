@@ -1,0 +1,36 @@
+{
+  "assetId": "ui-star-map-planet-5",
+  "schema": 1,
+  "source": {
+    "blend": "art/blender/ui-star-map-planet-5/ui-star-map-planet-5.blend",
+    "sha256": null,
+    "blender": null
+  },
+  "pxPerMetre": 4,
+  "atlasPx": [2048, 2048],
+  "maps": {
+    "albedo": "ui-star-map-planet-5.albedo.ktx2",
+    "normal": "ui-star-map-planet-5.normal.ktx2",
+    "emissive": false
+  },
+  "parts": [
+    {
+      "id": "ui-star-map-planet-5",
+      "tier": 1,
+      "rect": [8, 8, 1024, 1024],
+      "sizeM": [256.0, 256.0],
+      "pivotM": [128.0, 128.0],
+      "atM": [0.0, 0.0],
+      "z": 0
+    },
+    {
+      "id": "ui-star-map-planet-5-dot",
+      "tier": 1,
+      "rect": [1048, 8, 96, 96],
+      "sizeM": [24.0, 24.0],
+      "pivotM": [12.0, 12.0],
+      "atM": [156.0, 0.0],
+      "z": 0
+    }
+  ]
+}

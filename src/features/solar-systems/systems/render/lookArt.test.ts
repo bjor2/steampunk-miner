@@ -6,6 +6,7 @@ import { ARCHETYPE_PALETTE } from '../paletteRows'
 import {
   lookArtOf,
   lookIdOfTileAsset,
+  lookPreviewArtAssets,
   lookTileArtAssets,
   lookTileAssetIdOf,
   LOOK_ART,
@@ -52,6 +53,21 @@ describe('SS2 look art rows', () => {
       LOOK_IDS.map((lookId) => ({ id: lookTileAssetIdOf(lookId), category: 'ground' })),
     )
     expect(lookIdOfTileAsset('ground-band-1')).toBeNull()
+  })
+
+  it('names each look’s star map preview under the ui category with its orbit dot (ticket 795)', () => {
+    for (const art of LOOK_ART) {
+      expect(art.previewAssetId).toBe(`ui-star-map-planet-${art.lookId}`)
+      expect(categoryOfAssetId(art.previewAssetId)).toBe('ui')
+      expect(blenderAssetIds()).toContain(art.previewAssetId)
+    }
+    expect(lookPreviewArtAssets()).toEqual(
+      LOOK_IDS.map((lookId) => ({
+        id: `ui-star-map-planet-${lookId}`,
+        category: 'ui',
+        parts: [`ui-star-map-planet-${lookId}-dot`],
+      })),
+    )
   })
 
   it('answers a look its art and nothing for a look the palette lacks', () => {
