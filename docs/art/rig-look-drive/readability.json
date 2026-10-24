@@ -1,24 +1,59 @@
 {
-  "about": "Ticket 731: at a 360 px wide phone (30 px/m over the 12 m zoom), the pixels of the drive undercarriage's footprint [-0.44, -0.48, 0.44, -0.24] that change from each look to the next (a channel moving more than 24 of 255; the bare rig to the base look should change none), and the brightest pixel (Rec. 709 luminance, 0-255) of the drill nose against the footprint and the rest of the rig for each look, the nose lit as while drilling: under `lit` on the phone-size renders, under `glow` on the tier-1 emission-only render at 512 px/m; written by sheet_drive_looks.py. The nose must stay the brightest glow.",
+  "about": "Tickets 731 and 811: at a 360 px wide phone (30 px/m over the 12 m zoom, and 45 px/m over the closest 8 m zoom the sweep spec judges at), the pixels of the drive look box [-0.44, -0.48, 0.44, 0.06] (the undercarriage and the pod's belly the stacks rise over) that change from each look to the next (a channel moving more than 24 of 255; the bare rig to the base look should change none), and the brightest pixel (Rec. 709 luminance, 0-255) of the drill nose against the look (the undercarriage window [-0.44, -0.48, 0.44, -0.24] and the belly strip [-0.33, -0.24, 0.33, 0.06] the stacks rise through, clear of the lit headlamp) and the rest of the rig for each look, the nose lit as while drilling: under `lit` on the phone-size renders, under `glow` on the tier-1 emission-only render at 512 px/m; written by sheet_drive_looks.py. The nose must stay the brightest glow.",
   "lit": {
     "tier-1": {
       "phonePxPerM": 30.0,
-      "trackFootprintPx": {
+      "lookBoxPx": {
         "rig -> bare-hub": {
           "changed": 0,
-          "of": 252
+          "of": 504
         },
         "bare-hub -> iron-track": {
           "changed": 71,
-          "of": 252
+          "of": 504
         },
         "iron-track -> steel-track": {
           "changed": 96,
-          "of": 252
+          "of": 504
         },
         "steel-track -> guild-track": {
           "changed": 84,
-          "of": 252
+          "of": 504
+        },
+        "guild-track -> flywheel-track": {
+          "changed": 22,
+          "of": 504
+        },
+        "flywheel-track -> exhaust-track": {
+          "changed": 38,
+          "of": 504
+        }
+      },
+      "closestZoomPxPerM": 45.0,
+      "closestZoomLookBoxPx": {
+        "rig -> bare-hub": {
+          "changed": 0,
+          "of": 1000
+        },
+        "bare-hub -> iron-track": {
+          "changed": 169,
+          "of": 1000
+        },
+        "iron-track -> steel-track": {
+          "changed": 147,
+          "of": 1000
+        },
+        "steel-track -> guild-track": {
+          "changed": 155,
+          "of": 1000
+        },
+        "guild-track -> flywheel-track": {
+          "changed": 45,
+          "of": 1000
+        },
+        "flywheel-track -> exhaust-track": {
+          "changed": 96,
+          "of": 1000
         }
       },
       "brightest": {
@@ -46,27 +81,72 @@
           "nose": 203,
           "track": 214,
           "restOfRig": 255
+        },
+        "flywheel-track": {
+          "nose": 203,
+          "track": 215,
+          "restOfRig": 255
+        },
+        "exhaust-track": {
+          "nose": 203,
+          "track": 215,
+          "restOfRig": 255
         }
       }
     },
     "tier-3": {
       "phonePxPerM": 30.0,
-      "trackFootprintPx": {
+      "lookBoxPx": {
         "rig -> bare-hub": {
           "changed": 0,
-          "of": 252
+          "of": 504
         },
         "bare-hub -> iron-track": {
-          "changed": 64,
-          "of": 252
+          "changed": 65,
+          "of": 504
         },
         "iron-track -> steel-track": {
           "changed": 61,
-          "of": 252
+          "of": 504
         },
         "steel-track -> guild-track": {
           "changed": 64,
-          "of": 252
+          "of": 504
+        },
+        "guild-track -> flywheel-track": {
+          "changed": 16,
+          "of": 504
+        },
+        "flywheel-track -> exhaust-track": {
+          "changed": 27,
+          "of": 504
+        }
+      },
+      "closestZoomPxPerM": 45.0,
+      "closestZoomLookBoxPx": {
+        "rig -> bare-hub": {
+          "changed": 0,
+          "of": 1000
+        },
+        "bare-hub -> iron-track": {
+          "changed": 157,
+          "of": 1000
+        },
+        "iron-track -> steel-track": {
+          "changed": 108,
+          "of": 1000
+        },
+        "steel-track -> guild-track": {
+          "changed": 128,
+          "of": 1000
+        },
+        "guild-track -> flywheel-track": {
+          "changed": 37,
+          "of": 1000
+        },
+        "flywheel-track -> exhaust-track": {
+          "changed": 60,
+          "of": 1000
         }
       },
       "brightest": {
@@ -82,7 +162,7 @@
         },
         "iron-track": {
           "nose": 253,
-          "track": 224,
+          "track": 223,
           "restOfRig": 255
         },
         "steel-track": {
@@ -92,7 +172,17 @@
         },
         "guild-track": {
           "nose": 253,
-          "track": 224,
+          "track": 223,
+          "restOfRig": 255
+        },
+        "flywheel-track": {
+          "nose": 253,
+          "track": 225,
+          "restOfRig": 255
+        },
+        "exhaust-track": {
+          "nose": 253,
+          "track": 225,
           "restOfRig": 255
         }
       }
@@ -123,6 +213,16 @@
       "nose": 247,
       "track": 115,
       "restOfRig": 254
+    },
+    "flywheel-track": {
+      "nose": 247,
+      "track": 121,
+      "restOfRig": 253
+    },
+    "exhaust-track": {
+      "nose": 246,
+      "track": 131,
+      "restOfRig": 253
     }
   }
 }

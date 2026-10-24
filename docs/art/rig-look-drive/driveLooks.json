@@ -1,5 +1,5 @@
 {
-  "about": "The drive's rig-look parts, tracks and wheels per engine stage (ticket 731, wave 576-3A of the rig look ladder #576): one asset at the engine track's attach slot, one part per look step and the base look beside them. The stages are the engine row's (Systems' table #157 comment 6300543785, the GD rulings on #726: the drive keys on levels.engine, drill-speed buys never move it) and the step names Progression's engine names; the wiring (#726) reads thresholds and names from the rig-look registry (#577), not from here. windowM is the undercarriage box, the rollers' own, that a look may fill beyond the rig's silhouette: between the hubs' outer edges, never below the roller bottoms, where the belt runs over the ground line.",
+  "about": "The drive's rig-look parts, tracks and wheels per engine stage (ticket 731, wave 576-3A of the rig look ladder #576; the LK3 steps of ticket 811, wave 647-7K of the P1-P5 map #647): one asset at the engine track's attach slot, one part per look step and the base look beside them. The stages are the engine line's band edges LK1 (#809) froze, step 5 (the GD rulings on #726: the drive keys on levels.engine, drill-speed buys never move it), the first three named by Progression and the two LK3 parts fitted in sockets on the guild track in the ticket's order (a flywheel, then twin exhaust stacks with spark caps); the wiring (#726) reads thresholds and names from the rig-look registry (#577), not from here. windowM is the undercarriage box, the rollers' own, that a look may fill beyond the rig's silhouette: between the hubs' outer edges, never below the roller bottoms, where the belt runs over the ground line. lookBoxM is the box every look fits inside (the window plus the stacks rising over the pod's belly, which stay inside the rig's own silhouette): what the readability sheet measures a step over. stackBoxM is the belly strip the stacks rise through, between the thrusters' bells and the outer legs' hips and clear of the headlamp: with the window, where the sheet reads a look's brightest pixel.",
   "assetId": "vehicle-look-drive",
   "track": "engine",
   "attach": "chassis.drive",
@@ -7,6 +7,8 @@
   "replaces": null,
   "footprintM": [-0.44, -0.48, 0.44, -0.24],
   "windowM": [-0.44, -0.48, 0.44, -0.24],
+  "lookBoxM": [-0.44, -0.48, 0.44, 0.06],
+  "stackBoxM": [-0.33, -0.24, 0.33, 0.06],
   "looks": [
     {
       "part": "bare-hub",
@@ -19,19 +21,31 @@
       "part": "iron-track",
       "name": "Iron track",
       "step": "Single piston",
-      "purchases": 2
+      "purchases": 5
     },
     {
       "part": "steel-track",
       "name": "Steel track",
       "step": "Triple flywheel",
-      "purchases": 18
+      "purchases": 10
     },
     {
       "part": "guild-track",
       "name": "Guild track",
       "step": "Guild turbine",
-      "purchases": 26
+      "purchases": 15
+    },
+    {
+      "part": "flywheel-track",
+      "name": "Flywheel track",
+      "step": "Drive flywheel",
+      "purchases": 20
+    },
+    {
+      "part": "exhaust-track",
+      "name": "Exhaust track",
+      "step": "Twin exhaust stacks",
+      "purchases": 25
     }
   ]
 }

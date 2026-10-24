@@ -1,14 +1,16 @@
 """
-The review sheets cut from render_drive_looks.py's renders (ticket 731): the four looks alone, the
-rig at tiers 1 and 3 bare and with each look on the slot, each row resampled to a 1080p screen's
+The review sheets cut from render_drive_looks.py's renders (tickets 731 and 811): every look alone,
+the rig at tiers 1 and 3 bare and with each look on the slot, each row resampled to a 1080p screen's
 90 px/m at the default 12 m zoom (#39) and to a 360 px wide phone's 30 px/m over the same zoom
 (the width the #576 ladder is judged at), the phone copy enlarged 8x with no smoothing so each
 phone pixel shows. It also measures what the eye is asked to judge and writes readability.json:
-how many phone pixels of the undercarriage's footprint change between each look and the one before it
-(and between the bare rig and the base look, which should be none), and the brightest pixel of the
-drill nose against the brightest of the footprint and of the rest of the rig for each look, lit
-and by glow alone (the emission-only render, what the glow cap of #576 is about). Needs Pillow and
-numpy; run after the Blender render, which leaves its raw PNGs in build/ (removed here):
+how many phone pixels of the look box (the table's `lookBoxM`: the undercarriage's footprint plus
+the pod's belly the LK3 stacks rise over) change between each look and the one before it (and
+between the bare rig and the base look, which should be none), at the default zoom and at the
+closest, where the sweep spec judges a step, and the brightest pixel of the drill nose against the
+brightest of the look box and of the rest of the rig for each look, lit and by glow alone (the
+emission-only render, what the glow cap of #576 is about). Needs Pillow and numpy; run after the
+Blender render, which leaves its raw PNGs in build/ (removed here):
 
     python3 docs/art/rig-look-drive/sheet_drive_looks.py
 """
@@ -35,6 +37,10 @@ INGAME_PX_PER_M = 90
 PHONE_WIDTH_PX = 360
 ZOOM_M = 12
 PHONE_PX_PER_M = PHONE_WIDTH_PX / ZOOM_M
+# The closest zoom (VIEW_SHORT_AXIS_MIN_M, 8 m), where the rig-look sweep spec judges one visible
+# step (ticket 809: at least 16 pixels moved by 24 of 255).
+CLOSEST_ZOOM_M = 8
+PHONE_CLOSEST_PX_PER_M = PHONE_WIDTH_PX / CLOSEST_ZOOM_M
 PHONE_ENLARGE = 8
 # render_casing_driller.FRAME: (centre x, centre z), width, height in metres.
 RIG_FRAME = ((0.05, 0.05), 2.1, 1.75)
@@ -115,33 +121,46 @@ def sheet_path(name):
 
 def write_report(table, looks):
     sidecar = read_json(VEHICLE_SIDECAR)
-    track = tuple(table['footprintM'])
+    track = tuple(table['lookBoxM'])
+    look = (tuple(table['windowM']), tuple(table['stackBoxM']))
     nose = bounds_of_parts(sidecar, lambda part: '-drill-' in part['id'] and part['tier'] == 1)
-    lit = {'tier-%d' % tier: measured(tier, looks, track, nose) for tier in RIG_TIERS}
-    glow = {part: brightest_of('tier-%d.%s.glow' % (GLOW_TIER, part), track, nose) for part in [BARE] + looks}
+    lit = {'tier-%d' % tier: measured(tier, looks, track, look, nose) for tier in RIG_TIERS}
+    glow = {part: brightest_of('tier-%d.%s.glow' % (GLOW_TIER, part), look, nose) for part in [BARE] + looks}
     with open(REPORT, 'w', encoding='utf8') as file:
         json.dump(report_about(table, lit, glow), file, indent=2)
 
 
-def measured(tier, looks, track, nose):
-    phone = {part: resampled(flattened('tier-%d.%s' % (tier, part)), PHONE_PX_PER_M) for part in [BARE] + looks}
-    steps = list(zip([BARE] + looks, looks))
+def measured(tier, looks, track, look, nose):
+    """Each look against the one before it (ticket 811: every step reads at 360 px), at the phone's
+    px/m over the default zoom and over the closest zoom the sweep spec judges at."""
+    rendered = {part: flattened('tier-%d.%s' % (tier, part)) for part in [BARE] + looks}
+    phone = {part: resampled(image, PHONE_PX_PER_M) for part, image in rendered.items()}
+    closest = {part: resampled(image, PHONE_CLOSEST_PX_PER_M) for part, image in rendered.items()}
     return {
         'phonePxPerM': PHONE_PX_PER_M,
-        'trackFootprintPx': {'%s -> %s' % (before, after): changed_pixels(phone[before], phone[after], track)
-                           for before, after in steps},
-        'brightest': {part: brightest_of_image(image, track, nose) for part, image in phone.items()},
+        'lookBoxPx': stepped_pixels(phone, looks, track),
+        'closestZoomPxPerM': PHONE_CLOSEST_PX_PER_M,
+        'closestZoomLookBoxPx': stepped_pixels(closest, looks, track),
+        'brightest': {part: brightest_of_image(image, look, nose) for part, image in phone.items()},
     }
 
 
-def brightest_of(name, track, nose):
-    return brightest_of_image(flattened(name), track, nose)
+def stepped_pixels(images, looks, bounds):
+    """The look-box pixels each look changes against the look before it, the bare rig first."""
+    return {'%s -> %s' % (before, after): changed_pixels(images[before], images[after], bounds)
+            for before, after in zip([BARE] + looks, looks)}
 
 
-def brightest_of_image(image, track, nose):
+def brightest_of(name, look, nose):
+    return brightest_of_image(flattened(name), look, nose)
+
+
+def brightest_of_image(image, look, nose):
+    """The look's boxes are the undercarriage window and the belly strip the stacks rise through:
+    the headlamp's lens, lit at every look, stays out of them."""
     nose_box = pixel_box(nose, image.size)
-    return {'nose': brightest_in(image, nose_box), 'track': brightest_in(image, pixel_box(track, image.size)),
-            'restOfRig': brightest_outside(image, nose_box)}
+    track = max(brightest_in(image, pixel_box(bounds, image.size)) for bounds in look)
+    return {'nose': brightest_in(image, nose_box), 'track': track, 'restOfRig': brightest_outside(image, nose_box)}
 
 
 def changed_pixels(base, step, bounds):
@@ -195,13 +214,17 @@ def part_bounds(part):
 
 def report_about(table, lit, glow):
     return {
-        'about': 'Ticket 731: at a 360 px wide phone (%g px/m over the 12 m zoom), the pixels of the drive '
-                 'undercarriage\'s footprint %s that change from each look to the next (a channel moving more than %d of '
-                 '255; the bare rig to the base look should change none), and the brightest pixel (Rec. 709 '
-                 'luminance, 0-255) of the drill nose against the footprint and the rest of the rig for each '
-                 'look, the nose lit as while drilling: under `lit` on the phone-size renders, under `glow` on '
-                 'the tier-%d emission-only render at 512 px/m; written by sheet_drive_looks.py. The nose must '
-                 'stay the brightest glow.' % (PHONE_PX_PER_M, table['footprintM'], CHANGED_THRESHOLD, GLOW_TIER),
+        'about': 'Tickets 731 and 811: at a 360 px wide phone (%g px/m over the 12 m zoom, and %g px/m over the '
+                 'closest %g m zoom the sweep spec judges at), the pixels of the drive look box %s (the '
+                 'undercarriage and the pod\'s belly the stacks rise over) that change from each look to the next '
+                 '(a channel moving more than %d of 255; the bare rig to the base look should change none), and the '
+                 'brightest pixel (Rec. 709 luminance, 0-255) of the drill nose against the look (the undercarriage '
+                 'window %s and the belly strip %s the stacks rise through, clear of the lit headlamp) and the rest '
+                 'of the rig for each look, the nose lit as while drilling: under `lit` on the phone-size renders, under '
+                 '`glow` on the tier-%d emission-only render at 512 px/m; written by sheet_drive_looks.py. The nose '
+                 'must stay the brightest glow.' % (PHONE_PX_PER_M, PHONE_CLOSEST_PX_PER_M, CLOSEST_ZOOM_M,
+                                                    table['lookBoxM'], CHANGED_THRESHOLD, table['windowM'],
+                                                    table['stackBoxM'], GLOW_TIER),
         'lit': lit,
         'glow': glow,
     }

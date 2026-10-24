@@ -2,15 +2,25 @@
 
 The Blender source and review renders of
 [Rig look: tracks and wheels art per engine stage (#731)](https://github.com/bjor2/steampunk-miner/issues/731),
-wave 576-3A of [Rig look ladder and mineral skins (#576)](https://github.com/bjor2/steampunk-miner/issues/576):
-the drive look of the rig. Since [#723](https://github.com/bjor2/steampunk-miner/issues/723) the
-`engine` track is the only drive purchase, so the Game Director keyed the drive look on
-`levels.engine` with the engine row's own thresholds and had the tracks and wheels **replace** the
-engine's drive units on `chassis.drive` (GD rulings on #726 and #576 comment 6345096886; drill-speed
-buys never move it). The stages are Systems' engine steps at 2, 18 and 26 purchases (comment
-6300543785 on #157), the on-curve counts the player leaves planets 1, 5 and 8 with, named by
-Progression Single piston, Triple flywheel and Guild turbine (6300549964); the linear tail above
-the top step keeps every later purchase visible. The base rig's hub is the unnamed default.
+wave 576-3A of [Rig look ladder and mineral skins (#576)](https://github.com/bjor2/steampunk-miner/issues/576),
+and of the engine line's LK3 steps,
+[LK3: engine look steps to 5+ (#811)](https://github.com/bjor2/steampunk-miner/issues/811), wave
+647-7K of the P1-P5 map: the drive look of the rig. Since
+[#723](https://github.com/bjor2/steampunk-miner/issues/723) the `engine` track is the only drive
+purchase, so the Game Director keyed the drive look on `levels.engine` and had the tracks and wheels
+**replace** the engine's drive units on `chassis.drive` (GD rulings on #726 and #576 comment
+6345096886; drill-speed buys never move it). The stages were Systems' engine steps at 2, 18 and 26
+purchases (comment 6300543785 on #157), named by Progression Single piston, Triple flywheel and
+Guild turbine (6300549964); since LK1 ([#809](https://github.com/bjor2/steampunk-miner/issues/809))
+they sit on the engine line's band edges of 5 (5, 10, 15), and LK3 (#811) fits two more parts on
+the guild track at 20 and 25, the GD lock of 24 Oct 14:54: at least 5 authored steps on every line,
+each a new outline or an added part in a socket, never a recolour. The finish tail above the top
+step keeps every later band visible. The base rig's hub is the unnamed default.
+
+**LK3 (#811):** the ticket names `art/blender/vehicle-look-engine/`, but that asset was retired by
+#726 (the engine's drive units; [docs/art/rig-look-engine/](../rig-look-engine/README.md)), and the
+engine line's art is this one, so the flywheel and the stacks are drive parts: `flywheel-track` and
+`exhaust-track`, authored into this source by `author_drive_steps.py`.
 
 **Wired by #726**: the engine's three step rows name `iron-track`, `steel-track` and `guild-track` with `asset: "vehicle-look-drive"`, the parts join the track's glow slots so the tail paints them, and `vehicle-look-engine` is retired (its `.blend` kept as source). Below 2 purchases nothing is drawn, so `bare-hub` ships unused. #731 shipped the asset: `rigLook.json`'s `lookAssets` names
 `vehicle-look-drive` with its four parts (registered through `r.artAssets`, ticket 640), the
@@ -25,9 +35,10 @@ is the one table this folder's scripts share; the wiring keeps the registry's ro
 `vehicle-look-engine` is the drive units'.
 
 Authored in Blender 4.2.9 on the shared box: `author_drive_looks.py` wrote the first version of the
-file, and `art/blender/vehicle-look-drive/vehicle-look-drive.blend` is the source from now on (Git
-LFS). The sheets below are the headless renders; the box's Blender MCP was not up in this session,
-so the look-over was done on the renders at 512 px/m, in-game size and phone size.
+file, `author_drive_steps.py` fitted the two LK3 parts into it (a re-run rewrites those two objects
+and leaves the rest), and `art/blender/vehicle-look-drive/vehicle-look-drive.blend` is the source
+from now on (Git LFS). The sheets below are the headless renders; the look-over was done on the
+renders at 512 px/m, in-game size and phone size.
 
 ## The parts
 
@@ -54,30 +65,51 @@ size, and by the drive unit on the middle hub.
 | `bare-hub`    | 0, the default      | the leg's own brass hub cap and dark-iron axle nut, piece for piece (`leg_pieces` of the casing driller's author script), 1 mm proud: the rig is unchanged     |
 | `iron-track`  | 2, Single piston    | a rubber belt with iron cleats, riveted iron-plate frames, brass hub bosses with dark-iron nuts, a brass steam cylinder lying along the axle's left            |
 | `steel-track` | 18, Triple flywheel | a pale steel belt with brass cleats, dark steel frames under a brass rail, steel bosses with brass nuts, a six-spoked brass flywheel face on a steel rim       |
-| `guild-track` | 26, Guild turbine   | a guild-green enamel belt shod in brass, bronze frames with brass trim, enamel bosses, a glass window over a faintly lit blue core with four swept brass vanes |
+| `guild-track` | 15, Guild turbine   | a guild-green enamel belt shod in brass, bronze frames with brass trim, enamel bosses, a glass window over a faintly lit blue core with four swept brass vanes |
 
-The guild track's core is the one glow (emission 0.3, the engine turbine's, under a fifth of the
-nose seams' 1.6), so the drill nose stays the brightest part of the rig with every look.
+The steps' thresholds are LK1's edges (`driveLooks.json`; #731 drew them at 2, 18 and 26). The
+LK3 steps (#811) are the guild track with one more part fitted in a socket, in the ticket's order:
+
+| Part             | Step                    | Adds                                                                                                                                                                              |
+| ---------------- | ----------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `flywheel-track` | 20, Drive flywheel      | a brass-rimmed flywheel on the tail roller's axle, eight steel spokes from the hub boss, a dark-iron crank pin on the rim and a brass hub nut; the rim keeps inside the belt loop |
+| `exhaust-track`  | 25, Twin exhaust stacks | twin dark-iron exhaust stacks on brass feet rising from the belt's top run either side of the thrusters, brass-banded, each under a brass spark-arrestor bonnet with a glowing    |
+|                  |                         | ember mesh, a soot cap and three sparks over it                                                                                                                                   |
+
+Why those sockets: a look may not leave the rig's silhouette or the undercarriage window, and the
+thruster bells (`z` 4) are drawn over the look between the rollers, so the flywheel takes the tail
+axle (its spokes open over the roller's turning face, inside the belt's inner edge) and the stacks
+take the pod's belly either side of the thrusters, inboard of the outer legs' hips and clear of the
+headlamp, where the pod's own outline covers them. Piston count is the existing steps' (Single
+piston, Triple flywheel), so the new flywheel is the big side wheel of a traction engine, not a
+third piston.
+
+The guild track's core and the spark arrestors' mesh are the glows (emission 0.3, the engine
+turbine's, under a fifth of the nose seams' 1.6), so the drill nose stays the brightest part of the
+rig with every look.
 
 ## Files
 
-| File                       | What it is                                                                                                         |
-| -------------------------- | ------------------------------------------------------------------------------------------------------------------ |
-| `parts.png`                | each part alone in the game's front view at 768 px/m                                                               |
-| `tier-1.png`, `tier-3.png` | the rig at that tier, bare and with each look on the slot, 512 px/m, the nose lit as while drilling                |
-| `tier-<n>.ingame.png`      | the same at 90 px/m, about what a 1080p screen shows at the default 12 m zoom                                      |
-| `tier-<n>.phone.png`       | the same at a 360 px wide phone's 30 px/m over the 12 m zoom, enlarged 8x with no smoothing                        |
-| `glow.png`                 | the tier-1 rig, bare and with each look, by its emission alone: what the emissive map carries                      |
-| `outline.json`             | each look's silhouette cells outside the rig at tiers 1 and 3, inside and beyond the undercarriage window          |
-| `readability.json`         | the phone-size pixels each step changes, and the nose's brightest pixel against the undercarriage's and the rest's |
-| `driveLooks.json`          | the asset, its slot, its window, its parts with their step names and thresholds                                    |
-| `author_drive_looks.py`    | wrote the first version of the source (Blender)                                                                    |
-| `render_drive_looks.py`    | the renders above (Blender), on the casing driller review's frame and stage, draw order kept                       |
-| `check_outline.py`         | writes `outline.json` (Blender); exits 1 when a look leaves the rig outline and the undercarriage window           |
-| `sheet_drive_looks.py`     | lays the renders out into the sheets and writes `readability.json` (Pillow, numpy)                                 |
+| File                       | What it is                                                                                                    |
+| -------------------------- | ------------------------------------------------------------------------------------------------------------- |
+| `parts.png`                | each part alone in the game's front view at 768 px/m                                                          |
+| `tier-1.png`, `tier-3.png` | the rig at that tier, bare and with each look on the slot, 512 px/m, the nose lit as while drilling           |
+| `tier-<n>.ingame.png`      | the same at 90 px/m, about what a 1080p screen shows at the default 12 m zoom                                 |
+| `tier-<n>.phone.png`       | the same at a 360 px wide phone's 30 px/m over the 12 m zoom, enlarged 8x with no smoothing                   |
+| `glow.png`                 | the tier-1 rig, bare and with each look, by its emission alone: what the emissive map carries                 |
+| `outline.json`             | each look's silhouette cells outside the rig at tiers 1 and 3, inside and beyond the undercarriage window     |
+| `readability.json`         | the phone-size pixels each step changes at the default and the closest zoom, and the nose's brightest pixel   |
+|                            | against the look's (the window and the belly strip) and the rest of the rig's                                 |
+| `driveLooks.json`          | the asset, its slot, its window, its look box and belly strip, its parts with their step names and thresholds |
+| `author_drive_looks.py`    | wrote the first version of the source (Blender)                                                               |
+| `author_drive_steps.py`    | fitted the LK3 flywheel and exhaust stacks into the source (Blender, #811)                                    |
+| `render_drive_looks.py`    | the renders above (Blender), on the casing driller review's frame and stage, draw order kept                  |
+| `check_outline.py`         | writes `outline.json` (Blender); exits 1 when a look leaves the rig outline and the undercarriage window      |
+| `sheet_drive_looks.py`     | lays the renders out into the sheets and writes `readability.json` (Pillow, numpy)                            |
 
 ```
 blender -b --factory-startup --python-exit-code 1 -P docs/art/rig-look-drive/author_drive_looks.py
+blender -b --factory-startup --python-exit-code 1 -P docs/art/rig-look-drive/author_drive_steps.py
 blender -b --factory-startup --python-exit-code 1 -P docs/art/rig-look-drive/check_outline.py
 blender -b --factory-startup --python-exit-code 1 -P docs/art/rig-look-drive/render_drive_looks.py [-- alone|rig|glow]
 python3 docs/art/rig-look-drive/sheet_drive_looks.py
@@ -134,6 +166,39 @@ Against the ticket's acceptance, with the numbers the scripts wrote:
   final with exactly the four parts, each with the slot at the origin; the asset lint
   (`src/systems/art/assetLint.test.ts`) sees every shipped map and the placeholder's part ids.
 
+## Checks (24 Oct 2026, LK3)
+
+Against #811's acceptance, with the numbers the scripts wrote:
+
+- **Five authored steps on the first edges** (`driveLooks.json`, `rigLook.json`): 5, 10, 15, 20,
+  25, the step of 5 LK1 froze for the engine; the line's 20 bands to about P40 continue on the
+  finish tail over the exhaust track. Each new step is an added part, none a recolour, and the
+  ticket's two parts are the only ones the rule adds (3 existing + 2 = 5).
+- **Inside the rig outline** (`outline.json`): on a 4 mm grid the flywheel track and the exhaust
+  track have 0 cells outside the rig and the undercarriage window at tier 1 and at tier 3; the
+  flywheel stays inside the belt loop and the stacks inside the pod's silhouette (their cells
+  outside the rig inside the window, 1995 and 2026, are the belt's, as before). The drill tip is not
+  touched (the parts live on `chassis.drive` only), and the collider is the code constant
+  (`COLLIDER_M`, 0.9 m) no art feeds.
+- **Readable at 360 px** (`tier-<n>.phone.png`, `readability.json`): the pixels of the look box
+  each step changes against the look before it, a channel moving more than 24 of 255. At the
+  closest zoom (8 m, 45 px/m), where the sweep spec judges one visible step as 16 pixels: flywheel
+  45, exhaust stacks 96 (tier 1); 37 and 60 (tier 3). At the default 12 m zoom (30 px/m): 22 and
+  38 (tier 1), 16 and 27 (tier 3). The flywheel reads as a pale ring on the dark tail roller, the
+  stacks as two dark verticals with brass caps up the belly.
+- **The drill nose stays the brightest glow** (`glow.png`, `readability.json`): by emission alone
+  the nose's brightest pixel is 247 against the look's 121 (flywheel track) and 131 (exhaust track,
+  the spark mesh at 0.3; the guild core alone was 115, the other looks' 15 is the rig's own). Lit,
+  the look's brightest pixel (the window and the belly strip, clear of the headlamp) is 215 at
+  tier 1 against the bare rig's own 217 there and 225 at tier 3 against 224, the brass highlights
+  of the bonnets and the rim under the key light, with the lit nose at 203 and 253. The step glows
+  in `rigLook.json` rise 0.72 and 0.74, under the `rigBody` cap of 1 with the glint's 0.25.
+- **Desktop and phone** (`tier-<n>.ingame.png`, `tier-<n>.phone.png`): checked at 90 px/m and at
+  30 px/m. Screenshots of the running game at each step are the browser specs' (`rigLookEngine.spec.ts`
+  and `rigLookSweep.spec.ts`), which the Tester runs.
+- **Band names:** `Drive flywheel` and `Twin exhaust stacks`, data strings of 2 and 3 words in
+  `rigLook.json` (`card`) and `driveLooks.json`; the table checks refuse longer ones.
+
 ## Known limits
 
 - **Tier 3's grousers stand outside the belt.** The belt keeps inside the tier-1 roller's 0.12 m
@@ -149,3 +214,8 @@ Against the ticket's acceptance, with the numbers the scripts wrote:
   part of their own per phase, which the registry's one-part swap does not carry.
 - Below the first step the wiring can draw nothing or the bare hub; the bare hub exists so the swap
   is one rule for every step, not so the base rig changes.
+- **The flywheel does not turn.** Like the belt it is a still sprite over the tail roller, whose
+  own face keeps spinning between the spokes; at in-game and phone sizes that is not seen.
+- **The stacks stand in front of the belly.** The look draws at `z` 3 over the chassis's legs and
+  keel, so the stacks read as mounted on the pod's belly in front of the hip joints; the thruster
+  bells (`z` 4) are clear of them.
