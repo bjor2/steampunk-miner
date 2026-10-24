@@ -598,9 +598,9 @@
             },
             {
               "title": "Star map",
-              "description": "One tap on the labelled Star map button (top left on a phone, on the strip with its M tag on desktop) opens the system's star map, and a one-time hint rings the button after your first upgrade: the sun heads a brass rail of planet glyphs, each in its own ground colour, with the fuel its jump burns, the price and any shortfall against your tank; planets you cannot afford dim, never lock. Read-only: the jump itself still goes through the Sell bay.",
+              "description": "One tap on the labelled Star map button (top left on a phone, on the strip with its M tag on desktop), M, or the bay's Star map button opens the system's star map, and a one-time hint rings the button after your first upgrade: the sun heads a brass rail of planet glyphs, each in its own ground colour, with the fuel its jump burns, the price and any shortfall against your tank; planets you cannot afford dim, never lock. Each planet has a Jump (press twice); at the Sell bay a Buy fuel for its shortfall, a bigger tank and the jump drive, and on the system's last planet the jump to the next system.",
               "status": "built",
-              "issues": [650, 757, 758, 769, 792]
+              "issues": [650, 757, 758, 769, 792, 793]
             }
           ]
         }
@@ -1102,12 +1102,6 @@
               "issues": [89]
             }
           ]
-        },
-        {
-          "title": "End-of-slice card",
-          "description": "Completing planet 2's core shows an end-of-slice card; play continues behind it.",
-          "status": "built",
-          "issues": [2, 24]
         },
         {
           "title": "Endless mode",

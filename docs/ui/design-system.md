@@ -396,9 +396,19 @@ framed row per planet of the session's system on the shared Title+OneLine elemen
 line of the tank against that jump with any shortfall and what buying it here charges after the
 #648 clamp, and the jump's fuel and price as facts. The planet the session is on wears the brass
 edge; a planet the player cannot afford, whose shortfall the wallet cannot buy or the tank cannot
-hold, dims to steel and keeps every number, never locked or hidden. The map only reads state: no
-row acts. System 1 runs past `planetsPerSystem` (#781), so there it lists up to the hop after the
-session's planet.
+hold, dims to steel and keeps every number, never locked or hidden. System 1 runs past
+`planetsPerSystem` (#781), so there it lists up to the hop after the session's planet.
+**Jumps on the map (#793).** Every planet but the one the session is on carries a **Jump**: the
+first press arms it (its label turns to "Confirm jump", its frame thickens), the second sends the
+host's `jumpToPlanet`, and the map shuts so control is back after the 2 s transition. A jump the
+tank cannot fuel is struck through with the fuel it is short in its label and sends nothing. At the
+Sell bay, which sells fuel, a **Buy fuel** for that shortfall stands before it, the tank row carries
+its next level's price and button, and the jump drive's offer stands under it until it is fitted;
+on the system's last planet with the drive a **Next system** element carries the jump out. Every
+control is a menu button of at least 48 px both ways (`StarMapActions`, drawn from
+`starMapControlsOf`), and while the map is open over a bay its controls join that bay's focus
+stops, so keys and a pad reach them. The bay footer's **Star map** button opens the map; it
+replaced the slice's fragment Travel and its end-of-slice card.
 **Map art (#758):** the chart is a system view: the `art.starMap` sun heads a brass rail and each
 row's glyph, the planet sprite with its disc tinted the planet's own ground colour (the view's
 `colour`) through the sprite's mask, sits on it; the planet the session is on wears the here ring,
@@ -444,7 +454,7 @@ listed with the ticket that builds them. Every class lives in a CSS Module besid
 | hint chip     | #500's chip, unchanged: one line, 8% of height at most, queued when the clear view would fall                                                                                                                       | existing constants                                                    | exists  |
 | sale receipt  | the trip's sold kinds by rarity group (count, coin), the lining bill, the total rolling up in 1.2 s or less (a tap skips), the last trip's total; scrolls past 8 lines                                              | numbers, type.odometer, art.sheetFrame, copy                          | #717    |
 | unlock reveal | the first buy of a new capability (the shared flag): a brass plate over the dock, the bought part glowing on the car; a tap skips it                                                                                | art.sheetFrame, motion.durationsMs, copy                              | #718    |
-| star map      | the system's planets on one read-only chart: the tank and its bar, then the sun's rail with a tinted planet glyph and a row per planet with its jump's fuel, price and shortfall; unaffordable rows dim, never lock | art.sheetFrame, art.starMap, art.gaugeBar, numbers, copy              | #757    |
+| star map      | the system's planets on one chart: the tank and its bar, then the sun's rail with a tinted glyph and a row per planet with its jump's fuel, price, shortfall and its Jump (#793); unaffordable rows dim, never lock | art.sheetFrame, art.starMap, art.gaugeBar, numbers, copy              | #757    |
 
 **The sheet as built (#686).** One base sheet (`ui/sheet/BaseSheet.tsx`) draws the store's open
 tab (`openSheet(tabId)`, `closeSheet()`, Escape) in the kit frame (`kit/Sheet.tsx`). Its tabs are

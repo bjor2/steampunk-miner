@@ -5,16 +5,28 @@
  * (the `art.starMap` sprites, the planet's disc tinted through its mask) with the fuel its jump
  * burns, what that fuel costs and a line of the tank against it with any shortfall. The planet the
  * session is on wears the here ring; a planet the player cannot afford is dimmed, never locked or
- * hidden. Read-only (HS): nothing on it acts. The same chart fills the phone's full panel and
- * desktop's docked one. Drawn from `starMapViewOf`; markup only.
+ * hidden. Since ticket 793 each other planet carries its Jump (two presses) and, at the Sell bay,
+ * a Buy fuel for its shortfall; the tank its next level and the drive its offer there, and the
+ * system's last planet the jump on to the next system once the drive is fitted (`StarMapActions`).
+ * The same chart fills the phone's full panel and desktop's docked one. Drawn from `starMapViewOf`
+ * and `starMapControlsOf`; markup only.
  */
 import type { CSSProperties } from 'react'
-import { readStarMapModel } from '../../store/screenReads'
+import { useGameStore } from '../../store/gameStore'
+import { readStarMapControls, readStarMapModel } from '../../store/screenReads'
 import { buttonIconIdOf, hudLabelIconIdOf } from '../../systems/art/icons/iconSet'
 import type { ElementText } from '../../systems/views/uiText'
+import type { JumpControls, StarMapControls } from '../../systems/views/starMapControls'
 import type { StarMapPlanet, StarMapTank, StarMapView } from '../../systems/views/starMapView'
 import { TitleOneLine, type IconValue } from '../kit/TitleOneLine'
 import { useScreenModel } from '../useScreenModel'
+import {
+  JumpActions,
+  JumpDriveOffer,
+  JumpOutOffer,
+  PurchaseAction,
+  purchaseFactOf,
+} from './StarMapActions'
 import { starMapGlyphIdOf, starMapPlanetIdOf, STAR_MAP_UI_IDS } from './starMapIds'
 import styles from './StarMapChart.module.css'
 
@@ -24,24 +36,68 @@ const PERMILLE = 1000
 
 export function StarMapChart() {
   const map = useScreenModel(readStarMapModel)
-  return <StarMapChartView map={map} />
+  const controls = useScreenModel(readStarMapControls)
+  const focusedId = useGameStore((state) => state.focusedControlId)
+  return <StarMapChartView map={map} controls={controls} focusedId={focusedId} />
 }
 
-export function StarMapChartView({ map }: { map: StarMapView }) {
+export function StarMapChartView({
+  map,
+  controls,
+  focusedId,
+}: {
+  map: StarMapView
+  controls: StarMapControls
+  focusedId: string | null
+}) {
   return (
     <div className={styles.chart} data-testid={STAR_MAP_UI_IDS.starMapChart}>
-      <div className={styles.tank} data-testid={STAR_MAP_UI_IDS.starMapTank}>
-        <TitleOneLine text={TANK_TEXT} iconId={FUEL_ICON_ID} facts={tankFactsOf(map.tank)} />
-        <TankBar fillPermille={map.tank.fillPermille} />
-      </div>
+      <FuelTank tank={map.tank} controls={controls} focusedId={focusedId} />
+      {controls.buyDrive !== null && (
+        <JumpDriveOffer purchase={controls.buyDrive} focusedId={focusedId} />
+      )}
       <ol className={styles.system}>
         <li className={styles.sun} data-testid={STAR_MAP_UI_IDS.starMapSun} aria-hidden />
         {map.planets.map((planet) => (
-          <PlanetOnMap key={planet.place} planet={planet} />
+          <PlanetOnMap
+            key={planet.place}
+            planet={planet}
+            jump={jumpAt(controls, planet.place)}
+            focusedId={focusedId}
+          />
         ))}
       </ol>
+      {controls.jumpOut !== null && (
+        <JumpOutOffer controls={controls.jumpOut} focusedId={focusedId} />
+      )}
     </div>
   )
+}
+
+/** The tank's level and bar, with its next level's price and button at the Sell bay. */
+function FuelTank({
+  tank,
+  controls: { buyTank },
+  focusedId,
+}: {
+  tank: StarMapTank
+  controls: StarMapControls
+  focusedId: string | null
+}) {
+  const facts =
+    buyTank === null ? tankFactsOf(tank) : [...tankFactsOf(tank), purchaseFactOf(buyTank)]
+  return (
+    <div className={styles.tank} data-testid={STAR_MAP_UI_IDS.starMapTank}>
+      <TitleOneLine text={TANK_TEXT} iconId={FUEL_ICON_ID} facts={facts}>
+        {buyTank !== null && <PurchaseAction purchase={buyTank} focusedId={focusedId} />}
+      </TitleOneLine>
+      <TankBar fillPermille={tank.fillPermille} />
+    </div>
+  )
+}
+
+function jumpAt(controls: StarMapControls, place: number): JumpControls | null {
+  return controls.planets.find((planet) => planet.place === place) ?? null
 }
 
 /** The tank's fill as a brass-bezelled bar (`art.gaugeBar`); the numbers beside it are the value. */
@@ -62,7 +118,16 @@ function TankBar({ fillPermille }: { fillPermille: number }) {
   )
 }
 
-function PlanetOnMap({ planet }: { planet: StarMapPlanet }) {
+function PlanetOnMap({
+  planet,
+  jump,
+  focusedId,
+}: {
+  planet: StarMapPlanet
+  /** Null on the planet the session is on. */
+  jump: JumpControls | null
+  focusedId: string | null
+}) {
   return (
     <li
       className={styles.planet}
@@ -71,7 +136,9 @@ function PlanetOnMap({ planet }: { planet: StarMapPlanet }) {
       data-dimmed={planet.isDimmed || undefined}
     >
       <PlanetGlyph planet={planet} />
-      <TitleOneLine text={planetTextOf(planet)} facts={planetFactsOf(planet)} />
+      <TitleOneLine text={planetTextOf(planet)} facts={planetFactsOf(planet)}>
+        {jump !== null && <JumpActions controls={jump} focusedId={focusedId} />}
+      </TitleOneLine>
     </li>
   )
 }

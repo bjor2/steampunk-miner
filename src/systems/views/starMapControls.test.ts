@@ -15,10 +15,9 @@ import {
   STAR_MAP_BUY_TANK_ID,
   STAR_MAP_JUMP_OUT_ID,
   starMapBuyFuelIdOf,
-  starMapControlsOf,
   starMapJumpIdOf,
-  type StarMapControls,
-} from './starMapControls'
+} from './starMapControlIds'
+import { starMapControlsOf, type StarMapControls } from './starMapControls'
 
 // Ticket 793: the star map's Jump (two presses), its Buy fuel at the Sell bay, the tank and the
 // jump drive where they are sold, and the jump out of the system once the drive is fitted.

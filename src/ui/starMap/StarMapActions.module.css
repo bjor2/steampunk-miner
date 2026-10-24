@@ -1,0 +1,28 @@
+/*
+ * The star map's controls (ticket 793): a row of buttons under an element's lines, wrapping on a
+ * phone. Every control is at least 48 px both ways on touch and with a mouse alike (the ticket's
+ * floor, over the kit's 44 px `--tap-target-min`), so the phone and desktop layouts match.
+ */
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  margin-top: var(--space-1);
+}
+
+.actions > button {
+  min-width: 48px;
+  min-height: 48px;
+}
+
+/* The armed Jump waits for its second press: a thicker frame, not colour alone. */
+.actions[data-armed] > button:last-child {
+  border-width: 3px;
+  font-weight: bold;
+}
+
+.offer {
+  padding: var(--space-2);
+  border: var(--frame-hairline) solid var(--color-steel);
+  border-radius: var(--radius-panel);
+}

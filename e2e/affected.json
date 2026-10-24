@@ -923,6 +923,21 @@
       "specs": ["e2e/browser/ui/starMap.spec.ts", "e2e/browser/screens/touchControls.spec.ts"]
     },
     {
+      "why": "Star map jumps (ticket 793): the bay footer's Star map, each planet's Jump on two presses with its Buy fuel at the Sell bay, the jump shutting the map so control is back within 2 s, no end-of-slice text, and the goldens of the open map on the four reference phones and desktop.",
+      "paths": [
+        "src/systems/views/starMapControls.ts",
+        "src/systems/views/starMapControlIds.ts",
+        "src/systems/views/bayFrame.ts",
+        "src/ui/platform/BayFooter.tsx",
+        "src/ui/starMap/**",
+        "src/store/screenModels.ts",
+        "src/store/presentationSlice.ts",
+        "src/ui/TravelTransitionCard.tsx",
+        "e2e/browser/starMapJumps.ts"
+      ],
+      "specs": ["e2e/browser/ui/starMapJump.spec.ts", "e2e/browser/mobile/starMapJump.spec.ts"]
+    },
+    {
       "why": "The desktop brass art pass (ticket 770): the docked sheet in the dock rail frame and the gauge cluster in its rail frame on desktop, the phone's glass and sheet frames as before, and the strip and the docked sheet held through the NEW MATERIAL plaque cycle and on P40.",
       "paths": [
         "src/ui/kit/Sheet.module.css",

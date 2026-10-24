@@ -148,7 +148,7 @@ programs }` from three's `renderer.info` of the game canvas), read only when cal
   Collapse specs build a weak band-2 tunnel or dig one with `collapse/collapseFixtures.ts`. Bore gun specs (ticket 313) stand the rig in a pocket of band-1 rock with `bore/boreFixtures.ts` and register the gun's numbers through `boreGunSlice` inside `withRegistrations`, as no slice answers `boreGun` yet. Auto mode specs (ticket 317) use `bore/boreAutoFixtures.ts` `searSlice`, which adds the steam sear's numbers and its research, and stand the rig at `AUTO_RIG`, on the east edge of its collapse block, so a level shot east never warns the rig's own block. A slice's self-acting item (ticket 328: the steam shield) is specced with the real press path through `power-up-core`'s `withPowerUpCore([itemSlice, fixture])`, the fixture registering the item's research and a stand-in `autoFire` hook for the combo, in the corridor fight of `combat/combatFixtures.ts`. Collapse brace specs (ticket 331) register the fake `brace-probe` slice of `collapse/braceFixtures.ts` (a section, a command, a clock step and the provider) inside `withRegistrations`, so a brace can end by command, by clock step or by `untilTick`. Hazard strip specs (ticket 341) dig straight down the plain line of `render/hazardStrip/stripFixtures.ts`, fixtures placed in metres below the start, at a steady speed frame by frame; the per-frame cost is the sampler's own cost model (`spentUs`), and the wall clock is `npm run bench:strip`'s. Specs that mine deep (where crawlers live) freeze enemies first
   (`FREEZE_ENEMIES` in `scriptedSession.ts`); combat specs fight in the band-1 corridor of
   `combat/combatFixtures.ts`, where no spawn point is in reach. The `ui` namespace (`ui.setCameraMode('rotating' | 'fixed')`, `ui.setPref(name, value)`,
-  `ui.getPrefs()`, `ui.getHudModel()`, `ui.getSellBayModel()`, `ui.getUpgradeBayModel()`, `ui.getRefineryBayModel()` (#105), `ui.getStarMapModel()` (ticket 757: the star map's planets with their fuel cost, shortfall and dimming, and the tank), `ui.getBayPresentation()`, `ui.getAudioModel()`, `ui.getScreenLayout()` (#173: the stage, `--ui-scale`, the TV safe inset, the smallest control and the bay-screen text size), `ui.getPauseMenuModel()` and `ui.setPauseSaveName(name)` (ticket 404: the pause menu, null while closed, and the name its next save takes; ticket 704: a saved row's `scrap` and, once armed, its `scrapConfirm` question with Scrap and Keep)) reads the
+  `ui.getPrefs()`, `ui.getHudModel()`, `ui.getSellBayModel()`, `ui.getUpgradeBayModel()`, `ui.getRefineryBayModel()` (#105), `ui.getStarMapModel()` (ticket 757: the star map's planets with their fuel cost, shortfall and dimming, and the tank), `ui.getStarMapControls()` (ticket 793: each planet's Jump and Buy fuel, the tank and the drive at the Sell bay and the jump to the next system, each with the refusal its press would meet), `ui.getBayPresentation()`, `ui.getAudioModel()`, `ui.getScreenLayout()` (#173: the stage, `--ui-scale`, the TV safe inset, the smallest control and the bay-screen text size), `ui.getPauseMenuModel()` and `ui.setPauseSaveName(name)` (ticket 404: the pause menu, null while closed, and the name its next save takes; ticket 704: a saved row's `scrap` and, once armed, its `scrapConfirm` question with Scrap and Keep)) reads the
   screens' view models, the bay screen's shutter, text size and preview framing (#45, #44), the music's layer targets, settings and stinger sequence (#49) and
   the drill voice (`drillVoice`: `casing` while the drill's nose is in lining, #41), and
   changes local presentation only: no command, no log line, no `debugApplied` (#11 amendment 2,
@@ -1793,6 +1793,23 @@ incomePerHour}` go to `balance-report/drill-pace.ndjson`, which `pushTestMetrics
   runs a 360x640 phone (one tap, full screen) and a 1280x800 desktop (one M, docked), judging each
   row against `ui.getStarMapModel()`, and a dimmed planet that lights once money arrives. Box
   Tester only.
+- **Star map jumps** (ticket 793, spec #647): the controls are pure (`starMapControls.test.ts`:
+  a Jump on every planet but the session's, armed by the first press and sent by the armed one's, a
+  refused one naming the fuel it is short, Buy fuel for the shortfall at the Sell bay only, the tank
+  and the drive there, the jump to the next system on the last planet once the drive is fitted, the
+  focus stops in reading order). The store presses them through the bay's menu while the map is
+  open (`inputRuntime.test.ts`: the footer's Star map opens it, Buy fuel then two Jump presses land
+  on planet 3 and shut the map, another press disarms, a refused Jump sends and arms nothing), the
+  screen-driven trip in `debugScreens.test.ts` jumps from the star map, and the server-rendered
+  chart draws the controls on shared elements within the budget (`starMapChart.test.ts`). The bay
+  footer's Star map replaced Travel and the end card (`sellBayModel.test.ts`).
+  `e2e/browser/ui/starMapJump.spec.ts` runs 1440x900: P2 to P3, P4 and P5 by clicks with control
+  within 2 s of each confirm, no "End of the slice" at P2, P3 or P5 with the core complete, and a
+  dimmed planet's Jump refused with no run-log line; its golden cells (the four reference phones and
+  1440x900) shoot the open map to `docs/ui/screens/<cell>/star-map-jump.jpg` under
+  `npm run ui:screens:update` and hold every control to 48 px. `e2e/browser/mobile/starMapJump.spec.ts`
+  taps the same three hops on the iPhone 13 and Pixel 7 projects. Shared steps in
+  `e2e/browser/starMapJumps.ts`. Box Tester only.
 - **Desktop brass art** (ticket 770, spec #678): the cluster table's frame is per layout, pinned in
   `gaugeCluster.test.ts` (a phone in the glass frame, desktop in the cluster rail frame; a layout
   with no frame or an unshipped one fails the load), and the two rail sprites are held to the brief

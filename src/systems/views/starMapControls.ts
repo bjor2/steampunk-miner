@@ -31,6 +31,15 @@ import { placeOfCampaign } from '../starMap/campaignIndex'
 import { fuelOf } from '../vehicle/vehicleFuel'
 import { hasJumpDrive } from '../vehicle/vehicleJumpDrive'
 import type { FocusStop } from './menuFocus'
+import {
+  STAR_MAP_BUY_DRIVE_ID,
+  STAR_MAP_BUY_TANK_ID,
+  STAR_MAP_FOCUS_PANEL,
+  STAR_MAP_JUMP_OUT_FUEL_ID,
+  STAR_MAP_JUMP_OUT_ID,
+  starMapBuyFuelIdOf,
+  starMapJumpIdOf,
+} from './starMapControlIds'
 import { starMapPlacesOf } from './starMapView'
 import { priceReading, type AmountReading, type ScreenButton } from './viewParts'
 
@@ -67,23 +76,6 @@ export interface StarMapControls {
   buttons: ScreenButton[]
 }
 
-/** The star map's panel among a screen's focus stops. */
-export const STAR_MAP_FOCUS_PANEL = 'starMap'
-export const STAR_MAP_BUY_TANK_ID = 'star-map-buy-tank'
-export const STAR_MAP_BUY_DRIVE_ID = 'star-map-buy-drive'
-export const STAR_MAP_JUMP_OUT_ID = 'star-map-jump-out'
-export const STAR_MAP_JUMP_OUT_FUEL_ID = 'star-map-jump-out-fuel'
-
-/** A planet's Jump on the map, by its place in the system. */
-export function starMapJumpIdOf(place: number): string {
-  return `star-map-jump-${place}`
-}
-
-/** A planet's Buy fuel on the map, by its place in the system. */
-export function starMapBuyFuelIdOf(place: number): string {
-  return `star-map-buy-fuel-${place}`
-}
-
 const LAST_PLACE = BigInt(ECONOMY.starMap.planetsPerSystem)
 
 /** The controls for the map's rows (`starMapPlacesOf`), as they would act now. */
@@ -106,6 +98,13 @@ interface JumpUiState extends StarMapUiState {
   isAtFuelBay: boolean
 }
 
+/** A jump's button ids and the Jump's own label. */
+interface JumpNames {
+  jumpId: string
+  buyFuelId: string
+  jumpLabel: string
+}
+
 /** Every place but the one the session is on, which has nowhere to jump. */
 function planetJumpsOf(
   state: AuthorityState,
@@ -121,6 +120,7 @@ function planetJumpsOf(
       ...jumpControlsOf(state, playerId, { system, planet: BigInt(place) }, ui, {
         jumpId: starMapJumpIdOf(place),
         buyFuelId: starMapBuyFuelIdOf(place),
+        jumpLabel: 'Jump',
       }),
     }))
 }
@@ -135,6 +135,7 @@ function jumpOutOf(state: AuthorityState, playerId: string, ui: JumpUiState): Ju
   return jumpControlsOf(state, playerId, target, ui, {
     jumpId: STAR_MAP_JUMP_OUT_ID,
     buyFuelId: STAR_MAP_JUMP_OUT_FUEL_ID,
+    jumpLabel: 'Jump to next system',
   })
 }
 
@@ -148,15 +149,16 @@ function jumpControlsOf(
   playerId: string,
   target: JumpTarget,
   ui: JumpUiState,
-  ids: { jumpId: string; buyFuelId: string },
+  names: JumpNames,
 ): JumpControls {
   const lacking = fuelLackingFor(state, playerId, target)
-  const isArmed = ui.armedJumpId === ids.jumpId
+  const isArmed = ui.armedJumpId === names.jumpId
+  const label = jumpLabelOf(names.jumpLabel, isArmed, lacking)
   return {
-    jump: jumpButtonOf(state, playerId, target, { id: ids.jumpId, isArmed, lacking }),
+    jump: jumpButtonOf(state, playerId, target, { id: names.jumpId, label, isArmed }),
     isArmed,
     buyFuel:
-      ui.isAtFuelBay && lacking > 0 ? buyFuelOf(state, playerId, ids.buyFuelId, lacking) : null,
+      ui.isAtFuelBay && lacking > 0 ? buyFuelOf(state, playerId, names.buyFuelId, lacking) : null,
   }
 }
 
@@ -171,20 +173,21 @@ function jumpButtonOf(
   state: AuthorityState,
   playerId: string,
   target: JumpTarget,
-  jump: { id: string; isArmed: boolean; lacking: number },
+  jump: { id: string; label: string; isArmed: boolean },
 ): ScreenButton {
   const intent = jumpToPlanetCommand(target.system, target.planet)
   return {
     id: jump.id,
-    label: jumpLabelOf(jump.isArmed, jump.lacking),
+    label: jump.label,
     action: jump.isArmed ? { kind: 'submit', intent } : { kind: 'armJump' },
     reason: reasonOf(state, playerId, intent),
   }
 }
 
-function jumpLabelOf(isArmed: boolean, lacking: number): string {
+/** The armed Jump asks for its second press; a refused one says the fuel it is short. */
+function jumpLabelOf(label: string, isArmed: boolean, lacking: number): string {
   if (isArmed) return 'Confirm jump'
-  return lacking > 0 ? `Jump, short ${lacking} fuel` : 'Jump'
+  return lacking > 0 ? `${label}, short ${lacking} fuel` : label
 }
 
 function buyFuelOf(

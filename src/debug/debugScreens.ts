@@ -30,6 +30,7 @@ import {
   readPauseMenuModel,
   readRefineryBayModel,
   readSellBayModel,
+  readStarMapControls,
   readStarMapModel,
   readTitleMenuModel,
   readUpgradeBayModel,
@@ -60,6 +61,7 @@ import type { PauseMenuModel } from '../systems/views/pauseMenuModel'
 import { planetCardViewOf, type PlanetCardView } from '../systems/views/planetCardView'
 import type { RefineryBayModel } from '../systems/views/refineryBayModel'
 import type { SellBayModel } from '../systems/views/sellBayModel'
+import type { StarMapControls } from '../systems/views/starMapControls'
 import type { StarMapView } from '../systems/views/starMapView'
 import type { TitleMenuModel } from '../systems/views/titleMenuModel'
 import type { UpgradeBayModel } from '../systems/views/upgradeBayModel'
@@ -122,6 +124,11 @@ export interface DebugUi {
   getRefineryBayModel(): DebugResult<{ model: RefineryBayModel }>
   /** The star map's rows (ticket 757): each planet's fuel cost, the tank, any shortfall, dimming. */
   getStarMapModel(): DebugResult<{ model: StarMapView }>
+  /**
+   * The star map's controls (ticket 793): each planet's Jump and Buy fuel, the tank and the drive
+   * at the Sell bay and the jump to the next system, each with the refusal its press would meet.
+   */
+  getStarMapControls(): DebugResult<{ model: StarMapControls }>
   /** The pause menu (ticket 404) as it draws now; null while it is closed. */
   getPauseMenuModel(): DebugResult<{ model: PauseMenuModel | null }>
   /** The name the pause menu's next save takes, as if typed into its field; refused when closed. */
@@ -256,6 +263,7 @@ export function createDebugUi(): DebugUi {
     getUpgradeBayModel: () => ({ ok: true, model: readUpgradeBayModel() }),
     getRefineryBayModel: () => ({ ok: true, model: readRefineryBayModel() }),
     getStarMapModel: () => ({ ok: true, model: readStarMapModel() }),
+    getStarMapControls: () => ({ ok: true, model: readStarMapControls() }),
     getPauseMenuModel: () => ({ ok: true, model: readPauseMenuModel() }),
     setPauseSaveName: setPauseSaveNameUnlessRefused,
     getBayPresentation: () => ({ ok: true, presentation: bayPresentationNow() }),

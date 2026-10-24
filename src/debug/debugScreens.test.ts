@@ -141,6 +141,19 @@ describe('debug api: ui reads the HUD and the platform screen (#33 acceptance 4)
     expect(planets[1].isDimmed).toBe(false)
     expect(planets[4].isDimmed).toBe(true)
   })
+
+  it("reads the star map's controls, refusing the jumps the tank cannot fuel (ticket 793)", () => {
+    const result = createDebugApi().ui.getStarMapControls()
+    if (!result.ok) throw new Error(result.problems.join('; '))
+    const { planets } = result.model
+    expect(planets.map((planet) => planet.place)).toEqual([2, 3, 4, 5])
+    expect(planets.map((planet) => planet.jump.reason)).toEqual([
+      'not_docked',
+      'not_docked',
+      'not_docked',
+      'not_docked',
+    ])
+  })
 })
 
 describe('debug api: input acts like play (#33 acceptance 3 and 11)', () => {
