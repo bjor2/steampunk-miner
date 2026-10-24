@@ -57,4 +57,3 @@ function useUndockKeyLabel(): string | null {
   const isDesktop = layoutKindOf(useHudDensity()) === 'desktop'
   return isDesktop ? keyLabel : null
 }
-
