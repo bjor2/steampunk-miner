@@ -40,6 +40,7 @@ import { chunkMeshOf, disposeChunkMesh, showBlocks, type ChunkMesh } from './chu
 import { buildChunkMeshParts } from '../systems/render/chunkMeshParts'
 import {
   drawnBlockCountOf,
+  casingBitsOfDrawnTile,
   gateBitsOfDrawnTile,
   shownChunksOf,
   visibleGroundBlocksAround,
@@ -78,6 +79,8 @@ export interface ChunkMeshPool {
   builtChunkCount(): number
   /** A drawn tile's gate bits, or null where no tile is drawn now (ticket 299 debug reads). */
   gateBitsAt(tile: TilePoint): number | null
+  /** A drawn tile's casing look value, or null where no tile is drawn now (ticket 830 debug reads). */
+  casingBitsAt(tile: TilePoint): number | null
   /** The chunk worker builds the meshes now (ticket 337), not the main thread. */
   isWorkerMeshing(): boolean
   /** Chunks in view with no mesh yet: a hole in the ground until one is built (ticket 337). */
@@ -144,6 +147,7 @@ export function createChunkMeshPool(
     drawnBlockCount: () => countDrawnBlocks(pool),
     builtChunkCount: () => pool.meshes.size,
     gateBitsAt: (tile) => gateBitsOfTile(pool, tile),
+    casingBitsAt: (tile) => casingBitsOfTile(pool, tile),
     isWorkerMeshing: () => isWorkerMeshing(pool.jobs),
     unbuiltVisibleChunkCount: () => countUnbuiltVisible(pool),
     dispose: () => dropAll(pool, parent),
@@ -173,6 +177,13 @@ function gateBitsOfTile(pool: PoolState, { tx, ty }: TilePoint): number | null {
   const chunk = pool.meshes.get(chunkKey(cx, cy))
   if (chunk === undefined || !chunk.mesh.visible) return null
   return gateBitsOfDrawnTile(chunk.drawn, tx - firstTileOfChunk(cx), ty - firstTileOfChunk(cy))
+}
+
+function casingBitsOfTile(pool: PoolState, { tx, ty }: TilePoint): number | null {
+  const [cx, cy] = [chunkOfTile(tx), chunkOfTile(ty)]
+  const chunk = pool.meshes.get(chunkKey(cx, cy))
+  if (chunk === undefined || !chunk.mesh.visible) return null
+  return casingBitsOfDrawnTile(chunk.drawn, tx - firstTileOfChunk(cx), ty - firstTileOfChunk(cy))
 }
 
 function isSameView(pool: PoolState, view: TerrainView): boolean {

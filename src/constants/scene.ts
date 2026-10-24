@@ -588,6 +588,8 @@ export const CASING_GRADE_MARKS = {
   brickTiles: 0.5,
   /** The bright lip and the pips glint like the rivets, so a grade reads in band 5's dark. */
   pipGlow: 0.14,
+  /** A firebrick trim's mortar joints glow, as the refractory tile's do (#113). */
+  jointGlow: 0.45,
 } as const
 
 /**

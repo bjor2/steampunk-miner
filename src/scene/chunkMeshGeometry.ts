@@ -28,7 +28,15 @@ import {
 } from '../systems/render/groundBlocks'
 import { CHUNK_CELLS, firstTileOfChunk } from '../systems/world/tileGrid'
 
-export const INSTANCE_ATTRIBUTES = ['aTile', 'aBase', 'aOre', 'aStyle', 'aGate', 'aKind'] as const
+export const INSTANCE_ATTRIBUTES = [
+  'aTile',
+  'aBase',
+  'aOre',
+  'aStyle',
+  'aGate',
+  'aKind',
+  'aCasing',
+] as const
 
 /** Sized for a whole chunk, so showing more blocks never reallocates. */
 export function emptyInstances(): TileInstances {
@@ -40,6 +48,7 @@ export function emptyInstances(): TileInstances {
     styles: new Float32Array(CHUNK_CELLS * 4),
     gates: new Float32Array(CHUNK_CELLS),
     kinds: new Float32Array(CHUNK_CELLS),
+    casings: new Float32Array(CHUNK_CELLS),
   }
 }
 
@@ -72,6 +81,7 @@ export function geometryOf(batch: TileInstances): InstancedBufferGeometry {
   geometry.setAttribute('aStyle', new InstancedBufferAttribute(batch.styles, 4))
   geometry.setAttribute('aGate', new InstancedBufferAttribute(batch.gates, 1))
   geometry.setAttribute('aKind', new InstancedBufferAttribute(batch.kinds, 1))
+  geometry.setAttribute('aCasing', new InstancedBufferAttribute(batch.casings, 1))
   geometry.instanceCount = batch.count
   return geometry
 }

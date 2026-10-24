@@ -31,6 +31,8 @@ export interface TileInstances {
    * shader looks up in the kind look table (ticket 450); 0 with no kind or no `kindLook` provider.
    */
   kinds: Float32Array
+  /** 1 per tile: the casing look channel's value (`casingLookBits.ts`, ticket 830), 0 unlined. */
+  casings: Float32Array
 }
 
 /** A chunk's tiles laid out block by block: block `b` is `blockStarts[b]` to `blockStarts[b + 1]`. */
@@ -106,6 +108,14 @@ export function gateBitsOfDrawnTile(drawn: TileInstances, lx: number, ly: number
   return null
 }
 
+/** The casing look of the drawn tile at chunk-local (`lx`, `ly`), or null where none is drawn. */
+export function casingBitsOfDrawnTile(drawn: TileInstances, lx: number, ly: number): number | null {
+  for (let at = 0; at < drawn.count; at++) {
+    if (drawn.tiles[at * 2] === lx && drawn.tiles[at * 2 + 1] === ly) return drawn.casings[at]
+  }
+  return null
+}
+
 function isShownWithTiles(batch: BlockedTileInstances, blockMask: number, block: number): boolean {
   const isShown = (blockMask & (1 << block)) !== 0
   return isShown && batch.blockStarts[block + 1] > batch.blockStarts[block]
@@ -120,5 +130,6 @@ function copyBlock(batch: BlockedTileInstances, block: number, drawn: TileInstan
   drawn.styles.set(batch.styles.subarray(start * 4, end * 4), drawn.count * 4)
   drawn.gates.set(batch.gates.subarray(start, end), drawn.count)
   drawn.kinds.set(batch.kinds.subarray(start, end), drawn.count)
+  drawn.casings.set(batch.casings.subarray(start, end), drawn.count)
   drawn.count += end - start
 }

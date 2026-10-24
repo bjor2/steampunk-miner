@@ -61,8 +61,10 @@ export function PlanetTerrain() {
     const created = createChunkMeshPool(group.current, material, worker)
     pool.current = created
     groundGatePresence.gateBitsAt = created.gateBitsAt
+    groundGatePresence.casingBitsAt = created.casingBitsAt
     return () => {
       groundGatePresence.gateBitsAt = NO_DRAWN_GROUND
+      groundGatePresence.casingBitsAt = NO_DRAWN_GROUND
       created.dispose()
       worker?.terminate()
       material.dispose()

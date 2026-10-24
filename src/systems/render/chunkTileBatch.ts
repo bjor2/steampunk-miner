@@ -17,8 +17,9 @@
  * draws it as firebrick with glowing joints.
  *
  * Standard casing lining (#309 GD decision 3, ticket 315) rides the gate slot's lined bit, set
- * from the chunk's casing layer with no provider, so the shader draws its brass plate and rivet
- * line in the same draw.
+ * from the chunk's casing layer with no provider; since ticket 830 every lined cell's casing slot
+ * carries the look channel's value (`casingLookBits.ts`: its grade's plate, finish and pips and its
+ * lining type), so the shader draws the plate in the grade's metal in the same draw.
  *
  * Gated cells (ticket 298): the `cellGateLook` provider names the gate a cell shows, and its bits
  * (`cellGateBits.ts`) ride in the tile's gate slot, which the shader draws as the cell's top layer.
@@ -80,7 +81,7 @@ interface BatchContext {
   kindLook: KindLookProvider | null
   /** Reused for every tile the providers are asked about, so a rebuild allocates no points. */
   gateTile: { tx: number; ty: number }
-  /** The cells holding standard (ticket 315) and refractory (#113) lining, in cell order. */
+  /** The cells holding standard (ticket 315) and refractory (#113) lining and their looks (ticket 830). */
   lining: ChunkLining
 }
 
@@ -188,6 +189,7 @@ function emptyBatch(): ChunkTileBatch {
     styles: new Float32Array(CHUNK_CELLS * 4),
     gates: new Float32Array(CHUNK_CELLS),
     kinds: new Float32Array(CHUNK_CELLS),
+    casings: new Float32Array(CHUNK_CELLS),
   }
 }
 
@@ -219,6 +221,7 @@ function writeTile(
   )
   batch.gates[at] = gateBitsOfTile(context, cell, lx, ly)
   batch.kinds[at] = context.kindLook === null ? NO_KIND_SLOT : kindSlotOfCell(cell)
+  batch.casings[at] = context.lining.look[ly * CHUNK_SIZE + lx]
   batch.count = at + 1
 }
 

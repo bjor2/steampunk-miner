@@ -1,7 +1,7 @@
 /**
  * What the ground's gate markers draw now (ticket 299), for the debug reads that check them
  * against the lock marker in e2e: the viewer and the act tint the terrain material was last given,
- * and the chunk pool's read of a drawn tile's gate bits. Written by `terrainGateViewer`,
+ * and the chunk pool's read of a drawn tile's gate bits and casing look (ticket 830). Written by `terrainGateViewer`,
  * `terrainGateTint` and `PlanetTerrain`; a mutable registry, because the viewer is rewritten every
  * frame and never goes through React or the store.
  */
@@ -19,8 +19,11 @@ export const groundGatePresence: {
   viewer: GateViewer
   tint: Rgb
   gateBitsAt: DrawnGateBitsRead
+  /** A drawn tile's casing look value (ticket 830), or null where no tile is drawn now. */
+  casingBitsAt: DrawnGateBitsRead
 } = {
   viewer: { tipMajor: 0, isMotionReduced: false },
   tint: [0, 0, 0],
   gateBitsAt: NO_DRAWN_GROUND,
+  casingBitsAt: NO_DRAWN_GROUND,
 }

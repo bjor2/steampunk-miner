@@ -46,12 +46,15 @@
  * (the origin is a whole number of their tiles); hashes add the hi half as whole cells; directions
  * and radii read the sum; the strata rings add their change from the origin's own ring coordinates.
  *
- * A cell holding standard casing lining (#309 GD decision 3, ticket 315) sets the slot's lined
- * bit and draws a brass plate on its open face, ribbed across by dark grooves, with a rivet line
- * along it and a dark seam where it meets the rock (`casingLiningLook.ts` is the rule in TS). The
- * face is found from the density's slope across a sample, so the plate follows the bore's curve;
- * the ribs run on the tile axis nearest the face, so they stay pixel-straight and meet across
- * cells. Over the ore beneath, under any gate marker.
+ * A cell holding intact casing lining (#309 GD decision 3, ticket 315; the grade looks of CG2,
+ * ticket 830) carries its casing slot (`casingLookBits.ts`: its grade's plate, finish and pips and
+ * its lining type) and draws a metal plate on its open face in its grade's metal, worked in that
+ * plate's rivet pattern, with a lit lip or a chased band for its finish, pips in the seam for the
+ * uncapped tail, and its lining type's trim over the seam (the cement seam, firebrick with glowing
+ * joints, ...), so a ring shows its strength grade and its hazard lining at once
+ * (`casingLiningLook.ts` is the rule in TS). The face is found from the density's slope across a
+ * sample, so the plate follows the bore's curve; the ribs run on the tile axis nearest the face, so
+ * they stay pixel-straight and meet across cells. Over the ore beneath, under any gate marker.
  *
  * An electrified cell (spec #258, ticket 293) sets its own bit in the same slot, which is no gate:
  * its arc-flicker draws over whatever gate the cell shows, blue arcs striking across it a few times
@@ -72,6 +75,7 @@ attribute vec3 aBase;
 attribute vec4 aOre;
 attribute vec4 aStyle;
 attribute float aGate;
+attribute float aCasing;
 #ifndef TERRAIN_LITE
 attribute float aKind;
 varying float vKind;
@@ -85,6 +89,7 @@ varying vec3 vBase;
 varying vec4 vOre;
 varying vec4 vStyle;
 varying float vGate;
+varying float vCasing;
 
 uniform vec2 uWorldOffset;
 
@@ -98,6 +103,7 @@ void main() {
   vOre = aOre;
   vStyle = aStyle;
   vGate = aGate;
+  vCasing = aCasing;
 #ifndef TERRAIN_LITE
   vKind = aKind;
 #endif
@@ -160,6 +166,7 @@ varying vec3 vBase;
 varying vec4 vOre;
 varying vec4 vStyle;
 varying float vGate;
+varying float vCasing;
 #ifndef TERRAIN_LITE
 varying float vKind;
 #endif
@@ -295,10 +302,6 @@ float gateOpenness(float bits) {
 
 bool isElectrifiedCell(float bits) {
   return mod(floor(bits / float(ELECTRIFIED_BIT)), 2.0) > 0.5;
-}
-
-bool isLinedCell(float bits) {
-  return mod(floor(bits / float(LINED_BIT)), 2.0) > 0.5;
 }
 
 bool isGateKind(float kind, int pattern) {
@@ -487,21 +490,195 @@ vec2 liningFrameOf(float density) {
   return vec2(depth, abs(slope.x) > abs(slope.y) ? vChunk.y : vChunk.x);
 }
 
-// The lining drawn over colour; shares.x is the plate's share, shares.y the rivets'.
-vec3 liningOver(vec3 colour, vec2 frame, float soft, out vec2 shares) {
-  float depth = frame.x;
-  float ribs = frame.y * LINING_RIBS_PER_TILE;
-  float plate = 1.0 - smoothstep(LINING_PLATE_DEPTH - soft, LINING_PLATE_DEPTH + soft, depth);
-  float seamStart = LINING_PLATE_DEPTH - LINING_SEAM;
-  float seam = smoothstep(seamStart - soft, seamStart + soft, depth);
+// --- Casing grade looks (ticket 830; casingLiningLook.ts is the same rule in TS) ---
+
+// What a cell's casing slot carries (casingLookBits.ts): x the plate slot, y the finish slot,
+// z the drawn pips, w the lining type's trim slot.
+vec4 casingCodeOf(float value) {
+  float code = mod(value, CASING_TYPE_UNIT) - 1.0;
+  float plate = mod(code, CASING_PLATE_SLOTS);
+  float finish = mod(floor(code / CASING_PLATE_SLOTS), CASING_FINISH_SLOTS);
+  float pips = floor(code / (CASING_PLATE_SLOTS * CASING_FINISH_SLOTS));
+  return vec4(plate, finish, pips, floor(value / CASING_TYPE_UNIT));
+}
+
+// The plate slot's body, groove and rivet colours and its pattern code (casingGradeLooks.json).
+void casingPlateOf(float slot, out vec3 body, out vec3 groove, out vec3 rivet, out float pattern) {
+  if (slot < 0.5) {
+    body = CASING_PLATE_0_COLOUR; groove = CASING_PLATE_0_GROOVE; rivet = CASING_PLATE_0_RIVET;
+    pattern = float(CASING_PLATE_0_PATTERN);
+  } else if (slot < 1.5) {
+    body = CASING_PLATE_1_COLOUR; groove = CASING_PLATE_1_GROOVE; rivet = CASING_PLATE_1_RIVET;
+    pattern = float(CASING_PLATE_1_PATTERN);
+  } else if (slot < 2.5) {
+    body = CASING_PLATE_2_COLOUR; groove = CASING_PLATE_2_GROOVE; rivet = CASING_PLATE_2_RIVET;
+    pattern = float(CASING_PLATE_2_PATTERN);
+  } else if (slot < 3.5) {
+    body = CASING_PLATE_3_COLOUR; groove = CASING_PLATE_3_GROOVE; rivet = CASING_PLATE_3_RIVET;
+    pattern = float(CASING_PLATE_3_PATTERN);
+  } else {
+    body = CASING_PLATE_4_COLOUR; groove = CASING_PLATE_4_GROOVE; rivet = CASING_PLATE_4_RIVET;
+    pattern = float(CASING_PLATE_4_PATTERN);
+  }
+}
+
+// The finish slot: x the plate body's brightness, y 1 for a lit lip, z 1 for a chased band.
+vec3 casingFinishOf(float slot) {
+  if (slot < 0.5) return vec3(CASING_FINISH_0_SCALE, float(CASING_FINISH_0_LIP), float(CASING_FINISH_0_CHASED));
+  if (slot < 1.5) return vec3(CASING_FINISH_1_SCALE, float(CASING_FINISH_1_LIP), float(CASING_FINISH_1_CHASED));
+  if (slot < 2.5) return vec3(CASING_FINISH_2_SCALE, float(CASING_FINISH_2_LIP), float(CASING_FINISH_2_CHASED));
+  return vec3(CASING_FINISH_3_SCALE, float(CASING_FINISH_3_LIP), float(CASING_FINISH_3_CHASED));
+}
+
+// The lining type's trim: its style code and width, and its own band and joint colours, each with
+// a 1 where the trim has one of its own (else the plate's groove and rivet stand in).
+void casingTrimOf(
+  float slot, out float style, out float width, out vec3 band, out float ownBand, out vec3 joint, out float ownJoint
+) {
+  if (slot < 0.5) {
+    style = float(CASING_TRIM_0_STYLE); width = CASING_TRIM_0_WIDTH;
+    band = CASING_TRIM_0_COLOUR; ownBand = float(CASING_TRIM_0_OWN_COLOUR);
+    joint = CASING_TRIM_0_JOINT; ownJoint = float(CASING_TRIM_0_OWN_JOINT);
+  } else if (slot < 1.5) {
+    style = float(CASING_TRIM_1_STYLE); width = CASING_TRIM_1_WIDTH;
+    band = CASING_TRIM_1_COLOUR; ownBand = float(CASING_TRIM_1_OWN_COLOUR);
+    joint = CASING_TRIM_1_JOINT; ownJoint = float(CASING_TRIM_1_OWN_JOINT);
+  } else if (slot < 2.5) {
+    style = float(CASING_TRIM_2_STYLE); width = CASING_TRIM_2_WIDTH;
+    band = CASING_TRIM_2_COLOUR; ownBand = float(CASING_TRIM_2_OWN_COLOUR);
+    joint = CASING_TRIM_2_JOINT; ownJoint = float(CASING_TRIM_2_OWN_JOINT);
+  } else {
+    style = float(CASING_TRIM_3_STYLE); width = CASING_TRIM_3_WIDTH;
+    band = CASING_TRIM_3_COLOUR; ownBand = float(CASING_TRIM_3_OWN_COLOUR);
+    joint = CASING_TRIM_3_JOINT; ownJoint = float(CASING_TRIM_3_OWN_JOINT);
+  }
+}
+
+// How far x lies from the nearest whole number.
+float offWhole(float x) {
+  return abs(fract(x + 0.5) - 0.5);
+}
+
+// A soft groove about every whole number of ribs, halfWidth wide either side.
+float grooveMark(float ribs, float halfWidth, float soft) {
+  return 1.0 - smoothstep(halfWidth - soft, halfWidth + soft, offWhole(ribs));
+}
+
+// A soft rivet in the middle of every rib, on the row row deep.
+float rivetMark(float along, float depth, float row, float radius, float soft) {
+  vec2 off = vec2(offWhole(along * LINING_RIBS_PER_TILE + 0.5) / LINING_RIBS_PER_TILE, depth - row);
+  return 1.0 - smoothstep(radius - soft, radius + soft, length(off));
+}
+
+// A soft band between the depths from and to.
+float bandMark(float depth, float from, float to, float soft) {
+  return smoothstep(from - soft, from + soft, depth) * (1.0 - smoothstep(to - soft, to + soft, depth));
+}
+
+// The plate pattern's marks: x where its grooves (or strap) lie, y where its rivets (or bolts) do.
+vec2 casingPatternMarks(float pattern, float along, float depth, float soft) {
   float ribSoft = soft * LINING_RIBS_PER_TILE;
-  float groove = 1.0 - smoothstep(
-    LINING_GROOVE_HALF - ribSoft, LINING_GROOVE_HALF + ribSoft, abs(fract(ribs + 0.5) - 0.5)
+  if (pattern < 0.5) {
+    // Ticket 315's brass: a groove every rib, one rivet line.
+    return vec2(
+      grooveMark(along * LINING_RIBS_PER_TILE, LINING_GROOVE_HALF, ribSoft),
+      rivetMark(along, depth, LINING_RIVET_DEPTH, LINING_RIVET_RADIUS, soft)
+    );
+  }
+  if (pattern < 1.5) {
+    // Rivet pairs: two rows at every rib's centre, a groove only every other rib.
+    float groove = grooveMark(
+      along * LINING_RIBS_PER_TILE / CASING_PAIR_GROOVE_RIBS, LINING_GROOVE_HALF, ribSoft / CASING_PAIR_GROOVE_RIBS
+    );
+    float rivet = max(
+      rivetMark(along, depth, CASING_PAIR_ROW_A, CASING_PAIR_RIVET_RADIUS, soft),
+      rivetMark(along, depth, CASING_PAIR_ROW_B, CASING_PAIR_RIVET_RADIUS, soft)
+    );
+    return vec2(groove, rivet);
+  }
+  if (pattern < 2.5) {
+    // Bolt strap: no grooves, a dark strap with a square bolt at every rib's centre.
+    float middle = (CASING_STRAP_FROM + CASING_STRAP_TO) * 0.5;
+    vec2 off = vec2(offWhole(along * LINING_RIBS_PER_TILE + 0.5) / LINING_RIBS_PER_TILE, abs(depth - middle));
+    float bolt = (1.0 - smoothstep(CASING_BOLT_HALF - soft, CASING_BOLT_HALF + soft, off.x))
+      * (1.0 - smoothstep(CASING_BOLT_HALF - soft, CASING_BOLT_HALF + soft, off.y));
+    return vec2(bandMark(depth, CASING_STRAP_FROM, CASING_STRAP_TO, soft), bolt);
+  }
+  if (pattern < 3.5) {
+    // Lattice: grooves on both diagonals, a rib apart, no rivets.
+    float lattice = max(
+      grooveMark((along + depth) * LINING_RIBS_PER_TILE, CASING_LATTICE_HALF, ribSoft),
+      grooveMark((along - depth) * LINING_RIBS_PER_TILE, CASING_LATTICE_HALF, ribSoft)
+    );
+    return vec2(lattice, 0.0);
+  }
+  // Stagger: a groove every rib, the rivets zigzagging between two rows, one row per rib.
+  float rib = floor(along * LINING_RIBS_PER_TILE);
+  float row = mod(rib, 2.0) < 0.5 ? CASING_PAIR_ROW_A : CASING_PAIR_ROW_B;
+  return vec2(
+    grooveMark(along * LINING_RIBS_PER_TILE, LINING_GROOVE_HALF, ribSoft),
+    rivetMark(along, depth, row, CASING_STAGGER_RIVET_RADIUS, soft)
   );
-  vec2 offRivet = vec2(abs(fract(ribs) - 0.5) / LINING_RIBS_PER_TILE, depth - LINING_RIVET_DEPTH);
-  float rivet = 1.0 - smoothstep(LINING_RIVET_RADIUS - soft, LINING_RIVET_RADIUS + soft, length(offRivet));
-  vec3 lined = mix(mix(LINING_BRASS, LINING_GROOVE, max(groove, seam)), LINING_RIVET, rivet);
-  shares = vec2(plate, rivet * plate);
+}
+
+// The trim's joints: mortar lines on firebrick, stitches every rib, or a zigzag strap line;
+// across runs 0 to 1 through the trim band.
+float casingJointMark(float style, float along, float across, float width, float soft) {
+  if (style < 0.5) return 0.0;
+  float off;
+  if (style < 1.5) off = offWhole(along / CASING_BRICK_TILES) * CASING_BRICK_TILES;
+  else if (style < 2.5) off = offWhole(along * LINING_RIBS_PER_TILE) / LINING_RIBS_PER_TILE;
+  else off = abs(across - 2.0 * offWhole(along * LINING_RIBS_PER_TILE)) * width;
+  return 1.0 - smoothstep(CASING_JOINT_HALF - soft, CASING_JOINT_HALF + soft, off);
+}
+
+// Pip k of the drawn pips sits at (k + 1) / (most + 1) along each tile, on the pips' row.
+float casingPipMark(float along, float depth, float pips, float soft) {
+  float offRow = depth - CASING_PIPS_DEPTH;
+  float inTile = fract(along);
+  float mark = 0.0;
+  for (int pip = 0; pip < CASING_PIPS_MOST_INT; pip++) {
+    if (float(pip) >= pips) break;
+    float offPip = inTile - (float(pip) + 1.0) / (CASING_PIPS_MOST + 1.0);
+    float pipMark = 1.0 - smoothstep(CASING_PIPS_RADIUS - soft, CASING_PIPS_RADIUS + soft, length(vec2(offPip, offRow)));
+    mark = max(mark, pipMark);
+  }
+  return mark;
+}
+
+// The lining drawn over colour from the cell's casing slot: plate the plate's share of the
+// pixel, glow what it adds to the emissive (the rivets, pips and lip glinting, firebrick joints).
+vec3 casingLiningOver(vec3 colour, vec2 frame, float value, float soft, out float plate, out vec3 glow) {
+  float depth = frame.x;
+  float along = frame.y;
+  vec4 code = casingCodeOf(value);
+  vec3 body; vec3 grooveColour; vec3 rivetColour; float pattern;
+  casingPlateOf(code.x, body, grooveColour, rivetColour, pattern);
+  vec3 finish = casingFinishOf(code.y);
+  float trimStyle; float trimWidth; vec3 trimColour; float ownTrim; vec3 jointColour; float ownJoint;
+  casingTrimOf(code.w, trimStyle, trimWidth, trimColour, ownTrim, jointColour, ownJoint);
+  body *= finish.x;
+  plate = 1.0 - smoothstep(LINING_PLATE_DEPTH - soft, LINING_PLATE_DEPTH + soft, depth);
+  vec2 marks = casingPatternMarks(pattern, along, depth, soft);
+  vec3 lined = mix(mix(body, grooveColour, marks.x), rivetColour, marks.y);
+  // The finish's marks lie over the pattern.
+  float lip = finish.y * (1.0 - smoothstep(CASING_LIP_DEPTH - soft, CASING_LIP_DEPTH + soft, depth));
+  lined = mix(lined, mix(body, vec3(1.0), CASING_LIP_WHITE), lip);
+  float chased = finish.z * bandMark(depth, CASING_CHASED_FROM, CASING_CHASED_TO, soft);
+  lined = mix(lined, grooveColour, chased);
+  // The lining type's trim over the seam, with its joints.
+  float trimFrom = LINING_PLATE_DEPTH - trimWidth;
+  float trim = smoothstep(trimFrom - soft, trimFrom + soft, depth);
+  vec3 trimBand = mix(grooveColour, trimColour, ownTrim);
+  vec3 trimJoint = mix(rivetColour, jointColour, ownJoint);
+  float joint = trim * casingJointMark(trimStyle, along, (depth - trimFrom) / trimWidth, trimWidth, soft);
+  lined = mix(lined, mix(trimBand, trimJoint, joint / max(trim, 0.0001)), trim);
+  // The pips in the seam, over everything.
+  float pip = casingPipMark(along, depth, code.z, soft);
+  lined = mix(lined, rivetColour, pip);
+  float isFirebrick = step(0.5, trimStyle) * step(trimStyle, 1.5);
+  glow = rivetColour * LINING_RIVET_GLOW * plate * max(marks.y * (1.0 - trim), max(pip, lip))
+    + trimJoint * CASING_JOINT_GLOW * plate * joint * isFirebrick;
   return mix(colour, lined, plate);
 }
 
@@ -680,12 +857,13 @@ void main() {
   }
 
   float gateBits = floor(vGate + 0.5);
-  if (style < 1.5 && isLinedCell(gateBits)) {
-    // Casing lining (ticket 315): over the rock and ore, its rivets glinting in the dark.
-    vec2 shares;
-    colour = liningOver(colour, liningFrameOf(density), gateSoft, shares);
-    emissive *= 1.0 - shares.x;
-    emissive += LINING_RIVET * LINING_RIVET_GLOW * shares.y;
+  if (style < 1.5 && vCasing > 0.5) {
+    // Casing lining (tickets 315, 830): the grade's plate over the rock and ore, its rivets glinting.
+    float plate;
+    vec3 glow;
+    colour = casingLiningOver(colour, liningFrameOf(density), vCasing, gateSoft, plate, glow);
+    emissive *= 1.0 - plate;
+    emissive += glow;
   }
   float gateKind = gateKindOf(gateBits);
   float gateOpen = gateOpenness(gateBits);

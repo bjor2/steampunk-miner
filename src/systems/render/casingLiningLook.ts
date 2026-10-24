@@ -246,6 +246,7 @@ export function liningShaderDefines(
     CASING_PLATE_SLOTS: floatOf(CASING_PLATE_SLOTS),
     CASING_FINISH_SLOTS: floatOf(CASING_FINISH_SLOTS),
     CASING_PIPS_MOST: floatOf(table.pips.most),
+    CASING_PIPS_MOST_INT: String(table.pips.most),
     CASING_PIPS_DEPTH: floatOf(table.pips.depthTiles),
     CASING_PIPS_RADIUS: floatOf(table.pips.radiusTiles),
   }
@@ -275,6 +276,7 @@ function geometryDefines(): Record<string, string> {
     CASING_JOINT_HALF: floatOf(MARKS.jointHalfTiles),
     CASING_BRICK_TILES: floatOf(MARKS.brickTiles),
     CASING_PIP_GLOW: floatOf(MARKS.pipGlow),
+    CASING_JOINT_GLOW: floatOf(MARKS.jointGlow),
   }
 }
 
