@@ -32,10 +32,12 @@ export function isKitItemSoldAt(item: KitItem, planet: PlanetId): boolean {
 
 /** The item ids the merchant on `planet` stocks, in debut order: by home g, then by id. */
 export function stockOfMerchant(items: readonly KitItem[], planet: PlanetId): string[] {
-  return items
-    .filter((item) => isKitItemSoldAt(item, planet))
-    .sort(byDebut)
-    .map((item) => item.id)
+  return stockedItemsOf(items, planet).map((item) => item.id)
+}
+
+/** The items the merchant on `planet` stocks, in debut order. */
+export function stockedItemsOf(items: readonly KitItem[], planet: PlanetId): KitItem[] {
+  return items.filter((item) => isKitItemSoldAt(item, planet)).sort(byDebut)
 }
 
 /** "Pays extra for Honey Amber.": the merchant's premium tag. */

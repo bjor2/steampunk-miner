@@ -419,7 +419,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/ores/systems/rarityTripShare.test.ts` | 3 | 3 |
 | `src/features/ores/systems/slotDraws.test.ts` | 4 | 4 |
 
-### `planet-kit`: 8 files, 75 tests
+### `planet-kit`: 10 files, 96 tests
 
 | File | Tests | Sites |
 | --- | --- | --- |
@@ -428,7 +428,9 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/planet-kit/systems/containerRules.test.ts` | 11 | 11 |
 | `src/features/planet-kit/systems/containerViews.test.ts` | 4 | 4 |
 | `src/features/planet-kit/systems/kitSockets.test.ts` | 4 | 8 |
+| `src/features/planet-kit/systems/merchantVariant.test.ts` | 10 | 10 |
 | `src/features/planet-kit/systems/placedContainers.test.ts` | 15 | 16 |
+| `src/features/planet-kit/systems/planetKitPrices.test.ts` | 11 | 11 |
 | `src/features/planet-kit/systems/planetKitRows.test.ts` | 25 | 25 |
 | `src/features/planet-kit/systems/planetKitSales.test.ts` | 7 | 7 |
 
