@@ -1,7 +1,8 @@
 /**
  * The solar-systems slice's public API (feature-slices.md 2.1; ticket 775 under spec #774): the
  * archetype palette every system past the first is drawn from, and the roster it draws for a system
- * by seed, and the art of its looks (ticket 778). Types, pure selectors and constants only; never
+ * by seed, the art of its looks (ticket 778), and the SS2-B families' behaviour ledger and copy
+ * (ticket 780). Types, pure selectors and constants only; never
  * React, zustand or a store. Horizontal content with no stats.json row (HS input on #775): only the
  * jump drive has one.
  */
@@ -9,14 +10,29 @@ export const SOLAR_SYSTEMS_SLICE_ID = 'solar-systems'
 
 export type {
   ArchetypePalette,
+  BehaviourEffect,
   BiomeLook,
+  FamilyBehaviour,
+  FamilyCopy,
   NameParts,
+  NeverBehaviour,
   NewContentFamily,
   NewContentKind,
   NewContentSet,
+  RigPart,
   SizeClass,
   SizeClasses,
 } from './systems/paletteRows'
+export type { FirstSystemBehaviour } from './systems/familyBehaviours'
+export {
+  FIRST_SYSTEM_BEHAVIOURS,
+  recolouredFamiliesOf,
+  recolourProblemsOf,
+  telegraphTicksOf,
+} from './systems/familyBehaviours'
+export type { CopyFill, SlotCopy } from './systems/familyCopy'
+export { familyCopyFor, filledCopyOf, slotCopyOf } from './systems/familyCopy'
+export { NAME_WORDS_MAX, TAG_CHARACTERS_MAX } from './systems/familyGuards'
 export { ARCHETYPE_PALETTE, mixedActIds } from './systems/paletteRows'
 export { paletteProblems } from './systems/paletteGuards'
 export type { PlanetId, RosterPlanet, SurfaceStart } from './systems/systemRoster'

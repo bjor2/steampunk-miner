@@ -35,6 +35,31 @@ describe('solar-systems debug actions (ticket 775)', () => {
     })
   })
 
+  it("answers a planet's filled family copy, null copy for an empty slot, and refuses a missing place (ticket 780)", () => {
+    const planet = systemRosterOf(20261024, 2n)[1]
+    expect(solarSystemsDebugActions.slotCopyOf!('2', 2, 20261024)).toMatchObject({
+      ok: true,
+      copy: {
+        familyId: 'spall_glass',
+        tag: 'Spall glass',
+        rigPart: { name: 'Cutting collar' },
+        hoverLines: [expect.any(String), expect.stringContaining(planet.name)],
+      },
+    })
+    expect(solarSystemsDebugActions.slotCopyOf!(2, 2, 20261024)).toEqual(
+      solarSystemsDebugActions.slotCopyOf!('2', '2', 20261024),
+    )
+    expect(solarSystemsDebugActions.slotCopyOf!(3, 1, 20261024)).toEqual({ ok: true, copy: null })
+    expect(solarSystemsDebugActions.slotCopyOf!(2, 9, 0.5)).toEqual({
+      ok: false,
+      problems: ['worldSeed must be a safe integer'],
+    })
+    expect(solarSystemsDebugActions.slotCopyOf!(2, 9, 7)).toEqual({
+      ok: false,
+      problems: ['system 2 holds no planet 9'],
+    })
+  })
+
   it('describes the palette', () => {
     expect(solarSystemsDebugActions.describe!()).toMatchObject({
       ok: true,
