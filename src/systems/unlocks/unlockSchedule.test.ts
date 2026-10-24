@@ -18,7 +18,51 @@ import {
  * The bytes of the locked file. Any edit to the schedule, even one that keeps its `source_hash`,
  * fails here until this pin is updated on purpose with the Horizontal Scaler's refresh.
  */
-const LOCKED_FILE_SHA256 = '99a6771ed1a264a3065c55b47927399638df41c4c8cfbc7286cafa7c13024876'
+const LOCKED_FILE_SHA256 = 'aab8622fb7249f3fd8a9a3511c4fd00a1dc8a04b10001d9ae0108b798a8cf873'
+
+/** The pin before ticket 759 added the `jump_drive` row, the star map's one new row (#650 GD lock). */
+const PIN_BEFORE_JUMP_DRIVE_ROW = '99a6771ed1a264a3065c55b47927399638df41c4c8cfbc7286cafa7c13024876'
+
+/** What ticket 759 wrote into the file besides its row and the counts, each as `[before, after]`. */
+const JUMP_DRIVE_EDIT: readonly (readonly [string, string])[] = [
+  ['    "issues/309"\n  ],', '    "issues/309",\n    "issues/650"\n  ],'],
+  [
+    'sha256:4543f787bfaa38083631a917492562bb178fe5c3705da79632a09bd60845276d',
+    'sha256:688b54bad914719bc6fedddf95a84b9114f7b4f8eab9d510e404d775ac251121',
+  ],
+  [
+    ' source_hash recomputed',
+    ' #650 (GD lock, star map): jump_drive added at P5 (Upgrade, planet_gate, shipped), the one new row of the star map; P5\\u2013P40 cumulative +1 (P40 63). source_hash recomputed',
+  ],
+]
+
+/** The planet the `jump_drive` row opens on: the counts from it on moved by one. */
+const JUMP_DRIVE_PLANET = 5
+
+/** The file's text as it stood before ticket 759: its row out, the counts from P5 one lower. */
+function textBeforeJumpDriveRow(text: string): string {
+  const withoutRow = withoutRowOf(text, 'jump_drive')
+  const counts = withoutRow.indexOf('"cumulative_by_planet"')
+  const lowered =
+    withoutRow.slice(0, counts) +
+    withoutRow
+      .slice(counts)
+      .replace(/("planet": (\d+),\n\s+"cumulative": )(\d+)/g, lowerFromJumpDrive)
+  return JUMP_DRIVE_EDIT.reduce(
+    (current, [before, after]) => current.replace(after, before),
+    lowered,
+  )
+}
+
+function lowerFromJumpDrive(_: string, prefix: string, planet: string, count: string): string {
+  return `${prefix}${+planet >= JUMP_DRIVE_PLANET ? +count - 1 : +count}`
+}
+
+function withoutRowOf(text: string, rowId: string): string {
+  const row = text.indexOf(`    {\n      "id": "${rowId}"`)
+  const rowEnd = text.indexOf('    },\n', row) + '    },\n'.length
+  return text.slice(0, row) + text.slice(rowEnd)
+}
 
 /** The pin before ticket 367 gave `casing_cement` its scopeNote, Content's copy on #367 (ruling B). */
 const PIN_BEFORE_CEMENT_SCOPE_NOTE =
@@ -167,13 +211,13 @@ function progressWithEveryBindMet(rows: readonly UnlockRow[]): UnlockProgress {
 }
 
 describe('locked unlock schedule', () => {
-  it('loads the 57 locked Schedule C rows', () => {
-    expect(LOCKED_SCHEDULE.rows).toHaveLength(57)
+  it('loads the 58 locked Schedule C rows', () => {
+    expect(LOCKED_SCHEDULE.rows).toHaveLength(58)
   })
 
   it('carries the Horizontal Scaler source hash pin', () => {
     expect(LOCKED_SCHEDULE.sourceHash).toBe(
-      'sha256:4543f787bfaa38083631a917492562bb178fe5c3705da79632a09bd60845276d',
+      'sha256:688b54bad914719bc6fedddf95a84b9114f7b4f8eab9d510e404d775ac251121',
     )
     expect(LOCKED_SCHEDULE_SOURCE_HASH).toBe(LOCKED_SCHEDULE.sourceHash)
   })
@@ -195,8 +239,8 @@ describe('locked unlock schedule', () => {
     expect(createHash('sha256').update(bytes).digest('hex')).toBe(LOCKED_FILE_SHA256)
   })
 
-  it('schedules 62 unlocks cumulatively by planet 40', () => {
-    expect(unlockCountThrough(LOCKED_SCHEDULE, 40)).toBe(62)
+  it('schedules 63 unlocks cumulatively by planet 40, the jump_drive row of ticket 759 its re-pin', () => {
+    expect(unlockCountThrough(LOCKED_SCHEDULE, 40)).toBe(63)
   })
 
   it('matches the cumulative count the scaler recorded for every campaign planet', () => {
@@ -323,7 +367,9 @@ describe('locked unlock schedule', () => {
   })
 
   it('changed only magnetic_planets.status in the flip, leaving grounded_lining a vision row', () => {
-    const text = textBeforeBoreGunRow(textBeforeCementScopeNote(lockedFileText()))
+    const text = textBeforeBoreGunRow(
+      textBeforeCementScopeNote(textBeforeJumpDriveRow(lockedFileText())),
+    )
     const row = text.indexOf('"id": "magnetic_planets"')
     const rowEnd = text.indexOf('}', row)
     const unflipped =
@@ -338,12 +384,34 @@ describe('locked unlock schedule', () => {
   })
 
   it('added only the bore_gun row, the counts it moves and its provenance in ticket 313 (#309)', () => {
-    const before = textBeforeBoreGunRow(textBeforeCementScopeNote(lockedFileText()))
+    const before = textBeforeBoreGunRow(
+      textBeforeCementScopeNote(textBeforeJumpDriveRow(lockedFileText())),
+    )
     expect(createHash('sha256').update(before, 'utf8').digest('hex')).toBe(PIN_BEFORE_BORE_GUN_ROW)
   })
 
+  it('added only the jump_drive row, the counts it moves and its provenance in ticket 759 (#650)', () => {
+    const before = textBeforeJumpDriveRow(lockedFileText())
+    expect(createHash('sha256').update(before, 'utf8').digest('hex')).toBe(
+      PIN_BEFORE_JUMP_DRIVE_ROW,
+    )
+  })
+
+  it("opens the shipped jump_drive row at planet 5, the first system's last planet (#650)", () => {
+    const row = LOCKED_SCHEDULE.rows.find((candidate) => candidate.id === 'jump_drive')!
+    expect(row).toMatchObject({
+      planetIndex: 5,
+      lane: 'Upgrade',
+      bind: 'planet_gate',
+      status: 'shipped',
+      progressionAxis: 'horizontal',
+    })
+    expect(isUnlocked(row, { ...NO_PROGRESS, highestPlanetIndex: 4 })).toBe(false)
+    expect(isUnlocked(row, { ...NO_PROGRESS, highestPlanetIndex: 5 })).toBe(true)
+  })
+
   it('added only the casing_cement scopeNote in ticket 367 (#367 ruling B)', () => {
-    const text = lockedFileText()
+    const text = textBeforeJumpDriveRow(lockedFileText())
     expect(text).toContain(CEMENT_SCOPE_NOTE_EDIT[1])
     const before = textBeforeCementScopeNote(text)
     expect(createHash('sha256').update(before, 'utf8').digest('hex')).toBe(

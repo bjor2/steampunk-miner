@@ -79,6 +79,8 @@ export const DEFERRED_SCHEDULE_ROWS: Readonly<Record<DeferredScheduleHome, reado
     'finale',
     'endless_unlock',
     'finale_key',
+    // The star map's jump drive (ticket 759, #650): shipped in kernel code (`starMap/jumpDriveRules`).
+    'jump_drive',
   ],
 }
 
