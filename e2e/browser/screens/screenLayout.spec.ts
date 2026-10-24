@@ -44,6 +44,8 @@ const CANVAS_MAX_DPR = 2
 const LINED_BORE_DROP_MM = 5000
 const LINED_BORE_RADIUS_MM = 900
 const LINED_BORE_GRADE = 2
+/** Grade 2's plate metal in `casingGradeLooks.json` (ticket 830): plates[(2 - 1) mod 5]. */
+const LINED_BORE_PLATE = 'copper'
 /** Tiles either side of the bore's centre searched for its lined wall. */
 const LINED_SEARCH_TILES = 2
 /** A rounding pixel in the browser's layout. */
@@ -208,7 +210,7 @@ test.describe('screen matrix: UI (#173)', () => {
 })
 
 test.describe('screen matrix: ground (#173)', () => {
-  test('draws a lined cell that reads at the widest zoom and the render-scale floor (ticket 315)', async ({
+  test('draws a lined cell in its grade plate that reads at the widest zoom and the render-scale floor (tickets 315, 830)', async ({
     page,
   }) => {
     test.setTimeout(300_000)
@@ -228,7 +230,13 @@ test.describe('screen matrix: ground (#173)', () => {
       cell.renderScaleFloor
     await expect
       .poll(() => linedTileNear(page, centre, pixelsPerCell), { timeout: 60_000 })
-      .toMatchObject({ isLined: true, isReadable: true })
+      .toMatchObject({
+        isLined: true,
+        isReadable: true,
+        // The grade's plate metal rides the casing slot and the shader draws it (ticket 830).
+        casing: { plate: LINED_BORE_PLATE, finish: 'plain', pips: 0, liningType: 'standard' },
+        blinkShare: 0,
+      })
     expect(errors).toEqual([])
   })
 })

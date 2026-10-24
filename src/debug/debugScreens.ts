@@ -163,8 +163,9 @@ export interface DebugUi {
    */
   getTitleMenuModel(): DebugResult<{ model: TitleMenuModel | null }>
   /**
-   * Whether the drawn tile shows casing lining, and how it reads at `pixelsPerCell` over its band
-   * rock (ticket 315); null where no tile is drawn now.
+   * Whether the drawn tile shows casing lining, what its casing slot draws (its grade's plate,
+   * finish and pips and its lining type, ticket 830), how red it blinks over a warned block, and how
+   * it reads at `pixelsPerCell` over its band rock (ticket 315); null where no tile is drawn now.
    */
   getDrawnLiningAt(
     tx: unknown,

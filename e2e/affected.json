@@ -1172,6 +1172,24 @@
         "src/ui/platform/BayFooter.tsx"
       ],
       "specs": ["e2e/browser/ui/dockToggle.spec.ts"]
+    },
+    {
+      "why": "Casing grade looks, the red blink and the burst (ticket 830): the look rows and rule, the look channel through the mesher, the shader's plate, the blink uniforms, the burst sprays, the depth dial's band tint and the debug read the screen matrix asserts.",
+      "paths": [
+        "src/systems/render/casingGradeLooks.json",
+        "src/systems/render/casingGradeLook.ts",
+        "src/systems/render/casingLookBits.ts",
+        "src/systems/render/casingLiningLook.ts",
+        "src/systems/render/casingLiningCrop.ts",
+        "src/systems/render/casingBlink.ts",
+        "src/systems/render/casingBurst.ts",
+        "src/systems/render/liningCells.ts",
+        "src/scene/terrainCasingBlink.ts",
+        "src/scene/casingBurst.ts",
+        "src/systems/views/depthBandTint.ts",
+        "src/debug/debugLining.ts"
+      ],
+      "specs": ["e2e/browser/screens/screenLayout.spec.ts", "e2e/browser/render.spec.ts"]
     }
   ]
 }
