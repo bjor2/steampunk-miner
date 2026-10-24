@@ -4,8 +4,11 @@
  * pace-scaled, the same at every merchant; a consumable's is its own share of R at the buyer's g,
  * not pace-scaled, with one carry limit for all. The premium lift is in basis points and may never
  * pass +25% (VS row 4). `awayMarkup` is recorded as Systems' fallback and applied by nothing.
+ * `containers` holds the placed containers' caps per kind, per player and per planet, and the
+ * access a new one is placed with (the TD's final ruling on #823, points 1 and 5).
  */
 import { fromCanonical, isNonNegativeMoneyText, type Money } from '../../../systems/money'
+import { CONTAINER_ACCESS, type ContainerAccess } from './placedContainers'
 import { isPlainMap, isWholeFrom, SNAKE_ID, type Raw } from './planetKitRowShape'
 
 /** Where a price is read: the item's home planet's g, or the g of the planet it is bought on. */
@@ -28,12 +31,23 @@ export interface PlanetKitEconomy {
   consumableCarryLimit: number
   /** Each consumable's price rule, by item id. */
   consumablePrices: ReadonlyMap<string, KitPriceRule>
+  /** How many containers of each kind one player may have placed on one planet. */
+  containerCaps: ReadonlyMap<string, number>
+  /** The access a container is placed with. */
+  containerDefaultAccess: ContainerAccess
 }
 
 /** VS row 4: the ore premium is at most +25%. */
 export const PREMIUM_LIFT_CAP_BP = 2500
 const PRICED_AT: readonly PricedAt[] = ['home', 'buyer']
-const FIELDS: readonly string[] = ['source', 'premium', 'awayMarkup', 'tools', 'consumables']
+const FIELDS: readonly string[] = [
+  'source',
+  'premium',
+  'awayMarkup',
+  'tools',
+  'consumables',
+  'containers',
+]
 const CONSUMABLE_FIELDS: readonly string[] = [
   'carryLimit',
   'paceScaled',
@@ -49,6 +63,7 @@ export function planetKitEconomyProblems(economy: unknown): string[] {
     ...(isNonNegativeMoneyText(economy.awayMarkup) ? [] : ['awayMarkup must be money text']),
     ...toolsProblems(economy.tools),
     ...consumablesProblems(economy.consumables),
+    ...containersProblems(economy.containers),
     ...unknownFields(economy, '', FIELDS),
   ]
 }
@@ -58,12 +73,18 @@ export function planetKitEconomyOf(economy: Raw): PlanetKitEconomy {
   const premium = economy.premium as Raw
   const tools = economy.tools as Raw
   const consumables = economy.consumables as Raw
+  const containers = economy.containers as Raw
   return {
     premiumLiftBp: premium.liftBp as number,
     awayMarkup: fromCanonical(economy.awayMarkup as string),
     tools: priceRuleOf(tools.runValueShare as string, tools.paceScaled as boolean, tools.pricedAt),
     consumableCarryLimit: consumables.carryLimit as number,
     consumablePrices: consumablePricesOf(consumables),
+    containerCaps: new Map(Object.entries(containers.capPerPlayerPerPlanet as Raw)) as ReadonlyMap<
+      string,
+      number
+    >,
+    containerDefaultAccess: containers.defaultAccess as ContainerAccess,
   }
 }
 
@@ -120,6 +141,30 @@ function sharesProblems(shares: unknown): string[] {
     ...(isNonNegativeMoneyText(share)
       ? []
       : [`consumables.runValueShare.${id} must be money text`]),
+  ])
+}
+
+function containersProblems(containers: unknown): string[] {
+  if (!isPlainMap(containers))
+    return ['containers must be { capPerPlayerPerPlanet, defaultAccess }']
+  return [
+    ...containerCapsProblems(containers.capPerPlayerPerPlanet),
+    ...(CONTAINER_ACCESS.includes(containers.defaultAccess as ContainerAccess)
+      ? []
+      : [`containers.defaultAccess must be one of ${CONTAINER_ACCESS.join(', ')}`]),
+    ...unknownFields(containers, 'containers', ['capPerPlayerPerPlanet', 'defaultAccess']),
+  ]
+}
+
+function containerCapsProblems(caps: unknown): string[] {
+  if (!isPlainMap(caps)) return ['containers.capPerPlayerPerPlanet must map kinds to whole numbers']
+  return Object.entries(caps).flatMap(([kind, cap]) => [
+    ...(SNAKE_ID.test(kind)
+      ? []
+      : [`containers.capPerPlayerPerPlanet.${kind} is not a snake_case kind`]),
+    ...(isWholeFrom(cap, 1)
+      ? []
+      : [`containers.capPerPlayerPerPlanet.${kind} must be a whole number from 1`]),
   ])
 }
 

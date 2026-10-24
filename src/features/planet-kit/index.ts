@@ -44,3 +44,34 @@ export {
   premiumTagOf,
   stockOfMerchant,
 } from './systems/planetKitSales'
+export type {
+  ContainerAccess,
+  ContainerDrop,
+  ContainerPickup,
+  DropOutcome,
+  DropRefusal,
+  PickupOutcome,
+  PickupRefusal,
+  PlacedContainer,
+  PlacedContainers,
+  PlanetContainers,
+} from './systems/placedContainers'
+export {
+  canPickUp,
+  CONTAINER_ACCESS,
+  containedUnitsOf,
+  containerAt,
+  containersOn,
+  dropContainer,
+  dropRefusalOf,
+  NO_PLACED_CONTAINERS,
+  pickupContainer,
+  pickupRefusalOf,
+  placedCountOf,
+  shownContainersOn,
+} from './systems/placedContainers'
+export {
+  placedContainersOf,
+  placedContainersProblems,
+  toPortablePlacedContainers,
+} from './systems/placedContainersPortable'
