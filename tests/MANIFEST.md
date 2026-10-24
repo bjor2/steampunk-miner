@@ -856,6 +856,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/authority/combat/wreckerGuns.test.ts` | 10 | 4 |
 | `src/systems/authority/combat/wreckerRun.test.ts` | 16 | 16 |
 | `src/systems/authority/coreHarvest.test.ts` | 10 | 10 |
+| `src/systems/authority/coreNeededGoldens.test.ts` | 13 | 3 |
 | `src/systems/authority/cutFollowRead.test.ts` | 12 | 12 |
 | `src/systems/authority/cutShare.test.ts` | 3 | 3 |
 | `src/systems/authority/depthCurveTank.test.ts` | 78 | 2 |
@@ -1140,6 +1141,8 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/logging/commandLog.test.ts` | 15 | 15 |
 | `src/logging/commandLogPoseRuns.test.ts` | 13 | 11 |
 | `src/logging/compareRuns.test.ts` | 12 | 12 |
+| `src/logging/coreRevisit.lane.test.ts` | 2 | 2 |
+| `src/logging/coreRevisitBars.test.ts` | 5 | 5 |
 | `src/logging/devFlagReport.test.ts` | 8 | 8 |
 | `src/logging/diveCasing.test.ts` | 4 | 4 |
 | `src/logging/diveSummaries.test.ts` | 4 | 4 |

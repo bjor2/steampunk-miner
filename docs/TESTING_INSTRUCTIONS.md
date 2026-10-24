@@ -582,6 +582,17 @@ balance:report`, `oreValueCensus.lane.test.ts`.
   only `starMap.systemJump.fuelMultiplier`), and `systemJumpBars.test.ts` holds that bar on
   synthetic wallets and J's paper share (1.4 hops, 14% at the hop bar's middle). Hours of play, so
   it runs only when named.
+- **Per-planet core bay, the follow-up** (ticket 801, the VS and HS conditions on #790): the core
+  need is pinned at g = 1, 2, 5, 6 (system 2's planet 1), 10 and 1e6 on the pacing seeds to the size
+  row's `ceil(0.4 * coreTileCount)`, 63 on P1 and 127 from P2 on, with no g term
+  (`authority/coreNeededGoldens.test.ts`). The lane `src/logging/coreRevisit.lane.test.ts` plays each
+  of planets 1 to 4 to its core on the three pacing seeds and jumps on: the frontier rate is the
+  money a minute to the next planet's core. The revisit jumps back instead, lands on the completed
+  core with its full bay, and runs the bot's core trips until the shaft reaches the core again (the
+  fragments sell for nothing and complete nothing). On the median seed it must earn less a minute
+  than the frontier (`coreRevisitBars.ts`, the #756 back-travel bar); a miss goes to Systems and the
+  VS as a bay-cap or fragment-value row, never a bot retune. `coreRevisitBars.test.ts` holds the bar
+  on synthetic rates. Hours of play, so it runs only when named.
 - **Jump between solar systems** (ticket 759, spec #650): the data rows are pure
   (`economy/systemJump.test.ts`: J times the in-system units, the destination's unit price, the
   hardness step `k_jump^(s - 1)`, the jump drive's price, and the bignum goldens out of systems 1, 2,
