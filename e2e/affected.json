@@ -34,6 +34,11 @@
   ],
   "rules": [
     {
+      "why": "The planet-kit slice's Cache Crate (ticket 823): the placed container's markers, its list on the base sheet and the pickup its card sends.",
+      "paths": ["src/features/planet-kit/**"],
+      "specs": ["e2e/browser/cacheCrate.spec.ts"]
+    },
+    {
       "why": "The example slice answers smoke's features read, opens the slice screen, hangs the test piece and shows the shared UI parts (#423).",
       "paths": ["src/features/example/**"],
       "specs": [
