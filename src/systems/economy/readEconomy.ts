@@ -115,6 +115,7 @@ function readPrices(reader: FieldReader, prices: Record<string, unknown>): Econo
   return {
     referenceBand: reader.safeInteger('prices.referenceBand', prices.referenceBand),
     assayBeaconBand: reader.safeInteger('prices.assayBeaconBand', prices.assayBeaconBand),
+    orePremiumLiftCap: reader.money('prices.orePremiumLiftCap', prices.orePremiumLiftCap),
     chargePerEnergyUnit: reader.money('prices.chargePerEnergyUnit', prices.chargePerEnergyUnit),
     fullRepair: reader.money('prices.fullRepair', prices.fullRepair),
     rescueFee: {

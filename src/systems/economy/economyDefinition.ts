@@ -452,6 +452,11 @@ export interface Economy {
     referenceBand: number
     /** `assay_beacon` (#46): ore of the bands below this one sells at this band's unit price. */
     assayBeaconBand: number
+    /**
+     * The most a merchant's premium lifts its own ore's units at their origin (VS on #821, ticket
+     * 844): +25%, a ratio on V(t) that never stacks with another lift.
+     */
+    orePremiumLiftCap: Money
     chargePerEnergyUnit: Money
     fullRepair: Money
     rescueFee: { moneyFraction: Money; floor: Money; cap: Money }

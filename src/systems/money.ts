@@ -183,6 +183,20 @@ export function fromSafeInteger(count: number): Money {
   return wrap(new MoneyDecimal(count))
 }
 
+/** A whole count past the safe integers (a premium ledger's units, ticket 844) as money. */
+export function fromBigInt(count: bigint): Money {
+  return wrap(new MoneyDecimal(count.toString()))
+}
+
+/**
+ * An exact amount as its integer ratio in lowest terms (`1.5` reads 3/2), so sale lifts compare
+ * and apply without a float (ticket 844).
+ */
+export function integerRatioOf(amount: Money): { num: bigint; den: bigint } {
+  const [num, den] = unwrap(amount).toFraction()
+  return { num: BigInt(num.toFixed()), den: BigInt(den.toFixed()) }
+}
+
 /**
  * A bounded float (a rate or a share in the pacing bot's plan) as money, so the plan multiplies it
  * by a price in Money and never turns the price into a double, which is Infinity past 1.8e308
