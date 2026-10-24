@@ -3,13 +3,13 @@
   "schema": 1,
   "source": {
     "blend": "art/blender/vehicle-look-boiler/vehicle-look-boiler.blend",
-    "sha256": "4f47a9f835e43b7d5ddf960104179478de5be84801a9f9d91df804daf482b246",
+    "sha256": "91977a6e373cec01b1c5ef592ab55720f9ef61b5d9c0823d514ea665b63bb817",
     "blender": "4.2.9 LTS"
   },
   "pxPerMetre": 512,
   "atlasPx": [
-    512,
-    512
+    2048,
+    256
   ],
   "maps": {
     "albedo": "vehicle-look-boiler.albedo.ktx2",
@@ -18,7 +18,7 @@
   },
   "parts": [
     {
-      "id": "kettle-boiler",
+      "id": "firebox-boiler",
       "tier": 1,
       "rect": [
         8,
@@ -41,11 +41,126 @@
       "z": 3
     },
     {
+      "id": "gauged-boiler",
+      "tier": 1,
+      "rect": [
+        280,
+        8,
+        256,
+        164
+      ],
+      "sizeM": [
+        0.5,
+        0.3185
+      ],
+      "pivotM": [
+        0.24,
+        0.1175
+      ],
+      "atM": [
+        0.0,
+        0.0
+      ],
+      "z": 3
+    },
+    {
+      "id": "kettle-boiler",
+      "tier": 1,
+      "rect": [
+        552,
+        8,
+        256,
+        164
+      ],
+      "sizeM": [
+        0.5,
+        0.3185
+      ],
+      "pivotM": [
+        0.24,
+        0.1175
+      ],
+      "atM": [
+        0.0,
+        0.0
+      ],
+      "z": 3
+    },
+    {
+      "id": "manifold-boiler",
+      "tier": 1,
+      "rect": [
+        824,
+        8,
+        256,
+        164
+      ],
+      "sizeM": [
+        0.5,
+        0.3185
+      ],
+      "pivotM": [
+        0.24,
+        0.1175
+      ],
+      "atM": [
+        0.0,
+        0.0
+      ],
+      "z": 3
+    },
+    {
+      "id": "steam-drum-boiler",
+      "tier": 1,
+      "rect": [
+        1096,
+        8,
+        256,
+        164
+      ],
+      "sizeM": [
+        0.5,
+        0.3185
+      ],
+      "pivotM": [
+        0.24,
+        0.1175
+      ],
+      "atM": [
+        0.0,
+        0.0
+      ],
+      "z": 3
+    },
+    {
       "id": "twin-drum-boiler",
       "tier": 1,
       "rect": [
+        1368,
         8,
-        188,
+        256,
+        164
+      ],
+      "sizeM": [
+        0.5,
+        0.3185
+      ],
+      "pivotM": [
+        0.24,
+        0.1175
+      ],
+      "atM": [
+        0.0,
+        0.0
+      ],
+      "z": 3
+    },
+    {
+      "id": "whistle-boiler",
+      "tier": 1,
+      "rect": [
+        1640,
+        8,
         256,
         164
       ],

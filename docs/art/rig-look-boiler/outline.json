@@ -16,6 +16,46 @@
         "tier-3": 0
       },
       "differsFromSlotPart": 1060
+    },
+    "gauged-boiler": {
+      "cells": 4855,
+      "outsideRig": {
+        "tier-1": 0,
+        "tier-3": 0
+      },
+      "differsFromSlotPart": 1060
+    },
+    "whistle-boiler": {
+      "cells": 5003,
+      "outsideRig": {
+        "tier-1": 0,
+        "tier-3": 0
+      },
+      "differsFromSlotPart": 912
+    },
+    "manifold-boiler": {
+      "cells": 5115,
+      "outsideRig": {
+        "tier-1": 0,
+        "tier-3": 0
+      },
+      "differsFromSlotPart": 800
+    },
+    "steam-drum-boiler": {
+      "cells": 5196,
+      "outsideRig": {
+        "tier-1": 0,
+        "tier-3": 0
+      },
+      "differsFromSlotPart": 719
+    },
+    "firebox-boiler": {
+      "cells": 5196,
+      "outsideRig": {
+        "tier-1": 0,
+        "tier-3": 0
+      },
+      "differsFromSlotPart": 719
     }
   }
 }

@@ -90,7 +90,7 @@ describe('rig look table', () => {
     expect(fromsOf('drill_tip')).toEqual([60, 120, 180, 240, 300])
     expect(fromsOf('cargo_hold')).toEqual([11, 22, 33])
     expect(fromsOf('engine')).toEqual([5, 10, 15])
-    expect(fromsOf('boiler')).toEqual([5])
+    expect(fromsOf('boiler')).toEqual([5, 10, 15, 20, 25, 30])
     expect(fromsOf('hull')).toEqual([120, 240, 360, 480, 600])
   })
 
@@ -135,7 +135,14 @@ describe('rig look table', () => {
     ])
     expect(cardsOf('engine')).toEqual(['Single piston', 'Triple flywheel', 'Guild turbine'])
     expect(cardsOf('cargo_hold')).toEqual(['Plank crate', 'Ore hopper', 'Riveted bin'])
-    expect(cardsOf('boiler')).toEqual(['Twin-drum boiler'])
+    expect(cardsOf('boiler')).toEqual([
+      'Twin-drum boiler',
+      'Pressure gauge',
+      'Valve and whistle',
+      'Pipe manifold',
+      'Steam drum',
+      'Firebox door',
+    ])
   })
 
   it('has every upgrade track but combat, which waits for its own row block (#588)', () => {
@@ -292,7 +299,15 @@ describe('rig look table', () => {
 
   it('names each shipped look asset with the parts its Blender file has', () => {
     expect(RIG_LOOK_TABLE.lookAssets).toEqual({
-      'vehicle-look-boiler': ['kettle-boiler', 'twin-drum-boiler'],
+      'vehicle-look-boiler': [
+        'firebox-boiler',
+        'gauged-boiler',
+        'kettle-boiler',
+        'manifold-boiler',
+        'steam-drum-boiler',
+        'twin-drum-boiler',
+        'whistle-boiler',
+      ],
       'vehicle-look-cargo-hold': ['ore-hatch', 'ore-hopper', 'plank-crate', 'riveted-bin'],
       'vehicle-look-drill-tip': [
         'aether-cut-crown',

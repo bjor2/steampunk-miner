@@ -7,7 +7,7 @@
     "blender": null
   },
   "pxPerMetre": 512,
-  "atlasPx": [512, 512],
+  "atlasPx": [2048, 256],
   "maps": {
     "albedo": "vehicle-look-boiler.albedo.ktx2",
     "normal": "vehicle-look-boiler.normal.ktx2",
@@ -15,7 +15,7 @@
   },
   "parts": [
     {
-      "id": "kettle-boiler",
+      "id": "firebox-boiler",
       "tier": 1,
       "rect": [8, 8, 256, 164],
       "sizeM": [0.5, 0.3185],
@@ -24,9 +24,54 @@
       "z": 3
     },
     {
+      "id": "gauged-boiler",
+      "tier": 1,
+      "rect": [280, 8, 256, 164],
+      "sizeM": [0.5, 0.3185],
+      "pivotM": [0.24, 0.1175],
+      "atM": [0.0, 0.0],
+      "z": 3
+    },
+    {
+      "id": "kettle-boiler",
+      "tier": 1,
+      "rect": [552, 8, 256, 164],
+      "sizeM": [0.5, 0.3185],
+      "pivotM": [0.24, 0.1175],
+      "atM": [0.0, 0.0],
+      "z": 3
+    },
+    {
+      "id": "manifold-boiler",
+      "tier": 1,
+      "rect": [824, 8, 256, 164],
+      "sizeM": [0.5, 0.3185],
+      "pivotM": [0.24, 0.1175],
+      "atM": [0.0, 0.0],
+      "z": 3
+    },
+    {
+      "id": "steam-drum-boiler",
+      "tier": 1,
+      "rect": [1096, 8, 256, 164],
+      "sizeM": [0.5, 0.3185],
+      "pivotM": [0.24, 0.1175],
+      "atM": [0.0, 0.0],
+      "z": 3
+    },
+    {
       "id": "twin-drum-boiler",
       "tier": 1,
-      "rect": [8, 188, 256, 164],
+      "rect": [1368, 8, 256, 164],
+      "sizeM": [0.5, 0.3185],
+      "pivotM": [0.24, 0.1175],
+      "atM": [0.0, 0.0],
+      "z": 3
+    },
+    {
+      "id": "whistle-boiler",
+      "tier": 1,
+      "rect": [1640, 8, 256, 164],
       "sizeM": [0.5, 0.3185],
       "pivotM": [0.24, 0.1175],
       "atM": [0.0, 0.0],

@@ -5,7 +5,15 @@
     "rigBody": 1
   },
   "lookAssets": {
-    "vehicle-look-boiler": ["kettle-boiler", "twin-drum-boiler"],
+    "vehicle-look-boiler": [
+      "firebox-boiler",
+      "gauged-boiler",
+      "kettle-boiler",
+      "manifold-boiler",
+      "steam-drum-boiler",
+      "twin-drum-boiler",
+      "whistle-boiler"
+    ],
     "vehicle-look-cargo-hold": ["ore-hatch", "ore-hopper", "plank-crate", "riveted-bin"],
     "vehicle-look-drill-tip": [
       "aether-cut-crown",
@@ -201,7 +209,7 @@
       "replaces": "drill-bit",
       "plaque": {
         "step": "Fitting: {bandName}",
-        "tail": "Fitting: {bandName} · L{level}"
+        "tail": "Fitting: {bandName} \u00b7 L{level}"
       },
       "glowSlots": [
         [
@@ -272,7 +280,7 @@
       "slot": "chassis.drive",
       "plaque": {
         "step": "Fitting: {bandName}",
-        "tail": "Fitting: {bandName} · L{level}"
+        "tail": "Fitting: {bandName} \u00b7 L{level}"
       },
       "glowSlots": [["piston", "iron-track", "steel-track", "guild-track"]],
       "glowCap": "rigBody",
@@ -327,9 +335,20 @@
       "replaces": "boiler",
       "plaque": {
         "step": "Fitting: {bandName}",
-        "tail": "Fitting: {bandName} · L{level}"
+        "tail": "Fitting: {bandName} \u00b7 L{level}"
       },
-      "glowSlots": [["boiler", "boiler-2", "twin-drum-boiler"]],
+      "glowSlots": [
+        [
+          "boiler",
+          "boiler-2",
+          "twin-drum-boiler",
+          "gauged-boiler",
+          "whistle-boiler",
+          "manifold-boiler",
+          "steam-drum-boiler",
+          "firebox-boiler"
+        ]
+      ],
       "glowCap": "rigBody",
       "steps": [
         {
@@ -339,6 +358,46 @@
           "card": "Twin-drum boiler",
           "colour": "#ff7a3a",
           "glows": [0.5]
+        },
+        {
+          "from": 10,
+          "part": "gauged-boiler",
+          "asset": "vehicle-look-boiler",
+          "card": "Pressure gauge",
+          "colour": "#ff9a4a",
+          "glows": [0.54]
+        },
+        {
+          "from": 15,
+          "part": "whistle-boiler",
+          "asset": "vehicle-look-boiler",
+          "card": "Valve and whistle",
+          "colour": "#ffb85a",
+          "glows": [0.58]
+        },
+        {
+          "from": 20,
+          "part": "manifold-boiler",
+          "asset": "vehicle-look-boiler",
+          "card": "Pipe manifold",
+          "colour": "#ffd36a",
+          "glows": [0.62]
+        },
+        {
+          "from": 25,
+          "part": "steam-drum-boiler",
+          "asset": "vehicle-look-boiler",
+          "card": "Steam drum",
+          "colour": "#ffe98a",
+          "glows": [0.66]
+        },
+        {
+          "from": 30,
+          "part": "firebox-boiler",
+          "asset": "vehicle-look-boiler",
+          "card": "Firebox door",
+          "colour": "#fff6b0",
+          "glows": [0.7]
         }
       ],
       "band": {
@@ -365,7 +424,7 @@
       "replaces": "hopper",
       "plaque": {
         "step": "Fitting: {bandName}",
-        "tail": "Fitting: {bandName} · L{level}"
+        "tail": "Fitting: {bandName} \u00b7 L{level}"
       },
       "glowSlots": [["hopper", "plank-crate", "ore-hopper", "riveted-bin"]],
       "glowCap": "rigBody",
@@ -411,7 +470,7 @@
       "slot": "hull.plates",
       "plaque": {
         "step": "Fitting: {bandName}",
-        "tail": "Fitting: {bandName} · L{level}"
+        "tail": "Fitting: {bandName} \u00b7 L{level}"
       },
       "glowSlots": [
         [

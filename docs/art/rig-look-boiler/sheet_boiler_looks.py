@@ -1,13 +1,14 @@
 """
-The review sheets cut from render_boiler_looks.py's renders (ticket 582): the two looks alone,
-the rig at tiers 1 and 3 with each look on the slot, each row resampled to a 1080p screen's
+The review sheets cut from render_boiler_looks.py's renders (tickets 582 and 810): every look
+alone, the rig at tiers 1 and 3 with each look on the slot, each row resampled to a 1080p screen's
 90 px/m at the default 12 m zoom (#39) and to a 360 px wide phone's 30 px/m over the same zoom
 (the width the #576 ladder is judged at), the phone copy enlarged 8x with no smoothing so each
 phone pixel shows. It also measures what the eye is asked to judge and writes readability.json:
-how many phone pixels of the boiler's footprint change between the two looks, and the brightest
-pixel of the drill nose against the brightest of the boiler for each look, lit and by glow alone
-(the emission-only render, what the glow cap of #576 is about). Needs Pillow and numpy; run after
-the Blender render, which leaves its raw PNGs in build/ (removed here):
+how many phone pixels of the boiler's footprint each look changes against the one before it (at
+the default zoom and at the closest, where the sweep spec judges a step), and the brightest pixel
+of the drill nose against the brightest of the boiler for each look, lit and by glow alone (the
+emission-only render, what the glow cap of #576 is about). Needs Pillow and numpy; run after the
+Blender render, which leaves its raw PNGs in build/ (removed here):
 
     python3 docs/art/rig-look-boiler/sheet_boiler_looks.py
 """
@@ -34,6 +35,10 @@ INGAME_PX_PER_M = 90
 PHONE_WIDTH_PX = 360
 ZOOM_M = 12
 PHONE_PX_PER_M = PHONE_WIDTH_PX / ZOOM_M
+# The closest zoom (VIEW_SHORT_AXIS_MIN_M, 8 m), where the rig-look sweep spec judges one visible
+# step (ticket 809: at least 16 pixels moved by 24 of 255).
+CLOSEST_ZOOM_M = 8
+PHONE_CLOSEST_PX_PER_M = PHONE_WIDTH_PX / CLOSEST_ZOOM_M
 PHONE_ENLARGE = 8
 # render_casing_driller.FRAME: (centre x, centre z), width, height in metres.
 RIG_FRAME = ((0.05, 0.05), 2.1, 1.75)
@@ -121,13 +126,24 @@ def write_report(table, looks):
 
 
 def measured(tier, looks, boiler, nose):
-    phone = {part: resampled(flattened('tier-%d.%s' % (tier, part)), PHONE_PX_PER_M) for part in looks}
-    base, step = (phone[part] for part in looks)
+    """Each step against the look before it (ticket 810: every step reads at 360 px), at the
+    phone's px/m over the default zoom and over the closest zoom the sweep spec judges at."""
+    rendered = {part: flattened('tier-%d.%s' % (tier, part)) for part in looks}
+    phone = {part: resampled(image, PHONE_PX_PER_M) for part, image in rendered.items()}
     return {
         'phonePxPerM': PHONE_PX_PER_M,
-        'boilerFootprintPx': changed_pixels(base, step, boiler),
+        'boilerFootprintPx': stepped_pixels(phone, looks, boiler),
+        'closestZoomPxPerM': PHONE_CLOSEST_PX_PER_M,
+        'closestZoomBoilerFootprintPx': stepped_pixels(
+            {part: resampled(image, PHONE_CLOSEST_PX_PER_M) for part, image in rendered.items()}, looks, boiler),
         'brightest': {part: brightest_of_image(image, boiler, nose) for part, image in phone.items()},
     }
+
+
+def stepped_pixels(images, looks, bounds):
+    """The boiler-footprint pixels each look changes against the look before it."""
+    return {'%s->%s' % (before, after): changed_pixels(images[before], images[after], bounds)
+            for before, after in zip(looks, looks[1:])}
 
 
 def brightest_of(name, boiler, nose):
@@ -183,12 +199,14 @@ def part_bounds(part):
 
 def report_about(table, lit, glow):
     return {
-        'about': 'Ticket 582: at a 360 px wide phone (%g px/m over the 12 m zoom), the pixels of the %s footprint '
-                 'that change between the two looks (a channel moving more than %d of 255), and the brightest '
+        'about': 'Tickets 582 and 810: at a 360 px wide phone (%g px/m over the 12 m zoom, and %g px/m over the '
+                 'closest %g m zoom the sweep spec judges at), the pixels of the %s footprint that change between '
+                 'each look and the one before it (a channel moving more than %d of 255), and the brightest '
                  'pixel (Rec. 709 luminance, 0-255) of the drill nose against the boiler for each look, the nose lit '
                  'as while drilling: under `lit` on the phone-size renders, under `glow` on the tier-%d '
                  'emission-only render at 512 px/m; written by sheet_boiler_looks.py. The nose must stay the '
-                 'brightest glow.' % (PHONE_PX_PER_M, table['replaces'], CHANGED_THRESHOLD, GLOW_TIER),
+                 'brightest glow.' % (PHONE_PX_PER_M, PHONE_CLOSEST_PX_PER_M, CLOSEST_ZOOM_M, table['replaces'],
+                                      CHANGED_THRESHOLD, GLOW_TIER),
         'lit': lit,
         'glow': glow,
     }

@@ -81,10 +81,25 @@ boiler
 4: band 0 step 0 tail 0 pips 0 part null finish null tint null | null
 5: band 1 step 1 tail 0 pips 0 part twin-drum-boiler finish null tint #ff7a3a | Fitting: Twin-drum boiler
 6: band 1 step 1 tail 0 pips 0 part twin-drum-boiler finish null tint #ff7a3a | Fitting: Twin-drum boiler
-10: band 2 step 1 tail 1 pips 0 part twin-drum-boiler finish aged-copper tint #b06a3c | Fitting: Aged copper · L10
-99: band 19 step 1 tail 18 pips 3 part twin-drum-boiler finish polished-chrome tint #e8eef4 | Fitting: Polished chrome · L99
-9999: band 1999 step 1 tail 1998 pips 399 part twin-drum-boiler finish polished-chrome tint #e8eef4 | Fitting: Polished chrome · L9,999
-1000000: band 200000 step 1 tail 199999 pips 40000 part twin-drum-boiler finish aged-copper tint #b06a3c | Fitting: Aged copper · L1,000,000
+9: band 1 step 1 tail 0 pips 0 part twin-drum-boiler finish null tint #ff7a3a | Fitting: Twin-drum boiler
+10: band 2 step 2 tail 0 pips 0 part gauged-boiler finish null tint #ff9a4a | Fitting: Pressure gauge
+11: band 2 step 2 tail 0 pips 0 part gauged-boiler finish null tint #ff9a4a | Fitting: Pressure gauge
+14: band 2 step 2 tail 0 pips 0 part gauged-boiler finish null tint #ff9a4a | Fitting: Pressure gauge
+15: band 3 step 3 tail 0 pips 0 part whistle-boiler finish null tint #ffb85a | Fitting: Valve and whistle
+16: band 3 step 3 tail 0 pips 0 part whistle-boiler finish null tint #ffb85a | Fitting: Valve and whistle
+19: band 3 step 3 tail 0 pips 0 part whistle-boiler finish null tint #ffb85a | Fitting: Valve and whistle
+20: band 4 step 4 tail 0 pips 0 part manifold-boiler finish null tint #ffd36a | Fitting: Pipe manifold
+21: band 4 step 4 tail 0 pips 0 part manifold-boiler finish null tint #ffd36a | Fitting: Pipe manifold
+24: band 4 step 4 tail 0 pips 0 part manifold-boiler finish null tint #ffd36a | Fitting: Pipe manifold
+25: band 5 step 5 tail 0 pips 0 part steam-drum-boiler finish null tint #ffe98a | Fitting: Steam drum
+26: band 5 step 5 tail 0 pips 0 part steam-drum-boiler finish null tint #ffe98a | Fitting: Steam drum
+29: band 5 step 5 tail 0 pips 0 part steam-drum-boiler finish null tint #ffe98a | Fitting: Steam drum
+30: band 6 step 6 tail 0 pips 0 part firebox-boiler finish null tint #fff6b0 | Fitting: Firebox door
+31: band 6 step 6 tail 0 pips 0 part firebox-boiler finish null tint #fff6b0 | Fitting: Firebox door
+35: band 7 step 6 tail 1 pips 1 part firebox-boiler finish aged-copper tint #b06a3c | Fitting: Aged copper · L35
+99: band 19 step 6 tail 13 pips 3 part firebox-boiler finish aged-copper tint #b06a3c | Fitting: Aged copper · L99
+9999: band 1999 step 6 tail 1993 pips 399 part firebox-boiler finish aged-copper tint #b06a3c | Fitting: Aged copper · L9,999
+1000000: band 200000 step 6 tail 199994 pips 40000 part firebox-boiler finish gunmetal tint #4c5258 | Fitting: Gunmetal · L1,000,000
 
 cargo_hold
 0: band 0 step 0 tail 0 pips 0 part null finish null tint null | null

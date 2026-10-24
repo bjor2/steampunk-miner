@@ -102,9 +102,23 @@ test.describe('rig look ladder (#577)', () => {
   })
 })
 
-/** The boiler's one authored step on its first edge (ticket 809) and finish bands above it. */
-const BOILER_COUNTS = [4, 5, 10, 40]
-const BOILER_LOOK_PART = 'vehicle-look-boiler/twin-drum-boiler'
+/**
+ * The purchase before the boiler's first edge, each authored step on its band edge of 5 (tickets
+ * 809 and 810: the twin-drum boiler, then a part fitted per step), and two finish bands above the
+ * top step, which keep the top part.
+ */
+const BOILER_COUNTS: readonly { purchases: number; part: string | null }[] = [
+  { purchases: 4, part: null },
+  { purchases: 5, part: 'twin-drum-boiler' },
+  { purchases: 10, part: 'gauged-boiler' },
+  { purchases: 15, part: 'whistle-boiler' },
+  { purchases: 20, part: 'manifold-boiler' },
+  { purchases: 25, part: 'steam-drum-boiler' },
+  { purchases: 30, part: 'firebox-boiler' },
+  { purchases: 35, part: 'firebox-boiler' },
+  { purchases: 40, part: 'firebox-boiler' },
+]
+const boilerLookIdOf = (part: string) => `vehicle-look-boiler/${part}`
 const VIEWPORTS = [
   { name: 'desktop', width: 1280, height: 720 },
   { name: 'phone', width: 360, height: 780 },
@@ -123,15 +137,15 @@ function vehiclePartsOf(page: Page): Promise<PartsReading> {
   })
 }
 
-test.describe('boiler rig look (ticket 583)', () => {
+test.describe('boiler rig look (tickets 583 and 810)', () => {
   for (const viewport of VIEWPORTS) {
-    test(`swaps the twin-drum boiler in at 5 on every finish band, ${viewport.name}`, async ({
+    test(`fits each boiler step's part on its edge and keeps the top one above, ${viewport.name}`, async ({
       page,
     }) => {
       await page.setViewportSize(viewport)
       const errors = await openGame(page)
       const readings: PartsReading[] = []
-      for (const purchases of BOILER_COUNTS) {
+      for (const { purchases } of BOILER_COUNTS) {
         await setUpgrade(page, 'boiler', purchases)
         await expect.poll(async () => (await rigLookOf(page, 'boiler')).purchases).toBe(purchases)
         readings.push(await vehiclePartsOf(page))
@@ -140,12 +154,19 @@ test.describe('boiler rig look (ticket 583)', () => {
           contentType: 'image/png',
         })
       }
-      expect(readings[0].lookPartIds).not.toContain(BOILER_LOOK_PART)
-      expect(readings[0].partIds.some((id) => id.endsWith('-boiler'))).toBe(true)
-      for (const reading of readings.slice(1)) {
-        expect(reading.lookPartIds).toContain(BOILER_LOOK_PART)
+      const boilerLookIds = BOILER_COUNTS.flatMap(({ part }) =>
+        part === null ? [] : [boilerLookIdOf(part)],
+      )
+      BOILER_COUNTS.forEach(({ part }, at) => {
+        const reading = readings[at]
+        if (part === null) {
+          expect(reading.lookPartIds.filter((id) => boilerLookIds.includes(id))).toEqual([])
+          expect(reading.partIds.some((id) => /^t\d-boiler$/.test(id))).toBe(true)
+          return
+        }
+        expect(reading.lookPartIds).toContain(boilerLookIdOf(part))
         expect(reading.partIds.some((id) => /^t\d-boiler$/.test(id))).toBe(false)
-      }
+      })
       expect(errors).toEqual([])
     })
   }

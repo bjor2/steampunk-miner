@@ -1,5 +1,5 @@
 {
-  "about": "The boiler track's rig-look parts (ticket 582, wave 576-1B of the rig look ladder #576): one asset at the track's attach slot, one part per look step. The thresholds are Systems' table (#157, comment 6300543785) and the names Progression's (comment 6300549964); the wiring (#583) reads them from the rig-look registry (#577), not from here.",
+  "about": "The boiler track's rig-look parts (ticket 582, wave 576-1B of the rig look ladder #576; the LK2 steps of ticket 810, wave 647-7K): one asset at the track's attach slot, one part per look step. The thresholds are the band edges LK1 (#809) froze for the boiler, step 5, and the names the data strings of 3 words or fewer the hover line shows; the wiring reads them from rigLook.json (#577), not from here.",
   "assetId": "vehicle-look-boiler",
   "track": "boiler",
   "attach": "hull.boiler",
@@ -15,7 +15,32 @@
     {
       "part": "twin-drum-boiler",
       "name": "Twin-drum boiler",
-      "purchases": 16
+      "purchases": 5
+    },
+    {
+      "part": "gauged-boiler",
+      "name": "Pressure gauge",
+      "purchases": 10
+    },
+    {
+      "part": "whistle-boiler",
+      "name": "Valve and whistle",
+      "purchases": 15
+    },
+    {
+      "part": "manifold-boiler",
+      "name": "Pipe manifold",
+      "purchases": 20
+    },
+    {
+      "part": "steam-drum-boiler",
+      "name": "Steam drum",
+      "purchases": 25
+    },
+    {
+      "part": "firebox-boiler",
+      "name": "Firebox door",
+      "purchases": 30
     }
   ]
 }

@@ -11,10 +11,25 @@ import { rigLookOf, SHIPPED_RIG_LOOKS, trackLookFramesOf } from './rigLooks'
 import { partSwapsOf } from './render/rigLookParts'
 import { everyLookFrameOf } from './render/rigLookFrames'
 
-/** The boiler's first band edge of 5 (ticket 809): the one authored step, Twin-drum boiler. */
-const TOP_STEP = 5
+/**
+ * The boiler's authored steps on its band edges of 5 (ticket 809): the twin-drum boiler (ticket
+ * 583), then each LK2 part fitted in its socket in G&V's order (ticket 810). Past the top step the
+ * finish bands keep the top part.
+ */
 const BAND = 5
-const TAIL_POINTS = [10, 15, 1_000, 10_000]
+const STEPS: readonly { from: number; part: string }[] = [
+  { from: 5, part: 'twin-drum-boiler' },
+  { from: 10, part: 'gauged-boiler' },
+  { from: 15, part: 'whistle-boiler' },
+  { from: 20, part: 'manifold-boiler' },
+  { from: 25, part: 'steam-drum-boiler' },
+  { from: 30, part: 'firebox-boiler' },
+]
+const FIRST_STEP = STEPS[0].from
+const TOP = STEPS[STEPS.length - 1]
+const TAIL_POINTS = [TOP.from + BAND, TOP.from + 2 * BAND, 1_000, 10_000]
+
+const lookIdOf = (part: string) => `vehicle-look-boiler/${part}`
 
 function swapsAt(n: number) {
   const frame = rigLookOf('boiler', n)
@@ -31,48 +46,60 @@ function withBoilerLevel(state: AuthorityState, level: number): AuthorityState {
   return { ...state, players: { ...state.players, p1: { ...player, vehicle } } }
 }
 
-describe('boiler rig look (ticket 583)', () => {
+describe('boiler rig look (tickets 583 and 810)', () => {
   it('keeps the rig boiler below 5 purchases', () => {
-    expect(swapsAt(TOP_STEP - 1)).toEqual([])
-    expect(drawnSlotsAt(TOP_STEP - 1, 1)).toContain('boiler')
+    expect(swapsAt(FIRST_STEP - 1)).toEqual([])
+    expect(drawnSlotsAt(FIRST_STEP - 1, 1)).toContain('boiler')
   })
 
-  it('swaps the twin-drum boiler in at 5, in place of the rig boiler', () => {
-    expect(rigLookOf('boiler', TOP_STEP)?.step).toBe(1)
-    expect(lookPartIdsOf(SHIPPED_ART, swapsAt(TOP_STEP))).toEqual([
-      'vehicle-look-boiler/twin-drum-boiler',
-    ])
-    expect(drawnSlotsAt(TOP_STEP, 1)).not.toContain('boiler')
+  it('has at least 5 authored steps, one on each of the first band edges', () => {
+    expect(STEPS.length).toBeGreaterThanOrEqual(5)
+    STEPS.forEach((step, at) => {
+      expect(step.from).toBe((at + 1) * BAND)
+      expect(rigLookOf('boiler', step.from)?.step).toBe(at + 1)
+    })
   })
 
-  it.each([1, 2, 3])('draws the twin-drum boiler on hull.boiler at visual tier %i', (tier) => {
-    const [drawn] = lookBodyQuadsOf(SHIPPED_ART, swapsAt(TOP_STEP))
-    expect(drawn.quad.partId).toBe('twin-drum-boiler')
-    expect(drawnSlotsAt(TOP_STEP, tier)).not.toContain('boiler')
-  })
+  it.each(STEPS)(
+    'swaps $part in at $from, in place of the rig boiler, to the next edge',
+    (step) => {
+      for (const n of [step.from, step.from + BAND - 1]) {
+        expect(lookPartIdsOf(SHIPPED_ART, swapsAt(n))).toEqual([lookIdOf(step.part)])
+        expect(drawnSlotsAt(n, 1)).not.toContain('boiler')
+      }
+    },
+  )
 
-  it('keeps the twin-drum boiler on every finish band above the top step', () => {
-    for (const n of TAIL_POINTS) {
-      expect(lookPartIdsOf(SHIPPED_ART, swapsAt(n))).toEqual([
-        'vehicle-look-boiler/twin-drum-boiler',
-      ])
+  it.each([1, 2, 3])('draws every look part on hull.boiler at visual tier %i', (tier) => {
+    for (const step of STEPS) {
+      const [drawn] = lookBodyQuadsOf(SHIPPED_ART, swapsAt(step.from))
+      expect(drawn.quad.partId).toBe(step.part)
+      expect(drawnSlotsAt(step.from, tier)).not.toContain('boiler')
     }
   })
 
-  it('shows a different look on each neighbouring band from the step on', () => {
-    for (let n = TOP_STEP - 1; n < TOP_STEP + 60 * BAND; n += BAND) {
+  it('keeps the firebox door boiler on every finish band above the top step', () => {
+    for (const n of TAIL_POINTS) {
+      expect(lookPartIdsOf(SHIPPED_ART, swapsAt(n))).toEqual([lookIdOf(TOP.part)])
+    }
+  })
+
+  it('shows a different look on each neighbouring band from the first step on', () => {
+    for (let n = FIRST_STEP - 1; n < FIRST_STEP + 60 * BAND; n += BAND) {
       expect(rigLookOf('boiler', n + BAND)).not.toEqual(rigLookOf('boiler', n))
     }
   })
 
-  it('lights the twin-drum boiler itself, so a finish shows on the look part', () => {
+  it('lights every look part itself, under the rigBody cap, so a finish shows on it', () => {
     const frames = trackLookFramesOf(SHIPPED_RIG_LOOKS, 'boiler')!
-    expect(frames.rows.glowSlots.flat()).toContain(slotOfPartId('twin-drum-boiler'))
+    for (const step of STEPS) {
+      expect(frames.rows.glowSlots.flat()).toContain(slotOfPartId(step.part))
+    }
     expect(everyLookFrameOf(frames).every((frame) => frame.glows.every((g) => g < 1))).toBe(true)
   })
 
   it('leaves the state digest byte-identical at the lowest and the highest look', () => {
-    for (const n of [TOP_STEP, 10_000]) {
+    for (const n of [FIRST_STEP, 10_000]) {
       const state = withBoilerLevel(createScriptedSession().state(), n)
       const digest = stateDigest(state)
       for (const source of createRigLookSources()) source.lookOf(state, 'p1', 0)

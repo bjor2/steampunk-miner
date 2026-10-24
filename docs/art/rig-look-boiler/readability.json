@@ -1,11 +1,60 @@
 {
-  "about": "Ticket 582: at a 360 px wide phone (30 px/m over the 12 m zoom), the pixels of the t1-boiler footprint that change between the two looks (a channel moving more than 24 of 255), and the brightest pixel (Rec. 709 luminance, 0-255) of the drill nose against the boiler for each look, the nose lit as while drilling: under `lit` on the phone-size renders, under `glow` on the tier-1 emission-only render at 512 px/m; written by sheet_boiler_looks.py. The nose must stay the brightest glow.",
+  "about": "Tickets 582 and 810: at a 360 px wide phone (30 px/m over the 12 m zoom, and 45 px/m over the closest 8 m zoom the sweep spec judges at), the pixels of the t1-boiler footprint that change between each look and the one before it (a channel moving more than 24 of 255), and the brightest pixel (Rec. 709 luminance, 0-255) of the drill nose against the boiler for each look, the nose lit as while drilling: under `lit` on the phone-size renders, under `glow` on the tier-1 emission-only render at 512 px/m; written by sheet_boiler_looks.py. The nose must stay the brightest glow.",
   "lit": {
     "tier-1": {
       "phonePxPerM": 30.0,
       "boilerFootprintPx": {
-        "changed": 61,
-        "of": 176
+        "kettle-boiler->twin-drum-boiler": {
+          "changed": 61,
+          "of": 176
+        },
+        "twin-drum-boiler->gauged-boiler": {
+          "changed": 12,
+          "of": 176
+        },
+        "gauged-boiler->whistle-boiler": {
+          "changed": 17,
+          "of": 176
+        },
+        "whistle-boiler->manifold-boiler": {
+          "changed": 17,
+          "of": 176
+        },
+        "manifold-boiler->steam-drum-boiler": {
+          "changed": 11,
+          "of": 176
+        },
+        "steam-drum-boiler->firebox-boiler": {
+          "changed": 8,
+          "of": 176
+        }
+      },
+      "closestZoomPxPerM": 45.0,
+      "closestZoomBoilerFootprintPx": {
+        "kettle-boiler->twin-drum-boiler": {
+          "changed": 149,
+          "of": 345
+        },
+        "twin-drum-boiler->gauged-boiler": {
+          "changed": 29,
+          "of": 345
+        },
+        "gauged-boiler->whistle-boiler": {
+          "changed": 33,
+          "of": 345
+        },
+        "whistle-boiler->manifold-boiler": {
+          "changed": 38,
+          "of": 345
+        },
+        "manifold-boiler->steam-drum-boiler": {
+          "changed": 26,
+          "of": 345
+        },
+        "steam-drum-boiler->firebox-boiler": {
+          "changed": 21,
+          "of": 345
+        }
       },
       "brightest": {
         "kettle-boiler": {
@@ -15,14 +64,83 @@
         "twin-drum-boiler": {
           "nose": 203,
           "boiler": 209
+        },
+        "gauged-boiler": {
+          "nose": 203,
+          "boiler": 215
+        },
+        "whistle-boiler": {
+          "nose": 203,
+          "boiler": 215
+        },
+        "manifold-boiler": {
+          "nose": 203,
+          "boiler": 213
+        },
+        "steam-drum-boiler": {
+          "nose": 203,
+          "boiler": 213
+        },
+        "firebox-boiler": {
+          "nose": 203,
+          "boiler": 215
         }
       }
     },
     "tier-3": {
       "phonePxPerM": 30.0,
       "boilerFootprintPx": {
-        "changed": 61,
-        "of": 176
+        "kettle-boiler->twin-drum-boiler": {
+          "changed": 61,
+          "of": 176
+        },
+        "twin-drum-boiler->gauged-boiler": {
+          "changed": 12,
+          "of": 176
+        },
+        "gauged-boiler->whistle-boiler": {
+          "changed": 16,
+          "of": 176
+        },
+        "whistle-boiler->manifold-boiler": {
+          "changed": 18,
+          "of": 176
+        },
+        "manifold-boiler->steam-drum-boiler": {
+          "changed": 11,
+          "of": 176
+        },
+        "steam-drum-boiler->firebox-boiler": {
+          "changed": 9,
+          "of": 176
+        }
+      },
+      "closestZoomPxPerM": 45.0,
+      "closestZoomBoilerFootprintPx": {
+        "kettle-boiler->twin-drum-boiler": {
+          "changed": 149,
+          "of": 345
+        },
+        "twin-drum-boiler->gauged-boiler": {
+          "changed": 28,
+          "of": 345
+        },
+        "gauged-boiler->whistle-boiler": {
+          "changed": 33,
+          "of": 345
+        },
+        "whistle-boiler->manifold-boiler": {
+          "changed": 38,
+          "of": 345
+        },
+        "manifold-boiler->steam-drum-boiler": {
+          "changed": 26,
+          "of": 345
+        },
+        "steam-drum-boiler->firebox-boiler": {
+          "changed": 21,
+          "of": 345
+        }
       },
       "brightest": {
         "kettle-boiler": {
@@ -32,6 +150,26 @@
         "twin-drum-boiler": {
           "nose": 253,
           "boiler": 209
+        },
+        "gauged-boiler": {
+          "nose": 253,
+          "boiler": 215
+        },
+        "whistle-boiler": {
+          "nose": 253,
+          "boiler": 215
+        },
+        "manifold-boiler": {
+          "nose": 253,
+          "boiler": 213
+        },
+        "steam-drum-boiler": {
+          "nose": 253,
+          "boiler": 213
+        },
+        "firebox-boiler": {
+          "nose": 253,
+          "boiler": 215
         }
       }
     }
@@ -44,6 +182,26 @@
     "twin-drum-boiler": {
       "nose": 247,
       "boiler": 142
+    },
+    "gauged-boiler": {
+      "nose": 247,
+      "boiler": 143
+    },
+    "whistle-boiler": {
+      "nose": 247,
+      "boiler": 143
+    },
+    "manifold-boiler": {
+      "nose": 247,
+      "boiler": 148
+    },
+    "steam-drum-boiler": {
+      "nose": 247,
+      "boiler": 143
+    },
+    "firebox-boiler": {
+      "nose": 247,
+      "boiler": 152
     }
   }
 }
