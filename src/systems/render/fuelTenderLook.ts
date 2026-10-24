@@ -1,7 +1,8 @@
 /**
  * The coal tender's look ladder (ticket 758; the GD lock on #650: the fuel tank "shows on the rig
  * as a coal tender wagon on the #576 ladder"): which wagon the rig draws at its hitch for a tank
- * level, and the tint the tail paints above the top step. A pure function of the level alone (HS
+ * level, and above the top step the log tail (ticket 809): one finish a purchase, cycled, and pips
+ * counting decades of tank capacity, in integer maths only. A pure function of the level alone (HS
  * on #576), read from `fuelTender.json`; the table is refused whole at load, every problem listed,
  * so a broken row fails the specs and the game's start, never a frame. The tank's level is
  * `vehicleFuel.ts`'s `fuelTankLevelOf`, 1 before the first purchase.
@@ -17,12 +18,21 @@ export interface FuelTenderStep {
   card: string
 }
 
+/** A finish the tail wears: a material named in 3 words or fewer, in its colour. */
+export interface FuelTenderFinish {
+  name: string
+  /** `#rrggbb`. */
+  colour: string
+}
+
 export interface FuelTenderTail {
-  /** Purchases per tail step (the GD lock on #576: 1). */
+  /** Purchases per tail step (the GD lock on #576: 1; the tender keeps it under ticket 809). */
   delta: number
-  /** `#rrggbb` tints, one per tail step, cycling. */
-  palette: readonly string[]
-  /** The glow the tint paints with, under the rig body's cap. */
+  /** Tank levels that raise its capacity tenfold: ceil(ln 10 / ln 1.3), economy.json's ratio. */
+  decadeStep: number
+  /** One per tail step, cycling; at least `decadeStep / delta`, so finish and pips never repeat. */
+  finishes: readonly FuelTenderFinish[]
+  /** The glow the finish paints with, under the rig body's cap. */
   glow: number
 }
 
@@ -43,15 +53,19 @@ export interface FuelTenderLook {
   step: number
   /** Tail steps above the top step, 0 on or below it. */
   tail: number
-  /** The tail's tint, null on or below the top step. */
+  /** The tail's finish colour, null on or below the top step. */
   tint: string | null
+  /** The tail's finish name for the hover line, null on or below the top step. */
+  finish: string | null
+  /** Decades of tank capacity the tail's pips count, 0 on or below the top step. */
+  pips: number
   glow: number
 }
 
 /** The level every vehicle starts at, before any tank purchase (`economy/fuelTank.ts`). */
 const FIRST_LEVEL = 1
-const LADDER_MIN = 2
-const LADDER_MAX = 8
+const FINISHES_MAX = 12
+const BAND_NAME_WORDS_MAX = 3
 
 export class FuelTenderTableError extends Error {
   constructor(readonly problems: readonly string[]) {
@@ -75,14 +89,16 @@ export function fuelTenderLookOf(
 ): FuelTenderLook {
   const step = stepIndexAt(table.steps, level)
   const tail = tailStepsAt(table, level)
-  const tint = tintAt(table.tail, tail)
+  const finish = finishAt(table.tail, tail)
   return {
     partId: table.steps[step].part,
     card: table.steps[step].card,
     step,
     tail,
-    tint,
-    glow: tint === null ? 0 : table.tail.glow,
+    tint: finish?.colour ?? null,
+    finish: finish?.name ?? null,
+    pips: tail === 0 ? 0 : decadesAt(table.tail, level),
+    glow: finish === null ? 0 : table.tail.glow,
   }
 }
 
@@ -106,10 +122,15 @@ function tailStepsAt(table: FuelTenderTable, level: number): number {
   return level <= top ? 0 : Math.floor((level - top) / table.tail.delta)
 }
 
-/** The tail step reached from 1 wears the palette's first colour, and the ladder wraps. */
-function tintAt(tail: FuelTenderTail, tailStep: number): string | null {
+/** The tail step reached from 1 wears the first finish, and the cycle wraps. */
+function finishAt(tail: FuelTenderTail, tailStep: number): FuelTenderFinish | null {
   if (tailStep === 0) return null
-  return tail.palette[(tailStep - 1) % tail.palette.length]
+  return tail.finishes[(tailStep - 1) % tail.finishes.length]
+}
+
+/** Whole decades of capacity over the starting tank: integer division, no float power. */
+function decadesAt(tail: FuelTenderTail, level: number): number {
+  return Math.floor((level - FIRST_LEVEL) / tail.decadeStep)
 }
 
 /** Every problem with `table`; empty when it is sound. */
@@ -160,19 +181,44 @@ function tailProblemsOf(tail: FuelTenderTail): string[] {
   const problems: string[] = []
   if (!Number.isSafeInteger(tail.delta) || tail.delta < 1)
     problems.push('tail.delta must be 1 or more')
-  if (tail.palette.length < LADDER_MIN || tail.palette.length > LADDER_MAX) {
-    problems.push(`tail.palette must hold ${LADDER_MIN} to ${LADDER_MAX} colours`)
-  }
-  for (const colour of tail.palette) {
-    if (!isHexColour(colour)) problems.push(`tail.palette: "${colour}" is not #rrggbb`)
+  if (!Number.isSafeInteger(tail.decadeStep) || tail.decadeStep < 1)
+    problems.push('tail.decadeStep must be 1 or more')
+  problems.push(...finishCountProblemsOf(tail))
+  for (const { name, colour } of tail.finishes) {
+    if (!isHexColour(colour)) problems.push(`tail.finishes: "${colour}" is not #rrggbb`)
+    if (!isBandName(name)) problems.push(`tail.finishes: "${name}" is not 1 to 3 words`)
   }
   if (!(tail.glow > 0 && tail.glow < 1)) problems.push('tail.glow must lie between 0 and 1')
-  return [...problems, ...neighbourProblemsOf(tail.palette)]
+  return [...problems, ...neighbourProblemsOf(tail.finishes)]
+}
+
+/** Enough finishes that two tail steps sharing one are a decade of capacity apart. */
+function finishCountProblemsOf(tail: FuelTenderTail): string[] {
+  const needed = Math.max(2, Math.ceil(tail.decadeStep / tail.delta))
+  const count = tail.finishes.length
+  return count >= needed && count <= FINISHES_MAX
+    ? []
+    : [`tail.finishes must hold ${needed} to ${FINISHES_MAX} finishes`]
+}
+
+function isBandName(name: string): boolean {
+  const words = name
+    .trim()
+    .split(/\s+/)
+    .filter((word) => word.length > 0)
+  return words.length >= 1 && words.length <= BAND_NAME_WORDS_MAX
 }
 
 /** No two neighbouring tail steps alike, the wrap included, so neighbouring purchases differ. */
-function neighbourProblemsOf(palette: readonly string[]): string[] {
-  return palette
-    .filter((colour, at) => palette.length > 1 && colour === palette[(at + 1) % palette.length])
-    .map((colour) => `tail.palette: "${colour}" repeats on neighbouring steps`)
+function neighbourProblemsOf(finishes: readonly FuelTenderFinish[]): string[] {
+  return finishes
+    .filter(
+      (finish, at) =>
+        finishes.length > 1 && isSameFinish(finish, finishes[(at + 1) % finishes.length]),
+    )
+    .map((finish) => `tail.finishes: "${finish.name}" repeats on neighbouring steps`)
+}
+
+function isSameFinish(a: FuelTenderFinish, b: FuelTenderFinish): boolean {
+  return a.name === b.name || a.colour === b.colour
 }

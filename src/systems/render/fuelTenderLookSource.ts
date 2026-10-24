@@ -1,10 +1,11 @@
 /**
  * The coal tender's tail on the kernel vehicle (ticket 758; the GD lock on #650 and the #576
- * ladder): above the ladder's top step every tank purchase tints the wagon on through the bounded
- * palette, painted as a glow on the wagon's part slot through the vehicle look fold, the way the
+ * ladder; the log tail of ticket 809): above the ladder's top step every tank purchase wears the
+ * next finish of its cycle, painted as a glow in the finish's colour on the wagon's part slot
+ * through the vehicle look fold (the rig-look slice draws its pips beside it), the way the
  * rig-look slice paints its tracks' tails. One kernel source, reading only the player's tank level
- * from the state (HS on #576: no stat, price or planet read), answering a kept look per palette
- * colour so a frame allocates nothing; null on and below the top step, so the base wagons look as
+ * from the state (HS on #576: no stat, price or planet read), answering a kept look per
+ * finish so a frame allocates nothing; null on and below the top step, so the base wagons look as
  * they are. Never a flash.
  */
 import { vehicleOf, type AuthorityState } from '../authority/authorityState'
@@ -37,11 +38,11 @@ function tintOf(table: FuelTenderTable, state: AuthorityState, playerId: string)
   return fuelTenderLookOf(fuelTankLevelOf(vehicleOf(state, playerId)), table).tint
 }
 
-/** One look per palette colour, on the top step's wagon slot. */
+/** One look per finish colour, on the top step's wagon slot. */
 function keepTailLooksOf(table: FuelTenderTable): Map<string, VehicleLook> {
   const topPart = table.steps[table.steps.length - 1].part
   return new Map(
-    table.tail.palette.map((colour) => [
+    table.tail.finishes.map(({ colour }) => [
       colour,
       {
         tint: null,

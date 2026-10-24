@@ -5,13 +5,14 @@ import { FUEL_TENDER_TABLE } from './fuelTenderLook'
 import { createDrawnVehicleLook, createLookFlashes, drawVehicleLookAt } from './vehicleLookFold'
 
 // The coal tender's tail (ticket 758; the #576 ladder): above the top step every tank purchase
-// tints the wagon on, painted through the kernel vehicle look; on and below it the wagon is plain.
+// wears the next finish (ticket 809), painted through the kernel vehicle look; on and below it the
+// wagon is plain.
 
 const setMoney = { type: 'debug.setMoney', payload: { amount: '1e12' } } as const
 const dockAtSell = { type: 'dock', payload: { bay: 'sell' } } as const
 const buyTank = { type: 'buyFuelTank', payload: {} } as const
 const TOP = FUEL_TENDER_TABLE.steps[FUEL_TENDER_TABLE.steps.length - 1]
-const PALETTE = FUEL_TENDER_TABLE.tail.palette
+const FINISHES = FUEL_TENDER_TABLE.tail.finishes
 
 /** A session whose tank stands at `level`, bought at the Sell bay. */
 function sessionAtTankLevel(level: number) {
@@ -30,14 +31,14 @@ describe('fuel tender look source (ticket 758)', () => {
     ).toBeNull()
   })
 
-  it("glows the top wagon's slot in the tail's colour one purchase past the top step, kept between frames", () => {
+  it("glows the top wagon's slot in the first finish's colour one purchase past the top step, kept between frames", () => {
     const state = sessionAtTankLevel(TOP.fromLevel + 1).state()
     const look = FUEL_TENDER_LOOK_SOURCE.lookOf(state, 'p1', 0)
     expect(look).toMatchObject({
       tint: null,
       opacity: 1,
       outline: null,
-      glows: [{ slots: [TOP.part], colour: PALETTE[0], glow: FUEL_TENDER_TABLE.tail.glow }],
+      glows: [{ slots: [TOP.part], colour: FINISHES[0].colour, glow: FUEL_TENDER_TABLE.tail.glow }],
     })
     expect(FUEL_TENDER_LOOK_SOURCE.lookOf(state, 'p1', 7)).toBe(look)
   })
@@ -52,7 +53,7 @@ describe('fuel tender look source (ticket 758)', () => {
     const state = sessionAtTankLevel(TOP.fromLevel + 2).state()
     drawVehicleLookAt(drawn, createLookFlashes(), { state, playerId: 'p1', tick: state.tick })
     expect(drawn.glows).toEqual([
-      { slots: [TOP.part], colour: PALETTE[1], glow: FUEL_TENDER_TABLE.tail.glow },
+      { slots: [TOP.part], colour: FINISHES[1].colour, glow: FUEL_TENDER_TABLE.tail.glow },
     ])
     expect(drawn.tint).toBeNull()
   })
