@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-10-24T06:15:12+02:00",
+  "updated_at": "2026-10-24T06:17:25+02:00",
   "caps": {
     "grok": 12,
     "claude": 10,
@@ -127,12 +127,12 @@
   },
   "tester": {
     "state": "running",
-    "phase": "fast",
+    "phase": "slow",
     "sha": "ee94786d4137da4c5c48b57c49380a868bc0716f",
-    "since": "2026-10-24T01:19:14Z",
+    "since": "2026-10-24T04:17:21Z",
     "holds_gate": true,
     "claude_slot": null,
-    "last_run": "2026-10-24T01:19:11Z",
+    "last_run": "2026-10-24T04:17:19Z",
     "last_nightly": "2026-10-15T20:43:15Z",
     "last_nightly_result": "full=FAIL balance-report=ok bench=FAIL balance-planets=ok balance-guns=ok balance-charges=ok balance-refinery=ok balance-heat=ok e2e=FAIL memory-soak=FAIL packaged-smoke=ok ",
     "main_red_sha": null,
