@@ -31,6 +31,14 @@ export interface ContactSheetRow {
   heroCell: number | null
   /** The gem's rank k on its planet, cheapest first (ticket 741); null for a non-gem. */
   gemRank: number | null
+  /** The tier the gem sells at, `t_top + Δ_k` (ticket 741); null for a non-gem. */
+  gemSaleTier: number | null
+}
+
+/** Which gem of its planet a kind is: its rank k and the tier it sells at. */
+interface GemPlace {
+  rank: number
+  saleTier: number
 }
 
 /** A slot that binds no species: the shader would draw the family fallback on frame 1. */
@@ -61,7 +69,7 @@ export function planetContactSheetOf(params: PlanetParams): PlanetContactSheet {
     rows: looks.flatMap((look, at) =>
       look === null
         ? []
-        : [contactSheetRowOf(look, at + 1, heroCells, gemRankOf(params, roster[at], gemTiers))],
+        : [contactSheetRowOf(look, at + 1, heroCells, gemPlaceOf(params, roster[at], gemTiers))],
     ),
     unskinned: roster.flatMap((kind, at) =>
       looks[at] === null ? [{ slot: at + 1, slotId: kind.slotId }] : [],
@@ -73,7 +81,7 @@ function contactSheetRowOf(
   look: KindLook,
   slot: number,
   heroCells: ReadonlyMap<string, number>,
-  gemRank: number | null,
+  gem: GemPlace | null,
 ): ContactSheetRow {
   const heroCell = look.isHero ? (heroCells.get(look.speciesId) ?? null) : null
   const [silhouetteCode, patternCode, packedColour] = kindEntryOf(look, heroCell)
@@ -89,17 +97,18 @@ function contactSheetRowOf(
     patternCode,
     colour: hexOfPacked(packedColour),
     heroCell,
-    gemRank,
+    gemRank: gem?.rank ?? null,
+    gemSaleTier: gem?.saleTier ?? null,
   }
 }
 
-function gemRankOf(
+function gemPlaceOf(
   params: PlanetParams,
   kind: KindSlot,
   gemTiers: readonly number[],
-): number | null {
-  const tier = gemSaleTierOfKind(params, kind)
-  return tier === null ? null : gemTiers.indexOf(tier)
+): GemPlace | null {
+  const saleTier = gemSaleTierOfKind(params, kind)
+  return saleTier === null ? null : { rank: gemTiers.indexOf(saleTier), saleTier }
 }
 
 function hexOfPacked(packed: number): string {

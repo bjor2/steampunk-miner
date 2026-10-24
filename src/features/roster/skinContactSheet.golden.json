@@ -1,5 +1,5 @@
 {
-  "$comment": "The P1-P5 skin contact sheet (ticket 746 under #647): every kind slot of a fresh planet as the terrain draws it on frame 1, undrilled, from the look table (`systems/render/skinContactSheet.ts`). The pure spec `roster.skinContactSheet.test.ts` holds the sheet to this file and `e2e/browser/skinContactSheet.spec.ts` holds what the browser draws at 360x640 and 1280x800 to it. A skin change rewrites the rows it changes, in the commit that changes the skin, never to make a test pass. heroCell is the cell of the act's hero atlas (null draws the shader look); gemRank is the gem's k on its planet, cheapest first (ticket 741).",
+  "$comment": "The P1-P5 skin contact sheet (ticket 746 under #647): every kind slot of a fresh planet as the terrain draws it on frame 1, undrilled, from the look table (`systems/render/skinContactSheet.ts`). The pure spec `roster.skinContactSheet.test.ts` holds the sheet to this file and `e2e/browser/skinContactSheet.spec.ts` holds what the browser draws at 360x640 and 1280x800 to it. A skin change rewrites the rows it changes, in the commit that changes the skin, never to make a test pass. heroCell is the cell of the act's hero atlas (null draws the shader look); gemRank is the gem's k on its planet, cheapest first, and gemSaleTier the tier it sells at, t_top + Δ_k (ticket 741).",
   "planets": [
     {
       "planetIndex": 1,
@@ -15,7 +15,8 @@
           "patternCode": 1,
           "colour": "#87825e",
           "heroCell": null,
-          "gemRank": null
+          "gemRank": null,
+          "gemSaleTier": null
         },
         {
           "slot": 2,
@@ -28,7 +29,8 @@
           "patternCode": 2,
           "colour": "#49ba94",
           "heroCell": null,
-          "gemRank": null
+          "gemRank": null,
+          "gemSaleTier": null
         },
         {
           "slot": 3,
@@ -41,7 +43,8 @@
           "patternCode": 3,
           "colour": "#a4a9ae",
           "heroCell": null,
-          "gemRank": null
+          "gemRank": null,
+          "gemSaleTier": null
         },
         {
           "slot": 4,
@@ -54,7 +57,8 @@
           "patternCode": 4,
           "colour": "#dadcdd",
           "heroCell": null,
-          "gemRank": null
+          "gemRank": null,
+          "gemSaleTier": null
         },
         {
           "slot": 5,
@@ -67,7 +71,8 @@
           "patternCode": 5,
           "colour": "#afc9cc",
           "heroCell": null,
-          "gemRank": null
+          "gemRank": null,
+          "gemSaleTier": null
         },
         {
           "slot": 6,
@@ -80,7 +85,8 @@
           "patternCode": 6,
           "colour": "#999daf",
           "heroCell": null,
-          "gemRank": null
+          "gemRank": null,
+          "gemSaleTier": null
         },
         {
           "slot": 7,
@@ -93,7 +99,8 @@
           "patternCode": 7,
           "colour": "#b7baab",
           "heroCell": null,
-          "gemRank": null
+          "gemRank": null,
+          "gemSaleTier": null
         },
         {
           "slot": 8,
@@ -106,7 +113,8 @@
           "patternCode": 8,
           "colour": "#bf9e1b",
           "heroCell": null,
-          "gemRank": null
+          "gemRank": null,
+          "gemSaleTier": null
         },
         {
           "slot": 9,
@@ -119,7 +127,8 @@
           "patternCode": 9,
           "colour": "#8e70d5",
           "heroCell": 0,
-          "gemRank": null
+          "gemRank": null,
+          "gemSaleTier": null
         },
         {
           "slot": 10,
@@ -132,7 +141,8 @@
           "patternCode": 10,
           "colour": "#e0cc12",
           "heroCell": 1,
-          "gemRank": null
+          "gemRank": null,
+          "gemSaleTier": null
         },
         {
           "slot": 11,
@@ -145,7 +155,8 @@
           "patternCode": 11,
           "colour": "#5581e7",
           "heroCell": 2,
-          "gemRank": null
+          "gemRank": null,
+          "gemSaleTier": null
         },
         {
           "slot": 12,
@@ -158,7 +169,8 @@
           "patternCode": 12,
           "colour": "#db5667",
           "heroCell": 3,
-          "gemRank": null
+          "gemRank": null,
+          "gemSaleTier": null
         },
         {
           "slot": 13,
@@ -171,7 +183,8 @@
           "patternCode": 24,
           "colour": "#f6f8f9",
           "heroCell": null,
-          "gemRank": 0
+          "gemRank": 0,
+          "gemSaleTier": 12
         },
         {
           "slot": 14,
@@ -184,7 +197,8 @@
           "patternCode": 77,
           "colour": "#1ace65",
           "heroCell": null,
-          "gemRank": 1
+          "gemRank": 1,
+          "gemSaleTier": 13
         },
         {
           "slot": 15,
@@ -197,7 +211,8 @@
           "patternCode": 77,
           "colour": "#f0419e",
           "heroCell": null,
-          "gemRank": 2
+          "gemRank": 2,
+          "gemSaleTier": 15
         }
       ]
     },
@@ -215,7 +230,8 @@
           "patternCode": 3,
           "colour": "#8590a3",
           "heroCell": null,
-          "gemRank": null
+          "gemRank": null,
+          "gemSaleTier": null
         },
         {
           "slot": 2,
@@ -228,7 +244,8 @@
           "patternCode": 14,
           "colour": "#cd6a51",
           "heroCell": null,
-          "gemRank": null
+          "gemRank": null,
+          "gemSaleTier": null
         },
         {
           "slot": 3,
@@ -241,7 +258,8 @@
           "patternCode": 32,
           "colour": "#b8bec2",
           "heroCell": null,
-          "gemRank": null
+          "gemRank": null,
+          "gemSaleTier": null
         },
         {
           "slot": 4,
@@ -254,7 +272,8 @@
           "patternCode": 2,
           "colour": "#e6e021",
           "heroCell": null,
-          "gemRank": null
+          "gemRank": null,
+          "gemSaleTier": null
         },
         {
           "slot": 5,
@@ -267,7 +286,8 @@
           "patternCode": 48,
           "colour": "#838391",
           "heroCell": null,
-          "gemRank": null
+          "gemRank": null,
+          "gemSaleTier": null
         },
         {
           "slot": 6,
@@ -280,7 +300,8 @@
           "patternCode": 15,
           "colour": "#5781e1",
           "heroCell": null,
-          "gemRank": null
+          "gemRank": null,
+          "gemSaleTier": null
         },
         {
           "slot": 7,
@@ -293,7 +314,8 @@
           "patternCode": 46,
           "colour": "#c5b866",
           "heroCell": null,
-          "gemRank": null
+          "gemRank": null,
+          "gemSaleTier": null
         },
         {
           "slot": 8,
@@ -306,7 +328,8 @@
           "patternCode": 68,
           "colour": "#dfe0e5",
           "heroCell": null,
-          "gemRank": null
+          "gemRank": null,
+          "gemSaleTier": null
         },
         {
           "slot": 9,
@@ -319,7 +342,8 @@
           "patternCode": 51,
           "colour": "#b0b3b9",
           "heroCell": null,
-          "gemRank": null
+          "gemRank": null,
+          "gemSaleTier": null
         },
         {
           "slot": 10,
@@ -332,7 +356,8 @@
           "patternCode": 22,
           "colour": "#d65b84",
           "heroCell": 4,
-          "gemRank": 0
+          "gemRank": 0,
+          "gemSaleTier": 15
         },
         {
           "slot": 11,
@@ -345,7 +370,8 @@
           "patternCode": 74,
           "colour": "#53c696",
           "heroCell": 5,
-          "gemRank": 2
+          "gemRank": 2,
+          "gemSaleTier": 18
         },
         {
           "slot": 12,
@@ -358,7 +384,8 @@
           "patternCode": 35,
           "colour": "#8ba3b5",
           "heroCell": null,
-          "gemRank": null
+          "gemRank": null,
+          "gemSaleTier": null
         },
         {
           "slot": 13,
@@ -371,7 +398,8 @@
           "patternCode": 42,
           "colour": "#e35e54",
           "heroCell": null,
-          "gemRank": null
+          "gemRank": null,
+          "gemSaleTier": null
         },
         {
           "slot": 14,
@@ -384,7 +412,8 @@
           "patternCode": 41,
           "colour": "#a9dcd5",
           "heroCell": 6,
-          "gemRank": 1
+          "gemRank": 1,
+          "gemSaleTier": 16
         },
         {
           "slot": 15,
@@ -397,7 +426,8 @@
           "patternCode": 37,
           "colour": "#877673",
           "heroCell": null,
-          "gemRank": null
+          "gemRank": null,
+          "gemSaleTier": null
         }
       ]
     },
@@ -415,7 +445,8 @@
           "patternCode": 13,
           "colour": "#858e97",
           "heroCell": null,
-          "gemRank": null
+          "gemRank": null,
+          "gemSaleTier": null
         },
         {
           "slot": 2,
@@ -428,7 +459,8 @@
           "patternCode": 14,
           "colour": "#93a2a7",
           "heroCell": null,
-          "gemRank": null
+          "gemRank": null,
+          "gemSaleTier": null
         },
         {
           "slot": 3,
@@ -441,7 +473,8 @@
           "patternCode": 15,
           "colour": "#c7cecf",
           "heroCell": null,
-          "gemRank": null
+          "gemRank": null,
+          "gemSaleTier": null
         },
         {
           "slot": 4,
@@ -454,7 +487,8 @@
           "patternCode": 16,
           "colour": "#9093a4",
           "heroCell": null,
-          "gemRank": null
+          "gemRank": null,
+          "gemSaleTier": null
         },
         {
           "slot": 5,
@@ -467,7 +501,8 @@
           "patternCode": 17,
           "colour": "#c484c4",
           "heroCell": null,
-          "gemRank": null
+          "gemRank": null,
+          "gemSaleTier": null
         },
         {
           "slot": 6,
@@ -480,7 +515,8 @@
           "patternCode": 5,
           "colour": "#55bf8a",
           "heroCell": null,
-          "gemRank": null
+          "gemRank": null,
+          "gemSaleTier": null
         },
         {
           "slot": 7,
@@ -493,7 +529,8 @@
           "patternCode": 18,
           "colour": "#bab880",
           "heroCell": null,
-          "gemRank": null
+          "gemRank": null,
+          "gemSaleTier": null
         },
         {
           "slot": 8,
@@ -506,7 +543,8 @@
           "patternCode": 19,
           "colour": "#c5c7cb",
           "heroCell": null,
-          "gemRank": null
+          "gemRank": null,
+          "gemSaleTier": null
         },
         {
           "slot": 9,
@@ -519,7 +557,8 @@
           "patternCode": 12,
           "colour": "#88c0dc",
           "heroCell": null,
-          "gemRank": 2
+          "gemRank": 2,
+          "gemSaleTier": 23
         },
         {
           "slot": 10,
@@ -532,7 +571,8 @@
           "patternCode": 20,
           "colour": "#c6a0b3",
           "heroCell": null,
-          "gemRank": null
+          "gemRank": null,
+          "gemSaleTier": null
         },
         {
           "slot": 11,
@@ -545,7 +585,8 @@
           "patternCode": 21,
           "colour": "#a0a1b4",
           "heroCell": null,
-          "gemRank": null
+          "gemRank": null,
+          "gemSaleTier": null
         },
         {
           "slot": 12,
@@ -558,7 +599,8 @@
           "patternCode": 22,
           "colour": "#887edf",
           "heroCell": null,
-          "gemRank": null
+          "gemRank": null,
+          "gemSaleTier": null
         },
         {
           "slot": 13,
@@ -571,7 +613,8 @@
           "patternCode": 23,
           "colour": "#add3cf",
           "heroCell": null,
-          "gemRank": null
+          "gemRank": null,
+          "gemSaleTier": null
         },
         {
           "slot": 14,
@@ -584,7 +627,8 @@
           "patternCode": 24,
           "colour": "#bdb81f",
           "heroCell": null,
-          "gemRank": 1
+          "gemRank": 1,
+          "gemSaleTier": 21
         },
         {
           "slot": 15,
@@ -597,7 +641,8 @@
           "patternCode": 25,
           "colour": "#ece2e4",
           "heroCell": null,
-          "gemRank": 0
+          "gemRank": 0,
+          "gemSaleTier": 20
         },
         {
           "slot": 16,
@@ -610,7 +655,8 @@
           "patternCode": 26,
           "colour": "#d2d3c6",
           "heroCell": null,
-          "gemRank": null
+          "gemRank": null,
+          "gemSaleTier": null
         },
         {
           "slot": 17,
@@ -623,7 +669,8 @@
           "patternCode": 27,
           "colour": "#94a07f",
           "heroCell": null,
-          "gemRank": null
+          "gemRank": null,
+          "gemSaleTier": null
         }
       ]
     },
@@ -641,7 +688,8 @@
           "patternCode": 28,
           "colour": "#ac6e65",
           "heroCell": null,
-          "gemRank": null
+          "gemRank": null,
+          "gemSaleTier": null
         },
         {
           "slot": 2,
@@ -654,7 +702,8 @@
           "patternCode": 29,
           "colour": "#c77daf",
           "heroCell": null,
-          "gemRank": null
+          "gemRank": null,
+          "gemSaleTier": null
         },
         {
           "slot": 3,
@@ -667,7 +716,8 @@
           "patternCode": 30,
           "colour": "#ccd2d7",
           "heroCell": null,
-          "gemRank": null
+          "gemRank": null,
+          "gemSaleTier": null
         },
         {
           "slot": 4,
@@ -680,7 +730,8 @@
           "patternCode": 31,
           "colour": "#5a966e",
           "heroCell": null,
-          "gemRank": null
+          "gemRank": null,
+          "gemSaleTier": null
         },
         {
           "slot": 5,
@@ -693,7 +744,8 @@
           "patternCode": 32,
           "colour": "#aeb3ba",
           "heroCell": null,
-          "gemRank": null
+          "gemRank": null,
+          "gemSaleTier": null
         },
         {
           "slot": 6,
@@ -706,7 +758,8 @@
           "patternCode": 33,
           "colour": "#dbbdc5",
           "heroCell": null,
-          "gemRank": null
+          "gemRank": null,
+          "gemSaleTier": null
         },
         {
           "slot": 7,
@@ -719,7 +772,8 @@
           "patternCode": 34,
           "colour": "#9ea579",
           "heroCell": null,
-          "gemRank": null
+          "gemRank": null,
+          "gemSaleTier": null
         },
         {
           "slot": 8,
@@ -732,7 +786,8 @@
           "patternCode": 35,
           "colour": "#c9cdcf",
           "heroCell": null,
-          "gemRank": null
+          "gemRank": null,
+          "gemSaleTier": null
         },
         {
           "slot": 9,
@@ -745,7 +800,8 @@
           "patternCode": 36,
           "colour": "#4cc388",
           "heroCell": null,
-          "gemRank": 2
+          "gemRank": 2,
+          "gemSaleTier": 26
         },
         {
           "slot": 10,
@@ -758,7 +814,8 @@
           "patternCode": 37,
           "colour": "#b0a743",
           "heroCell": null,
-          "gemRank": null
+          "gemRank": null,
+          "gemSaleTier": null
         },
         {
           "slot": 11,
@@ -771,7 +828,8 @@
           "patternCode": 38,
           "colour": "#788bc5",
           "heroCell": null,
-          "gemRank": null
+          "gemRank": null,
+          "gemSaleTier": null
         },
         {
           "slot": 12,
@@ -784,7 +842,8 @@
           "patternCode": 39,
           "colour": "#43b18d",
           "heroCell": null,
-          "gemRank": null
+          "gemRank": null,
+          "gemSaleTier": null
         },
         {
           "slot": 13,
@@ -797,7 +856,8 @@
           "patternCode": 40,
           "colour": "#9fbabf",
           "heroCell": null,
-          "gemRank": null
+          "gemRank": null,
+          "gemSaleTier": null
         },
         {
           "slot": 14,
@@ -810,7 +870,8 @@
           "patternCode": 41,
           "colour": "#b4b4d2",
           "heroCell": null,
-          "gemRank": 1
+          "gemRank": 1,
+          "gemSaleTier": 24
         },
         {
           "slot": 15,
@@ -823,7 +884,8 @@
           "patternCode": 42,
           "colour": "#e04d59",
           "heroCell": null,
-          "gemRank": 0
+          "gemRank": 0,
+          "gemSaleTier": 23
         },
         {
           "slot": 16,
@@ -836,7 +898,8 @@
           "patternCode": 43,
           "colour": "#c3c4b6",
           "heroCell": null,
-          "gemRank": null
+          "gemRank": null,
+          "gemSaleTier": null
         },
         {
           "slot": 17,
@@ -849,7 +912,8 @@
           "patternCode": 44,
           "colour": "#a3ae98",
           "heroCell": null,
-          "gemRank": null
+          "gemRank": null,
+          "gemSaleTier": null
         }
       ]
     },
@@ -867,7 +931,8 @@
           "patternCode": 45,
           "colour": "#a56868",
           "heroCell": null,
-          "gemRank": null
+          "gemRank": null,
+          "gemSaleTier": null
         },
         {
           "slot": 2,
@@ -880,7 +945,8 @@
           "patternCode": 46,
           "colour": "#7f7e8c",
           "heroCell": null,
-          "gemRank": null
+          "gemRank": null,
+          "gemSaleTier": null
         },
         {
           "slot": 3,
@@ -893,7 +959,8 @@
           "patternCode": 47,
           "colour": "#dee1e2",
           "heroCell": null,
-          "gemRank": null
+          "gemRank": null,
+          "gemSaleTier": null
         },
         {
           "slot": 4,
@@ -906,7 +973,8 @@
           "patternCode": 3,
           "colour": "#c97177",
           "heroCell": null,
-          "gemRank": null
+          "gemRank": null,
+          "gemSaleTier": null
         },
         {
           "slot": 5,
@@ -919,7 +987,8 @@
           "patternCode": 48,
           "colour": "#9491a5",
           "heroCell": null,
-          "gemRank": null
+          "gemRank": null,
+          "gemSaleTier": null
         },
         {
           "slot": 6,
@@ -932,7 +1001,8 @@
           "patternCode": 49,
           "colour": "#8eba36",
           "heroCell": null,
-          "gemRank": null
+          "gemRank": null,
+          "gemSaleTier": null
         },
         {
           "slot": 7,
@@ -945,7 +1015,8 @@
           "patternCode": 50,
           "colour": "#8e94a2",
           "heroCell": null,
-          "gemRank": null
+          "gemRank": null,
+          "gemSaleTier": null
         },
         {
           "slot": 8,
@@ -958,7 +1029,8 @@
           "patternCode": 51,
           "colour": "#9ca5ae",
           "heroCell": null,
-          "gemRank": null
+          "gemRank": null,
+          "gemSaleTier": null
         },
         {
           "slot": 9,
@@ -971,7 +1043,8 @@
           "patternCode": 52,
           "colour": "#e05074",
           "heroCell": null,
-          "gemRank": 2
+          "gemRank": 2,
+          "gemSaleTier": 29
         },
         {
           "slot": 10,
@@ -984,7 +1057,8 @@
           "patternCode": 53,
           "colour": "#b7b78f",
           "heroCell": null,
-          "gemRank": null
+          "gemRank": null,
+          "gemSaleTier": null
         },
         {
           "slot": 11,
@@ -997,7 +1071,8 @@
           "patternCode": 54,
           "colour": "#b9a021",
           "heroCell": null,
-          "gemRank": null
+          "gemRank": null,
+          "gemSaleTier": null
         },
         {
           "slot": 12,
@@ -1010,7 +1085,8 @@
           "patternCode": 77,
           "colour": "#d2659c",
           "heroCell": null,
-          "gemRank": null
+          "gemRank": null,
+          "gemSaleTier": null
         },
         {
           "slot": 13,
@@ -1023,7 +1099,8 @@
           "patternCode": 55,
           "colour": "#92a157",
           "heroCell": null,
-          "gemRank": null
+          "gemRank": null,
+          "gemSaleTier": null
         },
         {
           "slot": 14,
@@ -1036,7 +1113,8 @@
           "patternCode": 56,
           "colour": "#efe00d",
           "heroCell": null,
-          "gemRank": 1
+          "gemRank": 1,
+          "gemSaleTier": 27
         },
         {
           "slot": 15,
@@ -1049,7 +1127,8 @@
           "patternCode": 57,
           "colour": "#f04b66",
           "heroCell": null,
-          "gemRank": 0
+          "gemRank": 0,
+          "gemSaleTier": 26
         },
         {
           "slot": 16,
@@ -1062,7 +1141,8 @@
           "patternCode": 58,
           "colour": "#899567",
           "heroCell": null,
-          "gemRank": null
+          "gemRank": null,
+          "gemSaleTier": null
         },
         {
           "slot": 17,
@@ -1075,7 +1155,8 @@
           "patternCode": 59,
           "colour": "#937875",
           "heroCell": null,
-          "gemRank": null
+          "gemRank": null,
+          "gemSaleTier": null
         }
       ]
     }

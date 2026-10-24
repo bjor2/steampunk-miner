@@ -14,7 +14,11 @@ import {
   rarityLooksByLead,
   ROSTER_KIND_LOOK,
 } from './systems/render/kindLookProvider'
-import { planetContactSheetOf, unreadablePairsOf } from './systems/render/skinContactSheet'
+import {
+  planetContactSheetOf,
+  unreadablePairsOf,
+  type ContactSheetRow,
+} from './systems/render/skinContactSheet'
 import golden from './skinContactSheet.golden.json'
 
 // Ticket 746's contact sheet (#647 done-when 1, the HS's distinct-sprite test on #741): every kind
@@ -27,13 +31,37 @@ const [SEED, SECOND_SEED] = NAMED_SEEDS
 const P2_INCOMING = ['p2-u1b', 'p2-u2b', 'p2-r3b']
 const PUBLIC = new URL('../../../public/', import.meta.url)
 const GEM_RANKS = ORE_ROWS.gems.tierLeads.map((_, rank) => rank)
+/**
+ * The gems that draw their grains on frame 1 for want of a hero cell (the GD lock on #746, rows
+ * listed there): #785 bakes their cells and turns each `it.todo` below into a test. A cell landing
+ * shrinks this list in the same commit; a gem losing its cell fails.
+ */
+const GEMS_OWED_A_HERO_CELL: Readonly<Record<number, readonly string[]>> = {
+  1: ['diamond-quartzine', 'emerald-quartzine', 'ruby-quartzine'],
+  3: ['blue-topaz-quartzine', 'orichalcum-brassvein', 'heart-diamond-quartzine'],
+  4: ['watermelon-tourmaline-quartzine', 'starsteel-brassvein', 'painite-quartzine'],
+  5: ['fire-garnet-quartzine', 'core-gold-brassvein', 'furnace-ruby-quartzine'],
+}
 
 function sheetOf(planetIndex: number, seed = SEED) {
   return planetContactSheetOf(freshPlanetParamsFor(seed, planetIndex))
 }
 
 function goldenRowsOf(planetIndex: number) {
-  return golden.planets.find((planet) => planet.planetIndex === planetIndex)?.rows
+  return golden.planets.find((planet) => planet.planetIndex === planetIndex)?.rows ?? []
+}
+
+function gemRowsOf(planetIndex: number) {
+  return sheetOf(planetIndex).rows.filter((row) => row.gemRank !== null)
+}
+
+function owedGemRowsOf(planetIndex: number) {
+  const owed = GEMS_OWED_A_HERO_CELL[planetIndex] ?? []
+  return goldenRowsOf(planetIndex).filter((row) => owed.includes(row.speciesId))
+}
+
+function bySaleTier(a: ContactSheetRow, b: ContactSheetRow): number {
+  return (a.gemSaleTier ?? 0) - (b.gemSaleTier ?? 0)
 }
 
 describe('skin contact sheet of P1 to P5 (ticket 746)', () => {
@@ -115,4 +143,46 @@ describe('skin contact sheet of P1 to P5 (ticket 746)', () => {
     )
     expect([...ranks].sort((a, b) => a - b)).toEqual(GEM_RANKS)
   })
+
+  it.each(SHEET_PLANETS)(
+    'ranks the gems of planet %i by sale value, so k never falls as the price rises',
+    (planetIndex) => {
+      const byPrice = gemRowsOf(planetIndex).sort(bySaleTier)
+      const tiers = byPrice.map((row) => row.gemSaleTier)
+      expect(byPrice.map((row) => row.gemRank)).toEqual(GEM_RANKS)
+      expect(new Set(tiers).size).toBe(tiers.length)
+    },
+  )
+
+  it.each(SHEET_PLANETS)(
+    'draws every gem of planet %i a hero cell of its own but the gems #785 owes one',
+    (planetIndex) => {
+      const gems = gemRowsOf(planetIndex)
+      const nonGemCells = sheetOf(planetIndex).rows.flatMap((row) =>
+        row.gemRank === null && row.heroCell !== null ? [row.heroCell] : [],
+      )
+      const cellless = gems.filter((row) => row.heroCell === null).map((row) => row.speciesId)
+      expect(cellless.sort()).toEqual([...(GEMS_OWED_A_HERO_CELL[planetIndex] ?? [])].sort())
+      const sharedCells = gems.filter(
+        (row) => row.heroCell !== null && nonGemCells.includes(row.heroCell),
+      )
+      expect(sharedCells).toEqual([])
+    },
+  )
+
+  for (const planetIndex of SHEET_PLANETS) {
+    for (const row of owedGemRowsOf(planetIndex)) {
+      it.todo(
+        `reads ${row.name} on planet ${planetIndex} as a gem on frame 1: a faceted hero cell with a highlight, apart from every non-gem, at 360 px and 1280+ (#785)`,
+      )
+    }
+  }
+
+  it.todo(
+    'scores no cheaper gem of a planet above a pricier one, nor under its top non-gem ore, on k plus its share of bright or saturated pixels (#785)',
+  )
+
+  it.todo(
+    "steps each gem's glint with its rank k, glintStep == gemRank, alike on every planet (#786)",
+  )
 })
