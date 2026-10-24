@@ -1970,6 +1970,12 @@ incomePerHour}` go to `balance-report/drill-pace.ndjson`, which `pushTestMetrics
   `drill-wall` (ticket 789): the tier-3 rig drilling sideways into a lined shaft wall, judged by
   the rig getting a cell through the wall. Emulation only (Chromium
   with `isMobile`/`hasTouch`), no on-device claim. Box Tester only.
+- **Drilling through laid casing** (ticket 843): `e2e/browser/casingRedrill.spec.ts` puts the rig
+  on planet 2 with 6 drill tip pips (no tip major) and casing grade 5, then drives it into a
+  grade-5 lined bore from the side and from above, on the phone held upright (390x844, touch) and
+  on desktop (1920x1080), judged on the pose getting past the far lining. Its Rapier twin,
+  `src/physics/casingRedrill.test.ts`, holds the same crossing for 3, 6 and 9 tip pips and the
+  planet 2-4 arrival kits at the shipped and a wider bore. Box Tester only.
 - **Drill-down run** (ticket 416): `e2e/browser/drillDown.spec.ts` holds the real Down key for 10 s
   on the P1 surface from `scenarios/drill-down-start.scenario.json`, at stored drill_power steps 1
   (the save's), 5, 10, 15 and 20 (`debug.setUpgrade`, ticket 434), and writes one row per run (start and end position, depth gained, cells/s,

@@ -1190,6 +1190,18 @@
         "src/debug/debugLining.ts"
       ],
       "specs": ["e2e/browser/screens/screenLayout.spec.ts", "e2e/browser/render.spec.ts"]
+    },
+    {
+      "why": "Drilling through laid casing (ticket 843): how lining is timed and re-drilled, how rings are laid and carved, and the drill rule the scratch gate lives in.",
+      "paths": [
+        "src/systems/authority/groundDrill.ts",
+        "src/systems/authority/casingPlacement.ts",
+        "src/systems/economy/casingGrades.ts",
+        "src/systems/vehicle/drillRule.ts",
+        "src/systems/world/casingLining.ts",
+        "src/systems/world/groundEdit.ts"
+      ],
+      "specs": ["e2e/browser/casingRedrill.spec.ts"]
     }
   ]
 }
