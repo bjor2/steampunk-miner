@@ -1,0 +1,257 @@
+{
+  "$comment": "The hue and motif reads of every shipped SS2 look tile at the two contact-sheet screens (ticket 778, look_post.py): mean colour, luma, hue and saturation; edge share, the edge anisotropy across the tile and across its diagonals, luma spread and the high and low shares; with the SHA-256 of the albedo map they were measured from. Written by look_post.py; look only.",
+  "screens": {
+    "360x640": 120,
+    "1280x800": 268
+  },
+  "looks": [
+    {
+      "lookId": "cinder-basalt",
+      "tileAssetId": "ground-look-cinder-basalt",
+      "albedoSha256": "b395cf25008fc2653045d1c314d234c3e5ef480f9640eb369633ddc58d33a0df",
+      "screens": {
+        "360x640": {
+          "meanHex": "#493532",
+          "luma": 0.23,
+          "hueDeg": 8.3,
+          "saturation": 0.249,
+          "edgeShare": 0.207,
+          "anisotropy": 0.043,
+          "diagonalAnisotropy": -0.001,
+          "lumaSpread": 0.081,
+          "highShare": 0.115,
+          "lowShare": 0.0
+        },
+        "1280x800": {
+          "meanHex": "#493532",
+          "luma": 0.23,
+          "hueDeg": 8.2,
+          "saturation": 0.243,
+          "edgeShare": 0.181,
+          "anisotropy": 0.055,
+          "diagonalAnisotropy": -0.001,
+          "lumaSpread": 0.09,
+          "highShare": 0.092,
+          "lowShare": 0.0
+        }
+      }
+    },
+    {
+      "lookId": "ash-plain",
+      "tileAssetId": "ground-look-ash-plain",
+      "albedoSha256": "aa3d715c6b859d7b89c721c6c1ef80f8f91f7b38e4720fee203d3d01389f05ab",
+      "screens": {
+        "360x640": {
+          "meanHex": "#75645c",
+          "luma": 0.409,
+          "hueDeg": 21.0,
+          "saturation": 0.198,
+          "edgeShare": 0.0,
+          "anisotropy": -0.723,
+          "diagonalAnisotropy": 0.0,
+          "lumaSpread": 0.029,
+          "highShare": 0.213,
+          "lowShare": 0.248
+        },
+        "1280x800": {
+          "meanHex": "#75655c",
+          "luma": 0.41,
+          "hueDeg": 21.0,
+          "saturation": 0.197,
+          "edgeShare": 0.0,
+          "anisotropy": -0.692,
+          "diagonalAnisotropy": 0.0,
+          "lumaSpread": 0.03,
+          "highShare": 0.205,
+          "lowShare": 0.245
+        }
+      }
+    },
+    {
+      "lookId": "rime-shelf",
+      "tileAssetId": "ground-look-rime-shelf",
+      "albedoSha256": "69f5817dcca3c9a35194e99634d8e04d296f3eedd01a6ab86ea8f3d3e2e95601",
+      "screens": {
+        "360x640": {
+          "meanHex": "#486d7c",
+          "luma": 0.392,
+          "hueDeg": 196.7,
+          "saturation": 0.426,
+          "edgeShare": 0.197,
+          "anisotropy": 0.008,
+          "diagonalAnisotropy": -0.007,
+          "lumaSpread": 0.075,
+          "highShare": 0.109,
+          "lowShare": 0.158
+        },
+        "1280x800": {
+          "meanHex": "#486e7c",
+          "luma": 0.392,
+          "hueDeg": 196.7,
+          "saturation": 0.426,
+          "edgeShare": 0.192,
+          "anisotropy": 0.01,
+          "diagonalAnisotropy": -0.008,
+          "lumaSpread": 0.078,
+          "highShare": 0.106,
+          "lowShare": 0.149
+        }
+      }
+    },
+    {
+      "lookId": "hoarfrost-vein",
+      "tileAssetId": "ground-look-hoarfrost-vein",
+      "albedoSha256": "be2209a35d213d584b5436c6654a9b317bcd34f1264f679483bd4eb9b6f21fe0",
+      "screens": {
+        "360x640": {
+          "meanHex": "#6c6687",
+          "luma": 0.422,
+          "hueDeg": 250.4,
+          "saturation": 0.252,
+          "edgeShare": 0.324,
+          "anisotropy": -0.006,
+          "diagonalAnisotropy": 0.525,
+          "lumaSpread": 0.106,
+          "highShare": 0.164,
+          "lowShare": 0.0
+        },
+        "1280x800": {
+          "meanHex": "#6c6688",
+          "luma": 0.422,
+          "hueDeg": 250.4,
+          "saturation": 0.253,
+          "edgeShare": 0.327,
+          "anisotropy": -0.005,
+          "diagonalAnisotropy": 0.527,
+          "lumaSpread": 0.118,
+          "highShare": 0.164,
+          "lowShare": 0.0
+        }
+      }
+    },
+    {
+      "lookId": "lode-banded",
+      "tileAssetId": "ground-look-lode-banded",
+      "albedoSha256": "5e975dd3807b2620a25bc0c03290bdd75180a602867dcd24544a967331dc7581",
+      "screens": {
+        "360x640": {
+          "meanHex": "#614145",
+          "luma": 0.295,
+          "hueDeg": 354.6,
+          "saturation": 0.593,
+          "edgeShare": 0.058,
+          "anisotropy": -0.469,
+          "diagonalAnisotropy": 0.009,
+          "lumaSpread": 0.041,
+          "highShare": 0.219,
+          "lowShare": 0.225
+        },
+        "1280x800": {
+          "meanHex": "#614145",
+          "luma": 0.295,
+          "hueDeg": 354.7,
+          "saturation": 0.621,
+          "edgeShare": 0.099,
+          "anisotropy": -0.51,
+          "diagonalAnisotropy": 0.004,
+          "lumaSpread": 0.044,
+          "highShare": 0.268,
+          "lowShare": 0.186
+        }
+      }
+    },
+    {
+      "lookId": "gauss-field",
+      "tileAssetId": "ground-look-gauss-field",
+      "albedoSha256": "6882d22975b4a5ea1c98106d33b16eec57aca4f39727552a9a003671b33dc5b6",
+      "screens": {
+        "360x640": {
+          "meanHex": "#435859",
+          "luma": 0.32,
+          "hueDeg": 183.0,
+          "saturation": 0.241,
+          "edgeShare": 0.092,
+          "anisotropy": 0.007,
+          "diagonalAnisotropy": 0.001,
+          "lumaSpread": 0.032,
+          "highShare": 0.139,
+          "lowShare": 0.072
+        },
+        "1280x800": {
+          "meanHex": "#435859",
+          "luma": 0.321,
+          "hueDeg": 182.9,
+          "saturation": 0.234,
+          "edgeShare": 0.284,
+          "anisotropy": 0.006,
+          "diagonalAnisotropy": 0.004,
+          "lumaSpread": 0.046,
+          "highShare": 0.152,
+          "lowShare": 0.0
+        }
+      }
+    },
+    {
+      "lookId": "hollow-honeycomb",
+      "tileAssetId": "ground-look-hollow-honeycomb",
+      "albedoSha256": "4eeffcf7f7bf90df90af3b6dcc0422ab8a826a71be1caba1293d2418d8534df9",
+      "screens": {
+        "360x640": {
+          "meanHex": "#66481e",
+          "luma": 0.299,
+          "hueDeg": 34.9,
+          "saturation": 0.715,
+          "edgeShare": 0.687,
+          "anisotropy": 0.028,
+          "diagonalAnisotropy": 0.0,
+          "lumaSpread": 0.187,
+          "highShare": 0.242,
+          "lowShare": 0.22
+        },
+        "1280x800": {
+          "meanHex": "#67481e",
+          "luma": 0.301,
+          "hueDeg": 34.9,
+          "saturation": 0.714,
+          "edgeShare": 0.654,
+          "anisotropy": 0.044,
+          "diagonalAnisotropy": 0.0,
+          "lumaSpread": 0.199,
+          "highShare": 0.244,
+          "lowShare": 0.19
+        }
+      }
+    },
+    {
+      "lookId": "brass-verdigris",
+      "tileAssetId": "ground-look-brass-verdigris",
+      "albedoSha256": "ef2fd2ab56c0a6492b6ef2267fc06fce276eca5e170461f1aca95a9189d4183a",
+      "screens": {
+        "360x640": {
+          "meanHex": "#7d7f42",
+          "luma": 0.47,
+          "hueDeg": 61.0,
+          "saturation": 0.509,
+          "edgeShare": 0.395,
+          "anisotropy": -0.023,
+          "diagonalAnisotropy": -0.018,
+          "lumaSpread": 0.093,
+          "highShare": 0.123,
+          "lowShare": 0.182
+        },
+        "1280x800": {
+          "meanHex": "#7d7f42",
+          "luma": 0.47,
+          "hueDeg": 60.9,
+          "saturation": 0.508,
+          "edgeShare": 0.372,
+          "anisotropy": -0.02,
+          "diagonalAnisotropy": -0.006,
+          "lumaSpread": 0.108,
+          "highShare": 0.106,
+          "lowShare": 0.123
+        }
+      }
+    }
+  ]
+}
