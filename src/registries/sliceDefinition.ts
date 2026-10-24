@@ -74,7 +74,7 @@ import type { SceneLayer } from '../scene/registries/sceneLayers'
 import type { VehiclePiece } from '../scene/registries/vehiclePieces'
 import type { WorldPiece } from '../scene/registries/worldPieces'
 import type { LoadoutAcceptance } from '../systems/registries/vehicleLoadout'
-import type { BayPanel } from '../ui/registries/bayPanels'
+import type { BayPanel, BayPanelKind, BayPanelRow } from '../ui/registries/bayPanels'
 import type { SliceBayScreen } from '../ui/registries/bayScreens'
 import type { HudPanel } from '../ui/registries/hudPanels'
 import type { MoneyCounterProvider } from '../ui/registries/moneyCounter'
@@ -220,6 +220,13 @@ export interface SliceRegistrar {
   toolSlot(row: ToolSlotRow): void
   /** A panel in the bay header, left of the money, or in the layer above the bay screen. */
   bayPanel(panel: BayPanel): void
+  /**
+   * A panel in the Sell bay's body, after its own rows: one data row, drawn by its kind's view
+   * while `visibleWhen` holds (ticket 845; a merchant is one row).
+   */
+  bayPanelRow(row: BayPanelRow): void
+  /** The view that draws every bay panel row of one kind, given the row's panel id (ticket 845). */
+  bayPanelKind(kind: BayPanelKind): void
   /** A bay's whole screen, one per bay, shown once its schedule row is open (#180). */
   bayScreen(screen: SliceBayScreen): void
   /** One provider across all slices: the money the bay header's counter shows (ticket 220). */

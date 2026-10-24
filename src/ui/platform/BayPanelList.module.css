@@ -1,0 +1,25 @@
+/*
+ * Ticket 845: the slice panels take the whole width under the bay's own rows. Desktop lays its page
+ * in the bay's two columns (`layout.bayPanels.desktopPerPage`) with the pager under them; a phone
+ * stacks every panel in one column and the bay's scroll area scrolls them.
+ */
+.list {
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-2);
+  align-content: start;
+  min-width: 0;
+}
+
+.list[data-layout='phone'] {
+  grid-template-columns: 1fr;
+}
+
+.panel {
+  min-width: 0;
+}
+
+.pager {
+  grid-column: 1 / -1;
+}

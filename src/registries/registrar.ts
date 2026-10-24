@@ -114,7 +114,12 @@ import { SCENE_LAYER_REGISTRY } from '../scene/registries/sceneLayers'
 import { VEHICLE_PIECE_REGISTRY } from '../scene/registries/vehiclePieces'
 import { WORLD_PIECE_REGISTRY } from '../scene/registries/worldPieces'
 import { LOADOUT_ACCEPTANCE_REGISTRY } from '../systems/registries/vehicleLoadout'
-import { BAY_PANEL_REGISTRY } from '../ui/registries/bayPanels'
+import {
+  BAY_PANEL_KIND_REGISTRY,
+  BAY_PANEL_REGISTRY,
+  BAY_PANEL_ROW_REGISTRY,
+  bayPanelRowEntryOf,
+} from '../ui/registries/bayPanels'
 import { BAY_ENTRY_REGISTRY } from '../systems/registries/bayEntries'
 import { BAY_SCREEN_REGISTRY } from '../ui/registries/bayScreens'
 import { HUD_PANEL_REGISTRY } from '../ui/registries/hudPanels'
@@ -179,6 +184,8 @@ export function registrarFor(sliceId: string): SliceRegistrar {
     touchBinding: (row) => add(TOUCH_BINDING_REGISTRY, row),
     toolSlot: (row) => add(TOOL_SLOT_REGISTRY, row),
     bayPanel: (panel) => add(BAY_PANEL_REGISTRY, panel),
+    bayPanelRow: (row) => add(BAY_PANEL_ROW_REGISTRY, bayPanelRowEntryOf(row)),
+    bayPanelKind: (kind) => add(BAY_PANEL_KIND_REGISTRY, kind),
     bayScreen: (screen) => add(BAY_SCREEN_REGISTRY, screen),
     moneyCounter: (provider) => add(MONEY_COUNTER_REGISTRY, provider),
     worldPiece: (piece) => add(WORLD_PIECE_REGISTRY, piece),

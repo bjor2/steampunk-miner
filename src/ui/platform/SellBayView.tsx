@@ -2,7 +2,8 @@
  * The Sell bay screen (#37): "Sell, repair and recharge" with its exact total (highlighted on the
  * first visit, #16), the Hold row that opens the Hold tab of the base sheet (ticket 688), the refined batches once the platform has the Refinery bay (#105),
  * the visit's lining bill while there is one (#128) and the charging station, each on the shared
- * Title+OneLine element (spec #422, pass #427), in the shared scroll area. Markup only.
+ * Title+OneLine element (spec #422, pass #427), then the slices' panels (ticket 845), in the shared
+ * scroll area. Markup only, but for the slice panels, which read their own rows.
  */
 import type { HoldRow, QuickServiceReading, SellBayModel } from '../../systems/views/sellBayModel'
 import { UI_IDS } from '../ids'
@@ -10,6 +11,7 @@ import { ScrollArea } from '../kit/ScrollArea'
 import { TitleOneLine } from '../kit/TitleOneLine'
 import { ScreenButtonView } from '../ScreenButtonView'
 import { BayFrame } from './BayFrame'
+import { BayPanelList } from './BayPanelList'
 import { ChargingPanel } from './ChargingPanel'
 import { LiningPanel } from './LiningPanel'
 import styles from './Platform.module.css'
@@ -33,6 +35,7 @@ export function SellBayView({ model, focusedId }: { model: SellBayModel; focused
           )}
           {model.lining === null ? null : <LiningPanel lining={model.lining} />}
           <ChargingPanel charging={model.charging} focusedId={focusedId} />
+          <BayPanelList bay={model.header.bay} />
         </div>
       </ScrollArea>
     </BayFrame>

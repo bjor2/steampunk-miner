@@ -26,6 +26,7 @@ import { chargesOf } from '../systems/authority/charges/chargeRules'
 import type { TouchSituation } from '../systems/input/touchControls'
 import { chargeSizeToPlantOf, nextChargeSizeOf } from '../systems/vehicle/chargeSelection'
 import type { BayId } from '../systems/world/dockBays'
+import { shownBayPanelIdsOn } from '../ui/registries/bayPanels'
 import { shownBayScreenIdOf } from '../ui/registries/bayScreens'
 import { shownSheetTabsOn } from '../ui/registries/sheetTabs'
 import { readAuthorityState } from './authorityLink'
@@ -70,6 +71,11 @@ export function readDockedBay(): BayId | null {
  */
 export function readSliceBayScreenIdAt(bay: BayId): string | null {
   return shownBayScreenIdOf(readAuthorityState(), bay)
+}
+
+/** The slice panels `bay`'s body draws now, in order (ticket 845): ids, so a re-read compares cheaply. */
+export function readShownBayPanelIds(bay: BayId): readonly string[] {
+  return shownBayPanelIdsOn(readAuthorityState(), useGameStore.getState().playerId, bay)
 }
 
 /** The base sheet's tabs shown now, in order (ticket 686): ids, so a re-read compares cheaply. */
