@@ -466,8 +466,14 @@ import type { DriveSigns } from '../vehicle/driveSigns'
  *    from its address, its ground `k_jump^(s - 1)` harder (`starMap/systemPlanetParams.ts`). On a
  *    system's last planet the clamped next hop is the jump out of it for a vehicle with the drive.
  *    A run that buys no drive moves no digest.
+ * 106: the core bay of each planet (ticket 790, the GD lock on #790): fragments banked on a planet
+ *    count toward its core alone. Leaving a planet stows its bay under its stable id `s:p`
+ *    (`platform.awayCoreBays`, absent while none is stowed) and the landing planet's bay comes
+ *    out, empty on a planet never banked on; a core completed on an earlier visit lands completed,
+ *    so `core_completed` is said once per planet. The jump still spends no fragment; `Travel`'s
+ *    surplus stays in the left planet's bay. A run that never leaves its planet moves no digest.
  */
-export const AUTHORITY_PROTOCOL_VERSION = 105
+export const AUTHORITY_PROTOCOL_VERSION = 106
 
 /** The kernel's own commands: the closed set its rule tables are written against. */
 export interface KernelCommandPayloads {

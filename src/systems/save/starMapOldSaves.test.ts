@@ -15,6 +15,7 @@ import { readSaveSlot, saveSlotOf } from './saveSlot'
 const STAR_MAP_STEP = { version: 'snapshotVersion', from: 21, to: 22 }
 const FUEL_TANK_STEP = { version: 'snapshotVersion', from: 22, to: 23 }
 const JUMP_DRIVE_STEP = { version: 'snapshotVersion', from: 23, to: 24 }
+const CORE_BAY_STEP = { version: 'snapshotVersion', from: 24, to: 25 }
 
 function restoredState(file: unknown): AuthorityState {
   const reading = readMigratedSaveSlot(file)
@@ -51,7 +52,12 @@ describe('save migration: snapshot 21 -> 22, the star map (ticket 755)', () => {
     const file = saveSlotOf({ ...takeSnapshot(state), snapshotVersion: 21 }, 1)
     const reading = readMigratedSaveSlot(file)
     if (!('state' in reading)) throw new Error(reading.problems.join('; '))
-    expect(reading.migrations).toEqual([STAR_MAP_STEP, FUEL_TANK_STEP, JUMP_DRIVE_STEP])
+    expect(reading.migrations).toEqual([
+      STAR_MAP_STEP,
+      FUEL_TANK_STEP,
+      JUMP_DRIVE_STEP,
+      CORE_BAY_STEP,
+    ])
     expect(reading.state).toEqual(state)
     expect(stateDigest(reading.state)).toBe(stateDigest(state))
   })

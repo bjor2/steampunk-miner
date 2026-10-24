@@ -77,6 +77,9 @@ import {
 } from './vehicleSnapshot'
 
 /**
+ * 25: the core bay of each planet (ticket 790): the bays of the planets the session has left, by
+ * `s:p`, under `platform.awayCoreBays` (older saves hold one bay, the current planet's, and no
+ * other, the absent key, `saveMigrations.ts`);
  * 24: the jump drive (ticket 759): each vehicle's `jumpDrive` once bought (older saves hold none,
  * the absent key, `saveMigrations.ts`), and planets of later systems with a generated world;
  * 23: the fuel tank track (ticket 756): each vehicle's tank level from level 2 (older saves hold
@@ -101,7 +104,7 @@ import {
  * vehicle's casing grade (#41, #58); 5: combat joined the state (#25); 4 the planet's core
  * progress (#24); 3 the platform (#23).
  */
-export const SNAPSHOT_VERSION = 24
+export const SNAPSHOT_VERSION = 25
 
 export interface SessionSnapshot {
   snapshotVersion: number
