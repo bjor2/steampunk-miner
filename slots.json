@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-10-24T21:59:04+02:00",
+  "updated_at": "2026-10-24T22:11:28+02:00",
   "caps": {
     "grok": 12,
     "claude": 10,
@@ -369,6 +369,22 @@
     "parallel": 1,
     "list": [
       {
+        "number": 851,
+        "key": "647-7S",
+        "map": 647,
+        "lane": "remote",
+        "mode": "solo",
+        "state": "ready",
+        "tickets": [
+          823,
+          844,
+          848,
+          849
+        ],
+        "done": [],
+        "live": 0
+      },
+      {
         "number": 846,
         "key": "647-7H",
         "map": 647,
@@ -407,10 +423,11 @@
         "mode": "solo",
         "state": "paused",
         "tickets": [
-          823,
+          821,
           824,
-          844,
-          821
+          825,
+          826,
+          850
         ],
         "done": [],
         "live": 0
@@ -436,20 +453,6 @@
           812
         ],
         "live": 1
-      },
-      {
-        "number": 817,
-        "key": "647-7S",
-        "map": 647,
-        "lane": "remote",
-        "mode": "solo",
-        "state": "paused",
-        "tickets": [
-          825,
-          826
-        ],
-        "done": [],
-        "live": 0
       },
       {
         "number": 766,
