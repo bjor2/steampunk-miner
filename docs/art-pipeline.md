@@ -678,24 +678,31 @@ renders, at desktop and at a 360 px phone's size, are in
 
 The art half of the `cargo_hold` line of the rig look ladder
 ([#576](https://github.com/bjor2/steampunk-miner/issues/576), built by
-[#580](https://github.com/bjor2/steampunk-miner/issues/580)): a Blender source for the three look
-steps Systems' table puts at 23, 31 and 33 purchases, `art/blender/vehicle-look-cargo-hold/`, with
-the base look beside them. Each part is authored with the track's attach slot, `hull.cargo`, at the
-origin and is meant to stand in place of the rig's ore hatch on the fore deck, `t1-hopper`:
-`ore-hatch` is that hatch piece for piece, then Progression's `plank-crate`, `ore-hopper` and
-`riveted-bin`. Cargo stays inside the rig's outline (the #576 HS rule), so every look keeps to the
-hatch's own 180 by 72 mm box and the steps differ by material and colour, not by growing the hold;
-the slot sits 28 mm above the lid, so each look carries a 10 mm stay up to it behind the steam ram,
+[#580](https://github.com/bjor2/steampunk-miner/issues/580), extended by
+[#812](https://github.com/bjor2/steampunk-miner/issues/812), LK4): a Blender source for the
+`cargo_hold` track's look steps, `art/blender/vehicle-look-cargo-hold/`, with the base look beside
+them. Each part is authored with the track's attach slot, `hull.cargo`, at the origin and stands in
+place of the rig's ore hatch on the fore deck, `t1-hopper`: `ore-hatch` is that hatch piece for
+piece, then Progression's `plank-crate`, `ore-hopper` and `riveted-bin` on the band edges of 11
+that LK1 ([#809](https://github.com/bjor2/steampunk-miner/issues/809)) froze (11, 22, 33), then
+the two LK4 steps, each the riveted bin with one more part fitted in a socket in the ticket's
+order: `racked-bin` (44, a dark-iron stake rack under each end of the bin) and `pannier-bin` (55,
+a strapped leather pannier hanging in each rack). Cargo stays inside the rig's outline (the #576 HS
+rule, #789): above the deck that outline is the hatch's own 180 by 72 mm box, so the first three
+steps differ by material and what fills the box, and the LK4 parts hang down the pod's flank under
+the hatch, the one socket inside the outline that the hull looks' armour, the dome's plate and the
+motor housing leave bare; the rig outline, the drawn drill tip and the collider never move. The
+slot sits 28 mm above the lid, so each look carries a 10 mm stay up to it behind the steam ram,
 which covers it through its whole stroke. The wiring
 ([#581](https://github.com/bjor2/steampunk-miner/issues/581)) registers it through `r.artAssets`
-from `rigLook.json`'s `lookAssets` and exports it to `public/assets/vehicle/` (4 parts, 256x256);
-each step row names its part with `asset: "vehicle-look-cargo-hold"`, the track's
-`replaces: "hopper"` hides the rig's `t1-hopper` under it, and the look parts join the track's glow
-slots so the tail above the top step paints them. Below 23 purchases nothing is swapped, so
-`ore-hatch` ships unused. `docs/art/rig-look-cargo-hold/author_cargo_hold_looks.py` wrote the
-first version of the `.blend`; from then on it is the source. The part table, the outline check at
-tiers 1 and 3 and the review renders, at desktop and at a 360 px phone's size, are in
-[docs/art/rig-look-cargo-hold/](art/rig-look-cargo-hold/README.md).
+from `rigLook.json`'s `lookAssets` and exports it to `public/assets/vehicle/` (6 parts); each step
+row names its part with `asset: "vehicle-look-cargo-hold"`, the track's `replaces: "hopper"`
+hides the rig's `t1-hopper` under it, and the look parts join the track's glow slots so the finish
+tail above the top step paints them. Below 11 purchases nothing is swapped, so `ore-hatch` ships
+unused. `docs/art/rig-look-cargo-hold/author_cargo_hold_looks.py` wrote the first version of the
+`.blend`, and `author_cargo_hold_steps.py` fitted the LK4 parts into it; from then on it is the
+source. The part table, the outline check at tiers 1 and 3 and the review renders, at desktop and
+at a 360 px phone's size, are in [docs/art/rig-look-cargo-hold/](art/rig-look-cargo-hold/README.md).
 
 ## Rig-look parts: the drill tip
 

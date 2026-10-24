@@ -1,72 +1,162 @@
 {
-  "about": "Ticket 580: at a 360 px wide phone (30 px/m over the 12 m zoom), the pixels of the hold's footprint (the rig's t1-hopper, which every look keeps to) that change between each look on hull.cargo and the next (a channel moving more than 24 of 255), and the brightest pixel (Rec. 709 luminance, 0-255) of the drill nose against the rest of the rig for each look, the nose lit as while drilling: under `lit` on the phone-size renders, under `glow` on the tier-1 emission-only render at 512 px/m; written by sheet_cargo_hold_looks.py. The nose must stay the brightest glow.",
+  "about": "Tickets 580 and 812: at a 360 px wide phone (30 px/m over the 12 m zoom, and 45 px/m over the closest 8 m zoom the sweep spec judges at), the pixels of the hold's look box (lookBoxM [0.125, 0.0, 0.345, 0.21]: the hatch, the flank under it and the stay) that change between each look on hull.cargo and the next (a channel moving more than 24 of 255), and the brightest pixel (Rec. 709 luminance, 0-255) of the drill nose against the look box and the rest of the rig for each look, the nose lit as while drilling: under `lit` on the phone-size renders, under `glow` on the tier-1 emission-only render at 512 px/m; written by sheet_cargo_hold_looks.py. The nose must stay the brightest glow.",
   "lit": {
     "tier-1": {
       "phonePxPerM": 30.0,
-      "holdFootprintPx": {
+      "lookBoxPx": {
         "ore-hatch -> plank-crate": {
           "changed": 9,
-          "of": 21
+          "of": 56
         },
         "plank-crate -> ore-hopper": {
           "changed": 12,
-          "of": 21
+          "of": 56
         },
         "ore-hopper -> riveted-bin": {
           "changed": 14,
-          "of": 21
+          "of": 56
+        },
+        "riveted-bin -> racked-bin": {
+          "changed": 16,
+          "of": 56
+        },
+        "racked-bin -> pannier-bin": {
+          "changed": 11,
+          "of": 56
+        }
+      },
+      "closestZoomPxPerM": 45.0,
+      "closestZoomLookBoxPx": {
+        "ore-hatch -> plank-crate": {
+          "changed": 24,
+          "of": 110
+        },
+        "plank-crate -> ore-hopper": {
+          "changed": 25,
+          "of": 110
+        },
+        "ore-hopper -> riveted-bin": {
+          "changed": 29,
+          "of": 110
+        },
+        "riveted-bin -> racked-bin": {
+          "changed": 32,
+          "of": 110
+        },
+        "racked-bin -> pannier-bin": {
+          "changed": 27,
+          "of": 110
         }
       },
       "brightest": {
         "ore-hatch": {
           "nose": 203,
+          "look": 180,
           "restOfRig": 255
         },
         "plank-crate": {
           "nose": 203,
+          "look": 180,
           "restOfRig": 255
         },
         "ore-hopper": {
           "nose": 203,
+          "look": 188,
           "restOfRig": 255
         },
         "riveted-bin": {
           "nose": 203,
+          "look": 200,
+          "restOfRig": 255
+        },
+        "racked-bin": {
+          "nose": 203,
+          "look": 196,
+          "restOfRig": 255
+        },
+        "pannier-bin": {
+          "nose": 203,
+          "look": 195,
           "restOfRig": 255
         }
       }
     },
     "tier-3": {
       "phonePxPerM": 30.0,
-      "holdFootprintPx": {
+      "lookBoxPx": {
         "ore-hatch -> plank-crate": {
           "changed": 9,
-          "of": 21
+          "of": 56
         },
         "plank-crate -> ore-hopper": {
           "changed": 12,
-          "of": 21
+          "of": 56
         },
         "ore-hopper -> riveted-bin": {
           "changed": 14,
-          "of": 21
+          "of": 56
+        },
+        "riveted-bin -> racked-bin": {
+          "changed": 16,
+          "of": 56
+        },
+        "racked-bin -> pannier-bin": {
+          "changed": 11,
+          "of": 56
+        }
+      },
+      "closestZoomPxPerM": 45.0,
+      "closestZoomLookBoxPx": {
+        "ore-hatch -> plank-crate": {
+          "changed": 25,
+          "of": 110
+        },
+        "plank-crate -> ore-hopper": {
+          "changed": 26,
+          "of": 110
+        },
+        "ore-hopper -> riveted-bin": {
+          "changed": 30,
+          "of": 110
+        },
+        "riveted-bin -> racked-bin": {
+          "changed": 34,
+          "of": 110
+        },
+        "racked-bin -> pannier-bin": {
+          "changed": 26,
+          "of": 110
         }
       },
       "brightest": {
         "ore-hatch": {
           "nose": 255,
+          "look": 181,
           "restOfRig": 226
         },
         "plank-crate": {
           "nose": 255,
+          "look": 181,
           "restOfRig": 226
         },
         "ore-hopper": {
           "nose": 255,
+          "look": 187,
           "restOfRig": 226
         },
         "riveted-bin": {
           "nose": 255,
+          "look": 198,
+          "restOfRig": 226
+        },
+        "racked-bin": {
+          "nose": 255,
+          "look": 196,
+          "restOfRig": 226
+        },
+        "pannier-bin": {
+          "nose": 255,
+          "look": 195,
           "restOfRig": 226
         }
       }
@@ -75,18 +165,32 @@
   "glow": {
     "ore-hatch": {
       "nose": 247,
+      "look": 31,
       "restOfRig": 253
     },
     "plank-crate": {
       "nose": 247,
+      "look": 31,
       "restOfRig": 253
     },
     "ore-hopper": {
       "nose": 247,
+      "look": 31,
       "restOfRig": 253
     },
     "riveted-bin": {
       "nose": 247,
+      "look": 178,
+      "restOfRig": 253
+    },
+    "racked-bin": {
+      "nose": 247,
+      "look": 175,
+      "restOfRig": 253
+    },
+    "pannier-bin": {
+      "nose": 247,
+      "look": 178,
       "restOfRig": 253
     }
   }
