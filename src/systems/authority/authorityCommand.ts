@@ -478,8 +478,15 @@ import type { DriveSigns } from '../vehicle/driveSigns'
  *    the same way. The swept cut cuts along the aim, a cut's speed along it held so its sideways
  *    part never passes the drive, and the face sits at the body's reach along the aim. A command
  *    with no aim aims at its facing, so every older log replays as it did and moves no digest.
+ * 108: the Cache Crate's placed containers (ticket 823, the TD's final ruling on #823): the
+ *    planet-kit slice's `planet-kit.drop_container` moves the whole hold into a container at the
+ *    vehicle's cell and `planet-kit.pickup_container` moves it back up to the hold's free room,
+ *    owner-only, answered by `planet-kit.ContainerDropped` and `planet-kit.ContainerPickedUp`;
+ *    `debug.planet-kit.placeContainer` places one for a scenario. The containers live in the
+ *    `planet-kit.containers` session section keyed by `s:p`, absent while none is placed, so a
+ *    run that places none moves no digest.
  */
-export const AUTHORITY_PROTOCOL_VERSION = 107
+export const AUTHORITY_PROTOCOL_VERSION = 108
 
 /** The kernel's own commands: the closed set its rule tables are written against. */
 export interface KernelCommandPayloads {
