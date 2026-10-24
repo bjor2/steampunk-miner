@@ -63,6 +63,48 @@ It is emulation: a throttled desktop CPU and SwiftShader software GL. It gives t
 numbers only; GPU numbers come from the real-device check (#482), and nothing here is "verified on
 device". `-- --dry-run` prints the lines and writes nothing.
 
+## Purchase-level rows
+
+`npm run bench:purchase-levels` (ticket 840, the row set and done-when from the #316 decision) is
+report only and not gated. It measures streaming and tick cost by drill purchase level: L1, L20
+(about 84 m/s), L30 (about 800 m/s), L40 (about 7 km/s) and the planet's radius-clamp level, on
+planets 1, 5, 10 and 40, on two profiles. Each row prints one JSON line, and the run writes
+`test-results/bench-purchase-levels/rows.ndjson` and `table.md`, the table to post on the ticket.
+`-- --planets 1,5 --levels L1,L20 --profiles phone` runs a subset. The vs-L1 column needs the L1
+row of the same planet and profile in the same run.
+
+- **Rigs.** A level names the law step of that `drill_power` purchase through planet 1's band-1
+  rock. On a harder planet the same purchase barely scratches the rock, so the row's rig is the
+  weakest purchase whose step on that planet's band-1 rock reaches the level's planet-1 step, as
+  ticket 560 named its rigs by speed. Every other track is the planet's on-curve step. The clamp
+  level is the weakest purchase whose step reaches the planet's radius in one tick, where
+  `stepWithinPlanetMm` holds it (ticket 558). It is computed per planet, never written down.
+- **Profiles.** Desktop is 1280x800, the ticket's size, because the repo has no desktop perf
+  profile. Phone is the perf:phone lane's profile: the Pixel 7 landscape screen (915x412) at the
+  lane's first throttle rate, 4x (`perfPhonePlan.json`). Node can't throttle a CPU, so the bench
+  models a uniformly slower one. Every time is multiplied by the slowdown, and the terrain's 2 ms
+  budget is spent at 2 ms / slowdown of this machine's time, which is what a 4x slower CPU gets
+  out of the budget. The view radius is half the screen's diagonal at the widest zoom its shape
+  allows, which is how far the camera pulls back at speed.
+- **A frame** is one tick. It runs the client's cut-follow read and the authority's tick (the
+  clock, a `drillStep`, a report every 12 ticks), then the terrain stream, then the hazard strip,
+  all on the main thread. Generation runs on the main thread here; the live client builds in the
+  worker (ticket 337), so waits are upper bounds. Rapier, React and the GPU aren't included; see
+  `bench:physics` and `perf:phone` for those. The rig starts already moving at its law speed, like
+  the #560 slab, so a row reads steady state, not the #724 gravity ramp. A pass runs from a cold
+  chunk cache down to the core's top, for at most 3 s. Passes repeat until 60 moving ticks are
+  read, or 10 passes have run.
+- **Columns.** Tick p50/p95 over the moving ticks; frame p95 against the 16.7 ms budget and terrain
+  p95 against the 2 ms budget (#4); chunk loads (generations) per second; builds per frame (mean,
+  max); frames with the rig's body or cut front in a chunk with no mesh, and the longest run of
+  them; frames whose strip window was gap-free and reached its full reach; frames that showed the
+  1 s collapse warning. For the warning, a block 16 m down the line is warned on the pass's first
+  frame, and its pip is checked on every frame until it refills or the nose reaches it.
+- **Done when (per row):** the tick p50 is within ±10% of the L1 row on the same planet and
+  profile; the rig never stands in unbuilt ground; frame and terrain p95 are within budget; at L20,
+  the strip is populated and the warning shown on every judged frame; and no command is refused. A
+  red row goes under #647 as streaming or prefetch work, **never as a speed clamp**.
+
 ## Bench run logs
 
 Any bench run with `-- --log` (`npm run bench:ground -- --log`) also writes its timed series as

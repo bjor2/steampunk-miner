@@ -40,6 +40,7 @@ Versions mirror `infernal-bistro` (same owner). The game is 2D: an orthographic 
 | `npm run bench:world`                     | `generateChunk` p50/p95 per planet (logged, not gated)    |
 | `npm run bench:render`                    | chunk mesh batch p50/p95 per planet (logged, not gated)   |
 | `npm run bench:physics`                   | physics tick p50/p95 at 24-384 m/s (logged, not gated)    |
+| `npm run bench:purchase-levels`           | tick/stream cost L1-L40+clamp, P1-P40, phone+desktop      |
 | `npm run bench:report-pose[:paired]`      | pose report cost a drilling tick; `:paired` + swept cut   |
 | `npm run bench:summary`                   | check + tabulate `bench:* -- --log` run folders (#124)    |
 | `npm run perf:record -- --source bench`   | record bench medians in `docs/perf/history.ndjson`        |
