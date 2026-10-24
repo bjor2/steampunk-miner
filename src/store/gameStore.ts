@@ -161,6 +161,12 @@ import {
   type StarMapValues,
 } from './starMapSlice'
 import {
+  STARTING_STAR_MAP_CAROUSEL,
+  starMapCarouselActionsOf,
+  type StarMapCarouselActions,
+  type StarMapCarouselValues,
+} from './starMapCarouselSlice'
+import {
   STARTING_TOOL_TRAY,
   toolTrayActionsOf,
   type ToolTrayActions,
@@ -238,6 +244,8 @@ export interface GameState
     ToolTrayActions,
     StarMapValues,
     StarMapPanelActions,
+    StarMapCarouselValues,
+    StarMapCarouselActions,
     TripIncomeValues,
     TripIncomeActions,
     DigRampValues,
@@ -357,6 +365,7 @@ type GameValues = Pick<
   | keyof HudDetailValues
   | keyof ToolTrayValues
   | keyof StarMapValues
+  | keyof StarMapCarouselValues
   | keyof TripIncomeValues
   | keyof DigRampValues
   | keyof WarningValues
@@ -393,6 +402,7 @@ export const STARTING_VALUES: GameValues = {
   ...STARTING_HUD_DETAIL,
   ...STARTING_TOOL_TRAY,
   ...STARTING_STAR_MAP,
+  ...STARTING_STAR_MAP_CAROUSEL,
   ...STARTING_TRIP_INCOME,
   ...STARTING_DIG_RAMP,
   ...STARTING_WARNINGS,
@@ -426,6 +436,7 @@ export const useGameStore = create<GameState>()((set, get) => ({
   ...hudDetailActionsOf(set, get),
   ...toolTrayActionsOf(set),
   ...starMapPanelActionsOf(set, get),
+  ...starMapCarouselActionsOf(set, get),
   ...tripIncomeActionsOf(set, get),
   ...digRampActionsOf(set, get),
   ...warningActionsOf(set, get),

@@ -9,7 +9,9 @@
  * (`jumpToPlanet`, `buyFuel`, `buyFuelTank`, `buyJumpDrive`): no rule here decides anything.
  *
  * The buttons are a menu's (`focusStops`, `buttons`), so a key or a pad moves through them as through
- * a bay's, and a click or a tap presses the same store action.
+ * a bay's, and a click or a tap presses the same store action. Since the carousel (ticket 796) only
+ * the shown planet's Jump and Buy fuel are drawn, so only theirs are focus stops; every planet's
+ * stay among the buttons.
  */
 import { refusalOfIntent } from '../authority/applyCommand'
 import { vehicleOf, type AuthorityState } from '../authority/authorityState'
@@ -40,12 +42,16 @@ import {
   starMapBuyFuelIdOf,
   starMapJumpIdOf,
 } from './starMapControlIds'
+import { placeShownAmong } from './starMapCarousel'
 import { starMapPlacesOf } from './starMapView'
 import { priceReading, type AmountReading, type ScreenButton } from './viewParts'
 
-/** The UI state the controls read besides the authority: the Jump whose first press armed it. */
+/** The UI state the controls read besides the authority. */
 export interface StarMapUiState {
+  /** The Jump whose first press armed it. */
   armedJumpId: string | null
+  /** The carousel's pick (ticket 796); null shows the planet the session is on. */
+  starMapPlace: number | null
 }
 
 /** A jump's two controls: the Jump itself and the fuel its tank lacks, where that fuel is sold. */
@@ -85,13 +91,15 @@ export function starMapControlsOf(
   ui: StarMapUiState,
 ): StarMapControls {
   const isAtFuelBay = dockedBayOf(state, playerId) === 'sell'
+  const places = starMapPlacesOf(state.planet)
   const controls = {
-    planets: planetJumpsOf(state, playerId, starMapPlacesOf(state.planet), { ...ui, isAtFuelBay }),
+    planets: planetJumpsOf(state, playerId, places, { ...ui, isAtFuelBay }),
     buyTank: isAtFuelBay ? buyTankOf(state, playerId) : null,
     buyDrive: isAtFuelBay ? buyDriveOf(state, playerId) : null,
     jumpOut: jumpOutOf(state, playerId, { ...ui, isAtFuelBay }),
   }
-  return { ...controls, ...menuOf(controls) }
+  const shownPlace = placeShownAmong(places, Number(placeOfSession(state)), ui.starMapPlace)
+  return { ...controls, ...menuOf(controls, shownPlace) }
 }
 
 interface JumpUiState extends StarMapUiState {
@@ -245,13 +253,19 @@ function reasonOf(state: AuthorityState, playerId: string, intent: CommandIntent
   return refusalOfIntent(state, playerId, intent)?.reason ?? null
 }
 
-/** The buttons in reading order: the bay's purchases, each planet's fuel then Jump, the way out. */
-function menuOf(controls: Omit<StarMapControls, 'focusStops' | 'buttons'>) {
-  const buttons = [
-    ...[controls.buyTank, controls.buyDrive].flatMap((purchase) => purchase?.button ?? []),
-    ...[...controls.planets, controls.jumpOut].flatMap(jumpButtonsOf),
-  ]
-  return { buttons, focusStops: buttons.map(focusStopOf) }
+/**
+ * The buttons in reading order: the bay's purchases, each planet's fuel then Jump, the way out;
+ * the focus stops are the drawn ones, the shown planet's alone among the planets'.
+ */
+function menuOf(controls: Omit<StarMapControls, 'focusStops' | 'buttons'>, shownPlace: number) {
+  const purchases = [controls.buyTank, controls.buyDrive].flatMap((p) => p?.button ?? [])
+  const shown = controls.planets.filter((planet) => planet.place === shownPlace)
+  return {
+    buttons: [...purchases, ...[...controls.planets, controls.jumpOut].flatMap(jumpButtonsOf)],
+    focusStops: [...purchases, ...[...shown, controls.jumpOut].flatMap(jumpButtonsOf)].map(
+      focusStopOf,
+    ),
+  }
 }
 
 function jumpButtonsOf(controls: JumpControls | null): ScreenButton[] {

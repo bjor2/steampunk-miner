@@ -35,6 +35,7 @@ import type { AuthorityState } from '../authority/authorityState'
 import { openArtefactCacheCommand } from '../artefacts/artefactCommands'
 import { isShopBay } from '../authority/dockRules'
 import { dockCommand, quickServiceCommand, undockCommand } from '../platform/platformCommands'
+import type { CarouselStep } from '../views/starMapCarousel'
 import {
   plantChargeCommand,
   requestRescueCommand,
@@ -76,6 +77,8 @@ export type InputReaction =
   | { kind: 'toggleStarMap' }
   /** Escape while the star map's panel is open (ticket 769): it shuts, and nothing else happens. */
   | { kind: 'closeStarMap' }
+  /** ←/→ or the d-pad at a bay while the star map is open (ticket 796): its carousel steps. */
+  | { kind: 'stepStarMap'; step: CarouselStep }
   /** The Dock key while docked (ticket 794): the sheet and the star map shut, then one Undock. */
   | { kind: 'leaveStation'; intent: CommandIntent }
   | { kind: 'none' }
@@ -173,6 +176,8 @@ const REACTIONS_BY_LAYER: Readonly<
   platform: {
     ...MENU_REACTIONS,
     ...SHEET_KEY_REACTIONS,
+    ui_left: (situation) => stepStarMapOrFocus(situation, -1),
+    ui_right: (situation) => stepStarMapOrFocus(situation, 1),
     quick_service: ({ dockedBay }) => (isShopBay(dockedBay) ? submit(quickServiceCommand()) : NONE),
     open_star_map: () => TOGGLE_STAR_MAP,
     ui_cancel: ({ isStarMapOpen }) => (isStarMapOpen ? CLOSE_STAR_MAP : submit(undockCommand())),
@@ -242,6 +247,15 @@ function interactReaction(situation: InputSituation): InputReaction {
 /** Docked, the Dock key closes whatever is open over the station and undocks in one press. */
 function leaveStationReaction({ dockedBay }: InputSituation): InputReaction {
   return dockedBay === null ? NONE : { kind: 'leaveStation', intent: undockCommand() }
+}
+
+/**
+ * Over a bay the open star map takes left and right for its carousel (ticket 796); up and down
+ * still walk the bay's and the map's buttons. Driving, the same keys steer, so the map steps by
+ * its buttons, a swipe or a click on the system strip there.
+ */
+function stepStarMapOrFocus({ isStarMapOpen }: InputSituation, step: CarouselStep): InputReaction {
+  return isStarMapOpen ? { kind: 'stepStarMap', step } : { kind: 'moveFocus', step }
 }
 
 /** `request_rescue` is live only for a vehicle that cannot move on its own (#7). */

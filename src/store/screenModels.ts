@@ -82,6 +82,8 @@ export interface ScreenSources {
   armedJumpId: string | null
   /** The star map's panel is open: its controls join the bay's menu (ticket 793). */
   isStarMapOpen: boolean
+  /** The carousel's pick (ticket 796): only that planet's Jump is a focus stop. */
+  starMapPlace: number | null
   focusedControlId: string | null
   liveStepHold: LiveStepHold
   installingUpgradeId: UpgradeId | null

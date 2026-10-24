@@ -355,6 +355,7 @@ function applyReaction(reaction: InputReaction): void {
   else if (reaction.kind === 'openSheetAtPlace') game.openSheetAtPlace(reaction.place)
   else if (reaction.kind === 'toggleStarMap') game.toggleStarMap()
   else if (reaction.kind === 'closeStarMap') game.closeStarMap()
+  else if (reaction.kind === 'stepStarMap') game.stepStarMapPlanet(reaction.step)
   else if (reaction.kind === 'leaveStation') leaveStation(reaction.intent)
 }
 

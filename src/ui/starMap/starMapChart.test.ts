@@ -36,7 +36,7 @@ function drawChartOn(planet: number, { money = '0', isDocked = false } = {}): st
   return renderToString(
     createElement(StarMapChartView, {
       map: starMapViewOf(state, 'p1'),
-      controls: starMapControlsOf(state, 'p1', { armedJumpId: null }),
+      controls: starMapControlsOf(state, 'p1', { armedJumpId: null, starMapPlace: null }),
       focusedId: null,
     }),
   )

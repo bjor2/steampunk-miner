@@ -12,8 +12,11 @@
  *
  * The map art (ticket 758) draws each planet as the tinted planet sprite in the planet's own ground
  * colour (its row look's surface rock, else its archetype palette's, #13), and the tank as a bar,
- * so the view carries the colour and the tank's fill as well as the numbers.
+ * so the view carries the colour and the tank's fill as well as the numbers. The carousel (ticket
+ * 796) draws each planet's Blender preview where the kernel can name it, and its gravity as its
+ * trait (#724).
  */
+import { firstSystemPreviewAssetIdOf } from '../art/starMapCarouselArt'
 import { vehicleOf, type AuthorityState } from '../authority/authorityState'
 import { systemOfPlanet, type SessionPlanet } from '../authority/planetOfState'
 import { fuelChargeOf } from '../authority/starMap/fuelShopRules'
@@ -39,6 +42,7 @@ import { toIndexText } from '../starMap/planetAddress'
 import { fuelCapacityOf, fuelOf, hasRoomFor } from '../vehicle/vehicleFuel'
 import type { VehicleState } from '../vehicle/vehicleState'
 import { planetArchetypeOf } from '../world/planetArchetype'
+import { planetGravityTraitOf, type LocalGravityReading } from './localGravityReading'
 import { amountReading, priceReading, type AmountReading } from './viewParts'
 
 export interface StarMapTank {
@@ -63,6 +67,10 @@ export interface StarMapPlanet {
   name: string
   /** The planet's ground colour, `#rrggbb`: the tint of its sprite on the map (ticket 758). */
   colour: string
+  /** The carousel's Blender preview of the planet (ticket 796); null draws the tinted glyph. */
+  previewAssetId: string | null
+  /** The planet's surface gravity, its trait (#724), "1.25 g". */
+  gravity: LocalGravityReading
   isHere: boolean
   /** The player cannot afford the jump now: drawn dimmed, still listed with its numbers. */
   isDimmed: boolean
@@ -127,12 +135,24 @@ function placeOf(planet: SessionPlanet): number {
   return planet.index - Number(planetsBefore(systemOfPlanet(planet)))
 }
 
+/** What a planet shows wherever the session is. */
+type PlanetLooks = Pick<StarMapPlanet, 'place' | 'name' | 'colour' | 'previewAssetId' | 'gravity'>
+
 function planetOnMapOf(state: AuthorityState, playerId: string, place: number): StarMapPlanet {
   const planetIndex = planetIndexAt(systemOfPlanet(state.planet), BigInt(place)) ?? 0
-  const name = planetDisplayNameOf(planetIndex)
-  const colour = planetMapColourOf(planetIndex)
-  if (planetIndex === state.planet.index) return herePlanetOf(place, name, colour)
-  return { place, name, colour, ...jumpReadingsOf(state, playerId, planetIndex) }
+  const looks = planetLooksOf(place, planetIndex)
+  if (planetIndex === state.planet.index) return herePlanetOf(looks)
+  return { ...looks, ...jumpReadingsOf(state, playerId, planetIndex) }
+}
+
+function planetLooksOf(place: number, planetIndex: number): PlanetLooks {
+  return {
+    place,
+    name: planetDisplayNameOf(planetIndex),
+    colour: planetMapColourOf(planetIndex),
+    previewAssetId: firstSystemPreviewAssetIdOf(planetIndex),
+    gravity: planetGravityTraitOf(planetIndex),
+  }
 }
 
 /** The planet's surface rock: its own row look's, else its archetype palette's (#13). */
@@ -142,11 +162,9 @@ export function planetMapColourOf(planetIndex: number): string {
   return hexOfRgb(paletteOf(planetArchetypeOf(planetIndex).paletteId).surface)
 }
 
-function herePlanetOf(place: number, name: string, colour: string): StarMapPlanet {
+function herePlanetOf(looks: PlanetLooks): StarMapPlanet {
   return {
-    place,
-    name,
-    colour,
+    ...looks,
     isHere: true,
     isDimmed: false,
     fuel: null,

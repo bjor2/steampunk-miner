@@ -14,6 +14,7 @@ import type { PlaqueModel } from '../systems/views/plaqueModel'
 import type { SellBayModel } from '../systems/views/sellBayModel'
 import type { HoldSheet } from '../systems/views/holdSheet'
 import { starMapViewOf, type StarMapView } from '../systems/views/starMapView'
+import { starMapCarouselOf, type StarMapCarousel } from '../systems/views/starMapCarousel'
 import type { StarMapControls } from '../systems/views/starMapControls'
 import type { UpgradeBayModel } from '../systems/views/upgradeBayModel'
 import type { RefineryBayModel } from '../systems/views/refineryBayModel'
@@ -91,6 +92,11 @@ export function readHoldSheetModel(): HoldSheet {
 /** The star map (ticket 757), as it would draw now, open or not. */
 export function readStarMapModel(): StarMapView {
   return starMapViewOf(readAuthorityState(), useGameStore.getState().playerId)
+}
+
+/** The star map's carousel (ticket 796): the shown planet and the system strip, open or not. */
+export function readStarMapCarousel(): StarMapCarousel {
+  return starMapCarouselOf(readStarMapModel(), useGameStore.getState().starMapPlace)
 }
 
 /** The star map's Jumps and purchases (ticket 793), as they would act now, open or not. */

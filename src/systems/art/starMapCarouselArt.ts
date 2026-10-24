@@ -86,6 +86,17 @@ export function starMapPreviewAssetIdOf(lookKey: string): string {
   return `${STAR_MAP_PREVIEW_ASSET_PREFIX}${lookKey}`
 }
 
+/**
+ * The preview a planet of the first system draws as the carousel's hero (ticket 796): its place
+ * is its index there. Null for a later planet: its palette look is the `solar-systems` slice's,
+ * and no kernel seam hands a planet its look yet (`planetRow.ts`), so the map draws its tinted
+ * glyph instead.
+ */
+export function firstSystemPreviewAssetIdOf(planetIndex: number): string | null {
+  const isFirstSystemPlace = planetIndex >= 1 && planetIndex <= ECONOMY.starMap.planetsPerSystem
+  return isFirstSystemPlace ? starMapPreviewAssetIdOf(String(planetIndex)) : null
+}
+
 /** The look key a preview asset is for, or null for another asset. */
 export function lookKeyOfPreviewAsset(assetId: string): string | null {
   if (!assetId.startsWith(STAR_MAP_PREVIEW_ASSET_PREFIX)) return null
@@ -121,6 +132,11 @@ export function starMapSystemPartIds(): string[] {
 /** Every part of the kernel's carousel assets, for the part id registry. */
 export function starMapCarouselKernelPartIds(): string[] {
   return [...firstSystemPreviewAssetIds().flatMap(starMapPreviewPartIds), ...starMapSystemPartIds()]
+}
+
+/** Whether the strip has an orbit for a place; system 1's run past five (#781) has none. */
+export function hasOrbitAt(place: number, system: StarMapSystemBrief = STAR_MAP_SYSTEM): boolean {
+  return place >= 1 && place <= system.orbitRadiiPx.length
 }
 
 /** Where a planet sits on the system strip: on the middle line, its orbit's radius from the sun. */

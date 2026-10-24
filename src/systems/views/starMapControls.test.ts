@@ -27,7 +27,7 @@ const setPlanet = (planetIndex: number) =>
   ({ type: 'debug.setPlanet', payload: { planetIndex } }) as const
 const dockAtSell = { type: 'dock', payload: { bay: 'sell' } } as const
 
-const NOTHING_ARMED = { armedJumpId: null }
+const NOTHING_ARMED = { armedJumpId: null, starMapPlace: null }
 
 /** A session on `planet` with `money`, docked at `bay` (or not docked), its tank holding `fuel`. */
 function sessionWith({
@@ -47,8 +47,12 @@ function sessionWith({
   return session
 }
 
-function controlsOf(session: ReturnType<typeof sessionWith>, armedJumpId: string | null = null) {
-  return starMapControlsOf(session.state(), 'p1', { armedJumpId })
+function controlsOf(
+  session: ReturnType<typeof sessionWith>,
+  armedJumpId: string | null = null,
+  starMapPlace: number | null = null,
+) {
+  return starMapControlsOf(session.state(), 'p1', { armedJumpId, starMapPlace })
 }
 
 function planetAt(controls: StarMapControls, place: number) {
@@ -161,17 +165,28 @@ describe('star map controls (ticket 793)', () => {
     expect(controlsOf(session).jumpOut).toBeNull()
   })
 
-  it('lists every control as a focus stop in reading order: purchases, each fuel then its Jump', () => {
-    const controls = controlsOf(sessionWith({ money: '1e9', fuel: 2 }))
-    expect(controls.focusStops.map((stop) => stop.id)).toEqual(
-      controls.buttons.map((button) => button.id),
-    )
-    expect(controls.buttons.slice(0, 2).map((button) => button.id)).toEqual([
+  it("lists the drawn controls as focus stops in reading order: purchases, the shown planet's fuel then its Jump", () => {
+    const controls = controlsOf(sessionWith({ money: '1e9', fuel: 2 }), null, 5)
+    expect(controls.focusStops.map((stop) => stop.id)).toEqual([
       STAR_MAP_BUY_TANK_ID,
       STAR_MAP_BUY_DRIVE_ID,
+      starMapBuyFuelIdOf(5),
+      starMapJumpIdOf(5),
     ])
+  })
+
+  it("keeps every planet's Jump among the buttons while only the shown one's is a focus stop (ticket 796)", () => {
+    const controls = controlsOf(sessionWith({ money: '1e9' }), null, 3)
     const ids = controls.buttons.map((button) => button.id)
-    expect(ids.indexOf(starMapBuyFuelIdOf(5))).toBe(ids.indexOf(starMapJumpIdOf(5)) - 1)
+    for (const place of [2, 3, 4, 5]) expect(ids).toContain(starMapJumpIdOf(place))
+    const stops = controls.focusStops.map((stop) => stop.id)
+    expect(stops).toContain(starMapJumpIdOf(3))
+    expect(stops).not.toContain(starMapJumpIdOf(2))
+  })
+
+  it('stops on no Jump while the carousel shows the planet the session is on (ticket 796)', () => {
+    const stops = controlsOf(sessionWith({ money: '1e9' })).focusStops.map((stop) => stop.id)
+    expect(stops).toEqual([STAR_MAP_BUY_TANK_ID, STAR_MAP_BUY_DRIVE_ID])
   })
 
   it('reads the state only: the same state gives the same controls', () => {

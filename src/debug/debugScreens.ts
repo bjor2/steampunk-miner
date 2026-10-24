@@ -30,6 +30,7 @@ import {
   readPauseMenuModel,
   readRefineryBayModel,
   readSellBayModel,
+  readStarMapCarousel,
   readStarMapControls,
   readStarMapModel,
   readTitleMenuModel,
@@ -61,6 +62,7 @@ import type { PauseMenuModel } from '../systems/views/pauseMenuModel'
 import { planetCardViewOf, type PlanetCardView } from '../systems/views/planetCardView'
 import type { RefineryBayModel } from '../systems/views/refineryBayModel'
 import type { SellBayModel } from '../systems/views/sellBayModel'
+import type { StarMapCarousel } from '../systems/views/starMapCarousel'
 import type { StarMapControls } from '../systems/views/starMapControls'
 import type { StarMapView } from '../systems/views/starMapView'
 import type { TitleMenuModel } from '../systems/views/titleMenuModel'
@@ -129,6 +131,11 @@ export interface DebugUi {
    * at the Sell bay and the jump to the next system, each with the refusal its press would meet.
    */
   getStarMapControls(): DebugResult<{ model: StarMapControls }>
+  /**
+   * The star map's carousel (ticket 796): the planet shown, whether a step back or on is left,
+   * and the system strip's pan target and planets on their orbits.
+   */
+  getStarMapCarousel(): DebugResult<{ model: StarMapCarousel }>
   /** The pause menu (ticket 404) as it draws now; null while it is closed. */
   getPauseMenuModel(): DebugResult<{ model: PauseMenuModel | null }>
   /** The name the pause menu's next save takes, as if typed into its field; refused when closed. */
@@ -264,6 +271,7 @@ export function createDebugUi(): DebugUi {
     getRefineryBayModel: () => ({ ok: true, model: readRefineryBayModel() }),
     getStarMapModel: () => ({ ok: true, model: readStarMapModel() }),
     getStarMapControls: () => ({ ok: true, model: readStarMapControls() }),
+    getStarMapCarousel: () => ({ ok: true, model: readStarMapCarousel() }),
     getPauseMenuModel: () => ({ ok: true, model: readPauseMenuModel() }),
     setPauseSaveName: setPauseSaveNameUnlessRefused,
     getBayPresentation: () => ({ ok: true, presentation: bayPresentationNow() }),
