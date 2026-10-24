@@ -9,7 +9,8 @@
  * drill power chain for its shot. The chips (#178) and tech tree (#165) are not built yet, so the
  * set shoots a dig and the settings screen in their places; each ticket swaps its shot in when it
  * lands. The portrait cells shoot the same set held upright (ticket 488), and `rotated` turned
- * sideways mid-dig with no reload.
+ * sideways mid-dig with no reload. `drill-wall` (ticket 789) is the tier-3 rig drilling sideways
+ * into its shaft's lined wall: the drawn tip where the ground opens, not behind the casing.
  */
 import { expect, test, type Page } from '@playwright/test'
 import type { ScreenCell } from './screenCells'
@@ -23,6 +24,24 @@ const GROUND_SETTLE_MS = 3000
 const ART_SETTLE_MS = 3000
 /** Held upright, the share of the height down to open ground, above the stick zone's 45%. */
 const UPRIGHT_TAP_HEIGHT_SHARE = 0.4
+/** The on-curve steps at the end of planet 2 (`onCurveSteps(2)`): visual tier 3, the widest head. */
+const TIER_3_STEPS = {
+  drill_power: 15,
+  drill_tip: 100,
+  engine: 5,
+  boiler: 5,
+  cargo_hold: 24,
+  hull: 80,
+} as const
+const CASING_GRADE = 1
+/**
+ * The 0.9 m body has 0.5 m of air to the 1.9 m shaft's wall (`sideClearanceMm`), the lining 0.25 m
+ * past it: shot with the head in the lining, judged once the body is a whole cell through it.
+ */
+const WALL_SHOT_MM = 600
+const WALL_CUT_MM = 1200
+/** Software WebGL on a loaded box drills slowly; a wait, not a judgement. */
+const WALL_CUT_TIMEOUT_MS = 120_000
 
 test.describe('screen matrix: review shots (#173)', () => {
   test('writes the look set for this screen', async ({ page }) => {
@@ -38,6 +57,11 @@ test.describe('screen matrix: review shots (#173)', () => {
     await digDown(page)
     await waitForGround(page)
     await shoot(page, 'dig')
+    const shaft = await lineTheShaftAtTier3(page)
+    await drillSidewaysPast(page, shaft, WALL_SHOT_MM)
+    await shoot(page, 'drill-wall')
+    await drillSidewaysPast(page, shaft, WALL_CUT_MM)
+    await page.evaluate(() => window.steampunkDebug!.input.release('aim_left'))
     await dockAt(page, 'upgrade')
     await holdMidChain(page)
     await shoot(page, 'workshop')
@@ -149,6 +173,55 @@ async function digDown(page: Page): Promise<void> {
   })
   await page.waitForTimeout(4000)
   await page.evaluate(() => window.steampunkDebug!.input.release('aim_down'))
+}
+
+interface RigSpot {
+  x: number
+  y: number
+}
+
+/** The rig at visual tier 3 (#789 repro), a ring of lining round it where it stands in the shaft. */
+async function lineTheShaftAtTier3(page: Page): Promise<RigSpot> {
+  const spot = await page.evaluate(
+    ({ steps, grade }) => {
+      const debug = window.steampunkDebug!
+      for (const [track, step] of Object.entries(steps)) debug.setUpgrade(track, step)
+      const snapshot = debug.snapshot()
+      if (!snapshot.ok) throw new Error(snapshot.problems.join('; '))
+      const pose = Object.values(snapshot.snapshot.state.players)[0].vehicle.pose
+      if (pose === null) throw new Error('the vehicle has no pose')
+      const lined = debug.lineCasing(pose.x, pose.y, grade)
+      if (!lined.ok) throw new Error(lined.problems.join('; '))
+      return { x: pose.x, y: pose.y }
+    },
+    { steps: TIER_3_STEPS, grade: CASING_GRADE },
+  )
+  expect(await visualTierOf(page)).toBe(3)
+  return spot
+}
+
+/** Left held until the rig's centre is `distanceMm` from where it stood in the shaft. */
+async function drillSidewaysPast(page: Page, shaft: RigSpot, distanceMm: number): Promise<void> {
+  await page.evaluate(() => window.steampunkDebug!.input.press('aim_left'))
+  await expect
+    .poll(() => distanceFromMm(page, shaft), { timeout: WALL_CUT_TIMEOUT_MS })
+    .toBeGreaterThanOrEqual(distanceMm)
+}
+
+function distanceFromMm(page: Page, from: RigSpot): Promise<number> {
+  return page.evaluate((spot) => {
+    const snapshot = window.steampunkDebug!.snapshot()
+    if (!snapshot.ok) throw new Error(snapshot.problems.join('; '))
+    const pose = Object.values(snapshot.snapshot.state.players)[0].vehicle.pose
+    return pose === null ? 0 : Math.hypot(pose.x - spot.x, pose.y - spot.y)
+  }, from)
+}
+
+function visualTierOf(page: Page): Promise<number> {
+  return page.evaluate(() => {
+    const parts = window.steampunkDebug!.vehicleParts()
+    return parts.ok ? parts.visualTier : 0
+  })
 }
 
 /** The ground drawn around the rig; the review shot needs a picture, not settled counts. */

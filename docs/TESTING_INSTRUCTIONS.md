@@ -1769,7 +1769,9 @@ incomePerHour}` go to `balance-report/drill-pace.ndjson`, which `pushTestMetrics
   the panels. `rotation.spec.ts` turns every touch cell the other way up and back with no reload:
   at rest, and mid-dig, where the rig keeps digging the same session and the same layout rows hold
   each way up. The review set (`reviewShots.spec.ts`) shoots the portrait cells' dock, dig,
-  workshop and settings upright, and `rotated` turned sideways mid-dig. Emulation only (Chromium
+  workshop and settings upright, and `rotated` turned sideways mid-dig. Every cell also shoots
+  `drill-wall` (ticket 789): the tier-3 rig drilling sideways into a lined shaft wall, judged by
+  the rig getting a cell through the wall. Emulation only (Chromium
   with `isMobile`/`hasTouch`), no on-device claim. Box Tester only.
 - **Drill-down run** (ticket 416): `e2e/browser/drillDown.spec.ts` holds the real Down key for 10 s
   on the P1 surface from `scenarios/drill-down-start.scenario.json`, at stored drill_power steps 1

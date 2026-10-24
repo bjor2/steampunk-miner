@@ -48,6 +48,11 @@ nearest screen:
 | `workshop.jpg` | the Upgrade bay screen                                                              | the workshop mid-chain (#177) |
 | `settings.jpg` | the settings screen, stand-in for a big menu                                        | the tech tree (#165)          |
 
+Beside #173's four, `drill-wall.jpg` (ticket 789) is the tier-3 rig drilling sideways out of that
+shaft into a ring of lining laid round it: the drawn drill tip sits where the ground opens, not
+behind the casing. The spec shoots it with the head in the lining and then holds Left until the
+body is a whole cell through the wall (a state check, never a pixel one).
+
 The portrait cells (`phone-portrait`, `pixel-portrait`, `tablet-portrait`) shoot the same four
-held upright (ticket 488), plus `rotated.jpg`: the game turned sideways mid-dig with no reload.
+held upright (ticket 488) with `drill-wall.jpg`, plus `rotated.jpg`: the game turned sideways mid-dig with no reload.
 They are Chromium emulation (`isMobile`, `hasTouch`), not shots from a device.
