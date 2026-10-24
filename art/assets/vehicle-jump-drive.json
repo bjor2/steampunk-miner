@@ -1,0 +1,10 @@
+{
+  "id": "vehicle-jump-drive",
+  "source": "blender",
+  "form": "parts",
+  "status": "final",
+  "color": "#8a5a30",
+  "partColors": {
+    "jump-drive": "#b07a3a"
+  }
+}

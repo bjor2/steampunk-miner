@@ -12,6 +12,7 @@ import { readLocalVehicle } from '../store/gameStore'
 import { readVehicleIntent } from '../store/inputRuntime'
 import { DrillHeadView } from './DrillHeadView'
 import { FuelTenderPiece } from './FuelTenderPiece'
+import { JumpDrivePiece } from './JumpDrivePiece'
 import { HeatShimmer } from './HeatShimmer'
 import { VehicleGuns } from './VehicleGuns'
 import { VehicleLook } from './VehicleLook'
@@ -42,6 +43,7 @@ export function Vehicle() {
           <DrillHeadView controller={controller} />
           <VehicleGuns />
           <FuelTenderPiece />
+          <JumpDrivePiece />
           <VehiclePieces />
           <HeatShimmer />
         </VehicleLook>

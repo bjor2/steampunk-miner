@@ -1,0 +1,27 @@
+{
+  "assetId": "vehicle-jump-drive",
+  "schema": 1,
+  "source": {
+    "blend": "art/blender/vehicle-jump-drive/vehicle-jump-drive.blend",
+    "sha256": null,
+    "blender": null
+  },
+  "pxPerMetre": 512,
+  "atlasPx": [512, 256],
+  "maps": {
+    "albedo": "vehicle-jump-drive.albedo.ktx2",
+    "normal": "vehicle-jump-drive.normal.ktx2",
+    "emissive": false
+  },
+  "parts": [
+    {
+      "id": "jump-drive",
+      "tier": 1,
+      "rect": [8, 8, 343, 152],
+      "sizeM": [0.6688, 0.2958],
+      "pivotM": [0.6548, 0.06],
+      "atM": [0.0, 0.0],
+      "z": 1
+    }
+  ]
+}
