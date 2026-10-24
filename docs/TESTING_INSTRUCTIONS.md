@@ -1896,7 +1896,14 @@ incomePerHour}` go to `balance-report/drill-pace.ndjson`, which `pushTestMetrics
   top step, the tail's palette cycling, the table refused with every problem listed), its tail
   reaches the kernel vehicle look through a scripted session's tank purchases
   (`fuelTenderLookSource.test.ts`), and its ids derive from the fuel tank item with one part per
-  step (`systems/art/fuelTenderArt.test.ts`). The star map's planet colour and tank fill are on the
+  step (`systems/art/fuelTenderArt.test.ts`). LK5 (ticket 813, spec #647) adds the three steps at
+  tank levels 6, 7 and 8 to the same specs: at least five authored steps, each one purchase after
+  the one before (the tender is exempt from the decade rule), each named in 3 words or fewer, the
+  seven parts in the asset with no emissive map, and the tank's golden lines in
+  `rigLookLines.golden.txt` at every step and one past it. The browser spec
+  `e2e/browser/fuelTenderLook.spec.ts` buys the tank level by level at the Sell bay and asserts the
+  mounted wagon part through `steampunkDebug.vehicleParts()`, with a shot per level at desktop and
+  360 px (Box Tester only). The star map's planet colour and tank fill are on the
   view (`starMapView.test.ts`), the server-rendered chart draws the sun, the tank's bar and a glyph
   per planet in its colour (`starMapChart.test.ts`), and `uiArt.test.ts` pins the `art.starMap`
   sprites' sizes and the planet disc as the one new tintable part. The look of the wagons on the

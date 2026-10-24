@@ -1,10 +1,11 @@
 """
-The review sheets cut from render_fuel_tender.py's renders (ticket 758): the four wagons alone, the
-rig at tiers 1 and 3 bare and with each wagon at the hitch, each row resampled to a 1080p screen's
+The review sheets cut from render_fuel_tender.py's renders (tickets 758 and 813): the seven wagons
+alone, the rig at tiers 1 and 3 bare and with each wagon at the hitch, each row resampled to a 1080p screen's
 90 px/m at the default 12 m zoom (#39) and to a 360 px wide phone's 30 px/m over the same zoom (the
 width the #576 ladder is judged at), the phone copy enlarged 8x with no smoothing so each phone
 pixel shows. It also measures what the eye is asked to judge and writes readability.json: how many
-phone pixels of the wagon's footprint change between each step and the one before it, and the
+phone pixels of the wagon's footprint change between each step and the one before it, at the
+default zoom and at the closest, where the rig-look sweep spec judges a step (ticket 813), and the
 brightest pixel of the drill nose against the brightest of the wagon for each step (the wagon has
 no glow of its own; the tail's tint is the vehicle look's). Needs Pillow and numpy; run after the
 Blender render, which leaves its raw PNGs in build/ (removed here):
@@ -34,6 +35,10 @@ INGAME_PX_PER_M = 90
 PHONE_WIDTH_PX = 360
 ZOOM_M = 12
 PHONE_PX_PER_M = PHONE_WIDTH_PX / ZOOM_M
+# The closest zoom (VIEW_SHORT_AXIS_MIN_M, 8 m), where the rig-look sweep spec judges one visible
+# step as at least 16 changed pixels of the slot's crop (#157; the LK5 steps of ticket 813).
+CLOSEST_ZOOM_M = 8
+PHONE_CLOSEST_PX_PER_M = PHONE_WIDTH_PX / CLOSEST_ZOOM_M
 PHONE_ENLARGE = 8
 # render_fuel_tender.RIG_FRAME: (centre x, centre z), width, height in metres.
 RIG_FRAME = ((-0.25, 0.05), 2.7, 1.75)
@@ -116,6 +121,7 @@ def write_report(table, parts):
     report = {
         'footprintM': footprint,
         'phonePxPerM': PHONE_PX_PER_M,
+        'closestZoomPxPerM': PHONE_CLOSEST_PX_PER_M,
         'changedThreshold': CHANGED_THRESHOLD,
         'tiers': {'tier-%d' % tier: measured(tier, parts, footprint, nose) for tier in RIG_TIERS},
     }
@@ -145,17 +151,32 @@ def bounds_of_parts(sidecar, keep):
 
 
 def measured(tier, parts, footprint, nose):
-    phone = {name: pixels(resampled(flattened('tier-%d.%s' % (tier, name)), PHONE_PX_PER_M)) for name in [BARE] + parts}
-    full = {name: pixels(flattened('tier-%d.%s' % (tier, name))) for name in [BARE] + parts}
+    rendered = {name: flattened('tier-%d.%s' % (tier, name)) for name in [BARE] + parts}
+    phone = {name: pixels(resampled(image, PHONE_PX_PER_M)) for name, image in rendered.items()}
+    closest = {name: pixels(resampled(image, PHONE_CLOSEST_PX_PER_M)) for name, image in rendered.items()}
+    full = {name: pixels(image) for name, image in rendered.items()}
+    brightest = {part: {'nose': int(crop(full[part], nose, RENDER_PX_PER_M).max()),
+                        'wagon': int(crop(full[part], footprint, RENDER_PX_PER_M).max())} for part in parts}
+    return {'footprintPhonePx': footprint_pixels(phone[BARE], footprint, PHONE_PX_PER_M),
+            'changedPhonePx': stepped_pixels(phone, parts, footprint, PHONE_PX_PER_M),
+            'footprintClosestZoomPx': footprint_pixels(closest[BARE], footprint, PHONE_CLOSEST_PX_PER_M),
+            'changedClosestZoomPx': stepped_pixels(closest, parts, footprint, PHONE_CLOSEST_PX_PER_M),
+            'brightest': brightest}
+
+
+def footprint_pixels(rows, footprint, px_per_m):
+    cropped = crop(rows, footprint, px_per_m)
+    return int(cropped.shape[0] * cropped.shape[1])
+
+
+def stepped_pixels(images, parts, footprint, px_per_m):
+    """The footprint pixels each step changes against the step before it (the bare rig first)."""
     changed = {}
     before = BARE
     for part in parts:
-        changed[part] = int(changed_pixels(crop(phone[before], footprint, PHONE_PX_PER_M), crop(phone[part], footprint, PHONE_PX_PER_M)))
+        changed[part] = int(changed_pixels(crop(images[before], footprint, px_per_m), crop(images[part], footprint, px_per_m)))
         before = part
-    brightest = {part: {'nose': int(crop(full[part], nose, RENDER_PX_PER_M).max()),
-                        'wagon': int(crop(full[part], footprint, RENDER_PX_PER_M).max())} for part in parts}
-    return {'footprintPhonePx': int(crop(phone[BARE], footprint, PHONE_PX_PER_M).shape[0] * crop(phone[BARE], footprint, PHONE_PX_PER_M).shape[1]),
-            'changedPhonePx': changed, 'brightest': brightest}
+    return changed
 
 
 def pixels(image):

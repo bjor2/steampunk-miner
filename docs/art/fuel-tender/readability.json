@@ -1,6 +1,7 @@
 {
   "footprintM": [-1.0917, -0.4787, -0.49129999999999985, 0.010000000000000009],
   "phonePxPerM": 30.0,
+  "closestZoomPxPerM": 45.0,
   "changedThreshold": 24,
   "tiers": {
     "tier-1": {
@@ -9,7 +10,20 @@
         "coal-cart": 100,
         "bunker-tender": 86,
         "riveted-tender": 101,
-        "guild-tender": 102
+        "guild-tender": 102,
+        "twin-tank-tender": 14,
+        "hopper-tender": 12,
+        "glass-tank-tender": 10
+      },
+      "footprintClosestZoomPx": 644,
+      "changedClosestZoomPx": {
+        "coal-cart": 214,
+        "bunker-tender": 189,
+        "riveted-tender": 236,
+        "guild-tender": 229,
+        "twin-tank-tender": 33,
+        "hopper-tender": 20,
+        "glass-tank-tender": 32
       },
       "brightest": {
         "coal-cart": {
@@ -25,6 +39,18 @@
           "wagon": 255
         },
         "guild-tender": {
+          "nose": 255,
+          "wagon": 255
+        },
+        "twin-tank-tender": {
+          "nose": 255,
+          "wagon": 255
+        },
+        "hopper-tender": {
+          "nose": 255,
+          "wagon": 255
+        },
+        "glass-tank-tender": {
           "nose": 255,
           "wagon": 255
         }
@@ -36,7 +62,20 @@
         "coal-cart": 100,
         "bunker-tender": 86,
         "riveted-tender": 101,
-        "guild-tender": 102
+        "guild-tender": 102,
+        "twin-tank-tender": 14,
+        "hopper-tender": 12,
+        "glass-tank-tender": 10
+      },
+      "footprintClosestZoomPx": 644,
+      "changedClosestZoomPx": {
+        "coal-cart": 214,
+        "bunker-tender": 189,
+        "riveted-tender": 236,
+        "guild-tender": 229,
+        "twin-tank-tender": 33,
+        "hopper-tender": 20,
+        "glass-tank-tender": 32
       },
       "brightest": {
         "coal-cart": {
@@ -52,6 +91,18 @@
           "wagon": 255
         },
         "guild-tender": {
+          "nose": 255,
+          "wagon": 255
+        },
+        "twin-tank-tender": {
+          "nose": 255,
+          "wagon": 255
+        },
+        "hopper-tender": {
+          "nose": 255,
+          "wagon": 255
+        },
+        "glass-tank-tender": {
           "nose": 255,
           "wagon": 255
         }

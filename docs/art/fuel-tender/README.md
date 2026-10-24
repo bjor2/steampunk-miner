@@ -12,8 +12,9 @@ wins it.
 
 Authored in Blender 4.2.9 on the shared box: `author_fuel_tender.py` wrote the first version of the
 file, and `art/blender/vehicle-fuel-tank/vehicle-fuel-tank.blend` is the source from now on (Git
-LFS). The sheets below are the headless renders; the look-over was done on them at 512 px/m,
-in-game size and phone size.
+LFS); `author_fuel_tender_steps.py` fitted the three LK5 parts into it (ticket 813, below). The
+sheets below are the headless renders; the look-over was done on them at 512 px/m, in-game size
+and phone size.
 
 ## The parts
 
@@ -37,29 +38,80 @@ levels are this pass's choice:
 | `riveted-tender` | 3                     | a steel bunker framed in brass with two rivet rows, a banded copper water tank with a brass dome |
 | `guild-tender`   | 5                     | a guild-green enamel tender in a brass frame with ring filigree, twin coal bunkers, a lantern    |
 
-Above level 5 the log tail (`fuelTender.json` `tail`, ticket 809) wears the guild tender in the
-next of ten named finishes per purchase, painted as a glow of 0.35 in the finish's colour on the
+Above level 8 (level 5 before ticket 813) the log tail (`fuelTender.json` `tail`, ticket 809)
+wears the top wagon in the next of ten named finishes per purchase, painted as a glow of 0.35 in the finish's colour on the
 wagon's slot through the kernel's vehicle look (`fuelTenderLookSource.ts`), under the rig body's
 cap of 1 so the drill nose stays the brightest part, and the rig-look slice draws a finish badge
 with pips counting decades of tank capacity (9 levels a decade). The wagon itself has no emissive
 map.
 
+## The LK5 steps (ticket 813)
+
+[LK5 (#813)](https://github.com/bjor2/steampunk-miner/issues/813), wave 647-7K of the P1-P5 map
+#647: the GD lock of 24 Oct 14:54 wants at least 5 authored steps on every line, each a new outline
+or an added part in a socket, never a recolour. The tender is exempt from the decade rule and keeps
+one step per purchase, so the #758 wagons stay the first steps and each step here is the guild
+tender with one more part fitted, one level a purchase, in the order the ticket named. The cards
+are the hover line's band names, data strings of 3 words or fewer in `fuelTender.json`.
+
+| Part                | Tank level | Card               | Adds                                                                                                                                          |
+| ------------------- | ---------- | ------------------ | --------------------------------------------------------------------------------------------------------------------------------------------- |
+| `twin-tank-tender`  | 6          | `Second tank`      | a brass-banded copper water tank lying over the middle of the tender, a brass filler dome on its top                                          |
+| `hopper-tender`     | 7          | `Coal hopper`      | a riveted iron-plate coal hopper, wide side up, over the left bunker between the lantern and the tank, braced, its brass rim heaped with coal |
+| `glass-tank-tender` | 8          | `Sight glass tank` | a pale steel belly tank slung under the frame between the wheels on two iron straps, brass-banded, a water sight glass in brass fittings      |
+
+**Where the parts sit (the socket).** The wagon trails the rig behind the stern, clear of the
+rig's own outline, and the footprint the game lays out (the union of the four #758 wagons' boxes:
+vehicle x -1.092..-0.492, z -0.48..0.008, `outline.json` `footprintM`) may not grow, so the parts
+fill the room the guild tender leaves inside it: over the body top under the 0.31 m ceiling the
+riveted tender's copper tank set (the second tank and the hopper), and under the frame between the
+two wheels above the ground line (the belly tank). The one place the rig reaches the wagon is its
+two casing arms, which reach back to vehicle x -0.733 over the wagon's stern end: the second tank
+stops short of them (a first pass ran under them and hid 84 cells; `check_outline.py` refused it).
+
+### Checks (24 Oct 2026)
+
+- **Rig bounds, drill tip, footprint, collider** (`check_outline.py` → `outline.json`, 4 mm grid,
+  tiers 1 and 3): every LK5 wagon adds **0 cells inside the rig** over the guild tender, has the
+  same 390 cells behind the stern the guild tender has (the hitch ring and drawbar of every #758
+  wagon), and its box stays inside the #758 footprint. The drill tip's drawing is untouched (the
+  wagon is a `vehicle-fuel-tank` part at the hitch; `vehicle.blend` is untouched), and the collider
+  is the code constant no art feeds.
+- **Readable at 360 px and 1280+** (`readability.json`, wagon-footprint pixels each step changes
+  against the step before, a channel moving > 24/255). At the closest zoom (8 m → 45 px/m on a 360
+  px phone, where `rigLookSweep.spec.ts` judges one visible step as ≥ 16 px): second tank **33**,
+  hopper **20**, belly tank **32** (tiers 1 and 3 alike), against the #758 steps' 189-236. At the
+  default 12 m zoom (30 px/m) the wagon is an 18 by 17 pixel box and the steps move 14, 12 and 10.
+  At 1280 px the parts are 3x larger again (`tier-1.ingame.png`).
+- **Glow under the `rigBody` cap:** the wagon still ships no emissive map (`fuelTenderArt.test.ts`
+  pins it), so the drill nose stays the brightest part by construction; the `brightest` readings are
+  lit brass highlights on both, as in #758. The tail's finish glow is `fuelTender.json`'s 0.35.
+- **Band names:** `Second tank`, `Coal hopper`, `Sight glass tank`: data strings of 2-3 words
+  (`fuelTenderLook.ts` refuses longer ones in the tail; the spec checks the steps). Progression and
+  G&V may rename them in `fuelTender.json`.
+- **Desktop and phone**: checked by eye on `parts.png`, `tier-1.ingame.png` and `tier-1.phone.png`.
+  Screenshots of the running game at each level are the Tester's (`e2e/browser/fuelTenderLook.spec.ts`).
+
 ## Files
 
-| File                       | What it is                                                                                     |
-| -------------------------- | ---------------------------------------------------------------------------------------------- |
-| `parts.png`                | each wagon alone in the game's front view at 768 px/m                                          |
-| `tier-1.png`, `tier-3.png` | the rig at that tier bare and with each wagon at the hitch, 512 px/m, the nose lit as drilling |
-| `tier-<n>.ingame.png`      | the same at 90 px/m, about what a 1080p screen shows at the default 12 m zoom                  |
-| `tier-<n>.phone.png`       | the same at a 360 px wide phone's 30 px/m over the 12 m zoom, enlarged 8x with no smoothing    |
-| `readability.json`         | the phone-size pixels each step changes, and the brightest pixel of the nose and the wagon     |
-| `author_fuel_tender.py`    | wrote the first version of the source (Blender); reads `src/data/vehicle/fuelTender.json`      |
-| `render_fuel_tender.py`    | the renders above (Blender), on the casing driller review's stage, framed wider to the left    |
-| `sheet_fuel_tender.py`     | lays the renders out into the sheets and writes `readability.json` (Pillow, numpy)             |
+| File                               | What it is                                                                                     |
+| ---------------------------------- | ---------------------------------------------------------------------------------------------- |
+| `parts.png`                        | each of the seven wagons alone in the game's front view at 768 px/m                            |
+| `tier-1.png`, `tier-3.png`         | the rig at that tier bare and with each wagon at the hitch, 512 px/m, the nose lit as drilling |
+| `tier-<n>.ingame.png`              | the same at 90 px/m, about what a 1080p screen shows at the default 12 m zoom                  |
+| `tier-<n>.phone.png`               | the same at a 360 px wide phone's 30 px/m over the 12 m zoom, enlarged 8x with no smoothing    |
+| `readability.json`                 | the phone-size pixels each step changes at the default and closest zoom, the brightest pixels  |
+| `author_fuel_tender.py`            | wrote the first version of the source (Blender); reads `src/data/vehicle/fuelTender.json`      |
+| `author_fuel_tender_steps.py`      | fitted the LK5 parts into the source (Blender, re-runnable; ticket 813)                        |
+| `check_outline.py`, `outline.json` | the wagons' silhouettes against the rig's and the #758 footprint (Blender; ticket 813)         |
+| `render_fuel_tender.py`            | the renders above (Blender), on the casing driller review's stage, framed wider to the left    |
+| `sheet_fuel_tender.py`             | lays the renders out into the sheets and writes `readability.json` (Pillow, numpy)             |
 
 ```
 blender -b --factory-startup --python-exit-code 1 -P docs/art/fuel-tender/author_fuel_tender.py
+blender -b --factory-startup --python-exit-code 1 -P docs/art/fuel-tender/author_fuel_tender_steps.py
 npm run art:export -- vehicle-fuel-tank
+blender -b --factory-startup --python-exit-code 1 -P docs/art/fuel-tender/check_outline.py
 blender -b --factory-startup --python-exit-code 1 -P docs/art/fuel-tender/render_fuel_tender.py [-- alone|rig]
 python3 docs/art/fuel-tender/sheet_fuel_tender.py
 ```
