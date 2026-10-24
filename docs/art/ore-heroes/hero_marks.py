@@ -7,6 +7,11 @@ facet-glint treatment the Horizontal Scaler asked of every gem (#741). Each buil
 cell at a centre with marks standing proud of the face at y = 0 (the #52 frame: game right +X,
 game up +Z, the camera at -Y), in the species' hue slot. The ore stage's shapes and materials are
 reused; the rarity frame and glow are the shader's (#450), so no builder adds a glow layer.
+
+The twelve gems of ticket 785 (gem_marks.py, gem_marks_deep.py) register their builders under
+the row's silhouette and pattern pair (`PATTERN_BUILDERS`), looked up before the silhouette alone,
+since two species may share a silhouette word with another pattern (emerald's faceted prisms
+beside aquamarine's watered ones, starsteel's watered stars beside the garnet's starred).
 """
 
 import math
@@ -28,10 +33,19 @@ def rng_of(hero):
     return random.Random('%d:%s' % (LAYOUT_SEED, hero['id']))
 
 
+def builder_of(hero):
+    """The builder of the row's silhouette and pattern, else of its silhouette; a row with neither fails."""
+    key = (hero['silhouette'], hero['pattern'])
+    if key in PATTERN_BUILDERS:
+        return PATTERN_BUILDERS[key]
+    if hero['silhouette'] in BUILDERS:
+        return BUILDERS[hero['silhouette']]
+    raise SystemExit('%s draws %s %s, which no builder makes' % (hero['id'], hero['pattern'], hero['silhouette']))
+
+
 def build_hero(hero, centre):
     """The hero's marks in a collection named for the species; returns the objects."""
-    builder = BUILDERS[hero['silhouette']]
-    objects = builder(hero, centre, rng_of(hero))
+    objects = builder_of(hero)(hero, centre, rng_of(hero))
     collection = bpy.data.collections.new(hero['id'])
     bpy.context.scene.collection.children.link(collection)
     for obj in objects:
@@ -546,6 +560,9 @@ def drive_rim(material, strength, floor):
     tree.links.new(scale.outputs['Value'], bsdf.inputs['Emission Strength'])
     return material
 
+
+# (silhouette, pattern) -> builder, filled by the gem modules of ticket 785 at import.
+PATTERN_BUILDERS = {}
 
 BUILDERS = {
     'cubes': build_cubes,

@@ -1,0 +1,680 @@
+{
+  "set": "p1-gems",
+  "tilePx": 40,
+  "heroes": {
+    "violet-fluorite-quartzine": {
+      "coverage": 0.388,
+      "hueDeg": 260.3,
+      "luma": 0.517,
+      "rockLuma": 0.31,
+      "contrast": 1.58
+    },
+    "vein-gold-brassvein": {
+      "coverage": 0.188,
+      "hueDeg": 51.2,
+      "luma": 0.552,
+      "rockLuma": 0.245,
+      "contrast": 2.04
+    },
+    "blue-corundum-quartzine": {
+      "coverage": 0.216,
+      "hueDeg": 224.0,
+      "luma": 0.639,
+      "rockLuma": 0.31,
+      "contrast": 1.92
+    },
+    "red-beryl-quartzine": {
+      "coverage": 0.193,
+      "hueDeg": 354.4,
+      "luma": 0.549,
+      "rockLuma": 0.245,
+      "contrast": 2.03
+    },
+    "diamond-quartzine": {
+      "coverage": 0.269,
+      "hueDeg": 38.9,
+      "luma": 0.884,
+      "rockLuma": 0.245,
+      "contrast": 3.16
+    },
+    "emerald-quartzine": {
+      "coverage": 0.25,
+      "hueDeg": 139.1,
+      "luma": 0.752,
+      "rockLuma": 0.245,
+      "contrast": 2.72
+    },
+    "ruby-quartzine": {
+      "coverage": 0.176,
+      "hueDeg": 334.9,
+      "luma": 0.632,
+      "rockLuma": 0.245,
+      "contrast": 2.31
+    }
+  },
+  "pairs": [
+    {
+      "a": "violet-fluorite-quartzine",
+      "b": "vein-gold-brassvein",
+      "silhouetteDifference": 0.748,
+      "hueDifferenceDeg": 150.9,
+      "lumaDifference": 0.035,
+      "deutanDistance": 0.545
+    },
+    {
+      "a": "violet-fluorite-quartzine",
+      "b": "blue-corundum-quartzine",
+      "silhouetteDifference": 0.599,
+      "hueDifferenceDeg": 36.3,
+      "lumaDifference": 0.122,
+      "deutanDistance": 0.227
+    },
+    {
+      "a": "violet-fluorite-quartzine",
+      "b": "red-beryl-quartzine",
+      "silhouetteDifference": 0.671,
+      "hueDifferenceDeg": 94.1,
+      "lumaDifference": 0.032,
+      "deutanDistance": 0.4
+    },
+    {
+      "a": "violet-fluorite-quartzine",
+      "b": "diamond-quartzine",
+      "silhouetteDifference": 0.546,
+      "hueDifferenceDeg": 138.6,
+      "lumaDifference": 0.367,
+      "deutanDistance": 0.621
+    },
+    {
+      "a": "violet-fluorite-quartzine",
+      "b": "emerald-quartzine",
+      "silhouetteDifference": 0.595,
+      "hueDifferenceDeg": 121.2,
+      "lumaDifference": 0.235,
+      "deutanDistance": 0.451
+    },
+    {
+      "a": "violet-fluorite-quartzine",
+      "b": "ruby-quartzine",
+      "silhouetteDifference": 0.614,
+      "hueDifferenceDeg": 74.6,
+      "lumaDifference": 0.115,
+      "deutanDistance": 0.305
+    },
+    {
+      "a": "vein-gold-brassvein",
+      "b": "blue-corundum-quartzine",
+      "silhouetteDifference": 0.752,
+      "hueDifferenceDeg": 172.8,
+      "lumaDifference": 0.087,
+      "deutanDistance": 0.709
+    },
+    {
+      "a": "vein-gold-brassvein",
+      "b": "red-beryl-quartzine",
+      "silhouetteDifference": 0.673,
+      "hueDifferenceDeg": 56.8,
+      "lumaDifference": 0.003,
+      "deutanDistance": 0.179
+    },
+    {
+      "a": "vein-gold-brassvein",
+      "b": "diamond-quartzine",
+      "silhouetteDifference": 0.802,
+      "hueDifferenceDeg": 12.3,
+      "lumaDifference": 0.332,
+      "deutanDistance": 0.757
+    },
+    {
+      "a": "vein-gold-brassvein",
+      "b": "emerald-quartzine",
+      "silhouetteDifference": 0.772,
+      "hueDifferenceDeg": 87.9,
+      "lumaDifference": 0.2,
+      "deutanDistance": 0.439
+    },
+    {
+      "a": "vein-gold-brassvein",
+      "b": "ruby-quartzine",
+      "silhouetteDifference": 0.764,
+      "hueDifferenceDeg": 76.3,
+      "lumaDifference": 0.08,
+      "deutanDistance": 0.423
+    },
+    {
+      "a": "blue-corundum-quartzine",
+      "b": "red-beryl-quartzine",
+      "silhouetteDifference": 0.643,
+      "hueDifferenceDeg": 130.4,
+      "lumaDifference": 0.09,
+      "deutanDistance": 0.54
+    },
+    {
+      "a": "blue-corundum-quartzine",
+      "b": "diamond-quartzine",
+      "silhouetteDifference": 0.664,
+      "hueDifferenceDeg": 174.9,
+      "lumaDifference": 0.245,
+      "deutanDistance": 0.499
+    },
+    {
+      "a": "blue-corundum-quartzine",
+      "b": "emerald-quartzine",
+      "silhouetteDifference": 0.67,
+      "hueDifferenceDeg": 84.9,
+      "lumaDifference": 0.113,
+      "deutanDistance": 0.459
+    },
+    {
+      "a": "blue-corundum-quartzine",
+      "b": "ruby-quartzine",
+      "silhouetteDifference": 0.555,
+      "hueDifferenceDeg": 110.9,
+      "lumaDifference": 0.007,
+      "deutanDistance": 0.342
+    },
+    {
+      "a": "red-beryl-quartzine",
+      "b": "diamond-quartzine",
+      "silhouetteDifference": 0.773,
+      "hueDifferenceDeg": 44.5,
+      "lumaDifference": 0.335,
+      "deutanDistance": 0.6
+    },
+    {
+      "a": "red-beryl-quartzine",
+      "b": "emerald-quartzine",
+      "silhouetteDifference": 0.725,
+      "hueDifferenceDeg": 144.7,
+      "lumaDifference": 0.203,
+      "deutanDistance": 0.286
+    },
+    {
+      "a": "red-beryl-quartzine",
+      "b": "ruby-quartzine",
+      "silhouetteDifference": 0.638,
+      "hueDifferenceDeg": 19.5,
+      "lumaDifference": 0.083,
+      "deutanDistance": 0.245
+    },
+    {
+      "a": "diamond-quartzine",
+      "b": "emerald-quartzine",
+      "silhouetteDifference": 0.808,
+      "hueDifferenceDeg": 100.2,
+      "lumaDifference": 0.132,
+      "deutanDistance": 0.318
+    },
+    {
+      "a": "diamond-quartzine",
+      "b": "ruby-quartzine",
+      "silhouetteDifference": 0.706,
+      "hueDifferenceDeg": 64.0,
+      "lumaDifference": 0.252,
+      "deutanDistance": 0.39
+    },
+    {
+      "a": "emerald-quartzine",
+      "b": "ruby-quartzine",
+      "silhouetteDifference": 0.776,
+      "hueDifferenceDeg": 164.2,
+      "lumaDifference": 0.12,
+      "deutanDistance": 0.147
+    }
+  ],
+  "leastDifferentPair": ["red-beryl-quartzine", "ruby-quartzine"],
+  "screens": [
+    {
+      "screen": "360x640",
+      "tilePx": 30,
+      "heroes": {
+        "violet-fluorite-quartzine": {
+          "coverage": 0.387,
+          "hueDeg": 260.3,
+          "luma": 0.517,
+          "rockLuma": 0.31,
+          "contrast": 1.58
+        },
+        "vein-gold-brassvein": {
+          "coverage": 0.199,
+          "hueDeg": 51.2,
+          "luma": 0.552,
+          "rockLuma": 0.245,
+          "contrast": 2.04
+        },
+        "blue-corundum-quartzine": {
+          "coverage": 0.217,
+          "hueDeg": 224.0,
+          "luma": 0.639,
+          "rockLuma": 0.31,
+          "contrast": 1.91
+        },
+        "red-beryl-quartzine": {
+          "coverage": 0.191,
+          "hueDeg": 354.4,
+          "luma": 0.55,
+          "rockLuma": 0.245,
+          "contrast": 2.03
+        },
+        "diamond-quartzine": {
+          "coverage": 0.27,
+          "hueDeg": 39.1,
+          "luma": 0.882,
+          "rockLuma": 0.245,
+          "contrast": 3.16
+        },
+        "emerald-quartzine": {
+          "coverage": 0.253,
+          "hueDeg": 139.0,
+          "luma": 0.75,
+          "rockLuma": 0.245,
+          "contrast": 2.71
+        },
+        "ruby-quartzine": {
+          "coverage": 0.179,
+          "hueDeg": 334.9,
+          "luma": 0.632,
+          "rockLuma": 0.245,
+          "contrast": 2.31
+        }
+      },
+      "pairs": [
+        {
+          "a": "violet-fluorite-quartzine",
+          "b": "vein-gold-brassvein",
+          "silhouetteDifference": 0.727,
+          "hueDifferenceDeg": 150.9,
+          "lumaDifference": 0.035,
+          "deutanDistance": 0.552
+        },
+        {
+          "a": "violet-fluorite-quartzine",
+          "b": "blue-corundum-quartzine",
+          "silhouetteDifference": 0.59,
+          "hueDifferenceDeg": 36.3,
+          "lumaDifference": 0.122,
+          "deutanDistance": 0.225
+        },
+        {
+          "a": "violet-fluorite-quartzine",
+          "b": "red-beryl-quartzine",
+          "silhouetteDifference": 0.667,
+          "hueDifferenceDeg": 94.1,
+          "lumaDifference": 0.033,
+          "deutanDistance": 0.402
+        },
+        {
+          "a": "violet-fluorite-quartzine",
+          "b": "diamond-quartzine",
+          "silhouetteDifference": 0.551,
+          "hueDifferenceDeg": 138.8,
+          "lumaDifference": 0.365,
+          "deutanDistance": 0.617
+        },
+        {
+          "a": "violet-fluorite-quartzine",
+          "b": "emerald-quartzine",
+          "silhouetteDifference": 0.592,
+          "hueDifferenceDeg": 121.3,
+          "lumaDifference": 0.233,
+          "deutanDistance": 0.449
+        },
+        {
+          "a": "violet-fluorite-quartzine",
+          "b": "ruby-quartzine",
+          "silhouetteDifference": 0.602,
+          "hueDifferenceDeg": 74.6,
+          "lumaDifference": 0.115,
+          "deutanDistance": 0.305
+        },
+        {
+          "a": "vein-gold-brassvein",
+          "b": "blue-corundum-quartzine",
+          "silhouetteDifference": 0.741,
+          "hueDifferenceDeg": 172.8,
+          "lumaDifference": 0.087,
+          "deutanDistance": 0.714
+        },
+        {
+          "a": "vein-gold-brassvein",
+          "b": "red-beryl-quartzine",
+          "silhouetteDifference": 0.665,
+          "hueDifferenceDeg": 56.8,
+          "lumaDifference": 0.002,
+          "deutanDistance": 0.184
+        },
+        {
+          "a": "vein-gold-brassvein",
+          "b": "diamond-quartzine",
+          "silhouetteDifference": 0.801,
+          "hueDifferenceDeg": 12.1,
+          "lumaDifference": 0.33,
+          "deutanDistance": 0.758
+        },
+        {
+          "a": "vein-gold-brassvein",
+          "b": "emerald-quartzine",
+          "silhouetteDifference": 0.774,
+          "hueDifferenceDeg": 87.8,
+          "lumaDifference": 0.198,
+          "deutanDistance": 0.44
+        },
+        {
+          "a": "vein-gold-brassvein",
+          "b": "ruby-quartzine",
+          "silhouetteDifference": 0.736,
+          "hueDifferenceDeg": 76.3,
+          "lumaDifference": 0.08,
+          "deutanDistance": 0.428
+        },
+        {
+          "a": "blue-corundum-quartzine",
+          "b": "red-beryl-quartzine",
+          "silhouetteDifference": 0.646,
+          "hueDifferenceDeg": 130.4,
+          "lumaDifference": 0.089,
+          "deutanDistance": 0.54
+        },
+        {
+          "a": "blue-corundum-quartzine",
+          "b": "diamond-quartzine",
+          "silhouetteDifference": 0.685,
+          "hueDifferenceDeg": 175.1,
+          "lumaDifference": 0.243,
+          "deutanDistance": 0.498
+        },
+        {
+          "a": "blue-corundum-quartzine",
+          "b": "emerald-quartzine",
+          "silhouetteDifference": 0.661,
+          "hueDifferenceDeg": 85.0,
+          "lumaDifference": 0.111,
+          "deutanDistance": 0.458
+        },
+        {
+          "a": "blue-corundum-quartzine",
+          "b": "ruby-quartzine",
+          "silhouetteDifference": 0.559,
+          "hueDifferenceDeg": 110.9,
+          "lumaDifference": 0.007,
+          "deutanDistance": 0.342
+        },
+        {
+          "a": "red-beryl-quartzine",
+          "b": "diamond-quartzine",
+          "silhouetteDifference": 0.779,
+          "hueDifferenceDeg": 44.7,
+          "lumaDifference": 0.332,
+          "deutanDistance": 0.596
+        },
+        {
+          "a": "red-beryl-quartzine",
+          "b": "emerald-quartzine",
+          "silhouetteDifference": 0.726,
+          "hueDifferenceDeg": 144.6,
+          "lumaDifference": 0.2,
+          "deutanDistance": 0.281
+        },
+        {
+          "a": "red-beryl-quartzine",
+          "b": "ruby-quartzine",
+          "silhouetteDifference": 0.601,
+          "hueDifferenceDeg": 19.5,
+          "lumaDifference": 0.082,
+          "deutanDistance": 0.245
+        },
+        {
+          "a": "diamond-quartzine",
+          "b": "emerald-quartzine",
+          "silhouetteDifference": 0.811,
+          "hueDifferenceDeg": 99.9,
+          "lumaDifference": 0.132,
+          "deutanDistance": 0.318
+        },
+        {
+          "a": "diamond-quartzine",
+          "b": "ruby-quartzine",
+          "silhouetteDifference": 0.709,
+          "hueDifferenceDeg": 64.2,
+          "lumaDifference": 0.25,
+          "deutanDistance": 0.386
+        },
+        {
+          "a": "emerald-quartzine",
+          "b": "ruby-quartzine",
+          "silhouetteDifference": 0.777,
+          "hueDifferenceDeg": 164.1,
+          "lumaDifference": 0.118,
+          "deutanDistance": 0.144
+        }
+      ],
+      "leastDifferentPair": ["red-beryl-quartzine", "ruby-quartzine"]
+    },
+    {
+      "screen": "1280x800",
+      "tilePx": 67,
+      "heroes": {
+        "violet-fluorite-quartzine": {
+          "coverage": 0.386,
+          "hueDeg": 260.4,
+          "luma": 0.519,
+          "rockLuma": 0.31,
+          "contrast": 1.58
+        },
+        "vein-gold-brassvein": {
+          "coverage": 0.189,
+          "hueDeg": 51.1,
+          "luma": 0.55,
+          "rockLuma": 0.245,
+          "contrast": 2.03
+        },
+        "blue-corundum-quartzine": {
+          "coverage": 0.217,
+          "hueDeg": 224.0,
+          "luma": 0.639,
+          "rockLuma": 0.31,
+          "contrast": 1.92
+        },
+        "red-beryl-quartzine": {
+          "coverage": 0.193,
+          "hueDeg": 354.4,
+          "luma": 0.55,
+          "rockLuma": 0.245,
+          "contrast": 2.03
+        },
+        "diamond-quartzine": {
+          "coverage": 0.271,
+          "hueDeg": 39.1,
+          "luma": 0.884,
+          "rockLuma": 0.245,
+          "contrast": 3.16
+        },
+        "emerald-quartzine": {
+          "coverage": 0.252,
+          "hueDeg": 139.1,
+          "luma": 0.751,
+          "rockLuma": 0.245,
+          "contrast": 2.71
+        },
+        "ruby-quartzine": {
+          "coverage": 0.179,
+          "hueDeg": 334.9,
+          "luma": 0.632,
+          "rockLuma": 0.245,
+          "contrast": 2.31
+        }
+      },
+      "pairs": [
+        {
+          "a": "violet-fluorite-quartzine",
+          "b": "vein-gold-brassvein",
+          "silhouetteDifference": 0.741,
+          "hueDifferenceDeg": 150.7,
+          "lumaDifference": 0.031,
+          "deutanDistance": 0.548
+        },
+        {
+          "a": "violet-fluorite-quartzine",
+          "b": "blue-corundum-quartzine",
+          "silhouetteDifference": 0.588,
+          "hueDifferenceDeg": 36.4,
+          "lumaDifference": 0.12,
+          "deutanDistance": 0.224
+        },
+        {
+          "a": "violet-fluorite-quartzine",
+          "b": "red-beryl-quartzine",
+          "silhouetteDifference": 0.666,
+          "hueDifferenceDeg": 94.0,
+          "lumaDifference": 0.031,
+          "deutanDistance": 0.401
+        },
+        {
+          "a": "violet-fluorite-quartzine",
+          "b": "diamond-quartzine",
+          "silhouetteDifference": 0.555,
+          "hueDifferenceDeg": 138.7,
+          "lumaDifference": 0.365,
+          "deutanDistance": 0.619
+        },
+        {
+          "a": "violet-fluorite-quartzine",
+          "b": "emerald-quartzine",
+          "silhouetteDifference": 0.591,
+          "hueDifferenceDeg": 121.3,
+          "lumaDifference": 0.232,
+          "deutanDistance": 0.449
+        },
+        {
+          "a": "violet-fluorite-quartzine",
+          "b": "ruby-quartzine",
+          "silhouetteDifference": 0.602,
+          "hueDifferenceDeg": 74.5,
+          "lumaDifference": 0.113,
+          "deutanDistance": 0.305
+        },
+        {
+          "a": "vein-gold-brassvein",
+          "b": "blue-corundum-quartzine",
+          "silhouetteDifference": 0.743,
+          "hueDifferenceDeg": 172.9,
+          "lumaDifference": 0.089,
+          "deutanDistance": 0.711
+        },
+        {
+          "a": "vein-gold-brassvein",
+          "b": "red-beryl-quartzine",
+          "silhouetteDifference": 0.676,
+          "hueDifferenceDeg": 56.7,
+          "lumaDifference": 0.0,
+          "deutanDistance": 0.182
+        },
+        {
+          "a": "vein-gold-brassvein",
+          "b": "diamond-quartzine",
+          "silhouetteDifference": 0.797,
+          "hueDifferenceDeg": 12.0,
+          "lumaDifference": 0.334,
+          "deutanDistance": 0.76
+        },
+        {
+          "a": "vein-gold-brassvein",
+          "b": "emerald-quartzine",
+          "silhouetteDifference": 0.779,
+          "hueDifferenceDeg": 88.0,
+          "lumaDifference": 0.201,
+          "deutanDistance": 0.441
+        },
+        {
+          "a": "vein-gold-brassvein",
+          "b": "ruby-quartzine",
+          "silhouetteDifference": 0.748,
+          "hueDifferenceDeg": 76.2,
+          "lumaDifference": 0.082,
+          "deutanDistance": 0.425
+        },
+        {
+          "a": "blue-corundum-quartzine",
+          "b": "red-beryl-quartzine",
+          "silhouetteDifference": 0.647,
+          "hueDifferenceDeg": 130.4,
+          "lumaDifference": 0.089,
+          "deutanDistance": 0.539
+        },
+        {
+          "a": "blue-corundum-quartzine",
+          "b": "diamond-quartzine",
+          "silhouetteDifference": 0.666,
+          "hueDifferenceDeg": 175.1,
+          "lumaDifference": 0.245,
+          "deutanDistance": 0.499
+        },
+        {
+          "a": "blue-corundum-quartzine",
+          "b": "emerald-quartzine",
+          "silhouetteDifference": 0.669,
+          "hueDifferenceDeg": 84.9,
+          "lumaDifference": 0.112,
+          "deutanDistance": 0.458
+        },
+        {
+          "a": "blue-corundum-quartzine",
+          "b": "ruby-quartzine",
+          "silhouetteDifference": 0.558,
+          "hueDifferenceDeg": 110.9,
+          "lumaDifference": 0.007,
+          "deutanDistance": 0.342
+        },
+        {
+          "a": "red-beryl-quartzine",
+          "b": "diamond-quartzine",
+          "silhouetteDifference": 0.771,
+          "hueDifferenceDeg": 44.7,
+          "lumaDifference": 0.334,
+          "deutanDistance": 0.599
+        },
+        {
+          "a": "red-beryl-quartzine",
+          "b": "emerald-quartzine",
+          "silhouetteDifference": 0.722,
+          "hueDifferenceDeg": 144.7,
+          "lumaDifference": 0.201,
+          "deutanDistance": 0.283
+        },
+        {
+          "a": "red-beryl-quartzine",
+          "b": "ruby-quartzine",
+          "silhouetteDifference": 0.622,
+          "hueDifferenceDeg": 19.5,
+          "lumaDifference": 0.082,
+          "deutanDistance": 0.244
+        },
+        {
+          "a": "diamond-quartzine",
+          "b": "emerald-quartzine",
+          "silhouetteDifference": 0.81,
+          "hueDifferenceDeg": 100.0,
+          "lumaDifference": 0.133,
+          "deutanDistance": 0.319
+        },
+        {
+          "a": "diamond-quartzine",
+          "b": "ruby-quartzine",
+          "silhouetteDifference": 0.707,
+          "hueDifferenceDeg": 64.2,
+          "lumaDifference": 0.252,
+          "deutanDistance": 0.39
+        },
+        {
+          "a": "emerald-quartzine",
+          "b": "ruby-quartzine",
+          "silhouetteDifference": 0.779,
+          "hueDifferenceDeg": 164.2,
+          "lumaDifference": 0.119,
+          "deutanDistance": 0.145
+        }
+      ],
+      "leastDifferentPair": ["red-beryl-quartzine", "ruby-quartzine"]
+    }
+  ]
+}

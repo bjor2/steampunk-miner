@@ -282,6 +282,21 @@ describe('legacy materials', () => {
     expect(MATERIAL_RARITIES.map(countOf)).toEqual([5, 4, 6, 0, 0])
   })
 
+  it("draws P1's three gems and the four #452 heroes from the act's atlas (tickets 452 and 785)", () => {
+    const heroes = legacy.filter((material) => material.hero).map((material) => material.id)
+    expect(heroes.sort()).toEqual(
+      [
+        'violet-fluorite-quartzine',
+        'vein-gold-brassvein',
+        'blue-corundum-quartzine',
+        'red-beryl-quartzine',
+        'diamond-quartzine',
+        'emerald-quartzine',
+        'ruby-quartzine',
+      ].sort(),
+    )
+  })
+
   it("names P1's three gems as Bjor named them, crystal rares of bands 3 to 5", () => {
     const gemOf = (slot: string) => legacy.find((material) => material.slot === slot)
     expect(

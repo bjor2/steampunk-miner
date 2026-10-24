@@ -1,0 +1,351 @@
+{
+  "$comment": "The gem-read measures of every committed hero cell at the two gem-read screens (ticket 785, hero_reads.py): highlights, facet edges, outline contrast and the bright-or-saturated share, with the SHA-256 of the cell they were measured from. Written by hero_post.py; look only.",
+  "screens": {
+    "360x640": 30,
+    "1280x800": 67
+  },
+  "heroes": [
+    {
+      "speciesId": "violet-fluorite-quartzine",
+      "cellSha256": "a2bc984f88b9cb36abe248305aeca105f22f86c2fe2db9951cafc3d6931a3ce8",
+      "screens": {
+        "360x640": {
+          "highlightCount": 0,
+          "facetEdgeShare": 0.569,
+          "outlineContrast": 1.55,
+          "brightOrSaturatedShare": 0.0
+        },
+        "1280x800": {
+          "highlightCount": 0,
+          "facetEdgeShare": 0.531,
+          "outlineContrast": 1.56,
+          "brightOrSaturatedShare": 0.009
+        }
+      }
+    },
+    {
+      "speciesId": "vein-gold-brassvein",
+      "cellSha256": "e3fa63f10a0ba8afc7050299cd3c04e0b971e420e3b9f9b33c84d34d3edbd641",
+      "screens": {
+        "360x640": {
+          "highlightCount": 0,
+          "facetEdgeShare": 0.832,
+          "outlineContrast": 1.84,
+          "brightOrSaturatedShare": 0.117
+        },
+        "1280x800": {
+          "highlightCount": 19,
+          "facetEdgeShare": 0.627,
+          "outlineContrast": 1.9,
+          "brightOrSaturatedShare": 0.106
+        }
+      }
+    },
+    {
+      "speciesId": "blue-corundum-quartzine",
+      "cellSha256": "b27212a28719210e2296321fc955de6f45294656a4fe7fb972fbdf8898b177aa",
+      "screens": {
+        "360x640": {
+          "highlightCount": 0,
+          "facetEdgeShare": 0.441,
+          "outlineContrast": 1.83,
+          "brightOrSaturatedShare": 0.011
+        },
+        "1280x800": {
+          "highlightCount": 0,
+          "facetEdgeShare": 0.211,
+          "outlineContrast": 1.86,
+          "brightOrSaturatedShare": 0.013
+        }
+      }
+    },
+    {
+      "speciesId": "red-beryl-quartzine",
+      "cellSha256": "887134519762f7c782942ffe12aa875d0e28f8af85d9eb0a51089e0f4127e42d",
+      "screens": {
+        "360x640": {
+          "highlightCount": 0,
+          "facetEdgeShare": 0.616,
+          "outlineContrast": 1.91,
+          "brightOrSaturatedShare": 0.168
+        },
+        "1280x800": {
+          "highlightCount": 0,
+          "facetEdgeShare": 0.304,
+          "outlineContrast": 1.95,
+          "brightOrSaturatedShare": 0.172
+        }
+      }
+    },
+    {
+      "speciesId": "diamond-quartzine",
+      "cellSha256": "4ef344b6916e296b7a2bf443d194d716d640d3e86421a9db764d84afaaaaaac1",
+      "screens": {
+        "360x640": {
+          "highlightCount": 3,
+          "facetEdgeShare": 0.712,
+          "outlineContrast": 2.94,
+          "brightOrSaturatedShare": 0.223
+        },
+        "1280x800": {
+          "highlightCount": 4,
+          "facetEdgeShare": 0.394,
+          "outlineContrast": 3.01,
+          "brightOrSaturatedShare": 0.236
+        }
+      }
+    },
+    {
+      "speciesId": "emerald-quartzine",
+      "cellSha256": "22c50e2ad39fc2da6377d8f86fe20e6b703b7e189c1ccce37299e4dceacebfcc",
+      "screens": {
+        "360x640": {
+          "highlightCount": 3,
+          "facetEdgeShare": 0.671,
+          "outlineContrast": 2.32,
+          "brightOrSaturatedShare": 0.047
+        },
+        "1280x800": {
+          "highlightCount": 5,
+          "facetEdgeShare": 0.366,
+          "outlineContrast": 2.36,
+          "brightOrSaturatedShare": 0.054
+        }
+      }
+    },
+    {
+      "speciesId": "ruby-quartzine",
+      "cellSha256": "f831858f3ff2660262c67eb841b901b53daaa4728190807537e710abc5cbe012",
+      "screens": {
+        "360x640": {
+          "highlightCount": 2,
+          "facetEdgeShare": 0.764,
+          "outlineContrast": 2.13,
+          "brightOrSaturatedShare": 0.036
+        },
+        "1280x800": {
+          "highlightCount": 2,
+          "facetEdgeShare": 0.453,
+          "outlineContrast": 2.18,
+          "brightOrSaturatedShare": 0.048
+        }
+      }
+    },
+    {
+      "speciesId": "p2-r1",
+      "cellSha256": "3f5fffe9c40c55fd33cf92582c97ef50dcb94b24d60f8d7923f7fdb42f6e27f4",
+      "screens": {
+        "360x640": {
+          "highlightCount": 4,
+          "facetEdgeShare": 0.919,
+          "outlineContrast": 2.24,
+          "brightOrSaturatedShare": 0.04
+        },
+        "1280x800": {
+          "highlightCount": 15,
+          "facetEdgeShare": 0.691,
+          "outlineContrast": 2.29,
+          "brightOrSaturatedShare": 0.044
+        }
+      }
+    },
+    {
+      "speciesId": "p2-r2",
+      "cellSha256": "868066e7fa376a990668b1d3fccb78e0981051d743ef2f5387121c527a27082b",
+      "screens": {
+        "360x640": {
+          "highlightCount": 6,
+          "facetEdgeShare": 0.907,
+          "outlineContrast": 1.74,
+          "brightOrSaturatedShare": 0.056
+        },
+        "1280x800": {
+          "highlightCount": 6,
+          "facetEdgeShare": 0.607,
+          "outlineContrast": 1.74,
+          "brightOrSaturatedShare": 0.061
+        }
+      }
+    },
+    {
+      "speciesId": "p2-r4",
+      "cellSha256": "62046d999454a429fdc0a49ea23b8ad35ad7f81923909ad51081d122acfd9dfc",
+      "screens": {
+        "360x640": {
+          "highlightCount": 1,
+          "facetEdgeShare": 0.622,
+          "outlineContrast": 2.39,
+          "brightOrSaturatedShare": 0.047
+        },
+        "1280x800": {
+          "highlightCount": 5,
+          "facetEdgeShare": 0.34,
+          "outlineContrast": 2.43,
+          "brightOrSaturatedShare": 0.054
+        }
+      }
+    },
+    {
+      "speciesId": "blue-topaz-quartzine",
+      "cellSha256": "ba1855022cb8b80e629c48886c4213e3309e2d3eee25c1916c600fda11d2ca7a",
+      "screens": {
+        "360x640": {
+          "highlightCount": 2,
+          "facetEdgeShare": 0.649,
+          "outlineContrast": 2.25,
+          "brightOrSaturatedShare": 0.028
+        },
+        "1280x800": {
+          "highlightCount": 6,
+          "facetEdgeShare": 0.365,
+          "outlineContrast": 2.29,
+          "brightOrSaturatedShare": 0.036
+        }
+      }
+    },
+    {
+      "speciesId": "orichalcum-brassvein",
+      "cellSha256": "56ca4c2e1bc422a4f8283787717ad414cfc6a879bfb2a794d5017d4b61eafdfd",
+      "screens": {
+        "360x640": {
+          "highlightCount": 18,
+          "facetEdgeShare": 0.993,
+          "outlineContrast": 2.23,
+          "brightOrSaturatedShare": 0.051
+        },
+        "1280x800": {
+          "highlightCount": 20,
+          "facetEdgeShare": 0.877,
+          "outlineContrast": 2.3,
+          "brightOrSaturatedShare": 0.065
+        }
+      }
+    },
+    {
+      "speciesId": "heart-diamond-quartzine",
+      "cellSha256": "e30efd2de939db7d701695d80a1d09e65e3943d61342b0320104be935f5e257a",
+      "screens": {
+        "360x640": {
+          "highlightCount": 6,
+          "facetEdgeShare": 0.677,
+          "outlineContrast": 2.6,
+          "brightOrSaturatedShare": 0.124
+        },
+        "1280x800": {
+          "highlightCount": 9,
+          "facetEdgeShare": 0.386,
+          "outlineContrast": 2.64,
+          "brightOrSaturatedShare": 0.138
+        }
+      }
+    },
+    {
+      "speciesId": "watermelon-tourmaline-quartzine",
+      "cellSha256": "c8181119373139e7cbbab7ee8b0c6d4db8cb85e2c067a32ac58abf0b9c7f50ed",
+      "screens": {
+        "360x640": {
+          "highlightCount": 1,
+          "facetEdgeShare": 0.781,
+          "outlineContrast": 2.22,
+          "brightOrSaturatedShare": 0.013
+        },
+        "1280x800": {
+          "highlightCount": 18,
+          "facetEdgeShare": 0.551,
+          "outlineContrast": 2.27,
+          "brightOrSaturatedShare": 0.024
+        }
+      }
+    },
+    {
+      "speciesId": "starsteel-brassvein",
+      "cellSha256": "3fa0393e4393178cccf81b1607bd77db97a599c42b1709e2272201ad4fe73d94",
+      "screens": {
+        "360x640": {
+          "highlightCount": 2,
+          "facetEdgeShare": 0.858,
+          "outlineContrast": 2.19,
+          "brightOrSaturatedShare": 0.011
+        },
+        "1280x800": {
+          "highlightCount": 14,
+          "facetEdgeShare": 0.682,
+          "outlineContrast": 2.23,
+          "brightOrSaturatedShare": 0.021
+        }
+      }
+    },
+    {
+      "speciesId": "painite-quartzine",
+      "cellSha256": "8384e930cc82b734bbd05ef31f1bd7c52745da86d64c995fbb59d13786606322",
+      "screens": {
+        "360x640": {
+          "highlightCount": 2,
+          "facetEdgeShare": 0.654,
+          "outlineContrast": 2.38,
+          "brightOrSaturatedShare": 0.026
+        },
+        "1280x800": {
+          "highlightCount": 5,
+          "facetEdgeShare": 0.443,
+          "outlineContrast": 2.42,
+          "brightOrSaturatedShare": 0.035
+        }
+      }
+    },
+    {
+      "speciesId": "fire-garnet-quartzine",
+      "cellSha256": "7a4be0f9689ca557b3436faab2dc5cc592df27c5e6d1873f29b6f756e8b530c2",
+      "screens": {
+        "360x640": {
+          "highlightCount": 4,
+          "facetEdgeShare": 0.756,
+          "outlineContrast": 2.13,
+          "brightOrSaturatedShare": 0.043
+        },
+        "1280x800": {
+          "highlightCount": 4,
+          "facetEdgeShare": 0.391,
+          "outlineContrast": 2.18,
+          "brightOrSaturatedShare": 0.054
+        }
+      }
+    },
+    {
+      "speciesId": "core-gold-brassvein",
+      "cellSha256": "7e3d64f0dd794b7ac5802c0f3e246c467f7b4b08efef8b7fa6a9fb7fcd13c14f",
+      "screens": {
+        "360x640": {
+          "highlightCount": 8,
+          "facetEdgeShare": 0.992,
+          "outlineContrast": 2.32,
+          "brightOrSaturatedShare": 0.063
+        },
+        "1280x800": {
+          "highlightCount": 22,
+          "facetEdgeShare": 0.877,
+          "outlineContrast": 2.43,
+          "brightOrSaturatedShare": 0.077
+        }
+      }
+    },
+    {
+      "speciesId": "furnace-ruby-quartzine",
+      "cellSha256": "75469b103f951b490cb70911c14b623f9f3e2dd6b1ffce32747e111be2bd18bf",
+      "screens": {
+        "360x640": {
+          "highlightCount": 3,
+          "facetEdgeShare": 0.92,
+          "outlineContrast": 2.25,
+          "brightOrSaturatedShare": 0.104
+        },
+        "1280x800": {
+          "highlightCount": 3,
+          "facetEdgeShare": 0.507,
+          "outlineContrast": 2.32,
+          "brightOrSaturatedShare": 0.122
+        }
+      }
+    }
+  ]
+}

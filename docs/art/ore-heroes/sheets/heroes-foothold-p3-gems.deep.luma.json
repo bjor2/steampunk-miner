@@ -1,0 +1,28 @@
+{
+  "pxPerMetre": 256,
+  "cells": [
+    {
+      "id": "blue-topaz-quartzine",
+      "oreLuma": 0.1149,
+      "rockLuma": 0.0156,
+      "orePeakLuma": 0.9674,
+      "contrast": 2.51
+    },
+    {
+      "id": "orichalcum-brassvein",
+      "oreLuma": 0.1456,
+      "rockLuma": 0.0133,
+      "orePeakLuma": 0.9901,
+      "contrast": 3.09
+    },
+    {
+      "id": "heart-diamond-quartzine",
+      "oreLuma": 0.1536,
+      "rockLuma": 0.0136,
+      "orePeakLuma": 0.9463,
+      "contrast": 3.2
+    }
+  ],
+  "oreLumaRisesAlongEveryRow": true,
+  "bodyLumaRisesAlongEveryRow": null
+}

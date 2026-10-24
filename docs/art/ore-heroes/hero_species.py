@@ -1,11 +1,11 @@
 """
-The hero species of the materials pools with hero art (#452, ticket 744): the `hero: true` rows of
-the materials slice's `materials.json` with the body colour of their hue slot, the acts a pool
-serves (planet-mix's `oreThemes.json`) and the cell table the per-act hero atlas (#451) reads. An
-act's atlas packs every authored pool that paints one of its planets, pool after pool in
-`AUTHORED_POOLS` order, so the legacy four keep cells 0 to 3 in both acts and P2's own gems follow
-them in the foothold.heavy atlas. Plain Python: the Blender authoring script and the python3 post
-step both import it.
+The hero species of the materials pools with hero art (#452, tickets 744 and 785): the `hero: true`
+rows of the materials slice's `materials.json` with the body colour of their hue slot, the acts an
+authored set serves (planet-mix's `oreThemes.json`) and the cell table the per-act hero atlas (#451)
+reads. An act's atlas packs every authored set that paints one of its planets, set after set in
+`AUTHORED_SETS` order, so the legacy four keep cells 0 to 3 in both acts, P1's gems follow them in
+the foothold.base atlas and P2's own gems in the foothold.heavy atlas, then the gems of P3 to P5.
+Plain Python: the Blender authoring script and the python3 post step both import it.
 """
 
 import colorsys
@@ -23,19 +23,30 @@ import atlas_layout as layout  # noqa: E402
 
 MATERIALS_PATH = os.path.join(REPO_ROOT, 'src', 'features', 'materials', 'materials.json')
 THEMES_PATH = os.path.join(REPO_ROOT, 'src', 'features', 'planet-mix', 'oreThemes.json')
+GEM_ROWS_PATH = os.path.join(REPO_ROOT, 'src', 'features', 'ores', 'ores.economy.json')
 CELLS_PATH = os.path.join(HERE, 'hero-cells.json')
 BLENDER_VERSION = '4.2.9 LTS'
 
 # The per-act hero atlas of #451 (TD shape on #450): 1024 px, 256 px cells, 16 a sheet, albedo only.
 ATLAS = {'sidePx': 1024, 'cellPx': 256, 'contentPx': 248, 'gutterPx': 4, 'cellsPerRow': 4}
-# The planets a pool paints: `legacy` is P1 and P2 (#447; a P2 held under ore rules 5 or earlier),
-# `foothold-p2` a fresh P2 (ticket 632), the foothold pools P3 to P7 (#453).
-POOL_PLANETS = {'legacy': (1, 2), 'foothold-p2': (2,), 'foothold-p3': (3,), 'foothold-p4': (4,), 'foothold-p5': (5,),
-                'foothold-p6-p7': (6, 7)}
-# The pools whose heroes have cells, in packing order: the legacy four of #452 first, so a P1 or an
-# older P2 keeps its cells, then P2's three gems of ticket 744. A pool whose `hero: true` rows have
-# no art yet (foothold-p3 on) stays off the list and its heroes draw the shader look.
-AUTHORED_POOLS = ('legacy', 'foothold-p2')
+# Which hero rows of a materials pool an authored set draws: every hero of the pool, the heroes on
+# the pool's gem slots (the `ore.gems` rows of the ores slice, ticket 741), or every other hero.
+EVERY_HERO, GEM_HEROES, NON_GEM_HEROES = 'every', 'gems', 'non-gems'
+# The authored sets, in packing order, each a materials pool, the planets it paints and which of
+# the pool's heroes it draws. `legacy` is #452's four on P1 and a P2 held under ore rules 5 or
+# earlier (#447): its gem slots bind only on a P1 under rules 12 (ticket 713), so P1's three gems are
+# their own set painting P1 alone (ticket 785), and keep the foothold.heavy atlas within 16 cells.
+# `foothold-p2` is a fresh P2's three gems (ticket 744). The gem sets of P3 to P5 (ticket 785) draw
+# the gem rows of the foothold pools of #453; their other `hero: true` rows have no art yet and draw
+# the shader look.
+AUTHORED_SETS = (
+    {'id': 'legacy', 'pool': 'legacy', 'planets': (1, 2), 'heroes': NON_GEM_HEROES},
+    {'id': 'p1-gems', 'pool': 'legacy', 'planets': (1,), 'heroes': GEM_HEROES},
+    {'id': 'foothold-p2', 'pool': 'foothold-p2', 'planets': (2,), 'heroes': EVERY_HERO},
+    {'id': 'foothold-p3-gems', 'pool': 'foothold-p3', 'planets': (3,), 'heroes': GEM_HEROES},
+    {'id': 'foothold-p4-gems', 'pool': 'foothold-p4', 'planets': (4,), 'heroes': GEM_HEROES},
+    {'id': 'foothold-p5-gems', 'pool': 'foothold-p5', 'planets': (5,), 'heroes': GEM_HEROES},
+)
 RARITY_ORDER = ('common', 'uncommon', 'rare', 'epic', 'mythic')
 
 
@@ -49,6 +60,20 @@ def load_acts():
         return json.load(file)['acts']
 
 
+def load_gem_slots():
+    """Per materials pool, the kind slots that sell as gems (`ore.gems.pools`, ticket 741)."""
+    with open(GEM_ROWS_PATH, encoding='utf-8') as file:
+        pools = json.load(file)['ore']['gems']['pools']
+    return {row['pool']: tuple(row['slots']) for row in pools}
+
+
+def set_named(set_id):
+    found = [entry for entry in AUTHORED_SETS if entry['id'] == set_id]
+    if not found:
+        raise SystemExit('no authored set is named %s (one of %s)' % (set_id, ', '.join(s['id'] for s in AUTHORED_SETS)))
+    return found[0]
+
+
 def heroes_of(pool, materials=None):
     """The pool's hero rows in rarity order, then by slot, each with its hue slot's colour attached."""
     materials = materials or load_materials()
@@ -58,23 +83,35 @@ def heroes_of(pool, materials=None):
     return [dict(row, hue=slots[row['hueSlot']]) for row in rows]
 
 
-def acts_of_pool(pool, acts=None):
-    """The act ids whose planets the pool paints: one hero atlas per act."""
+def heroes_of_set(set_id, materials=None, gem_slots=None):
+    """The set's hero rows: the pool's heroes it draws, in `heroes_of` order."""
+    entry = set_named(set_id)
+    gem_slots = gem_slots or load_gem_slots()
+    gems = gem_slots.get(entry['pool'], ())
+    return [hero for hero in heroes_of(entry['pool'], materials) if draws_hero(entry['heroes'], hero['slot'] in gems)]
+
+
+def draws_hero(which, is_gem):
+    return which == EVERY_HERO or (which == GEM_HEROES) == is_gem
+
+
+def acts_of_set(set_id, acts=None):
+    """The act ids whose planets the set paints: one hero atlas per act."""
     acts = acts or load_acts()
-    planets = POOL_PLANETS[pool]
+    planets = set_named(set_id)['planets']
     return [act['id'] for act in acts if any(act['firstPlanet'] <= p <= act['lastPlanet'] for p in planets)]
 
 
-def pools_of_act(act, pools=AUTHORED_POOLS, acts=None):
-    """The authored pools an act's atlas packs, in packing order."""
+def sets_of_act(act, sets=AUTHORED_SETS, acts=None):
+    """The authored sets an act's atlas packs, in packing order."""
     acts = acts or load_acts()
-    return [pool for pool in pools if act in acts_of_pool(pool, acts)]
+    return [entry['id'] for entry in sets if act in acts_of_set(entry['id'], acts)]
 
 
-def acts_of_pools(pools=AUTHORED_POOLS, acts=None):
-    """Every act an authored pool paints, in the acts' own order."""
+def acts_of_sets(sets=AUTHORED_SETS, acts=None):
+    """Every act an authored set paints, in the acts' own order."""
     acts = acts or load_acts()
-    painted = {act for pool in pools for act in acts_of_pool(pool, acts)}
+    painted = {act for entry in sets for act in acts_of_set(entry['id'], acts)}
     return [act['id'] for act in acts if act['id'] in painted]
 
 
@@ -114,50 +151,53 @@ def cell_rect_of(index):
             'w': ATLAS['contentPx'], 'h': ATLAS['contentPx']}
 
 
-def hero_entry_of(pool, hero):
-    return {'speciesId': hero['id'], 'pool': pool, 'family': hero['family'], 'rarity': hero['rarity'],
-            'silhouette': hero['silhouette'], 'pattern': hero['pattern'], 'hueSlot': hero['hueSlot'],
-            'bodyHex': slot_hex(hero['hue']), 'gradeBand': hero['gradeBand'],
+def hero_entry_of(set_id, hero):
+    return {'speciesId': hero['id'], 'set': set_id, 'pool': hero['pool'], 'family': hero['family'],
+            'rarity': hero['rarity'], 'silhouette': hero['silhouette'], 'pattern': hero['pattern'],
+            'hueSlot': hero['hueSlot'], 'bodyHex': slot_hex(hero['hue']), 'gradeBand': hero['gradeBand'],
             'cell': 'cells/%s.png' % hero['id'], 'blend': 'blend/hero-%s.blend' % hero['id']}
 
 
-def atlas_entry_of(act, pools, materials, acts):
-    packed = [hero for pool in pools_of_act(act, pools, acts) for hero in heroes_of(pool, materials)]
-    return {'act': act, 'pools': pools_of_act(act, pools, acts),
+def atlas_entry_of(act, sets, materials, acts, gem_slots):
+    packed_sets = sets_of_act(act, sets, acts)
+    packed = [hero for set_id in packed_sets for hero in heroes_of_set(set_id, materials, gem_slots)]
+    return {'act': act, 'sets': packed_sets,
             'cells': [{'index': i, 'speciesId': hero['id'], 'rect': cell_rect_of(i)} for i, hero in enumerate(packed)]}
 
 
-def cell_table_of(pools=AUTHORED_POOLS, materials=None, acts=None):
+def cell_table_of(sets=AUTHORED_SETS, materials=None, acts=None):
     materials = materials or load_materials()
     acts = acts or load_acts()
+    gem_slots = load_gem_slots()
+    set_ids = [entry['id'] for entry in sets]
     return {
-        '$comment': 'The hero cells of the %s pools (#452, ticket 744): one 256 px albedo cell per hero species '
-                    '(`heroes`), and per act the cells its atlas of #451 packs (`atlases`: cell i at column i mod %d, '
-                    'row i div %d, %d px of content inside a %d px gutter), pool after pool in packing order. '
-                    'Rendered lit on the ore stage with the rock held out, so the alpha is the mask; the shader '
-                    'draws the rarity frame and glow, never the sprite.'
-                    % (' and '.join(pools), ATLAS['cellsPerRow'], ATLAS['cellsPerRow'], ATLAS['contentPx'], ATLAS['gutterPx']),
-        'pools': list(pools),
+        '$comment': 'The hero cells of the authored sets %s (#452, tickets 744 and 785): one 256 px albedo cell '
+                    'per hero species (`heroes`), and per act the cells its atlas of #451 packs (`atlases`: cell i '
+                    'at column i mod %d, row i div %d, %d px of content inside a %d px gutter), set after set in '
+                    'packing order. Rendered lit on the ore stage with the rock held out, so the alpha is the '
+                    'mask; the shader draws the rarity frame and glow, never the sprite.'
+                    % (', '.join(set_ids), ATLAS['cellsPerRow'], ATLAS['cellsPerRow'], ATLAS['contentPx'], ATLAS['gutterPx']),
+        'sets': set_ids,
         'atlas': dict(ATLAS),
-        'atlases': [atlas_entry_of(act, pools, materials, acts) for act in acts_of_pools(pools, acts)],
-        'heroes': [hero_entry_of(pool, hero) for pool in pools for hero in heroes_of(pool, materials)],
+        'atlases': [atlas_entry_of(act, sets, materials, acts, gem_slots) for act in acts_of_sets(sets, acts)],
+        'heroes': [hero_entry_of(set_id, hero) for set_id in set_ids for hero in heroes_of_set(set_id, materials, gem_slots)],
     }
 
 
-def heroes_of_table(table, pool=None):
-    """The table's hero entries, or those of one pool."""
-    return [hero for hero in table['heroes'] if pool is None or hero['pool'] == pool]
+def heroes_of_table(table, set_id=None):
+    """The table's hero entries, or those of one authored set."""
+    return [hero for hero in table['heroes'] if set_id is None or hero['set'] == set_id]
 
 
-def heroes_sharing_acts(table, pool):
-    """Every hero packed into an act the pool paints: what the pool's heroes sit beside."""
-    acts = [atlas for atlas in table['atlases'] if pool in atlas['pools']]
+def heroes_sharing_acts(table, set_id):
+    """Every hero packed into an act the set paints: what the set's heroes sit beside."""
+    acts = [atlas for atlas in table['atlases'] if set_id in atlas['sets']]
     ids = {cell['speciesId'] for atlas in acts for cell in atlas['cells']}
     return [hero for hero in table['heroes'] if hero['speciesId'] in ids]
 
 
-def write_cell_table(pools=AUTHORED_POOLS):
-    table = cell_table_of(pools)
+def write_cell_table(sets=AUTHORED_SETS):
+    table = cell_table_of(sets)
     with open(CELLS_PATH, 'w', encoding='utf-8', newline='\n') as file:
         file.write(layout.json_text_of(table))
     return table
@@ -165,5 +205,5 @@ def write_cell_table(pools=AUTHORED_POOLS):
 
 if __name__ == '__main__':
     written = write_cell_table()
-    print('%d hero cells for %s, acts %s' % (len(written['heroes']), ', '.join(written['pools']),
+    print('%d hero cells for %s, acts %s' % (len(written['heroes']), ', '.join(written['sets']),
                                              ', '.join(atlas['act'] for atlas in written['atlases'])))

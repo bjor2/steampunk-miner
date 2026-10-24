@@ -1,0 +1,28 @@
+{
+  "pxPerMetre": 256,
+  "cells": [
+    {
+      "id": "fire-garnet-quartzine",
+      "oreLuma": 0.1074,
+      "rockLuma": 0.0132,
+      "orePeakLuma": 1.0,
+      "contrast": 2.49
+    },
+    {
+      "id": "core-gold-brassvein",
+      "oreLuma": 0.1223,
+      "rockLuma": 0.0144,
+      "orePeakLuma": 1.0,
+      "contrast": 2.68
+    },
+    {
+      "id": "furnace-ruby-quartzine",
+      "oreLuma": 0.0889,
+      "rockLuma": 0.0136,
+      "orePeakLuma": 0.8896,
+      "contrast": 2.18
+    }
+  ],
+  "oreLumaRisesAlongEveryRow": false,
+  "bodyLumaRisesAlongEveryRow": null
+}

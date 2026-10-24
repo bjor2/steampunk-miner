@@ -1,12 +1,13 @@
 """
-Authors the hero ore looks of one materials pool (#452, ticket 744) on the ore stage (docs/art/ores):
-one .blend per hero species (its 1 m cell on its band's rock, the lamp rig and the game's
-orthographic camera), the 248 px lit albedo sprite of each (the rock held out, so the alpha is the
-mask) into art/build/ore-heroes/ for hero_post.py, the cell table of every authored pool, and the
-review sheets of the pool's heroes side by side under the shallow and the deep rig. Run headless:
+Authors the hero ore looks of one authored set (#452, tickets 744 and 785; `AUTHORED_SETS` in
+hero_species.py) on the ore stage (docs/art/ores): one .blend per hero species (its 1 m cell on its
+band's rock, the lamp rig and the game's orthographic camera), the 248 px lit albedo sprite of each
+(the rock held out, so the alpha is the mask) into art/build/ore-heroes/ for hero_post.py, the cell
+table of every authored set, and the review sheets of the set's heroes side by side under the
+shallow and the deep rig. Run headless:
 
   BLENDER_USER_SCRIPTS=/tmp/empty blender -b --factory-startup --python-exit-code 1 \
-    -P docs/art/ore-heroes/author_ore_heroes.py -- [pool] [--no-sheets]
+    -P docs/art/ore-heroes/author_ore_heroes.py -- [set] [--no-sheets]
 
 or through the MCP: add this folder to sys.path, `import author_ore_heroes`, `author('legacy')`.
 """
@@ -22,6 +23,8 @@ for folder in (HERE, os.path.normpath(os.path.join(HERE, '..', 'ores')), os.path
     if folder not in sys.path:
         sys.path.insert(0, folder)
 
+import gem_marks  # noqa: E402
+import gem_marks_deep  # noqa: E402
 import hero_marks as marks  # noqa: E402
 import hero_species as species  # noqa: E402
 import ore_stage as stage  # noqa: E402
@@ -34,30 +37,30 @@ AMBIENTS = ('shallow', 'deep')
 
 
 def main():
-    pool, with_sheets = parse_arguments(sys.argv[sys.argv.index('--') + 1:] if '--' in sys.argv else [])
-    author(pool, sheets=with_sheets)
+    set_id, with_sheets = parse_arguments(sys.argv[sys.argv.index('--') + 1:] if '--' in sys.argv else [])
+    author(set_id, sheets=with_sheets)
 
 
 def parse_arguments(argv):
-    pool = next((arg for arg in argv if not arg.startswith('--')), 'legacy')
-    return pool, '--no-sheets' not in argv
+    set_id = next((arg for arg in argv if not arg.startswith('--')), 'legacy')
+    return set_id, '--no-sheets' not in argv
 
 
-def author(pool, sheets=True):
+def author(set_id, sheets=True):
     reload_modules()
-    heroes = species.heroes_of(pool)
+    heroes = species.heroes_of_set(set_id)
     for folder in (BLEND_DIR, SHEET_DIR, BUILD_DIR):
         os.makedirs(folder, exist_ok=True)
     for hero in heroes:
         author_hero(hero)
     species.write_cell_table()
     if sheets:
-        render_sheets(pool, heroes)
-    print('authored %d heroes of %s' % (len(heroes), pool))
+        render_sheets(set_id, heroes)
+    print('authored %d heroes of %s' % (len(heroes), set_id))
 
 
 def reload_modules():
-    for module in (species, marks):
+    for module in (species, marks, gem_marks, gem_marks_deep):
         importlib.reload(module)
 
 
@@ -118,10 +121,10 @@ def render_sprite(hero, rock):
         scene.render.image_settings.color_mode = 'RGB'
 
 
-# --- the pool's review sheets ------------------------------------------------------------------------
+# --- the set's review sheets -------------------------------------------------------------------------
 
 
-def render_sheets(pool, heroes):
+def render_sheets(set_id, heroes):
     stage.reset_scene()
     columns = len(heroes)
     for column, hero in enumerate(heroes):
@@ -132,13 +135,13 @@ def render_sheets(pool, heroes):
     for ambient in AMBIENTS:
         relight(ambient)
         stage.frame_grid(columns, 1)
-        sheet = stage.render_to(sheet_path(pool, ambient + '.png'))
-        stage.report_grid_luma(sheet, columns, 1, labels, sheet_path(pool, ambient + '.luma.json'))
+        sheet = stage.render_to(sheet_path(set_id, ambient + '.png'))
+        stage.report_grid_luma(sheet, columns, 1, labels, sheet_path(set_id, ambient + '.luma.json'))
     relight('shallow')
     stage.frame_grid(columns, 1, stage.CLOSEUP_PX_PER_M)
-    stage.render_to(sheet_path(pool, 'closeup.png'))
+    stage.render_to(sheet_path(set_id, 'closeup.png'))
     stage.frame_grid(columns, 1)
-    stage.save_blend(os.path.join(BLEND_DIR, 'heroes-%s.blend' % pool))
+    stage.save_blend(os.path.join(BLEND_DIR, 'heroes-%s.blend' % set_id))
 
 
 def relight(ambient):
@@ -148,8 +151,8 @@ def relight(ambient):
     stage.add_lamp_rig(ambient)
 
 
-def sheet_path(pool, suffix):
-    return os.path.join(SHEET_DIR, 'heroes-%s.%s' % (pool, suffix))
+def sheet_path(set_id, suffix):
+    return os.path.join(SHEET_DIR, 'heroes-%s.%s' % (set_id, suffix))
 
 
 if __name__ == '__main__':

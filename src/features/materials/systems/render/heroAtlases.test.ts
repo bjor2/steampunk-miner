@@ -2,6 +2,7 @@ import { readFileSync } from 'node:fs'
 import { describe, expect, it } from 'vitest'
 import {
   HERO_ATLAS_CELL_PX,
+  HERO_ATLAS_CELLS,
   HERO_ATLAS_LEVELS,
   HERO_ATLAS_MAX_RESIDENT_BYTES,
   HERO_ATLAS_SIDE_PX,
@@ -9,6 +10,7 @@ import {
 import { SHIPPED_ART } from '../../../../scene/shippedArt'
 import { readKtx2Header, readKtx2LevelCount } from '../../../../systems/art/ktx2Header'
 import { drawnHeroAtlasOf, residentBytesOf } from '../../../../systems/render/heroAtlas'
+import { ORE_ROWS } from '../../../ores'
 import { MATERIALS } from '../materialTable'
 import {
   HERO_ATLASES,
@@ -20,15 +22,16 @@ import {
 
 // Ticket 451's atlas rows (TD shape 6226270701 "#451 shape"): every cell a hero species, packed in
 // the order the #452 art packs it per act (ticket 744: the legacy four, then P2's three gems in the
-// foothold.heavy atlas), each cell shipped as a 256 px RGBA cell, and each shipped atlas one
-// 1024 px ETC1S map within 2 MiB.
+// foothold.heavy atlas; ticket 785: P1's three gems after the legacy four in foothold.base, and
+// the nine gems of P3 to P5 after P2's, filling foothold.heavy), each cell shipped as a 256 px RGBA
+// cell, and each shipped atlas one 1024 px ETC1S map within 2 MiB.
 
 const REPO = new URL('../../../../../', import.meta.url)
 const ART = new URL('docs/art/ore-heroes/', REPO)
 
 interface HeroCellTable {
   atlases: { act: string; cells: { index: number; speciesId: string }[] }[]
-  heroes: { speciesId: string; cell: string }[]
+  heroes: { speciesId: string; set: string; cell: string }[]
 }
 
 const HERO_CELLS = JSON.parse(
@@ -61,10 +64,44 @@ describe('hero atlases (ticket 451)', () => {
     )
   })
 
-  it("packs P2's three gems after the legacy four in the foothold.heavy atlas alone (ticket 744)", () => {
-    const legacy = heroAtlasOfAct('foothold.base')?.cells ?? []
+  it("packs the legacy four first in both acts, then P1's gems in foothold.base and P2's, P3's, P4's and P5's gems in foothold.heavy (tickets 744 and 785)", () => {
+    const legacy = HERO_CELLS.heroes
+      .filter((hero) => hero.set === 'legacy')
+      .map((hero) => hero.speciesId)
     expect(legacy).toHaveLength(4)
-    expect(heroAtlasOfAct('foothold.heavy')?.cells).toEqual([...legacy, 'p2-r1', 'p2-r2', 'p2-r4'])
+    expect(heroAtlasOfAct('foothold.base')?.cells).toEqual([
+      ...legacy,
+      'diamond-quartzine',
+      'emerald-quartzine',
+      'ruby-quartzine',
+    ])
+    expect(heroAtlasOfAct('foothold.heavy')?.cells).toEqual([
+      ...legacy,
+      'p2-r1',
+      'p2-r2',
+      'p2-r4',
+      'blue-topaz-quartzine',
+      'orichalcum-brassvein',
+      'heart-diamond-quartzine',
+      'watermelon-tourmaline-quartzine',
+      'starsteel-brassvein',
+      'painite-quartzine',
+      'fire-garnet-quartzine',
+      'core-gold-brassvein',
+      'furnace-ruby-quartzine',
+    ])
+    expect(heroAtlasOfAct('foothold.heavy')?.cells).toHaveLength(HERO_ATLAS_CELLS)
+  })
+
+  it('packs every gem of P1 to P5 that sells as a gem, keyed on its species id (ticket 785)', () => {
+    const packed = new Set(HERO_ATLASES.flatMap((atlas) => atlas.cells))
+    const gemSlotsOf = (pool: string) =>
+      ORE_ROWS.gems.pools.find((row) => row.pool === pool)?.slotIds ?? []
+    const gems = MATERIALS.materials.filter((material) =>
+      gemSlotsOf(material.pool).includes(material.slot),
+    )
+    expect(gems).toHaveLength(15)
+    expect(gems.filter((gem) => !packed.has(gem.id))).toEqual([])
   })
 
   it('ships every packed species as a 256 px RGBA cell', () => {

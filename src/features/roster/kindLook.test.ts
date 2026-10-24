@@ -267,10 +267,12 @@ describe('roster hero atlases (ticket 451)', () => {
   })
 
   // P2's own pool (ticket 632) has hero art for its three gems (ticket 744), so a fresh P2 shows
-  // three; a P2 a save holds under ore rules 5 keeps the legacy heroes its atlas packs.
+  // three; a P2 a save holds under ore rules 5 keeps the legacy heroes its atlas packs; a fresh P1
+  // shows the legacy four and its three gems (ticket 785). P3 to P5 have `hero: true` rows beyond
+  // their gems with no art yet, so there every hero is not in the atlas (3.72 Fallbacks).
   it("gives every hero of the P1 and P2 rosters a cell of its planet's atlas", () => {
     const rosters = [
-      { params: freshPlanetParamsFor(SEED, 1), heroCount: 4 },
+      { params: freshPlanetParamsFor(SEED, 1), heroCount: 7 },
       { params: planetParamsFor(SEED, 2, 5), heroCount: 4 },
       { params: freshPlanetParamsFor(SEED, 2), heroCount: 3 },
     ]

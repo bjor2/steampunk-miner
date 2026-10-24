@@ -1,6 +1,13 @@
 {
-  "$comment": "The hero cells of the legacy and foothold-p2 pools (#452, ticket 744): one 256 px albedo cell per hero species (`heroes`), and per act the cells its atlas of #451 packs (`atlases`: cell i at column i mod 4, row i div 4, 248 px of content inside a 4 px gutter), pool after pool in packing order. Rendered lit on the ore stage with the rock held out, so the alpha is the mask; the shader draws the rarity frame and glow, never the sprite.",
-  "pools": ["legacy", "foothold-p2"],
+  "$comment": "The hero cells of the authored sets legacy, p1-gems, foothold-p2, foothold-p3-gems, foothold-p4-gems, foothold-p5-gems (#452, tickets 744 and 785): one 256 px albedo cell per hero species (`heroes`), and per act the cells its atlas of #451 packs (`atlases`: cell i at column i mod 4, row i div 4, 248 px of content inside a 4 px gutter), set after set in packing order. Rendered lit on the ore stage with the rock held out, so the alpha is the mask; the shader draws the rarity frame and glow, never the sprite.",
+  "sets": [
+    "legacy",
+    "p1-gems",
+    "foothold-p2",
+    "foothold-p3-gems",
+    "foothold-p4-gems",
+    "foothold-p5-gems"
+  ],
   "atlas": {
     "sidePx": 1024,
     "cellPx": 256,
@@ -11,7 +18,7 @@
   "atlases": [
     {
       "act": "foothold.base",
-      "pools": ["legacy"],
+      "sets": ["legacy", "p1-gems"],
       "cells": [
         {
           "index": 0,
@@ -52,12 +59,42 @@
             "w": 248,
             "h": 248
           }
+        },
+        {
+          "index": 4,
+          "speciesId": "diamond-quartzine",
+          "rect": {
+            "x": 4,
+            "y": 260,
+            "w": 248,
+            "h": 248
+          }
+        },
+        {
+          "index": 5,
+          "speciesId": "emerald-quartzine",
+          "rect": {
+            "x": 260,
+            "y": 260,
+            "w": 248,
+            "h": 248
+          }
+        },
+        {
+          "index": 6,
+          "speciesId": "ruby-quartzine",
+          "rect": {
+            "x": 516,
+            "y": 260,
+            "w": 248,
+            "h": 248
+          }
         }
       ]
     },
     {
       "act": "foothold.heavy",
-      "pools": ["legacy", "foothold-p2"],
+      "sets": ["legacy", "foothold-p2", "foothold-p3-gems", "foothold-p4-gems", "foothold-p5-gems"],
       "cells": [
         {
           "index": 0,
@@ -128,6 +165,96 @@
             "w": 248,
             "h": 248
           }
+        },
+        {
+          "index": 7,
+          "speciesId": "blue-topaz-quartzine",
+          "rect": {
+            "x": 772,
+            "y": 260,
+            "w": 248,
+            "h": 248
+          }
+        },
+        {
+          "index": 8,
+          "speciesId": "orichalcum-brassvein",
+          "rect": {
+            "x": 4,
+            "y": 516,
+            "w": 248,
+            "h": 248
+          }
+        },
+        {
+          "index": 9,
+          "speciesId": "heart-diamond-quartzine",
+          "rect": {
+            "x": 260,
+            "y": 516,
+            "w": 248,
+            "h": 248
+          }
+        },
+        {
+          "index": 10,
+          "speciesId": "watermelon-tourmaline-quartzine",
+          "rect": {
+            "x": 516,
+            "y": 516,
+            "w": 248,
+            "h": 248
+          }
+        },
+        {
+          "index": 11,
+          "speciesId": "starsteel-brassvein",
+          "rect": {
+            "x": 772,
+            "y": 516,
+            "w": 248,
+            "h": 248
+          }
+        },
+        {
+          "index": 12,
+          "speciesId": "painite-quartzine",
+          "rect": {
+            "x": 4,
+            "y": 772,
+            "w": 248,
+            "h": 248
+          }
+        },
+        {
+          "index": 13,
+          "speciesId": "fire-garnet-quartzine",
+          "rect": {
+            "x": 260,
+            "y": 772,
+            "w": 248,
+            "h": 248
+          }
+        },
+        {
+          "index": 14,
+          "speciesId": "core-gold-brassvein",
+          "rect": {
+            "x": 516,
+            "y": 772,
+            "w": 248,
+            "h": 248
+          }
+        },
+        {
+          "index": 15,
+          "speciesId": "furnace-ruby-quartzine",
+          "rect": {
+            "x": 772,
+            "y": 772,
+            "w": 248,
+            "h": 248
+          }
         }
       ]
     }
@@ -135,6 +262,7 @@
   "heroes": [
     {
       "speciesId": "violet-fluorite-quartzine",
+      "set": "legacy",
       "pool": "legacy",
       "family": "crystal",
       "rarity": "uncommon",
@@ -148,6 +276,7 @@
     },
     {
       "speciesId": "vein-gold-brassvein",
+      "set": "legacy",
       "pool": "legacy",
       "family": "metal",
       "rarity": "rare",
@@ -161,6 +290,7 @@
     },
     {
       "speciesId": "blue-corundum-quartzine",
+      "set": "legacy",
       "pool": "legacy",
       "family": "crystal",
       "rarity": "rare",
@@ -174,6 +304,7 @@
     },
     {
       "speciesId": "red-beryl-quartzine",
+      "set": "legacy",
       "pool": "legacy",
       "family": "crystal",
       "rarity": "rare",
@@ -186,7 +317,50 @@
       "blend": "blend/hero-red-beryl-quartzine.blend"
     },
     {
+      "speciesId": "diamond-quartzine",
+      "set": "p1-gems",
+      "pool": "legacy",
+      "family": "crystal",
+      "rarity": "rare",
+      "silhouette": "octahedra",
+      "pattern": "lustrous",
+      "hueSlot": "diamond-white",
+      "bodyHex": "#f6f8f9",
+      "gradeBand": [3, 5],
+      "cell": "cells/diamond-quartzine.png",
+      "blend": "blend/hero-diamond-quartzine.blend"
+    },
+    {
+      "speciesId": "emerald-quartzine",
+      "set": "p1-gems",
+      "pool": "legacy",
+      "family": "crystal",
+      "rarity": "rare",
+      "silhouette": "prisms",
+      "pattern": "faceted",
+      "hueSlot": "emerald-green",
+      "bodyHex": "#1ace65",
+      "gradeBand": [3, 5],
+      "cell": "cells/emerald-quartzine.png",
+      "blend": "blend/hero-emerald-quartzine.blend"
+    },
+    {
+      "speciesId": "ruby-quartzine",
+      "set": "p1-gems",
+      "pool": "legacy",
+      "family": "crystal",
+      "rarity": "rare",
+      "silhouette": "drops",
+      "pattern": "faceted",
+      "hueSlot": "ruby-crimson",
+      "bodyHex": "#f0419e",
+      "gradeBand": [3, 5],
+      "cell": "cells/ruby-quartzine.png",
+      "blend": "blend/hero-ruby-quartzine.blend"
+    },
+    {
       "speciesId": "p2-r1",
+      "set": "foothold-p2",
       "pool": "foothold-p2",
       "family": "metal",
       "rarity": "rare",
@@ -200,6 +374,7 @@
     },
     {
       "speciesId": "p2-r2",
+      "set": "foothold-p2",
       "pool": "foothold-p2",
       "family": "crystal",
       "rarity": "rare",
@@ -213,6 +388,7 @@
     },
     {
       "speciesId": "p2-r4",
+      "set": "foothold-p2",
       "pool": "foothold-p2",
       "family": "crystal",
       "rarity": "rare",
@@ -223,6 +399,132 @@
       "gradeBand": [4, 5],
       "cell": "cells/p2-r4.png",
       "blend": "blend/hero-p2-r4.blend"
+    },
+    {
+      "speciesId": "blue-topaz-quartzine",
+      "set": "foothold-p3-gems",
+      "pool": "foothold-p3",
+      "family": "crystal",
+      "rarity": "rare",
+      "silhouette": "blocks",
+      "pattern": "clear",
+      "hueSlot": "blue-topaz",
+      "bodyHex": "#88c0dc",
+      "gradeBand": [3, 5],
+      "cell": "cells/blue-topaz-quartzine.png",
+      "blend": "blend/hero-blue-topaz-quartzine.blend"
+    },
+    {
+      "speciesId": "orichalcum-brassvein",
+      "set": "foothold-p3-gems",
+      "pool": "foothold-p3",
+      "family": "metal",
+      "rarity": "mythic",
+      "silhouette": "lattices",
+      "pattern": "lustrous",
+      "hueSlot": "orichalcum",
+      "bodyHex": "#bdb81f",
+      "gradeBand": [4, 5],
+      "cell": "cells/orichalcum-brassvein.png",
+      "blend": "blend/hero-orichalcum-brassvein.blend"
+    },
+    {
+      "speciesId": "heart-diamond-quartzine",
+      "set": "foothold-p3-gems",
+      "pool": "foothold-p3",
+      "family": "crystal",
+      "rarity": "mythic",
+      "silhouette": "octahedra",
+      "pattern": "fiery",
+      "hueSlot": "heart-diamond",
+      "bodyHex": "#ece2e4",
+      "gradeBand": [4, 5],
+      "cell": "cells/heart-diamond-quartzine.png",
+      "blend": "blend/hero-heart-diamond-quartzine.blend"
+    },
+    {
+      "speciesId": "watermelon-tourmaline-quartzine",
+      "set": "foothold-p4-gems",
+      "pool": "foothold-p4",
+      "family": "crystal",
+      "rarity": "rare",
+      "silhouette": "pencils",
+      "pattern": "two-tone",
+      "hueSlot": "watermelon-tourmaline",
+      "bodyHex": "#4cc388",
+      "gradeBand": [3, 5],
+      "cell": "cells/watermelon-tourmaline-quartzine.png",
+      "blend": "blend/hero-watermelon-tourmaline-quartzine.blend"
+    },
+    {
+      "speciesId": "starsteel-brassvein",
+      "set": "foothold-p4-gems",
+      "pool": "foothold-p4",
+      "family": "metal",
+      "rarity": "mythic",
+      "silhouette": "stars",
+      "pattern": "watered",
+      "hueSlot": "starsteel",
+      "bodyHex": "#b4b4d2",
+      "gradeBand": [4, 5],
+      "cell": "cells/starsteel-brassvein.png",
+      "blend": "blend/hero-starsteel-brassvein.blend"
+    },
+    {
+      "speciesId": "painite-quartzine",
+      "set": "foothold-p4-gems",
+      "pool": "foothold-p4",
+      "family": "crystal",
+      "rarity": "mythic",
+      "silhouette": "spindles",
+      "pattern": "deep-red",
+      "hueSlot": "painite",
+      "bodyHex": "#e04d59",
+      "gradeBand": [4, 5],
+      "cell": "cells/painite-quartzine.png",
+      "blend": "blend/hero-painite-quartzine.blend"
+    },
+    {
+      "speciesId": "fire-garnet-quartzine",
+      "set": "foothold-p5-gems",
+      "pool": "foothold-p5",
+      "family": "crystal",
+      "rarity": "rare",
+      "silhouette": "spheres",
+      "pattern": "glowing",
+      "hueSlot": "fire-garnet",
+      "bodyHex": "#e05074",
+      "gradeBand": [3, 5],
+      "cell": "cells/fire-garnet-quartzine.png",
+      "blend": "blend/hero-fire-garnet-quartzine.blend"
+    },
+    {
+      "speciesId": "core-gold-brassvein",
+      "set": "foothold-p5-gems",
+      "pool": "foothold-p5",
+      "family": "metal",
+      "rarity": "mythic",
+      "silhouette": "blooms",
+      "pattern": "molten",
+      "hueSlot": "core-gold",
+      "bodyHex": "#efe00d",
+      "gradeBand": [4, 5],
+      "cell": "cells/core-gold-brassvein.png",
+      "blend": "blend/hero-core-gold-brassvein.blend"
+    },
+    {
+      "speciesId": "furnace-ruby-quartzine",
+      "set": "foothold-p5-gems",
+      "pool": "foothold-p5",
+      "family": "crystal",
+      "rarity": "mythic",
+      "silhouette": "hearts",
+      "pattern": "inner-fire",
+      "hueSlot": "furnace-ruby",
+      "bodyHex": "#f04b66",
+      "gradeBand": [4, 5],
+      "cell": "cells/furnace-ruby-quartzine.png",
+      "blend": "blend/hero-furnace-ruby-quartzine.blend"
     }
   ]
 }

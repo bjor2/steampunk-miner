@@ -1,0 +1,28 @@
+{
+  "pxPerMetre": 256,
+  "cells": [
+    {
+      "id": "watermelon-tourmaline-quartzine",
+      "oreLuma": 0.1025,
+      "rockLuma": 0.0131,
+      "orePeakLuma": 0.9925,
+      "contrast": 2.42
+    },
+    {
+      "id": "starsteel-brassvein",
+      "oreLuma": 0.0782,
+      "rockLuma": 0.0176,
+      "orePeakLuma": 1.0,
+      "contrast": 1.9
+    },
+    {
+      "id": "painite-quartzine",
+      "oreLuma": 0.1136,
+      "rockLuma": 0.014,
+      "orePeakLuma": 0.8876,
+      "contrast": 2.56
+    }
+  ],
+  "oreLumaRisesAlongEveryRow": false,
+  "bodyLumaRisesAlongEveryRow": null
+}

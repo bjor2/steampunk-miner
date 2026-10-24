@@ -182,7 +182,7 @@
           "pattern": "lustrous",
           "patternCode": 24,
           "colour": "#f6f8f9",
-          "heroCell": null,
+          "heroCell": 4,
           "gemRank": 0,
           "gemSaleTier": 12
         },
@@ -196,7 +196,7 @@
           "pattern": "faceted",
           "patternCode": 77,
           "colour": "#1ace65",
-          "heroCell": null,
+          "heroCell": 5,
           "gemRank": 1,
           "gemSaleTier": 13
         },
@@ -210,7 +210,7 @@
           "pattern": "faceted",
           "patternCode": 77,
           "colour": "#f0419e",
-          "heroCell": null,
+          "heroCell": 6,
           "gemRank": 2,
           "gemSaleTier": 15
         }
@@ -556,7 +556,7 @@
           "pattern": "clear",
           "patternCode": 12,
           "colour": "#88c0dc",
-          "heroCell": null,
+          "heroCell": 7,
           "gemRank": 2,
           "gemSaleTier": 23
         },
@@ -626,7 +626,7 @@
           "pattern": "lustrous",
           "patternCode": 24,
           "colour": "#bdb81f",
-          "heroCell": null,
+          "heroCell": 8,
           "gemRank": 1,
           "gemSaleTier": 21
         },
@@ -640,7 +640,7 @@
           "pattern": "fiery",
           "patternCode": 25,
           "colour": "#ece2e4",
-          "heroCell": null,
+          "heroCell": 9,
           "gemRank": 0,
           "gemSaleTier": 20
         },
@@ -799,7 +799,7 @@
           "pattern": "two-tone",
           "patternCode": 36,
           "colour": "#4cc388",
-          "heroCell": null,
+          "heroCell": 10,
           "gemRank": 2,
           "gemSaleTier": 26
         },
@@ -869,7 +869,7 @@
           "pattern": "watered",
           "patternCode": 41,
           "colour": "#b4b4d2",
-          "heroCell": null,
+          "heroCell": 11,
           "gemRank": 1,
           "gemSaleTier": 24
         },
@@ -883,7 +883,7 @@
           "pattern": "deep-red",
           "patternCode": 42,
           "colour": "#e04d59",
-          "heroCell": null,
+          "heroCell": 12,
           "gemRank": 0,
           "gemSaleTier": 23
         },
@@ -1042,7 +1042,7 @@
           "pattern": "glowing",
           "patternCode": 52,
           "colour": "#e05074",
-          "heroCell": null,
+          "heroCell": 13,
           "gemRank": 2,
           "gemSaleTier": 29
         },
@@ -1112,7 +1112,7 @@
           "pattern": "molten",
           "patternCode": 56,
           "colour": "#efe00d",
-          "heroCell": null,
+          "heroCell": 14,
           "gemRank": 1,
           "gemSaleTier": 27
         },
@@ -1126,7 +1126,7 @@
           "pattern": "inner-fire",
           "patternCode": 57,
           "colour": "#f04b66",
-          "heroCell": null,
+          "heroCell": 15,
           "gemRank": 0,
           "gemSaleTier": 26
         },

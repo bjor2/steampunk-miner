@@ -1,0 +1,28 @@
+{
+  "pxPerMetre": 256,
+  "cells": [
+    {
+      "id": "diamond-quartzine",
+      "oreLuma": 0.4069,
+      "rockLuma": 0.0796,
+      "orePeakLuma": 1.0,
+      "contrast": 3.53
+    },
+    {
+      "id": "emerald-quartzine",
+      "oreLuma": 0.2818,
+      "rockLuma": 0.0666,
+      "orePeakLuma": 1.0,
+      "contrast": 2.85
+    },
+    {
+      "id": "ruby-quartzine",
+      "oreLuma": 0.1722,
+      "rockLuma": 0.0648,
+      "orePeakLuma": 1.0,
+      "contrast": 1.94
+    }
+  ],
+  "oreLumaRisesAlongEveryRow": false,
+  "bodyLumaRisesAlongEveryRow": null
+}

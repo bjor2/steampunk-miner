@@ -1,10 +1,11 @@
 # Hero ore looks: the P1 and P2 acts
 
 The hero sprites of
-[Art: hero ore looks for acts 1 and 2 (#452)](https://github.com/bjor2/steampunk-miner/issues/452)
-and of P2's three gems
+[Art: hero ore looks for acts 1 and 2 (#452)](https://github.com/bjor2/steampunk-miner/issues/452),
+of P2's three gems
 ([Art: hero gem skins for P2 Star Garnet, Verdigris Opal, Aquamarine (#744)](https://github.com/bjor2/steampunk-miner/issues/744),
-below),
+below) and of the twelve gems of P1 and P3 to P5
+([Gem hero cells P1–P5 (#785)](https://github.com/bjor2/steampunk-miner/issues/785), below),
 under the Game Director's materials rulings on
 [Wayfinder: Materials expansion (#139)](https://github.com/bjor2/steampunk-miner/issues/139): a
 look layer under the 12 ore families, with 4 or 5 hero species per act drawn by Blender and shipped
@@ -15,9 +16,11 @@ The heroes are the `hero: true` rows of the `legacy` pool in
 [Materials rows for P1 and P2 (#447)](https://github.com/bjor2/steampunk-miner/issues/447): the
 three rares and Violet Fluorite, four for the act. P1 (`foothold.base`) and a P2 a save holds
 under ore rules 5 or earlier (`foothold.heavy`, to P7) draw that pool, so both acts get these four
-cells first; the `foothold.heavy` atlas then packs the three gems of a fresh P2's own pool
-(`foothold-p2`, #744), and the foothold pools of P3 to P7 add their own heroes in a follow-up art
-ticket. This folder holds sources and renders; the game draws the cells from the per-act atlases
+cells first; the `foothold.base` atlas then packs P1's three gems (`p1-gems`, #785), and the
+`foothold.heavy` atlas the three gems of a fresh P2's own pool (`foothold-p2`, #744) and the nine
+gems of the P3 to P5 pools (`foothold-p3-gems` to `foothold-p5-gems`, #785), which fill its 16
+cells; the other `hero: true` rows of P3 to P7 have no art and draw the shader look. This folder
+holds sources and renders; the game draws the cells from the per-act atlases
 `encode_hero_atlases.py` packs from them (#451).
 
 Authored in Blender 4.2.9 on the shared box, headless, on the ore stage of
@@ -101,51 +104,133 @@ shader look, so that half of the gem-read test is the browser spec `e2e/browser/
 seven, the garnet a pink stone pile with a white spark, the opal green framed ovals, the
 aquamarine a pale cross of bars.
 
+## The twelve gems (#785)
+
+The gem rows of P1 and P3 to P5 that #746's contact sheet found drawing their grains on frame 1
+(the GD lock on #746: a gem reads as "a faceted outline and at least one highlight, at 360 px and
+1280+, distinguishable from every non-gem on its planet"). Each is its own construction in its hue
+slot with the shared facet glint, built from the species' mineral-skin row
+([docs/art/mineral-skins](../mineral-skins/README.md): the vein layout and the sheen) so the sprite
+and the skin agree. Builders live in `gem_marks.py` (P1, P3) and `gem_marks_deep.py` (P4, P5),
+keyed on the row's silhouette and pattern together, since emerald shares `prisms` with aquamarine
+and starsteel `stars` with the star garnet. Every gem is flat-shaded so a facet lights whole; a
+spark or fire where the skin has one is emission alone, in the slot's pale tint or on the ruby's
+own side of red, never in the reserved heat band (15 to 45).
+
+<!-- gems-785 -->
+
+| atlas, cell       | species                                      | silhouette + pattern | what it is                                                                                                                       |
+| ----------------- | -------------------------------------------- | -------------------- | -------------------------------------------------------------------------------------------------------------------------------- |
+| foothold.base 4   | `diamond-quartzine` Diamond (P1)             | octahedra, lustrous  | five near-white octahedra with a point toward the camera, the largest ring a small centre stone, four-rayed fire sparks on three |
+| foothold.base 5   | `emerald-quartzine` Emerald (P1)             | prisms, faceted      | five stubby hexagonal prisms standing toward the camera with chamfered ends, deep green with a pale jardin                       |
+| foothold.base 6   | `ruby-quartzine` Ruby (P1)                   | drops, faceted       | five faceted pears radiating from a heart, each drawn out to a six-sided point toward the centre, crimson                        |
+| foothold.heavy 7  | `blue-topaz-quartzine` Blue Topaz (P3)       | blocks, clear        | four chamfered rectangular blocks on a ring, each ending in a four-sided wedge, pale clear blue                                  |
+| foothold.heavy 8  | `orichalcum-brassvein` Orichalcum (P3)       | lattices, lustrous   | a trellis of six square gold bars, three crossing three at 60 degrees, hammered                                                  |
+| foothold.heavy 9  | `heart-diamond-quartzine` Heart Diamond (P3) | octahedra, fiery     | three large blush-white octahedra tipped on their side, a long edge to the camera, a warm pink fire spark on each crown          |
+| foothold.heavy 10 | `watermelon-tourmaline-quartzine` (P4)       | pencils, two-tone    | four three-sided pencils lying ridge-on, green rind, the cut ends showing the pink heart                                         |
+| foothold.heavy 11 | `starsteel-brassvein` Starsteel (P4)         | stars, watered       | three six-armed steel star plates standing proud, chamfered, a hot point at each centre, watered damask over lavender grey       |
+| foothold.heavy 12 | `painite-quartzine` Painite (P4)             | spindles, deep-red   | six six-sided spindles fanning from a root, deep red, a fire glint along every other waist                                       |
+| foothold.heavy 13 | `fire-garnet-quartzine` Fire Garnet (P5)     | spheres, glowing     | six faceted balls lit from within, an ember floor of their own red under the glint                                               |
+| foothold.heavy 14 | `core-gold-brassvein` Core Gold (P5)         | blooms, molten       | three rosettes of smooth gold lobes, a raised centre ringed by five petals, a molten sheen                                       |
+| foothold.heavy 15 | `furnace-ruby-quartzine` Kiln Ruby (P5)      | hearts, inner-fire   | three heart crystals extruded toward the camera and chamfered, a smaller flame-bright heart on each                              |
+
+<!-- /gems-785 -->
+
+Authored a set at a time: `author_ore_heroes.py -- <set>` and `hero_post.py <set>` for `p1-gems`,
+`foothold-p3-gems`, `foothold-p4-gems` and `foothold-p5-gems`, leaving the legacy and P2 cells
+byte-identical, then `encode_hero_atlases.py` packs both acts again.
+
+### Gem reads
+
+`hero_post.py` measures every committed cell at the two gem-read screens (`hero_reads.py`, written
+to `hero-reads.json` with the cell's SHA-256; 30 px a tile on 360x640, 67 px on 1280x800): the
+patches of the body brighter than 0.82 (highlights), the share of the body on a luma edge of 0.1
+or more (facet edges and the outline), the body's contrast against its rock, and the share of the
+tile that is bright (0.72) or saturated (0.5), Systems' showiness term. The roster's contact-sheet
+spec reads them: every gem shows a highlight at both screens, at least 0.15 of its body on facet
+edges and a 1.2 contrast, and its score, rank k plus the bright-or-saturated share, never falls as
+the price rises nor under the planet's top non-gem (a row with no cell has no cell pixels, so a
+shader-look non-gem scores 0; P1's legacy heroes score their cells' shares, red beryl the most).
+
+<!-- gem-reads-785 -->
+
+From `hero-reads.json`, the twelve at the two screens (highlights · facet-edge share · contrast · bright-or-saturated share):
+
+| species                                | 360x640 (30 px)          | 1280x800 (67 px)         |
+| -------------------------------------- | ------------------------ | ------------------------ |
+| `diamond-quartzine` (P1)               | 3 · 0.71 · 2.94 · 0.223  | 4 · 0.39 · 3.01 · 0.236  |
+| `emerald-quartzine` (P1)               | 3 · 0.67 · 2.32 · 0.047  | 5 · 0.37 · 2.36 · 0.054  |
+| `ruby-quartzine` (P1)                  | 2 · 0.76 · 2.13 · 0.036  | 2 · 0.45 · 2.18 · 0.048  |
+| `blue-topaz-quartzine` (P3)            | 2 · 0.65 · 2.25 · 0.028  | 6 · 0.36 · 2.29 · 0.036  |
+| `orichalcum-brassvein` (P3)            | 18 · 0.99 · 2.23 · 0.051 | 20 · 0.88 · 2.30 · 0.065 |
+| `heart-diamond-quartzine` (P3)         | 6 · 0.68 · 2.60 · 0.124  | 9 · 0.39 · 2.64 · 0.138  |
+| `watermelon-tourmaline-quartzine` (P4) | 1 · 0.78 · 2.22 · 0.013  | 18 · 0.55 · 2.27 · 0.024 |
+| `starsteel-brassvein` (P4)             | 2 · 0.86 · 2.19 · 0.011  | 14 · 0.68 · 2.23 · 0.021 |
+| `painite-quartzine` (P4)               | 2 · 0.65 · 2.38 · 0.026  | 5 · 0.44 · 2.42 · 0.035  |
+| `fire-garnet-quartzine` (P5)           | 4 · 0.76 · 2.13 · 0.043  | 4 · 0.39 · 2.18 · 0.054  |
+| `core-gold-brassvein` (P5)             | 8 · 0.99 · 2.32 · 0.063  | 22 · 0.88 · 2.43 · 0.077 |
+| `furnace-ruby-quartzine` (P5)          | 3 · 0.92 · 2.25 · 0.104  | 3 · 0.51 · 2.32 · 0.122  |
+
+- `p1-gems`: the closest pair within the set at 40 px is diamond-quartzine vs ruby-quartzine (silhouette 0.71 apart, 64° of hue, 0.25 of luma, 0.39 under deuteranopia); the closest pair of the whole atlas is red-beryl-quartzine vs ruby-quartzine.
+- `foothold-p3-gems`: the closest pair within the set at 40 px is orichalcum-brassvein vs heart-diamond-quartzine (silhouette 0.69 apart, 46° of hue, 0.15 of luma, 0.39 under deuteranopia); the closest pair of the whole atlas is blue-corundum-quartzine vs starsteel-brassvein.
+- `foothold-p4-gems`: the closest pair within the set at 40 px is watermelon-tourmaline-quartzine vs starsteel-brassvein (silhouette 0.74 apart, 88° of hue, 0.06 of luma, 0.17 under deuteranopia); the closest pair of the whole atlas is blue-corundum-quartzine vs starsteel-brassvein.
+- `foothold-p5-gems`: the closest pair within the set at 40 px is fire-garnet-quartzine vs furnace-ruby-quartzine (silhouette 0.70 apart, 8° of hue, 0.03 of luma, 0.07 under deuteranopia); the closest pair of the whole atlas is blue-corundum-quartzine vs starsteel-brassvein.
+
+<!-- /gem-reads-785 -->
+
 ## Files
 
-| File                                            | What it is                                                                                                                                                                                               |
-| ----------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `blend/hero-<species>.blend`                    | the hero's scene: its 1 m cell on the middle band of its window, the shallow lamp rig and the game's camera framing the cell at 248 px                                                                   |
-| `blend/heroes-<pool>.blend`                     | the pool's review scene: its cells in a row                                                                                                                                                              |
-| `cells/<species>.png`                           | the atlas cell: the 248 px lit sprite (straight alpha, the mask) with its edge pixels extended into the 4 px gutter of a 256 px cell, ready to pack                                                      |
-| `hero-cells.json`                               | the cell table for #451: the authored pools, the atlas shape, per act the cells it packs (index, species, content rect) and per hero the species, rarity, hue slot, body colour, window, cell and source |
-| `sheets/atlas-preview.<act>.png`                | the 1024 px per-act atlas as #451's shape packs it (cell `i` at column `i mod 4`, row `i div 4`); a preview, #451 owns the shipped KTX2                                                                  |
-| `encode_hero_atlases.py`                        | packs `cells/` into each act's shipped atlas, `public/assets/ground/ground-hero-atlas-<act>/` (ETC1S sRGB, four mip levels, colour bled into transparent texels)                                         |
-| `sheets/heroes-legacy.shallow.jpg`              | the four cells at 256 px/m on their band's rock under the headlamp and fill                                                                                                                              |
-| `sheets/heroes-legacy.deep.jpg`                 | the same under the dim cool fill of band 5                                                                                                                                                               |
-| `sheets/heroes-legacy.closeup.jpg`              | the four at 480 px/m                                                                                                                                                                                     |
-| `sheets/*-gray.png`, `*-ingame.png`             | the greyscale blind-order copy and the 85 px/m downsample (about a 1080p screen at the default 12 m zoom)                                                                                                |
-| `sheets/heroes-legacy.scale.png`                | the game-scale strip: every hero over its rock at 85, 40 and 22 px a tile (default zoom, the 20 m zoom, a phone); `-x4` is the same magnified 4x, with `-gray` and `-deutan` copies                      |
-| `sheets/heroes-legacy.{shallow,deep}.luma.json` | measured ore and rock luma per cell, as the family sheets report                                                                                                                                         |
-| `sheets/heroes-legacy.distinct.json`            | per hero at 40 px: coverage, mean hue, luma, contrast; per pair: silhouette, hue, luma and deuteranopia distance, and the least different pair                                                           |
+| File                                            | What it is                                                                                                                                                                                                   |
+| ----------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `blend/hero-<species>.blend`                    | the hero's scene: its 1 m cell on the middle band of its window, the shallow lamp rig and the game's camera framing the cell at 248 px                                                                       |
+| `blend/heroes-<set>.blend`                      | the authored set's review scene: its cells in a row                                                                                                                                                          |
+| `cells/<species>.png`                           | the atlas cell: the 248 px lit sprite (straight alpha, the mask) with its edge pixels extended into the 4 px gutter of a 256 px cell, ready to pack                                                          |
+| `hero-cells.json`                               | the cell table for #451: the authored sets, the atlas shape, per act the cells it packs (index, species, content rect) and per hero the species, set, rarity, hue slot, body colour, window, cell and source |
+| `hero-reads.json`                               | every committed cell's gem-read measures at the two screens, with its SHA-256 (#785; `hero_reads.py`)                                                                                                        |
+| `sheets/atlas-preview.<act>.png`                | the 1024 px per-act atlas as #451's shape packs it (cell `i` at column `i mod 4`, row `i div 4`); a preview, #451 owns the shipped KTX2                                                                      |
+| `encode_hero_atlases.py`                        | packs `cells/` into each act's shipped atlas, `public/assets/ground/ground-hero-atlas-<act>/` (ETC1S sRGB, four mip levels, colour bled into transparent texels)                                             |
+| `sheets/heroes-legacy.shallow.jpg`              | the four cells at 256 px/m on their band's rock under the headlamp and fill                                                                                                                                  |
+| `sheets/heroes-legacy.deep.jpg`                 | the same under the dim cool fill of band 5                                                                                                                                                                   |
+| `sheets/heroes-legacy.closeup.jpg`              | the four at 480 px/m                                                                                                                                                                                         |
+| `sheets/*-gray.png`, `*-ingame.png`             | the greyscale blind-order copy and the 85 px/m downsample (about a 1080p screen at the default 12 m zoom)                                                                                                    |
+| `sheets/heroes-legacy.scale.png`                | the game-scale strip: every hero over its rock at 85, 40 and 22 px a tile (default zoom, the 20 m zoom, a phone); `-x4` is the same magnified 4x, with `-gray` and `-deutan` copies                          |
+| `sheets/heroes-legacy.{shallow,deep}.luma.json` | measured ore and rock luma per cell, as the family sheets report                                                                                                                                             |
+| `sheets/heroes-legacy.distinct.json`            | per hero at 40 px: coverage, mean hue, luma, contrast; per pair: silhouette, hue, luma and deuteranopia distance, and the least different pair                                                               |
 
 ## Pipeline
 
 ```
 BLENDER_USER_SCRIPTS=/tmp/empty blender -b --factory-startup --python-exit-code 1 \
-  -P docs/art/ore-heroes/author_ore_heroes.py -- <pool>       # the pool's .blend files, sprites and sheets; hero-cells.json for every authored pool
-python3 docs/art/ore-heroes/hero_post.py <pool>               # the pool's cells, every act's atlas preview, scale strip, blind copies, distinctness, JPEG shrink
+  -P docs/art/ore-heroes/author_ore_heroes.py -- <set>        # the set's .blend files, sprites and sheets; hero-cells.json for every authored set
+python3 docs/art/ore-heroes/hero_post.py <set>                # the set's cells, every act's atlas preview, scale strip, blind copies, distinctness, hero-reads.json, JPEG shrink
 python3 docs/art/ore-heroes/encode_hero_atlases.py            # every act's shipped atlas from the committed cells
 ```
 
-A pool is `legacy` or `foothold-p2` (`AUTHORED_POOLS` in `hero_species.py`); set
-`PYTHONDONTWRITEBYTECODE=1` so importing the modules leaves the tracked `__pycache__` alone.
+An authored set (`AUTHORED_SETS` in `hero_species.py`) is a materials pool, the planets it paints
+and which of the pool's heroes it draws: `legacy` (its non-gem heroes, P1 and an old P2),
+`p1-gems` (the legacy pool's gem slots, P1), `foothold-p2` (every hero, P2) and
+`foothold-p3-gems` to `foothold-p5-gems` (each pool's gem slots, its planet); the gem slots are
+the ores slice's `ore.gems.pools`. Set `PYTHONDONTWRITEBYTECODE=1` so importing the modules leaves
+the tracked `__pycache__` alone.
 
-- `hero_species.py` reads a pool's hero rows, the hue slot colour of each and the acts the pool
+- `hero_species.py` reads a set's hero rows, the hue slot colour of each and the acts the set
   paints (`oreThemes.json`), and writes `hero-cells.json`: per act, the cells of every authored
-  pool that paints one of its planets, pool after pool, so the legacy four keep cells 0 to 3 in
-  both acts and P2's gems follow them in `foothold.heavy`. Plain Python, shared by both steps.
+  set that paints one of its planets, set after set, so the legacy four keep cells 0 to 3 in
+  both acts, P1's gems follow them in `foothold.base` and P2's gems then P3 to P5's in
+  `foothold.heavy`. Plain Python, shared by both steps.
 - `hero_marks.py` builds one silhouette per `silhouette` word of the rows (`cubes`, `wires`,
   `barrels`, `columns`, and the gems' `stars`, `ovals`, `prisms`) with the species' material,
-  seeded per species, from the ore stage's shapes and materials. A pool naming a silhouette with
-  no builder fails, never falls back.
+  seeded per species, from the ore stage's shapes and materials; `gem_marks.py` and
+  `gem_marks_deep.py` add the twelve gems of #785 under the row's silhouette and pattern pair,
+  looked up first. A set naming a look with no builder fails, never falls back.
 - `author_ore_heroes.py` stages each hero's cell, saves its `.blend`, and renders the sprite with
   the rock slab held out (`is_holdout`) on a transparent film: what stands off the face keeps its
   lamp shading, the rock and whatever is sunk into it come out transparent, and no compositor glow
   runs. Sprites land in `art/build/ore-heroes/` (gitignored). Then the review scene and sheets.
 - `hero_post.py` (python3, Pillow and numpy) pads the sprites into 256 px cells, packs the atlas
   previews, composites the scale strip over the band rock of `artDirection.json`, writes the
-  greyscale and deuteranopia copies, measures distinctness and shrinks the colour sheets to JPEG.
+  greyscale and deuteranopia copies, measures distinctness, writes every cell's gem reads
+  (`hero_reads.py`) and shrinks the colour sheets to JPEG.
 - Through the MCP: add this folder, `docs/art/ores` and `docs/art/ore-ladder` to `sys.path`,
   `import author_ore_heroes`, `author_ore_heroes.author('legacy', sheets=False)` and `look`.
 

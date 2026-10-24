@@ -743,7 +743,7 @@
       "hueSlot": "diamond-white",
       "gradeBand": [3, 5],
       "rarity": "rare",
-      "hero": false,
+      "hero": true,
       "flavour": "Clear as gauge glass, and harder than the bit that found it."
     },
     {
@@ -757,7 +757,7 @@
       "hueSlot": "emerald-green",
       "gradeBand": [3, 5],
       "rarity": "rare",
-      "hero": false,
+      "hero": true,
       "flavour": "Deep green; the assayer weighs it with the office door shut."
     },
     {
@@ -771,7 +771,7 @@
       "hueSlot": "ruby-crimson",
       "gradeBand": [3, 5],
       "rarity": "rare",
-      "hero": false,
+      "hero": true,
       "flavour": "A coal that never cools, paid for in sealed envelopes."
     },
     {

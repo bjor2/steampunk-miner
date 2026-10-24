@@ -1,6 +1,6 @@
 """
 Packs and encodes the per-act hero atlases the game ships (#451), from the committed 256 px cells
-of #452 and ticket 744 (`cells/<species>.png`) in the order the committed `hero-cells.json` packs
+of #452 and tickets 744 and 785 (`cells/<species>.png`) in the order the committed `hero-cells.json` packs
 them per act (`atlases`: cell i at column i mod 4, row i div 4). Each act becomes `public/assets/ground/ground-hero-atlas-<act>/
 ground-hero-atlas-<act>.albedo.ktx2`: Basis ETC1S, sRGB, as every albedo map (#52 "Formats"),
 with four mip levels so the last keeps half a texel of gutter and a cell never samples its
@@ -36,7 +36,7 @@ def main():
     for atlas in table['atlases']:
         asset_id = asset_id_of(atlas['act'])
         encode(asset_id, write_level_pngs(asset_id, table['atlas'], atlas['cells']))
-    print('encoded %d hero atlases for the %s pools' % (len(table['atlases']), ', '.join(table['pools'])))
+    print('encoded %d hero atlases for the sets %s' % (len(table['atlases']), ', '.join(table['sets'])))
 
 
 def asset_id_of(act):

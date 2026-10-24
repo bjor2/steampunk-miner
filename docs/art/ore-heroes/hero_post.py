@@ -1,12 +1,13 @@
 """
-The python3 post step of the hero ore looks (#452, ticket 744), after author_ore_heroes.py has
-rendered one pool: its 256 px atlas cells (the 248 px sprite with its edge pixels extended into
-the 4 px gutter), a preview of each act's hero atlas from the committed cells, the game-scale
-strip (every hero of the acts the pool paints over its rock at 85, 67, 40, 30 and 22 px a tile:
+The python3 post step of the hero ore looks (#452, tickets 744 and 785), after author_ore_heroes.py
+has rendered one authored set: its 256 px atlas cells (the 248 px sprite with its edge pixels
+extended into the 4 px gutter), a preview of each act's hero atlas from the committed cells, the
+game-scale strip (every hero of the acts the set paints over its rock at 85, 67, 40, 30 and 22 px a tile:
 the default 12 m zoom on a 1080p screen, on 1280x800, the 20 m zoom, the default zoom on a
 360x640 phone, and that phone at the 20 m zoom), the greyscale and deuteranopia copies, the
 distinctness report between every pair of those heroes at 40 px and at the two screens of the
-gem-read test (360x640 and 1280x800, ticket 744), and the JPEG shrink of the big colour sheets.
+gem-read test (360x640 and 1280x800, ticket 744), the gem-read measures of every committed cell at
+those screens (`hero-reads.json`, ticket 785), and the JPEG shrink of the big colour sheets.
 Pillow and numpy; Blender's Python has neither.
 """
 
@@ -22,6 +23,7 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 if HERE not in sys.path:
     sys.path.insert(0, HERE)
 
+import hero_reads  # noqa: E402
 import hero_species as species  # noqa: E402
 from atlas_layout import json_text_of  # noqa: E402
 
@@ -48,20 +50,22 @@ DEUTERANOPIA = np.array([
 
 
 def main():
-    pool = sys.argv[1] if len(sys.argv) > 1 else 'legacy'
+    set_id = sys.argv[1] if len(sys.argv) > 1 else 'legacy'
     table = species.cell_table_of()
-    for hero in species.heroes_of_table(table, pool):
+    for hero in species.heroes_of_table(table, set_id):
         write_cell(hero)
-    beside = species.heroes_sharing_acts(table, pool)
+    beside = species.heroes_sharing_acts(table, set_id)
     cells = {hero['speciesId']: read_rgba(os.path.join(HERE, hero['cell'])) for hero in beside}
     for atlas in table['atlases']:
         write_atlas_preview(atlas, table['atlas'], cells)
-    strip = write_scale_strip(pool, beside, cells)
+    strip = write_scale_strip(set_id, beside, cells)
     write_blind_copies(strip)
-    report = write_distinctness(pool, beside, cells)
-    post_sheets(pool)
+    report = write_distinctness(set_id, beside, cells)
+    hero_reads.write_hero_reads(table, lambda hero: content_of(read_rgba(os.path.join(HERE, hero['cell']))),
+                                rock_rgb_of, resampled_rgba, json_text_of)
+    post_sheets(set_id)
     print('post done: %d cells of %s beside %d heroes, least different pair %s'
-          % (len(species.heroes_of_table(table, pool)), pool, len(beside), report['leastDifferentPair']))
+          % (len(species.heroes_of_table(table, set_id)), set_id, len(beside), report['leastDifferentPair']))
 
 
 # --- cells and the atlas preview -----------------------------------------------------------------------
@@ -93,14 +97,14 @@ def write_atlas_preview(atlas_entry, shape, cells):
 # --- the game-scale strip --------------------------------------------------------------------------------
 
 
-def write_scale_strip(pool, heroes, cells):
+def write_scale_strip(set_id, heroes, cells):
     """One row per tile size, every hero over its band's rock, then magnified so the eye can read it."""
     rows = [strip_row(heroes, cells, px) for px in TILE_PX]
     width = max(row.shape[1] for row in rows)
     rows = [np.pad(row, ((0, STRIP_GAP_PX), (0, width - row.shape[1]), (0, 0)), constant_values=0.0) for row in rows]
     strip = np.concatenate(rows, axis=0)
-    write_rgb(os.path.join(SHEET_DIR, 'heroes-%s.scale.png' % pool), strip)
-    path = os.path.join(SHEET_DIR, 'heroes-%s.scale-x%d.png' % (pool, STRIP_MAGNIFY))
+    write_rgb(os.path.join(SHEET_DIR, 'heroes-%s.scale.png' % set_id), strip)
+    path = os.path.join(SHEET_DIR, 'heroes-%s.scale-x%d.png' % (set_id, STRIP_MAGNIFY))
     return write_rgb(path, magnified(strip, STRIP_MAGNIFY))
 
 
@@ -184,17 +188,17 @@ def deuteranopia_of(rgb):
 # --- distinctness -----------------------------------------------------------------------------------------
 
 
-def write_distinctness(pool, heroes, cells):
+def write_distinctness(set_id, heroes, cells):
     """
     Per hero at the 40 px tile: coverage, mean hue, luma and contrast against its rock. Per pair:
     how far apart the silhouettes (1 - mask IoU), the hues (degrees), the lumas and the colours
     seen with deuteranopia are. The least different pair is named so the README can say it. The
     pairs are measured again at the two screens of the gem-read test (ticket 744).
     """
-    report = {'pool': pool, 'tilePx': REPORT_TILE_PX, **pairs_at(heroes, cells, REPORT_TILE_PX),
+    report = {'set': set_id, 'tilePx': REPORT_TILE_PX, **pairs_at(heroes, cells, REPORT_TILE_PX),
               'screens': [{'screen': screen, 'tilePx': tile_px, **pairs_at(heroes, cells, tile_px)}
                           for screen, tile_px in SCREEN_TILE_PX.items()]}
-    with open(os.path.join(SHEET_DIR, 'heroes-%s.distinct.json' % pool), 'w', encoding='utf-8', newline='\n') as file:
+    with open(os.path.join(SHEET_DIR, 'heroes-%s.distinct.json' % set_id), 'w', encoding='utf-8', newline='\n') as file:
         file.write(json_text_of(report))
     return report
 
@@ -261,10 +265,10 @@ def hue_distance(a, b):
 # --- sheets ----------------------------------------------------------------------------------------------
 
 
-def post_sheets(pool):
+def post_sheets(set_id):
     """Greyscale and in-game copies of the colour sheets, then the colour sheets to JPEG for git."""
     for name in sorted(os.listdir(SHEET_DIR)):
-        if not name.startswith('heroes-%s.' % pool) or not name.endswith('.png') or any(tag in name for tag in ('-gray', '-ingame', '-deutan', '.scale')):
+        if not name.startswith('heroes-%s.' % set_id) or not name.endswith('.png') or any(tag in name for tag in ('-gray', '-ingame', '-deutan', '.scale')):
             continue
         path = os.path.join(SHEET_DIR, name)
         rgb = read_rgb(path)

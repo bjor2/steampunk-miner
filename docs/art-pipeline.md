@@ -481,16 +481,22 @@ since the source is twelve family files. Nothing draws it yet; the kernel ore re
 
 ## Hero ore sprites
 
-The hero materials of [#452](https://github.com/bjor2/steampunk-miner/issues/452) and
-[#744](https://github.com/bjor2/steampunk-miner/issues/744) (the `hero: true` rows of
+The hero materials of [#452](https://github.com/bjor2/steampunk-miner/issues/452),
+[#744](https://github.com/bjor2/steampunk-miner/issues/744) and
+[#785](https://github.com/bjor2/steampunk-miner/issues/785) (the `hero: true` rows of
 `src/features/materials/materials.json` with art: the legacy pool's four for the P1 and P2 acts,
-and the three gems of P2's own pool for the P2 act) are authored one species per file in
-`docs/art/ore-heroes/blend/hero-<species>.blend` on the same ore stage, a pool at a time, and
-rendered lit with the rock held out into 256 px albedo cells (`docs/art/ore-heroes/cells/`, the
-mask in alpha) that the per-act hero atlas of
-[#451](https://github.com/bjor2/steampunk-miner/issues/451) packs on its 16th sampler. The cell
-table is `docs/art/ore-heroes/hero-cells.json`, per act the cells of every authored pool that
-paints one of its planets; the rarity tint, frame and glow are the shader's, never the sprite's. See [docs/art/ore-heroes/README.md](art/ore-heroes/README.md).
+P1's three gems for the P1 act, and the gems of P2's own pool and of the P3 to P5 pools for the P2
+act) are authored one species per file in `docs/art/ore-heroes/blend/hero-<species>.blend` on the
+same ore stage, an authored set at a time (`AUTHORED_SETS` in `hero_species.py`: a materials pool,
+the planets it paints and which of its heroes it draws), and rendered lit with the rock held out
+into 256 px albedo cells (`docs/art/ore-heroes/cells/`, the mask in alpha) that the per-act hero
+atlas of [#451](https://github.com/bjor2/steampunk-miner/issues/451) packs on its 16th sampler.
+The cell table is `docs/art/ore-heroes/hero-cells.json`, per act the cells of every authored set
+that paints one of its planets; the rarity tint, frame and glow are the shader's, never the
+sprite's. `hero_post.py` also measures every committed cell at the two gem-read screens into
+`docs/art/ore-heroes/hero-reads.json` (highlights, facet edges, outline contrast, the
+bright-or-saturated share, with the cell's SHA-256), which the roster's contact-sheet spec reads.
+See [docs/art/ore-heroes/README.md](art/ore-heroes/README.md).
 `python3 docs/art/ore-heroes/encode_hero_atlases.py` packs the cells into one `atlas` asset per
 act (`ground-hero-atlas-<act>`, an albedo map alone: ETC1S sRGB like every albedo map, but four
 mip levels it writes itself, since `toktx` 4.4.2 makes only full chains and a full chain would
