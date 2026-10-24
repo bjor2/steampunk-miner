@@ -481,6 +481,24 @@ balance:report`, `oreValueCensus.lane.test.ts`.
   and the heaviest-first split. `materialPool.golden.test.ts` pins system 2 of seed 20261024 (planet
   2.1 kind by kind) and systems 10 and 1e6 by digest. `debug.test.ts` prints them through
   `steampunkDebug.features['solar-systems'].materialPoolsOf(system, worldSeed)`.
+- **The "solar system 2" re-baseline** (ticket 779, spec #774): `src/features/solar-systems/systemTwoPace.test.ts`
+  judges the system 2 bars on hand-built tallies: planets at g 6 to 10, each 22-30 min, felt speed
+  at least 0.9x the planet before (the jump's step against system 1's planet 5), drill + tip majors
+  3.5-7.0 with 7 printed amber, money per minute within 5% of the #551 equilibrium keyed on g,
+  fuel 3-8% of the money spent in the system, a seed that never jumped or left a core named, the fix
+  order printed for a planet outside 22-30 min, and the rows under the re-baseline name with the
+  roster's radius beside the world's. The lane, hours of play and run only when named, is
+  `npx vitest run src/features/solar-systems/systemTwoPace.lane.test.ts`: three seeds to system 1's
+  last core, the jump, system 2 to its last core, rows to `balance-report/solar-system-2.ndjson`.
+  `src/logging/drillPace.test.ts` feels a system 2 planet on its system's harder rock and system 1
+  as before. `systems/systemMoneyTexts.golden.test.ts` pins the fee, band 1 and band 5 sales and the
+  dearest gem's sale of systems 2, 10 and 1e6 through the #681 formatter (inside 6 characters under
+  1e300, never NaN, Infinity or MAX); `debug.test.ts` prints them through
+  `steampunkDebug.features['solar-systems'].moneyTextsOf(system, worldSeed)`.
+  `systems/planetRecolour.test.ts` is the HS fail-on-recolour test per planet: every planet of system
+  2 brings a family new by id, name and behaviour and a pool with no first-system species, under the
+  roster seed and the pacing seeds, and it fails on a planet with none, a first-system family word
+  or behaviour, or planet 6-7's species in new hues.
 - **The planet-row registry** (ticket 707, GD lock 6326252575): `src/systems/registries/planetRow.test.ts`
   resolves the generated row with no provider (`Planet {n}`, no pool, look or frozen radius), lays a
   provider's fields over it and keeps the ones it leaves out, resolves any planet up to the largest

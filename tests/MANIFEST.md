@@ -569,11 +569,13 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/sensing/systems/threatPeriscope.test.ts` | 6 | 6 |
 | `src/features/sensing/systems/useResolution.test.ts` | 16 | 16 |
 
-### `solar-systems`: 16 files, 112 tests
+### `solar-systems`: 20 files, 134 tests
 
 | File | Tests | Sites |
 | --- | --- | --- |
-| `src/features/solar-systems/debug.test.ts` | 7 | 7 |
+| `src/features/solar-systems/debug.test.ts` | 8 | 8 |
+| `src/features/solar-systems/systemTwoPace.lane.test.ts` | 2 | 2 |
+| `src/features/solar-systems/systemTwoPace.test.ts` | 10 | 10 |
 | `src/features/solar-systems/systems/economyRows.golden.test.ts` | 2 | 2 |
 | `src/features/solar-systems/systems/economyRows.test.ts` | 15 | 15 |
 | `src/features/solar-systems/systems/economyRules.test.ts` | 5 | 5 |
@@ -583,10 +585,12 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/solar-systems/systems/materialPool.test.ts` | 17 | 17 |
 | `src/features/solar-systems/systems/newContentSlots.test.ts` | 4 | 4 |
 | `src/features/solar-systems/systems/paletteRows.test.ts` | 11 | 11 |
+| `src/features/solar-systems/systems/planetRecolour.test.ts` | 4 | 4 |
 | `src/features/solar-systems/systems/poolRecolour.test.ts` | 3 | 3 |
 | `src/features/solar-systems/systems/poolRuns.test.ts` | 4 | 4 |
 | `src/features/solar-systems/systems/render/lookArt.test.ts` | 8 | 8 |
 | `src/features/solar-systems/systems/render/lookContactSheet.test.ts` | 7 | 7 |
+| `src/features/solar-systems/systems/systemMoneyTexts.golden.test.ts` | 5 | 3 |
 | `src/features/solar-systems/systems/systemRoster.golden.test.ts` | 2 | 2 |
 | `src/features/solar-systems/systems/systemRoster.test.ts` | 11 | 11 |
 
@@ -1160,7 +1164,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/logging/drillLadderSteps.test.ts` | 4 | 4 |
 | `src/logging/drillLogBytes.test.ts` | 4 | 4 |
 | `src/logging/drillPace.lane.test.ts` | 2 | 3 |
-| `src/logging/drillPace.test.ts` | 14 | 14 |
+| `src/logging/drillPace.test.ts` | 15 | 15 |
 | `src/logging/drillSpanGate.test.ts` | 2 | 2 |
 | `src/logging/driveBoundReport.test.ts` | 3 | 3 |
 | `src/logging/dynamiteDryRuns.test.ts` | 4 | 4 |
