@@ -6,17 +6,8 @@
  * material named in 3 words or fewer; and a glint that would reach its track's cap.
  */
 import { bandStepOf, finishesNeededOf } from './render/rigLookBands'
+import type { RigLookGlint } from './render/rigLookGlint'
 import type { RigLookFinish, TrackLookRows } from './render/rigLookIndex'
-
-/** A one-off glow on the purchase that crosses a band (Progression on #647). */
-export interface RigLookGlint {
-  /** Ticks it plays for, fading to nothing. */
-  ticks: number
-  /** `#rrggbb`. */
-  colour: string
-  /** Added to the slots' glow at its first tick. */
-  glow: number
-}
 
 const FINISHES_MAX = 12
 const HEX_COLOUR = /^#[0-9a-f]{6}$/

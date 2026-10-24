@@ -157,7 +157,7 @@ describe('rig look on the vehicle', () => {
     }
   })
 
-  it('plays no flash for any event', () => {
+  it('plays no flash for a debug level set, which is no purchase', () => {
     const session = createScriptedSession()
     const events = session.submit(1, setUpgrade('drill_tip', 70))
     for (const source of createRigLookSources()) {

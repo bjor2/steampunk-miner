@@ -4,11 +4,14 @@
  * reads only `players[playerId].vehicle.levels[track]`, the owned purchase count the vehicle
  * snapshot already carries (HS on #157): no stat, price, planet or local-player read, so any
  * client can paint any player's rig. The look is the frame's colour and glows on the track's glow
- * slots; never a tint over the whole car, so a fitted module's part keeps its own look. Read-only
- * on the state; no flash, no event, no save key.
+ * slots; never a tint over the whole car, so a fitted module's part keeps its own look. A
+ * purchase that takes the track into a new band plays the table's glint once (ticket 809), the
+ * one flash it answers. Read-only on the state; no event, no save key.
  */
 import type { AuthorityState } from '../../../systems/authority/authorityState'
+import type { DomainEvent } from '../../../systems/authority/domainEvent'
 import type { VehicleLook, VehicleLookSource } from '../../../systems/registries/vehicleLooks'
+import { createGlintFlash, isBandCrossing, type RigLookGlint } from './render/rigLookGlint'
 import {
   everyLookFrameOf,
   lookFrameAt,
@@ -21,7 +24,7 @@ export const RIG_LOOK_SOURCE_PREFIX = 'rig-look.'
 
 /** One source per track in `looks`, in table order. */
 export function createRigLookSources(looks: RigLooks = SHIPPED_RIG_LOOKS): VehicleLookSource[] {
-  return looks.tracks.map(createTrackLookSource)
+  return looks.tracks.map((frames) => createTrackLookSource(frames, looks.glint))
 }
 
 export function rigLookSourceIdOf(track: string): string {
@@ -44,13 +47,20 @@ export function ownedPurchasesOf(state: AuthorityState, playerId: string, track:
   return levels?.[track] ?? 0
 }
 
-function createTrackLookSource(frames: TrackLookFrames): VehicleLookSource {
+function createTrackLookSource(frames: TrackLookFrames, glint: RigLookGlint): VehicleLookSource {
   const looks = keepLooksOf(frames)
+  const glintFlash = createGlintFlash(frames.rows, glint)
   return {
     id: rigLookSourceIdOf(frames.rows.track),
     lookOf: (state, playerId) => looks.get(rigLookOfPlayer(frames, state, playerId)) ?? null,
-    flashOf: () => null,
+    flashOf: (event) => (isTrackBandCrossing(frames, event) ? glintFlash : null),
   }
+}
+
+/** A purchase on the track that takes it into another band. */
+function isTrackBandCrossing(frames: TrackLookFrames, event: DomainEvent): boolean {
+  if (event.type !== 'UpgradePurchased' || event.upgradeId !== frames.rows.track) return false
+  return isBandCrossing(frames.rows, event.fromLevel, event.toLevel)
 }
 
 /** Every frame's look made once, as the kernel asks for kept looks. */

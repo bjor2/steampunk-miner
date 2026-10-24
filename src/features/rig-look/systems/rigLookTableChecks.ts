@@ -26,8 +26,8 @@ import {
   glintCapProblemsOf,
   glintProblemsOf,
   isBandName,
-  type RigLookGlint,
 } from './rigLookBandChecks'
+import type { RigLookGlint } from './render/rigLookGlint'
 import { plaqueProblemsOf } from './rigLookPlaque'
 
 export interface RigLookTable {

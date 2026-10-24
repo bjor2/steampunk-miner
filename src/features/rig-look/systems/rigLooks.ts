@@ -9,6 +9,7 @@ import {
   type RigLookFrame,
   type TrackLookFrames,
 } from './render/rigLookFrames'
+import type { RigLookGlint } from './render/rigLookGlint'
 import { plaqueFactOf } from './rigLookPlaque'
 import { RIG_LOOK_TABLE } from './rigLookTable'
 import type { RigLookTable } from './rigLookTableChecks'
@@ -16,10 +17,15 @@ import type { RigLookTable } from './rigLookTableChecks'
 export interface RigLooks {
   /** In table order. */
   tracks: readonly TrackLookFrames[]
+  /** The glint a band crossing plays (ticket 809). */
+  glint: RigLookGlint
 }
 
 export function createRigLooks(table: RigLookTable): RigLooks {
-  return { tracks: table.tracks.map((rows) => createTrackLookFrames(rows, table.finishes)) }
+  return {
+    tracks: table.tracks.map((rows) => createTrackLookFrames(rows, table.finishes)),
+    glint: table.glint,
+  }
 }
 
 export const SHIPPED_RIG_LOOKS: RigLooks = createRigLooks(RIG_LOOK_TABLE)
