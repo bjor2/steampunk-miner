@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-10-24T15:28:20+02:00",
+  "updated_at": "2026-10-24T15:38:34+02:00",
   "caps": {
     "grok": 12,
     "claude": 10,
@@ -84,12 +84,11 @@
       "slots": [
         {
           "slot": "C7",
-          "state": "busy",
-          "ticket": 756,
-          "grok_slot": 2,
-          "kind": "dev",
-          "since": "2026-10-24T15:28:00+02:00",
-          "wave": "647-7H"
+          "state": "free",
+          "ticket": null,
+          "grok_slot": null,
+          "kind": null,
+          "since": null
         },
         {
           "slot": "C8",
@@ -117,8 +116,8 @@
         }
       ],
       "size": 4,
-      "used": 1,
-      "free": 3,
+      "used": 0,
+      "free": 4,
       "claims_last_hour": 4,
       "name": "Claude Max 2"
     }
@@ -168,11 +167,9 @@
     },
     {
       "slot": 2,
-      "state": "dev",
-      "ticket": 756,
-      "since": "2026-10-24T15:28:00+02:00",
-      "claude_slot": 7,
-      "wave": "647-7H"
+      "state": "free",
+      "ticket": null,
+      "since": null
     },
     {
       "slot": 3,
@@ -293,12 +290,11 @@
     },
     {
       "slot": 7,
-      "state": "busy",
-      "ticket": 756,
-      "grok_slot": 2,
-      "since": "2026-10-24T15:28:00+02:00",
-      "account": 2,
-      "wave": "647-7H"
+      "state": "free",
+      "ticket": null,
+      "grok_slot": null,
+      "since": null,
+      "account": 2
     },
     {
       "slot": 8,
@@ -326,17 +322,17 @@
     }
   ],
   "last_refill": {
-    "at": "2026-10-24 15:28 CEST",
+    "at": "2026-10-24 15:38 CEST",
     "mode": "refill-dev",
-    "triggers": "#790",
-    "started": "#756->C7/A2",
-    "note": "spawned 1 worker(s)"
+    "triggers": "#756",
+    "started": "",
+    "note": "load guard (1-min load 19.87 > 14)"
   },
   "totals": {
     "grok": {
       "size": 12,
-      "used": 4,
-      "dev": 4,
+      "used": 3,
+      "dev": 3,
       "dev_cap": 8,
       "planner": 0,
       "planner_cap": 4
@@ -344,8 +340,8 @@
     "claude": {
       "size": 10,
       "enabled": 10,
-      "used": 4,
-      "free": 6,
+      "used": 3,
+      "free": 7,
       "external": 0
     }
   },
@@ -355,13 +351,12 @@
     "list": [
       {
         "number": 827,
-        "key": "647-7K",
+        "key": "647-8B",
         "map": 647,
         "lane": "remote",
         "mode": "solo",
         "state": "blocked",
         "tickets": [
-          822,
           823,
           826
         ],
@@ -400,7 +395,7 @@
           825
         ],
         "done": [],
-        "live": 1
+        "live": 0
       },
       {
         "number": 814,
@@ -436,7 +431,7 @@
       },
       {
         "number": 766,
-        "key": "647-7L",
+        "key": "647-7K",
         "map": 647,
         "lane": "hitl",
         "mode": "bench",
