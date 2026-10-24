@@ -912,6 +912,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/authority/lawCarrySlab.lane.test.ts` | 338 | 6 |
 | `src/systems/authority/liftedQuantumState.test.ts` | 4 | 4 |
 | `src/systems/authority/liningBill.test.ts` | 10 | 10 |
+| `src/systems/authority/liningDrillTime.test.ts` | 48 | 4 |
 | `src/systems/authority/liningTypes.test.ts` | 9 | 9 |
 | `src/systems/authority/loadoutRules.test.ts` | 14 | 14 |
 | `src/systems/authority/loadoutSection.test.ts` | 5 | 5 |
@@ -1261,6 +1262,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | File | Tests | Sites |
 | --- | --- | --- |
 | `src/physics/carveCompleteRide.test.ts` | 6 | 1 |
+| `src/physics/casingRedrill.test.ts` | 24 | 1 |
 | `src/physics/clientFlagFlip.test.ts` | 1 | 1 |
 | `src/physics/cutFaceRide.test.ts` | 52 | 4 |
 | `src/physics/cutFollow.test.ts` | 5 | 3 |

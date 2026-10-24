@@ -34,7 +34,7 @@
 import { DRILL_SUBSTEPS_PER_TICK } from '../../constants/balance'
 import { casingHardness } from '../economy/casingGrades'
 import { coreHardness, blockHardness, oreSalePrice, oreTier } from '../economy/oreEconomy'
-import { toCanonical, type BigStat } from '../money'
+import { ZERO_MONEY, toCanonical, type BigStat } from '../money'
 import { pickedUpUnitOf, type PickedUp, type PickupFind } from '../registries/orePickup'
 import { drillDamage, subStepsPerTileAt, ticksPerTile, type DrillStats } from '../vehicle/drillRule'
 import { drillStampOf, stampSweptFrom } from '../vehicle/drillStamp'
@@ -451,13 +451,27 @@ export function drillSubStepsOfCells(
   return (tile, material, casingGrade) =>
     casingGrade === 0
       ? shockedSubStepsPerCell({ drill, quantum }, params, tile, material, shockTicksAt)
-      : subStepsPerTileAt(quantum, drill, liningHardnessOn(params, casingGrade))
+      : subStepsPerTileAt(
+          quantum,
+          drill,
+          liningHardnessOn(params, casingGrade),
+          LINING_SCRATCH_FLOOR,
+        )
 }
 
 /** Lining re-drills as band-G rock of its grade on this planet, in its system (ticket 759). */
 function liningHardnessOn(params: PlanetParams, casingGrade: number): BigStat {
   return groundHardnessInSystem(params, casingHardness(params.planetIndex, casingGrade))
 }
+
+/**
+ * Lining has no scratch floor (ticket 843): #41's Systems ruling makes own casing "boreable, not
+ * free and not a wall", but the floor compares the last tip major (#180 amendment 2), so the grade
+ * 5 that planet 1's core asks, carried to planet 2 as its band-5 rock, was a wall to a rig short
+ * of its first tip major: the stamp cut the rock behind the lining and the body stood on it. The
+ * law's efficiency alone slows it, so harder lining stays slower and costs more.
+ */
+const LINING_SCRATCH_FLOOR = ZERO_MONEY
 
 /** A drill timed in a quantum. */
 interface QuantumDrill {
@@ -479,7 +493,8 @@ function shockedSubStepsPerCell(
 
 /**
  * A sample's drill time from its own hardness: hard rock carves slower inside the same stamp, and
- * lining carves as band-G rock of its grade on this planet (#41 `casingHardness`). An electrified
+ * lining carves as band-G rock of its grade on this planet (#41 `casingHardness`), never refused
+ * by the scratch floor (`LINING_SCRATCH_FLOOR`). An electrified
  * cell adds the shock the player's drill pays. The shared dig function the bore gun spends its
  * budget through too (ticket 313).
  */
@@ -491,7 +506,7 @@ export function drillTicksOfCells(
   return (tile, material, casingGrade) =>
     casingGrade === 0
       ? shockedTicksPerCell(drill, params, tile, material, shockTicksAt)
-      : ticksPerTile(drill, liningHardnessOn(params, casingGrade))
+      : ticksPerTile(drill, liningHardnessOn(params, casingGrade), LINING_SCRATCH_FLOOR)
 }
 
 /** Who collects a carve's opened cells, and the gates and gear shares they are read with. */
