@@ -31,6 +31,7 @@
     "bench:report-pose:widths": "vite-node scripts/benchReportPose.ts --width-ladder",
     "bench:physics": "vite-node scripts/benchPhysicsAtSpeed.ts",
     "bench:strip": "vite-node scripts/benchHazardStrip.ts",
+    "bench:purchase-levels": "vite-node scripts/benchPurchaseLevels.ts",
     "bench:summary": "vite-node scripts/bench/summarizeBenchLogs.ts",
     "perf:record": "node scripts/perf/recordPerf.mjs",
     "perf:sessions": "vite-node scripts/perf/analyzeSessions.ts",
