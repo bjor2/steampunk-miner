@@ -5,13 +5,13 @@
  * vehicle at 60% of the preview panel's height. A dedicated rig over the same parts, not a clone
  * of the run renderer: no world, no camera roll, no physics.
  */
-import { VEHICLE_COLLIDER_SIZE } from '../../constants/physics'
 import { PREVIEW_VEHICLE_SHARE_PERCENT } from '../../constants/scene'
 import type { ArtCatalogue } from '../art/artCatalogue'
 import { slotOfPartId } from '../art/artIds'
 import type { AssetQuad } from '../art/assetLook'
 import type { UpgradeId } from '../economy/economyDefinition'
-import { drillHeadQuadsOf, drillHeadSizeOf, vehicleBodyQuadsOf } from './vehicleLook'
+import { drillHeadReachOf } from './drillHeadReach'
+import { drillHeadQuadsOf, vehicleBodyQuadsOf } from './vehicleLook'
 
 /** The box the drawn parts cover, in metres from the body's centre. */
 export interface PreviewBounds {
@@ -41,11 +41,6 @@ const MAX_WIDTH_SHARE = 0.9
 
 /** A repeated part (`wheel-2`) is the same part as its first (`wheel`). */
 const REPEAT_SUFFIX = /-\d+$/
-
-/** How far right of the body's centre the drill head sits when it faces right (`DrillHeadView`). */
-export function drillHeadReachOf(art: ArtCatalogue, visualTier: number): number {
-  return (VEHICLE_COLLIDER_SIZE + drillHeadSizeOf(art, visualTier)) / 2
-}
 
 export function isPartOfTrack(quad: AssetQuad, upgradeId: UpgradeId | null): boolean {
   if (upgradeId === null) return false

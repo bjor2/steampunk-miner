@@ -61,6 +61,15 @@ export function sweptStampAheadMmOf(stepMm: number): number {
 }
 
 /**
+ * Where the cut's front sits ahead of the centre of a body riding its face (ticket 789): the
+ * swept stamp's, its step taken, so the face's contour lies half a sample behind it. The drawn
+ * drill tip sits here, so the bit is drawn where the ground opens.
+ */
+export function ridingCutFrontAheadMmOf(): number {
+  return sweptStampAheadMmOf(0)
+}
+
+/**
  * The step a cutting tick's front takes (ticket 570): the drill law's step (`lawStepMm`), never the
  * body's speed, so physics jitter cannot shrink it, and never past the cutting bound.
  */

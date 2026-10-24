@@ -105,7 +105,7 @@ export function drillHeadLookQuadsOf(
   }))
 }
 
-/** The head plate's width, which sets how far ahead of the collider the head reaches. */
+/** The head plate's width; it grows with the tier. */
 export function drillHeadSizeOf(
   art: ArtCatalogue,
   visualTier: number,

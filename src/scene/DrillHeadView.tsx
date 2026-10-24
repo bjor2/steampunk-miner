@@ -3,21 +3,20 @@
  * over the same `SWIVEL_TICKS` as the logic, so it turns with the body's upright frame and never
  * rotates the body. Its parts (plate, bit, and the tier-3 bore collar) are the `vehicle` sidecar's
  * drill parts at the visual tier, with any a slice swaps in (#180), and another asset's look part
- * standing in a drill slot (ticket 640). Updated on a ref each frame;
- * the head's pose never goes through React state.
+ * standing in a drill slot (ticket 640). Its tip rides the cut's front (`drillHeadReach`, ticket
+ * 789). Updated on a ref each frame; the head's pose never goes through React state.
  */
 import { useFrame } from '@react-three/fiber'
 import { useMemo, useRef } from 'react'
 import type { Group } from 'three'
-import { VEHICLE_COLLIDER_SIZE } from '../constants/physics'
 import type { VehicleController } from '../physics/vehicleController'
 import { useGameStore } from '../store/gameStore'
+import { drillHeadReachOf } from '../systems/render/drillHeadReach'
 import { createDrillHeadPose, writeDrillHeadPose } from '../systems/render/drillHeadPose'
 import { lookPartKeyOf } from '../systems/render/lookPartQuads'
 import {
   drillHeadLookQuadsOf,
   drillHeadQuadsOf,
-  drillHeadSizeOf,
   vehicleAtlasMaps,
 } from '../systems/render/vehicleLook'
 import { LookPartMesh } from './LookPartMesh'
@@ -40,8 +39,7 @@ export function DrillHeadView({ controller }: { controller: VehicleController })
     () => drillHeadLookQuadsOf(SHIPPED_ART, visualTier, swapped.partIds, swapped.looks),
     [visualTier, swapped],
   )
-  const reach =
-    (VEHICLE_COLLIDER_SIZE + drillHeadSizeOf(SHIPPED_ART, visualTier, swapped.partIds)) / 2
+  const reach = drillHeadReachOf(SHIPPED_ART, visualTier, swapped.partIds)
   const head = useRef<Group>(null)
   const pose = useMemo(createDrillHeadPose, [])
   useFrame(() => {
