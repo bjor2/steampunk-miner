@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "updated_at": "2026-10-24T01:19:03Z",
+  "updated_at": "2026-10-24T01:19:13Z",
   "entries": {
     "steampunk-loop/1": {
       "loop": "steampunk-loop",
@@ -734,9 +734,9 @@
       "slot": null,
       "state": "working",
       "issue": null,
-      "note": "testing spec #753 (Fix red main: full suite red on dca609908 (src/logging/campaignPacingGate.test.ts src/logging/pacingGate.test.ts src/features/terrain-tools/foamPace.test.ts)) on c45e112",
+      "note": "testing spec #762 (Fix red main: full suite red on 663d15e92 (src/logging/campaignPacingGate.test.ts src/logging/exactCarryOnGolden.test.ts src/logging/heatWorkUncappedGolden.test.ts src/logging/reportCapsuleOffGolden.test.ts src/features/codex/materialContactOffGolden.test.ts src/features/mining-gates/systems/botShaftJog.test.ts scripts/e2e/affectedSpecs.test.mjs)) on ee94786",
       "stale_after_min": 420,
-      "updated_at": "2026-10-23T21:47:01Z",
+      "updated_at": "2026-10-24T01:19:13Z",
       "host": "grok-bot-vm-452660841"
     },
     "steampunk-loop/10": {
