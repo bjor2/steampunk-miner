@@ -715,13 +715,13 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/unlock-reveal/systems/revealCopy.test.ts` | 5 | 5 |
 | `src/features/unlock-reveal/systems/unlockReveal.test.ts` | 8 | 8 |
 
-### `workshop`: 12 files, 89 tests
+### `workshop`: 12 files, 90 tests
 
 | File | Tests | Sites |
 | --- | --- | --- |
 | `src/features/workshop/debug.test.ts` | 6 | 6 |
 | `src/features/workshop/scene/showcaseParts.test.ts` | 5 | 5 |
-| `src/features/workshop/store/workshopStore.test.ts` | 17 | 17 |
+| `src/features/workshop/store/workshopStore.test.ts` | 18 | 18 |
 | `src/features/workshop/systems/chainCues.test.ts` | 6 | 6 |
 | `src/features/workshop/systems/chainPreview.test.ts` | 6 | 6 |
 | `src/features/workshop/systems/holdChain.test.ts` | 15 | 15 |
@@ -1114,18 +1114,18 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 
 | File | Tests | Sites |
 | --- | --- | --- |
-| `src/systems/input/actionMap.test.ts` | 29 | 29 |
+| `src/systems/input/actionMap.test.ts` | 30 | 30 |
 | `src/systems/input/buildIntent.test.ts` | 11 | 11 |
 | `src/systems/input/cleanTap.test.ts` | 5 | 5 |
-| `src/systems/input/inputRouting.test.ts` | 32 | 32 |
-| `src/systems/input/keyTags.test.ts` | 6 | 6 |
+| `src/systems/input/inputRouting.test.ts` | 35 | 35 |
+| `src/systems/input/keyTags.test.ts` | 7 | 7 |
 | `src/systems/input/padCodes.test.ts` | 4 | 4 |
 | `src/systems/input/padFrame.test.ts` | 7 | 7 |
 | `src/systems/input/preferences.test.ts` | 24 | 24 |
 | `src/systems/input/promptLabel.test.ts` | 8 | 8 |
 | `src/systems/input/toolSlots.test.ts` | 9 | 9 |
 | `src/systems/input/touchBindings.test.ts` | 16 | 16 |
-| `src/systems/input/touchControls.test.ts` | 27 | 20 |
+| `src/systems/input/touchControls.test.ts` | 28 | 21 |
 
 ### `logging`
 
@@ -1525,7 +1525,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/store/gameStore.test.ts` | 26 | 26 |
 | `src/store/hintSlice.test.ts` | 15 | 15 |
 | `src/store/hudDetailSlice.test.ts` | 4 | 4 |
-| `src/store/inputRuntime.test.ts` | 51 | 51 |
+| `src/store/inputRuntime.test.ts` | 54 | 54 |
 | `src/store/ledgerToast.test.ts` | 5 | 5 |
 | `src/store/liveStepSlice.test.ts` | 22 | 22 |
 | `src/store/materialPopSlice.test.ts` | 4 | 4 |

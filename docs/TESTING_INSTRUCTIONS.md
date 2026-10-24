@@ -1749,6 +1749,16 @@ incomePerHour}` go to `balance-report/drill-pace.ndjson`, which `pushTestMetrics
   click, Escape and Close on the docked panel at most a quarter wide, the HUD strip left of it, and a
   dive's hazard strip inside the narrowed view; the phone draws no strip button and never docks the
   panel. Box Tester only.
+- **Dock button toggles** (ticket 794, spec #647): the `undock` action's reaction on the bay and
+  on the sheet over it, docked or not, in `inputRouting.test.ts`; E and Space in each layer in
+  `actionMap.test.ts`; one E closing the sheet and the star map and sending one Undock at every bay,
+  and Space still pressing a focused bay button, on the store seam in `inputRuntime.test.ts`; a
+  hold-to-buy stopped by the Dock key with only its bought steps kept in `workshopStore.test.ts`;
+  the docked cluster's Undock in `touchControls.test.ts` and its E tag in `keyTags.test.ts`.
+  `e2e/browser/ui/dockToggle.spec.ts` runs iPhone 13 either way up and a 360x640 phone (the Dock
+  button stays in its slot once docked and one tap drives off, from the bay or the sheet) and
+  1280x800 (E docks, the footer tags Undock with E, E undocks from the bay or the sheet, Space
+  still presses a focused bay button and confirms on the sheet). Box Tester only.
 - **Star map UI** (ticket 757, spec #650): the rows are pure (`starMapView.test.ts`: every planet of
   the system by name and the one the session is on, each jump's fuel and fee, the tank, the
   shortfall and its price here, the #648 clamp keeping the next planet lit on an empty wallet, the

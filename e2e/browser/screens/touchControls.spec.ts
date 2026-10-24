@@ -68,7 +68,8 @@ test.describe('screen matrix: touch controls (#173)', () => {
   }) => {
     const errors = await openGame(page, currentCell())
     await page.getByTestId('touch-interact').tap()
-    await expect.poll(() => clusterIds(page)).toEqual(['touch-quick_service'])
+    // The Dock button stays in its slot as Undock while docked (ticket 794).
+    await expect.poll(() => clusterIds(page)).toEqual(['touch-undock', 'touch-quick_service'])
     await expect(page.getByTestId('platform-screen')).toBeVisible()
     const quick = await boxOf(page, 'touch-quick_service')
     expect(Math.min(quick.width, quick.height)).toBeGreaterThanOrEqual(CLUSTER_PX)

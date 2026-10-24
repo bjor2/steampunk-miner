@@ -1107,6 +1107,19 @@
         "src/debug/debugKindLooks.ts"
       ],
       "specs": ["e2e/browser/firstCutSkins.spec.ts"]
+    },
+    {
+      "why": "The Dock button toggles (ticket 794): the undock action and its routing, the docked cluster's Undock in Interact's slot, and the bay footer's E tag the spec judges on phones and at 1280x800.",
+      "paths": [
+        "src/data/input/actions.json",
+        "src/systems/input/inputRouting.ts",
+        "src/systems/input/touchControls.ts",
+        "src/systems/input/keyTags.ts",
+        "src/store/inputRuntime.ts",
+        "src/ui/touch/**",
+        "src/ui/platform/BayFooter.tsx"
+      ],
+      "specs": ["e2e/browser/ui/dockToggle.spec.ts"]
     }
   ]
 }
