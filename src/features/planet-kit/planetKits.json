@@ -1,0 +1,135 @@
+{
+  "source": "Ticket 820 (PK1, spec #647): the five planet kits of the GD's final lock (24 Oct ~15:30), from the Horizontal Scaler's handoff planet-kits-p1-p5.md. One merchant variant per planet on the #175 dock shops, differing in stock and buy list only, and one signature item per planet that turns the planet's #651 hazard (or, on P1, the return leg) into a choice. Names, hover lines and the premium tag are Progression's copy per #680, verbatim; the hover lines are two sentences by that lock, so they are held to the #680 word budget and not to the one-sentence flavour rule. Effect and trade-off are the lock's words as data; their magnitudes are PK4's (#823) to set against the ±5% felt-speed check. Planet ids are (s,p) as #790 keys them; prices key on g (planet-kit.economy.json).",
+  "premiumTag": "Pays extra for <ore>.",
+  "merchants": [
+    {
+      "planet": { "system": "1", "planet": "1" },
+      "name": "Hearthmoor Assay",
+      "buys": { "pool": "legacy" },
+      "premiumOre": "honey-amber-quartzine",
+      "stock": ["cache_crate"]
+    },
+    {
+      "planet": { "system": "1", "planet": "2" },
+      "name": "Scree Yard",
+      "buys": { "pool": "foothold-p2" },
+      "premiumOre": "p2-u3",
+      "stock": ["scree_plough"]
+    },
+    {
+      "planet": { "system": "1", "planet": "3" },
+      "name": "Gasworks",
+      "buys": { "pool": "foothold-p3" },
+      "premiumOre": "green-apatite-quartzine",
+      "stock": ["scree_plough", "damp_flask"]
+    },
+    {
+      "planet": { "system": "1", "planet": "4" },
+      "name": "Lapidary",
+      "buys": { "pool": "foothold-p4" },
+      "premiumOre": "rose-quartz-quartzine",
+      "stock": ["scree_plough", "shard_tongs"]
+    },
+    {
+      "planet": { "system": "1", "planet": "5" },
+      "name": "Boilerhouse",
+      "buys": { "pool": "foothold-p5" },
+      "premiumOre": "chromite-brassvein",
+      "stock": ["scree_plough", "shard_tongs", "vent_vane"]
+    }
+  ],
+  "items": [
+    {
+      "id": "cache_crate",
+      "name": "Cache Crate",
+      "hoverLine": "Drop your hold as a crate. Sold only on Hearthmoor.",
+      "kind": "consumable",
+      "homePlanet": { "system": "1", "planet": "1" },
+      "sale": "home-only",
+      "stackLimit": 3,
+      "effect": {
+        "hazard": null,
+        "hazardEffect": null,
+        "behaviour": "cache_hold",
+        "summary": "Drops the hold's contents as a marked crate in the shaft, to be lifted later by the owner's car only."
+      },
+      "tradeOff": {
+        "costs": "return_trip",
+        "summary": "The ore waits in the shaft until its owner comes back for the crate."
+      }
+    },
+    {
+      "id": "scree_plough",
+      "name": "Scree Plough",
+      "hoverLine": "Shoves fallen scree aside. The engine pulls weaker.",
+      "kind": "tool",
+      "homePlanet": { "system": "1", "planet": "2" },
+      "sale": "home-and-later",
+      "effect": {
+        "hazard": "rockfall",
+        "hazardEffect": "refill",
+        "behaviour": "plough_refill",
+        "summary": "Rubble that refills a cut is pushed through at a crawl instead of being drilled again; the crush is unchanged."
+      },
+      "tradeOff": {
+        "costs": "engine_thrust",
+        "summary": "Engine thrust is lower while the plough is fitted."
+      }
+    },
+    {
+      "id": "damp_flask",
+      "name": "Damp Flask",
+      "hoverLine": "Hold still in firedamp to bottle it. Sold only on Coalfen.",
+      "kind": "consumable",
+      "homePlanet": { "system": "1", "planet": "3" },
+      "sale": "home-only",
+      "stackLimit": 3,
+      "effect": {
+        "hazard": "firedamp",
+        "hazardEffect": "drain",
+        "behaviour": "bottle_drain",
+        "summary": "Holding still through a breached pocket's capture window bottles the gas for sale; the drain still applies at a reduced share, never zero."
+      },
+      "tradeOff": {
+        "costs": "held_still",
+        "summary": "The car stands in the gas for the capture window, and a flask is spent."
+      }
+    },
+    {
+      "id": "shard_tongs",
+      "name": "Shard Tongs",
+      "hoverLine": "Lifts spinecrystal whole as fragile cargo. Cuts slower.",
+      "kind": "tool",
+      "homePlanet": { "system": "1", "planet": "4" },
+      "sale": "home-and-later",
+      "effect": {
+        "hazard": "spinecrystal",
+        "hazardEffect": "bite",
+        "behaviour": "lift_whole",
+        "summary": "A spinecrystal cell comes out whole with no hull bite and fills a hold slot as fragile cargo that breaks on a hard landing."
+      },
+      "tradeOff": {
+        "costs": "cut_speed",
+        "summary": "The cut takes longer with the tongs; ground hardness is unchanged."
+      }
+    },
+    {
+      "id": "vent_vane",
+      "name": "Vent Vane",
+      "hoverLine": "Ride a vent's blast up the shaft. Slower sideways.",
+      "kind": "tool",
+      "homePlanet": { "system": "1", "planet": "5" },
+      "sale": "home-and-later",
+      "effect": {
+        "hazard": "steamvent",
+        "hazardEffect": "shove",
+        "behaviour": "ride_shove",
+        "summary": "Deployed over a vent, its shove carries the car further up the shaft; the scald still applies."
+      },
+      "tradeOff": {
+        "costs": "horizontal_speed",
+        "summary": "Horizontal speed is lower while the vane is fitted."
+      }
+    }
+  ]
+}

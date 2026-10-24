@@ -1,0 +1,46 @@
+/**
+ * The planet-kit slice's public API (feature-slices.md 2.1; ticket 820 under spec #647): the P1-P5
+ * kit data rows of the GD lock of 24 Oct. Five merchant variants for the #175 dock shops (name,
+ * buy list of the planet's own pool, one +25% premium ore, stock) and five kit items (tools and
+ * consumables with their effect, trade-off, home planet, sale rule, stack limit and price rule),
+ * plus the read selectors the later kit tickets build on: PK2 (#821) merchants, PK4 (#823) items
+ * and the stats.json re-pin, PK5 (#824) generator rows. Types, pure selectors and constants only;
+ * never React, zustand or a store.
+ */
+export const PLANET_KIT_SLICE_ID = 'planet-kit'
+
+export type {
+  KitEffect,
+  KitItem,
+  KitItemKind,
+  KitPriceRule,
+  KitSale,
+  KitTradeOff,
+  MerchantRow,
+  PlanetKits,
+  PremiumOre,
+  PricedAt,
+  TradeOffCost,
+} from './systems/planetKitTypes'
+export { KIT_ITEM_KINDS, KIT_SALES, TRADE_OFF_COSTS } from './systems/planetKitRowShape'
+export type { PlanetKitEconomy } from './systems/planetKitEconomy'
+export { PREMIUM_LIFT_CAP_BP } from './systems/planetKitEconomy'
+export type {
+  KitPlanetFacts,
+  KitSpeciesFacts,
+  PlanetKitGuardContext,
+} from './systems/planetKitGuards'
+export {
+  loadPlanetKits,
+  PLANET_KITS,
+  planetKitGuardContext,
+  planetKitProblems,
+} from './systems/planetKitRows'
+export {
+  isKitItemSoldAt,
+  kitItemOf,
+  kitItemsOfKind,
+  merchantOfPlanet,
+  premiumTagOf,
+  stockOfMerchant,
+} from './systems/planetKitSales'

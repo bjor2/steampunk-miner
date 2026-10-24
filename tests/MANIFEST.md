@@ -417,6 +417,13 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/ores/systems/rarityTripShare.test.ts` | 3 | 3 |
 | `src/features/ores/systems/slotDraws.test.ts` | 4 | 4 |
 
+### `planet-kit`: 2 files, 32 tests
+
+| File | Tests | Sites |
+| --- | --- | --- |
+| `src/features/planet-kit/systems/planetKitRows.test.ts` | 25 | 25 |
+| `src/features/planet-kit/systems/planetKitSales.test.ts` | 7 | 7 |
+
 ### `planet-mix`: 24 files, 146 tests
 
 | File | Tests | Sites |
