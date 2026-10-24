@@ -6,6 +6,7 @@
     "aim_down": "stick down",
     "lift": "stick up",
     "interact": "Dock button",
+    "undock": "Dock button",
     "quick_service": "Service button",
     "request_rescue": "Tow button",
     "toggle_guns": "Guns button",

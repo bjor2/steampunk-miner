@@ -4,6 +4,7 @@ import { derivePurchaseChains } from '../../../logging/purchaseChains'
 import { createRunLog, installRunLog, uninstallRunLog } from '../../../logging/runLog'
 import { readAuthorityState } from '../../../store/authorityLink'
 import { listenForDomainEvents } from '../../../store/domainEventBroadcast'
+import { pressAction, resetInput } from '../../../store/inputRuntime'
 import { resetGameStore, takeSessionSnapshot, useGameStore } from '../../../store/gameStore'
 import { listenForSoundCues, type SoundCueRequest } from '../../../store/soundCueRequests'
 import {
@@ -36,7 +37,7 @@ import {
   RATCHET_CUE_ID,
 } from '../systems/render/purchaseSound'
 import { RESTING_TURN } from '../systems/render/showcaseReactions'
-import { resetWorkshopStore, useWorkshopStore } from './workshopStore'
+import { isHoldingTrack, resetWorkshopStore, useWorkshopStore } from './workshopStore'
 
 const game = () => useGameStore.getState()
 const workshop = () => useWorkshopStore.getState()
@@ -49,6 +50,7 @@ let stopListening: (() => void)[]
 beforeEach(() => {
   resetGameStore()
   resetWorkshopStore()
+  resetInput()
   sink = createMemorySink()
   installRunLog(createRunLog({ runId: 'run_test', sink, secondsSinceStart: () => 0 }))
   cues = []
@@ -174,6 +176,20 @@ describe('workshop hold-to-buy controller', () => {
     expect(stepOf('drill_power')).toBe(2)
     expect(stepOf('engine')).toBe(0)
     expect(workshop().hold?.chain.end).toBe('focus_left')
+  })
+
+  it('stops the hold on the Dock key mid-chain and keeps only the steps already bought (794)', () => {
+    atUpgradeBayWith()
+    workshop().pressTrack('engine', tick())
+    runFrames(HOLD_CURVE.windUpTicks + HOLD_CURVE.gapTicks[0])
+    const bought = boughtTicks().length
+    pressAction('undock')
+    runFrames(240)
+
+    expect(game().vehicle.mode).toBe('active')
+    expect(stepOf('engine')).toBe(bought)
+    expect(workshop().tally?.steps).toBe(bought)
+    expect(isHoldingTrack(workshop(), 'engine')).toBe(false)
   })
 
   it("stops at can't afford with the soft clunk, and the steps before it stand", () => {

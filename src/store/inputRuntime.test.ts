@@ -29,6 +29,7 @@ import {
 import { readUpgradeBayModel } from './screenReads'
 import { installPreferencesStorage, loadPreferences, preferencesWrites } from './preferencesFile'
 import { NO_DRIVE } from '../systems/vehicle/driveSigns'
+import { BAY_IDS } from '../systems/world/dockBays'
 
 let submitted: AuthorityCommand[]
 let clockMoves: number
@@ -84,6 +85,11 @@ function submittedDuring(run: () => void): string[] {
   const before = submitted.length
   run()
   return submitted.slice(before).map((command) => command.type)
+}
+
+function pressKey(code: string): void {
+  routeKeyChange(key(code, true))
+  routeKeyChange(key(code, false))
 }
 
 function dockAtStart(): void {
@@ -143,6 +149,41 @@ describe('input: no direct mutation (#33 acceptance 3)', () => {
       game().pressScreenButton('workshop-upgrade-engine-buy'),
     )
     expect([...atSellBay, ...atUpgradeBay]).toEqual(['rechargeEnergy', 'buyUpgrade'])
+  })
+
+  it('docks on E and undocks on E again: the Dock key toggles (794)', () => {
+    const presses = submittedDuring(() => {
+      pressKey('KeyE')
+      expect(game().vehicle.mode).toBe('docked')
+      pressKey('KeyE')
+    })
+    expect(presses).toEqual(['dock', 'undock'])
+    expect(game().vehicle.mode).toBe('active')
+  })
+
+  it('closes the whole screen stack and undocks in one press of E, at every bay (794)', () => {
+    game().setPlanet(3)
+    for (const bay of BAY_IDS) {
+      game().teleportToDock(bay)
+      expect(game().vehicle.mode).toBe('docked')
+      game().toggleSheet()
+      game().toggleStarMap()
+      expect(game().openSheetTabId).not.toBeNull()
+      expect(submittedDuring(() => pressKey('KeyE'))).toEqual(['undock'])
+      expect(game().vehicle.mode).toBe('active')
+      expect(game().openSheetTabId).toBeNull()
+      expect(game().isStarMapOpen).toBe(false)
+    }
+  })
+
+  it('still presses the focused bay button with Space while E undocks (794)', () => {
+    dockAtStart()
+    game().giveMoney('1e6')
+    game().setEnergy('100')
+    game().focusControl('charging-recharge')
+    expect(game().focusedControlId).toBe('charging-recharge')
+    expect(submittedDuring(() => pressKey('Space'))).toEqual(['rechargeEnergy'])
+    expect(game().vehicle.mode).toBe('docked')
   })
 
   it('docks again on interact right after Undock while still in the pad zone: no grace (#58)', () => {

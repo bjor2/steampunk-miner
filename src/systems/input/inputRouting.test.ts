@@ -225,6 +225,23 @@ describe('input routing', () => {
     expect(reactionToPress('interact', SHEET)).toEqual({ kind: 'none' })
   })
 
+  it('leaves the station on the Dock key from the bay screen, star map open or not (794)', () => {
+    const leave = { kind: 'leaveStation', intent: { type: 'undock', payload: {} } }
+    expect(reactionToPress('undock', DOCKED)).toEqual(leave)
+    expect(reactionToPress('undock', { ...DOCKED, isStarMapOpen: true })).toEqual(leave)
+    expect(reactionToPress('undock', AT_UPGRADE_BAY)).toEqual(leave)
+  })
+
+  it('shuts the sheet and undocks in one press of the Dock key over a docked bay (794)', () => {
+    const leave = { kind: 'leaveStation', intent: { type: 'undock', payload: {} } }
+    expect(reactionToPress('undock', SHEET)).toEqual(leave)
+    expect(reactionToPress('undock', { ...SHEET, isStarMapOpen: true })).toEqual(leave)
+  })
+
+  it('does nothing on the Dock key over a sheet opened from driving (794)', () => {
+    expect(reactionToPress('undock', { ...DRIVING, layer: 'sheet' })).toEqual({ kind: 'none' })
+  })
+
   it('walks and confirms menu focus on the base sheet, as the pad buys on the Outfitter (687)', () => {
     expect(reactionToPress('ui_down', SHEET)).toEqual({ kind: 'moveFocus', step: 1 })
     expect(reactionToPress('ui_up', SHEET)).toEqual({ kind: 'moveFocus', step: -1 })

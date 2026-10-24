@@ -35,7 +35,8 @@ describe('action map', () => {
     expect(bindings.aim_left).toEqual(['KeyA', 'ArrowLeft'])
     expect(bindings.aim_right).toEqual(['KeyD', 'ArrowRight'])
     expect(bindings.interact).toEqual(['Space', 'KeyE'])
-    expect(bindings.ui_confirm).toEqual(['Enter', 'Space', 'KeyE'])
+    expect(bindings.ui_confirm).toEqual(['Enter', 'Space'])
+    expect(bindings.undock).toEqual(['KeyE'])
   })
 
   it('has no aim_up and no panel jumps, and zooms with =, - and 0 (#37, #39, #40)', () => {
@@ -122,8 +123,20 @@ describe('action map', () => {
   it('lets a key press different actions in different contexts', () => {
     const bindings = defaultBindings(ACTION_MAP)
     expect(actionsOfChord(ACTION_MAP, bindings, 'vehicle', 'KeyE')).toEqual(['interact'])
-    expect(actionsOfChord(ACTION_MAP, bindings, 'platform', 'KeyE')).toEqual(['ui_confirm'])
+    expect(actionsOfChord(ACTION_MAP, bindings, 'platform', 'KeyE')).toEqual(['undock'])
     expect(actionsOfChord(ACTION_MAP, bindings, 'settings', 'KeyQ')).toEqual([])
+  })
+
+  it('makes E the Dock key both ways, while Space and A still confirm on the bay and the sheet (794)', () => {
+    const bindings = defaultBindings(ACTION_MAP)
+    const padBindings = defaultPadBindings(ACTION_MAP)
+    for (const layer of ['platform', 'sheet'] as const) {
+      expect(actionsOfChord(ACTION_MAP, bindings, layer, 'KeyE')).toEqual(['undock'])
+      expect(actionsOfChord(ACTION_MAP, bindings, layer, 'Space')).toEqual(['ui_confirm'])
+      expect(actionsOfChord(ACTION_MAP, padBindings, layer, 'PadA')).toEqual(['ui_confirm'])
+    }
+    expect(actionsOfChord(ACTION_MAP, bindings, 'pause', 'KeyE')).toEqual([])
+    expect(padBindings.undock).toEqual([])
   })
 
   it('refuses a broken file whole and lists its problems', () => {

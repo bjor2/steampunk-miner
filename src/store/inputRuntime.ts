@@ -33,6 +33,7 @@ import { padChordOf } from '../systems/input/padCodes'
 import { sliceIntentOfRelease } from '../systems/registries/inputReactions'
 import { canOpenArtefactCache } from '../systems/authority/artefactRules'
 import { dockableBayOf, dockedBayOf } from '../systems/authority/dockRules'
+import type { CommandIntent } from '../systems/authority/authorityCommand'
 import { IDLE_INTENT, type VehicleIntent } from '../systems/vehicle/vehicleIntent'
 import { plantRefusal } from '../systems/authority/charges/chargeRules'
 import { chargeSizeToPlantOf, nextChargeSizeOf } from '../systems/vehicle/chargeSelection'
@@ -314,4 +315,13 @@ function applyReaction(reaction: InputReaction): void {
   else if (reaction.kind === 'openSheetAtPlace') game.openSheetAtPlace(reaction.place)
   else if (reaction.kind === 'toggleStarMap') game.toggleStarMap()
   else if (reaction.kind === 'closeStarMap') game.closeStarMap()
+  else if (reaction.kind === 'leaveStation') leaveStation(reaction.intent)
+}
+
+/** Everything open over the station shuts first, so the one Undock lands back on driving. */
+function leaveStation(undock: CommandIntent): void {
+  const game = useGameStore.getState()
+  game.closeSheet()
+  game.closeStarMap()
+  game.submitPlayerIntent(undock)
 }

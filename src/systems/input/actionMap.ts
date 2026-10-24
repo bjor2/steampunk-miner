@@ -42,6 +42,8 @@ export const ACTION_IDS = [
   'aim_down',
   'lift',
   'interact',
+  // E on a docked station screen or the sheet over it (ticket 794): the Dock key toggles back.
+  'undock',
   'quick_service',
   'request_rescue',
   'toggle_guns',

@@ -44,6 +44,15 @@
       "gamepad": ["PadA"]
     },
     {
+      "id": "undock",
+      "displayName": "Undock",
+      "contexts": ["platform", "sheet"],
+      "kind": "press",
+      "keyboard": ["KeyE"],
+      "gamepad": [],
+      "noPadReason": "B already closes the station (ticket 794): ui_cancel undocks from the bay"
+    },
+    {
       "id": "quick_service",
       "displayName": "Sell, repair, recharge",
       "contexts": ["platform"],
@@ -136,7 +145,7 @@
       "displayName": "Confirm",
       "contexts": ["platform", "artefact", "settings", "pause", "sheet", "title"],
       "kind": "press",
-      "keyboard": ["Enter", "Space", "KeyE"],
+      "keyboard": ["Enter", "Space"],
       "gamepad": ["PadA"]
     },
     {

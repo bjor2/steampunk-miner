@@ -14,7 +14,9 @@
  * `Undock`), and in `vehicle` it opens the pause menu. On desktop Tab opens and shuts the sheet
  * from driving, the sheet or the Ledger (a bay's screen keeps Tab for its focus walk), and a
  * place's letter jumps to its tab from any of those or a bay (ticket 768). M opens and shuts the
- * star map's panel from driving or a bay, and while it is open Escape shuts it first (ticket 769). `interact` opens a live cache the
+ * star map's panel from driving or a bay, and while it is open Escape shuts it first (ticket 769).
+ * Docked, E (`undock`, ticket 794) shuts the sheet and the star map and undocks in one press, from
+ * the bay or the sheet over it, so the Dock key toggles. `interact` opens a live cache the
  * vehicle is over, else docks. An action outside its context, a dock or open the authority would
  * refuse, the quick action away from the shops (#37, #40, #170), a tow call while the vehicle can
  * still move, the guns' toggle with no guns mounted (#107), the bore gun's auto toggle before the
@@ -74,6 +76,8 @@ export type InputReaction =
   | { kind: 'toggleStarMap' }
   /** Escape while the star map's panel is open (ticket 769): it shuts, and nothing else happens. */
   | { kind: 'closeStarMap' }
+  /** The Dock key while docked (ticket 794): the sheet and the star map shut, then one Undock. */
+  | { kind: 'leaveStation'; intent: CommandIntent }
   | { kind: 'none' }
 
 /** What the routing needs to know about the session; read from the authority replica. */
@@ -172,6 +176,7 @@ const REACTIONS_BY_LAYER: Readonly<
     quick_service: ({ dockedBay }) => (isShopBay(dockedBay) ? submit(quickServiceCommand()) : NONE),
     open_star_map: () => TOGGLE_STAR_MAP,
     ui_cancel: ({ isStarMapOpen }) => (isStarMapOpen ? CLOSE_STAR_MAP : submit(undockCommand())),
+    undock: leaveStationReaction,
   },
   artefact: {
     ...MENU_REACTIONS,
@@ -193,6 +198,7 @@ const REACTIONS_BY_LAYER: Readonly<
     ...MENU_REACTIONS,
     ...SHEET_KEY_REACTIONS,
     ui_cancel: () => ({ kind: 'closeSheet' }),
+    undock: leaveStationReaction,
   },
   title: {
     ...MENU_REACTIONS,
@@ -231,6 +237,11 @@ function submitOrNone(intent: CommandIntent | null): InputReaction {
 function interactReaction(situation: InputSituation): InputReaction {
   if (situation.canOpenArtefactCache) return submit(openArtefactCacheCommand())
   return situation.dockableBay === null ? NONE : submit(dockCommand(situation.dockableBay))
+}
+
+/** Docked, the Dock key closes whatever is open over the station and undocks in one press. */
+function leaveStationReaction({ dockedBay }: InputSituation): InputReaction {
+  return dockedBay === null ? NONE : { kind: 'leaveStation', intent: undockCommand() }
 }
 
 /** `request_rescue` is live only for a vehicle that cannot move on its own (#7). */
