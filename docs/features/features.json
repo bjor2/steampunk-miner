@@ -598,14 +598,14 @@
             },
             {
               "title": "Star map",
-              "description": "One tap on the labelled Star map button (top left on a phone, on the strip with its M tag on desktop), M, or the bay's Star map button opens the system's star map, and a one-time hint rings the button after your first upgrade: the sun heads a brass rail of planet glyphs, each in its own ground colour, with the fuel its jump burns, the price and any shortfall against your tank; planets you cannot afford dim, never lock. Each planet has a Jump (press twice); at the Sell bay a Buy fuel for its shortfall, a bigger tank and the jump drive, and on the system's last planet the jump to the next system.",
+              "description": "One tap on the labelled Star map button (top left on a phone, on the strip with its M tag on desktop), M, or the bay's Star map button opens the system's star map, and a one-time hint rings the button after your first upgrade: each planet of the system, shown in turn on the carousel, with the fuel its jump burns, the price and any shortfall against your tank; planets you cannot afford dim, never lock. Each planet has a Jump (press twice); at the Sell bay a Buy fuel for its shortfall, a bigger tank and the jump drive, and on the system's last planet the jump to the next system.",
               "status": "built",
               "issues": [650, 757, 758, 769, 792, 793]
             },
             {
               "title": "Star map carousel",
-              "description": "The star map shows each planet as a large Blender-rendered preview (a lit sphere in the planet's own crust with a brass armillary ring and a haze), stepped with swipe, Previous and Next or the arrow keys, while the solar system strip pans to the selected planet's orbit with the here ring and the selected marker. The art, the orrery strip and the look and motion notes are made (#795); the carousel itself is the build ticket.",
-              "status": "planned",
+              "description": "The star map shows one planet at a time as a large Blender-rendered preview (a lit sphere in the planet's own crust with a brass armillary ring and a haze) with its name, fuel, price, gravity and its Jump and Buy fuel, opening on the planet you are on. Swipe, Previous and Next, a tap on the solar system strip or, docked, the arrow keys step it; the strip pans to the shown planet's orbit with the here ring and the selected marker, as a cut under reduced motion. Planets you cannot afford are shown dimmed, never skipped.",
+              "status": "built",
               "issues": [795, 796]
             }
           ]

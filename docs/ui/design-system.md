@@ -391,8 +391,9 @@ button and never docks the panel.
 button** (the compass, shown wherever M works: driving and every bay, in a cell of its own while
 Rescue and Quick service share one), or one M on desktop opens it: full screen on a phone, rising
 from the foot like the base sheet and stepping aside for it, docked on desktop. Its chart
-(`StarMapChart`, drawn from `starMapViewOf`) heads with the fuel tank, held of capacity, then one
-framed row per planet of the session's system on the shared Title+OneLine element: the name, a
+(`StarMapChart`, drawn from `starMapViewOf`) holds the fuel tank, held of capacity, and a framed
+card for each planet of the session's system (since #796 one at a time, below) on the shared
+Title+OneLine element: the name, a
 line of the tank against that jump with any shortfall and what buying it here charges after the
 #648 clamp, and the jump's fuel and price as facts. The planet the session is on wears the brass
 edge; a planet the player cannot afford, whose shortfall the wallet cannot buy or the tank cannot
@@ -409,19 +410,33 @@ control is a menu button of at least 48 px both ways (`StarMapActions`, drawn fr
 `starMapControlsOf`), and while the map is open over a bay its controls join that bay's focus
 stops, so keys and a pad reach them. The bay footer's **Star map** button opens the map; it
 replaced the slice's fragment Travel and its end-of-slice card.
-**Map art (#758):** the chart is a system view: the `art.starMap` sun heads a brass rail and each
+**Map art (#758):** the chart was a system view (the carousel's strip replaced it in #796, and the
+glyph stays as the hero for a planet with no preview): the `art.starMap` sun headed a brass rail and each
 row's glyph, the planet sprite with its disc tinted the planet's own ground colour (the view's
 `colour`) through the sprite's mask, sits on it; the planet the session is on wears the here ring,
 a dimmed row drains its glyph's colour, and the tank's bar is the `art.gaugeBar` sprite with a CSS
 fill. The tank's level shows on the rig as the coal tender at the hitch (docs/art-pipeline.md).
-**Carousel art (#795, build #796):** the carousel to come shows one planet at a time as a hero
-preview, `ui-star-map-planet-<key>` (256 px; a lit sphere in the planet's own crust motif and hue
-pair, a brass armillary ring, a haze of its horizon colour), stepped by swipe, Previous and Next or
-←/→, over the system strip `ui-star-map-system` (the sun and five brass orbits in an orrery rail
-frame) that pans to the selected planet's orbit dot in at most 400 ms, a cut under reduced motion;
-the here ring and the selected marker sit on the dots. Sizes, orbit positions and the swipe
-threshold are `starMapCarouselArt.json`; the look and motion notes and the mock frames are in
-docs/art/star-map-carousel/.
+**The carousel (#796, art #795).** Since #796 the chart shows one planet at a time: the planet the
+session is on when the map opens, stepped by **Previous** and **Next** (48 px chevrons at the hero's
+sides, stopping at the system's ends), a swipe across the hero or the strip (48 px along x, at most
+32 px off it, within 600 ms; anything else is the chart's scroll), ←/→ or the pad's d-pad at a bay
+(up and down still walk the buttons; driving, the same keys steer), or a tap or click on a planet
+of the system strip. The shown planet's **hero** is its Blender preview `ui-star-map-planet-<key>`
+(160 px on a phone, 256 px in the dock, 112 px on a phone on its side; a planet with no preview
+wears the #758 tinted glyph), crossfading in over 160 ms; under it its **card** carries the row's
+words and facts (name, the tank's line, fuel, price, and the planet's gravity as its trait) with
+its Buy fuel and Jump. Under them the **system strip** `ui-star-map-system`, drawn at 3/4 of its
+1x size in its orrery rail frame and seen through a 112 px band round the orbits, holds every
+planet's orbit dot on its socket, the here ring and the amber selected marker, and pans (pure CSS:
+the window is an inline-size container) so the shown socket is centred, clamped at the strip's
+ends, easing in at most 400 ms on the enter curve and cutting under reduced motion. A planet the
+player cannot afford drains its hero and its dot and keeps every number; it is never skipped. A
+narrow chart (a phone upright, the dock) stacks the hero and card over the strip and the tank, as
+#795's mocks draw it; a chart 560 px or wider (a phone on its side) sets the strip and the tank left
+of them. Only the shown planet's Jump and Buy fuel are focus stops. The pick is the store's
+`starMapPlace` (`starMapCarouselSlice.ts`), the rules `starMapCarouselOf` (`systems/views`), the
+sizes and motion `starMapCarouselArt.json` and `constants/starMapCarousel.ts`; the look and motion
+notes and the mocks are in docs/art/star-map-carousel/.
 
 **Desktop brass (#770, GD lock 23 Oct).** The wide panels wear frames of their own instead of the
 phone's stretched: the docked sheet draws `art.dockFrame` (`kit/Sheet.module.css`, on

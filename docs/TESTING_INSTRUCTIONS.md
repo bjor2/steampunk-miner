@@ -148,7 +148,7 @@ programs }` from three's `renderer.info` of the game canvas), read only when cal
   Collapse specs build a weak band-2 tunnel or dig one with `collapse/collapseFixtures.ts`. Bore gun specs (ticket 313) stand the rig in a pocket of band-1 rock with `bore/boreFixtures.ts` and register the gun's numbers through `boreGunSlice` inside `withRegistrations`, as no slice answers `boreGun` yet. Auto mode specs (ticket 317) use `bore/boreAutoFixtures.ts` `searSlice`, which adds the steam sear's numbers and its research, and stand the rig at `AUTO_RIG`, on the east edge of its collapse block, so a level shot east never warns the rig's own block. A slice's self-acting item (ticket 328: the steam shield) is specced with the real press path through `power-up-core`'s `withPowerUpCore([itemSlice, fixture])`, the fixture registering the item's research and a stand-in `autoFire` hook for the combo, in the corridor fight of `combat/combatFixtures.ts`. Collapse brace specs (ticket 331) register the fake `brace-probe` slice of `collapse/braceFixtures.ts` (a section, a command, a clock step and the provider) inside `withRegistrations`, so a brace can end by command, by clock step or by `untilTick`. Hazard strip specs (ticket 341) dig straight down the plain line of `render/hazardStrip/stripFixtures.ts`, fixtures placed in metres below the start, at a steady speed frame by frame; the per-frame cost is the sampler's own cost model (`spentUs`), and the wall clock is `npm run bench:strip`'s. Specs that mine deep (where crawlers live) freeze enemies first
   (`FREEZE_ENEMIES` in `scriptedSession.ts`); combat specs fight in the band-1 corridor of
   `combat/combatFixtures.ts`, where no spawn point is in reach. The `ui` namespace (`ui.setCameraMode('rotating' | 'fixed')`, `ui.setPref(name, value)`,
-  `ui.getPrefs()`, `ui.getHudModel()`, `ui.getSellBayModel()`, `ui.getUpgradeBayModel()`, `ui.getRefineryBayModel()` (#105), `ui.getStarMapModel()` (ticket 757: the star map's planets with their fuel cost, shortfall and dimming, and the tank), `ui.getStarMapControls()` (ticket 793: each planet's Jump and Buy fuel, the tank and the drive at the Sell bay and the jump to the next system, each with the refusal its press would meet), `ui.getBayPresentation()`, `ui.getAudioModel()`, `ui.getScreenLayout()` (#173: the stage, `--ui-scale`, the TV safe inset, the smallest control and the bay-screen text size), `ui.getPauseMenuModel()` and `ui.setPauseSaveName(name)` (ticket 404: the pause menu, null while closed, and the name its next save takes; ticket 704: a saved row's `scrap` and, once armed, its `scrapConfirm` question with Scrap and Keep)) reads the
+  `ui.getPrefs()`, `ui.getHudModel()`, `ui.getSellBayModel()`, `ui.getUpgradeBayModel()`, `ui.getRefineryBayModel()` (#105), `ui.getStarMapModel()` (ticket 757: the star map's planets with their fuel cost, shortfall and dimming, and the tank), `ui.getStarMapControls()` (ticket 793: each planet's Jump and Buy fuel, the tank and the drive at the Sell bay and the jump to the next system, each with the refusal its press would meet), `ui.getStarMapCarousel()` (ticket 796: the shown planet, whether a step back or on is left, and the system strip's pan target and planets on their orbits), `ui.getBayPresentation()`, `ui.getAudioModel()`, `ui.getScreenLayout()` (#173: the stage, `--ui-scale`, the TV safe inset, the smallest control and the bay-screen text size), `ui.getPauseMenuModel()` and `ui.setPauseSaveName(name)` (ticket 404: the pause menu, null while closed, and the name its next save takes; ticket 704: a saved row's `scrap` and, once armed, its `scrapConfirm` question with Scrap and Keep)) reads the
   screens' view models, the bay screen's shutter, text size and preview framing (#45, #44), the music's layer targets, settings and stinger sequence (#49) and
   the drill voice (`drillVoice`: `casing` while the drill's nose is in lining, #41), and
   changes local presentation only: no command, no log line, no `debugApplied` (#11 amendment 2,
@@ -1840,6 +1840,26 @@ incomePerHour}` go to `balance-report/drill-pace.ndjson`, which `pushTestMetrics
   matches `docs/art/star-map-carousel/preview-reads.json`), reads every pair apart in hue or in
   motif, equals `starMapCarouselSheet.golden.json`, and names a synthetic twin. Re-exporting a
   preview re-runs `python3 docs/art/star-map-carousel/preview_post.py` and re-pins the golden.
+- **Star map carousel** (ticket 796, spec #647): the carousel is pure (`starMapCarousel.test.ts`:
+  it opens on the planet the session is on, steps one planet and stops at the ends, holds a pick to
+  the map's places, shows an unaffordable planet dimmed and never skips it, pans toward the shown
+  orbit and to the strip's end past the orbits, marks the here and shown dots, names the first
+  system's previews, and judges a swipe by #795's threshold, axis and time). Only the shown planet's
+  Jump and Buy fuel are focus stops (`starMapControls.test.ts`). The store slice beside the panel's
+  (`starMapCarousel.test.ts` under `src/store`: opening resets the pick, steps stop at the ends, a
+  strip pick shows, ←/→ step at a bay, a step disarms a Jump). The sprites come from the shipped
+  catalogue (`starMapCarouselImages.test.ts`, `uiPartImageOf` in `uiArt.test.ts`), and the
+  server-rendered chart (`starMapChart.test.ts`) draws the hero, the card, every dot with the here
+  ring and the one marker, the pan target, the stopped steps, the cut under reduced motion and every
+  word within the budget. `e2e/browser/ui/starMapCarousel.spec.ts` runs 1440x900 and 1920x1080
+  docked (Next, Previous, ←/→ and a strip click step it with the marker moving and the pan growing,
+  Jump on a shown affordable planet after the confirm, the cut under reduced motion, a dimmed planet
+  kept with its numbers) and shoots the goldens at P1, P3 shown and P5 shown on the four reference
+  phones and 1440x900 to `docs/ui/screens/<cell>/star-map-carousel-p<n>.jpg` under
+  `npm run ui:screens:update`, each checking the card and Jump in view and uncovered.
+  `e2e/browser/mobile/starMapCarousel.spec.ts` swipes and taps on the iPhone 13 and Pixel 7
+  projects, on their side and upright. #757's and #793's specs show a planet before reading its
+  card. Shared steps in `e2e/browser/starMapCarousel.ts`. Box Tester only.
 - **Desktop brass art** (ticket 770, spec #678): the cluster table's frame is per layout, pinned in
   `gaugeCluster.test.ts` (a phone in the glass frame, desktop in the cluster rail frame; a layout
   with no frame or an unshipped one fails the load), and the two rail sprites are held to the brief

@@ -777,11 +777,12 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/art/refineryBayArt.test.ts` | 2 | 2 |
 | `src/systems/art/shopBuildingArt.test.ts` | 6 | 6 |
 | `src/systems/art/starMapCarouselArt.test.ts` | 8 | 8 |
+| `src/systems/art/starMapCarouselImages.test.ts` | 3 | 3 |
 | `src/systems/art/starMapCarouselSheet.test.ts` | 7 | 7 |
 | `src/systems/art/texelDensity.test.ts` | 7 | 2 |
 | `src/systems/art/tileLook.test.ts` | 5 | 5 |
 | `src/systems/art/tunnelWreckerArt.test.ts` | 3 | 3 |
-| `src/systems/art/uiArt.test.ts` | 15 | 15 |
+| `src/systems/art/uiArt.test.ts` | 16 | 16 |
 | `src/systems/art/workshopShowcaseArt.test.ts` | 8 | 8 |
 
 ### `artefacts`
@@ -1565,6 +1566,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/store/soundUnlockSlice.test.ts` | 4 | 4 |
 | `src/store/speciesRevealBroadcast.test.ts` | 2 | 2 |
 | `src/store/starMapActions.test.ts` | 6 | 6 |
+| `src/store/starMapCarousel.test.ts` | 6 | 6 |
 | `src/store/starMapHint.test.ts` | 2 | 2 |
 | `src/store/starMapKeys.test.ts` | 5 | 5 |
 | `src/store/tapSheetSlice.test.ts` | 6 | 6 |
@@ -1702,7 +1704,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/ui/screens/sliceScreen.test.ts` | 8 | 8 |
 | `src/ui/sheet/baseSheet.test.ts` | 15 | 15 |
 | `src/ui/sheets/exactAmountSheet.test.ts` | 3 | 3 |
-| `src/ui/starMap/starMapChart.test.ts` | 8 | 8 |
+| `src/ui/starMap/starMapChart.test.ts` | 11 | 11 |
 | `src/ui/toolSlots/desktopToolCell.test.ts` | 3 | 3 |
 | `src/ui/toolSlots/toolSlotRegistry.test.ts` | 10 | 10 |
 | `src/ui/touch/touchBindingTiles.test.ts` | 11 | 11 |
@@ -1831,7 +1833,8 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/views/sheetLayout.test.ts` | 14 | 14 |
 | `src/systems/views/shopGuidance.test.ts` | 8 | 8 |
 | `src/systems/views/slotSummaryLine.test.ts` | 8 | 8 |
-| `src/systems/views/starMapControls.test.ts` | 12 | 12 |
+| `src/systems/views/starMapCarousel.test.ts` | 11 | 11 |
+| `src/systems/views/starMapControls.test.ts` | 14 | 14 |
 | `src/systems/views/starMapEntry.test.ts` | 2 | 2 |
 | `src/systems/views/starMapView.test.ts` | 13 | 13 |
 | `src/systems/views/tileTime.test.ts` | 3 | 3 |
