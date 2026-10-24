@@ -29,7 +29,16 @@ import { RIG_LOOK_TABLE } from './rigLookTable'
 /** The golden counts every line is pinned at (#809). */
 const GOLDEN_COUNTS = [0, 1, 10, 99, 9_999, 1_000_000]
 /** The tank's golden levels: the start, each step, one past each and the golden counts. */
-const TANK_GOLDEN_LEVELS = [1, 2, 3, 4, 5, 6, 10, 99, 9_999, 1_000_000]
+const TANK_GOLDEN_LEVELS = [
+  ...new Set([
+    1,
+    ...FUEL_TENDER_TABLE.steps.flatMap((step) => [step.fromLevel, step.fromLevel + 1]),
+    10,
+    99,
+    9_999,
+    1_000_000,
+  ]),
+].sort((a, b) => a - b)
 const TANK_RATIO = ECONOMY_FILE.starMap.fuel.tank.capacityRatio
 
 const rowsOf = (track: string): TrackLookRows => trackLookFramesOf(SHIPPED_RIG_LOOKS, track)!.rows

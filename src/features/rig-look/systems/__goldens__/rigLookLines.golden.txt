@@ -160,8 +160,11 @@ fuel_tank
 3: step 2 tail 0 pips 0 part riveted-tender finish null
 4: step 2 tail 0 pips 0 part riveted-tender finish null
 5: step 3 tail 0 pips 0 part guild-tender finish null
-6: step 3 tail 1 pips 0 part guild-tender finish Bright brass
-10: step 3 tail 5 pips 1 part guild-tender finish Gunmetal
-99: step 3 tail 94 pips 10 part guild-tender finish Nickel plate
-9999: step 3 tail 9994 pips 1110 part guild-tender finish Nickel plate
-1000000: step 3 tail 999995 pips 111111 part guild-tender finish Gunmetal
+6: step 4 tail 0 pips 0 part twin-tank-tender finish null
+7: step 5 tail 0 pips 0 part hopper-tender finish null
+8: step 6 tail 0 pips 0 part glass-tank-tender finish null
+9: step 6 tail 1 pips 0 part glass-tank-tender finish Bright brass
+10: step 6 tail 2 pips 1 part glass-tank-tender finish Blued steel
+99: step 6 tail 91 pips 10 part glass-tank-tender finish Bright brass
+9999: step 6 tail 9991 pips 1110 part glass-tank-tender finish Bright brass
+1000000: step 6 tail 999992 pips 111111 part glass-tank-tender finish Blued steel

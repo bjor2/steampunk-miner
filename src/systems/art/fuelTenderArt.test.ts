@@ -3,7 +3,7 @@ import { SHIPPED_ART } from '../../scene/shippedArt'
 import { FUEL_TENDER_TABLE } from '../render/fuelTenderLook'
 import { isAttachId } from '../registries/vehicleAttach'
 import { blenderAssetIds, categoryOfAssetId, isValidPartId, registryPartIds } from './artIds'
-import { manifestEntryOf, placeholderSidecarOf } from './artCatalogue'
+import { exportedSidecarOf, manifestEntryOf, placeholderSidecarOf } from './artCatalogue'
 import { FUEL_TENDER_ASSET_ID, FUEL_TENDER_ATTACH_ID, fuelTenderArtPartIds } from './fuelTenderArt'
 
 // The coal tender (ticket 758; the GD lock on #650): the fuel tank track's wagon at the hitch, a
@@ -21,13 +21,27 @@ describe('fuel tender art', () => {
     expect(FUEL_TENDER_TABLE.assetId).toBe(FUEL_TENDER_ASSET_ID)
   })
 
-  it('takes one part per ladder step and no other', () => {
+  it('takes one part per ladder step and no other: the #758 wagons and the LK5 steps (ticket 813)', () => {
     expect(fuelTenderArtPartIds()).toEqual(FUEL_TENDER_TABLE.steps.map((step) => step.part))
+    expect(fuelTenderArtPartIds()).toEqual([
+      'coal-cart',
+      'bunker-tender',
+      'riveted-tender',
+      'guild-tender',
+      'twin-tank-tender',
+      'hopper-tender',
+      'glass-tank-tender',
+    ])
     for (const partId of fuelTenderArtPartIds()) {
       expect(registryPartIds()).toContain(partId)
       expect(isValidPartId(FUEL_TENDER_ASSET_ID, partId)).toBe(true)
     }
     expect(isValidPartId(FUEL_TENDER_ASSET_ID, 't1-wheel')).toBe(false)
+  })
+
+  it('ships no emissive map, so the drill nose stays the brightest part by construction', () => {
+    expect(placeholderSidecarOf(SHIPPED_ART, FUEL_TENDER_ASSET_ID)?.maps.emissive).toBe(false)
+    expect(exportedSidecarOf(SHIPPED_ART, FUEL_TENDER_ASSET_ID)?.maps.emissive).toBe(false)
   })
 
   it('ships a manifest entry and a placeholder with every wagon, the hitch inside each', () => {

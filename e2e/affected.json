@@ -126,6 +126,19 @@
       ]
     },
     {
+      "why": "The coal tender: the fuel tank's wagon at the hitch, one per tank level, the LK5 parts fitted on the guild tender and the finish tail past them (tickets 758, 813).",
+      "paths": [
+        "src/data/vehicle/fuelTender.json",
+        "src/systems/render/fuelTenderLook.ts",
+        "src/systems/render/fuelTenderLookSource.ts",
+        "src/systems/art/fuelTenderArt.ts",
+        "src/scene/FuelTenderPiece.tsx",
+        "public/assets/vehicle/vehicle-fuel-tank/**",
+        "art/placeholders/vehicle-fuel-tank.parts.json"
+      ],
+      "specs": ["e2e/browser/fuelTenderLook.spec.ts", "e2e/browser/render.spec.ts"]
+    },
+    {
       "why": "The drill look steps: a glow on the bit and head at drill_power purchase thresholds (ticket 554).",
       "paths": ["src/features/drill-look/**"],
       "specs": ["e2e/browser/drillLook.spec.ts", "e2e/browser/render.spec.ts"]

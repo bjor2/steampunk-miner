@@ -769,7 +769,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/art/assetManifest.test.ts` | 13 | 13 |
 | `src/systems/art/autoGunsArt.test.ts` | 5 | 5 |
 | `src/systems/art/blastingChargesArt.test.ts` | 2 | 2 |
-| `src/systems/art/fuelTenderArt.test.ts` | 4 | 4 |
+| `src/systems/art/fuelTenderArt.test.ts` | 5 | 5 |
 | `src/systems/art/heatLavaArt.test.ts` | 6 | 6 |
 | `src/systems/art/icons/iconCoverage.test.ts` | 9 | 9 |
 | `src/systems/art/icons/iconFiles.test.ts` | 3 | 3 |
@@ -1386,7 +1386,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/render/enemyPlaceholder.test.ts` | 7 | 3 |
 | `src/systems/render/enemyTint.test.ts` | 5 | 5 |
 | `src/systems/render/frameWindow.test.ts` | 4 | 4 |
-| `src/systems/render/fuelTenderLook.test.ts` | 13 | 13 |
+| `src/systems/render/fuelTenderLook.test.ts` | 22 | 17 |
 | `src/systems/render/fuelTenderLookSource.test.ts` | 4 | 4 |
 | `src/systems/render/gatePatterns.test.ts` | 10 | 10 |
 | `src/systems/render/gemGlint.test.ts` | 15 | 15 |

@@ -11,10 +11,25 @@ import {
 
 // The coal tender (ticket 758; the GD lock on #650): the fuel tank track shows on the rig as a
 // wagon that steps with the tank's level and, above its top step, wears a finish a purchase with
-// pips counting decades of capacity (the log tail of ticket 809), as a rig look does.
+// pips counting decades of capacity (the log tail of ticket 809), as a rig look does. LK5 (ticket
+// 813) adds three authored steps after the guild tender, one per purchase, so the line has at
+// least the five authored steps the GD lock of 24 Oct asks of every line; the tender is exempt
+// from the decade rule and keeps one step per purchase.
 
 const TOP = FUEL_TENDER_TABLE.steps[FUEL_TENDER_TABLE.steps.length - 1]
 const FINISHES = FUEL_TENDER_TABLE.tail.finishes
+
+/** The ladder as authored: the #758 wagons at 1, 2, 3 and 5, then the LK5 parts at 6, 7 and 8. */
+const AUTHORED_STEPS = [
+  { fromLevel: 1, part: 'coal-cart', card: 'Coal cart' },
+  { fromLevel: 2, part: 'bunker-tender', card: 'Bunker tender' },
+  { fromLevel: 3, part: 'riveted-tender', card: 'Riveted tender' },
+  { fromLevel: 5, part: 'guild-tender', card: 'Guild tender' },
+  { fromLevel: 6, part: 'twin-tank-tender', card: 'Second tank' },
+  { fromLevel: 7, part: 'hopper-tender', card: 'Coal hopper' },
+  { fromLevel: 8, part: 'glass-tank-tender', card: 'Sight glass tank' },
+]
+const AUTHORED_STEPS_MIN = 5
 
 describe('fuel tender look (ticket 758)', () => {
   it('shows the coal cart on the starting tank, before any purchase', () => {
@@ -30,16 +45,41 @@ describe('fuel tender look (ticket 758)', () => {
   })
 
   it('changes the wagon on the first tank purchase and at each later step level', () => {
-    const partsByLevel = [1, 2, 3, 4, 5, 6].map((level) => fuelTenderLookOf(level).partId)
+    const partsByLevel = [1, 2, 3, 4, 5, 6, 7, 8, 9].map((level) => fuelTenderLookOf(level).partId)
     expect(partsByLevel).toEqual([
       'coal-cart',
       'bunker-tender',
       'riveted-tender',
       'riveted-tender',
       'guild-tender',
-      'guild-tender',
+      'twin-tank-tender',
+      'hopper-tender',
+      'glass-tank-tender',
+      'glass-tank-tender',
     ])
     expect(fuelTenderLookOf(2).card).toBe('Bunker tender')
+  })
+
+  it('has at least five authored steps, the #758 wagons first and the LK5 parts after them (ticket 813)', () => {
+    expect(FUEL_TENDER_TABLE.steps).toEqual(AUTHORED_STEPS)
+    expect(FUEL_TENDER_TABLE.steps.length).toBeGreaterThanOrEqual(AUTHORED_STEPS_MIN)
+  })
+
+  it.each(AUTHORED_STEPS.slice(1))(
+    'shows $part from level $fromLevel, named $card, and holds it to the next step',
+    ({ fromLevel, part, card }) => {
+      const next = AUTHORED_STEPS.find((step) => step.fromLevel > fromLevel)
+      const before = fuelTenderLookOf(fromLevel - 1)
+      expect(before.partId).not.toBe(part)
+      for (let level = fromLevel; level < (next?.fromLevel ?? fromLevel + 1); level++) {
+        expect(fuelTenderLookOf(level)).toMatchObject({ partId: part, card, tail: 0, tint: null })
+      }
+    },
+  )
+
+  it('is exempt from the decade rule: every LK5 step is one purchase after the one before', () => {
+    const added = FUEL_TENDER_TABLE.steps.filter((step) => step.fromLevel > 5)
+    expect(added.map((step) => step.fromLevel)).toEqual([6, 7, 8])
   })
 
   it('is a pure function of the level: every level from 1 to 10,000 answers, no two neighbours alike', () => {
@@ -88,12 +128,13 @@ describe('fuel tender look (ticket 758)', () => {
   })
 
   it('lists the wagon parts in step order', () => {
-    expect(fuelTenderPartIds()).toEqual([
-      'coal-cart',
-      'bunker-tender',
-      'riveted-tender',
-      'guild-tender',
-    ])
+    expect(fuelTenderPartIds()).toEqual(AUTHORED_STEPS.map((step) => step.part))
+  })
+
+  it('names every step in 3 words or fewer, the hover line band names (Progression)', () => {
+    for (const step of FUEL_TENDER_TABLE.steps) {
+      expect(step.card.trim().split(/\s+/).length).toBeLessThanOrEqual(3)
+    }
   })
 })
 

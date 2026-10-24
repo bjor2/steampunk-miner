@@ -3,13 +3,13 @@
   "schema": 1,
   "source": {
     "blend": "art/blender/vehicle-fuel-tank/vehicle-fuel-tank.blend",
-    "sha256": "b4f8a30d1c27a5082d076056023a3016b2173bbbdfda43d5f19144d7065be3af",
+    "sha256": "6af5e4051cd0ef9fb5d024f7703ff01aefbc078e61f391894538401e5bb74d3e",
     "blender": "4.2.9 LTS"
   },
   "pxPerMetre": 512,
   "atlasPx": [
     512,
-    1024
+    2048
   ],
   "maps": {
     "albedo": "vehicle-fuel-tank.albedo.ktx2",
@@ -22,7 +22,7 @@
       "tier": 1,
       "rect": [
         8,
-        537,
+        1329,
         307,
         214
       ],
@@ -45,7 +45,7 @@
       "tier": 1,
       "rect": [
         8,
-        767,
+        1559,
         302,
         154
       ],
@@ -64,17 +64,63 @@
       "z": 0
     },
     {
-      "id": "guild-tender",
+      "id": "glass-tank-tender",
       "tier": 1,
       "rect": [
         8,
         275,
+        308,
+        249
+      ],
+      "sizeM": [
+        0.6004,
+        0.4847
+      ],
+      "pivotM": [
+        0.5717,
+        0.1787
+      ],
+      "atM": [
+        0.0,
+        0.0
+      ],
+      "z": 0
+    },
+    {
+      "id": "guild-tender",
+      "tier": 1,
+      "rect": [
+        8,
+        805,
         308,
         246
       ],
       "sizeM": [
         0.6004,
         0.4797
+      ],
+      "pivotM": [
+        0.5717,
+        0.1787
+      ],
+      "atM": [
+        0.0,
+        0.0
+      ],
+      "z": 0
+    },
+    {
+      "id": "hopper-tender",
+      "tier": 1,
+      "rect": [
+        8,
+        540,
+        308,
+        249
+      ],
+      "sizeM": [
+        0.6004,
+        0.4847
       ],
       "pivotM": [
         0.5717,
@@ -101,6 +147,29 @@
       ],
       "pivotM": [
         0.5617,
+        0.1787
+      ],
+      "atM": [
+        0.0,
+        0.0
+      ],
+      "z": 0
+    },
+    {
+      "id": "twin-tank-tender",
+      "tier": 1,
+      "rect": [
+        8,
+        1067,
+        308,
+        246
+      ],
+      "sizeM": [
+        0.6004,
+        0.4797
+      ],
+      "pivotM": [
+        0.5717,
         0.1787
       ],
       "atM": [
