@@ -472,7 +472,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/power-up-core/systems/useRefusals.test.ts` | 3 | 3 |
 | `src/features/power-up-core/systems/useResolution.test.ts` | 12 | 12 |
 
-### `rig-look`: 16 files, 218 tests
+### `rig-look`: 20 files, 243 tests
 
 | File | Tests | Sites |
 | --- | --- | --- |
@@ -481,17 +481,21 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/rig-look/systems/drillTipLooks.test.ts` | 14 | 8 |
 | `src/features/rig-look/systems/engineLooks.test.ts` | 34 | 14 |
 | `src/features/rig-look/systems/groundGunItemParts.test.ts` | 7 | 7 |
+| `src/features/rig-look/systems/render/rigLookBands.test.ts` | 10 | 10 |
 | `src/features/rig-look/systems/render/rigLookFrames.test.ts` | 10 | 10 |
 | `src/features/rig-look/systems/render/rigLookIndex.test.ts` | 8 | 8 |
 | `src/features/rig-look/systems/render/rigLookParts.test.ts` | 9 | 9 |
 | `src/features/rig-look/systems/rigLookArt.test.ts` | 6 | 4 |
+| `src/features/rig-look/systems/rigLookBadges.test.ts` | 12 | 8 |
 | `src/features/rig-look/systems/rigLookBoiler.test.ts` | 9 | 7 |
+| `src/features/rig-look/systems/rigLookGlint.test.ts` | 6 | 6 |
 | `src/features/rig-look/systems/rigLookHull.test.ts` | 15 | 9 |
-| `src/features/rig-look/systems/rigLookPlanets.test.ts` | 10 | 10 |
-| `src/features/rig-look/systems/rigLookPlaque.test.ts` | 43 | 23 |
+| `src/features/rig-look/systems/rigLookLines.test.ts` | 11 | 7 |
+| `src/features/rig-look/systems/rigLookPlanets.test.ts` | 4 | 4 |
+| `src/features/rig-look/systems/rigLookPlaque.test.ts` | 28 | 12 |
 | `src/features/rig-look/systems/rigLookReadability.test.ts` | 2 | 2 |
 | `src/features/rig-look/systems/rigLookSource.test.ts` | 13 | 13 |
-| `src/features/rig-look/systems/rigLookTable.test.ts` | 25 | 25 |
+| `src/features/rig-look/systems/rigLookTable.test.ts` | 32 | 32 |
 
 ### `roster`: 22 files, 382 tests
 
@@ -1366,7 +1370,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/render/enemyPlaceholder.test.ts` | 7 | 3 |
 | `src/systems/render/enemyTint.test.ts` | 5 | 5 |
 | `src/systems/render/frameWindow.test.ts` | 4 | 4 |
-| `src/systems/render/fuelTenderLook.test.ts` | 10 | 10 |
+| `src/systems/render/fuelTenderLook.test.ts` | 13 | 13 |
 | `src/systems/render/fuelTenderLookSource.test.ts` | 4 | 4 |
 | `src/systems/render/gatePatterns.test.ts` | 10 | 10 |
 | `src/systems/render/gemGlint.test.ts` | 15 | 15 |
