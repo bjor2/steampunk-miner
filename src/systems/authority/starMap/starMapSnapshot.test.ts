@@ -65,7 +65,7 @@ describe('star map snapshot (ticket 755)', () => {
     }
   })
 
-  it('has no generated world in a later system until the jump drive seeds it (ticket 759)', () => {
+  it('has no world at a campaign index the later system does not hold (ticket 759)', () => {
     const start = createScriptedSession().state()
     const state = { ...start, planet: withSystem(start.planet, 2n) }
     const { events } = applyCommand(state, {

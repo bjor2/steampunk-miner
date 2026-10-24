@@ -9,17 +9,17 @@
  *
  * The planet's star-map system (ticket 755) is a canonical index text under `system`, absent in
  * system 1: system 1 is today's planet line, where `index` is the planet's place `p`, so every
- * save from before the star map is in system 1 and digests as before. The generator learns the
- * seeds of later systems with the jump between them (ticket 759); until then a planet there has no
- * generated world.
+ * save from before the star map is in system 1 and digests as before. Past system 1 `index` is the
+ * campaign index `g` (#781), and the jump between systems (ticket 759) generates the planet from
+ * its address (`starMap/systemPlanetParams.ts`); an index the system does not hold has no world.
  */
 import { FIRST_SYSTEM, readIndexText, toIndexText } from '../starMap/planetAddress'
+import { isPlanetOfSystem, planetParamsAt } from '../starMap/systemPlanetParams'
 import { dockSiteOf, type DockSite } from '../world/dockSite'
 import { rejectionOf, type Rejection } from './commandRule'
 import {
   isKnownOreRulesVersion,
   oreRulesVersionOnEntry,
-  planetParamsFor,
   type PlanetParams,
 } from '../world/planetParams'
 
@@ -72,15 +72,24 @@ let lastParams: PlanetParams | null = null
 export function planetParamsOf(planet: SessionPlanet): PlanetParams | null {
   if (!isGeneratablePlanet(planet)) return null
   if (lastParams === null || !isPlanetOfParams(planet, lastParams)) {
-    lastParams = planetParamsFor(planet.seed, planet.index, planet.oreRulesVersion)
+    lastParams = planetParamsAt(
+      planet.seed,
+      systemOfPlanet(planet),
+      planet.index,
+      planet.oreRulesVersion,
+    )
   }
   return lastParams
 }
 
-/** The one-slot cache's key: a legacy and a stamped planet of one seed and index differ. */
+/**
+ * The one-slot cache's key: a legacy and a stamped planet of one seed and index differ, and so do
+ * two systems' planets of one index (ticket 759).
+ */
 function isPlanetOfParams(planet: SessionPlanet, params: PlanetParams): boolean {
   const isSamePlace = params.worldSeed === planet.seed && params.planetIndex === planet.index
-  return isSamePlace && params.oreRulesVersion === planet.oreRulesVersion
+  const isSameSystem = params.system === planet.system
+  return isSamePlace && isSameSystem && params.oreRulesVersion === planet.oreRulesVersion
 }
 
 export function dockSiteOfPlanet(planet: SessionPlanet): DockSite | null {
@@ -95,9 +104,9 @@ function isGeneratablePlanet(planet: SessionPlanet): boolean {
   return isUint32Seed && isIndex && isRules && isInGeneratedSystem(planet)
 }
 
-/** Only system 1 is generated until the jump between systems (ticket 759) seeds the others. */
+/** A later system holds the campaign indexes past its systems before (ticket 759). */
 function isInGeneratedSystem(planet: SessionPlanet): boolean {
-  return planet.system === undefined
+  return isPlanetOfSystem(systemOfPlanet(planet), planet.index)
 }
 
 /** Vehicle commands need a world to act in. */

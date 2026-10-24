@@ -9,6 +9,7 @@
 import { blockHardness } from '../economy/oreEconomy'
 import type { BigStat } from '../money'
 import { MM_PER_METRE } from '../../constants/physics'
+import { groundHardnessInSystem } from '../starMap/systemPlanetParams'
 import { bandOfTile } from '../world/planetGeometry'
 import type { PlanetParams } from '../world/planetParams'
 import type { TilePoint } from '../world/tileGrid'
@@ -36,8 +37,10 @@ export function bandRockHardnessOf(
 
 /**
  * The nominal ground at `tile`: its band's rock, never the cell's own hardness, so the surface
- * layer (ticket 625) that softens the top cells of a cut leaves the bounds where they were.
+ * layer (ticket 625) that softens the top cells of a cut leaves the bounds where they were. Past
+ * system 1 it takes the system jump's step, as the cells do (ticket 759).
  */
 export function bandRockHardnessAt(params: PlanetParams, tile: TilePoint): BigStat {
-  return blockHardness(params.planetIndex, bandOfTile(params, tile.tx, tile.ty))
+  const rock = blockHardness(params.planetIndex, bandOfTile(params, tile.tx, tile.ty))
+  return groundHardnessInSystem(params, rock)
 }

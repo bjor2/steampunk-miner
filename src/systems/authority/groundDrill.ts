@@ -52,6 +52,7 @@ import type { YieldedCell } from '../world/cellYield'
 import { bandOfTile } from '../world/planetGeometry'
 import type { PlanetParams } from '../world/planetParams'
 import { surfaceRockHardnessAt } from '../world/surfaceLayer'
+import { groundHardnessInSystem } from '../starMap/systemPlanetParams'
 import type { TilePoint } from '../world/tileGrid'
 import { CELL_KIND, kindOfCell } from '../world/worldCell'
 import { materialCellAt, type WorldState } from '../world/worldState'
@@ -263,9 +264,14 @@ export function drillAtPose(
  * Hardness is looked up, never stored in the cell (#4, #6): ore by its own tier, so a lead cell
  * (#140) is as hard as its tier (#223) and a signature as five tiers up (`signatureCells.ts`),
  * core by the planet, the rest by its band, softened near the surface by the pinned surface
- * layer and its ramp (ticket 625, `surfaceLayer.ts`).
+ * layer and its ramp (ticket 625, `surfaceLayer.ts`). Past system 1 all of it takes the system
+ * jump's step (ticket 759, `starMap/systemPlanetParams.ts`).
  */
 export function hardnessOfTile(params: PlanetParams, tile: TilePoint, cell: number): BigStat {
+  return groundHardnessInSystem(params, systemOneHardnessOf(params, tile, cell))
+}
+
+function systemOneHardnessOf(params: PlanetParams, tile: TilePoint, cell: number): BigStat {
   const kind = kindOfCell(cell)
   if (kind === CELL_KIND.core) return coreHardness(params.planetIndex)
   if (kind === CELL_KIND.ore) return oreCellHardness(params, tile, cell)
@@ -445,7 +451,12 @@ export function drillSubStepsOfCells(
   return (tile, material, casingGrade) =>
     casingGrade === 0
       ? shockedSubStepsPerCell({ drill, quantum }, params, tile, material, shockTicksAt)
-      : subStepsPerTileAt(quantum, drill, casingHardness(params.planetIndex, casingGrade))
+      : subStepsPerTileAt(quantum, drill, liningHardnessOn(params, casingGrade))
+}
+
+/** Lining re-drills as band-G rock of its grade on this planet, in its system (ticket 759). */
+function liningHardnessOn(params: PlanetParams, casingGrade: number): BigStat {
+  return groundHardnessInSystem(params, casingHardness(params.planetIndex, casingGrade))
 }
 
 /** A drill timed in a quantum. */
@@ -480,7 +491,7 @@ export function drillTicksOfCells(
   return (tile, material, casingGrade) =>
     casingGrade === 0
       ? shockedTicksPerCell(drill, params, tile, material, shockTicksAt)
-      : ticksPerTile(drill, casingHardness(params.planetIndex, casingGrade))
+      : ticksPerTile(drill, liningHardnessOn(params, casingGrade))
 }
 
 /** Who collects a carve's opened cells, and the gates and gear shares they are read with. */

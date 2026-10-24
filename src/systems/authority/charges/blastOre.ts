@@ -17,6 +17,7 @@
  */
 import { hashCell } from '../../cellRandom'
 import { blastHardnessCap, keptBlastOreUnits } from '../../economy/blastingCharges'
+import { groundHardnessInSystem } from '../../starMap/systemPlanetParams'
 import { chargeReachTiles, isInChargeRadius } from '../../economy/chargeSizes'
 import { oreSalePrice } from '../../economy/oreEconomy'
 import { add, cmp, div, fromSafeInteger, mul, ZERO_MONEY, type Money } from '../../money'
@@ -148,7 +149,8 @@ function isBreakableOn(params: PlanetParams, gateOf: BlastGateOf): IsBlastBreaka
 }
 
 function isBreakableRockOn(params: PlanetParams): IsBlastBreakable {
-  const cap = blastHardnessCap(params.planetIndex)
+  // The cap is the planet's band-5 rock, so it takes the system jump's step with it (ticket 759).
+  const cap = groundHardnessInSystem(params, blastHardnessCap(params.planetIndex))
   return (tile, material) =>
     isRemovableCell(material) &&
     kindOfCell(material) !== CELL_KIND.core &&

@@ -102,6 +102,12 @@ export interface PlanetParams {
    * the lattice is laid on `oreDensityBp` and every patch fires at `patchSeedChanceBp`.
    */
   patchLatticeDensityBp?: readonly number[]
+  /**
+   * The star-map system from 2 as canonical index text (ticket 759, `starMap/systemPlanetParams.ts`):
+   * its planet seed hashes the address, and its rock takes the system jump's step. Absent in system
+   * 1, so every system-1 planet's params stay byte-identical.
+   */
+  system?: string
 }
 
 /**
@@ -315,14 +321,16 @@ export function freshPlanetParamsFor(worldSeed: number, planetIndex: number): Pl
 }
 
 /**
- * Whether two params generate the same cells: one seed, one index and one set of ore rules. A cache
- * keyed on the seed and index alone would hand a stamped planet the legacy planet's cells.
+ * Whether two params generate the same cells: one seed, one index, one set of ore rules and one
+ * system. A cache keyed on the seed and index alone would hand a stamped planet the legacy
+ * planet's cells, or a later system's planet the system-1 planet of the same index (ticket 759).
  */
 export function isSameGeneratedPlanet(a: PlanetParams, b: PlanetParams): boolean {
   return (
     a.worldSeed === b.worldSeed &&
     a.planetIndex === b.planetIndex &&
-    a.oreRulesVersion === b.oreRulesVersion
+    a.oreRulesVersion === b.oreRulesVersion &&
+    a.system === b.system
   )
 }
 
