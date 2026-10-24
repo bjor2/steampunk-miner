@@ -37,10 +37,12 @@ levels are this pass's choice:
 | `riveted-tender` | 3                     | a steel bunker framed in brass with two rivet rows, a banded copper water tank with a brass dome |
 | `guild-tender`   | 5                     | a guild-green enamel tender in a brass frame with ring filigree, twin coal bunkers, a lantern    |
 
-Above level 5 the tail (`fuelTender.json` `tail`) tints the guild tender one palette colour per
-purchase, cycling through six, painted as a glow of 0.35 on the wagon's slot through the kernel's
-vehicle look (`fuelTenderLookSource.ts`), under the rig body's cap of 1 so the drill nose stays the
-brightest part. The wagon itself has no emissive map.
+Above level 5 the log tail (`fuelTender.json` `tail`, ticket 809) wears the guild tender in the
+next of ten named finishes per purchase, painted as a glow of 0.35 in the finish's colour on the
+wagon's slot through the kernel's vehicle look (`fuelTenderLookSource.ts`), under the rig body's
+cap of 1 so the drill nose stays the brightest part, and the rig-look slice draws a finish badge
+with pips counting decades of tank capacity (9 levels a decade). The wagon itself has no emissive
+map.
 
 ## Files
 
