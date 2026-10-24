@@ -64,6 +64,20 @@ export const MM_PER_METRE = 1000
 export const DRIVE_PUSH_SHARE_MIN = 0.5
 
 /**
+ * The analog drive's full push (ticket 791): the intent's `moveX` runs -64..64, a key or a full
+ * stick push at either end. 64ths are exact in binary, so `moveX / 64` times a speed is the same
+ * double on every machine, and a key's push of 64 drives exactly as the old 1 did.
+ */
+export const DRIVE_PUSH_STEPS = 64
+
+/**
+ * The drill's aim is an integer angle in this many steps a turn (ticket 791, 1/64 turn = 5.625
+ * degrees), counter-clockwise from the vehicle's local right: right 0, up 16, left 32, down 48.
+ * Integer, so the authority, a replay and a guest turn it alike.
+ */
+export const AIM_STEPS_PER_TURN = 64
+
+/**
  * Tangential drive acceleration at the engine's 1.0x `accel` (#7 gives only the 1.0x to 1.8x
  * multiplier). A placeholder from the demo scene, tuned by hand in the vehicle feel test.
  */
