@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-10-25T00:48:25+02:00",
+  "updated_at": "2026-10-25T00:54:33+02:00",
   "caps": {
     "grok": 12,
     "claude": 10,
@@ -28,20 +28,20 @@
         },
         {
           "slot": "C2",
+          "state": "busy",
+          "ticket": 844,
+          "grok_slot": 2,
+          "kind": "dev",
+          "since": "2026-10-25T00:54:00+02:00",
+          "wave": "647-7S"
+        },
+        {
+          "slot": "C3",
           "state": "free",
           "ticket": null,
           "grok_slot": null,
           "kind": null,
           "since": null
-        },
-        {
-          "slot": "C3",
-          "state": "busy",
-          "ticket": 823,
-          "grok_slot": 3,
-          "kind": "dev",
-          "since": "2026-10-24T22:51:00+02:00",
-          "wave": "647-7S"
         },
         {
           "slot": "C4",
@@ -71,7 +71,7 @@
       "size": 6,
       "used": 2,
       "free": 4,
-      "claims_last_hour": 1,
+      "claims_last_hour": 2,
       "name": "Claude Max 1"
     },
     {
@@ -185,17 +185,17 @@
     },
     {
       "slot": 2,
-      "state": "free",
-      "ticket": null,
-      "since": null
+      "state": "dev",
+      "ticket": 844,
+      "since": "2026-10-25T00:54:00+02:00",
+      "claude_slot": 2,
+      "wave": "647-7S"
     },
     {
       "slot": 3,
-      "state": "dev",
-      "ticket": 823,
-      "since": "2026-10-24T22:51:00+02:00",
-      "claude_slot": 3,
-      "wave": "647-7S"
+      "state": "free",
+      "ticket": null,
+      "since": null
     },
     {
       "slot": 4,
@@ -264,20 +264,20 @@
     },
     {
       "slot": 2,
+      "state": "busy",
+      "ticket": 844,
+      "grok_slot": 2,
+      "since": "2026-10-25T00:54:00+02:00",
+      "account": 1,
+      "wave": "647-7S"
+    },
+    {
+      "slot": 3,
       "state": "free",
       "ticket": null,
       "grok_slot": null,
       "since": null,
       "account": 1
-    },
-    {
-      "slot": 3,
-      "state": "busy",
-      "ticket": 823,
-      "grok_slot": 3,
-      "since": "2026-10-24T22:51:00+02:00",
-      "account": 1,
-      "wave": "647-7S"
     },
     {
       "slot": 4,
@@ -341,11 +341,11 @@
     }
   ],
   "last_refill": {
-    "at": "2026-10-24 23:49 CEST",
+    "at": "2026-10-25 00:54 CEST",
     "mode": "refill-dev",
-    "triggers": "#813",
-    "started": "",
-    "note": "load guard (MemAvailable 2558 MB < 3072 MB)"
+    "triggers": "#823",
+    "started": "#844->C2/A1",
+    "note": "spawned 1 worker(s)"
   },
   "totals": {
     "grok": {
@@ -381,7 +381,9 @@
           848,
           849
         ],
-        "done": [],
+        "done": [
+          823
+        ],
         "live": 1
       },
       {
