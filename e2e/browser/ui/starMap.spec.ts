@@ -3,12 +3,17 @@
  * desktop, both first-class: one tap on the HUD's star map button (ticket 792) or one M opens it,
  * full screen on the phone and docked beside the view on desktop. Every planet of the system shows
  * its fuel cost, the tank's level and any shortfall, and a planet the player cannot afford is
- * dimmed, never dropped. The rows are judged against `ui.getStarMapModel()`; state through the DOM
- * and `steampunkDebug` only, never pixels.
+ * dimmed, never dropped. Since the carousel (ticket 796) one planet shows at a time, so the spec
+ * steps through them with Next from the planet the session is on. The cards are judged against
+ * `ui.getStarMapModel()`; state through the DOM and `steampunkDebug` only, never pixels.
  */
-import { expect, test, type Page } from '@playwright/test'
+import { expect, test, type Locator, type Page } from '@playwright/test'
 import type { StarMapView } from '../../../src/systems/views/starMapView'
-import { starMapPlanetIdOf, STAR_MAP_UI_IDS } from '../../../src/ui/starMap/starMapIds'
+import {
+  starMapDotIdOf,
+  starMapPlanetIdOf,
+  STAR_MAP_UI_IDS,
+} from '../../../src/ui/starMap/starMapIds'
 import { UI_IDS } from '../../../src/ui/ids'
 import { openGame, type HudLayoutCell } from '../hud/hudLayoutHelpers'
 import { undock } from './uiShotSheets'
@@ -45,7 +50,7 @@ test.describe(`star map (ticket 757): ${PHONE.name}`, () => {
     await page.getByTestId(UI_IDS.hudPhoneStarMapButton).tap()
     await expect(page.getByTestId(PANEL)).toBeVisible()
     await expect(page.getByTestId(PANEL)).toHaveAttribute('data-placement', 'full')
-    await expectRowsOfModel(page)
+    await expectRowsOfModel(page, (control) => control.tap())
     await page.locator(`[data-testid="${PANEL}"] [data-sheet-close]`).tap()
     await expect(page.getByTestId(PANEL)).toHaveCount(0)
     expect(errors).toEqual([])
@@ -65,7 +70,7 @@ test.describe(`star map (ticket 757): ${DESKTOP.name}`, () => {
     await page.keyboard.press('KeyM')
     await expect(page.getByTestId(PANEL)).toBeVisible()
     await expect(page.getByTestId(PANEL)).toHaveAttribute('data-placement', 'docked')
-    await expectRowsOfModel(page)
+    await expectRowsOfModel(page, (control) => control.click())
     expect(errors).toEqual([])
   })
 
@@ -79,6 +84,7 @@ test.describe(`star map (ticket 757): ${DESKTOP.name}`, () => {
     await page.keyboard.press('KeyM')
     const dimmed = (await readStarMap(page)).planets.find((planet) => planet.isDimmed)
     expect(dimmed, 'a fresh wallet cannot fuel the far end of the system').toBeDefined()
+    await page.getByTestId(starMapDotIdOf(dimmed!.place)).click()
     const far = page.getByTestId(starMapPlanetIdOf(dimmed!.place))
     await expect(far).toHaveAttribute('data-dimmed', 'true')
     await expect(far).toContainText(dimmed!.fuel!.text)
@@ -88,12 +94,16 @@ test.describe(`star map (ticket 757): ${DESKTOP.name}`, () => {
   })
 })
 
-/** Every planet the model lists has its row, its here and dimmed marks and its numbers. */
-async function expectRowsOfModel(page: Page): Promise<void> {
+/**
+ * Every planet the model lists has its card, its here and dimmed marks and its numbers, shown in
+ * turn from the session's planet (the first) by Next.
+ */
+async function expectRowsOfModel(page: Page, press: (control: Locator) => Promise<void>) {
   const map = await readStarMap(page)
   await expect(page.getByTestId(STAR_MAP_UI_IDS.starMapTank)).toContainText(map.tank.held.text)
   await expect(page.getByTestId(STAR_MAP_UI_IDS.starMapTank)).toContainText(map.tank.capacity.text)
-  for (const planet of map.planets) {
+  for (const [index, planet] of map.planets.entries()) {
+    if (index > 0) await press(page.getByTestId(STAR_MAP_UI_IDS.starMapNext))
     const row = page.getByTestId(starMapPlanetIdOf(planet.place))
     await expect(row).toContainText(planet.name)
     await expect(row).toContainText(planet.line)

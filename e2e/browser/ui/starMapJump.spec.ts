@@ -4,7 +4,8 @@
  * shortfall, jumps with two presses and has control on the new planet within 2 s, from P2 to P3,
  * P3 to P4 and P4 to P5. No "End of the slice" renders at P2, P3 or P5 with the core complete, and
  * a planet the wallet cannot fuel stays on the map dimmed with its shortfall, its Jump refused on
- * the screen with no command sent. The goldens (#793) are the open map with its Jumps and Buy fuel
+ * the screen with no command sent. Since the carousel (ticket 796) each hop first shows its planet
+ * by its dot on the system strip. The goldens (#793) are the open map on P3's Jump and Buy fuel
  * on the four reference phones (#484's cells) and on desktop, each control at least 48 px; written
  * to `docs/ui/screens/<cell>/star-map-jump.jpg` under `npm run ui:screens:update`, never compared.
  * The phones' tapped run is `e2e/browser/mobile/starMapJump.spec.ts`. State through the DOM and
@@ -25,6 +26,7 @@ import {
   openStarMapFromTheBay,
   PRESS_AND_FRAME_SLACK_MS,
   seedPlanetTwoAtTheSellBay,
+  showPlanetOnTheStrip,
   TAP,
 } from '../starMapJumps'
 
@@ -97,6 +99,7 @@ test.describe(`star map jumps (ticket 793): ${DESKTOP.name}`, () => {
     await openStarMapFromTheBay(page, CLICK)
     const dimmed = (await readStarMap(page)).planets.find((planet) => planet.isDimmed)
     expect(dimmed, 'an empty wallet cannot fuel the far end of the system').toBeDefined()
+    await showPlanetOnTheStrip(page, dimmed!.place, CLICK)
     const row = page.getByTestId(starMapPlanetIdOf(dimmed!.place))
     await expect(row).toHaveAttribute('data-dimmed', 'true')
     await expect(row).toContainText(/short \d+/)
@@ -119,13 +122,16 @@ for (const cell of [...PHONES, DESKTOP]) {
       deviceScaleFactor: 1,
     })
 
-    test('draws the open map with every Jump and Buy fuel, each control at least 48 px', async ({
+    test('draws the open map with the shown Jump and Buy fuel, each control at least 48 px', async ({
       page,
     }) => {
       test.setTimeout(TEST_TIMEOUT_MS)
       const errors = await openPlainGame(page, cell)
       await seedPlanetTwoAtTheSellBay(page)
-      await openStarMapFromTheBay(page, cell.isTouch ? TAP : CLICK)
+      const press = cell.isTouch ? TAP : CLICK
+      await openStarMapFromTheBay(page, press)
+      // Ticket 796: the carousel opens on P2, which has no Jump; P3 shows its Jump and Buy fuel.
+      await showPlanetOnTheStrip(page, 3, press)
       await shoot(page, cell, 'star-map-jump')
       const controls = await readControls(page)
       expect(controls.buttons.length).toBeGreaterThan(controls.planets.length)

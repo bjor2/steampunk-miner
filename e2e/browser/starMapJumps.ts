@@ -1,7 +1,8 @@
 /**
  * The star map's jumps as a player makes them (ticket 793), shared by the desktop and phone specs:
  * a fresh save seeded through `steampunkDebug` to planet 2 with money and docked at the Sell bay,
- * then for each hop the bay footer's Star map, the destination row's Buy fuel and its Jump pressed
+ * then for each hop the bay footer's Star map, the destination's dot on the system strip (the
+ * carousel of ticket 796 draws only the shown planet's controls), its Buy fuel and its Jump pressed
  * twice, timed from the confirming press until the travel card is gone and the bay screen is back
  * on the new planet (#650 Map UX: at most 2 s from confirming to control). `press` is a click on
  * desktop and a tap on a phone. State through the DOM and the debug API, never pixels.
@@ -9,7 +10,7 @@
 import { expect, type Locator, type Page } from '@playwright/test'
 import { UI_IDS } from '../../src/ui/ids'
 import { starMapBuyFuelIdOf, starMapJumpIdOf } from '../../src/systems/views/starMapControlIds'
-import { STAR_MAP_UI_IDS } from '../../src/ui/starMap/starMapIds'
+import { starMapDotIdOf, starMapPlanetIdOf, STAR_MAP_UI_IDS } from '../../src/ui/starMap/starMapIds'
 import { dockAt } from './screens/screenHelpers'
 
 /** How a finger or a mouse presses a control. */
@@ -47,11 +48,18 @@ export async function openStarMapFromTheBay(page: Page, press: Press): Promise<v
   await expect(page.getByTestId(STAR_MAP_UI_IDS.starMapPanel)).toBeVisible()
 }
 
+/** The planet's dot on the system strip, pressed: the carousel shows it (ticket 796). */
+export async function showPlanetOnTheStrip(page: Page, place: number, press: Press): Promise<void> {
+  await press(page.getByTestId(starMapDotIdOf(place)))
+  await expect(page.getByTestId(starMapPlanetIdOf(place))).toBeVisible()
+}
+
 /**
- * Buys the destination's fuel shortfall and jumps there with two presses; answers the milliseconds
- * from the confirming press to control on the new planet.
+ * Shows the destination, buys its fuel shortfall and jumps there with two presses; answers the
+ * milliseconds from the confirming press to control on the new planet.
  */
 export async function buyFuelAndJumpTo(page: Page, place: number, press: Press): Promise<number> {
+  await showPlanetOnTheStrip(page, place, press)
   await press(page.getByTestId(starMapBuyFuelIdOf(place)))
   const jump = page.getByTestId(starMapJumpIdOf(place))
   await expect(jump).not.toHaveAttribute('data-reason', /.+/)
@@ -64,7 +72,7 @@ export async function buyFuelAndJumpTo(page: Page, place: number, press: Press):
 }
 
 /** The travel card gone and the Sell bay's screen open on `planet`: the player has the rig. */
-async function waitForControlOn(page: Page, planet: number): Promise<void> {
+export async function waitForControlOn(page: Page, planet: number): Promise<void> {
   await page.waitForFunction(
     ({ planet: expected, title }) => {
       const debug = window.steampunkDebug!

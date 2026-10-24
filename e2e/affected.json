@@ -907,7 +907,11 @@
         "src/ui/sheet/SheetDock*",
         "src/ui/starMap/**"
       ],
-      "specs": ["e2e/browser/ui/desktopStarMap.spec.ts", "e2e/browser/ui/starMap.spec.ts"]
+      "specs": [
+        "e2e/browser/ui/desktopStarMap.spec.ts",
+        "e2e/browser/ui/starMap.spec.ts",
+        "e2e/browser/ui/starMapEntry.spec.ts"
+      ]
     },
     {
       "why": "The star map UI (ticket 757): its rows from the star map view, the phone's one-tap button in the touch cluster, and the store and debug reads the spec judges the rows by.",
@@ -936,6 +940,36 @@
         "e2e/browser/starMapJumps.ts"
       ],
       "specs": ["e2e/browser/ui/starMapJump.spec.ts", "e2e/browser/mobile/starMapJump.spec.ts"]
+    },
+    {
+      "why": "The star map carousel (ticket 796): one planet at a time with Next, Previous, a swipe, the arrow keys at a bay and a click or tap on the system strip, the strip panning toward the shown planet (a cut under reduced motion), Jump on a shown planet after the confirm, an unaffordable planet dimmed and never skipped, and the goldens at P1, P3 and P5 on the four reference phones and desktop.",
+      "paths": [
+        "src/systems/views/starMapCarousel.ts",
+        "src/systems/views/starMapView.ts",
+        "src/systems/views/starMapControls.ts",
+        "src/systems/art/starMapCarouselArt.ts",
+        "src/systems/art/starMapCarouselImages.ts",
+        "src/systems/art/uiArt.ts",
+        "src/constants/starMapCarousel.ts",
+        "src/data/design/starMapCarouselArt.json",
+        "src/store/starMapCarouselSlice.ts",
+        "src/store/starMapSlice.ts",
+        "src/store/screenReads.ts",
+        "src/systems/input/inputRouting.ts",
+        "src/ui/starMap/**",
+        "src/ui/useScreenModel.ts",
+        "src/debug/debugScreens.ts",
+        "public/assets/ui/ui-star-map-*/**",
+        "e2e/browser/starMapCarousel.ts",
+        "e2e/browser/starMapJumps.ts"
+      ],
+      "specs": [
+        "e2e/browser/ui/starMapCarousel.spec.ts",
+        "e2e/browser/mobile/starMapCarousel.spec.ts",
+        "e2e/browser/ui/starMap.spec.ts",
+        "e2e/browser/ui/starMapJump.spec.ts",
+        "e2e/browser/mobile/starMapJump.spec.ts"
+      ]
     },
     {
       "why": "The desktop brass art pass (ticket 770): the docked sheet in the dock rail frame and the gauge cluster in its rail frame on desktop, the phone's glass and sheet frames as before, and the strip and the docked sheet held through the NEW MATERIAL plaque cycle and on P40.",
