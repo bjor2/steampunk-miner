@@ -4,7 +4,8 @@
  * and 1e6, at each authored edge and one either side, and on its first finish band, at 360 px and
  * at desktop size and attached for review; at 360 px and at 1280 px the slot's crop differs across
  * every band edge to the last authored one and the first 20 finish bands past it (Progression: two
- * neighbouring bands never match); and with every line maxed (a million purchases, pips and all)
+ * neighbouring bands never match); and with every line maxed (a million purchases, or P40 where
+ * the game cannot hold a million, pips and all)
  * the threat markers, the strip's pips and the collapse warning are still drawn as at the bare rig
  * at 360 px, 1280 x 800 and 1920 x 1080, and zoomed out on the desktop.
  *
@@ -60,8 +61,17 @@ const MAXED_VIEWS = [
 const GOLDEN_COUNTS = [0, 1, 10, 99, 9_999, 1_000_000]
 /** Finish bands past the last authored edge each crop must tell apart. */
 const FINISH_BANDS = 20
-/** Every line maxed: a million purchases, far past any authored edge. */
-const MAXED_PURCHASES = 1_000_000
+/**
+ * Every line maxed: a million purchases where the game can hold them, else the last authored edge
+ * (about P40): the engine's, the boiler's and the hold's whole stats leave the safe integers long
+ * before a million (`setUpgrade` throws), as the cargo hold spec notes.
+ */
+const MILLION_LINES: readonly string[] = ['drill_power', 'drill_tip', 'hull']
+function maxedPurchasesOf(rows: TrackRows): number {
+  return MILLION_LINES.includes(rows.track)
+    ? 1_000_000
+    : rows.band.edges[rows.band.edges.length - 1]
+}
 /**
  * One visible step at 360 px (#157: Δ is one visible step): at least 16 pixels, a 4 x 4 patch,
  * each moved by at least 24 of 255 on some channel. Fixed here, never tuned to pass.
@@ -85,11 +95,15 @@ function topOf(rows: TrackRows): number {
   return rows.steps[rows.steps.length - 1].from
 }
 
-/** The golden counts, each authored edge and one either side, and the first finish band. */
+/**
+ * The golden counts the game can hold, each authored edge and one either side, and the first
+ * finish band (the unit golden, rigLookLines.test.ts, pins every count of every line).
+ */
 function shotCountsOf(rows: TrackRows): number[] {
   const edges = rows.steps.flatMap((step) => [step.from - 1, step.from, step.from + 1])
   const counts = [...GOLDEN_COUNTS, ...edges, topOf(rows) + rows.band.step]
-  return [...new Set(counts)].sort((a, b) => a - b)
+  const reachable = counts.filter((n) => n <= maxedPurchasesOf(rows))
+  return [...new Set(reachable)].sort((a, b) => a - b)
 }
 
 /** `[n - 1, n]` across every band edge to the last authored one, then 20 finish bands on. */
@@ -313,13 +327,13 @@ async function redrawnWarningsOf(page: Page, bare: readonly WarningShot[]): Prom
 
 /** Every line maxed at once, then one held run: the collapse warning lasts only 60 ticks. */
 async function showMaxedLooks(page: Page): Promise<void> {
-  for (const rows of TRACKS) await setUpgrade(page, rows.track, MAXED_PURCHASES)
+  for (const rows of TRACKS) await setUpgrade(page, rows.track, maxedPurchasesOf(rows))
   await expect
     .poll(async () => {
       await page.clock.runFor(FRAME_RUN_MS)
       return Promise.all(TRACKS.map((rows) => lookPurchasesOf(page, rows.track)))
     })
-    .toEqual(TRACKS.map(() => MAXED_PURCHASES))
+    .toEqual(TRACKS.map(maxedPurchasesOf))
 }
 
 test.describe('rig look sweep (tickets 590, 809)', () => {
