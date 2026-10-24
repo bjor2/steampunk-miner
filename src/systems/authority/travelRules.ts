@@ -7,9 +7,10 @@
  * bay; otherwise it is refused with `not_docked`, `not_next_planet` or `core_short` and nothing
  * changes. Money never refuses it (ticket 648): the hop costs the clamped fee `travelChargeOf`,
  * reduced or free when the wallet is short. It spends exactly that charge and exactly `coreNeeded`
- * fragments (surplus stays banked), moves the session to the new planet's
- * dock site, and logs `travel_started`, `planet_unlocked`, a `feature_unlocked` per schedule row
- * opened on arrival (#88), `planet_entered`, `artefact_cache_spawned` (#46) and a `travel` digest.
+ * fragments (the surplus stays in the left planet's bay, ticket 790: the new planet's bay starts
+ * empty, `planetCoreBays.ts`), moves the session to the new planet's dock site, and logs
+ * `travel_started`, `planet_unlocked`, a `feature_unlocked` per schedule row opened on arrival
+ * (#88), `planet_entered`, `artefact_cache_spawned` (#46) and a `travel` digest.
  */
 import { planetPriceRow } from '../economy/economyTables'
 import { travelChargeOf } from '../economy/travelCharge'

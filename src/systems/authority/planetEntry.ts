@@ -1,7 +1,11 @@
 /**
  * Moving the session onto another planet (decisions #10 and #4): another planet is another world.
- * Its deltas start empty, its core progress, enemies, collapses, lava, bores, struts and grounded lines start fresh, and every vehicle stands on its dock
- * site, its drill's gated bite over (ticket 519) and its report cut's carry dropped (ticket 535). An item on auto stays on, its preview dropped (ticket 317). The vehicles keep their levels, energy, hull and cargo; the platform keeps its bay and look.
+ * Its deltas start empty, its core progress, enemies, collapses, lava, bores, struts and grounded
+ * lines start fresh, and every vehicle stands on its dock site, its drill's gated bite over (ticket
+ * 519) and its report cut's carry dropped (ticket 535). An item on auto stays on, its preview
+ * dropped (ticket 317). The vehicles keep their levels, energy, hull and cargo; the platform keeps
+ * its look, and its core bay becomes the new planet's own (ticket 790, `planetCoreBays.ts`), the
+ * left planet's bay stowed under that planet and a core completed there before landing completed.
  * A charge still on a wall stays on the old planet's wall: it is gone, and the rack keeps the rest.
  * `Travel`, the star map's jump (ticket 755) and `debug.setPlanet` all go through here; the planet
  * keeps the star-map system it is moved to.
@@ -30,8 +34,8 @@ import { NO_STRUTS, withStruts } from './bore/strutState'
 import { NO_GROUNDED_LINES, withGroundedLines } from './magnetic/groundedLines'
 import { playerOnNewPlanet } from './autoMode/autoModeState'
 import { combatOnNewPlanet } from './combat/enemyRoster'
-import { NEW_CORE_PROGRESS } from './coreProgress'
 import type { DomainEventBodies } from './domainEvent'
+import { coreBaysOnLanding } from './planetCoreBays'
 import {
   dockSiteOfPlanet,
   enteredPlanetOf,
@@ -59,9 +63,9 @@ export function withSessionOnPlanet(state: AuthorityState, to: SessionPlanet): A
   )
   return {
     ...withGroundedLines(withStruts(withBores(state, NO_BORES), NO_STRUTS), NO_GROUNDED_LINES),
+    ...coreBaysOnLanding(state, planet),
     planet,
     world: EMPTY_WORLD,
-    core: NEW_CORE_PROGRESS,
     combat: combatOnNewPlanet(state.combat),
     collapse: NO_COLLAPSE,
     lava: NO_LOOSE_LAVA,

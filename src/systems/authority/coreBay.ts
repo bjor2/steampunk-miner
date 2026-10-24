@@ -3,7 +3,8 @@
  * move into the bay when it docks and when the tow brings it home, so core is never lost. When the
  * bay first holds `coreNeeded` fragments the platform shows its `core_drive` (#23 acceptance 8,
  * not when the first core tile breaks), once for the run. Reaching `coreNeeded` also completes the
- * core of the planet the session is on (`core_completed`), once per planet.
+ * core of the planet the session is on (`core_completed`), once per planet: the bay is that
+ * planet's own (ticket 790), and a planet whose core completed lands completed (`planetCoreBays.ts`).
  */
 import { coreFragmentsNeeded } from '../economy/planetEconomy'
 import { coreTileCount } from '../world/planetGeometry'

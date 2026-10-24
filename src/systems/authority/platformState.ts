@@ -5,6 +5,7 @@
  * fragments travel needs and stays for the rest of the run. Facilities have no levels (#8).
  * The Refinery bay's slots (#105) travel with the platform; they are used from its unlock planet.
  */
+import type { AwayCoreBays } from './planetCoreBays'
 import { newRefinerySlots, type RefinerySlot } from './refinery/refineryBatch'
 
 export const PLATFORM_VISUAL_STATES = ['outpost', 'core_drive'] as const
@@ -32,7 +33,10 @@ export type PlatformBayId = (typeof PLATFORM_BAY_IDS)[number]
 export const REFINERY_BAY_LOOKS = ['idle', 'refining', 'ready'] as const
 
 export interface PlatformState {
+  /** The bay of the planet the session is on (ticket 790): fragments banked there alone. */
   coreBay: number
+  /** The bays of the planets the session has left, by `s:p` (`planetCoreBays.ts`); absent while none. */
+  awayCoreBays?: AwayCoreBays
   visualState: PlatformVisualState
   refinerySlots: readonly RefinerySlot[]
 }

@@ -54,6 +54,7 @@ import { heldArtefactProblems, type HeldArtefact } from './heldArtefact'
 import { isJsonObject, isWholeNumber } from './payloadFields'
 import { isPortableSystem, systemOfPlanet, withSystem, type SessionPlanet } from './planetOfState'
 import { isKnownOreRulesVersion } from '../world/planetParams'
+import { awayCoreBaysProblems, copyAwayCoreBays, withAwayCoreBays } from './planetCoreBays'
 import { isPlatformVisualState, type PlatformState } from './platformState'
 import { copyRefinerySlots, refinerySlotsProblems } from './refinery/refineryBatch'
 import {
@@ -365,11 +366,15 @@ function platformProblems(platform: unknown): string[] {
     isWholeNumber(platform.coreBay) &&
     isPlatformVisualState(platform.visualState)
   if (!isValid) return ['snapshot.state.platform must hold a whole coreBay and a visual state']
-  return refinerySlotsProblems(platform.refinerySlots, 'snapshot.state.platform.refinerySlots')
+  return [
+    ...refinerySlotsProblems(platform.refinerySlots, 'snapshot.state.platform.refinerySlots'),
+    ...awayCoreBaysProblems(platform.awayCoreBays, 'snapshot.state.platform.awayCoreBays'),
+  ]
 }
 
 function copyPlatform(platform: PlatformState): PlatformState {
-  return { ...platform, refinerySlots: copyRefinerySlots(platform.refinerySlots) }
+  const copied = { ...platform, refinerySlots: copyRefinerySlots(platform.refinerySlots) }
+  return withAwayCoreBays(copied, copyAwayCoreBays(platform.awayCoreBays ?? {}))
 }
 
 function playersProblems(players: unknown): string[] {

@@ -29,10 +29,13 @@ function dockedWith(fragments: number, money = '1000') {
 }
 
 describe('travel', () => {
-  it('leaves 7 of 70 fragments, takes exactly the fee and lands on planet 2', () => {
+  it('leaves 7 of 70 fragments in planet 1 bay, takes exactly the fee and lands on planet 2 with its bay empty', () => {
     const session = dockedWith(70, '1e4')
     const events = session.submit(10, travelTo(2))
-    expect(session.state().platform.coreBay).toBe(7)
+    expect(session.state().platform.coreBay).toBe(0)
+    expect(session.state().platform.awayCoreBays).toEqual({
+      '1:1': { fragments: 7, isCompleted: true },
+    })
     expect(toCanonical(session.state().players.p1.wallet)).toBe(
       toCanonical(sub(fromCanonical('1e4'), travelFee(1))),
     )
