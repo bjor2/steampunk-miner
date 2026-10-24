@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-10-24T14:21:21+02:00",
+  "updated_at": "2026-10-24T14:26:52+02:00",
   "caps": {
     "grok": 12,
     "claude": 10,
@@ -84,11 +84,11 @@
         {
           "slot": "C7",
           "state": "busy",
-          "ticket": 791,
+          "ticket": 807,
           "grok_slot": 3,
           "kind": "dev",
-          "since": "2026-10-24T11:39:00+02:00",
-          "wave": "647-7B"
+          "since": "2026-10-24T14:26:00+02:00",
+          "wave": "647-7G"
         },
         {
           "slot": "C8",
@@ -118,7 +118,7 @@
       "size": 4,
       "used": 1,
       "free": 3,
-      "claims_last_hour": 0,
+      "claims_last_hour": 1,
       "name": "Claude Max 2"
     }
   ],
@@ -171,10 +171,10 @@
     {
       "slot": 3,
       "state": "dev",
-      "ticket": 791,
-      "since": "2026-10-24T11:39:00+02:00",
+      "ticket": 807,
+      "since": "2026-10-24T14:26:00+02:00",
       "claude_slot": 7,
-      "wave": "647-7B"
+      "wave": "647-7G"
     },
     {
       "slot": 4,
@@ -285,11 +285,11 @@
     {
       "slot": 7,
       "state": "busy",
-      "ticket": 791,
+      "ticket": 807,
       "grok_slot": 3,
-      "since": "2026-10-24T11:39:00+02:00",
+      "since": "2026-10-24T14:26:00+02:00",
       "account": 2,
-      "wave": "647-7B"
+      "wave": "647-7G"
     },
     {
       "slot": 8,
@@ -317,10 +317,10 @@
     }
   ],
   "last_refill": {
-    "at": "2026-10-24 14:21 CEST",
+    "at": "2026-10-24 14:26 CEST",
     "mode": "refill-dev",
-    "triggers": "#777",
-    "started": "#779->C2/A1",
+    "triggers": "#791",
+    "started": "#807->C7/A2",
     "note": "spawned 1 worker(s)"
   },
   "totals": {
@@ -345,6 +345,19 @@
     "parallel": 1,
     "list": [
       {
+        "number": 808,
+        "key": "647-7G",
+        "map": 647,
+        "lane": "remote",
+        "mode": "solo",
+        "state": "running",
+        "tickets": [
+          807
+        ],
+        "done": [],
+        "live": 1
+      },
+      {
         "number": 799,
         "key": "647-7D",
         "map": 647,
@@ -355,19 +368,6 @@
           793,
           795,
           796
-        ],
-        "done": [],
-        "live": 1
-      },
-      {
-        "number": 797,
-        "key": "647-7B",
-        "map": 647,
-        "lane": "remote",
-        "mode": "solo",
-        "state": "running",
-        "tickets": [
-          791
         ],
         "done": [],
         "live": 1
@@ -387,7 +387,7 @@
       },
       {
         "number": 766,
-        "key": "647-7G",
+        "key": "647-7H",
         "map": 647,
         "lane": "hitl",
         "mode": "bench",
