@@ -1,0 +1,140 @@
+drill_power
+0: band 0 step 0 tail 0 pips 0 part null finish null tint null | null
+1: band 0 step 0 tail 0 pips 0 part null finish null tint null | null
+5: band 0 step 0 tail 0 pips 0 part null finish null tint null | null
+6: band 1 step 1 tail 0 pips 0 part null finish null tint #c8873a | null
+7: band 1 step 1 tail 0 pips 0 part null finish null tint #c8873a | null
+10: band 1 step 1 tail 0 pips 0 part null finish null tint #c8873a | null
+11: band 1 step 1 tail 0 pips 0 part null finish null tint #c8873a | null
+12: band 2 step 2 tail 0 pips 0 part null finish null tint #e8742a | null
+13: band 2 step 2 tail 0 pips 0 part null finish null tint #e8742a | null
+17: band 2 step 2 tail 0 pips 0 part null finish null tint #e8742a | null
+18: band 3 step 3 tail 0 pips 0 part null finish null tint #ff5a1f | null
+19: band 3 step 3 tail 0 pips 0 part null finish null tint #ff5a1f | null
+23: band 3 step 3 tail 0 pips 0 part null finish null tint #ff5a1f | null
+24: band 4 step 4 tail 0 pips 0 part null finish null tint #ffd27a | null
+25: band 4 step 4 tail 0 pips 0 part null finish null tint #ffd27a | null
+29: band 4 step 4 tail 0 pips 0 part null finish null tint #ffd27a | null
+30: band 5 step 5 tail 0 pips 0 part null finish null tint #5fd6c4 | null
+31: band 5 step 5 tail 0 pips 0 part null finish null tint #5fd6c4 | null
+35: band 5 step 5 tail 0 pips 0 part null finish null tint #5fd6c4 | null
+36: band 6 step 6 tail 0 pips 0 part null finish null tint #b07aff | null
+37: band 6 step 6 tail 0 pips 0 part null finish null tint #b07aff | null
+41: band 6 step 6 tail 0 pips 0 part null finish null tint #b07aff | null
+42: band 7 step 7 tail 0 pips 0 part null finish null tint #ff7ae0 | null
+43: band 7 step 7 tail 0 pips 0 part null finish null tint #ff7ae0 | null
+47: band 7 step 7 tail 0 pips 0 part null finish null tint #ff7ae0 | null
+48: band 8 step 8 tail 0 pips 0 part null finish null tint #f4f4ff | null
+49: band 8 step 8 tail 0 pips 0 part null finish null tint #f4f4ff | null
+53: band 8 step 8 tail 0 pips 0 part null finish null tint #f4f4ff | null
+54: band 9 step 9 tail 0 pips 0 part null finish null tint #ffe14a | null
+55: band 9 step 9 tail 0 pips 0 part null finish null tint #ffe14a | null
+60: band 10 step 9 tail 1 pips 5 part null finish gilt tint #f0c840 | null
+99: band 16 step 9 tail 7 pips 8 part null finish polished-chrome tint #e8eef4 | null
+9999: band 1666 step 9 tail 1657 pips 908 part null finish gilt tint #f0c840 | null
+1000000: band 166666 step 9 tail 166657 pips 90908 part null finish gilt tint #f0c840 | null
+
+drill_tip
+0: band 0 step 0 tail 0 pips 0 part null finish null tint null | null
+1: band 0 step 0 tail 0 pips 0 part null finish null tint null | null
+10: band 0 step 0 tail 0 pips 0 part null finish null tint null | null
+59: band 0 step 0 tail 0 pips 0 part null finish null tint null | null
+60: band 1 step 1 tail 0 pips 0 part steel-cone finish null tint #9fb4c8 | Fitting: Steel cone
+61: band 1 step 1 tail 0 pips 0 part steel-cone finish null tint #9fb4c8 | Fitting: Steel cone
+99: band 1 step 1 tail 0 pips 0 part steel-cone finish null tint #9fb4c8 | Fitting: Steel cone
+119: band 1 step 1 tail 0 pips 0 part steel-cone finish null tint #9fb4c8 | Fitting: Steel cone
+120: band 2 step 2 tail 0 pips 0 part fluted-bit finish null tint #7fd0ff | Fitting: Fluted bit
+121: band 2 step 2 tail 0 pips 0 part fluted-bit finish null tint #7fd0ff | Fitting: Fluted bit
+179: band 2 step 2 tail 0 pips 0 part fluted-bit finish null tint #7fd0ff | Fitting: Fluted bit
+180: band 3 step 3 tail 0 pips 0 part toothed-crown finish null tint #ffb347 | Fitting: Toothed crown
+181: band 3 step 3 tail 0 pips 0 part toothed-crown finish null tint #ffb347 | Fitting: Toothed crown
+239: band 3 step 3 tail 0 pips 0 part toothed-crown finish null tint #ffb347 | Fitting: Toothed crown
+240: band 4 step 4 tail 0 pips 0 part gem-set-crown finish null tint #d47aff | Fitting: Gem-set crown
+241: band 4 step 4 tail 0 pips 0 part gem-set-crown finish null tint #d47aff | Fitting: Gem-set crown
+299: band 4 step 4 tail 0 pips 0 part gem-set-crown finish null tint #d47aff | Fitting: Gem-set crown
+300: band 5 step 5 tail 0 pips 0 part aether-cut-crown finish null tint #7affd8 | Fitting: Aether-cut crown
+301: band 5 step 5 tail 0 pips 0 part aether-cut-crown finish null tint #7affd8 | Fitting: Aether-cut crown
+360: band 6 step 5 tail 1 pips 3 part aether-cut-crown finish nickel-plate tint #c8ccd0 | Fitting: Nickel plate · L360
+9999: band 166 step 5 tail 161 pips 90 part aether-cut-crown finish nickel-plate tint #c8ccd0 | Fitting: Nickel plate · L9,999
+1000000: band 16666 step 5 tail 16661 pips 9090 part aether-cut-crown finish nickel-plate tint #c8ccd0 | Fitting: Nickel plate · L1,000,000
+
+engine
+0: band 0 step 0 tail 0 pips 0 part null finish null tint null | null
+1: band 0 step 0 tail 0 pips 0 part null finish null tint null | null
+4: band 0 step 0 tail 0 pips 0 part null finish null tint null | null
+5: band 1 step 1 tail 0 pips 0 part iron-track finish null tint #d9a066 | Fitting: Single piston
+6: band 1 step 1 tail 0 pips 0 part iron-track finish null tint #d9a066 | Fitting: Single piston
+9: band 1 step 1 tail 0 pips 0 part iron-track finish null tint #d9a066 | Fitting: Single piston
+10: band 2 step 2 tail 0 pips 0 part steel-track finish null tint #ff8c42 | Fitting: Triple flywheel
+11: band 2 step 2 tail 0 pips 0 part steel-track finish null tint #ff8c42 | Fitting: Triple flywheel
+14: band 2 step 2 tail 0 pips 0 part steel-track finish null tint #ff8c42 | Fitting: Triple flywheel
+15: band 3 step 3 tail 0 pips 0 part guild-track finish null tint #6fd3ff | Fitting: Guild turbine
+16: band 3 step 3 tail 0 pips 0 part guild-track finish null tint #6fd3ff | Fitting: Guild turbine
+20: band 4 step 3 tail 1 pips 0 part guild-track finish bright-brass tint #d8b45a | Fitting: Bright brass · L20
+99: band 19 step 3 tail 16 pips 1 part guild-track finish verdigris tint #5fae94 | Fitting: Verdigris · L99
+9999: band 1999 step 3 tail 1996 pips 208 part guild-track finish verdigris tint #5fae94 | Fitting: Verdigris · L9,999
+1000000: band 200000 step 3 tail 199997 pips 20833 part guild-track finish gilt tint #f0c840 | Fitting: Gilt · L1,000,000
+
+boiler
+0: band 0 step 0 tail 0 pips 0 part null finish null tint null | null
+1: band 0 step 0 tail 0 pips 0 part null finish null tint null | null
+4: band 0 step 0 tail 0 pips 0 part null finish null tint null | null
+5: band 1 step 1 tail 0 pips 0 part twin-drum-boiler finish null tint #ff7a3a | Fitting: Twin-drum boiler
+6: band 1 step 1 tail 0 pips 0 part twin-drum-boiler finish null tint #ff7a3a | Fitting: Twin-drum boiler
+10: band 2 step 1 tail 1 pips 0 part twin-drum-boiler finish aged-copper tint #b06a3c | Fitting: Aged copper · L10
+99: band 19 step 1 tail 18 pips 3 part twin-drum-boiler finish polished-chrome tint #e8eef4 | Fitting: Polished chrome · L99
+9999: band 1999 step 1 tail 1998 pips 399 part twin-drum-boiler finish polished-chrome tint #e8eef4 | Fitting: Polished chrome · L9,999
+1000000: band 200000 step 1 tail 199999 pips 40000 part twin-drum-boiler finish aged-copper tint #b06a3c | Fitting: Aged copper · L1,000,000
+
+cargo_hold
+0: band 0 step 0 tail 0 pips 0 part null finish null tint null | null
+1: band 0 step 0 tail 0 pips 0 part null finish null tint null | null
+10: band 0 step 0 tail 0 pips 0 part null finish null tint null | null
+11: band 1 step 1 tail 0 pips 0 part plank-crate finish null tint #c89a5a | Fitting: Plank crate
+12: band 1 step 1 tail 0 pips 0 part plank-crate finish null tint #c89a5a | Fitting: Plank crate
+21: band 1 step 1 tail 0 pips 0 part plank-crate finish null tint #c89a5a | Fitting: Plank crate
+22: band 2 step 2 tail 0 pips 0 part ore-hopper finish null tint #e0c070 | Fitting: Ore hopper
+23: band 2 step 2 tail 0 pips 0 part ore-hopper finish null tint #e0c070 | Fitting: Ore hopper
+32: band 2 step 2 tail 0 pips 0 part ore-hopper finish null tint #e0c070 | Fitting: Ore hopper
+33: band 3 step 3 tail 0 pips 0 part riveted-bin finish null tint #9fd8ff | Fitting: Riveted bin
+34: band 3 step 3 tail 0 pips 0 part riveted-bin finish null tint #9fd8ff | Fitting: Riveted bin
+44: band 4 step 3 tail 1 pips 1 part riveted-bin finish burnished-iron tint #6e5a48 | Fitting: Burnished iron · L44
+99: band 9 step 3 tail 6 pips 3 part riveted-bin finish bright-brass tint #d8b45a | Fitting: Bright brass · L99
+9999: band 909 step 3 tail 906 pips 399 part riveted-bin finish bright-brass tint #d8b45a | Fitting: Bright brass · L9,999
+1000000: band 90909 step 3 tail 90906 pips 39999 part riveted-bin finish bright-brass tint #d8b45a | Fitting: Bright brass · L1,000,000
+
+hull
+0: band 0 step 0 tail 0 pips 0 part null finish null tint null | null
+1: band 0 step 0 tail 0 pips 0 part null finish null tint null | null
+10: band 0 step 0 tail 0 pips 0 part null finish null tint null | null
+99: band 0 step 0 tail 0 pips 0 part null finish null tint null | null
+119: band 0 step 0 tail 0 pips 0 part null finish null tint null | null
+120: band 1 step 1 tail 0 pips 0 part riveted-plate finish null tint #b8a088 | Fitting: Riveted plate
+121: band 1 step 1 tail 0 pips 0 part riveted-plate finish null tint #b8a088 | Fitting: Riveted plate
+239: band 1 step 1 tail 0 pips 0 part riveted-plate finish null tint #b8a088 | Fitting: Riveted plate
+240: band 2 step 2 tail 0 pips 0 part banded-iron finish null tint #8fa8c0 | Fitting: Banded iron
+241: band 2 step 2 tail 0 pips 0 part banded-iron finish null tint #8fa8c0 | Fitting: Banded iron
+359: band 2 step 2 tail 0 pips 0 part banded-iron finish null tint #8fa8c0 | Fitting: Banded iron
+360: band 3 step 3 tail 0 pips 0 part brass-trimmed-armour finish null tint #e0b050 | Fitting: Brass-trimmed armour
+361: band 3 step 3 tail 0 pips 0 part brass-trimmed-armour finish null tint #e0b050 | Fitting: Brass-trimmed armour
+479: band 3 step 3 tail 0 pips 0 part brass-trimmed-armour finish null tint #e0b050 | Fitting: Brass-trimmed armour
+480: band 4 step 4 tail 0 pips 0 part layered-armour finish null tint #a080d0 | Fitting: Layered armour
+481: band 4 step 4 tail 0 pips 0 part layered-armour finish null tint #a080d0 | Fitting: Layered armour
+599: band 4 step 4 tail 0 pips 0 part layered-armour finish null tint #a080d0 | Fitting: Layered armour
+600: band 5 step 5 tail 0 pips 0 part filigree-armour finish null tint #f0d8a0 | Fitting: Filigree armour
+601: band 5 step 5 tail 0 pips 0 part filigree-armour finish null tint #f0d8a0 | Fitting: Filigree armour
+720: band 6 step 5 tail 1 pips 3 part filigree-armour finish gunmetal tint #4c5258 | Fitting: Gunmetal · L720
+9999: band 83 step 5 tail 78 pips 47 part filigree-armour finish bright-brass tint #d8b45a | Fitting: Bright brass · L9,999
+1000000: band 8333 step 5 tail 8328 pips 4761 part filigree-armour finish aged-copper tint #b06a3c | Fitting: Aged copper · L1,000,000
+
+fuel_tank
+1: step 0 tail 0 pips 0 part coal-cart finish null
+2: step 1 tail 0 pips 0 part bunker-tender finish null
+3: step 2 tail 0 pips 0 part riveted-tender finish null
+4: step 2 tail 0 pips 0 part riveted-tender finish null
+5: step 3 tail 0 pips 0 part guild-tender finish null
+6: step 3 tail 1 pips 0 part guild-tender finish Bright brass
+10: step 3 tail 5 pips 1 part guild-tender finish Gunmetal
+99: step 3 tail 94 pips 10 part guild-tender finish Nickel plate
+9999: step 3 tail 9994 pips 1110 part guild-tender finish Nickel plate
+1000000: step 3 tail 999995 pips 111111 part guild-tender finish Gunmetal
