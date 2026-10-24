@@ -204,9 +204,10 @@ export const ZONE_TEST_MAX_MM = 65535
 export const DOCK_STATIONARY_MM_PER_SECOND = 50
 
 /**
- * The slice has two planets (#2 content budget); completing the core of the last one shows the
- * end-of-slice card (#2 done item 5, #24). Travel itself is not capped (#10: later planets use
- * the same formulas).
+ * The slice had two planets (#2 content budget). Only the pacing bot's slice run and its reports
+ * read this now (`playSlice.ts`, `pacingReport.ts`, `forkPace.ts`): the end-of-slice card and the
+ * bay footer's gate on it went with ticket 793, so a player travels on by the star map. Travel
+ * itself is not capped (#10: later planets use the same formulas).
  */
 export const SLICE_LAST_PLANET = 2
 
