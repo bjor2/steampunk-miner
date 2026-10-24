@@ -143,7 +143,7 @@ function isCarriedTowardStop(params: PlanetParams, { reach, request, path }: Fro
 
 /**
  * The furthest point of the path that `work` pays a bite into the crossed cell for, and the work
- * that bite spends: the fall in the price of the cell and of the next along the facing. Searched
+ * that bite spends: the fall in the price of the cell and of the next along the aim. Searched
  * from the path's start, not the walk's reach: on a tilted path the front square to the facing
  * meets a corner of the next cell before the stamp's centre enters it, and stands short of the
  * reach where the work cannot pay that. The next cell is priced too (ticket 662): a front that has
@@ -167,19 +167,19 @@ function biteOf(
 
 /**
  * The cell the stamp's centre crosses next after `crossing` on the path; past the path's end, the
- * cell after it along the facing.
+ * cell after it along the aim.
  */
 function nextCellOf({ path, pose }: FrontSweep, crossing: CellCrossing): TilePoint {
   for (let step = crossing.step + 1; step <= path.steps; step++) {
     const tile = centreTileAtStep(path, step)
     if (!isSameTile(tile, crossing.tile)) return tile
   }
-  return nextCellAlongFacing(crossing.tile, pose)
+  return nextCellAlongAim(crossing.tile, pose)
 }
 
-/** The cell after `tile` along the pose's facing, on the grid axis the facing runs nearest to. */
-function nextCellAlongFacing(tile: TilePoint, pose: VehiclePose): TilePoint {
-  const ahead = facingVectorOf(pose.upx, pose.upy, pose.facing)
+/** The cell after `tile` along the pose's aim, on the grid axis the aim runs nearest to. */
+function nextCellAlongAim(tile: TilePoint, pose: VehiclePose): TilePoint {
+  const ahead = aimVectorOfPose(pose)
   if (Math.abs(ahead.x) >= Math.abs(ahead.y)) return { ...tile, tx: tile.tx + Math.sign(ahead.x) }
   return { ...tile, ty: tile.ty + Math.sign(ahead.y) }
 }
