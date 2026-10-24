@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-10-24T16:22:16+02:00",
+  "updated_at": "2026-10-24T16:32:24+02:00",
   "caps": {
     "grok": 12,
     "claude": 10,
@@ -116,7 +116,7 @@
       "size": 4,
       "used": 0,
       "free": 4,
-      "claims_last_hour": 1,
+      "claims_last_hour": 0,
       "name": "Claude Max 2"
     }
   ],
@@ -342,13 +342,27 @@
     "parallel": 1,
     "list": [
       {
+        "number": 831,
+        "key": "647-7L",
+        "map": 647,
+        "lane": "remote",
+        "mode": "solo",
+        "state": "ready",
+        "tickets": [
+          830
+        ],
+        "done": [],
+        "live": 0
+      },
+      {
         "number": 827,
-        "key": "647-8B",
+        "key": "647-7K",
         "map": 647,
         "lane": "remote",
         "mode": "solo",
         "state": "blocked",
         "tickets": [
+          821,
           823,
           826
         ],
@@ -357,16 +371,18 @@
       },
       {
         "number": 819,
-        "key": "647-8A",
+        "key": "647-7J",
         "map": 647,
         "lane": "remote",
         "mode": "solo",
-        "state": "blocked",
+        "state": "ready",
         "tickets": [
+          810,
           811,
           812,
           813,
-          815
+          815,
+          816
         ],
         "done": [],
         "live": 0
@@ -382,24 +398,8 @@
           756,
           757,
           820,
-          821,
           824,
           825
-        ],
-        "done": [],
-        "live": 0
-      },
-      {
-        "number": 814,
-        "key": "647-7J",
-        "map": 647,
-        "lane": "remote",
-        "mode": "solo",
-        "state": "paused",
-        "tickets": [
-          809,
-          810,
-          816
         ],
         "done": [],
         "live": 0
@@ -423,7 +423,7 @@
       },
       {
         "number": 766,
-        "key": "647-7K",
+        "key": "647-7M",
         "map": 647,
         "lane": "hitl",
         "mode": "bench",
@@ -443,7 +443,8 @@
         "state": "ready",
         "tickets": [
           749,
-          750
+          750,
+          829
         ],
         "done": [],
         "live": 0
