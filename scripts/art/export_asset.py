@@ -16,7 +16,9 @@ byte-identical sidecar (#52 acceptance 5). An empty named `attach.<id>` is an at
 K5, the shop buildings of #170): its X and Z go into the sidecar's `attach` array, never baked.
 A `ui` asset (ticket 683) is a sheet of flat sprites at one unit per CSS px: each part also
 writes its PNG at 1x and 2x (ui_sprites.py), reads its nine-slice insets from the object's
-`inset` property, and ships a tint mask when a piece wears the `accent` material.
+`inset` property, and ships a tint mask when a piece wears the `accent` material. A piece whose
+material carries a `mask_alpha` property (0 to 1) ships with that alpha instead of opaque (ticket
+795: a haze that fades, a bounds outline that never shows); the albedo bake still reads its colour.
 """
 
 import hashlib
@@ -42,6 +44,7 @@ EMISSION_THRESHOLD = 1.0 / 255.0
 MAP_COLOUR_SPACES = {'albedo': 'sRGB', 'normal': 'Non-Color', 'emissive': 'sRGB', 'mask': 'Non-Color'}
 TINT_COLOUR_SPACE = {ui_sprites.TINT_MASK_NAME: 'Non-Color'}
 INSET_PROPERTY = 'inset'
+MASK_ALPHA_PROPERTY = 'mask_alpha'
 
 
 def main():
@@ -316,8 +319,17 @@ def uv_corners_of(rect, atlas):
 
 
 def mask_stand_in_for(obj):
-    """A copy of the part that glows pure white, so an emission bake of it is the part's mask."""
-    return stand_in_for(obj, lambda material: flat_emission_material('bake-mask', 1.0))
+    """
+    A copy of the part that glows white, so an emission bake of it is the part's mask. A material
+    with a `mask_alpha` custom property (ticket 795: the star map previews' haze, the system strip's
+    field) glows that much instead, so its pieces ship with that alpha; everything else is opaque.
+    """
+    return stand_in_for(obj, lambda material: flat_emission_material(*mask_emission_of(material)))
+
+
+def mask_emission_of(material):
+    alpha = 1.0 if material is None else float(material.get(MASK_ALPHA_PROPERTY, 1.0))
+    return 'bake-mask-%04d' % round(alpha * 1000), alpha
 
 
 def tint_stand_in_for(obj):
