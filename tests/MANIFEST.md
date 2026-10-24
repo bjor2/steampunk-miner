@@ -859,6 +859,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/authority/combat/vehicleTarget.test.ts` | 2 | 2 |
 | `src/systems/authority/combat/wreckerGuns.test.ts` | 10 | 4 |
 | `src/systems/authority/combat/wreckerRun.test.ts` | 16 | 16 |
+| `src/systems/authority/completedCoreRevisit.test.ts` | 3 | 3 |
 | `src/systems/authority/coreHarvest.test.ts` | 10 | 10 |
 | `src/systems/authority/coreNeededGoldens.test.ts` | 13 | 3 |
 | `src/systems/authority/cutFollowRead.test.ts` | 12 | 12 |
