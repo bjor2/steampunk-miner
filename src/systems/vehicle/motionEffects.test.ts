@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { PHYSICS_TIMESTEP } from '../../constants/physics'
+import { DRIVE_PUSH_STEPS, PHYSICS_TIMESTEP } from '../../constants/physics'
 import { withRegistrations } from '../../registries/registrar'
 import type { SliceDefinition } from '../../registries/sliceDefinition'
 import { createAuthorityState } from '../authority/authorityState'
@@ -19,7 +19,7 @@ const ENGINE = engineStats(0)
 const UP: Vector2 = { x: 0, y: 1 }
 const GRAVITY: Vector2 = { x: 0, y: -9.81 }
 const LIFT: VehicleIntent = { ...IDLE_INTENT, lift: true }
-const RIGHT: VehicleIntent = { ...IDLE_INTENT, moveX: 1 }
+const RIGHT: VehicleIntent = { ...IDLE_INTENT, moveX: DRIVE_PUSH_STEPS }
 
 const fold = (effects: readonly VehicleMotionEffect[], tick = 0) =>
   foldMotionEffects(effects, tick, CAP_BP)
