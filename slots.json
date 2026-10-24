@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-10-24T11:39:49+02:00",
+  "updated_at": "2026-10-24T12:12:02+02:00",
   "caps": {
     "grok": 12,
     "claude": 10,
@@ -33,7 +33,7 @@
           "grok_slot": 2,
           "kind": "dev",
           "since": "2026-10-24T11:39:00+02:00",
-          "wave": null
+          "wave": "647-7C"
         },
         {
           "slot": "C3",
@@ -88,7 +88,7 @@
           "grok_slot": 3,
           "kind": "dev",
           "since": "2026-10-24T11:39:00+02:00",
-          "wave": null
+          "wave": "647-7B"
         },
         {
           "slot": "C8",
@@ -166,7 +166,7 @@
       "ticket": 792,
       "since": "2026-10-24T11:39:00+02:00",
       "claude_slot": 2,
-      "wave": null
+      "wave": "647-7C"
     },
     {
       "slot": 3,
@@ -174,7 +174,7 @@
       "ticket": 791,
       "since": "2026-10-24T11:39:00+02:00",
       "claude_slot": 7,
-      "wave": null
+      "wave": "647-7B"
     },
     {
       "slot": 4,
@@ -248,7 +248,7 @@
       "grok_slot": 2,
       "since": "2026-10-24T11:39:00+02:00",
       "account": 1,
-      "wave": null
+      "wave": "647-7C"
     },
     {
       "slot": 3,
@@ -289,7 +289,7 @@
       "grok_slot": 3,
       "since": "2026-10-24T11:39:00+02:00",
       "account": 2,
-      "wave": null
+      "wave": "647-7B"
     },
     {
       "slot": 8,
@@ -345,6 +345,60 @@
     "parallel": 1,
     "list": [
       {
+        "number": 800,
+        "key": "647-7E",
+        "map": 647,
+        "lane": "remote",
+        "mode": "solo",
+        "state": "ready",
+        "tickets": [
+          794
+        ],
+        "done": [],
+        "live": 0
+      },
+      {
+        "number": 799,
+        "key": "647-7D",
+        "map": 647,
+        "lane": "remote",
+        "mode": "solo",
+        "state": "ready",
+        "tickets": [
+          793,
+          795,
+          796
+        ],
+        "done": [],
+        "live": 0
+      },
+      {
+        "number": 798,
+        "key": "647-7C",
+        "map": 647,
+        "lane": "remote",
+        "mode": "solo",
+        "state": "running",
+        "tickets": [
+          792
+        ],
+        "done": [],
+        "live": 1
+      },
+      {
+        "number": 797,
+        "key": "647-7B",
+        "map": 647,
+        "lane": "remote",
+        "mode": "solo",
+        "state": "running",
+        "tickets": [
+          791
+        ],
+        "done": [],
+        "live": 1
+      },
+      {
         "number": 784,
         "key": "774-2B",
         "map": 774,
@@ -380,7 +434,7 @@
       },
       {
         "number": 766,
-        "key": "647-6G",
+        "key": "647-7F",
         "map": 647,
         "lane": "hitl",
         "mode": "bench",
@@ -393,7 +447,7 @@
       },
       {
         "number": 751,
-        "key": "647-6B",
+        "key": "647-7A",
         "map": 647,
         "lane": "remote",
         "mode": "solo",
