@@ -70,10 +70,16 @@ engine
 14: band 2 step 2 tail 0 pips 0 part steel-track finish null tint #ff8c42 | Fitting: Triple flywheel
 15: band 3 step 3 tail 0 pips 0 part guild-track finish null tint #6fd3ff | Fitting: Guild turbine
 16: band 3 step 3 tail 0 pips 0 part guild-track finish null tint #6fd3ff | Fitting: Guild turbine
-20: band 4 step 3 tail 1 pips 0 part guild-track finish bright-brass tint #d8b45a | Fitting: Bright brass · L20
-99: band 19 step 3 tail 16 pips 1 part guild-track finish verdigris tint #5fae94 | Fitting: Verdigris · L99
-9999: band 1999 step 3 tail 1996 pips 208 part guild-track finish verdigris tint #5fae94 | Fitting: Verdigris · L9,999
-1000000: band 200000 step 3 tail 199997 pips 20833 part guild-track finish gilt tint #f0c840 | Fitting: Gilt · L1,000,000
+19: band 3 step 3 tail 0 pips 0 part guild-track finish null tint #6fd3ff | Fitting: Guild turbine
+20: band 4 step 4 tail 0 pips 0 part flywheel-track finish null tint #9fd0ff | Fitting: Drive flywheel
+21: band 4 step 4 tail 0 pips 0 part flywheel-track finish null tint #9fd0ff | Fitting: Drive flywheel
+24: band 4 step 4 tail 0 pips 0 part flywheel-track finish null tint #9fd0ff | Fitting: Drive flywheel
+25: band 5 step 5 tail 0 pips 0 part exhaust-track finish null tint #ffb070 | Fitting: Twin exhaust stacks
+26: band 5 step 5 tail 0 pips 0 part exhaust-track finish null tint #ffb070 | Fitting: Twin exhaust stacks
+30: band 6 step 5 tail 1 pips 0 part exhaust-track finish bright-brass tint #d8b45a | Fitting: Bright brass · L30
+99: band 19 step 5 tail 14 pips 1 part exhaust-track finish nickel-plate tint #c8ccd0 | Fitting: Nickel plate · L99
+9999: band 1999 step 5 tail 1994 pips 208 part exhaust-track finish nickel-plate tint #c8ccd0 | Fitting: Nickel plate · L9,999
+1000000: band 200000 step 5 tail 199995 pips 20833 part exhaust-track finish gunmetal tint #4c5258 | Fitting: Gunmetal · L1,000,000
 
 boiler
 0: band 0 step 0 tail 0 pips 0 part null finish null tint null | null

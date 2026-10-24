@@ -3,13 +3,13 @@
   "schema": 1,
   "source": {
     "blend": "art/blender/vehicle-look-drive/vehicle-look-drive.blend",
-    "sha256": "a7c56a51a42d17dd0f654803faaad5ed2e2177cb5a992341da9fb2730040e13b",
+    "sha256": "34d722a99382b90011916f80fd6cce4a35e95a8cbff5461393134238f8293361",
     "blender": "4.2.9 LTS"
   },
   "pxPerMetre": 512,
   "atlasPx": [
     512,
-    512
+    1024
   ],
   "maps": {
     "albedo": "vehicle-look-drive.albedo.ktx2",
@@ -22,7 +22,7 @@
       "tier": 1,
       "rect": [
         8,
-        422,
+        843,
         33,
         33
       ],
@@ -41,11 +41,57 @@
       "z": 3
     },
     {
-      "id": "guild-track",
+      "id": "exhaust-track",
       "tier": 1,
       "rect": [
         8,
         8,
+        450,
+        267
+      ],
+      "sizeM": [
+        0.8786,
+        0.5211
+      ],
+      "pivotM": [
+        0.4393,
+        0.1191
+      ],
+      "atM": [
+        0.0,
+        0.0
+      ],
+      "z": 3
+    },
+    {
+      "id": "flywheel-track",
+      "tier": 1,
+      "rect": [
+        8,
+        291,
+        450,
+        122
+      ],
+      "sizeM": [
+        0.878,
+        0.2379
+      ],
+      "pivotM": [
+        0.439,
+        0.1189
+      ],
+      "atM": [
+        0.0,
+        0.0
+      ],
+      "z": 3
+    },
+    {
+      "id": "guild-track",
+      "tier": 1,
+      "rect": [
+        8,
+        429,
         450,
         122
       ],
@@ -68,7 +114,7 @@
       "tier": 1,
       "rect": [
         8,
-        146,
+        567,
         450,
         122
       ],
@@ -91,7 +137,7 @@
       "tier": 1,
       "rect": [
         8,
-        284,
+        705,
         450,
         122
       ],

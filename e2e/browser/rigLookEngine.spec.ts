@@ -1,7 +1,8 @@
 /**
- * The engine's rig looks in the browser (ticket 587; tracks and wheels since ticket 726): from 5
- * purchases each step of `rigLook.json` lays its tracks and wheels of `vehicle-look-drive` on
- * `chassis.drive`, the middle roller's hub, over the chassis and hiding no rig part; the tail keeps
+ * The engine's rig looks in the browser (ticket 587; tracks and wheels since ticket 726; the LK3
+ * flywheel and twin exhaust stacks of ticket 811): from 5 purchases each step of `rigLook.json`
+ * lays its tracks and wheels of `vehicle-look-drive` on `chassis.drive`, the middle roller's hub,
+ * over the chassis and hiding no rig part; the tail keeps
  * the top part, a drill purchase never moves it (GD ruling on #726: since #723 the engine is the
  * only drive purchase), and the look leaves the physics world as it was; the engine card names the
  * owned band, past the art its finish and the exact level (#585's template, ticket 809). Asserted
@@ -21,20 +22,24 @@ declare global {
 }
 
 const ASSET_ID = 'vehicle-look-drive'
-/** The bare rig, the three steps on the band edges of 5 (ticket 809), then two finish bands. */
+/** The bare rig, the five steps on the band edges of 5 (ticket 809), then two finish bands. */
 const LOOKS = [
   { purchases: 4, part: null, fitting: null },
   { purchases: 5, part: 'iron-track', fitting: 'Fitting: Single piston' },
   { purchases: 10, part: 'steel-track', fitting: 'Fitting: Triple flywheel' },
   { purchases: 15, part: 'guild-track', fitting: 'Fitting: Guild turbine' },
-  { purchases: 20, part: 'guild-track', fitting: 'Fitting: Bright brass · L20' },
-  { purchases: 25, part: 'guild-track', fitting: 'Fitting: Blued steel · L25' },
+  { purchases: 20, part: 'flywheel-track', fitting: 'Fitting: Drive flywheel' },
+  { purchases: 25, part: 'exhaust-track', fitting: 'Fitting: Twin exhaust stacks' },
+  { purchases: 30, part: 'exhaust-track', fitting: 'Fitting: Bright brass · L30' },
+  { purchases: 35, part: 'exhaust-track', fitting: 'Fitting: Blued steel · L35' },
 ]
+/** The top authored part, which every finish band past the art keeps. */
+const TOP_PART = 'exhaust-track'
 /**
  * Levels the card must fit at 360 px past the art, kept to the range the cargo hold's spec owns
  * (ticket 581); the unit spec measures the widest text (rigLookPlaque.test.ts).
  */
-const TAIL_LEVELS = [20, 101, 200]
+const TAIL_LEVELS = [30, 101, 200]
 const CARD = `[data-testid="${UI_ID_TEMPLATES.workshopUpgradeBuy('engine')}"]`
 const FITTING = `${CARD} [data-sheet-card-line]`
 const VIEWPORTS = [
@@ -149,8 +154,8 @@ test.describe('engine look (ticket 587)', () => {
     await setUpgrade(page, 'engine', 4)
     await expectLook(page, null, bare)
     const lowest = await physicsCounts(page)
-    await setUpgrade(page, 'engine', 25)
-    await expectLook(page, 'guild-track', bare)
+    await setUpgrade(page, 'engine', 35)
+    await expectLook(page, TOP_PART, bare)
     await expect.poll(() => physicsCounts(page)).toEqual(lowest)
     expect(errors).toEqual([])
   })

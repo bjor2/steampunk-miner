@@ -89,7 +89,7 @@ describe('rig look table', () => {
   it('puts every authored step on its band edge, the art kept in order', () => {
     expect(fromsOf('drill_tip')).toEqual([60, 120, 180, 240, 300])
     expect(fromsOf('cargo_hold')).toEqual([11, 22, 33])
-    expect(fromsOf('engine')).toEqual([5, 10, 15])
+    expect(fromsOf('engine')).toEqual([5, 10, 15, 20, 25])
     expect(fromsOf('boiler')).toEqual([5, 10, 15, 20, 25, 30])
     expect(fromsOf('hull')).toEqual([120, 240, 360, 480, 600])
   })
@@ -133,7 +133,13 @@ describe('rig look table', () => {
       'Gem-set crown',
       'Aether-cut crown',
     ])
-    expect(cardsOf('engine')).toEqual(['Single piston', 'Triple flywheel', 'Guild turbine'])
+    expect(cardsOf('engine')).toEqual([
+      'Single piston',
+      'Triple flywheel',
+      'Guild turbine',
+      'Drive flywheel',
+      'Twin exhaust stacks',
+    ])
     expect(cardsOf('cargo_hold')).toEqual(['Plank crate', 'Ore hopper', 'Riveted bin'])
     expect(cardsOf('boiler')).toEqual([
       'Twin-drum boiler',
@@ -317,7 +323,14 @@ describe('rig look table', () => {
         'steel-cone',
         'toothed-crown',
       ],
-      'vehicle-look-drive': ['bare-hub', 'guild-track', 'iron-track', 'steel-track'],
+      'vehicle-look-drive': [
+        'bare-hub',
+        'exhaust-track',
+        'flywheel-track',
+        'guild-track',
+        'iron-track',
+        'steel-track',
+      ],
       'vehicle-look-hull': [
         'banded-iron',
         'brass-trimmed-armour',

@@ -23,7 +23,14 @@
       "steel-cone",
       "toothed-crown"
     ],
-    "vehicle-look-drive": ["bare-hub", "guild-track", "iron-track", "steel-track"],
+    "vehicle-look-drive": [
+      "bare-hub",
+      "exhaust-track",
+      "flywheel-track",
+      "guild-track",
+      "iron-track",
+      "steel-track"
+    ],
     "vehicle-look-hull": [
       "banded-iron",
       "brass-trimmed-armour",
@@ -282,7 +289,9 @@
         "step": "Fitting: {bandName}",
         "tail": "Fitting: {bandName} \u00b7 L{level}"
       },
-      "glowSlots": [["piston", "iron-track", "steel-track", "guild-track"]],
+      "glowSlots": [
+        ["piston", "iron-track", "steel-track", "guild-track", "flywheel-track", "exhaust-track"]
+      ],
       "glowCap": "rigBody",
       "steps": [
         {
@@ -308,6 +317,22 @@
           "card": "Guild turbine",
           "colour": "#6fd3ff",
           "glows": [0.7]
+        },
+        {
+          "from": 20,
+          "part": "flywheel-track",
+          "asset": "vehicle-look-drive",
+          "card": "Drive flywheel",
+          "colour": "#9fd0ff",
+          "glows": [0.72]
+        },
+        {
+          "from": 25,
+          "part": "exhaust-track",
+          "asset": "vehicle-look-drive",
+          "card": "Twin exhaust stacks",
+          "colour": "#ffb070",
+          "glows": [0.74]
         }
       ],
       "band": {
