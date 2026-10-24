@@ -2,13 +2,14 @@ import { describe, expect, it } from 'vitest'
 import type { AuthorityState } from '../systems/authority/authorityState'
 import type { DomainEvent } from '../systems/authority/domainEvent'
 import { createScriptedSession } from '../systems/authority/scriptedSession'
-import { drillPower } from '../systems/economy/vehicleStats'
+import { drillPower, onCurveSteps, type UpgradeLevels } from '../systems/economy/vehicleStats'
 import { fromCanonical, toFixedText } from '../systems/money'
 import {
   amberIncomeGainsOf,
   averageFeltOf,
   emptyDrillPaceTally,
   feltCellsPerSecond,
+  feltCellsPerSecondInSystem,
   incomeGainsOf,
   longestGapMinutesOf,
   planetMinutesOf,
@@ -34,6 +35,17 @@ function stateWith(tick: number, drill: number, planet = 1): AuthorityState {
   })
   const state = session.state()
   return { ...state, tick, planet: { ...state.planet, index: planet } }
+}
+
+/** The scripted state on campaign index 6 with `levels`, in system 1 or the system named. */
+function onPlanetSix(tick: number, levels: UpgradeLevels, system?: string): AuthorityState {
+  const state = stateWith(tick, levels.drill_power, 6)
+  const player = state.players.p1
+  return {
+    ...state,
+    planet: system === undefined ? state.planet : { ...state.planet, system },
+    players: { ...state.players, p1: { ...player, vehicle: { ...player.vehicle, levels } } },
+  }
 }
 
 const drillBought = (toLevel: number, cost = '20'): DomainEvent =>
@@ -113,6 +125,20 @@ describe('drill pace of a bot run (#551, ticket 552)', () => {
       (feltCellsPerSecond({ ...levelsOf(1) }, 1) + 3 * feltCellsPerSecond(levelsOf(2), 1)) / 4
     expect(averageFeltOf(tally.planets.get(1)!)).toBeCloseTo(expected, 9)
     expect(tally.planets.get(1)!.coreFelt).toBe(feltCellsPerSecond(levelsOf(2), 1))
+  })
+
+  it("feels a planet of solar system 2 on its system's harder rock, and system 1 as before (ticket 779)", () => {
+    const levels = onCurveSteps(6)
+    const inSystemTwo = emptyDrillPaceTally()
+    step(inSystemTwo, onPlanetSix(0, levels, '2'))
+    step(inSystemTwo, onPlanetSix(MINUTE, levels, '2'), [CORE])
+    const plain = emptyDrillPaceTally()
+    step(plain, onPlanetSix(0, levels))
+    step(plain, onPlanetSix(MINUTE, levels), [CORE])
+    const feltTwo = averageFeltOf(inSystemTwo.planets.get(6)!)
+    expect(feltTwo).toBe(feltCellsPerSecondInSystem(levels, 6, 2n))
+    expect(feltTwo).toBeLessThan(feltCellsPerSecond(levels, 6))
+    expect(averageFeltOf(plain.planets.get(6)!)).toBe(feltCellsPerSecond(levels, 6))
   })
 
   it('logs each drill purchase as n, D, price, planet, minute and the income a hour of the level it replaced', () => {

@@ -16,6 +16,7 @@
 import { TICKS_PER_SECOND } from '../constants/physics'
 import type { AuthorityState } from '../systems/authority/authorityState'
 import type { DomainEvent } from '../systems/authority/domainEvent'
+import { systemOfPlanet, type SessionPlanet } from '../systems/authority/planetOfState'
 import { blockHardness } from '../systems/economy/oreEconomy'
 import { systemHardnessStepOf } from '../systems/economy/systemJump'
 import { drillPower, vehicleStatsAt, type UpgradeLevels } from '../systems/economy/vehicleStats'
@@ -35,6 +36,7 @@ import {
 import { cutCellsPerSecondOf } from '../systems/vehicle/cutSpeed'
 import { drillQuantumOnPlanet } from '../systems/vehicle/drillQuantum'
 import { subStepsPerTileAt } from '../systems/vehicle/drillRule'
+import { FIRST_SYSTEM } from '../systems/starMap/planetAddress'
 
 const TICKS_PER_MINUTE = 60 * TICKS_PER_SECOND
 const TICKS_PER_HOUR = 60 * TICKS_PER_MINUTE
@@ -236,9 +238,20 @@ function retakeFelt(tally: DrillPaceTally, state: AuthorityState, playerId: stri
   tally.felt = {
     planet: state.planet.index,
     levelsKey,
-    cellsPerSecond: feltCellsPerSecond(levels, state.planet.index),
+    cellsPerSecond: feltOnSessionPlanet(levels, state.planet),
     sinceTick: state.tick,
   }
+}
+
+/**
+ * The felt speed on the session's planet: on its system's ground from system 2 (ticket 779), so a
+ * run into solar system 2 feels the jump's step; system 1 reads as it always has.
+ */
+function feltOnSessionPlanet(levels: UpgradeLevels, planet: SessionPlanet): number {
+  const system = systemOfPlanet(planet)
+  return system === FIRST_SYSTEM
+    ? feltCellsPerSecond(levels, planet.index)
+    : feltCellsPerSecondInSystem(levels, planet.index, system)
 }
 
 /** The law's band-1 cut of planet `planet` at these levels, in cells/s; 0 where it skids. */
