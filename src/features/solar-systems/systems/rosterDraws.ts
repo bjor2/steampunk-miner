@@ -18,6 +18,10 @@ export const ROSTER_STREAM = {
   lookWalk: 4,
   /** The per-index rolls of the system's new-content shuffle. */
   slotShuffle: 5,
+  /** Where a pool kind's silhouette, pattern and hue slot walks start (ticket 777), by kind index. */
+  kindSilhouette: 6,
+  kindPattern: 7,
+  kindHue: 8,
 } as const
 
 export type RosterStream = (typeof ROSTER_STREAM)[keyof typeof ROSTER_STREAM]

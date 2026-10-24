@@ -3,10 +3,26 @@
   "sizeClasses": {
     "baseTargetSeconds": 1500,
     "classes": [
-      { "id": "S", "radiusBp": 9000, "standardOnly": false },
-      { "id": "M", "radiusBp": 10000, "standardOnly": false },
-      { "id": "L", "radiusBp": 11000, "standardOnly": false },
-      { "id": "XL", "radiusBp": 12000, "standardOnly": true }
+      {
+        "id": "S",
+        "radiusBp": 9000,
+        "standardOnly": false
+      },
+      {
+        "id": "M",
+        "radiusBp": 10000,
+        "standardOnly": false
+      },
+      {
+        "id": "L",
+        "radiusBp": 11000,
+        "standardOnly": false
+      },
+      {
+        "id": "XL",
+        "radiusBp": 12000,
+        "standardOnly": true
+      }
     ]
   },
   "economyRows": {
@@ -16,5 +32,9 @@
     "feltSpeedFloor": "0.9",
     "poolStepFloor": "1.15",
     "gemShareCapBp": 1500
+  },
+  "materialPool": {
+    "source": "Ticket 777 (spec #774), the generated material pool under the GD lock of 23 Oct 2026 on Campaign Scaling: about 15 kinds per planet (Bjor's ask of 15 Oct on #647), never past the ores slice's 17-kind roster cap (the 8-bit slot). The pool is drawn from the ore mix a planet is generated with at its campaign index, one kind per family and rarity the mix paints, the heaviest split until the target; the gems are the ores slice's three per pool, the rares and gems live only from band 3 (d >= 0.35) in the kernel's 1-3 cell clusters, and the gem share of the pool value stays under the economy rows' gemShareCapBp. Numbers only: no price, hardness or drill law is set here.",
+    "kindsTarget": 15
   }
 }
