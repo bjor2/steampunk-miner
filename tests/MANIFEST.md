@@ -1032,7 +1032,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/debug/debugDevFlags.test.ts` | 4 | 4 |
 | `src/debug/debugHudCoverage.test.ts` | 5 | 5 |
 | `src/debug/debugHudLayout.test.ts` | 5 | 5 |
-| `src/debug/debugLining.test.ts` | 4 | 4 |
+| `src/debug/debugLining.test.ts` | 6 | 6 |
 | `src/debug/debugLiveTime.test.ts` | 3 | 3 |
 | `src/debug/debugMaterialPop.test.ts` | 3 | 3 |
 | `src/debug/debugMemory.test.ts` | 4 | 4 |
@@ -1351,7 +1351,11 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/render/bandPalette.test.ts` | 6 | 6 |
 | `src/systems/render/cameraFollow.test.ts` | 9 | 9 |
 | `src/systems/render/cameraTurn.test.ts` | 7 | 7 |
-| `src/systems/render/casingLiningLook.test.ts` | 7 | 7 |
+| `src/systems/render/casingBlink.test.ts` | 6 | 6 |
+| `src/systems/render/casingBurst.test.ts` | 4 | 4 |
+| `src/systems/render/casingGradeLook.test.ts` | 10 | 10 |
+| `src/systems/render/casingLiningLook.test.ts` | 16 | 16 |
+| `src/systems/render/casingLookBits.test.ts` | 7 | 7 |
 | `src/systems/render/cellGateBits.test.ts` | 12 | 12 |
 | `src/systems/render/chargePlacement.test.ts` | 2 | 2 |
 | `src/systems/render/chunkBuildBudget.test.ts` | 11 | 11 |
@@ -1362,7 +1366,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/render/chunkStreaming.test.ts` | 25 | 7 |
 | `src/systems/render/chunkTileBatch.test.ts` | 8 | 8 |
 | `src/systems/render/chunkTileBatchGates.test.ts` | 12 | 5 |
-| `src/systems/render/chunkTileBatchLining.test.ts` | 4 | 4 |
+| `src/systems/render/chunkTileBatchLining.test.ts` | 8 | 8 |
 | `src/systems/render/chunkTileBatchOreLook.test.ts` | 1 | 1 |
 | `src/systems/render/chunkWorkerStreaming.test.ts` | 8 | 2 |
 | `src/systems/render/collapseTelegraph.test.ts` | 8 | 8 |
@@ -1784,6 +1788,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/views/chargeViews.test.ts` | 14 | 14 |
 | `src/systems/views/combatStatuses.test.ts` | 8 | 8 |
 | `src/systems/views/compactNumbers.test.ts` | 3 | 3 |
+| `src/systems/views/depthBandTint.test.ts` | 4 | 4 |
 | `src/systems/views/depthDial.test.ts` | 51 | 7 |
 | `src/systems/views/designSystem.test.ts` | 19 | 19 |
 | `src/systems/views/designSystemDoc.test.ts` | 4 | 4 |
@@ -1793,7 +1798,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/views/dialBuyCue.test.ts` | 8 | 8 |
 | `src/systems/views/driveTrackCard.test.ts` | 5 | 4 |
 | `src/systems/views/gainText.test.ts` | 6 | 6 |
-| `src/systems/views/gaugeCluster.test.ts` | 23 | 23 |
+| `src/systems/views/gaugeCluster.test.ts` | 24 | 24 |
 | `src/systems/views/gravityReadings.test.ts` | 4 | 4 |
 | `src/systems/views/hazardStripFit.test.ts` | 5 | 5 |
 | `src/systems/views/hazardStripPlace.test.ts` | 6 | 6 |
