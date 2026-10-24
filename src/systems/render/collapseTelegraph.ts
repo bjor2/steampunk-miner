@@ -22,6 +22,8 @@ export interface TelegraphBlock {
   size: number
   /** 0 to 1. */
   progress: number
+  /** Ticks since the warning started, a braced block's frozen where it was caught (ticket 830). */
+  elapsedTicks: number
   /** The block's place as a crack seed. */
   seed: number
 }
@@ -34,7 +36,14 @@ const NOTHING_FROZEN: FrozenTicksLeftReader = () => null
 export const BLOCK_SIZE_M = COLLAPSE_BLOCK_SAMPLES / SAMPLES_PER_TILE
 
 export function createTelegraphSlots(count: number): TelegraphBlock[] {
-  return Array.from({ length: count }, () => ({ x0: 0, y0: 0, size: 0, progress: 0, seed: 0 }))
+  return Array.from({ length: count }, () => ({
+    x0: 0,
+    y0: 0,
+    size: 0,
+    progress: 0,
+    elapsedTicks: 0,
+    seed: 0,
+  }))
 }
 
 /** Fills `slots` with the collapsing blocks at `tick`; answers how many it filled. */
@@ -47,20 +56,19 @@ export function writeTelegraphBlocks(
   const count = Math.min(slots.length, collapse.blocks.length)
   for (let at = 0; at < count; at++) {
     const entry = collapse.blocks[at]
-    writeSlot(slots[at], entry.block, progressOfEntry(entry, tick, frozenTicksLeftOf))
+    writeSlot(slots[at], entry.block, elapsedOfEntry(entry, tick, frozenTicksLeftOf))
   }
   return count
 }
 
 /** Asks for a frozen countdown only of a braced block, so an unbraced frame reads no registry. */
-function progressOfEntry(
+function elapsedOfEntry(
   entry: CollapsingBlock,
   tick: number,
   frozenTicksLeftOf: FrozenTicksLeftReader,
 ): number {
   const frozenLeft = entry.isBraced === true ? frozenTicksLeftOf(entry.block) : null
-  const elapsed = frozenLeft === null ? tick - entry.startTick : COLLAPSE_WARN_TICKS - frozenLeft
-  return telegraphProgress(elapsed)
+  return frozenLeft === null ? tick - entry.startTick : COLLAPSE_WARN_TICKS - frozenLeft
 }
 
 /** How far the telegraph has run `elapsedTicks` after the warning started. */
@@ -94,14 +102,15 @@ export function writeCrackSegment(block: TelegraphBlock, index: number, out: Flo
   }
 }
 
-function writeSlot(slot: TelegraphBlock, id: string, progress: number): void {
+function writeSlot(slot: TelegraphBlock, id: string, elapsedTicks: number): void {
   const block = blockOfId(id)
   if (block === null) return
   const first = firstSampleOfBlock(block)
   slot.x0 = first.sx / SAMPLES_PER_TILE
   slot.y0 = first.sy / SAMPLES_PER_TILE
   slot.size = BLOCK_SIZE_M
-  slot.progress = progress
+  slot.progress = telegraphProgress(elapsedTicks)
+  slot.elapsedTicks = elapsedTicks
   slot.seed = (first.sx * 73856093) ^ (first.sy * 19349663)
 }
 

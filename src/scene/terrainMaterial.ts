@@ -9,6 +9,8 @@ import {
   AMBIENT_DEEP,
   AMBIENT_FADE_DEPTH_TILES,
   AMBIENT_SURFACE,
+  CASING_BLINK_BLOCKS,
+  CASING_BLINK_GLOW,
   HEADLAMP_COLOUR,
   HEADLAMP_HALF_ANGLE_RADIANS,
   HEADLAMP_RANGE_TILES,
@@ -38,6 +40,7 @@ import type { Vector2 } from '../systems/vehicle/localFrame'
 import { TERRAIN_FRAGMENT_SHADER, TERRAIN_VERTEX_SHADER } from './terrainShader'
 import { createGateTintUniforms } from './terrainGateTint'
 import { createGateViewerUniforms } from './terrainGateViewer'
+import { createCasingBlinkUniforms } from './terrainCasingBlink'
 import { createKindLookUniforms } from './terrainKindLooks'
 import { createRarityRevealUniforms } from './terrainRarityReveal'
 import { kindLookDefines } from './terrainKindShader'
@@ -72,6 +75,9 @@ export function createTerrainMaterial(
       ...(program === 'full' ? {} : { TERRAIN_LITE: 1 }),
       ...(program === 'full' && heroAtlas === 'sampled' ? { TERRAIN_HERO_ATLAS: 1 } : {}),
       MAX_POINT_LIGHTS,
+      // The casing blink's block slots and glow (ticket 830, terrainCasingBlink.ts).
+      CASING_BLINK_BLOCKS,
+      CASING_BLINK_GLOW,
       // The gate channel's layout (cellGateBits.ts), so the shader decodes what the mesher wrote.
       GATED_BIT,
       GATE_KIND_COUNT: MAX_GATE_KIND + 1,
@@ -115,6 +121,7 @@ export function createTerrainMaterial(
       ...createHeatTileUniforms(),
       ...createGateTintUniforms(),
       ...createGateViewerUniforms(),
+      ...createCasingBlinkUniforms(),
       ...createKindLookUniforms(),
       ...createRarityRevealUniforms(),
       ...createHeroAtlasUniforms(),

@@ -34,6 +34,7 @@ import { noteHeroAtlasUnit } from './terrainHeroAtlas'
 import { renderOriginPresence } from './renderOriginPresence'
 import { fitGateTintToPlanet } from './terrainGateTint'
 import { fitGateToViewer } from './terrainGateViewer'
+import { fitCasingBlinkToCollapse } from './terrainCasingBlink'
 import { fitKindLooksToViewer } from './terrainKindLooks'
 import { fitRarityRevealToClock, startRevealFlourish } from './terrainRarityReveal'
 import { groundGatePresence, NO_DRAWN_GROUND } from './groundGatePresence'
@@ -88,6 +89,7 @@ export function PlanetTerrain() {
     fitTerrainToOrigin(material, params, renderOriginPresence)
     fitGateTintToPlanet(material, params)
     fitGateToViewer(material)
+    fitCasingBlinkToCollapse(material, renderOriginPresence)
     fitKindLooksToViewer(material, params)
     fitRarityRevealToClock(material)
   })

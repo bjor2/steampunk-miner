@@ -410,6 +410,27 @@ export const COLLAPSE_DUST_LIFE_SECONDS = 0.9
 export const COLLAPSE_DUST_SIZE_PIXELS = 3
 export const COLLAPSE_DUST_COLOUR = '#8d7f6a'
 export const COLLAPSE_DUST_SEED = 0xd057
+
+/**
+ * The casing's red blink and burst (CG2, ticket 830; the GD lock on casing grades by depth, the
+ * Systems row "blinking for the last 3 s" and the HS's "the blink extends the #43/#316 warning"):
+ * the lining of every block warning of collapse blinks red over the telegraph for the last
+ * `CASING_BLINK_SECONDS` of its hold, or the whole hold when that is shorter (today's 1 s hold,
+ * `COLLAPSE_WARN_TICKS`), a square wave `CASING_BLINK_HALF_PERIOD_TICKS` ticks a half; with reduce
+ * motion it holds a steady `CASING_BLINK_STILL_SHARE` of red instead. Through the refill the ring
+ * holds full red until the lining is gone. The shader reads at most `CASING_BLINK_BLOCKS` blocks
+ * (the nearest the telegraph lists). When the refill starts the ring bursts: sparks, a cement puff
+ * of dust and crack debris from the block's centre, outward from the planet, at the counts in
+ * `CASING_BURST_SPRAYS`, at high priority so a burst is never dropped for tracer. My picks, by eye.
+ */
+export const CASING_BLINK_SECONDS = 3
+export const CASING_BLINK_HALF_PERIOD_TICKS = 8
+export const CASING_BLINK_STILL_SHARE = 0.6
+export const CASING_BLINK_BLOCKS = 16
+export const CASING_BLINK_RED = '#ff2a1a'
+/** The blinking plate glows this much of its red, so the warning reads in band 5's dark. */
+export const CASING_BLINK_GLOW = 0.5
+export const CASING_BURST_SPRAYS = { spark: 10, dust: 18, debris: 8 } as const
 /** Fixed seed for the spark spray: presentation only, never part of the world. */
 export const SPARK_SEED = 0x5a7c
 

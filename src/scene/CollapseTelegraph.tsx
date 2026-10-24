@@ -4,9 +4,11 @@
  * thicker as the refill nears; a braced block's cracks stand still while the brace holds. Read every frame from the authority replica, never through React;
  * the dust and the cracks are fixed pools, so stepping and uploading never allocate. Presentation
  * only, on the render delta with its own fixed seed. The rumble and the crash are feedback cues.
+ * The lining's red blink over a warned block is the terrain shader's (`terrainCasingBlink.ts`,
+ * ticket 830), and the ring's burst as the refill starts is `casingBurst.ts`.
  */
 import { useFrame } from '@react-three/fiber'
-import { useMemo } from 'react'
+import { useEffect, useMemo } from 'react'
 import {
   BufferAttribute,
   BufferGeometry,
@@ -29,6 +31,8 @@ import {
   CRACKS_PER_BLOCK,
 } from '../constants/scene'
 import { readCollapse, readFrozenTicksLeft } from '../store/collapseReads'
+import { listenForDomainEvents } from '../store/domainEventBroadcast'
+import { hearCasingBursts } from './casingBurst'
 import {
   crackSegmentsAt,
   createTelegraphSlots,
@@ -70,6 +74,8 @@ export function CollapseTelegraph() {
   useDisposeOnRelease(cracks.material)
   useDisposeOnRelease(dust.geometry)
   useDisposeOnRelease(dust.material)
+  // The ring bursts as the refill starts (ticket 830): sparks, a cement puff and debris.
+  useEffect(() => listenForDomainEvents(hearCasingBursts), [])
 
   useFrame((_, delta) => {
     const { collapse, tick } = readCollapse()

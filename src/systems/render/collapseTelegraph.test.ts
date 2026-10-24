@@ -29,8 +29,14 @@ describe('collapse telegraph', () => {
   it('places each collapsing block in metres with its own progress', () => {
     const slots = createTelegraphSlots(4)
     expect(writeTelegraphBlocks(slots, collapse, 130)).toBe(2)
-    expect(slots[0]).toMatchObject({ x0: 4, y0: 264, size: BLOCK_SIZE_M, progress: 0.5 })
-    expect(slots[1]).toMatchObject({ x0: -4, y0: 252, progress: 0 })
+    expect(slots[0]).toMatchObject({
+      x0: 4,
+      y0: 264,
+      size: BLOCK_SIZE_M,
+      progress: 0.5,
+      elapsedTicks: 30,
+    })
+    expect(slots[1]).toMatchObject({ x0: -4, y0: 252, progress: 0, elapsedTicks: -10 })
   })
 
   it('draws no more blocks than it has slots', () => {

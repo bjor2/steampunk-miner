@@ -120,6 +120,11 @@ uniform float uLampRange;
 uniform float uLampSpill;
 uniform vec3 uLampColour;
 uniform float uPlanetRadius;
+// The casing blink (ticket 830): blocks warning of collapse, x y their corner (render-local), z
+// their side, w how red their lining is this frame.
+uniform vec4 uBlinkBlocks[CASING_BLINK_BLOCKS];
+uniform int uBlinkCount;
+uniform vec3 uBlinkRed;
 uniform float uAmbientSurface;
 uniform float uAmbientDeep;
 uniform float uAmbientFade;
@@ -682,6 +687,18 @@ vec3 casingLiningOver(vec3 colour, vec2 frame, float value, float soft, out floa
   return mix(colour, lined, plate);
 }
 
+// How red the casing at render-local point p is this frame: the most of any blinking block holding it.
+float casingBlinkAt(vec2 p) {
+  float share = 0.0;
+  for (int i = 0; i < CASING_BLINK_BLOCKS; i++) {
+    if (i >= uBlinkCount) break;
+    vec4 block = uBlinkBlocks[i];
+    vec2 inBlock = step(block.xy, p) * step(p, block.xy + block.z);
+    share = max(share, block.w * inBlock.x * inBlock.y);
+  }
+  return share;
+}
+
 // The tile's depth band by the integer rule of bandOfTile: exact below 2^24, so for any planet.
 int bandOfTile(vec2 tile) {
   vec2 halfTile = 2.0 * tile + 1.0;
@@ -864,6 +881,10 @@ void main() {
     colour = casingLiningOver(colour, liningFrameOf(density), vCasing, gateSoft, plate, glow);
     emissive *= 1.0 - plate;
     emissive += glow;
+    // The red blink over a ring warning of collapse (ticket 830), held through its burst.
+    float blink = casingBlinkAt(vWorld) * plate;
+    colour = mix(colour, uBlinkRed, blink);
+    emissive += uBlinkRed * float(CASING_BLINK_GLOW) * blink;
   }
   float gateKind = gateKindOf(gateBits);
   float gateOpen = gateOpenness(gateBits);
