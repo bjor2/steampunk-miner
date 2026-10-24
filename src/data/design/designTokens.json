@@ -178,6 +178,7 @@
       "cooldownRingPx": 3
     },
     "tabsMax": 8,
+    "bayPanels": { "desktopPerPage": 2 },
     "sheetDock": { "widthPx": 400, "minScreenPx": 1280, "maxSharePercent": 25 },
     "coverageMaxPercent": { "phone": 12, "desktop": 8 },
     "mockups": [

@@ -473,6 +473,7 @@ listed with the ticket that builds them. Every class lives in a CSS Module besid
 | plaque, panel | `kit/Plaque.tsx`, `kit/Panel.tsx`: riveted double frame and the plain panel; keep their look, take the tokens                                                                                                       | framePx, radiusPx.panel                                               | exists  |
 | tool slot     | a 44/48 px cell: icon and a cooldown ring (`cooldownRingPx`), never text; a charges count past one; number-key hotkeys on desktop                                                                                   | layout.toolSlots, colour.accent                                       | #691    |
 | overflow tray | the cell after the slots (phone and desktop): turns the cells to the rest of the owned tools, a page at a time, and back                                                                                            | layout.toolSlots                                                      | #691    |
+| bay panels    | the Sell bay's slice panels after its own rows (ticket 845): an ordered list of data rows, each drawn by its kind's view; a phone scrolls them with the bay, desktop pages them with Previous and Next              | layout.bayPanels, layout.tapTargetMinPx                               | #845    |
 | gear button   | the one control that opens the strip's detail (exact values, words); in the thumb zone, never the top keep-out                                                                                                      | layout.tapTargetMinPx                                                 | #684    |
 | hint chip     | #500's chip, unchanged: one line, 8% of height at most, queued when the clear view would fall                                                                                                                       | existing constants                                                    | exists  |
 | sale receipt  | the trip's sold kinds by rarity group (count, coin), the lining bill, the total rolling up in 1.2 s or less (a tap skips), the last trip's total; scrolls past 8 lines                                              | numbers, type.odometer, art.sheetFrame, copy                          | #717    |
@@ -907,6 +908,7 @@ Generated from `designTokens.json`; a row is the token's path and its value. The
 | `layout.toolSlots.gapPx`                              | 4                       |
 | `layout.toolSlots.cooldownRingPx`                     | 3                       |
 | `layout.tabsMax`                                      | 8                       |
+| `layout.bayPanels.desktopPerPage`                     | 2                       |
 | `layout.sheetDock.widthPx`                            | 400                     |
 | `layout.sheetDock.minScreenPx`                        | 1280                    |
 | `layout.sheetDock.maxSharePercent`                    | 25                      |
