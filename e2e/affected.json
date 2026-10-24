@@ -935,6 +935,22 @@
       "specs": ["e2e/browser/ui/desktopBrass.spec.ts", "e2e/browser/ui/uiShots.spec.ts"]
     },
     {
+      "why": "The full desktop golden suite (ticket 772): at 1280x800, 1920x1080, 2560x1440 and a wide-bore 1280x800, the strip held and the long-mode hover whole through the money sweep, the level sweep with the Outfitter docked, a P40 save exported and imported, the dock at most a quarter of the play area while drilling; the phone undocked and untagged.",
+      "paths": [
+        "src/ui/hud/**",
+        "src/ui/sheet/**",
+        "src/ui/kit/HoverPlate*",
+        "src/ui/kit/KeyTag*",
+        "src/systems/displayAmount.ts",
+        "src/systems/views/sheetLayout.ts",
+        "src/systems/views/hoverValues.ts",
+        "src/systems/views/desktopStripSlots.ts",
+        "src/debug/debugSaves.ts",
+        "src/debug/debugSheet.ts"
+      ],
+      "specs": ["e2e/browser/ui/desktopGoldens.spec.ts"]
+    },
+    {
       "why": "One menu per building (ticket 734): the sheet a dock opens is that bay's one menu, closed once, with no bay frame hidden behind a phone's full sheet. The sheet slice, the bay screen's shutter, the workshop's dock hook and the debug sheet reads reach it.",
       "paths": [
         "src/store/sheetSlice.ts",

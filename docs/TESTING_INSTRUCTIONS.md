@@ -1683,6 +1683,16 @@ incomePerHour}` go to `balance-report/drill-pace.ndjson`, which `pushTestMetrics
   the strip and the docked sheet hold (same box, nothing spilled, no
   finding) through the NEW MATERIAL plaque cycle of the planet 1 start scenario and on P40. Box
   Tester only; the sweeps are ticket 767's and 768's specs.
+- **Desktop golden suite** (ticket 772, spec #678): the desktop goldens in one spec beside the
+  phone goldens of `uiShots.spec.ts`. `e2e/browser/ui/desktopGoldens.spec.ts` runs 1280x800,
+  1920x1080, 2560x1440 and a 1280x800 rig with the widest bore the build ships (the side cutters
+  switched on with their Mark 2 owned; #662): the strip holds its box with every figure at 6
+  characters at most and the #768 long-mode hover plate whole inside the screen through the 0 to
+  1e300 money sweep, every track at levels 1, 99, 9999 and 1e6 with the price hover and the docked
+  Outfitter clean, and a P40 save exported, reloaded and imported (strip, a dial's hover, the pause
+  menu); while drilling the HUD stays in its budget and the docked sheet covers at most a quarter
+  of the play area. A 360x640 phone cell holds the strip through the sweep with no dock, no key tag
+  and no plate. Steps in `desktopGoldenSteps.ts`. Box Tester only.
 - **Warning layer** (ticket 685, spec #678): the ladder is pure (`systems/views/warningWatch.ts`:
   each tier fires once on the way in and re-arms 5% above it, the deepest of several at once rings
   alone, the glow holds the deepest tier now), fed from the HUD's readings through the store's
