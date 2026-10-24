@@ -266,11 +266,14 @@ describe('drill gear cut', () => {
     expect(widened.spent).toBeGreaterThan(plain.spent)
   })
 
+  // Read on the exact charge (ticket 535's numerator): the quanta taken round it once, so on ticket
+  // 662's bore, whose wall band carves at its falloff's pace, the doubled share's quanta land one
+  // under twice the whole's while the charge doubles exactly.
   it('charges each side cell its share of the drill energy, never under a whole share', () => {
-    const plain = drillWith([]).spent
-    const whole = drillWith([gearSlice({ sideCells: 1, sideEnergyShareBp: 10000 })]).spent
-    const half = drillWith([gearSlice({ sideCells: 1, sideEnergyShareBp: 5000 })]).spent
-    const double = drillWith([gearSlice({ sideCells: 1, sideEnergyShareBp: 20000 })]).spent
+    const plain = drillWith([]).charged
+    const whole = drillWith([gearSlice({ sideCells: 1, sideEnergyShareBp: 10000 })]).charged
+    const half = drillWith([gearSlice({ sideCells: 1, sideEnergyShareBp: 5000 })]).charged
+    const double = drillWith([gearSlice({ sideCells: 1, sideEnergyShareBp: 20000 })]).charged
     expect(half).toBe(whole)
     expect(double - plain).toBe(2 * (whole - plain))
   })

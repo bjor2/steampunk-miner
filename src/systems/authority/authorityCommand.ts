@@ -553,10 +553,10 @@ import type { JsonCount } from '../wholeCount'
  * 118: the bore is the body plus its clearance (ticket 662, the GD locks on #661 and #662): the
  *    stamp's radius is half the 0.9 m body plus `DRILL_BORE_ROWS.sideClearanceMm` (0.15 m), 0.6 m
  *    where it was #36's 0.95 m, with no lift on a level cut. The drill's disc has a bore-wall edge,
- *    full weight out to its radius less half a sample and its contour on the circle; a level cut's
+ *    full weight out to its radius less one sample and its contour on the circle; a level cut's
  *    disc carries a floor band across the wheels' width; a pose report cuts its stamp run on 0.55 m
- *    along the facing. The casing ring lines `stampR <= d < stampR + 0.25 m`, the rock outside the
- *    wall, and the floor box under a level tunnel, never a cell a gate keeps standing against the
+ *    along the facing. The casing ring lines `stampR - 0.25 m <= d < stampR + 0.25 m` round the
+ *    wall and the floor box under a level tunnel, never a cell a gate keeps standing against the
  *    rig's drill. A level floor's ramp lays its contour on its circle (`stampShape.ts`), where the
  *    straight ramp left it up to 21 mm off. Ground already cut stays as it is.
  */

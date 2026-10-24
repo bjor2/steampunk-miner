@@ -7,7 +7,8 @@ import { add, ceilMilli, fromCanonical, mul, sub, toCanonical, ZERO_MONEY } from
 import { FACING } from '../vehicle/vehiclePose'
 import { casingTypeIndexOf } from '../world/chunkDelta'
 import { chunkOfSample, localSampleOf, MM_PER_SAMPLE, sampleIndexOf } from '../world/sampleGrid'
-import { currentCasingOfChunk } from '../world/worldState'
+import { currentCasingOfChunk, currentDensityOfChunk } from '../world/worldState'
+import { planetParamsOf } from './planetOfState'
 import type { CommandIntent } from './authorityCommand'
 import type { DomainEvent } from './domainEvent'
 import { readSnapshot, takeSnapshot } from './sessionSnapshot'
@@ -170,16 +171,24 @@ function drillBackThrough(session: ScriptedSession, tick: number): DomainEvent[]
 const linedOf = (events: readonly DomainEvent[]) =>
   events.flatMap((event) => (event.type === 'CasingLined' ? [event] : []))
 
-/** The lining type indexes found in the wall above the bore. */
+/**
+ * The lining type indexes found in the wall above the bore: its rock, as the drill meets it. Since
+ * the ring reaches a sample inside the 1.2 m bore's wall (TD check on #662), a sample the bore's
+ * end left part-cut can be lined and then cut open by the next pass; its mark lies in the air.
+ */
 function wallTypeIndexes(session: ScriptedSession): Set<number | null> {
   const found = new Set<number | null>()
+  const world = session.state().world
+  const params = planetParamsOf(session.state().planet)
   const sy = Math.floor((START.y + 1000) / MM_PER_SAMPLE)
   for (let sx = START.x / MM_PER_SAMPLE; sx < (START.x + 9000) / MM_PER_SAMPLE; sx++) {
     for (let dy = -2; dy <= 2; dy++) {
-      const world = session.state().world
-      const casing = currentCasingOfChunk(world, chunkOfSample(sx), chunkOfSample(sy + dy))
-      const value = casing[sampleIndexOf(localSampleOf(sx), localSampleOf(sy + dy))]
-      if (value > 0) found.add(casingTypeIndexOf(value))
+      const cx = chunkOfSample(sx)
+      const cy = chunkOfSample(sy + dy)
+      const index = sampleIndexOf(localSampleOf(sx), localSampleOf(sy + dy))
+      const value = currentCasingOfChunk(world, cx, cy)[index]
+      const isRock = params !== null && currentDensityOfChunk(world, params, cx, cy)[index] > 128
+      if (value > 0 && isRock) found.add(casingTypeIndexOf(value))
     }
   }
   return found

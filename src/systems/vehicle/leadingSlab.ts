@@ -1,5 +1,5 @@
 /**
- * The leading slab (TD scope 0 on #316, ticket 333): the stamp's full-weight samples ahead of the
+ * The leading slab (TD scope 0 on #316, ticket 333): the stamp's cleared core's samples ahead of the
  * body's face and within its width, the ground the next step drives into. Its uncut share opens
  * and closes the cut gate (`cutGate.ts`), and its uncut cells set the cut-follow's speed.
  *
@@ -9,7 +9,7 @@
  */
 import { VEHICLE_COLLIDER_SIZE } from '../../constants/physics'
 import { SAMPLES_PER_TILE } from '../world/sampleGrid'
-import { FULL_WEIGHT, discSamplesOf, type WeightedSample } from '../world/stampShape'
+import { discSamplesOf, isInClearedCore, type WeightedSample } from '../world/stampShape'
 import type { TilePoint } from '../world/tileGrid'
 import { acrossOf, aheadOf, isCuttable, type DrillAim, type DrillableGround } from './drillContact'
 
@@ -45,7 +45,7 @@ export function slabOfStep(front: LeadingSlab, reach: LeadingSlab): LeadingSlab 
 }
 
 function isInSlab(aim: DrillAim, sample: WeightedSample): boolean {
-  if (sample.weight !== FULL_WEIGHT) return false
+  if (!isInClearedCore(aim.stamp, sample.weight)) return false
   return aheadOf(aim, sample) >= HALF_BODY_MM && Math.abs(acrossOf(aim, sample)) <= HALF_BODY_MM
 }
 

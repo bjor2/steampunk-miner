@@ -161,9 +161,16 @@ describe('bore-walled disc (GD lock on #662, Q1 b)', () => {
   const weightAcross = (samples: number) =>
     discSamplesOf(BORE).find(({ sx, sy }) => sx === AXIS_SX + samples && sy === ROW)?.weight
 
-  it('weighs its core in full out to half a sample inside its radius', () => {
+  it('weighs its core in full out to one sample inside its radius', () => {
+    // Off-column centres put a sample 350 mm (the 600 mm radius less 250) and 375 mm out.
+    const weightOut = (centreXMm: number, outMm: number) =>
+      discSamplesOf({ ...BORE, xMm: centreXMm }).find(
+        ({ sx, sy }) => sx * MM_PER_SAMPLE === centreXMm + outMm && sy === ROW,
+      )?.weight
     expect(weightAcross(0)).toBe(FULL_WEIGHT)
     expect(weightAcross(1)).toBe(FULL_WEIGHT)
+    expect(weightOut(20_400, 350)).toBe(FULL_WEIGHT)
+    expect(weightOut(20_375, 375)).toBeLessThan(FULL_WEIGHT)
   })
 
   it('reaches half a sample past its radius, a soft rim never past it', () => {
@@ -184,8 +191,12 @@ describe('bore-walled disc (GD lock on #662, Q1 b)', () => {
 
   it('ramps the wall across one sample from open to solid round its radius', () => {
     expect(boreWallTargetOf(FULL_WEIGHT)).toBe(0)
-    expect(boreWallTargetOf(0)).toBe(SOLID_DENSITY)
-    expect(boreWallTargetOf(FULL_WEIGHT / 2)).toBe(ISO_DENSITY - 1)
+    // Half a sample inside the circle is open, half a sample past it solid, the iso on it.
+    const weightAt = (outMm: number) =>
+      Math.floor((FULL_WEIGHT * (BORE.radiusMm + 125 - outMm)) / 375)
+    expect(boreWallTargetOf(weightAt(BORE.radiusMm - 125))).toBe(0)
+    expect(boreWallTargetOf(weightAt(BORE.radiusMm))).toBe(ISO_DENSITY - 1)
+    expect(boreWallTargetOf(0)).toBeGreaterThanOrEqual(SOLID_DENSITY - 1)
   })
 
   it('leaves a gear cell beside it its wall band to cut, and keeps its full-weight core', () => {

@@ -170,8 +170,20 @@ describe('casing lining', () => {
     for (const { sx, sy } of floor) expect(casingAt(lined, sx, sy)).toBe(2)
   })
 
-  it('spans from the stamp radius to a quarter metre past it round the tunnel axis', () => {
-    expect(RING).toEqual({ ...CENTRE, clearMm: 600, widthMm: 250 })
+  it('spans from a quarter metre inside the stamp radius to a quarter metre past it', () => {
+    expect(RING).toEqual({ ...CENTRE, clearMm: 350, widthMm: 500 })
+  })
+
+  it('lines the wall rock a ring off the cut’s axis finds inside the stamp radius (TD check on #662)', () => {
+    // The bore centred at x = 640 mm leaves the sample at x = 1.25 m, 610 mm out, solid on its
+    // wall; a trail axis 20 mm further on finds it 590 mm out, inside the 600 mm circle.
+    const cut = { xMm: 640, yMm: CENTRE.yMm, radiusMm: drillStampRadiusMm(), floorRadiusMm: null }
+    const hole = clearDisc(EMPTY_WORLD, params, { ...cut, edge: 'boreWall' }, 255).world
+    const wall = { sx: 1250 / MM_PER_SAMPLE, sy: CENTRE.yMm / MM_PER_SAMPLE }
+    expect(densityAt(hole, wall.sx, wall.sy)).toBeGreaterThan(128)
+    expect(touchesAir(hole, wall.sx, wall.sy)).toBe(true)
+    const lined = lineRing(hole, params, casingRingAround(cut.xMm + 20, cut.yMm), 2).world
+    expect(casingAt(lined, wall.sx, wall.sy)).toBe(2)
   })
 
   it('never spreads into the rock: rings half a metre apart keep the lining one sample thick', () => {

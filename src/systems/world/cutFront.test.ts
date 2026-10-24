@@ -19,6 +19,14 @@ const FRONT: CutFront = {
   crossed: { xMm: 9_000, yMm: 0 },
 }
 
+/**
+ * The bore wall's weight `insideMm` inside its circle: full a sample inside, 0 half a sample past
+ * (`stampShape.ts`), so 70 mm inside opens to about 55 and 120 mm inside to about 5.
+ */
+function wallWeightInside(insideMm: number): number {
+  return Math.floor((FULL_WEIGHT * (MM_PER_SAMPLE / 2 + insideMm)) / (1.5 * MM_PER_SAMPLE))
+}
+
 /** A sample at (x, y) mm with the bore's weight there, its floor the wall's ramp as stamps give it. */
 function sampleAt(xMm: number, yMm: number, weight: number): WeightedSample {
   const floor = weight < FULL_WEIGHT ? boreWallTargetOf(weight) : 0
@@ -34,18 +42,18 @@ describe('swept cut front at the bore wall (ticket 662)', () => {
   })
 
   it('holds an open crossed wall sample against a fall under half the side clearance', () => {
-    const wall = sampleAt(8_500, 500, 200)
+    const wall = sampleAt(8_500, 500, wallWeightInside(70))
     expect(frontLoweredTo(wall, FRONT, 100)).toBe(100)
   })
 
   it('lets an open crossed wall sample follow a slide of half the clearance or more', () => {
-    const wall = sampleAt(8_500, 500, 250)
-    expect(frontLoweredTo(wall, FRONT, 100)).toBe(boreWallTargetOf(250))
+    const wall = sampleAt(8_500, 500, wallWeightInside(120))
+    expect(frontLoweredTo(wall, FRONT, 100)).toBe(boreWallTargetOf(wallWeightInside(120)))
   })
 
   it('lowers a solid crossed wall sample at once, the wall the body meets', () => {
-    const wall = sampleAt(8_500, 500, 200)
-    expect(frontLoweredTo(wall, FRONT, 140)).toBe(boreWallTargetOf(200))
+    const wall = sampleAt(8_500, 500, wallWeightInside(70))
+    expect(frontLoweredTo(wall, FRONT, 140)).toBe(boreWallTargetOf(wallWeightInside(70)))
   })
 
   it('clears the bore’s full-weight core behind the last front however little is left', () => {

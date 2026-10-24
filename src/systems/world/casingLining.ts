@@ -1,6 +1,6 @@
 /**
  * One ring of casing lining (decision #41 Placement rule "Where", amended twice on #56, 5 Oct, and
- * moved into the wall by the GD lock on #661), integer arithmetic only: the samples whose position
+ * held round the 1.2 m bore's wall by the GD lock on #662), integer arithmetic only: the samples whose position
  * in mm lies in the annulus `clearR <= d < clearR + width` round a centre on the tunnel axis,
  * chosen against the ground as it stood before the ring. Lining marks the **rock side** of the
  * bore's wall, so the bore never narrows:
@@ -82,12 +82,19 @@ interface RingLining {
 type RingStep = 'line' | 'retype' | 'reline' | 'skip'
 
 /**
- * The drill's ring round a point of the tunnel axis, read from the live stamp's radius: `stampR <=
- * d < stampR + 0.25 m`, the rock just outside the wall (GD lock on #661; it was `stampR - 0.25 m`
- * to `stampR + 0.25 m` inside #36's oversized bore).
+ * The drill's ring round a point of the tunnel axis, read from the live stamp's radius: `stampR -
+ * 0.25 m <= d < stampR + 0.25 m`, from the bore wall's full-weight edge (`stampShape.ts`) to the
+ * rock just outside it. The TD's release check on #662 found the ring that started at `stampR`
+ * left the rock behind a wall sample cut just under the iso unlined (24 samples on L20's down leg);
+ * starting a sample inside, as #36's ring did round its own bore, lines it.
  */
 export function casingRingAround(xMm: number, yMm: number): CasingRing {
-  return { xMm, yMm, clearMm: drillStampRadiusMm(), widthMm: CASING_LINING_WIDTH_MM }
+  return {
+    xMm,
+    yMm,
+    clearMm: drillStampRadiusMm() - CASING_LINING_WIDTH_MM,
+    widthMm: 2 * CASING_LINING_WIDTH_MM,
+  }
 }
 
 /** Lines one ring at the player's `grade`, in the lining type `typeIndex` (the standard one by default). */

@@ -30,10 +30,10 @@ describe('drill bore', () => {
     expect(drillStampLiftMm()).toBe(0)
   })
 
-  it('lines the ring in the rock outside the wall, never inside the bore', () => {
+  it('lines the ring from the bore wall’s full-weight edge to a quarter metre past the wall', () => {
     const ring = casingRingAround(0, 0)
-    expect(ring.clearMm).toBe(drillStampRadiusMm())
-    expect(ring.widthMm).toBe(CASING_LINING_WIDTH_MM)
+    expect(ring.clearMm).toBe(drillStampRadiusMm() - CASING_LINING_WIDTH_MM)
+    expect(ring.clearMm + ring.widthMm).toBe(drillStampRadiusMm() + CASING_LINING_WIDTH_MM)
   })
 
   it('cuts decision #36’s 1.9 m bore, lift and ring lag at a clearance of 0.5 m', () => {

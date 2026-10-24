@@ -32,7 +32,12 @@
 import { DRILL_BORE_ROWS } from '../../constants/balance'
 import { circleExcessMm2Of } from './exactSquares'
 import { ISO_DENSITY, MM_PER_SAMPLE, SOLID_DENSITY } from './sampleGrid'
-import { boreWallTargetOf, FULL_WEIGHT, type StampPoint, type WeightedSample } from './stampShape'
+import {
+  boreWallTargetOf,
+  isInBoreWallCore,
+  type StampPoint,
+  type WeightedSample,
+} from './stampShape'
 
 /**
  * The front plane: a point on it in mm, the facing it moves along (a 1024-scaled vector), and the
@@ -87,7 +92,7 @@ export function frontLoweredTo(sample: WeightedSample, front: CutFront, density:
  * a step: a solid one is still the wall the body meets, and falls at once.
  */
 function isWallDrift(sample: WeightedSample, density: number, drop: number): boolean {
-  return sample.weight < FULL_WEIGHT && density < ISO_DENSITY && drop < wallFollowMin()
+  return !isInBoreWallCore(sample.weight) && density < ISO_DENSITY && drop < wallFollowMin()
 }
 
 /** The last front's ramp, its floor undercut counted, had reached the bottom of its fall here. */

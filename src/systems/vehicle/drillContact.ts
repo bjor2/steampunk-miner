@@ -1,13 +1,13 @@
 /**
  * What the drill meets (decision #7, on the #36 ground): ground its stamp can still cut, either in
- * the body's way (just past its face, across its width) or further ahead in the stamp's full-weight
- * core. The drill bites on either; only ground in the way holds the body back. Only samples the
+ * the body's way (just past its face, across its width) or further ahead in the stamp's cleared
+ * core (`isInClearedCore`). The drill bites on either; only ground in the way holds the body back. Only samples the
  * stamp can still lower count, so pushing along the vehicle's own tunnel never drills (and drains
  * nothing), and nothing seen here is ground the drill may not cut: a wall, a floor below or the
  * lip of a shaft's round bottom. The dock pad and lava (#113) are never cut.
  *
  * With the swept cut on (ticket 330) the body reaches part-cut ground sooner, and a lip it rests on
- * can sit past the face's reach and outside the stamp's full-weight core: the drill would stop and
+ * can sit past the face's reach and outside the stamp's cleared core: the drill would stop and
  * the body would stay on it. `sweptDrillContactOf` therefore also bites on any ground the stamp can
  * still cut past the body's face. The authority charges only the ticks that removed something.
  *
@@ -18,8 +18,8 @@
 import { VEHICLE_COLLIDER_SIZE } from '../../constants/physics'
 import { ISO_DENSITY, MM_PER_SAMPLE, SAMPLES_PER_TILE } from '../world/sampleGrid'
 import {
-  FULL_WEIGHT,
   discSamplesOf,
+  isInClearedCore,
   type DiscStamp,
   type WeightedSample,
 } from '../world/stampShape'
@@ -103,7 +103,7 @@ function placeOf(aim: DrillAim, sample: WeightedSample): DrillContact {
   const isPastFace =
     ahead >= HALF_BODY_MM && ahead <= HALF_BODY_MM + (aim.inTheWayMm ?? IN_THE_WAY_MM)
   if (isPastFace && Math.abs(across) <= HALF_BODY_MM) return 'inTheWay'
-  return sample.weight === FULL_WEIGHT && ahead > 0 ? 'ahead' : 'none'
+  return isInClearedCore(aim.stamp, sample.weight) && ahead > 0 ? 'ahead' : 'none'
 }
 
 /** mm from the body's centre to the sample along the facing. */
