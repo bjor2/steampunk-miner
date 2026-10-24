@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-10-24T11:13:21+02:00",
+  "updated_at": "2026-10-24T11:14:49+02:00",
   "caps": {
     "grok": 12,
     "claude": 10,
@@ -70,7 +70,7 @@
       "size": 6,
       "used": 1,
       "free": 5,
-      "claims_last_hour": 1,
+      "claims_last_hour": 2,
       "name": "Claude Max 1"
     },
     {
@@ -121,39 +121,23 @@
     }
   ],
   "gate": {
-    "busy": 0,
+    "busy": 1,
     "max": 3
   },
   "tester": {
     "state": "running",
     "phase": "fast",
-    "sha": "5bb06695124b2c96ffe5e6608e8be441390d4618",
-    "since": "2026-10-24T09:13:14Z",
-    "holds_gate": false,
+    "sha": "6a92e11acf275fd3665a7dcca0f6ff7893609d57",
+    "since": "2026-10-24T09:14:40Z",
+    "holds_gate": true,
     "claude_slot": null,
-    "last_run": "2026-10-24T04:17:19Z",
+    "last_run": "2026-10-24T09:14:25Z",
     "last_nightly": "2026-10-15T20:43:15Z",
     "last_nightly_result": "full=FAIL balance-report=ok bench=FAIL balance-planets=ok balance-guns=ok balance-charges=ok balance-refinery=ok balance-heat=ok e2e=FAIL memory-soak=FAIL packaged-smoke=ok ",
     "main_red_sha": null,
-    "feature": 789,
-    "feature_title": "Bug: drill tip misaligned after upgrades, cuts behind casing instead of through it",
-    "queue": [
-      {
-        "feature": 650,
-        "kind": "spec",
-        "title": "Travel gate: keep the 127-fragment core gate, or make it a price surcharge (Bjor's call)",
-        "tickets": [
-          754,
-          755,
-          756,
-          757,
-          758,
-          759,
-          781
-        ],
-        "since": "2026-10-24T06:26:50+02:00"
-      }
-    ]
+    "feature": 650,
+    "feature_title": "Travel gate: keep the 127-fragment core gate, or make it a price surcharge (Bjor's call)",
+    "queue": []
   },
   "grok": [
     {
