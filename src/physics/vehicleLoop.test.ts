@@ -44,7 +44,7 @@ let sink: MemorySink
  */
 const STEADY_ORIGIN_RUN = { tiles: 14, xMm: -16866, yMm: 289461 }
 const MOVING_ORIGIN_RUN = { tiles: 13, xMm: -16847, yMm: 289710 }
-/** The known f32 noise between the two (TD v2 Q4 on #514), and since ticket 662 the 12-tick bar. */
+/** The known f32 noise between the two (TD v2 Q4 on #514), and since ticket 662 the 12-tick runs' position bar. */
 const ORIGIN_NOISE = { mm: 500, tiles: 1 }
 
 beforeAll(async () => {
@@ -238,26 +238,24 @@ describe('vehicle loop', () => {
     expect(spent).toBeLessThanOrEqual(SWIVEL_TICKS * ENERGY_QUANTA_PER_TICK.thrust)
   })
 
-  // As shipped, at 12-tick reports. Until ticket 662 the two runs ended within a millimetre: the
-  // drill's soft rim weighed a sample in 64 steps of its radius, so the f32 contact noise between
-  // the origins (TD v2 Q4 on #514, below) rarely moved a report's stamp across one. The bore-wall
-  // edge (GD lock on #662, Q1 b) weighs it to the millimetre, so that noise reaches the cut at
-  // 12-tick reports too, and the runs part as the every-tick ones do: within the known noise, each
-  // replayed byte for byte.
-  it('drills on through a moved render origin within the known f32 noise of a still one, each run replayed byte for byte (ticket 339)', () => {
+  // As shipped, at 12-tick reports. Until ticket 662 the two runs also ended within a millimetre:
+  // the drill's soft rim weighed a sample in 64 steps of its radius, so the f32 contact noise
+  // between the origins rarely moved a report's stamp across one. The bore wall (GD lock on #662,
+  // Q1 b) weighs it to the millimetre, so that noise reaches the cut's wall here too (4 mm apart at
+  // its end), and the position is held to the TD's known f32 noise (v2 Q4 on #514), as at
+  // every-tick reports below; the tiles stay the same tiles, and each run replays byte for byte.
+  it('drills on through a moved render origin the same tiles, within the known f32 noise (ticket 339)', () => {
     const steady = digAndTunnel({}, AS_SHIPPED)
     const moving = digAndTunnel({ originReachMm: 0 }, AS_SHIPPED)
     expect(steady.origins).toBe(1)
     expect(moving.origins).toBeGreaterThan(1)
     expect(steady.tiles.length).toBeGreaterThan(10)
+    expect(moving.tiles).toEqual(steady.tiles)
     const apartMm = Math.hypot(
       moving.reading.xMm - steady.reading.xMm,
       moving.reading.yMm - steady.reading.yMm,
     )
     expect(apartMm).toBeLessThanOrEqual(ORIGIN_NOISE.mm)
-    expect(Math.abs(moving.reading.tiles - steady.reading.tiles)).toBeLessThanOrEqual(
-      ORIGIN_NOISE.tiles,
-    )
     expect(replayedDigestOf(steady)).toBe(steady.end.digest)
     expect(replayedDigestOf(moving)).toBe(moving.end.digest)
   })
