@@ -88,7 +88,7 @@ describe('rig look table', () => {
 
   it('puts every authored step on its band edge, the art kept in order', () => {
     expect(fromsOf('drill_tip')).toEqual([60, 120, 180, 240, 300])
-    expect(fromsOf('cargo_hold')).toEqual([11, 22, 33])
+    expect(fromsOf('cargo_hold')).toEqual([11, 22, 33, 44, 55])
     expect(fromsOf('engine')).toEqual([5, 10, 15, 20, 25])
     expect(fromsOf('boiler')).toEqual([5, 10, 15, 20, 25, 30])
     expect(fromsOf('hull')).toEqual([120, 240, 360, 480, 600])
@@ -140,7 +140,13 @@ describe('rig look table', () => {
       'Drive flywheel',
       'Twin exhaust stacks',
     ])
-    expect(cardsOf('cargo_hold')).toEqual(['Plank crate', 'Ore hopper', 'Riveted bin'])
+    expect(cardsOf('cargo_hold')).toEqual([
+      'Plank crate',
+      'Ore hopper',
+      'Riveted bin',
+      'Side racks',
+      'Strapped panniers',
+    ])
     expect(cardsOf('boiler')).toEqual([
       'Twin-drum boiler',
       'Pressure gauge',
@@ -314,7 +320,14 @@ describe('rig look table', () => {
         'twin-drum-boiler',
         'whistle-boiler',
       ],
-      'vehicle-look-cargo-hold': ['ore-hatch', 'ore-hopper', 'plank-crate', 'riveted-bin'],
+      'vehicle-look-cargo-hold': [
+        'ore-hatch',
+        'ore-hopper',
+        'pannier-bin',
+        'plank-crate',
+        'racked-bin',
+        'riveted-bin',
+      ],
       'vehicle-look-drill-tip': [
         'aether-cut-crown',
         'cutter-crown',

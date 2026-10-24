@@ -14,7 +14,14 @@
       "twin-drum-boiler",
       "whistle-boiler"
     ],
-    "vehicle-look-cargo-hold": ["ore-hatch", "ore-hopper", "plank-crate", "riveted-bin"],
+    "vehicle-look-cargo-hold": [
+      "ore-hatch",
+      "ore-hopper",
+      "pannier-bin",
+      "plank-crate",
+      "racked-bin",
+      "riveted-bin"
+    ],
     "vehicle-look-drill-tip": [
       "aether-cut-crown",
       "cutter-crown",
@@ -451,7 +458,9 @@
         "step": "Fitting: {bandName}",
         "tail": "Fitting: {bandName} \u00b7 L{level}"
       },
-      "glowSlots": [["hopper", "plank-crate", "ore-hopper", "riveted-bin"]],
+      "glowSlots": [
+        ["hopper", "plank-crate", "ore-hopper", "riveted-bin", "racked-bin", "pannier-bin"]
+      ],
       "glowCap": "rigBody",
       "steps": [
         {
@@ -477,6 +486,22 @@
           "card": "Riveted bin",
           "colour": "#9fd8ff",
           "glows": [0.7]
+        },
+        {
+          "from": 44,
+          "part": "racked-bin",
+          "asset": "vehicle-look-cargo-hold",
+          "card": "Side racks",
+          "colour": "#8c9aa6",
+          "glows": [0.72]
+        },
+        {
+          "from": 55,
+          "part": "pannier-bin",
+          "asset": "vehicle-look-cargo-hold",
+          "card": "Strapped panniers",
+          "colour": "#d2a96a",
+          "glows": [0.74]
         }
       ],
       "band": {

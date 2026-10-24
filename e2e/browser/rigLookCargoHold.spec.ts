@@ -4,8 +4,7 @@
  * rig's ore hatch (`t1-hopper`), the tail keeps the top part, and the look leaves the physics world
  * as it was; the cargo hold card names the owned band, past the art its finish and the exact
  * level (#585's template, ticket 809). Asserted through `steampunkDebug`, never pixels; the shots
- * at every step and two finish bands,
- * desktop and 360 px, by the rig's tier 1 and tier 3 shape, are written to the test's output
+ * at every step and two finish bands, desktop and 360 px, by the rig's tier 1 and tier 3 shape, are written to the test's output
  * folder for review, never compared.
  */
 import { expect, test, type Page } from '@playwright/test'
@@ -20,21 +19,26 @@ declare global {
 }
 
 const ASSET_ID = 'vehicle-look-cargo-hold'
-/** The bare rig, the three steps on the band edges of 11 (ticket 809), then two finish bands. */
+/**
+ * The bare rig, the five steps on the band edges of 11 (ticket 809; the LK4 racks and panniers of
+ * ticket 812), then two finish bands.
+ */
 const LOOKS = [
   { purchases: 10, part: null, fitting: null },
   { purchases: 11, part: 'plank-crate', fitting: 'Fitting: Plank crate' },
   { purchases: 22, part: 'ore-hopper', fitting: 'Fitting: Ore hopper' },
   { purchases: 33, part: 'riveted-bin', fitting: 'Fitting: Riveted bin' },
-  { purchases: 44, part: 'riveted-bin', fitting: 'Fitting: Burnished iron · L44' },
-  { purchases: 55, part: 'riveted-bin', fitting: 'Fitting: Bright brass · L55' },
+  { purchases: 44, part: 'racked-bin', fitting: 'Fitting: Side racks' },
+  { purchases: 55, part: 'pannier-bin', fitting: 'Fitting: Strapped panniers' },
+  { purchases: 66, part: 'pannier-bin', fitting: 'Fitting: Burnished iron · L66' },
+  { purchases: 77, part: 'pannier-bin', fitting: 'Fitting: Bright brass · L77' },
 ]
 /**
  * Levels the card must fit at 360 px past the art. The hold's units stay safe integers only to
  * about purchase 250 (1.15 a purchase, ticket 553), so the game cannot own level 9999; the unit
  * spec measures the widest text instead (rigLookPlaque.test.ts).
  */
-const TAIL_LEVELS = [44, 101, 200]
+const TAIL_LEVELS = [66, 101, 200]
 const CARD = `[data-testid="${UI_ID_TEMPLATES.workshopUpgradeBuy('cargo_hold')}"]`
 const FITTING = `${CARD} [data-sheet-card-line]`
 const VIEWPORTS = [
@@ -143,8 +147,8 @@ test.describe('cargo hold look (ticket 581)', () => {
     await setUpgrade(page, 'cargo_hold', 10)
     await expectLook(page, null)
     const lowest = await physicsCounts(page)
-    await setUpgrade(page, 'cargo_hold', 55)
-    await expectLook(page, 'riveted-bin')
+    await setUpgrade(page, 'cargo_hold', 77)
+    await expectLook(page, 'pannier-bin')
     await expect.poll(() => physicsCounts(page)).toEqual(lowest)
     expect(errors).toEqual([])
   })

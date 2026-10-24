@@ -3,13 +3,13 @@
   "schema": 1,
   "source": {
     "blend": "art/blender/vehicle-look-cargo-hold/vehicle-look-cargo-hold.blend",
-    "sha256": "b7af853e4b6f650b5cf3d77b02f21272188a0f5552c2fd7d3fa65584d49236d2",
+    "sha256": "c42bba27db31500cd4ac0809d1c8feb336a4aa83659b258a67f94dfd0b8f1731",
     "blender": "4.2.9 LTS"
   },
   "pxPerMetre": 512,
   "atlasPx": [
     256,
-    256
+    512
   ],
   "maps": {
     "albedo": "vehicle-look-cargo-hold.albedo.ktx2",
@@ -22,7 +22,7 @@
       "tier": 1,
       "rect": [
         8,
-        8,
+        236,
         113,
         53
       ],
@@ -45,7 +45,7 @@
       "tier": 1,
       "rect": [
         8,
-        146,
+        374,
         108,
         53
       ],
@@ -64,11 +64,34 @@
       "z": 3
     },
     {
+      "id": "pannier-bin",
+      "tier": 1,
+      "rect": [
+        8,
+        8,
+        113,
+        98
+      ],
+      "sizeM": [
+        0.22,
+        0.19
+      ],
+      "pivotM": [
+        0.075,
+        0.188
+      ],
+      "atM": [
+        0.0,
+        0.0
+      ],
+      "z": 3
+    },
+    {
       "id": "plank-crate",
       "tier": 1,
       "rect": [
         137,
-        77,
+        305,
         111,
         53
       ],
@@ -87,11 +110,34 @@
       "z": 3
     },
     {
+      "id": "racked-bin",
+      "tier": 1,
+      "rect": [
+        8,
+        122,
+        113,
+        98
+      ],
+      "sizeM": [
+        0.22,
+        0.19
+      ],
+      "pivotM": [
+        0.075,
+        0.188
+      ],
+      "atM": [
+        0.0,
+        0.0
+      ],
+      "z": 3
+    },
+    {
       "id": "riveted-bin",
       "tier": 1,
       "rect": [
         8,
-        77,
+        305,
         113,
         53
       ],

@@ -32,6 +32,22 @@
         "tier-3": 0
       },
       "changesRigOutline": 13
+    },
+    "racked-bin": {
+      "cells": 1369,
+      "outsideRig": {
+        "tier-1": 0,
+        "tier-3": 0
+      },
+      "changesRigOutline": 13
+    },
+    "pannier-bin": {
+      "cells": 1673,
+      "outsideRig": {
+        "tier-1": 0,
+        "tier-3": 0
+      },
+      "changesRigOutline": 13
     }
   }
 }

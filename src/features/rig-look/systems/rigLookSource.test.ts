@@ -117,6 +117,8 @@ describe('rig look on the vehicle', () => {
       'iron-track',
       'steel-track',
       'guild-track',
+      'flywheel-track',
+      'exhaust-track',
     ])
   })
 
