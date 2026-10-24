@@ -94,6 +94,16 @@
     no-repeat;
 }
 
+/* The depth dial's band (ticket 830): a faint wash of the plate metal its casing grade wears, and
+ * a thin rim of it, so the dial and the lined walls agree; the zone colours below win over it. */
+.dial[data-band-tint]::before {
+  background: color-mix(in srgb, var(--color-dial-face), var(--dial-band-tint) 28%);
+}
+
+.dial[data-band-tint] {
+  box-shadow: inset 0 0 0 2px color-mix(in srgb, transparent, var(--dial-band-tint) 55%);
+}
+
 /* Amber at 25% and red at 10% of what is left: the face takes the zone's colour and a rim. */
 .dial[data-zone='amber'] {
   box-shadow: 0 0 0 var(--frame-bezel) var(--color-amber);

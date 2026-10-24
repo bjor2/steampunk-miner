@@ -20,6 +20,7 @@ import { hudLabelIconIdOf } from '../art/icons/iconSet'
 import { uiArtVariableOfPart } from '../art/uiArt'
 import { formatAmount } from '../displayAmount'
 import { DESIGN_TOKENS, type DesignTokens, type LayoutKind } from './designSystem'
+import { depthBandTintOf } from './depthBandTint'
 import { depthDialOf, type DepthMarker } from './depthDial'
 import { buyCueOfDials, type BuyCueMark } from './dialBuyCue'
 import {
@@ -65,6 +66,8 @@ export interface DialFace {
   badge: string | null
   /** The depth dial's band and core marks; none on the others. */
   markers: readonly DepthMarker[]
+  /** The depth dial's faint tint: the plate of the grade its band needs (ticket 830); null else. */
+  bandTint: string | null
   art: DialArt
   /** The heat at or under 60%: its slot stays and the dial does not draw. */
   isHeld: boolean
@@ -102,6 +105,7 @@ type FaceReading = Pick<
   | 'longText'
   | 'badge'
   | 'markers'
+  | 'bandTint'
   | 'isHeld'
 >
 
@@ -288,6 +292,7 @@ function depthReadingOf(model: HudModel, tokens: DesignTokens): FaceReading {
     longText: `${longAmountOfExact(String(depthTiles))} m`,
     badge: null,
     markers: dial.markers,
+    bandTint: depthBandTintOf(model.depth.band),
     isHeld: false,
   }
 }
@@ -301,6 +306,7 @@ function plainFaceOf(gauge: GaugeReading, fill: number): Omit<FaceReading, 'left
     longText: longAmountOfExact(gauge.exact),
     badge: null,
     markers: NO_MARKERS,
+    bandTint: null,
     isHeld: false,
   }
 }

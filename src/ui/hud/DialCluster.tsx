@@ -7,7 +7,8 @@
  * is the shared element's title, out of sight, so assistive tech reads it. A resting mouse also
  * shows the full value under the dial in the formatter's long mode (ticket 768). A pip on the rim, and
  * one under the "+N" for the dials it folds, steps one notch per upgrade bought (ticket 727), with
- * no ease, so it moves on the render the buy reaches. On desktop, where the dials outgrow the
+ * no ease, so it moves on the render the buy reaches. The depth dial's face takes a faint tint of
+ * the plate metal its band's casing grade wears (ticket 830). On desktop, where the dials outgrow the
  * strip, the "+N" is a button that turns it to the next page of them (ticket 767). Markup only.
  */
 import type { CSSProperties, ReactNode } from 'react'
@@ -101,9 +102,10 @@ function DialMeter({ face }: { face: DialFace }) {
   return (
     <span
       className={styles.dial}
-      style={dialStyleOf(face.art, face.needlePermille)}
+      style={dialStyleOf(face.art, face.needlePermille, face.bandTint)}
       data-testid={UI_ID_TEMPLATES.hudDial(face.id)}
       data-permille={face.needlePermille}
+      data-band-tint={face.bandTint ?? undefined}
       data-zone={face.zone}
       data-tier={face.tier}
       data-cue={face.cue?.notch}
@@ -210,9 +212,10 @@ function PageTurner({
 }
 
 /** The skin's baked face and needle through their art variables; the CSS frame stays behind. */
-function dialStyleOf(art: DialArt, needlePermille: number): CSSProperties {
+function dialStyleOf(art: DialArt, needlePermille: number, bandTint: string | null): CSSProperties {
   return {
     ...turnStyleOf(needlePermille),
+    ...(bandTint === null ? {} : { '--dial-band-tint': bandTint }),
     ...(art.face === null ? {} : faceArtStyleOf(art.face)),
     ...(art.needle === null ? {} : { '--dial-needle-art': `var(${art.needle})` }),
   } as CSSProperties

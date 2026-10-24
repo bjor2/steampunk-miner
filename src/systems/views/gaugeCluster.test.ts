@@ -3,6 +3,7 @@ import { SHIPPED_ART } from '../../scene/shippedArt'
 import { createScriptedSession } from '../authority/scriptedSession'
 import { KEYBOARD_PROMPTS } from '../input/promptFixtures'
 import { setEnergyCommand, setHullCommand } from '../vehicle/vehicleCommands'
+import { depthBandTintOf } from './depthBandTint'
 import { DESIGN_TOKENS } from './designSystem'
 import {
   chainBadgeTextOf,
@@ -158,6 +159,15 @@ describe('gauge cluster dials (ticket 716)', () => {
       'core',
     ])
     expect(depth?.text).toBe(`${RUN_DEPTH} m`)
+  })
+
+  it("tints the depth dial with the plate of its band's casing grade, and no other dial (ticket 830)", () => {
+    const model = hudOf(createScriptedSession(), RUN_DEPTH)
+    const dials = gaugeClusterOf(model, 'phone').dials
+    expect(model.depth.band).not.toBeNull()
+    expect(dialOf(dials, 'depth')?.bandTint).toBe(depthBandTintOf(model.depth.band))
+    expect(dialOf(dials, 'depth')?.bandTint).toMatch(/^#[0-9a-f]{6}$/)
+    expect(dialOf(dials, 'hull')?.bandTint).toBeNull()
   })
 
   it('shows the chain badge only once a wagon links on, through the shared formatter', () => {
