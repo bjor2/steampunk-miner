@@ -7,6 +7,8 @@
  * copy as the card and the hover will show it, filled with its name (ticket 780).
  * `economyRowsOf(system, worldSeed)` is the system's economy rows, amounts as canonical text, with
  * the problems the lock's guards find (none on a sound build; ticket 776).
+ * `materialPoolsOf(system, worldSeed)` is the system's generated material pools with the problems
+ * the pool guards find (ticket 777).
  */
 import type { DebugAction } from '../../debug/debugActionRegistry'
 import type { DebugResult } from '../../debug/debugScreens'
@@ -14,6 +16,8 @@ import { readIndexText } from '../../systems/starMap/planetAddress'
 import { economyRowProblemsOf } from './systems/economyRowGuards'
 import { economyRowTextOf, systemEconomyRowsOf, type EconomyRowText } from './systems/economyRows'
 import { slotCopyOf, type SlotCopy } from './systems/familyCopy'
+import { systemMaterialPoolsOf, type MaterialPool } from './systems/materialPool'
+import { materialPoolProblemsOf } from './systems/materialPoolGuards'
 import { ARCHETYPE_PALETTE } from './systems/paletteRows'
 import { lookArtOf, LOOK_ART, type LookArt } from './systems/render/lookArt'
 import { rosterPlanetOf, systemRosterOf, type RosterPlanet } from './systems/systemRoster'
@@ -24,6 +28,7 @@ export const solarSystemsDebugActions: Readonly<Record<string, DebugAction>> = {
   lookArtOf: (lookId) => lookArtResultOf(lookId),
   slotCopyOf: (system, planet, worldSeed) => slotCopyResultOf(system, planet, worldSeed),
   economyRowsOf: (system, worldSeed) => economyRowsResultOf(system, worldSeed),
+  materialPoolsOf: (system, worldSeed) => materialPoolsResultOf(system, worldSeed),
 }
 
 function describePalette() {
@@ -69,6 +74,24 @@ function economyRowsResultOf(
 function economyRowsAnswerOf(worldSeed: number, system: bigint) {
   const rows = systemEconomyRowsOf(worldSeed, system)
   return { rows: rows.map(economyRowTextOf), lockProblems: economyRowProblemsOf(rows) }
+}
+
+function materialPoolsResultOf(
+  system: unknown,
+  worldSeed: unknown,
+): DebugResult<{ pools: MaterialPool[]; lockProblems: string[] }> {
+  const index = indexOf(system)
+  const problems = [
+    ...(index === null ? ['system must be a whole index from 1'] : []),
+    ...(Number.isSafeInteger(worldSeed) ? [] : ['worldSeed must be a safe integer']),
+  ]
+  if (index === null || problems.length > 0) return { ok: false, problems }
+  return answerOrProblem(() => materialPoolsAnswerOf(worldSeed as number, index))
+}
+
+function materialPoolsAnswerOf(worldSeed: number, system: bigint) {
+  const pools = systemMaterialPoolsOf(worldSeed, system)
+  return { pools, lockProblems: materialPoolProblemsOf(pools) }
 }
 
 /** A planet's filled family copy; `copy` is null where the planet's slot is empty. */

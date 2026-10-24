@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { solarSystemsDebugActions } from './debug'
 import { economyRowTextOf, systemEconomyRowsOf } from './systems/economyRows'
+import { systemMaterialPoolsOf } from './systems/materialPool'
 import { systemRosterOf } from './systems/systemRoster'
 
 describe('solar-systems debug actions (ticket 775)', () => {
@@ -80,6 +81,20 @@ describe('solar-systems debug actions (ticket 775)', () => {
     })
     expect(rows[0]).toMatchObject({ campaignIndex: '6', arrivalStep: '1.1e+0' })
     expect(solarSystemsDebugActions.economyRowsOf!('1', 7)).toEqual({
+      ok: false,
+      problems: ['system 1 keeps its own rows: the palette draws from system 2'],
+    })
+  })
+
+  it("prints a system's generated material pools with no lock problem, and refuses system 1 (ticket 777)", () => {
+    const pools = systemMaterialPoolsOf(20261024, 2n)
+    expect(solarSystemsDebugActions.materialPoolsOf!(2, 20261024)).toEqual({
+      ok: true,
+      pools,
+      lockProblems: [],
+    })
+    expect(pools[0]).toMatchObject({ id: 'system2-p1', campaignIndex: '6' })
+    expect(solarSystemsDebugActions.materialPoolsOf!('1', 7)).toEqual({
       ok: false,
       problems: ['system 1 keeps its own rows: the palette draws from system 2'],
     })
