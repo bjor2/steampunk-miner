@@ -466,6 +466,21 @@ balance:report`, `oreValueCensus.lane.test.ts`.
   or felt under the floor. `economyRows.golden.test.ts` pins "solar system 2" spelled out and systems
   10 and 1e6 by digest. `debug.test.ts` prints them through
   `steampunkDebug.features['solar-systems'].economyRowsOf(system, worldSeed)`.
+- **The SS2 generated material pool** (ticket 777, spec #774): `src/features/solar-systems/systems/materialPool.test.ts`
+  draws each later planet's pool the same on every read and another under another seed, refuses
+  system 1, holds 15 kinds (never past the 17-kind cap) on systems 2 to 40 under two seeds and 1e6,
+  cuts every kind from a run the planet's own ore mix paints (its window the bands painted), keeps
+  band 1 scarce (commons and an uncommon only, the fewest kinds of any band) with an uncommon within
+  the first trip, rares only from band 3, the three rarest kinds as gems in bands 3 to 5 in 1-3 cell
+  clusters at the planet's gem tiers, the gems' paper share of the pool value under 15%, every planet
+  of system 2 its new family with an ore family on the band-1 uncommon, ids and names from the
+  address and the look; the guards hold the lock and refuse each broken pool, and the rules refuse a
+  target past the cap. `poolRecolour.test.ts` is fail-on-recolour at the species level: no kind of
+  systems 2 to 40 wears a first-system silhouette + pattern pair or word, and system 1's planet 6-7
+  species dressed in a pool's hue slots are named kind by kind. `poolRuns.test.ts` holds the run fold
+  and the heaviest-first split. `materialPool.golden.test.ts` pins system 2 of seed 20261024 (planet
+  2.1 kind by kind) and systems 10 and 1e6 by digest. `debug.test.ts` prints them through
+  `steampunkDebug.features['solar-systems'].materialPoolsOf(system, worldSeed)`.
 - **The planet-row registry** (ticket 707, GD lock 6326252575): `src/systems/registries/planetRow.test.ts`
   resolves the generated row with no provider (`Planet {n}`, no pool, look or frozen radius), lays a
   provider's fields over it and keeps the ones it leaves out, resolves any planet up to the largest

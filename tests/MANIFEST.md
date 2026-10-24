@@ -569,18 +569,22 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/sensing/systems/threatPeriscope.test.ts` | 6 | 6 |
 | `src/features/sensing/systems/useResolution.test.ts` | 16 | 16 |
 
-### `solar-systems`: 12 files, 84 tests
+### `solar-systems`: 16 files, 112 tests
 
 | File | Tests | Sites |
 | --- | --- | --- |
-| `src/features/solar-systems/debug.test.ts` | 6 | 6 |
+| `src/features/solar-systems/debug.test.ts` | 7 | 7 |
 | `src/features/solar-systems/systems/economyRows.golden.test.ts` | 2 | 2 |
 | `src/features/solar-systems/systems/economyRows.test.ts` | 15 | 15 |
 | `src/features/solar-systems/systems/economyRules.test.ts` | 5 | 5 |
 | `src/features/solar-systems/systems/familyBehaviours.test.ts` | 6 | 6 |
 | `src/features/solar-systems/systems/familyCopy.test.ts` | 7 | 7 |
+| `src/features/solar-systems/systems/materialPool.golden.test.ts` | 3 | 3 |
+| `src/features/solar-systems/systems/materialPool.test.ts` | 17 | 17 |
 | `src/features/solar-systems/systems/newContentSlots.test.ts` | 4 | 4 |
 | `src/features/solar-systems/systems/paletteRows.test.ts` | 11 | 11 |
+| `src/features/solar-systems/systems/poolRecolour.test.ts` | 3 | 3 |
+| `src/features/solar-systems/systems/poolRuns.test.ts` | 4 | 4 |
 | `src/features/solar-systems/systems/render/lookArt.test.ts` | 8 | 8 |
 | `src/features/solar-systems/systems/render/lookContactSheet.test.ts` | 7 | 7 |
 | `src/features/solar-systems/systems/systemRoster.golden.test.ts` | 2 | 2 |
