@@ -143,6 +143,12 @@
               "issues": [650, 756, 758]
             },
             {
+              "title": "Jump drive",
+              "description": "A money-bought jump drive stands on the coal tender's frame, a brass mast with copper windings under an aether globe; with it the star-map jump crosses into the next solar system, for a little more fuel, onto worlds of their own whose ground is a step harder.",
+              "status": "built",
+              "issues": [650, 759]
+            },
+            {
               "title": "Mounted modules on the rig",
               "description": "Bought modules show on the vehicle: the gun turret swings its barrel toward targets and the charge rack sits on the hull.",
               "status": "built",

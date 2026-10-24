@@ -23,7 +23,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | Every buyable has a description | #159 | `src/systems/registries/buyableRefs.test.ts`, `src/features/descriptions/systems/descriptionCoverage.test.ts` | 10 |
 | Every ore family has a gateClass row | #141, #142 | `src/features/planet-mix/systems/themeRows.test.ts`, `src/features/mining-gates/systems/rigs.test.ts`, `src/features/mining-gates/systems/gateTable.test.ts` | 19 |
 | Endless signature coverage, planets 41-65 | #148 | `src/features/mining-gates/systems/rigs.test.ts` | 8 |
-| Locked unlock schedule and one home per stats.json row (stay in the kernel) | #184, #191 | `src/systems/unlocks/unlockSchedule.test.ts`, `src/systems/registries/scheduleRows.test.ts` | 39 |
+| Locked unlock schedule and one home per stats.json row (stay in the kernel) | #184, #191 | `src/systems/unlocks/unlockSchedule.test.ts`, `src/systems/registries/scheduleRows.test.ts` | 41 |
 
 ## Slices
 
@@ -740,6 +740,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/art/icons/iconStems.test.ts` | 3 | 3 |
 | `src/systems/art/icons/iconSvg.test.ts` | 6 | 6 |
 | `src/systems/art/icons/oreIcon.test.ts` | 3 | 3 |
+| `src/systems/art/jumpDriveArt.test.ts` | 4 | 4 |
 | `src/systems/art/ktx2Header.test.ts` | 9 | 9 |
 | `src/systems/art/partsSidecar.test.ts` | 22 | 18 |
 | `src/systems/art/placeholderLook.test.ts` | 10 | 9 |
@@ -907,6 +908,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/authority/speedScaling.test.ts` | 28 | 12 |
 | `src/systems/authority/starMap/fuelShopRules.test.ts` | 11 | 11 |
 | `src/systems/authority/starMap/fuelTankRules.test.ts` | 6 | 6 |
+| `src/systems/authority/starMap/jumpDriveRules.test.ts` | 12 | 12 |
 | `src/systems/authority/starMap/jumpRules.test.ts` | 12 | 12 |
 | `src/systems/authority/starMap/jumpTwoClients.test.ts` | 4 | 3 |
 | `src/systems/authority/starMap/starMapSnapshot.test.ts` | 6 | 6 |
@@ -1044,8 +1046,9 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/economy/oreEconomy.test.ts` | 7 | 7 |
 | `src/systems/economy/perPurchaseRows.test.ts` | 40 | 21 |
 | `src/systems/economy/planetCharges.test.ts` | 17 | 13 |
-| `src/systems/economy/readEconomy.test.ts` | 27 | 27 |
+| `src/systems/economy/readEconomy.test.ts` | 28 | 28 |
 | `src/systems/economy/refineryEconomy.test.ts` | 6 | 6 |
+| `src/systems/economy/systemJump.test.ts` | 6 | 6 |
 | `src/systems/economy/trackKind.test.ts` | 1 | 1 |
 | `src/systems/economy/travelCharge.test.ts` | 7 | 7 |
 | `src/systems/economy/upgradePrices.test.ts` | 9 | 9 |
@@ -1175,10 +1178,11 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/logging/sessionAnalysis/memoryTrend.test.ts` | 7 | 7 |
 | `src/logging/sessionAnalysis/sessionTable.test.ts` | 12 | 12 |
 | `src/logging/sessionAnalysis/summaryComparison.test.ts` | 3 | 3 |
-| `src/logging/starMapTravel.lane.test.ts` | 2 | 2 |
+| `src/logging/starMapTravel.lane.test.ts` | 3 | 3 |
 | `src/logging/starMapTravel.test.ts` | 11 | 11 |
 | `src/logging/subStepFloor.test.ts` | 4 | 4 |
 | `src/logging/surfaceLayerReport.test.ts` | 4 | 4 |
+| `src/logging/systemJumpBars.test.ts` | 5 | 5 |
 | `src/logging/travelClampReport.test.ts` | 4 | 4 |
 | `src/logging/tripCellEnergy.lane.test.ts` | 1 | 1 |
 | `src/logging/tripCellEnergy.test.ts` | 2 | 2 |
@@ -1393,6 +1397,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/save/chunkDiffSave.test.ts` | 11 | 11 |
 | `src/systems/save/cutFrontSave.test.ts` | 2 | 2 |
 | `src/systems/save/fuelTankSaves.test.ts` | 3 | 3 |
+| `src/systems/save/jumpDriveSaves.test.ts` | 4 | 4 |
 | `src/systems/save/loadedSaveDigest.test.ts` | 4 | 4 |
 | `src/systems/save/newerSaveText.test.ts` | 5 | 5 |
 | `src/systems/save/oreRulesOldSaves.test.ts` | 17 | 11 |
@@ -1475,6 +1480,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/starMap/campaignIndex.test.ts` | 13 | 13 |
 | `src/systems/starMap/planetAddress.test.ts` | 2 | 2 |
 | `src/systems/starMap/planetAddressSeed.test.ts` | 6 | 6 |
+| `src/systems/starMap/systemPlanetParams.test.ts` | 7 | 7 |
 
 ### `store`
 
@@ -1515,7 +1521,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/store/slowDeviceChip.test.ts` | 2 | 2 |
 | `src/store/soundUnlockSlice.test.ts` | 4 | 4 |
 | `src/store/speciesRevealBroadcast.test.ts` | 2 | 2 |
-| `src/store/starMapActions.test.ts` | 4 | 4 |
+| `src/store/starMapActions.test.ts` | 6 | 6 |
 | `src/store/starMapKeys.test.ts` | 5 | 5 |
 | `src/store/tapSheetSlice.test.ts` | 6 | 6 |
 | `src/store/titleMenu.test.ts` | 9 | 9 |
@@ -1668,7 +1674,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/unlocks/readUnlockSchedule.test.ts` | 10 | 10 |
 | `src/systems/unlocks/scheduleCadence.test.ts` | 5 | 5 |
 | `src/systems/unlocks/travelUnlocks.test.ts` | 7 | 7 |
-| `src/systems/unlocks/unlockSchedule.test.ts` | 35 | 32 |
+| `src/systems/unlocks/unlockSchedule.test.ts` | 37 | 34 |
 
 ### `vehicle`
 

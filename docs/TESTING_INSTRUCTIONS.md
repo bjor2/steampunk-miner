@@ -518,7 +518,25 @@ balance:report`, `oreValueCensus.lane.test.ts`.
   speed on arrival for p -> p+1 and the skip p -> p+2. Planet minutes and money per minute against
   #551 stay the R3 lane's, which plays the same bot. `starMapTravel.test.ts` holds the fold and
   every bar on synthetic seeds; `travelClampReport.test.ts` and `radiusRebaseline.test.ts` hold a
-  jump judged on the fuel bought for it. Hours of play, so it runs only when named.
+  jump judged on the fuel bought for it. Since ticket 759 the bot then buys the jump drive and the
+  jump's fuel at planet 5's Sell bay and jumps to system 2's first planet; with the P1-P5 tallies
+  stopped at the core, the levels it arrives with are cut against band 1 there, k_jump harder, and
+  the arrival felt speed is gated at 0.9x planet 5's average (`systemJumpBars.ts`, the Producer's
+  k_jump lock on #759; a miss moves only `starMap.systemJump.hardnessStep`). Hours of play, so it
+  runs only when named.
+- **Jump between solar systems** (ticket 759, spec #650): the data rows are pure
+  (`economy/systemJump.test.ts`: J times the in-system units, the destination's unit price, the
+  hardness step `k_jump^(s - 1)`, the jump drive's price, and the bignum goldens out of systems 1, 2,
+  10 and 1e6; `readEconomy.test.ts` refuses a multiplier or step under 1). A later system's planet is
+  generated from its address with its ground k_jump harder (`starMap/systemPlanetParams.test.ts`:
+  system 1 byte-identical, system 2's planet a world of its own beside system 1's of the same g).
+  The authority's drive and jump are on scripted sessions (`authority/starMap/jumpDriveRules.test.ts`:
+  bought once at the Sell bay, `no_jump_drive` without it, J times the fuel, the trip home, the #648
+  clamp on the jump out of a system's last planet, the same digest twice); the save step and the
+  drive and later-system planet through save and load in `save/jumpDriveSaves.test.ts`; the store
+  in `starMapActions.test.ts`; the `jump_drive` row and its P40 62 -> 63 re-pin in
+  `unlocks/unlockSchedule.test.ts`; the rig part's ids in `systems/art/jumpDriveArt.test.ts`, its
+  look on the review sheets under `docs/art/jump-drive/`.
 - **Material looks** (ticket 450, TD shape on #450 6226270701 and the Scalers' conditions):
   `src/features/roster/kindLook.test.ts` holds the roster's look provider to its rules: a fresh
   save draws every species' skin with no rarity (ticket 698), a species' rarity shows only once the
