@@ -63,7 +63,7 @@ const DIAGONAL_GOLDEN: [number, number][] = [
   [1, -1], [2, -1], [3, -1], [4, -1],
   [2, -2], [3, -2], [4, -2], [5, -2],
   [3, -3], [4, -3], [5, -3], [6, -3],
-  [4, -4], [5, -4], [6, -4],
+  [4, -4], [5, -4], [6, -4], [7, -4],
   [5, -5], [6, -5],
 ]
 
@@ -82,7 +82,8 @@ describe('drill step aim (ticket 791)', () => {
 
   // The terrain-stamp golden of the diagonal: the cells the route cuts, as offsets from the
   // surface tile, pinned. They lie in a band four cells across the 45 degree line, the bore's
-  // width at a slant, its centre ahead of the body.
+  // width at a slant, its centre ahead of the body. Since ticket 662 the bore at 45 degrees is the
+  // body's 1.27 m across its path plus the clearance, so its last stamp reaches (7, -4) too.
   it('cuts the pinned diagonal band of cells, four cells across the 45 degree line', () => {
     const cut = cutOffsetsOf(cutRouteAlong(DOWN_RIGHT, FACING.right))
     expect(cut.every(([dx, dy]) => dx + dy >= 0 && dx + dy <= 3)).toBe(true)

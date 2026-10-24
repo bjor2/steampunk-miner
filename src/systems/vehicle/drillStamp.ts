@@ -34,8 +34,8 @@ import { centreDistanceFloorMmOf } from '../world/exactSquares'
 import type { FloorBand } from '../world/floorBand'
 import type { DiscStamp, StampPoint } from '../world/stampShape'
 import { MM_PER_SAMPLE } from '../world/sampleGrid'
-import { drillStampLiftMm, drillStampRadiusMm } from './drillBore'
-import { AIM, aimDirectionOf, aimOfPose, aimVectorOfPose, isSidewaysAim, type Aim } from './aim'
+import { bodyReachMmAlong, drillStampLiftMm, drillStampRadiusMmAlong } from './drillBore'
+import { AIM, aimOfPose, aimVectorOfPose, isSidewaysAim, type Aim } from './aim'
 import type { VehiclePose } from './vehiclePose'
 
 const HALF_BODY_MM = (VEHICLE_COLLIDER_SIZE * 1000) / 2
@@ -79,13 +79,12 @@ export function sweptStampAheadMmOf(stepMm: number, aim: Aim): number {
 }
 
 /**
- * How far the body's square reaches from its centre along an aim, whole mm rounded up: half its
- * side along one of the four facings, its corner's reach between them (ticket 791), so a diagonal
- * cut's face clears the corner that leads it instead of holding the body on it.
+ * How far the body's face sits from its centre along an aim (`bodyReachMmAlong`): its corner's
+ * reach between the four facings (ticket 791), so a diagonal cut's face clears the corner that
+ * leads it instead of holding the body on it.
  */
 export function bodyFaceMmAlong(aim: Aim): number {
-  const { along, up } = aimDirectionOf(aim)
-  return Math.ceil((BODY_HALF_SIZE_MM * (Math.abs(along) + Math.abs(up))) / UP_VECTOR_SCALE)
+  return bodyReachMmAlong(aim)
 }
 
 /**
@@ -195,7 +194,7 @@ function stampAheadBy(pose: VehiclePose, isLifting: boolean, aheadMm: number): D
   return {
     xMm: pose.x + scaled(ahead.x, aheadMm) + scaled(pose.upx, lift),
     yMm: pose.y + scaled(ahead.y, aheadMm) + scaled(pose.upy, lift),
-    radiusMm: drillStampRadiusMm(),
+    radiusMm: drillStampRadiusMmAlong(aimOfPose(pose)),
     floorRadiusMm: isLevelCut ? wheelFloorRadiusOf(pose, FLOOR_JITTER_MM) : null,
     edge: 'boreWall',
     ...(isLevelCut ? { floorBand: floorBandOf(pose) } : {}),

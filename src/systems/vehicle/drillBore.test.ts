@@ -5,9 +5,16 @@ import {
   DRILL_BORE_ROWS,
   DRILL_SIDE_CLEARANCE_RANGE_MM,
 } from '../../constants/balance'
-import { VEHICLE_COLLIDER_SIZE } from '../../constants/physics'
+import { AIM_STEPS_PER_TURN, VEHICLE_COLLIDER_SIZE } from '../../constants/physics'
 import { casingRingAround } from '../world/casingLining'
-import { casingRingLagMm, drillStampLiftMm, drillStampRadiusMm } from './drillBore'
+import { AIM, aimDirectionOf } from './aim'
+import {
+  casingRingLagMm,
+  drillStampLiftMm,
+  drillStampRadiusMm,
+  drillStampRadiusMmAlong,
+  widestStampRadiusMm,
+} from './drillBore'
 import { WIDE_BORE_CLEARANCE_MM, withDrillSideClearance } from './drillBoreFixtures'
 
 describe('drill bore', () => {
@@ -34,6 +41,25 @@ describe('drill bore', () => {
     const ring = casingRingAround(0, 0)
     expect(ring.clearMm).toBe(drillStampRadiusMm() - CASING_LINING_WIDTH_MM)
     expect(ring.clearMm + ring.widthMm).toBe(drillStampRadiusMm() + CASING_LINING_WIDTH_MM)
+  })
+
+  it('widens the bore across a diagonal aim to the body’s corners plus the clearance (ticket 791)', () => {
+    expect(drillStampRadiusMmAlong(AIM.down)).toBe(drillStampRadiusMm())
+    expect(drillStampRadiusMmAlong(AIM.right)).toBe(drillStampRadiusMm())
+    // 45 degrees: the 0.9 m square is 1.27 m across its path, its half 637 mm rounded up.
+    expect(drillStampRadiusMmAlong(40)).toBe(637 + 150)
+    expect(widestStampRadiusMm()).toBe(637 + 150)
+  })
+
+  it('fits the body’s width across its path and the clearance either side at every aim', () => {
+    for (let aim = 0; aim < AIM_STEPS_PER_TURN; aim++) {
+      const { along, up } = aimDirectionOf(aim)
+      // The square's half width across the path: its corners' reach at a quarter turn on.
+      const halfAcrossMm = (BODY_HALF_SIZE_MM * (Math.abs(along) + Math.abs(up))) / 1024
+      const clearMm = drillStampRadiusMmAlong(aim) - halfAcrossMm
+      expect(clearMm).toBeGreaterThanOrEqual(DRILL_BORE_ROWS.sideClearanceMm)
+      expect(clearMm).toBeLessThan(DRILL_BORE_ROWS.sideClearanceMm + 1)
+    }
   })
 
   it('cuts decision #36’s 1.9 m bore, lift and ring lag at a clearance of 0.5 m', () => {
