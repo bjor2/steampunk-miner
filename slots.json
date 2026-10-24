@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-10-24T17:30:36+02:00",
+  "updated_at": "2026-10-24T17:44:05+02:00",
   "caps": {
     "grok": 12,
     "claude": 10,
@@ -28,12 +28,11 @@
         },
         {
           "slot": "C2",
-          "state": "busy",
-          "ticket": 757,
-          "grok_slot": 2,
-          "kind": "dev",
-          "since": "2026-10-24T17:16:00+02:00",
-          "wave": "647-7H"
+          "state": "free",
+          "ticket": null,
+          "grok_slot": null,
+          "kind": null,
+          "since": null
         },
         {
           "slot": "C3",
@@ -70,8 +69,8 @@
         }
       ],
       "size": 6,
-      "used": 3,
-      "free": 3,
+      "used": 2,
+      "free": 4,
       "claims_last_hour": 5,
       "name": "Claude Max 1"
     },
@@ -141,7 +140,23 @@
     "main_red_sha": null,
     "feature": 774,
     "feature_title": "SS2 map: solar system 2 (generated)",
-    "queue": []
+    "queue": [
+      {
+        "feature": 650,
+        "kind": "spec",
+        "title": "Travel gate: keep the 127-fragment core gate, or make it a price surcharge (Bjor's call)",
+        "tickets": [
+          754,
+          755,
+          756,
+          757,
+          758,
+          759,
+          781
+        ],
+        "since": "2026-10-24T17:31:38+02:00"
+      }
+    ]
   },
   "grok": [
     {
@@ -154,11 +169,9 @@
     },
     {
       "slot": 2,
-      "state": "dev",
-      "ticket": 757,
-      "since": "2026-10-24T17:16:00+02:00",
-      "claude_slot": 2,
-      "wave": "647-7H"
+      "state": "free",
+      "ticket": null,
+      "since": null
     },
     {
       "slot": 3,
@@ -239,12 +252,11 @@
     },
     {
       "slot": 2,
-      "state": "busy",
-      "ticket": 757,
-      "grok_slot": 2,
-      "since": "2026-10-24T17:16:00+02:00",
-      "account": 1,
-      "wave": "647-7H"
+      "state": "free",
+      "ticket": null,
+      "grok_slot": null,
+      "since": null,
+      "account": 1
     },
     {
       "slot": 3,
@@ -315,17 +327,17 @@
     }
   ],
   "last_refill": {
-    "at": "2026-10-24 17:30 CEST",
+    "at": "2026-10-24 17:44 CEST",
     "mode": "refill-dev",
-    "triggers": "#796 #832 claude-run:tester-triage",
-    "started": "#789->C1/A1 #835->C7/A2 #810->C3/A1 #830->C8/A2",
-    "note": "spawned 4 worker(s)"
+    "triggers": "#757",
+    "started": "",
+    "note": "no pickable build ticket"
   },
   "totals": {
     "grok": {
       "size": 12,
-      "used": 5,
-      "dev": 5,
+      "used": 4,
+      "dev": 4,
       "dev_cap": 8,
       "planner": 0,
       "planner_cap": 4
@@ -333,8 +345,8 @@
     "claude": {
       "size": 10,
       "enabled": 10,
-      "used": 5,
-      "free": 5,
+      "used": 4,
+      "free": 6,
       "external": 0
     }
   },
@@ -417,8 +429,10 @@
           824,
           825
         ],
-        "done": [],
-        "live": 1
+        "done": [
+          757
+        ],
+        "live": 0
       },
       {
         "number": 766,
