@@ -24,12 +24,24 @@ describe('solar-systems debug actions (ticket 775)', () => {
     })
   })
 
+  it('answers a look its art row and tile, and refuses a look the palette lacks (ticket 778)', () => {
+    expect(solarSystemsDebugActions.lookArtOf!('gauss-field')).toMatchObject({
+      ok: true,
+      art: { lookId: 'gauss-field', tileAssetId: 'ground-look-gauss-field' },
+    })
+    expect(solarSystemsDebugActions.lookArtOf!('no-such-look')).toEqual({
+      ok: false,
+      problems: ['lookId must name a palette look'],
+    })
+  })
+
   it('describes the palette', () => {
     expect(solarSystemsDebugActions.describe!()).toMatchObject({
       ok: true,
       sliceId: 'solar-systems',
       newContentSet: 'SS2-B',
       sizeClasses: ['S', 'M', 'L', 'XL'],
+      lookTiles: expect.arrayContaining(['ground-look-cinder-basalt']) as unknown,
     })
   })
 })

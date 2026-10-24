@@ -1,0 +1,53 @@
+{
+  "source": "Ticket 778 (spec #774): the art rows of the eight SS2 biome looks of palette.json, one per look id, in the shape of a planet row look (ticket 653, planetRow.ts PlanetLook): band 1's and band 5's ground, the horizon behind the surface and the band of light along it, each a display #rrggbb read off the look's hue pair in the Planet & Narrative lock of 23 Oct. The look's ground motif is the tile asset ground-look-<id> (docs/art/ss2-looks), a Blender-authored 4 x 4 m tile whose mean colour is the look's surface rock. Under the ticket 653 guards: no rock brighter than the brightest archetype host rock, so every materials hue slot stays above it; rock surface, horizon and band colour at least 32 of 255 channel steps apart between any two looks, so the looks read apart in hue as the motifs do in pattern. Presentation only: nothing here reaches the authority state, a save or a digest; no kernel seam draws a later system's look yet (feature-slices 3.88).",
+  "looks": {
+    "cinder-basalt": {
+      "rockSurface": "#3a3236",
+      "rockDeep": "#1a1414",
+      "horizon": "#d8622a",
+      "skyBand": { "colour": "#ff8a3a", "heightM": 1, "thicknessM": 3, "flicker": 0.3 }
+    },
+    "ash-plain": {
+      "rockSurface": "#726860",
+      "rockDeep": "#2a2224",
+      "horizon": "#9a5a52",
+      "skyBand": { "colour": "#e05a3a", "heightM": 1, "thicknessM": 4, "flicker": 0.15 }
+    },
+    "rime-shelf": {
+      "rockSurface": "#4a7484",
+      "rockDeep": "#16303a",
+      "horizon": "#cfeef6",
+      "skyBand": { "colour": "#9ff0ff", "heightM": 2, "thicknessM": 3, "flicker": 0.2 }
+    },
+    "hoarfrost-vein": {
+      "rockSurface": "#5c5878",
+      "rockDeep": "#1c1a2c",
+      "horizon": "#b8a8d8",
+      "skyBand": { "colour": "#d2b8ff", "heightM": 1, "thicknessM": 3, "flicker": 0.25 }
+    },
+    "lode-banded": {
+      "rockSurface": "#6c5048",
+      "rockDeep": "#22262e",
+      "horizon": "#6a86a6",
+      "skyBand": { "colour": "#78a8d8", "heightM": 1, "thicknessM": 4, "flicker": 0.1 }
+    },
+    "gauss-field": {
+      "rockSurface": "#4a5256",
+      "rockDeep": "#141c1e",
+      "horizon": "#3a8c84",
+      "skyBand": { "colour": "#40e0c8", "heightM": 2, "thicknessM": 3, "flicker": 0.35 }
+    },
+    "hollow-honeycomb": {
+      "rockSurface": "#644020",
+      "rockDeep": "#241808",
+      "horizon": "#c88a3a",
+      "skyBand": { "colour": "#ffc050", "heightM": 1, "thicknessM": 5, "flicker": 0.2 }
+    },
+    "brass-verdigris": {
+      "rockSurface": "#70703a",
+      "rockDeep": "#1e2a1c",
+      "horizon": "#8aa878",
+      "skyBand": { "colour": "#a8d890", "heightM": 1, "thicknessM": 3, "flicker": 0.1 }
+    }
+  }
+}
