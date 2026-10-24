@@ -50,6 +50,13 @@ describe('terrain kind looks', () => {
     expect(material.uniforms.uKindLooks.value.map((look: { x: number }) => look.x)).toEqual(skins)
   })
 
+  it("gives the uniform each gem's rank glint on a fresh save, steps 0 to 2 (ticket 786)", () => {
+    fitKindLooksToViewer(createTerrainMaterial(), freshPlanetParamsFor(SEED, 1))
+    const read = readDrawnKindLooks()
+    const steps = read.ok ? read.looks.shown.flatMap((look) => look.gemGlint?.step ?? []) : []
+    expect([...steps].sort()).toEqual([0, 1, 2])
+  })
+
   it('rewrites nothing on a frame where the planet and the sightings are unchanged', () => {
     const material = createTerrainMaterial()
     const params = freshPlanetParamsFor(SEED, 1)

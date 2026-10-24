@@ -5,12 +5,15 @@
  * draws every skin but no rarity, ticket 698). State, never pixels; no command, no log line, not in the digest. It also reads the
  * per-act hero atlas (ticket 451): whether the probe gave it the 16th unit, the act resident, its
  * cells and how many binds there have been, so a spec sees a swap happen only at a change of act,
- * and the first-contact flourishes started (ticket 698), so a spec sees one per species met.
+ * and the first-contact flourishes started (ticket 698), so a spec sees one per species met, and
+ * each gem's rank glint (ticket 786) as the shader unpacks it.
  */
 import { heroAtlasPresence } from '../scene/heroAtlasPresence'
 import { kindLookPresence } from '../scene/kindLookPresence'
 import { speciesRevealPresence } from '../scene/speciesRevealPresence'
+import { gemGlintOfCode, type GemGlint } from '../systems/render/gemGlint'
 import {
+  gemGlintCodeOfEntry,
   heroCellOfEntry,
   KIND_LOOK_SLOTS,
   LOOK_VECTOR,
@@ -29,6 +32,8 @@ export interface DrawnKindLook {
   rarityLead: number
   /** The resident hero atlas's cell it draws from (ticket 451); null draws the shader look. */
   heroCell: number | null
+  /** A gem's rank glint (ticket 786): its step, pips and finish; null for a species no gem. */
+  gemGlint: GemGlint | null
 }
 
 export interface DrawnKindLooks {
@@ -76,5 +81,6 @@ function drawnLookOf(kinds: Float32Array, at: number): DrawnKindLook {
     colour: rgbOfPacked(colour),
     rarityLead: rarityLeadOfEntry(rarity),
     heroCell: heroCellOfEntry(rarity),
+    gemGlint: gemGlintOfCode(gemGlintCodeOfEntry(rarity)),
   }
 }

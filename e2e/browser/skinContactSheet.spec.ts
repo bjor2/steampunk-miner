@@ -4,7 +4,8 @@
  * and a desktop's 1280x800, every kind slot of planets 1 to 5 draws the skin the committed sheet
  * holds (`src/features/roster/skinContactSheet.golden.json`: silhouette, pattern, colour, hero cell)
  * with no rarity yet, so #698's first-frame skin holds on both layouts and on every planet. Where the
- * probe refuses the atlas its unit, every hero keeps the shader look the sheet also judges.
+ * probe refuses the atlas its unit, every hero keeps the shader look the sheet also judges. Each gem
+ * glints on the step of its rank k (ticket 786: glintStep == gemRank) and no other kind glints.
  */
 import { readFileSync } from 'node:fs'
 import { expect, test, type Page } from '@playwright/test'
@@ -24,6 +25,11 @@ interface SheetRow {
   heroCell: number | null
 }
 
+interface GoldenRow extends SheetRow {
+  /** The gem's rank k on its planet; null for a non-gem. */
+  gemRank: number | null
+}
+
 const PLANET_1_START = readFileSync(
   new URL('../../scenarios/planet1-start.scenario.json', import.meta.url),
   'utf8',
@@ -33,7 +39,7 @@ const SHEET = JSON.parse(
     new URL('../../src/features/roster/skinContactSheet.golden.json', import.meta.url),
     'utf8',
   ),
-) as { planets: { planetIndex: number; rows: SheetRow[] }[] }
+) as { planets: { planetIndex: number; rows: GoldenRow[] }[] }
 const VIEWPORTS = [
   { label: '360x640', size: { width: 360, height: 640 } },
   { label: '1280x800', size: { width: 1280, height: 800 } },
@@ -114,6 +120,9 @@ for (const viewport of VIEWPORTS) {
         await expect.poll(async () => drawnRowsOf(await kindLooks(page))).toEqual(expected)
         const looks = await kindLooks(page)
         expect(new Set(looks.shown.map((look) => look.rarityLead))).toEqual(new Set([0]))
+        expect(looks.shown.map((look) => look.gemGlint?.step ?? null)).toEqual(
+          rows.map((row) => row.gemRank),
+        )
       }
       expect(errors).toEqual([])
     })
