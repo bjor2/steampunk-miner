@@ -1,0 +1,12 @@
+{
+  "$comment": "The gem rank glint the terrain shader lays over a gem's tile (ticket 786; GD lock on #746 item 2, TD ruling 6374381455 with the Scalers' conditions): keyed only on the gem's rank k within its planet, cheapest first, never on the planet, tier or price, so the ladder is the same on every planet. `steps` is indexed by k: `strength` the sparkles' emissive peak, `sparkles` how many twinkle on the tile, `size` a sparkle's half arm length in tiles; strength, sparkle count and covered share (sparkles x (2 x size)^2) all rise strictly with k and stay within `caps` (HS condition 2 on #746: the glint never drowns the ore, hazard or warning reads; 0.6 is under the tier sparkles' peak of 1 and the electrified arc's 1.3). A k past the last step keeps the last step's glint (VS: bounded fall-through) and shows the ranks above it as a finish cycle plus pips, like the #576 ladder (HS): 1 to `pips.most` pips (GD on #576: at most 6, reset each finish) in the finish tint, the finish moving on every `pips.most` ranks through `finishes` and starting over after the last. `tint` is the glint's colour within the authored steps. `pips.radius` and `pips.pitch` are in tiles, the row along the top of the tile as the planet stands. Adding a rank is a new `steps` row, never a kernel change. Look only: no price, gate, income, save or digest reads it.",
+  "steps": [
+    { "strength": 0.35, "sparkles": 1, "size": 0.06 },
+    { "strength": 0.47, "sparkles": 2, "size": 0.07 },
+    { "strength": 0.6, "sparkles": 3, "size": 0.08 }
+  ],
+  "caps": { "strength": 0.6, "sparkles": 4, "coverage": 0.1 },
+  "tint": "#f4f8ff",
+  "finishes": ["#a8d8ff", "#ffe98a", "#8ff0dc", "#ffa8ec"],
+  "pips": { "most": 6, "radius": 0.04, "pitch": 0.13 }
+}

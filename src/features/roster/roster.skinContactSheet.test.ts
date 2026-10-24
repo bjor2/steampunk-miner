@@ -4,7 +4,13 @@ import { beforeEach, describe, expect, it } from 'vitest'
 import { SHIPPED_ART } from '../../scene/shippedArt'
 import { readAuthorityState } from '../../store/authorityLink'
 import { resetGameStore, useGameStore } from '../../store/gameStore'
-import { kindLookTableOf, LOOK_VECTOR, rarityLeadOfEntry } from '../../systems/render/kindLookTable'
+import { gemGlintOfCode } from '../../systems/render/gemGlint'
+import {
+  gemGlintCodeOfEntry,
+  kindLookTableOf,
+  LOOK_VECTOR,
+  rarityLeadOfEntry,
+} from '../../systems/render/kindLookTable'
 import { drawnHeroAtlasOf } from '../../systems/render/heroAtlas'
 import { freshPlanetParamsFor } from '../../systems/world/planetParams'
 import { ORE_ROWS } from '../ores'
@@ -67,6 +73,12 @@ function goldenGemRowsOf(planetIndex: number) {
 function cellSha256Of(speciesId: string): string {
   const bytes = readFileSync(new URL(`cells/${speciesId}.png`, ORE_HEROES_ART))
   return createHash('sha256').update(bytes).digest('hex')
+}
+
+/** The glint step a slot's entry carries, null for no glint. */
+function glintStepOfSlot(kinds: Float32Array, slot: number): number | null {
+  const fourth = kinds[(slot - 1) * LOOK_VECTOR + 3]
+  return gemGlintOfCode(gemGlintCodeOfEntry(fourth))?.step ?? null
 }
 
 function bySaleTier(a: ContactSheetRow, b: ContactSheetRow): number {
@@ -210,7 +222,33 @@ describe('skin contact sheet of P1 to P5 (ticket 746)', () => {
     },
   )
 
-  it.todo(
-    "steps each gem's glint with its rank k, glintStep == gemRank, alike on every planet (#786)",
+  it.each(SHEET_PLANETS)(
+    "steps each gem's glint of planet %i with its rank k, glintStep == gemRank, and glints no other kind (ticket 786)",
+    (planetIndex) => {
+      const table = kindLookTableOf(
+        planetKindLooksOf(freshPlanetParamsFor(SEED, planetIndex)),
+        rarityLooksByLead(),
+        () => false,
+      )
+      const rows = sheetOf(planetIndex).rows
+      const glintSteps = rows.map((row) => glintStepOfSlot(table.kinds, row.slot))
+      expect(glintSteps).toEqual(rows.map((row) => row.gemRank))
+    },
   )
+
+  it("packs each rank's glint as the same code on every planet of the sheet (ticket 786)", () => {
+    const codesOnPlanet = (planetIndex: number) => {
+      const table = kindLookTableOf(
+        planetKindLooksOf(freshPlanetParamsFor(SEED, planetIndex)),
+        rarityLooksByLead(),
+        () => false,
+      )
+      return gemRowsOf(planetIndex)
+        .sort(bySaleTier)
+        .map((row) => gemGlintCodeOfEntry(table.kinds[(row.slot - 1) * LOOK_VECTOR + 3]))
+    }
+    const [first, ...rest] = SHEET_PLANETS.map(codesOnPlanet)
+    expect(first).toHaveLength(GEM_RANKS.length)
+    for (const codes of rest) expect(codes).toEqual(first)
+  })
 })

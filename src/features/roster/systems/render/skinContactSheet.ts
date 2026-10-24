@@ -12,7 +12,7 @@ import type { PlanetParams } from '../../../../systems/world/planetParams'
 import { MATERIALS } from '../../../materials'
 import { gemSaleTiersOf, type KindSlot } from '../../../ores'
 import { planetRosterOf } from '../planetRoster'
-import { gemSaleTierOfKind } from '../rosterGems'
+import { gemRankAmong, gemSaleTierOfKind } from '../rosterGems'
 import { heroAtlasOfPlanet, planetKindLooksOf } from './kindLookProvider'
 
 /** One kind slot of the sheet: what it draws, and which gem of the planet it is. */
@@ -108,7 +108,7 @@ function gemPlaceOf(
   gemTiers: readonly number[],
 ): GemPlace | null {
   const saleTier = gemSaleTierOfKind(params, kind)
-  return saleTier === null ? null : { rank: gemTiers.indexOf(saleTier), saleTier }
+  return saleTier === null ? null : { rank: gemRankAmong(gemTiers, saleTier), saleTier }
 }
 
 function hexOfPacked(packed: number): string {

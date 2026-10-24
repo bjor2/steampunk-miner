@@ -1,5 +1,10 @@
 import { describe, expect, it } from 'vitest'
+import { HERO_ATLAS_CELLS } from '../../constants/scene'
+import { gemGlintCodeOf, gemGlintOf, gemGlintOfCode, largestGemGlintCodeOf } from './gemGlint'
 import {
+  GEM_GLINT_FLAG,
+  gemGlintCodeOfEntry,
+  HERO_LOOK_CELL_SPAN,
   HERO_LOOK_FLAG,
   heroCellOfEntry,
   KIND_LOOK_SLOTS,
@@ -21,6 +26,7 @@ const NUGGETS: KindLook = {
   colour: [1, 0.5, 0],
   rarityLead: 0,
   isHero: false,
+  gemRank: null,
 }
 
 const WIRES: KindLook = {
@@ -30,7 +36,11 @@ const WIRES: KindLook = {
   colour: [0.2, 0.4, 0.6],
   rarityLead: 2,
   isHero: true,
+  gemRank: null,
 }
+
+/** A hero gem of rank 2 drawn from cell 15, the atlas's last. */
+const GEM: KindLook = { ...WIRES, speciesId: 'probe-gem', rarityLead: 4, gemRank: 2 }
 
 const RARE: RarityLook = { tint: [0, 0, 1], frame: 0.04, glow: 0.3, pulse: 0 }
 
@@ -87,6 +97,43 @@ describe('material look table', () => {
     const rarity = 4 + HERO_LOOK_FLAG * 16
     expect(Math.fround(rarity)).toBe(rarity)
     expect([rarityLeadOfEntry(rarity), heroCellOfEntry(rarity)]).toEqual([4, 15])
+  })
+
+  it("carries a gem's rank glint over its hero cell and rarity lead, each read back (ticket 786)", () => {
+    const cells = new Map([['probe-gem', HERO_ATLAS_CELLS - 1]])
+    const [, , , rarity] = entryOf(kindLookTableOf([GEM], [], () => true, cells).kinds, 1)
+    expect(rarityLeadOfEntry(rarity)).toBe(4)
+    expect(heroCellOfEntry(rarity)).toBe(HERO_ATLAS_CELLS - 1)
+    expect(gemGlintOfCode(gemGlintCodeOfEntry(rarity))).toEqual(gemGlintOf(2))
+  })
+
+  it('draws the glint of a gem the player has not met, since the glint is not rarity (ticket 786)', () => {
+    const [, , , rarity] = entryOf(kindLookTableOf([GEM], [], () => false).kinds, 1)
+    expect(rarityLeadOfEntry(rarity)).toBe(0)
+    expect(gemGlintOfCode(gemGlintCodeOfEntry(rarity))?.step).toBe(2)
+  })
+
+  it('carries no glint for a species that is no gem', () => {
+    const [, , , rarity] = entryOf(kindLookTableOf([WIRES, NUGGETS], [], () => true).kinds, 1)
+    expect(gemGlintCodeOfEntry(rarity)).toBe(0)
+  })
+
+  it('keeps the largest glint code over the last cell and mythic exact in one float, at any rank (ticket 786)', () => {
+    const rarity = 4 + HERO_LOOK_FLAG * HERO_ATLAS_CELLS + GEM_GLINT_FLAG * largestGemGlintCodeOf()
+    expect(Math.fround(rarity)).toBe(rarity)
+    expect(HERO_ATLAS_CELLS).toBeLessThan(HERO_LOOK_CELL_SPAN)
+    for (const gemRank of [0, 1, 2, 3, 1e6]) {
+      const [, , , packed] = entryOf(
+        kindLookTableOf([{ ...GEM, gemRank }], [], () => true).kinds,
+        1,
+      )
+      expect(gemGlintCodeOfEntry(packed)).toBe(gemGlintCodeOf(gemGlintOf(gemRank)))
+    }
+  })
+
+  it('refuses a hero cell past what the entry holds', () => {
+    const cells = new Map([['probe-wires', HERO_LOOK_CELL_SPAN - 1]])
+    expect(() => kindLookTableOf([WIRES], [], () => true, cells)).toThrow(/hero cell 31/)
   })
 
   it('leaves a slot with no species at zeros, the family look', () => {

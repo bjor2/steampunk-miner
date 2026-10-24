@@ -18,6 +18,12 @@
  * The atlas takes the 16th unit only where the startup probe allows it (`TERRAIN_HERO_ATLAS`,
  * fixed when the material is made, so the program still compiles once); without it, or for a
  * hero with no cell, the look table carries no cell and the hero draws its grains.
+ *
+ * A gem twinkles by its rank k within its planet (ticket 786, `gemGlint.ts`), over its sprite or
+ * its grains alike, so every draw path shows it, from the first frame: sparkles whose strength and
+ * count come from the ladder's step, and past the authored steps a row of pips in a finish tint
+ * along the tile's top as the planet stands. The ladder is written in as constant tables, so a new
+ * rank is a data row and the material adds no uniform; reduce motion holds the twinkle at its mean.
  */
 import {
   HERO_ATLAS_CELL_PX,
@@ -26,7 +32,14 @@ import {
   HERO_ATLAS_SIDE_PX,
 } from '../constants/scene'
 import { RARITY_REVEAL_FLARE } from '../constants/speciesReveal'
-import { HERO_LOOK_FLAG, KIND_LOOK_SLOTS, RARITY_LOOK_LEADS } from '../systems/render/kindLookTable'
+import { GEM_GLINT, type GemGlintLadder } from '../systems/render/gemGlint'
+import {
+  GEM_GLINT_FLAG,
+  HERO_LOOK_CELL_SPAN,
+  HERO_LOOK_FLAG,
+  KIND_LOOK_SLOTS,
+  RARITY_LOOK_LEADS,
+} from '../systems/render/kindLookTable'
 import {
   KIND_LAYOUTS,
   KIND_LOOKS,
@@ -36,12 +49,18 @@ import {
   type KindLookCatalogue,
 } from '../systems/render/kindLooks'
 
-/** The table sizes, flag and atlas layout the GLSL below reads, as the material's defines. */
-export function kindLookDefines(): Record<string, number> {
+/** The table sizes, flags and atlas layout the GLSL below reads, as the material's defines. */
+export function kindLookDefines(ladder: GemGlintLadder = GEM_GLINT): Record<string, number> {
   return {
     KIND_LOOK_SLOTS,
     RARITY_LOOK_LEADS,
     HERO_LOOK_FLAG,
+    HERO_LOOK_CELL_SPAN,
+    GEM_GLINT_FLAG,
+    GEM_GLINT_STEPS: ladder.steps.length,
+    GEM_GLINT_SPARKLES: ladder.caps.sparkles,
+    GEM_GLINT_PIPS: ladder.pips.most,
+    GEM_GLINT_FINISHES: ladder.finishes.length,
     MAX_KIND_GRAINS,
     HERO_ATLAS_SIDE_PX,
     HERO_ATLAS_CELL_PX,
@@ -55,7 +74,7 @@ export function kindLookDefines(): Record<string, number> {
 export const KIND_LOOK_UNIFORMS = /* glsl */ `
 #ifndef TERRAIN_LITE
 // Per roster slot: silhouette, pattern, colour as 0xRRGGBB, rarity lead + HERO_LOOK_FLAG for a
-// hero; zeros draw the family look (kindLookTable.ts).
+// hero + GEM_GLINT_FLAG for a gem's glint; zeros draw the family look (kindLookTable.ts).
 uniform vec4 uKindLooks[KIND_LOOK_SLOTS];
 // Per rarity lead 1 to 4: tint as 0xRRGGBB, glow, frame width in tiles, pulse share of the glow.
 uniform vec4 uRarityLooks[RARITY_LOOK_LEADS];
@@ -68,12 +87,20 @@ uniform sampler2D uHeroAtlas;
 #endif
 `
 
-/** The material look's functions; they read `hash12` and `rotation` from the terrain shader. */
-export function kindLookFunctionsOf(catalogue: KindLookCatalogue = KIND_LOOKS): string {
+/**
+ * The material look's functions; they read `hash12`, `rotation`, `uTime` and `uGateStill` from the
+ * terrain shader.
+ */
+export function kindLookFunctionsOf(
+  catalogue: KindLookCatalogue = KIND_LOOKS,
+  ladder: GemGlintLadder = GEM_GLINT,
+): string {
   return `
 #ifndef TERRAIN_LITE
 ${catalogueTablesOf(catalogue)}
+${gemGlintTablesOf(ladder)}
 ${KIND_LOOK_GLSL}
+${GEM_GLINT_GLSL}
 #endif
 `
 }
@@ -240,7 +267,7 @@ const float HERO_CONTENT_PX = float(HERO_ATLAS_CELL_PX - 2 * HERO_ATLAS_GUTTER_P
 
 // The atlas cell the entry carries (kindLookTable.ts), or -1 for the shader look.
 float heroCellOf(vec4 kind) {
-  return floor(floor(kind.w + 0.5) / float(HERO_LOOK_FLAG)) - 1.0;
+  return mod(floor(floor(kind.w + 0.5) / float(HERO_LOOK_FLAG)), float(HERO_LOOK_CELL_SPAN)) - 1.0;
 }
 
 // A point of the cell's sprite, 0 to 1 across its content with y down the image, to the atlas.
@@ -283,10 +310,9 @@ float drawHeroSprite(vec4 kind, float reveal, float cell, vec2 local, vec2 up, v
 }
 #endif
 
-// The species' look over the tile: its hero sprite where the entry carries an atlas cell, else
-// its grains. up is the planet's up at the tile; the world gradients serve the sprite's sampling;
-// reveal is how far the rarity has risen (rarityRevealOf).
-float drawKindTile(vec4 kind, float reveal, vec2 local, vec2 tile, vec2 up, vec2 worldDx, vec2 worldDy, float soft, inout vec3 colour, inout vec3 emissive) {
+// The species' skin over the tile: its hero sprite where the entry carries an atlas cell, else
+// its grains.
+float drawKindSkin(vec4 kind, float reveal, vec2 local, vec2 tile, vec2 up, vec2 worldDx, vec2 worldDy, float soft, inout vec3 colour, inout vec3 emissive) {
 #ifdef TERRAIN_HERO_ATLAS
   float cell = heroCellOf(kind);
   if (cell >= 0.0) return drawHeroSprite(kind, reveal, cell, local, up, worldDx, worldDy, tile, colour, emissive);
@@ -294,6 +320,97 @@ float drawKindTile(vec4 kind, float reveal, vec2 local, vec2 tile, vec2 up, vec2
   return drawKindGrains(kind, reveal, local, tile, soft, colour, emissive);
 }
 `
+
+const GEM_GLINT_GLSL = /* glsl */ `
+// The glint code the entry carries (gemGlint.ts), 0 for a species that is no gem.
+float gemGlintCodeOf(vec4 kind) {
+  return floor(floor(kind.w + 0.5) / float(GEM_GLINT_FLAG));
+}
+
+// One four-armed sparkle of half arm length size round centre, brightest at its heart.
+float gemSparkle(vec2 local, vec2 centre, float size) {
+  vec2 q = abs(local - centre);
+  float arm = size * 0.2;
+  float upright = step(q.x, arm) * max(0.0, 1.0 - q.y / size);
+  float across = step(q.y, arm) * max(0.0, 1.0 - q.x / size);
+  return max(upright, across);
+}
+
+// The step's sparkles over the tile's middle, each twinkling between half and all of its light;
+// held at the mean with reduce motion.
+float gemSparkles(vec4 rung, vec2 local, vec2 tile) {
+  float light = 0.0;
+  for (int i = 0; i < GEM_GLINT_SPARKLES; i++) {
+    if (float(i) >= rung.y) break;
+    vec2 seed = tile + float(i) * 13.7 + 5.0;
+    vec2 centre = 0.25 + 0.5 * vec2(hash12(seed), hash12(seed + 1.3));
+    float wave = 0.5 + 0.5 * sin(uTime * 3.1 + hash12(seed + 8.2) * 6.2832);
+    float twinkle = 1.0 - 0.5 * mix(wave, 0.5, uGateStill);
+    light = max(light, gemSparkle(local, centre, rung.z) * twinkle);
+  }
+  return light;
+}
+
+// 1 on the count pips in a row along the tile's top as the planet stands, soft by about a pixel.
+float gemPips(float count, vec2 local, vec2 up, float soft) {
+  vec2 fromCentre = local - 0.5;
+  vec2 q = vec2(dot(fromCentre, vec2(up.y, -up.x)), dot(fromCentre, up));
+  float pip = 0.0;
+  for (int i = 0; i < GEM_GLINT_PIPS; i++) {
+    if (float(i) >= count) break;
+    vec2 centre = vec2((float(i) - 0.5 * (count - 1.0)) * GEM_PIP_PITCH, GEM_PIP_ROW);
+    pip = max(pip, 1.0 - smoothstep(GEM_PIP_RADIUS - soft, GEM_PIP_RADIUS + soft, length(q - centre)));
+  }
+  return pip;
+}
+
+// The gem's rank glint over its skin: the step's sparkles, and past the authored steps the pips
+// of its rank in its finish's tint (gemGlint.ts gemGlintOfCode unpacks the same code).
+void drawGemGlint(vec4 kind, vec2 local, vec2 tile, vec2 up, float soft, inout vec3 colour, inout vec3 emissive) {
+  float code = gemGlintCodeOf(kind);
+  if (code < 0.5) return;
+  float steps = float(GEM_GLINT_STEPS);
+  float pipSpan = float(GEM_GLINT_PIPS + 1);
+  float above = floor((code - 1.0) / steps);
+  int rung = clamp(int(code - 1.0 - above * steps + 0.5), 0, GEM_GLINT_STEPS - 1);
+  int finish = clamp(int(floor(above / pipSpan) + 0.5), 0, GEM_GLINT_FINISHES);
+  float pips = above - floor(above / pipSpan) * pipSpan;
+  vec4 look = GEM_GLINT_RUNGS[rung];
+  vec3 tint = GEM_GLINT_TINTS[finish];
+  emissive += tint * look.x * gemSparkles(look, local, tile);
+  float pip = gemPips(pips, local, up, soft);
+  colour = mix(colour, tint, pip);
+  emissive += tint * look.x * pip;
+}
+
+// The species' look over the tile: its skin, then a gem's rank glint over it. up is the planet's
+// up at the tile; the world gradients serve the sprite's sampling; reveal is how far the rarity
+// has risen (rarityRevealOf).
+float drawKindTile(vec4 kind, float reveal, vec2 local, vec2 tile, vec2 up, vec2 worldDx, vec2 worldDy, float soft, inout vec3 colour, inout vec3 emissive) {
+  float inside = drawKindSkin(kind, reveal, local, tile, up, worldDx, worldDy, soft, colour, emissive);
+  drawGemGlint(kind, local, tile, up, soft, colour, emissive);
+  return inside;
+}
+`
+
+/**
+ * The glint ladder as constant tables: a step's (strength, sparkles, half arm, 0) by rank, the
+ * tints (the ladder's, then each finish's) and the pip row's measures.
+ */
+function gemGlintTablesOf({ steps, tint, finishes, pips }: GemGlintLadder): string {
+  const rungs = steps.map((step) => vec4Of([step.strength, step.sparkles, step.size, 0]))
+  const tints = [tint, ...finishes].map((colour) => `vec3(${colour.map(glslFloatOf).join(', ')})`)
+  return [
+    constListOf('vec4', 'GEM_GLINT_RUNGS', rungs),
+    constListOf('vec3', 'GEM_GLINT_TINTS', tints),
+    `const float GEM_PIP_RADIUS = ${glslFloatOf(pips.radius)};`,
+    `const float GEM_PIP_PITCH = ${glslFloatOf(pips.pitch)};`,
+    `const float GEM_PIP_ROW = ${glslFloatOf(PIP_ROW_FROM_CENTRE - pips.radius)};`,
+  ].join('\n')
+}
+
+/** How far from the tile's centre, toward its top, the pip row's far edge sits, in tiles. */
+const PIP_ROW_FROM_CENTRE = 0.46
 
 function catalogueTablesOf({ silhouettes, patterns }: KindLookCatalogue): string {
   const shapes = silhouettes.map((row) =>
@@ -319,9 +436,12 @@ function catalogueTablesOf({ silhouettes, patterns }: KindLookCatalogue): string
 
 /** Code 0 is the family look, so every table starts with an unused row. */
 function constTableOf(type: string, name: string, rows: readonly string[]): string {
-  const all = [`${type}(0.0)`, ...rows]
-  const length = all.length
-  return `const ${type} ${name}[${length}] = ${type}[${length}](\n  ${all.join(',\n  ')}\n);`
+  return constListOf(type, name, [`${type}(0.0)`, ...rows])
+}
+
+function constListOf(type: string, name: string, rows: readonly string[]): string {
+  const length = rows.length
+  return `const ${type} ${name}[${length}] = ${type}[${length}](\n  ${rows.join(',\n  ')}\n);`
 }
 
 function vec4Of(values: readonly number[]): string {

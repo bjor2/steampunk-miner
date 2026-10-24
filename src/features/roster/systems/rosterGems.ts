@@ -7,7 +7,7 @@
  */
 import type { OreGemTag } from '../../../systems/registries/oreTypes'
 import type { PlanetParams } from '../../../systems/world/planetParams'
-import { gemSaleTierOfSlot, type KindSlot } from '../../ores'
+import { gemSaleTierOfSlot, gemSaleTiersOf, type KindSlot } from '../../ores'
 import { rosterKindOf } from './planetRoster'
 
 export const ROSTER_GEMS: OreGemTag = {
@@ -18,4 +18,20 @@ export const ROSTER_GEMS: OreGemTag = {
 /** The tier a kind of the planet's roster sells at when it is a gem; null for any other kind. */
 export function gemSaleTierOfKind(params: PlanetParams, kind: KindSlot | null): number | null {
   return kind === null ? null : gemSaleTierOfSlot(params, kind.slotId)
+}
+
+/**
+ * The gem's rank k on its planet, cheapest first (ticket 786): how many of the planet's gem tiers
+ * sell below its own, read from the price table, so k rises strictly with the price and is never
+ * written down; null for any other kind. Look only: the rank glint (`gemGlint.ts`) reads it.
+ */
+export function gemRankOfKind(params: PlanetParams, kind: KindSlot | null): number | null {
+  const saleTier = gemSaleTierOfKind(params, kind)
+  if (saleTier === null) return null
+  return gemRankAmong(gemSaleTiersOf(params.planetIndex, params.oreRulesVersion), saleTier)
+}
+
+/** How many of a planet's gem sale tiers sell below `saleTier`. */
+export function gemRankAmong(saleTiers: readonly number[], saleTier: number): number {
+  return saleTiers.filter((tier) => tier < saleTier).length
 }

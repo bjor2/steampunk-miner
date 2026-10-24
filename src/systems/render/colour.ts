@@ -57,6 +57,23 @@ export function withLuma(colour: Rgb, targetLuma: number): Rgb {
   return mixRgb(colour, [1, 1, 1], (targetLuma - luma) / (1 - luma))
 }
 
+const HUE_TURN = 360
+const HUE_SECTOR = 60
+
+/** The hue in degrees, 0 to 360, red at 0; a grey reads 0. */
+export function hueOf([r, g, b]: Rgb): number {
+  const high = Math.max(r, g, b)
+  const chroma = high - Math.min(r, g, b)
+  if (chroma === 0) return 0
+  return (hueSectorOf(r, g, b, high, chroma) * HUE_SECTOR + HUE_TURN) % HUE_TURN
+}
+
+function hueSectorOf(r: number, g: number, b: number, high: number, chroma: number): number {
+  if (high === r) return (g - b) / chroma
+  if (high === g) return (b - r) / chroma + 2
+  return (r - g) / chroma + 4
+}
+
 function clampUnit(value: number): number {
   return Math.min(1, Math.max(0, value))
 }

@@ -5,9 +5,12 @@
  * only its kind slot; everything it draws comes from here, so a reveal rebuilds no chunk.
  *
  * A slot's entry is (silhouette code, pattern code, colour as 0xRRGGBB, rarity lead + 8 × (cell + 1)
- * for a hero drawn from the resident act's atlas, ticket 451). A hero whose sprite is not in the
- * resident atlas, or with no atlas at all, keeps the lead alone and draws the shader look. A slot
- * that binds no species stays all zeros, which the shader draws as today's family look.
+ * for a hero drawn from the resident act's atlas, ticket 451, + 256 × the gem's glint code, ticket
+ * 786). A hero whose sprite is not in the resident atlas, or with no atlas at all, keeps the lead
+ * alone and draws the shader look. A gem carries the glint of its rank k within its planet
+ * (`gemGlint.ts`), shown from the first frame because it is not rarity (TD ruling 6374381455 on
+ * #746), and keyed on k alone, so the field is the same whole number on every planet. A slot that
+ * binds no species stays all zeros, which the shader draws as today's family look.
  *
  * Every species draws its own skin from the first frame (GD ruling on #698, option 2, splitting
  * Horizontal Scaler's condition a on #450): only its rarity waits for the player to meet it, so a
@@ -17,6 +20,7 @@
  * draws none. Look only: no price, gate or income reads it.
  */
 import type { Rgb } from './colour'
+import { GEM_GLINT, gemGlintCodeOf, gemGlintOf, type GemGlintLadder } from './gemGlint'
 import { KIND_LOOKS, patternCodeOf, silhouetteCodeOf, type KindLookCatalogue } from './kindLooks'
 
 /**
@@ -31,6 +35,13 @@ export const RARITY_LOOK_LEADS = 4
  * so the entry's fourth float carries both and the table needs no other vector.
  */
 export const HERO_LOOK_FLAG = 8
+/**
+ * The hero share counts cell + 1 below this, room for the atlas's 16 cells and twice as many, so
+ * the glint code above it never mixes with a cell.
+ */
+export const HERO_LOOK_CELL_SPAN = 32
+/** A gem adds this times its glint code (`gemGlint.ts`, ticket 786) to the fourth float. */
+export const GEM_GLINT_FLAG = HERO_LOOK_FLAG * HERO_LOOK_CELL_SPAN
 export const LOOK_VECTOR = 4
 
 /** How one roster slot's species looks: kernel catalogue ids, its hue slot's colour, its rarity. */
@@ -44,6 +55,11 @@ export interface KindLook {
   rarityLead: number
   /** The species is a hero (`materials.json`): drawn from the act's atlas when its sprite is there. */
   isHero: boolean
+  /**
+   * The gem's rank k on its planet, cheapest first, as the planet's price table orders its gems
+   * (ticket 786); null for a species that is no gem of the planet.
+   */
+  gemRank: number | null
 }
 
 /** One rarity lead's tint, frame and glow. */
@@ -126,6 +142,7 @@ export function kindEntryOf(
   look: KindLook,
   heroCell: number | null = null,
   catalogue: KindLookCatalogue = KIND_LOOKS,
+  ladder: GemGlintLadder = GEM_GLINT,
 ): number[] {
   if (!isRarityLead(look.rarityLead)) {
     throw new Error(`${look.speciesId} has the rarity lead ${look.rarityLead}, not 0 to 4`)
@@ -134,7 +151,7 @@ export function kindEntryOf(
     silhouetteCodeOf(look.silhouette, catalogue),
     patternCodeOf(look.pattern, catalogue),
     packedRgbOf(look.colour),
-    look.rarityLead + heroShareOf(look, heroCell),
+    look.rarityLead + heroShareOf(look, heroCell) + glintShareOf(look, ladder),
   ]
 }
 
@@ -144,7 +161,14 @@ function withoutRarity(look: KindLook): KindLook {
 }
 
 function heroShareOf(look: KindLook, heroCell: number | null): number {
-  return look.isHero && heroCell !== null ? HERO_LOOK_FLAG * (heroCell + 1) : 0
+  if (!look.isHero || heroCell === null) return 0
+  if (!isHeroCell(heroCell)) throw new Error(`${look.speciesId} names the hero cell ${heroCell}`)
+  return HERO_LOOK_FLAG * (heroCell + 1)
+}
+
+function glintShareOf(look: KindLook, ladder: GemGlintLadder): number {
+  if (look.gemRank === null) return 0
+  return GEM_GLINT_FLAG * gemGlintCodeOf(gemGlintOf(look.gemRank, ladder), ladder)
 }
 
 /** The rarity lead an entry's fourth float carries. */
@@ -154,8 +178,17 @@ export function rarityLeadOfEntry(rarity: number): number {
 
 /** The atlas cell an entry's fourth float carries, or null for the shader look. */
 export function heroCellOfEntry(rarity: number): number | null {
-  const share = Math.floor(rarity / HERO_LOOK_FLAG)
+  const share = Math.floor(rarity / HERO_LOOK_FLAG) % HERO_LOOK_CELL_SPAN
   return share > 0 ? share - 1 : null
+}
+
+/** The gem glint code an entry's fourth float carries (`gemGlintOfCode`), 0 for none. */
+export function gemGlintCodeOfEntry(rarity: number): number {
+  return Math.floor(rarity / GEM_GLINT_FLAG)
+}
+
+function isHeroCell(cell: number): boolean {
+  return Number.isInteger(cell) && cell >= 0 && cell < HERO_LOOK_CELL_SPAN - 1
 }
 
 function isRarityLead(lead: number): boolean {

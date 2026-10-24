@@ -24,6 +24,7 @@ const COMMON_LUMP: KindLook = {
   colour: [0.5, 0.5, 0.5],
   rarityLead: 0,
   isHero: false,
+  gemRank: null,
 }
 const RARE_WIRE: KindLook = { ...COMMON_LUMP, speciesId: 'probe-wire', rarityLead: 2 }
 const RARITY_LOOKS: RarityLook[] = [1, 2, 3, 4].map((lead) => ({

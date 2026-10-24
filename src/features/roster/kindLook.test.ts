@@ -6,6 +6,8 @@ import { resetGameStore, useGameStore } from '../../store/gameStore'
 import { kindLookProvider } from '../../systems/registries/kindLook'
 import { lumaOf } from '../../systems/render/colour'
 import {
+  GEM_GLINT_FLAG,
+  gemGlintCodeOfEntry,
   HERO_LOOK_FLAG,
   KIND_LOOK_SLOTS,
   kindEntryOf,
@@ -32,10 +34,10 @@ import {
 } from '../../systems/world/worldCell'
 import { generateChunk } from '../../systems/world/generateChunk'
 import { MATERIAL_RARITIES, MATERIALS } from '../materials'
-import { ORE_ROWS, rarityTiers } from '../ores'
+import { gemSaleTierOfSlot, ORE_ROWS, rarityTiers } from '../ores'
 import { NAMED_SEEDS } from './rosterFixtures'
 import { renderStateDigestOf } from './renderStateFixtures'
-import { ROSTER_ORE_RULES } from './systems/planetRoster'
+import { planetRosterOf, ROSTER_ORE_RULES } from './systems/planetRoster'
 import { actOf } from '../planet-mix'
 import {
   heroAtlasOfPlanet,
@@ -71,6 +73,12 @@ const MAIN_DRAWN_DIGESTS: Readonly<Record<string, string>> = {
   [`${SEED} 2`]: '912ad324518480f6',
   [`${SECOND_SEED} 1`]: 'f0ede6b77c78b468',
   [`${SECOND_SEED} 2`]: '2ee2e1ccd9ac0f5a',
+}
+
+/** A slot's entry without its gem glint: the species' skin, rarity and hero cell. */
+function skinEntryOf(look: KindLook): number[] {
+  const [silhouette, pattern, colour, fourth] = kindEntryOf(look)
+  return [silhouette, pattern, colour, fourth % GEM_GLINT_FLAG]
 }
 
 function shownLooks(params = freshPlanetParamsFor(SEED, 1)): KindLook[] {
@@ -155,14 +163,16 @@ describe('roster kind looks', () => {
     },
   )
 
-  it('keeps one look per species across bands and planets', () => {
+  // The gem glint (ticket 786) is left off: it follows the planet's price table, so a species sold
+  // as a gem under one ore rules version glints there alone (the next spec).
+  it('keeps one skin per species across bands and planets', () => {
     const entriesById = new Map<string, number[][]>()
     for (const seed of [SEED, SECOND_SEED]) {
       for (const params of everyShownPlanetOf(seed)) {
         for (const look of shownLooks(params)) {
           entriesById.set(look.speciesId, [
             ...(entriesById.get(look.speciesId) ?? []),
-            kindEntryOf(look),
+            skinEntryOf(look),
           ])
         }
       }
@@ -170,6 +180,17 @@ describe('roster kind looks', () => {
     expect(entriesById.size).toBe(MATERIALS.materials.length)
     for (const [id, [first, ...rest]] of entriesById) {
       for (const entry of rest) expect(entry, id).toEqual(first)
+    }
+  })
+
+  it('glints exactly the kinds the price table sells as gems of their planet (ticket 786)', () => {
+    for (const params of everyShownPlanetOf(SEED)) {
+      const roster = planetRosterOf(params)
+      planetKindLooksOf(params).forEach((look, at) => {
+        if (look === null) return
+        const isGem = gemSaleTierOfSlot(params, roster[at].slotId) !== null
+        expect(gemGlintCodeOfEntry(kindEntryOf(look)[3]) > 0, look.speciesId).toBe(isGem)
+      })
     }
   })
 

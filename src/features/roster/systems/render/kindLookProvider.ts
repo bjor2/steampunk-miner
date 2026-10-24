@@ -14,6 +14,9 @@
  *
  * Heroes (ticket 451): the atlas of the planet's act, from the materials slice, one object per
  * act, so the terrain swaps it only when a planet change crosses into another act.
+ *
+ * Gems (ticket 786): a slot naming one of the planet's gems carries its rank k, cheapest first,
+ * from the price table (`gemRankOfKind`), which the kernel's rank glint draws.
  */
 import type { AuthorityState } from '../../../../systems/authority/authorityState'
 import { hasDiscovered, type DiscoveryFallback } from '../../../../systems/registries/discovery'
@@ -34,6 +37,7 @@ import { rarityTiers } from '../../../ores'
 import { actOf } from '../../../planet-mix'
 import { planetRosterOf } from '../planetRoster'
 import { planetSpeciesOf } from '../planetSpecies'
+import { gemRankOfKind } from '../rosterGems'
 
 declare module '../../../../systems/registries/discovery' {
   interface DiscoveryKinds {
@@ -68,13 +72,18 @@ export function heroAtlasOfPlanet(planetIndex: number): HeroAtlasCells | null {
 
 /** By roster index, slot 1 first; null where the planet's pool binds no species to the slot. */
 export function planetKindLooksOf(params: PlanetParams): (KindLook | null)[] {
-  return planetRosterOf(params).map((_, index) => {
+  return planetRosterOf(params).map((kind, index) => {
     const species = planetSpeciesOf(params, index + 1)
-    return species === null ? null : kindLookOfSpecies(species)
+    return species === null ? null : kindLookOfSpecies(species, gemRankOfKind(params, kind))
   })
 }
 
-export function kindLookOfSpecies(species: Material, table: MaterialTable = MATERIALS): KindLook {
+/** The species' look; `gemRank` is its slot's rank among the planet's gems, null for a non-gem. */
+export function kindLookOfSpecies(
+  species: Material,
+  gemRank: number | null,
+  table: MaterialTable = MATERIALS,
+): KindLook {
   return {
     speciesId: species.id,
     silhouette: species.silhouette,
@@ -82,6 +91,7 @@ export function kindLookOfSpecies(species: Material, table: MaterialTable = MATE
     colour: hueSlotColourOf(hueSlotOf(species, table)),
     rarityLead: rarityLeadOf(species.rarity),
     isHero: species.hero,
+    gemRank,
   }
 }
 
