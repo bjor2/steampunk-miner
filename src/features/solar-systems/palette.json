@@ -1,0 +1,101 @@
+{
+  "source": "Planet & Narrative's SS2 archetype palette, locked 23 Oct 2026 on ticket 775 (spec #774, GD lock on Campaign Scaling 23 Oct 20:20): name parts in the ledger voice keyed to the act colour, the eight biome looks (hue and ground motif, each pair distinct), and Progression's SS2-B new-content set (23 Oct; ticket 780 writes the behaviours and completes the set). Progression's fifth row, the 'Void glass' ore family of planet 2.5, is not here: the fail-on-recolour check refuses it, as the first system's exotic family (Hollow's signature from planet 33) is already named Voidglass; ticket 780 names its replacement, and planet 2.5's slot stays empty until it does. Written once; every system from the second draws from it by seed and nothing is authored per planet. Prefixes are keyed to the #141 act at the planet's campaign index; the Foothold+ prefixes serve the foothold.heavy act, since no system past the first ever holds planet 1's act.",
+  "names": {
+    "prefixesByAct": {
+      "fire": ["Cinder", "Ember", "Soot"],
+      "frost": ["Rime", "Hoar"],
+      "lodestone": ["Lode", "Gauss"],
+      "hollow": ["Hollow", "Umber"],
+      "foothold.heavy": ["Brass", "Verdigris", "Tallow"]
+    },
+    "nouns": [
+      "Reach",
+      "Drift",
+      "Shoal",
+      "Spindle",
+      "Bourse",
+      "Tithe",
+      "Kiln",
+      "Vault",
+      "Crucible",
+      "Marrow",
+      "Ledger",
+      "Warrant"
+    ],
+    "charactersMax": 22,
+    "numberDigitsReserved": 3,
+    "hookTemplates": {
+      "mindful": "Entered at folio {g}. Ground: {ground}. Pays in {pays}; mind the {mind}.",
+      "paying": "Entered at folio {g}. Ground: {ground}. Pays in {pays}."
+    }
+  },
+  "looks": [
+    {
+      "id": "cinder-basalt",
+      "act": "fire",
+      "hue": "black/orange glow",
+      "groundMotif": "hex basalt columns"
+    },
+    {
+      "id": "ash-plain",
+      "act": "fire",
+      "hue": "grey/ember red",
+      "groundMotif": "layered ash strata"
+    },
+    {
+      "id": "rime-shelf",
+      "act": "frost",
+      "hue": "white/cyan",
+      "groundMotif": "cracked ice plates"
+    },
+    {
+      "id": "hoarfrost-vein",
+      "act": "frost",
+      "hue": "slate/pale violet",
+      "groundMotif": "needle crystal veins"
+    },
+    {
+      "id": "lode-banded",
+      "act": "lodestone",
+      "hue": "rust/steel blue",
+      "groundMotif": "banded iron stripes"
+    },
+    {
+      "id": "gauss-field",
+      "act": "lodestone",
+      "hue": "gunmetal/teal",
+      "groundMotif": "curled filings"
+    },
+    {
+      "id": "hollow-honeycomb",
+      "act": "hollow",
+      "hue": "umber/amber",
+      "groundMotif": "void honeycomb"
+    },
+    {
+      "id": "brass-verdigris",
+      "act": "foothold.heavy",
+      "hue": "brass/green patina",
+      "groundMotif": "riveted plate shale"
+    }
+  ],
+  "newContentSlots": {
+    "set": "SS2-B",
+    "families": [
+      { "id": "vent_flare", "kind": "hazard", "name": "Vent flares", "rigPart": null },
+      {
+        "id": "cinder_salt",
+        "kind": "ore_family",
+        "name": "Cinder salts",
+        "rigPart": "Quench tank"
+      },
+      { "id": "brine_leech", "kind": "enemy", "name": "Brine leeches", "rigPart": "Scraper skirt" },
+      {
+        "id": "ferro_sand_sink",
+        "kind": "hazard",
+        "name": "Ferro-sand sinks",
+        "rigPart": "Auger guard"
+      }
+    ]
+  }
+}

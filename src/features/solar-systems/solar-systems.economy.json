@@ -1,0 +1,15 @@
+{
+  "source": "Ticket 775 (spec #774), the GD lock of 23 Oct 2026 on Campaign Scaling: the four size classes S/M/L/XL at x0.9/1.0/1.1/1.2 of an SS1 planet's radius at the same time target, on a base of about 25 minutes, so the targets are 22.5/25/27.5/30 (VS and Systems, 23 Oct). Resources go with R squared; price is never retuned per class, and XL is drawn only on standard-surface planets. The hard start's hardness step k_s (one planet per system, never P1, never stacked with the jump step) is the Systems row of ticket 776; only its ceiling, the VS's 1.243, is written here.",
+  "sizeClasses": {
+    "baseTargetSeconds": 1500,
+    "classes": [
+      { "id": "S", "radiusBp": 9000, "standardOnly": false },
+      { "id": "M", "radiusBp": 10000, "standardOnly": false },
+      { "id": "L", "radiusBp": 11000, "standardOnly": false },
+      { "id": "XL", "radiusBp": 12000, "standardOnly": true }
+    ]
+  },
+  "hardStart": {
+    "stepCeiling": "1.243"
+  }
+}
