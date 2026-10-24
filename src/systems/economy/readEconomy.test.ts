@@ -58,6 +58,18 @@ describe('economy data validation', () => {
     ])
   })
 
+  it('refuses a jump between systems that would burn less, or find softer rock (ticket 759)', () => {
+    const broken = economyFileCopy()
+    broken.starMap.systemJump.fuelMultiplier = '0.9'
+    broken.starMap.systemJump.hardnessStep = '0.95'
+    broken.starMap.systemJump.driveRunValues = '0'
+    expect(problemsOf(broken)).toEqual([
+      'starMap.systemJump.fuelMultiplier must be 1 or more',
+      'starMap.systemJump.hardnessStep must be 1 or more',
+      'starMap.systemJump.driveRunValues must be above 0',
+    ])
+  })
+
   it('refuses a heat archetype whose bands or throttle line do not fit the gauge (#113)', () => {
     const broken = economyFileCopy()
     broken.archetypes[0].bandHeatPerSecond = ['0', '0.100']

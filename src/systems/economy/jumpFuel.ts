@@ -14,24 +14,52 @@
  * unitPrice(g_p + 1) = kappa * R(p). The hop to the next planet then pays exactly its fee, fuel
  * carried from an earlier planet was paid there, and a trip back burns the units it says on the map.
  * Fuel is never mined (GD lock, comment 6361556890).
+ *
+ * A jump between solar systems (ticket 759) is the same law times J, `starMap.systemJump`'s fuel
+ * multiplier, once per jump: its distance is the campaign index's, which already counts every
+ * planet of the systems between (#781), and it lands at the destination's unit price.
  */
 import { add, ceil, ceilMilli, cmp, fromSafeInteger, mul, type BigStat, type Money } from '../money'
 import { ECONOMY } from './economy'
 import { oreTier, oreValue } from './oreEconomy'
 
-const { fuel } = ECONOMY.starMap
+const { fuel, systemJump } = ECONOMY.starMap
 const ONE_UNIT = fromSafeInteger(1)
 
 /** The whole fuel units a jump from planet index `fromPlanet` to `toPlanet` of one system burns. */
 export function jumpFuelUnitsOf(fromPlanet: number, toPlanet: number): BigStat {
-  const distance = fromSafeInteger(Math.abs(toPlanet - fromPlanet))
-  const units = ceil(mul(fuel.baseUnits, add(ONE_UNIT, mul(fuel.distanceStep, distance))))
-  return cmp(units, ONE_UNIT) >= 0 ? units : ONE_UNIT
+  return wholeUnitsOf(lawUnitsOf(fromPlanet, toPlanet))
+}
+
+/** The whole fuel units a jump between systems burns: the same distance's units times J. */
+export function systemJumpFuelUnitsOf(fromPlanet: number, toPlanet: number): BigStat {
+  return wholeUnitsOf(mul(lawUnitsOf(fromPlanet, toPlanet), systemJump.fuelMultiplier))
 }
 
 /** Fee(a -> b): the jump's fuel at the destination's unit price, the cost the star map shows. */
 export function jumpFeeOf(fromPlanet: number, toPlanet: number): Money {
-  return ceilMilli(mul(jumpFuelUnitsOf(fromPlanet, toPlanet), destinationUnitPriceOf(toPlanet)))
+  return feeOfUnits(jumpFuelUnitsOf(fromPlanet, toPlanet), toPlanet)
+}
+
+/** The fee of a jump between systems, J times the units, at the destination's unit price. */
+export function systemJumpFeeOf(fromPlanet: number, toPlanet: number): Money {
+  return feeOfUnits(systemJumpFuelUnitsOf(fromPlanet, toPlanet), toPlanet)
+}
+
+/** U0 * (1 + 0.25 * |g_b - g_a|), before it is rounded up to whole units. */
+function lawUnitsOf(fromPlanet: number, toPlanet: number): BigStat {
+  const distance = fromSafeInteger(Math.abs(toPlanet - fromPlanet))
+  return mul(fuel.baseUnits, add(ONE_UNIT, mul(fuel.distanceStep, distance)))
+}
+
+/** Rounded up to whole units, and never under one. */
+function wholeUnitsOf(units: BigStat): BigStat {
+  const whole = ceil(units)
+  return cmp(whole, ONE_UNIT) >= 0 ? whole : ONE_UNIT
+}
+
+function feeOfUnits(units: BigStat, toPlanet: number): Money {
+  return ceilMilli(mul(units, destinationUnitPriceOf(toPlanet)))
 }
 
 /** unitPrice(g) = kappa * R(g - 1): one unit's price for a jump that lands on `planetIndex`. */

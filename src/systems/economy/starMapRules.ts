@@ -22,6 +22,16 @@
  * stands it in as `oreUnits` ore units of the planet's top band, so the curve keeps the VS ratio
  * V(t_top(g)) / V(t_top(1)). `runValue` and `tank.priceAtLevel1` are provisional (ticket 756): that
  * run's numbers retune them, never the shape.
+ *
+ * `systemJump` is the jump between solar systems (ticket 759): the same law with J, the jump fuel
+ * multiplier (GD lock on #650, VS input 6361573401: "g advancing by data J"), the system jump's
+ * hardness step k_jump (the Producer's GD lock on #759: 1.10, about 0.91x felt speed on paper),
+ * and the jump drive's price as run values R of a system's last planet:
+ *   fuelUnits(a -> b) = baseUnits * (1 + distanceStep * |g_b - g_a|) * fuelMultiplier   between systems
+ *   rock hardness     = H * hardnessStep^(s - 1)                                         in system s
+ *   jump drive        = driveRunValues * R(planetsPerSystem)
+ * J and the drive's price are provisional (ticket 759): no decision gives them, and the Tester's
+ * bot run of the jump judges them. k_jump is the GD's; if the felt speed misses, only it moves.
  */
 import { add, cmp, fromSafeInteger, mul, type BigStat, type Money } from '../money'
 import type { FieldReader } from './economyFieldReader'
@@ -30,6 +40,16 @@ export interface StarMapRules {
   /** The planets each solar system holds; the campaign index counts them system by system. */
   planetsPerSystem: number
   fuel: JumpFuelRules
+  systemJump: SystemJumpRules
+}
+
+export interface SystemJumpRules {
+  /** J: what a jump between systems burns over the same distance inside one. */
+  fuelMultiplier: BigStat
+  /** k_jump: how much harder each system's rock is than the system before at the same g. */
+  hardnessStep: BigStat
+  /** The jump drive's price in run values R of a system's last planet. */
+  driveRunValues: Money
 }
 
 export interface JumpFuelRules {
@@ -63,6 +83,7 @@ export function readStarMap(reader: FieldReader, value: unknown): StarMapRules {
   const read = {
     planetsPerSystem: reader.safeInteger(`${PATH}.planetsPerSystem`, starMap.planetsPerSystem),
     fuel: readJumpFuel(reader, starMap.fuel),
+    systemJump: readSystemJump(reader, starMap.systemJump),
   }
   if (read.planetsPerSystem < 1) reader.record(`${PATH}.planetsPerSystem must be 1 or more`)
   return read
@@ -86,6 +107,24 @@ function readJumpFuel(reader: FieldReader, value: unknown): JumpFuelRules {
     holdsHopAndReturn(read),
     `${path}.tank.capacityAtLevel1 must hold the next hop and the trip back`,
   )
+  return read
+}
+
+function readSystemJump(reader: FieldReader, value: unknown): SystemJumpRules {
+  const path = `${PATH}.systemJump`
+  const jump = reader.object(path, value)
+  const read = {
+    fuelMultiplier: reader.money(`${path}.fuelMultiplier`, jump.fuelMultiplier),
+    hardnessStep: reader.money(`${path}.hardnessStep`, jump.hardnessStep),
+    driveRunValues: reader.money(`${path}.driveRunValues`, jump.driveRunValues),
+  }
+  recordUnless(
+    reader,
+    isAtLeast(read.fuelMultiplier, 1),
+    `${path}.fuelMultiplier must be 1 or more`,
+  )
+  recordUnless(reader, isAtLeast(read.hardnessStep, 1), `${path}.hardnessStep must be 1 or more`)
+  recordUnless(reader, isAbove(read.driveRunValues, 0), `${path}.driveRunValues must be above 0`)
   return read
 }
 

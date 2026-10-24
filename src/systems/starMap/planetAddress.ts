@@ -14,6 +14,18 @@ export function assertValidAddress(system: bigint, planet: bigint): void {
   if (planet < FIRST_PLANET) throw new RangeError(`planet must be 1 or more, got ${planet}`)
 }
 
+/**
+ * The jumps between systems from system 1 to `system` (ticket 759), as the safe-integer count the
+ * economy's whole exponents take; throws past the safe range rather than rounding.
+ */
+export function jumpsBeforeSystem(system: bigint): number {
+  const jumps = system - FIRST_SYSTEM
+  if (jumps < 0n || jumps > BigInt(Number.MAX_SAFE_INTEGER)) {
+    throw new RangeError(`system ${system} has no safe-integer count of jumps before it`)
+  }
+  return Number(jumps)
+}
+
 /** An address index as JSON carries it: its canonical decimal string. */
 export function toIndexText(index: bigint): string {
   return index.toString()
