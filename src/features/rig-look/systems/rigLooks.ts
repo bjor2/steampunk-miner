@@ -6,6 +6,7 @@
 import {
   createTrackLookFrames,
   lookFrameAt,
+  type RigLookFinishes,
   type RigLookFrame,
   type TrackLookFrames,
 } from './render/rigLookFrames'
@@ -19,12 +20,15 @@ export interface RigLooks {
   tracks: readonly TrackLookFrames[]
   /** The glint a band crossing plays (ticket 809). */
   glint: RigLookGlint
+  /** The finishes a band past the art wears, by id. */
+  finishes: RigLookFinishes
 }
 
 export function createRigLooks(table: RigLookTable): RigLooks {
   return {
     tracks: table.tracks.map((rows) => createTrackLookFrames(rows, table.finishes)),
     glint: table.glint,
+    finishes: table.finishes,
   }
 }
 
