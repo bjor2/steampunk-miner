@@ -892,6 +892,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/authority/moneyRounding.test.ts` | 3 | 3 |
 | `src/systems/authority/oreRulesStamp.test.ts` | 8 | 8 |
 | `src/systems/authority/perPurchaseTrackEvents.test.ts` | 6 | 2 |
+| `src/systems/authority/planetCoreBays.test.ts` | 8 | 8 |
 | `src/systems/authority/planetOfState.test.ts` | 4 | 4 |
 | `src/systems/authority/platformCommands.test.ts` | 43 | 43 |
 | `src/systems/authority/purchaseChain.test.ts` | 18 | 10 |
@@ -1407,6 +1408,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/save/byteCodecs.test.ts` | 20 | 12 |
 | `src/systems/save/carriedCursors.test.ts` | 3 | 3 |
 | `src/systems/save/chunkDiffSave.test.ts` | 11 | 11 |
+| `src/systems/save/coreBaySaves.test.ts` | 4 | 4 |
 | `src/systems/save/cutFrontSave.test.ts` | 2 | 2 |
 | `src/systems/save/fuelTankSaves.test.ts` | 3 | 3 |
 | `src/systems/save/jumpDriveSaves.test.ts` | 4 | 4 |
