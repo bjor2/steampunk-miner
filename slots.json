@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-10-24T15:49:19+02:00",
+  "updated_at": "2026-10-24T15:54:32+02:00",
   "caps": {
     "grok": 12,
     "claude": 10,
@@ -38,11 +38,11 @@
         {
           "slot": "C3",
           "state": "busy",
-          "ticket": 795,
-          "grok_slot": 4,
+          "ticket": 756,
+          "grok_slot": 2,
           "kind": "dev",
-          "since": "2026-10-24T14:50:00+02:00",
-          "wave": "647-7D"
+          "since": "2026-10-24T15:51:00+02:00",
+          "wave": "647-7H"
         },
         {
           "slot": "C4",
@@ -123,7 +123,7 @@
     }
   ],
   "gate": {
-    "busy": 2,
+    "busy": 1,
     "max": 3
   },
   "tester": {
@@ -167,9 +167,11 @@
     },
     {
       "slot": 2,
-      "state": "free",
-      "ticket": null,
-      "since": null
+      "state": "dev",
+      "ticket": 756,
+      "since": "2026-10-24T15:51:00+02:00",
+      "claude_slot": 3,
+      "wave": "647-7H"
     },
     {
       "slot": 3,
@@ -181,11 +183,9 @@
     },
     {
       "slot": 4,
-      "state": "dev",
-      "ticket": 795,
-      "since": "2026-10-24T14:50:00+02:00",
-      "claude_slot": 3,
-      "wave": "647-7D"
+      "state": "free",
+      "ticket": null,
+      "since": null
     },
     {
       "slot": 5,
@@ -258,11 +258,11 @@
     {
       "slot": 3,
       "state": "busy",
-      "ticket": 795,
-      "grok_slot": 4,
-      "since": "2026-10-24T14:50:00+02:00",
+      "ticket": 756,
+      "grok_slot": 2,
+      "since": "2026-10-24T15:51:00+02:00",
       "account": 1,
-      "wave": "647-7D"
+      "wave": "647-7H"
     },
     {
       "slot": 4,
@@ -322,11 +322,11 @@
     }
   ],
   "last_refill": {
-    "at": "2026-10-24 15:38 CEST",
-    "mode": "refill-dev",
-    "triggers": "#756",
+    "at": "2026-10-24 15:53 CEST",
+    "mode": "recheck",
+    "triggers": "#795",
     "started": "",
-    "note": "load guard (1-min load 19.87 > 14)"
+    "note": "no pickable build ticket"
   },
   "totals": {
     "grok": {
@@ -395,7 +395,7 @@
           825
         ],
         "done": [],
-        "live": 0
+        "live": 1
       },
       {
         "number": 814,
@@ -427,7 +427,7 @@
         "done": [
           793
         ],
-        "live": 1
+        "live": 0
       },
       {
         "number": 766,
