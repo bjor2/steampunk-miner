@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { solarSystemsDebugActions } from './debug'
+import { economyRowTextOf, systemEconomyRowsOf } from './systems/economyRows'
 import { systemRosterOf } from './systems/systemRoster'
 
 describe('solar-systems debug actions (ticket 775)', () => {
@@ -67,6 +68,20 @@ describe('solar-systems debug actions (ticket 775)', () => {
       newContentSet: 'SS2-B',
       sizeClasses: ['S', 'M', 'L', 'XL'],
       lookTiles: expect.arrayContaining(['ground-look-cinder-basalt']) as unknown,
+    })
+  })
+
+  it("prints a system's economy rows as canonical text with no lock problem, and refuses system 1 (ticket 776)", () => {
+    const rows = systemEconomyRowsOf(20261024, 2n).map(economyRowTextOf)
+    expect(solarSystemsDebugActions.economyRowsOf!(2, 20261024)).toEqual({
+      ok: true,
+      rows,
+      lockProblems: [],
+    })
+    expect(rows[0]).toMatchObject({ campaignIndex: '6', arrivalStep: '1.1e+0' })
+    expect(solarSystemsDebugActions.economyRowsOf!('1', 7)).toEqual({
+      ok: false,
+      problems: ['system 1 keeps its own rows: the palette draws from system 2'],
     })
   })
 })

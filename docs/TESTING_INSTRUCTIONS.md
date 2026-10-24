@@ -453,6 +453,19 @@ balance:report`, `oreValueCensus.lane.test.ts`.
   behaviour without its column. `newContentSlots.test.ts` now pins five families with their rig
   parts and attach points and spall glass as Void glass's replacement. `debug.test.ts` prints a
   planet's copy through `steampunkDebug.features['solar-systems'].slotCopyOf(system, planet, worldSeed)`.
+- **The SS2 economy rows** (ticket 776, spec #774): `src/features/solar-systems/systems/economyRows.test.ts`
+  computes each drawn planet's row from the roster and system 1's laws at g: band tiers off
+  `oreTier` (system 2's surface is planet 5's band 4), a x3.375 value step at every arrival, the jump
+  included, gem tiers from the kernel planet row (t_top + 5/6/8), the radius as system 1's at g
+  times the size class, the ground k_jump harder on a system's first planet and k_s on its hard
+  start, never both, the arrival fee J times the hop's units into a system, the pool step as the
+  value step times the radius ratio squared; the row guards hold systems 2 to 40 under two seeds and
+  1e6 (no value step, arrival steps under 1.243 and felt at 0.9x on paper, R3 with the planet
+  before's gems at the 15% cap) and refuse each broken row; no stats.json row names the slice and
+  P40 stays at 63. `economyRules.test.ts` refuses a broken block, a k_s or k_jump over the ceiling
+  or felt under the floor. `economyRows.golden.test.ts` pins "solar system 2" spelled out and systems
+  10 and 1e6 by digest. `debug.test.ts` prints them through
+  `steampunkDebug.features['solar-systems'].economyRowsOf(system, worldSeed)`.
 - **The planet-row registry** (ticket 707, GD lock 6326252575): `src/systems/registries/planetRow.test.ts`
   resolves the generated row with no provider (`Planet {n}`, no pool, look or frozen radius), lays a
   provider's fields over it and keeps the ones it leaves out, resolves any planet up to the largest
@@ -564,8 +577,11 @@ balance:report`, `oreValueCensus.lane.test.ts`.
   jump's fuel at planet 5's Sell bay and jumps to system 2's first planet; with the P1-P5 tallies
   stopped at the core, the levels it arrives with are cut against band 1 there, k_jump harder, and
   the arrival felt speed is gated at 0.9x planet 5's average (`systemJumpBars.ts`, the Producer's
-  k_jump lock on #759; a miss moves only `starMap.systemJump.hardnessStep`). Hours of play, so it
-  runs only when named.
+  k_jump lock on #759; a miss moves only `starMap.systemJump.hardnessStep`). Since ticket 776 the
+  same bar file gates the jump's fee at 12-15% of the wallet at planet 5's core (J; a miss moves
+  only `starMap.systemJump.fuelMultiplier`), and `systemJumpBars.test.ts` holds that bar on
+  synthetic wallets and J's paper share (1.4 hops, 14% at the hop bar's middle). Hours of play, so
+  it runs only when named.
 - **Jump between solar systems** (ticket 759, spec #650): the data rows are pure
   (`economy/systemJump.test.ts`: J times the in-system units, the destination's unit price, the
   hardness step `k_jump^(s - 1)`, the jump drive's price, and the bignum goldens out of systems 1, 2,

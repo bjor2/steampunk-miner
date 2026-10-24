@@ -569,11 +569,14 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/sensing/systems/threatPeriscope.test.ts` | 6 | 6 |
 | `src/features/sensing/systems/useResolution.test.ts` | 16 | 16 |
 
-### `solar-systems`: 9 files, 61 tests
+### `solar-systems`: 12 files, 84 tests
 
 | File | Tests | Sites |
 | --- | --- | --- |
-| `src/features/solar-systems/debug.test.ts` | 5 | 5 |
+| `src/features/solar-systems/debug.test.ts` | 6 | 6 |
+| `src/features/solar-systems/systems/economyRows.golden.test.ts` | 2 | 2 |
+| `src/features/solar-systems/systems/economyRows.test.ts` | 15 | 15 |
+| `src/features/solar-systems/systems/economyRules.test.ts` | 5 | 5 |
 | `src/features/solar-systems/systems/familyBehaviours.test.ts` | 6 | 6 |
 | `src/features/solar-systems/systems/familyCopy.test.ts` | 7 | 7 |
 | `src/features/solar-systems/systems/newContentSlots.test.ts` | 4 | 4 |
@@ -1199,7 +1202,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/logging/starMapTravel.test.ts` | 11 | 11 |
 | `src/logging/subStepFloor.test.ts` | 4 | 4 |
 | `src/logging/surfaceLayerReport.test.ts` | 4 | 4 |
-| `src/logging/systemJumpBars.test.ts` | 5 | 5 |
+| `src/logging/systemJumpBars.test.ts` | 9 | 9 |
 | `src/logging/travelClampReport.test.ts` | 4 | 4 |
 | `src/logging/tripCellEnergy.lane.test.ts` | 1 | 1 |
 | `src/logging/tripCellEnergy.test.ts` | 2 | 2 |

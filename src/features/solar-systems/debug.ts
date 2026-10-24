@@ -5,10 +5,14 @@
  * picks in the lock were illustrative; the generator's are these). `lookArtOf(lookId)` is a look's
  * art row and tile (ticket 778). `slotCopyOf(system, planet, worldSeed)` is a planet's new-family
  * copy as the card and the hover will show it, filled with its name (ticket 780).
+ * `economyRowsOf(system, worldSeed)` is the system's economy rows, amounts as canonical text, with
+ * the problems the lock's guards find (none on a sound build; ticket 776).
  */
 import type { DebugAction } from '../../debug/debugActionRegistry'
 import type { DebugResult } from '../../debug/debugScreens'
 import { readIndexText } from '../../systems/starMap/planetAddress'
+import { economyRowProblemsOf } from './systems/economyRowGuards'
+import { economyRowTextOf, systemEconomyRowsOf, type EconomyRowText } from './systems/economyRows'
 import { slotCopyOf, type SlotCopy } from './systems/familyCopy'
 import { ARCHETYPE_PALETTE } from './systems/paletteRows'
 import { lookArtOf, LOOK_ART, type LookArt } from './systems/render/lookArt'
@@ -19,6 +23,7 @@ export const solarSystemsDebugActions: Readonly<Record<string, DebugAction>> = {
   rosterOf: (system, worldSeed) => rosterResultOf(system, worldSeed),
   lookArtOf: (lookId) => lookArtResultOf(lookId),
   slotCopyOf: (system, planet, worldSeed) => slotCopyResultOf(system, planet, worldSeed),
+  economyRowsOf: (system, worldSeed) => economyRowsResultOf(system, worldSeed),
 }
 
 function describePalette() {
@@ -46,6 +51,24 @@ function rosterResultOf(
   ]
   if (index === null || problems.length > 0) return { ok: false, problems }
   return answerOrProblem(() => ({ planets: systemRosterOf(worldSeed as number, index) }))
+}
+
+function economyRowsResultOf(
+  system: unknown,
+  worldSeed: unknown,
+): DebugResult<{ rows: EconomyRowText[]; lockProblems: string[] }> {
+  const index = indexOf(system)
+  const problems = [
+    ...(index === null ? ['system must be a whole index from 1'] : []),
+    ...(Number.isSafeInteger(worldSeed) ? [] : ['worldSeed must be a safe integer']),
+  ]
+  if (index === null || problems.length > 0) return { ok: false, problems }
+  return answerOrProblem(() => economyRowsAnswerOf(worldSeed as number, index))
+}
+
+function economyRowsAnswerOf(worldSeed: number, system: bigint) {
+  const rows = systemEconomyRowsOf(worldSeed, system)
+  return { rows: rows.map(economyRowTextOf), lockProblems: economyRowProblemsOf(rows) }
 }
 
 /** A planet's filled family copy; `copy` is null where the planet's slot is empty. */
