@@ -1332,6 +1332,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | File | Tests | Sites |
 | --- | --- | --- |
 | `src/physics/carveCompleteRide.test.ts` | 6 | 1 |
+| `src/physics/casingPerMetre.lane.test.ts` | 6 | 2 |
 | `src/physics/casingRedrill.test.ts` | 24 | 1 |
 | `src/physics/clientFlagFlip.test.ts` | 1 | 1 |
 | `src/physics/cutFaceRide.test.ts` | 52 | 4 |
@@ -1836,7 +1837,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/vehicle/cutStartBreakdown.test.ts` | 6 | 6 |
 | `src/systems/vehicle/downCutRamp.test.ts` | 12 | 12 |
 | `src/systems/vehicle/downCutRampFront.test.ts` | 5 | 5 |
-| `src/systems/vehicle/drillBore.test.ts` | 8 | 8 |
+| `src/systems/vehicle/drillBore.test.ts` | 10 | 10 |
 | `src/systems/vehicle/drillContact.test.ts` | 7 | 7 |
 | `src/systems/vehicle/drillGearCells.test.ts` | 12 | 12 |
 | `src/systems/vehicle/drillQuantum.test.ts` | 6 | 6 |
@@ -1959,7 +1960,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/world/carvePhase.test.ts` | 3 | 3 |
 | `src/systems/world/casingBand.test.ts` | 2 | 2 |
 | `src/systems/world/casingBreach.test.ts` | 15 | 15 |
-| `src/systems/world/casingLining.test.ts` | 16 | 16 |
+| `src/systems/world/casingLining.test.ts` | 17 | 17 |
 | `src/systems/world/chunkCache.test.ts` | 8 | 6 |
 | `src/systems/world/chunkDelta.test.ts` | 9 | 9 |
 | `src/systems/world/chunkRepair.test.ts` | 4 | 4 |
