@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-10-24T21:52:16+02:00",
+  "updated_at": "2026-10-24T21:59:04+02:00",
   "caps": {
     "grok": 12,
     "claude": 10,
@@ -28,20 +28,20 @@
         },
         {
           "slot": "C2",
+          "state": "busy",
+          "ticket": 845,
+          "grok_slot": 2,
+          "kind": "dev",
+          "since": "2026-10-24T21:59:00+02:00",
+          "wave": "647-7H"
+        },
+        {
+          "slot": "C3",
           "state": "free",
           "ticket": null,
           "grok_slot": null,
           "kind": null,
           "since": null
-        },
-        {
-          "slot": "C3",
-          "state": "busy",
-          "ticket": 843,
-          "grok_slot": 3,
-          "kind": "dev",
-          "since": "2026-10-24T21:20:00+02:00",
-          "wave": null
         },
         {
           "slot": "C4",
@@ -71,7 +71,7 @@
       "size": 6,
       "used": 2,
       "free": 4,
-      "claims_last_hour": 3,
+      "claims_last_hour": 4,
       "name": "Claude Max 1"
     },
     {
@@ -162,6 +162,15 @@
           789
         ],
         "since": "2026-10-24T18:46:17+02:00"
+      },
+      {
+        "feature": 843,
+        "kind": "ticket",
+        "title": "Bug: still can't drill through casing after early upgrades (post-#789)",
+        "tickets": [
+          843
+        ],
+        "since": "2026-10-24T21:56:25+02:00"
       }
     ]
   },
@@ -176,17 +185,17 @@
     },
     {
       "slot": 2,
-      "state": "free",
-      "ticket": null,
-      "since": null
+      "state": "dev",
+      "ticket": 845,
+      "since": "2026-10-24T21:59:00+02:00",
+      "claude_slot": 2,
+      "wave": "647-7H"
     },
     {
       "slot": 3,
-      "state": "dev",
-      "ticket": 843,
-      "since": "2026-10-24T21:20:00+02:00",
-      "claude_slot": 3,
-      "wave": null
+      "state": "free",
+      "ticket": null,
+      "since": null
     },
     {
       "slot": 4,
@@ -255,20 +264,20 @@
     },
     {
       "slot": 2,
+      "state": "busy",
+      "ticket": 845,
+      "grok_slot": 2,
+      "since": "2026-10-24T21:59:00+02:00",
+      "account": 1,
+      "wave": "647-7H"
+    },
+    {
+      "slot": 3,
       "state": "free",
       "ticket": null,
       "grok_slot": null,
       "since": null,
       "account": 1
-    },
-    {
-      "slot": 3,
-      "state": "busy",
-      "ticket": 843,
-      "grok_slot": 3,
-      "since": "2026-10-24T21:20:00+02:00",
-      "account": 1,
-      "wave": null
     },
     {
       "slot": 4,
@@ -332,11 +341,11 @@
     }
   ],
   "last_refill": {
-    "at": "2026-10-24 21:47 CEST",
+    "at": "2026-10-24 21:59 CEST",
     "mode": "refill-dev",
-    "triggers": "#812 #824",
-    "started": "",
-    "note": "load guard (MemAvailable 2393 MB < 3072 MB)"
+    "triggers": "#843",
+    "started": "#845->C2/A1",
+    "note": "spawned 1 worker(s)"
   },
   "totals": {
     "grok": {
@@ -360,6 +369,23 @@
     "parallel": 1,
     "list": [
       {
+        "number": 846,
+        "key": "647-7H",
+        "map": 647,
+        "lane": "remote",
+        "mode": "solo",
+        "state": "running",
+        "tickets": [
+          630,
+          631,
+          634,
+          635,
+          845
+        ],
+        "done": [],
+        "live": 1
+      },
+      {
         "number": 841,
         "key": "647-7A",
         "map": 647,
@@ -367,11 +393,7 @@
         "mode": "solo",
         "state": "paused",
         "tickets": [
-          630,
-          631,
           633,
-          634,
-          635,
           565
         ],
         "done": [],
@@ -379,20 +401,18 @@
       },
       {
         "number": 827,
-        "key": "647-7P",
+        "key": "647-7Q",
         "map": 647,
         "lane": "remote",
         "mode": "solo",
         "state": "paused",
         "tickets": [
-          820,
-          821,
           823,
-          824
+          824,
+          844,
+          821
         ],
-        "done": [
-          820
-        ],
+        "done": [],
         "live": 0
       },
       {
@@ -419,7 +439,7 @@
       },
       {
         "number": 817,
-        "key": "647-7Q",
+        "key": "647-7S",
         "map": 647,
         "lane": "remote",
         "mode": "solo",
@@ -433,7 +453,7 @@
       },
       {
         "number": 766,
-        "key": "647-7S",
+        "key": "647-7U",
         "map": 647,
         "lane": "hitl",
         "mode": "bench",
@@ -447,7 +467,7 @@
       },
       {
         "number": 751,
-        "key": "647-7H",
+        "key": "647-7P",
         "map": 647,
         "lane": "remote",
         "mode": "solo",
