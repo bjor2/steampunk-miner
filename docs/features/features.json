@@ -149,6 +149,12 @@
               "issues": [650, 759]
             },
             {
+              "title": "Generated solar systems",
+              "description": "Every solar system past the first is drawn from one archetype palette by seed: a ledger-voice name keyed to the act (\"Ember Reach 8\"), one of eight biome looks, a size class, a standard or hard surface start on the last planet, and a new enemy, hazard or ore family nowhere else in the campaign. Built: the palette, the naming rules and the deterministic roster with its goldens. Missing: the looks' art, the material pool, the economy rows, the pacing run and a screen that shows a later system's names.",
+              "status": "partial",
+              "issues": [774, 775, 776, 777, 778, 780]
+            },
+            {
               "title": "Mounted modules on the rig",
               "description": "Bought modules show on the vehicle: the gun turret swings its barrel toward targets and the charge rack sits on the hull.",
               "status": "built",

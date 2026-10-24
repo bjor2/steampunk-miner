@@ -411,6 +411,23 @@ balance:report`, `oreValueCensus.lane.test.ts`.
   (`uiScaleOf`), and the loader refusing a missing, stray, shared, digit-bearing or overlong name.
   The kernel's `src/systems/registries/planetRow.test.ts` checks the seam (`Planet {n}` with no
   provider, one provider at most).
+- **The SS2 archetype palette and system roster** (ticket 775, spec #774): the `solar-systems` slice.
+  `src/features/solar-systems/systems/paletteRows.test.ts` holds the palette shipping with no problem,
+  prefixes and a look for every #141 act a planet from campaign index 2 can hold, looks apart pairwise
+  in hue and motif, the 22-character name budget at the 24 px display size on 360x640 and 1280x800,
+  the four size classes (XL standard-only) and the loader refusing a missed or stray act, a shared or
+  lower-case word, an overlong name, a hook template without its slots, twin looks, a display-name id
+  and size classes without the x1.0 class. `systemRoster.test.ts` holds the roster byte-identical on
+  every read and different under another seed, ids `(s, p)` with `g = campaignIndex(s, p)` as the
+  name's number, `<Prefix> <Noun> <g>` with the act's prefix, no two names alike over systems 2 to 40
+  and none of system 1's, looks of the act at `g` walked before a repeat, the last planet hard and P1
+  standard, XL on a standard start only, each new family drawn once in the campaign and a null slot
+  past the set, the ledger hook by slot kind, and system 1 or a missing place refused.
+  `newContentSlots.test.ts` is the fail-on-recolour check at the id and name level against every
+  enemy kind, hazard kind, ore family, species and schedule row of the first system (it refuses
+  Progression's Void glass: the exotic family is Voidglass). `systemRoster.golden.test.ts` pins seed
+  20261024 at s = 2, 10 and 1e6. `debug.test.ts` re-prints a roster through
+  `steampunkDebug.features['solar-systems'].rosterOf(system, worldSeed)`.
 - **The planet-row registry** (ticket 707, GD lock 6326252575): `src/systems/registries/planetRow.test.ts`
   resolves the generated row with no provider (`Planet {n}`, no pool, look or frozen radius), lays a
   provider's fields over it and keeps the ones it leaves out, resolves any planet up to the largest
