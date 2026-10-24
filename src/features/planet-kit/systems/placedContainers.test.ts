@@ -229,8 +229,11 @@ describe('placed containers at any g and hold size (ticket 823, VS goldens)', ()
     { g: 6n, system: 2n, planet: 1n },
     { g: 1_000_000n, system: 200_000n, planet: 5n },
   ]
-  /** Cargo level 1e6 is the VS's third size; the kernel's hold counts end at level 361. */
-  const LEVELS = [1, 99]
+  /**
+   * The VS's sizes 1 and 99, and 361 for its third (1e6): the last level the kernel's hold counts
+   * reach until the bignum hold of #849 (the GD lock and TD ruling on #823, Q4).
+   */
+  const LEVELS = [1, 99, 361]
 
   it('keys the three planets by the (s,p) whose campaign index is g', () => {
     for (const { g, system, planet } of PLANETS) expect(campaignIndex(system, planet)).toBe(g)
@@ -255,14 +258,11 @@ describe('placed containers at any g and hold size (ticket 823, VS goldens)', ()
         if (!pickup.isPickedUp) throw new Error('pickup refused')
         expect(cargoUnitsOf(pickup.hold)).toBe(capacity)
         expect(cargoUnitsOf(pickup.moved)).toBe(capacity - cargoUnitsOf(partial))
-        expect(cargoUnitsOf(pickup.hold) + containedUnitsOf(pickup.placed)).toBe(
-          capacity + cargoUnitsOf(partial),
-        )
+        // Compared part by part: at level 361 the two holds' sum passes the safe integers.
+        expect(containedUnitsOf(pickup.placed)).toBe(capacity - cargoUnitsOf(pickup.moved))
       }
     }
   })
 
-  it.todo(
-    'moves a full hold of cargo level 1e6 the same way, once hold counts are bignum (asked on #823)',
-  )
+  it.todo('moves a full hold of cargo level 1e6 the same way, once #849 makes hold counts bignum')
 })

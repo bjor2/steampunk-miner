@@ -944,10 +944,19 @@
           "children": [
             {
               "title": "Specialist merchants",
-              "description": "Merchants with their own specialised trades.",
+              "description": "A merchant in the shops of each of planets 1 to 5 with its own stock and a premium on one home ore, selling that planet's kit item: the Cache Crate on planet 1, the Scree Plough, Damp Flask, Shard Tongs and Vent Vane on planets 2 to 5. Not built yet beyond the Cache Crate's containers.",
               "status": "planned",
-              "issues": [80],
-              "planet": 10
+              "issues": [80, 647, 821, 850],
+              "planet": 1,
+              "children": [
+                {
+                  "title": "Cache Crate containers",
+                  "description": "Drop your whole hold as a crate at your cell and pick it up later, only you; at most 3 per planet. Crates stay through saves and jumps, show as markers on the map and in the Cache Crates list on the base sheet. Buying and carrying a crate comes with the merchants.",
+                  "status": "partial",
+                  "issues": [823, 850],
+                  "planet": 1
+                }
+              ]
             },
             {
               "title": "Scanner station",

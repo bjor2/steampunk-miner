@@ -75,3 +75,17 @@ export {
   placedContainersProblems,
   toPortablePlacedContainers,
 } from './systems/placedContainersPortable'
+export type { ContainerRow } from './systems/containerViews'
+export { containerMarkersOf, containerRowsOf } from './systems/containerViews'
+export {
+  CONTAINER_RULES,
+  dropContainerIntent,
+  dropRejectionOf,
+  pickupContainerIntent,
+  pickupRejectionOf,
+} from './systems/containerRules'
+export { CONTAINERS_SECTION, placedContainersIn } from './systems/containerSection'
+export type { ContainerMoveBody } from './systems/containerEvents'
+export { contentsValueOf } from './systems/containerEvents'
+export type { KitSocket } from './systems/kitSockets'
+export { KIT_SOCKETS } from './systems/kitSockets'

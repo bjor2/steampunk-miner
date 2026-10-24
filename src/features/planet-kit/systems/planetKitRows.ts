@@ -80,6 +80,9 @@ export const PLANET_KITS: PlanetKits = loadPlanetKits(
   planetKitGuardContext(),
 )
 
+/** The kits' numbers, read after `PLANET_KITS` refused a broken file: the container caps' source. */
+export const PLANET_KIT_ECONOMY: PlanetKitEconomy = planetKitEconomyOf(economyFile as Raw)
+
 function typedTableProblems(
   file: Raw,
   economy: PlanetKitEconomy,

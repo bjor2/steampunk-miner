@@ -1,0 +1,29 @@
+/*
+ * A small tag centred on its container's cell: the overlay card's corner sits on the cell's
+ * centre, so the tag offsets itself by half its size. The border is the owner's tag colour.
+ */
+.marker {
+  display: inline-flex;
+  gap: var(--space-1);
+  padding: 1px var(--space-1);
+  border: 1px solid var(--color-brass);
+  border-radius: 4px;
+  background: var(--color-panel);
+  color: var(--color-parchment);
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  white-space: nowrap;
+  transform: translate(-50%, -50%);
+}
+
+.marker[data-owner='other'] {
+  border-color: var(--color-copper);
+}
+
+.name {
+  color: var(--color-brass);
+}
+
+.marker[data-owner='other'] .name {
+  color: var(--color-copper);
+}
