@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-10-24T02:14:38+02:00",
+  "updated_at": "2026-10-24T02:16:36+02:00",
   "caps": {
     "grok": 12,
     "claude": 10,
@@ -28,12 +28,11 @@
         },
         {
           "slot": "C2",
-          "state": "busy",
-          "ticket": 772,
-          "grok_slot": 2,
-          "kind": "dev",
-          "since": "2026-10-24T01:52:00+02:00",
-          "wave": "678-7A"
+          "state": "free",
+          "ticket": null,
+          "grok_slot": null,
+          "kind": null,
+          "since": null
         },
         {
           "slot": "C3",
@@ -69,8 +68,8 @@
         }
       ],
       "size": 6,
-      "used": 2,
-      "free": 4,
+      "used": 1,
+      "free": 5,
       "claims_last_hour": 3,
       "name": "Claude Max 1"
     },
@@ -123,7 +122,7 @@
     }
   ],
   "gate": {
-    "busy": 2,
+    "busy": 1,
     "max": 3
   },
   "tester": {
@@ -162,11 +161,9 @@
     },
     {
       "slot": 2,
-      "state": "dev",
-      "ticket": 772,
-      "since": "2026-10-24T01:52:00+02:00",
-      "claude_slot": 2,
-      "wave": "678-7A"
+      "state": "free",
+      "ticket": null,
+      "since": null
     },
     {
       "slot": 3,
@@ -243,12 +240,11 @@
     },
     {
       "slot": 2,
-      "state": "busy",
-      "ticket": 772,
-      "grok_slot": 2,
-      "since": "2026-10-24T01:52:00+02:00",
-      "account": 1,
-      "wave": "678-7A"
+      "state": "free",
+      "ticket": null,
+      "grok_slot": null,
+      "since": null,
+      "account": 1
     },
     {
       "slot": 3,
@@ -317,17 +313,17 @@
     }
   ],
   "last_refill": {
-    "at": "2026-10-24 02:12 CEST",
+    "at": "2026-10-24 02:16 CEST",
     "mode": "refill-dev",
-    "triggers": "#758 #787",
-    "started": "#758->C1/A1",
-    "note": "spawned 1 worker(s)"
+    "triggers": "#772",
+    "started": "",
+    "note": "no pickable build ticket"
   },
   "totals": {
     "grok": {
       "size": 12,
-      "used": 3,
-      "dev": 3,
+      "used": 2,
+      "dev": 2,
       "dev_cap": 8,
       "planner": 0,
       "planner_cap": 4
@@ -335,8 +331,8 @@
     "claude": {
       "size": 10,
       "enabled": 10,
-      "used": 3,
-      "free": 7,
+      "used": 2,
+      "free": 8,
       "external": 0
     }
   },
@@ -373,19 +369,6 @@
         ],
         "done": [],
         "live": 0
-      },
-      {
-        "number": 773,
-        "key": "678-7A",
-        "map": 678,
-        "lane": "remote",
-        "mode": "solo",
-        "state": "running",
-        "tickets": [
-          772
-        ],
-        "done": [],
-        "live": 1
       },
       {
         "number": 766,
