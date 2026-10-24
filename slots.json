@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-10-24T13:46:35+02:00",
+  "updated_at": "2026-10-24T13:47:18+02:00",
   "caps": {
     "grok": 12,
     "claude": 10,
@@ -321,11 +321,11 @@
     }
   ],
   "last_refill": {
-    "at": "2026-10-24 12:54 CEST",
+    "at": "2026-10-24 13:47 CEST",
     "mode": "refill-dev",
-    "triggers": "#776 #792",
-    "started": "#794->C1/A1 #777->C2/A1 #801->C8/A2",
-    "note": "spawned 3 worker(s)"
+    "triggers": "#801",
+    "started": "",
+    "note": "load guard (1-min load 14.77 > 14)"
   },
   "totals": {
     "grok": {
@@ -348,19 +348,6 @@
     "mode": "on",
     "parallel": 1,
     "list": [
-      {
-        "number": 802,
-        "key": "647-7F",
-        "map": 647,
-        "lane": "remote",
-        "mode": "solo",
-        "state": "running",
-        "tickets": [
-          801
-        ],
-        "done": [],
-        "live": 0
-      },
       {
         "number": 800,
         "key": "647-7E",
