@@ -280,17 +280,16 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/ground-gun/turretPace.lane.test.ts` | 1 | 1 |
 | `src/features/ground-gun/ui/fireGauge.test.ts` | 3 | 3 |
 
-### `materials`: 5 files, 80 tests
+### `materials`: 4 files, 71 tests
 
 | File | Tests | Sites |
 | --- | --- | --- |
 | `src/features/materials/materialPatterns.test.ts` | 2 | 2 |
 | `src/features/materials/systems/materialNames.test.ts` | 14 | 4 |
 | `src/features/materials/systems/materialTable.test.ts` | 50 | 47 |
-| `src/features/materials/systems/render/heroAtlases.test.ts` | 9 | 9 |
 | `src/features/materials/systems/render/rarityLooks.test.ts` | 5 | 5 |
 
-### `mineral-skins`: 10 files, 160 tests
+### `mineral-skins`: 11 files, 177 tests
 
 | File | Tests | Sites |
 | --- | --- | --- |
@@ -301,9 +300,10 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/mineral-skins/mineralSkins.planet3.test.ts` | 19 | 4 |
 | `src/features/mineral-skins/mineralSkins.planet4.test.ts` | 8 | 3 |
 | `src/features/mineral-skins/mineralSkins.planet5.test.ts` | 18 | 3 |
+| `src/features/mineral-skins/systems/heroAtlases.test.ts` | 16 | 16 |
 | `src/features/mineral-skins/systems/mineralSkin.test.ts` | 10 | 10 |
 | `src/features/mineral-skins/systems/signatureMaterial.test.ts` | 4 | 4 |
-| `src/features/mineral-skins/systems/skinTable.test.ts` | 21 | 21 |
+| `src/features/mineral-skins/systems/skinTable.test.ts` | 22 | 22 |
 
 ### `mining-gates`: 25 files, 153 tests
 
@@ -511,7 +511,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/rig-look/systems/rigLookSource.test.ts` | 13 | 13 |
 | `src/features/rig-look/systems/rigLookTable.test.ts` | 32 | 32 |
 
-### `roster`: 22 files, 382 tests
+### `roster`: 22 files, 387 tests
 
 | File | Tests | Sites |
 | --- | --- | --- |
@@ -526,7 +526,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/roster/roster.p2Pool.test.ts` | 3 | 3 |
 | `src/features/roster/roster.pacing.lane.test.ts` | 1 | 1 |
 | `src/features/roster/roster.poolSeam.test.ts` | 7 | 1 |
-| `src/features/roster/roster.skinContactSheet.test.ts` | 70 | 16 |
+| `src/features/roster/roster.skinContactSheet.test.ts` | 75 | 17 |
 | `src/features/roster/roster.speciesAudit.test.ts` | 50 | 5 |
 | `src/features/roster/systems/planetRoster.test.ts` | 13 | 13 |
 | `src/features/roster/systems/planetSpecies.test.ts` | 9 | 8 |
@@ -1415,8 +1415,8 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/render/headlamp.test.ts` | 3 | 3 |
 | `src/systems/render/heatShimmer.test.ts` | 2 | 2 |
 | `src/systems/render/heatTiles.test.ts` | 3 | 3 |
-| `src/systems/render/heroAtlas.test.ts` | 5 | 5 |
-| `src/systems/render/kindLookTable.test.ts` | 19 | 19 |
+| `src/systems/render/heroAtlas.test.ts` | 15 | 15 |
+| `src/systems/render/kindLookTable.test.ts` | 20 | 20 |
 | `src/systems/render/kindLooks.test.ts` | 6 | 6 |
 | `src/systems/render/lookPartQuads.test.ts` | 6 | 6 |
 | `src/systems/render/mountedPartLook.test.ts` | 8 | 4 |
@@ -1497,6 +1497,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/scene/VehiclePieces.test.ts` | 2 | 2 |
 | `src/scene/chunkHaloEdits.test.ts` | 1 | 1 |
 | `src/scene/chunkJobStream.test.ts` | 3 | 3 |
+| `src/scene/heroAtlasLayers.test.ts` | 3 | 3 |
 | `src/scene/materialPops.test.ts` | 3 | 3 |
 | `src/scene/mountedPartsPresence.test.ts` | 3 | 3 |
 | `src/scene/oneShotPlayer.test.ts` | 5 | 5 |
@@ -1506,7 +1507,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/scene/sceneDisposal.test.ts` | 8 | 3 |
 | `src/scene/soundCuePlayer.test.ts` | 5 | 5 |
 | `src/scene/sprayIntake.test.ts` | 3 | 3 |
-| `src/scene/terrainHeroAtlas.test.ts` | 5 | 5 |
+| `src/scene/terrainHeroAtlas.test.ts` | 6 | 6 |
 | `src/scene/terrainKindLooks.test.ts` | 5 | 5 |
 | `src/scene/terrainRarityReveal.test.ts` | 3 | 3 |
 | `src/scene/terrainSamplers.test.ts` | 8 | 8 |

@@ -117,6 +117,23 @@ function leadingAlbedoMapsOf(pages: readonly HeroAtlasPage[], art: ArtCatalogue)
   return (missing === -1 ? maps : maps.slice(0, missing)) as string[]
 }
 
+/** What the overflow check adds to the act's id, so the swap reads as its own atlas. */
+export const OVERFLOW_ATLAS_SUFFIX = '#overflow'
+
+/**
+ * Ticket 852's synthetic overflow, for the eye check and the browser spec while no act fills a
+ * page: the drawn pages again as the pages after them, every hero moved to its cell there, so each
+ * hero draws its own sprite from a page past page 1 with no new art.
+ */
+export function overflowedHeroAtlasOf(drawn: DrawnHeroAtlas): DrawnHeroAtlas {
+  const shift = drawn.albedos.length * HERO_ATLAS_CELLS
+  return {
+    id: `${drawn.id}${OVERFLOW_ATLAS_SUFFIX}`,
+    albedos: [...drawn.albedos, ...drawn.albedos],
+    heroCells: new Map([...drawn.heroCells].map(([id, cell]) => [id, cell + shift])),
+  }
+}
+
 /** The albedo map of a final `atlas` asset, or null. */
 export function atlasAlbedoMapOf(art: ArtCatalogue, assetId: string): string | null {
   const entry = manifestEntryOf(art, assetId)

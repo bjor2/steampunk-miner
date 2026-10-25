@@ -11,7 +11,13 @@ import {
   LOOK_VECTOR,
   rarityLeadOfEntry,
 } from '../../systems/render/kindLookTable'
-import { drawnHeroAtlasOf } from '../../systems/render/heroAtlas'
+import { HERO_ATLAS_CELLS } from '../../constants/scene'
+import {
+  drawnHeroAtlasOf,
+  heroPageOfCell,
+  packHeroPages,
+  type HeroAtlasCells,
+} from '../../systems/render/heroAtlas'
 import { freshPlanetParamsFor } from '../../systems/world/planetParams'
 import { ORE_ROWS } from '../ores'
 import { NAMED_SEEDS } from './rosterFixtures'
@@ -56,6 +62,21 @@ const HERO_READS = JSON.parse(
 
 function sheetOf(planetIndex: number, seed = SEED) {
   return planetContactSheetOf(freshPlanetParamsFor(seed, planetIndex))
+}
+
+/**
+ * Ticket 852's synthetic overflow of the planet's act: a full page of stand-ins packed ahead of the
+ * act's heroes, so the packer opens page 2 and every hero lands there.
+ */
+function overflowAtlasOf(planetIndex: number): HeroAtlasCells {
+  const stand = Array.from({ length: HERO_ATLAS_CELLS }, (_, at) => `stand-in-${at}`)
+  const shipped = heroAtlasOfPlanet(planetIndex)
+  const heroes = shipped?.pages.flatMap((page) => page.cells) ?? []
+  const placements = [...stand, ...heroes].map((speciesId) => ({ speciesId, page: null }))
+  return {
+    id: `${shipped?.id ?? 'none'}#overflow`,
+    pages: packHeroPages(placements).map((cells, at) => ({ assetId: `page-${at + 1}`, cells })),
+  }
 }
 
 function goldenRowsOf(planetIndex: number) {
@@ -257,4 +278,27 @@ describe('skin contact sheet of P1 to P5 (ticket 746)', () => {
     expect(first).toHaveLength(GEM_RANKS.length)
     for (const codes of rest) expect(codes).toEqual(first)
   })
+
+  it.each(SHEET_PLANETS)(
+    'draws every hero of planet %i from page 2 when a synthetic overflow fills page 1, each still apart from its neighbours (ticket 852)',
+    (planetIndex) => {
+      const shipped = sheetOf(planetIndex).rows
+      const overflow = planetContactSheetOf(
+        freshPlanetParamsFor(SEED, planetIndex),
+        overflowAtlasOf(planetIndex),
+      )
+      const heroRows = overflow.rows.filter((row) => row.heroCell !== null)
+      expect(heroRows.length).toBe(shipped.filter((row) => row.heroCell !== null).length)
+      expect(heroRows.map((row) => heroPageOfCell(row.heroCell ?? 0))).toEqual(
+        heroRows.map(() => 2),
+      )
+      expect(overflow.rows).toEqual(
+        shipped.map((row) => ({
+          ...row,
+          heroCell: row.heroCell === null ? null : row.heroCell + HERO_ATLAS_CELLS,
+        })),
+      )
+      expect(unreadablePairsOf(overflow)).toEqual([])
+    },
+  )
 })

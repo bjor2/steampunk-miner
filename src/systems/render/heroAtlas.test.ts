@@ -14,6 +14,7 @@ import {
   heroCellsOf,
   heroPageOfCell,
   heroPlacementProblems,
+  overflowedHeroAtlasOf,
   packHeroPages,
   residentBytesOf,
   type HeroAtlasCells,
@@ -183,5 +184,18 @@ describe('hero atlas pages (ticket 852)', () => {
     expect(heroAtlasProblems({ id: 'fire', pages })).toEqual([
       `fire has ${HERO_ATLAS_MAX_PAGES + 1} pages, over the ${HERO_ATLAS_MAX_PAGES} the look table numbers`,
     ])
+  })
+
+  it('overflows the drawn pages onto the pages after them, every hero on its cell there', () => {
+    const drawn = drawnHeroAtlasOf(ATLAS, artWith([atlasEntry(PAGE_ONE, 'final')]))
+    const overflowed = drawn === null ? null : overflowedHeroAtlasOf(drawn)
+    expect(overflowed).toEqual({
+      id: 'foothold.base#overflow',
+      albedos: [mapOf(PAGE_ONE), mapOf(PAGE_ONE)],
+      heroCells: new Map([
+        ['violet-fluorite-quartzine', HERO_ATLAS_CELLS],
+        ['vein-gold-brassvein', HERO_ATLAS_CELLS + 1],
+      ]),
+    })
   })
 })

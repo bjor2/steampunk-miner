@@ -8,6 +8,7 @@
  * and the first-contact flourishes started (ticket 698), so a spec sees one per species met, and
  * each gem's rank glint (ticket 786) as the shader unpacks it.
  */
+import { packHeroAtlasOverflow } from '../scene/heroAtlasOverflowSwitch'
 import { heroAtlasPresence } from '../scene/heroAtlasPresence'
 import { kindLookPresence } from '../scene/kindLookPresence'
 import { speciesRevealPresence } from '../scene/speciesRevealPresence'
@@ -74,6 +75,16 @@ export function readDrawnKindLooks(): DebugResult<{ looks: DrawnKindLooks }> {
 
 export function showEveryKindLook(): DebugResult {
   kindLookPresence.isEveryKindShown = true
+  return { ok: true }
+}
+
+/**
+ * Binds the resident act's synthetic overflow (ticket 852) or the act's own pages again: with it
+ * on, every hero draws its sprite from a page past page 1, the act id gaining `#overflow`.
+ */
+export function packHeroAtlasOverflowUnlessRefused(packed: unknown): DebugResult {
+  if (typeof packed !== 'boolean') return { ok: false, problems: ['packed must be true or false'] }
+  packHeroAtlasOverflow(packed)
   return { ok: true }
 }
 

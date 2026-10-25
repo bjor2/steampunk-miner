@@ -6,7 +6,7 @@
  * hero. Nothing has been met on frame 1, so no row carries a rarity (GD ruling on #698, option 2).
  * Look only: no price, gate or income reads it.
  */
-import { heroCellsOf } from '../../../../systems/render/heroAtlas'
+import { heroCellsOf, type HeroAtlasCells } from '../../../../systems/render/heroAtlas'
 import { kindEntryOf, type KindLook } from '../../../../systems/render/kindLookTable'
 import type { PlanetParams } from '../../../../systems/world/planetParams'
 import { MATERIALS } from '../../../materials'
@@ -62,10 +62,14 @@ const HEX_RADIX = 16
 const LOOK_CHANNELS = ['silhouetteCode', 'patternCode', 'colour'] as const
 const MIN_CHANNELS_APART = 2
 
-export function planetContactSheetOf(params: PlanetParams): PlanetContactSheet {
+/** `atlas` is the planet's act's unless a check packs another (ticket 852's synthetic overflow). */
+export function planetContactSheetOf(
+  params: PlanetParams,
+  atlas: HeroAtlasCells | null = heroAtlasOfPlanet(params.planetIndex),
+): PlanetContactSheet {
   const roster = planetRosterOf(params)
   const looks = planetKindLooksOf(params)
-  const heroCells = heroCellsOf(heroAtlasOfPlanet(params.planetIndex)?.pages ?? [])
+  const heroCells = heroCellsOf(atlas?.pages ?? [])
   const gemTiers = gemSaleTiersOf(params.planetIndex, params.oreRulesVersion)
   return {
     planetIndex: params.planetIndex,

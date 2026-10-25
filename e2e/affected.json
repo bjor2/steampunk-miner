@@ -1155,11 +1155,16 @@
       "specs": ["e2e/browser/materialLooks.spec.ts", "e2e/browser/render.spec.ts"]
     },
     {
-      "why": "The per-act hero atlas (ticket 451): the materials' atlas rows and art, the roster's act lookup, the probe's 16th-unit gate, the terrain's swap and binder, and its debug read; the P1-P5 skin contact sheet (ticket 746).",
+      "why": "The per-act hero atlas (ticket 451): the mineral skins' atlas rows, pages and art (ticket 852), the roster's act lookup, the probe's 16th-unit gate, the terrain's swap, page layers and binder, the overflow switch, and its debug read; the P1-P5 skin contact sheet (ticket 746).",
       "paths": [
         "src/features/roster/systems/render/**",
         "src/features/roster/skinContactSheet.golden.json",
         "src/features/materials/**",
+        "src/features/mineral-skins/heroAtlases.json",
+        "src/features/mineral-skins/mineralSkins.json",
+        "src/features/mineral-skins/systems/heroAtlases.ts",
+        "src/scene/heroAtlasLayers.ts",
+        "src/scene/heroAtlasOverflowSwitch.ts",
         "src/systems/registries/kindLook.ts",
         "src/systems/render/heroAtlas.ts",
         "src/systems/render/gpuTier.ts",
@@ -1175,6 +1180,7 @@
       ],
       "specs": [
         "e2e/browser/heroAtlas.spec.ts",
+        "e2e/browser/heroAtlasPages.spec.ts",
         "e2e/browser/materialLooks.spec.ts",
         "e2e/browser/renderQuality.spec.ts",
         "e2e/browser/p2GemSkins.spec.ts",

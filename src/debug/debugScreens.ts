@@ -80,6 +80,7 @@ import { warningsNow, type WarningsReading } from './debugWarnings'
 import { showHintUnlessRefused, stageHudUnlessRefused, vehicleScreenBoxNow } from './debugHudLayout'
 import {
   readDrawnKindLooks,
+  packHeroAtlasOverflowUnlessRefused,
   showEveryKindLook,
   showSeenKindLooksOnly,
   type DrawnKindLooks,
@@ -203,6 +204,11 @@ export interface DebugUi {
   showEveryKindLook(): DebugResult
   /** Back to the kinds the local player has met. */
   showSeenKindLooksOnly(): DebugResult
+  /**
+   * Binds the resident act's synthetic overflow, every hero on a page past page 1, or (false) the
+   * act's own pages again (ticket 852); refused for anything but a boolean.
+   */
+  packHeroAtlasOverflow(packed: unknown): DebugResult
 }
 
 export interface BayPresentation {
@@ -296,6 +302,7 @@ export function createDebugUi(): DebugUi {
     getKindLooks: readDrawnKindLooks,
     showEveryKindLook,
     showSeenKindLooksOnly,
+    packHeroAtlasOverflow: packHeroAtlasOverflowUnlessRefused,
   }
 }
 
