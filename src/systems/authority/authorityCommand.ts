@@ -502,8 +502,13 @@ import type { DriveSigns } from '../vehicle/driveSigns'
  *    started or stopped acting, and `debug.placeHazard` places a hazard for a scenario in the
  *    session's optional `placedHazards`. Planet 1 holds no hazard and a factor of 0 plays nothing,
  *    so those runs move no digest.
+ * 111: the merchant variants pay their ore premium (ticket 821, PK2): the planet-kit slice stands
+ *    the merchant counter that opens the `merchants` row from planet 1, counts a mined unit whose
+ *    species is the premium ore of the merchant trading on its planet (Honey Amber on P1 to
+ *    Chromite on P5), and pays those units 5/4 of V(t) at that merchant, the beacon's lift instead
+ *    where it pays more. A run that mines no premium ore on P1 to P5 moves no digest.
  */
-export const AUTHORITY_PROTOCOL_VERSION = 110
+export const AUTHORITY_PROTOCOL_VERSION = 111
 
 /** The kernel's own commands: the closed set its rule tables are written against. */
 export interface KernelCommandPayloads {

@@ -1,24 +1,13 @@
 import { describe, expect, it } from 'vitest'
-import { formatAmount, formatPrice } from '../../../systems/displayAmount'
-import { assayedSalePrice } from '../../../systems/economy/assayPricing'
-import { oreSalePrice, oreTier, oreValue } from '../../../systems/economy/oreEconomy'
-import { cmp, fromCanonical, mul, toCanonical, type Money } from '../../../systems/money'
+import { formatPrice } from '../../../systems/displayAmount'
+import { toCanonical, type Money } from '../../../systems/money'
 import { campaignIndex, planetIndexOfCampaign } from '../../../systems/starMap/campaignIndex'
-import {
-  kitItemPriceAt,
-  kitPriceAtIndex,
-  planetIndexOfKitPlanet,
-  premiumUnitPrice,
-  premiumUnitPriceWithBeacon,
-} from './planetKitPrices'
+import { kitItemPriceAt, kitPriceAtIndex, planetIndexOfKitPlanet } from './planetKitPrices'
 import { PLANET_KITS } from './planetKitRows'
 import { kitItemOf } from './planetKitSales'
 import type { KitPriceRule } from './planetKitTypes'
 
 const at = (system: string, planet: string) => ({ system, planet })
-const LIFT_BP = PLANET_KITS.premiumLiftBp
-const BAND_ONE = 1
-const MID_BAND = 3
 /** g = 1, 2, 5, 6, 10 and 1e6 (VS row 0), then s = 2, 10 and 1e6 at p = 1. */
 const GOLDEN_G = [1, 2, 5, 6, 10, 1_000_000]
 const GOLDEN_SYSTEMS = [2n, 10n, 1_000_000n]
@@ -30,11 +19,6 @@ function ruleOf(itemId: string): KitPriceRule {
 /** `g amount readout` of a price. */
 function priceLineOf(g: number, price: Money): string {
   return `${g} ${toCanonical(price)} ${formatPrice(price)}`
-}
-
-/** `g amount readout` of a sale. */
-function saleLineOf(g: number, sale: Money): string {
-  return `${g} ${toCanonical(sale)} ${formatAmount(sale)}`
 }
 
 function firstPlanetIndexOfSystem(system: bigint): number {
@@ -108,63 +92,5 @@ describe('planet kit prices (ticket 821)', () => {
       toCanonical(kitPriceAtIndex(flask.price, 3)),
     )
     expect(formatPrice(kitItemPriceAt(flask, at('1', '3')))).toBe('1,154')
-  })
-})
-
-describe('planet kit premium sale (ticket 821)', () => {
-  it('pays V(t) times 1.25 on the premium ore, rounded toward zero, with its readout', () => {
-    expect(
-      GOLDEN_G.map((g) => saleLineOf(g, premiumUnitPrice(oreTier(g, BAND_ONE), LIFT_BP))),
-    ).toEqual([
-      '1 1.25e+1 12.5',
-      '2 4.2187e+1 42.1',
-      '5 1.621829e+3 1,621',
-      '6 5.473673e+3 5,473',
-      '10 7.10189108e+5 710k',
-      '1000000 2.217191880798092496734020428214779540092e+528274 2e528274',
-    ])
-  })
-
-  it('never lifts the premium ore by more than a quarter over its value', () => {
-    for (const g of [...GOLDEN_G, ...GOLDEN_SYSTEMS.map(firstPlanetIndexOfSystem)]) {
-      const tier = oreTier(g, BAND_ONE)
-      const quarterUp = mul(oreValue(tier), fromCanonical('1.25'))
-      expect(cmp(premiumUnitPrice(tier, LIFT_BP), quarterUp)).toBeLessThan(1)
-      expect(cmp(premiumUnitPrice(tier, LIFT_BP), oreSalePrice(tier))).toBe(1)
-    }
-  })
-
-  it('sells the premium ore with the beacon held at exactly V times max(1.25, beaconLift)', () => {
-    for (const g of [...GOLDEN_G, ...GOLDEN_SYSTEMS.map(firstPlanetIndexOfSystem)]) {
-      const tier = oreTier(g, BAND_ONE)
-      const beaconLifted = assayedSalePrice(g, tier)
-      const premium = premiumUnitPrice(tier, LIFT_BP)
-      const larger = cmp(beaconLifted, premium) >= 0 ? beaconLifted : premium
-      expect(toCanonical(premiumUnitPriceWithBeacon(g, tier, LIFT_BP))).toBe(toCanonical(larger))
-    }
-  })
-
-  it('takes the beacon’s band-3 price on band 1, where it lifts more than the premium', () => {
-    expect(
-      GOLDEN_G.map((g) =>
-        saleLineOf(g, premiumUnitPriceWithBeacon(g, oreTier(g, BAND_ONE), LIFT_BP)),
-      ),
-    ).toEqual([
-      '1 2.25e+1 22.5',
-      '2 7.5937e+1 75.9',
-      '5 2.919292e+3 2,919',
-      '6 9.852612e+3 9,852',
-      '10 1.278340394e+6 1.27M',
-      '1000000 3.990945385436566494121236770786603172165e+528274 3e528274',
-    ])
-  })
-
-  it('keeps the premium alone on a tier the beacon does not lift, never adding both', () => {
-    for (const g of GOLDEN_G) {
-      const tier = oreTier(g, MID_BAND)
-      expect(toCanonical(premiumUnitPriceWithBeacon(g, tier, LIFT_BP))).toBe(
-        toCanonical(premiumUnitPrice(tier, LIFT_BP)),
-      )
-    }
   })
 })

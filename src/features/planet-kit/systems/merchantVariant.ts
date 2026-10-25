@@ -5,8 +5,7 @@
  * long as the rows make it (HS: lists grow without limit); each price is shown through the one
  * compact formatter (`formatPrice`, ticket 681), rounded up.
  *
- * The premium is paid once per ore: only the merchant whose premium ore it is pays the lift, so an
- * ore never earns a second premium at another planet's merchant (VS row 4: no stacking).
+ * The premium is paid once per ore, at its origin's merchant only (`merchantPremium.ts`).
  */
 import { formatPrice } from '../../../systems/displayAmount'
 import type { Money } from '../../../systems/money'
@@ -52,16 +51,6 @@ export function merchantVariantOf(kits: PlanetKits, planet: PlanetId): MerchantV
     premiumLiftBp: kits.premiumLiftBp,
     stock: merchantStockRowsOf(kits, merchant),
   }
-}
-
-/** The lift in basis points the merchant on `planet` pays on `speciesId`: its premium ore's only. */
-export function premiumLiftBpOf(kits: PlanetKits, planet: PlanetId, speciesId: string): number {
-  const merchant = merchantOfPlanet(kits, planet)
-  return isPremiumOreOf(merchant, speciesId) ? kits.premiumLiftBp : 0
-}
-
-function isPremiumOreOf(merchant: MerchantRow | null, speciesId: string): boolean {
-  return merchant?.premiumOre.speciesId === speciesId
 }
 
 function merchantStockRowsOf(kits: PlanetKits, merchant: MerchantRow): MerchantStockRow[] {

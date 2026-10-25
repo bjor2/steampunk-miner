@@ -44,7 +44,6 @@ export const DEFERRED_SCHEDULE_ROWS: Readonly<Record<DeferredScheduleHome, reado
     'mobile_platform',
     'two_bay_shops',
     'refinery_bay',
-    'merchants',
     'quest_office',
     'core_forge',
   ],

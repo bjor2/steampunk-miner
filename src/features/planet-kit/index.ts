@@ -46,6 +46,11 @@ export {
   stockedItemsOf,
   stockOfMerchant,
 } from './systems/planetKitSales'
+export { kitItemPriceAt, kitPriceAtIndex, planetIndexOfKitPlanet } from './systems/planetKitPrices'
+export type { MerchantStockRow, MerchantVariant } from './systems/merchantVariant'
+export { merchantVariantOf } from './systems/merchantVariant'
+export { merchantPremiumLiftOf, premiumSpeciesAt } from './systems/merchantPremium'
+export { MERCHANTS_ROW_ID, sessionMerchantOf, sessionPlanetIdOf } from './systems/sessionMerchant'
 export type {
   ContainerAccess,
   ContainerDrop,
@@ -91,12 +96,3 @@ export type { ContainerMoveBody } from './systems/containerEvents'
 export { contentsValueOf } from './systems/containerEvents'
 export type { KitSocket } from './systems/kitSockets'
 export { KIT_SOCKETS } from './systems/kitSockets'
-export {
-  kitItemPriceAt,
-  kitPriceAtIndex,
-  planetIndexOfKitPlanet,
-  premiumUnitPrice,
-  premiumUnitPriceWithBeacon,
-} from './systems/planetKitPrices'
-export type { MerchantStockRow, MerchantVariant } from './systems/merchantVariant'
-export { merchantVariantOf, premiumLiftBpOf } from './systems/merchantVariant'

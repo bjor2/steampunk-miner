@@ -4,7 +4,9 @@
  * the session section that keeps them per planet, the drop and pickup commands and the scenario
  * call, their log lines, the map markers and the list on the base sheet, and the placeholder
  * parts on the sockets G&V named for the kit tools (shown by a debug switch until #850 lets a
- * player own one). Buying kit items and the four hazard tools come with #850.
+ * player own one). Ticket 821 stands the merchant counter on the dock (it claims the `merchants`
+ * row), and counts and pays the merchant's ore premium on the kernel's ledger and sale-lift
+ * seams. Buying kit items and the four hazard tools come with #850.
  */
 import type { SliceDefinition } from '../../registries/sliceDefinition'
 import { planetKitDebugActions } from './debug'
@@ -12,12 +14,17 @@ import { PLANET_KIT_PROJECTIONS, PLANET_KIT_RUN_EVENTS } from './logging'
 import { KIT_SOCKET_PIECE_ID, KitSocketParts } from './scene/KitSocketParts'
 import { CONTAINER_RULES } from './systems/containerRules'
 import { CONTAINERS_SECTION } from './systems/containerSection'
+import { MERCHANT_ORE_PREMIUM, MERCHANT_PREMIUM_LIFT } from './systems/merchantPremium'
+import { MERCHANT_FACILITY } from './systems/sessionMerchant'
 import { CONTAINER_MARKER_PRIORITY, ContainerMarkers } from './ui/ContainerMarkers'
 import { CONTAINERS_TAB } from './ui/ContainersTab'
 
 export const slice: SliceDefinition = {
   id: 'planet-kit',
   register(r) {
+    r.dockFacility(MERCHANT_FACILITY)
+    r.orePremium(MERCHANT_ORE_PREMIUM)
+    r.oreSaleLift(MERCHANT_PREMIUM_LIFT)
     r.saveSection(CONTAINERS_SECTION)
     r.commandRules(CONTAINER_RULES)
     r.eventProjections(PLANET_KIT_PROJECTIONS)

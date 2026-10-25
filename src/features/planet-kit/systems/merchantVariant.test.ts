@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { merchantVariantOf, premiumLiftBpOf } from './merchantVariant'
+import { merchantVariantOf } from './merchantVariant'
 import { PLANET_KITS } from './planetKitRows'
 
 const at = (system: string, planet: string) => ({ system, planet })
@@ -74,23 +74,5 @@ describe('merchant variants (ticket 821)', () => {
 
   it('places no merchant where the rows have none', () => {
     expect(merchantVariantOf(PLANET_KITS, at('1', '6'))).toBeNull()
-  })
-})
-
-describe('merchant premium (ticket 821)', () => {
-  it('pays the +25% premium on its own premium ore only', () => {
-    expect(premiumLiftBpOf(PLANET_KITS, at('1', '1'), 'honey-amber-quartzine')).toBe(2500)
-    expect(premiumLiftBpOf(PLANET_KITS, at('1', '1'), 'violet-fluorite-quartzine')).toBe(0)
-  })
-
-  it('pays an ore its premium once, at its own planet’s merchant and never at another', () => {
-    const paying = FIRST_FIVE.filter(
-      (planet) => premiumLiftBpOf(PLANET_KITS, planet, 'honey-amber-quartzine') > 0,
-    )
-    expect(paying).toEqual([at('1', '1')])
-  })
-
-  it('pays no premium where no merchant stands', () => {
-    expect(premiumLiftBpOf(PLANET_KITS, at('1', '6'), 'honey-amber-quartzine')).toBe(0)
   })
 })

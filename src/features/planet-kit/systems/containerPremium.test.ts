@@ -50,7 +50,16 @@ const merchant: SliceDefinition = {
   },
 }
 
-const withKit = <T>(run: () => T): T => withRegistrations([planetKit, merchant], run)
+/**
+ * The slice's crate rules with the probe merchant standing in for its own premium (ticket 821),
+ * so the moves are judged on any g, a merchant there or not.
+ */
+const crateRulesOnly: SliceDefinition = {
+  id: planetKit.id,
+  register: (r) => planetKit.register({ ...r, orePremium: () => {}, oreSaleLift: () => {} }),
+}
+
+const withKit = <T>(run: () => T): T => withRegistrations([crateRulesOnly, merchant], run)
 
 /** A session on `planet` holding N premium (this planet's) plus M commons of its tier-2-up ore. */
 function holdingOn(planet: number, premium: number, commons: number) {
