@@ -172,7 +172,12 @@ programs }` from three's `renderer.info` of the game canvas), read only when cal
   `authority/hazards/toolContexts.test.ts`, the real tools in `planet-kit/systems/kitToolRules.test.ts`,
   the flask in `flaskRules.test.ts` and the bot's flask policy in `botFlask.test.ts`; the tools on/off
   replay (payback, felt speed, the 22-minute floor; bars in `toolPaceBars.ts`, unit-tested) is the
-  lane `planet-kit/toolPace.lane.test.ts`.
+  lane `planet-kit/toolPace.lane.test.ts`. Each tool's one outcome (ticket 882) is specced the same
+  way in `planet-kit/systems/kitToolOutcomes.test.ts` (the plough's scree moved aside through the
+  terrain queue and kept through a save, the tongs' loot, the vane's outward shove at the vaned size,
+  the flask's cleared firedamp), the kernel seams with probe slices in
+  `authority/hazards/hazardOutcomeSeams.test.ts`, and the overlay tags in
+  `planet-kit/systems/render/kitOutcomeTags.test.ts`; the lane above replays with the outcomes on.
   Collapse specs build a weak band-2 tunnel or dig one with `collapse/collapseFixtures.ts`. Bore gun specs (ticket 313) stand the rig in a pocket of band-1 rock with `bore/boreFixtures.ts` and register the gun's numbers through `boreGunSlice` inside `withRegistrations`, as no slice answers `boreGun` yet. Auto mode specs (ticket 317) use `bore/boreAutoFixtures.ts` `searSlice`, which adds the steam sear's numbers and its research, and stand the rig at `AUTO_RIG`, on the east edge of its collapse block, so a level shot east never warns the rig's own block. A slice's self-acting item (ticket 328: the steam shield) is specced with the real press path through `power-up-core`'s `withPowerUpCore([itemSlice, fixture])`, the fixture registering the item's research and a stand-in `autoFire` hook for the combo, in the corridor fight of `combat/combatFixtures.ts`. Collapse brace specs (ticket 331) register the fake `brace-probe` slice of `collapse/braceFixtures.ts` (a section, a command, a clock step and the provider) inside `withRegistrations`, so a brace can end by command, by clock step or by `untilTick`. Hazard strip specs (ticket 341) dig straight down the plain line of `render/hazardStrip/stripFixtures.ts`, fixtures placed in metres below the start, at a steady speed frame by frame; the per-frame cost is the sampler's own cost model (`spentUs`), and the wall clock is `npm run bench:strip`'s. Specs that mine deep (where crawlers live) freeze enemies first
   (`FREEZE_ENEMIES` in `scriptedSession.ts`); combat specs fight in the band-1 corridor of
   `combat/combatFixtures.ts`, where no spawn point is in reach. The `ui` namespace (`ui.setCameraMode('rotating' | 'fixed')`, `ui.setPref(name, value)`,
@@ -1795,9 +1800,15 @@ incomePerHour}` go to `balance-report/drill-pace.ndjson`, which `pushTestMetrics
   inside the bay, no sideways scroll, and no merchant on planet 6. Box Tester only.
   `e2e/browser/kitBuying.spec.ts` (ticket 850) buys at the same two sizes through each line's Buy:
   three Cache Crates on planet 1 until the line shows "Carrying the most." and 3/3 with no Buy, a
-  Scree Plough on planet 2 locked as "Owned.", and a granted crate counted on the HUD (attached
+  Scree Plough on planet 2 bought through its Buy and locked as "Owned." (on sale since ticket 882),
+  and a granted crate counted on the HUD (attached
   only: the compact HUD folds the gauges into its tray). Box Tester only. The buy rules themselves
   are `planet-kit/systems/kitBuyRules.test.ts` and `kitHoldings.test.ts`.
+  `e2e/browser/kitOutcomes.spec.ts` (ticket 882) makes each hazard tool's outcome happen on the
+  planet 1 start at 360x640 and 1920x1080, a tool granted and its hazard placed through
+  `steampunkDebug`, the cut through `fastForward`, and checks its overlay tag
+  (`planet-kit-outcome-tag`, `data-outcome` the verb) is drawn, attaching each screen as that size's
+  golden for review. Box Tester only.
 - **Sale receipt** (ticket 717, spec #678): the rules are pure in the sell-burst slice. The hold's
   kinds are tallied as units come in (`systems/heldManifest.ts`, read by `heldUnits.ts` as the pickup
   popup reads a species and rarity) and cut back to the authority's hold every batch; the trip's

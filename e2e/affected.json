@@ -49,6 +49,11 @@
       "specs": ["e2e/browser/kitBuying.spec.ts"]
     },
     {
+      "why": "The planet-kit slice's hazard tool outcomes (ticket 882): the plough's shove, the tongs' loot, the vane's ride and the flask's cleared firedamp, each tagged on the overlay at 360 px and 1920x1080.",
+      "paths": ["src/features/planet-kit/**"],
+      "specs": ["e2e/browser/kitOutcomes.spec.ts"]
+    },
+    {
       "why": "The example slice answers smoke's features read, opens the slice screen, hangs the test piece and shows the shared UI parts (#423).",
       "paths": ["src/features/example/**"],
       "specs": [
