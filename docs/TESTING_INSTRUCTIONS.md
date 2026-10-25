@@ -684,14 +684,24 @@ balance:report`, `oreValueCensus.lane.test.ts`.
   readability at 360 px on each band's ground is an eye check on the screen matrix.
   The per-act hero atlas (ticket 451): `src/systems/render/gpuTier.test.ts` gives it the 16th unit
   only with 16 units, the full program and an ETC1S alpha target;
-  `src/systems/render/heroAtlas.test.ts` the asset lookup, the 16-cell cap and the 2 MiB resident
-  budget; `src/features/materials/systems/render/heroAtlases.test.ts` the rows (hero species
-  only, in the #452 cell order) and each shipped KTX2 (1024 px, ETC1S sRGB, four levels);
-  `src/features/roster/kindLook.test.ts` one atlas object per act; `src/scene/terrainHeroAtlas.test.ts`
-  the binder (one resident, released and disposed before the next, RGBA8 refused) and the table
-  drawing a hero from its cell only while bound, met or not (ticket 698). The browser spec
-  `e2e/browser/heroAtlas.spec.ts` checks through `ui.getKindLooks()` that a change of act binds
-  once, a planet change inside an act binds none, and no bind links a program.
+  `src/systems/render/heroAtlas.test.ts` the asset lookup, the 16-cell page cap and the 2 MiB
+  resident budget a page, and the page packer of ticket 852 (a synthetic overflow opens page 2, a
+  recorded page holds, pages unbounded up to the 63 the look table numbers, a page with no final map
+  drawing the shader look, the overflow switch's shifted cells);
+  `src/features/mineral-skins/systems/heroAtlases.test.ts` the rows (hero species only, in the
+  #452 cell order, page by page as `hero-cells.json` packs them, every packed hero's page recorded on
+  its skin row, the refusal naming the page to record) and each shipped page's KTX2 (1024 px,
+  ETC1S sRGB, four levels); `src/features/roster/kindLook.test.ts` one atlas object per act;
+  `src/scene/heroAtlasLayers.test.ts` the pages stacked as one array texture's layers, page 1's
+  bytes, format and filtering unchanged; `src/scene/terrainHeroAtlas.test.ts` the binder (one act
+  resident, released and disposed before the next, RGBA8 refused) and the table drawing a hero from
+  its cell only while bound, met or not (ticket 698); `roster.skinContactSheet.test.ts` every hero of
+  P1 to P5 drawn from page 2 of a synthetic overflow, shifted 16 cells and still apart. The browser
+  spec `e2e/browser/heroAtlas.spec.ts` checks through `ui.getKindLooks()` that a change of act binds
+  once, a planet change inside an act binds none, and no bind links a program;
+  `e2e/browser/heroAtlasPages.spec.ts` (box Tester) binds the synthetic overflow
+  (`ui.packHeroAtlasOverflow`) on a 640x360 phone at 24 px a cell and at 1280x800: two layers, every
+  hero on page 2's cell, no new program, page 1 again after, with a screenshot attached for the eye.
 - **Pacing bot** (`src/systems/bot/`, #29): plays `scenarios/bot-slice.scenario.json` through
   authority commands with the #6 movement-time model, buying casing grades on-curve (grade `b`
   before it mines band `b`, grade 5 before the core, S11). Its scripted mining (`drillTile`) lays

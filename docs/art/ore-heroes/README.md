@@ -178,6 +178,25 @@ From `hero-reads.json`, the twelve at the two screens (highlights · facet-edge 
 
 <!-- /gem-reads-785 -->
 
+## Pages (#852)
+
+An act's atlas is an unbounded list of pages
+([MA: unbounded mineral atlas pages per act (#852)](https://github.com/bjor2/steampunk-miner/issues/852),
+HS ruling (a) of 24 Oct): `foothold.heavy`'s first page is full, and a second atlas is never
+hard-coded. A page is one 1024 px KTX2 of 16 cells, shaped as above. The page a hero sits on is
+its mineral skin row's `atlasPage` in `src/features/mineral-skins/mineralSkins.json`, so a page
+never moves once its art ships. A hero with none goes on the first page with room, and a new page
+opens when the last is full (`packed_pages` in `hero_species.py`, the same rule as `packHeroPages`
+in `src/systems/render/heroAtlas.ts`). The game refuses to load until the row records the page it
+names. `hero-cells.json` gives each cell its `page` and its `index` on that page. The encoder
+writes each page as its own map: page 1 keeps `ground-hero-atlas-<act>`, and page n is
+`ground-hero-atlas-<act>-page-<n>`, so adding a page leaves every other page's map byte-identical.
+The previews are `sheets/atlas-preview.<act>.png` and `atlas-preview.<act>.page-<n>.png`. The
+game stacks an act's pages as the layers of one texture on the atlas's one sampler unit, so every
+page of the act is resident together and the cost grows per act, never per planet. A new page
+also needs its `atlas` row in the asset manifest before the game draws it; until then its heroes
+draw the shader look.
+
 ## Files
 
 | File                                            | What it is                                                                                                                                                                                                   |
@@ -187,8 +206,8 @@ From `hero-reads.json`, the twelve at the two screens (highlights · facet-edge 
 | `cells/<species>.png`                           | the atlas cell: the 248 px lit sprite (straight alpha, the mask) with its edge pixels extended into the 4 px gutter of a 256 px cell, ready to pack                                                          |
 | `hero-cells.json`                               | the cell table for #451: the authored sets, the atlas shape, per act the cells it packs (index, species, content rect) and per hero the species, set, rarity, hue slot, body colour, window, cell and source |
 | `hero-reads.json`                               | every committed cell's gem-read measures at the two screens, with its SHA-256 (#785; `hero_reads.py`)                                                                                                        |
-| `sheets/atlas-preview.<act>.png`                | the 1024 px per-act atlas as #451's shape packs it (cell `i` at column `i mod 4`, row `i div 4`); a preview, #451 owns the shipped KTX2                                                                      |
-| `encode_hero_atlases.py`                        | packs `cells/` into each act's shipped atlas, `public/assets/ground/ground-hero-atlas-<act>/` (ETC1S sRGB, four mip levels, colour bled into transparent texels)                                             |
+| `sheets/atlas-preview.<act>[.page-<n>].png`     | each 1024 px page of the act's atlas as #451's shape packs it (cell `i` of the page at column `i mod 4`, row `i div 4`; page 1 unsuffixed, #852); a preview, #451 owns the shipped KTX2                      |
+| `encode_hero_atlases.py`                        | packs `cells/` into each page of each act's shipped atlas, `public/assets/ground/ground-hero-atlas-<act>[-page-<n>]/` (ETC1S sRGB, four mip levels, colour bled into transparent texels)                     |
 | `sheets/heroes-legacy.shallow.jpg`              | the four cells at 256 px/m on their band's rock under the headlamp and fill                                                                                                                                  |
 | `sheets/heroes-legacy.deep.jpg`                 | the same under the dim cool fill of band 5                                                                                                                                                                   |
 | `sheets/heroes-legacy.closeup.jpg`              | the four at 480 px/m                                                                                                                                                                                         |

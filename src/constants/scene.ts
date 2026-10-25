@@ -137,11 +137,12 @@ export const GPU_MIN_TEXTURE_UNITS = 12
 export const GPU_MIN_TEXTURE_SIZE = 2048
 
 /**
- * The per-act hero atlas (ticket 451, TD shape 6226270701 "#451 shape"): one albedo-only KTX2,
- * 1024 px square, of 256 px cells (16, four to a row), each a 248 px sprite in a 4 px gutter
- * (#452's `hero-cells.json`). Four mip levels keep a gutter of at least half a texel at the last
- * one, so a cell never samples its neighbour. At most 2 MiB resident: one byte a texel on every
- * alpha target Basis transcodes to (BC7, BC3, ASTC 4x4, ETC2 RGBA), which is why RGBA8 is refused.
+ * A page of the per-act hero atlas (ticket 451, TD shape 6226270701 "#451 shape"; an act has as
+ * many pages as it needs, ticket 852): one albedo-only KTX2, 1024 px square, of 256 px cells (16,
+ * four to a row), each a 248 px sprite in a 4 px gutter (#452's `hero-cells.json`). Four mip levels
+ * keep a gutter of at least half a texel at the last one, so a cell never samples its neighbour. At
+ * most 2 MiB resident a page: one byte a texel on every alpha target Basis transcodes to (BC7, BC3,
+ * ASTC 4x4, ETC2 RGBA), which is why RGBA8 is refused.
  */
 export const HERO_ATLAS_SIDE_PX = 1024
 export const HERO_ATLAS_CELL_PX = 256
