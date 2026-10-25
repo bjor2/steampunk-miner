@@ -515,7 +515,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/power-up-core/systems/useRefusals.test.ts` | 3 | 3 |
 | `src/features/power-up-core/systems/useResolution.test.ts` | 12 | 12 |
 
-### `rig-look`: 20 files, 331 tests
+### `rig-look`: 20 files, 349 tests
 
 | File | Tests | Sites |
 | --- | --- | --- |
