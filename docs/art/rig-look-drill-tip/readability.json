@@ -1,5 +1,5 @@
 {
-  "about": "Ticket 578: at a 360 px wide phone (30 px/m over the 12 m zoom), the pixels of the drill nose's footprint (its head and bit at the tier) that change between each look on drill.head and the next (a channel moving more than 24 of 255), and the brightest pixel (Rec. 709 luminance, 0-255) of the nose against the rest of the rig for each look, the nose lit as while drilling: under `lit` on the phone-size renders, under `glow` on the tier-1 emission-only render at 512 px/m; written by sheet_drill_tip_looks.py. The nose must stay the brightest glow.",
+  "about": "Tickets 578 and 815: at a 360 px wide phone (30 px/m over the 12 m zoom, and 45 px/m over the closest 8 m zoom the sweep spec judges at), the pixels of the drill nose's footprint (its head and bit at the tier) that change between each look on drill.head and the next (a channel moving more than 24 of 255), and the brightest pixel (Rec. 709 luminance, 0-255) of the nose against the rest of the rig for each look, the nose lit as while drilling: under `lit` on the phone-size renders, under `glow` on the tier-1 emission-only render at 512 px/m; written by sheet_drill_tip_looks.py. The nose must stay the brightest glow.",
   "lit": {
     "tier-1": {
       "phonePxPerM": 30.0,
@@ -23,6 +23,149 @@
         "gem-set-crown -> aether-cut-crown": {
           "changed": 7,
           "of": 96
+        },
+        "aether-cut-crown -> collared-crown": {
+          "changed": 11,
+          "of": 96
+        },
+        "collared-crown -> ferruled-crown": {
+          "changed": 4,
+          "of": 96
+        },
+        "ferruled-crown -> knurled-crown": {
+          "changed": 0,
+          "of": 96
+        },
+        "knurled-crown -> reamed-crown": {
+          "changed": 10,
+          "of": 96
+        },
+        "reamed-crown -> chromed-crown": {
+          "changed": 0,
+          "of": 96
+        },
+        "chromed-crown -> bossed-crown": {
+          "changed": 0,
+          "of": 96
+        },
+        "bossed-crown -> cooled-crown": {
+          "changed": 1,
+          "of": 96
+        },
+        "cooled-crown -> inlaid-crown": {
+          "changed": 0,
+          "of": 96
+        },
+        "inlaid-crown -> haloed-crown": {
+          "changed": 1,
+          "of": 96
+        },
+        "haloed-crown -> blur-collar-crown": {
+          "changed": 0,
+          "of": 96
+        },
+        "blur-collar-crown -> streaked-crown": {
+          "changed": 0,
+          "of": 96
+        },
+        "streaked-crown -> double-halo-crown": {
+          "changed": 0,
+          "of": 96
+        },
+        "double-halo-crown -> fanned-crown": {
+          "changed": 0,
+          "of": 96
+        },
+        "fanned-crown -> vortex-crown": {
+          "changed": 0,
+          "of": 96
+        },
+        "vortex-crown -> aether-vortex-crown": {
+          "changed": 1,
+          "of": 96
+        }
+      },
+      "closestZoomPxPerM": 45.0,
+      "closestZoomNoseFootprintPx": {
+        "cutter-crown -> steel-cone": {
+          "changed": 18,
+          "of": 198
+        },
+        "steel-cone -> fluted-bit": {
+          "changed": 13,
+          "of": 198
+        },
+        "fluted-bit -> toothed-crown": {
+          "changed": 20,
+          "of": 198
+        },
+        "toothed-crown -> gem-set-crown": {
+          "changed": 16,
+          "of": 198
+        },
+        "gem-set-crown -> aether-cut-crown": {
+          "changed": 15,
+          "of": 198
+        },
+        "aether-cut-crown -> collared-crown": {
+          "changed": 21,
+          "of": 198
+        },
+        "collared-crown -> ferruled-crown": {
+          "changed": 7,
+          "of": 198
+        },
+        "ferruled-crown -> knurled-crown": {
+          "changed": 0,
+          "of": 198
+        },
+        "knurled-crown -> reamed-crown": {
+          "changed": 16,
+          "of": 198
+        },
+        "reamed-crown -> chromed-crown": {
+          "changed": 1,
+          "of": 198
+        },
+        "chromed-crown -> bossed-crown": {
+          "changed": 2,
+          "of": 198
+        },
+        "bossed-crown -> cooled-crown": {
+          "changed": 10,
+          "of": 198
+        },
+        "cooled-crown -> inlaid-crown": {
+          "changed": 0,
+          "of": 198
+        },
+        "inlaid-crown -> haloed-crown": {
+          "changed": 4,
+          "of": 198
+        },
+        "haloed-crown -> blur-collar-crown": {
+          "changed": 4,
+          "of": 198
+        },
+        "blur-collar-crown -> streaked-crown": {
+          "changed": 0,
+          "of": 198
+        },
+        "streaked-crown -> double-halo-crown": {
+          "changed": 0,
+          "of": 198
+        },
+        "double-halo-crown -> fanned-crown": {
+          "changed": 0,
+          "of": 198
+        },
+        "fanned-crown -> vortex-crown": {
+          "changed": 0,
+          "of": 198
+        },
+        "vortex-crown -> aether-vortex-crown": {
+          "changed": 2,
+          "of": 198
         }
       },
       "brightest": {
@@ -49,6 +192,66 @@
         "aether-cut-crown": {
           "nose": 249,
           "restOfRig": 255
+        },
+        "collared-crown": {
+          "nose": 248,
+          "restOfRig": 255
+        },
+        "ferruled-crown": {
+          "nose": 249,
+          "restOfRig": 255
+        },
+        "knurled-crown": {
+          "nose": 249,
+          "restOfRig": 255
+        },
+        "reamed-crown": {
+          "nose": 249,
+          "restOfRig": 255
+        },
+        "chromed-crown": {
+          "nose": 252,
+          "restOfRig": 255
+        },
+        "bossed-crown": {
+          "nose": 252,
+          "restOfRig": 255
+        },
+        "cooled-crown": {
+          "nose": 252,
+          "restOfRig": 255
+        },
+        "inlaid-crown": {
+          "nose": 252,
+          "restOfRig": 255
+        },
+        "haloed-crown": {
+          "nose": 255,
+          "restOfRig": 255
+        },
+        "blur-collar-crown": {
+          "nose": 255,
+          "restOfRig": 255
+        },
+        "streaked-crown": {
+          "nose": 255,
+          "restOfRig": 255
+        },
+        "double-halo-crown": {
+          "nose": 255,
+          "restOfRig": 255
+        },
+        "fanned-crown": {
+          "nose": 255,
+          "restOfRig": 255
+        },
+        "vortex-crown": {
+          "nose": 255,
+          "restOfRig": 255
+        },
+        "aether-vortex-crown": {
+          "nose": 255,
+          "restOfRig": 255
         }
       }
     },
@@ -74,6 +277,149 @@
         "gem-set-crown -> aether-cut-crown": {
           "changed": 7,
           "of": 108
+        },
+        "aether-cut-crown -> collared-crown": {
+          "changed": 10,
+          "of": 108
+        },
+        "collared-crown -> ferruled-crown": {
+          "changed": 2,
+          "of": 108
+        },
+        "ferruled-crown -> knurled-crown": {
+          "changed": 0,
+          "of": 108
+        },
+        "knurled-crown -> reamed-crown": {
+          "changed": 10,
+          "of": 108
+        },
+        "reamed-crown -> chromed-crown": {
+          "changed": 0,
+          "of": 108
+        },
+        "chromed-crown -> bossed-crown": {
+          "changed": 0,
+          "of": 108
+        },
+        "bossed-crown -> cooled-crown": {
+          "changed": 1,
+          "of": 108
+        },
+        "cooled-crown -> inlaid-crown": {
+          "changed": 0,
+          "of": 108
+        },
+        "inlaid-crown -> haloed-crown": {
+          "changed": 1,
+          "of": 108
+        },
+        "haloed-crown -> blur-collar-crown": {
+          "changed": 0,
+          "of": 108
+        },
+        "blur-collar-crown -> streaked-crown": {
+          "changed": 0,
+          "of": 108
+        },
+        "streaked-crown -> double-halo-crown": {
+          "changed": 0,
+          "of": 108
+        },
+        "double-halo-crown -> fanned-crown": {
+          "changed": 0,
+          "of": 108
+        },
+        "fanned-crown -> vortex-crown": {
+          "changed": 0,
+          "of": 108
+        },
+        "vortex-crown -> aether-vortex-crown": {
+          "changed": 0,
+          "of": 108
+        }
+      },
+      "closestZoomPxPerM": 45.0,
+      "closestZoomNoseFootprintPx": {
+        "cutter-crown -> steel-cone": {
+          "changed": 17,
+          "of": 234
+        },
+        "steel-cone -> fluted-bit": {
+          "changed": 8,
+          "of": 234
+        },
+        "fluted-bit -> toothed-crown": {
+          "changed": 18,
+          "of": 234
+        },
+        "toothed-crown -> gem-set-crown": {
+          "changed": 15,
+          "of": 234
+        },
+        "gem-set-crown -> aether-cut-crown": {
+          "changed": 15,
+          "of": 234
+        },
+        "aether-cut-crown -> collared-crown": {
+          "changed": 21,
+          "of": 234
+        },
+        "collared-crown -> ferruled-crown": {
+          "changed": 6,
+          "of": 234
+        },
+        "ferruled-crown -> knurled-crown": {
+          "changed": 0,
+          "of": 234
+        },
+        "knurled-crown -> reamed-crown": {
+          "changed": 15,
+          "of": 234
+        },
+        "reamed-crown -> chromed-crown": {
+          "changed": 1,
+          "of": 234
+        },
+        "chromed-crown -> bossed-crown": {
+          "changed": 2,
+          "of": 234
+        },
+        "bossed-crown -> cooled-crown": {
+          "changed": 9,
+          "of": 234
+        },
+        "cooled-crown -> inlaid-crown": {
+          "changed": 0,
+          "of": 234
+        },
+        "inlaid-crown -> haloed-crown": {
+          "changed": 4,
+          "of": 234
+        },
+        "haloed-crown -> blur-collar-crown": {
+          "changed": 6,
+          "of": 234
+        },
+        "blur-collar-crown -> streaked-crown": {
+          "changed": 0,
+          "of": 234
+        },
+        "streaked-crown -> double-halo-crown": {
+          "changed": 0,
+          "of": 234
+        },
+        "double-halo-crown -> fanned-crown": {
+          "changed": 0,
+          "of": 234
+        },
+        "fanned-crown -> vortex-crown": {
+          "changed": 0,
+          "of": 234
+        },
+        "vortex-crown -> aether-vortex-crown": {
+          "changed": 1,
+          "of": 234
         }
       },
       "brightest": {
@@ -99,6 +445,66 @@
         },
         "aether-cut-crown": {
           "nose": 252,
+          "restOfRig": 255
+        },
+        "collared-crown": {
+          "nose": 252,
+          "restOfRig": 255
+        },
+        "ferruled-crown": {
+          "nose": 252,
+          "restOfRig": 255
+        },
+        "knurled-crown": {
+          "nose": 252,
+          "restOfRig": 255
+        },
+        "reamed-crown": {
+          "nose": 252,
+          "restOfRig": 255
+        },
+        "chromed-crown": {
+          "nose": 252,
+          "restOfRig": 255
+        },
+        "bossed-crown": {
+          "nose": 252,
+          "restOfRig": 255
+        },
+        "cooled-crown": {
+          "nose": 252,
+          "restOfRig": 255
+        },
+        "inlaid-crown": {
+          "nose": 252,
+          "restOfRig": 255
+        },
+        "haloed-crown": {
+          "nose": 255,
+          "restOfRig": 255
+        },
+        "blur-collar-crown": {
+          "nose": 255,
+          "restOfRig": 255
+        },
+        "streaked-crown": {
+          "nose": 255,
+          "restOfRig": 255
+        },
+        "double-halo-crown": {
+          "nose": 255,
+          "restOfRig": 255
+        },
+        "fanned-crown": {
+          "nose": 255,
+          "restOfRig": 255
+        },
+        "vortex-crown": {
+          "nose": 255,
+          "restOfRig": 255
+        },
+        "aether-vortex-crown": {
+          "nose": 255,
           "restOfRig": 255
         }
       }
@@ -107,24 +513,167 @@
       "phonePxPerM": 30.0,
       "noseFootprintPx": {
         "cutter-crown -> steel-cone": {
-          "changed": 5,
-          "of": 285
+          "changed": 4,
+          "of": 315
         },
         "steel-cone -> fluted-bit": {
           "changed": 0,
-          "of": 285
+          "of": 315
         },
         "fluted-bit -> toothed-crown": {
           "changed": 4,
-          "of": 285
+          "of": 315
         },
         "toothed-crown -> gem-set-crown": {
           "changed": 2,
-          "of": 285
+          "of": 315
         },
         "gem-set-crown -> aether-cut-crown": {
-          "changed": 7,
-          "of": 285
+          "changed": 6,
+          "of": 315
+        },
+        "aether-cut-crown -> collared-crown": {
+          "changed": 0,
+          "of": 315
+        },
+        "collared-crown -> ferruled-crown": {
+          "changed": 0,
+          "of": 315
+        },
+        "ferruled-crown -> knurled-crown": {
+          "changed": 0,
+          "of": 315
+        },
+        "knurled-crown -> reamed-crown": {
+          "changed": 0,
+          "of": 315
+        },
+        "reamed-crown -> chromed-crown": {
+          "changed": 0,
+          "of": 315
+        },
+        "chromed-crown -> bossed-crown": {
+          "changed": 0,
+          "of": 315
+        },
+        "bossed-crown -> cooled-crown": {
+          "changed": 0,
+          "of": 315
+        },
+        "cooled-crown -> inlaid-crown": {
+          "changed": 0,
+          "of": 315
+        },
+        "inlaid-crown -> haloed-crown": {
+          "changed": 1,
+          "of": 315
+        },
+        "haloed-crown -> blur-collar-crown": {
+          "changed": 0,
+          "of": 315
+        },
+        "blur-collar-crown -> streaked-crown": {
+          "changed": 0,
+          "of": 315
+        },
+        "streaked-crown -> double-halo-crown": {
+          "changed": 0,
+          "of": 315
+        },
+        "double-halo-crown -> fanned-crown": {
+          "changed": 0,
+          "of": 315
+        },
+        "fanned-crown -> vortex-crown": {
+          "changed": 0,
+          "of": 315
+        },
+        "vortex-crown -> aether-vortex-crown": {
+          "changed": 0,
+          "of": 315
+        }
+      },
+      "closestZoomPxPerM": 45.0,
+      "closestZoomNoseFootprintPx": {
+        "cutter-crown -> steel-cone": {
+          "changed": 9,
+          "of": 713
+        },
+        "steel-cone -> fluted-bit": {
+          "changed": 0,
+          "of": 713
+        },
+        "fluted-bit -> toothed-crown": {
+          "changed": 10,
+          "of": 713
+        },
+        "toothed-crown -> gem-set-crown": {
+          "changed": 5,
+          "of": 713
+        },
+        "gem-set-crown -> aether-cut-crown": {
+          "changed": 15,
+          "of": 713
+        },
+        "aether-cut-crown -> collared-crown": {
+          "changed": 0,
+          "of": 713
+        },
+        "collared-crown -> ferruled-crown": {
+          "changed": 0,
+          "of": 713
+        },
+        "ferruled-crown -> knurled-crown": {
+          "changed": 0,
+          "of": 713
+        },
+        "knurled-crown -> reamed-crown": {
+          "changed": 0,
+          "of": 713
+        },
+        "reamed-crown -> chromed-crown": {
+          "changed": 1,
+          "of": 713
+        },
+        "chromed-crown -> bossed-crown": {
+          "changed": 0,
+          "of": 713
+        },
+        "bossed-crown -> cooled-crown": {
+          "changed": 0,
+          "of": 713
+        },
+        "cooled-crown -> inlaid-crown": {
+          "changed": 0,
+          "of": 713
+        },
+        "inlaid-crown -> haloed-crown": {
+          "changed": 5,
+          "of": 713
+        },
+        "haloed-crown -> blur-collar-crown": {
+          "changed": 0,
+          "of": 713
+        },
+        "blur-collar-crown -> streaked-crown": {
+          "changed": 0,
+          "of": 713
+        },
+        "streaked-crown -> double-halo-crown": {
+          "changed": 0,
+          "of": 713
+        },
+        "double-halo-crown -> fanned-crown": {
+          "changed": 0,
+          "of": 713
+        },
+        "fanned-crown -> vortex-crown": {
+          "changed": 0,
+          "of": 713
+        },
+        "vortex-crown -> aether-vortex-crown": {
+          "changed": 0,
+          "of": 713
         }
       },
       "brightest": {
@@ -149,6 +698,66 @@
           "restOfRig": 226
         },
         "aether-cut-crown": {
+          "nose": 255,
+          "restOfRig": 226
+        },
+        "collared-crown": {
+          "nose": 255,
+          "restOfRig": 226
+        },
+        "ferruled-crown": {
+          "nose": 255,
+          "restOfRig": 226
+        },
+        "knurled-crown": {
+          "nose": 255,
+          "restOfRig": 226
+        },
+        "reamed-crown": {
+          "nose": 255,
+          "restOfRig": 226
+        },
+        "chromed-crown": {
+          "nose": 255,
+          "restOfRig": 226
+        },
+        "bossed-crown": {
+          "nose": 255,
+          "restOfRig": 226
+        },
+        "cooled-crown": {
+          "nose": 255,
+          "restOfRig": 226
+        },
+        "inlaid-crown": {
+          "nose": 255,
+          "restOfRig": 226
+        },
+        "haloed-crown": {
+          "nose": 255,
+          "restOfRig": 226
+        },
+        "blur-collar-crown": {
+          "nose": 255,
+          "restOfRig": 226
+        },
+        "streaked-crown": {
+          "nose": 255,
+          "restOfRig": 226
+        },
+        "double-halo-crown": {
+          "nose": 255,
+          "restOfRig": 226
+        },
+        "fanned-crown": {
+          "nose": 255,
+          "restOfRig": 226
+        },
+        "vortex-crown": {
+          "nose": 255,
+          "restOfRig": 226
+        },
+        "aether-vortex-crown": {
           "nose": 255,
           "restOfRig": 226
         }
@@ -178,6 +787,66 @@
     },
     "aether-cut-crown": {
       "nose": 247,
+      "restOfRig": 253
+    },
+    "collared-crown": {
+      "nose": 247,
+      "restOfRig": 253
+    },
+    "ferruled-crown": {
+      "nose": 247,
+      "restOfRig": 253
+    },
+    "knurled-crown": {
+      "nose": 247,
+      "restOfRig": 253
+    },
+    "reamed-crown": {
+      "nose": 247,
+      "restOfRig": 253
+    },
+    "chromed-crown": {
+      "nose": 247,
+      "restOfRig": 253
+    },
+    "bossed-crown": {
+      "nose": 247,
+      "restOfRig": 253
+    },
+    "cooled-crown": {
+      "nose": 247,
+      "restOfRig": 253
+    },
+    "inlaid-crown": {
+      "nose": 247,
+      "restOfRig": 253
+    },
+    "haloed-crown": {
+      "nose": 248,
+      "restOfRig": 253
+    },
+    "blur-collar-crown": {
+      "nose": 251,
+      "restOfRig": 253
+    },
+    "streaked-crown": {
+      "nose": 248,
+      "restOfRig": 253
+    },
+    "double-halo-crown": {
+      "nose": 251,
+      "restOfRig": 253
+    },
+    "fanned-crown": {
+      "nose": 251,
+      "restOfRig": 253
+    },
+    "vortex-crown": {
+      "nose": 255,
+      "restOfRig": 253
+    },
+    "aether-vortex-crown": {
+      "nose": 255,
       "restOfRig": 253
     }
   }

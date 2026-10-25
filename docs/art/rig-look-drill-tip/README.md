@@ -2,12 +2,18 @@
 
 The Blender source and review renders of
 [Rig look art: drill_tip Blender parts (6 parts) (#578)](https://github.com/bjor2/steampunk-miner/issues/578),
-wave 576-1A of [Rig look ladder and mineral skins (#576)](https://github.com/bjor2/steampunk-miner/issues/576):
-every purchase on the `drill_tip` track visibly changes the rig. Systems' table puts the track's
-five look steps at 70, 100, 130, 190 and 280 purchases (comment 6300543785 on #157), the on-curve
-counts the player leaves planets 1, 2, 3, 5 and 8 with, and the linear tail above the top step keeps
-every later purchase visible. Progression named the steps Steel cone, Fluted bit, Toothed crown,
-Gem-set crown and Aether-cut crown (6300549964); the base rig's cutter crown is the unnamed default.
+wave 576-1A of [Rig look ladder and mineral skins (#576)](https://github.com/bjor2/steampunk-miner/issues/576),
+grown to about P40 by
+[LK6: drill_tip look steps to P40 (#815)](https://github.com/bjor2/steampunk-miner/issues/815),
+wave 647-7K of the P1-P5 map (#647): every band of the `drill_tip` track visibly changes the rig.
+Since LK1 ([#809](https://github.com/bjor2/steampunk-miner/issues/809)) the track steps on the
+power-decade band rule, a band every 60 purchases, so the look steps sit on 60, 120, ..., 1200 (the
+on-curve count the player leaves planet 40 with); Systems' first table had put the five #578 steps
+at 70, 100, 130, 190 and 280 (comment 6300543785 on #157). Progression named those five Steel cone,
+Fluted bit, Toothed crown, Gem-set crown and Aether-cut crown (6300549964); the base rig's cutter
+crown is the unnamed default. The fifteen LK6 steps (ticket 815) each fit one more part onto the
+aether-cut crown, the bit-finish steps first and the spin-blur steps after, and the finish tail of
+#809 keeps every later band visible above 1200.
 
 **Wired by #579.** The rig-look slice registers and exports the asset and swaps each step's part
 onto the slot from the registry's rows (`src/features/rig-look/rigLook.json`, #577). `drillTipLooks.json` here is the one table this folder's scripts share;
@@ -16,10 +22,12 @@ form under the vehicle category, `vehicle-look-<track>`, so the registry can nam
 id; the part ids are the step names.
 
 Authored in Blender 4.2.9 on the shared box: `author_drill_tip_looks.py` wrote the first version of
-the file, and `art/blender/vehicle-look-drill-tip/vehicle-look-drill-tip.blend` is the source from
-now on (Git LFS). The six parts were then appended into the live Blender through the Blender MCP and
-looked over from the front and three-quarter after each cut (see Checks); the sheets below are
-the headless renders.
+the file, `author_drill_tip_steps.py` fitted the LK6 parts into it (a re-run rewrites those fifteen
+objects and leaves the six of #578 alone), and
+`art/blender/vehicle-look-drill-tip/vehicle-look-drill-tip.blend` is the source from now on (Git
+LFS). The six #578 parts were appended into the live Blender through the Blender MCP and looked
+over from the front and three-quarter after each cut (see Checks); the sheets below are the
+headless renders.
 
 ## The parts
 
@@ -35,14 +43,41 @@ chord and the rig's tooth at the point, the crowns keep their cutters where the 
 no further out. So the steps differ by colour, by what fills the disc and by which of the tooth
 positions they keep, not by growing the nose.
 
-| Part               | Step           | Look                                                                                                                                                                                |
-| ------------------ | -------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `cutter-crown`     | 0, the default | the rig's own crown, piece for piece (`crown_pieces` of the casing driller's author script), re-based on the slot: the rig's outline is unchanged with it in place (`outline.json`) |
-| `steel-cone`       | 70 purchases   | a polished steel cone on a brass collar, over a steel sheath, one hot seam near the point                                                                                           |
-| `fluted-bit`       | 100 purchases  | the same cone in blued steel, three dark spiral flutes lying on it, a bright steel point                                                                                            |
-| `toothed-crown`    | 130 purchases  | eight brass cutters where the rig's teeth stand and eight short steel ones between, on a steel wheel round a wider hot core with a brass hub                                        |
-| `gem-set-crown`    | 190 purchases  | a dark iron wheel rimmed in brass, six violet gems round a bezelled centre gem, four brass prongs on the rig's diagonal teeth, a brass band on the sheath                           |
-| `aether-cut-crown` | 280 purchases  | a pale ceramic wheel with eight aether-glass fins where the rig's teeth stand and eight ceramic ones between, round a teal core; teal collars on the sheath                         |
+The LK6 parts take the sockets behind the crown as well (ticket 815: the bit layers onto the drill
+head and is never a second head sprite). At tier 1 the head's cone ahead of the gimbal steps from
+radius 100 mm down to 18 mm over three steps, measured from the staged head's rings (look x -132 to
+-45 mm at 100 down to 76.5 mm, -45 to +41 at 70.6 down to 47, +41 to +128 at 41 down to 17.6); the
+carbide collar sits on the second step, the ferrule and the reamer ring on the first (ahead of the
+hot seam band, and just ahead of the gimbal), every rim 1.5 mm under the cone's radius, and each
+stands with its axis 40 mm nearer the camera than the head's so its whole face is in front of the
+cone's in the review renders, as the game draws the look sprite over the head sprite (draw order 9
+over 8). The sheath and bridge keep their collars, and every face-on ring stays inside the wheel's
+disc, because a face-on ring covers its whole radius in the silhouette and the arc between the
+teeth is outside the rig. Every LK6 part keeps the aether-cut crown's front edge (174.1 mm ahead
+of the slot, the cutters on the rig's tooth positions), so the drawn drill tip never moves
+(`drillTipAheadOf`, #789; the author script refuses a part that does).
+
+The LK6 steps (ticket 815), each the aether-cut crown with every part before it and one more
+fitted. The bit-finish steps put hardware on the bit's working surface; the spin-blur steps add
+the glowing halos, collars, streaks and fan of a bit spinning fast.
+
+| Part                  | Step | Adds                                                                                                                                                                                                               |
+| --------------------- | ---- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `collared-crown`      | 360  | **Carbide collar**: a dark-iron collar over the cone's second step, from 26 mm behind the slot to the step's end, a brass bead on the seam ahead                                                                   |
+| `ferruled-crown`      | 420  | **Steel ferrule**: a bright steel ferrule on the cone's first step (92 to 56 mm behind the slot), dark iron rim bands at both ends; the seam band and a bare brass band of the cone stay between it and the collar |
+| `knurled-crown`       | 480  | **Knurled bands**: two bright steel knurl bands and ten studs across the dark collar, a dark band across the bright ferrule                                                                                        |
+| `reamed-crown`        | 540  | **Reamer ring**: a dark-iron reamer ring on the cone's first step just ahead of the gimbal (128 to 98 mm behind the slot), a brass rim, six steel teeth                                                            |
+| `chromed-crown`       | 600  | **Chrome face**: a polished-chrome ring on the wheel's face over the teal ring, chrome collars on the bridge and the sheath                                                                                        |
+| `bossed-crown`        | 660  | **Brass bosses**: five brass bosses on the reamer ring's camera side and four on the ferrule's                                                                                                                     |
+| `cooled-crown`        | 720  | **Coolant lines**: a copper ring in the gap between the ferrule and the reamer ring, two copper lines along the bit's camera side from a copper fitting on the ferrule to the collar                               |
+| `inlaid-crown`        | 780  | **Diamond inlays**: eight diamond inlays set in the chrome ring where the rig's teeth stand                                                                                                                        |
+| `haloed-crown`        | 840  | **Spin halo**: a glowing teal halo round the wheel's face at the fins' roots, inside the disc                                                                                                                      |
+| `blur-collar-crown`   | 900  | **Blur collars**: glowing collars on the ferrule's and the carbide collar's front edges                                                                                                                            |
+| `streaked-crown`      | 960  | **Spin streaks**: eight glowing streaks along the chrome ring between the inlays                                                                                                                                   |
+| `double-halo-crown`   | 1020 | **Double halo**: a second, inner halo round the hot core                                                                                                                                                           |
+| `fanned-crown`        | 1080 | **Blur fan**: eight glowing fan blades radiating between the teeth, proud of the streaks and the halo                                                                                                              |
+| `vortex-crown`        | 1140 | **Vortex core**: a bright vortex core over the hot core under a chrome hub                                                                                                                                         |
+| `aether-vortex-crown` | 1200 | **Aether vortex**: glow collars along the whole bit, on the reamer ring, the ferrule, the sheath and the bridge                                                                                                    |
 
 A swap, as the wiring will draw it (`render_drill_tip_looks.py`): the rig's `t1-drill-bit` is
 left out and the look's part stands on the slot. The cutter crown reproduces the crown exactly, so
@@ -53,33 +88,106 @@ bounds.
 
 The crowns keep the rig's hot core (`nose-glow`, the material of the nose seams, emission 1.6) and
 the cones a hot seam of it, so the drill nose stays the brightest part of the rig with every look;
-the gem (0.8) and aether (1.2) glows sit under it.
+the gem (0.8), aether (1.2), diamond (0.4), spin-blur (0.9) and vortex core (1.2) glows sit under
+it.
 
 ## Files
 
-| File                                     | What it is                                                                                                              |
-| ---------------------------------------- | ----------------------------------------------------------------------------------------------------------------------- |
-| `parts.png`                              | each part alone in the game's front view at 768 px/m                                                                    |
-| `tier-1.png`, `tier-2.png`, `tier-3.png` | the rig at that tier with each look on the slot, 512 px/m, the nose lit as while drilling                               |
-| `tier-<n>.ingame.png`                    | the same at 90 px/m, about what a 1080p screen shows at the default 12 m zoom                                           |
-| `tier-<n>.phone.png`                     | the same at a 360 px wide phone's 30 px/m over the 12 m zoom, enlarged 8x with no smoothing                             |
-| `glow.png`                               | the tier-1 rig with each look by its emission alone: what the emissive map carries                                      |
-| `outline.json`                           | each look's silhouette cells outside the rig at tiers 1, 2 and 3, and the base look's against the rig                   |
-| `readability.json`                       | the phone-size pixels each step changes from the one before, and the nose's brightest pixel against the rest of the rig |
-| `drillTipLooks.json`                     | the asset, its slot, its parts with their step names and thresholds                                                     |
-| `author_drill_tip_looks.py`              | wrote the first version of the source (Blender)                                                                         |
-| `render_drill_tip_looks.py`              | the renders above (Blender), on the casing driller review's frame and stage                                             |
-| `check_outline.py`                       | writes `outline.json` (Blender); exits 1 when a look leaves the rig outline                                             |
-| `sheet_drill_tip_looks.py`               | lays the renders out into the sheets and writes `readability.json` (Pillow, numpy)                                      |
+| File                                     | What it is                                                                                                         |
+| ---------------------------------------- | ------------------------------------------------------------------------------------------------------------------ |
+| `parts.png`                              | each part alone in the game's front view at 768 px/m                                                               |
+| `tier-1.png`, `tier-2.png`, `tier-3.png` | the rig at that tier with each look on the slot, seven a row, 512 px/m, the nose lit as while drilling             |
+| `tier-<n>.ingame.png`                    | the same at 90 px/m, about what a 1080p screen shows at the default 12 m zoom                                      |
+| `tier-<n>.phone.png`                     | the same at a 360 px wide phone's 30 px/m over the 12 m zoom, enlarged 8x with no smoothing                        |
+| `glow.png`                               | the tier-1 rig with each look by its emission alone: what the emissive map carries                                 |
+| `outline.json`                           | each look's silhouette cells outside the rig at tiers 1, 2 and 3, and the base look's against the rig              |
+| `readability.json`                       | the phone-size pixels each step changes from the one before (default and closest zoom), the nose's brightest pixel |
+| `drillTipLooks.json`                     | the asset, its slot, its parts with their step names and thresholds                                                |
+| `author_drill_tip_looks.py`              | wrote the first version of the source (Blender)                                                                    |
+| `author_drill_tip_steps.py`              | fits the fifteen LK6 parts into the source, re-runnable (Blender, ticket 815)                                      |
+| `render_drill_tip_looks.py`              | the renders above (Blender), on the casing driller review's frame and stage                                        |
+| `check_outline.py`                       | writes `outline.json` (Blender); exits 1 when a look leaves the rig outline                                        |
+| `sheet_drill_tip_looks.py`               | lays the renders out into the sheets and writes `readability.json` (Pillow, numpy)                                 |
 
 ```
 blender -b --factory-startup --python-exit-code 1 -P docs/art/rig-look-drill-tip/author_drill_tip_looks.py
+blender -b --factory-startup --python-exit-code 1 -P docs/art/rig-look-drill-tip/author_drill_tip_steps.py
 blender -b --factory-startup --python-exit-code 1 -P docs/art/rig-look-drill-tip/check_outline.py
 blender -b --factory-startup --python-exit-code 1 -P docs/art/rig-look-drill-tip/render_drill_tip_looks.py [-- alone|rig|glow]
 python3 docs/art/rig-look-drill-tip/sheet_drill_tip_looks.py
 ```
 
-## Checks (21 Oct 2026)
+## Checks (25 Oct 2026, LK6)
+
+Against ticket 815's acceptance, with the numbers the scripts wrote after the LK6 parts:
+
+- **Step count and edges** (`drillTipLooks.json`, `rigLook.json`): twenty authored steps, one on
+  each band edge LK1 froze for the line, 60 to 1200 (about P40 on the median path, the on-curve
+  count at planet 40). The five #578 parts stay the first five steps, in their order; nothing in
+  the drill_tip row of `rigLookLines.golden.txt` below 360 changed, and no band to P40 is an
+  `it.todo` any more.
+- **A new part every step, never a recolour** (`parts.png`): each LK6 part is the step before
+  with one more part fitted in a socket (the table above). Each step keeps its own tint and glow
+  in `rigLook.json` as the #578 steps do, so a band's colour changes with its part.
+- **Inside the rig outline, the tip where it was** (`outline.json`, 4 mm grid): every look has 0
+  silhouette cells outside the rig at tiers 1, 2 and 3; the cutter crown still changes the tier-1
+  outline by 0 cells. The LK6 parts grow from 922 cells (the collar) to 1808 (the aether vortex),
+  all of them cells of the head's cone or the crown's disc. Every LK6 part's front edge is the
+  aether-cut crown's, 174.1 mm ahead of the slot (the exported `sizeM` less `pivotM`), so
+  `drillTipAheadOf` and the drawn tip read the same from 300 purchases up
+  (`drillTipLooks.test.ts`). The collider is the code constant no art feeds; `vehicle.blend` is
+  untouched.
+- **Readable at 360 px and 1280+** (`readability.json`): nose-footprint pixels each step changes
+  against the step before (a channel moving more than 24 of 255) at a 360 px phone, at the default
+  12 m zoom (30 px/m) and at the closest 8 m zoom (45 px/m), where `rigLookSweep.spec.ts` judges
+  one visible step as at least 16 px over the whole rig:
+
+  | Step                               | Tier 1, 30 / 45 px/m | Tier 2, 30 / 45 px/m |
+  | ---------------------------------- | -------------------: | -------------------: |
+  | Aether-cut crown to Carbide collar |              11 / 21 |              10 / 21 |
+  | Carbide collar to Steel ferrule    |                4 / 7 |                2 / 6 |
+  | Steel ferrule to Knurled bands     |                0 / 0 |                0 / 0 |
+  | Knurled bands to Reamer ring       |              10 / 16 |              10 / 15 |
+  | Reamer ring to Chrome face         |                0 / 1 |                0 / 1 |
+  | Chrome face to Brass bosses        |                0 / 2 |                0 / 2 |
+  | Brass bosses to Coolant lines      |               1 / 10 |                1 / 9 |
+  | Coolant lines to Diamond inlays    |                0 / 0 |                0 / 0 |
+  | Diamond inlays to Spin halo        |                1 / 4 |                1 / 4 |
+  | Spin halo to Blur collars          |                0 / 4 |                0 / 6 |
+  | Blur collars to Spin streaks       |                0 / 0 |                0 / 0 |
+  | Spin streaks to Double halo        |                0 / 0 |                0 / 0 |
+  | Double halo to Blur fan            |                0 / 0 |                0 / 0 |
+  | Blur fan to Vortex core            |                0 / 0 |                0 / 0 |
+  | Vortex core to Aether vortex       |                1 / 2 |                0 / 1 |
+
+  The two steps that re-dress a whole cone step (the carbide collar, the reamer ring) clear the
+  sweep's 16 by geometry alone at 45 px/m; the coolant lines and the ferrule move 7 to 10. The
+  steps that fit detail to the wheel's face or the bit's surface (bands, studs, bosses, inlays,
+  the face halos, streaks, fan and core) move 0 to 6 phone pixels: the wheel is 3.6 px across at
+  45 px/m and 7 px at a 1280 px desktop's 90 px/m, so nothing fitted inside it can move a 4 x 4
+  patch there (the #578 limit below). In the game each band also wears its own tint and glow
+  (`rigLook.json`), which the untinted renders here leave out; the sweep's crop diff sees both.
+  Tier 3's cone covers the parts behind the crown, as it covers the #578 looks. At 90 px/m
+  (`tier-1.ingame.png`) the collar, ferrule, reamer ring and coolant lines read; the face parts
+  read on `parts.png` and `tier-1.png`.
+
+- **The drill nose stays the brightest part** (`glow.png`, `readability.json`): by emission alone
+  the nose's brightest pixel is 247 with every bit-finish look, the stock rig's own, and rises
+  to 248-255 only with the spin-blur looks, whose glows (spin-blur 0.9, vortex core 1.2) sit on
+  the nose itself under the seams' 1.6; no look adds a glow anywhere else, and the rest of the
+  rig reads 253 (the headlamp lens) as on the stock rig. In `rigLook.json` the LK6 step glows are
+  0.51 to 0.58, so the nose slot's sum with drill_power's 2.4 stays under the `drillNose` cap of 3
+  and every drill_tip glow is under 1 (`drillTipLooks.test.ts`, `rigLookReadability.test.ts`).
+- **Band names**: `Carbide collar`, `Steel ferrule`, `Knurled bands`, `Reamer ring`, `Chrome
+face`, `Brass bosses`, `Coolant lines`, `Diamond inlays`, `Spin halo`, `Blur collars`, `Spin
+streaks`, `Double halo`, `Blur fan`, `Vortex core`, `Aether vortex`: data strings of 2 words in
+  `rigLook.json` (`card`) and `drillTipLooks.json`; the table checks refuse longer ones.
+- **Review renders:** the first LK6 cut stood 1.5 mm under the cone's radius on the head's own
+  axis and so lay inside the cone in the composite renders (0 pixels moved at every step), though
+  the game would have drawn its sprite over the head; the parts now stand 40 mm nearer the camera
+  (see The parts) and the composite shows what the game draws.
+
+## Checks (21 Oct 2026, #578)
 
 Against the ticket's acceptance, with the numbers the scripts wrote:
 
@@ -149,4 +257,6 @@ Against the ticket's acceptance, with the numbers the scripts wrote:
   more, the Fluted bit's guide ring is where to add area.
 - Below the first step the wiring can draw the rig's own `t1-drill-bit` or the cutter crown; the
   cutter crown exists so the swap is one rule for every step, not so the base rig changes.
-- The tail above 280 (tint, glow, plating) is the wiring's, on the aether-cut crown.
+- The tail above 1200 (a finish and rank pips a band, #809) is the wiring's, on the aether vortex
+  crown. Since #789's retry tier 3's `drill-bit` is a tip crown too; a look hides it and stands
+  over the cone's third step as before, so the tier-3 point is the cone's own steel tip.

@@ -708,22 +708,31 @@ at a 360 px phone's size, are in [docs/art/rig-look-cargo-hold/](art/rig-look-ca
 
 The art half of the `drill_tip` line of the rig look ladder
 ([#576](https://github.com/bjor2/steampunk-miner/issues/576), built by
-[#578](https://github.com/bjor2/steampunk-miner/issues/578)): a Blender source for the five look
-steps Systems' table puts at 70, 100, 130, 190 and 280 purchases, `art/blender/vehicle-look-drill-tip/`,
-with the base look beside them. Each part is authored with the track's attach slot, `drill.head`, at
-the origin and is meant to stand in place of the rig's tier-1 cutter crown, `t1-drill-bit`, sheathing
+[#578](https://github.com/bjor2/steampunk-miner/issues/578) and grown to about P40 by
+[#815](https://github.com/bjor2/steampunk-miner/issues/815), LK6): a Blender source for the twenty
+look steps on the band edges LK1 ([#809](https://github.com/bjor2/steampunk-miner/issues/809))
+froze for the line, 60, 120, ..., 1200 purchases, `art/blender/vehicle-look-drill-tip/`, with the
+base look beside them. Each part is authored with the track's attach slot, `drill.head`, at the
+origin and is meant to stand in place of the rig's tier-1 cutter crown, `t1-drill-bit`, sheathing
 the last step of the stepped cone behind it: `cutter-crown` is that crown piece for piece, then
-Progression's `steel-cone`, `fluted-bit`, `toothed-crown`, `gem-set-crown` and `aether-cut-crown`.
-Every look keeps inside the crown's own silhouette (its disc and its eight tooth positions) and the
-cone's, so the rig's outline never grows, and the crowns carry the rig's hot core so the nose stays
-the brightest part. The wiring ([#579](https://github.com/bjor2/steampunk-miner/issues/579))
+Progression's `steel-cone`, `fluted-bit`, `toothed-crown`, `gem-set-crown` and `aether-cut-crown`
+on the first five edges, then the fifteen LK6 parts, each the aether-cut crown with one more part
+fitted in a socket on the bit: the bit-finish steps (a carbide collar, a steel ferrule, knurled
+bands, a reamer ring, a chrome face, brass bosses, coolant lines, diamond inlays) and then the
+spin-blur steps (a spin halo, blur collars, spin streaks, a double halo, a blur fan, a vortex core,
+the aether vortex). Every look keeps inside the rig's own silhouette (the crown's disc and its
+eight tooth positions, the head's cone steps) and keeps the aether-cut crown's front edge, so the
+rig's outline never grows and the drawn tip never moves (`drillTipAheadOf`, #789); the crowns
+carry the rig's hot core and every added glow stays at or under the aether crown's, so the nose
+stays the brightest part. The wiring ([#579](https://github.com/bjor2/steampunk-miner/issues/579))
 registers it through `r.artAssets` from `rigLook.json`'s `lookAssets` and exports it to
 `public/assets/vehicle/`; each step row names its part with `asset: "vehicle-look-drill-tip"`, the
 track's `replaces: "drill-bit"` hides the rig's bit under it on the swivelling head, and the look
-parts join the track's glow slots so the tail above the top step paints them. Below 70 purchases
+parts join the track's glow slots so the tail above the top step paints them. Below 60 purchases
 nothing is swapped, so `cutter-crown` ships unused. `docs/art/rig-look-drill-tip/author_drill_tip_looks.py` wrote the first version of the
-`.blend`; from then on it is the source. The part table, the outline check at tiers 1 to 3 and the
-review renders, at desktop and at a 360 px phone's size, are in
+`.blend`, and `author_drill_tip_steps.py` fitted the LK6 parts into it; from then on it is the
+source. The part table, the outline check at tiers 1 to 3 and the review renders, at desktop and
+at a 360 px phone's size, are in
 [docs/art/rig-look-drill-tip/](art/rig-look-drill-tip/README.md).
 
 ## Rig-look parts: the engine

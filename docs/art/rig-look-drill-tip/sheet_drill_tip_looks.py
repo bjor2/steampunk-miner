@@ -1,14 +1,15 @@
 """
-The review sheets cut from render_drill_tip_looks.py's renders (ticket 578): the six looks alone,
-the rig at tiers 1, 2 and 3 with each look on the slot, each row resampled to a 1080p screen's
-90 px/m at the default 12 m zoom (#39) and to a 360 px wide phone's 30 px/m over the same zoom
-(the width the #576 ladder is judged at), the phone copy enlarged 8x with no smoothing so each
-phone pixel shows. It also measures what the eye is asked to judge and writes readability.json:
-how many phone pixels of the nose's footprint change between each look and the next (the ladder's
-neighbours), and the brightest pixel of the drill nose against the brightest of the rest of the
-rig for each look, lit and by glow alone (the emission-only render, what the glow cap of #576 is
-about). Needs Pillow and numpy; run after the Blender render, which leaves its raw PNGs in build/
-(removed here):
+The review sheets cut from render_drill_tip_looks.py's renders (tickets 578 and 815): every look
+alone, the rig at tiers 1, 2 and 3 with each look on the slot, seven looks a row, each resampled
+to a 1080p screen's 90 px/m at the default 12 m zoom (#39) and to a 360 px wide phone's 30 px/m
+over the same zoom (the width the #576 ladder is judged at), the phone copy enlarged 8x with no
+smoothing so each phone pixel shows. It also measures what the eye is asked to judge and writes
+readability.json: how many phone pixels of the nose's footprint change between each look and the
+next (the ladder's neighbours), at the default zoom and at the closest, where the rig-look sweep
+spec judges a step, and the brightest pixel of the drill nose against the brightest of the rest
+of the rig for each look, lit and by glow alone (the emission-only render, what the glow cap of
+#576 is about). Needs Pillow and numpy; run after the Blender render, which leaves its raw PNGs
+in build/ (removed here):
 
     python3 docs/art/rig-look-drill-tip/sheet_drill_tip_looks.py
 """
@@ -35,7 +36,13 @@ INGAME_PX_PER_M = 90
 PHONE_WIDTH_PX = 360
 ZOOM_M = 12
 PHONE_PX_PER_M = PHONE_WIDTH_PX / ZOOM_M
+# The closest zoom (VIEW_SHORT_AXIS_MIN_M, 8 m), where the rig-look sweep spec judges one visible
+# step (ticket 809: at least 16 pixels moved by 24 of 255).
+CLOSEST_ZOOM_M = 8
+PHONE_CLOSEST_PX_PER_M = PHONE_WIDTH_PX / CLOSEST_ZOOM_M
 PHONE_ENLARGE = 8
+# Looks a row on a sheet: twenty-one looks in one row would be 22,000 px wide at 512 px/m.
+LOOKS_PER_ROW = 7
 # render_casing_driller.FRAME: (centre x, centre z), width, height in metres.
 RIG_FRAME = ((0.05, 0.05), 2.1, 1.75)
 RIG_TIERS = (1, 2, 3)
@@ -88,10 +95,14 @@ def labelled(tile, label):
 
 
 def laid_out(tiles):
-    width, height = tiles[0].size
-    sheet = Image.new('RGB', (len(tiles) * width, height), BACKGROUND)
+    """The tiles in rows of LOOKS_PER_ROW, each cell as wide and tall as the largest tile."""
+    width = max(tile.width for tile in tiles)
+    height = max(tile.height for tile in tiles)
+    columns = min(len(tiles), LOOKS_PER_ROW)
+    rows = (len(tiles) + columns - 1) // columns
+    sheet = Image.new('RGB', (columns * width, rows * height), BACKGROUND)
     for index, tile in enumerate(tiles):
-        sheet.paste(tile, (index * width, 0))
+        sheet.paste(tile, ((index % columns) * width, (index // columns) * height))
     return sheet
 
 
@@ -138,13 +149,24 @@ def shown_parts_of(sidecar, tier):
 
 
 def measured(tier, looks, nose):
-    phone = {part: resampled(flattened('tier-%d.%s' % (tier, part)), PHONE_PX_PER_M) for part in looks}
+    """Each step against the look before it, at the phone's px/m over the default zoom and over
+    the closest zoom the sweep spec judges at (ticket 815: every step reads at 360 px)."""
+    rendered = {part: flattened('tier-%d.%s' % (tier, part)) for part in looks}
+    phone = {part: resampled(image, PHONE_PX_PER_M) for part, image in rendered.items()}
+    closest = {part: resampled(image, PHONE_CLOSEST_PX_PER_M) for part, image in rendered.items()}
     return {
         'phonePxPerM': PHONE_PX_PER_M,
-        'noseFootprintPx': {'%s -> %s' % pair: changed_pixels(phone[pair[0]], phone[pair[1]], nose)
-                            for pair in zip(looks, looks[1:])},
+        'noseFootprintPx': stepped_pixels(phone, looks, nose),
+        'closestZoomPxPerM': PHONE_CLOSEST_PX_PER_M,
+        'closestZoomNoseFootprintPx': stepped_pixels(closest, looks, nose),
         'brightest': {part: brightest_of_image(image, nose) for part, image in phone.items()},
     }
+
+
+def stepped_pixels(images, looks, nose):
+    """The nose-footprint pixels each look changes against the look before it."""
+    return {'%s -> %s' % pair: changed_pixels(images[pair[0]], images[pair[1]], nose)
+            for pair in zip(looks, looks[1:])}
 
 
 def brightest_of_image(image, nose):
@@ -203,13 +225,15 @@ def part_bounds(part):
 
 def report_about(table, lit, glow):
     return {
-        'about': 'Ticket 578: at a 360 px wide phone (%g px/m over the 12 m zoom), the pixels of the drill nose\'s '
-                 'footprint (its head and bit at the tier) that change between each look on %s and the next (a '
-                 'channel moving more than %d of 255), and the brightest pixel (Rec. 709 luminance, 0-255) of the '
-                 'nose against the rest of the rig for each look, the nose lit as while drilling: under `lit` on the '
-                 'phone-size renders, under `glow` on the tier-%d emission-only render at 512 px/m; written by '
+        'about': 'Tickets 578 and 815: at a 360 px wide phone (%g px/m over the 12 m zoom, and %g px/m over the '
+                 'closest %g m zoom the sweep spec judges at), the pixels of the drill nose\'s footprint (its head '
+                 'and bit at the tier) that change between each look on %s and the next (a channel moving more than '
+                 '%d of 255), and the brightest pixel (Rec. 709 luminance, 0-255) of the nose against the rest of '
+                 'the rig for each look, the nose lit as while drilling: under `lit` on the phone-size renders, '
+                 'under `glow` on the tier-%d emission-only render at 512 px/m; written by '
                  'sheet_drill_tip_looks.py. The nose must stay the brightest glow.'
-                 % (PHONE_PX_PER_M, table['attach'], CHANGED_THRESHOLD, GLOW_TIER),
+                 % (PHONE_PX_PER_M, PHONE_CLOSEST_PX_PER_M, CLOSEST_ZOOM_M, table['attach'], CHANGED_THRESHOLD,
+                    GLOW_TIER),
         'lit': lit,
         'glow': glow,
     }
