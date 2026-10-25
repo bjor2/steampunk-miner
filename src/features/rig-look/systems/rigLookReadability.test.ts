@@ -43,15 +43,16 @@ describe('rig look readability', () => {
   })
 
   it("keeps the drill tip's crowns as the nose, standing in the bit's place", () => {
-    expect([...noseSlots()].sort()).toEqual(
-      [
-        'drill-bit',
-        'steel-cone',
-        'fluted-bit',
-        'toothed-crown',
-        'gem-set-crown',
-        'aether-cut-crown',
-      ].sort(),
-    )
+    const drillTip = RIG_LOOK_TABLE.tracks.find((rows) => rows.track === 'drill_tip')!
+    const crowns = drillTip.steps.map((step) => step.part)
+    expect(crowns).toHaveLength(20)
+    expect(crowns.slice(0, 5)).toEqual([
+      'steel-cone',
+      'fluted-bit',
+      'toothed-crown',
+      'gem-set-crown',
+      'aether-cut-crown',
+    ])
+    expect([...noseSlots()].sort()).toEqual(['drill-bit', ...crowns].sort())
   })
 })

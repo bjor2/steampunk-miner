@@ -54,9 +54,54 @@ drill_tip
 299: band 4 step 4 tail 0 pips 0 part gem-set-crown finish null tint #d47aff | Fitting: Gem-set crown
 300: band 5 step 5 tail 0 pips 0 part aether-cut-crown finish null tint #7affd8 | Fitting: Aether-cut crown
 301: band 5 step 5 tail 0 pips 0 part aether-cut-crown finish null tint #7affd8 | Fitting: Aether-cut crown
-360: band 6 step 5 tail 1 pips 3 part aether-cut-crown finish nickel-plate tint #c8ccd0 | Fitting: Nickel plate · L360
-9999: band 166 step 5 tail 161 pips 90 part aether-cut-crown finish nickel-plate tint #c8ccd0 | Fitting: Nickel plate · L9,999
-1000000: band 16666 step 5 tail 16661 pips 9090 part aether-cut-crown finish nickel-plate tint #c8ccd0 | Fitting: Nickel plate · L1,000,000
+359: band 5 step 5 tail 0 pips 0 part aether-cut-crown finish null tint #7affd8 | Fitting: Aether-cut crown
+360: band 6 step 6 tail 0 pips 0 part collared-crown finish null tint #aeb8c4 | Fitting: Carbide collar
+361: band 6 step 6 tail 0 pips 0 part collared-crown finish null tint #aeb8c4 | Fitting: Carbide collar
+419: band 6 step 6 tail 0 pips 0 part collared-crown finish null tint #aeb8c4 | Fitting: Carbide collar
+420: band 7 step 7 tail 0 pips 0 part ferruled-crown finish null tint #e4e9ef | Fitting: Steel ferrule
+421: band 7 step 7 tail 0 pips 0 part ferruled-crown finish null tint #e4e9ef | Fitting: Steel ferrule
+479: band 7 step 7 tail 0 pips 0 part ferruled-crown finish null tint #e4e9ef | Fitting: Steel ferrule
+480: band 8 step 8 tail 0 pips 0 part knurled-crown finish null tint #ffd6a6 | Fitting: Knurled bands
+481: band 8 step 8 tail 0 pips 0 part knurled-crown finish null tint #ffd6a6 | Fitting: Knurled bands
+539: band 8 step 8 tail 0 pips 0 part knurled-crown finish null tint #ffd6a6 | Fitting: Knurled bands
+540: band 9 step 9 tail 0 pips 0 part reamed-crown finish null tint #9faab8 | Fitting: Reamer ring
+541: band 9 step 9 tail 0 pips 0 part reamed-crown finish null tint #9faab8 | Fitting: Reamer ring
+599: band 9 step 9 tail 0 pips 0 part reamed-crown finish null tint #9faab8 | Fitting: Reamer ring
+600: band 10 step 10 tail 0 pips 0 part chromed-crown finish null tint #f4f7fa | Fitting: Chrome face
+601: band 10 step 10 tail 0 pips 0 part chromed-crown finish null tint #f4f7fa | Fitting: Chrome face
+659: band 10 step 10 tail 0 pips 0 part chromed-crown finish null tint #f4f7fa | Fitting: Chrome face
+660: band 11 step 11 tail 0 pips 0 part bossed-crown finish null tint #ffcf7a | Fitting: Brass bosses
+661: band 11 step 11 tail 0 pips 0 part bossed-crown finish null tint #ffcf7a | Fitting: Brass bosses
+719: band 11 step 11 tail 0 pips 0 part bossed-crown finish null tint #ffcf7a | Fitting: Brass bosses
+720: band 12 step 12 tail 0 pips 0 part cooled-crown finish null tint #f0a882 | Fitting: Coolant lines
+721: band 12 step 12 tail 0 pips 0 part cooled-crown finish null tint #f0a882 | Fitting: Coolant lines
+779: band 12 step 12 tail 0 pips 0 part cooled-crown finish null tint #f0a882 | Fitting: Coolant lines
+780: band 13 step 13 tail 0 pips 0 part inlaid-crown finish null tint #d8f4ff | Fitting: Diamond inlays
+781: band 13 step 13 tail 0 pips 0 part inlaid-crown finish null tint #d8f4ff | Fitting: Diamond inlays
+839: band 13 step 13 tail 0 pips 0 part inlaid-crown finish null tint #d8f4ff | Fitting: Diamond inlays
+840: band 14 step 14 tail 0 pips 0 part haloed-crown finish null tint #8fffe6 | Fitting: Spin halo
+841: band 14 step 14 tail 0 pips 0 part haloed-crown finish null tint #8fffe6 | Fitting: Spin halo
+899: band 14 step 14 tail 0 pips 0 part haloed-crown finish null tint #8fffe6 | Fitting: Spin halo
+900: band 15 step 15 tail 0 pips 0 part blur-collar-crown finish null tint #a4f0ff | Fitting: Blur collars
+901: band 15 step 15 tail 0 pips 0 part blur-collar-crown finish null tint #a4f0ff | Fitting: Blur collars
+959: band 15 step 15 tail 0 pips 0 part blur-collar-crown finish null tint #a4f0ff | Fitting: Blur collars
+960: band 16 step 16 tail 0 pips 0 part streaked-crown finish null tint #c8fff2 | Fitting: Spin streaks
+961: band 16 step 16 tail 0 pips 0 part streaked-crown finish null tint #c8fff2 | Fitting: Spin streaks
+1019: band 16 step 16 tail 0 pips 0 part streaked-crown finish null tint #c8fff2 | Fitting: Spin streaks
+1020: band 17 step 17 tail 0 pips 0 part double-halo-crown finish null tint #7ff0ff | Fitting: Double halo
+1021: band 17 step 17 tail 0 pips 0 part double-halo-crown finish null tint #7ff0ff | Fitting: Double halo
+1079: band 17 step 17 tail 0 pips 0 part double-halo-crown finish null tint #7ff0ff | Fitting: Double halo
+1080: band 18 step 18 tail 0 pips 0 part fanned-crown finish null tint #b0ffff | Fitting: Blur fan
+1081: band 18 step 18 tail 0 pips 0 part fanned-crown finish null tint #b0ffff | Fitting: Blur fan
+1139: band 18 step 18 tail 0 pips 0 part fanned-crown finish null tint #b0ffff | Fitting: Blur fan
+1140: band 19 step 19 tail 0 pips 0 part vortex-crown finish null tint #e8fffb | Fitting: Vortex core
+1141: band 19 step 19 tail 0 pips 0 part vortex-crown finish null tint #e8fffb | Fitting: Vortex core
+1199: band 19 step 19 tail 0 pips 0 part vortex-crown finish null tint #e8fffb | Fitting: Vortex core
+1200: band 20 step 20 tail 0 pips 0 part aether-vortex-crown finish null tint #9af5ff | Fitting: Aether vortex
+1201: band 20 step 20 tail 0 pips 0 part aether-vortex-crown finish null tint #9af5ff | Fitting: Aether vortex
+1260: band 21 step 20 tail 1 pips 11 part aether-vortex-crown finish nickel-plate tint #c8ccd0 | Fitting: Nickel plate · L1,260
+9999: band 166 step 20 tail 146 pips 90 part aether-vortex-crown finish case-hardened tint #8a7ab8 | Fitting: Case-hardened · L9,999
+1000000: band 16666 step 20 tail 16646 pips 9090 part aether-vortex-crown finish case-hardened tint #8a7ab8 | Fitting: Case-hardened · L1,000,000
 
 engine
 0: band 0 step 0 tail 0 pips 0 part null finish null tint null | null

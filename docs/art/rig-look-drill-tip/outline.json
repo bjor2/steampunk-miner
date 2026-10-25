@@ -54,6 +54,141 @@
         "tier-3": 0
       },
       "changesRigOutline": 68
+    },
+    "collared-crown": {
+      "cells": 922,
+      "outsideRig": {
+        "tier-1": 0,
+        "tier-2": 0,
+        "tier-3": 0
+      },
+      "changesRigOutline": 68
+    },
+    "ferruled-crown": {
+      "cells": 1336,
+      "outsideRig": {
+        "tier-1": 0,
+        "tier-2": 0,
+        "tier-3": 0
+      },
+      "changesRigOutline": 68
+    },
+    "knurled-crown": {
+      "cells": 1336,
+      "outsideRig": {
+        "tier-1": 0,
+        "tier-2": 0,
+        "tier-3": 0
+      },
+      "changesRigOutline": 68
+    },
+    "reamed-crown": {
+      "cells": 1710,
+      "outsideRig": {
+        "tier-1": 0,
+        "tier-2": 0,
+        "tier-3": 0
+      },
+      "changesRigOutline": 68
+    },
+    "chromed-crown": {
+      "cells": 1716,
+      "outsideRig": {
+        "tier-1": 0,
+        "tier-2": 0,
+        "tier-3": 0
+      },
+      "changesRigOutline": 68
+    },
+    "bossed-crown": {
+      "cells": 1716,
+      "outsideRig": {
+        "tier-1": 0,
+        "tier-2": 0,
+        "tier-3": 0
+      },
+      "changesRigOutline": 68
+    },
+    "cooled-crown": {
+      "cells": 1788,
+      "outsideRig": {
+        "tier-1": 0,
+        "tier-2": 0,
+        "tier-3": 0
+      },
+      "changesRigOutline": 68
+    },
+    "inlaid-crown": {
+      "cells": 1788,
+      "outsideRig": {
+        "tier-1": 0,
+        "tier-2": 0,
+        "tier-3": 0
+      },
+      "changesRigOutline": 68
+    },
+    "haloed-crown": {
+      "cells": 1794,
+      "outsideRig": {
+        "tier-1": 0,
+        "tier-2": 0,
+        "tier-3": 0
+      },
+      "changesRigOutline": 62
+    },
+    "blur-collar-crown": {
+      "cells": 1802,
+      "outsideRig": {
+        "tier-1": 0,
+        "tier-2": 0,
+        "tier-3": 0
+      },
+      "changesRigOutline": 62
+    },
+    "streaked-crown": {
+      "cells": 1802,
+      "outsideRig": {
+        "tier-1": 0,
+        "tier-2": 0,
+        "tier-3": 0
+      },
+      "changesRigOutline": 62
+    },
+    "double-halo-crown": {
+      "cells": 1802,
+      "outsideRig": {
+        "tier-1": 0,
+        "tier-2": 0,
+        "tier-3": 0
+      },
+      "changesRigOutline": 62
+    },
+    "fanned-crown": {
+      "cells": 1802,
+      "outsideRig": {
+        "tier-1": 0,
+        "tier-2": 0,
+        "tier-3": 0
+      },
+      "changesRigOutline": 62
+    },
+    "vortex-crown": {
+      "cells": 1802,
+      "outsideRig": {
+        "tier-1": 0,
+        "tier-2": 0,
+        "tier-3": 0
+      },
+      "changesRigOutline": 62
+    },
+    "aether-vortex-crown": {
+      "cells": 1808,
+      "outsideRig": {
+        "tier-1": 0,
+        "tier-2": 0,
+        "tier-3": 0
+      },
+      "changesRigOutline": 62
     }
   }
 }

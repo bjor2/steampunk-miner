@@ -24,11 +24,26 @@
     ],
     "vehicle-look-drill-tip": [
       "aether-cut-crown",
+      "aether-vortex-crown",
+      "blur-collar-crown",
+      "bossed-crown",
+      "chromed-crown",
+      "collared-crown",
+      "cooled-crown",
       "cutter-crown",
+      "double-halo-crown",
+      "fanned-crown",
+      "ferruled-crown",
       "fluted-bit",
       "gem-set-crown",
+      "haloed-crown",
+      "inlaid-crown",
+      "knurled-crown",
+      "reamed-crown",
       "steel-cone",
-      "toothed-crown"
+      "streaked-crown",
+      "toothed-crown",
+      "vortex-crown"
     ],
     "vehicle-look-drive": [
       "bare-hub",
@@ -137,7 +152,22 @@
           "fluted-bit",
           "toothed-crown",
           "gem-set-crown",
-          "aether-cut-crown"
+          "aether-cut-crown",
+          "collared-crown",
+          "ferruled-crown",
+          "knurled-crown",
+          "reamed-crown",
+          "chromed-crown",
+          "bossed-crown",
+          "cooled-crown",
+          "inlaid-crown",
+          "haloed-crown",
+          "blur-collar-crown",
+          "streaked-crown",
+          "double-halo-crown",
+          "fanned-crown",
+          "vortex-crown",
+          "aether-vortex-crown"
         ],
         ["drill-head"]
       ],
@@ -232,7 +262,22 @@
           "fluted-bit",
           "toothed-crown",
           "gem-set-crown",
-          "aether-cut-crown"
+          "aether-cut-crown",
+          "collared-crown",
+          "ferruled-crown",
+          "knurled-crown",
+          "reamed-crown",
+          "chromed-crown",
+          "bossed-crown",
+          "cooled-crown",
+          "inlaid-crown",
+          "haloed-crown",
+          "blur-collar-crown",
+          "streaked-crown",
+          "double-halo-crown",
+          "fanned-crown",
+          "vortex-crown",
+          "aether-vortex-crown"
         ]
       ],
       "glowCap": "drillNose",
@@ -276,6 +321,126 @@
           "card": "Aether-cut crown",
           "colour": "#7affd8",
           "glows": [0.5]
+        },
+        {
+          "from": 360,
+          "part": "collared-crown",
+          "asset": "vehicle-look-drill-tip",
+          "card": "Carbide collar",
+          "colour": "#aeb8c4",
+          "glows": [0.51]
+        },
+        {
+          "from": 420,
+          "part": "ferruled-crown",
+          "asset": "vehicle-look-drill-tip",
+          "card": "Steel ferrule",
+          "colour": "#e4e9ef",
+          "glows": [0.515]
+        },
+        {
+          "from": 480,
+          "part": "knurled-crown",
+          "asset": "vehicle-look-drill-tip",
+          "card": "Knurled bands",
+          "colour": "#ffd6a6",
+          "glows": [0.52]
+        },
+        {
+          "from": 540,
+          "part": "reamed-crown",
+          "asset": "vehicle-look-drill-tip",
+          "card": "Reamer ring",
+          "colour": "#9faab8",
+          "glows": [0.525]
+        },
+        {
+          "from": 600,
+          "part": "chromed-crown",
+          "asset": "vehicle-look-drill-tip",
+          "card": "Chrome face",
+          "colour": "#f4f7fa",
+          "glows": [0.53]
+        },
+        {
+          "from": 660,
+          "part": "bossed-crown",
+          "asset": "vehicle-look-drill-tip",
+          "card": "Brass bosses",
+          "colour": "#ffcf7a",
+          "glows": [0.535]
+        },
+        {
+          "from": 720,
+          "part": "cooled-crown",
+          "asset": "vehicle-look-drill-tip",
+          "card": "Coolant lines",
+          "colour": "#f0a882",
+          "glows": [0.54]
+        },
+        {
+          "from": 780,
+          "part": "inlaid-crown",
+          "asset": "vehicle-look-drill-tip",
+          "card": "Diamond inlays",
+          "colour": "#d8f4ff",
+          "glows": [0.545]
+        },
+        {
+          "from": 840,
+          "part": "haloed-crown",
+          "asset": "vehicle-look-drill-tip",
+          "card": "Spin halo",
+          "colour": "#8fffe6",
+          "glows": [0.55]
+        },
+        {
+          "from": 900,
+          "part": "blur-collar-crown",
+          "asset": "vehicle-look-drill-tip",
+          "card": "Blur collars",
+          "colour": "#a4f0ff",
+          "glows": [0.555]
+        },
+        {
+          "from": 960,
+          "part": "streaked-crown",
+          "asset": "vehicle-look-drill-tip",
+          "card": "Spin streaks",
+          "colour": "#c8fff2",
+          "glows": [0.56]
+        },
+        {
+          "from": 1020,
+          "part": "double-halo-crown",
+          "asset": "vehicle-look-drill-tip",
+          "card": "Double halo",
+          "colour": "#7ff0ff",
+          "glows": [0.565]
+        },
+        {
+          "from": 1080,
+          "part": "fanned-crown",
+          "asset": "vehicle-look-drill-tip",
+          "card": "Blur fan",
+          "colour": "#b0ffff",
+          "glows": [0.57]
+        },
+        {
+          "from": 1140,
+          "part": "vortex-crown",
+          "asset": "vehicle-look-drill-tip",
+          "card": "Vortex core",
+          "colour": "#e8fffb",
+          "glows": [0.575]
+        },
+        {
+          "from": 1200,
+          "part": "aether-vortex-crown",
+          "asset": "vehicle-look-drill-tip",
+          "card": "Aether vortex",
+          "colour": "#9af5ff",
+          "glows": [0.58]
         }
       ],
       "band": {

@@ -1,7 +1,7 @@
 /**
- * The drill tip's rig looks in the browser (ticket 579): from 60 purchases each step of
+ * The drill tip's rig looks in the browser (tickets 579 and 815): from 60 purchases each step of
  * `rigLook.json` swaps its part of `vehicle-look-drill-tip` onto the drill head in place of the
- * rig's bit, the tail keeps the top part, and the look leaves the physics world as it was; the
+ * rig's bit, to the twentieth at 1200 (about P40), the tail keeps the top part, and the look leaves the physics world as it was; the
  * drill tip card names the owned band, past the art its finish and the exact level (#585's
  * template, ticket 809). Asserted through `steampunkDebug`, never pixels; the shots at every step
  * and two finish bands,
@@ -20,7 +20,10 @@ declare global {
 }
 
 const ASSET_ID = 'vehicle-look-drill-tip'
-/** The bare rig, the five steps on the band edges of 60 (ticket 809), then two finish bands. */
+/**
+ * The bare rig, the twenty steps on the band edges of 60 to about P40 (tickets 809 and 815:
+ * #578's five parts, then each LK6 part fitted onto the aether-cut crown), then two finish bands.
+ */
 const LOOKS = [
   { purchases: 59, part: null, fitting: null },
   { purchases: 60, part: 'steel-cone', fitting: 'Fitting: Steel cone' },
@@ -28,11 +31,26 @@ const LOOKS = [
   { purchases: 180, part: 'toothed-crown', fitting: 'Fitting: Toothed crown' },
   { purchases: 240, part: 'gem-set-crown', fitting: 'Fitting: Gem-set crown' },
   { purchases: 300, part: 'aether-cut-crown', fitting: 'Fitting: Aether-cut crown' },
-  { purchases: 360, part: 'aether-cut-crown', fitting: 'Fitting: Nickel plate · L360' },
-  { purchases: 420, part: 'aether-cut-crown', fitting: 'Fitting: Case-hardened · L420' },
+  { purchases: 360, part: 'collared-crown', fitting: 'Fitting: Carbide collar' },
+  { purchases: 420, part: 'ferruled-crown', fitting: 'Fitting: Steel ferrule' },
+  { purchases: 480, part: 'knurled-crown', fitting: 'Fitting: Knurled bands' },
+  { purchases: 540, part: 'reamed-crown', fitting: 'Fitting: Reamer ring' },
+  { purchases: 600, part: 'chromed-crown', fitting: 'Fitting: Chrome face' },
+  { purchases: 660, part: 'bossed-crown', fitting: 'Fitting: Brass bosses' },
+  { purchases: 720, part: 'cooled-crown', fitting: 'Fitting: Coolant lines' },
+  { purchases: 780, part: 'inlaid-crown', fitting: 'Fitting: Diamond inlays' },
+  { purchases: 840, part: 'haloed-crown', fitting: 'Fitting: Spin halo' },
+  { purchases: 900, part: 'blur-collar-crown', fitting: 'Fitting: Blur collars' },
+  { purchases: 960, part: 'streaked-crown', fitting: 'Fitting: Spin streaks' },
+  { purchases: 1020, part: 'double-halo-crown', fitting: 'Fitting: Double halo' },
+  { purchases: 1080, part: 'fanned-crown', fitting: 'Fitting: Blur fan' },
+  { purchases: 1140, part: 'vortex-crown', fitting: 'Fitting: Vortex core' },
+  { purchases: 1200, part: 'aether-vortex-crown', fitting: 'Fitting: Aether vortex' },
+  { purchases: 1260, part: 'aether-vortex-crown', fitting: 'Fitting: Nickel plate · L1,260' },
+  { purchases: 1320, part: 'aether-vortex-crown', fitting: 'Fitting: Case-hardened · L1,320' },
 ]
 /** The levels the card must fit at 360 px past the art (#809's goldens, the #681 long mode). */
-const TAIL_LEVELS = [360, 9_999, 1_000_000]
+const TAIL_LEVELS = [1_260, 9_999, 1_000_000]
 const CARD = `[data-testid="${UI_ID_TEMPLATES.workshopUpgradeBuy('drill_tip')}"]`
 const FITTING = `${CARD} [data-sheet-card-line]`
 const VIEWPORTS = [
@@ -121,7 +139,7 @@ async function expectLook(page: Page, part: string | null): Promise<void> {
   else expect(bits).toEqual([])
 }
 
-test.describe('drill tip look (ticket 579)', () => {
+test.describe('drill tip look (tickets 579 and 815)', () => {
   test('swaps each step onto the head in place of the bit, the top part past the art', async ({
     page,
   }) => {
@@ -140,8 +158,8 @@ test.describe('drill tip look (ticket 579)', () => {
     await setUpgrade(page, 'drill_tip', 59)
     await expectLook(page, null)
     const lowest = await physicsCounts(page)
-    await setUpgrade(page, 'drill_tip', 420)
-    await expectLook(page, 'aether-cut-crown')
+    await setUpgrade(page, 'drill_tip', 1320)
+    await expectLook(page, 'aether-vortex-crown')
     await expect.poll(() => physicsCounts(page)).toEqual(lowest)
     expect(errors).toEqual([])
   })

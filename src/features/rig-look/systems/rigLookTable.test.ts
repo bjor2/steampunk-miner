@@ -87,7 +87,8 @@ describe('rig look table', () => {
   })
 
   it('puts every authored step on its band edge, the art kept in order', () => {
-    expect(fromsOf('drill_tip')).toEqual([60, 120, 180, 240, 300])
+    expect(fromsOf('drill_tip')).toEqual(bandOf('drill_tip').edges)
+    expect(fromsOf('drill_tip')).toHaveLength(20)
     expect(fromsOf('cargo_hold')).toEqual([11, 22, 33, 44, 55])
     expect(fromsOf('engine')).toEqual([5, 10, 15, 20, 25])
     expect(fromsOf('boiler')).toEqual([5, 10, 15, 20, 25, 30])
@@ -132,6 +133,21 @@ describe('rig look table', () => {
       'Toothed crown',
       'Gem-set crown',
       'Aether-cut crown',
+      'Carbide collar',
+      'Steel ferrule',
+      'Knurled bands',
+      'Reamer ring',
+      'Chrome face',
+      'Brass bosses',
+      'Coolant lines',
+      'Diamond inlays',
+      'Spin halo',
+      'Blur collars',
+      'Spin streaks',
+      'Double halo',
+      'Blur fan',
+      'Vortex core',
+      'Aether vortex',
     ])
     expect(cardsOf('engine')).toEqual([
       'Single piston',
@@ -330,11 +346,26 @@ describe('rig look table', () => {
       ],
       'vehicle-look-drill-tip': [
         'aether-cut-crown',
+        'aether-vortex-crown',
+        'blur-collar-crown',
+        'bossed-crown',
+        'chromed-crown',
+        'collared-crown',
+        'cooled-crown',
         'cutter-crown',
+        'double-halo-crown',
+        'fanned-crown',
+        'ferruled-crown',
         'fluted-bit',
         'gem-set-crown',
+        'haloed-crown',
+        'inlaid-crown',
+        'knurled-crown',
+        'reamed-crown',
         'steel-cone',
+        'streaked-crown',
         'toothed-crown',
+        'vortex-crown',
       ],
       'vehicle-look-drive': [
         'bare-hub',

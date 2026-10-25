@@ -1,5 +1,5 @@
 {
-  "about": "The drill_tip track's rig-look parts (ticket 578, wave 576-1A of the rig look ladder #576): one asset at the track's attach slot, one part per look step. The thresholds are Systems' table (#157, comment 6300543785) and the names Progression's (comment 6300549964); the wiring (#579) reads them from the rig-look registry (#577), not from here.",
+  "about": "The drill_tip track's rig-look parts (ticket 578, wave 576-1A of the rig look ladder #576; the LK6 steps of ticket 815, wave 647-7K): one asset at the track's attach slot, one part per look step. The thresholds are the band edges LK1 (#809) froze for the drill tip, step 60, authored to about P40 (1200); the names are the data strings of 3 words or fewer the hover line shows; the wiring reads them from rigLook.json (#577), not from here. The 15 LK6 parts are the aether-cut crown with one more part fitted each: bit-finish steps first (360-780), then spin-blur steps (840-1200).",
   "assetId": "vehicle-look-drill-tip",
   "track": "drill_tip",
   "attach": "drill.head",
@@ -15,27 +15,102 @@
     {
       "part": "steel-cone",
       "name": "Steel cone",
-      "purchases": 70
+      "purchases": 60
     },
     {
       "part": "fluted-bit",
       "name": "Fluted bit",
-      "purchases": 100
+      "purchases": 120
     },
     {
       "part": "toothed-crown",
       "name": "Toothed crown",
-      "purchases": 130
+      "purchases": 180
     },
     {
       "part": "gem-set-crown",
       "name": "Gem-set crown",
-      "purchases": 190
+      "purchases": 240
     },
     {
       "part": "aether-cut-crown",
       "name": "Aether-cut crown",
-      "purchases": 280
+      "purchases": 300
+    },
+    {
+      "part": "collared-crown",
+      "name": "Carbide collar",
+      "purchases": 360
+    },
+    {
+      "part": "ferruled-crown",
+      "name": "Steel ferrule",
+      "purchases": 420
+    },
+    {
+      "part": "knurled-crown",
+      "name": "Knurled bands",
+      "purchases": 480
+    },
+    {
+      "part": "reamed-crown",
+      "name": "Reamer ring",
+      "purchases": 540
+    },
+    {
+      "part": "chromed-crown",
+      "name": "Chrome face",
+      "purchases": 600
+    },
+    {
+      "part": "bossed-crown",
+      "name": "Brass bosses",
+      "purchases": 660
+    },
+    {
+      "part": "cooled-crown",
+      "name": "Coolant lines",
+      "purchases": 720
+    },
+    {
+      "part": "inlaid-crown",
+      "name": "Diamond inlays",
+      "purchases": 780
+    },
+    {
+      "part": "haloed-crown",
+      "name": "Spin halo",
+      "purchases": 840
+    },
+    {
+      "part": "blur-collar-crown",
+      "name": "Blur collars",
+      "purchases": 900
+    },
+    {
+      "part": "streaked-crown",
+      "name": "Spin streaks",
+      "purchases": 960
+    },
+    {
+      "part": "double-halo-crown",
+      "name": "Double halo",
+      "purchases": 1020
+    },
+    {
+      "part": "fanned-crown",
+      "name": "Blur fan",
+      "purchases": 1080
+    },
+    {
+      "part": "vortex-crown",
+      "name": "Vortex core",
+      "purchases": 1140
+    },
+    {
+      "part": "aether-vortex-crown",
+      "name": "Aether vortex",
+      "purchases": 1200
     }
   ]
 }
