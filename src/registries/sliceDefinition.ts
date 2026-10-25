@@ -59,6 +59,7 @@ import type { MagneticGroundProvider } from '../systems/registries/magneticGroun
 import type { PlanetCardLineSource } from '../systems/registries/planetCardLines'
 import type { PlanetRowProvider } from '../systems/registries/planetRow'
 import type { HazardPocketsProvider } from '../systems/registries/hazardPockets'
+import type { ContactEffectRow, ContactFactor } from '../systems/registries/contactEffects'
 import type { PlanetSkyBandProvider } from '../systems/registries/planetSkyBand'
 import type { ShockShield } from '../systems/registries/shockShields'
 import type { OreDrillClassProvider } from '../systems/registries/oreDrillClasses'
@@ -296,6 +297,13 @@ export interface SliceRegistrar {
   planetRow(provider: PlanetRowProvider): void
   /** One provider across all slices: each planet's hazard pockets from its row (ticket 652). */
   hazardPockets(provider: HazardPocketsProvider): void
+  /**
+   * What a hazard kind's pocket does to the rig that meets it (ticket 848): one row per kind,
+   * `refill`, `drain`, `bite` or `shove`, every number scaled by its `factorBp`.
+   */
+  contactEffect(row: ContactEffectRow): void
+  /** A tool's or a consumable's factor on one hazard kind's contacts, smallest first (848). */
+  contactFactor(factor: ContactFactor): void
   /**
    * A planet class's tag, arrival line and values on the kernel's planet card (ticket 343): shown
    * once its `featureId` row is open, the hazard and gate kind only, never an unlock id.

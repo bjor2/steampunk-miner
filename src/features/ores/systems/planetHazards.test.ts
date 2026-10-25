@@ -80,10 +80,27 @@ describe('per-planet hazards', () => {
   it('names every row hazard in the kind table, each with the numbers its effect uses', () => {
     const kinds = ORE_ROWS.planets.hazards
     expect(Object.keys(kinds).sort()).toEqual(['firedamp', 'rockfall', 'spinecrystal', 'steamvent'])
-    expect(kinds.rockfall).toEqual({ effect: 'refill', hullShareBp: 300 })
-    expect(kinds.firedamp).toEqual({ effect: 'drain', energyShareBp: 1500, ticks: 180 })
-    expect(kinds.spinecrystal).toEqual({ effect: 'bite', hullShareBp: 200 })
-    expect(kinds.steamvent).toEqual({ effect: 'shove', hullShareBp: 200, shoveTiles: 3, ticks: 20 })
+    expect(kinds.rockfall).toEqual({
+      effect: 'refill',
+      factorBp: 10000,
+      refillShareBp: 10000,
+      hullShareBp: 300,
+    })
+    expect(kinds.firedamp).toEqual({
+      effect: 'drain',
+      factorBp: 10000,
+      energyShareBp: 1500,
+      ticks: 180,
+      floorBp: 2500,
+    })
+    expect(kinds.spinecrystal).toEqual({ effect: 'bite', factorBp: 10000, hullShareBp: 200 })
+    expect(kinds.steamvent).toEqual({
+      effect: 'shove',
+      factorBp: 10000,
+      hullShareBp: 200,
+      shoveTiles: 3,
+      ticks: 20,
+    })
   })
 
   it('places a depth window as floor(num * R / den) in whole cells from the surface', () => {
@@ -208,6 +225,16 @@ describe('per-planet hazards', () => {
     ])
     expect(problemsWithKind('steamvent', { effect: 'melt' })).toEqual([
       'ore.planets.hazards.steamvent.effect must be refill, drain, bite or shove',
+    ])
+  })
+
+  it('takes a factor from 0, which turns the effect off, to the whole (ticket 848)', () => {
+    expect(problemsWithKind('rockfall', { factorBp: 0 })).toEqual([])
+    expect(problemsWithKind('rockfall', { factorBp: 10001 })).toEqual([
+      'ore.planets.hazards.rockfall.factorBp must be whole, from 0 to 10000',
+    ])
+    expect(problemsWithKind('firedamp', { floorBp: 0 })).toEqual([
+      'ore.planets.hazards.firedamp.floorBp must be whole, from 1 to 10000',
     ])
   })
 

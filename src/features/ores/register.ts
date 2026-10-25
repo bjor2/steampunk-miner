@@ -10,15 +10,18 @@
  * provider (ticket 707): world generation reads each planet's radius (ticket 643), menus its display
  * name (ticket 702) and the renderer its look (ticket 653). They also give the hazard pockets of
  * planets 2 to 5 (`hazardPockets`, ticket 652), and the planet card reads planets 2 to 5 their
- * hazard's tag and arrival line (`planetCardLine`, ticket 654).
+ * hazard's tag and arrival line (`planetCardLine`, ticket 654). Each hazard kind is a row of the
+ * kernel's contact-effect registry (`contactEffect`, ticket 848).
  */
 import type { SliceDefinition } from '../../registries/sliceDefinition'
 import { oresDebugActions } from './debug'
 import { oreReportRows } from './oreReportRows'
 import { kernelOreAliases } from './systems/kernelOreAliases'
 import { HAZARD_CARD_SOURCE } from './systems/hazardCardSource'
+import { hazardContactRowsOf } from './systems/hazardContactRows'
 import { HAZARD_POCKETS_PROVIDER } from './systems/hazardPockets'
 import { oreLeadHook } from './systems/leadRoll'
+import { ORE_ROWS } from './systems/oreRows'
 import { PLANET_ROW_PROVIDER } from './systems/planetRowProvider'
 import { oreTypeProvider } from './systems/oreTypeProvider'
 import { RARITY_PICKUP_PROVIDER, RARITY_TRIP_RESET } from './systems/rarityPickup'
@@ -31,6 +34,7 @@ export const slice: SliceDefinition = {
     r.generationHook(oreLeadHook)
     r.planetRow(PLANET_ROW_PROVIDER)
     r.hazardPockets(HAZARD_POCKETS_PROVIDER)
+    hazardContactRowsOf(ORE_ROWS.planets.hazards).forEach((row) => r.contactEffect(row))
     r.planetCardLine(HAZARD_CARD_SOURCE)
     r.discoveryAliases(kernelOreAliases())
     r.orePickup(RARITY_PICKUP_PROVIDER)

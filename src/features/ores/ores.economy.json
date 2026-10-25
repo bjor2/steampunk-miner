@@ -173,10 +173,27 @@
         "endings": ["holt", "mere", "fell", "worth", "gate", "combe", "stead", "ford"]
       },
       "hazards": {
-        "rockfall": { "effect": "refill", "hullShareBp": 300 },
-        "firedamp": { "effect": "drain", "energyShareBp": 1500, "ticks": 180 },
-        "spinecrystal": { "effect": "bite", "hullShareBp": 200 },
-        "steamvent": { "effect": "shove", "hullShareBp": 200, "shoveTiles": 3, "ticks": 20 }
+        "rockfall": {
+          "effect": "refill",
+          "factorBp": 10000,
+          "refillShareBp": 10000,
+          "hullShareBp": 300
+        },
+        "firedamp": {
+          "effect": "drain",
+          "factorBp": 10000,
+          "energyShareBp": 1500,
+          "ticks": 180,
+          "floorBp": 2500
+        },
+        "spinecrystal": { "effect": "bite", "factorBp": 10000, "hullShareBp": 200 },
+        "steamvent": {
+          "effect": "shove",
+          "factorBp": 10000,
+          "hullShareBp": 200,
+          "shoveTiles": 3,
+          "ticks": 20
+        }
       },
       "rows": [
         {

@@ -1,33 +1,35 @@
 /**
  * The hazard kind table of the planet registry (ticket 651, spec #647): `ores.economy.json`
  * `planets.hazards`, one entry per hazard a planet row may name, and `planets.hazardCaps`, the
- * most any one contact may cost. Every kind fires the same way, when the drill cuts one of its
- * painted pocket cells (the one hook the build ticket 652 wires, beside the electrified check), and
- * differs in its effect:
+ * most any one contact may cost. Each kind is one row of the kernel's contact-effect registry
+ * (ticket 848, `contactEffects.ts`, registered by `hazardContactRows.ts`), and differs in its
+ * effect:
  *
- * - `refill` (rockfall): the cut cell fills again with the rubble above it and the rig in it is
- *   crushed for `hullShareBp` of its on-curve hull, as a collapse refill crushes.
- * - `drain` (firedamp): the breached gas chokes the boiler, draining `energyShareBp` of the
- *   on-curve energy over `ticks`.
+ * - `refill` (rockfall): the cut cell fills again by `refillShareBp` of its cut and the rig is
+ *   crushed for `hullShareBp` of the on-curve hull, as a collapse refill crushes.
+ * - `drain` (firedamp): while the rig stands in a cut pocket the gas chokes the boiler, draining
+ *   `energyShareBp` of the owned energy track every `ticks`, never below `floorBp` of it (the
+ *   rescue tow's 25%, #9, so the drain never strands the rig).
  * - `bite` (spinecrystal): the shattering cluster scores the hull for `hullShareBp`, once a cell.
  * - `shove` (steam vents): the vent blows, scalding the hull for `hullShareBp` and pushing the rig
- *   `shoveTiles` back up the shaft over `ticks`.
+ *   `shoveTiles` along the vent's normal over `ticks`.
  *
- * The caps are the Horizontal Scaler's "purchasables price-only" condition in numbers: no contact
- * costs more than `hullShareBp` or `energyShareBp`, and a dive never loses more than
- * `diveHullCapBp` to hazards in all (magnetic's own cap, #258). The shares are provisional until
- * the Systems designer retunes them on ticket 644's pace rows; they never touch a power or cost
- * curve.
+ * Every kind carries `factorBp`, the scale on all of its numbers (0 plays nothing). The caps are the
+ * Horizontal Scaler's "purchasables price-only" condition in numbers: no contact costs more than
+ * `hullShareBp` or `energyShareBp`, and a dive never loses more than `diveHullCapBp` to hazards in
+ * all (magnetic's own cap, #258). The shares are provisional until the Systems designer retunes
+ * them on ticket 644's pace rows; they never touch a power or cost curve.
  */
 type Raw = Record<string, unknown>
 
 export type HazardEffect = 'refill' | 'drain' | 'bite' | 'shove'
 
-export type HazardKind =
-  | { effect: 'refill'; hullShareBp: number }
-  | { effect: 'drain'; energyShareBp: number; ticks: number }
+export type HazardKind = { factorBp: number } & (
+  | { effect: 'refill'; refillShareBp: number; hullShareBp: number }
+  | { effect: 'drain'; energyShareBp: number; ticks: number; floorBp: number }
   | { effect: 'bite'; hullShareBp: number }
   | { effect: 'shove'; hullShareBp: number; shoveTiles: number; ticks: number }
+)
 
 export interface HazardCaps {
   /** The most hull one contact costs, in basis points of the on-curve hull. */
@@ -53,11 +55,13 @@ const MAX_SHOVE_TILES = 8
 
 /** The number fields each effect carries, beside `effect`. */
 const FIELDS_OF_EFFECT: Readonly<Record<HazardEffect, readonly string[]>> = {
-  refill: ['hullShareBp'],
-  drain: ['energyShareBp', 'ticks'],
-  bite: ['hullShareBp'],
-  shove: ['hullShareBp', 'shoveTiles', 'ticks'],
+  refill: ['factorBp', 'refillShareBp', 'hullShareBp'],
+  drain: ['factorBp', 'energyShareBp', 'ticks', 'floorBp'],
+  bite: ['factorBp', 'hullShareBp'],
+  shove: ['factorBp', 'hullShareBp', 'shoveTiles', 'ticks'],
 }
+/** A factor of 0 is allowed: it turns the effect off (ticket 848). */
+const ZERO_ALLOWED: readonly string[] = ['factorBp']
 
 /** Why the kind table and the caps are not #651's data; empty when they are. */
 export function hazardKindProblems(kinds: unknown, caps: unknown): string[] {
@@ -127,9 +131,10 @@ function effectFieldProblems(where: string, kind: Raw, effect: HazardEffect, cap
 
 function numberProblems(where: string, field: string, value: unknown, caps: HazardCaps): string[] {
   const [highest, capName] = rangeOfField(field, caps)
-  if (isWholeBetween(value, 1, highest)) return []
+  const lowest = ZERO_ALLOWED.includes(field) ? 0 : 1
+  if (isWholeBetween(value, lowest, highest)) return []
   const suffix = capName === null ? '' : ` (hazardCaps.${capName})`
-  return [`${where}.${field} must be whole, from 1 to ${highest}${suffix}`]
+  return [`${where}.${field} must be whole, from ${lowest} to ${highest}${suffix}`]
 }
 
 /** The top of a field's range, and the cap it comes from where it is one. */
@@ -137,7 +142,8 @@ function rangeOfField(field: string, caps: HazardCaps): [number, keyof HazardCap
   if (field === 'hullShareBp') return [caps.hullShareBp, 'hullShareBp']
   if (field === 'energyShareBp') return [caps.energyShareBp, 'energyShareBp']
   if (field === 'shoveTiles') return [MAX_SHOVE_TILES, null]
-  return [MAX_TICKS, null]
+  if (field === 'ticks') return [MAX_TICKS, null]
+  return [BASIS_POINTS, null]
 }
 
 function isEffect(value: unknown): value is HazardEffect {

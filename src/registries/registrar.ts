@@ -76,6 +76,10 @@ import { MAGNETIC_GROUND_REGISTRY } from '../systems/registries/magneticGround'
 import { PLANET_CARD_LINE_REGISTRY } from '../systems/registries/planetCardLines'
 import { PLANET_ROW_REGISTRY } from '../systems/registries/planetRow'
 import { HAZARD_POCKETS_REGISTRY } from '../systems/registries/hazardPockets'
+import {
+  CONTACT_EFFECT_REGISTRY,
+  CONTACT_FACTOR_REGISTRY,
+} from '../systems/registries/contactEffects'
 import { PLANET_SKY_BAND_REGISTRY } from '../systems/registries/planetSkyBand'
 import { ITEM_DESCRIBER_REGISTRY } from '../systems/registries/itemDescriber'
 import { ITEM_HOOK_REGISTRY } from '../systems/registries/itemHooks'
@@ -213,6 +217,8 @@ export function registrarFor(sliceId: string): SliceRegistrar {
     planetSkyBand: (provider) => add(PLANET_SKY_BAND_REGISTRY, provider),
     planetRow: (provider) => add(PLANET_ROW_REGISTRY, provider),
     hazardPockets: (provider) => add(HAZARD_POCKETS_REGISTRY, provider),
+    contactEffect: (row) => addPrefixed(CONTACT_EFFECT_REGISTRY, sliceId, row),
+    contactFactor: (factor) => addPrefixed(CONTACT_FACTOR_REGISTRY, sliceId, factor),
     planetCardLine: (source) => addPrefixed(PLANET_CARD_LINE_REGISTRY, sliceId, source),
     boreGun: (provider) => add(BORE_GUN_REGISTRY, provider),
     boreLineListener: (listener) => add(BORE_LINE_LISTENER_REGISTRY, listener),
