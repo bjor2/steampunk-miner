@@ -1,6 +1,6 @@
 /**
- * The kit items a player owns as saved state (the `planet-kit.holdings` save section v1, ticket
- * 850): a player section, so it rides on the player through every planet, jump and save, and the
+ * The kit items a player owns as saved state (the `planet-kit.holdings` save section, ticket 850;
+ * v2 since ticket 881 adds the uncorked flask's `flaskUntilTick`, a whole tick): a player section, so it rides on the player through every planet, jump and save, and the
  * host answers each player's buys from it. At its initial value (nothing owned) it is out of the
  * state and the digest, so a run that never buys a kit item saves and digests as before, and an
  * older save restores with nothing owned. The portable form is the state's own shape: item ids,
@@ -22,9 +22,11 @@ import {
 } from './kitHoldings'
 import { isPlainMap, SNAKE_ID } from './planetKitRowShape'
 
+const HOLDINGS_FIELDS: readonly string[] = ['tools', 'stacks', 'flaskUntilTick']
+
 export const KIT_HOLDINGS_SECTION: SaveSection<KitHoldings> = {
   id: 'planet-kit.holdings',
-  version: 1,
+  version: 2,
   scope: 'player',
   initial: NO_KIT_HOLDINGS,
   problems: kitHoldingsProblems,
@@ -50,8 +52,11 @@ export function kitHoldingsProblems(body: unknown): string[] {
   return [
     ...toolsProblems(body.tools),
     ...stacksProblems(body.stacks),
+    ...(body.flaskUntilTick === undefined || isWholeTick(body.flaskUntilTick)
+      ? []
+      : ['kit holdings.flaskUntilTick must be a whole tick, or be left out']),
     ...Object.keys(body)
-      .filter((field) => field !== 'tools' && field !== 'stacks')
+      .filter((field) => !HOLDINGS_FIELDS.includes(field))
       .map((field) => `kit holdings.${field} is not a field`),
   ]
 }
@@ -91,6 +96,10 @@ function stackProblems(stack: unknown, where: string): string[] {
       .filter((field) => !['itemId', 'g', 'count'].includes(field))
       .map((field) => `${where}.${field} is not a field`),
   ]
+}
+
+function isWholeTick(value: unknown): boolean {
+  return Number.isSafeInteger(value) && (value as number) >= 0
 }
 
 function isStrictlySorted<T>(list: readonly T[], compare: (a: T, b: T) => number): boolean {

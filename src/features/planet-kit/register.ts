@@ -12,7 +12,7 @@
  * claiming its schedule row, the Buy on each merchant line, the carried crates' count with the
  * drop beside the gauges, and the crate the pacing bot carries under its kit policy. Ticket 881
  * makes the three hazard tools act by context: their trade-offs, their factors on their hazards'
- * contacts and the kernel's pre-cut hook that decides when each acts.
+ * contacts and the kernel's pre-cut hook that decides when each acts; and the Damp Flask's uncork.
  */
 import type { SliceDefinition } from '../../registries/sliceDefinition'
 import { planetKitDebugActions } from './debug'
@@ -23,6 +23,7 @@ import { PLANET_KIT_BOT_CRATES } from './systems/botCrates'
 import { CONTAINER_RULES } from './systems/containerRules'
 import { CONTAINERS_SECTION } from './systems/containerSection'
 import { KIT_BUY_RULES } from './systems/kitBuyRules'
+import { FLASK_FACTOR, FLASK_RULES } from './systems/flaskRules'
 import { KIT_HOLDINGS_SECTION } from './systems/kitHoldingsSection'
 import { KIT_TOOL_CONTEXTS, KIT_TOOL_FACTORS, KIT_TOOL_TRADE_OFFS } from './systems/kitToolRules'
 import { kitItemEntriesOf } from './systems/kitItemContent'
@@ -50,6 +51,9 @@ export const slice: SliceDefinition = {
     r.preCutContext(KIT_TOOL_CONTEXTS)
     KIT_TOOL_TRADE_OFFS.forEach((row) => r.toolTradeOff(row))
     KIT_TOOL_FACTORS.forEach((factor) => r.contactFactor(factor))
+    // The Damp Flask, uncorked on purpose: no firedamp drain while it is open (ticket 881).
+    r.commandRules(FLASK_RULES)
+    r.contactFactor(FLASK_FACTOR)
     // The crate the pacing bot carries under `kitPolicy.crates: 'drop_on_full'` (ticket 850).
     r.botCrates(PLANET_KIT_BOT_CRATES)
     r.eventProjections(PLANET_KIT_PROJECTIONS)

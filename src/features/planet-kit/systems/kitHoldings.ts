@@ -7,6 +7,10 @@
  * stay JSON. A use spends the stack of the lowest g first, the oldest-priced unit.
  *
  * Tools are kept in id order and stacks in item id then g order, so one holding has one shape.
+ *
+ * An uncorked flask (ticket 881, the TD's seam on #850) keeps its window as `flaskUntilTick`, the
+ * tick it closes at: saved state, not a timer, so it outlives a save and a load. Absent until the
+ * first uncork.
  */
 import { readIndexText, toIndexText } from '../../../systems/starMap/planetAddress'
 
@@ -22,6 +26,8 @@ export interface KitHoldings {
   /** The tool item ids owned, in id order. */
   tools: readonly string[]
   stacks: readonly KitStack[]
+  /** The tick the last uncorked flask closes at; absent before the first uncork. */
+  flaskUntilTick?: number
 }
 
 /** What a use took: the holdings left and the g the spent unit was bought at. */
@@ -97,6 +103,16 @@ export function kitBuyRefusalOf(
 ): KitBuyRefusal | null {
   if (item.stackLimit === null) return ownsKitTool(holdings, item.id) ? 'kit_tool_owned' : null
   return heldCountOf(holdings, item.id) >= BigInt(item.stackLimit) ? 'stack_full' : null
+}
+
+/** Whether an uncorked flask is still open at `tick`. */
+export function isFlaskOpenAt(holdings: KitHoldings, tick: number): boolean {
+  return holdings.flaskUntilTick !== undefined && tick < holdings.flaskUntilTick
+}
+
+/** The holdings with a flask open until `untilTick`. */
+export function withFlaskOpenUntil(holdings: KitHoldings, untilTick: number): KitHoldings {
+  return { ...holdings, flaskUntilTick: untilTick }
 }
 
 /** Item id order, then ascending g. */
